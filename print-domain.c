@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.63 2001-01-01 04:22:56 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.64 2001-01-02 23:24:51 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -239,7 +239,7 @@ static const u_char *
 ns_nprint(register const u_char *cp, register const u_char *bp)
 {
 	register u_int i, l;
-	register const u_char *rp;
+	register const u_char *rp = NULL;
 	register int compress = 0;
 	int chars_processed;
 	int elt;
@@ -552,7 +552,7 @@ ns_print(register const u_char *bp, u_int length)
 {
 	register const HEADER *np;
 	register int qdcount, ancount, nscount, arcount;
-	register const u_char *cp;
+	register const u_char *cp = NULL;
 
 	np = (const HEADER *)bp;
 	/* get the byte-order right */
