@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.68 2003-06-17 13:12:59 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.69 2003-07-01 08:33:43 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -1151,7 +1151,6 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                     case BGP_EXT_COM_LINKBAND:
 		        bw.i = EXTRACT_32BITS(tptr+2);
                         printf(": bandwidth: %.3f Mbps",
-                               extd_comm,
                                bw.f*8/1000000);
                         break;
                     case BGP_EXT_COM_VPN_ORIGIN:
