@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.11 2000-05-15 06:22:16 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.12 2000-05-15 06:27:02 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -686,12 +686,21 @@ icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
 				printf(", \"");
 				while (cp < ep) {
 					i = *cp++;
-					while (i-- && cp < ep) {
-						safeputc(*cp);
-						cp++;
-					}
-					if (cp + 1 < ep && *cp)
+					if (i) {
+						if (i > ep - cp) {
+							printf("???");
+							break;
+						}
+						while (i-- && cp < ep) {
+							safeputc(*cp);
+							cp++;
+						}
+						if (cp + 1 < ep && *cp)
+							printf(".");
+					} else {
+						/* terminating dot */
 						printf(".");
+					}
 				}
 				printf("\"");
 			}
@@ -781,16 +790,21 @@ icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
 				printf(", \"");
 				while (cp < ep) {
 					i = *cp++;
-					if (i > ep - cp) {
-						printf("???");
-						break;
-					}
-					while (i-- && cp < ep) {
-						safeputc(*cp);
-						cp++;
-					}
-					if (cp + 1 < ep && *cp)
+					if (i) {
+						if (i > ep - cp) {
+							printf("???");
+							break;
+						}
+						while (i-- && cp < ep) {
+							safeputc(*cp);
+							cp++;
+						}
+						if (cp + 1 < ep && *cp)
+							printf(".");
+					} else {
+						/* terminating dot */
 						printf(".");
+					}
 				}
 				printf("\"");
 			}
