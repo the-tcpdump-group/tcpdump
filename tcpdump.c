@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.241 2004-04-06 13:04:17 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.242 2004-04-07 08:14:10 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -68,6 +68,7 @@ extern int SIZE_BUF;
 #ifndef WIN32
 #include <pwd.h>
 #include <grp.h>
+#include <errno.h>
 #endif /* WIN32 */
 
 #include "netdissect.h"
@@ -320,7 +321,7 @@ droproot(const char *username, const char *chroot_dir)
 	struct passwd *pw = NULL;
 
 	if (chroot_dir && !username) {
-		fprintf(stderr, "Chroot without dropping root is insecure\n");
+		fprintf(stderr, "tcpdump: Chroot without dropping root is insecure\n");
 		exit(1);
 	}
 	
@@ -328,19 +329,24 @@ droproot(const char *username, const char *chroot_dir)
 	if (pw) {
 		if (chroot_dir) {
 			if (chroot(chroot_dir) != 0 || chdir ("/") != 0) {
-				fprintf(stderr, "Couldn't chroot/chdir to '%.64s'\n", chroot_dir);
+				fprintf(stderr, "tcpdump: Couldn't chroot/chdir to '%.64s': %s\n",
+				    chroot_dir, pcap_strerror(errno));
 				exit(1);
 			}
 		}
-		if (initgroups(pw->pw_name, pw->pw_gid) != 0 || setgid(pw->pw_gid) != 0 ||
-				 setuid(pw->pw_uid) != 0) {
-			fprintf(stderr, "Couldn't change to '%.32s' uid=%d gid=%d\n", username, 
-							pw->pw_uid, pw->pw_gid);
+		if (initgroups(pw->pw_name, pw->pw_gid) != 0 ||
+		    setgid(pw->pw_gid) != 0 || setuid(pw->pw_uid) != 0) {
+			fprintf(stderr, "tcpdump: Couldn't change to '%.32s' uid=%lu gid=%lu: %s\n",
+			    username, 
+			    (unsigned long)pw->pw_uid,
+			    (unsigned long)pw->pw_gid,
+			    pcap_strerror(errno));
 			exit(1);
 		}
 	}
 	else {
-		fprintf(stderr, "Couldn't find user '%.32s'\n", username);
+		fprintf(stderr, "tcpdump: Couldn't find user '%.32s'\n",
+		    username);
 		exit(1);
 	}
 }
