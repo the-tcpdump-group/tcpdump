@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.33 2004-12-28 09:16:09 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.34 2004-12-28 09:35:18 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -360,8 +360,8 @@ print_trans(const u_char *words, const u_char *data1, const u_char *buf, const u
 
     smb_fdata(words + 1, f1, SMBMIN(words + 1 + 2 * words[0], maxbuf));
 
-    TCHECK2(*data, 2);
-    bcc = EXTRACT_LE_16BITS(data);
+    TCHECK2(*data1, 2);
+    bcc = EXTRACT_LE_16BITS(data1);
     printf("smb_bcc=%u\n", bcc);
     smb_fdata(data1 + 2, f2, maxbuf - (paramlen + datalen));
 
