@@ -68,6 +68,7 @@ missing/resolv6.h
 missing/resolv_ext.h
 missing/sockstorage.h
 mkdep
+nameser.h
 netbios.h
 nfs.h
 nfsfh.h
