@@ -51,12 +51,13 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.6 2000-01-17 06:24:26 itojun Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.7 2000-05-28 04:23:14 itojun Exp $";
 #endif
 
 #include <sys/param.h>
 #include <sys/time.h>
 #include <sys/types.h>
+#include <ctype.h>
 
 #include <netinet/in.h>
 #include <netinet/in_systm.h>
@@ -78,10 +79,25 @@ static const char rcsid[] =
 #include "interface.h"
 #include "addrtoname.h"
 
-
 #ifndef TELCMD_FIRST
 # define TELCMD_FIRST SE
 #endif
+
+static void safeputs __P((const char *));
+
+#define safeputc(c) \
+    printf((((unsigned char)c) < 0x80 && isprint((c)) ? "%c" : "\\%03o"), \
+	((unsigned char)c) & 0xff)
+
+static void
+safeputs(s)
+	const char *s;
+{
+	while (*s) {
+		safeputc(*s);
+		s++;
+	}
+}
 
 void
 telnet_print(register const u_char *sp, u_int length)
@@ -174,11 +190,13 @@ telnet_print(register const u_char *sp, u_int length)
 			hex_print_with_offset(osp, i, off);
 			off += i;
 			if (i > 8)
-				printf("\n\t\t\t\t%s", tnet);
+				printf("\n\t\t\t\t");
 			else
-				printf("%*s\t%s", (8 - i) * 3, "", tnet);
+				printf("%*s\t", (8 - i) * 3, "");
+			safeputs(tnet);
 		} else {
-			printf("%s%s", (first) ? " [telnet " : ", ", tnet);
+			printf("%s", (first) ? " [telnet " : ", ");
+			safeputs(tnet);
 		}
 		first = 0;
 	}

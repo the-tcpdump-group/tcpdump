@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.14 2000-05-17 14:54:03 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.15 2000-05-28 04:23:14 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -578,7 +578,9 @@ mld6_print(register const u_char *bp)
 #endif
 
 #ifdef HAVE_STRUCT_ICMP6_NODEINFO
-#define safeputc(c)	printf((isprint((c)) ? "%c" : "\\%03o"), c)
+#define safeputc(c) \
+    printf((((unsigned char)c) < 0x80 && isprint((c)) ? "%c" : "\\%03o"), \
+	((unsigned char)c) & 0xff)
 
 static void
 dnsname_print(const u_char *cp, const u_char *ep)
