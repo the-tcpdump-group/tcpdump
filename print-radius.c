@@ -44,7 +44,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "$Id: print-radius.c,v 1.12 2002-06-11 17:08:55 itojun Exp $";
+    "$Id: print-radius.c,v 1.13 2002-07-03 16:27:12 fenner Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -526,7 +526,8 @@ print_attr_num(register u_char *data, u_int length, u_short attr_code )
          data_value = EXTRACT_32BITS(data);
       }
       if ( data_value <= (attr_type[attr_code].siz_subtypes - 1 +
-            attr_type[attr_code].first_subtype) )
+            attr_type[attr_code].first_subtype) &&
+	   data_value >= attr_type[attr_code].first_subtype )
          printf("{%s}",table[data_value]);
       else
          printf("{#%d}",data_value);
