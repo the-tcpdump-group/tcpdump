@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.94 2001-01-14 08:13:09 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.95 2001-01-14 21:04:45 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -551,9 +551,12 @@ for most of those protocols; the exceptions are \fIiso\fP and \fIsap\fP,
 for which it checks for an 802.3 frame and then checks the LLC header as
 it does for FDDI and Token Ring, \fIatalk\fP, where it checks both for
 the Appletalk etype in an Ethernet frame and for a SNAP-format packet as
-it does for FDDI and Token Ring, and \fIaarp\fP, where it checks for the
+it does for FDDI and Token Ring, \fIaarp\fP, where it checks for the
 Appletalk ARP etype in either an Ethernet frame or an 802.2 SNAP frame
-with an OUI of 0x000000.]
+with an OUI of 0x000000, and \fIipx\fP, where it checks for the IPX
+etype in an Ethernet frame, the IPX DSAP in the LLC header, and the old
+802.3 with no LLC header encapsulation of IPX, but not for the IPX etype
+in a SNAP frame.]
 .IP "\fBdecnet src \fIhost\fR"
 True if the DECNET source address is
 .IR host ,
@@ -566,7 +569,7 @@ True if the DECNET destination address is
 .IP "\fBdecnet host \fIhost\fR"
 True if either the DECNET source or destination address is
 .IR host .
-.IP "\fBip\fR, \fBip6\fR, \fBarp\fR, \fBrarp\fR, \fBatalk\fR, \fBaarp\fR, \fBdecnet\fR, \fBiso\fR, \fBstp\fR"
+.IP "\fBip\fR, \fBip6\fR, \fBarp\fR, \fBrarp\fR, \fBatalk\fR, \fBaarp\fR, \fBdecnet\fR, \fBiso\fR, \fBstp\fR, \fBipx\fR"
 Abbreviations for:
 .in +.5i
 .nf
@@ -574,7 +577,7 @@ Abbreviations for:
 .fi
 .in -.5i
 where \fIp\fR is one of the above protocols.
-.IP "\fBlat\fR, \fBmoprc\fR, \fBmopdl\fR, \fBipx\fR"
+.IP "\fBlat\fR, \fBmoprc\fR, \fBmopdl\fR"
 Abbreviations for:
 .in +.5i
 .nf
