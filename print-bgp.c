@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.59 2003-01-25 23:23:57 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.60 2003-02-10 16:59:30 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -319,22 +319,35 @@ static struct tok bgp_afi_values[] = {
 #define BGP_EXT_COM_RO_1        0x0103  /* Route Origin,Format IP address:AN(2bytes) */
 #define BGP_EXT_COM_LINKBAND    0x4004  /* Link Bandwidth,Format AS(2B):Bandwidth(4B) */
                                         /* rfc2547 bgp-mpls-vpns */
-#define BGP_EXT_COM_VPN_ORIGIN  0x0005  /* OSPF Domain ID / VPN of Origin  */
-                                        /* draft-rosen-vpns-ospf-bgp-mpls */
-#define BGP_EXT_COM_OSPF_RTYPE  0x8000  /* OSPF Route Type,Format Area(4B):RouteType(1B):Options(1B) */
-#define BGP_EXT_COM_OSPF_RID    0x8001  /* OSPF Router ID,Format RouterID(4B):Unused(2B) */
+
+#define BGP_EXT_COM_VPN_ORIGIN  0x0005  /* OSPF Domain ID / VPN of Origin  - draft-rosen-vpns-ospf-bgp-mpls */
+#define BGP_EXT_COM_VPN_ORIGIN2 0x0105  /* duplicate - keep for backwards compatability */
+#define BGP_EXT_COM_VPN_ORIGIN3 0x0205  /* duplicate - keep for backwards compatability */
+#define BGP_EXT_COM_VPN_ORIGIN4 0x8005  /* duplicate - keep for backwards compatability */
+
+#define BGP_EXT_COM_OSPF_RTYPE  0x0306  /* OSPF Route Type,Format Area(4B):RouteType(1B):Options(1B) */
+#define BGP_EXT_COM_OSPF_RTYPE2 0x8000  /* duplicate - keep for backwards compatability */
+
+#define BGP_EXT_COM_OSPF_RID    0x0107  /* OSPF Router ID,Format RouterID(4B):Unused(2B) */
+#define BGP_EXT_COM_OSPF_RID2   0x8001  /* duplicate - keep for backwards compatability */ 
+
 #define BGP_EXT_COM_L2INFO      0x800a  /* draft-kompella-ppvpn-l2vpn */
 
 static struct tok bgp_extd_comm_subtype_values[] = {
-    { BGP_EXT_COM_RT_0,       "target"},
-    { BGP_EXT_COM_RT_1,       "target"},
-    { BGP_EXT_COM_RO_0,       "origin"},
-    { BGP_EXT_COM_RO_1,       "origin"},
-    { BGP_EXT_COM_LINKBAND,   "link-BW"},
-    { BGP_EXT_COM_VPN_ORIGIN, "ospf-domain"},
-    { BGP_EXT_COM_OSPF_RTYPE, "ospf-route-type"},
-    { BGP_EXT_COM_OSPF_RID,   "ospf-router-id"},
-    { BGP_EXT_COM_L2INFO,     "layer2-info"}, 
+    { BGP_EXT_COM_RT_0,        "target"},
+    { BGP_EXT_COM_RT_1,        "target"},
+    { BGP_EXT_COM_RO_0,        "origin"},
+    { BGP_EXT_COM_RO_1,        "origin"},
+    { BGP_EXT_COM_LINKBAND,    "link-BW"},
+    { BGP_EXT_COM_VPN_ORIGIN,  "ospf-domain"},
+    { BGP_EXT_COM_VPN_ORIGIN2, "ospf-domain"},
+    { BGP_EXT_COM_VPN_ORIGIN3, "ospf-domain"},
+    { BGP_EXT_COM_VPN_ORIGIN4, "ospf-domain"},
+    { BGP_EXT_COM_OSPF_RTYPE,  "ospf-route-type"},
+    { BGP_EXT_COM_OSPF_RTYPE2, "ospf-route-type"},
+    { BGP_EXT_COM_OSPF_RID,    "ospf-router-id"},
+    { BGP_EXT_COM_OSPF_RID2,   "ospf-router-id"},
+    { BGP_EXT_COM_L2INFO,      "layer2-info"}, 
     { 0, NULL},
 };
 
@@ -1078,66 +1091,77 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                     switch(extd_comm) {
                     case BGP_EXT_COM_RT_0:
                     case BGP_EXT_COM_RO_0:
-                        printf("\n\t    %s%s%s:%u:%s",
+                        printf("\n\t    %s%s%s(0x%04x):%u:%s",
                                (extd_comm&0x8000) ? "vendor-specific: " : "",
                                (extd_comm&0x4000) ? "non-transitive: " : "",
                                tok2str(bgp_extd_comm_subtype_values,
                                        "unknown",
                                        extd_comm),
+                               extd_comm,
                                EXTRACT_16BITS(tptr+2),
                                getname(tptr+4));
                         break;
                     case BGP_EXT_COM_RT_1:
                     case BGP_EXT_COM_RO_1:
-                        printf("\n\t    %s%s%s:%s:%u",
+                        printf("\n\t    %s%s%s(0x%04x):%s:%u",
                                (extd_comm&0x8000) ? "vendor-specific: " : "",
                                (extd_comm&0x4000) ? "non-transitive: " : "",
                                tok2str(bgp_extd_comm_subtype_values,
                                        "unknown",
                                        extd_comm),
+                               extd_comm,
                                getname(tptr+2),
                                EXTRACT_16BITS(tptr+6));
                         break;
                     case BGP_EXT_COM_LINKBAND:
                         memcpy (&bw, tptr+2, 4);
-                        printf("\n\t    %s%s%s:bandwidth: %.3f Mbps",
+                        printf("\n\t    %s%s%s(0x%04x):bandwidth: %.3f Mbps",
                                (extd_comm&0x8000) ? "vendor-specific: " : "",
                                (extd_comm&0x4000) ? "non-transitive: " : "",
                                tok2str(bgp_extd_comm_subtype_values,
                                        "unknown",
                                        extd_comm),
+                               extd_comm,
                                bw*8/1000000);
                         break;
                     case BGP_EXT_COM_VPN_ORIGIN:
+                    case BGP_EXT_COM_VPN_ORIGIN2:
+                    case BGP_EXT_COM_VPN_ORIGIN3:
+                    case BGP_EXT_COM_VPN_ORIGIN4:
                     case BGP_EXT_COM_OSPF_RID:
-                        printf("\n\t    %s%s%s:%s",
+                    case BGP_EXT_COM_OSPF_RID2:
+                        printf("\n\t    %s%s%s(0x%04x):%s",
                                (extd_comm&0x8000) ? "vendor-specific: " : "",
                                (extd_comm&0x4000) ? "non-transitive: " : "",
                                tok2str(bgp_extd_comm_subtype_values,
                                        "unknown",
                                        extd_comm),
+                               extd_comm,
                                getname(tptr+2));
                         break;
-                    case BGP_EXT_COM_OSPF_RTYPE: 
-                        printf("\n\t    %s%s%s, area:%s, router-type:%s, metric-type:%s%s",
+                    case BGP_EXT_COM_OSPF_RTYPE:
+                    case BGP_EXT_COM_OSPF_RTYPE2: 
+                        printf("\n\t    %s%s%s(0x%04x), area:%s, router-type:%s, metric-type:%s%s",
                                (extd_comm&0x8000) ? "vendor-specific: " : "",
                                (extd_comm&0x4000) ? "non-transitive: " : "",
                                tok2str(bgp_extd_comm_subtype_values,
                                        "unknown",
                                        extd_comm),
+                               extd_comm,
                                getname(tptr+2),
                                tok2str(bgp_extd_comm_ospf_rtype_values,
-                                       "unknown",
-                                       extd_comm),
+                                       "unknown (0x%02x)",
+                                       *(tptr+6)),
                                (*(tptr+7) &  BGP_OSPF_RTYPE_METRIC_TYPE) ? "E2" : "",
                                (*(tptr+6) == (BGP_OSPF_RTYPE_EXT ||BGP_OSPF_RTYPE_NSSA )) ? "E1" : "");
                         break;
                     case BGP_EXT_COM_L2INFO:
-                        printf("\n\t    %s%s:%s:Control Flags [0x%02x]:MTU %u",
+                        printf("\n\t    %s%s:%s(0x%04x):Control Flags [0x%02x]:MTU %u",
                                (extd_comm&0x4000) ? "non-transitive: " : "",
                                tok2str(bgp_extd_comm_subtype_values,
                                        "unknown",
                                        extd_comm),
+                               extd_comm,
                                tok2str(bgp_l2vpn_encaps_values,
                                        "unknown encaps",
                                        *(tptr+2)),
@@ -1145,7 +1169,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                                EXTRACT_16BITS(tptr+4));
                         break;
                     default:
-                        printf("\n\t      no typecode %u decoder",
+                        printf("\n\t    unknown extd community typecode (0x%04x)",
                                extd_comm);
                         print_unknown_data(tptr,"\n\t      ",8);
                         break;
