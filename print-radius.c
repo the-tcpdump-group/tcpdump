@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "$Id: print-radius.c,v 1.6 2001-03-19 03:58:11 guy Exp $";
+    "$Id: print-radius.c,v 1.7 2001-06-18 09:16:28 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -117,6 +117,7 @@ struct radius_hdr { u_int8_t  code; /* Radius packet code  */
                     u_int8_t  auth[16]; /* Authenticator   */
                   };
 
+#define MIN_RADIUS_LEN	20
 
 struct radius_attr { u_int8_t type; /* Attribute type   */
                      u_int8_t len;  /* Attribute length */
@@ -732,7 +733,7 @@ static void print_attr_strange(register u_char *data, u_int length, u_short attr
 
 
 static void
-radius_attr_print(register u_char *attr, u_int length)
+radius_attr_print(register const u_char *attr, u_int length)
 {
    register const struct radius_attr *rad_attr = (struct radius_attr *)attr;
    
@@ -745,6 +746,11 @@ radius_attr_print(register u_char *attr, u_int length)
    printf(" Attr[ ");
    while (length > 0)
    {
+     if (rad_attr->len == 0)
+     {
+     	printf("(zero-length attribute)");
+     	return;
+     }
      if ( rad_attr->len <= length )
      {
         if ( !rad_attr->type || (rad_attr->type > (TAM_SIZE(attr_type)-1))  )
@@ -780,17 +786,30 @@ radius_print(const u_char *dat, u_int length)
 {
    register const struct radius_hdr *rad;
    register int i;
+   int len;
    
-   i = min(length, snapend - dat) - sizeof(*rad);
+   i = min(length, snapend - dat);
 
-   if (i < 0) 
+   if (i < MIN_RADIUS_LEN)
    {
 	  printf(" [|radius]");
 	  return;
    }
 
    rad = (struct radius_hdr *)dat;
- 
+   len = ntohs(rad->len);
+
+   if (len < MIN_RADIUS_LEN)
+   {
+	  printf(" [|radius]");
+	  return;
+   }
+
+   if (len < i)
+	  i = len;
+   
+   i -= MIN_RADIUS_LEN;
+
    switch (rad->code) 
    {
      case RADCMD_ACCESS_REQ:
@@ -836,5 +855,5 @@ radius_print(const u_char *dat, u_int length)
    printf(" [id %d]", rad->id);
  
    if (i)
-      radius_attr_print( ((u_char *)(rad+1)), i);  
+      radius_attr_print( dat + MIN_RADIUS_LEN, i);  
 }
