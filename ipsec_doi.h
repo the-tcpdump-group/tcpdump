@@ -26,7 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-/* YIPS @(#)$Id: ipsec_doi.h,v 1.3 2000-10-03 05:16:38 itojun Exp $ */
+/* YIPS @(#)$Id: ipsec_doi.h,v 1.4 2000-10-04 03:00:29 itojun Exp $ */
 
 /* refer to RFC 2407 */
 
@@ -51,6 +51,9 @@
 #define   IPSECDOI_AH_MD5                              2
 #define   IPSECDOI_AH_SHA                              3
 #define   IPSECDOI_AH_DES                              4
+#define   IPSECDOI_AH_SHA2_256                         5
+#define   IPSECDOI_AH_SHA2_384                         6
+#define   IPSECDOI_AH_SHA2_512                         7
 
 /* 4.4.1 IPSEC Security Protocol Identifiers */
 #define IPSECDOI_PROTO_IPSEC_ESP                     3
@@ -66,6 +69,8 @@
 #define   IPSECDOI_ESP_DES_IV32                        9
 #define   IPSECDOI_ESP_RC4                            10
 #define   IPSECDOI_ESP_NULL                           11
+#define   IPSECDOI_ESP_RIJNDAEL				12
+#define   IPSECDOI_ESP_AES				12
 
 /* 4.4.1 IPSEC Security Protocol Identifiers */
 #define IPSECDOI_PROTO_IPCOMP                        4
@@ -73,7 +78,6 @@
 #define   IPSECDOI_IPCOMP_OUI                          1
 #define   IPSECDOI_IPCOMP_DEFLATE                      2
 #define   IPSECDOI_IPCOMP_LZS                          3
-#define   IPSECDOI_IPCOMP_V42BIS                       4
 
 /* 4.5 IPSEC Security Association Attributes */
 #define IPSECDOI_ATTR_SA_LTYPE                1 /* B */
@@ -88,16 +92,17 @@
 #define   IPSECDOI_ATTR_ENC_MODE_TUNNEL         1
 #define   IPSECDOI_ATTR_ENC_MODE_TRNS           2
 #define IPSECDOI_ATTR_AUTH                    5 /* B */
+	/* 0 means not to use authentication. */
 #define   IPSECDOI_ATTR_AUTH_HMAC_MD5           1
 #define   IPSECDOI_ATTR_AUTH_HMAC_SHA1          2
 #define   IPSECDOI_ATTR_AUTH_DES_MAC            3
-#define   IPSECDOI_ATTR_AUTH_KPDK               4
+#define   IPSECDOI_ATTR_AUTH_KPDK               4 /*RFC-1826(Key/Pad/Data/Key)*/
 	/*
-	When negotiating ESP without authentication, the Auth
-	Algorithm attribute MUST NOT be included in the proposal.
-	When negotiating ESP without confidentiality, the Auth
-	Algorithm attribute MUST be included in the proposal and
-	the ESP transform ID must be ESP_NULL.
+	 * When negotiating ESP without authentication, the Auth
+	 * Algorithm attribute MUST NOT be included in the proposal.
+	 * When negotiating ESP without confidentiality, the Auth
+	 * Algorithm attribute MUST be included in the proposal and
+	 * the ESP transform ID must be ESP_NULL.
 	*/
 #define IPSECDOI_ATTR_KEY_LENGTH              6 /* B */
 #define IPSECDOI_ATTR_KEY_ROUNDS              7 /* B */
