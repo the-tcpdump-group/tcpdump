@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.10 2003-10-04 14:29:52 hannes Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.11 2003-10-22 17:08:46 hannes Exp $ (LBL) */
 /*
  * Copyright (c) 1991, 1993, 1994, 1995, 1996, 1997
  *	The Regents of the University of California.  All rights reserved.
@@ -255,8 +255,14 @@ struct ospfhdr {
 
 	/* Link State Request */
 	struct lsr {
-	    u_int32_t ls_type;
-	    struct in_addr ls_stateid;
+	    u_int8_t ls_type[4];
+            union {
+                struct in_addr ls_stateid;
+                struct { /* opaque LSAs change the LSA-ID field */
+                    u_int8_t opaque_type;
+                    u_int8_t opaque_id[3];
+                } opaque_field;
+            } un_ls_stateid;
 	    struct in_addr ls_router;
 	} un_lsr[1];		/* may repeat	*/
 

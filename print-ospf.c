@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.43 2003-10-22 16:29:18 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.44 2003-10-22 17:08:45 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -629,14 +629,30 @@ ospf_decode_v2(register const struct ospfhdr *op,
 	case OSPF_TYPE_LS_REQ:
                 lsrp = op->ospf_lsr;
                 while ((u_char *)lsrp < dataend) {
-                        TCHECK(*lsrp);
+                    TCHECK(*lsrp);
 
-                        printf("\n\t  %s LSA (%d), LSA-ID: %s, Advertising Router: %s",
-                               tok2str(lsa_values,"unknown",lsrp->ls_type),
-                               lsrp->ls_type,
-                               ipaddr_string(&lsrp->ls_stateid),
-                               ipaddr_string(&lsrp->ls_router));
-                        ++lsrp;
+                    printf("\n\t  Advertising Router: %s, %s LSA (%u)",
+                           ipaddr_string(&lsrp->ls_router),
+                           tok2str(lsa_values,"unknown",EXTRACT_32BITS(lsrp->ls_type)),
+                           EXTRACT_32BITS(&lsrp->ls_type));
+
+                    switch (EXTRACT_32BITS(lsrp->ls_type)) {
+                        /* the LSA header for opaque LSAs was slightly changed */
+                    case LS_TYPE_OPAQUE_LL:
+                    case LS_TYPE_OPAQUE_AL:
+                    case LS_TYPE_OPAQUE_DW:
+                        printf(", Opaque-Type: %s LSA (%u), Opaque-ID: %u",
+                               tok2str(lsa_opaque_values, "unknown",lsrp->un_ls_stateid.opaque_field.opaque_type),
+                               lsrp->un_ls_stateid.opaque_field.opaque_type,
+                               EXTRACT_24BITS(&lsrp->un_ls_stateid.opaque_field.opaque_id));
+                        break;
+                    default:
+                        printf(", LSA-ID: %s",
+                               ipaddr_string(&lsrp->un_ls_stateid.ls_stateid));
+                        break;
+                    }
+                    
+                    ++lsrp;
                 }
 		break;
 
