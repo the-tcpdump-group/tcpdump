@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.135 2000-09-18 05:11:43 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.136 2000-09-23 08:03:30 guy Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -131,30 +131,8 @@ extern int packettype;		/* as specified by -T */
 #define LITTLE_ENDIAN 1234
 #endif
 
-#ifdef ETHER_HEADER_HAS_EA
-#define ESRC(ep) ((ep)->ether_shost.ether_addr_octet)
-#define EDST(ep) ((ep)->ether_dhost.ether_addr_octet)
-#else
 #define ESRC(ep) ((ep)->ether_shost)
 #define EDST(ep) ((ep)->ether_dhost)
-#endif
-
-#ifdef ETHER_ARP_HAS_X
-#define SHA(ap) ((ap)->arp_xsha)
-#define THA(ap) ((ap)->arp_xtha)
-#define SPA(ap) ((ap)->arp_xspa)
-#define TPA(ap) ((ap)->arp_xtpa)
-#else
-#ifdef ETHER_ARP_HAS_EA
-#define SHA(ap) ((ap)->arp_sha.ether_addr_octet)
-#define THA(ap) ((ap)->arp_tha.ether_addr_octet)
-#else
-#define SHA(ap) ((ap)->arp_sha)
-#define THA(ap) ((ap)->arp_tha)
-#endif
-#define SPA(ap) ((ap)->arp_spa)
-#define TPA(ap) ((ap)->arp_tpa)
-#endif
 
 #ifndef NTOHL
 #define NTOHL(x)	(x) = ntohl(x)

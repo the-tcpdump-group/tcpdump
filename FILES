@@ -21,6 +21,7 @@ configure.in
 decnet.h
 dhcp6.h
 dhcp6opt.h
+ether.h
 ethertype.h
 extract.h
 fddi.h

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.6 2000-08-18 07:44:47 itojun Exp $ (LBL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.7 2000-09-23 08:03:40 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -37,7 +37,6 @@ struct rtentry;
 #include <net/if.h>
 
 #include <netinet/in.h>
-#include <netinet/if_ether.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -46,6 +45,7 @@ struct rtentry;
 #include "addrtoname.h"
 #include "ppp.h"
 #include "ethertype.h"
+#include "ether.h"
 #include "extract.h"			/* must come after interface.h */
 
 /* Codes */

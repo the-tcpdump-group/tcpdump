@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.120 2000-07-11 00:48:16 assar Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.121 2000-09-23 08:03:29 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.120 $)
+AC_REVISION($Revision: 1.121 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -552,80 +552,6 @@ AC_LBL_CHECK_TYPE(u_int32_t, u_int)
 AC_LBL_DEVEL(V_CCOPT)
 
 AC_LBL_SOCKADDR_SA_LEN
-
-AC_MSG_CHECKING(if ether_header uses ether_addr structs)
-AC_CACHE_VAL(ac_cv_ether_header_has_ea,
-    LBL_SAVE_CFLAGS="$CFLAGS"
-    CFLAGS="$CFLAGS $V_INCLS"
-    AC_TRY_COMPILE([
-#	include <sys/types.h>
-#	if __STDC__
-	/* osf3 has REALLY good prototyes */
-	struct mbuf;
-	struct rtentry;
-#	endif
-#	include <sys/socket.h>
-#	include <net/if.h>
-#	include <netinet/in.h>
-#	include <netinet/if_ether.h>],
-	[u_int i =
-	    sizeof(((struct ether_header *)0)->ether_dhost.ether_addr_octet)],
-	ac_cv_ether_header_has_ea=yes,
-	ac_cv_ether_header_has_ea=no)
-    CFLAGS="$LBL_SAVE_CFLAGS")
-AC_MSG_RESULT($ac_cv_ether_header_has_ea)
-if test $ac_cv_ether_header_has_ea = yes ; then
-	AC_DEFINE(ETHER_HEADER_HAS_EA)
-fi
-
-AC_MSG_CHECKING(if ether_arp uses ether_addr structs)
-AC_CACHE_VAL(ac_cv_ether_arp_has_ea,
-    LBL_SAVE_CFLAGS="$CFLAGS"
-    CFLAGS="$CFLAGS $V_INCLS"
-    AC_TRY_COMPILE([
-#	include <sys/types.h>
-#	if __STDC__
-	/* osf3 has REALLY good prototyes */
-	struct mbuf;
-	struct rtentry;
-#	endif
-#	include <sys/socket.h>
-#	include <net/if.h>
-#	include <netinet/in.h>
-#	include <netinet/if_ether.h>],
-	[u_int i =
-	    sizeof(((struct ether_arp *)0)->arp_sha.ether_addr_octet)],
-	ac_cv_ether_arp_has_ea=yes,
-	ac_cv_ether_arp_has_ea=no)
-    CFLAGS="$LBL_SAVE_CFLAGS")
-AC_MSG_RESULT($ac_cv_ether_arp_has_ea)
-if test $ac_cv_ether_arp_has_ea = yes ; then
-	AC_DEFINE(ETHER_ARP_HAS_EA)
-fi
-
-AC_MSG_CHECKING(if ether_arp uses erp_xsha member)
-AC_CACHE_VAL(ac_cv_struct_ether_arp_x,
-    LBL_SAVE_CFLAGS="$CFLAGS"
-    CFLAGS="$CFLAGS $V_INCLS"
-    AC_TRY_COMPILE([
-#	include <sys/types.h>
-#	include <sys/socket.h>
-#	if __STDC__
-	/* osf3 has REALLY good prototyes */
-	struct mbuf;
-	struct rtentry;
-#	endif
-#	include <net/if.h>
-#	include <netinet/in.h>
-#	include <netinet/if_ether.h>],
-	[u_int i = sizeof( ((struct ether_arp *)0)->arp_xsha)],
-	ac_cv_struct_ether_arp_x=yes,
-	ac_cv_struct_ether_arp_x=no)
-    CFLAGS="$LBL_SAVE_CFLAGS")
-AC_MSG_RESULT($ac_cv_struct_ether_arp_x)
-if test $ac_cv_struct_ether_arp_x = yes ; then
-	AC_DEFINE(ETHER_ARP_HAS_X)
-fi
 
 AC_LBL_UNALIGNED_ACCESS
 

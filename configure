@@ -4350,148 +4350,8 @@ EOF
 
     fi
 
-echo $ac_n "checking if ether_header uses ether_addr structs""... $ac_c" 1>&6
-echo "configure:4355: checking if ether_header uses ether_addr structs" >&5
-if eval "test \"`echo '$''{'ac_cv_ether_header_has_ea'+set}'`\" = set"; then
-  echo $ac_n "(cached) $ac_c" 1>&6
-else
-  LBL_SAVE_CFLAGS="$CFLAGS"
-    CFLAGS="$CFLAGS $V_INCLS"
-    cat > conftest.$ac_ext <<EOF
-#line 4362 "configure"
-#include "confdefs.h"
-
-#	include <sys/types.h>
-#	if __STDC__
-	/* osf3 has REALLY good prototyes */
-	struct mbuf;
-	struct rtentry;
-#	endif
-#	include <sys/socket.h>
-#	include <net/if.h>
-#	include <netinet/in.h>
-#	include <netinet/if_ether.h>
-int main() {
-u_int i =
-	    sizeof(((struct ether_header *)0)->ether_dhost.ether_addr_octet)
-; return 0; }
-EOF
-if { (eval echo configure:4380: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
-  rm -rf conftest*
-  ac_cv_ether_header_has_ea=yes
-else
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
-  rm -rf conftest*
-  ac_cv_ether_header_has_ea=no
-fi
-rm -f conftest*
-    CFLAGS="$LBL_SAVE_CFLAGS"
-fi
-
-echo "$ac_t""$ac_cv_ether_header_has_ea" 1>&6
-if test $ac_cv_ether_header_has_ea = yes ; then
-	cat >> confdefs.h <<\EOF
-#define ETHER_HEADER_HAS_EA 1
-EOF
-
-fi
-
-echo $ac_n "checking if ether_arp uses ether_addr structs""... $ac_c" 1>&6
-echo "configure:4402: checking if ether_arp uses ether_addr structs" >&5
-if eval "test \"`echo '$''{'ac_cv_ether_arp_has_ea'+set}'`\" = set"; then
-  echo $ac_n "(cached) $ac_c" 1>&6
-else
-  LBL_SAVE_CFLAGS="$CFLAGS"
-    CFLAGS="$CFLAGS $V_INCLS"
-    cat > conftest.$ac_ext <<EOF
-#line 4409 "configure"
-#include "confdefs.h"
-
-#	include <sys/types.h>
-#	if __STDC__
-	/* osf3 has REALLY good prototyes */
-	struct mbuf;
-	struct rtentry;
-#	endif
-#	include <sys/socket.h>
-#	include <net/if.h>
-#	include <netinet/in.h>
-#	include <netinet/if_ether.h>
-int main() {
-u_int i =
-	    sizeof(((struct ether_arp *)0)->arp_sha.ether_addr_octet)
-; return 0; }
-EOF
-if { (eval echo configure:4427: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
-  rm -rf conftest*
-  ac_cv_ether_arp_has_ea=yes
-else
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
-  rm -rf conftest*
-  ac_cv_ether_arp_has_ea=no
-fi
-rm -f conftest*
-    CFLAGS="$LBL_SAVE_CFLAGS"
-fi
-
-echo "$ac_t""$ac_cv_ether_arp_has_ea" 1>&6
-if test $ac_cv_ether_arp_has_ea = yes ; then
-	cat >> confdefs.h <<\EOF
-#define ETHER_ARP_HAS_EA 1
-EOF
-
-fi
-
-echo $ac_n "checking if ether_arp uses erp_xsha member""... $ac_c" 1>&6
-echo "configure:4449: checking if ether_arp uses erp_xsha member" >&5
-if eval "test \"`echo '$''{'ac_cv_struct_ether_arp_x'+set}'`\" = set"; then
-  echo $ac_n "(cached) $ac_c" 1>&6
-else
-  LBL_SAVE_CFLAGS="$CFLAGS"
-    CFLAGS="$CFLAGS $V_INCLS"
-    cat > conftest.$ac_ext <<EOF
-#line 4456 "configure"
-#include "confdefs.h"
-
-#	include <sys/types.h>
-#	include <sys/socket.h>
-#	if __STDC__
-	/* osf3 has REALLY good prototyes */
-	struct mbuf;
-	struct rtentry;
-#	endif
-#	include <net/if.h>
-#	include <netinet/in.h>
-#	include <netinet/if_ether.h>
-int main() {
-u_int i = sizeof( ((struct ether_arp *)0)->arp_xsha)
-; return 0; }
-EOF
-if { (eval echo configure:4473: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
-  rm -rf conftest*
-  ac_cv_struct_ether_arp_x=yes
-else
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
-  rm -rf conftest*
-  ac_cv_struct_ether_arp_x=no
-fi
-rm -f conftest*
-    CFLAGS="$LBL_SAVE_CFLAGS"
-fi
-
-echo "$ac_t""$ac_cv_struct_ether_arp_x" 1>&6
-if test $ac_cv_struct_ether_arp_x = yes ; then
-	cat >> confdefs.h <<\EOF
-#define ETHER_ARP_HAS_X 1
-EOF
-
-fi
-
 echo $ac_n "checking if unaligned accesses fail""... $ac_c" 1>&6
-echo "configure:4495: checking if unaligned accesses fail" >&5
+echo "configure:4355: checking if unaligned accesses fail" >&5
     if eval "test \"`echo '$''{'ac_cv_lbl_unaligned_fail'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4556,12 +4416,12 @@ EOF
 
 
 	echo $ac_n "checking for h_errno""... $ac_c" 1>&6
-echo "configure:4560: checking for h_errno" >&5
+echo "configure:4420: checking for h_errno" >&5
 	if eval "test \"`echo '$''{'ac_cv_var_h_errno'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 4565 "configure"
+#line 4425 "configure"
 #include "confdefs.h"
 
 #		include <sys/types.h>
@@ -4570,7 +4430,7 @@ int main() {
 int foo = h_errno;
 ; return 0; }
 EOF
-if { (eval echo configure:4574: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:4434: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   ac_cv_var_h_errno=yes
 else
@@ -4598,7 +4458,7 @@ if test "${with_crypto+set}" = set; then
 else
   
 echo $ac_n "checking for SSLeay""... $ac_c" 1>&6
-echo "configure:4602: checking for SSLeay" >&5
+echo "configure:4462: checking for SSLeay" >&5
 ac_cv_ssleay_path=no
 incdir=no
 for dir in /usr /usr/local /usr/local/ssl /usr/pkg; do
@@ -4630,7 +4490,7 @@ if test "$ac_cv_ssleay_path" != no; then
 		LIBS="$LIBS -lrsaref"
 	fi
 	echo $ac_n "checking for des_cbc_encrypt in -lcrypto""... $ac_c" 1>&6
-echo "configure:4634: checking for des_cbc_encrypt in -lcrypto" >&5
+echo "configure:4494: checking for des_cbc_encrypt in -lcrypto" >&5
 ac_lib_var=`echo crypto'_'des_cbc_encrypt | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -4638,7 +4498,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lcrypto  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 4642 "configure"
+#line 4502 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -4649,7 +4509,7 @@ int main() {
 des_cbc_encrypt()
 ; return 0; }
 EOF
-if { (eval echo configure:4653: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:4513: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -4683,17 +4543,17 @@ fi
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:4687: checking for $ac_hdr" >&5
+echo "configure:4547: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 4692 "configure"
+#line 4552 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:4697: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:4557: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -4722,12 +4582,12 @@ done
 
 	if test "$ac_cv_header_cast_h" = "yes"; then
 		echo $ac_n "checking for buggy CAST128""... $ac_c" 1>&6
-echo "configure:4726: checking for buggy CAST128" >&5
+echo "configure:4586: checking for buggy CAST128" >&5
 		if test "$cross_compiling" = yes; then
   buggy_cast128="cross-compiling, assume yes"
 else
   cat > conftest.$ac_ext <<EOF
-#line 4731 "configure"
+#line 4591 "configure"
 #include "confdefs.h"
 
 #include <cast.h>
@@ -4746,7 +4606,7 @@ main()
 		return 1;
 }
 EOF
-if { (eval echo configure:4750: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:4610: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
 then
   buggy_cast128=yes
 else
@@ -4793,7 +4653,7 @@ fi
 # SVR4 /usr/ucb/install, which tries to use the nonexistent group "staff"
 # ./install, which can be erroneously created by make from ./install.sh.
 echo $ac_n "checking for a BSD compatible install""... $ac_c" 1>&6
-echo "configure:4797: checking for a BSD compatible install" >&5
+echo "configure:4657: checking for a BSD compatible install" >&5
 if test -z "$INSTALL"; then
 if eval "test \"`echo '$''{'ac_cv_path_install'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6

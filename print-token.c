@@ -25,7 +25,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-token.c,v 1.2 2000-07-30 05:55:44 assar Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-token.c,v 1.3 2000-09-23 08:03:41 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -41,7 +41,6 @@ struct rtentry;
 #include <net/if.h>
 
 #include <netinet/in.h>
-#include <netinet/if_ether.h>
 #include <netinet/in_systm.h>
 #include <netinet/ip.h>
 
@@ -52,6 +51,7 @@ struct rtentry;
 #include "addrtoname.h"
 #include "ethertype.h"
 
+#include "ether.h"
 #include "token.h"
 
 /* Extract src, dst addresses */

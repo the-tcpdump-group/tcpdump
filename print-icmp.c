@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.48 2000-07-01 03:39:03 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.49 2000-09-23 08:03:35 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -37,7 +37,6 @@ struct rtentry;
 #include <net/if.h>
 
 #include <netinet/in.h>
-#include <netinet/if_ether.h>
 #include <netinet/in_systm.h>
 #include <netinet/ip.h>
 #include <netinet/ip_icmp.h>

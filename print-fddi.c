@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-fddi.c,v 1.41 2000-07-01 03:39:02 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-fddi.c,v 1.42 2000-09-23 08:03:35 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -39,7 +39,6 @@ struct rtentry;
 #include <net/if.h>
 
 #include <netinet/in.h>
-#include <netinet/if_ether.h>
 #include <netinet/in_systm.h>
 #include <netinet/ip.h>
 
@@ -53,6 +52,7 @@ struct rtentry;
 #include "addrtoname.h"
 #include "ethertype.h"
 
+#include "ether.h"
 #include "fddi.h"
 
 /*

@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.54 2000-04-02 23:50:48 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.55 2000-09-23 08:03:31 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -44,7 +44,6 @@ struct rtentry;
 #include <netinet/in_systm.h>
 #include <netinet/ip.h>
 #include <netinet/ip_var.h>
-#include <netinet/if_ether.h>
 #include <netinet/udp.h>
 #include <netinet/udp_var.h>
 #include <netinet/tcp.h>

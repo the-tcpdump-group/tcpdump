@@ -36,11 +36,6 @@
  */
 #undef ETHER_HEADER_HAS_EA
 
-/*
- * define if struct ether_arp.arp_sha is a struct with ether_addr_octet
- */
-#undef ETHER_ARP_HAS_EA
-
 /* define if struct ether_arp contains arp_xsha */
 #undef ETHER_ARP_HAS_X
 
