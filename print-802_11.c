@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.13 2002-12-12 07:28:35 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.14 2002-12-12 07:39:19 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -749,6 +749,11 @@ ieee802_11_print(const u_char *p, u_int length, u_int caplen)
 	u_int HEADER_LENGTH;
 	u_short extracted_ethertype;
 
+	if (caplen < IEEE802_11_FC_LEN) {
+		printf("[|802.11]");
+		return;
+	}
+
 	fc = EXTRACT_LE_16BITS(p);
 	HEADER_LENGTH = GetHeaderLength(fc);
 
@@ -839,14 +844,8 @@ ieee802_11_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char 
 	++infodelay;
 	ts_print(&h->ts);
 
-	if (caplen < IEEE802_11_FC_LEN) {
-		printf("[|802.11]");
-		goto out;
-	}
-
 	ieee802_11_print(p, length, caplen);
 
-out:
 	putchar('\n');
 	--infodelay;
 	if (infoprint)
@@ -869,7 +868,7 @@ prism_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 	++infodelay;
 	ts_print(&h->ts);
 
-	if (caplen < PRISM_HDR_LEN + IEEE802_11_FC_LEN) {
+	if (caplen < PRISM_HDR_LEN) {
 		printf("[|802.11]");
 		goto out;
 	}
@@ -884,8 +883,6 @@ out:
 		info(0);
 }
 
-#define IEEE802_11_RADIO_HDR_LEN	146
-
 /*
  * For DLT_IEEE802_11_RADIO; like DLT_IEEE802_11, but with an extra
  * header, containing information such as radio information, which we
@@ -897,18 +894,34 @@ ieee802_11_radio_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;
+	u_int32_t caphdr_len;
 
 	++infodelay;
 	ts_print(&h->ts);
 
-	if (caplen < IEEE802_11_RADIO_HDR_LEN + IEEE802_11_FC_LEN) {
+	if (caplen < 8) {
 		printf("[|802.11]");
 		goto out;
 	}
 
-	ieee802_11_print(p + IEEE802_11_RADIO_HDR_LEN,
-	    length - IEEE802_11_RADIO_HDR_LEN,
-	    caplen - IEEE802_11_RADIO_HDR_LEN);
+	caphdr_len = EXTRACT_32BITS(p + 4);
+	if (caphdr_len < 8) {
+		/*
+		 * Yow!  The capture header length is claimed not
+		 * to be large enough to include even the version
+		 * cookie or capture header length!
+		 */
+		printf("[|802.11]");
+		goto out;
+	}
+
+	if (caplen < caphdr_len) {
+		printf("[|802.11]");
+		goto out;
+	}
+
+	ieee802_11_print(p + caphdr_len, length - caphdr_len,
+	    caplen - caphdr_len);
 
 out:
 	putchar('\n');
