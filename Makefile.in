@@ -17,7 +17,7 @@
 #  WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 #  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.272 2003-03-08 08:55:33 guy Exp $ (LBL)
+# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.273 2003-03-25 08:32:59 guy Exp $ (LBL)
 
 #
 # Various configurable paths (remember to edit Makefile.in, not Makefile)
@@ -143,6 +143,8 @@ strlcat.o: $(srcdir)/missing/strlcat.c
 	$(CC) $(CFLAGS) -o $@ -c $(srcdir)/missing/strlcat.c
 strlcpy.o: $(srcdir)/missing/strlcpy.c
 	$(CC) $(CFLAGS) -o $@ -c $(srcdir)/missing/strlcpy.c
+strsep.o: $(srcdir)/missing/strsep.c
+	$(CC) $(CFLAGS) -o $@ -c $(srcdir)/missing/strsep.c
 
 version.o: version.c
 	$(CC) $(CFLAGS) -c version.c
