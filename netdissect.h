@@ -21,7 +21,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.12 2004-11-07 22:05:20 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.13 2004-12-23 10:43:12 guy Exp $ (LBL)
  */
 
 #ifndef netdissect_h
@@ -137,8 +137,6 @@ struct netdissect_options {
   /* pointer to void function to output stuff */
   void (*ndo_default_print)(netdissect_options *,
   		      register const u_char *bp, register u_int length);
-  void (*ndo_default_print_unaligned)(netdissect_options *,
-		      register const u_char *bp, register u_int length);
   void (*ndo_info)(netdissect_options *, int verbose);
 
   int  (*ndo_printf)(netdissect_options *,
@@ -284,8 +282,6 @@ extern void cnfp_print(netdissect_options *,const u_char *cp,
 extern void decnet_print(netdissect_options *,const u_char *,
 			 u_int, u_int);
 extern void default_print(netdissect_options *,const u_char *, u_int);
-extern void default_print_unaligned(netdissect_options *,const u_char *,
-				    u_int);
 extern void dvmrp_print(netdissect_options *,const u_char *, u_int);
 extern void egp_print(netdissect_options *,const u_char *, u_int,
 		      const u_char *);

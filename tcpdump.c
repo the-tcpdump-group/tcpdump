@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.250 2004-11-07 22:05:20 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.251 2004-12-23 10:43:12 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -106,6 +106,7 @@ static void usage(void) __attribute__((noreturn));
 static void show_dlts_and_exit(pcap_t *pd) __attribute__((noreturn));
 
 static void print_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
+static void ndo_default_print(netdissect_options *, const u_char *, u_int);
 static void dump_packet_and_trunc(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void dump_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void droproot(const char *, const char *);
@@ -431,6 +432,7 @@ main(int argc, char **argv)
         gndo->ndo_Oflag=1;
 	gndo->ndo_Rflag=1;
 	gndo->ndo_dlt=-1;
+	gndo->ndo_default_print=ndo_default_print;
 	gndo->ndo_printf=tcpdump_printf;
 	gndo->ndo_error=ndo_error;
 	gndo->ndo_warning=ndo_warning;
@@ -1272,10 +1274,16 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 /*
  * By default, print the specified data out in hex.
  */
-void
-default_print(register const u_char *bp, register u_int length)
+static void
+ndo_default_print(netdissect_options *ndo _U_, const u_char *bp, u_int length)
 {
 	ascii_print("\n\t", bp, length); /* pass on lf and identation string */
+}
+
+void
+default_print(const u_char *bp, u_int length)
+{
+	ndo_default_print(gndo, bp, length);
 }
 
 #ifdef SIGINFO
