@@ -1,14 +1,14 @@
 #
 # Auto-regenerate configure script or Makefile when things change.
-# From autoconf-2.13.info .  Works best with GNU Make.
+# From autoconf.info .  Works best with GNU Make.
 #
 ${srcdir}/configure: configure.in
-	cd ${srcdir} && autoconf-2.13
+	cd ${srcdir} && autoconf
 
-# autoheader-2.13 might not change config.h.in, so touch a stamp file.
+# autoheader might not change config.h.in, so touch a stamp file.
 ${srcdir}/config.h.in: ${srcdir}/stamp-h.in
 ${srcdir}/stamp-h.in: configure.in acconfig.h
-	cd ${srcdir} && autoheader-2.13
+	cd ${srcdir} && autoheader
 	echo timestamp > ${srcdir}/stamp-h.in
 
 config.h: stamp-h
