@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) Andrew Tridgell 1995-1999
  *
  * This software may be distributed either under the terms of the
@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.14 2001-06-26 03:33:44 itojun Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.15 2001-06-26 04:16:27 itojun Exp $";
 #endif
 
 #include <stdio.h>
@@ -55,7 +55,7 @@ smbfind(int id, struct smbfns *list)
 {
     int sindex;
 
-    for (sindex = 0; list[sindex].name; sindex++) 
+    for (sindex = 0; list[sindex].name; sindex++)
 	if (list[sindex].id == id)
 	    return(&list[sindex]);
 
@@ -127,26 +127,26 @@ trans2_qfsinfo(const uchar *param, const uchar *data, ...)
 }
 
 struct smbfns trans2_fns[] = {
-    { 0, "TRANSACT2_OPEN", 0, 
+    { 0, "TRANSACT2_OPEN", 0,
 	{ "Flags2=[w]\nMode=[w]\nSearchAttrib=[A]\nAttrib=[A]\nTime=[T2]\nOFun=[w]\nSize=[D]\nRes=([w, w, w, w, w])\nPath=[S]",
-	  NULL, 
+	  NULL,
 	  "Handle=[d]\nAttrib=[A]\nTime=[T2]\nSize=[D]\nAccess=[w]\nType=[w]\nState=[w]\nAction=[w]\nInode=[W]\nOffErr=[d]\n|EALength=[d]\n",
-	  NULL, NULL }}, 
-    { 1, "TRANSACT2_FINDFIRST", 0, 
-	{ NULL, NULL, NULL, NULL, trans2_findfirst }}, 
-    { 2, "TRANSACT2_FINDNEXT", 0, DEFDESCRIPT }, 
-    { 3, "TRANSACT2_QFSINFO", 0, 
-	{ NULL, NULL, NULL, NULL, trans2_qfsinfo }}, 
-    { 4, "TRANSACT2_SETFSINFO", 0, DEFDESCRIPT }, 
-    { 5, "TRANSACT2_QPATHINFO", 0, DEFDESCRIPT }, 
-    { 6, "TRANSACT2_SETPATHINFO", 0, DEFDESCRIPT }, 
-    { 7, "TRANSACT2_QFILEINFO", 0, DEFDESCRIPT }, 
-    { 8, "TRANSACT2_SETFILEINFO", 0, DEFDESCRIPT }, 
-    { 9, "TRANSACT2_FSCTL", 0, DEFDESCRIPT }, 
-    { 10, "TRANSACT2_IOCTL", 0, DEFDESCRIPT }, 
-    { 11, "TRANSACT2_FINDNOTIFYFIRST", 0, DEFDESCRIPT }, 
-    { 12, "TRANSACT2_FINDNOTIFYNEXT", 0, DEFDESCRIPT }, 
-    { 13, "TRANSACT2_MKDIR", 0, DEFDESCRIPT }, 
+	  NULL, NULL }},
+    { 1, "TRANSACT2_FINDFIRST", 0,
+	{ NULL, NULL, NULL, NULL, trans2_findfirst }},
+    { 2, "TRANSACT2_FINDNEXT", 0, DEFDESCRIPT },
+    { 3, "TRANSACT2_QFSINFO", 0,
+	{ NULL, NULL, NULL, NULL, trans2_qfsinfo }},
+    { 4, "TRANSACT2_SETFSINFO", 0, DEFDESCRIPT },
+    { 5, "TRANSACT2_QPATHINFO", 0, DEFDESCRIPT },
+    { 6, "TRANSACT2_SETPATHINFO", 0, DEFDESCRIPT },
+    { 7, "TRANSACT2_QFILEINFO", 0, DEFDESCRIPT },
+    { 8, "TRANSACT2_SETFILEINFO", 0, DEFDESCRIPT },
+    { 9, "TRANSACT2_FSCTL", 0, DEFDESCRIPT },
+    { 10, "TRANSACT2_IOCTL", 0, DEFDESCRIPT },
+    { 11, "TRANSACT2_FINDNOTIFYFIRST", 0, DEFDESCRIPT },
+    { 12, "TRANSACT2_FINDNOTIFYNEXT", 0, DEFDESCRIPT },
+    { 13, "TRANSACT2_MKDIR", 0, DEFDESCRIPT },
     { -1, NULL, 0, DEFDESCRIPT }
 };
 
@@ -186,7 +186,7 @@ print_trans2(const uchar *words, const uchar *dat, ...)
 	    fdata(words + 1,
 		"Trans2Secondary\nTotParam=[d]\nTotData=[d]\nParamCnt=[d]\nParamOff=[d]\nParamDisp=[d]\nDataCnt=[d]\nDataOff=[d]\nDataDisp=[d]\nHandle=[d]\n",
 		maxbuf);
-	    return;	    
+	    return;
 	} else {
 	    fdata(words + 1,
 		"TotParam=[d]\nTotData=[d]\nMaxParam=[d]\nMaxData=[d]\nMaxSetup=[d]\nFlags=[w]\nTimeOut=[D]\nRes1=[w]\nParamCnt=[d]\nParamOff=[d]\nDataCnt=[d]\nDataOff=[d]\nSetupCnt=[d]\n",
@@ -212,7 +212,7 @@ print_trans2(const uchar *words, const uchar *dat, ...)
 	fn->descript.fn(param, data, pcnt, dcnt);
     else {
 	fdata(param, f1 ? f1 : (uchar *)"Paramaters=\n", param + pcnt);
-	fdata(data, f2 ? f2 : (uchar *)"Data=\n", data + dcnt);      
+	fdata(data, f2 ? f2 : (uchar *)"Data=\n", data + dcnt);
     }
 }
 
@@ -379,13 +379,13 @@ print_negprot(const uchar *words, const uchar *data, ...)
 	    f1 = "Coreplus/Lanman1/Lanman2 Protocol\nDialectIndex=[d]\nSecMode=[w]\nMaxXMit=[d]\nMaxMux=[d]\nMaxVcs=[d]\nBlkMode=[w]\nSessionKey=[W]\nServerTime=[T1]TimeZone=[d]\nRes=[W]\nCryptKey=";
     }
 
-    if (f1) 
+    if (f1)
 	fdata(words + 1, f1, MIN(words + 1 + CVAL(words, 0) * 2, maxbuf));
     else
 	print_data(words + 1, MIN(CVAL(words, 0) * 2,
 	    PTR_DIFF(maxbuf, words + 1)));
 
-    if (f2) 
+    if (f2)
 	fdata(data + 2, f2, MIN(data + 2 + SVAL(data, 0), maxbuf));
     else
 	print_data(data + 2, MIN(SVAL(data, 0), PTR_DIFF(maxbuf, data + 2)));
@@ -418,16 +418,16 @@ print_sesssetup(const uchar *words, const uchar *data, ...)
 	}
     }
 
-    if (f1) 
+    if (f1)
 	fdata(words + 1, f1, MIN(words + 1 + CVAL(words, 0) * 2, maxbuf));
     else
 	print_data(words + 1, MIN(CVAL(words, 0) * 2,
 	    PTR_DIFF(maxbuf, words + 1)));
 
-    if (f2) 
+    if (f2)
 	fdata(data + 2, f2, MIN(data + 2 + SVAL(data, 0), maxbuf));
     else
-	print_data(data + 2, MIN(SVAL(data, 0), PTR_DIFF(maxbuf, data+2))); 
+	print_data(data + 2, MIN(SVAL(data, 0), PTR_DIFF(maxbuf, data+2)));
 }
 
 
@@ -495,10 +495,10 @@ static struct smbfns smb_fns[] = {
 	{ "Handle=[d]\nTime=[T2]", NULL, NULL, NULL, NULL } },
 
     { SMBmkdir, "SMBmkdir", 0,
-	{ NULL, "Path=[Z]\n", NULL, NULL, NULL } }, 
+	{ NULL, "Path=[Z]\n", NULL, NULL, NULL } },
 
     { SMBrmdir, "SMBrmdir", 0,
-	{ NULL, "Path=[Z]\n", NULL, NULL, NULL } }, 
+	{ NULL, "Path=[Z]\n", NULL, NULL, NULL } },
 
     { SMBdskattr, "SMBdskattr", 0,
 	{ NULL, NULL,
@@ -655,7 +655,7 @@ static struct smbfns smb_fns[] = {
 
     { SMBsendstrt, "SMBsendstrt", 0,
 	{ NULL, "Source=[Z]\nDest=[Z]\n", "GroupID=[d]\n", NULL, NULL } },
-      
+
     { SMBsendend, "SMBsendend", 0,
 	{ "GroupID=[d]\n", NULL, NULL, NULL, NULL } },
 
@@ -669,7 +669,7 @@ static struct smbfns smb_fns[] = {
     { SMBcancelf, "SMBcancelf", 0, DEFDESCRIPT },
     { SMBgetmac, "SMBgetmac", 0, DEFDESCRIPT },
 
-    { SMBnegprot, "SMBnegprot", 0, 
+    { SMBnegprot, "SMBnegprot", 0,
 	{ NULL, NULL, NULL, NULL, print_negprot } },
 
     { SMBsesssetupX, "SMBsesssetupX", FLG_CHAIN,
@@ -794,7 +794,7 @@ print_smb(const uchar *buf, const uchar *maxbuf)
 	    words = data = NULL;
     }
 
-    printf("\n");  
+    printf("\n");
 }
 
 
@@ -823,9 +823,9 @@ nbt_tcp_print(const uchar *data, int length)
     printf("\n");
 
     switch (flags) {
-    case 1:    
+    case 1:
 	printf("flags=0x%x\n", flags);
-    case 0:    
+    case 0:
 	data = fdata(data, "NBT Session Packet\nFlags=[rw]\nLength=[rd]\n",
 	    data + 4);
 	if (data == NULL)
@@ -856,21 +856,21 @@ nbt_tcp_print(const uchar *data, int length)
 	    data = fdata(data, "NBT SessionReject\nFlags=[rW]\nReason=[B]\n",
 		maxbuf);
 	    switch (ecode) {
-	    case 0x80: 
-		printf("Not listening on called name\n"); 
+	    case 0x80:
+		printf("Not listening on called name\n");
 		break;
-	    case 0x81: 
-		printf("Not listening for calling name\n"); 
+	    case 0x81:
+		printf("Not listening for calling name\n");
 		break;
-	    case 0x82: 
-		printf("Called name not present\n"); 
+	    case 0x82:
+		printf("Called name not present\n");
 		break;
-	    case 0x83: 
-		printf("Called name present, but insufficient resources\n"); 
+	    case 0x83:
+		printf("Called name present, but insufficient resources\n");
 		break;
 	    default:
-		printf("Unspecified error 0x%X\n", ecode); 
-		break;	  
+		printf("Unspecified error 0x%X\n", ecode);
+		break;
 	    }
 	  }
 	    break;
@@ -894,137 +894,144 @@ nbt_tcp_print(const uchar *data, int length)
 void
 nbt_udp137_print(const uchar *data, int length)
 {
-  const uchar *maxbuf = data + length;
-  int name_trn_id = RSVAL(data,0);
-  int response = (CVAL(data,2)>>7);
-  int opcode = (CVAL(data,2) >> 3) & 0xF;
-  int nm_flags = ((CVAL(data,2) & 0x7) << 4) + (CVAL(data,3)>>4);
-  int rcode = CVAL(data,3) & 0xF;
-  int qdcount = RSVAL(data,4);
-  int ancount = RSVAL(data,6);
-  int nscount = RSVAL(data,8);
-  int arcount = RSVAL(data,10);
-  char *opcodestr;  
-  const char *p;
+    const uchar *maxbuf = data + length;
+    int name_trn_id = RSVAL(data, 0);
+    int response = (CVAL(data, 2) >> 7);
+    int opcode = (CVAL(data, 2) >> 3) & 0xF;
+    int nm_flags = ((CVAL(data, 2) & 0x7) << 4) + (CVAL(data, 3) >> 4);
+    int rcode = CVAL(data, 3) & 0xF;
+    int qdcount = RSVAL(data, 4);
+    int ancount = RSVAL(data, 6);
+    int nscount = RSVAL(data, 8);
+    int arcount = RSVAL(data, 10);
+    char *opcodestr;
+    const char *p;
+    int total, i;
 
-  startbuf = data;
+    startbuf = data;
 
-  if (maxbuf <= data) return;
+    if (maxbuf <= data)
+	return;
 
-  if (vflag > 1)
-    printf("\n>>> ");
+    if (vflag > 1)
+	printf("\n>>> ");
 
-  printf("NBT UDP PACKET(137): ");
+    printf("NBT UDP PACKET(137): ");
 
-  switch (opcode) {
-  case 0: opcodestr = "QUERY"; break;
-  case 5: opcodestr = "REGISTRATION"; break;
-  case 6: opcodestr = "RELEASE"; break;
-  case 7: opcodestr = "WACK"; break;
-  case 8: opcodestr = "REFRESH(8)"; break;
-  case 9: opcodestr = "REFRESH"; break;
-  default: opcodestr = "OPUNKNOWN"; break;
-  }
-  printf("%s", opcodestr);
-  if (response) {
-    if (rcode)
-      printf("; NEGATIVE");
+    switch (opcode) {
+    case 0: opcodestr = "QUERY"; break;
+    case 5: opcodestr = "REGISTRATION"; break;
+    case 6: opcodestr = "RELEASE"; break;
+    case 7: opcodestr = "WACK"; break;
+    case 8: opcodestr = "REFRESH(8)"; break;
+    case 9: opcodestr = "REFRESH"; break;
+    default: opcodestr = "OPUNKNOWN"; break;
+    }
+    printf("%s", opcodestr);
+    if (response) {
+	if (rcode)
+	    printf("; NEGATIVE");
+	else
+	    printf("; POSITIVE");
+    }
+
+    if (response)
+	printf("; RESPONSE");
     else
-      printf("; POSITIVE");
-  }
-    
-  if (response) 
-    printf("; RESPONSE");
-  else
-    printf("; REQUEST");
+	printf("; REQUEST");
 
-  if (nm_flags&1)
-    printf("; BROADCAST");
-  else
-    printf("; UNICAST");
-  
-  if (vflag < 2)
-    return;
+    if (nm_flags & 1)
+	printf("; BROADCAST");
+    else
+	printf("; UNICAST");
 
-  printf("\nTrnID=0x%X\nOpCode=%d\nNmFlags=0x%X\nRcode=%d\nQueryCount=%d\nAnswerCount=%d\nAuthorityCount=%d\nAddressRecCount=%d\n",
-	 name_trn_id,opcode,nm_flags,rcode,qdcount,ancount,nscount,arcount);
+    if (vflag < 2)
+	return;
 
-  p = data + 12;
+    printf("\nTrnID=0x%X\nOpCode=%d\nNmFlags=0x%X\nRcode=%d\nQueryCount=%d\nAnswerCount=%d\nAuthorityCount=%d\nAddressRecCount=%d\n",
+	name_trn_id, opcode, nm_flags, rcode, qdcount, ancount, nscount,
+	arcount);
 
-  {
-    int total = ancount+nscount+arcount;
-    int i;
+    p = data + 12;
 
-    if (qdcount>100 || total>100) {
-      printf("Corrupt packet??\n");
-      return;
+    total = ancount + nscount + arcount;
+
+    if (qdcount > 100 || total > 100) {
+	printf("Corrupt packet??\n");
+	return;
     }
 
     if (qdcount) {
-      printf("QuestionRecords:\n");
-      for (i=0;i<qdcount;i++)
-	p = fdata(p,"|Name=[n1]\nQuestionType=[rw]\nQuestionClass=[rw]\n#",maxbuf);
+	printf("QuestionRecords:\n");
+	for (i = 0; i < qdcount; i++)
+	    p = fdata(p,
+		"|Name=[n1]\nQuestionType=[rw]\nQuestionClass=[rw]\n#",
+		maxbuf);
 	if (p == NULL)
-	  goto out;
+	    goto out;
     }
 
     if (total) {
-      printf("\nResourceRecords:\n");
-      for (i=0;i<total;i++) {	  
-	int rdlen;
-	int restype;
-	p = fdata(p,"Name=[n1]\n#",maxbuf);
-	if (p == NULL)
-	  goto out;
-	restype = RSVAL(p,0);
-	p = fdata(p,"ResType=[rw]\nResClass=[rw]\nTTL=[rD]\n",p+8);
-	if (p == NULL)
-	  goto out;
-	rdlen = RSVAL(p,0);
-	printf("ResourceLength=%d\nResourceData=\n",rdlen);
-	p += 2;
-	if (rdlen == 6) {
-	  p = fdata(p,"AddrType=[rw]\nAddress=[b.b.b.b]\n",p+rdlen);
-	  if (p == NULL)
-	    goto out;
-	} else {
-	  if (restype == 0x21) {
-	    int numnames = CVAL(p,0);
-	    p = fdata(p,"NumNames=[B]\n",p+1);
-	    if (p == NULL)
-	      goto out;
-	    while (numnames--) {
-	      p = fdata(p,"Name=[n2]\t#",maxbuf);
-	      if (p[0] & 0x80) printf("<GROUP> ");
-	      switch (p[0] & 0x60) {
-	      case 0x00: printf("B "); break;
-	      case 0x20: printf("P "); break;
-	      case 0x40: printf("M "); break;
-	      case 0x60: printf("_ "); break;
-	      }
-	      if (p[0] & 0x10) printf("<DEREGISTERING> ");
-	      if (p[0] & 0x08) printf("<CONFLICT> ");
-	      if (p[0] & 0x04) printf("<ACTIVE> ");
-	      if (p[0] & 0x02) printf("<PERMANENT> ");
-	      printf("\n");
-	      p += 2;
-	    }
-	  } else {
-	    print_data(p, min(rdlen, length - ((const uchar *)p - data)));
-	    p += rdlen;
-	  }
-	}
-      }
-    }
-  }
+	printf("\nResourceRecords:\n");
+	for (i = 0; i < total; i++) {
+	    int rdlen;
+	    int restype;
 
-  if ((uchar*)p < maxbuf) {
-    fdata(p,"AdditionalData:\n",maxbuf);    
-  }      
-  
+	    p = fdata(p, "Name=[n1]\n#", maxbuf);
+	    if (p == NULL)
+		goto out;
+	    restype = RSVAL(p, 0);
+	    p = fdata(p, "ResType=[rw]\nResClass=[rw]\nTTL=[rD]\n", p + 8);
+	    if (p == NULL)
+		goto out;
+	    rdlen = RSVAL(p, 0);
+	    printf("ResourceLength=%d\nResourceData=\n", rdlen);
+	    p += 2;
+	    if (rdlen == 6) {
+		p = fdata(p, "AddrType=[rw]\nAddress=[b.b.b.b]\n", p + rdlen);
+		if (p == NULL)
+		    goto out;
+	    } else {
+		if (restype == 0x21) {
+		    int numnames = CVAL(p, 0);
+		    p = fdata(p, "NumNames=[B]\n", p + 1);
+		    if (p == NULL)
+			goto out;
+		    while (numnames--) {
+			p = fdata(p, "Name=[n2]\t#", maxbuf);
+			if (p[0] & 0x80)
+			    printf("<GROUP> ");
+			switch (p[0] & 0x60) {
+			case 0x00: printf("B "); break;
+			case 0x20: printf("P "); break;
+			case 0x40: printf("M "); break;
+			case 0x60: printf("_ "); break;
+			}
+			if (p[0] & 0x10)
+			    printf("<DEREGISTERING> ");
+			if (p[0] & 0x08)
+			    printf("<CONFLICT> ");
+			if (p[0] & 0x04)
+			    printf("<ACTIVE> ");
+			if (p[0] & 0x02)
+			    printf("<PERMANENT> ");
+			printf("\n");
+			p += 2;
+		    }
+		} else {
+		    print_data(p, min(rdlen, length - ((const uchar *)p - data)));
+		    p += rdlen;
+		}
+	    }
+	}
+    }
+
+    if ((uchar*)p < maxbuf)
+	fdata(p, "AdditionalData:\n", maxbuf);
+
 out:
-  printf("\n");
-  fflush(stdout);
+    printf("\n");
+    fflush(stdout);
 }
 
 
@@ -1034,138 +1041,141 @@ out:
  */
 void nbt_udp138_print(const uchar *data, int length)
 {
-  const uchar *maxbuf = data + length;
+    const uchar *maxbuf = data + length;
 
-  if (maxbuf > snapend) maxbuf = snapend;
-  if (maxbuf <= data) return;
-  startbuf = data;
+    if (maxbuf > snapend)
+	maxbuf = snapend;
+    if (maxbuf <= data)
+	return;
+    startbuf = data;
 
-  if (vflag < 2) {
-    printf("NBT UDP PACKET(138)");
-    return;
-  }
+    if (vflag < 2) {
+	printf("NBT UDP PACKET(138)");
+	return;
+    }
 
-  data = fdata(data,"\n>>> NBT UDP PACKET(138) Res=[rw] ID=[rw] IP=[b.b.b.b] Port=[rd] Length=[rd] Res2=[rw]\nSourceName=[n1]\nDestName=[n1]\n#",maxbuf);
+    data = fdata(data,
+	"\n>>> NBT UDP PACKET(138) Res=[rw] ID=[rw] IP=[b.b.b.b] Port=[rd] Length=[rd] Res2=[rw]\nSourceName=[n1]\nDestName=[n1]\n#",
+	maxbuf);
 
-  if (data != NULL)
-    print_smb(data,maxbuf);
-  
-  printf("\n");
-  fflush(stdout);
+    if (data != NULL)
+	print_smb(data, maxbuf);
+
+    printf("\n");
+    fflush(stdout);
 }
 
 
-
 /*
-   print netbeui frames 
+   print netbeui frames
 */
 void netbeui_print(u_short control, const uchar *data, int length)
 {
-  const uchar *maxbuf = data + length;
-  int len;
-  int command;
-  const uchar *data2;
-  int is_truncated = 0;
+    const uchar *maxbuf = data + length;
+    int len;
+    int command;
+    const uchar *data2;
+    int is_truncated = 0;
 
-  if (maxbuf > snapend)
+    if (maxbuf > snapend)
     maxbuf = snapend;
-  if (&data[7] >= maxbuf)
+    if (&data[7] >= maxbuf)
     goto out;
-  len = SVAL(data,0);
-  command = CVAL(data,4);
-  data2 = data + len;
-  if (data2 >= maxbuf) {
+    len = SVAL(data,0);
+    command = CVAL(data,4);
+    data2 = data + len;
+    if (data2 >= maxbuf) {
     data2 = maxbuf;
     is_truncated = 1;
-  }
+    }
 
-  startbuf = data;
+    startbuf = data;
 
-  if (vflag < 2) {
+    if (vflag < 2) {
     printf("NetBeui Packet");
     return;
-  }
+    }
 
-  printf("\n>>> NetBeui Packet\nType=0x%X ", control);
-  data = fdata(data,"Length=[d] Signature=[w] Command=[B]\n#",maxbuf);
-  if (data == NULL)
+    printf("\n>>> NetBeui Packet\nType=0x%X ", control);
+    data = fdata(data,"Length=[d] Signature=[w] Command=[B]\n#",maxbuf);
+    if (data == NULL)
     goto out;
 
-  switch (command) {
-  case 0xA: 
+    switch (command) {
+    case 0xA:
     data = fdata(data,"NameQuery:[P1]\nSessionNumber=[B]\nNameType=[B][P2]\nResponseCorrelator=[w]\nDestination=[n2]\nSource=[n2]\n",data2);
     break;
 
-  case 0x8:
+    case 0x8:
     data = fdata(data,"NetbiosDataGram:[P7]\nDestination=[n2]\nSource=[n2]\n",data2);
     break;
 
-  case 0xE:
+    case 0xE:
     data = fdata(data,"NameRecognise:\n[P1]\nData2=[w]\nTransmitCorrelator=[w]\nResponseCorelator=[w]\nDestination=[n2]\nSource=[n2]\n",data2);
     break;
 
-  case 0x19:
+    case 0x19:
     data = fdata(data,"SessionInitialise:\nData1=[B]\nData2=[w]\nTransmitCorrelator=[w]\nResponseCorelator=[w]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n",data2);
     break;
 
-  case 0x17:
+    case 0x17:
     data = fdata(data,"SessionConfirm:\nData1=[B]\nData2=[w]\nTransmitCorrelator=[w]\nResponseCorelator=[w]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n",data2);
     break;
 
-  case 0x16:
+    case 0x16:
     data = fdata(data,"NetbiosDataOnlyLast:\nFlags=[{|NO_ACK|PIGGYBACK_ACK_ALLOWED|PIGGYBACK_ACK_INCLUDED|}]\nResyncIndicator=[w][P2]\nResponseCorelator=[w]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n",data2);
     break;
 
-  case 0x14:
+    case 0x14:
     data = fdata(data,"NetbiosDataAck:\n[P3]TransmitCorrelator=[w][P2]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n",data2);
     break;
 
-  case 0x18:
+    case 0x18:
     data = fdata(data,"SessionEnd:\n[P1]Data2=[w][P4]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n",data2);
     break;
 
-  case 0x1f:
+    case 0x1f:
     data = fdata(data,"SessionAlive\n",data2);
     break;
 
-  default:
+    default:
     data = fdata(data,"Unknown Netbios Command ",data2);
     break;
-  }
-  if (data == NULL)
-    goto out;
-
-  if (is_truncated) {
-    /* data2 was past the end of the buffer */
-    goto out;
-  }
-
-  /* If there isn't enough data for "\377SMB", don't look for it. */
-  if (&data2[3] >= maxbuf)
-    goto out;
-
-  if (memcmp(data2,"\377SMB",4)==0) {
-    print_smb(data2,maxbuf);
-  } else {
-    int i;
-    for (i=0;i<128;i++) {
-      if (&data2[i+3] >= maxbuf)
-        break;
-      if (memcmp(&data2[i],"\377SMB",4)==0) {
-	printf("found SMB packet at %d\n", i);
-	print_smb(&data2[i],maxbuf);
-	break;
-      }
     }
-  }
+    if (data == NULL)
+    goto out;
+
+    if (is_truncated) {
+	/* data2 was past the end of the buffer */
+	goto out;
+    }
+
+    /* If there isn't enough data for "\377SMB", don't look for it. */
+    if (&data2[3] >= maxbuf)
+	goto out;
+
+    if (memcmp(data2, "\377SMB",4) == 0)
+	print_smb(data2, maxbuf);
+    else {
+	int i;
+	for (i = 0; i < 128; i++) {
+	    if (&data2[i + 3] >= maxbuf)
+		break;
+	    if (memcmp(&data2[i], "\377SMB", 4) == 0) {
+		printf("found SMB packet at %d\n", i);
+		print_smb(&data2[i], maxbuf);
+		break;
+	    }
+	}
+    }
 
 out:
-  printf("\n");
+    printf("\n");
 }
 
 
 /*
- * print IPX-Netbios frames 
+ * print IPX-Netbios frames
  */
 void ipx_netbios_print(const uchar *data, u_int length)
 {
