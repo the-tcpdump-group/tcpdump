@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.112 
+# From configure.in Revision: 1.113 
 
 
 
@@ -79,7 +79,7 @@ ac_help="$ac_help
   --enable-ipv6           enable ipv6 (with ipv4) support
   --disable-ipv6          disable ipv6 support"
 ac_help="$ac_help
-  --without-crypto           disable crypto support"
+  --without-crypto        disable crypto support"
 
 # Initialize some variables set by options.
 # The variables have the same names as the options, with
