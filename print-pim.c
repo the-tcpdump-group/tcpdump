@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.36 2002-12-11 07:14:06 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.37 2003-10-29 02:07:57 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -637,6 +637,26 @@ pimv2_print(register const u_char *bp, register u_int len)
 				(void)printf(" (bidir-capable)");
 				break;
 
+			case 24:	/* Address List */
+			case 65001:	/* Address List (old implementations) */
+				(void)printf(" (%saddr-list",
+					     otype == 65001 ? "old" : "");
+				if (vflag > 1) {
+					const u_char *ptr = &bp[4];
+					while (ptr < &bp[4 + olen]) {
+						int advance;
+
+						printf(" ");
+						advance = pimv2_addr_print(ptr, pimv2_unicast, 0);
+						if (advance < 0) {
+							printf("...");
+							break;
+						}
+						ptr += advance;
+					}
+				}
+				(void)printf(")");
+				break;
 			default:
 			unknown:
 				if (vflag)
