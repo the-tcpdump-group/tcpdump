@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.26 2004-10-12 21:02:00 hannes Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.27 2004-10-18 12:11:34 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -40,7 +40,7 @@ static const char rcsid[] _U_ =
 #include "nlpid.h"
 #include "extract.h"
 
-static void lmi_print(const u_char *, u_int);
+static void q933_print(const u_char *, u_int);
 static void frf15_print(const u_char *, u_int);
 
 /*
@@ -217,7 +217,7 @@ fr_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 		return caplen;
 	}
 
-	if (p[addr_len] != 0x03) {
+	if (p[addr_len] != 0x03 && dlci != 0) {
 
                 /* lets figure out if we have cisco style encapsulation: */
                 extracted_ethertype = EXTRACT_16BITS(p+addr_len);
@@ -286,8 +286,8 @@ fr_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 		}
 		break;
 
-	case NLPID_LMI:
-		lmi_print(p, length);
+        case NLPID_Q933:
+		q933_print(p, length);
 		break;
 
         case NLPID_MFR:
@@ -401,7 +401,7 @@ frf15_print (const u_char *p, u_int length) {
 #define MSG_TYPE_STATUS           0x7D
 #define MSG_TYPE_STATUS_ENQ       0x75
 
-struct tok fr_lmi_msg_values[] = {
+struct tok fr_q933_msg_values[] = {
     { MSG_TYPE_ESC_TO_NATIONAL, "ESC to National" },
     { MSG_TYPE_ALERT, "Alert" },
     { MSG_TYPE_CALL_PROCEEDING, "Call proceeding" },
@@ -430,7 +430,7 @@ struct tok fr_lmi_msg_values[] = {
 #define FR_LMI_CCITT_LINK_VERIFY_IE	0x53
 #define FR_LMI_CCITT_PVC_STATUS_IE	0x57
 
-struct tok fr_lmi_ie_values[] = {
+struct tok fr_q933_ie_values[] = {
     { FR_LMI_ANSI_REPORT_TYPE_IE, "ANSI Report Type" },
     { FR_LMI_ANSI_LINK_VERIFY_IE_91, "ANSI Link Verify" },
     { FR_LMI_ANSI_LINK_VERIFY_IE, "ANSI Link Verify" },
@@ -458,7 +458,7 @@ struct common_ie_header {
 };
 
 static void
-lmi_print(const u_char *p, u_int length)
+q933_print(const u_char *p, u_int length)
 {
 	const u_char *ptemp = p;
 	struct common_ie_header *ie_p;
@@ -467,7 +467,7 @@ lmi_print(const u_char *p, u_int length)
         u_int dlci;
 
 	if (length < 9) {	/* shortest: Q.933a LINK VERIFY */
-		printf("[|lmi]");
+		printf("[|q.933]");
 		return;
 	}
 
@@ -475,7 +475,7 @@ lmi_print(const u_char *p, u_int length)
 		is_ansi = 1;
     
         if (!eflag)
-            printf("Q.933 LMI, ");
+            printf("Q.933, ");
 
 	/* printing out header part */
 	printf(is_ansi ? "ANSI" : "CCITT ");
@@ -485,17 +485,17 @@ lmi_print(const u_char *p, u_int length)
 
         if (vflag)
             printf(", %s (0x%02x), length %u",
-                   tok2str(fr_lmi_msg_values,"unknown message",p[1]),
+                   tok2str(fr_q933_msg_values,"unknown message",p[1]),
                    p[1],
                    length);
         else
             printf(", %s",
-                   tok2str(fr_lmi_msg_values,"unknown message 0x%02x",p[1]));            
+                   tok2str(fr_q933_msg_values,"unknown message 0x%02x",p[1]));            
 
         olen = length; /* preserve the original length for non verbose mode */
 
 	if (length < (u_int)(2 - is_ansi)) {
-		printf("[|lmi]");
+		printf("[|q.933]");
 		return;
 	}
 	length -= 2 - is_ansi;
@@ -507,7 +507,7 @@ lmi_print(const u_char *p, u_int length)
 		if (length < sizeof(struct common_ie_header) ||
 		    length < sizeof(struct common_ie_header) + ie_p->ie_len) {
                     if (vflag) /* not bark if there is just a trailer */
-                        printf("\n[|lmi]");
+                        printf("\n[|q.933]");
                     else
                         printf(", length %u",olen);
                     return;
@@ -518,7 +518,7 @@ lmi_print(const u_char *p, u_int length)
                  * are also intereststing in non-verbose mode */
                 if (vflag)
                     printf("\n\t%s IE (%u), length %u: ",
-                           tok2str(fr_lmi_ie_values,"unknown",ie_p->ie_id),
+                           tok2str(fr_q933_ie_values,"unknown",ie_p->ie_id),
                            ie_p->ie_id,
                            ie_p->ie_len);
                     
