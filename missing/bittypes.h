@@ -71,7 +71,7 @@ typedef unsigned short u_int32_t;
 #if SIZEOF_LONG_LONG == 8
 typedef unsigned long long u_int64_t;
 #elif defined(_MSC_EXTENSIONS)
-typedef _int64 u_int64_t;
+typedef unsigned _int64 u_int64_t;
 #elif SIZEOF_INT == 8
 typedef unsigned int u_int64_t;
 #elif SIZEOF_LONG == 8
