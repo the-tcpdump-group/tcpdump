@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.66 2002-12-11 07:14:01 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.67 2002-12-11 22:29:21 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -48,12 +48,12 @@ static const char rcsid[] =
 static const char *get_rtpref(u_int);
 static const char *get_lifetime(u_int32_t);
 static void print_lladdr(const u_char *, size_t);
-void icmp6_opt_print(const u_char *, int);
-void mld6_print(const u_char *);
-static struct udphdr *get_upperlayer(u_char *, int *);
+static void icmp6_opt_print(const u_char *, int);
+static void mld6_print(const u_char *);
+static struct udphdr *get_upperlayer(u_char *, u_int *);
 static void dnsname_print(const u_char *, const u_char *);
-void icmp6_nodeinfo_print(int, const u_char *, const u_char *);
-void icmp6_rrenum_print(int, const u_char *, const u_char *);
+static void icmp6_nodeinfo_print(u_int, const u_char *, const u_char *);
+static void icmp6_rrenum_print(u_int, const u_char *, const u_char *);
 
 #ifndef abs
 #define abs(a)	((0 < (a)) ? (a) : -(a))
@@ -111,7 +111,7 @@ icmp6_print(const u_char *bp, const u_char *bp2)
 	int dport;
 	const u_char *ep;
 	char buf[256];
-	int icmp6len, prot;
+	u_int icmp6len, prot;
 
 	dp = (struct icmp6_hdr *)bp;
 	ip = (struct ip6_hdr *)bp2;
@@ -399,7 +399,7 @@ trunc:
 }
 
 static struct udphdr *
-get_upperlayer(u_char *bp, int *prot)
+get_upperlayer(u_char *bp, u_int *prot)
 {
 	const u_char *ep;
 	struct ip6_hdr *ip6 = (struct ip6_hdr *)bp;
@@ -407,12 +407,13 @@ get_upperlayer(u_char *bp, int *prot)
 	struct ip6_hbh *hbh;
 	struct ip6_frag *fragh;
 	struct ah *ah;
-	int nh, hlen;
+	u_int nh;
+	int hlen;
 
 	/* 'ep' points to the end of available data. */
 	ep = snapend;
 
-	if (TTEST(ip6->ip6_nxt) == 0)
+	if (!TTEST(ip6->ip6_nxt))
 		return NULL;
 
 	nh = ip6->ip6_nxt;
@@ -437,7 +438,7 @@ get_upperlayer(u_char *bp, int *prot)
 		case IPPROTO_DSTOPTS:
 		case IPPROTO_ROUTING:
 			hbh = (struct ip6_hbh *)bp;
-			if (TTEST(hbh->ip6h_len) == 0)
+			if (!TTEST(hbh->ip6h_len))
 				return(NULL);
 			nh = hbh->ip6h_nxt;
 			hlen = (hbh->ip6h_len + 1) << 3;
@@ -445,10 +446,10 @@ get_upperlayer(u_char *bp, int *prot)
 
 		case IPPROTO_FRAGMENT: /* this should be odd, but try anyway */
 			fragh = (struct ip6_frag *)bp;
-			if (TTEST(fragh->ip6f_offlg) == 0)
+			if (!TTEST(fragh->ip6f_offlg))
 				return(NULL);
 			/* fragments with non-zero offset are meaningless */
-			if ((fragh->ip6f_offlg & IP6F_OFF_MASK) != 0)
+			if ((EXTRACT_16BITS(&fragh->ip6f_offlg) & IP6F_OFF_MASK) != 0)
 				return(NULL);
 			nh = fragh->ip6f_nxt;
 			hlen = sizeof(struct ip6_frag);
@@ -456,7 +457,7 @@ get_upperlayer(u_char *bp, int *prot)
 
 		case IPPROTO_AH:
 			ah = (struct ah *)bp;
-			if (TTEST(ah->ah_len) == 0)
+			if (!TTEST(ah->ah_len))
 				return(NULL);
 			nh = ah->ah_nxt;
 			hlen = (ah->ah_len + 2) << 2;
@@ -471,7 +472,7 @@ get_upperlayer(u_char *bp, int *prot)
 	return(NULL);		/* should be notreached, though */
 }
 
-void
+static void
 icmp6_opt_print(const u_char *bp, int resid)
 {
 	const struct nd_opt_hdr *op;
@@ -632,7 +633,7 @@ icmp6_opt_print(const u_char *bp, int resid)
 #undef ECHECK
 }
 
-void
+static void
 mld6_print(const u_char *bp)
 {
 	struct mld6_hdr *mp = (struct mld6_hdr *)bp;
@@ -684,15 +685,17 @@ dnsname_print(const u_char *cp, const u_char *ep)
 	printf("\"");
 }
 
-void
-icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
+static void
+icmp6_nodeinfo_print(u_int icmp6len, const u_char *bp, const u_char *ep)
 {
 	struct icmp6_nodeinfo *ni6;
 	struct icmp6_hdr *dp;
 	const u_char *cp;
-	int siz, i;
+	size_t siz, i;
 	int needcomma;
 
+	if (ep < bp)
+		return;
 	dp = (struct icmp6_hdr *)bp;
 	ni6 = (struct icmp6_nodeinfo *)bp;
 	siz = ep - bp;
@@ -931,8 +934,8 @@ trunc:
 	fputs("[|icmp6]", stdout);
 }
 
-void
-icmp6_rrenum_print(int icmp6len, const u_char *bp, const u_char *ep)
+static void
+icmp6_rrenum_print(u_int icmp6len, const u_char *bp, const u_char *ep)
 {
 	struct icmp6_router_renum *rr6;
 	struct icmp6_hdr *dp;
@@ -943,6 +946,8 @@ icmp6_rrenum_print(int icmp6len, const u_char *bp, const u_char *ep)
 	char hbuf[NI_MAXHOST];
 	int n;
 
+	if (ep < bp)
+		return;
 	dp = (struct icmp6_hdr *)bp;
 	rr6 = (struct icmp6_router_renum *)bp;
 	siz = ep - bp;

@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf6.c,v 1.10 2002-12-11 07:14:06 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf6.c,v 1.11 2002-12-11 22:29:22 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -37,6 +37,7 @@ static const char rcsid[] =
 
 #include "interface.h"
 #include "addrtoname.h"
+#include "extract.h"
 
 #include "ospf6.h"
 
@@ -131,7 +132,7 @@ ospf6_print_ls_type(register u_int ls_type,
     register const rtrid_t *ls_stateid,
     register const rtrid_t *ls_router, register const char *fmt)
 {
-	char *scope;
+	const char *scope;
 
 	switch (ls_type & LS_SCOPE_MASK) {
 	case LS_SCOPE_LINKLOCAL:
@@ -229,7 +230,7 @@ trunc:
 static int
 ospf6_print_lsaprefix(register const struct lsa_prefix *lsapp)
 {
-	int k;
+	u_int k;
 	struct in6_addr prefix;
 
 	TCHECK(*lsapp);
@@ -274,7 +275,8 @@ ospf6_print_lsa(register const struct lsa *lsap)
 #if 0
 	register const u_int32_t *lp;
 #endif
-	register int j, k;
+	register u_int j;
+	register int k;
 	u_int32_t flags32;
 
 	if (ospf6_print_lshdr(&lsap->ls_hdr))

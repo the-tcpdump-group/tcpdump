@@ -32,7 +32,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.23 2002-12-11 07:13:59 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.24 2002-12-11 22:29:21 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -130,7 +130,7 @@ struct dhcp6opt {
 	/* type-dependent data follows */
 };
 
-static char *
+static const char *
 dhcp6opt_name(int type)
 {
 	static char genstr[sizeof("opt_65535") + 1]; /* XXX thread unsafe */
@@ -163,7 +163,7 @@ dhcp6opt_name(int type)
 	}
 }
 
-static char *
+static const char *
 dhcp6stcode(int code)
 {
 	static char genstr[sizeof("code255") + 1]; /* XXX thread unsafe */
@@ -201,7 +201,8 @@ dhcp6opt_print(u_char *cp, u_char *ep)
 {
 	struct dhcp6opt *dh6o;
 	u_char *tp;
-	int i, opttype;
+	size_t i;
+	u_int16_t opttype;
 	size_t optlen;
 	u_int16_t val16;
 	u_int32_t val32;
@@ -210,11 +211,11 @@ dhcp6opt_print(u_char *cp, u_char *ep)
 	if (cp == ep)
 		return;
 	while (cp < ep) {
-		if (ep - cp < sizeof(*dh6o))
+		if (ep < cp + sizeof(*dh6o))
 			goto trunc;
 		dh6o = (struct dhcp6opt *)cp;
 		optlen = EXTRACT_16BITS(&dh6o->dh6opt_len);
-		if (ep - cp < sizeof(*dh6o) + optlen)
+		if (ep < cp + sizeof(*dh6o) + optlen)
 			goto trunc;
 		opttype = EXTRACT_16BITS(&dh6o->dh6opt_type);
 		printf(" (%s", dhcp6opt_name(opttype));

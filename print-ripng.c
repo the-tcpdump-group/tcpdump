@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ripng.c,v 1.14 2002-12-11 07:14:08 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ripng.c,v 1.15 2002-12-11 22:29:22 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -71,14 +71,18 @@ ripng_print(const u_char *dat, unsigned int length)
 {
 	register const struct rip6 *rp = (struct rip6 *)dat;
 	register const struct netinfo6 *ni;
-	register int amt = snapend - dat;
-	register int i = min(length, amt) -
-			 (sizeof(struct rip6) - sizeof(struct netinfo6));
+	register u_int amt;
+	register u_int i;
 	int j;
 	int trunc;
 
-	if (i < 0)
+	if (snapend < dat)
 		return;
+	amt = snapend - dat;
+	i = min(length, amt);
+	if (i < (sizeof(struct rip6) - sizeof(struct netinfo6)))
+		return;
+	i -= (sizeof(struct rip6) - sizeof(struct netinfo6));
 
 	switch (rp->rip6_cmd) {
 
@@ -95,7 +99,8 @@ ripng_print(const u_char *dat, unsigned int length)
 		else
 			printf(" ripng-req %d:", j);
 		trunc = ((i / sizeof(*ni)) * sizeof(*ni) != i);
-		for (ni = rp->rip6_nets; (i -= sizeof(*ni)) >= 0; ++ni) {
+		for (ni = rp->rip6_nets; i >= sizeof(*ni);
+		    i -= sizeof(*ni), ++ni) {
 			if (vflag > 1)
 				printf("\n\t");
 			else
@@ -110,7 +115,8 @@ ripng_print(const u_char *dat, unsigned int length)
 		else
 			printf(" ripng-resp %d:", j);
 		trunc = ((i / sizeof(*ni)) * sizeof(*ni) != i);
-		for (ni = rp->rip6_nets; (i -= sizeof(*ni)) >= 0; ++ni) {
+		for (ni = rp->rip6_nets; i >= sizeof(*ni);
+		    i -= sizeof(*ni), ++ni) {
 			if (vflag > 1)
 				printf("\n\t");
 			else

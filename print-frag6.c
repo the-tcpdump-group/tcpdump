@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-frag6.c,v 1.15 2002-12-11 07:14:00 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-frag6.c,v 1.16 2002-12-11 22:29:21 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -58,19 +58,19 @@ frag6_print(register const u_char *bp, register const u_char *bp2)
 	if (vflag) {
 		printf("frag (0x%08x:%d|%ld)",
 		       EXTRACT_32BITS(&dp->ip6f_ident),
-		       EXTRACT_16BITS(&dp->ip6f_offlg & IP6F_OFF_MASK),
+		       EXTRACT_16BITS(&dp->ip6f_offlg) & IP6F_OFF_MASK,
 		       sizeof(struct ip6_hdr) + EXTRACT_16BITS(&ip6->ip6_plen) -
 			       (long)(bp - bp2) - sizeof(struct ip6_frag));
 	} else {
 		printf("frag (%d|%ld)",
-		       EXTRACT_16BITS(&dp->ip6f_offlg & IP6F_OFF_MASK),
+		       EXTRACT_16BITS(&dp->ip6f_offlg) & IP6F_OFF_MASK,
 		       sizeof(struct ip6_hdr) + EXTRACT_16BITS(&ip6->ip6_plen) -
 			       (long)(bp - bp2) - sizeof(struct ip6_frag));
 	}
 
 #if 1
 	/* it is meaningless to decode non-first fragment */
-	if (EXTRACT_16BITS(&dp->ip6f_offlg & IP6F_OFF_MASK) != 0)
+	if ((EXTRACT_16BITS(&dp->ip6f_offlg) & IP6F_OFF_MASK) != 0)
 		return 65535;
 	else
 #endif
