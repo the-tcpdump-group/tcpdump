@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.103 2003-10-28 20:52:25 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.104 2003-10-30 00:55:51 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1360,19 +1360,25 @@ static int isis_print (const u_int8_t *p, u_int length)
 	}
 
 	TCHECK(*header_lsp);
-	printf("\n\t  lsp-id: %s, seq: 0x%08x, lifetime: %5us",
+	printf("\n\t  lsp-id: %s, seq: 0x%08x, lifetime: %5us\n\t  chksum: 0x%04x",
                isis_print_id(header_lsp->lsp_id, LSP_ID_LEN),
                EXTRACT_32BITS(header_lsp->sequence_number),
-               EXTRACT_16BITS(header_lsp->remaining_lifetime));
-        /* verify the checksum -
-         * checking starts at the lsp-id field
-         * which is 12 bytes after the packet start*/
-	printf("\n\t  chksum: 0x%04x (%s), PDU length: %u",
-               EXTRACT_16BITS(header_lsp->checksum),
-               (osi_cksum(optr+12, length-12)) ? "incorrect" : "correct",
-               pdu_len);
+               EXTRACT_16BITS(header_lsp->remaining_lifetime),
+               EXTRACT_16BITS(header_lsp->checksum));
 
-	printf(", %s", ISIS_MASK_LSP_OL_BIT(header_lsp->typeblock) ? "Overload bit set, " : "");
+        /* if this is a purge do not attempt to verify the checksum */
+        if ( EXTRACT_16BITS(header_lsp->remaining_lifetime) == 0 &&
+             EXTRACT_16BITS(header_lsp->checksum) == 0)
+            printf(" (purged)");
+        else
+            /* verify the checksum -
+             * checking starts at the lsp-id field
+             * which is 12 bytes after the packet start*/
+            printf(" (%s)", (osi_cksum(optr+12, length-12)) ? "incorrect" : "correct");
+
+	printf(", PDU length: %u, Flags: [ %s",
+               pdu_len,
+               ISIS_MASK_LSP_OL_BIT(header_lsp->typeblock) ? "Overload bit set, " : "");
 
 	if (ISIS_MASK_LSP_ATT_BITS(header_lsp->typeblock)) {
 	    printf("%s", ISIS_MASK_LSP_ATT_DEFAULT_BIT(header_lsp->typeblock) ? "default " : "");
@@ -1382,7 +1388,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    printf("ATT bit set, ");
 	}
 	printf("%s", ISIS_MASK_LSP_PARTITION_BIT(header_lsp->typeblock) ? "P bit set, " : "");
-	printf("%s", tok2str(isis_lsp_istype_values,"Unknown(0x%x)",ISIS_MASK_LSP_ISTYPE_BITS(header_lsp->typeblock)));
+	printf("%s ]", tok2str(isis_lsp_istype_values,"Unknown(0x%x)",ISIS_MASK_LSP_ISTYPE_BITS(header_lsp->typeblock)));
 
         if (vflag > 1) {
             if(!print_unknown_data(pptr,"\n\t  ",ISIS_LSP_HEADER_SIZE))
