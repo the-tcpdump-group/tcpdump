@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sl.c,v 1.58 2002-08-01 08:53:28 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sl.c,v 1.59 2002-09-05 21:25:47 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -49,7 +49,7 @@ static void sliplink_print(const u_char *, const struct ip *, u_int);
 static void compressed_sl_print(const u_char *, const struct ip *, u_int, int);
 
 void
-sl_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
+sl_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 {
 	register u_int caplen = h->caplen;
 	register u_int length = h->len;
@@ -101,7 +101,7 @@ sl_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 
 
 void
-sl_bsdos_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
+sl_bsdos_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 {
 	register u_int caplen = h->caplen;
 	register u_int length = h->len;

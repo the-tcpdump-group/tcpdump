@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ipcomp.c,v 1.14 2002-08-01 08:53:11 risso Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ipcomp.c,v 1.15 2002-09-05 21:25:42 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -47,7 +47,7 @@ struct ipcomp {
 #include "addrtoname.h"
 
 int
-ipcomp_print(register const u_char *bp, register const u_char *bp2, int *nhdr)
+ipcomp_print(register const u_char *bp, int *nhdr)
 {
 	register const struct ipcomp *ipcomp;
 	register const u_char *ep;

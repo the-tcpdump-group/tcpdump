@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.102 2002-09-05 00:00:22 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.103 2002-09-05 21:25:49 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -601,7 +601,7 @@ tcp_print(register const u_char *bp, register u_int length,
 		} else if (sport == BGP_PORT || dport == BGP_PORT)
 			bgp_print(bp, length);
 		else if (sport == PPTP_PORT || dport == PPTP_PORT)
-			pptp_print(bp, length);
+			pptp_print(bp);
 #ifdef TCPDUMP_DO_SMB
 		else if (sport == NETBIOS_SSN_PORT || dport == NETBIOS_SSN_PORT)
 			nbt_tcp_print(bp, length);

@@ -119,7 +119,6 @@ print-isoclns.c
 print-krb.c
 print-l2tp.c
 print-lane.c
-print-lcp.c
 print-llc.c
 print-lwres.c
 print-mobile.c

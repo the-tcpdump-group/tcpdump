@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.25 2002-08-01 08:53:01 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.26 2002-09-05 21:25:37 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -84,13 +84,13 @@ atm_llc_print(const u_char *p, int length, int caplen)
 }
 
 /*
- * This is the top level routine of the printer.  'p' is the points
- * to the LLC/SNAP header of the packet, 'tvp' is the timestamp,
- * 'length' is the length of the packet off the wire, and 'caplen'
+ * This is the top level routine of the printer.  'p' points
+ * to the LLC/SNAP header of the packet, 'h->ts' is the timestamp,
+ * 'h->length' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
 void
-atm_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
+atm_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;

@@ -281,10 +281,6 @@ SOURCE="..\..\print-lane.c"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\print-lcp.c"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\print-llc.c"
 # End Source File
 # Begin Source File

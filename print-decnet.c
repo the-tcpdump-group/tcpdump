@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-decnet.c,v 1.35 2002-08-01 08:53:04 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-decnet.c,v 1.36 2002-09-05 21:25:39 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -340,13 +340,13 @@ print_i_info(int info)
 }
 
 static void
-print_elist(const char *elp, u_int len)
+print_elist(const char *elp _U_, u_int len _U_)
 {
 	/* Not enough examples available for me to debug this */
 }
 
 static void
-print_nsp(const u_char *nspp, u_int nsplen)
+print_nsp(const u_char *nspp, u_int nsplen _U_)
 {
 	const struct nsphdr *nsphp = (struct nsphdr *)nspp;
 	int dst, src, flags;

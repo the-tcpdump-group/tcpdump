@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sll.c,v 1.8 2002-08-01 08:53:28 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sll.c,v 1.9 2002-09-05 21:25:48 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -87,13 +87,13 @@ sll_print(register const struct sll_header *sllp, u_int length)
 }
 
 /*
- * This is the top level routine of the printer.  'p' is the points
- * to the ether header of the packet, 'h->tv' is the timestamp,
+ * This is the top level routine of the printer.  'p' points to the
+ * Linux "cooked capture" header of the packet, 'h->ts' is the timestamp,
  * 'h->length' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
 void
-sll_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
+sll_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;

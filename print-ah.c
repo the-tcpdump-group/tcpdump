@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ah.c,v 1.17 2002-08-01 08:52:59 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ah.c,v 1.18 2002-09-05 21:25:36 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -40,7 +40,7 @@ static const char rcsid[] =
 #include "addrtoname.h"
 
 int
-ah_print(register const u_char *bp, register const u_char *bp2)
+ah_print(register const u_char *bp)
 {
 	register const struct ah *ah;
 	register const u_char *ep;

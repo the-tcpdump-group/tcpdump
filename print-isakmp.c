@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.34 2002-09-05 00:43:21 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.35 2002-09-05 21:25:42 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -411,7 +411,7 @@ isakmp_attr_print(const u_char *p, const u_char *ep)
 
 static const u_char *
 isakmp_sa_print(const struct isakmp_gen *ext, const u_char *ep, u_int32_t phase,
-	u_int32_t doi0, u_int32_t proto0, int depth)
+	u_int32_t doi0 _U_, u_int32_t proto0, int depth)
 {
 	const struct isakmp_pl_sa *p;
 	struct isakmp_pl_sa sa;
@@ -464,7 +464,7 @@ isakmp_sa_print(const struct isakmp_gen *ext, const u_char *ep, u_int32_t phase,
 
 static const u_char *
 isakmp_p_print(const struct isakmp_gen *ext, const u_char *ep, u_int32_t phase,
-	u_int32_t doi0, u_int32_t proto0, int depth)
+	u_int32_t doi0, u_int32_t proto0 _U_, int depth)
 {
 	const struct isakmp_pl_p *p;
 	struct isakmp_pl_p prop;
@@ -546,8 +546,9 @@ const struct attrmap oakley_t_map[] = {
 };
 
 static const u_char *
-isakmp_t_print(const struct isakmp_gen *ext, const u_char *ep, u_int32_t phase,
-	u_int32_t doi, u_int32_t proto, int depth)
+isakmp_t_print(const struct isakmp_gen *ext, const u_char *ep,
+	u_int32_t phase _U_, u_int32_t doi _U_, u_int32_t proto,
+	int depth _U_)
 {
 	const struct isakmp_pl_t *p;
 	struct isakmp_pl_t t;
@@ -609,8 +610,9 @@ isakmp_t_print(const struct isakmp_gen *ext, const u_char *ep, u_int32_t phase,
 }
 
 static const u_char *
-isakmp_ke_print(const struct isakmp_gen *ext, const u_char *ep, u_int32_t phase,
-	u_int32_t doi, u_int32_t proto, int depth)
+isakmp_ke_print(const struct isakmp_gen *ext, const u_char *ep _U_,
+	u_int32_t phase _U_, u_int32_t doi _U_, u_int32_t proto _U_,
+	int depth _U_)
 {
 	struct isakmp_gen e;
 
@@ -626,8 +628,9 @@ isakmp_ke_print(const struct isakmp_gen *ext, const u_char *ep, u_int32_t phase,
 }
 
 static const u_char *
-isakmp_id_print(const struct isakmp_gen *ext, const u_char *ep, u_int32_t phase,
-	u_int32_t doi, u_int32_t proto, int depth)
+isakmp_id_print(const struct isakmp_gen *ext, const u_char *ep _U_,
+	u_int32_t phase, u_int32_t doi _U_, u_int32_t proto _U_,
+	int depth _U_)
 {
 #define USE_IPSECDOI_IN_PHASE1	1
 	const struct isakmp_pl_id *p;
@@ -768,8 +771,9 @@ isakmp_id_print(const struct isakmp_gen *ext, const u_char *ep, u_int32_t phase,
 }
 
 static const u_char *
-isakmp_cert_print(const struct isakmp_gen *ext, const u_char *ep,
-	u_int32_t phase, u_int32_t doi0, u_int32_t proto0, int depth)
+isakmp_cert_print(const struct isakmp_gen *ext, const u_char *ep _U_,
+	u_int32_t phase _U_, u_int32_t doi0 _U_, u_int32_t proto0 _U_,
+	int depth _U_)
 {
 	const struct isakmp_pl_cert *p;
 	struct isakmp_pl_cert cert;
@@ -793,8 +797,9 @@ isakmp_cert_print(const struct isakmp_gen *ext, const u_char *ep,
 }
 
 static const u_char *
-isakmp_cr_print(const struct isakmp_gen *ext, const u_char *ep, u_int32_t phase,
-	u_int32_t doi0, u_int32_t proto0, int depth)
+isakmp_cr_print(const struct isakmp_gen *ext, const u_char *ep _U_,
+	u_int32_t phase _U_, u_int32_t doi0 _U_, u_int32_t proto0 _U_,
+	int depth _U_)
 {
 	const struct isakmp_pl_cert *p;
 	struct isakmp_pl_cert cert;
@@ -818,8 +823,9 @@ isakmp_cr_print(const struct isakmp_gen *ext, const u_char *ep, u_int32_t phase,
 }
 
 static const u_char *
-isakmp_hash_print(const struct isakmp_gen *ext, const u_char *ep,
-	u_int32_t phase, u_int32_t doi, u_int32_t proto, int depth)
+isakmp_hash_print(const struct isakmp_gen *ext, const u_char *ep _U_,
+	u_int32_t phase _U_, u_int32_t doi _U_, u_int32_t proto _U_,
+	int depth _U_)
 {
 	struct isakmp_gen e;
 
@@ -835,8 +841,9 @@ isakmp_hash_print(const struct isakmp_gen *ext, const u_char *ep,
 }
 
 static const u_char *
-isakmp_sig_print(const struct isakmp_gen *ext, const u_char *ep,
-	u_int32_t phase, u_int32_t doi, u_int32_t proto, int depth)
+isakmp_sig_print(const struct isakmp_gen *ext, const u_char *ep _U_,
+	u_int32_t phase _U_, u_int32_t doi _U_, u_int32_t proto _U_,
+	int depth _U_)
 {
 	struct isakmp_gen e;
 
@@ -852,8 +859,9 @@ isakmp_sig_print(const struct isakmp_gen *ext, const u_char *ep,
 }
 
 static const u_char *
-isakmp_nonce_print(const struct isakmp_gen *ext, const u_char *ep,
-	u_int32_t phase, u_int32_t doi, u_int32_t proto, int depth)
+isakmp_nonce_print(const struct isakmp_gen *ext, const u_char *ep _U_,
+	u_int32_t phase _U_, u_int32_t doi _U_, u_int32_t proto _U_,
+	int depth _U_)
 {
 	struct isakmp_gen e;
 
@@ -870,7 +878,7 @@ isakmp_nonce_print(const struct isakmp_gen *ext, const u_char *ep,
 
 static const u_char *
 isakmp_n_print(const struct isakmp_gen *ext, const u_char *ep, u_int32_t phase,
-	u_int32_t doi0, u_int32_t proto0, int depth)
+	u_int32_t doi0 _U_, u_int32_t proto0 _U_, int depth)
 {
 	struct isakmp_pl_n *p, n;
 	const u_char *cp;
@@ -1002,8 +1010,9 @@ isakmp_n_print(const struct isakmp_gen *ext, const u_char *ep, u_int32_t phase,
 }
 
 static const u_char *
-isakmp_d_print(const struct isakmp_gen *ext, const u_char *ep, u_int32_t phase,
-	u_int32_t doi0, u_int32_t proto0, int depth)
+isakmp_d_print(const struct isakmp_gen *ext, const u_char *ep _U_,
+	u_int32_t phase _U_, u_int32_t doi0 _U_, u_int32_t proto0 _U_,
+	int depth _U_)
 {
 	const struct isakmp_pl_d *p;
 	struct isakmp_pl_d d;
@@ -1039,8 +1048,9 @@ isakmp_d_print(const struct isakmp_gen *ext, const u_char *ep, u_int32_t phase,
 }
 
 static const u_char *
-isakmp_vid_print(const struct isakmp_gen *ext, const u_char *ep,
-	u_int32_t phase, u_int32_t doi, u_int32_t proto, int depth)
+isakmp_vid_print(const struct isakmp_gen *ext, const u_char *ep _U_,
+	u_int32_t phase _U_, u_int32_t doi _U_, u_int32_t proto _U_,
+	int depth _U_)
 {
 	struct isakmp_gen e;
 

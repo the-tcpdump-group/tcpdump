@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.26 2002-09-05 00:00:20 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.27 2002-09-05 21:25:48 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -169,7 +169,7 @@ struct smbfnsint trans2_fns[] = {
 
 
 static void
-print_trans2(const u_char *words, const u_char *dat, const u_char *buf, const u_char *maxbuf)
+print_trans2(const u_char *words, const u_char *dat _U_, const u_char *buf, const u_char *maxbuf)
 {
     static struct smbfnsint *fn = &trans2_fns[0];
     const u_char *data, *param;
@@ -382,7 +382,7 @@ trunc:
 
 
 static void
-print_negprot(const u_char *words, const u_char *data, const u_char *buf, const u_char *maxbuf)
+print_negprot(const u_char *words, const u_char *data, const u_char *buf _U_, const u_char *maxbuf)
 {
     u_int wcnt;
     const char *f1 = NULL, *f2 = NULL;
@@ -417,7 +417,7 @@ trunc:
 }
 
 static void
-print_sesssetup(const u_char *words, const u_char *data, const u_char *buf, const u_char *maxbuf)
+print_sesssetup(const u_char *words, const u_char *data, const u_char *buf _U_, const u_char *maxbuf)
 {
     u_int wcnt;
     const char *f1 = NULL, *f2 = NULL;

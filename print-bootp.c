@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.65 2002-08-06 04:42:05 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.66 2002-09-05 21:25:38 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -49,8 +49,7 @@ static char tstr[] = " [|bootp]";
  * Print bootp requests
  */
 void
-bootp_print(register const u_char *cp, u_int length,
-	    u_short sport, u_short dport)
+bootp_print(register const u_char *cp, u_short sport, u_short dport)
 {
 	register const struct bootp *bp;
 	static const u_char vm_cmu[4] = VM_CMU;

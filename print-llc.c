@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.49 2002-09-05 00:00:15 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.50 2002-09-05 21:25:44 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -193,8 +193,8 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 		 * Does anybody ever bridge one form of LAN traffic
 		 * over a networking type that uses 802.2 LLC?
 		 */
-		ret = snap_print(p, length, caplen, esrc, edst,
-		    extracted_ethertype, orgcode, et, 2);
+		ret = snap_print(p, length, caplen, extracted_ethertype,
+		    orgcode, et, 2);
 		if (ret)
 			return (ret);
 	}
@@ -286,8 +286,8 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 
 int
 snap_print(const u_char *p, u_int length, u_int caplen,
-    const u_char *esrc, const u_char *edst, u_short *extracted_ethertype,
-    u_int32_t orgcode, u_short et, u_int bridge_pad)
+    u_short *extracted_ethertype, u_int32_t orgcode, u_short et,
+    u_int bridge_pad)
 {
 	register int ret;
 
@@ -325,7 +325,7 @@ snap_print(const u_char *p, u_int length, u_int caplen,
 
 	case OUI_CISCO:
 		if (et == PID_CISCO_CDP) {
-			cdp_print(p, length, caplen, esrc, edst);
+			cdp_print(p, length, caplen);
 			return (1);
 		}
 		break;

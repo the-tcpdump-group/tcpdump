@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cip.c,v 1.18 2002-08-01 08:53:03 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cip.c,v 1.19 2002-09-05 21:25:38 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -52,7 +52,7 @@ static unsigned char rfcllc[] = {
 	0x00 };
 
 static inline void
-cip_print(register const u_char *bp, int length)
+cip_print(int length)
 {
 	/*
 	 * There is no MAC-layer header, so just print the length.
@@ -61,13 +61,13 @@ cip_print(register const u_char *bp, int length)
 }
 
 /*
- * This is the top level routine of the printer.  'p' is the points
- * to the raw header of the packet, 'tvp' is the timestamp,
- * 'length' is the length of the packet off the wire, and 'caplen'
+ * This is the top level routine of the printer.  'p' points
+ * to the LLC/SNAP or raw header of the packet, 'h->ts' is the timestamp,
+ * 'h->length' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
 void
-cip_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
+cip_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;
@@ -82,7 +82,7 @@ cip_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	}
 
 	if (eflag)
-		cip_print(p, length);
+		cip_print(length);
 
 	/*
 	 * Some printers want to get back at the ethernet addresses,
@@ -100,7 +100,7 @@ cip_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 		    &extracted_ethertype) == 0) {
 			/* ether_type not known, print raw packet */
 			if (!eflag)
-				cip_print(p, length);
+				cip_print(length);
 			if (extracted_ethertype) {
 				printf("(LLC %s) ",
 			       etherproto_string(htons(extracted_ethertype)));

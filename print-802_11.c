@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.10 2002-09-05 00:00:09 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.11 2002-09-05 21:25:36 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -113,7 +113,7 @@ static const char *reason_text[] = {
 	NULL
 };
 
-static int wep_print(const u_char *p,u_int length)
+static int wep_print(const u_char *p)
 {
 	u_int32_t iv;
 
@@ -210,8 +210,7 @@ static int parse_elements(struct mgmt_body_t *pbody,const u_char *p,int offset)
  * Print Handle functions for the management frame types
  *********************************************************************************/
 
-static int handle_beacon(u_int16_t fc, const struct mgmt_header_t *pmh,
-    const u_char *p)
+static int handle_beacon(u_int16_t fc, const u_char *p)
 {
 	struct mgmt_body_t pbody;
 	int offset = 0;
@@ -242,8 +241,7 @@ static int handle_beacon(u_int16_t fc, const struct mgmt_header_t *pmh,
 	return 1;
 }
 
-static int handle_assoc_request(u_int16_t fc, const struct mgmt_header_t *pmh,
-    const u_char *p)
+static int handle_assoc_request(u_int16_t fc, const u_char *p)
 {
 	struct mgmt_body_t pbody;
 	int offset = 0;
@@ -267,8 +265,7 @@ static int handle_assoc_request(u_int16_t fc, const struct mgmt_header_t *pmh,
 	return 1;
 }
 
-static int handle_assoc_response(u_int16_t fc, const struct mgmt_header_t *pmh,
-    const u_char *p)
+static int handle_assoc_response(u_int16_t fc, const u_char *p)
 {
 	struct mgmt_body_t pbody;
 	int offset = 0;
@@ -296,8 +293,7 @@ static int handle_assoc_response(u_int16_t fc, const struct mgmt_header_t *pmh,
 }
 
 
-static int handle_reassoc_request(u_int16_t fc, const struct mgmt_header_t *pmh,
-    const u_char *p)
+static int handle_reassoc_request(u_int16_t fc, const u_char *p)
 {
 	struct mgmt_body_t pbody;
 	int offset = 0;
@@ -323,15 +319,13 @@ static int handle_reassoc_request(u_int16_t fc, const struct mgmt_header_t *pmh,
 	return 1;
 }
 
-static int handle_reassoc_response(u_int16_t fc, const struct mgmt_header_t *pmh,
-    const u_char *p)
+static int handle_reassoc_response(u_int16_t fc, const u_char *p)
 {
 	/* Same as a Association Reponse */
-	return handle_assoc_response(fc,pmh,p);
+	return handle_assoc_response(fc, p);
 }
 
-static int handle_probe_request(u_int16_t fc, const struct mgmt_header_t *pmh,
-    const u_char *p)
+static int handle_probe_request(u_int16_t fc, const u_char *p)
 {
 	struct mgmt_body_t  pbody;
 	int offset = 0;
@@ -349,8 +343,7 @@ static int handle_probe_request(u_int16_t fc, const struct mgmt_header_t *pmh,
 	return 1;
 }
 
-static int handle_probe_response(u_int16_t fc, const struct mgmt_header_t *pmh,
-    const u_char *p)
+static int handle_probe_response(u_int16_t fc, const u_char *p)
 {
 	struct mgmt_body_t  pbody;
 	int offset = 0;
@@ -379,16 +372,14 @@ static int handle_probe_response(u_int16_t fc, const struct mgmt_header_t *pmh,
 	return 1;
 }
 
-static int handle_atim(u_int16_t fc, const struct mgmt_header_t *pmh,
-    const u_char *p)
+static int handle_atim(void)
 {
 	/* the frame body for ATIM is null. */
 	printf("ATIM");
 	return 1;
 }
 
-static int handle_disassoc(u_int16_t fc, const struct mgmt_header_t *pmh,
-    const u_char *p)
+static int handle_disassoc(u_int16_t fc, const u_char *p)
 {
 	struct mgmt_body_t  pbody;
 	int offset = 0;
@@ -406,8 +397,7 @@ static int handle_disassoc(u_int16_t fc, const struct mgmt_header_t *pmh,
 	return 1;
 }
 
-static int handle_auth(u_int16_t fc, const struct mgmt_header_t *pmh,
-    const u_char *p)
+static int handle_auth(u_int16_t fc, const u_char *p)
 {
 	struct mgmt_body_t  pbody;
 	int offset = 0;
@@ -478,36 +468,36 @@ static int handle_deauth(u_int16_t fc, const struct mgmt_header_t *pmh,
 
 
 static int mgmt_body_print(u_int16_t fc, const struct mgmt_header_t *pmh,
-    const u_char *p, u_int length)
+    const u_char *p)
 {
 	switch (FC_SUBTYPE(fc)) {
 	case ST_ASSOC_REQUEST:
-		return (handle_assoc_request(fc, pmh, p));
+		return (handle_assoc_request(fc, p));
 	case ST_ASSOC_RESPONSE:
-		return (handle_assoc_response(fc, pmh, p));
+		return (handle_assoc_response(fc, p));
 	case ST_REASSOC_REQUEST:
-		return (handle_reassoc_request(fc, pmh, p));
+		return (handle_reassoc_request(fc, p));
 	case ST_REASSOC_RESPONSE:
-		return (handle_reassoc_response(fc, pmh, p));
+		return (handle_reassoc_response(fc, p));
 	case ST_PROBE_REQUEST:
-		return (handle_probe_request(fc, pmh, p));
+		return (handle_probe_request(fc, p));
 	case ST_PROBE_RESPONSE:
-		return (handle_probe_response(fc, pmh, p));
+		return (handle_probe_response(fc, p));
 	case ST_BEACON:
-		return (handle_beacon(fc, pmh, p));
+		return (handle_beacon(fc, p));
 	case ST_ATIM:
-		return (handle_atim(fc, pmh, p));
+		return (handle_atim());
 	case ST_DISASSOC:
-		return (handle_disassoc(fc, pmh, p));
+		return (handle_disassoc(fc, p));
 	case ST_AUTH:
 		if (!TTEST2(*p, 3))
 			return 0;
 		if ((p[0] == 0 ) && (p[1] == 0) && (p[2] == 0)) {
 			printf("Authentication (Shared-Key)-3 ");
-			return (wep_print(p, length));
+			return (wep_print(p));
 		}
 		else
-			return (handle_auth(fc, pmh, p));
+			return (handle_auth(fc, p));
 	case ST_DEAUTH:
 		return (handle_deauth(fc, pmh, p));
 		break;
@@ -523,7 +513,7 @@ static int mgmt_body_print(u_int16_t fc, const struct mgmt_header_t *pmh,
  * Handles printing all the control frame types
  *********************************************************************************/
 
-static int ctrl_body_print(u_int16_t fc,const u_char *p, u_int length)
+static int ctrl_body_print(u_int16_t fc, const u_char *p)
 {
 	switch (FC_SUBTYPE(fc)) {
 	case CTRL_PS_POLL:
@@ -599,7 +589,7 @@ static int ctrl_body_print(u_int16_t fc,const u_char *p, u_int length)
  *    1    |  1      |  RA    | TA     | DA     | SA
  */
 
-static void data_header_print(u_int16_t fc,const u_char *p, u_int length)
+static void data_header_print(u_int16_t fc, const u_char *p)
 {
 #define ADDR1  (p + 4)
 #define ADDR2  (p + 10)
@@ -633,7 +623,7 @@ static void data_header_print(u_int16_t fc,const u_char *p, u_int length)
 }
 
 
-static void mgmt_header_print(const u_char *p, u_int length)
+static void mgmt_header_print(const u_char *p)
 {
 	const struct mgmt_header_t *hp = (const struct mgmt_header_t *) p;
 
@@ -642,7 +632,7 @@ static void mgmt_header_print(const u_char *p, u_int length)
 	    etheraddr_string((hp)->sa));
 }
 
-static void ctrl_header_print(u_int16_t fc,const u_char *p, u_int length)
+static void ctrl_header_print(u_int16_t fc, const u_char *p)
 {
 	switch (FC_SUBTYPE(fc)) {
 	case CTRL_PS_POLL:
@@ -730,19 +720,19 @@ static int GetHeaderLength(u_int16_t fc)
  * Print the 802.11 MAC header
  */
 static inline void
-ieee_802_11_print(u_int16_t fc, const u_char *p, u_int length)
+ieee_802_11_print(u_int16_t fc, const u_char *p)
 {
 	switch (FC_TYPE(fc)) {
 	case T_MGMT:
-		mgmt_header_print(p, length);
+		mgmt_header_print(p);
 		break;
 
 	case T_CTRL:
-		ctrl_header_print(fc, p, length);
+		ctrl_header_print(fc, p);
 		break;
 
 	case T_DATA:
-		data_header_print(fc, p, length);
+		data_header_print(fc, p);
 		break;
 
 	default:
@@ -753,13 +743,13 @@ ieee_802_11_print(u_int16_t fc, const u_char *p, u_int length)
 }
 
 /*
- * This is the top level routine of the printer.  'p' is the points
- * to the ether header of the packet, 'h->tv' is the timestamp,
+ * This is the top level routine of the printer.  'p' points
+ * to the 802.11 header of the packet, 'h->ts' is the timestamp,
  * 'h->length' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
 void
-ieee802_11_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
+ieee802_11_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;
@@ -775,10 +765,16 @@ ieee802_11_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 		goto out;
 	}
 
-	fc=EXTRACT_LE_16BITS(p);
+	fc = EXTRACT_LE_16BITS(p);
+	HEADER_LENGTH = GetHeaderLength(fc);
+
+	if (caplen < HEADER_LENGTH) {
+		printf("[|802.11]");
+		goto out;
+	}
 
 	if (eflag)
-		ieee_802_11_print(fc, p, length);
+		ieee_802_11_print(fc, p);
 
 	/*
 	 * Some printers want to get back at the ethernet addresses,
@@ -788,8 +784,6 @@ ieee802_11_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	packetp = p;
 	snapend = p + caplen;
 
-	HEADER_LENGTH=GetHeaderLength(fc);
-
 	length -= HEADER_LENGTH;
 	caplen -= HEADER_LENGTH;
 	p += HEADER_LENGTH;
@@ -797,15 +791,14 @@ ieee802_11_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	switch (FC_TYPE(fc)) {
 	case T_MGMT:
 		if (!mgmt_body_print(fc, (const struct mgmt_header_t *)packetp,
-		    p, length)) {
+		    p)) {
 			printf("[|802.11]");
 			goto out;
 		}
 		break;
 
 	case T_CTRL:
-		if (!ctrl_body_print(fc, p - HEADER_LENGTH,
-		    length + HEADER_LENGTH)) {
+		if (!ctrl_body_print(fc, p - HEADER_LENGTH)) {
 			printf("[|802.11]");
 			goto out;
 		}
@@ -814,7 +807,7 @@ ieee802_11_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	case T_DATA:
 		/* There may be a problem w/ AP not having this bit set */
 		if (FC_WEP(fc)) {
-			if (!wep_print(p,length)) {
+			if (!wep_print(p)) {
 				printf("[|802.11]");
 				goto out;
 			}
@@ -826,8 +819,7 @@ ieee802_11_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 				 * handle intelligently
 				 */
 				if (!eflag)
-					ieee_802_11_print(fc, p - HEADER_LENGTH,
-					    length + HEADER_LENGTH);
+					ieee_802_11_print(fc, p - HEADER_LENGTH);
 				if (extracted_ethertype) {
 					printf("(LLC %s) ",
 					    etherproto_string(htons(extracted_ethertype)));

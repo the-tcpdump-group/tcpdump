@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-fddi.c,v 1.57 2002-08-01 08:53:06 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-fddi.c,v 1.58 2002-09-05 21:25:40 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -233,7 +233,7 @@ fddi_hdr_print(register const struct fddi_header *fddip, register u_int length,
 }
 
 static inline void
-fddi_smt_print(const u_char *p, u_int length)
+fddi_smt_print(const u_char *p _U_, u_int length _U_)
 {
 	printf("<SMT printer not yet implemented>");
 }
@@ -308,13 +308,13 @@ fddi_print(const u_char *p, u_int length, u_int caplen)
 }
 
 /*
- * This is the top level routine of the printer.  'sp' is the points
- * to the FDDI header of the packet, 'tvp' is the timestamp,
- * 'length' is the length of the packet off the wire, and 'caplen'
+ * This is the top level routine of the printer.  'p' points
+ * to the FDDI header of the packet, 'h->ts' is the timestamp,
+ * 'h->length' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
 void
-fddi_if_print(u_char *pcap, const struct pcap_pkthdr *h,
+fddi_if_print(u_char *pcap _U_, const struct pcap_pkthdr *h,
 	      register const u_char *p)
 {
 	u_int caplen = h->caplen;

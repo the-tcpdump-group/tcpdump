@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-igmp.c,v 1.8 2002-08-01 08:53:09 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-igmp.c,v 1.9 2002-09-05 21:25:41 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -111,12 +111,21 @@ print_mtrace(register const u_char *bp, register u_int len)
 {
     register const struct tr_query *tr = (const struct tr_query *)(bp + 8);
 
+    TCHECK(*tr);
+    if (len < 8 + sizeof (struct tr_query)) {
+	(void)printf(" [invalid len %d]", len);
+	return;
+    }
     printf("mtrace %lu: %s to %s reply-to %s",
         (u_long)TR_GETQID(ntohl(tr->tr_rttlqid)),
         ipaddr_string(&tr->tr_src), ipaddr_string(&tr->tr_dst),
         ipaddr_string(&tr->tr_raddr));
     if (IN_CLASSD(ntohl(tr->tr_raddr)))
         printf(" with-ttl %d", TR_GETTTL(ntohl(tr->tr_rttlqid)));
+    return;
+trunc:
+    (void)printf("[|igmp]");
+    return;
 }
 
 static void
@@ -124,12 +133,21 @@ print_mresp(register const u_char *bp, register u_int len)
 {
     register const struct tr_query *tr = (const struct tr_query *)(bp + 8);
 
+    TCHECK(*tr);
+    if (len < 8 + sizeof (struct tr_query)) {
+	(void)printf(" [invalid len %d]", len);
+	return;
+    }
     printf("mresp %lu: %s to %s reply-to %s",
         (u_long)TR_GETQID(ntohl(tr->tr_rttlqid)),
         ipaddr_string(&tr->tr_src), ipaddr_string(&tr->tr_dst),
         ipaddr_string(&tr->tr_raddr));
     if (IN_CLASSD(ntohl(tr->tr_raddr)))
         printf(" with-ttl %d", TR_GETTTL(ntohl(tr->tr_rttlqid)));
+    return;
+trunc:
+    (void)printf("[|igmp]");
+    return;
 }
 
 static void

@@ -68,7 +68,6 @@ OBJS = \
 	../../print-krb.o \
 	../../print-l2tp.o \
 	../../print-lane.o \
-	../../print-lcp.o \
 	../../print-llc.o \
 	../../print-lwres.o \
 	../../print-mobile.o \

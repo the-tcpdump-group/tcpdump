@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.69 2002-09-05 00:00:17 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.70 2002-09-05 21:25:45 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -801,7 +801,7 @@ handle_pap(const u_char *p, int length)
 
 /* BAP */
 static void
-handle_bap(const u_char *p, int length)
+handle_bap(const u_char *p _U_, int length _U_)
 {
 	/* XXX: to be supported!! */
 }
@@ -1029,7 +1029,7 @@ trunc:
 
 /* PPP I/F printer */
 void
-ppp_if_print(u_char *user, const struct pcap_pkthdr *h,
+ppp_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
 	     register const u_char *p)
 {
 	register u_int length = h->len;
@@ -1113,7 +1113,7 @@ out:
  * This handles, for example, DLT_PPP_SERIAL in NetBSD.
  */
 void
-ppp_hdlc_if_print(u_char *user, const struct pcap_pkthdr *h,
+ppp_hdlc_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
 	     register const u_char *p)
 {
 	register u_int length = h->len;
@@ -1227,8 +1227,8 @@ struct tok ppptype2str[] = {
 
 /* BSD/OS specific PPP printer */
 void
-ppp_bsdos_if_print(u_char *user, const struct pcap_pkthdr *h,
-	     register const u_char *p)
+ppp_bsdos_if_print(u_char *user _U_, const struct pcap_pkthdr *h _U_,
+	     register const u_char *p _U_)
 {
 #ifdef __bsdi__
 	register u_int length = h->len;
@@ -1316,7 +1316,7 @@ ppp_bsdos_if_print(u_char *user, const struct pcap_pkthdr *h,
 
 		switch (ptype) {
 		case PPP_VJC:
-			ptype = vjc_print(q, length - (q - p), ptype);
+			ptype = vjc_print(q, ptype);
 			hdrlength = PPP_BSDI_HDRLEN;
 			p += hdrlength;
 			switch (ptype) {
@@ -1331,7 +1331,7 @@ ppp_bsdos_if_print(u_char *user, const struct pcap_pkthdr *h,
 			}
 			goto printx;
 		case PPP_VJNC:
-			ptype = vjc_print(q, length - (q - p), ptype);
+			ptype = vjc_print(q, ptype);
 			hdrlength = PPP_BSDI_HDRLEN;
 			p += hdrlength;
 			switch (ptype) {

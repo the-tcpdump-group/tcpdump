@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-pptp.c,v 1.6 2002-09-05 00:00:17 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-pptp.c,v 1.7 2002-09-05 21:25:45 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -961,7 +961,7 @@ trunc:
 }
 
 void
-pptp_print(const u_char *dat, u_int length)
+pptp_print(const u_char *dat)
 {
 	const struct pptp_hdr *hdr;
 	u_int32_t mc;

@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-krb.c,v 1.17 2002-08-06 04:42:05 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-krb.c,v 1.18 2002-09-05 21:25:43 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -37,11 +37,9 @@ static const char rcsid[] =
 #include "interface.h"
 #include "addrtoname.h"
 
-const u_char *c_print(register const u_char *, register const u_char *);
-const u_char *krb4_print_hdr(const u_char *);
-void krb4_print(const u_char *);
-void krb_print(const u_char *, u_int);
-
+static const u_char *c_print(register const u_char *, register const u_char *);
+static const u_char *krb4_print_hdr(const u_char *);
+static void krb4_print(const u_char *);
 
 #define AUTH_MSG_KDC_REQUEST			1<<1
 #define AUTH_MSG_KDC_REPLY			2<<1
@@ -119,7 +117,7 @@ static struct tok kerr2str[] = {
 
 
 
-const u_char *
+static const u_char *
 c_print(register const u_char *s, register const u_char *ep)
 {
 	register u_char c;
@@ -148,7 +146,7 @@ c_print(register const u_char *s, register const u_char *ep)
 	return (s);
 }
 
-const u_char *
+static const u_char *
 krb4_print_hdr(const u_char *cp)
 {
 	cp += 2;
@@ -169,7 +167,7 @@ trunc:
 #undef PRINT
 }
 
-void
+static void
 krb4_print(const u_char *cp)
 {
 	register const struct krb *kp;
@@ -247,7 +245,7 @@ trunc:
 }
 
 void
-krb_print(const u_char *dat, u_int length)
+krb_print(const u_char *dat)
 {
 	register const struct krb *kp;
 

@@ -25,7 +25,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-vjc.c,v 1.10 2002-08-01 08:53:34 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-vjc.c,v 1.11 2002-09-05 21:25:51 guy Exp $ (LBL)";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -40,7 +40,7 @@ static const char rcsid[] =
 #include "ppp.h"
 
 int
-vjc_print(register const char *bp, register u_int length, u_short proto)
+vjc_print(register const char *bp, u_short proto)
 {
 	int i;
 

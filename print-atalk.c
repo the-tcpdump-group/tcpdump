@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.73 2002-08-06 04:42:04 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.74 2002-09-05 21:25:37 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -82,7 +82,7 @@ static const char *ddpskt_string(int);
  * Print LLAP packets received on a physical LocalTalk interface.
  */
 void
-ltalk_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
+ltalk_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 {
 	snapend = p + h->caplen;
 	++infodelay;

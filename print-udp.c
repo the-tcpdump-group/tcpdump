@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.108 2002-08-20 00:01:38 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.109 2002-09-05 21:25:50 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -105,7 +105,7 @@ struct rtcp_rr {
 #define RTCP_PT_APP	204
 
 static void
-vat_print(const void *hdr, u_int len, register const struct udphdr *up)
+vat_print(const void *hdr, register const struct udphdr *up)
 {
 	/* vat/vt audio */
 	u_int ts = *(u_int16_t *)hdr;
@@ -489,7 +489,7 @@ udp_print(register const u_char *bp, u_int length,
 
 		case PT_VAT:
 			udpipaddr_print(ip, sport, dport);
-			vat_print((void *)(up + 1), length, up);
+			vat_print((void *)(up + 1), up);
 			break;
 
 		case PT_WB:
@@ -526,7 +526,7 @@ udp_print(register const u_char *bp, u_int length,
 
 		case PT_CNFP:
 			udpipaddr_print(ip, sport, dport);
-			cnfp_print(cp, length, (const u_char *)ip);
+			cnfp_print(cp, (const u_char *)ip);
 			break;
 		}
 		return;
@@ -598,12 +598,11 @@ udp_print(register const u_char *bp, u_int length,
 		if (ISPORT(NAMESERVER_PORT) || ISPORT(MULTICASTDNS_PORT))
 			ns_print((const u_char *)(up + 1), length);
 		else if (ISPORT(TIMED_PORT))
-			timed_print((const u_char *)(up + 1), length);
+			timed_print((const u_char *)(up + 1));
 		else if (ISPORT(TFTP_PORT))
 			tftp_print((const u_char *)(up + 1), length);
 		else if (ISPORT(IPPORT_BOOTPC) || ISPORT(IPPORT_BOOTPS))
-			bootp_print((const u_char *)(up + 1), length,
-			    sport, dport);
+			bootp_print((const u_char *)(up + 1), sport, dport);
 		else if (ISPORT(RIP_PORT))
 			rip_print((const u_char *)(up + 1), length);
 		else if (ISPORT(ISAKMP_PORT))
@@ -617,7 +616,7 @@ udp_print(register const u_char *bp, u_int length,
 		else if (ISPORT(NTP_PORT))
 			ntp_print((const u_char *)(up + 1), length);
 		else if (ISPORT(KERBEROS_PORT) || ISPORT(KERBEROS_SEC_PORT))
-			krb_print((const void *)(up + 1), length);
+			krb_print((const void *)(up + 1));
 		else if (ISPORT(L2TP_PORT))
 			l2tp_print((const u_char *)(up + 1), length);
 #ifdef TCPDUMP_DO_SMB
@@ -627,7 +626,7 @@ udp_print(register const u_char *bp, u_int length,
 			nbt_udp138_print((const u_char *)(up + 1), length);
 #endif
 		else if (dport == 3456)
-			vat_print((const void *)(up + 1), length, up);
+			vat_print((const void *)(up + 1), up);
 		else if (ISPORT(ZEPHYR_SRV_PORT) || ISPORT(ZEPHYR_CLT_PORT))
 			zephyr_print((const void *)(up + 1), length);
 		/*

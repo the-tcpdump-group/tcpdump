@@ -31,7 +31,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sunatm.c,v 1.3 2002-08-05 07:47:23 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sunatm.c,v 1.4 2002-09-05 21:25:49 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -64,13 +64,13 @@ struct rtentry;
 #define PT_LLC		0x02	/* LLC encapsulation */
 
 /*
- * This is the top level routine of the printer.  'p' is the points
- * to the SunATM pseudo-header for the packet, 'h->tv' is the timestamp,
+ * This is the top level routine of the printer.  'p' points
+ * to the SunATM pseudo-header for the packet, 'h->ts' is the timestamp,
  * 'h->length' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
 void
-sunatm_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
+sunatm_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;

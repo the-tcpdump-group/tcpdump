@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.14 2002-08-01 08:53:03 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.15 2002-09-05 21:25:38 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -45,7 +45,7 @@ static void chdlc_slarp_print(const u_char *, u_int);
 
 /* Standard CHDLC printer */
 void
-chdlc_if_print(u_char *user, const struct pcap_pkthdr *h,
+chdlc_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
 	     register const u_char *p)
 {
 	register u_int length = h->len;

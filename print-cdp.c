@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.16 2002-08-07 05:21:07 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.17 2002-09-05 21:25:38 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -47,8 +47,7 @@ static int cdp_print_prefixes(const u_char *, int);
 static unsigned long cdp_get_number(const u_char *, int);
 
 void
-cdp_print(const u_char *p, u_int length, u_int caplen,
-	  const u_char *esrc, const u_char *edst)
+cdp_print(const u_char *p, u_int length, u_int caplen)
 {
 	u_int i;
 	int type, len;

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.80 2002-09-05 00:00:11 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.81 2002-09-05 21:25:39 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -54,7 +54,7 @@ static const char *ns_resp[] = {
 
 /* skip over a domain name */
 static const u_char *
-ns_nskip(register const u_char *cp, register const u_char *bp)
+ns_nskip(register const u_char *cp)
 {
 	register u_char i;
 
@@ -227,7 +227,7 @@ ns_nprint(register const u_char *cp, register const u_char *bp)
 
 /* print a <character-string> */
 static const u_char *
-ns_cprint(register const u_char *cp, register const u_char *bp)
+ns_cprint(register const u_char *cp)
 {
 	register u_int i;
 
@@ -308,7 +308,7 @@ ns_qprint(register const u_char *cp, register const u_char *bp)
 	register const u_char *np = cp;
 	register u_int i;
 
-	cp = ns_nskip(cp, bp);
+	cp = ns_nskip(cp);
 
 	if (cp == NULL || !TTEST2(*cp, 4))
 		return(NULL);
@@ -340,7 +340,7 @@ ns_rprint(register const u_char *cp, register const u_char *bp)
 		if ((cp = ns_nprint(cp, bp)) == NULL)
 			return NULL;
 	} else
-		cp = ns_nskip(cp, bp);
+		cp = ns_nskip(cp);
 
 	if (cp == NULL || !TTEST2(*cp, 10))
 		return (snapend);
@@ -416,7 +416,7 @@ ns_rprint(register const u_char *cp, register const u_char *bp)
 
 	case T_TXT:
 		putchar(' ');
-		(void)ns_cprint(cp, bp);
+		(void)ns_cprint(cp);
 		break;
 
 #ifdef INET6
@@ -538,7 +538,7 @@ ns_print(register const u_char *bp, u_int length)
 				if ((cp = ns_qprint(cp, bp)) == NULL)
 					goto trunc;
 			} else {
-				if ((cp = ns_nskip(cp, bp)) == NULL)
+				if ((cp = ns_nskip(cp)) == NULL)
 					goto trunc;
 				cp += 4;	/* skip QTYPE and QCLASS */
 			}

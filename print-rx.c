@@ -34,7 +34,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.33 2002-09-05 00:00:19 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.34 2002-09-05 21:25:46 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -398,7 +398,7 @@ static struct rx_cache_entry	rx_cache[RX_CACHE_SIZE];
 
 static int	rx_cache_next = 0;
 static int	rx_cache_hint = 0;
-static void	rx_cache_insert(const u_char *, const struct ip *, int, int);
+static void	rx_cache_insert(const u_char *, const struct ip *, int);
 static int	rx_cache_find(const struct rx_header *, const struct ip *,
 			      int, int32_t *);
 
@@ -418,7 +418,7 @@ static void vol_print(const u_char *, int);
 static void vol_reply_print(const u_char *, int, int32_t);
 static void bos_print(const u_char *, int);
 static void bos_reply_print(const u_char *, int, int32_t);
-static void ubik_print(const u_char *, int);
+static void ubik_print(const u_char *);
 static void ubik_reply_print(const u_char *, int, int32_t);
 
 static void rx_ack_print(const u_char *, int);
@@ -500,7 +500,7 @@ rx_print(register const u_char *bp, int length, int sport, int dport,
 		 * have a chance to print out replies
 		 */
 
-		rx_cache_insert(bp, (const struct ip *) bp2, dport, length);
+		rx_cache_insert(bp, (const struct ip *) bp2, dport);
 
 		switch (dport) {
 			case FS_RX_PORT:	/* AFS file service */
@@ -586,8 +586,7 @@ rx_print(register const u_char *bp, int length, int sport, int dport,
  */
 
 static void
-rx_cache_insert(const u_char *bp, const struct ip *ip, int dport,
-		int length)
+rx_cache_insert(const u_char *bp, const struct ip *ip, int dport)
 {
 	struct rx_cache_entry *rxent;
 	const struct rx_header *rxh = (const struct rx_header *) bp;
@@ -1308,7 +1307,7 @@ prot_print(register const u_char *bp, int length)
 	printf(" pt");
 
 	if (is_ubik(pt_op)) {
-		ubik_print(bp, length);
+		ubik_print(bp);
 		return;
 	}
 
@@ -1562,7 +1561,7 @@ vldb_print(register const u_char *bp, int length)
 	printf(" vldb");
 
 	if (is_ubik(vldb_op)) {
-		ubik_print(bp, length);
+		ubik_print(bp);
 		return;
 	}
 	printf(" call %s", tok2str(vldb_req, "op#%d", vldb_op));
@@ -1841,7 +1840,7 @@ kauth_print(register const u_char *bp, int length)
 	printf(" kauth");
 
 	if (is_ubik(kauth_op)) {
-		ubik_print(bp, length);
+		ubik_print(bp);
 		return;
 	}
 
@@ -2195,7 +2194,7 @@ is_ubik(u_int32_t opcode)
  */
 
 static void
-ubik_print(register const u_char *bp, int length)
+ubik_print(register const u_char *bp)
 {
 	int ubik_op;
 	int32_t temp;

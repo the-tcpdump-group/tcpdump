@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rip.c,v 1.51 2002-09-05 00:00:18 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rip.c,v 1.52 2002-09-05 21:25:46 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -69,7 +69,7 @@ rip_printblk(const u_char *cp, const u_char *ep)
 }
 
 static void
-rip_entry_print_v1(register int vers, register const struct rip_netinfo *ni)
+rip_entry_print_v1(register const struct rip_netinfo *ni)
 {
 	register u_short family;
 
@@ -97,7 +97,7 @@ rip_entry_print_v1(register int vers, register const struct rip_netinfo *ni)
 }
 
 static void
-rip_entry_print_v2(register int vers, register const struct rip_netinfo *ni)
+rip_entry_print_v2(register const struct rip_netinfo *ni)
 {
 	register u_char *p;
 	register u_short family;
@@ -208,9 +208,9 @@ rip_print(const u_char *dat, u_int length)
 			ni = (struct rip_netinfo *)(rp + 1);
 			for (; i >= sizeof(*ni); ++ni) {
 				if (rp->rip_vers == 1)
-					rip_entry_print_v1(rp->rip_vers, ni);
+					rip_entry_print_v1(ni);
 				else
-					rip_entry_print_v2(rp->rip_vers, ni);
+					rip_entry_print_v2(ni);
 				i -= sizeof(*ni);
 			}
 			if (trunc)

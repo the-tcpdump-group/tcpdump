@@ -20,7 +20,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-egp.c,v 1.31 2002-09-05 00:00:12 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-egp.c,v 1.32 2002-09-05 21:25:40 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -134,7 +134,7 @@ const char *egp_reasons[] = {
 };
 
 static void
-egpnrprint(register const struct egp_packet *egp, register u_int length)
+egpnrprint(register const struct egp_packet *egp)
 {
 	register const u_char *cp;
 	u_int32_t addr;
@@ -213,17 +213,18 @@ trunc:
 }
 
 void
-egp_print(register const u_char *bp, register u_int length,
-	  register const u_char *bp2)
+egp_print(register const u_char *bp)
 {
 	register const struct egp_packet *egp;
-	register const struct ip *ip;
 	register int status;
 	register int code;
 	register int type;
 
 	egp = (struct egp_packet *)bp;
-	ip = (struct ip *)bp2;
+	if (!TTEST(*egp)) {
+		printf("[|egp]");
+		return;
+	}
 	(void)printf("egp: ");
 
 	if (egp->egp_version != EGP_VERSION) {
@@ -327,7 +328,7 @@ egp_print(register const u_char *bp, register u_int length,
 		       egp->egp_intgw,
 		       egp->egp_extgw);
 		if (vflag)
-			egpnrprint(egp, length);
+			egpnrprint(egp);
 		break;
 
 	case EGPT_ERROR:

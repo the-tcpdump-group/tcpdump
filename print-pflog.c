@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pflog.c,v 1.3 2002-08-01 08:53:23 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pflog.c,v 1.4 2002-09-05 21:25:44 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -97,7 +97,7 @@ pflog_print(const struct pfloghdr *hdr)
 }
 
 void
-pflog_if_print(u_char *user, const struct pcap_pkthdr *h,
+pflog_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
      register const u_char *p)
 {
 	u_int length = h->len;

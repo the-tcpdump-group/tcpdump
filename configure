@@ -4405,7 +4405,7 @@ rm -f os-proto.h
 			    fi
 			    V_CCOPT="$V_CCOPT -Wall"
 			    if test $ac_cv_lbl_gcc_vers -gt 1 ; then
-				    V_CCOPT="$V_CCOPT -Wmissing-prototypes -Wstrict-prototypes -Wwrite-strings -W -Wno-unused"
+				    V_CCOPT="$V_CCOPT -Wmissing-prototypes -Wstrict-prototypes -Wwrite-strings -W"
 			    fi
 		    fi
 	    else

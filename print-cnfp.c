@@ -34,7 +34,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cnfp.c,v 1.10 2002-09-05 00:00:10 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cnfp.c,v 1.11 2002-09-05 21:25:39 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -78,7 +78,7 @@ struct nfrec {
 };
 
 void
-cnfp_print(const u_char *cp, u_int len, const u_char *bp)
+cnfp_print(const u_char *cp, const u_char *bp)
 {
 	register const struct nfhdr *nh;
 	register const struct nfrec *nr;

@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lane.c,v 1.15 2002-08-01 08:53:15 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lane.c,v 1.16 2002-09-05 21:25:43 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -81,8 +81,8 @@ lane_hdr_print(register const u_char *bp, int length)
 }
 
 /*
- * This is the top level routine of the printer.  'p' is the points
- * to the ether header of the packet, 'h->tv' is the timestamp,
+ * This is the top level routine of the printer.  'p' points
+ * to the LANE header of the packet, 'h->ts' is the timestamp,
  * 'h->length' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  *
@@ -166,7 +166,7 @@ lane_print(const u_char *p, u_int length, u_int caplen)
 }
 
 void
-lane_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
+lane_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 {
 	int caplen = h->caplen;
 	int length = h->len;

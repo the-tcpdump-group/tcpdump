@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-timed.c,v 1.5 2002-09-05 00:00:23 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-timed.c,v 1.6 2002-09-05 21:25:50 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -43,7 +43,7 @@ static const char *tsptype[TSPTYPENUMBER] =
   "TEST", "SETDATE", "SETDATEREQ", "LOOP" };
 
 void
-timed_print(register const u_char *bp, u_int length)
+timed_print(register const u_char *bp)
 {
 #define endof(x) ((u_char *)&(x) + sizeof (x))
 	struct tsp *tsp = (struct tsp *)bp;
