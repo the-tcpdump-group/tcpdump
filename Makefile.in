@@ -17,7 +17,7 @@
 #  WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 #  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.289 2004-07-27 17:04:20 hannes Exp $ (LBL)
+# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.290 2004-09-23 21:57:24 dyoung Exp $ (LBL)
 
 #
 # Various configurable paths (remember to edit Makefile.in, not Makefile)
@@ -65,7 +65,7 @@ INSTALL_DATA = @INSTALL_DATA@
 	@rm -f $@
 	$(CC) $(CFLAGS) -c $(srcdir)/$*.c
 
-CSRC =	addrtoname.c gmpls.c oui.c gmt2local.c ipproto.c l2vpn.c machdep.c parsenfsfh.c \
+CSRC =	addrtoname.c cpack.c gmpls.c oui.c gmt2local.c ipproto.c l2vpn.c machdep.c parsenfsfh.c \
 	print-802_11.c print-ap1394.c print-ah.c print-arcnet.c \
 	print-aodv.c print-arp.c print-ascii.c print-atalk.c print-atm.c \
 	print-beep.c print-bfd.c print-bgp.c print-bootp.c print-cdp.c \
@@ -97,7 +97,7 @@ SRC =	$(CSRC) $(GENSRC) $(LOCALSRC)
 # We would like to say "OBJ = $(SRC:.c=.o)" but Ultrix's make cannot
 # hack the extra indirection
 OBJ =	$(CSRC:.c=.o) $(GENSRC:.c=.o) $(LOCALSRC:.c=.o) $(LIBOBJS)
-HDR =   addrtoname.h appletalk.h bootp.h decnet.h \
+HDR =   addrtoname.h appletalk.h bootp.h cpack.h decnet.h \
 	ethertype.h extract.h fddi.h gmt2local.h igrp.h interface.h \
 	ipx.h llc.h machdep.h mib.h nfsfh.h nfsv2.h ntp.h ospf.h \
 	setsignal.h \
