@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.28 2001-06-15 22:17:34 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.29 2001-07-04 21:36:15 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -258,7 +258,9 @@ trunc:
 
 /*
  * auto-RP is a cisco protocol, documented at
- * ftp://ftpeng.cisco.com/ipmulticast/pim-autorp-spec01.txt
+ * ftp://ftpeng.cisco.com/ipmulticast/specs/pim-autorp-spec01.txt
+ *
+ * This implements version 1+, dated Sept 9, 1998.
  */
 void
 cisco_autorp_print(register const u_char *bp, register u_int len)
@@ -327,6 +329,8 @@ cisco_autorp_print(register const u_char *bp, register u_int len)
 		case 3:	printf(" PIMv1+2");
 			break;
 		}
+		if (bp[4] & 0xfc)
+			(void)printf(" [rsvd=0x%02x]", bp[4] & 0xfc);
 		TCHECK(bp[5]);
 		nentries = bp[5];
 		bp += 6; len -= 6;
@@ -335,6 +339,8 @@ cisco_autorp_print(register const u_char *bp, register u_int len)
 			TCHECK2(bp[0], 6);
 			(void)printf("%c%s%s/%d", s, bp[0] & 1 ? "!" : "",
 			    ipaddr_string(&bp[2]), bp[1]);
+			if (bp[0] & 0xfe)
+				(void)printf("[rsvd=0x%02x]", bp[0] & 0xfe);
 			s = ',';
 			bp += 6; len -= 6;
 		}
