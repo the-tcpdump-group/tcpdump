@@ -35,7 +35,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-"@(#) $Header: /tcpdump/master/tcpdump/print-sctp.c,v 1.4 2001-06-27 02:48:45 itojun Exp $ (NETLAB/PEL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-sctp.c,v 1.5 2001-08-01 03:31:55 guy Exp $ (NETLAB/PEL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -50,12 +50,6 @@ static const char rcsid[] =
 #include "sctpHeader.h"
 #include "sctpConstants.h"
 #include <assert.h>
-
-#if __STDC__
-struct mbuf;
-struct rtentry;
-#endif
-#include <net/if.h>
 
 #include <netinet/in.h>
 
