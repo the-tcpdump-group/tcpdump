@@ -16,7 +16,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.7 2004-05-27 21:20:50 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.8 2004-06-15 09:42:42 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -33,6 +33,8 @@ static const char rcsid[] _U_ =
 #include "decode_prefix.h"
 #include "extract.h"
 #include "addrtoname.h"
+
+#include "l2vpn.h"
 
 /*
  * ldp common header
@@ -185,33 +187,6 @@ static const struct tok ldp_fec_values[] = {
     { 0, NULL}
 };
 
-/* From draft-martini-l2circuit-trans-mpls-13.txt */
-#define LDP_MARTINI_VCTYPE_FR_DLCI	0x0001
-#define LDP_MARTINI_VCTYPE_ATM_AAL5	0x0002
-#define LDP_MARTINI_VCTYPE_ATM_CELL	0x0003
-#define LDP_MARTINI_VCTYPE_ETH_VLAN	0x0004
-#define LDP_MARTINI_VCTYPE_ETHERNET	0x0005
-#define LDP_MARTINI_VCTYPE_HDLC		0x0006
-#define LDP_MARTINI_VCTYPE_PPP		0x0007
-#define LDP_MARTINI_VCTYPE_CEM		0x0008
-#define LDP_MARTINI_VCTYPE_ATM_VCC	0x0009
-#define LDP_MARTINI_VCTYPE_ATM_VPC	0x000A
-
-/* Overlaps print-bgp.c bgp_l2vpn_encaps_values */
-static const struct tok ldp_vctype_values[] = {
-    { LDP_MARTINI_VCTYPE_FR_DLCI,	"Frame Relay DLCI" },
-    { LDP_MARTINI_VCTYPE_ATM_AAL5,	"ATM AAL5 VCC transport" },
-    { LDP_MARTINI_VCTYPE_ATM_CELL,	"ATM transparent cell transport" },
-    { LDP_MARTINI_VCTYPE_ETH_VLAN,	"Ethernet VLAN" },
-    { LDP_MARTINI_VCTYPE_ETHERNET,	"Ethernet" },
-    { LDP_MARTINI_VCTYPE_HDLC,		"HDLC" },
-    { LDP_MARTINI_VCTYPE_PPP,		"PPP" },
-    { LDP_MARTINI_VCTYPE_CEM,		"SONET/SDH Circuit Emulation Service" },
-    { LDP_MARTINI_VCTYPE_ATM_VCC,	"ATM VCC cell transport" },
-    { LDP_MARTINI_VCTYPE_ATM_VPC,	"ATM VPC cell transport" },
-    { 0, NULL}
-};
-
 /* RFC1700 address family numbers, same definition in print-bgp.c */
 #define AFNUM_INET	1
 #define AFNUM_INET6	2
@@ -350,7 +325,7 @@ ldp_tlv_print(register const u_char *tptr) {
 	    break;
 	case LDP_FEC_MARTINI_VC:
 	    printf(": %s, %scontrol word, VC %u",
-		   tok2str(ldp_vctype_values, "Unknown", EXTRACT_16BITS(tptr)&0x7fff),
+		   tok2str(l2vpn_encaps_values, "Unknown", EXTRACT_16BITS(tptr)&0x7fff),
 		   EXTRACT_16BITS(tptr)&0x8000 ? "" : "no ",
 		   EXTRACT_32BITS(tptr+7));
 	    break;

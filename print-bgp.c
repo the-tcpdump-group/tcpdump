@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.86 2004-06-12 08:52:21 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.87 2004-06-15 09:42:41 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -49,6 +49,7 @@ static const char rcsid[] _U_ =
 #include "addrtoname.h"
 #include "extract.h"
 #include "bgp.h"
+#include "l2vpn.h"
 
 struct bgp {
 	u_int8_t bgp_marker[16];
@@ -442,24 +443,6 @@ static struct tok bgp_extd_comm_ospf_rtype_values[] = {
   { BGP_OSPF_RTYPE_NSSA,"NSSA External" },
   { BGP_OSPF_RTYPE_SHAM,"MPLS-VPN Sham" },  
   { 0, NULL },
-};
-
-struct tok bgp_l2vpn_encaps_values[] = {
-    { 0,                      "Reserved"},
-    { 1,                      "Frame Relay"},
-    { 2,                      "ATM AAL5 VCC transport"},
-    { 3,                      "ATM transparent cell transport"}, 
-    { 4,                      "Ethernet VLAN"}, 
-    { 5,                      "Ethernet"}, 
-    { 6,                      "Cisco-HDLC"}, 
-    { 7,                      "PPP"}, 
-    { 8,                      "CEM"}, 
-    { 9,                      "ATM VCC cell transport"}, 
-    { 10,                     "ATM VPC cell transport"}, 
-    { 11,                     "MPLS"}, 
-    { 12,                     "VPLS"}, 
-    { 64,                     "IP-interworking"}, 
-    { 0, NULL},
 };
 
 int
@@ -1462,7 +1445,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                         break;
                     case BGP_EXT_COM_L2INFO:
                         printf(": %s Control Flags [0x%02x]:MTU %u",
-                               tok2strbuf(bgp_l2vpn_encaps_values,
+                               tok2strbuf(l2vpn_encaps_values,
 					  "unknown encaps",
 					  *(tptr+2),
 					  tokbuf, sizeof(tokbuf)),

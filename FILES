@@ -20,6 +20,7 @@ atm.h
 atmuni31.h
 bootp.h
 bpf_dump.c
+bgp.h
 chdlc.h
 config.guess
 config.h.in
@@ -51,6 +52,8 @@ ipsec_doi.h
 ipx.h
 isakmp.h
 l2tp.h
+l2vpn.c
+l2vpn.h
 lane.h
 lbl/os-osf4.h
 lbl/os-solaris2.h
@@ -80,6 +83,7 @@ missing/strlcat.c
 missing/strlcpy.c
 missing/strsep.c
 mkdep
+mpls.h
 nameser.h
 netbios.h
 nfs.h
