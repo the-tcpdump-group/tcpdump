@@ -31,6 +31,7 @@ extract.h
 fddi.h
 gmt2local.c
 gmt2local.h
+ieee802_11.h
 igrp.h
 install-sh
 interface.h
@@ -75,6 +76,7 @@ ospf6.h
 packetdat.awk
 parsenfsfh.c
 ppp.h
+print-802_11.c
 print-ah.c
 print-arcnet.c
 print-arp.c
