@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.152 2001-01-20 07:22:22 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.153 2001-01-28 08:12:25 itojun Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -266,8 +266,8 @@ extern void print_data(const unsigned char *, int);
 extern void l2tp_print(const u_char *, u_int);
 extern void lcp_print(const u_char *, u_int);
 extern void vrrp_print(const u_char *bp, u_int len, int ttl);
-extern void cdp_print(const u_char *p, u_int length, u_int caplen,
-		      const u_char *esrc, const u_char *edst);
+extern void cdp_print(const u_char *, u_int, u_int, const u_char *,
+	const u_char *);
 extern void stp_print(const u_char *p, u_int length);
 extern void radius_print(const u_char *, u_int);
 
@@ -283,4 +283,4 @@ extern int rt6_print(const u_char *, const u_char *);
 extern void ospf6_print(const u_char *, u_int);
 extern void dhcp6_print(const u_char *, u_int, u_int16_t, u_int16_t);
 #endif /*INET6*/
-extern u_short in_cksum(const u_short *addr, register int len, u_short csum);
+extern u_short in_cksum(const u_short *, register int, u_short);
