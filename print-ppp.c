@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.31 1999-11-21 09:36:59 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.32 1999-12-15 07:52:15 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -345,6 +345,8 @@ handle_chap(const u_char *p, int length)
 {
 	int x;
 	const u_char *ptr;
+
+	x = p[4];
 
 	if ((x >= CHAP_CODEMIN) && (x <= CHAP_CODEMAX))
 		printf("%s", chapcode[x - 1]);
