@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.125 2000-05-15 00:37:06 assar Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.126 2000-06-01 01:14:43 assar Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -92,6 +92,7 @@ extern int Rflag;		/* print sequence # field in AH/ESP*/
 extern int sflag;		/* use the libsmi to translate OIDs */
 extern int Sflag;		/* print raw TCP sequence numbers */
 extern int tflag;		/* print packet arrival time */
+extern int uflag;		/* Print undecoded NFS handles */
 extern int vflag;		/* verbose */
 extern int xflag;		/* print packet in hex */
 extern int Xflag;		/* print packet in hex/ascii */
