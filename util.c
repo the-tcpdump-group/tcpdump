@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.67 2000-06-21 09:08:34 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.68 2000-07-01 03:39:12 assar Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -38,16 +38,9 @@ static const char rcsid[] =
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
-#ifdef HAVE_MALLOC_H
-#include <malloc.h>
-#endif
 #include <pcap.h>
 #include <stdio.h>
-#if __STDC__
 #include <stdarg.h>
-#else
-#include <varargs.h>
-#endif
 #include <stdlib.h>
 #include <string.h>
 #ifdef TIME_WITH_SYS_TIME
@@ -227,22 +220,12 @@ tok2str(register const struct tok *lp, register const char *fmt,
 
 /* VARARGS */
 __dead void
-#if __STDC__
 error(const char *fmt, ...)
-#else
-error(fmt, va_alist)
-	const char *fmt;
-	va_dcl
-#endif
 {
 	va_list ap;
 
 	(void)fprintf(stderr, "%s: ", program_name);
-#if __STDC__
 	va_start(ap, fmt);
-#else
-	va_start(ap);
-#endif
 	(void)vfprintf(stderr, fmt, ap);
 	va_end(ap);
 	if (*fmt) {
@@ -256,22 +239,12 @@ error(fmt, va_alist)
 
 /* VARARGS */
 void
-#if __STDC__
 warning(const char *fmt, ...)
-#else
-warning(fmt, va_alist)
-	const char *fmt;
-	va_dcl
-#endif
 {
 	va_list ap;
 
 	(void)fprintf(stderr, "%s: WARNING: ", program_name);
-#if __STDC__
 	va_start(ap, fmt);
-#else
-	va_start(ap);
-#endif
 	(void)vfprintf(stderr, fmt, ap);
 	va_end(ap);
 	if (*fmt) {

@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.67 2000-01-19 05:24:16 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.68 2000-07-01 03:38:59 assar Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -34,10 +34,8 @@ static const char rcsid[] =
 #include <sys/socket.h>
 #include <sys/time.h>
 
-#if __STDC__
 struct mbuf;
 struct rtentry;
-#endif
 #include <net/if.h>
 
 #include <netinet/in.h>
@@ -53,12 +51,6 @@ struct rtentry;
 #include <netdb.h>
 #include <pcap.h>
 #include <pcap-namedb.h>
-#ifdef HAVE_MALLOC_H
-#include <malloc.h>
-#endif
-#ifdef HAVE_MEMORY_H
-#include <memory.h>
-#endif
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>

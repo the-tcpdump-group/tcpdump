@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.3 2000-04-24 12:59:39 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.4 2000-07-01 03:39:01 assar Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -35,10 +35,8 @@ static const char rcsid[] =
 #include <sys/file.h>
 #include <sys/ioctl.h>
 
-#if __STDC__
 struct mbuf;
 struct rtentry;
-#endif
 #include <net/if.h>
 
 #include <netinet/in.h>

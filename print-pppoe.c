@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.3 1999-12-15 00:23:06 fenner Exp $ (LBL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.4 2000-07-01 03:39:08 assar Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -32,18 +32,13 @@ static const char rcsid[] =
 #include <sys/time.h>
 #include <sys/socket.h>
 
-#if __STDC__
 struct mbuf;
 struct rtentry;
-#endif
 #include <net/if.h>
 
 #include <netinet/in.h>
 #include <netinet/if_ether.h>
 
-#ifdef HAVE_MEMORY_H
-#include <memory.h>
-#endif
 #include <stdio.h>
 #include <string.h>
 

@@ -51,7 +51,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.8 2000-06-03 16:40:35 itojun Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.9 2000-07-01 03:39:11 assar Exp $";
 #endif
 
 #include <sys/param.h>
@@ -70,9 +70,7 @@ static const char rcsid[] =
 #include <arpa/telnet.h>
 
 #include <stdio.h>
-#ifdef __STDC__
 #include <stdlib.h>
-#endif
 #include <unistd.h>
 #include <string.h>
 
