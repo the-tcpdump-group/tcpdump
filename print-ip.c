@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.107 2002-07-14 19:46:51 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.108 2002-07-20 23:37:40 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -308,6 +308,8 @@ ip_print(register const u_char *bp, register u_int length)
 
         printf("IP ");
 
+	off = ntohs(ip->ip_off);
+
         if (vflag) {
             (void)printf("(tos 0x%x", (int)ip->ip_tos);
             /* ECN bits */
@@ -332,12 +334,10 @@ ip_print(register const u_char *bp, register u_int length)
             (void)printf(", len %d) ", (int)ntohs(ip->ip_len));
 	}
 
-
 	/*
 	 * If this is fragment zero, hand it to the next higher
 	 * level protocol.
 	 */
-	off = ntohs(ip->ip_off);
 	if ((off & 0x1fff) == 0) {
 		cp = (const u_char *)ip + hlen;
 		nh = ip->ip_p;
