@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.31 2004-05-31 01:55:07 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.32 2004-05-31 02:08:27 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -912,7 +912,7 @@ nbt_tcp_print(const u_char *data, int length)
 	printf ("\n>>> NBT Session Packet\n");
 	switch (type) {
 	case 0x00:
-	    data = smb_fdata(data, "[P1]NBT Session Message\nFlags=[rB]\nLength=[d]\n",
+	    data = smb_fdata(data, "[P1]NBT Session Message\nFlags=[B]\nLength=[rd]\n",
 		data + 4);
 	    if (data == NULL)
 		break;
@@ -927,12 +927,12 @@ nbt_tcp_print(const u_char *data, int length)
 
 	case 0x81:
 	    data = smb_fdata(data,
-		"[P1]NBT Session Request\nFlags=[rB]\nDestination=[n1]\nSource=[n1]\n",
+		"[P1]NBT Session Request\nFlags=[B]\nLength=[rd]\nDestination=[n1]\nSource=[n1]\n",
 		maxbuf);
 	    break;
 
 	case 0x82:
-	    data = smb_fdata(data, "[P1]NBT Session Granted\nFlags=[rB]\n", maxbuf);
+	    data = smb_fdata(data, "[P1]NBT Session Granted\nFlags=[B]\nLength=[rd]\n", maxbuf);
 	    break;
 
 	case 0x83:
@@ -942,7 +942,7 @@ nbt_tcp_print(const u_char *data, int length)
 	    TCHECK(data[4]);
 	    ecode = data[4];
 
-	    data = smb_fdata(data, "[P1]NBT SessionReject\nFlags=[rB]\nReason=[B]\n",
+	    data = smb_fdata(data, "[P1]NBT SessionReject\nFlags=[B]\nLength=[rd]\nReason=[B]\n",
 		maxbuf);
 	    switch (ecode) {
 	    case 0x80:
@@ -965,11 +965,11 @@ nbt_tcp_print(const u_char *data, int length)
 	    break;
 
 	case 0x85:
-	    data = smb_fdata(data, "[P1]NBT Session Keepalive\nFlags=[rB]\n", maxbuf);
+	    data = smb_fdata(data, "[P1]NBT Session Keepalive\nFlags=[B]\nLength=[rd]\n", maxbuf);
 	    break;
 
 	default:
-	    data = smb_fdata(data, "NBT - Unknown packet type\nType=[rB]\n", maxbuf);
+	    data = smb_fdata(data, "NBT - Unknown packet type\nType=[B]\n", maxbuf);
 	    break;
 	}
 	printf("\n");
