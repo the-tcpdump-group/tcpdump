@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.52 2002-10-11 10:33:09 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.53 2002-10-11 13:09:51 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -1141,7 +1141,7 @@ bgp_open_print(const u_char *dat, int length)
                         break;
                     case BGP_CAPCODE_RESTART:
                         printf("\n\t\tRestart Flags: [%s], Restart Time %us",
-                               (opt[i+BGP_OPT_SIZE+2]) ? "R" : "none",
+                               ((opt[i+BGP_OPT_SIZE+2])&0x80) ? "R" : "none",
                                EXTRACT_16BITS(opt+i+BGP_OPT_SIZE+2)&0xfff);
                         tcap_len-=2;
                         cap_offset=4;
