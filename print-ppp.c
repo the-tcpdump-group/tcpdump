@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.73 2002-09-14 23:06:10 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.74 2002-09-15 00:56:25 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -97,7 +97,7 @@ struct tok ppptype2str[] = {
 	{ PPP_CHAP,	  "CHAP" },
 	{ PPP_BACP,	  "BACP" },
 	{ PPP_BAP,	  "BAP" },
-	{ PPP_MP,	  "MP" },
+	{ PPP_MP,	  "PPP" },
 	{ 0,		  NULL }
 };
 
@@ -372,31 +372,29 @@ static void handle_ppp (u_int proto, const u_char *p, int length);
 
 /* generic Control Protocol (e.g. LCP, IPCP, CCP, etc.) handler */
 static void
-handle_ctrl_proto(u_int proto, const u_char *p, int length)
+handle_ctrl_proto(u_int proto, const u_char *pptr, int length)
 {
 	u_int code, len;
 	int (*pfunc)(const u_char *, int);
 	int x, j;
+        const u_char *tptr;
 
-	if (length < 1) {
-		printf("[|%s]",
-                       tok2str(ppptype2str, "unknown protocol 0x%04x", proto));
-		return;
-	} else if (length < 4) {
-		printf("[|%s 0x%02x]",
-                       tok2str(ppptype2str, "unknown protocol 0x%04x", proto),
-                       *p);
-		return;
-	}
+        tptr=pptr;
 
-	code = *p++;
+        if (!vflag) /* omit the proto id as we already have printed it */
+                printf("%s: ",tok2str(ppptype2str, "unknown", proto));
+
+	if (length < 4) /* FIXME weak boundary checking */
+		return;
+
+	code = *tptr++;
 	
         printf("%s (%u)",
-               tok2str(cpcodes, "unknown opcode 0x%02x",code),
-               *p++); /* ID */
+               tok2str(cpcodes, "Unknown Opcode 0x%02x",code),
+               *tptr++); /* ID */
 
-	len = EXTRACT_16BITS(p);
-	p += 2;
+	len = EXTRACT_16BITS(tptr);
+	tptr += 2;
 
 	if (length <= 4)
 		return;		/* there may be a NULL confreq etc. */
@@ -405,9 +403,9 @@ handle_ctrl_proto(u_int proto, const u_char *p, int length)
 	case CPCODES_VEXT:
 		if (length < 11)
 			break;
-		printf(", Magic-Num=%08x", EXTRACT_32BITS(p));
-		p += 4;
-		printf(" OUI=%02x%02x%02x", p[0], p[1], p[2]);
+		printf(", Magic-Num=%08x", EXTRACT_32BITS(tptr));
+		tptr += 4;
+		printf(" OUI=%02x%02x%02x", tptr[0], tptr[1], tptr[2]);
 		/* XXX: need to decode Kind and Value(s)? */
 		break;
 	case CPCODES_CONF_REQ:
@@ -438,10 +436,10 @@ handle_ctrl_proto(u_int proto, const u_char *p, int length)
 				pfunc = NULL;
 				break;
 			}
-			if ((j = (*pfunc)(p, len)) == 0)
+			if ((j = (*pfunc)(tptr, len)) == 0)
 				break;
 			x -= j;
-			p += j;
+			tptr += j;
 		} while (x > 0);
 		break;
 
@@ -455,7 +453,7 @@ handle_ctrl_proto(u_int proto, const u_char *p, int length)
 	case CPCODES_PROT_REJ:
 		if (length < 6)
 			break;
-		printf(", Rejected-Protocol=%04x", EXTRACT_16BITS(p));
+		printf(", Rejected-Protocol=%04x", EXTRACT_16BITS(tptr));
 		/* XXX: need to decode Rejected-Information? */
 		break;
 	case CPCODES_ECHO_REQ:
@@ -464,20 +462,27 @@ handle_ctrl_proto(u_int proto, const u_char *p, int length)
 	case CPCODES_ID:
 		if (length < 8)
 			break;
-		printf(", Magic-Num=%08x", EXTRACT_32BITS(p));
+		printf(", Magic-Num=%08x", EXTRACT_32BITS(tptr));
 		/* XXX: need to decode Data? */
 		break;
 	case CPCODES_TIME_REM:
 		if (length < 12)
 			break;
-		printf(", Magic-Num=%08x", EXTRACT_32BITS(p));
-		printf(" Seconds-Remaining=%u", EXTRACT_32BITS(p + 4));
+		printf(", Magic-Num=%08x", EXTRACT_32BITS(tptr));
+		printf(" Seconds-Remaining=%u", EXTRACT_32BITS(tptr + 4));
 		/* XXX: need to decode Message? */
 		break;
 	default:
-                print_unknown_data(p,"\n\t",len);
+            /* XXX this is dirty but we do not get the
+             * original pointer passed to the begin
+             * the PPP packet */
+                if (!vflag)
+                    print_unknown_data(pptr-2,"\n\t",length+2);
 		break;
 	}
+
+        if (vflag)
+            print_unknown_data(pptr-2,"\n\t",length+2);
 }
 
 /* LCP config options */
@@ -981,7 +986,9 @@ handle_ppp(u_int proto, const u_char *p, int length)
 		mpls_print(p, length);
 		break;
 	default:
-		break;
+                if (!vflag)
+                    printf("unknown PPP protocol (0x%04x)", proto);
+                break;
 	}
 }
 
@@ -990,7 +997,7 @@ u_int
 ppp_print(register const u_char *p, u_int length)
 {
 	u_int proto;
-	u_int full_length = length;
+        u_int olen = length; /* _o_riginal length */
 	u_int hdr_len = 0;
 
 	/*
@@ -1019,9 +1026,10 @@ ppp_print(register const u_char *p, u_int length)
 		hdr_len += 2;
 	}
 
-	printf("%s, length: %u : ",
-               tok2str(ppptype2str, "unknown-0x%04x", proto),
-               full_length);
+        if (vflag)
+            printf("PPP-%s (length: %u): ",
+                   tok2str(ppptype2str, "unknown (0x%04x)", proto),
+                   olen);
 
 	handle_ppp(proto, p, length);
 	return (hdr_len);
@@ -1156,7 +1164,7 @@ ppp_hdlc_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
 		proto = EXTRACT_16BITS(p);
 		p += 2;
 		length -= 2;
-		printf("%s: ", tok2str(ppptype2str, "unknown-0x%04x", proto));
+		printf("%s: ", tok2str(ppptype2str, "unknown PPP protocol (0x%04x)", proto));
 
 		handle_ppp(proto, p, length);
 		break;
@@ -1351,7 +1359,7 @@ ppp_bsdos_if_print(u_char *user _U_, const struct pcap_pkthdr *h _U_,
                 mpls_print(p, length);
                 break;
 	default:
-		printf("%s ", tok2str(ppptype2str, "unknown protocol 0x%04x", ptype));
+		printf("%s ", tok2str(ppptype2str, "unknown PPP protocol (0x%04x)", ptype));
 	}
 
 printx:
