@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.12 2000-09-29 04:58:41 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.13 2000-10-03 04:19:07 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -40,6 +40,7 @@ static const char rcsid[] =
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
 #include "interface.h"
 #include "addrtoname.h"
@@ -67,7 +68,7 @@ ip6_print(register const u_char *bp, register int length)
 	 * This will never happen with BPF.  It does happen raw packet
 	 * dumps from -r.
 	 */
-	if ((int)ip6 & 15) {
+	if ((u_long)ip6 & 15) {
 		static u_char *abuf;
 
 		if (abuf == NULL)
