@@ -2,6 +2,15 @@
  * make them to acconfig.h and rerun autoheader */
 @TOP@
 
+/* Define __P() macro, if necessary */
+#ifndef __P
+#if __STDC__
+#define __P(protos) protos
+#else
+#define __P(protos) ()
+#endif
+#endif
+
 /* Define if you have SSLeay 0.9.0b with the buggy cast128. */
 #undef HAVE_BUGGY_CAST128
 
