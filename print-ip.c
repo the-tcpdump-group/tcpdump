@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.75 1999-11-21 16:26:59 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.76 1999-11-22 07:25:27 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -187,7 +187,7 @@ igmp_print(register const u_char *bp, register u_int len,
 		break;
 	case 0x14:
 		(void)printf("igmp pim");
-		igmp_pim_print(bp, len);
+		pimv1_print(bp, len);
   		break;
 	case 0x1e:
 		print_mresp(bp, len);

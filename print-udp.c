@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.67 1999-11-21 15:57:51 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.68 1999-11-22 07:25:27 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -309,6 +309,7 @@ rtcp_print(const u_char *hdr, const u_char *ep)
 #define RX_PORT_HIGH 7009	/*XXX*/
 #define NETBIOS_NS_PORT   137
 #define NETBIOS_DGRAM_PORT   138
+#define CISCO_AUTORP_PORT 496	/*XXX*/
 
 #ifdef INET6
 #define RIPNG_PORT 521		/*XXX*/
@@ -538,6 +539,8 @@ udp_print(register const u_char *bp, u_int length, register const u_char *bp2)
 		 */
 		else if (dport == 4567)
 			wb_print((const void *)(up + 1), length);
+		else if (ISPORT(CISCO_AUTORP_PORT))
+			cisco_autorp_print((const void *)(up + 1), length);
 		else
 			(void)printf(" udp %u",
 			    (u_int32_t)(ulen - sizeof(*up)));
