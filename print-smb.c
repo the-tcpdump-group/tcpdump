@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.16 2001-06-28 03:15:38 itojun Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.17 2001-07-28 22:59:30 guy Exp $";
 #endif
 
 #include <stdio.h>
@@ -925,6 +925,7 @@ nbt_udp137_print(const uchar *data, int length)
     case 7: opcodestr = "WACK"; break;
     case 8: opcodestr = "REFRESH(8)"; break;
     case 9: opcodestr = "REFRESH"; break;
+    case 15: opcodestr = "MULTIHOMED REGISTRATION"; break;
     default: opcodestr = "OPUNKNOWN"; break;
     }
     printf("%s", opcodestr);
