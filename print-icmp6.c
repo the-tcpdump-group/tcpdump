@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.38 2000-11-08 10:10:59 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.39 2000-11-08 13:01:37 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -885,6 +885,7 @@ icmp6_rrenum_print(int icmp6len, const u_char *bp, const u_char *ep)
 		}
 		printf("segnum=%u,", rr6->rr_segnum);
 		printf("maxdelay=%u", rr6->rr_maxdelay);
+		printf("seqnum=%u,", (u_int32_t)ntohl(rr6->rr_seqnum));
 		if (rr6->rr_reserved)
 			printf("rsvd=0x%x", (u_int16_t)ntohs(rr6->rr_reserved));
 		/*[*/
