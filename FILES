@@ -71,6 +71,7 @@ missing/sockstorage.h
 missing/strdup.c
 missing/strlcat.c
 missing/strlcpy.c
+missing/strsep.c
 mkdep
 nameser.h
 netbios.h

@@ -184,6 +184,9 @@
 /* Define if you have the strlcpy function.  */
 #undef HAVE_STRLCPY
 
+/* Define if you have the strsep function.  */
+#undef HAVE_STRSEP
+
 /* Define if you have the vfprintf function.  */
 #undef HAVE_VFPRINTF
 

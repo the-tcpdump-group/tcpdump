@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.33 2003-02-26 18:58:05 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.34 2003-03-02 23:19:38 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -53,6 +53,11 @@ static const char rcsid[] =
 #include "esp.h"
 #ifdef INET6
 #include "ip6.h"
+#endif
+
+#if defined(__MINGW32__) || defined(__WATCOMC__)
+#include "addrinfo.h"
+extern char *strsep (char **stringp, const char *delim); /* Missing/strsep.c */
 #endif
 
 #define AVOID_CHURN 1
@@ -192,13 +197,13 @@ static void esp_print_decode_onesecret(char *line)
     char  fileline[1024];
     char  *nl;
 
-    secretfile=fopen(line, "r");
+    secretfile = fopen(line, FOPEN_READ_TXT);
     if(secretfile == NULL) {
       perror(line);
       exit(3);
     }
     
-    while(fgets(fileline, 1024, secretfile) != NULL) {
+    while(fgets(fileline, sizeof(fileline)-1, secretfile) != NULL) {
 
       /* remove newline from the line */
       nl = strchr(fileline, '\n');
@@ -467,7 +472,15 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 
 		if (espsecret_keylen != 8)
 			goto fail;
-#if OPENSSL_VERSION_NUMBER >= 0x00907000L
+
+#if OPENSSL_VERSION_NUMBER >= 0x00908000L
+		DES_set_key_unchecked((const_DES_cblock *)secret, &schedule);
+
+		DES_cbc_encrypt((const unsigned char *)p, p,
+			(long)(ep - p), &schedule, (DES_cblock *)iv,
+			DES_DECRYPT);
+
+#elif OPENSSL_VERSION_NUMBER >= 0x00907000L
 		DES_set_key_unchecked((DES_cblock *)secret, schedule);
 
 		DES_cbc_encrypt((const unsigned char *)p, p,
@@ -557,6 +570,17 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 		DES_set_odd_parity((DES_cblock *)secret);
 		DES_set_odd_parity((DES_cblock *)(secret + 8));
 		DES_set_odd_parity((DES_cblock *)(secret + 16));
+#if OPENSSL_VERSION_NUMBER >= 0x00908000L
+		if(DES_set_key_checked((const_DES_cblock *)secret, &s1) != 0) {
+		  printf("failed to schedule key 1\n");
+		}
+		if(DES_set_key_checked((const_DES_cblock *)(secret + 8), &s2)!=0) {
+		  printf("failed to schedule key 2\n");
+		}
+		if(DES_set_key_checked((const_DES_cblock *)(secret + 16), &s3)!=0) {
+		  printf("failed to schedule key 3\n");
+		}
+#else
 		if(DES_set_key_checked((DES_cblock *)secret, s1) != 0) {
 		  printf("failed to schedule key 1\n");
 		}
@@ -566,6 +590,7 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 		if(DES_set_key_checked((DES_cblock *)(secret + 16), s3)!=0) {
 		  printf("failed to schedule key 3\n");
 		}
+#endif
 
 		p = ivoff + ivlen;
 		DES_ede3_cbc_encrypt((const unsigned char *)p, p,

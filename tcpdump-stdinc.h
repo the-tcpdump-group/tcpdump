@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/tcpdump-stdinc.h,v 1.3 2002-08-05 07:47:24 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/tcpdump-stdinc.h,v 1.4 2003-03-02 23:19:38 guy Exp $ (LBL)
  */
 
 /*
@@ -28,16 +28,22 @@
  * differences to this one file.
  */
 
+#ifndef tcpdump_stdinc_h
+#define tcpdump_stdinc_h
+
 #ifdef WIN32
 
+#include <stdio.h>
 #include <winsock2.h>
 #include "bittypes.h"
+#include <ctype.h>
 #include <time.h>
 #include <io.h>
 #include "IP6_misc.h"
 #include <fcntl.h>
 
 #ifdef __MINGW32__
+#include <stdint.h>
 int* _errno();
 #define errno (*_errno())
 
@@ -45,6 +51,10 @@ int* _errno();
 #define INET6_ADDRSTRLEN 46
 
 #endif /* __MINGW32__ */
+
+#ifndef toascii
+#define toascii(c) ((c) & 0x7f)
+#endif
 
 #ifndef caddr_t
 typedef char* caddr_t;
@@ -57,7 +67,8 @@ typedef char* caddr_t;
 #define vsnprintf _vsnprintf
 #define RETSIGTYPE void
 
-#ifndef __MINGW32__
+#if !defined(__MINGW32__) && !defined(__WATCOMC__)
+#undef toascii
 #define isascii __isascii
 #define toascii __toascii
 #define stat _stat
@@ -91,3 +102,17 @@ typedef short ino_t;
 #ifdef INET6
 #include "ip6.h"
 #endif
+
+#if defined(WIN32) || defined(MSDOS)
+  #define FOPEN_READ_TXT   "rt"
+  #define FOPEN_READ_BIN   "rb"
+  #define FOPEN_WRITE_TXT  "wt"
+  #define FOPEN_WRITE_BIN  "wb"
+#else
+  #define FOPEN_READ_TXT   "r"
+  #define FOPEN_READ_BIN   FOPEN_READ_BIN
+  #define FOPEN_WRITE_TXT  "w"
+  #define FOPEN_WRITE_BIN  FOPEN_WRITE_TXT
+#endif
+
+#endif /* tcpdump_stdinc_h */
