@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.54 2002-07-19 10:10:34 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.55 2002-07-25 09:00:42 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -432,6 +432,35 @@ struct isis_tlv_lsp {
     u_char checksum[2];
 };
 
+
+/* allocate space for the following string
+ * xx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx
+ * 32 bytes plus one termination byte */
+static char *
+print_nsap(register const u_char *cp, register int length)
+{
+	int i;
+	static char nsap[33];
+        char *pos = nsap;
+
+        if (length==0) {
+		*(pos) = '0';
+                *(pos+1) = '\0';
+                return (nsap);
+        }
+
+	for (i = 0; i < length; i++) {
+		if (!TTEST2(*cp, 1))
+			return (0);
+		pos+=sprintf(pos, "%02x", *cp++);
+		if (((i & 1) == 0) && (i + 1 < length)) {
+			pos+=sprintf(pos, ".");
+		}
+	}
+        *(pos) = '\0';
+	return (nsap);
+}
+
 #define ISIS_COMMON_HEADER_SIZE (sizeof(struct isis_common_header))
 #define ISIS_IIH_LAN_HEADER_SIZE (sizeof(struct isis_iih_lan_header))
 #define ISIS_IIH_PTP_HEADER_SIZE (sizeof(struct isis_iih_ptp_header))
@@ -468,7 +497,7 @@ void isoclns_print(const u_char *p, u_int length, u_int caplen,
 		break;
 
 	case NLPID_ESIS:
-		(void)printf("ESIS");
+		(void)printf("ESIS(%u)", length);
 		if (!eflag && esrc != NULL && edst != NULL)
 			(void)printf(", %s > %s",
 				     etheraddr_string(esrc),
@@ -477,7 +506,7 @@ void isoclns_print(const u_char *p, u_int length, u_int caplen,
 		return;
 
 	case NLPID_ISIS:
-		(void)printf("ISIS(%d)", length);
+		(void)printf("ISIS(%u)", length);
 		if (!eflag && esrc != NULL && edst != NULL)
 			(void)printf(", %s > %s",
 			     etheraddr_string(esrc),
@@ -559,11 +588,11 @@ esis_print(const u_char *p, u_int length)
 		break;
 
 	case ESIS_ESH:
-		printf(" esh");
+		printf(" ESH");
 		break;
 
 	case ESIS_ISH:
-		printf(" ish");
+		printf(" ISH");
 		break;
 
 	default:
@@ -608,7 +637,7 @@ esis_print(const u_char *p, u_int length)
 	}
 #if 0
 	case ESIS_ESH:
-		printf(" esh");
+		printf(" ESH");
 		break;
 #endif
 	case ESIS_ISH: {
@@ -622,7 +651,7 @@ esis_print(const u_char *p, u_int length)
 		if (p > snapend)
 			return;
 		if (!qflag)
-			printf("\n\t\t %s", isonsap_string(is));
+			printf("\n\tNET: %s", print_nsap(is+1,*is));
 		li = ep - p;
 		break;
 	}
@@ -667,34 +696,6 @@ esis_print(const u_char *p, u_int length)
 				printf("%02x", *q++);
 			printf (">");
 		}
-}
-
-/* allocate space for the following string
- * xx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx
- * 32 bytes plus one termination byte */
-static char *
-print_nsap(register const u_char *cp, register int length)
-{
-	int i;
-	static char nsap[33];
-        char *pos = nsap;
-
-        if (length==0) {
-		*(pos) = '0';
-                *(pos+1) = '\0';
-                return (nsap);
-        }
-
-	for (i = 0; i < length; i++) {
-		if (!TTEST2(*cp, 1))
-			return (0);
-		pos+=sprintf(pos, "%02x", *cp++);
-		if (((i & 1) == 0) && (i + 1 < length)) {
-			pos+=sprintf(pos, ".");
-		}
-	}
-        *(pos) = '\0';
-	return (nsap);
 }
 
 /* allocate space for the following string
@@ -1192,9 +1193,9 @@ static int isis_print (const u_char *p, u_int length)
     pdu_type=header->pdu_type;
 
     /* first lets see if we know the PDU name*/
-    printf(", %s",
+    printf(", pdu-type: %s",
            tok2str(isis_pdu_values,
-                   "unknown PDU, type %d",
+                   "unknown, type %d",
                    pdu_type));
 
     switch (pdu_type) {
