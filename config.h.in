@@ -57,9 +57,6 @@
 /* define if INADDRSZ is defined (XXX not used!) */
 #undef HAVE_INADDRSZ
 
-/* define if you have <net/slip.h> */
-#undef HAVE_NET_SLIP_H
-
 /* define if this is a development version, to use additional prototypes. */
 #undef HAVE_OS_PROTO_H
 
@@ -187,9 +184,6 @@
 
 /* Define if you have the <fcntl.h> header file.  */
 #undef HAVE_FCNTL_H
-
-/* Define if you have the <net/slip.h> header file.  */
-#undef HAVE_NET_SLIP_H
 
 /* Define if you have the <rc5.h> header file.  */
 #undef HAVE_RC5_H

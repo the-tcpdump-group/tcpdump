@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.126 2000-10-07 05:58:06 itojun Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.127 2000-10-09 01:58:53 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.126 $)
+AC_REVISION($Revision: 1.127 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -38,11 +38,9 @@ linux*)
 	if test $ac_cv_linux_vers -lt 2 ; then
 		AC_MSG_ERROR(version 2 or higher required; see the INSTALL doc for more info)
 	fi
-	AC_DEFINE(HAVE_NET_SLIP_H)
 	;;
 
 *)
-	AC_CHECK_HEADERS(net/slip.h)
 	;;
 esac
 

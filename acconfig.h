@@ -53,9 +53,6 @@
 /* define if INADDRSZ is defined (XXX not used!) */
 #undef HAVE_INADDRSZ
 
-/* define if you have <net/slip.h> */
-#undef HAVE_NET_SLIP_H
-
 /* define if this is a development version, to use additional prototypes. */
 #undef HAVE_OS_PROTO_H
 
