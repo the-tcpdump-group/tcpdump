@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.47 2001-05-09 01:08:03 fenner Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.48 2001-05-09 02:43:40 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -64,6 +64,13 @@ void icmp6_rrenum_print(int, const u_char *, const u_char *);
 #ifndef abs
 #define abs(a)	((0 < (a)) ? (a) : -(a))
 #endif
+
+static char *rtpref_str[] = {
+	"medium",		/* 00 */
+	"high",			/* 01 */
+	"rsv",			/* 10 */
+	"low"			/* 11 */
+};
 
 void
 icmp6_print(register const u_char *bp, register const u_char *bp2)
@@ -224,6 +231,7 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 		printf("icmp6: router advertisement");
 		if (vflag) {
 			struct nd_router_advert *p;
+			int rtpref;
 
 			p = (struct nd_router_advert *)dp;
 			TCHECK(p->nd_ra_retransmit);
@@ -237,8 +245,17 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 #endif
 			if (p->nd_ra_flags_reserved & ND_RA_FLAG_HA)
 				printf("H");
-			if (p->nd_ra_flags_reserved != 0)
+#ifndef ND_RA_FLAG_RTPREF_MASK
+#define ND_RA_FLAG_RTPREF_MASK	0x18
+#endif
+
+			if ((p->nd_ra_flags_reserved & ~ND_RA_FLAG_RTPREF_MASK)
+			    != 0)
 				printf(" ");
+
+			rtpref = ((p->nd_ra_flags_reserved & ND_RA_FLAG_RTPREF_MASK) >> 3) & 0xff;
+			printf("pref=%s, ", rtpref_str[rtpref]);
+
 			printf("router_ltime=%d, ", ntohs(p->nd_ra_router_lifetime));
 			printf("reachable_time=%u, ",
 				(u_int32_t)ntohl(p->nd_ra_reachable));
