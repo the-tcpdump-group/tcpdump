@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.105 2005-01-05 03:55:05 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.106 2005-01-05 08:16:45 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -517,9 +517,10 @@ nfsreq_print(register const u_char *bp, u_int length,
 		if ((dp = parsereq(rp, length)) != NULL &&
 		    (dp = parsefh(dp, v3)) != NULL) {
 			if (v3) {
-				TCHECK(dp[3]);
-				printf(" %u bytes @ %" PRIu64,
-						EXTRACT_32BITS(&dp[3]),
+				TCHECK(dp[2]);
+				printf(" %u (%u) bytes @ %" PRIu64,
+						EXTRACT_32BITS(&dp[4]),
+						EXTRACT_32BITS(&dp[2]),
 						EXTRACT_64BITS(&dp[0]));
 				if (vflag) {
 					dp += 3;
