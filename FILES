@@ -25,6 +25,7 @@ config.sub
 configure
 configure.in
 decnet.h
+enc.h
 esp.h
 ether.h
 ethertype.h
