@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.42 2000-12-13 07:57:05 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.43 2001-01-22 02:31:18 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -893,7 +893,7 @@ icmp6_rrenum_print(int icmp6len, const u_char *bp, const u_char *ep)
 		if (rr6->rr_flags) {
 			printf("%s%s%s%s%s,", F(ICMP6_RR_FLAGS_TEST, "T"),
 			    F(ICMP6_RR_FLAGS_REQRESULT, "R"),
-			    F(ICMP6_RR_FLAGS_ALLIF, "A"),
+			    F(ICMP6_RR_FLAGS_FORCEAPPLY, "A"),
 			    F(ICMP6_RR_FLAGS_SPECSITE, "S"),
 			    F(ICMP6_RR_FLAGS_PREVDONE, "P"));
 		}
