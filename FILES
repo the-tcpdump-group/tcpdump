@@ -128,6 +128,7 @@ print-ripng.c
 print-rt6.c
 print-rx.c
 print-sl.c
+print-sll.c
 print-smb.c
 print-snmp.c
 print-stp.c
@@ -150,6 +151,7 @@ setsignal.c
 setsignal.h
 slip.h
 slcompress.h
+sll.h
 smb.h
 smbutil.c
 stime.awk
