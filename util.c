@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.77 2002-08-01 08:53:37 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.78 2002-08-02 04:22:11 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -367,7 +367,7 @@ read_infile(char *fname)
 		pdest=strchr( cp, '\xa');
 		*pdest=0;
 	}
-#endif WIN32
+#endif /* WIN32 */
 	cp[(int)buf.st_size] = '\0';
 
 	return (cp);
