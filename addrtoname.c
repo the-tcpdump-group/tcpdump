@@ -23,21 +23,25 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.61.1.1 1999-10-07 23:47:09 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.69.2.1 2001-01-17 18:29:58 guy Exp $ (LBL)";
+#endif
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/time.h>
 
-#if __STDC__
 struct mbuf;
 struct rtentry;
-#endif
 #include <net/if.h>
 
 #include <netinet/in.h>
+#ifdef HAVE_NETINET_IF_ETHER_H
 #include <netinet/if_ether.h>
+#endif
 
 #include <arpa/inet.h>
 
@@ -45,12 +49,6 @@ struct rtentry;
 #include <netdb.h>
 #include <pcap.h>
 #include <pcap-namedb.h>
-#ifdef HAVE_MALLOC_H
-#include <malloc.h>
-#endif
-#ifdef HAVE_MEMORY_H
-#include <memory.h>
-#endif
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
@@ -84,6 +82,16 @@ struct hnamemem uporttable[HASHNAMESIZE];
 struct hnamemem eprototable[HASHNAMESIZE];
 struct hnamemem dnaddrtable[HASHNAMESIZE];
 struct hnamemem llcsaptable[HASHNAMESIZE];
+
+#ifdef INET6
+struct h6namemem {
+	struct in6_addr addr;
+	char *name;
+	struct h6namemem *nxt;
+};
+
+struct h6namemem h6nametable[HASHNAMESIZE];
+#endif /* INET6 */
 
 struct enamemem {
 	u_short e_addr0;
@@ -171,39 +179,7 @@ getname(const u_char *ap)
 #ifndef LBL_ALIGN
 	addr = *(const u_int32_t *)ap;
 #else
-	/*
-	 * Extract 32 bits in network order, dealing with alignment.
-	 */
-	switch ((long)ap & 3) {
-
-	case 0:
-		addr = *(u_int32_t *)ap;
-		break;
-
-	case 2:
-#ifdef WORDS_BIGENDIAN
-		addr = ((u_int32_t)*(u_short *)ap << 16) |
-			(u_int32_t)*(u_short *)(ap + 2);
-#else
-		addr = ((u_int32_t)*(u_short *)(ap + 2) << 16) |
-			(u_int32_t)*(u_short *)ap;
-#endif
-		break;
-
-	default:
-#ifdef WORDS_BIGENDIAN
-		addr = ((u_int32_t)ap[0] << 24) |
-			((u_int32_t)ap[1] << 16) |
-			((u_int32_t)ap[2] << 8) |
-			(u_int32_t)ap[3];
-#else
-		addr = ((u_int32_t)ap[3] << 24) |
-			((u_int32_t)ap[2] << 16) |
-			((u_int32_t)ap[1] << 8) |
-			(u_int32_t)ap[0];
-#endif
-		break;
-	}
+	memcpy(&addr, ap, sizeof(addr));
 #endif
 	p = &hnametable[addr & (HASHNAMESIZE-1)];
 	for (; p->nxt; p = p->nxt) {
@@ -248,6 +224,71 @@ getname(const u_char *ap)
 	p->name = savestr(intoa(addr));
 	return (p->name);
 }
+
+#ifdef INET6
+/*
+ * Return a name for the IP6 address pointed to by ap.  This address
+ * is assumed to be in network byte order.
+ */
+char *
+getname6(const u_char *ap)
+{
+	register struct hostent *hp;
+	struct in6_addr addr;
+	static struct h6namemem *p;		/* static for longjmp() */
+	register char *cp;
+	char ntop_buf[INET6_ADDRSTRLEN];
+
+	memcpy(&addr, ap, sizeof(addr));
+	p = &h6nametable[*(u_int16_t *)&addr.s6_addr[14] & (HASHNAMESIZE-1)];
+	for (; p->nxt; p = p->nxt) {
+		if (memcmp(&p->addr, &addr, sizeof(addr)) == 0)
+			return (p->name);
+	}
+	p->addr = addr;
+	p->nxt = newh6namemem();
+
+	/*
+	 * Only print names when:
+	 *	(1) -n was not given.
+	 *      (2) Address is foreign and -f was given. (If -f was not
+	 *	    give, f_netmask and f_local are 0 and the test
+	 *	    evaluates to true)
+	 *      (3) -a was given or the host portion is not all ones
+	 *          nor all zeros (i.e. not a network or broadcast address)
+	 */
+	if (!nflag
+#if 0
+	&&
+	    (addr & f_netmask) == f_localnet &&
+	    (aflag ||
+	    !((addr & ~netmask) == 0 || (addr | netmask) == 0xffffffff))
+#endif
+	    ) {
+		if (!setjmp(getname_env)) {
+			(void)setsignal(SIGALRM, nohostname);
+			(void)alarm(20);
+			hp = gethostbyaddr((char *)&addr, sizeof(addr), AF_INET6);
+			(void)alarm(0);
+			if (hp) {
+				char *dotp;
+
+				p->name = savestr(hp->h_name);
+				if (Nflag) {
+					/* Remove domain qualifications */
+					dotp = strchr(p->name, '.');
+					if (dotp)
+						*dotp = '\0';
+				}
+				return (p->name);
+			}
+		}
+	}
+	cp = (char *)inet_ntop(AF_INET6, &addr, ntop_buf, sizeof(ntop_buf));
+	p->name = savestr(cp);
+	return (p->name);
+}
+#endif /* INET6 */
 
 static char hex[] = "0123456789abcdef";
 
@@ -444,7 +485,6 @@ protoid_string(register const u_char *pi)
 char *
 llcsap_string(u_char sap)
 {
-	register char *cp;
 	register struct hnamemem *tp;
 	register u_int32_t i = sap;
 	char buf[sizeof("sap 00")];
@@ -456,12 +496,7 @@ llcsap_string(u_char sap)
 	tp->addr = i;
 	tp->nxt = newhnamemem();
 
-	cp = buf;
-	(void)strcpy(cp, "sap ");
-	cp += strlen(cp);
-	*cp++ = hex[sap >> 4 & 0xf];
-	*cp++ = hex[sap & 0xf];
-	*cp++ = '\0';
+	snprintf(buf, sizeof(buf), "sap %02x", sap & 0xff);
 	tp->name = savestr(buf);
 	return (tp->name);
 }
@@ -505,7 +540,7 @@ tcpport_string(u_short port)
 	tp->addr = i;
 	tp->nxt = newhnamemem();
 
-	(void)sprintf(buf, "%u", i);
+	(void)snprintf(buf, sizeof(buf), "%u", i);
 	tp->name = savestr(buf);
 	return (tp->name);
 }
@@ -524,7 +559,7 @@ udpport_string(register u_short port)
 	tp->addr = i;
 	tp->nxt = newhnamemem();
 
-	(void)sprintf(buf, "%u", i);
+	(void)snprintf(buf, sizeof(buf), "%u", i);
 	tp->name = savestr(buf);
 	return (tp->name);
 }
@@ -550,7 +585,7 @@ init_servarray(void)
 		while (table->name)
 			table = table->nxt;
 		if (nflag) {
-			(void)sprintf(buf, "%d", port);
+			(void)snprintf(buf, sizeof(buf), "%d", port);
 			table->name = savestr(buf);
 		} else
 			table->name = savestr(sv->s_name);
@@ -764,3 +799,24 @@ newhnamemem(void)
 	p = ptr++;
 	return (p);
 }
+
+#ifdef INET6
+/* Return a zero'ed h6namemem struct and cuts down on calloc() overhead */
+struct h6namemem *
+newh6namemem(void)
+{
+	register struct h6namemem *p;
+	static struct h6namemem *ptr = NULL;
+	static u_int num = 0;
+
+	if (num  <= 0) {
+		num = 64;
+		ptr = (struct h6namemem *)calloc(num, sizeof (*ptr));
+		if (ptr == NULL)
+			error("newh6namemem: calloc");
+	}
+	--num;
+	p = ptr++;
+	return (p);
+}
+#endif /* INET6 */
