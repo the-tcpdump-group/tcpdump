@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "$Id: print-radius.c,v 1.2 2000-10-08 08:48:48 guy Exp $";
+    "$Id: print-radius.c,v 1.3 2000-10-10 05:14:35 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -39,9 +39,6 @@ static const char rcsid[] =
 #include "interface.h"
 #include "addrtoname.h"
 #include "extract.h"
-
-#include "ip.h"
-#include "udp.h"
 
 #define TAM_SIZE(x) (sizeof(x)/sizeof(x[0]) )
 
@@ -112,15 +109,15 @@ static void print_attr_time(register u_char *, u_int, u_short);
 static void print_attr_strange(register u_char *, u_int, u_short);
 
 
-struct radius_hdr { u_char  code; /* Radius packet code  */
-                    u_char  id;   /* Radius packet id    */
-                    u_short len;  /* Radius total length */
-                    u_char  auth[16]; /* Authenticator   */
+struct radius_hdr { u_int8_t  code; /* Radius packet code  */
+                    u_int8_t  id;   /* Radius packet id    */
+                    u_int16_t len;  /* Radius total length */
+                    u_int8_t  auth[16]; /* Authenticator   */
                   };
 
 
-struct radius_attr { u_char type; /* Attribute type   */
-                     u_char len;  /* Attribute length */
+struct radius_attr { u_int8_t type; /* Attribute type   */
+                     u_int8_t len;  /* Attribute length */
                    };
 
 
@@ -470,6 +467,7 @@ print_attr_string(register u_char *data, u_int length, u_short attr_code )
 static void
 print_attr_num(register u_char *data, u_int length, u_short attr_code )
 {
+   u_int8_t tag;
    u_int32_t timeout;
    
    TCHECK2(data[0],4);
@@ -486,10 +484,14 @@ print_attr_num(register u_char *data, u_int length, u_short attr_code )
             printf("{Tag[Unused]");
          else
             printf("{Tag[%d]", *data);
-         data_value = EXTRACT_24BITS(++data);
+         data++;
+         data_value = EXTRACT_24BITS(data);
       }
       else
-         data_value = EXTRACT_32BITS(++data);
+      {
+      	 data++;
+         data_value = EXTRACT_32BITS(data);
+      }
       if ( data_value <= (attr_type[attr_code].siz_subtypes - 1 +
             attr_type[attr_code].first_subtype) )
          printf("{%s}",table[data_value]);
@@ -542,10 +544,12 @@ print_attr_num(register u_char *data, u_int length, u_short attr_code )
           break;
 
         case TUNNEL_PREFERENCE:
-            if (!*data)
-               printf("{Tag[Unused] %d}",EXTRACT_24BITS(++data) );
+            tag = *data;
+            data++;
+            if (tag == 0)
+               printf("{Tag[Unused] %d}",EXTRACT_24BITS(data) );
             else
-               printf("{Tag[%d] %d}", *data, EXTRACT_24BITS(++data) );
+               printf("{Tag[%d] %d}", tag, EXTRACT_24BITS(data) );
           break;
 
         default:
@@ -610,9 +614,12 @@ print_attr_address(register u_char *data, u_int length, u_short attr_code )
 /*************************************/
 static void print_attr_time(register u_char *data, u_int length, u_short attr_code)
 {
+   time_t attr_time;
+
    TCHECK2(data[0],4);
    
-   printf("{%s}", ctime( ((const time_t *)EXTRACT_32BITS(data) )) );
+   attr_time = EXTRACT_32BITS(data);
+   printf("{%.24s}", ctime(&attr_time));
    return;
    
    trunc:
@@ -700,7 +707,7 @@ radius_attr_print(register u_char *attr, u_int length)
            printf(" %s",attr_type[rad_attr->type].name);
 
            if ( attr_type[rad_attr->type].print_func )
-              (*attr_type[rad_attr->type].print_func)( ((char *)(rad_attr+1)),
+              (*attr_type[rad_attr->type].print_func)( ((u_char *)(rad_attr+1)),
                                            rad_attr->len - 2, rad_attr->type);
         }
      }
@@ -778,5 +785,5 @@ radius_print(const u_char *dat, u_int length)
    printf(" [id %d]", rad->id);
  
    if (i)
-      radius_attr_print( ((char *)(rad+1)), i);  
+      radius_attr_print( ((u_char *)(rad+1)), i);  
 }
