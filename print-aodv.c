@@ -32,7 +32,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-aodv.c,v 1.6 2003-09-12 22:10:42 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-aodv.c,v 1.7 2003-09-12 22:16:53 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -76,7 +76,7 @@ aodv_extension(const struct aodv_ext *ep, u_int length)
 		break;
 
 	default:
-		printf("\n\text %d %d", ep->type, ep->length);
+		printf("\n\text %u %u", ep->type, ep->length);
 		break;
 	}
 }
@@ -96,8 +96,8 @@ aodv_rreq(const union aodv *ap, const u_char *dat, u_int length)
 		return;
 	}
 	i -= sizeof(ap->rreq);
-	printf(" rreq %d %s%s%s%s%shops %d id 0x%08lx\n"
-	    "\tdst %s seq %ld src %s seq %ld", length,
+	printf(" rreq %u %s%s%s%s%shops %u id 0x%08lx\n"
+	    "\tdst %s seq %lu src %s seq %lu", length,
 	    ap->rreq.rreq_type & RREQ_JOIN ? "[J]" : "",
 	    ap->rreq.rreq_type & RREQ_REPAIR ? "[R]" : "",
 	    ap->rreq.rreq_type & RREQ_GRAT ? "[G]" : "",
@@ -128,8 +128,8 @@ aodv_rrep(const union aodv *ap, const u_char *dat, u_int length)
 		return;
 	}
 	i -= sizeof(ap->rrep);
-	printf(" rrep %d %s%sprefix %d hops %d\n"
-	    "\tdst %s dseq %ld src %s %ld ms", length,
+	printf(" rrep %u %s%sprefix %u hops %u\n"
+	    "\tdst %s dseq %lu src %s %lu ms", length,
 	    ap->rrep.rrep_type & RREP_REPAIR ? "[R]" : "",
 	    ap->rrep.rrep_type & RREP_ACK ? "[A] " : " ",
 	    ap->rrep.rrep_ps & RREP_PREFIX_MASK,
@@ -152,7 +152,7 @@ aodv_rerr(const union aodv *ap, u_int length)
 	j = sizeof(ap->rerr.r.dest[0]);
 	dp = &ap->rerr.r.dest[0];
 	n = ap->rerr.rerr_dc * j;
-	printf(" rerr %s [items %d] [%d]:",
+	printf(" rerr %s [items %u] [%u]:",
 	    ap->rerr.rerr_flags & RERR_NODELETE ? "[D]" : "",
 	    ap->rerr.rerr_dc, length);
 	trunc = n - (i/j);
@@ -184,8 +184,8 @@ aodv_v6_rreq(const union aodv *ap _U_, const u_char *dat _U_, u_int length)
 		return;
 	}
 	i -= sizeof(ap->rreq6);
-	printf(" v6 rreq %d %s%s%s%s%shops %d id 0x%08lx\n"
-	    "\tdst %s seq %ld src %s seq %ld", length,
+	printf(" v6 rreq %u %s%s%s%s%shops %u id 0x%08lx\n"
+	    "\tdst %s seq %lu src %s seq %lu", length,
 	    ap->rreq6.rreq_type & RREQ_JOIN ? "[J]" : "",
 	    ap->rreq6.rreq_type & RREQ_REPAIR ? "[R]" : "",
 	    ap->rreq6.rreq_type & RREQ_GRAT ? "[G]" : "",
@@ -200,7 +200,7 @@ aodv_v6_rreq(const union aodv *ap _U_, const u_char *dat _U_, u_int length)
 	if (i >= sizeof(struct aodv_ext))
 		aodv_extension((void *)(&ap->rreq6 + 1), i);
 #else
-	printf(" v6 rreq %d", length);
+	printf(" v6 rreq %u", length);
 #endif
 }
 
@@ -224,8 +224,8 @@ aodv_v6_rrep(const union aodv *ap _U_, const u_char *dat _U_, u_int length)
 		return;
 	}
 	i -= sizeof(ap->rrep6);
-	printf(" rrep %d %s%sprefix %d hops %d\n"
-	   "\tdst %s dseq %ld src %s %ld ms", length,
+	printf(" rrep %u %s%sprefix %u hops %u\n"
+	   "\tdst %s dseq %lu src %s %lu ms", length,
 	    ap->rrep6.rrep_type & RREP_REPAIR ? "[R]" : "",
 	    ap->rrep6.rrep_type & RREP_ACK ? "[A] " : " ",
 	    ap->rrep6.rrep_ps & RREP_PREFIX_MASK,
@@ -237,7 +237,7 @@ aodv_v6_rrep(const union aodv *ap _U_, const u_char *dat _U_, u_int length)
 	if (i >= sizeof(struct aodv_ext))
 		aodv_extension((void *)(&ap->rrep6 + 1), i);
 #else
-	printf(" v6 rrep %d", length);
+	printf(" v6 rrep %u", length);
 #endif
 }
 
@@ -256,7 +256,7 @@ aodv_v6_rerr(const union aodv *ap _U_, u_int length)
 	j = sizeof(ap->rerr.r.dest6[0]);
 	dp6 = &ap->rerr.r.dest6[0];
 	n = ap->rerr.rerr_dc * j;
-	printf(" rerr %s [items %d] [%d]:",
+	printf(" rerr %s [items %u] [%u]:",
 	    ap->rerr.rerr_flags & RERR_NODELETE ? "[D]" : "",
 	    ap->rerr.rerr_dc, length);
 	trunc = n - (i/j);
@@ -267,7 +267,7 @@ aodv_v6_rerr(const union aodv *ap _U_, u_int length)
 	if (trunc)
 		printf("[|rerr]");
 #else
-	printf(" v6 rerr %d", length);
+	printf(" v6 rerr %u", length);
 #endif
 }
 
@@ -311,7 +311,7 @@ aodv_print(const u_char *dat, u_int length, int is_ip6)
 		break;
 
 	case AODV_RREP_ACK:
-		printf(" rrep-ack %d", length);
+		printf(" rrep-ack %u", length);
 		break;
 
 	case AODV_V6_RREQ:
@@ -327,10 +327,10 @@ aodv_print(const u_char *dat, u_int length, int is_ip6)
 		break;
 
 	case AODV_V6_RREP_ACK:
-		printf(" v6 rrep-ack %d", length);
+		printf(" v6 rrep-ack %u", length);
 		break;
 
 	default:
-		printf(" %d %d", ap->rreq.rreq_type, length);
+		printf(" %u %u", ap->rreq.rreq_type, length);
 	}
 }
