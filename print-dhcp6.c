@@ -51,7 +51,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.28 2003-11-15 00:39:19 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.29 2003-11-15 01:08:37 guy Exp $";
 #endif
 /* lease duration */
 #define DHCP6_DURATITION_INFINITE 0xffffffff
@@ -395,7 +395,7 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 				printf(" for inf-req)");
 				break;
 			default:
-				printf(" for ???(%02x))", *tp);
+				printf(" for ?\?\?(%02x))", *tp);
 				break;
 			}
 			break;
