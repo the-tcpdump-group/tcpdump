@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-null.c,v 1.47 2002-12-19 09:39:13 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-null.c,v 1.48 2003-02-05 02:28:45 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -42,10 +42,6 @@ static const char rcsid[] =
 #include "ip6.h"
 #endif
 
-#ifndef AF_NS
-#define AF_NS		6		/* XEROX NS protocols */
-#endif
-
 /*
  * The DLT_NULL packet header is 4 bytes long. It contains a host-byte-order
  * 32-bit integer that specifies the family, e.g. AF_INET.
@@ -58,6 +54,22 @@ static const char rcsid[] =
  */
 #define	NULL_HDRLEN 4
 
+/*
+ * BSD AF_ values.
+ *
+ * Unfortunately, the BSDs don't all use the same value for AF_INET6,
+ * so, because we want to be able to read captures from all of the BSDs,
+ * we check for all of them.
+ */
+#define BSD_AF_INET		2
+#define BSD_AF_NS		6		/* XEROX NS protocols */
+#define BSD_AF_ISO		7
+#define BSD_AF_APPLETALK	16
+#define BSD_AF_IPX		23
+#define BSD_AF_INET6_BSD	24	/* OpenBSD (and probably NetBSD), BSD/OS */
+#define BSD_AF_INET6_FREEBSD	28
+#define BSD_AF_INET6_DARWIN	30
+
 static void
 null_print(u_int family, u_int length)
 {
@@ -66,18 +78,32 @@ null_print(u_int family, u_int length)
 	else {
 		switch (family) {
 
-		case AF_INET:
+		case BSD_AF_INET:
 			printf("ip ");
 			break;
 
 #ifdef INET6
-		case AF_INET6:
+		case BSD_AF_INET6_BSD:
+		case BSD_AF_INET6_FREEBSD:
+		case BSD_AF_INET6_DARWIN:
 			printf("ip6 ");
 			break;
 #endif
 
-		case AF_NS:
+		case BSD_AF_NS:
 			printf("ns ");
+			break;
+
+		case BSD_AF_ISO:
+			printf("osi ");
+			break;
+
+		case BSD_AF_APPLETALK:
+			printf("atalk ");
+			break;
+
+		case BSD_AF_IPX:
+			printf("ipx ");
 			break;
 
 		default:
@@ -96,12 +122,23 @@ null_print(u_int family, u_int length)
 #define	SWAPLONG(y) \
 ((((y)&0xff)<<24) | (((y)&0xff00)<<8) | (((y)&0xff0000)>>8) | (((y)>>24)&0xff))
 
+/*
+ * This is the top level routine of the printer.  'p' points
+ * to the ether header of the packet, 'h->ts' is the timestamp,
+ * 'h->length' is the length of the packet off the wire, and 'h->caplen'
+ * is the number of bytes actually captured.
+ */
 u_int
 null_if_print(const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int length = h->len;
-	const struct ip *ip;
+	u_int caplen = h->caplen;
 	u_int family;
+
+	if (caplen < NULL_HDRLEN) {
+		printf("[|null]");
+		return (NULL_HDRLEN);
+	}
 
 	memcpy((char *)&family, (char *)p, sizeof(family));
 
@@ -117,24 +154,44 @@ null_if_print(const struct pcap_pkthdr *h, const u_char *p)
 		family = SWAPLONG(family);
 
 	length -= NULL_HDRLEN;
-
-	ip = (struct ip *)(p + NULL_HDRLEN);
+	caplen -= NULL_HDRLEN;
+	p += NULL_HDRLEN;
 
 	if (eflag)
 		null_print(family, length);
 
-	switch (IP_V(ip)) {
-	case 4:
-		ip_print((const u_char *)ip, length);
+	switch (family) {
+
+	case BSD_AF_INET:
+		ip_print(p, length);
 		break;
+
 #ifdef INET6
-	case 6:
-		ip6_print((const u_char *)ip, length);
+	case BSD_AF_INET6_BSD:
+	case BSD_AF_INET6_FREEBSD:
+	case BSD_AF_INET6_DARWIN:
+		ip6_print(p, length);
 		break;
-#endif /* INET6 */
+#endif
+
+	case BSD_AF_ISO:
+		isoclns_print(p, length, caplen, NULL, NULL);
+		break;
+
+	case BSD_AF_APPLETALK:
+		atalk_print(p, length);
+		break;
+
+	case BSD_AF_IPX:
+		ipx_print(p, length);
+		break;
+
 	default:
-		printf("ip v%d", IP_V(ip));
-		break;
+		/* unknown AF_ value */
+		if (!eflag)
+			null_print(family, length + NULL_HDRLEN);
+		if (!xflag && !qflag)
+			default_print(p, caplen);
 	}
 
 	return (NULL_HDRLEN);
