@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.89 2001-07-08 08:01:43 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.90 2002-02-18 08:56:45 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -758,7 +758,7 @@ nfs_printfh(register const u_int32_t *dp, const u_int len)
 	ino_t ino;
 	char *sfsname = NULL;
 
-	Parse_fh((caddr_t*)dp, len, &fsid, &ino, NULL, &sfsname, 0);
+	Parse_fh((caddr_t*)dp, len, &fsid, &ino, NULL, (const char **)&sfsname, 0);
 
 	if (sfsname) {
 		/* file system ID is ASCII, not numeric, for this server OS */
