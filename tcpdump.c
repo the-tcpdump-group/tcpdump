@@ -24,7 +24,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.160 2001-04-17 08:39:20 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.161 2001-04-30 16:08:43 fenner Exp $ (LBL)";
 #endif
 
 /*
@@ -376,9 +376,12 @@ main(int argc, char **argv)
 			if (device == NULL)
 				error("%s", ebuf);
 		}
+		*ebuf = '\0';
 		pd = pcap_open_live(device, snaplen, !pflag, 1000, ebuf);
 		if (pd == NULL)
 			error("%s", ebuf);
+		else if (*ebuf)
+			warning("%s", ebuf);
 		i = pcap_snapshot(pd);
 		if (snaplen < i) {
 			warning("snaplen raised from %d to %d", snaplen, i);
