@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.37 2004-12-28 22:29:44 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.38 2004-12-29 00:06:28 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -170,8 +170,9 @@ struct smbfnsint trans2_fns[] = {
 
 
 static void
-print_trans2(const u_char *words, const u_char *dat _U_, const u_char *buf, const u_char *maxbuf)
+print_trans2(const u_char *words, const u_char *dat, const u_char *buf, const u_char *maxbuf)
 {
+    u_int bcc;
     static struct smbfnsint *fn = &trans2_fns[0];
     const u_char *data, *param;
     const u_char *w = words + 1;
@@ -211,7 +212,6 @@ print_trans2(const u_char *words, const u_char *dat _U_, const u_char *buf, cons
 	    smb_fdata(words + 1,
 		"TotParam=[d]\nTotData=[d]\nMaxParam=[d]\nMaxData=[d]\nMaxSetup=[d]\nFlags=[w]\nTimeOut=[D]\nRes1=[w]\nParamCnt=[d]\nParamOff=[d]\nDataCnt=[d]\nDataOff=[d]\nSetupCnt=[d]\n",
 		words + 1 + 14 * 2, unicodestr);
-	    smb_fdata(data + 1, "TransactionName=[S]\n%", maxbuf, unicodestr);
 	}
 	f1 = fn->descript.req_f1;
 	f2 = fn->descript.req_f2;
@@ -223,6 +223,9 @@ print_trans2(const u_char *words, const u_char *dat _U_, const u_char *buf, cons
 	f2 = fn->descript.rep_f2;
     }
 
+    TCHECK2(*dat, 2);
+    bcc = EXTRACT_LE_16BITS(dat);
+    printf("smb_bcc=%u\n", bcc);
     if (fn->descript.fn)
 	(*fn->descript.fn)(param, data, pcnt, dcnt);
     else {
