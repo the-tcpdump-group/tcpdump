@@ -169,6 +169,10 @@ SOURCE="..\..\print-beep.c"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\print-bfd.c"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\print-bgp.c"
 # End Source File
 # Begin Source File
