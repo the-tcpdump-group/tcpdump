@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.21 2003-11-16 09:36:15 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.22 2003-12-29 19:26:28 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -99,9 +99,9 @@ cdp_print(const u_char *pptr, u_int length, u_int caplen)
 
         if (!TTEST2(*tptr, CDP_HEADER_LEN))
                 goto trunc;
-	printf("CDP v%u, ttl: %us", *tptr, *(tptr+1));
+	printf("CDPv%u, ttl: %us", *tptr, *(tptr+1));
         if (vflag)
-                printf(", checksum: %u (unverified)", EXTRACT_16BITS(tptr));
+                printf(", checksum: %u (unverified), length %u", EXTRACT_16BITS(tptr), length);
 	tptr += CDP_HEADER_LEN;
 
 	while (tptr < (pptr+length)) {
@@ -213,6 +213,9 @@ cdp_print(const u_char *pptr, u_int length, u_int caplen)
 			break;
 		tptr = tptr+len;
 	}
+        if (vflag < 1)
+            printf(", length %u",caplen);
+
 	return;
 trunc:
 	printf("[|cdp]");
