@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.80 2000-06-12 06:50:50 assar Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.81 2000-07-13 06:36:58 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -795,7 +795,7 @@ host \fIrtsg\fP to host \fIcsam\fP:
 .nf
 .sp .5
 \f(CWarp who-has csam tell rtsg
-arp reply csam is-at CSAM\fP
+arp reply csam is-at CSAM\fR
 .sp .5
 .fi
 .RE
@@ -819,7 +819,7 @@ broadcast and the second is point-to-point would be visible:
 .nf
 .sp .5
 \f(CWRTSG Broadcast 0806  64: arp who-has csam tell rtsg
-CSAM RTSG 0806  64: arp reply csam is-at CSAM\fP
+CSAM RTSG 0806  64: arp reply csam is-at CSAM\fR
 .sp .5
 .fi
 .RE
@@ -871,7 +871,7 @@ csam.login > rtsg.1023: . ack 2 win 4096
 rtsg.1023 > csam.login: P 2:21(19) ack 1 win 4096
 csam.login > rtsg.1023: P 1:2(1) ack 21 win 4077
 csam.login > rtsg.1023: P 2:3(1) ack 21 win 4077 urg 1
-csam.login > rtsg.1023: P 3:4(1) ack 21 win 4077 urg 1\fP\s+2
+csam.login > rtsg.1023: P 3:4(1) ack 21 win 4077 urg 1\fR\s+2
 .sp .5
 .fi
 .RE
@@ -1139,7 +1139,7 @@ Name server requests are formatted as
 .sp .5
 \fIsrc > dst: id op? flags qtype qclass name (len)\fP
 .sp .5
-\f(CWh2opolo.1538 > helios.domain: 3+ A? ucbvax.berkeley.edu. (37)\fP
+\f(CWh2opolo.1538 > helios.domain: 3+ A? ucbvax.berkeley.edu. (37)\fR
 .sp .5
 .fi
 .RE
@@ -1176,7 +1176,7 @@ Name server responses are formatted as
 \fIsrc > dst:  id op rcode flags a/n/au type class data (len)\fP
 .sp .5
 \f(CWhelios.domain > h2opolo.1538: 3 3/3/7 A 128.32.137.3 (273)
-helios.domain > h2opolo.1537: 2 NXDomain* 0/1/0 (97)\fP
+helios.domain > h2opolo.1537: 2 NXDomain* 0/1/0 (97)\fR
 .sp .5
 .fi
 .RE
@@ -1242,7 +1242,7 @@ sushi.201b > wrl.nfs:
 	144 lookup fh 9,74/4096.6878 "xcolors"
 wrl.nfs > sushi.201b:
 	reply ok 128 lookup fh 9,74/4134.3150
-\fP
+\fR
 .sp .5
 .fi
 .RE
@@ -1299,7 +1299,7 @@ NFS reply packets do not explicitly identify the RPC operation.  Instead,
 replies using the transaction ID.  If a reply does not closely follow the
 corresponding request, it might not be parsable.
 .HD
-AFS Request and Replies
+AFS Requests and Replies
 .LP
 Transarc AFS (Andrew File System) requests and replies are printed
 as:
@@ -1316,7 +1316,7 @@ elvis.7001 > pike.afsfs:
 	rx data fs call rename old fid 536876964/1/1 ".newsrc.new"
 	new fid 536876964/1/1 ".newsrc"
 pike.afsfs > elvis.7001: rx data fs reply rename
-\fP
+\fR
 .sp .5
 .fi
 .RE
@@ -1339,11 +1339,12 @@ AFS and RX.
 If the -v (verbose) flag is given, the RX call number and sequence number
 are printed.
 .LP
-If the -v flag is given twice, additional information is printed.
+If the -v flag is given twice, additional information is printed,
 such as the the RX call ID, serial number, and the RX packet flags.
 The MTU negotiation information is also printed from RX ack packets.
 .LP
-If the -v flag three times, the security index and service id are printed.
+If the -v flag is given three times, the security index and service id
+are printed.
 .LP
 Error codes are printed for abort packets, with the exception of Ubik
 beacon packets (because abort packets are used to signify a yes vote
@@ -1375,7 +1376,7 @@ Lines in this file have the form
 
 \f(CW1.254		ether
 16.1		icsd-net
-1.254.110	ace\fP
+1.254.110	ace\fR
 .sp .5
 .fi
 .RE
@@ -1398,7 +1399,7 @@ Appletalk addresses are printed in the form
 
 \f(CW144.1.209.2 > icsd-net.112.220
 office.2 > icsd-net.112.220
-jssmag.149.235 > icsd-net.2\fP
+jssmag.149.235 > icsd-net.2\fR
 .sp .5
 .fi
 .RE
@@ -1426,7 +1427,7 @@ protocol) and packet size.
 .sp .5
 \s-2\f(CWicsd-net.112.220 > jssmag.2: nbp-lkup 190: "=:LaserWriter@*"
 jssmag.209.2 > icsd-net.112.220: nbp-reply 190: "RM1140:LaserWriter@*" 250
-techpit.2 > icsd-net.112.220: nbp-reply 190: "techpit:LaserWriter@*" 186\fP\s+2
+techpit.2 > icsd-net.112.220: nbp-reply 190: "techpit:LaserWriter@*" 186\fR\s+2
 .sp .5
 .fi
 .RE
@@ -1455,7 +1456,7 @@ jssmag.209.165 > helios.132: atp-req  12266<3,5> 0xae030001
 helios.132 > jssmag.209.165: atp-resp 12266:3 (512) 0xae040000
 helios.132 > jssmag.209.165: atp-resp 12266:5 (512) 0xae040000
 jssmag.209.165 > helios.132: atp-rel  12266<0-7> 0xae030001
-jssmag.209.133 > helios.132: atp-req* 12267<0-7> 0xae030002\fP\s+2
+jssmag.209.133 > helios.132: atp-req* 12267<0-7> 0xae030002\fR\s+2
 .sp .5
 .fi
 .RE
@@ -1563,11 +1564,16 @@ The original distribution is available via anonymous ftp:
 IPv6/IPsec support is added by WIDE/KAME project.
 This program uses Eric Young's SSLeay library, under specific configuration.
 .SH BUGS
-Please send problems, bugs, questions, desirable enhancements, source
-code contributions, etc. to:
+Please send problems, bugs, questions, desirable enhancements, etc. to:
 .LP
 .RS
 tcpdump-workers@tcpdump.org
+.RE
+.LP
+Please send source code contributions, etc. to:
+.LP
+.RS
+patches@tcpdump.org
 .RE
 .LP
 NIT doesn't let you watch your own outbound traffic, BPF will.
