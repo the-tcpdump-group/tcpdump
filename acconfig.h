@@ -129,3 +129,6 @@
 
 /* define if should drop privileges by default */
 #undef WITH_USER
+
+/* define if should chroot when dropping privileges */
+#undef WITH_CHROOT

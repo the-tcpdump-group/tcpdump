@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.231 2004-02-24 08:12:18 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.232 2004-02-25 14:23:32 hannes Exp $ (LBL)";
 #endif
 
 /*
@@ -129,7 +129,7 @@ static void show_dlts_and_exit(pcap_t *pd) __attribute__((noreturn));
 static void print_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void dump_packet_and_trunc(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void dump_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
-static void droproot(const char *);
+static void droproot(const char *, const char *);
 
 #ifdef SIGINFO
 RETSIGTYPE requestinfo(int);
@@ -324,15 +324,26 @@ show_dlts_and_exit(pcap_t *pd)
 #define U_FLAG
 #endif
 
-/* Drop root privileges */
+/* Drop root privileges and chroot if necessary */
 static void
-droproot(const char *username)
+droproot(const char *username, const char *chroot_dir)
 {
 	struct passwd *pw = NULL;
 
+	if (chroot_dir && !username) {
+		fprintf(stderr, "Chroot without dropping root is insecure\n");
+		exit(1);
+	}
+	
 	pw = getpwnam(username);
 	if (pw) {
-		if (initgroups(pw->pw_name, 0) != 0 || setgid(pw->pw_gid) != 0 ||
+		if (chroot_dir) {
+			if (chroot(chroot_dir) != 0 || chdir ("/") != 0) {
+				fprintf(stderr, "Couldn't chroot/chdir to '%.64s'\n", chroot_dir);
+				exit(1);
+			}
+		}
+		if (initgroups(pw->pw_name, pw->pw_gid) != 0 || setgid(pw->pw_gid) != 0 ||
 				 setuid(pw->pw_uid) != 0) {
 			fprintf(stderr, "Couldn't change to '%.32s' uid=%d gid=%d\n", username, 
 							pw->pw_uid, pw->pw_gid);
@@ -386,6 +397,7 @@ main(int argc, char **argv)
 	u_char *pcap_userdata;
 	char ebuf[PCAP_ERRBUF_SIZE];
 	char *username = NULL;
+	char *chroot_dir = NULL;
 #ifdef HAVE_PCAP_FINDALLDEVS
 	pcap_if_t *devpointer;
 	int devnum;
@@ -704,6 +716,15 @@ main(int argc, char **argv)
 	if (tflag > 0)
 		thiszone = gmt2local(0);
 
+#ifdef WITH_CHROOT
+	/* if run as root, prepare for chrooting */
+	if (getuid() == 0 || geteuid() == 0) {
+		/* future extensibility for cmd-line arguments */
+		if (!chroot_dir)
+			chroot_dir = WITH_CHROOT;
+	}
+#endif
+
 #ifdef WITH_USER
 	/* if run as root, prepare for dropping root privileges */
 	if (getuid() == 0 || geteuid() == 0) {
@@ -885,9 +906,8 @@ main(int argc, char **argv)
 	 * We cannot do this earlier, because we want to be able to open
 	 * the file (if done) for writing before giving up permissions.
 	 */
-	if (username) {
-		droproot(username);
-	}
+	if (username || chroot_dir)
+		droproot(username, chroot_dir);
 #endif /* WIN32 */
 #ifdef SIGINFO
 	(void)setsignal(SIGINFO, requestinfo);
