@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/extract.h,v 1.19 2002-12-11 07:13:51 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/extract.h,v 1.20 2004-09-23 21:30:12 dyoung Exp $ (LBL)
  */
 
 /* Network to host order macros */
@@ -96,3 +96,12 @@ typedef struct {
 		     (u_int32_t)*((const u_int8_t *)(p) + 2) << 16 | \
 		     (u_int32_t)*((const u_int8_t *)(p) + 1) << 8 | \
 		     (u_int32_t)*((const u_int8_t *)(p) + 0)))
+#define EXTRACT_LE_64BITS(p) \
+	((u_int64_t)((u_int64_t)*((const u_int8_t *)(p) + 7) << 56 | \
+		     (u_int64_t)*((const u_int8_t *)(p) + 6) << 48 | \
+		     (u_int64_t)*((const u_int8_t *)(p) + 5) << 40 | \
+		     (u_int64_t)*((const u_int8_t *)(p) + 4) << 32 | \
+	             (u_int64_t)*((const u_int8_t *)(p) + 3) << 24 | \
+		     (u_int64_t)*((const u_int8_t *)(p) + 2) << 16 | \
+		     (u_int64_t)*((const u_int8_t *)(p) + 1) << 8 | \
+		     (u_int64_t)*((const u_int8_t *)(p) + 0)))
