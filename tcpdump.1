@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.114.2.4 2002-05-07 04:01:05 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.114.2.5 2002-05-17 09:58:49 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -171,11 +171,22 @@ You must be root or
 .I tcpdump
 must be installed setuid to root.
 .TP
-.B Under Ultrix and Digital UNIX:
-Once the super-user has enabled promiscuous-mode operation using
-.IR pfconfig (8),
-any user may capture network traffic with
+.B Under Ultrix and Digital UNIX/Tru64 UNIX:
+Any user may capture network traffic with
 .IR tcpdump .
+However, no user (not even the super-user) can capture in promiscuous
+mode on an interface unless the super-user has enabled promiscuous-mode
+operation on that interface using
+.IR pfconfig (8),
+and no user (not even the super-user) can capture unicast traffic
+received by or sent by the machine on an interface unless the super-user
+has enabled copy-all-mode operation on that interface using
+.IR pfconfig ,
+so
+.I useful
+packet capture on an interface probably requires that either
+promiscuous-mode or copy-all-mode operation, or both modes of
+operation, be enabled on that interface.
 .TP
 .B Under BSD:
 You must have read access to
