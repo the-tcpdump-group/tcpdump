@@ -20,7 +20,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "21 December 2002"
+.TH TCPDUMP 1  "1 July 2003"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -1312,7 +1312,8 @@ The general format of a tcp protocol line is:
 \fISrc\fP and \fIdst\fP are the source and destination IP
 addresses and ports.
 \fIFlags\fP are some combination of S (SYN),
-F (FIN), P (PUSH) or R (RST) or a single `.' (no flags).
+F (FIN), P (PUSH), R (RST), W (ECN CWR) or E (ECN-Echo), or a single
+`.' (no flags).
 \fIData-seqno\fP describes the portion of sequence space covered
 by the data in this packet (see example below).
 \fIAck\fP is sequence number of the next data expected the other
