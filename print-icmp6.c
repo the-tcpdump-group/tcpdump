@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.35 2000-10-07 05:58:06 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.36 2000-11-08 07:03:04 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -111,11 +111,7 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 			printf("icmp6: %s unreachable prohibited",
 			       ip6addr_string(&oip->ip6_dst));
 			break;
-#ifdef ICMP6_DST_UNREACH_BEYONDSCOPE
 		case ICMP6_DST_UNREACH_BEYONDSCOPE:
-#else
-		case ICMP6_DST_UNREACH_NOTNEIGHBOR:
-#endif
 			printf("icmp6: %s beyond scope of source address %s",
 			       ip6addr_string(&oip->ip6_dst),
 			       ip6addr_string(&oip->ip6_src));
@@ -313,20 +309,11 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 		break;
 #undef REDIRECTLEN
 #undef RDR
-#ifndef ICMP6_ROUTER_RENUMBERING
-#define ICMP6_ROUTER_RENUMBERING	138	/* router renumbering */
-#endif
 	case ICMP6_ROUTER_RENUMBERING:
 		switch (dp->icmp6_code) {
-#ifndef ICMP6_ROUTER_RENUMBERING_COMMAND
-#define ICMP6_ROUTER_RENUMBERING_COMMAND  0	/* rr command */
-#endif
 		case ICMP6_ROUTER_RENUMBERING_COMMAND:
 			printf("icmp6: router renum command");
 			break;
-#ifndef ICMP6_ROUTER_RENUMBERING_RESULT
-#define ICMP6_ROUTER_RENUMBERING_RESULT   1	/* rr result */
-#endif
 		case ICMP6_ROUTER_RENUMBERING_RESULT:
 			printf("icmp6: router renum result");
 			break;
