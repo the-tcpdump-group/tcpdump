@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.80 2000-07-29 08:05:04 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.81 2000-08-03 18:52:24 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -97,6 +97,55 @@ u_int32_t nfsv3_procid[NFS_NPROCS] = {
 	NFSPROC_NOOP,
 	NFSPROC_NOOP,
 	NFSPROC_NOOP
+};
+
+/*
+ * NFS V2 and V3 status values.
+ *
+ * Some of these come from the RFCs for NFS V2 and V3, with the message
+ * strings taken from the FreeBSD C library "errlst.c".
+ *
+ * Others are errors that are not in the RFC but that I suspect some
+ * NFS servers could return; the values are FreeBSD errno values, as
+ * the first NFS server was the SunOS 2.0 one, and until 5.0 SunOS
+ * was primarily BSD-derived.
+ */
+static struct tok status2str[] = {
+	{ 1,     "Operation not permitted" },	/* EPERM */
+	{ 2,     "No such file or directory" },	/* ENOENT */
+	{ 5,     "Input/output error" },	/* EIO */
+	{ 6,     "Device not configured" },	/* ENXIO */
+	{ 11,    "Resource deadlock avoided" },	/* EDEADLK */
+	{ 12,    "Cannot allocate memory" },	/* ENOMEM */
+	{ 13,    "Permission denied" },		/* EACCES */
+	{ 17,    "File exists" },		/* EEXIST */
+	{ 18,    "Cross-device link" },		/* EXDEV */
+	{ 19,    "Operation not supported by device" }, /* ENODEV */
+	{ 20,    "Not a directory" },		/* ENOTDIR */
+	{ 21,    "Is a directory" },		/* EISDIR */
+	{ 22,    "Invalid argument" },		/* EINVAL */
+	{ 26,    "Text file busy" },		/* ETXTBSY */
+	{ 27,    "File too large" },		/* EFBIG */
+	{ 28,    "No space left on device" },	/* ENOSPC */
+	{ 30,    "Read-only file system" },	/* EROFS */
+	{ 31,    "Too many links" },		/* EMLINK */
+	{ 45,    "Operation not supported" },	/* EOPNOTSUPP */
+	{ 62,    "Too many levels of symbolic links" }, /* ELOOP */
+	{ 63,    "File name too long" },	/* ENAMETOOLONG */
+	{ 66,    "Directory not empty" },	/* ENOTEMPTY */
+	{ 69,    "Disc quota exceeded" },	/* EDQUOT */
+	{ 70,    "Stale NFS file handle" },	/* ESTALE */
+	{ 71,    "Too many levels of remote in path" }, /* EREMOTE */
+	{ 99,    "Write cache flushed to disk" }, /* NFSERR_WFLUSH (not used) */
+	{ 10001, "Illegal NFS file handle" },	/* NFS3ERR_BADHANDLE */
+	{ 10002, "Update synchronization mismatch" }, /* NFS3ERR_NOT_SYNC */
+	{ 10003, "READDIR/READDIRPLUS cookie is stale" }, /* NFS3ERR_BAD_COOKIE */
+	{ 10004, "Operation not supported" },	/* NFS3ERR_NOTSUPP */
+	{ 10005, "Buffer or request is too small" }, /* NFS3ERR_TOOSMALL */
+	{ 10006, "Unspecified error on server" }, /* NFS3ERR_SERVERFAULT */
+	{ 10007, "Object of that type not supported" }, /* NFS3ERR_BADTYPE */
+	{ 10008, "Request couldn't be completed in time" }, /* NFS3ERR_JUKEBOX */
+	{ 0,     NULL }
 };
 
 static struct tok nfsv3_writemodes[] = {
@@ -977,7 +1026,8 @@ parsestatus(const u_int32_t *dp, int *er)
 		*er = errnum;
 	if (errnum != 0) {
 		if (!qflag)
-			printf(" ERROR: %s", pcap_strerror(errnum));
+			printf(" ERROR: %s",
+			    tok2str(status2str, "unk %d", errnum));
 		nfserr = 1;
 		return (NULL);
 	}
