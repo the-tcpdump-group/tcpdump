@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.37 2002-07-18 00:39:12 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.38 2002-07-22 02:55:20 hannes Exp $";
 #endif
 
 #include <sys/param.h>
@@ -63,12 +63,14 @@ struct bgp {
 #define BGP_UPDATE		2
 #define BGP_NOTIFICATION	3
 #define BGP_KEEPALIVE		4
+#define BGP_ROUTE_REFRESH       5
 
 static struct tok bgp_msg_values[] = {
     { BGP_OPEN,                 "Open"},
     { BGP_UPDATE,               "Update"},
     { BGP_NOTIFICATION,         "Notification"},
     { BGP_KEEPALIVE,            "Keepalive"},
+    { BGP_ROUTE_REFRESH,        "Route Refresh"},
     { 0, NULL}
 };
 
@@ -297,6 +299,13 @@ static struct tok bgp_afi_values[] = {
     { AFNUM_BANYAN,           "Banyan Vines"},
     { AFNUM_E164NSAP,         "E.164 with NSAP subaddress"},
     { AFNUM_L2VPN,            "Layer-2 VPN"},
+    { 0, NULL},
+};
+
+static struct tok bgp_extd_comm_subtype_values[] = {
+    { 2,                      "target"},
+    { 3,                      "origin"},
+    { 4,                      "link-BW"},
     { 0, NULL},
 };
 
@@ -646,8 +655,6 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
                        safi);
 
 		p += 3;
-
-		printf("\n\t    Withdrawn routes");
                 
 		while (len - (p - dat) > 0) {
 			switch (af) {
@@ -691,7 +698,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
                             break;
 #endif
 			default:
-				printf("\n\t      no AFI %u decoder",af);
+				printf("\n\t    no AFI %u decoder",af);
                                 print_unknown_data(p-3,"\n\t    ",tlen);
 				advance = 0;
 				p = dat + len;
@@ -701,10 +708,66 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 			p += advance;
 		}
 		break;
+        case BGPTYPE_EXTD_COMMUNITIES:
+		if (len % 8) {
+			printf("invalid len");
+			break;
+		}
+                while (tlen>0) {
+                    u_int8_t extd_comm,extd_comm_type,extd_comm_subtype;
+                    extd_comm=*p;
+                    extd_comm_type=extd_comm&0x3f;
+                    extd_comm_subtype=*(p+1);
+                    switch(extd_comm_type) {
+                        case 0:
+                            printf("%s%s%s:%u:%s%s",
+                                   (extd_comm&0x80) ? "vendor-specific: " : "",
+                                   (extd_comm&0x40) ? "non-transitive:" : "",
+                                   tok2str(bgp_extd_comm_subtype_values,
+                                           "unknown",
+                                           extd_comm_subtype&0x3f),
+                                   EXTRACT_16BITS(p+2),
+                                   getname(p+4),
+                                   (tlen>8) ? ", " : "");
+                            break;
+                        case 1:
+                            printf("%s%s%s:%s:%u%s",
+                                   (extd_comm&0x80) ? "vendor-specific: " : "",
+                                   (extd_comm&0x40) ? "non-transitive:" : "",
+                                   tok2str(bgp_extd_comm_subtype_values,
+                                           "unknown",
+                                           extd_comm_subtype&0x3f),
+                                   getname(p+2),
+                                   EXTRACT_16BITS(p+6),
+                                   (tlen>8) ? ", " : "");
+                            break;
+                        case 2:
+                            printf("%s%s%s:%u:%u%s",
+                                   (extd_comm&0x80) ? "vendor-specific: " : "",
+                                   (extd_comm&0x40) ? "non-transitive:" : "",
+                                   tok2str(bgp_extd_comm_subtype_values,
+                                           "unknown",
+                                           extd_comm_subtype&0x3f),
+                                   EXTRACT_32BITS(p+2),
+                                   EXTRACT_16BITS(p+6),
+                                   (tlen>8) ? ", " : "");
+                            break;
+
+                        default:
+                            printf("\n\t      no typecode %u decoder",
+                               extd_comm_type);
+                            print_unknown_data(p,"\n\t      ",8);
+                            break;
+                    }
+                    tlen -=8;
+                    p +=8;
+                }
+                break;
+
 	default:
             printf("\n\t    no Attribute %u decoder",attr->bgpa_type); /* we have no decoder for the attribute */
             print_unknown_data(p,"\n\t    ",tlen);
-		break;
+            break;
 	}
 }
 
