@@ -12,6 +12,7 @@ addrtoname.h
 appletalk.h
 atime.awk
 bootp.h
+chdlc.h
 config.guess
 config.h.in
 config.sub

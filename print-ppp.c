@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.43 2000-09-09 07:06:17 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.44 2000-09-18 05:11:44 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -66,6 +66,7 @@ struct rtentry;
 #include "extract.h"
 #include "addrtoname.h"
 #include "ppp.h"
+#include "chdlc.h"
 
 /* XXX This goes somewhere else. */
 #define PPP_HDRLEN 4
@@ -1106,6 +1107,88 @@ ppp_if_print(u_char *user, const struct pcap_pkthdr *h,
 #endif
 
 	ppp_print(p, length);
+
+	if (xflag)
+		default_print(p, caplen);
+out:
+	putchar('\n');
+}
+
+/*
+ * PPP I/F printer to use if we know that RFC 1662-style PPP in HDLC-like
+ * framing, or Cisco PPP with HDLC framing as per section 4.3.1 of RFC 1547,
+ * is being used (i.e., we don't check for PPP_ADDRESS and PPP_CONTROL,
+ * discard them *if* those are the first two octets, and parse the remaining
+ * packet as a PPP packet, as "ppp_print()" does).
+ *
+ * This handles, for example, DLT_PPP_SERIAL in NetBSD.
+ */
+void
+ppp_hdlc_if_print(u_char *user, const struct pcap_pkthdr *h,
+	     register const u_char *p)
+{
+	register u_int length = h->len;
+	register u_int caplen = h->caplen;
+	u_int proto;
+
+	if (caplen < 2) {
+		printf("[|ppp]");
+		goto out;
+	}
+
+	/*
+	 * Some printers want to get back at the link level addresses,
+	 * and/or check that they're not walking off the end of the packet.
+	 * Rather than pass them all the way down, we set these globals.
+	 */
+	packetp = p;
+	snapend = p + caplen;
+
+	switch (p[0]) {
+
+	case PPP_ADDRESS:
+		if (caplen < 4) {
+			printf("[|ppp]");
+			goto out;
+		}
+
+		ts_print(&h->ts);
+		if (eflag)
+			printf("%02x %02x %d ", p[0], p[1], length);
+		p += 2;
+		length -= 2;
+
+		proto = EXTRACT_16BITS(p);
+		p += 2;
+		length -= 2;
+		printf("%s: ", ppp_protoname(proto));
+
+		handle_ppp(proto, p, length);
+		break;
+
+	case CHDLC_UNICAST:
+	case CHDLC_BCAST:
+		/*
+		 * Have the Cisco HDLC print routine do all the work.
+		 */
+		chdlc_if_print(user, h, p);
+		return;
+
+	default:
+		ts_print(&h->ts);
+		if (eflag)
+			printf("%02x %02x %d ", p[0], p[1], length);
+		p += 2;
+		length -= 2;
+
+		/*
+		 * XXX - NetBSD's "ppp_netbsd_serial_if_print()" treats
+		 * the next two octets as an Ethernet type; does that
+		 * ever happen?
+		 */
+		printf("unknown addr %02x; ctrl %02x", p[0], p[1]);
+		break;
+	}
 
 	if (xflag)
 		default_print(p, caplen);

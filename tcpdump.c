@@ -24,7 +24,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.151 2000-09-17 04:13:13 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.152 2000-09-18 05:11:44 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -125,7 +125,8 @@ static struct printer printers[] = {
 	{ fddi_if_print,	PCAP_ENCAP_FDDI },
 
 	/*
-	 * DLT_* codes that aren't the same on all platforms.
+	 * DLT_* codes that aren't the same on all platforms, or that
+	 * aren't present on all platforms.
 	 */
 #ifdef DLT_ATM_RFC1483
 	{ atm_if_print,		DLT_ATM_RFC1483 },
@@ -148,6 +149,9 @@ static struct printer printers[] = {
 #ifdef DLT_LANE8023
 	{ lane_if_print,        DLT_LANE8023 },
 #endif
+#ifdef DLT_PPP_SERIAL
+	{ ppp_hdlc_if_print,    DLT_PPP_SERIAL },
+#endif
 
 	/*
 	 * PCAP_ENCAP_* codes corresponding to DLT_* codes that aren't
@@ -160,6 +164,7 @@ static struct printer printers[] = {
 	{ ppp_bsdos_if_print,	PCAP_ENCAP_PPP_BSDOS },
 	{ chdlc_if_print,	PCAP_ENCAP_C_HDLC },
 	{ cip_if_print,         PCAP_ENCAP_ATM_CLIP },
+	{ ppp_hdlc_if_print,    PCAP_ENCAP_PPP_HDLC },
 	{ NULL,			0 },
 };
 

@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.4 2000-07-01 03:39:01 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.5 2000-09-18 05:11:44 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -56,13 +56,7 @@ struct rtentry;
 #include "interface.h"
 #include "addrtoname.h"
 #include "ppp.h"
-
-/* XXX This goes somewhere else. */
-#define CHDLC_HDRLEN 4
-#define CHDLC_UNICAST	0x0f
-#define CHDLC_BCAST	0x8f
-#define CHDLC_TYPE_SLARP	0x8035
-#define CHDLC_TYPE_CDP		0x2000
+#include "chdlc.h"
 
 static void chdlc_slarp_print(const u_char *, u_int);
 
