@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.48 2004-03-25 03:31:05 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.49 2004-11-04 07:49:14 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1201,7 +1201,7 @@ isakmp_sub0_print(u_char np, const struct isakmp_gen *ext, const u_char *ep,
 		 * XXX - what if item_len is too short, or too long,
 		 * for this payload type?
 		 */
-		cp = (*NPFUNC(np))(ext, item_len, ep, phase, doi, proto, depth);
+		cp = (*npfunc[np])(ext, item_len, ep, phase, doi, proto, depth);
 	} else {
 		printf("%s", NPSTR(np));
 		cp += item_len;
