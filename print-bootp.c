@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.49 2000-07-01 03:39:01 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.50 2000-07-01 03:56:43 assar Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -264,7 +264,7 @@ static struct tok tag2str[] = {
 	{ TAG_RENEWAL_TIME,	"lRN" },
 	{ TAG_REBIND_TIME,	"lRB" },
 	{ TAG_VENDOR_CLASS,	"bVC" },
-	{ TAG_CLIENT_ID,	"bCID" },
+	{ TAG_CLIENT_ID,	"xCID" },
 	{ 0,			NULL }
 };
 
@@ -427,12 +427,13 @@ rfc1048_print(register const u_char *bp, register u_int length)
 			break;
 
 		case 'b':
+		case 'x':
 		default:
 			/* Bytes */
 			while (size > 0) {
 				if (!first)
-					putchar('.');
-				printf("%d", *bp);
+					putchar (c == 'x' ? ':' : '.');
+				printf (c == 'x' ? "%02x" : "%d", *bp);
 				++bp;
 				--size;
 				first = 0;
