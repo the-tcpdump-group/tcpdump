@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.61 2003-02-11 06:28:39 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.62 2003-05-27 12:43:37 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -199,6 +199,18 @@ static struct tok bgp_notify_major_values[] = {
     { BGP_NOTIFY_MAJOR_HOLDTIME,"Hold Timer Expired"},
     { BGP_NOTIFY_MAJOR_FSM,     "Finite State Machine Error"},
     { BGP_NOTIFY_MAJOR_CEASE,   "Cease"},
+    { 0, NULL}
+};
+
+/* draft-ietf-idr-cease-subcode-02 */
+static struct tok bgp_notify_minor_cease_values[] = {
+    { 1,                        "Maximum Number of Prefixes Reached"},
+    { 2,                        "Administratively Shutdown"},
+    { 3,                        "Peer Unconfigured"},
+    { 4,                        "Administratively Reset"},
+    { 5,                        "Connection Rejected"},
+    { 6,                        "Other Configuration Change"},
+    { 7,                        "Connection Collision Resolution"},
     { 0, NULL}
 };
 
@@ -1418,6 +1430,9 @@ bgp_notification_print(const u_char *dat, int length)
             break;
         case BGP_NOTIFY_MAJOR_UPDATE:
             printf(" subcode %s", tok2str(bgp_notify_minor_update_values, "Unknown", bgpn.bgpn_minor));
+            break;
+        case BGP_NOTIFY_MAJOR_CEASE:
+            printf(" subcode %s", tok2str(bgp_notify_minor_cease_values, "Unknown", bgpn.bgpn_minor));
             break;
         default:
             break;
