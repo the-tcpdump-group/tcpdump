@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sl.c,v 1.55 2000-10-09 01:53:20 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sl.c,v 1.56 2000-10-10 05:06:10 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -265,5 +265,5 @@ compressed_sl_print(const u_char *chdr, const struct ip *ip,
 	hlen = IP_HL(ip);
 	hlen += TH_OFF((struct tcphdr *)&((int32_t *)ip)[hlen]);
 	lastlen[dir][lastconn] = length - (hlen << 2);
-	printf(" %d (%d)", lastlen[dir][lastconn], cp - chdr);
+	printf(" %d (%ld)", lastlen[dir][lastconn], (long)(cp - chdr));
 }
