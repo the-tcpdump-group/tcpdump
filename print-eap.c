@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-eap.c,v 1.2 2004-04-05 22:35:36 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-eap.c,v 1.3 2004-04-23 19:03:39 mcr Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -59,8 +59,8 @@ eap_print(netdissect_options *ndo,
 	eap = (const struct eap_packet_t *)cp;
 	ND_TCHECK(eap->data);
 
-        ND_PRINT("EAP code=%u id=%u length=%u ", 
-		 eap->code, eap->id, (eap->length[0]<<8) + eap->length[1]);
+        ND_PRINT((ndo, "EAP code=%u id=%u length=%u ", 
+		  eap->code, eap->id, (eap->length[0]<<8) + eap->length[1]));
 
         if (!ndo->ndo_vflag)
             return;

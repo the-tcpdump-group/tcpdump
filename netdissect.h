@@ -21,7 +21,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.5 2004-04-05 04:27:41 mcr Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.6 2004-04-23 19:03:39 mcr Exp $ (LBL)
  */
 
 #ifndef netdissect_h
@@ -196,7 +196,7 @@ struct netdissect_options {
 /* Bail if "var" was not captured */
 #define ND_TCHECK(var) ND_TCHECK2(var, sizeof(var))
 
-#define ND_PRINT(fmt, args...) (*ndo->ndo_printf)(ndo, fmt, ##args)
+#define ND_PRINT(STUFF) (*ndo->ndo_printf)STUFF
 
 #if 0	
 extern void ts_print(netdissect_options *ipdo,
