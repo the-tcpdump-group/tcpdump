@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.159 2004-01-22 09:51:31 hannes Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.160 2004-01-26 02:05:18 guy Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -22,7 +22,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "23 November 2003"
+.TH TCPDUMP 1  "25 January 2004"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -73,6 +73,10 @@ tcpdump \- dump traffic on a network
 ]
 .br
 .ti +8
+[
+.B \-W
+.I filecount
+]
 [
 .B \-E
 .I spi@ipaddr algo:secret,...
@@ -247,7 +251,7 @@ currently larger than \fIfile_size\fP and, if so, close the current
 savefile and open a new one.  Savefiles after the first savefile will
 have the name specified with the
 .B \-w
-flag, with a number after it, starting at 2 and continuing upward.
+flag, with a number after it, starting at 1 and continuing upward.
 The units of \fIfile_size\fP are millions of bytes (1,000,000 bytes,
 not 1,048,576 bytes).
 .TP
@@ -519,6 +523,16 @@ Write the raw packets to \fIfile\fR rather than parsing and printing
 them out.
 They can later be printed with the \-r option.
 Standard output is used if \fIfile\fR is ``-''.
+.TP
+.B \-W
+Used in conjunction with the 
+.I \-C 
+option, this will limit the number
+of files created to the specified number, and begin overwriting files
+from the beginning, thus creating a 'rotating' buffer. 
+In addition, it will name
+the files with enough leading 0s to support the maximum number of
+files, allowing them to sort correctly.
 .TP
 .B \-x
 Print each packet (minus its link level header) in hex.

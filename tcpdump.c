@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.227 2004-01-22 09:51:31 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.228 2004-01-26 02:05:18 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -75,14 +75,14 @@ extern int SIZE_BUF;
 #include "gmt2local.h"
 #include "pcap-missing.h"
 
-int dflag;			/* print filter code */
+static int dflag;		/* print filter code */
 int eflag;			/* print ethernet header */
 int fflag;			/* don't translate "foreign" IP address */
-int Lflag;			/* list available data link types and exit */
+static int Lflag;		/* list available data link types and exit */
 int nflag;			/* leave addresses as numbers */
 int Nflag;			/* remove domains from printed host names */
-int Oflag = 1;			/* run filter code optimizer */
-int pflag;			/* don't go promiscuous */
+static int Oflag = 1;		/* run filter code optimizer */
+static int pflag;		/* don't go promiscuous */
 int qflag;			/* quick (shorter) output */
 int Rflag = 1;			/* print sequence # field in AH/ESP*/
 int sflag = 0;			/* use the libsmi to translate OIDs */
@@ -93,9 +93,20 @@ int uflag = 0;			/* Print undecoded NFS handles */
 int vflag;			/* verbose */
 int xflag;			/* print packet in hex */
 int Xflag;			/* print packet in ascii as well as hex */
-off_t Cflag = 0;                /* rotate dump files after this many bytes */
+static off_t Cflag = 0;		/* rotate dump files after this many bytes */
 int Aflag = 0;                  /* print packet only in ascii observing LF, CR, TAB, SPACE */
-int dlt = -1;		/* if != -1, ask libpcap for the DLT it names */
+static int dlt = -1;		/* if != -1, ask libpcap for the DLT it names */
+static int Cflag_count = 0;	/* Keep track of which file number we're writing */
+static int Wflag = 0;		/* recycle output files after this number of files */
+static int WflagChars = 0;
+
+/*
+ * Define the maximum number of files for the -C flag, and how many
+ * characters can be added to a filename for the -C flag (which
+ * should be enough to handle MAX_CFLAG - 1).
+ */
+#define MAX_CFLAG	1000000
+#define MAX_CFLAG_CHARS	6
 
 const char *dlt_name = NULL;
 
@@ -314,9 +325,11 @@ show_dlts_and_exit(pcap_t *pd)
 #endif
 
 /* Drop root privileges */
-void droproot(const char *username)
+static void
+droproot(const char *username)
 {
 	struct passwd *pw = NULL;
+
 	pw = getpwnam(username);
 	if (pw) {
 		if (initgroups(pw->pw_name, 0) != 0 || setgid(pw->pw_gid) != 0 ||
@@ -332,12 +345,36 @@ void droproot(const char *username)
 	}
 }
 
+static int
+getWflagChars(int x)
+{
+	int c = 0;
+
+	x -= 1;
+	while (x > 0) {
+		c += 1;
+		x /= 10;
+	}
+
+	return c;
+}
+
+
+static void
+MakeFilename(char *buffer, char *orig_name, int cnt, int max_chars)
+{
+	if (cnt == 0 && max_chars == 0)
+		strcpy(buffer, orig_name);
+	else
+		sprintf(buffer, "%s%0*d", orig_name, max_chars, cnt);
+}
+
 int
 main(int argc, char **argv)
 {
 	register int cnt, op, i;
 	bpf_u_int32 localnet, netmask;
-	register char *cp, *infile, *cmdbuf, *device, *RFileName, *WFileName;
+	register char *cp, *infile, *cmdbuf, *device, *RFileName, *WFileName, *WFileNameAlt;
 	pcap_handler callback;
 	int type;
 	struct bpf_program fcode;
@@ -378,7 +415,7 @@ main(int argc, char **argv)
 
 	opterr = 0;
 	while (
-	    (op = getopt(argc, argv, "aA" B_FLAG "c:C:d" D_FLAG "eE:fF:i:lLm:nNOpqr:Rs:StT:u" U_FLAG "vw:xXy:YZ:")) != -1)
+	    (op = getopt(argc, argv, "aA" B_FLAG "c:C:d" D_FLAG "eE:fF:i:lLm:nNOpqr:Rs:StT:u" U_FLAG "vw:W:xXy:YZ:")) != -1)
 		switch (op) {
 
 		case 'a':
@@ -612,6 +649,13 @@ main(int argc, char **argv)
 			WFileName = optarg;
 			break;
 
+		case 'W':
+			Wflag = atoi(optarg);
+			if (Wflag < 0) 
+				error("invalid number of output files %s", optarg);
+			WflagChars = getWflagChars(Wflag);
+			break;
+
 		case 'x':
 			++xflag;
 			break;
@@ -805,7 +849,13 @@ main(int argc, char **argv)
 	if (pcap_setfilter(pd, &fcode) < 0)
 		error("%s", pcap_geterr(pd));
 	if (WFileName) {
-		pcap_dumper_t *p = pcap_dump_open(pd, WFileName);
+		pcap_dumper_t *p;
+
+		WFileNameAlt = (char *)malloc(strlen(WFileName) + MAX_CFLAG_CHARS + 1);
+		if (WFileNameAlt == NULL)
+			error("malloc of WFileNameAlt");
+		MakeFilename(WFileNameAlt, WFileName, 0, WflagChars);
+		p = pcap_dump_open(pd, WFileNameAlt);
 		if (p == NULL)
 			error("%s", pcap_geterr(pd));
 		if (Cflag != 0) {
@@ -988,37 +1038,9 @@ info(register int verbose)
 }
 
 static void
-reverse(char *s)
-{
-	int i, j, c;
-
-	for (i = 0, j = strlen(s) - 1; i < j; i++, j--) {
-		c = s[i];
-		s[i] = s[j];
-		s[j] = c;
-	}
-}
-
-
-static void
-swebitoa(unsigned int n, char *s)
-{
-	unsigned int i;
-
-	i = 0;
-	do {
-		s[i++] = n % 10 + '0';
-	} while ((n /= 10) > 0);
-
-	s[i] = '\0';
-	reverse(s);
-}
-
-static void
 dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
 	struct dump_info *dump_info;
-	static uint cnt = 2;
 	char *name;
 
 	++packets_captured;
@@ -1033,13 +1055,22 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 	 * file could put it over Cflag.
 	 */
 	if (ftell((FILE *)dump_info->p) > Cflag) {
-		name = (char *) malloc(strlen(dump_info->WFileName) + 4);
+		/*
+		 * Close the current file and open a new one.
+		 */
+		pcap_dump_close(dump_info->p);
+		Cflag_count++;
+		if (Wflag > 0) {
+			if (Cflag_count >= Wflag)
+				Cflag_count = 0;
+		} else {
+			if (Cflag_count >= MAX_CFLAG)
+				error("too many output files");
+		}
+		name = (char *)malloc(strlen(dump_info->WFileName) + MAX_CFLAG_CHARS + 1);
 		if (name == NULL)
 			error("dump_packet_and_trunc: malloc");
-		strcpy(name, dump_info->WFileName);
-		swebitoa(cnt, name + strlen(dump_info->WFileName));
-		cnt++;
-		pcap_dump_close(dump_info->p);
+		MakeFilename(name, dump_info->WFileName, Cflag_count, WflagChars);
 		dump_info->p = pcap_dump_open(dump_info->pd, name);
 		free(name);
 		if (dump_info->p == NULL)
