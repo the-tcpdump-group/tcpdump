@@ -37,6 +37,7 @@ OBJS = \
 	../../print-802_11.o \
 	../../print-ah.o \
 	../../print-aodv.o \
+	../../print-ap1394.o \
 	../../print-arcnet.o \
 	../../print-arp.o \
 	../../print-ascii.o \
@@ -110,6 +111,7 @@ OBJS = \
 	../../print-stp.o \
 	../../print-sunatm.o \
 	../../print-sunrpc.o \
+	../../print-symantec.o \
 	../../print-tcp.o \
 	../../print-telnet.o \
 	../../print-tftp.o \
