@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.72 2002-09-14 13:25:36 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.73 2002-09-14 23:06:10 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -119,8 +119,6 @@ struct tok ppptype2str[] = {
 #define CPCODES_TIME_REM	13	/* Time-Remaining (LCP only) RFC1570 */
 #define CPCODES_RESET_REQ	14	/* Reset-Request (CCP only) RFC1962 */
 #define CPCODES_RESET_REP	15	/* Reset-Reply (CCP only) */
-
-#define CPCODES_MAX	CPCODES_RESET_REP
 
 struct tok cpcodes[] = {
 	{CPCODES_VEXT,      "Vendor-Extension"}, /* RFC2153 */
