@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.4 2000-07-29 07:27:54 assar Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.5 2001-05-10 02:58:30 fenner Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -50,9 +50,6 @@ static const char rcsid[] =
 static void cdp_print_addr( const u_char * p, int l );
 static void cdp_print_prefixes( const u_char * p, int l );
 
-/*
- * Returns non-zero IFF it succeeds in printing the header
- */
 void
 cdp_print(const u_char *p, u_int length, u_int caplen,
 	  const u_char *esrc, const u_char *edst)
@@ -62,31 +59,31 @@ cdp_print(const u_char *p, u_int length, u_int caplen,
 
 	/* Cisco Discovery Protocol */
 
-
-	if ( caplen < 12 ) {
+	if ( caplen < 4 ) {
 		(void)printf("[|cdp]");
 		return;
 	}
 
-	i=8;		/* CDP data starts at offset 8 */
+	i=0;		/* CDP data starts at offset 0 */
 	printf ("CDP v%d, ttl=%ds", p[i], p[i+1] );
 	i+=4;		/* skip version, TTL and chksum */
 
 	while (i < length) {
 	    if ( i+4 > caplen ) {
-		printf("[!cdp]");
+		printf("[|cdp]");
 		return;
 	    }
 	    type = (p[i]<<8) + p[i+1];
 	    len  = (p[i+2]<<8) + p[i+3];
 
-	    if ( vflag )
-		printf( "\n\t%02x/%02x", type, len );
-	    else
+	    if (vflag > 1)
 		printf( "\n\t" );
 
+	    if ( vflag )
+		printf( " %02x/%02x", type, len );
+
 	    if ( i+len > caplen ) {
-		printf("[!cdp]");
+		printf("[|cdp]");
 		return;
 	    }
 
@@ -106,7 +103,7 @@ cdp_print(const u_char *p, u_int length, u_int caplen,
 		printf( " CAP 0x%02x", (unsigned) p[i+7] );
 		break;
 	    case 0x05:
-		if ( vflag )
+		if ( vflag > 1 )
 		    printf( " Version:\n%.*s", len-4, p+i+4 );
 		else
 		    printf( " Version: (suppressed)" );
