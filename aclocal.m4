@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.72 2000-09-19 04:01:25 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.73 2001-01-02 22:18:27 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -215,7 +215,7 @@ AC_DEFUN(AC_LBL_LIBPCAP,
     else
 	    $1=$libpcap
 	    if test -r $d/pcap.h; then
-	    $2="-I$d $$2"
+		    $2="-I$d $$2"
 	    elif test -r $srcdir/../libpcap/pcap.h; then
 		    $2="-I$d -I$srcdir/../libpcap $$2"
 	    else
