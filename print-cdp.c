@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.3 2000-05-26 09:32:00 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.4 2000-07-29 07:27:54 assar Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -116,6 +116,15 @@ cdp_print(const u_char *p, u_int length, u_int caplen,
 		break;
 	    case 0x07:
 	        cdp_print_prefixes( p+i+4, len-4 );
+		break;
+	    case 0x09:		/* guess - not documented */
+		printf( " VTP Management Domain: '%.*s'", len-4, p+i+4 );
+		break;
+	    case 0x0a:		/* guess - not documented */
+		printf( " Native VLAN ID: %d", (p[i+4]<<8) + p[i+4+1] - 1 );
+		break;
+	    case 0x0b:		/* guess - not documented */
+		printf( " Duplex: %s", p[i+4] ? "full": "half" );
 		break;
 	    default:
 		printf( " unknown field type %02x, len %d", type, len );
