@@ -13,7 +13,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.11 2000-02-10 17:56:13 kenh Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.12 2000-07-10 04:38:25 assar Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -22,6 +22,7 @@ static const char rcsid[] =
 
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include <sys/param.h>
 #include <sys/time.h>
 #include <sys/types.h>
