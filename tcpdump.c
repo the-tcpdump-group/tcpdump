@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.172 2001-11-15 08:03:41 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.173 2001-12-22 22:12:23 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -195,7 +195,7 @@ main(int argc, char **argv)
 	pcap_handler printer;
 	struct bpf_program fcode;
 	RETSIGTYPE (*oldhandler)(int);
-	struct dump_info info;
+	struct dump_info dumpinfo;
 	u_char *pcap_userdata;
 	char ebuf[PCAP_ERRBUF_SIZE];
 
@@ -461,10 +461,10 @@ main(int argc, char **argv)
 			error("%s", pcap_geterr(pd));
 		if (Cflag != 0) {
 			printer = dump_and_trunc;
-			info.WFileName = WFileName;
-			info.pd = pd;
-			info.p = p;
-			pcap_userdata = (u_char *)&info;
+			dumpinfo.WFileName = WFileName;
+			dumpinfo.pd = pd;
+			dumpinfo.p = p;
+			pcap_userdata = (u_char *)&dumpinfo;
 		} else {
 			printer = pcap_dump;
 			pcap_userdata = (u_char *)p;
@@ -486,6 +486,8 @@ main(int argc, char **argv)
 		    program_name, pcap_geterr(pd));
 		exit(1);
 	}
+	if (RFileName == NULL)
+		info(1);
 	pcap_close(pd);
 	exit(0);
 }
