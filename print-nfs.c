@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.74 2000-06-10 05:21:08 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.75 2000-06-10 05:23:19 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -468,7 +468,7 @@ nfsreq_print(register const u_char *bp, u_int length,
 		if ((dp = parsereq(rp, length)) != NULL &&
 		    (dp = parsefh(dp, v3)) != NULL) {
 			TCHECK(dp[0]);
-			printf(" %04x", (unsigned)ntohl(dp[0]));
+			printf(" %04x", (u_int32_t)ntohl(dp[0]));
 			return;
 		}
 		break;
@@ -567,8 +567,8 @@ nfsreq_print(register const u_char *bp, u_int length,
 			if (vflag && (type == NFCHR || type == NFBLK)) {
 				TCHECK(dp[1]);
 				printf(" %u/%u",
-				       (unsigned)ntohl(dp[0]),
-				       (unsigned)ntohl(dp[1]));
+				       (u_int32_t)ntohl(dp[0]),
+				       (u_int32_t)ntohl(dp[1]));
 				dp += 2;
 			}
 			if (vflag)
@@ -1162,7 +1162,7 @@ parserddires(const u_int32_t *dp)
 
 	TCHECK(dp[2]);
 	printf(" offset %x size %d ",
-	       (unsigned)ntohl(dp[0]), (unsigned)ntohl(dp[1]));
+	       (u_int32_t)ntohl(dp[0]), (u_int32_t)ntohl(dp[1]));
 	if (dp[2] != 0)
 		printf(" eof");
 
@@ -1177,8 +1177,8 @@ parse_wcc_attr(const u_int32_t *dp)
 	printf(" sz ");
 	print_int64(dp, UNSIGNED);
 	printf(" mtime %u.%06u ctime %u.%06u",
-	       (unsigned)ntohl(dp[2]), (unsigned)ntohl(dp[3]),
-	       (unsigned)ntohl(dp[4]), (unsigned)ntohl(dp[5]));
+	       (u_int32_t)ntohl(dp[2]), (u_int32_t)ntohl(dp[3]),
+	       (u_int32_t)ntohl(dp[4]), (u_int32_t)ntohl(dp[5]));
 	return (dp + 6);
 }
 
@@ -1445,7 +1445,7 @@ interp_reply(const struct rpc_msg *rp, u_int32_t proc, u_int32_t vers, int lengt
 		if (!(dp = parse_post_op_attr(dp, vflag)))
 			break;
 		if (!er)
-			printf(" c %04x", (unsigned)ntohl(dp[0]));
+			printf(" c %04x", (u_int32_t)ntohl(dp[0]));
 		return;
 
 	case NFSPROC_READLINK:
