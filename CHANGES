@@ -1,3 +1,7 @@
+Fri Aug 18 16:43:03 JST 2000
+	* improved PPP/L2TP/PPPoE decoder.
+	  From: Motonori Shindo <mshindo@mshindo.net>
+
 Wed Aug  2 05:28:45 JST 2000  itojun@iijlab.net
 	* tcp/udp pseudo header checksum code, from netbsd-current.
 
@@ -602,4 +606,4 @@ v2.0 Sun Jan 13 12:20:40 PST 1991
 
 - Initial public release.
 
-@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.72 2000-08-01 20:29:26 itojun Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.73 2000-08-18 07:45:24 itojun Exp $ (LBL)
