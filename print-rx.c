@@ -13,7 +13,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.7 2000-01-09 21:34:19 fenner Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.8 2000-02-08 20:57:07 kenh Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -33,6 +33,7 @@ static const char rcsid[] =
 
 #include "interface.h"
 #include "addrtoname.h"
+#include "extract.h"
 
 #undef NOERROR					/* Solaris sucks */
 #include <arpa/nameser.h>
@@ -333,6 +334,22 @@ static struct tok afs_fs_errors[] = {
 };
 
 /*
+ * Reasons for acknowledging a packet
+ */
+
+static struct tok rx_ack_reasons[] = {
+	{ 1,		"ack requested" },
+	{ 2,		"duplicate packet" },
+	{ 3,		"out of sequence" },
+	{ 4,		"exceeds window" },
+	{ 5,		"no buffer space" },
+	{ 6,		"ping" },
+	{ 7,		"ping response" },
+	{ 8,		"delay" },
+	{ 0,		NULL },
+};
+
+/*
  * Cache entries we keep around so we can figure out the RX opcode
  * numbers for replies.  This allows us to make sense of RX reply packets.
  */
@@ -374,6 +391,8 @@ static void bos_reply_print(const u_char *, int, int32_t);
 static void ubik_print(const u_char *, int);
 static void ubik_reply_print(const u_char *, int, int32_t);
 
+static void rx_ack_print(const u_char *, int);
+
 static int is_ubik(u_int32_t);
 
 /*
@@ -401,14 +420,14 @@ rx_print(register const u_char *bp, int length, int sport, int dport,
 	if (vflag > 1) {
 		int firstflag = 0;
 		printf(" cid %08x call# %d seq %d ser %d",
-		       (int) ntohl(rxh->cid),
-		       (int) ntohl(rxh->callNumber),
-		       (int) ntohl(rxh->seq),
-		       (int) ntohl(rxh->serial));
+		       (int) EXTRACT_32BITS(&rxh->cid),
+		       (int) EXTRACT_32BITS(&rxh->callNumber),
+		       (int) EXTRACT_32BITS(&rxh->seq),
+		       (int) EXTRACT_32BITS(&rxh->serial));
 		if (vflag > 2)
 			printf(" secindex %d serviceid %hu",
 				(int) rxh->securityIndex,
-				ntohs(rxh->serviceId));
+				EXTRACT_16BITS(&rxh->serviceId));
 		for (i = 0; i < NUM_RX_FLAGS; i++) {
 			if (rxh->flags & rx_flags[i].v) {
 				if (!firstflag) {
@@ -431,7 +450,8 @@ rx_print(register const u_char *bp, int length, int sport, int dport,
 	 * as well.
 	 */
 
-	if (rxh->type == RX_PACKET_TYPE_DATA && ntohl(rxh->seq) == 1 &&
+	if (rxh->type == RX_PACKET_TYPE_DATA &&
+	    EXTRACT_32BITS(&rxh->seq) == 1 &&
 	    rxh->flags & RX_CLIENT_INITIATED) {
 
 		/*
@@ -475,7 +495,7 @@ rx_print(register const u_char *bp, int length, int sport, int dport,
 	 */
 
 	} else if (((rxh->type == RX_PACKET_TYPE_DATA &&
-						ntohl(rxh->seq) == 1) ||
+					EXTRACT_32BITS(&rxh->seq) == 1) ||
 		    rxh->type == RX_PACKET_TYPE_ABORT) &&
 		   (rxh->flags & RX_CLIENT_INITIATED) == 0 &&
 		   rx_cache_find(rxh, (const struct ip *) bp2,
@@ -506,7 +526,15 @@ rx_print(register const u_char *bp, int length, int sport, int dport,
 			default:
 				;
 		}
-	}
+
+	/*
+	 * If it's an RX ack packet, then use the appropriate ack decoding
+	 * function (there isn't any service-specific information in the
+	 * ack packet, so we can use one for all AFS services)
+	 */
+
+	} else if (rxh->type == RX_PACKET_TYPE_ACK)
+		rx_ack_print(bp, length);
 
 
 	printf(" (%d)", length);
@@ -536,7 +564,7 @@ rx_cache_insert(const u_char *bp, const struct ip *ip, int dport,
 	rxent->server = ip->ip_dst;
 	rxent->dport = dport;
 	rxent->serviceId = rxh->serviceId;
-	rxent->opcode = ntohl(*((int *) (bp + sizeof(struct rx_header))));
+	rxent->opcode = EXTRACT_32BITS(bp + sizeof(struct rx_header));
 }
 
 /*
@@ -587,18 +615,18 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 #define TRUNC(n) if (snapend - bp + 1 <= n) goto trunc;
 #define FIDOUT() { unsigned long n1, n2, n3; \
 			TRUNC(sizeof(int32_t) * 3); \
-			n1 = ntohl(*((int *) bp)); \
+			n1 = EXTRACT_32BITS(bp); \
 			bp += sizeof(int32_t); \
-			n2 = ntohl(*((int *) bp)); \
+			n2 = EXTRACT_32BITS(bp); \
 			bp += sizeof(int32_t); \
-			n3 = ntohl(*((int *) bp)); \
+			n3 = EXTRACT_32BITS(bp); \
 			bp += sizeof(int32_t); \
 			printf(" fid %d/%d/%d", (int) n1, (int) n2, (int) n3); \
 		}
 
 #define STROUT(MAX) { int i; \
 			TRUNC(sizeof(int32_t)); \
-			i = (int) ntohl(*((int *) bp)); \
+			i = (int) EXTRACT_32BITS(bp); \
 			bp += sizeof(int32_t); \
 			TRUNC(i); \
 			strncpy(s, bp, min(MAX, i)); \
@@ -609,21 +637,21 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 
 #define INTOUT() { int i; \
 			TRUNC(sizeof(int32_t)); \
-			i = (int) ntohl(*((int *) bp)); \
+			i = (int) EXTRACT_32BITS(bp); \
 			bp += sizeof(int32_t); \
 			printf(" %d", i); \
 		}
 
 #define UINTOUT() { unsigned long i; \
 			TRUNC(sizeof(int32_t)); \
-			i = ntohl(*((int *) bp)); \
+			i = EXTRACT_32BITS(bp); \
 			bp += sizeof(int32_t); \
 			printf(" %lu", i); \
 		}
 
 #define DATEOUT() { time_t t; struct tm *tm; char str[256]; \
 			TRUNC(sizeof(int32_t)); \
-			t = (time_t) ntohl(*((int *) bp)); \
+			t = (time_t) EXTRACT_32BITS(bp); \
 			bp += sizeof(int32_t); \
 			tm = localtime(&t); \
 			strftime(str, 256, "%Y/%m/%d %T", tm); \
@@ -632,17 +660,17 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 
 #define STOREATTROUT() { unsigned long mask, i; \
 			TRUNC((sizeof(int32_t)*6)); \
-			mask = ntohl(*((int *) bp)); bp += sizeof(int32_t); \
+			mask = EXTRACT_32BITS(bp); bp += sizeof(int32_t); \
 			if (mask) printf (" StoreStatus"); \
   		        if (mask & 1) { printf(" date"); DATEOUT(); } \
 			else bp += sizeof(int32_t); \
-			i = ntohl(*((int *) bp)); bp += sizeof(int32_t); \
+			i = EXTRACT_32BITS(bp); bp += sizeof(int32_t); \
   		        if (mask & 2) printf(" owner %lu", i);  \
-			i = ntohl(*((int32_t *) bp)); bp += sizeof(int32_t); \
+			i = EXTRACT_32BITS(bp); bp += sizeof(int32_t); \
   		        if (mask & 4) printf(" group %lu", i); \
-			i = ntohl(*((int32_t *) bp)); bp += sizeof(int32_t); \
+			i = EXTRACT_32BITS(bp); bp += sizeof(int32_t); \
   		        if (mask & 8) printf(" mode %lo", i & 07777); \
-			i = ntohl(*((int32_t *) bp)); bp += sizeof(int32_t); \
+			i = EXTRACT_32BITS(bp); bp += sizeof(int32_t); \
   		        if (mask & 16) printf(" segsize %lu", i); \
 			/* undocumented in 3.3 docu */ \
   		        if (mask & 1024) printf(" fsync");  \
@@ -650,26 +678,26 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 
 #define UBIK_VERSIONOUT() {int32_t epoch; int32_t counter; \
 			TRUNC(sizeof(int32_t) * 2); \
-			epoch = ntohl(*((int *) bp)); \
+			epoch = EXTRACT_32BITS(bp); \
 			bp += sizeof(int32_t); \
-			counter = ntohl(*((int *) bp)); \
+			counter = EXTRACT_32BITS(bp); \
 			bp += sizeof(int32_t); \
 			printf(" %d.%d", epoch, counter); \
 		}
 
 #define AFSUUIDOUT() {u_int32_t temp; int i; \
 			TRUNC(11*sizeof(u_int32_t)); \
-			temp = ntohl(*((int *) bp)); \
+			temp = EXTRACT_32BITS(bp); \
 			bp += sizeof(u_int32_t); \
 			printf(" %08x", temp); \
-			temp = ntohl(*((int *) bp)); \
+			temp = EXTRACT_32BITS(bp); \
 			bp += sizeof(u_int32_t); \
 			printf("%04x", temp); \
-			temp = ntohl(*((int *) bp)); \
+			temp = EXTRACT_32BITS(bp); \
 			bp += sizeof(u_int32_t); \
 			printf("%04x", temp); \
 			for (i = 0; i < 8; i++) { \
-				temp = ntohl(*((int *) bp)); \
+				temp = EXTRACT_32BITS(bp); \
 				bp += sizeof(u_int32_t); \
 				printf("%02x", (unsigned char) temp); \
 			} \
@@ -684,7 +712,7 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 			TRUNC(MAX * sizeof(int32_t)); \
 			sp = s; \
 			for (k = 0; k < MAX; k++) { \
-				*sp++ = (char) ntohl(*((int *) bp)); \
+				*sp++ = (char) EXTRACT_32BITS(bp); \
 				bp += sizeof(int32_t); \
 			} \
 			s[MAX] = '\0'; \
@@ -714,7 +742,7 @@ fs_print(register const u_char *bp, int length)
 	 * gleaned from fsint/afsint.xg
 	 */
 
-	fs_op = ntohl(*((int *) (bp + sizeof(struct rx_header))));
+	fs_op = EXTRACT_32BITS(bp + sizeof(struct rx_header));
 
 	printf(" fs call %s", tok2str(fs_req, "op#%d", fs_op));
 
@@ -766,7 +794,7 @@ fs_print(register const u_char *bp, int length)
 			char a[AFSOPAQUEMAX];
 			FIDOUT();
 			TRUNC(4);
-			i = ntohl(*((int *) bp));
+			i = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 			TRUNC(i);
 			strncpy(a, bp, min(AFSOPAQUEMAX, i));
@@ -821,7 +849,7 @@ fs_print(register const u_char *bp, int length)
 		{
 			unsigned long j;
 			TRUNC(4);
-			j = ntohl(*((int *) bp));
+			j = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 
 			for (i = 0; i < j; i++) {
@@ -877,7 +905,7 @@ fs_reply_print(register const u_char *bp, int length, int32_t opcode)
 		{
 			char a[AFSOPAQUEMAX];
 			TRUNC(4);
-			i = ntohl(*((int *) bp));
+			i = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 			TRUNC(i);
 			strncpy(a, bp, min(AFSOPAQUEMAX, i));
@@ -907,7 +935,7 @@ fs_reply_print(register const u_char *bp, int length, int32_t opcode)
  		 * Otherwise, just print out the return code
  		 */
 		TRUNC(sizeof(int32_t)); 
-		i = (int) ntohl(*((int *) bp)); 
+		i = (int) EXTRACT_32BITS(bp); 
 		bp += sizeof(int32_t); 
 
 		printf(" error %s", tok2str(afs_fs_errors, "#%d", i));
@@ -1017,7 +1045,7 @@ cb_print(register const u_char *bp, int length)
 	 * gleaned from fsint/afscbint.xg
 	 */
 
-	cb_op = ntohl(*((int *) (bp + sizeof(struct rx_header))));
+	cb_op = EXTRACT_32BITS(bp + sizeof(struct rx_header));
 
 	printf(" cb call %s", tok2str(cb_req, "op#%d", cb_op));
 
@@ -1033,7 +1061,7 @@ cb_print(register const u_char *bp, int length)
 		{
 			unsigned long j, t;
 			TRUNC(4);
-			j = ntohl(*((int *) bp));
+			j = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 
 			for (i = 0; i < j; i++) {
@@ -1045,7 +1073,7 @@ cb_print(register const u_char *bp, int length)
 			if (j == 0)
 				printf(" <none!>");
 
-			j = ntohl(*((int *) bp));
+			j = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 
 			if (j != 0)
@@ -1057,7 +1085,7 @@ cb_print(register const u_char *bp, int length)
 				printf(" expires");
 				DATEOUT();
 				TRUNC(4);
-				t = ntohl(*((int *) bp));
+				t = EXTRACT_32BITS(bp);
 				bp += sizeof(int32_t);
 				tok2str(cb_types, "type %d", t);
 			}
@@ -1149,7 +1177,7 @@ prot_print(register const u_char *bp, int length)
 	 * gleaned from ptserver/ptint.xg
 	 */
 
-	pt_op = ntohl(*((int *) (bp + sizeof(struct rx_header))));
+	pt_op = EXTRACT_32BITS(bp + sizeof(struct rx_header));
 
 	printf(" pt");
 
@@ -1201,7 +1229,7 @@ prot_print(register const u_char *bp, int length)
 		{
 			unsigned long j;
 			TRUNC(4);
-			j = ntohl(*((int *) bp));
+			j = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 
 			/*
@@ -1223,7 +1251,7 @@ prot_print(register const u_char *bp, int length)
 			unsigned long j;
 			printf(" ids:");
 			TRUNC(4);
-			i = ntohl(*((int *) bp));
+			i = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 			for (j = 0; j < i; j++)
 				INTOUT();
@@ -1313,7 +1341,7 @@ prot_reply_print(register const u_char *bp, int length, int32_t opcode)
 			unsigned long j;
 			printf(" ids:");
 			TRUNC(4);
-			i = ntohl(*((int *) bp));
+			i = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 			for (j = 0; j < i; j++)
 				INTOUT();
@@ -1325,7 +1353,7 @@ prot_reply_print(register const u_char *bp, int length, int32_t opcode)
 		{
 			unsigned long j;
 			TRUNC(4);
-			j = ntohl(*((int *) bp));
+			j = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 
 			/*
@@ -1350,7 +1378,7 @@ prot_reply_print(register const u_char *bp, int length, int32_t opcode)
 		{
 			unsigned long j;
 			TRUNC(4);
-			j = ntohl(*((int *) bp));
+			j = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 			for (i = 0; i < j; i++) {
 				INTOUT();
@@ -1405,7 +1433,7 @@ vldb_print(register const u_char *bp, int length)
 	 * gleaned from vlserver/vldbint.xg
 	 */
 
-	vldb_op = ntohl(*((int *) (bp + sizeof(struct rx_header))));
+	vldb_op = EXTRACT_32BITS(bp + sizeof(struct rx_header));
 
 	printf(" vldb");
 
@@ -1435,7 +1463,7 @@ vldb_print(register const u_char *bp, int length)
 			printf(" volid");
 			INTOUT();
 			TRUNC(sizeof(int32_t));
-			i = ntohl(*((int *) bp));
+			i = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 			if (i <= 2)
 				printf(" type %s", voltype[i]);
@@ -1455,7 +1483,7 @@ vldb_print(register const u_char *bp, int length)
 			printf(" volid");
 			INTOUT();
 			TRUNC(sizeof(int32_t));
-			i = ntohl(*((int *) bp));
+			i = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 			if (i <= 2)
 				printf(" type %s", voltype[i]);
@@ -1528,7 +1556,7 @@ vldb_reply_print(register const u_char *bp, int length, int32_t opcode)
 			bp += sizeof(int32_t);
 			printf(" numservers");
 			TRUNC(sizeof(int32_t));
-			nservers = ntohl(*((int *) bp));
+			nservers = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 			printf(" %lu", nservers);
 			printf(" servers");
@@ -1542,7 +1570,7 @@ vldb_reply_print(register const u_char *bp, int length, int32_t opcode)
 			printf(" partitions");
 			for (i = 0; i < 8; i++) {
 				TRUNC(sizeof(int32_t));
-				j = ntohl(*((int *) bp));
+				j = EXTRACT_32BITS(bp);
 				if (i < nservers && j <= 26)
 					printf(" %c", 'a' + (int)j);
 				else if (i < nservers)
@@ -1575,7 +1603,7 @@ vldb_reply_print(register const u_char *bp, int length, int32_t opcode)
 			VECOUT(VLNAMEMAX);
 			printf(" numservers");
 			TRUNC(sizeof(int32_t));
-			nservers = ntohl(*((int *) bp));
+			nservers = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 			printf(" %lu", nservers);
 			printf(" servers");
@@ -1589,7 +1617,7 @@ vldb_reply_print(register const u_char *bp, int length, int32_t opcode)
 			printf(" partitions");
 			for (i = 0; i < 13; i++) {
 				TRUNC(sizeof(int32_t));
-				j = ntohl(*((int *) bp));
+				j = EXTRACT_32BITS(bp);
 				if (i < nservers && j <= 26)
 					printf(" %c", 'a' + (int)j);
 				else if (i < nservers)
@@ -1612,7 +1640,7 @@ vldb_reply_print(register const u_char *bp, int length, int32_t opcode)
 			VECOUT(VLNAMEMAX);
 			printf(" numservers");
 			TRUNC(sizeof(int32_t));
-			nservers = ntohl(*((int *) bp));
+			nservers = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 			printf(" %lu", nservers);
 			printf(" servers");
@@ -1630,7 +1658,7 @@ vldb_reply_print(register const u_char *bp, int length, int32_t opcode)
 			printf(" partitions");
 			for (i = 0; i < 13; i++) {
 				TRUNC(sizeof(int32_t));
-				j = ntohl(*((int *) bp));
+				j = EXTRACT_32BITS(bp);
 				if (i < nservers && j <= 26)
 					printf(" %c", 'a' + (int)j);
 				else if (i < nservers)
@@ -1686,7 +1714,7 @@ kauth_print(register const u_char *bp, int length)
 	 * gleaned from kauth/kauth.rg
 	 */
 
-	kauth_op = ntohl(*((int *) (bp + sizeof(struct rx_header))));
+	kauth_op = EXTRACT_32BITS(bp + sizeof(struct rx_header));
 
 	printf(" kauth");
 
@@ -1728,7 +1756,7 @@ kauth_print(register const u_char *bp, int length)
 			printf(" domain");
 			STROUT(KANAMEMAX);
 			TRUNC(sizeof(int32_t));
-			i = (int) ntohl(*((int *) bp));
+			i = (int) EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 			TRUNC(i);
 			bp += i;
@@ -1830,7 +1858,7 @@ vol_print(register const u_char *bp, int length)
 	 * gleaned from volser/volint.xg
 	 */
 
-	vol_op = ntohl(*((int *) (bp + sizeof(struct rx_header))));
+	vol_op = EXTRACT_32BITS(bp + sizeof(struct rx_header));
 
 	printf(" vol call %s", tok2str(vol_req, "op#%d", vol_op));
 
@@ -1913,7 +1941,7 @@ bos_print(register const u_char *bp, int length)
 	 * gleaned from bozo/bosint.xg
 	 */
 
-	bos_op = ntohl(*((int *) (bp + sizeof(struct rx_header))));
+	bos_op = EXTRACT_32BITS(bp + sizeof(struct rx_header));
 
 	printf(" bos call %s", tok2str(bos_req, "op#%d", bos_op));
 
@@ -2056,7 +2084,7 @@ ubik_print(register const u_char *bp, int length)
 	 * gleaned from ubik/ubik_int.xg
 	 */
 
-	ubik_op = ntohl(*((int *) (bp + sizeof(struct rx_header))));
+	ubik_op = EXTRACT_32BITS(bp + sizeof(struct rx_header));
 
 	printf(" ubik call %s", tok2str(ubik_req, "op#%d", ubik_op));
 
@@ -2069,7 +2097,7 @@ ubik_print(register const u_char *bp, int length)
 	switch (ubik_op) {
 		case 10000:		/* Beacon */
 			TRUNC(4);
-			temp = ntohl(*((int *) bp));
+			temp = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 			printf(" syncsite %s", temp ? "yes" : "no");
 			printf(" votestart");
@@ -2100,7 +2128,7 @@ ubik_print(register const u_char *bp, int length)
 			INTOUT();
 			printf(" length");
 			INTOUT();
-			temp = ntohl(*((int *) bp));
+			temp = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 			tok2str(ubik_lock_types, "type %d", temp);
 			break;
@@ -2212,3 +2240,195 @@ ubik_reply_print(register const u_char *bp, int length, int32_t opcode)
 trunc:
 	printf(" [|ubik]");
 }
+
+/*
+ * Handle RX ACK packets.
+ */
+
+void
+rx_ack_print(register const u_char *bp, int length)
+{
+	struct rx_ackPacket *rxa;
+	int i, start, last;
+
+	if (length < sizeof(struct rx_header))
+		return;
+
+	bp += sizeof(struct rx_header);
+
+	/*
+	 * This may seem a little odd .... the rx_ackPacket structure
+	 * contains an array of individual packet acknowledgements
+	 * (used for selective ack/nack), but since it's variable in size,
+	 * we don't want to truncate based on the size of the whole
+	 * rx_ackPacket structure.
+	 */
+
+	TRUNC(sizeof(struct rx_ackPacket) - RX_MAXACKS);
+
+	rxa = (struct rx_ackPacket *) bp;
+	bp += (sizeof(struct rx_ackPacket) - RX_MAXACKS);
+
+	/*
+	 * Print out a few useful things from the ack packet structure
+	 */
+
+	if (vflag > 2)
+		printf(" bufspace %d maxskew %d",
+		       (int) EXTRACT_16BITS(&rxa->bufferSpace),
+		       (int) EXTRACT_16BITS(&rxa->maxSkew));
+	
+	printf(" first %d serial %d reason %s",
+	       EXTRACT_32BITS(&rxa->firstPacket), EXTRACT_32BITS(&rxa->serial),
+	       tok2str(rx_ack_reasons, "#%d", (int) rxa->reason));
+	
+	/*
+	 * Okay, now we print out the ack array.  The way _this_ works
+	 * is that we start at "first", and step through the ack array.
+	 * If we have a contiguous range of acks/nacks, try to
+	 * collapse them into a range.
+	 *
+	 * If you're really clever, you might have noticed that this
+	 * doesn't seem quite correct.  Specifically, due to structure
+	 * padding, sizeof(struct rx_ackPacket) - RX_MAXACKS won't actually
+	 * yield the start of the ack array (because RX_MAXACKS is 255
+	 * and the structure will likely get padded to a 2 or 4 byte
+	 * boundary).  However, this is the way it's implemented inside
+	 * of AFS - the start of the extra fields are at 
+	 * sizeof(struct rx_ackPacket) - RX_MAXACKS + nAcks, which _isn't_
+	 * the exact start of the ack array.  Sigh.  That's why we aren't
+	 * using bp, but instead use rxa->acks[].  But nAcks gets added
+	 * to bp after this, so bp ends up at the right spot.  Go figure.
+	 */
+
+	if (rxa->nAcks != 0) {
+
+		TRUNC(rxa->nAcks);
+
+		/*
+		 * Sigh, this is gross, but it seems to work to collapse
+		 * ranges correctly.
+		 */
+
+		for (i = 0, start = last = -2; i < rxa->nAcks; i++)
+			if (rxa->acks[i] == RX_ACK_TYPE_ACK) {
+
+				/*
+				 * I figured this deserved _some_ explanation.
+				 * First, print "acked" and the packet seq
+				 * number if this is the first time we've
+				 * seen an acked packet.
+				 */
+
+				if (last == -2) {
+					printf(" acked %d",
+					       rxa->firstPacket + i);
+					start = i;
+				}
+
+				/*
+				 * Otherwise, if the there is a skip in
+				 * the range (such as an nacked packet in
+				 * the middle of some acked packets),
+				 * then print the current packet number
+				 * seperated from the last number by
+				 * a comma.
+				 */
+
+				else if (last != i - 1) {
+					printf(",%d", rxa->firstPacket + i);
+					start = i;
+				}
+
+				/*
+				 * We always set last to the value of
+				 * the last ack we saw.  Conversely, start
+				 * is set to the value of the first ack
+				 * we saw in a range.
+				 */
+
+				last = i;
+
+				/*
+				 * Okay, this bit a code gets executed when
+				 * we hit a nack ... in _this_ case we
+				 * want to print out the range of packets
+				 * that were acked, so we need to print
+				 * the _previous_ packet number seperated
+				 * from the first by a dash (-).  Since we
+				 * already printed the first packet above,
+				 * just print the final packet.
+				 */
+			} else if (last == i - 1)
+				printf("-%d", rxa->firstPacket + i - 1);
+		
+		/*
+		 * So, what's going on here?  We ran off the end of the
+		 * ack list, and if we got a range we need to finish it up.
+		 * So we need to determine if the last packet in the list
+		 * was an ack (if so, then last will be set to it) and
+		 * we need to see if the last range didn't start with the
+		 * last packet (because if it _did_, then that would mean
+		 * that the packet number has already been printed and
+		 * we don't need to print it again).
+		 */
+
+		if (last == i - 1 && start != last)
+			printf("-%d", rxa->firstPacket + i - 1);
+
+		/*
+		 * Same as above, just without comments
+		 */
+		
+		for (i = 0, start = last = -2; i < rxa->nAcks; i++)
+			if (rxa->acks[i] == RX_ACK_TYPE_NACK) {
+				if (last == -2) {
+					printf(" nacked %d",
+					       rxa->firstPacket + i);
+					start = i;
+				} else if (last != i - 1) {
+					printf(",%d", rxa->firstPacket + i);
+					start = i;
+				}
+				last = i;
+			} else if (last == i - 1)
+				printf("-%d", rxa->firstPacket + i - 1);
+		
+		if (last == i - 1 && start != last)
+			printf("-%d", rxa->firstPacket + i - 1);
+
+		bp += rxa->nAcks;
+	}
+
+
+	/*
+	 * These are optional fields; depending on your version of AFS,
+	 * you may or may not see them
+	 */
+
+#define TRUNCRET(n)	if (snapend - bp + 1 <= n) return;
+
+	if (vflag > 1) {
+		TRUNCRET(4);
+		printf(" ifmtu");
+		INTOUT();
+
+		TRUNCRET(4);
+		printf(" maxmtu");
+		INTOUT();
+
+		TRUNCRET(4);
+		printf(" rwind");
+		INTOUT();
+
+		TRUNCRET(4);
+		printf(" maxpackets");
+		INTOUT();
+	}
+
+	return;
+
+trunc:
+	printf(" [|ack]");
+}
+#undef TRUNCRET

@@ -1,7 +1,7 @@
 /*
  * Rx protocol format
  *
- * $Id: rx.h,v 1.1 1999-11-17 05:45:58 assar Exp $
+ * $Id: rx.h,v 1.2 2000-02-08 20:57:07 kenh Exp $
  */
 
 #define FS_RX_PORT	7000
@@ -66,3 +66,24 @@ struct rx_header {
 					/* I wasted a day figuring that out! */
 
 #define NUM_RX_FLAGS 5
+
+#define RX_MAXACKS 255
+
+struct rx_ackPacket {
+	u_short bufferSpace;		/* Number of packet buffers available */
+	u_short maxSkew;		/* Max diff between ack'd packet and */
+					/* highest packet received */
+	u_int32_t firstPacket;		/* The first packet in ack list */
+	u_int32_t previousPacket;	/* Previous packet recv'd (obsolete) */
+	u_int32_t serial;		/* # of packet that prompted the ack */
+	u_char reason;			/* Reason for acknowledgement */
+	u_char nAcks;			/* Number of acknowledgements */
+	u_char acks[RX_MAXACKS];	/* Up to RX_MAXACKS acknowledgements */
+};
+
+/*
+ * Values for the acks array
+ */
+
+#define RX_ACK_TYPE_NACK	0	/* Don't have this packet */
+#define RX_ACK_TYPE_ACK		1	/* I have this packet */
