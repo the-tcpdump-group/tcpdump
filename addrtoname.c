@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.80 2001-06-26 13:58:24 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.81 2001-06-26 21:00:20 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -180,9 +180,7 @@ getname(const u_char *ap)
 	u_int32_t addr;
 	static struct hnamemem *p;		/* static for longjmp() */
 
-	addr = ((u_int32_t)ap[0] << 24) | ((u_int32_t)ap[1] << 16) |
-	    ((u_int32_t)ap[2] << 8) | ((u_int32_t)ap[3] << 0);
-
+	memcpy(&addr, ap, sizeof(addr));
 	p = &hnametable[addr & (HASHNAMESIZE-1)];
 	for (; p->nxt; p = p->nxt) {
 		if (p->addr == addr)
@@ -240,10 +238,8 @@ getname6(const u_char *ap)
 	static struct h6namemem *p;		/* static for longjmp() */
 	register char *cp;
 	char ntop_buf[INET6_ADDRSTRLEN];
-	int i;
 
-	for (i = 0; i < sizeof(addr); i++)
-		addr.s6_addr[i] = ap[i];
+	memcpy(&addr, ap, sizeof(addr));
 	p = &h6nametable[*(u_int16_t *)&addr.s6_addr[14] & (HASHNAMESIZE-1)];
 	for (; p->nxt; p = p->nxt) {
 		if (memcmp(&p->addr, &addr, sizeof(addr)) == 0)
