@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-eap.c,v 1.1 2004-03-25 03:29:53 mcr Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-eap.c,v 1.2 2004-04-05 22:35:36 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -66,6 +66,6 @@ eap_print(netdissect_options *ndo,
             return;
 
 trunc:
-
+	;
 }
 
