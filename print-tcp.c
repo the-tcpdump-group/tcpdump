@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.88 2001-08-20 17:53:53 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.89 2001-09-17 20:06:18 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -99,6 +99,7 @@ static struct tcp_seq_hash tcp_seq_hash[TSEQ_HASHSIZE];
 #ifndef NFS_PORT
 #define NFS_PORT	2049
 #endif
+#define MSDP_PORT	639
 
 static int tcp_cksum(register const struct ip *ip,
 		     register const struct tcphdr *tp,
@@ -607,6 +608,8 @@ tcp_print(register const u_char *bp, register u_int length,
 		    (sport == NAMESERVER_PORT || dport == NAMESERVER_PORT)) {
 			/* TCP DNS query has 2byte length at the head */
 			ns_print(bp + 2, length - 2);
+		} else if (sport == MSDP_PORT || dport == MSDP_PORT) {
+			msdp_print(bp, length);
 		}
 	}
 	return;
