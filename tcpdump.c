@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.228 2004-01-26 02:05:18 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.229 2004-01-26 02:09:23 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -1253,7 +1253,9 @@ usage(void)
 	(void)fprintf(stderr,
 "\t\t[ -E algo:secret ] [ -F file ] [ -i interface ] [ -r file ]\n");
 	(void)fprintf(stderr,
-"\t\t[ -s snaplen ] [ -T type ] [ -w file ] [ -y datalinktype ] [ -Z user ]\n");
+"\t\t[ -s snaplen ] [ -T type ] [ -w file ] [ -W filecount ]\n");
+	(void)fprintf(stderr,
+"\t\t[ -y datalinktype ] [ -Z user ]\n");
 	(void)fprintf(stderr,
 "\t\t[ expression ]\n");
 	exit(1);
