@@ -9,7 +9,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/parsenfsfh.c,v 1.14 1999-10-07 23:47:11 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/parsenfsfh.c,v 1.15 1999-11-21 05:43:50 assar Exp $ (LBL)";
 #endif
 
 #include <sys/types.h>
@@ -77,8 +77,9 @@ static const char rcsid[] =
 static int is_UCX(unsigned char *);
 
 void
-Parse_fh(fh, fsidp, inop, osnamep, fsnamep, ourself)
+Parse_fh(fh, len, fsidp, inop, osnamep, fsnamep, ourself)
 register caddr_t *fh;
+int len;
 my_fsid *fsidp;
 ino_t *inop;
 char **osnamep;		/* if non-NULL, return OS name here */

@@ -1,12 +1,12 @@
 /*
- * $Header: /tcpdump/master/tcpdump/nfsfh.h,v 1.6 1999-10-07 23:47:10 mcr Exp $
+ * $Header: /tcpdump/master/tcpdump/nfsfh.h,v 1.7 1999-11-21 05:43:49 assar Exp $
  *
  * nfsfh.h - NFS file handle definitions (for portable use)
  *
  * Jeffrey C. Mogul
  * Digital Equipment Corporation
  * Western Research Laboratory
- */
+/*	$NetBSD: nfsfh.h,v 1.1.1.2 1997/10/03 17:25:13 christos Exp $	*/
 
 /*
  * Internal representation of dev_t, because different NFS servers
@@ -31,4 +31,4 @@ typedef	struct {
 #define	fsid_eq(a,b)	((a.fsid_code == b.fsid_code) &&\
 			 dev_eq(a.Fsid_dev, b.Fsid_dev))
 
-extern void Parse_fh(caddr_t *, my_fsid *, ino_t *, char **, char **, int);
+extern void Parse_fh(caddr_t *, int, my_fsid *, ino_t *, char **, char **, int);
