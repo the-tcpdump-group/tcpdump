@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-igmp.c,v 1.3 2001-01-09 08:01:18 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-igmp.c,v 1.4 2001-05-11 02:13:19 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -196,6 +196,7 @@ static void
 print_igmpv3_query(register const u_char *bp, register u_int len,
        register const u_char *bp2)
 {
+    int mrt, mrc;
     int nsrcs;
     register int i;
 
@@ -204,6 +205,17 @@ print_igmpv3_query(register const u_char *bp, register u_int len,
     if (len < 12 || len & 0x03) {
     	(void)printf(" [invalid len %d]", len);
     	return;
+    }
+    mrc = bp[1];
+    if (mrc < 128) {
+	mrt = mrc;
+    } else {
+        mrt = ((mrc & 0x0f) | 0x10) << (((mrc & 0x70) >> 4) + 3);
+    }
+    if (mrc != 100) {
+	(void)printf(" [max resp time ");
+	relts_print(mrt);
+	(void)printf("]");
     }
     TCHECK2(bp[4], 4);
     if (EXTRACT_32BITS(&bp[4]) == 0)
