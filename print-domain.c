@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.64 2001-01-02 23:24:51 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.65 2001-01-12 15:06:06 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -590,34 +590,40 @@ ns_print(register const u_char *bp, u_int length)
 		if (ancount--) {
 			if ((cp = ns_rprint(cp, bp)) == NULL)
 				goto trunc;
-			while (ancount-- && cp < snapend) {
+			while (cp < snapend && ancount--) {
 				putchar(',');
 				if ((cp = ns_rprint(cp, bp)) == NULL)
 					goto trunc;
 			}
 		}
+		if (ancount > 0)
+			goto trunc;
 		/* Print NS and AR sections on -vv */
 		if (vflag > 1) {
-			if (nscount-- && cp < snapend) {
+			if (cp < snapend && nscount--) {
 				fputs(" ns:", stdout);
 				if ((cp = ns_rprint(cp, bp)) == NULL)
 					goto trunc;
-				while (nscount-- && cp < snapend) {
+				while (cp < snapend && nscount--) {
 					putchar(',');
 					if ((cp = ns_rprint(cp, bp)) == NULL)
 						goto trunc;
 				}
 			}
-			if (arcount-- && cp < snapend) {
+			if (nscount > 0)
+				goto trunc;
+			if (cp < snapend && arcount--) {
 				fputs(" ar:", stdout);
 				if ((cp = ns_rprint(cp, bp)) == NULL)
 					goto trunc;
-				while (arcount-- && cp < snapend) {
+				while (cp < snapend && arcount--) {
 					putchar(',');
 					if ((cp = ns_rprint(cp, bp)) == NULL)
 						goto trunc;
 				}
 			}
+			if (arcount > 0)
+				goto trunc;
 		}
 	}
 	else {
@@ -652,30 +658,30 @@ ns_print(register const u_char *bp, u_int length)
 				       (const u_char *)np);
 			if (!cp)
 				goto trunc;
-			if ((cp = ns_rprint(cp, bp)) == NULL)
-				goto trunc;
-			while (qdcount-- && cp < snapend) {
+			while (cp < snapend && qdcount--) {
 				cp = ns_qprint((const u_char *)cp,
 					       (const u_char *)np);
 				if (!cp)
 					goto trunc;
-				if ((cp = ns_rprint(cp, bp)) == NULL)
-					goto trunc;
 			}
 		}
+		if (qdcount > 0)
+			goto trunc;
 
 		/* Print remaining sections on -vv */
 		if (vflag > 1) {
 			if (ancount--) {
 				if ((cp = ns_rprint(cp, bp)) == NULL)
 					goto trunc;
-				while (ancount-- && cp < snapend) {
+				while (cp < snapend && ancount--) {
 					putchar(',');
 					if ((cp = ns_rprint(cp, bp)) == NULL)
 						goto trunc;
 				}
 			}
-			if (nscount-- && cp < snapend) {
+			if (ancount > 0)
+				goto trunc;
+			if (cp < snapend && nscount--) {
 				fputs(" ns:", stdout);
 				if ((cp = ns_rprint(cp, bp)) == NULL)
 					goto trunc;
@@ -685,16 +691,20 @@ ns_print(register const u_char *bp, u_int length)
 						goto trunc;
 				}
 			}
-			if (arcount-- && cp < snapend) {
+			if (nscount > 0)
+				goto trunc;
+			if (cp < snapend && arcount--) {
 				fputs(" ar:", stdout);
 				if ((cp = ns_rprint(cp, bp)) == NULL)
 					goto trunc;
-				while (arcount-- && cp < snapend) {
+				while (cp < snapend && arcount--) {
 					putchar(',');
 					if ((cp = ns_rprint(cp, bp)) == NULL)
 						goto trunc;
 				}
 			}
+			if (arcount > 0)
+				goto trunc;
 		}
 	}
 	printf(" (%d)", length);
