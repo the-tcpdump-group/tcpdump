@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-arcnet.c,v 1.14 2003-01-23 09:05:38 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-arcnet.c,v 1.15 2003-01-23 09:15:14 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -151,11 +151,11 @@ arcnet_if_print(const struct pcap_pkthdr *h, const u_char *p)
 				return (caplen);
 			}
 			flag = ap->arc_flag2;
-			seqid = ap->arc_seqid2;
+			seqid = ntohs(ap->arc_seqid2);
 			archdrlen = ARC_HDRNEWLEN_EXC;
 		} else {
 			flag = ap->arc_flag;
-			seqid = ap->arc_seqid;
+			seqid = ntohs(ap->arc_seqid);
 			archdrlen = ARC_HDRNEWLEN;
 		}
 	}
@@ -190,7 +190,8 @@ arcnet_if_print(const struct pcap_pkthdr *h, const u_char *p)
  * 'h->length' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.  It is quite similar
  * to the non-Linux style printer except that Linux doesn't ever
- * supply packets that look like exception frames, and headers have an
+ * supply packets that look like exception frames, it always supplies
+ * reassembled packets rather than raw frames, and headers have an
  * extra "offset" field between the src/dest and packet type.
  */
 u_int
@@ -200,8 +201,7 @@ arcnet_linux_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	u_int length = h->len;
 	const struct arc_linux_header *ap;
 
-	int flag = 0, archdrlen = 0;
-	u_int seqid = 0;
+	int archdrlen = 0;
 	u_char arc_type;
 
 	if (caplen < ARC_LINUX_HDRLEN) {
@@ -228,7 +228,7 @@ arcnet_linux_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	}
 
 	if (eflag)
-		arcnet_print(p, length, 0, flag, seqid);
+		arcnet_print(p, length, 0, 0, 0);
 
 	/*
 	 * Go past the ARCNET header.
