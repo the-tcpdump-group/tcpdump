@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.100 2001-10-04 09:18:47 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.101 2001-10-08 21:25:24 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -114,14 +114,14 @@ vat_print(const void *hdr, u_int len, register const struct udphdr *up)
 	u_int ts = *(u_int16_t *)hdr;
 	if ((ts & 0xf060) != 0) {
 		/* probably vt */
-		(void)printf(" udp/vt %u %d / %d",
+		(void)printf("udp/vt %u %d / %d",
 			     (u_int32_t)(ntohs(up->uh_ulen) - sizeof(*up)),
 			     ts & 0x3ff, ts >> 10);
 	} else {
 		/* probably vat */
 		u_int32_t i0 = (u_int32_t)ntohl(((u_int *)hdr)[0]);
 		u_int32_t i1 = (u_int32_t)ntohl(((u_int *)hdr)[1]);
-		printf(" udp/vat %u c%d %u%s",
+		printf("udp/vat %u c%d %u%s",
 			(u_int32_t)(ntohs(up->uh_ulen) - sizeof(*up) - 8),
 			i0 & 0xffff,
 			i1, i0 & 0x800000? "*" : "");
@@ -165,7 +165,7 @@ rtp_print(const void *hdr, u_int len, register const struct udphdr *up)
 		ip += 1;
 		len -= 1;
 	}
-	printf(" udp/%s %d c%d %s%s %d %u",
+	printf("udp/%s %d c%d %s%s %d %u",
 		ptype,
 		dlen,
 		contype,
@@ -449,7 +449,7 @@ udp_print(register const u_char *bp, u_int length,
 		switch (packettype) {
 
 		case PT_VAT:
-			(void)printf("%s.%s > %s.%s:",
+			(void)printf("%s.%s > %s.%s: ",
 				ipaddr_string(&ip->ip_src),
 				udpport_string(sport),
 				ipaddr_string(&ip->ip_dst),
@@ -458,7 +458,7 @@ udp_print(register const u_char *bp, u_int length,
 			break;
 
 		case PT_WB:
-			(void)printf("%s.%s > %s.%s:",
+			(void)printf("%s.%s > %s.%s: ",
 				ipaddr_string(&ip->ip_src),
 				udpport_string(sport),
 				ipaddr_string(&ip->ip_dst),
@@ -478,7 +478,7 @@ udp_print(register const u_char *bp, u_int length,
 			break;
 
 		case PT_RTP:
-			(void)printf("%s.%s > %s.%s:",
+			(void)printf("%s.%s > %s.%s: ",
 				ipaddr_string(&ip->ip_src),
 				udpport_string(sport),
 				ipaddr_string(&ip->ip_dst),
@@ -630,7 +630,7 @@ udp_print(register const u_char *bp, u_int length,
 			krb_print((const void *)(up + 1), length);
 		else if (ISPORT(L2TP_PORT))
 			l2tp_print((const u_char *)(up + 1), length);
-#if 0
+#ifdef TCPDUMP_DO_SMB
  		else if (ISPORT(NETBIOS_NS_PORT))
 			nbt_udp137_print((const u_char *)(up + 1), length);
  		else if (ISPORT(NETBIOS_DGRAM_PORT))
@@ -673,9 +673,9 @@ udp_print(register const u_char *bp, u_int length,
 		else if (ISPORT(LWRES_PORT))
 			lwres_print((const u_char *)(up + 1), length);
 		else
-			(void)printf(" udp %u",
+			(void)printf("udp %u",
 			    (u_int32_t)(ulen - sizeof(*up)));
 #undef ISPORT
 	} else
-		(void)printf(" udp %u", (u_int32_t)(ulen - sizeof(*up)));
+		(void)printf("udp %u", (u_int32_t)(ulen - sizeof(*up)));
 }
