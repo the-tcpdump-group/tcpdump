@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/ethertype.h,v 1.23 2004-06-12 16:32:56 hannes Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/ethertype.h,v 1.24 2004-10-07 16:04:07 hannes Exp $ (LBL)
  */
 
 /*
@@ -32,6 +32,10 @@
  * We declare all of them here so that no file has to include
  * <netinet/if_ether.h> if all it needs are ETHERTYPE_ values.
  */
+
+#ifndef ETHERTYPE_LEN
+#define ETHERTYPE_LEN           2
+#endif
 
 #ifndef ETHERTYPE_GRE_ISO
 #define ETHERTYPE_GRE_ISO       0x00FE  /* not really an ethertype only used in GRE */

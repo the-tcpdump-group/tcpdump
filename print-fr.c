@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.22 2004-10-07 14:53:10 hannes Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.23 2004-10-07 16:04:06 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -176,8 +176,27 @@ fr_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 		return caplen;
 	}
 
-	if (p[addr_len] != 0x03)
-		printf("UI %02x! ", p[addr_len]);
+	if (p[addr_len] != 0x03) {
+
+                /* lets figure out if we have cisco style encapsulation: */
+                extracted_ethertype = EXTRACT_16BITS(p+addr_len);
+
+                if (eflag)
+                    printf("%s (0x%04x), length %u: ",
+                           tok2str(ethertype_values, "unknown", extracted_ethertype),
+                           extracted_ethertype,
+                           length);
+
+                if (ether_encap_print(extracted_ethertype,
+                                      p+addr_len+ETHERTYPE_LEN,
+                                      length-(addr_len),
+                                      caplen-(addr_len),
+                                      &extracted_ethertype) == 0)
+                    /* ether_type not known, probably it wasn't one */
+                    printf("UI %02x! ", p[addr_len]);
+                else
+                    return hdr_len;                    
+        }
 
 	if (!p[addr_len + 1]) {	/* pad byte should be used with 3-byte Q.922 */
 		if (addr_len != 3)
