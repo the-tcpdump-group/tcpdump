@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.56 2000-10-05 04:10:02 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.57 2000-10-10 05:03:32 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -39,6 +39,7 @@ struct rtentry;
 
 #include <stdio.h>
 #include <string.h>
+#include <netdb.h>		/* for MAXHOSTNAMELEN on some platforms */
 
 #include "interface.h"
 #include "addrtoname.h"

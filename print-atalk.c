@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.61 2000-10-06 04:23:10 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.62 2000-10-10 05:03:32 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -39,6 +39,7 @@ static const char rcsid[] =
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <netdb.h>		/* for MAXHOSTNAMELEN on some platforms */
 
 #include "interface.h"
 #include "addrtoname.h"

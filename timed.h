@@ -51,7 +51,7 @@ struct tsp {
 		struct timeval tspu_time;
 		char tspu_hopcnt;
 	} tsp_u;
-	char tsp_name[MAXHOSTNAMELEN];
+	char tsp_name[256];
 };
 
 #define	tsp_time	tsp_u.tspu_time
