@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.17 2000-06-26 20:04:53 assar Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.18 2000-07-16 05:25:16 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -619,6 +619,7 @@ icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
 	struct icmp6_hdr *dp;
 	const u_char *cp;
 	int siz, i;
+	int needcomma;
 
 	dp = (struct icmp6_hdr *)bp;
 	ni6 = (struct icmp6_nodeinfo *)bp;
@@ -744,20 +745,28 @@ icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
 			break;
 		}
 
+		needcomma = 0;
+
 		ni6 = (struct icmp6_nodeinfo *)dp;
 		printf("icmp6: node information query");
 		printf(" (");	/*)*/
 		switch (ni6->ni_code) {
 		case ICMP6_NI_SUCESS:
+			if (vflag) {
+				printf("success");
+				needcomma++;
+			}
 			break;
 		case ICMP6_NI_REFUSED:
 			printf("refused");
+			needcomma++;
 			if (siz != sizeof(*ni6))
 				if (vflag)
 					printf(", invalid length");
 			break;
 		case ICMP6_NI_UNKNOWN:
 			printf("unknown");
+			needcomma++;
 			if (siz != sizeof(*ni6))
 				if (vflag)
 					printf(", invalid length");
@@ -772,20 +781,25 @@ icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
 
 		switch (ntohs(ni6->ni_qtype)) {
 		case NI_QTYPE_NOOP:
+			if (needcomma)
+				printf(", ");
 			printf("noop");
 			if (siz != sizeof(*ni6))
 				if (vflag)
 					printf(", invalid length");
 			break;
 		case NI_QTYPE_SUPTYPES:
+			if (needcomma)
+				printf(", ");
 			printf("supported qtypes");
 			i = ntohs(ni6->ni_flags);
 			if (i)
 				printf(" [%s]", (i & 0x01) ? "C" : "");
 			break;
 		case NI_QTYPE_FQDN:
-			if (vflag)
-				printf("DNS name");
+			if (needcomma)
+				printf(", ");
+			printf("DNS name");
 			cp = (const u_char *)(ni6 + 1) + 4;
 			if (cp[0] == ep - cp - 1) {
 				/* icmp-name-lookup-03, pascal string */
@@ -804,6 +818,8 @@ icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
 				printf(" [TTL=%u]", *(u_int32_t *)(ni6 + 1));
 			break;
 		case NI_QTYPE_NODEADDR:
+			if (needcomma)
+				printf(", ");
 			printf("node addresses");
 			for (i = sizeof(*ni6);
 			     i < siz;
@@ -823,6 +839,8 @@ icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
 			    (i & NI_NODEADDR_FLAG_TRUNCATE) ? "T" : "");
 			break;
 		default:
+			if (needcomma)
+				printf(", ");
 			printf("unknown");
 			break;
 		}
