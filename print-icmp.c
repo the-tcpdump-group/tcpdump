@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.66 2002-07-05 15:58:20 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.67 2002-07-21 21:03:07 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -485,9 +485,15 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2)
 	}
 	(void)printf("icmp %d: %s", plen, str);
 	if (vflag) {
+		u_int16_t sum, icmp_sum;
 		if (TTEST2(*bp, plen)) {
-			if (in_cksum((u_short*)dp, plen, 0))
-				printf(" (wrong icmp csum)");
+			sum = in_cksum((u_short*)dp, plen, 0);
+			if (sum != 0) {
+				icmp_sum = ntohs(dp->icmp_cksum);
+				(void)printf(" (wrong icmp cksum %x (->%x)!)",
+					     icmp_sum,
+					     in_cksum_shouldbe(icmp_sum, sum));
+			}
 		}
 	}
 	if (vflag > 1 && !ICMP_INFOTYPE(dp->icmp_type)) {
