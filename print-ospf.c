@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.40 2003-10-04 14:29:52 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.41 2003-10-20 16:11:45 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -181,7 +181,7 @@ ospf_print_lsa(register const struct lsa *lsap)
 	register const struct aslametric *almp;
 	register const struct mcla *mcp;
 	register const u_int32_t *lp;
-	register int j, k,tlv_type, tlv_length, subtlv_type, subtlv_length, priority_level;
+	register int j, k,ls_length, tlv_type, tlv_length, subtlv_type, subtlv_length, priority_level;
 	const u_int8_t *tptr;
         union { /* int to float conversion buffer for several subTLVs */
             float f; 
@@ -189,11 +189,13 @@ ospf_print_lsa(register const struct lsa *lsap)
         } bw;
 
 	tptr = (u_int8_t *)lsap->lsa_un.un_unknown; /* squelch compiler warnings */
+        ls_length = EXTRACT_16BITS(&lsap->ls_hdr.ls_length)-sizeof(struct lsa_hdr);
 
-	printf("\n\t  Advertising Router: %s, seq 0x%08x, age %us",
+	printf(", Advertising Router: %s, seq 0x%08x, age %us, length: %u",
 	       ipaddr_string(&lsap->ls_hdr.ls_router),
 	       EXTRACT_32BITS(&lsap->ls_hdr.ls_seq),
-	       EXTRACT_16BITS(&lsap->ls_hdr.ls_age));
+	       EXTRACT_16BITS(&lsap->ls_hdr.ls_age),
+               ls_length);
 
         switch (lsap->ls_hdr.ls_type) {
 	/* the LSA header for opaque LSAs was slightly changed */
@@ -224,6 +226,7 @@ ospf_print_lsa(register const struct lsa *lsap)
 
 	TCHECK(lsap->ls_hdr.ls_length);
 	ls_end = (u_char *)lsap + EXTRACT_16BITS(&lsap->ls_hdr.ls_length);
+
 	switch (lsap->ls_hdr.ls_type) {
 
 	case LS_TYPE_ROUTER:
@@ -404,141 +407,147 @@ ospf_print_lsa(register const struct lsa *lsap)
 	    case LS_OPAQUE_TYPE_TE:
  	        if (!TTEST2(*tptr, 4))
 		    goto trunc;
-	        tlv_type = EXTRACT_16BITS(&lsap->lsa_un.un_te_lsa_tlv.type);
-		tlv_length = EXTRACT_16BITS(&lsap->lsa_un.un_te_lsa_tlv.length);
-		tptr = (u_int8_t *)(&lsap->lsa_un.un_te_lsa_tlv.data);
 
-		printf("\n\t    %s TLV (%u), length: %u",
-		       tok2str(lsa_opaque_te_tlv_values,"unknown",tlv_type),
-		       tlv_type,
-		       tlv_length);
-	
-		switch(tlv_type) {
-		case LS_OPAQUE_TE_TLV_LINK:
-		    while (tlv_length > 0) {
-		        if (!TTEST2(*tptr, 4))
-			    goto trunc;
-  		        subtlv_type = EXTRACT_16BITS(tptr);
-  		        subtlv_length = EXTRACT_16BITS(tptr+2);
-			tlv_length-=4;
-			tptr+=4;
+		tptr = (u_int8_t *)(&lsap->lsa_un.un_te_lsa_tlv.type);                
 
-			printf("\n\t      %s subTLV (%u), length: %u",
-			       tok2str(lsa_opaque_te_link_tlv_subtlv_values,"unknown",subtlv_type),
-			       subtlv_type,
-			       subtlv_length);
+		while (ls_length > 0) {
+                    tlv_type = EXTRACT_16BITS(tptr);
+                    tlv_length = EXTRACT_16BITS(tptr+2);
+                    ls_length-=(tlv_length+4);
+                    tptr+=4;
+                    
+                    printf("\n\t    %s TLV (%u), length: %u",
+                           tok2str(lsa_opaque_te_tlv_values,"unknown",tlv_type),
+                           tlv_type,
+                           tlv_length);
 
-		        if (!TTEST2(*tptr, subtlv_length))
-			    goto trunc;
-			switch(subtlv_type) {
-			case LS_OPAQUE_TE_LINK_SUBTLV_LINK_ID:
-			case LS_OPAQUE_TE_LINK_SUBTLV_ADMIN_GROUP:
-			case LS_OPAQUE_TE_LINK_SUBTLV_LINK_LOCAL_REMOTE_ID:
-			    printf(", 0x%08x", EXTRACT_32BITS(tptr));
-			    if (subtlv_length == 8) /* draft-ietf-ccamp-ospf-gmpls-extensions */
-			        printf(", 0x%08x", EXTRACT_32BITS(tptr+4));
-			    break;
-			case LS_OPAQUE_TE_LINK_SUBTLV_LOCAL_IP:
-			case LS_OPAQUE_TE_LINK_SUBTLV_REMOTE_IP:
-			    printf(", %s", ipaddr_string(tptr));
-			    break;
-			case LS_OPAQUE_TE_LINK_SUBTLV_MAX_BW:
-			case LS_OPAQUE_TE_LINK_SUBTLV_MAX_RES_BW:
-			    bw.i = EXTRACT_32BITS(tptr);
-			    printf(", %.3f Mbps", bw.f*8/1000000 );
-			    break;
-			case LS_OPAQUE_TE_LINK_SUBTLV_UNRES_BW:
-			    for (priority_level = 0; priority_level < 8; priority_level++) {
-			        bw.i = EXTRACT_32BITS(tptr+priority_level*4);
-				printf("\n\t\tpriority level %d: %.3f Mbps",
-				       priority_level,
-				       bw.f*8/1000000 );
-			    }
-			    break;
-			case LS_OPAQUE_TE_LINK_SUBTLV_TE_METRIC:
-			    printf(", Metric %u", EXTRACT_32BITS(tptr));
-			    break;
-			case LS_OPAQUE_TE_LINK_SUBTLV_LINK_PROTECTION_TYPE:
-			    printf(", %s, Priority %u",
-				   bittok2str(gmpls_link_prot_values, "none", *tptr),
-				   *(tptr+1));
-			    break;
-			case LS_OPAQUE_TE_LINK_SUBTLV_INTF_SW_CAP_DESCR:
-			    printf("\n\t\tInterface Switching Capability: %s",
-				   tok2str(gmpls_switch_cap_values, "Unknown", *(tptr)));
-			    printf("\n\t\tLSP Encoding: %s\n\t\tMax LSP Bandwidth:",
-				   tok2str(gmpls_encoding_values, "Unknown", *(tptr+1)));
-			    for (priority_level = 0; priority_level < 8; priority_level++) {
-			        bw.i = EXTRACT_32BITS(tptr+4+(priority_level*4));
-				printf("\n\t\t  priority level %d: %.3f Mbps",
-				       priority_level,
-				       bw.f*8/1000000 );
-			    }
-			    break;
-			case LS_OPAQUE_TE_LINK_SUBTLV_LINK_TYPE:
-			    printf(", %s (%u)",
-				   tok2str(lsa_opaque_te_tlv_link_type_sub_tlv_values,"unknown",*tptr),
-				   *tptr);
-			    break;
+                    switch(tlv_type) {
+                    case LS_OPAQUE_TE_TLV_LINK:
+                        while (tlv_length > 0) {
+                            if (!TTEST2(*tptr, 4))
+                                goto trunc;
+                            subtlv_type = EXTRACT_16BITS(tptr);
+                            subtlv_length = EXTRACT_16BITS(tptr+2);
+                            tlv_length-=4;
+                            tptr+=4;
+                            
+                            printf("\n\t      %s subTLV (%u), length: %u",
+                                   tok2str(lsa_opaque_te_link_tlv_subtlv_values,"unknown",subtlv_type),
+                                   subtlv_type,
+                                   subtlv_length);
+                            
+                            if (!TTEST2(*tptr, subtlv_length))
+                                goto trunc;
+                            switch(subtlv_type) {
+                            case LS_OPAQUE_TE_LINK_SUBTLV_ADMIN_GROUP:
+                                printf(", 0x%08x", EXTRACT_32BITS(tptr));
+                                break;
+                            case LS_OPAQUE_TE_LINK_SUBTLV_LINK_ID:
+                            case LS_OPAQUE_TE_LINK_SUBTLV_LINK_LOCAL_REMOTE_ID:
+                                printf(", %s (0x%08x)",
+                                       ipaddr_string(tptr),
+                                       EXTRACT_32BITS(tptr));
+                                if (subtlv_length == 8) /* draft-ietf-ccamp-ospf-gmpls-extensions */
+                                    printf(", 0x%08x", EXTRACT_32BITS(tptr+4));
+                                break;
+                            case LS_OPAQUE_TE_LINK_SUBTLV_LOCAL_IP:
+                            case LS_OPAQUE_TE_LINK_SUBTLV_REMOTE_IP:
+                                printf(", %s", ipaddr_string(tptr));
+                                break;
+                            case LS_OPAQUE_TE_LINK_SUBTLV_MAX_BW:
+                            case LS_OPAQUE_TE_LINK_SUBTLV_MAX_RES_BW:
+                                bw.i = EXTRACT_32BITS(tptr);
+                                printf(", %.3f Mbps", bw.f*8/1000000 );
+                                break;
+                            case LS_OPAQUE_TE_LINK_SUBTLV_UNRES_BW:
+                                for (priority_level = 0; priority_level < 8; priority_level++) {
+                                    bw.i = EXTRACT_32BITS(tptr+priority_level*4);
+                                    printf("\n\t\tpriority level %d: %.3f Mbps",
+                                           priority_level,
+                                           bw.f*8/1000000 );
+                                }
+                                break;
+                            case LS_OPAQUE_TE_LINK_SUBTLV_TE_METRIC:
+                                printf(", Metric %u", EXTRACT_32BITS(tptr));
+                                break;
+                            case LS_OPAQUE_TE_LINK_SUBTLV_LINK_PROTECTION_TYPE:
+                                printf(", %s, Priority %u",
+                                       bittok2str(gmpls_link_prot_values, "none", *tptr),
+                                       *(tptr+1));
+                                break;
+                            case LS_OPAQUE_TE_LINK_SUBTLV_INTF_SW_CAP_DESCR:
+                                printf("\n\t\tInterface Switching Capability: %s",
+                                       tok2str(gmpls_switch_cap_values, "Unknown", *(tptr)));
+                                printf("\n\t\tLSP Encoding: %s\n\t\tMax LSP Bandwidth:",
+                                       tok2str(gmpls_encoding_values, "Unknown", *(tptr+1)));
+                                for (priority_level = 0; priority_level < 8; priority_level++) {
+                                    bw.i = EXTRACT_32BITS(tptr+4+(priority_level*4));
+                                    printf("\n\t\t  priority level %d: %.3f Mbps",
+                                           priority_level,
+                                           bw.f*8/1000000 );
+                                }
+                                break;
+                            case LS_OPAQUE_TE_LINK_SUBTLV_LINK_TYPE:
+                                printf(", %s (%u)",
+                                       tok2str(lsa_opaque_te_tlv_link_type_sub_tlv_values,"unknown",*tptr),
+                                       *tptr);
+                                break;
 
-			/*
-			 * FIXME those are the defined subTLVs that lack a decoder
-			 * you are welcome to contribute code ;-)
-			 */
-			case LS_OPAQUE_TE_LINK_SUBTLV_SHARED_RISK_GROUP:
+                                /*
+                                 * FIXME those are the defined subTLVs that lack a decoder
+                                 * you are welcome to contribute code ;-)
+                                 */
+                            case LS_OPAQUE_TE_LINK_SUBTLV_SHARED_RISK_GROUP:
 
-			default:
-			  if (vflag <= 1) {
-			      if(!print_unknown_data(tptr,"\n\t\t",subtlv_length))
-			        return(0);
-			  }
-			  break;
-			}
-			/* in OSPF everything has to be 32-bit aligned, including TLVs */
-			if (subtlv_length%4 != 0)
-  			    subtlv_length+=4-(subtlv_length%4);
-
-			tlv_length-=subtlv_length;
-			tptr+=subtlv_length;
-
-		    }
-		    break;
-
-	        /*
-		 * FIXME those are the defined TLVs that lack a decoder
-		 * you are welcome to contribute code ;-)
-		 */
-
-		case LS_OPAQUE_TE_TLV_ROUTER:
-
-		default:
-		    if (vflag <= 1) {
-		        if(!print_unknown_data(tptr,"\n\t      ",tlv_length))
-			    return(0);
-		    }
-		    break;
+                            default:
+                                if (vflag <= 1) {
+                                    if(!print_unknown_data(tptr,"\n\t\t",subtlv_length))
+                                        return(0);
+                                }
+                                break;
+                            }
+                            /* in OSPF everything has to be 32-bit aligned, including TLVs */
+                            if (subtlv_length%4 != 0)
+                                subtlv_length+=4-(subtlv_length%4);
+                            
+                            tlv_length-=subtlv_length;
+                            tptr+=subtlv_length;
+                            
+                        }
+                        break;
+                        
+                    case LS_OPAQUE_TE_TLV_ROUTER:
+                        printf(", %s", ipaddr_string(tptr));
+                        break;
+                        
+                    default:
+                        if (vflag <= 1) {
+                            if(!print_unknown_data(tptr,"\n\t      ",tlv_length))
+                                return(0);
+                        }
+                        break;
+                    }
+                    tptr+=tlv_length;
 		}
-
-	      break;
+                break;
 	    }
-
 	    break;
         default:
-	  if (vflag <= 1) {
-	    if(!print_unknown_data((u_int8_t *)lsap->lsa_un.un_unknown,
-				   "\n\t    ", EXTRACT_16BITS(&lsap->ls_hdr.ls_length)-sizeof(struct lsa_hdr)))
-	      return(0);
-	  }
-	  break;
+            if (vflag <= 1) {
+                if(!print_unknown_data((u_int8_t *)lsap->lsa_un.un_unknown,
+                                       "\n\t    ", EXTRACT_16BITS(&lsap->ls_hdr.ls_length)-sizeof(struct lsa_hdr)))
+                    return(0);
+            } 
+            break;
         }
 
         /* do we want to see an additionally hexdump ? */
-        if (vflag> 1) {
-	  if(!print_unknown_data((u_int8_t *)lsap->lsa_un.un_unknown,
-				 "\n\t    ", EXTRACT_16BITS(&lsap->ls_hdr.ls_length)-sizeof(struct lsa_hdr)))
-	    return(0);
-	}
-
+        if (vflag> 1)
+            if(!print_unknown_data((u_int8_t *)lsap->lsa_un.un_unknown,
+                                   "\n\t    ", EXTRACT_16BITS(&lsap->ls_hdr.ls_length)-sizeof(struct lsa_hdr))) {
+                return(0);
+            }
+        
 	return (0);
 trunc:
 	return (1);
@@ -552,7 +561,7 @@ ospf_decode_v2(register const struct ospfhdr *op,
 	register const struct lsr *lsrp;
 	register const struct lsa_hdr *lshp;
 	register const struct lsa *lsap;
-	register int lsa_count;
+	register u_int32_t lsa_count,lsa_count_max;
 
 	switch (op->ospf_type) {
 
@@ -628,9 +637,10 @@ ospf_decode_v2(register const struct ospfhdr *op,
 	case OSPF_TYPE_LS_UPDATE:
                 lsap = op->ospf_lsu.lsu_lsa;
                 TCHECK(op->ospf_lsu.lsu_count);
-                lsa_count = EXTRACT_32BITS(&op->ospf_lsu.lsu_count);
-                printf(", %d LSA%s",lsa_count, lsa_count > 1 ? "s" : "");
-                while (lsa_count--) {
+                lsa_count_max = EXTRACT_32BITS(&op->ospf_lsu.lsu_count);
+                printf(", %d LSA%s",lsa_count_max, lsa_count_max > 1 ? "s" : "");
+                for (lsa_count=1;lsa_count <= lsa_count_max;lsa_count++) {
+                    printf("\n\t  LSA #%u",lsa_count);
                         if (ospf_print_lsa(lsap))
                                 goto trunc;
                         lsap = (struct lsa *)((u_char *)lsap +
