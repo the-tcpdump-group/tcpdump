@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.109 2002-09-05 21:25:50 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.110 2002-09-10 01:45:33 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -670,9 +670,3 @@ udp_print(register const u_char *bp, u_int length,
 	} else
 		(void)printf("udp %u", (u_int32_t)(ulen - sizeof(*up)));
 }
-
-
-
-
-
-
