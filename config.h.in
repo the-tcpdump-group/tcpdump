@@ -250,3 +250,6 @@
 /* define if you have struct mld6hdr */
 #undef HAVE_STRUCT_MLD6_HDR
 
+/* define if you have struct icmp6_nodeinfo */
+#undef HAVE_STRUCT_ICMP6_NODEINFO
+
