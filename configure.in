@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.85 1999-12-13 18:06:14 mcr Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.86 1999-12-14 22:35:17 fenner Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -446,8 +446,8 @@ if test -f /dev/bpf0 ; then
 fi
 
 AC_LBL_CHECK_TYPE(u_int8_t, u_char)
-AC_LBL_CHECK_TYPE(int16_t, u_short)
-AC_LBL_CHECK_TYPE(u_int16_t, short)
+AC_LBL_CHECK_TYPE(int16_t, short)
+AC_LBL_CHECK_TYPE(u_int16_t, u_short)
 AC_LBL_CHECK_TYPE(int32_t, int)
 AC_LBL_CHECK_TYPE(u_int32_t, u_int)
 
