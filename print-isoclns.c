@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.77 2003-02-24 09:36:56 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.78 2003-03-30 01:21:13 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -856,35 +856,43 @@ isis_print_tlv_ip_reach (const u_int8_t *cp, const char *ident, int length)
 static int
 isis_print_ip_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *ident) {
 
-        switch(subt) {
-        case SUBTLV_IP_REACH_ADMIN_TAG32:
-            if (!TTEST2(*tptr,4))
-                goto trunctlv;
-            printf("%s32-Bit Administrative tag: 0x%08x (=%u)",
-                   ident,
-                   EXTRACT_32BITS(tptr),
-                   EXTRACT_32BITS(tptr));
-            break;
-        case SUBTLV_IP_REACH_ADMIN_TAG64:
-            if (!TTEST2(*tptr,8))
-                goto trunctlv;
-            printf("%s64-Bit Administrative tag: 0x%08x%08x",
-                   ident,
-                   EXTRACT_32BITS(tptr),
-                   EXTRACT_32BITS(tptr+4));
-            break;
-        default:
-            printf("%sunknown subTLV, type %d, length %d",
-                   ident,
-                   subt,
-                   subl);
-            if(!print_unknown_data(tptr,"\n\t\t    ",
-                                       subl))
-                return(0);
-            break;
-        }
-        return(1);
-
+    switch(subt) {
+    case SUBTLV_IP_REACH_ADMIN_TAG32:
+        while (subl >= 4) {
+	    if (!TTEST2(*tptr,4))
+	        goto trunctlv;
+	    printf("%s32-Bit Administrative tag: 0x%08x (=%u)",
+		   ident,
+		   EXTRACT_32BITS(tptr),
+		   EXTRACT_32BITS(tptr));
+	    tptr+=4;
+	    subl-=4;
+	}
+	break;
+    case SUBTLV_IP_REACH_ADMIN_TAG64:
+        while (subl >= 8) {
+	    if (!TTEST2(*tptr,8))
+	        goto trunctlv;
+	    printf("%s64-Bit Administrative tag: 0x%08x%08x",
+		   ident,
+		   EXTRACT_32BITS(tptr),
+		   EXTRACT_32BITS(tptr+4));
+	    tptr+=8;
+	    subl-=8;
+	}
+	break;
+    default:
+        printf("%sunknown subTLV, type %d, length %d",
+	       ident,
+	       subt,
+	       subl);
+	if(!print_unknown_data(tptr,"\n\t\t    ",
+			       subl))
+	  return(0);
+	break;
+    }
+    return(1);
+	
 trunctlv:
     printf("%spacket exceeded snapshot",ident);
     return(0);
