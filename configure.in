@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.138 2001-06-26 06:36:09 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.139 2001-06-28 00:24:04 fenner Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.138 $)
+AC_REVISION($Revision: 1.139 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -502,10 +502,6 @@ AC_CHECK_FUNCS(vsnprintf snprintf,,
 if test $needsnprintf = yes; then
 	LIBOBJS="$LIBOBJS snprintf.o"
 fi
-
-dnl The following generates a warning from autoconf...
-errprint(__file__:__line__: please ignore the next warning:
-)dnl
 
 AC_CHECK_LIB(dnet, main)
 AC_CHECK_LIB(rpc, main)
