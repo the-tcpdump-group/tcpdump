@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.46 2000-05-15 00:59:41 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.47 2000-06-10 13:41:19 assar Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -352,7 +352,24 @@ icmp_print(register const u_char *bp, u_int plen, register const u_char *bp2)
 	case ICMP_MASKREPLY:
 		TCHECK(dp->icmp_mask);
 		(void)snprintf(buf, sizeof(buf), "address mask is 0x%08x",
-		    (u_int32_t)ntohl(dp->icmp_mask));
+		    (unsigned)ntohl(dp->icmp_mask));
+		break;
+
+	case ICMP_TSTAMP:
+		TCHECK(dp->icmp_seq);
+		(void)sprintf(buf, "time stamp query id %u seq %u",
+		    (unsigned)ntohs(dp->icmp_id),
+		    (unsigned)ntohs(dp->icmp_seq));
+		break;
+
+	case ICMP_TSTAMPREPLY:
+		TCHECK(dp->icmp_ttime);
+		(void)sprintf(buf, "time stamp reply id %u seq %u : org 0x%lx recv 0x%lx xmit 0x%lx",
+		    (unsigned)ntohs(dp->icmp_id),
+		    (unsigned)ntohs(dp->icmp_seq),
+		    (unsigned long)ntohl(dp->icmp_otime),
+		    (unsigned long)ntohl(dp->icmp_rtime),
+		    (unsigned long)ntohl(dp->icmp_ttime));
 		break;
 
 	default:
