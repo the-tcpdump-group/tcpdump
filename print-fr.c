@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.15 2003-10-16 09:50:37 guy Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.16 2003-10-18 00:27:16 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -437,18 +437,6 @@ lmi_print(const u_char *p, u_int length)
 	
 	/* Loop through the rest of IE */
 	while (length > 0) {
-		if (is_ansi && (ptemp[0] & ONE_BYTE_IE_MASK)) {
-			/* not sure what's that - any pointers to
-			   documentation? Is it for ANSI T1.617 annex D only,
-			   isn't it? */
-			printf("\t\tOne byte IE: %02x, Content %02x\n", 
-			       (*ptemp & 0x70) >> 4, (*ptemp & 0x0F));
-			length--;
-			ptemp++;
-			continue;
-		}
-
-		/* Multi-byte IE */
 		ie_p = (struct common_ie_header *)ptemp;
 		if (length < sizeof(struct common_ie_header) ||
 		    length < sizeof(struct common_ie_header) + ie_p->ie_len) {
