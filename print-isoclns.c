@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.89 2003-06-28 17:15:19 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.90 2003-07-01 08:34:30 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1175,8 +1175,8 @@ static int isis_print (const u_int8_t *p, u_int length)
     u_int8_t pdu_type, max_area, id_length, tlv_type, tlv_len, tmp, alen, lan_alen, prefix_len;
     u_int8_t ext_is_len, ext_ip_len, mt_len;
     const u_int8_t *optr, *pptr, *tptr;
-    u_short packet_len,pdu_len,time_remain;
-    u_int i,ra,rr;
+    u_short packet_len,pdu_len;
+    u_int i;
 
     packet_len=length;
     optr = p; /* initialize the _o_riginal pointer to the packet start -
