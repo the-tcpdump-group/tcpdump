@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.43 2000-04-17 06:49:27 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.44 2000-04-27 03:44:05 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -428,13 +428,15 @@ ns_print(register const u_char *bp, u_int length)
 
 	if (np->qr) {
 		/* this is a response */
-		printf(" %d%s%s%s%s%s",
+		printf(" %d%s%s%s%s%s%s",
 			ntohs(np->id),
 			ns_ops[np->opcode],
 			ns_resp[np->rcode],
 			np->aa? "*" : "",
 			np->ra? "" : "-",
-			np->tc? "|" : "");
+			np->tc? "|" : "",
+			np->cd? "%" : "");
+
 		if (qdcount != 1)
 			printf(" [%dq]", qdcount);
 		/* Print QUESTION section on -vv */
@@ -454,13 +456,14 @@ ns_print(register const u_char *bp, u_int length)
 	}
 	else {
 		/* this is a request */
-		printf(" %d%s%s",
+		printf(" %d%s%s%s",
 		        ntohs(np->id),
 			ns_ops[np->opcode],
-			np->rd? "+" : "");
+			np->rd? "+" : "",
+			np->ad? "$" : "");
 
 		/* any weirdness? */
-		if (*(((u_short *)np)+1) & htons(0x6ff))
+		if (*(((u_short *)np)+1) & htons(0x6cf))
 			printf(" [b2&3=0x%x]", ntohs(*(((u_short *)np)+1)));
 
 		if (np->opcode == IQUERY) {
