@@ -144,6 +144,7 @@ print-sunrpc.c
 print-tcp.c
 print-telnet.c
 print-tftp.c
+print-timed.c
 print-token.c
 print-udp.c
 print-vjc.c
@@ -163,6 +164,7 @@ strcasecmp.c
 tcp.h
 tcpdump.1
 tcpdump.c
+timed.h
 token.h
 udp.h
 util.c
