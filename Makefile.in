@@ -17,7 +17,7 @@
 #  WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 #  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.220 2000-01-07 15:55:37 assar Exp $ (LBL)
+# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.221 2000-01-15 00:43:17 fenner Exp $ (LBL)
 
 #
 # Various configurable paths (remember to edit Makefile.in, not Makefile)
@@ -156,7 +156,7 @@ clean:
 
 distclean:
 	rm -f $(CLEANFILES) Makefile config.cache config.log config.status \
-	    config.h gnuc.h os-proto.h
+	    config.h gnuc.h os-proto.h stamp-h stamp-h.in
 
 tags: $(TAGFILES)
 	ctags -wtd $(TAGFILES)
