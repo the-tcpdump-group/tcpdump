@@ -9,6 +9,10 @@ Fri Aug 18 16:43:03 JST 2000  itjun@iijlab.net
 Wed Aug  2 05:28:45 JST 2000  itojun@iijlab.net
 	* tcp/udp pseudo header checksum code, from netbsd-current.
 
+Tue Jul 11 01:14:41 GMT 2000 Assar Westerlund  <assar@sics.se>
+	* (ip6_print): rewrite the alignment code to be for v6 and not v4.
+	based on a patch from Love <lha@stacken.kth.se>
+
 Tue Jul 11 01:22:38 GMT 2000 Love <lha@stacken.kth.se>
 	* check the ip protocol version on printing raw packets
 
@@ -610,4 +614,4 @@ v2.0 Sun Jan 13 12:20:40 PST 1991
 
 - Initial public release.
 
-@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.75 2000-12-17 15:16:51 fenner Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.76 2000-12-17 19:37:57 guy Exp $ (LBL)
