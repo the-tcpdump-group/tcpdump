@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.101 2000-01-18 05:25:06 itojun Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.102 2000-01-19 04:34:55 itojun Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.101 $)
+AC_REVISION($Revision: 1.102 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -296,13 +296,11 @@ main()
   }
 
   /* supported family should be 2, unsupported family should be 0 */
-  if (inet4 == 0 || inet4 == 2)
-    goto good;
-  if (inet6 == 0 || inet6 == 2)
-    goto good;
-  goto bad;
+  if (!(inet4 == 0 || inet4 == 2))
+    goto bad;
+  if (!(inet6 == 0 || inet6 == 2))
+    goto bad;
 
- good:
   if (aitop)
     freeaddrinfo(aitop);
   exit(0);
