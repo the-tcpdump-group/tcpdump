@@ -15,14 +15,6 @@
 /* Define if you have the <smi.h> header file.  */
 #undef HAVE_SMI_H
 
-/* Is T_AAAA predefined? */
-#undef HAVE_AAAA
-
-/* Fallback definition if not in headers */
-/* XXX why is this not #ifndef HAVE_AAA #define T_AAAA ... ? */
-/* XXX or even #ifndef T_AAAA ... */
-#undef T_AAAA
-
 /* define if you have struct __res_state_ext */
 #undef HAVE_RES_STATE_EXT
 

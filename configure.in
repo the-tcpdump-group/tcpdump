@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.105 2000-01-19 05:34:17 itojun Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.106 2000-01-20 06:50:57 fenner Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.105 $)
+AC_REVISION($Revision: 1.106 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -388,13 +388,6 @@ dnl Checks for RES_USE_INET6
 AC_CHECK_RES_USE_INET6(ac_cv_res_inet6)
 if test "$ac_cv_res_inet6" = no; then
 	missing_includes=yes
-fi
-
-dnl
-dnl Checks for AAAA
-AC_CHECK_AAAA(ac_cv_aaaa)
-if test "$ac_cv_aaaa" = no; then
-	AC_DEFINE(T_AAAA, 28)
 fi
 
 dnl
