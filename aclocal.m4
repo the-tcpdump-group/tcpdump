@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.79 2001-11-25 02:26:34 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.80 2001-12-10 08:41:15 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -57,7 +57,7 @@ AC_DEFUN(AC_LBL_C_INIT,
 	    LBL_CFLAGS="$CFLAGS"
     fi
     if test -z "$CC" ; then
-	    case "$target_os" in
+	    case "$host_os" in
 
 	    bsdi*)
 		    AC_CHECK_PROG(SHLICC2, shlicc2, yes, no)
@@ -100,7 +100,7 @@ AC_DEFUN(AC_LBL_C_INIT,
 		    ac_cv_lbl_cc_ansi_prototypes=no))
 	    AC_MSG_RESULT($ac_cv_lbl_cc_ansi_prototypes)
 	    if test $ac_cv_lbl_cc_ansi_prototypes = no ; then
-		    case "$target_os" in
+		    case "$host_os" in
 
 		    hpux*)
 			    AC_MSG_CHECKING(for HP-UX ansi compiler ($CC -Aa -D_HPUX_SOURCE))
@@ -129,7 +129,7 @@ AC_DEFUN(AC_LBL_C_INIT,
 	    $2="$$2 -I/usr/local/include"
 	    LDFLAGS="$LDFLAGS -L/usr/local/lib"
 
-	    case "$target_os" in
+	    case "$host_os" in
 
 	    irix*)
 		    V_CCOPT="$V_CCOPT -xansi -signed -O"
@@ -226,7 +226,7 @@ AC_DEFUN(AC_LBL_LIBPCAP,
 	    AC_MSG_RESULT($libpcap)
     fi
     LIBS="$libpcap $LIBS"
-    case "$target_os" in
+    case "$host_os" in
 
     aix*)
 	    pseexe="/lib/pse.exp"
@@ -258,7 +258,7 @@ AC_DEFUN(AC_LBL_TYPE_SIGNAL,
     else
 	    AC_DEFINE(RETSIGVAL,(0))
     fi
-    case "$target_os" in
+    case "$host_os" in
 
     irix*)
 	    AC_DEFINE(_BSD_SIGNALS)
@@ -491,7 +491,7 @@ dnl
 AC_DEFUN(AC_LBL_UNALIGNED_ACCESS,
     [AC_MSG_CHECKING(if unaligned accesses fail)
     AC_CACHE_VAL(ac_cv_lbl_unaligned_fail,
-	[case "$target_cpu" in
+	[case "$host_cpu" in
 
 	# XXX: should also check that they don't do weird things (like on arm)
 	alpha*|arm*|hp*|mips*|sparc*|ia64)
@@ -579,7 +579,7 @@ AC_DEFUN(AC_LBL_DEVEL,
 			    fi
 		    fi
 	    else
-		    case "$target_os" in
+		    case "$host_os" in
 
 		    irix6*)
 			    V_CCOPT="$V_CCOPT -n32"
@@ -589,7 +589,7 @@ AC_DEFUN(AC_LBL_DEVEL,
 			    ;;
 		    esac
 	    fi
-	    os=`echo $target_os | sed -e 's/\([[0-9]][[0-9]]*\)[[^0-9]].*$/\1/'`
+	    os=`echo $host_os | sed -e 's/\([[0-9]][[0-9]]*\)[[^0-9]].*$/\1/'`
 	    name="lbl/os-$os.h"
 	    if test -f $name ; then
 		    ln -s $name os-proto.h
