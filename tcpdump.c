@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.232 2004-02-25 14:23:32 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.233 2004-02-26 08:47:27 hannes Exp $ (LBL)";
 #endif
 
 /*
@@ -906,8 +906,10 @@ main(int argc, char **argv)
 	 * We cannot do this earlier, because we want to be able to open
 	 * the file (if done) for writing before giving up permissions.
 	 */
-	if (username || chroot_dir)
-		droproot(username, chroot_dir);
+	if (getuid() == 0 || geteuid() == 0) {
+		if (username || chroot_dir)
+			droproot(username, chroot_dir);
+	}
 #endif /* WIN32 */
 #ifdef SIGINFO
 	(void)setsignal(SIGINFO, requestinfo);
