@@ -14,8 +14,8 @@ CFLAGS = -I ${PCAP_DIR}/wpcap/libpcap/bpf \
 	-I ${PCAP_DIR}/wpcap/libpcap/Win32/Include/net \
 	-I ../../Win32/Include -I ../../linux-Include \
 	-I ../../lbl -I../.. \
-	-DWIN32 -DHAVE_ADDRINFO_H -DINET6 \
-	-DSIZEOF_CHAR=1 -DSIZEOF_SHORT=2 -DSIZEOF_INT=4 \
+	-DWIN32 -DHAVE_ADDRINFO_H -DHAVE_PCAP_FINDALLDEVS \
+	-DINET6 -DSIZEOF_CHAR=1 -DSIZEOF_SHORT=2 -DSIZEOF_INT=4 \
 	-mno-cygwin ${OPTFLAGS}
 LDFLAGS = 
 LIBS = -L ${PCAP_DIR}/WPCAP/LIB -lwpcap -lwsock32

@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.180 2002-08-01 08:53:37 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.181 2002-08-03 22:37:02 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -217,8 +217,10 @@ main(int argc, char **argv)
 	struct dump_info dumpinfo;
 	u_char *pcap_userdata;
 	char ebuf[PCAP_ERRBUF_SIZE];
+#ifdef HAVE_PCAP_FINDALLDEVS
 	pcap_if_t *devpointer;
 	int devnum;
+#endif
 #ifdef WIN32
 	int ii;
 	DWORD dwVersion;
@@ -292,6 +294,7 @@ main(int argc, char **argv)
 			++dflag;
 			break;
 
+#ifdef HAVE_PCAP_FINDALLDEVS
 		case 'D':
 			if (pcap_findalldevs(&devpointer, ebuf) < 0)
 				error("%s", ebuf);
@@ -305,6 +308,7 @@ main(int argc, char **argv)
 				}
 			}
 			return 0;
+#endif /* HAVE_PCAP_FINDALLDEVS */
 
 		case 'e':
 			++eflag;
@@ -329,6 +333,7 @@ main(int argc, char **argv)
 			if (optarg[0] == '0' && optarg[1] == 0)
 				error("Invalid adapter index");
 			
+#ifdef HAVE_PCAP_FINDALLDEVS
 			/*
 			 * If the argument is a number, treat it as
 			 * an index into the list of adapters, as
@@ -355,6 +360,7 @@ main(int argc, char **argv)
 				device = devpointer->name;
 				break;
 			}
+#endif /* HAVE_PCAP_FINDALLDEVS */
 			device = optarg;
 			break;
 

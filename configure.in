@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.154 2002-08-03 20:28:05 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.155 2002-08-03 22:37:01 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.154 $)
+AC_REVISION($Revision: 1.155 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -559,6 +559,7 @@ dnl AC_CHECK_HEADERS(zlib.h)
 
 AC_LBL_LIBPCAP(V_PCAPDEP, V_INCLS)
 
+AC_CHECK_FUNCS(pcap_findalldevs)
 AC_REPLACE_FUNCS(bpf_dump)	dnl moved to libpcap in 0.6
 
 V_GROUP=0

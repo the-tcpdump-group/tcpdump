@@ -42,7 +42,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /I "../../../winpcap/wpcap/libpcap/bpf" /I "../../../winpcap/wpcap/libpcap" /I "../../../winpcap/wpcap/libpcap/Win32/Include" /I "../../../winpcap/wpcap/libpcap/Win32/Include/net" /I "../../Win32/Include" /I "../../linux-Include" /I "../../lbl" /I "../../" /I "../../../winpcap/wpcap/win32-extensions" /D "NDEBUG" /D HAVE_ADDRINFO=1 /D "_CONSOLE" /D "__STDC__" /D "INET6" /D "WIN32" /D "_MBCS" /D SIZEOF_CHAR=1 /D SIZEOF_SHORT=2 /D SIZEOF_INT=4 /D "WPCAP" /YX /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /I "../../../winpcap/wpcap/libpcap/bpf" /I "../../../winpcap/wpcap/libpcap" /I "../../../winpcap/wpcap/libpcap/Win32/Include" /I "../../../winpcap/wpcap/libpcap/Win32/Include/net" /I "../../Win32/Include" /I "../../linux-Include" /I "../../lbl" /I "../../" /I "../../../winpcap/wpcap/win32-extensions" /D "NDEBUG" /D HAVE_ADDRINFO=1 /D HAVE_PCAP_FINDALLDEVS=1 /D "_CONSOLE" /D "__STDC__" /D "INET6" /D "WIN32" /D "_MBCS" /D SIZEOF_CHAR=1 /D SIZEOF_SHORT=2 /D SIZEOF_INT=4 /D "WPCAP" /YX /FD /c
 # ADD BASE RSC /l 0x410 /d "NDEBUG"
 # ADD RSC /l 0x410 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -66,7 +66,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /W3 /Gm /Gi /GX /ZI /I "../../../winpcap/wpcap/libpcap/bpf" /I "../../../winpcap/wpcap/libpcap" /I "../../../winpcap/wpcap/libpcap/Win32/Include" /I "../../../winpcap/wpcap/libpcap/Win32/Include/net" /I "../../Win32/Include" /I "../../linux-Include" /I "../../lbl" /I "../../" /I "../../../winpcap/wpcap/win32-extensions" /D "_DEBUG" /D "_WINDOWS" /D "HAVE_ADDRINFO" /D "_CONSOLE" /D "__STDC__" /D "INET6" /D "WIN32" /D "_MBCS" /D SIZEOF_CHAR=1 /D SIZEOF_SHORT=2 /D SIZEOF_INT=4 /D "WPCAP" /FR /YX /FD /c
+# ADD CPP /nologo /W3 /Gm /Gi /GX /ZI /I "../../../winpcap/wpcap/libpcap/bpf" /I "../../../winpcap/wpcap/libpcap" /I "../../../winpcap/wpcap/libpcap/Win32/Include" /I "../../../winpcap/wpcap/libpcap/Win32/Include/net" /I "../../Win32/Include" /I "../../linux-Include" /I "../../lbl" /I "../../" /I "../../../winpcap/wpcap/win32-extensions" /D "_DEBUG" /D "_WINDOWS" /D "HAVE_ADDRINFO" /D HAVE_PCAP_FINDALLDEVS=1 /D "_CONSOLE" /D "__STDC__" /D "INET6" /D "WIN32" /D "_MBCS" /D SIZEOF_CHAR=1 /D SIZEOF_SHORT=2 /D SIZEOF_INT=4 /D "WPCAP" /FR /YX /FD /c
 # ADD BASE RSC /l 0x410 /d "_DEBUG"
 # ADD RSC /l 0x410 /d "_DEBUG"
 BSC32=bscmake.exe
