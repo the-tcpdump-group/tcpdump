@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.4 2004-06-12 08:23:45 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.5 2004-06-12 08:54:57 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -339,6 +339,45 @@ struct lspping_tlv_targetfec_subtlv_l3vpn_ipv6_t {
     u_int8_t prefix_len;
 };
 
+/*
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                      Route Distinguisher                      |
+ * |                          (8 octets)                           |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |         Sender's CE ID        |       Receiver's CE ID        |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |      Encapsulation Type       |         Must Be Zero          |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  0                   1                   2                   3
+ */
+struct lspping_tlv_targetfec_subtlv_l2vpn_endpt_t {
+    u_int8_t rd [8];
+    u_int8_t sender_ce_id [2];
+    u_int8_t receiver_ce_id [2];
+    u_int8_t encapsulation;
+};
+
+/*
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                     Sender's PE Address                       |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                      Remote PE Address                        |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                             VC ID                             |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |      Encapsulation Type       |         Must Be Zero          |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ */
+struct lspping_tlv_targetfec_subtlv_l2vpn_vcid_t {
+    u_int8_t sender_pe_address [4];
+    u_int8_t remote_pe_address [4];
+    u_int8_t vc_id [4];
+    u_int8_t encapsulation;
+};
+
 void
 lspping_print(register const u_char *pptr, register u_int len) {
 
@@ -357,6 +396,8 @@ lspping_print(register const u_char *pptr, register u_int len) {
         const struct lspping_tlv_targetfec_subtlv_rsvp_ipv6_t *lspping_tlv_targetfec_subtlv_rsvp_ipv6;
         const struct lspping_tlv_targetfec_subtlv_l3vpn_ipv4_t *lspping_tlv_targetfec_subtlv_l3vpn_ipv4;
         const struct lspping_tlv_targetfec_subtlv_l3vpn_ipv6_t *lspping_tlv_targetfec_subtlv_l3vpn_ipv6;
+        const struct lspping_tlv_targetfec_subtlv_l2vpn_endpt_t *lspping_tlv_targetfec_subtlv_l2vpn_endpt;
+        const struct lspping_tlv_targetfec_subtlv_l2vpn_vcid_t *lspping_tlv_targetfec_subtlv_l2vpn_vcid;
         const struct lspping_tlv_targetfec_subtlv_bgp_ipv4_t *lspping_tlv_targetfec_subtlv_bgp_ipv4;
         const struct lspping_tlv_targetfec_subtlv_bgp_ipv6_t *lspping_tlv_targetfec_subtlv_bgp_ipv6;
     } subtlv_ptr;
@@ -553,7 +594,7 @@ lspping_print(register const u_char *pptr, register u_int len) {
                 case LSPPING_TLV_TARGETFEC_SUBTLV_L3VPN_IPV4:
                     subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv4 = \
                         (const struct lspping_tlv_targetfec_subtlv_l3vpn_ipv4_t *)subtlv_tptr;
-                    printf("\n\t      RD: %s :%s/%u",
+                    printf("\n\t      RD: %s, %s/%u",
                            bgp_vpn_rd_print(subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv4->rd),
                            ipaddr_string(subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv4->prefix),
                            subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv4->prefix_len);
@@ -563,21 +604,42 @@ lspping_print(register const u_char *pptr, register u_int len) {
                 case LSPPING_TLV_TARGETFEC_SUBTLV_L3VPN_IPV6:
                     subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv6 = \
                         (const struct lspping_tlv_targetfec_subtlv_l3vpn_ipv6_t *)subtlv_tptr;
-                    printf("\n\t      RD: %s :%s/%u",
+                    printf("\n\t      RD: %s, %s/%u",
                            bgp_vpn_rd_print(subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv6->rd),
                            ip6addr_string(subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv6->prefix),
                            subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv6->prefix_len);
                     break;
 #endif
 
-
-                    /*
-                     *  FIXME those are the defined subTLVs that lack a decoder
-                     *  you are welcome to contribute code ;-)
-                     */
-
                 case LSPPING_TLV_TARGETFEC_SUBTLV_L2VPN_ENDPT:
+                    subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt = \
+                        (const struct lspping_tlv_targetfec_subtlv_l2vpn_endpt_t *)subtlv_tptr;
+                    printf("\n\t      RD: %s, Sender CE-ID: %u, Receiver CE-ID: %u" \
+                           "\n\t      Encapsulation Type: %s (%u)",
+                           bgp_vpn_rd_print(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->rd),
+                           EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->sender_ce_id),
+                           EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->receiver_ce_id),
+                           tok2str(bgp_l2vpn_encaps_values,
+                                   "unknown",
+                                   subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->encapsulation),
+                           subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->encapsulation);
+                    
+                    break;
+
                 case LSPPING_TLV_TARGETFEC_SUBTLV_L2VPN_VCID:
+                    subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid = \
+                        (const struct lspping_tlv_targetfec_subtlv_l2vpn_vcid_t *)subtlv_tptr;
+                    printf("\n\t      Sender PE: %s, Remote PE: %s" \
+                           "\n\t      VC-ID: 0x%08x, Encapsulation Type: %s (%u)",
+                           ipaddr_string(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid->sender_pe_address),
+                           ipaddr_string(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid->remote_pe_address),
+                           EXTRACT_32BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid->vc_id),
+                           tok2str(bgp_l2vpn_encaps_values, /* FIXME are the L2 encaps codepoints of BGP == LDP ??? */
+                                   "unknown",
+                                   subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->encapsulation),
+                           subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->encapsulation);
+                    
+                    break;
 
                 default:
                     subtlv_hexdump=TRUE; /* unknown subTLV just hexdump it */
