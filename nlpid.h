@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/nlpid.h,v 1.2 2004-10-12 21:02:00 hannes Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/nlpid.h,v 1.3 2004-10-18 12:09:20 hannes Exp $ (LBL) */
 /* 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that: (1) source code
@@ -17,8 +17,8 @@
 extern struct tok nlpid_values[];
 
 #define	NLPID_NULLNS	0x00
-#define NLPID_LMI       0x08 /* ANSI T1.617 Annex D or ITU-T Q.933 Annex A */
-#define NLPID_CISCO_LMI 0x09 /* The original, aka Cisco, aka Gang of Four */
+#define NLPID_Q933      0x08 /* ANSI T1.617 Annex D or ITU-T Q.933 Annex A */
+#define NLPID_LMI       0x09 /* The original, aka Cisco, aka Gang of Four */
 #define NLPID_SNAP      0x80
 #define	NLPID_CLNP	0x81 /* iso9577 */
 #define	NLPID_ESIS	0x82 /* iso9577 */
