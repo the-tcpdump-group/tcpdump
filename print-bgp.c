@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.38 2002-07-22 02:55:20 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.39 2002-07-22 14:09:07 hannes Exp $";
 #endif
 
 #include <sys/param.h>
@@ -389,17 +389,17 @@ decode_prefix6(const u_char *pd, char *buf, u_int buflen)
 #endif
 
 static void
-bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
+bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
 {
 	int i;
 	u_int16_t af;
 	u_int8_t safi, snpa;
 	int advance;
 	int tlen;
-	const u_char *p;
+	const u_char *tptr;
 	char buf[MAXHOSTNAMELEN + 100];
 
-	p = dat;
+        tptr = pptr;
         tlen=len;
 
 	switch (attr->bgpa_type) {
@@ -407,7 +407,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 		if (len != 1)
 			printf("invalid len");
 		else
-			printf("%s", tok2str(bgp_origin_values, "Unknown Origin Typecode", p[0]));
+			printf("%s", tok2str(bgp_origin_values, "Unknown Origin Typecode", tptr[0]));
 		break;
 	case BGPTYPE_AS_PATH:
 		if (len % 2) {
@@ -418,35 +418,35 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 			printf("empty");
 			break;
                 }
-		while (p < dat + len) {
+		while (tptr < pptr + len) {
 			/*
 			 * under RFC1965, p[0] means:
 			 * 1: AS_SET 2: AS_SEQUENCE
 			 * 3: AS_CONFED_SET 4: AS_CONFED_SEQUENCE
 			 */
-			if (p[0] == 3 || p[0] == 4)
+			if (tptr[0] == 3 || tptr[0] == 4)
 				printf("confed");
-			printf("%s", (p[0] & 1) ? "{" : "");
-			for (i = 0; i < p[1] * 2; i += 2) {
+			printf("%s", (tptr[0] & 1) ? "{" : "");
+			for (i = 0; i < tptr[1] * 2; i += 2) {
 				printf("%s%u", i == 0 ? "" : " ",
-					EXTRACT_16BITS(&p[2 + i]));
+					EXTRACT_16BITS(&tptr[2 + i]));
 			}
-			printf("%s", (p[0] & 1) ? "}" : "");
-			p += 2 + p[1] * 2;
+			printf("%s", (tptr[0] & 1) ? "}" : "");
+			tptr += 2 + tptr[1] * 2;
 		}
 		break;
 	case BGPTYPE_NEXT_HOP:
 		if (len != 4)
 			printf("invalid len");
 		else
-			printf("%s", getname(p));
+			printf("%s", getname(tptr));
 		break;
 	case BGPTYPE_MULTI_EXIT_DISC:
 	case BGPTYPE_LOCAL_PREF:
 		if (len != 4)
 			printf("invalid len");
 		else
-			printf("%u", EXTRACT_32BITS(p));
+			printf("%u", EXTRACT_32BITS(tptr));
 		break;
 	case BGPTYPE_ATOMIC_AGGREGATE:
 		if (len != 0)
@@ -457,8 +457,8 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 			printf("invalid len");
 			break;
 		}
-		printf(" AS #%u, origin %s", EXTRACT_16BITS(p),
-			getname(p + 2));
+		printf(" AS #%u, origin %s", EXTRACT_16BITS(tptr),
+			getname(tptr + 2));
 		break;
 	case BGPTYPE_COMMUNITIES:
 		if (len % 4) {
@@ -467,7 +467,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 		}
 		while (tlen>0) {
 			u_int32_t comm;
-			comm = EXTRACT_32BITS(p);
+			comm = EXTRACT_32BITS(tptr);
 			switch (comm) {
 			case BGP_COMMUNITY_NO_EXPORT:
 				printf(" NO_EXPORT");
@@ -486,7 +486,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 				break;
 			}
                         tlen -=4;
-                        p +=4;
+                        tptr +=4;
 		}
 		break;
         case BGPTYPE_ORIGINATOR_ID:
@@ -494,20 +494,20 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 			printf("invalid len");
 			break;
 		}
-                printf("%s",getname(p));
+                printf("%s",getname(tptr));
                 break;
         case BGPTYPE_CLUSTER_LIST:
                 while (tlen>0) {
                         printf("%s%s",
-                               getname(p),
+                               getname(tptr),
                                 (tlen>4) ? ", " : "");
                         tlen -=4;
-                        p +=4;
+                        tptr +=4;
                 }
                 break;
 	case BGPTYPE_MP_REACH_NLRI:
-		af = EXTRACT_16BITS(p);
-		safi = p[2];
+		af = EXTRACT_16BITS(tptr);
+		safi = tptr[2];
 	
                 printf("\n\t    AFI: %s (%u), %sSAFI: %s (%u)",
                        tok2str(bgp_afi_values, "Unknown AFI", af),
@@ -524,16 +524,19 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 #endif
 		else {
                     printf("\n\t    no AFI %u decoder",af);
-                    print_unknown_data(p,"\n\t    ",tlen);
+                    if (!vflag)
+                        print_unknown_data(tptr,"\n\t    ",tlen);
                     break;
                 }
 
-                p +=3;
-		tlen = p[0];
+                tptr +=3;
+
+		tlen = tptr[0];
+                tptr++;
+
 		if (tlen) {
 			printf("\n\t    nexthop: ");
-			i = 0;
-			while (i < tlen) {
+			while (tlen > 0) {
 				switch (af) {
 				case AFNUM_INET:
                                     switch(safi) {
@@ -541,13 +544,14 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
                                     case SAFNUM_MULTICAST:
                                     case SAFNUM_UNIMULTICAST:
                                     case SAFNUM_LABUNICAST:
-					printf("%s", getname(p + 1 + i));
-					i += sizeof(struct in_addr);
+					printf("%s", getname(tptr));
+					tlen -= sizeof(struct in_addr);
+                                        tptr += sizeof(struct in_addr);
 					break;
                                     default:
                                         printf("no SAFI %u decoder",safi);                                        
-                                        print_unknown_data(p,"\n\t    ",tlen);
-                                        i = tlen;
+                                        if (!vflag)
+                                            print_unknown_data(tptr,"\n\t    ",tlen);
                                         break;
                                     }
                                     break;
@@ -558,57 +562,60 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
                                     case SAFNUM_MULTICAST:
                                     case SAFNUM_UNIMULTICAST:
                                     case SAFNUM_LABUNICAST:
-                                        printf("%s", getname6(p + 1 + i));
-                                        i += sizeof(struct in6_addr);
+                                        printf("%s", getname6(tptr));
+                                        tlen -= sizeof(struct in6_addr);
+                                        tptr += sizeof(struct in6_addr);
                                         break;
                                     default:
                                         printf("no SAFI %u decoder",safi);
-                                        print_unknown_data(p,"\n\t    ",tlen);                                        
-                                        i = tlen;
+                                        if (!vflag)
+                                            print_unknown_data(tptr,"\n\t    ",tlen);                                        
                                         break;
                                     }
 #endif
 				default:
                                     printf("no AFI %u decoder",af);
-                                    print_unknown_data(p,"\n\t    ",tlen);
-                                    i = tlen;	/*exit loop*/
+                                    if (!vflag)
+                                      print_unknown_data(tptr,"\n\t    ",tlen);
                                     break;
 				}
 			}
 		}
-		p += 1 + tlen;
+		tptr += tlen;
 
-		snpa = p[0];
-		p++;
+		snpa = tptr[0];
+		tptr++;
+
 		if (snpa) {
 			printf("\n\t    %u SNPA", snpa);
 			for (/*nothing*/; snpa > 0; snpa--) {
-				printf("\n\t      %d bytes", p[0]);
-				p += p[0] + 1;
+				printf("\n\t      %d bytes", tptr[0]);
+				tptr += tptr[0] + 1;
 			}
 		} else {
                 printf(", no SNPA");
                 }
 
-		while (len - (p - dat) > 0) {
+		while (len - (tptr - pptr) > 0) {
 			switch (af) {
 			case AFNUM_INET:
                             switch (safi) {
                             case SAFNUM_UNICAST:
                             case SAFNUM_MULTICAST:
                             case SAFNUM_UNIMULTICAST:
-                                advance = decode_prefix4(p, buf, sizeof(buf));
+                                advance = decode_prefix4(tptr, buf, sizeof(buf));
                                 printf("\n\t      %s", buf);
                                 break;
                             case SAFNUM_LABUNICAST:
-                                advance = decode_labeled_prefix4(p, buf, sizeof(buf));
+                                advance = decode_labeled_prefix4(tptr, buf, sizeof(buf));
                                 printf("\n\t      %s", buf);
                                 break;
                             default:
                                 printf("\n\t      no SAFI %u decoder",safi);
-                                print_unknown_data(p-3,"\n\t    ",tlen);
+                                if (!vflag)
+                                    print_unknown_data(tptr-3,"\n\t    ",tlen);
                                 advance = 0;
-				p = dat + len;
+				tptr = pptr + len;
 				break;  
                             }
                             break;
@@ -618,34 +625,36 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
                             case SAFNUM_UNICAST:
                             case SAFNUM_MULTICAST:
                             case SAFNUM_UNIMULTICAST:
-				advance = decode_prefix6(p, buf, sizeof(buf));
+				advance = decode_prefix6(tptr, buf, sizeof(buf));
 				printf("\n\t      %s", buf);
 				break;
                             default:
                                 printf("\n\t      no SAFI %u decoder ",safi);
-                                print_unknown_data(p-3,"\n\t    ",tlen);
+                                if (!vflag)
+                                    print_unknown_data(tptr-3,"\n\t    ",tlen);
                                 advance = 0;
-				p = dat + len;
+				tptr = ptr + len;
 				break;
                             }
                             break;
 #endif
 			default:
                             printf("\n\t      no AFI %u decoder ",af);
-                            print_unknown_data(p-3,"\n\t    ",tlen);
+                            if (!vflag)
+                                    print_unknown_data(tptr-3,"\n\t    ",tlen);
                             advance = 0;
-                            p = dat + len;
+                            tptr = pptr + len;
                             break;
 			}
 
-			p += advance;
+			tptr += advance;
 		}
 
 		break;
 
 	case BGPTYPE_MP_UNREACH_NLRI:
-		af = EXTRACT_16BITS(p);
-		safi = p[2];
+		af = EXTRACT_16BITS(tptr);
+		safi = tptr[2];
 
                 printf("\n\t    AFI: %s (%u), %sSAFI: %s (%u)",
                        tok2str(bgp_afi_values, "Unknown AFI", af),
@@ -654,27 +663,28 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
                        tok2str(bgp_safi_values, "Unknown SAFI", safi),
                        safi);
 
-		p += 3;
+		tptr += 3;
                 
-		while (len - (p - dat) > 0) {
+		while (len - (tptr - pptr) > 0) {
 			switch (af) {
 			case AFNUM_INET:
                             switch (safi) {
                             case SAFNUM_UNICAST:
                             case SAFNUM_MULTICAST:
                             case SAFNUM_UNIMULTICAST:
-                                advance = decode_prefix4(p, buf, sizeof(buf));
+                                advance = decode_prefix4(tptr, buf, sizeof(buf));
                                 printf("\n\t      %s", buf);
                                 break;
                             case SAFNUM_LABUNICAST:
-                                advance = decode_labeled_prefix4(p, buf, sizeof(buf));
+                                advance = decode_labeled_prefix4(tptr, buf, sizeof(buf));
                                 printf("\n\t      %s", buf);
                                 break;
                             default:
                                 printf("\n\t      no SAFI %u decoder",safi);
-                                print_unknown_data(p-3,"\n\t    ",tlen);
+                                if (!vflag)
+                                    print_unknown_data(tptr-3,"\n\t    ",tlen);
                                 advance = 0;
-				p = dat + len;
+				tptr = pptr + len;
 				break;  
                             }
                             break;
@@ -685,27 +695,29 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
                             case SAFNUM_UNICAST:
                             case SAFNUM_MULTICAST:
                             case SAFNUM_UNIMULTICAST:
-				advance = decode_prefix6(p, buf, sizeof(buf));
+				advance = decode_prefix6(tptr, buf, sizeof(buf));
 				printf("\n\t      %s", buf);
 				break;
                             default:
                                 printf("\n\t      no SAFI %u decoder",safi);
-                                print_unknown_data(p-3,"\n\t    ",tlen);
+                                if (!vflag)
+                                    print_unknown_data(tptr-3,"\n\t    ",tlen);
                                 advance = 0;
-				p = dat + len;
+				tptr = pptr + len;
 				break;
                             }
                             break;
 #endif
 			default:
 				printf("\n\t    no AFI %u decoder",af);
-                                print_unknown_data(p-3,"\n\t    ",tlen);
+                                if (!vflag)
+                                    print_unknown_data(tptr-3,"\n\t    ",tlen);
 				advance = 0;
-				p = dat + len;
+				tptr = pptr + len;
 				break;
 			}
 
-			p += advance;
+			tptr += advance;
 		}
 		break;
         case BGPTYPE_EXTD_COMMUNITIES:
@@ -715,9 +727,9 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 		}
                 while (tlen>0) {
                     u_int8_t extd_comm,extd_comm_type,extd_comm_subtype;
-                    extd_comm=*p;
+                    extd_comm=*tptr;
                     extd_comm_type=extd_comm&0x3f;
-                    extd_comm_subtype=*(p+1);
+                    extd_comm_subtype=*(tptr+1);
                     switch(extd_comm_type) {
                         case 0:
                             printf("%s%s%s:%u:%s%s",
@@ -726,8 +738,8 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
                                    tok2str(bgp_extd_comm_subtype_values,
                                            "unknown",
                                            extd_comm_subtype&0x3f),
-                                   EXTRACT_16BITS(p+2),
-                                   getname(p+4),
+                                   EXTRACT_16BITS(tptr+2),
+                                   getname(tptr+4),
                                    (tlen>8) ? ", " : "");
                             break;
                         case 1:
@@ -737,8 +749,8 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
                                    tok2str(bgp_extd_comm_subtype_values,
                                            "unknown",
                                            extd_comm_subtype&0x3f),
-                                   getname(p+2),
-                                   EXTRACT_16BITS(p+6),
+                                   getname(tptr+2),
+                                   EXTRACT_16BITS(tptr+6),
                                    (tlen>8) ? ", " : "");
                             break;
                         case 2:
@@ -748,27 +760,30 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
                                    tok2str(bgp_extd_comm_subtype_values,
                                            "unknown",
                                            extd_comm_subtype&0x3f),
-                                   EXTRACT_32BITS(p+2),
-                                   EXTRACT_16BITS(p+6),
+                                   EXTRACT_32BITS(tptr+2),
+                                   EXTRACT_16BITS(tptr+6),
                                    (tlen>8) ? ", " : "");
                             break;
 
                         default:
                             printf("\n\t      no typecode %u decoder",
                                extd_comm_type);
-                            print_unknown_data(p,"\n\t      ",8);
+                            print_unknown_data(tptr,"\n\t      ",8);
                             break;
                     }
                     tlen -=8;
-                    p +=8;
+                    tptr +=8;
                 }
                 break;
 
 	default:
             printf("\n\t    no Attribute %u decoder",attr->bgpa_type); /* we have no decoder for the attribute */
-            print_unknown_data(p,"\n\t    ",tlen);
+            if (!vflag)
+                print_unknown_data(pptr,"\n\t    ",len);
             break;
 	}
+        if (vflag&&len) /* omit zero length attributes*/
+            print_unknown_data(pptr,"\n\t    ",len);
 }
 
 static void
