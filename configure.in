@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.180 2004-04-17 08:44:51 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.181 2004-07-10 21:53:31 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.180 $)
+AC_REVISION($Revision: 1.181 $)
 AC_PREREQ(2.50)
 AC_INIT(tcpdump.c)
 
@@ -592,8 +592,12 @@ if test $ac_cv_func_pcap_findalldevs = "yes" ; then
 dnl Check for Mac OS X, which may ship pcap.h from 0.6 but libpcap may
 dnl be 0.8; this means that lib has pcap_findalldevs but header doesn't
 dnl have pcap_if_t.
+    savedcflags="$CFLAGS"
+    CFLAGS="$CFLAGS $V_INCLS"
     AC_CHECK_TYPES(pcap_if_t, , , [#include <pcap.h>])
+    CFLAGS="$savedcflags"
 fi
+
 if test $ac_cv_func_pcap_lib_version = "no" ; then
     AC_MSG_CHECKING(whether pcap_version is defined by libpcap)
     AC_TRY_LINK([],
