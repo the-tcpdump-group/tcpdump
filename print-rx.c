@@ -13,7 +13,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.24 2001-07-09 09:17:44 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.25 2001-07-09 09:24:09 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -635,7 +635,7 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 #define STROUT(MAX) { unsigned int i; \
 			TCHECK2(bp[0], sizeof(int32_t)); \
 			i = EXTRACT_32BITS(bp); \
-			if (i > MAX) \
+			if (i > (MAX)) \
 				goto trunc; \
 			bp += sizeof(int32_t); \
 			printf(" \""); \
@@ -718,14 +718,17 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
  */
 
 #define VECOUT(MAX) { char *sp; \
+			char s[AFSNAMEMAX]; \
 			int k; \
-			TCHECK2(bp[0], MAX * sizeof(int32_t)); \
+			if ((MAX) + 1 > sizeof(s)) \
+				goto trunc; \
+			TCHECK2(bp[0], (MAX) * sizeof(int32_t)); \
 			sp = s; \
-			for (k = 0; k < MAX; k++) { \
+			for (k = 0; k < (MAX); k++) { \
 				*sp++ = (char) EXTRACT_32BITS(bp); \
 				bp += sizeof(int32_t); \
 			} \
-			s[MAX] = '\0'; \
+			s[(MAX)] = '\0'; \
 			printf(" \""); \
 			fn_print(s, NULL); \
 			printf("\""); \
@@ -1254,7 +1257,6 @@ static void
 prot_print(register const u_char *bp, int length)
 {
 	unsigned long i;
-	char s[AFSNAMEMAX];
 	int pt_op;
 
 	if (length <= sizeof(struct rx_header))
@@ -1398,7 +1400,6 @@ prot_reply_print(register const u_char *bp, int length, int32_t opcode)
 {
 	struct rx_header *rxh;
 	unsigned long i;
-	char s[AFSNAMEMAX];
 
 	if (length < sizeof(struct rx_header))
 		return;
@@ -1511,7 +1512,6 @@ vldb_print(register const u_char *bp, int length)
 {
 	int vldb_op;
 	unsigned long i;
-	char s[AFSNAMEMAX];
 
 	if (length <= sizeof(struct rx_header))
 		return;
@@ -1605,7 +1605,6 @@ vldb_reply_print(register const u_char *bp, int length, int32_t opcode)
 {
 	struct rx_header *rxh;
 	unsigned long i;
-	char s[AFSNAMEMAX];
 
 	if (length < sizeof(struct rx_header))
 		return;
