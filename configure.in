@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.167 2003-07-17 13:32:03 itojun Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.168 2003-07-17 13:39:03 itojun Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.167 $)
+AC_REVISION($Revision: 1.168 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -729,7 +729,6 @@ if test "$ac_cv_ssleay_path" != no; then
 	AC_CHECK_HEADERS(openssl/evp.h)
 fi
 ])
-AC_CHECK_HEADERS(openssl/rc5.h)
 
 AC_SUBST(V_CCOPT)
 AC_SUBST(V_GROUP)
