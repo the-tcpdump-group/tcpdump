@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.143 2004-08-27 03:57:40 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.144 2004-09-27 21:13:09 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -41,11 +41,23 @@ static const char rcsid[] _U_ =
 #include "ip.h"
 #include "ipproto.h"
 
+struct tok ip_option_values[] = {
+    { IPOPT_EOL, "EOL" },
+    { IPOPT_NOP, "NOP" },
+    { IPOPT_TS, "timestamp" },
+    { IPOPT_SECURITY, "security" },
+    { IPOPT_RR, "RR" },
+    { IPOPT_SSRR, "SSRR" },
+    { IPOPT_LSRR, "LSRR" },
+    { IPOPT_RA, "RA" },
+    { 0, NULL }
+};
+
 /*
  * print the recorded route in an IP RR, LSRR or SSRR option.
  */
 static void
-ip_printroute(const char *type, register const u_char *cp, u_int length)
+ip_printroute(register const u_char *cp, u_int length)
 {
 	register u_int ptr;
 	register u_int len;
@@ -54,21 +66,17 @@ ip_printroute(const char *type, register const u_char *cp, u_int length)
 		printf(" [bad length %u]", length);
 		return;
 	}
-	printf(" %s{", type);
 	if ((length + 1) & 3)
 		printf(" [bad length %u]", length);
 	ptr = cp[2] - 1;
 	if (ptr < 3 || ((ptr + 1) & 3) || ptr > length + 1)
 		printf(" [bad ptr %u]", cp[2]);
 
-	type = "";
 	for (len = 3; len < length; len += 4) {
-		if (ptr == len)
-			type = "#";
-		printf("%s%s", type, ipaddr_string(&cp[len]));
-		type = " ";
+		printf("%s", ipaddr_string(&cp[len]));
+                if (ptr > len)
+                    printf (", ");
 	}
-	printf("%s}", ptr == len? "#" : "");
 }
 
 /*
@@ -188,75 +196,56 @@ done:
 static void
 ip_optprint(register const u_char *cp, u_int length)
 {
-	register u_int len;
+	register u_int option_len;
 
-	for (; length > 0; cp += len, length -= len) {
-		int tt;
+	for (; length > 0; cp += option_len, length -= option_len) {
+		u_int option_code;
 
 		TCHECK(*cp);
-		tt = *cp;
-		if (tt == IPOPT_NOP || tt == IPOPT_EOL)
-			len = 1;
+		option_code = *cp;
+
+		if (option_code == IPOPT_NOP ||
+                    option_code == IPOPT_EOL)
+			option_len = 1;
+
 		else {
 			TCHECK(cp[1]);
-			len = cp[1];
-			if (len < 2) {
-				printf("[|ip op len %d]", len);
-				return;
-			}
-			TCHECK2(*cp, len);
+			option_len = cp[1];			
 		}
-		switch (tt) {
 
+                printf("%s (%u) len %u",
+                       tok2str(ip_option_values,"unknown",option_code),
+                       option_code,
+                       option_len);
+
+                if (option_len < 2)
+                        return;
+
+                TCHECK2(*cp, option_len);
+
+		switch (option_code) {
 		case IPOPT_EOL:
-			printf(" EOL");
-			if (length > 1)
-				printf("-%d", length - 1);
 			return;
 
-		case IPOPT_NOP:
-			printf(" NOP");
-			break;
-
 		case IPOPT_TS:
-			ip_printts(cp, len);
+			ip_printts(cp, option_len);
 			break;
 
-#ifndef IPOPT_SECURITY
-#define IPOPT_SECURITY 130
-#endif /* IPOPT_SECURITY */
-		case IPOPT_SECURITY:
-			printf(" SECURITY{%d}", len);
-			break;
-
-		case IPOPT_RR:
-			ip_printroute("RR", cp, len);
-			break;
-
+		case IPOPT_RR:       /* fall through */
 		case IPOPT_SSRR:
-			ip_printroute("SSRR", cp, len);
-			break;
-
 		case IPOPT_LSRR:
-			ip_printroute("LSRR", cp, len);
+			ip_printroute( cp, option_len);
 			break;
 
-#ifndef IPOPT_RA
-#define IPOPT_RA 148		/* router alert */
-#endif
 		case IPOPT_RA:
-			printf(" RA");
-			if (len != 4)
-				printf("{%d}", len);
-			else {
-				TCHECK(cp[3]);
-				if (cp[2] || cp[3])
-					printf("%d.%d", cp[2], cp[3]);
-			}
+                        TCHECK(cp[3]);
+                        if (EXTRACT_16BITS(&cp[2]) != 0)
+                            printf("value %u", EXTRACT_16BITS(&cp[2]));
 			break;
 
+		case IPOPT_NOP:       /* nothing to print - fall through */
+		case IPOPT_SECURITY:
 		default:
-			printf(" IPOPT-%d{%d}", cp[0], len);
 			break;
 		}
 	}
@@ -461,7 +450,7 @@ ip_print(register const u_char *bp, register u_int length)
             (void)printf(", length: %u", EXTRACT_16BITS(&ip->ip_len));
 
             if ((hlen - sizeof(struct ip)) > 0) {
-                (void)printf(", optlength: %u (", hlen - (u_int)sizeof(struct ip));
+                printf(", options ( ");
                 ip_optprint((u_char *)(ip + 1), hlen - sizeof(struct ip));
                 printf(" )");
             }
