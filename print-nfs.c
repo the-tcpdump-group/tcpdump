@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.71 2000-05-15 00:40:26 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.72 2000-06-01 01:08:18 assar Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -689,13 +689,17 @@ nfs_printfh(register const u_int32_t *dp, const u_int len)
 		if (sfsname)
 			*sfsname = 0;
 
-		(void)printf(" fh %s/%ld", temp, (long) ino);
+		(void)printf(" fh %s/", temp);
+	} else {
+		(void)printf(" fh %d,%d/",
+			     fsid.Fsid_dev.Major, fsid.Fsid_dev.Minor);
 	}
-	else {
-		(void)printf(" fh %d,%d/%ld",
-			fsid.Fsid_dev.Major, fsid.Fsid_dev.Minor,
-			(long) ino);
-	}
+
+	if(fsid.Fsid_dev.Minor == 257 && uflag)
+		/* Print the undecoded handle */ 
+		(void)printf("%s", fsid.Opaque_Handle);
+	else
+		(void)printf("%ld", (long) ino);
 }
 
 /*
