@@ -17,7 +17,7 @@
 #  WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 #  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.244 2000-12-21 10:43:20 guy Exp $ (LBL)
+# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.245 2001-01-20 20:51:44 guy Exp $ (LBL)
 
 #
 # Various configurable paths (remember to edit Makefile.in, not Makefile)
@@ -74,7 +74,7 @@ CSRC =	tcpdump.c \
 	print-pim.c print-ppp.c print-raw.c print-rip.c print-sl.c \
 	print-snmp.c print-stp.c print-sunrpc.c print-tcp.c print-tftp.c \
 	print-udp.c print-wb.c addrtoname.c gmt2local.c machdep.c \
-	parsenfsfh.c util.c savestr.c setsignal.c \
+	parsenfsfh.c util.c setsignal.c \
 	print-esp.c print-ah.c print-vjc.c print-isakmp.c print-chdlc.c \
 	print-ipcomp.c print-mobile.c print-l2tp.c print-bgp.c print-rx.c \
 	print-lane.c print-cip.c print-pppoe.c print-lcp.c \
@@ -94,7 +94,7 @@ OBJ =	$(CSRC:.c=.o) $(GENSRC:.c=.o) $(LOCALSRC:.c=.o) $(LIBOBJS)
 HDR =   addrtoname.h appletalk.h bootp.h decnet.h \
 	ethertype.h extract.h fddi.h gmt2local.h igrp.h interface.h \
 	ipx.h llc.h machdep.h mib.h nfsfh.h nfsv2.h ntp.h ospf.h \
-	savestr.c setsignal.h \
+	setsignal.h \
 	gnuc.h ipsec_doi.h isakmp.h l2tp.h nameser.h \
 	netbios.h oakley.h ospf6.h ppp.h route6d.h
 
