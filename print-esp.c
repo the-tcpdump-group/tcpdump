@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.32 2003-02-05 02:38:45 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.33 2003-02-26 18:58:05 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -60,11 +60,6 @@ static const char rcsid[] =
 #include "addrtoname.h"
 #include "extract.h"
 
-static struct esp_algorithm *espsecret_xform=NULL;  /* cache of decoded alg. */
-static char                 *espsecret_key=NULL;
-static int                   espsecret_keylen=0;
-
-
 enum cipher { NONE,
 	      DESCBC,
 	      BLOWFISH,
@@ -75,26 +70,66 @@ enum cipher { NONE,
 
 
 struct esp_algorithm {
-	const char   *name;
-	enum  cipher algo;
-	int          ivlen;
-	int          authlen;
-	int          replaysize;
+  const char   *name;
+  enum  cipher algo;
+  int          ivlen;
+  int          authlen;
+  int          replaysize;   /* number of bytes, in excess of 4,
+				may be negative */
 };
 
 struct esp_algorithm esp_xforms[]={
 	{"none",                  NONE,    0,  0, 0},
 	{"des-cbc",               DESCBC,  8,  0, 0},
-	{"des-cbc-hmac96",        DESCBC,  8, 12, 4},
+	{"des-cbc-hmac96",        DESCBC,  8, 12, 0},
 	{"blowfish-cbc",          BLOWFISH,8,  0, 0},
-	{"blowfish-cbc-hmac96",   BLOWFISH,8, 12, 4},
+	{"blowfish-cbc-hmac96",   BLOWFISH,8, 12, 0},
 	{"rc5-cbc",               RC5,     8,  0, 0},
-	{"rc5-cbc-hmac96",        RC5,     8, 12, 4},
+	{"rc5-cbc-hmac96",        RC5,     8, 12, 0},
 	{"cast128-cbc",           CAST128, 8,  0, 0},
-	{"cast128-cbc-hmac96",    CAST128, 8, 12, 4},
-	{"3des-cbc-hmac96",       DES3CBC, 8, 12, 4},
+	{"cast128-cbc-hmac96",    CAST128, 8, 12, 0},
+	{"3des-cbc-hmac96",       DES3CBC, 8, 12, 0},
 	{NULL,                    NONE,    0,  0, 0}
 };
+
+struct esp_algorithm *null_xf =
+  &esp_xforms[sizeof(esp_xforms)/sizeof(esp_xforms[0]) - 1];
+
+struct sa_list {
+  struct sa_list *next;
+  uint32_t       daddr;
+  uint32_t         spi;
+  struct         esp_algorithm *xform;
+  char           secret[256];  /* is that big enough for all secrets? */
+  int            secretlen;
+};
+
+static struct sa_list *sa_list_head=NULL;
+static struct sa_list *sa_default=NULL;
+
+static void esp_print_addsa(struct sa_list *sa, int sa_def)
+{
+  /* copy the "sa" */
+
+  struct sa_list *nsa;
+
+  nsa = (struct sa_list *)malloc(sizeof(struct sa_list));
+  if(nsa == NULL ) {
+    fprintf(stderr, "%s: ran out of memory (%d) to allocate sa structure\n",
+	    program_name, sizeof(struct sa_list));
+    exit(2);
+  }
+
+  *nsa = *sa;
+
+  if(sa_def) {
+    sa_default = nsa;
+  }
+
+  nsa->next = sa_list_head;
+  sa_list_head = nsa;
+}
+ 
 
 static int hexdigit(char hex)
 {
@@ -119,70 +154,176 @@ static int hex2byte(char *hexstring)
 	return byte;
 }
 
+/* 
+ * decode the form:    SPINUM@IP <tab> ALGONAME:0xsecret
+ *
+ * special form: file /name 
+ * causes us to go read from this file instead.
+ *
+ */
+
+static void esp_print_decode_onesecret(char *line)
+{
+  struct esp_algorithm *xf;
+  struct sa_list sa1;
+  int sa_def;
+
+  char *spikey;
+  char *decode;
+
+  spikey = strsep(&line, " \t");
+  sa_def = 0;
+  memset(&sa1, 0, sizeof(struct sa_list));
+
+  /* if there is only one token, then it is an algo:key token */
+  if(line == NULL) {
+    decode = spikey;
+    spikey = NULL;
+    sa1.daddr = 0;
+    sa1.spi   = 0;
+    sa_def    = 1;
+  } else {
+    decode = line;
+  }
+
+  if(spikey && strcasecmp(spikey, "file")==0) {
+    /* open file and read it */
+    FILE *secretfile;
+    char  fileline[1024];
+    char  *nl;
+
+    secretfile=fopen(line, "r");
+    if(secretfile == NULL) {
+      perror(line);
+      exit(3);
+    }
+    
+    while(fgets(fileline, 1024, secretfile) != NULL) {
+
+      /* remove newline from the line */
+      nl = strchr(fileline, '\n');
+      if(nl) {
+	*nl = '\0';
+      }
+      if(fileline[0]=='#') continue;
+      if(fileline[0]=='\0') continue;
+      
+      esp_print_decode_onesecret(fileline);
+    }
+    fclose(secretfile);
+    
+    return;
+  }
+
+  if(spikey) {
+    char *spistr, *foo;
+    u_int32_t spino;
+    struct in_addr ina;
+
+    spistr = strsep(&spikey, "@");
+   
+    spino = strtoul(spistr, &foo, 0);
+    if(spistr == foo) {
+      printf("print_esp: failed to decode spi# %s\n", foo);
+      return;
+    }
+
+    if(inet_pton(AF_INET, spikey, &ina) <= 0) {
+      printf("print_esp: can not decode IP# %s\n", spikey);
+      return;
+    }
+
+    sa1.daddr = ina.s_addr;
+    sa1.spi = spino;
+  }
+
+  if(decode) {
+    char *colon;
+    char  espsecret_key[256];
+    unsigned int   len, i;
+
+    /* skip any blank spaces */
+    while(isspace(*decode)) decode++;
+
+    colon = strchr(decode, ':');
+    if(colon == NULL) {
+      printf("failed to decode espsecret: %s\n", decode);
+      return;
+    }
+
+    len = colon - decode;
+    xf = esp_xforms;
+    while(xf->name && strncasecmp(decode, xf->name, len)!=0) {
+      xf++;
+    }
+    if(xf->name == NULL) {
+      printf("failed to find cipher algo %s\n", decode);
+      /* set to NULL transform */
+      return;
+    }
+    sa1.xform = xf;
+
+    colon++;
+    if(colon[0]=='0' && colon[1]=='x') {
+      /* decode some hex! */
+      colon+=2;
+      len = strlen(colon) / 2;
+
+      if(len > 256) {
+	printf("secret is too big: %d\n", len);
+	return;
+      }
+
+      i = 0;
+      while(colon[0] != '\0' && colon[1]!='\0') {
+	espsecret_key[i]=hex2byte(colon);
+	colon+=2;
+	i++;
+      }
+      memcpy(sa1.secret, espsecret_key, i);
+      sa1.secretlen=i;
+    } else {
+      i = strlen(colon);
+      if(i < sizeof(sa1.secret)) {
+	memcpy(sa1.secret, espsecret_key, i);
+	sa1.secretlen = i;
+      } else {
+	memcpy(sa1.secret, espsecret_key, sizeof(sa1.secret));
+	sa1.secretlen = sizeof(sa1.secret);
+      }
+    }
+    
+  }
+
+  esp_print_addsa(&sa1, sa_def);
+}
+
 
 static void esp_print_decodesecret(void)
 {
-	char *colon;
-	int   len, i;
-	struct esp_algorithm *xf;
-	struct esp_algorithm *null_xf =
-		&esp_xforms[sizeof(esp_xforms)/sizeof(esp_xforms[0]) - 1];
-
-	if(espsecret == NULL) {
-		/* set to NULL transform */
-		espsecret_xform = null_xf;
-		return;
-	}
-
-	if(espsecret_key != NULL) {
-		return;
-	}
-
-	colon = strchr(espsecret, ':');
-	if(colon == NULL) {
-		printf("failed to decode espsecret: %s\n",
-		       espsecret);
-		/* set to NULL transform */
-		espsecret_xform = null_xf;
-		return;
-	}
-
-	len = colon - espsecret;
-	xf = esp_xforms;
-	while(xf->name && strncasecmp(espsecret, xf->name, len)!=0) {
-		xf++;
-	}
-	if(xf->name == NULL) {
-		printf("failed to find cipher algo %s\n",
-		       espsecret);
-		/* set to NULL transform */
-		espsecret_xform = null_xf;
-		return;
-	}
-	espsecret_xform = xf;
-
-	colon++;
-	if(colon[0]=='0' && colon[1]=='x') {
-		/* decode some hex! */
-		colon+=2;
-		len = strlen(colon) / 2;
-		espsecret_key = (char *)malloc(len);
-		if(espsecret_key == NULL) {
-		  fprintf(stderr, "%s: ran out of memory (%d) to allocate secret key\n",
-			  program_name, len);
-		  exit(2);
-		}
-		i = 0;
-		while(colon[0] != '\0' && colon[1]!='\0') {
-			espsecret_key[i]=hex2byte(colon);
-			colon+=2;
-			i++;
-		}
-		espsecret_keylen = len;
-	} else {
-		espsecret_key = colon;
-		espsecret_keylen = strlen(colon);
-	}
+  char *line;
+  char *p;
+  
+  if(espsecret == NULL) {
+    sa_list_head = NULL;
+    return;
+  }
+  
+  if(sa_list_head != NULL) {
+    return;
+  }
+  
+  p=espsecret;
+  
+  while(espsecret && espsecret[0]!='\0') { 
+    /* pick out the first line or first thing until a comma */
+    if((line = strsep(&espsecret, "\n,"))==NULL) {
+      line=espsecret;
+      espsecret=NULL;
+    }
+    
+    esp_print_decode_onesecret(line);
+  }
 }
 
 int
@@ -192,6 +333,8 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 	register const struct newesp *esp;
 	register const u_char *ep;
 	struct ip *ip = NULL;
+	struct sa_list *sa;
+	int espsecret_keylen;
 #ifdef INET6
 	struct ip6_hdr *ip6 = NULL;
 #endif
@@ -206,6 +349,7 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 
 	esp = (struct newesp *)bp;
 	secret = NULL;
+	advance = 0;
 
 #if 0
 	/* keep secret out of a register */
@@ -224,13 +368,14 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 	printf(")");
 
 	/* if we don't have decryption key, we can't decrypt this packet. */
-	if (!espsecret)
-		goto fail;
-
-	if(!espsecret_xform) {
-		esp_print_decodesecret();
+	if(sa_list_head == NULL) {
+	  if (!espsecret) {
+	    goto fail;
+	  }
+	  esp_print_decodesecret();
 	}
-	if(espsecret_xform->name == NULL) {
+
+	if(sa_list_head == NULL) {
 		goto fail;
 	}
 
@@ -268,11 +413,30 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 		ep = bp2 + len;
 	}
 
-	ivoff = (u_char *)(esp + 1) + espsecret_xform->replaysize;
-	ivlen = espsecret_xform->ivlen;
-	secret = espsecret_key;
+	/* see if we can find the SA, and if so, decode it */
+	sa = sa_list_head;
+	while(sa != NULL &&
+	      sa->daddr != ip->ip_dst.s_addr &&
+	      sa->spi   != ntohl(esp->esp_spi)) {
+	  sa = sa->next;
+	}
 
-	switch (espsecret_xform->algo) {
+	/* if we didn't find the specific one, then look for
+	 * an unspecified one.
+	 */
+	if(sa == NULL) {
+	  sa = sa_default;
+	}
+	
+	/* if not found fail */
+	if(sa == NULL) goto fail;
+
+	ivoff = (u_char *)(esp + 1) + sa->xform->replaysize;
+	ivlen = sa->xform->ivlen;
+	secret = sa->secret;
+	espsecret_keylen = sa->secretlen;
+
+	switch (sa->xform->algo) {
 	case DESCBC:
 #ifdef HAVE_LIBCRYPTO
 	    {
@@ -442,11 +606,11 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 
 	case NONE:
 	default:
-		advance = sizeof(struct newesp) + espsecret_xform->replaysize;
+		advance = sizeof(struct newesp) + sa->xform->replaysize;
 		break;
 	}
 
-	ep = ep - espsecret_xform->authlen;
+	ep = ep - sa->xform->authlen;
 	/* sanity check for pad length */
 	if (ep - bp < *(ep - 2))
 		goto fail;

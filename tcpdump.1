@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.139 2003-02-14 07:51:12 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.140 2003-02-26 18:58:04 mcr Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -73,8 +73,10 @@ tcpdump \- dump traffic on a network
 .ti +8
 [
 .B \-E
-.I algo:secret
+.I spi@ipaddr algo:secret,...
 ]
+.br
+.ti +8
 [
 .B \-y
 .I datalinktype
@@ -263,7 +265,12 @@ function.
 Print the link-level header on each dump line.
 .TP
 .B \-E
-Use \fIalgo:secret\fP for decrypting IPsec ESP packets.
+Use \fIspi@ipaddr algo:secret\fP for decrypting IPsec ESP packets that
+are addressed to \fIaddr\fP and contain Security Parameter Index value
+\fIspi\fP. This combination may be repeated with comma or newline seperation.
+.IP
+Note that setting the secret for IPv4 ESP packets is supported at this time.
+.IP
 Algorithms may be
 \fBdes-cbc\fP,
 \fB3des-cbc\fP,
@@ -274,15 +281,22 @@ Algorithms may be
 The default is \fBdes-cbc\fP.
 The ability to decrypt packets is only present if \fItcpdump\fP was compiled
 with cryptography enabled.
-\fIsecret\fP the ASCII text for ESP secret key.
-We cannot take arbitrary binary value at this moment.
+.IP
+\fIsecret\fP is the ASCII text for ESP secret key. 
+If preceeded by 0x, then a hex value will be read.
+.IP
 The option assumes RFC2406 ESP, not RFC1827 ESP.
 The option is only for debugging purposes, and
-the use of this option with truly `secret' key is discouraged.
+the use of this option with a true `secret' key is discouraged.
 By presenting IPsec secret key onto command line
 you make it visible to others, via
 .IR ps (1)
 and other occasions.
+.IP
+In addition to the above syntax, the syntax \fIfile name\fP may be used
+to have tcpdump read the provided file in. The file is opened upon 
+receiving the first ESP packet, so any special permissions that tcpdump
+may have been given should already have been given up.
 .TP
 .B \-f
 Print `foreign' IPv4 addresses numerically rather than symbolically

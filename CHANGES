@@ -1,4 +1,7 @@
-$Header: /tcpdump/master/tcpdump/CHANGES,v 1.81 2002-01-21 11:03:33 mcr Exp $
+$Header: /tcpdump/master/tcpdump/CHANGES,v 1.82 2003-02-26 18:58:04 mcr Exp $
+
+	changed syntax of -E argument so that multiple SAs can be decrypted
+
 
 Monday, January 21, 2002. mcr@sandelman.ottawa.on.ca. Summary for 3.7 release
 see http://www.tcpdump.org/cvs-log/2002-01-21.10:16:48.html for commit log.
@@ -653,4 +656,4 @@ v2.0 Sun Jan 13 12:20:40 PST 1991
 
 - Initial public release.
 
-@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.81 2002-01-21 11:03:33 mcr Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.82 2003-02-26 18:58:04 mcr Exp $ (LBL)
