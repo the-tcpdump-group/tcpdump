@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.202 2003-02-11 07:41:52 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.203 2003-02-11 08:04:18 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -1006,7 +1006,7 @@ usage(void)
 
 #ifdef HAVE_PCAP_LIB_VERSION
 	(void)fprintf(stderr, "%s version %s\n", program_name, version);
-	(void)fprintf(stderr, "libpcap version %s\n", pcap_lib_version());
+	(void)fprintf(stderr, "%s\n", pcap_lib_version());
 #else /* HAVE_PCAP_LIB_VERSION */
 #ifdef WIN32
 	(void)fprintf(stderr, "%s version %s, based on tcpdump version %s\n", program_name, WDversion, version);
