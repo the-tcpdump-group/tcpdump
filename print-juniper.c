@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.7 2005-01-27 18:30:36 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.8 2005-04-06 21:32:41 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -337,8 +337,8 @@ ip_heuristic_guess(register const u_char *p, u_int length) {
     case 0x4d:
     case 0x4e:
     case 0x4f:
-        ip_print(p, length);
-        break;
+	    ip_print(gndo, p, length);
+	    break;
 #ifdef INET6
     case 0x60:
     case 0x61:
@@ -399,3 +399,11 @@ juniper_parse_header (const u_char *p, u_int8_t *direction, u_int length) {
     }
     return 1; /* everything went ok so far. continue parsing */
 }
+
+
+/*
+ * Local Variables:
+ * c-style: whitesmith
+ * c-basic-offset: 8
+ * End:
+ */

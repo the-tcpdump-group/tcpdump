@@ -38,7 +38,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-gre.c,v 1.27 2004-07-02 06:39:11 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-gre.c,v 1.28 2005-04-06 21:32:39 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -206,7 +206,7 @@ gre_print_0(const u_char *bp, u_int length)
 
 	switch (prot) {
 	case ETHERTYPE_IP:
-		ip_print(bp, len);
+	        ip_print(gndo, bp, len);
 		break;
 #ifdef INET6
 	case ETHERTYPE_IPV6:

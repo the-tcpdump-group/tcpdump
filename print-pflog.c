@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pflog.c,v 1.12 2004-04-02 06:48:10 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pflog.c,v 1.13 2005-04-06 21:32:41 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -136,7 +136,7 @@ pflog_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 #if OPENBSD_AF_INET != AF_INET
 		case OPENBSD_AF_INET:		/* XXX: read pcap files */
 #endif
-			ip_print(p, length);
+		        ip_print(gndo, p, length);
 			break;
 
 #ifdef INET6
@@ -161,3 +161,10 @@ trunc:
 	printf("[|pflog]");
 	return (hdrlen);
 }
+
+/*
+ * Local Variables:
+ * c-style: whitesmith
+ * c-basic-offset: 8
+ * End:
+ */

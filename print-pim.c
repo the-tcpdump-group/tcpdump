@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.44 2004-09-29 16:49:31 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.45 2005-04-06 21:32:42 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -743,7 +743,7 @@ pimv2_print(register const u_char *bp, register u_int len)
 		switch (IP_V(ip)) {
 		case 4:	/* IPv4 */
 			printf(" ");
-			ip_print(bp, len);
+			ip_print(gndo, bp, len);
 			break;
 #ifdef INET6
 		case 6:	/* IPv6 */
@@ -1062,3 +1062,10 @@ pimv2_print(register const u_char *bp, register u_int len)
 trunc:
 	(void)printf("[|pim]");
 }
+
+/*
+ * Local Variables:
+ * c-style: whitesmith
+ * c-basic-offset: 8
+ * End:
+ */

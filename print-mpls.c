@@ -28,7 +28,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-mpls.c,v 1.12 2004-06-14 14:47:58 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-mpls.c,v 1.13 2005-04-06 21:32:41 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -86,7 +86,7 @@ mpls_print(const u_char *bp, u_int length)
 	switch (MPLS_LABEL(v)) {
 	case 0:	/* IPv4 explicit NULL label */
         case 3:	/* IPv4 implicit NULL label */
-		ip_print(p, length - (p - bp));
+		ip_print(gndo, p, length - (p - bp));
 		break;
 #ifdef INET6
 	case 2:	/* IPv6 explicit NULL label */
@@ -122,7 +122,7 @@ mpls_print(const u_char *bp, u_int length)
                     case 0x4f:
 		        if (vflag>0) {
                             printf("\n\t");
-                            ip_print(p, length - (p - bp));
+                            ip_print(gndo, p, length - (p - bp));
 			    }
                         else printf(", IP, length: %u",length);
                         break;
@@ -170,3 +170,11 @@ mpls_print(const u_char *bp, u_int length)
 trunc:
 	printf("[|MPLS]");
 }
+
+
+/*
+ * Local Variables:
+ * c-style: whitesmith
+ * c-basic-offset: 8
+ * End:
+ */

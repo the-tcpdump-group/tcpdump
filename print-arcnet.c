@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-arcnet.c,v 1.19 2004-04-30 16:42:14 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-arcnet.c,v 1.20 2005-04-06 21:32:38 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -259,7 +259,7 @@ arcnet_encap_print(u_char arctype, const u_char *p,
 
 	case ARCTYPE_IP_OLD:
 	case ARCTYPE_IP:
-		ip_print(p, length);
+	        ip_print(gndo, p, length);
 		return (1);
 
 #ifdef INET6

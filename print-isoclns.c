@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.132 2005-04-02 18:32:41 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.133 2005-04-06 21:32:40 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -594,7 +594,7 @@ void isoclns_print(const u_int8_t *p, u_int length, u_int caplen)
                 break;
 
         case NLPID_IP:
-                ip_print(p+1, length-1);
+		ip_print(gndo, p+1, length-1);
                 break;
 
 #ifdef INET6
@@ -2437,3 +2437,11 @@ osi_cksum(const u_int8_t *tptr, u_int len)
 	}
 	return (c0 | c1);
 }
+
+
+/*
+ * Local Variables:
+ * c-style: whitesmith
+ * c-basic-offset: 8
+ * End:
+ */

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.80 2004-12-23 10:51:47 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.81 2005-04-06 21:32:40 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -527,7 +527,7 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
 		(void)printf("\n\t");
 		ip = (struct ip *)bp;
 		snaplen = snapend - bp;
-		ip_print(bp, EXTRACT_16BITS(&ip->ip_len));
+		ip_print(gndo, bp, EXTRACT_16BITS(&ip->ip_len));
 	}
 
         if (vflag >= 1 && plen > ICMP_EXTD_MINLEN && ICMP_MPLS_EXT_TYPE(dp->icmp_type)) {

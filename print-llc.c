@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.60 2005-04-06 20:09:08 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.61 2005-04-06 21:32:41 mcr Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -131,7 +131,7 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 	}
 
 	if (llc.ssap == LLCSAP_IP && llc.dsap == LLCSAP_IP) {
-		ip_print(p+4, length-4);
+		ip_print(gndo, p+4, length-4);
 		return (1);
 	}
 
@@ -438,3 +438,11 @@ snap_print(const u_char *p, u_int length, u_int caplen,
 	}
 	return (0);
 }
+
+
+/*
+ * Local Variables:
+ * c-style: whitesmith
+ * c-basic-offset: 8
+ * End:
+ */

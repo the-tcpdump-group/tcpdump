@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.147 2005-01-21 08:02:06 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.148 2005-04-06 21:33:02 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -356,31 +356,187 @@ static struct tok ip_frag_values[] = {
         { 0,            NULL }
 };
 
+struct ip_print_demux_state {
+	const struct ip *ip;
+	const u_char *cp;
+	u_int   hlen, len, off;
+	u_char  nh;
+	int     advance;
+};
+
+static void
+ip_print_demux(netdissect_options *ndo,
+	       struct ip_print_demux_state *ipds)
+{
+	struct protoent *proto;
+
+again:
+	switch (ipds->nh) {
+
+	case IPPROTO_AH:
+		ipds->nh = *ipds->cp;
+		ipds->advance = ah_print(ipds->cp);
+		if (ipds->advance <= 0)
+			break;
+		ipds->cp += ipds->advance;
+		ipds->len -= ipds->advance;
+		goto again;
+
+	case IPPROTO_ESP:
+	{
+		int enh, padlen;
+		ipds->advance = esp_print(ndo, ipds->cp, ipds->len,
+				    (const u_char *)ipds->ip,
+				    &enh, &padlen);
+		if (ipds->advance <= 0)
+			break;
+		ipds->cp += ipds->advance;
+		ipds->len -= ipds->advance + padlen;
+		ipds->nh = enh & 0xff;
+		goto again;
+	}
+	
+	case IPPROTO_IPCOMP:
+	{
+		int enh;
+		ipds->advance = ipcomp_print(ipds->cp, &enh);
+		if (ipds->advance <= 0)
+			break;
+		ipds->cp += ipds->advance;
+		ipds->len -= ipds->advance;
+		ipds->nh = enh & 0xff;
+		goto again;
+	}
+
+	case IPPROTO_SCTP:
+		sctp_print(ipds->cp, (const u_char *)ipds->ip, ipds->len);
+		break;
+		
+	case IPPROTO_TCP:
+		tcp_print(ipds->cp, ipds->len, (const u_char *)ipds->ip,
+			  (ipds->off &~ 0x6000));
+		break;
+		
+	case IPPROTO_UDP:
+		udp_print(ipds->cp, ipds->len, (const u_char *)ipds->ip,
+			  (ipds->off &~ 0x6000));
+		break;
+		
+	case IPPROTO_ICMP:
+		/* pass on the MF bit plus the offset to detect fragments */
+		icmp_print(ipds->cp, ipds->len, (const u_char *)ipds->ip,
+			   (ipds->off & 0x3fff));
+		break;
+		
+	case IPPROTO_PIGP:
+		/*
+		 * XXX - the current IANA protocol number assignments
+		 * page lists 9 as "any private interior gateway
+		 * (used by Cisco for their IGRP)" and 88 as
+		 * "EIGRP" from Cisco.
+		 *
+		 * Recent BSD <netinet/in.h> headers define
+		 * IP_PROTO_PIGP as 9 and IP_PROTO_IGRP as 88.
+		 * We define IP_PROTO_PIGP as 9 and
+		 * IP_PROTO_EIGRP as 88; those names better
+		 * match was the current protocol number
+		 * assignments say.
+		 */
+		igrp_print(ipds->cp, ipds->len, (const u_char *)ipds->ip);
+		break;
+		
+	case IPPROTO_EIGRP:
+		eigrp_print(ipds->cp, ipds->len);
+		break;
+		
+	case IPPROTO_ND:
+		ND_PRINT((ndo, " nd %d", ipds->len));
+		break;
+
+	case IPPROTO_EGP:
+		egp_print(ipds->cp, ipds->len);
+		break;
+
+	case IPPROTO_OSPF:
+		ospf_print(ipds->cp, ipds->len, (const u_char *)ipds->ip);
+		break;
+
+	case IPPROTO_IGMP:
+		igmp_print(ipds->cp, ipds->len);
+		break;
+
+	case IPPROTO_IPV4:
+		/* DVMRP multicast tunnel (ip-in-ip encapsulation) */
+		ip_print(gndo, ipds->cp, ipds->len);
+		if (! vflag) {
+			ND_PRINT((ndo, " (ipip-proto-4)"));
+			return;
+		}
+		break;
+		
+#ifdef INET6
+	case IPPROTO_IPV6:
+		/* ip6-in-ip encapsulation */
+		ip6_print(ipds->cp, ipds->len);
+		break;
+#endif /*INET6*/
+
+	case IPPROTO_RSVP:
+		rsvp_print(ipds->cp, ipds->len);
+		break;
+
+	case IPPROTO_GRE:
+		/* do it */
+		gre_print(ipds->cp, ipds->len);
+		break;
+
+	case IPPROTO_MOBILE:
+		mobile_print(ipds->cp, ipds->len);
+		break;
+
+	case IPPROTO_PIM:
+		pim_print(ipds->cp,  ipds->len);
+		break;
+
+	case IPPROTO_VRRP:
+		vrrp_print(ipds->cp, ipds->len, ipds->ip->ip_ttl);
+		break;
+
+	default:
+		if ((proto = getprotobynumber(ipds->nh)) != NULL)
+			ND_PRINT((ndo, " %s", proto->p_name));
+		else
+			ND_PRINT((ndo, " ip-proto-%d", ipds->nh));
+		ND_PRINT((ndo, " %d", ipds->len));
+		break;
+	}
+}
+	       
+
 /*
  * print an IP datagram.
  */
 void
-ip_print(register const u_char *bp, register u_int length)
+ip_print(netdissect_options *ndo,
+	 const u_char *bp,
+	 u_int length)
 {
-	register const struct ip *ip;
-	register u_int hlen, len, off;
+	struct ip_print_demux_state  ipd;
+	struct ip_print_demux_state *ipds=&ipd;
 	const u_char *ipend;
-	register const u_char *cp;
-	u_char nh;
-	int advance;
-	struct protoent *proto;
 	u_int16_t sum, ip_sum;
+	struct protoent *proto;
 
-	ip = (const struct ip *)bp;
-	if (IP_V(ip) != 4) { /* print version if != 4 */
-	    printf("IP%u ", IP_V(ip));
-	    if (IP_V(ip) == 6)
+	ipds->ip = (const struct ip *)bp;
+	if (IP_V(ipds->ip) != 4) { /* print version if != 4 */
+	    printf("IP%u ", IP_V(ipds->ip));
+	    if (IP_V(ipds->ip) == 6)
 		printf(", wrong link-layer encapsulation");
 	}
         else if (!eflag)
 	    printf("IP ");
 
-	if ((u_char *)(ip + 1) > snapend) {
+	if ((u_char *)(ipds->ip + 1) > snapend) {
 		printf("[|ip]");
 		return;
 	}
@@ -388,28 +544,28 @@ ip_print(register const u_char *bp, register u_int length)
 		(void)printf("truncated-ip %u", length);
 		return;
 	}
-	hlen = IP_HL(ip) * 4;
-	if (hlen < sizeof (struct ip)) {
-		(void)printf("bad-hlen %u", hlen);
+	ipds->hlen = IP_HL(ipds->ip) * 4;
+	if (ipds->hlen < sizeof (struct ip)) {
+		(void)printf("bad-hlen %u", ipds->hlen);
 		return;
 	}
 
-	len = EXTRACT_16BITS(&ip->ip_len);
-	if (length < len)
+	ipds->len = EXTRACT_16BITS(&ipds->ip->ip_len);
+	if (length < ipds->len)
 		(void)printf("truncated-ip - %u bytes missing! ",
-			len - length);
-	if (len < hlen) {
+			ipds->len - length);
+	if (ipds->len < ipds->hlen) {
 #ifdef GUESS_TSO
-            if (len) {
-                (void)printf("bad-len %u", len);
+            if (ipds->len) {
+                (void)printf("bad-len %u", ipds->len);
                 return;
             }
             else {
                 /* we guess that it is a TSO send */
-                len = length;
+                ipds->len = length;
             }
 #else
-            (void)printf("bad-len %u", len);
+            (void)printf("bad-len %u", ipds->len);
             return;
 #endif /* GUESS_TSO */
 	}
@@ -417,19 +573,19 @@ ip_print(register const u_char *bp, register u_int length)
 	/*
 	 * Cut off the snapshot length to the end of the IP payload.
 	 */
-	ipend = bp + len;
+	ipend = bp + ipds->len;
 	if (ipend < snapend)
 		snapend = ipend;
 
-	len -= hlen;
+	ipds->len -= ipds->hlen;
 
-	off = EXTRACT_16BITS(&ip->ip_off);
+	ipds->off = EXTRACT_16BITS(&ipds->ip->ip_off);
 
         if (vflag) {
-            (void)printf("(tos 0x%x", (int)ip->ip_tos);
+            (void)printf("(tos 0x%x", (int)ipds->ip->ip_tos);
             /* ECN bits */
-            if (ip->ip_tos & 0x03) {
-                switch (ip->ip_tos & 0x03) {
+            if (ipds->ip->ip_tos & 0x03) {
+                switch (ipds->ip->ip_tos & 0x03) {
                 case 1:
                     (void)printf(",ECT(1)");
                     break;
@@ -441,8 +597,8 @@ ip_print(register const u_char *bp, register u_int length)
                 }
             }
 
-            if (ip->ip_ttl >= 1)
-                (void)printf(", ttl %3u", ip->ip_ttl);    
+            if (ipds->ip->ip_ttl >= 1)
+                (void)printf(", ttl %3u", ipds->ip->ip_ttl);    
 
 	    /*
 	     * for the firewall guys, print id, offset.
@@ -451,24 +607,24 @@ ip_print(register const u_char *bp, register u_int length)
 	     */
 
 	    (void)printf(", id %u, offset %u, flags [%s], proto: %s (%u)",
-                         EXTRACT_16BITS(&ip->ip_id),
-                         (off & 0x1fff) * 8,
-                         bittok2str(ip_frag_values, "none", off & 0xe000 ),
-                         tok2str(ipproto_values,"unknown",ip->ip_p),
-                         ip->ip_p);
+                         EXTRACT_16BITS(&ipds->ip->ip_id),
+                         (ipds->off & 0x1fff) * 8,
+                         bittok2str(ip_frag_values, "none", ipds->off&0xe000 ),
+                         tok2str(ipproto_values,"unknown",ipds->ip->ip_p),
+                         ipds->ip->ip_p);
 
-            (void)printf(", length: %u", EXTRACT_16BITS(&ip->ip_len));
+            (void)printf(", length: %u", EXTRACT_16BITS(&ipds->ip->ip_len));
 
-            if ((hlen - sizeof(struct ip)) > 0) {
+            if ((ipds->hlen - sizeof(struct ip)) > 0) {
                 printf(", options ( ");
-                ip_optprint((u_char *)(ip + 1), hlen - sizeof(struct ip));
+                ip_optprint((u_char *)(ipds->ip + 1), ipds->hlen - sizeof(struct ip));
                 printf(" )");
             }
 
-	    if ((u_char *)ip + hlen <= snapend) {
-	        sum = in_cksum((const u_short *)ip, hlen, 0);
+	    if ((u_char *)ipds->ip + ipds->hlen <= snapend) {
+	        sum = in_cksum((const u_short *)ipds->ip, ipds->hlen, 0);
 		if (sum != 0) {
-		    ip_sum = EXTRACT_16BITS(&ip->ip_sum);
+		    ip_sum = EXTRACT_16BITS(&ipds->ip->ip_sum);
 		    (void)printf(", bad cksum %x (->%x)!", ip_sum,
 			     in_cksum_shouldbe(ip_sum, sum));
 		}
@@ -481,150 +637,17 @@ ip_print(register const u_char *bp, register u_int length)
 	 * If this is fragment zero, hand it to the next higher
 	 * level protocol.
 	 */
-	if ((off & 0x1fff) == 0) {
-		cp = (const u_char *)ip + hlen;
-		nh = ip->ip_p;
+	if ((ipds->off & 0x1fff) == 0) {
+		ipds->cp = (const u_char *)ipds->ip + ipds->hlen;
+		ipds->nh = ipds->ip->ip_p;
 
-		if (nh != IPPROTO_TCP && nh != IPPROTO_UDP &&
-		    nh != IPPROTO_SCTP) {
-			(void)printf("%s > %s: ", ipaddr_string(&ip->ip_src),
-				ipaddr_string(&ip->ip_dst));
+		if (ipds->nh != IPPROTO_TCP && ipds->nh != IPPROTO_UDP &&
+		    ipds->nh != IPPROTO_SCTP) {
+			(void)printf("%s > %s: ",
+				     ipaddr_string(&ipds->ip->ip_src),
+				     ipaddr_string(&ipds->ip->ip_dst));
 		}
-again:
-		switch (nh) {
-
-		case IPPROTO_AH:
-			nh = *cp;
-			advance = ah_print(cp);
-			if (advance <= 0)
-				break;
-			cp += advance;
-			len -= advance;
-			goto again;
-
-		case IPPROTO_ESP:
-		    {
-			int enh, padlen;
-			advance = esp_print(gndo, cp, len, (const u_char *)ip, &enh, &padlen);
-			if (advance <= 0)
-				break;
-			cp += advance;
-			len -= advance + padlen;
-			nh = enh & 0xff;
-			goto again;
-		    }
-
-		case IPPROTO_IPCOMP:
-		    {
-			int enh;
-			advance = ipcomp_print(cp, &enh);
-			if (advance <= 0)
-				break;
-			cp += advance;
-			len -= advance;
-			nh = enh & 0xff;
-			goto again;
-		    }
-
-		case IPPROTO_SCTP:
-			sctp_print(cp, (const u_char *)ip, len);
-			break;
-
-		case IPPROTO_TCP:
-			tcp_print(cp, len, (const u_char *)ip, (off &~ 0x6000));
-			break;
-
-		case IPPROTO_UDP:
-			udp_print(cp, len, (const u_char *)ip, (off &~ 0x6000));
-			break;
-
-		case IPPROTO_ICMP:
-		        /* pass on the MF bit plus the offset to detect fragments */
-			icmp_print(cp, len, (const u_char *)ip, (off & 0x3fff));
-			break;
-
-		case IPPROTO_PIGP:
-			/*
-			 * XXX - the current IANA protocol number assignments
-			 * page lists 9 as "any private interior gateway
-			 * (used by Cisco for their IGRP)" and 88 as
-			 * "EIGRP" from Cisco.
-			 *
-			 * Recent BSD <netinet/in.h> headers define
-			 * IP_PROTO_PIGP as 9 and IP_PROTO_IGRP as 88.
-			 * We define IP_PROTO_PIGP as 9 and
-			 * IP_PROTO_EIGRP as 88; those names better
-			 * match was the current protocol number
-			 * assignments say.
-			 */
-			igrp_print(cp, len, (const u_char *)ip);
-			break;
-
-		case IPPROTO_EIGRP:
-			eigrp_print(cp, len);
-			break;
-
-		case IPPROTO_ND:
-			(void)printf(" nd %d", len);
-			break;
-
-		case IPPROTO_EGP:
-			egp_print(cp, len);
-			break;
-
-		case IPPROTO_OSPF:
-			ospf_print(cp, len, (const u_char *)ip);
-			break;
-
-		case IPPROTO_IGMP:
-			igmp_print(cp, len);
-			break;
-
-		case IPPROTO_IPV4:
-			/* DVMRP multicast tunnel (ip-in-ip encapsulation) */
-			ip_print(cp, len);
-			if (! vflag) {
-				printf(" (ipip-proto-4)");
-				return;
-			}
-			break;
-
-#ifdef INET6
-		case IPPROTO_IPV6:
-			/* ip6-in-ip encapsulation */
-			ip6_print(cp, len);
-			break;
-#endif /*INET6*/
-
-		case IPPROTO_RSVP:
-			rsvp_print(cp, len);
-			break;
-
-		case IPPROTO_GRE:
-			/* do it */
-			gre_print(cp, len);
-			break;
-
-		case IPPROTO_MOBILE:
-			mobile_print(cp, len);
-			break;
-
-		case IPPROTO_PIM:
-			pim_print(cp, len);
-			break;
-
-		case IPPROTO_VRRP:
-			vrrp_print(cp, len, ip->ip_ttl);
-			break;
-
-		default:
-			if ((proto = getprotobynumber(nh)) != NULL)
-				(void)printf(" %s", proto->p_name);
-			else
-				(void)printf(" ip-proto-%d", nh);
-			printf(" %d", len);
-			break;
-		}
+		ip_print_demux(ndo, ipds);
 	} else {
 	    /* Ultra quiet now means that all this stuff should be suppressed */
 	    if (qflag > 1) return;
@@ -634,13 +657,13 @@ again:
 	     * next level protocol header.  print the ip addr
 	     * and the protocol.
 	     */
-	    if (off & 0x1fff) {
-	        (void)printf("%s > %s:", ipaddr_string(&ip->ip_src),
-			     ipaddr_string(&ip->ip_dst));
-		if ((proto = getprotobynumber(ip->ip_p)) != NULL)
+	    if (ipds->off & 0x1fff) {
+	        (void)printf("%s > %s:", ipaddr_string(&ipds->ip->ip_src),
+			     ipaddr_string(&ipds->ip->ip_dst));
+		if ((proto = getprotobynumber(ipds->ip->ip_p)) != NULL)
 		    (void)printf(" %s", proto->p_name);
 		else
-		    (void)printf(" ip-proto-%d", ip->ip_p);
+		    (void)printf(" ip-proto-%d", ipds->ip->ip_p);
 	    } 
 	}
 }
@@ -658,7 +681,7 @@ ipN_print(register const u_char *bp, register u_int length)
 	memcpy (&hdr, (char *)ip, 4);
 	switch (IP_V(&hdr)) {
 	case 4:
-		ip_print (bp, length);
+		ip_print (gndo, bp, length);
 		return;
 #ifdef INET6
 	case 6:

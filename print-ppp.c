@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.107 2005-01-25 16:27:56 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.108 2005-04-06 21:32:42 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1149,8 +1149,8 @@ ppp_hdlc(const u_char *p, int length)
         
         switch (proto) {
         case PPP_IP:
-            ip_print(b+1, t - b - 1);
-            goto cleanup;
+		ip_print(gndo, b+1, t - b - 1);
+		goto cleanup;
 #ifdef INET6
         case PPP_IPV6:
             ip6_print(b+1, t - b - 1);
@@ -1213,7 +1213,7 @@ handle_ppp(u_int proto, const u_char *p, int length)
 	case ETHERTYPE_IP:	/*XXX*/
         case PPP_VJNC:
 	case PPP_IP:
-		ip_print(p, length);
+		ip_print(gndo, p, length);
 		break;
 #ifdef INET6
 	case ETHERTYPE_IPV6:	/*XXX*/
@@ -1597,3 +1597,11 @@ printx:
 #endif /* __bsdi__ */
 	return (hdrlength);
 }
+
+
+/*
+ * Local Variables:
+ * c-style: whitesmith
+ * c-basic-offset: 8
+ * End:
+ */

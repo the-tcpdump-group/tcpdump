@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.94 2005-01-25 16:22:56 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.95 2005-04-06 21:32:39 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -202,7 +202,7 @@ ether_encap_print(u_short ether_type, const u_char *p,
 	switch (ether_type) {
 
 	case ETHERTYPE_IP:
-		ip_print(p, length);
+	        ip_print(gndo, p, length);
 		return (1);
 
 #ifdef INET6
@@ -329,9 +329,11 @@ ether_encap_print(u_short ether_type, const u_char *p,
 	}
 }
 
+
 /*
  * Local Variables:
- * c-style: bsd
+ * c-style: whitesmith
+ * c-basic-offset: 8
  * End:
  */
 
