@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.66 2002-09-05 21:25:38 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.67 2002-12-04 19:09:29 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -49,11 +49,16 @@ static char tstr[] = " [|bootp]";
  * Print bootp requests
  */
 void
-bootp_print(register const u_char *cp, u_short sport, u_short dport)
+bootp_print(register const u_char *cp, u_short sport, u_short dport, u_int length)
 {
 	register const struct bootp *bp;
 	static const u_char vm_cmu[4] = VM_CMU;
 	static const u_char vm_rfc1048[4] = VM_RFC1048;
+
+        printf("BOOTP/DHCP, length: %u",length);
+
+        if (!vflag)
+            return;
 
 	bp = (const struct bootp *)cp;
 	TCHECK(bp->bp_op);
@@ -61,59 +66,60 @@ bootp_print(register const u_char *cp, u_short sport, u_short dport)
 
 	case BOOTREQUEST:
 		/* Usually, a request goes from a client to a server */
-		if (sport != IPPORT_BOOTPC || dport != IPPORT_BOOTPS)
-			printf(" (request)");
+		if (sport == IPPORT_BOOTPC && dport == IPPORT_BOOTPS)
+			printf("\n\tRequest");
 		break;
 
 	case BOOTREPLY:
 		/* Usually, a reply goes from a server to a client */
-		if (sport != IPPORT_BOOTPS || dport != IPPORT_BOOTPC)
-			printf(" (reply)");
+		if (sport == IPPORT_BOOTPS && dport == IPPORT_BOOTPC)
+			printf("\n\tReply");
 		break;
 
 	default:
-		printf(" bootp-#%d", bp->bp_op);
+		printf("\n\tbootp-#%d", bp->bp_op);
+                break;
 	}
 
 	TCHECK(bp->bp_secs);
 
 	/* The usual hardware address type is 1 (10Mb Ethernet) */
 	if (bp->bp_htype != 1)
-		printf(" htype-#%d", bp->bp_htype);
+		printf(", htype-#%d", bp->bp_htype);
 
 	/* The usual length for 10Mb Ethernet address is 6 bytes */
 	if (bp->bp_htype != 1 || bp->bp_hlen != 6)
-		printf(" hlen:%d", bp->bp_hlen);
+		printf(", hlen:%d", bp->bp_hlen);
 
 	/* Only print interesting fields */
 	if (bp->bp_hops)
-		printf(" hops:%d", bp->bp_hops);
+		printf(", hops:%d", bp->bp_hops);
 	if (bp->bp_xid)
-		printf(" xid:0x%x", (u_int32_t)ntohl(bp->bp_xid));
+		printf(", xid:0x%x", (u_int32_t)ntohl(bp->bp_xid));
 	if (bp->bp_secs)
-		printf(" secs:%d", ntohs(bp->bp_secs));
+		printf(", secs:%d", ntohs(bp->bp_secs));
 	if (bp->bp_flags)
-		printf(" flags:0x%x", ntohs(bp->bp_flags));
+		printf(", flags:0x%x", ntohs(bp->bp_flags));
 
 	/* Client's ip address */
 	TCHECK(bp->bp_ciaddr);
 	if (bp->bp_ciaddr.s_addr)
-		printf(" C:%s", ipaddr_string(&bp->bp_ciaddr));
+		printf("\n\t  Client IP: %s", ipaddr_string(&bp->bp_ciaddr));
 
 	/* 'your' ip address (bootp client) */
 	TCHECK(bp->bp_yiaddr);
 	if (bp->bp_yiaddr.s_addr)
-		printf(" Y:%s", ipaddr_string(&bp->bp_yiaddr));
+		printf("\n\t  Your IP: %s", ipaddr_string(&bp->bp_yiaddr));
 
 	/* Server's ip address */
 	TCHECK(bp->bp_siaddr);
 	if (bp->bp_siaddr.s_addr)
-		printf(" S:%s", ipaddr_string(&bp->bp_siaddr));
+		printf("\n\t  Server IP: %s", ipaddr_string(&bp->bp_siaddr));
 
 	/* Gateway's ip address */
 	TCHECK(bp->bp_giaddr);
 	if (bp->bp_giaddr.s_addr)
-		printf(" G:%s", ipaddr_string(&bp->bp_giaddr));
+		printf("\n\t  Gateway IP: %s", ipaddr_string(&bp->bp_giaddr));
 
 	/* Client's Ethernet address */
 	if (bp->bp_htype == 1 && bp->bp_hlen == 6) {
@@ -127,14 +133,14 @@ bootp_print(register const u_char *cp, u_short sport, u_short dport)
 		else if (bp->bp_op == BOOTREPLY)
 			e = (const char *)EDST(eh);
 		else
-			e = 0;
-		if (e == 0 || memcmp((const char *)bp->bp_chaddr, e, 6) != 0)
-			printf(" ether %s", etheraddr_string(bp->bp_chaddr));
+			e = NULL;
+		if ( bp->bp_chaddr != NULL )
+                    printf("\n\t  Client Ethernet Address: %s", etheraddr_string(bp->bp_chaddr));
 	}
 
 	TCHECK2(bp->bp_sname[0], 1);		/* check first char only */
 	if (*bp->bp_sname) {
-		printf(" sname \"");
+		printf("\n\t  sname \"");
 		if (fn_print(bp->bp_sname, snapend)) {
 			putchar('"');
 			fputs(tstr + 1, stdout);
@@ -144,7 +150,7 @@ bootp_print(register const u_char *cp, u_short sport, u_short dport)
 	}
 	TCHECK2(bp->bp_sname[0], 1);		/* check first char only */
 	if (*bp->bp_file) {
-		printf(" file \"");
+		printf("\n\t  file \"");
 		if (fn_print(bp->bp_file, snapend)) {
 			putchar('"');
 			fputs(tstr + 1, stdout);
@@ -166,7 +172,7 @@ bootp_print(register const u_char *cp, u_short sport, u_short dport)
 
 		ul = EXTRACT_32BITS(&bp->bp_vend);
 		if (ul != 0)
-			printf("vend-#0x%x", ul);
+			printf("\n\t  Vendor-#0x%x", ul);
 	}
 
 	return;
@@ -349,7 +355,7 @@ rfc1048_print(register const u_char *bp)
 	u_int16_t us;
 	u_int8_t uc;
 
-	printf(" vend-rfc1048");
+	printf("\n\t  Vendor-rfc1048:");
 
 	/* Step over magic cookie */
 	bp += sizeof(int32_t);
@@ -372,7 +378,7 @@ rfc1048_print(register const u_char *bp)
 		} else
 			cp = tok2str(tag2str, "?T%u", tag);
 		c = *cp++;
-		printf(" %s:", cp);
+		printf("\n\t    %s:", cp);
 
 		/* Get the length; check for truncation */
 		if (bp + 1 >= snapend) {
