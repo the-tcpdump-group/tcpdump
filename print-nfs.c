@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.95 2002-08-01 08:53:21 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.96 2002-08-26 09:36:20 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -189,12 +189,18 @@ static int print_int64(const u_int32_t *dp, int how)
 		return (0);
 	}
 #else
+	u_int32_t high;
+
+	high = (u_int32_t)ntohl(dp[0]);
+
 	switch (how) {
 	case SIGNED:
 	case UNSIGNED:
 	case HEX:
-		printf("0x%x%08x", (u_int32_t)ntohl(dp[0]),
-		    (u_int32_t)ntohl(dp[1]));
+		if (high != 0)
+			printf("0x%x%08x", high, (u_int32_t)ntohl(dp[1]));
+		else
+			printf("0x%x", (u_int32_t)ntohl(dp[1]));
 		break;
 	default:
 		return (0);
@@ -757,6 +763,19 @@ nfs_printfh(register const u_int32_t *dp, const u_int len)
 	const char *sfsname = NULL;
 	char *spacep;
 
+	if (uflag) {
+		int i;
+		char const *sep = "";
+
+		printf(" fh[");
+		for (i=0; i<len; i++) {
+			(void)printf("%s%x", sep, dp[i]);
+			sep = ":";
+		}
+		printf("]");
+		return;
+	}
+
 	Parse_fh((const u_char *)dp, len, &fsid, &ino, NULL, &sfsname, 0);
 
 	if (sfsname) {
@@ -777,7 +796,7 @@ nfs_printfh(register const u_int32_t *dp, const u_int len)
 			     fsid.Fsid_dev.Major, fsid.Fsid_dev.Minor);
 	}
 
-	if(fsid.Fsid_dev.Minor == 257 && uflag)
+	if(fsid.Fsid_dev.Minor == 257)
 		/* Print the undecoded handle */
 		(void)printf("%s", fsid.Opaque_Handle);
 	else
@@ -1065,9 +1084,9 @@ parsefattr(const u_int32_t *dp, int verbose, int v3)
 			       (u_int32_t) ntohl(fap->fa3_rdev.specdata1),
 			       (u_int32_t) ntohl(fap->fa3_rdev.specdata2));
 			printf("fsid ");
-			print_int64((u_int32_t *)&fap->fa2_fsid, HEX);
+			print_int64((u_int32_t *)&fap->fa3_fsid, HEX);
 			printf(" nodeid ");
-			print_int64((u_int32_t *)&fap->fa2_fileid, HEX);
+			print_int64((u_int32_t *)&fap->fa3_fileid, HEX);
 			printf(" a/m/ctime %u.%06u ",
 			       (u_int32_t) ntohl(fap->fa3_atime.nfsv3_sec),
 			       (u_int32_t) ntohl(fap->fa3_atime.nfsv3_nsec));
