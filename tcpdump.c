@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.245 2004-06-15 23:09:46 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.246 2004-07-21 22:06:47 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -388,7 +388,7 @@ static int tcpdump_printf(netdissect_options *ndo _U_,
   va_end(args);
 
   return ret;
-};
+}
 
 int
 main(int argc, char **argv)
@@ -1327,7 +1327,7 @@ usage(void)
 
 
 /* VARARGS */
-void
+static void
 ndo_error(netdissect_options *ndo _U_, const char *fmt, ...)
 {
 	va_list ap;
@@ -1346,7 +1346,7 @@ ndo_error(netdissect_options *ndo _U_, const char *fmt, ...)
 }
 
 /* VARARGS */
-void
+static void
 ndo_warning(netdissect_options *ndo _U_, const char *fmt, ...)
 {
 	va_list ap;
