@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.105 2004-04-17 08:44:50 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.106 2005-03-27 03:31:01 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -166,8 +166,13 @@ AC_DEFUN(AC_LBL_C_INIT,
 # at least some versions of HP's C compiler can inline that, but can't
 # inline a function that returns a struct pointer.
 #
+# Make sure we use the V_CCOPT flags, because some of those might
+# disable inlining.
+#
 AC_DEFUN(AC_LBL_C_INLINE,
     [AC_MSG_CHECKING(for inline)
+    save_CFLAGS="$CFLAGS"
+    CFLAGS="$V_CCOPT"
     AC_CACHE_VAL(ac_cv_lbl_inline, [
 	ac_cv_lbl_inline=""
 	ac_lbl_cc_inline=no
@@ -195,6 +200,7 @@ AC_DEFUN(AC_LBL_C_INLINE,
 	if test "$ac_lbl_cc_inline" = yes ; then
 	    ac_cv_lbl_inline=$ac_lbl_inline
 	fi])
+    CFLAGS="$save_CFLAGS"
     if test ! -z "$ac_cv_lbl_inline" ; then
 	AC_MSG_RESULT($ac_cv_lbl_inline)
     else
