@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.9 2002-12-11 07:18:08 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.10 2002-12-12 13:29:20 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -116,26 +116,26 @@ static const struct tok rsvp_msg_type_values[] = {
 #define	RSVP_OBJ_FLOWSPEC           9  /* rfc2210 */
 #define	RSVP_OBJ_FILTERSPEC         10 /* rfc2210 */
 #define	RSVP_OBJ_SENDER_TEMPLATE    11
-#define	RSVP_OBJ_SENDER_TSPEC       12
+#define	RSVP_OBJ_SENDER_TSPEC       12 /* rfc2210 */
 #define	RSVP_OBJ_ADSPEC             13 /* rfc2210 */
 #define	RSVP_OBJ_POLICY_DATA        14
 #define	RSVP_OBJ_CONFIRM            15
 #define	RSVP_OBJ_LABEL              16 /* rfc3209 */
 #define	RSVP_OBJ_LABEL_REQ          19 /* rfc3209 */
-#define	RSVP_OBJ_ERO                20
-#define	RSVP_OBJ_RRO                21
-#define	RSVP_OBJ_HELLO              22
+#define	RSVP_OBJ_ERO                20 /* rfc3209 */
+#define	RSVP_OBJ_RRO                21 /* rfc3209 */
+#define	RSVP_OBJ_HELLO              22 /* rfc3209 */
 #define	RSVP_OBJ_MESSAGE_ID         23
 #define	RSVP_OBJ_MESSAGE_ID_ACK     24
 #define	RSVP_OBJ_MESSAGE_ID_LIST    25
 #define	RSVP_OBJ_RECOVERY_LABEL     34
 #define	RSVP_OBJ_UPSTREAM_LABEL     35
-#define	RSVP_OBJ_DETOUR             63
+#define	RSVP_OBJ_DETOUR             63  /* draft-ietf-mpls-rsvp-lsp-fastreroute-01 */
 #define	RSVP_OBJ_SUGGESTED_LABEL    129
 #define	RSVP_OBJ_PROPERTIES         204
-#define	RSVP_OBJ_FASTREROUTE        205
+#define	RSVP_OBJ_FASTREROUTE        205 /* draft-ietf-mpls-rsvp-lsp-fastreroute-01 */
 #define	RSVP_OBJ_SESSION_ATTRIBUTE  207 /* rfc3209 */
-#define	RSVP_OBJ_RESTART_CAPABILITY 131 /* draft-pan-rsvp-te-restart */
+#define	RSVP_OBJ_RESTART_CAPABILITY 131 /* draft-pan-rsvp-te-restart  */
 
 static const struct tok rsvp_obj_values[] = {
     { RSVP_OBJ_SESSION,            "Session" },
@@ -210,6 +210,8 @@ static const struct tok rsvp_ctype_values[] = {
     { 256*RSVP_OBJ_RRO+RSVP_CTYPE_IPV4,                      "IPv4" },
     { 256*RSVP_OBJ_RESTART_CAPABILITY+RSVP_CTYPE_1,          "IPv4" },
     { 256*RSVP_OBJ_SESSION_ATTRIBUTE+RSVP_CTYPE_TUNNEL_IPV4, "Tunnel IPv4" },
+    { 256*RSVP_OBJ_FASTREROUTE+RSVP_CTYPE_TUNNEL_IPV4,       "Tunnel IPv4" },
+    { 256*RSVP_OBJ_DETOUR+RSVP_CTYPE_TUNNEL_IPV4,            "Tunnel IPv4" },
     { 0, NULL}
 };
 
@@ -762,6 +764,44 @@ rsvp_print(register const u_char *pptr, register u_int len) {
             }
             break;
 
+        case RSVP_OBJ_FASTREROUTE:
+            switch(rsvp_obj_ctype) {
+            case RSVP_CTYPE_TUNNEL_IPV4:
+                bw.i = EXTRACT_32BITS(obj_tptr+4);
+                printf("\n\t    Setup Priority: %u, Holding Priority: %u, Hop-limit: %u, Bandwidth: %.10g Mbps",
+                       (int)*obj_tptr,
+                       (int)*(obj_tptr+1),
+                       (int)*(obj_tptr+2),
+                        bw.f*8/1000000);              
+                printf("\n\t    Include Colors: 0x%08x, Exclude Colors: 0x%08x",
+                       EXTRACT_32BITS(obj_tptr+8),
+                       EXTRACT_32BITS(obj_tptr+12));
+                obj_tlen-=16;
+                obj_tptr+=16;
+                break;
+            default:
+                hexdump=TRUE;
+            }
+            break;
+
+        case RSVP_OBJ_DETOUR:
+            switch(rsvp_obj_ctype) {
+            case RSVP_CTYPE_TUNNEL_IPV4:
+                while(obj_tlen >= 8) {
+                    printf("\n\t    PLR-ID: %s, Avoid-Node-ID: %s",
+                           ipaddr_string(obj_tptr),
+                           ipaddr_string(obj_tptr+4));              
+                    obj_tlen-=8;
+                    obj_tptr+=8;
+                }
+                break;
+            default:
+                hexdump=TRUE;
+            }
+            break;
+
+            break;
+
         /*
          *  FIXME those are the defined objects that lack a decoder
          *  you are welcome to contribute code ;-)
@@ -779,10 +819,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         case RSVP_OBJ_MESSAGE_ID_LIST:
         case RSVP_OBJ_RECOVERY_LABEL:
         case RSVP_OBJ_UPSTREAM_LABEL:
-        case RSVP_OBJ_DETOUR:
         case RSVP_OBJ_SUGGESTED_LABEL:
         case RSVP_OBJ_PROPERTIES:
-        case RSVP_OBJ_FASTREROUTE:
         default:
             if (vflag <= 1)
                 print_unknown_data(obj_tptr,"\n\t    ",obj_tlen);
