@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.243 2004-06-15 00:00:04 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.244 2004-06-15 23:05:05 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -420,7 +420,6 @@ main(int argc, char **argv)
 
         gndo->ndo_Oflag=1;
 	gndo->ndo_Rflag=1;
-	gndo->ndo_tflag=1;
 	gndo->ndo_dlt=-1;
 	gndo->ndo_printf=tcpdump_printf;
 	gndo->ndo_error=ndo_error;
@@ -644,7 +643,7 @@ main(int argc, char **argv)
 			break;
 
 		case 't':
-			--tflag;
+			++tflag;
 			break;
 
 		case 'T':
@@ -741,8 +740,13 @@ main(int argc, char **argv)
 			/* NOTREACHED */
 		}
 
-	if (tflag > 0 || tflag == -3)
+	switch (tflag) {
+
+	case 0: /* Default */
+	case 4: /* Default + Date*/
 		thiszone = gmt2local(0);
+		break;
+	}
 
 #ifdef WITH_CHROOT
 	/* if run as root, prepare for chrooting */

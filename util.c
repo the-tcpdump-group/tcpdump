@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.93 2004-04-29 02:15:16 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.94 2004-06-15 23:05:06 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -116,19 +116,25 @@ ts_print(register const struct timeval *tvp)
 	static unsigned b_sec;
 	static unsigned b_usec;
 
-	switch(tflag) {
-	case 1: /* Default */
+	switch (tflag) {
+
+	case 0: /* Default */
 		s = (tvp->tv_sec + thiszone) % 86400;
 		(void)printf("%02d:%02d:%02d.%06u ",
 			     s / 3600, (s % 3600) / 60, s % 60,
 			     (unsigned)tvp->tv_usec);
 		break;
-	case -1: /* Unix timeval style */
+
+	case 1: /* No time stamp */
+		break;
+
+	case 2: /* Unix timeval style */
 		(void)printf("%u.%06u ",
 			     (unsigned)tvp->tv_sec,
 			     (unsigned)tvp->tv_usec);
 		break;
-	case -2:
+
+	case 3: /* Microseconds since previous packet */
 		if (b_sec == 0) {
 			printf("000000 ");
 		} else {
@@ -146,7 +152,8 @@ ts_print(register const struct timeval *tvp)
 		b_sec = tvp->tv_sec;
 		b_usec = tvp->tv_usec;
 		break;
-	case -3: /* Default + Date*/
+
+	case 4: /* Default + Date*/
 		s = (tvp->tv_sec + thiszone) % 86400;
 		Time = (tvp->tv_sec + thiszone) - s;
 		tm = gmtime (&Time);
