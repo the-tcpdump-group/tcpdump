@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.117 2004-07-15 00:13:01 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.118 2004-09-15 01:21:17 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -52,6 +52,10 @@ static const char rcsid[] _U_ =
 
 #ifdef HAVE_LIBCRYPTO
 #include <openssl/md5.h>
+
+#define SIGNATURE_VALID		0
+#define SIGNATURE_INVALID	1
+#define CANT_CHECK_SIGNATURE	2
 
 static int tcp_verify_signature(const struct ip *ip, const struct tcphdr *tp,
     const u_char *data, int length, const u_char *rcvsig);
@@ -589,11 +593,23 @@ tcp_print(register const u_char *bp, register u_int length,
 				datalen = TCP_SIGLEN;
 				LENCHECK(datalen);
 #ifdef HAVE_LIBCRYPTO
-				if (tcp_verify_signature(ip, tp,
-				    bp + TH_OFF(tp) * 4, length, cp) == 0)
+				switch (tcp_verify_signature(ip, tp,
+				    bp + TH_OFF(tp) * 4, length, cp)) {
+
+				case SIGNATURE_VALID:
 					(void)printf("valid");
-				else
+					break;
+
+				case SIGNATURE_INVALID:
 					(void)printf("invalid");
+					break;
+
+				case CANT_CHECK_SIGNATURE:
+					(void)printf("can't check - ");
+					for (i = 0; i < TCP_SIGLEN; ++i)
+						(void)printf("%02x", cp[i]);
+					break;
+				}
 #else
 				for (i = 0; i < TCP_SIGLEN; ++i)
 					(void)printf("%02x", cp[i]);
@@ -724,14 +740,16 @@ tcp_verify_signature(const struct ip *ip, const struct tcphdr *tp,
 	char zero_proto = 0;
 	MD5_CTX ctx;
 	u_int16_t savecsum, tlen;
+#ifdef INET6
 	struct ip6_hdr *ip6;
+#endif
 	u_int32_t len32;
 	u_int8_t nxt;
 
 	tp1 = *tp;
 
 	if (tcpmd5secret == NULL)
-		return (-1);
+		return (CANT_CHECK_SIGNATURE);
 
 	MD5_Init(&ctx);
 	/*
@@ -745,6 +763,7 @@ tcp_verify_signature(const struct ip *ip, const struct tcphdr *tp,
 		tlen = EXTRACT_16BITS(&ip->ip_len) - IP_HL(ip) * 4;
 		tlen = htons(tlen);
 		MD5_Update(&ctx, (char *)&tlen, sizeof(tlen));
+#ifdef INET6
 	} else if (IP_V(ip) == 6) {
 		ip6 = (struct ip6_hdr *)ip;
 		MD5_Update(&ctx, (char *)&ip6->ip6_src, sizeof(ip6->ip6_src));
@@ -757,8 +776,9 @@ tcp_verify_signature(const struct ip *ip, const struct tcphdr *tp,
 		MD5_Update(&ctx, (char *)&nxt, sizeof(nxt));
 		nxt = IPPROTO_TCP;
 		MD5_Update(&ctx, (char *)&nxt, sizeof(nxt));
+#endif
 	} else
-		return (-1);
+		return (CANT_CHECK_SIGNATURE);
 
 	/*
 	 * Step 2: Update MD5 hash with TCP header, excluding options.
@@ -779,6 +799,9 @@ tcp_verify_signature(const struct ip *ip, const struct tcphdr *tp,
 	MD5_Update(&ctx, tcpmd5secret, strlen(tcpmd5secret));
 	MD5_Final(sig, &ctx);
 
-	return (memcmp(rcvsig, sig, 16));
+	if (memcmp(rcvsig, sig, 16))
+		return (SIGNATURE_VALID);
+	else
+		return (SIGNATURE_INVALID);
 }
 #endif /* HAVE_LIBCRYPTO */
