@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.176 2004-02-25 14:23:32 hannes Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.177 2004-03-23 18:57:33 fenner Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.176 $)
+AC_REVISION($Revision: 1.177 $)
 AC_PREREQ(2.50)
 AC_INIT(tcpdump.c)
 
@@ -16,7 +16,9 @@ AC_LBL_C_INIT(V_CCOPT, V_INCLS)
 AC_LBL_C_INLINE
 AC_C___ATTRIBUTE__
 
-AC_CHECK_HEADERS(fcntl.h rpc/rpcent.h netinet/if_ether.h netdnet/dnetdb.h netinet/ether.h)
+AC_CHECK_HEADERS(fcntl.h rpc/rpcent.h netdnet/dnetdb.h netinet/ether.h)
+AC_CHECK_HEADERS(netinet/if_ether.h, , , [#include <sys/types.h>
+#include <sys/socket.h>])
 AC_HEADER_TIME
 
 case "$host_os" in
@@ -586,6 +588,12 @@ if test "$ac_cv_sockaddr_has_sa_len" = no; then
 fi
 
 AC_CHECK_FUNCS(pcap_findalldevs pcap_dump_flush pcap_lib_version)
+if test $ac_cv_func_pcap_findalldevs = "yes" ; then
+dnl Check for MacOS X, which may ship pcap.h from 0.6 but libpcap may
+dnl be 0.8; this means that lib has pcap_findalldevs but header doesn't
+dnl have pcap_if_t.
+    AC_CHECK_TYPES(pcap_if_t, , , [#include <pcap.h>])
+fi
 if test $ac_cv_func_pcap_lib_version = "no" ; then
     AC_MSG_CHECKING(whether pcap_version is defined by libpcap)
     AC_TRY_LINK([],

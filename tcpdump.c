@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.237 2004-03-23 07:15:38 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.238 2004-03-23 18:57:33 fenner Exp $ (LBL)";
 #endif
 
 /*
@@ -320,6 +320,12 @@ show_dlts_and_exit(pcap_t *pd)
 #define B_FLAG
 #define B_FLAG_USAGE
 #endif /* WIN32 */
+
+#ifdef HAVE_PCAP_FINDALLDEVS
+#ifndef HAVE_PCAP_IF_T
+#undef HAVE_PCAP_FINDALLDEVS
+#endif
+#endif
 
 #ifdef HAVE_PCAP_FINDALLDEVS
 #define D_FLAG	"D"
