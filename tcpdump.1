@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.126 2002-08-06 04:32:32 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.127 2002-08-08 08:41:56 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -510,6 +510,7 @@ protos are:
 .BR ether ,
 .BR fddi ,
 .BR tr ,
+.BR wlan ,
 .BR ip ,
 .BR ip6 ,
 .BR arp ,
@@ -535,8 +536,11 @@ analogous Ethernet fields.
 FDDI headers also contain other fields,
 but you cannot name them explicitly in a filter expression.
 .LP
-Similarly, `tr' is an alias for `ether'; the previous paragraph's
-statements about FDDI headers also apply to Token Ring headers.]
+Similarly, `tr' and `wlan' are aliases for `ether'; the previous
+paragraph's statements about FDDI headers also apply to Token Ring
+and 802.11 wireless LAN headers.  For 802.11 headers, the destination
+address is the DA field and the source address is the SA field; the
+BSSID, RA, and TA fields aren't tested.]
 .LP
 In addition to the above, there are some special `primitive' keywords
 that don't follow the pattern:
@@ -728,35 +732,54 @@ True if the packet is of ether type \fIprotocol\fR.
 Note these identifiers are also keywords
 and must be escaped via backslash (\\).
 .IP
-[In the case of FDDI (e.g., `\fBfddi protocol arp\fR') and Token Ring
-(e.g., `\fBtr protocol arp\fR'), for most of those protocols, the
+[In the case of FDDI (e.g., `\fBfddi protocol arp\fR'), Token Ring
+(e.g., `\fBtr protocol arp\fR'), and IEEE 802.11 wireless LANS (e.g.,
+`\fBwlan protocol arp\fR'), for most of those protocols, the
 protocol identification comes from the 802.2 Logical Link Control (LLC)
-header, which is usually layered on top of the FDDI or Token Ring
-header.
+header, which is usually layered on top of the FDDI, Token Ring, or
+802.11 header.
 .IP
-When filtering for most protocol identifiers on FDDI or Token Ring,
-\fItcpdump\fR checks only the protocol ID field of an LLC header in
-so-called SNAP format with an Organizational Unit Identifier (OUI) of
+When filtering for most protocol identifiers on FDDI, Token Ring, or
+802.11, \fItcpdump\fR checks only the protocol ID field of an LLC header
+in so-called SNAP format with an Organizational Unit Identifier (OUI) of
 0x000000, for encapsulated Ethernet; it doesn't check whether the packet
 is in SNAP format with an OUI of 0x000000.
-.IP
-The exceptions are \fIiso\fP, for which it checks the DSAP (Destination
-Service Access Point) and SSAP (Source Service Access Point) fields of
-the LLC header, \fIstp\fP and \fInetbeui\fP, where it checks the DSAP of
-the LLC header, and \fIatalk\fP, where it checks for a SNAP-format
-packet with an OUI of 0x080007 and the Appletalk etype.
+The exceptions are:
+.RS
+.TP
+\fBiso\fP
+\fItcpdump\fR checks the DSAP (Destination Service Access Point) and
+SSAP (Source Service Access Point) fields of the LLC header;
+.TP
+\fBstp\fP and \fInetbeui\fP
+\fItcpdump\fR checks the DSAP of the LLC header;
+.TP
+\fIatalk\fP
+\fItcpdump\fR checks for a SNAP-format packet with an OUI of 0x080007
+and the Appletalk etype.
+.RE
 .IP
 In the case of Ethernet, \fItcpdump\fR checks the Ethernet type field
-for most of those protocols; the exceptions are \fIiso\fP, \fIsap\fP,
-and \fInetbeui\fP, for which it checks for an 802.3 frame and then
-checks the LLC header as it does for FDDI and Token Ring, \fIatalk\fP,
-where it checks both for the Appletalk etype in an Ethernet frame and
-for a SNAP-format packet as it does for FDDI and Token Ring, \fIaarp\fP,
-where it checks for the Appletalk ARP etype in either an Ethernet frame
-or an 802.2 SNAP frame with an OUI of 0x000000, and \fIipx\fP, where it
-checks for the IPX etype in an Ethernet frame, the IPX DSAP in the LLC
-header, the 802.3 with no LLC header encapsulation of IPX, and the IPX
-etype in a SNAP frame.]
+for most of those protocols.  The exceptions are:
+.RS
+.TP
+\fBiso\fP, \fBsap\fP, and \fBnetbeui\fP
+\fItcpdump\fR checks for an 802.3 frame and then checks the LLC header as
+it does for FDDI, Token Ring, and 802.11;
+.TP
+\fBatalk\fP
+\fItcpdump\fR checks both for the Appletalk etype in an Ethernet frame and
+for a SNAP-format packet as it does for FDDI, Token Ring, and 802.11;
+.TP
+\fBaarp\fP
+\fItcpdump\fR checks for the Appletalk ARP etype in either an Ethernet
+frame or an 802.2 SNAP frame with an OUI of 0x000000;
+.TP
+\fBipx\fP
+\fItcpdump\fR checks for the IPX etype in an Ethernet frame, the IPX
+DSAP in the LLC header, the 802.3-with-no-LLC-header encapsulation of
+IPX, and the IPX etype in a SNAP frame.
+.RE
 .IP "\fBdecnet src \fIhost\fR"
 True if the DECNET source address is
 .IR host ,
@@ -874,11 +897,11 @@ data inside the packet, use the following syntax:
 \fIproto\fB [ \fIexpr\fB : \fIsize\fB ]\fR
 .fi
 .in -.5i
-\fIProto\fR is one of \fBether, fddi, tr, ppp, slip, link,
+\fIProto\fR is one of \fBether, fddi, tr, wlan, ppp, slip, link,
 ip, arp, rarp, tcp, udp, icmp\fR or \fBip6\fR, and
 indicates the protocol layer for the index operation.
-(\fBether, fddi, tr, ppp, slip\fR and \fBlink\fR all refer to the link
-layer.)
+(\fBether, fddi, wlan, tr, ppp, slip\fR and \fBlink\fR all refer to the
+link layer.)
 Note that \fItcp, udp\fR and other upper-layer protocol types only
 apply to IPv4, not IPv6 (this will be fixed in the future).
 The byte offset, relative to the indicated protocol layer, is
@@ -1083,6 +1106,12 @@ packets are assumed to contain an LLC packet.
 Regardless of whether
 the '-e' option is specified or not, the source routing information is
 printed for source-routed packets.
+.LP
+On 802.11 networks, the '-e' option causes \fItcpdump\fP to print
+the `frame control' fields, all of the addresses in the 802.11 header,
+and the packet length.
+As on FDDI networks,
+packets are assumed to contain an LLC packet.
 .LP
 \fI(N.B.: The following description assumes familiarity with
 the SLIP compression algorithm described in RFC-1144.)\fP
@@ -2016,16 +2045,19 @@ prefer to fix the program generating them rather than \fItcpdump\fP.
 A packet trace that crosses a daylight savings time change will give
 skewed time stamps (the time change is ignored).
 .LP
-Filter expressions that manipulate FDDI or Token Ring headers assume
-that all FDDI and Token Ring packets are SNAP-encapsulated Ethernet
-packets.
+Filter expressions that manipulate FDDI, Token Ring, or 802.11 headers
+assume that all FDDI, Token Ring, and 802.11 packets are
+SNAP-encapsulated Ethernet packets.
 This is true for IP, ARP, and DECNET Phase IV, but is not true
 for protocols such as ISO CLNS.
 Therefore, the filter may inadvertently
 accept certain packets that do not properly match the filter expression.
 .LP
-Filter expressions on fields other than those that manipulate Token Ring
-headers will not correctly handle source-routed Token Ring packets.
+Filter expressions on fields other than those in Token Ring headers will
+not correctly handle source-routed Token Ring packets.
+.LP
+Filter expressions on fields other than those in 802.11 headers will not
+correctly handle 802.11 data packets with both To DS and From DS set.
 .LP
 .BR "ip6 proto"
 should chase header chain, but at this moment it does not.
