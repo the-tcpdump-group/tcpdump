@@ -158,8 +158,10 @@ smb.h
 smbutil.c
 stime.awk
 strcasecmp.c
+tcp.h
 tcpdump.1
 tcpdump.c
 token.h
+udp.h
 util.c
 vfprintf.c

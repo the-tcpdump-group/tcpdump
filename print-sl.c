@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sl.c,v 1.48 2000-09-23 08:03:40 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sl.c,v 1.49 2000-09-23 08:26:38 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -44,8 +44,6 @@ struct rtentry;
 #include <netinet/in.h>
 #include <netinet/in_systm.h>
 #include <netinet/ip.h>
-#include <netinet/udp.h>
-#include <netinet/tcp.h>
 
 #include <net/slcompress.h>
 #include <net/slip.h>
@@ -58,6 +56,8 @@ struct rtentry;
 #include "interface.h"
 #include "addrtoname.h"
 #include "extract.h"			/* must come after interface.h */
+
+#include "tcp.h"
 
 static u_int lastlen[2][256];
 static u_int lastconn = 255;

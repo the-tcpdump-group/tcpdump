@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.49 2000-09-23 08:03:35 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.50 2000-09-23 08:26:34 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -41,9 +41,6 @@ struct rtentry;
 #include <netinet/ip.h>
 #include <netinet/ip_icmp.h>
 #include <netinet/ip_var.h>
-#include <netinet/udp.h>
-#include <netinet/udp_var.h>
-#include <netinet/tcp.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -51,6 +48,8 @@ struct rtentry;
 #include "interface.h"
 #include "addrtoname.h"
 #include "extract.h"			/* must come after interface.h */
+
+#include "udp.h"
 
 /* rfc1700 */
 #ifndef ICMP_UNREACH_NET_UNKNOWN

@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ether.h,v 1.2 2000-09-23 08:26:30 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/tcp.h,v 1.1 2000-09-23 08:26:39 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1982, 1986, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -31,32 +31,51 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	@(#)if_ether.h	8.3 (Berkeley) 5/2/95
+ *	@(#)tcp.h	8.1 (Berkeley) 6/10/93
  */
 
-#if 0
-#include <net/if_arp.h>
+typedef	u_int	tcp_seq;
+/*
+ * TCP header.
+ * Per RFC 793, September, 1981.
+ */
+struct tcphdr {
+	u_short	th_sport;		/* source port */
+	u_short	th_dport;		/* destination port */
+	tcp_seq	th_seq;			/* sequence number */
+	tcp_seq	th_ack;			/* acknowledgement number */
+#if BYTE_ORDER == LITTLE_ENDIAN 
+	u_char	th_x2:4,		/* (unused) */
+		th_off:4;		/* data offset */
 #endif
-
-#define	ETHERMTU	1500
-
-/*
- * The number of bytes in an ethernet (MAC) address.
- */
-#define	ETHER_ADDR_LEN		6
-
-/*
- * Ethernet address - 6 octets
- */
-struct ether_addr {
-	u_char	ether_addr_octet[ETHER_ADDR_LEN];
+#if BYTE_ORDER == BIG_ENDIAN 
+	u_char	th_off:4,		/* data offset */
+		th_x2:4;		/* (unused) */
+#endif
+	u_char	th_flags;
+#define	TH_FIN	0x01
+#define	TH_SYN	0x02
+#define	TH_RST	0x04
+#define	TH_PUSH	0x08
+#define	TH_ACK	0x10
+#define	TH_URG	0x20
+	u_short	th_win;			/* window */
+	u_short	th_sum;			/* checksum */
+	u_short	th_urp;			/* urgent pointer */
 };
 
-/*
- * Structure of a 10Mb/s Ethernet header.
- */
-struct	ether_header {
-	u_char	ether_dhost[ETHER_ADDR_LEN];
-	u_char	ether_shost[ETHER_ADDR_LEN];
-	u_short	ether_type;
-};
+#define	TCPOPT_EOL		0
+#define	TCPOPT_NOP		1
+#define	TCPOPT_MAXSEG		2
+#define    TCPOLEN_MAXSEG		4
+#define TCPOPT_WINDOW		3
+#define    TCPOLEN_WINDOW		3
+#define TCPOPT_SACK_PERMITTED	4		/* Experimental */
+#define    TCPOLEN_SACK_PERMITTED	2
+#define TCPOPT_SACK		5		/* Experimental */
+#define TCPOPT_TIMESTAMP	8
+#define    TCPOLEN_TIMESTAMP		10
+#define    TCPOLEN_TSTAMP_APPA		(TCPOLEN_TIMESTAMP+2) /* appendix A */
+
+#define TCPOPT_TSTAMP_HDR	\
+    (TCPOPT_NOP<<24|TCPOPT_NOP<<16|TCPOPT_TIMESTAMP<<8|TCPOLEN_TIMESTAMP)

@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ether.h,v 1.2 2000-09-23 08:26:30 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/udp.h,v 1.1 2000-09-23 08:26:39 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1982, 1986, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -31,32 +31,16 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	@(#)if_ether.h	8.3 (Berkeley) 5/2/95
+ *	@(#)udp.h	8.1 (Berkeley) 6/10/93
  */
-
-#if 0
-#include <net/if_arp.h>
-#endif
-
-#define	ETHERMTU	1500
 
 /*
- * The number of bytes in an ethernet (MAC) address.
+ * Udp protocol header.
+ * Per RFC 768, September, 1981.
  */
-#define	ETHER_ADDR_LEN		6
-
-/*
- * Ethernet address - 6 octets
- */
-struct ether_addr {
-	u_char	ether_addr_octet[ETHER_ADDR_LEN];
-};
-
-/*
- * Structure of a 10Mb/s Ethernet header.
- */
-struct	ether_header {
-	u_char	ether_dhost[ETHER_ADDR_LEN];
-	u_char	ether_shost[ETHER_ADDR_LEN];
-	u_short	ether_type;
+struct udphdr {
+	u_short	uh_sport;		/* source port */
+	u_short	uh_dport;		/* destination port */
+	short	uh_ulen;		/* udp length */
+	u_short	uh_sum;			/* udp checksum */
 };
