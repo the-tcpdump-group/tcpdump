@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.66 2001-01-28 07:47:56 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.67 2001-01-28 07:56:21 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -269,16 +269,16 @@ static struct tok type2str[] = {
 	{ T_PX,		"PX" },
 	{ T_GPOS,	"GPOS" },
 	{ T_AAAA,	"AAAA" },
-	{ T_LOC,	"LOC " },
-	{ T_NXT,	"NXT " },
-	{ T_EID,	"EID " },
-	{ T_NIMLOC,	"NIMLOC " },
-	{ T_SRV,	"SRV " },
-	{ T_ATMA,	"ATMA " },
-	{ T_NAPTR,	"NAPTR " },
-	{ T_A6,		"A6 " },
-	{ T_DNAME,	"DNAME " },
-	{ T_OPT,	"OPT " },
+	{ T_LOC,	"LOC" },
+	{ T_NXT,	"NXT" },
+	{ T_EID,	"EID" },
+	{ T_NIMLOC,	"NIMLOC" },
+	{ T_SRV,	"SRV" },
+	{ T_ATMA,	"ATMA" },
+	{ T_NAPTR,	"NAPTR" },
+	{ T_A6,		"A6" },
+	{ T_DNAME,	"DNAME" },
+	{ T_OPT,	"OPT" },
 	{ T_UINFO,	"UINFO" },
 	{ T_UID,	"UID" },
 	{ T_GID,	"GID" },
@@ -293,7 +293,7 @@ static struct tok type2str[] = {
 
 static struct tok class2str[] = {
 	{ C_IN,		"IN" },		/* Not used */
-	{ C_CHAOS,	"CHAOS)" },
+	{ C_CHAOS,	"CHAOS" },
 	{ C_HS,		"HS" },
 	{ C_ANY,	"ANY" },
 	{ 0,		NULL }
