@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.30 2004-09-23 21:57:25 dyoung Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.31 2004-11-04 07:35:53 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -964,7 +964,7 @@ print_radiotap_field(struct cpack_state *s, u_int32_t bit)
 		rc = cpack_uint8(s, &u.u8);
 		break;
 	case IEEE80211_RADIOTAP_DBM_TX_POWER:
-		rc = cpack_uint8(s, &u.i8);
+		rc = cpack_int8(s, &u.i8);
 		break;
 	case IEEE80211_RADIOTAP_TSFT:
 		rc = cpack_uint64(s, &u.u64);
