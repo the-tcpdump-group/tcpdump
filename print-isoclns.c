@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.88 2003-06-17 06:05:22 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.89 2003-06-28 17:15:19 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -245,9 +245,6 @@ static struct tok isis_mt_flag_values[] = {
 #define ISIS_MASK_TLV_EXT_IP6_IE(x)        ((x)&0x40)
 #define ISIS_MASK_TLV_EXT_IP6_SUBTLV(x)    ((x)&0x20)
 
-#define ISIS_MASK_TLV_RESTART_RR(x)        ((x)&0x1)
-#define ISIS_MASK_TLV_RESTART_RA(x)        ((x)&0x2)
-
 #define ISIS_LSP_TLV_METRIC_SUPPORTED(x)   ((x)&0x80)
 #define ISIS_LSP_TLV_METRIC_IE(x)          ((x)&0x40)
 #define ISIS_LSP_TLV_METRIC_UPDOWN(x)      ((x)&0x80)
@@ -345,6 +342,12 @@ struct isis_tlv_ip_reach {
 static struct tok isis_is_reach_virtual_values[] = {
     { 0,    "IsNotVirtual"},
     { 1,    "IsVirtual"},
+    { 0, NULL }
+};
+
+static struct tok isis_restart_flag_values[] = {
+    { 0x1,  "Restart Request"},
+    { 0x2,  "Restart Acknowledgement"},
     { 0, NULL }
 };
 
@@ -1899,12 +1902,10 @@ static int isis_print (const u_int8_t *p, u_int length)
 	case TLV_RESTART_SIGNALING:
             if (!TTEST2(*tptr, 3))
                 goto trunctlv;
-	    rr = ISIS_MASK_TLV_RESTART_RR(*tptr);
-	    ra = ISIS_MASK_TLV_RESTART_RA(*tptr);
-	    tptr++;
-	    time_remain = EXTRACT_16BITS(tptr);
-	    printf("\n\t      Restart Request bit %s, Restart Acknowledgement bit %s\n\t      Remaining holding time: %us",
-		   rr ? "set" : "clear", ra ? "set" : "clear", time_remain);
+            printf("\n\t      Flags [%s], Remaining holding time %us",
+                   bittok2str(isis_restart_flag_values, "none", *tptr),
+                   EXTRACT_16BITS(tptr+1));
+	    tptr+=3;
 	    break;
 
         case TLV_IDRP_INFO:
