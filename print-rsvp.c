@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.10 2002-12-12 13:29:20 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.11 2002-12-12 15:58:33 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -113,11 +113,11 @@ static const struct tok rsvp_msg_type_values[] = {
 #define	RSVP_OBJ_ERROR_SPEC         6 
 #define	RSVP_OBJ_SCOPE              7
 #define	RSVP_OBJ_STYLE              8  /* rfc2205 */
-#define	RSVP_OBJ_FLOWSPEC           9  /* rfc2210 */
-#define	RSVP_OBJ_FILTERSPEC         10 /* rfc2210 */
+#define	RSVP_OBJ_FLOWSPEC           9  /* rfc2215 */
+#define	RSVP_OBJ_FILTERSPEC         10 /* rfc2215 */
 #define	RSVP_OBJ_SENDER_TEMPLATE    11
-#define	RSVP_OBJ_SENDER_TSPEC       12 /* rfc2210 */
-#define	RSVP_OBJ_ADSPEC             13 /* rfc2210 */
+#define	RSVP_OBJ_SENDER_TSPEC       12 /* rfc2215 */
+#define	RSVP_OBJ_ADSPEC             13 /* rfc2215 */
 #define	RSVP_OBJ_POLICY_DATA        14
 #define	RSVP_OBJ_CONFIRM            15
 #define	RSVP_OBJ_LABEL              16 /* rfc3209 */
@@ -191,6 +191,8 @@ static const struct tok rsvp_ctype_values[] = {
     { 256*RSVP_OBJ_TIME_VALUES+RSVP_CTYPE_1,	             "1" },
     { 256*RSVP_OBJ_FLOWSPEC+RSVP_CTYPE_1,	             "obsolete" },
     { 256*RSVP_OBJ_FLOWSPEC+RSVP_CTYPE_2,	             "IntServ" },
+    { 256*RSVP_OBJ_SENDER_TSPEC+RSVP_CTYPE_2,	             "IntServ" },
+    { 256*RSVP_OBJ_ADSPEC+RSVP_CTYPE_2,	                     "IntServ" },
     { 256*RSVP_OBJ_FILTERSPEC+RSVP_CTYPE_IPV4,	             "IPv4" },
     { 256*RSVP_OBJ_FILTERSPEC+RSVP_CTYPE_IPV6,	             "IPv6" },
     { 256*RSVP_OBJ_FILTERSPEC+RSVP_CTYPE_3,	             "IPv6 Flow-label" },
@@ -244,14 +246,19 @@ static const struct tok rsvp_resstyle_values[] = {
 #define RSVP_OBJ_INTSERV_CONTROLLED_LOAD 5
 
 static const struct tok rsvp_intserv_service_type_values[] = {
+    { 1,                                "Default/Global Information" },
     { RSVP_OBJ_INTSERV_CONTROLLED_LOAD,	"Controlled Load" },
     { RSVP_OBJ_INTSERV_GUARANTEED_SERV, "Guaranteed Service" },
     { 0, NULL}
 };
 
 static const struct tok rsvp_intserv_parameter_id_values[] = {
-    { 127,	              "Token Bucket TSpec" },
-    { 130,	              "Guaranteed Service RSpec" },
+    { 4,                     "IS hop cnt" },
+    { 6,                     "Path b/w estimate" },
+    { 8,                     "Minimum path latency" },
+    { 10,                    "Composed MTU" },
+    { 127,                   "Token Bucket TSpec" },
+    { 130,                   "Guaranteed Service RSpec" },
     { 0, NULL}
 };
 
@@ -265,6 +272,142 @@ static struct tok rsvp_session_attribute_flag_values[] = {
 #define FALSE 0
 #define TRUE  1
 
+
+int rsvp_intserv_print(const u_char *);
+
+/* 
+ * this is a dissector for all the intserv defined
+ * specs as defined per rfc2215
+ * it is called from various rsvp objects;
+ * returns the amount of bytes being processed
+ */
+int
+rsvp_intserv_print(const u_char *tptr) {
+
+    int parameter_id,parameter_length;
+    union {
+	float f;
+	u_int32_t i;
+    } bw;
+
+    parameter_id = *(tptr);
+    parameter_length = EXTRACT_16BITS(tptr+2)<<2; /* convert wordcount to bytecount */
+
+    printf("\n\t      Parameter ID: %s (%u), length: %u, Flags: [0x%02x]",
+           tok2str(rsvp_intserv_parameter_id_values,"unknown",parameter_id),
+           parameter_id,
+           parameter_length,
+           *(tptr+1));
+
+    switch(parameter_id) { /* parameter_id */
+
+    case 4:
+       /*
+        * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        * |    4 (e)      |    (f)        |           1 (g)               |
+        * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        * |        IS hop cnt (32-bit unsigned integer)                   |
+        * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        */
+        printf("\n\t\tIS hop cnt: %u", EXTRACT_32BITS(tptr+4));
+        break;
+
+    case 6:
+       /*
+        * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        * |    6 (h)      |    (i)        |           1 (j)               |
+        * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        * |  Path b/w estimate  (32-bit IEEE floating point number)       |
+        * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        */
+        bw.i = EXTRACT_32BITS(tptr+4);
+        printf("\n\t\tPath b/w estimate: %.10g Mbps", bw.f/125000);
+        break;
+
+    case 8:
+       /*
+        * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        * |     8 (k)     |    (l)        |           1 (m)               |
+        * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        * |        Minimum path latency (32-bit integer)                  |
+        * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        */
+        printf("\n\t\tMinimum path latency: ");
+        if (EXTRACT_32BITS(tptr+4) == 0xffffffff)
+            printf("don't care");
+        else
+            printf("%u", EXTRACT_32BITS(tptr+4));
+        break;
+
+    case 10:
+
+       /*
+        * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        * |     10 (n)    |      (o)      |           1 (p)               |
+        * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        * |      Composed MTU (32-bit unsigned integer)                   |
+        * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        */
+        printf("\n\t\tComposed MTU: %u bytes", EXTRACT_32BITS(tptr+4));
+        break;
+    case 127:
+       /* 
+        * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        * |   127 (e)     |    0 (f)      |             5 (g)             |
+        * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        * |  Token Bucket Rate [r] (32-bit IEEE floating point number)    |
+        * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        * |  Token Bucket Size [b] (32-bit IEEE floating point number)    |
+        * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        * |  Peak Data Rate [p] (32-bit IEEE floating point number)       |
+        * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        * |  Minimum Policed Unit [m] (32-bit integer)                    |
+        * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        * |  Maximum Packet Size [M]  (32-bit integer)                    |
+        * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        */
+
+        bw.i = EXTRACT_32BITS(tptr+4);
+        printf("\n\t\tToken Bucket Rate: %.10g Mbps", bw.f/125000);
+        bw.i = EXTRACT_32BITS(tptr+8);
+        printf("\n\t\tToken Bucket Size: %.10g bytes", bw.f);
+        bw.i = EXTRACT_32BITS(tptr+12);
+        printf("\n\t\tPeak Data Rate: %.10g Mbps", bw.f/125000);
+        printf("\n\t\tMinimum Policed Unit: %u bytes", EXTRACT_32BITS(tptr+16));
+        printf("\n\t\tMaximum Packet Size: %u bytes", EXTRACT_32BITS(tptr+20));
+        break;
+
+    case 130:
+       /* 
+        * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        * |     130 (h)   |    0 (i)      |            2 (j)              |
+        * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        * |  Rate [R]  (32-bit IEEE floating point number)                |
+        * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        * |  Slack Term [S]  (32-bit integer)                             |
+        * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        */
+
+        bw.i = EXTRACT_32BITS(tptr+4);
+        printf("\n\t\tRate: %.10g Mbps", bw.f/125000);
+        printf("\n\t\tSlack Term: %u", EXTRACT_32BITS(tptr+8));
+        break;
+    /*
+     *  FIXME those are the defined paramters that lack a decoder
+     *  you are welcome to contribute code ;-)
+     */
+    case 133:
+    case 134:
+    case 135:
+    case 136:
+
+    default:
+        if (vflag <= 1)
+            print_unknown_data(tptr+4,"\n\t      ",parameter_length);
+    }
+    return (parameter_length+4); /* header length 4 bytes */
+}
+
 void
 rsvp_print(register const u_char *pptr, register u_int len) {
 
@@ -272,7 +415,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
     const struct rsvp_object_header *rsvp_obj_header;
     const u_char *tptr,*obj_tptr;
     u_short tlen,rsvp_obj_len,rsvp_obj_ctype,obj_tlen;
-    int hexdump;
+    int hexdump,processed;
     union {
 	float f;
 	u_int32_t i;
@@ -375,6 +518,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 obj_tlen-=20;
                 obj_tptr+=20;                
                 break;
+
             case RSVP_CTYPE_TUNNEL_IPV6:
                 printf("\n\t    IPv6 Tunnel EndPoint: %s, Tunnel ID: 0x%04x, Extended Tunnel ID: %s",
                        ip6addr_string(obj_tptr),
@@ -396,6 +540,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 hexdump=TRUE;
             }
             break;
+
         case RSVP_OBJ_LABEL:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_1:
@@ -409,6 +554,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 hexdump=TRUE;
             }
             break;
+
         case RSVP_OBJ_STYLE:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_1:
@@ -424,6 +570,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 hexdump=TRUE;
             }
             break;
+
         case RSVP_OBJ_SENDER_TEMPLATE:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_TUNNEL_IPV4:
@@ -437,6 +584,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 hexdump=TRUE;
             }
             break;
+
         case RSVP_OBJ_LABEL_REQ:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_1:
@@ -481,6 +629,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 hexdump=TRUE;
             }
             break;
+
         case RSVP_OBJ_RRO:
         case RSVP_OBJ_ERO:
             switch(rsvp_obj_ctype) {
@@ -505,6 +654,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 hexdump=TRUE;
             }
             break;
+
         case RSVP_OBJ_HELLO:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_1:
@@ -519,6 +669,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 hexdump=TRUE;
             }
             break;
+
         case RSVP_OBJ_RESTART_CAPABILITY:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_1:
@@ -530,6 +681,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 hexdump=TRUE;
             }
             break;
+
         case RSVP_OBJ_SESSION_ATTRIBUTE:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_TUNNEL_IPV4:
@@ -548,6 +700,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 hexdump=TRUE;
             }
             break;
+
         case RSVP_OBJ_RSVP_HOP:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_IPV4:
@@ -570,6 +723,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 hexdump=TRUE;
             }
             break;
+
         case RSVP_OBJ_TIME_VALUES:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_1:
@@ -582,138 +736,30 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 hexdump=TRUE;
             }
             break;
+
+        /* those three objects do share the same semantics */
+        case RSVP_OBJ_SENDER_TSPEC:
+        case RSVP_OBJ_ADSPEC:
         case RSVP_OBJ_FLOWSPEC:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_2:
-                printf("\n\t    Msg-Version: %u, length: %u words (32-bit), Service Type: %s (%u)",
+                printf("\n\t    Msg-Version: %u, length: %u\n\t      Service Type: %s (%u), Service length: %u",
                        (*obj_tptr & 0xf0) >> 4,
-                       EXTRACT_16BITS(obj_tptr+2),
+                       EXTRACT_16BITS(obj_tptr+2)<<2,
                        tok2str(rsvp_intserv_service_type_values,"unknown",*(obj_tptr+4)),
-                       *(obj_tptr+4));
+                       *(obj_tptr+4),
+                       EXTRACT_16BITS(obj_tptr+6)<<2);
 
-                switch (*(obj_tptr+4)) {
+                obj_tlen-=8; /* get to the start of the parameter list */
+                obj_tptr+=8;
 
-                case RSVP_OBJ_INTSERV_CONTROLLED_LOAD:
-
-                /* controlled load service
-                 *      31           24 23           16 15            8 7             0
-                 *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                 * 1   | 0 (a) |    reserved           |             7 (b)             |
-                 *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                 * 2   |    5  (c)     |0| reserved    |             6 (d)             |
-                 *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                 * 3   |   127 (e)     |    0 (f)      |             5 (g)             |
-                 *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                 * 4   |  Token Bucket Rate [r] (32-bit IEEE floating point number)    |
-                 *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                 * 5   |  Token Bucket Size [b] (32-bit IEEE floating point number)    |
-                 *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                 * 6   |  Peak Data Rate [p] (32-bit IEEE floating point number)       |
-                 *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                 * 7   |  Minimum Policed Unit [m] (32-bit integer)                    |
-                 *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                 * 8   |  Maximum Packet Size [M]  (32-bit integer)                    |
-                 *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                 *
-                 *   (a) - Message format version number (0)
-                 *   (b) - Overall length (7 words not including header)
-                 *   (c) - Service header, service number 5 (Controlled-Load)
-                 *   (d) - Length of controlled-load data, 6 words not including
-                 *         per-service header
-                 *   (e) - Parameter ID, parameter 127 (Token Bucket TSpec)
-                 *   (f) - Parameter 127 flags (none set)
-                 *   (g) - Parameter 127 length, 5 words not including per-service
-                 *         header
-                 */
-
-                    printf("\n\t    Parameter ID: %s (%u), length: %u words (32-bit), Flags: [0x%02x]",
-                           tok2str(rsvp_intserv_parameter_id_values,"unknown",*(obj_tptr+8)),
-                           *(obj_tptr+8),
-                           EXTRACT_16BITS(obj_tptr+10),
-                           *(obj_tptr+9));
-                    bw.i = EXTRACT_32BITS(obj_tptr+12);
-                    printf("\n\t      Token Bucket Rate: %.10g Mbps", bw.f*8/1000000);
-                    bw.i = EXTRACT_32BITS(obj_tptr+16);
-                    printf("\n\t      Token Bucket Size: %.10g bytes", bw.f);
-                    bw.i = EXTRACT_32BITS(obj_tptr+20);
-                    printf("\n\t      Peak Data Rate: %.10g Mbps", bw.f*8/1000000);
-                    printf("\n\t      Minimum Policed Unit: %u bytes", EXTRACT_32BITS(obj_tptr+24));
-                    printf("\n\t      Maximum Packet Size: %u bytes", EXTRACT_32BITS(obj_tptr+28));
-
-                    obj_tlen-=32;
-                    obj_tptr+=32;                    
-                    break;
-
-                case RSVP_OBJ_INTSERV_GUARANTEED_SERV:
-
-                /* guaranteed service
-                 *      31           24 23           16 15            8 7             0
-                 *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                 * 1   | 0 (a) |    Unused             |            10 (b)             |
-                 *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                 * 2   |    2  (c)     |0| reserved    |             9 (d)             |
-                 *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                 * 3   |   127 (e)     |    0 (f)      |             5 (g)             |
-                 *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                 * 4   |  Token Bucket Rate [r] (32-bit IEEE floating point number)    |
-                 *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                 * 5   |  Token Bucket Size [b] (32-bit IEEE floating point number)    |
-                 *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                 * 6   |  Peak Data Rate [p] (32-bit IEEE floating point number)       |
-                 *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                 * 7   |  Minimum Policed Unit [m] (32-bit integer)                    |
-                 *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                 * 8   |  Maximum Packet Size [M]  (32-bit integer)                    |
-                 *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                 * 9   |     130 (h)   |    0 (i)      |            2 (j)              |
-                 *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                 * 10  |  Rate [R]  (32-bit IEEE floating point number)                |
-                 *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                 * 11  |  Slack Term [S]  (32-bit integer)                             |
-                 *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                 *   (a) - Message format version number (0)
-                 *   (b) - Overall length (9 words not including header)
-                 *   (c) - Service header, service number 2 (Guaranteed)
-                 *   (d) - Length of per-service data, 9 words not including per-service
-                 *         header
-                 *   (e) - Parameter ID, parameter 127 (Token Bucket TSpec)
-                 *   (f) - Parameter 127 flags (none set)
-                 *   (g) - Parameter 127 length, 5 words not including parameter header
-                 *   (h) - Parameter ID, parameter 130 (Guaranteed Service RSpec)
-                 *   (i) - Parameter 130 flags (none set)
-                 *   (j) - Parameter 130 length, 2 words not including parameter header
-                 */
-
-                    printf("\n\t    Parameter ID: %s (%u), length: %u words (32-bit), Flags: [0x%02x]",
-                           tok2str(rsvp_intserv_parameter_id_values,"unknown",*(obj_tptr+8)),
-                           *(obj_tptr+8),
-                           EXTRACT_16BITS(obj_tptr+10),
-                           *(obj_tptr+9));
-                    bw.i = EXTRACT_32BITS(obj_tptr+12);
-                    printf("\n\t      Token Bucket Rate: %.10g Mbps", bw.f*8/1000000);
-                    bw.i = EXTRACT_32BITS(obj_tptr+16);
-                    printf("\n\t      Token Bucket Size: %.10g bytes", bw.f);
-                    bw.i = EXTRACT_32BITS(obj_tptr+20);
-                    printf("\n\t      Peak Data Rate: %.10g Mbps", bw.f*8/1000000);
-                    printf("\n\t      Minimum Policed Unit: %u bytes", EXTRACT_32BITS(obj_tptr+24));
-                    printf("\n\t      Maximum Packet Size: %u bytes", EXTRACT_32BITS(obj_tptr+28));
-                    
-                    printf("\n\t    Parameter ID: %s (%u), length: %u words (32-bit), Flags: [0x%02x]",
-                           tok2str(rsvp_intserv_parameter_id_values,"unknown",*(obj_tptr+32)),
-                           *(obj_tptr+32),
-                           EXTRACT_16BITS(obj_tptr+34),
-                           *(obj_tptr+33));
-                    bw.i = EXTRACT_32BITS(obj_tptr+36);
-                    printf("\n\t      Rate: %.10g Mbps", bw.f*8/1000000);
-                    printf("\n\t      Slack Term: %u", EXTRACT_32BITS(obj_tptr+40));
-
-                    obj_tlen-=44;
-                    obj_tptr+=44;                        
-                    break;
-                default:
-                    hexdump=TRUE;
+                while (obj_tlen>4) {
+                    processed = rsvp_intserv_print(obj_tptr);
+                    if (processed == 0)
+                        break;
+                        obj_tlen-=processed;
+                        obj_tptr+=processed;
                 }
-
                 break;
             default:
                 hexdump=TRUE;
@@ -800,8 +846,6 @@ rsvp_print(register const u_char *pptr, register u_int len) {
             }
             break;
 
-            break;
-
         /*
          *  FIXME those are the defined objects that lack a decoder
          *  you are welcome to contribute code ;-)
@@ -810,8 +854,6 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         case RSVP_OBJ_INTEGRITY:
         case RSVP_OBJ_ERROR_SPEC:
         case RSVP_OBJ_SCOPE:
-        case RSVP_OBJ_SENDER_TSPEC:
-        case RSVP_OBJ_ADSPEC:
         case RSVP_OBJ_POLICY_DATA:
         case RSVP_OBJ_CONFIRM:
         case RSVP_OBJ_MESSAGE_ID:
@@ -838,5 +880,4 @@ rsvp_print(register const u_char *pptr, register u_int len) {
 trunc:
     printf("\n\t\t packet exceeded snapshot");
 }
-
 
