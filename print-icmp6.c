@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.8 2000-05-10 08:20:52 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.9 2000-05-10 08:57:22 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -114,7 +114,6 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 	register const u_char *ep;
 	char buf[256];
 	int icmp6len;
-	struct icmp6_nodeinfo *ni6;
 
 #if 0
 #define TCHECK(var) if ((u_char *)&(var) > ep - sizeof(var)) goto trunc
