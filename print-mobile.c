@@ -43,6 +43,10 @@ __RCSID("$NetBSD: print-mobile.c,v 1.2 1998/09/30 08:57:01 hwr Exp $");
 #endif
 #endif
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <sys/param.h>
 #include <sys/time.h>
 #include <sys/uio.h>

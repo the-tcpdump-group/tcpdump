@@ -24,6 +24,10 @@ static const char rcsid[] =
     "@(#) /master/usr.sbin/tcpdump/tcpdump/print-rip.c,v 2.1 1995/02/03 18:15:05 polk Exp (LBL)";
 #endif
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #ifdef INET6
 
 #include <sys/param.h>

@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.81 1999-11-21 03:42:19 assar Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.82 1999-11-21 09:36:46 fenner Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -601,6 +601,8 @@ AC_SUBST(V_PCAPDEP)
 AC_SUBST(LOCALSRC)
 
 AC_PROG_INSTALL
+
+AC_CONFIG_HEADER(config.h)
 
 AC_OUTPUT(Makefile)
 

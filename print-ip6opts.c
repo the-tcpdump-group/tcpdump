@@ -27,6 +27,10 @@
  * SUCH DAMAGE.
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #ifdef INET6
 #include <sys/param.h>
 #include <sys/time.h>

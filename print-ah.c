@@ -26,6 +26,10 @@ static char rcsid[] =
     "@(#) Header: print-ah.c,v 1.37 94/06/10 17:01:42 mccanne Exp (LBL)";
 #endif
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <sys/param.h>
 #include <sys/time.h>
 #include <sys/types.h>

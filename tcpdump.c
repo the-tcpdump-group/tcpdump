@@ -24,7 +24,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.134 1999-11-21 03:50:26 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.135 1999-11-21 09:37:04 fenner Exp $ (LBL)";
 #endif
 
 /*
@@ -34,6 +34,10 @@ static const char rcsid[] =
  * Mercilessly hacked and occasionally improved since then via the
  * combined efforts of Van, Steve McCanne and Craig Leres of LBL.
  */
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include <sys/types.h>
 #include <sys/time.h>

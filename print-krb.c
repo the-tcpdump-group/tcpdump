@@ -23,7 +23,11 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-krb.c,v 1.11 1999-10-30 05:11:17 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-krb.c,v 1.12 1999-11-21 09:36:55 fenner Exp $";
+#endif
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include <sys/param.h>

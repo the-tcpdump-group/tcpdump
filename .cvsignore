@@ -3,3 +3,6 @@ Makefile
 config.status
 config.log
 config.cache
+config.h
+.devel
+tcpdump

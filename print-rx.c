@@ -13,7 +13,11 @@
 
 #ifndef lint
 static char rcsid[] =
-    "@(#) $Id: print-rx.c,v 1.3 1999-11-17 22:19:41 assar Exp $";
+    "@(#) $Id: print-rx.c,v 1.4 1999-11-21 09:37:00 fenner Exp $";
+#endif
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include <stdio.h>
