@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.70 2002-09-05 21:25:45 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.71 2002-09-14 13:14:04 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -61,7 +61,47 @@ static const char rcsid[] =
  * for the up-to-date information.
  */
 
-/* Control Protocols (LCP/IPCP/CCP etc.) Codes */
+/* Protocol Codes defined in ppp.h */
+
+struct tok ppptype2str[] = {
+        { PPP_IP,	  "IP" },
+        { PPP_OSI,	  "OSI" },
+        { PPP_NS,	  "NS" },
+        { PPP_DECNET,	  "DECNET" },
+        { PPP_APPLE,	  "APPLE" },
+	{ PPP_IPX,	  "IPX" },
+	{ PPP_VJC,	  "VJC" },
+	{ PPP_VJNC,	  "VJNC" },
+	{ PPP_BRPDU,	  "BRPDU" },
+	{ PPP_STII,	  "STII" },
+	{ PPP_VINES,	  "VINES" },
+	{ PPP_MPLS_UCAST, "MPLS" },
+	{ PPP_MPLS_MCAST, "MPLS" },
+
+	{ PPP_HELLO,	  "HELLO" },
+	{ PPP_LUXCOM,	  "LUXCOM" },
+	{ PPP_SNS,	  "SNS" },
+	{ PPP_IPCP,	  "IPCP" },
+	{ PPP_OSICP,	  "OSICP" },
+	{ PPP_NSCP,	  "NSCP" },
+	{ PPP_DECNETCP,   "DECNETCP" },
+	{ PPP_APPLECP,	  "APPLECP" },
+	{ PPP_IPXCP,	  "IPXCP" },
+	{ PPP_STIICP,	  "STIICP" },
+	{ PPP_VINESCP,	  "VINESCP" },
+	{ PPP_MPLSCP,	  "MPLSCP" },
+
+	{ PPP_LCP,	  "LCP" },
+	{ PPP_PAP,	  "PAP" },
+	{ PPP_LQM,	  "LQM" },
+	{ PPP_CHAP,	  "CHAP" },
+	{ PPP_BACP,	  "BACP" },
+	{ PPP_BAP,	  "BAP" },
+	{ PPP_MP,	  "MP" },
+	{ 0,		  NULL }
+};
+
+/* Control Protocols (LCP/IPCP/CCP etc.) Codes defined in RFC 1661 */
 
 #define CPCODES_VEXT		0	/* Vendor-Specific (RFC2153) */
 #define CPCODES_CONF_REQ	1	/* Configure-Request */
@@ -75,33 +115,31 @@ static const char rcsid[] =
 #define CPCODES_ECHO_REQ	9	/* Echo-Request (LCP only) */
 #define CPCODES_ECHO_RPL	10	/* Echo-Reply (LCP only) */
 #define CPCODES_DISC_REQ	11	/* Discard-Request (LCP only) */
-#define CPCODES_ID		12	/* Identification (LCP only) */
-#define CPCODES_TIME_REM	13	/* Time-Remaining (LCP only) */
-#define CPCODES_RESET_REQ	14	/* Reset-Request (CCP only) */
+#define CPCODES_ID		12	/* Identification (LCP only) RFC1570 */
+#define CPCODES_TIME_REM	13	/* Time-Remaining (LCP only) RFC1570 */
+#define CPCODES_RESET_REQ	14	/* Reset-Request (CCP only) RFC1962 */
 #define CPCODES_RESET_REP	15	/* Reset-Reply (CCP only) */
 
 #define CPCODES_MAX	CPCODES_RESET_REP
 
-static const char *cpcodes[] = {
-	/*
-	 * Control Protocol code values (RFC1661)
-	 */
-	"Vend-Ext",	/* (0) RFC2153 */
-	"Conf-Req",	/* (1) */
-	"Conf-Ack",	/* (2) */
-	"Conf-Nak",	/* (3) */
-	"Conf-Rej",	/* (4) */
-	"Term-Req",	/* (5) */
-	"Term-Ack",	/* (6) */
-	"Code-Rej",	/* (7) */
-	"Prot-Rej",	/* (8) */
-	"Echo-Req",	/* (9) */
-	"Echo-Rep",	/* (10) */
-	"Disc-Req",	/* (11) */
-	"Ident",	/* (12) RFC1570 */
-	"Time-Rem",	/* (13) RFC1570 */
-	"Reset-Req",	/* (14) RFC1962 */
-	"Reset-Ack",	/* (15) RFC1962 */
+struct tok cpcodes[] = {
+	{CPCODES_VEXT,      "Vendor-Extension"}, /* RFC2153 */
+	{CPCODES_CONF_REQ,  "Conf-Request"},
+        {CPCODES_CONF_ACK,  "Conf-Ack"},
+	{CPCODES_CONF_NAK,  "Conf-Nack"},
+	{CPCODES_CONF_REJ,  "Conf-Reject"},
+	{CPCODES_TERM_REQ,  "Term-Request"},
+	{CPCODES_TERM_ACK,  "Term-Ack"},
+	{CPCODES_CODE_REJ,  "Code-Reject"},
+	{CPCODES_PROT_REJ,  "Prot-Reject"},
+	{CPCODES_ECHO_REQ,  "Echo-Request"},
+	{CPCODES_ECHO_RPL,  "Echo-Reply"},
+	{CPCODES_DISC_REQ,  "Disc-Req"},
+	{CPCODES_ID,        "Ident"},            /* RFC1570 */
+	{CPCODES_TIME_REM,  "Time-Rem"},         /* RFC1570 */
+	{CPCODES_RESET_REQ, "Reset-Req"},        /* RFC1962 */
+	{CPCODES_RESET_REP, "Reset-Ack"},        /* RFC1962 */
+        {0,                 NULL}
 };
 
 /* LCP Config Options */
@@ -255,6 +293,7 @@ static const char *ccpconfopts[] = {
 /* BVCP - to be supported */
 /* BCP - to be supported */
 /* IPXCP - to be supported */
+/* MPLSCP - to be supported */
 
 /* Auth Algorithms */
 
@@ -323,7 +362,6 @@ static const char *papcode[] = {
 #define BAP_CSIND	7
 #define BAP_CSRES	8
 
-static const char *ppp_protoname (u_int proto);
 static void handle_ctrl_proto (u_int proto,const u_char *p, int length);
 static void handle_chap (const u_char *p, int length);
 static void handle_pap (const u_char *p, int length);
@@ -334,41 +372,6 @@ static int print_ccp_config_options (const u_char *p, int);
 static int print_bacp_config_options (const u_char *p, int);
 static void handle_ppp (u_int proto, const u_char *p, int length);
 
-static const char *
-ppp_protoname(u_int proto)
-{
-	static char buf[20];
-
-	switch (proto) {
-	case PPP_IP:	return "IP";
-	case PPP_IPV6:	return "IPv6";
-#ifdef PPP_XNS
-	case PPP_XNS:	return "XNS";
-#endif
-	case PPP_IPX:	return "IPX";
-	case PPP_OSI:   return "OSI";
-	case PPP_VJC:	return "VJC";
-	case PPP_VJNC:	return "VJNC";
-	case PPP_COMP:	return "COMP";
-	case PPP_IPCP:	return "IPCP";
-	case PPP_IPV6CP: return "IPv6CP";
-	case PPP_IPXCP:	return "IPXCP";
-	case PPP_OSICP: return "OSICP";
-	case PPP_CCP:	return "CCP";
-	case PPP_LCP:	return "LCP";
-	case PPP_PAP:	return "PAP";
-#ifdef PPP_LQR
-	case PPP_LQR:	return "LQR";
-#endif
-	case PPP_CHAP:	return "CHAP";
-	case PPP_BACP:	return "BACP";
-	case PPP_BAP:	return "BAP";
-	default:
-		snprintf(buf, sizeof(buf), "unknown-0x%04x", proto);
-		return buf;
-	}
-}
-
 /* generic Control Protocol (e.g. LCP, IPCP, CCP, etc.) handler */
 static void
 handle_ctrl_proto(u_int proto, const u_char *p, int length)
@@ -378,23 +381,25 @@ handle_ctrl_proto(u_int proto, const u_char *p, int length)
 	int x, j;
 
 	if (length < 1) {
-		printf("[|%s]", ppp_protoname(proto));
+		printf("[|%s]",
+                       tok2str(ppptype2str, "unknown protocol 0x%04x", proto));
 		return;
 	} else if (length < 4) {
-		printf("[|%s 0x%02x]", ppp_protoname(proto), *p);
+		printf("[|%s 0x%02x]",
+                       tok2str(ppptype2str, "unknown protocol 0x%04x", proto),
+                       *p);
 		return;
 	}
 
 	code = *p;
-	if (code <= CPCODES_MAX)
-		printf("%s", cpcodes[code]);
-	else {
-		printf("0x%02x", code);
-		return;
-	}
 	p++;
+	if (code > CPCODES_MAX)
+            return;
+	
+        printf("%s (%u)",
+               tok2str(cpcodes, "unknown opcode 0x%02x",code),
+               *p); /* ID */
 
-	printf("(%u)", *p);		/* ID */
 	p++;
 
 	len = EXTRACT_16BITS(p);
@@ -495,9 +500,9 @@ print_lcp_config_options(const u_char *p, int length)
 	if (length < len)
 		return 0;
 	if ((opt >= LCPOPT_MIN) && (opt <= LCPOPT_MAX))
-		printf(", %s", lcpconfopts[opt]);
+		printf(", %s ", lcpconfopts[opt]);
 	else {
-		printf(", unknwhown-%d", opt);
+		printf(", unknown LCP option 0x%02x", opt);
 		return len;
 	}
 
@@ -978,6 +983,10 @@ handle_ppp(u_int proto, const u_char *p, int length)
 	case PPP_OSI:
 	        isoclns_print(p, length, length, NULL, NULL);
 	        break;
+	case PPP_MPLS_UCAST:
+	case PPP_MPLS_MCAST:
+		mpls_print(p, length);
+		break;
 	default:
 		break;
 	}
@@ -1017,7 +1026,9 @@ ppp_print(register const u_char *p, u_int length)
 		hdr_len += 2;
 	}
 
-	printf("%s %d: ", ppp_protoname(proto), full_length);
+	printf("%s, length: %u : ",
+               tok2str(ppptype2str, "unknown-0x%04x", proto),
+               full_length);
 
 	handle_ppp(proto, p, length);
 	return (hdr_len);
@@ -1152,7 +1163,7 @@ ppp_hdlc_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
 		proto = EXTRACT_16BITS(p);
 		p += 2;
 		length -= 2;
-		printf("%s: ", ppp_protoname(proto));
+		printf("%s: ", tok2str(ppptype2str, "unknown-0x%04x", proto));
 
 		handle_ppp(proto, p, length);
 		break;
@@ -1185,43 +1196,6 @@ out:
 	if (infoprint)
 		info(0);
 }
-
-
-
-struct tok ppptype2str[] = {
-	{ PPP_IP,	"IP" },
-	{ PPP_OSI,	"OSI" },
-	{ PPP_NS,	"NS" },
-	{ PPP_DECNET,	"DECNET" },
-	{ PPP_APPLE,	"APPLE" },
-	{ PPP_IPX,	"IPX" },
-	{ PPP_VJC,	"VJC" },
-	{ PPP_VJNC,	"VJNC" },
-	{ PPP_BRPDU,	"BRPDU" },
-	{ PPP_STII,	"STII" },
-	{ PPP_VINES,	"VINES" },
-
-	{ PPP_HELLO,	"HELLO" },
-	{ PPP_LUXCOM,	"LUXCOM" },
-	{ PPP_SNS,	"SNS" },
-	{ PPP_IPCP,	"IPCP" },
-	{ PPP_OSICP,	"OSICP" },
-	{ PPP_NSCP,	"NSCP" },
-	{ PPP_DECNETCP, "DECNETCP" },
-	{ PPP_APPLECP,	"APPLECP" },
-	{ PPP_IPXCP,	"IPXCP" },
-	{ PPP_STIICP,	"STIICP" },
-	{ PPP_VINESCP,	"VINESCP" },
-
-	{ PPP_LCP,	"LCP" },
-	{ PPP_PAP,	"PAP" },
-	{ PPP_LQM,	"LQM" },
-	{ PPP_CHAP,	"CHAP" },
-	{ PPP_BACP,	"BACP" },
-	{ PPP_BAP,	"BAP" },
-	{ PPP_MP,	"MP" },
-	{ 0,		NULL }
-};
 
 #define PPP_BSDI_HDRLEN 24
 
@@ -1328,6 +1302,10 @@ ppp_bsdos_if_print(u_char *user _U_, const struct pcap_pkthdr *h _U_,
 				ip6_print(p, length);
 				break;
 #endif
+			case PPP_MPLS_UCAST:
+			case PPP_MPLS_MCAST:
+				mpls_print(p, length);
+				break;
 			}
 			goto printx;
 		case PPP_VJNC:
@@ -1343,6 +1321,10 @@ ppp_bsdos_if_print(u_char *user _U_, const struct pcap_pkthdr *h _U_,
 				ip6_print(p, length);
 				break;
 #endif
+			case PPP_MPLS_UCAST:
+			case PPP_MPLS_MCAST:
+				mpls_print(p, length);
+				break;
 			}
 			goto printx;
 		default:
@@ -1371,8 +1353,12 @@ ppp_bsdos_if_print(u_char *user _U_, const struct pcap_pkthdr *h _U_,
 		ip6_print(p, length);
 		break;
 #endif
+        case PPP_MPLS_UCAST:
+        case PPP_MPLS_MCAST:
+                mpls_print(p, length);
+                break;
 	default:
-		printf("%s ", tok2str(ppptype2str, "proto-#%d", ptype));
+		printf("%s ", tok2str(ppptype2str, "unknown protocol 0x%04x", ptype));
 	}
 
 printx:
