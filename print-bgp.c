@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.20 2000-12-04 05:27:49 fenner Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.21 2000-12-05 05:48:35 guy Exp $";
 #endif
 
 #include <sys/param.h>
@@ -596,7 +596,7 @@ bgp_update_print(const u_char *dat, int length)
 		TCHECK2(p[2], len);
  		i = 2;
 
-		printf(" (Withdrawn routes:", len);
+		printf(" (Withdrawn routes:");
 			
 		while(i < 2 + len) {
 			i += decode_prefix4(&p[i], buf, sizeof(buf));
