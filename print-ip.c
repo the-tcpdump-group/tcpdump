@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.76 1999-11-22 07:25:27 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.77 1999-11-23 08:31:10 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -70,21 +70,11 @@ struct tr_query {
 	u_int  tr_src;			/* traceroute source */
 	u_int  tr_dst;			/* traceroute destination */
 	u_int  tr_raddr;		/* traceroute response address */
-#if defined(WORDS_BIGENDIAN) || (defined(BYTE_ORDER) && (BYTE_ORDER == BIG_ENDIAN))
-	struct {
-		u_int   ttl : 8;	/* traceroute response ttl */
-		u_int   qid : 24;	/* traceroute query id */
-	} q;
-#else
-	struct {
-		u_int	qid : 24;	/* traceroute query id */
-		u_int	ttl : 8;	/* traceroute response ttl */
-	} q;
-#endif
+ 	u_int  tr_rttlqid;		/* response ttl and qid */
 };
 
-#define tr_rttl q.ttl
-#define tr_qid  q.qid
+#define TR_GETTTL(x)		(((x) >> 24) & 0xff)
+#define TR_GETQID(x)		((x) & 0x00ffffff)
 
 /*
  * Traceroute response format.  A traceroute response has a tr_query at the
@@ -129,22 +119,24 @@ static void print_mtrace(register const u_char *bp, register u_int len)
 {
 	register struct tr_query *tr = (struct tr_query *)(bp + 8);
 
-	printf("mtrace %d: %s to %s reply-to %s", tr->tr_qid,
+	printf("mtrace %d: %s to %s reply-to %s",
+		TR_GETQID(ntohl(tr->tr_rttlqid)),
 		ipaddr_string(&tr->tr_src), ipaddr_string(&tr->tr_dst),
 		ipaddr_string(&tr->tr_raddr));
 	if (IN_CLASSD(ntohl(tr->tr_raddr)))
-		printf(" with-ttl %d", tr->tr_rttl);
+		printf(" with-ttl %d", TR_GETTTL(ntohl(tr->tr_rttlqid)));
 }
 
 static void print_mresp(register const u_char *bp, register u_int len)
 {
 	register struct tr_query *tr = (struct tr_query *)(bp + 8);
 
-	printf("mresp %d: %s to %s reply-to %s", tr->tr_qid,
+	printf("mresp %d: %s to %s reply-to %s",
+		TR_GETQID(ntohl(tr->tr_rttlqid)),
 		ipaddr_string(&tr->tr_src), ipaddr_string(&tr->tr_dst),
 		ipaddr_string(&tr->tr_raddr));
 	if (IN_CLASSD(ntohl(tr->tr_raddr)))
-		printf(" with-ttl %d", tr->tr_rttl);
+		printf(" with-ttl %d", TR_GETTTL(ntohl(tr->tr_rttlqid)));
 }
 
 static void
@@ -158,22 +150,27 @@ igmp_print(register const u_char *bp, register u_int len,
 		ipaddr_string(&ip->ip_src),
 		ipaddr_string(&ip->ip_dst));
 
+	if (qflag) {
+		(void)printf("igmp");
+		return;
+	}
+
 	TCHECK2(bp[0], 8);
 	switch (bp[0]) {
 	case 0x11:
 		(void)printf("igmp query");
-		if (*(int *)&bp[4])
+		if (EXTRACT_32BITS(&bp[4]))
 			(void)printf(" [gaddr %s]", ipaddr_string(&bp[4]));
 		if (len != 8)
 			(void)printf(" [len %d]", len);
 		break;
 	case 0x12:
-		(void)printf("igmp report %s", ipaddr_string(&bp[4]));
+		(void)printf("igmp v1 report %s", ipaddr_string(&bp[4]));
 		if (len != 8)
 			(void)printf(" [len %d]", len);
 		break;
 	case 0x16:
-		(void)printf("igmp nreport %s", ipaddr_string(&bp[4]));
+		(void)printf("igmp v2 report %s", ipaddr_string(&bp[4]));
 		break;
 	case 0x17:
 		(void)printf("igmp leave %s", ipaddr_string(&bp[4]));
@@ -186,7 +183,7 @@ igmp_print(register const u_char *bp, register u_int len,
 			dvmrp_print(bp, len);
 		break;
 	case 0x14:
-		(void)printf("igmp pim");
+		(void)printf("igmp pimv1");
 		pimv1_print(bp, len);
   		break;
 	case 0x1e:
@@ -196,14 +193,11 @@ igmp_print(register const u_char *bp, register u_int len,
 		print_mtrace(bp, len);
 		break;
 	default:
-		(void)printf("igmp-%d", bp[0] & 0xf);
+		(void)printf("igmp-%d", bp[0]);
 		break;
 	}
-	if ((bp[0] >> 4) != 1)
-		(void)printf(" [v%d]", bp[0] >> 4);
 
-	TCHECK2(bp[0], len);
-	if (vflag) {
+	if (vflag && TTEST2(bp[0], len)) {
 		/* Check the IGMP checksum */
 		if (in_cksum((const u_short*)bp, len, 0))
 			printf(" bad igmp cksum %x!", EXTRACT_16BITS(&bp[2]));
