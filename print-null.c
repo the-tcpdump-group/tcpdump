@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-null.c,v 1.39 2000-12-04 06:47:17 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-null.c,v 1.40 2000-12-16 22:00:50 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -56,20 +56,22 @@ struct rtentry;
 #endif
 
 /*
- * The DLT_NULL packet header is 4 bytes long. It contains a network
- * order 32 bit integer that specifies the family, e.g. AF_INET
+ * The DLT_NULL packet header is 4 bytes long. It contains a host-byte-order
+ * 32-bit integer that specifies the family, e.g. AF_INET.
+ *
+ * Note here that "host" refers to the host on which the packets were
+ * captured; that isn't necessarily *this* host.
+ *
+ * The OpenBSD DLT_LOOP packet header is the same, except that the integer
+ * is in network byte order.
  */
 #define	NULL_HDRLEN 4
 
 static void
-null_print(const u_char *p, const struct ip *ip, u_int length)
+null_print(u_int family, u_int length)
 {
-	u_int family;
-
-	memcpy((char *)&family, (char *)p, sizeof(family));
-
 	if (nflag)
-		printf("AF %d ", family);
+		printf("AF %u ", family);
 	else {
 		switch (family) {
 
@@ -88,12 +90,20 @@ null_print(const u_char *p, const struct ip *ip, u_int length)
 			break;
 
 		default:
-			printf("AF %d ", family);
+			printf("AF %u ", family);
 			break;
 		}
 	}
 	printf("%d: ", length);
 }
+
+/*
+ * Byte-swap a 32-bit number.
+ * ("htonl()" or "ntohl()" won't work - we want to byte-swap even on
+ * big-endian platforms.)
+ */
+#define	SWAPLONG(y) \
+((((y)&0xff)<<24) | (((y)&0xff00)<<8) | (((y)&0xff0000)>>8) | (((y)>>24)&0xff))
 
 void
 null_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
@@ -101,8 +111,22 @@ null_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	u_int length = h->len;
 	u_int caplen = h->caplen;
 	const struct ip *ip;
+	u_int family;
 
 	ts_print(&h->ts);
+
+	memcpy((char *)&family, (char *)p, sizeof(family));
+
+	/*
+	 * This isn't necessarily in our host byte order; if this is
+	 * a DLT_LOOP capture, it's in network byte order, and if
+	 * this is a DLT_NULL capture from a machine with the opposite
+	 * byte-order, it's in the opposite byte order from ours.
+	 *
+	 * If the upper 16 bits aren't all zero, assume it's byte-swapped.
+	 */
+	if ((family & 0xFFFF0000) != 0)
+		family = SWAPLONG(family);
 
 	/*
 	 * Some printers want to get back at the link level addresses,
@@ -117,7 +141,7 @@ null_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	ip = (struct ip *)(p + NULL_HDRLEN);
 
 	if (eflag)
-		null_print(p, ip, length);
+		null_print(family, length);
 
 	switch (IP_V(ip)) {
 	case 4:
