@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.23 2004-03-24 00:41:13 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.24 2004-03-24 05:59:16 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -243,11 +243,12 @@ cdp_print_addr(const u_char * p, int l)
 	};
 #endif
 
+	TCHECK2(*p, 2);
 	num = EXTRACT_32BITS(p);
 	p += 4;
 
 	while (p < endp && num >= 0) {
-		TCHECK2(p, 2);
+		TCHECK2(*p, 2);
 		if (p + 2 > endp)
 			goto trunc;
 		pt = p[0];		/* type of "protocol" field */
