@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.23 2002-08-06 04:42:07 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.24 2002-09-04 09:53:42 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -572,6 +572,8 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf)
 	case 'T':
 	  {
 	    time_t t;
+	    struct tm *lt;
+	    char *tstring;
 	    int x;
 	    x = EXTRACT_LE_32BITS(buf);
 
@@ -595,7 +597,15 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf)
 		buf += 8;
 		break;
 	    }
-	    printf("%s", t ? asctime(localtime(&t)) : "NULL\n");
+	    if (t != 0) {
+		lt = localtime(&t);
+		if (lt != NULL)
+		    tstring = asctime(lt);
+		else
+		    tstring = "(Can't convert time)\n";
+	    } else
+		tstring = "NULL\n";
+	    printf("%s", tstring);
 	    fmt++;
 	    while (isdigit((unsigned char)*fmt))
 		fmt++;
