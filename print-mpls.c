@@ -28,7 +28,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-mpls.c,v 1.4 2002-08-01 08:53:20 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-mpls.c,v 1.5 2002-08-08 19:52:48 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -82,15 +82,15 @@ mpls_print(const u_char *bp, u_int length)
 		TCHECK2(*p, sizeof(v));
 		v = EXTRACT_32BITS(p);
 		printf(" (");	/*)*/
-		printf("label 0x%x", MPLS_LABEL(v));
+		printf("label %u", MPLS_LABEL(v));
 		if (vflag &&
 		    MPLS_LABEL(v) < sizeof(mpls_labelname) / sizeof(mpls_labelname[0]))
-			printf("(%s)", mpls_labelname[MPLS_LABEL(v)]);
+			printf(" (%s)", mpls_labelname[MPLS_LABEL(v)]);
 		if (MPLS_EXP(v))
-			printf(" exp 0x%x", MPLS_EXP(v));
+			printf(", exp %u", MPLS_EXP(v));
 		if (MPLS_STACK(v))
-			printf("[S]");
-		printf(" TTL %u", MPLS_TTL(v));
+			printf(", [S]");
+		printf(", ttl %u", MPLS_TTL(v));
 		/*(*/
 		printf(")");
 
@@ -99,6 +99,7 @@ mpls_print(const u_char *bp, u_int length)
 
 	switch (MPLS_LABEL(v)) {
 	case 0:	/* IPv4 explicit NULL label */
+        case 3:	/* IPv4 implicit NULL label */
 		ip_print(p, length - (p - bp));
 		break;
 #ifdef INET6
@@ -108,12 +109,68 @@ mpls_print(const u_char *bp, u_int length)
 #endif
 	default:
 		/*
-		 * Since there's no indication of protocol in MPLS label
-		 * encoding, we can print nothing further.
+		 * Generally there's no indication of protocol in MPLS label
+		 * encoding, however draft-hsmit-isis-aal5mux-00.txt describes
+                 * a technique that looks at the first payload byte if the BOS (bottom of stack)
+                 * bit is set and tries to determine the network layer protocol
+                 * 0x45-0x4f is IPv4
+                 * 0x60-0x6f is IPv6
+                 * 0x83      is IS-IS
+                 * this technique is sometimes known as NULL encapsulation
+                 * and decoding is particularly useful for control-plane traffic [BGP]
+                 * which cisco by default sends MPLS encapsulated
 		 */
-		return;
+
+                if (MPLS_STACK(v)) { /* only do this if the stack bit is set */
+                    switch(*p) {
+                    case 0x45:
+                    case 0x46:
+                    case 0x47:
+                    case 0x48:
+                    case 0x49:
+                    case 0x4a:
+                    case 0x4b:
+                    case 0x4c:
+                    case 0x4d:
+                    case 0x4e:
+                    case 0x4f:
+                        printf("\n\t");
+                        ip_print(p, length - (p - bp));
+                        break;
+#ifdef INET6
+                    case 0x60:
+                    case 0x61:
+                    case 0x62:
+                    case 0x63:
+                    case 0x64:
+                    case 0x65:
+                    case 0x66:
+                    case 0x67:
+                    case 0x68:
+                    case 0x69:
+                    case 0x6a:
+                    case 0x6b:
+                    case 0x6c:
+                    case 0x6d:
+                    case 0x6e:
+                    case 0x6f:
+                        printf("\n\t");
+                        ip6_print(p, length - (p - bp));
+                        break;
+#endif
+                    case 0x83:
+                        printf("\n\t");
+                        isoclns_print(p, length - (p - bp), length - (p - bp), NULL, NULL);
+                        break;
+                    default:
+                        /* ok bail out - we did not figure out what it is*/
+                        break;
+                    }
+                }
+                return;
 	}
 
 trunc:
 	printf("[|MPLS]");
 }
+
