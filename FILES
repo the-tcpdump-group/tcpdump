@@ -92,9 +92,9 @@ parsenfsfh.c
 pcap-missing.h
 ppp.h
 print-802_11.c
-print-ap1394.c
 print-ah.c
 print-aodv.c
+print-ap1394.c
 print-arcnet.c
 print-arp.c
 print-ascii.c
