@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.16 2002-09-11 22:18:03 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.17 2002-09-20 10:02:42 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -117,7 +117,7 @@ chdlc_print(register const u_char *p, u_int length, u_int caplen)
 		break;
 #endif
         case ETHERTYPE_ISO:
-                isoclns_print(p, length, length, NULL, NULL);
+                isoclns_print(p+CHDLC_HDRLEN, length, length, NULL, NULL);
                 break;
 	}
 	if (xflag)
