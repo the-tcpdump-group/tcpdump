@@ -42,7 +42,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-mobile.c,v 1.14 2003-11-16 09:36:28 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-mobile.c,v 1.15 2004-03-24 01:58:14 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -77,7 +77,7 @@ mobile_print(const u_char *bp, u_int length)
 
 	mob = (const struct mobile_ip *)bp;
 
-	if (length < MOBILE_SIZE) {
+	if (length < MOBILE_SIZE || !TTEST(*mob)) {
 		fputs("[|mobile]", stdout);
 		return;
 	}
