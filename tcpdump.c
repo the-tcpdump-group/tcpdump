@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.223 2004-01-14 03:24:29 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.224 2004-01-15 19:53:49 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -55,6 +55,10 @@ extern int SIZE_BUF;
 #define off_t long
 #define uint UINT
 #endif /* WIN32 */
+
+#ifdef HAVE_SMI_H
+#include <smi.h>
+#endif
 
 #include <pcap.h>
 #include <signal.h>
@@ -115,6 +119,14 @@ static void dump_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
 
 #ifdef SIGINFO
 RETSIGTYPE requestinfo(int);
+#endif
+
+#if defined(USE_WIN32_MM_TIMER)
+  #include <MMsystem.h>
+  static UINT timer_id;
+  static void CALLBACK verbose_stats_dump(UINT, UINT, DWORD_PTR, DWORD_PTR, DWORD_PTR);
+#elif defined(HAVE_ALARM)
+  static void verbose_stats_dump(int sig);
 #endif
 
 static void info(int);
@@ -777,6 +789,23 @@ main(int argc, char **argv)
 #ifdef SIGINFO
 	(void)setsignal(SIGINFO, requestinfo);
 #endif
+
+	if (vflag > 0 && WFileName) {
+		/*
+		 * When capturing to a file, "-v" means tcpdump should,
+		 * every 10 secodns, "v"erbosely report the number of
+		 * packets captured.
+		 */
+#ifdef USE_WIN32_MM_TIMER
+		/* call requestinfo() each 1000 +/-100msec */
+		timer_id = timeSetEvent(1000, 100, verbose_stats_dump, 0, TIME_PERIODIC);
+		setvbuf(stderr, NULL, _IONBF, 0);
+#elif defined(HAVE_ALARM)
+		(void)setsignal(SIGALRM, verbose_stats_dump);
+		alarm(1);
+#endif
+	}
+
 #ifndef WIN32
 	if (RFileName == NULL) {
 		int dlt;
@@ -839,6 +868,14 @@ main(int argc, char **argv)
 static RETSIGTYPE
 cleanup(int signo _U_)
 {
+#ifdef USE_WIN32_MM_TIMER
+	if (timer_id)
+		timeKillEvent(timer_id);
+	timer_id = 0;
+#elif defined(HAVE_ALARM)
+	alarm(0);
+#endif
+
 #ifdef HAVE_PCAP_BREAKLOOP
 	/*
 	 * We have "pcap_breakloop()"; use it, so that we do as little
@@ -1052,7 +1089,9 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	 * "Wpcap_version" information on Windows.
 	 */
 	char WDversion[]="current-cvs.tcpdump.org";
+#if !defined(HAVE_GENERATED_VERSION)
 	char version[]="current-cvs.tcpdump.org";
+#endif
 	char pcap_version[]="current-cvs.tcpdump.org";
 	char Wpcap_version[]="3.0 alpha";
 #endif
@@ -1073,6 +1112,29 @@ RETSIGTYPE requestinfo(int signo _U_)
 		++infoprint;
 	else
 		info(0);
+}
+#endif
+
+/*
+ * Called once each second in verbose mode while dumping to file
+ */
+#ifdef USE_WIN32_MM_TIMER
+void CALLBACK verbose_stats_dump (UINT timer_id _U_, UINT msg _U_, DWORD_PTR arg _U_,
+                                  DWORD_PTR dw1 _U_, DWORD_PTR dw2 _U_)
+{
+	struct pcap_stat stat;
+
+	if (infodelay == 0 && pcap_stats(pd, &stat) >= 0)
+		fprintf(stderr, "Got %u\r", packets_captured);
+}
+#elif defined(HAVE_ALARM)
+static void verbose_stats_dump(int sig _U_)
+{
+	struct pcap_stat stat;
+
+	if (infodelay == 0 && pcap_stats(pd, &stat) >= 0)
+		fprintf(stderr, "Got %u\r", packets_captured);
+	alarm(1);
 }
 #endif
 

@@ -127,6 +127,9 @@
 /* Define if you have a dnet_htoa declaration in <netdnet/dnetdb.h>.  */
 #undef HAVE_NETDNET_DNETDB_H_DNET_HTOA
 
+/* Define to 1 if you have the `alarm' function. */
+#undef HAVE_ALARM
+
 /* Define to 1 if you have the `bpf_dump' function. */
 #undef HAVE_BPF_DUMP
 
