@@ -18,15 +18,6 @@
    byte first (like Motorola and SPARC, unlike Intel and VAX).  */
 #undef WORDS_BIGENDIAN
 
-/* Define __P() macro, if necessary */
-#ifndef __P
-#if __STDC__
-#define __P(protos) protos
-#else
-#define __P(protos) ()
-#endif
-#endif
-
 /* Define if you have SSLeay 0.9.0b with the buggy cast128. */
 #undef HAVE_BUGGY_CAST128
 
@@ -59,9 +50,6 @@
 
 /* define if this is a development version, to use additional prototypes. */
 #undef HAVE_OS_PROTO_H
-
-/* define if <unistd.h> defines __P() */
-#undef HAVE_PORTABLE_PROTOTYPE
 
 /* define if RES_USE_INET6 is defined */
 #undef HAVE_RES_USE_INET6

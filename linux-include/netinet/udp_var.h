@@ -81,12 +81,12 @@ struct	udpstat {
 struct	inpcb udb;
 struct	udpstat udpstat;
 
-void	 udp_ctlinput __P((int, struct sockaddr *, struct ip *));
-void	 udp_init __P((void));
-void	 udp_input __P((struct mbuf *, int));
-int	 udp_output __P((struct inpcb *,
-	    struct mbuf *, struct mbuf *, struct mbuf *));
-int	 udp_sysctl __P((int *, u_int, void *, size_t *, void *, size_t));
-int	 udp_usrreq __P((struct socket *,
-	    int, struct mbuf *, struct mbuf *, struct mbuf *));
+void	 udp_ctlinput (int, struct sockaddr *, struct ip *);
+void	 udp_init (void);
+void	 udp_input (struct mbuf *, int);
+int	 udp_output (struct inpcb *,
+	    struct mbuf *, struct mbuf *, struct mbuf *);
+int	 udp_sysctl (int *, u_int, void *, size_t *, void *, size_t);
+int	 udp_usrreq (struct socket *,
+	    int, struct mbuf *, struct mbuf *, struct mbuf *);
 #endif

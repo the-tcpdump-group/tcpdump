@@ -152,9 +152,9 @@ struct icmp {
 	(type) == ICMP_MASKREQ || (type) == ICMP_MASKREPLY)
 
 #ifdef KERNEL
-void	icmp_error __P((struct mbuf *, int, int, n_int, struct ifnet *));
-void	icmp_input __P((struct mbuf *, int));
-void	icmp_reflect __P((struct mbuf *));
-void	icmp_send __P((struct mbuf *, struct mbuf *));
-int	icmp_sysctl __P((int *, u_int, void *, size_t *, void *, size_t));
+void	icmp_error (struct mbuf *, int, int, n_int, struct ifnet *);
+void	icmp_input (struct mbuf *, int);
+void	icmp_reflect (struct mbuf *);
+void	icmp_send (struct mbuf *, struct mbuf *);
+int	icmp_sysctl (int *, u_int, void *, size_t *, void *, size_t);
 #endif

@@ -142,37 +142,37 @@ struct	ipq	ipq;			/* ip reass. queue */
 u_short	ip_id;				/* ip packet ctr, for ids */
 int	ip_defttl;			/* default IP ttl */
 
-int	 in_control __P((struct socket *, n_long, caddr_t, struct ifnet *));
-int	 ip_ctloutput __P((int, struct socket *, int, int, struct mbuf **));
-void	 ip_deq __P((struct ipasfrag *));
-int	 ip_dooptions __P((struct mbuf *));
-void	 ip_drain __P((void));
-void	 ip_enq __P((struct ipasfrag *, struct ipasfrag *));
-void	 ip_forward __P((struct mbuf *, int));
-void	 ip_freef __P((struct ipq *));
-void	 ip_freemoptions __P((struct ip_moptions *));
-int	 ip_getmoptions __P((int, struct ip_moptions *, struct mbuf **));
-void	 ip_init __P((void));
-int	 ip_mforward __P((struct mbuf *, struct ifnet *));
-int	 ip_optcopy __P((struct ip *, struct ip *));
-int	 ip_output __P((struct mbuf *,
-	    struct mbuf *, struct route *, int, struct ip_moptions *));
-int	 ip_pcbopts __P((struct mbuf **, struct mbuf *));
+int	 in_control (struct socket *, n_long, caddr_t, struct ifnet *);
+int	 ip_ctloutput (int, struct socket *, int, int, struct mbuf **);
+void	 ip_deq (struct ipasfrag *);
+int	 ip_dooptions (struct mbuf *);
+void	 ip_drain (void);
+void	 ip_enq (struct ipasfrag *, struct ipasfrag *);
+void	 ip_forward (struct mbuf *, int);
+void	 ip_freef (struct ipq *);
+void	 ip_freemoptions (struct ip_moptions *);
+int	 ip_getmoptions (int, struct ip_moptions *, struct mbuf **);
+void	 ip_init (void);
+int	 ip_mforward (struct mbuf *, struct ifnet *);
+int	 ip_optcopy (struct ip *, struct ip *);
+int	 ip_output (struct mbuf *,
+	    struct mbuf *, struct route *, int, struct ip_moptions *);
+int	 ip_pcbopts (struct mbuf **, struct mbuf *);
 struct ip *
-	 ip_reass __P((struct ipasfrag *, struct ipq *));
+	 ip_reass (struct ipasfrag *, struct ipq *);
 struct in_ifaddr *
-	 ip_rtaddr __P((struct in_addr));
-int	 ip_setmoptions __P((int, struct ip_moptions **, struct mbuf *));
-void	 ip_slowtimo __P((void));
+	 ip_rtaddr (struct in_addr);
+int	 ip_setmoptions (int, struct ip_moptions **, struct mbuf *);
+void	 ip_slowtimo (void);
 struct mbuf *
-	 ip_srcroute __P((void));
-void	 ip_stripoptions __P((struct mbuf *, struct mbuf *));
-int	 ip_sysctl __P((int *, n_long, void *, size_t *, void *, size_t));
-void	 ipintr __P((void));
-int	 rip_ctloutput __P((int, struct socket *, int, int, struct mbuf **));
-void	 rip_init __P((void));
-void	 rip_input __P((struct mbuf *));
-int	 rip_output __P((struct mbuf *, struct socket *, n_long));
-int	 rip_usrreq __P((struct socket *,
-	    int, struct mbuf *, struct mbuf *, struct mbuf *));
+	 ip_srcroute (void);
+void	 ip_stripoptions (struct mbuf *, struct mbuf *);
+int	 ip_sysctl (int *, n_long, void *, size_t *, void *, size_t);
+void	 ipintr (void);
+int	 rip_ctloutput (int, struct socket *, int, int, struct mbuf **);
+void	 rip_init (void);
+void	 rip_input (struct mbuf *);
+int	 rip_output (struct mbuf *, struct socket *, n_long);
+int	 rip_usrreq (struct socket *,
+	    int, struct mbuf *, struct mbuf *, struct mbuf *);
 #endif

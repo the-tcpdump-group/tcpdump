@@ -238,43 +238,43 @@ struct	inpcb tcb;		/* head of queue of active tcpcb's */
 struct	tcpstat tcpstat;	/* tcp statistics */
 n_long	tcp_now;		/* for RFC 1323 timestamps */
 
-int	 tcp_attach __P((struct socket *));
-void	 tcp_canceltimers __P((struct tcpcb *));
+int	 tcp_attach (struct socket *);
+void	 tcp_canceltimers (struct tcpcb *);
 struct tcpcb *
-	 tcp_close __P((struct tcpcb *));
-void	 tcp_ctlinput __P((int, struct sockaddr *, struct ip *));
-int	 tcp_ctloutput __P((int, struct socket *, int, int, struct mbuf **));
+	 tcp_close (struct tcpcb *);
+void	 tcp_ctlinput (int, struct sockaddr *, struct ip *);
+int	 tcp_ctloutput (int, struct socket *, int, int, struct mbuf **);
 struct tcpcb *
-	 tcp_disconnect __P((struct tcpcb *));
+	 tcp_disconnect (struct tcpcb *);
 struct tcpcb *
-	 tcp_drop __P((struct tcpcb *, int));
-void	 tcp_dooptions __P((struct tcpcb *,
-	    u_char *, int, struct tcpiphdr *, int *, n_long *, n_long *));
-void	 tcp_drain __P((void));
-void	 tcp_fasttimo __P((void));
-void	 tcp_init __P((void));
-void	 tcp_input __P((struct mbuf *, int));
-int	 tcp_mss __P((struct tcpcb *, u_int));
+	 tcp_drop (struct tcpcb *, int);
+void	 tcp_dooptions (struct tcpcb *,
+	    u_char *, int, struct tcpiphdr *, int *, n_long *, n_long *);
+void	 tcp_drain (void);
+void	 tcp_fasttimo (void);
+void	 tcp_init (void);
+void	 tcp_input (struct mbuf *, int);
+int	 tcp_mss (struct tcpcb *, u_int);
 struct tcpcb *
-	 tcp_newtcpcb __P((struct inpcb *));
-void	 tcp_notify __P((struct inpcb *, int));
-int	 tcp_output __P((struct tcpcb *));
-void	 tcp_pulloutofband __P((struct socket *,
-	    struct tcpiphdr *, struct mbuf *));
-void	 tcp_quench __P((struct inpcb *, int));
-int	 tcp_reass __P((struct tcpcb *, struct tcpiphdr *, struct mbuf *));
-void	 tcp_respond __P((struct tcpcb *,
-	    struct tcpiphdr *, struct mbuf *, n_long, n_long, int));
-void	 tcp_setpersist __P((struct tcpcb *));
-void	 tcp_slowtimo __P((void));
+	 tcp_newtcpcb (struct inpcb *);
+void	 tcp_notify (struct inpcb *, int);
+int	 tcp_output (struct tcpcb *);
+void	 tcp_pulloutofband (struct socket *,
+	    struct tcpiphdr *, struct mbuf *);
+void	 tcp_quench (struct inpcb *, int);
+int	 tcp_reass (struct tcpcb *, struct tcpiphdr *, struct mbuf *);
+void	 tcp_respond (struct tcpcb *,
+	    struct tcpiphdr *, struct mbuf *, n_long, n_long, int);
+void	 tcp_setpersist (struct tcpcb *);
+void	 tcp_slowtimo (void);
 struct tcpiphdr *
-	 tcp_template __P((struct tcpcb *));
+	 tcp_template (struct tcpcb *);
 struct tcpcb *
-	 tcp_timers __P((struct tcpcb *, int));
-void	 tcp_trace __P((int, int, struct tcpcb *, struct tcpiphdr *, int));
+	 tcp_timers (struct tcpcb *, int);
+void	 tcp_trace (int, int, struct tcpcb *, struct tcpiphdr *, int);
 struct tcpcb *
-	 tcp_usrclosed __P((struct tcpcb *));
-int	 tcp_usrreq __P((struct socket *,
-	    int, struct mbuf *, struct mbuf *, struct mbuf *));
-void	 tcp_xmit_timer __P((struct tcpcb *, int));
+	 tcp_usrclosed (struct tcpcb *);
+int	 tcp_usrreq (struct socket *,
+	    int, struct mbuf *, struct mbuf *, struct mbuf *);
+void	 tcp_xmit_timer (struct tcpcb *, int);
 #endif

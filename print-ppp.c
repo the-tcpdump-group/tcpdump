@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.54 2000-10-09 01:53:20 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.55 2000-10-24 00:56:50 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -324,16 +324,16 @@ static const char *papcode[] = {
 #define BAP_CSIND	7
 #define BAP_CSRES	8
 
-static const char *ppp_protoname __P((u_int proto));
-static void handle_ctrl_proto __P((u_int proto,const u_char *p, int length));
-static void handle_chap __P((const u_char *p, int length));
-static void handle_pap __P((const u_char *p, int length));
-static void handle_bap __P((const u_char *p, int length));
-static int print_lcp_config_options __P((const u_char *p, int));
-static int print_ipcp_config_options __P((const u_char *p, int));
-static int print_ccp_config_options __P((const u_char *p, int));
-static int print_bacp_config_options __P((const u_char *p, int));
-static void handle_ppp __P((u_int proto, const u_char *p, int length));
+static const char *ppp_protoname (u_int proto);
+static void handle_ctrl_proto (u_int proto,const u_char *p, int length);
+static void handle_chap (const u_char *p, int length);
+static void handle_pap (const u_char *p, int length);
+static void handle_bap (const u_char *p, int length);
+static int print_lcp_config_options (const u_char *p, int);
+static int print_ipcp_config_options (const u_char *p, int);
+static int print_ccp_config_options (const u_char *p, int);
+static int print_bacp_config_options (const u_char *p, int);
+static void handle_ppp (u_int proto, const u_char *p, int length);
 
 static const char *
 ppp_protoname(u_int proto)

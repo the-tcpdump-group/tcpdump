@@ -63,7 +63,6 @@ mib.h
 missing/addrinfo.h
 missing/addrsize.h
 missing/bittypes.h
-missing/cdecl_ext.h
 missing/getaddrinfo.c
 missing/getnameinfo.c
 missing/inet_aton.c

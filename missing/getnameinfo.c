@@ -43,7 +43,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/missing/getnameinfo.c,v 1.7 2000-10-07 05:20:24 itojun Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/missing/getnameinfo.c,v 1.8 2000-10-24 00:56:53 fenner Exp $";
 #endif
 
 #include <sys/types.h>
@@ -57,10 +57,6 @@ static const char rcsid[] =
 #include <string.h>
 #include <stddef.h>
 #include <errno.h>
-
-#ifndef HAVE_PORTABLE_PROTOTYPE
-#include "cdecl_ext.h"
-#endif 
 
 #ifdef NEED_ADDRINFO_H
 #include "addrinfo.h"

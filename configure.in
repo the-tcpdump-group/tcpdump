@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.128 2000-10-21 04:54:26 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.129 2000-10-24 00:56:49 fenner Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.128 $)
+AC_REVISION($Revision: 1.129 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -371,13 +371,6 @@ dnl
 dnl Check for sa_len
 AC_CHECK_SA_LEN(ac_cv_sockaddr_has_sa_len)
 if test "$ac_cv_sockaddr_has_sa_len" = no; then
-	missing_includes=yes
-fi
-
-dnl
-dnl check __P macro
-AC_CHECK_PORTABLE_PROTO(ac_cv_portable_proto)
-if test "$ac_cv_portable_proto" = no; then
 	missing_includes=yes
 fi
 
