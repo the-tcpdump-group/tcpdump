@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.40 2002-03-19 10:49:44 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.41 2002-03-20 07:00:03 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -756,7 +756,7 @@ static int isis_print (const u_char *p, u_int length)
     const struct isis_tlv_ptp_adj *tlv_ptp_adj;
     const struct isis_tlv_is_reach *tlv_is_reach;
 
-    u_char pdu_type, max_area, type, len, tmp, alen, subl, subt, tslen, ttslen;
+    u_char pdu_type, max_area, id_length, type, len, tmp, alen, subl, subt, tslen;
     const u_char *optr, *pptr, *tptr;
     u_short packet_len,pdu_len,time_remain;
     u_int i,j,bit_length,byte_length,metric,ra,rr;
@@ -805,7 +805,7 @@ static int isis_print (const u_char *p, u_int length)
     max_area = header->max_area;
     switch(max_area) {
     case 0:
-	max_area = 3;			/* silly shit */
+	max_area = 3;	 /* silly shit */
 	break;
     case 255:
 	printf(", bad packet -- 255 areas");
@@ -814,9 +814,34 @@ static int isis_print (const u_char *p, u_int length)
 	break;
     }
 
-    printf(", hlen: %u, v: %u, sys-id-len: 6 (0), max-area: %u (%u)",
+    id_length = header->id_length;
+    switch(id_length) {
+    case 0:
+        id_length = 6;	 /* silly shit again */
+	break;
+    case 1:              /* 1-8 are valid sys-ID lenghts */               
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+        break;
+    case 255:
+        id_length = 0;   /* entirely useless */
+	break;
+    default:
+	printf(", bad packet -- illegal sys-ID length (%u)", id_length);      
+	return (0);
+	break;
+    }
+
+    printf(", hlen: %u, v: %u, sys-id-len: %u (%u), max-area: %u (%u)",
            header->fixed_len,
-           header->pkt_version,
+           header->version,
+	   id_length,
+	   header->id_length,
            max_area,
            header->max_area);
            
@@ -1153,9 +1178,8 @@ static int isis_print (const u_char *p, u_int length)
                 tslen=*(tptr++);
                 printf(", %ssub-TLVs present",tslen ? "" : "no ");
                 if (tslen) {
-                    printf(" (%u)",tslen);
-                    ttslen=tslen;
-                    while (ttslen>0) {
+                    printf(" (%u)",tslen);                    
+                    while (tslen>0) {
                         if (!TTEST2(*tptr,2))
                             goto trunctlv;
                         printf("\n\t\t\t  ");
@@ -1196,15 +1220,13 @@ static int isis_print (const u_char *p, u_int length)
                         case SUBTLV_EXT_IS_REACH_UNRESERVED_BW :
                             printf("Unreserved bandwidth:");
                             for (i = 0; i < 8; i++) {
-                                if (!TTEST2(*tptr,4))
+                                if (!TTEST2(*(tptr+i*4),4))
                                     goto trunctlv;
                                 j = EXTRACT_32BITS(tptr);
                                 memcpy (&bw, &j, 4); 	
                                 printf("\n\t\t\t    priority level %d: %.3f Mbps",
                                        i, bw*8/1000000 );
-                                tptr+=4;
                             }
-                            tptr-=32;
                             break;      
                         case SUBTLV_EXT_IS_REACH_TE_METRIC:
                             if (!TTEST2(*tptr,3))
@@ -1236,8 +1258,7 @@ static int isis_print (const u_char *p, u_int length)
 				    printf(", ");
 				i++;
 			    }
-			    tptr++;
-			    printf(", Priority %u", *tptr);
+			    printf(", Priority %u", *(tptr+1));
                             break;
 			case SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR:
  			    printf("Interface Switching Capability");
@@ -1245,37 +1266,29 @@ static int isis_print (const u_char *p, u_int length)
 			    if (!TTEST2(*tptr,1))
 			      goto trunctlv;
 			    printf("\n\t\t\t  Interface Switching Capability:%s",
-				   tok2str(isis_gmpls_sw_cap_values, "Unknown", *(tptr++)));
-			    tptr++;
-			    subl--;
+				   tok2str(isis_gmpls_sw_cap_values, "Unknown", *(tptr)));
 
-			    if (!TTEST2(*tptr,1))
+			    if (!TTEST2(*(tptr+1),1))
 			      goto trunctlv;
 			    printf(", LSP Encoding: %s",
-				   tok2str(isis_gmpls_lsp_enc_values, "Unknown", *(tptr++)));
-			    tptr++;
-			    subl--;
+				   tok2str(isis_gmpls_lsp_enc_values, "Unknown", *(tptr+1)));
 
-			    if (!TTEST2(*tptr,2)) /* skip 2 res. bytes */
+			    if (!TTEST2(*(tptr+2),2)) /* skip 2 res. bytes */
 			      goto trunctlv;
-			    tptr+=2;
-			    subl-=2;
 
 			    printf("\n\t\t\t  Max LSP Bandwidth:");
 			    for (i = 0; i < 8; i++) {
-			      if (!TTEST2(*tptr,4))
+			      if (!TTEST2(*(tptr+(i*4)+4),4))
 				goto trunctlv;
 			      j = EXTRACT_32BITS(tptr);
 			      memcpy (&bw, &j, 4); 	
 			      printf("\n\t\t\t    priority level %d: %.3f Mbps",
 				     i, bw*8/1000000 );
-			      tptr+=4;
-			      subl-=4;
                             }
 			    /* there is some optional stuff left to decode but this is as of yet
 			       not specified so just lets hexdump what is left */
 			    if(!subl){
-			      if(isis_print_unknown_data(tptr,"\n\t\t\t    ",subl))
+			      if(isis_print_unknown_data(tptr,"\n\t\t\t    ",subl-36))
 			          return(1);
 			    }
 			    break;
@@ -1296,10 +1309,9 @@ static int isis_print (const u_char *p, u_int length)
 			    break;
                         }	
 		    tptr+=subl;
-	            ttslen-=(subl+2);
+	            tslen-=(subl+2);
                     }
                 }	
-                tptr+=tslen;
                 tmp-=(11+tslen);
             }
             break;
@@ -1666,13 +1678,13 @@ static int isis_print (const u_char *p, u_int length)
 		printf("-%02x",(tlv_lsp->lsp_id)[SYSTEM_ID_LEN+1]);
 		if (!TTEST2(tlv_lsp->sequence_number, 4))
 		    goto trunctlv;
-		printf("\n\t\t\t  sequence number: 0x%08x",EXTRACT_32BITS(tlv_lsp->sequence_number));
+		printf(", seq: 0x%08x",EXTRACT_32BITS(tlv_lsp->sequence_number));
 		if (!TTEST2(tlv_lsp->remaining_lifetime, 2))
 		    goto trunctlv;
-		printf("\n\t\t\t  Remaining lifetime: %5ds",EXTRACT_16BITS(tlv_lsp->remaining_lifetime));
+		printf(", lifetime: %5ds",EXTRACT_16BITS(tlv_lsp->remaining_lifetime));
 		if (!TTEST2(tlv_lsp->checksum, 2))
 		    goto trunctlv;
-		printf("\n\t\t\t  checksum: 0x%04x",EXTRACT_16BITS(tlv_lsp->checksum));
+		printf(", chksum: 0x%04x",EXTRACT_16BITS(tlv_lsp->checksum));
 		i+=sizeof(struct isis_tlv_lsp);
 		tlv_lsp++;
 	    }
