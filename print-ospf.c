@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.44 2003-10-22 17:08:45 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.45 2003-10-22 20:00:03 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -145,21 +145,30 @@ static char tstr[] = " [|ospf]";
 #endif /* WIN32 */
 
 static int ospf_print_lshdr(const struct lsa_hdr *);
-static int ospf_print_lsa(const struct lsa *);
+static const u_char *ospf_print_lsa(const struct lsa *);
 static int ospf_decode_v2(const struct ospfhdr *, const u_char *);
 
 static int
-ospf_print_lshdr(register const struct lsa_hdr *lshp) {
+ospf_print_lshdr(register const struct lsa_hdr *lshp)
+{
+        u_int ls_length;
 
-	TCHECK(lshp->ls_type);
-	TCHECK(lshp->ls_options);
+        TCHECK(lshp->ls_length);
+        ls_length = EXTRACT_16BITS(&lshp->ls_length);
+        if (ls_length < sizeof(struct lsa_hdr)) {
+                printf("\n\t    Bogus length %u < %lu", ls_length,
+                    (unsigned long)sizeof(struct lsa_hdr));
+                return(-1);
+        }
 
+        TCHECK(lshp->ls_seq);	/* XXX - ls_length check checked this */
 	printf("\n\t  Advertising Router: %s, seq 0x%08x, age %us, length: %u",
 	       ipaddr_string(&lshp->ls_router),
 	       EXTRACT_32BITS(&lshp->ls_seq),
 	       EXTRACT_16BITS(&lshp->ls_age),
-               EXTRACT_16BITS(&lshp->ls_length)-sizeof(struct lsa_hdr));
+               ls_length-(u_int)sizeof(struct lsa_hdr));
 
+	TCHECK(lshp->ls_type);	/* XXX - ls_length check checked this */
         switch (lshp->ls_type) {
 	/* the LSA header for opaque LSAs was slightly changed */
         case LS_TYPE_OPAQUE_LL:
@@ -187,27 +196,31 @@ ospf_print_lshdr(register const struct lsa_hdr *lshp) {
             break;
         }
 
+	TCHECK(lshp->ls_options);	/* XXX - ls_length check checked this */
         printf("\n\t    Options: [%s]", bittok2str(ospf_option_values,"none",lshp->ls_options));
 
-return (0);
+        return (ls_length);
 trunc:
-	return (1);
+	return (-1);
 }
 
 /*
- * Print a single link state advertisement.  If truncated return 1, else 0.
+ * Print a single link state advertisement.  If truncated or if LSA length
+ * field is less than the length of the LSA header, return NULl, else
+ * return pointer to data past end of LSA.
  */
-static int
+static const u_int8_t *
 ospf_print_lsa(register const struct lsa *lsap)
 {
-	register const u_char *ls_end;
+	register const u_int8_t *ls_end;
 	register const struct rlalink *rlp;
 	register const struct tos_metric *tosp;
 	register const struct in_addr *ap;
 	register const struct aslametric *almp;
 	register const struct mcla *mcp;
 	register const u_int32_t *lp;
-	register int j, k,ls_length, tlv_type, tlv_length, subtlv_type, subtlv_length, priority_level;
+	register int j, k, tlv_type, tlv_length, subtlv_type, subtlv_length, priority_level;
+	register int ls_length;
 	const u_int8_t *tptr;
 	int count_srlg;
         union { /* int to float conversion buffer for several subTLVs */
@@ -216,12 +229,11 @@ ospf_print_lsa(register const struct lsa *lsap)
         } bw;
 
 	tptr = (u_int8_t *)lsap->lsa_un.un_unknown; /* squelch compiler warnings */
-        ls_length = EXTRACT_16BITS(&lsap->ls_hdr.ls_length)-sizeof(struct lsa_hdr);
-
-        ospf_print_lshdr(&lsap->ls_hdr);
-
-	TCHECK(lsap->ls_hdr.ls_length);
-	ls_end = (u_char *)lsap + EXTRACT_16BITS(&lsap->ls_hdr.ls_length);
+        ls_length = ospf_print_lshdr(&lsap->ls_hdr);
+        if (ls_length == -1)
+                return(NULL);
+	ls_end = (u_int8_t *)lsap + ls_length;
+	ls_length -= sizeof(struct lsa_hdr);
 
 	switch (lsap->ls_hdr.ls_type) {
 
@@ -264,7 +276,7 @@ ospf_print_lsa(register const struct lsa *lsap)
 			default:
 				printf("\n\t      Unknown Router Link Type (%u)",
 				    rlp->link_type);
-				return (0);
+				return (ls_end);
 			}
 			printf(", tos 0, metric: %d", EXTRACT_16BITS(&rlp->link_tos0metric));
 			tosp = (struct tos_metric *)
@@ -404,28 +416,43 @@ ospf_print_lsa(register const struct lsa *lsap)
  	        if (!TTEST2(*tptr, 4))
 		    goto trunc;
 
-		tptr = (u_int8_t *)(&lsap->lsa_un.un_te_lsa_tlv.type);                
+		tptr = (u_int8_t *)(&lsap->lsa_un.un_te_lsa_tlv.type);
 
-		while (ls_length > 0) {
+		while (ls_length != 0) {
+		    if (ls_length < 4) {
+                        printf("\n\t    Remaining LS length %u < 4", ls_length);
+                        return(ls_end);
+                    }
                     tlv_type = EXTRACT_16BITS(tptr);
                     tlv_length = EXTRACT_16BITS(tptr+2);
-                    ls_length-=(tlv_length+4);
                     tptr+=4;
+                    ls_length-=4;
                     
                     printf("\n\t    %s TLV (%u), length: %u",
                            tok2str(lsa_opaque_te_tlv_values,"unknown",tlv_type),
                            tlv_type,
                            tlv_length);
 
+                    if (tlv_length > ls_length) {
+                        printf("\n\t    Bogus length %u > %u", tlv_length,
+                            ls_length);
+                        return(ls_end);
+                    }
+                    ls_length-=tlv_length;
                     switch(tlv_type) {
                     case LS_OPAQUE_TE_TLV_LINK:
-                        while (tlv_length > 0) {
+                        while (tlv_length != 0) {
+                            if (tlv_length < 4) {
+                                printf("\n\t    Remaining TLV length %u < 4",
+                                    tlv_length);
+                                return(ls_end);
+                            }
                             if (!TTEST2(*tptr, 4))
                                 goto trunc;
                             subtlv_type = EXTRACT_16BITS(tptr);
                             subtlv_length = EXTRACT_16BITS(tptr+2);
-                            tlv_length-=4;
                             tptr+=4;
+                            tlv_length-=4;
                             
                             printf("\n\t      %s subTLV (%u), length: %u",
                                    tok2str(lsa_opaque_te_link_tlv_subtlv_values,"unknown",subtlv_type),
@@ -508,7 +535,7 @@ ospf_print_lsa(register const struct lsa *lsap)
                             default:
                                 if (vflag <= 1) {
                                     if(!print_unknown_data(tptr,"\n\t\t",subtlv_length))
-                                        return(0);
+                                        return(ls_end);
                                 }
                                 break;
                             }
@@ -529,7 +556,7 @@ ospf_print_lsa(register const struct lsa *lsap)
                     default:
                         if (vflag <= 1) {
                             if(!print_unknown_data(tptr,"\n\t      ",tlv_length))
-                                return(0);
+                                return(ls_end);
                         }
                         break;
                     }
@@ -541,8 +568,8 @@ ospf_print_lsa(register const struct lsa *lsap)
         default:
             if (vflag <= 1) {
                 if(!print_unknown_data((u_int8_t *)lsap->lsa_un.un_unknown,
-                                       "\n\t    ", EXTRACT_16BITS(&lsap->ls_hdr.ls_length)-sizeof(struct lsa_hdr)))
-                    return(0);
+                                       "\n\t    ", ls_length))
+                    return(ls_end);
             } 
             break;
         }
@@ -550,13 +577,13 @@ ospf_print_lsa(register const struct lsa *lsap)
         /* do we want to see an additionally hexdump ? */
         if (vflag> 1)
             if(!print_unknown_data((u_int8_t *)lsap->lsa_un.un_unknown,
-                                   "\n\t    ", EXTRACT_16BITS(&lsap->ls_hdr.ls_length)-sizeof(struct lsa_hdr))) {
-                return(0);
+                                   "\n\t    ", ls_length)) {
+                return(ls_end);
             }
         
-	return (0);
+	return (ls_end);
 trunc:
-	return (1);
+	return (NULL);
 }
 
 static int
@@ -620,7 +647,7 @@ ospf_decode_v2(register const struct ospfhdr *op,
 		if (vflag) {
 			/* Print all the LS adv's */
 			lshp = op->ospf_db.db_lshdr;
-			while (!ospf_print_lshdr(lshp)) {
+			while (ospf_print_lshdr(lshp) != -1) {
 				++lshp;
 			}
 		}
@@ -663,16 +690,15 @@ ospf_decode_v2(register const struct ospfhdr *op,
                 printf(", %d LSA%s",lsa_count_max, lsa_count_max > 1 ? "s" : "");
                 for (lsa_count=1;lsa_count <= lsa_count_max;lsa_count++) {
                     printf("\n\t  LSA #%u",lsa_count);
-                        if (ospf_print_lsa(lsap))
+                        lsap = (const struct lsa *)ospf_print_lsa(lsap);
+                        if (lsap == NULL)
                                 goto trunc;
-                        lsap = (struct lsa *)((u_char *)lsap +
-                                              EXTRACT_16BITS(&lsap->ls_hdr.ls_length));
                 }
 		break;
 
 	case OSPF_TYPE_LS_ACK:
                 lshp = op->ospf_lsa.lsa_lshdr;
-                while (!ospf_print_lshdr(lshp)) {
+                while (ospf_print_lshdr(lshp) != -1) {
                     ++lshp;
                 }
                 break;
