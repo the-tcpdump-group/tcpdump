@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.76 2003-01-25 23:23:58 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.77 2003-02-24 09:36:56 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -860,8 +860,9 @@ isis_print_ip_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
         case SUBTLV_IP_REACH_ADMIN_TAG32:
             if (!TTEST2(*tptr,4))
                 goto trunctlv;
-            printf("%s32-Bit Administrative tag: 0x%08x",
+            printf("%s32-Bit Administrative tag: 0x%08x (=%u)",
                    ident,
+                   EXTRACT_32BITS(tptr),
                    EXTRACT_32BITS(tptr));
             break;
         case SUBTLV_IP_REACH_ADMIN_TAG64:
@@ -1204,7 +1205,7 @@ isis_print_extd_ip_reach (const u_int8_t *tptr, const char *ident, u_int16_t afi
         if (!TTEST2(*tptr, 1))
             return (0);
         sublen=*(tptr++);
-        processed+=sublen;
+        processed+=sublen+1;
         printf(" (%u)",sublen);   /* print out subTLV length */
         
         while (sublen>0) {
