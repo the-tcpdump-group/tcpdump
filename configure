@@ -4498,7 +4498,7 @@ else
   case "$target_cpu" in
 
 	# XXX: should also check that they don't do weird things (like on arm)
-	alpha|arm*|hp*|mips|sparc)
+	alpha*|arm*|hp*|mips|sparc)
 		ac_cv_lbl_unaligned_fail=yes
 		;;
 
