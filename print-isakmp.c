@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.36.2.2 2003-11-16 08:51:28 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.36.2.3 2003-12-15 10:40:57 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1076,20 +1076,25 @@ isakmp_sub0_print(u_char np, const struct isakmp_gen *ext, const u_char *ep,
 	cp = (u_char *)ext;
 	safememcpy(&e, ext, sizeof(e));
 
-	if (NPFUNC(np))
+	/*
+	 * Since we can't have a payload length of less than 4 bytes,
+	 * we need to bail out here if the generic header is nonsensical
+	 * or truncated, otherwise we could loop forever processing
+	 * zero-length items or otherwise misdissect the packet.
+	 */
+	item_len = ntohs(e.len);
+	if (item_len <= 4)
+		return NULL;
+
+	if (NPFUNC(np)) {
+		/*
+		 * XXX - what if item_len is too short, or too long,
+		 * for this payload type?
+		 */
 		cp = (*NPFUNC(np))(ext, ep, phase, doi, proto, depth);
-	else {
+	} else {
 		printf("%s", NPSTR(np));
-		item_len = ntohs(e.len);
-		if (item_len == 0) {
-			/*
-			 * We don't want to loop forever processing this
-			 * bogus (zero-length) item; return NULL so that
-			 * we stop dissecting.
-			 */
-			cp = NULL;
-		} else
-			cp += item_len;
+		cp += item_len;
 	}
 
 	return cp;
