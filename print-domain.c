@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.85 2003-09-25 22:30:22 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.86 2003-11-05 06:03:00 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -305,7 +305,7 @@ struct tok ns_class2str[] = {
 
 /* print a query */
 static const u_char *
-ns_qprint(register const u_char *cp, register const u_char *bp)
+ns_qprint(register const u_char *cp, register const u_char *bp, int is_mdns)
 {
 	register const u_char *np = cp;
 	register u_int i;
@@ -321,7 +321,9 @@ ns_qprint(register const u_char *cp, register const u_char *bp)
 	printf(" %s", tok2str(ns_type2str, "Type%d", i));
 	i = EXTRACT_16BITS(cp);
 	cp += 2;
-	if (i != C_IN)
+	if (is_mdns && i == (C_IN|C_CACHE_FLUSH))
+		printf(" (Cache flush)");
+	else if (i != C_IN)
 		printf(" %s", tok2str(ns_class2str, "(Class %d)", i));
 
 	fputs("? ", stdout);
@@ -331,7 +333,7 @@ ns_qprint(register const u_char *cp, register const u_char *bp)
 
 /* print a reply */
 static const u_char *
-ns_rprint(register const u_char *cp, register const u_char *bp)
+ns_rprint(register const u_char *cp, register const u_char *bp, int is_mdns)
 {
 	register u_int class;
 	register u_short typ, len;
@@ -352,7 +354,9 @@ ns_rprint(register const u_char *cp, register const u_char *bp)
 	cp += 2;
 	class = EXTRACT_16BITS(cp);
 	cp += 2;
-	if (class != C_IN && typ != T_OPT)
+	if (is_mdns && class == (C_IN|C_CACHE_FLUSH))
+		printf(" (Cache flush)");
+	else if (class != C_IN && typ != T_OPT)
 		printf(" %s", tok2str(ns_class2str, "(Class %d)", class));
 
 	/* ignore ttl */
@@ -518,7 +522,7 @@ ns_rprint(register const u_char *cp, register const u_char *bp)
 }
 
 void
-ns_print(register const u_char *bp, u_int length)
+ns_print(register const u_char *bp, u_int length, int is_mdns)
 {
 	register const HEADER *np;
 	register int qdcount, ancount, nscount, arcount;
@@ -553,7 +557,7 @@ ns_print(register const u_char *bp, u_int length)
 				putchar(',');
 			if (vflag > 1) {
 				fputs(" q:", stdout);
-				if ((cp = ns_qprint(cp, bp)) == NULL)
+				if ((cp = ns_qprint(cp, bp, is_mdns)) == NULL)
 					goto trunc;
 			} else {
 				if ((cp = ns_nskip(cp)) == NULL)
@@ -563,11 +567,11 @@ ns_print(register const u_char *bp, u_int length)
 		}
 		printf(" %d/%d/%d", ancount, nscount, arcount);
 		if (ancount--) {
-			if ((cp = ns_rprint(cp, bp)) == NULL)
+			if ((cp = ns_rprint(cp, bp, is_mdns)) == NULL)
 				goto trunc;
 			while (cp < snapend && ancount--) {
 				putchar(',');
-				if ((cp = ns_rprint(cp, bp)) == NULL)
+				if ((cp = ns_rprint(cp, bp, is_mdns)) == NULL)
 					goto trunc;
 			}
 		}
@@ -577,11 +581,11 @@ ns_print(register const u_char *bp, u_int length)
 		if (vflag > 1) {
 			if (cp < snapend && nscount--) {
 				fputs(" ns:", stdout);
-				if ((cp = ns_rprint(cp, bp)) == NULL)
+				if ((cp = ns_rprint(cp, bp, is_mdns)) == NULL)
 					goto trunc;
 				while (cp < snapend && nscount--) {
 					putchar(',');
-					if ((cp = ns_rprint(cp, bp)) == NULL)
+					if ((cp = ns_rprint(cp, bp, is_mdns)) == NULL)
 						goto trunc;
 				}
 			}
@@ -589,11 +593,11 @@ ns_print(register const u_char *bp, u_int length)
 				goto trunc;
 			if (cp < snapend && arcount--) {
 				fputs(" ar:", stdout);
-				if ((cp = ns_rprint(cp, bp)) == NULL)
+				if ((cp = ns_rprint(cp, bp, is_mdns)) == NULL)
 					goto trunc;
 				while (cp < snapend && arcount--) {
 					putchar(',');
-					if ((cp = ns_rprint(cp, bp)) == NULL)
+					if ((cp = ns_rprint(cp, bp, is_mdns)) == NULL)
 						goto trunc;
 				}
 			}
@@ -631,12 +635,13 @@ ns_print(register const u_char *bp, u_int length)
 
 		cp = (const u_char *)(np + 1);
 		if (qdcount--) {
-			cp = ns_qprint(cp, (const u_char *)np);
+			cp = ns_qprint(cp, (const u_char *)np, is_mdns);
 			if (!cp)
 				goto trunc;
 			while (cp < snapend && qdcount--) {
 				cp = ns_qprint((const u_char *)cp,
-					       (const u_char *)np);
+					       (const u_char *)np,
+					       is_mdns);
 				if (!cp)
 					goto trunc;
 			}
@@ -647,11 +652,11 @@ ns_print(register const u_char *bp, u_int length)
 		/* Print remaining sections on -vv */
 		if (vflag > 1) {
 			if (ancount--) {
-				if ((cp = ns_rprint(cp, bp)) == NULL)
+				if ((cp = ns_rprint(cp, bp, is_mdns)) == NULL)
 					goto trunc;
 				while (cp < snapend && ancount--) {
 					putchar(',');
-					if ((cp = ns_rprint(cp, bp)) == NULL)
+					if ((cp = ns_rprint(cp, bp, is_mdns)) == NULL)
 						goto trunc;
 				}
 			}
@@ -659,11 +664,11 @@ ns_print(register const u_char *bp, u_int length)
 				goto trunc;
 			if (cp < snapend && nscount--) {
 				fputs(" ns:", stdout);
-				if ((cp = ns_rprint(cp, bp)) == NULL)
+				if ((cp = ns_rprint(cp, bp, is_mdns)) == NULL)
 					goto trunc;
 				while (nscount-- && cp < snapend) {
 					putchar(',');
-					if ((cp = ns_rprint(cp, bp)) == NULL)
+					if ((cp = ns_rprint(cp, bp, is_mdns)) == NULL)
 						goto trunc;
 				}
 			}
@@ -671,11 +676,11 @@ ns_print(register const u_char *bp, u_int length)
 				goto trunc;
 			if (cp < snapend && arcount--) {
 				fputs(" ar:", stdout);
-				if ((cp = ns_rprint(cp, bp)) == NULL)
+				if ((cp = ns_rprint(cp, bp, is_mdns)) == NULL)
 					goto trunc;
 				while (cp < snapend && arcount--) {
 					putchar(',');
-					if ((cp = ns_rprint(cp, bp)) == NULL)
+					if ((cp = ns_rprint(cp, bp, is_mdns)) == NULL)
 						goto trunc;
 				}
 			}

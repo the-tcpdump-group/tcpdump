@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/nameser.h,v 1.13 2002-12-11 07:13:55 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/nameser.h,v 1.14 2003-11-05 06:02:59 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1983, 1989, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -190,6 +190,7 @@
 #define C_HS		4		/* for Hesiod name server (MIT) (XXX) */
 	/* Query class values which do not appear in resource records */
 #define C_ANY		255		/* wildcard match */
+#define C_CACHE_FLUSH	0x8000		/* mDNS cache flush flag */
 
 /*
  * Status return codes for T_UNSPEC conversion routines

@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.216 2003-10-27 10:13:45 hannes Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.217 2003-11-05 06:02:58 guy Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -249,7 +249,7 @@ extern u_int ltalk_if_print(const struct pcap_pkthdr *, const u_char *);
 extern void msdp_print(const unsigned char *, u_int);
 extern void nfsreply_print(const u_char *, u_int, const u_char *);
 extern void nfsreq_print(const u_char *, u_int, const u_char *);
-extern void ns_print(const u_char *, u_int);
+extern void ns_print(const u_char *, u_int, int);
 extern void ntp_print(const u_char *, u_int);
 extern u_int null_if_print(const struct pcap_pkthdr *, const u_char *);
 extern void ospf_print(const u_char *, u_int, const u_char *);
