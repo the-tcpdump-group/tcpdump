@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.44 2001-01-28 09:02:14 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.45 2001-01-28 09:09:36 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -411,7 +411,7 @@ icmp6_opt_print(register const u_char *bp, int resid)
 	register const struct nd_opt_prefix_info *opp;
 	register const struct icmp6_opts_redirect *opr;
 	register const struct nd_opt_mtu *opm;
-	register const struct nd_opt_advint *opa;
+	register const struct nd_opt_advinterval *opa;
 	register const u_char *ep;
 	int	opts_len;
 #if 0
@@ -526,11 +526,11 @@ icmp6_opt_print(register const u_char *bp, int resid)
 				resid - (op->nd_opt_len << 3));
 		break;
         case ND_OPT_ADVINTERVAL:
-		opa = (struct nd_opt_advint *)op;
-		TCHECK(opa->nd_opt_advint_advint);
+		opa = (struct nd_opt_advinterval *)op;
+		TCHECK(opa->nd_opt_adv_interval);
 		printf("(advint: ");	/*)*/
 		printf("advint=%u",
-		    (u_int32_t)ntohl(opa->nd_opt_advint_advint));
+		    (u_int32_t)ntohl(opa->nd_opt_adv_interval));
 		/*(*/
 		printf(")");
 		icmp6_opt_print((const u_char *)op + (op->nd_opt_len << 3),

@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/icmp6.h,v 1.6 2001-01-28 09:02:14 itojun Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/icmp6.h,v 1.7 2001-01-28 09:09:36 itojun Exp $ (LBL) */
 /*	$NetBSD: icmp6.h,v 1.13 2000/08/03 16:30:37 itojun Exp $	*/
 /*	$KAME: icmp6.h,v 1.22 2000/08/03 15:25:16 jinmei Exp $	*/
 
@@ -250,6 +250,7 @@ struct nd_opt_hdr {		/* Neighbor discovery option header */
 #define ND_OPT_REDIRECTED_HEADER	4
 #define ND_OPT_MTU			5
 #define ND_OPT_ADVINTERVAL		7
+#define ND_OPT_HOMEAGENT_INFO		8
 
 struct nd_opt_prefix_info {	/* prefix information */
 	u_int8_t	nd_opt_pi_type;
@@ -281,11 +282,19 @@ struct nd_opt_mtu {		/* MTU option */
 	u_int32_t	nd_opt_mtu_mtu;
 };
 
-struct nd_opt_advint {		/* Advertisement interval option */
-	u_int8_t	nd_opt_advint_type;
-	u_int8_t	nd_opt_advint_len;
-	u_int16_t	nd_opt_advint_reserved;
-	u_int32_t	nd_opt_advint_advint;
+struct nd_opt_advinterval {	/* Advertisement interval option */
+	u_int8_t	nd_opt_adv_type;
+	u_int8_t	nd_opt_adv_len;
+	u_int16_t	nd_opt_adv_reserved;
+	u_int32_t	nd_opt_adv_interval;
+};
+
+struct nd_opt_homeagent_info {	/* Home Agent info */
+	uint8_t		nd_opt_hai_type;
+	uint8_t		nd_opt_hai_len;
+	uint16_t	nd_opt_hai_reserved;
+	int16_t		nd_opt_hai_preference;
+	uint16_t	nd_opt_hai_lifetime;
 };
 
 /*
