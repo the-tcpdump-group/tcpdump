@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.13 2003-08-13 02:26:52 itojun Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.14 2003-08-13 02:28:21 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -169,15 +169,15 @@ fr_flags(const u_char *p)
 	static char flags[1+1+4+1+4+1+2+1];
 
 	if (p[0] & FR_CR_BIT)
-		strcpy(flags, "C");
+		strlcpy(flags, "C", sizeof(flags));
 	else
-		strcpy(flags, "R");
+		strlcpy(flags, "R", sizeof(flags));
 	if (p[1] & FR_FECN)
-		strcat(flags, ",FECN");
+		strlcat(flags, ",FECN", sizeof(flags));
 	if (p[1] & FR_BECN)
-		strcat(flags, ",BECN");
+		strlcat(flags, ",BECN", sizeof(flags));
 	if (p[1] & FR_DE)
-		strcat(flags, ",DE");
+		strlcat(flags, ",DE", sizeof(flags));
 	return flags;
 }
 
