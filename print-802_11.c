@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.21 2003-07-22 17:35:04 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.22 2003-07-22 17:36:57 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -553,47 +553,48 @@ ctrl_body_print(u_int16_t fc, const u_char *p)
 {
 	switch (FC_SUBTYPE(fc)) {
 	case CTRL_PS_POLL:
-		if (!TTEST2(*p, CTRL_PS_POLL_LEN))
+		printf("Power Save-Poll");
+		if (!TTEST2(*p, CTRL_PS_POLL_HDRLEN))
 			return 0;
-		printf("Power Save-Poll AID(%x)",
+		printf(" AID(%x)",
 		    EXTRACT_LE_16BITS(&(((const struct ctrl_ps_poll_t *)p)->aid)));
 		break;
 	case CTRL_RTS:
-		if (!TTEST2(*p, CTRL_RTS_LEN))
-			return 0;
 		printf("Request-To-Send");
+		if (!TTEST2(*p, CTRL_RTS_HDRLEN))
+			return 0;
 		if (!eflag)
 			printf(" TA:%s ",
 			    etheraddr_string(((const struct ctrl_rts_t *)p)->ta));
 		break;
 	case CTRL_CTS:
-		if (!TTEST2(*p, CTRL_CTS_LEN))
-			return 0;
 		printf("Clear-To-Send");
+		if (!TTEST2(*p, CTRL_CTS_HDRLEN))
+			return 0;
 		if (!eflag)
 			printf(" RA:%s ",
 			    etheraddr_string(((const struct ctrl_cts_t *)p)->ra));
 		break;
 	case CTRL_ACK:
-		if (!TTEST2(*p, CTRL_ACK_LEN))
-			return 0;
 		printf("Acknowledgment");
+		if (!TTEST2(*p, CTRL_ACK_HDRLEN))
+			return 0;
 		if (!eflag)
 			printf(" RA:%s ",
 			    etheraddr_string(((const struct ctrl_ack_t *)p)->ra));
 		break;
 	case CTRL_CF_END:
-		if (!TTEST2(*p, CTRL_END_LEN))
-			return 0;
 		printf("CF-End");
+		if (!TTEST2(*p, CTRL_END_HDRLEN))
+			return 0;
 		if (!eflag)
 			printf(" RA:%s ",
 			    etheraddr_string(((const struct ctrl_end_t *)p)->ra));
 		break;
 	case CTRL_END_ACK:
-		if (!TTEST2(*p, CTRL_END_ACK_LEN))
-			return 0;
 		printf("CF-End+CF-Ack");
+		if (!TTEST2(*p, CTRL_END_ACK_HDRLEN))
+			return 0;
 		if (!eflag)
 			printf(" RA:%s ",
 			    etheraddr_string(((const struct ctrl_end_ack_t *)p)->ra));
@@ -762,21 +763,21 @@ extract_header_length(u_int16_t fc)
 {
 	switch (FC_TYPE(fc)) {
 	case T_MGMT:
-		return MGMT_HEADER_LEN;
+		return MGMT_HDRLEN;
 	case T_CTRL:
 		switch (FC_SUBTYPE(fc)) {
 		case CTRL_PS_POLL:
-			return CTRL_PS_POLL_LEN;
+			return CTRL_PS_POLL_HDRLEN;
 		case CTRL_RTS:
-			return CTRL_RTS_LEN;
+			return CTRL_RTS_HDRLEN;
 		case CTRL_CTS:
-			return CTRL_CTS_LEN;
+			return CTRL_CTS_HDRLEN;
 		case CTRL_ACK:
-			return CTRL_ACK_LEN;
+			return CTRL_ACK_HDRLEN;
 		case CTRL_CF_END:
-			return CTRL_END_LEN;
+			return CTRL_END_HDRLEN;
 		case CTRL_END_ACK:
-			return CTRL_END_ACK_LEN;
+			return CTRL_END_ACK_HDRLEN;
 		default:
 			return 0;
 		}
@@ -810,6 +811,10 @@ ieee_802_11_hdr_print(u_int16_t fc, const u_char *p, const u_int8_t **srcp,
 			printf("Strictly Ordered ");
 		if (FC_WEP(fc))
 			printf("WEP Encrypted ");
+		if (FC_TYPE(fc) != T_CTRL || FC_SUBTYPE(fc) != CTRL_PS_POLL)
+			printf("%dus ",
+			    EXTRACT_LE_16BITS(
+			        &((const struct mgmt_header_t *)p)->duration));
 	}
 
 	switch (FC_TYPE(fc)) {

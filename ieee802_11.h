@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ieee802_11.h,v 1.8 2003-07-22 17:35:04 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ieee802_11.h,v 1.9 2003-07-22 17:36:57 guy Exp $ (LBL) */
 /*
  * Copyright (c) 2001
  *	Fortress Technologies
@@ -112,7 +112,7 @@ struct mgmt_header_t {
 	u_int16_t	seq_ctrl;
 };
 
-#define	MGMT_HEADER_LEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
+#define	MGMT_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
 			 IEEE802_11_DA_LEN+IEEE802_11_SA_LEN+\
 			 IEEE802_11_BSSID_LEN+IEEE802_11_SEQ_LEN)
 
@@ -226,8 +226,8 @@ struct ctrl_rts_t {
 	u_int8_t	fcs[4];
 };
 
-#define	CTRL_RTS_LEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
-			 IEEE802_11_RA_LEN+IEEE802_11_TA_LEN+IEEE802_11_FCS_LEN)
+#define	CTRL_RTS_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
+			 IEEE802_11_RA_LEN+IEEE802_11_TA_LEN)
 
 struct ctrl_cts_t {
 	u_int16_t	fc;
@@ -236,8 +236,7 @@ struct ctrl_cts_t {
 	u_int8_t	fcs[4];
 };
 
-#define	CTRL_CTS_LEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
-			 IEEE802_11_RA_LEN+IEEE802_11_FCS_LEN)
+#define	CTRL_CTS_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+IEEE802_11_RA_LEN)
 
 struct ctrl_ack_t {
 	u_int16_t	fc;
@@ -246,8 +245,7 @@ struct ctrl_ack_t {
 	u_int8_t	fcs[4];
 };
 
-#define	CTRL_ACK_LEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
-			 IEEE802_11_RA_LEN+IEEE802_11_FCS_LEN)
+#define	CTRL_ACK_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+IEEE802_11_RA_LEN)
 
 struct ctrl_ps_poll_t {
 	u_int16_t	fc;
@@ -257,9 +255,8 @@ struct ctrl_ps_poll_t {
 	u_int8_t	fcs[4];
 };
 
-#define	CTRL_PS_POLL_LEN	(IEEE802_11_FC_LEN+IEEE802_11_AID_LEN+\
-				 IEEE802_11_BSSID_LEN+IEEE802_11_TA_LEN+\
-				 IEEE802_11_FCS_LEN)
+#define	CTRL_PS_POLL_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_AID_LEN+\
+				 IEEE802_11_BSSID_LEN+IEEE802_11_TA_LEN)
 
 struct ctrl_end_t {
 	u_int16_t	fc;
@@ -269,9 +266,8 @@ struct ctrl_end_t {
 	u_int8_t	fcs[4];
 };
 
-#define	CTRL_END_LEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
-			 IEEE802_11_RA_LEN+IEEE802_11_BSSID_LEN+\
-			 IEEE802_11_FCS_LEN)
+#define	CTRL_END_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
+			 IEEE802_11_RA_LEN+IEEE802_11_BSSID_LEN)
 
 struct ctrl_end_ack_t {
 	u_int16_t	fc;
@@ -281,9 +277,8 @@ struct ctrl_end_ack_t {
 	u_int8_t	fcs[4];
 };
 
-#define	CTRL_END_ACK_LEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
-				 IEEE802_11_RA_LEN+IEEE802_11_BSSID_LEN+\
-				 IEEE802_11_FCS_LEN)
+#define	CTRL_END_ACK_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
+				 IEEE802_11_RA_LEN+IEEE802_11_BSSID_LEN)
 
 #define	IV_IV(iv)	((iv) & 0xFFFFFF)
 #define	IV_PAD(iv)	(((iv) >> 24) & 0x3F)
