@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.152 2003-11-19 01:59:19 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.153 2003-11-23 21:01:50 hannes Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -1013,10 +1013,11 @@ True if the packet is an ATM packet, for SunATM on Solaris, and is
 on a meta signaling circuit and is a Q.2931 Setup, Call Proceeding, Connect,
 Release, or Release Done message.
 .IP  "\fIexpr relop expr\fR"
-True if the relation holds, where \fIrelop\fR is one of >, <, >=, <=, =, !=,
-and \fIexpr\fR is an arithmetic expression composed of integer constants
-(expressed in standard C syntax), the normal binary operators
-[+, -, *, /, &, |], a length operator, and special packet data accessors.
+True if the relation holds, where \fIrelop\fR is one of >, <, >=, <=, =,
+!=, and \fIexpr\fR is an arithmetic expression composed of integer
+constants (expressed in standard C syntax), the normal binary operators
+[+, -, *, /, &, |, <<, >>], a length operator, and special packet data
+accessors.
 To access
 data inside the packet, use the following syntax:
 .in +.5i
