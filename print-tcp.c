@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.91 2001-10-08 21:25:23 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.92 2001-10-19 09:32:01 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -608,7 +608,10 @@ tcp_print(register const u_char *bp, register u_int length,
 			bxxp_print(bp, length);
 		else if (length > 2 &&
 		    (sport == NAMESERVER_PORT || dport == NAMESERVER_PORT)) {
-			/* TCP DNS query has 2byte length at the head */
+			/*
+			 * TCP DNS query has 2byte length at the head.
+			 * XXX packet could be unaligned, it can go strange
+			 */
 			ns_print(bp + 2, length - 2);
 		} else if (sport == MSDP_PORT || dport == MSDP_PORT) {
 			msdp_print(bp, length);
