@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-fddi.c,v 1.47 2000-10-09 02:59:40 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-fddi.c,v 1.48 2000-12-18 05:41:59 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -298,8 +298,8 @@ fddi_if_print(u_char *pcap, const struct pcap_pkthdr *h,
 	extracted_ethertype = 0;
 	if ((fddip->fddi_fc & FDDIFC_CLFF) == FDDIFC_LLC_ASYNC) {
 		/* Try to print the LLC-layer header & higher layers */
-		if (llc_print(p, length, caplen, ESRC(&ehdr), EDST(&ehdr))
-		    == 0) {
+		if (llc_print(p, length, caplen, ESRC(&ehdr), EDST(&ehdr),
+		    &extracted_ethertype) == 0) {
 			/*
 			 * Some kinds of LLC packet we cannot
 			 * handle intelligently

@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.30 2000-12-05 06:42:48 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.31 2000-12-18 05:42:00 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -64,7 +64,7 @@ static struct tok cmd2str[] = {
  */
 int
 llc_print(const u_char *p, u_int length, u_int caplen,
-	  const u_char *esrc, const u_char *edst)
+	  const u_char *esrc, const u_char *edst, u_short *extracted_ethertype)
 {
 	struct llc llc;
 	register u_short et;
@@ -153,7 +153,8 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 
 		/* This is an encapsulated Ethernet packet */
 		et = EXTRACT_16BITS(&llc.ethertype[0]);
-		ret = ether_encap_print(et, p, length, caplen);
+		ret = ether_encap_print(et, p, length, caplen,
+		    extracted_ethertype);
 		if (ret)
 			return (ret);
 	}

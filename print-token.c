@@ -25,7 +25,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-token.c,v 1.8 2000-10-06 04:23:14 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-token.c,v 1.9 2000-12-18 05:42:00 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -180,8 +180,8 @@ token_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	extracted_ethertype = 0;
 	if (FRAME_TYPE(trp) == TOKEN_FC_LLC) {
 		/* Try to print the LLC-layer header & higher layers */
-		if (llc_print(p, length, caplen, ESRC(&ehdr), EDST(&ehdr))
-		    == 0) {
+		if (llc_print(p, length, caplen, ESRC(&ehdr), EDST(&ehdr),
+		    &extracted_ethertype) == 0) {
 			/* ether_type not known, print raw packet */
 			if (!eflag)
 				token_print(trp, length,

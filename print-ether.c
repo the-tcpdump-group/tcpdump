@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.59 2000-10-22 04:17:53 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.60 2000-12-18 05:41:59 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -67,8 +67,6 @@ ether_print(register const u_char *bp, u_int length)
 			     length);
 }
 
-static u_short extracted_ethertype;
-
 /*
  * This is the top level routine of the printer.  'p' is the points
  * to the ether header of the packet, 'h->tv' is the timestamp,
@@ -82,6 +80,7 @@ ether_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	u_int length = h->len;
 	struct ether_header *ep;
 	u_short ether_type;
+	u_short extracted_ethertype;
 
 	ts_print(&h->ts);
 
@@ -114,7 +113,8 @@ ether_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	extracted_ethertype = 0;
 	if (ether_type <= ETHERMTU) {
 		/* Try to print the LLC-layer header & higher layers */
-		if (llc_print(p, length, caplen, ESRC(ep), EDST(ep)) == 0) {
+		if (llc_print(p, length, caplen, ESRC(ep), EDST(ep),
+		    &extracted_ethertype) == 0) {
 			/* ether_type not known, print raw packet */
 			if (!eflag)
 				ether_print((u_char *)ep, length);
@@ -125,7 +125,8 @@ ether_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 			if (!xflag && !qflag)
 				default_print(p, caplen);
 		}
-	} else if (ether_encap_print(ether_type, p, length, caplen) == 0) {
+	} else if (ether_encap_print(ether_type, p, length, caplen,
+	    &extracted_ethertype) == 0) {
 		/* ether_type not known, print raw packet */
 		if (!eflag)
 			ether_print((u_char *)ep, length + ETHER_HDRLEN);
@@ -144,16 +145,18 @@ ether_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
  *
  * Returns non-zero if it can do so, zero if the ethertype is unknown.
  *
- * Stuffs the ether type into a global for the benefit of lower layers
- * that might want to know what it is.
+ * The Ethernet type code is passed through a pointer; if it was
+ * ETHERTYPE_8021Q, it gets updated to be the Ethernet type of
+ * the 802.1Q payload, for the benefit of lower layers that might
+ * want to know what it is.
  */
 
 int
 ether_encap_print(u_short ethertype, const u_char *p,
-    u_int length, u_int caplen)
+    u_int length, u_int caplen, u_short *extracted_ethertype)
 {
  recurse:
-	extracted_ethertype = ethertype;
+	*extracted_ethertype = ethertype;
 
 	switch (ethertype) {
 
@@ -202,15 +205,16 @@ ether_encap_print(u_short ethertype, const u_char *p,
 		if (ethertype > ETHERMTU)
 			goto recurse;
 
-		extracted_ethertype = 0;
+		*extracted_ethertype = 0;
 
-		if (llc_print(p, length, caplen, p - 18, p - 12) == 0) {
+		if (llc_print(p, length, caplen, p - 18, p - 12,
+		    extracted_ethertype) == 0) {
 			/* ether_type not known, print raw packet */
 			if (!eflag)
 				ether_print(p - 18, length + 4);
-			if (extracted_ethertype) {
+			if (*extracted_ethertype) {
 				printf("(LLC %s) ",
-			       etherproto_string(htons(extracted_ethertype)));
+			       etherproto_string(htons(*extracted_ethertype)));
 			}
 			if (!xflag && !qflag)
 				default_print(p - 18, caplen + 4);

@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cip.c,v 1.9 2000-09-29 04:58:35 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cip.c,v 1.10 2000-12-18 05:41:58 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -132,7 +132,8 @@ cip_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	extracted_ethertype = 0;
 	if (ether_type < ETHERMTU) {
 		/* Try to print the LLC-layer header & higher layers */
-		if (llc_print(p, length, caplen, NULL, NULL)==0) {
+		if (llc_print(p, length, caplen, NULL, NULL,
+		    &extracted_ethertype)==0) {
 			/* ether_type not known, print raw packet */
 			if (!eflag)
 				cip_print((u_char *)bp, length);
@@ -143,7 +144,8 @@ cip_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 			if (!xflag && !qflag)
 				default_print(p, caplen);
 		}
-	} else if (ether_encap_print(ether_type, p, length, caplen) == 0) {
+	} else if (ether_encap_print(ether_type, p, length, caplen,
+	    &extracted_ethertype) == 0) {
 		/* ether_type not known, print raw packet */
 		if (!eflag)
 			cip_print((u_char *)bp, length + RFC1483LLC_LEN);
