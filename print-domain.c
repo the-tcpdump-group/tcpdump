@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.68 2001-01-29 20:04:00 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.69 2001-02-03 05:04:33 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -489,16 +489,20 @@ ns_print(register const u_char *bp, u_int length)
 		if (qdcount != 1)
 			printf(" [%dq]", qdcount);
 		/* Print QUESTION section on -vv */
-		if (vflag > 1) {
-			fputs(" q:", stdout);
-			if ((cp = ns_qprint((const u_char *)(np + 1), bp))
-			    == NULL)
-				goto trunc;
-		} else {
-			if ((cp = ns_nskip((const u_char *)(np + 1), bp))
-			    == NULL)
-				goto trunc;
-			cp += 4;
+		while (qdcount--) {
+			if (qdcount < ntohs(np->qdcount) - 1)
+				putchar(',');
+			if (vflag > 1) {
+				fputs(" q:", stdout);
+				if ((cp = ns_qprint((const u_char *)(np + 1), bp))
+				    == NULL)
+					goto trunc;
+			} else {
+				if ((cp = ns_nskip((const u_char *)(np + 1), bp))
+				    == NULL)
+					goto trunc;
+				cp += 4;	/* skip QTYPE and QCLASS */
+			}
 		}
 		printf(" %d/%d/%d", ancount, nscount, arcount);
 		if (ancount--) {
