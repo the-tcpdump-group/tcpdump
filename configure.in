@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.91 2000-01-09 21:34:16 fenner Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.92 2000-01-09 21:41:01 fenner Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.91 $)
+AC_REVISION($Revision: 1.92 $)
 AC_INIT(tcpdump.c)
 
 AC_CANONICAL_SYSTEM
@@ -60,6 +60,8 @@ main()
   AC_DEFINE(LIBSMI)
   libsmi=yes],
 [ AC_MSG_RESULT(no)
+  libsmi=no],
+[ AC_MSG_RESULT(not when cross-compiling)
   libsmi=no]
 )
 
@@ -341,11 +343,12 @@ if test "$ac_cv_portable_proto" = no; then
 fi
 
 dnl
-dnl check sizeof basic types
-AC_CHECK_SIZEOF(char)
-AC_CHECK_SIZEOF(short)
-AC_CHECK_SIZEOF(int)
-AC_CHECK_SIZEOF(long)
+dnl check sizeof basic types.
+dnl They're very likely to be wrong for cross-compiling.
+AC_CHECK_SIZEOF(char, 1)
+AC_CHECK_SIZEOF(short, 2)
+AC_CHECK_SIZEOF(int, 4)
+AC_CHECK_SIZEOF(long, 4)
 
 dnl
 dnl Checks for u_intXX_t
@@ -414,6 +417,8 @@ AC_CHECK_FUNCS(ether_ntohost setlinebuf gethostbyname2)
 AC_CHECK_FUNCS(vsnprintf snprintf asprintf asnprintf vasprintf vasnprintf)
 
 dnl The following generates a warning from autoconf...
+errprint(__file__:__line__: please ignore the next warning:
+)dnl
 AC_C_BIGENDIAN
 
 AC_CHECK_LIB(dnet, main)
