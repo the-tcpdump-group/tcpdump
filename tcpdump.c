@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.216.2.7 2004-01-14 03:25:28 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.216.2.8 2004-01-26 01:42:18 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -941,13 +941,18 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 	 * file could put it over Cflag.
 	 */
 	if (ftell((FILE *)dump_info->p) > Cflag) {
+		/*
+		 * Close the current file and open a new one.
+		 */
+		pcap_dump_close(dump_info->p);
 		name = (char *) malloc(strlen(dump_info->WFileName) + 4);
 		if (name == NULL)
 			error("dump_packet_and_trunc: malloc");
 		strcpy(name, dump_info->WFileName);
+		if (cnt >= 1000)
+			error("too many output files");
 		swebitoa(cnt, name + strlen(dump_info->WFileName));
 		cnt++;
-		pcap_dump_close(dump_info->p);
 		dump_info->p = pcap_dump_open(dump_info->pd, name);
 		free(name);
 		if (dump_info->p == NULL)
