@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.62 1999-10-30 05:11:06 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.63 1999-11-20 15:34:39 itojun Exp $ (LBL)";
 #endif
 
 #include <sys/types.h>
@@ -246,7 +246,7 @@ getname6(const u_char *ap)
 	char ntop_buf[INET6_ADDRSTRLEN];
 
 	memcpy(&addr, ap, sizeof(addr));
-	p = &h6nametable[*(u_int16_t *)&addr.s6_addr[15] & (HASHNAMESIZE-1)];
+	p = &h6nametable[*(u_int16_t *)&addr.s6_addr[14] & (HASHNAMESIZE-1)];
 	for (; p->nxt; p = p->nxt) {
 		if (memcmp(&p->addr, &addr, sizeof(addr)) == 0)
 			return (p->name);
