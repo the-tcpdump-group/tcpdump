@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.81 2003-05-08 14:25:04 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.82 2003-05-11 08:59:22 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -381,8 +381,7 @@ handle_ctrl_proto(u_int proto, const u_char *pptr, int length)
 
         tptr=pptr;
 
-        if (!vflag) /* omit the proto id as we already have printed it */
-                printf("%s: ",tok2str(ppptype2str, "unknown", proto));
+        printf("%s, ",tok2str(ppptype2str, "unknown", proto));
 
 	if (length < 4) /* FIXME weak boundary checking */
 		return;
@@ -1027,8 +1026,9 @@ ppp_print(register const u_char *p, u_int length)
 	}
 
         if (eflag)
-            printf("PPP-%s (length: %u): ",
-                   tok2str(ppptype2str, "unknown (0x%04x)", proto),
+            printf("PPP-%s (0x%04x) length: %u, ",
+                   tok2str(ppptype2str, "unknown", proto),
+                   proto,
                    olen);
 
 	handle_ppp(proto, p, length);
