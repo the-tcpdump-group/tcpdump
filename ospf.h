@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.5 2002-11-09 17:19:23 itojun Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.6 2002-12-11 07:07:25 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1991, 1993, 1994, 1995, 1996, 1997
  *	The Regents of the University of California.  All rights reserved.
@@ -167,7 +167,7 @@ struct lsa {
 	    u_int8_t opaque_type;
 	    u_int8_t opaque_id[3];
 	    struct in_addr adv_router;
-	    struct in_addr sequence_num;;
+	    struct in_addr sequence_num;
 	    u_int16_t chksum;
             u_int16_t length;
 	} un_opaque[1];
