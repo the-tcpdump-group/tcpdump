@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.33 2002-09-05 00:00:16 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.34 2002-10-19 02:43:05 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -577,6 +577,22 @@ pimv2_print(register const u_char *bp, register u_int len)
 				(void)printf(" (Hold-time ");
 				relts_print(EXTRACT_16BITS(&bp[4]));
 				(void)printf(")");
+				break;
+
+			case 2:		/* LAN Prune Delay */
+				(void)printf(" (LAN-Prune-Delay: ");
+				if (olen != 4) {
+					(void)printf("!olen=%d!)", olen);
+				} else {
+					char t_bit;
+					u_int16_t lan_delay, override_interval;
+					lan_delay = EXTRACT_16BITS(&bp[4]);
+					override_interval = EXTRACT_16BITS(&bp[6]);
+					t_bit = (lan_delay & 0x8000)? 1 : 0;
+					lan_delay &= ~0x8000;
+					(void)printf("T-bit=%d lan-delay=%dms override-interval=%dms)",
+					t_bit, lan_delay, override_interval);
+				}
 				break;
 
 			case 18:	/* Old DR-Priority */
