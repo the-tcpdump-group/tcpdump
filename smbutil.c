@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.18.2.2 2002-07-10 07:27:52 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.18.2.3 2002-07-10 07:29:23 guy Exp $";
 #endif
 
 #include <sys/param.h>
@@ -418,7 +418,7 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf)
 	    int l = atoi(fmt + 1);
 	    buf += l;
 	    fmt++;
-	    while (isdigit(*fmt))
+	    while (isdigit((unsigned char)*fmt))
 		fmt++;
 	    break;
 	  }
@@ -532,7 +532,7 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf)
 	    printf("%-*.*s", l, l, buf);
 	    buf += l;
 	    fmt++;
-	    while (isdigit(*fmt))
+	    while (isdigit((unsigned char)*fmt))
 		fmt++;
 	    break;
 	  }
@@ -542,7 +542,7 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf)
 	    while (l--)
 		printf("%02x", *buf++);
 	    fmt++;
-	    while (isdigit(*fmt))
+	    while (isdigit((unsigned char)*fmt))
 		fmt++;
 	    break;
 	  }
@@ -574,7 +574,7 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf)
 		break;
 	    }
 	    fmt++;
-	    while (isdigit(*fmt))
+	    while (isdigit((unsigned char)*fmt))
 		fmt++;
 	    break;
 	  }
@@ -606,7 +606,7 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf)
 	    }
 	    printf("%s", t ? asctime(localtime(&t)) : "NULL\n");
 	    fmt++;
-	    while (isdigit(*fmt))
+	    while (isdigit((unsigned char)*fmt))
 		fmt++;
 	    break;
 	  }
