@@ -38,6 +38,9 @@
 /* define if you have the addrinfo function. */
 #undef HAVE_ADDRINFO
 
+/* define if you need to include missing/addrinfoh.h. */
+#undef NEED_ADDRINFO_H
+
 /* define ifyou have the h_errno variable. */
 #undef HAVE_H_ERRNO
 
