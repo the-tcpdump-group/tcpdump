@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.39 2004-12-29 02:43:24 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.40 2004-12-29 03:10:24 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -123,10 +123,10 @@ trans2_qfsinfo(const u_char *param, const u_char *data, int pcnt, int dcnt)
 	    fmt = "idFileSystem=[W]\nSectorUnit=[D]\nUnit=[D]\nAvail=[D]\nSectorSize=[d]\n";
 	    break;
 	case 2:
-	    fmt = "CreationTime=[T2]VolNameLength=[B]\nVolumeLabel=[s12]\n";
+	    fmt = "CreationTime=[T2]VolNameLength=[lb]\nVolumeLabel=[c]\n";
 	    break;
 	case 0x105:
-	    fmt = "Capabilities=[W]\nMaxFileLen=[D]\nVolNameLen=[D]\nVolume=[S]\n";
+	    fmt = "Capabilities=[W]\nMaxFileLen=[D]\nVolNameLen=[lD]\nVolume=[C]\n";
 	    break;
 	default:
 	    fmt = "UnknownLevel\n";
@@ -210,14 +210,14 @@ print_trans2(const u_char *words, const u_char *dat, const u_char *buf, const u_
 	    return;
 	} else {
 	    smb_fdata(words + 1,
-		"TotParam=[d]\nTotData=[d]\nMaxParam=[d]\nMaxData=[d]\nMaxSetup=[d]\nFlags=[w]\nTimeOut=[D]\nRes1=[w]\nParamCnt=[d]\nParamOff=[d]\nDataCnt=[d]\nDataOff=[d]\nSetupCnt=[d]\n",
+		"TotParam=[d]\nTotData=[d]\nMaxParam=[d]\nMaxData=[d]\nMaxSetup=[b][P1]\nFlags=[w]\nTimeOut=[D]\nRes1=[w]\nParamCnt=[d]\nParamOff=[d]\nDataCnt=[d]\nDataOff=[d]\nSetupCnt=[b][P1]\n",
 		words + 1 + 14 * 2, unicodestr);
 	}
 	f1 = fn->descript.req_f1;
 	f2 = fn->descript.req_f2;
     } else {
 	smb_fdata(words + 1,
-	    "TotParam=[d]\nTotData=[d]\nRes1=[w]\nParamCnt=[d]\nParamOff=[d]\nParamDisp[d]\nDataCnt=[d]\nDataOff=[d]\nDataDisp=[d]\nSetupCnt=[d]\n",
+	    "TotParam=[d]\nTotData=[d]\nRes1=[w]\nParamCnt=[d]\nParamOff=[d]\nParamDisp[d]\nDataCnt=[d]\nDataOff=[d]\nDataDisp=[d]\nSetupCnt=[b][P1]\n",
 	    words + 1 + 10 * 2, unicodestr);
 	f1 = fn->descript.rep_f1;
 	f2 = fn->descript.rep_f2;
@@ -777,8 +777,8 @@ static struct smbfns smb_fns[] = {
     { SMBnttranss, "SMBnttranss", 0, DEFDESCRIPT },
 
     { SMBntcreateX, "SMBntcreateX", FLG_CHAIN,
-	{ "Com2=[w]\nOff2=[d]\nRes=[b]\nNameLen=[d]\nFlags=[W]\nRootDirectoryFid=[D]\nAccessMask=[W]\nAllocationSize=[L]\nExtFileAttributes=[W]\nShareAccess=[W]\nCreateDisposition=[W]\nCreateOptions=[W]\nImpersonationLevel=[W]\nSecurityFlags=[b]\n",
-	  "Path=[S]\n",
+	{ "Com2=[w]\nOff2=[d]\nRes=[b]\nNameLen=[ld]\nFlags=[W]\nRootDirectoryFid=[D]\nAccessMask=[W]\nAllocationSize=[L]\nExtFileAttributes=[W]\nShareAccess=[W]\nCreateDisposition=[W]\nCreateOptions=[W]\nImpersonationLevel=[W]\nSecurityFlags=[b]\n",
+	  "Path=[C]\n",
 	  "Com2=[w]\nOff2=[d]\nOplockLevel=[b]\nFid=[d]\nCreateAction=[W]\nCreateTime=[T3]LastAccessTime=[T3]LastWriteTime=[T3]ChangeTime=[T3]ExtFileAttributes=[W]\nAllocationSize=[L]\nEndOfFile=[L]\nFileType=[w]\nDeviceState=[w]\nDirectory=[b]\n",
 	  NULL, NULL } },
 

@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.32 2004-12-28 22:29:45 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.33 2004-12-29 03:10:25 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -25,6 +25,7 @@ static const char rcsid[] _U_ =
 #include "extract.h"
 #include "smb.h"
 
+static u_int32_t stringlen;
 extern const u_char *startbuf;
 
 /*
@@ -328,38 +329,87 @@ write_bits(unsigned int val, const char *fmt)
 }
 
 /* convert a UCS2 string into iso-8859-1 string */
+#define MAX_UNISTR_SIZE	1000
 static const char *
-unistr(const u_char *s, int *len, int use_unicode)
+unistr(const u_char *s, u_int32_t *len, int use_unicode)
 {
-    static char buf[1000];
-    int l=0;
+    static char buf[MAX_UNISTR_SIZE+1];
+    size_t l = 0;
+    u_int32_t strsize;
+    const u_char *sp;
 
+    if (use_unicode) {
+	/*
+	 * Skip padding that puts the string on an even boundary.
+	 */
+	if (((s - startbuf) % 2) != 0)
+	    s++;
+    }
+    if (*len == 0) {
+	/*
+	 * Null-terminated string.
+	 */
+	strsize = 0;
+	sp = s;
+	if (!use_unicode) {
+	    for (;;) {
+		*len += 1;
+		if (sp[0] == 0)
+		    break;
+		sp++;
+	    }
+	    strsize = *len - 1;
+	} else {
+	    for (;;) {
+		*len += 2;
+		if (sp[0] == 0 && sp[1] == 0)
+		    break;
+		sp += 2;
+	    }
+	    strsize = *len - 2;
+	}
+    } else {
+	/*
+	 * Counted string.
+	 */
+	strsize = *len;
+    }
     if (!use_unicode) {
-	*len = strlen((const char *)s) + 1;
-	return (const char *)s;
-    }
-
-    /*
-     * Skip padding that puts the string on an even boundary.
-     */
-    if (((s - startbuf) % 2) != 0)
-	s++;
-
-    *len = 0;
-
-    if (s[0] == 0 && s[1] != 0) {
-	s++;
-	*len = 1;
-    }
-
-    while (l < (int)(sizeof(buf) - 1) && s[0] && s[1] == 0) {
-	buf[l] = s[0];
-	s += 2;
-	l++;
-	*len += 2;
+    	while (strsize != 0) {
+	    if (l >= MAX_UNISTR_SIZE)
+		break;
+	    if (isprint(s[0]))
+		buf[l] = s[0];
+	    else {
+		if (s[0] == 0)
+		    break;
+		buf[l] = '.';
+	    }
+	    l++;
+	    s++;
+	    strsize--;
+	}
+    } else {
+	while (strsize != 0) {
+	    if (l >= MAX_UNISTR_SIZE)
+		break;
+	    if (s[1] == 0 && isprint(s[0])) {
+		/* It's a printable ASCII character */
+		buf[l] = s[0];
+	    } else {
+		/* It's a non-ASCII character or a non-printable ASCII character */
+		if (s[0] == 0 && s[1] == 0)
+		    break;
+		buf[l] = '.';
+	    }
+	    l++;
+	    s += 2;
+	    if (strsize == 1)
+		break;
+	    strsize -= 2;
+	}
     }
     buf[l] = 0;
-    *len += 2;
     return buf;
 }
 
@@ -509,12 +559,43 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf,
 	    fmt++;
 	    break;
 	  }
+	case 'l':
+	  {
+	    fmt++;
+	    switch (*fmt) {
+
+	    case 'b':
+		TCHECK(buf[0]);
+		stringlen = buf[0];
+		printf("%u", stringlen);
+		buf += 1;
+		break;
+
+	    case 'd':
+		TCHECK2(buf[0], 2);
+		stringlen = reverse ? EXTRACT_16BITS(buf) :
+				      EXTRACT_LE_16BITS(buf);
+		printf("%u", stringlen);
+		buf += 2;
+		break;
+
+	    case 'D':
+		TCHECK2(buf[0], 4);
+		stringlen = reverse ? EXTRACT_32BITS(buf) :
+				      EXTRACT_LE_32BITS(buf);
+		printf("%u", stringlen);
+		buf += 4;
+		break;
+	    }
+	    fmt++;
+	    break;
+	  }
 	case 'S':
 	case 'R':	/* like 'S', but always ASCII */
 	  {
 	    /*XXX unistr() */
-	    printf("%.*s", (int)PTR_DIFF(maxbuf, buf),
-		unistr(buf, &len, (*fmt == 'R') ? 0 : unicodestr));
+	    len = 0;
+	    printf("%s", unistr(buf, &len, (*fmt == 'R') ? 0 : unicodestr));
 	    buf += len;
 	    fmt++;
 	    break;
@@ -525,8 +606,8 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf,
 	    if (*buf != 4 && *buf != 2)
 		printf("Error! ASCIIZ buffer of type %u (safety=%lu)\n", *buf,
 		    (unsigned long)PTR_DIFF(maxbuf, buf));
-	    printf("%.*s", (int)PTR_DIFF(maxbuf, buf + 1),
-		unistr(buf + 1, &len, (*fmt == 'Y') ? 0 : unicodestr));
+	    len = 0;
+	    printf("%s", unistr(buf + 1, &len, (*fmt == 'Y') ? 0 : unicodestr));
 	    buf += len + 1;
 	    fmt++;
 	    break;
@@ -539,6 +620,27 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf,
 	    fmt++;
 	    while (isdigit((unsigned char)*fmt))
 		fmt++;
+	    break;
+	  }
+	case 'c':
+	  {
+	    TCHECK2(*buf, stringlen);
+	    printf("%-*.*s", stringlen, stringlen, buf);
+	    buf += stringlen;
+	    fmt++;
+	    while (isdigit((unsigned char)*fmt))
+		fmt++;
+	    break;
+	  }
+	case 'C':
+	  {
+	    const char *s;
+	    s = unistr(buf, &stringlen, unicodestr);
+	    if (s == NULL)
+		goto trunc;
+	    printf("%s", s);
+	    buf += stringlen;
+	    fmt++;
 	    break;
 	  }
 	case 'h':
