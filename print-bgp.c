@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.78 2004-03-14 21:10:37 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.79 2004-03-16 11:39:59 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -511,10 +511,8 @@ decode_labeled_prefix4(const u_char *pptr, char *buf, u_int buflen)
 static char *
 bgp_vpn_rd_print (const u_char *pptr) {
 
-   /* allocate space for the following string
-    * xxx.xxx.xxx.xxx:xxxxx
-    * 21 bytes plus one termination byte */
-    static char rd[22];
+   /* allocate space for the largest possible string */
+    static char rd[sizeof("xxxxxxxxxx:xxxxx (xxx.xxx.xxx.xxx:xxxxx)")];
     char *pos = rd;
 
     /* ok lets load the RD format */
@@ -534,8 +532,9 @@ bgp_vpn_rd_print (const u_char *pptr) {
 
         /* 4-byte-AS:number fmt*/
     case 2:
-        snprintf(pos, sizeof(rd) - (pos - rd), "%u:%u",
-            EXTRACT_32BITS(pptr+2), EXTRACT_16BITS(pptr+6));
+        snprintf(pos, sizeof(rd) - (pos - rd), "%u:%u (%u.%u.%u.%u:%u)",
+            EXTRACT_32BITS(pptr+2), EXTRACT_16BITS(pptr+6),
+            *(pptr+2), *(pptr+3), *(pptr+4), *(pptr+5), EXTRACT_16BITS(pptr+6));
         break;
     default:
         snprintf(pos, sizeof(rd) - (pos - rd), "unknown RD format");
