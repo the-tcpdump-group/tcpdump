@@ -34,7 +34,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cnfp.c,v 1.3 2000-04-27 13:45:11 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cnfp.c,v 1.4 2000-04-28 11:17:36 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -48,6 +48,8 @@ static const char rcsid[] =
 
 #include <netinet/in.h>
 #include <netinet/tcp.h>
+
+#include <arpa/inet.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -88,7 +90,6 @@ cnfp_print(const u_char *cp, u_int len, const u_char *bp)
 	struct protoent *pent;
 	int nrecs, ver;
 	time_t t;
-	char *p;
 
 	ip = (struct ip *)bp;
 	nh = (struct nfhdr *)cp;
@@ -117,8 +118,8 @@ cnfp_print(const u_char *cp, u_int len, const u_char *bp)
 	printf("%2u recs", nrecs);
 
 	for (; nrecs-- && (u_char *)(nr + 1) <= snapend; nr++) {
-		char buf[5];
-		char asbuf[7];
+		char buf[20];
+		char asbuf[20];
 
 		printf("\n  started %u.%03u, last %u.%03u",
 			ntohl(nr->start_time)/1000, ntohl(nr->start_time)%1000,
@@ -126,15 +127,19 @@ cnfp_print(const u_char *cp, u_int len, const u_char *bp)
 
 		asbuf[0] = buf[0] = '\0';
 		if (ver == 5) {
-			sprintf(buf, "/%d", (ntohl(nr->masks) >> 24) & 0xff);
-			sprintf(asbuf, "%d:", (ntohl(nr->asses) >> 16) & 0xffff);
+			snprintf(buf, sizeof(buf), "/%u",
+			    (ntohl(nr->masks) >> 24) & 0xff);
+			snprintf(asbuf, sizeof(asbuf), "%u:",
+			    (ntohl(nr->asses) >> 16) & 0xffff);
 		}
 		printf("\n    %s%s%s:%u ", inet_ntoa(nr->src_ina), buf, asbuf,
 			ntohl(nr->ports) >> 16);
 
 		if (ver == 5) {
-			sprintf(buf, "/%d", (ntohl(nr->masks) >> 16) & 0xff);
-			sprintf(asbuf, "%d:", ntohl(nr->asses) & 0xffff);
+			snprintf(buf, sizeof(buf), "/%d",
+			    (ntohl(nr->masks) >> 16) & 0xff);
+			snprintf(asbuf, sizeof(asbuf), "%u:",
+			    ntohl(nr->asses) & 0xffff);
 		}
 		printf("> %s%s%s:%u ", inet_ntoa(nr->dst_ina), buf, asbuf,
 			ntohl(nr->ports) & 0xffff);
@@ -165,9 +170,5 @@ cnfp_print(const u_char *cp, u_int len, const u_char *bp)
 		}
 		printf("tos %u, %u (%u octets)", ntohl(nr->proto_tos) & 0xff,
 			ntohl(nr->packets), ntohl(nr->octets));
-
-
 	}
-
 }
-
