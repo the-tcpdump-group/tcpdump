@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.101 2003-10-26 09:59:11 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.102 2003-10-28 19:10:15 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -694,7 +694,7 @@ static char *
 isis_print_id(const u_int8_t *cp, int id_len)
 {
     int i;
-    static char id[21];
+    static char id[sizeof("xxxx.xxxx.xxxx.yy-zz")];
     char *pos = id;
 
     for (i = 1; i <= SYSTEM_ID_LEN; i++) {
@@ -1229,7 +1229,10 @@ static int isis_print (const u_int8_t *p, u_int length)
 
 	case L1_LAN_IIH:
 	case L2_LAN_IIH:
-	    printf(", source-id %s", isis_print_id(header_iih_lan->source_id,SYSTEM_ID_LEN));
+	    printf(", source-id %s",
+                   isis_print_id(header_iih_lan->source_id,SYSTEM_ID_LEN));
+	    printf(", DIS lan-id %s",
+                   isis_print_id(header_iih_lan->lan_id,NODE_ID_LEN));
 	    break;
 	case PTP_IIH:
 	    printf(", source-id %s", isis_print_id(header_iih_ptp->source_id,SYSTEM_ID_LEN));
@@ -1293,14 +1296,14 @@ static int isis_print (const u_int8_t *p, u_int length)
 	}
 
 	TCHECK(*header_iih_lan);
-	printf("\n\t  source-id: %s,  holding time: %us, Flags: [%s]",
+	printf("\n\t  source-id:  %s,  holding time: %us, Flags: [%s]",
                isis_print_id(header_iih_lan->source_id,SYSTEM_ID_LEN),
                EXTRACT_16BITS(header_iih_lan->holding_time),
                tok2str(isis_iih_circuit_type_values,
                        "unknown circuit type 0x%02x",
                        header_iih_lan->circuit_type));
 
-	printf("\n\t  lan-id:    %s, Priority: %u, PDU length: %u",
+	printf("\n\t  DIS lan-id: %s, Priority: %u, PDU length: %u",
                isis_print_id(header_iih_lan->lan_id, NODE_ID_LEN),
                (header_iih_lan->priority) & PRIORITY_MASK,
                pdu_len);
