@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.78 1999-10-30 07:53:38 itojun Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.79 1999-10-30 23:43:57 itojun Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -385,7 +385,7 @@ fi
 
 
 AC_REPLACE_FUNCS(vfprintf strcasecmp)
-AC_CHECK_FUNCS(ether_ntoa setlinebuf gethostbyname2 inet_ntop inet_pton)
+AC_CHECK_FUNCS(ether_ntoa setlinebuf gethostbyname2)
 
 dnl The following generates a warning from autoconf...
 AC_C_BIGENDIAN
@@ -415,7 +415,7 @@ irix*)
 	;;
 
 linux*)
-	V_INCLS="$V_INCLS -Ilinux-include"
+	V_INCLS="$V_INCLS -I\$(srcdir)/linux-include"
 	;;
 
 osf*)
