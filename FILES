@@ -5,6 +5,7 @@ INSTALL
 LICENSE
 Makefile.in
 README
+Readme.Win32
 VERSION
 acconfig.h
 aclocal.m4

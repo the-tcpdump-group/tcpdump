@@ -1,4 +1,4 @@
-@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.56.2.1 2003-12-15 02:34:18 guy Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.56.2.2 2003-12-15 02:44:06 guy Exp $ (LBL)
 
 If you have not built libpcap, do so first.  See the README
 file in this directory for the ftp location.
@@ -46,6 +46,7 @@ INSTALL		- this file
 LICENSE		- the license under which tcpdump is distributed
 Makefile.in	- compilation rules (input to the configure script)
 README		- description of distribution
+Readme.Win32	- notes on building tcpdump on Win32 systems (with WinPcap)
 VERSION		- version of this release
 acconfig.h	- autoconf input
 aclocal.m4	- autoconf macros
