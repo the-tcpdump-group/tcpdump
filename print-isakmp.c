@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.18 2000-09-23 08:54:33 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.19 2000-09-24 07:50:35 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -70,37 +70,37 @@ struct rtentry;
 #define sockaddr_storage sockaddr
 #endif
 
-static u_char *isakmp_sa_print __P((struct isakmp_gen *, u_char *, u_int32_t,
-	u_int32_t, u_int32_t));
-static u_char *isakmp_p_print __P((struct isakmp_gen *, u_char *, u_int32_t,
-	u_int32_t, u_int32_t));
-static u_char *isakmp_t_print __P((struct isakmp_gen *, u_char *, u_int32_t,
-	u_int32_t, u_int32_t));
-static u_char *isakmp_ke_print __P((struct isakmp_gen *, u_char *, u_int32_t,
-	u_int32_t, u_int32_t));
-static u_char *isakmp_id_print __P((struct isakmp_gen *, u_char *, u_int32_t,
-	u_int32_t, u_int32_t));
-static u_char *isakmp_cert_print __P((struct isakmp_gen *, u_char *, u_int32_t,
-	u_int32_t, u_int32_t));
-static u_char *isakmp_cr_print __P((struct isakmp_gen *, u_char *, u_int32_t,
-	u_int32_t, u_int32_t));
-static u_char *isakmp_sig_print __P((struct isakmp_gen *, u_char *, u_int32_t,
-	u_int32_t, u_int32_t));
-static u_char *isakmp_hash_print __P((struct isakmp_gen *, u_char *,
-	u_int32_t, u_int32_t, u_int32_t));
-static u_char *isakmp_nonce_print __P((struct isakmp_gen *, u_char *,
-	u_int32_t, u_int32_t, u_int32_t));
-static u_char *isakmp_n_print __P((struct isakmp_gen *, u_char *, u_int32_t,
-	u_int32_t, u_int32_t));
-static u_char *isakmp_d_print __P((struct isakmp_gen *, u_char *, u_int32_t,
-	u_int32_t, u_int32_t));
-static u_char *isakmp_vid_print __P((struct isakmp_gen *, u_char *, u_int32_t,
-	u_int32_t, u_int32_t));
-static u_char *isakmp_sub0_print __P((u_char, struct isakmp_gen *, u_char *,
-	u_int32_t, u_int32_t, u_int32_t));
-static u_char *isakmp_sub_print __P((u_char, struct isakmp_gen *, u_char *,
-	u_int32_t, u_int32_t, u_int32_t));
-static char *numstr __P((int));
+static u_char *isakmp_sa_print(struct isakmp_gen *, u_char *, u_int32_t,
+	u_int32_t, u_int32_t);
+static u_char *isakmp_p_print(struct isakmp_gen *, u_char *, u_int32_t,
+	u_int32_t, u_int32_t);
+static u_char *isakmp_t_print(struct isakmp_gen *, u_char *, u_int32_t,
+	u_int32_t, u_int32_t);
+static u_char *isakmp_ke_print(struct isakmp_gen *, u_char *, u_int32_t,
+	u_int32_t, u_int32_t);
+static u_char *isakmp_id_print(struct isakmp_gen *, u_char *, u_int32_t,
+	u_int32_t, u_int32_t);
+static u_char *isakmp_cert_print(struct isakmp_gen *, u_char *, u_int32_t,
+	u_int32_t, u_int32_t);
+static u_char *isakmp_cr_print(struct isakmp_gen *, u_char *, u_int32_t,
+	u_int32_t, u_int32_t);
+static u_char *isakmp_sig_print(struct isakmp_gen *, u_char *, u_int32_t,
+	u_int32_t, u_int32_t);
+static u_char *isakmp_hash_print(struct isakmp_gen *, u_char *,
+	u_int32_t, u_int32_t, u_int32_t);
+static u_char *isakmp_nonce_print(struct isakmp_gen *, u_char *,
+	u_int32_t, u_int32_t, u_int32_t);
+static u_char *isakmp_n_print(struct isakmp_gen *, u_char *, u_int32_t,
+	u_int32_t, u_int32_t);
+static u_char *isakmp_d_print(struct isakmp_gen *, u_char *, u_int32_t,
+	u_int32_t, u_int32_t);
+static u_char *isakmp_vid_print(struct isakmp_gen *, u_char *, u_int32_t,
+	u_int32_t, u_int32_t);
+static u_char *isakmp_sub0_print(u_char, struct isakmp_gen *, u_char *,
+	u_int32_t, u_int32_t, u_int32_t);
+static u_char *isakmp_sub_print(u_char, struct isakmp_gen *, u_char *,
+	u_int32_t, u_int32_t, u_int32_t);
+static char *numstr(int);
 
 #define MAXINITIATORS	20
 int ninitiator = 0;
@@ -122,8 +122,8 @@ static char *npstr[] = {
 };
 
 /* isakmp->np */
-static u_char *(*npfunc[]) __P((struct isakmp_gen *, u_char *, u_int32_t,
-		u_int32_t, u_int32_t)) = {
+static u_char *(*npfunc[])(struct isakmp_gen *, u_char *, u_int32_t,
+		u_int32_t, u_int32_t) = {
 	NULL,
 	isakmp_sa_print,
 	isakmp_p_print,
