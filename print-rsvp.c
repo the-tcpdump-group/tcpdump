@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.16 2003-03-05 11:28:21 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.17 2003-03-11 06:40:58 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -943,15 +943,16 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                        ipaddr_string(obj_tptr),
                        *(obj_tptr+4),
                        tok2str(rsvp_obj_error_code_values,"unknown",error_code),
-                       error_code,
-                       error_value);
+                       error_code);
                 switch (error_code) {
                 case RSVP_OBJ_ERROR_SPEC_CODE_ROUTING:
                     printf(", Error Value: %s (%u)",
-                           tok2str(rsvp_obj_error_code_routing_values,"unknown",error_value));
+                           tok2str(rsvp_obj_error_code_routing_values,"unknown",error_value),
+                           error_value);
                     break;
                 default:
-                    printf(", Unknown Error Value (%u)");
+                    printf(", Unknown Error Value (%u)", error_value);
+                    break;
                 }
                 break;
 #ifdef INET6
