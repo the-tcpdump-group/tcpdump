@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.177 2004-03-23 18:57:33 fenner Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.178 2004-04-05 00:11:27 mcr Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.177 $)
+AC_REVISION($Revision: 1.178 $)
 AC_PREREQ(2.50)
 AC_INIT(tcpdump.c)
 
@@ -706,7 +706,10 @@ AC_ARG_WITH(crypto, [  --without-crypto        disable crypto support],
 AC_MSG_CHECKING(for SSLeay)
 ac_cv_ssleay_path=no
 incdir=no
-for dir in /usr/${host_alias} /usr /usr/local /usr/local/ssl /usr/pkg; do
+
+Xprefix=`eval echo $prefix`
+
+for dir in $Xprefix /usr/${host_alias} /usr /usr/local /usr/local/ssl /usr/pkg; do
 	#
 	# XXX - is there a better way to check if a given library is
 	# in a given directory than checking each of the possible
@@ -743,7 +746,7 @@ if test "$ac_cv_ssleay_path" != no; then
 	if test -f $ac_cv_ssleay_path/lib/librsaref.a; then
 		LIBS="$LIBS -lrsaref"
 	fi
-	AC_CHECK_LIB(crypto, des_cbc_encrypt)
+	AC_CHECK_LIB(crypto, DES_cbc_encrypt)
 
 	CPPFLAGS="$CPPFLAGS $V_INCLS"
 	AC_CHECK_HEADERS(openssl/evp.h)
