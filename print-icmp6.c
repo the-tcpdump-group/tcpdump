@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.30 2000-10-03 02:19:05 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.31 2000-10-03 02:55:39 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -414,7 +414,7 @@ get_upperlayer(register u_char *bp, int *prot)
 	struct ah *ah;
 	int nh, hlen;
 
-	/* 'ep' points to the end of avaible data. */
+	/* 'ep' points to the end of available data. */
 	ep = snapend;
 
 	if (TTEST(ip6->ip6_nxt) == 0)
