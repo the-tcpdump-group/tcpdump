@@ -32,7 +32,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-aodv.c,v 1.3 2003-08-13 02:23:07 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-aodv.c,v 1.4 2003-09-06 22:16:56 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -205,9 +205,9 @@ aodv_rerr(union aodv *ap, u_int length, void *ip6
 	)
 {
 	int i, j, n, trunc;
-	struct rerr_unreach *dp;
+	struct rerr_unreach *dp = NULL;
 #ifdef INET6
-	struct rerr_unreach6 *dp6;
+	struct rerr_unreach6 *dp6 = NULL;
 #endif
 
 	i = length - offsetof(struct aodv_rerr, r);
