@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.18 2000-07-16 05:25:16 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.19 2000-08-03 14:25:57 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -84,8 +84,12 @@ struct icmp6_nodeinfo {
 #define ni_flags	icmp6_ni_hdr.icmp6_data16[1]
 #endif
 
+/* cope with past KAME typo - shipped with freebsd4[01] and openbsd27 */
+#if defined(ICMP6_NI_SUCESS) && !defined(ICMP6_NI_SUCCESS)
+#define ICMP6_NI_SUCCESS	ICMP6_NI_SUCESS
+#endif
 #ifndef ICMP6_NI_SUCCESS
-#define ICMP6_NI_SUCESS		0	/* node information successful reply */
+#define ICMP6_NI_SUCCESS	0	/* node information successful reply */
 #define ICMP6_NI_REFUSED	1	/* node information request is refused */
 #define ICMP6_NI_UNKNOWN	2	/* unknown Qtype */
 #endif
@@ -751,7 +755,7 @@ icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
 		printf("icmp6: node information query");
 		printf(" (");	/*)*/
 		switch (ni6->ni_code) {
-		case ICMP6_NI_SUCESS:
+		case ICMP6_NI_SUCCESS:
 			if (vflag) {
 				printf("success");
 				needcomma++;
@@ -773,7 +777,7 @@ icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
 			break;
 		}
 
-		if (ni6->ni_code != ICMP6_NI_SUCESS) {
+		if (ni6->ni_code != ICMP6_NI_SUCCESS) {
 			/*(*/
 			printf(")");
 			break;
