@@ -88,6 +88,7 @@ print-bgp.c
 print-bootp.c
 print-chdlc.c
 print-cip.c
+print-cnfp.c
 print-decnet.c
 print-dhcp6.c
 print-domain.c
