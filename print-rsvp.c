@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.8 2002-12-11 07:14:08 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.9 2002-12-11 07:18:08 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -630,11 +630,11 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                            EXTRACT_16BITS(obj_tptr+10),
                            *(obj_tptr+9));
                     bw.i = EXTRACT_32BITS(obj_tptr+12);
-                    printf("\n\t      Token Bucket Rate: %.3f Mbps", bw.f*8/1000000);
+                    printf("\n\t      Token Bucket Rate: %.10g Mbps", bw.f*8/1000000);
                     bw.i = EXTRACT_32BITS(obj_tptr+16);
-                    printf("\n\t      Token Bucket Size: %.3f bytes", bw.f);
+                    printf("\n\t      Token Bucket Size: %.10g bytes", bw.f);
                     bw.i = EXTRACT_32BITS(obj_tptr+20);
-                    printf("\n\t      Peak Data Rate: %.3f Mbps", bw.f*8/1000000);
+                    printf("\n\t      Peak Data Rate: %.10g Mbps", bw.f*8/1000000);
                     printf("\n\t      Minimum Policed Unit: %u bytes", EXTRACT_32BITS(obj_tptr+24));
                     printf("\n\t      Maximum Packet Size: %u bytes", EXTRACT_32BITS(obj_tptr+28));
 
@@ -688,11 +688,11 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                            EXTRACT_16BITS(obj_tptr+10),
                            *(obj_tptr+9));
                     bw.i = EXTRACT_32BITS(obj_tptr+12);
-                    printf("\n\t      Token Bucket Rate: %.3f Mbps", bw.f*8/1000000);
+                    printf("\n\t      Token Bucket Rate: %.10g Mbps", bw.f*8/1000000);
                     bw.i = EXTRACT_32BITS(obj_tptr+16);
-                    printf("\n\t      Token Bucket Size: %.3f bytes", bw.f);
+                    printf("\n\t      Token Bucket Size: %.10g bytes", bw.f);
                     bw.i = EXTRACT_32BITS(obj_tptr+20);
-                    printf("\n\t      Peak Data Rate: %.3f Mbps", bw.f*8/1000000);
+                    printf("\n\t      Peak Data Rate: %.10g Mbps", bw.f*8/1000000);
                     printf("\n\t      Minimum Policed Unit: %u bytes", EXTRACT_32BITS(obj_tptr+24));
                     printf("\n\t      Maximum Packet Size: %u bytes", EXTRACT_32BITS(obj_tptr+28));
                     
@@ -702,7 +702,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                            EXTRACT_16BITS(obj_tptr+34),
                            *(obj_tptr+33));
                     bw.i = EXTRACT_32BITS(obj_tptr+36);
-                    printf("\n\t      Rate: %.3f Mbps", bw.f*8/1000000);
+                    printf("\n\t      Rate: %.10g Mbps", bw.f*8/1000000);
                     printf("\n\t      Slack Term: %u", EXTRACT_32BITS(obj_tptr+40));
 
                     obj_tlen-=44;
