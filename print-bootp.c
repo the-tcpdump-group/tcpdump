@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.55 2000-12-03 23:45:37 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.56 2000-12-04 00:00:08 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -174,7 +174,7 @@ bootp_print(register const u_char *cp, u_int length,
 	else {
 		u_int32_t ul;
 
-		memcpy((char *)&ul, (char *)bp->bp_vend, sizeof(ul));
+		ul = EXTRACT_32BITS(&bp->bp_vend);
 		if (ul != 0)
 			printf("vend-#0x%x", ul);
 	}
@@ -331,7 +331,7 @@ rfc1048_print(register const u_char *bp, register u_int length)
 		if (tag == TAG_END)
 			return;
 		if (tag == TAG_EXTENDED_OPTION) {
-			TCHECK(bp + 1, 2);
+			TCHECK2(*(bp + 1), 2);
 			tag = EXTRACT_16BITS(bp + 1);
 			/* XXX we don't know yet if the IANA will
 			 * preclude overlap of 1-byte and 2-byte spaces.
@@ -427,10 +427,11 @@ rfc1048_print(register const u_char *bp, register u_int length)
 			while (size >= sizeof(ul)) {
 				if (!first)
 					putchar(',');
-				memcpy((char *)&ul, (char *)bp, sizeof(ul));
-				if (c == 'i')
+				ul = EXTRACT_32BITS(bp);
+				if (c == 'i') {
+					ul = htonl(ul);
 					printf("%s", ipaddr_string(&ul));
-				else if (c == 'L')
+				} else if (c == 'L')
 					printf("%d", ul);
 				else
 					printf("%u", ul);
@@ -461,7 +462,7 @@ rfc1048_print(register const u_char *bp, register u_int length)
 			while (size >= sizeof(us)) {
 				if (!first)
 					putchar(',');
-				memcpy((char *)&us, (char *)bp, sizeof(us));
+				us = EXTRACT_16BITS(bp);
 				printf("%d", us);
 				bp += sizeof(us);
 				size -= sizeof(us);
@@ -509,6 +510,9 @@ rfc1048_print(register const u_char *bp, register u_int length)
 		if (size)
 			printf("[len %d]", len);
 	}
+	return;
+trunc:
+	printf("|[rfc1048]");
 }
 
 static void
