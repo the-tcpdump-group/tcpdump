@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.101 2004-08-18 14:56:28 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.102 2004-09-09 16:36:23 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -328,14 +328,12 @@ static const char *ccpconfopts[] = {
 #define CHAP_SUCC	3
 #define CHAP_FAIL	4
 
-#define CHAP_CODEMIN CHAP_CHAL
-#define CHAP_CODEMAX CHAP_FAIL
-
-static const char *chapcode[] = {
-	"Chal",		/* (1) */
-	"Resp",		/* (2) */
-	"Succ",		/* (3) */
-	"Fail",		/* (4) */
+struct tok chapcode_values[] = {
+	{ CHAP_CHAL, "Challenge" },
+	{ CHAP_RESP, "Response" },
+	{ CHAP_SUCC, "Success" },
+	{ CHAP_FAIL, "Fail" },
+        { 0, NULL}
 };
 
 /* PAP */
@@ -344,13 +342,11 @@ static const char *chapcode[] = {
 #define PAP_AACK	2
 #define PAP_ANAK	3
 
-#define PAP_CODEMIN	PAP_AREQ
-#define PAP_CODEMAX	PAP_ANAK
-
-static const char *papcode[] = {
-	"Auth-Req",	/* (1) */
-	"Auth-Ack",	/* (2) */
-	"Auth-Nak",	/* (3) */
+struct tok papcode_values[] = {
+        { PAP_AREQ, "Auth-Req" },
+        { PAP_AACK, "Auth-ACK" },
+        { PAP_ANAK, "Auth-NACK" },
+        { 0, NULL }
 };
 
 /* BAP */
@@ -744,16 +740,13 @@ handle_chap(const u_char *p, int length)
 
 	TCHECK(*p);
 	code = *p;
-	if ((code >= CHAP_CODEMIN) && (code <= CHAP_CODEMAX))
-		printf("%s", chapcode[code - 1]);
-	else {
-		printf("0x%02x", code);
-		return;
-	}
+        printf("CHAP, %s (0x%02x)",
+               tok2str(chapcode_values,"unknown",code),
+               code);
 	p++;
 
 	TCHECK(*p);
-	printf("(%u)", *p);		/* ID */
+	printf(", id %u", *p);		/* ID */
 	p++;
 
 	TCHECK2(*p, 2);
@@ -826,16 +819,13 @@ handle_pap(const u_char *p, int length)
 
 	TCHECK(*p);
 	code = *p;
-	if ((code >= PAP_CODEMIN) && (code <= PAP_CODEMAX))
-		printf("%s", papcode[code - 1]);
-	else {
-		printf("0x%02x", code);
-		return;
-	}
+        printf("PAP, %s (0x%02x)",
+               tok2str(papcode_values,"unknown",code),
+               code);
 	p++;
 
 	TCHECK(*p);
-	printf("(%u)", *p);		/* ID */
+	printf(", id %u", *p);		/* ID */
 	p++;
 
 	TCHECK2(*p, 2);
