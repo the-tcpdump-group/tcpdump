@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.37 2003-03-25 08:30:46 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.38 2003-04-21 09:28:24 risso Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -56,7 +56,6 @@ static const char rcsid[] =
 #endif
 
 #if defined(__MINGW32__) || defined(__WATCOMC__)
-#include "addrinfo.h"
 extern char *strsep (char **stringp, const char *delim); /* Missing/strsep.c */
 #endif
 
