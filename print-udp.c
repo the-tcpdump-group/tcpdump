@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.89 2000-11-17 19:08:16 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.90 2000-12-23 20:55:22 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -325,7 +325,7 @@ static int udp_cksum(register const struct ip *ip,
 		sum += *sp++;
 
 	if (tlen & 1) {
-		sum += htons( (*(const char *)sp) << 8);
+		sum += htons( (*(const u_int8_t *)sp) << 8);
 	}
 
 	while (sum > 0xffff)
@@ -373,7 +373,7 @@ static int udp6_cksum(const struct ip6_hdr *ip6, const struct udphdr *up,
 		sum += *sp++;
 
 	if (tlen & 1)
-		sum += htons((*(const char *)sp) << 8);
+		sum += htons((*(const u_int8_t *)sp) << 8);
 
 	while (sum > 0xffff)
 		sum = (sum & 0xffff) + (sum >> 16);
