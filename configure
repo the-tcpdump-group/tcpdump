@@ -4686,7 +4686,7 @@ else
 	# know it does work, and have the script just fail on other
 	# cpu types and update it when such a failure occurs.
 	#
-	alpha*|arm*|hp*|mips*|sh*|sparc*|ia64)
+	alpha*|arm*|hp*|mips*|sh*|sparc*|ia64|nv1)
 		ac_cv_lbl_unaligned_fail=yes
 		;;
 
