@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.8 2003-10-02 13:35:52 hannes Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.9 2003-10-03 13:00:33 hannes Exp $ (LBL) */
 /*
  * Copyright (c) 1991, 1993, 1994, 1995, 1996, 1997
  *	The Regents of the University of California.  All rights reserved.
@@ -107,7 +107,13 @@ struct lsa_hdr {
     u_int16_t ls_age;
     u_int8_t ls_options;
     u_int8_t ls_type;
-    struct in_addr ls_stateid;
+    union {
+        struct in_addr ls_stateid;
+        struct { /* opaque LSAs change the LSA-ID field */
+            u_int8_t opaque_type;
+            u_int8_t opaque_id[3];
+	};
+    };
     struct in_addr ls_router;
     u_int32_t ls_seq;
     u_int16_t ls_chksum;
@@ -161,16 +167,6 @@ struct lsa {
 	    u_int32_t mcla_vtype;
 	    struct in_addr mcla_vid;
 	} un_mcla[1];
-
-	/* Opaque LSA */
-	struct opaque {
-	    u_int8_t opaque_type;
-	    u_int8_t opaque_id[3];
-	    struct in_addr adv_router;
-	    struct in_addr sequence_num;
-	    u_int16_t chksum;
-            u_int16_t length;
-	} un_opaque[1];
 
         /* Unknown LSA */
         struct unknown {
