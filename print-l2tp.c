@@ -23,13 +23,14 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-l2tp.c,v 1.4 1999-11-21 09:36:55 fenner Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-l2tp.c,v 1.5 1999-12-15 06:55:43 fenner Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
+#include <stdio.h>
 #include <sys/types.h>
 #include <sys/param.h>
 #include <netinet/in.h>
@@ -255,7 +256,7 @@ l2tp_result_code_print(const u_char *dat, u_int length)
 	} else if (length == 4) { 	/* result & error code */
 		printf("%d/%d", ntohs(*ptr), ntohs(*(ptr+1)));
 	} else if (length > 4) {	/* result & error code & msg */
-		printf("%d/%d %s", ntohs(*ptr), ntohs(*(ptr+1)));
+		printf("%d/%d ", ntohs(*ptr), ntohs(*(ptr+1)));
 		print_string((u_char *)(ptr+2), length - 4);
 	}
 }
@@ -601,7 +602,7 @@ l2tp_avp_print(const u_char *dat, u_int length)
 			}
 			printf(")");
 		} else {
-			printf(" invalid AVP %s", ntohs(*ptr));
+			printf(" invalid AVP %d", ntohs(*ptr));
 		}
 
 		l2tp_avp_print(dat + len, length - len);
