@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sl.c,v 1.43 1999-10-17 21:37:15 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sl.c,v 1.44 1999-11-21 03:49:30 assar Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_NET_SLIP_H
@@ -101,7 +101,18 @@ sl_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	if (eflag)
 		sliplink_print(p, ip, length);
 
-	ip_print((u_char *)ip, length);
+	switch (ip->ip_v) {
+	case 4:
+		ip_print((u_char *)ip, length);
+		break;
+#ifdef INET6
+	case 6:
+		ipv6_print((u_char *)ip, length);
+		break;
+#endif
+	default:
+		printf ("ip v%d", ip->ip_v);
+	}
 
 	if (xflag)
 		default_print((u_char *)ip, caplen - SLIP_HDRLEN);
