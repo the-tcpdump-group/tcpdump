@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.7 2002-12-11 07:13:56 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.8 2003-10-02 13:35:52 hannes Exp $ (LBL) */
 /*
  * Copyright (c) 1991, 1993, 1994, 1995, 1996, 1997
  *	The Regents of the University of California.  All rights reserved.
@@ -171,6 +171,11 @@ struct lsa {
 	    u_int16_t chksum;
             u_int16_t length;
 	} un_opaque[1];
+
+        /* Unknown LSA */
+        struct unknown {
+	    u_int8_t data[1]; /* may repeat   */
+	} un_unknown[1];
 
     } lsa_un;
 };

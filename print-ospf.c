@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.36 2002-12-23 19:57:49 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.37 2003-10-02 13:35:52 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -325,6 +325,31 @@ ospf_print_lsa(register const struct lsa *lsap)
 			}
 		++mcp;
 		}
+		break;
+
+	  /*
+	   * FIXME those are the defined LSAs that lack a decoder
+	   * you are welcome to contribute code ;-)
+	   */
+
+	case LS_TYPE_OPAQUE_LL:
+	case LS_TYPE_OPAQUE_AL: 
+	case LS_TYPE_OPAQUE_DW:
+
+        default:
+	  if (vflag <= 1) {
+	    if(!print_unknown_data((u_char *)lsap->lsa_un.un_unknown,
+				   "\n\t    ", EXTRACT_16BITS(&lsap->ls_hdr.ls_length)-sizeof(struct lsa_hdr)))
+	      return(0);
+	  }
+	  break;
+        }
+
+        /* do we want to see an additionally hexdump ? */
+        if (vflag> 1) {
+	  if(!print_unknown_data((u_char *)lsap->lsa_un.un_unknown,
+				 "\n\t    ", EXTRACT_16BITS(&lsap->ls_hdr.ls_length)-sizeof(struct lsa_hdr)))
+	    return(0);
 	}
 
 	return (0);
