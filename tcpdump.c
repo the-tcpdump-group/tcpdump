@@ -24,7 +24,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.137 1999-12-22 06:27:24 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.138 1999-12-22 15:44:11 itojun Exp $ (LBL)";
 #endif
 
 /*
@@ -76,6 +76,7 @@ int Sflag;			/* print raw TCP sequence numbers */
 int tflag = 1;			/* print packet arrival time */
 int vflag;			/* verbose */
 int xflag;			/* print packet in hex */
+int Xflag;			/* print packet in ascii as well as hex */
 
 char *ahsecret = NULL;		/* AH secret key */
 char *espsecret = NULL;		/* ESP secret key */
@@ -175,7 +176,7 @@ main(int argc, char **argv)
 	
 	opterr = 0;
 	while (
-	    (op = getopt(argc, argv, "ac:deE:fF:i:lnNm:Opqr:Rs:StT:vw:xY")) != EOF)
+	    (op = getopt(argc, argv, "ac:deE:fF:i:lnNm:Opqr:Rs:StT:vw:xXY")) != EOF)
 		switch (op) {
 
 		case 'a':
@@ -310,6 +311,15 @@ main(int argc, char **argv)
 		case 'w':
 			WFileName = optarg;
 			break;
+
+		case 'x':
+			++xflag;
+			break;
+
+		case 'X':
+			++Xflag;
+			break;
+
 #ifdef YYDEBUG
 		case 'Y':
 			{
@@ -319,10 +329,6 @@ main(int argc, char **argv)
 			}
 			break;
 #endif
-		case 'x':
-			++xflag;
-			break;
-
 		default:
 			usage();
 			/* NOTREACHED */
@@ -445,10 +451,13 @@ cleanup(int signo)
 void
 default_print_unaligned(register const u_char *cp, register u_int length)
 {
-#if 1
 	register u_int i, s;
 	register int nshorts;
 
+	if (Xflag) {
+		ascii_print(cp, length);
+		return;
+	}
 	nshorts = (u_int) length / sizeof(u_short);
 	i = 0;
 	while (--nshorts >= 0) {
@@ -462,44 +471,6 @@ default_print_unaligned(register const u_char *cp, register u_int length)
 			(void)printf("\n\t\t\t");
 		(void)printf(" %02x", *cp);
 	}
-#else
-  register u_int i;
-  register int nshorts;
-
-  char line[81];
-  
-  nshorts = (u_int) length / sizeof(u_short);
-  i = 0;
-  memset(line, ' ', 80);
-  line[81]='\0';
-
-  putchar('\n');
-  while (nshorts >= 0) {
-    
-    sprintf(line+20+i*5, "%02x%02x  ", cp[0], cp[1]);
-
-    if(isprint(cp[0])) {
-      line[62+i*2]=cp[0];
-    } else {
-      line[62+i*2]='.';
-    }
-    if(isprint(cp[1])) {
-      line[62+i*2+1]=cp[1];
-    } else {
-      line[62+i*2+1]='.';
-    }
-    i++;
-    if (i == 8) {
-      line[60]=' ';
-      line[61]=' ';
-      line[62+16]='\0';
-      puts(line);
-      i=0;
-    }
-    cp += 2;
-    nshorts--;
-  }
-#endif
 }
 
 /*
@@ -522,7 +493,7 @@ usage(void)
 	(void)fprintf(stderr, "%s version %s\n", program_name, version);
 	(void)fprintf(stderr, "libpcap version %s\n", pcap_version);
 	(void)fprintf(stderr,
-"Usage: %s [-adeflnNOpqStvx] [-c count] [ -F file ]\n", program_name);
+"Usage: %s [-adeflnNOpqStvxX] [-c count] [ -F file ]\n", program_name);
 	(void)fprintf(stderr,
 "\t\t[ -i interface ] [ -r file ] [ -s snaplen ]\n");
 	(void)fprintf(stderr,

@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.117 1999-12-22 06:27:20 itojun Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.118 1999-12-22 15:44:09 itojun Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -47,6 +47,7 @@ extern int Sflag;		/* print raw TCP sequence numbers */
 extern int tflag;		/* print packet arrival time */
 extern int vflag;		/* verbose */
 extern int xflag;		/* print packet in hex */
+extern int Xflag;		/* print packet in hex/ascii */
 
 extern char *ahsecret;
 extern char *espsecret;
@@ -172,6 +173,11 @@ extern char *dnnum_string(u_short);
 struct pcap_pkthdr;
 #endif
 
+extern void ascii_print_with_offset(const u_char *, u_int, u_int);    
+extern void ascii_print(const u_char *, u_int);    
+extern void hex_print_with_offset(const u_char *, u_int, u_int);    
+extern void telnet_print(const u_char *, u_int);    
+extern void hex_print(const u_char *, u_int);    
 extern int ether_encap_print(u_short, const u_char *, u_int, u_int);
 extern int llc_print(const u_char *, u_int, u_int, const u_char *,
 	const u_char *);

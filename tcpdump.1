@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.71 1999-12-13 18:06:15 mcr Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.72 1999-12-22 15:44:10 itojun Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -27,7 +27,7 @@ tcpdump \- dump traffic on a network
 .na
 .B tcpdump
 [
-.B \-adeflnNOpqRStvx
+.B \-adeflnNOpqRStvxX
 ] [
 .B \-c
 .I count
@@ -223,6 +223,13 @@ and type of service information in an IP packet is printed.
 Even more verbose output.  For example, additional fields are
 printed from NFS reply packets.
 .TP
+.B \-vvv
+Even more verbose output.  For example,
+telnet \fBSB\fP ... \fBSE\fP options
+are printed in full.  With
+.B \-X
+telnet options are printed in hex as well.
+.TP
 .B \-w
 Write the raw packets to \fIfile\fR rather than parsing and printing
 them out.  They can later be printed with the \-r option.
@@ -233,6 +240,16 @@ Print each packet (minus its link level header) in hex.
 The smaller of the entire packet or
 .I snaplen
 bytes will be printed.
+.TP
+.B \-X
+When printing hex, print ascii too.  Thus if
+.B \-x
+is also set, the packet is printed in hex/ascii.
+This is very handy for analysing new protocols.
+Even if
+.B \-x
+is not also set, some parts of some packets may be printed
+in hex/ascii.
 .IP "\fI expression\fP"
 .RS
 selects which packets will be dumped.  If no \fIexpression\fP
