@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.125 2000-10-07 05:47:31 itojun Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.126 2000-10-07 05:58:06 itojun Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.125 $)
+AC_REVISION($Revision: 1.126 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -367,46 +367,6 @@ struct in_addr dst;
 inet_aton(src, &dst);],
 	[AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)
 	AC_REPLACE_FUNCS(inet_aton)])
-
-dnl check for struct icmp6_mld and struct mld6_hdr
-
-AC_CACHE_CHECK([for struct icmp6_mld],
-ac_cv_struct_icmp6_mld,
-[AC_EGREP_CPP([icmp6_mld],[dnl
-#include <sys/types.h>
-#include <netinet/icmp6.h>
-],
-ac_cv_struct_icmp6_mld=yes,
-ac_cv_struct_icmp6_mld=no)])
-if test "$ac_cv_struct_icmp6_mld" = "yes"; then
-  AC_DEFINE(HAVE_STRUCT_ICMP6_MLD, 1, [define if you have struct icmp6_mld])
-fi
-
-AC_CACHE_CHECK([for struct mld6_hdr],
-ac_cv_struct_mld6_hdr,
-[AC_EGREP_CPP([mld6_hdr],[dnl
-#include <sys/types.h>
-#include <netinet/icmp6.h>
-],
-ac_cv_struct_mld6_hdr=yes,
-ac_cv_struct_mld6_hdr=no)])
-if test "$ac_cv_struct_mld6_hdr" = "yes"; then
-  AC_DEFINE(HAVE_STRUCT_MLD6_HDR, 1, [define if you have struct mld6hdr])
-fi
-
-dnl check for struct icmp6_nodeinfo
-
-AC_CACHE_CHECK([for struct icmp6_nodeinfo],
-ac_cv_struct_icmp6_nodeinfo,
-[AC_EGREP_CPP([icmp6_nodeinfo],[dnl
-#include <sys/types.h>
-#include <netinet/icmp6.h>
-],
-ac_cv_struct_icmp6_nodeinfo=yes,
-ac_cv_struct_icmp6_nodeinfo=no)])
-if test "$ac_cv_struct_icmp6_nodeinfo" = "yes"; then
-  AC_DEFINE(HAVE_STRUCT_ICMP6_NODEINFO, 1, [define if you have struct icmp6_nodeinfo])
-fi
 
 dnl portability macros for getaddrinfo/getnameinfo
 dnl

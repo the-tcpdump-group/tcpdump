@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.34 2000-10-07 05:53:10 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.35 2000-10-07 05:58:06 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -56,50 +56,11 @@ static const char rcsid[] =
 void icmp6_opt_print(const u_char *, int);
 void mld6_print(const u_char *);
 static struct udphdr *get_upperlayer(u_char *, int *);
-#ifdef HAVE_STRUCT_ICMP6_NODEINFO
 static void dnsname_print(const u_char *, const u_char *);
 void icmp6_nodeinfo_print(int, const u_char *, const u_char *);
-#endif
 
 #ifndef abs
 #define abs(a)	((0 < (a)) ? (a) : -(a))
-#endif
-
-#ifndef HAVE_STRUCT_ICMP6_NODEINFO
-struct icmp6_nodeinfo {
-	struct icmp6_hdr icmp6_ni_hdr;
-	u_int8_t icmp6_ni_nonce[8];
-	/* could be followed by reply data */
-};
-
-#define ni_type		icmp6_ni_hdr.icmp6_type
-#define ni_code		icmp6_ni_hdr.icmp6_code
-#define ni_cksum	icmp6_ni_hdr.icmp6_cksum
-#define ni_qtype	icmp6_ni_hdr.icmp6_data16[0]
-#define ni_flags	icmp6_ni_hdr.icmp6_data16[1]
-#endif
-
-/* cope with past KAME typo - shipped with freebsd4[01] and openbsd27 */
-#if defined(ICMP6_NI_SUCESS) && !defined(ICMP6_NI_SUCCESS)
-#define ICMP6_NI_SUCCESS	ICMP6_NI_SUCESS
-#endif
-#ifndef ICMP6_NI_SUCCESS
-#define ICMP6_NI_SUCCESS	0	/* node information successful reply */
-#define ICMP6_NI_REFUSED	1	/* node information request is refused */
-#define ICMP6_NI_UNKNOWN	2	/* unknown Qtype */
-#endif
-
-#ifdef NI_QTYPE_NOOP
-#define NI_QTYPE_NOOP		0 /* NOOP  */
-#define NI_QTYPE_SUPTYPES	1 /* Supported Qtypes */
-#define NI_QTYPE_FQDN		2 /* FQDN */
-#define NI_QTYPE_NODEADDR	3 /* Node Addresses. XXX: spec says 2, but it may be a typo... */
-#endif
-
-#ifndef ICMP6_NI_SUBJ_IPV6
-#define ICMP6_NI_SUBJ_IPV6	0	/* Query Subject is an IPv6 address */
-#define ICMP6_NI_SUBJ_FQDN	1	/* Query Subject is a Domain name */
-#define ICMP6_NI_SUBJ_IPV4	2	/* Query Subject is an IPv4 address */
 #endif
 
 void
@@ -241,7 +202,6 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 	case ICMP6_ECHO_REPLY:
 		printf("icmp6: echo reply");
 		break;
-#if defined(HAVE_STRUCT_MLD6_HDR) || defined(HAVE_STRUCT_ICMP6_MLD)
 	case ICMP6_MEMBERSHIP_QUERY:
 		printf("icmp6: multicast listener query ");
 		mld6_print((const u_char *)dp);
@@ -254,7 +214,6 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 		printf("icmp6: multicast listener done ");
 		mld6_print((const u_char *)dp);
 		break;
-#endif
 	case ND_ROUTER_SOLICIT:
 		printf("icmp6: router solicitation ");
 		if (vflag) {
@@ -376,20 +335,12 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 			break;
 		}
 		break;
-#ifdef HAVE_STRUCT_ICMP6_NODEINFO
-#ifndef ICMP6_NI_QUERY
-#define ICMP6_NI_QUERY	139
-#endif
 	case ICMP6_NI_QUERY:
 		icmp6_nodeinfo_print(icmp6len, bp, ep);
 		break;
-#ifndef ICMP6_NI_REPLY
-#define ICMP6_NI_REPLY	140
-#endif
 	case ICMP6_NI_REPLY:
 		icmp6_nodeinfo_print(icmp6len, bp, ep);
 		break;
-#endif
 	default:
 		printf("icmp6: type-#%d", dp->icmp6_type);
 		break;
@@ -611,7 +562,6 @@ icmp6_opt_print(register const u_char *bp, int resid)
 #undef ECHECK
 }
 
-#if defined(HAVE_STRUCT_MLD6_HDR)
 void
 mld6_print(register const u_char *bp)
 {
@@ -628,27 +578,6 @@ mld6_print(register const u_char *bp)
 	printf("addr: %s", ip6addr_string(&mp->mld6_addr));
 }
 
-#elif defined(HAVE_STRUCT_ICMP6_MLD)
-
-void
-mld6_print(register const u_char *bp)
-{
-	register struct icmp6_mld *mp = (struct icmp6_mld *)bp;
-	register const u_char *ep;
-
-	/* 'ep' points to the end of available data. */
-	ep = snapend;
-
-	if ((u_char *)mp + sizeof(*mp) > ep)
-		return;
-
-	printf("max resp delay: %d ", ntohs(mp->icmp6m_hdr.icmp6_maxdelay));
-	printf("addr: %s", ip6addr_string(&mp->icmp6m_group));
-}
-
-#endif
-
-#ifdef HAVE_STRUCT_ICMP6_NODEINFO
 static void
 dnsname_print(const u_char *cp, const u_char *ep)
 {
@@ -931,6 +860,5 @@ icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
 trunc:
 	fputs("[|icmp6]", stdout);
 }
-#endif
 
 #endif /* INET6 */
