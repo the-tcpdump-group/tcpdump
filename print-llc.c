@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.29 2000-06-10 20:57:56 assar Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.30 2000-12-05 06:42:48 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -68,6 +68,7 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 {
 	struct llc llc;
 	register u_short et;
+	u_short control;
 	register int ret;
 
 	if (caplen < 3) {
@@ -102,7 +103,32 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 		 * smb parser can handle many smb-in-netbeui packets, which
 		 * is very useful, so we call that
 		 */
-		netbeui_print(p + 2, p + min(caplen, length));
+
+		/*
+		 * Skip the DSAP and LSAP.
+		 */
+		p += 2;
+		length -= 2;
+		caplen -= 2;
+
+		/*
+		 * OK, what type of LLC frame is this?  The length
+		 * of the control field depends on that - S or I
+		 * frames have a two-byte control field, and U frames
+		 * have a one-byte control field.
+		 */
+		if ((llc.llcu & LLC_U_FMT) == LLC_U_FMT) {
+			control = llc.llcu;
+			p += 1;
+			length -= 1;
+			caplen -= 1;
+		} else {
+			control = llc.llcis;
+			p += 2;
+			length -= 2;
+			caplen -= 2;
+		}
+		netbeui_print(control, p, p + min(caplen, length));
 		return (1);
 	}
 	if (llc.ssap == LLCSAP_ISONS && llc.dsap == LLCSAP_ISONS

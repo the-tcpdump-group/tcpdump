@@ -11,7 +11,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.6 2000-12-04 00:35:44 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.7 2000-12-05 06:42:47 guy Exp $";
 #endif
 
 #include <stdio.h>
@@ -935,15 +935,22 @@ void nbt_udp138_print(const uchar *data, int length)
 /*
    print netbeui frames 
 */
-void netbeui_print(const uchar *data, const uchar *maxbuf)
+void netbeui_print(u_short control, const uchar *data, const uchar *maxbuf)
 {
-  int len = SVAL(data,1);
-  int command = CVAL(data,5);
-  const uchar *data2 = data + 1 + len;
+  int len = SVAL(data,0);
+  int command = CVAL(data,4);
+  const uchar *data2 = data + len;
+  int is_truncated = 0;
+
+  if (data2 >= maxbuf) {
+    data2 = maxbuf;
+    is_truncated = 1;
+  }
 
   startbuf = data;
 
-  data = fdata(data,"\n>>> NetBeui Packet\nType=[B] Length=[d] Signature=[w] Command=[B]\n#",maxbuf);
+  printf("\n>>> NetBeui Packet\nType=0x%X ", control);
+  data = fdata(data,"Length=[d] Signature=[w] Command=[B]\n#",maxbuf);
   if (data == NULL)
     goto out;
 
@@ -980,6 +987,10 @@ void netbeui_print(const uchar *data, const uchar *maxbuf)
     data = fdata(data,"SessionEnd:\n[P1]Data2=[w][P4]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n",data2);
     break;
 
+  case 0x1f:
+    data = fdata(data,"SessionAlive\n",data2);
+    break;
+
   default:
     data = fdata(data,"Unknown Netbios Command ",data2);
     break;
@@ -987,11 +998,18 @@ void netbeui_print(const uchar *data, const uchar *maxbuf)
   if (data == NULL)
     goto out;
 
+  if (is_truncated) {
+    /* data2 was past the end of the buffer */
+    goto out;
+  }
+
   if (memcmp(data2,"\377SMB",4)==0) {
     print_smb(data2,maxbuf);
   } else {
     int i;
     for (i=0;i<128;i++) {
+      if (&data2[i] >= maxbuf)
+        break;
       if (memcmp(&data2[i],"\377SMB",4)==0) {
 	printf("found SMB packet at %d\n", i);
 	print_smb(&data2[i],maxbuf);
