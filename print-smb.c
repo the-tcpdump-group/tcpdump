@@ -11,7 +11,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.5 2000-01-19 05:17:13 itojun Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.6 2000-12-04 00:35:44 guy Exp $";
 #endif
 
 #include <stdio.h>
@@ -719,6 +719,8 @@ void nbt_tcp_print(const uchar *data,int length)
     printf("flags=0x%x\n", flags);
   case 0:    
     data = fdata(data,"NBT Session Packet\nFlags=[rw]\nLength=[rd]\n",data+4);
+    if (data == NULL)
+      break;
     if (memcmp(data,"\377SMB",4)==0) {
       if (nbt_len>PTR_DIFF(maxbuf,data))
 	printf("WARNING: Short packet. Try increasing the snap length (%ld)\n",
@@ -845,6 +847,8 @@ void nbt_udp137_print(const uchar *data, int length)
       printf("QuestionRecords:\n");
       for (i=0;i<qdcount;i++)
 	p = fdata(p,"|Name=[n1]\nQuestionType=[rw]\nQuestionClass=[rw]\n#",maxbuf);
+	if (p == NULL)
+	  goto out;
     }
 
     if (total) {
@@ -853,17 +857,25 @@ void nbt_udp137_print(const uchar *data, int length)
 	int rdlen;
 	int restype;
 	p = fdata(p,"Name=[n1]\n#",maxbuf);
+	if (p == NULL)
+	  goto out;
 	restype = RSVAL(p,0);
 	p = fdata(p,"ResType=[rw]\nResClass=[rw]\nTTL=[rD]\n",p+8);
+	if (p == NULL)
+	  goto out;
 	rdlen = RSVAL(p,0);
 	printf("ResourceLength=%d\nResourceData=\n",rdlen);
 	p += 2;
 	if (rdlen == 6) {
 	  p = fdata(p,"AddrType=[rw]\nAddress=[b.b.b.b]\n",p+rdlen);
+	  if (p == NULL)
+	    goto out;
 	} else {
 	  if (restype == 0x21) {
 	    int numnames = CVAL(p,0);
 	    p = fdata(p,"NumNames=[B]\n",p+1);
+	    if (p == NULL)
+	      goto out;
 	    while (numnames--) {
 	      p = fdata(p,"Name=[n2]\t#",maxbuf);
 	      if (p[0] & 0x80) printf("<GROUP> ");
@@ -893,6 +905,7 @@ void nbt_udp137_print(const uchar *data, int length)
     fdata(p,"AdditionalData:\n",maxbuf);    
   }      
   
+out:
   printf("\n");
   fflush(stdout);
 }
@@ -910,7 +923,8 @@ void nbt_udp138_print(const uchar *data, int length)
 
   data = fdata(data,"\n>>> NBT UDP PACKET(138) Res=[rw] ID=[rw] IP=[b.b.b.b] Port=[rd] Length=[rd] Res2=[rw]\nSourceName=[n1]\nDestName=[n1]\n#",maxbuf);
 
-  print_smb(data,maxbuf);
+  if (data != NULL)
+    print_smb(data,maxbuf);
   
   printf("\n");
   fflush(stdout);
@@ -930,6 +944,8 @@ void netbeui_print(const uchar *data, const uchar *maxbuf)
   startbuf = data;
 
   data = fdata(data,"\n>>> NetBeui Packet\nType=[B] Length=[d] Signature=[w] Command=[B]\n#",maxbuf);
+  if (data == NULL)
+    goto out;
 
   switch (command) {
   case 0xA: 
@@ -968,6 +984,8 @@ void netbeui_print(const uchar *data, const uchar *maxbuf)
     data = fdata(data,"Unknown Netbios Command ",data2);
     break;
   }
+  if (data == NULL)
+    goto out;
 
   if (memcmp(data2,"\377SMB",4)==0) {
     print_smb(data2,maxbuf);
@@ -982,6 +1000,7 @@ void netbeui_print(const uchar *data, const uchar *maxbuf)
     }
   }
 
+out:
   printf("\n");
 }
 
@@ -997,7 +1016,8 @@ void ipx_netbios_print(const uchar *data, const uchar *maxbuf)
   for (i=0;i<128;i++)
     if (memcmp(&data[i],"\377SMB",4)==0) {
       fdata(data,"\n>>> IPX transport ",&data[i]);
-      print_smb(&data[i],maxbuf);
+      if (data != NULL)
+	print_smb(&data[i],maxbuf);
       printf("\n");
       fflush(stdout);
       break;
