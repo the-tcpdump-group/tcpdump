@@ -1,3 +1,6 @@
+2000-01-07  Assar Westerlund  <assar@sics.se>
+	* print-rx.c: add printing of fs error messages
+
 Thu Dec 23 00:45:44 JST 1999  itojun@iijlab.net
 	* -X will make a ascii dump.  from netbsd.
 	* telnet command sequence decoder (ff xx xx).  from netbsd.
@@ -558,4 +561,4 @@ v2.0 Sun Jan 13 12:20:40 PST 1991
 
 - Initial public release.
 
-@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.63 1999-12-22 15:44:39 itojun Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.64 2000-01-07 15:19:46 assar Exp $ (LBL)
