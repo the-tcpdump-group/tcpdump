@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.81 2000-05-01 17:35:45 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.82 2000-05-10 05:11:27 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -299,7 +299,15 @@ ip_optprint(register const u_char *cp, u_int length)
 	for (; length > 0; cp += len, length -= len) {
 		int tt = *cp;
 
-		len = (tt == IPOPT_NOP || tt == IPOPT_EOL) ? 1 : cp[1];
+		if (tt == IPOPT_NOP || tt == IPOPT_EOL)
+			len = 1;
+		else {
+			if (&cp[1] >= snapend) {
+				printf("[|ip]");
+				return;
+			}
+			len = cp[1];
+		}
 		if (len <= 0) {
 			printf("[|ip op len %d]", len);
 			return;
