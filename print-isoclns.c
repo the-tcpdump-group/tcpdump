@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.46 2002-04-30 09:04:35 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.47 2002-05-16 10:19:23 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -147,14 +147,14 @@ static struct tok isis_tlv_values[] = {
     { TLV_IS_ALIAS_ID,       "IS Alias ID"},
     { TLV_DECNET_PHASE4,     "DECnet Phase IV"},     
     { TLV_LUCENT_PRIVATE,    "Lucent Proprietary"},     
-    { TLV_IP_REACH,          "IP Internal reachability"}, 
+    { TLV_IP_REACH,          "IPv4 Internal reachability"}, 
     { TLV_PROTOCOLS,         "Protocols supported"}, 
-    { TLV_IP_REACH_EXT,      "IP External reachability"}, 
+    { TLV_IP_REACH_EXT,      "IPv4 External reachability"}, 
     { TLV_IDRP_INFO,         "Inter-Domain Information Type"}, 
-    { TLV_IPADDR,            "IP Interface address(es)"},            
-    { TLV_IPAUTH,            "IP authentication (depreciated)"},            
+    { TLV_IPADDR,            "IPv4 Interface address(es)"},            
+    { TLV_IPAUTH,            "IPv4 authentication (deprecated)"},            
     { TLV_TE_ROUTER_ID,      "Traffic Engineering Router ID"}, 
-    { TLV_EXT_IP_REACH,      "Extended IP reachability"}, 
+    { TLV_EXT_IP_REACH,      "Extended IPv4 reachability"}, 
     { TLV_HOSTNAME,          "Hostname"}, 
     { TLV_SHARED_RISK_GROUP, "Shared Risk Link Group"},  
     { TLV_NORTEL_PRIVATE1,   "Nortel Proprietary"},   
@@ -162,9 +162,9 @@ static struct tok isis_tlv_values[] = {
     { TLV_RESTART_SIGNALING, "Restart Signaling"}, 
     { TLV_MT_IS_REACH,       "Multi Topology IS Reachability"}, 
     { TLV_MT_SUPPORTED,      "Multi Topology"}, 
-    { TLV_IP6ADDR,           "IP6 Interface address(es)"},           
-    { TLV_MT_IP_REACH,       "Multi-Topology IP reachability"}, 
-    { TLV_IP6_REACH,         "IP6 reachability"}, 
+    { TLV_IP6ADDR,           "IPv6 Interface address(es)"},           
+    { TLV_MT_IP_REACH,       "Multi-Topology IPv4 reachability"}, 
+    { TLV_IP6_REACH,         "IPv6 reachability"}, 
     { TLV_MT_IP6_REACH,      "Multi-Topology IP6 reachability"},      
     { TLV_PTP_ADJ,           "Point-to-point Adjacency State"}, 
     { 0, NULL }
@@ -799,7 +799,7 @@ isis_print_tlv_ip_reach (const u_char *cp, int length)
 
 	while (length > 0) {
 		if (length < sizeof(*tlv_ip_reach)) {
-			printf("short IP reachability (%d vs %lu)", length,
+			printf("short IPv4 reachability (%d vs %lu)", length,
 			    (unsigned long)sizeof(*tlv_ip_reach));
 			return (0);
 		}
@@ -1950,6 +1950,12 @@ static int isis_print (const u_char *p, u_int length)
             }
             break;
 
+        case TLV_LSP_BUFFERSIZE:
+            if (!TTEST2(*tptr, 2))
+                goto trunctlv;            
+                printf("LSP Buffersize: %u",EXTRACT_16BITS(tptr));
+            break;
+
             /*
              * FIXME those are the defined TLVs that lack a decoder
              * you are welcome to contribute code ;-)
@@ -1958,7 +1964,6 @@ static int isis_print (const u_char *p, u_int length)
         case TLV_ESNEIGH:
         case TLV_PART_DIS:
         case TLV_SUMMARY:
-        case TLV_LSP_BUFFERSIZE:
         case TLV_IS_ALIAS_ID:
         case TLV_DECNET_PHASE4:
         case TLV_LUCENT_PRIVATE:
