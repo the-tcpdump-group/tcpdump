@@ -31,7 +31,7 @@
  * SUCH DAMAGE.
  */
 
-/* $Id: snprintf.c,v 1.2 2000-01-09 21:35:46 fenner Exp $ */
+/* $Id: snprintf.c,v 1.3 2000-01-10 16:57:44 fenner Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -39,7 +39,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/missing/snprintf.c,v 1.2 2000-01-09 21:35:46 fenner Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/missing/snprintf.c,v 1.3 2000-01-10 16:57:44 fenner Exp $";
 #endif
 
 #include <stdio.h>
@@ -47,6 +47,7 @@ static const char rcsid[] =
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <sys/types.h>
 
 #include <interface.h>
 
