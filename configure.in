@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.88 2000-01-07 15:45:52 assar Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.89 2000-01-07 16:33:22 assar Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -19,7 +19,7 @@ fi
 AC_LBL_C_INIT(V_CCOPT, V_INCLS)
 AC_C_INLINE
 
-AC_CHECK_HEADERS(fcntl.h malloc.h memory.h rpc/rpcent.h)
+AC_CHECK_HEADERS(fcntl.h malloc.h memory.h rpc/rpcent.h sys/cdefs.h)
 AC_HEADER_TIME
 
 case "$target_os" in
