@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.76 1999-10-30 07:33:45 itojun Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.77 1999-10-30 07:45:38 itojun Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -379,8 +379,8 @@ AC_STRUCT_RES_STATE(ac_cv_res_state)
 dnl
 dnl set additional include path if necessary
 if test "$missing_includes" = "yes"; then
-	CPPFLAGS="$CPPFLAGS -I$(srcdir)/missing"
-	V_INCLS="$V_INCLS -I$(srcdir)/missing"
+	CPPFLAGS="$CPPFLAGS -I\$(srcdir)/missing"
+	V_INCLS="$V_INCLS -I\$(srcdir)/missing"
 fi
 
 
