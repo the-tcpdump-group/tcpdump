@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.247 2004-08-18 14:56:27 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.248 2004-09-04 00:08:04 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -702,7 +702,6 @@ main(int argc, char **argv)
 			break;
 
 		case 'X':
-		        ++xflag;
 			++Xflag;
 			break;
 
@@ -1197,7 +1196,7 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 			/*
 			 * Include the link-layer header.
 			 */
-			default_print(sp, h->caplen);
+			hex_print("\n\t", sp, h->caplen);
 		} else {
 			/*
 			 * Don't include the link-layer header - and if
@@ -1205,7 +1204,26 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 			 * print nothing.
 			 */
 			if (h->caplen > hdrlen)
-				default_print(sp + hdrlen,
+				hex_print("\n\t", sp + hdrlen,
+				    h->caplen - hdrlen);
+		}
+       } else if (Xflag) {
+		/*
+		 * Print the raw packet data.
+		 */
+		if (Xflag > 1) {
+			/*
+			 * Include the link-layer header.
+			 */
+			ascii_print("\n\t", sp, h->caplen);
+		} else {
+			/*
+			 * Don't include the link-layer header - and if
+			 * we have nothing past the link-layer header,
+			 * print nothing.
+			 */
+			if (h->caplen > hdrlen)
+				ascii_print("\n\t", sp + hdrlen,
 				    h->caplen - hdrlen);
 		}
 	}
@@ -1250,7 +1268,7 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 void
 default_print(register const u_char *bp, register u_int length)
 {
-    ascii_print("\n\t", bp, length); /* pass on lf and identation string */
+	ascii_print("\n\t", bp, length); /* pass on lf and identation string */
 }
 
 #ifdef SIGINFO
