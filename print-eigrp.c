@@ -16,7 +16,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-eigrp.c,v 1.2 2004-04-30 23:52:00 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-eigrp.c,v 1.3 2004-05-01 09:07:01 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -67,6 +67,12 @@ static const struct tok eigrp_opcode_values[] = {
     { 0, NULL}
 };
 
+static const struct tok eigrp_common_header_flag_values[] = {
+    { 0x01, "Init" },
+    { 0x02, "Conditionally Received" },
+    { 0, NULL}
+};
+
 struct eigrp_tlv_header {
     u_int8_t type[2];
     u_int8_t length[2];
@@ -101,7 +107,7 @@ static const struct tok eigrp_tlv_values[] = {
     { 0, NULL}
 };
 
-struct eigrp_tlv_general_parm {
+struct eigrp_tlv_general_parm_t {
     u_int8_t k1;
     u_int8_t k2;
     u_int8_t k3;
@@ -111,11 +117,24 @@ struct eigrp_tlv_general_parm {
     u_int8_t holdtime[2];
 };          
 
-struct eigrp_tlv_sw_version {
+struct eigrp_tlv_sw_version_t {
     u_int8_t ios_major;
     u_int8_t ios_minor;
     u_int8_t eigrp_major;
     u_int8_t eigrp_minor;
+}; 
+
+struct eigrp_tlv_ip_int_t {
+    u_int8_t nexthop[4];
+    u_int8_t delay[4];
+    u_int8_t bandwidth[4];
+    u_int8_t mtu[3];
+    u_int8_t hopcount;
+    u_int8_t reliability;
+    u_int8_t load;
+    u_int8_t reserved[2];
+    u_int8_t plen;
+    u_int8_t destination; /* variable length [0-4] bytes encoding */
 }; 
 
 void
@@ -124,11 +143,13 @@ eigrp_print(register const u_char *pptr, register u_int len) {
     const struct eigrp_common_header *eigrp_com_header;
     const struct eigrp_tlv_header *eigrp_tlv_header;
     const u_char *tptr,*tlv_tptr;
-    int tlen,eigrp_tlv_len,eigrp_tlv_type,tlv_tlen;
+    int tlen,eigrp_tlv_len,eigrp_tlv_type,tlv_tlen,byte_length, bit_length;
+    u_int8_t prefix[4];
 
     union {
-        const struct eigrp_tlv_general_parm *eigrp_tlv_general_parm;
-        const struct eigrp_tlv_sw_version *eigrp_tlv_sw_version;
+        const struct eigrp_tlv_general_parm_t *eigrp_tlv_general_parm;
+        const struct eigrp_tlv_sw_version_t *eigrp_tlv_sw_version;
+        const struct eigrp_tlv_ip_int_t *eigrp_tlv_ip_int;
     } tlv_ptr;
 
     tptr=pptr;
@@ -156,12 +177,14 @@ eigrp_print(register const u_char *pptr, register u_int len) {
     tlen=len-sizeof(struct eigrp_common_header);
 
     /* FIXME print other header info */
-    printf("\n\tEIGRP v%u, opcode: %s (%u), chksum: 0x%04x, Flags: [0x%08x]\n\tseq: 0x%08x, ack: 0x%08x, AS: %u, length: %u",
+    printf("\n\tEIGRP v%u, opcode: %s (%u), chksum: 0x%04x, Flags: [%s]\n\tseq: 0x%08x, ack: 0x%08x, AS: %u, length: %u",
            eigrp_com_header->version,
            tok2str(eigrp_opcode_values, "unknown, type: %u",eigrp_com_header->opcode),
            eigrp_com_header->opcode,
            EXTRACT_16BITS(&eigrp_com_header->checksum),
-           EXTRACT_32BITS(&eigrp_com_header->flags),
+           tok2str(eigrp_common_header_flag_values,
+                   "none",
+                   EXTRACT_32BITS(&eigrp_com_header->flags)),
            EXTRACT_32BITS(&eigrp_com_header->seq),
            EXTRACT_32BITS(&eigrp_com_header->ack),
            EXTRACT_32BITS(&eigrp_com_header->asn),
@@ -201,7 +224,8 @@ eigrp_print(register const u_char *pptr, register u_int len) {
         switch(eigrp_tlv_type) {
 
         case EIGRP_TLV_GENERAL_PARM:
-            tlv_ptr.eigrp_tlv_general_parm = (const struct eigrp_tlv_general_parm *)tlv_tptr;
+            tlv_ptr.eigrp_tlv_general_parm = (const struct eigrp_tlv_general_parm_t *)tlv_tptr;
+
             printf("\n\t    holdtime: %us, k1 %u, k2 %u, k3 %u, k4 %u, k5 %u",
                    EXTRACT_16BITS(tlv_ptr.eigrp_tlv_general_parm->holdtime),
                    tlv_ptr.eigrp_tlv_general_parm->k1,
@@ -212,12 +236,42 @@ eigrp_print(register const u_char *pptr, register u_int len) {
             break;
 
         case EIGRP_TLV_SW_VERSION:
-            tlv_ptr.eigrp_tlv_sw_version = (const struct eigrp_tlv_sw_version *)tlv_tptr;
+            tlv_ptr.eigrp_tlv_sw_version = (const struct eigrp_tlv_sw_version_t *)tlv_tptr;
+
             printf("\n\t    IOS version: %u.%u, EIGRP version %u.%u",
                    tlv_ptr.eigrp_tlv_sw_version->ios_major,
                    tlv_ptr.eigrp_tlv_sw_version->ios_minor,
                    tlv_ptr.eigrp_tlv_sw_version->eigrp_major,
                    tlv_ptr.eigrp_tlv_sw_version->eigrp_minor);
+            break;
+
+        case EIGRP_TLV_IP_INT:
+            tlv_ptr.eigrp_tlv_ip_int = (const struct eigrp_tlv_ip_int_t *)tlv_tptr;
+
+            bit_length = tlv_ptr.eigrp_tlv_ip_int->plen;
+            if (bit_length < 0 || bit_length > 32) {
+                printf("\n\t    illegal prefix length %u",bit_length);
+                break;
+            }
+            byte_length = (bit_length + 7) / 8; /* variable length encoding */
+            memset(prefix, 0, 4);
+            memcpy(prefix,&tlv_ptr.eigrp_tlv_ip_int->destination,byte_length);
+
+            printf("\n\t    IPv4 prefix: %15s/%u, nexthop: ",
+                   ipaddr_string(prefix),
+                   bit_length);
+            if (EXTRACT_32BITS(&tlv_ptr.eigrp_tlv_ip_int->nexthop) == 0)
+                printf("self");
+            else
+                printf("%s",ipaddr_string(EXTRACT_32BITS(&tlv_ptr.eigrp_tlv_ip_int->nexthop)));
+
+            printf("\n\t      delay %u ms, bandwidth %u Kbps, mtu %u, hop %u, reliability %u, load %u",
+                   (EXTRACT_32BITS(&tlv_ptr.eigrp_tlv_ip_int->delay)/100),
+                   EXTRACT_32BITS(&tlv_ptr.eigrp_tlv_ip_int->bandwidth),
+                   EXTRACT_24BITS(&tlv_ptr.eigrp_tlv_ip_int->mtu),
+                   tlv_ptr.eigrp_tlv_ip_int->hopcount,
+                   tlv_ptr.eigrp_tlv_ip_int->reliability,
+                   tlv_ptr.eigrp_tlv_ip_int->load);
             break;
 
             /*
@@ -228,7 +282,6 @@ eigrp_print(register const u_char *pptr, register u_int len) {
         case EIGRP_TLV_AUTH:
         case EIGRP_TLV_SEQ:
         case EIGRP_TLV_MCAST_SEQ:
-        case EIGRP_TLV_IP_INT:
         case EIGRP_TLV_IP_EXT:
         case EIGRP_TLV_AT_INT:
         case EIGRP_TLV_AT_EXT:
