@@ -13,7 +13,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.13 2000-07-22 17:32:32 assar Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.14 2000-07-29 08:10:05 assar Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -374,6 +374,7 @@ static void	rx_cache_insert(const u_char *, const struct ip *, int, int);
 static int	rx_cache_find(const struct rx_header *, const struct ip *,
 			      int, int32_t *);
 
+static void ack_print(const u_char *, int);
 static void fs_print(const u_char *, int);
 static void fs_reply_print(const u_char *, int, int32_t);
 static void acl_print(u_char *, u_char *);
@@ -458,7 +459,9 @@ rx_print(register const u_char *bp, int length, int sport, int dport,
 	 * as well.
 	 */
 
-	if (rxh->type == RX_PACKET_TYPE_DATA &&
+ 	if (rxh->type == RX_PACKET_TYPE_ACK)
+ 	    ack_print(bp, length);
+	else if (rxh->type == RX_PACKET_TYPE_DATA &&
 	    EXTRACT_32BITS(&rxh->seq) == 1 &&
 	    rxh->flags & RX_CLIENT_INITIATED) {
 
@@ -725,6 +728,75 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 			s[MAX] = '\0'; \
 			printf(" \"%s\"", s); \
 		}
+
+void
+ack_print(register const u_char *bp, int length)
+{
+        u_char nAcks;
+	int i;
+
+	if (vflag <= 1)
+	        return;
+
+ 	if (length <= sizeof(struct rx_header))
+		return;
+
+	bp += sizeof(struct rx_header);
+
+	/*
+	 * Packets < firstPacket are implicitly acknowledged and may
+	 * be discarded by the sender.
+	 *
+	 * Packets >= firstPacket+nAcks are implicitly NOT acknowledged.
+	 *
+	 * No packets with sequence numbers >= firstPacket should be
+	 * discarded by the sender (they may thrown out at any time by
+	 * the receiver)
+	 */
+#define RX_ACK_REASONS "RDOXSprn"
+	/* Requested, Duplicate, Out_of_sequence, eXceeds_window, no_Space,
+	 * Ping, ping_Response, No_{progress, particular_reason}.
+	 */
+#if 0
+	struct rx_ackPacket {
+	  u_short bufferSpace;	/* Skip! */
+	  u_short maxSkew;	/* Skip! */
+	  u_long  firstPacket;
+	  u_long  previousPacket; /* Obsolete! */
+	  u_long  serial;	/* Serial that prompted the ack, */
+	  u_char  reason;	/* and the reason why. */
+	  u_char  nAcks;
+	  u_char  acks[RX_MAXACKS]; /* Selective acks (not a bitmap). */
+	};
+#endif
+#define RX_ACK_TYPE_NACK 0
+
+	TRUNC(4); bp += 4;	/* bufferSpace and maxSkew */
+	TRUNC(4);
+	printf(" fir %u", ntohl(*(u_int32_t*)bp));
+	bp += 4;		/* firstPacket */
+	TRUNC(4); bp += 4;	/* previousPacket */
+	TRUNC(4);
+	printf(" %u", ntohl(*(u_int32_t*)bp));
+	bp += 4;		/* serial */
+	TRUNC(1);
+	printf("%c", RX_ACK_REASONS[(*bp - 1) & 07u]);
+	bp += 1;		/* reason */
+	TRUNC(1);
+	nAcks = *bp;
+	bp += 1;		/* nAcks */
+
+	for (i = 0; i < nAcks; i++) {
+	  TRUNC(1);
+	  putchar(*bp == RX_ACK_TYPE_NACK? '-' : '*');
+	  bp += 1;
+	}
+	
+	return;
+
+trunc:
+	printf(" [|ack]");
+}
 
 /*
  * Handle calls to the AFS file service (fs)

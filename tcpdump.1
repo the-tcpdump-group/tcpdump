@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.84 2000-07-29 06:06:28 assar Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.85 2000-07-29 08:10:06 assar Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -1352,8 +1352,9 @@ The format is intended to be self-describing, but it will probably
 not be useful to people who are not familiar with the workings of
 AFS and RX.
 .LP
-If the -v (verbose) flag is given, the RX call number and sequence number
-are printed.
+If the -v (verbose) flag is given twice, acknowledgement packets and
+additional header information is printed, such as the the RX call ID,
+call number, sequence number, serial number, and the RX packet flags.
 .LP
 If the -v flag is given twice, additional information is printed,
 such as the the RX call ID, serial number, and the RX packet flags.
