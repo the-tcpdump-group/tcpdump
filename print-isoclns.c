@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.112 2003-12-15 04:16:57 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.113 2003-12-20 22:24:51 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -46,12 +46,22 @@ static const char rcsid[] _U_ =
 #include "gmpls.h"
 #include "oui.h"
 
-#define	NLPID_CLNS	129	/* 0x81 */
-#define	NLPID_ESIS	130	/* 0x82 */
-#define	NLPID_ISIS	131	/* 0x83 */
+#define	NLPID_CLNP	0x81 /* iso9577 */
+#define	NLPID_ESIS	0x82 /* iso9577 */
+#define	NLPID_ISIS	0x83 /* iso9577 */
 #define NLPID_IP6       0x8e
 #define NLPID_IP        0xcc
 #define	NLPID_NULLNS	0
+
+static struct tok osi_nlpid_values[] = {
+    { NLPID_NULLNS, "NULL-NS"},
+    { NLPID_CLNP,   "CLNP"},
+    { NLPID_ESIS,   "ES-IS"},
+    { NLPID_ISIS,   "IS-IS"},
+    { NLPID_IP,     "IPv4"},
+    { NLPID_IP6,    "IPv6"},
+    { 0, NULL }
+};
 
 #define IPV4            1       /* AFI value */
 #define IPV6            2       /* AFI value */
@@ -63,31 +73,35 @@ static const char rcsid[] _U_ =
 #define SYSTEM_ID_LEN	ETHER_ADDR_LEN
 #define NODE_ID_LEN     SYSTEM_ID_LEN+1
 #define LSP_ID_LEN      SYSTEM_ID_LEN+2
+#define NSAP_MAX_LENGTH 20
 
 #define ISIS_VERSION	1
-#define PDU_TYPE_MASK	0x1F
-#define PRIORITY_MASK	0x7F
+#define ESIS_VERSION	1
 
-#define L1_LAN_IIH	15
-#define L2_LAN_IIH	16
-#define PTP_IIH		17
-#define L1_LSP       	18
-#define L2_LSP       	20
-#define L1_CSNP  	24
-#define L2_CSNP  	25
-#define L1_PSNP		26
-#define L2_PSNP		27
+#define ISIS_PDU_TYPE_MASK      0x1F
+#define ESIS_PDU_TYPE_MASK      0x1F
+#define ISIS_LAN_PRIORITY_MASK  0x7F
+
+#define ISIS_PDU_L1_LAN_IIH	15
+#define ISIS_PDU_L2_LAN_IIH	16
+#define ISIS_PDU_PTP_IIH	17
+#define ISIS_PDU_L1_LSP       	18
+#define ISIS_PDU_L2_LSP       	20
+#define ISIS_PDU_L1_CSNP  	24
+#define ISIS_PDU_L2_CSNP  	25
+#define ISIS_PDU_L1_PSNP        26
+#define ISIS_PDU_L2_PSNP        27
 
 static struct tok isis_pdu_values[] = {
-    { L1_LAN_IIH,       "L1 Lan IIH"},
-    { L2_LAN_IIH,       "L2 Lan IIH"},
-    { PTP_IIH,          "p2p IIH"},
-    { L1_LSP,           "L1 LSP"},
-    { L2_LSP,           "L2 LSP"},
-    { L1_CSNP,          "L1 CSNP"},
-    { L2_CSNP,          "L2 CSNP"},
-    { L1_PSNP,          "L1 PSNP"},
-    { L2_PSNP,          "L2 PSNP"},
+    { ISIS_PDU_L1_LAN_IIH,       "L1 Lan IIH"},
+    { ISIS_PDU_L2_LAN_IIH,       "L2 Lan IIH"},
+    { ISIS_PDU_PTP_IIH,          "p2p IIH"},
+    { ISIS_PDU_L1_LSP,           "L1 LSP"},
+    { ISIS_PDU_L2_LSP,           "L2 LSP"},
+    { ISIS_PDU_L1_CSNP,          "L1 CSNP"},
+    { ISIS_PDU_L2_CSNP,          "L2 CSNP"},
+    { ISIS_PDU_L1_PSNP,          "L1 PSNP"},
+    { ISIS_PDU_L2_PSNP,          "L2 PSNP"},
     { 0, NULL}
 };
 
@@ -99,157 +113,173 @@ static struct tok isis_pdu_values[] = {
  * list taken from rfc3359 plus some memory from veterans ;-)
  */
 
-#define TLV_AREA_ADDR           1   /* iso10589 */
-#define TLV_IS_REACH            2   /* iso10589 */
-#define TLV_ESNEIGH             3   /* iso10589 */
-#define TLV_PART_DIS            4   /* iso10589 */
-#define TLV_PREFIX_NEIGH        5   /* iso10589 */
-#define TLV_ISNEIGH             6   /* iso10589 */
-#define TLV_ISNEIGH_VARLEN      7   /* iso10589 */
-#define TLV_PADDING             8   /* iso10589 */
-#define TLV_LSP                 9   /* iso10589 */
-#define TLV_AUTH                10  /* iso10589, rfc3567 */
-#define TLV_CHECKSUM            12  /* rfc3358 */
-#define TLV_LSP_BUFFERSIZE      14  /* iso10589 rev2 */
-#define TLV_EXT_IS_REACH        22  /* draft-ietf-isis-traffic-05 */
-#define TLV_IS_ALIAS_ID         24  /* draft-ietf-isis-ext-lsp-frags-02 */
-#define TLV_DECNET_PHASE4       42
-#define TLV_LUCENT_PRIVATE      66
-#define TLV_INT_IP_REACH        128 /* rfc1195, rfc2966 */
-#define TLV_PROTOCOLS           129 /* rfc1195 */
-#define TLV_EXT_IP_REACH        130 /* rfc1195, rfc2966 */
-#define TLV_IDRP_INFO           131 /* rfc1195 */
-#define TLV_IPADDR              132 /* rfc1195 */
-#define TLV_IPAUTH              133 /* rfc1195 */
-#define TLV_TE_ROUTER_ID        134 /* draft-ietf-isis-traffic-05 */
-#define TLV_EXTD_IP_REACH       135 /* draft-ietf-isis-traffic-05 */
-#define TLV_HOSTNAME            137 /* rfc2763 */
-#define TLV_SHARED_RISK_GROUP   138 /* draft-ietf-isis-gmpls-extensions */
-#define TLV_NORTEL_PRIVATE1     176
-#define TLV_NORTEL_PRIVATE2     177
-#define TLV_HOLDTIME            198 /* ES-IS */
-#define TLV_RESTART_SIGNALING   211 /* draft-ietf-isis-restart-01 */
-#define TLV_MT_IS_REACH         222 /* draft-ietf-isis-wg-multi-topology-05 */
-#define TLV_MT_SUPPORTED        229 /* draft-ietf-isis-wg-multi-topology-05 */
-#define TLV_IP6ADDR             232 /* draft-ietf-isis-ipv6-02 */
-#define TLV_MT_IP_REACH         235 /* draft-ietf-isis-wg-multi-topology-05 */
-#define TLV_IP6_REACH           236 /* draft-ietf-isis-ipv6-02 */
-#define TLV_MT_IP6_REACH        237 /* draft-ietf-isis-wg-multi-topology-05 */
-#define TLV_PTP_ADJ             240 /* rfc3373 */
-#define TLV_IIH_SEQNR           241 /* draft-shen-isis-iih-sequence-00 */
-#define TLV_VENDOR_PRIVATE      250 /* draft-ietf-isis-proprietary-tlv-00 */
+#define ISIS_TLV_AREA_ADDR           1   /* iso10589 */
+#define ISIS_TLV_IS_REACH            2   /* iso10589 */
+#define ISIS_TLV_ESNEIGH             3   /* iso10589 */
+#define ISIS_TLV_PART_DIS            4   /* iso10589 */
+#define ISIS_TLV_PREFIX_NEIGH        5   /* iso10589 */
+#define ISIS_TLV_ISNEIGH             6   /* iso10589 */
+#define ISIS_TLV_ISNEIGH_VARLEN      7   /* iso10589 */
+#define ISIS_TLV_PADDING             8   /* iso10589 */
+#define ISIS_TLV_LSP                 9   /* iso10589 */
+#define ISIS_TLV_AUTH                10  /* iso10589, rfc3567 */
+#define ISIS_TLV_CHECKSUM            12  /* rfc3358 */
+#define ISIS_TLV_LSP_BUFFERSIZE      14  /* iso10589 rev2 */
+#define ISIS_TLV_EXT_IS_REACH        22  /* draft-ietf-isis-traffic-05 */
+#define ISIS_TLV_IS_ALIAS_ID         24  /* draft-ietf-isis-ext-lsp-frags-02 */
+#define ISIS_TLV_DECNET_PHASE4       42
+#define ISIS_TLV_LUCENT_PRIVATE      66
+#define ISIS_TLV_INT_IP_REACH        128 /* rfc1195, rfc2966 */
+#define ISIS_TLV_PROTOCOLS           129 /* rfc1195 */
+#define ISIS_TLV_EXT_IP_REACH        130 /* rfc1195, rfc2966 */
+#define ISIS_TLV_IDRP_INFO           131 /* rfc1195 */
+#define ISIS_TLV_IPADDR              132 /* rfc1195 */
+#define ISIS_TLV_IPAUTH              133 /* rfc1195 */
+#define ISIS_TLV_TE_ROUTER_ID        134 /* draft-ietf-isis-traffic-05 */
+#define ISIS_TLV_EXTD_IP_REACH       135 /* draft-ietf-isis-traffic-05 */
+#define ISIS_TLV_HOSTNAME            137 /* rfc2763 */
+#define ISIS_TLV_SHARED_RISK_GROUP   138 /* draft-ietf-isis-gmpls-extensions */
+#define ISIS_TLV_NORTEL_PRIVATE1     176
+#define ISIS_TLV_NORTEL_PRIVATE2     177
+#define ISIS_TLV_HOLDTIME            198 /* ES-IS */
+#define ISIS_TLV_RESTART_SIGNALING   211 /* draft-ietf-isis-restart-01 */
+#define ISIS_TLV_MT_IS_REACH         222 /* draft-ietf-isis-wg-multi-topology-05 */
+#define ISIS_TLV_MT_SUPPORTED        229 /* draft-ietf-isis-wg-multi-topology-05 */
+#define ISIS_TLV_IP6ADDR             232 /* draft-ietf-isis-ipv6-02 */
+#define ISIS_TLV_MT_IP_REACH         235 /* draft-ietf-isis-wg-multi-topology-05 */
+#define ISIS_TLV_IP6_REACH           236 /* draft-ietf-isis-ipv6-02 */
+#define ISIS_TLV_MT_IP6_REACH        237 /* draft-ietf-isis-wg-multi-topology-05 */
+#define ISIS_TLV_PTP_ADJ             240 /* rfc3373 */
+#define ISIS_TLV_IIH_SEQNR           241 /* draft-shen-isis-iih-sequence-00 */
+#define ISIS_TLV_VENDOR_PRIVATE      250 /* draft-ietf-isis-proprietary-tlv-00 */
 
 static struct tok isis_tlv_values[] = {
-    { TLV_AREA_ADDR,	     "Area address(es)"},
-    { TLV_IS_REACH,          "IS Reachability"},
-    { TLV_ESNEIGH,           "ES Neighbor(s)"},
-    { TLV_PART_DIS,          "Partition DIS"},
-    { TLV_PREFIX_NEIGH,      "Prefix Neighbors"},
-    { TLV_ISNEIGH,           "IS Neighbor(s)"},
-    { TLV_ISNEIGH_VARLEN,    "IS Neighbor(s) (variable length)"},
-    { TLV_PADDING,           "Padding"},
-    { TLV_LSP,               "LSP entries"},
-    { TLV_AUTH,              "Authentication"},
-    { TLV_CHECKSUM,          "Checksum"},
-    { TLV_LSP_BUFFERSIZE,    "LSP Buffersize"},
-    { TLV_EXT_IS_REACH,      "Extended IS Reachability"},
-    { TLV_IS_ALIAS_ID,       "IS Alias ID"},
-    { TLV_DECNET_PHASE4,     "DECnet Phase IV"},
-    { TLV_LUCENT_PRIVATE,    "Lucent Proprietary"},
-    { TLV_INT_IP_REACH,      "IPv4 Internal Reachability"},
-    { TLV_PROTOCOLS,         "Protocols supported"},
-    { TLV_EXT_IP_REACH,      "IPv4 External Reachability"},
-    { TLV_IDRP_INFO,         "Inter-Domain Information Type"},
-    { TLV_IPADDR,            "IPv4 Interface address(es)"},
-    { TLV_IPAUTH,            "IPv4 authentication (deprecated)"},
-    { TLV_TE_ROUTER_ID,      "Traffic Engineering Router ID"},
-    { TLV_EXTD_IP_REACH,      "Extended IPv4 Reachability"},
-    { TLV_HOSTNAME,          "Hostname"},
-    { TLV_SHARED_RISK_GROUP, "Shared Risk Link Group"},
-    { TLV_NORTEL_PRIVATE1,   "Nortel Proprietary"},
-    { TLV_NORTEL_PRIVATE2,   "Nortel Proprietary"},
-    { TLV_HOLDTIME,          "Holdtime"},
-    { TLV_RESTART_SIGNALING, "Restart Signaling"},
-    { TLV_MT_IS_REACH,       "Multi Topology IS Reachability"},
-    { TLV_MT_SUPPORTED,      "Multi Topology"},
-    { TLV_IP6ADDR,           "IPv6 Interface address(es)"},
-    { TLV_MT_IP_REACH,       "Multi-Topology IPv4 Reachability"},
-    { TLV_IP6_REACH,         "IPv6 reachability"},
-    { TLV_MT_IP6_REACH,      "Multi-Topology IP6 Reachability"},
-    { TLV_PTP_ADJ,           "Point-to-point Adjacency State"},
-    { TLV_IIH_SEQNR,         "Hello PDU Sequence Number"},
-    { TLV_VENDOR_PRIVATE,    "Vendor Private"},
+    { ISIS_TLV_AREA_ADDR,	   "Area address(es)"},
+    { ISIS_TLV_IS_REACH,           "IS Reachability"},
+    { ISIS_TLV_ESNEIGH,            "ES Neighbor(s)"},
+    { ISIS_TLV_PART_DIS,           "Partition DIS"},
+    { ISIS_TLV_PREFIX_NEIGH,       "Prefix Neighbors"},
+    { ISIS_TLV_ISNEIGH,            "IS Neighbor(s)"},
+    { ISIS_TLV_ISNEIGH_VARLEN,     "IS Neighbor(s) (variable length)"},
+    { ISIS_TLV_PADDING,            "Padding"},
+    { ISIS_TLV_LSP,                "LSP entries"},
+    { ISIS_TLV_AUTH,               "Authentication"},
+    { ISIS_TLV_CHECKSUM,           "Checksum"},
+    { ISIS_TLV_LSP_BUFFERSIZE,     "LSP Buffersize"},
+    { ISIS_TLV_EXT_IS_REACH,       "Extended IS Reachability"},
+    { ISIS_TLV_IS_ALIAS_ID,        "IS Alias ID"},
+    { ISIS_TLV_DECNET_PHASE4,      "DECnet Phase IV"},
+    { ISIS_TLV_LUCENT_PRIVATE,     "Lucent Proprietary"},
+    { ISIS_TLV_INT_IP_REACH,       "IPv4 Internal Reachability"},
+    { ISIS_TLV_PROTOCOLS,          "Protocols supported"},
+    { ISIS_TLV_EXT_IP_REACH,       "IPv4 External Reachability"},
+    { ISIS_TLV_IDRP_INFO,          "Inter-Domain Information Type"},
+    { ISIS_TLV_IPADDR,             "IPv4 Interface address(es)"},
+    { ISIS_TLV_IPAUTH,             "IPv4 authentication (deprecated)"},
+    { ISIS_TLV_TE_ROUTER_ID,       "Traffic Engineering Router ID"},
+    { ISIS_TLV_EXTD_IP_REACH,      "Extended IPv4 Reachability"},
+    { ISIS_TLV_SHARED_RISK_GROUP,  "Shared Risk Link Group"},
+    { ISIS_TLV_NORTEL_PRIVATE1,    "Nortel Proprietary"},
+    { ISIS_TLV_NORTEL_PRIVATE2,    "Nortel Proprietary"},
+    { ISIS_TLV_HOSTNAME,           "Hostname"},
+    { ISIS_TLV_RESTART_SIGNALING,  "Restart Signaling"},
+    { ISIS_TLV_MT_IS_REACH,        "Multi Topology IS Reachability"},
+    { ISIS_TLV_MT_SUPPORTED,       "Multi Topology"},
+    { ISIS_TLV_IP6ADDR,            "IPv6 Interface address(es)"},
+    { ISIS_TLV_MT_IP_REACH,        "Multi-Topology IPv4 Reachability"},
+    { ISIS_TLV_IP6_REACH,          "IPv6 reachability"},
+    { ISIS_TLV_MT_IP6_REACH,       "Multi-Topology IP6 Reachability"},
+    { ISIS_TLV_PTP_ADJ,            "Point-to-point Adjacency State"},
+    { ISIS_TLV_IIH_SEQNR,          "Hello PDU Sequence Number"},
+    { ISIS_TLV_VENDOR_PRIVATE,     "Vendor Private"},
     { 0, NULL }
 };
 
-#define SUBTLV_EXT_IS_REACH_ADMIN_GROUP           3 /* draft-ietf-isis-traffic-05 */
-#define SUBTLV_EXT_IS_REACH_LINK_LOCAL_REMOTE_ID  4 /* draft-ietf-isis-gmpls-extensions */
-#define SUBTLV_EXT_IS_REACH_LINK_REMOTE_ID        5 /* draft-ietf-isis-traffic-05 */
-#define SUBTLV_EXT_IS_REACH_IPV4_INTF_ADDR        6 /* draft-ietf-isis-traffic-05 */
-#define SUBTLV_EXT_IS_REACH_IPV4_NEIGHBOR_ADDR    8 /* draft-ietf-isis-traffic-05 */
-#define SUBTLV_EXT_IS_REACH_MAX_LINK_BW           9 /* draft-ietf-isis-traffic-05 */
-#define SUBTLV_EXT_IS_REACH_RESERVABLE_BW        10 /* draft-ietf-isis-traffic-05 */
-#define SUBTLV_EXT_IS_REACH_UNRESERVED_BW        11 /* draft-ietf-isis-traffic-05 */
-#define SUBTLV_EXT_IS_REACH_TE_METRIC            18 /* draft-ietf-isis-traffic-05 */
-#define SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE 20 /* draft-ietf-isis-gmpls-extensions */
-#define SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR    21 /* draft-ietf-isis-gmpls-extensions */
+#define ESIS_OPTION_PROTOCOLS        129
+#define ESIS_OPTION_QOS_MAINTENANCE  195 /* iso9542 */
+#define ESIS_OPTION_SECURITY         197 /* iso9542 */
+#define ESIS_OPTION_ES_CONF_TIME     198 /* iso9542 */
+#define ESIS_OPTION_PRIORITY         205 /* iso9542 */
+#define ESIS_OPTION_ADDRESS_MASK     225 /* iso9542 */
+#define ESIS_OPTION_SNPA_MASK        226 /* iso9542 */
+
+static struct tok esis_option_values[] = {
+    { ESIS_OPTION_PROTOCOLS,       "Protocols supported"},
+    { ESIS_OPTION_QOS_MAINTENANCE, "QoS Maintenance" },
+    { ESIS_OPTION_SECURITY,        "Security" },
+    { ESIS_OPTION_ES_CONF_TIME,    "ES Configuration Time" },
+    { ESIS_OPTION_PRIORITY,        "Priority" },
+    { ESIS_OPTION_ADDRESS_MASK,    "Addressk Mask" },
+    { ESIS_OPTION_SNPA_MASK,       "SNPA Mask" },
+    { 0, NULL }
+};
+
+#define ISIS_SUBTLV_EXT_IS_REACH_ADMIN_GROUP           3 /* draft-ietf-isis-traffic-05 */
+#define ISIS_SUBTLV_EXT_IS_REACH_LINK_LOCAL_REMOTE_ID  4 /* draft-ietf-isis-gmpls-extensions */
+#define ISIS_SUBTLV_EXT_IS_REACH_LINK_REMOTE_ID        5 /* draft-ietf-isis-traffic-05 */
+#define ISIS_SUBTLV_EXT_IS_REACH_IPV4_INTF_ADDR        6 /* draft-ietf-isis-traffic-05 */
+#define ISIS_SUBTLV_EXT_IS_REACH_IPV4_NEIGHBOR_ADDR    8 /* draft-ietf-isis-traffic-05 */
+#define ISIS_SUBTLV_EXT_IS_REACH_MAX_LINK_BW           9 /* draft-ietf-isis-traffic-05 */
+#define ISIS_SUBTLV_EXT_IS_REACH_RESERVABLE_BW        10 /* draft-ietf-isis-traffic-05 */
+#define ISIS_SUBTLV_EXT_IS_REACH_UNRESERVED_BW        11 /* draft-ietf-isis-traffic-05 */
+#define ISIS_SUBTLV_EXT_IS_REACH_TE_METRIC            18 /* draft-ietf-isis-traffic-05 */
+#define ISIS_SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE 20 /* draft-ietf-isis-gmpls-extensions */
+#define ISIS_SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR    21 /* draft-ietf-isis-gmpls-extensions */
 
 static struct tok isis_ext_is_reach_subtlv_values[] = {
-    { SUBTLV_EXT_IS_REACH_ADMIN_GROUP,            "Administrative groups" },
-    { SUBTLV_EXT_IS_REACH_LINK_LOCAL_REMOTE_ID,   "Link Local/Remote Identifier" },
-    { SUBTLV_EXT_IS_REACH_LINK_REMOTE_ID,         "Link Remote Identifier" },
-    { SUBTLV_EXT_IS_REACH_IPV4_INTF_ADDR,         "IPv4 interface address" },
-    { SUBTLV_EXT_IS_REACH_IPV4_NEIGHBOR_ADDR,     "IPv4 neighbor address" },
-    { SUBTLV_EXT_IS_REACH_MAX_LINK_BW,            "Maximum link bandwidth" },
-    { SUBTLV_EXT_IS_REACH_RESERVABLE_BW,          "Reservable link bandwidth" },
-    { SUBTLV_EXT_IS_REACH_UNRESERVED_BW,          "Unreserved bandwidth" },
-    { SUBTLV_EXT_IS_REACH_TE_METRIC,              "Traffic Engineering Metric" },
-    { SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE,   "Link Protection Type" },
-    { SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR,      "Interface Switching Capability" },
-    { 250,                                        "Reserved for cisco specific extensions" },
-    { 251,                                        "Reserved for cisco specific extensions" },
-    { 252,                                        "Reserved for cisco specific extensions" },
-    { 253,                                        "Reserved for cisco specific extensions" },
-    { 254,                                        "Reserved for cisco specific extensions" },
-    { 255,                                        "Reserved for future expansion" },
+    { ISIS_SUBTLV_EXT_IS_REACH_ADMIN_GROUP,            "Administrative groups" },
+    { ISIS_SUBTLV_EXT_IS_REACH_LINK_LOCAL_REMOTE_ID,   "Link Local/Remote Identifier" },
+    { ISIS_SUBTLV_EXT_IS_REACH_LINK_REMOTE_ID,         "Link Remote Identifier" },
+    { ISIS_SUBTLV_EXT_IS_REACH_IPV4_INTF_ADDR,         "IPv4 interface address" },
+    { ISIS_SUBTLV_EXT_IS_REACH_IPV4_NEIGHBOR_ADDR,     "IPv4 neighbor address" },
+    { ISIS_SUBTLV_EXT_IS_REACH_MAX_LINK_BW,            "Maximum link bandwidth" },
+    { ISIS_SUBTLV_EXT_IS_REACH_RESERVABLE_BW,          "Reservable link bandwidth" },
+    { ISIS_SUBTLV_EXT_IS_REACH_UNRESERVED_BW,          "Unreserved bandwidth" },
+    { ISIS_SUBTLV_EXT_IS_REACH_TE_METRIC,              "Traffic Engineering Metric" },
+    { ISIS_SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE,   "Link Protection Type" },
+    { ISIS_SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR,      "Interface Switching Capability" },
+    { 250,                                             "Reserved for cisco specific extensions" },
+    { 251,                                             "Reserved for cisco specific extensions" },
+    { 252,                                             "Reserved for cisco specific extensions" },
+    { 253,                                             "Reserved for cisco specific extensions" },
+    { 254,                                             "Reserved for cisco specific extensions" },
+    { 255,                                             "Reserved for future expansion" },
     { 0, NULL }
 };
 
-#define SUBTLV_EXTD_IP_REACH_ADMIN_TAG32          1 /* draft-ietf-isis-admin-tags-01 */
-#define SUBTLV_EXTD_IP_REACH_ADMIN_TAG64          2 /* draft-ietf-isis-admin-tags-01 */
-#define SUBTLV_EXTD_IP_REACH_MGMT_PREFIX_COLOR  117 /* draft-ietf-isis-wg-multi-topology-05 */
+#define ISIS_SUBTLV_EXTD_IP_REACH_ADMIN_TAG32          1 /* draft-ietf-isis-admin-tags-01 */
+#define ISIS_SUBTLV_EXTD_IP_REACH_ADMIN_TAG64          2 /* draft-ietf-isis-admin-tags-01 */
+#define ISIS_SUBTLV_EXTD_IP_REACH_MGMT_PREFIX_COLOR  117 /* draft-ietf-isis-wg-multi-topology-05 */
 
 static struct tok isis_ext_ip_reach_subtlv_values[] = {
-    { SUBTLV_EXTD_IP_REACH_ADMIN_TAG32,           "32-Bit Administrative tag" },
-    { SUBTLV_EXTD_IP_REACH_ADMIN_TAG64,           "64-Bit Administrative tag" },
-    { SUBTLV_EXTD_IP_REACH_MGMT_PREFIX_COLOR,     "Management Prefix Color" },
+    { ISIS_SUBTLV_EXTD_IP_REACH_ADMIN_TAG32,           "32-Bit Administrative tag" },
+    { ISIS_SUBTLV_EXTD_IP_REACH_ADMIN_TAG64,           "64-Bit Administrative tag" },
+    { ISIS_SUBTLV_EXTD_IP_REACH_MGMT_PREFIX_COLOR,     "Management Prefix Color" },
     { 0, NULL }
 };
 
-#define SUBTLV_AUTH_SIMPLE        1
-#define SUBTLV_AUTH_MD5          54
-#define SUBTLV_AUTH_MD5_LEN      16
-#define SUBTLV_AUTH_PRIVATE     255
+#define ISIS_SUBTLV_AUTH_SIMPLE        1
+#define ISIS_SUBTLV_AUTH_MD5          54
+#define ISIS_SUBTLV_AUTH_MD5_LEN      16
+#define ISIS_SUBTLV_AUTH_PRIVATE     255
 
 static struct tok isis_subtlv_auth_values[] = {
-    { SUBTLV_AUTH_SIMPLE,	"simple text password"},
-    { SUBTLV_AUTH_MD5,	        "HMAC-MD5 password"},
-    { SUBTLV_AUTH_PRIVATE,	"Routing Domain private password"},
+    { ISIS_SUBTLV_AUTH_SIMPLE,	"simple text password"},
+    { ISIS_SUBTLV_AUTH_MD5,	"HMAC-MD5 password"},
+    { ISIS_SUBTLV_AUTH_PRIVATE,	"Routing Domain private password"},
     { 0, NULL }
 };
 
-#define SUBTLV_IDRP_RES           0
-#define SUBTLV_IDRP_LOCAL         1
-#define SUBTLV_IDRP_ASN           2
+#define ISIS_SUBTLV_IDRP_RES           0
+#define ISIS_SUBTLV_IDRP_LOCAL         1
+#define ISIS_SUBTLV_IDRP_ASN           2
 
 static struct tok isis_subtlv_idrp_values[] = {
-    { SUBTLV_IDRP_RES,         "Reserved"},
-    { SUBTLV_IDRP_LOCAL,       "Routing-Domain Specific"},
-    { SUBTLV_IDRP_ASN,         "AS Number Tag"},
+    { ISIS_SUBTLV_IDRP_RES,         "Reserved"},
+    { ISIS_SUBTLV_IDRP_LOCAL,       "Routing-Domain Specific"},
+    { ISIS_SUBTLV_IDRP_ASN,         "AS Number Tag"},
     { 0, NULL}
 };
-
-#define ISIS_8BIT_MASK(x)                  ((x)&0xff)
 
 #define ISIS_MASK_LSP_OL_BIT(x)            ((x)&0x4)
 #define ISIS_MASK_LSP_ISTYPE_BITS(x)       ((x)&0x3)
@@ -311,13 +341,6 @@ static struct tok isis_lsp_istype_values[] = {
     { 0, NULL }
 };
 
-static struct tok osi_nlpid_values[] = {
-    { NLPID_CLNS,   "CLNS"},
-    { NLPID_IP,     "IPv4"},
-    { NLPID_IP6,    "IPv6"},
-    { 0, NULL }
-};
-
 /*
  * Katz's point to point adjacency TLV uses codes to tell us the state of
  * the remote adjacency.  Enumerate them.
@@ -326,7 +349,6 @@ static struct tok osi_nlpid_values[] = {
 #define ISIS_PTP_ADJ_UP   0
 #define ISIS_PTP_ADJ_INIT 1
 #define ISIS_PTP_ADJ_DOWN 2
-
 
 static struct tok isis_ptp_adjancey_values[] = {
     { ISIS_PTP_ADJ_UP,    "Up" },
@@ -444,7 +466,7 @@ print_nsap(register const u_int8_t *pptr, register int nsap_length)
 	static char nsap_ascii_output[sizeof("xx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xx")];
         char *junk_buf = nsap_ascii_output;
 
-        if (nsap_length < 1 || nsap_length > 20) {
+        if (nsap_length < 1 || nsap_length > NSAP_MAX_LENGTH) {
                 snprintf(nsap_ascii_output, sizeof(nsap_ascii_output),
                     "illegal length");
                 return (nsap_ascii_output);
@@ -479,15 +501,17 @@ void isoclns_print(const u_int8_t *p, u_int length, u_int caplen)
 
 	header = (const struct isis_common_header *)p;
 
-        printf("%sOSI", caplen < 1 ? "|" : "");
+        if (caplen <= 1) { /* enough bytes on the wire ? */
+            printf("|OSI");
+            return;
+        }
 
-        if (caplen < 1) /* enough bytes on the wire ? */
-                return;
-
+        printf("OSI, %s",tok2str(osi_nlpid_values,"Unknown NLPID (0x%02x)",*p));
+        
 	switch (*p) {
 
-	case NLPID_CLNS:
-		(void)printf(", CLNS, length %u", length);
+	case NLPID_CLNP:
+		(void)printf(", length %u", length);
 		break;
 
 	case NLPID_ESIS:
@@ -500,42 +524,44 @@ void isoclns_print(const u_int8_t *p, u_int length, u_int caplen)
 		break;
 
 	case NLPID_NULLNS:
-		(void)printf(", ISO NULLNS, length: %u", length);
+		(void)printf(", length: %u", length);
 		break;
 
 	default:
-		(void)printf(", Unknown NLPID 0x%02x, length: %u", p[0], length);
+		(void)printf(", length: %u", length);
 		if (caplen > 1)
                         print_unknown_data(p,"\n\t",caplen);
 		break;
 	}
 }
 
-#define	ESIS_REDIRECT	6
-#define	ESIS_ESH	2
-#define	ESIS_ISH	4
+#define	ESIS_PDU_REDIRECT	6
+#define	ESIS_PDU_ESH	        2
+#define	ESIS_PDU_ISH	        4
 
-static struct tok esis_values[] = {
-    { ESIS_REDIRECT, "redirect"},
-    { ESIS_ESH,      "ESH"},
-    { ESIS_ISH,      "ISH"},
+static struct tok esis_pdu_values[] = {
+    { ESIS_PDU_REDIRECT, "redirect"},
+    { ESIS_PDU_ESH,      "ESH"},
+    { ESIS_PDU_ISH,      "ISH"},
     { 0, NULL }
 };
 
-struct esis_hdr {
+struct esis_header_t {
+	u_int8_t nlpid;
+	u_int8_t length_indicator;
 	u_int8_t version;
 	u_int8_t reserved;
 	u_int8_t type;
-	u_int8_t tmo[2];
+	u_int8_t holdtime[2];
 	u_int8_t cksum[2];
 };
 
 static void
-esis_print(const u_int8_t *p, u_int length)
+esis_print(const u_int8_t *pptr, u_int length)
 {
-	const u_int8_t *ep;
-	u_int li;
-	const struct esis_hdr *eh;
+	const u_int8_t *optr;
+	u_int li,esis_pdu_type,source_address_length, source_address_number;
+	const struct esis_header_t *esis_header;
 
 	if (length <= 2) {
 		if (qflag)
@@ -544,144 +570,190 @@ esis_print(const u_int8_t *p, u_int length)
 			printf(" no header at all!");
 		return;
 	}
-	li = p[1];
-	eh = (const struct esis_hdr *) &p[2];
-	ep = p + li;
+
+	esis_header = (const struct esis_header_t *) pptr;
+        li = esis_header->length_indicator;
+        optr = pptr;
+
+        /*
+         * Sanity checking of the header.
+         */
+        
+        if (esis_header->version != ESIS_VERSION) {
+            printf(", version %d packet not supported", esis_header->version);
+            return;
+        }
+                
 	if (li > length) {
-		if (qflag)
-			printf(" bad pkt!");
+            printf(", length indicator(%d) > PDU size (%d)!", li, length);
+            return;
+	}
+
+	if (li < sizeof(struct esis_header_t) + 2) {
+            printf(", length indicator < min PDU size %d:", li);
+            while (--length != 0)
+                printf("%02X", *pptr++);
+            return;
+	}
+
+        esis_pdu_type = esis_header->type & ESIS_PDU_TYPE_MASK;
+
+        if (vflag < 1) {
+            printf(", %s, length %u",
+                   tok2str(esis_pdu_values,"unknown type (%u)",esis_pdu_type),
+                   length);
+            return;
+        } else
+            printf(", length %u\n\t%s (%u)",
+                   length,
+                   tok2str(esis_pdu_values,"unknown type: %u", esis_pdu_type),
+                   esis_pdu_type);
+
+        printf(", v: %u%s", esis_header->version, esis_header->version == ESIS_VERSION ? "" : "unsupported" );
+        printf(", checksum: 0x%04x ", EXTRACT_16BITS(esis_header->cksum));
+        /* do not attempt to verify the checksum if it is zero */
+        if (EXTRACT_16BITS(esis_header->cksum) == 0)
+                printf("(unverified)");
+            else printf("(%s)", osi_cksum(pptr, li) ? "incorrect" : "correct");
+
+        printf(", holding time: %us, length indicator: %u",EXTRACT_16BITS(esis_header->holdtime),li);
+
+        if (vflag > 1)
+            print_unknown_data(optr,"\n\t",sizeof(struct esis_header_t));
+
+	pptr += sizeof(struct esis_header_t);
+	li -= sizeof(struct esis_header_t);
+
+	switch (esis_pdu_type) {
+	case ESIS_PDU_REDIRECT: {
+		const u_int8_t *dst, *snpa, *tptr;
+
+		dst = pptr; pptr += *pptr + 1;
+		if (pptr > snapend)
+			return;
+		printf("\n\t  %s", isonsap_string(dst));
+		snpa = pptr; pptr += *pptr + 1;
+		tptr = pptr;   pptr += *pptr + 1;
+		if (pptr > snapend)
+			return;
+
+		if (tptr[0] == 0)
+			printf("\n\t  %s", etheraddr_string(&snpa[1]));
 		else
-			printf(" LI(%d) > PDU size (%d)!", li, length);
-		return;
-	}
-	if (li < sizeof(struct esis_hdr) + 2) {
-		if (qflag)
-			printf(" bad pkt!");
-		else {
-			printf(" too short for esis header %d:", li);
-			while (--length != 0)
-				printf("%02X", *p++);
-		}
-		return;
-	}
-
-        printf(", ES-IS, %s, length %u",
-               tok2str(esis_values,"unknown type: %u",eh->type & 0x1f),
-               length);
-
-        if(vflag < 1)
-               return;
-
-	if (vflag && osi_cksum(p, li)) {
-		printf(" bad cksum (got 0x%02x%02x)",
-		       eh->cksum[1], eh->cksum[0]);
-		default_print(p, length);
-		return;
-	}
-	if (eh->version != 1) {
-		printf(" unsupported version %d", eh->version);
-		return;
-	}
-	p += sizeof(*eh) + 2;
-	li -= sizeof(*eh) + 2;	/* protoid * li */
-
-	switch (eh->type & 0x1f) {
-	case ESIS_REDIRECT: {
-		const u_int8_t *dst, *snpa, *is;
-
-		dst = p; p += *p + 1;
-		if (p > snapend)
-			return;
-		printf("\n\t\t %s", isonsap_string(dst));
-		snpa = p; p += *p + 1;
-		is = p;   p += *p + 1;
-		if (p > snapend)
-			return;
-		if (p > ep) {
-			printf(" [bad li]");
-			return;
-		}
-		if (is[0] == 0)
-			printf(" > %s", etheraddr_string(&snpa[1]));
-		else
-			printf(" > %s", isonsap_string(is));
-		li = ep - p;
+			printf("\n\t  %s", isonsap_string(tptr));
 		break;
 	}
 
-	case ESIS_ESH:
-		break;
+	case ESIS_PDU_ESH:
+            source_address_number = *pptr;
+            pptr++;
+            li--;
 
-	case ESIS_ISH: {
-		const u_int8_t *is;
+            printf("\n\t  Number of Source Addresses: %u", source_address_number);
+           
+            while (source_address_number > 0) {
+                source_address_length = *pptr;
+                printf("\n\t  NET (length: %u): %s",
+                       source_address_length,
+                       print_nsap(pptr+1, source_address_length));
 
-		is = p; p += *p + 1;
-		if (p > ep) {
-			printf(" [bad li]");
-			return;
-		}
-		if (p > snapend)
-			return;
-		if (!qflag)
-			printf("\n\tNET: %s", print_nsap(is+1,*is));
-		li = ep - p;
-		break;
+                pptr += source_address_length+1;
+                li -= source_address_length+1;
+                source_address_number--;
+            }
+
+            break;
+
+	case ESIS_PDU_ISH: {
+            source_address_length = *pptr;
+            printf("\n\t  NET (length: %u): %s", source_address_length, print_nsap(pptr+1, source_address_length));
+            pptr += source_address_length+1;
+            li -= source_address_length +1;
+            break;
 	}
 
 	default:
             if (vflag <= 1) {
-		    if (p < snapend) 
-                            print_unknown_data(p,"\n\t  ",snapend-p);
+		    if (pptr < snapend) 
+                            print_unknown_data(pptr,"\n\t  ",snapend-pptr);
             }
             return;
 	}
 
-        /* hexdump - FIXME ? */
-        if (vflag > 1) {
-                    if (p < snapend)
-                            print_unknown_data(p,"\n\t  ",snapend-p);
+        /* now walk the options */
+        while (li >= 2) {
+            u_int op, opli;
+            const u_int8_t *tptr;
+            
+            if (snapend - pptr < 2)
+                return;
+            if (li < 2) {
+                printf(", bad opts/li");
+                return;
+            }
+            op = *pptr++;
+            opli = *pptr++;
+            li -= 2;
+            if (opli > li) {
+                printf(", opt (%d) too long", op);
+                return;
+            }
+            li -= opli;
+            tptr = pptr;
+            
+            if (snapend < pptr)
+                return;
+            
+            printf("\n\t  %s Option #%u, length %u, value: ",
+                   tok2str(esis_option_values,"Unknown",op),
+                   op,
+                   opli);
+
+            switch (op) {
+
+            case ISIS_TLV_AREA_ADDR:
+                printf("\n\t    %s", print_nsap(tptr, opli));
+                break;
+
+            case ESIS_OPTION_ES_CONF_TIME:
+                printf("%us", EXTRACT_16BITS(tptr));
+                break;
+                
+
+            case ESIS_OPTION_PROTOCOLS:
+                while (opli>0) {
+                    printf("%s (0x%02x)",
+                           tok2str(osi_nlpid_values,
+                                   "unknown",
+                                   *tptr),
+                           *tptr);
+                    if (opli>1) /* further NPLIDs ? - put comma */
+                        printf(", ");
+                    tptr++;
+                    opli--;
+                }
+                break;
+
+                /*
+                 * FIXME those are the defined Options that lack a decoder
+                 * you are welcome to contribute code ;-)
+                 */
+
+            case ESIS_OPTION_QOS_MAINTENANCE:
+            case ESIS_OPTION_SECURITY:
+            case ESIS_OPTION_PRIORITY:
+            case ESIS_OPTION_ADDRESS_MASK:
+            case ESIS_OPTION_SNPA_MASK:
+
+            default:
+                print_unknown_data(tptr,"\n\t  ",opli);
+                break;
+            }
+            if (vflag > 1)
+                print_unknown_data(pptr,"\n\t  ",opli);
+            pptr += opli;
         }
-	if (vflag)
-		while (p < ep && li) {
-			u_int op, opli;
-			const u_int8_t *q;
-
-			if (snapend - p < 2)
-				return;
-			if (li < 2) {
-				printf(", bad opts/li");
-				return;
-			}
-			op = *p++;
-			opli = *p++;
-			li -= 2;
-			if (opli > li) {
-				printf(", opt (%d) too long", op);
-				return;
-			}
-			li -= opli;
-			q = p;
-			p += opli;
-
-			if (snapend < p)
-				return;
-
-			if (op == TLV_HOLDTIME && opli == 2) {
-				printf("\n\tholdtime: %us", EXTRACT_16BITS(q));
-				continue;
-			}
-
-			if (op == TLV_PROTOCOLS && opli >= 1) {
-				printf("\n\t%s (length: %u): %s",
-                                       tok2str(isis_tlv_values, "unknown", op),
-                                       opli,
-                                       tok2str(osi_nlpid_values,"Unknown 0x%02x",*q));
-				continue;
-			}
-
-                        print_unknown_data(q,"\n\t  ",opli);
-		}
-}
+}   
 
 /* shared routine for printing system, node and lsp-ids */
 static char *
@@ -811,8 +883,8 @@ isis_print_ip_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
 	    goto trunctlv;
 
     switch(subt) {
-    case SUBTLV_EXTD_IP_REACH_MGMT_PREFIX_COLOR: /* fall through */
-    case SUBTLV_EXTD_IP_REACH_ADMIN_TAG32:
+    case ISIS_SUBTLV_EXTD_IP_REACH_MGMT_PREFIX_COLOR: /* fall through */
+    case ISIS_SUBTLV_EXTD_IP_REACH_ADMIN_TAG32:
         while (subl >= 4) {
 	    printf(", 0x%08x (=%u)",
 		   EXTRACT_32BITS(tptr),
@@ -821,7 +893,7 @@ isis_print_ip_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
 	    subl-=4;
 	}
 	break;
-    case SUBTLV_EXTD_IP_REACH_ADMIN_TAG64:
+    case ISIS_SUBTLV_EXTD_IP_REACH_ADMIN_TAG64:
         while (subl >= 8) {
 	    printf(", 0x%08x%08x",
 		   EXTRACT_32BITS(tptr),
@@ -870,23 +942,23 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
 	    goto trunctlv;
 
         switch(subt) {
-        case SUBTLV_EXT_IS_REACH_ADMIN_GROUP:      
-        case SUBTLV_EXT_IS_REACH_LINK_LOCAL_REMOTE_ID:
-        case SUBTLV_EXT_IS_REACH_LINK_REMOTE_ID:
+        case ISIS_SUBTLV_EXT_IS_REACH_ADMIN_GROUP:      
+        case ISIS_SUBTLV_EXT_IS_REACH_LINK_LOCAL_REMOTE_ID:
+        case ISIS_SUBTLV_EXT_IS_REACH_LINK_REMOTE_ID:
             printf(", 0x%08x", EXTRACT_32BITS(tptr));
 	    if (subl == 8) /* draft-ietf-isis-gmpls-extensions */
 	      printf(", 0x%08x", EXTRACT_32BITS(tptr+4));
 	    break;
-        case SUBTLV_EXT_IS_REACH_IPV4_INTF_ADDR:
-        case SUBTLV_EXT_IS_REACH_IPV4_NEIGHBOR_ADDR:
+        case ISIS_SUBTLV_EXT_IS_REACH_IPV4_INTF_ADDR:
+        case ISIS_SUBTLV_EXT_IS_REACH_IPV4_NEIGHBOR_ADDR:
             printf(", %s", ipaddr_string(tptr));
             break;
-        case SUBTLV_EXT_IS_REACH_MAX_LINK_BW :
-	case SUBTLV_EXT_IS_REACH_RESERVABLE_BW:  
+        case ISIS_SUBTLV_EXT_IS_REACH_MAX_LINK_BW :
+	case ISIS_SUBTLV_EXT_IS_REACH_RESERVABLE_BW:  
             bw.i = EXTRACT_32BITS(tptr);
             printf(", %.3f Mbps", bw.f*8/1000000 );
             break;
-        case SUBTLV_EXT_IS_REACH_UNRESERVED_BW :
+        case ISIS_SUBTLV_EXT_IS_REACH_UNRESERVED_BW :
             for (priority_level = 0; priority_level < 8; priority_level++) {
                 bw.i = EXTRACT_32BITS(tptr);
                 printf("%s  priority level %d: %.3f Mbps",
@@ -896,15 +968,15 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
 		tptr+=4;
             }
             break;
-        case SUBTLV_EXT_IS_REACH_TE_METRIC:
+        case ISIS_SUBTLV_EXT_IS_REACH_TE_METRIC:
             printf(", %u", EXTRACT_24BITS(tptr));
             break;
-        case SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE:
+        case ISIS_SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE:
             printf(", %s, Priority %u",
 		   bittok2str(gmpls_link_prot_values, "none", *tptr),
                    *(tptr+1));
             break;
-        case SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR:
+        case ISIS_SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR:
             printf("%s  Interface Switching Capability:%s",
                    ident,
                    tok2str(gmpls_switch_cap_values, "Unknown", *(tptr)));
@@ -961,7 +1033,7 @@ isis_print_ext_is_reach (const u_int8_t *tptr,const char *ident, int tlv_type) {
     printf("%sIS Neighbor: %s", ident, isis_print_id(tptr, NODE_ID_LEN));
     tptr+=(NODE_ID_LEN);
 
-    if (tlv_type != TLV_IS_ALIAS_ID) { /* the Alias TLV Metric field is implicit 0 */
+    if (tlv_type != ISIS_TLV_IS_ALIAS_ID) { /* the Alias TLV Metric field is implicit 0 */
         if (!TTEST2(*tptr, 3))    /* and is therefore skipped */
 	    return(0);
 	printf(", Metric: %d",EXTRACT_24BITS(tptr));
@@ -1123,7 +1195,7 @@ isis_print_extd_ip_reach (const u_int8_t *tptr, const char *ident, u_int16_t afi
 
 static int isis_print (const u_int8_t *p, u_int length)
 {
-    const struct isis_common_header *header;
+    const struct isis_common_header *isis_header;
 
     const struct isis_iih_lan_header *header_iih_lan;
     const struct isis_iih_ptp_header *header_iih_ptp;
@@ -1145,8 +1217,8 @@ static int isis_print (const u_int8_t *p, u_int length)
     packet_len=length;
     optr = p; /* initialize the _o_riginal pointer to the packet start -
                  need it for parsing the checksum TLV */
-    header = (const struct isis_common_header *)p;
-    TCHECK(*header);
+    isis_header = (const struct isis_common_header *)p;
+    TCHECK(*isis_header);
     pptr = p+(ISIS_COMMON_HEADER_SIZE);
     header_iih_lan = (const struct isis_iih_lan_header *)pptr;
     header_iih_ptp = (const struct isis_iih_ptp_header *)pptr;
@@ -1158,23 +1230,23 @@ static int isis_print (const u_int8_t *p, u_int length)
      * Sanity checking of the header.
      */
 
-    if (header->version != ISIS_VERSION) {
-	printf(", version %d packet not supported", header->version);
+    if (isis_header->version != ISIS_VERSION) {
+	printf(", version %d packet not supported", isis_header->version);
 	return (0);
     }
 
-    if ((header->id_length != SYSTEM_ID_LEN) && (header->id_length != 0)) {
+    if ((isis_header->id_length != SYSTEM_ID_LEN) && (isis_header->id_length != 0)) {
 	printf(", system ID length of %d is not supported",
-	       header->id_length);
+	       isis_header->id_length);
 	return (0);
     }
 
-    if (header->pdu_version != ISIS_VERSION) {
-	printf(", version %d packet not supported", header->pdu_version);
+    if (isis_header->pdu_version != ISIS_VERSION) {
+	printf(", version %d packet not supported", isis_header->pdu_version);
 	return (0);
     }
 
-    max_area = header->max_area;
+    max_area = isis_header->max_area;
     switch(max_area) {
     case 0:
 	max_area = 3;	 /* silly shit */
@@ -1186,7 +1258,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	break;
     }
 
-    id_length = header->id_length;
+    id_length = isis_header->id_length;
     switch(id_length) {
     case 0:
         id_length = 6;	 /* silly shit again */
@@ -1213,39 +1285,38 @@ static int isis_print (const u_int8_t *p, u_int length)
 	return (0);
     }
 
-    pdu_type=header->pdu_type;
+    pdu_type=isis_header->pdu_type;
 
     /* in non-verbose mode print the basic PDU Type plus PDU specific brief information*/
     if (vflag < 1) {
-        printf(", IS-IS, %s",
-               tok2str(isis_pdu_values,"unknown PDU-Type %u",pdu_type));
+        printf(", %s", tok2str(isis_pdu_values,"unknown PDU-Type %u",pdu_type));
 
 	switch (pdu_type) {
 
-	case L1_LAN_IIH:
-	case L2_LAN_IIH:
+	case ISIS_PDU_L1_LAN_IIH:
+	case ISIS_PDU_L2_LAN_IIH:
 	    printf(", src-id %s",
                    isis_print_id(header_iih_lan->source_id,SYSTEM_ID_LEN));
 	    printf(", lan-id %s, prio %u",
                    isis_print_id(header_iih_lan->lan_id,NODE_ID_LEN),
                    header_iih_lan->priority);
 	    break;
-	case PTP_IIH:
+	case ISIS_PDU_PTP_IIH:
 	    printf(", src-id %s", isis_print_id(header_iih_ptp->source_id,SYSTEM_ID_LEN));
 	    break;
-	case L1_LSP:
-	case L2_LSP:
+	case ISIS_PDU_L1_LSP:
+	case ISIS_PDU_L2_LSP:
 	    printf(", lsp-id %s, seq 0x%08x, lifetime %5us",
 		   isis_print_id(header_lsp->lsp_id, LSP_ID_LEN),
 		   EXTRACT_32BITS(header_lsp->sequence_number),
 		   EXTRACT_16BITS(header_lsp->remaining_lifetime));
 	    break;
-	case L1_CSNP:
-	case L2_CSNP:
+	case ISIS_PDU_L1_CSNP:
+	case ISIS_PDU_L2_CSNP:
 	    printf(", src-id %s", isis_print_id(header_csnp->source_id,SYSTEM_ID_LEN));
 	    break;
-	case L1_PSNP:
-	case L2_PSNP:
+	case ISIS_PDU_L1_PSNP:
+	case ISIS_PDU_L2_PSNP:
 	    printf(", src-id %s", isis_print_id(header_psnp->source_id,SYSTEM_ID_LEN));
 	    break;
 
@@ -1256,19 +1327,19 @@ static int isis_print (const u_int8_t *p, u_int length)
     }
 
     /* ok they seem to want to know everything - lets fully decode it */
-    printf(", IS-IS, length: %u",length);
+    printf(", length: %u",length);
 
     printf("\n\t%s, hlen: %u, v: %u, pdu-v: %u, sys-id-len: %u (%u), max-area: %u (%u)",
            tok2str(isis_pdu_values,
                    "unknown, type %u",
                    pdu_type),
-           header->fixed_len,
-           header->version,
-           header->pdu_version,
+           isis_header->fixed_len,
+           isis_header->version,
+           isis_header->pdu_version,
 	   id_length,
-	   header->id_length,
+	   isis_header->id_length,
            max_area,
-           header->max_area);
+           isis_header->max_area);
 
     if (vflag > 1) {
         if(!print_unknown_data(optr,"\n\t",8)) /* provide the _o_riginal pointer */
@@ -1277,11 +1348,11 @@ static int isis_print (const u_int8_t *p, u_int length)
 
     switch (pdu_type) {
 
-    case L1_LAN_IIH:
-    case L2_LAN_IIH:
-	if (header->fixed_len != (ISIS_COMMON_HEADER_SIZE+ISIS_IIH_LAN_HEADER_SIZE)) {
+    case ISIS_PDU_L1_LAN_IIH:
+    case ISIS_PDU_L2_LAN_IIH:
+	if (isis_header->fixed_len != (ISIS_COMMON_HEADER_SIZE+ISIS_IIH_LAN_HEADER_SIZE)) {
 	    printf(", bogus fixed header length %u should be %lu",
-		   header->fixed_len, (unsigned long)ISIS_IIH_LAN_HEADER_SIZE);
+		   isis_header->fixed_len, (unsigned long)ISIS_IIH_LAN_HEADER_SIZE);
 	    return (0);
 	}
 
@@ -1301,7 +1372,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 
 	printf("\n\t  lan-id:    %s, Priority: %u, PDU length: %u",
                isis_print_id(header_iih_lan->lan_id, NODE_ID_LEN),
-               (header_iih_lan->priority) & PRIORITY_MASK,
+               (header_iih_lan->priority) & ISIS_LAN_PRIORITY_MASK,
                pdu_len);
 
         if (vflag > 1) {
@@ -1313,10 +1384,10 @@ static int isis_print (const u_int8_t *p, u_int length)
 	pptr = p + (ISIS_COMMON_HEADER_SIZE+ISIS_IIH_LAN_HEADER_SIZE);
 	break;
 
-    case PTP_IIH:
-	if (header->fixed_len != (ISIS_COMMON_HEADER_SIZE+ISIS_IIH_PTP_HEADER_SIZE)) {
+    case ISIS_PDU_PTP_IIH:
+	if (isis_header->fixed_len != (ISIS_COMMON_HEADER_SIZE+ISIS_IIH_PTP_HEADER_SIZE)) {
 	    printf(", bogus fixed header length %u should be %lu",
-		   header->fixed_len, (unsigned long)ISIS_IIH_PTP_HEADER_SIZE);
+		   isis_header->fixed_len, (unsigned long)ISIS_IIH_PTP_HEADER_SIZE);
 	    return (0);
 	}
 
@@ -1347,11 +1418,11 @@ static int isis_print (const u_int8_t *p, u_int length)
 	pptr = p + (ISIS_COMMON_HEADER_SIZE+ISIS_IIH_PTP_HEADER_SIZE);
 	break;
 
-    case L1_LSP:
-    case L2_LSP:
-	if (header->fixed_len != (ISIS_COMMON_HEADER_SIZE+ISIS_LSP_HEADER_SIZE)) {
+    case ISIS_PDU_L1_LSP:
+    case ISIS_PDU_L2_LSP:
+	if (isis_header->fixed_len != (ISIS_COMMON_HEADER_SIZE+ISIS_LSP_HEADER_SIZE)) {
 	    printf(", bogus fixed header length %u should be %lu",
-		   header->fixed_len, (unsigned long)ISIS_LSP_HEADER_SIZE);
+		   isis_header->fixed_len, (unsigned long)ISIS_LSP_HEADER_SIZE);
 	    return (0);
 	}
 
@@ -1401,11 +1472,11 @@ static int isis_print (const u_int8_t *p, u_int length)
 	pptr = p + (ISIS_COMMON_HEADER_SIZE+ISIS_LSP_HEADER_SIZE);
 	break;
 
-    case L1_CSNP:
-    case L2_CSNP:
-	if (header->fixed_len != (ISIS_COMMON_HEADER_SIZE+ISIS_CSNP_HEADER_SIZE)) {
+    case ISIS_PDU_L1_CSNP:
+    case ISIS_PDU_L2_CSNP:
+	if (isis_header->fixed_len != (ISIS_COMMON_HEADER_SIZE+ISIS_CSNP_HEADER_SIZE)) {
 	    printf(", bogus fixed header length %u should be %lu",
-		   header->fixed_len, (unsigned long)ISIS_CSNP_HEADER_SIZE);
+		   isis_header->fixed_len, (unsigned long)ISIS_CSNP_HEADER_SIZE);
 	    return (0);
 	}
 
@@ -1433,11 +1504,11 @@ static int isis_print (const u_int8_t *p, u_int length)
 	pptr = p + (ISIS_COMMON_HEADER_SIZE+ISIS_CSNP_HEADER_SIZE);
         break;
 
-    case L1_PSNP:
-    case L2_PSNP:
-	if (header->fixed_len != (ISIS_COMMON_HEADER_SIZE+ISIS_PSNP_HEADER_SIZE)) {
+    case ISIS_PDU_L1_PSNP:
+    case ISIS_PDU_L2_PSNP:
+	if (isis_header->fixed_len != (ISIS_COMMON_HEADER_SIZE+ISIS_PSNP_HEADER_SIZE)) {
 	    printf("- bogus fixed header length %u should be %lu",
-		   header->fixed_len, (unsigned long)ISIS_PSNP_HEADER_SIZE);
+		   isis_header->fixed_len, (unsigned long)ISIS_PSNP_HEADER_SIZE);
 	    return (0);
 	}
 
@@ -1500,7 +1571,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 
         /* now check if we have a decoder otherwise do a hexdump at the end*/
 	switch (tlv_type) {
-	case TLV_AREA_ADDR:
+	case ISIS_TLV_AREA_ADDR:
 	    if (!TTEST2(*tptr, 1))
 		goto trunctlv;
 	    alen = *tptr++;
@@ -1517,7 +1588,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 		alen = *tptr++;
 	    }
 	    break;
-	case TLV_ISNEIGH:
+	case ISIS_TLV_ISNEIGH:
 	    while (tmp >= ETHER_ADDR_LEN) {
                 if (!TTEST2(*tptr, ETHER_ADDR_LEN))
                     goto trunctlv;
@@ -1527,7 +1598,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    }
 	    break;
 
-        case TLV_ISNEIGH_VARLEN:
+        case ISIS_TLV_ISNEIGH_VARLEN:
             if (!TTEST2(*tptr, 1))
 		goto trunctlv;
 	    lan_alen = *tptr++; /* LAN adress length */
@@ -1542,10 +1613,10 @@ static int isis_print (const u_int8_t *p, u_int length)
             }
             break;
 
-	case TLV_PADDING:
+	case ISIS_TLV_PADDING:
 	    break;
 
-        case TLV_MT_IS_REACH:
+        case ISIS_TLV_MT_IS_REACH:
             while (tmp >= 2+NODE_ID_LEN+3+1) {
                 mt_len = isis_print_mtid(tptr, "\n\t      ");
                 if (mt_len == 0) /* did something go wrong ? */
@@ -1562,7 +1633,7 @@ static int isis_print (const u_int8_t *p, u_int length)
             }
             break;
 
-        case TLV_IS_ALIAS_ID:
+        case ISIS_TLV_IS_ALIAS_ID:
 	    while (tmp >= NODE_ID_LEN+1) { /* is it worth attempting a decode ? */
 	        ext_is_len = isis_print_ext_is_reach(tptr,"\n\t      ",tlv_type);
 		if (ext_is_len == 0) /* did something go wrong ? */
@@ -1572,7 +1643,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    }
 	    break;
 
-        case TLV_EXT_IS_REACH:
+        case ISIS_TLV_EXT_IS_REACH:
             while (tmp >= NODE_ID_LEN+3+1) { /* is it worth attempting a decode ? */
                 ext_is_len = isis_print_ext_is_reach(tptr,"\n\t      ",tlv_type);
                 if (ext_is_len == 0) /* did something go wrong ? */
@@ -1581,7 +1652,7 @@ static int isis_print (const u_int8_t *p, u_int length)
                 tptr+=ext_is_len;
             }
             break;
-        case TLV_IS_REACH:
+        case ISIS_TLV_IS_REACH:
 	    if (!TTEST2(*tptr,1))  /* check if there is one byte left to read out the virtual flag */
                 goto trunctlv;
             printf("\n\t      %s",
@@ -1600,7 +1671,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    }
             break;
 
-        case TLV_ESNEIGH:
+        case ISIS_TLV_ESNEIGH:
 	    tlv_es_reach = (const struct isis_tlv_es_reach *)tptr;
             while (tmp >= sizeof(struct isis_tlv_es_reach)) {
 		if (!TTEST(*tlv_es_reach))
@@ -1614,13 +1685,13 @@ static int isis_print (const u_int8_t *p, u_int length)
             break;
 
             /* those two TLVs share the same format */
-	case TLV_INT_IP_REACH:
-	case TLV_EXT_IP_REACH:
+	case ISIS_TLV_INT_IP_REACH:
+	case ISIS_TLV_EXT_IP_REACH:
 	    if (!isis_print_tlv_ip_reach(pptr, "\n\t      ", tlv_len))
 		return (1);
 	    break;
 
-	case TLV_EXTD_IP_REACH:
+	case ISIS_TLV_EXTD_IP_REACH:
 	    while (tmp>0) {
                 ext_ip_len = isis_print_extd_ip_reach(tptr, "\n\t      ", IPV4);
                 if (ext_ip_len == 0) /* did something go wrong ? */
@@ -1630,7 +1701,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    }
 	    break;
 
-        case TLV_MT_IP_REACH:
+        case ISIS_TLV_MT_IP_REACH:
 	    while (tmp>0) {
                 mt_len = isis_print_mtid(tptr, "\n\t      ");
                 if (mt_len == 0) /* did something go wrong ? */
@@ -1647,7 +1718,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    break;
 
 #ifdef INET6
-	case TLV_IP6_REACH:
+	case ISIS_TLV_IP6_REACH:
 	    while (tmp>0) {
                 ext_ip_len = isis_print_extd_ip_reach(tptr, "\n\t      ", IPV6);
                 if (ext_ip_len == 0) /* did something go wrong ? */
@@ -1657,7 +1728,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    }
 	    break;
 
-	case TLV_MT_IP6_REACH:
+	case ISIS_TLV_MT_IP6_REACH:
 	    while (tmp>0) {
                 mt_len = isis_print_mtid(tptr, "\n\t      ");
                 if (mt_len == 0) /* did something go wrong ? */
@@ -1673,7 +1744,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    }
 	    break;
 
-	case TLV_IP6ADDR:
+	case ISIS_TLV_IP6ADDR:
 	    while (tmp>0) {
 		if (!TTEST2(*tptr, 16))
 		    goto trunctlv;
@@ -1686,7 +1757,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    }
 	    break;
 #endif
-	case TLV_AUTH:
+	case ISIS_TLV_AUTH:
 	    if (!TTEST2(*tptr, 1))
 		goto trunctlv;
 
@@ -1696,23 +1767,23 @@ static int isis_print (const u_int8_t *p, u_int length)
                            *tptr));
 
 	    switch (*tptr) {
-	    case SUBTLV_AUTH_SIMPLE:
+	    case ISIS_SUBTLV_AUTH_SIMPLE:
 		for(i=1;i<tlv_len;i++) {
 		    if (!TTEST2(*(tptr+i), 1))
 			goto trunctlv;
 		    printf("%c",*(tptr+i));
 		}
 		break;
-	    case SUBTLV_AUTH_MD5:
+	    case ISIS_SUBTLV_AUTH_MD5:
 		for(i=1;i<tlv_len;i++) {
 		    if (!TTEST2(*(tptr+i), 1))
 			goto trunctlv;
 		    printf("%02x",*(tptr+i));
 		}
-		if (tlv_len != SUBTLV_AUTH_MD5_LEN+1)
+		if (tlv_len != ISIS_SUBTLV_AUTH_MD5_LEN+1)
                     printf(", (malformed subTLV) ");
 		break;
-	    case SUBTLV_AUTH_PRIVATE:
+	    case ISIS_SUBTLV_AUTH_PRIVATE:
 	    default:
 		if(!print_unknown_data(tptr+1,"\n\t\t  ",tlv_len-1))
 		    return(0);
@@ -1720,7 +1791,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    }
 	    break;
 
-	case TLV_PTP_ADJ:
+	case ISIS_TLV_PTP_ADJ:
 	    tlv_ptp_adj = (const struct isis_tlv_ptp_adj *)tptr;
 	    if(tmp>=1) {
 		if (!TTEST2(*tptr, 1))
@@ -1754,7 +1825,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    }
 	    break;
 
-	case TLV_PROTOCOLS:
+	case ISIS_TLV_PROTOCOLS:
 	    printf("\n\t      NLPID(s): ");
 	    while (tmp>0) {
 		if (!TTEST2(*(tptr), 1))
@@ -1771,13 +1842,13 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    }
 	    break;
 
-	case TLV_TE_ROUTER_ID:
+	case ISIS_TLV_TE_ROUTER_ID:
 	    if (!TTEST2(*pptr, 4))
 		goto trunctlv;
 	    printf("\n\t      Traffic Engineering Router ID: %s", ipaddr_string(pptr));
 	    break;
 
-	case TLV_IPADDR:
+	case ISIS_TLV_IPADDR:
 	    while (tmp>0) {
 		if (!TTEST2(*tptr, 4))
 		    goto trunctlv;
@@ -1787,7 +1858,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    }
 	    break;
 
-	case TLV_HOSTNAME:
+	case ISIS_TLV_HOSTNAME:
 	    printf("\n\t      Hostname: ");
 	    while (tmp>0) {
 		if (!TTEST2(*tptr, 1))
@@ -1797,7 +1868,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    }
 	    break;
 
-	case TLV_SHARED_RISK_GROUP:
+	case ISIS_TLV_SHARED_RISK_GROUP:
 	    if (!TTEST2(*tptr, NODE_ID_LEN))
                 goto trunctlv;
 	    printf("\n\t      IS Neighbor: %s", isis_print_id(tptr, NODE_ID_LEN));
@@ -1830,7 +1901,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    }
 	    break;
 
-	case TLV_LSP:
+	case ISIS_TLV_LSP:
 	    tlv_lsp = (const struct isis_tlv_lsp *)tptr;
 	    while(tmp>0) {
 		if (!TTEST((tlv_lsp->lsp_id)[LSP_ID_LEN-1]))
@@ -1851,7 +1922,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    }
 	    break;
 
-	case TLV_CHECKSUM:
+	case ISIS_TLV_CHECKSUM:
 	    if (!TTEST2(*tptr, 2))
 		goto trunctlv;
 	    printf("\n\t      checksum: 0x%04x ", EXTRACT_16BITS(tptr));
@@ -1865,7 +1936,7 @@ static int isis_print (const u_int8_t *p, u_int length)
             else printf("(%s)", osi_cksum(optr, length) ? "incorrect" : "correct");
 	    break;
 
-	case TLV_MT_SUPPORTED:
+	case ISIS_TLV_MT_SUPPORTED:
 	    while (tmp>1) {
 		/* length can only be a multiple of 2, otherwise there is
 		   something broken -> so decode down until length is 1 */
@@ -1882,7 +1953,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    }
 	    break;
 
-	case TLV_RESTART_SIGNALING:
+	case ISIS_TLV_RESTART_SIGNALING:
             if (!TTEST2(*tptr, 3))
                 goto trunctlv;
             printf("\n\t      Flags [%s], Remaining holding time %us",
@@ -1891,7 +1962,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    tptr+=3;
 	    break;
 
-        case TLV_IDRP_INFO:
+        case ISIS_TLV_IDRP_INFO:
             if (!TTEST2(*tptr, 1))
                 goto trunctlv;
             printf("\n\t      Inter-Domain Information Type: %s",
@@ -1899,13 +1970,13 @@ static int isis_print (const u_int8_t *p, u_int length)
                            "Unknown (0x%02x)",
                            *tptr));
             switch (*tptr++) {
-            case SUBTLV_IDRP_ASN:
+            case ISIS_SUBTLV_IDRP_ASN:
                 if (!TTEST2(*tptr, 2)) /* fetch AS number */
                     goto trunctlv;
                 printf("AS Number: %u",EXTRACT_16BITS(tptr));
                 break;
-            case SUBTLV_IDRP_LOCAL:
-            case SUBTLV_IDRP_RES:
+            case ISIS_SUBTLV_IDRP_LOCAL:
+            case ISIS_SUBTLV_IDRP_RES:
             default:
                 if(!print_unknown_data(tptr,"\n\t      ",tlv_len-1))
                     return(0);
@@ -1913,13 +1984,13 @@ static int isis_print (const u_int8_t *p, u_int length)
             }
             break;
 
-        case TLV_LSP_BUFFERSIZE:
+        case ISIS_TLV_LSP_BUFFERSIZE:
             if (!TTEST2(*tptr, 2))
                 goto trunctlv;
             printf("\n\t      LSP Buffersize: %u",EXTRACT_16BITS(tptr));
             break;
 
-        case TLV_PART_DIS:
+        case ISIS_TLV_PART_DIS:
             while (tmp >= SYSTEM_ID_LEN) {
                 if (!TTEST2(*tptr, SYSTEM_ID_LEN))
                     goto trunctlv;
@@ -1929,7 +2000,7 @@ static int isis_print (const u_int8_t *p, u_int length)
             }
             break;
 
-        case TLV_PREFIX_NEIGH:
+        case ISIS_TLV_PREFIX_NEIGH:
             if (!TTEST2(*tptr, sizeof(struct isis_metric_block)))
                 goto trunctlv;
             printf("\n\t      Metric Block");
@@ -1952,13 +2023,13 @@ static int isis_print (const u_int8_t *p, u_int length)
             }
             break;
 
-        case TLV_IIH_SEQNR:
+        case ISIS_TLV_IIH_SEQNR:
             if (!TTEST2(*tptr, 4)) /* check if four bytes are on the wire */
                 goto trunctlv;
             printf("\n\t      Sequence number: %u", EXTRACT_32BITS(tptr) );
             break;
 
-        case TLV_VENDOR_PRIVATE:
+        case ISIS_TLV_VENDOR_PRIVATE:
             if (!TTEST2(*tptr, 3)) /* check if enough byte for a full oui */
                 goto trunctlv;
             vendor_id = EXTRACT_24BITS(tptr);
@@ -1976,11 +2047,11 @@ static int isis_print (const u_int8_t *p, u_int length)
              * you are welcome to contribute code ;-)
              */
 
-        case TLV_DECNET_PHASE4:
-        case TLV_LUCENT_PRIVATE:
-        case TLV_IPAUTH:
-        case TLV_NORTEL_PRIVATE1:
-        case TLV_NORTEL_PRIVATE2:
+        case ISIS_TLV_DECNET_PHASE4:
+        case ISIS_TLV_LUCENT_PRIVATE:
+        case ISIS_TLV_IPAUTH:
+        case ISIS_TLV_NORTEL_PRIVATE1:
+        case ISIS_TLV_NORTEL_PRIVATE2:
 
 	default:
             if (vflag <= 1) {
