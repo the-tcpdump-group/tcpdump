@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.53 2002-10-11 13:09:51 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.54 2002-10-19 12:31:47 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -432,7 +432,6 @@ decode_labeled_prefix4(const u_char *pptr, char *buf, u_int buflen)
 	return 4 + (plen + 7) / 8;
 }
 
-
 static char *
 bgp_vpn_rd_print (const u_char *pptr) {
 
@@ -552,7 +551,7 @@ decode_prefix6(const u_char *pd, char *buf, u_int buflen)
 	u_int plen;
 
 	plen = pd[0];
-	if (plen < 0 || 128 < plen)
+	if (128 < plen)
 		return -1;
 
 	memset(&addr, 0, sizeof(addr));
@@ -563,6 +562,64 @@ decode_prefix6(const u_char *pd, char *buf, u_int buflen)
 	}
 	snprintf(buf, buflen, "%s/%d", getname6((u_char *)&addr), plen);
 	return 1 + (plen + 7) / 8;
+}
+
+static int
+decode_labeled_prefix6(const u_char *pptr, char *buf, u_int buflen)
+{
+	struct in6_addr addr;
+	u_int plen;
+
+	plen = pptr[0]; /* get prefix length */
+        plen-=24; /* adjust prefixlen - labellength */
+
+	if (128 < plen)
+		return -1;
+
+	memset(&addr, 0, sizeof(addr));
+	memcpy(&addr, &pptr[4], (plen + 7) / 8);
+	if (plen % 8) {
+		addr.s6_addr[(plen + 7) / 8 - 1] &=
+			((0xff00 >> (plen % 8)) & 0xff);
+	}
+        /* the label may get offsetted by 4 bits so lets shift it right */
+	snprintf(buf, buflen, "%s/%d, label:%u %s",
+                 getname6((u_char *)&addr),
+                 plen,
+                 EXTRACT_24BITS(pptr+1)>>4,
+                 ((pptr[3]&1)==0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
+
+	return 4 + (plen + 7) / 8;
+}
+
+static int
+decode_labeled_vpn_prefix6(const u_char *pptr, char *buf, u_int buflen)
+{
+	struct in6_addr addr;
+	u_int plen;
+
+	plen = pptr[0];   /* get prefix length */
+
+        plen-=(24+64); /* adjust prefixlen - labellength - RD len*/
+
+	if (128 < plen)
+		return -1;
+
+	memset(&addr, 0, sizeof(addr));
+	memcpy(&addr, &pptr[12], (plen + 7) / 8);
+	if (plen % 8) {
+		addr.s6_addr[(plen + 7) / 8 - 1] &=
+			((0xff00 >> (plen % 8)) & 0xff);
+	}
+        /* the label may get offsetted by 4 bits so lets shift it right */
+	snprintf(buf, buflen, "RD: %s, %s/%d, label:%u %s",
+                 bgp_vpn_rd_print(pptr+4),
+                 getname6((u_char *)&addr),
+                 plen,
+                 EXTRACT_24BITS(pptr+1)>>4,
+                 ((pptr[3]&1)==0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
+
+	return 12 + (plen + 7) / 8;
 }
 #endif
 
@@ -849,6 +906,16 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
 				advance = decode_prefix6(tptr, buf, sizeof(buf));
 				printf("\n\t      %s", buf);
 				break;
+                            case SAFNUM_LABUNICAST:
+                                advance = decode_labeled_prefix6(tptr, buf, sizeof(buf));
+                                printf("\n\t      %s", buf);
+                                break;
+                            case SAFNUM_VPNUNICAST:
+                            case SAFNUM_VPNMULTICAST:
+                            case SAFNUM_VPNUNIMULTICAST:
+                                advance = decode_labeled_vpn_prefix6(tptr, buf, sizeof(buf));
+                                printf("\n\t      %s", buf);
+                                break;
                             default:
                                 printf("\n\t      no SAFI %u decoder ",safi);
                                 if (vflag <= 1)
@@ -942,6 +1009,16 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
 				advance = decode_prefix6(tptr, buf, sizeof(buf));
 				printf("\n\t      %s", buf);
 				break;
+                            case SAFNUM_LABUNICAST:
+                                advance = decode_labeled_prefix6(tptr, buf, sizeof(buf));
+                                printf("\n\t      %s", buf);
+                                break;
+                            case SAFNUM_VPNUNICAST:
+                            case SAFNUM_VPNMULTICAST:
+                            case SAFNUM_VPNUNIMULTICAST:
+                                advance = decode_labeled_vpn_prefix6(tptr, buf, sizeof(buf));
+                                printf("\n\t      %s", buf);
+                                break;
                             default:
                                 printf("\n\t      no SAFI %u decoder",safi);
                                 if (vflag <= 1)
