@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.92 2003-01-11 20:51:41 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.93 2003-02-12 10:17:08 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -310,6 +310,13 @@ AC_DEFUN(AC_LBL_LIBPCAP,
 		    AC_MSG_RESULT(yes)
 		    LIBS="$LIBS -I:$pseexe"
 	    fi
+	    #
+	    # We need "-lodm" and "-lcfg", as libpcap requires them on
+	    # AIX, and we just build a static libpcap.a and thus can't
+	    # arrange that when you link with libpcap you automatically
+	    # link with those libraries.
+	    #
+	    LIBS="$LIBS -lodm -lcfg"
 	    ;;
     esac
 
