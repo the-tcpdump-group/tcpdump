@@ -26,23 +26,8 @@
 
 #include <sys/param.h>
 #include <sys/time.h>
-#include <sys/socket.h>
-
-#if __STDC__
-struct mbuf;
-struct rtentry;
-#endif
-#include <net/if.h>
 
 #include <netinet/in.h>
-#include <netinet/if_ether.h>
-#include <netinet/in_systm.h>
-#include <netinet/ip.h>
-#include <netinet/ip_var.h>
-#include <netinet/udp.h>
-#include <netinet/udp_var.h>
-#include <netinet/tcp.h>
-#include <netinet/tcpip.h>
 
 #include <stdio.h>
 #include <pcap.h>
