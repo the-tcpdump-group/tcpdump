@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.129 2000-10-24 00:56:49 fenner Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.130 2000-12-09 02:58:47 fenner Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.129 $)
+AC_REVISION($Revision: 1.130 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -481,6 +481,8 @@ dnl AC_CHECK_HEADERS(zlib.h)
 AC_LBL_TYPE_SIGNAL
 
 AC_LBL_LIBPCAP(V_PCAPDEP, V_INCLS)
+
+AC_REPLACE_FUNCS(bpf_dump)	dnl moved to libpcap in 0.6
 
 V_GROUP=0
 if test -f /etc/group -a ! -z "`grep '^wheel:' /etc/group`" ; then
