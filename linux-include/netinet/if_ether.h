@@ -36,18 +36,23 @@
 #include <net/if_arp.h>
 
 /*
+ * The number of bytes in an ethernet (MAC) address.
+ */
+#define	ETHER_ADDR_LEN		6
+
+/*
  * Ethernet address - 6 octets
  */
 struct ether_addr {
-	u_char	ether_addr_octet[6];
+	u_char	ether_addr_octet[ETHER_ADDR_LEN];
 };
 
 /*
  * Structure of a 10Mb/s Ethernet header.
  */
 struct	ether_header {
-	u_char	ether_dhost[6];
-	u_char	ether_shost[6];
+	u_char	ether_dhost[ETHER_ADDR_LEN];
+	u_char	ether_shost[ETHER_ADDR_LEN];
 	u_short	ether_type;
 };
 
