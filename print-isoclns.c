@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.27 2001-10-04 09:26:37 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.28 2001-10-04 09:47:34 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -501,136 +501,135 @@ esis_print(const u_char *p, u_int length)
  * print_nsap
  * Print out an NSAP. 
  */
-
 static void
-print_nsap (register const u_char *cp, register int length)
+print_nsap(register const u_char *cp, register int length)
 {
-    int i;
-    
-    for (i = 0; i < length; i++) {
-	printf("%02x", *cp++);
-	if (((i & 1) == 0) && (i + 1 < length)) {
-	    printf(".");
-	}
+	int i;
 
-    }
+	for (i = 0; i < length; i++) {
+		printf("%02x", *cp++);
+		if (((i & 1) == 0) && (i + 1 < length)) {
+			printf(".");
+		}
+	}
 }
 
 static void
-isis_print_sysid (const u_char *cp)
+isis_print_sysid(const u_char *cp)
 {
-    int i;
-    for (i=1;i<=6;i++) {
-        printf("%02x",*cp++);
-	if ( (i==2)^(i==4) ) {
-	    printf(".");
+	int i;
+
+	for (i = 1; i <= 6; i++) {
+		printf("%02x", *cp++);
+		if ((i==2)^(i==4)) {
+			printf(".");
+		}
 	}
-    }
 }
 
 static void
-isis_print_nodeid (const u_char *cp)
+isis_print_nodeid(const u_char *cp)
 {
-    int i;
-    for (i=1;i<=7;i++) {
-        printf("%02x",*cp++);
-	if ((i & 1) == 0) {
-	    printf(".");
+	int i;
+
+	for (i = 1; i <= 7; i++) {
+		printf("%02x", *cp++);
+		if ((i & 1) == 0) {
+			printf(".");
+		}
 	}
-    }
 }
 
 static void
-isis_print_lspid (const u_char *cp)
+isis_print_lspid(const u_char *cp)
 {
-    int i;
-    for (i=1;i<=7;i++) {
-        printf("%02x",*cp++);
-	if ((i & 1) == 0)
-	    printf(".");
+	int i;
+
+	for (i = 1; i <= 7; i++) {
+		printf("%02x", *cp++);
+		if ((i & 1) == 0)
+			printf(".");
 	}
-	printf("-%02x",*cp);
+	printf("-%02x", *cp);
 }
 
 static void
 isis_print_tlv_ip_reach (const u_char *cp, int length)
 {
-      int bitmasks[33] = {
-	  0x00000000,
-	  0x80000000, 0xc0000000, 0xe0000000, 0xf0000000,
-	  0xf8000000, 0xfc000000, 0xfe000000, 0xff000000,
-	  0xff800000, 0xffc00000, 0xffe00000, 0xfff00000,
-	  0xfff80000, 0xfffc0000, 0xfffe0000, 0xffff0000,
-	  0xffff8000, 0xffffc000, 0xffffe000, 0xfffff000,
-	  0xfffff800, 0xfffffc00, 0xfffffe00, 0xffffff00,
-	  0xffffff80, 0xffffffc0, 0xffffffe0, 0xfffffff0,
-	  0xfffffff8, 0xfffffffc, 0xfffffffe, 0xffffffff
-	}; 
+	int bitmasks[33] = {
+		0x00000000,
+		0x80000000, 0xc0000000, 0xe0000000, 0xf0000000,
+		0xf8000000, 0xfc000000, 0xfe000000, 0xff000000,
+		0xff800000, 0xffc00000, 0xffe00000, 0xfff00000,
+		0xfff80000, 0xfffc0000, 0xfffe0000, 0xffff0000,
+		0xffff8000, 0xffffc000, 0xffffe000, 0xfffff000,
+		0xfffff800, 0xfffffc00, 0xfffffe00, 0xffffff00,
+		0xffffff80, 0xffffffc0, 0xffffffe0, 0xfffffff0,
+		0xfffffff8, 0xfffffffc, 0xfffffffe, 0xffffffff
+	};
+	int mask, prefix_len;
+	const struct isis_tlv_ip_reach *tlv_ip_reach;
 
-	  int mask,prefix_len;
+	tlv_ip_reach = (const struct isis_tlv_ip_reach *)cp;
 
-	  const struct isis_tlv_ip_reach *tlv_ip_reach;
-	  tlv_ip_reach = (const struct isis_tlv_ip_reach *)cp;
-
-	  while ( length > 0 ) {
-		if (length<12) {
-		  printf("short IP reachability (%d vs 12)", length );
+	while (length > 0) {
+		if (length < sizeof(*tlv_ip_reach)) {
+			printf("short IP reachability (%d vs %lu)", length,
+			    (unsigned long)sizeof(*tlv_ip_reach));
 			return;
 		}
 
-	  	mask=EXTRACT_32BITS(tlv_ip_reach->mask);
-	  	prefix_len=0;
+		mask = EXTRACT_32BITS(tlv_ip_reach->mask);
+		prefix_len = 0;
 
-			while(prefix_len<=33) {
-			  if (bitmasks[prefix_len++]==mask) {
-			    prefix_len--;
-			    break;
-			  }
+		while (prefix_len <= 33) {
+			if (bitmasks[prefix_len++] == mask) {
+				prefix_len--;
+				break;
 			}
-	  
-			/* 34 indicates no match -> must be a discontiguous netmask
-			   lets dump the mask, otherwise print the prefix_len */
+		}
 
-			if(prefix_len==34) 
-				printf("\n\t\t\tIPv4 prefix: %u.%u.%u.%u mask %u.%u.%u.%u",
-					   (tlv_ip_reach->prefix)[0],
-					   (tlv_ip_reach->prefix)[1],
-					   (tlv_ip_reach->prefix)[2],
-					   (tlv_ip_reach->prefix)[3],
-					   (tlv_ip_reach->mask)[0],
-					   (tlv_ip_reach->mask)[1],
-					   (tlv_ip_reach->mask)[2],
-					   (tlv_ip_reach->mask)[3]);
-			else 
-			    printf("\n\t\t\tIPv4 prefix: %u.%u.%u.%u/%u",
-					   (tlv_ip_reach->prefix)[0],
-					   (tlv_ip_reach->prefix)[1],
-					   (tlv_ip_reach->prefix)[2],
-					   (tlv_ip_reach->prefix)[3],
-					    prefix_len);
+		/*
+		 * 34 indicates no match -> must be a discontiguous netmask
+		 * lets dump the mask, otherwise print the prefix_len
+		 */
+		if (prefix_len == 34) 
+			printf("\n\t\t\tIPv4 prefix: %u.%u.%u.%u mask %u.%u.%u.%u",
+			    (tlv_ip_reach->prefix)[0],
+			    (tlv_ip_reach->prefix)[1],
+			    (tlv_ip_reach->prefix)[2],
+			    (tlv_ip_reach->prefix)[3],
+			    (tlv_ip_reach->mask)[0], (tlv_ip_reach->mask)[1],
+			    (tlv_ip_reach->mask)[2], (tlv_ip_reach->mask)[3]);
+		else 
+			printf("\n\t\t\tIPv4 prefix: %u.%u.%u.%u/%u",
+			    (tlv_ip_reach->prefix)[0],
+			    (tlv_ip_reach->prefix)[1],
+			    (tlv_ip_reach->prefix)[2],
+			    (tlv_ip_reach->prefix)[3], prefix_len);
 
-			printf("\n\t\t\t  Default Metric: %02d, %s, Distribution: %s",
-				   ISIS_LSP_TLV_METRIC_VALUE(tlv_ip_reach->metric_default),
-				   ISIS_LSP_TLV_METRIC_IE(tlv_ip_reach->metric_default) ? "External" : "Internal",
-				   ISIS_LSP_TLV_METRIC_UPDOWN(tlv_ip_reach->metric_default) ? "down" : "up");
+		printf("\n\t\t\t  Default Metric: %02d, %s, Distribution: %s",
+		    ISIS_LSP_TLV_METRIC_VALUE(tlv_ip_reach->metric_default),
+		    ISIS_LSP_TLV_METRIC_IE(tlv_ip_reach->metric_default) ? "External" : "Internal",
+		    ISIS_LSP_TLV_METRIC_UPDOWN(tlv_ip_reach->metric_default) ? "down" : "up");
 
-			if (!ISIS_LSP_TLV_METRIC_SUPPORTED(tlv_ip_reach->metric_delay))
-			    printf("\n\t\t\t  Delay Metric: %02d, %s",
-					   ISIS_LSP_TLV_METRIC_VALUE(tlv_ip_reach->metric_delay),
-					   ISIS_LSP_TLV_METRIC_IE(tlv_ip_reach->metric_delay) ? "External" : "Internal");
+		if (!ISIS_LSP_TLV_METRIC_SUPPORTED(tlv_ip_reach->metric_delay))
+			printf("\n\t\t\t  Delay Metric: %02d, %s",
+			    ISIS_LSP_TLV_METRIC_VALUE(tlv_ip_reach->metric_delay),
+			    ISIS_LSP_TLV_METRIC_IE(tlv_ip_reach->metric_delay) ? "External" : "Internal");
 
-			if (!ISIS_LSP_TLV_METRIC_SUPPORTED(tlv_ip_reach->metric_expense))
-			    printf("\n\t\t\t  Expense Metric: %02d, %s",
-					   ISIS_LSP_TLV_METRIC_VALUE(tlv_ip_reach->metric_expense),
-					   ISIS_LSP_TLV_METRIC_IE(tlv_ip_reach->metric_expense) ? "External" : "Internal");
+		if (!ISIS_LSP_TLV_METRIC_SUPPORTED(tlv_ip_reach->metric_expense))
+			printf("\n\t\t\t  Expense Metric: %02d, %s",
+			    ISIS_LSP_TLV_METRIC_VALUE(tlv_ip_reach->metric_expense),
+			    ISIS_LSP_TLV_METRIC_IE(tlv_ip_reach->metric_expense) ? "External" : "Internal");
 
-			if (!ISIS_LSP_TLV_METRIC_SUPPORTED(tlv_ip_reach->metric_error))
-			    printf("\n\t\t\t  Error Metric: %02d, %s",
-					   ISIS_LSP_TLV_METRIC_VALUE(tlv_ip_reach->metric_error),
-					   ISIS_LSP_TLV_METRIC_IE(tlv_ip_reach->metric_error) ? "External" : "Internal");
+		if (!ISIS_LSP_TLV_METRIC_SUPPORTED(tlv_ip_reach->metric_error))
+			printf("\n\t\t\t  Error Metric: %02d, %s",
+			    ISIS_LSP_TLV_METRIC_VALUE(tlv_ip_reach->metric_error),
+			    ISIS_LSP_TLV_METRIC_IE(tlv_ip_reach->metric_error) ? "External" : "Internal");
 
-			length-=sizeof(struct isis_tlv_ip_reach);
-			tlv_ip_reach++;
+		length -= sizeof(struct isis_tlv_ip_reach);
+		tlv_ip_reach++;
 	}
 }
 
