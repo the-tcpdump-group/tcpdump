@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.120 2003-02-05 02:30:39 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.121 2003-04-24 12:51:35 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -339,6 +339,21 @@ in_cksum_shouldbe(u_int16_t sum, u_int16_t computed_sum)
 	return shouldbe;
 }
 
+#ifndef IP_MF
+#define IP_MF 0x2000
+#endif /* IP_MF */
+#ifndef IP_DF
+#define IP_DF 0x4000
+#endif /* IP_DF */
+#define IP_RES 0x8000
+
+static struct tok ip_frag_values[] = {
+        { IP_MF,        "+" },
+        { IP_DF,        "DF" },
+	{ IP_RES,       "rsvd" }, /* The RFC3514 evil ;-) bit */
+        { 0,            NULL }
+};
+
 /*
  * print an IP datagram.
  */
@@ -351,6 +366,8 @@ ip_print(register const u_char *bp, register u_int length)
 	u_char nh;
 	int advance;
 	struct protoent *proto;
+	u_int16_t sum, ip_sum;
+	const char *sep = "";
 
 	ip = (const struct ip *)bp;
 	if ((u_char *)(ip + 1) > snapend) {
@@ -395,8 +412,16 @@ ip_print(register const u_char *bp, register u_int length)
             if (ip->ip_ttl >= 1)
                 (void)printf(", ttl %u", ip->ip_ttl);    
 
-            if ((off & 0x3fff) != 0)
-                (void)printf(", id %u", EXTRACT_16BITS(&ip->ip_id));
+	    /*
+	     * for the firewall guys, print id, offset.
+             * On all but the last stick a "+" in the flags portion.
+	     * For unfragmented datagrams, note the don't fragment flag.
+	     */
+
+	    (void)printf(", id %u, offset %u, flags [%s]",
+			     EXTRACT_16BITS(&ip->ip_id),
+			     (off & 0x1fff) * 8,
+			     bittok2str(ip_frag_values, "none", off & 0xe000 ));
 
             (void)printf(", length: %u", EXTRACT_16BITS(&ip->ip_len));
 
@@ -405,6 +430,18 @@ ip_print(register const u_char *bp, register u_int length)
                 ip_optprint((u_char *)(ip + 1), hlen - sizeof(struct ip));
                 printf(" )");
             }
+
+	    if ((u_char *)ip + hlen <= snapend) {
+	        sum = in_cksum((const u_short *)ip, hlen, 0);
+		if (sum != 0) {
+		    ip_sum = EXTRACT_16BITS(&ip->ip_sum);
+		    (void)printf("%sbad cksum %x (->%x)!", sep,
+			     ip_sum,
+			     in_cksum_shouldbe(ip_sum, sum));
+		    sep = ", ";
+		}
+	    }
+
             printf(") ");
 	}
 
@@ -575,60 +612,23 @@ again:
 			printf(" %d", len);
 			break;
 		}
-	}
+	} else {
+	    /* Ultra quiet now means that all this stuff should be suppressed */
+	    if (qflag > 1) return;
 
-	/* Ultra quiet now means that all this stuff should be suppressed */
-	/* res 3-Nov-98 */
-	if (qflag > 1) return;
-
-
-	/*
-	 * for fragmented datagrams, print id:size@offset.  On all
-	 * but the last stick a "+".  For unfragmented datagrams, note
-	 * the don't fragment flag.
-	 */
-	len = len0;	/* get the original length */
-	if (off & 0x3fff) {
-		/*
-		 * if this isn't the first frag, we're missing the
-		 * next level protocol header.  print the ip addr
-		 * and the protocol.
-		 */
-		if (off & 0x1fff) {
-			(void)printf("%s > %s:", ipaddr_string(&ip->ip_src),
-				      ipaddr_string(&ip->ip_dst));
-			if ((proto = getprotobynumber(ip->ip_p)) != NULL)
-				(void)printf(" %s", proto->p_name);
-			else
-				(void)printf(" ip-proto-%d", ip->ip_p);
-		}
-#ifndef IP_MF
-#define IP_MF 0x2000
-#endif /* IP_MF */
-#ifndef IP_DF
-#define IP_DF 0x4000
-#endif /* IP_DF */
-		(void)printf(" (frag %u:%u@%u%s)", EXTRACT_16BITS(&ip->ip_id), len,
-			(off & 0x1fff) * 8,
-			(off & IP_MF)? "+" : "");
-
-	} else if (off & IP_DF)
-		(void)printf(" (DF)");
-
-	if (vflag) {
-		u_int16_t sum, ip_sum;
-		const char *sep = "";
-
-		if ((u_char *)ip + hlen <= snapend) {
-			sum = in_cksum((const u_short *)ip, hlen, 0);
-			if (sum != 0) {
-				ip_sum = EXTRACT_16BITS(&ip->ip_sum);
-				(void)printf("%sbad cksum %x (->%x)!", sep,
-					     ip_sum,
-					     in_cksum_shouldbe(ip_sum, sum));
-				sep = ", ";
-			}
-		}
+	    /*
+	     * if this isn't the first frag, we're missing the
+	     * next level protocol header.  print the ip addr
+	     * and the protocol.
+	     */
+	    if (off & 0x1fff) {
+	        (void)printf("%s > %s:", ipaddr_string(&ip->ip_src),
+			     ipaddr_string(&ip->ip_dst));
+		if ((proto = getprotobynumber(ip->ip_p)) != NULL)
+		    (void)printf(" %s", proto->p_name);
+		else
+		    (void)printf(" ip-proto-%d", ip->ip_p);
+	    } 
 	}
 }
 
