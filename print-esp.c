@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.29 2002-09-05 00:00:12 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.30 2002-11-13 09:35:13 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -259,6 +259,10 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 	/* if we can't get nexthdr, we do not need to decrypt it */
 	if (ep - bp2 < len)
 		goto fail;
+	if (ep - bp2 > len) {
+		/* FCS included at end of frame (NetBSD 1.6 or later) */
+		ep = bp2 + len;
+	}
 
 	ivoff = (u_char *)(esp + 1) + espsecret_xform->replaysize;
 	ivlen = espsecret_xform->ivlen;
