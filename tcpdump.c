@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.182 2002-08-03 23:16:57 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.183 2002-08-06 04:36:12 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -254,12 +254,12 @@ main(int argc, char **argv)
 	opterr = 0;
 	while (
 #ifdef WIN32
-	    (op = getopt(argc, argv, "aB:c:C:dDeE:fF:i:lm:nNOpqr:Rs:StT:uvw:xXY")) != -1)
+	    (op = getopt(argc, argv, "aAB:c:C:dDeE:fF:i:lm:nNOpqr:Rs:StT:uvw:xXY")) != -1)
 #else /* WIN32 */
 #ifdef HAVE_PCAP_FINDALLDEVS
-	    (op = getopt(argc, argv, "ac:C:dDeE:fF:i:lm:nNOpqr:Rs:StT:uvw:xXY")) != -1)
+	    (op = getopt(argc, argv, "aAc:C:dDeE:fF:i:lm:nNOpqr:Rs:StT:uvw:xXY")) != -1)
 #else /* HAVE_PCAP_FINDALLDEVS */
-	    (op = getopt(argc, argv, "ac:C:deE:fF:i:lm:nNOpqr:Rs:StT:uvw:xXY")) != -1)
+	    (op = getopt(argc, argv, "aAc:C:deE:fF:i:lm:nNOpqr:Rs:StT:uvw:xXY")) != -1)
 #endif /* HAVE_PCAP_FINDALLDEVS */
 #endif /* WIN32 */
 		switch (op) {
@@ -574,9 +574,7 @@ main(int argc, char **argv)
 		error("%s", pcap_geterr(pd));
 	if (dflag) {
 		bpf_dump(&fcode, dflag);
-#ifdef WIN32
-	    pcap_close(pd);
-#endif /* WIN32 */
+		pcap_close(pd);
 		exit(0);
 	}
 	init_addrtoname(localnet, netmask);
@@ -754,6 +752,24 @@ default_print_unaligned(register const u_char *cp, register u_int length)
 }
 
 #ifdef WIN32
+	/*
+	 * XXX - there should really be libpcap calls to get the version
+	 * number as a string (the string would be generated from #defines
+	 * at run time, so that it's not generated from string constants
+	 * in the library, as, on many UNIX systems, those constants would
+	 * be statically linked into the application executable image, and
+	 * would thus reflect the version of libpcap on the system on
+	 * which the application was *linked*, not the system on which it's
+	 * *running*.
+	 *
+	 * That routine should be documented, unlike the "version[]"
+	 * string, so that UNIX vendors providing their own libpcaps
+	 * don't omit it (as a couple of vendors have...).
+	 *
+	 * Packet.dll should perhaps also export a routine to return the
+	 * version number of the Packet.dll code, to supply the
+	 * "Wpcap_version" information on Windows.
+	 */
 	char WDversion[]="current-cvs.tcpdump.org";
 	char version[]="current-cvs.tcpdump.org";
 	char pcap_version[]="current-cvs.tcpdump.org";
@@ -794,12 +810,12 @@ usage(void)
 #endif /* WIN32 */
 	(void)fprintf(stderr,
 #ifdef WIN32
-"Usage: %s [-adDeflnNOpqStuvxX] [-B size] [-c count] [ -C file_size ]\n", program_name);
+"Usage: %s [-aAdDeflnNOpqRStuvxX] [-B size] [-c count] [ -C file_size ]\n", program_name);
 #else /* WIN32 */
 #ifdef HAVE_PCAP_FINDALLDEVS
-"Usage: %s [-adDeflnNOpqStuvxX] [-c count] [ -C file_size ]\n", program_name);
+"Usage: %s [-aAdDeflnNOpqRStuvxX] [-c count] [ -C file_size ]\n", program_name);
 #else /* HAVE_PCAP_FINDALLDEVS */
-"Usage: %s [-adeflnNOpqStuvxX] [-c count] [ -C file_size ]\n", program_name);
+"Usage: %s [-aAdeflnNOpqRStuvxX] [-c count] [ -C file_size ]\n", program_name);
 #endif /* HAVE_PCAP_FINDALLDEVS */
 #endif /* WIN32 */
 	(void)fprintf(stderr,
