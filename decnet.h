@@ -18,16 +18,16 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/decnet.h,v 1.8 2002-08-01 08:52:57 risso Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/decnet.h,v 1.9 2002-08-02 04:35:57 guy Exp $ (LBL)
  */
 
 #ifndef WIN32
-typedef u_int8_t byte[1];		/* XXX the byte keyword generates conflicts in Windows */
+typedef u_int8_t byte[1];		/* single byte field */
 #else
 /*
  * the keyword 'byte' generates conflicts in Windows
  */
-typedef unsigned char Byte[1];
+typedef unsigned char Byte[1];		/* single byte field */
 #define byte Byte
 #endif /* WIN32 */
 typedef u_int8_t word[2];		/* 2 byte field */
