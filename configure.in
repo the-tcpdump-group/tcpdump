@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.166 2003-07-08 01:19:10 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.167 2003-07-17 13:32:03 itojun Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.166 $)
+AC_REVISION($Revision: 1.167 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -725,41 +725,8 @@ if test "$ac_cv_ssleay_path" != no; then
 	fi
 	AC_CHECK_LIB(crypto, des_cbc_encrypt)
 
-	bak_CPPFLAGS=$CPPFLAGS
 	CPPFLAGS="$CPPFLAGS $V_INCLS"
-	AC_CHECK_HEADERS(openssl/cast.h)
-
-	if test "$ac_cv_header_openssl_cast_h" = "yes"; then
-		AC_MSG_CHECKING(for buggy CAST128)
-		AC_CACHE_VAL(td_cv_buggy_cast128, [AC_TRY_RUN(dnl
-[
-#include <openssl/cast.h>
-main()
-{
-	unsigned char key[] = {0x01,0x23,0x45,0x67,0x12};
-	unsigned char in[] = {0x01,0x23,0x45,0x67,0x89,0xAB,0xCD,0xEF};
-	unsigned char out[sizeof(in)];
-	unsigned char ok[] = {0x7A,0xC8,0x16,0xD1,0x6E,0x9B,0x30,0x2E};
-	CAST_KEY ks;
-	CAST_set_key(&ks, sizeof(key), key);
-	CAST_ecb_encrypt(in, out, &ks, CAST_ENCRYPT);
-	if (memcmp(out, ok, sizeof(ok)) != 0)
-		return 0;
-	else
-		return 1;
-}],
-			[td_cv_buggy_cast128=yes],
-			[td_cv_buggy_cast128=no],
-			[td_cv_buggy_cast128="cross-compiling, assume yes"])])
-		AC_MSG_RESULT($td_cv_buggy_cast128)
-		if test "$td_cv_buggy_cast128" != no; then
-			echo "NOTE: SSLeay 0.9.0b has a bug in CAST128 en/decoding routine."
-			echo "disabling CAST128 support."
-			AC_DEFINE(HAVE_BUGGY_CAST128)
-		fi
-	fi
-
-	CPPFLAGS=$bak_CPPFLAGS
+	AC_CHECK_HEADERS(openssl/evp.h)
 fi
 ])
 AC_CHECK_HEADERS(openssl/rc5.h)
