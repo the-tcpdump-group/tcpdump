@@ -86,6 +86,8 @@ ntp.h
 oakley.h
 ospf.h
 ospf6.h
+oui.c
+oui.h
 packetdat.awk
 parsenfsfh.c
 pcap-missing.h
