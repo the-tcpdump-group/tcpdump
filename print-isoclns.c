@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.81 2003-04-17 10:08:56 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.82 2003-05-01 18:04:41 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -710,7 +710,7 @@ isis_print_id(const u_int8_t *cp, int id_len)
     for (i = 1; i <= SYSTEM_ID_LEN; i++) {
         sprintf(pos, "%02x", *cp++);
 	pos += strlen(pos);
-	if (i == 2 ^ i==4)
+	if (i == 2 || i == 4)
 	    *pos++ = '.';
 	}
     if (id_len == NODE_ID_LEN) {
