@@ -11,7 +11,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.7 2000-12-05 06:42:47 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.8 2001-01-15 03:24:00 guy Exp $";
 #endif
 
 #include <stdio.h>
@@ -1003,12 +1003,18 @@ void netbeui_print(u_short control, const uchar *data, const uchar *maxbuf)
     goto out;
   }
 
+  /* If there isn't enough data for "\377SMB", don't look for it. */
+  if (!TTEST2(data2[3], 4))
+    goto out;
+
   if (memcmp(data2,"\377SMB",4)==0) {
     print_smb(data2,maxbuf);
   } else {
     int i;
     for (i=0;i<128;i++) {
-      if (&data2[i] >= maxbuf)
+      if (!TTEST2(data2[i], 4))
+        break;
+      if (&data2[i+3] >= maxbuf)
         break;
       if (memcmp(&data2[i],"\377SMB",4)==0) {
 	printf("found SMB packet at %d\n", i);
@@ -1026,12 +1032,20 @@ out:
 /*
    print IPX-Netbios frames 
 */
-void ipx_netbios_print(const uchar *data, const uchar *maxbuf)
+void ipx_netbios_print(const uchar *data, u_int length)
 {
-  /* this is a hack till I work out how to parse the rest of the IPX stuff */
+  /* this is a hack till I work out how to parse the rest of the
+     NetBIOS-over-IPX stuff */
   int i;
+  const uchar *maxbuf;
+
+  maxbuf = data + length;
   startbuf = data;
-  for (i=0;i<128;i++)
+  for (i=0;i<128;i++) {
+    if (!TTEST2(data[i], 4))
+      break;
+    if (&data[i+3] >= maxbuf)
+      break;
     if (memcmp(&data[i],"\377SMB",4)==0) {
       fdata(data,"\n>>> IPX transport ",&data[i]);
       if (data != NULL)
@@ -1040,6 +1054,7 @@ void ipx_netbios_print(const uchar *data, const uchar *maxbuf)
       fflush(stdout);
       break;
     }
+  }
   if (i==128)
     fdata(data,"\n>>> Unknown IPX ",maxbuf);
 }

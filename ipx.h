@@ -1,7 +1,7 @@
 /*
  * IPX protocol formats 
  *
- * @(#) $Header: /tcpdump/master/tcpdump/ipx.h,v 1.3 2001-01-15 00:43:59 guy Exp $
+ * @(#) $Header: /tcpdump/master/tcpdump/ipx.h,v 1.4 2001-01-15 03:23:59 guy Exp $
  */
 
 /* well-known sockets */
@@ -10,7 +10,8 @@
 #define	IPX_SKT_RIP		0x0453
 #define	IPX_SKT_NETBIOS		0x0455
 #define	IPX_SKT_DIAGNOSTICS	0x0456
-#define IPX_SKT_EIGRP		0x85be	/* Cisco EIGRP over IPX */
+#define	IPX_SKT_NWLINK_DGM	0x0553	/* NWLink datagram, may contain SMB */
+#define	IPX_SKT_EIGRP		0x85be	/* Cisco EIGRP over IPX */
 
 /* IPX transport header */
 struct ipxHdr {

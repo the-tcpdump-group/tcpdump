@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.33 2001-01-15 00:33:59 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.34 2001-01-15 03:24:00 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -244,14 +244,6 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 				length -= 3;
 				caplen -= 3;
 			}
-		}
-
-		if (cmd == LLC_UI && f == 'C') {
-			/*
-			 * we don't have a proper ipx decoder yet, but there
-			 * is a partial one in the smb code
-			 */
-			ipx_netbios_print(p,p+min(caplen,length));
 		}
 	} else {
 		char f;

@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ipx.c,v 1.29 2001-01-15 02:23:25 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ipx.c,v 1.30 2001-01-15 03:23:59 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -108,9 +108,14 @@ ipx_decode(const struct ipxHdr *ipx, const u_char *datap, u_int length)
 	break;
       case IPX_SKT_NETBIOS:
 	(void)printf(" ipx-netbios %d", length);
+	ipx_netbios_print(datap, length);
 	break;
       case IPX_SKT_DIAGNOSTICS:
 	(void)printf(" ipx-diags %d", length);
+	break;
+      case IPX_SKT_NWLINK_DGM:
+	(void)printf(" ipx-nwlink-dgm %d", length);
+	ipx_netbios_print(datap, length);
 	break;
       case IPX_SKT_EIGRP:
 	(void)printf(" ipx-eigrp %d", length);
