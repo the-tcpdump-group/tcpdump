@@ -25,7 +25,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ntp.c,v 1.35 2002-12-11 07:14:06 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ntp.c,v 1.36 2002-12-28 17:15:06 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -66,7 +66,7 @@ ntp_print(register const u_char *cp, u_int length)
 	TCHECK(bp->status);
 
 	version = (int)(bp->status & VERSIONMASK) >> 3;
-	printf(" v%d", version);
+	printf("NTPv%d", version);
 
 	leapind = bp->status & LEAPMASK;
 	switch (leapind) {
@@ -121,14 +121,14 @@ ntp_print(register const u_char *cp, u_int length)
 	}
 
 	TCHECK(bp->stratum);
-	printf(" strat %d", bp->stratum);
+	printf(", strat %d", bp->stratum);
 
 	TCHECK(bp->ppoll);
-	printf(" poll %d", bp->ppoll);
+	printf(", poll %d", bp->ppoll);
 
 	/* Can't TCHECK bp->precision bitfield so bp->distance + 0 instead */
 	TCHECK2(bp->distance, 0);
-	printf(" prec %d", bp->precision);
+	printf(", prec %d", bp->precision);
 
 	if (!vflag)
 		return;
@@ -138,11 +138,11 @@ ntp_print(register const u_char *cp, u_int length)
 	p_sfix(&bp->distance);
 
 	TCHECK(bp->dispersion);
-	fputs(" disp ", stdout);
+	fputs(", disp ", stdout);
 	p_sfix(&bp->dispersion);
 
 	TCHECK(bp->refid);
-	fputs(" ref ", stdout);
+	fputs(", ref ", stdout);
 	/* Interpretation depends on stratum */
 	switch (bp->stratum) {
 
@@ -274,3 +274,4 @@ p_ntp_delta(register const struct l_fixedpt *olfp,
 		putchar('+');
 	printf("%d.%09d", i, f);
 }
+
