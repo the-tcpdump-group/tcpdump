@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.26 2001-05-10 05:30:21 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.27 2001-05-11 02:12:32 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -597,9 +597,13 @@ pimv2_print(register const u_char *bp, register u_int len)
 				break;
 
 			case 21:
-				(void)printf(" (State Refresh Capable");
-				if (EXTRACT_32BITS(&bp[4]) != 1) {
-					(void)printf(" ?0x%x?", EXTRACT_32BITS(&bp[4]));
+				(void)printf(" (State Refresh Capable; v%d", bp[4]);
+				if (bp[5] != 0) {
+					(void)printf(" interval ");
+					relts_print(bp[5]);
+				}
+				if (EXTRACT_16BITS(&bp[6]) != 0) {
+					(void)printf(" ?0x%04x?", EXTRACT_16BITS(&bp[6]));
 				}
 				(void)printf(")");
 				break;
