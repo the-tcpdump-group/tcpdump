@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.9 2000-09-28 06:43:06 guy Exp $ (LBL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.10 2000-10-05 04:10:03 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -219,7 +219,7 @@ pppoe_print(register const u_char *bp, u_int length)
       printf("%s ", tok2str(ppptype2str, "proto-0x%x", ptype));
 #endif
     printf(" ");
-    ppp_print(pppoe_payload);
+    ppp_print(pppoe_payload, pppoe_length);
   }
   return;
 }

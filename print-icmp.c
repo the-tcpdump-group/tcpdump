@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.55 2000-10-03 09:30:37 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.56 2000-10-05 04:10:02 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -276,7 +276,7 @@ icmp_print(register const u_char *bp, u_int plen, register const u_char *bp2)
 	register const struct ip *oip;
 	register const struct udphdr *ouh;
 	register u_int hlen, dport, mtu;
-	char buf[256];
+	char buf[MAXHOSTNAMELEN + 100];
 
 	dp = (struct icmp *)bp;
 	ip = (struct ip *)bp2;
@@ -458,14 +458,16 @@ icmp_print(register const u_char *bp, u_int plen, register const u_char *bp2)
 
 	case ICMP_TSTAMP:
 		TCHECK(dp->icmp_seq);
-		(void)sprintf(buf, "time stamp query id %u seq %u",
+		(void)snprintf(buf, sizeof(buf),
+		    "time stamp query id %u seq %u",
 		    (unsigned)ntohs(dp->icmp_id),
 		    (unsigned)ntohs(dp->icmp_seq));
 		break;
 
 	case ICMP_TSTAMPREPLY:
 		TCHECK(dp->icmp_ttime);
-		(void)sprintf(buf, "time stamp reply id %u seq %u : org 0x%lx recv 0x%lx xmit 0x%lx",
+		(void)snprintf(buf, sizeof(buf),
+		    "time stamp reply id %u seq %u : org 0x%lx recv 0x%lx xmit 0x%lx",
 		    (unsigned)ntohs(dp->icmp_id),
 		    (unsigned)ntohs(dp->icmp_seq),
 		    (unsigned long)ntohl(dp->icmp_otime),

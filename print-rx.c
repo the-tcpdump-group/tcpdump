@@ -13,7 +13,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.18 2000-09-29 04:58:48 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.19 2000-10-05 04:10:04 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -21,6 +21,7 @@ static const char rcsid[] =
 #endif
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <sys/param.h>
@@ -377,7 +378,7 @@ static int	rx_cache_find(const struct rx_header *, const struct ip *,
 static void ack_print(const u_char *, int);
 static void fs_print(const u_char *, int);
 static void fs_reply_print(const u_char *, int, int32_t);
-static void acl_print(u_char *, u_char *);
+static void acl_print(u_char *, int, u_char *);
 static void cb_print(const u_char *, int);
 static void cb_reply_print(const u_char *, int, int32_t);
 static void prot_print(const u_char *, int);
@@ -878,7 +879,7 @@ fs_print(register const u_char *bp, int length)
 			TCHECK2(bp[0], i);
 			strncpy(a, (char *) bp, min(AFSOPAQUEMAX, i));
 			a[i] = '\0';
-			acl_print((u_char *) a, (u_char *) a + i);
+			acl_print((u_char *) a, sizeof(a), (u_char *) a + i);
 			break;
 		}
 		case 137:	/* Create file */
@@ -989,7 +990,7 @@ fs_reply_print(register const u_char *bp, int length, int32_t opcode)
 			TCHECK2(bp[0], i);
 			strncpy(a, (char *) bp, min(AFSOPAQUEMAX, i));
 			a[i] = '\0';
-			acl_print((u_char *) a, (u_char *) a + i);
+			acl_print((u_char *) a, sizeof(a), (u_char *) a + i);
 			break;
 		}
 		case 137:	/* Create file */
@@ -1043,19 +1044,22 @@ trunc:
  */
 
 static void
-acl_print(u_char *s, u_char *end)
+acl_print(u_char *s, int maxsize, u_char *end)
 {
 	int pos, neg, acl;
 	int n, i;
-	char user[128];
+	char *user;
+
+	if ((user = (char *)malloc(maxsize)) == NULL)
+		return;
 
 	if (sscanf((char *) s, "%d %d\n%n", &pos, &neg, &n) != 2)
-		return;
+		goto finish;
 	
 	s += n;
 
 	if (s > end)
-		return;
+		goto finish;
 
 	/*
 	 * This wacky order preserves the order used by the "fs" command
@@ -1079,25 +1083,29 @@ acl_print(u_char *s, u_char *end)
 
 	for (i = 0; i < pos; i++) {
 		if (sscanf((char *) s, "%s %d\n%n", user, &acl, &n) != 2)
-			return;
+			goto finish;
 		s += n;
 		printf(" +{%s ", user);
 		ACLOUT(acl);
 		printf("}");
 		if (s > end)
-			return;
+			goto finish;
 	}
 
 	for (i = 0; i < neg; i++) {
 		if (sscanf((char *) s, "%s %d\n%n", user, &acl, &n) != 2)
-			return;
+			goto finish;
 		s += n;
 		printf(" -{%s ", user);
 		ACLOUT(acl);
 		printf("}");
 		if (s > end)
-			return;
+			goto finish;
 	}
+
+finish:
+	free(user);
+	return;
 }
 
 #undef ACLOUT

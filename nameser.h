@@ -81,7 +81,9 @@
 #define QUERY		0x0		/* standard query */
 #define IQUERY		0x1		/* inverse query */
 #define STATUS		0x2		/* nameserver status query */
-/*#define xxx		0x3		/* 0x3 reserved */
+#if 0
+#define xxx		0x3		/* 0x3 reserved */
+#endif
 	/* non standard - supports ALLOW_UPDATES stuff from Mike Schwartz */
 #define UPDATEA		0x9		/* add resource record */
 #define UPDATED		0xa		/* delete a specific resource record */
@@ -200,9 +202,6 @@ struct rrec {
 	int	r_size;			/* size of data area */
 	char	*r_data;		/* pointer to data */
 };
-
-extern	u_int16_t	_getshort();
-extern	u_int32_t	_getlong();
 
 /*
  * Inline versions of get/put short/long.  Pointer is advanced.

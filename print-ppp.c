@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.51 2000-10-04 22:37:29 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.52 2000-10-05 04:10:03 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -492,7 +492,6 @@ static int
 print_lcp_config_options(const u_char *p, int length)
 {
 	int len, opt;
-	int i;
 
 	if (length < 2)
 		return 0;
@@ -753,7 +752,6 @@ handle_pap(const u_char *p, int length)
 	}
 
 	code = *p;
-	if (length < 4)
 	if ((code >= PAP_CODEMIN) && (code <= PAP_CODEMAX))
 		printf("%s", papcode[code - 1]);
 	else {
@@ -1030,8 +1028,6 @@ ppp_if_print(u_char *user, const struct pcap_pkthdr *h,
 {
 	register u_int length = h->len;
 	register u_int caplen = h->caplen;
-	const struct ip *ip;
-	u_int proto;
 
 	ts_print(&h->ts);
 
