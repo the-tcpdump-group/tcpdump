@@ -126,6 +126,12 @@
 /* The number of bytes in a short.  */
 #undef SIZEOF_SHORT
 
+/* Define if you have the asnprintf function.  */
+#undef HAVE_ASNPRINTF
+
+/* Define if you have the asprintf function.  */
+#undef HAVE_ASPRINTF
+
 /* Define if you have the ether_ntohost function.  */
 #undef HAVE_ETHER_NTOHOST
 
@@ -159,11 +165,23 @@
 /* Define if you have the sigset function.  */
 #undef HAVE_SIGSET
 
+/* Define if you have the snprintf function.  */
+#undef HAVE_SNPRINTF
+
 /* Define if you have the strcasecmp function.  */
 #undef HAVE_STRCASECMP
 
+/* Define if you have the vasnprintf function.  */
+#undef HAVE_VASNPRINTF
+
+/* Define if you have the vasprintf function.  */
+#undef HAVE_VASPRINTF
+
 /* Define if you have the vfprintf function.  */
 #undef HAVE_VFPRINTF
+
+/* Define if you have the vsnprintf function.  */
+#undef HAVE_VSNPRINTF
 
 /* Define if you have the <cast.h> header file.  */
 #undef HAVE_CAST_H
@@ -191,6 +209,9 @@
 
 /* Define if you have the <smi.h> header file.  */
 #undef HAVE_SMI_H
+
+/* Define if you have the <sys/cdefs.h> header file.  */
+#undef HAVE_SYS_CDEFS_H
 
 /* Define if you have the <zlib.h> header file.  */
 #undef HAVE_ZLIB_H
