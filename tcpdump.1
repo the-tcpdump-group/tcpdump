@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.128 2002-08-08 08:48:11 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.129 2002-08-11 18:40:12 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -850,6 +850,12 @@ virtual channel identifier of
 .IP \fBlane\fP
 True if the packet is an ATM packet, for SunATM on Solaris, and is
 an ATM LANE packet.
+Note that the first \fBlane\fR keyword encountered in \fIexpression\fR
+changes the tests done in the remainder of \fIexpression\fR
+on the assumption that the packet is either a LANE emulated Ethernet
+packet or a LANE LE Control packet.  If \fBlane\fR isn't specified, the
+tests are done under the assumption that the packet is an
+LLC-encapsulated packet.
 .IP \fBllc\fP
 True if the packet is an ATM packet, for SunATM on Solaris, and is
 an LLC-encapsulated packet.
