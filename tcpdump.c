@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.199 2003-01-08 04:33:27 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.200 2003-01-16 07:55:06 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -1007,7 +1007,7 @@ usage(void)
 	(void)fprintf(stderr, "libpcap version %s\n", pcap_version);
 #endif /* WIN32 */
 	(void)fprintf(stderr,
-"Usage: %s [-aAd" D_FLAG "eflLnNOpqRStu" U_FLAG "vxXy]" B_FLAG_USAGE " [-c count] [ -C file_size ]\n", program_name);
+"Usage: %s [-aAd" D_FLAG "eflLnNOpqRStu" U_FLAG "vxX]" B_FLAG_USAGE " [-c count] [ -C file_size ]\n", program_name);
 	(void)fprintf(stderr,
 "\t\t[ -E algo:secret ] [ -F file ] [ -i interface ] [ -r file ]\n");
 	(void)fprintf(stderr,
