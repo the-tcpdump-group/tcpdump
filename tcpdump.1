@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.115 2002-01-25 05:27:27 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.116 2002-02-08 06:45:05 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -152,7 +152,9 @@ to capture in promiscuous mode; on those versions of Solaris, you must
 be root, or
 .I tcpdump
 must be installed setuid to root, in order to capture in promiscuous
-mode.
+mode.  Note that, on many (perhaps all) interfaces, if you don't capture
+in promiscuous mode, you will not see any outgoing packets, so a capture
+not done in promiscuous mode may not be very useful.
 .TP
 .B Under HP-UX with DLPI:
 You must be root or
