@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.29 2004-07-21 21:43:26 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.30 2004-07-21 21:50:46 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -520,7 +520,7 @@ rsvp_intserv_print(const u_char *tptr, u_short obj_tlen) {
 }
 
 static int
-rsvp_obj_print (const u_char *tptr, const u_char *ident, u_int tlen) {
+rsvp_obj_print (const u_char *tptr, const char *ident, u_int tlen) {
 
     const struct rsvp_object_header *rsvp_obj_header;
     const u_char *obj_tptr;
@@ -1152,7 +1152,7 @@ rsvp_obj_print (const u_char *tptr, const u_char *ident, u_int tlen) {
                     return-1;
                 error_code=*(obj_tptr+5);
                 error_value=EXTRACT_16BITS(obj_tptr+6);
-                printf("%s  Error Node Adress: %s, Flags: [0x%02x]%s  Error Code: %s (%u)",
+                printf("%s  Error Node Address: %s, Flags: [0x%02x]%s  Error Code: %s (%u)",
                        ident,
                        ipaddr_string(obj_tptr),
                        *(obj_tptr+4),
@@ -1179,7 +1179,7 @@ rsvp_obj_print (const u_char *tptr, const u_char *ident, u_int tlen) {
                     return-1;
                 error_code=*(obj_tptr+17);
                 error_value=EXTRACT_16BITS(obj_tptr+18);
-                printf("%s  Error Node Adress: %s, Flags: [0x%02x]%s  Error Code: %s (%u)",
+                printf("%s  Error Node Address: %s, Flags: [0x%02x]%s  Error Code: %s (%u)",
                        ident,
                        ip6addr_string(obj_tptr),
                        *(obj_tptr+16),
@@ -1277,12 +1277,12 @@ rsvp_obj_print (const u_char *tptr, const u_char *ident, u_int tlen) {
         case RSVP_OBJ_PROTECTION:
         default:
             if (vflag <= 1)
-                print_unknown_data(obj_tptr,"\n\t    ",obj_tlen); /* FIXME identation */
+                print_unknown_data(obj_tptr,"\n\t    ",obj_tlen); /* FIXME indentation */
             break;
         }
-        /* do we want to see an additionally hexdump ? */
+        /* do we also want to see a hex dump ? */
         if (vflag > 1 || hexdump==TRUE)
-            print_unknown_data(tptr+sizeof(sizeof(struct rsvp_object_header)),"\n\t    ", /* FIXME identation */
+            print_unknown_data(tptr+sizeof(sizeof(struct rsvp_object_header)),"\n\t    ", /* FIXME indentation */
                                rsvp_obj_len-sizeof(struct rsvp_object_header));
 
         tptr+=rsvp_obj_len;
