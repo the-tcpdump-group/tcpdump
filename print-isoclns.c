@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.51 2002-06-11 17:08:51 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.52 2002-06-29 04:33:31 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1478,7 +1478,7 @@ static int isis_print (const u_char *p, u_int length)
                 tptr+=2;
                 if (!TTEST2(*tptr, NODE_ID_LEN))
 		    goto trunctlv;
-	printf("\n\t\t\t  IS Neighbor: %s", isis_print_nodeid(tptr));
+		printf("\n\t\t\t  IS Neighbor: %s", isis_print_nodeid(tptr));
                 tptr+=(NODE_ID_LEN);
                 if (!TTEST2(*tptr, 3))
                     goto trunctlv;
@@ -1493,8 +1493,8 @@ static int isis_print (const u_char *p, u_int length)
                     while (tslen>0) {
                         if (!TTEST2(*tptr,2))
                             goto trunctlv;
-	subt=*(tptr++);
-	subl=*(tptr++);
+			subt=*(tptr++);
+			subl=*(tptr++);
 			if(!isis_print_is_reach_subtlv(tptr,subt,subl,"\n\t\t\t  "))
 			    return(0);
 			tptr+=subl;
@@ -1510,7 +1510,7 @@ static int isis_print (const u_char *p, u_int length)
             while (tmp>0) {
                 if (!TTEST2(*tptr, NODE_ID_LEN))
                     goto trunctlv;
-	printf("\n\t\t\tIS Neighbor: %s", isis_print_nodeid(tptr));
+		printf("\n\t\t\tIS Neighbor: %s", isis_print_nodeid(tptr));
                 tptr+=(NODE_ID_LEN);
 
                 if (!TTEST2(*tptr, 3))
@@ -1527,8 +1527,8 @@ static int isis_print (const u_char *p, u_int length)
                     while (tslen>0) {
                         if (!TTEST2(*tptr,2))
                             goto trunctlv;
-	subt=*(tptr++);
-	subl=*(tptr++);
+			subt=*(tptr++);
+			subl=*(tptr++);
 			if(!isis_print_is_reach_subtlv(tptr,subt,subl,"\n\t\t\t  "))
 			    return(0);
 			tptr+=subl;
@@ -1632,8 +1632,8 @@ static int isis_print (const u_char *p, u_int length)
                     while (tslen>0) {
                         if (!TTEST2(*tptr,2))
                             goto trunctlv;
-	subt=*(tptr++);
-	subl=*(tptr++);
+			subt=*(tptr++);
+			subl=*(tptr++);
 			if(!isis_print_ip_reach_subtlv(tptr,subt,subl,"\n\t\t\t  "))
 			    return(0);
 			tptr+=subl;
@@ -1688,8 +1688,8 @@ static int isis_print (const u_char *p, u_int length)
                     while (tslen>0) {
                         if (!TTEST2(*tptr,2))
                             goto trunctlv;
-	subt=*(tptr++);
-	subl=*(tptr++);
+			subt=*(tptr++);
+			subl=*(tptr++);
 			if(!isis_print_ip_reach_subtlv(tptr,subt,subl,"\n\t\t\t  "))
 			    return(0);
 			tptr+=subl;
@@ -1745,8 +1745,8 @@ static int isis_print (const u_char *p, u_int length)
                     while (tslen>0) {
                         if (!TTEST2(*tptr,2))
                             goto trunctlv;
-	subt=*(tptr++);
-	subl=*(tptr++);
+			subt=*(tptr++);
+			subl=*(tptr++);
 			if(!isis_print_ip_reach_subtlv(tptr,subt,subl,"\n\t\t\t  "))
 			    return(0);
 			tptr+=subl;
