@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.117 2004-01-27 13:35:57 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.118 2004-03-18 10:58:17 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -509,7 +509,7 @@ void isoclns_print(const u_int8_t *p, u_int length, u_int caplen)
             return;
         }
 
-        printf("OSI, %s",tok2str(osi_nlpid_values,"Unknown NLPID (0x%02x)",*p));
+        printf("%s",tok2str(osi_nlpid_values,"Unknown NLPID (0x%02x)",*p));
         
 	switch (*p) {
 
