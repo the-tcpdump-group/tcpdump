@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.120 2004-09-09 07:11:57 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.121 2004-09-15 17:54:11 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1091,20 +1091,19 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
             }
             break;
         case ISIS_SUBTLV_EXT_IS_REACH_DIFFSERV_TE:
-            if (subl >= 36) {
-              printf("%sBandwidth Constraints Model ID: (%u)",ident, *tptr);
-              tptr+=4;
-              /* for now lets just print the first 8 BCs -
-               * FIXME is this dep. on the BC model ?
-               */
-              for (bandwidth_constraint = 0; bandwidth_constraint < 8; bandwidth_constraint++) {
+            printf("%sBandwidth Constraints Model ID: %s (%u)",
+                   ident,
+                   tok2str(diffserv_te_bc_values, "unknown", *tptr),
+                   *tptr);
+            tptr++;
+            /* decode BCs until the subTLV ends */
+            for (bandwidth_constraint = 0; bandwidth_constraint < (subl-1)/4; bandwidth_constraint++) {
                 bw.i = EXTRACT_32BITS(tptr);
                 printf("%s  Bandwidth constraint %d: %.3f Mbps",
                        ident,
                        bandwidth_constraint,
                        bw.f*8/1000000 );
 		tptr+=4;
-	      }
             }
             break;
         case ISIS_SUBTLV_EXT_IS_REACH_TE_METRIC:

@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.52 2004-09-09 16:17:38 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.53 2004-09-15 17:54:11 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -566,8 +566,11 @@ ospf_print_lsa(register const struct lsa *lsap)
                                 }
                                 break;
                             case LS_OPAQUE_TE_LINK_SUBTLV_DIFFSERV_TE:
-                                printf("\n\t\tBandwidth Constraints Model ID: (%u)", *tptr);
-                                for (bandwidth_constraint = 0; bandwidth_constraint < 8; bandwidth_constraint++) {
+                                printf("\n\t\tBandwidth Constraints Model ID: %s (%u)",
+                                       tok2str(diffserv_te_bc_values, "unknown", *tptr),
+                                       *tptr);
+                                /* decode BCs until the subTLV ends */
+                                for (bandwidth_constraint = 0; bandwidth_constraint < (subtlv_length-4)/4; bandwidth_constraint++) {
                                     bw.i = EXTRACT_32BITS(tptr+4+bandwidth_constraint*4);
                                     printf("\n\t\t  Bandwidth constraint %d: %.3f Mbps",
                                            bandwidth_constraint,
