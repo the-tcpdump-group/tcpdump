@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-ip6opts.c,v 1.16 2003-11-16 09:36:24 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-ip6opts.c,v 1.17 2003-11-19 00:36:08 guy Exp $";
 #endif
 
 #ifdef INET6
@@ -305,7 +305,7 @@ hbhopt_print(register const u_char *bp)
 
   trunc:
     fputs("[|HBH]", stdout);
-    return(hbhlen);
+    return(-1);
 }
 
 int
@@ -330,6 +330,6 @@ dstopt_print(register const u_char *bp)
 
   trunc:
     fputs("[|DSTOPT]", stdout);
-    return(dstoptlen);
+    return(-1);
 }
 #endif /* INET6 */

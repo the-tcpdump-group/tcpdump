@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.46 2003-11-16 09:36:20 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.47 2003-11-19 00:36:07 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -337,7 +337,12 @@ esp_print(const u_char *bp, const u_char *bp2
 	_U_
 #endif
 	,
-	int *nhdr, int *padlen
+	int *nhdr
+#ifndef HAVE_LIBCRYPTO
+	_U_
+#endif
+	,
+	int *padlen
 #ifndef HAVE_LIBCRYPTO
 	_U_
 #endif
@@ -367,7 +372,7 @@ esp_print(const u_char *bp, const u_char *bp2
 
 #ifdef HAVE_LIBCRYPTO
 	secret = NULL;
-	advance = 0;
+	padvance = 0;
 
 	if (!initialized) {
 		esp_init();
@@ -501,7 +506,5 @@ esp_print(const u_char *bp, const u_char *bp2
 #endif
 
 fail:
-	if (nhdr)
-		*nhdr = -1;
-	return 65536;
+	return -1;
 }
