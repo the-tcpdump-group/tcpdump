@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.108 2003-11-16 09:36:25 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.109 2003-11-26 08:50:48 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -214,12 +214,14 @@ static struct tok isis_ext_is_reach_subtlv_values[] = {
     { 0, NULL }
 };
 
-#define SUBTLV_EXTD_IP_REACH_ADMIN_TAG32          1
-#define SUBTLV_EXTD_IP_REACH_ADMIN_TAG64          2
+#define SUBTLV_EXTD_IP_REACH_ADMIN_TAG32          1 /* draft-ietf-isis-admin-tags-01 */
+#define SUBTLV_EXTD_IP_REACH_ADMIN_TAG64          2 /* draft-ietf-isis-admin-tags-01 */
+#define SUBTLV_EXTD_IP_REACH_MGMT_PREFIX_COLOR  117 /* draft-ietf-isis-wg-multi-topology-05 */
 
 static struct tok isis_ext_ip_reach_subtlv_values[] = {
     { SUBTLV_EXTD_IP_REACH_ADMIN_TAG32,           "32-Bit Administrative tag" },
     { SUBTLV_EXTD_IP_REACH_ADMIN_TAG64,           "64-Bit Administrative tag" },
+    { SUBTLV_EXTD_IP_REACH_MGMT_PREFIX_COLOR,     "Management Prefix Color" },
     { 0, NULL }
 };
 
@@ -810,6 +812,7 @@ isis_print_ip_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
 	    goto trunctlv;
 
     switch(subt) {
+    case SUBTLV_EXTD_IP_REACH_MGMT_PREFIX_COLOR: /* fall through */
     case SUBTLV_EXTD_IP_REACH_ADMIN_TAG32:
         while (subl >= 4) {
 	    printf(", 0x%08x (=%u)",
