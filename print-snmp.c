@@ -45,7 +45,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.43 2000-11-04 22:50:23 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.44 2000-11-10 17:34:10 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -428,13 +428,13 @@ asn1_parse(register const u_char *p, u_int len, struct be *elem)
 	elem->form = form;
 	elem->class = class;
 	elem->id = id;
-	if (vflag)
+	if (vflag > 1)
 		printf("|%.2x", *p);
 	p++; len--; hdr = 1;
 	/* extended tag field */
 	if (id == ASN_ID_EXT) {
 		for (id = 0; *p & ASN_BIT8 && len > 0; len--, hdr++, p++) {
-			if (vflag)
+			if (vflag > 1)
 				printf("|%.2x", *p);
 			id = (id << 7) | (*p & ~ASN_BIT8);
 		}
@@ -452,7 +452,7 @@ asn1_parse(register const u_char *p, u_int len, struct be *elem)
 		return -1;
 	}
 	elem->asnlen = *p;
-	if (vflag)
+	if (vflag > 1)
 		printf("|%.2x", *p);
 	p++; len--; hdr++;
 	if (elem->asnlen & ASN_BIT8) {
@@ -463,7 +463,7 @@ asn1_parse(register const u_char *p, u_int len, struct be *elem)
 			return -1;
 		}
 		for (; noct-- > 0; len--, hdr++) {
-			if (vflag)
+			if (vflag > 1)
 				printf("|%.2x", *p);
 			elem->asnlen = (elem->asnlen << ASN_SHIFT8) | *p++;
 		}
@@ -861,7 +861,7 @@ struct smi2be {
     int be;
 };
 
-struct smi2be smi2betab[] = {
+static struct smi2be smi2betab[] = {
     { SMI_BASETYPE_INTEGER32,		BE_INT },
     { SMI_BASETYPE_OCTETSTRING,		BE_STR },
     { SMI_BASETYPE_OCTETSTRING,		BE_INETADDR },
@@ -918,7 +918,7 @@ static int smi_check_type(SmiBasetype basetype, int be)
 static int smi_check_a_range(SmiType *smiType, SmiRange *smiRange,
 			     struct be *elem)
 {
-    int ok;
+    int ok = 1;
     
     switch (smiType->basetype) {
     case SMI_BASETYPE_OBJECTIDENTIFIER:
@@ -1041,6 +1041,13 @@ static void smi_print_value(SmiNode *smiNode, u_char pduid, struct be *elem)
 
 	if (! smiNode || ! (smiNode->nodekind
 			    & (SMI_NODEKIND_SCALAR | SMI_NODEKIND_COLUMN))) {
+	    asn1_print(elem);
+	    return;
+	}
+
+	if (elem->type == BE_NOSUCHOBJECT
+	    || elem->type == BE_NOSUCHINST
+	    || elem->type == BE_ENDOFMIBVIEW) {
 	    asn1_print(elem);
 	    return;
 	}
@@ -1295,7 +1302,8 @@ snmppdu_print(u_char pduid, const u_char *np, u_int length)
 		asn1_print(&elem);
 		return;
 	}
-	/* ignore the reqId */
+	if (vflag)
+		printf("R=%d ", elem.data.integer);
 	length -= count;
 	np += count;
 
@@ -1462,7 +1470,11 @@ pdu_print(const u_char *np, u_int length, int version)
 	}
 	if (count < length)
 		printf("[%d extra after PDU]", length - count);
+	if (vflag) {
+		fputs("{ ", stdout);
+	}
 	asn1_print(&pdu);
+	fputs(" ", stdout);
 	/* descend into PDU */
 	length = pdu.asnlen;
 	np = (u_char *)pdu.data.raw;
@@ -1493,6 +1505,10 @@ pdu_print(const u_char *np, u_int length, int version)
 	case REPORT:
 		snmppdu_print(pdu.id, np, length);
 		break;
+	}
+
+	if (vflag) {
+		fputs("} ", stdout);
 	}
 }
 
@@ -1697,6 +1713,10 @@ v3msg_print(const u_char *np, u_int length)
 	length = elem.asnlen;
 	np = (u_char *)elem.data.raw;
 
+	if (vflag) {
+		fputs("{ ", stdout);
+	}
+
 	/* msgID (INTEGER) */
 	if ((count = asn1_parse(np, length, &elem)) < 0)
 		return;
@@ -1761,9 +1781,13 @@ v3msg_print(const u_char *np, u_int length)
 	if (count < length)
 		printf("[%d extra after message SEQ]", length - count);
 
+	if (vflag) {
+		fputs("} ", stdout);
+	}
+
 	if (model == 3) {
 	    if (vflag) {
-		fputs("USM ", stdout);
+		fputs("{ USM ", stdout);
 	    }
 	} else {
 	    printf("[security model %d]", model);
@@ -1786,13 +1810,20 @@ v3msg_print(const u_char *np, u_int length)
 
 	if (model == 3) {
 	    usm_print(elem.data.str, elem.asnlen);
+	    if (vflag) {
+		fputs("} ", stdout);
+	    }
 	}
 
 	if (vflag) {
-	    fputs("ScopedPDU ", stdout);
+	    fputs("{ ScopedPDU ", stdout);
 	}
 
 	scopedpdu_print(np, length, 3);
+
+	if (vflag) {
+		fputs("} ", stdout);
+	}
 }
 
 /*
@@ -1843,7 +1874,7 @@ snmp_print(const u_char *np, u_int length)
 	case SNMP_VERSION_2:
 	case SNMP_VERSION_3:
 	        if (vflag)
-		        printf("%s ", SnmpVersion[elem.data.integer]);
+		        printf("{ %s ", SnmpVersion[elem.data.integer]);
 		break;
 	default:
 	        printf("[version = %d]", elem.data.integer);
@@ -1864,5 +1895,9 @@ snmp_print(const u_char *np, u_int length)
 	default:
 	        printf("[version = %d]", elem.data.integer);
 		break;
+	}
+
+	if (vflag) {
+		fputs("} ", stdout);
 	}
 }
