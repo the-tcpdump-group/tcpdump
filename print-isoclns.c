@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.56 2002-08-01 08:53:13 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.57 2002-08-09 22:57:22 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1390,7 +1390,7 @@ static int isis_print (const u_char *p, u_int length)
 		goto trunctlv;
 	    alen = *tptr++;
 	    while (tmp && alen < tmp) {
-		printf("\n\t\tArea address (%u): %s",
+		printf("\n\t\tArea address (length: %u): %s",
                        alen,
                        print_nsap(tptr, alen));
 		tptr += alen;
