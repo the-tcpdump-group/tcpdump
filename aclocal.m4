@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.96 2003-05-01 21:20:52 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.97 2003-05-02 08:41:01 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -281,7 +281,7 @@ AC_DEFUN(AC_LBL_LIBPCAP,
 		    d="/usr/include/pcap"
 		fi
 	    fi
-	    if test -z $d ; then
+	    if test -z "$d" ; then
 		AC_MSG_RESULT(not found)
 	    else
 		$2="-I$d $$2"

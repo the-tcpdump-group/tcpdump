@@ -3930,7 +3930,7 @@ echo "configure:3925: checking for extraneous pcap header directories" >&5
 		    d="/usr/include/pcap"
 		fi
 	    fi
-	    if test -z $d ; then
+	    if test -z "$d" ; then
 		echo "$ac_t""not found" 1>&6
 	    else
 		V_INCLS="-I$d $V_INCLS"
