@@ -91,6 +91,7 @@
 
 /* Workaround for missing sized types */
 /* XXX this should move to the more standard uint*_t */
+#undef int8_t
 #undef int16_t
 #undef int32_t
 #undef u_int16_t
