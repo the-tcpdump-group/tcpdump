@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.36 2002-07-14 14:14:51 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.37 2002-07-18 00:39:12 hannes Exp $";
 #endif
 
 #include <sys/param.h>
@@ -500,14 +500,12 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 		af = EXTRACT_16BITS(p);
 		safi = p[2];
 	
-                printf("\n\t    AFI %s (%u), %sSAFI %s (%u)",
+                printf("\n\t    AFI: %s (%u), %sSAFI: %s (%u)",
                        tok2str(bgp_afi_values, "Unknown AFI", af),
                        af,
                        (safi>128) ? "vendor specific " : "", /* 128 is meanwhile wellknown */
                        tok2str(bgp_safi_values, "Unknown SAFI", safi),
                        safi);
-	
-		p += 3;
 
 		if (af == AFNUM_INET)
 			;
@@ -515,9 +513,13 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 		else if (af == AFNUM_INET6)
 			;
 #endif
-		else
-			break;
+		else {
+                    printf("\n\t    no AFI %u decoder",af);
+                    print_unknown_data(p,"\n\t    ",tlen);
+                    break;
+                }
 
+                p +=3;
 		tlen = p[0];
 		if (tlen) {
 			printf("\n\t    nexthop: ");
@@ -535,6 +537,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 					break;
                                     default:
                                         printf("no SAFI %u decoder",safi);                                        
+                                        print_unknown_data(p,"\n\t    ",tlen);
                                         i = tlen;
                                         break;
                                     }
@@ -550,13 +553,15 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
                                         i += sizeof(struct in6_addr);
                                         break;
                                     default:
-                                        printf("no SAFI %u decoder",safi);                                        
+                                        printf("no SAFI %u decoder",safi);
+                                        print_unknown_data(p,"\n\t    ",tlen);                                        
                                         i = tlen;
                                         break;
                                     }
 #endif
 				default:
-                                    printf("no AF %u decoder",af);
+                                    printf("no AFI %u decoder",af);
+                                    print_unknown_data(p,"\n\t    ",tlen);
                                     i = tlen;	/*exit loop*/
                                     break;
 				}
@@ -592,6 +597,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
                                 break;
                             default:
                                 printf("\n\t      no SAFI %u decoder",safi);
+                                print_unknown_data(p-3,"\n\t    ",tlen);
                                 advance = 0;
 				p = dat + len;
 				break;  
@@ -608,6 +614,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 				break;
                             default:
                                 printf("\n\t      no SAFI %u decoder ",safi);
+                                print_unknown_data(p-3,"\n\t    ",tlen);
                                 advance = 0;
 				p = dat + len;
 				break;
@@ -615,7 +622,8 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
                             break;
 #endif
 			default:
-                            printf("\n\t      no AF %u decoder ",af);
+                            printf("\n\t      no AFI %u decoder ",af);
+                            print_unknown_data(p-3,"\n\t    ",tlen);
                             advance = 0;
                             p = dat + len;
                             break;
@@ -630,7 +638,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 		af = EXTRACT_16BITS(p);
 		safi = p[2];
 
-                printf("\n\t    AFI %s (%u), %sSAFI %s (%u)",
+                printf("\n\t    AFI: %s (%u), %sSAFI: %s (%u)",
                        tok2str(bgp_afi_values, "Unknown AFI", af),
                        af,
                        (safi>128) ? "vendor specific " : "", /* 128 is meanwhile wellknown */
@@ -657,6 +665,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
                                 break;
                             default:
                                 printf("\n\t      no SAFI %u decoder",safi);
+                                print_unknown_data(p-3,"\n\t    ",tlen);
                                 advance = 0;
 				p = dat + len;
 				break;  
@@ -674,6 +683,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 				break;
                             default:
                                 printf("\n\t      no SAFI %u decoder",safi);
+                                print_unknown_data(p-3,"\n\t    ",tlen);
                                 advance = 0;
 				p = dat + len;
 				break;
@@ -681,7 +691,8 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
                             break;
 #endif
 			default:
-				printf("\n\t      no AF %u decoder",af);
+				printf("\n\t      no AFI %u decoder",af);
+                                print_unknown_data(p-3,"\n\t    ",tlen);
 				advance = 0;
 				p = dat + len;
 				break;
@@ -691,7 +702,8 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 		}
 		break;
 	default:
-            printf("no decoder");
+            printf("\n\t    no Attribute %u decoder",attr->bgpa_type); /* we have no decoder for the attribute */
+            print_unknown_data(p,"\n\t    ",tlen);
 		break;
 	}
 }
@@ -826,9 +838,13 @@ bgp_update_print(const u_char *dat, int length)
 			alen = bgp_attr_len(&bgpa);
 			aoff = bgp_attr_off(&bgpa);
 
-			printf("\n\t  %s ", tok2str(bgp_attr_values, "Unknown Attribute", bgpa.bgpa_type));
+		       printf("\n\t  %s (%u), length: %u",
+                              tok2str(bgp_attr_values, "Unknown Attribute", bgpa.bgpa_type),
+                              bgpa.bgpa_type,
+                              alen);
+
 			if (bgpa.bgpa_flags) {
-				printf("[%s%s%s%s",
+				printf(", flags [%s%s%s%s",
 					bgpa.bgpa_flags & 0x80 ? "O" : "",
 					bgpa.bgpa_flags & 0x40 ? "T" : "",
 					bgpa.bgpa_flags & 0x20 ? "P" : "",
@@ -837,7 +853,6 @@ bgp_update_print(const u_char *dat, int length)
 					printf("+%x", bgpa.bgpa_flags & 0xf);
 				printf("]: ");
 			}
-
 			bgp_attr_print(&bgpa, &p[i + aoff], alen);
 			i += aoff + alen;
 		}
@@ -899,7 +914,10 @@ bgp_header_print(const u_char *dat, int length)
 
 	TCHECK2(dat[0], BGP_SIZE);
 	memcpy(&bgp, dat, BGP_SIZE);
-	printf("\n\t%s Message", tok2str(bgp_msg_values, "Unknown Type", bgp.bgp_type));
+	printf("\n\t%s Message (%u), length: %u ",
+               tok2str(bgp_msg_values, "Unknown", bgp.bgp_type),
+               bgp.bgp_type,
+               length);
 
 	switch (bgp.bgp_type) {
 	case BGP_OPEN:
@@ -911,6 +929,13 @@ bgp_header_print(const u_char *dat, int length)
 	case BGP_NOTIFICATION:
 		bgp_notification_print(dat, length);
 		break;
+        case BGP_KEEPALIVE:
+                break;
+        default:
+            /* we have no decoder for the BGP message */
+            printf("\n\t  no Message %u decoder",bgp.bgp_type);
+            print_unknown_data(dat,"\n\t  ",length);
+                break;
 	}
 	return;
 trunc:
@@ -977,6 +1002,11 @@ bgp_print(const u_char *dat, int length)
 trunc:
 	printf(" [|BGP]");
 }
+
+
+
+
+
 
 
 
