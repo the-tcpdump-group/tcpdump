@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-ip6opts.c,v 1.3 2000-01-09 21:34:18 fenner Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-ip6opts.c,v 1.4 2000-04-09 19:15:59 assar Exp $";
 #endif
 
 #ifdef INET6
@@ -58,17 +58,32 @@ ip6_opt_print(const u_char *bp, int len)
 
     for (i = 0; i < len; i += optlen) {
 	switch (bp[i]) {
+#ifndef IP6OPT_PAD1
+#define IP6OPT_PAD1	0x00
+#endif
 	case IP6OPT_PAD1:
 	    optlen = 1;
 	    break;
+#ifndef IP6OPT_PADN
+#define IP6OPT_PADN	0x01
+#endif
 	case IP6OPT_PADN:
+#ifndef IP6OPT_MINLEN
+#define IP6OPT_MINLEN	2
+#endif
 	    if (len - i < IP6OPT_MINLEN) {
 		printf("(padn: trunc)");
 		goto trunc;
 	    }
 	    optlen = bp[i + 1] + 2;
 	    break;
+#ifndef IP6OPT_RTALERT
+#define IP6OPT_RTALERT	0x05
+#endif
 	case IP6OPT_RTALERT:
+#ifndef IP6OPT_RTALERT_LEN
+#define IP6OPT_RTALERT_LEN	4
+#endif
 	    if (len - i < IP6OPT_RTALERT_LEN) {
 		printf("(rtalert: trunc)");
 		goto trunc;
@@ -80,7 +95,13 @@ ip6_opt_print(const u_char *bp, int len)
 	    printf("(rtalert: 0x%04x) ", ntohs(*(u_short *)&bp[i + 2]));
 	    optlen = IP6OPT_RTALERT_LEN;
 	    break;
+#ifndef IP6OPT_JUMBO
+#define IP6OPT_JUMBO	0xC2
+#endif
 	case IP6OPT_JUMBO:
+#ifndef IP6OPT_JUMBO_LEN
+#define IP6OPT_JUMBO_LEN	6
+#endif
 	    if (len - i < IP6OPT_JUMBO_LEN) {
 		printf("(jumbo: trunc)");
 		goto trunc;
