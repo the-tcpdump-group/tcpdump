@@ -223,6 +223,9 @@
 /* Define if you have the dnet library (-ldnet).  */
 #undef HAVE_LIBDNET
 
+/* Define if you have the nsl library (-lnsl).  */
+#undef HAVE_LIBNSL
+
 /* Define if you have the resolv library (-lresolv).  */
 #undef HAVE_LIBRESOLV
 
