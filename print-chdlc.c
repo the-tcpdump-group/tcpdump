@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.22 2002-11-09 17:19:24 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.23 2002-12-04 19:06:50 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -120,8 +120,10 @@ chdlc_print(register const u_char *p, u_int length, u_int caplen)
                 mpls_print((const u_char *)(ip), length);
 		break;
         case ETHERTYPE_ISO:
-                /* is the fudge byte set ? if yes lets skip a byte */
-                if (*(p+CHDLC_HDRLEN) == 0)
+                /* is the fudge byte set ? lets verify by spotting ISO headers */
+                if (*(p+CHDLC_HDRLEN+1) == 0x81 ||
+                    *(p+CHDLC_HDRLEN+1) == 0x82 ||
+                    *(p+CHDLC_HDRLEN+1) == 0x83)
                     isoclns_print(p+CHDLC_HDRLEN+1, length-1, length-1, NULL, NULL);
                 else
                     isoclns_print(p+CHDLC_HDRLEN, length, length, NULL, NULL);
@@ -181,10 +183,10 @@ chdlc_slarp_print(const u_char *cp, u_int length)
 			ipaddr_string(&slarp->un.addr.mask));
 		break;
 	case SLARP_KEEPALIVE:
-		printf("keepalive: mineseen=0x%08x yourseen=0x%08x ",
+		printf("keepalive: mineseen=0x%08x, yourseen=0x%08x",
 			(u_int32_t)ntohl(slarp->un.keep.myseq),
 			(u_int32_t)ntohl(slarp->un.keep.yourseq));
-		printf("reliability=0x%04x t1=%d.%d",
+		printf(", reliability=0x%04x, t1=%d.%d",
 			ntohs(slarp->un.keep.rel), ntohs(slarp->un.keep.t1),
 			ntohs(slarp->un.keep.t2));
 		break;
