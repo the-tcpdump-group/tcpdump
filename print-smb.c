@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.15 2001-06-26 04:16:27 itojun Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.16 2001-06-28 03:15:38 itojun Exp $";
 #endif
 
 #include <stdio.h>
@@ -1039,7 +1039,8 @@ out:
 /*
  * print a NBT packet received across udp on port 138
  */
-void nbt_udp138_print(const uchar *data, int length)
+void
+nbt_udp138_print(const uchar *data, int length)
 {
     const uchar *maxbuf = data + length;
 
@@ -1069,7 +1070,8 @@ void nbt_udp138_print(const uchar *data, int length)
 /*
    print netbeui frames
 */
-void netbeui_print(u_short control, const uchar *data, int length)
+void
+netbeui_print(u_short control, const uchar *data, int length)
 {
     const uchar *maxbuf = data + length;
     int len;
@@ -1078,72 +1080,85 @@ void netbeui_print(u_short control, const uchar *data, int length)
     int is_truncated = 0;
 
     if (maxbuf > snapend)
-    maxbuf = snapend;
+	maxbuf = snapend;
     if (&data[7] >= maxbuf)
-    goto out;
+	goto out;
     len = SVAL(data,0);
     command = CVAL(data,4);
     data2 = data + len;
     if (data2 >= maxbuf) {
-    data2 = maxbuf;
-    is_truncated = 1;
+	data2 = maxbuf;
+	is_truncated = 1;
     }
 
     startbuf = data;
 
     if (vflag < 2) {
-    printf("NetBeui Packet");
-    return;
+	printf("NetBeui Packet");
+	return;
     }
 
     printf("\n>>> NetBeui Packet\nType=0x%X ", control);
-    data = fdata(data,"Length=[d] Signature=[w] Command=[B]\n#",maxbuf);
+    data = fdata(data, "Length=[d] Signature=[w] Command=[B]\n#", maxbuf);
     if (data == NULL)
-    goto out;
+	goto out;
 
     switch (command) {
     case 0xA:
-    data = fdata(data,"NameQuery:[P1]\nSessionNumber=[B]\nNameType=[B][P2]\nResponseCorrelator=[w]\nDestination=[n2]\nSource=[n2]\n",data2);
-    break;
+	data = fdata(data, "NameQuery:[P1]\nSessionNumber=[B]\nNameType=[B][P2]\nResponseCorrelator=[w]\nDestination=[n2]\nSource=[n2]\n", data2);
+	break;
 
     case 0x8:
-    data = fdata(data,"NetbiosDataGram:[P7]\nDestination=[n2]\nSource=[n2]\n",data2);
-    break;
+	data = fdata(data,
+	    "NetbiosDataGram:[P7]\nDestination=[n2]\nSource=[n2]\n", data2);
+	break;
 
     case 0xE:
-    data = fdata(data,"NameRecognise:\n[P1]\nData2=[w]\nTransmitCorrelator=[w]\nResponseCorelator=[w]\nDestination=[n2]\nSource=[n2]\n",data2);
-    break;
+	data = fdata(data,
+	    "NameRecognise:\n[P1]\nData2=[w]\nTransmitCorrelator=[w]\nResponseCorelator=[w]\nDestination=[n2]\nSource=[n2]\n",
+	    data2);
+	break;
 
     case 0x19:
-    data = fdata(data,"SessionInitialise:\nData1=[B]\nData2=[w]\nTransmitCorrelator=[w]\nResponseCorelator=[w]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n",data2);
-    break;
+	data = fdata(data,
+	    "SessionInitialise:\nData1=[B]\nData2=[w]\nTransmitCorrelator=[w]\nResponseCorelator=[w]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n",
+	    data2);
+	break;
 
     case 0x17:
-    data = fdata(data,"SessionConfirm:\nData1=[B]\nData2=[w]\nTransmitCorrelator=[w]\nResponseCorelator=[w]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n",data2);
-    break;
+	data = fdata(data,
+	    "SessionConfirm:\nData1=[B]\nData2=[w]\nTransmitCorrelator=[w]\nResponseCorelator=[w]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n",
+	    data2);
+	break;
 
     case 0x16:
-    data = fdata(data,"NetbiosDataOnlyLast:\nFlags=[{|NO_ACK|PIGGYBACK_ACK_ALLOWED|PIGGYBACK_ACK_INCLUDED|}]\nResyncIndicator=[w][P2]\nResponseCorelator=[w]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n",data2);
-    break;
+	data = fdata(data,
+	    "NetbiosDataOnlyLast:\nFlags=[{|NO_ACK|PIGGYBACK_ACK_ALLOWED|PIGGYBACK_ACK_INCLUDED|}]\nResyncIndicator=[w][P2]\nResponseCorelator=[w]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n",
+	    data2);
+	break;
 
     case 0x14:
-    data = fdata(data,"NetbiosDataAck:\n[P3]TransmitCorrelator=[w][P2]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n",data2);
-    break;
+	data = fdata(data,
+	    "NetbiosDataAck:\n[P3]TransmitCorrelator=[w][P2]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n",
+	    data2);
+	break;
 
     case 0x18:
-    data = fdata(data,"SessionEnd:\n[P1]Data2=[w][P4]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n",data2);
-    break;
+	data = fdata(data,
+	    "SessionEnd:\n[P1]Data2=[w][P4]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n",
+	    data2);
+	break;
 
     case 0x1f:
-    data = fdata(data,"SessionAlive\n",data2);
-    break;
+	data = fdata(data, "SessionAlive\n", data2);
+	break;
 
     default:
-    data = fdata(data,"Unknown Netbios Command ",data2);
-    break;
+	data = fdata(data, "Unknown Netbios Command ", data2);
+	break;
     }
     if (data == NULL)
-    goto out;
+	goto out;
 
     if (is_truncated) {
 	/* data2 was past the end of the buffer */
@@ -1177,7 +1192,8 @@ out:
 /*
  * print IPX-Netbios frames
  */
-void ipx_netbios_print(const uchar *data, u_int length)
+void
+ipx_netbios_print(const uchar *data, u_int length)
 {
     /*
      * this is a hack till I work out how to parse the rest of the
