@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.30 2002-06-11 17:08:43 itojun Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.31 2002-07-02 10:05:09 hannes Exp $";
 #endif
 
 #include <sys/param.h>
@@ -200,6 +200,10 @@ static const char *bgpattr_type[] = {
 #define SAFNUM_UNIMULTICAST 3
 /* labeled BGP RFC3107 */
 #define SAFNUM_LABUNICAST   4
+/* Section 4.3.4 of draft-rosen-rfc2547bis-03.txt  */
+#define SAFNUM_VPNUNICAST   128
+#define SAFNUM_VPNMULTICAST 129
+#define SAFNUM_VPNANYCAST   130
 
 static const char *bgpattr_nlri_safi[] = {
     "Reserved", "Unicast", "Multicast", "Unicast+Multicast", "labeled Unicast"
@@ -312,7 +316,7 @@ decode_labeled_prefix4(const u_char *pd, char *buf, u_int buflen)
            is added of the prefix length;
            we also do only read out just one label -
            there is no real application for advertisment of
-           stacked labels in a asingle BGP message
+           stacked labels in a a single BGP message
         */
 
         plen-=24; /* adjust prefixlen - labellength */
@@ -850,3 +854,9 @@ bgp_print(const u_char *dat, int length)
 trunc:
 	printf(" [|BGP]");
 }
+
+
+
+
+
+
