@@ -294,7 +294,7 @@ typedef	struct nfs_uquad	nfsuint64;
  */
 union nfs_quadconvert {
 	u_int32_t lval[2];
-	u_quad_t  qval;
+	u_int64_t qval;
 };
 typedef union nfs_quadconvert	nfsquad_t;
 
