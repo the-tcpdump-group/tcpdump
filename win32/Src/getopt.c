@@ -59,11 +59,7 @@ getopt(nargc, nargv, ostr)
 	char * const *nargv;
 	const char *ostr;
 {
-#ifdef WIN32
-	char *__progname="windump";
-#else
-	extern char *__progname;
-#endif
+	extern char *program_name;
 	static char *place = EMSG;		/* option letter processing */
 	char *oli;				/* option letter list index */
 
@@ -91,7 +87,7 @@ getopt(nargc, nargv, ostr)
 			++optind;
 		if (opterr && *ostr != ':')
 			(void)fprintf(stderr,
-			    "%s: illegal option -- %c\n", __progname, optopt);
+			    "%s: illegal option -- %c\n", program_name, optopt);
 		return (BADCH);
 	}
 	if (*++oli != ':') {			/* don't need argument */
@@ -109,7 +105,7 @@ getopt(nargc, nargv, ostr)
 			if (opterr)
 				(void)fprintf(stderr,
 				    "%s: option requires an argument -- %c\n",
-				    __progname, optopt);
+				    program_name, optopt);
 			return (BADCH);
 		}
 	 	else				/* white space */
