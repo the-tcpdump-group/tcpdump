@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ieee802_11.h,v 1.2 2001-06-13 07:25:57 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ieee802_11.h,v 1.3 2001-06-14 09:50:01 guy Exp $ (LBL) */
 /*
  * Copyright (c) 2001
  *	Fortress Technologies
@@ -74,8 +74,10 @@ struct mgmt_header_t {
 	u_int8_t	da[6];
 	u_int8_t	sa[6];
 	u_int8_t	bssid[6];
-	u_int8_t	seq_ctrl;
+	u_int16_t	seq_ctrl;
 };
+
+#define MGMT_HEADER_LEN	(2+2+6+6+6+2)
 
 #define CAPABILITY_ESS(cap)	((cap) & 0x0001)
 #define CAPABILITY_IBSS(cap)	((cap) & 0x0002)
@@ -187,6 +189,8 @@ struct ctrl_rts_t {
 	u_int8_t	fcs[4];
 };
 
+#define CTRL_RTS_LEN	(2+2+6+6+4)
+
 struct ctrl_cts_t {
 	u_int16_t	fc;
 	u_int16_t	duration;
@@ -194,12 +198,16 @@ struct ctrl_cts_t {
 	u_int8_t	fcs[4];
 };
 
+#define CTRL_CTS_LEN	(2+2+6+4)
+
 struct ctrl_ack_t {
 	u_int16_t	fc;
 	u_int16_t	duration;
 	u_int8_t	ra[6];
 	u_int8_t	fcs[4];
 };
+
+#define CTRL_ACK_LEN	(2+2+6+4)
 
 struct ctrl_ps_poll_t {
 	u_int16_t	fc;
@@ -209,6 +217,8 @@ struct ctrl_ps_poll_t {
 	u_int8_t	fcs[4];
 };
 
+#define CTRL_PS_POLL_LEN	(2+2+6+6+4)
+
 struct ctrl_end_t {
 	u_int16_t	fc;
 	u_int16_t	duration;
@@ -217,6 +227,8 @@ struct ctrl_end_t {
 	u_int8_t	fcs[4];
 };
 
+#define CTRL_END_LEN	(2+2+6+6+4)
+
 struct ctrl_end_ack_t {
 	u_int16_t	fc;
 	u_int16_t	duration;
@@ -224,6 +236,8 @@ struct ctrl_end_ack_t {
 	u_int8_t	bssid[6];
 	u_int8_t	fcs[4];
 };
+
+#define CTRL_END_ACK_LEN	(2+2+6+6+4)
 
 #define IV_IV(iv)	((iv) & 0xFFFFFF)
 #define IV_PAD(iv)	(((iv) >> 24) & 0x3F)

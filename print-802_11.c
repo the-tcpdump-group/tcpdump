@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.2 2001-06-13 07:25:58 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.3 2001-06-14 09:50:02 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -534,12 +534,13 @@ static int ctrl_body_print(u_int16_t fc,const u_char *p, u_int length)
 	switch (FC_SUBTYPE(fc))
 	{
 		case CTRL_PS_POLL:
-			if (!TTEST(*((struct ctrl_ps_poll_t *)p)))
+			if (!TTEST2(*p, CTRL_PS_POLL_LEN))
 				return 0;
-			printf("Power Save-Poll AID(%x)",((u_int16_t)( ((struct ctrl_ps_poll_t *)p)->aid  << 2 )) >> 2 );
+			printf("Power Save-Poll AID(%x)",
+			    EXTRACT_LE_16BITS(&(((struct ctrl_ps_poll_t *)p)->aid)));
 			break;
 		case CTRL_RTS:
-			if (!TTEST(*((struct ctrl_rts_t *)p)))
+			if (!TTEST2(*p, CTRL_RTS_LEN))
 				return 0;
 			if (eflag)
 				printf("Request-To-Send");
@@ -547,7 +548,7 @@ static int ctrl_body_print(u_int16_t fc,const u_char *p, u_int length)
 				printf("Request-To-Send TA:%s ", etheraddr_string( ((struct ctrl_rts_t *)p)->ta));
 			break;
 		case CTRL_CTS:
-			if (!TTEST(*((struct ctrl_cts_t *)p)))
+			if (!TTEST2(*p, CTRL_CTS_LEN))
 				return 0;
 			if (eflag)
 				printf("Clear-To-Send");
@@ -555,7 +556,7 @@ static int ctrl_body_print(u_int16_t fc,const u_char *p, u_int length)
 				printf("Clear-To-Send RA:%s ", etheraddr_string( ((struct ctrl_cts_t *)p)->ra));
 			break;
 		case CTRL_ACK:
-			if (!TTEST(*((struct ctrl_ack_t *)p)))
+			if (!TTEST2(*p, CTRL_ACK_LEN))
 				return 0;
 			if (eflag)
 				printf("Acknowledgment");
@@ -563,7 +564,7 @@ static int ctrl_body_print(u_int16_t fc,const u_char *p, u_int length)
 				printf("Acknowledgment RA:%s ", etheraddr_string( ((struct ctrl_ack_t *)p)->ra));
 			break;
 		case CTRL_CF_END:
-			if (!TTEST(*((struct ctrl_end_t *)p)))
+			if (!TTEST2(*p, CTRL_END_LEN))
 				return 0;
 			if (eflag)
 				printf("CF-End");
@@ -571,7 +572,7 @@ static int ctrl_body_print(u_int16_t fc,const u_char *p, u_int length)
 				printf("CF-End RA:%s ", etheraddr_string( ((struct ctrl_end_t *)p)->ra));
 			break;
 		case CTRL_END_ACK:
-			if (!TTEST(*((struct ctrl_end_ack_t *)p)))
+			if (!TTEST2(*p, CTRL_END_ACK_LEN))
 				return 0;
 			if (eflag)
 				printf("CF-End+CF-Ack");
@@ -677,28 +678,28 @@ static int GetHeaderLength(u_int16_t fc)
 	switch (FC_TYPE(fc))
 	{
 		case T_MGMT:
-			iLength=sizeof(struct mgmt_header_t);
+			iLength=MGMT_HEADER_LEN;
 			break;
 		case T_CTRL:
 			switch (FC_SUBTYPE(fc))
 			{
 				case CTRL_PS_POLL:
-					iLength=sizeof(struct ctrl_ps_poll_t);
+					iLength=CTRL_PS_POLL_LEN;
 					break;
 				case CTRL_RTS:
-					iLength=sizeof(struct ctrl_rts_t);
+					iLength=CTRL_RTS_LEN;
 					break;
 				case CTRL_CTS:
-					iLength=sizeof(struct ctrl_cts_t);
+					iLength=CTRL_CTS_LEN;
 					break;
 				case CTRL_ACK:
-					iLength=sizeof(struct ctrl_ack_t);
+					iLength=CTRL_ACK_LEN;
 					break;
 				case CTRL_CF_END:
-					iLength=sizeof(struct ctrl_end_t);
+					iLength=CTRL_END_LEN;
 					break;
 				case CTRL_END_ACK:
-					iLength=sizeof(struct ctrl_end_ack_t);
+					iLength=CTRL_END_ACK_LEN;
 					break;
 				default:
 					iLength=0;
