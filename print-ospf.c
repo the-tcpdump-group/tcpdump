@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.42 2003-10-22 15:47:44 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.43 2003-10-22 16:29:18 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -180,14 +180,14 @@ ospf_print_lshdr(register const struct lsa_hdr *lshp) {
 
 	/* all other LSA types use regular style LSA headers */
 	default:
-            printf("\n\t  %s LSA (%d), LSA-ID: %s",
+            printf("\n\t    %s LSA (%d), LSA-ID: %s",
                    tok2str(lsa_values,"unknown",lshp->ls_type),
                    lshp->ls_type,
                    ipaddr_string(&lshp->un_lsa_id.lsa_id));
             break;
         }
 
-        printf("\n\t    Options: %s", bittok2str(ospf_option_values,"none",lshp->ls_options));
+        printf("\n\t    Options: [%s]", bittok2str(ospf_option_values,"none",lshp->ls_options));
 
 return (0);
 trunc:
@@ -227,7 +227,7 @@ ospf_print_lsa(register const struct lsa *lsap)
 
 	case LS_TYPE_ROUTER:
 		TCHECK(lsap->lsa_un.un_rla.rla_flags);
-                printf("\n\t    Router LSA Options: %s", bittok2str(ospf_rla_flag_values,"unknown (%u)",lsap->lsa_un.un_rla.rla_flags));
+                printf("\n\t    Router LSA Options: [%s]", bittok2str(ospf_rla_flag_values,"none",lsap->lsa_un.un_rla.rla_flags));
 
 		TCHECK(lsap->lsa_un.un_rla.rla_count);
 		j = EXTRACT_16BITS(&lsap->lsa_un.un_rla.rla_count);
@@ -238,31 +238,31 @@ ospf_print_lsa(register const struct lsa *lsap)
 			switch (rlp->link_type) {
 
 			case RLA_TYPE_VIRTUAL:
-				printf("\n\t      Virtual Link: Neighbor-Router-ID: %s, Interface-IP: %s",
+				printf("\n\t      Virtual Link: Neighbor Router-ID: %s, Interface Address: %s",
 				    ipaddr_string(&rlp->link_id),
 				    ipaddr_string(&rlp->link_data)); 
                                 break;
 
 			case RLA_TYPE_ROUTER:
-				printf("\n\t      Neighbor-Router-ID: %s, Interface-IP: %s",
+				printf("\n\t      Neighbor Router-ID: %s, Interface Address: %s",
 				    ipaddr_string(&rlp->link_id),
 				    ipaddr_string(&rlp->link_data));
 				break;
 
 			case RLA_TYPE_TRANSIT:
-				printf("\n\t      Neighbor-Network-ID: %s, Interface-IP: %s",
+				printf("\n\t      Neighbor Network-ID: %s, Interface Address: %s",
 				    ipaddr_string(&rlp->link_id),
 				    ipaddr_string(&rlp->link_data));
 				break;
 
 			case RLA_TYPE_STUB:
-				printf("\n\t      Stub-Network: %s, mask: %s",
+				printf("\n\t      Stub Network: %s, Mask: %s",
 				    ipaddr_string(&rlp->link_id),
 				    ipaddr_string(&rlp->link_data));
 				break;
 
 			default:
-				printf("\n\t      unknown Router Links Type (%u)",
+				printf("\n\t      Unknown Router Link Type (%u)",
 				    rlp->link_type);
 				return (0);
 			}
@@ -282,19 +282,19 @@ ospf_print_lsa(register const struct lsa *lsap)
 
 	case LS_TYPE_NETWORK:
 		TCHECK(lsap->lsa_un.un_nla.nla_mask);
-		printf("\n\t    mask %s rtrs",
+		printf("\n\t    Mask %s\n\t    Connected Routers:",
 		    ipaddr_string(&lsap->lsa_un.un_nla.nla_mask));
 		ap = lsap->lsa_un.un_nla.nla_router;
 		while ((u_char *)ap < ls_end) {
 			TCHECK(*ap);
-			printf(" %s", ipaddr_string(ap));
+			printf("\n\t      %s", ipaddr_string(ap));
 			++ap;
 		}
 		break;
 
 	case LS_TYPE_SUM_IP:
 		TCHECK(lsap->lsa_un.un_nla.nla_mask);
-		printf("\n\t    mask %s",
+		printf("\n\t    Mask %s",
 		    ipaddr_string(&lsap->lsa_un.un_sla.sla_mask));
 		TCHECK(lsap->lsa_un.un_sla.sla_tosmetric);
 		lp = lsap->lsa_un.un_sla.sla_tosmetric;
@@ -337,7 +337,7 @@ ospf_print_lsa(register const struct lsa *lsap)
 
 	case LS_TYPE_ASE:
 		TCHECK(lsap->lsa_un.un_nla.nla_mask);
-		printf("\n\t    mask %s",
+		printf("\n\t    Mask %s",
 		    ipaddr_string(&lsap->lsa_un.un_asla.asla_mask));
 
 		TCHECK(lsap->lsa_un.un_sla.sla_tosmetric);
@@ -579,15 +579,15 @@ ospf_decode_v2(register const struct ospfhdr *op,
 		break;
 
 	case OSPF_TYPE_HELLO:
+                printf("\n\tOptions: [%s]",
+                       bittok2str(ospf_option_values,"none",op->ospf_hello.hello_options));
+
                 TCHECK(op->ospf_hello.hello_deadint);
-                printf("\n\t  Hello Timer: %us, Dead Timer %us, mask: %s, Priority: %u",
+                printf("\n\t  Hello Timer: %us, Dead Timer %us, Mask: %s, Priority: %u",
                        EXTRACT_16BITS(&op->ospf_hello.hello_helloint),
                        EXTRACT_32BITS(&op->ospf_hello.hello_deadint),
                        ipaddr_string(&op->ospf_hello.hello_mask),
                        op->ospf_hello.hello_priority);
-
-                printf("\n\t  Options: %s",
-                       bittok2str(ospf_option_values,"none",op->ospf_hello.hello_options));
 
 		TCHECK(op->ospf_hello.hello_dr);
 		if (op->ospf_hello.hello_dr.s_addr != 0)
@@ -611,10 +611,10 @@ ospf_decode_v2(register const struct ospfhdr *op,
 
 	case OSPF_TYPE_DD:
 		TCHECK(op->ospf_db.db_options);
-                printf("\n\t  Options: %s",
+                printf("\n\tOptions: [%s]",
                        bittok2str(ospf_option_values,"none",op->ospf_db.db_options));
 		TCHECK(op->ospf_db.db_flags);
-                printf("\n\t  DD Flags: %s",
+                printf(", DD Flags: [%s]",
                        bittok2str(ospf_dd_flag_values,"none",op->ospf_db.db_flags));
 
 		if (vflag) {
