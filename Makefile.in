@@ -17,7 +17,7 @@
 #  WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 #  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.236 2000-07-29 06:51:24 assar Exp $ (LBL)
+# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.237 2000-07-30 05:57:09 assar Exp $ (LBL)
 
 #
 # Various configurable paths (remember to edit Makefile.in, not Makefile)
@@ -27,9 +27,9 @@
 prefix = @prefix@
 exec_prefix = @exec_prefix@
 # Pathname of directory to install the binary
-BINDEST = @sbindir@
+sbindir = @sbindir@
 # Pathname of directory to install the man page
-MANDEST = @mandir@
+mandir = @mandir@
 
 # VPATH
 srcdir = @srcdir@
@@ -55,6 +55,8 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 
 INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
 
 # Explicitly define compilation rule since SunOS 4's make doesn't like gcc.
 # Also, gcc does not remove the .o before forking 'as', which can be a
@@ -141,16 +143,14 @@ version.c: $(srcdir)/VERSION
 	sed -e 's/.*/char version[] = "&";/' $(srcdir)/VERSION > $@
 
 install:
-	[ -d $(DESTDIR)$(BINDEST) ] || mkdir -p $(DESTDIR)$(BINDEST)
-	$(INSTALL) -m 550 $(PROG) \
-	    $(DESTDIR)$(BINDEST)/$(PROG)
-	[ -d $(DESTDIR)$(MANDEST)/man1 ] || mkdir -p $(DESTDIR)$(MANDEST)/man1
-	$(INSTALL) -m 444 $(srcdir)/$(PROG).1 \
-	    $(DESTDIR)$(MANDEST)/man1/$(PROG).1
+	[ -d $(DESTDIR)$(sbindir) ] || mkdir -p $(DESTDIR)$(sbindir)
+	$(INSTALL_PROGRAM) $(PROG) $(DESTDIR)$(sbindir)/$(PROG)
+	[ -d $(DESTDIR)$(mandir)/man1 ] || mkdir -p $(DESTDIR)$(mandir)/man1
+	$(INSTALL_DATA) $(srcdir)/$(PROG).1 $(DESTDIR)$(mandir)/man1/$(PROG).1
 
 uninstall:
-	rm -f $(DESTDIR)$(BINDEST)/$(PROG)
-	rm -f $(DESTDIR)$(MANDEST)/man1/$(PROG).1
+	rm -f $(DESTDIR)$(sbindir)/$(PROG)
+	rm -f $(DESTDIR)$(mandir)/man1/$(PROG).1
 
 lint: $(GENSRC)
 	lint -hbxn $(SRC) | \
