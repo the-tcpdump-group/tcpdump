@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.10 1999-10-30 07:36:38 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.11 1999-11-17 04:14:50 assar Exp $ (LBL)";
 #endif
 
 #include <sys/param.h>
@@ -45,14 +45,14 @@ static const char rcsid[] =
 #else
 struct pim {
 #if defined(WORDS_BIGENDIAN) || (defined(BYTE_ORDER) && (BYTE_ORDER == LITTLE_ENDIAN))
-	u_char	pim_type:4, /* the PIM message type, currently they are:
+	u_int	pim_type:4, /* the PIM message type, currently they are:
 			    * Hello, Register, Register-Stop, Join/Prune,
 			    * Bootstrap, Assert, Graft (PIM-DM only),
 			    * Graft-Ack (PIM-DM only), C-RP-Adv
 			    */
 		pim_ver:4;  /* PIM version number; 2 for PIMv2 */
 #else
-	u_char	pim_ver:4,	/* PIM version */
+	u_int	pim_ver:4,	/* PIM version */
 		pim_type:4;	/* PIM type    */
 #endif
 	u_char  pim_rsv;	/* Reserved */

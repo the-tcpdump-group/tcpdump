@@ -26,7 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-/* YIPS @(#)$Id: isakmp.h,v 1.2 1999-10-30 07:36:36 itojun Exp $ */
+/* YIPS @(#)$Id: isakmp.h,v 1.3 1999-11-17 04:14:50 assar Exp $ */
 
 /* refer to RFC 2408 */
 
@@ -102,10 +102,10 @@ struct isakmp {
 	cookie_t r_ck;     /* Responder Cookie */
 	u_int8_t   np;       /* Next Payload Type */
 #if defined(WORDS_BIGENDIAN) || (defined(BYTE_ORDER) && (BYTE_ORDER == BIG_ENDIAN))
-	u_int8_t   v_maj:4,  /* MnVer */
+	u_int   v_maj:4,  /* MnVer */
 	         v_min:4;  /* MjVer */
 #else
-	u_int8_t   v_min:4,  /* MnVer */
+	u_int   v_min:4,  /* MnVer */
 	         v_maj:4;  /* MjVer */
 #endif
 	u_int8_t   etype;    /* Exchange Type */

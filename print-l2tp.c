@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-l2tp.c,v 1.2 1999-10-30 23:45:51 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-l2tp.c,v 1.3 1999-11-17 04:14:50 assar Exp $";
 #endif
 
 #include <sys/types.h>
@@ -44,7 +44,7 @@ static char tstr[] = " [|l2tp]";
 #define FALSE 0
 #endif
 
-static u_char *l2tp_message_type_string[] = {
+static char *l2tp_message_type_string[] = {
 	"RESERVED_0",		/* 0  Reserved */
 	"SCCRQ",		/* 1  Start-Control-Connection-Request */
 	"SCCRP",		/* 2  Start-Control-Connection-Reply */
@@ -683,7 +683,7 @@ l2tp_print(const u_char *dat, u_int length)
 
 	if (flag_o) {
 		pad =  ntohs(*ptr++);
-		(u_char *)ptr += pad;
+		ptr += pad / sizeof(*ptr);
 		cnt += (2 + pad);
 	}
 
