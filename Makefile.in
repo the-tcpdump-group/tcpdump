@@ -17,7 +17,7 @@
 #  WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 #  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.276.2.3 2004-03-17 19:47:47 guy Exp $ (LBL)
+# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.276.2.4 2004-03-28 21:25:02 fenner Exp $ (LBL)
 
 #
 # Various configurable paths (remember to edit Makefile.in, not Makefile)
@@ -100,7 +100,7 @@ HDR =   addrtoname.h appletalk.h bootp.h decnet.h \
 	ipx.h llc.h machdep.h mib.h nfsfh.h nfsv2.h ntp.h ospf.h \
 	setsignal.h \
 	gnuc.h ipsec_doi.h isakmp.h l2tp.h nameser.h \
-	netbios.h oakley.h ospf6.h ppp.h route6d.h
+	netbios.h oakley.h ospf6.h pf.h ppp.h route6d.h
 
 TAGHDR = \
 	/usr/include/arpa/tftp.h \
