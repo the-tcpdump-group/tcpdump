@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.34 2004-12-28 09:35:18 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.35 2004-12-28 11:18:29 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -363,22 +363,24 @@ print_trans(const u_char *words, const u_char *data1, const u_char *buf, const u
     TCHECK2(*data1, 2);
     bcc = EXTRACT_LE_16BITS(data1);
     printf("smb_bcc=%u\n", bcc);
-    smb_fdata(data1 + 2, f2, maxbuf - (paramlen + datalen));
+    if (bcc > 0) {
+	smb_fdata(data1 + 2, f2, maxbuf - (paramlen + datalen));
 
-    if (strcmp((const char *)(data1 + 2), "\\MAILSLOT\\BROWSE") == 0) {
-	print_browse(param, paramlen, data, datalen);
-	return;
+	if (strcmp((const char *)(data1 + 2), "\\MAILSLOT\\BROWSE") == 0) {
+	    print_browse(param, paramlen, data, datalen);
+	    return;
+	}
+
+	if (strcmp((const char *)(data1 + 2), "\\PIPE\\LANMAN") == 0) {
+	    print_ipc(param, paramlen, data, datalen);
+	    return;
+	}
+
+	if (paramlen)
+	    smb_fdata(param, f3, SMBMIN(param + paramlen, maxbuf));
+	if (datalen)
+	    smb_fdata(data, f4, SMBMIN(data + datalen, maxbuf));
     }
-
-    if (strcmp((const char *)(data1 + 2), "\\PIPE\\LANMAN") == 0) {
-	print_ipc(param, paramlen, data, datalen);
-	return;
-    }
-
-    if (paramlen)
-	smb_fdata(param, f3, SMBMIN(param + paramlen, maxbuf));
-    if (datalen)
-	smb_fdata(data, f4, SMBMIN(data + datalen, maxbuf));
     return;
 trunc:
     printf("[|SMB]");
@@ -413,10 +415,12 @@ print_negprot(const u_char *words, const u_char *data, const u_char *buf _U_, co
     TCHECK2(*data, 2);
     bcc = EXTRACT_LE_16BITS(data);
     printf("smb_bcc=%u\n", bcc);
-    if (f2)
-	smb_fdata(data + 2, f2, SMBMIN(data + 2 + EXTRACT_LE_16BITS(data), maxbuf));
-    else
-	print_data(data + 2, SMBMIN(EXTRACT_LE_16BITS(data), PTR_DIFF(maxbuf, data + 2)));
+    if (bcc > 0) {
+	if (f2)
+	    smb_fdata(data + 2, f2, SMBMIN(data + 2 + EXTRACT_LE_16BITS(data), maxbuf));
+	else
+	    print_data(data + 2, SMBMIN(EXTRACT_LE_16BITS(data), PTR_DIFF(maxbuf, data + 2)));
+    }
     return;
 trunc:
     printf("[|SMB]");
@@ -453,10 +457,12 @@ print_sesssetup(const u_char *words, const u_char *data, const u_char *buf _U_, 
     TCHECK2(*data, 2);
     bcc = EXTRACT_LE_16BITS(data);
     printf("smb_bcc=%u\n", bcc);
-    if (f2)
-	smb_fdata(data + 2, f2, SMBMIN(data + 2 + EXTRACT_LE_16BITS(data), maxbuf));
-    else
-	print_data(data + 2, SMBMIN(EXTRACT_LE_16BITS(data), PTR_DIFF(maxbuf, data + 2)));
+    if (bcc > 0) {
+	if (f2)
+	    smb_fdata(data + 2, f2, SMBMIN(data + 2 + EXTRACT_LE_16BITS(data), maxbuf));
+	else
+	    print_data(data + 2, SMBMIN(EXTRACT_LE_16BITS(data), PTR_DIFF(maxbuf, data + 2)));
+    }
     return;
 trunc:
     printf("[|SMB]");
@@ -741,11 +747,11 @@ static void
 print_smb(const u_char *buf, const u_char *maxbuf)
 {
     int command;
-    const u_char *words, *data;
+    const u_char *words, *maxwords, *data;
     struct smbfns *fn;
     const char *fmt_smbheader =
         "[P4]SMB Command   =  [B]\nError class   =  [BP1]\nError code    =  [d]\nFlags1        =  [B]\nFlags2        =  [B][P13]\nTree ID       =  [d]\nProc ID       =  [d]\nUID           =  [d]\nMID           =  [d]\nWord Count    =  [b]\n";
-
+    int smboffset;
 
     TCHECK(buf[9]);
     request = (buf[9] & 0x80) ? 0 : 1;
@@ -768,17 +774,19 @@ print_smb(const u_char *buf, const u_char *maxbuf)
     if (buf[5])
 	printf("SMBError = %s\n", smb_errstr(buf[5], EXTRACT_LE_16BITS(&buf[7])));
 
-    words = buf + 32;
-    TCHECK(words[0]);
+    smboffset = 32;
 
     for (;;) {
 	const char *f1, *f2;
 	int wct;
 	u_int bcc;
+	int newsmboffset;
 
+	words = buf + smboffset;
 	TCHECK(words[0]);
 	wct = words[0];
 	data = words + 1 + wct * 2;
+	maxwords = SMBMIN(data, maxbuf);
 
 	if (request) {
 	    f1 = fn->descript.req_f1;
@@ -793,12 +801,12 @@ print_smb(const u_char *buf, const u_char *maxbuf)
 	else {
 	    if (wct) {
 		if (f1)
-		    smb_fdata(words + 1, f1, words + 1 + wct * 2);
+		    smb_fdata(words + 1, f1, maxwords);
 		else {
 		    int i;
 		    int v;
 
-		    for (i = 0; i < wct; i++) {
+		    for (i = 0; &words[1 + 2 * i] < maxwords; i++) {
 			TCHECK2(words[1 + 2 * i], 2);
 			v = EXTRACT_LE_16BITS(words + 1 + 2 * i);
 			printf("smb_vwv[%d]=%d (0x%X)\n", i, v, v);
@@ -825,16 +833,21 @@ print_smb(const u_char *buf, const u_char *maxbuf)
 	if (wct == 0)
 	    break;
 	TCHECK(words[1]);
-	command = EXTRACT_LE_16BITS(words + 1);
+	command = words[1];
 	if (command == 0xFF)
 	    break;
 	TCHECK2(words[3], 2);
-	words = buf + EXTRACT_LE_16BITS(words + 3);
+	newsmboffset = EXTRACT_LE_16BITS(words + 3); 
 
 	fn = smbfind(command, smb_fns);
 
 	printf("\nSMB PACKET: %s (%s) (CHAINED)\n",
 	    fn->name, request ? "REQUEST" : "REPLY");
+	if (newsmboffset < smboffset) {
+	    printf("Bad andX offset: %u < %u\n", newsmboffset, smboffset);
+	    break;
+	}
+	smboffset = newsmboffset;
     }
 
     printf("\n");
