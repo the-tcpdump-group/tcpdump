@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.76 2000-02-10 17:56:14 kenh Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.77 2000-04-21 10:32:59 assar Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -210,7 +210,8 @@ Note that taking larger snapshots both increases
 the amount of time it takes to process packets and, effectively,
 decreases the amount of packet buffering.  This may cause packets to be
 lost.  You should limit \fIsnaplen\fP to the smallest number that will
-capture the protocol information you're interested in.
+capture the protocol information you're interested in.  Setting
+\fIsnaplen\fP to 0 means use the required length to catch whole packets.
 .TP
 .B \-T
 Force packets selected by "\fIexpression\fP" to be interpreted the
