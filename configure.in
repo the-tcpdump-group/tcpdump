@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.72 1999-10-09 23:57:19 mcr Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.73 1999-10-17 21:37:10 mcr Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -32,7 +32,8 @@ linux*)
 	if test $ac_cv_linux_vers -lt 2 ; then
 		AC_MSG_ERROR(version 2 or higher required; see the INSTALL doc for more info)
 	fi
-	AC_DEFINE(HAVE_NET_SLIP_H)
+dnl	AC_DEFINE(HAVE_NET_SLIP_H)
+dnl	this is not the case on 2.2.x, we need a better way of figuring this out
 	;;
 
 *)

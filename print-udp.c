@@ -21,19 +21,19 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.60 1999-10-07 23:47:12 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.61 1999-10-17 21:37:16 mcr Exp $ (LBL)";
 #endif
 
 #include <sys/param.h>
 #include <sys/time.h>
 #include <sys/socket.h>
 
+#define __FAVOR_BSD
+
 #include <netinet/in.h>
 #include <netinet/in_systm.h>
 #include <netinet/ip.h>
-#include <netinet/ip_var.h>
 #include <netinet/udp.h>
-#include <netinet/udp_var.h>
 
 #ifdef NOERROR
 #undef NOERROR					/* Solaris sucks */
@@ -373,6 +373,15 @@ udp_print(register const u_char *bp, u_int length, register const u_char *bp2)
 				udpport_string(dport));
 			while (cp < ep)
 				cp = rtcp_print(cp, ep);
+			break;
+
+		case PT_SNMP:
+			(void)printf("%s.%s > %s.%s:",
+                                ipaddr_string(&ip->ip_src),
+                                udpport_string(sport),
+                                ipaddr_string(&ip->ip_dst),
+                                udpport_string(dport));
+			snmp_print((const u_char *)(up + 1), length);
 			break;
 		}
 		return;

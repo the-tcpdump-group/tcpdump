@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sl.c,v 1.42 1999-10-07 23:47:12 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sl.c,v 1.43 1999-10-17 21:37:15 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_NET_SLIP_H
@@ -42,11 +42,8 @@ struct rtentry;
 #include <netinet/in_systm.h>
 #include <netinet/ip.h>
 #include <netinet/if_ether.h>
-#include <netinet/ip_var.h>
 #include <netinet/udp.h>
-#include <netinet/udp_var.h>
 #include <netinet/tcp.h>
-#include <netinet/tcpip.h>
 
 #include <net/slcompress.h>
 #include <net/slip.h>

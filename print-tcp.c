@@ -21,18 +21,18 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.55 1999-10-07 23:47:12 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.56 1999-10-17 21:37:16 mcr Exp $ (LBL)";
 #endif
 
 #include <sys/param.h>
 #include <sys/time.h>
 
+#define __FAVOR_BSD
+
 #include <netinet/in.h>
 #include <netinet/in_systm.h>
 #include <netinet/ip.h>
-#include <netinet/ip_var.h>
 #include <netinet/tcp.h>
-#include <netinet/tcpip.h>
 
 #ifdef HAVE_MEMORY_H
 #include <memory.h>
