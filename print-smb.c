@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.29 2003-11-16 09:36:37 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.30 2004-05-31 01:19:10 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -1140,6 +1140,61 @@ out:
 /*
    print netbeui frames
 */
+struct nbf_strings {
+	const char	*name;
+	const char	*nonverbose;
+	const char	*verbose;
+} nbf_strings[0x20] = {
+	{ "Add Group Name Query", ", [P23]Name to add=[n2]#",
+	  "[P5]ResponseCorrelator=[w]\n[P16]Name to add=[n2]\n" },
+	{ "Add Name Query", ", [P23]Name to add=[n2]#",
+	  "[P5]ResponseCorrelator=[w]\n[P16]Name to add=[n2]\n" },
+	{ "Name In Conflict", NULL, NULL },
+	{ "Status Query", NULL, NULL },
+	{ NULL, NULL, NULL },	/* not used */
+	{ NULL, NULL, NULL },	/* not used */
+	{ NULL, NULL, NULL },	/* not used */
+	{ "Terminate Trace", NULL, NULL },
+	{ "Datagram", NULL,
+	  "[P7]Destination=[n2]\nSource=[n2]\n" },
+	{ "Broadcast Datagram", NULL,
+	  "[P7]Destination=[n2]\nSource=[n2]\n" },
+	{ "Name Query", ", [P7]Name=[n2]#",
+	  "[P1]SessionNumber=[B]\nNameType=[B][P2]\nResponseCorrelator=[w]\nName=[n2]\nName of sender=[n2]\n" },
+	{ NULL, NULL, NULL },	/* not used */
+	{ NULL, NULL, NULL },	/* not used */
+	{ "Add Name Response", ", [P1]GroupName=[w] [P4]Destination=[n2] Source=[n2]#",
+	  "AddNameInProcess=[B]\nGroupName=[w]\nTransmitCorrelator=[w][P2]\nDestination=[n2]\nSource=[n2]\n" },
+	{ "Name Recognized", NULL,
+	  "[P1]Data2=[w]\nTransmitCorrelator=[w]\nResponseCorelator=[w]\nDestination=[n2]\nSource=[n2]\n" },
+	{ "Status Response", NULL, NULL },
+	{ NULL, NULL, NULL },	/* not used */
+	{ NULL, NULL, NULL },	/* not used */
+	{ NULL, NULL, NULL },	/* not used */
+	{ "Terminate Trace", NULL, NULL },
+	{ "Data Ack", NULL,
+	  "[P3]TransmitCorrelator=[w][P2]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n" },
+	{ "Data First/Middle", NULL,
+	  "Flags=[{RECEIVE_CONTINUE|NO_ACK||PIGGYBACK_ACK_INCLUDED|}]\nResyncIndicator=[w][P2]\nResponseCorelator=[w]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n" },
+	{ "Data Only/Last", NULL,
+	  "Flags=[{|NO_ACK|PIGGYBACK_ACK_ALLOWED|PIGGYBACK_ACK_INCLUDED|}]\nResyncIndicator=[w][P2]\nResponseCorelator=[w]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n" },
+	{ "Session Confirm", NULL,
+	  "Data1=[B]\nData2=[w]\nTransmitCorrelator=[w]\nResponseCorelator=[w]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n" },
+	{ "Session End", NULL,
+	  "[P1]Data2=[w][P4]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n" },
+	{ "Session Initialize", NULL,
+	  "Data1=[B]\nData2=[w]\nTransmitCorrelator=[w]\nResponseCorelator=[w]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n" },
+	{ "No Receive", NULL,
+	  "Flags=[{|SEND_NO_ACK}]\nDataBytesAccepted=[b][P4]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n" },
+	{ "Receive Outstanding", NULL,
+	  "[P1]DataBytesAccepted=[b][P4]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n" },
+	{ "Receive Continue", NULL,
+	  "[P2]TransmitCorrelator=[w]\n[P2]RemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n" },
+	{ NULL, NULL, NULL },	/* not used */
+	{ NULL, NULL, NULL },	/* not used */
+	{ "Session Alive", NULL, NULL }
+};
+
 void
 netbeui_print(u_short control, const u_char *data, int length)
 {
@@ -1163,69 +1218,37 @@ netbeui_print(u_short control, const u_char *data, int length)
     startbuf = data;
 
     if (vflag < 2) {
-	printf("NetBeui Packet");
-	return;
+	printf("NBF Packet: ");
+	data = smb_fdata(data, "[P5]#", maxbuf);
+    } else {
+	printf("\n>>> NBF Packet\nType=0x%X ", control);
+	data = smb_fdata(data, "Length=[d] Signature=[w] Command=[B]\n#", maxbuf);
     }
-
-    printf("\n>>> NetBeui Packet\nType=0x%X ", control);
-    data = smb_fdata(data, "Length=[d] Signature=[w] Command=[B]\n#", maxbuf);
     if (data == NULL)
 	goto out;
 
-    switch (command) {
-    case 0xA:
-	data = smb_fdata(data, "NameQuery:[P1]\nSessionNumber=[B]\nNameType=[B][P2]\nResponseCorrelator=[w]\nDestination=[n2]\nSource=[n2]\n", data2);
-	break;
-
-    case 0x8:
-	data = smb_fdata(data,
-	    "NetbiosDataGram:[P7]\nDestination=[n2]\nSource=[n2]\n", data2);
-	break;
-
-    case 0xE:
-	data = smb_fdata(data,
-	    "NameRecognise:\n[P1]\nData2=[w]\nTransmitCorrelator=[w]\nResponseCorelator=[w]\nDestination=[n2]\nSource=[n2]\n",
-	    data2);
-	break;
-
-    case 0x19:
-	data = smb_fdata(data,
-	    "SessionInitialise:\nData1=[B]\nData2=[w]\nTransmitCorrelator=[w]\nResponseCorelator=[w]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n",
-	    data2);
-	break;
-
-    case 0x17:
-	data = smb_fdata(data,
-	    "SessionConfirm:\nData1=[B]\nData2=[w]\nTransmitCorrelator=[w]\nResponseCorelator=[w]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n",
-	    data2);
-	break;
-
-    case 0x16:
-	data = smb_fdata(data,
-	    "NetbiosDataOnlyLast:\nFlags=[{|NO_ACK|PIGGYBACK_ACK_ALLOWED|PIGGYBACK_ACK_INCLUDED|}]\nResyncIndicator=[w][P2]\nResponseCorelator=[w]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n",
-	    data2);
-	break;
-
-    case 0x14:
-	data = smb_fdata(data,
-	    "NetbiosDataAck:\n[P3]TransmitCorrelator=[w][P2]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n",
-	    data2);
-	break;
-
-    case 0x18:
-	data = smb_fdata(data,
-	    "SessionEnd:\n[P1]Data2=[w][P4]\nRemoteSessionNumber=[B]\nLocalSessionNumber=[B]\n",
-	    data2);
-	break;
-
-    case 0x1f:
-	data = smb_fdata(data, "SessionAlive\n", data2);
-	break;
-
-    default:
-	data = smb_fdata(data, "Unknown Netbios Command ", data2);
-	break;
+    if (command > 0x1f || nbf_strings[command].name == NULL) {
+	if (vflag < 2)
+	    data = smb_fdata(data, "Unknown NBF Command#", data2);
+	else
+	    data = smb_fdata(data, "Unknown NBF Command\n", data2);
+    } else {
+	if (vflag < 2) {
+	    printf("%s", nbf_strings[command].name);
+	    if (nbf_strings[command].nonverbose != NULL)
+		data = smb_fdata(data, nbf_strings[command].nonverbose, data2);
+	} else {
+	    printf("%s:\n", nbf_strings[command].name);
+	    if (nbf_strings[command].verbose != NULL)
+		data = smb_fdata(data, nbf_strings[command].verbose, data2);
+	    else
+		printf("\n");
+	}
     }
+
+    if (vflag < 2)
+	return;
+
     if (data == NULL)
 	goto out;
 
@@ -1233,6 +1256,11 @@ netbeui_print(u_short control, const u_char *data, int length)
 	/* data2 was past the end of the buffer */
 	goto out;
     }
+
+    /* If this isn't a command that would contain an SMB message, quit. */
+    if (command != 0x08 && command != 0x09 && command != 0x15 &&
+        command != 0x16)
+	goto out;
 
     /* If there isn't enough data for "\377SMB", don't look for it. */
     if (&data2[3] >= maxbuf)
