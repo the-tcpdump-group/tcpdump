@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/tcp.h,v 1.3 2000-09-29 05:05:48 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/tcp.h,v 1.4 2000-10-03 02:26:53 itojun Exp $ (LBL) */
 /*
  * Copyright (c) 1982, 1986, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -67,14 +67,8 @@ struct tcphdr {
 	u_short	th_dport;		/* destination port */
 	tcp_seq	th_seq;			/* sequence number */
 	tcp_seq	th_ack;			/* acknowledgement number */
-#if BYTE_ORDER == LITTLE_ENDIAN 
-	u_int	th_x2:4,		/* (unused) */
-		th_off:4;		/* data offset */
-#endif
-#if BYTE_ORDER == BIG_ENDIAN 
-	u_int	th_off:4,		/* data offset */
-		th_x2:4;		/* (unused) */
-#endif
+	u_char	th_x2off;
+#define TH_OFF(th)	((th)->th_x2off & 0x0f)	/* data offset, th_off */
 	u_char	th_flags;
 #define	TH_FIN	0x01
 #define	TH_SYN	0x02

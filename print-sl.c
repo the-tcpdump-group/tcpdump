@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sl.c,v 1.52 2000-09-29 04:58:50 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sl.c,v 1.53 2000-10-03 02:26:53 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -193,7 +193,7 @@ sliplink_print(register const u_char *p, register const struct ip *ip,
 		 */
 		lastconn = ((struct ip *)&p[SLX_CHDR])->ip_p;
 		hlen = ip->ip_hl;
-		hlen += ((struct tcphdr *)&((int *)ip)[hlen])->th_off;
+		hlen += TH_OFF((struct tcphdr *)&((int *)ip)[hlen]);
 		lastlen[dir][lastconn] = length - (hlen << 2);
 		printf("utcp %d: ", lastconn);
 		break;
@@ -283,7 +283,7 @@ compressed_sl_print(const u_char *chdr, const struct ip *ip,
 	 * 'length - hlen' is the amount of data in the packet.
 	 */
 	hlen = ip->ip_hl;
-	hlen += ((struct tcphdr *)&((int32_t *)ip)[hlen])->th_off;
+	hlen += TH_OFF((struct tcphdr *)&((int32_t *)ip)[hlen]);
 	lastlen[dir][lastconn] = length - (hlen << 2);
 	printf(" %d (%d)", lastlen[dir][lastconn], cp - chdr);
 }

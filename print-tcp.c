@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.76 2000-09-30 03:35:56 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.77 2000-10-03 02:26:53 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -264,7 +264,7 @@ tcp_print(register const u_char *bp, register u_int length,
 	dport = ntohs(tp->th_dport);
 
 
-	hlen = tp->th_off * 4;
+	hlen = TH_OFF(tp) * 4;
 
 	/*
 	 * If data present and NFS port used, assume NFS.
@@ -320,7 +320,7 @@ tcp_print(register const u_char *bp, register u_int length,
 	urp = ntohs(tp->th_urp);
 
 	if (qflag) {
-		(void)printf("tcp %d", length - tp->th_off * 4);
+		(void)printf("tcp %d", length - TH_OFF(tp) * 4);
 		return;
 	}
 	if ((flags = tp->th_flags) & (TH_SYN|TH_FIN|TH_RST|TH_PUSH|
@@ -640,7 +640,7 @@ tcp_print(register const u_char *bp, register u_int length,
 	/*
 	 * Decode payload if necessary.
 	 */
-	bp += (tp->th_off * 4);
+	bp += TH_OFF(tp) * 4;
 	if (flags & TH_RST) {
 		if (vflag)
 			print_tcp_rst_data(bp, length);
