@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.35 2001-01-15 03:59:13 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.36 2001-01-28 09:46:43 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -123,7 +123,7 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 		return (1);
 	}
 
-	if (llc.ssap == 0xf0 && llc.dsap == 0xf0
+	if (llc.ssap == LLCSAP_NETBEUI && llc.dsap == LLCSAP_NETBEUI
 	    && (!(llc.llcu & LLC_S_FMT) || llc.llcu == LLC_U_FMT)) {
 		/*
 		 * we don't actually have a full netbeui parser yet, but the
