@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.129 2002-08-11 18:40:12 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.130 2002-09-06 21:42:30 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -281,10 +281,18 @@ you make it visible to others, via
 and other occasions.
 .TP
 .B \-f
-Print `foreign' internet addresses numerically rather than symbolically
+Print `foreign' IPv4 addresses numerically rather than symbolically
 (this option is intended to get around serious brain damage in
-Sun's yp server \(em usually it hangs forever translating non-local
+Sun's NIS server \(em usually it hangs forever translating non-local
 internet numbers).
+.IP
+The test for `foreign' IPv4 addresses is done using the IPv4 address and
+netmask of the interface on which capture is being done.  If that
+address or netmask are not available, available, either because the
+interface on which capture is being done has no address or netmask or
+because the capture is being done on the Linux "any" interface, which
+can capture on more than one interface, this option will not work
+correctly.
 .TP
 .B \-F
 Use \fIfile\fP as input for the filter expression.
@@ -710,10 +718,16 @@ True if the packet is an ethernet broadcast packet.
 The \fIether\fP
 keyword is optional.
 .IP "\fBip broadcast\fR"
-True if the packet is an IP broadcast packet.
-It checks for both
-the all-zeroes and all-ones broadcast conventions, and looks up
-the local subnet mask.
+True if the packet is an IPv4 broadcast packet.
+It checks for both the all-zeroes and all-ones broadcast conventions,
+and looks up the subnet mask on the interface on which the capture is
+being done.
+.IP
+If the subnet mask of the interface on which the capture is being done
+is not available, either because the interface on which capture is being
+done has no netmask or because the capture is being done on the Linux
+"any" interface, which can capture on more than one interface, this
+check will not work correctly.
 .IP "\fBether multicast\fR"
 True if the packet is an ethernet multicast packet.
 The \fIether\fP
