@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.126 2005-01-27 10:13:52 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.127 2005-03-07 14:36:16 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -61,10 +61,12 @@ static const char rcsid[] _U_ =
 
 #define ISIS_VERSION	1
 #define ESIS_VERSION	1
+#define CLNP_VERSION	1
 
 #define ISIS_PDU_TYPE_MASK      0x1F
 #define ESIS_PDU_TYPE_MASK      0x1F
 #define CLNP_PDU_TYPE_MASK      0x1F
+#define CLNP_FLAG_MASK          0xE0
 #define ISIS_LAN_PRIORITY_MASK  0x7F
 
 #define ISIS_PDU_L1_LAN_IIH	15
@@ -198,6 +200,17 @@ static struct tok esis_option_values[] = {
     { 0, NULL }
 };
 
+#define CLNP_OPTION_DISCARD_REASON   193
+#define CLNP_OPTION_QOS_MAINTENANCE  195 /* iso8473 */
+#define CLNP_OPTION_PRIORITY         205 /* iso8473 */
+
+static struct tok clnp_option_values[] = {
+    { CLNP_OPTION_DISCARD_REASON,  "Discard Reason"},
+    { CLNP_OPTION_PRIORITY,        "Priority"},
+    { CLNP_OPTION_QOS_MAINTENANCE, "QoS Maintenance"},
+    { 0, NULL }
+};
+
 #define ISIS_SUBTLV_EXT_IS_REACH_ADMIN_GROUP           3 /* draft-ietf-isis-traffic-05 */
 #define ISIS_SUBTLV_EXT_IS_REACH_LINK_LOCAL_REMOTE_ID  4 /* draft-ietf-isis-gmpls-extensions */
 #define ISIS_SUBTLV_EXT_IS_REACH_LINK_REMOTE_ID        5 /* draft-ietf-isis-traffic-05 */
@@ -264,6 +277,17 @@ static struct tok isis_subtlv_idrp_values[] = {
     { ISIS_SUBTLV_IDRP_RES,         "Reserved"},
     { ISIS_SUBTLV_IDRP_LOCAL,       "Routing-Domain Specific"},
     { ISIS_SUBTLV_IDRP_ASN,         "AS Number Tag"},
+    { 0, NULL}
+};
+
+#define CLNP_SEGMENT_PART  0x80
+#define CLNP_MORE_SEGMENTS 0x40
+#define CLNP_REQUEST_ER    0x20
+
+static struct tok clnp_flag_values[] = {
+    { CLNP_SEGMENT_PART, "Segmentation permitted"},
+    { CLNP_MORE_SEGMENTS, "more Segments"},
+    { CLNP_REQUEST_ER, "request Error Report"},
     { 0, NULL}
 };
 
@@ -571,6 +595,12 @@ struct clnp_header_t {
     u_int8_t cksum[2];
 };
 
+struct clnp_segment_header_t {
+    u_int8_t data_unit_id[2];
+    u_int8_t segment_offset[2];
+    u_int8_t total_length[2];
+};
+
 /*
  * clnp_print
  * Decode CLNP packets.  Return 0 on error.
@@ -579,10 +609,13 @@ struct clnp_header_t {
 static int clnp_print (const u_int8_t *pptr, u_int length)
 {
 	const u_int8_t *optr,*source_address,*dest_address;
-        u_int li,source_address_length,dest_address_length, clnp_pdu_type;
+        u_int li,source_address_length,dest_address_length, clnp_pdu_type, clnp_flags;
 	const struct clnp_header_t *clnp_header;
+	const struct clnp_segment_header_t *clnp_segment_header;
 
 	clnp_header = (const struct clnp_header_t *) pptr;
+        TCHECK(*clnp_header);
+
         li = clnp_header->length_indicator;
         optr = pptr;
 
@@ -593,31 +626,41 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
          * Sanity checking of the header.
          */
 
-        /* FIXME */
+        if (clnp_header->version != CLNP_VERSION) {
+            printf("version %d packet not supported", clnp_header->version);
+            return (0);
+        }
+
+        /* FIXME further header sanity checking */
 
         clnp_pdu_type = clnp_header->type & CLNP_PDU_TYPE_MASK;
+        clnp_flags = clnp_header->type & CLNP_FLAG_MASK;
 
         pptr += sizeof(struct clnp_header_t);
+        li -= sizeof(struct clnp_header_t);
         dest_address_length = *pptr;
         dest_address = pptr + 1;
 
         pptr += (1 + dest_address_length);
+        li -= (1 + dest_address_length);
         source_address_length = *pptr;
         source_address = pptr +1;
 
         pptr += (1 + source_address_length);
+        li -= (1 + source_address_length);
 
         if (vflag < 1) {
-            printf("%s%s > %s, length %u",
+            printf("%s%s",
                    eflag ? "" : ", ",
-                   print_nsap(source_address, source_address_length),
+                   print_nsap(source_address, source_address_length));
+            printf("> %s, length %u",
                    print_nsap(dest_address, dest_address_length),
                    length);
             return (1);
         }
         printf("%slength %u",eflag ? "" : ", ",length);
 
-    printf("\n\t%s PDU, hlen: %u, v: %u, lifetime: %u.%us, PDU length: %u, checksum: 0x%04x ",
+    printf("\n\t%s PDU, hlen: %u, v: %u, lifetime: %u.%us, Segment PDU length: %u, checksum: 0x%04x ",
            tok2str(clnp_pdu_values,
                    "unknown (%u)",
                    clnp_pdu_type),
@@ -633,15 +676,76 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
                 printf("(unverified)");
             else printf("(%s)", osi_cksum(optr, li) ? "incorrect" : "correct");
 
-        printf("\n\tsource address (length %u): %s\n\tdest   address (length %u): %s",
+        printf("\n\tFlags [%s]",
+               bittok2str(clnp_flag_values,"none",clnp_flags));
+
+        printf("\n\tsource address (length %u): %s",
                source_address_length,
-               print_nsap(source_address, source_address_length),
+               print_nsap(source_address, source_address_length));
+        printf("\n\tdest   address (length %u): %s",
                dest_address_length,
                print_nsap(dest_address, dest_address_length));
 
-        /* dump the remaining header data */
-        printf("\n\tundecoded header data");
-        print_unknown_data(pptr,"\n\t",clnp_header->length_indicator-(pptr-optr));
+        if (clnp_flags & CLNP_SEGMENT_PART) {
+            	clnp_segment_header = (const struct clnp_segment_header_t *) pptr;
+                printf("\n\tData Unit ID: 0x%04x, Segment Offset: %u, Total PDU Length: %u",
+                       EXTRACT_16BITS(clnp_segment_header->data_unit_id),
+                       EXTRACT_16BITS(clnp_segment_header->segment_offset),
+                       EXTRACT_16BITS(clnp_segment_header->total_length));
+                pptr+=sizeof(const struct clnp_segment_header_t);
+                li-=sizeof(const struct clnp_segment_header_t);
+        }
+
+        /* now walk the options */
+        while (li >= 2) {
+            u_int op, opli;
+            const u_int8_t *tptr;
+            
+            if (snapend - pptr < 2)
+                return (0);
+            if (li < 2) {
+                printf(", bad opts/li");
+                return (0);
+            }
+            op = *pptr++;
+            opli = *pptr++;
+            li -= 2;
+            if (opli > li) {
+                printf(", opt (%d) too long", op);
+                return (0);
+            }
+            li -= opli;
+            tptr = pptr;
+            
+            if (snapend < pptr)
+                return(0);
+            
+            printf("\n\t  %s Option #%u, length %u, value: ",
+                   tok2str(clnp_option_values,"Unknown",op),
+                   op,
+                   opli);
+
+            switch (op) {
+
+            case CLNP_OPTION_PRIORITY:
+                printf("%u", *tptr);
+                break;
+
+                /*
+                 * FIXME those are the defined Options that lack a decoder
+                 * you are welcome to contribute code ;-)
+                 */
+
+            case CLNP_OPTION_DISCARD_REASON:
+
+            default:
+                print_unknown_data(tptr,"\n\t  ",opli);
+                break;
+            }
+            if (vflag > 1)
+                print_unknown_data(pptr,"\n\t  ",opli);
+            pptr += opli;
+        }
 
         switch (clnp_pdu_type) {
 
@@ -659,6 +763,11 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
         }
 
         return (1);
+
+ trunc:
+    fputs("[|clnp]", stdout);
+    return (1);
+
 }
 
 
