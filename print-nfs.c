@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.90 2002-02-18 08:56:45 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.91 2002-04-24 06:27:06 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -756,9 +756,10 @@ nfs_printfh(register const u_int32_t *dp, const u_int len)
 {
 	my_fsid fsid;
 	ino_t ino;
-	char *sfsname = NULL;
+	const char *sfsname = NULL;
+	char *spacep;
 
-	Parse_fh((caddr_t*)dp, len, &fsid, &ino, NULL, (const char **)&sfsname, 0);
+	Parse_fh((const u_char *)dp, len, &fsid, &ino, NULL, &sfsname, 0);
 
 	if (sfsname) {
 		/* file system ID is ASCII, not numeric, for this server OS */
@@ -768,9 +769,9 @@ nfs_printfh(register const u_int32_t *dp, const u_int len)
 		strncpy(temp, sfsname, NFSX_V3FHMAX);
 		temp[sizeof(temp) - 1] = '\0';
 		/* Remove trailing spaces */
-		sfsname = strchr(temp, ' ');
-		if (sfsname)
-			*sfsname = 0;
+		spacep = strchr(temp, ' ');
+		if (spacep)
+			*spacep = '\0';
 
 		(void)printf(" fh %s/", temp);
 	} else {
