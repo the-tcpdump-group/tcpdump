@@ -1,3 +1,7 @@
+Sun Oct 30 JST 1999  itojun@iijlab.net
+	* bring in KAME IPv6/IPsec decoding code.
+	* bring in more portability fixes from Assar Westerlund <assar@sics.se>.
+
 1999-10-09  Michael C. Richardson  <mcr@sandelman.ottawa.on.ca>
 
 	* Added patches from Assar Westerlund <assar@sics.se> to permit
@@ -520,4 +524,4 @@ v2.0 Sun Jan 13 12:20:40 PST 1991
 
 - Initial public release.
 
-@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.55 1999-10-09 23:57:18 mcr Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.56 1999-10-30 23:49:31 itojun Exp $ (LBL)
