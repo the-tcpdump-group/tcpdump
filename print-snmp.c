@@ -45,7 +45,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.48 2001-04-23 19:29:21 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.49 2001-06-15 21:06:59 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1036,7 +1036,7 @@ static void smi_print_value(SmiNode *smiNode, u_char pduid, struct be *elem)
 	}
 
 	if (! smi_check_range(smiType, elem)) {
-	    fputs("[wrongLength]", stdout);
+	    fputs("[outOfRange]", stdout);
 	}
 
 	/* resolve bits to named bits */
