@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.108 2002-07-20 23:37:40 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.109 2002-07-21 20:48:26 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -245,6 +245,58 @@ in_cksum(const u_short *addr, register u_int len, int csum)
 	sum += (sum >> 16);			/* add carry */
 	answer = ~sum;				/* truncate to 16 bits */
 	return (answer);
+}
+
+/*
+ * Given the host-byte-order value of the checksum field in a packet
+ * header, and the network-byte-order computed checksum of the data
+ * that the checksum covers (including the checksum itself), compute
+ * what the checksum field *should* have been.
+ */
+u_int16_t
+in_cksum_shouldbe(u_int16_t sum, u_int16_t computed_sum)
+{
+	u_int32_t shouldbe;
+
+	/*
+	 * The value that should have gone into the checksum field
+	 * is the negative of the value gotten by summing up everything
+	 * *but* the checksum field.
+	 *
+	 * We can compute that by subtracting the value of the checksum
+	 * field from the sum of all the data in the packet, and then
+	 * computing the negative of that value.
+	 *
+	 * "sum" is the value of the checksum field, and "computed_sum"
+	 * is the negative of the sum of all the data in the packets,
+	 * so that's -(-computed_sum - sum), or (sum + computed_sum).
+	 *
+	 * All the arithmetic in question is one's complement, so the
+	 * addition must include an end-around carry; we do this by
+	 * doing the arithmetic in 32 bits (with no sign-extension),
+	 * and then adding the upper 16 bits of the sum, which contain
+	 * the carry, to the lower 16 bits of the sum, and then do it
+	 * again in case *that* sum produced a carry.
+	 *
+	 * As RFC 1071 notes, the checksum can be computed without
+	 * byte-swapping the 16-bit words; summing 16-bit words
+	 * on a big-endian machine gives a big-endian checksum, which
+	 * can be directly stuffed into the big-endian checksum fields
+	 * in protocol headers, and summing words on a little-endian
+	 * machine gives a little-endian checksum, which must be
+	 * byte-swapped before being stuffed into a big-endian checksum
+	 * field.
+	 *
+	 * "computed_sum" is a network-byte-order value, so we must put
+	 * it in host byte order before subtracting it from the
+	 * host-byte-order value from the header; the adjusted checksum
+	 * will be in host byte order, which is what we'll return.
+	 */
+	shouldbe = sum;
+	shouldbe += ntohs(computed_sum);
+	shouldbe = (shouldbe & 0xFFFF) + (shouldbe >> 16);
+	shouldbe = (shouldbe & 0xFFFF) + (shouldbe >> 16);
+	return shouldbe;
 }
 
 /*
@@ -536,15 +588,16 @@ again:
 		(void)printf(" (DF)");
 
 	if (vflag) {
-		int sum;
+		u_int16_t sum, ip_sum;
 		char *sep = "";
 
 		if ((u_char *)ip + hlen <= snapend) {
 			sum = in_cksum((const u_short *)ip, hlen, 0);
 			if (sum != 0) {
+				ip_sum = ntohs(ip->ip_sum);
 				(void)printf("%sbad cksum %x (->%x)!", sep,
-					     ntohs(ip->ip_sum),
-					     ntohs(ip->ip_sum)-sum);
+					     ip_sum,
+					     in_cksum_shouldbe(ip_sum, sum));
 				sep = ", ";
 			}
 		}

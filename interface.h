@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.191 2002-07-18 00:04:13 hannes Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.192 2002-07-21 20:48:26 guy Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -324,6 +324,7 @@ extern void ospf6_print(const u_char *, u_int);
 extern void dhcp6_print(const u_char *, u_int, u_int16_t, u_int16_t);
 #endif /*INET6*/
 extern u_short in_cksum(const u_short *, register u_int, int);
+extern u_int16_t in_cksum_shouldbe(u_int16_t, u_int16_t);
 
 #ifndef HAVE_BPF_DUMP
 struct bpf_program;
