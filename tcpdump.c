@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.197 2003-01-07 09:51:20 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.198 2003-01-07 09:56:00 hannes Exp $ (LBL)";
 #endif
 
 /*
@@ -729,6 +729,8 @@ main(int argc, char **argv)
 	if (RFileName == NULL) {
             if (vflag == 0)
                 (void)fprintf(stderr, "%s: verbose output suppressed, use -v or -vv for full protocol decode\n",program_name);
+            else
+                (void)fprintf(stderr, "%s: ",program_name);
             (void)fprintf(stderr, "listening on %s, capture size %u bytes\n", device, snaplen);
             (void)fflush(stderr);
 	}
