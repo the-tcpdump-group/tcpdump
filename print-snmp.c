@@ -58,7 +58,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.51 2002-05-07 07:39:05 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.52 2002-05-07 18:27:40 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1462,7 +1462,7 @@ pdu_print(const u_char *np, u_int length, int version)
 	}
 
 	if (vflag) {
-		fputs("} ", stdout);
+		fputs(" } ", stdout);
 	}
 }
 
