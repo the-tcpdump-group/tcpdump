@@ -38,7 +38,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-gre.c,v 1.20 2002-10-30 05:29:16 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-gre.c,v 1.21 2002-10-31 07:17:02 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -67,7 +67,7 @@ static const char rcsid[] =
 
 #define	GREPROTO_IP	0x0800		/* IP */
 #define	GREPROTO_PPP	0x880b		/* PPTP */
-#define	GREPROTO_ISO	0xfefe		/* OSI */
+#define	GREPROTO_ISO	0x00fe		/* OSI */
 
 /* source route entry types */
 #define	GRESRE_IP	0x0800		/* IP */
