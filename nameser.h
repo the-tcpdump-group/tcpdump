@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/nameser.h,v 1.8 2001-06-26 06:19:03 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/nameser.h,v 1.9 2001-06-27 05:40:16 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1983, 1989, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -97,8 +97,11 @@
 
 /*
  * Undefine various #defines from various System V-flavored OSes (Solaris,
- * SINIX) so the compiler doesn't whine that we redefine them.
+ * SINIX, HP-UX) so the compiler doesn't whine that we redefine them.
  */
+#ifdef T_NULL
+#undef T_NULL
+#endif
 #ifdef T_OPT
 #undef T_OPT
 #endif
