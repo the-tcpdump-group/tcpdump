@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-frag6.c,v 1.4 2000-01-09 21:34:17 fenner Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-frag6.c,v 1.5 2000-02-03 18:16:40 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -86,7 +86,7 @@ frag6_print(register const u_char *bp, register const u_char *bp2)
 			       (long)(bp - bp2) - sizeof(struct ip6_frag));
 	}
 
-#if 0
+#if 1
 	/* it is meaningless to decode non-first fragment */
 	if (ntohs(dp->ip6f_offlg & IP6F_OFF_MASK) != 0)
 		return 65535;
