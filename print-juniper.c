@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.5 2005-01-25 09:59:40 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.6 2005-01-27 10:17:58 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -30,11 +30,17 @@ static const char rcsid[] _U_ =
 #include "interface.h"
 #include "extract.h"
 #include "ppp.h"
+#include "llc.h"
+#include "nlpid.h"
 
 #define JUNIPER_BPF_OUT           0       /* Outgoing packet */
 #define JUNIPER_BPF_IN            1       /* Incoming packet */
 #define JUNIPER_BPF_PKT_IN        0x1     /* Incoming packet */
 #define JUNIPER_BPF_NO_L2         0x2     /* L2 header stripped */
+
+#define LS_COOKIE_ID            0x54
+#define LS_MLFR_LEN		4
+#define ML_MLFR_LEN		2
 
 #define ATM2_PKT_TYPE_MASK  0x70
 #define ATM2_GAP_COUNT_MASK 0x3F
@@ -42,6 +48,58 @@ static const char rcsid[] _U_ =
 int ip_heuristic_guess(register const u_char *, u_int);
 int juniper_ppp_heuristic_guess(register const u_char *, u_int);
 static int juniper_parse_header (const u_char *, u_int8_t *, u_int);
+
+u_int
+juniper_mlfr_print(const struct pcap_pkthdr *h, register const u_char *p)
+{
+	register u_int length = h->len;
+	register u_int caplen = h->caplen;
+        u_int8_t direction,bundle,cookie_len;
+        u_int32_t cookie,proto,frelay_len = 0;
+        
+        if(juniper_parse_header(p, &direction,length) == 0)
+            return 0;
+
+        p+=4;
+        length-=4;
+        caplen-=4;
+
+        if (p[0] == LS_COOKIE_ID) {
+            cookie=EXTRACT_32BITS(p);
+            if (eflag) printf("LSPIC-MLFR cookie 0x%08x, ",cookie);
+            cookie_len = LS_MLFR_LEN;
+            bundle = cookie & 0xff;
+        } else {
+            cookie=EXTRACT_16BITS(p);
+            if (eflag) printf("MLPIC-MLFR cookie 0x%04x, ",cookie);
+            cookie_len = ML_MLFR_LEN;
+            bundle = (cookie >> 8) & 0xff;
+        }
+
+        proto = EXTRACT_16BITS(p+cookie_len);        
+        p += cookie_len+2;
+        length-= cookie_len+2;
+        caplen-= cookie_len+2;
+
+        /* suppress Bundle-ID if frame was captured on a child-link */
+        if (eflag && cookie != 1) printf("Bundle-ID %u, ",bundle);
+
+        switch (proto) {
+        case (LLC_UI):
+        case (LLC_UI<<8):
+            isoclns_print(p, length, caplen);
+            break;
+        case (LLC_UI<<8 | NLPID_Q933):
+        case (LLC_UI<<8 | NLPID_IP):
+        case (LLC_UI<<8 | NLPID_IP6):
+            isoclns_print(p-1, length+1, caplen+1); /* pass IP{4,6} to the OSI layer for proper link-layer printing */
+            break;
+        default:
+            printf("unknown protocol 0x%04x, length %u",proto, length);
+        }
+
+        return cookie_len + frelay_len;
+}
 
 /*
  *     ATM1 PIC cookie format
@@ -73,7 +131,7 @@ juniper_atm1_print(const struct pcap_pkthdr *h, register const u_char *p)
             /* FIXME decode channel-id, vc-index, fmt-id
                for once lets just hexdump the cookie */
 
-            printf("ATM1 cookie 0x%08x, ", EXTRACT_32BITS(p));
+            printf("ATM1 cookie 0x%08x, ", cookie1);
         }
 
         p+=4;
