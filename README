@@ -1,4 +1,4 @@
-@(#) $Header: /tcpdump/master/tcpdump/README,v 1.61 2002-05-29 03:08:29 mcr Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/README,v 1.62 2002-05-29 07:04:09 guy Exp $ (LBL)
 
 TCPDUMP 3.7.1
 Now maintained by "The Tcpdump Group"
@@ -66,13 +66,19 @@ It is a program that can be used to extract portions of tcpdump binary
 trace files. See the above distribution for further details and
 documentation.
 
-Problems, bugs, questions, desirable enhancements, etc. 
-should be sent to the address "tcpdump-workers@tcpdump.org".
+Problems, bugs, questions, desirable enhancements, etc. should be sent
+to the address "tcpdump-workers@tcpdump.org".  Bugs, support requests,
+and feature requests may also be submitted on the SourceForge site for
+tcpdump at
 
-Source code contributions, etc. should be sent to the email address 
-"patches@tcpdump.org".
+	http://sourceforge.net/projects/tcpdump/
 
-Current versions can be found at www.tcpdump.org
+Source code contributions, etc. should be sent to the email address
+"patches@tcpdump.org", or submitted as patches on the SourceForge site
+for tcpdump.
+
+Current versions can be found at www.tcpdump.org, or the SourceForge
+site for tcpdump.
 
  - The TCPdump team
 
