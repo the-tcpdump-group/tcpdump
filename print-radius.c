@@ -16,14 +16,14 @@
  * RFC 2869:
  *      "RADIUS Extensions"
  *
- * Alfredo Andres Omella (aandres@mfom.es) v0.1 2000/09/15
+ * Alfredo Andres Omella (aandres@s21sec.com) v0.1 2000/09/15
  *
  * TODO: Among other things to print ok MacIntosh and Vendor values 
  */
 
 #ifndef lint
 static const char rcsid[] =
-    "$Id: print-radius.c,v 1.4 2000-12-03 20:31:26 guy Exp $";
+    "$Id: print-radius.c,v 1.5 2000-12-18 08:16:58 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
