@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ipx.c,v 1.36 2003-11-16 09:36:25 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ipx.c,v 1.37 2004-04-30 22:22:05 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -118,7 +118,7 @@ ipx_decode(const struct ipxHdr *ipx, const u_char *datap, u_int length)
 #endif
 	break;
       case IPX_SKT_EIGRP:
-	(void)printf(" ipx-eigrp %d", length);
+        eigrp_print(datap,length);
 	break;
       default:
 	(void)printf(" ipx-#%x %d", dstSkt, length);

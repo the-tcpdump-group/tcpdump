@@ -117,6 +117,7 @@ print-dvmrp.c
 print-egp.c
 print-enc.c
 print-esp.c
+print-eigrp.c
 print-ether.c
 print-fddi.c
 print-fr.c
