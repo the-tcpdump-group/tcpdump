@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ipx.c,v 1.28 2001-01-15 00:43:59 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ipx.c,v 1.29 2001-01-15 02:23:25 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -139,12 +139,8 @@ ipx_sap_print(const u_short *ipx, u_int length)
 	else
 	    (void)printf("ipx-sap-nearest-req");
 
-	if (length > 0) {
-	    TCHECK(ipx[1]);
-	    (void)printf(" %x '", EXTRACT_16BITS(&ipx[0]));
-	    fn_print((u_char *)&ipx[1], (u_char *)&ipx[1] + 48);
-	    putchar('\'');
-	}
+	TCHECK(ipx[0]);
+	(void)printf(" %x", EXTRACT_16BITS(&ipx[0]));
 	break;
 
       case 2:
@@ -155,7 +151,7 @@ ipx_sap_print(const u_short *ipx, u_int length)
 	    (void)printf("ipx-sap-nearest-resp");
 
 	for (i = 0; i < 8 && length > 0; i++) {
-	    TCHECK2(ipx[27], 1);
+	    TCHECK2(ipx[25], 10);
 	    (void)printf(" %x '", EXTRACT_16BITS(&ipx[0]));
 	    fn_print((u_char *)&ipx[1], (u_char *)&ipx[1] + 48);
 	    printf("' addr %s",
@@ -165,12 +161,12 @@ ipx_sap_print(const u_short *ipx, u_int length)
 	}
 	break;
       default:
-	    (void)printf("ipx-sap-?%x", command);
+	(void)printf("ipx-sap-?%x", command);
 	break;
     }
-	return;
+    return;
 trunc:
-	printf("[|ipx %d]", length);
+    printf("[|ipx %d]", length);
 }
 
 void
@@ -204,10 +200,11 @@ ipx_rip_print(const u_short *ipx, u_int length)
 	}
 	break;
       default:
-	    (void)printf("ipx-rip-?%x", command);
+	(void)printf("ipx-rip-?%x", command);
+	break;
     }
-	return;
+    return;
 trunc:
-	printf("[|ipx %d]", length);
+    printf("[|ipx %d]", length);
 }
 
