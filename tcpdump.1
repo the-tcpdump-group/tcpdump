@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.107 2001-07-05 22:58:29 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.108 2001-07-25 04:35:10 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -1215,7 +1215,7 @@ Let's have a closer look at octet no. 13:
                 |7   5   3     0|
 .fi
 .PP
-We see that this octet contains 2 bytes from the reserved field.
+We see that this octet contains 2 bits from the reserved field.
 According to RFC 793 this field is reserved for future use and must
 be 0.
 The remaining 6 bits are the TCP control bits we are interested
