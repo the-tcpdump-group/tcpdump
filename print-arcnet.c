@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-arcnet.c,v 1.3 2001-05-22 06:23:29 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-arcnet.c,v 1.4 2001-07-05 18:54:14 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -141,6 +141,7 @@ arcnet_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	u_int seqid = 0;
 	u_char arc_type;
 
+	++infodelay;
 	ts_print(&h->ts);
 
 	if (caplen < ARC_HDRLEN) {
@@ -216,6 +217,9 @@ arcnet_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 
  out:
 	putchar('\n');
+	--infodelay;
+	if (infoprint)
+		info(0);
 }
 
 /*

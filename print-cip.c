@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cip.c,v 1.13 2001-06-08 04:48:23 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cip.c,v 1.14 2001-07-05 18:54:15 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -96,6 +96,7 @@ cip_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	u_short extracted_ethertype;
 	u_short *bp;
 
+	++infodelay;
 	ts_print(&h->ts);
 
 	if (memcmp(rfcllc, p, sizeof(rfcllc))==0 && caplen < RFC1483LLC_LEN) {
@@ -155,4 +156,7 @@ cip_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 		default_print(p, caplen);
  out:
 	putchar('\n');
+	--infodelay;
+	if (infoprint)
+		info(0);
 }

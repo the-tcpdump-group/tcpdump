@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.4 2001-06-15 07:39:43 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.5 2001-07-05 18:54:13 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -771,6 +771,7 @@ ieee802_11_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	u_int HEADER_LENGTH;
 	u_short extracted_ethertype;
 
+	++infodelay;
 	ts_print(&h->ts);
 
 	if (caplen < IEEE802_11_FC_LEN) {
@@ -851,4 +852,7 @@ ieee802_11_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 		default_print(p, caplen);
  out:
 	putchar('\n');
+	--infodelay;
+	if (infoprint)
+		info(0);
 }

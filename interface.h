@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.165 2001-07-04 22:03:13 fenner Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.166 2001-07-05 18:54:13 guy Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -249,6 +249,7 @@ extern void sl_bsdos_if_print(u_char *, const struct pcap_pkthdr *,
     const u_char *);
 extern void chdlc_if_print(u_char *, const struct pcap_pkthdr *,
     const u_char *);
+extern void chdlc_print(register const u_char *, u_int, u_int);
 extern void sll_if_print(u_char *, const struct pcap_pkthdr *, const u_char *);
 extern void snmp_print(const u_char *, u_int);
 extern void sunrpcrequest_print(const u_char *, u_int, const u_char *);

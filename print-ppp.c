@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.61 2001-06-11 10:33:03 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.62 2001-07-05 18:54:16 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1032,6 +1032,7 @@ ppp_if_print(u_char *user, const struct pcap_pkthdr *h,
 	register u_int length = h->len;
 	register u_int caplen = h->caplen;
 
+	++infodelay;
 	ts_print(&h->ts);
 
 	if (caplen < PPP_HDRLEN) {
@@ -1094,6 +1095,9 @@ ppp_if_print(u_char *user, const struct pcap_pkthdr *h,
 		default_print(p, caplen);
 out:
 	putchar('\n');
+	--infodelay;
+	if (infoprint)
+		info(0);
 }
 
 /*
@@ -1112,6 +1116,9 @@ ppp_hdlc_if_print(u_char *user, const struct pcap_pkthdr *h,
 	register u_int length = h->len;
 	register u_int caplen = h->caplen;
 	u_int proto;
+
+	++infodelay;
+	ts_print(&h->ts);
 
 	if (caplen < 2) {
 		printf("[|ppp]");
@@ -1134,7 +1141,6 @@ ppp_hdlc_if_print(u_char *user, const struct pcap_pkthdr *h,
 			goto out;
 		}
 
-		ts_print(&h->ts);
 		if (eflag)
 			printf("%02x %02x %d ", p[0], p[1], length);
 		p += 2;
@@ -1151,14 +1157,10 @@ ppp_hdlc_if_print(u_char *user, const struct pcap_pkthdr *h,
 
 	case CHDLC_UNICAST:
 	case CHDLC_BCAST:
-		/*
-		 * Have the Cisco HDLC print routine do all the work.
-		 */
-		chdlc_if_print(user, h, p);
-		return;
+		chdlc_print(p, length, caplen);
+		goto out;
 
 	default:
-		ts_print(&h->ts);
 		if (eflag)
 			printf("%02x %02x %d ", p[0], p[1], length);
 		p += 2;
@@ -1177,6 +1179,9 @@ ppp_hdlc_if_print(u_char *user, const struct pcap_pkthdr *h,
 		default_print(p, caplen);
 out:
 	putchar('\n');
+	--infodelay;
+	if (infoprint)
+		info(0);
 }
 
 
@@ -1231,6 +1236,7 @@ ppp_bsdos_if_print(u_char *user, const struct pcap_pkthdr *h,
 	const u_char *q;
 	int i;
 
+	++infodelay;
 	ts_print(&h->ts);
 
 	if (caplen < PPP_BSDI_HDRLEN) {
@@ -1372,5 +1378,8 @@ printx:
 		default_print((const u_char *)p, caplen - hdrlength);
 out:
 	putchar('\n');
+	--infodelay;
+	if (infoprint)
+		info(0);
 #endif /* __bsdi__ */
 }

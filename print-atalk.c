@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.66 2001-06-18 08:52:53 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.67 2001-07-05 18:54:14 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -90,11 +90,15 @@ void
 ltalk_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 {
 	snapend = p + h->caplen;
+	++infodelay;
 	ts_print(&h->ts);
 	llap_print(p, h->caplen);
 	if(xflag)
 		default_print(p, h->caplen);
 	putchar('\n');
+	--infodelay;
+	if (infoprint)
+		info(0);
 }
 
 /*

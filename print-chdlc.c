@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.11 2000-10-09 01:53:19 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.12 2001-07-05 18:54:14 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -54,25 +54,38 @@ chdlc_if_print(u_char *user, const struct pcap_pkthdr *h,
 {
 	register u_int length = h->len;
 	register u_int caplen = h->caplen;
-	const struct ip *ip;
-	u_int proto;
 
+	++infodelay;
 	ts_print(&h->ts);
-
-	if (caplen < CHDLC_HDRLEN) {
-		printf("[|chdlc]");
-		goto out;
-	}
 
 	/*
 	 * Some printers want to get back at the link level addresses,
 	 * and/or check that they're not walking off the end of the packet.
 	 * Rather than pass them all the way down, we set these globals.
 	 */
-	proto = ntohs(*(u_short *)&p[2]);
 	packetp = p;
 	snapend = p + caplen;
 
+	chdlc_print(p, length, caplen);
+
+	putchar('\n');
+	--infodelay;
+	if (infoprint)
+		info(0);
+}
+
+void
+chdlc_print(register const u_char *p, u_int length, u_int caplen)
+{
+	const struct ip *ip;
+	u_int proto;
+
+	if (caplen < CHDLC_HDRLEN) {
+		printf("[|chdlc]");
+		return;
+	}
+
+	proto = ntohs(*(u_short *)&p[2]);
 	if (eflag) {
 		switch (p[0]) {
 		case CHDLC_UNICAST:
@@ -110,8 +123,6 @@ chdlc_if_print(u_char *user, const struct pcap_pkthdr *h,
 	}
 	if (xflag)
 		default_print((const u_char *)ip, caplen - CHDLC_HDRLEN);
-out:
-	putchar('\n');
 }
 
 struct cisco_slarp {
