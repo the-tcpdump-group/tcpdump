@@ -26,7 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-/* YIPS @(#)$Id: ipsec_doi.h,v 1.1 1999-10-30 05:11:09 itojun Exp $ */
+/* YIPS @(#)$Id: ipsec_doi.h,v 1.2 2000-09-29 20:42:34 itojun Exp $ */
 
 /* refer to RFC 2407 */
 
@@ -109,12 +109,12 @@ struct ipsecdoi_sa {
 	struct isakmp_gen h;
 	u_int32_t doi; /* Domain of Interpretation */
 	u_int32_t sit; /* Situation */
-};
+} __attribute__((__packed__));
 
 struct ipsecdoi_secrecy_h {
 	u_int16_t len;
 	u_int16_t reserved;
-};
+} __attribute__((__packed__));
 
 /* 4.6.2.1 Identification Type Values */
 struct ipsecdoi_id {
@@ -123,7 +123,7 @@ struct ipsecdoi_id {
 	u_int8_t  proto_id;	/* Protocol ID */
 	u_int16_t port;		/* Port */
 	/* Identification Data */
-};
+} __attribute__((__packed__));
 
 #define IPSECDOI_ID_IPV4_ADDR                        1
 #define IPSECDOI_ID_FQDN                             2
@@ -142,23 +142,5 @@ struct ipsecdoi_id {
 #define IPSECDOI_NTYPE_RESPONDER_LIFETIME                  24576
 #define IPSECDOI_NTYPE_REPLAY_STATUS                       24577
 #define IPSECDOI_NTYPE_INITIAL_CONTACT                     24578
-
-#if 0
-/* ipsec sa structure */
-struct ipsec_sa {
-	u_int8_t  proto_id;            /* Protocol id */
-	vchar_t *spi;                /* spi to receive, network byte order */
-	vchar_t *spi_p;              /* spi to send, network byte order */
-	vchar_t *keymat;             /* KEYMAT */
-	u_int8_t  t_id;                /* transform id */
-	u_int8_t  enc_t;               /* type of cipher */
-	u_int8_t  mode_t;              /* tunnel or transport */
-	u_int8_t  hash_t;              /* type of hash */
-	u_int8_t  life_t;              /* type of duration of lifetime */
-	u_int32_t ldur;                /* life duration */
-	u_int8_t  dhgrp;               /* DH; group */
-	struct ipsec_sa *next;
-};
-#endif
 
 #endif /* !defined(_IPSEC_DOI_H_) */

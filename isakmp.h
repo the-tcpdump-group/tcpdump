@@ -26,7 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-/* YIPS @(#)$Id: isakmp.h,v 1.5 2000-01-07 14:09:02 itojun Exp $ */
+/* YIPS @(#)$Id: isakmp.h,v 1.6 2000-09-29 20:42:35 itojun Exp $ */
 
 /* refer to RFC 2408 */
 
@@ -41,7 +41,7 @@ typedef u_char msgid_t[4];
 typedef struct { /* i_cookie + r_cookie */
 	cookie_t i_ck;
 	cookie_t r_ck;
-} isakmp_index;
+} __attribute__((__packed__)) isakmp_index;
 
 #define INITIATOR       1
 #define RESPONDER       2
@@ -110,7 +110,7 @@ struct isakmp {
 	u_int8_t flags;		/* Flags */
 	msgid_t msgid;
 	u_int32_t len;		/* Length */
-};
+} __attribute__((__packed__));
 
 /* Next Payload Type */
 #define ISAKMP_NPTYPE_NONE   0 /* NONE*/
@@ -153,7 +153,7 @@ struct isakmp_gen {
 	u_int8_t  np;       /* Next Payload */
 	u_int8_t  reserved; /* RESERVED, unused, must set to 0 */
 	u_int16_t len;      /* Payload Length */
-};
+} __attribute__((__packed__));
 
 /* 3.3 Data Attributes
          0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -170,7 +170,7 @@ struct isakmp_data {
 	u_int16_t lorv;     /* if f equal 1, Attribute Length */
 	                  /* if f equal 0, Attribute Value */
 	/* if f equal 1, Attribute Value */
-};
+} __attribute__((__packed__));
 #define ISAKMP_GEN_TLV 0x0000
 #define ISAKMP_GEN_TV  0x8000
 	/* mask for type of attribute format */
@@ -192,7 +192,7 @@ struct isakmp_pl_sa {
 	struct isakmp_gen h;
 	u_int32_t doi; /* Domain of Interpretation */
 	u_int32_t sit; /* Situation */
-};
+} __attribute__((__packed__));
 
 /* 3.5 Proposal Payload */
 	/*
@@ -209,7 +209,7 @@ struct isakmp_pl_p {
 	u_int8_t spi_size;  /* SPI Size */
 	u_int8_t num_t;     /* Number of Transforms */
 	/* SPI */
-};
+} __attribute__((__packed__));
 
 /* 3.6 Transform Payload */
 	/*
@@ -224,13 +224,13 @@ struct isakmp_pl_t {
 	u_int8_t  t_id;     /* Transform-Id */
 	u_int16_t reserved; /* RESERVED2 */
 	/* SA Attributes */
-};
+} __attribute__((__packed__));
 
 /* 3.7 Key Exchange Payload */
 struct isakmp_pl_ke {
 	struct isakmp_gen h;
 	/* Key Exchange Data */
-};
+} __attribute__((__packed__));
 
 /* 3.8 Identification Payload */
 	/* MUST NOT to be used, because of being defined in ipsec-doi. */
@@ -241,7 +241,7 @@ struct isakmp_pl_id {
 		u_int32_t doi_data;  /* DOI Specific ID Data */
 	} d;
 	/* Identification Data */
-};
+} __attribute__((__packed__));
 
 /* 3.9 Certificate Payload */
 struct isakmp_pl_cert {
@@ -253,7 +253,7 @@ struct isakmp_pl_cert {
 		certificate or certificate-related information contained in the
 		Certificate Data field.
 		*/
-};
+} __attribute__((__packed__));
 
 /* Certificate Type */
 #define ISAKMP_CERT_NONE   0
@@ -279,28 +279,28 @@ struct isakmp_pl_cr {
 	*/
 	/* # Certificate Authorities (1 octet) */
 	/* Certificate Authorities (variable length) */
-};
+} __attribute__((__packed__));
 
 /* 3.11 Hash Payload */
 	/* may not be used, because of having only data. */
 struct isakmp_pl_hash {
 	struct isakmp_gen h;
 	/* Hash Data */
-};
+} __attribute__((__packed__));
 
 /* 3.12 Signature Payload */
 	/* may not be used, because of having only data. */
 struct isakmp_pl_sig {
 	struct isakmp_gen h;
 	/* Signature Data */
-};
+} __attribute__((__packed__));
 
 /* 3.13 Nonce Payload */
 	/* may not be used, because of having only data. */
 struct isakmp_pl_nonce {
 	struct isakmp_gen h;
 	/* Nonce Data */
-};
+} __attribute__((__packed__));
 
 /* 3.14 Notification Payload */
 struct isakmp_pl_n {
@@ -311,7 +311,7 @@ struct isakmp_pl_n {
 	u_int16_t type;     /* Notify Message Type */
 	/* SPI */
 	/* Notification Data */
-};
+} __attribute__((__packed__));
 
 /* 3.14.1 Notify Message Types */
 /* NOTIFY MESSAGES - ERROR TYPES */
@@ -354,89 +354,20 @@ struct isakmp_pl_d {
 	u_int8_t  spi_size; /* SPI Size */
 	u_int16_t num_spi;  /* # of SPIs */
 	/* SPI(es) */
-};
+} __attribute__((__packed__));
 
 
 struct isakmp_ph1tab {
 	struct isakmp_ph1 *head;
 	struct isakmp_ph1 *tail;
 	int len;
-};
+} __attribute__((__packed__));
 
 struct isakmp_ph2tab {
 	struct isakmp_ph2 *head;
 	struct isakmp_ph2 *tail;
 	int len;
-};
-
-#if 0
-/* isakmp status structure */
-struct isakmp_ph1 {
-	isakmp_index index;
-	u_int8_t  dir;                 /* INITIATOR or RESPONDER */
-	u_int16_t status;              /* status of this SA */
-	u_int16_t etype;
-	u_int32_t doi;
-	u_int32_t sit;
-	vchar_t   *dhp;                /* DH; prime, static value */
-	vchar_t   *dhpriv;             /* DH; private value */
-	vchar_t   *dhpub;              /* DH; public value */
-	vchar_t   *dhpub_p;            /* DH; partner's public value */
-	vchar_t   *dhgxy;              /* DH; shared secret */
-	vchar_t   *nonce;              /* nonce value */
-	vchar_t   *nonce_p;            /* partner's nonce value */
-	vchar_t   *skeyid;             /* SKEYID */
-	vchar_t   *skeyid_d;           /* SKEYID_d */
-	vchar_t   *skeyid_a;           /* SKEYID_a, i.e. hash */
-	vchar_t   *skeyid_e;           /* SKEYID_e, i.e. encryption */
-	vchar_t   *key;                /* cipher key */
-	vchar_t   *hash;               /* HASH minus general header */
-	vchar_t   *iv;                 /* IV */
-	vchar_t   *ive;                /* new IV to encrypt next packet */
-	vchar_t   *ivd;                /* new IV to decrypt next packet */
-	vchar_t   *sa;                 /* SA minus general header including p,t.*/
-	vchar_t   *id;                 /* ID minus general header */
-	vchar_t   *id_p;               /* partner's ID minus general header */
-	struct sockaddr  *local;       /* pointer to the my sockaddr */
-	struct sockaddr  *remote;      /* partner's sockaddr */
-	struct oakley_sa *isa;         /* Is it good that caddr_t ? */
-	struct sched *sc;              /* back pointer to the record in schedule
-	                                used to resend. */
-	struct isakmp_ph1 *next;
-	struct isakmp_ph1 *prev;
-	struct isakmp_conf *cfp;     /* pointer to isakmp configuration */
-	struct isakmp_ph2tab ph2tab; /* list on negotiating Phase 2 */
-	u_int32_t msgid2;              /* XXX: msgid counter for Phase 2 */
-};
-
-struct isakmp_ph2 {
-	msgid_t msgid;
-	u_int8_t  dir;             /* INITIATOR or RESPONDER */
-	u_int16_t status;          /* status of this SA */
-	vchar_t *dhp;            /* DH; prime, static value */
-	vchar_t *dhpriv;         /* DH; private value */
-	vchar_t *dhpub;          /* DH; public value */
-	vchar_t *dhpub_p;        /* DH; partner's public value */
-	vchar_t *dhgxy;          /* DH; shared secret */
-	vchar_t *id;             /* ID */
-	vchar_t *id_p;           /* ID for peer */
-	vchar_t *nonce;          /* nonce value in phase 2 */
-	vchar_t *nonce_p;        /* partner's nonce value in phase 2 */
-	vchar_t *hash;           /* HASH2 minus general header */
-	vchar_t *iv;             /* IV for Phase 2 */
-	vchar_t *ive;            /* new IV to encrypt next packet */
-	vchar_t *ivd;            /* new IV to decrypt next packet */
-	struct isakmp_ph1 *ph1;  /* back pointer to isakmp status */
-	struct sched *sc;        /* back pointer to the schedule using resend */
-	struct pfkey_st *pst;    /* pointer to the pfkey status record.
-	                            is only used by initiator. */
-	u_int8_t proxy;            /* is proxy or not ?. */
-	vchar_t *sa;             /* SA payload */
-	struct ipsec_sa *isa;    /* values of SA to use, same SA in use. */
-	struct isakmp_ph2 *next;
-	struct isakmp_ph2 *prev;
-};
-#endif
+} __attribute__((__packed__));
 
 #define EXCHANGE_PROXY   1
 #define EXCHANGE_MYSELF  0
