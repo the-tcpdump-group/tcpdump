@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.63 2000-01-17 06:24:27 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.64 2000-06-01 01:13:53 assar Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -129,22 +129,31 @@ void
 ts_print(register const struct timeval *tvp)
 {
 	register int s;
+	struct tm *tm;
+	time_t Time;
+	static unsigned b_sec;
+	static unsigned b_usec;
 
-	if (tflag > 0) {
-		/* Default */
-		s = (tvp->tv_sec + thiszone) % 86400;
-		(void)printf("%02d:%02d:%02d.%06u ",
-		    s / 3600, (s % 3600) / 60, s % 60, (u_int32_t)tvp->tv_usec);
-	} else if (tflag < 0) {
-		if (tflag < -1) {
-			static unsigned b_sec;
-			static unsigned b_usec;
+	switch(tflag)
+	{
+		case 1: /* Default */
+			s = (tvp->tv_sec + thiszone) % 86400;
+			(void)printf("%02d:%02d:%02d.%06u ",
+				     s / 3600, (s % 3600) / 60, s % 60,
+				     (unsigned)tvp->tv_usec);
+			break;
+		case -1: /* Unix timeval style */
+			(void)printf("%u.%06u ",
+				     (unsigned)tvp->tv_sec,
+				     (unsigned)tvp->tv_usec);
+			break;
+		case -2:
 			if (b_sec == 0) {
 				printf("000000 ");
 			} else {
 				int d_usec = tvp->tv_usec - b_usec;
 				int d_sec = tvp->tv_sec - b_sec;
-
+				
 				while (d_usec < 0) {
 					d_usec += 1000000;
 					d_sec--;
@@ -155,11 +164,17 @@ ts_print(register const struct timeval *tvp)
 			}
 			b_sec = tvp->tv_sec;
 			b_usec = tvp->tv_usec;
-		} else {
-			/* Unix timeval style */
-			(void)printf("%u.%06u ",
-				     (u_int32_t)tvp->tv_sec, (u_int32_t)tvp->tv_usec);
-		}
+			break;
+		case -3: /* Default + Date*/
+			s = (tvp->tv_sec + thiszone) % 86400;
+			time(&Time);
+			tm = localtime(&Time);
+			(void)printf("%02d/%02d/%04d %02d:%02d:%02d.%06u ",
+				     tm->tm_mon+1, tm->tm_mday,
+				     tm->tm_year+1900,
+				     s / 3600, (s % 3600) / 60,
+				     s % 60, (unsigned)tvp->tv_usec);
+			break;
 	}
 }
 
