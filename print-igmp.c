@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-igmp.c,v 1.6 2002-06-02 18:24:41 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-igmp.c,v 1.7 2002-06-11 17:08:49 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -109,7 +109,7 @@ static struct tok igmpv3report2str[] = {
 	{ 0,	NULL }
 };
 
-static void 
+static void
 print_mtrace(register const u_char *bp, register u_int len)
 {
     register const struct tr_query *tr = (const struct tr_query *)(bp + 8);
@@ -122,7 +122,7 @@ print_mtrace(register const u_char *bp, register u_int len)
         printf(" with-ttl %d", TR_GETTTL(ntohl(tr->tr_rttlqid)));
 }
 
-static void 
+static void
 print_mresp(register const u_char *bp, register u_int len)
 {
     register const struct tr_query *tr = (const struct tr_query *)(bp + 8);
@@ -135,7 +135,7 @@ print_mresp(register const u_char *bp, register u_int len)
         printf(" with-ttl %d", TR_GETTTL(ntohl(tr->tr_rttlqid)));
 }
 
-static void 
+static void
 print_igmpv3_report(register const u_char *bp, register u_int len)
 {
     u_int group, nsrcs, ngroups;
@@ -143,15 +143,15 @@ print_igmpv3_report(register const u_char *bp, register u_int len)
 
     /* Minimum len is 16, and should be a multiple of 4 */
     if (len < 16 || len & 0x03) {
-    	(void)printf(" [invalid len %d]", len);
-    	return;
+	(void)printf(" [invalid len %d]", len);
+	return;
     }
     TCHECK2(bp[6], 2);
     ngroups = EXTRACT_16BITS(&bp[6]);
-    (void)printf(", %d group record(s)", ngroups); 
+    (void)printf(", %d group record(s)", ngroups);
     if (vflag > 0) {
 	/* Print the group records */
-    	group = 8;
+	group = 8;
         for (i=0; i<ngroups; i++) {
 	    if (len < group+8) {
 		(void)printf(" [invalid number of groups]");
@@ -200,8 +200,8 @@ print_igmpv3_query(register const u_char *bp, register u_int len)
     (void)printf(" v3");
     /* Minimum len is 12, and should be a multiple of 4 */
     if (len < 12 || len & 0x03) {
-    	(void)printf(" [invalid len %d]", len);
-    	return;
+	(void)printf(" [invalid len %d]", len);
+	return;
     }
     mrc = bp[1];
     if (mrc < 128) {
@@ -261,7 +261,7 @@ igmp_print(register const u_char *bp, register u_int len)
 		    (void)printf(" [max resp time %d]", bp[1]);
 	    } else
 		(void)printf(" v1");
-       	    if (EXTRACT_32BITS(&bp[4]))
+	    if (EXTRACT_32BITS(&bp[4]))
                 (void)printf(" [gaddr %s]", ipaddr_string(&bp[4]));
             if (len != 8)
                 (void)printf(" [len %d]", len);

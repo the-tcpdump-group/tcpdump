@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.66 2002-05-29 10:32:02 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.67 2002-06-11 17:08:54 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -99,7 +99,7 @@ static const char *cpcodes[] = {
 	"Conf-Rej",	/* (4) */
 	"Term-Req",	/* (5) */
 	"Term-Ack",	/* (6) */
- 	"Code-Rej",	/* (7) */
+	"Code-Rej",	/* (7) */
 	"Prot-Rej",	/* (8) */
 	"Echo-Req",	/* (9) */
 	"Echo-Rep",	/* (10) */

@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.13 2002-04-26 09:51:34 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.14 2002-06-11 17:08:44 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -130,7 +130,7 @@ cdp_print(const u_char *p, u_int length, u_int caplen,
 			printf(" Duplex: %s", p[i + 4] ? "full": "half");
 			break;
 /* http://www.cisco.com/univercd/cc/td/doc/product/voice/ata/atarn/186rn21m.htm
- * plus more details from other sources 
+ * plus more details from other sources
  */
 		case 0x0e:		/* incomplete doc. */
 			printf(" ATA-186 VoIP VLAN request, app %d, vlan %d",
@@ -140,7 +140,7 @@ cdp_print(const u_char *p, u_int length, u_int caplen,
 			printf(" ATA-186 VoIP VLAN assignment" );
 			break;
 		case 0x10:		/* incomplete doc. */
-			printf(" power consumption: %1.2fW", 
+			printf(" power consumption: %1.2fW",
 				cdp_get_number(p+i+4, len-4)/1000.0 );
 			break;
 		case 0x11:		/* guess - not documented */
@@ -242,7 +242,7 @@ cdp_print_addr(const u_char * p, int l)
 			 * protocol = LLC+SNAP header with the IPv6
 			 * Ethertype, address length = 16
 			 */
-			p += 10; 
+			p += 10;
 			if (p + al > endp)
 				goto trunc;
 

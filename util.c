@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.72 2001-10-08 16:12:13 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.73 2002-06-11 17:09:01 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -145,7 +145,7 @@ ts_print(register const struct timeval *tvp)
 		} else {
 			int d_usec = tvp->tv_usec - b_usec;
 			int d_sec = tvp->tv_sec - b_sec;
-			
+
 			while (d_usec < 0) {
 				d_usec += 1000000;
 				d_sec--;

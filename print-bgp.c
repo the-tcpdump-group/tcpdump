@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 1999 WIDE Project.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -13,7 +13,7 @@
  * 3. Neither the name of the project nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE PROJECT AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.29 2002-05-24 17:49:29 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.30 2002-06-11 17:08:43 itojun Exp $";
 #endif
 
 #include <sys/param.h>
@@ -654,14 +654,14 @@ bgp_update_print(const u_char *dat, int length)
 	         */
 #ifdef INET6
 		printf(" (Withdrawn routes: %d bytes)", len);
-#else	
+#else
 		char buf[MAXHOSTNAMELEN + 100];
 
 		TCHECK2(p[2], len);
- 		i = 2;
+		i = 2;
 
 		printf(" (Withdrawn routes:");
-			
+
 		while(i < 2 + len) {
 			i += decode_prefix4(&p[i], buf, sizeof(buf));
 			printf(" %s", buf);
@@ -707,7 +707,7 @@ bgp_update_print(const u_char *dat, int length)
 			newline = 1;
 
 			/* ( */
-			printf(")");	
+			printf(")");
 
 			i += aoff + alen;
 		}
@@ -791,8 +791,8 @@ bgp_print(const u_char *dat, int length)
 	const u_char *ep;
 	const u_char *start;
 	const u_char marker[] = {
-		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
-		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
+		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 	};
 	struct bgp bgp;
 	u_int16_t hlen;

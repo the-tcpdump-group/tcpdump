@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.30 2002-05-07 18:28:38 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.31 2002-06-11 17:08:53 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -586,7 +586,7 @@ pimv2_print(register const u_char *bp, register u_int len)
 
 			case 18:	/* Old DR-Priority */
 				if (olen == 4)
-					(void)printf(" (OLD-DR-Priority: %d)", 
+					(void)printf(" (OLD-DR-Priority: %d)",
 							EXTRACT_32BITS(&bp[4]));
 				else
 					goto unknown;

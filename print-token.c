@@ -25,7 +25,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-token.c,v 1.15 2002-05-29 10:06:27 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-token.c,v 1.16 2002-06-11 17:08:57 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -145,13 +145,13 @@ token_print(const u_char *p, u_int length, u_int caplen)
 		if (vflag) {
 			printf("%s ", broadcast_indicator[BROADCAST(trp)]);
 			printf("%s", direction[DIRECTION(trp)]);
-     
+
 			for (seg = 0; seg < SEGMENT_COUNT(trp); seg++)
 				printf(" [%d:%d]", RING_NUMBER(trp, seg),
 				    BRIDGE_NUMBER(trp, seg));
 		} else {
 			printf("rt = %x", ntohs(trp->token_rcf));
- 
+
 			for (seg = 0; seg < SEGMENT_COUNT(trp); seg++)
 				printf(":%x", ntohs(trp->token_rseg[seg]));
 		}

@@ -42,7 +42,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-mobile.c,v 1.8 2002-06-01 23:50:32 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-mobile.c,v 1.9 2002-06-11 17:08:52 itojun Exp $";
 #endif
 
 #include <sys/param.h>
@@ -94,7 +94,7 @@ mobile_print(const u_char *bp, u_int length)
 		osp=1;
 		cp +=4 ;
 	}
-	
+
 	if (osp)  {
 		fputs("[S] ",stdout);
 		if (vflag)

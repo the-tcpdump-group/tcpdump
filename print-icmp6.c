@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.60 2002-05-30 22:01:34 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.61 2002-06-11 17:08:48 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -567,7 +567,7 @@ icmp6_opt_print(const u_char *bp, int resid)
 			    (u_int32_t)ntohl(opa->nd_opt_adv_interval));
 			/*(*/
 			printf(")");
-			break;                
+			break;
 		case ND_OPT_HOMEAGENT_INFO:
 			oph = (struct nd_opt_homeagent_info *)op;
 			TCHECK(oph->nd_opt_hai_lifetime);
@@ -575,7 +575,7 @@ icmp6_opt_print(const u_char *bp, int resid)
 			printf(" pref=%d", ntohs(oph->nd_opt_hai_preference));
 			printf(", lifetime=%u", ntohs(oph->nd_opt_hai_lifetime));
 			printf(")");
-			break;                
+			break;
 		case ND_OPT_ROUTE_INFO:
 			opri = (struct nd_opt_route_info *)op;
 			TCHECK(opri->nd_opt_rti_lifetime);

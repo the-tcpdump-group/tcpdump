@@ -17,12 +17,12 @@
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
- * 
+ *
  * From: NetBSD: print-arcnet.c,v 1.2 2000/04/24 13:02:28 itojun Exp
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-arcnet.c,v 1.7 2002-06-01 23:50:30 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-arcnet.c,v 1.8 2002-06-11 17:08:41 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H

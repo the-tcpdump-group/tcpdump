@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/sctpHeader.h,v 1.3 2001-08-01 03:34:00 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/sctpHeader.h,v 1.4 2002-06-11 17:08:59 itojun Exp $ (LBL) */
 
 /* SCTP reference Implementation Copyright (C) 1999 Cisco And Motorola
  *
@@ -31,14 +31,14 @@
  *
  * This file is part of the SCTP reference Implementation
  *
- * 
+ *
  * Please send any bug reports or fixes you make to one of the following email
  * addresses:
- * 
+ *
  * rstewar1@email.mot.com
  * kmorneau@cisco.com
  * qxie1@email.mot.com
- * 
+ *
  * Any bugs reported given to us we will try to fix... any fixes shared will
  * be incorperated into the next SCTP release.
  */
@@ -57,7 +57,7 @@ extern "C" {
 
 #ifdef TRU64
  #define _64BITS 1
-#endif 
+#endif
 
 struct sctpHeader{
   u_short source;
@@ -149,7 +149,7 @@ struct cookieMessage{
   u_short locScope;			/* V6 local scope flag */
   u_short siteScope;			/* V6 site scope flag */
   /* at the end is tacked on the INIT chunk sent in
-   * its entirety and of course our 
+   * its entirety and of course our
    * signature.
    */
 };
@@ -171,10 +171,10 @@ struct sctpSendableInit{
 };
 
 
-/* Selective Acknowledgement 
+/* Selective Acknowledgement
  * has the following structure with
  * a optional ammount of trailing int's
- * on the last part (based on the numberOfDesc 
+ * on the last part (based on the numberOfDesc
  * field).
  */
 
@@ -197,7 +197,7 @@ struct sctpUnifiedSack{
 };
 
 /* for both RTT request/response the
- * following is sent 
+ * following is sent
  */
 
 struct sctpHBrequest {
@@ -220,10 +220,10 @@ struct sctpHBsender{
   char addrFmt[SCTP_ADDRMAX];
   unsigned short userreq;
 };
-  
 
 
-/* for the abort and shutdown ACK 
+
+/* for the abort and shutdown ACK
  * we must carry the init tag in the common header. Just the
  * common header is all that is needed with a chunk descriptor.
  */
@@ -308,13 +308,13 @@ struct sctpUnifiedDatagram{
 struct sctpECN_echo{
   struct sctpChunkDesc uh;
   u_int Lowest_TSN;
-};    
+};
 
 
 struct sctpCWR{
   struct sctpChunkDesc uh;
   u_int TSN_reduced_at;
-};    
+};
 
 #ifdef	__cplusplus
 }

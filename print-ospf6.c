@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf6.c,v 1.7 2001-05-09 01:08:03 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf6.c,v 1.8 2002-06-11 17:08:53 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -241,7 +241,7 @@ ospf6_print_lsaprefix(register const struct lsa_prefix *lsapp)
 	}
 	memset(&prefix, 0, sizeof(prefix));
 	memcpy(&prefix, lsapp->lsa_p_prefix, k * 4);
-	printf(" %s/%d", ip6addr_string(&prefix), 
+	printf(" %s/%d", ip6addr_string(&prefix),
 		lsapp->lsa_p_len);
 	if (lsapp->lsa_p_opt)
 		printf("(opt=%x)", lsapp->lsa_p_opt);
@@ -379,7 +379,7 @@ ospf6_print_lsa(register const struct lsa *lsap)
 
 			if ((flags32 & ASLA_FLAG_ROUTETAG) != 0) {
 				TCHECK(*(u_int32_t *)ls_opt);
-				printf(" tag %s", 
+				printf(" tag %s",
 				       ipaddr_string((u_int32_t *)ls_opt));
 
 				ls_opt += sizeof(u_int32_t);

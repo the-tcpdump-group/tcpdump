@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.93 2002-06-01 23:50:32 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.94 2002-06-11 17:08:52 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -168,7 +168,7 @@ static struct tok type2str[] = {
  *
  * Assume that a system that has INT64_FORMAT defined, has a 64-bit
  * integer datatype and can print it.
- */ 
+ */
 
 #define UNSIGNED 0
 #define SIGNED   1
@@ -783,7 +783,7 @@ nfs_printfh(register const u_int32_t *dp, const u_int len)
 	}
 
 	if(fsid.Fsid_dev.Minor == 257 && uflag)
-		/* Print the undecoded handle */ 
+		/* Print the undecoded handle */
 		(void)printf("%s", fsid.Opaque_Handle);
 	else
 		(void)printf("%ld", (long) ino);
@@ -884,7 +884,7 @@ xid_map_find(const struct rpc_msg *rp, const u_char *bp, u_int32_t *proc,
 	int cmp;
 
 	/* Start searching from where we last left off */
-	i = xid_map_hint; 
+	i = xid_map_hint;
 	do {
 		xmep = &xid_map[i];
 		cmp = 1;

@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.62 2002-06-01 23:50:30 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.63 2002-06-11 17:08:43 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -580,7 +580,7 @@ rfc1048_print(register const u_char *bp)
 				size--;
 				if (type == 0) {
 					putchar('"');
-					(void)fn_printn(bp, size, NULL);  
+					(void)fn_printn(bp, size, NULL);
 					putchar('"');
 					break;
 				} else {

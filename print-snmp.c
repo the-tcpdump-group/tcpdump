@@ -58,7 +58,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.52 2002-05-07 18:27:40 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.53 2002-06-11 17:08:56 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -559,7 +559,7 @@ asn1_parse(register const u_char *p, u_int len, struct be *elem)
 			        elem->type = BE_UNS64;
 				high = 0, low = 0;
 				for (i = elem->asnlen; i-- > 0; p++) {
-				        high = (high << 8) | 
+				        high = (high << 8) |
 					    ((low & 0xFF000000) >> 24);
 					low = (low << 8) | *p;
 				}
@@ -685,7 +685,7 @@ asn1_print(struct be *elem)
 			o = (o << ASN_SHIFT7) + (*p & ~ASN_BIT8);
 			if (*p & ASN_LONGLEN)
 			        continue;
-			
+
 			/*
 			 * first subitem encodes two items with 1st*OIDMUX+2nd
 			 * (see X.690:1997 clause 8.19 for the details)
@@ -725,7 +725,7 @@ asn1_print(struct be *elem)
 		        break;
 		}
 		d = elem->data.uns64.high * 4294967296.0;	/* 2^32 */
-		if (elem->data.uns64.high <= 0x1fffff) { 
+		if (elem->data.uns64.high <= 0x1fffff) {
 		        d += elem->data.uns64.low;
 #if 0 /*is looks illegal, but what is the intention?*/
 			printf("%.f", d);
@@ -876,7 +876,7 @@ static void smi_decode_oid(struct be *elem, unsigned int *oid,
 	        o = (o << ASN_SHIFT7) + (*p & ~ASN_BIT8);
 		if (*p & ASN_LONGLEN)
 		    continue;
-	    
+
 		/*
 		 * first subitem encodes two items with 1st*OIDMUX+2nd
 		 * (see X.690:1997 clause 8.19 for the details)
@@ -914,7 +914,7 @@ static int smi_check_a_range(SmiType *smiType, SmiRange *smiRange,
 			     struct be *elem)
 {
     int ok = 1;
-    
+
     switch (smiType->basetype) {
     case SMI_BASETYPE_OBJECTIDENTIFIER:
     case SMI_BASETYPE_OCTETSTRING:
@@ -931,12 +931,12 @@ static int smi_check_a_range(SmiType *smiType, SmiRange *smiRange,
 	ok = (elem->data.integer >= smiRange->minValue.value.integer32
 	      && elem->data.integer <= smiRange->maxValue.value.integer32);
 	break;
-	    
+
     case SMI_BASETYPE_UNSIGNED32:
 	ok = (elem->data.uns >= smiRange->minValue.value.unsigned32
 	      && elem->data.uns <= smiRange->maxValue.value.unsigned32);
 	break;
-	
+
     case SMI_BASETYPE_UNSIGNED64:
 	/* XXX */
 	break;
@@ -1066,7 +1066,7 @@ static void smi_print_value(SmiNode *smiNode, u_char pduid, struct be *elem)
 	/* apply display hints (integer, octetstring) */
 
 	/* convert instance identifier to index type values */
-	
+
 	switch (elem->type) {
 	case BE_OID:
 	        if (smiType->basetype == SMI_BASETYPE_BITS) {
@@ -1083,7 +1083,7 @@ static void smi_print_value(SmiNode *smiNode, u_char pduid, struct be *elem)
 				}
 				fputs(smiNode->name, stdout);
 				if (smiNode->oidlen < oidlen) {
-				        for (i = smiNode->oidlen; 
+				        for (i = smiNode->oidlen;
 					     i < oidlen; i++) {
 					        printf(".%u", oid[i]);
 					}
@@ -1434,7 +1434,7 @@ pdu_print(const u_char *np, u_int length, int version)
 	np = (u_char *)pdu.data.raw;
 
 	if (version == SNMP_VERSION_1 &&
-	    (pdu.id == GETBULKREQ || pdu.id == INFORMREQ || 
+	    (pdu.id == GETBULKREQ || pdu.id == INFORMREQ ||
 	     pdu.id == V2TRAP || pdu.id == REPORT)) {
 	        printf("[v2 PDU in v1 message]");
 		return;
@@ -1586,7 +1586,7 @@ usm_print(const u_char *np, u_int length)
 		asn1_print(&elem);
 		return;
 	}
-	if (vflag) 
+	if (vflag)
 	        printf("B=%d ", elem.data.integer);
 	length -= count;
 	np += count;
@@ -1599,7 +1599,7 @@ usm_print(const u_char *np, u_int length)
 		asn1_print(&elem);
 		return;
 	}
-	if (vflag) 
+	if (vflag)
 	        printf("T=%d ", elem.data.integer);
 	length -= count;
 	np += count;
@@ -1706,7 +1706,7 @@ v3msg_print(const u_char *np, u_int length)
 		return;
 	}
 	flags = elem.data.str[0];
-	if (flags != 0x00 && flags != 0x01 && flags != 0x03 
+	if (flags != 0x00 && flags != 0x01 && flags != 0x03
 	    && flags != 0x04 && flags != 0x05 && flags != 0x07) {
 		printf("[msgFlags=0x%02X]", flags);
 		return;

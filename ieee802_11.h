@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ieee802_11.h,v 1.3 2001-06-14 09:50:01 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ieee802_11.h,v 1.4 2002-06-11 17:08:38 itojun Exp $ (LBL) */
 /*
  * Copyright (c) 2001
  *	Fortress Technologies
@@ -28,15 +28,15 @@
 #define T_DATA 0x2 /* data */
 #define T_RESV 0x3  /* reserved */
 
-#define ST_ASSOC_REQUEST   	0x0 
-#define ST_ASSOC_RESPONSE 	0x1 
-#define ST_REASSOC_REQUEST   	0x2 
-#define ST_REASSOC_RESPONSE  	0x3 
-#define ST_PROBE_REQUEST   	0x4 
-#define ST_PROBE_RESPONSE   	0x5 
+#define ST_ASSOC_REQUEST   	0x0
+#define ST_ASSOC_RESPONSE 	0x1
+#define ST_REASSOC_REQUEST   	0x2
+#define ST_REASSOC_RESPONSE  	0x3
+#define ST_PROBE_REQUEST   	0x4
+#define ST_PROBE_RESPONSE   	0x5
 /* RESERVED 			0x6  */
 /* RESERVED 			0x7  */
-#define ST_BEACON   		0x8 
+#define ST_BEACON   		0x8
 #define ST_ATIM			0x9
 #define ST_DISASSOC		0xA
 #define ST_AUTH			0xB
@@ -46,7 +46,7 @@
 /* RESERVED 			0xF  */
 
 
-#define CTRL_PS_POLL	0xA 
+#define CTRL_PS_POLL	0xA
 #define CTRL_RTS	0xB
 #define CTRL_CTS	0xC
 #define CTRL_ACK	0xD
@@ -153,7 +153,7 @@ struct tim_t {
 /* reserved 		15 */
 /* reserved 		16 */
 
-#define E_CHALLENGE 	16	
+#define E_CHALLENGE 	16
 /* reserved 		17 */
 /* reserved 		18 */
 /* reserved 		19 */

@@ -23,8 +23,8 @@
 
 
 #ifndef lint
-static const char rcsid[] = 
-     "@(#) $Header: /tcpdump/master/tcpdump/print-pptp.c,v 1.3 2001-10-31 08:54:31 guy Exp $";
+static const char rcsid[] =
+     "@(#) $Header: /tcpdump/master/tcpdump/print-pptp.c,v 1.4 2002-06-11 17:08:54 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -55,7 +55,7 @@ static char tstr[] = " [|pptp]";
 
 #define PPTP_CTRL_MSG_TYPE_SCCRQ	1
 #define PPTP_CTRL_MSG_TYPE_SCCRP	2
-#define PPTP_CTRL_MSG_TYPE_StopCCRQ	3 
+#define PPTP_CTRL_MSG_TYPE_StopCCRQ	3
 #define PPTP_CTRL_MSG_TYPE_StopCCRP	4
 #define PPTP_CTRL_MSG_TYPE_ECHORQ	5
 #define PPTP_CTRL_MSG_TYPE_ECHORP	6
@@ -185,8 +185,8 @@ struct pptp_msg_icrq {
 	u_int16_t call_ser;
 	u_int32_t bearer_type;
 	u_int32_t phy_chan_id;
-	u_int16_t dialed_no_len;		
-	u_int16_t dialing_no_len;		
+	u_int16_t dialed_no_len;
+	u_int16_t dialing_no_len;
 	u_char dialed_no[64];		/* DNIS */
 	u_char dialing_no[64];		/* CLID */
 	u_char subaddr[64];
@@ -245,7 +245,7 @@ struct pptp_msg_sli {
 
 /* attributes that appear more than once in above messages:
 
-   Number of         
+   Number of
    occurence    attributes
   --------------------------------------
       2         u_int32_t bearer_cap;
@@ -272,7 +272,7 @@ struct pptp_msg_sli {
       2         u_char subaddr[64];
       2         u_char vendor[64];
 
-  so I will prepare print out functions for these attributes (except for 
+  so I will prepare print out functions for these attributes (except for
   reserved*).
 */
 
@@ -308,7 +308,7 @@ pptp_bearer_type_print(const u_int32_t *bearer_type)
 	case 2:
 		printf("D");	/* Digital */
 		break;
-	case 3: 
+	case 3:
 		printf("Any");
 		break;
 	default:
@@ -707,7 +707,7 @@ pptp_echorq_print(const u_char *dat)
 
 	TCHECK(ptr->id);
 	pptp_id_print(&ptr->id);
-	
+
 	return;
 
 trunc:
@@ -726,7 +726,7 @@ pptp_echorp_print(const u_char *dat)
 	TCHECK(ptr->err_code);
 	pptp_err_code_print(&ptr->err_code);
 	TCHECK(ptr->reserved1);
-	
+
 	return;
 
 trunc:
@@ -832,7 +832,7 @@ static void
 pptp_icrp_print(const u_char *dat)
 {
 	struct pptp_msg_icrp *ptr = (struct pptp_msg_icrp *)dat;
-	
+
 	TCHECK(ptr->call_id);
 	pptp_call_id_print(&ptr->call_id);
 	TCHECK(ptr->peer_call_id);
@@ -927,10 +927,10 @@ pptp_wen_print(const u_char *dat)
 	TCHECK(ptr->framing_err);
 	printf(" FRAMING_ERR(%lu)", (unsigned long)ntohl(ptr->framing_err));
 	TCHECK(ptr->hardware_overrun);
-	printf(" HARDWARE_OVERRUN(%lu)", 
+	printf(" HARDWARE_OVERRUN(%lu)",
 	       (unsigned long)ntohl(ptr->hardware_overrun));
 	TCHECK(ptr->buffer_overrun);
-	printf(" BUFFER_OVERRUN(%lu)", 
+	printf(" BUFFER_OVERRUN(%lu)",
 	       (unsigned long)ntohl(ptr->buffer_overrun));
 	TCHECK(ptr->timeout_err);
 	printf(" TIMEOUT_ERR(%lu)", (unsigned long)ntohl(ptr->timeout_err));
@@ -1003,7 +1003,7 @@ pptp_print(const u_char *dat, u_int length)
 	TCHECK(hdr->ctrl_msg_type);
 	ctrl_msg_type = ntohs(hdr->ctrl_msg_type);
 	if (ctrl_msg_type < PPTP_MAX_MSGTYPE_INDEX) {
-		printf(" CTRL_MSGTYPE=%s", 
+		printf(" CTRL_MSGTYPE=%s",
 		       pptp_message_type_string[ctrl_msg_type]);
 	} else {
 		printf(" UNKNOWN_CTRL_MSGTYPE(%u)", ctrl_msg_type);
@@ -1067,4 +1067,4 @@ pptp_print(const u_char *dat, u_int length)
 
 trunc:
 	printf("%s", tstr);
-}	
+}

@@ -1,6 +1,6 @@
 /*
- * Marko Kiiskila carnil@cs.tut.fi 
- * 
+ * Marko Kiiskila carnil@cs.tut.fi
+ *
  * Tampere University of Technology - Telecommunications Laboratory
  *
  * Permission to use, copy, modify and distribute this
@@ -12,15 +12,15 @@
  * documentation, and that the use of this software is
  * acknowledged in any publications resulting from using
  * the software.
- * 
+ *
  * TUT ALLOWS FREE USE OF THIS SOFTWARE IN ITS "AS IS"
  * CONDITION AND DISCLAIMS ANY LIABILITY OF ANY KIND FOR
  * ANY DAMAGES WHATSOEVER RESULTING FROM THE USE OF THIS
  * SOFTWARE.
- * 
+ *
  */
 
-/* $Id: lane.h,v 1.3 2000-10-03 02:54:56 itojun Exp $ */
+/* $Id: lane.h,v 1.4 2002-06-11 17:08:39 itojun Exp $ */
 
 #ifndef ETHER_ADDR_LEN
 #define ETHER_ADDR_LEN 6

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.103 2001-12-03 02:06:10 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.104 2002-06-11 17:08:58 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -620,23 +620,23 @@ udp_print(register const u_char *bp, u_int length,
 		else if (ISPORT(L2TP_PORT))
 			l2tp_print((const u_char *)(up + 1), length);
 #ifdef TCPDUMP_DO_SMB
- 		else if (ISPORT(NETBIOS_NS_PORT))
+		else if (ISPORT(NETBIOS_NS_PORT))
 			nbt_udp137_print((const u_char *)(up + 1), length);
- 		else if (ISPORT(NETBIOS_DGRAM_PORT))
- 			nbt_udp138_print((const u_char *)(up + 1), length);
+		else if (ISPORT(NETBIOS_DGRAM_PORT))
+			nbt_udp138_print((const u_char *)(up + 1), length);
 #endif
 		else if (dport == 3456)
 			vat_print((const void *)(up + 1), length, up);
 		else if (ISPORT(ZEPHYR_SRV_PORT) || ISPORT(ZEPHYR_CLT_PORT))
 			zephyr_print((const void *)(up + 1), length);
- 		/*
- 		 * Since there are 10 possible ports to check, I think
- 		 * a <> test would be more efficient
- 		 */
- 		else if ((sport >= RX_PORT_LOW && sport <= RX_PORT_HIGH) ||
- 			 (dport >= RX_PORT_LOW && dport <= RX_PORT_HIGH))
- 			rx_print((const void *)(up + 1), length, sport, dport,
- 				 (u_char *) ip);
+		/*
+		 * Since there are 10 possible ports to check, I think
+		 * a <> test would be more efficient
+		 */
+		else if ((sport >= RX_PORT_LOW && sport <= RX_PORT_HIGH) ||
+			 (dport >= RX_PORT_LOW && dport <= RX_PORT_HIGH))
+			rx_print((const void *)(up + 1), length, sport, dport,
+				 (u_char *) ip);
 #ifdef INET6
 		else if (ISPORT(RIPNG_PORT))
 			ripng_print((const u_char *)(up + 1), length);
@@ -654,11 +654,11 @@ udp_print(register const u_char *bp, u_int length,
 			cisco_autorp_print((const void *)(up + 1), length);
 		else if (ISPORT(RADIUS_PORT) ||
 			 ISPORT(RADIUS_NEW_PORT) ||
-			 ISPORT(RADIUS_ACCOUNTING_PORT) || 
+			 ISPORT(RADIUS_ACCOUNTING_PORT) ||
 			 ISPORT(RADIUS_NEW_ACCOUNTING_PORT) )
 			radius_print((const u_char *)(up+1), length);
 		else if (dport == HSRP_PORT)
- 			hsrp_print((const u_char *)(up + 1), length);
+			hsrp_print((const u_char *)(up + 1), length);
 		else if (ISPORT(LWRES_PORT))
 			lwres_print((const u_char *)(up + 1), length);
 		else

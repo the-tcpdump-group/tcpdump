@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.64 2002-06-01 23:50:32 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.65 2002-06-11 17:08:48 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -68,7 +68,7 @@ struct icmp {
 
 		/* ICMP_UNREACH_NEEDFRAG -- Path MTU Discovery (RFC1191) */
 		struct ih_pmtu {
-			u_int16_t ipm_void;    
+			u_int16_t ipm_void;
 			u_int16_t ipm_nextmtu;
 		} ih_pmtu;
 	} icmp_hun;
@@ -282,16 +282,16 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2)
 
 	TCHECK(dp->icmp_code);
 	switch (dp->icmp_type) {
-	
+
 	case ICMP_ECHO:
 		TCHECK(dp->icmp_seq);
-		(void)snprintf(buf, sizeof(buf), "echo request seq %u", 
+		(void)snprintf(buf, sizeof(buf), "echo request seq %u",
 			(unsigned)ntohs(dp->icmp_seq));
 		break;
 
 	case ICMP_ECHOREPLY:
 		TCHECK(dp->icmp_seq);
-		(void)snprintf(buf, sizeof(buf), "echo reply seq %u", 
+		(void)snprintf(buf, sizeof(buf), "echo reply seq %u",
 			(unsigned)ntohs(dp->icmp_seq));
 		break;
 
@@ -490,13 +490,13 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2)
 				printf(" (wrong icmp csum)");
 		}
 	}
- 	if (vflag > 1 && !ICMP_INFOTYPE(dp->icmp_type)) {
- 		bp += 8;
- 		(void)printf(" for ");
- 		ip = (struct ip *)bp;
- 		snaplen = snapend - bp;
- 		ip_print(bp, ntohs(ip->ip_len));
- 	}
+	if (vflag > 1 && !ICMP_INFOTYPE(dp->icmp_type)) {
+		bp += 8;
+		(void)printf(" for ");
+		ip = (struct ip *)bp;
+		snaplen = snapend - bp;
+		ip_print(bp, ntohs(ip->ip_len));
+	}
 	return;
 trunc:
 	fputs("[|icmp]", stdout);

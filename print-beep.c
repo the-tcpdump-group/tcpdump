@@ -1,8 +1,8 @@
 /*
  * Copyright (C) 2000, Richard Sharpe
  *
- * This software may be distributed either under the terms of the 
- * BSD-style licence that accompanies tcpdump or under the GNU GPL 
+ * This software may be distributed either under the terms of the
+ * BSD-style licence that accompanies tcpdump or under the GNU GPL
  * version 2 or later.
  *
  * print-beep.c
@@ -11,7 +11,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-  "@(#) $Header: /tcpdump/master/tcpdump/print-beep.c,v 1.1 2001-12-10 08:21:24 guy Exp $";
+  "@(#) $Header: /tcpdump/master/tcpdump/print-beep.c,v 1.2 2002-06-11 17:08:42 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -34,7 +34,7 @@ static const char rcsid[] =
 
 /* Check for a string but not go beyond length
  * Return TRUE on match, FALSE otherwise
- * 
+ *
  * Looks at the first few chars up to tl1 ...
  */
 
@@ -68,6 +68,6 @@ beep_print(const u_char *bp, u_int length)
 		printf(" BEEP SEQ");
 	else if (l_strnstart("END", 4, bp, length))
 		printf(" BEEP END");
-	else 
+	else
 		printf(" BEEP (payload or undecoded)");
 }

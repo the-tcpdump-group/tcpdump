@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-gre.c,v 1.14 2002-06-01 23:50:31 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-gre.c,v 1.15 2002-06-11 17:08:46 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -108,7 +108,7 @@ gre_print(const u_char *bp, u_int length)
 			printf("R%x", (flags & GRE_RECUR_MASK) >> GRE_RECUR_SHIFT);
 		ver = flags & GRE_VER_MASK;
 		printf("v%u", ver);
-		
+
 		if (flags & GRE_MBZ_MASK)
 			printf("!%x", flags & GRE_MBZ_MASK);
 		fputs("] ", stdout);
@@ -143,7 +143,7 @@ gre_print(const u_char *bp, u_int length)
 				printf("PL:%u ", EXTRACT_16BITS(cp));
 			printf("ID:%04x ", EXTRACT_16BITS(cp+2));
 		}
-		else 
+		else
 			printf("K:%08x ", EXTRACT_32BITS(cp));
 		cp += 4;	/* skip key */
 	}
@@ -166,7 +166,7 @@ gre_print(const u_char *bp, u_int length)
 	length -= cp - bp;
 	if (ether_encap_print(proto, cp, length, length,
 	    &extracted_ethertype) == 0)
- 		printf("gre-proto-0x%04X", proto);
+		printf("gre-proto-0x%04X", proto);
 	return;
 
 trunc:

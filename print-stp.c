@@ -11,7 +11,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-stp.c,v 1.7 2002-05-29 09:59:12 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-stp.c,v 1.8 2002-06-11 17:08:57 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -82,7 +82,7 @@ stp_print(const u_char *p, u_int length)
 		printf("unknown version");
 		return;
 	}
-		
+
 	switch (p[6])
 	{
 	case 0:

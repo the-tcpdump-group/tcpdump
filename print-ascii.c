@@ -42,7 +42,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-ascii.c,v 1.7 2002-04-24 06:55:55 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-ascii.c,v 1.8 2002-06-11 17:08:42 itojun Exp $";
 #endif
 #include <stdio.h>
 #include <sys/types.h>
@@ -56,7 +56,7 @@ static const char rcsid[] =
 #define HEXDUMP_HEXSTUFF_PER_SHORT 5 /* 4 hex digits and a space */
 #define HEXDUMP_HEXSTUFF_PER_LINE \
 		(HEXDUMP_HEXSTUFF_PER_SHORT * HEXDUMP_SHORTS_PER_LINE)
-     
+
 void
 ascii_print_with_offset(register const u_char *cp, register u_int length,
 			register u_int oset)
@@ -131,7 +131,7 @@ ascii_print(register const u_char *cp, register u_int length)
 {
 	ascii_print_with_offset(cp, length, 0);
 }
-	
+
 /*
  * telnet_print() wants this.  It is essentially default_print_unaligned()
  */

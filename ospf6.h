@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ospf6.h,v 1.3 2000-12-17 23:07:50 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ospf6.h,v 1.4 2002-06-11 17:08:40 itojun Exp $ (LBL) */
 /*
  * Copyright (c) 1991, 1993, 1994, 1995, 1996, 1997
  *	The Regents of the University of California.  All rights reserved.
@@ -153,7 +153,7 @@ struct lsa {
 	/* AS external links advertisements */
 	struct {
 	    u_int32_t asla_metric;
-	    struct lsa_prefix asla_prefix[1]; 
+	    struct lsa_prefix asla_prefix[1];
 	    /* some optional fields follow */
 	} un_asla;
 

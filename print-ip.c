@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.104 2002-05-29 09:47:04 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.105 2002-06-11 17:08:49 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -109,7 +109,7 @@ ip_printts(register const u_char *cp, u_int length)
 	case 3:			/* IPOPT_TS_PRESPEC */
 		printf("PRESPEC");
 		break;
-	default:	
+	default:
 		printf("[bad ts type %d]", cp[3]&0xF);
 		goto done;
 	}
@@ -225,12 +225,12 @@ in_cksum(const u_short *addr, register u_int len, int csum)
 	u_short answer;
 	int sum = csum;
 
- 	/*
+	/*
 	 *  Our algorithm is simple, using a 32 bit accumulator (sum),
 	 *  we add sequential 16 bit words to it, and at the end, fold
 	 *  back all the carry bits from the top 16 bits into the lower
 	 *  16 bits.
- 	 */
+	 */
 	while (nleft > 1)  {
 		sum += *w++;
 		nleft -= 2;
@@ -367,7 +367,7 @@ again:
 		    }
 
 		case IPPROTO_SCTP:
-  			sctp_print(cp, (const u_char *)ip, len);
+			sctp_print(cp, (const u_char *)ip, len);
 			break;
 
 		case IPPROTO_TCP:
@@ -470,9 +470,9 @@ again:
 		}
 	}
 
- 	/* Ultra quiet now means that all this stuff should be suppressed */
- 	/* res 3-Nov-98 */
- 	if (qflag > 1) return;
+	/* Ultra quiet now means that all this stuff should be suppressed */
+	/* res 3-Nov-98 */
+	if (qflag > 1) return;
 
 
 	/*

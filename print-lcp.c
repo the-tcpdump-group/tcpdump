@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-"@(#) $Header: /tcpdump/master/tcpdump/Attic/print-lcp.c,v 1.9 2000-10-06 04:23:12 guy Exp $ (LBL)";
+"@(#) $Header: /tcpdump/master/tcpdump/Attic/print-lcp.c,v 1.10 2002-06-11 17:08:52 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -43,7 +43,7 @@ static const char rcsid[] =
 #include "ppp.h"
 
 /* Codes */
-enum { 
+enum {
   LCP_CONFREQ = 1,
   LCP_CONFACK = 2,
   LCP_CONFNAK = 3,
@@ -122,18 +122,18 @@ lcp_print(register const u_char *bp, u_int length)
   const u_char *lcp_data;
 
   lcp_data = bp+4;
-	
+
   if (snapend < lcp_data) {
     printf(" [LCP|]");
     return;
   }
-  
+
   lcp_code  = bp[0];
   lcp_id    = bp[1];
   lcp_length = EXTRACT_16BITS(bp+2);
 
   printf("LCP %s id=0x%x", tok2str(lcpcode2str, "LCP-#%d", lcp_code), lcp_id);
-  
+
   switch (lcp_code) {
   case LCP_CONFREQ:
   case LCP_CONFACK:
@@ -159,7 +159,7 @@ lcp_print(register const u_char *bp, u_int length)
 	    if (snapend < p+2) return;
 	    printf("%s",tok2str(lcpauth2str, "AUTH-%#x", ntohs(*(u_short*)p)));
 	    if (lcpopt_length < 4) printf(" len=%d!",lcpopt_length);
-	    if (lcpopt_length >= 5 && p < snapend) 
+	    if (lcpopt_length >= 5 && p < snapend)
 	      printf(" %s",tok2str(lcpchap2str, "%#x", p[0]));
 	    break;
 	  case LCP_QUALPROTO:
@@ -211,6 +211,6 @@ lcp_print(register const u_char *bp, u_int length)
   default:
     break;
   }
-  
+
   return;
 }

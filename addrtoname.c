@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.88 2002-06-02 00:07:36 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.89 2002-06-11 17:08:37 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -299,7 +299,7 @@ lookup_emem(const u_char *ep)
 }
 
 /*
- * Find the hash node that corresponds to the bytestring 'bs' 
+ * Find the hash node that corresponds to the bytestring 'bs'
  * with length 'nlen'
  */
 
@@ -458,7 +458,7 @@ linkaddr_string(const u_char *ep, const unsigned int len)
 
 	if (len == 6)	/* XXX not totally correct... */
 		return etheraddr_string(ep);
-	
+
 	tp = lookup_bytestring(ep, len);
 	if (tp->e_name)
 		return (tp->e_name);

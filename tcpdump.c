@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.176 2002-05-16 10:25:58 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.177 2002-06-11 17:09:00 itojun Exp $ (LBL)";
 #endif
 
 /*
@@ -219,7 +219,7 @@ main(int argc, char **argv)
 #ifdef LIBSMI
 	smiInit("tcpdump");
 #endif
-	
+
 	opterr = 0;
 	while (
 	    (op = getopt(argc, argv, "aAc:C:deE:fF:i:lm:nNOpqr:Rs:StT:uvw:xXY")) != -1)
@@ -233,7 +233,7 @@ main(int argc, char **argv)
                        ++xflag;
                        ++Xflag;
                        ++Aflag;
-                       break; 
+                       break;
 
 		case 'c':
 			cnt = atoi(optarg);
@@ -243,7 +243,7 @@ main(int argc, char **argv)
 
 		case 'C':
 			Cflag = atoi(optarg) * 1000000;
-			if (Cflag < 0) 
+			if (Cflag < 0)
 				error("invalid file size %s", optarg);
 			break;
 
@@ -301,7 +301,7 @@ main(int argc, char **argv)
 				      program_name, optarg);
 			(void)fprintf(stderr, "(no libsmi support)\n");
 #endif
-			
+
 		case 'O':
 			Oflag = 0;
 			break;
@@ -364,7 +364,7 @@ main(int argc, char **argv)
 		case 'u':
 			++uflag;
 			break;
-			
+
 		case 'v':
 			++vflag;
 			break;
@@ -378,7 +378,7 @@ main(int argc, char **argv)
 			break;
 
 		case 'X':
-    		        ++xflag;
+		        ++xflag;
 			++Xflag;
 			break;
 
@@ -574,7 +574,7 @@ dump_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	char *name;
 
 	info = (struct dump_info *)user;
-	
+
 	/*
 	 * XXX - this won't prevent capture files from getting
 	 * larger than Cflag - the last packet written to the

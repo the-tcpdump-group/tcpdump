@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.21 2001-11-16 02:17:36 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.22 2002-06-11 17:08:50 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -60,7 +60,7 @@ ip6_print(register const u_char *bp, register u_int length)
 	int nh;
 	int fragmented = 0;
 	u_int flow;
-	
+
 	ip6 = (const struct ip6_hdr *)bp;
 
 #ifdef LBL_ALIGN
@@ -195,7 +195,7 @@ ip6_print(register const u_char *bp, register u_int length)
 	}
 
  end:
-	
+
 	flow = ntohl(ip6->ip6_flow);
 #if 0
 	/* rfc1883 */

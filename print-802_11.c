@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.7 2002-05-13 08:30:19 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.8 2002-06-11 17:08:41 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -817,7 +817,7 @@ ieee802_11_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 
 	case T_DATA:
 		/* There may be a problem w/ AP not having this bit set */
- 		if (FC_WEP(fc)) {
+		if (FC_WEP(fc)) {
 			if (!wep_print(p,length)) {
 				printf("[|802.11]");
 				goto out;

@@ -1,10 +1,10 @@
 /*
  * Copyright (C) 2000 Alfredo Andres Omella.  All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- *  
+ *
  *   1. Redistributions of source code must retain the above copyright
  *      notice, this list of conditions and the following disclaimer.
  *   2. Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
  *   3. The names of the authors may not be used to endorse or promote
  *      products derived from this software without specific prior
  *      written permission.
- *  
+ *
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
@@ -39,12 +39,12 @@
  *
  * Alfredo Andres Omella (aandres@s21sec.com) v0.1 2000/09/15
  *
- * TODO: Among other things to print ok MacIntosh and Vendor values 
+ * TODO: Among other things to print ok MacIntosh and Vendor values
  */
 
 #ifndef lint
 static const char rcsid[] =
-    "$Id: print-radius.c,v 1.11 2002-04-20 09:40:42 guy Exp $";
+    "$Id: print-radius.c,v 1.12 2002-06-11 17:08:55 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -149,20 +149,20 @@ struct radius_attr { u_int8_t type; /* Attribute type   */
                    };
 
 
-/* Service-Type Attribute standard values */                 
+/* Service-Type Attribute standard values */
 static const char *serv_type[]={ NULL,
                                 "Login",
-                                "Framed",  
+                                "Framed",
                                 "Callback Login",
                                 "Callback Framed",
                                 "Outbound",
                                 "Administrative",
-                                "NAS Prompt",                            
+                                "NAS Prompt",
                                 "Authenticate Only",
                                 "Callback NAS Prompt",
                                 "Call Check",
                                 "Callback Administrative",
-                               };                               
+                               };
 
 /* Framed-Protocol Attribute standard values */
 static const char *frm_proto[]={ NULL,
@@ -172,14 +172,14 @@ static const char *frm_proto[]={ NULL,
                                  "Gandalf proprietary",
                                  "Xylogics IPX/SLIP",
                                  "X.75 Synchronous",
-                               };                               
+                               };
 
 /* Framed-Routing Attribute standard values */
 static const char *frm_routing[]={ "None",
                                    "Send",
                                    "Listen",
                                    "Send&Listen",
-                                 };                               
+                                 };
 
 /* Framed-Compression Attribute standard values */
 static const char *frm_comp[]={ "None",
@@ -227,7 +227,7 @@ static const char *nas_port_type[]={ "Async",
                                      "Cable",
                                      "Wireless - Other",
                                      "Wireless - IEEE 802.11",
-                                   };         
+                                   };
 
 /* Acct-Status-Type Accounting Attribute standard values */
 static const char *acct_status[]={ NULL,
@@ -292,7 +292,7 @@ static const char *tunnel_type[]={ NULL,
                                    "DVS",
                                    "IP-in-IP Tunneling",
                                  };
-                                   
+
 /* Tunnel-Medium-Type Attribute standard values */
 static const char *tunnel_medium[]={ NULL,
                                      "IPv4",
@@ -323,8 +323,8 @@ static const char *arap_zone[]={ NULL,
 static const char *prompt[]={ "No Echo",
                               "Echo",
                             };
-                            
-                                                               
+
+
 struct attrtype { char *name;            /* Attribute name                 */
                   const char **subtypes; /* Standard Values (if any)       */
                   u_char siz_subtypes;   /* Size of total standard values  */
@@ -338,23 +338,23 @@ struct attrtype { char *name;            /* Attribute name                 */
      { "CHAP-Pass",      NULL, 0, 0, NULL               },
      { "NAS_ipaddr",     NULL, 0, 0, print_attr_address },
      { "NAS_port",       NULL, 0, 0, print_attr_num     },
-     { "Service_type",   serv_type, TAM_SIZE(serv_type)-1, 1, print_attr_num },                 
+     { "Service_type",   serv_type, TAM_SIZE(serv_type)-1, 1, print_attr_num },
      { "Framed_proto",   frm_proto, TAM_SIZE(frm_proto)-1, 1, print_attr_num },
      { "Framed_ipaddr",  NULL, 0, 0, print_attr_address },
      { "Framed_ipnet",   NULL, 0, 0, print_attr_address },
-     { "Framed_routing", frm_routing, TAM_SIZE(frm_routing), 0, 
-                                                              print_attr_num }, 
+     { "Framed_routing", frm_routing, TAM_SIZE(frm_routing), 0,
+                                                              print_attr_num },
      { "Filter_id",      NULL, 0, 0, print_attr_string  },
      { "Framed_mtu",     NULL, 0, 0, print_attr_num     },
      { "Framed_compress",  frm_comp, TAM_SIZE(frm_comp),   0, print_attr_num },
      { "Login_iphost",   NULL, 0, 0, print_attr_address },
      { "Login_service",  login_serv, TAM_SIZE(login_serv), 0, print_attr_num },
-     { "Login_TCP_port", NULL, 0, 0, print_attr_num     },                 
-/*17*/ { "Unassigned", NULL, 0, 0, NULL },                 
+     { "Login_TCP_port", NULL, 0, 0, print_attr_num     },
+/*17*/ { "Unassigned", NULL, 0, 0, NULL },
      { "Reply",           NULL, 0, 0, print_attr_string },
      { "Callback-number", NULL, 0, 0, print_attr_string },
      { "Callback-id",     NULL, 0, 0, print_attr_string },
-/*21*/ { "Unassigned", NULL, 0, 0, NULL },   
+/*21*/ { "Unassigned", NULL, 0, 0, NULL },
      { "Framed_route",      NULL, 0, 0, print_attr_string },
      { "Framed_ipx_net",    NULL, 0, 0, print_attr_num    },
      { "State",             NULL, 0, 0, print_attr_string },
@@ -364,7 +364,7 @@ struct attrtype { char *name;            /* Attribute name                 */
      { "Idle_timeout",      NULL, 0, 0, print_attr_num    },
      { "Term_action", term_action, TAM_SIZE(term_action), 0, print_attr_num },
      { "Called_station",    NULL, 0, 0, print_attr_string },
-     { "Calling_station",   NULL, 0, 0, print_attr_string },   
+     { "Calling_station",   NULL, 0, 0, print_attr_string },
      { "NAS_id",            NULL, 0, 0, print_attr_string },
      { "Proxy_state",       NULL, 0, 0, print_attr_string },
      { "Login_LAT_service", NULL, 0, 0, print_attr_string },
@@ -393,13 +393,13 @@ struct attrtype { char *name;            /* Attribute name                 */
 /*57*/ { "Unassigned", NULL, 0, 0, NULL },
 /*58*/ { "Unassigned", NULL, 0, 0, NULL },
 /*59*/ { "Unassigned", NULL, 0, 0, NULL },
-     { "CHAP_challenge", NULL, 0, 0, print_attr_string },  
-     { "NAS_port_type",  nas_port_type, TAM_SIZE(nas_port_type), 0, 
+     { "CHAP_challenge", NULL, 0, 0, print_attr_string },
+     { "NAS_port_type",  nas_port_type, TAM_SIZE(nas_port_type), 0,
                                                               print_attr_num },
      { "Port_limit",     NULL, 0, 0, print_attr_num },
 /*63*/ { "Login_LAT_port", NULL, 0, 0, print_attr_string },
      { "Tunnel_type", tunnel_type, TAM_SIZE(tunnel_type)-1, 1, print_attr_num },
-     { "Tunnel_medium", tunnel_medium, TAM_SIZE(tunnel_medium)-1, 1, 
+     { "Tunnel_medium", tunnel_medium, TAM_SIZE(tunnel_medium)-1, 1,
                                                              print_attr_num },
      { "Tunnel_client_end",   NULL, 0, 0, print_attr_string },
      { "Tunnel_server_end",   NULL, 0, 0, print_attr_string },
@@ -407,7 +407,7 @@ struct attrtype { char *name;            /* Attribute name                 */
      { "Tunnel_pass",  NULL, 0, 0, print_attr_string  },
      { "ARAP_pass",    NULL, 0, 0, print_attr_strange },
      { "ARAP_feature", NULL, 0, 0, print_attr_strange },
-/*72*/ { "ARAP_zone_acces", arap_zone, TAM_SIZE(arap_zone)-1, 1, 
+/*72*/ { "ARAP_zone_acces", arap_zone, TAM_SIZE(arap_zone)-1, 1,
                                                              print_attr_num },
      { "ARAP_security",      NULL, 0, 0, print_attr_string },
      { "ARAP_security_data", NULL, 0, 0, print_attr_string },
@@ -430,7 +430,7 @@ struct attrtype { char *name;            /* Attribute name                 */
      { "Tunnel_server_auth_id", NULL, 0, 0, print_attr_string },
 /*92*/ { "Unassigned",  NULL, 0, 0, NULL },
 /*93*/ { "Unassigned",  NULL, 0, 0, NULL }
-  };                    
+  };
 
 
 /*****************************/
@@ -444,9 +444,9 @@ static void
 print_attr_string(register u_char *data, u_int length, u_short attr_code )
 {
    register u_int i;
-   
+
    TCHECK2(data[0],length);
-   
+
    printf("{");
    switch(attr_code)
    {
@@ -477,12 +477,12 @@ print_attr_string(register u_char *data, u_int length, u_short attr_code )
        printf("%c",(*data < 32 || *data > 128) ? '.' : *data );
 
    printf("}");
-   
+
    return;
-   
+
    trunc:
       printf("|radius");
-}  
+}
 
 
 /******************************/
@@ -497,7 +497,7 @@ print_attr_num(register u_char *data, u_int length, u_short attr_code )
 {
    u_int8_t tag;
    u_int32_t timeout;
-   
+
    if (length != 4)
    {
        printf("{length %u != 4}", length);
@@ -506,12 +506,12 @@ print_attr_num(register u_char *data, u_int length, u_short attr_code )
 
    TCHECK2(data[0],4);
                           /* This attribute has standard values */
-   if (attr_type[attr_code].siz_subtypes) 
+   if (attr_type[attr_code].siz_subtypes)
    {
       static const char **table;
       u_int32_t data_value;
       table = attr_type[attr_code].subtypes;
-      
+
       if ( (attr_code == TUNNEL_TYPE) || (attr_code == TUNNEL_MEDIUM) )
       {
          if (!*data)
@@ -529,7 +529,7 @@ print_attr_num(register u_char *data, u_int length, u_short attr_code )
             attr_type[attr_code].first_subtype) )
          printf("{%s}",table[data_value]);
       else
-         printf("{#%d}",data_value);          
+         printf("{#%d}",data_value);
    }
    else
    {
@@ -539,7 +539,7 @@ print_attr_num(register u_char *data, u_int length, u_short attr_code )
              if (EXTRACT_32BITS( data) == 0xFFFFFFFE )
                 printf("{NAS_select}");
              else
-                printf("{%d}",EXTRACT_32BITS( data) );          
+                printf("{%d}",EXTRACT_32BITS( data) );
           break;
 
         case SESSION_TIMEOUT:
@@ -553,27 +553,27 @@ print_attr_num(register u_char *data, u_int length, u_short attr_code )
              else
              {
                 if ( timeout < 3600 )
-                   printf( "{%02d:%02d min}", 
+                   printf( "{%02d:%02d min}",
                           timeout / 60, timeout % 60);
                 else
                    printf( "{%02d:%02d:%02d hours}",
-                          timeout / 3600, (timeout % 3600) / 60, 
+                          timeout / 3600, (timeout % 3600) / 60,
                           timeout % 60);
              }
           break;
 
         case FRM_ATALK_LINK:
-             if (EXTRACT_32BITS(data) )          
+             if (EXTRACT_32BITS(data) )
                 printf("{%d}",EXTRACT_32BITS(data) );
              else
                 printf("{Unnumbered}" );
           break;
-             
+
         case FRM_ATALK_NETWORK:
-             if (EXTRACT_32BITS(data) )          
+             if (EXTRACT_32BITS(data) )
                 printf("{%d}",EXTRACT_32BITS(data) );
              else
-                printf("{NAS_assign}" );          
+                printf("{NAS_assign}" );
           break;
 
         case TUNNEL_PREFERENCE:
@@ -588,13 +588,13 @@ print_attr_num(register u_char *data, u_int length, u_short attr_code )
         default:
              printf("{%d}",EXTRACT_32BITS( data) );
           break;
-      
+
       } /* switch */
-   
+
    } /* if-else */
 
    return;
-   
+
    trunc:
      printf("|radius}");
 }
@@ -617,7 +617,7 @@ print_attr_address(register u_char *data, u_int length, u_short attr_code )
    }
 
    TCHECK2(data[0],4);
-   
+
    switch(attr_code)
    {
       case FRM_IPADDR:
@@ -630,14 +630,14 @@ print_attr_address(register u_char *data, u_int length, u_short attr_code )
               else
                  printf("{%s}",ipaddr_string(data));
       break;
-      
+
       default:
           printf("{%s}",ipaddr_string(data) );
       break;
    }
-   
+
    return;
-   
+
    trunc:
      printf("{|radius}");
 }
@@ -663,19 +663,19 @@ static void print_attr_time(register u_char *data, u_int length, u_short attr_co
    }
 
    TCHECK2(data[0],4);
-   
+
    attr_time = EXTRACT_32BITS(data);
    strlcpy(string, ctime(&attr_time), sizeof(string));
    /* Get rid of the newline */
    string[24] = '\0';
    printf("{%.24s}", string);
    return;
-   
+
    trunc:
      printf("{|radius}");
 }
 
-           
+
 /***********************************/
 /* Print an attribute of 'strange' */
 /* data format pointed by 'data'   */
@@ -686,7 +686,7 @@ static void print_attr_time(register u_char *data, u_int length, u_short attr_co
 static void print_attr_strange(register u_char *data, u_int length, u_short attr_code)
 {
    u_short len_data;
-   
+
    switch(attr_code)
    {
       case ARAP_PASS:
@@ -705,7 +705,7 @@ static void print_attr_strange(register u_char *data, u_int length, u_short attr
            PRINT_HEX(len_data, data);
            printf("]}");
         break;
-        
+
       case ARAP_FEATURES:
            if (length != 14)
            {
@@ -749,7 +749,7 @@ static void print_attr_strange(register u_char *data, u_int length, u_short attr
            printf("}");
         break;
    }
-   
+
    trunc:
      printf("|radius}");
 }
@@ -760,20 +760,20 @@ static void
 radius_attr_print(register const u_char *attr, u_int length)
 {
    register const struct radius_attr *rad_attr = (struct radius_attr *)attr;
-   
+
    if (length < 3)
    {
       printf(" [|radius]");
       return;
    }
- 
+
    printf(" Attr[ ");
    while (length > 0)
    {
      if (rad_attr->len == 0)
      {
-     	printf("(zero-length attribute)");
-     	return;
+	printf("(zero-length attribute)");
+	return;
      }
      if ( rad_attr->len <= length )
      {
@@ -786,7 +786,7 @@ radius_attr_print(register const u_char *attr, u_int length)
            if (rad_attr->len > 2)
            {
                if ( attr_type[rad_attr->type].print_func )
-                  (*attr_type[rad_attr->type].print_func)( 
+                  (*attr_type[rad_attr->type].print_func)(
 		                           ((u_char *)(rad_attr+1)),
                                            rad_attr->len - 2, rad_attr->type);
            }
@@ -800,7 +800,7 @@ radius_attr_print(register const u_char *attr, u_int length)
      length-=(rad_attr->len);
      rad_attr = (struct radius_attr *)( ((char *)(rad_attr))+rad_attr->len);
    }
-   
+
    printf(" ]");
 }
 
@@ -811,7 +811,7 @@ radius_print(const u_char *dat, u_int length)
    register const struct radius_hdr *rad;
    register int i;
    int len;
-   
+
    i = min(length, snapend - dat);
 
    if (i < MIN_RADIUS_LEN)
@@ -831,10 +831,10 @@ radius_print(const u_char *dat, u_int length)
 
    if (len < i)
 	  i = len;
-   
+
    i -= MIN_RADIUS_LEN;
 
-   switch (rad->code) 
+   switch (rad->code)
    {
      case RADCMD_ACCESS_REQ:
          printf(" rad-access-req %d", length);
@@ -877,7 +877,7 @@ radius_print(const u_char *dat, u_int length)
          break;
    }
    printf(" [id %d]", rad->id);
- 
+
    if (i)
-      radius_attr_print( dat + MIN_RADIUS_LEN, i);  
+      radius_attr_print( dat + MIN_RADIUS_LEN, i);
 }

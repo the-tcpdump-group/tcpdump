@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ah.c,v 1.15 2001-09-17 21:57:54 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ah.c,v 1.16 2002-06-11 17:08:41 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -67,7 +67,7 @@ ah_print(register const u_char *bp, register const u_char *bp2)
 	if (bp + sizeof(struct ah) + sumlen > ep)
 		fputs("[truncated]", stdout);
 	fputs("): ", stdout);
-	
+
 	return sizeof(struct ah) + sumlen;
  trunc:
 	fputs("[|AH]", stdout);

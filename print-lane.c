@@ -1,6 +1,6 @@
 /*
- * Marko Kiiskila carnil@cs.tut.fi 
- * 
+ * Marko Kiiskila carnil@cs.tut.fi
+ *
  * Tampere University of Technology - Telecommunications Laboratory
  *
  * Permission to use, copy, modify and distribute this
@@ -12,17 +12,17 @@
  * documentation, and that the use of this software is
  * acknowledged in any publications resulting from using
  * the software.
- * 
+ *
  * TUT ALLOWS FREE USE OF THIS SOFTWARE IN ITS "AS IS"
  * CONDITION AND DISCLAIMS ANY LIABILITY OF ANY KIND FOR
  * ANY DAMAGES WHATSOEVER RESULTING FROM THE USE OF THIS
  * SOFTWARE.
- * 
+ *
  */
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lane.c,v 1.12 2001-07-05 18:54:15 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lane.c,v 1.13 2002-06-11 17:08:51 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H

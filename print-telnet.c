@@ -37,11 +37,11 @@
  */
 /*
  *      @(#)Copyright (c) 1994, Simon J. Gerraty.
- *      
+ *
  *      This is free software.  It comes with NO WARRANTY.
- *      Permission to use, modify and distribute this source code 
+ *      Permission to use, modify and distribute this source code
  *      is granted subject to the following conditions.
- *      1/ that the above copyright notice and this notice 
+ *      1/ that the above copyright notice and this notice
  *      are preserved in all copies.
  */
 
@@ -51,7 +51,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.18 2001-09-10 06:40:08 fenner Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.19 2002-06-11 17:08:57 itojun Exp $";
 #endif
 
 #include <sys/param.h>
@@ -237,7 +237,7 @@ telnet_print(const u_char *sp, u_int length)
 	int l;
 
 	osp = sp;
-	
+
 	while (length > 0 && *sp == IAC) {
 		l = telnet_parse(sp, length, 0);
 		if (l < 0)
