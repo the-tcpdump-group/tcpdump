@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.3 2000-01-09 21:34:17 fenner Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.4 2000-03-13 05:00:04 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -92,7 +92,7 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 		icmp6len = snapend - bp;
 
 #if 0
-        (void)printf("%s > %s: ",
+	(void)printf("%s > %s: ",
 		ip6addr_string(&ip->ip6_src),
 		ip6addr_string(&ip->ip6_dst));
 #endif
@@ -216,7 +216,7 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 		printf("icmp6: router solicitation ");
 		if (vflag) {
 #define RTSOLLEN 8
-		        icmp6_opt_print((const u_char *)dp + RTSOLLEN,
+			icmp6_opt_print((const u_char *)dp + RTSOLLEN,
 					icmp6len - RTSOLLEN);
 		}
 		break;
@@ -232,6 +232,8 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 				printf("M");
 			if (p->nd_ra_flags_reserved & ND_RA_FLAG_OTHER)
 				printf("O");
+			if (p->nd_ra_flags_reserved & ND_RA_FLAG_HA)
+				printf("H");
 			if (p->nd_ra_flags_reserved != 0)
 				printf(" ");
 			printf("router_ltime=%d, ", ntohs(p->nd_ra_router_lifetime));
@@ -240,7 +242,7 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 			printf("retrans_time=%u)",
 				(u_int32_t)ntohl(p->nd_ra_retransmit));
 #define RTADVLEN 16
-		        icmp6_opt_print((const u_char *)dp + RTADVLEN,
+			icmp6_opt_print((const u_char *)dp + RTADVLEN,
 					icmp6len - RTADVLEN);
 		}
 		break;
@@ -253,7 +255,7 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 			ip6addr_string(&p->nd_ns_target));
 		if (vflag) {
 #define NDSOLLEN 24
-		        icmp6_opt_print((const u_char *)dp + NDSOLLEN,
+			icmp6_opt_print((const u_char *)dp + NDSOLLEN,
 					icmp6len - NDSOLLEN);
 		}
 	    }
@@ -266,7 +268,7 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 		TCHECK(p->nd_na_target);
 		printf("icmp6: neighbor adv: tgt is %s",
 			ip6addr_string(&p->nd_na_target));
-                if (vflag) {
+		if (vflag) {
 #define ND_NA_FLAG_ALL	\
 	(ND_NA_FLAG_ROUTER|ND_NA_FLAG_SOLICITED|ND_NA_FLAG_OVERRIDE)
 			/* we don't need ntohl() here.  see advanced-api-04. */
@@ -285,7 +287,7 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 				printf(")");
 			}
 #define NDADVLEN 24
-		        icmp6_opt_print((const u_char *)dp + NDADVLEN,
+			icmp6_opt_print((const u_char *)dp + NDADVLEN,
 					icmp6len - NDADVLEN);
 		}
 	    }
@@ -326,11 +328,15 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 	    {
 		int siz;
 		siz = ep - (u_char *)(dp + 1);
+		if (icmp6len > ep - (u_char *)dp) {
+			printf("[|icmp6: who-are-you/FQDN request]");
+			break;
+		}
 		if (siz == 4)
 			printf("icmp6: who-are-you request");
 		else {
 			printf("icmp6: FQDN request");
-			if (vflag) {
+			if (vflag && icmp6len == ep - (u_char *)dp) {
 				if (siz < 8)
 					printf("?(icmp6_data %d bytes)", siz);
 				else if (8 < siz)
@@ -344,19 +350,20 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 	case ICMP6_WRUREPLY:	/*ICMP6_FQDN_REPLY*/
 	    {
 		enum { UNKNOWN, WRU, FQDN } mode = UNKNOWN;
-		u_char const *buf;
-		u_char const *cp = NULL;
+		const u_char *buf;
+		const u_char *cp = NULL;
+		const char *modename = NULL;
 
 		buf = (u_char *)(dp + 1);
 
 		/* fair guess */
-		if (buf[12] == ep - buf - 13)
+		if (ep - buf > 12 && buf[12] == ep - buf - 13)
 			mode = FQDN;
 		else if (dp->icmp6_code == 1)
 			mode = FQDN;
 
 		/* wild guess */
-		if (mode == UNKNOWN) {
+		if (mode == UNKNOWN && ep - buf > 4) {
 			cp = buf + 4;
 			while (cp < ep) {
 				if (!isprint(*cp++))
@@ -366,18 +373,29 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 #ifndef abs
 #define abs(a)	((0 < (a)) ? (a) : -(a))
 #endif
-		if (mode == UNKNOWN && 2 < abs(buf[12] - (ep - buf - 13)))
+		if (mode == UNKNOWN && ep - buf > 12 &&
+		    2 < abs(buf[12] - (ep - buf - 13))) {
 			mode = WRU;
+		}
 		if (mode == UNKNOWN)
 			mode = FQDN;
 
 		if (mode == WRU) {
-			cp = buf + 4;
-			printf("icmp6: who-are-you reply(\"");
+			if (ep - buf > 12 && buf[12] == ep - buf - 13)
+				cp = buf + 4;
+			else
+				cp = ep + 1;	/*truncated*/
+			modename = "icmp6: who-are-you reply";
 		} else if (mode == FQDN) {
 			cp = buf + 13;
-			printf("icmp6: FQDN reply(\"");
+			modename = "icmp6: FQDN reply";
 		}
+		if (icmp6len > ep - (u_char *)dp) {
+			printf("[|%s]", modename);
+			break;
+		}
+		printf("%s", modename);
+		printf("(\"");	/*)*/
 		for (; cp < ep; cp++)
 			printf((isprint(*cp) ? "%c" : "\\%03o"), *cp);
 		printf("\"");
@@ -399,6 +417,7 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 				}
 			}
 		}
+		/*(*/
 		printf(")");
 		break;
 	    }
@@ -460,10 +479,11 @@ icmp6_opt_print(register const u_char *bp, int resid)
 #else
 		TCHECK((u_char *)opl + (opl->nd_opt_len << 3) - 1);
 #endif
-		printf("(src lladdr: %s",
+		printf("(src lladdr: %s",	/*)*/
 			etheraddr_string((u_char *)(opl + 1)));
 		if (opl->nd_opt_len != 1)
 			printf("!");
+		/*(*/
 		printf(")");
 		icmp6_opt_print((const u_char *)op + (op->nd_opt_len << 3),
 				resid - (op->nd_opt_len << 3));
@@ -476,10 +496,11 @@ icmp6_opt_print(register const u_char *bp, int resid)
 #else
 		TCHECK((u_char *)opl + (opl->nd_opt_len << 3) - 1);
 #endif
-		printf("(tgt lladdr: %s",
+		printf("(tgt lladdr: %s",	/*)*/
 			etheraddr_string((u_char *)(opl + 1)));
 		if (opl->nd_opt_len != 1)
 			printf("!");
+		/*(*/
 		printf(")");
 		icmp6_opt_print((const u_char *)op + (op->nd_opt_len << 3),
 				resid - (op->nd_opt_len << 3));
@@ -487,7 +508,7 @@ icmp6_opt_print(register const u_char *bp, int resid)
 	case ND_OPT_PREFIX_INFORMATION:
 		opp = (struct nd_opt_prefix_info *)op;
 		TCHECK(opp->nd_opt_pi_prefix);
-		printf("(prefix info: ");
+		printf("(prefix info: ");	/*)*/
 		if (opp->nd_opt_pi_flags_reserved & ND_OPT_PI_FLAG_ONLINK)
 		       printf("L");
 		if (opp->nd_opt_pi_flags_reserved & ND_OPT_PI_FLAG_AUTO)
@@ -512,6 +533,7 @@ icmp6_opt_print(register const u_char *bp, int resid)
 			opp->nd_opt_pi_prefix_len);
 		if (opp->nd_opt_pi_len != 4)
 			printf("!");
+		/*(*/
 		printf(")");
 		icmp6_opt_print((const u_char *)op + (op->nd_opt_len << 3),
 				resid - (op->nd_opt_len << 3));
@@ -526,7 +548,7 @@ icmp6_opt_print(register const u_char *bp, int resid)
 	case ND_OPT_MTU:
 		opm = (struct nd_opt_mtu *)op;
 		TCHECK(opm->nd_opt_mtu_mtu);
-		printf("(mtu: ");
+		printf("(mtu: ");	/*)*/
 		printf("mtu=%u", (u_int32_t)ntohl(opm->nd_opt_mtu_mtu));
 		if (opm->nd_opt_mtu_len != 1)
 			printf("!");
