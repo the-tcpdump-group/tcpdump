@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.77 2001-09-17 21:58:00 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.78 2001-10-19 09:00:48 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -508,7 +508,7 @@ ns_print(register const u_char *bp, u_int length)
 {
 	register const HEADER *np;
 	register int qdcount, ancount, nscount, arcount;
-	register const u_char *cp = NULL;
+	register const u_char *cp;
 
 	np = (const HEADER *)bp;
 	TCHECK(*np);
@@ -538,12 +538,10 @@ ns_print(register const u_char *bp, u_int length)
 				putchar(',');
 			if (vflag > 1) {
 				fputs(" q:", stdout);
-				if ((cp = ns_qprint((const u_char *)(np + 1), bp))
-				    == NULL)
+				if ((cp = ns_qprint(cp, bp)) == NULL)
 					goto trunc;
 			} else {
-				if ((cp = ns_nskip((const u_char *)(np + 1), bp))
-				    == NULL)
+				if ((cp = ns_nskip(cp, bp)) == NULL)
 					goto trunc;
 				cp += 4;	/* skip QTYPE and QCLASS */
 			}
@@ -615,9 +613,9 @@ ns_print(register const u_char *bp, u_int length)
 		if (arcount)
 			printf(" [%dau]", arcount);
 
+		cp = (const u_char *)(np + 1);
 		if (qdcount--) {
-			cp = ns_qprint((const u_char *)(np + 1),
-				       (const u_char *)np);
+			cp = ns_qprint(cp, (const u_char *)np);
 			if (!cp)
 				goto trunc;
 			while (cp < snapend && qdcount--) {
