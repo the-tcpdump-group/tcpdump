@@ -45,6 +45,7 @@ ipx.h
 isakmp.h
 l2tp.h
 lane.h
+lbl/os-osf4.h
 lbl/os-solaris2.h
 lbl/os-sunos4.h
 lbl/os-ultrix4.h
