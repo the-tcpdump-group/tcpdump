@@ -1,7 +1,7 @@
 /*
  * Definitions for tcp compression routines.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/slcompress.h,v 1.1 2000-10-09 01:53:21 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/slcompress.h,v 1.2 2000-10-09 02:03:44 guy Exp $ (LBL)
  *
  * Copyright (c) 1989, 1990, 1992, 1993 Regents of the University of
  * California. All rights reserved.
@@ -21,9 +21,6 @@
  *	Van Jacobson (van@ee.lbl.gov), Dec 31, 1989:
  *	- Initial distribution.
  */
-
-#define MAX_STATES 16		/* must be > 2 and < 256 */
-#define MAX_HDR MLEN		/* XXX 4bsd-ism: should really be 128 */
 
 /*
  * Compressed packet format:
@@ -86,3 +83,5 @@
 #define SPECIAL_I (NEW_S|NEW_W|NEW_U)		/* echoed interactive traffic */
 #define SPECIAL_D (NEW_S|NEW_A|NEW_W|NEW_U)	/* unidirectional data */
 #define SPECIALS_MASK (NEW_S|NEW_A|NEW_W|NEW_U)
+
+#define TCP_PUSH_BIT 0x10
