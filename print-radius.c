@@ -44,7 +44,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "$Id: print-radius.c,v 1.17 2002-11-09 17:19:29 itojun Exp $";
+    "$Id: print-radius.c,v 1.18 2002-11-10 20:37:31 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -646,7 +646,7 @@ print_attr_address(register u_char *data, u_int length, u_short attr_code )
 /*************************************/
 /* Returns nothing.                  */
 /*************************************/
-static void print_attr_time(register u_char *data, u_int length, u_short attr_code)
+static void print_attr_time(register u_char *data, u_int length, u_short attr_code _U_)
 {
    time_t attr_time;
    char string[26];
