@@ -18,6 +18,15 @@
  * PURPOSE.
  */
 
+#ifndef lint
+static const char rcsid[] =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-zephyr.c,v 1.2 2001-09-11 02:37:12 guy Exp $";
+#endif
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
