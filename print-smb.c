@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.12 2001-06-25 03:07:30 itojun Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.13 2001-06-25 18:58:07 itojun Exp $";
 #endif
 
 #include <stdio.h>
@@ -816,8 +816,8 @@ nbt_tcp_print(const uchar *data, int length)
 	    break;
 	if (memcmp(data,"\377SMB",4) == 0) {
 	    if (nbt_len > PTR_DIFF(maxbuf, data))
-	    printf("WARNING: Short packet. Try increasing the snap length (%ld)\n",
-	       PTR_DIFF(maxbuf, data));
+	    printf("WARNING: Short packet. Try increasing the snap length (%lu)\n",
+	       (unsigned long)PTR_DIFF(maxbuf, data));
 	    print_smb(data, maxbuf > data + nbt_len ? data + nbt_len : maxbuf);
 	} else
 	    printf("Session packet:(raw data?)\n");

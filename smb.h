@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/smb.h,v 1.4 2001-06-25 03:07:31 itojun Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/smb.h,v 1.5 2001-06-25 18:58:08 itojun Exp $ (LBL) */
 /* 
  * Copyright (C) Andrew Tridgell 1995-1999
  *
@@ -148,7 +148,7 @@
 #define TRANSACT2_FINDNOTIFYNEXT  12
 #define TRANSACT2_MKDIR           13
 
-#define PTR_DIFF(p1, p2) ((unsigned long)(((char *)(p1)) - (char *)(p2)))
+#define PTR_DIFF(p1, p2) ((size_t)(((char *)(p1)) - (char *)(p2)))
 
 /* some protos */
 const uchar *fdata(const uchar *, const char *, const uchar *);
