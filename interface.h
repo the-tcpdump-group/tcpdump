@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.114 1999-12-15 00:23:06 fenner Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.115 1999-12-15 06:58:49 fenner Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -231,6 +231,15 @@ extern int esp_print(register const u_char *, register const u_char *, int *);
 extern void isakmp_print(const u_char *, u_int, const u_char *);
 extern int ipcomp_print(register const u_char *, register const u_char *, int *);
 extern void rx_print(register const u_char *, int, int, int, u_char *);
+extern void netbeui_print(u_char *, u_char *);
+extern void ipx_netbios_print(u_char *, u_char *);
+extern void nbt_tcp_print(u_char *, int);
+extern void nbt_udp137_print(u_char *data, int);
+extern void nbt_udp138_print(u_char *data, int);
+extern char *smb_errstr(int, int);
+extern void print_data(unsigned char *, int);
+extern void l2tp_print(const u_char *, u_int);
+
 #ifdef INET6
 extern void ip6_print(const u_char *, int);
 extern void ip6_opt_print(const u_char *, int);
