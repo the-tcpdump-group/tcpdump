@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bfd.c,v 1.2 2003-10-27 17:21:32 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bfd.c,v 1.3 2003-10-27 22:44:37 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -30,6 +30,8 @@ static const char rcsid[] =
 #include "interface.h"
 #include "extract.h"
 #include "addrtoname.h"
+
+#include "udp.h"
 
 /*
  * Control packet, draft-katz-ward-bfd-01.txt
@@ -67,8 +69,8 @@ struct bfd_header_t {
 #define	BFD_EXTRACT_DIAG(x)     ((x)&0x1f)
 
 static const struct tok bfd_port_values[] = {
-    { 3784, "Control" },
-    { 3785, "Echo" },
+    { BFD_CONTROL_PORT, "Control" },
+    { BFD_ECHO_PORT,    "Echo" },
     { 0, NULL }
 };
 
@@ -105,36 +107,52 @@ bfd_print(register const u_char *pptr, register u_int len, register u_int port)
         bfd_header = (const struct bfd_header_t *)pptr;
         TCHECK(*bfd_header);
 
-        if (vflag < 1 )
-        {
-            printf("BFDv%u, %s, Flags: [%s], length: %u",
+        switch (port) {
+
+        case BFD_CONTROL_PORT:
+            if (vflag < 1 )
+            {
+                printf("BFDv%u, %s, Flags: [%s], length: %u",
+                       BFD_EXTRACT_VERSION(bfd_header->version_diag),
+                       tok2str(bfd_port_values, "unknown (%u)", port),
+                       bittok2str(bfd_flag_values, "none", bfd_header->flags),
+                       len);
+                return;
+            }
+            
+            printf("BFDv%u, length: %u\n\t%s, Flags: [%s], Diagnostic: %s (0x%02x)",
                    BFD_EXTRACT_VERSION(bfd_header->version_diag),
+                   len,
                    tok2str(bfd_port_values, "unknown (%u)", port),
                    bittok2str(bfd_flag_values, "none", bfd_header->flags),
-                   len);
-            return;
-        }
-
-        printf("BFDv%u, length: %u\n\t%s, Flags: [%s], Diagnostic: %s (0x%02x)",
-               BFD_EXTRACT_VERSION(bfd_header->version_diag),
-               len,
-               tok2str(bfd_port_values, "unknown (%u)", port),
-               bittok2str(bfd_flag_values, "none", bfd_header->flags),
-               tok2str(bfd_diag_values,"unknown",BFD_EXTRACT_DIAG(bfd_header->version_diag)),
+                   tok2str(bfd_diag_values,"unknown",BFD_EXTRACT_DIAG(bfd_header->version_diag)),
                BFD_EXTRACT_DIAG(bfd_header->version_diag));
-        
-        printf("\n\tDetection Timer Multiplier: %u (%u ms Detection time), BFD Length: %u",
-               bfd_header->detect_time_multiplier,
-               bfd_header->detect_time_multiplier * EXTRACT_32BITS(bfd_header->desired_min_tx_interval)/1000,
-               bfd_header->length);
+            
+            printf("\n\tDetection Timer Multiplier: %u (%u ms Detection time), BFD Length: %u",
+                   bfd_header->detect_time_multiplier,
+                   bfd_header->detect_time_multiplier * EXTRACT_32BITS(bfd_header->desired_min_tx_interval)/1000,
+                   bfd_header->length);
 
 
-        printf("\n\tMy Discriminator: 0x%08x", EXTRACT_32BITS(bfd_header->my_discriminator));
-        printf(", Your Discriminator: 0x%08x", EXTRACT_32BITS(bfd_header->your_discriminator));
-        printf("\n\t  Desired min Tx Interval:    %4u ms", EXTRACT_32BITS(bfd_header->desired_min_tx_interval)/1000);
-        printf("\n\t  Required min Rx Interval:   %4u ms", EXTRACT_32BITS(bfd_header->required_min_rx_interval)/1000);
-        printf("\n\t  Required min Echo Interval: %4u ms", EXTRACT_32BITS(bfd_header->required_min_echo_interval)/1000);
+            printf("\n\tMy Discriminator: 0x%08x", EXTRACT_32BITS(bfd_header->my_discriminator));
+            printf(", Your Discriminator: 0x%08x", EXTRACT_32BITS(bfd_header->your_discriminator));
+            printf("\n\t  Desired min Tx Interval:    %4u ms", EXTRACT_32BITS(bfd_header->desired_min_tx_interval)/1000);
+            printf("\n\t  Required min Rx Interval:   %4u ms", EXTRACT_32BITS(bfd_header->required_min_rx_interval)/1000);
+            printf("\n\t  Required min Echo Interval: %4u ms", EXTRACT_32BITS(bfd_header->required_min_echo_interval)/1000);
+            break;
 
+        case BFD_ECHO_PORT: /* not yet supported - fall through */
+
+        default:
+            printf("BFD, %s, length: %u",
+                   tok2str(bfd_port_values, "unknown (%u)", port),
+                   len);
+            if (vflag >= 1) {
+                if(!print_unknown_data(pptr,"\n\t",len))
+                    return;
+            }
+            break;
+        }
         return;
 
 trunc:
