@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.40 2004-12-29 03:10:24 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.41 2004-12-30 03:36:51 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -794,7 +794,10 @@ static struct smbfns smb_fns[] = {
 static void
 print_smb(const u_char *buf, const u_char *maxbuf)
 {
+    u_int16_t flags2;
+    int nterrcodes;
     int command;
+    u_int32_t nterror;
     const u_char *words, *maxwords, *data;
     struct smbfns *fn;
     const char *fmt_smbheader =
@@ -803,7 +806,9 @@ print_smb(const u_char *buf, const u_char *maxbuf)
 
     TCHECK(buf[9]);
     request = (buf[9] & 0x80) ? 0 : 1;
-    unicodestr = EXTRACT_LE_16BITS(&buf[10]) & 0x8000;
+    flags2 = EXTRACT_LE_16BITS(&buf[10]);
+    unicodestr = flags2 & 0x8000;
+    nterrcodes = flags2 & 0x4000;
     startbuf = buf;
 
     command = buf[4];
@@ -821,8 +826,14 @@ print_smb(const u_char *buf, const u_char *maxbuf)
     /* print out the header */
     smb_fdata(buf, fmt_smbheader, buf + 33, unicodestr);
 
-    if (buf[5])
-	printf("SMBError = %s\n", smb_errstr(buf[5], EXTRACT_LE_16BITS(&buf[7])));
+    if (nterrcodes) {
+    	nterror = EXTRACT_LE_32BITS(&buf[5]);
+	if (nterror)
+	    printf("NTError = %s\n", nt_errstr(nterror));
+    } else {
+	if (buf[5])
+	    printf("SMBError = %s\n", smb_errstr(buf[5], EXTRACT_LE_16BITS(&buf[7])));
+    }
 
     smboffset = 32;
 

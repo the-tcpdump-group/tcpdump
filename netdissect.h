@@ -21,7 +21,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.13 2004-12-23 10:43:12 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.14 2004-12-30 03:36:51 guy Exp $ (LBL)
  */
 
 #ifndef netdissect_h
@@ -389,6 +389,7 @@ extern void nbt_udp137_print(netdissect_options *,
 extern void nbt_udp138_print(netdissect_options *,
 			     const u_char *data, int);
 extern char *smb_errstr(netdissect_options *,int, int);
+extern const char *nt_errstr(netdissect_options *, u_int32_t);
 extern void print_data(netdissect_options *,const unsigned char *, int);
 extern void l2tp_print(netdissect_options *,const u_char *, u_int);
 extern void lcp_print(netdissect_options *,const u_char *, u_int);
