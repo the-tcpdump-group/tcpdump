@@ -25,7 +25,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-vrrp.c,v 1.4 2001-07-20 03:16:23 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-vrrp.c,v 1.5 2001-07-23 22:27:30 fenner Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -129,7 +129,7 @@ vrrp_print(register const u_char *bp, register u_int len, int ttl)
 		if (auth_type == VRRP_AUTH_SIMPLE) { /* simple text password */
 			TCHECK(bp[7]);
 			printf(" auth \"");
-			fn_printn(bp, bp[7] - bp[0] + 1, NULL);
+			fn_printn(bp, 8, NULL);
 			printf("\"");
 		}
 	}
