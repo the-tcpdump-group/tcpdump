@@ -13,7 +13,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.23 2001-07-09 01:39:43 fenner Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.24 2001-07-09 09:17:44 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -809,7 +809,6 @@ fs_print(register const u_char *bp, int length)
 {
 	int fs_op;
 	unsigned long i;
-	char s[AFSNAMEMAX];
 
 	if (length <= sizeof(struct rx_header))
 		return;
@@ -960,7 +959,6 @@ static void
 fs_reply_print(register const u_char *bp, int length, int32_t opcode)
 {
 	unsigned long i;
-	char s[AFSNAMEMAX];
 	struct rx_header *rxh;
 
 	if (length <= sizeof(struct rx_header))
@@ -1794,7 +1792,6 @@ static void
 kauth_print(register const u_char *bp, int length)
 {
 	int kauth_op;
-	char s[AFSNAMEMAX];
 
 	if (length <= sizeof(struct rx_header))
 		return;
@@ -2021,7 +2018,6 @@ static void
 bos_print(register const u_char *bp, int length)
 {
 	int bos_op;
-	char s[BOSNAMEMAX];
 
 	if (length <= sizeof(struct rx_header))
 		return;
