@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.194 2002-12-22 00:15:28 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.195 2002-12-22 21:15:36 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -266,18 +266,14 @@ show_dlts_and_exit(pcap_t *pd)
 /*
  * Set up flags that might or might not be supported depending on the
  * version of libpcap we're using.
- *
- * Win32 builds are assumed to be done with the latest version of WinPcap.
  */
 #ifdef WIN32
 #define B_FLAG		"B:"
 #define B_FLAG_USAGE	" [ -B size ]"
-#define D_FLAG		"D"
-#define U_FLAG		"U"
 #else /* WIN32 */
-
 #define B_FLAG
 #define B_FLAG_USAGE
+#endif /* WIN32 */
 
 #ifdef HAVE_PCAP_FINDALLDEVS
 #define D_FLAG	"D"
@@ -290,8 +286,6 @@ show_dlts_and_exit(pcap_t *pd)
 #else
 #define U_FLAG
 #endif
-
-#endif /* WIN32 */
 
 int
 main(int argc, char **argv)
@@ -846,7 +840,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 	}
 
 	pcap_dump((u_char *)dump_info->p, h, sp);
-#ifdef HAVE_PCAP_FINDALLDEVS
+#ifdef HAVE_PCAP_DUMP_FLUSH
 	if (Uflag)
 		pcap_dump_flush(dump_info->p);
 #endif
@@ -862,7 +856,7 @@ dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	++infodelay;
 
 	pcap_dump(user, h, sp);
-#ifdef HAVE_PCAP_FINDALLDEVS
+#ifdef HAVE_PCAP_DUMP_FLUSH
 	if (Uflag)
 		pcap_dump_flush((pcap_dumper_t *)user);
 #endif
