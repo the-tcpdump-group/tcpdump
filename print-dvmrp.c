@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dvmrp.c,v 1.26 2003-11-16 09:36:19 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dvmrp.c,v 1.27 2003-11-19 09:42:04 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -62,13 +62,13 @@ static const char rcsid[] _U_ =
 #define DVMRP_NF_DISABLED	0x20	/* administratively disabled */
 #define DVMRP_NF_QUERIER	0x40	/* I am the subnet's querier */
 
-static void print_probe(const u_char *, const u_char *, u_int);
-static void print_report(const u_char *, const u_char *, u_int);
-static void print_neighbors(const u_char *, const u_char *, u_int);
-static void print_neighbors2(const u_char *, const u_char *, u_int);
-static void print_prune(const u_char *);
-static void print_graft(const u_char *);
-static void print_graft_ack(const u_char *);
+static int print_probe(const u_char *, const u_char *, u_int);
+static int print_report(const u_char *, const u_char *, u_int);
+static int print_neighbors(const u_char *, const u_char *, u_int);
+static int print_neighbors2(const u_char *, const u_char *, u_int);
+static int print_prune(const u_char *);
+static int print_graft(const u_char *);
+static int print_graft_ack(const u_char *);
 
 static u_int32_t target_level;
 
@@ -82,6 +82,7 @@ dvmrp_print(register const u_char *bp, register u_int len)
 	if (bp >= ep)
 		return;
 
+	TCHECK(bp[1]);
 	type = bp[1];
 
 	/* Skip IGMP header */
@@ -92,14 +93,18 @@ dvmrp_print(register const u_char *bp, register u_int len)
 
 	case DVMRP_PROBE:
 		printf(" Probe");
-		if (vflag)
-			print_probe(bp, ep, len);
+		if (vflag) {
+			if (print_probe(bp, ep, len) < 0)
+				goto trunc;
+		}
 		break;
 
 	case DVMRP_REPORT:
 		printf(" Report");
-		if (vflag > 1)
-			print_report(bp, ep, len);
+		if (vflag > 1) {
+			if (print_report(bp, ep, len) < 0)
+				goto trunc;
+		}
 		break;
 
 	case DVMRP_ASK_NEIGHBORS:
@@ -108,7 +113,8 @@ dvmrp_print(register const u_char *bp, register u_int len)
 
 	case DVMRP_NEIGHBORS:
 		printf(" Neighbors(old)");
-		print_neighbors(bp, ep, len);
+		if (print_neighbors(bp, ep, len) < 0)
+			goto trunc;
 		break;
 
 	case DVMRP_ASK_NEIGHBORS2:
@@ -122,34 +128,44 @@ dvmrp_print(register const u_char *bp, register u_int len)
 		 * address field
 		 */
 		bp -= 4;
+		TCHECK2(bp[0], 4);
 		target_level = (bp[0] << 24) | (bp[1] << 16) |
 		    (bp[2] << 8) | bp[3];
 		bp += 4;
-		print_neighbors2(bp, ep, len);
+		if (print_neighbors2(bp, ep, len) < 0)
+			goto trunc;
 		break;
 
 	case DVMRP_PRUNE:
 		printf(" Prune");
-		print_prune(bp);
+		if (print_prune(bp) < 0)
+			goto trunc;
 		break;
 
 	case DVMRP_GRAFT:
 		printf(" Graft");
-		print_graft(bp);
+		if (print_graft(bp) < 0)
+			goto trunc;
 		break;
 
 	case DVMRP_GRAFT_ACK:
 		printf(" Graft-ACK");
-		print_graft_ack(bp);
+		if (print_graft_ack(bp) < 0)
+			goto trunc;
 		break;
 
 	default:
 		printf(" [type %d]", type);
 		break;
 	}
+	return;
+
+trunc:
+	printf("[|dvmrp]");
+	return;
 }
 
-static void
+static int 
 print_report(register const u_char *bp, register const u_char *ep,
     register u_int len)
 {
@@ -160,8 +176,9 @@ print_report(register const u_char *bp, register const u_char *ep,
 	while (len > 0) {
 		if (len < 3) {
 			printf(" [|]");
-			return;
+			return (0);
 		}
+		TCHECK2(bp[0], 3);
 		mask = (u_int32_t)0xff << 24 | bp[0] << 16 | bp[1] << 8 | bp[2];
 		width = 1;
 		if (bp[0])
@@ -177,18 +194,21 @@ print_report(register const u_char *bp, register const u_char *ep,
 		do {
 			if (bp + width + 1 > ep) {
 				printf(" [|]");
-				return;
+				return (0);
 			}
 			if (len < width + 1) {
 				printf("\n\t  [Truncated Report]");
-				return;
+				return (0);
 			}
 			origin = 0;
-			for (i = 0; i < width; ++i)
+			for (i = 0; i < width; ++i) {
+				TCHECK(*bp);
 				origin = origin << 8 | *bp++;
+			}
 			for ( ; i < 4; ++i)
 				origin <<= 8;
 
+			TCHECK(*bp);
 			metric = *bp++;
 			done = metric & 0x80;
 			metric &= 0x7f;
@@ -197,9 +217,12 @@ print_report(register const u_char *bp, register const u_char *ep,
 			len -= width + 1;
 		} while (!done);
 	}
+	return (0);
+trunc:
+	return (-1);
 }
 
-static void
+static int
 print_probe(register const u_char *bp, register const u_char *ep,
     register u_int len)
 {
@@ -209,7 +232,7 @@ print_probe(register const u_char *bp, register const u_char *ep,
 	if ((len < 4) || ((bp + 4) > ep)) {
 		/* { (ctags) */
 		printf(" [|}");
-		return;
+		return (0);
 	}
 	genid = (bp[0] << 24) | (bp[1] << 16) | (bp[2] << 8) | bp[3];
 	bp += 4;
@@ -220,19 +243,19 @@ print_probe(register const u_char *bp, register const u_char *ep,
 		printf(" ");
 	printf("genid %u", genid);
 	if (vflag < 2)
-		return;
+		return (0);
 
 	while ((len > 0) && (bp < ep)) {
 		TCHECK2(bp[0], 4);
 		printf("\n\tneighbor %s", ipaddr_string(bp));
 		bp += 4; len -= 4;
 	}
-	return;
+	return (0);
 trunc:
-	(void)printf("[|dvmrp]");
+	return (-1);
 }
 
-static void
+static int
 print_neighbors(register const u_char *bp, register const u_char *ep,
     register u_int len)
 {
@@ -258,12 +281,12 @@ print_neighbors(register const u_char *bp, register const u_char *ep,
 			len -= 4;
 		}
 	}
-	return;
+	return (0);
 trunc:
-	(void)printf("[|dvmrp]");
+	return (-1);
 }
 
-static void
+static int
 print_neighbors2(register const u_char *bp, register const u_char *ep,
     register u_int len)
 {
@@ -304,15 +327,15 @@ print_neighbors2(register const u_char *bp, register const u_char *ep,
 		}
 		if (ncount != -1) {
 			printf(" [|]");
-			return;
+			return (0);
 		}
 	}
-	return;
+	return (0);
 trunc:
-	(void)printf("[|dvmrp]");
+	return (-1);
 }
 
-static void
+static int
 print_prune(register const u_char *bp)
 {
 	TCHECK2(bp[0], 12);
@@ -320,27 +343,27 @@ print_prune(register const u_char *bp)
 	bp += 8;
 	(void)printf(" timer ");
 	relts_print(EXTRACT_32BITS(bp));
-	return;
+	return (0);
 trunc:
-	(void)printf("[|dvmrp]");
+	return (-1);
 }
 
-static void
+static int
 print_graft(register const u_char *bp)
 {
 	TCHECK2(bp[0], 8);
 	printf(" src %s grp %s", ipaddr_string(bp), ipaddr_string(bp + 4));
-	return;
+	return (0);
 trunc:
-	(void)printf("[|dvmrp]");
+	return (-1);
 }
 
-static void
+static int
 print_graft_ack(register const u_char *bp)
 {
 	TCHECK2(bp[0], 8);
 	printf(" src %s grp %s", ipaddr_string(bp), ipaddr_string(bp + 4));
-	return;
+	return (0);
 trunc:
-	(void)printf("[|dvmrp]");
+	return (-1);
 }
