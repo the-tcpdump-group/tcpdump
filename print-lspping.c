@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.11 2004-10-20 16:17:29 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.12 2004-11-11 12:02:31 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -791,7 +791,8 @@ lspping_print(register const u_char *pptr, register u_int len) {
                 tlv_tptr+=sizeof(struct lspping_tlv_downstream_map_ipv4_t);
                 tlv_tlen-=sizeof(struct lspping_tlv_downstream_map_ipv4_t);
                 break;
-            case LSPPING_AFI_IPV6:
+#ifdef INET6
+             case LSPPING_AFI_IPV6:
                 printf("\n\t    Downstream IP: %s" \
                        "\n\t    Downstream Interface IP: %s",
                        ip6addr_string(tlv_ptr.lspping_tlv_downstream_map_ipv6->downstream_ip),
@@ -799,7 +800,7 @@ lspping_print(register const u_char *pptr, register u_int len) {
                 tlv_tptr+=sizeof(struct lspping_tlv_downstream_map_ipv6_t);
                 tlv_tlen-=sizeof(struct lspping_tlv_downstream_map_ipv6_t);
                 break;
-
+#endif
             case LSPPING_AFI_UNMB:
                 printf("\n\t    Downstream IP: %s" \
                        "\n\t    Downstream Interface Index: 0x%08x",
