@@ -35,7 +35,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-"@(#) $Header: /tcpdump/master/tcpdump/print-sctp.c,v 1.6 2001-12-11 09:41:54 guy Exp $ (NETLAB/PEL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-sctp.c,v 1.7 2001-12-12 07:16:40 guy Exp $ (NETLAB/PEL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -207,14 +207,16 @@ void sctp_print(const u_char *bp,        /* beginning of sctp packet */
 	      {		           /* at the command line */
 		char *payloadPtr;
 		
-		printf("[Payload: {");
+		printf("[Payload");
 
-		payloadPtr = (char *) (++dataHdrPtr);
-		fwrite(payloadPtr,
-		      htons(chunkDescPtr->chunkLength)-1 -
-		      sizeof(struct sctpDataPart)-sizeof(struct sctpChunkDesc),
-		      1, stdout);
-		printf("}] ");
+		if (!xflag && !qflag) {
+			payloadPtr = (char *) (++dataHdrPtr);
+			printf(":");
+			default_print(payloadPtr,
+			      htons(chunkDescPtr->chunkLength)-1 -
+			      sizeof(struct sctpDataPart)-sizeof(struct sctpChunkDesc));
+		} else
+			printf("]");
 	      }
 	    break;
 	  }
