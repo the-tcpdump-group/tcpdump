@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.78 2003-03-30 01:21:13 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.79 2003-04-09 12:16:50 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1185,7 +1185,7 @@ isis_print_extd_ip_reach (const u_int8_t *tptr, const char *ident, u_int16_t afi
                bit_length);
 #ifdef INET6
     if (afi == IPV6)
-        printf("%sIPv6 prefix: %39s/%u",
+        printf("%sIPv6 prefix: %s/%u",
                ident,
                ip6addr_string(prefix),
                bit_length);
@@ -1640,16 +1640,8 @@ static int isis_print (const u_int8_t *p, u_int length)
             }
             break;
 
+	    /* those two TLVs share the same format */
         case TLV_IS_ALIAS_ID:
-            while (tmp >= NODE_ID_LEN+3+1) { /* is it worth attempting a decode ? */
-                ext_is_len = isis_print_ext_is_reach(tptr,"\n\t      ");
-                if (ext_is_len == 0) /* did something go wrong ? */
-                    goto trunctlv;                   
-                tmp-=ext_is_len;
-                tptr+=ext_is_len;
-            }
-            break;
-
         case TLV_EXT_IS_REACH:
             while (tmp >= NODE_ID_LEN+3+1) { /* is it worth attempting a decode ? */
                 ext_is_len = isis_print_ext_is_reach(tptr,"\n\t      ");
