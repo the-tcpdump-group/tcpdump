@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.75 2002-12-23 14:40:46 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.76 2003-01-25 23:23:58 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -454,18 +454,18 @@ print_nsap(register const u_int8_t *pptr, register int nsap_length)
         char *junk_buf = nsap_ascii_output;
 
         if (nsap_length < 1 || nsap_length > 13) {
-                junk_buf+=sprintf(junk_buf, "illegal length");
-		*(junk_buf) = '\0';
+                sprintf(junk_buf, "illegal length");
                 return (nsap_ascii_output);
         }
 
 	for (nsap_idx = 0; nsap_idx < nsap_length; nsap_idx++) {
 		if (!TTEST2(*pptr, 1))
 			return (0);
-		junk_buf+=sprintf(junk_buf, "%02x", *pptr++);
+		sprintf(junk_buf, "%02x", *pptr++);
+		junk_buf += strlen(junk_buf);
 		if (((nsap_idx & 1) == 0) &&
                      (nsap_idx + 1 < nsap_length)) {
-			junk_buf+=sprintf(junk_buf, ".");
+                     	*junk_buf++ = '.';
 		}
 	}
         *(junk_buf) = '\0';
@@ -709,9 +709,10 @@ isis_print_sysid(const u_int8_t *cp, int sysid_len)
 	for (i = 1; i <= sysid_len; i++) {
 		if (!TTEST2(*cp, 1))
 			return (0);
-		pos+=sprintf(pos, "%02x", *cp++);
+		sprintf(pos, "%02x", *cp++);
+		pos += strlen(pos);
 		if ((i==2)^(i==4)) {
-			pos+=sprintf(pos, ".");
+			*pos++ = '.';
 		}
 	}
         *(pos) = '\0';
@@ -732,9 +733,10 @@ isis_print_nodeid(const u_int8_t *cp)
 	for (i = 1; i <= 7; i++) {
 		if (!TTEST2(*cp, 1))
 			return (0);
-		pos+=sprintf(pos, "%02x", *cp++);
+		sprintf(pos, "%02x", *cp++);
+		pos += strlen(pos);
 		if ((i & 1) == 0) {
-			pos+=sprintf(pos, ".");
+			*pos++ = '.';
 		}
 	}
         *(pos) = '\0';
@@ -752,11 +754,12 @@ isis_print_lspid(const u_int8_t *cp)
         char *pos = lspid;
 
 	for (i = 1; i <= 7; i++) {
-		pos+=sprintf(pos, "%02x", *cp++);
+		sprintf(pos, "%02x", *cp++);
+		pos += strlen(pos);
 		if ((i & 1) == 0)
-			pos+=sprintf(pos, ".");
+			*pos++ = '.';
 	}
-	pos+=sprintf(pos, "-%02x", *cp);
+	sprintf(pos, "-%02x", *cp);
         return (lspid);
 }
 
