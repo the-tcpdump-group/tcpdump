@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.105 2001-06-25 03:18:27 itojun Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.106 2001-06-25 03:23:19 itojun Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -128,12 +128,12 @@ Print the link-level header on each dump line.
 .TP
 .B \-E
 Use \fIalgo:secret\fP for decrypting IPsec ESP packets.
-Algorithms may be 
-\fBdes-cbc\fP, 
-\fB3des-cbc\fP, 
-\fBblowfish-cbc\fP, 
-\fBrc3-cbc\fP, 
-\fBcast128-cbc\fP, or 
+Algorithms may be
+\fBdes-cbc\fP,
+\fB3des-cbc\fP,
+\fBblowfish-cbc\fP,
+\fBrc3-cbc\fP,
+\fBcast128-cbc\fP, or
 \fBnone\fP.
 The default is \fBdes-cbc\fP.
 The ability to decrypt packets is only present if \fItcpdump\fP was compiled
@@ -190,7 +190,7 @@ instead of ``nic.ddn.mil''.
 .TP
 .B \-m
 Load SMI MIB module definitions from file \fImodule\fR.
-This option 
+This option
 can be used several times to load several MIB modules into \fItcpdump\fP.
 .TP
 .B \-O
@@ -262,7 +262,7 @@ Print absolute, rather than relative, TCP sequence numbers.
 Print an unformatted timestamp on each dump line.
 .TP
 .B \-ttt
-Print a delta (in micro-seconds) between current and previous line 
+Print a delta (in micro-seconds) between current and previous line
 on each dump line.
 .TP
 .B \-tttt
