@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.220 2003-11-18 23:09:43 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.221 2003-12-18 01:20:31 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -636,10 +636,11 @@ main(int argc, char **argv)
 		dlt = pcap_datalink(pd);
 		dlt_name = pcap_datalink_val_to_name(dlt);
 		if (dlt_name == NULL) {
-			printf("reading from file %s, link-type %u\n",
+			fprintf(stderr, "reading from file %s, link-type %u\n",
 			    RFileName, dlt);
 		} else {
-			printf("reading from file %s, link-type %s (%s)\n",
+			fprintf(stderr,
+			    "reading from file %s, link-type %s (%s)\n",
 			    RFileName, dlt_name,
 			    pcap_datalink_val_to_description(dlt));
 		}
