@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.53 2000-03-13 05:01:04 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.54 2000-04-02 23:50:48 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -71,13 +71,13 @@ static struct tok type2str[] = {
 };
 
 struct aarp {
-	u_short htype, ptype;
-	u_char	halen, palen;
-	u_short op;
-	u_char	hsaddr[6];
-	u_char	psaddr[4];
-	u_char	hdaddr[6];
-	u_char	pdaddr[4];
+	u_int16_t	htype, ptype;
+	u_int8_t	halen, palen;
+	u_int16_t	op;
+	u_int8_t	hsaddr[6];
+	u_int8_t	psaddr[4];
+	u_int8_t	hdaddr[6];
+	u_int8_t	pdaddr[4];
 };
 
 static char tstr[] = "[|atalk]";
@@ -166,9 +166,9 @@ aarp_print(register const u_char *bp, u_int length)
 
 	printf("aarp ");
 	ap = (const struct aarp *)bp;
-	if (ap->htype == 1 && ap->ptype == ETHERTYPE_ATALK &&
+	if (ntohs(ap->htype) == 1 && ntohs(ap->ptype) == ETHERTYPE_ATALK &&
 	    ap->halen == 6 && ap->palen == 4 )
-		switch (ap->op) {
+		switch (ntohs(ap->op)) {
 
 		case 1:				/* request */
 			(void)printf("who-has %s tell %s",
@@ -185,8 +185,9 @@ aarp_print(register const u_char *bp, u_int length)
 			    AT(pdaddr), AT(psaddr));
 			return;
 		}
-	(void)printf("len %d op %d htype %d ptype %#x halen %d palen %d",
-	    length, ap->op, ap->htype, ap->ptype, ap->halen, ap->palen );
+	(void)printf("len %u op %u htype %u ptype %#x halen %u palen %u",
+	    length, ntohs(ap->op), ntohs(ap->htype), ntohs(ap->ptype),
+	    ap->halen, ap->palen);
 }
 
 static void
