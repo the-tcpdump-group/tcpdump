@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.5 1999-12-15 08:10:18 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.6 2000-01-15 02:33:06 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -49,7 +49,7 @@ static const char rcsid[] =
 #include <netinet/udp_var.h>
 #include <netinet/tcp.h>
 
-#ifdef CRYPTO
+#ifdef HAVE_LIBCRYPTO
 #include <des.h>
 #include <blowfish.h>
 #ifdef HAVE_RC5_H
@@ -197,7 +197,7 @@ esp_print(register const u_char *bp, register const u_char *bp2, int *nhdr)
 
 	switch (algo) {
 	case DESCBC:
-#ifdef CRYPTO
+#ifdef HAVE_LIBCRYPTO
 	    {
 		u_char iv[8];
 		des_key_schedule schedule;
@@ -232,10 +232,10 @@ esp_print(register const u_char *bp, register const u_char *bp2, int *nhdr)
 	    }
 #else
 		goto fail;
-#endif /*CRYPTO*/
+#endif /*HAVE_LIBCRYPTO*/
 
 	case BLOWFISH:
-#ifdef CRYPTO
+#ifdef HAVE_LIBCRYPTO
 	    {
 		BF_KEY schedule;
 		u_char *p;
@@ -250,10 +250,10 @@ esp_print(register const u_char *bp, register const u_char *bp2, int *nhdr)
 	    }
 #else
 		goto fail;
-#endif /*CRYPTO*/
+#endif /*HAVE_LIBCRYPTO*/
 
 	case RC5:
-#if defined(CRYPTO) && defined(HAVE_RC5_H)
+#if defined(HAVE_LIBCRYPTO) && defined(HAVE_RC5_H)
 	    {
 		RC5_32_KEY schedule;
 		u_char *p;
@@ -269,10 +269,10 @@ esp_print(register const u_char *bp, register const u_char *bp2, int *nhdr)
 	    }
 #else
 		goto fail;
-#endif /*CRYPTO*/
+#endif /*HAVE_LIBCRYPTO*/
 
 	case CAST128:
-#if defined(CRYPTO) && defined(HAVE_CAST_H) && !defined(HAVE_BUGGY_CAST128)
+#if defined(HAVE_LIBCRYPTO) && defined(HAVE_CAST_H) && !defined(HAVE_BUGGY_CAST128)
 	    {
 		CAST_KEY schedule;
 		u_char *p;
@@ -287,10 +287,10 @@ esp_print(register const u_char *bp, register const u_char *bp2, int *nhdr)
 	    }
 #else
 		goto fail;
-#endif /*CRYPTO*/
+#endif /*HAVE_LIBCRYPTO*/
 
 	case DES3CBC:
-#if defined(CRYPTO)
+#if defined(HAVE_LIBCRYPTO)
 	    {
 		des_key_schedule s1, s2, s3;
 		u_char *p;
@@ -308,7 +308,7 @@ esp_print(register const u_char *bp, register const u_char *bp2, int *nhdr)
 	    }
 #else
 		goto fail;
-#endif /*CRYPTO*/
+#endif /*HAVE_LIBCRYPTO*/
 
 	case NONE:
 	default:

@@ -24,7 +24,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.139 1999-12-29 01:12:55 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.140 2000-01-15 02:33:06 mcr Exp $ (LBL)";
 #endif
 
 /*
@@ -185,7 +185,7 @@ main(int argc, char **argv)
 
 #if 0
 		case 'A':
-#ifndef CRYPTO
+#ifndef HAVE_LIBCRYPTO
 			warning("crypto code not compiled in");
 #endif
 			ahsecret = optarg;
@@ -207,7 +207,7 @@ main(int argc, char **argv)
 			break;
 
 		case 'E':
-#ifndef CRYPTO
+#ifndef HAVE_LIBCRYPTO
 			warning("crypto code not compiled in");
 #endif
 			espsecret = optarg;
