@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.58 2002-08-20 00:17:23 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.59 2002-09-01 21:08:02 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -433,28 +433,29 @@ struct isis_tlv_lsp {
  * xx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx
  * 32 bytes plus one termination byte */
 static char *
-print_nsap(register const u_char *cp, register int length)
+print_nsap(register const u_char *pptr, register int nsap_length)
 {
-	int i;
-	static char nsap[33];
-        char *pos = nsap;
+	int nsap_idx;
+	static char nsap_ascii_output[33];
+        char *junk_buf = nsap_ascii_output;
 
-        if (length==0) {
-		*(pos) = '0';
-                *(pos+1) = '\0';
-                return (nsap);
+        if (nsap_length < 1 || nsap_length > 13) {
+                junk_buf+=sprintf(junk_buf, "illegal length");
+		*(junk_buf) = '\0';
+                return (nsap_ascii_output);
         }
 
-	for (i = 0; i < length; i++) {
-		if (!TTEST2(*cp, 1))
+	for (nsap_idx = 0; nsap_idx < nsap_length; nsap_idx++) {
+		if (!TTEST2(*pptr, 1))
 			return (0);
-		pos+=sprintf(pos, "%02x", *cp++);
-		if (((i & 1) == 0) && (i + 1 < length)) {
-			pos+=sprintf(pos, ".");
+		junk_buf+=sprintf(junk_buf, "%02x", *pptr++);
+		if (((nsap_idx & 1) == 0) &&
+                     (nsap_idx + 1 < nsap_length)) {
+			junk_buf+=sprintf(junk_buf, ".");
 		}
 	}
-        *(pos) = '\0';
-	return (nsap);
+        *(junk_buf) = '\0';
+	return (nsap_ascii_output);
 }
 
 #define ISIS_COMMON_HEADER_SIZE (sizeof(struct isis_common_header))
