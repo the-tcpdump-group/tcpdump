@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.164 2004-09-24 01:14:20 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.165 2004-11-08 07:45:05 guy Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -1077,7 +1077,8 @@ True if the relation holds, where \fIrelop\fR is one of >, <, >=, <=, =,
 !=, and \fIexpr\fR is an arithmetic expression composed of integer
 constants (expressed in standard C syntax), the normal binary operators
 [+, -, *, /, &, |, <<, >>], a length operator, and special packet data
-accessors.
+accessors.  Note that all comparisons are unsigned, so that, for example,
+0x80000000 and 0xffffffff are > 0.
 To access
 data inside the packet, use the following syntax:
 .in +.5i
