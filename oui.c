@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/oui.c,v 1.1 2003-11-26 08:49:14 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/oui.c,v 1.2 2004-01-25 09:56:15 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -26,31 +26,37 @@ static const char rcsid[] _U_ =
 #include "interface.h"
 #include "oui.h"
 
+/* FIXME complete OUI list using a script */
+
+struct tok oui_values[] = {
+    { 0x009069, "Juniper"},
+    { 0x00000c, "Cisco"},
+};
 
 /* list taken from ethereal/packet-radius.c */
 
-struct tok oui_values[] = {
-    { OUI_ACC,                  "ACC"},
-    { OUI_CISCO,                "Cisco"},
-    { OUI_SHIVA,                "Shiva"},
-    { OUI_MICROSOFT,            "Microsoft"},
-    { OUI_LIVINGSTON,           "Livingston"},
-    { OUI_3COM,                 "3Com"},
-    { OUI_ASCEND,               "Ascend"},
-    { OUI_BAY,                  "Bay Networks"},
-    { OUI_FOUNDRY,              "Foundry"},
-    { OUI_VERSANET,             "Versanet"},
-    { OUI_REDBACK,              "Redback"},
-    { OUI_JUNIPER,              "Juniper Networks"},
-    { OUI_APTIS,                "Aptis"},
-    { OUI_COSINE,               "CoSine Communications"},
-    { OUI_SHASTA,               "Shasta"},
-    { OUI_NOMADIX,              "Nomadix"},
-    { OUI_UNISPHERE,            "Unisphere Networks"},
-    { OUI_ISSANNI,              "Issanni Communications"},
-    { OUI_QUINTUM,              "Quintum"},
-    { OUI_COLUBRIS,             "Colubris"},
-    { OUI_COLUMBIA_UNIVERSITY,  "Columbia University"},
-    { OUI_THE3GPP,              "3GPP"},
+struct tok smi_values[] = {
+    { SMI_ACC,                  "ACC"},
+    { SMI_CISCO,                "Cisco"},
+    { SMI_SHIVA,                "Shiva"},
+    { SMI_MICROSOFT,            "Microsoft"},
+    { SMI_LIVINGSTON,           "Livingston"},
+    { SMI_3COM,                 "3Com"},
+    { SMI_ASCEND,               "Ascend"},
+    { SMI_BAY,                  "Bay Networks"},
+    { SMI_FOUNDRY,              "Foundry"},
+    { SMI_VERSANET,             "Versanet"},
+    { SMI_REDBACK,              "Redback"},
+    { SMI_JUNIPER,              "Juniper Networks"},
+    { SMI_APTIS,                "Aptis"},
+    { SMI_COSINE,               "CoSine Communications"},
+    { SMI_SHASTA,               "Shasta"},
+    { SMI_NOMADIX,              "Nomadix"},
+    { SMI_UNISPHERE,            "Unisphere Networks"},
+    { SMI_ISSANNI,              "Issanni Communications"},
+    { SMI_QUINTUM,              "Quintum"},
+    { SMI_COLUBRIS,             "Colubris"},
+    { SMI_COLUMBIA_UNIVERSITY,  "Columbia University"},
+    { SMI_THE3GPP,              "3GPP"},
     { 0, NULL }
 };

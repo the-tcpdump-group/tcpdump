@@ -44,7 +44,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "$Id: print-radius.c,v 1.25 2004-01-25 09:31:14 hannes Exp $";
+    "$Id: print-radius.c,v 1.26 2004-01-25 09:56:15 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -503,7 +503,7 @@ print_vendor_attr(register u_char *data, u_int length, u_short attr_code _U_)
     length-=4;
 
     printf("Vendor: %s (%u)",
-           tok2str(oui_values,"Unknown",vendor_id),
+           tok2str(smi_values,"Unknown",vendor_id),
            vendor_id);
 
     while (length >= 2) {
