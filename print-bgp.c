@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.84 2004-05-27 21:20:50 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.85 2004-06-12 08:17:50 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -48,6 +48,7 @@ static const char rcsid[] _U_ =
 #include "decode_prefix.h"
 #include "addrtoname.h"
 #include "extract.h"
+#include "bgp.h"
 
 struct bgp {
 	u_int8_t bgp_marker[16];
@@ -531,7 +532,7 @@ trunc:
 /* RDs and RTs share the same semantics
  * we use bgp_vpn_rd_print for
  * printing route targets inside a NLRI */
-static char *
+char *
 bgp_vpn_rd_print (const u_char *pptr) {
 
    /* allocate space for the largest possible string */
