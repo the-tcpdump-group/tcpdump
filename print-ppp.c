@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.85 2003-05-22 15:29:22 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.86 2003-05-22 15:40:08 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -402,7 +402,7 @@ handle_ctrl_proto(u_int proto, const u_char *pptr, int length)
 	case CPCODES_VEXT:
 		if (length < 11)
 			break;
-		printf(", Magic-Num=%08x", EXTRACT_32BITS(tptr));
+		printf(", Magic-Num 0x%08x", EXTRACT_32BITS(tptr));
 		tptr += 4;
 		printf(" OUI 0x%06x", EXTRACT_24BITS(tptr));
 		/* XXX: need to decode Kind and Value(s)? */
@@ -463,13 +463,13 @@ handle_ctrl_proto(u_int proto, const u_char *pptr, int length)
 	case CPCODES_ID:
 		if (length < 8)
 			break;
-		printf(", Magic-Num=%08x", EXTRACT_32BITS(tptr));
+		printf(", Magic-Num 0x%08x", EXTRACT_32BITS(tptr));
 		/* XXX: need to decode Data? */
 		break;
 	case CPCODES_TIME_REM:
 		if (length < 12)
 			break;
-		printf(", Magic-Num=%08x", EXTRACT_32BITS(tptr));
+		printf(", Magic-Num 0x%08x", EXTRACT_32BITS(tptr));
 		printf(" Seconds-Remaining=%u", EXTRACT_32BITS(tptr + 4));
 		/* XXX: need to decode Message? */
 		break;
@@ -1037,7 +1037,7 @@ ppp_print(register const u_char *p, u_int length)
 	}
 
         if (eflag)
-            printf("PPP-%s (0x%04x), length %u, ",
+            printf("PPP-%s (0x%04x), length %u: ",
                    tok2str(ppptype2str, "unknown", proto),
                    proto,
                    olen);
