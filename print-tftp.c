@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tftp.c,v 1.34 2003-02-19 08:01:36 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tftp.c,v 1.35 2003-05-02 08:45:21 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -111,8 +111,8 @@ tftp_print(register const u_char *bp, u_int length)
 		putchar('"');
 
 		/* Print the mode and any options */
-		while ((p = strchr(p, '\0')) != NULL) {
-			if (length <= ((unsigned)p - (unsigned)&tp->th_block))
+		while ((p = (const u_char *)strchr((const char *)p, '\0')) != NULL) {
+			if (length <= (u_int)(p - (const u_char *)&tp->th_block))
 				break;
 			p++;
 			if (*p != '\0') {
