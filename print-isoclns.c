@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.80 2003-04-09 12:46:38 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.81 2003-04-17 10:08:56 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -696,75 +696,33 @@ esis_print(const u_int8_t *p, u_int length)
 		}
 }
 
-/* allocate space for the following string
- * xxxx.xxxx.xxxx
- * 14 bytes plus one termination byte */
-static char *
-isis_print_sysid(const u_int8_t *cp, int sysid_len)
-{
-	int i;
-	static char sysid[15];
-        char *pos = sysid;
-
-	for (i = 1; i <= sysid_len; i++) {
-		if (!TTEST2(*cp, 1))
-			return (0);
-		sprintf(pos, "%02x", *cp++);
-		pos += strlen(pos);
-		if ((i==2)^(i==4)) {
-			*pos++ = '.';
-		}
-	}
-        *(pos) = '\0';
-	return (sysid);
-}
-
-
-/* allocate space for the following string
- * xxxx.xxxx.xxxx.yy
- * 17 bytes plus one termination byte */
-static char *
-isis_print_nodeid(const u_int8_t *cp)
-{
-	int i;
-	static char nodeid[18];
-        char *pos = nodeid;
-
-	for (i = 1; i <= 7; i++) {
-		if (!TTEST2(*cp, 1))
-			return (0);
-		sprintf(pos, "%02x", *cp++);
-		pos += strlen(pos);
-		if ((i & 1) == 0) {
-			*pos++ = '.';
-		}
-	}
-        *(pos) = '\0';
-	return (nodeid);
-}
-
-/* allocate space for the following string
+/* shared routine for printing system, node and lsp-ids
+ * allocate space for the worst-case string
  * xxxx.xxxx.xxxx.yy-zz
  * 20 bytes plus one termination byte */
 static char *
-isis_print_lspid(const u_int8_t *cp)
+isis_print_id(const u_int8_t *cp, int id_len)
 {
-	int i;
-	static char lspid[21];
-        char *pos = lspid;
+    int i;
+    static char id[21];
+    char *pos = id;
 
-	for (i = 1; i <= 7; i++) {
-		sprintf(pos, "%02x", *cp++);
-		pos += strlen(pos);
-		if ((i & 1) == 0)
-			*pos++ = '.';
+    for (i = 1; i <= SYSTEM_ID_LEN; i++) {
+        sprintf(pos, "%02x", *cp++);
+	pos += strlen(pos);
+	if (i == 2 ^ i==4)
+	    *pos++ = '.';
 	}
-	sprintf(pos, "-%02x", *cp);
-        return (lspid);
+    if (id_len == NODE_ID_LEN) {
+        sprintf(pos, ".%02x", *cp++);
+	pos += strlen(pos);
+    }
+    if (id_len == LSP_ID_LEN)
+        sprintf(pos, "-%02x", *cp);
+    return (id);
 }
 
 /* print the 4-byte metric block which is common found in the old-style TLVs */
-
 static int
 isis_print_metric_block (const struct isis_metric_block *isis_metric_block)
 {
@@ -1076,7 +1034,7 @@ isis_print_ext_is_reach (const u_int8_t *tptr,const char *ident, int tlv) {
     if (!TTEST2(*tptr, NODE_ID_LEN))
         return(0);
 
-    printf("%sIS Neighbor: %s", ident, isis_print_nodeid(tptr));
+    printf("%sIS Neighbor: %s", ident, isis_print_id(tptr, NODE_ID_LEN));
     tptr+=(NODE_ID_LEN);
 
     if (tlv != TLV_IS_ALIAS_ID) {
@@ -1382,14 +1340,14 @@ static int isis_print (const u_int8_t *p, u_int length)
 
 	TCHECK(*header_iih_lan);
 	printf("\n\t  source-id: %s,  holding time: %us, Flags: [%s]",
-               isis_print_sysid(header_iih_lan->source_id,SYSTEM_ID_LEN),
+               isis_print_id(header_iih_lan->source_id,SYSTEM_ID_LEN),
                EXTRACT_16BITS(header_iih_lan->holding_time),
                tok2str(isis_iih_circuit_type_values,
                        "unknown circuit type 0x%02x",
                        header_iih_lan->circuit_type));
 
 	printf("\n\t  lan-id:    %s, Priority: %u, PDU length: %u",
-               isis_print_nodeid(header_iih_lan->lan_id),
+               isis_print_id(header_iih_lan->lan_id, NODE_ID_LEN),
                (header_iih_lan->priority) & PRIORITY_MASK,
                pdu_len);
 
@@ -1417,7 +1375,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 
 	TCHECK(*header_iih_ptp);
 	printf("\n\t  source-id: %s, holding time: %us, circuit-id: 0x%02x, %s, PDU length: %u",
-               isis_print_sysid(header_iih_ptp->source_id,SYSTEM_ID_LEN),
+               isis_print_id(header_iih_ptp->source_id,SYSTEM_ID_LEN),
                EXTRACT_16BITS(header_iih_ptp->holding_time),
                header_iih_ptp->circuit_id,
                tok2str(isis_iih_circuit_type_values,
@@ -1450,7 +1408,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 
 	TCHECK(*header_lsp);
 	printf("\n\t  lsp-id: %s, seq: 0x%08x, lifetime: %5us",
-               isis_print_lspid(header_lsp->lsp_id),
+               isis_print_id(header_lsp->lsp_id, LSP_ID_LEN),
                EXTRACT_32BITS(header_lsp->sequence_number),
                EXTRACT_16BITS(header_lsp->remaining_lifetime));
         /* verify the checksum -
@@ -1498,12 +1456,12 @@ static int isis_print (const u_int8_t *p, u_int length)
 
 	TCHECK(*header_csnp);
 	printf("\n\t  source-id:    %s, PDU length: %u",
-               isis_print_nodeid(header_csnp->source_id),
+               isis_print_id(header_csnp->source_id, NODE_ID_LEN),
                pdu_len);
 	printf("\n\t  start lsp-id: %s",
-               isis_print_lspid(header_csnp->start_lsp_id));
+               isis_print_id(header_csnp->start_lsp_id, LSP_ID_LEN));
 	printf("\n\t  end lsp-id:   %s",
-               isis_print_lspid(header_csnp->end_lsp_id));
+               isis_print_id(header_csnp->end_lsp_id, LSP_ID_LEN));
 
         if (vflag > 1) {
             if(!print_unknown_data(pptr,"\n\t  ",ISIS_CSNP_HEADER_SIZE))
@@ -1530,7 +1488,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 
 	TCHECK(*header_psnp);
 	printf("\n\t  source-id:    %s",
-               isis_print_nodeid(header_psnp->source_id));
+               isis_print_id(header_psnp->source_id, NODE_ID_LEN));
 
         if (vflag > 1) {
             if(!print_unknown_data(pptr,"\n\t  ",ISIS_PSNP_HEADER_SIZE))
@@ -1601,7 +1559,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    while (tmp >= ETHER_ADDR_LEN) {
                 if (!TTEST2(*tptr, ETHER_ADDR_LEN))
                     goto trunctlv;
-                printf("\n\t      IS Neighbor: %s",isis_print_sysid(tptr,ETHER_ADDR_LEN));
+                printf("\n\t      IS Neighbor: %s",isis_print_id(tptr,ETHER_ADDR_LEN));
                 tmp -= ETHER_ADDR_LEN;
                 tptr += ETHER_ADDR_LEN;
 	    }
@@ -1616,7 +1574,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    while (tmp >= lan_alen) {
                 if (!TTEST2(*tptr, lan_alen))
                     goto trunctlv;
-                printf("\n\t\tIS Neighbor: %s",isis_print_sysid(tptr,lan_alen));
+                printf("\n\t\tIS Neighbor: %s",isis_print_id(tptr,lan_alen));
                 tmp -= lan_alen;
                 tptr +=lan_alen;
             }
@@ -1672,7 +1630,8 @@ static int isis_print (const u_int8_t *p, u_int length)
             while (tmp >= sizeof(struct isis_tlv_is_reach)) {
 		if (!TTEST(*tlv_is_reach))
 		    goto trunctlv;
-		printf("\n\t      IS Neighbor: %s", isis_print_nodeid(tlv_is_reach->neighbor_nodeid));
+		printf("\n\t      IS Neighbor: %s",
+		       isis_print_id(tlv_is_reach->neighbor_nodeid, NODE_ID_LEN));
                 isis_print_metric_block(&tlv_is_reach->isis_metric_block);
 		tmp -= sizeof(struct isis_tlv_is_reach);
 		tlv_is_reach++;
@@ -1685,7 +1644,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 		if (!TTEST(*tlv_es_reach))
 		    goto trunctlv;
 		printf("\n\t      ES Neighbor: %s",
-                       isis_print_sysid(tlv_es_reach->neighbor_sysid,SYSTEM_ID_LEN));
+                       isis_print_id(tlv_es_reach->neighbor_sysid,SYSTEM_ID_LEN));
                 isis_print_metric_block(&tlv_es_reach->isis_metric_block);
 		tmp -= sizeof(struct isis_tlv_es_reach);
 		tlv_es_reach++;
@@ -1820,7 +1779,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 		if (!TTEST2(tlv_ptp_adj->neighbor_sysid, SYSTEM_ID_LEN))
 		    goto trunctlv;
 		printf("\n\t      Neighbor SystemID: %s",
-		       isis_print_sysid(tlv_ptp_adj->neighbor_sysid,SYSTEM_ID_LEN));
+		       isis_print_id(tlv_ptp_adj->neighbor_sysid,SYSTEM_ID_LEN));
 		tmp-=SYSTEM_ID_LEN;
 	    }
 	    if(tmp>=sizeof(tlv_ptp_adj->neighbor_extd_local_circuit_id)) {
@@ -1876,7 +1835,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	case TLV_SHARED_RISK_GROUP:
 	    if (!TTEST2(*tptr, NODE_ID_LEN))
                 goto trunctlv;
-	    printf("\n\t      IS Neighbor: %s", isis_print_nodeid(tptr));
+	    printf("\n\t      IS Neighbor: %s", isis_print_id(tptr, NODE_ID_LEN));
 	    tptr+=(NODE_ID_LEN);
 	    tmp-=(NODE_ID_LEN);
 
@@ -1909,11 +1868,10 @@ static int isis_print (const u_int8_t *p, u_int length)
 	case TLV_LSP:
 	    tlv_lsp = (const struct isis_tlv_lsp *)tptr;
 	    while(tmp>0) {
-		printf("\n\t      lsp-id: %s",
-                       isis_print_nodeid(tlv_lsp->lsp_id));
-		if (!TTEST((tlv_lsp->lsp_id)[NODE_ID_LEN]))
+		if (!TTEST((tlv_lsp->lsp_id)[LSP_ID_LEN]))
 		    goto trunctlv;
-		printf("-%02x",(tlv_lsp->lsp_id)[NODE_ID_LEN]);
+		printf("\n\t      lsp-id: %s",
+                       isis_print_id(tlv_lsp->lsp_id, LSP_ID_LEN));
 		if (!TTEST2(tlv_lsp->sequence_number, 4))
 		    goto trunctlv;
 		printf(", seq: 0x%08x",EXTRACT_32BITS(tlv_lsp->sequence_number));
@@ -1996,7 +1954,7 @@ static int isis_print (const u_int8_t *p, u_int length)
             while (tmp >= SYSTEM_ID_LEN) {
                 if (!TTEST2(*tptr, SYSTEM_ID_LEN))
                     goto trunctlv;
-                printf("\n\t      %s",isis_print_sysid(tptr,SYSTEM_ID_LEN));
+                printf("\n\t      %s",isis_print_id(tptr,SYSTEM_ID_LEN));
                 tptr+=SYSTEM_ID_LEN;
                 tmp-=SYSTEM_ID_LEN;
             }
