@@ -21,7 +21,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.10 2004-07-21 22:00:10 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.11 2004-11-04 07:44:05 guy Exp $ (LBL)
  */
 
 #ifndef netdissect_h
@@ -31,7 +31,6 @@
 #include "os-proto.h"
 #endif
 #include <sys/types.h>
-#include <sys/time.h>
 
 #ifndef HAVE___ATTRIBUTE__
 #define __attribute__(x)
