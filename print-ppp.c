@@ -17,11 +17,20 @@
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * Extensively modified by Motonori Shindo (mshindo@mshindo.net) for more
+ * complete PPP support.
+ */
+
+/* TODO: 
+   o resolve XXX as much as possible
+   o MP support
+   o BAP support 
  */
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.39 2000-07-01 03:39:08 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.40 2000-08-18 07:44:46 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -60,39 +69,55 @@ struct rtentry;
 /* XXX This goes somewhere else. */
 #define PPP_HDRLEN 4
 
-/* LCP */
+/* The following constatns are defined by IANA. Please refer to 
+      http://www.isi.edu/in-notes/iana/assignments/ppp-numbers
+   for the up-to-date information. */
 
-#define LCP_CONF_REQ	1
-#define LCP_CONF_ACK	2
-#define LCP_CONF_NAK	3
-#define LCP_CONF_REJ	4
-#define LCP_TERM_REQ	5
-#define LCP_TERM_ACK	6
-#define LCP_CODE_REJ	7
-#define LCP_PROT_REJ	8
-#define LCP_ECHO_REQ	9
-#define LCP_ECHO_RPL	10
-#define LCP_DISC_REQ	11
+/* Control Protocols (LCP/IPCP/CCP etc.) Codes */
 
-#define LCP_MIN	LCP_CONF_REQ
-#define LCP_MAX LCP_DISC_REQ
+#define CPCODES_VEXT		0	/* Vendor-Specific (RFC2153) */
+#define CPCODES_CONF_REQ	1	/* Configure-Request */
+#define CPCODES_CONF_ACK	2	/* Configure-Ack */
+#define CPCODES_CONF_NAK	3	/* Configure-Nak */
+#define CPCODES_CONF_REJ	4	/* Configure-Reject */
+#define CPCODES_TERM_REQ	5	/* Terminate-Request */
+#define CPCODES_TERM_ACK	6	/* Terminate-Ack */
+#define CPCODES_CODE_REJ	7	/* Code-Reject */
+#define CPCODES_PROT_REJ	8	/* Protocol-Reject (LCP only) */
+#define CPCODES_ECHO_REQ	9	/* Echo-Request (LCP only) */
+#define CPCODES_ECHO_RPL	10	/* Echo-Reply (LCP only) */
+#define CPCODES_DISC_REQ	11	/* Discard-Request (LCP only) */
+#define CPCODES_ID		12	/* Identification (LCP only) */
+#define CPCODES_TIME_REM	13	/* Time-Remaining (LCP only) */
+#define CPCODES_RESET_REQ	14	/* Reset-Request (CCP only) */
+#define CPCODES_RESET_REP	15	/* Reset-Reply (CCP only) */
 
-static char *lcpcodes[] = {
+#define CPCODES_MIN	CPCODES_VEXT
+#define CPCODES_MAX	CPCODES_RESET_REP
+
+static const char *cpcodes[] = {
 	/*
-	 * LCP code values (RFC1661, pp26)
+	 * Control Protocol code values (RFC1661)
 	 */
-	"Configure-Request",
-	"Configure-Ack",
-	"Configure-Nak",
-	"Configure-Reject",
-	"Terminate-Request",
-	"Terminate-Ack",
- 	"Code-Reject",
-	"Protocol-Reject",
-	"Echo-Request",
-	"Echo-Reply",
-	"Discard-Request",
+	"Vend-Ext",	/* (0) RFC2153 */
+	"Conf-Req",	/* (1) */
+	"Conf-Ack",	/* (2) */
+	"Conf-Nak",	/* (3) */
+	"Conf-Rej",	/* (4) */
+	"Term-Req",	/* (5) */
+	"Term-Ack",	/* (6) */
+ 	"Code-Rej",	/* (7) */
+	"Prot-Rej",	/* (8) */
+	"Echo-Req",	/* (9) */
+	"Echo-Rep",	/* (10) */
+	"Disc-Req",	/* (11) */
+	"Ident",	/* (12) RFC1570 */
+	"Time-Rem",	/* (13) RFC1570 */
+	"Reset-Req",	/* (14) RFC1962 */
+	"Reset-Ack",	/* (15) RFC1962 */
 };
+
+/* LCP Config Options */
 
 #define LCPOPT_VEXT	0
 #define LCPOPT_MRU	1
@@ -100,39 +125,174 @@ static char *lcpcodes[] = {
 #define LCPOPT_AP	3
 #define LCPOPT_QP	4
 #define LCPOPT_MN	5
+#define LCPOPT_DEP6	6
 #define LCPOPT_PFC	7
 #define LCPOPT_ACFC	8
+#define LCPOPT_FCSALT	9
+#define LCPOPT_SDP	10
+#define LCPOPT_NUMMODE	11
+#define LCPOPT_DEP12	12
+#define LCPOPT_CBACK	13
+#define LCPOPT_DEP14	14
+#define LCPOPT_DEP15	15
+#define LCPOPT_DEP16	16
+#define LCPOPT_MLMRRU	17
+#define LCPOPT_MLSSNHF	18
+#define LCPOPT_MLED	19
+#define LCPOPT_PROP	20
+#define LCPOPT_DCEID	21
+#define LCPOPT_MPP	22
+#define LCPOPT_LD	23
+#define LCPOPT_LCPAOPT	24
+#define LCPOPT_COBS	25
+#define LCPOPT_PE	26
+#define LCPOPT_MLHF	27
+#define LCPOPT_I18N	28
+#define LCPOPT_SDLOS	29
+#define LCPOPT_PPPMUX	30
 
-#define LCPOPT_MIN 0
-#define LCPOPT_MAX 24
+#define LCPOPT_MIN LCPOPT_VEXT
+#define LCPOPT_MAX LCPOPT_PPPMUX
 
-static char *lcpconfopts[] = {
-	"Vendor-Ext",
-	"Max-Rx-Unit",
-	"Async-Ctrl-Char-Map",
-	"Auth-Prot",
-	"Quality-Prot",
-	"Magic-Number",
-	"unassigned (6)",	
-	"Prot-Field-Compr",
-	"Add-Ctrl-Field-Compr",
-	"FCS-Alternatives",
-	"Self-Describing-Pad",
-	"Numbered-Mode",
-	"Multi-Link-Procedure",
-	"Call-Back",
-	"Connect-Time",
-	"Compund-Frames",
-	"Nominal-Data-Encap",
-	"Multilink-MRRU",
-	"Multilink-SSNHF",
-	"Multilink-ED",
-	"Proprietary",
-	"DCE-Identifier",
-	"Multilink-Plus-Proc",
-	"Link-Discriminator",
-	"LCP-Auth-Option",
+static const char *lcpconfopts[] = {
+	"Vend-Ext",		/* (0) */
+	"MRU",			/* (1) */		
+	"ACCM",			/* (2) */
+	"Auth-Prot",		/* (3) */
+	"Qual-Prot",		/* (4) */
+	"Magic-Num",		/* (5) */
+	"deprecated(6)",	/* used to be a Quality Protocol */
+	"PFC",			/* (7) */
+	"ACFC",			/* (8) */
+	"FCS-Alt",		/* (9) */
+	"SDP",			/* (10) */
+	"Num-Mode",		/* (11) */
+	"deprecated(12)",	/* used to be a Multi-Link-Procedure*/
+	"Call-Back",		/* (13) */
+	"deprecated(14)",	/* used to be a Connect-Time */
+	"deprecated(15)",	/* used to be a Compund-Frames */
+	"deprecated(16)",	/* used to be a Nominal-Data-Encap */
+	"MRRU",			/* (17) */
+	"SSNHF",		/* (18) */
+	"End-Disc",		/* (19) */
+	"Proprietary",		/* (20) */
+	"DCE-Id",		/* (21) */
+	"MP+",			/* (22) */
+	"Link-Disc",		/* (23) */
+	"LCP-Auth-Opt",		/* (24) */
+	"COBS",			/* (25) */
+	"Prefix-elision",	/* (26) */
+	"Multilink-header-Form",/* (27) */
+	"I18N",			/* (28) */
+	"SDL-over-SONET/SDH",	/* (29) */
+	"PPP-Muxing",		/* (30) */
 };
+
+/* IPV6CP - to be supported */
+/* ECP - to be supported */
+
+/* CCP Config Options */
+
+#define CCPOPT_OUI	0	/* RFC1962 */
+#define CCPOPT_PRED1	1	/* RFC1962 */
+#define CCPOPT_PRED2	2	/* RFC1962 */
+#define CCPOPT_PJUMP	3	/* RFC1962 */
+/* 4-15 unassigned */
+#define CCPOPT_HPPPC	16	/* RFC1962 */
+#define CCPOPT_STACLZS	17	/* RFC1974 */
+#define CCPOPT_MPPC	18	/* RFC2118 */
+#define CCPOPT_GFZA	19	/* RFC1962 */
+#define CCPOPT_V42BIS	20	/* RFC1962 */
+#define CCPOPT_BSDCOMP	21	/* RFC1977 */
+/* 22 unassigned */
+#define CCPOPT_LZSDCP	23	/* RFC1967 */
+#define CCPOPT_MVRCA	24	/* RFC1975 */
+#define CCPOPT_DEC	25	/* RFC1976 */
+#define CCPOPT_DEFLATE	26	/* RFC1979 */
+/* 27-254 unassigned */
+#define CCPOPT_RESV	255	/* RFC1962 */
+
+#define CCPOPT_MIN CCPOPT_OUI
+#define CCPOPT_MAX CCPOPT_DEFLATE    /* XXX: should be CCPOPT_RESV but... */
+
+static const char *ccpconfopts[] = {
+	"OUI",			/* (0) */
+	"Pred-1",		/* (1) */		
+	"Pred-2",		/* (2) */
+	"Puddle",		/* (3) */
+	"unassigned(4)",	/* (4) */
+	"unassigned(5)",	/* (5) */
+	"unassigned(6)",	/* (6) */
+	"unassigned(7)",	/* (7) */
+	"unassigned(8)",	/* (8) */
+	"unassigned(9)",	/* (9) */
+	"unassigned(10)",	/* (10) */
+	"unassigned(11)",	/* (11) */
+	"unassigned(12)",	/* (12) */
+	"unassigned(13)",	/* (13) */
+	"unassigned(14)",	/* (14) */
+	"unassigned(15)",	/* (15) */
+	"HP-PPC",		/* (16) */
+	"Stac-LZS",		/* (17) */
+	"MPPC",			/* (18) */
+	"Gand-FZA",		/* (19) */
+	"V.42bis",		/* (20) */
+	"BSD-Comp",		/* (21) */
+	"unassigned(22)",	/* (22) */
+	"LZS-DCP",		/* (23) */
+	"MVRCA",		/* (24) */
+	"DEC",			/* (25) */
+	"Deflate",		/* (26) */
+};
+
+/* BACP Config Options */
+
+#define BACPOPT_FPEER	1	/* RFC2125 */
+
+/* SDCP - to be supported */
+
+/* IPCP Config Options */
+
+#define IPCPOPT_2ADDR	1	/* RFC1172, RFC1332 (deprecated) */
+#define IPCPOPT_IPCOMP	2	/* RFC1332 */
+#define IPCPOPT_ADDR	3	/* RFC1332 */
+#define IPCPOPT_MOBILE4	4	/* RFC2290 */
+
+#define IPCPOPT_PRIDNS	129	/* RFC1877 */
+#define IPCPOPT_PRINBNS	130	/* RFC1877 */
+#define IPCPOPT_SECDNS	131	/* RFC1877 */
+#define IPCPOPT_SECNBNS	132	/* RFC1877 */
+
+/* ATCP - to be supported */
+/* OSINLCP - to be supported */
+/* BVCP - to be supported */
+/* BCP - to be supported */
+/* IPXCP - to be supported */
+
+/* Auth Algorithms */
+
+/* 0-4 Reserved (RFC1994) */ 
+#define AUTHALG_CHAPMD5	5	/* RFC1994 */
+#define AUTHALG_MSCHAP1	128	/* RFC2433 */
+#define AUTHALG_MSCHAP2	129	/* RFC2795 */
+
+/* FCS Alternatives - to be supported */
+
+/* Multilink Endpoint Discriminator (RFC1717) */
+#define MEDCLASS_NULL	0	/* Null Class */
+#define MEDCLASS_LOCAL	1	/* Locally Assigned */
+#define MEDCLASS_IPV4	2	/* Internet Protocol (IPv4) */
+#define MEDCLASS_MAC	3	/* IEEE 802.1 global MAC address */
+#define MEDCLASS_MNB	4	/* PPP Magic Number Block */
+#define MEDCLASS_PSNDN	5	/* Public Switched Network Director Number */
+
+/* PPP LCP Callback */
+#define CALLBACK_AUTH	0	/* Location determined by user auth */
+#define CALLBACK_DSTR	1	/* Dialing string */
+#define CALLBACK_LID	2	/* Location identifier */
+#define CALLBACK_E164	3	/* E.164 number */
+#define CALLBACK_X500	4	/* X.500 distinguished name */
+#define CALLBACK_CBCP	6	/* Location is determined during CBCP nego */
 
 /* CHAP */
 
@@ -141,14 +301,14 @@ static char *lcpconfopts[] = {
 #define CHAP_SUCC	3
 #define CHAP_FAIL	4
 
-#define CHAP_CODEMIN 1
-#define CHAP_CODEMAX 4
+#define CHAP_CODEMIN CHAP_CHAL
+#define CHAP_CODEMAX CHAP_FAIL
 
-static char *chapcode[] = {
-	"Challenge",
-	"Response",
-	"Success",
-	"Failure",	
+static const char *chapcode[] = {
+	"Chal",		/* (1) */
+	"Resp",		/* (2) */
+	"Succ",		/* (3) */
+	"Fail",		/* (4) */
 };
 
 /* PAP */
@@ -157,30 +317,38 @@ static char *chapcode[] = {
 #define PAP_AACK	2
 #define PAP_ANAK	3
 
-#define PAP_CODEMIN	1
-#define PAP_CODEMAX	3
+#define PAP_CODEMIN	PAP_AREQ
+#define PAP_CODEMAX	PAP_ANAK
 
-static char *papcode[] = {
-	"Authenticate-Request",
-	"Authenticate-Ack",
-	"Authenticate-Nak",
+static const char *papcode[] = {
+	"Auth-Req",	/* (1) */
+	"Auth-Ack",	/* (2) */
+	"Auth-Nak",	/* (3) */
 };
 
-/* IPCP */
+/* BAP */
+#define BAP_CALLREQ	1
+#define BAP_CALLRES	2
+#define BAP_CBREQ	3
+#define BAP_CBRES	4
+#define BAP_LDQREQ	5
+#define BAP_LDQRES	6
+#define BAP_CSIND	7
+#define BAP_CSRES	8
 
-#define IPCP_2ADDR	1
-#define IPCP_CP		2
-#define IPCP_ADDR	3
-
-static const char *ppp_protoname __P((int proto));
-static void handle_lcp __P((const u_char *p, int length));
-static int print_lcp_config_options __P((const u_char *p));
+static const char *ppp_protoname __P((u_int proto));
+static void handle_ctrl_proto __P((u_int proto,const u_char *p, int length));
 static void handle_chap __P((const u_char *p, int length));
-static void handle_ipcp __P((const u_char *p, int length));
 static void handle_pap __P((const u_char *p, int length));
+static void handle_bap __P((const u_char *p, int length));
+static int print_lcp_config_options __P((const u_char *p));
+static int print_ipcp_config_options __P((const u_char *p));
+static int print_ccp_config_options __P((const u_char *p));
+static int print_bacp_config_options __P((const u_char *p));
+static void handle_ppp __P((u_int proto, const u_char *p, int length));
 
 static const char *
-ppp_protoname(int proto)
+ppp_protoname(u_int proto)
 {
 	static char buf[20];
 
@@ -219,56 +387,104 @@ ppp_protoname(int proto)
 #ifdef PPP_CHAP
 	case PPP_CHAP:	return "CHAP";
 #endif
+#ifdef PPP_BACP
+	case PPP_BACP:	return "BACP";
+#endif
+#ifdef PPP_BAP
+	case PPP_BAP:	return "BAP";
+#endif
 	default:
 		snprintf(buf, sizeof(buf), "unknown-0x%04x", proto);
 		return buf;
 	}
 }
 
-/* print LCP frame */
+/* generic Control Protocol (e.g. LCP, IPCP, CCP, etc.) handler */
 static void
-handle_lcp(const u_char *p, int length)
+handle_ctrl_proto(u_int proto, const u_char *p, int length)
 {
+	u_int code, len;
+	int (*pfunc)();
 	int x, j;
-	const u_char *ptr;
 
-	x = p[4];
-
-	if ((x >= LCP_MIN) && (x <= LCP_MAX))
-		printf("%s", lcpcodes[x - 1]);
+	code = *p;
+	if ((code >= CPCODES_MIN) && (code <= CPCODES_MAX))
+		printf("%s", cpcodes[code]);
 	else {
-		printf("0x%02x", x);
+		printf("0x%02x", code);
 		return;
 	}
+	p++;
 
-	length -= 4;
+	printf("(%u)", *p);		/* ID */
+	p++;
+
+	len = EXTRACT_16BITS(p);
+	p += 2;
+
+	if (len <= 4) {
+		return;		/* there may be a NULL confreq etc.*/
+	}
 	
-	switch (x) {
-	case LCP_CONF_REQ:
-	case LCP_CONF_ACK:
-	case LCP_CONF_NAK:
-	case LCP_CONF_REJ:
-		x = length;
-		ptr = p + 8;
+	switch (code) {
+	case CPCODES_VEXT:
+		printf(", Magic-Num=%08x", EXTRACT_32BITS(p));
+		p += 4;
+		printf(" OUI=%02x%02x%02x", p[0], p[1], p[2]);
+		/* XXX: need to decode Kind and Value(s)? */ 
+		break;
+	case CPCODES_CONF_REQ:
+	case CPCODES_CONF_ACK:
+	case CPCODES_CONF_NAK:
+	case CPCODES_CONF_REJ:
+		x = len - 4;	/* Code(1), Identifier(1) and Length(2) */
 		do {
-			if ((j = print_lcp_config_options(ptr)) == 0)
+			switch (proto) {
+			case PPP_LCP:
+				pfunc = print_lcp_config_options;
+				break;
+			case PPP_IPCP:
+				pfunc = print_ipcp_config_options;
+				break;
+			case PPP_CCP:
+				pfunc = print_ccp_config_options;
+				break;
+			case PPP_BACP:
+				pfunc = print_bacp_config_options;
+				break;
+			}
+			if ((j = (*pfunc)(p)) == 0)
 				break;
 			x -= j;
-			ptr += j;
+			p += j;
 		} while (x > 0);
 		break;
 
-	case LCP_ECHO_REQ:
-	case LCP_ECHO_RPL:
-		printf(", Magic-Number=%u",
-			EXTRACT_32BITS(p+8));
+	case CPCODES_TERM_REQ:
+	case CPCODES_TERM_ACK:
+		/* XXX: need to decode Data? */
 		break;
-	case LCP_TERM_REQ:
-	case LCP_TERM_ACK:
-	case LCP_CODE_REJ:
-	case LCP_PROT_REJ:
-	case LCP_DISC_REQ:
+	case CPCODES_CODE_REJ:
+		/* XXX: need to decode Rejected-Packet? */
+		break;
+	case CPCODES_PROT_REJ:
+		printf(", Rejected-Protocol=%04x", EXTRACT_16BITS(p));
+		/* XXX: need to decode Rejected-Information? */
+		break;
+	case CPCODES_ECHO_REQ:
+	case CPCODES_ECHO_RPL:
+	case CPCODES_DISC_REQ:
+	case CPCODES_ID:
+		printf(", Magic-Num=%08x", EXTRACT_32BITS(p));
+		/* XXX: need to decode Data? */
+		break;
+	case CPCODES_TIME_REM:
+		printf(", Magic-Num=%08x", EXTRACT_32BITS(p));
+		printf(" Seconds-Remaining=%u", EXTRACT_32BITS(p+4));
+		/* XXX: need to decode Message? */
+		break;
 	default:
+		printf(", unknown-Codes-0x%02x", code);
 		break;
 	}
 }
@@ -279,14 +495,31 @@ print_lcp_config_options(const u_char *p)
 {
 	int len	= p[1];
 	int opt = p[0];
+	int i;
 	
 	if ((opt >= LCPOPT_MIN) && (opt <= LCPOPT_MAX))
 		printf(", %s", lcpconfopts[opt]);
 
 	switch (opt) {
+	case LCPOPT_VEXT:
+		if (len >= 6) {
+			printf(" OUI=%02x%02x%02x", p[2], p[3], p[4]);
+#if 0		      
+			printf(" kind=%02x", p[5]);
+			printf(" val=")
+			for (i=0; i<len-6; i++) {
+				printf("%02x", p[6+i]);
+			}
+#endif
+		}
+		break;
 	case LCPOPT_MRU:
 		if (len == 4)
-			printf("=%d", (*(p+2) << 8) + *(p+3));
+			printf("=%u", EXTRACT_16BITS(p+2));
+		break;
+	case LCPOPT_ACCM:
+		if (len == 6)
+			printf("=%08x", EXTRACT_32BITS(p+2));
 		break;
 	case LCPOPT_AP:
 		if (len >= 4) {
@@ -298,11 +531,14 @@ print_lcp_config_options(const u_char *p)
 				default:
 					printf("unknown-algorithm-%u", p[4]);
 					break;
-				case 5:
+				case AUTHALG_CHAPMD5:
 					printf("MD5");
 					break;
-				case 0x80:
-					printf("Microsoft");
+				case AUTHALG_MSCHAP1:
+					printf("MSCHAPv1");
+					break;
+				case AUTHALG_MSCHAP2:
+					printf("MSCHAPv2");
 					break;
 				}
 			}
@@ -326,14 +562,92 @@ print_lcp_config_options(const u_char *p)
 		break;
 	case LCPOPT_MN:
 		if (len == 6)
-			printf("=%u", EXTRACT_32BITS(p+2));
+			printf("=%08x", EXTRACT_32BITS(p+2));
 		break;
 	case LCPOPT_PFC:
-		printf(" PFC");
 		break;
 	case LCPOPT_ACFC:
-		printf(" ACFC");
 		break;
+	case LCPOPT_LD:
+		if (len == 4)
+			printf("=%04x", EXTRACT_16BITS(p+2));
+		break;
+	case LCPOPT_CBACK:
+		switch (p[2]) {		/* Operation */
+		case CALLBACK_AUTH:
+			printf(" UserAuth");
+			break;
+		case CALLBACK_DSTR:
+			printf(" DialString");
+			break;
+		case CALLBACK_LID:
+			printf(" LocalID");
+			break;
+		case CALLBACK_E164:
+			printf(" E.164");
+			break;
+		case CALLBACK_X500:
+			printf(" X.500");
+			break;
+		case CALLBACK_CBCP:
+			printf(" CBCP");
+			break;
+		default:
+			printf(" unknown-operation=%u", p[2]);
+			break;
+		}
+		break;
+	case LCPOPT_MLMRRU:
+		if (len == 4) 
+			printf("=%u", EXTRACT_16BITS(p+2));
+		break;
+	case LCPOPT_MLED:
+		switch (p[2]) {		/* class */
+		case MEDCLASS_NULL:
+			printf(" Null");
+			break;
+		case MEDCLASS_LOCAL:
+			printf(" Local"); /* XXX */
+			break;
+		case MEDCLASS_IPV4:
+			printf(" IPv4=%s", ipaddr_string(p + 3));
+			break;
+		case MEDCLASS_MAC:
+			printf(" MAC=%02x:%02x:%02x:%02x:%02x:%02x",
+			       p[3], p[4], p[5], p[6], p[7], p[8]);
+			break;
+		case MEDCLASS_MNB:
+			printf(" Magic-Num-Block"); /* XXX */
+			break;
+		case MEDCLASS_PSNDN:
+			printf(" PSNDN"); /* XXX */
+			break;
+		}
+		break;
+
+/* XXX: to be supported */
+#if 0 
+	case LCPOPT_DEP6:
+	case LCPOPT_FCSALT:
+	case LCPOPT_SDP:
+	case LCPOPT_NUMMODE:
+	case LCPOPT_DEP12:
+	case LCPOPT_DEP14:
+	case LCPOPT_DEP15:
+	case LCPOPT_DEP16:
+	case LCPOPT_MLSSNHF:
+	case LCPOPT_PROP:
+	case LCPOPT_DCEID:
+	case LCPOPT_MPP:
+	case LCPOPT_LCPAOPT:
+	case LCPOPT_COBS:
+	case LCPOPT_PE:
+	case LCPOPT_MLHF:
+	case LCPOPT_I18N:
+	case LCPOPT_SDLOS:
+	case LCPOPT_PPPMUX:
+		break;
+#endif
 	}
 	return len;
 }
@@ -342,36 +656,59 @@ print_lcp_config_options(const u_char *p)
 static void
 handle_chap(const u_char *p, int length)
 {
-	int x;
-	const u_char *ptr;
+	u_int code, len;
+	int  val_size, name_size, msg_size;
+	int i;
 
-	x = p[4];
-
-	if ((x >= CHAP_CODEMIN) && (x <= CHAP_CODEMAX))
-		printf("%s", chapcode[x - 1]);
+	code = *p;
+	if ((code >= CHAP_CODEMIN) && (code <= CHAP_CODEMAX))
+		printf("%s", chapcode[code - 1]);
 	else {
-		printf("0x%02x", x);
+		printf("0x%02x", code);
 		return;
 	}
+	p++;
 
-	length -= 4;
+	printf("(%u)", *p);		/* ID */
+	p++;
+
+	len = EXTRACT_16BITS(p);
+	p += 2;
+
+	/* Note that this is a generic CHAP decoding routine. Since we
+	   don't know which flavor of CHAP (i.e. CHAP-MD5, MS-CHAPv1,
+	   MS-CHAPv2) is used at this point, we can't decode packet
+	   specifically to each algorithms. Instead, we simply decode
+	   the GCD (Gratest Common Denominator) for all algorithms. */
 	
-	switch (p[4]) {
+	switch (code) {
 	case CHAP_CHAL:
 	case CHAP_RESP:
+		val_size = *p;		/* value size */
+		p++;
 		printf(", Value=");
-		x = p[8];	/* value size */
-		ptr = p + 9;
-		while (--x >= 0)
-			printf("%02x", *ptr++);
-		x = length - p[8] - 1;
+		for (i = 0; i < val_size; i++) 
+			printf("%02x", *p++);
+		name_size = len - val_size - 5;
 		printf(", Name=");
-		while (--x >= 0) {
-			if (isprint(*ptr))
-				printf("%c", *ptr);
+		for (i = 0; i < name_size; i++) {
+			if (isprint(*p))
+				printf("%c", *p);
 			else
-				printf("\\%03o", *ptr);
-			ptr++;
+				printf("\\%03o", *p);
+			p++;
+		}
+		break;
+	case CHAP_SUCC:
+	case CHAP_FAIL:
+		msg_size = len - 4;
+		printf(", Msg=");
+		for (i = 0; i< msg_size; i++) {
+			if (isprint(*p))
+				printf("%c", *p);
+			else
+				printf("\\%03o", *p);
+			p++;
 		}
 		break;
 	}
@@ -381,72 +718,237 @@ handle_chap(const u_char *p, int length)
 static void
 handle_pap(const u_char *p, int length)
 {
-	int x;
-	const u_char *ptr;
+	u_int code, len;
+	int  peerid_len, passwd_len, msg_len;
+	int i;
 
-	x = p[4];
-
-	if ((x >= PAP_CODEMIN) && (x <= PAP_CODEMAX))
-		printf("%s", papcode[x - 1]);
+	code = *p;
+	if ((code >= PAP_CODEMIN) && (code <= PAP_CODEMAX))
+		printf("%s", papcode[code - 1]);
 	else {
-		printf("0x%02x", x);
+		printf("0x%02x", code);
 		return;
 	}
+	p++;
 
-	length -= 4;
-	
-	switch (x) {
+	printf("(%u)", *p);		/* ID */
+	p++;
+
+	len = EXTRACT_16BITS(p);
+	p += 2;
+
+	switch (code) {
 	case PAP_AREQ:
-		printf(", Peer-Id=");
-		x = p[8];	/* peerid size */
-		ptr = p + 9;
-		while (--x >= 0) {
-			if (isprint(*ptr))
-				printf("%c", *ptr);
+		peerid_len = *p;	/* Peer-ID Length */
+		p++;
+		printf(", Peer=");
+		for (i = 0; i < peerid_len; i++) {
+			if (isprint(*p))
+				printf("%c", *p);
 			else
-				printf("\\%03o", *ptr);
-			ptr++;
+				printf("\\%03o", *p);
+			p++;
 		}
-		x = *ptr++;
-		printf(", Passwd=");
-		while (--x >= 0) {
-			if (isprint(*ptr))
-				printf("%c", *ptr);
+		passwd_len = *p;	/* Password Length */
+		p++;
+		printf(", Name=");
+		for (i = 0; i < passwd_len; i++) {
+			if (isprint(*p))
+				printf("%c", *p);
 			else
-				printf("\\%03o", *ptr);
-			ptr++;
+				printf("\\%03o", *p);
+			p++;
 		}
 		break;
 	case PAP_AACK:
 	case PAP_ANAK:
+		msg_len = *p;		/* Msg-Length */
+		p++;
+		printf(", Msg=");
+		for (i = 0; i< msg_len; i++) {
+			if (isprint(*p))
+				printf("%c", *p);
+			else
+				printf("\\%03o", *p);
+			p++;
+		}
 		break;
 	}
 }
 
-/* IPCP */
+/* BAP */
 static void
-handle_ipcp(const u_char *p, int length)
+handle_bap(const u_char *p, int length)
 {
-	length -= 4;
-	
-	switch (p[8]) {
-	case IPCP_2ADDR:
-		printf("IP-Addresses");
-		printf(", src=%s", ipaddr_string(p + 10));
-		printf(", drc=%s", ipaddr_string(p + 14));
-		break;
-		
-	case IPCP_CP:
-		printf("IP-Compression-Protocol");
-		break;
+	/* XXX: to be supported!! */
+}
 
-	case IPCP_ADDR:
-		printf("IP-Address=%s", ipaddr_string(p + 10));
+
+/* IPCP config options */
+static int
+print_ipcp_config_options(const u_char *p)
+{
+	int len	= p[1];
+	int opt = p[0];
+	
+	switch (opt) {
+	case IPCPOPT_2ADDR:		/* deprecated */
+		printf(", IP-Addrs src=%s dst=%s",
+		       ipaddr_string(p + 2), 
+		       ipaddr_string(p + 6));
+		break;		
+	case IPCPOPT_IPCOMP:
+		printf(", IP-Comp");
+		if (EXTRACT_16BITS(p+2) == PPP_VJC) {
+			printf(" VJ-Comp");
+			/* XXX: VJ-Comp parameters should be decoded */
+		} else {
+			printf(" unknown-comp-proto=%04x", 
+			       EXTRACT_16BITS(p+2));
+		}
+		break;
+	case IPCPOPT_ADDR:
+		printf(", IP-Addr=%s", ipaddr_string(p + 2));
+		break;
+	case IPCPOPT_MOBILE4:
+		printf(", Home-Addr=%s", ipaddr_string(p + 2));
+		break;
+	case IPCPOPT_PRIDNS:
+		printf(", Pri-DNS=%s", ipaddr_string(p + 2));
+		break;
+	case IPCPOPT_PRINBNS:
+		printf(", Pri-NBNS=%s", ipaddr_string(p + 2));
+		break;
+	case IPCPOPT_SECDNS:
+		printf(", Sec-DNS=%s", ipaddr_string(p + 2));
+		break;
+	case IPCPOPT_SECNBNS:
+		printf(", Sec-NBNS=%s", ipaddr_string(p + 2));
+		break;
+	default:
+		printf(", unknown-%d", opt);
 		break;
 	}
+	return len;
 }
-	
+
+/* CCP config options */
+static int
+print_ccp_config_options(const u_char *p)
+{
+	int len	= p[1];
+	int opt = p[0];
+
+	if ((opt >= CCPOPT_MIN) && (opt <= CCPOPT_MAX))
+		printf(", %s", ccpconfopts[opt]);
+#if 0	/* XXX */
+	switch (opt) {
+	case CCPOPT_OUI:
+	case CCPOPT_PRED1:
+	case CCPOPT_PRED2:
+	case CCPOPT_PJUMP:
+	case CCPOPT_HPPPC:
+	case CCPOPT_STACLZS:
+	case CCPOPT_MPPC:
+	case CCPOPT_GFZA:
+	case CCPOPT_V42BIS:
+	case CCPOPT_BSDCOMP:
+	case CCPOPT_LZSDCP:
+	case CCPOPT_MVRCA:
+	case CCPOPT_DEC:
+	case CCPOPT_DEFLATE:
+	case CCPOPT_RESV:
+		break;
+
+	default:
+		printf(", unknown-%d", opt);
+		break;
+	}
+#endif
+	return len;
+}
+
+/* BACP config options */
+static int
+print_bacp_config_options(const u_char *p)
+{
+	int len	= p[1];
+	int opt = p[0];
+
+	if (opt == BACPOPT_FPEER) {
+		printf(", Favored-Peer");
+		printf(" Magic-Num=%08x", EXTRACT_32BITS(p+2));
+	} else {
+		printf(", unknown-option-%d", opt);
+	} 
+	return len;
+}
+
+
+/* PPP */
+static void
+handle_ppp(u_int proto, const u_char *p, int length)
+{
+	switch (proto) {
+	case PPP_LCP:
+	case PPP_IPCP:
+	case PPP_CCP:
+	case PPP_BACP:
+		handle_ctrl_proto(proto, p, length);
+		break;
+	case PPP_CHAP:
+		handle_chap(p, length);
+		break;
+	case PPP_PAP:
+		handle_pap(p, length);
+		break;
+	case PPP_BAP:		/* XXX: not yet completed */
+		handle_bap(p, length);
+		break;
+	case ETHERTYPE_IP:	/*XXX*/
+	case PPP_IP:
+		ip_print(p, length);
+		break;
+#ifdef INET6
+	case ETHERTYPE_IPV6:	/*XXX*/
+	case PPP_IPV6:
+		ip6_print(p, length);
+		break;
+#endif
+	}
+}
+
 /* Standard PPP printer */
+void
+ppp_print(register const u_char *p, u_int length)
+{
+	u_int proto;
+
+	/* Here, we assume that p points to the Address and Control
+	   field (if they present). */
+
+	if (*p == PPP_ADDRESS && *(p+1) == PPP_CONTROL) { 
+		p += 2;			/* ACFC not used */
+		length -= 2;
+	}
+		
+	if (*p % 2) {			
+		proto = *p;		/* PFC is used */
+		p++;
+		length--; 
+	} else {
+		proto = EXTRACT_16BITS(p);
+		p += 2;
+		length -= 2;
+	}
+
+	printf("%s: ", ppp_protoname(proto));
+
+	handle_ppp(proto, p, length);
+}
+
+
+/* PPP I/F printer */
 void
 ppp_if_print(u_char *user, const struct pcap_pkthdr *h,
 	     register const u_char *p)
@@ -462,51 +964,34 @@ ppp_if_print(u_char *user, const struct pcap_pkthdr *h,
 		printf("[|ppp]");
 		goto out;
 	}
-
+	
 	/*
 	 * Some printers want to get back at the link level addresses,
 	 * and/or check that they're not walking off the end of the packet.
-	 * Rather than pass them all the way down, we set these globals.
-	 */
-	proto = ntohs(*(u_int16_t *)&p[2]);
+	 * Rather than pass them all the way down, we set these globals.  */
+
 	packetp = p;
 	snapend = p + caplen;
 
-	if (eflag)
-		printf("%c %4d %02x %s: ", p[0] ? 'O' : 'I', length,
-		       p[1], ppp_protoname(proto));
+#if 0
+	/* XXX: seems to assume that there are 2 octets prepended to an 
+	   actual PPP frame. The 1st octet looks like Input/Output flag 
+	   while 2nd octet is unknown, at least to me 
+	   (mshindo@mshindo.net). */
 
-	length -= PPP_HDRLEN;
-	ip = (struct ip *)(p + PPP_HDRLEN);
-	switch (proto) {
-	case PPP_LCP:
-		handle_lcp(p, length);
-		break;
-	case PPP_CHAP:
-		handle_chap(p, length);
-		break;
-	case PPP_PAP:
-		handle_pap(p, length);
-		break;
-	case PPP_IPCP:
-		handle_ipcp(p, length);
-		break;
-	case ETHERTYPE_IP:	/*XXX*/
-	case PPP_IP:
-		ip_print((const u_char *)ip, length);
-		break;
-#ifdef INET6
-	case ETHERTYPE_IPV6:	/*XXX*/
-	case PPP_IPV6:
-		ip6_print((const u_char *)ip, length);
-		break;
+	if (eflag)
+		printf("%c %4d %02x ", p[0] ? 'O' : 'I', length, p[1]);
 #endif
-	}
+
+	ppp_print(p, length);
+
 	if (xflag)
-		default_print((const u_char *)ip, caplen - PPP_HDRLEN);
+		default_print(p, caplen);
 out:
 	putchar('\n');
 }
+
+
 
 struct tok ppptype2str[] = {
 	{ PPP_IP,	"IP" },
@@ -528,15 +1013,18 @@ struct tok ppptype2str[] = {
 	{ PPP_OSICP,	"OSICP" },
 	{ PPP_NSCP,	"NSCP" },
 	{ PPP_DECNETCP, "DECNETCP" },
-	{ PPP_APPLECP, "APPLECP" },
+	{ PPP_APPLECP,	"APPLECP" },
 	{ PPP_IPXCP,	"IPXCP" },
 	{ PPP_STIICP,	"STIICP" },
-	{ PPP_VINESCP, "VINESCP" },
+	{ PPP_VINESCP,	"VINESCP" },
 
 	{ PPP_LCP,	"LCP" },
 	{ PPP_PAP,	"PAP" },
 	{ PPP_LQM,	"LQM" },
 	{ PPP_CHAP,	"CHAP" },
+	{ PPP_BACP,	"BACP" },
+	{ PPP_BAP,	"BAP" },
+	{ PPP_MP,	"MP" },
 	{ 0,		NULL }
 };
 

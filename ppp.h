@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ppp.h,v 1.9 2000-05-23 16:56:07 itojun Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ppp.h,v 1.10 2000-08-18 07:44:45 itojun Exp $ (LBL) */
 /*
  * Point to Point Protocol (PPP) RFC1331
  *
@@ -45,9 +45,14 @@
 #define PPP_STIICP	0x8033	/* Strean Protocol Control Protocol */
 #define PPP_VINESCP	0x8035	/* Banyan Vines Control Protocol */
 #define PPP_IPV6CP	0x8057	/* IPv6 Control Protocol */
+#define PPP_CCP		0x80fd	/* Compress Control Protocol */
 
 #define PPP_LCP		0xc021	/* Link Control Protocol */
 #define PPP_PAP		0xc023	/* Password Authentication Protocol */
 #define PPP_LQM		0xc025	/* Link Quality Monitoring */
 #define PPP_CHAP	0xc223	/* Challenge Handshake Authentication Protocol */
+#define PPP_BACP	0xc02b	/* Bandwidth Allocation Control Protocol */
+#define PPP_BAP		0xc02d	/* BAP */
+#define PPP_MP		0xc03d	/* Multi-Link */
+
 extern struct tok ppptype2str[];

@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-l2tp.c,v 1.7 2000-07-01 03:48:44 assar Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-l2tp.c,v 1.8 2000-08-18 07:44:46 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -712,12 +712,8 @@ l2tp_print(const u_char *dat, u_int length)
 			l2tp_avp_print((u_char *)ptr, length - cnt);
 		}
 	} else {
-#if 0
 		printf(" {");
-		ppp_hdlc_print((u_char *)ptr, length - cnt);
+		ppp_print((u_char *)ptr, length - cnt);
 		printf("}");
-#else
-		printf("[hdlc|]");
-#endif
 	}
 }	

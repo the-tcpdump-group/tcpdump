@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.5 2000-07-10 04:36:19 assar Exp $ (LBL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.6 2000-08-18 07:44:47 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -194,6 +194,10 @@ pppoe_print(register const u_char *bp, u_int length)
       /* p points to next tag */
     }
   } else {
+#if 0
+    /* We now make use of ppp_print() instead, because it has more
+       comprehensive support for PPP. It also gives us a consistent 
+       output with other protocols like L2TP. */
     u_short ptype;
     if (pppoe_payload[0] & 0x1) {
       ptype = pppoe_payload[0];
@@ -214,6 +218,9 @@ pppoe_print(register const u_char *bp, u_int length)
       lcp_print(pppoe_payload, pppoe_length);
     else
       printf("%s ", tok2str(ppptype2str, "proto-0x%x", ptype));
+#endif
+    printf(" ");
+    ppp_print(pppoe_payload);
   }
   return;
 }
