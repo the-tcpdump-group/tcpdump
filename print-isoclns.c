@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.21 2000-10-10 05:40:22 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.22 2000-10-11 04:04:33 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -435,11 +435,13 @@ isis_print (const u_char *p, u_int length)
 {
     struct isis_header *header;
     struct isis_ptp_header *header_ptp;
-    u_char pdu_type, max_area, priority, *pptr, type, len, *tptr, tmp, alen;
+    u_char pdu_type, max_area, priority, type, len, tmp, alen;
+    const u_char *pptr, *tptr;
     u_short packet_len, holding_time;
     int i;
 
-    header_ptp = (struct isis_ptp_header *)header = (struct isis_header *)p;
+    header = (struct isis_header *)p;
+    header_ptp = (struct isis_ptp_header *)header;
     printf("\n\t\t\t");
 
     /*
@@ -572,10 +574,10 @@ isis_print (const u_char *p, u_int length)
      */
     if(pdu_type==PTP_IIH) {
 	    packet_len -= ISIS_PTP_HEADER_SIZE;
-	    pptr = (char *)p + ISIS_PTP_HEADER_SIZE;
+	    pptr = p + ISIS_PTP_HEADER_SIZE;
     } else {
 	    packet_len -= ISIS_HEADER_SIZE;
-	    pptr = (char *)p + ISIS_HEADER_SIZE;
+	    pptr = p + ISIS_HEADER_SIZE;
     }
     while (packet_len >= 2) {
 	if (pptr >= snapend) {
