@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.94 2004-03-24 03:30:06 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.95 2004-07-02 06:32:47 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -71,8 +71,8 @@ struct tok ppptype2str[] = {
         { PPP_DECNET,	  "DECNET" },
         { PPP_APPLE,	  "APPLE" },
 	{ PPP_IPX,	  "IPX" },
-	{ PPP_VJC,	  "VJC" },
-	{ PPP_VJNC,	  "VJNC" },
+	{ PPP_VJC,	  "VJC IP" },
+	{ PPP_VJNC,	  "VJNC IP" },
 	{ PPP_BRPDU,	  "BRPDU" },
 	{ PPP_STII,	  "STII" },
 	{ PPP_VINES,	  "VINES" },
@@ -1076,6 +1076,7 @@ handle_ppp(u_int proto, const u_char *p, int length)
 		handle_bap(p, length);
 		break;
 	case ETHERTYPE_IP:	/*XXX*/
+        case PPP_VJNC:
 	case PPP_IP:
 		ip_print(p, length);
 		break;
