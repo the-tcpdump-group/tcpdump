@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.98 2003-10-21 23:04:23 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.99 2003-10-22 22:32:01 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1441,8 +1441,9 @@ static int isis_print (const u_int8_t *p, u_int length)
 	}
 
 	TCHECK(*header_psnp);
-	printf("\n\t  source-id:    %s",
-               isis_print_id(header_psnp->source_id, NODE_ID_LEN));
+	printf("\n\t  source-id:    %s, PDU length: %u",
+               isis_print_id(header_psnp->source_id, NODE_ID_LEN),
+               pdu_len);
 
         if (vflag > 1) {
             if(!print_unknown_data(pptr,"\n\t  ",ISIS_PSNP_HEADER_SIZE))
