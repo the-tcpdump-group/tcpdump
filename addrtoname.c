@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.86 2001-11-25 01:48:46 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.87 2002-05-31 09:51:13 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -425,9 +425,9 @@ etheraddr_string(register const u_char *ep)
 		return (tp->e_name);
 #ifdef USE_ETHER_NTOHOST
 	if (!nflag) {
-		char buf[128];
-		if (ether_ntohost(buf, (const struct ether_addr *)ep) == 0) {
-			tp->e_name = strdup(buf);
+		char buf2[128];
+		if (ether_ntohost(buf2, (const struct ether_addr *)ep) == 0) {
+			tp->e_name = strdup(buf2);
 			return (tp->e_name);
 		}
 	}
