@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.62 2000-12-31 07:12:18 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.63 2001-01-01 04:22:56 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -650,11 +650,15 @@ ns_print(register const u_char *bp, u_int length)
 		if (qdcount--) {
 			cp = ns_qprint((const u_char *)(np + 1),
 				       (const u_char *)np);
+			if (!cp)
+				goto trunc;
 			if ((cp = ns_rprint(cp, bp)) == NULL)
 				goto trunc;
 			while (qdcount-- && cp < snapend) {
 				cp = ns_qprint((const u_char *)cp,
 					       (const u_char *)np);
+				if (!cp)
+					goto trunc;
 				if ((cp = ns_rprint(cp, bp)) == NULL)
 					goto trunc;
 			}
