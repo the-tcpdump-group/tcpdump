@@ -20,6 +20,8 @@
 /* define if your struct __res_state has the nsort member */
 #undef HAVE_NEW_RES_STATE
 
+/* define if <inttypes.h> defines PRI[doxu]64 macros */
+#undef INTTYPES_H_DEFINES_FORMATS
 
 /*
  * define if struct ether_header.ether_dhost is a struct with ether_addr_octet
@@ -111,6 +113,12 @@
 #undef u_int16_t
 #undef u_int32_t
 #undef u_int64_t
+
+/* Workaround for missing 64-bit formats */
+#undef PRId64
+#undef PRIo64
+#undef PRIx64
+#undef PRIu64
 
 /* Whether or not to include the possibly-buggy SMB printer */
 #undef TCPDUMP_DO_SMB

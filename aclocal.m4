@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.104 2004-04-17 04:33:17 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.105 2004-04-17 08:44:50 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -585,6 +585,47 @@ AC_DEFUN(AC_LBL_CHECK_TYPE,
     if test $ac_cv_lbl_have_$1 = no ; then
 	    AC_DEFINE($1, $2)
     fi])
+
+dnl
+dnl Check whether a given format can be used to print 64-bit integers
+dnl
+AC_DEFUN(AC_LBL_CHECK_64BIT_FORMAT,
+  [
+    AC_MSG_CHECKING([whether %$1x can be used to format 64-bit integers])
+    AC_RUN_IFELSE(
+      [
+	AC_LANG_SOURCE(
+	  [[
+#	    ifdef HAVE_INTTYPES_H
+	    #include <inttypes.h>
+#	    endif
+	    #include <stdio.h>
+	    #include <sys/types.h>
+
+	    main()
+	    {
+	      u_int64_t t = 1;
+	      char strbuf[16+1];
+	      sprintf(strbuf, "%016$1x", t << 32);
+	      if (strcmp(strbuf, "0000000100000000") == 0)
+		exit(0);
+	      else
+		exit(1);
+	    }
+	  ]])
+      ],
+      [
+	AC_DEFINE(PRId64, "$1d")
+	AC_DEFINE(PRIo64, "$1o")
+	AC_DEFINE(PRIx64, "$1x")
+	AC_DEFINE(PRIu64, "$1u")
+	AC_MSG_RESULT(yes)
+      ],
+      [
+	AC_MSG_RESULT(no)
+	$2
+      ])
+  ])
 
 dnl
 dnl Checks to see if unaligned memory accesses fail

@@ -83,3 +83,35 @@ typedef unsigned short u_int64_t;
 #endif
 
 #endif /* HAVE_U_INT64_T */
+
+#ifndef PRId64
+#ifdef _MSC_EXTENSIONS
+#define PRId64	"i64d"
+#else /* _MSC_EXTENSIONS */
+#define PRId64	"lld"
+#endif /* _MSC_EXTENSIONS */
+#endif /* PRId64 */
+
+#ifndef PRIo64
+#ifdef _MSC_EXTENSIONS
+#define PRIo64	"i64o"
+#else /* _MSC_EXTENSIONS */
+#define PRIo64	"llo"
+#endif /* _MSC_EXTENSIONS */
+#endif /* PRIo64 */
+
+#ifndef PRIx64
+#ifdef _MSC_EXTENSIONS
+#define PRIx64	"i64x"
+#else /* _MSC_EXTENSIONS */
+#define PRIx64	"llx"
+#endif /* _MSC_EXTENSIONS */
+#endif /* PRIx64 */
+
+#ifndef PRIu64
+#ifdef _MSC_EXTENSIONS
+#define PRIu64	"i64u"
+#else /* _MSC_EXTENSIONS */
+#define PRIu64	"llu"
+#endif /* _MSC_EXTENSIONS */
+#endif /* PRIu64 */
