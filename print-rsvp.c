@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.21 2003-06-07 23:05:19 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.22 2003-10-20 10:35:20 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -231,7 +231,7 @@ static const struct tok rsvp_ctype_values[] = {
     { 256*RSVP_OBJ_LABEL_REQ+RSVP_CTYPE_1,	             "without label range" },
     { 256*RSVP_OBJ_LABEL_REQ+RSVP_CTYPE_2,	             "with ATM label range" },
     { 256*RSVP_OBJ_LABEL_REQ+RSVP_CTYPE_3,                   "with FR label range" },
-    { 256*RSVP_OBJ_LABEL_REQ+RSVP_CTYPE_4,                   "generalized" },
+    { 256*RSVP_OBJ_LABEL_REQ+RSVP_CTYPE_4,                   "Generalized Label" },
     { 256*RSVP_OBJ_LABEL+RSVP_CTYPE_1,                       "Label" },
     { 256*RSVP_OBJ_LABEL+RSVP_CTYPE_2,                       "Generalized Label" },
     { 256*RSVP_OBJ_LABEL+RSVP_CTYPE_3,                       "Waveband Switching" },
@@ -397,7 +397,7 @@ rsvp_intserv_print(const u_char *tptr) {
         * |        IS hop cnt (32-bit unsigned integer)                   |
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         */
-        printf("\n\t\tIS hop cnt: %u", EXTRACT_32BITS(tptr+4));
+        printf("\n\t\tIS hop count: %u", EXTRACT_32BITS(tptr+4));
         break;
 
     case 6:
@@ -631,14 +631,14 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         case RSVP_OBJ_CONFIRM:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_IPV4:
-                printf("\n\t    IPv4 Receiver Address %s",
+                printf("\n\t    IPv4 Receiver Address: %s",
                        ipaddr_string(obj_tptr));
                 obj_tlen-=4;
                 obj_tptr+=4;                
                 break;
 #ifdef INET6
             case RSVP_CTYPE_IPV6:
-                printf("\n\t    IPv6 Receiver Address %s",
+                printf("\n\t    IPv6 Receiver Address: %s",
                        ip6addr_string(obj_tptr));
                 obj_tlen-=16;
                 obj_tptr+=16;                
@@ -652,14 +652,14 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         case RSVP_OBJ_NOTIFY_REQ:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_IPV4:
-                printf("\n\t    IPv4 Notify Node Address %s",
+                printf("\n\t    IPv4 Notify Node Address: %s",
                        ipaddr_string(obj_tptr));
                 obj_tlen-=4;
                 obj_tptr+=4;                
                 break;
 #ifdef INET6
             case RSVP_CTYPE_IPV6:
-                printf("\n\t    IPv6 Notify Node Address %s",
+                printf("\n\t    IPv6 Notify Node Address: %s",
                        ip6addr_string(obj_tptr));
                 obj_tlen-=16;
                 obj_tptr+=16;                
@@ -677,19 +677,19 @@ rsvp_print(register const u_char *pptr, register u_int len) {
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_1:
                 while(obj_tlen >= 4 ) {
-                    printf("\n\t    Label %u", EXTRACT_32BITS(obj_tptr));
+                    printf("\n\t    Label: %u", EXTRACT_32BITS(obj_tptr));
                     obj_tlen-=4;
                     obj_tptr+=4;
                 }
                 break;
             case RSVP_CTYPE_2:
-                printf("\n\t    Generalized Label %u",
+                printf("\n\t    Generalized Label: %u",
                        EXTRACT_32BITS(obj_tptr));
                 obj_tlen-=4;
                 obj_tptr+=4;
                 break;
             case RSVP_CTYPE_3:
-                printf("\n\t    Waveband ID %u\n\t    Start Label %u, Stop Label %u",
+                printf("\n\t    Waveband ID: %u\n\t    Start Label: %u, Stop Label: %u",
                        EXTRACT_32BITS(obj_tptr),
                        EXTRACT_32BITS(obj_tptr+4),
                        EXTRACT_32BITS(obj_tptr+8));
@@ -751,7 +751,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_1:
                 while(obj_tlen >= 4 ) {
-                    printf("\n\t    L3 Protocol ID %s",
+                    printf("\n\t    L3 Protocol ID: %s",
                            tok2str(ethertype_values,
                                    "Unknown Protocol (0x%04x)",
                                    EXTRACT_16BITS(obj_tptr+2)));
@@ -760,26 +760,26 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 }
                 break;
             case RSVP_CTYPE_2:
-                printf("\n\t    L3 Protocol ID %s",
+                printf("\n\t    L3 Protocol ID: %s",
                        tok2str(ethertype_values,
                                "Unknown Protocol (0x%04x)",
                                EXTRACT_16BITS(obj_tptr+2)));
                 printf(",%s merge capability",((*(obj_tptr+4))&0x80) ? "no" : "" );
-                printf("\n\t    Minimum VPI/VCI %u/%u",
+                printf("\n\t    Minimum VPI/VCI: %u/%u",
                        (EXTRACT_16BITS(obj_tptr+4))&0xfff,
                        (EXTRACT_16BITS(obj_tptr+6))&0xfff);
-                printf("\n\t    Maximum VPI/VCI %u/%u",
+                printf("\n\t    Maximum VPI/VCI: %u/%u",
                        (EXTRACT_16BITS(obj_tptr+8))&0xfff,
                        (EXTRACT_16BITS(obj_tptr+10))&0xfff);
                 obj_tlen-=12;
                 obj_tptr+=12;
                 break;
             case RSVP_CTYPE_3:
-                printf("\n\t    L3 Protocol ID %s",
+                printf("\n\t    L3 Protocol ID: %s",
                        tok2str(ethertype_values,
                                "Unknown Protocol (0x%04x)",
                                EXTRACT_16BITS(obj_tptr+2)));
-                printf("\n\t    Minimum/Maximum DLCI %u/%u, %s%s bit DLCI",
+                printf("\n\t    Minimum/Maximum DLCI: %u/%u, %s%s bit DLCI",
                        (EXTRACT_32BITS(obj_tptr+4))&0x7fffff,
                        (EXTRACT_32BITS(obj_tptr+8))&0x7fffff,
                        (((EXTRACT_16BITS(obj_tptr+4)>>7)&3) == 0 ) ? "10" : "",
@@ -788,17 +788,19 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 obj_tptr+=12;
                 break;
             case RSVP_CTYPE_4:
-                printf("\n\t    LSP Encoding Type %s",
+                printf("\n\t    LSP Encoding Type: %s",
                        tok2str(gmpls_encoding_values,
                                "Unknown (0x%02x)",
                                *obj_tptr));
-                printf("\n\t    Switching Type %s, Payload ID %s",
+                printf("\n\t    Switching Type: %s (%u), Payload ID: %s (0x%04x)",
                        tok2str(gmpls_switch_cap_values,
-                               "Unknown (0x%02x)",
+                               "Unknown",
                                *(obj_tptr+1)),
+		       *(obj_tptr+1),
                        tok2str(gmpls_payload_values,
-                               "Unknown (0x%04x)",
-                               EXTRACT_16BITS(obj_tptr+2)));
+                               "Unknown",
+                               EXTRACT_16BITS(obj_tptr+2)),
+		       EXTRACT_16BITS(obj_tptr+2));
                 obj_tlen-=8;
                 obj_tptr+=8;
                 break;
@@ -839,7 +841,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_1:
             case RSVP_CTYPE_2:
-                printf("\n\t    Source Instance 0x%08x, Destination Instance 0x%08x",
+                printf("\n\t    Source Instance: 0x%08x, Destination Instance: 0x%08x",
                        EXTRACT_32BITS(obj_tptr),
                        EXTRACT_32BITS(obj_tptr+4));
                 obj_tlen-=8;
@@ -853,7 +855,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         case RSVP_OBJ_RESTART_CAPABILITY:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_1:
-                printf("\n\t    Restart  Time: %ums\n\t    Recovery Time: %ums",
+                printf("\n\t    Restart  Time: %ums, Recovery Time: %ums",
                        EXTRACT_16BITS(obj_tptr),
                        EXTRACT_16BITS(obj_tptr+4));
                 break;
