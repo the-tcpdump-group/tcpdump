@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.2 2002-12-13 14:29:24 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.3 2002-12-14 13:27:56 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -121,28 +121,6 @@ static const struct tok ldp_msg_values[] = {
     { 0, NULL}
 };
 
-/* 
- * ldp tlv header
- *
- *  0                   1                   2                   3
- *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |U|F|        Type               |            Length             |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |                                                               |
- * |                             Value                             |
- * ~                                                               ~
- * |                                                               |
- * |                               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |                               |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- */
-
-struct ldp_tlv_header {
-    u_int8_t type[2];
-    u_int8_t length[2];
-};
-
 #define	LDP_MASK_TLV_TYPE(x)  ((x)&0x3fff) 
 #define	LDP_MASK_F_BIT(x) ((x)&0x4000) 
 
@@ -158,7 +136,7 @@ struct ldp_tlv_header {
 #define	LDP_TLV_RETURNED_PDU         0x0302
 #define	LDP_TLV_RETURNED_MSG         0x0303
 #define	LDP_TLV_COMMON_HELLO         0x0400
-#define	LDP_TLV_IPV4_TRASNPORT_ADDR  0x0401
+#define	LDP_TLV_IPV4_TRANSPORT_ADDR  0x0401
 #define	LDP_TLV_CONFIG_SEQ_NUMBER    0x0402
 #define	LDP_TLV_IPV6_TRANSPORT_ADDR  0x0403
 #define	LDP_TLV_COMMON_SESSION       0x0500
@@ -179,7 +157,7 @@ static const struct tok ldp_tlv_values[] = {
     { LDP_TLV_RETURNED_PDU,          "Returned PDU" },
     { LDP_TLV_RETURNED_MSG,          "Returned Message" },
     { LDP_TLV_COMMON_HELLO,          "Common Hello Parameters" },
-    { LDP_TLV_IPV4_TRASNPORT_ADDR,   "IPv4 Transport Address" },
+    { LDP_TLV_IPV4_TRANSPORT_ADDR,   "IPv4 Transport Address" },
     { LDP_TLV_CONFIG_SEQ_NUMBER,     "Configuration Sequence Number" },
     { LDP_TLV_IPV6_TRANSPORT_ADDR,   "IPv6 Transport Address" },
     { LDP_TLV_COMMON_SESSION,        "Common Session Parameters" },
@@ -192,6 +170,103 @@ static const struct tok ldp_tlv_values[] = {
 #define FALSE 0
 #define TRUE  1
 
+int ldp_tlv_print(register const u_char *);
+   
+/* 
+ * ldp tlv header
+ *
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |U|F|        Type               |            Length             |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                                                               |
+ * |                             Value                             |
+ * ~                                                               ~
+ * |                                                               |
+ * |                               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                               |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ */
+
+int
+ldp_tlv_print(register const u_char *tptr) {
+
+    struct ldp_tlv_header {
+        u_int8_t type[2];
+        u_int8_t length[2];
+    };
+
+    const struct ldp_tlv_header *ldp_tlv_header;
+    u_short tlv_type,tlv_len,tlv_tlen;
+
+    ldp_tlv_header = (const struct ldp_tlv_header *)tptr;    
+    tlv_len=EXTRACT_16BITS(ldp_tlv_header->length);
+    tlv_tlen=tlv_len;
+    tlv_type=LDP_MASK_TLV_TYPE(EXTRACT_16BITS(ldp_tlv_header->type));
+
+    /* FIXME vendor private / experimental check */
+    printf("\n\t    %s TLV (0x%04x), length: %u, Flags: [%s and %s forward if unknown]",
+           tok2str(ldp_tlv_values,
+                   "Unknown",
+                   tlv_type),
+           tlv_type,
+           tlv_len,
+           LDP_MASK_U_BIT(EXTRACT_16BITS(&ldp_tlv_header->type)) ? "continue processing" : "ignore",
+           LDP_MASK_F_BIT(EXTRACT_16BITS(&ldp_tlv_header->type)) ? "do" : "don't");
+
+    tptr+=sizeof(struct ldp_tlv_header);
+
+    switch(tlv_type) {
+
+    case LDP_TLV_COMMON_HELLO:
+        printf("\n\t      Hold Time: %us, Flags: [%s Hello%s]",
+               EXTRACT_16BITS(tptr),
+               (EXTRACT_16BITS(tptr+2)&0x8000) ? "Targeted" : "Link",
+               (EXTRACT_16BITS(tptr+2)&0x4000) ? ", Request for trageted Hellos" : "");
+        break;
+
+    case LDP_TLV_IPV4_TRANSPORT_ADDR:
+        printf("\n\t      %s", ipaddr_string(tptr));
+        break;
+#ifdef INET6
+    case LDP_TLV_IPV6_TRANSPORT_ADDR:
+        printf("\n\t      %s", ip6addr_string(tptr));
+        break;
+#endif
+    case LDP_TLV_CONFIG_SEQ_NUMBER:
+        printf("\n\t      Sequence Number: %u", EXTRACT_32BITS(tptr));
+        break;
+
+    /*
+     *  FIXME those are the defined TLVs that lack a decoder
+     *  you are welcome to contribute code ;-)
+     */
+
+    case LDP_TLV_FEC:
+    case LDP_TLV_ADDRESS_LIST:
+    case LDP_TLV_HOP_COUNT:
+    case LDP_TLV_PATH_VECTOR:
+    case LDP_TLV_GENERIC_LABEL:
+    case LDP_TLV_ATM_LABEL:
+    case LDP_TLV_FR_LABEL:
+    case LDP_TLV_STATUS:
+    case LDP_TLV_EXTD_STATUS:
+    case LDP_TLV_RETURNED_PDU:
+    case LDP_TLV_RETURNED_MSG:
+    case LDP_TLV_COMMON_SESSION:
+    case LDP_TLV_ATM_SESSION_PARM:
+    case LDP_TLV_FR_SESSION_PARM:
+    case LDP_TLV_LABEL_REQUEST_MSG_ID:
+
+    default:
+        if (vflag <= 1)
+            print_unknown_data(tptr,"\n\t      ",tlv_tlen);
+        break;
+    }
+    return(tlv_len+4); /* Type & Length fields not included */
+}
+
 void
 ldp_print(register const u_char *pptr, register u_int len) {
 
@@ -200,7 +275,7 @@ ldp_print(register const u_char *pptr, register u_int len) {
     const u_char *tptr,*msg_tptr;
     u_short tlen;
     u_short msg_len,msg_type,msg_tlen;
-    int hexdump;
+    int hexdump,processed;
 
     tptr=pptr;
     ldp_com_header = (const struct ldp_common_header *)pptr;
@@ -249,10 +324,10 @@ ldp_print(register const u_char *pptr, register u_int len) {
                msg_type,
                msg_len,
                EXTRACT_32BITS(&ldp_msg_header->id),
-               LDP_MASK_U_BIT(EXTRACT_16BITS(&ldp_msg_header->type)) ? "continue processing" : "ignore all and notify");
+               LDP_MASK_U_BIT(EXTRACT_16BITS(&ldp_msg_header->type)) ? "continue processing" : "ignore");
 
         msg_tptr=tptr+sizeof(struct ldp_msg_header);
-        msg_tlen=msg_len-sizeof(struct ldp_msg_header);
+        msg_tlen=msg_len-sizeof(struct ldp_msg_header)+4; /* Type & Length fields not included */
 
         /* did we capture enough for fully decoding the message ? */
         if (!TTEST2(*tptr, msg_len))
@@ -261,13 +336,22 @@ ldp_print(register const u_char *pptr, register u_int len) {
 
         switch(msg_type) {
  
+        case LDP_MSG_HELLO:
+            while(msg_tlen >= 4) {
+                processed = ldp_tlv_print(msg_tptr);
+                if (processed == 0)
+                    break;
+                msg_tlen-=processed;
+                msg_tptr+=processed;
+            }
+            break;
+
         /*
          *  FIXME those are the defined messages that lack a decoder
          *  you are welcome to contribute code ;-)
          */
 
         case LDP_MSG_NOTIF:
-        case LDP_MSG_HELLO:
         case LDP_MSG_INIT:
         case LDP_MSG_KEEPALIVE:
         case LDP_MSG_ADDRESS:
