@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.187 2002-10-18 09:17:48 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.188 2002-11-11 19:54:40 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -104,7 +104,8 @@ int32_t thiszone;		/* seconds offset from gmt to local time */
 static RETSIGTYPE cleanup(int);
 static void usage(void) __attribute__((noreturn));
 
-static void dump_and_trunc(u_char *, const struct pcap_pkthdr *, const u_char *);
+static void dump_packet_and_trunc(u_char *, const struct pcap_pkthdr *, const u_char *);
+static void dump_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
 
 #ifdef SIGINFO
 RETSIGTYPE requestinfo(int);
@@ -587,22 +588,22 @@ main(int argc, char **argv)
 		if (p == NULL)
 			error("%s", pcap_geterr(pd));
 		if (Cflag != 0) {
-			printer = dump_and_trunc;
+			printer = dump_packet_and_trunc;
 			dumpinfo.WFileName = WFileName;
 			dumpinfo.pd = pd;
 			dumpinfo.p = p;
 			pcap_userdata = (u_char *)&dumpinfo;
 		} else {
-			printer = pcap_dump;
+			printer = dump_packet;
 			pcap_userdata = (u_char *)p;
 		}
 	} else {
 		printer = lookup_printer(pcap_datalink(pd));
 		pcap_userdata = 0;
-#ifdef SIGINFO
-		(void)setsignal(SIGINFO, requestinfo);
-#endif
 	}
+#ifdef SIGINFO
+	(void)setsignal(SIGINFO, requestinfo);
+#endif
 #ifndef WIN32
 	if (RFileName == NULL) {
 		(void)fprintf(stderr, "%s: listening on %s\n",
@@ -688,34 +689,52 @@ swebitoa(unsigned int n, char *s)
 }
 
 static void
-dump_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
+dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
-	struct dump_info *info;
+	struct dump_info *dump_info;
 	static uint cnt = 2;
 	char *name;
 
-	info = (struct dump_info *)user;
+	++infodelay;
+
+	dump_info = (struct dump_info *)user;
 
 	/*
 	 * XXX - this won't prevent capture files from getting
 	 * larger than Cflag - the last packet written to the
 	 * file could put it over Cflag.
 	 */
-	if (ftell((FILE *)info->p) > Cflag) {
-		name = (char *) malloc(strlen(info->WFileName) + 4);
+	if (ftell((FILE *)dump_info->p) > Cflag) {
+		name = (char *) malloc(strlen(dump_info->WFileName) + 4);
 		if (name == NULL)
-			error("dump_and_trunc: malloc");
-		strcpy(name, info->WFileName);
-		swebitoa(cnt, name + strlen(info->WFileName));
+			error("dump_packet_and_trunc: malloc");
+		strcpy(name, dump_info->WFileName);
+		swebitoa(cnt, name + strlen(dump_info->WFileName));
 		cnt++;
-		pcap_dump_close(info->p);
-		info->p = pcap_dump_open(info->pd, name);
+		pcap_dump_close(dump_info->p);
+		dump_info->p = pcap_dump_open(dump_info->pd, name);
 		free(name);
-		if (info->p == NULL)
+		if (dump_info->p == NULL)
 			error("%s", pcap_geterr(pd));
 	}
 
-	pcap_dump((u_char *)info->p, h, sp);
+	pcap_dump((u_char *)dump_info->p, h, sp);
+
+	--infodelay;
+	if (infoprint)
+		info(0);
+}
+
+static void
+dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
+{
+	++infodelay;
+
+	pcap_dump(user, h, sp);
+
+	--infodelay;
+	if (infoprint)
+		info(0);
 }
 
 /* Like default_print() but data need not be aligned */
