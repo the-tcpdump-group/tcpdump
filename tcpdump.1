@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.78 2000-04-27 10:07:05 itojun Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.79 2000-06-11 16:51:09 mcr Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -920,6 +920,191 @@ it as ``[\fIbad opt\fP]'' and does not interpret any further options (since
 it's impossible to tell where they start).  If the header length indicates
 options are present but the IP datagram length is not long enough for the
 options to actually be there, tcpdump reports it as ``[\fIbad hdr length\fP]''.
+.HD
+.B Capturing TCP packets with particular flag combinations (SYN-ACK, URG-ACK, etc.)
+.PP
+There are 6 bits in the control bits section of the TCP header:
+.IP
+.I URG | ACK | PSH | RST | SYN | FIN
+.PP
+Let's assume that we want to watch packets used in establishing
+a TCP connection. Recall that TCP uses a 3-way handshake protocol
+when it initializes a new connection; the connection sequence with
+regard to the TCP control bits is
+.PP
+.RS
+1) Caller sends SYN
+.RE
+.RS
+2) Recipient responds with SYN, ACK
+.RE
+.RS
+3) Caller sends ACK
+.RE
+.PP
+Now we're interested in capturing packets that have only the
+SYN bit set (Step 1). Note that we don't want packets from step 2
+(SYN-ACK), just a plain initial SYN. What we need is a correct filter
+expression for tcpdump.
+.PP
+Recall the structure of a TCP header without options:
+.PP
+.nf
+ 0                            15                              31
+-----------------------------------------------------------------
+|          source port          |       destination port        |
+-----------------------------------------------------------------
+|                        sequence number                        |
+-----------------------------------------------------------------
+|                     acknowledgment number                     |
+-----------------------------------------------------------------
+|  HL   | reserved  |U|A|P|R|S|F|        window size            |
+-----------------------------------------------------------------
+|         TCP checksum          |       urgent pointer          |
+-----------------------------------------------------------------
+.fi
+.PP
+A TCP header usually holds 20 octets of data, unless options are
+present.  The fist line of the graph contains octets 0 - 3, the
+second line shows octets 4 - 7 etc.
+.PP
+Starting to count with 0, the relevant TCP control bits are contained
+in octet 13:
+.PP
+.nf
+ 0             7|             15|             23|             31
+----------------|---------------|---------------|----------------
+|  HL   | reserved  |U|A|P|R|S|F|        window size            |
+----------------|---------------|---------------|----------------
+|               |  13th octet   |               |               |
+.fi
+.PP
+Let's have a closer look at octet no. 13:
+.PP
+.nf
+                |               |
+                |---------------|
+                |   |U|A|P|R|S|F|
+                |---------------|
+                |7   5   3     0|
+.fi
+.PP
+We see that this octet contains 2 bytes from the reserved field.
+According to RFC 793 this field is reserved for future use and must
+be 0. The remaining 6 bits are the TCP control bits we are interested
+in. We have numbered the bits in this octet from 0 to 7, right to
+left, so the PSH bit is bit number 3, while the URG bit is number 5.
+.PP
+Recall that we want to capture packets with only SYN set.
+Let's see what happens to octet 13 if a TCP datagram arrives
+with the SYN bit set in its header:
+.PP
+.nf
+                |   |U|A|P|R|S|F|
+                |---------------|
+                |0 0 0 0 0 0 1 0|
+                |---------------|
+                |7 6 5 4 3 2 1 0|
+.fi
+.PP
+We already mentioned that bits number 7 and 6 belong to the
+reserved field, so they must must be 0. Looking at the
+control bits section we see that only bit number 1 (SYN) is set.
+.PP
+Assuming that octet number 13 is an 8-bit unsigned integer in
+network byte order, the binary value of this octet is
+.IP
+00000010
+.PP
+and its decimal representation is
+.PP
+.nf
+   7     6     5     4     3     2     1     0
+0*2 + 0*2 + 0*2 + 0*2 + 0*2 + 0*2 + 1*2 + 0*2  =  2
+.fi
+.PP
+We're almost done, because now we know that if only SYN is set,
+the value of the 13th octet in the TCP header, when interpreted
+as a 8-bit unsigned integer in network byte order, must be exactly 2.
+.PP
+This relationship can be expressed as
+.RS
+.B
+tcp[13] == 2
+.RE
+.PP
+We can use this expression as the filter for tcpdump in order
+to watch packets which have only SYN set:
+.RS
+.B
+tcpdump -i xl0 tcp[13] == 2
+.RE
+.PP
+The expression says "let the 13th octet of a TCP datagram have
+the decimal value 2", which is exactly what we want.
+.PP
+Now, let's assume that we need to capture SYN packets, but we
+don't care if ACK or any other TCP control bit is set at the
+same time. Let's see what happens to octet 13 when a TCP datagram
+with SYN-ACK set arrives:
+.PP
+.nf
+     |   |U|A|P|R|S|F|
+     |---------------|
+     |0 0 0 1 0 0 1 0|
+     |---------------|
+     |7 6 5 4 3 2 1 0|
+.fi
+.PP
+Now bits 1 and 4 are set in the 13th octet. The binary value of
+octet 13 is
+.IP
+     00010010
+.PP
+which translates to decimal
+.PP
+.nf
+   7     6     5     4     3     2     1     0
+0*2 + 0*2 + 0*2 + 1*2 + 0*2 + 0*2 + 1*2 + 0*2   = 18
+.fi
+.PP
+Now we can't just use 'tcp[13] == 18' in the tcpdump filter expression,
+because that would select only those packets that have SYN-ACK set,
+but not those with only SYN set. Remember that we don't care
+if ACK or any other control bit is set as long as SYN is set.
+.PP
+In order to achieve our goal, we need to logically AND the
+binary value of octet 13 with some other value to preserve
+the SYN bit. We know that we want SYN to be set in any case,
+so we'll logically AND the value in the 13th octet with
+the binary value of a SYN:
+.PP
+.nf
+
+          00010010 SYN-ACK              00000010 SYN
+     AND  00000010 (we want SYN)   AND  00000010 (we want SYN)
+          --------                      --------
+     =    00000010                 =    00000010
+.fi
+.PP
+We see that this AND operation delivers the same result
+regardless whether ACK or another TCP control bit is set.
+The decimal representation of the AND value as well as
+the result of this operation is 2 (binary 00000010),
+so we know that for packets with SYN set the following
+relation must hold true:
+.IP
+( ( value of octet 13 ) AND ( 2 ) ) == ( 2 )
+.PP
+This points us to the tcpdump filter expression
+.RS
+.B
+     tcpdump -i xl0 'tcp[13] & 2 == 2'
+.RE
+.PP
+Note that you should use single quotes or a backslash
+in the expression to hide the AND ('&') special character
+from the shell.
 .HD
 .B
 UDP Packets
