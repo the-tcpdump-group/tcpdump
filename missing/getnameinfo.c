@@ -32,15 +32,18 @@
  * - Thread safe-ness must be checked
  * - Return values.  There seems to be no standard for return value (RFC2553)
  *   but INRIA implementation returns EAI_xxx defined for getaddrinfo().
+ * - RFC2553 says that we should raise error on short buffer.  X/Open says
+ *   we need to truncate the result.  We obey RFC2553 (and X/Open should be
+ *   modified).
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif 
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/missing/getnameinfo.c,v 1.3.2.1 2000-01-11 06:58:29 fenner Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/missing/getnameinfo.c,v 1.3.2.2 2000-01-25 18:39:03 itojun Exp $";
 #endif
 
 #include <sys/types.h>
@@ -59,7 +62,9 @@ static const char rcsid[] =
 #include "cdecl_ext.h"
 #endif 
 
+#ifdef NEED_ADDRINFO_H
 #include "addrinfo.h"
+#endif
 
 #define SUCCESS 0
 #define ANY 0
@@ -111,7 +116,7 @@ getnameinfo(sa, salen, host, hostlen, serv, servlen, flags)
 	u_short port;
 	int family, i;
 	char *addr, *p;
-	u_long v4a;
+	u_int32_t v4a;
 	int h_error;
 	char numserv[512];
 	char numaddr[512];
@@ -140,7 +145,12 @@ getnameinfo(sa, salen, host, hostlen, serv, servlen, flags)
 	addr = (char *)sa + afd->a_off;
 
 	if (serv == NULL || servlen == 0) {
-		/* what we should do? */
+		/*
+		 * do nothing in this case.
+		 * in case you are wondering if "&&" is more correct than
+		 * "||" here: RFC2553 says that serv == NULL OR servlen == 0
+		 * means that the caller does not want the result.
+		 */
 	} else {
 		if (flags & NI_NUMERICSERV)
 			sp = NULL;
@@ -162,11 +172,12 @@ getnameinfo(sa, salen, host, hostlen, serv, servlen, flags)
 
 	switch (sa->sa_family) {
 	case AF_INET:
-		v4a = ntohl(((struct sockaddr_in *)sa)->sin_addr.s_addr);
+		v4a = (u_int32_t)
+			ntohl(((struct sockaddr_in *)sa)->sin_addr.s_addr);
 		if (IN_MULTICAST(v4a) || IN_EXPERIMENTAL(v4a))
 			flags |= NI_NUMERICHOST;
 		v4a >>= IN_CLASSA_NSHIFT;
-		if (v4a == 0 || v4a == IN_LOOPBACKNET)
+		if (v4a == 0)
 			flags |= NI_NUMERICHOST;			
 		break;
 #ifdef INET6
@@ -196,7 +207,12 @@ getnameinfo(sa, salen, host, hostlen, serv, servlen, flags)
 #endif
 	}
 	if (host == NULL || hostlen == 0) {
-		/* what should we do? */
+		/*
+		 * do nothing in this case.
+		 * in case you are wondering if "&&" is more correct than
+		 * "||" here: RFC2553 says that host == NULL OR hostlen == 0
+		 * means that the caller does not want the result.
+		 */
 	} else if (flags & NI_NUMERICHOST) {
 		/* NUMERICHOST and NAMEREQD conflicts with each other */
 		if (flags & NI_NAMEREQD)
@@ -207,7 +223,7 @@ getnameinfo(sa, salen, host, hostlen, serv, servlen, flags)
 		if (strlen(numaddr) > hostlen)
 			return ENI_MEMORY;
 		strcpy(host, numaddr);
-#ifdef INET6
+#if defined(INET6) && defined(NI_WITHSCOPEID)
 		if (afd->a_af == AF_INET6 &&
 		    (IN6_IS_ADDR_LINKLOCAL((struct in6_addr *)addr) ||
 		     IN6_IS_ADDR_MULTICAST((struct in6_addr *)addr)) &&

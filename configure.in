@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.87.2.3 2000-01-11 07:10:26 fenner Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.87.2.4 2000-01-25 18:39:02 itojun Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -212,8 +212,10 @@ if test "$ipv6" = "yes" -a "$ipv6lib" != "none"; then
 fi
 
 
-AC_MSG_CHECKING(getaddrinfo bug)
-AC_TRY_RUN([
+if test "$ipv6" = "yes"; then
+	AC_CHECK_FUNCS(getaddrinfo, [dnl
+	AC_MSG_CHECKING(getaddrinfo bug)
+	AC_TRY_RUN([
 #include <sys/types.h>
 #include <netdb.h>
 #include <string.h>
@@ -291,7 +293,10 @@ main()
     }
   }
 
-  if (inet6 != 2 || inet4 != 2)
+  /* supported family should be 2, unsupported family should be 0 */
+  if (!(inet4 == 0 || inet4 == 2))
+    goto bad;
+  if (!(inet6 == 0 || inet6 == 2))
     goto bad;
 
   if (aitop)
@@ -304,25 +309,27 @@ main()
   exit(1);
 }
 ],
-AC_MSG_RESULT(good)
-buggygetaddrinfo=no,
-AC_MSG_RESULT(buggy)
-buggygetaddrinfo=yes,
-AC_MSG_RESULT(buggy)
-buggygetaddrinfo=yes)
+	AC_MSG_RESULT(good)
+	buggygetaddrinfo=no,
+	AC_MSG_RESULT(buggy)
+	buggygetaddrinfo=yes,
+	AC_MSG_RESULT(buggy)
+	buggygetaddrinfo=yes)], [buggygetaddrinfo=yes])
 
-if test "$buggygetaddrinfo" = "yes"; then
-	if test "$ipv6" = "yes" -a "$ipv6type" != "linux"; then
-		echo 'Fatal: You must get working getaddrinfo() function.'
-		echo '       or you can specify "--disable-ipv6"'.
-		exit 1
-	elif test "$ipv6type" = "linux"; then
-		echo 'Warning: getaddrinfo() implementation on your system seems be buggy.'
-		echo '         Better upgreade your system library to newest version'
-		echo '         of GNU C library (aka glibc).'
+	if test "$buggygetaddrinfo" = "yes"; then
+		if test "$ipv6type" != "linux"; then
+			echo 'Fatal: You must get working getaddrinfo() function.'
+			echo '       or you can specify "--disable-ipv6"'.
+			exit 1
+		else
+			echo 'Warning: getaddrinfo() implementation on your system seems be buggy.'
+			echo '         Better upgreade your system library to newest version'
+			echo '         of GNU C library (aka glibc).'
+		fi
 	fi
+	AC_REPLACE_FUNCS(getaddrinfo getnameinfo)
 fi
-AC_REPLACE_FUNCS(getaddrinfo getnameinfo inet_ntop inet_pton inet_aton)
+AC_REPLACE_FUNCS(inet_ntop inet_pton inet_aton)
 
 dnl portability macros for getaddrinfo/getnameinfo
 dnl
@@ -340,11 +347,12 @@ if test "$ac_cv_portable_proto" = no; then
 fi
 
 dnl
-dnl check sizeof basic types
-AC_CHECK_SIZEOF(char)
-AC_CHECK_SIZEOF(short)
-AC_CHECK_SIZEOF(int)
-AC_CHECK_SIZEOF(long)
+dnl check sizeof basic types.
+dnl They're very likely to be wrong for cross-compiling.
+AC_CHECK_SIZEOF(char, 1)
+AC_CHECK_SIZEOF(short, 2)
+AC_CHECK_SIZEOF(int, 4)
+AC_CHECK_SIZEOF(long, 4)
 
 dnl
 dnl Checks for u_intXX_t
@@ -357,6 +365,20 @@ dnl
 dnl Checks for addrinfo structure
 AC_STRUCT_ADDRINFO(ac_cv_addrinfo)
 if test "$ac_cv_addrinfo" = no; then
+	missing_includes=yes
+fi
+
+dnl
+dnl Checks for NI_MAXSERV
+AC_NI_MAXSERV(ac_cv_maxserv)
+if test "$ac_cv_maxserv" = no; then
+	missing_includes=yes
+fi
+
+dnl
+dnl Checks for NI_NAMEREQD
+AC_NI_NAMEREQD(ac_cv_namereqd)
+if test "$ac_cv_namereqd" = no; then
 	missing_includes=yes
 fi
 
@@ -416,7 +438,7 @@ AC_C_BIGENDIAN
 AC_CHECK_LIB(dnet, main)
 AC_CHECK_LIB(rpc, main)
 AC_CHECK_LIB(z, uncompress)
-AC_CHECK_HEADERS(zlib.h netinet6/ipcomp.h)
+AC_CHECK_HEADERS(zlib.h)
 
 AC_LBL_TYPE_SIGNAL
 
