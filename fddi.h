@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/fddi.h,v 1.8 1999-10-07 23:47:10 mcr Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/fddi.h,v 1.8.1.1 1999-10-07 23:47:10 mcr Exp $ (LBL)
  */
 
 /*

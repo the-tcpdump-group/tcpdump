@@ -2,7 +2,7 @@
  * Definitions that user level programs might need to know to interact
  * with serial line IP (slip) lines.
 
- * @(#) $Header: /tcpdump/master/tcpdump/linux-include/net/Attic/slip.h,v 1.4 1999-10-07 23:47:14 mcr Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/linux-include/net/Attic/slip.h,v 1.4.1.1 1999-10-07 23:47:14 mcr Exp $ (LBL)
  *
  * Copyright (c) 1990 Regents of the University of California.
  * All rights reserved.

@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ppp.h,v 1.7 1999-10-07 23:47:11 mcr Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ppp.h,v 1.7.1.1 1999-10-07 23:47:11 mcr Exp $ (LBL) */
 /*
  * Point to Point Protocol (PPP) RFC1331
  *

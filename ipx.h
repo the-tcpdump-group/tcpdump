@@ -1,7 +1,7 @@
 /*
  * IPX protocol formats 
  *
- * @(#) $Header: /tcpdump/master/tcpdump/ipx.h,v 1.1 1999-10-07 23:47:10 mcr Exp $
+ * @(#) $Header: /tcpdump/master/tcpdump/ipx.h,v 1.1.1.1 1999-10-07 23:47:10 mcr Exp $
  */
 
 /* well-known sockets */

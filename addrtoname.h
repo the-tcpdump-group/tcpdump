@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/addrtoname.h,v 1.15 1999-10-07 23:47:09 mcr Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/addrtoname.h,v 1.15.1.1 1999-10-07 23:47:09 mcr Exp $ (LBL)
  */
 
 /* Name to address translation routines. */

@@ -20,7 +20,7 @@
  *
  * AppleTalk protocol formats (courtesy Bill Croft of Stanford/SUMEX).
  *
- * @(#) $Header: /tcpdump/master/tcpdump/appletalk.h,v 1.12 1999-10-07 23:47:09 mcr Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/appletalk.h,v 1.12.1.1 1999-10-07 23:47:09 mcr Exp $ (LBL)
  */
 
 struct LAP {

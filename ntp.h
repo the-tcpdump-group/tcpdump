@@ -1,4 +1,4 @@
-/* $Header: /tcpdump/master/tcpdump/ntp.h,v 1.3 1999-10-07 23:47:11 mcr Exp $ */
+/* $Header: /tcpdump/master/tcpdump/ntp.h,v 1.3.1.1 1999-10-07 23:47:11 mcr Exp $ */
 
 /*
  * Based on ntp.h from the U of MD implementation

@@ -1,7 +1,7 @@
 /*
  * Definitions for tcp compression routines.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/linux-include/net/Attic/slcompress.h,v 1.15 1999-10-07 23:47:14 mcr Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/linux-include/net/Attic/slcompress.h,v 1.15.1.1 1999-10-07 23:47:14 mcr Exp $ (LBL)
  *
  * Copyright (c) 1989, 1990, 1992, 1993 Regents of the University of
  * California. All rights reserved.

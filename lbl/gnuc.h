@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/lbl/Attic/gnuc.h,v 1.3 1999-10-07 23:47:13 mcr Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/lbl/Attic/gnuc.h,v 1.3.1.1 1999-10-07 23:47:13 mcr Exp $ (LBL) */
 
 /* Define __P() macro, if necessary */
 #ifndef __P

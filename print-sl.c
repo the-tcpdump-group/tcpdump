@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sl.c,v 1.42 1999-10-07 23:47:12 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sl.c,v 1.42.1.1 1999-10-07 23:47:12 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_NET_SLIP_H

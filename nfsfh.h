@@ -1,5 +1,5 @@
 /*
- * $Header: /tcpdump/master/tcpdump/nfsfh.h,v 1.6 1999-10-07 23:47:10 mcr Exp $
+ * $Header: /tcpdump/master/tcpdump/nfsfh.h,v 1.6.1.1 1999-10-07 23:47:10 mcr Exp $
  *
  * nfsfh.h - NFS file handle definitions (for portable use)
  *
