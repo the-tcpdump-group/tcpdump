@@ -11,7 +11,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.9 2001-01-15 03:59:14 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.10 2001-02-20 19:28:02 fenner Exp $";
 #endif
 
 #include <stdio.h>
@@ -624,9 +624,13 @@ static void print_smb(const uchar *buf, const uchar *maxbuf)
 
   fn = smbfind(command,smb_fns);
 
-  printf("\nSMB PACKET: %s (%s)\n",fn->name,request?"REQUEST":"REPLY");
+  if (vflag > 1)
+    printf("\n");
 
-  if (vflag == 0) return;
+  printf("SMB PACKET: %s (%s)\n",fn->name,request?"REQUEST":"REPLY");
+
+  if (vflag < 2)
+    return;
 
   /* print out the header */
   fdata(buf,fmt_smbheader,buf+33);
@@ -712,8 +716,16 @@ void nbt_tcp_print(const uchar *data,int length)
   startbuf = data;
   if (maxbuf <= data) return;
 
-  printf("\n>>> NBT Packet\n");
+  if (vflag > 1)
+    printf ("\n>>> ");
 
+  printf("NBT Packet");
+
+  if (vflag < 2)
+    return;
+
+  printf("\n");
+  
   switch (flags) {
   case 1:    
     printf("flags=0x%x\n", flags);
@@ -798,7 +810,10 @@ void nbt_udp137_print(const uchar *data, int length)
 
   if (maxbuf <= data) return;
 
-  printf("\n>>> NBT UDP PACKET(137): ");
+  if (vflag > 1)
+    printf("\n>>> ");
+
+  printf("NBT UDP PACKET(137): ");
 
   switch (opcode) {
   case 0: opcodestr = "QUERY"; break;
@@ -827,7 +842,8 @@ void nbt_udp137_print(const uchar *data, int length)
   else
     printf("; UNICAST");
   
-  if (vflag == 0) return;
+  if (vflag < 2)
+    return;
 
   printf("\nTrnID=0x%X\nOpCode=%d\nNmFlags=0x%X\nRcode=%d\nQueryCount=%d\nAnswerCount=%d\nAuthorityCount=%d\nAddressRecCount=%d\n",
 	 name_trn_id,opcode,nm_flags,rcode,qdcount,ancount,nscount,arcount);
@@ -923,6 +939,11 @@ void nbt_udp138_print(const uchar *data, int length)
   if (maxbuf <= data) return;
   startbuf = data;
 
+  if (vflag < 2) {
+    printf("NBT UDP PACKET(138)");
+    return;
+  }
+
   data = fdata(data,"\n>>> NBT UDP PACKET(138) Res=[rw] ID=[rw] IP=[b.b.b.b] Port=[rd] Length=[rd] Res2=[rw]\nSourceName=[n1]\nDestName=[n1]\n#",maxbuf);
 
   if (data != NULL)
@@ -958,6 +979,11 @@ void netbeui_print(u_short control, const uchar *data, int length)
   }
 
   startbuf = data;
+
+  if (vflag < 2) {
+    printf("NetBeui Packet");
+    return;
+  }
 
   printf("\n>>> NetBeui Packet\nType=0x%X ", control);
   data = fdata(data,"Length=[d] Signature=[w] Command=[B]\n#",maxbuf);
