@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.244 2004-06-15 23:05:05 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.245 2004-06-15 23:09:46 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -746,6 +746,15 @@ main(int argc, char **argv)
 	case 4: /* Default + Date*/
 		thiszone = gmt2local(0);
 		break;
+
+	case 1: /* No time stamp */
+	case 2: /* Unix timeval style */
+	case 3: /* Microseconds since previous packet */
+		break;
+
+	default: /* Not supported */
+		error("only -t, -tt, -ttt, and -tttt are supported");
+		break;
 	}
 
 #ifdef WITH_CHROOT
@@ -1307,9 +1316,9 @@ usage(void)
 	(void)fprintf(stderr,
 "\t\t[ -E algo:secret ] [ -F file ] [ -i interface ] [ -M secret ]\n");
 	(void)fprintf(stderr,
-"\t\t[ -r file ] [ -s snaplen ] [ -T type ] [ -w file ] [ -W filecount ]\n");
+"\t\t[ -r file ] [ -s snaplen ] [ -T type ] [ -w file ]\n");
 	(void)fprintf(stderr,
-"\t\t[ -y datalinktype ] [ -Z user ]\n");
+"\t\t[ -W filecount ] [ -y datalinktype ] [ -Z user ]\n");
 	(void)fprintf(stderr,
 "\t\t[ expression ]\n");
 	exit(1);
