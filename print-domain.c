@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.50 2000-09-24 07:43:26 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.51 2000-09-28 06:42:58 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -34,7 +34,6 @@ static const char rcsid[] =
 
 struct mbuf;
 struct rtentry;
-#include <net/if.h>
 
 #include <netinet/in.h>
 #include <netinet/in_systm.h>
