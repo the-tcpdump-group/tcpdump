@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.148.2.1 2003-11-16 09:41:56 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.148.2.2 2003-11-19 01:58:58 guy Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -22,7 +22,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "1 July 2003"
+.TH TCPDUMP 1  "18 November 2003"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -196,7 +196,7 @@ CAP_NET_ADMIN to enumerate network devices with, for example, the
 .B \-D
 flag).
 .TP
-.B Under Ultrix and Digital UNIX/Tru64 UNIX:
+.B Under ULTRIX and Digital UNIX/Tru64 UNIX:
 Any user may capture network traffic with
 .IR tcpdump .
 However, no user (not even the super-user) can capture in promiscuous
@@ -869,7 +869,7 @@ True if the DECNET source address is
 .IR host ,
 which may be an address of the form ``10.123'', or a DECNET host
 name.
-[DECNET host name support is only available on Ultrix systems
+[DECNET host name support is only available on ULTRIX systems
 that are configured to run DECNET.]
 .IP "\fBdecnet dst \fIhost\fR"
 True if the DECNET destination address is
@@ -1911,7 +1911,7 @@ and dumped as DDP packets (i.e., all the UDP header information is
 discarded).
 The file
 .I /etc/atalk.names
-is used to translate appletalk net and node numbers to names.
+is used to translate AppleTalk net and node numbers to names.
 Lines in this file have the form
 .RS
 .nf
@@ -1924,7 +1924,7 @@ Lines in this file have the form
 .sp .5
 .fi
 .RE
-The first two lines give the names of appletalk networks.
+The first two lines give the names of AppleTalk networks.
 The third
 line gives the name of a particular host (a host is distinguished
 from a net by the 3rd octet in the number \-
@@ -1950,7 +1950,7 @@ jssmag.149.235 > icsd-net.2\fR
 .RE
 (If the
 .I /etc/atalk.names
-doesn't exist or doesn't contain an entry for some appletalk
+doesn't exist or doesn't contain an entry for some AppleTalk
 host/net number, addresses are printed in numeric form.)
 In the first example, NBP (DDP port 2) on net 144.1 node 209
 is sending to whatever is listening on port 220 of net icsd node 112.
