@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.40 2002-07-22 23:00:22 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.41 2002-07-22 23:16:12 hannes Exp $";
 #endif
 
 #include <sys/param.h>
@@ -382,14 +382,20 @@ bgp_vpn_rd_print (const u_char *pptr) {
     switch (EXTRACT_16BITS(pptr)) {
         /* AS:IP-address fmt*/
     case 0:
-        pos+=sprintf(pos, "%u:%s",
+        pos+=sprintf(pos, "%u:%u.%u.%u.%u",
                      EXTRACT_16BITS(pptr+2),
-                     getname(pptr+4));
+                     *(pptr+4),
+                     *(pptr+5),
+                     *(pptr+6),
+                     *(pptr+7));
         break;
         /* IP-address:AS fmt*/
     case 1:
-        pos+=sprintf(pos, "%s:%u",
-                     getname(pptr+2),
+        pos+=sprintf(pos, "%u.%u.%u.%u:%u",
+                     *(pptr+2),
+                     *(pptr+3),
+                     *(pptr+4),
+                     *(pptr+5),
                      EXTRACT_16BITS(pptr+6));
         break;
     default:
