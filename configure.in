@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.124 2000-10-06 04:19:22 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.125 2000-10-07 05:47:31 itojun Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.124 $)
+AC_REVISION($Revision: 1.125 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -85,7 +85,6 @@ AC_ARG_ENABLE(ipv6,
   --disable-ipv6          disable ipv6 support],
 [ case "$enableval" in
 yes)   AC_MSG_RESULT(yes)
-       AC_DEFINE(ENABLE_IPV6)
        LOCALSRC="print-ip6.c print-ip6opts.c print-ripng.c print-icmp6.c print-frag6.c print-rt6.c print-ospf6.c print-dhcp6.c $LOCALSRC"
        AC_DEFINE(INET6)
        ipv6=yes
@@ -108,7 +107,6 @@ main()
 }
 ],
 [ AC_MSG_RESULT(yes)
-  AC_DEFINE(ENABLE_IPV6)
   LOCALSRC="print-ip6.c print-ip6opts.c print-ripng.c print-icmp6.c print-frag6.c print-rt6.c print-ospf6.c print-dhcp6.c $LOCALSRC"
   AC_DEFINE(INET6)
   ipv6=yes],
