@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/bpf_dump.c,v 1.10 1999-11-21 09:36:44 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/bpf_dump.c,v 1.11 2000-06-18 11:12:59 assar Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -34,8 +34,6 @@ static const char rcsid[] =
 #include <stdio.h>
 
 #include "interface.h"
-
-extern void bpf_dump(struct bpf_program *, int);
 
 void
 bpf_dump(struct bpf_program *p, int option)
