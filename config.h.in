@@ -178,9 +178,6 @@
 /* Define if you have the <smi.h> header file.  */
 #undef HAVE_SMI_H
 
-/* Define if you have the <strings.h> header file.  */
-#undef HAVE_STRINGS_H
-
 /* Define if you have the crypto library (-lcrypto).  */
 #undef HAVE_LIBCRYPTO
 
