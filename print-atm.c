@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.27 2002-12-04 19:12:39 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.28 2002-12-09 05:12:25 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -43,6 +43,44 @@ static const char rcsid[] =
 #include "ether.h"
 
 /*
+ * Print an RFC 1483 LLC-encapsulated ATM frame.
+ */
+static void
+atm_llc_print(const u_char *p, int length, int caplen)
+{
+	struct ether_header ehdr;
+	u_short extracted_ethertype;
+
+	/*
+	 * Fake up an Ethernet header for the benefit of printers that
+	 * insist on "packetp" pointing to an Ethernet header.
+	 */
+	memset(&ehdr, '\0', sizeof ehdr);
+
+	/*
+	 * Some printers want to get back at the ethernet addresses.
+	 * Rather than pass it all the way down, we set this global.
+	 *
+	 * Actually, the only printers that use packetp are print-arp.c
+	 * and print-bootp.c, and they assume that packetp points to an
+	 * Ethernet header.  The right thing to do is to fix them to know
+	 * which link type is in use when they excavate. XXX
+	 */
+	packetp = (u_char *)&ehdr;
+
+	if (!llc_print(p, length, caplen, ESRC(&ehdr), EDST(&ehdr),
+	    &extracted_ethertype)) {
+		/* ether_type not known, print raw packet */
+		if (extracted_ethertype) {
+			printf("(LLC %s) ",
+		etherproto_string(htons(extracted_ethertype)));
+		}
+		if (!xflag && !qflag)
+			default_print(p, caplen);
+	}
+}
+
+/*
  * This is the top level routine of the printer.  'p' points
  * to the LLC/SNAP header of the packet, 'h->ts' is the timestamp,
  * 'h->length' is the length of the packet off the wire, and 'h->caplen'
@@ -53,6 +91,7 @@ atm_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;
+	u_int32_t llchdr;
 
 	++infodelay;
 	ts_print(&h->ts);
@@ -69,12 +108,16 @@ atm_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 	 */
 	snapend = p + caplen;
 
-	if (EXTRACT_24BITS(p) == 0xaaaa03) {
+	/*
+	 * Extract the presumed LLC header into a variable, for quick
+	 * testing.
+	 * Then check for a header that's neither a header for a SNAP
+	 * packet nor an RFC 2684 routed NLPID-formatted PDU.
+	 */
+	llchdr = EXTRACT_24BITS(p);
+	if (llchdr != 0xaaaa03 && llchdr != 0xfefe03) {
 		/*
 		 * XXX - assume 802.6 MAC header from Fore driver.
-		 * XXX - should we also assume it's not a MAC header
-		 * if it begins with 0xfe 0xfe 0x03, for RFC 2684
-		 * routed NLPID-formatted PDUs?
 		 */
 		if (eflag)
 			printf("%08x%08x %08x%08x ",
@@ -86,10 +129,7 @@ atm_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 		length -= 20;
 		caplen -= 20;
 	}
-
-        /* lets call into the generic LLC handler */
-	llc_print(p, length, caplen, NULL, NULL, NULL);
-
+	atm_llc_print(p, length, caplen);
 	if (xflag)
 		default_print(p, caplen);
  out:
