@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.66 2000-01-19 04:45:59 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.67 2000-01-19 05:24:16 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -495,7 +495,6 @@ protoid_string(register const u_char *pi)
 char *
 llcsap_string(u_char sap)
 {
-	register char *cp;
 	register struct hnamemem *tp;
 	register u_int32_t i = sap;
 	char buf[sizeof("sap 00")];
@@ -507,12 +506,7 @@ llcsap_string(u_char sap)
 	tp->addr = i;
 	tp->nxt = newhnamemem();
 
-	cp = buf;
-	(void)strcpy(cp, "sap ");
-	cp += strlen(cp);
-	*cp++ = hex[sap >> 4 & 0xf];
-	*cp++ = hex[sap & 0xf];
-	*cp++ = '\0';
+	snprintf(buf, sizeof(buf), "sap %02x", sap & 0xff);
 	tp->name = savestr(buf);
 	return (tp->name);
 }
