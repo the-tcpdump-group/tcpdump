@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lane.c,v 1.3 2000-01-09 10:00:22 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lane.c,v 1.4 2000-07-10 04:35:58 assar Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -51,9 +51,6 @@ static const char rcsid[] =
 #include "interface.h"
 #include "addrtoname.h"
 #include "lane.h"
-
-static const u_char *packetp;
-static const u_char *snapend;
 
 static inline void
 lane_print(register const u_char *bp, int length)
