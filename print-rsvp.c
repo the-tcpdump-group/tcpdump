@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.32 2004-09-16 09:02:43 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.33 2005-01-13 07:08:54 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -932,8 +932,8 @@ rsvp_obj_print (const u_char *tptr, const char *ident, u_int tlen) {
                     return-1;
                 printf("%s  Restart  Time: %ums, Recovery Time: %ums",
                        ident,
-                       EXTRACT_16BITS(obj_tptr),
-                       EXTRACT_16BITS(obj_tptr+4));
+                       EXTRACT_32BITS(obj_tptr),
+                       EXTRACT_32BITS(obj_tptr+4));
                 obj_tlen-=8;
                 obj_tptr+=8;
                 break;
