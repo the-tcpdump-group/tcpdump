@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.22.2.2 2003-11-16 08:51:08 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.22.2.3 2003-11-19 02:02:00 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -537,7 +537,7 @@ mgmt_body_print(u_int16_t fc, const struct mgmt_header_t *pmh,
 		return handle_deauth(fc, pmh, p);
 		break;
 	default:
-		printf("Unhandled Managment subtype(%x)",
+		printf("Unhandled Management subtype(%x)",
 		    FC_SUBTYPE(fc));
 		return 1;
 	}
