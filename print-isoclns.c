@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.84 2003-05-22 16:52:37 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.85 2003-06-06 23:47:53 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -43,6 +43,7 @@ static const char rcsid[] =
 #include "ethertype.h"
 #include "ether.h"
 #include "extract.h"
+#include "gmpls.h"
 
 #define	NLPID_CLNS	129	/* 0x81 */
 #define	NLPID_ESIS	130	/* 0x82 */
@@ -253,45 +254,6 @@ static struct tok isis_mt_flag_values[] = {
 #define ISIS_LSP_TLV_METRIC_VALUE(x)	   ((x)&0x3f)
 
 #define ISIS_MASK_TLV_SHARED_RISK_GROUP(x) ((x)&0x1)
-
-static struct tok isis_gmpls_link_prot_values[] = {
-    { 0x01, "Extra Traffic"},
-    { 0x02, "Unprotected"},
-    { 0x04, "Shared"},
-    { 0x08, "Dedicated 1:1"},
-    { 0x10, "Dedicated 1+1"},
-    { 0x20, "Enhanced"},
-    { 0x40, "Reserved"},
-    { 0x80, "Reserved"},
-    { 0, NULL }
-};
-
-static struct tok isis_gmpls_sw_cap_values[] = {
-    { 1,	"Packet-Switch Capable-1"},
-    { 2,	"Packet-Switch Capable-2"},
-    { 3,	"Packet-Switch Capable-3"},
-    { 4,	"Packet-Switch Capable-4"},
-    { 51,	"Layer-2 Switch Capable"},
-    { 100,	"Time-Division-Multiplex"},
-    { 150,	"Lambda-Switch Capable"},
-    { 200,	"Fiber-Switch Capable"},
-    { 0, NULL }
-};
-
-static struct tok isis_gmpls_lsp_enc_values[] = {
-    { 1,    "Packet"},
-    { 2,    "Ethernet V2/DIX"},
-    { 3,    "ANSI PDH"},
-    { 4,    "ETSI PDH"},
-    { 5,    "SDH ITU-T G.707"},
-    { 6,    "SONET ANSI T1.105"},
-    { 7,    "Digital Wrapper"},
-    { 8,    "Lambda (photonic)"},
-    { 9,    "Fiber"},
-    { 10,   "Ethernet 802.3"},
-    { 11,   "FiberChannel"},
-    { 0, NULL }
-};
 
 static struct tok isis_mt_values[] = {
     { 0,    "IPv4 unicast"},
@@ -941,7 +903,7 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
                 goto trunctlv;
             printf("%sLink Protection Type: %s, Priority %u",
                    ident,
-                   bittok2str(isis_gmpls_link_prot_values, "none", *tptr),
+                   bittok2str(gmpls_link_prot_values, "none", *tptr),
                    *(tptr+1));
             break;
         case SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR:
@@ -951,12 +913,12 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
                 goto trunctlv;
             printf("%s  Interface Switching Capability:%s",
                    ident,
-                   tok2str(isis_gmpls_sw_cap_values, "Unknown", *(tptr)));
+                   tok2str(gmpls_switch_cap_values, "Unknown", *(tptr)));
 
             if (!TTEST2(*(tptr+1),1))
                 goto trunctlv;
             printf(", LSP Encoding: %s",
-                   tok2str(isis_gmpls_lsp_enc_values, "Unknown", *(tptr+1)));
+                   tok2str(gmpls_encoding_values, "Unknown", *(tptr+1)));
 
             if (!TTEST2(*(tptr+2),2)) /* skip 2 res. bytes */
                 goto trunctlv;
