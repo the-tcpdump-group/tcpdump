@@ -1,3 +1,10 @@
+v3.5.3 Wed Jan 10 07:40:51 PST 2001
+
+Version 3.6 is highly recommended; 3.5.3 is provided in case updating
+to 3.6 is unfeasible for some reason.
+
+- Fix buffer overflows in AFS ACL parsing.
+
 v3.5 Fri Jan 28 18:00:00 PST 2000
 
 Bill Fenner <fenner@research.att.com>
@@ -558,4 +565,4 @@ v2.0 Sun Jan 13 12:20:40 PST 1991
 
 - Initial public release.
 
-@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.63.2.1 2000-01-27 23:18:19 fenner Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.63.2.2 2001-01-10 15:43:05 fenner Exp $ (LBL)
