@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lmp.c,v 1.3 2004-04-26 13:22:50 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lmp.c,v 1.4 2004-04-26 13:40:41 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -298,7 +298,12 @@ lmp_print(register const u_char *pptr, register u_int len) {
     int tlen,lmp_obj_len,lmp_obj_ctype,obj_tlen;
     int hexdump;
     int offset;
-    
+
+    union { /* int to float conversion buffer */
+        float f; 
+        u_int32_t i;
+    } bw;
+
     tptr=pptr;
     lmp_com_header = (const struct lmp_common_header *)pptr;
     TCHECK(*lmp_com_header);
@@ -536,8 +541,8 @@ lmp_print(register const u_char *pptr, register u_int len) {
 			EXTRACT_16BITS(obj_tptr+10),
 			EXTRACT_16BITS(obj_tptr+10),
 			EXTRACT_16BITS(obj_tptr+10)&8000 ? "(Payload test messages capable)" : "");
-		printf("\n\t    Transmission Rate: (0x%x)",
-			EXTRACT_32BITS(obj_tptr+12));
+                bw.i = EXTRACT_32BITS(obj_tptr+12);
+		printf("\n\t    Transmission Rate: %.3f Mbps",bw.f);
 		printf("\n\t    Wavelength: %u",
 			EXTRACT_32BITS(obj_tptr+16));
 		break;
