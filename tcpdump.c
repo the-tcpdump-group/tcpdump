@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.219 2003-11-18 08:53:19 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.220 2003-11-18 23:09:43 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -256,7 +256,8 @@ show_dlts_and_exit(pcap_t *pd)
 	while (--n_dlts >= 0) {
 		dlt_name = pcap_datalink_val_to_name(dlts[n_dlts]);
 		if (dlt_name != NULL) {
-			(void) fprintf(stderr, "  %s", dlt_name);
+			(void) fprintf(stderr, "  %s (%s)", dlt_name,
+			    pcap_datalink_val_to_description(dlts[n_dlts]));
 
 			/*
 			 * OK, does tcpdump handle that type?
@@ -634,10 +635,14 @@ main(int argc, char **argv)
 			error("%s", ebuf);
 		dlt = pcap_datalink(pd);
 		dlt_name = pcap_datalink_val_to_name(dlt);
-		if (dlt_name == NULL)
-			dlt_name = "???";
-                printf("reading from file %s, link-type %u (%s)\n",
-		       RFileName, dlt, dlt_name);
+		if (dlt_name == NULL) {
+			printf("reading from file %s, link-type %u\n",
+			    RFileName, dlt);
+		} else {
+			printf("reading from file %s, link-type %s (%s)\n",
+			    RFileName, dlt_name,
+			    pcap_datalink_val_to_description(dlt));
+		}
 		localnet = 0;
 		netmask = 0;
 		if (fflag != 0)
@@ -783,10 +788,14 @@ main(int argc, char **argv)
 			(void)fprintf(stderr, "%s: ", program_name);
 		dlt = pcap_datalink(pd);
 		dlt_name = pcap_datalink_val_to_name(dlt);
-		if (dlt_name == NULL)
-			dlt_name = "???";
-		(void)fprintf(stderr, "listening on %s, link-type %u (%s), capture size %u bytes\n",
-		    device, dlt, dlt_name, snaplen);
+		if (dlt_name == NULL) {
+			(void)fprintf(stderr, "listening on %s, link-type %u, capture size %u bytes\n",
+			    device, dlt, snaplen);
+		} else {
+			(void)fprintf(stderr, "listening on %s, link-type %s (%s), capture size %u bytes\n",
+			    device, dlt_name,
+			    pcap_datalink_val_to_description(dlt), snaplen);
+		}
 		(void)fflush(stderr);
 	}
 #endif /* WIN32 */

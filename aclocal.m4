@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.100 2003-11-16 09:44:20 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.101 2003-11-18 23:09:42 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -331,7 +331,12 @@ AC_DEFUN(AC_LBL_LIBPCAP,
     AC_CHECK_FUNC(pcap_set_datalink,
 	AC_DEFINE(HAVE_PCAP_SET_DATALINK))
     AC_CHECK_FUNC(pcap_datalink_name_to_val,
-	AC_DEFINE(HAVE_PCAP_DATALINK_NAME_TO_VAL),
+	[
+	    AC_DEFINE(HAVE_PCAP_DATALINK_NAME_TO_VAL)
+	    AC_CHECK_FUNC(pcap_datalink_val_to_description,
+		AC_DEFINE(HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION),
+		LIBOBJS="$LIBOBJS dlnames.o")
+	],
 	LIBOBJS="$LIBOBJS dlnames.o")
 
     dnl
