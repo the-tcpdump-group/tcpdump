@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.82 2002-12-11 07:13:59 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.83 2003-04-04 00:18:54 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -60,9 +60,10 @@ ns_nskip(register const u_char *cp)
 
 	if (!TTEST2(*cp, 1))
 		return (NULL);
-	if (((i = *cp++) & INDIR_MASK) == INDIR_MASK)
-		return (cp + 1);
+	i = *cp++;
 	while (i) {
+		if ((i & INDIR_MASK) == INDIR_MASK)
+			return (cp + 1);
 		if ((i & INDIR_MASK) == EDNS0_MASK) {
 			int bitlen, bytelen;
 
@@ -417,6 +418,16 @@ ns_rprint(register const u_char *cp, register const u_char *bp)
 	case T_TXT:
 		putchar(' ');
 		(void)ns_cprint(cp);
+		break;
+
+	case T_SRV:
+		putchar(' ');
+		if (!TTEST2(*cp, 6))
+			return(NULL);
+		if (ns_nprint(cp + 6, bp) == NULL)
+			return(NULL);
+		printf(":%d %d %d", EXTRACT_16BITS(cp + 4),
+			EXTRACT_16BITS(cp), EXTRACT_16BITS(cp + 2));
 		break;
 
 #ifdef INET6
