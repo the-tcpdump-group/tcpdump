@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.38 2002-03-14 05:59:53 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.39 2002-03-14 07:19:00 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -726,8 +726,8 @@ static int isis_print (const u_char *p, u_int length)
 
     u_char pdu_type, max_area, type, len, tmp, alen, subl, subt, tslen, ttslen;
     const u_char *optr, *pptr, *tptr;
-    u_short packet_len,pdu_len;
-    u_int i,j,bit_length,byte_length,metric;
+    u_short packet_len,pdu_len,time_remain;
+    u_int i,j,bit_length,byte_length,metric,ra,rr;
     u_char prefix[4]; /* copy buffer for ipv4 prefixes */
 #ifdef INET6
     u_char prefix6[16]; /* copy buffer for ipv6 prefixes */
@@ -1361,7 +1361,8 @@ static int isis_print (const u_char *p, u_int length)
 		      return (1);		  
 		    printf(" (%u)",*tptr);  /* no subTLV decoder supported - just print out subTLV length */
 		    i-=*tptr;
-		    tptr+=*tptr++;
+		    tptr = tptr + *tptr;
+		    tptr++;
 		}
 
 		i-=(5+byte_length);
@@ -1408,7 +1409,8 @@ static int isis_print (const u_char *p, u_int length)
 		      return (1);		  
 		    printf(" (%u)",*tptr); /* no subTLV decoder supported - just print out subTLV length */
 		    i-=*tptr;
-		    tptr+=*tptr++;
+		    tptr = tptr + *tptr;
+		    tptr++;
 		}
 
 		i-=(6+byte_length);
@@ -1689,10 +1691,12 @@ static int isis_print (const u_char *p, u_int length)
 		    if (!TTEST2(*tptr, 3))
 			goto trunctlv;
 		    
+	    rr = ISIS_MASK_TLV_RESTART_RR(*tptr);
+	    ra = ISIS_MASK_TLV_RESTART_RA(*tptr);
+	    tptr++;
+	    time_remain = EXTRACT_16BITS(tptr);
 	    printf("\n\t\t\tRestart Request bit %s, Restart Acknowledgement bit %s\n\t\t\tRemaining holding time: %us",
-                   ISIS_MASK_TLV_RESTART_RR(*tptr) ? "set" : "clear",
-		   ISIS_MASK_TLV_RESTART_RA(*tptr++) ? "set" : "clear",
-		   EXTRACT_16BITS(tptr));
+		   rr ? "set" : "clear", ra ? "set" : "clear", time_remain);
 
 	    break;
 
