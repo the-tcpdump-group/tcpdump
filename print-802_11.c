@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.16 2002-12-17 09:13:45 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.17 2002-12-18 08:53:19 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -590,7 +590,9 @@ static int ctrl_body_print(u_int16_t fc, const u_char *p)
  *    1    |  1      |  RA    | TA     | DA     | SA
  */
 
-static void data_header_print(u_int16_t fc, const u_char *p)
+static void
+data_header_print(u_int16_t fc, const u_char *p, const u_int8_t **srcp,
+    const u_int8_t **dstp)
 {
 #define ADDR1  (p + 4)
 #define ADDR2  (p + 10)
@@ -598,23 +600,49 @@ static void data_header_print(u_int16_t fc, const u_char *p)
 #define ADDR4  (p + 24)
 
 	if (!FC_TO_DS(fc)) {
-		if (!FC_FROM_DS(fc))
+		if (!FC_FROM_DS(fc)) {
+			if (srcp != NULL)
+				*srcp = ADDR2;
+			if (dstp != NULL)
+				*dstp = ADDR1;
+			if (!eflag)
+				return;
 			printf("DA:%s SA:%s BSSID:%s ",
 			    etheraddr_string(ADDR1), etheraddr_string(ADDR2),
 			    etheraddr_string(ADDR3));
-		else
+		} else {
+			if (srcp != NULL)
+				*srcp = ADDR3;
+			if (dstp != NULL)
+				*dstp = ADDR1;
+			if (!eflag)
+				return;
 			printf("DA:%s BSSID:%s SA:%s ",
 			    etheraddr_string(ADDR1), etheraddr_string(ADDR2),
 			    etheraddr_string(ADDR3));
+		}
 	} else {
-		if (!FC_FROM_DS(fc))
+		if (!FC_FROM_DS(fc)) {
+			if (srcp != NULL)
+				*srcp = ADDR2;
+			if (dstp != NULL)
+				*dstp = ADDR3;
+			if (!eflag)
+				return;
 			printf("BSSID:%s SA:%s DA:%s ",
 			    etheraddr_string(ADDR1), etheraddr_string(ADDR2),
 			    etheraddr_string(ADDR3));
-		else
+		} else {
+			if (srcp != NULL)
+				*srcp = ADDR4;
+			if (dstp != NULL)
+				*dstp = ADDR3;
+			if (!eflag)
+				return;
 			printf("RA:%s TA:%s DA:%s SA:%s ",
 			    etheraddr_string(ADDR1), etheraddr_string(ADDR2),
 			    etheraddr_string(ADDR3), etheraddr_string(ADDR4));
+		}
 	}
 
 #undef ADDR1
@@ -624,17 +652,35 @@ static void data_header_print(u_int16_t fc, const u_char *p)
 }
 
 
-static void mgmt_header_print(const u_char *p)
+static void
+mgmt_header_print(const u_char *p, const u_int8_t **srcp,
+    const u_int8_t **dstp)
 {
 	const struct mgmt_header_t *hp = (const struct mgmt_header_t *) p;
+
+	if (srcp != NULL)
+		*srcp = hp->sa;
+	if (dstp != NULL)
+		*dstp = hp->da;
+	if (!eflag)
+		return;
 
 	printf("BSSID:%s DA:%s SA:%s ",
 	    etheraddr_string((hp)->bssid), etheraddr_string((hp)->da),
 	    etheraddr_string((hp)->sa));
 }
 
-static void ctrl_header_print(u_int16_t fc, const u_char *p)
+static void
+ctrl_header_print(u_int16_t fc, const u_char *p, const u_int8_t **srcp,
+    const u_int8_t **dstp)
 {
+	if (srcp != NULL)
+		*srcp = NULL;
+	if (dstp != NULL)
+		*dstp = NULL;
+	if (!eflag)
+		return;
+
 	switch (FC_SUBTYPE(fc)) {
 	case CTRL_PS_POLL:
 		printf("BSSID:%s TA:%s ",
@@ -666,6 +712,7 @@ static void ctrl_header_print(u_int16_t fc, const u_char *p)
 		break;
 	default:
 		printf("(H) Unknown Ctrl Subtype");
+		break;
 	}
 }
 
@@ -718,27 +765,32 @@ static int GetHeaderLength(u_int16_t fc)
 }
 
 /*
- * Print the 802.11 MAC header
+ * Print the 802.11 MAC header if eflag is set, and set "*srcp" and "*dstp"
+ * to point to the source and destination MAC addresses in any case if
+ * "srcp" and "dstp" aren't null.
  */
 static inline void
-ieee_802_11_hdr_print(u_int16_t fc, const u_char *p)
+ieee_802_11_hdr_print(u_int16_t fc, const u_char *p, const u_int8_t **srcp,
+    const u_int8_t **dstp)
 {
 	switch (FC_TYPE(fc)) {
 	case T_MGMT:
-		mgmt_header_print(p);
+		mgmt_header_print(p, srcp, dstp);
 		break;
 
 	case T_CTRL:
-		ctrl_header_print(fc, p);
+		ctrl_header_print(fc, p, srcp, dstp);
 		break;
 
 	case T_DATA:
-		data_header_print(fc, p);
+		data_header_print(fc, p, srcp, dstp);
 		break;
 
 	default:
 		printf("(header) unknown IEEE802.11 frame type (%d)",
 		    FC_TYPE(fc));
+		*srcp = NULL;
+		*dstp = NULL;
 		break;
 	}
 }
@@ -748,6 +800,7 @@ ieee802_11_print(const u_char *p, u_int length, u_int caplen)
 {
 	u_int16_t fc;
 	u_int HEADER_LENGTH;
+	const u_int8_t *src, *dst;
 	u_short extracted_ethertype;
 
 	if (caplen < IEEE802_11_FC_LEN) {
@@ -763,15 +816,13 @@ ieee802_11_print(const u_char *p, u_int length, u_int caplen)
 		return;
 	}
 
-	if (eflag)
-		ieee_802_11_hdr_print(fc, p);
+	ieee_802_11_hdr_print(fc, p, &src, &dst);
 
 	/*
-	 * Some printers want to get back at the ethernet addresses,
-	 * and/or check that they're not walking off the end of the packet.
-	 * Rather than pass them all the way down, we set these globals.
+	 * Some printers want to check that they're not walking off the
+	 * end of the packet.
+	 * Rather than pass it all the way down, we set this global.
 	 */
-	packetp = p;
 	snapend = p + caplen;
 
 	length -= HEADER_LENGTH;
@@ -780,8 +831,8 @@ ieee802_11_print(const u_char *p, u_int length, u_int caplen)
 
 	switch (FC_TYPE(fc)) {
 	case T_MGMT:
-		if (!mgmt_body_print(fc, (const struct mgmt_header_t *)packetp,
-		    p)) {
+		if (!mgmt_body_print(fc,
+		    (const struct mgmt_header_t *)(p - HEADER_LENGTH), p)) {
 			printf("[|802.11]");
 			return;
 		}
@@ -802,14 +853,15 @@ ieee802_11_print(const u_char *p, u_int length, u_int caplen)
 				return;
 			}
 		} else {
-			if (llc_print(p, length, caplen, packetp + 10,
-			    packetp + 4, &extracted_ethertype) == 0) {
+			if (llc_print(p, length, caplen, dst, src,
+			    &extracted_ethertype) == 0) {
 				/*
 				 * Some kinds of LLC packet we cannot
 				 * handle intelligently
 				 */
 				if (!eflag)
-					ieee_802_11_hdr_print(fc, p - HEADER_LENGTH);
+					ieee_802_11_hdr_print(fc, p - HEADER_LENGTH,
+					    NULL, NULL);
 				if (extracted_ethertype) {
 					printf("(LLC %s) ",
 					    etherproto_string(htons(extracted_ethertype)));

@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.68 2002-12-11 07:13:58 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.69 2002-12-18 08:53:20 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -123,19 +123,8 @@ bootp_print(register const u_char *cp, u_short sport, u_short dport, u_int lengt
 
 	/* Client's Ethernet address */
 	if (bp->bp_htype == 1 && bp->bp_hlen == 6) {
-		register const struct ether_header *eh;
-		register const char *e;
-
 		TCHECK2(bp->bp_chaddr[0], 6);
-		eh = (const struct ether_header *)packetp;
-		if (bp->bp_op == BOOTREQUEST)
-			e = (const char *)ESRC(eh);
-		else if (bp->bp_op == BOOTREPLY)
-			e = (const char *)EDST(eh);
-		else
-			e = NULL;
-		if ( bp->bp_chaddr != NULL )
-                    printf("\n\t  Client Ethernet Address: %s", etheraddr_string(bp->bp_chaddr));
+		printf("\n\t  Client Ethernet Address: %s", etheraddr_string(bp->bp_chaddr));
 	}
 
 	TCHECK2(bp->bp_sname[0], 1);		/* check first char only */

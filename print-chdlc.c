@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.24 2002-12-11 07:13:58 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.25 2002-12-18 08:53:20 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -54,11 +54,10 @@ chdlc_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
 	ts_print(&h->ts);
 
 	/*
-	 * Some printers want to get back at the link level addresses,
-	 * and/or check that they're not walking off the end of the packet.
-	 * Rather than pass them all the way down, we set these globals.
+	 * Some printers want to check that they're not walking off the
+	 * end of the packet.
+	 * Rather than pass it all the way down, we set this global.
 	 */
-	packetp = p;
 	snapend = p + caplen;
 
 	chdlc_print(p, length, caplen);

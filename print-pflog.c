@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pflog.c,v 1.4 2002-09-05 21:25:44 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pflog.c,v 1.5 2002-12-18 08:53:22 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -113,11 +113,10 @@ pflog_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
 	}
 
 	/*
-	 * Some printers want to get back at the link level addresses,
-	 * and/or check that they're not walking off the end of the packet.
-	 * Rather than pass them all the way down, we set these globals.
+	 * Some printers want to check that they're not walking off the
+	 * end of the packet.
+	 * Rather than pass it all the way down, we set this global.
 	 */
-	packetp = p;
 	snapend = p + caplen;
 
 	hdr = (const struct pfloghdr *)p;

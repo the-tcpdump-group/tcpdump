@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.73 2002-09-05 21:25:40 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.74 2002-12-18 08:53:21 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -38,7 +38,6 @@ static const char rcsid[] =
 
 #include "ether.h"
 
-const u_char *packetp;
 const u_char *snapend;
 
 static inline void
@@ -76,11 +75,10 @@ ether_print(const u_char *p, u_int length, u_int caplen)
 		ether_hdr_print(p, length);
 
 	/*
-	 * Some printers want to get back at the ethernet addresses,
-	 * and/or check that they're not walking off the end of the packet.
-	 * Rather than pass them all the way down, we set these globals.
+	 * Some printers want to check that they're not walking off the
+	 * end of the packet.
+	 * Rather than pass it all the way down, we set this global.
 	 */
-	packetp = p;
 	snapend = p + caplen;
 
 	length -= ETHER_HDRLEN;

@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sll.c,v 1.9 2002-09-05 21:25:48 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sll.c,v 1.10 2002-12-18 08:53:24 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -98,8 +98,6 @@ sll_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 	u_int caplen = h->caplen;
 	u_int length = h->len;
 	register const struct sll_header *sllp;
-	u_short pkttype;
-	struct ether_header ehdr;
 	u_short ether_type;
 	u_short extracted_ethertype;
 
@@ -118,61 +116,15 @@ sll_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 
 	sllp = (const struct sll_header *)p;
 
-	/*
-	 * Fake up an Ethernet header for the benefit of printers that
-	 * insist on "packetp" pointing to an Ethernet header.
-	 */
-	pkttype = ntohs(sllp->sll_pkttype);
-
-	/* The source address is in the packet header */
-	memcpy(ehdr.ether_shost, sllp->sll_addr, ETHER_ADDR_LEN);
-
-	if (pkttype != LINUX_SLL_OUTGOING) {
-		/*
-		 * We received this packet.
-		 *
-		 * We don't know the destination address, so
-		 * we fake it - all 0's except that the
-		 * bottommost bit of the bottommost octet
-		 * is set for a unicast packet, all 0's except
-		 * that the bottommost bit of the uppermost
-		 * octet is set for a multicast packet, all
-		 * 1's for a broadcast packet.
-		 */
-		if (pkttype == LINUX_SLL_BROADCAST)
-			memset(ehdr.ether_dhost, 0xFF, ETHER_ADDR_LEN);
-		else {
-			memset(ehdr.ether_dhost, 0, ETHER_ADDR_LEN);
-			if (pkttype == LINUX_SLL_MULTICAST)
-				ehdr.ether_dhost[0] = 1;
-			else
-				ehdr.ether_dhost[ETHER_ADDR_LEN-1] = 1;
-		}
-	} else {
-		/*
-		 * We sent this packet; we don't know whether it's
-		 * broadcast, multicast, or unicast, so just make
-		 * the destination address all 0's.
-		 */
-		memset(ehdr.ether_dhost, 0, ETHER_ADDR_LEN);
-	}
-
 	if (eflag)
 		sll_print(sllp, length);
 
 	/*
-	 * Some printers want to get back at the ethernet addresses,
-	 * and/or check that they're not walking off the end of the packet.
-	 * Rather than pass them all the way down, we set these globals.
+	 * Some printers want to check that they're not walking off the
+	 * end of the packet.
+	 * Rather than pass it all the way down, we set this global.
 	 */
 	snapend = p + caplen;
-	/*
-	 * Actually, the only printers that use packetp are print-arp.c
-	 * and print-bootp.c, and they assume that packetp points to an
-	 * Ethernet header.  The right thing to do is to fix them to know
-	 * which link type is in use when they excavate. XXX
-	 */
-	packetp = (u_char *)&ehdr;
 
 	length -= SLL_HDR_LEN;
 	caplen -= SLL_HDR_LEN;
@@ -203,8 +155,8 @@ sll_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 			 * 802.2.
 			 * Try to print the LLC-layer header & higher layers.
 			 */
-			if (llc_print(p, length, caplen, ESRC(&ehdr),
-			    EDST(&ehdr), &extracted_ethertype) == 0)
+			if (llc_print(p, length, caplen, NULL, NULL,
+			    &extracted_ethertype) == 0)
 				goto unknown;	/* unknown LLC type */
 			break;
 

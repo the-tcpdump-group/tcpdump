@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lane.c,v 1.17 2002-12-11 07:14:04 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lane.c,v 1.18 2002-12-18 08:53:22 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -122,11 +122,10 @@ lane_print(const u_char *p, u_int length, u_int caplen)
 		lane_hdr_print(p, length);
 
 	/*
-	 * Some printers want to get back at the ethernet addresses,
-	 * and/or check that they're not walking off the end of the packet.
-	 * Rather than pass them all the way down, we set these globals.
+	 * Some printers want to check that they're not walking off the
+	 * end of the packet.
+	 * Rather than pass it all the way down, we set this global.
 	 */
-	packetp = p + 2;	/* skip the LECID */
 	snapend = p + caplen;
 
 	length -= sizeof(struct lecdatahdr_8023);

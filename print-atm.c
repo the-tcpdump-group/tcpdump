@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.30 2002-12-11 06:55:08 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.31 2002-12-18 08:53:19 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -49,27 +49,9 @@ static const char rcsid[] =
 static void
 atm_llc_print(const u_char *p, int length, int caplen)
 {
-	struct ether_header ehdr;
 	u_short extracted_ethertype;
 
-	/*
-	 * Fake up an Ethernet header for the benefit of printers that
-	 * insist on "packetp" pointing to an Ethernet header.
-	 */
-	memset(&ehdr, '\0', sizeof ehdr);
-
-	/*
-	 * Some printers want to get back at the ethernet addresses.
-	 * Rather than pass it all the way down, we set this global.
-	 *
-	 * Actually, the only printers that use packetp are print-arp.c
-	 * and print-bootp.c, and they assume that packetp points to an
-	 * Ethernet header.  The right thing to do is to fix them to know
-	 * which link type is in use when they excavate. XXX
-	 */
-	packetp = (u_char *)&ehdr;
-
-	if (!llc_print(p, length, caplen, ESRC(&ehdr), EDST(&ehdr),
+	if (!llc_print(p, length, caplen, NULL, NULL,
 	    &extracted_ethertype)) {
 		/* ether_type not known, print raw packet */
 		if (extracted_ethertype) {

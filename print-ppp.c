@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.77 2002-11-03 23:04:07 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.78 2002-12-18 08:53:23 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1056,11 +1056,10 @@ ppp_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
 	}
 
 	/*
-	 * Some printers want to get back at the link level addresses,
-	 * and/or check that they're not walking off the end of the packet.
-	 * Rather than pass them all the way down, we set these globals.  */
-
-	packetp = p;
+	 * Some printers want to check that they're not walking off the
+	 * end of the packet.
+	 * Rather than pass it all the way down, we set this global.
+	 */
 	snapend = p + caplen;
 
 #if 0
@@ -1141,11 +1140,10 @@ ppp_hdlc_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
 	}
 
 	/*
-	 * Some printers want to get back at the link level addresses,
-	 * and/or check that they're not walking off the end of the packet.
-	 * Rather than pass them all the way down, we set these globals.
+	 * Some printers want to check that they're not walking off the
+	 * end of the packet.
+	 * Rather than pass it all the way down, we set this global.
 	 */
-	packetp = p;
 	snapend = p + caplen;
 
 	switch (p[0]) {
@@ -1222,11 +1220,10 @@ ppp_bsdos_if_print(u_char *user _U_, const struct pcap_pkthdr *h _U_,
 	}
 
 	/*
-	 * Some printers want to get back at the link level addresses,
-	 * and/or check that they're not walking off the end of the packet.
-	 * Rather than pass them all the way down, we set these globals.
+	 * Some printers want to check that they're not walking off the
+	 * end of the packet.
+	 * Rather than pass it all the way down, we set this global.
 	 */
-	packetp = p;
 	snapend = p + caplen;
 	hdrlength = 0;
 

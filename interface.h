@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.200 2002-12-13 00:40:34 hannes Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.201 2002-12-18 08:53:18 guy Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -129,8 +129,7 @@ extern char *program_name;	/* used to generate self-identifying messages */
 extern int32_t thiszone;	/* seconds offset from gmt to local time */
 
 extern int snaplen;
-/* global pointers to beginning and end of current packet (during printing) */
-extern const u_char *packetp;
+/* global pointer to end of current packet (during printing) */
 extern const u_char *snapend;
 
 /*
