@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.12 2002-12-12 18:31:58 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.13 2002-12-14 01:38:32 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -249,8 +249,8 @@ static const struct tok rsvp_resstyle_values[] = {
 
 static const struct tok rsvp_intserv_service_type_values[] = {
     { 1,                                "Default/Global Information" },
-    { RSVP_OBJ_INTSERV_CONTROLLED_LOAD,	"Controlled Load" },
     { RSVP_OBJ_INTSERV_GUARANTEED_SERV, "Guaranteed Service" },
+    { RSVP_OBJ_INTSERV_CONTROLLED_LOAD,	"Controlled Load" },
     { 0, NULL}
 };
 
@@ -405,7 +405,7 @@ rsvp_intserv_print(const u_char *tptr) {
 
     default:
         if (vflag <= 1)
-            print_unknown_data(tptr+4,"\n\t      ",parameter_length);
+            print_unknown_data(tptr+4,"\n\t\t",parameter_length);
     }
     return (parameter_length+4); /* header length 4 bytes */
 }
@@ -416,7 +416,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
     const struct rsvp_common_header *rsvp_com_header;
     const struct rsvp_object_header *rsvp_obj_header;
     const u_char *tptr,*obj_tptr;
-    u_short tlen,rsvp_obj_len,rsvp_obj_ctype,obj_tlen;
+    u_short tlen,rsvp_obj_len,rsvp_obj_ctype,obj_tlen,intserv_serv_tlen;
     int hexdump,processed;
     union {
 	float f;
@@ -766,22 +766,30 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         case RSVP_OBJ_FLOWSPEC:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_2:
-                printf("\n\t    Msg-Version: %u, length: %u\n\t      Service Type: %s (%u), Service length: %u",
+                printf("\n\t    Msg-Version: %u, length: %u",
                        (*obj_tptr & 0xf0) >> 4,
-                       EXTRACT_16BITS(obj_tptr+2)<<2,
-                       tok2str(rsvp_intserv_service_type_values,"unknown",*(obj_tptr+4)),
-                       *(obj_tptr+4),
-                       EXTRACT_16BITS(obj_tptr+6)<<2);
+                       EXTRACT_16BITS(obj_tptr+2)<<2);
+                obj_tptr+=4; /* get to the start of the service header */
+                obj_tlen-=4;
 
-                obj_tlen-=8; /* get to the start of the parameter list */
-                obj_tptr+=8;
+                while (obj_tlen >= 8) {
+                    intserv_serv_tlen=EXTRACT_16BITS(obj_tptr+2)<<2;
+                    printf("\n\t    Service Type: %s (%u), Service length: %u",
+                           tok2str(rsvp_intserv_service_type_values,"unknown",*(obj_tptr)),
+                           *(obj_tptr),
+                           intserv_serv_tlen);
+                    
+                    obj_tptr+=4; /* get to the start of the parameter list */
+                    obj_tlen-=4;
 
-                while (obj_tlen>4) {
-                    processed = rsvp_intserv_print(obj_tptr);
-                    if (processed == 0)
-                        break;
+                    while (intserv_serv_tlen>=4) {
+                        processed = rsvp_intserv_print(obj_tptr);
+                        if (processed == 0)
+                            break;
                         obj_tlen-=processed;
+                        intserv_serv_tlen-=processed;
                         obj_tptr+=processed;
+                    }
                 }
                 break;
             default:
