@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.53 2004-07-21 21:32:12 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.54 2004-07-21 21:42:32 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -44,17 +44,13 @@ static const char rcsid[] _U_ =
 
 #include <stdio.h>
 
-#include "interface.h"
 #include "ip.h"
 #include "esp.h"
 #ifdef INET6
 #include "ip6.h"
 #endif
 
-#if defined(__MINGW32__) || defined(__WATCOMC__)
-extern char *strsep(char **stringp, const char *delim); /* Missing/strsep.c */
-#endif
-
+#include "interface.h"
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
