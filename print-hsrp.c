@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-hsrp.c,v 1.2 2001-10-08 16:12:37 fenner Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-hsrp.c,v 1.3 2002-05-07 18:31:49 fenner Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -119,7 +119,7 @@ hsrp_print(register const u_char *bp, register u_int len)
 	if (hp->hsrp_reserved != 0) {
 		printf("[reserved=%d!] ", hp->hsrp_reserved);
 	}
-	TCHECK2(hp->hsrp_virtaddr, sizeof(hp->hsrp_virtaddr));
+	TCHECK(hp->hsrp_virtaddr);
 	printf("addr=%s", ipaddr_string(&hp->hsrp_virtaddr));
 	if (vflag) {
 		printf(" hellotime=");
