@@ -104,6 +104,9 @@
 /* Define if you have the asprintf function.  */
 #undef HAVE_ASPRINTF
 
+/* Define if you have the bpf_dump function.  */
+#undef HAVE_BPF_DUMP
+
 /* Define if you have the ether_ntohost function.  */
 #undef HAVE_ETHER_NTOHOST
 
