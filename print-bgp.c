@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.46 2002-08-06 04:42:04 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.47 2002-08-20 00:23:59 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -1247,7 +1247,7 @@ bgp_header_print(const u_char *dat, int length)
 
 	TCHECK2(dat[0], BGP_SIZE);
 	memcpy(&bgp, dat, BGP_SIZE);
-	printf("\n\t%s Message (%u), length: %u ",
+	printf("\n\t%s Message (%u), length: %u",
                tok2str(bgp_msg_values, "Unknown", bgp.bgp_type),
                bgp.bgp_type,
                length);
@@ -1295,7 +1295,7 @@ bgp_print(const u_char *dat, int length)
 	if (snapend < dat + length)
 		ep = snapend;
 
-	printf(": BGP");
+	printf(": BGP, length: %u",length);
 
 	p = dat;
 	start = p;
