@@ -18,11 +18,12 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/addrtoname.h,v 1.16 1999-10-30 05:11:07 itojun Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/addrtoname.h,v 1.17 2001-06-18 09:12:28 itojun Exp $ (LBL)
  */
 
 /* Name to address translation routines. */
 
+extern char *linkaddr_string(const u_char *, const int);
 extern char *etheraddr_string(const u_char *);
 extern char *etherproto_string(u_short);
 extern char *tcpport_string(u_short);
