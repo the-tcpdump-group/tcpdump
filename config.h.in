@@ -280,10 +280,10 @@
 #undef HAVE___ATTRIBUTE__
 
 /* Define to 1 if netinet/ether.h declares `ether_ntohost' */
-#undef NETINET_ETHER_H_DECLARES_ETHER_ntohost
+#undef NETINET_ETHER_H_DECLARES_ETHER_NTOHOST
 
 /* Define to 1 if netinet/if_ether.h declares `ether_ntohost' */
-#undef NETINET_IF_ETHER_H_DECLARES_ETHER_ntohost
+#undef NETINET_IF_ETHER_H_DECLARES_ETHER_NTOHOST
 
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT

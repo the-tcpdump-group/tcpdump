@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.184 2005-03-27 22:38:09 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.185 2005-03-27 22:44:22 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.184 $)
+AC_REVISION($Revision: 1.185 $)
 AC_PREREQ(2.50)
 AC_INIT(tcpdump.c)
 
@@ -548,7 +548,8 @@ AC_CHECK_FUNCS(ether_ntohost, [
 	AC_DEFINE(USE_ETHER_NTOHOST)
     fi
 ])
-if test "$ac_cv_func_ether_ntohost" = yes; then
+if test "$ac_cv_func_ether_ntohost" = yes -a \
+    test "$ac_cv_buggy_ether_ntohost" = "no"; then
 	#
 	# OK, we have ether_ntohost().  Do we have <netinet/if_ether.h>?
 	#
@@ -558,7 +559,7 @@ if test "$ac_cv_func_ether_ntohost" = yes; then
 		#
 		AC_CHECK_DECLS(ether_ntohost,
 		    [
-			AC_DEFINE(NETINET_IF_ETHER_H_DECLARES_ETHER_ntohost,,
+			AC_DEFINE(NETINET_IF_ETHER_H_DECLARES_ETHER_NTOHOST,,
 			    [Define to 1 if netinet/if_ether.h declares `ether_ntohost'])
 		    ],,
 		    [
@@ -589,7 +590,7 @@ struct rtentry;
 			unset ac_cv_have_decl_ether_ntohost
 			AC_CHECK_DECLS(ether_ntohost,
 			    [
-				AC_DEFINE(NETINET_ETHER_H_DECLARES_ETHER_ntohost,,
+				AC_DEFINE(NETINET_ETHER_H_DECLARES_ETHER_NTOHOST,,
 				    [Define to 1 if netinet/ether.h declares `ether_ntohost'])
 			    ],,
 			    [
