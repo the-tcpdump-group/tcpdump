@@ -3921,8 +3921,8 @@ fi
 	    fi
 	    	    	    	    	    	    	    	    	    	    	    	    	    	    	    	    echo $ac_n "checking for extraneous pcap header directories""... $ac_c" 1>&6
 echo "configure:3924: checking for extraneous pcap header directories" >&5
-	    if ! test \( -r /usr/local/include/pcap.h -o \
-			 -r /usr/include/pcap.h \); then
+	    if test \( ! -r /usr/local/include/pcap.h \) -a \
+			\( ! -r /usr/include/pcap.h \); then
 		if test -r /usr/local/include/pcap/pcap.h; then
 		    d="/usr/local/include/pcap"
 		elif test -r /usr/include/pcap/pcap.h; then

@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.95 2003-03-28 08:36:35 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.96 2003-05-01 21:20:52 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -273,8 +273,8 @@ AC_DEFUN(AC_LBL_LIBPCAP,
 	    dnl if so, add that subdirectory to the "-I" list.
 	    dnl
 	    AC_MSG_CHECKING(for extraneous pcap header directories)
-	    if ! test \( -r /usr/local/include/pcap.h -o \
-			 -r /usr/include/pcap.h \); then
+	    if test \( ! -r /usr/local/include/pcap.h \) -a \
+			\( ! -r /usr/include/pcap.h \); then
 		if test -r /usr/local/include/pcap/pcap.h; then
 		    d="/usr/local/include/pcap"
 		elif test -r /usr/include/pcap/pcap.h; then
