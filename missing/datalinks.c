@@ -31,18 +31,12 @@
  * SUCH DAMAGE.
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/missing/datalinks.c,v 1.1.2.2 2003-11-16 08:51:59 guy Exp $ (LBL)";
 #endif
 
 #include <tcpdump-stdinc.h>
-
-#include "interface.h"
-
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/missing/datalinks.c,v 1.1.2.1 2003-11-15 22:29:20 guy Exp $ (LBL)";
-#endif
 
 #include <pcap.h>
 #include <stdlib.h>

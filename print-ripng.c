@@ -19,6 +19,10 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ripng.c,v 1.15.2.2 2003-11-16 08:51:42 guy Exp $";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -50,10 +54,6 @@ IN6_ADDR_EQUAL(const struct in6_addr *a, const struct in6_addr *b)
 #include "addrtoname.h"
 #include "extract.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ripng.c,v 1.15.2.1 2003-11-15 22:29:05 guy Exp $";
-#endif
 static int
 rip6_entry_print(register const struct netinfo6 *ni, int metric)
 {

@@ -31,12 +31,16 @@
  * SUCH DAMAGE.
  */
 
-/* $Id: snprintf.c,v 1.6.2.1 2003-11-15 22:29:22 guy Exp $ */
+/* $Id: snprintf.c,v 1.6.2.2 2003-11-16 08:52:02 guy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
 
+#ifndef lint
+static const char rcsid[] _U_ =
+     "@(#) $Header: /tcpdump/master/tcpdump/missing/snprintf.c,v 1.6.2.2 2003-11-16 08:52:02 guy Exp $";
+#endif
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -47,10 +51,6 @@
 
 #include <interface.h>
 
-#ifndef lint
-static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/missing/snprintf.c,v 1.6.2.1 2003-11-15 22:29:22 guy Exp $";
-#endif
 enum format_flags {
     minus_flag     =  1,
     plus_flag      =  2,

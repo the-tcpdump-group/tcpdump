@@ -19,6 +19,10 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.87.2.2 2003-11-16 08:51:58 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -40,10 +44,6 @@
 
 #include "interface.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.87.2.1 2003-11-15 22:29:19 guy Exp $ (LBL)";
-#endif
 /*
  * Print out a filename (or other ascii string).
  * If ep is NULL, assume no truncation check is needed.

@@ -19,6 +19,10 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ipcomp.c,v 1.17.2.2 2003-11-16 08:51:27 guy Exp $";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -43,10 +47,6 @@ struct ipcomp {
 #include "addrtoname.h"
 #include "extract.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ipcomp.c,v 1.17.2.1 2003-11-15 22:28:54 guy Exp $";
-#endif
 int
 ipcomp_print(register const u_char *bp, int *nhdr)
 {

@@ -27,6 +27,10 @@
  * SUCH DAMAGE.
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lwres.c,v 1.10.2.2 2003-11-16 08:51:32 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -43,10 +47,6 @@
 #include "addrtoname.h"
 #include "extract.h"                    /* must come after interface.h */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lwres.c,v 1.10.2.1 2003-11-15 22:28:58 guy Exp $ (LBL)";
-#endif
 /* BIND9 lib/lwres/include/lwres */
 typedef u_int32_t lwres_uint32_t;
 typedef u_int16_t lwres_uint16_t;

@@ -9,6 +9,10 @@
  *
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+  "@(#) $Header: /tcpdump/master/tcpdump/print-beep.c,v 1.4.2.2 2003-11-16 08:51:12 guy Exp $";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -26,10 +30,6 @@
 #include "interface.h"
 #include "extract.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-  "@(#) $Header: /tcpdump/master/tcpdump/print-beep.c,v 1.4.2.1 2003-11-15 22:28:41 guy Exp $";
-#endif
 /* Check for a string but not go beyond length
  * Return TRUE on match, FALSE otherwise
  *

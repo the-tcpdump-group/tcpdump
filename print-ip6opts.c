@@ -31,6 +31,10 @@
 #include "config.h"
 #endif
 
+#ifndef lint
+static const char rcsid[] _U_ =
+     "@(#) $Header: /tcpdump/master/tcpdump/print-ip6opts.c,v 1.14.2.2 2003-11-16 08:51:27 guy Exp $";
+#endif
 
 #ifdef INET6
 #include <tcpdump-stdinc.h>
@@ -43,10 +47,6 @@
 #include "addrtoname.h"
 #include "extract.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-ip6opts.c,v 1.14.2.1 2003-11-15 22:28:53 guy Exp $";
-#endif
 /* items outside of rfc2292bis */
 #ifndef IP6OPT_MINLEN
 #define IP6OPT_MINLEN	2

@@ -21,6 +21,10 @@
  * Format and print AppleTalk packets.
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.78.2.2 2003-11-16 08:51:11 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -39,10 +43,6 @@
 #include "extract.h"			/* must come after interface.h */
 #include "appletalk.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.78.2.1 2003-11-15 22:28:40 guy Exp $ (LBL)";
-#endif
 static struct tok type2str[] = {
 	{ ddpRTMP,		"rtmp" },
 	{ ddpRTMPrequest,	"rtmpReq" },

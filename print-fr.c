@@ -19,6 +19,10 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.17.2.2 2003-11-16 08:51:23 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -35,10 +39,6 @@
 #include "ethertype.h"
 #include "extract.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.17.2.1 2003-11-15 22:28:49 guy Exp $ (LBL)";
-#endif
 static void lmi_print(const u_char *, u_int);
 
 #define NLPID_LMI       0x08   /* ANSI T1.617 Annex D or ITU-T Q.933 Annex A */

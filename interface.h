@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.217 2003-11-05 06:02:58 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.217.2.1 2003-11-16 08:51:06 guy Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -31,8 +31,6 @@
 #ifndef HAVE___ATTRIBUTE__
 #define __attribute__(x)
 #endif
-
-#define _U_	__attribute__((unused))
 
 /* snprintf et al */
 

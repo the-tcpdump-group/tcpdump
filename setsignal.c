@@ -19,20 +19,16 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/setsignal.c,v 1.9.2.2 2003-11-16 08:51:56 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include <tcpdump-stdinc.h>
-
-
-#include "interface.h"
-
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/setsignal.c,v 1.9.2.1 2003-11-15 22:29:17 guy Exp $ (LBL)";
-#endif
 
 #include <signal.h>
 #ifdef HAVE_SIGACTION

@@ -23,6 +23,10 @@
  * Further tweaked to more closely resemble print-fddi.c
  *	Guy Harris <guy@alum.mit.edu>
  */
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-token.c,v 1.22.2.2 2003-11-16 08:51:51 guy Exp $";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -38,10 +42,6 @@
 #include "addrtoname.h"
 #include "ethertype.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-token.c,v 1.22.2.1 2003-11-15 22:29:14 guy Exp $";
-#endif
 #include "ether.h"
 #include "token.h"
 

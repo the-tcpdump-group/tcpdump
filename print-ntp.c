@@ -23,6 +23,10 @@
  *	loosely based on print-bootp.c
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ntp.c,v 1.37.2.2 2003-11-16 08:51:36 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -40,10 +44,6 @@
 #include "addrtoname.h"
 #include "extract.h"
 #ifdef MODEMASK
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ntp.c,v 1.37.2.1 2003-11-15 22:29:01 guy Exp $ (LBL)";
-#endif
 #undef MODEMASK					/* Solaris sucks */
 #endif
 #include "ntp.h"

@@ -31,20 +31,16 @@
  * SUCH DAMAGE.
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/missing/dlnames.c,v 1.2.2.2 2003-11-16 08:51:59 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include <tcpdump-stdinc.h>
-
-
-#include "interface.h"
-
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/missing/dlnames.c,v 1.2.2.1 2003-11-15 22:29:20 guy Exp $ (LBL)";
-#endif
 
 #include <pcap.h>
 #include <string.h>

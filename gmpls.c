@@ -13,6 +13,10 @@
  * Original code by Hannes Gredler (hannes@juniper.net)
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/gmpls.c,v 1.2.2.2 2003-11-16 08:51:05 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -22,10 +26,6 @@
 
 #include "interface.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/gmpls.c,v 1.2.2.1 2003-11-15 22:28:36 guy Exp $ (LBL)";
-#endif
 /* rfc3471 */
 struct tok gmpls_link_prot_values[] = {
     { 0x01, "Extra Traffic"},

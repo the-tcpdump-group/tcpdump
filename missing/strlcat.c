@@ -28,20 +28,16 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/missing/strlcat.c,v 1.3.2.2 2003-11-16 08:52:03 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H 
 #include <config.h>
 #endif
 
 #include <tcpdump-stdinc.h>
-
-
-#include "interface.h"
-
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/missing/strlcat.c,v 1.3.2.1 2003-11-15 22:29:22 guy Exp $ (LBL)";
-#endif
 
 #include <string.h>
 

@@ -40,6 +40,10 @@
 #include "config.h"
 #endif
 
+#ifndef lint
+static const char rcsid[] _U_ =
+     "@(#) $Header: /tcpdump/master/tcpdump/print-mobile.c,v 1.12.2.2 2003-11-16 08:51:33 guy Exp $";
+#endif
 
 #include <tcpdump-stdinc.h>
 
@@ -49,10 +53,6 @@
 #include "addrtoname.h"
 #include "extract.h"		/* must come after interface.h */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-mobile.c,v 1.12.2.1 2003-11-15 22:28:58 guy Exp $";
-#endif
 #define MOBILE_SIZE (8)
 
 struct mobile_ip {

@@ -22,6 +22,10 @@
  *	with an awful lot of hacking by Jeffrey Mogul, DECWRL
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.53.2.2 2003-11-16 08:51:32 guy Exp $";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -36,10 +40,6 @@
 #include "addrtoname.h"
 #include "extract.h"			/* must come after interface.h */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.53.2.1 2003-11-15 22:28:58 guy Exp $";
-#endif
 #include "llc.h"
 #include "ethertype.h"
 

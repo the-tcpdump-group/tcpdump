@@ -20,6 +20,10 @@
  *
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lane.c,v 1.20.2.2 2003-11-16 08:51:31 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -36,10 +40,6 @@
 #include "ether.h"
 #include "lane.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lane.c,v 1.20.2.1 2003-11-15 22:28:57 guy Exp $ (LBL)";
-#endif
 static const struct tok lecop2str[] = {
 	{ 0x0001,	"configure request" },
 	{ 0x0101,	"configure response" },
