@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.40 2000-11-08 13:03:12 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.41 2000-11-12 15:16:16 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -315,8 +315,6 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 		icmp6_rrenum_print(icmp6len, bp, ep);
 		break;
 	case ICMP6_NI_QUERY:
-		icmp6_nodeinfo_print(icmp6len, bp, ep);
-		break;
 	case ICMP6_NI_REPLY:
 		icmp6_nodeinfo_print(icmp6len, bp, ep);
 		break;
