@@ -34,7 +34,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-wb.c,v 1.31 2003-11-15 00:39:44 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-wb.c,v 1.30.2.1 2003-11-15 22:29:17 guy Exp $ (LBL)";
 #endif
 /* XXX need to add byte-swapping macros! */
 /* XXX - you mean like the ones in "extract.h"? */

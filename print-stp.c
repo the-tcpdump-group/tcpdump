@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-stp.c,v 1.12 2003-11-15 00:39:41 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-stp.c,v 1.11.2.1 2003-11-15 22:29:10 guy Exp $";
 #endif
 static void
 stp_print_bridge_id(const u_char *p)

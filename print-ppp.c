@@ -53,7 +53,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.90 2003-11-15 00:39:36 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.89.2.1 2003-11-15 22:29:03 guy Exp $ (LBL)";
 #endif
 /*
  * The following constatns are defined by IANA. Please refer to

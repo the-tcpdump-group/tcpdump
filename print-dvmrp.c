@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dvmrp.c,v 1.25 2003-11-15 00:39:20 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dvmrp.c,v 1.24.2.1 2003-11-15 22:28:47 guy Exp $ (LBL)";
 #endif
 /*
  * DVMRP message types and flag values shamelessly stolen from

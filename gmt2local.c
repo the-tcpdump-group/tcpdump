@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/gmt2local.c,v 1.8 2003-11-15 00:39:13 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/gmt2local.c,v 1.7.2.1 2003-11-15 22:28:37 guy Exp $ (LBL)";
 #endif
 
 #include <stdio.h>

@@ -43,7 +43,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-hsrp.c,v 1.8 2003-11-15 00:39:24 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-hsrp.c,v 1.7.2.1 2003-11-15 22:28:50 guy Exp $";
 #endif
 /* HSRP op code types. */
 static const char *op_code_str[] = {

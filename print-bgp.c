@@ -46,7 +46,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.73 2003-11-15 00:39:17 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.72.2.1 2003-11-15 22:28:42 guy Exp $";
 #endif
 struct bgp {
 	u_int8_t bgp_marker[16];

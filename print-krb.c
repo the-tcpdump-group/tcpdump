@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-krb.c,v 1.22 2003-11-15 00:39:29 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-krb.c,v 1.21.2.1 2003-11-15 22:28:56 guy Exp $";
 #endif
 static const u_char *c_print(register const u_char *, register const u_char *);
 static const u_char *krb4_print_hdr(const u_char *);

@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.28 2003-11-15 00:39:40 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.27.2.1 2003-11-15 22:29:08 guy Exp $";
 #endif
 static int request = 0;
 

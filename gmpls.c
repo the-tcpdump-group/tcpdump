@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/gmpls.c,v 1.3 2003-11-15 00:39:13 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/gmpls.c,v 1.2.2.1 2003-11-15 22:28:36 guy Exp $ (LBL)";
 #endif
 /* rfc3471 */
 struct tok gmpls_link_prot_values[] = {

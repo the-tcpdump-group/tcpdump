@@ -35,7 +35,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-raw.c,v 1.40 2003-11-15 00:39:37 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-raw.c,v 1.39.2.1 2003-11-15 22:29:05 guy Exp $ (LBL)";
 #endif
 /*
  * The DLT_RAW packet has no header. It contains a raw IP packet.

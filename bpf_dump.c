@@ -32,7 +32,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/bpf_dump.c,v 1.15 2003-11-15 00:39:12 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/bpf_dump.c,v 1.14.2.1 2003-11-15 22:28:36 guy Exp $ (LBL)";
 #endif
 void
 bpf_dump(struct bpf_program *p, int option)

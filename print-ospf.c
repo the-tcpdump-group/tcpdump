@@ -37,7 +37,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.46 2003-11-15 00:39:34 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.45.2.1 2003-11-15 22:29:01 guy Exp $ (LBL)";
 #endif
 #include "ospf.h"
 

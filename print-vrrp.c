@@ -39,7 +39,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-vrrp.c,v 1.8 2003-11-15 00:39:44 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-vrrp.c,v 1.7.2.1 2003-11-15 22:29:16 guy Exp $";
 #endif
 /*
  * RFC 2338:

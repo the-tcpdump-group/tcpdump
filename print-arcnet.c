@@ -35,7 +35,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-arcnet.c,v 1.16 2003-11-15 00:39:15 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-arcnet.c,v 1.15.2.1 2003-11-15 22:28:39 guy Exp $ (LBL)";
 #endif
 static int arcnet_encap_print(u_char arctype, const u_char *p,
     u_int length, u_int caplen);

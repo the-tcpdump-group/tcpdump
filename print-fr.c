@@ -37,7 +37,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.18 2003-11-15 00:39:22 guy Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.17.2.1 2003-11-15 22:28:49 guy Exp $ (LBL)";
 #endif
 static void lmi_print(const u_char *, u_int);
 

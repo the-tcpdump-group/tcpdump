@@ -56,7 +56,7 @@ extern char *strsep(char **stringp, const char *delim); /* Missing/strsep.c */
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.45 2003-11-15 00:39:22 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.44.2.1 2003-11-15 22:28:48 guy Exp $ (LBL)";
 #endif
 #ifndef HAVE_SOCKADDR_STORAGE
 #ifdef INET6

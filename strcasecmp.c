@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/strcasecmp.c,v 1.5 2003-11-15 00:39:45 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/strcasecmp.c,v 1.4.2.1 2003-11-15 22:29:18 guy Exp $";
 #endif
 /*
  * This array is designed for mapping upper and lower case letter

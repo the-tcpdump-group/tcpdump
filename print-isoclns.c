@@ -43,7 +43,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.107 2003-11-15 00:39:29 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.106.2.1 2003-11-15 22:28:55 guy Exp $ (LBL)";
 #endif
 #define	NLPID_CLNS	129	/* 0x81 */
 #define	NLPID_ESIS	130	/* 0x82 */

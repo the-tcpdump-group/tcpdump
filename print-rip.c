@@ -35,7 +35,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rip.c,v 1.56 2003-11-15 00:39:37 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rip.c,v 1.55.2.1 2003-11-15 22:29:05 guy Exp $ (LBL)";
 #endif
 struct rip {
 	u_int8_t rip_cmd;		/* request/response */

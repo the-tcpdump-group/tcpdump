@@ -35,7 +35,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-timed.c,v 1.8 2003-11-15 00:39:42 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-timed.c,v 1.7.2.1 2003-11-15 22:29:14 guy Exp $";
 #endif
 static const char *tsptype[TSPTYPENUMBER] =
   { "ANY", "ADJTIME", "ACK", "MASTERREQ", "MASTERACK", "SETTIME", "MASTERUP",

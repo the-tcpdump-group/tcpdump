@@ -29,7 +29,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bfd.c,v 1.4 2003-11-15 00:39:16 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bfd.c,v 1.3.2.1 2003-11-15 22:28:42 guy Exp $";
 #endif
 #include "udp.h"
 

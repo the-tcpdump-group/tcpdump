@@ -48,7 +48,7 @@ struct rtentry;
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sunatm.c,v 1.6 2003-11-15 00:39:41 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sunatm.c,v 1.5.2.1 2003-11-15 22:29:10 guy Exp $ (LBL)";
 #endif
 #include "atm.h"
 #include "atmuni31.h"

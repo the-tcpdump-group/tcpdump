@@ -28,7 +28,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-  "@(#) $Header: /tcpdump/master/tcpdump/print-beep.c,v 1.5 2003-11-15 00:39:16 guy Exp $";
+  "@(#) $Header: /tcpdump/master/tcpdump/print-beep.c,v 1.4.2.1 2003-11-15 22:28:41 guy Exp $";
 #endif
 /* Check for a string but not go beyond length
  * Return TRUE on match, FALSE otherwise

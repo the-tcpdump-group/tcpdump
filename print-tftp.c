@@ -42,7 +42,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tftp.c,v 1.36 2003-11-15 00:39:42 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tftp.c,v 1.35.2.1 2003-11-15 22:29:13 guy Exp $ (LBL)";
 #endif
 /* op code to string mapping */
 static struct tok op2str[] = {

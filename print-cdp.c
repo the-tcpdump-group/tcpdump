@@ -40,7 +40,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.20 2003-11-15 00:39:17 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.19.2.1 2003-11-15 22:28:43 guy Exp $";
 #endif
 #define CDP_HEADER_LEN  4
 

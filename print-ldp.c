@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.5 2003-11-15 00:39:30 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.4.2.1 2003-11-15 22:28:57 guy Exp $";
 #endif
 /*
  * ldp common header

@@ -35,7 +35,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/vfprintf.c,v 1.5 2003-11-15 00:39:46 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/vfprintf.c,v 1.4.8.1 2003-11-15 22:29:20 guy Exp $ (LBL)";
 #endif
 /*
  * Stock 4.3 doesn't have vfprintf.

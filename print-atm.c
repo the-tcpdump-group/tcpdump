@@ -39,7 +39,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.34 2003-11-15 00:39:16 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.33.2.1 2003-11-15 22:28:41 guy Exp $ (LBL)";
 #endif
 #include "ether.h"
 

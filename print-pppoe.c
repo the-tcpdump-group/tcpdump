@@ -40,7 +40,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.26 2003-11-15 01:02:02 guy Exp $ (LBL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.24.2.1 2003-11-15 22:29:04 guy Exp $ (LBL)";
 #endif
 /* Codes */
 enum {
@@ -196,7 +196,7 @@ pppoe_print(register const u_char *bp, u_int length)
 					/* Print hex, not fast to abuse printf but this doesn't get used much */
 					printf(" [%s 0x", tok2str(pppoetag2str, "TAG-0x%x", tag_type));
 					for (v=p; v<p+tag_len; v++) {
-						printf("%02X", *v);
+						printf("%02.2X", *v);
 					}
 					printf("]");
 				}

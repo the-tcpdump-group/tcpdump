@@ -34,7 +34,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-vjc.c,v 1.12 2003-11-15 00:39:43 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-vjc.c,v 1.11.2.1 2003-11-15 22:29:16 guy Exp $ (LBL)";
 #endif
 #include "slcompress.h"
 #include "ppp.h"

@@ -54,7 +54,7 @@
 #ifdef INET6
 #ifndef lint
 static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-sctp.c,v 1.14 2003-11-15 00:39:39 guy Exp $ (NETLAB/PEL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-sctp.c,v 1.13.2.1 2003-11-15 22:29:07 guy Exp $ (NETLAB/PEL)";
 #endif
 #include "ip6.h"
 #endif

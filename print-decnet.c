@@ -44,7 +44,7 @@ struct rtentry;
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-decnet.c,v 1.37 2003-11-15 00:39:19 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-decnet.c,v 1.36.2.1 2003-11-15 22:28:46 guy Exp $ (LBL)";
 #endif
 /* Forwards */
 static void print_decnet_ctlmsg(const union routehdr *, u_int);

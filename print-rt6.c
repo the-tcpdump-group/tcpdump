@@ -38,7 +38,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rt6.c,v 1.24 2003-11-15 00:39:38 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rt6.c,v 1.23.2.1 2003-11-15 22:29:06 guy Exp $";
 #endif
 int
 rt6_print(register const u_char *bp, register const u_char *bp2)

@@ -51,7 +51,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-mobile.c,v 1.13 2003-11-15 00:39:31 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-mobile.c,v 1.12.2.1 2003-11-15 22:28:58 guy Exp $";
 #endif
 #define MOBILE_SIZE (8)
 

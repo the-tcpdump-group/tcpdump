@@ -54,7 +54,7 @@ struct rtentry;		/* declarations in <net/if.h> */
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.97 2003-11-15 00:39:12 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.96.2.1 2003-11-15 22:28:35 guy Exp $ (LBL)";
 #endif
 /*
  * hash tables for whatever-to-name translations

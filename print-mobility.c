@@ -45,7 +45,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-mobility.c,v 1.10 2003-11-15 00:39:31 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-mobility.c,v 1.9.2.1 2003-11-15 22:28:59 guy Exp $";
 #endif
 /* Mobility header */
 struct ip6_mobility {

@@ -37,7 +37,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-arp.c,v 1.62 2003-11-15 00:39:15 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-arp.c,v 1.61.2.1 2003-11-15 22:28:39 guy Exp $ (LBL)";
 #endif
 /*
  * Address Resolution Protocol.

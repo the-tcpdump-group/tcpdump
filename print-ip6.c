@@ -38,7 +38,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.33 2003-11-15 00:39:27 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.32.2.1 2003-11-15 22:28:53 guy Exp $";
 #endif
 #include "ip6.h"
 #include "ipproto.h"

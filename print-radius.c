@@ -59,7 +59,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "$Id: print-radius.c,v 1.20 2003-11-15 00:39:37 guy Exp $";
+    "$Id: print-radius.c,v 1.19.2.1 2003-11-15 22:29:04 guy Exp $";
 #endif
 #define TAM_SIZE(x) (sizeof(x)/sizeof(x[0]) )
 

@@ -40,7 +40,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-netbios.c,v 1.19 2003-11-15 00:39:33 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-netbios.c,v 1.18.2.1 2003-11-15 22:29:00 guy Exp $";
 #endif
 /*
  * Print NETBIOS packets.

@@ -38,7 +38,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lane.c,v 1.21 2003-11-15 00:39:30 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lane.c,v 1.20.2.1 2003-11-15 22:28:57 guy Exp $ (LBL)";
 #endif
 static const struct tok lecop2str[] = {
 	{ 0x0001,	"configure request" },

@@ -52,7 +52,7 @@ IN6_ADDR_EQUAL(const struct in6_addr *a, const struct in6_addr *b)
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ripng.c,v 1.16 2003-11-15 00:39:37 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ripng.c,v 1.15.2.1 2003-11-15 22:29:05 guy Exp $";
 #endif
 static int
 rip6_entry_print(register const struct netinfo6 *ni, int metric)

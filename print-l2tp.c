@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-l2tp.c,v 1.15 2003-11-15 00:39:30 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-l2tp.c,v 1.14.2.1 2003-11-15 22:28:57 guy Exp $";
 #endif
 static char tstr[] = " [|l2tp]";
 

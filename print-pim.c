@@ -55,7 +55,7 @@ struct pim {
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.38 2003-11-15 00:39:35 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.37.2.1 2003-11-15 22:29:02 guy Exp $ (LBL)";
 #endif
 #include "ip.h"
 

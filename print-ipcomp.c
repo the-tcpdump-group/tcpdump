@@ -45,7 +45,7 @@ struct ipcomp {
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ipcomp.c,v 1.18 2003-11-15 00:39:28 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ipcomp.c,v 1.17.2.1 2003-11-15 22:28:54 guy Exp $";
 #endif
 int
 ipcomp_print(register const u_char *bp, int *nhdr)

@@ -43,7 +43,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/missing/dlnames.c,v 1.3 2003-11-15 00:39:47 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/missing/dlnames.c,v 1.2.2.1 2003-11-15 22:29:20 guy Exp $ (LBL)";
 #endif
 
 #include <pcap.h>

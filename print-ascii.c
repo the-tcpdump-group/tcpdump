@@ -47,7 +47,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-ascii.c,v 1.11 2003-11-15 00:39:15 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-ascii.c,v 1.10.2.1 2003-11-15 22:28:40 guy Exp $";
 #endif
 #define ASCII_LINELENGTH 300
 #define HEXDUMP_BYTES_PER_LINE 16

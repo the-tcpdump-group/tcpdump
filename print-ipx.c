@@ -40,7 +40,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ipx.c,v 1.35 2003-11-15 00:39:28 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ipx.c,v 1.34.2.1 2003-11-15 22:28:54 guy Exp $";
 #endif
 
 static const char *ipxaddr_string(u_int32_t, const u_char *);

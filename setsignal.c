@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/setsignal.c,v 1.10 2003-11-15 00:39:45 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/setsignal.c,v 1.9.2.1 2003-11-15 22:29:17 guy Exp $ (LBL)";
 #endif
 
 #include <signal.h>

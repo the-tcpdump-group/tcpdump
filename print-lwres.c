@@ -45,7 +45,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lwres.c,v 1.11 2003-11-15 00:39:31 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lwres.c,v 1.10.2.1 2003-11-15 22:28:58 guy Exp $ (LBL)";
 #endif
 /* BIND9 lib/lwres/include/lwres */
 typedef u_int32_t lwres_uint32_t;

@@ -38,7 +38,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-igrp.c,v 1.19 2003-11-15 00:39:26 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-igrp.c,v 1.18.2.1 2003-11-15 22:28:52 guy Exp $ (LBL)";
 #endif
 static void
 igrp_entry_print(register struct igrprte *igr, register int is_interior,
