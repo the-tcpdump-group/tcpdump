@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.71 2002-12-11 07:14:01 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.72 2003-05-15 16:58:04 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -260,7 +260,7 @@ struct id_rdiscovery {
 };
 
 void
-icmp_print(const u_char *bp, u_int plen, const u_char *bp2)
+icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
 {
 	char *cp;
 	const struct icmp *dp;
@@ -476,7 +476,7 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2)
 		break;
 	}
 	(void)printf("icmp %d: %s", plen, str);
-	if (vflag) {
+	if (vflag && !fragmented) { /* don't attempt checksumming if this is a frag */
 		u_int16_t sum, icmp_sum;
 		if (TTEST2(*bp, plen)) {
 			sum = in_cksum((u_short*)dp, plen, 0);
