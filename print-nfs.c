@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.88 2001-07-04 19:24:10 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.89 2001-07-08 08:01:43 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1205,7 +1205,7 @@ parserddires(const u_int32_t *dp)
 	int er;
 
 	dp = parsestatus(dp, &er);
-	if (dp == 0 || er)
+	if (dp == NULL || er)
 		return (0);
 	if (qflag)
 		return (1);
