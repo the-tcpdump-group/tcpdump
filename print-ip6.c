@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.32.2.6 2003-11-19 06:17:36 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.32.2.7 2003-11-19 06:31:10 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -67,7 +67,8 @@ ip6_print(register const u_char *bp, register u_int length)
 		return;
 	}
 
-	len = EXTRACT_16BITS(&ip6->ip6_plen) + sizeof(struct ip6_hdr);
+	payload_len = EXTRACT_16BITS(&ip6->ip6_plen);
+	len = payload_len + sizeof(struct ip6_hdr);
 	if (length < len)
 		(void)printf("truncated-ip6 - %d bytes missing!",
 			len - length);
@@ -80,12 +81,11 @@ ip6_print(register const u_char *bp, register u_int length)
 		snapend = ipend;
 
 	cp = (const u_char *)ip6;
-	payload_len = len;
 	advance = sizeof(struct ip6_hdr);
 	nh = ip6->ip6_nxt;
 	while (cp < snapend && advance > 0) {
 		cp += advance;
-		payload_len -= advance;
+		len -= advance;
 
 		if (cp == (const u_char *)(ip6 + 1) &&
 		    nh != IPPROTO_TCP && nh != IPPROTO_UDP &&
@@ -124,19 +124,16 @@ ip6_print(register const u_char *bp, register u_int length)
 			nh = *cp;
 			break;
 		case IPPROTO_SCTP:
-			sctp_print(cp, (const u_char *)ip6, payload_len);
+			sctp_print(cp, (const u_char *)ip6, len);
 			goto end;
 		case IPPROTO_TCP:
-			tcp_print(cp, payload_len, (const u_char *)ip6,
-			    fragmented);
+			tcp_print(cp, len, (const u_char *)ip6, fragmented);
 			goto end;
 		case IPPROTO_UDP:
-			udp_print(cp, payload_len, (const u_char *)ip6,
-			    fragmented);
+			udp_print(cp, len, (const u_char *)ip6, fragmented);
 			goto end;
 		case IPPROTO_ICMPV6:
-			icmp6_print(cp, payload_len, (const u_char *)ip6,
-			    fragmented);
+			icmp6_print(cp, len, (const u_char *)ip6, fragmented);
 			goto end;
 		case IPPROTO_AH:
 			advance = ah_print(cp);
@@ -159,18 +156,18 @@ ip6_print(register const u_char *bp, register u_int length)
 		    }
 
 		case IPPROTO_PIM:
-			pim_print(cp, payload_len);
+			pim_print(cp, len);
 			goto end;
 		case IPPROTO_OSPF:
-			ospf6_print(cp, payload_len);
+			ospf6_print(cp, len);
 			goto end;
 
 		case IPPROTO_IPV6:
-			ip6_print(cp, payload_len);
+			ip6_print(cp, len);
 			goto end;
 
 		case IPPROTO_IPV4:
-			ip_print(cp, payload_len);
+			ip_print(cp, len);
 			goto end;
 
 		case IPPROTO_NONE:
@@ -178,8 +175,7 @@ ip6_print(register const u_char *bp, register u_int length)
 			goto end;
 
 		default:
-			(void)printf("ip-proto-%d %d", ip6->ip6_nxt,
-			    payload_len);
+			(void)printf("ip-proto-%d %d", ip6->ip6_nxt, len);
 			goto end;
 		}
 	}
@@ -202,11 +198,11 @@ ip6_print(register const u_char *bp, register u_int length)
 #endif
 
 	if (ip6->ip6_hlim <= 1)
-		(void)printf(" [hlim %d]", (int)ip6->ip6_hlim);
+		(void)printf(" [hlim %u]", ip6->ip6_hlim);
 
 	if (vflag) {
 		printf(" (");
-		(void)printf("len %d", len);
+		(void)printf("len %u", payload_len);
 		if (ip6->ip6_hlim > 1)
 			(void)printf(", hlim %d", (int)ip6->ip6_hlim);
 		printf(")");
