@@ -27,6 +27,8 @@ config.h.in
 config.sub
 configure
 configure.in
+cpack.c
+cpack.h
 decnet.h
 decode_prefix.h
 enc.h
@@ -41,12 +43,14 @@ gmt2local.c
 gmt2local.h
 icmp6.h
 ieee802_11.h
+ieee802_11_radio.h
 igrp.h
 install-sh
 interface.h
 ip.h
 ip6.h
 ipfc.h
+ipproto.c
 ipproto.h
 ipsec_doi.h
 ipx.h
@@ -86,8 +90,11 @@ mkdep
 mpls.h
 nameser.h
 netbios.h
+netdissect.h
 nfs.h
 nfsfh.h
+nlpid.c
+nlpid.h
 ntp.h
 oakley.h
 ospf.h
@@ -97,6 +104,7 @@ oui.h
 packetdat.awk
 parsenfsfh.c
 pcap-missing.h
+pf.h
 ppp.h
 print-802_11.c
 print-ah.c
@@ -119,6 +127,7 @@ print-decnet.c
 print-dhcp6.c
 print-domain.c
 print-dvmrp.c
+print-eap.c
 print-egp.c
 print-enc.c
 print-esp.c
@@ -172,6 +181,7 @@ print-rsvp.c
 print-rt6.c
 print-rx.c
 print-sctp.c
+print-sip.c
 print-sl.c
 print-sll.c
 print-smb.c
