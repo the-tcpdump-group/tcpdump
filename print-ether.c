@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.66 2001-11-25 02:01:47 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.65.4.1 2002-06-01 23:51:12 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -30,9 +30,6 @@ static const char rcsid[] =
 #include <sys/param.h>
 #include <sys/time.h>
 #include <sys/socket.h>
-
-struct mbuf;
-struct rtentry;
 
 #include <netinet/in.h>
 
@@ -194,7 +191,6 @@ ether_encap_print(u_short ethertype, const u_char *p,
 		return (1);
 
 	case ETHERTYPE_IPX:
-		printf("(NOV-ETHII) ");
 		ipx_print(p, length);
 		return (1);
 
