@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.96 2003-09-08 16:18:06 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.97 2003-10-21 23:02:41 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -155,14 +155,14 @@ static struct tok isis_tlv_values[] = {
     { TLV_IS_ALIAS_ID,       "IS Alias ID"},
     { TLV_DECNET_PHASE4,     "DECnet Phase IV"},
     { TLV_LUCENT_PRIVATE,    "Lucent Proprietary"},
-    { TLV_IP_REACH,          "IPv4 Internal reachability"},
+    { TLV_IP_REACH,          "IPv4 Internal Reachability"},
     { TLV_PROTOCOLS,         "Protocols supported"},
-    { TLV_IP_REACH_EXT,      "IPv4 External reachability"},
+    { TLV_IP_REACH_EXT,      "IPv4 External Reachability"},
     { TLV_IDRP_INFO,         "Inter-Domain Information Type"},
     { TLV_IPADDR,            "IPv4 Interface address(es)"},
     { TLV_IPAUTH,            "IPv4 authentication (deprecated)"},
     { TLV_TE_ROUTER_ID,      "Traffic Engineering Router ID"},
-    { TLV_EXT_IP_REACH,      "Extended IPv4 reachability"},
+    { TLV_EXT_IP_REACH,      "Extended IPv4 Reachability"},
     { TLV_HOSTNAME,          "Hostname"},
     { TLV_SHARED_RISK_GROUP, "Shared Risk Link Group"},
     { TLV_NORTEL_PRIVATE1,   "Nortel Proprietary"},
@@ -172,9 +172,9 @@ static struct tok isis_tlv_values[] = {
     { TLV_MT_IS_REACH,       "Multi Topology IS Reachability"},
     { TLV_MT_SUPPORTED,      "Multi Topology"},
     { TLV_IP6ADDR,           "IPv6 Interface address(es)"},
-    { TLV_MT_IP_REACH,       "Multi-Topology IPv4 reachability"},
+    { TLV_MT_IP_REACH,       "Multi-Topology IPv4 Reachability"},
     { TLV_IP6_REACH,         "IPv6 reachability"},
-    { TLV_MT_IP6_REACH,      "Multi-Topology IP6 reachability"},
+    { TLV_MT_IP6_REACH,      "Multi-Topology IP6 Reachability"},
     { TLV_PTP_ADJ,           "Point-to-point Adjacency State"},
     { TLV_IIH_SEQNR,         "Hello PDU Sequence Number"},
     { TLV_VENDOR_PRIVATE,    "Vendor Private"},
@@ -745,7 +745,7 @@ isis_print_tlv_ip_reach (const u_int8_t *cp, const char *ident, int length)
 
 	while (length > 0) {
 		if ((size_t)length < sizeof(*tlv_ip_reach)) {
-			printf("short IPv4 reachability (%d vs %lu)",
+			printf("short IPv4 Reachability (%d vs %lu)",
                                length,
                                (unsigned long)sizeof(*tlv_ip_reach));
 			return (0);
@@ -805,7 +805,7 @@ static int
 isis_print_ip_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *ident) {
 
         /* first lets see if we know the subTLVs name*/
-	printf("%s%s (subTLV #%u), length: %u",
+	printf("%s%s subTLV #%u, length: %u",
 	       ident,
                tok2str(isis_ext_ip_reach_subtlv_values,
                        "unknown",
@@ -1259,7 +1259,10 @@ static int isis_print (const u_int8_t *p, u_int length)
     /* ok they seem to want to know everything - lets fully decode it */
     printf(", IS-IS, length: %u",length);
 
-    printf("\n\thlen: %u, v: %u, pdu-v: %u, sys-id-len: %u (%u), max-area: %u (%u)",
+    printf("\n\t%s, hlen: %u, v: %u, pdu-v: %u, sys-id-len: %u (%u), max-area: %u (%u)",
+           tok2str(isis_pdu_values,
+                   "unknown, type %u",
+                   pdu_type),
            header->fixed_len,
            header->version,
            header->pdu_version,
@@ -1267,12 +1270,6 @@ static int isis_print (const u_int8_t *p, u_int length)
 	   header->id_length,
            max_area,
            header->max_area);
-
-    /* first lets see if we know the PDU name*/
-    printf(", pdu-type: %s",
-           tok2str(isis_pdu_values,
-                   "unknown, type %u",
-                   pdu_type));
 
     if (vflag > 1) {
         if(!print_unknown_data(optr,"\n\t",8)) /* provide the _o_riginal pointer */
