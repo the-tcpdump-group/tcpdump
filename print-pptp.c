@@ -22,6 +22,10 @@
  */
 
 
+#ifndef lint
+static const char rcsid[] _U_ =
+     "@(#) $Header: /tcpdump/master/tcpdump/print-pptp.c,v 1.11 2003-11-16 09:36:33 guy Exp $";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -34,10 +38,6 @@
 #include "interface.h"
 #include "extract.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-pptp.c,v 1.10 2003-11-15 00:39:36 guy Exp $";
-#endif
 static char tstr[] = " [|pptp]";
 
 #ifndef TRUE

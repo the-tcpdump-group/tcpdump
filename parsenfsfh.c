@@ -40,6 +40,10 @@
  * Western Research Laboratory
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/parsenfsfh.c,v 1.27 2003-11-16 09:36:11 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -53,10 +57,6 @@
 #include "interface.h"
 #include "nfsfh.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/parsenfsfh.c,v 1.26 2003-11-15 00:39:13 guy Exp $ (LBL)";
-#endif
 /*
  * This routine attempts to parse a file handle (in network byte order),
  * using heuristics to guess what kind of format it is in.  See the

@@ -17,7 +17,7 @@
 #  WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 #  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.276 2003-10-27 10:13:45 hannes Exp $ (LBL)
+# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.277 2003-11-16 09:36:07 guy Exp $ (LBL)
 
 #
 # Various configurable paths (remember to edit Makefile.in, not Makefile)
@@ -43,7 +43,7 @@ CC = @CC@
 PROG = tcpdump
 CCOPT = @V_CCOPT@
 INCLS = -I. @V_INCLS@
-DEFS = @DEFS@
+DEFS = @DEFS@ @V_DEFS@
 
 # Standard CFLAGS
 CFLAGS = $(CCOPT) $(DEFS) $(INCLS)

@@ -21,6 +21,10 @@
  * L2TP support contributed by Motonori Shindo (mshindo@mshindo.net)
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-l2tp.c,v 1.16 2003-11-16 09:36:26 guy Exp $";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -34,10 +38,6 @@
 #include "interface.h"
 #include "extract.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-l2tp.c,v 1.15 2003-11-15 00:39:30 guy Exp $";
-#endif
 static char tstr[] = " [|l2tp]";
 
 #ifndef TRUE

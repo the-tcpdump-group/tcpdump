@@ -32,6 +32,10 @@
  * Ken Hornstein <kenh@cmf.nrl.navy.mil>
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.37 2003-11-16 09:36:36 guy Exp $";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -46,10 +50,6 @@
 #include "addrtoname.h"
 #include "extract.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.36 2003-11-15 00:39:38 guy Exp $";
-#endif
 #include "rx.h"
 
 #include "ip.h"

@@ -32,6 +32,10 @@
 
 /* Cisco NetFlow protocol */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cnfp.c,v 1.16 2003-11-16 09:36:16 guy Exp $";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -46,10 +50,6 @@
 #include "addrtoname.h"
 #include "extract.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cnfp.c,v 1.15 2003-11-15 00:39:18 guy Exp $";
-#endif
 #include "tcp.h"
 #include "ipproto.h"
 

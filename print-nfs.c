@@ -19,6 +19,10 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.101 2003-11-16 09:36:30 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -36,10 +40,6 @@
 #include "addrtoname.h"
 #include "extract.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.100 2003-11-15 00:39:33 guy Exp $ (LBL)";
-#endif
 #include "nfs.h"
 #include "nfsfh.h"
 

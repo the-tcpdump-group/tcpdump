@@ -19,6 +19,10 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.126 2003-11-16 09:36:41 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -41,10 +45,6 @@
 #include "extract.h"
 #include "appletalk.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.125 2003-11-15 00:39:43 guy Exp $ (LBL)";
-#endif
 #include "udp.h"
 
 #include "ip.h"

@@ -49,6 +49,10 @@
 #include "config.h"
 #endif
 
+#ifndef lint
+static const char rcsid[] _U_ =
+     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.23 2003-11-16 09:36:39 guy Exp $";
+#endif
 
 #include <tcpdump-stdinc.h>
 
@@ -59,10 +63,6 @@
 #include "interface.h"
 #include "addrtoname.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.22 2003-11-15 00:39:42 guy Exp $";
-#endif
 #define TELCMDS
 #define TELOPTS
 #include "telnet.h"

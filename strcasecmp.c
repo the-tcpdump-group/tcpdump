@@ -14,15 +14,15 @@
 #include "config.h"
 #endif
 
+#ifndef lint
+static const char rcsid[] _U_ =
+     "@(#) $Header: /tcpdump/master/tcpdump/strcasecmp.c,v 1.6 2003-11-16 09:36:43 guy Exp $";
+#endif
 
 #include <tcpdump-stdinc.h>
 
 #include "interface.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/strcasecmp.c,v 1.5 2003-11-15 00:39:45 guy Exp $";
-#endif
 /*
  * This array is designed for mapping upper and lower case letter
  * together for a case independent comparison.  The mappings are

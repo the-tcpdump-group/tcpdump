@@ -36,6 +36,10 @@
  * RFC1701 (GRE), RFC1702 (GRE IPv4), and RFC2637 (Enhanced GRE)
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-gre.c,v 1.24 2003-11-16 09:36:21 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -50,10 +54,6 @@
 #include "addrtoname.h"
 #include "extract.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-gre.c,v 1.23 2003-11-15 00:39:23 guy Exp $ (LBL)";
-#endif
 #include "ip.h"
 
 #define	GRE_CP		0x8000		/* checksum present */

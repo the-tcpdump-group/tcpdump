@@ -49,14 +49,9 @@
 #include <config.h>
 #endif
 
-#include "tcpdump-stdinc.h"
-
-#include "interface.h"
-
-
 #ifndef lint
-static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/missing/getaddrinfo.c,v 1.12 2003-11-15 00:39:47 guy Exp $";
+static const char rcsid[] _U_ =
+     "@(#) $Header: /tcpdump/master/tcpdump/missing/getaddrinfo.c,v 1.13 2003-11-16 09:36:48 guy Exp $";
 #endif
 
 #include <sys/types.h>

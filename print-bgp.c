@@ -34,6 +34,10 @@
 #include "config.h"
 #endif
 
+#ifndef lint
+static const char rcsid[] _U_ =
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.74 2003-11-16 09:36:15 guy Exp $";
+#endif
 
 #include <tcpdump-stdinc.h>
 
@@ -44,10 +48,6 @@
 #include "addrtoname.h"
 #include "extract.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.73 2003-11-15 00:39:17 guy Exp $";
-#endif
 struct bgp {
 	u_int8_t bgp_marker[16];
 	u_int16_t bgp_len;

@@ -18,6 +18,10 @@
  * PURPOSE.
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-zephyr.c,v 1.8 2003-11-16 09:36:42 guy Exp $";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -31,10 +35,6 @@
 
 #include "interface.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-zephyr.c,v 1.7 2003-11-15 00:39:44 guy Exp $";
-#endif
 struct z_packet {
     char *version;
     int numfields;

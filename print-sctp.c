@@ -33,6 +33,10 @@
  * SUCH DAMAGE.
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+"@(#) $Header: /tcpdump/master/tcpdump/print-sctp.c,v 1.15 2003-11-16 09:36:36 guy Exp $ (NETLAB/PEL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -52,10 +56,6 @@
 #include "extract.h"			/* must come after interface.h */
 #include "ip.h"
 #ifdef INET6
-#ifndef lint
-static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-sctp.c,v 1.14 2003-11-15 00:39:39 guy Exp $ (NETLAB/PEL)";
-#endif
 #include "ip6.h"
 #endif
 

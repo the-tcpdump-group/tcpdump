@@ -19,6 +19,10 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rt6.c,v 1.25 2003-11-16 09:36:35 guy Exp $";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -36,10 +40,6 @@
 #include "addrtoname.h"
 #include "extract.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rt6.c,v 1.24 2003-11-15 00:39:38 guy Exp $";
-#endif
 int
 rt6_print(register const u_char *bp, register const u_char *bp2)
 {

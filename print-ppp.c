@@ -29,6 +29,10 @@
  * o BAP support
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.91 2003-11-16 09:36:32 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -51,10 +55,6 @@
 #include "chdlc.h"
 #include "ethertype.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.90 2003-11-15 00:39:36 guy Exp $ (LBL)";
-#endif
 /*
  * The following constatns are defined by IANA. Please refer to
  *    http://www.isi.edu/in-notes/iana/assignments/ppp-numbers

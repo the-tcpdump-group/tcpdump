@@ -21,6 +21,10 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pflog.c,v 1.9 2003-11-16 09:36:32 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -34,10 +38,6 @@
 #include "interface.h"
 #include "addrtoname.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pflog.c,v 1.8 2003-11-15 00:39:35 guy Exp $ (LBL)";
-#endif
 /* The header in OpenBSD pflog files. */
 
 struct pfloghdr {

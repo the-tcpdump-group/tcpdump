@@ -26,6 +26,10 @@
  * SUCH DAMAGE.
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-mpls.c,v 1.10 2003-11-16 09:36:29 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -41,10 +45,6 @@
 #include "interface.h"
 #include "extract.h"			/* must come after interface.h */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-mpls.c,v 1.9 2003-11-15 00:39:32 guy Exp $ (LBL)";
-#endif
 #define LABEL_MASK	0xfffff000
 #define LABEL_SHIFT	12
 #define	EXP_MASK	0x00000e00

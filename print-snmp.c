@@ -56,6 +56,10 @@
  #	@(#)snmp.awk.x	1.1 (LANL) 1/15/90
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.58 2003-11-16 09:36:38 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -73,10 +77,6 @@
 #include "interface.h"
 #include "addrtoname.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.57 2003-11-15 00:39:40 guy Exp $ (LBL)";
-#endif
 /*
  * Universal ASN.1 types
  * (we only care about the tag values for those allowed in the Internet SMI)

@@ -20,6 +20,10 @@
  *
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cip.c,v 1.23 2003-11-16 09:36:16 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -37,10 +41,6 @@
 #include "ethertype.h"
 #include "ether.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cip.c,v 1.22 2003-11-15 00:39:18 guy Exp $ (LBL)";
-#endif
 #define RFC1483LLC_LEN	8
 
 static unsigned char rfcllc[] = {

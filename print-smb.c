@@ -10,6 +10,10 @@
 #include "config.h"
 #endif
 
+#ifndef lint
+static const char rcsid[] _U_ =
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.29 2003-11-16 09:36:37 guy Exp $";
+#endif
 
 #include <tcpdump-stdinc.h>
 
@@ -20,10 +24,6 @@
 #include "extract.h"
 #include "smb.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.28 2003-11-15 00:39:40 guy Exp $";
-#endif
 static int request = 0;
 
 const u_char *startbuf = NULL;

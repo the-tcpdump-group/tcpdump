@@ -21,6 +21,10 @@
  * Original code by Greg Stark <gsstark@mit.edu> 
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.27 2003-11-16 09:36:33 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -38,10 +42,6 @@
 #include "ether.h"
 #include "extract.h"			/* must come after interface.h */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.26 2003-11-15 01:02:02 guy Exp $ (LBL)";
-#endif
 /* Codes */
 enum {
 	PPPOE_PADI = 0x09,

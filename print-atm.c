@@ -18,6 +18,10 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.35 2003-11-16 09:36:13 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -37,10 +41,6 @@
 #include "atmuni31.h"
 #include "llc.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.34 2003-11-15 00:39:16 guy Exp $ (LBL)";
-#endif
 #include "ether.h"
 
 /*

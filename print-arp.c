@@ -19,6 +19,10 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-arp.c,v 1.63 2003-11-16 09:36:12 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -35,10 +39,6 @@
 #include "ethertype.h"
 #include "extract.h"			/* must come after interface.h */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-arp.c,v 1.62 2003-11-15 00:39:15 guy Exp $ (LBL)";
-#endif
 /*
  * Address Resolution Protocol.
  *

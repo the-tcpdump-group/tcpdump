@@ -19,6 +19,10 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-wb.c,v 1.32 2003-11-16 09:36:42 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -32,10 +36,6 @@
 #include "addrtoname.h"
 #include "extract.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-wb.c,v 1.31 2003-11-15 00:39:44 guy Exp $ (LBL)";
-#endif
 /* XXX need to add byte-swapping macros! */
 /* XXX - you mean like the ones in "extract.h"? */
 

@@ -19,6 +19,10 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-raw.c,v 1.41 2003-11-16 09:36:34 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -33,10 +37,6 @@
 #include "addrtoname.h"
 #include "interface.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-raw.c,v 1.40 2003-11-15 00:39:37 guy Exp $ (LBL)";
-#endif
 /*
  * The DLT_RAW packet has no header. It contains a raw IP packet.
  */

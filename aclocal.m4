@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.98 2003-11-04 07:29:15 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.99 2003-11-16 09:36:08 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -1193,6 +1193,9 @@ ac_cv___attribute__=yes,
 ac_cv___attribute__=no)])
 if test "$ac_cv___attribute__" = "yes"; then
   AC_DEFINE(HAVE___ATTRIBUTE__, 1, [define if your compiler has __attribute__])
+  V_DEFS="$V_DEFS -D_U_=\"__attribute__((unused))\""
+else
+  V_DEFS="$V_DEFS -D_U_=\"\""
 fi
 AC_MSG_RESULT($ac_cv___attribute__)
 ])

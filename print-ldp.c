@@ -13,6 +13,10 @@
  * Original code by Hannes Gredler (hannes@juniper.net)
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.6 2003-11-16 09:36:27 guy Exp $";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -28,10 +32,6 @@
 #include "extract.h"
 #include "addrtoname.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.5 2003-11-15 00:39:30 guy Exp $";
-#endif
 /*
  * ldp common header
  *

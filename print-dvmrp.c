@@ -19,6 +19,10 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dvmrp.c,v 1.26 2003-11-16 09:36:19 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -34,10 +38,6 @@
 #include "extract.h"
 #include "addrtoname.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dvmrp.c,v 1.25 2003-11-15 00:39:20 guy Exp $ (LBL)";
-#endif
 /*
  * DVMRP message types and flag values shamelessly stolen from
  * mrouted/dvmrp.h.

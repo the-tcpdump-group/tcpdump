@@ -21,6 +21,10 @@
  * OSPF support contributed by Jeffrey Honig (jch@mitchell.cit.cornell.edu)
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.47 2003-11-16 09:36:31 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -35,10 +39,6 @@
 #include "extract.h"
 #include "gmpls.h"
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.46 2003-11-15 00:39:34 guy Exp $ (LBL)";
-#endif
 #include "ospf.h"
 
 #include "ip.h"
