@@ -105,6 +105,10 @@ SOURCE=..\Src\getopt.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\gmpls.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\gmt2local.c
 # End Source File
 # Begin Source File
@@ -134,6 +138,10 @@ SOURCE="..\..\print-802_11.c"
 # Begin Source File
 
 SOURCE="..\..\print-ah.c"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\print-aodv.c"
 # End Source File
 # Begin Source File
 
