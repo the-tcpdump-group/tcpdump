@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.95 2001-12-10 08:21:24 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.96 2002-07-21 20:56:24 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -393,12 +393,14 @@ tcp_print(register const u_char *bp, register u_int length,
 	}
 
 	if (IP_V(ip) == 4 && vflag && !fragmented) {
-		int sum;
+		u_int16_t sum, tcp_sum;
 		if (TTEST2(tp->th_sport, length)) {
 			sum = tcp_cksum(ip, tp, length);
-			if (sum != 0)
-				(void)printf(" [bad tcp cksum %x!]", sum);
-			else
+			if (sum != 0) {
+				tcp_sum = ntohs(tp->th_sum);
+				(void)printf(" [bad tcp cksum %x (->%x)!]",
+				    tcp_sum, in_cksum_shouldbe(tcp_sum, sum));
+			} else
 				(void)printf(" [tcp sum ok]");
 		}
 	}
