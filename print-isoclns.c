@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.39 2002-03-14 07:19:00 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.40 2002-03-19 10:49:44 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -620,6 +620,38 @@ isis_print_lspid(const u_char *cp)
 	printf("-%02x", *cp);
 }
 
+/*
+ *  this is a generic routine for printing unknown data;
+ *  as it is called from various places (TLV and subTLV parsing routines)
+ *  we pass on the linefeed plus indentation string to
+ *  get a proper output
+ */
+
+static int
+isis_print_unknown_data(const u_char *cp,const u_char *lf,int len)
+{
+        int i;
+	
+	printf("%s0x0000: ",lf);
+	for(i=0;i<len;i++) {
+	    if (!TTEST2(*(cp+i), 1))
+	      goto trunctlv;
+	    printf("%02x",*(cp+i));
+	    if (i%2)
+	        printf(" ");
+	    if (i/16!=(i+1)/16) {
+	        if (i<(len-1))
+		    printf("%s0x%04x: ",lf,i);
+	    }
+	}
+	return(0); /* everything is ok */
+
+trunctlv:
+    printf("%spacket exceeded snapshot",lf);
+    return(1);
+
+}
+
 static int
 isis_print_tlv_ip_reach (const u_char *cp, int length)
 {
@@ -976,6 +1008,8 @@ static int isis_print (const u_char *p, u_int length)
 
     default:
 	printf(", PDU type (0x%02x) not supported", pdu_type);
+	if(isis_print_unknown_data(pptr,"\n\t\t  ",length))
+	    return(1);	
 	return (1);
     }
 
@@ -1087,7 +1121,13 @@ static int isis_print (const u_char *p, u_int length)
                     goto trunctlv;
                 tslen=*(tptr++);
                 printf(", %ssub-TLVs present",tslen ? "" : "no ");
-   	
+		/* so far no decoding of subTLVs is supported
+		 * so lets print out a hexdump of the unknown subTLV data
+		 */
+		if(!tslen){
+		     if(isis_print_unknown_data(tptr,"\n\t\t\t    ",tslen))
+		          return(1);
+		}
                 tptr+=tslen;
                 tmp-=(13+tslen);
             }
@@ -1207,16 +1247,19 @@ static int isis_print (const u_char *p, u_int length)
 			    printf("\n\t\t\t  Interface Switching Capability:%s",
 				   tok2str(isis_gmpls_sw_cap_values, "Unknown", *(tptr++)));
 			    tptr++;
+			    subl--;
 
 			    if (!TTEST2(*tptr,1))
 			      goto trunctlv;
 			    printf(", LSP Encoding: %s",
 				   tok2str(isis_gmpls_lsp_enc_values, "Unknown", *(tptr++)));
 			    tptr++;
+			    subl--;
 
 			    if (!TTEST2(*tptr,2)) /* skip 2 res. bytes */
 			      goto trunctlv;
 			    tptr+=2;
+			    subl-=2;
 
 			    printf("\n\t\t\t  Max LSP Bandwidth:");
 			    for (i = 0; i < 8; i++) {
@@ -1227,9 +1270,14 @@ static int isis_print (const u_char *p, u_int length)
 			      printf("\n\t\t\t    priority level %d: %.3f Mbps",
 				     i, bw*8/1000000 );
 			      tptr+=4;
+			      subl-=4;
                             }
 			    /* there is some optional stuff left to decode but this is as of yet
-			       not specified */
+			       not specified so just lets hexdump what is left */
+			    if(!subl){
+			      if(isis_print_unknown_data(tptr,"\n\t\t\t    ",subl))
+			          return(1);
+			    }
 			    break;
                         case 250:
                         case 251:
@@ -1243,6 +1291,9 @@ static int isis_print (const u_char *p, u_int length)
                              break;                                 
                         default:
                             printf("unknown subTLV, type %d, length %d", subt, subl);
+			    if(isis_print_unknown_data(tptr,"\n\t\t\t    ",subl))
+			        return(1);
+			    break;
                         }	
 		    tptr+=subl;
 	            ttslen-=(subl+2);
@@ -1359,7 +1410,14 @@ static int isis_print (const u_char *p, u_int length)
 		if (ISIS_MASK_TLV_EXT_IP_SUBTLV(j)) {
 		    if (!TTEST2(*tptr, 1))
 		      return (1);		  
-		    printf(" (%u)",*tptr);  /* no subTLV decoder supported - just print out subTLV length */
+		    printf(" (%u)",*tptr);   /* print out subTLV length */	    
+
+		    /* so far no decoding of subTLVs is supported
+                     * so lets print out a hexdump of the unknown subTLV data
+		     */
+		    if(isis_print_unknown_data(tptr,"\n\t\t\t    ",*tptr))
+		      return(1);
+
 		    i-=*tptr;
 		    tptr = tptr + *tptr;
 		    tptr++;
@@ -1407,7 +1465,14 @@ static int isis_print (const u_char *p, u_int length)
 		if (ISIS_MASK_TLV_IP6_SUBTLV(j)) {
 		    if (!TTEST2(*tptr, 1))
 		      return (1);		  
-		    printf(" (%u)",*tptr); /* no subTLV decoder supported - just print out subTLV length */
+		    printf(" (%u)",*tptr);   /* print out subTLV length */	    
+
+		    /* so far no decoding of subTLVs is supported
+                     * so lets print out a hexdump of the unknown subTLV data
+		     */
+		    if(isis_print_unknown_tlv(tptr,"\n\t\t\t    ",*tptr))
+		      return(1);
+
 		    i-=*tptr;
 		    tptr = tptr + *tptr;
 		    tptr++;
@@ -1463,22 +1528,13 @@ static int isis_print (const u_char *p, u_int length)
 		break;
 	    case SUBTLV_AUTH_PRIVATE:
 		printf("\n\t\t\tRouting Domain private password: ");
-		tptr=pptr+1;
-		len--;
-		for(i=0;i<len;i++) {
-		    if (!TTEST2(*(tptr+i), 1))
-		        goto trunctlv;
-		    printf("%02x",*(tptr+i)); /* formatted hex output of unknown data */
-		    if (i%2)
-		        printf(" ");
-		    if (i/16!=(i+1)/16) {
-		       if (i<(len-1))
-		           printf("\n\t\t\t  ");
-		    }
-		}	
+		if(isis_print_unknown_data(pptr+1,"\n\t\t\t    ",len-1))
+		    return(1);	
 		break;
 	    default:
 	        printf("\n\t\t\tunknown Authentication method");
+		if(isis_print_unknown_data(pptr+1,"\n\t\t\t    ",len-1))
+		    return(1);	
 		break;
 	    }
 	    break;
@@ -1701,20 +1757,9 @@ static int isis_print (const u_char *p, u_int length)
 	    break;
 
 	default:
-	    printf("unknown TLV, type %d, length %d\n\t\t\t", type, len);
-	    tptr=pptr;
-
-	    for(i=0;i<len;i++) {
-		if (!TTEST2(*(tptr+i), 1))
-		    goto trunctlv;
-		printf("%02x",*(tptr+i)); /* formatted hex output of unknown TLV data */
-		if (i%2)
-		    printf(" ");
-		if (i/16!=(i+1)/16) {
-		  if (i<(len-1))
-		    printf("\n\t\t\t");
-		}
-	    }
+	    printf("unknown TLV, type %d, length %d", type, len);
+	    if(isis_print_unknown_data(pptr,"\n\t\t\t",len))
+	        return(1);
 	    break;
 	}
 
