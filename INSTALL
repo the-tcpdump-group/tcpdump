@@ -1,4 +1,4 @@
-@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.56 2003-08-06 06:49:39 guy Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.57 2003-12-15 02:38:32 guy Exp $ (LBL)
 
 If you have not built libpcap, do so first.  See the README
 file in this directory for the ftp location.
@@ -39,10 +39,10 @@ Please see "PLATFORMS" for notes about tested platforms.
 
 FILES
 -----
-CHANGES         - description of differences between releases
+CHANGES		- description of differences between releases
 CREDITS		- people that have helped tcpdump along
 FILES		- list of files exported as part of the distribution
-INSTALL         - this file
+INSTALL		- this file
 LICENSE		- the license under which tcpdump is distributed
 Makefile.in	- compilation rules (input to the configure script)
 README		- description of distribution
@@ -175,7 +175,7 @@ print-radius.c	- Radius protocol printer routines
 print-raw.c	- Raw IP printer routines
 print-rip.c	- Routing Information Protocol printer routines
 print-ripng.c	- IPv6 Routing Information Protocol printer routines
-print-rsvp.c    - Resource reSerVation Protocol (RSVP) printer routines
+print-rsvp.c	- Resource reSerVation Protocol (RSVP) printer routines
 print-rt6.c	- IPv6 routing header printer routines
 print-rx.c	- AFS RX printer routines
 print-sctp.c	- Stream Control Transmission Protocol printer routines
@@ -219,3 +219,4 @@ token.h		- Token Ring definitions
 udp.h		- UDP definitions
 util.c		- utility routines
 vfprintf.c	- emulation routine
+win32		- headers and routines for building on Win32 systems
