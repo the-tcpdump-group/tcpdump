@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-arcnet.c,v 1.4 2001-07-05 18:54:14 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-arcnet.c,v 1.5 2001-09-10 00:20:43 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -43,9 +43,6 @@ struct rtentry;
 
 #include "interface.h"
 #include "arcnet.h"
-
-const u_char *packetp;
-const u_char *snapend;
 
 int arcnet_encap_print(u_char arctype, const u_char *p,
     u_int length, u_int caplen);
