@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-gre.c,v 1.12 2001-03-13 01:03:17 fenner Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-gre.c,v 1.13 2001-06-15 22:17:31 fenner Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -88,6 +88,7 @@ gre_print(const u_char *bp, u_int length)
 	TCHECK(gre->proto);
 	flags = EXTRACT_16BITS(&gre->flags);
 	proto = EXTRACT_16BITS(&gre->proto);
+	(void)printf("gre ");
 
 	if (flags) {
 		/* Decode the flags */

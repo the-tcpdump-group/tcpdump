@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.27 2001-05-11 02:12:32 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.28 2001-06-15 22:17:34 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -416,11 +416,6 @@ static int pimv2_addr_len;
 enum pimv2_addrtype {
 	pimv2_unicast, pimv2_group, pimv2_source
 };
-#if 0
-static char *addrtypestr[] = {
-	"unicast", "group", "source"
-};
-#endif
 
 /*  0                   1                   2                   3
  *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1

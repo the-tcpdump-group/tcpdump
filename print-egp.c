@@ -20,7 +20,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-egp.c,v 1.26 2000-09-29 04:58:36 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-egp.c,v 1.27 2001-06-15 22:17:31 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -230,9 +230,7 @@ egp_print(register const u_char *bp, register u_int length,
 
 	egp = (struct egp_packet *)bp;
 	ip = (struct ip *)bp2;
-        (void)printf("%s > %s: egp: ",
-		     ipaddr_string(&ip->ip_src),
-		     ipaddr_string(&ip->ip_dst));
+	(void)printf("egp: ");
 
 	if (egp->egp_version != EGP_VERSION) {
 		printf("[version %d]", egp->egp_version);

@@ -42,7 +42,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-mobile.c,v 1.5 2000-09-29 04:58:43 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-mobile.c,v 1.6 2001-06-15 22:17:33 fenner Exp $";
 #endif
 
 #include <sys/param.h>
@@ -89,6 +89,7 @@ mobile_print(const u_char *bp, u_int length)
 		fputs("[|mobile]", stdout);
 		return;
 	}
+	fputs("mobile: ", stdout);
 
 	proto = EXTRACT_16BITS(&mob->proto);
 	crc =  EXTRACT_16BITS(&mob->hcheck);

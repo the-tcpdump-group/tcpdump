@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.54 2001-06-01 23:01:04 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.55 2001-06-15 22:17:32 fenner Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -122,10 +122,6 @@ icmp6_print(const u_char *bp, const u_char *bp2)
 	char buf[256];
 	int icmp6len, prot;
 
-#if 0
-#define TCHECK(var) if ((u_char *)&(var) > ep - sizeof(var)) goto trunc
-#endif
-
 	dp = (struct icmp6_hdr *)bp;
 	ip = (struct ip6_hdr *)bp2;
 	oip = (struct ip6_hdr *)(dp + 1);
@@ -137,12 +133,6 @@ icmp6_print(const u_char *bp, const u_char *bp2)
 			    (bp - bp2));
 	else			/* XXX: jumbo payload case... */
 		icmp6len = snapend - bp;
-
-#if 0
-	(void)printf("%s > %s: ",
-		ip6addr_string(&ip->ip6_src),
-		ip6addr_string(&ip->ip6_dst));
-#endif
 
 	TCHECK(dp->icmp6_code);
 	switch (dp->icmp6_type) {
@@ -372,9 +362,6 @@ icmp6_print(const u_char *bp, const u_char *bp2)
 	return;
 trunc:
 	fputs("[|icmp6]", stdout);
-#if 0
-#undef TCHECK
-#endif
 }
 
 static struct udphdr *

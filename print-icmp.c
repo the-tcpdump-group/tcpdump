@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.58 2001-01-28 09:53:18 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.59 2001-06-15 22:17:32 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -282,12 +282,6 @@ icmp_print(register const u_char *bp, u_int plen, register const u_char *bp2)
 	dp = (struct icmp *)bp;
 	ip = (struct ip *)bp2;
 	str = buf;
-
-#if 0
-	(void)printf("%s > %s: ",
-		ipaddr_string(&ip->ip_src),
-		ipaddr_string(&ip->ip_dst));
-#endif
 
 	TCHECK(dp->icmp_code);
 	switch (dp->icmp_type) {

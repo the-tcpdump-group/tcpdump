@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.97 2001-05-29 15:35:20 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.98 2001-06-15 22:17:33 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -390,10 +390,6 @@ again:
 			break;
 
 		case IPPROTO_ND:
-#if 0
-			(void)printf("%s > %s:", ipaddr_string(&ip->ip_src),
-				ipaddr_string(&ip->ip_dst));
-#endif
 			(void)printf(" nd %d", len);
 			break;
 
@@ -417,12 +413,6 @@ again:
 
 		case 4:
 			/* DVMRP multicast tunnel (ip-in-ip encapsulation) */
-#if 0
-			if (vflag)
-				(void)printf("%s > %s: ",
-					     ipaddr_string(&ip->ip_src),
-					     ipaddr_string(&ip->ip_dst));
-#endif
 			ip_print(cp, len);
 			if (! vflag) {
 				printf(" (ipip-proto-4)");
@@ -436,17 +426,7 @@ again:
 #endif
 		case IP6PROTO_ENCAP:
 			/* ip6-in-ip encapsulation */
-#if 0
-			if (vflag)
-				(void)printf("%s > %s: ",
-					     ipaddr_string(&ip->ip_src),
-					     ipaddr_string(&ip->ip_dst));
-#endif
 			ip6_print(cp, len);
-			if (! vflag) {
-				printf(" (encap)");
-				return;
-			}
 			break;
 #endif /*INET6*/
 
@@ -455,31 +435,15 @@ again:
 #define IPPROTO_GRE 47
 #endif
 		case IPPROTO_GRE:
-			if (vflag)
-				(void)printf("gre %s > %s: ",
-					     ipaddr_string(&ip->ip_src),
-					     ipaddr_string(&ip->ip_dst));
 			/* do it */
 			gre_print(cp, len);
-			if (! vflag) {
-				printf(" (gre encap)");
-				return;
-			}
 			break;
 
 #ifndef IPPROTO_MOBILE
 #define IPPROTO_MOBILE 55
 #endif
 		case IPPROTO_MOBILE:
-			if (vflag)
-				(void)printf("mobile %s > %s: ",
-					     ipaddr_string(&ip->ip_src),
-					     ipaddr_string(&ip->ip_dst));
 			mobile_print(cp, len);
-			if (! vflag) {
-				printf(" (mobile encap)");
-				return;
-			}
 			break;
 
 #ifndef IPPROTO_PIM
@@ -493,18 +457,10 @@ again:
 #define IPPROTO_VRRP	112
 #endif
 		case IPPROTO_VRRP:
-			if (vflag)
-				(void)printf("vrrp %s > %s: ",
-					     ipaddr_string(&ip->ip_src),
-					     ipaddr_string(&ip->ip_dst));
 			vrrp_print(cp, len, ip->ip_ttl);
 			break;
 
 		default:
-#if 0
-			(void)printf("%s > %s:", ipaddr_string(&ip->ip_src),
-				ipaddr_string(&ip->ip_dst));
-#endif
 			(void)printf(" ip-proto-%d %d", nh, len);
 			break;
 		}

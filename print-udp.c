@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.93 2001-03-17 04:41:51 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.94 2001-06-15 22:17:34 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -570,11 +570,6 @@ udp_print(register const u_char *bp, u_int length,
 			return;
 		}
 	}
-#if 0
-	(void)printf("%s.%s > %s.%s:",
-		ipaddr_string(&ip->ip_src), udpport_string(sport),
-		ipaddr_string(&ip->ip_dst), udpport_string(dport));
-#else
 #ifdef INET6
 	if (ip6) {
 		if (ip6->ip6_nxt == IPPROTO_UDP) {
@@ -601,7 +596,6 @@ udp_print(register const u_char *bp, u_int length,
 				udpport_string(sport), udpport_string(dport));
 		}
 	}
-#endif
 
 	if (IP_V(ip) == 4 && vflag && !fragmented) {
 		int sum = up->uh_sum;
