@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.178 2004-04-05 00:11:27 mcr Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.179 2004-04-17 04:33:17 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.178 $)
+AC_REVISION($Revision: 1.179 $)
 AC_PREREQ(2.50)
 AC_INIT(tcpdump.c)
 
@@ -430,6 +430,7 @@ AC_CHECK_SIZEOF(char, 1)
 AC_CHECK_SIZEOF(short, 2)
 AC_CHECK_SIZEOF(int, 4)
 AC_CHECK_SIZEOF(long, 4)
+AC_CHECK_SIZEOF(long long, 8)
 
 dnl
 dnl Checks for u_intXX_t
@@ -692,6 +693,8 @@ AC_LBL_CHECK_TYPE(int16_t, short)
 AC_LBL_CHECK_TYPE(u_int16_t, u_short)
 AC_LBL_CHECK_TYPE(int32_t, int)
 AC_LBL_CHECK_TYPE(u_int32_t, u_int)
+AC_LBL_CHECK_TYPE(int64_t, long long)
+AC_LBL_CHECK_TYPE(u_int64_t, unsigned long long)
 
 AC_LBL_DEVEL(V_CCOPT)
 

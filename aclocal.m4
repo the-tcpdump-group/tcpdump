@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.103 2004-01-31 05:26:50 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.104 2004-04-17 04:33:17 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -977,6 +977,20 @@ dnl check for u_int32_t
 	AC_MSG_RESULT($ac_cv_u_int32_t)
 	if test $ac_cv_u_int32_t = yes; then
 		AC_DEFINE(HAVE_U_INT32_T)
+	else
+		$1=no
+	fi
+dnl check for u_int64_t
+	AC_MSG_CHECKING(for u_int64_t)
+	AC_CACHE_VAL(ac_cv_u_int64_t,
+	AC_TRY_COMPILE([
+#		include <sys/types.h>],
+		[u_int64_t i],
+		ac_cv_u_int64_t=yes,
+		ac_cv_u_int64_t=no))
+	AC_MSG_RESULT($ac_cv_u_int64_t)
+	if test $ac_cv_u_int64_t = yes; then
+		AC_DEFINE(HAVE_U_INT64_T)
 	else
 		$1=no
 	fi

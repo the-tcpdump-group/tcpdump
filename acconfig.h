@@ -106,9 +106,11 @@
 #undef int8_t
 #undef int16_t
 #undef int32_t
+#undef int64_t
+#undef u_int8_t
 #undef u_int16_t
 #undef u_int32_t
-#undef u_int8_t
+#undef u_int64_t
 
 /* Whether or not to include the possibly-buggy SMB printer */
 #undef TCPDUMP_DO_SMB

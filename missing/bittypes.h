@@ -65,3 +65,21 @@ typedef unsigned short u_int32_t;
 #endif
 
 #endif /* HAVE_U_INT32_T */
+
+#ifndef HAVE_U_INT64_T
+
+#if SIZEOF_LONG_LONG == 8
+typedef unsigned long long u_int64_t;
+#elif defined(_MSC_EXTENSIONS)
+typedef _int64 u_int64_t;
+#elif SIZEOF_INT == 8
+typedef unsigned int u_int64_t;
+#elif SIZEOF_LONG == 8
+typedef unsigned long u_int64_t;
+#elif SIZEOF_SHORT == 8
+typedef unsigned short u_int64_t;
+#else  /* XXX */
+#error "there's no appropriate type for u_int64_t"
+#endif
+
+#endif /* HAVE_U_INT64_T */

@@ -1,6 +1,7 @@
-/* config.h.in.  Generated from configure.in by autoheader.  */
+/* config.h.in.  Generated automatically from configure.in by autoheader.  */
 /* "generated automatically" means DO NOT MAKE CHANGES TO config.h.in --
  * make them to acconfig.h and rerun autoheader */
+
 
 /* Define if you have SSLeay 0.9.0b with the buggy cast128. */
 #undef HAVE_BUGGY_CAST128
@@ -106,9 +107,11 @@
 #undef int8_t
 #undef int16_t
 #undef int32_t
+#undef int64_t
+#undef u_int8_t
 #undef u_int16_t
 #undef u_int32_t
-#undef u_int8_t
+#undef u_int64_t
 
 /* Whether or not to include the possibly-buggy SMB printer */
 #undef TCPDUMP_DO_SMB
@@ -133,149 +136,134 @@
 /* define if should chroot when dropping privileges */
 #undef WITH_CHROOT
 
-/* Define to 1 if you have the `alarm' function. */
+/* Define if you have the `alarm' function. */
 #undef HAVE_ALARM
 
-/* Define to 1 if you have the `bpf_dump' function. */
+/* Define if you have the `bpf_dump' function. */
 #undef HAVE_BPF_DUMP
 
-/* Define to 1 if you have the `ether_ntohost' function. */
+/* Define if you have the `ether_ntohost' function. */
 #undef HAVE_ETHER_NTOHOST
 
-/* Define to 1 if you have the <fcntl.h> header file. */
+/* Define if you have the <fcntl.h> header file. */
 #undef HAVE_FCNTL_H
 
-/* Define to 1 if you have the `getaddrinfo' function. */
+/* Define if you have the `getaddrinfo' function. */
 #undef HAVE_GETADDRINFO
 
-/* Define to 1 if you have the `getnameinfo' function. */
+/* Define if you have the `getnameinfo' function. */
 #undef HAVE_GETNAMEINFO
 
-/* Define to 1 if you have the <inttypes.h> header file. */
+/* Define if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
-/* Define to 1 if you have the `crypto' library (-lcrypto). */
+/* Define if you have the `crypto' library (-lcrypto). */
 #undef HAVE_LIBCRYPTO
 
-/* Define to 1 if you have the `rpc' library (-lrpc). */
+/* Define if you have the `rpc' library (-lrpc). */
 #undef HAVE_LIBRPC
 
-/* Define to 1 if you have the `smi' library (-lsmi). */
+/* Define if you have the `smi' library (-lsmi). */
 #undef HAVE_LIBSMI
 
-/* Define to 1 if you have the <memory.h> header file. */
+/* Define if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
-/* Define to 1 if you have the <netdnet/dnetdb.h> header file. */
+/* Define if you have the <netdnet/dnetdb.h> header file. */
 #undef HAVE_NETDNET_DNETDB_H
 
-/* Define to 1 if you have the <netinet/ether.h> header file. */
+/* Define if you have the <netinet/ether.h> header file. */
 #undef HAVE_NETINET_ETHER_H
 
-/* Define to 1 if you have the <netinet/if_ether.h> header file. */
+/* Define if you have the <netinet/if_ether.h> header file. */
 #undef HAVE_NETINET_IF_ETHER_H
 
-/* Define to 1 if you have the <openssl/evp.h> header file. */
+/* Define if you have the <openssl/evp.h> header file. */
 #undef HAVE_OPENSSL_EVP_H
 
-/* Define to 1 if you have the `pcap_breakloop' function. */
+/* Define if you have the `pcap_breakloop' function. */
 #undef HAVE_PCAP_BREAKLOOP
 
-/* Define to 1 if you have the `pcap_dump_flush' function. */
+/* Define if you have the `pcap_dump_flush' function. */
 #undef HAVE_PCAP_DUMP_FLUSH
 
-/* Define to 1 if you have the `pcap_findalldevs' function. */
+/* Define if you have the `pcap_findalldevs' function. */
 #undef HAVE_PCAP_FINDALLDEVS
 
-/* Define to 1 if the system has the type `pcap_if_t'. */
+/* Define if the system has the type `pcap_if_t'. */
 #undef HAVE_PCAP_IF_T
 
-/* Define to 1 if you have the `pcap_lib_version' function. */
+/* Define if you have the `pcap_lib_version' function. */
 #undef HAVE_PCAP_LIB_VERSION
 
-/* Define to 1 if you have the `pfopen' function. */
+/* Define if you have the `pfopen' function. */
 #undef HAVE_PFOPEN
 
-/* Define to 1 if you have the <rpc/rpcent.h> header file. */
+/* Define if you have the <rpc/rpcent.h> header file. */
 #undef HAVE_RPC_RPCENT_H
 
-/* Define to 1 if you have the `setlinebuf' function. */
+/* Define if you have the `setlinebuf' function. */
 #undef HAVE_SETLINEBUF
 
-/* Define to 1 if you have the `sigaction' function. */
+/* Define if you have the `sigaction' function. */
 #undef HAVE_SIGACTION
 
-/* Define to 1 if you have the `sigset' function. */
+/* Define if you have the `sigset' function. */
 #undef HAVE_SIGSET
 
-/* Define to 1 if you have the <smi.h> header file. */
+/* Define if you have the <smi.h> header file. */
 #undef HAVE_SMI_H
 
-/* Define to 1 if you have the `snprintf' function. */
+/* Define if you have the `snprintf' function. */
 #undef HAVE_SNPRINTF
 
-/* Define to 1 if you have the <stdint.h> header file. */
+/* Define if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
 
-/* Define to 1 if you have the <stdlib.h> header file. */
+/* Define if you have the <stdlib.h> header file. */
 #undef HAVE_STDLIB_H
 
-/* Define to 1 if you have the `strcasecmp' function. */
+/* Define if you have the `strcasecmp' function. */
 #undef HAVE_STRCASECMP
 
-/* Define to 1 if you have the `strdup' function. */
+/* Define if you have the `strdup' function. */
 #undef HAVE_STRDUP
 
-/* Define to 1 if you have the `strftime' function. */
+/* Define if you have the `strftime' function. */
 #undef HAVE_STRFTIME
 
-/* Define to 1 if you have the <strings.h> header file. */
+/* Define if you have the <strings.h> header file. */
 #undef HAVE_STRINGS_H
 
-/* Define to 1 if you have the <string.h> header file. */
+/* Define if you have the <string.h> header file. */
 #undef HAVE_STRING_H
 
-/* Define to 1 if you have the `strlcat' function. */
+/* Define if you have the `strlcat' function. */
 #undef HAVE_STRLCAT
 
-/* Define to 1 if you have the `strlcpy' function. */
+/* Define if you have the `strlcpy' function. */
 #undef HAVE_STRLCPY
 
-/* Define to 1 if you have the `strsep' function. */
+/* Define if you have the `strsep' function. */
 #undef HAVE_STRSEP
 
-/* Define to 1 if you have the <sys/stat.h> header file. */
+/* Define if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
 
-/* Define to 1 if you have the <sys/types.h> header file. */
+/* Define if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
 
-/* Define to 1 if you have the <unistd.h> header file. */
+/* Define if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
-/* Define to 1 if you have the `vfprintf' function. */
+/* Define if you have the `vfprintf' function. */
 #undef HAVE_VFPRINTF
 
-/* Define to 1 if you have the `vsnprintf' function. */
+/* Define if you have the `vsnprintf' function. */
 #undef HAVE_VSNPRINTF
 
 /* define if your compiler has __attribute__ */
 #undef HAVE___ATTRIBUTE__
-
-/* Define to the address where bug reports for this package should be sent. */
-#undef PACKAGE_BUGREPORT
-
-/* Define to the full name of this package. */
-#undef PACKAGE_NAME
-
-/* Define to the full name and version of this package. */
-#undef PACKAGE_STRING
-
-/* Define to the one symbol short name of this package. */
-#undef PACKAGE_TARNAME
-
-/* Define to the version of this package. */
-#undef PACKAGE_VERSION
 
 /* Define as the return type of signal handlers (`int' or `void'). */
 #undef RETSIGTYPE
@@ -289,13 +277,16 @@
 /* The size of a `long', as computed by sizeof. */
 #undef SIZEOF_LONG
 
+/* The size of a `long long', as computed by sizeof. */
+#undef SIZEOF_LONG_LONG
+
 /* The size of a `short', as computed by sizeof. */
 #undef SIZEOF_SHORT
 
-/* Define to 1 if you have the ANSI C header files. */
+/* Define if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
-/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
+/* Define if you can safely include both <sys/time.h> and <time.h>. */
 #undef TIME_WITH_SYS_TIME
 
 /* Define as token for inline if inlining supported */
