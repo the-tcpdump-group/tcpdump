@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.15 2003-03-05 11:13:34 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.16 2003-03-05 11:28:21 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -764,7 +764,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         case RSVP_OBJ_SESSION_ATTRIBUTE:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_TUNNEL_IPV4:
-                printf("\n\t    Session Name: %s",(obj_tptr+3));
+                printf("\n\t    Session Name: %s",(obj_tptr+4));
                 printf("\n\t    Setup Priority: %u, Holding Priority: %u, Flags: [%s]",
                        (int)*obj_tptr,
                        (int)*(obj_tptr+1),
