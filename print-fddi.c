@@ -21,14 +21,13 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-fddi.c,v 1.39 1999-11-21 09:36:52 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-fddi.c,v 1.40 1999-12-14 16:49:02 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#ifdef HAVE_FDDI
 #include <sys/param.h>
 #include <sys/time.h>
 #include <sys/socket.h>
@@ -339,19 +338,3 @@ fddi_if_print(u_char *pcap, const struct pcap_pkthdr *h,
 out:
 	putchar('\n');
 }
-#else
-#include <sys/types.h>
-#include <sys/time.h>
-
-#include <stdio.h>
-
-#include "interface.h"
-void
-fddi_if_print(u_char *pcap, const struct pcap_pkthdr *h,
-	      register const u_char *p)
-{
-
-	error("not configured for fddi");
-	/* NOTREACHED */
-}
-#endif
