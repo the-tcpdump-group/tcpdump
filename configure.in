@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.121 2000-09-23 08:03:29 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.122 2000-09-29 20:37:27 itojun Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.121 $)
+AC_REVISION($Revision: 1.122 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -594,7 +594,7 @@ if test "$ac_cv_ssleay_path" != no; then
 
 	bak_CPPFLAGS=$CPPFLAGS
 	CPPFLAGS="$CPPFLAGS $V_INCLS"
-	AC_CHECK_HEADERS(cast.h rc5.h)
+	AC_CHECK_HEADERS(cast.h)
 
 	if test "$ac_cv_header_cast_h" = "yes"; then
 		AC_MSG_CHECKING(for buggy CAST128)
