@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sunrpc.c,v 1.30 2000-01-17 06:24:26 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sunrpc.c,v 1.31 2000-04-27 11:10:59 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -131,6 +131,6 @@ progstr(prog)
 	if (rp == NULL)
 		(void) snprintf(buf, sizeof(buf), "#%u", prog);
 	else
-		strcpy(buf, rp->r_name);
+		strlcpy(buf, rp->r_name, sizeof(buf));
 	return (buf);
 }
