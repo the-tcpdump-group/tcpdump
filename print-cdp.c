@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.11 2001-09-17 21:57:56 fenner Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.12 2002-04-26 09:13:19 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -49,6 +49,7 @@ static const char rcsid[] =
 
 static int cdp_print_addr(const u_char *, int);
 static int cdp_print_prefixes(const u_char *, int);
+static unsigned long cdp_get_number(const u_char *, int);
 
 void
 cdp_print(const u_char *p, u_int length, u_int caplen,
@@ -114,16 +115,55 @@ cdp_print(const u_char *p, u_int length, u_int caplen,
 			if (cdp_print_prefixes(p + i + 4, len - 4) < 0)
 				goto trunc;
 			break;
+		case 0x08:		/* guess - not documented */
+			printf(" Protocol-Hello option" );
+			break;
 		case 0x09:		/* guess - not documented */
 			printf(" VTP Management Domain: '%.*s'", len - 4,
 			    p + i + 4);
 			break;
 		case 0x0a:		/* guess - not documented */
 			printf(" Native VLAN ID: %d",
-			    (p[i + 4] << 8) + p[i + 4 + 1] - 1);
+			    (p[i + 4] << 8) + p[i + 4 + 1] );
 			break;
 		case 0x0b:		/* guess - not documented */
 			printf(" Duplex: %s", p[i + 4] ? "full": "half");
+			break;
+/* http://www.cisco.com/univercd/cc/td/doc/product/voice/ata/atarn/186rn21m.htm
+ * plus more details from other sources 
+ */
+		case 0x0e:		/* incomplete doc. */
+			printf(" ATA-186 VoIP VLAN request, app %d, vlan %d",
+				p[i + 4], (p[i + 4] << 8) + p[i + 4 + 1] );
+			break;
+		case 0x0f:		/* incomplete doc. */
+			printf(" ATA-186 VoIP VLAN assignment" );
+			break;
+		case 0x10:		/* incomplete doc. */
+			printf(" power consumption: %1.2fW", 
+				cdp_get_number(p+i+4, len-4)/1000.0 );
+			break;
+		case 0x11:		/* guess - not documented */
+			printf(" MTU %u bytes", EXTRACT_32BITS(&p[i+4]));
+			break;
+		case 0x12:		/* guess - not documented */
+			printf(" AVVID trust bitmap 0x%02x", p[i+4] );
+			break;
+		case 0x13:		/* guess - not documented */
+			printf(" AVVID untrusted ports CoS: 0x%02x", p[i+4]);
+			break;
+		case 0x14:		/* guess - not documented */
+			printf(" sysName='%.*s'", len - 4, p + i + 4 );
+			break;
+		case 0x15:		/* guess - not documented */
+			printf(" sysObjectID" );		/* TODO */
+			break;
+		case 0x16:		/* guess - not documented */
+			printf(" management address(es)" );
+			break;
+		case 0x17:		/* guess - not documented */
+			printf(" phys. location 0x%02x/%.*s",
+				p[i+4], len - 5, p + i + 5 );
 			break;
 		default:
 			printf(" unknown field type %02x, len %d", type, len);
@@ -259,4 +299,18 @@ cdp_print_prefixes(const u_char * p, int l)
 
 trunc:
 	return -1;
+}
+
+/* read in a <n>-byte number, MSB first
+ * (of course this can handle max sizeof(long))
+ */
+static unsigned long cdp_get_number(const u_char * p, int l)
+{
+    unsigned long res=0;
+    while( l>0 )
+    {
+	res = (res<<8) + *p;
+	p++; l--;
+    }
+    return res;
 }
