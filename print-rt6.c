@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rt6.c,v 1.8 2000-05-10 05:13:20 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rt6.c,v 1.9 2000-06-16 19:41:31 assar Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -83,6 +83,9 @@ rt6_print(register const u_char *bp, register const u_char *bp2)
 	printf(", segleft=%d", dp->ip6r_segleft);
 
 	switch (dp->ip6r_type) {
+#ifndef IPV6_RTHDR_TYPE_0
+#define IPV6_RTHDR_TYPE_0 0
+#endif
 	case IPV6_RTHDR_TYPE_0:
 		dp0 = (struct ip6_rthdr0 *)dp;
 
