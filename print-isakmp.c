@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.39 2003-12-15 10:40:13 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.40 2003-12-20 09:58:10 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1231,33 +1231,33 @@ isakmp_print(const u_char *bp, u_int length, const u_char *bp2)
 	}
 	printf(":");
 
-    {
-	const struct isakmp_gen *ext;
-	int nparen;
+	if (vflag) {
+		const struct isakmp_gen *ext;
+		int nparen;
 
 #define CHECKLEN(p, np) \
-	if (ep < (u_char *)(p)) {				\
-		printf(" [|%s]", NPSTR(np));			\
-		goto done;					\
+		if (ep < (u_char *)(p)) {				\
+			printf(" [|%s]", NPSTR(np));			\
+			goto done;					\
+		}
+
+		/* regardless of phase... */
+		if (base.flags & ISAKMP_FLAG_E) {
+			/*
+			 * encrypted, nothing we can do right now.
+			 * we hope to decrypt the packet in the future...
+			 */
+			printf(" [encrypted %s]", NPSTR(base.np));
+			goto done;
+		}
+
+		nparen = 0;
+		CHECKLEN(p + 1, base.np)
+
+		np = base.np;
+		ext = (struct isakmp_gen *)(p + 1);
+		isakmp_sub_print(np, ext, ep, phase, 0, 0, 0);
 	}
-
-	/* regardless of phase... */
-	if (base.flags & ISAKMP_FLAG_E) {
-		/*
-		 * encrypted, nothing we can do right now.
-		 * we hope to decrypt the packet in the future...
-		 */
-		printf(" [encrypted %s]", NPSTR(base.np));
-		goto done;
-	}
-
-	nparen = 0;
-	CHECKLEN(p + 1, base.np)
-
-	np = base.np;
-	ext = (struct isakmp_gen *)(p + 1);
-	isakmp_sub_print(np, ext, ep, phase, 0, 0, 0);
-    }
 
 done:
 	if (vflag) {
