@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.105 2003-06-07 11:57:54 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.106 2003-10-28 03:16:36 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -133,7 +133,7 @@ static int tcp_cksum(register const struct ip *ip,
 static int tcp6_cksum(const struct ip6_hdr *ip6, const struct tcphdr *tp,
 	int len)
 {
-	int i, tlen;
+	size_t i, tlen;
 	register const u_int16_t *sp;
 	u_int32_t sum;
 	union {

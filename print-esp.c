@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.43 2003-08-06 04:59:48 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.44 2003-10-28 03:16:36 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -226,7 +226,8 @@ static void esp_print_decode_onesecret(char *line)
 	if (decode) {
 		char *colon, *p;
 		char  espsecret_key[256];
-		int len, i;
+		int len;
+		size_t i;
 		const EVP_CIPHER *evp;
 		int ivlen = 8;
 		int authlen = 0;
