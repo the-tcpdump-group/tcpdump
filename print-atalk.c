@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.63 2000-10-30 05:41:30 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.64 2000-10-30 06:22:14 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -84,11 +84,10 @@ static void ddp_print(const u_char *, u_int, int, u_short, u_char, u_char);
 static const char *ddpskt_string(int);
 
 /*
- * Print AppleTalk-inside-UDP (Kinetics IPTalk, CAP) Datagram Delivery
- * Protocol packets.
+ * Print AppleTalk LLAP packets.
  */
 void
-iptalk_print(register const u_char *bp, u_int length)
+llap_print(register const u_char *bp, u_int length)
 {
 	register const struct LAP *lp;
 	register const struct atDDP *dp;
@@ -146,7 +145,9 @@ iptalk_print(register const u_char *bp, u_int length)
 }
 
 /*
- * Print AppleTalk Datagram Delivery Protocol packets.
+ * Print EtherTalk/TokenTalk packets (or FDDITalk, or whatever it's called
+ * when it runs over FDDI; yes, I've seen FDDI captures with AppleTalk
+ * packets in them).
  */
 void
 atalk_print(register const u_char *bp, u_int length)
@@ -204,6 +205,9 @@ aarp_print(register const u_char *bp, u_int length)
 	    ap->halen, ap->palen);
 }
 
+/*
+ * Print AppleTalk Datagram Delivery Protocol packets.
+ */
 static void
 ddp_print(register const u_char *bp, register u_int length, register int t,
 	  register u_short snet, register u_char snode, u_char skt)
