@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.28 2004-03-24 03:04:01 guy Exp $ (LBL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.29 2004-08-27 03:28:58 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -160,6 +160,7 @@ pppoe_print(register const u_char *bp, u_int length)
 		 */
 		while (tag_type && p + 4 < pppoe_payload + length &&
 		    p + 4 < snapend) {
+			TCHECK2(*p, 4);
 			tag_type = EXTRACT_16BITS(p);
 			tag_len = EXTRACT_16BITS(p + 2);
 			p += 4;
@@ -172,6 +173,7 @@ pppoe_print(register const u_char *bp, u_int length)
 				unsigned tag_str_len = 0;
 
 				/* TODO print UTF-8 decoded text */
+				TCHECK2(*p, tag_len);
 				for (v = p; v < p + tag_len && tag_str_len < MAXTAGPRINT-1; v++)
 					if (*v >= 32 && *v < 127) {
 						tag_str[tag_str_len++] = *v;
