@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.91 2001-01-29 09:18:50 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.92 2001-02-20 19:03:15 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -606,13 +606,13 @@ udp_print(register const u_char *bp, u_int length,
 	if (IP_V(ip) == 4 && vflag && !fragmented) {
 		int sum = up->uh_sum;
 		if (sum == 0) {
-			(void)printf(" [no cksum]");
+			(void)printf("[no cksum] ");
 		} else if (TTEST2(cp[0], length)) {
 			sum = udp_cksum(ip, up, length);
 			if (sum != 0)
-				(void)printf(" [bad udp cksum %x!]", sum);
+				(void)printf("[bad udp cksum %x!] ", sum);
 			else
-				(void)printf(" [udp sum ok]");
+				(void)printf("[udp sum ok] ");
 		}
 	}
 #ifdef INET6
@@ -622,9 +622,9 @@ udp_print(register const u_char *bp, u_int length,
 		if (TTEST2(cp[0], length)) {
 			sum = udp6_cksum(ip6, up, length);
 			if (sum != 0)
-				(void)printf(" [bad udp cksum %x!]", sum);
+				(void)printf("[bad udp cksum %x!] ", sum);
 			else
-				(void)printf(" [udp sum ok]");
+				(void)printf("[udp sum ok] ");
 		}
 	}
 #endif
