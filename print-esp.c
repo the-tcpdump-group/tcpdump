@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.23 2002-02-18 08:54:56 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.24 2002-04-07 02:16:03 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -42,10 +42,10 @@ static const char rcsid[] =
 #ifdef HAVE_LIBCRYPTO
 #include <openssl/des.h>
 #include <openssl/blowfish.h>
-#ifdef HAVE_RC5_H
+#ifdef HAVE_OPENSSL_RC5_H
 #include <openssl/rc5.h>
 #endif
-#ifdef HAVE_CAST_H
+#ifdef HAVE_OPENSSL_CAST_H
 #include <openssl/cast.h>
 #endif
 #endif

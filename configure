@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.148 
+# From configure.in Revision: 1.149 
 
 
 
@@ -4362,7 +4362,7 @@ echo $ac_n "checking for SSLeay""... $ac_c" 1>&6
 echo "configure:4363: checking for SSLeay" >&5
 ac_cv_ssleay_path=no
 incdir=no
-for dir in /usr /usr/local /usr/local/ssl /usr/pkg; do
+for dir in /usr/${host_alias} /usr /usr/local /usr/local/ssl /usr/pkg; do
 	if test -d $dir/lib -a -f $dir/lib/libcrypto.a; then
 		ac_cv_ssleay_path=$dir
 	fi
@@ -4436,7 +4436,7 @@ fi
 
 	bak_CPPFLAGS=$CPPFLAGS
 	CPPFLAGS="$CPPFLAGS $V_INCLS"
-	for ac_hdr in cast.h
+	for ac_hdr in openssl/cast.h
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
@@ -4477,17 +4477,20 @@ fi
 done
 
 
-	if test "$ac_cv_header_cast_h" = "yes"; then
+	if test "$ac_cv_header_openssl_cast_h" = "yes"; then
 		echo $ac_n "checking for buggy CAST128""... $ac_c" 1>&6
 echo "configure:4483: checking for buggy CAST128" >&5
-		if test "$cross_compiling" = yes; then
-  buggy_cast128="cross-compiling, assume yes"
+		if eval "test \"`echo '$''{'td_cv_buggy_cast128'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  if test "$cross_compiling" = yes; then
+  td_cv_buggy_cast128="cross-compiling, assume yes"
 else
   cat > conftest.$ac_ext <<EOF
-#line 4488 "configure"
+#line 4491 "configure"
 #include "confdefs.h"
 
-#include <cast.h>
+#include <openssl/cast.h>
 main()
 {
 	unsigned char key[] = {0x01,0x23,0x45,0x67,0x12};
@@ -4503,20 +4506,22 @@ main()
 		return 1;
 }
 EOF
-if { (eval echo configure:4507: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:4510: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
 then
-  buggy_cast128=yes
+  td_cv_buggy_cast128=yes
 else
   echo "configure: failed program was:" >&5
   cat conftest.$ac_ext >&5
   rm -fr conftest*
-  buggy_cast128=no
+  td_cv_buggy_cast128=no
 fi
 rm -fr conftest*
 fi
 
-		echo "$ac_t""$buggy_cast128" 1>&6
-		if test "$buggy_cast128" != no; then
+fi
+
+		echo "$ac_t""$td_cv_buggy_cast128" 1>&6
+		if test "$td_cv_buggy_cast128" != no; then
 			echo "NOTE: SSLeay 0.9.0b has a bug in CAST128 en/decoding routine."
 			echo "disabling CAST128 support."
 			cat >> confdefs.h <<\EOF
@@ -4531,21 +4536,21 @@ fi
 
 fi
 
-for ac_hdr in rc5.h
+for ac_hdr in openssl/rc5.h
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:4539: checking for $ac_hdr" >&5
+echo "configure:4544: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 4544 "configure"
+#line 4549 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:4549: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:4554: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -4590,7 +4595,7 @@ done
 # SVR4 /usr/ucb/install, which tries to use the nonexistent group "staff"
 # ./install, which can be erroneously created by make from ./install.sh.
 echo $ac_n "checking for a BSD compatible install""... $ac_c" 1>&6
-echo "configure:4594: checking for a BSD compatible install" >&5
+echo "configure:4599: checking for a BSD compatible install" >&5
 if test -z "$INSTALL"; then
 if eval "test \"`echo '$''{'ac_cv_path_install'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6

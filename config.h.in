@@ -165,9 +165,6 @@
 /* Define if you have the vsnprintf function.  */
 #undef HAVE_VSNPRINTF
 
-/* Define if you have the <cast.h> header file.  */
-#undef HAVE_CAST_H
-
 /* Define if you have the <fcntl.h> header file.  */
 #undef HAVE_FCNTL_H
 
@@ -177,8 +174,11 @@
 /* Define if you have the <netinet/if_ether.h> header file.  */
 #undef HAVE_NETINET_IF_ETHER_H
 
-/* Define if you have the <rc5.h> header file.  */
-#undef HAVE_RC5_H
+/* Define if you have the <openssl/cast.h> header file.  */
+#undef HAVE_OPENSSL_CAST_H
+
+/* Define if you have the <openssl/rc5.h> header file.  */
+#undef HAVE_OPENSSL_RC5_H
 
 /* Define if you have the <rpc/rpcent.h> header file.  */
 #undef HAVE_RPC_RPCENT_H

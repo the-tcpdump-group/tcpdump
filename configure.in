@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.148 2002-04-07 02:12:01 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.149 2002-04-07 02:16:03 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.148 $)
+AC_REVISION($Revision: 1.149 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -585,7 +585,7 @@ AC_ARG_WITH(crypto, [  --without-crypto        disable crypto support],
 AC_MSG_CHECKING(for SSLeay)
 ac_cv_ssleay_path=no
 incdir=no
-for dir in /usr /usr/local /usr/local/ssl /usr/pkg; do
+for dir in /usr/${host_alias} /usr /usr/local /usr/local/ssl /usr/pkg; do
 	if test -d $dir/lib -a -f $dir/lib/libcrypto.a; then
 		ac_cv_ssleay_path=$dir
 	fi
@@ -613,13 +613,13 @@ if test "$ac_cv_ssleay_path" != no; then
 
 	bak_CPPFLAGS=$CPPFLAGS
 	CPPFLAGS="$CPPFLAGS $V_INCLS"
-	AC_CHECK_HEADERS(cast.h)
+	AC_CHECK_HEADERS(openssl/cast.h)
 
-	if test "$ac_cv_header_cast_h" = "yes"; then
+	if test "$ac_cv_header_openssl_cast_h" = "yes"; then
 		AC_MSG_CHECKING(for buggy CAST128)
-		AC_TRY_RUN(dnl
+		AC_CACHE_VAL(td_cv_buggy_cast128, [AC_TRY_RUN(dnl
 [
-#include <cast.h>
+#include <openssl/cast.h>
 main()
 {
 	unsigned char key[] = {0x01,0x23,0x45,0x67,0x12};
@@ -634,11 +634,11 @@ main()
 	else
 		return 1;
 }],
-			[buggy_cast128=yes],
-			[buggy_cast128=no],
-			[buggy_cast128="cross-compiling, assume yes"])
-		AC_MSG_RESULT($buggy_cast128)
-		if test "$buggy_cast128" != no; then
+			[td_cv_buggy_cast128=yes],
+			[td_cv_buggy_cast128=no],
+			[td_cv_buggy_cast128="cross-compiling, assume yes"])])
+		AC_MSG_RESULT($td_cv_buggy_cast128)
+		if test "$td_cv_buggy_cast128" != no; then
 			echo "NOTE: SSLeay 0.9.0b has a bug in CAST128 en/decoding routine."
 			echo "disabling CAST128 support."
 			AC_DEFINE(HAVE_BUGGY_CAST128)
@@ -648,7 +648,7 @@ main()
 	CPPFLAGS=$bak_CPPFLAGS
 fi
 ])
-AC_CHECK_HEADERS(rc5.h)
+AC_CHECK_HEADERS(openssl/rc5.h)
 
 AC_SUBST(V_CCOPT)
 AC_SUBST(V_GROUP)
