@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.86 2002-08-03 22:32:36 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.87 2002-08-04 21:20:29 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -658,7 +658,10 @@ dnl results:
 dnl
 dnl	LIBS
 dnl
-dnl XXX - not used; why not?
+dnl XXX - "AC_LBL_LIBRARY_NET" was redone to use "AC_SEARCH_LIBS"
+dnl rather than "AC_LBL_CHECK_LIB", so this isn't used any more.
+dnl We keep it around for reference purposes in case it's ever
+dnl useful in the future.
 dnl
 
 define(AC_LBL_CHECK_LIB,
