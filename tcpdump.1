@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.162 2004-03-28 20:33:28 fenner Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.163 2004-06-12 08:51:23 guy Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -57,12 +57,12 @@ tcpdump \- dump traffic on a network
 .B \-M
 .I secret
 ]
+.br
+.ti +8
 [
 .B \-r
 .I file
 ]
-.br
-.ti +8
 [
 .B \-s
 .I snaplen
@@ -81,6 +81,8 @@ tcpdump \- dump traffic on a network
 .B \-W
 .I filecount
 ]
+.br
+.ti +8
 [
 .B \-E
 .I spi@ipaddr algo:secret,...
@@ -889,7 +891,7 @@ In the case of Ethernet, \fItcpdump\fR checks the Ethernet type field
 for most of those protocols.  The exceptions are:
 .RS
 .TP
-\fBiso\fP, \fBsap\fP, and \fBnetbeui\fP
+\fBiso\fP, \fBstp\fP, and \fBnetbeui\fP
 \fItcpdump\fR checks for an 802.3 frame and then checks the LLC header as
 it does for FDDI, Token Ring, and 802.11;
 .TP
