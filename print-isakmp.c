@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.42 2004-01-07 08:00:51 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.43 2004-01-23 09:35:41 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1271,7 +1271,7 @@ isakmp_print(const u_char *bp, u_int length, const u_char *bp2)
 done:
 	if (vflag) {
 		if (ntohl(base.len) != length) {
-			printf(" (len mismatch: isakmp %u/ip %d)",
+			printf(" (len mismatch: isakmp %u/ip %u)",
 				(u_int32_t)ntohl(base.len), length);
 		}
 	}
