@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.111 2004-03-23 07:15:36 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.112 2004-04-05 00:12:54 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -53,7 +53,7 @@ static const char rcsid[] _U_ =
 #ifdef HAVE_LIBCRYPTO
 #include <openssl/md5.h>
 
-static int tcp_verify_signature(const struct ip *ip, struct tcphdr *tp,
+static int tcp_verify_signature(const struct ip *ip, const struct tcphdr *tp,
     const u_char *data, int length, const u_char *rcvsig);
 #endif
 
@@ -703,13 +703,16 @@ print_tcp_rst_data(register const u_char *sp, u_int length)
 
 #ifdef HAVE_LIBCRYPTO
 static int
-tcp_verify_signature(const struct ip *ip, struct tcphdr *tp,
+tcp_verify_signature(const struct ip *ip, const struct tcphdr *tp,
     const u_char *data, int length, const u_char *rcvsig)
 {
+        struct tcphdr tp1;
 	char sig[TCP_SIGLEN];
 	char zero_proto = 0;
 	MD5_CTX ctx;
 	u_short savecsum, tlen;
+
+	tp1 = *tp;
 
 	if (tcpmd5secret == NULL)
 		return (-1);
@@ -725,14 +728,15 @@ tcp_verify_signature(const struct ip *ip, struct tcphdr *tp,
 	tlen = EXTRACT_16BITS(&ip->ip_len) - IP_HL(ip) * 4;
 	tlen = htons(tlen);
 	MD5_Update(&ctx, (char *)&tlen, sizeof(tlen));
+
 	/*
 	 * Step 2: Update MD5 hash with TCP header, excluding options.
 	 * The TCP checksum must be set to zero.
 	 */
-	savecsum = tp->th_sum;
-	tp->th_sum = 0;
-	MD5_Update(&ctx, (char *)tp, sizeof(struct tcphdr));
-	tp->th_sum = savecsum;
+	savecsum = tp1.th_sum;
+	tp1.th_sum = 0;
+	MD5_Update(&ctx, (char *)&tp1, sizeof(struct tcphdr));
+	tp1.th_sum = savecsum;
 	/*
 	 * Step 3: Update MD5 hash with TCP segment data, if present.
 	 */
