@@ -129,6 +129,10 @@ SOURCE=..\..\machdep.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\oui.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\parsenfsfh.c
 # End Source File
 # Begin Source File
@@ -142,6 +146,10 @@ SOURCE="..\..\print-ah.c"
 # Begin Source File
 
 SOURCE="..\..\print-aodv.c"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\print-ap1394.c"
 # End Source File
 # Begin Source File
 
@@ -438,6 +446,10 @@ SOURCE="..\..\print-sunatm.c"
 # Begin Source File
 
 SOURCE="..\..\print-sunrpc.c"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\print-symantec.c"
 # End Source File
 # Begin Source File
 
