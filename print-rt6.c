@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rt6.c,v 1.7 2000-04-24 12:59:40 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rt6.c,v 1.8 2000-05-10 05:13:20 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -78,9 +78,9 @@ rt6_print(register const u_char *bp, register const u_char *bp2)
 
 	TCHECK(dp->ip6r_segleft);
 
-	printf("srcrt (len=%d, ", dp->ip6r_len);
-	printf("type=%d, ", dp->ip6r_type);
-	printf("segleft=%d, ", dp->ip6r_segleft);
+	printf("srcrt (len=%d", dp->ip6r_len);	/*)*/
+	printf(", type=%d", dp->ip6r_type);
+	printf(", segleft=%d", dp->ip6r_segleft);
 
 	switch (dp->ip6r_type) {
 	case IPV6_RTHDR_TYPE_0:
@@ -88,8 +88,8 @@ rt6_print(register const u_char *bp, register const u_char *bp2)
 
 		TCHECK(dp0->ip6r0_reserved);
 		if (dp0->ip6r0_reserved || vflag) {
-			printf("rsv=0x%0x, ",
-				(u_int32_t)ntohl(dp0->ip6r0_reserved));
+			printf(", rsv=0x%0x",
+			    (u_int32_t)ntohl(dp0->ip6r0_reserved));
 		}
 
 		if (len % 2 == 1)
@@ -102,12 +102,10 @@ rt6_print(register const u_char *bp, register const u_char *bp2)
 			if ((u_char *)addr > ep - sizeof(*addr))
 				goto trunc;
 
-			printf("[%d]%s", i, ip6addr_string((u_char *)addr));
-			if (i != len - 1)
-				printf(", ");
-		   
+			printf(", [%d]%s", i, ip6addr_string((u_char *)addr));
 		}
-		printf(")");
+		/*(*/
+		printf(") ");
 		return((dp0->ip6r0_len + 1) << 3);
 		break;
 	default:
