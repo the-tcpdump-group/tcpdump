@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.37 2004-10-18 16:26:20 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.38 2005-01-19 16:46:27 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -54,20 +54,34 @@ struct tok oam_celltype_values[] = {
 struct tok oam_fm_functype_values[] = {
     { 0x0, "AIS" },
     { 0x1, "RDI" },
+    { 0x4, "Continuity Check" },
     { 0x8, "Loopback" },
+    { 0, NULL }
+};
+
+struct tok oam_pm_functype_values[] = {
+    { 0x0, "Forward Monitoring" },
+    { 0x1, "Backward Reporting" },
+    { 0x2, "Monitoring and Reporting" },
+    { 0, NULL }
+};
+
+struct tok oam_ad_functype_values[] = {
+    { 0x0, "Performance Monitoring" },
+    { 0x1, "Continuity Check" },
     { 0, NULL }
 };
 
 static const struct tok *oam_functype_values[16] = {
     NULL,
-    oam_fm_functype_values,
+    oam_fm_functype_values, /* 1 */
+    oam_pm_functype_values, /* 2 */
     NULL,
     NULL,
     NULL,
     NULL,
     NULL,
-    NULL,
-    NULL,
+    oam_ad_functype_values, /* 8 */
     NULL,
     NULL,
     NULL,
