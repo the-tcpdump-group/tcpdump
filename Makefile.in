@@ -17,7 +17,7 @@
 #  WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 #  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.216 1999-11-21 15:57:52 assar Exp $ (LBL)
+# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.217 1999-12-04 20:10:00 mcr Exp $ (LBL)
 
 #
 # Various configurable paths (remember to edit Makefile.in, not Makefile)
@@ -133,10 +133,12 @@ version.c: $(srcdir)/VERSION
 	sed -e 's/.*/char version[] = "&";/' $(srcdir)/VERSION > $@
 
 install: force
+	[ -d $(DESTDIR)$(BINDEST) ] || mkdir -p $(DESTDIR)$(BINDEST)
 	$(INSTALL) -m 550 -o bin -g @V_GROUP@ $(PROG) \
 	    $(DESTDIR)$(BINDEST)/$(PROG)
 
 install-man: force
+	[ -d $(DESTDIR)$(MANDEST)/man1 ] || mkdir -p $(DESTDIR)$(MANDEST)/man1
 	$(INSTALL) -m 444 -o bin -g bin $(srcdir)/$(PROG).1 \
 	    $(DESTDIR)$(MANDEST)/man1/$(PROG).1
 
