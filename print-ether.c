@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.84 2003-11-16 09:36:20 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.85 2003-12-29 09:19:38 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -139,7 +139,11 @@ ether_print(const u_char *p, u_int length, u_int caplen)
 
 		if (!xflag && !qflag)
 			default_print(p, caplen);
-	}
+	} else { /* handle the case where we know the ethertype but do not have a printer for it */
+                printf("%s, length %u",
+                       tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", ether_type),
+                       length);
+        }
 }
 
 /*
