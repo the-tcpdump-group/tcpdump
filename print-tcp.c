@@ -2,6 +2,8 @@
  * Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997
  *	The Regents of the University of California.  All rights reserved.
  *
+ * Copyright (c) 1999-2004 The tcpdump.org project
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that: (1) source code distributions
  * retain the above copyright notice and this paragraph in its entirety, (2)
@@ -21,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.119 2004-12-27 00:41:31 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.120 2005-04-06 18:53:56 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
