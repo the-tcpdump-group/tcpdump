@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.45 2000-04-28 11:46:11 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.46 2000-05-15 00:59:41 assar Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -314,6 +314,7 @@ icmp_print(register const u_char *bp, u_int plen, register const u_char *bp2)
 			    ipaddr_string(&idp->ird_addr),
 			    EXTRACT_32BITS(&idp->ird_pref));
 			cp = buf + strlen(buf);
+			++idp;
 		}
 	    }
 		break;
