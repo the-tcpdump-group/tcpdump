@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/bootp.h,v 1.9 2000-10-03 02:54:54 itojun Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/bootp.h,v 1.10 2000-12-03 23:42:23 fenner Exp $ (LBL) */
 /*
  * Bootstrap Protocol (BOOTP).  RFC951 and RFC1048.
  *
@@ -144,6 +144,48 @@ struct bootp {
 #define	TAG_REBIND_TIME		((u_int8_t)  59)
 #define	TAG_VENDOR_CLASS	((u_int8_t)  60)
 #define	TAG_CLIENT_ID		((u_int8_t)  61)
+/* RFC 2241 */
+#define	TAG_NDS_SERVERS		((u_int8_t)  85)
+#define	TAG_NDS_TREE_NAME	((u_int8_t)  86)
+#define	TAG_NDS_CONTEXT		((u_int8_t)  87)
+/* RFC 2485 */
+#define	TAG_OPEN_GROUP_UAP	((u_int8_t)  98)
+/* RFC 2563 */
+#define	TAG_DISABLE_AUTOCONF	((u_int8_t) 116)
+/* RFC 2610 */
+#define	TAG_SLP_DA		((u_int8_t)  78)
+#define	TAG_SLP_SCOPE		((u_int8_t)  79)
+/* RFC 2937 */
+#define	TAG_NS_SEARCH		((u_int8_t) 117)
+/* RFC 3011 */
+#define	TAG_IP4_SUBNET_SELECT	((u_int8_t) 118)
+/* ftp://ftp.isi.edu/.../assignments/bootp-dhcp-extensions */
+#define	TAG_USER_CLASS		((u_int8_t)  77)
+#define	TAG_SLP_NAMING_AUTH	((u_int8_t)  80)
+#define	TAG_CLIENT_FQDN		((u_int8_t)  81)
+#define	TAG_AGENT_CIRCUIT	((u_int8_t)  82)
+#define	TAG_AGENT_REMOTE	((u_int8_t)  83)
+#define	TAG_AGENT_MASK		((u_int8_t)  84)
+#define	TAG_TZ_STRING		((u_int8_t)  88)
+#define	TAG_FQDN_OPTION		((u_int8_t)  89)
+#define	TAG_AUTH		((u_int8_t)  90)
+#define	TAG_VINES_SERVERS	((u_int8_t)  91)
+#define	TAG_SERVER_RANK		((u_int8_t)  92)
+#define	TAG_CLIENT_ARCH		((u_int8_t)  93)
+#define	TAG_CLIENT_NDI		((u_int8_t)  94)
+#define	TAG_CLIENT_GUID		((u_int8_t)  97)
+#define	TAG_LDAP_URL		((u_int8_t)  95)
+#define	TAG_6OVER4		((u_int8_t)  96)
+#define	TAG_PRINTER_NAME	((u_int8_t) 100)
+#define	TAG_MDHCP_SERVER	((u_int8_t) 101)
+#define	TAG_IPX_COMPAT		((u_int8_t) 110)
+#define	TAG_NETINFO_PARENT	((u_int8_t) 112)
+#define	TAG_NETINFO_PARENT_TAG	((u_int8_t) 113)
+#define	TAG_URL			((u_int8_t) 114)
+#define	TAG_FAILOVER		((u_int8_t) 115)
+#define	TAG_EXTENDED_REQUEST	((u_int8_t) 126)
+#define	TAG_EXTENDED_OPTION	((u_int8_t) 127)
+
 
 /* DHCP Message types (values for TAG_DHCP_MESSAGE option) */
 #define		DHCPDISCOVER	1

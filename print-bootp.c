@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.53 2000-10-27 23:26:30 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.54 2000-12-03 23:42:24 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -44,6 +44,7 @@ struct rtentry;
 
 #include "interface.h"
 #include "addrtoname.h"
+#include "extract.h"
 #include "ether.h"
 #include "bootp.h"
 
@@ -263,7 +264,46 @@ static struct tok tag2str[] = {
 	{ TAG_RENEWAL_TIME,	"lRN" },
 	{ TAG_REBIND_TIME,	"lRB" },
 	{ TAG_VENDOR_CLASS,	"bVC" },
-	{ TAG_CLIENT_ID,	"xCID" },
+	{ TAG_CLIENT_ID,	"bCID" },
+/* RFC 2485 */
+	{ TAG_OPEN_GROUP_UAP,	"aUAP" },
+/* RFC 2563 */
+	{ TAG_DISABLE_AUTOCONF,	"BNOAUTO" },
+/* RFC 2610 */
+	{ TAG_SLP_DA,		"bSLP-DA" },	/*"b" is a little wrong */
+	{ TAG_SLP_SCOPE,	"bSLP-SCOPE" },	/*"b" is a little wrong */
+/* RFC 2937 */
+	{ TAG_NS_SEARCH,	"sNSSEARCH" },	/* XXX 's' */
+/* RFC 3011 */
+	{ TAG_IP4_SUBNET_SELECT, "iSUBNET" },
+/* ftp://ftp.isi.edu/.../assignments/bootp-dhcp-extensions */
+	{ TAG_USER_CLASS,	"aCLASS" },
+	{ TAG_SLP_NAMING_AUTH,	"aSLP-NA" },
+	{ TAG_CLIENT_FQDN,	"bFQDN" },	/* XXX 'b' */
+	{ TAG_AGENT_CIRCUIT,	"bACKT" },
+	{ TAG_AGENT_REMOTE,	"bARMT" },
+	{ TAG_AGENT_MASK,	"bAMSK" },
+	{ TAG_TZ_STRING,	"aTZSTR" },
+	{ TAG_FQDN_OPTION,	"bFQDNS" },	/* XXX 'b' */
+	{ TAG_AUTH,		"bAUTH" },	/* XXX 'b' */
+	{ TAG_VINES_SERVERS,	"iVINES" },
+	{ TAG_SERVER_RANK,	"sRANK" },
+	{ TAG_CLIENT_ARCH,	"sARCH" },
+	{ TAG_CLIENT_NDI,	"bNDI" },	/* XXX 'b' */
+	{ TAG_CLIENT_GUID,	"bGUID" },	/* XXX 'b' */
+	{ TAG_LDAP_URL,		"aLDAP" },
+	{ TAG_6OVER4,		"i6o4" },
+	{ TAG_PRINTER_NAME,	"aPRTR" },
+	{ TAG_MDHCP_SERVER,	"bMDHCP" },	/* XXX 'b' */
+	{ TAG_IPX_COMPAT,	"bIPX" },	/* XXX 'b' */
+	{ TAG_NETINFO_PARENT,	"iNI" },
+	{ TAG_NETINFO_PARENT_TAG, "aNITAG" },
+	{ TAG_URL,		"aURL" },
+	{ TAG_FAILOVER,		"bFAIL" },	/* XXX 'b' */
+	{ 0,			NULL }
+};
+/* 2-byte extended tags */
+static struct tok xtag2str[] = {
 	{ 0,			NULL }
 };
 
@@ -290,7 +330,16 @@ rfc1048_print(register const u_char *bp, register u_int length)
 			continue;
 		if (tag == TAG_END)
 			return;
-		cp = tok2str(tag2str, "?T%d", tag);
+		if (tag == TAG_EXTENDED_OPTION) {
+			TCHECK(bp + 1, 2);
+			tag = EXTRACT_16BITS(bp + 1);
+			/* XXX we don't know yet if the IANA will
+			 * preclude overlap of 1-byte and 2-byte spaces.
+			 * If not, we need to offset tag after this step.
+			 */
+			cp = tok2str(xtag2str, "?xT%d", tag);
+		} else
+			cp = tok2str(tag2str, "?T%d", tag);
 		c = *cp++;
 		printf(" %s:", cp);
 
@@ -325,7 +374,21 @@ rfc1048_print(register const u_char *bp, register u_int length)
 			first = 1;
 			while (len-- > 0) {
 				c = *bp++;
-				cp = tok2str(tag2str, "?%d", c);
+				cp = tok2str(tag2str, "?T%d", c);
+				if (!first)
+					putchar('+');
+				printf("%s", cp + 1);
+				first = 0;
+			}
+			continue;
+		}
+		if (tag == TAG_EXTENDED_REQUEST) {
+			first = 1;
+			while (len > 1) {
+				len -= 2;
+				c = EXTRACT_16BITS(bp);
+				bp += 2;
+				cp = tok2str(xtag2str, "?xT%d", c);
 				if (!first)
 					putchar('+');
 				printf("%s", cp + 1);
