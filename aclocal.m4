@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.84 2002-07-02 02:22:36 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.85 2002-07-13 09:36:36 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -184,7 +184,7 @@ AC_DEFUN(AC_LBL_C_INLINE,
 		static inline struct iltest *
 		foo()
 		{
-		    struct iltest xxx;
+		    static struct iltest xxx;
 
 		    return &xxx;
 		}],,ac_lbl_cc_inline=yes,)
