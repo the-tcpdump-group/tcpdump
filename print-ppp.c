@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.52 2000-10-05 04:10:03 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.53 2000-10-06 04:25:59 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -443,6 +443,14 @@ handle_ctrl_proto(u_int proto, const u_char *p, int length)
 				break;
 			case PPP_BACP:
 				pfunc = print_bacp_config_options;
+				break;
+			default:
+				/*
+				 * This should never happen, but we set
+				 * "pfunc" to squelch uninitialized
+				 * variable warnings from compilers.
+				 */
+				pfunc = NULL;
 				break;
 			}
 			if ((j = (*pfunc)(p, len)) == 0)
