@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.25 2000-10-07 05:53:12 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.26 2000-12-12 09:20:26 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -422,9 +422,8 @@ isakmp_sa_print(struct isakmp_gen *ext, u_char *ep, u_int32_t phase,
 {
 	struct isakmp_pl_sa *p, sa;
 	u_int32_t *q;
-	u_int32_t doi;
-	u_int32_t sit;
-	u_char *cp;
+	u_int32_t doi, sit, ident;
+	u_char *cp, *np;
 	int t;
 
 	printf("%s:", NPSTR(ISAKMP_NPTYPE_SA));
@@ -432,6 +431,7 @@ isakmp_sa_print(struct isakmp_gen *ext, u_char *ep, u_int32_t phase,
 	p = (struct isakmp_pl_sa *)ext;
 	safememcpy(&sa, ext, sizeof(sa));
 	doi = ntohl(sa.doi);
+	sit = ntohl(sa.sit);
 	if (doi != 1) {
 		printf(" doi=%d", doi);
 		printf(" situation=%u", (u_int32_t)ntohl(sa.sit));
@@ -442,22 +442,25 @@ isakmp_sa_print(struct isakmp_gen *ext, u_char *ep, u_int32_t phase,
 	q = (u_int32_t *)&sa.sit;
 	printf(" situation=");
 	t = 0;
-	if (ntohl(*q) & 0x01) {
+	if (sit & 0x01) {
 		printf("identity");
 		t++;
 	}
-	if (ntohl(*q) & 0x02) {
+	if (sit & 0x02) {
 		printf("%ssecrecy", t ? "+" : "");
 		t++;
 	}
-	if (ntohl(*q) & 0x04)
+	if (sit & 0x04)
 		printf("%sintegrity", t ? "+" : "");
-	sit = htonl(*q++);
 
-	if (sit != 0x01)
-		printf(" ident=%u", (u_int32_t)ntohl(*q++));
+	np = (u_char *)ext + sizeof(sa);
+	if (sit != 0x01) {
+		safememcpy(&ident, ext + 1, sizeof(ident));
+		printf(" ident=%u", (u_int32_t)ntohl(ident));
+		np += sizeof(ident);
+	}
 
-	ext = (struct isakmp_gen *)q;
+	ext = (struct isakmp_gen *)np;
 
 	cp = isakmp_sub_print(ISAKMP_NPTYPE_P, ext, ep, phase, doi, proto0);
 
