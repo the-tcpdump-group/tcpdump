@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.42 2004-03-18 14:12:18 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.43 2004-03-24 02:51:10 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -163,6 +163,7 @@ pimv1_join_prune_print(register const u_char *bp, register u_int len)
 	while (ngroups--) {
 		TCHECK2(bp[0], 4);
 		(void)printf("\n\tGroup: %s", ipaddr_string(bp));
+		TCHECK2(bp[4], 4);
 		if (EXTRACT_32BITS(&bp[4]) != 0xffffffff)
 			(void)printf("/%s", ipaddr_string(&bp[4]));
 		TCHECK2(bp[8], 4);
