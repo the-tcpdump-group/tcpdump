@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.34 
+# From configure.in Revision: 1.35 
 
 
 
@@ -2562,7 +2562,7 @@ if test "$missing_includes" = "yes"; then
 fi
 
 
-for ac_func in vfprintf strcasecmp
+for ac_func in vfprintf strcasecmp strlcat strlcpy
 do
 echo $ac_n "checking for $ac_func""... $ac_c" 1>&6
 echo "configure:2569: checking for $ac_func" >&5
