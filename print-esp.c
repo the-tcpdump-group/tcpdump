@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.38 2003-04-21 09:28:24 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.39 2003-05-02 08:43:28 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -131,11 +131,8 @@ static void esp_print_addsa(struct sa_list *sa, int sa_def)
   struct sa_list *nsa;
 
   nsa = (struct sa_list *)malloc(sizeof(struct sa_list));
-  if(nsa == NULL ) {
-    fprintf(stderr, "%s: ran out of memory (%d) to allocate sa structure\n",
-	    program_name, sizeof(struct sa_list));
-    exit(2);
-  }
+  if (nsa == NULL)
+    error("ran out of memory to allocate sa structure");
 
   *nsa = *sa;
 
