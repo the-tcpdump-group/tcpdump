@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.34 2003-11-16 09:36:24 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.35 2003-11-19 00:17:32 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -52,6 +52,7 @@ ip6_print(register const u_char *bp, register u_int length)
 	register const struct ip6_hdr *ip6;
 	register int advance;
 	register u_int len;
+	const u_char *ipend;
 	register const u_char *cp;
 	int nh;
 	int fragmented = 0;
@@ -64,17 +65,25 @@ ip6_print(register const u_char *bp, register u_int length)
 		(void)printf("truncated-ip6 %d", length);
 		return;
 	}
-	advance = sizeof(struct ip6_hdr);
 
-	len = EXTRACT_16BITS(&ip6->ip6_plen);
-	if (length < len + advance)
+	len = EXTRACT_16BITS(&ip6->ip6_plen) + sizeof(struct ip6_hdr);
+	if (length < len)
 		(void)printf("truncated-ip6 - %d bytes missing!",
-			len + advance - length);
+			len - length);
+
+	/*
+	 * Cut off the snapshot length to the end of the IP payload.
+	 */
+	ipend = bp + len;
+	if (ipend < snapend)
+		snapend = ipend;
 
 	cp = (const u_char *)ip6;
+	advance = sizeof(struct ip6_hdr);
 	nh = ip6->ip6_nxt;
 	while (cp < snapend) {
 		cp += advance;
+		len -= advance;
 
 		if (cp == (const u_char *)(ip6 + 1) &&
 		    nh != IPPROTO_TCP && nh != IPPROTO_UDP &&

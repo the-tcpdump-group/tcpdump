@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.130 2003-11-16 09:36:23 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.131 2003-11-19 00:17:32 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -358,6 +358,7 @@ ip_print(register const u_char *bp, register u_int length)
 {
 	register const struct ip *ip;
 	register u_int hlen, len, len0, off;
+	const u_char *ipend;
 	register const u_char *cp;
 	u_char nh;
 	int advance;
@@ -383,14 +384,26 @@ ip_print(register const u_char *bp, register u_int length)
 	}
 	hlen = IP_HL(ip) * 4;
 	if (hlen < sizeof (struct ip)) {
-		(void)printf("bad-hlen %d", hlen);
+		(void)printf("bad-hlen %u", hlen);
 		return;
 	}
 
 	len = EXTRACT_16BITS(&ip->ip_len);
 	if (length < len)
-		(void)printf("truncated-ip - %d bytes missing! ",
+		(void)printf("truncated-ip - %u bytes missing! ",
 			len - length);
+	if (len < hlen) {
+		(void)printf("bad-len %u", len);
+		return;
+	}
+
+	/*
+	 * Cut off the snapshot length to the end of the IP payload.
+	 */
+	ipend = bp + len;
+	if (ipend < snapend)
+		snapend = ipend;
+
 	len -= hlen;
 	len0 = len;
 

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.127 2003-11-18 23:26:38 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.128 2003-11-19 00:17:33 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -285,7 +285,7 @@ rtcp_print(const u_char *hdr, const u_char *ep)
 
 static int udp_cksum(register const struct ip *ip,
 		     register const struct udphdr *up,
-		     register int len)
+		     register u_int len)
 {
 	union phu {
 		struct phdr {
@@ -300,7 +300,7 @@ static int udp_cksum(register const struct ip *ip,
 	register const u_int16_t *sp;
 
 	/* pseudo-header.. */
-	phu.ph.len = htons(len);
+	phu.ph.len = htons((u_int16_t)len);
 	phu.ph.mbz = 0;
 	phu.ph.proto = IPPROTO_UDP;
 	memcpy(&phu.ph.src, &ip->ip_src.s_addr, sizeof(u_int32_t));
@@ -316,9 +316,9 @@ static int udp_cksum(register const struct ip *ip,
 
 #ifdef INET6
 static int udp6_cksum(const struct ip6_hdr *ip6, const struct udphdr *up,
-	int len)
+	u_int len)
 {
-	int i, tlen;
+	int i;
 	register const u_int16_t *sp;
 	u_int32_t sum;
 	union {
@@ -332,14 +332,11 @@ static int udp6_cksum(const struct ip6_hdr *ip6, const struct udphdr *up,
 		u_int16_t pa[20];
 	} phu;
 
-	tlen = EXTRACT_16BITS(&ip6->ip6_plen) + sizeof(struct ip6_hdr) -
-	    ((const char *)up - (const char*)ip6);
-
 	/* pseudo-header */
 	memset(&phu, 0, sizeof(phu));
 	phu.ph.ph_src = ip6->ip6_src;
 	phu.ph.ph_dst = ip6->ip6_dst;
-	phu.ph.ph_len = htonl(tlen);
+	phu.ph.ph_len = htonl(len);
 	phu.ph.ph_nxt = IPPROTO_UDP;
 
 	sum = 0;
@@ -348,10 +345,10 @@ static int udp6_cksum(const struct ip6_hdr *ip6, const struct udphdr *up,
 
 	sp = (const u_int16_t *)up;
 
-	for (i = 0; i < (tlen & ~1); i += 2)
+	for (i = 0; i < (len & ~1); i += 2)
 		sum += *sp++;
 
-	if (tlen & 1)
+	if (len & 1)
 		sum += htons((*(const u_int8_t *)sp) << 8);
 
 	while (sum > 0xffff)
@@ -588,7 +585,7 @@ udp_print(register const u_char *bp, u_int length,
 		int sum = up->uh_sum;
 		/* for IPv6, UDP checksum is mandatory */
 		if (TTEST2(cp[0], length)) {
-			sum = udp6_cksum(ip6, up, length);
+			sum = udp6_cksum(ip6, up, length + sizeof(struct udphdr));
 			if (sum != 0)
 				(void)printf("[bad udp cksum %x!] ", sum);
 			else
