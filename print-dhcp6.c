@@ -38,7 +38,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.33 2004-06-16 00:12:35 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.34 2004-07-05 07:49:30 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -108,12 +108,17 @@ struct dhcp6_relay {
 #define DH6OPT_IADDR 5
 #define DH6OPT_ORO 6
 #define DH6OPT_PREFERENCE 7
-#  define DH6OPT_PREF_UNDEF -1
 #  define DH6OPT_PREF_MAX 255
 #define DH6OPT_ELAPSED_TIME 8
 #define DH6OPT_RELAY_MSG 9
 /*#define DH6OPT_SERVER_MSG 10 deprecated */
 #define DH6OPT_AUTH 11
+#  define DH6OPT_AUTHPROTO_DELAYED 2
+#  define DH6OPT_AUTHPROTO_RECONFIG 3
+#  define DH6OPT_AUTHALG_HMACMD5 1
+#  define DH6OPT_AUTHRDM_MONOCOUNTER 0
+#  define DH6OPT_AUTHRECONFIG_KEY 1
+#  define DH6OPT_AUTHRECONFIG_HMACMD5 2
 #define DH6OPT_UNICAST 12
 #define DH6OPT_STATUS_CODE 13
 #  define DH6OPT_STCODE_SUCCESS 0
@@ -174,6 +179,16 @@ struct dhcp6_ia_prefix {
 	u_int8_t dh6opt_ia_prefix_plen;
 	struct in6_addr dh6opt_ia_prefix_addr;
 }  __attribute__ ((__packed__));
+
+struct dhcp6_auth {
+	u_int16_t dh6opt_auth_type;
+	u_int16_t dh6opt_auth_len;
+	u_int8_t dh6opt_auth_proto;
+	u_int8_t dh6opt_auth_alg;
+	u_int8_t dh6opt_auth_rdm;
+	u_int8_t dh6opt_auth_rdinfo[8];
+	/* authentication information follows */
+} __attribute__ ((__packed__));
 
 static const char *
 dhcp6opt_name(int type)
@@ -286,6 +301,8 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 	struct in6_addr addr6;
 	struct dhcp6_ia ia;
 	struct dhcp6_ia_prefix ia_prefix;
+	struct dhcp6_auth authopt;
+	int authinfolen, authrealmlen;
 
 	if (cp == ep)
 		return;
@@ -385,6 +402,97 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 		case DH6OPT_RELAY_MSG:
 			printf(" (");
 			dhcp6_print((const u_char *)(dh6o + 1), optlen);
+			printf(")");
+			break;
+		case DH6OPT_AUTH:
+			if (optlen < sizeof(authopt) - sizeof(*dh6o)) {
+				printf(" ?)");
+				break;
+			}
+			memcpy(&authopt, dh6o, sizeof(authopt));
+			switch (authopt.dh6opt_auth_proto) {
+			case DH6OPT_AUTHPROTO_DELAYED:
+				printf(" proto: delayed");
+				break;
+			case DH6OPT_AUTHPROTO_RECONFIG:
+				printf(" proto: reconfigure");
+				break;
+			default:
+				printf(" proto: %d",
+				    authopt.dh6opt_auth_proto);
+				break;
+			}
+			switch (authopt.dh6opt_auth_alg) {
+			case DH6OPT_AUTHALG_HMACMD5:
+				/* XXX: may depend on the protocol */
+				printf(", alg: HMAC-MD5");
+				break;
+			default:
+				printf(", alg: %d", authopt.dh6opt_auth_alg);
+				break;
+			}
+			switch (authopt.dh6opt_auth_rdm) {
+			case DH6OPT_AUTHRDM_MONOCOUNTER:
+				printf(", RDM: mono");
+				break;
+			default:
+				printf(", RDM: %d", authopt.dh6opt_auth_rdm);
+				break;
+			}
+			tp = (u_char *)&authopt.dh6opt_auth_rdinfo;
+			printf(", RD:");
+			for (i = 0; i < 4; i++, tp += sizeof(val16))
+				printf(" %04x", EXTRACT_16BITS(tp));
+
+			/* protocol dependent part */
+			tp = (u_char *)dh6o + sizeof(authopt);
+			authinfolen =
+			    optlen + sizeof(*dh6o) - sizeof(authopt); 
+			switch (authopt.dh6opt_auth_proto) {
+			case DH6OPT_AUTHPROTO_DELAYED:
+				if (authinfolen == 0)
+					break;
+				authrealmlen = authinfolen - 20;
+				if (authrealmlen < 0) {
+					printf(" ??");
+					break;
+				}
+				if (authrealmlen > 0) {
+					printf(", realm: ");
+				}
+				for (i = 0; i < authrealmlen; i++, tp++)
+					printf("%02x", *tp);
+				printf(", key ID: %08x", EXTRACT_32BITS(tp));
+				tp += 4;
+				printf(", HMAC-MD5:");
+				for (i = 0; i < 4; i++, tp+= 4)
+					printf(" %08x", EXTRACT_32BITS(tp));
+				break;
+			case DH6OPT_AUTHPROTO_RECONFIG:
+				if (authinfolen != 17) {
+					printf(" ??");
+					break;
+				}
+				switch (*tp++) {
+				case DH6OPT_AUTHRECONFIG_KEY:
+					printf(" reconfig-key");
+					break;
+				case DH6OPT_AUTHRECONFIG_HMACMD5:
+					printf(" type: HMAC-MD5");
+					break;
+				default:
+					printf(" type: ??");
+					break;
+				}
+				printf(" value:");
+				for (i = 0; i < 4; i++, tp+= 4)
+					printf(" %08x", EXTRACT_32BITS(tp));
+				break;
+			default:
+				printf(" ??");
+				break;
+			}
+
 			printf(")");
 			break;
 		case DH6OPT_RAPID_COMMIT: /* nothing todo */
