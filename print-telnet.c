@@ -49,13 +49,9 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_SYS_CDEFS_H
-#include <sys/cdefs.h>
-#endif
-#if 0
 #ifndef lint
-__RCSID("$NetBSD: print-telnet.c,v 1.2 1999/10/11 12:40:12 sjg Exp $");
-#endif
+static const char rcsid[] =
+     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.5 2000-01-09 21:34:20 fenner Exp $";
 #endif
 
 #include <sys/param.h>

@@ -210,9 +210,6 @@
 /* Define if you have the <smi.h> header file.  */
 #undef HAVE_SMI_H
 
-/* Define if you have the <sys/cdefs.h> header file.  */
-#undef HAVE_SYS_CDEFS_H
-
 /* Define if you have the <zlib.h> header file.  */
 #undef HAVE_ZLIB_H
 

@@ -31,6 +31,11 @@
 #include "config.h"
 #endif
 
+#ifndef lint
+static const char rcsid[] =
+     "@(#) $Header: /tcpdump/master/tcpdump/print-ip6opts.c,v 1.3 2000-01-09 21:34:18 fenner Exp $";
+#endif
+
 #ifdef INET6
 #include <sys/param.h>
 #include <sys/time.h>

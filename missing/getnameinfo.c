@@ -38,6 +38,11 @@
 #include "config.h"
 #endif 
 
+#ifndef lint
+static const char rcsid[] =
+     "@(#) $Header: /tcpdump/master/tcpdump/missing/getnameinfo.c,v 1.4 2000-01-09 21:35:44 fenner Exp $";
+#endif
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <net/if.h>

@@ -42,6 +42,11 @@
 #include "config.h"
 #endif 
 
+#ifndef lint
+static const char rcsid[] =
+     "@(#) $Header: /tcpdump/master/tcpdump/missing/getaddrinfo.c,v 1.7 2000-01-09 21:35:44 fenner Exp $";
+#endif
+
 #include <sys/types.h>
 #include <sys/param.h>
 #if 0

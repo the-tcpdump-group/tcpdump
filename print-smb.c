@@ -9,6 +9,11 @@
 #include "config.h"
 #endif
 
+#ifndef lint
+static const char rcsid[] =
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.4 2000-01-09 21:34:19 fenner Exp $";
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>

@@ -31,6 +31,11 @@
 #include "config.h"
 #endif
 
+#ifndef lint
+static const char rcsid[] =
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.10 2000-01-09 21:34:17 fenner Exp $";
+#endif
+
 #include <sys/param.h>
 #include <sys/time.h>
 #include <sys/types.h>
