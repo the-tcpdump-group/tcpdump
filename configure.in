@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.187 2005-03-27 22:58:08 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.188 2005-03-27 23:16:08 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.187 $)
+AC_REVISION($Revision: 1.188 $)
 AC_PREREQ(2.50)
 AC_INIT(tcpdump.c)
 
@@ -512,7 +512,69 @@ AC_STRUCT_RES_STATE(ac_cv_res_state)
 
 AC_REPLACE_FUNCS(vfprintf strcasecmp strlcat strlcpy strdup strsep)
 AC_CHECK_FUNCS(strftime)
+AC_CHECK_FUNCS(setlinebuf alarm)
 
+needsnprintf=no
+AC_CHECK_FUNCS(vsnprintf snprintf,,
+	[needsnprintf=yes])
+if test $needsnprintf = yes; then
+	AC_LIBOBJ(snprintf)
+fi
+
+AC_LBL_TYPE_SIGNAL
+
+AC_SEARCH_LIBS(dnet_htoa, dnet, AC_DEFINE(HAVE_DNET_HTOA))
+
+AC_CHECK_LIB(rpc, main)		dnl It's unclear why we might need -lrpc
+
+dnl Some platforms may need -lnsl for getrpcbynumber.
+AC_SEARCH_LIBS(getrpcbynumber, nsl, AC_DEFINE(HAVE_GETRPCBYNUMBER))
+
+dnl AC_CHECK_LIB(z, uncompress)
+dnl AC_CHECK_HEADERS(zlib.h)
+
+AC_LBL_LIBPCAP(V_PCAPDEP, V_INCLS)
+
+#
+# Check for these after AC_LBL_LIBPCAP, so we link with the appropriate
+# libraries (e.g., "-lsocket -lnsl" on Solaris).
+#
+# We don't use AC_REPLACE_FUNCS because that uses AC_CHECK_FUNCS which
+# use AC_CHECK_FUNC which doesn't let us specify the right #includes
+# to make this work on BSD/OS 4.x.  BSD/OS 4.x ships with the BIND8
+# resolver, and the way it defines inet_{ntop,pton} is rather strange;
+# it does not ship with a libc symbol "inet_ntop()", it ships with
+# "_inet_ntop()", and has a #define macro in one of the system headers
+# to rename it.
+#
+dnl AC_TRY_COMPILE(inet_ntop inet_pton inet_aton)
+AC_MSG_CHECKING(for inet_ntop)
+AC_TRY_LINK([#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>], [char src[4], dst[128];
+inet_ntop(AF_INET, src, dst, sizeof(dst));],
+	[AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)
+	AC_LIBOBJ(inet_ntop)])
+AC_MSG_CHECKING(for inet_pton)
+AC_TRY_LINK([#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>], [char src[128], dst[4];
+inet_pton(AF_INET, src, dst);],
+	[AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)
+	AC_LIBOBJ(inet_pton)])
+AC_MSG_CHECKING(for inet_aton)
+AC_TRY_LINK([#include <sys/types.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>], [char src[128];
+struct in_addr dst;
+inet_aton(src, &dst);],
+	[AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)
+	AC_LIBOBJ(inet_aton)])
+
+#
+# Check for these after AC_LBL_LIBPCAP, for the same reason.
 #
 # You are in a twisty little maze of UN*Xes, all different.
 # Some might not have ether_ntohost().
@@ -599,67 +661,6 @@ struct rtentry;
 		fi
 	fi
 fi
-
-AC_CHECK_FUNCS(setlinebuf alarm)
-
-needsnprintf=no
-AC_CHECK_FUNCS(vsnprintf snprintf,,
-	[needsnprintf=yes])
-if test $needsnprintf = yes; then
-	AC_LIBOBJ(snprintf)
-fi
-
-AC_LBL_TYPE_SIGNAL
-
-AC_SEARCH_LIBS(dnet_htoa, dnet, AC_DEFINE(HAVE_DNET_HTOA))
-
-AC_CHECK_LIB(rpc, main)		dnl It's unclear why we might need -lrpc
-
-dnl Some platforms may need -lnsl for getrpcbynumber.
-AC_SEARCH_LIBS(getrpcbynumber, nsl, AC_DEFINE(HAVE_GETRPCBYNUMBER))
-
-dnl AC_CHECK_LIB(z, uncompress)
-dnl AC_CHECK_HEADERS(zlib.h)
-
-AC_LBL_LIBPCAP(V_PCAPDEP, V_INCLS)
-
-#
-# Check for these after AC_LBL_LIBPCAP, so we link with the appropriate
-# libraries (e.g., "-lsocket -lnsl" on Solaris).
-#
-# We don't use AC_REPLACE_FUNCS because that uses AC_CHECK_FUNCS which
-# use AC_CHECK_FUNC which doesn't let us specify the right #includes
-# to make this work on BSD/OS 4.x.  BSD/OS 4.x ships with the BIND8
-# resolver, and the way it defines inet_{ntop,pton} is rather strange;
-# it does not ship with a libc symbol "inet_ntop()", it ships with
-# "_inet_ntop()", and has a #define macro in one of the system headers
-# to rename it.
-#
-dnl AC_TRY_COMPILE(inet_ntop inet_pton inet_aton)
-AC_MSG_CHECKING(for inet_ntop)
-AC_TRY_LINK([#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>], [char src[4], dst[128];
-inet_ntop(AF_INET, src, dst, sizeof(dst));],
-	[AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)
-	AC_LIBOBJ(inet_ntop)])
-AC_MSG_CHECKING(for inet_pton)
-AC_TRY_LINK([#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>], [char src[128], dst[4];
-inet_pton(AF_INET, src, dst);],
-	[AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)
-	AC_LIBOBJ(inet_pton)])
-AC_MSG_CHECKING(for inet_aton)
-AC_TRY_LINK([#include <sys/types.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>], [char src[128];
-struct in_addr dst;
-inet_aton(src, &dst);],
-	[AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)
-	AC_LIBOBJ(inet_aton)])
 
 dnl portability macros for getaddrinfo/getnameinfo
 dnl
