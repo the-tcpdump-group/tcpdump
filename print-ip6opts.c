@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-ip6opts.c,v 1.13 2002-12-11 07:14:03 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-ip6opts.c,v 1.14 2003-01-10 08:11:00 guy Exp $";
 #endif
 
 #ifdef INET6
@@ -139,7 +139,7 @@ void
 ip6_opt_print(const u_char *bp, int len)
 {
     int i;
-    int optlen;
+    int optlen = 0;
 
     for (i = 0; i < len; i += optlen) {
 	if (bp[i] == IP6OPT_PAD1)
