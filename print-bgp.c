@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.79 2004-03-16 11:39:59 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.80 2004-03-18 11:14:45 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -196,13 +196,19 @@ static struct tok bgp_opt_values[] = {
 
 #define BGP_CAPCODE_MP                  1
 #define BGP_CAPCODE_RR                  2
+#define BGP_CAPCODE_ORF                 3 /* XXX */
 #define BGP_CAPCODE_RESTART            64 /* draft-ietf-idr-restart-05  */
+#define BGP_CAPCODE_AS_NEW             65 /* XXX */
+#define BGP_CAPCODE_DYN_CAP            67 /* XXX */
 #define BGP_CAPCODE_RR_CISCO          128
 
 static struct tok bgp_capcode_values[] = {
     { BGP_CAPCODE_MP,           "Multiprotocol Extensions"},
     { BGP_CAPCODE_RR,           "Route Refresh"},
+    { BGP_CAPCODE_ORF,          "Cooperative Route Filtering"},
     { BGP_CAPCODE_RESTART,      "Graceful Restart"},
+    { BGP_CAPCODE_AS_NEW,       "32-Bit AS Number"},
+    { BGP_CAPCODE_DYN_CAP,      "Dynamic Capability"},
     { BGP_CAPCODE_RR_CISCO,     "Route Refresh (Cisco)"},
     { 0, NULL}
 };
@@ -293,6 +299,9 @@ static struct tok bgp_origin_values[] = {
 #define SAFNUM_UNIMULTICAST             3
 /* labeled BGP RFC3107 */
 #define SAFNUM_LABUNICAST               4
+#define SAFNUM_TUNNEL                   64 /* XXX */
+#define SAFNUM_VPLS                     65 /* XXX */
+#define SAFNUM_MDT                      66 /* XXX */
 /* Section 4.3.4 of draft-rosen-rfc2547bis-03.txt  */
 #define SAFNUM_VPNUNICAST               128
 #define SAFNUM_VPNMULTICAST             129
@@ -308,6 +317,9 @@ static struct tok bgp_safi_values[] = {
     { SAFNUM_MULTICAST,         "Multicast"},
     { SAFNUM_UNIMULTICAST,      "Unicast+Multicast"},
     { SAFNUM_LABUNICAST,        "labeled Unicast"},
+    { SAFNUM_TUNNEL,            "Tunnel"},
+    { SAFNUM_VPLS,              "VPLS"},
+    { SAFNUM_MDT,               "MDT"},
     { SAFNUM_VPNUNICAST,        "labeled VPN Unicast"},
     { SAFNUM_VPNMULTICAST,      "labeled VPN Multicast"},
     { SAFNUM_VPNUNIMULTICAST,   "labeled VPN Unicast+Multicast"},
