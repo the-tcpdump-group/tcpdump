@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/udp.h,v 1.6 2004-04-19 21:17:14 hannes Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/udp.h,v 1.7 2004-07-27 17:04:21 hannes Exp $ (LBL) */
 /*
  * Copyright (c) 1982, 1986, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -52,12 +52,14 @@ struct udphdr {
 #define NTP_PORT 123		/*XXX*/
 #define SNMPTRAP_PORT 162	/*XXX*/
 #define ISAKMP_PORT 500		/*XXX*/
+#define SYSLOG_PORT 514         /* rfc3164 */
 #define TIMED_PORT 525		/*XXX*/
 #define RIP_PORT 520		/*XXX*/
 #define LDP_PORT 646
 #define AODV_PORT 654		/*XXX*/
 #define KERBEROS_SEC_PORT 750	/*XXX*/
 #define L2TP_PORT 1701		/*XXX*/
+#define SIP_PORT 5060
 #define ISAKMP_PORT_USER1 7500	/*XXX - nonstandard*/
 #define ISAKMP_PORT_USER2 8500	/*XXX - nonstandard*/
 #define RX_PORT_LOW 7000	/*XXX*/

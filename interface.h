@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.232 2004-07-21 22:00:10 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.233 2004-07-27 17:05:41 hannes Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -278,6 +278,7 @@ extern void mpls_lsp_ping_print(const u_char *, u_int);
 extern void zephyr_print(const u_char *, int);
 extern void hsrp_print(const u_char *, u_int);
 extern void bfd_print(const u_char *, u_int, u_int);
+extern void sip_print(const u_char *, u_int);
 
 #ifdef INET6
 extern void ip6_print(const u_char *, u_int);
