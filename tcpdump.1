@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.102 2001-02-25 01:00:25 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.103 2001-03-04 00:17:28 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -247,6 +247,13 @@ Print absolute, rather than relative, TCP sequence numbers.
 .TP
 .B \-tt
 Print an unformatted timestamp on each dump line.
+.TP
+.B \-ttt
+Print a delta (in micro-seconds) between current and previous line 
+on each dump line.
+.TP
+.B \-tttt
+Print a timestamp in default format proceeded by date on each dump line.
 .TP
 .B \-v
 (Slightly more) verbose output.  For example, the time to live,
