@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.99 2003-10-22 22:32:01 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.100 2003-10-25 12:02:01 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1328,13 +1328,15 @@ static int isis_print (const u_int8_t *p, u_int length)
 	}
 
 	TCHECK(*header_iih_ptp);
-	printf("\n\t  source-id: %s, holding time: %us, circuit-id: 0x%02x, %s, PDU length: %u",
+	printf("\n\t  source-id: %s, holding time: %us, Flags: [%s]",
                isis_print_id(header_iih_ptp->source_id,SYSTEM_ID_LEN),
                EXTRACT_16BITS(header_iih_ptp->holding_time),
-               header_iih_ptp->circuit_id,
                tok2str(isis_iih_circuit_type_values,
                        "unknown circuit type 0x%02x",
-                       header_iih_ptp->circuit_type),
+                       header_iih_ptp->circuit_type));
+
+	printf("\n\t  circuit-id: 0x%02x, PDU length: %u",
+               header_iih_ptp->circuit_id,
                pdu_len);
 
         if (vflag > 1) {
