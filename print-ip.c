@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.71 1999-10-30 05:30:20 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.72 1999-10-30 07:36:37 itojun Exp $ (LBL)";
 #endif
 
 #include <sys/param.h>
@@ -400,6 +400,9 @@ ip_print(register const u_char *bp, register u_int length)
 again:
 		switch (nh) {
 
+#ifndef IPPROTO_AH
+#define IPPROTO_AH	51
+#endif
 		case IPPROTO_AH:
 			nh = *cp;
 			advance = ah_print(cp, (const u_char *)ip);
@@ -407,6 +410,9 @@ again:
 			len -= advance;
 			goto again;
 
+#ifndef IPPROTO_ESP
+#define IPPROTO_ESP	50
+#endif
 		case IPPROTO_ESP:
 		    {
 			int enh;

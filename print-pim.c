@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.9 1999-10-30 05:11:19 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.10 1999-10-30 07:36:38 itojun Exp $ (LBL)";
 #endif
 
 #include <sys/param.h>
@@ -44,7 +44,7 @@ static const char rcsid[] =
 #include <netinet6/pim6.h>
 #else
 struct pim {
-#if defined(BYTE_ORDER) && (BYTE_ORDER == LITTLE_ENDIAN)
+#if defined(WORDS_BIGENDIAN) || (defined(BYTE_ORDER) && (BYTE_ORDER == LITTLE_ENDIAN))
 	u_char	pim_type:4, /* the PIM message type, currently they are:
 			    * Hello, Register, Register-Stop, Join/Prune,
 			    * Bootstrap, Assert, Graft (PIM-DM only),

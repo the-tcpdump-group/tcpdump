@@ -65,9 +65,11 @@
 #include "cdecl_ext.h"
 #endif 
 
+#if 0
 #ifndef HAVE_U_INT32_T
 #include "bittypes.h"
 #endif 
+#endif
 
 #ifndef HAVE_SOCKADDR_STORAGE
 #include "sockstorage.h"

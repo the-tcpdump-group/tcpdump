@@ -17,7 +17,7 @@
 #  WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 #  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.210 1999-10-30 05:11:06 itojun Exp $ (LBL)
+# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.211 1999-10-30 07:36:34 itojun Exp $ (LBL)
 
 #
 # Various configurable paths (remember to edit Makefile.in, not Makefile)
@@ -118,6 +118,8 @@ getaddrinfo.o: $(srcdir)/missing/getaddrinfo.c
 	$(CC) $(CFLAGS) -o $@ -c $(srcdir)/missing/getaddrinfo.c
 
 version.o: version.c
+	$(CC) $(CFLAGS) -c version.c
+
 version.c: $(srcdir)/VERSION
 	@rm -f $@
 	sed -e 's/.*/char version[] = "&";/' $(srcdir)/VERSION > $@
