@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-gre.c,v 1.9 2000-12-18 05:41:59 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-gre.c,v 1.10 2001-02-03 20:21:28 fenner Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -72,14 +72,29 @@ struct gre {
 	}     gre_void4;
 };
 
+/* RFC 2784 - GRE */
 #define GRE_CP		0x8000	/* Checksum Present */
-#define GRE_RP		0x4000	/* Routing Present */
+#define GRE_VER_MASK	0x0007	/* Version */
+
+/* RFC 2890 - Key and Sequence extensions to GRE */
 #define GRE_KP		0x2000	/* Key Present */
 #define GRE_SP		0x1000	/* Sequence Present */
 
+/* Legacy from RFC 1700 */
+#define GRE_RP		0x4000	/* Routing Present */
+#define GRE_sP		0x0800	/* strict source route present */
+#define GRE_RECUR_MASK	0x0700  /* Recursion Control */
+#define GRE_RECUR_SHIFT	8
+
+/* "Enhanced GRE" from RFC2637 - PPTP */
+#define GRE_AP		0x0080	/* Ack present */
+
+#define GRE_MBZ_MASK	0x0078	/* not defined */
 
 /*
  * Deencapsulate and print a GRE-tunneled IP datagram
+ *
+ * XXX PPTP needs to interpret the "key" field...
  */
 void
 gre_print(const u_char *bp, u_int length)
@@ -90,13 +105,11 @@ gre_print(const u_char *bp, u_int length)
 
 	gre = (const struct gre *)bp;
 
-	if (length < GRE_SIZE) {
-		goto trunc;
-	}
+	TCHECK(gre->proto);
 	flags = EXTRACT_16BITS(&gre->flags);
 	proto = EXTRACT_16BITS(&gre->proto);
 
-	if (vflag) {
+	if (flags) {
 		/* Decode the flags */
 		putchar('[');
 		if (flags & GRE_CP)
@@ -107,6 +120,16 @@ gre_print(const u_char *bp, u_int length)
 			putchar('K');
 		if (flags & GRE_SP)
 			putchar('S');
+		if (flags & GRE_sP)
+			putchar('s');
+		if (flags & GRE_AP)
+			putchar('A');
+		if (flags & GRE_RECUR_MASK)
+			printf("R%x", (flags & GRE_RECUR_MASK) >> GRE_RECUR_SHIFT);
+		if (flags & GRE_VER_MASK)
+			printf("v%x", flags & GRE_VER_MASK);
+		if (flags & GRE_MBZ_MASK)
+			printf("!%x", flags & GRE_MBZ_MASK);
 		fputs("] ", stdout);
 	}
 	/* Checksum & Offset are present */
@@ -117,10 +140,26 @@ gre_print(const u_char *bp, u_int length)
 	if (flags & GRE_RP)
 		return;
 
-	if (flags & GRE_KP)
-		cp += 4;
-	if (flags & GRE_SP)
-		cp += 4;
+	if (flags & GRE_KP) {
+		TCHECK2(*cp, 4);
+		if (vflag > 1)
+			printf("K:%08x ", EXTRACT_32BITS(cp));
+		cp += 4;	/* skip key */
+	}
+	if (flags & GRE_SP) {
+		TCHECK2(*cp, 4);
+		if (vflag > 1)
+			printf("S:%08x ", EXTRACT_32BITS(cp));
+		cp += 4;	/* skip seq */
+	}
+	if (flags & GRE_AP && (flags & GRE_VER_MASK) >= 1) {
+		TCHECK2(*cp, 4);
+		if (vflag > 1)
+			printf("A:%08x ", EXTRACT_32BITS(cp));
+		cp += 4;	/* skip ack */
+	}
+
+	TCHECK(cp[0]);
 
 	length -= cp - bp;
 	if (ether_encap_print(proto, cp, length, length,
