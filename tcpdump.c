@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.174 2002-02-05 10:07:40 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.175 2002-04-24 06:55:56 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -83,6 +83,7 @@ int vflag;			/* verbose */
 int xflag;			/* print packet in hex */
 int Xflag;			/* print packet in ascii as well as hex */
 off_t Cflag = 0;                /* rotate dump files after this many bytes */
+int Aflag = 0;                  /* print packet only in ascii observing LF, CR, TAB, SPACE */
 
 char *espsecret = NULL;		/* ESP secret key */
 
@@ -221,12 +222,18 @@ main(int argc, char **argv)
 	
 	opterr = 0;
 	while (
-	    (op = getopt(argc, argv, "ac:C:deE:fF:i:lm:nNOpqr:Rs:StT:uvw:xXY")) != -1)
+	    (op = getopt(argc, argv, "aAc:C:deE:fF:i:lm:nNOpqr:Rs:StT:uvw:xXY")) != -1)
 		switch (op) {
 
 		case 'a':
 			++aflag;
 			break;
+
+               case 'A':
+                       ++xflag;
+                       ++Xflag;
+                       ++Aflag;
+                       break; 
 
 		case 'c':
 			cnt = atoi(optarg);
@@ -641,7 +648,7 @@ usage(void)
 	(void)fprintf(stderr, "%s version %s\n", program_name, version);
 	(void)fprintf(stderr, "libpcap version %s\n", pcap_version);
 	(void)fprintf(stderr,
-"Usage: %s [-adeflnNOpqRStuvxX] [ -c count ] [ -C file_size ]\n", program_name);
+"Usage: %s [-aAdeflnNOpqRStuvxX] [ -c count ] [ -C file_size ]\n", program_name);
 	(void)fprintf(stderr,
 "\t\t[ -F file ] [ -i interface ] [ -r file ] [ -s snaplen ]\n");
 	(void)fprintf(stderr,

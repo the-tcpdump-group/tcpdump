@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.117 2002-02-10 00:36:40 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.118 2002-04-24 06:55:55 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -27,7 +27,7 @@ tcpdump \- dump traffic on a network
 .na
 .B tcpdump
 [
-.B \-adeflnNOpqRStuvxX
+.B \-aAdeflnNOpqRStuvxX
 ] [
 .B \-c
 .I count
@@ -184,6 +184,10 @@ You must have read access to
 Reading a saved packet file doesn't require special privileges.
 .SH OPTIONS
 .TP
+.TP
+.B \-A
+Print each packet (minus its link level header) in ASCII.  Handy for
+capturing web pages.
 .B \-a
 Attempt to convert network and broadcast addresses to names.
 .TP

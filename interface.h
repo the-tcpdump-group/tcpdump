@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.180 2002-04-07 09:50:30 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.181 2002-04-24 06:55:55 guy Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -79,7 +79,7 @@ extern int uflag;		/* Print undecoded NFS handles */
 extern int vflag;		/* verbose */
 extern int xflag;		/* print packet in hex */
 extern int Xflag;		/* print packet in hex/ascii */
-
+extern int Aflag;		/* print packet only in ascii observing TAB, LF, CR and SPACE as graphical chars */
 extern char *espsecret;
 extern struct esp_algorithm *espsecret_xform;   /* cache of decoded alg. */
 extern char                 *espsecret_key;
