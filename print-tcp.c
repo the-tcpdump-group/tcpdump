@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.85 2001-03-09 05:38:21 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.86 2001-05-09 01:16:57 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -58,45 +58,6 @@ static void print_tcp_rst_data(register const u_char *sp, u_int length);
 
 #define MAX_RST_DATA_LEN	30
 
-/* Compatibility */
-#ifndef TCPOPT_WSCALE
-#define	TCPOPT_WSCALE		3	/* window scale factor (rfc1072) */
-#endif
-#ifndef TCPOPT_SACKOK
-#define	TCPOPT_SACKOK		4	/* selective ack ok (rfc1072) */
-#endif
-#ifndef TCPOPT_SACK
-#define	TCPOPT_SACK		5	/* selective ack (rfc1072) */
-#endif
-#ifndef TCPOPT_ECHO
-#define	TCPOPT_ECHO		6	/* echo (rfc1072) */
-#endif
-#ifndef TCPOPT_ECHOREPLY
-#define	TCPOPT_ECHOREPLY	7	/* echo (rfc1072) */
-#endif
-#ifndef TCPOPT_TIMESTAMP
-#define TCPOPT_TIMESTAMP	8	/* timestamps (rfc1323) */
-#endif
-#ifndef TCPOPT_CC
-#define TCPOPT_CC		11	/* T/TCP CC options (rfc1644) */
-#endif
-#ifndef TCPOPT_CCNEW
-#define TCPOPT_CCNEW		12	/* T/TCP CC options (rfc1644) */
-#endif
-#ifndef TCPOPT_CCECHO
-#define TCPOPT_CCECHO		13	/* T/TCP CC options (rfc1644) */
-#endif
-
-/*
- * Definitions required for ECN
- * for use if the OS running tcpdump does not have ECN
- */
-#ifndef TH_ECNECHO
-#define TH_ECNECHO		0x40	/* ECN Echo in tcp header */
-#endif
-#ifndef TH_CWR
-#define TH_CWR			0x80	/* ECN Cwnd Reduced in tcp header*/
-#endif
 
 struct tha {
 #ifndef INET6
