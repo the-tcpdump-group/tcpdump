@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.14 2000-09-22 20:35:34 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.15 2000-09-23 04:43:42 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -86,6 +86,8 @@ static u_char *isakmp_id_print __P((struct isakmp_gen *, u_char *, u_int32_t,
 	u_int32_t, u_int32_t));
 static u_char *isakmp_cert_print __P((struct isakmp_gen *, u_char *, u_int32_t,
 	u_int32_t, u_int32_t));
+static u_char *isakmp_cr_print __P((struct isakmp_gen *, u_char *, u_int32_t,
+	u_int32_t, u_int32_t));
 static u_char *isakmp_sig_print __P((struct isakmp_gen *, u_char *, u_int32_t,
 	u_int32_t, u_int32_t));
 static u_char *isakmp_hash_print __P((struct isakmp_gen *, u_char *,
@@ -133,7 +135,7 @@ static u_char *(*npfunc[]) __P((struct isakmp_gen *, u_char *, u_int32_t,
 	isakmp_ke_print,
 	isakmp_id_print,
 	isakmp_cert_print,
-	isakmp_cert_print,
+	isakmp_cr_print,
 	isakmp_hash_print,
 	isakmp_sig_print,
 	isakmp_nonce_print,
@@ -772,6 +774,29 @@ isakmp_cert_print(struct isakmp_gen *ext, u_char *ep, u_int32_t phase,
 	};
 
 	printf("%s:", NPSTR(ISAKMP_NPTYPE_CERT));
+
+	p = (struct isakmp_pl_cert *)ext;
+	printf(" len=%d", ntohs(ext->len) - 4);
+	printf(" type=%s", STR_OR_ID((p->encode), certstr));
+	if (2 < vflag && 4 < ntohs(ext->len)) {
+		printf(" ");
+		rawprint((caddr_t)(ext + 1), ntohs(ext->len) - 4);
+	}
+	return (u_char *)ext + ntohs(ext->len);
+}
+
+static u_char *
+isakmp_cr_print(struct isakmp_gen *ext, u_char *ep, u_int32_t phase,
+	u_int32_t doi0, u_int32_t proto0)
+{
+	struct isakmp_pl_cert *p;
+	static char *certstr[] = {
+		"none",	"pkcs7", "pgp", "dns",
+		"x509sign", "x509ke", "kerberos", "crl",
+		"arl", "spki", "x509attr",
+	};
+
+	printf("%s:", NPSTR(ISAKMP_NPTYPE_CR));
 
 	p = (struct isakmp_pl_cert *)ext;
 	printf(" len=%d", ntohs(ext->len) - 4);
