@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.86 2003-06-07 07:12:11 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.87 2003-06-16 07:06:28 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1250,9 +1250,37 @@ static int isis_print (const u_int8_t *p, u_int length)
 
     /* in non-verbose mode just lets print the basic PDU Type*/
     if (vflag < 1) {
-        printf(", IS-IS, %s, length %u",
-               tok2str(isis_pdu_values,"unknown PDU-Type %u",pdu_type),
-               length);
+        printf(", IS-IS, %s",
+               tok2str(isis_pdu_values,"unknown PDU-Type %u",pdu_type));
+
+	switch (pdu_type) {
+
+	case L1_LAN_IIH:
+	case L2_LAN_IIH:
+	    printf(", source-id %s", isis_print_id(header_iih_lan->source_id,SYSTEM_ID_LEN));
+	    break;
+	case PTP_IIH:
+	    printf(", source-id %s", isis_print_id(header_iih_ptp->source_id,SYSTEM_ID_LEN));
+	    break;
+	case L1_LSP:
+	case L2_LSP:
+	    printf(", lsp-id %s, seq 0x%08x, lifetime %5us",
+		   isis_print_id(header_lsp->lsp_id, LSP_ID_LEN),
+		   EXTRACT_32BITS(header_lsp->sequence_number),
+		   EXTRACT_16BITS(header_lsp->remaining_lifetime));
+	    break;
+	case L1_CSNP:
+	case L2_CSNP:
+	    printf(", source-id %s", isis_print_id(header_csnp->source_id,SYSTEM_ID_LEN));
+	    break;
+	case L1_PSNP:
+	case L2_PSNP:
+	    printf(", source-id %s", isis_print_id(header_psnp->source_id,SYSTEM_ID_LEN));
+	    break;
+
+	}
+	printf(", length %u", length);
+
         return(1);
     }
 
