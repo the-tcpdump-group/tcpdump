@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.75 2001-02-23 08:55:21 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.76 2001-06-26 06:19:04 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -33,12 +33,6 @@ static const char rcsid[] =
 
 #include <netinet/in.h>
 
-#ifdef NOERROR
-#undef NOERROR					/* Solaris sucks */
-#endif
-#ifdef NOERROR
-#undef T_UNSPEC					/* SINIX does too */
-#endif
 #include "nameser.h"
 
 #include <stdio.h>

@@ -29,7 +29,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lwres.c,v 1.4 2001-02-09 05:16:48 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lwres.c,v 1.5 2001-06-26 06:19:05 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -41,12 +41,6 @@ static const char rcsid[] =
 
 #include <netinet/in.h>
 
-#ifdef NOERROR
-#undef NOERROR					/* Solaris sucks */
-#endif
-#ifdef NOERROR
-#undef T_UNSPEC					/* SINIX does too */
-#endif
 #include "nameser.h"
 
 #include <stdio.h>

@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/nameser.h,v 1.7 2001-02-20 06:31:34 itojun Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/nameser.h,v 1.8 2001-06-26 06:19:03 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1983, 1989, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -94,6 +94,20 @@
 
 #define ZONEINIT	0xe		/* initial zone transfer */
 #define ZONEREF		0xf		/* incremental zone referesh */
+
+/*
+ * Undefine various #defines from various System V-flavored OSes (Solaris,
+ * SINIX) so the compiler doesn't whine that we redefine them.
+ */
+#ifdef T_OPT
+#undef T_OPT
+#endif
+#ifdef T_UNSPEC
+#undef T_UNSPEC
+#endif
+#ifdef NOERROR
+#undef NOERROR
+#endif
 
 /*
  * Currently defined response codes

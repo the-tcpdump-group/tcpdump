@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.95 2001-06-25 21:38:51 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.96 2001-06-26 06:19:06 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -54,12 +54,6 @@ static const char rcsid[] =
 #include "ip6.h"
 #endif
 
-#ifdef NOERROR
-#undef NOERROR					/* Solaris sucks */
-#endif
-#ifdef T_UNSPEC
-#undef T_UNSPEC					/* SINIX does too */
-#endif
 #include "nameser.h"
 #include "nfs.h"
 #include "bootp.h"

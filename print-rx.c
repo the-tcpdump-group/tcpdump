@@ -13,7 +13,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.20 2001-01-10 08:12:01 fenner Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.21 2001-06-26 06:19:05 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -35,8 +35,9 @@ static const char rcsid[] =
 #include "addrtoname.h"
 #include "extract.h"
 
-#undef NOERROR					/* Solaris sucks */
-#include <arpa/nameser.h>
+#if 0
+#include "nameser.h"
+#endif
 
 #include "rx.h"
 
