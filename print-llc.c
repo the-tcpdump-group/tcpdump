@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.38 2001-06-04 05:47:14 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.39 2001-06-15 07:59:14 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -218,7 +218,7 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 
 		case OUI_CISCO:
 			if (et == ETHERTYPE_CISCO_CDP) {
-				cdp_print( p, length, caplen, esrc, edst);
+				cdp_print(p, length, caplen, esrc, edst);
 				return 1;
 			}
 			break;
