@@ -11,7 +11,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-stp.c,v 1.10 2002-09-05 21:25:49 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-stp.c,v 1.11 2003-09-12 20:53:19 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -81,13 +81,13 @@ stp_print(const u_char *p, u_int length)
 
 	switch (p[6])
 	{
-	case 0:
+	case 0x00:
 		if (length < 10)
 			goto trunc;
 		stp_print_config_bpdu(p);
 		break;
 
-	case 1:
+	case 0x80:
 		stp_print_tcn_bpdu();
 		break;
 
