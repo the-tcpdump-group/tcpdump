@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/ethertype.h,v 1.8 2000-01-17 06:23:19 itojun Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/ethertype.h,v 1.9 2000-01-29 20:58:41 fenner Exp $ (LBL)
  */
 
 /* Types missing from some systems */
@@ -48,7 +48,7 @@
 #define ETHERTYPE_SCA		0x6007
 #endif
 #ifndef	ETHERTYPE_8021Q
-#define	ETHERTYPE_8021Q		0x8001
+#define	ETHERTYPE_8021Q		0x8100
 #endif
 #ifndef ETHERTYPE_REVARP
 #define ETHERTYPE_REVARP	0x8035
