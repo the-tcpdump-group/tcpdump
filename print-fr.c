@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.2 2002-07-11 08:27:03 guy Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.3 2002-07-16 04:09:27 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -254,7 +254,6 @@ fr_if_print(u_char *user, const struct pcap_pkthdr *h,
 	switch (protocol) {
 
 	case NLPID_IP:
-	case ETHERTYPE_IP:
 		ip_print(p, length);
 		break;
 
