@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.41 2002-07-22 23:16:12 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.42 2002-07-24 00:10:46 hannes Exp $";
 #endif
 
 #include <sys/param.h>
@@ -103,6 +103,17 @@ struct bgp_notification {
 	/* data should follow */
 };
 #define BGP_NOTIFICATION_SIZE		21	/* unaligned */
+
+struct bgp_route_refresh {
+    u_int8_t  bgp_marker[16];
+    u_int16_t len;
+    u_int8_t  type;
+    u_int8_t  afi;    /* the compiler messes this structure up               */
+    u_int8_t  pad;    /* when doing misaligned sequences of int8 and int16   */
+    u_int8_t  res;    /* afi should be int16 - so we have to access it using */
+    u_int8_t  safi;   /* EXTRACT_16BITS(&bgp_route_refresh->afi) (sigh)      */ 
+};
+#define BGP_ROUTE_REFRESH_SIZE          23
 
 struct bgp_attr {
 	u_int8_t bgpa_flags;
@@ -1085,6 +1096,26 @@ trunc:
 }
 
 static void
+bgp_route_refresh_print(const u_char *pptr, int len) {
+
+        const struct bgp_route_refresh *bgp_route_refresh_header;
+        bgp_route_refresh_header = (const struct bgp_route_refresh *)pptr;
+
+        printf("\n\t  AFI %s (%u), SAFI %s (%u)",
+               tok2str(bgp_afi_values,"Unknown",
+                       EXTRACT_16BITS(&bgp_route_refresh_header->afi)), /* this stinks but the compiler pads the structure weird */
+               EXTRACT_16BITS(&bgp_route_refresh_header->afi),
+               tok2str(bgp_safi_values,"Unknown",
+                       bgp_route_refresh_header->safi),
+               bgp_route_refresh_header->safi);
+
+        if (vflag)
+            print_unknown_data(pptr,"\n\t  ", len);
+        
+        return;
+}
+
+static void
 bgp_header_print(const u_char *dat, int length)
 {
 	struct bgp bgp;
@@ -1107,6 +1138,9 @@ bgp_header_print(const u_char *dat, int length)
 		bgp_notification_print(dat, length);
 		break;
         case BGP_KEEPALIVE:
+                break;
+        case BGP_ROUTE_REFRESH:
+                bgp_route_refresh_print(dat, length);
                 break;
         default:
             /* we have no decoder for the BGP message */
