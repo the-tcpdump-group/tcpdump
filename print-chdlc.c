@@ -1,4 +1,3 @@
-/* maybe it should be merged into print-ppp.c */
 /*
  * Copyright (c) 1990, 1991, 1993, 1994, 1995, 1996, 1997
  *	The Regents of the University of California.  All rights reserved.
@@ -22,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.18 2002-09-23 11:18:08 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.19 2002-10-04 08:15:35 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -117,7 +116,10 @@ chdlc_print(register const u_char *p, u_int length, u_int caplen)
 		break;
 #endif
         case ETHERTYPE_ISO:
-                isoclns_print(p+CHDLC_HDRLEN, length, length, NULL, NULL);
+                if (*(p+CHDLC_HDRLEN) == 0) /* is the fudge byte set ? if yes lets skip a byte */
+                    isoclns_print(p+CHDLC_HDRLEN+1, length-1, length-1, NULL, NULL);
+                else
+                    isoclns_print(p+CHDLC_HDRLEN, length, length, NULL, NULL);
                 break;
 	default:
                 printf("unknown CHDLC protocol (0x%04x)", proto);
