@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.34 2002-07-07 20:55:16 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.35 2002-07-14 09:36:00 hannes Exp $";
 #endif
 
 #include <sys/param.h>
@@ -460,14 +460,12 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 	case BGPTYPE_MP_REACH_NLRI:
 		af = EXTRACT_16BITS(p);
 		safi = p[2];
-		if (safi >= 128)
-			printf(" %s vendor specific,",
-                               tok2str(bgp_afi_values, "Unknown AFI", af));
-		else {
-			printf(" AFI %s SAFI %s,",
-                               tok2str(bgp_afi_values, "Unknown AFI", af),
-                               tok2str(bgp_safi_values, "Unknown SAFI", safi));
-		}
+	
+                printf(" AFI %s, %sSAFI %s,",
+                       tok2str(bgp_afi_values, "Unknown AFI", af),
+                       (safi>128) ? "vendor specific " : "", /* 128 is meanwhile wellknown */
+                       tok2str(bgp_safi_values, "Unknown SAFI", safi));
+	
 		p += 3;
 
 		if (af == AFNUM_INET)
@@ -522,23 +520,43 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 		while (len - (p - dat) > 0) {
 			switch (af) {
 			case AFNUM_INET:
-                            if(safi==SAFNUM_LABUNICAST) {
-                                advance = decode_labeled_prefix4(p, buf, sizeof(buf));
-                            } else {
-				advance = decode_prefix4(p, buf, sizeof(buf));
-                            }
-                            if (advance<0)
+                            switch (safi) {
+                            case SAFNUM_UNICAST:
+                            case SAFNUM_MULTICAST:
+                            case SAFNUM_UNIMULTICAST:
+                                advance = decode_prefix4(p, buf, sizeof(buf));
+                                printf(" %s", buf);
                                 break;
-                            printf(" %s", buf);
+                            case SAFNUM_LABUNICAST:
+                                advance = decode_labeled_prefix4(p, buf, sizeof(buf));
+                                printf(" %s", buf);
+                                break;
+                            default:
+                                printf(" (no SAFI %u decoder)",safi);
+                                advance = 0;
+				p = dat + len;
+				break;  
+                            }
                             break;
 #ifdef INET6
 			case AFNUM_INET6:
-                            advance = decode_prefix6(p, buf, sizeof(buf));
-                            printf(" %s", buf);
+                            switch (safi) {
+                            case SAFNUM_UNICAST:
+                            case SAFNUM_MULTICAST:
+                            case SAFNUM_UNIMULTICAST:
+				advance = decode_prefix6(p, buf, sizeof(buf));
+				printf(" %s", buf);
+				break;
+                            default:
+                                printf(" (no SAFI %u decoder)",safi);
+                                advance = 0;
+				p = dat + len;
+				break;
+                            }
                             break;
 #endif
 			default:
-                            printf(" (unknown af)");
+                            printf(" (unknown AF)");
                             advance = 0;
                             p = dat + len;
                             break;
@@ -552,37 +570,57 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 	case BGPTYPE_MP_UNREACH_NLRI:
 		af = EXTRACT_16BITS(p);
 		safi = p[2];
-		if (safi >= 128)
-			printf(" %s vendor specific,",
-                               tok2str(bgp_afi_values, "Unknown AFI", af));
-		else {
-			printf(" AFI %s SAFI %s,",
-                               tok2str(bgp_afi_values, "Unknown AFI", af),
-                               tok2str(bgp_safi_values, "Unknown SAFI", safi));
-		}
+
+                printf(" AFI %s, %sSAFI %s,",
+                       tok2str(bgp_afi_values, "Unknown AFI", af),
+                       (safi>128) ? "vendor specific " : "", /* 128 is meanwhile wellknown */
+                       tok2str(bgp_safi_values, "Unknown SAFI", safi));
+
 		p += 3;
 
-		printf(" Withdraw");
+		printf(" Withdrawn routes");
+                
 		while (len - (p - dat) > 0) {
 			switch (af) {
 			case AFNUM_INET:
-                            if(safi==SAFNUM_LABUNICAST) {
-                                advance = decode_labeled_prefix4(p, buf, sizeof(buf));
-                            } else {
-				advance = decode_prefix4(p, buf, sizeof(buf));
-                            }
-                            if (advance<0)
+                            switch (safi) {
+                            case SAFNUM_UNICAST:
+                            case SAFNUM_MULTICAST:
+                            case SAFNUM_UNIMULTICAST:
+                                advance = decode_prefix4(p, buf, sizeof(buf));
+                                printf(" %s", buf);
                                 break;
-                            printf(" %s", buf);
+                            case SAFNUM_LABUNICAST:
+                                advance = decode_labeled_prefix4(p, buf, sizeof(buf));
+                                printf(" %s", buf);
+                                break;
+                            default:
+                                printf(" (no SAFI %u decoder)",safi);
+                                advance = 0;
+				p = dat + len;
+				break;  
+                            }
                             break;
+
 #ifdef INET6
 			case AFNUM_INET6:
+                            switch (safi) {
+                            case SAFNUM_UNICAST:
+                            case SAFNUM_MULTICAST:
+                            case SAFNUM_UNIMULTICAST:
 				advance = decode_prefix6(p, buf, sizeof(buf));
 				printf(" %s", buf);
 				break;
+                            default:
+                                printf(" (no SAFI %u decoder)",safi);
+                                advance = 0;
+				p = dat + len;
+				break;
+                            }
+                            break;
 #endif
 			default:
-				printf(" (unknown af)");
+				printf(" (unknown AF)");
 				advance = 0;
 				p = dat + len;
 				break;
