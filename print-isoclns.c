@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.111 2003-12-15 03:42:48 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.112 2003-12-15 04:16:57 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -475,11 +475,9 @@ print_nsap(register const u_int8_t *pptr, register int nsap_length)
 
 void isoclns_print(const u_int8_t *p, u_int length, u_int caplen)
 {
-	u_int8_t pdu_type;
 	const struct isis_common_header *header;
 
 	header = (const struct isis_common_header *)p;
-	pdu_type = header->pdu_type & PDU_TYPE_MASK;
 
         printf("%sOSI", caplen < 1 ? "|" : "");
 
