@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.87 2003-12-29 19:05:37 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.88 2004-02-18 14:23:27 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -69,7 +69,9 @@ const struct tok ethertype_values[] = {
     { ETHERTYPE_PPP,            "PPP" },
     { ETHERTYPE_PPPOED,         "PPPoE D" },
     { ETHERTYPE_PPPOES,         "PPPoE S" },
+    { ETHERTYPE_JUMBO,          "Jumbo" },
     { ETHERTYPE_LOOPBACK,       "Loopback" },
+    { ETHERTYPE_ISO,            "OSI" },
     { 0, NULL}
 };
 
@@ -247,6 +249,35 @@ ether_encap_print(u_short ether_type, const u_char *p,
 		        default_print(p - 18, caplen + 4);
 
 		return (1);
+
+        case ETHERTYPE_JUMBO:
+                ether_type = ntohs(*(u_int16_t *)(p));
+                p += 2;
+                length -= 2;      
+                caplen -= 2;
+
+                if (ether_type > ETHERMTU) {
+                    if (eflag)
+                        printf("ethertype %s, ",
+                               tok2str(ethertype_values,"0x%04x", ether_type));
+                    goto recurse;
+                }
+
+                *extracted_ether_type = 0;
+
+                if (llc_print(p, length, caplen, p - 16, p - 10,
+                              extracted_ether_type) == 0) {
+                    ether_hdr_print(p - 16, length + 2);
+                }
+
+                if (!xflag && !qflag)
+                    default_print(p - 16, caplen + 2);
+
+                return (1);
+
+        case ETHERTYPE_ISO:
+                isoclns_print(p+1, length-1, length-1);
+                return(1);
 
 	case ETHERTYPE_PPPOED:
 	case ETHERTYPE_PPPOES:
