@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.75 1999-10-30 05:26:22 itojun Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.76 1999-10-30 07:33:45 itojun Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -325,10 +325,10 @@ AC_CHECK_SIZEOF(long)
 
 dnl
 dnl Checks for u_intXX_t
-AC_CHECK_BITTYPES(ac_cv_bittypes)
-if test "$ac_cv_bittypes" = no; then
-	missing_includes=yes
-fi
+dnl AC_CHECK_BITTYPES(ac_cv_bittypes)
+dnl if test "$ac_cv_bittypes" = no; then
+dnl 	missing_includes=yes
+dnl fi
 
 dnl
 dnl Checks for addrinfo structure
@@ -379,12 +379,13 @@ AC_STRUCT_RES_STATE(ac_cv_res_state)
 dnl
 dnl set additional include path if necessary
 if test "$missing_includes" = "yes"; then
-	CPPFLAGS="$CPPFLAGS -I./missing"
+	CPPFLAGS="$CPPFLAGS -I$(srcdir)/missing"
+	V_INCLS="$V_INCLS -I$(srcdir)/missing"
 fi
 
 
 AC_REPLACE_FUNCS(vfprintf strcasecmp)
-AC_CHECK_FUNCS(ether_ntoa setlinebuf)
+AC_CHECK_FUNCS(ether_ntoa setlinebuf gethostbyname2 inet_ntop inet_pton)
 
 dnl The following generates a warning from autoconf...
 AC_C_BIGENDIAN
@@ -432,6 +433,9 @@ if test -f /dev/bpf0 ; then
 	V_GROUP=bpf
 fi
 
+AC_LBL_CHECK_TYPE(u_int8_t, u_char)
+AC_LBL_CHECK_TYPE(int16_t, u_short)
+AC_LBL_CHECK_TYPE(u_int16_t, short)
 AC_LBL_CHECK_TYPE(int32_t, int)
 AC_LBL_CHECK_TYPE(u_int32_t, u_int)
 
@@ -582,15 +586,9 @@ main()
 	CPPFLAGS=$bak_CPPFLAGS
 fi
 
-if test "${srcdir}" = "." ; then
-	srcdirprefix=""
-else
-	srcdirprefix="./"
-fi
-
-if test -r ${srcdirprefix}lbl/gnuc.h ; then
+if test -r ${srcdir}/lbl/gnuc.h ; then
 	rm -f gnuc.h
-	ln -s ${srcdirprefix}lbl/gnuc.h gnuc.h
+	ln -s ${srcdir}/lbl/gnuc.h gnuc.h
 fi
 
 AC_SUBST(V_CCOPT)
