@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.93 2000-01-14 23:17:01 mcr Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.94 2000-01-15 00:03:36 mcr Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.93 $)
+AC_REVISION($Revision: 1.94 $)
 AC_INIT(tcpdump.c)
 
 AC_CANONICAL_SYSTEM
@@ -559,14 +559,12 @@ for dir in /usr /usr/local /usr/local/ssl /usr/pkg; do
 	if test -d $dir/lib -a -f $dir/lib/libcrypto.a; then
 		ac_cv_ssleay_path=$dir
 	fi
-	if test -d $dir/include -a -f $dir/include/des.h; then
+	if test -d $dir/include/ssleay -a -f $dir/include/ssleay/des.h; then
+	  incdir="-I$dir/include/ssleay"
+	elif test -d $dir/include/openssl -a -f $dir/include/openssl/des.h; then
+   	  incdir="-I$dir/include -I$dir/include/openssl"
+	elif test -d $dir/include -a -f $dir/include/des.h; then
 		incdir="-I$dir/include"
-	else
-		if test -d $dir/include/ssleay -a -f $dir/include/ssleay/des.h; then
-			incdir="-I$dir/include/ssleay"
-		elif test -d $dir/include/openssl -a -f $dir/include/openssl/des.h; then
-			incdir="-I$dir/include -I$dir/include/openssl"
-		fi
 	fi
 	if test "$ac_cv_ssleay_path" != "no" -a "$incdir" != "no"; then
 		break;
@@ -586,7 +584,7 @@ if test "$ac_cv_ssleay_path" != no; then
 		LIBS="$LIBS -lrsaref"
 	fi
 	AC_CHECK_LIB(crypto, des_cbc_encrypt)
-	AC_DEFINE(CRYPTO)
+	AC_DEFINE(HAVE_LIBCRYPTO)
 
 	bak_CPPFLAGS=$CPPFLAGS
 	CPPFLAGS="$CPPFLAGS $V_INCLS"
