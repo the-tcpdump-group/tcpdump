@@ -13,7 +13,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.8 2000-02-08 20:57:07 kenh Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.9 2000-02-09 16:00:50 kenh Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -629,7 +629,7 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 			i = (int) EXTRACT_32BITS(bp); \
 			bp += sizeof(int32_t); \
 			TRUNC(i); \
-			strncpy(s, bp, min(MAX, i)); \
+			strncpy(s, (char *) bp, min(MAX, i)); \
 			s[i] = '\0'; \
 			printf(" \"%s\"", s); \
 			bp += ((i + sizeof(int32_t) - 1) / sizeof(int32_t)) * sizeof(int32_t); \
@@ -797,7 +797,7 @@ fs_print(register const u_char *bp, int length)
 			i = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 			TRUNC(i);
-			strncpy(a, bp, min(AFSOPAQUEMAX, i));
+			strncpy(a, (char *) bp, min(AFSOPAQUEMAX, i));
 			a[i] = '\0';
 			acl_print((u_char *) a, (u_char *) a + i);
 			break;
@@ -908,7 +908,7 @@ fs_reply_print(register const u_char *bp, int length, int32_t opcode)
 			i = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 			TRUNC(i);
-			strncpy(a, bp, min(AFSOPAQUEMAX, i));
+			strncpy(a, (char *) bp, min(AFSOPAQUEMAX, i));
 			a[i] = '\0';
 			acl_print((u_char *) a, (u_char *) a + i);
 			break;
