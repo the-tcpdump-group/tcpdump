@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.43 2001-10-08 21:25:22 fenner Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.44 2001-11-25 02:01:48 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -96,6 +96,7 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 		 * such as an 802.11 network; this has appeared in at
 		 * least one capture file.)
 		 */
+		printf("(NOV-802.3) ");
 		ipx_print(p, length);
 		return (1);
 	}
@@ -114,6 +115,7 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 		 *
 		 * Skip DSAP, LSAP, and control field.
 		 */
+		printf("(NOV-802.2) ");
 		p += 3;
 		length -= 3;
 		caplen -= 3;

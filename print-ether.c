@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.65 2001-07-04 22:03:14 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.66 2001-11-25 02:01:47 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -194,6 +194,7 @@ ether_encap_print(u_short ethertype, const u_char *p,
 		return (1);
 
 	case ETHERTYPE_IPX:
+		printf("(NOV-ETHII) ");
 		ipx_print(p, length);
 		return (1);
 
