@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.75 2000-06-10 05:23:19 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.76 2000-06-10 05:26:42 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -718,6 +718,7 @@ nfs_printfh(register const u_int32_t *dp, const u_int len)
 
 		/* Make sure string is null-terminated */
 		strncpy(temp, sfsname, NFSX_V3FHMAX);
+		temp[sizeof(temp) - 1] = '\0';
 		/* Remove trailing spaces */
 		sfsname = strchr(temp, ' ');
 		if (sfsname)
