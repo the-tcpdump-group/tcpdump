@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.44 2000-01-17 06:24:25 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.45 2000-04-28 11:46:11 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -234,20 +234,20 @@ icmp_print(register const u_char *bp, u_int plen, register const u_char *bp2)
 			break;
 
 		case ICMP_UNREACH_NEEDFRAG:
-			{
+		    {
 			register const struct mtu_discovery *mp;
-
 			mp = (struct mtu_discovery *)&dp->icmp_void;
                         mtu = EXTRACT_16BITS(&mp->nexthopmtu);
-                        if (mtu)
-			    (void)snprintf(buf, sizeof(buf),
-				"%s unreachable - need to frag (mtu %d)",
-				ipaddr_string(&dp->icmp_ip.ip_dst), mtu);
-                        else
-			    (void)snprintf(buf, sizeof(buf),
-				"%s unreachable - need to frag",
-				ipaddr_string(&dp->icmp_ip.ip_dst));
+                        if (mtu) {
+				(void)snprintf(buf, sizeof(buf),
+				    "%s unreachable - need to frag (mtu %d)",
+				    ipaddr_string(&dp->icmp_ip.ip_dst), mtu);
+                        } else {
+				(void)snprintf(buf, sizeof(buf),
+				    "%s unreachable - need to frag",
+				    ipaddr_string(&dp->icmp_ip.ip_dst));
 			}
+		    }
 			break;
 
 		default:
@@ -269,12 +269,12 @@ icmp_print(register const u_char *bp, u_int plen, register const u_char *bp2)
 		break;
 
 	case ICMP_ROUTERADVERT:
-		{
+	    {
 		register const struct ih_rdiscovery *ihp;
 		register const struct id_rdiscovery *idp;
 		u_int lifetime, num, size;
 
-		(void)strcpy(buf, "router advertisement");
+		(void)snprintf(buf, sizeof(buf), "router advertisement");
 		cp = buf + strlen(buf);
 
 		ihp = (struct ih_rdiscovery *)&dp->icmp_void;
@@ -282,18 +282,19 @@ icmp_print(register const u_char *bp, u_int plen, register const u_char *bp2)
 		(void)strncpy(cp, " lifetime ", sizeof(buf) - (cp - buf));
 		cp = buf + strlen(buf);
 		lifetime = EXTRACT_16BITS(&ihp->ird_lifetime);
-		if (lifetime < 60)
+		if (lifetime < 60) {
 			(void)snprintf(cp, sizeof(buf) - (cp - buf), "%u",
 			    lifetime);
-		else if (lifetime < 60 * 60)
+		} else if (lifetime < 60 * 60) {
 			(void)snprintf(cp, sizeof(buf) - (cp - buf), "%u:%02u",
 			    lifetime / 60, lifetime % 60);
-		else
+		} else {
 			(void)snprintf(cp, sizeof(buf) - (cp - buf),
 			    "%u:%02u:%02u",
 			    lifetime / 3600,
 			    (lifetime % 3600) / 60,
 			    lifetime % 60);
+		}
 		cp = buf + strlen(buf);
 
 		num = ihp->ird_addrnum;
@@ -314,7 +315,7 @@ icmp_print(register const u_char *bp, u_int plen, register const u_char *bp2)
 			    EXTRACT_32BITS(&idp->ird_pref));
 			cp = buf + strlen(buf);
 		}
-		}
+	    }
 		break;
 
 	case ICMP_TIMXCEED:

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.6 2000-04-24 12:59:39 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.7 2000-04-28 11:46:12 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -313,7 +313,7 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 		}
 		break;
 	}
-#ifndef	ICMP6_ROUTER_RENUMBERING
+#ifndef ICMP6_ROUTER_RENUMBERING
 #define ICMP6_ROUTER_RENUMBERING	138	/* router renumbering */
 #endif
 	case ICMP6_ROUTER_RENUMBERING:
