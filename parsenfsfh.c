@@ -42,7 +42,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/parsenfsfh.c,v 1.20 2001-06-15 07:42:19 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/parsenfsfh.c,v 1.21 2001-06-18 08:39:36 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -81,6 +81,8 @@ static const char rcsid[] =
 #define	FHT_SUNOS5	9
 #define	FHT_AIX32	10
 #define	FHT_HPUX9	11
+#define	FHT_NETBSDEL	12
+#define	FHT_NETBSDEB	13
 
 #ifdef	ultrix
 /* Nasty hack to keep the Ultrix C compiler from emitting bogus warnings */
@@ -148,10 +150,28 @@ int ourself;		/* true if file handle was generated on this host */
 #if	defined(__osf__)
 	    fhtype = FHT_DECOSF;
 #endif
+#if	defined(__NetBSD__)
+#if	BYTE_ORDER == LITTLE_ENDIAN
+	    fhtype = FHT_NETBSDEL;
+#else
+	    fhtype = FHT_NETBSDEB;
+#endif
+#endif
 	}
 	/*
 	 * This is basically a big decision tree
 	 */
+	else if (fhp[8] == 12 && fhp[9] == 0 && fhp[10] == 0 && fhp[11] == 0)
+	    /*
+	     * bytes[8,9] = (12,0); sizeof(struct ufid).
+	     * bytes[10,11] = (0,0); pad.
+	     */
+	    fhtype = FHT_NETBSDEL;
+	else if (fhp[8] == 0 && fhp[9] == 12 && fhp[10] == 0 && fhp[11] == 0)
+	    /*
+	     * ... same as above but from big-endian machine.
+	     */
+	    fhtype = FHT_NETBSDEB;
 	else if ((fhp[0] == 0) && (fhp[1] == 0)) {
 	    /* bytes[0,1] == (0,0); rules out Ultrix, IRIX5, SUNOS5 */
 	    /* probably rules out HP-UX, AIX unless they allow major=0 */
@@ -399,20 +419,70 @@ int ourself;		/* true if file handle was generated on this host */
 		*osnamep = "HPUX9";
 	    break;
 
+	case FHT_NETBSDEL:
+#define	netbsd_major(x)	((int32_t)((((x) & 0x000fff00) >>  8)))
+#define	netbsd_minor(x)	((int32_t)((((x) & 0xfff00000) >> 12) | \
+				   (((x) & 0x000000ff) >>  0)))
+	    /*
+	     * fsid_t.val[0]
+	     *
+	     * device number for a file system on real device or
+	     * some unique number for layer file system.
+	     */
+	    temp = make_uint32(fhp[3], fhp[2], fhp[1], fhp[0]);
+	    fsidp->Fsid_dev.Major = netbsd_major(temp);
+	    fsidp->Fsid_dev.Minor = netbsd_minor(temp);
+
+	    /*
+	     * fsid_t.val[1]
+	     *
+	     * number based on file system type name.
+	     */
+	    fsidp->fsid_code = make_uint32(fhp[7], fhp[6], fhp[5], fhp[4]);
+
+	    /*
+	     * struct fid (typically struct ufid)
+	     *
+	     * 2 octet of size of file handle followed by 2 octet of pad.
+	     */
+
+	    /*
+	     * if struct ufid, 4 octet of inode number.  The null file
+	     * system also forwards vptofh vnode call to underlying file
+	     * system.
+	     */
+	    temp = make_uint32(fhp[15], fhp[14], fhp[13], fhp[12]);
+	    *inop = temp;
+
+	    if (osnamep)
+		*osnamep = "NetBSDEL";
+	    break;
+
+	case FHT_NETBSDEB:
+	    temp = make_uint32(fhp[0], fhp[1], fhp[2], fhp[3]);
+	    fsidp->Fsid_dev.Major = netbsd_major(temp);
+	    fsidp->Fsid_dev.Minor = netbsd_minor(temp);
+	    fsidp->fsid_code = make_uint32(fhp[4], fhp[5], fhp[6], fhp[7]);
+
+	    temp = make_uint32(fhp[12], fhp[13], fhp[14], fhp[15]);
+	    *inop = temp;
+
+	    if (osnamep)
+		*osnamep = "NetBSDEB";
+	    break;
+
 	case FHT_UNKNOWN:
 #ifdef DEBUG
 	    /* XXX debugging */
-	    int i;
 	    for (i = 0; i < 32; i++)
 		(void)fprintf(stderr, "%x.", fhp[i]);
 	    (void)fprintf(stderr, "\n");
 #endif
-	    /* XXX for now, give "bogus" values to aid debugging */
-
 	    /* Save the actual handle, so it can be display with -u */
 	    for (i = 0; i < 32; i++)
 	    	(void)snprintf(&(fsidp->Opaque_Handle[i*2]), 3, "%.2X", fhp[i]);
 
+	    /* XXX for now, give "bogus" values to aid debugging */
 	    fsidp->fsid_code = 0;
 	    fsidp->Fsid_dev.Minor = 257;
 	    fsidp->Fsid_dev.Major = 257;
