@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.15 2002-12-12 07:47:38 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.16 2002-12-17 09:13:45 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -853,29 +853,74 @@ ieee802_11_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char 
 		info(0);
 }
 
-#define PRISM_HDR_LEN	144
+static void
+ieee802_11_radio_print(const u_char *p, u_int length, u_int caplen)
+{
+	u_int32_t caphdr_len;
+
+	caphdr_len = EXTRACT_32BITS(p + 4);
+	if (caphdr_len < 8) {
+		/*
+		 * Yow!  The capture header length is claimed not
+		 * to be large enough to include even the version
+		 * cookie or capture header length!
+		 */
+		printf("[|802.11]");
+		return;
+	}
+
+	if (caplen < caphdr_len) {
+		printf("[|802.11]");
+		return;
+	}
+
+	ieee802_11_print(p + caphdr_len, length - caphdr_len,
+	    caplen - caphdr_len);
+}
+
+#define PRISM_HDR_LEN		144
+
+#define WLANCAP_MAGIC_COOKIE_V1	0x80211001
 
 /*
  * For DLT_PRISM_HEADER; like DLT_IEEE802_11, but with an extra header,
  * containing information such as radio information, which we
  * currently ignore.
+ *
+ * If, however, the packet begins with WLANCAP_MAGIC_COOKIE_V1, it's
+ * really DLT_IEEE802_11_RADIO (currently, on Linux, there's no
+ * ARPHRD_ type for DLT_IEEE802_11_RADIO, as there is a
+ * ARPHRD_IEEE80211_PRISM for DLT_PRISM_HEADER, so
+ * ARPHRD_IEEE80211_PRISM is used for DLT_IEEE802_11_RADIO, and
+ * the first 4 bytes of the header are used to indicate which it is).
  */
 void
 prism_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;
+	u_int32_t msgcode;
 
 	++infodelay;
 	ts_print(&h->ts);
 
-	if (caplen < PRISM_HDR_LEN) {
+	if (caplen < 4) {
 		printf("[|802.11]");
 		goto out;
 	}
 
-	ieee802_11_print(p + PRISM_HDR_LEN, length - PRISM_HDR_LEN,
-	    caplen - PRISM_HDR_LEN);
+	msgcode = EXTRACT_32BITS(p);
+	if (msgcode == WLANCAP_MAGIC_COOKIE_V1)
+		ieee802_11_radio_print(p, length, caplen);
+	else {
+		if (caplen < PRISM_HDR_LEN) {
+			printf("[|802.11]");
+			goto out;
+		}
+
+		ieee802_11_print(p + PRISM_HDR_LEN, length - PRISM_HDR_LEN,
+		    caplen - PRISM_HDR_LEN);
+	}
 
 out:
 	putchar('\n');
@@ -895,7 +940,6 @@ ieee802_11_radio_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;
-	u_int32_t caphdr_len;
 
 	++infodelay;
 	ts_print(&h->ts);
@@ -905,24 +949,7 @@ ieee802_11_radio_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
 		goto out;
 	}
 
-	caphdr_len = EXTRACT_32BITS(p + 4);
-	if (caphdr_len < 8) {
-		/*
-		 * Yow!  The capture header length is claimed not
-		 * to be large enough to include even the version
-		 * cookie or capture header length!
-		 */
-		printf("[|802.11]");
-		goto out;
-	}
-
-	if (caplen < caphdr_len) {
-		printf("[|802.11]");
-		goto out;
-	}
-
-	ieee802_11_print(p + caphdr_len, length - caphdr_len,
-	    caplen - caphdr_len);
+	ieee802_11_radio_print(p, length, caplen);
 
 out:
 	putchar('\n');
