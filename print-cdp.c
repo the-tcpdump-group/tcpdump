@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.1 2000-05-15 00:41:06 assar Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.2 2000-05-16 23:54:55 assar Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -48,6 +48,7 @@ static const char rcsid[] =
 #include "extract.h"			/* must come after interface.h */
 
 static void cdp_print_addr( const u_char * p, int l );
+static void cdp_print_prefixes( const u_char * p, int l );
 
 /*
  * Returns non-zero IFF it succeeds in printing the header
@@ -113,9 +114,11 @@ cdp_print(const u_char *p, u_int length, u_int caplen,
 	    case 0x06:
 		printf( " Platform: '%.*s'", len-4, p+i+4 );
 		break;
+	    case 0x07:
+	        cdp_print_prefixes( p+i+4, len-4 );
+		break;
 	    default:
-		printf( " unknown field type %02x, len %d", 
-			type, len );
+		printf( " unknown field type %02x, len %d", type, len );
 	    }
 	    i+=len;
 
@@ -157,4 +160,16 @@ cdp_print_addr( const u_char * p, int l )
 		printf("  ");
 		num--;
 	}
+}
+
+
+static void
+cdp_print_prefixes( const u_char * p, int l )
+{
+    printf( " IPv4 Prefixes (%d):", l/5 );
+
+    while(l > 0) {
+	printf( " %d.%d.%d.%d/%d", p[0], p[1], p[2], p[3], p[4] );
+	l-=5; p+=5;
+    }
 }
