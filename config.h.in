@@ -56,6 +56,15 @@
 /* define if you have ether_ntohost() and it works */
 #undef USE_ETHER_NTOHOST
 
+/* define if libpcap has pcap_version */
+#undef HAVE_PCAP_VERSION
+
+/* define if libpcap has pcap_debug */
+#undef HAVE_PCAP_DEBUG
+
+/* define if libpcap has yydebug */
+#undef HAVE_YYDEBUG
+
 /* define if unaligned memory accesses fail */
 #undef LBL_ALIGN
 

@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.184 2002-08-09 13:50:15 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.185 2002-09-05 01:31:42 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -475,12 +475,17 @@ main(int argc, char **argv)
 			++Xflag;
 			break;
 
-#ifdef YYDEBUG
+#if defined(HAVE_PCAP_DEBUG) || defined(HAVE_YYDEBUG)
 		case 'Y':
 			{
 			/* Undocumented flag */
+#ifdef HAVE_PCAP_DEBUG
+			extern int pcap_debug;
+			pcap_debug = 1;
+#else
 			extern int yydebug;
 			yydebug = 1;
+#endif
 			}
 			break;
 #endif
@@ -784,7 +789,11 @@ static void
 usage(void)
 {
 	extern char version[];
+#if defined(WIN32) || defined(HAVE_PCAP_VERSION)
 	extern char pcap_version[];
+#else
+	static char pcap_version[] = "unknown";
+#endif
 
 #ifdef WIN32
 	(void)fprintf(stderr, "%s version %s, based on tcpdump version %s\n", program_name, WDversion, version);
