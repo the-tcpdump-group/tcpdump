@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.36 2003-03-19 05:36:22 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.37 2003-03-25 08:30:46 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -278,7 +278,7 @@ static void esp_print_decode_onesecret(char *line)
     unsigned int   len, i;
 
     /* skip any blank spaces */
-    while(isspace(*decode)) decode++;
+    while(isspace((unsigned char)*decode)) decode++;
 
     colon = strchr(decode, ':');
     if(colon == NULL) {
