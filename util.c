@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.89 2003-11-16 09:36:44 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.90 2003-12-29 11:07:17 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -199,27 +199,9 @@ relts_print(int secs)
  */
 
 int
-print_unknown_data(const u_char *cp,const char *lf,int len)
+print_unknown_data(const u_char *cp,const char *ident,int len)
 {
-        int i;
-
-        if (len ==0)
-	    return(0);
-
-	printf("%s0x0000: ",lf);
-	for(i=0;i<len;i++) {
-	    if (!TTEST2(*(cp+i), 1)) {
-              printf("%spacket exceeded snapshot",lf);
-              return(0);
-            }
-	    printf("%02x",*(cp+i));
-	    if (i%2)
-	        printf(" ");
-	    if (i/16!=(i+1)/16) {
-	        if (i<(len-1))
-		    printf("%s0x%04x: ",lf,i+1);
-	    }
-	}
+        hex_print(ident,cp,len);
 	return(1); /* everything is ok */
 }
 
