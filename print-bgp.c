@@ -537,12 +537,11 @@ bgp_notification_print(const u_char *dat, int length)
 }
 
 static void
-bgp_header_print(const u_char *dat, int length, int newline)
+bgp_header_print(const u_char *dat, int length)
 {
 	struct bgp bgp;
 
 	memcpy(&bgp, dat, sizeof(bgp));
-	printf(newline ? "\n\t" : " ");
 	printf("(%s", bgp_type(bgp.bgp_type));		/* ) */
 
 	switch (bgp.bgp_type) {
@@ -566,6 +565,7 @@ bgp_print(const u_char *dat, int length)
 {
 	const u_char *p;
 	const u_char *ep;
+	const u_char *start, *end;
 	const u_char marker[] = {
 		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
 		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
@@ -582,6 +582,7 @@ bgp_print(const u_char *dat, int length)
 
 	p = dat;
 	newline = 0;
+	start = p;
 	while (p < snapend) {
 		if (!TTEST2(p[0], 1))
 			break;
@@ -601,13 +602,22 @@ bgp_print(const u_char *dat, int length)
 		TCHECK2(p[0], BGP_SIZE);	/*XXX*/
 		memcpy(&bgp, p, sizeof(bgp));
 
+		if (start != p)
+			printf(" [|BGP]");
+
 		hlen = ntohs(bgp.bgp_len);
+		if (vflag && newline)
+			printf("\n\t");
+		else
+			printf(" ");
 		if (TTEST2(p[0], hlen)) {
-			bgp_header_print(p, hlen, vflag ? newline : 0);
+			if (vflag && newline)
+			bgp_header_print(p, hlen);
 			newline = 1;
 			p += hlen;
+			start = p;
 		} else {
-			printf(" [|BGP %s]", bgp_type(bgp.bgp_type));
+			printf("[|BGP %s]", bgp_type(bgp.bgp_type));
 			break;
 		}
 	}
