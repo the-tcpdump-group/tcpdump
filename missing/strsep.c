@@ -33,11 +33,16 @@
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/missing/strsep.c,v 1.2 2003-03-03 00:56:31 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/missing/strsep.c,v 1.3 2003-03-25 08:33:48 guy Exp $ (LBL)";
 #endif /* LIBC_SCCS and not lint */
 
+#ifdef HAVE_CONFIG_H 
+#include <config.h>
+#endif
+
+#include <tcpdump-stdinc.h>
+
 #include <string.h>
-#include <stdio.h>
 
 /*
  * Get next token from string *stringp, where tokens are possibly-empty
@@ -51,9 +56,7 @@ static const char rcsid[] =
  * If *stringp is NULL, strsep returns NULL.
  */
 char *
-strsep(stringp, delim)
-	register char **stringp;
-	register const char *delim;
+strsep(char **stringp, const char *delim)
 {
 	register char *s;
 	register const char *spanp;
