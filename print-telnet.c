@@ -67,7 +67,6 @@ __RCSID("$NetBSD: print-telnet.c,v 1.2 1999/10/11 12:40:12 sjg Exp $");
 #include <netinet/ip.h>
 #include <netinet/ip_var.h>
 #include <netinet/tcp.h>
-#include <netinet/tcpip.h>
 
 #define TELCMDS
 #define TELOPTS
