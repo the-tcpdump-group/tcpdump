@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.67 2002-04-07 09:50:31 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.68 2002-05-29 10:06:26 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -76,7 +76,7 @@ ether_print(const u_char *p, u_int length, u_int caplen)
 
 	if (caplen < ETHER_HDRLEN) {
 		printf("[|ether]");
-		goto out;
+		return;
 	}
 
 	if (eflag)
@@ -123,10 +123,6 @@ ether_print(const u_char *p, u_int length, u_int caplen)
 		if (!xflag && !qflag)
 			default_print(p, caplen);
 	}
-	if (xflag)
-		default_print(p, caplen);
- out:
-	putchar('\n');
 }
 
 /*
@@ -145,6 +141,15 @@ ether_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	ts_print(&h->ts);
 
 	ether_print(p, length, caplen);
+
+	/*
+	 * If "-x" was specified, print stuff past the Ethernet header,
+	 * if there's anything to print.
+	 */
+	if (xflag && caplen > ETHER_HDRLEN)
+		default_print(p + ETHER_HDRLEN, caplen - ETHER_HDRLEN);
+
+	putchar('\n');
 
 	--infodelay;
 	if (infoprint)

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-fddi.c,v 1.54 2002-04-07 09:50:32 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-fddi.c,v 1.55 2002-05-29 10:06:27 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -255,7 +255,7 @@ fddi_print(const u_char *p, u_int length, u_int caplen)
 
 	if (caplen < FDDI_HDRLEN) {
 		printf("[|fddi]");
-		goto out;
+		return;
 	}
 	/*
 	 * Get the FDDI addresses into a canonical form
@@ -313,10 +313,6 @@ fddi_print(const u_char *p, u_int length, u_int caplen)
 		if (!xflag && !qflag)
 			default_print(p, caplen);
 	}
-	if (xflag)
-		default_print(p, caplen);
-out:
-	putchar('\n');
 }
 
 /*
@@ -336,6 +332,15 @@ fddi_if_print(u_char *pcap, const struct pcap_pkthdr *h,
 	ts_print(&h->ts);
 
 	fddi_print(p, length, caplen);
+
+	/*
+	 * If "-x" was specified, print stuff past the FDDI header,
+	 * if there's anything to print.
+	 */
+	if (xflag && caplen > FDDI_HDRLEN)
+		default_print(p + FDDI_HDRLEN, caplen - FDDI_HDRLEN);
+
+	putchar('\n');
 
 	--infodelay;
 	if (infoprint)
