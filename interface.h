@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.118 1999-12-22 15:44:09 itojun Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.119 2000-01-07 15:59:28 assar Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -27,6 +27,42 @@
 #include "gnuc.h"
 #ifdef HAVE_OS_PROTO_H
 #include "os-proto.h"
+#endif
+#include <sys/types.h>
+#include <sys/time.h>
+
+/* snprintf et al */
+
+#include <stdarg.h>
+
+#if !defined(HAVE_SNPRINTF)
+int snprintf (char *str, size_t sz, const char *format, ...)
+     __attribute__ ((format (printf, 3, 4)));
+#endif
+
+#if !defined(HAVE_VSNPRINTF)
+int vsnprintf (char *str, size_t sz, const char *format, va_list ap)
+     __attribute__((format (printf, 3, 0)));
+#endif
+
+#if !defined(HAVE_ASPRINTF)
+int asprintf (char **ret, const char *format, ...)
+     __attribute__ ((format (printf, 2, 3)));
+#endif
+
+#if !defined(HAVE_VASPRINTF)
+int vasprintf (char **ret, const char *format, va_list ap)
+     __attribute__((format (printf, 2, 0)));
+#endif
+
+#if !defined(HAVE_ASNPRINTF)
+int asnprintf (char **ret, size_t max_sz, const char *format, ...)
+     __attribute__ ((format (printf, 3, 4)));
+#endif
+
+#if !defined(HAVE_VASNPRINTF)
+int vasnprintf (char **ret, size_t max_sz, const char *format, va_list ap)
+     __attribute__((format (printf, 3, 0)));
 #endif
 
 struct tok {
