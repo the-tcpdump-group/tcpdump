@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.23 2004-10-07 16:04:06 hannes Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.24 2004-10-07 16:16:02 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -182,7 +182,10 @@ fr_if_print(const struct pcap_pkthdr *h, register const u_char *p)
                 extracted_ethertype = EXTRACT_16BITS(p+addr_len);
 
                 if (eflag)
-                    printf("%s (0x%04x), length %u: ",
+                    printf("DLCI %u, %s%scisco-ethertype %s (0x%04x), length %u: ",
+                           dlci,
+                           flags,
+                           *flags ? ", " : "",
                            tok2str(ethertype_values, "unknown", extracted_ethertype),
                            extracted_ethertype,
                            length);
