@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.37 2001-05-10 02:57:57 fenner Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.38 2001-06-04 05:47:14 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -185,8 +185,14 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 		orgcode = EXTRACT_24BITS(&llc.llc_orgcode[0]);
 		et = EXTRACT_16BITS(&llc.llc_ethertype[0]);
 		switch (orgcode) {
-		case 0x000000:
-			/* This is an encapsulated Ethernet packet */
+		case OUI_ENCAP_ETHER:
+		case OUI_CISCO_90:
+			/*
+			 * This is an encapsulated Ethernet packet,
+			 * or a packet bridged by some piece of
+			 * Cisco hardware; the protocol ID is
+			 * an Ethernet protocol type.
+			 */
 			ret = ether_encap_print(et, p, length, caplen,
 			    extracted_ethertype);
 			if (ret)

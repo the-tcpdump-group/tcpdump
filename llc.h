@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/llc.h,v 1.12 2001-05-10 02:57:57 fenner Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/llc.h,v 1.13 2001-06-04 05:47:13 guy Exp $ (LBL)
  */
 
 /*
@@ -125,6 +125,8 @@ struct llc {
 #define	LLCSAP_ISONS		0xfe
 #endif
 
-#define	OUI_CISCO	0x00000c
+#define	OUI_ENCAP_ETHER	0x000000	/* encapsulated Ethernet */
+#define	OUI_CISCO	0x00000c	/* Cisco protocols */
 #define	ETHERTYPE_CISCO_CDP	0x2000	/* Cisco Discovery Protocol */
-#define	OUI_APPLETALK	0x080007
+#define	OUI_CISCO_90	0x0000f8	/* Cisco bridging */
+#define	OUI_APPLETALK	0x080007	/* Appletalk */
