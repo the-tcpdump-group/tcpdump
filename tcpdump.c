@@ -24,7 +24,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.146 2000-04-27 10:41:27 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.147 2000-06-01 01:10:31 assar Exp $ (LBL)";
 #endif
 
 /*
@@ -74,6 +74,7 @@ int Rflag = 1;			/* print sequence # field in AH/ESP*/
 int sflag = 0;			/* use the libsmi to translate OIDs */
 int Sflag;			/* print raw TCP sequence numbers */
 int tflag = 1;			/* print packet arrival time */
+int uflag = 0;			/* Print undecoded NFS handles */
 int vflag;			/* verbose */
 int xflag;			/* print packet in hex */
 int Xflag;			/* print packet in ascii as well as hex */
@@ -175,7 +176,7 @@ main(int argc, char **argv)
 	
 	opterr = 0;
 	while (
-	    (op = getopt(argc, argv, "ac:deE:fF:i:lm:nNOpqr:Rs:StT:vw:xXY")) != EOF)
+	    (op = getopt(argc, argv, "ac:deE:fF:i:lm:nNOpqr:Rs:StT:uvw:xXY")) != -1)
 		switch (op) {
 
 		case 'a':
@@ -302,6 +303,10 @@ main(int argc, char **argv)
 				error("unknown packet type `%s'", optarg);
 			break;
 
+		case 'u':
+			++uflag;
+			break;
+			
 		case 'v':
 			++vflag;
 			break;
@@ -490,7 +495,7 @@ usage(void)
 	(void)fprintf(stderr, "%s version %s\n", program_name, version);
 	(void)fprintf(stderr, "libpcap version %s\n", pcap_version);
 	(void)fprintf(stderr,
-"Usage: %s [-adeflnNOpqStvxX] [-c count] [ -F file ]\n", program_name);
+"Usage: %s [-adeflnNOpqStuvxX] [-c count] [ -F file ]\n", program_name);
 	(void)fprintf(stderr,
 "\t\t[ -i interface ] [ -r file ] [ -s snaplen ]\n");
 	(void)fprintf(stderr,
