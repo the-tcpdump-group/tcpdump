@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.36 2002-01-10 09:33:23 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.36.2.1 2002-02-25 09:36:58 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -574,7 +574,7 @@ isis_print_lspid(const u_char *cp)
 static int
 isis_print_tlv_ip_reach (const u_char *cp, int length)
 {
-	int bitmasks[33] = {
+	u_int bitmasks[33] = {
 		0x00000000,
 		0x80000000, 0xc0000000, 0xe0000000, 0xf0000000,
 		0xf8000000, 0xfc000000, 0xfe000000, 0xff000000,
@@ -585,7 +585,8 @@ isis_print_tlv_ip_reach (const u_char *cp, int length)
 		0xffffff80, 0xffffffc0, 0xffffffe0, 0xfffffff0,
 		0xfffffff8, 0xfffffffc, 0xfffffffe, 0xffffffff
 	};
-	int mask, prefix_len;
+	u_int mask;
+	int prefix_len;
 	const struct isis_tlv_ip_reach *tlv_ip_reach;
 
 	tlv_ip_reach = (const struct isis_tlv_ip_reach *)cp;
