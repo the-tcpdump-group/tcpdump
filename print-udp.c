@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.63 1999-10-30 05:11:21 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.64 1999-11-17 05:45:58 assar Exp $ (LBL)";
 #endif
 
 #include <sys/param.h>
@@ -301,6 +301,8 @@ rtcp_print(const u_char *hdr, const u_char *ep)
 #define L2TP_PORT 1701		/*XXX*/
 #define ISAKMP_PORT_USER1 7500	/*??? - nonstandard*/
 #define ISAKMP_PORT_USER2 8500	/*??? - nonstandard*/
+#define RX_PORT_LOW 7000	/*XXX*/
+#define RX_PORT_HIGH 7009	/*XXX*/
 
 #ifdef INET6
 #define RIPNG_PORT 521		/*XXX*/
@@ -503,6 +505,14 @@ udp_print(register const u_char *bp, u_int length, register const u_char *bp2)
 			l2tp_print((const u_char *)(up + 1), length);
 		else if (dport == 3456)
 			vat_print((const void *)(up + 1), length, up);
+ 		/*
+ 		 * Since there are 10 possible ports to check, I think
+ 		 * a <> test would be more efficient
+ 		 */
+ 		else if ((sport >= RX_PORT_LOW && sport <= RX_PORT_HIGH) ||
+ 			 (dport >= RX_PORT_LOW && dport <= RX_PORT_HIGH))
+ 			rx_print((const void *)(up + 1), length, sport, dport,
+ 				 (u_char *) ip);
 #ifdef INET6
 		else if (ISPORT(RIPNG_PORT))
 			ripng_print((const u_char *)(up + 1), length);
