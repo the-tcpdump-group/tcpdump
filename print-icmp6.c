@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.12 2000-05-15 06:27:02 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.13 2000-05-15 09:23:49 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -669,7 +669,7 @@ icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
 			break;
 		case ICMP6_NI_SUBJ_FQDN:
 			printf(", subject=DNS name");
-			cp = (const u_char *)(ni6 + 1) + 4;
+			cp = (const u_char *)(ni6 + 1);
 			if (cp[0] == ep - cp - 1) {
 				/* icmp-name-lookup-03, pascal string */
 				if (vflag)
