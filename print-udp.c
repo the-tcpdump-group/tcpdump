@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.118 2003-06-07 11:57:54 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.119 2003-07-31 23:38:20 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -400,7 +400,7 @@ static int udp6_cksum(const struct ip6_hdr *ip6, const struct udphdr *up,
 #endif
 
 static void
-udpipaddr_print(const struct ip *ip, u_int16_t sport, u_int16_t dport)
+udpipaddr_print(const struct ip *ip, int sport, int dport)
 {
 #ifdef INET6
 	const struct ip6_hdr *ip6;
@@ -412,27 +412,45 @@ udpipaddr_print(const struct ip *ip, u_int16_t sport, u_int16_t dport)
 
 	if (ip6) {
 		if (ip6->ip6_nxt == IPPROTO_UDP) {
-			(void)printf("%s.%s > %s.%s: ",
-				ip6addr_string(&ip6->ip6_src),
-				udpport_string(sport),
-				ip6addr_string(&ip6->ip6_dst),
-				udpport_string(dport));
+			if (sport == -1) {
+				(void)printf("%s > %s: ",
+					ip6addr_string(&ip6->ip6_src),
+					ip6addr_string(&ip6->ip6_dst));
+			} else {
+				(void)printf("%s.%s > %s.%s: ",
+					ip6addr_string(&ip6->ip6_src),
+					udpport_string(sport),
+					ip6addr_string(&ip6->ip6_dst),
+					udpport_string(dport));
+			}
 		} else {
-			(void)printf("%s > %s: ",
-				udpport_string(sport), udpport_string(dport));
+			if (sport != -1) {
+				(void)printf("%s > %s: ",
+					udpport_string(sport),
+					udpport_string(dport));
+			}
 		}
 	} else
 #endif /*INET6*/
 	{
 		if (ip->ip_p == IPPROTO_UDP) {
-			(void)printf("%s.%s > %s.%s: ",
-				ipaddr_string(&ip->ip_src),
-				udpport_string(sport),
-				ipaddr_string(&ip->ip_dst),
-				udpport_string(dport));
+			if (sport == -1) {
+				(void)printf("%s > %s: ",
+					ipaddr_string(&ip->ip_src),
+					ipaddr_string(&ip->ip_dst));
+			} else {
+				(void)printf("%s.%s > %s.%s: ",
+					ipaddr_string(&ip->ip_src),
+					udpport_string(sport),
+					ipaddr_string(&ip->ip_dst),
+					udpport_string(dport));
+			}
 		} else {
-			(void)printf("%s > %s: ",
-				udpport_string(sport), udpport_string(dport));
+			if (sport != -1) {
+				(void)printf("%s > %s: ",
+					udpport_string(sport),
+					udpport_string(dport));
+			}
 		}
 	}
 }
@@ -461,27 +479,32 @@ udp_print(register const u_char *bp, u_int length,
 		ip6 = NULL;
 #endif /*INET6*/
 	cp = (u_char *)(up + 1);
-	if (cp > snapend) {
-		(void)printf("%s > %s: [|udp]",
-			ipaddr_string(&ip->ip_src), ipaddr_string(&ip->ip_dst));
+	if (!TTEST(up->uh_dport)) {
+		udpipaddr_print(ip, -1, -1);
+		(void)printf("[|udp]");
 		return;
 	}
+
+	sport = EXTRACT_16BITS(&up->uh_sport);
+	dport = EXTRACT_16BITS(&up->uh_dport);
+
 	if (length < sizeof(struct udphdr)) {
-		(void)printf("%s > %s: truncated-udp %d",
-			ipaddr_string(&ip->ip_src), ipaddr_string(&ip->ip_dst),
-			length);
+		udpipaddr_print(ip, sport, dport);
+		(void)printf("truncated-udp %d", length);
 		return;
 	}
 	length -= sizeof(struct udphdr);
 
-	sport = EXTRACT_16BITS(&up->uh_sport);
-	dport = EXTRACT_16BITS(&up->uh_dport);
+	if (cp > snapend) {
+		udpipaddr_print(ip, sport, dport);
+		(void)printf("[|udp]");
+		return;
+	}
+
 	ulen = EXTRACT_16BITS(&up->uh_ulen);
 	if (ulen < 8) {
-		(void)printf("%s > %s: truncated-udplength %d",
-			     ipaddr_string(&ip->ip_src),
-			     ipaddr_string(&ip->ip_dst),
-			     ulen);
+		udpipaddr_print(ip, sport, dport);
+		(void)printf("truncated-udplength %d", ulen);
 		return;
 	}
 	if (packettype) {
