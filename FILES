@@ -123,6 +123,7 @@ print-ospf6.c
 print-pim.c
 print-ppp.c
 print-pppoe.c
+print-pptp.c
 print-radius.c
 print-raw.c
 print-rip.c

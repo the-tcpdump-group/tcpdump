@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.84 2001-02-03 05:04:49 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.85 2001-03-09 05:38:21 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -131,6 +131,9 @@ static struct tcp_seq_hash tcp_seq_hash[TSEQ_HASHSIZE];
 #define BGP_PORT	179
 #endif
 #define NETBIOS_SSN_PORT 139
+#ifndef PPTP_PORT
+#define PPTP_PORT	1723
+#endif
 #define BXXP_PORT        10288
 #ifndef NFS_PORT
 #define NFS_PORT	2049
@@ -650,6 +653,8 @@ tcp_print(register const u_char *bp, register u_int length,
 				telnet_print(bp, length);
 		} else if (sport == BGP_PORT || dport == BGP_PORT)
 			bgp_print(bp, length);
+		else if (sport == PPTP_PORT || dport == PPTP_PORT)
+			pptp_print(bp, length);
 		else if (sport == NETBIOS_SSN_PORT || dport == NETBIOS_SSN_PORT)
 			nbt_tcp_print(bp, length);
 		else if (sport == BXXP_PORT || dport == BXXP_PORT)
