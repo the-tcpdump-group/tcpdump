@@ -1,3 +1,4 @@
+/* @(#) $Header: /tcpdump/master/tcpdump/icmp6.h,v 1.4 2000-12-17 23:13:32 guy Exp $ (LBL) */
 /*	$NetBSD: icmp6.h,v 1.13 2000/08/03 16:30:37 itojun Exp $	*/
 /*	$KAME: icmp6.h,v 1.22 2000/08/03 15:25:16 jinmei Exp $	*/
 
