@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.14 1999-11-22 07:25:27 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.15 1999-12-14 16:58:03 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -35,10 +35,12 @@ static const char rcsid[] =
 #include <netinet/in.h>
 #include <netinet/in_systm.h>
 #include <netinet/ip.h>
+/*
 #include <netinet/ip_var.h>
 #include <netinet/udp.h>
 #include <netinet/udp_var.h>
 #include <netinet/tcp.h>
+*/
 
 /*
  * XXX: We consider a case where IPv6 is not ready yet for portability,
@@ -379,6 +381,48 @@ pim_print(register const u_char *bp, register u_int len)
 	return;
 }
 
+/*
+ * PIMv2 uses encoded address representations.
+ *
+ * The last PIM-SM I-D before RFC2117 was published specified the
+ * following representation for unicast addresses.  However, RFC2117
+ * specified no encoding for unicast addresses with the unicast
+ * address length specified in the header.  Therefore, we have to
+ * guess which encoding is being used (Cisco's PIMv2 implementation
+ * uses the non-RFC encoding).  RFC2117 turns a previously "Reserved"
+ * field into a 'unicast-address-length-in-bytes' field.  We guess
+ * that it's the draft encoding if this reserved field is zero.
+ *
+ * RFC2362 goes back to the encoded format, and calls the addr length
+ * field "reserved" again.
+ *
+ * The first byte is the address family, from:
+ *
+ *    0    Reserved
+ *    1    IP (IP version 4)
+ *    2    IP6 (IP version 6)
+ *    3    NSAP
+ *    4    HDLC (8-bit multidrop)
+ *    5    BBN 1822
+ *    6    802 (includes all 802 media plus Ethernet "canonical format")
+ *    7    E.163
+ *    8    E.164 (SMDS, Frame Relay, ATM)
+ *    9    F.69 (Telex)
+ *   10    X.121 (X.25, Frame Relay)
+ *   11    IPX
+ *   12    Appletalk
+ *   13    Decnet IV
+ *   14    Banyan Vines
+ *   15    E.164 with NSAP format subaddress
+ *
+ * In addition, the second byte is an "Encoding".  0 is the default
+ * encoding for the address family, and no other encodings are currently
+ * specified.
+ *
+ */
+
+static int pimv2_addr_len;
+
 enum pimv2_addrtype {
 	pimv2_unicast, pimv2_group, pimv2_source
 };
@@ -388,100 +432,130 @@ static char *addrtypestr[] = {
 };
 #endif
 
+/*  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * | Addr Family   | Encoding Type |     Unicast Address           |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+++++++
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * | Addr Family   | Encoding Type |   Reserved    |  Mask Len     |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                Group multicast Address                        |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * | Addr Family   | Encoding Type | Rsrvd   |S|W|R|  Mask Len     |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                        Source Address                         |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ */
 static int
 pimv2_addr_print(const u_char *bp, enum pimv2_addrtype at, int silent)
 {
-	const u_char *ep;
 	int af;
 	char *afstr;
-	int len;
+	int len, hdrlen;
 
-	ep = (const u_char *)snapend;
-	if (bp >= ep)
-		return -1;
+	TCHECK(bp[0]);
 
-	switch (bp[0]) {
-	 case 1:
-		af = AF_INET;
-		afstr = "IPv4";
-		break;
+	if (pimv2_addr_len == 0) {
+		TCHECK(bp[1]);
+		switch (bp[0]) {
+		 case 1:
+			af = AF_INET;
+			afstr = "IPv4";
+			len = 4;
+			break;
 #ifdef INET6
-	 case 2:
-		af = AF_INET6;
-		afstr = "IPv6";
-		break;
+		 case 2:
+			af = AF_INET6;
+			afstr = "IPv6";
+			len = 16;
+			break;
 #endif
-	 default:
-		return -1;
+		 default:
+			return -1;
+		}
+		if (bp[1] != 0)
+			return -1;
+		hdrlen = 2;
+	} else {
+		switch (pimv2_addr_len) {
+		 case 4:
+			af = AF_INET;
+			afstr = "IPv4";
+			break;
+#ifdef INET6
+		 case 16:
+			af = AF_INET6;
+			afstr = "IPv6";
+			break;
+#endif
+		 default:
+			return -1;
+			break;
+		}
+		len = pimv2_addr_len;
+		hdrlen = 0;
 	}
 
-	if (bp[1] != 0)
-		return -1;
-
+	bp += hdrlen;
 	switch (at) {
 	 case pimv2_unicast:
+		TCHECK2(bp[0], len);
 		if (af == AF_INET) {
-			len = 4;
-			if (bp + 2 + len > ep)
-				return -1;
 			if (!silent)
-				(void)printf("%s", ipaddr_string(bp + 2));
+				(void)printf("%s", ipaddr_string(bp));
 		}
 #ifdef INET6
 		else if (af == AF_INET6) {
-			len = 16;
-			if (bp + 2 + len > ep)
-				return -1;
 			if (!silent)
-				(void)printf("%s", ip6addr_string(bp + 2));
+				(void)printf("%s", ip6addr_string(bp));
 		}
 #endif
-		return 2 + len;
+		return hdrlen + len;
 	 case pimv2_group:
-		if (af == AF_INET) {
-			len = 4;
-			if (bp + 4 + len > ep)
-				return -1;
-			if (!silent)
-				(void)printf("%s/%u", ipaddr_string(bp + 4), bp[3]);
-		}
-#ifdef INET6
-		else if (af == AF_INET6) {
-			len = 16;
-			if (bp + 4 + len > ep)
-				return -1;
-			if (!silent)
-				(void)printf("%s/%u", ip6addr_string(bp + 4), bp[3]);
-		}
-#endif
-		return 4 + len;
 	 case pimv2_source:
+		TCHECK2(bp[0], len + 2);
 		if (af == AF_INET) {
-			len = 4;
-			if (bp + 4 + len > ep)
-				return -1;
-			if (!silent)
-				(void)printf("%s/%u", ipaddr_string(bp + 4), bp[3]);
+			if (!silent) {
+				(void)printf("%s", ipaddr_string(bp + 2));
+				if (bp[1] != 32)
+					(void)printf("/%u", bp[1]);
+			}
 		}
 #ifdef INET6
 		else if (af == AF_INET6) {
-			len = 16;
-			if (bp + 4 + len > ep)
-				return -1;
-			if (!silent)
-				(void)printf("%s/%u", ip6addr_string(bp + 4), bp[3]);
+			if (!silent) {
+				(void)printf("%s", ip6addr_string(bp + 2));
+				if (bp[1] != 128)
+					(void)printf("/%u", bp[1]);
+			}
 		}
 #endif
-		if (vflag && bp[2] && !silent) {
-			(void)printf("(%s%s%s)",
-				bp[2] & 0x04 ? "S" : "",
-				bp[2] & 0x02 ? "W" : "",
-				bp[2] & 0x01 ? "R" : "");
+		if (bp[0] && !silent) {
+			if (at == pimv2_group) {
+				(void)printf("(0x%02x)", bp[0]);
+			} else {
+				(void)printf("(%s%s%s",
+					bp[0] & 0x04 ? "S" : "",
+					bp[0] & 0x02 ? "W" : "",
+					bp[0] & 0x01 ? "R" : "");
+				if (bp[0] & 0xf8) {
+					(void) printf("+0x%02x", bp[0] & 0xf8);
+				}
+				(void)printf(")");
+			}
 		}
-		return 4 + len;
+		return hdrlen + 2 + len;
 	default:
 		return -1;
 	}
+trunc:
+	return -1;
 }
 
 static void
@@ -494,9 +568,10 @@ pimv2_print(register const u_char *bp, register u_int len)
 	ep = (const u_char *)snapend;
 	if (bp >= ep)
 		return;
-#ifdef notyet			/* currently we see only version and type */
 	TCHECK(pim->pim_rsv);
-#endif
+	pimv2_addr_len = pim->pim_rsv;
+	if (pimv2_addr_len != 0)
+		(void)printf("[RFC2117-encoding] ");
 
 	switch (pim->pim_type) {
 	 case 0:
@@ -505,19 +580,50 @@ pimv2_print(register const u_char *bp, register u_int len)
 		(void)printf(" Hello");
 		bp += 4;
 		while (bp < ep) {
-			otype = ntohs(*(u_int16_t *)(bp + 0));
-			olen = ntohs(*(u_int16_t *)(bp + 2));
-			if (otype == 1 && olen == 2 && bp + 4 + olen <= ep) {
-				u_int16_t value;
-				(void)printf(" holdtime=");
-				value = ntohs(*(u_int16_t *)(bp + 4));
-				if (value == 0xffff)
-					(void)printf("infty");
-				else
-					(void)printf("%u", value);
-				bp += 4 + olen;
-			} else
+			TCHECK2(bp[0], 4);
+			otype = EXTRACT_16BITS(&bp[0]);
+			olen = EXTRACT_16BITS(&bp[2]);
+			TCHECK2(bp[0], 4 + olen);
+			switch (otype) {
+			case 1:		/* Hold time */
+				(void)printf(" (Hold-time ");
+				relts_print(EXTRACT_16BITS(&bp[4]));
+				(void)printf(")");
 				break;
+
+			/* XXX
+			 * draft-ietf-idmr-pimv2-dr-priority-00.txt
+			 * says that DR-Priority is option 19.
+			 * draft-ietf-pim-v2-sm-00.txt says it's 18.
+			 */
+			case 18:	/* DR-Priority */
+				(void)printf(" (DR-Priority: %d)", EXTRACT_32BITS(&bp[4]));
+				break;
+
+			case 19:	/* Bidir-Capable */
+				if (olen == 4)
+					(void)printf(" (OLD-DR-Priority: %d)", EXTRACT_32BITS(&bp[4]));
+				else
+					(void)printf(" (bidir-capable)");
+				break;
+
+			case 20:
+				(void)printf(" (Genid: 0x%08x)", EXTRACT_32BITS(&bp[4]));
+				break;
+
+			case 21:
+				(void)printf(" (State Refresh Capable");
+				if (EXTRACT_32BITS(&bp[4]) != 1) {
+					(void)printf(" ?0x%x?", EXTRACT_32BITS(&bp[4]));
+				}
+				(void)printf(")");
+				break;
+
+			default:
+				if (vflag)
+					(void)printf(" [Hello option %d]", otype);
+			}
+			bp += 4 + olen;
 		}
 		break;
 	    }
@@ -611,14 +717,14 @@ pimv2_print(register const u_char *bp, register u_int len)
 		if (bp + 4 > ep)
 			break;
 		ngroup = bp[1];
-		holdtime = ntohs(*(u_int16_t *)(bp + 2));
+		holdtime = EXTRACT_16BITS(&bp[2]);
 		(void)printf(" groups=%u", ngroup);
 		if (pim->pim_type != 7) {	/*not for Graft-ACK*/
 			(void)printf(" holdtime=");
 			if (holdtime == 0xffff)
 				(void)printf("infty");
 			else
-				(void)printf("%u", holdtime);
+				relts_print(holdtime);
 		}
 		bp += 4; len -= 4;
 		for (i = 0; i < ngroup; i++) {
@@ -634,8 +740,8 @@ pimv2_print(register const u_char *bp, register u_int len)
 				(void)printf("...)");
 				goto jp_done;
 			}
-			njoin = ntohs(*(u_int16_t *)(bp + 0));
-			nprune = ntohs(*(u_int16_t *)(bp + 2));
+			njoin = EXTRACT_16BITS(&bp[0]);
+			nprune = EXTRACT_16BITS(&bp[2]);
 			(void)printf(" join=%u", njoin);
 			bp += 4; len -= 4;
 			for (j = 0; j < njoin; j++) {
@@ -670,7 +776,7 @@ pimv2_print(register const u_char *bp, register u_int len)
 
 		/* Fragment Tag, Hash Mask len, and BSR-priority */
 		if (bp + sizeof(u_int16_t) >= ep) break;
-		(void)printf(" tag=%x", ntohs(*(u_int16_t *)bp));
+		(void)printf(" tag=%x", EXTRACT_16BITS(bp));
 		bp += sizeof(u_int16_t);
 		if (bp >= ep) break;
 		(void)printf(" hashmlen=%d", bp[0]);
@@ -725,8 +831,8 @@ pimv2_print(register const u_char *bp, register u_int len)
 					(void)printf("...)");
 					goto bs_done;
 				}
-				(void)printf(",holdtime=%d",
-					     ntohs(*(u_int16_t *)bp));
+				(void)printf(",holdtime=");
+				relts_print(EXTRACT_16BITS(bp));
 				if (bp + 2 >= ep) {
 					(void)printf("...)");
 					goto bs_done;
@@ -760,10 +866,10 @@ pimv2_print(register const u_char *bp, register u_int len)
 		bp += advance; len -= advance;
 		if (bp + 8 > ep)
 			break;
-		if (ntohl(*(u_int32_t *)bp) & 0x80000000)
+		if (bp[0] & 0x80)
 			(void)printf(" RPT");
-		(void)printf(" pref=%u", ntohl(*(u_int32_t *)bp & 0x7fffffff));
-		(void)printf(" metric=%u", ntohl(*(u_int32_t *)(bp + 4)));
+		(void)printf(" pref=%u", EXTRACT_32BITS(&bp[0]) & 0x7fffffff);
+		(void)printf(" metric=%u", EXTRACT_32BITS(&bp[4]));
 		break;
 
 	 case 8:
@@ -780,7 +886,8 @@ pimv2_print(register const u_char *bp, register u_int len)
 		if (bp + 1 >= ep) break;
 		(void)printf(" prio=%d", bp[1]);
 		if (bp + 3 >= ep) break;
-		(void)printf(" holdtime=%d", ntohs(*(u_int16_t *)(bp + 2)));
+		(void)printf(" holdtime=");
+		relts_print(EXTRACT_16BITS(&bp[2]));
 		bp += 4;
 
 		/* Encoded-Unicast-RP-Address */
@@ -805,10 +912,39 @@ pimv2_print(register const u_char *bp, register u_int len)
 		break;
 	 }
 
+	 case 9:
+		(void)printf(" Prune-Refresh");
+		(void)printf(" src=");
+		if ((advance = pimv2_addr_print(bp, pimv2_unicast, 0)) < 0) {
+			(void)printf("...");
+			break;
+		}
+		bp += advance;
+		(void)printf(" grp=");
+		if ((advance = pimv2_addr_print(bp, pimv2_group, 0)) < 0) {
+			(void)printf("...");
+			break;
+		}
+		bp += advance;
+		(void)printf(" forwarder=");
+		if ((advance = pimv2_addr_print(bp, pimv2_unicast, 0)) < 0) {
+			(void)printf("...");
+			break;
+		}
+		bp += advance;
+		TCHECK2(bp[0], 2);
+		(void)printf(" TUNR ");
+		relts_print(EXTRACT_16BITS(bp));
+		break;
+
+
 	 default:
 		(void)printf(" [type %d]", pim->pim_type);
 		break;
 	}
 
 	return;
+
+trunc:
+	(void)printf("[|pim]");
 }
