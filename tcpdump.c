@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.175 2002-04-24 06:55:56 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.176 2002-05-16 10:25:58 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -494,6 +494,8 @@ main(int argc, char **argv)
 	if (pcap_loop(pd, cnt, printer, pcap_userdata) < 0) {
 		(void)fprintf(stderr, "%s: pcap_loop: %s\n",
 		    program_name, pcap_geterr(pd));
+		cleanup(0);
+		pcap_close(pd);
 		exit(1);
 	}
 	if (RFileName == NULL)
@@ -513,7 +515,8 @@ cleanup(int signo)
 		putc('\n', stderr);
 		info(1);
 	}
-	exit(0);
+	if (signo)
+		exit(0);
 }
 
 void
