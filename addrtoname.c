@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.105 2004-12-13 05:55:37 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.106 2005-01-04 00:07:09 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -103,10 +103,6 @@ win32_gethostbyaddr(const char *addr, int len, int type)
 		memset(&addr6, 0, sizeof(addr6));
 		addr6.sin6_family = AF_INET6;
 		memcpy(&addr6.sin6_addr, addr, len);
-#ifdef __MINGW32__
-		/* MinGW doesn't provide getnameinfo */
-		return NULL;
-#else
 		if (getnameinfo((struct sockaddr *)&addr6, sizeof(addr6),
 		    hname, sizeof(hname), NULL, 0, 0)) {
 			return NULL;
@@ -114,14 +110,13 @@ win32_gethostbyaddr(const char *addr, int len, int type)
 			strcpy(host.h_name, hname);
 			return &host;
 		}
-#endif /* __MINGW32__ */
 		break;
 	default:
 		return NULL;
 	}
 }
 #define gethostbyaddr win32_gethostbyaddr
-#endif /* INET6 & WIN32*/
+#endif /* INET6 & WIN32 */
 
 #ifdef INET6
 struct h6namemem {
@@ -703,13 +698,14 @@ init_servarray(void)
 	endservent();
 }
 
-/*XXX from libbpfc.a */
-#ifndef WIN32
-extern struct eproto {
+/* in libpcap.a (nametoaddr.c) */
+#if defined(WIN32) && !defined(USE_STATIC_LIBPCAP)
+__declspec(dllimport)
 #else
-__declspec( dllimport) struct eproto {
+extern
 #endif
-	char *s;
+const struct eproto {
+	const char *s;
 	u_short p;
 } eproto_db[];
 
