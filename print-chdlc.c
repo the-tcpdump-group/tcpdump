@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.20 2002-10-06 16:35:45 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.21 2002-10-18 20:08:34 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -115,6 +115,10 @@ chdlc_print(register const u_char *p, u_int length, u_int caplen)
 		chdlc_cdp_print((const u_char *)ip, length);
 		break;
 #endif
+        case ETHERTYPE_MPLS:
+        case ETHERTYPE_MPLS_MULTI:
+                mpls_print((const u_char *)(ip), length);
+		break;
         case ETHERTYPE_ISO:
                 /* is the fudge byte set ? if yes lets skip a byte */
                 if (*(p+CHDLC_HDRLEN) == 0)
