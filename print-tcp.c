@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.79 2000-10-07 05:53:14 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.80 2000-11-17 19:08:16 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -229,7 +229,7 @@ static int tcp6_cksum(const struct ip6_hdr *ip6, const struct tcphdr *tp,
 
 void
 tcp_print(register const u_char *bp, register u_int length,
-	  register const u_char *bp2)
+	  register const u_char *bp2, int fragmented)
 {
 	register const struct tcphdr *tp;
 	register const struct ip *ip;
@@ -444,7 +444,7 @@ tcp_print(register const u_char *bp, register u_int length,
 		return;
 	}
 
-	if (IP_V(ip) == 4 && vflag) {
+	if (IP_V(ip) == 4 && vflag && !fragmented) {
 		int sum;
 		if (TTEST2(tp->th_sport, length)) {
 			sum = tcp_cksum(ip, tp, length);
@@ -455,7 +455,7 @@ tcp_print(register const u_char *bp, register u_int length,
 		}
 	}
 #ifdef INET6
-	if (IP_V(ip) == 6 && ip6->ip6_plen && vflag) {
+	if (IP_V(ip) == 6 && ip6->ip6_plen && vflag && !fragmented) {
 		int sum;
 		if (TTEST2(tp->th_sport, length)) {
 			sum = tcp6_cksum(ip6, tp, length);

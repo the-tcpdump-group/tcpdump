@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.88 2000-10-30 06:22:15 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.89 2000-11-17 19:08:16 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -415,7 +415,8 @@ static int udp6_cksum(const struct ip6_hdr *ip6, const struct udphdr *up,
 #endif
 
 void
-udp_print(register const u_char *bp, u_int length, register const u_char *bp2)
+udp_print(register const u_char *bp, u_int length,
+	  register const u_char *bp2, int fragmented)
 {
 	register const struct udphdr *up;
 	register const struct ip *ip;
@@ -601,7 +602,7 @@ udp_print(register const u_char *bp, u_int length, register const u_char *bp2)
 	}
 #endif
 
-	if (IP_V(ip) == 4 && vflag) {
+	if (IP_V(ip) == 4 && vflag && !fragmented) {
 		int sum = up->uh_sum;
 		if (sum == 0) {
 			(void)printf(" [no cksum]");
@@ -614,7 +615,7 @@ udp_print(register const u_char *bp, u_int length, register const u_char *bp2)
 		}
 	}
 #ifdef INET6
-	if (IP_V(ip) == 6 && ip6->ip6_plen && vflag) {
+	if (IP_V(ip) == 6 && ip6->ip6_plen && vflag && !fragmented) {
 		int sum = up->uh_sum;
 		/* for IPv6, UDP checksum is mandatory */
 		if (TTEST2(cp[0], length)) {

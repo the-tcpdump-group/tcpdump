@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.15 2000-11-09 07:43:50 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.16 2000-11-17 19:08:15 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -58,6 +58,7 @@ ip6_print(register const u_char *bp, register int length)
 	register int len;
 	register const u_char *cp;
 	int nh;
+	int fragmented = 0;
 	u_int flow;
 	
 	ip6 = (const struct ip6_hdr *)bp;
@@ -119,6 +120,7 @@ ip6_print(register const u_char *bp, register int length)
 			if (snapend <= cp + advance)
 				goto end;
 			nh = *cp;
+			fragmented = 1;
 			break;
 		case IPPROTO_ROUTING:
 			advance = rt6_print(cp, (const u_char *)ip6);
@@ -126,11 +128,11 @@ ip6_print(register const u_char *bp, register int length)
 			break;
 		case IPPROTO_TCP:
 			tcp_print(cp, len + sizeof(struct ip6_hdr) - (cp - bp),
-				(const u_char *)ip6);
+				(const u_char *)ip6, fragmented);
 			goto end;
 		case IPPROTO_UDP:
 			udp_print(cp, len + sizeof(struct ip6_hdr) - (cp - bp),
-				(const u_char *)ip6);
+				(const u_char *)ip6, fragmented);
 			goto end;
 		case IPPROTO_ICMPV6:
 			icmp6_print(cp, (const u_char *)ip6);
