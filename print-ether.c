@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.56 2000-09-29 04:58:38 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.57 2000-10-07 05:46:21 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -38,10 +38,6 @@ struct rtentry;
 
 #include <stdio.h>
 #include <pcap.h>
-
-#ifdef INET6
-#include <netinet/ip6.h>
-#endif
 
 #include "interface.h"
 #include "addrtoname.h"

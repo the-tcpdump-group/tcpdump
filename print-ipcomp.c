@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ipcomp.c,v 1.11 2000-10-06 04:23:12 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ipcomp.c,v 1.12 2000-10-07 05:46:21 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -37,10 +37,6 @@ static const char rcsid[] =
 #include <netinet/in.h>
 
 #include <stdio.h>
-
-#ifdef INET6
-#include <netinet/ip6.h>
-#endif
 
 struct ipcomp {
 	u_int8_t comp_nxt;	/* Next Header */
