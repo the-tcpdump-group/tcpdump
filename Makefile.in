@@ -17,7 +17,7 @@
 #  WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 #  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.264 2002-07-11 08:09:46 guy Exp $ (LBL)
+# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.265 2002-07-11 09:17:22 guy Exp $ (LBL)
 
 #
 # Various configurable paths (remember to edit Makefile.in, not Makefile)
@@ -80,10 +80,10 @@ CSRC =	addrtoname.c gmt2local.c machdep.c parsenfsfh.c \
 	print-ospf.c print-pflog.c print-pim.c print-ppp.c \
 	print-pppoe.c print-pptp.c print-radius.c print-raw.c \
 	print-rip.c print-rx.c print-sctp.c print-sl.c print-sll.c \
-	print-snmp.c print-stp.c print-sunrpc.c print-tcp.c \
-	print-telnet.c print-tftp.c print-timed.c print-token.c \
-	print-udp.c print-vjc.c print-vrrp.c print-wb.c print-zephyr.c \
-	setsignal.c tcpdump.c util.c
+	print-snmp.c print-stp.c print-sunatm.c print-sunrpc.c \
+	print-tcp.c print-telnet.c print-tftp.c print-timed.c \
+	print-token.c print-udp.c print-vjc.c print-vrrp.c \
+	print-wb.c print-zephyr.c setsignal.c tcpdump.c util.c
 
 LOCALSRC = @LOCALSRC@
 GENSRC = version.c

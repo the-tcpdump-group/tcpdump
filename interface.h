@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.189 2002-07-11 08:27:03 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.190 2002-07-11 09:17:22 guy Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -202,7 +202,10 @@ extern int snap_print(const u_char *, u_int, u_int, const u_char *,
 extern void aarp_print(const u_char *, u_int);
 extern void arp_print(const u_char *, u_int, u_int);
 extern void atalk_print(const u_char *, u_int);
+extern void atm_print(u_int, u_int, u_int, const u_char *, u_int, u_int);
 extern void atm_if_print(u_char *, const struct pcap_pkthdr *, const u_char *);
+extern void bpfatm_if_print(u_char *, const struct pcap_pkthdr *, const u_char *);
+extern void sunatm_if_print(u_char *, const struct pcap_pkthdr *, const u_char *);
 extern void bootp_print(const u_char *, u_int, u_short, u_short);
 extern void bgp_print(const u_char *, int);
 extern void beep_print(const u_char *, u_int);
@@ -264,6 +267,7 @@ extern int vjc_print(register const char *, register u_int, u_short);
 extern void raw_if_print(u_char *, const struct pcap_pkthdr *, const u_char *);
 extern void rip_print(const u_char *, u_int);
 extern void sl_if_print(u_char *, const struct pcap_pkthdr *, const u_char *);
+extern void lane_print(const u_char *, u_int, u_int);
 extern void lane_if_print(u_char *, const struct pcap_pkthdr *,const u_char *);
 extern void cip_if_print(u_char *, const struct pcap_pkthdr *,const u_char *);
 extern void sl_bsdos_if_print(u_char *, const struct pcap_pkthdr *,

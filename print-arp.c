@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-arp.c,v 1.53 2002-04-25 04:37:31 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-arp.c,v 1.54 2002-07-11 09:17:23 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -98,10 +98,47 @@ struct	arp_pkthdr {
 #define THA(ap) (ar_tha(ap))
 #define TPA(ap) (ar_tpa(ap))
 
+/*
+ * ATM Address Resolution Protocol.
+ *
+ * See RFC 2225 for protocol description.  ARP packets are variable
+ * in size; the arphdr structure defines the fixed-length portion.
+ * Protocol type values are the same as those for 10 Mb/s Ethernet.
+ * It is followed by the variable-sized fields ar_sha, arp_spa,
+ * arp_tha and arp_tpa in that order, according to the lengths
+ * specified.  Field names used correspond to RFC 826.
+ */
+struct	atmarp_pkthdr {
+	u_short	ar_hrd;		/* format of hardware address */
+#define ARPHRD_ATM2225	19	/* ATM (RFC 2225) */
+	u_short	ar_pro;		/* format of protocol address */
+	u_char	ar_shtl;	/* length of hardware address */
+	u_char	ar_sstl;	/* length of hardware address */
+	u_short	ar_op;		/* same as regular ARP */
+	u_char	ar_spln;
+	u_char	ar_thtl;
+	u_char	ar_tstl;
+	u_char	ar_tpln;
+/*
+ * The remaining fields are variable in size,
+ * according to the sizes above.
+ */
+#ifdef COMMENT_ONLY
+	u_char	ar_sha[];	/* sender hardware address */
+	u_char	ar_spa[];	/* sender protocol address */
+	u_char	ar_tha[];	/* target hardware address */
+	u_char	ar_tpa[];	/* target protocol address */
+#endif
+#define ar_sha(ap)	(((const u_char *)((ap)+1))+0)
+#define ar_spa(ap)	(((const u_char *)((ap)+1))+  (ap)->ar_hln)
+#define ar_tha(ap)	(((const u_char *)((ap)+1))+  (ap)->ar_hln+(ap)->ar_pln)
+#define ar_tpa(ap)	(((const u_char *)((ap)+1))+2*(ap)->ar_hln+(ap)->ar_pln)
+};
+
 static u_char ezero[6];
 
-void
-arp_print(const u_char *bp, u_int length, u_int caplen)
+static void
+atmarp_print(const u_char *bp, u_int length, u_int caplen)
 {
 	const struct arp_pkthdr *ap;
 	u_short pro, hrd, op;
@@ -114,8 +151,10 @@ arp_print(const u_char *bp, u_int length, u_int caplen)
 		return;
 	}
 
-	pro = EXTRACT_16BITS(&PRO(ap));
 	hrd = EXTRACT_16BITS(&HRD(ap));
+	if (hrd == ARPHRD_ATM2225)
+		atmarp_print(bp, length, caplen);
+	pro = EXTRACT_16BITS(&PRO(ap));
 	op = EXTRACT_16BITS(&OP(ap));
 
 	if (pro != ETHERTYPE_IP && pro != ETHERTYPE_TRAIL) {
@@ -148,6 +187,96 @@ arp_print(const u_char *bp, u_int length, u_int caplen)
 
 	case ARPOP_REVREPLY:
 		(void)printf("rarp reply %s at %s",
+			linkaddr_string(THA(ap), HLN(ap)),
+			ipaddr_string(TPA(ap)));
+		break;
+
+	case ARPOP_INVREQUEST:
+		(void)printf("invarp who-is %s tell %s",
+			linkaddr_string(THA(ap), HLN(ap)),
+			linkaddr_string(SHA(ap), HLN(ap)));
+		break;
+
+	case ARPOP_INVREPLY:
+		(void)printf("invarp reply %s at %s",
+			linkaddr_string(THA(ap), HLN(ap)),
+			ipaddr_string(TPA(ap)));
+		break;
+
+	default:
+		(void)printf("arp-#%d", op);
+		default_print((const u_char *)ap, caplen);
+		return;
+	}
+	if (hrd != ARPHRD_ETHER)
+		printf(" hardware #%d", hrd);
+	return;
+trunc:
+	(void)printf("[|arp]");
+}
+
+void
+arp_print(const u_char *bp, u_int length, u_int caplen)
+{
+	const struct arp_pkthdr *ap;
+	u_short pro, hrd, op;
+
+	ap = (const struct arp_pkthdr *)bp;
+	TCHECK(*ap);
+	if ((const u_char *)(ar_tpa(ap) + PLN(ap)) > snapend) {
+		(void)printf("truncated-arp");
+		default_print((const u_char *)ap, length);
+		return;
+	}
+
+	hrd = EXTRACT_16BITS(&HRD(ap));
+	if (hrd == ARPHRD_ATM2225)
+		atmarp_print(bp, length, caplen);
+	pro = EXTRACT_16BITS(&PRO(ap));
+	op = EXTRACT_16BITS(&OP(ap));
+
+	if (pro != ETHERTYPE_IP && pro != ETHERTYPE_TRAIL) {
+		(void)printf("arp-#%d for proto #%d (%d) hardware #%d (%d)",
+				op, pro, PLN(ap), hrd, HLN(ap));
+		return;
+	}
+	if (pro == ETHERTYPE_TRAIL)
+		(void)printf("trailer-");
+	switch (op) {
+
+	case ARPOP_REQUEST:
+		(void)printf("arp who-has %s", ipaddr_string(TPA(ap)));
+		if (memcmp((const char *)ezero, (const char *)THA(ap), HLN(ap)) != 0)
+			(void)printf(" (%s)",
+			    linkaddr_string(THA(ap), HLN(ap)));
+		(void)printf(" tell %s", ipaddr_string(SPA(ap)));
+		break;
+
+	case ARPOP_REPLY:
+		(void)printf("arp reply %s", ipaddr_string(SPA(ap)));
+		(void)printf(" is-at %s", linkaddr_string(SHA(ap), HLN(ap)));
+		break;
+
+	case ARPOP_REVREQUEST:
+		(void)printf("rarp who-is %s tell %s",
+			linkaddr_string(THA(ap), HLN(ap)),
+			linkaddr_string(SHA(ap), HLN(ap)));
+		break;
+
+	case ARPOP_REVREPLY:
+		(void)printf("rarp reply %s at %s",
+			linkaddr_string(THA(ap), HLN(ap)),
+			ipaddr_string(TPA(ap)));
+		break;
+
+	case ARPOP_INVREQUEST:
+		(void)printf("invarp who-is %s tell %s",
+			linkaddr_string(THA(ap), HLN(ap)),
+			linkaddr_string(SHA(ap), HLN(ap)));
+		break;
+
+	case ARPOP_INVREPLY:
+		(void)printf("invarp reply %s at %s",
 			linkaddr_string(THA(ap), HLN(ap)),
 			ipaddr_string(TPA(ap)));
 		break;

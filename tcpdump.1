@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.122 2002-06-24 21:06:23 fenner Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.123 2002-07-11 09:17:24 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -781,6 +781,52 @@ Abbreviations for:
 .in -.5i
 where \fIp\fR is one of the above protocols.
 Note that \fItcpdump\fR does an incomplete job of parsing these protocols.
+.IP "\fBvpi\fP \fIn\fR
+True if the packet is an ATM packet, for SunATM on Solaris, with a
+virtual path identifier of
+.IR n .
+.IP "\fBvci\fP \fIn\fR
+True if the packet is an ATM packet, for SunATM on Solaris, with a
+virtual channel identifier of
+.IR n .
+.IP \fBlane\fP
+True if the packet is an ATM packet, for SunATM on Solaris, and is
+an ATM LANE packet.
+.IP \fBllc\fP
+True if the packet is an ATM packet, for SunATM on Solaris, and is
+an LLC-encapsulated packet.
+.IP \fBoamf4s\fP
+True if the packet is an ATM packet, for SunATM on Solaris, and is
+a segment OAM F4 flow cell (VPI=0 & VCI=3).
+.IP \fBoamf4e\fP
+True if the packet is an ATM packet, for SunATM on Solaris, and is
+an end-to-end OAM F4 flow cell (VPI=0 & VCI=4).
+.IP \fBoamf4\fP
+True if the packet is an ATM packet, for SunATM on Solaris, and is
+a segment or end-to-end OAM F4 flow cell (VPI=0 & (VCI=3 | VCI=4)).
+.IP \fBoam\fP
+True if the packet is an ATM packet, for SunATM on Solaris, and is
+a segment or end-to-end OAM F4 flow cell (VPI=0 & (VCI=3 | VCI=4)).
+.IP \fBmetac\fP
+True if the packet is an ATM packet, for SunATM on Solaris, and is
+on a meta signaling circuit (VPI=0 & VCI=1).
+.IP \fBbcc\fP
+True if the packet is an ATM packet, for SunATM on Solaris, and is
+on a broadcast signaling circuit (VPI=0 & VCI=2).
+.IP \fBsc\fP
+True if the packet is an ATM packet, for SunATM on Solaris, and is
+on a signaling circuit (VPI=0 & VCI=5).
+.IP \fBilmic\fP
+True if the packet is an ATM packet, for SunATM on Solaris, and is
+on an ILMI circuit (VPI=0 & VCI=16).
+.IP \fBconnectmsg\fP
+True if the packet is an ATM packet, for SunATM on Solaris, and is
+on a signaling circuit and is a Q.2931 Setup, Call Proceeding, Connect,
+Connect Ack, Release, or Release Done message.
+.IP \fBmetaconnect\fP
+True if the packet is an ATM packet, for SunATM on Solaris, and is
+on a meta signaling circuit and is a Q.2931 Setup, Call Proceeding, Connect,
+Release, or Release Done message.
 .IP  "\fIexpr relop expr\fR"
 True if the relation holds, where \fIrelop\fR is one of >, <, >=, <=, =, !=,
 and \fIexpr\fR is an arithmetic expression composed of integer constants

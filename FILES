@@ -14,6 +14,8 @@ ah.h
 appletalk.h
 arcnet.h
 atime.awk
+atm.h
+atmuni31.h
 bootp.h
 bpf_dump.c
 chdlc.h
@@ -147,6 +149,7 @@ print-sll.c
 print-smb.c
 print-snmp.c
 print-stp.c
+print-sunatm.c
 print-sunrpc.c
 print-tcp.c
 print-telnet.c
