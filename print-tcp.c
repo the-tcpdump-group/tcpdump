@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.112 2004-04-05 00:12:54 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.113 2004-04-24 17:19:00 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -406,23 +406,27 @@ tcp_print(register const u_char *bp, register u_int length,
 		u_int16_t sum, tcp_sum;
 		if (TTEST2(tp->th_sport, length)) {
 			sum = tcp_cksum(ip, tp, length);
+
+                        (void)printf(", cksum 0x%04x",EXTRACT_16BITS(&tp->th_sum));
 			if (sum != 0) {
 				tcp_sum = EXTRACT_16BITS(&tp->th_sum);
-				(void)printf(" [bad tcp cksum %x (->%x)!]",
-				    tcp_sum, in_cksum_shouldbe(tcp_sum, sum));
+				(void)printf(" (incorrect (-> 0x%04x),",in_cksum_shouldbe(tcp_sum, sum));
 			} else
-				(void)printf(" [tcp sum ok]");
+				(void)printf(" (correct),");
 		}
 	}
 #ifdef INET6
 	if (IP_V(ip) == 6 && ip6->ip6_plen && vflag && !fragmented) {
-		int sum;
+		u_int16_t sum,tcp_sum;
 		if (TTEST2(tp->th_sport, length)) {
 			sum = tcp6_cksum(ip6, tp, length);
-			if (sum != 0)
-				(void)printf(" [bad tcp cksum %x!]", sum);
-			else
-				(void)printf(" [tcp sum ok]");
+                        (void)printf(", cksum 0x%04x",EXTRACT_16BITS(&tp->th_sum));
+			if (sum != 0) {
+				tcp_sum = EXTRACT_16BITS(&tp->th_sum);
+				(void)printf(" (incorrect (-> 0x%04x),",in_cksum_shouldbe(tcp_sum, sum));
+			} else
+				(void)printf(" (correct),");
+
 		}
 	}
 #endif
