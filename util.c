@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.90 2003-12-29 11:07:17 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.91 2004-04-28 22:06:33 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -212,7 +212,9 @@ const char *
 tok2str(register const struct tok *lp, register const char *fmt,
 	register int v)
 {
-	static char buf[128];
+	static char buf[4][128];
+	static int idx = 0;
+	char *ret;
 
 	while (lp->s != NULL) {
 		if (lp->v == v)
@@ -221,8 +223,10 @@ tok2str(register const struct tok *lp, register const char *fmt,
 	}
 	if (fmt == NULL)
 		fmt = "#%d";
-	(void)snprintf(buf, sizeof(buf), fmt, v);
-	return (buf);
+	ret = buf[idx];
+	(void)snprintf(ret, sizeof(buf[0]), fmt, v);
+	idx = (idx+1) & 3;
+	return (ret);
 }
 
 /*
