@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.144 2004-09-27 21:13:09 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.145 2004-12-27 22:30:54 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -363,7 +363,7 @@ void
 ip_print(register const u_char *bp, register u_int length)
 {
 	register const struct ip *ip;
-	register u_int hlen, len, len0, off;
+	register u_int hlen, len, off;
 	const u_char *ipend;
 	register const u_char *cp;
 	u_char nh;
@@ -411,7 +411,6 @@ ip_print(register const u_char *bp, register u_int length)
 		snapend = ipend;
 
 	len -= hlen;
-	len0 = len;
 
 	off = EXTRACT_16BITS(&ip->ip_off);
 
