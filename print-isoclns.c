@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.82 2003-05-01 18:04:41 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.83 2003-05-10 16:33:07 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -444,16 +444,16 @@ struct isis_tlv_lsp {
 
 
 /* allocate space for the following string
- * xx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx
- * 32 bytes plus one termination byte */
+ * xx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xx
+ * 50 bytes plus one termination byte */
 static char *
 print_nsap(register const u_int8_t *pptr, register int nsap_length)
 {
 	int nsap_idx;
-	static char nsap_ascii_output[33];
+	static char nsap_ascii_output[51];
         char *junk_buf = nsap_ascii_output;
 
-        if (nsap_length < 1 || nsap_length > 13) {
+        if (nsap_length < 1 || nsap_length > 20) {
                 sprintf(junk_buf, "illegal length");
                 return (nsap_ascii_output);
         }
