@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.213 2003-08-06 06:49:41 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.214 2003-08-08 09:47:45 risso Exp $ (LBL)";
 #endif
 
 /*
@@ -317,15 +317,8 @@ main(int argc, char **argv)
 	int devnum;
 #endif
 #ifdef WIN32
-	DWORD dwVersion;
-	DWORD dwWindowsMajorVersion;
-	u_int UserBufferSize=1000000;
-#endif
-
-#ifdef WIN32
-	dwVersion=GetVersion();		/* get the OS version */
-	dwWindowsMajorVersion =  (DWORD)(LOBYTE(LOWORD(dwVersion)));
-	if(wsockinit()!=0) return 1;
+	u_int UserBufferSize = 1000000;
+	if(wsockinit() != 0) return 1;
 #endif /* WIN32 */
 
 	cnt = -1;
@@ -641,7 +634,19 @@ main(int argc, char **argv)
 				error("%s", ebuf);
 		}
 #ifdef WIN32
-		PrintCapBegins(program_name,device);
+		if(IsTextUnicode(device,  
+			wcslen((short*)device),                // Device always ends with a double \0, so this way to determine its 
+													// length should be always valid
+			NULL))
+		{
+			fprintf(stderr, "%s: listening on %ws\n", program_name, device);
+		}
+		else
+		{
+			fprintf(stderr, "%s: listening on %s\n", program_name, device);
+		}
+
+		fflush(stderr);	
 #endif /* WIN32 */
 		*ebuf = '\0';
 		pd = pcap_open_live(device, snaplen, !pflag, 1000, ebuf);
