@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.217.2.1 2003-11-16 08:51:06 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.217.2.2 2003-11-18 23:26:14 guy Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -318,7 +318,7 @@ extern void icmp6_print(const u_char *, const u_char *, int);
 extern void ripng_print(const u_char *, unsigned int);
 extern int rt6_print(const u_char *, const u_char *);
 extern void ospf6_print(const u_char *, u_int);
-extern void dhcp6_print(const u_char *, u_int, u_int16_t, u_int16_t);
+extern void dhcp6_print(const u_char *, u_int);
 #endif /*INET6*/
 extern u_short in_cksum(const u_short *, register u_int, int);
 extern u_int16_t in_cksum_shouldbe(u_int16_t, u_int16_t);

@@ -37,7 +37,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.27.2.3 2003-11-16 08:51:16 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.27.2.4 2003-11-18 23:26:14 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -371,7 +371,7 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 			break;
 		case DH6OPT_RELAY_MSG:
 			printf(" (");
-			dhcp6_print((const u_char *)(dh6o + 1), optlen, 0, 0);
+			dhcp6_print((const u_char *)(dh6o + 1), optlen);
 			printf(")");
 			break;
 		case DH6OPT_RAPID_COMMIT: /* nothing todo */
@@ -504,8 +504,7 @@ trunc:
  * Print dhcp6 packets
  */
 void
-dhcp6_print(const u_char *cp, u_int length,
-	    u_int16_t sport, u_int16_t dport)
+dhcp6_print(const u_char *cp, u_int length)
 {
 	struct dhcp6 *dh6;
 	struct dhcp6_relay *dh6relay;
