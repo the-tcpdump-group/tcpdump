@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.104 2004-10-20 16:14:15 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.105 2004-10-28 11:21:23 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1198,17 +1198,18 @@ handle_ppp(u_int proto, const u_char *p, int length)
         }
 
 	switch (proto) {
-	case PPP_LCP:
+	case PPP_LCP: /* fall through */
 	case PPP_IPCP:
 	case PPP_OSICP:
 	case PPP_MPLSCP:
 	case PPP_IPV6CP:
 	case PPP_CCP:
-        case PPP_ML:
-                handle_mlppp(p, length);
 	case PPP_BACP:
 		handle_ctrl_proto(proto, p, length);
 		break;
+        case PPP_ML:
+                handle_mlppp(p, length);
+                break;
 	case PPP_CHAP:
 		handle_chap(p, length);
 		break;
