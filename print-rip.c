@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rip.c,v 1.44 2000-09-23 08:54:38 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rip.c,v 1.45 2000-09-24 07:59:35 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -106,7 +106,7 @@ rip_entry_print_v2(register int vers, register const struct rip_netinfo *ni)
 {
 	register u_char *p;
 	register u_short family;
-	char buf[RIP_AUTHLEN];
+	u_char buf[RIP_AUTHLEN];
 
 	/* RFC 1723 */
 	family = EXTRACT_16BITS(&ni->rip_family);
@@ -170,8 +170,20 @@ rip_print(const u_char *dat, u_int length)
 	rp = (struct rip *)dat;
 	switch (rp->rip_vers) {
 	case 0:
-		/* RFC 1058 */
+		/*
+		 * RFC 1058.
+		 *
+		 * XXX - RFC 1058 says
+		 *
+		 * 0  Datagrams whose version number is zero are to be ignored.
+		 *    These are from a previous version of the protocol, whose
+		 *    packet format was machine-specific.
+		 *
+		 * so perhaps we should just dump the first few words of
+		 * the packet, in hex.
+                 */
 		printf(" RIPv0: ");
+		ni = (struct rip_netinfo *)(rp + 1);
 		rip_printblk((u_char *)&ni->rip_family,
 			     (u_char *)&ni->rip_metric +
 			     sizeof(ni->rip_metric));
