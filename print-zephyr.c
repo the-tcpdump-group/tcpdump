@@ -20,7 +20,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-zephyr.c,v 1.2 2001-09-11 02:37:12 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-zephyr.c,v 1.2.4.1 2002-07-11 07:48:06 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -56,7 +56,7 @@ struct z_packet {
     /* Other fields follow here.. */
 };
 
-enum {
+enum z_packet_type {
     Z_PACKET_UNSAFE = 0,
     Z_PACKET_UNACKED,
     Z_PACKET_ACKED,
@@ -66,7 +66,7 @@ enum {
     Z_PACKET_SERVNAK,
     Z_PACKET_CLIENTACK,
     Z_PACKET_STAT
-} z_packet_type;
+};
 
 static struct tok z_types[] = {
     { Z_PACKET_UNSAFE,		"unsafe" },
