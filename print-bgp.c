@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.19 2000-12-04 00:43:39 fenner Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.20 2000-12-04 05:27:49 fenner Exp $";
 #endif
 
 #include <sys/param.h>
@@ -534,7 +534,7 @@ bgp_open_print(const u_char *dat, int length)
 	const u_char *opt;
 	int i;
 
-	TCHECK2(dat, sizeof(bgpo));
+	TCHECK2(dat[0], sizeof(bgpo));
 	memcpy(&bgpo, dat, sizeof(bgpo));
 	hlen = ntohs(bgpo.bgpo_len);
 
@@ -575,7 +575,7 @@ bgp_update_print(const u_char *dat, int length)
 	int i;
 	int newline;
 
-	TCHECK2(dat, sizeof(bgp));
+	TCHECK2(dat[0], sizeof(bgp));
 	memcpy(&bgp, dat, sizeof(bgp));
 	hlen = ntohs(bgp.bgp_len);
 	p = dat + BGP_SIZE;	/*XXX*/
@@ -590,26 +590,24 @@ bgp_update_print(const u_char *dat, int length)
 	         */
 #ifdef INET6
 		printf(" (Withdrawn routes: %d bytes)", len);
-		p+= len;
 #else	
-		u_char *p2 = (u_char *)p;
-		int advance;
 		char buf[MAXHOSTNAMELEN + 100];
+
+		TCHECK2(p[2], len);
+ 		i = 2;
 
 		printf(" (Withdrawn routes:", len);
 			
-		while(p - p2 < len) {
-			advance = decode_prefix4(p, buf, sizeof(buf));
+		while(i < 2 + len) {
+			i += decode_prefix4(&p[i], buf, sizeof(buf));
 			printf(" %s", buf);
-			p += advance;
 		}
 		printf(")\n");
 #endif
-		printf(" (Withdrawn routes: %d bytes)", len);
 	}
 	p += 2 + len;
 
-	TCHECK2(p, 2);
+	TCHECK2(p[0], 2);
 	len = EXTRACT_16BITS(p);
 	if (len) {
 		/* do something more useful!*/
@@ -682,7 +680,7 @@ bgp_notification_print(const u_char *dat, int length)
 	struct bgp_notification bgpn;
 	int hlen;
 
-	TCHECK2(dat, sizeof(bgpn));
+	TCHECK2(dat[0], sizeof(bgpn));
 	memcpy(&bgpn, dat, sizeof(bgpn));
 	hlen = ntohs(bgpn.bgpn_len);
 
@@ -699,7 +697,7 @@ bgp_header_print(const u_char *dat, int length)
 {
 	struct bgp bgp;
 
-	TCHECK2(dat, sizeof(bgp));
+	TCHECK2(dat[0], sizeof(bgp));
 	memcpy(&bgp, dat, sizeof(bgp));
 	printf("(%s", bgp_type(bgp.bgp_type));		/* ) */
 
@@ -761,7 +759,7 @@ bgp_print(const u_char *dat, int length)
 		}
 
 		/* found BGP header */
-		TCHECK2(p[0], BGP_SIZE);	/*XXX*/
+		TCHECK2(p[0], sizeof(bgp));	/*XXX*/
 		memcpy(&bgp, p, sizeof(bgp));
 
 		if (start != p)
