@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.18 2003-03-14 10:03:52 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.19 2003-05-08 14:52:20 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -977,16 +977,16 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                        ip6addr_string(obj_tptr),
                        *(obj_tptr+16),
                        tok2str(rsvp_obj_error_code_values,"unknown",error_code),
-                       error_code,
-                       error_value);
+                       error_code);
 
                 switch (error_code) {
                 case RSVP_OBJ_ERROR_SPEC_CODE_ROUTING:
                     printf(", Error Value: %s (%u)",
-                           tok2str(rsvp_obj_error_code_routing_values,"unknown",error_value));
+                           tok2str(rsvp_obj_error_code_routing_values,"unknown",error_value),
+			   error_value);
                     break;
                 default:
-                    printf(", Unknown Error Value (%u)");
+                    break;
                 }
 
                 break;
