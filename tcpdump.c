@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.252 2005-01-27 10:17:59 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.253 2005-01-27 18:30:36 hannes Exp $ (LBL)";
 #endif
 
 /*
@@ -228,6 +228,9 @@ static struct printer printers[] = {
 #endif
 #ifdef DLT_JUNIPER_MLFR
 	{ juniper_mlfr_print,	DLT_JUNIPER_MLFR },
+#endif
+#ifdef DLT_JUNIPER_MLPPP
+	{ juniper_mlppp_print,	DLT_JUNIPER_MLPPP },
 #endif
 	{ NULL,			0 },
 };

@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.6 2005-01-27 10:17:58 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.7 2005-01-27 18:30:36 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -48,6 +48,59 @@ static const char rcsid[] _U_ =
 int ip_heuristic_guess(register const u_char *, u_int);
 int juniper_ppp_heuristic_guess(register const u_char *, u_int);
 static int juniper_parse_header (const u_char *, u_int8_t *, u_int);
+
+u_int
+juniper_mlppp_print(const struct pcap_pkthdr *h, register const u_char *p)
+{
+	register u_int length = h->len;
+	register u_int caplen = h->caplen;
+        u_int8_t direction,bundle,cookie_len;
+        u_int32_t cookie,proto;
+        
+        if(juniper_parse_header(p, &direction,length) == 0)
+            return 0;
+
+        p+=4;
+        length-=4;
+        caplen-=4;
+
+        if (p[0] == LS_COOKIE_ID) {
+            cookie=EXTRACT_32BITS(p);
+            if (eflag) printf("LSPIC-MLPPP cookie 0x%08x, ",cookie);
+            cookie_len = LS_MLFR_LEN;
+            bundle = cookie & 0xff;
+        } else {
+            cookie=EXTRACT_16BITS(p);
+            if (eflag) printf("MLPIC-MLPPP cookie 0x%04x, ",cookie);
+            cookie_len = ML_MLFR_LEN;
+            bundle = (cookie >> 8) & 0xff;
+        }
+
+        proto = EXTRACT_16BITS(p+cookie_len);        
+        p += cookie_len;
+        length-= cookie_len;
+        caplen-= cookie_len;
+
+        /* suppress Bundle-ID if frame was captured on a child-link
+         * this may be the case if the cookie looks like a proto */
+        if (eflag &&
+            cookie != PPP_OSI &&
+            cookie !=  (PPP_ADDRESS << 8 | PPP_CONTROL))
+            printf("Bundle-ID %u, ",bundle);
+
+        switch (cookie) {
+        case PPP_OSI:
+            ppp_print(p-2,length+2);
+            break;
+        case (PPP_ADDRESS << 8 | PPP_CONTROL): /* fall through */
+        default:
+            ppp_print(p,length);
+            break;
+        }
+
+        return cookie_len;
+}
+
 
 u_int
 juniper_mlfr_print(const struct pcap_pkthdr *h, register const u_char *p)
