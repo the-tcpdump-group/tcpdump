@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-null.c,v 1.26 1999-10-30 05:11:18 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-null.c,v 1.27 1999-11-21 03:48:05 assar Exp $ (LBL)";
 #endif
 
 #include <sys/param.h>
@@ -123,14 +123,19 @@ null_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	if (eflag)
 		null_print(p, ip, length);
 
-#ifndef INET6
-	ip_print((const u_char *)ip, length);
-#else
-	if (ip->ip_v == IPVERSION)
-		ip_print((const u_char *)ip, length);
-	else if (ip->ip_v == 6)
-		ip6_print((const u_char *)ip, length);
-#endif /*INET6*/
+	switch (ip->ip_v) {
+	case 4 :
+		ip_print((const void *)ip, length);
+		break;
+#ifdef INET6
+	case 6:
+		ipv6_print((const void *)ip, length);
+		break;
+#endif /* INET6 */
+	default :
+		printf("ip v%d", ip->ip_v);
+		break;
+	}
 
 	if (xflag)
 		default_print((const u_char *)ip, caplen - NULL_HDRLEN);
