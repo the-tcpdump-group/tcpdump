@@ -51,7 +51,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.5 2000-01-09 21:34:20 fenner Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.6 2000-01-17 06:24:26 itojun Exp $";
 #endif
 
 #include <sys/param.h>
@@ -127,15 +127,16 @@ telnet_print(register const u_char *sp, u_int length)
 				x = *sp++; /* option */
 				length--;
 				if (x >= 0 && x < NTELOPTS) {
-					(void)sprintf(tnet, "%s %s",
-						      telcmds[i], telopts[x]);
+					(void)snprintf(tnet, sizeof(tnet),
+					    "%s %s", telcmds[i], telopts[x]);
 				} else {
-					(void)sprintf(tnet, "%s %#x",
-						      telcmds[i], x);
+					(void)snprintf(tnet, sizeof(tnet),
+					    "%s %#x", telcmds[i], x);
 				}
 				break;
 			default:
-				(void)strcpy(tnet, telcmds[i]);
+				(void)snprintf(tnet, sizeof(tnet), "%s",
+				    telcmds[i]);
 			}
 			if (c == SB) {
 				c = *sp++;

@@ -11,7 +11,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.5 2000-01-09 21:34:20 fenner Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.6 2000-01-17 06:24:27 itojun Exp $";
 #endif
 
 #include <sys/param.h>
@@ -680,17 +680,17 @@ char *smb_errstr(int class,int num)
 	    for (j=0;err[j].name;j++)
 	      if (num == err[j].code)
 		{
-		  sprintf(ret,"%s - %s (%s)",err_classes[i].class,
+		  snprintf(ret,sizeof(ret),"%s - %s (%s)",err_classes[i].class,
 			  err[j].name,err[j].message);
 		  return ret;
 		}
 	  }
 
-	sprintf(ret,"%s - %d",err_classes[i].class,num);
+	snprintf(ret,sizeof(ret),"%s - %d",err_classes[i].class,num);
 	return ret;
       }
   
-  sprintf(ret,"ERROR: Unknown error (%d,%d)",class,num);
+  snprintf(ret,sizeof(ret),"ERROR: Unknown error (%d,%d)",class,num);
   return(ret);
 }
 

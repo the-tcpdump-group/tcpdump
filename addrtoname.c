@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.64 1999-11-21 09:36:44 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.65 2000-01-17 06:24:23 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -556,7 +556,7 @@ tcpport_string(u_short port)
 	tp->addr = i;
 	tp->nxt = newhnamemem();
 
-	(void)sprintf(buf, "%u", i);
+	(void)snprintf(buf, sizeof(buf), "%u", i);
 	tp->name = savestr(buf);
 	return (tp->name);
 }
@@ -575,7 +575,7 @@ udpport_string(register u_short port)
 	tp->addr = i;
 	tp->nxt = newhnamemem();
 
-	(void)sprintf(buf, "%u", i);
+	(void)snprintf(buf, sizeof(buf), "%u", i);
 	tp->name = savestr(buf);
 	return (tp->name);
 }
@@ -601,7 +601,7 @@ init_servarray(void)
 		while (table->name)
 			table = table->nxt;
 		if (nflag) {
-			(void)sprintf(buf, "%d", port);
+			(void)snprintf(buf, sizeof(buf), "%d", port);
 			table->name = savestr(buf);
 		} else
 			table->name = savestr(sv->s_name);

@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.10 2000-01-09 21:34:17 fenner Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.11 2000-01-17 06:24:24 itojun Exp $";
 #endif
 
 #include <sys/param.h>
@@ -240,7 +240,7 @@ num_or_str(const char **table, size_t siz, int value)
 {
 	static char buf[20];
 	if (value < 0 || siz <= value || table[value] == NULL) {
-		sprintf(buf, "#%d", value);
+		snprintf(buf, sizeof(buf), "#%d", value);
 		return buf;
 	} else
 		return table[value];
@@ -266,7 +266,7 @@ bgp_notify_minor(int major, int minor)
 	} else
 		p = NULL;
 	if (p == NULL) {
-		sprintf(buf, "#%d", minor);
+		snprintf(buf, sizeof(buf), "#%d", minor);
 		return buf;
 	} else
 		return p;
@@ -288,7 +288,7 @@ decode_prefix4(const u_char *pd, char *buf, int buflen)
 		((u_char *)&addr)[(plen + 7) / 8 - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
 	}
-	sprintf(buf, "%s/%d", getname((char *)&addr), plen);
+	snprintf(buf, buflen, "%s/%d", getname((char *)&addr), plen);
 	return 1 + (plen + 7) / 8;
 }
 
@@ -309,7 +309,7 @@ decode_prefix6(const u_char *pd, char *buf, int buflen)
 		addr.s6_addr[(plen + 7) / 8 - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
 	}
-	sprintf(buf, "%s/%d", getname6((char *)&addr), plen);
+	snprintf(buf, buflen, "%s/%d", getname6((char *)&addr), plen);
 	return 1 + (plen + 7) / 8;
 }
 #endif

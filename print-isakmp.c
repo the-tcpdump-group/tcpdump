@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.9 2000-01-07 14:09:02 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.10 2000-01-17 06:24:25 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -989,7 +989,7 @@ static char *
 numstr(int x)
 {
 	static char buf[20];
-	sprintf(buf, "#%d", x);
+	snprintf(buf, sizeof(buf), "#%d", x);
 	return buf;
 }
 

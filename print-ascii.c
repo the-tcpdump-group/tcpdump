@@ -42,7 +42,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-ascii.c,v 1.4 2000-01-09 21:34:16 fenner Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-ascii.c,v 1.5 2000-01-17 06:24:24 itojun Exp $";
 #endif
 #include <stdio.h>
 #include <sys/types.h>
@@ -72,7 +72,7 @@ ascii_print_with_offset(register const u_char *cp, register u_int length,
 	while (--nshorts >= 0) {
 		s1 = *cp++;
 		s2 = *cp++;
-		(void)sprintf(hsp, " %02x%02x", s1, s2);
+		(void)snprintf(hsp, sizeof(hsp), " %02x%02x", s1, s2);
 		hsp += HEXDUMP_HEXSTUFF_PER_SHORT;
 		*(asp++) = (isgraph(s1) ? s1 : '.');
 		*(asp++) = (isgraph(s2) ? s2 : '.');
@@ -87,7 +87,7 @@ ascii_print_with_offset(register const u_char *cp, register u_int length,
 	}
 	if (length & 1) {
 		s1 = *cp++;
-		(void)sprintf(hsp, " %02x", s1);
+		(void)snprintf(hsp, sizeof(hsp), " %02x", s1);
 		hsp += 3;
 		*(asp++) = (isgraph(s1) ? s1 : '.');
 		++i;

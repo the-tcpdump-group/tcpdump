@@ -45,7 +45,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.39 1999-12-22 06:27:22 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.40 2000-01-17 06:24:26 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -188,7 +188,8 @@ char *ErrorStatus[] = {
 };
 #define DECODE_ErrorStatus(e) \
 	( e >= 0 && e < sizeof(ErrorStatus)/sizeof(ErrorStatus[0]) \
-	? ErrorStatus[e] : (sprintf(errbuf, "err=%u", e), errbuf))
+		? ErrorStatus[e] \
+		: (snprintf(errbuf, sizeof(errbuf), "err=%u", e), errbuf))
 
 /*
  * generic-trap values in the SNMP Trap-PDU
@@ -205,7 +206,8 @@ char *GenericTrap[] = {
 };
 #define DECODE_GenericTrap(t) \
 	( t >= 0 && t < sizeof(GenericTrap)/sizeof(GenericTrap[0]) \
-	? GenericTrap[t] : (sprintf(buf, "gt=%d", t), buf))
+		? GenericTrap[t] \
+		: (snprintf(buf, sizeof(buf), "gt=%d", t), buf))
 
 /*
  * ASN.1 type class table
@@ -730,11 +732,12 @@ asn1_print(struct be *elem)
 		}
 		d += (elem->data.uns64.low & 0xfffff000);
 #if 0 /*is looks illegal, but what is the intention???*/
-		sprintf(first, "%.f", d);
+		snprintf(first, sizeof(first), "%.f", d);
 #else
-		sprintf(first, "%f", d);
+		snprintf(first, sizeof(first), "%f", d);
 #endif
-		sprintf(last, "%5.5d", elem->data.uns64.low & 0xfff);
+		snprintf(last, sizeof(last), "%5.5d",
+		    elem->data.uns64.low & 0xfff);
 		for (carry = 0, cpf = first+strlen(first)-1, cpl = last+4;
 		     cpl >= last;
 		     cpf--, cpl--) {

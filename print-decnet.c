@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-decnet.c,v 1.27 1999-11-21 09:36:50 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-decnet.c,v 1.28 2000-01-17 06:24:24 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -740,13 +740,14 @@ char *
 dnnum_string(u_short dnaddr)
 {
 	char *str;
+	size_t siz;
 	int area = (u_short)(dnaddr & AREAMASK) >> AREASHIFT;
 	int node = dnaddr & NODEMASK;
 
-	str = (char *)malloc(sizeof("00.0000"));
+	str = (char *)malloc(siz = sizeof("00.0000"));
 	if (str == NULL)
 		error("dnnum_string: malloc");
-	sprintf(str, "%d.%d", area, node);
+	snprintf(str, siz, "%d.%d", area, node);
 	return(str);
 }
 

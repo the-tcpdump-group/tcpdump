@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.33 1999-12-22 06:27:22 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.34 2000-01-17 06:24:26 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -221,7 +221,7 @@ ppp_protoname(int proto)
 	case PPP_CHAP:	return "CHAP";
 #endif
 	default:
-		sprintf(buf, "unknown-0x%04x\n", proto);
+		snprintf(buf, sizeof(buf), "unknown-0x%04x\n", proto);
 		return buf;
 	}
 }
