@@ -29,6 +29,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef lint
+static const char rcsid[] =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sunatm.c,v 1.3 2002-08-05 07:47:23 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
