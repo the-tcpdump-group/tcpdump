@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.71 2003-10-27 08:04:52 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.72 2003-10-27 08:18:57 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -542,7 +542,7 @@ decode_rt_routing_info(const u_char *pptr, char *buf, u_int buflen)
 	}
 	snprintf(buf, buflen, "origin AS: %u, route target %s",
                  EXTRACT_32BITS(pptr+1),
-                 bgp_vpn_rd_print(pptr+5));
+                 bgp_vpn_rd_print((u_char *)&route_target));
 
 	return 5 + (plen + 7) / 8;
 }
