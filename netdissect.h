@@ -21,7 +21,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.9 2004-07-16 14:06:00 hannes Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.10 2004-07-21 22:00:10 guy Exp $ (LBL)
  */
 
 #ifndef netdissect_h
@@ -60,6 +60,10 @@ extern size_t strlcpy (char *, const char *, size_t);
 
 #ifndef HAVE_STRDUP
 extern char *strdup (const char *str);
+#endif
+
+#ifndef HAVE_STRSEP
+extern char *strsep(char **, const char *);
 #endif
 
 struct tok {
@@ -189,8 +193,16 @@ struct netdissect_options {
 #define HTONS(x)	(x) = htons(x)
 #endif
 
-/* True if  "l" bytes of "var" were captured */
-#define ND_TTEST2(var, l) ((u_char *)&(var) <= ndo->ndo_snapend - (l))
+/*
+ * True if "l" bytes of "var" were captured.
+ *
+ * The "ndo->ndo_snapend - (l) <= ndo->ndo_snapend" checks to make sure
+ * "l" isn't so large that "ndo->ndo_snapend - (l)" underflows.
+ *
+ * The check is for <= rather than < because "l" might be 0.
+ */
+#define ND_TTEST2(var, l) (ndo->ndo_snapend - (l) <= ndo->ndo_snapend && \
+			(const u_char *)&(var) <= ndo->ndo_snapend - (l))
 
 /* True if "var" was captured */
 #define ND_TTEST(var) ND_TTEST2(var, sizeof(var))
@@ -244,13 +256,13 @@ extern int esp_print(netdissect_options *,
 extern void arp_print(netdissect_options *,const u_char *, u_int, u_int);
 
 #if 0
-extern void ascii_print_with_offset(netdissect_options *, const u_char *,
+extern void ascii_print_with_offset(netdissect_options *, const char *,
 				    u_int, u_int);    
-extern void ascii_print(netdissect_options *,const u_char *, u_int);    
-extern void hex_print_with_offset(netdissect_options *,const u_char *,
+extern void ascii_print(netdissect_options *,const char *, u_int);    
+extern void hex_print_with_offset(netdissect_options *,const char *,
 				  u_int, u_int);    
 extern void telnet_print(netdissect_options *,const u_char *, u_int);    
-extern void hex_print(netdissect_options *,const u_char *, u_int);    
+extern void hex_print(netdissect_options *,const char *, u_int);    
 extern int ether_encap_print(netdissect_options *,u_short, const u_char *,
 			     u_int, u_int, u_short *);
 extern int llc_print(netdissect_options *,
