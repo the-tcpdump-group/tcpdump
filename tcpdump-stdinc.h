@@ -28,6 +28,8 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
+ *
+ * @(#) $Header: /tcpdump/master/tcpdump/tcpdump-stdinc.h,v 1.7.2.1 2003-11-16 09:57:50 guy Exp $ (LBL)
  */
 
 /*
