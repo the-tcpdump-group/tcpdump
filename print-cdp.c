@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.15 2002-08-01 08:53:02 risso Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.16 2002-08-07 05:21:07 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -148,16 +148,19 @@ cdp_print(const u_char *p, u_int length, u_int caplen,
 			printf(" AVVID untrusted ports CoS: 0x%02x", p[i+4]);
 			break;
 		case 0x14:		/* guess - not documented */
-			printf(" sysName='%.*s'", len - 4, p + i + 4 );
+			printf(" System Name: '%.*s'", len - 4,
+				p + i + 4);
 			break;
 		case 0x15:		/* guess - not documented */
-			printf(" sysObjectID" );		/* TODO */
+			printf(" System Object ID (not decoded) ");	/* TODO */
 			break;
 		case 0x16:		/* guess - not documented */
-			printf(" management address(es)" );
+			printf(" Management Addresses: ");
+			if (cdp_print_addr(p + i + 4, len - 4) < 0)
+				goto trunc;
 			break;
 		case 0x17:		/* guess - not documented */
-			printf(" phys. location 0x%02x/%.*s",
+			printf(" Physical Location: 0x%02x/%.*s",
 				p[i+4], len - 5, p + i + 5 );
 			break;
 		default:
