@@ -32,7 +32,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-aodv.c,v 1.8.2.2 2003-11-16 08:51:09 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-aodv.c,v 1.8.2.3 2004-03-24 00:30:41 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -143,20 +143,30 @@ aodv_rrep(const union aodv *ap, const u_char *dat, u_int length)
 }
 
 static void
-aodv_rerr(const union aodv *ap, u_int length)
+aodv_rerr(const union aodv *ap, const u_char *dat, u_int length)
 {
+	u_int i;
 	const struct rerr_unreach *dp = NULL;
-	int i, j, n, trunc;
+	int n, trunc;
 
-	i = length - offsetof(struct aodv_rerr, r);
-	j = sizeof(ap->rerr.r.dest[0]);
+	if (snapend < dat) {
+		printf(" [|aodv]");
+		return;
+	}
+	i = min(length, (u_int)(snapend - dat));
+	if (i < offsetof(struct aodv_rerr, r)) {
+		printf(" [|rerr]");
+		return;
+	}
+	i -= offsetof(struct aodv_rerr, r);
 	dp = &ap->rerr.r.dest[0];
-	n = ap->rerr.rerr_dc * j;
+	n = ap->rerr.rerr_dc * sizeof(ap->rerr.r.dest[0]);
 	printf(" rerr %s [items %u] [%u]:",
 	    ap->rerr.rerr_flags & RERR_NODELETE ? "[D]" : "",
 	    ap->rerr.rerr_dc, length);
-	trunc = n - (i/j);
-	for (; i -= j >= 0; ++dp) {
+	trunc = n - (i/sizeof(ap->rerr.r.dest[0]));
+	for (; i >= sizeof(ap->rerr.r.dest[0]);
+	    ++dp, i -= sizeof(ap->rerr.r.dest[0])) {
 		printf(" {%s}(%ld)", ipaddr_string(&dp->u_da),
 		    (unsigned long)EXTRACT_32BITS(&dp->u_ds));
 	}
@@ -416,7 +426,7 @@ aodv_print(const u_char *dat, u_int length, int is_ip6)
 		if (is_ip6)
 			aodv_v6_rerr(ap, length);
 		else
-			aodv_rerr(ap, length);
+			aodv_rerr(ap, dat, length);
 		break;
 
 	case AODV_RREP_ACK:
