@@ -3185,7 +3185,7 @@ EOF
 	    ;;
 
     *)
-	    	    for ac_func in sigset
+	    	    for ac_func in sigaction
 do
 echo $ac_n "checking for $ac_func""... $ac_c" 1>&6
 echo "configure:3192: checking for $ac_func" >&5
@@ -3240,8 +3240,8 @@ else
 fi
 done
 
-	    if test $ac_cv_func_sigset = no ; then
-		    for ac_func in sigaction
+	    if test $ac_cv_func_sigaction = no ; then
+		    for ac_func in sigset
 do
 echo $ac_n "checking for $ac_func""... $ac_c" 1>&6
 echo "configure:3248: checking for $ac_func" >&5
