@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.22.2.3 2003-11-19 02:02:00 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.22.2.4 2003-11-27 02:31:15 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -244,7 +244,7 @@ handle_beacon(u_int16_t fc, const u_char *p)
 	if (!parse_elements(&pbody, p, offset))
 		return 0;
 
-	printf("%s (", subtype_text[FC_SUBTYPE(fc)]);
+	printf(" (");
 	fn_print(pbody.ssid.ssid, NULL);
 	printf(")");
 	PRINT_RATES(pbody);
@@ -274,7 +274,7 @@ handle_assoc_request(u_int16_t fc, const u_char *p)
 	if (!parse_elements(&pbody, p, offset))
 		return 0;
 
-	printf("%s (", subtype_text[FC_SUBTYPE(fc)]);
+	printf(" (");
 	fn_print(pbody.ssid.ssid, NULL);
 	printf(")");
 	PRINT_RATES(pbody);
@@ -302,8 +302,7 @@ handle_assoc_response(u_int16_t fc, const u_char *p)
 	if (!parse_elements(&pbody, p, offset))
 		return 0;
 
-	printf("%s AID(%x) :%s: %s", subtype_text[FC_SUBTYPE(fc)],
-	    ((u_int16_t)(pbody.aid << 2 )) >> 2 ,
+	printf(" AID(%x) :%s: %s", ((u_int16_t)(pbody.aid << 2 )) >> 2 ,
 	    CAPABILITY_PRIVACY(pbody.capability_info) ? " PRIVACY " : "",
 	    (pbody.status_code < 19 ? status_text[pbody.status_code] : "n/a"));
 
@@ -331,7 +330,7 @@ handle_reassoc_request(u_int16_t fc, const u_char *p)
 	if (!parse_elements(&pbody, p, offset))
 		return 0;
 
-	printf("%s (", subtype_text[FC_SUBTYPE(fc)]);
+	printf(" (");
 	fn_print(pbody.ssid.ssid, NULL);
 	printf(") AP : %s", etheraddr_string( pbody.ap ));
 
@@ -356,7 +355,7 @@ handle_probe_request(u_int16_t fc, const u_char *p)
 	if (!parse_elements(&pbody, p, offset))
 		return 0;
 
-	printf("%s (", subtype_text[FC_SUBTYPE(fc)]);
+	printf(" (");
 	fn_print(pbody.ssid.ssid, NULL);
 	printf(")");
 	PRINT_RATES(pbody);
@@ -386,7 +385,7 @@ handle_probe_response(u_int16_t fc, const u_char *p)
 	if (!parse_elements(&pbody, p, offset))
 		return 0;
 
-	printf("%s (", subtype_text[FC_SUBTYPE(fc)]);
+	printf(" (");
 	fn_print(pbody.ssid.ssid, NULL);
 	printf(") ");
 	PRINT_RATES(pbody);
@@ -400,7 +399,6 @@ static int
 handle_atim(void)
 {
 	/* the frame body for ATIM is null. */
-	printf("ATIM");
 	return 1;
 }
 
@@ -415,7 +413,7 @@ handle_disassoc(u_int16_t fc, const u_char *p)
 		return 0;
 	pbody.reason_code = EXTRACT_LE_16BITS(p);
 
-	printf("%s: %s", subtype_text[FC_SUBTYPE(fc)],
+	printf(": %s",
 	    (pbody.reason_code < 10) ? reason_text[pbody.reason_code]
 	                             : "Reserved" );
 
@@ -445,8 +443,7 @@ handle_auth(u_int16_t fc, const u_char *p)
 	if ((pbody.auth_alg == 1) &&
 	    ((pbody.auth_trans_seq_num == 2) ||
 	     (pbody.auth_trans_seq_num == 3))) {
-		printf("%s (%s)-%x [Challenge Text] %s",
-		    subtype_text[FC_SUBTYPE(fc)],
+		printf(" (%s)-%x [Challenge Text] %s",
 		    (pbody.auth_alg < 4) ? auth_alg_text[pbody.auth_alg]
 		                         : "Reserved",
 		    pbody.auth_trans_seq_num,
@@ -456,8 +453,7 @@ handle_auth(u_int16_t fc, const u_char *p)
 			       : "n/a") : ""));
 		return 1;
 	}
-	printf("%s (%s)-%x: %s",
-	    subtype_text[FC_SUBTYPE(fc)],
+	printf(" (%s)-%x: %s",
 	    (pbody.auth_alg < 4) ? auth_alg_text[pbody.auth_alg] : "Reserved",
 	    pbody.auth_trans_seq_num,
 	    (pbody.auth_trans_seq_num % 2)
@@ -487,11 +483,9 @@ handle_deauth(u_int16_t fc, const struct mgmt_header_t *pmh,
 	                                  : "Reserved";
 
 	if (eflag) {
-		printf("%s: %s", subtype_text[FC_SUBTYPE(fc)], reason);
+		printf(": %s", reason);
 	} else {
-		printf("%s (%s): %s",
-		    subtype_text[FC_SUBTYPE(fc)], etheraddr_string(pmh->sa),
-		    reason);
+		printf(" (%s): %s", etheraddr_string(pmh->sa), reason);
 	}
 	return 1;
 }
@@ -506,6 +500,8 @@ static int
 mgmt_body_print(u_int16_t fc, const struct mgmt_header_t *pmh,
     const u_char *p)
 {
+	printf("%s", subtype_text[FC_SUBTYPE(fc)]);
+
 	switch (FC_SUBTYPE(fc)) {
 	case ST_ASSOC_REQUEST:
 		return handle_assoc_request(fc, p);
