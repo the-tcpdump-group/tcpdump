@@ -13,7 +13,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Id: print-rx.c,v 1.5 1999-12-15 08:10:18 fenner Exp $";
+    "@(#) $Id: print-rx.c,v 1.6 2000-01-07 15:17:43 assar Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -314,6 +314,23 @@ static struct tok ubik_lock_types[] = {
 };
 
 static char *voltype[] = { "read-write", "read-only", "backup" };
+
+static struct tok afs_fs_errors[] = {
+	{ 101,		"salvage volume" },
+	{ 102, 		"no such vnode" },
+	{ 103, 		"no such volume" },
+	{ 104, 		"volume exist" },
+	{ 105, 		"no service" },
+	{ 106, 		"volume offline" },
+	{ 107, 		"voline online" },
+	{ 108, 		"diskfull" },
+	{ 109, 		"diskquota exceeded" },
+	{ 110, 		"volume busy" },
+	{ 111, 		"volume moved" },
+	{ 112, 		"AFS IO error" },
+	{ -100,		"restarting fileserver" },
+	{ 0,		NULL }
+};
 
 /*
  * Cache entries we keep around so we can figure out the RX opcode
@@ -854,7 +871,7 @@ fs_reply_print(register const u_char *bp, int length, int32_t opcode)
 	 * If it was a data packet, interpret the response
 	 */
 
-	if (rxh->type == RX_PACKET_TYPE_DATA)
+	if (rxh->type == RX_PACKET_TYPE_DATA) {
 		switch (opcode) {
 		case 131:	/* Fetch ACL */
 		{
@@ -883,12 +900,19 @@ fs_reply_print(register const u_char *bp, int length, int32_t opcode)
 		default:
 			;
 		}
-	else {
-		/*
-		 * Otherwise, just print out the return code
-		 */
-		printf(" errcode");
-		INTOUT();
+	} else if (rxh->type == RX_PACKET_TYPE_ABORT) {
+		int i;
+
+ 		/*
+ 		 * Otherwise, just print out the return code
+ 		 */
+		TRUNC(sizeof(int32_t)); 
+		i = (int) ntohl(*((int *) bp)); 
+		bp += sizeof(int32_t); 
+
+		printf(" error %s", tok2str(afs_fs_errors, "#%d", i));
+	} else {
+		printf(" strange fs reply of type %d", rxh->type);
 	}
 
 	return;
