@@ -13,7 +13,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.9 2000-02-09 16:00:50 kenh Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.10 2000-02-09 16:29:00 kenh Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -2357,9 +2357,11 @@ rx_ack_print(register const u_char *bp, int length)
 				 * the _previous_ packet number seperated
 				 * from the first by a dash (-).  Since we
 				 * already printed the first packet above,
-				 * just print the final packet.
+				 * just print the final packet.  Don't
+				 * do this if there will be a single-length
+				 * range.
 				 */
-			} else if (last == i - 1)
+			} else if (last == i - 1 && start != last)
 				printf("-%d", rxa->firstPacket + i - 1);
 		
 		/*
@@ -2391,7 +2393,7 @@ rx_ack_print(register const u_char *bp, int length)
 					start = i;
 				}
 				last = i;
-			} else if (last == i - 1)
+			} else if (last == i - 1 && start != last)
 				printf("-%d", rxa->firstPacket + i - 1);
 		
 		if (last == i - 1 && start != last)
