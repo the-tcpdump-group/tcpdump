@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.144 2001-12-10 08:41:15 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.145 2002-01-17 05:00:16 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.144 $)
+AC_REVISION($Revision: 1.145 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -89,8 +89,10 @@ fi
 
 AC_MSG_CHECKING([whether to enable the possibly-buggy SMB printer])
 AC_ARG_ENABLE(smb,
-[  --enable-smb            enable possibly-buggy SMB printer],
-[ case "$enableval" in
+[  --enable-smb            enable possibly-buggy SMB printer [default=yes]
+  --disable-smb           disable possibly-buggy SMB printer],,
+   enableval=yes)
+case "$enableval" in
 yes)	AC_MSG_RESULT(yes)
 	AC_WARN([The SMB printer may have exploitable buffer overflows!!!])
 	AC_DEFINE(TCPDUMP_DO_SMB)
@@ -98,8 +100,7 @@ yes)	AC_MSG_RESULT(yes)
 	;;
 *)	AC_MSG_RESULT(no)
 	;;
-  esac
-], AC_MSG_RESULT(no))
+esac
 
 CFLAGS="$CFLAGS -Dss_family=__ss_family -Dss_len=__ss_len"
 AC_MSG_CHECKING([whether to enable ipv6])
