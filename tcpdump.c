@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.240 2004-04-05 00:15:52 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.241 2004-04-06 13:04:17 risso Exp $ (LBL)";
 #endif
 
 /*
@@ -798,11 +798,8 @@ main(int argc, char **argv)
 				error("%s", ebuf);
 		}
 #ifdef WIN32
-		if(IsTextUnicode(device,  
-			wcslen((short*)device),                // Device always ends with a double \0, so this way to determine its 
-													// length should be always valid
-			NULL))
-		{
+		if(strlen(device) == 1)	//we assume that an ASCII string is always longer than 1 char
+		{						//a Unicode string has a \0 as second byte (so strlen() is 1)
 			fprintf(stderr, "%s: listening on %ws\n", program_name, device);
 		}
 		else
@@ -1222,7 +1219,7 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	char version[]="current-cvs.tcpdump.org";
 #endif
 	char pcap_version[]="current-cvs.tcpdump.org";
-	char Wpcap_version[]="3.0 alpha";
+	char Wpcap_version[]="3.1";
 #endif
 
 /*
@@ -1280,8 +1277,12 @@ usage(void)
 #endif /* HAVE_PCAP_LIB_VERSION */
 
 #ifdef HAVE_PCAP_LIB_VERSION
+#ifdef WIN32
+	(void)fprintf(stderr, "%s version %s, based on tcpdump version %s\n", program_name, WDversion, version);
+#else /* WIN32 */
 	(void)fprintf(stderr, "%s version %s\n", program_name, version);
-	(void)fprintf(stderr, "%s\n", pcap_lib_version());
+#endif /* WIN32 */
+	(void)fprintf(stderr, "%s\n",pcap_lib_version());
 #else /* HAVE_PCAP_LIB_VERSION */
 #ifdef WIN32
 	(void)fprintf(stderr, "%s version %s, based on tcpdump version %s\n", program_name, WDversion, version);
