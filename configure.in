@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.92 2000-01-09 21:41:01 fenner Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.93 2000-01-14 23:17:01 mcr Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.92 $)
+AC_REVISION($Revision: 1.93 $)
 AC_INIT(tcpdump.c)
 
 AC_CANONICAL_SYSTEM
@@ -555,7 +555,7 @@ AC_VAR_H_ERRNO
 AC_MSG_CHECKING(for SSLeay)
 ac_cv_ssleay_path=no
 incdir=no
-for dir in /usr/local /usr/local/ssl /usr/pkg; do
+for dir in /usr /usr/local /usr/local/ssl /usr/pkg; do
 	if test -d $dir/lib -a -f $dir/lib/libcrypto.a; then
 		ac_cv_ssleay_path=$dir
 	fi
