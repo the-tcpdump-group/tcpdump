@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.100 2003-10-25 12:02:01 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.101 2003-10-26 09:59:11 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1516,7 +1516,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    while (tmp >= ETHER_ADDR_LEN) {
                 if (!TTEST2(*tptr, ETHER_ADDR_LEN))
                     goto trunctlv;
-                printf("\n\t      IS Neighbor: %s",isis_print_id(tptr,ETHER_ADDR_LEN));
+                printf("\n\t      SNPA: %s",isis_print_id(tptr,ETHER_ADDR_LEN));
                 tmp -= ETHER_ADDR_LEN;
                 tptr += ETHER_ADDR_LEN;
 	    }
@@ -1798,7 +1798,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 
 	    if (!TTEST2(*tptr, 1))
                 goto trunctlv;
-	    printf(", %s", ISIS_MASK_TLV_SHARED_RISK_GROUP(*tptr++) ? "numbered" : "unnumbered");
+	    printf(", Flags: [%s]", ISIS_MASK_TLV_SHARED_RISK_GROUP(*tptr++) ? "numbered" : "unnumbered");
 	    tmp--;
 
 	    if (!TTEST2(*tptr,4))
