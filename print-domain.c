@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.42 1999-11-21 09:36:50 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.43 2000-04-17 06:49:27 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -176,8 +176,11 @@ ns_nprint(register const u_char *cp, register const u_char *bp)
 	register u_int i;
 	register const u_char *rp;
 	register int compress;
+	int chars_processed;
+	int data_size = snapend - bp;
 
 	i = *cp++;
+	chars_processed = 1;
 	rp = cp + i;
 	if ((i & INDIR_MASK) == INDIR_MASK) {
 		rp = cp + 1;
@@ -189,13 +192,29 @@ ns_nprint(register const u_char *cp, register const u_char *bp)
 			if ((i & INDIR_MASK) == INDIR_MASK) {
 				cp = bp + (((i << 8) | *cp) & 0x3fff);
 				i = *cp++;
+				chars_processed++;
+
+				/*
+				 * If we've looked at every character in
+				 * the message, this pointer will make
+				 * us look at some character again,
+				 * which means we're looping.
+				 */
+				if (chars_processed >= data_size) {
+					fn_printn(cp, 6, "<LOOP>");
+					if (!compress)
+						rp += i + 1;
+					return (rp);
+				}
 				continue;
 			}
 			if (fn_printn(cp, i, snapend))
 				break;
 			cp += i;
+			chars_processed += i;
 			putchar('.');
 			i = *cp++;
+			chars_processed++;
 			if (!compress)
 				rp += i + 1;
 		}
