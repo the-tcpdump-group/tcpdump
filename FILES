@@ -120,6 +120,7 @@ print-lcp.c
 print-llc.c
 print-lwres.c
 print-mobile.c
+print-mobility.c
 print-mpls.c
 print-msdp.c
 print-netbios.c

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rt6.c,v 1.19 2002-06-11 17:08:55 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rt6.c,v 1.20 2002-06-27 08:21:41 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -72,7 +72,11 @@ rt6_print(register const u_char *bp, register const u_char *bp2)
 #ifndef IPV6_RTHDR_TYPE_0
 #define IPV6_RTHDR_TYPE_0 0
 #endif
+#ifndef IPV6_RTHDR_TYPE_2
+#define IPV6_RTHDR_TYPE_2 2
+#endif
 	case IPV6_RTHDR_TYPE_0:
+	case IPV6_RTHDR_TYPE_2:			/* Mobile IPv6 ID-17 */
 		dp0 = (struct ip6_rthdr0 *)dp;
 
 		TCHECK(dp0->ip6r0_reserved);

@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.150 
+# From configure.in Revision: 1.151 
 
 
 
@@ -1525,7 +1525,7 @@ if test "${enable_ipv6+set}" = set; then
   enableval="$enable_ipv6"
    case "$enableval" in
 yes)   echo "$ac_t""yes" 1>&6
-       LOCALSRC="print-ip6.c print-ip6opts.c print-ripng.c print-icmp6.c print-frag6.c print-rt6.c print-ospf6.c print-dhcp6.c $LOCALSRC"
+       LOCALSRC="print-ip6.c print-ip6opts.c print-mobility.c print-ripng.c print-icmp6.c print-frag6.c print-rt6.c print-ospf6.c print-dhcp6.c $LOCALSRC"
        cat >> confdefs.h <<\EOF
 #define INET6 1
 EOF
@@ -1561,7 +1561,7 @@ EOF
 if { (eval echo configure:1562: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
 then
    echo "$ac_t""yes" 1>&6
-  LOCALSRC="print-ip6.c print-ip6opts.c print-ripng.c print-icmp6.c print-frag6.c print-rt6.c print-ospf6.c print-dhcp6.c $LOCALSRC"
+  LOCALSRC="print-ip6.c print-ip6opts.c print-mobility.c print-ripng.c print-icmp6.c print-frag6.c print-rt6.c print-ospf6.c print-dhcp6.c $LOCALSRC"
   cat >> confdefs.h <<\EOF
 #define INET6 1
 EOF

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.61 2002-06-11 17:08:48 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.62 2002-06-27 08:21:40 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -357,27 +357,42 @@ icmp6_print(const u_char *bp, const u_char *bp2)
 		icmp6_nodeinfo_print(icmp6len, bp, ep);
 		break;
 	case ICMP6_HADISCOV_REQUEST:
-	case ICMP6_HADISCOV_REPLY:
-	{
-		struct in6_addr *in6;
-		u_int32_t *res;
-		u_char *cp;
-		printf("icmp6: ha discovery %s: ",
-		       dp->icmp6_type == ICMP6_HADISCOV_REQUEST ?
-		       "request" : "reply");
-		TCHECK(dp->icmp6_data16[0]);
-		printf("id=%d", ntohs(dp->icmp6_data16[0]));
-		cp = (u_char *)dp + icmp6len;
-		res = (u_int32_t *)(dp + 1);
-		in6 = (struct in6_addr *)(res + 2);
-		for (; (u_char *)in6 < cp; in6++) {
-			TCHECK(*in6);
-			printf(", %s", ip6addr_string(in6));
+		printf("icmp6: ha discovery request");
+		if (vflag) {
+			TCHECK(dp->icmp6_data16[0]);
+			printf("(id=%d)", ntohs(dp->icmp6_data16[0]));
 		}
 		break;
-	}
+	case ICMP6_HADISCOV_REPLY:
+		printf("icmp6: ha discovery reply");
+		if (vflag) {
+			struct in6_addr *in6;
+			u_int32_t *res;
+			u_char *cp;
+
+			TCHECK(dp->icmp6_data16[0]);
+			printf("(id=%d", ntohs(dp->icmp6_data16[0]));
+			cp = (u_char *)dp + icmp6len;
+			res = (u_int32_t *)(dp + 1);
+			in6 = (struct in6_addr *)(res + 2);
+			for (; (u_char *)in6 < cp; in6++) {
+				TCHECK(*in6);
+				printf(", %s", ip6addr_string(in6));
+			}
+			printf(")");
+		}
+		break;
 	case ICMP6_MOBILEPREFIX_SOLICIT:
+		printf("icmp6: mobile router solicitation");
+		break;
 	case ICMP6_MOBILEPREFIX_ADVERT:
+		printf("icmp6: mobile router advertisement");
+		if (vflag) {
+#define MPADVLEN 4
+			icmp6_opt_print((const u_char *)dp + MPADVLEN,
+					icmp6len - MPADVLEN);
+		}
+		break;
 	default:
 		printf("icmp6: type-#%d", dp->icmp6_type);
 		break;
