@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-arp.c,v 1.52 2002-02-25 09:40:32 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-arp.c,v 1.53 2002-04-25 04:37:31 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -80,10 +80,10 @@ struct	arp_pkthdr {
 	u_char	ar_tha[];	/* target hardware address */
 	u_char	ar_tpa[];	/* target protocol address */
 #endif
-#define ar_sha(ap)	(((const caddr_t)((ap)+1))+0)
-#define ar_spa(ap)	(((const caddr_t)((ap)+1))+  (ap)->ar_hln)
-#define ar_tha(ap)	(((const caddr_t)((ap)+1))+  (ap)->ar_hln+(ap)->ar_pln)
-#define ar_tpa(ap)	(((const caddr_t)((ap)+1))+2*(ap)->ar_hln+(ap)->ar_pln)
+#define ar_sha(ap)	(((const u_char *)((ap)+1))+0)
+#define ar_spa(ap)	(((const u_char *)((ap)+1))+  (ap)->ar_hln)
+#define ar_tha(ap)	(((const u_char *)((ap)+1))+  (ap)->ar_hln+(ap)->ar_pln)
+#define ar_tpa(ap)	(((const u_char *)((ap)+1))+2*(ap)->ar_hln+(ap)->ar_pln)
 };
 
 #define ARP_HDRLEN	8
