@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.28 2000-09-29 05:46:11 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.29 2000-10-03 02:17:50 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -40,6 +40,8 @@ static const char rcsid[] =
 
 #include <netinet/in.h>
 
+#include <netinet6/ah.h>
+
 #include <arpa/inet.h>
 
 #include <stdio.h>
@@ -54,6 +56,7 @@ static const char rcsid[] =
 
 void icmp6_opt_print(const u_char *, int);
 void mld6_print(const u_char *);
+static struct udphdr *get_upperlayer(u_char *, int *);
 #ifdef HAVE_STRUCT_ICMP6_NODEINFO
 static void dnsname_print(const u_char *, const u_char *);
 void icmp6_nodeinfo_print(int, const u_char *, const u_char *);
@@ -111,7 +114,7 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 	register int hlen, dport;
 	register const u_char *ep;
 	char buf[256];
-	int icmp6len;
+	int icmp6len, prot;
 
 #if 0
 #define TCHECK(var) if ((u_char *)&(var) > ep - sizeof(var)) goto trunc
@@ -162,11 +165,12 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 			       ip6addr_string(&oip->ip6_dst));
 			break;
 		case ICMP6_DST_UNREACH_NOPORT:
-			TCHECK(oip->ip6_nxt);
-			hlen = sizeof(struct ip6_hdr);
-			ouh = (struct udphdr *)(((u_char *)oip) + hlen);
+			if ((ouh = get_upperlayer((u_char *)oip, &prot))
+			    == NULL)
+				goto trunc;
+
 			dport = ntohs(ouh->uh_dport);
-			switch (oip->ip6_nxt) {
+			switch (prot) {
 			case IPPROTO_TCP:
 				printf("icmp6: %s tcp port %s unreachable",
 					ip6addr_string(&oip->ip6_dst),
@@ -397,6 +401,79 @@ trunc:
 #if 0
 #undef TCHECK
 #endif
+}
+
+static struct udphdr *
+get_upperlayer(register u_char *bp, int *prot)
+{
+	register const u_char *ep;
+	struct ip6_hdr *ip6 = (struct ip6_hdr *)bp;
+	struct udphdr *uh;
+	struct ip6_hbh *hbh;
+	struct ip6_frag *fragh;
+	struct ah *ah;
+	int nh, hlen;
+
+	/* 'ep' points to the end of avaible data. */
+	ep = snapend;
+
+	if (TTEST(ip6->ip6_nxt) == 0)
+		return NULL;
+
+	nh = ip6->ip6_nxt;
+	hlen = sizeof(struct ip6_hdr);
+
+	while (bp < snapend) {
+		bp += hlen;
+
+		switch(nh) {
+		case IPPROTO_UDP:
+		case IPPROTO_TCP:
+			uh = (struct udphdr *)bp;
+			if (TTEST(uh->uh_dport)) {
+				*prot = nh;
+				return(uh);
+			}
+			else
+				return(NULL);
+			/* NOTREACHED */
+
+		case IPPROTO_HOPOPTS:
+		case IPPROTO_DSTOPTS:
+		case IPPROTO_ROUTING:
+			hbh = (struct ip6_hbh *)bp;
+			if (TTEST(hbh->ip6h_len) == 0)
+				return(NULL);
+			nh = hbh->ip6h_nxt;
+			hlen = (hbh->ip6h_len + 1) << 3;
+			break;
+
+		case IPPROTO_FRAGMENT: /* this should be odd, but try anyway */
+			fragh = (struct ip6_frag *)bp;
+			if (TTEST(fragh->ip6f_offlg) == 0)
+				return(NULL);
+			/* fragments with non-zero offset are meaningless */
+			if ((fragh->ip6f_offlg & IP6F_OFF_MASK) != 0)
+				return(NULL);
+			nh = fragh->ip6f_nxt;
+			hlen = sizeof(struct ip6_frag);
+			break;
+
+		case IPPROTO_AH:
+			ah = (struct ah *)bp;
+			if (TTEST(ah->ah_len) == 0)
+				return(NULL);
+			nh = ah->ah_nxt;
+			hlen = (ah->ah_len + 2) << 2;
+			break;
+
+		default:	/* unknown or undecodable header */
+			*prot = nh; /* meaningless, but set here anyway */
+			return(NULL);
+		}
+	}
+
+	return(NULL);		/* should be notreached, though */
 }
 
 void
