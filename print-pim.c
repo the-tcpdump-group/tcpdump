@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.25 2001-04-27 02:18:27 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.26 2001-05-10 05:30:21 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -96,10 +96,16 @@ pimv1_join_prune_print(register const u_char *bp, register u_int len)
 	}
 
 	TCHECK2(bp[0], 4);
-	(void)printf("\n Upstream Nbr: %s", ipaddr_string(bp));
+	if (vflag > 1)
+		(void)printf("\n");
+	(void)printf(" Upstream Nbr: %s", ipaddr_string(bp));
 	TCHECK2(bp[6], 2);
-	(void)printf("\n Hold time: ");
+	if (vflag > 1)
+		(void)printf("\n");
+	(void)printf(" Hold time: ");
 	relts_print(EXTRACT_16BITS(&bp[6]));
+	if (vflag < 2)
+		return;
 	bp += 8;
 	len -= 8;
 

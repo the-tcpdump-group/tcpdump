@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ripng.c,v 1.7 2000-10-07 05:46:21 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ripng.c,v 1.8 2001-05-10 05:30:22 fenner Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -86,7 +86,7 @@ ripng_print(const u_char *dat, int length)
 			printf(" ripng-req %d:", j);
 		trunc = ((i / sizeof(*ni)) * sizeof(*ni) != i);
 		for (ni = rp->rip6_nets; (i -= sizeof(*ni)) >= 0; ++ni) {
-			if (vflag)
+			if (vflag > 1)
 				printf("\n\t");
 			else
 				printf(" ");
@@ -101,7 +101,7 @@ ripng_print(const u_char *dat, int length)
 			printf(" ripng-resp %d:", j);
 		trunc = ((i / sizeof(*ni)) * sizeof(*ni) != i);
 		for (ni = rp->rip6_nets; (i -= sizeof(*ni)) >= 0; ++ni) {
-			if (vflag)
+			if (vflag > 1)
 				printf("\n\t");
 			else
 				printf(" ");

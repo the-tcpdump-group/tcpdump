@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rip.c,v 1.48 2001-01-28 08:14:55 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rip.c,v 1.49 2001-05-10 05:30:22 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -215,7 +215,7 @@ rip_print(const u_char *dat, u_int length)
 		case RIPCMD_TRACEON:
 			printf(" RIPv%d-traceon %d: \"", rp->rip_vers, length);
 			(void)fn_print((const u_char *)(rp + 1), snapend);
-			fputs("\"\n", stdout);
+			fputs("\"", stdout);
 			break;
 		case RIPCMD_TRACEOFF:
 			printf(" RIPv%d-traceoff %d", rp->rip_vers, length);

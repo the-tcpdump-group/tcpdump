@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.48 2001-05-09 02:43:40 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.49 2001-05-10 05:30:21 fenner Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -162,7 +162,7 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 		break;
 	case ICMP6_PACKET_TOO_BIG:
 		TCHECK(dp->icmp6_mtu);
-		printf("icmp6: too big %u\n", (u_int32_t)ntohl(dp->icmp6_mtu));
+		printf("icmp6: too big %u", (u_int32_t)ntohl(dp->icmp6_mtu));
 		break;
 	case ICMP6_TIME_EXCEEDED:
 		TCHECK(oip->ip6_dst);
@@ -184,15 +184,15 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 		TCHECK(oip->ip6_dst);
 		switch (dp->icmp6_code) {
 		case ICMP6_PARAMPROB_HEADER:
-			printf("icmp6: parameter problem errorneous - octet %u\n",
+			printf("icmp6: parameter problem errorneous - octet %u",
 				(u_int32_t)ntohl(dp->icmp6_pptr));
 			break;
 		case ICMP6_PARAMPROB_NEXTHEADER:
-			printf("icmp6: parameter problem next header - octet %u\n",
+			printf("icmp6: parameter problem next header - octet %u",
 				(u_int32_t)ntohl(dp->icmp6_pptr));
 			break;
 		case ICMP6_PARAMPROB_OPTION:
-			printf("icmp6: parameter problem option - octet %u\n",
+			printf("icmp6: parameter problem option - octet %u",
 				(u_int32_t)ntohl(dp->icmp6_pptr));
 			break;
 		default:
@@ -929,7 +929,7 @@ icmp6_rrenum_print(int icmp6len, const u_char *bp, const u_char *ep)
 
 		TCHECK(match->rpm_prefix);
 
-		if (vflag)
+		if (vflag > 1)
 			printf("\n\t");
 		else
 			printf(" ");
@@ -963,7 +963,7 @@ icmp6_rrenum_print(int icmp6len, const u_char *bp, const u_char *ep)
 
 			TCHECK(use->rpu_prefix);
 
-			if (vflag)
+			if (vflag > 1)
 				printf("\n\t");
 			else
 				printf(" ");
