@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.113 2001-10-27 08:18:44 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.114 2002-01-04 07:37:49 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -1409,8 +1409,8 @@ Any other qclass would have been printed
 immediately after the `A'.
 .LP
 A few anomalies are checked and may result in extra fields enclosed in
-square brackets:  If a query contains an answer, name server or
-authority section,
+square brackets:  If a query contains an answer, authority records or
+additional records section,
 .IR ancount ,
 .IR nscount ,
 or
@@ -1435,7 +1435,7 @@ helios.domain > h2opolo.1537: 2 NXDomain* 0/1/0 (97)\fR
 .fi
 .RE
 In the first example, \fIhelios\fP responds to query id 3 from \fIh2opolo\fP
-with 3 answer records, 3 name server records and 7 authority records.
+with 3 answer records, 3 name server records and 7 additional records.
 The first answer record is type A (address) and its data is internet
 address 128.32.137.3.
 The total size of the response was 273 bytes,
