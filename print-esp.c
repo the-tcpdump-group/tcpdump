@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.41 2003-07-17 13:31:02 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.42 2003-07-17 13:43:24 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -71,6 +71,7 @@ struct sockaddr_storage {
 #endif
 #endif /* HAVE_SOCKADDR_STORAGE */
 
+#ifdef HAVE_LIBCRYPTO
 struct sa_list {
 	struct sa_list	*next;
 	struct sockaddr_storage daddr;
@@ -327,6 +328,7 @@ static void esp_init(void)
 	OpenSSL_add_all_algorithms();
 	EVP_add_cipher_alias(SN_des_ede3_cbc, "3des");
 }
+#endif
 
 int
 esp_print(const u_char *bp, const u_char *bp2, int *nhdr, int *padlen)
@@ -378,6 +380,9 @@ esp_print(const u_char *bp, const u_char *bp2, int *nhdr, int *padlen)
 	printf(",seq=0x%x", EXTRACT_32BITS(&esp->esp_seq));
 	printf(")");
 
+#ifndef HAVE_LIBCRYPTO
+	goto fail;
+#else
 	/* initiailize SAs */
 	if (sa_list_head == NULL) {
 		if (!espsecret)
@@ -482,6 +487,7 @@ esp_print(const u_char *bp, const u_char *bp2, int *nhdr, int *padlen)
 
 	printf(": ");
 	return advance;
+#endif
 
 fail:
 	if (nhdr)
