@@ -29,7 +29,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @(#) $Header: /tcpdump/master/tcpdump/tcpdump-stdinc.h,v 1.11 2005-03-27 01:26:54 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/tcpdump-stdinc.h,v 1.12 2005-03-27 01:35:45 guy Exp $ (LBL)
  */
 
 /*
@@ -65,10 +65,6 @@
 extern const char *inet_ntop (int, const void *, char *, size_t);
 extern int inet_pton (int, const char *, void *);
 extern int inet_aton (const char *cp, struct in_addr *addr);
-
-#ifndef INET_ADDRSTRLEN
-#define INET_ADDRSTRLEN 16
-#endif
 
 #ifndef INET6_ADDRSTRLEN
 #define INET6_ADDRSTRLEN 46
@@ -155,6 +151,10 @@ typedef char* caddr_t;
             : "=q" (x) : "0" (x));
     return (x);
   }
+#endif
+
+#ifndef INET_ADDRSTRLEN
+#define INET_ADDRSTRLEN 16
 #endif
 
 #endif /* tcpdump_stdinc_h */
