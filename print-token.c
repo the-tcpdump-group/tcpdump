@@ -25,7 +25,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-token.c,v 1.21 2002-12-18 09:41:18 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-token.c,v 1.22 2002-12-19 09:39:16 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -118,13 +118,6 @@ token_print(const u_char *p, u_int length, u_int caplen)
 	 */
 	extract_token_addrs(trp, (char*)ESRC(&ehdr), (char*)EDST(&ehdr));
 
-	/*
-	 * Some printers want to check that they're not walking off the
-	 * end of the packet.
-	 * Rather than pass it all the way down, we set this global.
-	 */
-	snapend = p + caplen;
-
 	/* Adjust for source routing information in the MAC header */
 	if (IS_SOURCE_ROUTED(trp)) {
 		/* Clear source-routed bit */
@@ -195,27 +188,8 @@ token_print(const u_char *p, u_int length, u_int caplen)
  * 'h->length' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-void
-token_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
+u_int
+token_if_print(const struct pcap_pkthdr *h, const u_char *p)
 {
-	u_int caplen = h->caplen;
-	u_int length = h->len;
-	u_int hdr_len;
-
-	++infodelay;
-	ts_print(&h->ts);
-
-	hdr_len = token_print(p, length, caplen);
-
-	/*
-	 * If "-x" was specified, print packet data in hex.
-	 */
-	if (xflag)
-		default_print_packet(p, caplen, hdr_len);
-
-	putchar('\n');
-
-	--infodelay;
-	if (infoprint)
-		info(0);
+	return (token_print(p, h->len, h->caplen));
 }

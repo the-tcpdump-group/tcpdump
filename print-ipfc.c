@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ipfc.c,v 1.3 2002-12-18 09:41:16 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ipfc.c,v 1.4 2002-12-19 09:39:13 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -93,13 +93,6 @@ ipfc_print(const u_char *p, u_int length, u_int caplen)
 	 */
 	extract_ipfc_addrs(ipfcp, (char *)ESRC(&ehdr), (char *)EDST(&ehdr));
 
-	/*
-	 * Some printers want to check that they're not walking off the
-	 * end of the packet.
-	 * Rather than pass it all the way down, we set this global.
-	 */
-	snapend = p + caplen;
-
 	if (eflag)
 		ipfc_hdr_print(ipfcp, length, ESRC(&ehdr), EDST(&ehdr));
 
@@ -130,32 +123,15 @@ ipfc_print(const u_char *p, u_int length, u_int caplen)
 }
 
 /*
- * This is the top level routine of the printer.  'sp' is the points
- * to the Network_Header of the packet, 'tvp' is the timestamp,
- * 'length' is the length of the packet off the wire, and 'caplen'
+ * This is the top level routine of the printer.  'p' points
+ * to the Network_Header of the packet, 'h->ts' is the timestamp,
+ * 'h->length' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-void
-ipfc_if_print(u_char *pcap _U_, const struct pcap_pkthdr *h,
-	      register const u_char *p)
+u_int
+ipfc_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
-	u_int caplen = h->caplen;
-	u_int length = h->len;
+	ipfc_print(p, h->len, h->caplen);
 
-	++infodelay;
-	ts_print(&h->ts);
-
-	ipfc_print(p, length, caplen);
-
-	/*
-	 * If "-x" was specified, print packet data in hex.
-	 */
-	if (xflag)
-		default_print_packet(p, caplen, IPFC_HDRLEN);
-
-	putchar('\n');
-
-	--infodelay;
-	if (infoprint)
-		info(0);
+	return (IPFC_HDRLEN);
 }

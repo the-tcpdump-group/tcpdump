@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-raw.c,v 1.38 2002-12-18 08:53:23 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-raw.c,v 1.39 2002-12-19 09:39:15 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -41,31 +41,13 @@ static const char rcsid[] =
  * The DLT_RAW packet has no header. It contains a raw IP packet.
  */
 
-void
-raw_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
+u_int
+raw_if_print(const struct pcap_pkthdr *h, const u_char *p)
 {
-	u_int length = h->len;
-	u_int caplen = h->caplen;
-
-	++infodelay;
-	ts_print(&h->ts);
-
-	/*
-	 * Some printers want to check that they're not walking off the
-	 * end of the packet.
-	 * Rather than pass it all the way down, we set this global.
-	 */
-	snapend = p + caplen;
-
 	if (eflag)
 		printf("ip: ");
 
-	ipN_print(p, length);
+	ipN_print(p, h->len);
 
-	if (xflag)
-		default_print(p, caplen);
-	putchar('\n');
-	--infodelay;
-	if (infoprint)
-		info(0);
+	return (0);
 }

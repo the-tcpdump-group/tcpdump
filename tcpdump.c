@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.192 2002-12-19 09:27:57 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.193 2002-12-19 09:39:17 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -97,8 +97,8 @@ char *espsecret = NULL;		/* ESP secret key */
 
 int packettype;
 
-int infodelay;
-int infoprint;
+static int infodelay;
+static int infoprint;
 
 char *program_name;
 
@@ -109,6 +109,7 @@ static RETSIGTYPE cleanup(int);
 static void usage(void) __attribute__((noreturn));
 static void show_dlts_and_exit(pcap_t *pd) __attribute__((noreturn));
 
+static void print_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void dump_packet_and_trunc(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void dump_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
 
@@ -116,11 +117,15 @@ static void dump_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
 RETSIGTYPE requestinfo(int);
 #endif
 
+static void info(int);
+
 /* Length of saved portion of packet. */
 int snaplen = DEFAULT_SNAPLEN;
 
+typedef u_int (*if_printer)(const struct pcap_pkthdr *, const u_char *);
+
 struct printer {
-	pcap_handler f;
+	if_printer f;
 	int type;
 };
 
@@ -193,7 +198,7 @@ static struct printer printers[] = {
 	{ NULL,			0 },
 };
 
-static pcap_handler
+static if_printer
 lookup_printer(int type)
 {
 	struct printer *p;
@@ -211,6 +216,10 @@ static pcap_t *pd;
 extern int optind;
 extern int opterr;
 extern char *optarg;
+
+struct print_info {
+	if_printer printer;
+};
 
 struct dump_info {
 	char	*WFileName;
@@ -259,12 +268,13 @@ main(int argc, char **argv)
 	register int cnt, op, i;
 	bpf_u_int32 localnet, netmask;
 	register char *cp, *infile, *cmdbuf, *device, *RFileName, *WFileName;
+	pcap_handler callback;
 	int type;
-	pcap_handler printer;
 	struct bpf_program fcode;
 #ifndef WIN32
 	RETSIGTYPE (*oldhandler)(int);
 #endif
+	struct print_info printinfo;
 	struct dump_info dumpinfo;
 	u_char *pcap_userdata;
 	char ebuf[PCAP_ERRBUF_SIZE];
@@ -667,26 +677,27 @@ main(int argc, char **argv)
 		if (p == NULL)
 			error("%s", pcap_geterr(pd));
 		if (Cflag != 0) {
-			printer = dump_packet_and_trunc;
+			callback = dump_packet_and_trunc;
 			dumpinfo.WFileName = WFileName;
 			dumpinfo.pd = pd;
 			dumpinfo.p = p;
 			pcap_userdata = (u_char *)&dumpinfo;
 		} else {
-			printer = dump_packet;
+			callback = dump_packet;
 			pcap_userdata = (u_char *)p;
 		}
 	} else {
 		type = pcap_datalink(pd);
-		printer = lookup_printer(type);
-		if (printer == NULL) {
+		printinfo.printer = lookup_printer(type);
+		if (printinfo.printer == NULL) {
 			dlt_name = pcap_datalink_val_to_name(type);
 			if (dlt_name != NULL)
 				error("unsupported data link type %s", dlt_name);
 			else
 				error("unsupported data link type %d", type);
 		}
-		pcap_userdata = 0;
+		callback = print_packet;
+		pcap_userdata = (u_char *)&printinfo;
 	}
 #ifdef SIGINFO
 	(void)setsignal(SIGINFO, requestinfo);
@@ -698,7 +709,7 @@ main(int argc, char **argv)
 		(void)fflush(stderr);
 	}
 #endif /* WIN32 */
-	if (pcap_loop(pd, cnt, printer, pcap_userdata) < 0) {
+	if (pcap_loop(pd, cnt, callback, pcap_userdata) < 0) {
 		(void)fprintf(stderr, "%s: pcap_loop: %s\n",
 		    program_name, pcap_geterr(pd));
 		cleanup(0);
@@ -726,7 +737,7 @@ cleanup(int signo)
 		exit(0);
 }
 
-void
+static void
 info(register int verbose)
 {
 	struct pcap_stat stat;
@@ -824,6 +835,53 @@ dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 		info(0);
 }
 
+static void
+print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
+{
+	struct print_info *print_info;
+	u_int hdrlen;
+
+	++infodelay;
+	ts_print(&h->ts);
+
+	print_info = (struct print_info *)user;
+
+	/*
+	 * Some printers want to check that they're not walking off the
+	 * end of the packet.
+	 * Rather than pass it all the way down, we set this global.
+	 */
+	snapend = sp + h->caplen;
+
+	hdrlen = (*print_info->printer)(h, sp);
+	if (xflag) {
+		/*
+		 * Print the raw packet data.
+		 */
+		if (xflag > 1) {
+			/*
+			 * Include the link-layer header.
+			 */
+			default_print_unaligned(sp, h->caplen);
+		} else {
+			/*
+			 * Don't include the link-layer header - and if
+			 * we have nothing past the link-layer header,
+			 * print nothing.
+			 */
+			if (h->caplen > hdrlen)
+				default_print_unaligned(sp + hdrlen,
+				    h->caplen - hdrlen);
+		}
+	}
+
+	putchar('\n');
+
+	--infodelay;
+	if (infoprint)
+		info(0);
+}
+
 /* Like default_print() but data need not be aligned */
 void
 default_print_unaligned(register const u_char *cp, register u_int length)
@@ -882,31 +940,6 @@ void
 default_print(register const u_char *bp, register u_int length)
 {
 	default_print_unaligned(bp, length);
-}
-
-/*
- * By default, print the packet out in hex; if eflag is set, print
- * everything, otherwise print everything except for the link-layer
- * header.
- */
-void
-default_print_packet(register const u_char *bp, register u_int length,
-    u_int hdr_length)
-{
-	if (xflag > 1) {
-		/*
-		 * Include the link-layer header.
-		 */
-		default_print_unaligned(bp, length);
-	} else {
-		/*
-		 * Don't include the link-layer header - and if we have
-		 * nothing past the link-layer header, print nothing.
-		 */
-		if (length > hdr_length)
-			default_print_unaligned(bp + hdr_length,
-			    length - hdr_length);
-	}
 }
 
 #ifdef SIGINFO

@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cip.c,v 1.20 2002-12-18 08:53:20 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cip.c,v 1.21 2002-12-19 09:39:12 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -66,30 +66,20 @@ cip_print(int length)
  * 'h->length' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-void
-cip_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
+u_int
+cip_if_print(const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;
 	u_short extracted_ethertype;
 
-	++infodelay;
-	ts_print(&h->ts);
-
 	if (memcmp(rfcllc, p, sizeof(rfcllc))==0 && caplen < RFC1483LLC_LEN) {
 		printf("[|cip]");
-		goto out;
+		return (0);
 	}
 
 	if (eflag)
 		cip_print(length);
-
-	/*
-	 * Some printers want to check that they're not walking off the
-	 * end of the packet.
-	 * Rather than pass it all the way down, we set this global.
-	 */
-	snapend = p + caplen;
 
 	if (memcmp(rfcllc, p, sizeof(rfcllc)) == 0) {
 		/*
@@ -114,11 +104,5 @@ cip_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 		ip_print(p, length);
 	}
 
-	if (xflag)
-		default_print(p, caplen);
- out:
-	putchar('\n');
-	--infodelay;
-	if (infoprint)
-		info(0);
+	return (0);
 }

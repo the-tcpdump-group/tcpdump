@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.32 2002-12-18 09:41:14 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.33 2002-12-19 09:39:11 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -75,27 +75,18 @@ atm_llc_print(const u_char *p, int length, int caplen)
  * 'h->length' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-void
-atm_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
+u_int
+atm_if_print(const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;
 	u_int32_t llchdr;
-
-	++infodelay;
-	ts_print(&h->ts);
+	u_int hdrlen = 0;
 
 	if (caplen < 8) {
 		printf("[|atm]");
-		goto out;
+		return (caplen);
 	}
-
-	/*
-	 * Some printers want to check that they're not walking off the
-	 * end of the packet.
-	 * Rather than pass it all the way down, we set this global.
-	 */
-	snapend = p + caplen;
 
 	/*
 	 * Extract the presumed LLC header into a variable, for quick
@@ -133,15 +124,10 @@ atm_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 		p += 20;
 		length -= 20;
 		caplen -= 20;
+		hdrlen += 20;
 	}
 	atm_llc_print(p, length, caplen);
-	if (xflag)
-		default_print(p, caplen);
- out:
-	putchar('\n');
-	--infodelay;
-	if (infoprint)
-		info(0);
+	return (hdrlen);
 }
 
 /*
@@ -210,40 +196,33 @@ atm_print(u_int vpi, u_int vci, u_int traftype, const u_char *p, u_int length,
 	if (eflag)
 		printf("VPI:%u VCI:%u ", vpi, vci);
 
-	/*
-	 * Some printers want to check that they're not walking off the
-	 * end of the packet.
-	 * Rather than pass it all the way down, we set this global.
-	 */
-	snapend = p + caplen;
-
 	if (vpi == 0) {
 		switch (vci) {
 
 		case PPC:
 			sig_print(p, caplen);
-			goto out;
+			return;
 
 		case BCC:
 			printf("broadcast sig: ");
-			goto out;
+			return;
 
 		case OAMF4SC:
 			printf("oamF4(segment): ");
-			goto out;
+			return;
 
 		case OAMF4EC:
 			printf("oamF4(end): ");
-			goto out;
+			return;
 
 		case METAC:
 			printf("meta: ");
-			goto out;
+			return;
 
 		case ILMIC:
 			printf("ilmi: ");
 			snmp_print(p, length);
-			goto out;
+			return;
 		}
 	}
 
@@ -261,8 +240,4 @@ atm_print(u_int vpi, u_int vci, u_int traftype, const u_char *p, u_int length,
 		lane_print(p, length, caplen);
 		break;
 	}
-
-out:
-	if (xflag)
-		default_print(p, caplen);
 }

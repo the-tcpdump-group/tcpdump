@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lane.c,v 1.19 2002-12-18 09:41:16 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lane.c,v 1.20 2002-12-19 09:39:13 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -122,13 +122,6 @@ lane_print(const u_char *p, u_int length, u_int caplen)
 		lane_hdr_print(p, length);
 
 	/*
-	 * Some printers want to check that they're not walking off the
-	 * end of the packet.
-	 * Rather than pass it all the way down, we set this global.
-	 */
-	snapend = p + caplen;
-
-	/*
 	 * Go past the LANE header.
 	 */
 	length -= sizeof(struct lecdatahdr_8023);
@@ -166,26 +159,10 @@ lane_print(const u_char *p, u_int length, u_int caplen)
 	}
 }
 
-void
-lane_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
+u_int
+lane_if_print(const struct pcap_pkthdr *h, const u_char *p)
 {
-	int caplen = h->caplen;
-	int length = h->len;
+	lane_print(p, h->len, h->caplen);
 
-	++infodelay;
-	ts_print(&h->ts);
-
-	lane_print(p, length, caplen);
-
-	/*
-	 * If "-x" was specified, print packet data in hex.
-	 */
-	if (xflag)
-		default_print_packet(p, caplen,
-		    sizeof(struct lecdatahdr_8023));
-
-	putchar('\n');
-	--infodelay;
-	if (infoprint)
-		info(0);
+	return (sizeof(struct lecdatahdr_8023));
 }

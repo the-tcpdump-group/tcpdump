@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.26 2002-12-18 09:41:15 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.27 2002-12-19 09:39:11 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -43,40 +43,17 @@ static const char rcsid[] =
 static void chdlc_slarp_print(const u_char *, u_int);
 
 /* Standard CHDLC printer */
-void
-chdlc_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
-	     register const u_char *p)
+u_int
+chdlc_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
 	register u_int length = h->len;
 	register u_int caplen = h->caplen;
-
-	++infodelay;
-	ts_print(&h->ts);
-
-	/*
-	 * Some printers want to check that they're not walking off the
-	 * end of the packet.
-	 * Rather than pass it all the way down, we set this global.
-	 */
-	snapend = p + caplen;
-
-	chdlc_print(p, length, caplen);
-
-	putchar('\n');
-	--infodelay;
-	if (infoprint)
-		info(0);
-}
-
-void
-chdlc_print(register const u_char *p, u_int length, u_int caplen)
-{
 	const struct ip *ip;
 	u_int proto;
 
 	if (caplen < CHDLC_HDRLEN) {
 		printf("[|chdlc]");
-		return;
+		return (caplen);
 	}
 
 	proto = EXTRACT_16BITS(&p[2]);
@@ -131,8 +108,8 @@ chdlc_print(register const u_char *p, u_int length, u_int caplen)
                 printf("unknown CHDLC protocol (0x%04x)", proto);
                 break;
 	}
-	if (xflag)
-		default_print_packet(p, caplen, CHDLC_HDRLEN);
+
+	return (CHDLC_HDRLEN);
 }
 
 struct cisco_slarp {

@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.75 2002-12-18 09:41:15 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.76 2002-12-19 09:39:12 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -74,13 +74,6 @@ ether_print(const u_char *p, u_int length, u_int caplen)
 	if (eflag)
 		ether_hdr_print(p, length);
 
-	/*
-	 * Some printers want to check that they're not walking off the
-	 * end of the packet.
-	 * Rather than pass it all the way down, we set this global.
-	 */
-	snapend = p + caplen;
-
 	length -= ETHER_HDRLEN;
 	caplen -= ETHER_HDRLEN;
 	ep = (struct ether_header *)p;
@@ -122,28 +115,12 @@ ether_print(const u_char *p, u_int length, u_int caplen)
  * 'h->length' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-void
-ether_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
+u_int
+ether_if_print(const struct pcap_pkthdr *h, const u_char *p)
 {
-	u_int caplen = h->caplen;
-	u_int length = h->len;
+	ether_print(p, h->len, h->caplen);
 
-	++infodelay;
-	ts_print(&h->ts);
-
-	ether_print(p, length, caplen);
-
-	/*
-	 * If "-x" was specified, print packet data in hex.
-	 */
-	if (xflag)
-		default_print_packet(p, caplen, ETHER_HDRLEN);
-
-	putchar('\n');
-
-	--infodelay;
-	if (infoprint)
-		info(0);
+	return (ETHER_HDRLEN);
 }
 
 /*

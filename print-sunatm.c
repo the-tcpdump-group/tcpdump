@@ -31,7 +31,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sunatm.c,v 1.4 2002-09-05 21:25:49 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sunatm.c,v 1.5 2002-12-19 09:39:16 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -69,8 +69,8 @@ struct rtentry;
  * 'h->length' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-void
-sunatm_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
+u_int
+sunatm_if_print(const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;
@@ -78,11 +78,9 @@ sunatm_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 	u_char vpi;
 	u_int traftype;
 
- 	ts_print(&h->ts);
-
 	if (caplen < PKT_BEGIN_POS) {
 		printf("[|atm]");
-		goto out;
+		return (caplen);
 	}
 
 	if (eflag) {
@@ -115,9 +113,5 @@ sunatm_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 	length -= PKT_BEGIN_POS;
 	atm_print(vpi, vci, traftype, p, length, caplen);
 
- out:
-	putchar('\n');
-	--infodelay;
-	if (infoprint)
-		info(0);
+	return (PKT_BEGIN_POS);
 }

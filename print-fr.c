@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.10 2002-12-18 09:41:16 guy Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.11 2002-12-19 09:39:12 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -211,43 +211,24 @@ fr_hdr_print(const u_char *p, int length)
 			     fr_protostring(proto), length);
 }
 
-void
-fr_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
-	     register const u_char *p)
+u_int
+fr_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
 	register u_int length = h->len;
 	register u_int caplen = h->caplen;
-	const u_char *orig_p;
-	u_int orig_caplen;
 	u_char protocol;
 	int layer2_len;
 	u_short extracted_ethertype;
 	u_int32_t orgcode;
 	register u_short et;
 
-	ts_print(&h->ts);
-
 	if (caplen < fr_hdrlen(p)) {
 		printf("[|fr]");
-		goto out;
+		return (caplen);
 	}
-
-	/*
-	 * Some printers want to check that they're not walking off the
-	 * end of the packet.
-	 * Rather than pass it all the way down, we set this global.
-	 */
-	snapend = p + caplen;
 
 	if (eflag)
 		fr_hdr_print(p, length);
-
-	/*
-	 * Save the information for the full packet, so we can print
-	 * everything if "-e" and "-x" are both specified.
-	 */
-	orig_p = p;
-	orig_caplen = caplen;
 
 	protocol = FR_PROTOCOL(p);
 	layer2_len = LAYER2_LEN(p);
@@ -296,10 +277,7 @@ fr_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
 			default_print(p, caplen);
 	}
 
-	if (xflag)
-		default_print_packet(orig_p, orig_caplen, layer2_len);
-out:
-	putchar('\n');
+	return (layer2_len);
 }
 
 /*

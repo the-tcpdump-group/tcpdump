@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sll.c,v 1.11 2002-12-18 09:41:18 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sll.c,v 1.12 2002-12-19 09:39:16 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -92,19 +92,14 @@ sll_print(register const struct sll_header *sllp, u_int length)
  * 'h->length' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-void
-sll_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
+u_int
+sll_if_print(const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;
-	const u_char *orig_p;
-	u_int orig_caplen;
 	register const struct sll_header *sllp;
 	u_short ether_type;
 	u_short extracted_ethertype;
-
-	++infodelay;
-	ts_print(&h->ts);
 
 	if (caplen < SLL_HDR_LEN) {
 		/*
@@ -113,27 +108,13 @@ sll_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 		 * cooked socket capture.
 		 */
 		printf("[|sll]");
-		goto out;
+		return (caplen);
 	}
 
 	sllp = (const struct sll_header *)p;
 
 	if (eflag)
 		sll_print(sllp, length);
-
-	/*
-	 * Some printers want to check that they're not walking off the
-	 * end of the packet.
-	 * Rather than pass it all the way down, we set this global.
-	 */
-	snapend = p + caplen;
-
-	/*
-	 * Save the information for the full packet, so we can print
-	 * everything if "-e" and "-x" are both specified.
-	 */
-	orig_p = p;
-	orig_caplen = caplen;
 
 	/*
 	 * Go past the cooked-mode header.
@@ -193,11 +174,6 @@ sll_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 		if (!xflag && !qflag)
 			default_print(p, caplen);
 	}
-	if (xflag)
-		default_print_packet(orig_p, orig_caplen, SLL_HDR_LEN);
- out:
-	putchar('\n');
-	--infodelay;
-	if (infoprint)
-		info(0);
+
+	return (SLL_HDR_LEN);
 }

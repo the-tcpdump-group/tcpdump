@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.77 2002-12-11 07:13:57 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.78 2002-12-19 09:39:11 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -81,31 +81,23 @@ static const char *ddpskt_string(int);
 /*
  * Print LLAP packets received on a physical LocalTalk interface.
  */
-void
-ltalk_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
+u_int
+ltalk_if_print(const struct pcap_pkthdr *h, const u_char *p)
 {
-	snapend = p + h->caplen;
-	++infodelay;
-	ts_print(&h->ts);
-	llap_print(p, h->caplen);
-	if(xflag)
-		default_print(p, h->caplen);
-	putchar('\n');
-	--infodelay;
-	if (infoprint)
-		info(0);
+	return (llap_print(p, h->caplen));
 }
 
 /*
  * Print AppleTalk LLAP packets.
  */
-void
+u_int
 llap_print(register const u_char *bp, u_int length)
 {
 	register const struct LAP *lp;
 	register const struct atDDP *dp;
 	register const struct atShortDDP *sdp;
 	u_short snet;
+	u_int hdrlen;
 
 	/*
 	 * Our packet is on a 4-byte boundary, as we're either called
@@ -118,12 +110,13 @@ llap_print(register const u_char *bp, u_int length)
 	lp = (const struct LAP *)bp;
 	bp += sizeof(*lp);
 	length -= sizeof(*lp);
+	hdrlen = sizeof(*lp);
 	switch (lp->type) {
 
 	case lapShortDDP:
 		if (length < ddpSSize) {
 			(void)printf(" [|sddp %d]", length);
-			return;
+			return (length);
 		}
 		sdp = (const struct atShortDDP *)bp;
 		printf("%s.%s",
@@ -132,13 +125,14 @@ llap_print(register const u_char *bp, u_int length)
 		    ataddr_string(0, lp->dst), ddpskt_string(sdp->dstSkt));
 		bp += ddpSSize;
 		length -= ddpSSize;
+		hdrlen += ddpSSize;
 		ddp_print(bp, length, sdp->type, 0, lp->src, sdp->srcSkt);
 		break;
 
 	case lapDDP:
 		if (length < ddpSize) {
 			(void)printf(" [|ddp %d]", length);
-			return;
+			return (length);
 		}
 		dp = (const struct atDDP *)bp;
 		snet = EXTRACT_16BITS(&dp->srcNet);
@@ -149,6 +143,7 @@ llap_print(register const u_char *bp, u_int length)
 		    ddpskt_string(dp->dstSkt));
 		bp += ddpSize;
 		length -= ddpSize;
+		hdrlen += ddpSize;
 		ddp_print(bp, length, dp->type, snet, dp->srcNode, dp->srcSkt);
 		break;
 
@@ -163,6 +158,7 @@ llap_print(register const u_char *bp, u_int length)
 		    lp->src, lp->dst, lp->type, length);
 		break;
 	}
+	return (hdrlen);
 }
 
 /*

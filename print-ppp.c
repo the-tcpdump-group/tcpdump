@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.79 2002-12-18 09:41:17 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.80 2002-12-19 09:39:14 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1040,27 +1040,16 @@ trunc:
 
 
 /* PPP I/F printer */
-void
-ppp_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
-	     register const u_char *p)
+u_int
+ppp_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
 	register u_int length = h->len;
 	register u_int caplen = h->caplen;
 
-	++infodelay;
-	ts_print(&h->ts);
-
 	if (caplen < PPP_HDRLEN) {
 		printf("[|ppp]");
-		goto out;
+		return (caplen);
 	}
-
-	/*
-	 * Some printers want to check that they're not walking off the
-	 * end of the packet.
-	 * Rather than pass it all the way down, we set this global.
-	 */
-	snapend = p + caplen;
 
 #if 0
 	/*
@@ -1105,13 +1094,7 @@ ppp_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
 
 	ppp_print(p, length);
 
-	if (xflag)
-		default_print(p, caplen);
-out:
-	putchar('\n');
-	--infodelay;
-	if (infoprint)
-		info(0);
+	return (0);
 }
 
 /*
@@ -1123,54 +1106,37 @@ out:
  *
  * This handles, for example, DLT_PPP_SERIAL in NetBSD.
  */
-void
-ppp_hdlc_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
-	     register const u_char *p)
+u_int
+ppp_hdlc_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
 	register u_int length = h->len;
 	register u_int caplen = h->caplen;
-	const u_char *orig_p;
-	u_int orig_caplen;
 	u_int proto;
-
-	++infodelay;
-	ts_print(&h->ts);
+	u_int hdrlen = 0;
 
 	if (caplen < 2) {
 		printf("[|ppp]");
-		goto out;
+		return (caplen);
 	}
-
-	/*
-	 * Some printers want to check that they're not walking off the
-	 * end of the packet.
-	 * Rather than pass it all the way down, we set this global.
-	 */
-	snapend = p + caplen;
-
-	/*
-	 * Save the information for the full packet, so we can print
-	 * everything if "-e" and "-x" are both specified.
-	 */
-	orig_p = p;
-	orig_caplen = caplen;
 
 	switch (p[0]) {
 
 	case PPP_ADDRESS:
 		if (caplen < 4) {
 			printf("[|ppp]");
-			goto out;
+			return (caplen);
 		}
 
 		if (eflag)
 			printf("%02x %02x %d ", p[0], p[1], length);
 		p += 2;
 		length -= 2;
+		hdrlen += 2;
 
 		proto = EXTRACT_16BITS(p);
 		p += 2;
 		length -= 2;
+		hdrlen += 2;
 		printf("%s: ", tok2str(ppptype2str, "unknown PPP protocol (0x%04x)", proto));
 
 		handle_ppp(proto, p, length);
@@ -1178,14 +1144,14 @@ ppp_hdlc_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
 
 	case CHDLC_UNICAST:
 	case CHDLC_BCAST:
-		chdlc_print(p, length, caplen);
-		goto out;
+		return (chdlc_if_print(h, p));
 
 	default:
 		if (eflag)
 			printf("%02x %02x %d ", p[0], p[1], length);
 		p += 2;
 		length -= 2;
+		hdrlen += 2;
 
 		/*
 		 * XXX - NetBSD's "ppp_netbsd_serial_if_print()" treats
@@ -1196,52 +1162,29 @@ ppp_hdlc_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
 		break;
 	}
 
-	if (xflag)
-		default_print_packet(orig_p, orig_caplen, p - orig_p);
-out:
-	putchar('\n');
-	--infodelay;
-	if (infoprint)
-		info(0);
+	return (hdrlen);
 }
 
 #define PPP_BSDI_HDRLEN 24
 
 /* BSD/OS specific PPP printer */
-void
-ppp_bsdos_if_print(u_char *user _U_, const struct pcap_pkthdr *h _U_,
-	     register const u_char *p _U_)
+u_int
+ppp_bsdos_if_print(const struct pcap_pkthdr *h _U_, register const u_char *p _U_)
 {
+	register int hdrlength;
 #ifdef __bsdi__
 	register u_int length = h->len;
 	register u_int caplen = h->caplen;
-	const u_char *orig_p;
-	register int hdrlength;
 	u_int16_t ptype;
 	const u_char *q;
 	int i;
 
-	++infodelay;
-	ts_print(&h->ts);
-
 	if (caplen < PPP_BSDI_HDRLEN) {
 		printf("[|ppp]");
-		goto out;
+		return (caplen)
 	}
 
-	/*
-	 * Some printers want to check that they're not walking off the
-	 * end of the packet.
-	 * Rather than pass it all the way down, we set this global.
-	 */
-	snapend = p + caplen;
 	hdrlength = 0;
-
-	/*
-	 * Save the information for the full packet, so we can print
-	 * everything if "-e" and "-x" are both specified.
-	 */
-	orig_p = p;
 
 #if 0
 	if (p[0] == PPP_ADDRESS && p[1] == PPP_CONTROL) {
@@ -1376,12 +1319,8 @@ ppp_bsdos_if_print(u_char *user _U_, const struct pcap_pkthdr *h _U_,
 	}
 
 printx:
-	if (xflag)
-		default_print_packet(orig_p, caplen, hdrlength);
-out:
-	putchar('\n');
-	--infodelay;
-	if (infoprint)
-		info(0);
+#else /* __bsdi */
+	hdrlength = 0;
 #endif /* __bsdi__ */
+	return (hdrlength);
 }

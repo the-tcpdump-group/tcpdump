@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-null.c,v 1.46 2002-12-18 09:41:16 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-null.c,v 1.47 2002-12-19 09:39:13 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -96,16 +96,12 @@ null_print(u_int family, u_int length)
 #define	SWAPLONG(y) \
 ((((y)&0xff)<<24) | (((y)&0xff00)<<8) | (((y)&0xff0000)>>8) | (((y)>>24)&0xff))
 
-void
-null_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
+u_int
+null_if_print(const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int length = h->len;
-	u_int caplen = h->caplen;
 	const struct ip *ip;
 	u_int family;
-
-	++infodelay;
-	ts_print(&h->ts);
 
 	memcpy((char *)&family, (char *)p, sizeof(family));
 
@@ -119,13 +115,6 @@ null_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 	 */
 	if ((family & 0xFFFF0000) != 0)
 		family = SWAPLONG(family);
-
-	/*
-	 * Some printers want to check that they're not walking off the
-	 * end of the packet.
-	 * Rather than pass it all the way down, we set this global.
-	 */
-	snapend = p + caplen;
 
 	length -= NULL_HDRLEN;
 
@@ -148,11 +137,6 @@ null_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 		break;
 	}
 
-	if (xflag)
-		default_print_packet(p, caplen, NULL_HDRLEN);
-	putchar('\n');
-	--infodelay;
-	if (infoprint)
-		info(0);
+	return (NULL_HDRLEN);
 }
 

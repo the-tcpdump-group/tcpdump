@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pflog.c,v 1.6 2002-12-18 09:41:17 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pflog.c,v 1.7 2002-12-19 09:39:14 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -96,37 +96,18 @@ pflog_print(const struct pfloghdr *hdr)
 	    hdr->ifname);
 }
 
-void
-pflog_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
-     register const u_char *p)
+u_int
+pflog_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
 	u_int length = h->len;
 	u_int caplen = h->caplen;
-	const u_char *orig_p;
-	u_int orig_caplen;
 	const struct pfloghdr *hdr;
 	u_int8_t af;
 
-	ts_print(&h->ts);
-
 	if (caplen < PFLOG_HDRLEN) {
 		printf("[|pflog]");
-		goto out;
+		return (caplen);
 	}
-
-	/*
-	 * Some printers want to check that they're not walking off the
-	 * end of the packet.
-	 * Rather than pass it all the way down, we set this global.
-	 */
-	snapend = p + caplen;
-
-	/*
-	 * Save the information for the full packet, so we can print
-	 * everything if "-e" and "-x" are both specified.
-	 */
-	orig_p = p;
-	orig_caplen = caplen;
 
 	hdr = (const struct pfloghdr *)p;
 	if (eflag)
@@ -155,11 +136,5 @@ pflog_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
 			default_print(p, caplen);
 	}
 
-	if (xflag)
-		default_print_packet(orig_p, orig_caplen, PFLOG_HDRLEN);
-out:
-	putchar('\n');
-	--infodelay;
-	if (infoprint)
-		info(0);
+	return (PFLOG_HDRLEN);
 }

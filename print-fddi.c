@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-fddi.c,v 1.60 2002-12-18 09:41:15 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-fddi.c,v 1.61 2002-12-19 09:39:12 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -255,13 +255,6 @@ fddi_print(const u_char *p, u_int length, u_int caplen)
 	 */
 	extract_fddi_addrs(fddip, (char *)ESRC(&ehdr), (char *)EDST(&ehdr));
 
-	/*
-	 * Some printers want to check that they're not walking off the
-	 * end of the packet.
-	 * Rather than pass it all the way down, we set this global.
-	 */
-	snapend = p + caplen;
-
 	if (eflag)
 		fddi_hdr_print(fddip, length, ESRC(&ehdr), EDST(&ehdr));
 
@@ -308,27 +301,10 @@ fddi_print(const u_char *p, u_int length, u_int caplen)
  * 'h->length' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-void
-fddi_if_print(u_char *pcap _U_, const struct pcap_pkthdr *h,
-	      register const u_char *p)
+u_int
+fddi_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
-	u_int caplen = h->caplen;
-	u_int length = h->len;
+	fddi_print(p, h->len, h->caplen);
 
-	++infodelay;
-	ts_print(&h->ts);
-
-	fddi_print(p, length, caplen);
-
-	/*
-	 * If "-x" was specified, print packet data in hex.
-	 */
-	if (xflag)
-		default_print_packet(p, caplen, FDDI_HDRLEN);
-
-	putchar('\n');
-
-	--infodelay;
-	if (infoprint)
-		info(0);
+	return (FDDI_HDRLEN);
 }

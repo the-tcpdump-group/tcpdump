@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.20 2002-12-18 09:41:17 guy Exp $ (LBL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.21 2002-12-19 09:39:14 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -89,37 +89,10 @@ static struct tok pppoetag2str[] = {
 
 #define PPPOE_HDRLEN 6
 
-void
-pppoe_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
-	     register const u_char *p)
+u_int
+pppoe_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
-	register u_int length = h->len;
-	register u_int caplen = h->caplen;
-	u_int hdr_len;
-
-	++infodelay;
-	ts_print(&h->ts);
-
-	/*
-	 * Some printers want to check that they're not walking off the
-	 * end of the packet.
-	 * Rather than pass it all the way down, we set this global.
-	 */
-	snapend = p + caplen;
-
-	hdr_len = pppoe_print(p, length);
-
-	/*
-	 * If "-x" was specified, print packet data in hex.
-	 */
-	if (xflag)
-		default_print_packet(p, caplen, hdr_len);
-
-	putchar('\n');
-
-	--infodelay;
-	if (infoprint)
-		info(0);
+	return (pppoe_print(p, h->len));
 }
 
 u_int

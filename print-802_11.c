@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.18 2002-12-18 09:41:14 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.19 2002-12-19 09:39:10 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -795,19 +795,17 @@ ieee_802_11_hdr_print(u_int16_t fc, const u_char *p, const u_int8_t **srcp,
 	}
 }
 
-static void
+static u_int
 ieee802_11_print(const u_char *p, u_int length, u_int caplen)
 {
 	u_int16_t fc;
 	u_int HEADER_LENGTH;
-	const u_char *orig_p;
-	u_int orig_caplen;
 	const u_int8_t *src, *dst;
 	u_short extracted_ethertype;
 
 	if (caplen < IEEE802_11_FC_LEN) {
 		printf("[|802.11]");
-		return;
+		return caplen;
 	}
 
 	fc = EXTRACT_LE_16BITS(p);
@@ -815,24 +813,10 @@ ieee802_11_print(const u_char *p, u_int length, u_int caplen)
 
 	if (caplen < HEADER_LENGTH) {
 		printf("[|802.11]");
-		return;
+		return HEADER_LENGTH;
 	}
 
 	ieee_802_11_hdr_print(fc, p, &src, &dst);
-
-	/*
-	 * Some printers want to check that they're not walking off the
-	 * end of the packet.
-	 * Rather than pass it all the way down, we set this global.
-	 */
-	snapend = p + caplen;
-
-	/*
-	 * Save the information for the full packet, so we can print
-	 * everything if "-e" and "-x" are both specified.
-	 */
-	orig_p = p;
-	orig_caplen = caplen;
 
 	/*
 	 * Go past the 802.11 header.
@@ -846,14 +830,14 @@ ieee802_11_print(const u_char *p, u_int length, u_int caplen)
 		if (!mgmt_body_print(fc,
 		    (const struct mgmt_header_t *)(p - HEADER_LENGTH), p)) {
 			printf("[|802.11]");
-			return;
+			return HEADER_LENGTH;
 		}
 		break;
 
 	case T_CTRL:
 		if (!ctrl_body_print(fc, p - HEADER_LENGTH)) {
 			printf("[|802.11]");
-			return;
+			return HEADER_LENGTH;
 		}
 		break;
 
@@ -862,7 +846,7 @@ ieee802_11_print(const u_char *p, u_int length, u_int caplen)
 		if (FC_WEP(fc)) {
 			if (!wep_print(p)) {
 				printf("[|802.11]");
-				return;
+				return HEADER_LENGTH;
 			}
 		} else {
 			if (llc_print(p, length, caplen, dst, src,
@@ -890,8 +874,7 @@ ieee802_11_print(const u_char *p, u_int length, u_int caplen)
 		break;
 	}
 
-	if (xflag)
-		default_print_packet(orig_p, orig_caplen, HEADER_LENGTH);
+	return HEADER_LENGTH;
 }
 
 /*
@@ -900,24 +883,13 @@ ieee802_11_print(const u_char *p, u_int length, u_int caplen)
  * 'h->length' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
-void
-ieee802_11_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
+u_int
+ieee802_11_if_print(const struct pcap_pkthdr *h, const u_char *p)
 {
-	u_int caplen = h->caplen;
-	u_int length = h->len;
-
-	++infodelay;
-	ts_print(&h->ts);
-
-	ieee802_11_print(p, length, caplen);
-
-	putchar('\n');
-	--infodelay;
-	if (infoprint)
-		info(0);
+	return ieee802_11_print(p, h->len, h->caplen);
 }
 
-static void
+static u_int
 ieee802_11_radio_print(const u_char *p, u_int length, u_int caplen)
 {
 	u_int32_t caphdr_len;
@@ -930,16 +902,16 @@ ieee802_11_radio_print(const u_char *p, u_int length, u_int caplen)
 		 * cookie or capture header length!
 		 */
 		printf("[|802.11]");
-		return;
+		return caplen;
 	}
 
 	if (caplen < caphdr_len) {
 		printf("[|802.11]");
-		return;
+		return caplen;
 	}
 
-	ieee802_11_print(p + caphdr_len, length - caphdr_len,
-	    caplen - caphdr_len);
+	return caphdr_len + ieee802_11_print(p + caphdr_len,
+	    length - caphdr_len, caplen - caphdr_len);
 }
 
 #define PRISM_HDR_LEN		144
@@ -958,39 +930,30 @@ ieee802_11_radio_print(const u_char *p, u_int length, u_int caplen)
  * ARPHRD_IEEE80211_PRISM is used for DLT_IEEE802_11_RADIO, and
  * the first 4 bytes of the header are used to indicate which it is).
  */
-void
-prism_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
+u_int
+prism_if_print(const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;
 	u_int32_t msgcode;
 
-	++infodelay;
-	ts_print(&h->ts);
-
 	if (caplen < 4) {
 		printf("[|802.11]");
-		goto out;
+		return caplen;
 	}
 
 	msgcode = EXTRACT_32BITS(p);
 	if (msgcode == WLANCAP_MAGIC_COOKIE_V1)
-		ieee802_11_radio_print(p, length, caplen);
+		return ieee802_11_radio_print(p, length, caplen);
 	else {
 		if (caplen < PRISM_HDR_LEN) {
 			printf("[|802.11]");
-			goto out;
+			return caplen;
 		}
 
-		ieee802_11_print(p + PRISM_HDR_LEN, length - PRISM_HDR_LEN,
-		    caplen - PRISM_HDR_LEN);
+		return PRISM_HDR_LEN + ieee802_11_print(p + PRISM_HDR_LEN,
+		    length - PRISM_HDR_LEN, caplen - PRISM_HDR_LEN);
 	}
-
-out:
-	putchar('\n');
-	--infodelay;
-	if (infoprint)
-		info(0);
 }
 
 /*
@@ -998,26 +961,16 @@ out:
  * header, containing information such as radio information, which we
  * currently ignore.
  */
-void
-ieee802_11_radio_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
-    const u_char *p)
+u_int
+ieee802_11_radio_if_print(const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;
 
-	++infodelay;
-	ts_print(&h->ts);
-
 	if (caplen < 8) {
 		printf("[|802.11]");
-		goto out;
+		return caplen;
 	}
 
-	ieee802_11_radio_print(p, length, caplen);
-
-out:
-	putchar('\n');
-	--infodelay;
-	if (infoprint)
-		info(0);
+	return ieee802_11_radio_print(p, length, caplen);
 }
