@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.56 2002-12-11 07:13:58 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.57 2002-12-15 08:33:23 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -876,7 +876,10 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                             case SAFNUM_MULTICAST:
                             case SAFNUM_UNIMULTICAST:
                                 advance = decode_prefix4(tptr, buf, sizeof(buf));
-                                printf("\n\t      %s", buf);
+	                        if (advance >= 0)
+                                	printf("\n\t      %s", buf);
+				else 
+	                                printf("\n\t    (illegal prefix length)");
                                 break;
                             case SAFNUM_LABUNICAST:
                                 advance = decode_labeled_prefix4(tptr, buf, sizeof(buf));
@@ -978,7 +981,10 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                             case SAFNUM_MULTICAST:
                             case SAFNUM_UNIMULTICAST:
                                 advance = decode_prefix4(tptr, buf, sizeof(buf));
-                                printf("\n\t      %s", buf);
+	                        if (advance >= 0) 
+                                	printf("\n\t      %s", buf);
+				else
+	                                printf("\n\t    (illegal prefix length)");
                                 break;
                             case SAFNUM_LABUNICAST:
                                 advance = decode_labeled_prefix4(tptr, buf, sizeof(buf));
@@ -1287,6 +1293,7 @@ bgp_update_print(const u_char *dat, int length)
 		printf("\n\t  Withdrawn routes: %d bytes", len);
 #else
 		char buf[MAXHOSTNAMELEN + 100];
+		int wpfx;
 
 		TCHECK2(p[2], len);
 		i = 2;
@@ -1294,8 +1301,14 @@ bgp_update_print(const u_char *dat, int length)
 		printf("\n\t  Withdrawn routes:");
 
 		while(i < 2 + len) {
-			i += decode_prefix4(&p[i], buf, sizeof(buf));
-			printf("\n\t    %s", buf);
+			wpfx = decode_prefix4(&p[i], buf, sizeof(buf));
+			if (wpfx >= 0) {
+				i += wpfx;
+				printf("\n\t    %s", buf);
+			} else {
+				printf("\n\t    (illegal prefix length)");
+				break;
+			}
 		}
 #endif
 	}
@@ -1340,10 +1353,13 @@ bgp_update_print(const u_char *dat, int length)
 		while (dat + length > p) {
 			char buf[MAXHOSTNAMELEN + 100];
 			i = decode_prefix4(p, buf, sizeof(buf));
-			printf("\n\t    %s", buf);
-			if (i < 0)
+			if (i >= 0) {
+				printf("\n\t    %s", buf);
+				p += i;
+			} else {
+				printf("\n\t    (illegal prefix length)");
 				break;
-			p += i;
+			}
 		}
 	}
 	return;
