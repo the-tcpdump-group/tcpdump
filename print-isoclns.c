@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.113 2003-12-20 22:24:51 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.114 2003-12-22 19:41:51 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -80,6 +80,7 @@ static struct tok osi_nlpid_values[] = {
 
 #define ISIS_PDU_TYPE_MASK      0x1F
 #define ESIS_PDU_TYPE_MASK      0x1F
+#define CLNP_PDU_TYPE_MASK      0x1F
 #define ISIS_LAN_PRIORITY_MASK  0x7F
 
 #define ISIS_PDU_L1_LAN_IIH	15
@@ -365,6 +366,7 @@ struct isis_tlv_ptp_adj {
 };
 
 static int osi_cksum(const u_int8_t *, u_int);
+static int clnp_print(const u_int8_t *, u_int);
 static void esis_print(const u_int8_t *, u_int);
 static int isis_print(const u_int8_t *, u_int);
 
@@ -511,7 +513,8 @@ void isoclns_print(const u_int8_t *p, u_int length, u_int caplen)
 	switch (*p) {
 
 	case NLPID_CLNP:
-		(void)printf(", length %u", length);
+		if (!clnp_print(p, length))
+                        print_unknown_data(p,"\n\t",caplen);
 		break;
 
 	case NLPID_ESIS:
@@ -534,6 +537,116 @@ void isoclns_print(const u_int8_t *p, u_int length, u_int caplen)
 		break;
 	}
 }
+
+#define	CLNP_PDU_ER	 1
+#define	CLNP_PDU_DT	28
+#define	CLNP_PDU_MD	29
+#define	CLNP_PDU_ERQ	30
+#define	CLNP_PDU_ERP	31
+
+static struct tok clnp_pdu_values[] = {
+    { CLNP_PDU_ER,  "Error Report"},
+    { CLNP_PDU_MD,  "MD"},
+    { CLNP_PDU_DT,  "Data"},
+    { CLNP_PDU_ERQ, "Echo Request"},
+    { CLNP_PDU_ERP, "Echo Response"},
+    { 0, NULL }
+};
+
+struct clnp_header_t {
+    u_int8_t nlpid;
+    u_int8_t length_indicator;
+    u_int8_t version;
+    u_int8_t lifetime; /* units of 500ms */
+    u_int8_t type;
+    u_int8_t segment_length[2];
+    u_int8_t cksum[2];
+};
+
+/*
+ * clnp_print
+ * Decode CLNP packets.  Return 0 on error.
+ */
+
+static int clnp_print (const u_int8_t *pptr, u_int length)
+{
+	const u_int8_t *optr,*source_address,*dest_address;
+        u_int li,source_address_length,dest_address_length, clnp_pdu_type;
+	const struct clnp_header_t *clnp_header;
+
+	clnp_header = (const struct clnp_header_t *) pptr;
+        li = clnp_header->length_indicator;
+        optr = pptr;
+
+        /*
+         * Sanity checking of the header.
+         */
+
+        /* FIXME */
+
+        clnp_pdu_type = clnp_header->type & CLNP_PDU_TYPE_MASK;
+
+        pptr += sizeof(struct clnp_header_t);
+        dest_address_length = *pptr;
+        dest_address = pptr + 1;
+
+        pptr += (1 + dest_address_length);
+        source_address_length = *pptr;
+        source_address = pptr +1;
+
+        pptr += (1 + source_address_length);
+
+        if (vflag < 1) {
+            printf(", %s > %s, length %u",
+                   print_nsap(source_address, source_address_length),
+                   print_nsap(dest_address, dest_address_length),
+                   length);
+            return (1);
+        }
+        printf(", length %u", length);
+
+    printf("\n\t%s PDU, hlen: %u, v: %u, lifetime: %u.%us, PDU length: %u, checksum: 0x%04x ",
+           tok2str(clnp_pdu_values,
+                   "unknown (%u)",
+                   clnp_pdu_type),
+           clnp_header->length_indicator,
+           clnp_header->version,
+           clnp_header->lifetime/2,
+           (clnp_header->lifetime%2)*5,
+           EXTRACT_16BITS(clnp_header->segment_length),
+           EXTRACT_16BITS(clnp_header->cksum));
+
+        /* do not attempt to verify the checksum if it is zero */
+        if (EXTRACT_16BITS(clnp_header->cksum) == 0)
+                printf("(unverified)");
+            else printf("(%s)", osi_cksum(optr, li) ? "incorrect" : "correct");
+
+        printf("\n\tsource address (length %u): %s\n\tdest   address (length %u): %s",
+               source_address_length,
+               print_nsap(source_address, source_address_length),
+               dest_address_length,
+               print_nsap(dest_address, dest_address_length));
+
+        /* dump the remaining header data */
+        print_unknown_data(pptr,"\n\t",clnp_header->length_indicator-(pptr-optr));
+
+        switch (clnp_pdu_type) {
+
+        case 	CLNP_PDU_ER:
+        case 	CLNP_PDU_DT:
+        case 	CLNP_PDU_MD:
+        case 	CLNP_PDU_ERQ:
+        case 	CLNP_PDU_ERP:
+
+        default:
+            /* dump the PDU specific data */
+            print_unknown_data(optr+clnp_header->length_indicator,"\n\t  ",length-clnp_header->length_indicator);
+
+        }
+
+        return (1);
+}
+
 
 #define	ESIS_PDU_REDIRECT	6
 #define	ESIS_PDU_ESH	        2
@@ -578,7 +691,12 @@ esis_print(const u_int8_t *pptr, u_int length)
         /*
          * Sanity checking of the header.
          */
-        
+
+        if (esis_header->nlpid != NLPID_ESIS) {
+            printf(", nlpid 0x%02x packet not supported", esis_header->nlpid);
+            return;
+        }
+
         if (esis_header->version != ESIS_VERSION) {
             printf(", version %d packet not supported", esis_header->version);
             return;
@@ -710,10 +828,6 @@ esis_print(const u_int8_t *pptr, u_int length)
                    opli);
 
             switch (op) {
-
-            case ISIS_TLV_AREA_ADDR:
-                printf("\n\t    %s", print_nsap(tptr, opli));
-                break;
 
             case ESIS_OPTION_ES_CONF_TIME:
                 printf("%us", EXTRACT_16BITS(tptr));
