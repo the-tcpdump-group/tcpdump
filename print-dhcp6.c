@@ -30,14 +30,14 @@
  * RFC3315: DHCPv6
  * supported DHCPv6 options: 
  *  RFC3319,
- *  draft-ietf-dhc-dhcpv6-opt-dnsconfig-04.txt,
- *  draft-ietf-dhc-dhcpv6-opt-prefix-delegation-05.txt
- *  draft-ietf-dhc-dhcpv6-opt-timeconfig-02.txt,
+ *  RFC3633,
+ *  RFC3646,
+ *  draft-ietf-dhc-dhcpv6-opt-timeconfig-03.txt,
  */
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.31 2003-11-18 23:26:37 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.32 2004-01-21 03:53:08 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -133,24 +133,21 @@ struct dhcp6_relay {
 #define DH6OPT_SIP_SERVER_A 22
 #define DH6OPT_DNS 23
 #define DH6OPT_DNSNAME 24
+#define DH6OPT_IA_PD 25
+#define DH6OPT_IA_PD_PREFIX 26
 
 /*
- * The option type has not been assigned for the following options.
- * We temporarily adopt values used in the service specification document
+ * The old prefix delegation option used in the service specification document
  * (200206xx version) by NTT Communications.
- * Note that we'll change the following definitions if different type values
- * are officially assigned.
  */
 #define DH6OPT_PREFIX_DELEGATION 30
 #define DH6OPT_PREFIX_INFORMATION 31
 #define DH6OPT_PREFIX_REQUEST 32
 
 /*
- * The followings are also unassigned numbers.
+ * The following one is an unassigned number.
  * We temporarily use values as of KAME snap 20031013.
  */
-#define DH6OPT_IA_PD 33
-#define DH6OPT_IA_PD_PREFIX 34
 #define DH6OPT_NTP_SERVERS 35
 
 struct dhcp6opt {
