@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.84 1999-12-04 19:30:04 mcr Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.85 1999-12-13 18:06:14 mcr Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -41,11 +41,22 @@ linux*)
 	;;
 esac
 
+
+AC_ARG_ENABLE(libsmi,
+	[  --enable-libsmi         enable libsmi support],
+	[libsmi=$enableval], [libsmi=no])
+if test "$libsmi" = "yes"; then
+	AC_CHECK_HEADERS(smi.h)
+	AC_CHECK_LIB(smi, main)
+	AC_DEFINE(LIBSMI)
+fi
+
+
 CFLAGS="$CFLAGS -Dss_family=__ss_family -Dss_len=__ss_len"
 AC_MSG_CHECKING([whether to enable ipv6])
 AC_ARG_ENABLE(ipv6,
-[  --enable-ipv6		Enable ipv6 (with ipv4) support
-  --disable-ipv6		Disable ipv6 support],
+[  --enable-ipv6           enable ipv6 (with ipv4) support
+  --disable-ipv6          disable ipv6 support],
 [ case "$enableval" in
 yes)   AC_MSG_RESULT(yes)
        AC_DEFINE(ENABLE_IPV6)
@@ -59,7 +70,7 @@ yes)   AC_MSG_RESULT(yes)
        ;;
   esac ],
 
-  AC_TRY_RUN([ /* AF_INET6 avalable check */
+  AC_TRY_RUN([ /* AF_INET6 available check */
 #include <sys/types.h>
 #include <sys/socket.h>
 main()

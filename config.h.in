@@ -23,6 +23,12 @@
 #undef ENABLE_IPV6
 #undef INET6
 
+/* Define if you enable support for the libsmi. */
+#undef LIBSMI
+
+/* Define if you have the <smi.h> header file.  */
+#undef HAVE_SMI_H
+
 /* Is T_AAAA predefined? */
 #undef HAVE_AAAA
 

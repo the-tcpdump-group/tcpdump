@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.70 1999-11-21 15:57:50 assar Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.71 1999-12-13 18:06:15 mcr Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -40,16 +40,21 @@ tcpdump \- dump traffic on a network
 [
 .B \-i
 .I interface
-] [
+]
+[
+.B \-m
+.I module
+]
+[
 .B \-r
 .I file
 ]
+.br
+.ti +8
 [
 .B \-s
 .I snaplen
 ]
-.br
-.ti +8
 [
 .B \-T
 .I type
@@ -58,6 +63,8 @@ tcpdump \- dump traffic on a network
 .B \-w
 .I file
 ]
+.br
+.ti +8
 [
 .I expression
 ]
@@ -146,6 +153,10 @@ Don't print domain name qualification of host names.  E.g.,
 if you give this flag then \fItcpdump\fP will print ``nic''
 instead of ``nic.ddn.mil''.
 .TP
+.B \-m
+Load SMI MIB module definitions from file \fImodule\fR. This option 
+can be used several times to load several MIB modules into tcpdump.
+.TP
 .B \-O
 Do not run the packet-matching code optimizer.  This is useful only
 if you suspect a bug in the optimizer.
@@ -184,6 +195,7 @@ specified \fItype\fR. Currently known types are
 \fBrpc\fR (Remote Procedure Call),
 \fBrtp\fR (Real-Time Applications protocol),
 \fBrtcp\fR (Real-Time Applications control protocol),
+\fBsnmp\fR (Simple Network Management Protocol),
 \fBvat\fR (Visual Audio Tool),
 and
 \fBwb\fR (distributed White Board).

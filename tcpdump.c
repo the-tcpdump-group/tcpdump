@@ -24,7 +24,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.135 1999-11-21 09:37:04 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.136 1999-12-13 18:06:15 mcr Exp $ (LBL)";
 #endif
 
 /*
@@ -70,6 +70,7 @@ int Oflag = 1;			/* run filter code optimizer */
 int pflag;			/* don't go promiscuous */
 int qflag;			/* quick (shorter) output */
 int Rflag = 1;			/* print sequence # field in AH/ESP*/
+int sflag = 0;			/* use the libsmi to translate OIDs */
 int Sflag;			/* print raw TCP sequence numbers */
 int tflag = 1;			/* print packet arrival time */
 int vflag;			/* verbose */
@@ -167,9 +168,13 @@ main(int argc, char **argv)
 	if (abort_on_misalignment(ebuf) < 0)
 		error("%s", ebuf);
 
+#ifdef LIBSMI
+	smiInit("tcpdump");
+#endif
+	
 	opterr = 0;
 	while (
-	    (op = getopt(argc, argv, "ac:deE:fF:i:lnNOpqr:Rs:StT:vw:xY")) != EOF)
+	    (op = getopt(argc, argv, "ac:deE:fF:i:lnNm:Opqr:Rs:StT:vw:xY")) != EOF)
 		switch (op) {
 
 		case 'a':
@@ -234,6 +239,18 @@ main(int argc, char **argv)
 			++Nflag;
 			break;
 
+		case 'm':
+#ifdef LIBSMI
+		        if (smiLoadModule(optarg) == 0) {
+				error("could not load MIB module %s", optarg);
+		        }
+			sflag = 1;
+#else
+			(void)fprintf(stderr, "%s: ignoring option `-m %s' ",
+				      program_name, optarg);
+			(void)fprintf(stderr, "(no libsmi support)\n");
+#endif
+			
 		case 'O':
 			Oflag = 0;
 			break;
