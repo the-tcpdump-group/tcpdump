@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1999, 2000
+ * Copyright (c) 1988-2002
  *	The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.177 2001-12-10 08:21:23 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.178 2002-01-21 11:39:58 mcr Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -81,6 +81,8 @@ extern int xflag;		/* print packet in hex */
 extern int Xflag;		/* print packet in hex/ascii */
 
 extern char *espsecret;
+extern struct esp_algorithm *espsecret_xform;   /* cache of decoded alg. */
+extern char                 *espsecret_key;
 
 extern int packettype;		/* as specified by -T */
 #define PT_VAT		1	/* Visual Audio Tool */
