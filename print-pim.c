@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.16 2000-01-19 04:57:12 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.17 2000-01-19 04:58:09 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -35,12 +35,6 @@ static const char rcsid[] =
 #include <netinet/in.h>
 #include <netinet/in_systm.h>
 #include <netinet/ip.h>
-/*
-#include <netinet/ip_var.h>
-#include <netinet/udp.h>
-#include <netinet/udp_var.h>
-#include <netinet/tcp.h>
-*/
 
 /*
  * XXX: We consider a case where IPv6 is not ready yet for portability,
