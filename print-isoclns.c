@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.31 2001-11-10 21:35:04 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.32 2001-12-03 09:17:07 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -119,6 +119,7 @@ static const char rcsid[] =
 #define SUBTLV_AUTH_MD5         54
 
 #define ISIS_MASK_LEVEL_BITS(x)            ((x)&0x1) 
+
 #define ISIS_MASK_LSP_OL_BIT(x)            ((x)&0x4)
 #define ISIS_MASK_LSP_ISTYPE_BITS(x)       ((x)&0x3)
 #define ISIS_MASK_LSP_PARTITION_BIT(x)     ((x)&0x80)
@@ -127,8 +128,13 @@ static const char rcsid[] =
 #define ISIS_MASK_LSP_ATT_EXPENSE_BIT(x)   ((x)&0x20)
 #define ISIS_MASK_LSP_ATT_DELAY_BIT(x)     ((x)&0x10)
 #define ISIS_MASK_LSP_ATT_DEFAULT_BIT(x)   ((x)&0x8)
+
 #define ISIS_MASK_TLV_EXT_IP_UPDOWN(x)     ((x)&0x80)
 #define ISIS_MASK_TLV_EXT_IP_SUBTLV(x)     ((x)&0x40)
+
+#define ISIS_MASK_TLV_IP6_UPDOWN(x)        ((x)&0x80)
+#define ISIS_MASK_TLV_IP6_IE(x)            ((x)&0x40)
+#define ISIS_MASK_TLV_IP6_SUBTLV(x)        ((x)&0x20)
 
 #define ISIS_LSP_TLV_METRIC_SUPPORTED(x)   ((x)&0x80)
 #define ISIS_LSP_TLV_METRIC_IE(x)          ((x)&0x40)
@@ -669,9 +675,12 @@ static int isis_print (const u_char *p, u_int length)
     const u_char *optr, *pptr, *tptr;
     u_short packet_len;
     u_int i,j,bit_length,byte_length,metric;
-    u_char prefix[4];
+    u_char prefix[4]; /* copy buffer for ipv4 prefixes */
+#ifdef INET6
+    u_char prefix6[16]; /* copy buffer for ipv6 prefixes */
+#endif
     u_char off[2];
-    float bw;
+    float bw; /* copy buffer for several subTLVs of the extended IS reachability TLV */
 
     packet_len=length;
     optr = p; /* initialize the _o_riginal pointer - need it for parsing the checksum TLV */
@@ -738,7 +747,7 @@ static int isis_print (const u_char *p, u_int length)
 	    return (0);
 	}
 	printf(", L%s Lan IIH",
-	       ISIS_MASK_LEVEL_BITS(pdu_type) ? "2" : "1"); 
+	       ISIS_MASK_LEVEL_BITS(pdu_type) ? "1" : "2"); 
 	TCHECK(*header_iih_lan);
 	printf("\n\t\t  source-id: ");
 	isis_print_sysid(header_iih_lan->source_id);
@@ -1169,6 +1178,7 @@ static int isis_print (const u_char *p, u_int length)
 		byte_length = (bit_length + 7) / 8;
 		if (!TTEST2(*tptr, byte_length))
 		    return (1);
+
 		memcpy(prefix,tptr,byte_length);
 
 		printf("\n\t\t\tIPv4 prefix: %u.%u.%u.%u/%d", 
@@ -1184,12 +1194,86 @@ static int isis_print (const u_char *p, u_int length)
 
 		printf(", %ssub-TLVs present",
 		       ISIS_MASK_TLV_EXT_IP_SUBTLV(j) ? "" : "no ");
-			
+
+		if (ISIS_MASK_TLV_EXT_IP_SUBTLV(j)) {
+		    if (!TTEST2(*tptr, 1))
+		      return (1);		  
+		    printf(" (%u)",*tptr);  /* no subTLV decoder supported - just print out subTLV length */
+		    i-=*tptr;
+		    tptr+=*tptr++;
+		}
+
 		i-=(5+byte_length);
 		tptr+=byte_length;
 	    }
 	    break;
 
+#ifdef INET6
+
+	case TLV_IP6_REACH:
+	    printf("IP6 reachability (%u)",len);
+	    i=len;
+	    tptr=pptr;
+		
+	    while (i>0) {
+		if (!TTEST2(*tptr, 4))
+		    return (1);
+	        metric = EXTRACT_32BITS(tptr);
+		tptr+=4;
+
+		if (!TTEST2(*tptr, 2))
+		    return (1);
+		j=*(tptr++);
+		bit_length = (*(tptr)++);
+		byte_length = (bit_length + 7) / 8;
+		if (!TTEST2(*tptr, byte_length))
+		    return (1);
+
+		memset(prefix6, 0, 16);
+		memcpy(prefix6,tptr,byte_length);
+
+		printf("\n\t\t\tIPv6 prefix: %s/%u",
+		       ip6addr_string(prefix6),
+		       bit_length);
+
+		printf("\n\t\t\t  Metric: %u, %s, Distribution: %s, %ssub-TLVs present",
+		    metric,
+		    ISIS_MASK_TLV_IP6_IE(j) ? "External" : "Internal",
+		    ISIS_MASK_TLV_IP6_UPDOWN(j) ? "down" : "up",
+		    ISIS_MASK_TLV_IP6_SUBTLV(j) ? "" : "no ");
+
+		if (ISIS_MASK_TLV_IP6_SUBTLV(j)) {
+		    if (!TTEST2(*tptr, 1))
+		      return (1);		  
+		    printf(" (%u)",*tptr); /* no subTLV decoder supported - just print out subTLV length */
+		    i-=*tptr;
+		    tptr+=*tptr++;
+		}
+
+		i-=(6+byte_length);
+                tptr+=byte_length;
+	    }
+
+	    break;
+#endif
+
+#ifdef INET6
+	case TLV_IP6ADDR:
+	    printf("IPv6 Interface address(es) (%u)",len); 
+	    i=len;
+	    tptr=pptr;
+	    while (i>0) {
+		if (!TTEST2(*tptr, 16))
+		    goto trunctlv;
+
+                printf("\n\t\t\tIPv6 interface address: %s",
+		       ip6addr_string(tptr));
+
+		tptr += 16;
+		i -= 16;
+	    }
+	    break;
+#endif
 	case TLV_AUTH:
 	    if (!TTEST2(*pptr, 1))
 		goto trunctlv;
@@ -1267,7 +1351,7 @@ static int isis_print (const u_char *p, u_int length)
 	    break;
 
 	case TLV_IPADDR:
-	    printf("IP Interface address(es) (%u)",len); 
+	    printf("IPv4 Interface address(es) (%u)",len); 
 	    i=len;
 	    tptr=pptr;
 	    while (i>0) {
@@ -1378,7 +1462,16 @@ static int isis_print (const u_char *p, u_int length)
 	    break;
 
 	default:
-	    printf("unknown TLV, type %d, length %d", type, len);
+	    printf("unknown TLV, type %d, length %d\n\t\t\t", type, len);
+	    tptr=pptr;
+
+	    for(i=0;i<len;i++) {
+		if (!TTEST2(*(tptr+i), 1))
+		    goto trunctlv;
+		printf("%02x",*(tptr+i));
+		if (i/2!=(i+1)/2)
+		    printf(" ");
+	    }	    
 	    break;
 	}
 
