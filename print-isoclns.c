@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.106.2.5 2004-03-24 01:45:26 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.106.2.6 2004-09-09 07:17:42 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1250,11 +1250,11 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    break;
 	case L1_CSNP:
 	case L2_CSNP:
-	    printf(", src-id %s", isis_print_id(header_csnp->source_id,SYSTEM_ID_LEN));
+	    printf(", src-id %s", isis_print_id(header_csnp->source_id,NODE_ID_LEN));
 	    break;
 	case L1_PSNP:
 	case L2_PSNP:
-	    printf(", src-id %s", isis_print_id(header_psnp->source_id,SYSTEM_ID_LEN));
+	    printf(", src-id %s", isis_print_id(header_psnp->source_id,NODE_ID_LEN));
 	    break;
 
 	}
