@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lmp.c,v 1.2 2004-04-23 18:29:44 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lmp.c,v 1.3 2004-04-26 13:22:50 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -31,6 +31,7 @@ static const char rcsid[] _U_ =
 #include "interface.h"
 #include "extract.h"
 #include "addrtoname.h"
+#include "gmpls.h"
 
 /*
  * LMP common header
@@ -71,6 +72,38 @@ static const struct tok lmp_obj_data_link_flag_values[] = {
     { 0x01, "Data Link Port"},
     { 0x02, "Allocated for user traffic"},
     { 0x04, "Failed link"},
+    { 0, NULL}
+};
+
+static const struct tok lmp_obj_channel_status_values[] = {
+    { 1, "Signal Okay"},
+    { 2, "Signal Degraded"},
+    { 3, "Signal Fail"},
+    { 0, NULL}
+};
+
+static const struct tok lmp_obj_begin_verify_flag_values[] = {
+    { 0x0001, "Verify all links"},
+    { 0x0002, "Data link type"},
+    { 0, NULL}
+};
+
+static const struct tok lmp_obj_begin_verify_error_values[] = {
+    { 0x01, "\n\t\tLink Verification Procedure Not supported"},
+    { 0x02, "\n\t\tUnwilling to verify"},
+    { 0x04, "\n\t\tUnsupported verification transport mechanism"},
+    { 0x08, "\n\t\tLink_Id configuration error"},
+    { 0x10, "\n\t\tUnknown object c-type"},
+    { 0, NULL}
+};
+
+static const struct tok lmp_obj_link_summary_error_values[] = {
+    { 0x01, "\n\t\tUnacceptable non-negotiable LINK_SUMMARY parameters"},
+    { 0x02, "\n\t\tRenegotiate LINK_SUMMARY parameters"},
+    { 0x04, "\n\t\tInvalid TE-LINK Object"},
+    { 0x08, "\n\t\tInvalid DATA-LINK Object"},
+    { 0x10, "\n\t\tUnknown TE-LINK Object c-type"},
+    { 0x20, "\n\t\tUnknown DATA-LINK Object c-type"},
     { 0, NULL}
 };
 
@@ -153,7 +186,7 @@ struct lmp_object_header {
 #define LMP_OBJ_DATA_LINK            12
 #define LMP_OBJ_CHANNEL_STATUS       13
 #define LMP_OBJ_CHANNEL_STATUS_REQ   14
-#define LMP_OBJ_ERROR_CODE           15
+#define LMP_OBJ_ERROR_CODE           20
 
 static const struct tok lmp_obj_values[] = {
     { LMP_OBJ_CC_ID, "Control Channel ID" },
@@ -171,6 +204,15 @@ static const struct tok lmp_obj_values[] = {
     { LMP_OBJ_CHANNEL_STATUS, "Channel Status" },
     { LMP_OBJ_CHANNEL_STATUS_REQ, "Channel Status Request" },
     { LMP_OBJ_ERROR_CODE, "Error Code" },
+    { 0, NULL}
+};
+
+#define INT_SWITCHING_TYPE_SUBOBJ 1
+#define WAVELENGTH_SUBOBJ         2
+
+static const struct tok lmp_data_link_subobj[] = {
+    { INT_SWITCHING_TYPE_SUBOBJ, "Interface Switching Type" },
+    { WAVELENGTH_SUBOBJ        , "Wavelength" },
     { 0, NULL}
 };
 
@@ -193,6 +235,9 @@ static const struct tok lmp_obj_values[] = {
 
 #define LMP_CTYPE_HELLO_CONFIG  1
 #define LMP_CTYPE_HELLO         1
+
+#define LMP_CTYPE_BEGIN_VERIFY_ERROR 1
+#define LMP_CTYPE_LINK_SUMMARY_ERROR 2
 
 #define FALSE 0
 #define TRUE  1
@@ -250,8 +295,9 @@ lmp_print(register const u_char *pptr, register u_int len) {
     const struct lmp_common_header *lmp_com_header;
     const struct lmp_object_header *lmp_obj_header;
     const u_char *tptr,*obj_tptr;
-    u_short tlen,lmp_obj_len,lmp_obj_ctype,obj_tlen;
+    int tlen,lmp_obj_len,lmp_obj_ctype,obj_tlen;
     int hexdump;
+    int offset;
     
     tptr=pptr;
     lmp_com_header = (const struct lmp_common_header *)pptr;
@@ -395,11 +441,6 @@ lmp_print(register const u_char *pptr, register u_int len) {
             }
             break;
 
-        /*
-         *  FIXME those are the defined objects that lack a decoder
-         *  you are welcome to contribute code ;-)
-         */
-
         case LMP_OBJ_CONFIG:
             switch(lmp_obj_ctype) {
             case LMP_CTYPE_HELLO_CONFIG:
@@ -479,12 +520,134 @@ lmp_print(register const u_char *pptr, register u_int len) {
             break;      
 	    
         case LMP_OBJ_VERIFY_BEGIN:
+	    switch(lmp_obj_ctype) {
+            case LMP_CTYPE_1:
+		printf("\n\t    Flags: %s",
+		bittok2str(lmp_obj_begin_verify_flag_values,
+			"none",
+			EXTRACT_16BITS(obj_tptr)));
+		printf("\n\t    Verify Interval: %u",
+			EXTRACT_16BITS(obj_tptr+2));
+		printf("\n\t    Data links: %u",
+			EXTRACT_32BITS(obj_tptr+4));
+                printf("\n\t    Encoding type: %s",
+			tok2str(gmpls_encoding_values, "Unknown", *(obj_tptr+8)));
+                printf("\n\t    Verify Tranport Mechanism: %u (0x%x) %s",
+			EXTRACT_16BITS(obj_tptr+10),
+			EXTRACT_16BITS(obj_tptr+10),
+			EXTRACT_16BITS(obj_tptr+10)&8000 ? "(Payload test messages capable)" : "");
+		printf("\n\t    Transmission Rate: (0x%x)",
+			EXTRACT_32BITS(obj_tptr+12));
+		printf("\n\t    Wavelength: %u",
+			EXTRACT_32BITS(obj_tptr+16));
+		break;
+		
+            default:
+                hexdump=TRUE;
+            }
+            break;      
+	
         case LMP_OBJ_VERIFY_BEGIN_ACK:
-        case LMP_OBJ_VERIFY_ID:
-        case LMP_OBJ_CHANNEL_STATUS:
-        case LMP_OBJ_CHANNEL_STATUS_REQ:
+	    switch(lmp_obj_ctype) {
+            case LMP_CTYPE_1:
+                printf("\n\t    Verify Dead Interval: %u 	\
+			\n\t    Verify Transport Response: %u",
+                       EXTRACT_16BITS(obj_tptr),
+                       EXTRACT_16BITS(obj_tptr+2));
+                break;
+		
+            default:
+                hexdump=TRUE;
+            }
+            break;      
+        
+	case LMP_OBJ_VERIFY_ID:
+	    switch(lmp_obj_ctype) {
+            case LMP_CTYPE_1:
+                printf("\n\t    Verify ID: %u",
+                       EXTRACT_32BITS(obj_tptr));
+                break;
+		
+            default:
+                hexdump=TRUE;
+            }
+            break;      
+        
+	case LMP_OBJ_CHANNEL_STATUS:
+            switch(lmp_obj_ctype) {
+	    case LMP_CTYPE_IPV4:
+	    case LMP_CTYPE_UNMD:
+		offset = 0;
+		/* Decode pairs: <Interface_ID (4 bytes), Channel_status (4 bytes)> */
+		while (offset < (lmp_obj_len-(int)sizeof(struct lmp_object_header)) ) {
+			printf("\n\t    Interface ID: %s (0x%08x)",
+			ipaddr_string(obj_tptr+offset),
+			EXTRACT_32BITS(obj_tptr+offset));
+			
+			printf("\n\t\t    Active: %s (%u)", 		(EXTRACT_32BITS(obj_tptr+offset+4)>>31) ? 
+						"Allocated" : "Non-allocated",
+				(EXTRACT_32BITS(obj_tptr+offset+4)>>31));
+			
+			printf("\n\t\t    Direction: %s (%u)", (EXTRACT_32BITS(obj_tptr+offset+4)>>30)&0x1 ? 
+						"Transmit" : "Receive",
+				(EXTRACT_32BITS(obj_tptr+offset+4)>>30)&0x1);	
+						
+			printf("\n\t\t    Channel Status: %s (%u)",
+					tok2str(lmp_obj_channel_status_values,
+			 		"Unknown",
+					EXTRACT_32BITS(obj_tptr+offset+4)&0x3FFFFFF),
+			EXTRACT_32BITS(obj_tptr+offset+4)&0x3FFFFFF);
+			offset+=8;
+		}
+                break;
+#ifdef INET6       
+	    case LMP_CTYPE_IPV6:
+#endif
+            default:
+                hexdump=TRUE;
+            }
+            break;      
+        
+	case LMP_OBJ_CHANNEL_STATUS_REQ:
+            switch(lmp_obj_ctype) {
+	    case LMP_CTYPE_IPV4:
+	    case LMP_CTYPE_UNMD:
+		offset = 0;
+		while (offset < (lmp_obj_len-(int)sizeof(struct lmp_object_header)) ) {
+			printf("\n\t    Interface ID: %s (0x%08x)",
+			ipaddr_string(obj_tptr+offset),
+			EXTRACT_32BITS(obj_tptr+offset));
+			offset+=4;
+		}
+                break;
+#ifdef INET6       
+	    case LMP_CTYPE_IPV6:
+#endif
+	    default:
+                hexdump=TRUE;
+            }
+            break;      
+	
         case LMP_OBJ_ERROR_CODE:
-
+	    switch(lmp_obj_ctype) {
+            case LMP_CTYPE_BEGIN_VERIFY_ERROR:
+		printf("\n\t    Error Code: %s",
+		bittok2str(lmp_obj_begin_verify_error_values,
+			"none",
+			EXTRACT_32BITS(obj_tptr)));
+                break;
+		
+            case LMP_CTYPE_LINK_SUMMARY_ERROR:
+		printf("\n\t    Error Code: %s",
+		bittok2str(lmp_obj_link_summary_error_values,
+			"none",
+			EXTRACT_32BITS(obj_tptr)));
+                break;
+            default:
+                hexdump=TRUE;
+            }
+            break;      
+	    
         default:
             if (vflag <= 1)
                 print_unknown_data(obj_tptr,"\n\t    ",obj_tlen);
