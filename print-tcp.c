@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.81 2000-12-23 20:55:22 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.82 2001-01-28 08:06:07 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -697,10 +697,7 @@ print_tcp_rst_data(register const u_char *sp, u_int length)
 	putchar(' ');
 	while (length-- && sp <= snapend) {
 		c = *sp++;
-		if (isprint(c))
-			putchar(c);
-		else
-			putchar('.');
+		safeputchar(c);
 	}
 	putchar(']');
 }

@@ -11,7 +11,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.12 2000-12-04 00:35:45 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.13 2001-01-28 08:06:08 itojun Exp $";
 #endif
 
 #include <sys/param.h>
@@ -234,7 +234,7 @@ static void print_asc(const unsigned char *buf,int len)
 {
   int i;
   for (i=0;i<len;i++)
-    printf("%c",isprint(buf[i])?buf[i]:'.');
+    safeputchar(buf[i]);
 }
 
 static char *name_type_str(int name_type)

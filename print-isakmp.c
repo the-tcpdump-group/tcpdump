@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.26 2000-12-12 09:20:26 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.27 2001-01-28 08:06:07 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -702,12 +702,8 @@ isakmp_id_print(struct isakmp_gen *ext, u_char *ep, u_int32_t phase,
 		    {
 			int i;
 			printf(" len=%d ", len);
-			for (i = 0; i < len; i++) {
-				if (isprint(data[i]))
-					printf("%c", data[i]);
-				else
-					printf("\\%03o", data[i]);
-			}
+			for (i = 0; i < len; i++)
+				safeputchar(data[i]);
 			len = 0;
 			break;
 		    }

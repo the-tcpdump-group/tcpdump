@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-decnet.c,v 1.31 2001-01-20 07:22:24 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-decnet.c,v 1.32 2001-01-28 08:06:06 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -768,10 +768,7 @@ pdata(u_char *dp, u_int maxlen)
 
 	while (x-- > 0) {
 	    c = *dp++;
-	    if (isprint(c))
-		putchar(c);
-	    else
-		printf("\\%o", c & 0xFF);
+	    safeputchar(c);
 	}
 }
 #endif
