@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ieee802_11.h,v 1.1 2001-06-12 05:17:17 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ieee802_11.h,v 1.2 2001-06-13 07:25:57 guy Exp $ (LBL) */
 /*
  * Copyright (c) 2001
  *	Fortress Technologies
@@ -184,21 +184,21 @@ struct ctrl_rts_t {
 	u_int16_t	duration;
 	u_int8_t	ra[6];
 	u_int8_t	ta[6];
-	u_int32_t	fcs;
+	u_int8_t	fcs[4];
 };
 
 struct ctrl_cts_t {
 	u_int16_t	fc;
 	u_int16_t	duration;
 	u_int8_t	ra[6];
-	u_int32_t	fcs;
+	u_int8_t	fcs[4];
 };
 
 struct ctrl_ack_t {
 	u_int16_t	fc;
 	u_int16_t	duration;
 	u_int8_t	ra[6];
-	u_int32_t	fcs;
+	u_int8_t	fcs[4];
 };
 
 struct ctrl_ps_poll_t {
@@ -206,7 +206,7 @@ struct ctrl_ps_poll_t {
 	u_int16_t	aid;
 	u_int8_t	bssid[6];
 	u_int8_t	ta[6];
-	u_int32_t	fcs;
+	u_int8_t	fcs[4];
 };
 
 struct ctrl_end_t {
@@ -214,7 +214,7 @@ struct ctrl_end_t {
 	u_int16_t	duration;
 	u_int8_t	ra[6];
 	u_int8_t	bssid[6];
-	u_int32_t	fcs;
+	u_int8_t	fcs[4];
 };
 
 struct ctrl_end_ack_t {
@@ -222,7 +222,7 @@ struct ctrl_end_ack_t {
 	u_int16_t	duration;
 	u_int8_t	ra[6];
 	u_int8_t	bssid[6];
-	u_int32_t	fcs;
+	u_int8_t	fcs[4];
 };
 
 #define IV_IV(iv)	((iv) & 0xFFFFFF)

@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.1 2001-06-12 05:17:17 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.2 2001-06-13 07:25:58 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -104,59 +104,86 @@ static const char *reason_text[]= { "Reserved", /* 0 */
 				"Station requesting (re)association is not authenticated with responding station", /* 9 */
 				NULL };
 	
-static void wep_print(const u_char *p,u_int length)
+static int wep_print(const u_char *p,u_int length)
 {
 	u_int32_t iv;
 
+	if (!TTEST2(*p, 4))
+		return 0;
 	iv = EXTRACT_LE_32BITS(p);
 
 	printf("Data IV:%3x Pad %x KeyID %x", IV_IV(iv), IV_PAD(iv),
 	    IV_KEYID(iv));
 
-	return;
+	return 1;
 }
 
 
-static void parse_elements(struct mgmt_body_t *pbody,const u_char *p,int offset)
+static int parse_elements(struct mgmt_body_t *pbody,const u_char *p,int offset)
 {	
-	while ( *(p+offset) != 0xff )
-	{
+	for (;;) {
+		if (!TTEST2(*(p+offset), 1))
+			return 0;
+		if (*(p+offset) == 0xff)
+			break;
 		switch (*(p+offset))
 		{
 			case E_SSID:
+				if (!TTEST2(*(p+offset), 2))
+					return 0;
 				memcpy(&(pbody->ssid),p+offset,2); offset += 2;
 				if (pbody->ssid.length > 0)
 				{
+					if (!TTEST2(*(p+offset), pbody->ssid.length))
+						return 0;
 					memcpy(&(pbody->ssid.ssid),p+offset,pbody->ssid.length); offset += pbody->ssid.length;
 					pbody->ssid.ssid[pbody->ssid.length]='\0';
 				}
 				break;
 			case E_CHALLENGE:
+				if (!TTEST2(*(p+offset), 2))
+					return 0;
 				memcpy(&(pbody->challenge),p+offset,2); offset += 2;
 				if (pbody->challenge.length > 0)
 				{
+					if (!TTEST2(*(p+offset), pbody->challenge.length))
+						return 0;
 					memcpy(&(pbody->challenge.text),p+offset,pbody->challenge.length); offset += pbody->challenge.length;
 					pbody->challenge.text[pbody->challenge.length]='\0';
 				}
 				break;
-	
 			case E_RATES:
+				if (!TTEST2(*(p+offset), 2))
+					return 0;
 				memcpy(&(pbody->rates),p+offset,2); offset += 2;
-				if (pbody->rates.length > 0)
+				if (pbody->rates.length > 0) {
+					if (!TTEST2(*(p+offset), pbody->rates.length))
+						return 0;
 					memcpy(&(pbody->rates.rate),p+offset,pbody->rates.length); offset += pbody->rates.length;
+				}
 				break;
 			case E_DS:
+				if (!TTEST2(*(p+offset), 3))
+					return 0;
 				memcpy(&(pbody->ds),p+offset,3); offset +=3;
 				break;
 			case E_CF:
+				if (!TTEST2(*(p+offset), 8))
+					return 0;
 				memcpy(&(pbody->cf),p+offset,8); offset +=8;
 				break;
 			case E_TIM:
+				if (!TTEST2(*(p+offset), 2))
+					return 0;
 				memcpy(&(pbody->tim),p+offset,2); offset +=2;
+				if (!TTEST2(*(p+offset), 3))
+					return 0;
 				memcpy(&(pbody->tim.count),p+offset,3); offset +=3;
 
 				if ((pbody->tim.length -3) > 0)
 				{
+					if (!TTEST2(*(p+offset), pbody->tim.length -3))
+						return 0;
 					memcpy((pbody->tim.bitmap),p+(pbody->tim.length -3),(pbody->tim.length -3));
 					offset += pbody->tim.length -3;
 				}
@@ -170,13 +197,14 @@ static void parse_elements(struct mgmt_body_t *pbody,const u_char *p,int offset)
 				break;
 		}
 	}
+	return 1;
 }
 
 /*********************************************************************************
  * Print Handle functions for the management frame types
  *********************************************************************************/
 
-static void handle_beacon(u_int16_t fc, const struct mgmt_header_t *pmh,
+static int handle_beacon(u_int16_t fc, const struct mgmt_header_t *pmh,
     const u_char *p)
 {
 	struct mgmt_body_t pbody;
@@ -186,6 +214,8 @@ static void handle_beacon(u_int16_t fc, const struct mgmt_header_t *pmh,
 	memset(buf,0,128);
 	memset(&pbody,0,sizeof(struct mgmt_body_t));
 
+	if (!TTEST2(*p, 12))
+		return 0;
 	memcpy(&pbody.timestamp,p,8);
 	offset += 8;
 	pbody.beacon_interval = EXTRACT_LE_16BITS(p+offset);
@@ -193,7 +223,8 @@ static void handle_beacon(u_int16_t fc, const struct mgmt_header_t *pmh,
 	pbody.capability_info = EXTRACT_LE_16BITS(p+offset);
 	offset += 2;
 
-	parse_elements(&pbody,p,offset);
+	if (!parse_elements(&pbody,p,offset))
+		return 0;
 
 	RATEStoBUF(pbody,buf);
 
@@ -202,10 +233,10 @@ static void handle_beacon(u_int16_t fc, const struct mgmt_header_t *pmh,
 		pbody.ssid.ssid,buf,CAPABILITY_ESS(pbody.capability_info) ? "ESS" : "IBSS" ,pbody.ds.channel,
 		CAPABILITY_PRIVACY(pbody.capability_info) ? ", PRIVACY" : "" );
 	
-	return ;
+	return 1;
 }
 
-static void handle_assoc_request(u_int16_t fc, const struct mgmt_header_t *pmh,
+static int handle_assoc_request(u_int16_t fc, const struct mgmt_header_t *pmh,
     const u_char *p)
 {
 	struct mgmt_body_t pbody;
@@ -215,20 +246,23 @@ static void handle_assoc_request(u_int16_t fc, const struct mgmt_header_t *pmh,
 	memset(buf,0,128);
 	memset(&pbody,0,sizeof(struct mgmt_body_t));
 
+	if (!TTEST2(*p, 4))
+		return 0;
 	pbody.capability_info = EXTRACT_LE_16BITS(p);
 	offset += 2;
 	pbody.listen_interval = EXTRACT_LE_16BITS(p+offset);
 	offset += 2;
 	
-	parse_elements(&pbody,p,offset);
+	if (!parse_elements(&pbody,p,offset))
+		return 0;
 
 	RATEStoBUF(pbody,buf);
 
 	printf("%s (%s) [%s Mbit] ", subtype_text[FC_SUBTYPE(fc)], pbody.ssid.ssid,buf);
-	return;
+	return 1;
 }
 
-static void handle_assoc_response(u_int16_t fc, const struct mgmt_header_t *pmh,
+static int handle_assoc_response(u_int16_t fc, const struct mgmt_header_t *pmh,
     const u_char *p)
 {
 	struct mgmt_body_t pbody;
@@ -236,6 +270,8 @@ static void handle_assoc_response(u_int16_t fc, const struct mgmt_header_t *pmh,
 
 	memset(&pbody,0,sizeof(struct mgmt_body_t));
 
+	if (!TTEST2(*p, 6))
+		return 0;
 	pbody.capability_info = EXTRACT_LE_16BITS(p);
 	offset += 2;
 	pbody.status_code = EXTRACT_LE_16BITS(p+offset);
@@ -243,18 +279,19 @@ static void handle_assoc_response(u_int16_t fc, const struct mgmt_header_t *pmh,
 	pbody.aid = EXTRACT_LE_16BITS(p+offset);
 	offset += 2;
 
-	parse_elements(&pbody,p,offset);
+	if (!parse_elements(&pbody,p,offset))
+		return 0;
 
 	printf("%s AID(%x) :%s: %s   ",subtype_text[FC_SUBTYPE(fc)], 
 		((u_int16_t)( pbody.aid << 2 )) >> 2 , 
 		CAPABILITY_PRIVACY(pbody.capability_info) ? " PRIVACY " : "" ,
 		(pbody.status_code < 19 ? status_text[pbody.status_code] : "n/a")  );
 
-	return;
+	return 1;
 }
 
 
-static void handle_reassoc_request(u_int16_t fc, const struct mgmt_header_t *pmh,
+static int handle_reassoc_request(u_int16_t fc, const struct mgmt_header_t *pmh,
     const u_char *p)
 {
 	struct mgmt_body_t pbody;
@@ -262,6 +299,8 @@ static void handle_reassoc_request(u_int16_t fc, const struct mgmt_header_t *pmh
 
 	memset(&pbody,0,sizeof(struct mgmt_body_t));
 
+	if (!TTEST2(*p, 10))
+		return 0;
 	pbody.capability_info = EXTRACT_LE_16BITS(p);
 	offset += 2;
 	pbody.listen_interval = EXTRACT_LE_16BITS(p+offset);
@@ -269,21 +308,22 @@ static void handle_reassoc_request(u_int16_t fc, const struct mgmt_header_t *pmh
 	memcpy(&pbody.ap,p+offset,6);
 	offset += 6;
 
-	parse_elements(&pbody,p,offset);
+	if (!parse_elements(&pbody,p,offset))
+		return 0;
 
 	printf("%s (%s) AP : %s",subtype_text[FC_SUBTYPE(fc)], pbody.ssid.ssid, etheraddr_string( pbody.ap ));
 	
-	return;
+	return 1;
 }
 
-static void handle_reassoc_response(u_int16_t fc, const struct mgmt_header_t *pmh,
+static int handle_reassoc_response(u_int16_t fc, const struct mgmt_header_t *pmh,
     const u_char *p)
 {
 	/* Same as a Association Reponse */
 	return handle_assoc_response(fc,pmh,p);
 }
 
-static void handle_probe_request(u_int16_t fc, const struct mgmt_header_t *pmh,
+static int handle_probe_request(u_int16_t fc, const struct mgmt_header_t *pmh,
     const u_char *p)
 {
 	struct mgmt_body_t  pbody;
@@ -294,16 +334,17 @@ static void handle_probe_request(u_int16_t fc, const struct mgmt_header_t *pmh,
 
 	memset(&pbody,0,sizeof(struct mgmt_body_t));
 
-	parse_elements(&pbody,p,offset);
+	if (!parse_elements(&pbody,p,offset))
+		return 0;
 	
 	RATEStoBUF(pbody,buf);
 
 	printf("%s (%s) [%s Mbit] ",subtype_text[FC_SUBTYPE(fc)], pbody.ssid.ssid,buf);
 
-	return;
+	return 1;
 }
 
-static void handle_probe_response(u_int16_t fc, const struct mgmt_header_t *pmh,
+static int handle_probe_response(u_int16_t fc, const struct mgmt_header_t *pmh,
     const u_char *p)
 {
 	struct mgmt_body_t  pbody;
@@ -314,6 +355,8 @@ static void handle_probe_response(u_int16_t fc, const struct mgmt_header_t *pmh,
 
 	memset(&pbody,0,sizeof(struct mgmt_body_t));
 
+	if (!TTEST2(*p, 12))
+		return 0;
 	memcpy(&pbody.timestamp,p,8);
 	offset += 8;
 	pbody.beacon_interval = EXTRACT_LE_16BITS(p+offset);
@@ -321,23 +364,24 @@ static void handle_probe_response(u_int16_t fc, const struct mgmt_header_t *pmh,
 	pbody.capability_info = EXTRACT_LE_16BITS(p+offset);
 	offset += 2;
 	
-	parse_elements(&pbody,p,offset);
+	if (!parse_elements(&pbody,p,offset))
+		return 0;
 
 	printf("%s (%s) CH: %x %s",subtype_text[FC_SUBTYPE(fc)], pbody.ssid.ssid,pbody.ds.channel,
 		CAPABILITY_PRIVACY(pbody.capability_info) ? ",PRIVACY " : "" );
 
-	return;
+	return 1;
 }
 
-static void handle_atim(u_int16_t fc, const struct mgmt_header_t *pmh,
+static int handle_atim(u_int16_t fc, const struct mgmt_header_t *pmh,
     const u_char *p)
 {
 	/* the frame body for ATIM is null. */
 	printf("ATIM");
-	return;
+	return 1;
 }
 
-static void handle_disassoc(u_int16_t fc, const struct mgmt_header_t *pmh,
+static int handle_disassoc(u_int16_t fc, const struct mgmt_header_t *pmh,
     const u_char *p)
 {
 	struct mgmt_body_t  pbody;
@@ -345,16 +389,18 @@ static void handle_disassoc(u_int16_t fc, const struct mgmt_header_t *pmh,
 
 	memset(&pbody,0,sizeof(struct mgmt_body_t));
 
+	if (!TTEST2(*p, 2))
+		return 0;
 	pbody.reason_code = EXTRACT_LE_16BITS(p);
 	offset += 2;
 
 	printf("%s: %s ", subtype_text[FC_SUBTYPE(fc)],
 	    pbody.reason_code < 10 ? reason_text[pbody.reason_code] : "Reserved" );
 
-	return;
+	return 1;
 }
 
-static void handle_auth(u_int16_t fc, const struct mgmt_header_t *pmh,
+static int handle_auth(u_int16_t fc, const struct mgmt_header_t *pmh,
     const u_char *p)
 {
 	struct mgmt_body_t  pbody;
@@ -362,7 +408,8 @@ static void handle_auth(u_int16_t fc, const struct mgmt_header_t *pmh,
 
 	memset(&pbody,0,sizeof(struct mgmt_body_t));
 
-
+	if (!TTEST2(*p, 6))
+		return 0;
 	pbody.auth_alg = EXTRACT_LE_16BITS(p);
 	offset += 2;
 	pbody.auth_trans_seq_num = EXTRACT_LE_16BITS(p+offset);
@@ -370,8 +417,8 @@ static void handle_auth(u_int16_t fc, const struct mgmt_header_t *pmh,
 	pbody.status_code = EXTRACT_LE_16BITS(p+offset);
 	offset += 2;
 
-	parse_elements(&pbody,p,offset);
-
+	if (!parse_elements(&pbody,p,offset))
+		return 0;
 
 	if (( pbody.auth_alg == 1) && 
 		( ( pbody.auth_trans_seq_num == 2) || (pbody.auth_trans_seq_num == 3) ))
@@ -395,11 +442,10 @@ static void handle_auth(u_int16_t fc, const struct mgmt_header_t *pmh,
 			 );
 	}
 
-
-	return;
+	return 1;
 }
 
-static void handle_deauth(u_int16_t fc, const struct mgmt_header_t *pmh,
+static int handle_deauth(u_int16_t fc, const struct mgmt_header_t *pmh,
     const u_char *p)
 {
 	struct mgmt_body_t  pbody;
@@ -407,6 +453,8 @@ static void handle_deauth(u_int16_t fc, const struct mgmt_header_t *pmh,
 
 	memset(&pbody,0,sizeof(struct mgmt_body_t));
 
+	if (!TTEST2(*p, 2))
+		return 0;
 	pbody.reason_code = EXTRACT_LE_16BITS(p);
 	offset += 2;
 	
@@ -424,7 +472,7 @@ static void handle_deauth(u_int16_t fc, const struct mgmt_header_t *pmh,
 			pbody.reason_code < 10 ? reason_text[pbody.reason_code] : "Reserved" );
 	}
 		
-	return;
+	return 1;
 }
 
 
@@ -433,53 +481,46 @@ static void handle_deauth(u_int16_t fc, const struct mgmt_header_t *pmh,
  *********************************************************************************/
 
 
-static void mgmt_body_print(u_int16_t fc, const struct mgmt_header_t *pmh,
+static int mgmt_body_print(u_int16_t fc, const struct mgmt_header_t *pmh,
     const u_char *p, u_int length)
 {
 	switch (FC_SUBTYPE(fc))
 	{
 		case ST_ASSOC_REQUEST:
-			handle_assoc_request(fc,pmh,p);
-			break;
+			return (handle_assoc_request(fc,pmh,p));
 		case ST_ASSOC_RESPONSE:
-			handle_assoc_response(fc,pmh,p);
-			break;
+			return (handle_assoc_response(fc,pmh,p));
 		case ST_REASSOC_REQUEST:
-			handle_reassoc_request(fc,pmh,p);
-			break;
+			return (handle_reassoc_request(fc,pmh,p));
 		case ST_REASSOC_RESPONSE:
-			handle_reassoc_response(fc,pmh,p);
-			break;
+			return (handle_reassoc_response(fc,pmh,p));
 		case ST_PROBE_REQUEST:
-			handle_probe_request(fc,pmh,p);
-			break;
+			return (handle_probe_request(fc,pmh,p));
 		case ST_PROBE_RESPONSE:
-			handle_probe_response(fc,pmh,p);
-			break;
+			return (handle_probe_response(fc,pmh,p));
 		case ST_BEACON:
-			handle_beacon(fc,pmh,p);
-			break;
+			return (handle_beacon(fc,pmh,p));
 		case ST_ATIM:
-			handle_atim(fc,pmh,p);
-			break;
+			return (handle_atim(fc,pmh,p));
 		case ST_DISASSOC:
-			handle_disassoc(fc,pmh,p);
-			break;
+			return (handle_disassoc(fc,pmh,p));
 		case ST_AUTH:
+			if (!TTEST2(*p, 3))
+				return 0;
 			if ((p[0] == 0 ) && (p[1] == 0) && (p[2] == 0))
 			{
 				printf("Authentication (Shared-Key)-3 ");
-				wep_print(p,length);
+				return (wep_print(p,length));
 			}
 			else
-				handle_auth(fc,pmh,p);
-			break;
+				return (handle_auth(fc,pmh,p));
 		case ST_DEAUTH:
-			handle_deauth(fc,pmh,p);
+			return (handle_deauth(fc,pmh,p));
 			break;
 		default:
 			printf("Unhandled Managment subtype(%x)",
 			    FC_SUBTYPE(fc));
+			return 1;
 	}
 }
 
@@ -488,38 +529,50 @@ static void mgmt_body_print(u_int16_t fc, const struct mgmt_header_t *pmh,
  * Handles printing all the control frame types
  *********************************************************************************/
 
-static void ctrl_body_print(u_int16_t fc,const u_char *p, u_int length)
+static int ctrl_body_print(u_int16_t fc,const u_char *p, u_int length)
 {
 	switch (FC_SUBTYPE(fc))
 	{
 		case CTRL_PS_POLL:
+			if (!TTEST(*((struct ctrl_ps_poll_t *)p)))
+				return 0;
 			printf("Power Save-Poll AID(%x)",((u_int16_t)( ((struct ctrl_ps_poll_t *)p)->aid  << 2 )) >> 2 );
 			break;
 		case CTRL_RTS:
+			if (!TTEST(*((struct ctrl_rts_t *)p)))
+				return 0;
 			if (eflag)
 				printf("Request-To-Send");
 			else
 				printf("Request-To-Send TA:%s ", etheraddr_string( ((struct ctrl_rts_t *)p)->ta));
 			break;
 		case CTRL_CTS:
+			if (!TTEST(*((struct ctrl_cts_t *)p)))
+				return 0;
 			if (eflag)
 				printf("Clear-To-Send");
 			else
 				printf("Clear-To-Send RA:%s ", etheraddr_string( ((struct ctrl_cts_t *)p)->ra));
 			break;
 		case CTRL_ACK:
+			if (!TTEST(*((struct ctrl_ack_t *)p)))
+				return 0;
 			if (eflag)
 				printf("Acknowledgment");
 			else
 				printf("Acknowledgment RA:%s ", etheraddr_string( ((struct ctrl_ack_t *)p)->ra));
 			break;
 		case CTRL_CF_END:
+			if (!TTEST(*((struct ctrl_end_t *)p)))
+				return 0;
 			if (eflag)
 				printf("CF-End");
 			else
 				printf("CF-End RA:%s ", etheraddr_string( ((struct ctrl_end_t *)p)->ra));
 			break;
 		case CTRL_END_ACK:
+			if (!TTEST(*((struct ctrl_end_ack_t *)p)))
+				return 0;
 			if (eflag)
 				printf("CF-End+CF-Ack");
 			else
@@ -528,6 +581,7 @@ static void ctrl_body_print(u_int16_t fc,const u_char *p, u_int length)
 		default:
 			printf("(B) Unknown Ctrl Subtype");
 	}
+	return 1;
 }
 
 
@@ -737,18 +791,27 @@ ieee802_11_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	switch (FC_TYPE(fc)) {
 
 	case T_MGMT:
-		mgmt_body_print(fc,(const struct mgmt_header_t *)packetp,p,length);
+		if (!mgmt_body_print(fc,(const struct mgmt_header_t *)packetp,p,length)) {
+			printf("[|802.11]");
+			goto out;
+		}
 		break;
 
 	case T_CTRL:
-		ctrl_body_print(fc,p,length);
+		if (!ctrl_body_print(fc,p - HEADER_LENGTH,length + HEADER_LENGTH)) {
+			printf("[|802.11]");
+			goto out;
+		}
 		break;
 
 	case T_DATA:
 		/* There may be a problem w/ AP not having this bit set */
- 		if (FC_WEP(fc))
-			wep_print(p,length);
-		else {
+ 		if (FC_WEP(fc)) {
+			if (!wep_print(p,length)) {
+				printf("[|802.11]");
+				goto out;
+			}
+		} else {
 			if (llc_print(p, length, caplen, packetp+10,
 			    packetp+4, &extracted_ethertype) == 0) {
 				/*
