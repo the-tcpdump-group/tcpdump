@@ -1,3 +1,11 @@
+Wed Jan 19 JST 2000  itojun@iijlab.net
+	* fix get{addr,name}info portability issues.
+	* improve linux portability for IPv6 enabled case.  pull in structure
+	  defs from KAME include files into tcpdump tree itself.
+	* fix pim structure def.
+	* string buffer overrun prevention, using snprintf(), strlcpy and
+	  others (not complete).
+
 2000-01-09  Assar Westerlund  <assar@sics.se>
 
 	* remove some <netinet/tcpip.h>, it's not needed and causes
@@ -576,4 +584,4 @@ v2.0 Sun Jan 13 12:20:40 PST 1991
 
 - Initial public release.
 
-@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.67 2000-01-09 10:01:39 assar Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.68 2000-01-19 13:39:22 itojun Exp $ (LBL)
