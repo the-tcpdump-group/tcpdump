@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.73 2000-01-15 07:54:15 itojun Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.74 2000-01-27 23:53:50 fenner Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -1111,6 +1111,64 @@ NFS reply packets do not explicitly identify the RPC operation.  Instead,
 \fItcpdump\fP keeps track of ``recent'' requests, and matches them to the
 replies using the transaction ID.  If a reply does not closely follow the
 corresponding request, it might not be parsable.
+.HD
+AFS Request and Replies
+.LP
+Transarc AFS (Andrew File System) requests and replies are printed
+as:
+.HD
+.RS
+.nf
+.sp .5
+\fIsrc.sport > dst.dport: rx packet-type\fP
+\fIsrc.sport > dst.dport: rx packet-type service call call-name args\fP
+\fIsrc.sport > dst.dport: rx packet-type service reply call-name args\fP
+.sp .5
+\f(CW
+elvis.7001 > pike.afsfs:
+	rx data fs call rename old fid 536876964/1/1 ".newsrc.new"
+	new fid 536876964/1/1 ".newsrc"
+pike.afsfs > elvis.7001: rx data fs reply rename
+\fP
+.sp .5
+.fi
+.RE
+In the first line, host elvis sends a RX packet to pike.  This was
+a RX data packet to the fs (fileserver) service, and is the start of
+an RPC call.  The RPC call was a rename, with the old directory file id
+of 536876964/1/1 and an old filename of `.newsrc.new', and a new directory
+file id of 536876964/1/1 and a new filename of `.newsrc'.  The host pike
+responds with a RPC reply to the rename call (which was successful, because
+it was a data packet and not an abort packet).
+.LP
+In general, all AFS RPCs are decoded at least by RPC call name.  Most
+AFS RPCs have at least some of the arguments decoded (generally only
+the `interesting' arguments, for some definition of interesting).
+.LP
+The format is intended to be self-describing, but it will probably
+not be useful to people who are not familiar with the workings of
+AFS and RX.
+.LP
+If the -v (verbose) flag is given twice, additional information is printed,
+such as the the RX call ID, call number, sequence number, serial number,
+and the RX packet flags.
+.LP
+If the -v flag is given again, the security index and service id are printed.
+.LP
+Error codes are printed for abort packets, with the exception of Ubik
+beacon packets (because abort packets are used to signify a yes vote
+for the Ubik protocol).
+.LP
+Note that AFS requests are very large and many of the arguments won't
+be printed unless \fIsnaplen\fP is increased.  Try using `\fB-s 256\fP'
+to watch AFS traffic.
+.LP
+AFS reply packets do not explicitly identify the RPC operation.  Instead,
+\fItcpdump\fP keeps track of ``recent'' requests, and matches them to the
+replies using the call number and service ID.  If a reply does not closely
+follow the
+corresponding request, it might not be parsable.
+
 .HD
 KIP Appletalk (DDP in UDP)
 .LP
