@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sunrpc.c,v 1.41 2002-08-01 08:53:31 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sunrpc.c,v 1.42 2002-09-05 00:00:22 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -136,7 +136,7 @@ progstr(prog)
 	register struct rpcent *rp;
 #endif
 	static char buf[32];
-	static int lastprog = 0;
+	static u_int32_t lastprog = 0;
 
 	if (lastprog != 0 && prog == lastprog)
 		return (buf);

@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.68 2002-08-01 08:53:24 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.69 2002-09-05 00:00:17 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -80,7 +80,6 @@ static const char rcsid[] =
 #define CPCODES_RESET_REQ	14	/* Reset-Request (CCP only) */
 #define CPCODES_RESET_REP	15	/* Reset-Reply (CCP only) */
 
-#define CPCODES_MIN	CPCODES_VEXT
 #define CPCODES_MAX	CPCODES_RESET_REP
 
 static const char *cpcodes[] = {
@@ -387,7 +386,7 @@ handle_ctrl_proto(u_int proto, const u_char *p, int length)
 	}
 
 	code = *p;
-	if ((code >= CPCODES_MIN) && (code <= CPCODES_MAX))
+	if (code <= CPCODES_MAX)
 		printf("%s", cpcodes[code]);
 	else {
 		printf("0x%02x", code);

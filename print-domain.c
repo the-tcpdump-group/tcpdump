@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.79 2002-08-01 08:53:04 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.80 2002-09-05 00:00:11 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -152,7 +152,7 @@ ns_nprint(register const u_char *cp, register const u_char *bp)
 	int elt;
 	int data_size = snapend - bp;
 
-	if ((l = labellen(cp)) < 0)
+	if ((l = labellen(cp)) == (u_int)-1)
 		return(NULL);
 	if (!TTEST2(*cp, 1))
 		return(NULL);
@@ -172,7 +172,7 @@ ns_nprint(register const u_char *cp, register const u_char *bp)
 				if (!TTEST2(*cp, 1))
 					return(NULL);
 				cp = bp + (((i << 8) | *cp) & 0x3fff);
-				if ((l = labellen(cp)) < 0)
+				if ((l = labellen(cp)) == (u_int)-1)
 					return(NULL);
 				if (!TTEST2(*cp, 1))
 					return(NULL);
@@ -211,7 +211,7 @@ ns_nprint(register const u_char *cp, register const u_char *bp)
 			cp += l;
 			chars_processed += l;
 			putchar('.');
-			if ((l = labellen(cp)) < 0)
+			if ((l = labellen(cp)) == (u_int)-1)
 				return(NULL);
 			if (!TTEST2(*cp, 1))
 				return(NULL);

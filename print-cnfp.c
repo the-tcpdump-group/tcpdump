@@ -34,7 +34,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cnfp.c,v 1.9 2002-08-01 08:53:03 risso Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cnfp.c,v 1.10 2002-09-05 00:00:10 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -47,6 +47,8 @@ static const char rcsid[] =
 #include <string.h>
 
 #include "interface.h"
+
+#include "addrtoname.h"
 
 #include "tcp.h"
 
@@ -129,7 +131,7 @@ cnfp_print(const u_char *cp, u_int len, const u_char *bp)
 			snprintf(asbuf, sizeof(asbuf), ":%u",
 				 (unsigned)(ntohl(nr->asses) >> 16) & 0xffff);
 		}
-		printf("\n    %s%s%s:%u ", inet_ntoa(nr->src_ina), buf, asbuf,
+		printf("\n    %s%s%s:%u ", intoa(nr->src_ina.s_addr), buf, asbuf,
 			(unsigned)ntohl(nr->ports) >> 16);
 
 		if (ver == 5 || ver ==6) {
@@ -138,10 +140,10 @@ cnfp_print(const u_char *cp, u_int len, const u_char *bp)
 			snprintf(asbuf, sizeof(asbuf), ":%u",
 				 (unsigned)ntohl(nr->asses) & 0xffff);
 		}
-		printf("> %s%s%s:%u ", inet_ntoa(nr->dst_ina), buf, asbuf,
+		printf("> %s%s%s:%u ", intoa(nr->dst_ina.s_addr), buf, asbuf,
 			(unsigned)ntohl(nr->ports) & 0xffff);
 
-		printf(">> %s\n    ", inet_ntoa(nr->nhop_ina));
+		printf(">> %s\n    ", intoa(nr->nhop_ina.s_addr));
 
 		pent = getprotobynumber((ntohl(nr->proto_tos) >> 8) & 0xff);
 		if (!pent || nflag)

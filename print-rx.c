@@ -34,7 +34,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.32 2002-08-06 04:42:06 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.33 2002-09-05 00:00:19 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -71,7 +71,7 @@ static struct tok rx_types[] = {
 static struct double_tok {
 	int flag;		/* Rx flag */
 	int packetType;		/* Packet type */
-	char *s;		/* Flag string */
+	const char *s;		/* Flag string */
 } rx_flags[] = {
 	{ RX_CLIENT_INITIATED,	0,			"client-init" },
 	{ RX_REQUEST_ACK,	0,			"req-ack" },
@@ -343,7 +343,7 @@ static struct tok ubik_lock_types[] = {
 	{ 0,		NULL },
 };
 
-static char *voltype[] = { "read-write", "read-only", "backup" };
+static const char *voltype[] = { "read-write", "read-only", "backup" };
 
 static struct tok afs_fs_errors[] = {
 	{ 101,		"salvage volume" },
@@ -438,7 +438,7 @@ rx_print(register const u_char *bp, int length, int sport, int dport,
 	int i;
 	int32_t opcode;
 
-	if (snapend - bp < sizeof (struct rx_header)) {
+	if (snapend - bp < (int)sizeof (struct rx_header)) {
 		printf(" [|rx] (%d)", length);
 		return;
 	}
@@ -592,7 +592,7 @@ rx_cache_insert(const u_char *bp, const struct ip *ip, int dport,
 	struct rx_cache_entry *rxent;
 	const struct rx_header *rxh = (const struct rx_header *) bp;
 
-	if (snapend - bp + 1 <= sizeof(struct rx_header) + sizeof(int32_t))
+	if (snapend - bp + 1 <= (int)(sizeof(struct rx_header) + sizeof(int32_t)))
 		return;
 
 	rxent = &rx_cache[rx_cache_next];
@@ -775,7 +775,7 @@ ack_print(register const u_char *bp, int length)
 	if (vflag <= 1)
 	        return;
 
-	if (length <= sizeof(struct rx_header))
+	if (length <= (int)sizeof(struct rx_header))
 		return;
 
 	bp += sizeof(struct rx_header);
@@ -845,10 +845,10 @@ fs_print(register const u_char *bp, int length)
 	int fs_op;
 	unsigned long i;
 
-	if (length <= sizeof(struct rx_header))
+	if (length <= (int)sizeof(struct rx_header))
 		return;
 
-	if (snapend - bp + 1 <= sizeof(struct rx_header) + sizeof(int32_t)) {
+	if (snapend - bp + 1 <= (int)(sizeof(struct rx_header) + sizeof(int32_t))) {
 		goto trunc;
 	}
 
@@ -996,7 +996,7 @@ fs_reply_print(register const u_char *bp, int length, int32_t opcode)
 	unsigned long i;
 	struct rx_header *rxh;
 
-	if (length <= sizeof(struct rx_header))
+	if (length <= (int)sizeof(struct rx_header))
 		return;
 
 	rxh = (struct rx_header *) bp;
@@ -1160,10 +1160,10 @@ cb_print(register const u_char *bp, int length)
 	int cb_op;
 	unsigned long i;
 
-	if (length <= sizeof(struct rx_header))
+	if (length <= (int)sizeof(struct rx_header))
 		return;
 
-	if (snapend - bp + 1 <= sizeof(struct rx_header) + sizeof(int32_t)) {
+	if (snapend - bp + 1 <= (int)(sizeof(struct rx_header) + sizeof(int32_t))) {
 		goto trunc;
 	}
 
@@ -1241,7 +1241,7 @@ cb_reply_print(register const u_char *bp, int length, int32_t opcode)
 {
 	struct rx_header *rxh;
 
-	if (length <= sizeof(struct rx_header))
+	if (length <= (int)sizeof(struct rx_header))
 		return;
 
 	rxh = (struct rx_header *) bp;
@@ -1291,10 +1291,10 @@ prot_print(register const u_char *bp, int length)
 	unsigned long i;
 	int pt_op;
 
-	if (length <= sizeof(struct rx_header))
+	if (length <= (int)sizeof(struct rx_header))
 		return;
 
-	if (snapend - bp + 1 <= sizeof(struct rx_header) + sizeof(int32_t)) {
+	if (snapend - bp + 1 <= (int)(sizeof(struct rx_header) + sizeof(int32_t))) {
 		goto trunc;
 	}
 
@@ -1433,7 +1433,7 @@ prot_reply_print(register const u_char *bp, int length, int32_t opcode)
 	struct rx_header *rxh;
 	unsigned long i;
 
-	if (length < sizeof(struct rx_header))
+	if (length < (int)sizeof(struct rx_header))
 		return;
 
 	rxh = (struct rx_header *) bp;
@@ -1545,10 +1545,10 @@ vldb_print(register const u_char *bp, int length)
 	int vldb_op;
 	unsigned long i;
 
-	if (length <= sizeof(struct rx_header))
+	if (length <= (int)sizeof(struct rx_header))
 		return;
 
-	if (snapend - bp + 1 <= sizeof(struct rx_header) + sizeof(int32_t)) {
+	if (snapend - bp + 1 <= (int)(sizeof(struct rx_header) + sizeof(int32_t))) {
 		goto trunc;
 	}
 
@@ -1638,7 +1638,7 @@ vldb_reply_print(register const u_char *bp, int length, int32_t opcode)
 	struct rx_header *rxh;
 	unsigned long i;
 
-	if (length < sizeof(struct rx_header))
+	if (length < (int)sizeof(struct rx_header))
 		return;
 
 	rxh = (struct rx_header *) bp;
@@ -1687,7 +1687,7 @@ vldb_reply_print(register const u_char *bp, int length, int32_t opcode)
 				TCHECK2(bp[0], sizeof(int32_t));
 				if (i < nservers)
 					printf(" %s",
-					   inet_ntoa(*((struct in_addr *) bp)));
+					   intoa(((struct in_addr *) bp)->s_addr));
 				bp += sizeof(int32_t);
 			}
 			printf(" partitions");
@@ -1734,7 +1734,7 @@ vldb_reply_print(register const u_char *bp, int length, int32_t opcode)
 				TCHECK2(bp[0], sizeof(int32_t));
 				if (i < nservers)
 					printf(" %s",
-					   inet_ntoa(*((struct in_addr *) bp)));
+					   intoa(((struct in_addr *) bp)->s_addr));
 				bp += sizeof(int32_t);
 			}
 			printf(" partitions");
@@ -1824,10 +1824,10 @@ kauth_print(register const u_char *bp, int length)
 {
 	int kauth_op;
 
-	if (length <= sizeof(struct rx_header))
+	if (length <= (int)sizeof(struct rx_header))
 		return;
 
-	if (snapend - bp + 1 <= sizeof(struct rx_header) + sizeof(int32_t)) {
+	if (snapend - bp + 1 <= (int)(sizeof(struct rx_header) + sizeof(int32_t))) {
 		goto trunc;
 	}
 
@@ -1917,7 +1917,7 @@ kauth_reply_print(register const u_char *bp, int length, int32_t opcode)
 {
 	struct rx_header *rxh;
 
-	if (length <= sizeof(struct rx_header))
+	if (length <= (int)sizeof(struct rx_header))
 		return;
 
 	rxh = (struct rx_header *) bp;
@@ -1968,10 +1968,10 @@ vol_print(register const u_char *bp, int length)
 {
 	int vol_op;
 
-	if (length <= sizeof(struct rx_header))
+	if (length <= (int)sizeof(struct rx_header))
 		return;
 
-	if (snapend - bp + 1 <= sizeof(struct rx_header) + sizeof(int32_t)) {
+	if (snapend - bp + 1 <= (int)(sizeof(struct rx_header) + sizeof(int32_t))) {
 		goto trunc;
 	}
 
@@ -2006,7 +2006,7 @@ vol_reply_print(register const u_char *bp, int length, int32_t opcode)
 {
 	struct rx_header *rxh;
 
-	if (length <= sizeof(struct rx_header))
+	if (length <= (int)sizeof(struct rx_header))
 		return;
 
 	rxh = (struct rx_header *) bp;
@@ -2050,10 +2050,10 @@ bos_print(register const u_char *bp, int length)
 {
 	int bos_op;
 
-	if (length <= sizeof(struct rx_header))
+	if (length <= (int)sizeof(struct rx_header))
 		return;
 
-	if (snapend - bp + 1 <= sizeof(struct rx_header) + sizeof(int32_t)) {
+	if (snapend - bp + 1 <= (int)(sizeof(struct rx_header) + sizeof(int32_t))) {
 		goto trunc;
 	}
 
@@ -2141,7 +2141,7 @@ bos_reply_print(register const u_char *bp, int length, int32_t opcode)
 {
 	struct rx_header *rxh;
 
-	if (length <= sizeof(struct rx_header))
+	if (length <= (int)sizeof(struct rx_header))
 		return;
 
 	rxh = (struct rx_header *) bp;
@@ -2308,7 +2308,7 @@ ubik_reply_print(register const u_char *bp, int length, int32_t opcode)
 {
 	struct rx_header *rxh;
 
-	if (length < sizeof(struct rx_header))
+	if (length < (int)sizeof(struct rx_header))
 		return;
 
 	rxh = (struct rx_header *) bp;
@@ -2372,7 +2372,7 @@ rx_ack_print(register const u_char *bp, int length)
 	struct rx_ackPacket *rxa;
 	int i, start, last;
 
-	if (length < sizeof(struct rx_header))
+	if (length < (int)sizeof(struct rx_header))
 		return;
 
 	bp += sizeof(struct rx_header);

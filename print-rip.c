@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rip.c,v 1.50 2002-08-01 08:53:26 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rip.c,v 1.51 2002-09-05 00:00:18 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -154,13 +154,21 @@ rip_print(const u_char *dat, u_int length)
 {
 	register const struct rip *rp;
 	register const struct rip_netinfo *ni;
-	register int i, j, trunc;
+	register u_int i, j;
+	register int trunc;
 
-	i = min(length, snapend - dat) - sizeof(*rp);
-	if (i < 0) {
+	if (snapend < dat) {
 		printf(" [|rip]");
 		return;
 	}
+	i = snapend - dat;
+	if (i > length)
+		i = length;
+	if (i < sizeof(*rp)) {
+		printf(" [|rip]");
+		return;
+	}
+	i -= sizeof(*rp);
 
 	rp = (struct rip *)dat;
 	switch (rp->rip_vers) {
@@ -190,7 +198,7 @@ rip_print(const u_char *dat, u_int length)
 			break;
 		case RIPCMD_RESPONSE:
 			j = length / sizeof(*ni);
-			if (j * sizeof(*ni) != length - 4)
+			if (j * sizeof(*ni) + 4 != length)
 				printf(" RIPv%d-resp [items %d] [%d]:",
 				       rp->rip_vers, j, length);
 			else
@@ -198,11 +206,12 @@ rip_print(const u_char *dat, u_int length)
 				       rp->rip_vers, j);
 			trunc = (i / sizeof(*ni)) != j;
 			ni = (struct rip_netinfo *)(rp + 1);
-			for (; (i -= sizeof(*ni)) >= 0; ++ni) {
+			for (; i >= sizeof(*ni); ++ni) {
 				if (rp->rip_vers == 1)
 					rip_entry_print_v1(rp->rip_vers, ni);
 				else
 					rip_entry_print_v2(rp->rip_vers, ni);
+				i -= sizeof(*ni);
 			}
 			if (trunc)
 				printf("[|rip]");

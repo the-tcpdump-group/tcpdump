@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.101 2002-08-20 00:17:23 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.102 2002-09-05 00:00:22 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -183,7 +183,7 @@ tcp_print(register const u_char *bp, register u_int length,
 	register const struct tcphdr *tp;
 	register const struct ip *ip;
 	register u_char flags;
-	register int hlen;
+	register u_int hlen;
 	register char ch;
 	u_int16_t sport, dport, win, urp;
 	u_int32_t seq, ack, thseq, thack;
@@ -429,10 +429,12 @@ tcp_print(register const u_char *bp, register u_int length,
 	/*
 	 * Handle any options.
 	 */
-	if ((hlen -= sizeof(*tp)) > 0) {
+	if (hlen > sizeof(*tp)) {
 		register const u_char *cp;
-		register int i, opt, len, datalen;
+		register u_int i, opt, datalen;
+		register u_int len;
 
+		hlen -= sizeof(*tp);
 		cp = (const u_char *)tp + sizeof(*tp);
 		putchar(' ');
 		ch = '<';
@@ -556,7 +558,7 @@ tcp_print(register const u_char *bp, register u_int length,
 				break;
 
 			default:
-				(void)printf("opt-%d:", opt);
+				(void)printf("opt-%u:", opt);
 				datalen = len - 2;
 				for (i = 0; i < datalen; ++i) {
 					LENCHECK(i);

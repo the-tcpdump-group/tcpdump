@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-l2tp.c,v 1.13 2002-08-01 08:53:15 risso Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-l2tp.c,v 1.14 2002-09-05 00:00:14 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -244,7 +244,7 @@ static char *l2tp_error_code_general[] = {
 static void
 print_string(const u_char *dat, u_int length)
 {
-	int i;
+	u_int i;
 	for (i=0; i<length; i++) {
 		printf("%c", *dat++);
 	}
@@ -253,7 +253,7 @@ print_string(const u_char *dat, u_int length)
 static void
 print_octets(const u_char *dat, u_int length)
 {
-	int i;
+	u_int i;
 	for (i=0; i<length; i++) {
 		printf("%02x", *dat++);
 	}

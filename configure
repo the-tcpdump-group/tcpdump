@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.155 
+# From configure.in Revision: 1.156 
 
 
 
@@ -1268,7 +1268,7 @@ else
 fi
 echo "$ac_t""$CPP" 1>&6
 
-for ac_hdr in fcntl.h rpc/rpcent.h netinet/if_ether.h netdnet/dnetdb.h
+for ac_hdr in fcntl.h rpc/rpcent.h netinet/if_ether.h netdnet/dnetdb.h netinet/ether.h
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
@@ -4291,7 +4291,7 @@ rm -f os-proto.h
 			    fi
 			    V_CCOPT="$V_CCOPT -Wall"
 			    if test $ac_cv_lbl_gcc_vers -gt 1 ; then
-				    V_CCOPT="$V_CCOPT -Wmissing-prototypes -Wstrict-prototypes"
+				    V_CCOPT="$V_CCOPT -Wmissing-prototypes -Wstrict-prototypes -Wwrite-strings -W -Wno-unused"
 			    fi
 		    fi
 	    else

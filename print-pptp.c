@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-pptp.c,v 1.5 2002-08-01 08:53:25 risso Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-pptp.c,v 1.6 2002-09-05 00:00:17 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -73,7 +73,7 @@ static char tstr[] = " [|pptp]";
 #define PPTP_BEARER_CAP_ANALOG_MASK	0x00000001      /* Analog */
 #define PPTP_BEARER_CAP_DIGITAL_MASK	0x00000002      /* Digital */
 
-static char *pptp_message_type_string[] = {
+static const char *pptp_message_type_string[] = {
 	"NOT_DEFINED",		/* 0  Not defined in the RFC2637 */
 	"SCCRQ",		/* 1  Start-Control-Connection-Request */
 	"SCCRP",		/* 2  Start-Control-Connection-Reply */

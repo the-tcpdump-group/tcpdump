@@ -51,7 +51,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.20 2002-08-01 08:53:32 risso Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.21 2002-09-05 00:00:22 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -109,7 +109,8 @@ numstr(int x)
 static int
 telnet_parse(const u_char *sp, u_int length, int print)
 {
-	int i, c, x;
+	int i, x;
+	u_int c;
 	const u_char *osp, *p;
 #define FETCH(c, sp, length) \
 	do { \
@@ -155,7 +156,7 @@ telnet_parse(const u_char *sp, u_int length, int print)
 			break;
 		/* IAC SB .... IAC SE */
 		p = sp;
-		while (length > p + 1 - sp) {
+		while (length > (u_int)(p + 1 - sp)) {
 			if (p[0] == IAC && p[1] == SE)
 				break;
 			p++;

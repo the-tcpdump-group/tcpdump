@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.96 2002-08-26 09:36:20 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.97 2002-09-05 00:00:16 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -764,7 +764,7 @@ nfs_printfh(register const u_int32_t *dp, const u_int len)
 	char *spacep;
 
 	if (uflag) {
-		int i;
+		u_int i;
 		char const *sep = "";
 
 		printf(" fh[");

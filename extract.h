@@ -18,20 +18,20 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/extract.h,v 1.17 2001-09-17 21:57:52 fenner Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/extract.h,v 1.18 2002-09-05 00:00:09 guy Exp $ (LBL)
  */
 
 /* Network to host order macros */
 
 #ifdef LBL_ALIGN
 #define EXTRACT_16BITS(p) \
-	((u_int16_t)*((const u_int8_t *)(p) + 0) << 8 | \
-	(u_int16_t)*((const u_int8_t *)(p) + 1))
+	((u_int16_t)((u_int16_t)*((const u_int8_t *)(p) + 0) << 8 | \
+		     (u_int16_t)*((const u_int8_t *)(p) + 1)))
 #define EXTRACT_32BITS(p) \
-	((u_int32_t)*((const u_int8_t *)(p) + 0) << 24 | \
-	(u_int32_t)*((const u_int8_t *)(p) + 1) << 16 | \
-	(u_int32_t)*((const u_int8_t *)(p) + 2) << 8 | \
-	(u_int32_t)*((const u_int8_t *)(p) + 3))
+	((u_int32_t)((u_int32_t)*((const u_int8_t *)(p) + 0) << 24 | \
+		     (u_int32_t)*((const u_int8_t *)(p) + 1) << 16 | \
+		     (u_int32_t)*((const u_int8_t *)(p) + 2) << 8 | \
+		     (u_int32_t)*((const u_int8_t *)(p) + 3)))
 #else
 #define EXTRACT_16BITS(p) \
 	((u_int16_t)ntohs(*(const u_int16_t *)(p)))
@@ -40,18 +40,18 @@
 #endif
 
 #define EXTRACT_24BITS(p) \
-	((u_int32_t)*((const u_int8_t *)(p) + 0) << 16 | \
-	(u_int32_t)*((const u_int8_t *)(p) + 1) << 8 | \
-	(u_int32_t)*((const u_int8_t *)(p) + 2))
+	((u_int32_t)((u_int32_t)*((const u_int8_t *)(p) + 0) << 16 | \
+		     (u_int32_t)*((const u_int8_t *)(p) + 1) << 8 | \
+		     (u_int32_t)*((const u_int8_t *)(p) + 2)))
 
 /* Little endian protocol host order macros */
 
 #define EXTRACT_LE_8BITS(p) (*(p))
 #define EXTRACT_LE_16BITS(p) \
-	((u_int16_t)*((const u_int8_t *)(p) + 1) << 8 | \
-	(u_int16_t)*((const u_int8_t *)(p) + 0))
+	((u_int16_t)((u_int16_t)*((const u_int8_t *)(p) + 1) << 8 | \
+		     (u_int16_t)*((const u_int8_t *)(p) + 0)))
 #define EXTRACT_LE_32BITS(p) \
-	((u_int32_t)*((const u_int8_t *)(p) + 3) << 24 | \
-	(u_int32_t)*((const u_int8_t *)(p) + 2) << 16 | \
-	(u_int32_t)*((const u_int8_t *)(p) + 1) << 8 | \
-	(u_int32_t)*((const u_int8_t *)(p) + 0))
+	((u_int32_t)((u_int32_t)*((const u_int8_t *)(p) + 3) << 24 | \
+		     (u_int32_t)*((const u_int8_t *)(p) + 2) << 16 | \
+		     (u_int32_t)*((const u_int8_t *)(p) + 1) << 8 | \
+		     (u_int32_t)*((const u_int8_t *)(p) + 0)))

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.4 2002-08-01 08:53:07 risso Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.5 2002-09-05 00:00:12 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -52,10 +52,10 @@ static void q933_print(const u_char *, int);
 #define FR_DLCI(b0, b1)	((((b0)&0xFC)<<2)+(((b1)&0xF0)>>4))
 
 /* find out how many bytes are there in a frame */
-static int
+static u_int
 fr_addr_len(const u_char *p)
 {
-	int i=0;
+	u_int i=0;
 	
 	while (!FR_EA_BIT(p[i]) && i++ && !FR_EA_BIT(p[i+1])) i++;
 	return (i+1);
@@ -138,10 +138,10 @@ init_fr_nlpids(void)
 
 #define FR_PROTOCOL(p) fr_protocol((p))
 
-static int
+static u_int
 fr_hdrlen(const u_char *p)
 {
-	int hlen;
+	u_int hlen;
 	hlen = fr_addr_len(p)+1;  /* addr_len + 0x03 + padding */
 	if (p[hlen])
 		return hlen;
@@ -371,7 +371,8 @@ q933_print(const u_char *p, int length)
 	struct q933_header *header = (struct q933_header *)(p+1);
 	const u_char *ptemp = p;
 	int ie_len;
-	char *decode_str, temp_str[255];
+	const char *decode_str;
+	char temp_str[255];
 	struct common_ie_header *ie_p;
     
 	/* printing out header part */

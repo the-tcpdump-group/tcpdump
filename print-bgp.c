@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.49 2002-08-25 18:25:57 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.50 2002-09-05 00:00:10 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -380,7 +380,7 @@ decode_prefix4(const u_char *pptr, char *buf, u_int buflen)
 	u_int plen;
 
 	plen = pptr[0];
-	if (plen < 0 || 32 < plen)
+	if (32 < plen)
 		return -1;
 
 	memset(&addr, 0, sizeof(addr));
@@ -411,7 +411,7 @@ decode_labeled_prefix4(const u_char *pptr, char *buf, u_int buflen)
 
         plen-=24; /* adjust prefixlen - labellength */
 
-	if (plen < 0 || 32 < plen)
+	if (32 < plen)
 		return -1;
 
 	memset(&addr, 0, sizeof(addr));
@@ -478,7 +478,7 @@ decode_labeled_vpn_prefix4(const u_char *pptr, char *buf, u_int buflen)
 
         plen-=(24+64); /* adjust prefixlen - labellength - RD len*/
 
-	if (plen < 0 || 32 < plen)
+	if (32 < plen)
 		return -1;
 
 	memset(&addr, 0, sizeof(addr));

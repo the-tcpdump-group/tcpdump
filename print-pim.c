@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.32 2002-08-01 08:53:23 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.33 2002-09-05 00:00:16 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -122,7 +122,7 @@ pimv1_join_prune_print(register const u_char *bp, register u_int len)
 		bp += 12;
 		len -= 12;
 		for (njp = 0; njp < (njoin + nprune); njp++) {
-			char *type;
+			const char *type;
 
 			if (njp < njoin)
 				type = "Join ";
@@ -442,7 +442,7 @@ static int
 pimv2_addr_print(const u_char *bp, enum pimv2_addrtype at, int silent)
 {
 	int af;
-	char *afstr;
+	const char *afstr;
 	int len, hdrlen;
 
 	TCHECK(bp[0]);

@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.48 2002-08-01 08:53:17 risso Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.49 2002-09-05 00:00:15 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -265,7 +265,7 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 		}
 
 		if ((control & LLC_S_FMT) == LLC_S_FMT) {
-			static char *llc_s[] = { "rr", "rej", "rnr", "03" };
+			static const char *llc_s[] = { "rr", "rej", "rnr", "03" };
 			(void)printf("%s (r=%d,%c)",
 				llc_s[LLC_S_CMD(control)],
 				LLC_IS_NR(control),

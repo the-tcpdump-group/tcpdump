@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.111 2002-08-01 08:53:10 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.112 2002-09-05 00:00:13 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -122,7 +122,7 @@ ip_printts(register const u_char *cp, u_int length)
 	register u_int ptr = cp[2] - 1;
 	register u_int len = 0;
 	int hoplen;
-	char *type;
+	const char *type;
 
 	printf(" TS{");
 	hoplen = ((cp[3]&0xF) != IPOPT_TS_TSONLY) ? 8 : 4;
@@ -629,7 +629,7 @@ again:
 
 	if (vflag) {
 		u_int16_t sum, ip_sum;
-		char *sep = "";
+		const char *sep = "";
 
 		if ((u_char *)ip + hlen <= snapend) {
 			sum = in_cksum((const u_short *)ip, hlen, 0);

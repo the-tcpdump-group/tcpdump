@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.60 2002-09-03 14:21:42 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.61 2002-09-05 00:00:14 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -806,7 +806,7 @@ isis_print_tlv_ip_reach (const u_char *cp, int length)
 	tlv_ip_reach = (const struct isis_tlv_ip_reach *)cp;
 
 	while (length > 0) {
-		if (length < sizeof(*tlv_ip_reach)) {
+		if ((size_t)length < sizeof(*tlv_ip_reach)) {
 			printf("short IPv4 reachability (%d vs %lu)", length,
 			    (unsigned long)sizeof(*tlv_ip_reach));
 			return (0);

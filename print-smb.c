@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.25 2002-08-01 08:53:29 risso Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.26 2002-09-05 00:00:20 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -384,25 +384,26 @@ trunc:
 static void
 print_negprot(const u_char *words, const u_char *data, const u_char *buf, const u_char *maxbuf)
 {
+    u_int wcnt;
     const char *f1 = NULL, *f2 = NULL;
 
     TCHECK(words[0]);
+    wcnt = words[0];
     if (request)
 	f2 = "*|Dialect=[Z]\n";
     else {
-	if (words[0] == 1)
+	if (wcnt == 1)
 	    f1 = "Core Protocol\nDialectIndex=[d]";
-	else if (words[0] == 17)
+	else if (wcnt == 17)
 	    f1 = "NT1 Protocol\nDialectIndex=[d]\nSecMode=[B]\nMaxMux=[d]\nNumVcs=[d]\nMaxBuffer=[D]\nRawSize=[D]\nSessionKey=[W]\nCapabilities=[W]\nServerTime=[T3]TimeZone=[d]\nCryptKey=";
-	else if (words[0] == 13)
+	else if (wcnt == 13)
 	    f1 = "Coreplus/Lanman1/Lanman2 Protocol\nDialectIndex=[d]\nSecMode=[w]\nMaxXMit=[d]\nMaxMux=[d]\nMaxVcs=[d]\nBlkMode=[w]\nSessionKey=[W]\nServerTime=[T1]TimeZone=[d]\nRes=[W]\nCryptKey=";
     }
 
     if (f1)
-	smb_fdata(words + 1, f1, SMBMIN(words + 1 + words[0] * 2, maxbuf));
+	smb_fdata(words + 1, f1, SMBMIN(words + 1 + wcnt * 2, maxbuf));
     else
-	print_data(words + 1, SMBMIN(words[0] * 2,
-	    PTR_DIFF(maxbuf, words + 1)));
+	print_data(words + 1, SMBMIN(wcnt * 2, PTR_DIFF(maxbuf, words + 1)));
 
     TCHECK2(*data, 2);
     if (f2)
@@ -418,7 +419,7 @@ trunc:
 static void
 print_sesssetup(const u_char *words, const u_char *data, const u_char *buf, const u_char *maxbuf)
 {
-    int wcnt;
+    u_int wcnt;
     const char *f1 = NULL, *f2 = NULL;
 
     TCHECK(words[0]);
@@ -429,19 +430,18 @@ print_sesssetup(const u_char *words, const u_char *data, const u_char *buf, cons
 	else
 	    f1 = "Com2=[B]\nRes1=[B]\nOff2=[d]\nMaxBuffer=[d]\nMaxMpx=[d]\nVcNumber=[d]\nSessionKey=[W]\nCaseInsensitivePasswordLength=[d]\nCaseSensitivePasswordLength=[d]\nRes=[W]\nCapabilities=[W]\nPass1&Pass2&Account&Domain&OS&LanMan=\n";
     } else {
-	if (words[0] == 3) {
+	if (wcnt == 3) {
 	    f1 = "Com2=[w]\nOff2=[d]\nAction=[w]\n";
-	} else if (words[0] == 13) {
+	} else if (wcnt == 13) {
 	    f1 = "Com2=[B]\nRes=[B]\nOff2=[d]\nAction=[w]\n";
 	    f2 = "NativeOS=[S]\nNativeLanMan=[S]\nPrimaryDomain=[S]\n";
 	}
     }
 
     if (f1)
-	smb_fdata(words + 1, f1, SMBMIN(words + 1 + words[0] * 2, maxbuf));
+	smb_fdata(words + 1, f1, SMBMIN(words + 1 + wcnt * 2, maxbuf));
     else
-	print_data(words + 1, SMBMIN(words[0] * 2,
-	    PTR_DIFF(maxbuf, words + 1)));
+	print_data(words + 1, SMBMIN(wcnt * 2, PTR_DIFF(maxbuf, words + 1)));
 
     TCHECK2(*data, 2);
     if (f2)
@@ -539,7 +539,7 @@ static struct smbfns smb_fns[] = {
     { pSETDIR, "SMBsetdir", 0, { NULL, "Path=[Z]\n", NULL, NULL, NULL } },
 
     { SMBlseek, "SMBlseek", 0,
-	{ "Handle=[d]\nMode=[w]\nOffset=[D]\n", "Offset=[D]\n", NULL, NULL } },
+	{ "Handle=[d]\nMode=[w]\nOffset=[D]\n", "Offset=[D]\n", NULL, NULL, NULL } },
 
     { SMBflush, "SMBflush", 0, { "Handle=[d]\n", NULL, NULL, NULL, NULL } },
 
@@ -717,7 +717,7 @@ static struct smbfns smb_fns[] = {
 	{ "Com2=[w]\nOff2=[d]\nRes=[b]\nNameLen=[d]\nFlags=[W]\nRootDirectoryFid=[D]\nAccessMask=[W]\nAllocationSize=[L]\nExtFileAttributes=[W]\nShareAccess=[W]\nCreateDisposition=[W]\nCreateOptions=[W]\nImpersonationLevel=[W]\nSecurityFlags=[b]\n",
 	  "Path=[S]\n",
 	  "Com2=[w]\nOff2=[d]\nOplockLevel=[b]\nFid=[d]\nCreateAction=[W]\nCreateTime=[T3]LastAccessTime=[T3]LastWriteTime=[T3]ChangeTime=[T3]ExtFileAttributes=[W]\nAllocationSize=[L]\nEndOfFile=[L]\nFileType=[w]\nDeviceState=[w]\nDirectory=[b]\n",
-	  NULL } },
+	  NULL, NULL } },
 
     { SMBntcancel, "SMBntcancel", 0, DEFDESCRIPT },
 
@@ -734,7 +734,7 @@ print_smb(const u_char *buf, const u_char *maxbuf)
     int command;
     const u_char *words, *data;
     struct smbfns *fn;
-    char *fmt_smbheader =
+    const char *fmt_smbheader =
         "[P4]SMB Command   =  [B]\nError class   =  [BP1]\nError code    =  [d]\nFlags1        =  [B]\nFlags2        =  [B][P13]\nTree ID       =  [d]\nProc ID       =  [d]\nUID           =  [d]\nMID           =  [d]\nWord Count    =  [b]\n";
 
 
@@ -765,7 +765,7 @@ print_smb(const u_char *buf, const u_char *maxbuf)
     for (;;) {
 	const char *f1, *f2;
 	int wct;
-	int bcc;
+	u_int bcc;
 
 	TCHECK(words[0]);
 	wct = words[0];
@@ -806,7 +806,7 @@ print_smb(const u_char *buf, const u_char *maxbuf)
 		    smb_fdata(data + 2, f2, data + 2 + bcc);
 		}
 	    } else {
-		printf("smb_bcc=%d\n", bcc);
+		printf("smb_bcc=%u\n", bcc);
 		if (bcc > 0) {
 		    printf("smb_buf[]=\n");
 		    print_data(data + 2, SMBMIN(bcc, PTR_DIFF(maxbuf, data + 2)));
@@ -847,7 +847,7 @@ nbt_tcp_print(const u_char *data, int length)
 {
     const u_char *maxbuf = data + length;
     int flags;
-    int nbt_len;
+    u_int nbt_len;
 
     TCHECK2(data[2], 2);
     flags = data[0];
@@ -949,7 +949,7 @@ nbt_udp137_print(const u_char *data, int length)
     const u_char *maxbuf = data + length;
     int name_trn_id, response, opcode, nm_flags, rcode;
     int qdcount, ancount, nscount, arcount;
-    char *opcodestr;
+    const char *opcodestr;
     const u_char *p;
     int total, i;
 

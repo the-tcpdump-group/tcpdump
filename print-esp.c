@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.28 2002-08-01 08:53:05 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.29 2002-09-05 00:00:12 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -73,7 +73,7 @@ enum cipher { NONE,
 
 
 struct esp_algorithm {
-	char        *name;
+	const char   *name;
 	enum  cipher algo;
 	int          ivlen;
 	int          authlen;

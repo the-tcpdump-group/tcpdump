@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.32 2002-08-01 08:53:13 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.33 2002-09-05 00:00:13 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -101,12 +101,12 @@ struct {
 } cookiecache[MAXINITIATORS];
 
 /* protocol id */
-static char *protoidstr[] = {
+static const char *protoidstr[] = {
 	NULL, "isakmp", "ipsec-ah", "ipsec-esp", "ipcomp",
 };
 
 /* isakmp->np */
-static char *npstr[] = {
+static const char *npstr[] = {
 	"none", "sa", "p", "t", "ke", "id", "cert", "cr", "hash",
 	"sig", "nonce", "n", "d", "vid"
 };
@@ -131,7 +131,7 @@ static u_char *(*npfunc[])(struct isakmp_gen *, u_char *, u_int32_t,
 };
 
 /* isakmp->etype */
-static char *etypestr[] = {
+static const char *etypestr[] = {
 	"none", "base", "ident", "auth", "agg", "inf", NULL, NULL,
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
@@ -325,7 +325,7 @@ static void
 rawprint(caddr_t loc, size_t len)
 {
 	static u_char *p;
-	int i;
+	size_t i;
 
 	p = (u_char *)loc;
 	for (i = 0; i < len; i++)
@@ -333,9 +333,9 @@ rawprint(caddr_t loc, size_t len)
 }
 
 struct attrmap {
-	char *type;
-	int nvalue;
-	char *value[30];	/*XXX*/
+	const char *type;
+	u_int nvalue;
+	const char *value[30];	/*XXX*/
 };
 
 static u_char *
@@ -485,40 +485,40 @@ isakmp_p_print(struct isakmp_gen *ext, u_char *ep, u_int32_t phase,
 	return cp;
 }
 
-static char *isakmp_p_map[] = {
+static const char *isakmp_p_map[] = {
 	NULL, "ike",
 };
 
-static char *ah_p_map[] = {
+static const char *ah_p_map[] = {
 	NULL, "(reserved)", "md5", "sha", "1des",
 	"sha2-256", "sha2-384", "sha2-512",
 };
 
-static char *esp_p_map[] = {
+static const char *esp_p_map[] = {
 	NULL, "1des-iv64", "1des", "3des", "rc5", "idea", "cast",
 	"blowfish", "3idea", "1des-iv32", "rc4", "null", "aes"
 };
 
-static char *ipcomp_p_map[] = {
+static const char *ipcomp_p_map[] = {
 	NULL, "oui", "deflate", "lzs",
 };
 
 struct attrmap ipsec_t_map[] = {
-	{ NULL,	0, },
+	{ NULL,	0, { NULL } },
 	{ "lifetype", 3, { NULL, "sec", "kb", }, },
-	{ "life", 0, },
+	{ "life", 0, { NULL } },
 	{ "group desc", 5,	{ NULL, "modp768", "modp1024", "EC2N 2^155",
 				  "EC2N 2^185", }, },
 	{ "enc mode", 3, { NULL, "tunnel", "transport", }, },
 	{ "auth", 5, { NULL, "hmac-md5", "hmac-sha1", "1des-mac", "keyed", }, },
-	{ "keylen", 0, },
-	{ "rounds", 0, },
-	{ "dictsize", 0, },
-	{ "privalg", 0, },
+	{ "keylen", 0, { NULL } },
+	{ "rounds", 0, { NULL } },
+	{ "dictsize", 0, { NULL } },
+	{ "privalg", 0, { NULL } },
 };
 
 struct attrmap oakley_t_map[] = {
-	{ NULL,	0 },
+	{ NULL,	0, { NULL } },
 	{ "enc", 8,	{ NULL, "1des", "idea", "blowfish", "rc5",
 		 	  "3des", "cast", "aes", }, },
 	{ "hash", 7,	{ NULL, "md5", "sha1", "tiger",
@@ -528,17 +528,17 @@ struct attrmap oakley_t_map[] = {
 	{ "group desc", 5,	{ NULL, "modp768", "modp1024", "EC2N 2^155",
 				  "EC2N 2^185", }, },
 	{ "group type", 4,	{ NULL, "MODP", "ECP", "EC2N", }, },
-	{ "group prime", 0, },
-	{ "group gen1", 0, },
-	{ "group gen2", 0, },
-	{ "group curve A", 0, },
-	{ "group curve B", 0, },
+	{ "group prime", 0, { NULL } },
+	{ "group gen1", 0, { NULL } },
+	{ "group gen2", 0, { NULL } },
+	{ "group curve A", 0, { NULL } },
+	{ "group curve B", 0, { NULL } },
 	{ "lifetype", 3,	{ NULL, "sec", "kb", }, },
-	{ "lifeduration", 0, },
-	{ "prf", 0, },
-	{ "keylen", 0, },
-	{ "field", 0, },
-	{ "order", 0, },
+	{ "lifeduration", 0, { NULL } },
+	{ "prf", 0, { NULL } },
+	{ "keylen", 0, { NULL } },
+	{ "field", 0, { NULL } },
+	{ "order", 0, { NULL } },
 };
 
 static u_char *
@@ -547,7 +547,7 @@ isakmp_t_print(struct isakmp_gen *ext, u_char *ep, u_int32_t phase,
 {
 	struct isakmp_pl_t *p, t;
 	u_char *cp;
-	char *idstr;
+	const char *idstr;
 	struct attrmap *map;
 	size_t nmap;
 	u_char *ep2;
@@ -626,10 +626,10 @@ isakmp_id_print(struct isakmp_gen *ext, u_char *ep, u_int32_t phase,
 {
 #define USE_IPSECDOI_IN_PHASE1	1
 	struct isakmp_pl_id *p, id;
-	static char *idtypestr[] = {
+	static const char *idtypestr[] = {
 		"IPv4", "IPv4net", "IPv6", "IPv6net",
 	};
-	static char *ipsecidtypestr[] = {
+	static const char *ipsecidtypestr[] = {
 		NULL, "IPv4", "FQDN", "user FQDN", "IPv4net", "IPv6",
 		"IPv6net", "IPv4range", "IPv6range", "ASN1 DN", "ASN1 GN",
 		"keyid",
@@ -765,7 +765,7 @@ isakmp_cert_print(struct isakmp_gen *ext, u_char *ep, u_int32_t phase,
 	u_int32_t doi0, u_int32_t proto0)
 {
 	struct isakmp_pl_cert *p, cert;
-	static char *certstr[] = {
+	static const char *certstr[] = {
 		"none",	"pkcs7", "pgp", "dns",
 		"x509sign", "x509ke", "kerberos", "crl",
 		"arl", "spki", "x509attr",
@@ -789,7 +789,7 @@ isakmp_cr_print(struct isakmp_gen *ext, u_char *ep, u_int32_t phase,
 	u_int32_t doi0, u_int32_t proto0)
 {
 	struct isakmp_pl_cert *p, cert;
-	static char *certstr[] = {
+	static const char *certstr[] = {
 		"none",	"pkcs7", "pgp", "dns",
 		"x509sign", "x509ke", "kerberos", "crl",
 		"arl", "spki", "x509attr",
@@ -868,7 +868,7 @@ isakmp_n_print(struct isakmp_gen *ext, u_char *ep, u_int32_t phase,
 	u_char *ep2;
 	u_int32_t doi;
 	u_int32_t proto;
-	static char *notifystr[] = {
+	static const char *notify_error_str[] = {
 		NULL,				"INVALID-PAYLOAD-TYPE",
 		"DOI-NOT-SUPPORTED",		"SITUATION-NOT-SUPPORTED",
 		"INVALID-COOKIE",		"INVALID-MAJOR-VERSION",
@@ -886,15 +886,33 @@ isakmp_n_print(struct isakmp_gen *ext, u_char *ep, u_int32_t phase,
 		"CERTIFICATE-UNAVAILABLE",	"UNSUPPORTED-EXCHANGE-TYPE",
 		"UNEQUAL-PAYLOAD-LENGTHS",
 	};
-	static char *ipsecnotifystr[] = {
+	static const char *ipsec_notify_error_str[] = {
+		"RESERVED",
+	};
+	static const char *notify_status_str[] = {
+		"CONNECTED",
+	};
+	static const char *ipsec_notify_status_str[] = {
 		"RESPONDER-LIFETIME",		"REPLAY-STATUS",
 		"INITIAL-CONTACT",
 	};
 /* NOTE: these macro must be called with x in proper range */
-#define NOTIFYSTR(x) \
-	(((x) == 16384) ? "CONNECTED" : STR_OR_ID((x), notifystr))
-#define IPSECNOTIFYSTR(x) \
-	(((x) == 8192) ? "RESERVED" : STR_OR_ID(((x) - 24576), ipsecnotifystr))
+
+/* 0 - 8191 */
+#define NOTIFY_ERROR_STR(x) \
+	STR_OR_ID((x), notify_error_str)
+
+/* 8192 - 16383 */
+#define IPSEC_NOTIFY_ERROR_STR(x) \
+	STR_OR_ID((u_int)((x) - 8192), ipsec_notify_error_str)
+
+/* 16384 - 24575 */
+#define NOTIFY_STATUS_STR(x) \
+	STR_OR_ID((u_int)((x) - 16384), notify_status_str)
+
+/* 24576 - 32767 */
+#define IPSEC_NOTIFY_STATUS_STR(x) \
+	STR_OR_ID((u_int)((x) - 24576), ipsec_notify_status_str)
 
 	printf("%s:", NPSTR(ISAKMP_NPTYPE_N));
 
@@ -905,7 +923,14 @@ isakmp_n_print(struct isakmp_gen *ext, u_char *ep, u_int32_t phase,
 	if (doi != 1) {
 		printf(" doi=%d", doi);
 		printf(" proto=%d", proto);
-		printf(" type=%s", NOTIFYSTR(ntohs(n.type)));
+		if (ntohs(n.type) < 8192)
+			printf(" type=%s", NOTIFY_ERROR_STR(ntohs(n.type)));
+		else if (ntohs(n.type) < 16384)
+			printf(" type=%s", numstr(ntohs(n.type)));
+		else if (ntohs(n.type) < 24576)
+			printf(" type=%s", NOTIFY_STATUS_STR(ntohs(n.type)));
+		else
+			printf(" type=%s", numstr(ntohs(n.type)));
 		if (n.spi_size) {
 			printf(" spi=");
 			rawprint((caddr_t)(p + 1), n.spi_size);
@@ -916,15 +941,15 @@ isakmp_n_print(struct isakmp_gen *ext, u_char *ep, u_int32_t phase,
 	printf(" doi=ipsec");
 	printf(" proto=%s", PROTOIDSTR(proto));
 	if (ntohs(n.type) < 8192)
-		printf(" type=%s", NOTIFYSTR(ntohs(n.type)));
+		printf(" type=%s", NOTIFY_ERROR_STR(ntohs(n.type)));
 	else if (ntohs(n.type) < 16384)
-		printf(" type=%s", IPSECNOTIFYSTR(ntohs(n.type)));
+		printf(" type=%s", IPSEC_NOTIFY_ERROR_STR(ntohs(n.type)));
 	else if (ntohs(n.type) < 24576)
-		printf(" type=%s", NOTIFYSTR(ntohs(n.type)));
-	else if (ntohs(n.type) < 40960)
-		printf(" type=%s", IPSECNOTIFYSTR(ntohs(n.type)));
+		printf(" type=%s", NOTIFY_STATUS_STR(ntohs(n.type)));
+	else if (ntohs(n.type) < 32768)
+		printf(" type=%s", IPSEC_NOTIFY_STATUS_STR(ntohs(n.type)));
 	else
-		printf(" type=%s", NOTIFYSTR(ntohs(n.type)));
+		printf(" type=%s", numstr(ntohs(n.type)));
 	if (n.spi_size) {
 		printf(" spi=");
 		rawprint((caddr_t)(p + 1), n.spi_size);

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-wb.c,v 1.27 2002-08-01 08:53:34 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-wb.c,v 1.28 2002-09-05 00:00:24 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -286,7 +286,7 @@ wb_prep(const struct pkt_prep *prep, u_int len)
 }
 
 
-char *dopstr[] = {
+const char *dopstr[] = {
 	"dop-0!",
 	"dop-1!",
 	"RECT",
@@ -317,7 +317,7 @@ wb_dops(const struct dophdr *dh, u_int32_t ss, u_int32_t es)
 		else {
 			printf(" %s", dopstr[t]);
 			if (t == DT_SKIP || t == DT_HOLE) {
-				int ts = ntohl(dh->dh_ts);
+				u_int32_t ts = ntohl(dh->dh_ts);
 				printf("%d", ts - ss + 1);
 				if (ss > ts || ts > es) {
 					printf("[|]");

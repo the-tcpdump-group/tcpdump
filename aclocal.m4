@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.87 2002-08-04 21:20:29 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.88 2002-09-05 00:00:07 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -594,7 +594,8 @@ EOF
 dnl
 dnl If using gcc and the file .devel exists:
 dnl	Compile with -g (if supported) and -Wall
-dnl	If using gcc 2, do extra prototype checking
+dnl	If using gcc 2 or later, do extra prototype checking and some other
+dnl	checks
 dnl	If an os prototype include exists, symlink os-proto.h to it
 dnl
 dnl usage:
@@ -620,7 +621,7 @@ AC_DEFUN(AC_LBL_DEVEL,
 			    fi
 			    $1="$$1 -Wall"
 			    if test $ac_cv_lbl_gcc_vers -gt 1 ; then
-				    $1="$$1 -Wmissing-prototypes -Wstrict-prototypes"
+				    $1="$$1 -Wmissing-prototypes -Wstrict-prototypes -Wwrite-strings -W -Wno-unused"
 			    fi
 		    fi
 	    else

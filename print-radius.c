@@ -44,7 +44,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "$Id: print-radius.c,v 1.15 2002-08-06 04:42:06 guy Exp $";
+    "$Id: print-radius.c,v 1.16 2002-09-05 00:00:18 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -319,7 +319,7 @@ static const char *prompt[]={ "No Echo",
                             };
 
 
-struct attrtype { char *name;            /* Attribute name                 */
+struct attrtype { const char *name;      /* Attribute name                 */
                   const char **subtypes; /* Standard Values (if any)       */
                   u_char siz_subtypes;   /* Size of total standard values  */
                   u_char first_subtype;  /* First standard value is 0 or 1 */
@@ -519,12 +519,12 @@ print_attr_num(register u_char *data, u_int length, u_short attr_code )
       {
          data_value = EXTRACT_32BITS(data);
       }
-      if ( data_value <= (attr_type[attr_code].siz_subtypes - 1 +
+      if ( data_value <= (u_int32_t)(attr_type[attr_code].siz_subtypes - 1 +
             attr_type[attr_code].first_subtype) &&
 	   data_value >= attr_type[attr_code].first_subtype )
          printf("{%s}",table[data_value]);
       else
-         printf("{#%d}",data_value);
+         printf("{#%u}",data_value);
    }
    else
    {
@@ -804,10 +804,17 @@ void
 radius_print(const u_char *dat, u_int length)
 {
    register const struct radius_hdr *rad;
-   register int i;
-   int len;
+   register u_int i;
+   u_int len;
 
-   i = min(length, snapend - dat);
+   if (snapend < dat)
+   {
+	  printf(" [|radius]");
+	  return;
+   }
+   i = snapend - dat;
+   if (i > length)
+	  i = length;
 
    if (i < MIN_RADIUS_LEN)
    {
@@ -832,46 +839,46 @@ radius_print(const u_char *dat, u_int length)
    switch (rad->code)
    {
      case RADCMD_ACCESS_REQ:
-         printf(" rad-access-req %d", length);
+         printf(" rad-access-req %u", length);
          break;
 
      case RADCMD_ACCESS_ACC:
-         printf(" rad-access-accept %d", length);
+         printf(" rad-access-accept %u", length);
          break;
 
      case RADCMD_ACCESS_REJ:
-         printf(" rad-access-reject %d", length);
+         printf(" rad-access-reject %u", length);
          break;
 
      case RADCMD_ACCOUN_REQ:
-         printf(" rad-account-req %d", length);
+         printf(" rad-account-req %u", length);
          break;
 
      case RADCMD_ACCOUN_RES:
-         printf(" rad-account-resp %d", length);
+         printf(" rad-account-resp %u", length);
          break;
 
      case RADCMD_ACCESS_CHA:
-         printf(" rad-access-cha %d", length);
+         printf(" rad-access-cha %u", length);
          break;
 
      case RADCMD_STATUS_SER:
-         printf(" rad-status-serv %d", length);
+         printf(" rad-status-serv %u", length);
          break;
 
      case RADCMD_STATUS_CLI:
-         printf(" rad-status-cli %d", length);
+         printf(" rad-status-cli %u", length);
          break;
 
      case RADCMD_RESERVED:
-         printf(" rad-reserved %d", length);
+         printf(" rad-reserved %u", length);
          break;
 
      default:
-         printf(" rad-#%d %d", rad->code, length);
+         printf(" rad-#%u %u", rad->code, length);
          break;
    }
-   printf(" [id %d]", rad->id);
+   printf(" [id %u]", rad->id);
 
    if (i)
       radius_attr_print( dat + MIN_RADIUS_LEN, i);

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dvmrp.c,v 1.22 2002-08-01 08:53:05 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dvmrp.c,v 1.23 2002-09-05 00:00:11 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -154,7 +154,8 @@ print_report(register const u_char *bp, register const u_char *ep,
     register u_int len)
 {
 	register u_int32_t mask, origin;
-	register int metric, i, width, done;
+	register int metric, done;
+	register u_int i, width;
 
 	while (len > 0) {
 		if (len < 3) {

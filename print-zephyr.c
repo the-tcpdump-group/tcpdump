@@ -20,7 +20,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-zephyr.c,v 1.5 2002-08-01 08:53:35 risso Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-zephyr.c,v 1.6 2002-09-05 00:00:24 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -48,7 +48,7 @@ struct z_packet {
     char *inst;
     char *opcode;
     char *sender;
-    char *recipient;
+    const char *recipient;
     char *format;
     int cksum;
     int multi;
@@ -105,7 +105,7 @@ parse_field(char **pptr, int *len)
 }
 
 static const char *
-z_triple(char *class, char *inst, char *recipient)
+z_triple(char *class, char *inst, const char *recipient)
 {
     if (!*recipient)
 	recipient = "*";

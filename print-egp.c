@@ -20,7 +20,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-egp.c,v 1.30 2002-08-01 08:53:05 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-egp.c,v 1.31 2002-09-05 00:00:12 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -142,7 +142,7 @@ egpnrprint(register const struct egp_packet *egp, register u_int length)
 	register u_int netlen;
 	int gateways, distances, networks;
 	int t_gateways;
-	char *comma;
+	const char *comma;
 
 	addr = egp->egp_sourcenet;
 	if (IN_CLASSA(addr)) {

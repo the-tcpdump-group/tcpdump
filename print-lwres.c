@@ -29,7 +29,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lwres.c,v 1.6 2002-08-01 08:53:18 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lwres.c,v 1.7 2002-09-05 00:00:15 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -196,7 +196,7 @@ static int
 lwres_printname(size_t l, const char *p0)
 {
 	const char *p;
-	int i;
+	size_t i;
 
 	p = p0;
 	/* + 1 for terminating \0 */
@@ -420,9 +420,10 @@ lwres_print(register const u_char *bp, u_int length)
 
 			printf(" %s", tok2str(ns_type2str, "Type%d",
 			    ntohs(grbn->rdtype)));
-			if (ntohs(grbn->rdclass) != C_IN);
+			if (ntohs(grbn->rdclass) != C_IN) {
 				printf(" %s", tok2str(ns_class2str, "Class%d",
 				    ntohs(grbn->rdclass)));
+			}
 
 			/* XXX grbn points to packed struct */
 			s = (const char *)&grbn->namelen +
@@ -446,7 +447,7 @@ lwres_print(register const u_char *bp, u_int length)
 		lwres_gnbaresponse_t *gnba;
 		lwres_grbnresponse_t *grbn;
 		u_int32_t l, na;
-		int i;
+		u_int32_t i;
 
 		gabn = NULL;
 		gnba = NULL;
@@ -538,9 +539,10 @@ lwres_print(register const u_char *bp, u_int length)
 
 			printf(" %s", tok2str(ns_type2str, "Type%d",
 			    ntohs(grbn->rdtype)));
-			if (ntohs(grbn->rdclass) != C_IN);
+			if (ntohs(grbn->rdclass) != C_IN) {
 				printf(" %s", tok2str(ns_class2str, "Class%d",
 				    ntohs(grbn->rdclass)));
+			}
 			printf(" TTL ");
 			relts_print(ntohl(grbn->ttl));
 			printf(" %u/%u", ntohs(grbn->nrdatas),

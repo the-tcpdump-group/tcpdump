@@ -171,6 +171,9 @@
 /* Define if you have the <netdnet/dnetdb.h> header file.  */
 #undef HAVE_NETDNET_DNETDB_H
 
+/* Define if you have the <netinet/ether.h> header file.  */
+#undef HAVE_NETINET_ETHER_H
+
 /* Define if you have the <netinet/if_ether.h> header file.  */
 #undef HAVE_NETINET_IF_ETHER_H
 

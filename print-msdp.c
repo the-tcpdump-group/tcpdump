@@ -17,7 +17,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-msdp.c,v 1.3 2002-08-01 08:53:20 risso Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-msdp.c,v 1.4 2002-09-05 00:00:16 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -52,7 +52,7 @@ msdp_print(const unsigned char *sp, u_int length)
 		type = *sp;
 		len = EXTRACT_16BITS(sp + 1);
 		if (len > 1400 || vflag)
-			printf(" [len %d]", len);
+			printf(" [len %u]", len);
 		if (len < 3)
 			goto trunc;
 		sp += 3;
@@ -65,8 +65,8 @@ msdp_print(const unsigned char *sp, u_int length)
 			else
 				(void)printf(" SA-Response");
 			TCHECK(*sp);
-			(void)printf(" %d entries", *sp);
-			if (*sp * 12 + 8 < len) {
+			(void)printf(" %u entries", *sp);
+			if ((u_int)((*sp * 12) + 8) < len) {
 				(void)printf(" [w/data]");
 				if (vflag > 1) {
 					(void)printf(" ");
