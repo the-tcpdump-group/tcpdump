@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.40 2001-07-21 23:14:23 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.41 2001-09-23 21:52:39 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -231,7 +231,7 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 	}
 
 	if ((llc.ssap & ~LLC_GSAP) == llc.dsap) {
-		if (eflag)
+		if (eflag || esrc == NULL || edst == NULL)
 			(void)printf("%s ", llcsap_string(llc.dsap));
 		else
 			(void)printf("%s > %s %s ",
@@ -239,7 +239,7 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 					etheraddr_string(edst),
 					llcsap_string(llc.dsap));
 	} else {
-		if (eflag)
+		if (eflag || esrc == NULL || edst == NULL)
 			(void)printf("%s > %s ",
 				llcsap_string(llc.ssap & ~LLC_GSAP),
 				llcsap_string(llc.dsap));
