@@ -24,7 +24,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.145 2000-04-27 10:05:31 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.146 2000-04-27 10:41:27 itojun Exp $ (LBL)";
 #endif
 
 /*
@@ -478,7 +478,7 @@ default_print_unaligned(register const u_char *cp, register u_int length)
 void
 default_print(register const u_char *bp, register u_int length)
 {
-  default_print_unaligned(bp, length);
+	default_print_unaligned(bp, length);
 }
 
 __dead void
