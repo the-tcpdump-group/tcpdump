@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.242 2004-04-07 08:14:10 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.243 2004-06-15 00:00:04 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -741,7 +741,7 @@ main(int argc, char **argv)
 			/* NOTREACHED */
 		}
 
-	if (tflag > 0)
+	if (tflag > 0 || tflag == -3)
 		thiszone = gmt2local(0);
 
 #ifdef WITH_CHROOT
