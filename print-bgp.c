@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.26 2001-10-18 09:51:31 itojun Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.27 2001-10-18 09:52:17 itojun Exp $";
 #endif
 
 #include <sys/param.h>
@@ -131,7 +131,7 @@ static const char *bgptype[] = {
 #define bgp_type(x) num_or_str(bgptype, sizeof(bgptype)/sizeof(bgptype[0]), (x))
 
 static const char *bgpopt_type[] = {
-	NULL, "Authentication Information",
+	NULL, "Authentication Information", "Capabilities Advertisement",
 };
 #define bgp_opttype(x) \
 	num_or_str(bgpopt_type, sizeof(bgpopt_type)/sizeof(bgpopt_type[0]), (x))
