@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.96 2002-07-21 20:56:24 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.97 2002-07-28 04:14:22 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -122,7 +122,10 @@ static int tcp_cksum(register const struct ip *ip,
 	phu.ph.mbz = 0;
 	phu.ph.proto = IPPROTO_TCP;
 	memcpy(&phu.ph.src, &ip->ip_src.s_addr, sizeof(u_int32_t));
-	memcpy(&phu.ph.dst, &ip->ip_dst.s_addr, sizeof(u_int32_t));
+	if (IP_HL(ip) == 5)
+		memcpy(&phu.ph.dst, &ip->ip_dst.s_addr, sizeof(u_int32_t));
+	else
+		phu.ph.dst = ip_finddst(ip);
 
 	sp = &phu.pa[0];
 	return in_cksum((u_short *)tp, len,

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.104 2002-06-11 17:08:58 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.105 2002-07-28 04:14:22 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -305,7 +305,10 @@ static int udp_cksum(register const struct ip *ip,
 	phu.ph.mbz = 0;
 	phu.ph.proto = IPPROTO_UDP;
 	memcpy(&phu.ph.src, &ip->ip_src.s_addr, sizeof(u_int32_t));
-	memcpy(&phu.ph.dst, &ip->ip_dst.s_addr, sizeof(u_int32_t));
+	if (IP_HL(ip) == 5)
+		memcpy(&phu.ph.dst, &ip->ip_dst.s_addr, sizeof(u_int32_t));
+	else
+		phu.ph.dst = ip_finddst(ip);
 
 	sp = &phu.pa[0];
 	return in_cksum((u_short *)up, len,

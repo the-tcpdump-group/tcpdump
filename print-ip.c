@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.109 2002-07-21 20:48:26 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.110 2002-07-28 04:14:21 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -74,6 +74,52 @@ ip_printroute(const char *type, register const u_char *cp, u_int length)
 		type = " ";
 	}
 	printf("%s}", ptr == len? "#" : "");
+}
+
+/*
+ * If source-routing is present, return the final destination.
+ * Otherwise, return IP destination.
+ *
+ * This is used for UDP and TCP pseudo-header in the checksum
+ * calculation.
+ */
+u_int32_t
+ip_finddst(const struct ip *ip)
+{
+	int length;
+	int len;
+	const u_char *cp;
+	uint32_t retval;
+
+	cp = (const u_char *)(ip + 1);
+	length = (IP_HL(ip) << 2) - sizeof(struct ip);
+
+	for (; length > 0; cp += len, length -= len) {
+		int tt = *cp;
+
+		if (tt == IPOPT_NOP || tt == IPOPT_EOL)
+			len = 1;
+		else {
+			if (&cp[1] >= snapend) {
+				return 0;
+			}
+			len = cp[1];
+		}
+		if (len <= 0) {
+			return 0;
+		}
+		if (&cp[1] >= snapend || cp + len > snapend) {
+			return 0;
+		}
+		switch (tt) {
+
+		case IPOPT_SSRR:
+		case IPOPT_LSRR:
+			memcpy(&retval, cp + len - 4, 4);
+			return retval;
+		}
+	}
+	return ip->ip_dst.s_addr;
 }
 
 static void
