@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.56 2000-12-04 00:00:08 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.57 2001-02-21 05:59:37 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -498,8 +498,11 @@ rfc1048_print(register const u_char *bp, register u_int length)
 			/* Bytes */
 			while (size > 0) {
 				if (!first)
-					putchar (c == 'x' ? ':' : '.');
-				printf (c == 'x' ? "%02x" : "%d", *bp);
+					putchar(c == 'x' ? ':' : '.');
+				if (c == 'x')
+					printf("%02x", *bp);
+				else
+					printf("%d", *bp);
 				++bp;
 				--size;
 				first = 0;
@@ -519,7 +522,7 @@ static void
 cmu_print(register const u_char *bp, register u_int length)
 {
 	register const struct cmu_vend *cmu;
-	char *fmt = " %s:%s";
+	const char *fmt = " %s:%s";
 
 #define PRINTCMUADDR(m, s) { TCHECK(cmu->m); \
     if (cmu->m.s_addr != 0) \
