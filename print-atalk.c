@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.69 2001-09-17 21:57:55 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.70 2001-11-15 08:23:12 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -174,8 +174,8 @@ atalk_print(register const u_char *bp, u_int length)
 	u_short snet;
 
 	if (length < ddpSize) {
-	  (void)printf(" [|ddp %d]", length);
-	  return;
+		(void)printf(" [|ddp %d]", length);
+		return;
 	}
 	dp = (const struct atDDP *)bp;
 	snet = EXTRACT_16BITS(&dp->srcNet);
