@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.138 2003-02-04 06:00:36 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.139 2003-02-14 07:51:12 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -538,7 +538,8 @@ If
 there is no dir qualifier,
 .B "src or dst"
 is assumed.
-For `null' link layers (i.e. point to point protocols such as slip) the
+For some link layers, such as SLIP and the ``cooked'' Linux capture mode
+used for the ``any'' device and for some other device types, the
 .B inbound
 and
 .B outbound
