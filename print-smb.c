@@ -11,7 +11,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.10 2001-02-20 19:28:02 fenner Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.11 2001-04-03 22:55:33 fenner Exp $";
 #endif
 
 #include <stdio.h>
@@ -909,7 +909,7 @@ void nbt_udp137_print(const uchar *data, int length)
 	      p += 2;
 	    }
 	  } else {
-	    print_data(p,rdlen);
+	    print_data(p, min(rdlen, length - ((const uchar *)p - data)));
 	    p += rdlen;
 	  }
 	}
