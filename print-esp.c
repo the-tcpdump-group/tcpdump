@@ -52,10 +52,6 @@ static char rcsid[] =
 
 #include "interface.h"
 #include "addrtoname.h"
-#include "appletalk.h"
-
-#include "nfs.h"
-#include "bootp.h"
 
 extern int packettype;
 

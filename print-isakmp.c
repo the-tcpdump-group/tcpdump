@@ -45,6 +45,7 @@ static char rcsid[] =
 #endif
 
 #include <ctype.h>
+#include <pcap.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -68,7 +69,7 @@ struct isakmp_header {
   u_char  exgtype;
   u_char  flags;
   u_char  msgid[4];
-  u_int32 length;
+  u_int32_t length;
 };
 
 #define FLAGS_ENCRYPTION 1
@@ -83,8 +84,6 @@ isakmp_print(register const u_char *cp, int length)
   struct isakmp_header *ih;
   register const u_char *ep;
   int mode, version, leapind;
-  
-#define TCHECK(var, l) if ((u_char *)&(var) > ep - l) goto trunc
   
   ih = (struct isakmp_header *)cp;
   /* Note funny sized packets */
@@ -116,12 +115,12 @@ isakmp_print(register const u_char *cp, int length)
 	 ih->resp_cookie[0], ih->resp_cookie[1], 
 	 ih->resp_cookie[2], ih->resp_cookie[3]);
 
-  TCHECK(ih->msgid, sizeof(ih->msgid));
+  TCHECK(ih->msgid);
   printf(" msgid:%02x%02x%02x%02x",
 	 ih->msgid[0], ih->msgid[1],
 	 ih->msgid[2], ih->msgid[3]);
 
-  TCHECK(ih->length, sizeof(ih->length));
+  TCHECK(ih->length);
   printf(" length %d", ntohl(ih->length));
   
   if(ih->mjver > 1)

@@ -52,10 +52,6 @@ static char rcsid[] =
 
 #include "interface.h"
 #include "addrtoname.h"
-#include "appletalk.h"
-
-#include "nfs.h"
-#include "bootp.h"
 
 extern int packettype;
 
@@ -96,6 +92,9 @@ ah_print(register const u_char *bp, int length, register const u_char *bp2)
   (void)printf("spi:%08x seqno:%d authlen: %d authdata: ", spi,
 	       seqno, authlen);
   (void)default_print_unaligned(bp+12, authlen);
-  
-  (void)print_ipproto(nextheader, ip, nh, length-authlen);
+
+  /* PRINT rest of packet, requires some reorg of print-ip.c */
+#if XXX  
+  (void)ip_print(nextheader, ip, nh, length-authlen);
+#endif
 }
