@@ -150,6 +150,7 @@ print-ipfc.c
 print-ipx.c
 print-isakmp.c
 print-isoclns.c
+print-juniper.c
 print-krb.c
 print-l2tp.c
 print-lane.c
