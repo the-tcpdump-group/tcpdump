@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.29 2002-12-10 08:03:36 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.30 2002-12-11 06:55:08 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -268,9 +268,8 @@ atm_print(u_int vpi, u_int vci, u_int traftype, const u_char *p, u_int length,
 	default:
 		/*
 		 * Assumes traffic is LLC if unknown.
-                 * call into the generic LLC handler
 		 */
-		llc_print(p, length, caplen, NULL, NULL, NULL);
+		atm_llc_print(p, length, caplen);
 		break;
 
 	case ATM_LANE:
