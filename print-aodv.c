@@ -32,7 +32,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-aodv.c,v 1.2 2003-08-07 11:31:42 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-aodv.c,v 1.3 2003-08-13 02:23:07 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -103,18 +103,18 @@ aodv_rreq(union aodv *ap, const u_char *dat, u_int length, void *ip6
 #ifdef INET6
 	if (ip6 != NULL) {
 		printf(" rreq %d %s%s%s%s%shops %d id 0x%08lx\n"
-			"\tdst %s seq %d src %s seq %d", length,
+			"\tdst %s seq %ld src %s seq %ld", length,
 			ap->rreq6.rreq_type & RREQ_JOIN ? "[J]" : "",
 			ap->rreq6.rreq_type & RREQ_REPAIR ? "[R]" : "",
 			ap->rreq6.rreq_type & RREQ_GRAT ? "[G]" : "",
 			ap->rreq6.rreq_type & RREQ_DEST ? "[D]" : "",
 			ap->rreq6.rreq_type & RREQ_UNKNOWN ? "[U] " : " ",
 			ap->rreq6.rreq_hops,
-			EXTRACT_32BITS(ap->rreq6.rreq_id),
+			(unsigned long)EXTRACT_32BITS(ap->rreq6.rreq_id),
 			ip6addr_string(&ap->rreq6.rreq_da),
-			EXTRACT_32BITS(ap->rreq6.rreq_ds),
+			(unsigned long)EXTRACT_32BITS(ap->rreq6.rreq_ds),
 			ip6addr_string(&ap->rreq6.rreq_oa),
-			EXTRACT_32BITS(ap->rreq6.rreq_os));
+			(unsigned long)EXTRACT_32BITS(ap->rreq6.rreq_os));
 		if (i >= sizeof(ap->rreq6) + sizeof(struct aodv_ext)) {
 			aodv_extension((void *) (&ap->rreq6 + 1),
 					length - sizeof(ap->rreq6));
