@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.206 2003-05-11 06:01:17 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.207 2003-05-22 16:33:07 hannes Exp $ (LBL)";
 #endif
 
 /*
@@ -618,6 +618,9 @@ main(int argc, char **argv)
 #endif /* WIN32 */
 
 		pd = pcap_open_offline(RFileName, ebuf);
+                printf("reading from file %s, link-type %u\n",
+		       RFileName,
+		       pcap_datalink(pd));
 		if (pd == NULL)
 			error("%s", ebuf);
 		localnet = 0;
@@ -745,8 +748,8 @@ main(int argc, char **argv)
 			    program_name);
 		} else
 			(void)fprintf(stderr, "%s: ", program_name);
-		(void)fprintf(stderr, "listening on %s, capture size %u bytes\n",
-		    device, snaplen);
+		(void)fprintf(stderr, "listening on %s, link-type %u, capture size %u bytes\n",
+		    device, type, snaplen);
 		(void)fflush(stderr);
 	}
 #endif /* WIN32 */
