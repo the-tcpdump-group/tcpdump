@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.61 1999-11-22 04:27:10 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.62 1999-12-22 06:27:23 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -108,6 +108,9 @@ struct tcp_seq_hash {
 static struct tcp_seq_hash tcp_seq_hash[TSEQ_HASHSIZE];
 
 
+#ifndef BGP_PORT
+#define BGP_PORT	179
+#endif
 #define NETBIOS_SSN_PORT 139
 
 void
@@ -184,10 +187,11 @@ tcp_print(register const u_char *bp, register u_int length,
 		return;
 	}
 #ifdef TH_ECN
-	if ((flags = tp->th_flags) & (TH_SYN|TH_FIN|TH_RST|TH_PUSH|TH_ECN)) {
+	if ((flags = tp->th_flags) & (TH_SYN|TH_FIN|TH_RST|TH_PUSH|TH_ECN))
 #else
-	if ((flags = tp->th_flags) & (TH_SYN|TH_FIN|TH_RST|TH_PUSH)) {
+	if ((flags = tp->th_flags) & (TH_SYN|TH_FIN|TH_RST|TH_PUSH))
 #endif
+	{
 		if (flags & TH_SYN)
 			putchar('S');
 		if (flags & TH_FIN)
@@ -487,7 +491,7 @@ tcp_print(register const u_char *bp, register u_int length,
 	 * Decode payload if necessary.
 	 */
 	bp += (tp->th_off * 4);
-	if (sport == 179 || dport == 179)
+	if (sport == BGP_PORT || dport == BGP_PORT)
 		bgp_print(bp, length);
 	if (sport == NETBIOS_SSN_PORT || dport == NETBIOS_SSN_PORT)
 		nbt_tcp_print(bp, length);

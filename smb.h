@@ -149,4 +149,4 @@
 #define PTR_DIFF(p1,p2) ((unsigned long)(((char *)(p1)) - (char *)(p2)))
 
 /* some protos */
-uchar *fdata(uchar *buf,char *fmt,uchar *maxbuf);
+const uchar *fdata(const uchar *buf, const char *fmt, const uchar *maxbuf);

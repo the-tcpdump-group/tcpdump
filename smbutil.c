@@ -50,7 +50,7 @@ static void interpret_dos_date(uint32 date,int *year,int *month,int *day,int *ho
 /*******************************************************************
   create a unix date from a dos date
 ********************************************************************/
-static time_t make_unix_date(void *date_ptr)
+static time_t make_unix_date(const void *date_ptr)
 {
   uint32 dos_date=0;
   struct tm t;
@@ -71,7 +71,7 @@ static time_t make_unix_date(void *date_ptr)
 /*******************************************************************
   create a unix date from a dos date
 ********************************************************************/
-static time_t make_unix_date2(void *date_ptr)
+static time_t make_unix_date2(const void *date_ptr)
 {
   uint32 x,x2;
 
@@ -86,7 +86,7 @@ static time_t make_unix_date2(void *date_ptr)
 interpret an 8 byte "filetime" structure to a time_t
 It's originally in "100ns units since jan 1st 1601"
 ****************************************************************************/
-static time_t interpret_long_date(char *p)
+static time_t interpret_long_date(const char *p)
 {
   double d;
   time_t ret;
@@ -167,9 +167,9 @@ static int name_extract(char *buf,int ofs,char *name)
 /****************************************************************************
 return the total storage length of a mangled name
 ****************************************************************************/
-static int name_len(unsigned char *s)
+static int name_len(const unsigned char *s)
 {
-  char *s0 = s;
+  const char *s0 = s;
   unsigned char c = *(unsigned char *)s;
   if ((c & 0xC0) == 0xC0)
     return(2);  
@@ -177,7 +177,7 @@ static int name_len(unsigned char *s)
   return(PTR_DIFF(s,s0)+1);
 }
 
-static void print_asc(unsigned char *buf,int len)
+static void print_asc(const unsigned char *buf,int len)
 {
   int i;
   for (i=0;i<len;i++)
@@ -199,7 +199,7 @@ static char *name_type_str(int name_type)
   return(f);
 }
 
-void print_data(unsigned char *buf,int len)
+void print_data(const unsigned char *buf, int len)
 {
   int i=0;
   if (len<=0) return;
@@ -246,7 +246,7 @@ static void write_bits(unsigned int val,char *fmt)
 }
 
 /* convert a unicode string */
-static char *unistr(char *s, int *len)
+static const char *unistr(const char *s, int *len)
 {
 	static char buf[1000];
 	int l=0;
@@ -283,7 +283,7 @@ static char *unistr(char *s, int *len)
 	return buf;
 }
 
-static uchar *fdata1(uchar *buf,char *fmt,uchar *maxbuf)
+static const uchar *fdata1(const uchar *buf, const char *fmt, const uchar *maxbuf)
 {
   int reverse=0;
   char *attrib_fmt = "READONLY|HIDDEN|SYSTEM|VOLUME|DIR|ARCHIVE|";
@@ -482,7 +482,7 @@ static uchar *fdata1(uchar *buf,char *fmt,uchar *maxbuf)
   return(buf);
 }
 
-uchar *fdata(uchar *buf,char *fmt,uchar *maxbuf)
+const uchar *fdata(const uchar *buf, const char *fmt, const uchar *maxbuf)
 {
   static int depth=0;
   char s[128];
@@ -493,7 +493,7 @@ uchar *fdata(uchar *buf,char *fmt,uchar *maxbuf)
     case '*':
       fmt++;
       while (buf < maxbuf) {
-	uchar *buf2;
+	const uchar *buf2;
 	depth++;
 	buf2 = fdata(buf,fmt,maxbuf);
 	depth--;

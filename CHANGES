@@ -1,3 +1,14 @@
+Wed Dec 22 13:06:17 JST 1999  itojun@iijlab.net
+	* print-rt6.c: make IPv6 routing header printing work with new 2292bis
+	  API.
+	* print-bgp.c: improve options printing.  ugly code exists for
+	  unaligned option parsing (need some fix).
+	* const poisoning in SMB decoder.
+	* make dump format back to original.  someone may want to add an
+	  option to do ascii printing, but keep the default behavior as is
+	  for scripts used in many places.
+	* -Wall -Werror clean checks.
+
 1999-11-21  Assar Westerlund  <assar@sics.se>
 
 	* Add SMB printing code from Andrew Tridgell <tridge@linuxcare.com>
@@ -543,4 +554,4 @@ v2.0 Sun Jan 13 12:20:40 PST 1991
 
 - Initial public release.
 
-@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.61 1999-11-21 15:58:53 assar Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.62 1999-12-22 06:27:19 itojun Exp $ (LBL)

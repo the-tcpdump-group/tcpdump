@@ -29,7 +29,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.2 1999-11-21 09:36:50 fenner Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.3 1999-12-22 06:27:20 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -54,6 +54,7 @@ struct rtentry;
 #endif
 #include <stdio.h>
 #include <string.h>
+#include <arpa/inet.h>
 
 #include "interface.h"
 #include "addrtoname.h"
@@ -62,8 +63,8 @@ struct rtentry;
 
 #if 0
 static void dhcp6opttab_init __P((void));
-#endif
 static struct dhcp6_opt *dhcp6opttab_byname __P((char *));
+#endif
 static struct dhcp6_opt *dhcp6opttab_bycode __P((u_int));
 
 static char tstr[] = " [|dhcp6]";
@@ -122,6 +123,7 @@ dhcp6opttab_init()
 }
 #endif
 
+#if 0
 static struct dhcp6_opt *
 dhcp6opttab_byname(name)
 	char *name;
@@ -133,6 +135,7 @@ dhcp6opttab_byname(name)
 			return p;
 	return NULL;
 }
+#endif
 
 static struct dhcp6_opt *
 dhcp6opttab_bycode(code)
@@ -151,7 +154,6 @@ dhcp6ext_print(u_char *cp, u_char *ep)
 {
 	u_int16_t code, len;
 	struct dhcp6_opt *p;
-	char *q;
 	char buf[BUFSIZ];
 	int i;
 

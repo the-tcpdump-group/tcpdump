@@ -18,7 +18,7 @@
 
 static int request=0;
 
-uchar *startbuf=NULL;
+const uchar *startbuf=NULL;
 
 struct smbdescript
 {
@@ -179,9 +179,9 @@ static void print_trans2(uchar *words,uchar *dat,uchar *buf,uchar *maxbuf)
 }
 
 
-static void print_browse(uchar *param,int paramlen,uchar *data,int datalen)
+static void print_browse(uchar *param,int paramlen,const uchar *data,int datalen)
 {
-  uchar *maxbuf = data + datalen;
+  const uchar *maxbuf = data + datalen;
   int command = CVAL(data,0);
 
   fdata(param,"BROWSE PACKET\n|Param ",param+paramlen);
@@ -605,10 +605,10 @@ NULL,NULL}},
 /*******************************************************************
 print a SMB message
 ********************************************************************/
-static void print_smb(uchar *buf,uchar *maxbuf)
+static void print_smb(const uchar *buf, const uchar *maxbuf)
 {
   int command;
-  uchar *words, *data;
+  const uchar *words, *data;
   struct smbfns *fn;
   char *fmt_smbheader = 
 "[P4]SMB Command   =  [B]\nError class   =  [BP1]\nError code    =  [d]\nFlags1        =  [B]\nFlags2        =  [B][P13]\nTree ID       =  [d]\nProc ID       =  [d]\nUID           =  [d]\nMID           =  [d]\nWord Count    =  [b]\n";
@@ -673,7 +673,7 @@ static void print_smb(uchar *buf,uchar *maxbuf)
 	  printf("smb_bcc=%d\n",bcc);
 	  if (bcc>0) {
 	    printf("smb_buf[]=\n");
-	    print_data(data+2,MIN(bcc,PTR_DIFF(maxbuf,data+2)));
+	    print_data(data + 2, MIN(bcc,PTR_DIFF(maxbuf,data+2)));
 	  }
 	}
       }
@@ -698,11 +698,12 @@ static void print_smb(uchar *buf,uchar *maxbuf)
 /*
    print a NBT packet received across tcp on port 139
 */
-void nbt_tcp_print(uchar *data,int length)
+void nbt_tcp_print(const uchar *data,int length)
 {
-  uchar *maxbuf = data + length;
+  const uchar *maxbuf = data + length;
   int flags = CVAL(data,0);
   int nbt_len = RSVAL(data,2);
+
   startbuf = data;
   if (maxbuf <= data) return;
 
@@ -715,7 +716,7 @@ void nbt_tcp_print(uchar *data,int length)
     data = fdata(data,"NBT Session Packet\nFlags=[rw]\nLength=[rd]\n",data+4);
     if (memcmp(data,"\377SMB",4)==0) {
       if (nbt_len>PTR_DIFF(maxbuf,data))
-	printf("WARNING: Short packet. Try increasing the snap length (%d)\n",
+	printf("WARNING: Short packet. Try increasing the snap length (%ld)\n",
 	       PTR_DIFF(maxbuf,data));
       print_smb(data,maxbuf>data+nbt_len?data+nbt_len:maxbuf);
     } else {
@@ -771,9 +772,9 @@ void nbt_tcp_print(uchar *data,int length)
 /*
    print a NBT packet received across udp on port 137
 */
-void nbt_udp137_print(uchar *data,int length)
+void nbt_udp137_print(const uchar *data, int length)
 {
-  uchar *maxbuf = data + length;
+  const uchar *maxbuf = data + length;
   int name_trn_id = RSVAL(data,0);
   int response = (CVAL(data,2)>>7);
   int opcode = (CVAL(data,2) >> 3) & 0xF;
@@ -785,7 +786,7 @@ void nbt_udp137_print(uchar *data,int length)
   int arcount = RSVAL(data,10);
   char des[1024];
   char *opcodestr="OPUNKNOWN";  
-  char *p;
+  const char *p;
 
   startbuf = data;
 
@@ -897,9 +898,9 @@ void nbt_udp137_print(uchar *data,int length)
 /*
    print a NBT packet received across udp on port 138
 */
-void nbt_udp138_print(uchar *data,int length)
+void nbt_udp138_print(const uchar *data, int length)
 {
-  uchar *maxbuf = data + length;
+  const uchar *maxbuf = data + length;
   startbuf = data;
   if (maxbuf <= data) return;
 
@@ -916,11 +917,11 @@ void nbt_udp138_print(uchar *data,int length)
 /*
    print netbeui frames 
 */
-void netbeui_print(uchar *data,uchar *maxbuf)
+void netbeui_print(const uchar *data, const uchar *maxbuf)
 {
   int len = SVAL(data,1);
   int command = CVAL(data,5);
-  uchar *data2 = data + 1 + len;
+  const uchar *data2 = data + 1 + len;
 
   startbuf = data;
 
@@ -984,7 +985,7 @@ void netbeui_print(uchar *data,uchar *maxbuf)
 /*
    print IPX-Netbios frames 
 */
-void ipx_netbios_print(uchar *data,uchar *maxbuf)
+void ipx_netbios_print(const uchar *data, const uchar *maxbuf)
 {
   /* this is a hack till I work out how to parse the rest of the IPX stuff */
   int i;

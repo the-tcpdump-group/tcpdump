@@ -74,6 +74,12 @@ struct bgp_open {
 	/* options should follow */
 };
 
+struct bgp_opt {
+	u_int8_t bgpopt_type;
+	u_int8_t bgpopt_len;
+	/* variable length */
+};
+
 struct bgp_notification {
 	u_int8_t bgpn_marker[16];
 	u_int16_t bgpn_len;
@@ -104,6 +110,12 @@ struct bgp_attr {
 #define BGPTYPE_LOCAL_PREF		5
 #define BGPTYPE_ATOMIC_AGGREGATE	6
 #define BGPTYPE_AGGREGATOR		7
+#define	BGPTYPE_COMMUNITIES		8	/* RFC1997 */
+#define	BGPTYPE_ORIGINATOR_ID		9	/* RFC1998 */
+#define	BGPTYPE_CLUSTER_LIST		10	/* RFC1998 */
+#define	BGPTYPE_DPA			11	/* work in progress */
+#define	BGPTYPE_ADVERTISERS		12	/* RFC1863 */
+#define	BGPTYPE_RCID_PATH		13	/* RFC1863 */
 #define BGPTYPE_MP_REACH_NLRI		14	/* RFC2283 */
 #define BGPTYPE_MP_UNREACH_NLRI		15	/* RFC2283 */
 
@@ -112,6 +124,12 @@ static const char *bgptype[] = {
 	NULL, "OPEN", "UPDATE", "NOTIFICATION", "KEEPALIVE",
 };
 #define bgp_type(x) num_or_str(bgptype, sizeof(bgptype)/sizeof(bgptype[0]), (x))
+
+static const char *bgpopt_type[] = {
+	NULL, "Authentication Information",
+};
+#define bgp_opttype(x) \
+	num_or_str(bgpopt_type, sizeof(bgpopt_type)/sizeof(bgpopt_type[0]), (x))
 
 static const char *bgpnotify_major[] = {
 	NULL, "Message Header Error",
@@ -163,8 +181,8 @@ static const char *bgpattr_origin[] = {
 static const char *bgpattr_type[] = {
 	NULL, "ORIGIN", "AS_PATH", "NEXT_HOP",
 	"MULTI_EXIT_DISC", "LOCAL_PREF", "ATOMIC_AGGREGATE", "AGGREGATOR",
-	NULL, NULL, NULL, NULL,
-	NULL, NULL, "MP_REACH_NLRI", "MP_UNREACH_NLRI",
+	"COMMUNITIES", "ORIGINATOR_ID", "CLUSTER_LIST", "DPA",
+	"ADVERTISERS", "RCID_PATH", "MP_REACH_NLRI", "MP_UNREACH_NLRI",
 };
 #define bgp_attr_type(x) \
 	num_or_str(bgpattr_type, \
@@ -177,6 +195,11 @@ static const char *bgpattr_nlri_safi[] = {
 #define bgp_attr_nlri_safi(x) \
 	num_or_str(bgpattr_nlri_safi, \
 		sizeof(bgpattr_nlri_safi)/sizeof(bgpattr_nlri_safi[0]), (x))
+
+/* well-known community */
+#define BGP_COMMUNITY_NO_EXPORT			0xffffff01
+#define BGP_COMMUNITY_NO_ADVERT			0xffffff02
+#define BGP_COMMUNITY_NO_EXPORT_SUBCONFED	0xffffff03
 
 /* RFC1700 address family numbers */
 #define AFNUM_INET	1
@@ -311,8 +334,23 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 			printf(" invalid len");
 			break;
 		}
-		for (i = 0; i < len; i += 2)
-			printf(" %u", ntohs(*(u_int16_t *)&p[i]));
+		while (p < dat + len) {
+			/*
+			 * under RFC1965, p[0] means:
+			 * 1: AS_SET 2: AS_SEQUENCE
+			 * 3: AS_CONFED_SET 4: AS_CONFED_SEQUENCE
+			 */
+			printf(" ");
+			if (p[0] == 3 || p[0] == 4)
+				printf("confed");
+			printf("%s", (p[0] & 1) ? "{" : "");
+			for (i = 0; i < p[1]; i += 2) {
+				printf("%s%u", i == 0 ? "" : " ",
+					ntohs(*(u_int16_t *)&p[2 + i]));
+			}
+			printf("%s", (p[0] & 1) ? "}" : "");
+			p += 2 + p[1] * 2;
+		}
 		break;
 	case BGPTYPE_NEXT_HOP:
 		if (len != 4)
@@ -338,6 +376,31 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 		}
 		printf(" AS #%u, origin %s", ntohs(*(u_int16_t *)p),
 			getname(p + 2));
+		break;
+	case BGPTYPE_COMMUNITIES:
+		if (len % 4) {
+			printf(" invalid len");
+			break;
+		}
+		for (i = 0; i < len; i++) {
+			u_int32_t comm;
+			comm = (u_int32_t)ntohl(*(u_int32_t *)&p[i]);
+			switch (comm) {
+			case BGP_COMMUNITY_NO_EXPORT:
+				printf(" NO_EXPORT");
+				break;
+			case BGP_COMMUNITY_NO_ADVERT:
+				printf(" NO_ADVERTISE");
+				break;
+			case BGP_COMMUNITY_NO_EXPORT_SUBCONFED:
+				printf(" NO_EXPORT_SUBCONFED");
+				break;
+			default:
+				printf(" (AS #%d value 0x%04x)",
+					(comm >> 16) & 0xffff, comm & 0xfffff);
+				break;
+			}
+		}
 		break;
 	case BGPTYPE_MP_REACH_NLRI:
 		af = ntohs(*(u_int16_t *)p);
@@ -440,7 +503,10 @@ static void
 bgp_open_print(const u_char *dat, int length)
 {
 	struct bgp_open bgpo;
+	struct bgp_opt bgpopt;
 	int hlen;
+	const u_char *opt;
+	int i;
 
 	memcpy(&bgpo, dat, sizeof(bgpo));
 	hlen = ntohs(bgpo.bgpo_len);
@@ -450,6 +516,22 @@ bgp_open_print(const u_char *dat, int length)
 	printf(" Holdtime %u,", ntohs(bgpo.bgpo_holdtime));
 	printf(" ID %s,", getname((char *)&bgpo.bgpo_id));
 	printf(" Option length %u", bgpo.bgpo_optlen);
+
+	/* ugly! */
+	opt = &((struct bgp_open *)dat)->bgpo_optlen;
+	opt++;
+
+	for (i = 0; i < bgpo.bgpo_optlen; i++) {
+		memcpy(&bgpopt, &opt[i], sizeof(bgpopt));
+		if (i + 2 + bgpopt.bgpopt_len > bgpo.bgpo_optlen) {
+			printf(" [|opt %d %d]", bgpopt.bgpopt_len, bgpopt.bgpopt_type);
+			break;
+		}
+
+		printf(" (option %s, len=%d)", bgp_opttype(bgpopt.bgpopt_type),
+			bgpopt.bgpopt_len);
+		i += sizeof(bgpopt) + bgpopt.bgpopt_len;
+	}
 }
 
 static void
@@ -505,14 +587,6 @@ bgp_update_print(const u_char *dat, int length)
 			bgp_attr_print(&bgpa, &p[i + aoff], alen);
 			newline = 1;
 
-#if 0
-	    default:
-		proto_tree_add_text(subtree2, p - pd + i + aoff, alen,
-			"Unknown (%d bytes)", alen);
-		break;
-	    }
-#endif
-
 			/* ( */
 			printf(")");	
 
@@ -524,6 +598,22 @@ bgp_update_print(const u_char *dat, int length)
 	}
 	p += 2 + len;
 
+	if (len && dat + length > p)
+		printf("\n\t\t");
+	if (dat + length > p) {
+		printf("(NLRI:");	/* ) */
+		while (dat + length > p) {
+			char buf[256];
+			i = decode_prefix4(p, buf, sizeof(buf));
+			printf(" %s", buf);
+			if (i < 0)
+				break;
+			p += i;
+		}
+
+		/* ( */
+		printf(")");
+	}
 }
 
 static void

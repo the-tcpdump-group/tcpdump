@@ -24,7 +24,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.136 1999-12-13 18:06:15 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.137 1999-12-22 06:27:24 itojun Exp $ (LBL)";
 #endif
 
 /*
@@ -50,6 +50,7 @@ static const char rcsid[] =
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <ctype.h>
 
 #include <netinet/in_systm.h>
 #include <netinet/ip.h>
@@ -444,7 +445,25 @@ cleanup(int signo)
 void
 default_print_unaligned(register const u_char *cp, register u_int length)
 {
-  register u_int i, s;
+#if 1
+	register u_int i, s;
+	register int nshorts;
+
+	nshorts = (u_int) length / sizeof(u_short);
+	i = 0;
+	while (--nshorts >= 0) {
+		if ((i++ % 8) == 0)
+			(void)printf("\n\t\t\t");
+		s = *cp++;
+		(void)printf(" %02x%02x", s, *cp++);
+	}
+	if (length & 1) {
+		if ((i % 8) == 0)
+			(void)printf("\n\t\t\t");
+		(void)printf(" %02x", *cp);
+	}
+#else
+  register u_int i;
   register int nshorts;
 
   char line[81];
@@ -480,6 +499,7 @@ default_print_unaligned(register const u_char *cp, register u_int length)
     cp += 2;
     nshorts--;
   }
+#endif
 }
 
 /*
@@ -490,10 +510,6 @@ default_print_unaligned(register const u_char *cp, register u_int length)
 void
 default_print(register const u_char *bp, register u_int length)
 {
-	register const u_short *sp;
-	register u_int i;
-	register int nshorts;
-
 	default_print_unaligned(bp, length);
 }
 

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.78 1999-12-15 00:34:10 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.79 1999-12-22 06:27:21 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -119,8 +119,8 @@ static void print_mtrace(register const u_char *bp, register u_int len)
 {
 	register struct tr_query *tr = (struct tr_query *)(bp + 8);
 
-	printf("mtrace %ld: %s to %s reply-to %s",
-		TR_GETQID(ntohl(tr->tr_rttlqid)),
+	printf("mtrace %lu: %s to %s reply-to %s",
+		(u_long)TR_GETQID(ntohl(tr->tr_rttlqid)),
 		ipaddr_string(&tr->tr_src), ipaddr_string(&tr->tr_dst),
 		ipaddr_string(&tr->tr_raddr));
 	if (IN_CLASSD(ntohl(tr->tr_raddr)))
@@ -131,8 +131,8 @@ static void print_mresp(register const u_char *bp, register u_int len)
 {
 	register struct tr_query *tr = (struct tr_query *)(bp + 8);
 
-	printf("mresp %ld: %s to %s reply-to %s",
-		TR_GETQID(ntohl(tr->tr_rttlqid)),
+	printf("mresp %lu: %s to %s reply-to %s",
+		(u_long)TR_GETQID(ntohl(tr->tr_rttlqid)),
 		ipaddr_string(&tr->tr_src), ipaddr_string(&tr->tr_dst),
 		ipaddr_string(&tr->tr_raddr));
 	if (IN_CLASSD(ntohl(tr->tr_raddr)))

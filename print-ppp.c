@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.32 1999-12-15 07:52:15 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.33 1999-12-22 06:27:22 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -481,7 +481,7 @@ ppp_if_print(u_char *user, const struct pcap_pkthdr *h,
 	ip = (struct ip *)(p + PPP_HDRLEN);
 	switch (proto) {
 	case PPP_LCP:
-		handle_lcp (p, length);
+		handle_lcp(p, length);
 		break;
 	case PPP_CHAP:
 		handle_chap(p, length);
@@ -512,36 +512,36 @@ out:
 }
 
 struct tok ppptype2str[] = {
-  { PPP_IP,	"IP" },
-  { PPP_OSI,	"OSI" },
-  { PPP_NS,	"NS" },
-  { PPP_DECNET,	"DECNET" },
-  { PPP_APPLE,	"APPLE" },
-  { PPP_IPX,	"IPX" },
-  { PPP_VJC,	"VJC" },
-  { PPP_VJNC,	"VJNC" },
-  { PPP_BRPDU,	"BRPDU" },
-  { PPP_STII,	"STII" },
-  { PPP_VINES,	"VINES" },
+	{ PPP_IP,	"IP" },
+	{ PPP_OSI,	"OSI" },
+	{ PPP_NS,	"NS" },
+	{ PPP_DECNET,	"DECNET" },
+	{ PPP_APPLE,	"APPLE" },
+	{ PPP_IPX,	"IPX" },
+	{ PPP_VJC,	"VJC" },
+	{ PPP_VJNC,	"VJNC" },
+	{ PPP_BRPDU,	"BRPDU" },
+	{ PPP_STII,	"STII" },
+	{ PPP_VINES,	"VINES" },
 
-  { PPP_HELLO,	"HELLO" },
-  { PPP_LUXCOM,	"LUXCOM" },
-  { PPP_SNS,	"SNS" },
-  { PPP_IPCP,	"IPCP" },
-  { PPP_OSICP,	"OSICP" },
-  { PPP_NSCP,	"NSCP" },
-  { PPP_DECNETCP, "DECNETCP" },
-  { PPP_APPLECP, "APPLECP" },
-  { PPP_IPXCP,	"IPXCP" },
-  { PPP_STIICP,	"STIICP" },
-  { PPP_VINESCP, "VINESCP" },
+	{ PPP_HELLO,	"HELLO" },
+	{ PPP_LUXCOM,	"LUXCOM" },
+	{ PPP_SNS,	"SNS" },
+	{ PPP_IPCP,	"IPCP" },
+	{ PPP_OSICP,	"OSICP" },
+	{ PPP_NSCP,	"NSCP" },
+	{ PPP_DECNETCP, "DECNETCP" },
+	{ PPP_APPLECP, "APPLECP" },
+	{ PPP_IPXCP,	"IPXCP" },
+	{ PPP_STIICP,	"STIICP" },
+	{ PPP_VINESCP, "VINESCP" },
 
-  { PPP_LCP,	"LCP" },
-  { PPP_PAP,	"PAP" },
-  { PPP_LQM,	"LQM" },
-  { PPP_CHAP,	"CHAP" },
-  { 0,		NULL }
- };
+	{ PPP_LCP,	"LCP" },
+	{ PPP_PAP,	"PAP" },
+	{ PPP_LQM,	"LQM" },
+	{ PPP_CHAP,	"CHAP" },
+	{ 0,		NULL }
+};
 
 #define PPP_BSDI_HDRLEN 24
 

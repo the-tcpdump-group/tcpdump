@@ -26,7 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-/* YIPS @(#)$Id: isakmp.h,v 1.3 1999-11-17 04:14:50 assar Exp $ */
+/* YIPS @(#)$Id: isakmp.h,v 1.4 1999-12-22 06:27:20 itojun Exp $ */
 
 /* refer to RFC 2408 */
 
@@ -98,20 +98,20 @@ typedef struct { /* i_cookie + r_cookie */
         +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
 struct isakmp {
-	cookie_t i_ck;     /* Initiator Cookie */
-	cookie_t r_ck;     /* Responder Cookie */
-	u_int8_t   np;       /* Next Payload Type */
+	cookie_t i_ck;		/* Initiator Cookie */
+	cookie_t r_ck;		/* Responder Cookie */
+	u_int8_t np;		/* Next Payload Type */
 #if defined(WORDS_BIGENDIAN) || (defined(BYTE_ORDER) && (BYTE_ORDER == BIG_ENDIAN))
-	u_int   v_maj:4,  /* MnVer */
-	         v_min:4;  /* MjVer */
+	u_int v_maj:4,		/* MnVer */
+		v_min:4;	/* MjVer */
 #else
-	u_int   v_min:4,  /* MnVer */
-	         v_maj:4;  /* MjVer */
+	u_int v_min:4,		/* MnVer */
+		v_maj:4;	/* MjVer */
 #endif
-	u_int8_t   etype;    /* Exchange Type */
-	u_int8_t   flags;    /* Flags */
-	msgid_t  msgid;
-	u_int32_t  len;      /* Length */
+	u_int8_t etype;		/* Exchange Type */
+	u_int8_t flags;		/* Flags */
+	msgid_t msgid;
+	u_int32_t len;		/* Length */
 };
 
 /* Next Payload Type */

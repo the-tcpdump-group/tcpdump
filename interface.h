@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.116 1999-12-15 07:55:42 fenner Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.117 1999-12-22 06:27:20 itojun Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -48,6 +48,7 @@ extern int tflag;		/* print packet arrival time */
 extern int vflag;		/* verbose */
 extern int xflag;		/* print packet in hex */
 
+extern char *ahsecret;
 extern char *espsecret;
 
 extern int packettype;		/* as specified by -T */
@@ -231,13 +232,13 @@ extern int esp_print(register const u_char *, register const u_char *, int *);
 extern void isakmp_print(const u_char *, u_int, const u_char *);
 extern int ipcomp_print(register const u_char *, register const u_char *, int *);
 extern void rx_print(register const u_char *, int, int, int, u_char *);
-extern void netbeui_print(u_char *, u_char *);
-extern void ipx_netbios_print(u_char *, u_char *);
-extern void nbt_tcp_print(u_char *, int);
-extern void nbt_udp137_print(u_char *data, int);
-extern void nbt_udp138_print(u_char *data, int);
+extern void netbeui_print(const u_char *, const u_char *);
+extern void ipx_netbios_print(const u_char *, const u_char *);
+extern void nbt_tcp_print(const u_char *, int);
+extern void nbt_udp137_print(const u_char *data, int);
+extern void nbt_udp138_print(const u_char *data, int);
 extern char *smb_errstr(int, int);
-extern void print_data(unsigned char *, int);
+extern void print_data(const unsigned char *, int);
 extern void l2tp_print(const u_char *, u_int);
 extern void lcp_print(const u_char *, u_int);
 

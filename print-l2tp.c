@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-l2tp.c,v 1.5 1999-12-15 06:55:43 fenner Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-l2tp.c,v 1.6 1999-12-22 06:27:21 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -156,6 +156,7 @@ static struct l2tp_avp_vec l2tp_avp[] = {
 #define L2TP_MAX_AVP_INDEX	40
 };
 
+#if 0
 static char *l2tp_result_code_StopCCN[] = {
          "Reserved",
          "General request to clear control connection",
@@ -167,7 +168,9 @@ static char *l2tp_result_code_StopCCN[] = {
          "Finite State Machine error"
 #define L2TP_MAX_RESULT_CODE_STOPCC_INDEX	8
 };
+#endif
 
+#if 0
 static char *l2tp_result_code_CDN[] = {
 	"Reserved",
 	"Call disconnected due to loss of carrier",
@@ -185,7 +188,9 @@ static char *l2tp_result_code_CDN[] = {
 	"Call was connected but no appropriate framing was detected"
 #define L2TP_MAX_RESULT_CODE_CDN_INDEX	12
 };
+#endif
 
+#if 0
 static char *l2tp_error_code_general[] = {
 	"No general error",
 	"No control connection exists yet for this LAC-LNS pair",
@@ -198,6 +203,7 @@ static char *l2tp_error_code_general[] = {
 	"Try another"
 #define L2TP_MAX_ERROR_CODE_GENERAL_INDEX	8
 };
+#endif
 
 /******************************/
 /* generic print out routines */
@@ -223,13 +229,13 @@ print_octets(const u_char *dat, u_int length)
 static void
 print_short(const u_short *dat)
 {
-	printf("%d", ntohs(*dat));
+	printf("%u", ntohs(*dat));
 }
 
 static void
 print_int(const u_int *dat)
 {
-	printf("%d", ntohl(*dat));
+	printf("%lu", (u_long)ntohl(*dat));
 }
 
 /**********************************/
@@ -252,11 +258,11 @@ l2tp_result_code_print(const u_char *dat, u_int length)
 	u_short *ptr = (u_short *)dat;
 	
 	if (length == 2) {		/* result code */
-		printf("%d", ntohs(*ptr));	
+		printf("%u", ntohs(*ptr));	
 	} else if (length == 4) { 	/* result & error code */
-		printf("%d/%d", ntohs(*ptr), ntohs(*(ptr+1)));
+		printf("%u/%u", ntohs(*ptr), ntohs(*(ptr+1)));
 	} else if (length > 4) {	/* result & error code & msg */
-		printf("%d/%d ", ntohs(*ptr), ntohs(*(ptr+1)));
+		printf("%u/%u ", ntohs(*ptr), ntohs(*(ptr+1)));
 		print_string((u_char *)(ptr+2), length - 4);
 	}
 }
@@ -340,7 +346,7 @@ static void
 l2tp_q931_cc_print(const u_char *dat, u_int length)
 {
 	print_short((u_short *)dat);
-	printf(",%02x", dat+2);
+	printf(", %02x", dat[2]);
 	if (length > 3) {
 		printf(" ");
 		print_string(dat+3, length-3);
@@ -503,7 +509,7 @@ l2tp_proxy_auth_id_print(const u_char *dat, u_int length)
 {
 	u_short *ptr = (u_short *)dat;
 
-	printf("%d", ntohs(*ptr) & L2TP_PROXY_AUTH_ID_MASK);
+	printf("%u", ntohs(*ptr) & L2TP_PROXY_AUTH_ID_MASK);
 }
 
 static void
@@ -602,7 +608,7 @@ l2tp_avp_print(const u_char *dat, u_int length)
 			}
 			printf(")");
 		} else {
-			printf(" invalid AVP %d", ntohs(*ptr));
+			printf(" invalid AVP %u", ntohs(*ptr));
 		}
 
 		l2tp_avp_print(dat + len, length - len);
@@ -676,13 +682,13 @@ l2tp_print(const u_char *dat, u_int length)
 		l2tp_len = 0;
 	}
 
-	printf("(%d/", ntohs(*ptr++));		/* Tunnel ID */
-	printf("%d)",  ntohs(*ptr++));		/* Session ID */
+	printf("(%u/", ntohs(*ptr++));		/* Tunnel ID */
+	printf("%u)",  ntohs(*ptr++));		/* Session ID */
 	cnt += 4;
 
 	if (flag_s) {
-		printf("Ns=%d,", ntohs(*ptr++));
-		printf("Nr=%d",  ntohs(*ptr++));
+		printf("Ns=%u,", ntohs(*ptr++));
+		printf("Nr=%u",  ntohs(*ptr++));
 		cnt += 4;
 	}
 
