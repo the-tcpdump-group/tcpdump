@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.69 2002-12-05 23:40:10 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.70 2002-12-10 17:17:14 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -247,15 +247,16 @@ static struct tok isis_subtlv_idrp_values[] = {
 
 #define ISIS_MASK_TLV_SHARED_RISK_GROUP(x) ((x)&0x1)
 
-static const char *isis_gmpls_link_prot_values[] = {
-    "Extra",
-    "Unprotected",
-    "Shared",
-    "Dedicated 1:1",
-    "Dedicated 1+1",
-    "Enhanced",
-    "Reserved",
-    "Reserved"
+static struct tok isis_gmpls_link_prot_values[] = {
+    { 0x01, "Extra Traffic"},
+    { 0x02, "Unprotected"},
+    { 0x04, "Shared"},
+    { 0x08, "Dedicated 1:1"},
+    { 0x10, "Dedicated 1+1"},
+    { 0x20, "Enhanced"},
+    { 0x40, "Reserved"},
+    { 0x80, "Reserved"},
+    { 0, NULL }
 };
 
 static struct tok isis_gmpls_sw_cap_values[] = {
@@ -905,8 +906,11 @@ trunctlv:
 static int
 isis_print_is_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *ident) {
 
-        int i,j;
-        float bw; /* copy buffer for several subTLVs */
+        int i;
+        union { /* int to float conversion buffer for several subTLVs */
+            float f; 
+            u_int32_t i;
+        } bw;
 
         switch(subt) {
         case SUBTLV_EXT_IS_REACH_ADMIN_GROUP:
@@ -933,32 +937,29 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
         case SUBTLV_EXT_IS_REACH_MAX_LINK_BW :
             if (!TTEST2(*tptr,4))
                 goto trunctlv;
-            j = EXTRACT_32BITS(tptr);
-            memcpy (&bw, &j, 4);
+            bw.i = EXTRACT_32BITS(tptr);
             printf("%sMaximum link bandwidth : %.3f Mbps",
                    ident,
-                   bw*8/1000000 );
+                   bw.f*8/1000000 );
             break;
         case SUBTLV_EXT_IS_REACH_RESERVABLE_BW :
             if (!TTEST2(*tptr,4))
                 goto trunctlv;
-            j = EXTRACT_32BITS(tptr);
-            memcpy (&bw, &j, 4);
+            bw.i = EXTRACT_32BITS(tptr);
             printf("%sReservable link bandwidth: %.3f Mbps",
                    ident,
-                   bw*8/1000000  );
+                   bw.f*8/1000000  );
             break;
         case SUBTLV_EXT_IS_REACH_UNRESERVED_BW :
             printf("%sUnreserved bandwidth:",ident);
             for (i = 0; i < 8; i++) {
                 if (!TTEST2(*(tptr+i*4),4))
                     goto trunctlv;
-                j = EXTRACT_32BITS(tptr);
-                memcpy (&bw, &j, 4);
+                bw.i = EXTRACT_32BITS(tptr);
                 printf("%s  priority level %d: %.3f Mbps",
                        ident,
                        i,
-                       bw*8/1000000 );
+                       bw.f*8/1000000 );
             }
             break;
         case SUBTLV_EXT_IS_REACH_TE_METRIC:
@@ -985,21 +986,10 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
         case SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE:
             if (!TTEST2(*tptr,2))
                 goto trunctlv;
-            i = 0;
-            j = (ISIS_8BIT_MASK(*tptr)); /* fetch the typecode and make sure
-                                            that no high-order LSBs are set */
-            printf("%sLink Protection Type: %s",
+            printf("%sLink Protection Type: %s, Priority %u",
                    ident,
-                   (j) ? "" : "none" );
-            /* scan through the bits until the typecode is zero */
-            while(!j) {
-                printf("%s", isis_gmpls_link_prot_values[i]);
-                j=j>>1;
-                if (j) /*any other bit set ?*/
-                    printf(", ");
-                i++;
-            }
-            printf(", Priority %u", *(tptr+1));
+                   bittok2str(isis_gmpls_link_prot_values, "none", *tptr),
+                   *(tptr+1));
             break;
         case SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR:
             printf("%sInterface Switching Capability",ident);
@@ -1022,12 +1012,11 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
             for (i = 0; i < 8; i++) {
                 if (!TTEST2(*(tptr+(i*4)+4),4))
                     goto trunctlv;
-                j = EXTRACT_32BITS(tptr);
-                memcpy (&bw, &j, 4);
+                bw.i = EXTRACT_32BITS(tptr);
                 printf("%s    priority level %d: %.3f Mbps",
                        ident,
                        i,
-                       bw*8/1000000 );
+                       bw.f*8/1000000 );
             }
             subl-=36;
             /* there is some optional stuff left to decode but this is as of yet
