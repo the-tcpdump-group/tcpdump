@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.72 1999-12-22 15:44:10 itojun Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.73 2000-01-15 07:54:15 itojun Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -66,6 +66,10 @@ tcpdump \- dump traffic on a network
 .br
 .ti +8
 [
+.B \-E
+.I algo:secret
+]
+[
 .I expression
 ]
 .br
@@ -121,6 +125,25 @@ Dump packet-matching code as decimal numbers (preceded with a count).
 .TP
 .B \-e
 Print the link-level header on each dump line.
+.TP
+.B \-E
+Use \fIalgo:secret\fP for decrypting IPsec ESP packets. Algorithms may be 
+\fIdes-cbc\fP, 
+\fI3des-cbc\fP, 
+\fIblowfish-cbc\fP, 
+\fIrc3-cbc\fP, 
+\fIcast128-cbc\fP, or 
+\fInone\fP.
+The default is \fIdes-cbc\fP.
+The ability to decrypt packets is only present if tcpdump was compiled
+with cryptography enabled.
+\fIsecret\fP the ascii text for ESP secret key.
+We cannot take arbitrary binary value at this moment.
+The option assumes RFC2406 ESP, not RFC1827 ESP.
+The option is only for debugging purposes, and
+the use of this option with truely `secret' key is discouraged.
+By presenting IPsec secret key onto command line
+you make it visible to others, via ps(1) and other occasions.
 .TP
 .B \-f
 Print `foreign' internet addresses numerically rather than symbolically
@@ -1312,7 +1335,5 @@ do not properly match the filter expression.
 .LP
 .BR "ip6 proto"
 should chase header chain, but at this moment it does not.
-.BR tcp
-or
-.BR udp
-should chase header chain too.
+.BR "ip6 protochain"
+is supplied for this behavior.
