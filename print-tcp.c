@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.64 2000-04-27 11:09:08 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.65 2000-04-28 11:34:13 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -290,7 +290,7 @@ tcp_print(register const u_char *bp, register u_int length,
 				  sizeof(th->addr)))
 				break;
 
-		if (!th->nxt || flags & TH_SYN) {
+		if (!th->nxt || (flags & TH_SYN)) {
 			/* didn't find it or new conversation */
 			if (th->nxt == NULL) {
 				th->nxt = (struct tcp_seq_hash *)
@@ -303,16 +303,19 @@ tcp_print(register const u_char *bp, register u_int length,
 				th->ack = seq, th->seq = ack - 1;
 			else
 				th->seq = seq, th->ack = ack - 1;
-		} else {
-	  
-			thseq = th->seq;
-			thack = th->ack;
 
+		} else {
 			if (rev)
 				seq -= th->ack, ack -= th->seq;
 			else
 				seq -= th->seq, ack -= th->ack;
 		}
+
+		thseq = th->seq;
+		thack = th->ack;
+	} else {
+		/*fool gcc*/
+		thseq = thack = threv = 0;
 	}
 	hlen = tp->th_off * 4;
 	if (hlen > length) {

@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.12 2000-01-25 09:23:10 itojun Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.13 2000-04-28 11:34:12 itojun Exp $";
 #endif
 
 #include <sys/param.h>
@@ -430,20 +430,24 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 		tlen = p[0];
 		if (tlen) {
 			printf(" nexthop");
-			if (af == AFNUM_INET)
-				advance = 4;
-#ifdef INET6
-			else if (af == AFNUM_INET6)
-				advance = 16;
-#endif
-
-			for (i = 0; i < tlen; i += advance) {
-				if (af == AFNUM_INET)
+			i = 0;
+			while (i < tlen) {
+				switch (af) {
+				case AFNUM_INET:
 					printf(" %s", getname(p + 1 + i));
+					i += sizeof(struct in_addr);
+					break;
 #ifdef INET6
-				else if (af == AFNUM_INET6)
+				case AFNUM_INET6:
 					printf(" %s", getname6(p + 1 + i));
+					i += sizeof(struct in6_addr);
+					break;
 #endif
+				default:
+					printf(" (unknown af)");
+					i = tlen;	/*exit loop*/
+					break;
+				}
 			}
 			printf(",");
 		}
@@ -462,13 +466,23 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 
 		printf(" NLRI");
 		while (len - (p - dat) > 0) {
-			if (af == AFNUM_INET)
+			switch (af) {
+			case AFNUM_INET:
 				advance = decode_prefix4(p, buf, sizeof(buf));
+				printf(" %s", buf);
+				break;
 #ifdef INET6
-			else if (af == AFNUM_INET6)
+			case AFNUM_INET6:
 				advance = decode_prefix6(p, buf, sizeof(buf));
+				printf(" %s", buf);
+				break;
 #endif
-			printf(" %s", buf);
+			default:
+				printf(" (unknown af)");
+				advance = 0;
+				p = dat + len;
+				break;
+			}
 
 			p += advance;
 		}
@@ -488,13 +502,23 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 
 		printf(" Withdraw");
 		while (len - (p - dat) > 0) {
-			if (af == AFNUM_INET)
+			switch (af) {
+			case AFNUM_INET:
 				advance = decode_prefix4(p, buf, sizeof(buf));
+				printf(" %s", buf);
+				break;
 #ifdef INET6
-			else if (af == AFNUM_INET6)
+			case AFNUM_INET6:
 				advance = decode_prefix6(p, buf, sizeof(buf));
+				printf(" %s", buf);
+				break;
 #endif
-			printf(" %s", buf);
+			default:
+				printf(" (unknown af)");
+				advance = 0;
+				p = dat + len;
+				break;
+			}
 
 			p += advance;
 		}
