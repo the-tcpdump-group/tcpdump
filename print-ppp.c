@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.62 2001-07-05 18:54:16 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.63 2001-09-09 01:38:32 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -352,12 +352,14 @@ ppp_protoname(u_int proto)
 	case PPP_XNS:	return "XNS";
 #endif
 	case PPP_IPX:	return "IPX";
+	case PPP_OSI:   return "OSI";
 	case PPP_VJC:	return "VJC";
 	case PPP_VJNC:	return "VJNC";
 	case PPP_COMP:	return "COMP";
 	case PPP_IPCP:	return "IPCP";
 	case PPP_IPV6CP: return "IPv6CP";
 	case PPP_IPXCP:	return "IPXCP";
+	case PPP_OSICP: return "OSICP";
 	case PPP_CCP:	return "CCP";
 	case PPP_LCP:	return "LCP";
 	case PPP_PAP:	return "PAP";
@@ -949,6 +951,8 @@ print_bacp_config_options(const u_char *p, int length)
 static void
 handle_ppp(u_int proto, const u_char *p, int length)
 {
+	int save_eflag;
+
 	switch (proto) {
 	case PPP_LCP:
 	case PPP_IPCP:
@@ -979,6 +983,18 @@ handle_ppp(u_int proto, const u_char *p, int length)
 	case PPP_IPX:
 		ipx_print(p, length);
 		break;
+	case PPP_OSI:
+		save_eflag = eflag;
+	        eflag = 1;      /* set the eflag indicating to isoclns_print()
+				   that this packet was _not_ captured over an
+				   ethernet circuit - hence no need to print
+				   mac-addresses - send bogus addresses for
+				   source & dest mac
+
+				   XXX - this needs to be handled better. */
+	        isoclns_print(p, length, length, "000000", "000000");
+	        eflag = save_eflag;
+	        break;
 	default:
 		break;
 	}
