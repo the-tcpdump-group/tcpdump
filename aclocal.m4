@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.76 2001-10-08 16:43:44 fenner Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.77 2001-10-08 17:18:51 mcr Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -214,10 +214,12 @@ AC_DEFUN(AC_LBL_LIBPCAP,
 	    fi
     else
 	    $1=$libpcap
+	    places=`ls $srcdir/.. | sed -e 's,/$,,' -e 's,^,$srcdir/../,' | \
+    	 		egrep '/libpcap-[0-9]*.[0-9]*(.[0-9]*)?([ab][0-9]*)?$'`
 	    if test -r $d/pcap.h; then
 		    $2="-I$d $$2"
-	    elif test -r $srcdir/../libpcap/pcap.h; then
-		    $2="-I$d -I$srcdir/../libpcap $$2"
+	    elif test -r $places/pcap.h; then
+		    $2="-I$places $$2"
 	    else
                     AC_MSG_ERROR(cannot find pcap.h, see INSTALL)
  	    fi
