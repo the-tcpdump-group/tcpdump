@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.34 2000-01-17 06:24:26 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.35 2000-01-27 23:56:05 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -55,6 +55,7 @@ struct rtentry;
 #endif
 
 #include "interface.h"
+#include "extract.h"
 #include "addrtoname.h"
 #include "ppp.h"
 
@@ -122,7 +123,7 @@ static char *lcpconfopts[] = {
 	"Numbered-Mode",
 	"Multi-Link-Procedure",
 	"Call-Back",
-	"Connect-Time"
+	"Connect-Time",
 	"Compund-Frames",
 	"Nominal-Data-Encap",
 	"Multilink-MRRU",
@@ -262,7 +263,7 @@ handle_lcp(const u_char *p, int length)
 	case LCP_ECHO_REQ:
 	case LCP_ECHO_RPL:
 		printf(", Magic-Number=%u",
-			(u_int32_t)ntohl(*(u_int32_t *)(p + 8)));
+			EXTRACT_32BITS(p+8));
 		break;
 	case LCP_TERM_REQ:
 	case LCP_TERM_ACK:
@@ -327,7 +328,7 @@ print_lcp_config_options(const u_char *p)
 		break;
 	case LCPOPT_MN:
 		if (len == 6)
-			printf("=%u", (u_int32_t)ntohl(*(u_int32_t *)(p + 2)));
+			printf("=%u", EXTRACT_32BITS(p+2));
 		break;
 	case LCPOPT_PFC:
 		printf(" PFC");
