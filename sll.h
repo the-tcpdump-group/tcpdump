@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/sll.h,v 1.2 2000-12-22 12:18:32 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/sll.h,v 1.3 2000-12-22 22:45:12 guy Exp $ (LBL)
  */
 
 /*
@@ -87,3 +87,27 @@ struct sll_header {
 #define LINUX_SLL_MULTICAST	2
 #define LINUX_SLL_OTHERHOST	3
 #define LINUX_SLL_OUTGOING	4
+
+/*
+ * The LINUX_SLL_ values for "sll_protocol"; these correspond to the
+ * ETH_P_ values on Linux, but are defined here so that they're
+ * available even on systems other than Linux.  We assume, for now,
+ * that the ETH_P_ values won't change in Linux; if they do, then:
+ *
+ *	if we don't translate them in "pcap-linux.c", capture files
+ *	won't necessarily be readable if captured on a system that
+ *	defines ETH_P_ values that don't match these values;
+ *
+ *	if we do translate them in "pcap-linux.c", that makes life
+ *	unpleasant for the BPF code generator, as the values you test
+ *	for in the kernel aren't the values that you test for when
+ *	reading a capture file, so the fixup code run on BPF programs
+ *	handed to the kernel ends up having to do more work.
+ *
+ * Add other values here as necessary, for handling packet types that
+ * might show up on non-Ethernet, non-802.x networks.  (Not all the ones
+ * in the Linux "if_ether.h" will, I suspect, actually show up in
+ * captures.)
+ */
+#define LINUX_SLL_P_802_3	0x0001	/* Novell 802.3 frames without 802.2 LLC header */
+#define LINUX_SLL_P_802_2	0x0004	/* 802.2 frames (not D/I/X Ethernet) */

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-fddi.c,v 1.48 2000-12-18 05:41:59 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-fddi.c,v 1.49 2000-12-22 22:45:11 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -305,7 +305,7 @@ fddi_if_print(u_char *pcap, const struct pcap_pkthdr *h,
 			 * handle intelligently
 			 */
 			if (!eflag)
-				fddi_print(fddip, length,
+				fddi_print(fddip, length + FDDI_HDRLEN,
 				    ESRC(&ehdr), EDST(&ehdr));
 			if (extracted_ethertype) {
 				printf("(LLC %s) ",
@@ -319,7 +319,8 @@ fddi_if_print(u_char *pcap, const struct pcap_pkthdr *h,
 	else {
 		/* Some kinds of FDDI packet we cannot handle intelligently */
 		if (!eflag)
-			fddi_print(fddip, length, ESRC(&ehdr), EDST(&ehdr));
+			fddi_print(fddip, length + FDDI_HDRLEN, ESRC(&ehdr),
+			    EDST(&ehdr));
 		if (!xflag && !qflag)
 			default_print(p, caplen);
 	}

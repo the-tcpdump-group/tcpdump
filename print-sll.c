@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sll.c,v 1.1 2000-12-21 10:43:22 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sll.c,v 1.2 2000-12-22 22:45:11 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -187,28 +187,44 @@ sll_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	ether_type = ntohs(sllp->sll_protocol);
 
 	/*
-	 * Is it (gag) an 802.3 encapsulation?
+	 * Is it (gag) an 802.3 encapsulation, or some non-Ethernet
+	 * packet type?
 	 */
 	extracted_ethertype = 0;
 	if (ether_type <= ETHERMTU) {
-		/* Try to print the LLC-layer header & higher layers */
-		if (llc_print(p, length, caplen, ESRC(&ehdr), EDST(&ehdr),
-		    &extracted_ethertype) == 0) {
+		/*
+		 * Yes - what type is it?
+		 */
+		switch (ether_type) {
+
+		case LINUX_SLL_P_802_2:
+			/*
+			 * 802.2.
+			 * Try to print the LLC-layer header & higher layers.
+			 */
+			if (llc_print(p, length, caplen, ESRC(&ehdr),
+			    EDST(&ehdr), &extracted_ethertype) == 0)
+				goto unknown;	/* unknown LLC type */
+			break;
+
+		default:
+		unknown:
 			/* ether_type not known, print raw packet */
 			if (!eflag)
-				sll_print(packetp, length);
+				sll_print(packetp, length + SLL_HDR_LEN);
 			if (extracted_ethertype) {
 				printf("(LLC %s) ",
 			       etherproto_string(htons(extracted_ethertype)));
 			}
 			if (!xflag && !qflag)
 				default_print(p, caplen);
+			break;
 		}
 	} else if (ether_encap_print(ether_type, p, length, caplen,
 	    &extracted_ethertype) == 0) {
 		/* ether_type not known, print raw packet */
 		if (!eflag)
-			sll_print(p - SLL_HDR_LEN, length + SLL_HDR_LEN);
+			sll_print(packetp, length + SLL_HDR_LEN);
 		if (!xflag && !qflag)
 			default_print(p, caplen);
 	}

@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.19 2000-10-06 04:23:10 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.20 2000-12-22 22:45:09 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -131,8 +131,8 @@ atm_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 		/* ether_type not known, print raw packet */
 		if (!eflag)
 			printf("%02x %02x %02x %02x-%02x-%02x %04x: ",
-			       p[0], p[1], p[2], /* dsap/ssap/ctrl */
-			       p[3], p[4], p[5], /* manufacturer's code */
+			       packetp[0], packetp[1], packetp[2], /* dsap/ssap/ctrl */
+			       packetp[3], packetp[4], packetp[5], /* manufacturer's code */
 			       ethertype);
 		if (!xflag && !qflag)
 			default_print(p, caplen);

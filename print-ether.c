@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.60 2000-12-18 05:41:59 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.61 2000-12-22 22:45:10 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -117,7 +117,7 @@ ether_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 		    &extracted_ethertype) == 0) {
 			/* ether_type not known, print raw packet */
 			if (!eflag)
-				ether_print((u_char *)ep, length);
+				ether_print((u_char *)ep, length + ETHER_HDRLEN);
 			if (extracted_ethertype) {
 				printf("(LLC %s) ",
 			       etherproto_string(htons(extracted_ethertype)));

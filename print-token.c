@@ -25,7 +25,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-token.c,v 1.9 2000-12-18 05:42:00 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-token.c,v 1.10 2000-12-22 22:45:12 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -184,7 +184,8 @@ token_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 		    &extracted_ethertype) == 0) {
 			/* ether_type not known, print raw packet */
 			if (!eflag)
-				token_print(trp, length,
+				token_print(trp,
+				    length + TOKEN_HDRLEN + route_len,
 				    ESRC(&ehdr), EDST(&ehdr));
 			if (extracted_ethertype) {
 				printf("(LLC %s) ",
@@ -197,7 +198,8 @@ token_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 		/* Some kinds of TR packet we cannot handle intelligently */
 		/* XXX - dissect MAC packets if frame type is 0 */
 		if (!eflag)
-			token_print(trp, length, ESRC(&ehdr), EDST(&ehdr));
+			token_print(trp, length + TOKEN_HDRLEN + route_len,
+			    ESRC(&ehdr), EDST(&ehdr));
 		if (!xflag && !qflag)
 			default_print(p, caplen);
 	}
