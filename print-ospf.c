@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.53 2004-09-15 17:54:11 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.54 2004-09-20 14:36:16 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -103,6 +103,7 @@ static struct tok ospf_dd_flag_values[] = {
 static struct tok lsa_opaque_values[] = {
 	{ LS_OPAQUE_TYPE_TE,    "Traffic Engineering" },
 	{ LS_OPAQUE_TYPE_GRACE, "Graceful restart" },
+	{ LS_OPAQUE_TYPE_RI,    "Router Information" },
 	{ 0,			NULL }
 };
 
@@ -149,6 +150,25 @@ static struct tok lsa_opaque_te_tlv_link_type_sub_tlv_values[] = {
 	{ LS_OPAQUE_TE_LINK_SUBTLV_LINK_TYPE_PTP, "Point-to-point" },
 	{ LS_OPAQUE_TE_LINK_SUBTLV_LINK_TYPE_MA,  "Multi-Access" },
 	{ 0,			NULL }
+};
+
+static struct tok lsa_opaque_ri_tlv_values[] = {
+	{ LS_OPAQUE_RI_TLV_CAP, "Router Capabilities" },
+	{ 0,		        NULL }
+};
+
+static struct tok lsa_opaque_ri_tlv_cap_values[] = {
+	{ 1, "Reserved" },
+	{ 2, "Reserved" },
+	{ 4, "Reserved" },
+	{ 8, "Reserved" },
+	{ 16, "graceful restart capable" },
+	{ 32, "graceful restart helper" },
+	{ 64, "Stub router support" },
+	{ 128, "Traffic engineering" },
+	{ 256, "p2p over LAN" },
+	{ 512, "path computation server" },
+	{ 0,		        NULL }
 };
 
 static char tstr[] = " [|ospf]";
@@ -426,6 +446,54 @@ ospf_print_lsa(register const struct lsa *lsap)
 	case LS_TYPE_OPAQUE_DW:
 
 	    switch (*(&lsap->ls_hdr.un_lsa_id.opaque_field.opaque_type)) {
+            case LS_OPAQUE_TYPE_RI:
+		tptr = (u_int8_t *)(&lsap->lsa_un.un_ri_tlv.type);
+
+		while (ls_length != 0) {
+                    TCHECK2(*tptr, 4);
+		    if (ls_length < 4) {
+                        printf("\n\t    Remaining LS length %u < 4", ls_length);
+                        return(ls_end);
+                    }
+                    tlv_type = EXTRACT_16BITS(tptr);
+                    tlv_length = EXTRACT_16BITS(tptr+2);
+                    tptr+=4;
+                    ls_length-=4;
+                    
+                    printf("\n\t    %s TLV (%u), length: %u, value: ",
+                           tok2str(lsa_opaque_ri_tlv_values,"unknown",tlv_type),
+                           tlv_type,
+                           tlv_length);
+
+                    if (tlv_length > ls_length) {
+                        printf("\n\t    Bogus length %u > %u", tlv_length,
+                            ls_length);
+                        return(ls_end);
+                    }
+                    ls_length-=tlv_length;
+                    TCHECK2(*tptr, tlv_length);
+                    switch(tlv_type) {
+
+                    case LS_OPAQUE_RI_TLV_CAP:
+                        if (tlv_length != 4) {
+                            printf("\n\t    Bogus length %u != 4", tlv_length);
+                            return(ls_end);
+                        }
+                        printf("Capabilities: %s",
+                               bittok2str(lsa_opaque_ri_tlv_cap_values, "Unknown", EXTRACT_32BITS(tptr)));
+                        break;
+                    default:
+                        if (vflag <= 1) {
+                            if(!print_unknown_data(tptr,"\n\t      ",tlv_length))
+                                return(ls_end);
+                        }
+                        break;
+
+                    }
+                    tptr+=tlv_length;
+                }
+
+                break;
             case LS_OPAQUE_TYPE_GRACE:
 		tptr = (u_int8_t *)(&lsap->lsa_un.un_grace_tlv.type);
 

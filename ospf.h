@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.14 2004-09-09 16:17:38 hannes Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.15 2004-09-20 14:36:16 hannes Exp $ (LBL) */
 /*
  * Copyright (c) 1991, 1993, 1994, 1995, 1996, 1997
  *	The Regents of the University of California.  All rights reserved.
@@ -70,6 +70,7 @@
 
 #define LS_OPAQUE_TYPE_TE       1   /* rfc3630 */
 #define LS_OPAQUE_TYPE_GRACE    3   /* rfc3623 */
+#define LS_OPAQUE_TYPE_RI       4   /* draft-ietf-ospf-cap-03 */
 
 #define LS_OPAQUE_TE_TLV_ROUTER 1   /* rfc3630 */
 #define LS_OPAQUE_TE_TLV_LINK   2   /* rfc3630 */
@@ -100,6 +101,8 @@
 #define LS_OPAQUE_GRACE_TLV_REASON_SW_RESTART  1 /* rfc3623 */
 #define LS_OPAQUE_GRACE_TLV_REASON_SW_UPGRADE  2 /* rfc3623 */
 #define LS_OPAQUE_GRACE_TLV_REASON_CP_SWITCH   3 /* rfc3623 */
+
+#define LS_OPAQUE_RI_TLV_CAP             1 /* draft-ietf-ospf-cap-03 */
 
 /*************************************************
  *
@@ -208,12 +211,19 @@ struct lsa {
 	    u_int8_t data[1]; /* may repeat   */
 	} un_te_lsa_tlv;
 
-        /* Grace LSA */
+        /* Opaque Grace LSA */
         struct {
 	    u_int16_t type;
 	    u_int16_t length;
 	    u_int8_t data[1]; /* may repeat   */
 	} un_grace_tlv;
+
+        /* Opaque Router information LSA */
+        struct {
+	    u_int16_t type;
+	    u_int16_t length;
+	    u_int8_t data[1]; /* may repeat   */
+	} un_ri_tlv;
 
         /* Unknown LSA */
         struct unknown {
