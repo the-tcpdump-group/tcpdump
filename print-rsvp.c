@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.11 2002-12-12 15:58:33 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.12 2002-12-12 18:31:58 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -119,7 +119,7 @@ static const struct tok rsvp_msg_type_values[] = {
 #define	RSVP_OBJ_SENDER_TSPEC       12 /* rfc2215 */
 #define	RSVP_OBJ_ADSPEC             13 /* rfc2215 */
 #define	RSVP_OBJ_POLICY_DATA        14
-#define	RSVP_OBJ_CONFIRM            15
+#define	RSVP_OBJ_CONFIRM            15 /* rfc2205 */
 #define	RSVP_OBJ_LABEL              16 /* rfc3209 */
 #define	RSVP_OBJ_LABEL_REQ          19 /* rfc3209 */
 #define	RSVP_OBJ_ERO                20 /* rfc3209 */
@@ -188,6 +188,8 @@ static const struct tok rsvp_obj_values[] = {
 static const struct tok rsvp_ctype_values[] = {
     { 256*RSVP_OBJ_RSVP_HOP+RSVP_CTYPE_IPV4,	             "IPv4" },
     { 256*RSVP_OBJ_RSVP_HOP+RSVP_CTYPE_IPV6,	             "IPv6" },
+    { 256*RSVP_OBJ_CONFIRM+RSVP_CTYPE_IPV4,	             "IPv4" },
+    { 256*RSVP_OBJ_CONFIRM+RSVP_CTYPE_IPV6,	             "IPv6" },
     { 256*RSVP_OBJ_TIME_VALUES+RSVP_CTYPE_1,	             "1" },
     { 256*RSVP_OBJ_FLOWSPEC+RSVP_CTYPE_1,	             "obsolete" },
     { 256*RSVP_OBJ_FLOWSPEC+RSVP_CTYPE_2,	             "IntServ" },
@@ -541,6 +543,27 @@ rsvp_print(register const u_char *pptr, register u_int len) {
             }
             break;
 
+        case RSVP_OBJ_CONFIRM:
+            switch(rsvp_obj_ctype) {
+            case RSVP_CTYPE_IPV4:
+                printf("\n\t    IPv4 ReceiverAddress: %s",
+                       ipaddr_string(obj_tptr));
+                obj_tlen-=4;
+                obj_tptr+=4;                
+                break;
+#ifdef INET6
+            case RSVP_CTYPE_IPV6:
+                printf("\n\t    IPv6 ReceiverAddress: %s",
+                       ip6addr_string(obj_tptr));
+                obj_tlen-=16;
+                obj_tptr+=16;                
+                break;
+#endif
+            default:
+                hexdump=TRUE;
+            }
+            break;
+
         case RSVP_OBJ_LABEL:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_1:
@@ -855,7 +878,6 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         case RSVP_OBJ_ERROR_SPEC:
         case RSVP_OBJ_SCOPE:
         case RSVP_OBJ_POLICY_DATA:
-        case RSVP_OBJ_CONFIRM:
         case RSVP_OBJ_MESSAGE_ID:
         case RSVP_OBJ_MESSAGE_ID_ACK:
         case RSVP_OBJ_MESSAGE_ID_LIST:
@@ -880,4 +902,3 @@ rsvp_print(register const u_char *pptr, register u_int len) {
 trunc:
     printf("\n\t\t packet exceeded snapshot");
 }
-
