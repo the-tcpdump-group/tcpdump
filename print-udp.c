@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.135 2004-12-27 00:41:32 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.136 2004-12-27 01:13:44 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -526,7 +526,7 @@ udp_print(register const u_char *bp, u_int length,
 #ifdef INET6
 			    ip6 != NULL);
 #else
-			    FALSE);
+			    0);
 #endif
 			break;
 		}
@@ -613,7 +613,7 @@ udp_print(register const u_char *bp, u_int length,
 #ifdef INET6
 			    ip6 != NULL);
 #else
-			    FALSE);
+			    0);
 #endif
 		else if (ISPORT(ISAKMP_PORT))
 			isakmp_print((const u_char *)(up + 1), length, bp2);
