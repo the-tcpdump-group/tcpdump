@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.14 2000-10-06 04:23:11 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.15 2000-10-06 11:32:19 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -56,29 +56,7 @@ static const char rcsid[] =
 #endif
 
 #include "ip.h"
-
-/* there's no standard definition so we are on our own */
-struct esp {
-	u_int32_t	esp_spi;	/* ESP */
-	/*variable size, 32bit bound*/	/* Initialization Vector */
-	/*variable size*/		/* Payload data */
-	/*variable size*/		/* padding */
-	/*8bit*/			/* pad size */
-	/*8bit*/			/* next header */
-	/*8bit*/			/* next header */
-	/*variable size, 32bit bound*/	/* Authentication data (new IPsec) */
-};
-
-struct newesp {
-	u_int32_t	esp_spi;	/* ESP */
-	u_int32_t	esp_seq;	/* Sequence number */
-	/*variable size*/		/* (IV and) Payload data */
-	/*variable size*/		/* padding */
-	/*8bit*/			/* pad size */
-	/*8bit*/			/* next header */
-	/*8bit*/			/* next header */
-	/*variable size, 32bit bound*/	/* Authentication data */
-};
+#include "esp.h"
 
 #include "interface.h"
 #include "addrtoname.h"

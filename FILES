@@ -9,6 +9,7 @@ acconfig.h
 aclocal.m4
 addrtoname.c
 addrtoname.h
+ah.h
 appletalk.h
 atime.awk
 bootp.h
@@ -21,6 +22,7 @@ configure.in
 decnet.h
 dhcp6.h
 dhcp6opt.h
+esp.h
 ether.h
 ethertype.h
 extract.h
