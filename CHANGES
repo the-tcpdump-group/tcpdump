@@ -1,4 +1,11 @@
+2000-01-09  Assar Westerlund  <assar@sics.se>
+
+	* remove some <netinet/tcpip.h>, it's not needed and causes
+	problems when compiling with v6 support if v6 headers have not been
+	included before
+
 2000-01-07  Assar Westerlund  <assar@sics.se>
+
 	* check for sys/cdefs.h
 
 	* missing/snprintf.c: snprintf implementation
@@ -569,4 +576,4 @@ v2.0 Sun Jan 13 12:20:40 PST 1991
 
 - Initial public release.
 
-@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.66 2000-01-07 16:34:18 assar Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.67 2000-01-09 10:01:39 assar Exp $ (LBL)
