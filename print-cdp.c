@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.12 2002-04-26 09:13:19 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.13 2002-04-26 09:51:34 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -134,7 +134,7 @@ cdp_print(const u_char *p, u_int length, u_int caplen,
  */
 		case 0x0e:		/* incomplete doc. */
 			printf(" ATA-186 VoIP VLAN request, app %d, vlan %d",
-				p[i + 4], (p[i + 4] << 8) + p[i + 4 + 1] );
+				p[i + 4], EXTRACT_16BITS(&p[i+4+1]));
 			break;
 		case 0x0f:		/* incomplete doc. */
 			printf(" ATA-186 VoIP VLAN assignment" );
