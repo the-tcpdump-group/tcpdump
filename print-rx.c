@@ -13,7 +13,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.12 2000-07-10 04:38:25 assar Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.13 2000-07-22 17:32:32 assar Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -620,9 +620,8 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
  * These extrememly grody macros handle the printing of various AFS stuff.
  */
 
-#define TRUNC(n) if (snapend - bp + 1 <= n) goto trunc;
 #define FIDOUT() { unsigned long n1, n2, n3; \
-			TRUNC(sizeof(int32_t) * 3); \
+			TCHECK2(bp[0], sizeof(int32_t) * 3); \
 			n1 = EXTRACT_32BITS(bp); \
 			bp += sizeof(int32_t); \
 			n2 = EXTRACT_32BITS(bp); \
@@ -633,10 +632,10 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 		}
 
 #define STROUT(MAX) { int i; \
-			TRUNC(sizeof(int32_t)); \
+			TCHECK2(bp[0], sizeof(int32_t)); \
 			i = (int) EXTRACT_32BITS(bp); \
 			bp += sizeof(int32_t); \
-			TRUNC(i); \
+			TCHECK2(bp[0], i); \
 			strncpy(s, (char *) bp, min(MAX, i)); \
 			s[i] = '\0'; \
 			printf(" \"%s\"", s); \
@@ -644,21 +643,21 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 		}
 
 #define INTOUT() { int i; \
-			TRUNC(sizeof(int32_t)); \
+			TCHECK2(bp[0], sizeof(int32_t)); \
 			i = (int) EXTRACT_32BITS(bp); \
 			bp += sizeof(int32_t); \
 			printf(" %d", i); \
 		}
 
 #define UINTOUT() { unsigned long i; \
-			TRUNC(sizeof(int32_t)); \
+			TCHECK2(bp[0], sizeof(int32_t)); \
 			i = EXTRACT_32BITS(bp); \
 			bp += sizeof(int32_t); \
 			printf(" %lu", i); \
 		}
 
 #define DATEOUT() { time_t t; struct tm *tm; char str[256]; \
-			TRUNC(sizeof(int32_t)); \
+			TCHECK2(bp[0], sizeof(int32_t)); \
 			t = (time_t) EXTRACT_32BITS(bp); \
 			bp += sizeof(int32_t); \
 			tm = localtime(&t); \
@@ -667,7 +666,7 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 		}
 
 #define STOREATTROUT() { unsigned long mask, i; \
-			TRUNC((sizeof(int32_t)*6)); \
+			TCHECK2(bp[0], (sizeof(int32_t)*6)); \
 			mask = EXTRACT_32BITS(bp); bp += sizeof(int32_t); \
 			if (mask) printf (" StoreStatus"); \
   		        if (mask & 1) { printf(" date"); DATEOUT(); } \
@@ -685,7 +684,7 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 		}
 
 #define UBIK_VERSIONOUT() {int32_t epoch; int32_t counter; \
-			TRUNC(sizeof(int32_t) * 2); \
+			TCHECK2(bp[0], sizeof(int32_t) * 2); \
 			epoch = EXTRACT_32BITS(bp); \
 			bp += sizeof(int32_t); \
 			counter = EXTRACT_32BITS(bp); \
@@ -694,7 +693,7 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 		}
 
 #define AFSUUIDOUT() {u_int32_t temp; int i; \
-			TRUNC(11*sizeof(u_int32_t)); \
+			TCHECK2(bp[0], 11*sizeof(u_int32_t)); \
 			temp = EXTRACT_32BITS(bp); \
 			bp += sizeof(u_int32_t); \
 			printf(" %08x", temp); \
@@ -717,7 +716,7 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 
 #define VECOUT(MAX) { char *sp; \
 			int k; \
-			TRUNC(MAX * sizeof(int32_t)); \
+			TCHECK2(bp[0], MAX * sizeof(int32_t)); \
 			sp = s; \
 			for (k = 0; k < MAX; k++) { \
 				*sp++ = (char) EXTRACT_32BITS(bp); \
@@ -801,10 +800,10 @@ fs_print(register const u_char *bp, int length)
 		{
 			char a[AFSOPAQUEMAX];
 			FIDOUT();
-			TRUNC(4);
+			TCHECK2(bp[0], 4);
 			i = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
-			TRUNC(i);
+			TCHECK2(bp[0], i);
 			strncpy(a, (char *) bp, min(AFSOPAQUEMAX, i));
 			a[i] = '\0';
 			acl_print((u_char *) a, (u_char *) a + i);
@@ -856,7 +855,7 @@ fs_print(register const u_char *bp, int length)
 		case 155:	/* Bulk stat */
 		{
 			unsigned long j;
-			TRUNC(4);
+			TCHECK2(bp[0], 4);
 			j = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 
@@ -912,10 +911,10 @@ fs_reply_print(register const u_char *bp, int length, int32_t opcode)
 		case 131:	/* Fetch ACL */
 		{
 			char a[AFSOPAQUEMAX];
-			TRUNC(4);
+			TCHECK2(bp[0], 4);
 			i = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
-			TRUNC(i);
+			TCHECK2(bp[0], i);
 			strncpy(a, (char *) bp, min(AFSOPAQUEMAX, i));
 			a[i] = '\0';
 			acl_print((u_char *) a, (u_char *) a + i);
@@ -942,7 +941,7 @@ fs_reply_print(register const u_char *bp, int length, int32_t opcode)
  		/*
  		 * Otherwise, just print out the return code
  		 */
-		TRUNC(sizeof(int32_t)); 
+		TCHECK2(bp[0], sizeof(int32_t)); 
 		i = (int) EXTRACT_32BITS(bp); 
 		bp += sizeof(int32_t); 
 
@@ -1068,7 +1067,7 @@ cb_print(register const u_char *bp, int length)
 		case 204:		/* Callback */
 		{
 			unsigned long j, t;
-			TRUNC(4);
+			TCHECK2(bp[0], 4);
 			j = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 
@@ -1092,7 +1091,7 @@ cb_print(register const u_char *bp, int length)
 				INTOUT();
 				printf(" expires");
 				DATEOUT();
-				TRUNC(4);
+				TCHECK2(bp[0], 4);
 				t = EXTRACT_32BITS(bp);
 				bp += sizeof(int32_t);
 				tok2str(cb_types, "type %d", t);
@@ -1236,7 +1235,7 @@ prot_print(register const u_char *bp, int length)
 		case 504:	/* Name to ID */
 		{
 			unsigned long j;
-			TRUNC(4);
+			TCHECK2(bp[0], 4);
 			j = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 
@@ -1258,7 +1257,7 @@ prot_print(register const u_char *bp, int length)
 		{
 			unsigned long j;
 			printf(" ids:");
-			TRUNC(4);
+			TCHECK2(bp[0], 4);
 			i = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 			for (j = 0; j < i; j++)
@@ -1348,7 +1347,7 @@ prot_reply_print(register const u_char *bp, int length, int32_t opcode)
 		{
 			unsigned long j;
 			printf(" ids:");
-			TRUNC(4);
+			TCHECK2(bp[0], 4);
 			i = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 			for (j = 0; j < i; j++)
@@ -1360,7 +1359,7 @@ prot_reply_print(register const u_char *bp, int length, int32_t opcode)
 		case 505:		/* ID to name */
 		{
 			unsigned long j;
-			TRUNC(4);
+			TCHECK2(bp[0], 4);
 			j = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 
@@ -1385,7 +1384,7 @@ prot_reply_print(register const u_char *bp, int length, int32_t opcode)
 		case 519:		/* Get host CPS */
 		{
 			unsigned long j;
-			TRUNC(4);
+			TCHECK2(bp[0], 4);
 			j = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 			for (i = 0; i < j; i++) {
@@ -1470,7 +1469,7 @@ vldb_print(register const u_char *bp, int length)
 		case 518:	/* Get entry by ID N */
 			printf(" volid");
 			INTOUT();
-			TRUNC(sizeof(int32_t));
+			TCHECK2(bp[0], sizeof(int32_t));
 			i = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 			if (i <= 2)
@@ -1490,7 +1489,7 @@ vldb_print(register const u_char *bp, int length)
 		case 520:	/* Replace entry N */
 			printf(" volid");
 			INTOUT();
-			TRUNC(sizeof(int32_t));
+			TCHECK2(bp[0], sizeof(int32_t));
 			i = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 			if (i <= 2)
@@ -1560,16 +1559,16 @@ vldb_reply_print(register const u_char *bp, int length, int32_t opcode)
 		case 504:	/* Get entry by name */
 		{	unsigned long nservers, j;
 			VECOUT(VLNAMEMAX);
-			TRUNC(sizeof(int32_t));
+			TCHECK2(bp[0], sizeof(int32_t));
 			bp += sizeof(int32_t);
 			printf(" numservers");
-			TRUNC(sizeof(int32_t));
+			TCHECK2(bp[0], sizeof(int32_t));
 			nservers = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 			printf(" %lu", nservers);
 			printf(" servers");
 			for (i = 0; i < 8; i++) {
-				TRUNC(sizeof(int32_t));
+				TCHECK2(bp[0], sizeof(int32_t));
 				if (i < nservers)
 					printf(" %s",
 					   inet_ntoa(*((struct in_addr *) bp)));
@@ -1577,7 +1576,7 @@ vldb_reply_print(register const u_char *bp, int length, int32_t opcode)
 			}
 			printf(" partitions");
 			for (i = 0; i < 8; i++) {
-				TRUNC(sizeof(int32_t));
+				TCHECK2(bp[0], sizeof(int32_t));
 				j = EXTRACT_32BITS(bp);
 				if (i < nservers && j <= 26)
 					printf(" %c", 'a' + (int)j);
@@ -1585,7 +1584,7 @@ vldb_reply_print(register const u_char *bp, int length, int32_t opcode)
 					printf(" %lu", j);
 				bp += sizeof(int32_t);
 			}
-			TRUNC(8 * sizeof(int32_t));
+			TCHECK2(bp[0], 8 * sizeof(int32_t));
 			bp += 8 * sizeof(int32_t);
 			printf(" rwvol");
 			UINTOUT();
@@ -1610,13 +1609,13 @@ vldb_reply_print(register const u_char *bp, int length, int32_t opcode)
 		{	unsigned long nservers, j;
 			VECOUT(VLNAMEMAX);
 			printf(" numservers");
-			TRUNC(sizeof(int32_t));
+			TCHECK2(bp[0], sizeof(int32_t));
 			nservers = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 			printf(" %lu", nservers);
 			printf(" servers");
 			for (i = 0; i < 13; i++) {
-				TRUNC(sizeof(int32_t));
+				TCHECK2(bp[0], sizeof(int32_t));
 				if (i < nservers)
 					printf(" %s",
 					   inet_ntoa(*((struct in_addr *) bp)));
@@ -1624,7 +1623,7 @@ vldb_reply_print(register const u_char *bp, int length, int32_t opcode)
 			}
 			printf(" partitions");
 			for (i = 0; i < 13; i++) {
-				TRUNC(sizeof(int32_t));
+				TCHECK2(bp[0], sizeof(int32_t));
 				j = EXTRACT_32BITS(bp);
 				if (i < nservers && j <= 26)
 					printf(" %c", 'a' + (int)j);
@@ -1632,7 +1631,7 @@ vldb_reply_print(register const u_char *bp, int length, int32_t opcode)
 					printf(" %lu", j);
 				bp += sizeof(int32_t);
 			}
-			TRUNC(13 * sizeof(int32_t));
+			TCHECK2(bp[0], 13 * sizeof(int32_t));
 			bp += 13 * sizeof(int32_t);
 			printf(" rwvol");
 			UINTOUT();
@@ -1647,7 +1646,7 @@ vldb_reply_print(register const u_char *bp, int length, int32_t opcode)
 		{	unsigned long nservers, j;
 			VECOUT(VLNAMEMAX);
 			printf(" numservers");
-			TRUNC(sizeof(int32_t));
+			TCHECK2(bp[0], sizeof(int32_t));
 			nservers = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 			printf(" %lu", nservers);
@@ -1657,15 +1656,15 @@ vldb_reply_print(register const u_char *bp, int length, int32_t opcode)
 					printf(" afsuuid");
 					AFSUUIDOUT();
 				} else {
-					TRUNC(44);
+					TCHECK2(bp[0], 44);
 					bp += 44;
 				}
 			}
-			TRUNC(4 * 13);
+			TCHECK2(bp[0], 4 * 13);
 			bp += 4 * 13;
 			printf(" partitions");
 			for (i = 0; i < 13; i++) {
-				TRUNC(sizeof(int32_t));
+				TCHECK2(bp[0], sizeof(int32_t));
 				j = EXTRACT_32BITS(bp);
 				if (i < nservers && j <= 26)
 					printf(" %c", 'a' + (int)j);
@@ -1673,7 +1672,7 @@ vldb_reply_print(register const u_char *bp, int length, int32_t opcode)
 					printf(" %lu", j);
 				bp += sizeof(int32_t);
 			}
-			TRUNC(13 * sizeof(int32_t));
+			TCHECK2(bp[0], 13 * sizeof(int32_t));
 			bp += 13 * sizeof(int32_t);
 			printf(" rwvol");
 			UINTOUT();
@@ -1763,10 +1762,10 @@ kauth_print(register const u_char *bp, int length)
 			INTOUT();
 			printf(" domain");
 			STROUT(KANAMEMAX);
-			TRUNC(sizeof(int32_t));
+			TCHECK2(bp[0], sizeof(int32_t));
 			i = (int) EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
-			TRUNC(i);
+			TCHECK2(bp[0], i);
 			bp += i;
 			printf(" principal");
 			STROUT(KANAMEMAX);
@@ -2104,7 +2103,7 @@ ubik_print(register const u_char *bp, int length)
 
 	switch (ubik_op) {
 		case 10000:		/* Beacon */
-			TRUNC(4);
+			TCHECK2(bp[0], 4);
 			temp = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 			printf(" syncsite %s", temp ? "yes" : "no");
@@ -2272,7 +2271,7 @@ rx_ack_print(register const u_char *bp, int length)
 	 * rx_ackPacket structure.
 	 */
 
-	TRUNC(sizeof(struct rx_ackPacket) - RX_MAXACKS);
+	TCHECK2(bp[0], sizeof(struct rx_ackPacket) - RX_MAXACKS);
 
 	rxa = (struct rx_ackPacket *) bp;
 	bp += (sizeof(struct rx_ackPacket) - RX_MAXACKS);
@@ -2311,7 +2310,7 @@ rx_ack_print(register const u_char *bp, int length)
 
 	if (rxa->nAcks != 0) {
 
-		TRUNC(rxa->nAcks);
+		TCHECK2(bp[0], rxa->nAcks);
 
 		/*
 		 * Sigh, this is gross, but it seems to work to collapse
