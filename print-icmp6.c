@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.16 2000-06-03 16:40:35 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.17 2000-06-26 20:04:53 assar Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -241,6 +241,7 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 	case ICMP6_ECHO_REPLY:
 		printf("icmp6: echo reply");
 		break;
+#if defined(HAVE_STRUCT_MLD6_HDR) || defined(HAVE_STRUCT_ICMP6_MLD)
 	case ICMP6_MEMBERSHIP_QUERY:
 		printf("icmp6: multicast listener query ");
 		mld6_print((const u_char *)dp);
@@ -253,6 +254,7 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 		printf("icmp6: multicast listener done ");
 		mld6_print((const u_char *)dp);
 		break;
+#endif
 	case ND_ROUTER_SOLICIT:
 		printf("icmp6: router solicitation ");
 		if (vflag) {
@@ -570,10 +572,6 @@ mld6_print(register const u_char *bp)
 	printf("max resp delay: %d ", ntohs(mp->icmp6m_hdr.icmp6_maxdelay));
 	printf("addr: %s", ip6addr_string(&mp->icmp6m_group));
 }
-
-#else
-
-#error unknown mld6 struct
 
 #endif
 
