@@ -20,7 +20,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-zephyr.c,v 1.3 2002-03-05 11:33:25 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-zephyr.c,v 1.4 2002-04-27 23:39:25 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -122,7 +122,7 @@ str_to_lower(char *string)
 
     string = z_buf;
     while (*string) {
-	*string = tolower(*string);
+	*string = tolower((unsigned char)(*string));
 	string++;
     }
 
