@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.146 2005-01-12 11:19:08 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.147 2005-01-21 08:02:06 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -399,8 +399,19 @@ ip_print(register const u_char *bp, register u_int length)
 		(void)printf("truncated-ip - %u bytes missing! ",
 			len - length);
 	if (len < hlen) {
-		(void)printf("bad-len %u", len);
-		return;
+#ifdef GUESS_TSO
+            if (len) {
+                (void)printf("bad-len %u", len);
+                return;
+            }
+            else {
+                /* we guess that it is a TSO send */
+                len = length;
+            }
+#else
+            (void)printf("bad-len %u", len);
+            return;
+#endif /* GUESS_TSO */
 	}
 
 	/*
