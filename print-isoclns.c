@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.57 2002-08-09 22:57:22 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.58 2002-08-20 00:17:23 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -485,7 +485,7 @@ void isoclns_print(const u_char *p, u_int length, u_int caplen,
 	switch (*p) {
 
 	case NLPID_CLNS:
-		(void)printf("CLNS(%d)", length);
+		(void)printf("CLNS, length: %u", length);
 		if (!eflag && esrc != NULL && edst != NULL)
 			(void)printf(", %s > %s",
 				     etheraddr_string(esrc),
@@ -493,7 +493,7 @@ void isoclns_print(const u_char *p, u_int length, u_int caplen,
 		break;
 
 	case NLPID_ESIS:
-		(void)printf("ESIS(%u)", length);
+		(void)printf("ESIS, length: %u", length);
 		if (!eflag && esrc != NULL && edst != NULL)
 			(void)printf(", %s > %s",
 				     etheraddr_string(esrc),
@@ -502,7 +502,7 @@ void isoclns_print(const u_char *p, u_int length, u_int caplen,
 		return;
 
 	case NLPID_ISIS:
-		(void)printf("ISIS(%u)", length);
+		(void)printf("ISIS, length: %u", length);
 		if (!eflag && esrc != NULL && edst != NULL)
 			(void)printf(", %s > %s",
 			     etheraddr_string(esrc),
@@ -512,7 +512,7 @@ void isoclns_print(const u_char *p, u_int length, u_int caplen,
 		break;
 
 	case NLPID_NULLNS:
-		(void)printf("ISO NULLNS(%d)", length);
+		(void)printf("ISO NULLNS, length: %u", length);
 		if (!eflag && esrc != NULL && edst != NULL)
 			(void)printf(", %s > %s",
 				     etheraddr_string(esrc),
@@ -520,7 +520,7 @@ void isoclns_print(const u_char *p, u_int length, u_int caplen,
 		break;
 
 	default:
-		(void)printf("CLNS %02x(%d)", p[0], length);
+		(void)printf("CLNS 0x%02x, length: %u", p[0], length);
 		if (!eflag && esrc != NULL && edst != NULL)
 			(void)printf(", %s > %s",
 				     etheraddr_string(esrc),

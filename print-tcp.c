@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.100 2002-08-20 00:01:38 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.101 2002-08-20 00:17:23 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -618,7 +618,7 @@ tcp_print(register const u_char *bp, register u_int length,
 			msdp_print(bp, length);
 		}
                 else if (sport == LDP_PORT || dport == LDP_PORT)
-                        printf("LDP, length: %u", length);
+                        printf(": LDP, length: %u", length);
 	}
 	return;
 bad:
