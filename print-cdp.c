@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.6 2001-06-15 07:54:19 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.7 2001-06-15 07:58:28 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -47,8 +47,8 @@ static const char rcsid[] =
 #include "addrtoname.h"
 #include "extract.h"			/* must come after interface.h */
 
-static void cdp_print_addr(const u_char *, int);
-static void cdp_print_prefixes(const u_char *, int);
+static int cdp_print_addr(const u_char *, int);
+static int cdp_print_prefixes(const u_char *, int);
 
 void
 cdp_print(const u_char *p, u_int length, u_int caplen,
@@ -89,7 +89,8 @@ cdp_print(const u_char *p, u_int length, u_int caplen,
 			break;
 		case 0x02:
 			printf(" Addr");
-			cdp_print_addr(p + i + 4, len - 4);
+			if (cdp_print_addr(p + i + 4, len - 4) < 0)
+				goto trunc;
 			break;
 		case 0x03:
 			printf(" PortID '%.*s'", len - 4, p + i + 4);
@@ -107,7 +108,8 @@ cdp_print(const u_char *p, u_int length, u_int caplen,
 			printf(" Platform: '%.*s'", len - 4, p + i + 4);
 			break;
 		case 0x07:
-			cdp_print_prefixes(p + i + 4, len - 4);
+			if (cdp_print_prefixes(p + i + 4, len - 4) < 0)
+				goto trunc;
 			break;
 		case 0x09:		/* guess - not documented */
 			printf(" VTP Management Domain: '%.*s'", len - 4,
@@ -137,7 +139,7 @@ trunc:
 	printf("[|cdp]");
 }
 
-static void
+static int
 cdp_print_addr(const u_char * p, int l)
 {
 	int pl, al, num;
@@ -150,29 +152,29 @@ cdp_print_addr(const u_char * p, int l)
 
 	while (p < endp && num >= 0) {
 		if (p + 2 >= endp)
-			break;
+			goto trunc;
 		pl = p[1];
 		p += 2;
 
 		/* special case: IPv4, protocol type=0xcc, addr. length=4 */
 		if (p + 3 >= endp)
-			break;
+			goto trunc;
 		if (pl == 1 && *p == 0xcc && p[1] == 0 && p[2] == 4) {
 			if (p + 7 >= endp)
-				break;
+				goto trunc;
 			p += 3;
 
 			printf("IPv4 %u.%u.%u.%u ", p[0], p[1], p[2], p[3]);
 			p += 4;
 		} else {	/* generic case: just print raw data */
 			if (p + pl >= endp)
-				break;
-			printf("pt=0x%02x, pl=%d, pb=", *(p-2), pl);
+				goto trunc;
+			printf("pt=0x%02x, pl=%d, pb=", *(p - 2), pl);
 			while (pl-- > 0)
 				printf(" %02x", *p++);
 			al = (*p << 8) + *(p + 1);
 			if (p + 2 + al >= endp)
-				break;
+				goto trunc;
 			printf(", al=%d, a=", al);
 			p += 2;
 			while (al-- > 0)
@@ -181,19 +183,30 @@ cdp_print_addr(const u_char * p, int l)
 		printf("  ");
 		num--;
 	}
+
+	return 0;
+
+trunc:
+	return -1;
 }
 
 
-static void
+static int
 cdp_print_prefixes(const u_char * p, int l)
 {
+	if (l % 5)
+		goto trunc;
+
 	printf(" IPv4 Prefixes (%d):", l / 5);
 
 	while (l > 0) {
-		if (l < 5)
-			break;
 		printf(" %u.%u.%u.%u/%u", p[0], p[1], p[2], p[3], p[4]);
 		l -= 5;
 		p += 5;
 	}
+
+	return 0;
+
+trunc:
+	return -1;
 }
