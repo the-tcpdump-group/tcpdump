@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.92 2001-10-19 09:32:01 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.93 2001-11-05 08:23:40 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -211,7 +211,6 @@ tcp_print(register const u_char *bp, register u_int length,
 
 	sport = ntohs(tp->th_sport);
 	dport = ntohs(tp->th_dport);
-
 
 	hlen = TH_OFF(tp) * 4;
 
