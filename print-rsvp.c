@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.14 2002-12-14 02:03:10 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.15 2003-03-05 11:13:34 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -214,10 +214,13 @@ static const struct tok rsvp_ctype_values[] = {
     { 256*RSVP_OBJ_LABEL+RSVP_CTYPE_1,                       "1" },
     { 256*RSVP_OBJ_ERO+RSVP_CTYPE_IPV4,                      "IPv4" },
     { 256*RSVP_OBJ_RRO+RSVP_CTYPE_IPV4,                      "IPv4" },
+    { 256*RSVP_OBJ_ERROR_SPEC+RSVP_CTYPE_IPV4,               "IPv4" },
+    { 256*RSVP_OBJ_ERROR_SPEC+RSVP_CTYPE_IPV6,               "IPv6" },
     { 256*RSVP_OBJ_RESTART_CAPABILITY+RSVP_CTYPE_1,          "IPv4" },
     { 256*RSVP_OBJ_SESSION_ATTRIBUTE+RSVP_CTYPE_TUNNEL_IPV4, "Tunnel IPv4" },
     { 256*RSVP_OBJ_FASTREROUTE+RSVP_CTYPE_TUNNEL_IPV4,       "Tunnel IPv4" },
     { 256*RSVP_OBJ_DETOUR+RSVP_CTYPE_TUNNEL_IPV4,            "Tunnel IPv4" },
+    { 256*RSVP_OBJ_PROPERTIES+RSVP_CTYPE_1,                  "1" },
     { 0, NULL}
 };
 
@@ -274,6 +277,38 @@ static struct tok rsvp_session_attribute_flag_values[] = {
     { 1,	              "Local Protection desired" },
     { 2,                      "Label Recording desired" },
     { 4,                      "SE Style desired" },
+    { 0, NULL}
+};
+
+static struct tok rsvp_obj_prop_tlv_values[] = {
+    { 0x01,                   "Cos" },
+    { 0x02,                   "Metric 1" },
+    { 0x04,                   "Metric 2" },
+    { 0x08,                   "CCC Status" },
+    { 0x10,                   "Path Type" },
+    { 0, NULL}
+};
+
+#define RSVP_OBJ_ERROR_SPEC_CODE_ROUTING 24
+#define RSVP_OBJ_ERROR_SPEC_CODE_NOTIFY  25
+
+static struct tok rsvp_obj_error_code_values[] = {
+    { RSVP_OBJ_ERROR_SPEC_CODE_ROUTING, "Routing Problem" },
+    { RSVP_OBJ_ERROR_SPEC_CODE_NOTIFY,  "Notify Error" },
+    { 0, NULL}
+};
+
+static struct tok rsvp_obj_error_code_routing_values[] = {
+    { 1,                      "Bad EXPLICIT_ROUTE object" },
+    { 2,                      "Bad strict node" },
+    { 3,                      "Bad loose node" },
+    { 4,                      "Bad initial subobject" },
+    { 5,                      "No route available toward destination" },
+    { 6,                      "Unacceptable label value" },
+    { 7,                      "RRO indicated routing loops" },
+    { 8,                      "non-RSVP-capable router in the path" },
+    { 9,                      "MPLS label allocation failure" },
+    { 10,                     "Unsupported L3PID" },
     { 0, NULL}
 };
 
@@ -422,7 +457,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
     const struct rsvp_object_header *rsvp_obj_header;
     const u_char *tptr,*obj_tptr;
     u_short tlen,rsvp_obj_len,rsvp_obj_ctype,obj_tlen,intserv_serv_tlen;
-    int hexdump,processed;
+    int hexdump,processed,padbytes,error_code,error_value;
     union {
 	float f;
 	u_int32_t i;
@@ -899,13 +934,84 @@ rsvp_print(register const u_char *pptr, register u_int len) {
             }
             break;
 
+        case RSVP_OBJ_ERROR_SPEC:
+            switch(rsvp_obj_ctype) {
+            case RSVP_CTYPE_IPV4:
+                error_code=*(obj_tptr+5);
+                error_value=EXTRACT_16BITS(obj_tptr+6);
+                printf("\n\t    Error Node Adress: %s, Flags: [0x%02x]\n\t    Error Code: %s (%u)",
+                       ipaddr_string(obj_tptr),
+                       *(obj_tptr+4),
+                       tok2str(rsvp_obj_error_code_values,"unknown",error_code),
+                       error_code,
+                       error_value);
+                switch (error_code) {
+                case RSVP_OBJ_ERROR_SPEC_CODE_ROUTING:
+                    printf(", Error Value: %s (%u)",
+                           tok2str(rsvp_obj_error_code_routing_values,"unknown",error_value));
+                    break;
+                default:
+                    printf(", Unknown Error Value (%u)");
+                }
+                break;
+#ifdef INET6
+            case RSVP_CTYPE_IPV6:
+                error_code=*(obj_tptr+17);
+                error_value=EXTRACT_16BITS(obj_tptr+18);
+                printf("\n\t    Error Node Adress: %s, Flags: [0x%02x]\n\t    Error Code: %s (%u)",
+                       ip6addr_string(obj_tptr),
+                       *(obj_tptr+16),
+                       tok2str(rsvp_obj_error_code_values,"unknown",error_code),
+                       error_code,
+                       error_value);
+
+                switch (error_code) {
+                case RSVP_OBJ_ERROR_SPEC_CODE_ROUTING:
+                    printf(", Error Value: %s (%u)",
+                           tok2str(rsvp_obj_error_code_routing_values,"unknown",error_value));
+                    break;
+                default:
+                    printf(", Unknown Error Value (%u)");
+                }
+
+                break;
+#endif
+            default:
+                hexdump=TRUE;
+            }
+            break;
+
+        case RSVP_OBJ_PROPERTIES:
+            switch(rsvp_obj_ctype) {
+            case RSVP_CTYPE_1:
+                padbytes = EXTRACT_16BITS(obj_tptr+2);
+                printf("\n\t    TLV count: %u, padding bytes: %u",
+                       EXTRACT_16BITS(obj_tptr),
+                       padbytes);
+                       obj_tlen-=4;
+                       obj_tptr+=4;
+                /* loop through as long there is anything longer than the TLV header (2) */
+                while(obj_tlen >= 2 + padbytes) {
+                    printf("\n\t      %s TLV (0x%02x), length: %u", /* length includes header */
+                           tok2str(rsvp_obj_prop_tlv_values,"unknown",*obj_tptr),
+                           *obj_tptr,
+                           *(obj_tptr+1));
+                    print_unknown_data(obj_tptr+2,"\n\t\t",*(obj_tptr+1)-2);
+                    obj_tlen-=*(obj_tptr+1);
+                    obj_tptr+=*(obj_tptr+1);
+                }
+                break;
+            default:
+                hexdump=TRUE;
+            }
+            break;
+
         /*
          *  FIXME those are the defined objects that lack a decoder
          *  you are welcome to contribute code ;-)
          */
 
         case RSVP_OBJ_INTEGRITY:
-        case RSVP_OBJ_ERROR_SPEC:
         case RSVP_OBJ_SCOPE:
         case RSVP_OBJ_POLICY_DATA:
         case RSVP_OBJ_MESSAGE_ID:
@@ -914,7 +1020,6 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         case RSVP_OBJ_RECOVERY_LABEL:
         case RSVP_OBJ_UPSTREAM_LABEL:
         case RSVP_OBJ_SUGGESTED_LABEL:
-        case RSVP_OBJ_PROPERTIES:
         default:
             if (vflag <= 1)
                 print_unknown_data(obj_tptr,"\n\t    ",obj_tlen);
