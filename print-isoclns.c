@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.35 2001-12-18 09:00:14 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.36 2002-01-10 09:33:23 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -202,7 +202,6 @@ struct isis_tlv_ip_reach {
 };
 
 struct isis_tlv_is_reach {
-    u_char virtual_flag;
     u_char metric_default;
     u_char metric_delay;
     u_char metric_expense;
@@ -1141,16 +1140,35 @@ static int isis_print (const u_char *p, u_int length)
             break;
         case TLV_IS_REACH:
             printf("IS Reachability (%u)",len);
-	    tlv_is_reach = (const struct isis_tlv_is_reach *)pptr;
-	    if (!TTEST(*tlv_is_reach))
-		goto trunctlv;
-	    printf("\n\t\t\tIS Neighbor: ");
-            isis_print_nodeid(tlv_is_reach->neighbor_nodeid);
+
+	    tptr=pptr;
+
+	    if (!TTEST2(*tptr,1))  /* check if there is one byte left to read out the virtual flag */
+		 goto trunctlv;
+
+	    switch (*tptr) {
+	    case 0:
+	      printf("\n\t\t\tIsNotVirtual");
+	      break;
+	    case 1:
+	      printf("\n\t\t\tIsVirtual");
+	      break;
+	    default:
+	      printf("\n\t\t\tbogus virtual flag 0x%02x",(*tptr));
+	      break;     
+	    }
+
+	    tptr++;
+
+	    tlv_is_reach = (const struct isis_tlv_is_reach *)tptr;
 
 	    tmp = len;
             while (tmp >= sizeof(struct isis_tlv_is_reach)) {
 		if (!TTEST(*tlv_is_reach))
 		    goto trunctlv;
+
+		printf("\n\t\t\tIS Neighbor: ");
+		isis_print_nodeid(tlv_is_reach->neighbor_nodeid);
 
 		printf(", Default Metric: %d, %s",
 			   ISIS_LSP_TLV_METRIC_VALUE(tlv_is_reach->metric_default),
@@ -1170,18 +1188,6 @@ static int isis_print (const u_char *p, u_int length)
 		    printf("\n\t\t\t  Error Metric: %d, %s",
 				   ISIS_LSP_TLV_METRIC_VALUE(tlv_is_reach->metric_error),
 				   ISIS_LSP_TLV_METRIC_IE(tlv_is_reach->metric_error) ? "External" : "Internal");
-
-            	switch (tlv_is_reach->virtual_flag) {
-            	    case 0:
-            	        printf(", IsNotVirtual");
-            	        break;
-            	    case 1:
-                        printf(", IsVirtual");
-                        break;
-                    default:
-                        printf(", bogus virtual flag 0x%02x",tlv_is_reach->virtual_flag);
-                        break;     
-            	    }
 
 		tmp -= sizeof(struct isis_tlv_is_reach);
 		tlv_is_reach++;
