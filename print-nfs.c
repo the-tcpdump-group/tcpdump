@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.98 2002-12-11 07:14:05 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.99 2002-12-12 07:57:50 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1091,47 +1091,46 @@ parsefattr(const u_int32_t *dp, int verbose, int v3)
 			TCHECK(fap->fa3_size);
 			printf(" sz ");
 			print_int64((u_int32_t *)&fap->fa3_size, UNSIGNED);
-			putchar(' ');
 		} else {
 			TCHECK(fap->fa2_size);
-			printf(" sz %d ", EXTRACT_32BITS(&fap->fa2_size));
+			printf(" sz %d", EXTRACT_32BITS(&fap->fa2_size));
 		}
 	}
 	/* print lots more stuff */
 	if (verbose > 1) {
 		if (v3) {
 			TCHECK(fap->fa3_ctime);
-			printf("nlink %d rdev %d/%d ",
+			printf(" nlink %d rdev %d/%d",
 			       EXTRACT_32BITS(&fap->fa_nlink),
 			       EXTRACT_32BITS(&fap->fa3_rdev.specdata1),
 			       EXTRACT_32BITS(&fap->fa3_rdev.specdata2));
-			printf("fsid ");
+			printf(" fsid ");
 			print_int64((u_int32_t *)&fap->fa3_fsid, HEX);
-			printf(" nodeid ");
+			printf(" fileid ");
 			print_int64((u_int32_t *)&fap->fa3_fileid, HEX);
-			printf(" a/m/ctime %u.%06u ",
+			printf(" a/m/ctime %u.%06u",
 			       EXTRACT_32BITS(&fap->fa3_atime.nfsv3_sec),
 			       EXTRACT_32BITS(&fap->fa3_atime.nfsv3_nsec));
-			printf("%u.%06u ",
+			printf(" %u.%06u",
 			       EXTRACT_32BITS(&fap->fa3_mtime.nfsv3_sec),
 			       EXTRACT_32BITS(&fap->fa3_mtime.nfsv3_nsec));
-			printf("%u.%06u ",
+			printf(" %u.%06u",
 			       EXTRACT_32BITS(&fap->fa3_ctime.nfsv3_sec),
 			       EXTRACT_32BITS(&fap->fa3_ctime.nfsv3_nsec));
 		} else {
 			TCHECK(fap->fa2_ctime);
-			printf("nlink %d rdev %x fsid %x nodeid %x a/m/ctime ",
+			printf(" nlink %d rdev %x fsid %x nodeid %x a/m/ctime",
 			       EXTRACT_32BITS(&fap->fa_nlink),
 			       EXTRACT_32BITS(&fap->fa2_rdev),
 			       EXTRACT_32BITS(&fap->fa2_fsid),
 			       EXTRACT_32BITS(&fap->fa2_fileid));
-			printf("%u.%06u ",
+			printf(" %u.%06u",
 			       EXTRACT_32BITS(&fap->fa2_atime.nfsv2_sec),
 			       EXTRACT_32BITS(&fap->fa2_atime.nfsv2_usec));
-			printf("%u.%06u ",
+			printf(" %u.%06u",
 			       EXTRACT_32BITS(&fap->fa2_mtime.nfsv2_sec),
 			       EXTRACT_32BITS(&fap->fa2_mtime.nfsv2_usec));
-			printf("%u.%06u ",
+			printf(" %u.%06u",
 			       EXTRACT_32BITS(&fap->fa2_ctime.nfsv2_sec),
 			       EXTRACT_32BITS(&fap->fa2_ctime.nfsv2_usec));
 		}
@@ -1353,7 +1352,7 @@ parsecreateopres(const u_int32_t *dp, int verbose)
 			if (!(dp = parse_post_op_attr(dp, verbose)))
 				return (0);
 			if (vflag > 1) {
-				printf("dir attr:");
+				printf(" dir attr:");
 				dp = parse_wcc_data(dp, verbose);
 			}
 		}
@@ -1568,7 +1567,7 @@ interp_reply(const struct rpc_msg *rp, u_int32_t proc, u_int32_t vers, int lengt
 				return;
 			if (vflag) {
 				TCHECK(dp[1]);
-				printf("%u bytes", EXTRACT_32BITS(&dp[0]));
+				printf(" %u bytes", EXTRACT_32BITS(&dp[0]));
 				if (EXTRACT_32BITS(&dp[1]))
 					printf(" EOF");
 			}
@@ -1592,7 +1591,7 @@ interp_reply(const struct rpc_msg *rp, u_int32_t proc, u_int32_t vers, int lengt
 				return;
 			if (vflag) {
 				TCHECK(dp[0]);
-				printf("%u bytes", EXTRACT_32BITS(&dp[0]));
+				printf(" %u bytes", EXTRACT_32BITS(&dp[0]));
 				if (vflag > 1) {
 					TCHECK(dp[1]);
 					printf(" <%s>",
