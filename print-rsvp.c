@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.2 2002-10-06 08:00:26 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.3 2002-10-10 19:34:51 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -173,17 +173,32 @@ static const struct tok rsvp_obj_values[] = {
 #define	RSVP_CTYPE_IPV4        1
 #define	RSVP_CTYPE_IPV6        2
 #define	RSVP_CTYPE_TUNNEL_IPV4 7
+#define	RSVP_CTYPE_TUNNEL_IPV6 8
 #define RSVP_CTYPE_1           1
+#define RSVP_CTYPE_2           2
+#define RSVP_CTYPE_3           3
+
+/*
+ * the ctypes are not globally unique so for
+ * translating it to strings we build a table based
+ * on objects offsetted by the ctype
+ */
 
 static const struct tok rsvp_ctype_values[] = {
-    { 256*RSVP_OBJ_SESSION+RSVP_CTYPE_IPV4,	      "IPv4" },
-    { 256*RSVP_OBJ_SESSION+RSVP_CTYPE_IPV6,	      "IPv6" },
-    { 256*RSVP_OBJ_SESSION+RSVP_CTYPE_TUNNEL_IPV4,    "Tunnel IPv4" },
-    { 256*RSVP_OBJ_LABEL+RSVP_CTYPE_IPV4,	      "IPv4" },
-    { 256*RSVP_OBJ_LABEL_REQ+RSVP_CTYPE_IPV4,         "IPv4" },
-    { 256*RSVP_OBJ_ERO+RSVP_CTYPE_IPV4,               "IPv4" },
-    { 256*RSVP_OBJ_RRO+RSVP_CTYPE_IPV4,               "IPv4" },
-    { 256*RSVP_OBJ_RESTART_CAPABILITY+RSVP_CTYPE_1,   "IPv4" },
+    { 256*RSVP_OBJ_SESSION+RSVP_CTYPE_IPV4,	           "IPv4" },
+    { 256*RSVP_OBJ_SESSION+RSVP_CTYPE_IPV6,	           "IPv6" },
+    { 256*RSVP_OBJ_SESSION+RSVP_CTYPE_TUNNEL_IPV4,         "Tunnel IPv4" },
+    { 256*RSVP_OBJ_SENDER_TEMPLATE+RSVP_CTYPE_TUNNEL_IPV4, "Tunnel IPv4" },
+    { 256*RSVP_OBJ_STYLE+RSVP_CTYPE_1,                     "1" },
+    { 256*RSVP_OBJ_HELLO+RSVP_CTYPE_1,                     "Hello Request" },
+    { 256*RSVP_OBJ_HELLO+RSVP_CTYPE_2,                     "Hello Ack" },
+    { 256*RSVP_OBJ_LABEL_REQ+RSVP_CTYPE_1,	           "without label range" },
+    { 256*RSVP_OBJ_LABEL_REQ+RSVP_CTYPE_2,	           "with ATM label range" },
+    { 256*RSVP_OBJ_LABEL_REQ+RSVP_CTYPE_3,                 "with FR label range" },
+    { 256*RSVP_OBJ_LABEL+RSVP_CTYPE_1,                     "1" },
+    { 256*RSVP_OBJ_ERO+RSVP_CTYPE_IPV4,                    "IPv4" },
+    { 256*RSVP_OBJ_RRO+RSVP_CTYPE_IPV4,                    "IPv4" },
+    { 256*RSVP_OBJ_RESTART_CAPABILITY+RSVP_CTYPE_1,        "IPv4" },
     { 0, NULL}
 };
 
@@ -205,6 +220,16 @@ static const struct tok rsvp_obj_xro_values[] = {
     { 0, NULL}
 };
 
+static const struct tok rsvp_resstyle_values[] = {
+    { 17,	              "Wildcard Filter" },
+    { 10,                     "Fixed Filter" },
+    { 18,                     "Shared Explicit" },
+    { 0, NULL}
+};
+
+#define FALSE 0
+#define TRUE  1
+
 void
 rsvp_print(register const u_char *pptr, register u_int len) {
 
@@ -212,6 +237,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
     const struct rsvp_object_header *rsvp_obj_header;
     const u_char *tptr,*obj_tptr;
     u_short tlen,rsvp_obj_len,rsvp_obj_ctype,obj_tlen;
+    int hexdump;
 
     tptr=pptr;
     rsvp_com_header = (const struct rsvp_common_header *)pptr;
@@ -262,10 +288,21 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         if(rsvp_obj_len % 4 || rsvp_obj_len < 4)
             return;
 
-        printf("\n\t  %s Object (%u), Class-Type: %s (%u), length: %u",
-               tok2str(rsvp_obj_values, "Unknown",rsvp_obj_header->class_num),
+        printf("\n\t  %s Object (%u) flags: [%s",
+               tok2str(rsvp_obj_values,
+                       "Unknown",
+                       rsvp_obj_header->class_num),
                rsvp_obj_header->class_num,
-               tok2str(rsvp_ctype_values, "Unknown",((rsvp_obj_header->class_num)<<8)+rsvp_obj_ctype),
+               ((rsvp_obj_header->class_num)&0x80) ? "ignore" : "reject");
+
+        if (rsvp_obj_header->class_num > 128)
+            printf(" %s",
+                   ((rsvp_obj_header->class_num)&0x40) ? "and forward" : "silently");
+
+        printf(" if unknown], Class-Type: %s (%u), length: %u",
+               tok2str(rsvp_ctype_values,
+                       "Unknown",
+                       ((rsvp_obj_header->class_num)<<8)+rsvp_obj_ctype),
                rsvp_obj_ctype,
                rsvp_obj_len);
 
@@ -275,22 +312,97 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         /* did we capture enough for fully decoding the object ? */
         if (!TTEST2(*tptr, rsvp_obj_len))
             goto trunc;
+        hexdump=FALSE;
 
         switch(rsvp_obj_header->class_num) {
-        case RSVP_OBJ_LABEL:
+        case RSVP_OBJ_SESSION:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_IPV4:
+                printf("\n\t    IPv4 DestAddress: %s, Protocol ID: 0x%02x",
+                       ipaddr_string(obj_tptr),
+                       *(obj_tptr+4));
+                printf("\n\t    Flags: 0x%02x, DestPort %u",
+                       *(obj_tptr+5),
+                       EXTRACT_16BITS(obj_tptr+6));
+                obj_tlen-=8;
+                obj_tptr+=8;                
+                break;
+#ifdef INET6
+            case RSVP_CTYPE_IPV6:
+                printf("\n\t    IPv6 DestAddress: %s, Protocol ID: 0x%02x",
+                       ip6addr_string(obj_tptr),
+                       *(obj_tptr+16));
+                printf("\n\t    Flags: 0x%02x, DestPort %u",
+                       *(obj_tptr+17),
+                       EXTRACT_16BITS(obj_tptr+18));
+                obj_tlen-=20;
+                obj_tptr+=20;                
+                break;
+            case RSVP_CTYPE_TUNNEL_IPV6:
+                printf("\n\t    IPv6 Tunnel EndPoint: %s, Tunnel ID: 0x%04x, Extended Tunnel ID: %s",
+                       ip6addr_string(obj_tptr),
+                       EXTRACT_16BITS(obj_tptr+18),
+                       ip6addr_string(obj_tptr+20));
+                obj_tlen-=36;
+                obj_tptr+=36;                
+                break;
+#endif
+            case RSVP_CTYPE_TUNNEL_IPV4:
+                printf("\n\t    IPv4 Tunnel EndPoint: %s, Tunnel ID: 0x%04x, Extended Tunnel ID: %s",
+                       ipaddr_string(obj_tptr),
+                       EXTRACT_16BITS(obj_tptr+6),
+                       ipaddr_string(obj_tptr+8));
+                obj_tlen-=12;
+                obj_tptr+=12;                
+                break;
+            default:
+                hexdump=TRUE;
+            }
+            break;
+        case RSVP_OBJ_LABEL:
+            switch(rsvp_obj_ctype) {
+            case RSVP_CTYPE_1:
                 while(obj_tlen >= 4 ) {
                     printf("\n\t    Label: %u", EXTRACT_32BITS(obj_tptr));
                     obj_tlen-=4;
                     obj_tptr+=4;
                 }
                 break;
+            default:
+                hexdump=TRUE;
+            }
+            break;
+        case RSVP_OBJ_STYLE:
+            switch(rsvp_obj_ctype) {
+            case RSVP_CTYPE_1:
+                printf("\n\t    Reservation Style: %s, Flags: 0x%02x",
+                       tok2str(rsvp_resstyle_values,
+                               "Unknown",
+                               EXTRACT_24BITS(obj_tptr+1)),
+                       *(obj_tptr));
+                obj_tlen-=4;
+                obj_tptr+=4;
+                break;
+            default:
+                hexdump=TRUE;
+            }
+            break;
+        case RSVP_OBJ_SENDER_TEMPLATE:
+            switch(rsvp_obj_ctype) {
+            case RSVP_CTYPE_TUNNEL_IPV4:
+                printf("\n\t    IPv4 Tunnel Sender Address: %s, LSP-ID: 0x%04x",
+                       ipaddr_string(obj_tptr),
+                       EXTRACT_16BITS(obj_tptr+6));
+                obj_tlen-=8;
+                obj_tptr+=8;
+                break;
+            default:
+                hexdump=TRUE;
             }
             break;
         case RSVP_OBJ_LABEL_REQ:
             switch(rsvp_obj_ctype) {
-            case RSVP_CTYPE_IPV4:
+            case RSVP_CTYPE_1:
                 while(obj_tlen >= 4 ) {
                     printf("\n\t    L3 Protocol ID: %s",
                            tok2str(ethertype_values,
@@ -300,6 +412,36 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                     obj_tptr+=4;
                 }
                 break;
+            case RSVP_CTYPE_2:
+                printf("\n\t    L3 Protocol ID: %s",
+                       tok2str(ethertype_values,
+                               "Unknown Protocol 0x%04x",
+                               EXTRACT_16BITS(obj_tptr+2)));
+                printf(",%s merge capability",((*(obj_tptr+4))&0x80) ? "no" : "" );
+                printf("\n\t    Minimum VPI/VCI %u/%u",
+                       (EXTRACT_16BITS(obj_tptr+4))&0xfff,
+                       (EXTRACT_16BITS(obj_tptr+6))&0xfff);
+                printf("\n\t    Maximum VPI/VCI %u/%u",
+                       (EXTRACT_16BITS(obj_tptr+8))&0xfff,
+                       (EXTRACT_16BITS(obj_tptr+10))&0xfff);
+                obj_tlen-=12;
+                obj_tptr+=12;
+                break;
+            case RSVP_CTYPE_3:
+                printf("\n\t    L3 Protocol ID: %s",
+                       tok2str(ethertype_values,
+                               "Unknown Protocol 0x%04x",
+                               EXTRACT_16BITS(obj_tptr+2)));
+                printf("\n\t    Minimum/Maximum DLCI %u/%u, %s%s bit DLCI",
+                       (EXTRACT_32BITS(obj_tptr+4))&0x7fffff,
+                       (EXTRACT_32BITS(obj_tptr+8))&0x7fffff,
+                       (((EXTRACT_16BITS(obj_tptr+4)>>7)&3) == 0 ) ? "10" : "",
+                       (((EXTRACT_16BITS(obj_tptr+4)>>7)&3) == 2 ) ? "23" : "");
+                obj_tlen-=12;
+                obj_tptr+=12;
+                break;
+            default:
+                hexdump=TRUE;
             }
             break;
         case RSVP_OBJ_RRO:
@@ -322,35 +464,49 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                     obj_tptr+=*(obj_tptr+1);
                 }
                 break;
+            default:
+                hexdump=TRUE;
+            }
+            break;
+        case RSVP_OBJ_HELLO:
+            switch(rsvp_obj_ctype) {
+            case RSVP_CTYPE_1:
+            case RSVP_CTYPE_2:
+                printf("\n\t    Source Instance 0x%08x, Destination Instance 0x%08x",
+                       EXTRACT_32BITS(obj_tptr),
+                       EXTRACT_32BITS(obj_tptr+4));
+                obj_tlen-=8;
+                obj_tptr+=8;
+                break;
+            default:
+                hexdump=TRUE;
             }
             break;
         case RSVP_OBJ_RESTART_CAPABILITY:
             switch(rsvp_obj_ctype) {
-            case 1:
+            case RSVP_CTYPE_1:
                 printf("\n\t    Restart  Time: %ums\n\t    Recovery Time: %ums",
                        EXTRACT_16BITS(obj_tptr),
                        EXTRACT_16BITS(obj_tptr+4));
                 break;
+            default:
+                hexdump=TRUE;
             }
             break;
         /*
          *  FIXME those are the defined objects that lack a decoder
          *  you are welcome to contribute code ;-)
          */
-        case RSVP_OBJ_SESSION:
         case RSVP_OBJ_RSVP_HOP:
         case RSVP_OBJ_INTEGRITY:
         case RSVP_OBJ_TIME_VALUES:
         case RSVP_OBJ_ERROR_SPEC:
         case RSVP_OBJ_SCOPE:
-        case RSVP_OBJ_STYLE:
         case RSVP_OBJ_FILTERSPEC:
-        case RSVP_OBJ_SENDER_TEMPLATE:
         case RSVP_OBJ_SENDER_TSPEC:
         case RSVP_OBJ_ADSPEC:
         case RSVP_OBJ_POLICY_DATA:
         case RSVP_OBJ_CONFIRM:
-        case RSVP_OBJ_HELLO:
         case RSVP_OBJ_MESSAGE_ID:
         case RSVP_OBJ_MESSAGE_ID_ACK:
         case RSVP_OBJ_MESSAGE_ID_LIST:
@@ -367,7 +523,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
             break;
         }
         /* do we want to see an additionally hexdump ? */
-        if (vflag > 1)
+        if (vflag > 1 || hexdump==TRUE)
             print_unknown_data(tptr+sizeof(sizeof(struct rsvp_object_header)),"\n\t    ",
                                rsvp_obj_len-sizeof(struct rsvp_object_header));
 
