@@ -45,7 +45,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.47 2001-03-22 02:06:43 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.48 2001-04-23 19:29:21 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -849,7 +849,7 @@ static struct smi2be smi2betab[] = {
 };
 
 static void smi_decode_oid(struct be *elem, unsigned int *oid,
-			   unsigned int *oidlen)
+			   unsigned int oidsize, unsigned int *oidlen)
 {
 	u_char *p = (u_char *)elem->data.raw;
 	u_int32_t asnlen = elem->asnlen;
@@ -865,10 +865,14 @@ static void smi_decode_oid(struct be *elem, unsigned int *oid,
 		 */
 		if (first < 0) {
 		        first = 0;
-			oid[(*oidlen)++] = o/OIDMUX;
+			if (*oidlen < oidsize) {
+			    oid[(*oidlen)++] = o/OIDMUX;
+			}
 			o %= OIDMUX;
 		}
-		oid[(*oidlen)++] = o;
+		if (*oidlen < oidsize) {
+		    oid[(*oidlen)++] = o;
+		}
 		o = 0;
 	}
 }
@@ -965,7 +969,7 @@ static SmiNode *smi_print_variable(struct be *elem)
 	SmiNode *smiNode = NULL;
 	int i;
 
-	smi_decode_oid(elem, oid, &oidlen);
+	smi_decode_oid(elem, oid, sizeof(oid)/sizeof(unsigned int), &oidlen);
 	smiNode = smiGetNodeByOID(oidlen, oid);
 	if (! smiNode) {
 	        asn1_print(elem);
@@ -1048,7 +1052,9 @@ static void smi_print_value(SmiNode *smiNode, u_char pduid, struct be *elem)
 	        if (smiType->basetype == SMI_BASETYPE_BITS) {
 		        /* print bit labels */
 		} else {
-		        smi_decode_oid(elem, oid, &oidlen);
+		        smi_decode_oid(elem, oid,
+				       sizeof(oid)/sizeof(unsigned int),
+				       &oidlen);
 			smiNode = smiGetNodeByOID(oidlen, oid);
 			if (smiNode) {
 			        if (vflag) {
