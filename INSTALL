@@ -1,4 +1,4 @@
-@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.36 1999-10-07 23:47:09 mcr Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.37 2000-01-14 18:05:45 mcr Exp $ (LBL)
 
 If you have not built libpcap, do so first.  See the README
 file in this directory for the ftp location.
@@ -52,6 +52,11 @@ for any modifications you need to make. However, we are not interested
 in ascii packet printer patches. We believe adding this feature would
 make it too easy for crackers who do not have the programming skills
 needed to write a password sniffer to grab clear text passwords.
+
+== Tested platforms ==
+NetBSD 		1.4.1/i386	(mcr)
+RedHat Linux 	6.1/i386	(assar)
+
 
 FILES
 -----
