@@ -21,12 +21,12 @@
  * Original code by Matt Thomas, Digital Equipment Corporation
  *
  * Extensively modified by Hannes Gredler (hannes@juniper.net) for more
- * complete IS-IS support.
+ * complete IS-IS & CLNP support.
  */
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.127 2005-03-07 14:36:16 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.128 2005-03-08 08:52:39 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -57,7 +57,6 @@ static const char rcsid[] _U_ =
 #define SYSTEM_ID_LEN	ETHER_ADDR_LEN
 #define NODE_ID_LEN     SYSTEM_ID_LEN+1
 #define LSP_ID_LEN      SYSTEM_ID_LEN+2
-#define NSAP_MAX_LENGTH 20
 
 #define ISIS_VERSION	1
 #define ESIS_VERSION	1
@@ -470,35 +469,6 @@ struct isis_tlv_lsp {
     u_int8_t checksum[2];
 };
 
-static char *
-print_nsap(register const u_int8_t *pptr, register int nsap_length)
-{
-	int nsap_idx;
-	static char nsap_ascii_output[sizeof("xx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xx")];
-        char *junk_buf = nsap_ascii_output;
-
-        if (nsap_length < 1 || nsap_length > NSAP_MAX_LENGTH) {
-                snprintf(nsap_ascii_output, sizeof(nsap_ascii_output),
-                    "illegal length");
-                return (nsap_ascii_output);
-        }
-
-	for (nsap_idx = 0; nsap_idx < nsap_length; nsap_idx++) {
-		if (!TTEST2(*pptr, 1))
-			return (0);
-		snprintf(junk_buf,
-		    sizeof(nsap_ascii_output) - (junk_buf - nsap_ascii_output),
-		    "%02x", *pptr++);
-		junk_buf += strlen(junk_buf);
-		if (((nsap_idx & 1) == 0) &&
-                     (nsap_idx + 1 < nsap_length)) {
-                     	*junk_buf++ = '.';
-		}
-	}
-        *(junk_buf) = '\0';
-	return (nsap_ascii_output);
-}
-
 #define ISIS_COMMON_HEADER_SIZE (sizeof(struct isis_common_header))
 #define ISIS_IIH_LAN_HEADER_SIZE (sizeof(struct isis_iih_lan_header))
 #define ISIS_IIH_PTP_HEADER_SIZE (sizeof(struct isis_iih_ptp_header))
@@ -650,26 +620,24 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
         li -= (1 + source_address_length);
 
         if (vflag < 1) {
-            printf("%s%s",
+            printf("%s%s > %s, %s, length %u",
                    eflag ? "" : ", ",
-                   print_nsap(source_address, source_address_length));
-            printf("> %s, length %u",
-                   print_nsap(dest_address, dest_address_length),
+                   isonsap_string(source_address, source_address_length),
+                   isonsap_string(dest_address, dest_address_length),
+                   tok2str(clnp_pdu_values,"unknown (%u)",clnp_pdu_type),
                    length);
             return (1);
         }
         printf("%slength %u",eflag ? "" : ", ",length);
 
-    printf("\n\t%s PDU, hlen: %u, v: %u, lifetime: %u.%us, Segment PDU length: %u, checksum: 0x%04x ",
-           tok2str(clnp_pdu_values,
-                   "unknown (%u)",
-                   clnp_pdu_type),
-           clnp_header->length_indicator,
-           clnp_header->version,
-           clnp_header->lifetime/2,
-           (clnp_header->lifetime%2)*5,
-           EXTRACT_16BITS(clnp_header->segment_length),
-           EXTRACT_16BITS(clnp_header->cksum));
+        printf("\n\t%s PDU, hlen: %u, v: %u, lifetime: %u.%us, Segment PDU length: %u, checksum: 0x%04x ",
+               tok2str(clnp_pdu_values, "unknown (%u)",clnp_pdu_type),
+               clnp_header->length_indicator,
+               clnp_header->version,
+               clnp_header->lifetime/2,
+               (clnp_header->lifetime%2)*5,
+               EXTRACT_16BITS(clnp_header->segment_length),
+               EXTRACT_16BITS(clnp_header->cksum));
 
         /* do not attempt to verify the checksum if it is zero */
         if (EXTRACT_16BITS(clnp_header->cksum) == 0)
@@ -679,12 +647,11 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
         printf("\n\tFlags [%s]",
                bittok2str(clnp_flag_values,"none",clnp_flags));
 
-        printf("\n\tsource address (length %u): %s",
+        printf("\n\tsource address (length %u): %s\n\tdest   address (length %u): %s",
                source_address_length,
-               print_nsap(source_address, source_address_length));
-        printf("\n\tdest   address (length %u): %s",
+               isonsap_string(source_address, source_address_length),
                dest_address_length,
-               print_nsap(dest_address, dest_address_length));
+               isonsap_string(dest_address,dest_address_length));
 
         if (clnp_flags & CLNP_SEGMENT_PART) {
             	clnp_segment_header = (const struct clnp_segment_header_t *) pptr;
@@ -877,7 +844,7 @@ esis_print(const u_int8_t *pptr, u_int length)
 		dst = pptr; pptr += *pptr + 1;
 		if (pptr > snapend)
 			return;
-		printf("\n\t  %s", isonsap_string(dst));
+		printf("\n\t  %s", isonsap_string(dst+1,*dst));
 		snpa = pptr; pptr += *pptr + 1;
 		tptr = pptr;   pptr += *pptr + 1;
 		if (pptr > snapend)
@@ -886,7 +853,7 @@ esis_print(const u_int8_t *pptr, u_int length)
 		if (tptr[0] == 0)
 			printf("\n\t  %s", etheraddr_string(&snpa[1]));
 		else
-			printf("\n\t  %s", isonsap_string(tptr));
+			printf("\n\t  %s", isonsap_string(tptr+1,*tptr));
 		break;
 	}
 
@@ -901,7 +868,7 @@ esis_print(const u_int8_t *pptr, u_int length)
                 source_address_length = *pptr;
                 printf("\n\t  NET (length: %u): %s",
                        source_address_length,
-                       print_nsap(pptr+1, source_address_length));
+                       isonsap_string(pptr+1,source_address_length));
 
                 pptr += source_address_length+1;
                 li -= source_address_length+1;
@@ -912,7 +879,7 @@ esis_print(const u_int8_t *pptr, u_int length)
 
 	case ESIS_PDU_ISH: {
             source_address_length = *pptr;
-            printf("\n\t  NET (length: %u): %s", source_address_length, print_nsap(pptr+1, source_address_length));
+            printf("\n\t  NET (length: %u): %s", source_address_length, isonsap_string(pptr+1, source_address_length));
             pptr += source_address_length+1;
             li -= source_address_length +1;
             break;
@@ -1853,7 +1820,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    while (tmp && alen < tmp) {
 		printf("\n\t      Area address (length: %u): %s",
                        alen,
-                       print_nsap(tptr, alen));
+                       isonsap_string(tptr,alen));
 		tptr += alen;
 		tmp -= alen + 1;
 		if (tmp==0) /* if this is the last area address do not attemt a boundary check */
@@ -2291,7 +2258,7 @@ static int isis_print (const u_int8_t *p, u_int length)
                 if (!TTEST2(*tptr, prefix_len/2))
                     goto trunctlv;
                 printf("\n\t\tAddress: %s/%u",
-                       print_nsap(tptr,prefix_len/2),
+                       isonsap_string(tptr,prefix_len/2),
                        prefix_len*4);
                 tptr+=prefix_len/2;
                 tmp-=prefix_len/2;

@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.106 2005-01-04 00:07:09 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.107 2005-03-08 08:52:38 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -578,26 +578,32 @@ llcsap_string(u_char sap)
 	return (tp->name);
 }
 
+#define ISONSAP_MAX_LENGTH 20
 const char *
-isonsap_string(const u_char *nsap)
+isonsap_string(const u_char *nsap, register u_int nsap_length)
 {
-	register u_int i, nlen = nsap[0];
+	register u_int nsap_idx;
 	register char *cp;
 	register struct enamemem *tp;
+
+        if (nsap_length < 1 || nsap_length > ISONSAP_MAX_LENGTH)
+		error("isonsap_string: illegal length");
 
 	tp = lookup_nsap(nsap);
 	if (tp->e_name)
 		return tp->e_name;
 
-	tp->e_name = cp = (char *)malloc(nlen * 2 + 2);
+	tp->e_name = cp = (char *)malloc(sizeof("xx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xx"));
 	if (cp == NULL)
 		error("isonsap_string: malloc");
 
-	nsap++;
-	*cp++ = '/';
-	for (i = nlen; (int)--i >= 0;) {
+	for (nsap_idx = 0; nsap_idx < nsap_length; nsap_idx++) {
 		*cp++ = hex[*nsap >> 4];
 		*cp++ = hex[*nsap++ & 0xf];
+		if (((nsap_idx & 1) == 0) &&
+                     (nsap_idx + 1 < nsap_length)) {
+                     	*cp++ = '.';
+		}
 	}
 	*cp = '\0';
 	return (tp->e_name);
