@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.26 2002-07-27 19:30:36 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.27 2002-07-28 04:23:00 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -272,7 +272,11 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 #ifdef HAVE_LIBCRYPTO
 	    {
 		u_char iv[8];
+#if OPENSSL_VERSION_NUMBER >= 0x00907000L
+		DES_key_schedule schedule;
+#else
 		des_key_schedule schedule;
+#endif
 
 		switch (ivlen) {
 		case 4:
@@ -290,14 +294,22 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 		default:
 			goto fail;
 		}
+		p = ivoff + ivlen;
 
+#if OPENSSL_VERSION_NUMBER >= 0x00907000L
+		DES_set_key_unchecked((DES_cblock *)secret, schedule);
+
+		DES_cbc_encrypt((const unsigned char *)p, p,
+			(long)(ep - p), schedule, (DES_cblock *)iv,
+			DES_DECRYPT);
+#else
 		des_check_key = 0;
 		des_set_key((void *)secret, schedule);
 
-		p = ivoff + ivlen;
 		des_cbc_encrypt((void *)p, (void *)p,
 			(long)(ep - p), schedule, (void *)iv,
 			DES_DECRYPT);
+#endif
 		advance = ivoff - (u_char *)esp + ivlen;
 		break;
 	    }
@@ -360,6 +372,28 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 	case DES3CBC:
 #if defined(HAVE_LIBCRYPTO)
 	    {
+#if OPENSSL_VERSION_NUMBER >= 0x00907000L
+		DES_key_schedule s1, s2, s3;
+
+		DES_set_odd_parity((DES_cblock *)secret);
+		DES_set_odd_parity((DES_cblock *)(secret + 8));
+		DES_set_odd_parity((DES_cblock *)(secret + 16));
+		if(DES_set_key_checked((DES_cblock *)secret, s1) != 0) {
+		  printf("failed to schedule key 1\n");
+		}
+		if(DES_set_key_checked((DES_cblock *)(secret + 8), s2)!=0) {
+		  printf("failed to schedule key 2\n");
+		}
+		if(DES_set_key_checked((DES_cblock *)(secret + 16), s3)!=0) {
+		  printf("failed to schedule key 3\n");
+		}
+
+		p = ivoff + ivlen;
+		DES_ede3_cbc_encrypt((const unsigned char *)p, p,
+				     (long)(ep - p),
+				     &s1, &s2, &s3,
+				     (DES_cblock *)ivoff, DES_DECRYPT);
+#else
 		des_key_schedule s1, s2, s3;
 
 		des_check_key = 1;
@@ -381,6 +415,7 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 				     (long)(ep - p),
 				     s1, s2, s3,
 				     (void *)ivoff, DES_DECRYPT);
+#endif
 		advance = ivoff - (u_char *)esp + ivlen;
 		break;
 	    }
