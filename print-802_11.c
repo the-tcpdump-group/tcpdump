@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.19 2002-12-19 09:39:10 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.20 2003-02-04 05:53:22 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -594,6 +594,24 @@ static void
 data_header_print(u_int16_t fc, const u_char *p, const u_int8_t **srcp,
     const u_int8_t **dstp)
 {
+	switch (FC_SUBTYPE(fc)) {
+	case DATA_DATA:
+	case DATA_NODATA:
+		break;
+	case DATA_DATA_CF_ACK:
+	case DATA_NODATA_CF_ACK:
+		printf("CF Ack ");
+		break;
+	case DATA_DATA_CF_POLL:
+	case DATA_NODATA_CF_POLL:
+		printf("CF Poll ");
+		break;
+	case DATA_DATA_CF_ACK_POLL:
+	case DATA_NODATA_CF_ACK_POLL:
+		printf("CF Ack/Poll ");
+		break;
+	}
+
 #define ADDR1  (p + 4)
 #define ADDR2  (p + 10)
 #define ADDR3  (p + 16)
@@ -773,6 +791,21 @@ static inline void
 ieee_802_11_hdr_print(u_int16_t fc, const u_char *p, const u_int8_t **srcp,
     const u_int8_t **dstp)
 {
+	if (vflag) {
+		if (FC_MORE_DATA(fc))
+			printf("More Data ");
+		if (FC_MORE_FLAG(fc))
+			printf("More Fragments ");
+		if (FC_POWER_MGMT(fc))
+			printf("Pwr Mgmt ");
+		if (FC_RETRY(fc))
+			printf("Retry ");
+		if (FC_ORDER(fc))
+			printf("Strictly Ordered ");
+		if (FC_WEP(fc))
+			printf("WEP Encrypted ");
+	}
+
 	switch (FC_TYPE(fc)) {
 	case T_MGMT:
 		mgmt_header_print(p, srcp, dstp);

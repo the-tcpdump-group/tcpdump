@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ieee802_11.h,v 1.6 2002-12-11 07:13:52 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ieee802_11.h,v 1.7 2003-02-04 05:53:21 guy Exp $ (LBL) */
 /*
  * Copyright (c) 2001
  *	Fortress Technologies
@@ -52,6 +52,15 @@
 #define CTRL_ACK	0xD
 #define CTRL_CF_END	0xE
 #define CTRL_END_ACK	0xF
+
+#define DATA_DATA		0x0
+#define DATA_DATA_CF_ACK	0x1
+#define DATA_DATA_CF_POLL	0x2
+#define DATA_DATA_CF_ACK_POLL	0x3
+#define DATA_NODATA		0x4
+#define DATA_NODATA_CF_ACK	0x5
+#define DATA_NODATA_CF_POLL	0x6
+#define DATA_NODATA_CF_ACK_POLL	0x7
 
 /*
  * Bits in the frame control field.
