@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.96.2.5 2004-02-18 15:13:04 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.96.2.6 2004-03-24 04:14:31 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -195,6 +195,21 @@ static u_int32_t f_localnet;
 /*
  * Return a name for the IP address pointed to by ap.  This address
  * is assumed to be in network byte order.
+ *
+ * NOTE: ap is *NOT* necessarily part of the packet data (not even if
+ * this is being called with the "ipaddr_string()" macro), so you
+ * *CANNOT* use the TCHECK{2}/TTEST{2} macros on it.  Furthermore,
+ * even in cases where it *is* part of the packet data, the caller
+ * would still have to check for a null return value, even if it's
+ * just printing the return value with "%s" - not all versions of
+ * printf print "(null)" with "%s" and a null pointer, some of them
+ * don't check for a null pointer and crash in that case.
+ *
+ * The callers of this routine should, before handing this routine
+ * a pointer to packet data, be sure that the data is present in
+ * the packet buffer.  They should probably do those checks anyway,
+ * as other data at that layer might not be IP addresses, and it
+ * also needs to check whether they're present in the packet buffer.
  */
 const char *
 getname(const u_char *ap)
@@ -202,10 +217,6 @@ getname(const u_char *ap)
 	register struct hostent *hp;
 	u_int32_t addr;
 	static struct hnamemem *p;		/* static for longjmp() */
-
-	if(!TTEST2(*ap, sizeof(addr))) {
-		return NULL;
-	}
 
 	memcpy(&addr, ap, sizeof(addr));
 	p = &hnametable[addr & (HASHNAMESIZE-1)];
