@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.33 2002-07-04 09:24:43 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.34 2002-07-07 20:55:16 guy Exp $";
 #endif
 
 #include <sys/param.h>
@@ -284,17 +284,6 @@ static struct tok bgp_afi_values[] = {
     { AFNUM_L2VPN,            "Layer-2 VPN"},
     { 0, NULL},
 };
-
-static const char *
-num_or_str(const char **table, size_t siz, int value)
-{
-	static char buf[20];
-	if (value < 0 || siz <= value || table[value] == NULL) {
-		snprintf(buf, sizeof(buf), "#%d", value);
-		return buf;
-	} else
-		return table[value];
-}
 
 static int
 decode_prefix4(const u_char *pd, char *buf, u_int buflen)
