@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.6 2004-06-15 07:58:45 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.7 2004-06-15 08:17:19 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -356,7 +356,7 @@ struct lspping_tlv_targetfec_subtlv_l2vpn_endpt_t {
     u_int8_t rd [8];
     u_int8_t sender_ce_id [2];
     u_int8_t receiver_ce_id [2];
-    u_int8_t encapsulation;
+    u_int8_t encapsulation[2];
 };
 
 /*
@@ -375,7 +375,7 @@ struct lspping_tlv_targetfec_subtlv_l2vpn_vcid_t {
     u_int8_t sender_pe_address [4];
     u_int8_t remote_pe_address [4];
     u_int8_t vc_id [4];
-    u_int8_t encapsulation;
+    u_int8_t encapsulation[2];
 };
 
 void
@@ -621,8 +621,8 @@ lspping_print(register const u_char *pptr, register u_int len) {
                            EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->receiver_ce_id),
                            tok2str(bgp_l2vpn_encaps_values,
                                    "unknown",
-                                   subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->encapsulation),
-                           subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->encapsulation);
+                                   EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->encapsulation)),
+                           EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->encapsulation));
                     
                     break;
 
@@ -636,8 +636,8 @@ lspping_print(register const u_char *pptr, register u_int len) {
                            EXTRACT_32BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid->vc_id),
                            tok2str(bgp_l2vpn_encaps_values, /* FIXME are the L2 encaps codepoints of BGP == LDP ??? */
                                    "unknown",
-                                   subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->encapsulation),
-                           subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->encapsulation);
+                                   EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->encapsulation)),
+                           EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->encapsulation));
                     
                     break;
 
