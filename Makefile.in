@@ -17,7 +17,7 @@
 #  WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 #  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.248 2001-04-17 08:39:18 guy Exp $ (LBL)
+# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.249 2001-05-09 00:32:01 fenner Exp $ (LBL)
 
 #
 # Various configurable paths (remember to edit Makefile.in, not Makefile)
@@ -65,23 +65,24 @@ INSTALL_DATA = @INSTALL_DATA@
 	@rm -f $@
 	$(CC) $(CFLAGS) -c $(srcdir)/$*.c
 
-CSRC =	tcpdump.c \
-	print-arp.c print-atalk.c print-atm.c print-bootp.c \
-	print-decnet.c print-domain.c print-dvmrp.c print-egp.c \
-	print-ether.c print-fddi.c print-gre.c print-icmp.c print-igmp.c \
-	print-igrp.c print-ip.c print-ipx.c print-isoclns.c print-krb.c \
-	print-llc.c print-nfs.c print-ntp.c print-null.c print-ospf.c \
-	print-pim.c print-ppp.c print-raw.c print-rip.c print-sl.c \
-	print-snmp.c print-stp.c print-sunrpc.c print-tcp.c print-tftp.c \
-	print-udp.c print-wb.c addrtoname.c gmt2local.c machdep.c \
-	parsenfsfh.c util.c setsignal.c \
-	print-esp.c print-ah.c print-vjc.c print-isakmp.c print-chdlc.c \
-	print-ipcomp.c print-mobile.c print-l2tp.c print-bgp.c print-rx.c \
-	print-lane.c print-cip.c print-pppoe.c print-lcp.c \
-	print-smb.c smbutil.c print-ascii.c print-telnet.c print-cnfp.c \
-	print-vrrp.c print-cdp.c print-token.c print-bxxp.c print-timed.c \
-	print-radius.c print-sll.c print-lwres.c print-pptp.c \
-	print-arcnet.c
+CSRC =	addrtoname.c gmt2local.c machdep.c parsenfsfh.c \
+	print-ah.c print-arcnet.c print-arp.c print-ascii.c \
+	print-atalk.c print-atm.c print-bgp.c print-bootp.c \
+	print-bxxp.c print-cdp.c print-chdlc.c print-cip.c \
+	print-cnfp.c print-decnet.c print-domain.c print-dvmrp.c \
+	print-egp.c print-esp.c print-ether.c print-fddi.c \
+	print-gre.c print-icmp.c print-igmp.c print-igrp.c \
+	print-ip.c print-ipcomp.c print-ipx.c print-isakmp.c \
+	print-isoclns.c print-krb.c print-l2tp.c print-lane.c \
+	print-lcp.c print-llc.c print-lwres.c print-mobile.c \
+	print-nfs.c print-ntp.c print-null.c print-ospf.c \
+	print-pim.c print-ppp.c print-pppoe.c print-pptp.c \
+	print-radius.c print-raw.c print-rip.c print-rx.c \
+	print-sl.c print-sll.c print-smb.c print-snmp.c \
+	print-stp.c print-sunrpc.c print-tcp.c print-telnet.c \
+	print-tftp.c print-timed.c print-token.c print-udp.c \
+	print-vjc.c print-vrrp.c print-wb.c \
+	setsignal.c smbutil.c tcpdump.c util.c
 
 LOCALSRC = @LOCALSRC@
 GENSRC = version.c
