@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.72 2000-06-01 01:08:18 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.73 2000-06-10 05:12:20 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -42,6 +42,9 @@ struct rtentry;
 #include <netinet/if_ether.h>
 #include <netinet/in_systm.h>
 #include <netinet/ip.h>
+#ifdef INET6
+#include <netinet/ip6.h>
+#endif
 
 #include <rpc/rpc.h>
 
@@ -57,13 +60,14 @@ struct rtentry;
 #include "nfsfh.h"
 
 static void nfs_printfh(const u_int32_t *, const u_int);
-static void xid_map_enter(const struct rpc_msg *, const struct ip *);
-static int32_t xid_map_find(const struct rpc_msg *, const struct ip *,
+static void xid_map_enter(const struct rpc_msg *, const u_char *);
+static int32_t xid_map_find(const struct rpc_msg *, const u_char *,
 			    u_int32_t *, u_int32_t *);
 static void interp_reply(const struct rpc_msg *, u_int32_t, u_int32_t, int);
 static const u_int32_t *parse_post_op_attr(const u_int32_t *, int);
 static void print_sattr3(const struct nfsv3_sattr *sa3, int verbose);
 static int print_int64(const u_int32_t *dp, int how);
+static void print_nfsaddr(const u_char *, const char *, const char *);
 
 /*
  * Mapping of old NFS Version 2 RPC numbers to generic numbers.
@@ -161,6 +165,42 @@ static int print_int64(const u_int32_t *dp, int how)
 	return 1;
 }
 
+static void
+print_nfsaddr(const u_char *bp, const char *s, const char *d)
+{
+	struct ip *ip;
+#ifdef INET6
+	struct ip6_hdr *ip6;
+	char srcaddr[INET6_ADDRSTRLEN], dstaddr[INET6_ADDRSTRLEN];
+#else
+	char srcaddr[INET_ADDRSTRLEN], dstaddr[INET_ADDRSTRLEN];
+#endif
+
+	srcaddr[0] = dstaddr[0] = '\0';
+	switch (((struct ip *)bp)->ip_v) {
+	case 4:
+		ip = (struct ip *)bp;
+		strlcpy(srcaddr, ipaddr_string(&ip->ip_src), sizeof(srcaddr));
+		strlcpy(dstaddr, ipaddr_string(&ip->ip_dst), sizeof(dstaddr));
+		break;
+#ifdef INET6
+	case 6:
+		ip6 = (struct ip6_hdr *)bp;
+		strlcpy(srcaddr, ip6addr_string(&ip6->ip6_src),
+		    sizeof(srcaddr));
+		strlcpy(dstaddr, ip6addr_string(&ip6->ip6_dst),
+		    sizeof(dstaddr));
+		break;
+#endif
+	default:
+		strlcpy(srcaddr, "?", sizeof(srcaddr));
+		strlcpy(dstaddr, "?", sizeof(dstaddr));
+		break;
+	}
+
+	(void)printf("%s.%s > %s.%s: ", srcaddr, s, dstaddr, d);
+}
+
 static const u_int32_t *
 parse_sattr3(const u_int32_t *dp, struct nfsv3_sattr *sa3)
 {
@@ -233,32 +273,28 @@ nfsreply_print(register const u_char *bp, u_int length,
 	       register const u_char *bp2)
 {
 	register const struct rpc_msg *rp;
-	register const struct ip *ip;
 	u_int32_t proc, vers;
+	char srcid[20], dstid[20];	/*fits 32bit*/
 
 	nfserr = 0;		/* assume no error */
 	rp = (const struct rpc_msg *)bp;
-	ip = (const struct ip *)bp2;
 
-	if (!nflag)
-		(void)printf("%s.nfs > %s.%u: reply %s %d",
-			     ipaddr_string(&ip->ip_src),
-			     ipaddr_string(&ip->ip_dst),
-			     (u_int32_t)ntohl(rp->rm_xid),
-			     ntohl(rp->rm_reply.rp_stat) == MSG_ACCEPTED?
-				     "ok":"ERR",
-			     length);
-	else
-		(void)printf("%s.%u > %s.%u: reply %s %d",
-			     ipaddr_string(&ip->ip_src),
-			     NFS_PORT,
-			     ipaddr_string(&ip->ip_dst),
-			     (u_int32_t)ntohl(rp->rm_xid),
-			     ntohl(rp->rm_reply.rp_stat) == MSG_ACCEPTED?
-			     	"ok":"ERR",
+	if (!nflag) {
+		strlcpy(srcid, "nfs", sizeof(srcid));
+		snprintf(dstid, sizeof(dstid), "%u",
+		    (u_int32_t)ntohl(rp->rm_xid));
+	} else {
+		snprintf(srcid, sizeof(srcid), "%u", NFS_PORT);
+		snprintf(dstid, sizeof(dstid), "%u",
+		    (u_int32_t)ntohl(rp->rm_xid));
+	}
+	print_nfsaddr(bp2, srcid, dstid);
+	(void)printf("reply %s %d",
+		     ntohl(rp->rm_reply.rp_stat) == MSG_ACCEPTED?
+			     "ok":"ERR",
 			     length);
 
-	if (xid_map_find(rp, ip, &proc, &vers) >= 0)
+	if (xid_map_find(rp, bp2, &proc, &vers) >= 0)
 		interp_reply(rp, proc, vers, length);
 }
 
@@ -368,31 +404,28 @@ nfsreq_print(register const u_char *bp, u_int length,
     register const u_char *bp2)
 {
 	register const struct rpc_msg *rp;
-	register const struct ip *ip;
 	register const u_int32_t *dp;
 	nfstype type;
 	int v3;
 	u_int32_t proc;
 	struct nfsv3_sattr sa3;
+	char srcid[20], dstid[20];	/*fits 32bit*/
 
 	nfserr = 0;		/* assume no error */
 	rp = (const struct rpc_msg *)bp;
-	ip = (const struct ip *)bp2;
-	if (!nflag)
-		(void)printf("%s.%u > %s.nfs: %d",
-			     ipaddr_string(&ip->ip_src),
-			     (u_int32_t)ntohl(rp->rm_xid),
-			     ipaddr_string(&ip->ip_dst),
-			     length);
-	else
-		(void)printf("%s.%u > %s.%u: %d",
-			     ipaddr_string(&ip->ip_src),
-			     (u_int32_t)ntohl(rp->rm_xid),
-			     ipaddr_string(&ip->ip_dst),
-			     NFS_PORT,
-			     length);
+	if (!nflag) {
+		snprintf(srcid, sizeof(srcid), "%u",
+		    (u_int32_t)ntohl(rp->rm_xid));
+		strlcpy(dstid, "nfs", sizeof(dstid));
+	} else {
+		snprintf(srcid, sizeof(srcid), "%u",
+		    (u_int32_t)ntohl(rp->rm_xid));
+		snprintf(dstid, sizeof(dstid), "%u", NFS_PORT);
+	}
+	print_nfsaddr(bp2, srcid, dstid);
+	(void)printf("%d", length);
 
-	xid_map_enter(rp, ip);	/* record proc number for later on */
+	xid_map_enter(rp, bp2);	/* record proc number for later on */
 
 	v3 = (ntohl(rp->rm_call.cb_vers) == NFS_VER3);
 	proc = ntohl(rp->rm_call.cb_proc);
@@ -709,11 +742,17 @@ nfs_printfh(register const u_int32_t *dp, const u_int len)
  */
 
 struct xid_map_entry {
-	u_int32_t		xid;		/* transaction ID (net order) */
+	u_int32_t	xid;		/* transaction ID (net order) */
+	int ipver;			/* IP version (4 or 6) */
+#ifdef INET6
+	struct in6_addr	client;		/* client IP address (net order) */
+	struct in6_addr	server;		/* server IP address (net order) */
+#else
 	struct in_addr	client;		/* client IP address (net order) */
 	struct in_addr	server;		/* server IP address (net order) */
-	u_int32_t		proc;		/* call proc number (host order) */
-	u_int32_t		vers;	/* program version (host order) */
+#endif
+	u_int32_t	proc;		/* call proc number (host order) */
+	u_int32_t	vers;		/* program version (host order) */
 };
 
 /*
@@ -730,9 +769,26 @@ int	xid_map_next = 0;
 int	xid_map_hint = 0;
 
 static void
-xid_map_enter(const struct rpc_msg *rp, const struct ip *ip)
+xid_map_enter(const struct rpc_msg *rp, const u_char *bp)
 {
+	struct ip *ip = NULL;
+#ifdef INET6
+	struct ip6_hdr *ip6 = NULL;
+#endif
 	struct xid_map_entry *xmep;
+
+	switch (((struct ip *)bp)->ip_v) {
+	case 4:
+		ip = (struct ip *)bp;
+		break;
+#ifdef INET6
+	case 6:
+		ip6 = (struct ip6_hdr *)bp;
+		break;
+#endif
+	default:
+		return;
+	}
 
 	xmep = &xid_map[xid_map_next];
 
@@ -740,8 +796,18 @@ xid_map_enter(const struct rpc_msg *rp, const struct ip *ip)
 		xid_map_next = 0;
 
 	xmep->xid = rp->rm_xid;
-	xmep->client = ip->ip_src;
-	xmep->server = ip->ip_dst;
+	if (ip) {
+		xmep->ipver = 4;
+		memcpy(&xmep->client, &ip->ip_src, sizeof(ip->ip_src));
+		memcpy(&xmep->server, &ip->ip_dst, sizeof(ip->ip_dst));
+	}
+#ifdef INET6
+	else if (ip6) {
+		xmep->ipver = 6;
+		memcpy(&xmep->client, &ip6->ip6_src, sizeof(ip6->ip6_src));
+		memcpy(&xmep->server, &ip6->ip6_dst, sizeof(ip6->ip6_dst));
+	}
+#endif
 	xmep->proc = ntohl(rp->rm_call.cb_proc);
 	xmep->vers = ntohl(rp->rm_call.cb_vers);
 }
@@ -751,27 +817,56 @@ xid_map_enter(const struct rpc_msg *rp, const struct ip *ip)
  * version in vers return, or returns -1 on failure
  */
 static int
-xid_map_find(const struct rpc_msg *rp, const struct ip *ip, u_int32_t *proc,
+xid_map_find(const struct rpc_msg *rp, const u_char *bp, u_int32_t *proc,
 	     u_int32_t *vers)
 {
 	int i;
 	struct xid_map_entry *xmep;
 	u_int32_t xid = rp->rm_xid;
-	u_int32_t clip = ip->ip_dst.s_addr;
-	u_int32_t sip = ip->ip_src.s_addr;
+	struct ip *ip = (struct ip *)ip;
+#ifdef INET6
+	struct ip6_hdr *ip6 = (struct ip6_hdr *)bp;
+#endif
+	int cmp;
 
 	/* Start searching from where we last left off */
-	i = xid_map_hint;
+	i = xid_map_hint; 
 	do {
 		xmep = &xid_map[i];
-		if (xmep->xid == xid && xmep->client.s_addr == clip &&
-		    xmep->server.s_addr == sip) {
+		cmp = 1;
+		if (xmep->ipver != ip->ip_v || xmep->xid != xid)
+			goto nextitem;
+		switch (xmep->ipver) {
+		case 4:
+			if (memcmp(&ip->ip_src, &xmep->server,
+				   sizeof(ip->ip_src)) != 0 ||
+			    memcmp(&ip->ip_dst, &xmep->client,
+				   sizeof(ip->ip_dst)) != 0) {
+				cmp = 0;
+			}
+			break;
+#ifdef INET6
+		case 6:
+			if (memcmp(&ip6->ip6_src, &xmep->server,
+				   sizeof(ip6->ip6_src)) != 0 ||
+			    memcmp(&ip6->ip6_dst, &xmep->client,
+				   sizeof(ip6->ip6_dst)) != 0) {
+				cmp = 0;
+			}
+			break;
+#endif
+		default:
+			cmp = 0;
+			break;
+		}
+		if (cmp) {
 			/* match */
 			xid_map_hint = i;
 			*proc = xmep->proc;
 			*vers = xmep->vers;
 			return 0;
 		}
+	nextitem:
 		if (++i >= XIDMAPSIZE)
 			i = 0;
 	} while (i != xid_map_hint);
