@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.25 2001-10-16 08:00:37 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.26 2001-10-18 09:51:31 itojun Exp $";
 #endif
 
 #include <sys/param.h>
@@ -551,7 +551,8 @@ bgp_open_print(const u_char *dat, int length)
 	opt = &((const struct bgp_open *)dat)->bgpo_optlen;
 	opt++;
 
-	for (i = 0; i < bgpo.bgpo_optlen; i++) {
+	i = 0;
+	while (i < bgpo.bgpo_optlen) {
 		TCHECK2(opt[i], BGP_OPT_SIZE);
 		memcpy(&bgpopt, &opt[i], BGP_OPT_SIZE);
 		if (i + 2 + bgpopt.bgpopt_len > bgpo.bgpo_optlen) {
