@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.19 2000-04-24 12:59:39 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.20 2000-08-17 18:38:24 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -799,12 +799,12 @@ pimv2_print(register const u_char *bp, register u_int len)
 				(void)printf("...)");
 				goto bs_done;
 			}
-			(void)printf(" RPcnt=%d", frpcnt = bp[0]);
+			(void)printf(" RPcnt=%d", bp[0]);
 			if (bp + 1 >= ep) {
 				(void)printf("...)");
 				goto bs_done;
 			}
-			(void)printf(" FRPcnt=%d", bp[1]);
+			(void)printf(" FRPcnt=%d", frpcnt = bp[1]);
 			bp += 4;
 
 			for (j = 0; j < frpcnt && bp < ep; j++) {
