@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.35 2003-03-13 07:40:48 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.36 2003-03-19 05:36:22 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -116,7 +116,7 @@ struct sockaddr_storage {
 struct sa_list {
   struct sa_list *next;
   struct sockaddr_storage daddr;
-  uint32_t         spi;
+  u_int32_t      spi;
   struct         esp_algorithm *xform;
   char           secret[256];  /* is that big enough for all secrets? */
   int            secretlen;
