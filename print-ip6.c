@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.39 2003-11-19 06:31:28 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.40 2003-11-24 20:30:52 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -111,10 +111,17 @@ ip6_print(register const u_char *bp, register u_int length)
 			fragmented = 1;
 			break;
 
+		case IPPROTO_MOBILITY_OLD:
 		case IPPROTO_MOBILITY:
 			/*
-			 * XXX - we don't use "advance"; is this
-			 * header always a final header?
+			 * XXX - we don't use "advance"; the current
+			 * "Mobility Support in IPv6" draft
+			 * (draft-ietf-mobileip-ipv6-24) says that
+			 * the next header field in a mobility header
+			 * should be IPPROTO_NONE, but speaks of
+			 * the possiblity of a future extension in
+			 * which payload can be piggybacked atop a
+			 * mobility header.
 			 */
 			advance = mobility_print(cp, (const u_char *)ip6);
 			nh = *cp;
