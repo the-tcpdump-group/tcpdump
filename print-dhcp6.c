@@ -29,7 +29,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.6 2000-05-13 18:34:09 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.7 2000-05-15 04:29:32 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -74,36 +74,35 @@ static struct dhcp6_opt dh6opttab[] = {
 	{ 1, OL6_N,	"IP Address",			OT6_NONE, },
 
 	/* General Extension */
-	{ 2, 4,		"Time Offset",			OT6_NUM, },
-	{ 3, OL6_N,	"IEEE 1003.1 POSIX Timezone",	OT6_STR, },
-	{ 6, OL6_16N,	"Domain Name Server",		OT6_V6, },
-	{ 10, OL6_N,	"Domain Name",			OT6_STR, },
+	{ 8193, OL6_N,	"IEEE 1003.1 POSIX Timezone",	OT6_STR, },
+	{ 8194, OL6_16N, "Domain Name Server",		OT6_V6, },
+	{ 8195, OL6_N,	"Domain Name",			OT6_STR, },
 
-	/* Application and Service Parameters */
-	{ 16, OL6_N,	"Directory Agent",		OT6_NONE, },
-	{ 17, OL6_N,	"Service Scope"	,		OT6_NONE, },
-	{ 18, OL6_16N,	"Network Time Protocol Servers", OT6_V6, },
-	{ 19, OL6_N,	"NIS Domain",			OT6_STR, },
-	{ 20, OL6_16N,	"NIS Servers",			OT6_V6, },
-	{ 21, OL6_N,	"NIS+ Domain",			OT6_STR, },
-	{ 22, OL6_16N,	"NIS+ Servers",			OT6_V6, },
+	{ 8196, OL6_N,	"SLP Agent",			OT6_NONE, },
+	{ 8197, OL6_N,	"SLP Scope"	,		OT6_NONE, },
+	{ 8198, OL6_16N, "Network Time Protocol Servers", OT6_V6, },
+	{ 8199, OL6_N,	"NIS Domain",			OT6_STR, },
+	{ 8200, OL6_16N, "NIS Servers",			OT6_V6, },
+	{ 8201, OL6_N,	"NIS+ Domain",			OT6_STR, },
+	{ 8202, OL6_16N, "NIS+ Servers",		OT6_V6, },
 
 	/* TCP Parameters */
-	{ 32, 4,	"TCP Keepalive Interval",	OT6_NUM, },
+	{ 8203, 4,	"TCP Keepalive Interval",	OT6_NUM, },
 
 	/* DHCPv6 Extensions */
-	{ 40, 4,	"Maximum DHCPv6 Message Size",	OT6_NUM, },
-	{ 41, OL6_N,	"DHCP Retransmission and Configuration Parameter",
+	{ 8204, 4,	"Maximum DHCPv6 Message Size",	OT6_NUM, },
+	{ 8205, OL6_N,	"DHCP Retransmission and Configuration Parameter",
 							OT6_NONE, },
-	{ 48, OL6_N,	"Platform Specific Information", OT6_NONE, },
-	{ 49, OL6_N,	"Platform Class Identifier",	OT6_STR, },
-	{ 64, OL6_N,	"Class Identifier",		OT6_STR, },
-	{ 66, 16,	"Reconfigure Multicast Address", OT6_V6, },
-	{ 67, 16,	"Renumber DHCPv6 Server Address",
+	{ 8206, OL6_N,	"Extension Request",		OT6_NONE, },
+	{ 8207, OL6_N,	"Subnet Prefix",		OT6_NONE, },
+	{ 8208, OL6_N,	"Platform Specific Information", OT6_NONE, },
+	{ 8209, OL6_N,	"Platform Class Identifier",	OT6_STR, },
+	{ 8210, OL6_N,	"Class Identifier",		OT6_STR, },
+	{ 8211, 16,	"Reconfigure Multicast Address", OT6_V6, },
+	{ 8212, 16,	"Renumber DHCPv6 Server Address",
 							OT6_V6, },
-	{ 68, OL6_N,	"DHCP Relay ICMP Error Message", OT6_NONE, },
-	{ 84, OL6_N,	"Client-Server Authentication",	OT6_NONE, },
-	{ 85, 4,	"Client Key Selection",		OT6_NUM, },
+	{ 8213, OL6_N,	"Client-Server Authentication",	OT6_NONE, },
+	{ 8214, 4,	"Client Key Selection",		OT6_NUM, },
 
 	/* End Extension */
 	{ 65536, OL6_Z,	"End",				OT6_NONE, },
@@ -161,11 +160,17 @@ dhcp6ext_print(u_char *cp, u_char *ep)
 		return;
 	printf(" ");
 	while (cp < ep) {
+		if (ep - cp < sizeof(u_int16_t))
+			break;
 		code = ntohs(*(u_int16_t *)&cp[0]);
+		if (ep - cp < sizeof(u_int16_t) * 2)
+			break;
 		if (code != 65535)
 			len = ntohs(*(u_int16_t *)&cp[2]);
 		else
 			len = 0;
+		if (ep - cp < len + 4)
+			break;
 		p = dhcp6opttab_bycode(code);
 		if (p == NULL) {
 			printf("(unknown, len=%d)", len);
