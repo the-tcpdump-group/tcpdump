@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lmp.c,v 1.4 2004-04-26 13:40:41 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lmp.c,v 1.5 2004-04-27 14:03:44 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -297,7 +297,7 @@ lmp_print(register const u_char *pptr, register u_int len) {
     const u_char *tptr,*obj_tptr;
     int tlen,lmp_obj_len,lmp_obj_ctype,obj_tlen;
     int hexdump;
-    int offset;
+    int offset,subobj_type,subobj_len,total_subobj_len;
 
     union { /* int to float conversion buffer */
         float f; 
@@ -513,7 +513,48 @@ lmp_print(register const u_char *pptr, register u_int len) {
                        ipaddr_string(obj_tptr+8),
                        EXTRACT_32BITS(obj_tptr+8));
 		
-		/* FIXME: Missing Data link Subobjects decoder */
+		total_subobj_len = lmp_obj_len - 16;	 
+		offset = 12;
+		while (total_subobj_len > 0 && hexdump == FALSE ) {
+			subobj_type = EXTRACT_16BITS(obj_tptr+offset)>>8;
+			subobj_len  = EXTRACT_16BITS(obj_tptr+offset)&0x00FF;
+			printf("\n\t    Subobject, Type: %s (%u), Length: %u",
+				tok2str(lmp_data_link_subobj,
+					"Unknown",
+					subobj_type),
+					subobj_type,
+					subobj_len);
+			switch(subobj_type) {
+			case INT_SWITCHING_TYPE_SUBOBJ:
+				printf("\n\t\t    Switching Type: %s (%u)",
+					tok2str(gmpls_switch_cap_values, 
+						"Unknown", 
+						EXTRACT_16BITS(obj_tptr+offset+2)>>8),
+					EXTRACT_16BITS(obj_tptr+offset+2)>>8);
+				printf("\n\t\t    Encoding Type: %s (%u)",
+					tok2str(gmpls_encoding_values, 
+						"Unknown", 
+						EXTRACT_16BITS(obj_tptr+offset+2)&0x00FF),
+					EXTRACT_16BITS(obj_tptr+offset+2)&0x00FF);
+				bw.i = EXTRACT_32BITS(obj_tptr+offset+4);
+				printf("\n\t\t    Min Reservable Bandwidth: %.3f Mbps",
+					bw.f);
+				bw.i = EXTRACT_32BITS(obj_tptr+offset+8);
+				printf("\n\t\t    Max Reservable Bandwidth: %.3f Mbps",
+					bw.f);
+				break;	
+			case WAVELENGTH_SUBOBJ:
+				printf("\n\t\t    Wavelength: %u",
+					EXTRACT_32BITS(obj_tptr+offset+4));
+				break;
+			default:
+				/* Any Unknown Subobject ==> Exit loop */
+				hexdump=TRUE;
+				break;
+			}
+			total_subobj_len-=subobj_len;
+			offset+=subobj_len;
+		}
 		
 		break;
 #ifdef INET6   
