@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.21 2001-07-05 18:54:14 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.22 2002-04-07 02:54:03 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -35,10 +35,57 @@ static const char rcsid[] =
 
 #include <stdio.h>
 #include <pcap.h>
+#include <string.h>
 
 #include "interface.h"
 #include "addrtoname.h"
 #include "ethertype.h"
+
+#include "ether.h"
+
+/*
+ * Print an RFC 1483 LLC-encapsulated ATM frame.
+ */
+static void
+atm_llc_print(const u_char *p, int length, int caplen)
+{
+	struct ether_header ehdr;
+	u_short ether_type;
+	u_short extracted_ethertype;
+
+	ether_type = p[6] << 8 | p[7];
+
+	/*
+	 * Fake up an Ethernet header for the benefit of printers that
+	 * insist on "packetp" pointing to an Ethernet header.
+	 */
+	memset(&ehdr, '\0', sizeof ehdr);
+
+	/*
+	 * Some printers want to get back at the ethernet addresses,
+	 * and/or check that they're not walking off the end of the packet.
+	 * Rather than pass them all the way down, we set these globals.
+	 */
+	snapend = p + caplen;
+	/*
+	 * Actually, the only printers that use packetp are print-arp.c
+	 * and print-bootp.c, and they assume that packetp points to an
+	 * Ethernet header.  The right thing to do is to fix them to know
+	 * which link type is in use when they excavate. XXX
+	 */
+	packetp = (u_char *)&ehdr;
+
+	if (!llc_print(p, length, caplen, ESRC(&ehdr), EDST(&ehdr),
+	    &extracted_ethertype)) {
+		/* ether_type not known, print raw packet */
+		if (extracted_ethertype) {
+			printf("(LLC %s) ",
+		etherproto_string(htons(extracted_ethertype)));
+		}
+		if (!xflag && !qflag)
+			default_print(p, caplen);
+	}
+}
 
 /*
  * This is the top level routine of the printer.  'p' is the points
@@ -51,7 +98,6 @@ atm_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;
-	u_short ethertype;
 
 	++infodelay;
 	ts_print(&h->ts);
@@ -72,72 +118,7 @@ atm_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 		length -= 20;
 		caplen -= 20;
 	}
-	ethertype = p[6] << 8 | p[7];
-	if (eflag)
-		printf("%02x %02x %02x %02x-%02x-%02x %04x: ",
-		       p[0], p[1], p[2], /* dsap/ssap/ctrl */
-		       p[3], p[4], p[5], /* manufacturer's code */
-		       ethertype);
-
-	/*
-	 * Some printers want to get back at the ethernet addresses,
-	 * and/or check that they're not walking off the end of the packet.
-	 * Rather than pass them all the way down, we set these globals.
-	 */
-	packetp = p;
-	snapend = p + caplen;
-
-	length -= 8;
-	caplen -= 8;
-	p += 8;
-
-	switch (ethertype) {
-
-	case ETHERTYPE_IP:
-		ip_print(p, length);
-		break;
-
-#ifdef INET6
-	case ETHERTYPE_IPV6:
-		ip6_print(p, length);
-		break;
-#endif /*INET6*/
-
-		/*XXX this probably isn't right */
-	case ETHERTYPE_ARP:
-	case ETHERTYPE_REVARP:
-		arp_print(p, length, caplen);
-		break;
-#ifdef notyet
-	case ETHERTYPE_DN:
-		decnet_print(p, length, caplen);
-		break;
-
-	case ETHERTYPE_ATALK:
-		if (vflag)
-			fputs("et1 ", stdout);
-		atalk_print(p, length);
-		break;
-
-	case ETHERTYPE_AARP:
-		aarp_print(p, length);
-		break;
-
-	case ETHERTYPE_LAT:
-	case ETHERTYPE_MOPRC:
-	case ETHERTYPE_MOPDL:
-		/* default_print for now */
-#endif
-	default:
-		/* ether_type not known, print raw packet */
-		if (!eflag)
-			printf("%02x %02x %02x %02x-%02x-%02x %04x: ",
-			       packetp[0], packetp[1], packetp[2], /* dsap/ssap/ctrl */
-			       packetp[3], packetp[4], packetp[5], /* manufacturer's code */
-			       ethertype);
-		if (!xflag && !qflag)
-			default_print(p, caplen);
-	}
+	atm_llc_print(p, length, caplen);
 	if (xflag)
 		default_print(p, caplen);
  out:
