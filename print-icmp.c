@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.40 1999-10-30 05:11:13 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.41 1999-11-21 03:46:38 assar Exp $ (LBL)";
 #endif
 
 #include <sys/param.h>
@@ -162,7 +162,7 @@ struct id_rdiscovery {
 };
 
 void
-icmp_print(register const u_char *bp, register const u_char *bp2)
+icmp_print(register const u_char *bp, u_int plen, register const u_char *bp2)
 {
 	register char *cp;
 	register const struct icmp *dp;
@@ -349,6 +349,12 @@ icmp_print(register const u_char *bp, register const u_char *bp2)
 		break;
 	}
         (void)printf("icmp: %s", str);
+	if (vflag) {
+		if (((u_char*)bp) + plen <= snapend) {
+			if (in_cksum((u_short*)dp, plen, 0))
+				printf(" (wrong icmp csum)");
+		}
+	}
 	return;
 trunc:
 	fputs("[|icmp]", stdout);
