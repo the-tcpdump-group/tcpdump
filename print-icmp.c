@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.60 2001-06-28 19:53:42 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.61 2001-07-19 19:37:31 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -347,19 +347,20 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2)
 			break;
 
 		default:
-			fmt = tok2str(unreach2str, "#%d",
+			fmt = tok2str(unreach2str, "#%d %%s unreachable",
 			    dp->icmp_code);
-			(void)snprintf(buf, sizeof(buf), "%s %s unreachable",
-			    fmt, ipaddr_string(&dp->icmp_ip.ip_dst));
+			(void)snprintf(buf, sizeof(buf), fmt,
+			    ipaddr_string(&dp->icmp_ip.ip_dst));
 			break;
 		}
 		break;
 
 	case ICMP_REDIRECT:
 		TCHECK(dp->icmp_ip.ip_dst);
-		fmt = tok2str(type2str, "#%d", dp->icmp_code);
-		(void)snprintf(buf, sizeof(buf), "redirect-%s %s to net %s",
-		    fmt, ipaddr_string(&dp->icmp_ip.ip_dst),
+		fmt = tok2str(type2str, "redirect-#%d %%s to net %%s",
+		    dp->icmp_code);
+		(void)snprintf(buf, sizeof(buf), fmt,
+		    ipaddr_string(&dp->icmp_ip.ip_dst),
 		    ipaddr_string(&dp->icmp_gwaddr));
 		break;
 
@@ -374,7 +375,7 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2)
 
 		ihp = (struct ih_rdiscovery *)&dp->icmp_void;
 		TCHECK(*ihp);
-		(void)snprintf(cp, sizeof(buf) - (cp - buf), " lifetime ");
+		(void)strncpy(cp, " lifetime ", sizeof(buf) - (cp - buf));
 		cp = buf + strlen(buf);
 		lifetime = EXTRACT_16BITS(&ihp->ird_lifetime);
 		if (lifetime < 60) {
