@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.83 2003-02-08 19:32:00 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.84 2003-03-04 08:53:26 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -154,12 +154,14 @@ ts_print(register const struct timeval *tvp)
 	case -3: /* Default + Date*/
 		s = (tvp->tv_sec + thiszone) % 86400;
 		Time = (tvp->tv_sec + thiszone) - s;
-		tm  = gmtime (&Time);
-		(void)printf("%02d/%02d/%04d %02d:%02d:%02d.%06u ",
-			     tm->tm_mon+1, tm->tm_mday,
-			     tm->tm_year+1900,
-			     s / 3600, (s % 3600) / 60,
-			     s % 60, (unsigned)tvp->tv_usec);
+		tm = gmtime (&Time);
+		if (!tm)
+			printf("Date fail  ");
+		else
+			printf("%04d-%02d-%02d ",
+				   tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday);
+		printf("%02d:%02d:%02d.%06u ",
+			   s / 3600, (s % 3600) / 60, s % 60, (unsigned)tvp->tv_usec);
 		break;
 	}
 }
