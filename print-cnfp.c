@@ -34,7 +34,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cnfp.c,v 1.2 2000-04-27 10:41:40 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cnfp.c,v 1.3 2000-04-27 13:45:11 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -64,9 +64,9 @@ struct nfhdr {
 };
 
 struct nfrec {
-	in_addr_t	src_ina;
-	in_addr_t	dst_ina;
-	in_addr_t	nhop_ina;
+	struct in_addr	src_ina;
+	struct in_addr	dst_ina;
+	struct in_addr	nhop_ina;
 	u_int32_t	ifaces;		/* src,dst ifaces */
 	u_int32_t	packets;
 	u_int32_t	octets;
