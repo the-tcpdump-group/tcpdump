@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] = 
-     "@(#) $Header: /tcpdump/master/tcpdump/print-pptp.c,v 1.1 2001-03-09 05:38:21 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-pptp.c,v 1.2 2001-03-17 04:41:50 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -312,7 +312,7 @@ pptp_bearer_type_print(const u_int32_t *bearer_type)
 		printf("Any");
 		break;
 	default:
-		printf("???");
+		printf("?");
 		break;
         }
 	printf(")");
@@ -370,7 +370,7 @@ pptp_err_code_print(const u_int8_t *err_code)
 			printf(":PAC-Error");
 			break;
 		default:
-			printf(":???");
+			printf(":?");
 			break;
 		}
 	}
@@ -411,7 +411,7 @@ pptp_framing_type_print(const u_int32_t *framing_type)
 		printf("E");		/* Either */
 		break;
 	default:
-		printf("???");
+		printf("?");
 		break;
 	}
 	printf(")");
@@ -490,7 +490,7 @@ pptp_result_code_print(const u_int8_t *result_code, int ctrl_msg_type)
 				printf(":The protocol version of the requester is not supported");
 				break;
 			default:
-				printf(":???");
+				printf(":?");
 				break;
 			}
 			break;
@@ -504,7 +504,7 @@ pptp_result_code_print(const u_int8_t *result_code, int ctrl_msg_type)
 				printf(":General Error");
 				break;
 			default:
-				printf(":???");
+				printf(":?");
 				break;
 			}
 			break;
@@ -532,7 +532,7 @@ pptp_result_code_print(const u_int8_t *result_code, int ctrl_msg_type)
 				printf(":Do Not Accept");
 				break;
 			default:
-				printf(":???");
+				printf(":?");
 				break;
 			}
 			break;
@@ -548,7 +548,7 @@ pptp_result_code_print(const u_int8_t *result_code, int ctrl_msg_type)
 				printf(":Do Not Accept");
 				break;
 			default:
-				printf(":???");
+				printf(":?");
 				break;
 			}
 			break;
@@ -566,7 +566,7 @@ pptp_result_code_print(const u_int8_t *result_code, int ctrl_msg_type)
 			case 4:
 				printf(":Request");
 			default:
-				printf(":???");
+				printf(":?");
 				break;
 			break;
 			}
@@ -669,7 +669,7 @@ pptp_stopccrq_print(const u_char *dat)
 			printf(":Stop-Local-Shutdown");
 			break;
 		default:
-			printf(":???");
+			printf(":?");
 			break;
 		}
 	}

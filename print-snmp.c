@@ -45,7 +45,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.45 2001-01-24 21:50:58 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.46 2001-03-17 04:41:50 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -720,7 +720,7 @@ asn1_print(struct be *elem)
 		d = elem->data.uns64.high * 4294967296.0;	/* 2^32 */
 		if (elem->data.uns64.high <= 0x1fffff) { 
 		        d += elem->data.uns64.low;
-#if 0 /*is looks illegal, but what is the intention???*/
+#if 0 /*is looks illegal, but what is the intention?*/
 			printf("%.f", d);
 #else
 			printf("%f", d);
@@ -728,7 +728,7 @@ asn1_print(struct be *elem)
 			break;
 		}
 		d += (elem->data.uns64.low & 0xfffff000);
-#if 0 /*is looks illegal, but what is the intention???*/
+#if 0 /*is looks illegal, but what is the intention?*/
 		snprintf(first, sizeof(first), "%.f", d);
 #else
 		snprintf(first, sizeof(first), "%f", d);

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.92 2001-02-20 19:03:15 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.93 2001-03-17 04:41:51 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -396,8 +396,8 @@ static int udp6_cksum(const struct ip6_hdr *ip6, const struct udphdr *up,
 #define RIP_PORT 520		/*XXX*/
 #define KERBEROS_SEC_PORT 750	/*XXX*/
 #define L2TP_PORT 1701		/*XXX*/
-#define ISAKMP_PORT_USER1 7500	/*??? - nonstandard*/
-#define ISAKMP_PORT_USER2 8500	/*??? - nonstandard*/
+#define ISAKMP_PORT_USER1 7500	/*XXX - nonstandard*/
+#define ISAKMP_PORT_USER2 8500	/*XXX - nonstandard*/
 #define RX_PORT_LOW 7000	/*XXX*/
 #define RX_PORT_HIGH 7009	/*XXX*/
 #define NETBIOS_NS_PORT   137

@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.59 2001-02-04 02:17:54 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.60 2001-03-17 04:41:49 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -980,7 +980,6 @@ handle_ppp(u_int proto, const u_char *p, int length)
 		ipx_print(p, length);
 		break;
 	default:
-		printf("[???]");
 		break;
 	}
 }
