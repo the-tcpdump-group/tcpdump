@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.6 2000-07-01 03:39:05 assar Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.7 2000-07-11 00:55:22 assar Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -67,7 +67,7 @@ ip6_print(register const u_char *bp, register int length)
 	
 	ip6 = (const struct ip6_hdr *)bp;
 
-#ifdef TCPDUMP_ALIGN
+#ifdef LBL_ALIGN
 	/*
 	 * The IP header is not word aligned, so copy into abuf.
 	 * This will never happen with BPF.  It does happen raw packet
