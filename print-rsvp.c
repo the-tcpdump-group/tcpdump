@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.1 2002-10-03 16:01:58 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.2 2002-10-06 08:00:26 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -134,7 +134,7 @@ static const struct tok rsvp_msg_type_values[] = {
 #define	RSVP_OBJ_PROPERTIES         204
 #define	RSVP_OBJ_FASTREROUTE        205
 #define	RSVP_OBJ_SESSION_ATTTRIBUTE 207
-#define	RSVP_OBJ_RESTART_CAPABILITY 131
+#define	RSVP_OBJ_RESTART_CAPABILITY 131 /* draft-pan-rsvp-te-restart */
 
 static const struct tok rsvp_obj_values[] = {
     { RSVP_OBJ_SESSION,            "Session" },
@@ -173,11 +173,17 @@ static const struct tok rsvp_obj_values[] = {
 #define	RSVP_CTYPE_IPV4        1
 #define	RSVP_CTYPE_IPV6        2
 #define	RSVP_CTYPE_TUNNEL_IPV4 7
+#define RSVP_CTYPE_1           1
 
 static const struct tok rsvp_ctype_values[] = {
-    { RSVP_CTYPE_IPV4,	      "IPv4" },
-    { RSVP_CTYPE_IPV6,	      "IPv6" },
-    { RSVP_CTYPE_TUNNEL_IPV4, "Tunnel IPv4" },
+    { 256*RSVP_OBJ_SESSION+RSVP_CTYPE_IPV4,	      "IPv4" },
+    { 256*RSVP_OBJ_SESSION+RSVP_CTYPE_IPV6,	      "IPv6" },
+    { 256*RSVP_OBJ_SESSION+RSVP_CTYPE_TUNNEL_IPV4,    "Tunnel IPv4" },
+    { 256*RSVP_OBJ_LABEL+RSVP_CTYPE_IPV4,	      "IPv4" },
+    { 256*RSVP_OBJ_LABEL_REQ+RSVP_CTYPE_IPV4,         "IPv4" },
+    { 256*RSVP_OBJ_ERO+RSVP_CTYPE_IPV4,               "IPv4" },
+    { 256*RSVP_OBJ_RRO+RSVP_CTYPE_IPV4,               "IPv4" },
+    { 256*RSVP_OBJ_RESTART_CAPABILITY+RSVP_CTYPE_1,   "IPv4" },
     { 0, NULL}
 };
 
@@ -259,7 +265,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         printf("\n\t  %s Object (%u), Class-Type: %s (%u), length: %u",
                tok2str(rsvp_obj_values, "Unknown",rsvp_obj_header->class_num),
                rsvp_obj_header->class_num,
-               tok2str(rsvp_ctype_values, "Unknown",rsvp_obj_ctype),
+               tok2str(rsvp_ctype_values, "Unknown",((rsvp_obj_header->class_num)<<8)+rsvp_obj_ctype),
                rsvp_obj_ctype,
                rsvp_obj_len);
 
@@ -318,6 +324,15 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 break;
             }
             break;
+        case RSVP_OBJ_RESTART_CAPABILITY:
+            switch(rsvp_obj_ctype) {
+            case 1:
+                printf("\n\t    Restart  Time: %ums\n\t    Recovery Time: %ums",
+                       EXTRACT_16BITS(obj_tptr),
+                       EXTRACT_16BITS(obj_tptr+4));
+                break;
+            }
+            break;
         /*
          *  FIXME those are the defined objects that lack a decoder
          *  you are welcome to contribute code ;-)
@@ -346,7 +361,6 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         case RSVP_OBJ_PROPERTIES:
         case RSVP_OBJ_FASTREROUTE:
         case RSVP_OBJ_SESSION_ATTTRIBUTE:
-        case RSVP_OBJ_RESTART_CAPABILITY:
         default:
             if (vflag <= 1)
                 print_unknown_data(obj_tptr,"\n\t    ",obj_tlen);
