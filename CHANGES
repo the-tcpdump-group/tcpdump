@@ -1,3 +1,5 @@
+$Header: /tcpdump/master/tcpdump/CHANGES,v 1.79 2001-01-10 20:13:58 mcr Exp $
+
 Tuesday January 9, 2001. mcr@sandelman.ottawa.on.ca. Summary for 3.6 release
 	Cleaned up documentation.
 	Promisc mode fixes for Linux
@@ -593,4 +595,4 @@ v2.0 Sun Jan 13 12:20:40 PST 1991
 
 - Initial public release.
 
-@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.78 2001-01-10 05:30:07 guy Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.79 2001-01-10 20:13:58 mcr Exp $ (LBL)
