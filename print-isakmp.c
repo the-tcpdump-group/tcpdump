@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.43 2004-01-23 09:35:41 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.44 2004-03-12 01:13:53 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -333,7 +333,7 @@ rawprint(caddr_t loc, size_t len)
 	for (i = 0; i < len; i++)
 		printf("%02x", p[i] & 0xff);
 trunc:
-
+	;
 }
 
 struct attrmap {
