@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.29.2.1 2002-06-01 23:51:14 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.29.2.2 2003-02-26 05:58:39 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1025,6 +1025,7 @@ isakmp_sub0_print(u_char np, struct isakmp_gen *ext, u_char *ep,
 {
 	u_char *cp;
 	struct isakmp_gen e;
+	u_int item_len;
 
 	cp = (u_char *)ext;
 	safememcpy(&e, ext, sizeof(e));
@@ -1033,7 +1034,16 @@ isakmp_sub0_print(u_char np, struct isakmp_gen *ext, u_char *ep,
 		cp = (*NPFUNC(np))(ext, ep, phase, doi, proto);
 	else {
 		printf("%s", NPSTR(np));
-		cp += ntohs(e.len);
+		item_len = ntohs(e.len);
+		if (item_len == 0) {
+			/*
+			 * We don't want to loop forever processing this
+			 * bogus (zero-length) item; return NULL so that
+			 * we stop dissecting.
+			 */
+			cp = NULL;
+		} else
+			cp += item_len;
 	}
 	return cp;
 }
@@ -1065,6 +1075,11 @@ isakmp_sub_print(u_char np, struct isakmp_gen *ext, u_char *ep,
 		cp = isakmp_sub0_print(np, ext, ep, phase, doi, proto);
 		printf(")");
 		depth--;
+
+		if (cp == NULL) {
+			/* Zero-length subitem */
+			return NULL;
+		}
 
 		np = e.np;
 		ext = (struct isakmp_gen *)cp;
