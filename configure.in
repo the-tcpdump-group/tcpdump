@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.110 2000-03-31 16:57:13 assar Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.111 2000-04-01 12:09:57 assar Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.110 $)
+AC_REVISION($Revision: 1.111 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -20,6 +20,7 @@ fi
 
 AC_LBL_C_INIT(V_CCOPT, V_INCLS)
 AC_C_INLINE
+AC_C___ATTRIBUTE__
 
 AC_CHECK_HEADERS(fcntl.h malloc.h memory.h rpc/rpcent.h)
 AC_HEADER_TIME
