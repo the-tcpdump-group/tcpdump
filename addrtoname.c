@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.79 2001-06-26 06:36:08 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.80 2001-06-26 13:58:24 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -55,7 +55,7 @@ struct rtentry;
 #include <stdlib.h>
 #include <unistd.h>
 #ifdef HAVE_STRINGS_H
-#include <strings.h>	/* declare "bcmp()" and "bcopy()" */
+#include <strings.h>
 #endif
 
 #include "interface.h"
@@ -354,7 +354,7 @@ lookup_bytestring(register const u_char *bs, const int nlen)
 		if (tp->e_addr0 == i &&
 		    tp->e_addr1 == j &&
 		    tp->e_addr2 == k &&
-		    bcmp((char *)bs, (char *)(tp->e_bs), nlen) == 0)
+		    memcmp((char *)bs, (char *)(tp->e_bs), nlen) == 0)
 			return tp;
 		else
 			tp = tp->e_nxt;
@@ -364,7 +364,7 @@ lookup_bytestring(register const u_char *bs, const int nlen)
 	tp->e_addr2 = k;
 
 	tp->e_bs = (u_char *) calloc(1, nlen + 1);
-	bcopy(bs, tp->e_bs, nlen);
+	memcpy(tp->e_bs, bs, nlen);
 	tp->e_nxt = (struct enamemem *)calloc(1, sizeof(*tp));
 	if (tp->e_nxt == NULL)
 		error("lookup_bytestring: calloc");
