@@ -164,6 +164,9 @@
 /* Define if you have the <fcntl.h> header file.  */
 #undef HAVE_FCNTL_H
 
+/* Define if you have the <netinet/if_ether.h> header file.  */
+#undef HAVE_NETINET_IF_ETHER_H
+
 /* Define if you have the <rc5.h> header file.  */
 #undef HAVE_RC5_H
 
