@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.69 2001-02-03 05:04:33 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.70 2001-02-20 06:03:42 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -489,6 +489,7 @@ ns_print(register const u_char *bp, u_int length)
 		if (qdcount != 1)
 			printf(" [%dq]", qdcount);
 		/* Print QUESTION section on -vv */
+		cp = (const u_char *)(np + 1);
 		while (qdcount--) {
 			if (qdcount < ntohs(np->qdcount) - 1)
 				putchar(',');
