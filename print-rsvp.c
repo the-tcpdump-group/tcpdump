@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.31 2004-09-16 06:34:01 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.32 2004-09-16 09:02:43 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -348,10 +348,12 @@ static struct tok rsvp_obj_prop_tlv_values[] = {
 
 #define RSVP_OBJ_ERROR_SPEC_CODE_ROUTING 24
 #define RSVP_OBJ_ERROR_SPEC_CODE_NOTIFY  25
+#define RSVP_OBJ_ERROR_SPEC_CODE_DIFFSERV_TE 125
 
 static struct tok rsvp_obj_error_code_values[] = {
     { RSVP_OBJ_ERROR_SPEC_CODE_ROUTING, "Routing Problem" },
     { RSVP_OBJ_ERROR_SPEC_CODE_NOTIFY,  "Notify Error" },
+    { RSVP_OBJ_ERROR_SPEC_CODE_DIFFSERV_TE, "Diffserv TE Error" },
     { 0, NULL}
 };
 
@@ -366,6 +368,17 @@ static struct tok rsvp_obj_error_code_routing_values[] = {
     { 8,                      "non-RSVP-capable router in the path" },
     { 9,                      "MPLS label allocation failure" },
     { 10,                     "Unsupported L3PID" },
+    { 0, NULL}
+};
+
+static struct tok rsvp_obj_error_code_diffserv_te_values[] = {
+    { 1,                      "Unexpected CLASSTYPE object" },
+    { 2,                      "Unsupported Class-Type" },
+    { 3,                      "Invalid Class-Type value" },
+    { 4,                      "Class-Type and setup priority do not form a configured TE-Class" },
+    { 5,                      "Class-Type and holding priority do not form a configured TE-Class" },
+    { 6,                      "Inconsistency between signaled PSC and signaled Class-Type" },
+    { 7,                      "Inconsistency between signaled PHBs and signaled Class-Type" },
     { 0, NULL}
 };
 
@@ -1180,6 +1193,11 @@ rsvp_obj_print (const u_char *tptr, const char *ident, u_int tlen) {
                 case RSVP_OBJ_ERROR_SPEC_CODE_ROUTING:
                     printf(", Error Value: %s (%u)",
                            tok2str(rsvp_obj_error_code_routing_values,"unknown",error_value),
+                           error_value);
+                    break;
+                case RSVP_OBJ_ERROR_SPEC_CODE_DIFFSERV_TE:
+                    printf(", Error Value: %s (%u)",
+                           tok2str(rsvp_obj_error_code_diffserv_te_values,"unknown",error_value),
                            error_value);
                     break;
                 default:
