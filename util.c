@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.79 2002-08-06 04:42:07 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.80 2002-10-11 10:34:07 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -205,6 +205,9 @@ int
 print_unknown_data(const u_char *cp,const char *lf,int len)
 {
         int i;
+
+        if (len ==0)
+	    return(0);
 
 	printf("%s0x0000: ",lf);
 	for(i=0;i<len;i++) {
