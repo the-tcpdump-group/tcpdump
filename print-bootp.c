@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.74 2003-07-01 19:16:06 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.75 2003-08-01 03:10:11 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -141,7 +141,7 @@ bootp_print(register const u_char *cp, u_int length)
 		}
 		putchar('"');
 	}
-	TCHECK2(bp->bp_sname[0], 1);		/* check first char only */
+	TCHECK2(bp->bp_file[0], 1);		/* check first char only */
 	if (*bp->bp_file) {
 		printf("\n\t  file \"");
 		if (fn_print(bp->bp_file, snapend)) {
