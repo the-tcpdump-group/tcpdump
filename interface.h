@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.120 2000-01-15 07:42:32 itojun Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.121 2000-01-19 05:34:18 itojun Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -63,6 +63,13 @@ int asnprintf (char **ret, size_t max_sz, const char *format, ...)
 #if !defined(HAVE_VASNPRINTF)
 int vasnprintf (char **ret, size_t max_sz, const char *format, va_list ap)
      __attribute__((format (printf, 3, 0)));
+#endif
+
+#ifndef HAVE_STRLCAT
+extern size_t strlcat __P((char *, const char *, size_t));
+#endif
+#ifndef HAVE_STRLCPY
+extern size_t strlcpy __P((char *, const char *, size_t));
 #endif
 
 struct tok {

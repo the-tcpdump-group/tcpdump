@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.104 2000-01-19 04:51:10 itojun Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.105 2000-01-19 05:34:17 itojun Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.104 $)
+AC_REVISION($Revision: 1.105 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -416,7 +416,7 @@ if test "$missing_includes" = "yes"; then
 fi
 
 
-AC_REPLACE_FUNCS(vfprintf strcasecmp)
+AC_REPLACE_FUNCS(vfprintf strcasecmp strlcat strlcpy)
 AC_CHECK_FUNCS(ether_ntohost setlinebuf gethostbyname2)
 
 needsnprintf=no
