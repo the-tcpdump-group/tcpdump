@@ -13,17 +13,19 @@
 
 #ifndef lint
 static char rcsid[] =
-    "@(#) $Id: print-rx.c,v 1.2 1999-11-17 20:28:50 assar Exp $";
+    "@(#) $Id: print-rx.c,v 1.3 1999-11-17 22:19:41 assar Exp $";
 #endif
 
+#include <stdio.h>
+#include <string.h>
 #include <sys/param.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <stdio.h>
 #include <netinet/in.h>
 #include <netinet/in_systm.h>
 #include <netinet/ip.h>
+#include <arpa/inet.h>
 
 #include "interface.h"
 #include "addrtoname.h"
@@ -740,7 +742,7 @@ fs_print(register const u_char *bp, int length)
 			break;
 		case 134:	/* Store ACL */
 		{
-			int a[AFSOPAQUEMAX];
+			char a[AFSOPAQUEMAX];
 			FIDOUT();
 			TRUNC(4);
 			i = ntohl(*((int *) bp));
@@ -852,7 +854,7 @@ fs_reply_print(register const u_char *bp, int length, int32_t opcode)
 		switch (opcode) {
 		case 131:	/* Fetch ACL */
 		{
-			int a[AFSOPAQUEMAX];
+			char a[AFSOPAQUEMAX];
 			TRUNC(4);
 			i = ntohl(*((int *) bp));
 			bp += sizeof(int32_t);
@@ -1032,6 +1034,11 @@ cb_print(register const u_char *bp, int length)
 				tok2str(cb_types, "type %d", t);
 			}
 		}
+		case 214: {
+			printf(" afsuuid");
+			AFSUUIDOUT();
+			break;
+		}
 		default:
 			;
 	}
@@ -1049,8 +1056,6 @@ trunc:
 static void
 cb_reply_print(register const u_char *bp, int length, int32_t opcode)
 {
-	unsigned long i;
-	char s[AFSNAMEMAX];
 	struct rx_header *rxh;
 
 	if (length <= sizeof(struct rx_header))
@@ -1072,8 +1077,13 @@ cb_reply_print(register const u_char *bp, int length, int32_t opcode)
 	 */
 
 	if (rxh->type == RX_PACKET_TYPE_DATA)
-		/* Well, no, not really.  Leave this for later */
+		switch (opcode) {
+		case 213:	/* InitCallBackState3 */
+			AFSUUIDOUT();
+			break;
+		default:
 		;
+		}
 	else {
 		/*
 		 * Otherwise, just print out the return code
@@ -1095,9 +1105,9 @@ trunc:
 static void
 prot_print(register const u_char *bp, int length)
 {
-	int pt_op;
 	unsigned long i;
 	char s[AFSNAMEMAX];
+	int pt_op;
 
 	if (length <= sizeof(struct rx_header))
 		return;
@@ -1492,7 +1502,7 @@ vldb_reply_print(register const u_char *bp, int length, int32_t opcode)
 			TRUNC(sizeof(int32_t));
 			nservers = ntohl(*((int *) bp));
 			bp += sizeof(int32_t);
-			printf(" %d", nservers);
+			printf(" %lu", nservers);
 			printf(" servers");
 			for (i = 0; i < 8; i++) {
 				TRUNC(sizeof(int32_t));
@@ -1506,9 +1516,9 @@ vldb_reply_print(register const u_char *bp, int length, int32_t opcode)
 				TRUNC(sizeof(int32_t));
 				j = ntohl(*((int *) bp));
 				if (i < nservers && j <= 26)
-					printf(" %c", 'a' + j);
+					printf(" %c", 'a' + (int)j);
 				else if (i < nservers)
-					printf(" %d", j);
+					printf(" %lu", j);
 				bp += sizeof(int32_t);
 			}
 			TRUNC(8 * sizeof(int32_t));
@@ -1539,7 +1549,7 @@ vldb_reply_print(register const u_char *bp, int length, int32_t opcode)
 			TRUNC(sizeof(int32_t));
 			nservers = ntohl(*((int *) bp));
 			bp += sizeof(int32_t);
-			printf(" %d", nservers);
+			printf(" %lu", nservers);
 			printf(" servers");
 			for (i = 0; i < 13; i++) {
 				TRUNC(sizeof(int32_t));
@@ -1553,9 +1563,9 @@ vldb_reply_print(register const u_char *bp, int length, int32_t opcode)
 				TRUNC(sizeof(int32_t));
 				j = ntohl(*((int *) bp));
 				if (i < nservers && j <= 26)
-					printf(" %c", 'a' + j);
+					printf(" %c", 'a' + (int)j);
 				else if (i < nservers)
-					printf(" %d", j);
+					printf(" %lu", j);
 				bp += sizeof(int32_t);
 			}
 			TRUNC(13 * sizeof(int32_t));
@@ -1576,7 +1586,7 @@ vldb_reply_print(register const u_char *bp, int length, int32_t opcode)
 			TRUNC(sizeof(int32_t));
 			nservers = ntohl(*((int *) bp));
 			bp += sizeof(int32_t);
-			printf(" %d", nservers);
+			printf(" %lu", nservers);
 			printf(" servers");
 			for (i = 0; i < 13; i++) {
 				if (i < nservers) {
@@ -1594,9 +1604,9 @@ vldb_reply_print(register const u_char *bp, int length, int32_t opcode)
 				TRUNC(sizeof(int32_t));
 				j = ntohl(*((int *) bp));
 				if (i < nservers && j <= 26)
-					printf(" %c", 'a' + j);
+					printf(" %c", 'a' + (int)j);
 				else if (i < nservers)
-					printf(" %d", j);
+					printf(" %lu", j);
 				bp += sizeof(int32_t);
 			}
 			TRUNC(13 * sizeof(int32_t));
@@ -1727,8 +1737,6 @@ trunc:
 static void
 kauth_reply_print(register const u_char *bp, int length, int32_t opcode)
 {
-	unsigned long i;
-	char s[AFSNAMEMAX];
 	struct rx_header *rxh;
 
 	if (length <= sizeof(struct rx_header))
@@ -1818,8 +1826,6 @@ trunc:
 static void
 vol_reply_print(register const u_char *bp, int length, int32_t opcode)
 {
-	unsigned long i;
-	char s[AFSNAMEMAX];
 	struct rx_header *rxh;
 
 	if (length <= sizeof(struct rx_header))
@@ -1956,8 +1962,6 @@ trunc:
 static void
 bos_reply_print(register const u_char *bp, int length, int32_t opcode)
 {
-	unsigned long i;
-	char s[AFSNAMEMAX];
 	struct rx_header *rxh;
 
 	if (length <= sizeof(struct rx_header))
