@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.99 2003-12-15 04:03:21 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.100 2004-01-26 14:26:40 risso Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -103,6 +103,10 @@ win32_gethostbyaddr(const char *addr, int len, int type)
 		memset(&addr6, 0, sizeof(addr6));
 		addr6.sin6_family = AF_INET6;
 		memcpy(&addr6.sin6_addr, addr, len);
+#ifdef __MINGW32__
+		/* Cygnus doesn't provide getnameinfo */
+	    return NULL;
+#else
 		if (getnameinfo((struct sockaddr *)&addr6, sizeof(addr6),
 			hname, sizeof(hname), NULL, 0, 0)) {
 		    return NULL;
@@ -110,6 +114,7 @@ win32_gethostbyaddr(const char *addr, int len, int type)
 			strcpy(host.h_name, hname);
 			return &host;
 		}
+#endif /* __MINGW32__ */
 		break;
 	default:
 		return NULL;
