@@ -1,4 +1,4 @@
-@(#) $Header: /tcpdump/master/tcpdump/README,v 1.56 2000-07-13 06:36:57 guy Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/README,v 1.57 2000-07-13 06:39:17 guy Exp $ (LBL)
 
 TCPDUMP 3.5
 Now maintained by "The Tcpdump Group"
@@ -18,7 +18,7 @@ Please send patches against the master copy to patches@tcpdump.org.
 
 formerly from 	Lawrence Berkeley National Laboratory
 		Network Research Group <tcpdump@ee.lbl.gov>
-		ftp://ftp.ee.lbl.gov/tcpdump.tar.Z
+		ftp://ftp.ee.lbl.gov/tcpdump.tar.Z (3.4)
 
 This directory contains source code for tcpdump, a tool for network
 monitoring and data acquisition.  This software was originally
