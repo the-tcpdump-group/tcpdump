@@ -71,34 +71,18 @@ void* GetAdapterFromList(void* device,int index)
 
 void PrintCapBegins (char* program_name, char* device)
 {
-	DWORD dwVersion;
-	DWORD dwWindowsMajorVersion;
-	int ii,jj;
-	char dev[256];
 
-	dwVersion=GetVersion();
-	dwWindowsMajorVersion =  (DWORD)(LOBYTE(LOWORD(dwVersion)));
-	if (dwVersion >= 0x80000000 && dwWindowsMajorVersion >= 4)			// Windows '95
+	if(IsTextUnicode(device,  
+		wcslen((short*)device),                // Device always ends with a double \0, so this way to determine its 
+												// length should be always valid
+		NULL))
 	{
-		for(ii=0,jj=0;ii<128;ii++) 
-				if (device[ii]=='\0') break; 
-				else if (device[ii]!='\0') {dev[jj]=device[ii];jj++;}
-		dev[jj]='\0';
-		(void)fprintf(stderr, "%s: listening on %s\n",program_name, dev);
-		(void)fflush(stderr);
+		fprintf(stderr, "%s: listening on %ws\n",program_name, device);
 	}
-
 	else
 	{
-		for(ii=0,jj=0;ii<128;ii++) 
-				if (device[ii]=='\0'&& device[ii+1]=='\0') break; 
-				else if (device[ii]!='\0') {dev[jj]=device[ii];jj++;}
-		dev[jj++]='\0';
-		dev[jj]='\0';
-		fwrite(program_name,strlen(program_name),1,stderr);
-		fwrite(": listening on ",15,1,stderr);
-		fwrite(dev,strlen(dev),1,stderr); 
-		fwrite("\n",1,1,stderr); 
-		(void)fflush(stderr);
+		fprintf(stderr, "%s: listening on %s\n",program_name, device);
 	}
+
+	fflush(stderr);	
 }
