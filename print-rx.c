@@ -13,7 +13,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.16 2000-09-23 08:54:39 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.17 2000-09-24 07:44:33 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -730,7 +730,7 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 			printf(" \"%s\"", s); \
 		}
 
-void
+static void
 ack_print(register const u_char *bp, int length)
 {
         u_char nAcks;
@@ -803,7 +803,7 @@ trunc:
  * Handle calls to the AFS file service (fs)
  */
 
-void
+static void
 fs_print(register const u_char *bp, int length)
 {
 	int fs_op;
@@ -2325,7 +2325,7 @@ trunc:
  * Handle RX ACK packets.
  */
 
-void
+static void
 rx_ack_print(register const u_char *bp, int length)
 {
 	struct rx_ackPacket *rxa;
