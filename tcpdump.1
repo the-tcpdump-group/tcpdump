@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.92.2.1 2001-01-17 18:54:07 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.92.2.2 2001-01-18 04:38:31 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -162,6 +162,12 @@ Listen on \fIinterface\fP.
 If unspecified, \fItcpdump\fP searches the system interface list for the
 lowest numbered, configured up interface (excluding loopback).
 Ties are broken by choosing the earliest match.
+.IP
+On Linux systems with 2.2 or later kernels, an
+.I interface
+argument of ``any'' can be used to capture packets from all interfaces. 
+Note that captures on the ``any'' device will not be done in promiscuous
+mode.
 .TP
 .B \-l
 Make stdout line buffered.  Useful if you want to see the data
