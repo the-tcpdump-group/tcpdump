@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.121 2003-09-12 22:05:57 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.122 2003-10-27 10:13:44 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -393,6 +393,8 @@ static int udp6_cksum(const struct ip6_hdr *ip6, const struct udphdr *up,
 #define ZEPHYR_SRV_PORT		2103
 #define ZEPHYR_CLT_PORT		2104
 #define MPLS_LSP_PING_PORT      3503 /* draft-ietf-mpls-lsp-ping-02.txt */
+#define BFD_CONTROL_PORT        3784 /* draft-katz-ward-bfd-v4v6-1hop-00.txt */
+#define BFD_ECHO_PORT           3785 /* draft-katz-ward-bfd-v4v6-1hop-00.txt */
 
 #ifdef INET6
 #define RIPNG_PORT 521		/*XXX*/
@@ -714,10 +716,13 @@ udp_print(register const u_char *bp, u_int length,
 			ldp_print((const u_char *)(up + 1), length);
                 else if (ISPORT(MPLS_LSP_PING_PORT))
 			mpls_lsp_ping_print((const u_char *)(up + 1), length);
+		else if (dport == BFD_CONTROL_PORT ||
+			 dport == BFD_ECHO_PORT )
+			bfd_print((const u_char *)(up+1), length, dport);
 		else
-			(void)printf("udp %u",
+			(void)printf("UDP, length: %u",
 			    (u_int32_t)(ulen - sizeof(*up)));
 #undef ISPORT
 	} else
-		(void)printf("udp %u", (u_int32_t)(ulen - sizeof(*up)));
+		(void)printf("UDP, length: %u", (u_int32_t)(ulen - sizeof(*up)));
 }

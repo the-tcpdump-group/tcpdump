@@ -99,6 +99,7 @@ print-ascii.c
 print-atalk.c
 print-atm.c
 print-beep.c
+print-bfd.c
 print-bgp.c
 print-bootp.c
 print-cdp.c
