@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.28 2002-05-16 10:20:47 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.29 2002-05-24 17:49:29 hannes Exp $";
 #endif
 
 #include <sys/param.h>
@@ -310,12 +310,15 @@ decode_labeled_prefix4(const u_char *pd, char *buf, u_int buflen)
         /* this is one of the weirdnesses of rfc3107
            the label length (actually the label + COS bits)
            is added of the prefix length;
-           hence we do nod check for 0-32 but rather
-           for 24-56 - hannes@juniper.net
+           we also do only read out just one label -
+           there is no real application for advertisment of
+           stacked labels in a asingle BGP message
         */
-	if (plen < 24 || 56 < plen)
-		return -1;
+
         plen-=24; /* adjust prefixlen - labellength */
+
+	if (plen < 0 || 32 < plen)
+		return -1;
 
 	memset(&addr, 0, sizeof(addr));
 	memcpy(&addr, &pd[4], (plen + 7) / 8);
@@ -324,12 +327,12 @@ decode_labeled_prefix4(const u_char *pd, char *buf, u_int buflen)
 			((0xff00 >> (plen % 8)) & 0xff);
 	}
         /* the label may get offsetted by 4 bits so lets shift it right */
-	snprintf(buf, buflen, "%s/%d (label:%u EXP:%u, S:%u)",
+	snprintf(buf, buflen, "%s/%d label:%u %s",
                  getname((u_char *)&addr),
                  plen,
                  EXTRACT_24BITS(pd+1)>>4,
-                 (pd[3]>>1)&7,
-                 (pd[3]&1));
+                 ((pd[3]&1)==0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
+
 	return 4 + (plen + 7) / 8;
 }
 
