@@ -1,4 +1,4 @@
-@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.43 2000-07-29 06:50:51 assar Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.44 2000-08-19 02:07:30 guy Exp $ (LBL)
 
 If you have not built libpcap, do so first.  See the README
 file in this directory for the ftp location.
@@ -122,7 +122,7 @@ print-atm.c	- atm printer routines
 print-bgp.c	- Border Gateway Protocol printer routines
 print-bootp.c	- BOOTP and IPv4 DHCP printer routines
 print-chdlc.c	- CHDLC printer routines
-print-cip.c	-
+print-cip.c	- Classical-IP over ATM routines
 print-cnfp.c	- Cisco NetFlow printer routines
 print-decnet.c	- DECnet printer routines
 print-dhcp6.c	- IPv6 DHCP printer routines
@@ -172,6 +172,7 @@ print-sunrpc.c	- Sun Remote Procedure Call printer routines
 print-tcp.c	- TCP printer routines
 print-telnet.c	- Telnet option printer routines
 print-tftp.c	- Trivial File Transfer Protocol printer routines
+print-token.c	- Token Ring printer routines
 print-udp.c	- UDP printer routines
 print-vjc.c	- PPP Van Jacovson compression (RFC1144) printer routines
 print-vrrp.c	- Virtual Router Redundancy Protocol
