@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.74 2001-09-14 08:11:33 torsten Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.75 2001-10-08 16:17:02 fenner Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -614,10 +614,11 @@ dnl
 
 define(AC_LBL_CHECK_LIB,
 [AC_MSG_CHECKING([for $2 in -l$1])
-dnl Use a cache variable name containing both the library and function name,
-dnl because the test really is for library $1 defining function $2, not
-dnl just for library $1.  Separate tests with the same $1 and different $2's
-dnl may have different results.
+dnl Use a cache variable name containing the library, function
+dnl name, and extra libraries to link with, because the test really is
+dnl for library $1 defining function $2, when linked with potinal
+dnl library $5, not just for library $1.  Separate tests with the same
+dnl $1 and different $2's or $5's may have different results.
 ac_lib_var=`echo $1['_']$2['_']$5 | sed 'y%./+- %__p__%'`
 AC_CACHE_VAL(ac_cv_lbl_lib_$ac_lib_var,
 [ac_save_LIBS="$LIBS"
@@ -693,23 +694,20 @@ dnl
 AC_DEFUN(AC_LBL_LIBRARY_NET, [
     # Most operating systems have gethostbyname() in the default searched
     # libraries (i.e. libc):
-    AC_CHECK_FUNC(gethostbyname, ,
-	# Some OSes (eg. Solaris) place it in libnsl:
-	AC_LBL_CHECK_LIB(nsl, gethostbyname, , 
-	    # Some strange OSes (SINIX) have it in libsocket:
-	    AC_LBL_CHECK_LIB(socket, gethostbyname, ,
-		# Unfortunately libsocket sometimes depends on libnsl.
-		# AC_CHECK_LIB's API is essentially broken so the
-		# following ugliness is necessary:
-		AC_LBL_CHECK_LIB(socket, gethostbyname,
-		    LIBS="-lsocket -lnsl $LIBS",
-		    AC_CHECK_LIB(resolv, gethostbyname),
-		    -lnsl))))
-    AC_CHECK_FUNC(socket, , AC_CHECK_LIB(socket, socket, ,
-	AC_LBL_CHECK_LIB(socket, socket, LIBS="-lsocket -lnsl $LIBS", ,
-	    -lnsl)))
+    # Some OSes (eg. Solaris) place it in libnsl
+    # Some strange OSes (SINIX) have it in libsocket:
+    AC_SEARCH_LIBS(gethostbyname, nsl socket resolv)
+    # Unfortunately libsocket sometimes depends on libnsl and
+    # AC_SEARCH_LIBS isn't up to the task of handling dependencies like this.
+    if test "$ac_cv_search_gethostbyname" = "no"
+    then
+	AC_CHECK_LIB(socket, gethostbyname,
+                     LIBS="-lsocket -lnsl $LIBS", , -lnsl)
+    fi
+    AC_SEARCH_LIBS(socket, socket, ,
+	AC_CHECK_LIB(socket, socket, LIBS="-lsocket -lnsl $LIBS", , -lnsl))
     # DLPI needs putmsg under HPUX so test for -lstr while we're at it
-    AC_CHECK_LIB(str, putmsg)
+    AC_SEARCH_LIBS(putmsg, str)
     ])
 
 dnl Copyright (c) 1999 WIDE Project. All rights reserved.

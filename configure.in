@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.140 2001-06-28 10:27:09 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.141 2001-10-08 16:17:02 fenner Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.140 $)
+AC_REVISION($Revision: 1.141 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -469,7 +469,6 @@ AC_CHECK_FUNCS(ether_ntohost, [
 		#include <sys/types.h>
 		#include <sys/param.h>
 		#include <sys/socket.h>
-		#include <net/ethernet.h>
 
 		int
 		main(int argc, char **argv)
@@ -489,13 +488,6 @@ AC_CHECK_FUNCS(ether_ntohost, [
 ])
 AC_CHECK_FUNCS(setlinebuf)
 
-usegetipnodeby=yes
-AC_CHECK_FUNCS(getipnodebyname getipnodebyaddr freeaddrinfo,
-	[], [usegetipnodeby=no])
-if test $usegetipnodeby = yes; then
-	AC_DEFINE(USE_GETIPNODEBY)
-fi
-
 needsnprintf=no
 AC_CHECK_FUNCS(vsnprintf snprintf,,
 	[needsnprintf=yes])
@@ -503,13 +495,17 @@ if test $needsnprintf = yes; then
 	LIBOBJS="$LIBOBJS snprintf.o"
 fi
 
-AC_CHECK_LIB(dnet, main)
-AC_CHECK_LIB(rpc, main)
-AC_CHECK_LIB(nsl, getrpcbynumber)
+AC_LBL_TYPE_SIGNAL
+
+AC_CHECK_LIB(dnet, dnet_htoa)
+
+AC_CHECK_LIB(rpc, main)		dnl It's unclear why we might need -lrpc
+
+dnl HP/UX may need -lnsl for getrpcbynumber.
+AC_SEARCH_LIBS(getrpcbynumber, nsl)
+
 dnl AC_CHECK_LIB(z, uncompress)
 dnl AC_CHECK_HEADERS(zlib.h)
-
-AC_LBL_TYPE_SIGNAL
 
 AC_LBL_LIBPCAP(V_PCAPDEP, V_INCLS)
 
