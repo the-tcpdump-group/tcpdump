@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.32 2002-08-01 08:53:22 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.33 2002-11-07 23:46:23 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -41,33 +41,53 @@ static const char rcsid[] =
 
 #include "ip.h"
 
-struct bits {
-	u_int32_t bit;
-	const char *str;
-};
-
-static const struct bits ospf_option_bits[] = {
-	{ OSPF_OPTION_T,	"T" },
-	{ OSPF_OPTION_E,	"E" },
-	{ OSPF_OPTION_MC,	"MC" },
+static struct tok ospf_option_values[] = {
+	{ OSPF_OPTION_T,	"TOS" },
+	{ OSPF_OPTION_E,	"External" },
+	{ OSPF_OPTION_MC,	"Multicast" },
+	{ OSPF_OPTION_NP,	"NSSA" },
+	{ OSPF_OPTION_EA,	"Advertise External" },
+	{ OSPF_OPTION_DC,	"Demand Circuit" },
+	{ OSPF_OPTION_O,	"Opaque" },
 	{ 0,			NULL }
 };
 
-static const struct bits ospf_rla_flag_bits[] = {
-	{ RLA_FLAG_B,		"B" },
-	{ RLA_FLAG_E,		"E" },
-	{ RLA_FLAG_W1,		"W1" },
+static struct tok ospf_rla_flag_values[] = {
+	{ RLA_FLAG_B,		"ABR" },
+	{ RLA_FLAG_E,		"ASBR" },
+	{ RLA_FLAG_W1,		"Virtual" },
 	{ RLA_FLAG_W2,		"W2" },
 	{ 0,			NULL }
 };
 
 static struct tok type2str[] = {
-	{ OSPF_TYPE_UMD,	"umd" },
-	{ OSPF_TYPE_HELLO,	"hello" },
-	{ OSPF_TYPE_DB,		"dd" },
-	{ OSPF_TYPE_LSR,	"ls_req" },
-	{ OSPF_TYPE_LSU,	"ls_upd" },
-	{ OSPF_TYPE_LSA,	"ls_ack" },
+	{ OSPF_TYPE_UMD,	"UMD" },
+	{ OSPF_TYPE_HELLO,	"Hello" },
+	{ OSPF_TYPE_DD,		"Database Description" },
+	{ OSPF_TYPE_LS_REQ,	"LS-Request" },
+	{ OSPF_TYPE_LS_UPDATE,	"LS-Update" },
+	{ OSPF_TYPE_LS_ACK,	"LS-Ack" },
+	{ 0,			NULL }
+};
+
+static struct tok lsa_values[] = {
+	{ LS_TYPE_ROUTER,       "Router" },
+	{ LS_TYPE_NETWORK,      "Network" },
+	{ LS_TYPE_SUM_IP,       "Summary" },
+	{ LS_TYPE_SUM_ABR,      "ASBR Summary" },
+	{ LS_TYPE_ASE,          "External" },
+	{ LS_TYPE_GROUP,        "Multicast Group" },
+	{ LS_TYPE_NSSA,         "NSSA" },
+	{ LS_TYPE_OPAQUE_LL,    "Link Local Opaque" },
+	{ LS_TYPE_OPAQUE_AL,    "Area Local Opaque" },
+	{ LS_TYPE_OPAQUE_DW,    "Domain Wide Opaque" },
+	{ 0,			NULL }
+};
+
+static struct tok ospf_dd_flag_values[] = {
+	{ OSPF_DB_INIT,	        "Init" },
+	{ OSPF_DB_MORE,	        "More" },
+	{ OSPF_DB_MASTER,	"Master" },
 	{ 0,			NULL }
 };
 
@@ -77,114 +97,29 @@ static char tstr[] = " [|ospf]";
 #define inline __inline
 #endif /* WIN32 */
 
-/* Forwards */
-static inline void ospf_print_seqage(u_int32_t, time_t);
-static inline void ospf_print_bits(const struct bits *, u_char);
-static void ospf_print_ls_type(u_int, const struct in_addr *,
-    const struct in_addr *, const char *);
 static int ospf_print_lshdr(const struct lsa_hdr *);
 static int ospf_print_lsa(const struct lsa *);
 static int ospf_decode_v2(const struct ospfhdr *, const u_char *);
 
-static inline void
-ospf_print_seqage(register u_int32_t seq, register time_t us)
-{
-	register time_t sec = us % 60;
-	register time_t mins = (us / 60) % 60;
-	register time_t hour = us / 3600;
-
-	printf(" S %X age ", seq);
-	if (hour)
-		printf("%u:%02u:%02u",
-		    (u_int32_t) hour, (u_int32_t) mins, (u_int32_t) sec);
-	else if (mins)
-		printf("%u:%02u", (u_int32_t) mins, (u_int32_t) sec);
-	else
-		printf("%u", (u_int32_t) sec);
-}
-
-
-static inline void
-ospf_print_bits(register const struct bits *bp, register u_char options)
-{
-	register char sep = ' ';
-
-	do {
-		if (options & bp->bit) {
-			printf("%c%s", sep, bp->str);
-			sep = '/';
-		}
-	} while ((++bp)->bit);
-}
-
-static void
-ospf_print_ls_type(register u_int ls_type,
-    register const struct in_addr *ls_stateid,
-    register const struct in_addr *ls_router, register const char *fmt)
-{
-
-	switch (ls_type) {
-
-	case LS_TYPE_ROUTER:
-		printf(" rtr %s ", ipaddr_string(ls_router));
-		break;
-
-	case LS_TYPE_NETWORK:
-		printf(" net dr %s if %s",
-		    ipaddr_string(ls_router),
-		    ipaddr_string(ls_stateid));
-		break;
-
-	case LS_TYPE_SUM_IP:
-		printf(" sum %s abr %s",
-		    ipaddr_string(ls_stateid),
-		    ipaddr_string(ls_router));
-		break;
-
-	case LS_TYPE_SUM_ABR:
-		printf(" abr %s rtr %s",
-		    ipaddr_string(ls_router),
-		    ipaddr_string(ls_stateid));
-		break;
-
-	case LS_TYPE_ASE:
-		printf(" ase %s asbr %s",
-		    ipaddr_string(ls_stateid),
-		    ipaddr_string(ls_router));
-		break;
-
-	case LS_TYPE_GROUP:
-		printf(" group %s rtr %s",
-		    ipaddr_string(ls_stateid),
-		    ipaddr_string(ls_router));
-		break;
-
-	default:
-		putchar(' ');
-		printf(fmt, ls_type);
-		break;
-	}
-}
-
 static int
-ospf_print_lshdr(register const struct lsa_hdr *lshp)
-{
+ospf_print_lshdr(register const struct lsa_hdr *lshp) {
 
 	TCHECK(lshp->ls_type);
-	printf(" {");						/* } (ctags) */
-
 	TCHECK(lshp->ls_options);
-	ospf_print_bits(ospf_option_bits, lshp->ls_options);
-	TCHECK(lshp->ls_seq);
-	ospf_print_seqage(ntohl(lshp->ls_seq), ntohs(lshp->ls_age));
-	ospf_print_ls_type(lshp->ls_type, &lshp->ls_stateid, &lshp->ls_router,
-	    "ls_type %d");
+
+        printf("\n\t  %s LSA (%d), LSA-ID: %s, Advertising Router: %s, seq 0x%08x, age %ds",
+               tok2str(lsa_values,"unknown",lshp->ls_type),
+               lshp->ls_type,
+               ipaddr_string(&lshp->ls_stateid),
+               ipaddr_string(&lshp->ls_router),
+               ntohl(lshp->ls_seq),
+               ntohs(lshp->ls_age));
+        printf("\n\t    Options: %s", bittok2str(ospf_option_values,"none",lshp->ls_options));
 
 	return (0);
 trunc:
 	return (1);
 }
-
 
 /*
  * Print a single link state advertisement.  If truncated return 1, else 0.
@@ -201,16 +136,22 @@ ospf_print_lsa(register const struct lsa *lsap)
 	register const u_int32_t *lp;
 	register int j, k;
 
-	if (ospf_print_lshdr(&lsap->ls_hdr))
-		return (1);
+        printf("\n\t  %s LSA (%d), LSA-ID: %s, Advertising Router: %s, seq 0x%08x, age %ds",
+               tok2str(lsa_values,"unknown",lsap->ls_hdr.ls_type),
+               lsap->ls_hdr.ls_type,
+               ipaddr_string(&lsap->ls_hdr.ls_stateid),
+               ipaddr_string(&lsap->ls_hdr.ls_router),
+               ntohl(lsap->ls_hdr.ls_seq),
+               ntohs(lsap->ls_hdr.ls_age));
+        printf("\n\t    Options: %s", bittok2str(ospf_option_values,"none",lsap->ls_hdr.ls_options));
+
 	TCHECK(lsap->ls_hdr.ls_length);
 	ls_end = (u_char *)lsap + ntohs(lsap->ls_hdr.ls_length);
 	switch (lsap->ls_hdr.ls_type) {
 
 	case LS_TYPE_ROUTER:
 		TCHECK(lsap->lsa_un.un_rla.rla_flags);
-		ospf_print_bits(ospf_rla_flag_bits,
-		    lsap->lsa_un.un_rla.rla_flags);
+                printf("\n\t    Router LSA Options: %s", bittok2str(ospf_rla_flag_values,"unknown (%u)",lsap->lsa_un.un_rla.rla_flags));
 
 		TCHECK(lsap->lsa_un.un_rla.rla_count);
 		j = ntohs(lsap->lsa_un.un_rla.rla_count);
@@ -218,48 +159,46 @@ ospf_print_lsa(register const struct lsa *lsap)
 		rlp = lsap->lsa_un.un_rla.rla_link;
 		while (j--) {
 			TCHECK(*rlp);
-			printf(" {");				/* } (ctags) */
 			switch (rlp->link_type) {
 
 			case RLA_TYPE_VIRTUAL:
-				printf(" virt");
-				/* Fall through */
+				printf("\n\t      Virtual Link: Neighbor-Router-ID: %s, Interface-IP: %s",
+				    ipaddr_string(&rlp->link_id),
+				    ipaddr_string(&rlp->link_data)); 
+                                break;
 
 			case RLA_TYPE_ROUTER:
-				printf(" nbrid %s if %s",
+				printf("\n\t      Neighbor-Router-ID: %s, Interface-IP: %s",
 				    ipaddr_string(&rlp->link_id),
 				    ipaddr_string(&rlp->link_data));
 				break;
 
 			case RLA_TYPE_TRANSIT:
-				printf(" dr %s if %s",
+				printf("\n\t      Neighbor-Network-ID: %s, Interface-IP: %s",
 				    ipaddr_string(&rlp->link_id),
 				    ipaddr_string(&rlp->link_data));
 				break;
 
 			case RLA_TYPE_STUB:
-				printf(" net %s mask %s",
+				printf("\n\t      Stub-Network: %s, mask: %s",
 				    ipaddr_string(&rlp->link_id),
 				    ipaddr_string(&rlp->link_data));
 				break;
 
 			default:
-								/* { (ctags) */
-				printf(" ??RouterLinksType %d?? }",
+				printf("\n\t      unknown Router Links Type (%u)",
 				    rlp->link_type);
 				return (0);
 			}
-			printf(" tos 0 metric %d", ntohs(rlp->link_tos0metric));
+			printf(", tos 0, metric: %d", ntohs(rlp->link_tos0metric));
 			tosp = (struct tos_metric *)
 			    ((sizeof rlp->link_tos0metric) + (u_char *) rlp);
 			for (k = 0; k < (int) rlp->link_toscount; ++k, ++tosp) {
 				TCHECK(*tosp);
-				printf(" tos %d metric %d",
+				printf(", tos %d, metric: %d",
 				    tosp->tos_type,
 				    ntohs(tosp->tos_metric));
 			}
-								/* { (ctags) */
-			printf(" }");
 			rlp = (struct rlalink *)((u_char *)(rlp + 1) +
 			    ((rlp->link_toscount) * sizeof(*tosp)));
 		}
@@ -267,7 +206,7 @@ ospf_print_lsa(register const struct lsa *lsap)
 
 	case LS_TYPE_NETWORK:
 		TCHECK(lsap->lsa_un.un_nla.nla_mask);
-		printf(" mask %s rtrs",
+		printf("\n\t    mask %s rtrs",
 		    ipaddr_string(&lsap->lsa_un.un_nla.nla_mask));
 		ap = lsap->lsa_un.un_nla.nla_router;
 		while ((u_char *)ap < ls_end) {
@@ -279,19 +218,41 @@ ospf_print_lsa(register const struct lsa *lsap)
 
 	case LS_TYPE_SUM_IP:
 		TCHECK(lsap->lsa_un.un_nla.nla_mask);
-		printf(" mask %s",
+		printf("\n\t    mask %s",
 		    ipaddr_string(&lsap->lsa_un.un_sla.sla_mask));
-		/* Fall through */
-
-	case LS_TYPE_SUM_ABR:
 		TCHECK(lsap->lsa_un.un_sla.sla_tosmetric);
 		lp = lsap->lsa_un.un_sla.sla_tosmetric;
+                /* suppress tos if its not supported */
+                if(!((lsap->ls_hdr.ls_options)&OSPF_OPTION_T)) {
+                    printf(", metric: %d", ntohl(*lp)&SLA_MASK_METRIC);
+                    break;
+                }
 		while ((u_char *)lp < ls_end) {
 			register u_int32_t ul;
 
 			TCHECK(*lp);
 			ul = ntohl(*lp);
-			printf(" tos %d metric %d",
+			printf(", tos %d metric %d",
+			    (ul & SLA_MASK_TOS) >> SLA_SHIFT_TOS,
+			    ul & SLA_MASK_METRIC);
+			++lp;
+		}
+		break;
+
+	case LS_TYPE_SUM_ABR:
+		TCHECK(lsap->lsa_un.un_sla.sla_tosmetric);
+		lp = lsap->lsa_un.un_sla.sla_tosmetric;
+                /* suppress tos if its not supported */
+                if(!((lsap->ls_hdr.ls_options)&OSPF_OPTION_T)) {
+                    printf(", metric: %d", ntohl(*lp)&SLA_MASK_METRIC);
+                    break;
+                }
+		while ((u_char *)lp < ls_end) {
+			register u_int32_t ul;
+
+			TCHECK(*lp);
+			ul = ntohl(*lp);
+			printf(", tos %d metric %d",
 			    (ul & SLA_MASK_TOS) >> SLA_SHIFT_TOS,
 			    ul & SLA_MASK_METRIC);
 			++lp;
@@ -300,7 +261,7 @@ ospf_print_lsa(register const struct lsa *lsap)
 
 	case LS_TYPE_ASE:
 		TCHECK(lsap->lsa_un.un_nla.nla_mask);
-		printf(" mask %s",
+		printf("\n\t    mask %s",
 		    ipaddr_string(&lsap->lsa_un.un_asla.asla_mask));
 
 		TCHECK(lsap->lsa_un.un_sla.sla_tosmetric);
@@ -310,18 +271,22 @@ ospf_print_lsa(register const struct lsa *lsap)
 
 			TCHECK(almp->asla_tosmetric);
 			ul = ntohl(almp->asla_tosmetric);
-			printf(" type %d tos %d metric %d",
+			printf(", type %d, tos %d metric:",
 			    (ul & ASLA_FLAG_EXTERNAL) ? 2 : 1,
-			    (ul & ASLA_MASK_TOS) >> ASLA_SHIFT_TOS,
-			    (ul & ASLA_MASK_METRIC));
+			    (ul & ASLA_MASK_TOS) >> ASLA_SHIFT_TOS);
+                        if ((ul & ASLA_MASK_METRIC)==0xffffff)
+                            printf(" infinite");
+                        else
+                            printf(" %d", (ul & ASLA_MASK_METRIC));
+
 			TCHECK(almp->asla_forward);
 			if (almp->asla_forward.s_addr) {
-				printf(" forward %s",
+				printf(", forward %s",
 				    ipaddr_string(&almp->asla_forward));
 			}
 			TCHECK(almp->asla_tag);
 			if (almp->asla_tag.s_addr) {
-				printf(" tag %s",
+				printf(", tag %s",
 				    ipaddr_string(&almp->asla_tag));
 			}
 			++almp;
@@ -336,17 +301,17 @@ ospf_print_lsa(register const struct lsa *lsap)
 			switch (ntohl(mcp->mcla_vtype)) {
 
 			case MCLA_VERTEX_ROUTER:
-				printf(" rtr rtrid %s",
+				printf("\n\t    Router Router-ID %s",
 				    ipaddr_string(&mcp->mcla_vid));
 				break;
 
 			case MCLA_VERTEX_NETWORK:
-				printf(" net dr %s",
+				printf("\n\t    Network Designated Router %s",
 				    ipaddr_string(&mcp->mcla_vid));
 				break;
 
 			default:
-				printf(" ??VertexType %u??",
+				printf("\n\t    unknown VertexType (%u)",
 				    (u_int32_t)ntohl(mcp->mcla_vtype));
 				break;
 			}
@@ -354,11 +319,8 @@ ospf_print_lsa(register const struct lsa *lsap)
 		}
 	}
 
-								/* { (ctags) */
-	fputs(" }", stdout);
 	return (0);
 trunc:
-	fputs(" }", stdout);
 	return (1);
 }
 
@@ -370,8 +332,7 @@ ospf_decode_v2(register const struct ospfhdr *op,
 	register const struct lsr *lsrp;
 	register const struct lsa_hdr *lshp;
 	register const struct lsa *lsap;
-	register char sep;
-	register int i;
+	register int lsa_count;
 
 	switch (op->ospf_type) {
 
@@ -383,114 +344,89 @@ ospf_decode_v2(register const struct ospfhdr *op,
 		break;
 
 	case OSPF_TYPE_HELLO:
-		if (vflag) {
-			TCHECK(op->ospf_hello.hello_deadint);
-			ospf_print_bits(ospf_option_bits,
-			    op->ospf_hello.hello_options);
-			printf(" mask %s int %d pri %d dead %u",
-			    ipaddr_string(&op->ospf_hello.hello_mask),
-			    ntohs(op->ospf_hello.hello_helloint),
-			    op->ospf_hello.hello_priority,
-			    (u_int32_t)ntohl(op->ospf_hello.hello_deadint));
-		}
+                TCHECK(op->ospf_hello.hello_deadint);
+                printf("\n\t  Hello Timer: %us, Dead Timer %us, mask: %s, Priority: %u",
+                       ntohs(op->ospf_hello.hello_helloint),
+                       (u_int32_t)ntohl(op->ospf_hello.hello_deadint),
+                       ipaddr_string(&op->ospf_hello.hello_mask),
+                       op->ospf_hello.hello_priority);
+
+                printf("\n\t  Options: %s",
+                       bittok2str(ospf_option_values,"none",op->ospf_hello.hello_options));
+
 		TCHECK(op->ospf_hello.hello_dr);
 		if (op->ospf_hello.hello_dr.s_addr != 0)
-			printf(" dr %s",
+			printf("\n\t  Designated Router %s",
 			    ipaddr_string(&op->ospf_hello.hello_dr));
+
 		TCHECK(op->ospf_hello.hello_bdr);
 		if (op->ospf_hello.hello_bdr.s_addr != 0)
-			printf(" bdr %s",
+			printf(", Backup Designated Router %s",
 			    ipaddr_string(&op->ospf_hello.hello_bdr));
-		if (vflag) {
-			ap = op->ospf_hello.hello_neighbor;
-			if ((u_char *)ap < dataend)
-				printf(" nbrs");
-			while ((u_char *)ap < dataend) {
-				TCHECK(*ap);
-				printf(" %s", ipaddr_string(ap));
-				++ap;
-			}
-		}
+
+                ap = op->ospf_hello.hello_neighbor;
+                if ((u_char *)ap < dataend)
+                        printf("\n\t  Neighbor List:");
+                while ((u_char *)ap < dataend) {
+                        TCHECK(*ap);
+                        printf("\n\t    %s", ipaddr_string(ap));
+                        ++ap;
+                }
 		break;	/* HELLO */
 
-	case OSPF_TYPE_DB:
+	case OSPF_TYPE_DD:
 		TCHECK(op->ospf_db.db_options);
-		ospf_print_bits(ospf_option_bits, op->ospf_db.db_options);
-		sep = ' ';
+                printf("\n\t  Options: %s",
+                       bittok2str(ospf_option_values,"none",op->ospf_db.db_options));
 		TCHECK(op->ospf_db.db_flags);
-		if (op->ospf_db.db_flags & OSPF_DB_INIT) {
-			printf("%cI", sep);
-			sep = '/';
-		}
-		if (op->ospf_db.db_flags & OSPF_DB_MORE) {
-			printf("%cM", sep);
-			sep = '/';
-		}
-		if (op->ospf_db.db_flags & OSPF_DB_MASTER) {
-			printf("%cMS", sep);
-			sep = '/';
-		}
-		TCHECK(op->ospf_db.db_seq);
-		printf(" S %X", (u_int32_t)ntohl(op->ospf_db.db_seq));
+                printf("\n\t  DD Flags: %s",
+                       bittok2str(ospf_dd_flag_values,"none",op->ospf_db.db_flags));
 
 		if (vflag) {
 			/* Print all the LS adv's */
 			lshp = op->ospf_db.db_lshdr;
-
 			while (!ospf_print_lshdr(lshp)) {
-							/* { (ctags) */
-				printf(" }");
 				++lshp;
 			}
 		}
 		break;
 
-	case OSPF_TYPE_LSR:
-		if (vflag) {
-			lsrp = op->ospf_lsr;
-			while ((u_char *)lsrp < dataend) {
-				TCHECK(*lsrp);
-				printf(" {");		/* } (ctags) */
-				ospf_print_ls_type(ntohl(lsrp->ls_type),
-				    &lsrp->ls_stateid,
-				    &lsrp->ls_router,
-				    "LinkStateType %d");
-							/* { (ctags) */
-				printf(" }");
-				++lsrp;
-			}
-		}
+	case OSPF_TYPE_LS_REQ:
+                lsrp = op->ospf_lsr;
+                while ((u_char *)lsrp < dataend) {
+                        TCHECK(*lsrp);
+
+                        printf("\n\t  %s LSA (%d), LSA-ID: %s, Advertising Router: %s",
+                               tok2str(lsa_values,"unknown",lsrp->ls_type),
+                               lsrp->ls_type,
+                               ipaddr_string(&lsrp->ls_stateid),
+                               ipaddr_string(&lsrp->ls_router));
+                        ++lsrp;
+                }
 		break;
 
-	case OSPF_TYPE_LSU:
-		if (vflag) {
-			lsap = op->ospf_lsu.lsu_lsa;
-			TCHECK(op->ospf_lsu.lsu_count);
-			i = ntohl(op->ospf_lsu.lsu_count);
-			while (i--) {
-				if (ospf_print_lsa(lsap))
-					goto trunc;
-				lsap = (struct lsa *)((u_char *)lsap +
-				    ntohs(lsap->ls_hdr.ls_length));
-			}
-		}
+	case OSPF_TYPE_LS_UPDATE:
+                lsap = op->ospf_lsu.lsu_lsa;
+                TCHECK(op->ospf_lsu.lsu_count);
+                lsa_count = ntohl(op->ospf_lsu.lsu_count);
+                printf(", %d LSA%s",lsa_count, lsa_count > 1 ? "s" : "");
+                while (lsa_count--) {
+                        if (ospf_print_lsa(lsap))
+                                goto trunc;
+                        lsap = (struct lsa *)((u_char *)lsap +
+                                              ntohs(lsap->ls_hdr.ls_length));
+                }
 		break;
 
-
-	case OSPF_TYPE_LSA:
-		if (vflag) {
-			lshp = op->ospf_lsa.lsa_lshdr;
-
-			while (!ospf_print_lshdr(lshp)) {
-							/* { (ctags) */
-				printf(" }");
-				++lshp;
-			}
-		}
-		break;
+	case OSPF_TYPE_LS_ACK:
+                lshp = op->ospf_lsa.lsa_lshdr;
+                while (!ospf_print_lshdr(lshp)) {
+                    ++lshp;
+                }
+                break;
 
 	default:
-		printf("v2 type %d", op->ospf_type);
+		printf("v2 type (%d)", op->ospf_type);
 		break;
 	}
 	return (0);
@@ -520,10 +456,13 @@ ospf_print(register const u_char *bp, register u_int length,
 	/* If the type is valid translate it, or just print the type */
 	/* value.  If it's not valid, say so and return */
 	TCHECK(op->ospf_type);
-	cp = tok2str(type2str, "type%d", op->ospf_type);
-	printf("OSPFv%d-%s %d:", op->ospf_version, cp, length);
-	if (*cp == 't')
+	cp = tok2str(type2str, "unknown LS-Type %d", op->ospf_type);
+	printf("OSPFv%d %s length: %d", op->ospf_version, cp, length);
+	if (*cp == 'u')
 		return;
+
+        if(!vflag) /* non verbose - so lets bail out here */
+                return;
 
 	TCHECK(op->ospf_len);
 	if (length != ntohs(op->ospf_len)) {
@@ -535,13 +474,13 @@ ospf_print(register const u_char *bp, register u_int length,
 	/* Print the routerid if it is not the same as the source */
 	TCHECK(op->ospf_routerid);
 	if (ip->ip_src.s_addr != op->ospf_routerid.s_addr)
-		printf(" rtrid %s", ipaddr_string(&op->ospf_routerid));
+		printf("\n\tRouter-ID: %s", ipaddr_string(&op->ospf_routerid));
 
 	TCHECK(op->ospf_areaid);
 	if (op->ospf_areaid.s_addr != 0)
-		printf(" area %s", ipaddr_string(&op->ospf_areaid));
+		printf(", Area %s", ipaddr_string(&op->ospf_areaid));
 	else
-		printf(" backbone");
+		printf(", Backbone Area");
 
 	if (vflag) {
 		/* Print authentication data (should we really do this?) */
@@ -552,18 +491,18 @@ ospf_print(register const u_char *bp, register u_int length,
 			break;
 
 		case OSPF_AUTH_SIMPLE:
-			printf(" auth \"");
+			printf(", simple Authentication \"");
 			(void)fn_printn(op->ospf_authdata,
 			    sizeof(op->ospf_authdata), NULL);
 			printf("\"");
 			break;
 
 		case OSPF_AUTH_MD5:
-			printf(" auth MD5");
+			printf(", MD5 Authentication");
 			break;
 
 		default:
-			printf(" ??authtype-%d??", ntohs(op->ospf_authtype));
+			printf(", unknown Authentication Type %d", ntohs(op->ospf_authtype));
 			return;
 		}
 	}
