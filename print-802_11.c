@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.22.2.4 2003-11-27 02:31:15 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.22.2.5 2003-11-27 02:51:21 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -64,15 +64,15 @@ static const char *subtype_text[]={
 	"ReAssoc Response",
 	"Probe Request",
 	"Probe Response",
-	"RESERVED",
-	"RESERVED",
+	"",
+	"",
 	"Beacon",
 	"ATIM",
 	"Disassociation",
 	"Authentication",
 	"DeAuthentication",
-	"RESERVED",
-	"RESERVED"
+	"",
+	""
 };
 
 static const char *status_text[] = {
