@@ -51,7 +51,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.13 2001-06-15 07:43:13 itojun Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.14 2001-06-25 22:49:36 itojun Exp $";
 #endif
 
 #include <sys/param.h>
@@ -77,106 +77,144 @@ static const char rcsid[] =
 # define TELCMD_FIRST SE
 #endif
 
-void
-telnet_print(register const u_char *sp, u_int length)
+/* sp points to IAB byte */
+static int
+telnet_parse(const u_char *sp, u_int length, int print)
 {
-	static char tnet[128];
-	register int i, c, x;
-	register u_char *rcp;
-	int off, first = 1;
-	u_char	*osp;
+	int i, c, x;
+	const u_char *osp, *p;
+#define PEEK(c, sp, length) \
+	do { \
+		if (length < 1) \
+			goto trunc; \
+		c = *sp; \
+	} while (0)
+#define FETCH(c, sp, length) \
+	do { \
+		PEEK((c), (sp), (length)); \
+		sp++; \
+		length--; \
+	} while (0)
 
-	off = 0;
-	x = 0;
+	osp = sp;
+
+	FETCH(c, sp, length);
+	if (c != IAC)
+		goto trunc;
+	FETCH(c, sp, length);
+	if (c == IAC) {		/* <IAC><IAC>! */
+		if (print)
+			printf("IAC IAC");
+		goto done;
+	}
+
+	i = c - TELCMD_FIRST;
+	if (i < 0 || i > IAC - TELCMD_FIRST) {
+		(void)printf("unknown: ff%02x\n", c);
+		goto trunc;
+	}
+
+	switch (c) {
+	case DONT:
+	case DO:
+	case WONT:
+	case WILL:
+	case SB:
+		/* DONT/DO/WONT/WILL x */
+		FETCH(x, sp, length);
+		if (x >= 0 && x < NTELOPTS) {
+			if (print)
+				(void)printf("%s %s", telcmds[i], telopts[x]);
+		} else {
+			if (print)
+				(void)printf("%s %#x", telcmds[i], x);
+		}
+		if (c != SB)
+			break;
+		/* IAC SB .... IAC SE */
+		p = sp;
+		while (length > p + 1 - sp) {
+			if (p[0] == IAC && p[1] == SE)
+				break;
+			p++;
+		}
+		if (*p != IAC)
+			goto trunc;
+
+		PEEK(c, sp, length);
+		if (c) {
+			while (p > sp) {
+				FETCH(x, sp, length);
+				if (print)
+					(void)printf(" %#x", x);
+			}
+		} else {
+			FETCH(c, sp, length);
+			if (print)
+				(void)printf(" IS '");
+			while (p > sp) {
+				FETCH(x, sp, length);
+				if (print)
+					safeputchar(x);
+			}
+			/* terminating IAC SE */
+			if (print)
+				(void)printf("'");
+		}
+		/* terminating IAC SE */
+		if (print)
+			(void)printf(" SE");
+		sp += 2;
+		length -= 2;
+		break;
+	default:
+		if (print)
+			(void)printf("%s", telcmds[i]);
+		goto done;
+	}
+
+done:
+	return sp - osp;
+
+trunc:
+	return -1;
+#undef PEEK
+#undef FETCH
+}
+
+void
+telnet_print(const u_char *sp, u_int length)
+{
+	int first = 1;
+	const u_char *osp;
+	int l;
+
+	osp = sp;
 	
 	while (length > 0 && *sp == IAC) {
-		osp = (u_char *) sp;
-		tnet[0] = '\0';
-		
-		c = *sp++;
-		length--;
-		switch (*sp) {
-		case IAC:			/* <IAC><IAC>! */
-			if (length > 1 && sp[1] == IAC) {
-				(void)strlcpy(tnet, "IAC IAC", sizeof(tnet));
-			} else {
-				length = 0;
-				continue;
-			}
+		l = telnet_parse(sp, length, 0);
+		if (l < 0)
 			break;
-		default:
-			c = *sp++;
-			length--;
-			if ((i = c - TELCMD_FIRST) < 0
-			    || i > IAC - TELCMD_FIRST) {
-				(void)printf("unknown: ff%02x\n", c);
-				return;
-			}
-			switch (c) {
-			case DONT:
-			case DO:
-			case WONT:
-			case WILL:
-			case SB:
-				x = *sp++; /* option */
-				length--;
-				if (x >= 0 && x < NTELOPTS) {
-					(void)snprintf(tnet, sizeof(tnet),
-					    "%s %s", telcmds[i], telopts[x]);
-				} else {
-					(void)snprintf(tnet, sizeof(tnet),
-					    "%s %#x", telcmds[i], x);
-				}
-				break;
-			default:
-				(void)snprintf(tnet, sizeof(tnet), "%s",
-				    telcmds[i]);
-			}
-			if (c == SB) {
-				c = *sp++;
-				length--;
-				(void)strcat(tnet, c ? " SEND" : " IS '");
-				rcp = (u_char *) sp;
-				i = strlen(tnet);
-				while (length > 0 && (x = *sp++) != IAC)
-					--length;
-				if (x == IAC) {
-					if (2 < vflag
-					    && i + 16 + sp - rcp < sizeof(tnet)) {
-						(void)strncpy(&tnet[i], rcp, sp - rcp);
-						i += (sp - rcp) - 1;
-						tnet[i] = '\0';
-					} else if (i + 8 < sizeof(tnet)) {
-						(void)strcat(&tnet[i], "...");
-					}
-					if (*sp++ == SE
-					    && i + 4 < sizeof(tnet))
-						(void)strcat(tnet, c ? " SE" : "' SE");
-				} else if (i + 16 < sizeof(tnet)) {
-					(void)strcat(tnet, " truncated!");
-				}
-			}
-			break;
-		}
+
 		/*
 		 * now print it
 		 */
 		if (Xflag && 2 < vflag) {
 			if (first)
-				printf("\nTelnet:\n");
-			i = sp - osp;
-			hex_print_with_offset(osp, i, off);
-			off += i;
-			if (i > 8)
+				printf("\nTelnet:");
+			hex_print_with_offset(sp, l, sp - osp);
+			if (l > 8)
 				printf("\n\t\t\t\t");
 			else
-				printf("%*s\t", (8 - i) * 3, "");
-			safeputs(tnet);
-		} else {
+				printf("%*s\t", (8 - l) * 3, "");
+		} else
 			printf("%s", (first) ? " [telnet " : ", ");
-			safeputs(tnet);
-		}
+
+		(void)telnet_parse(sp, length, 1);
 		first = 0;
+
+		sp += l;
+		length -= l;
 	}
 	if (!first) {
 		if (Xflag && 2 < vflag)
