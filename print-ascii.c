@@ -40,13 +40,9 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_SYS_CDEFS_H
-#include <sys/cdefs.h>
-#endif
-#if 0
 #ifndef lint
-__RCSID("$NetBSD: print-ascii.c,v 1.1 1999/09/30 14:49:12 sjg Exp $");
-#endif
+static const char rcsid[] =
+     "@(#) $Header: /tcpdump/master/tcpdump/print-ascii.c,v 1.2.2.2 2000-01-11 06:58:23 fenner Exp $";
 #endif
 #include <stdio.h>
 #include <sys/types.h>
