@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.24 2002-08-01 08:53:10 risso Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.25 2002-08-02 04:10:14 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -119,6 +119,10 @@ ip6_print(register const u_char *bp, register u_int length)
 #define IPPROTO_MOBILITY 62
 #endif
 		case IPPROTO_MOBILITY:
+			/*
+			 * XXX - we don't use "advance"; is this
+			 * header always a final header?
+			 */
 			advance = mobility_print(cp, (const u_char *)ip6);
 			nh = *cp;
 			goto end;

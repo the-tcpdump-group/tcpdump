@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-mobility.c,v 1.3 2002-08-01 08:53:19 risso Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-mobility.c,v 1.4 2002-08-02 04:10:14 guy Exp $";
 #endif
 
 #ifdef INET6
@@ -87,7 +87,7 @@ struct ip6_mobility {
 #define IP6MOPT_AUTH          0x5
 #define IP6MOPT_AUTH_MINLEN     2 /* 2+len */
 
-void
+static void
 mobility_opt_print(const u_char *bp, int len)
 {
 	int i;
@@ -181,7 +181,22 @@ mobility_print(const u_char *bp, const u_char *bp2)
 	/* 'ep' points to the end of available data. */
 	ep = snapend;
 
-	TCHECK(mh->ip6m_len);
+	if (!TTEST(mh->ip6m_len)) {
+		/*
+		 * There's not enough captured data to include the
+		 * mobility header length.
+		 *
+		 * Our caller expects us to return the length, however,
+		 * so return a value that will run to the end of the
+		 * captured data.
+		 *
+		 * XXX - "ip6_print()" doesn't do anything with the
+		 * returned length, however, as it breaks out of the
+		 * header-processing loop.
+		 */
+		mhlen = ep - bp;
+		goto trunc;
+	}
 	mhlen = (int)(mh->ip6m_len << 3);
 	if (mhlen < IP6M_MINLEN)
 		mhlen = IP6M_MINLEN;	/* XXX */
