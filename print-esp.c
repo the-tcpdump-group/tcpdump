@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.44.2.4 2003-11-19 05:36:40 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.44.2.5 2004-04-10 08:43:20 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -475,6 +475,7 @@ esp_print(const u_char *bp, const u_char *bp2
 	ivlen = sa->ivlen;
 	secret = sa->secret;
 	espsecret_keylen = sa->secretlen;
+	ep = ep - sa->authlen;
 
 	if (sa->evp) {
 		memset(&ctx, 0, sizeof(ctx));
@@ -490,7 +491,6 @@ esp_print(const u_char *bp, const u_char *bp2
 	} else
 		advance = sizeof(struct newesp);
 
-	ep = ep - sa->authlen;
 	/* sanity check for pad length */
 	if (ep - bp < *(ep - 2))
 		goto fail;
