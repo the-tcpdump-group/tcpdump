@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.128 2005-03-08 08:52:39 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.129 2005-03-09 18:42:51 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -642,7 +642,7 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
         /* do not attempt to verify the checksum if it is zero */
         if (EXTRACT_16BITS(clnp_header->cksum) == 0)
                 printf("(unverified)");
-            else printf("(%s)", osi_cksum(optr, li) ? "incorrect" : "correct");
+            else printf("(%s)", osi_cksum(optr, clnp_header->length_indicator) ? "incorrect" : "correct");
 
         printf("\n\tFlags [%s]",
                bittok2str(clnp_flag_values,"none",clnp_flags));
@@ -716,16 +716,23 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
 
         switch (clnp_pdu_type) {
 
+        case 	CLNP_PDU_ERP:
+            if (*(pptr) == NLPID_CLNP) {
+                printf("\n\t-----request packet-----\n\t");
+                /* FIXME recursion protection */
+                clnp_print(pptr, length-clnp_header->length_indicator);
+                break;
+            } 
+
         case 	CLNP_PDU_ER:
         case 	CLNP_PDU_DT:
         case 	CLNP_PDU_MD:
         case 	CLNP_PDU_ERQ:
-        case 	CLNP_PDU_ERP:
-
+            
         default:
             /* dump the PDU specific data */
-            printf("\n\t  undecoded non-header data");
-            print_unknown_data(optr+clnp_header->length_indicator,"\n\t  ",length-clnp_header->length_indicator);
+            printf("\n\t  undecoded non-header data, length %u",length-clnp_header->length_indicator);
+            print_unknown_data(pptr,"\n\t  ",length-(pptr-optr));
 
         }
 
