@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.22 2002-04-25 04:54:02 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.23 2002-04-30 09:09:41 guy Exp $";
 #endif
 
 #include <stdio.h>
@@ -859,9 +859,9 @@ nbt_tcp_print(const u_char *data, int length)
 	return;
 
     if (vflag > 1)
-	printf ("\n>>> ");
+	printf ("\n>>>");
 
-    printf("NBT Packet");
+    printf(" NBT Packet");
 
     if (vflag < 2)
 	return;
