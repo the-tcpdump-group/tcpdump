@@ -68,6 +68,9 @@
 /* define if you have struct sockaddr_storage */
 #undef HAVE_SOCKADDR_STORAGE
 
+/* define if you have both getipnodebyname() and getipnodebyaddr() */
+#undef USE_GETIPNODEBY
+
 /* define if unaligned memory accesses fail */
 #undef LBL_ALIGN
 

@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.108 2000-01-25 05:05:21 itojun Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.109 2000-01-25 17:57:59 itojun Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.108 $)
+AC_REVISION($Revision: 1.109 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -429,6 +429,13 @@ fi
 AC_REPLACE_FUNCS(vfprintf strcasecmp strlcat strlcpy)
 AC_CHECK_FUNCS(ether_ntohost setlinebuf gethostbyname2)
 
+usegetipnodeby=yes
+AC_CHECK_FUNCS(getipnodebyname getipnodebyaddr freeaddrinfo,
+	[], [usegetipnodeby=no])
+if test $usegetipnodeby = yes; then
+	AC_DEFINE(USE_GETIPNODEBY)
+fi
+
 needsnprintf=no
 AC_CHECK_FUNCS(vsnprintf snprintf asprintf asnprintf vasprintf vasnprintf,,
 	[needsnprintf=yes])
@@ -443,8 +450,8 @@ AC_C_BIGENDIAN
 
 AC_CHECK_LIB(dnet, main)
 AC_CHECK_LIB(rpc, main)
-AC_CHECK_LIB(z, uncompress)
-AC_CHECK_HEADERS(zlib.h)
+dnl AC_CHECK_LIB(z, uncompress)
+dnl AC_CHECK_HEADERS(zlib.h)
 
 AC_LBL_TYPE_SIGNAL
 
