@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/ethertype.h,v 1.18 2002-10-03 16:00:33 hannes Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/ethertype.h,v 1.19 2003-05-28 08:59:14 hannes Exp $ (LBL)
  */
 
 /*
@@ -69,9 +69,6 @@
 #ifndef ETHERTYPE_SCA
 #define ETHERTYPE_SCA		0x6007
 #endif
-#ifndef ETHERTYPE_REVARP
-#define ETHERTYPE_REVARP	0x8035
-#endif
 #ifndef	ETHERTYPE_LANBRIDGE
 #define	ETHERTYPE_LANBRIDGE	0x8038
 #endif
@@ -120,15 +117,42 @@
 #ifndef	ETHERTYPE_LOOPBACK
 #define	ETHERTYPE_LOOPBACK	0x9000
 #endif
+#ifndef	ETHERTYPE_VMAN
+#define	ETHERTYPE_VMAN	        0x9100 /* Extreme VMAN Protocol */ 
+#endif
 #ifndef	ETHERTYPE_ISO
 #define	ETHERTYPE_ISO           0xfefe  /* nonstandard - used in Cisco HDLC encapsulation */
 #endif
 
-/* FIXME complete the proto-id to string mapping */
 static const struct tok ethertype_values[] = { 
     { ETHERTYPE_IP,		"IPv4" },
     { ETHERTYPE_MPLS,		"MPLS unicast" },
     { ETHERTYPE_MPLS_MULTI,	"MPLS multicast" },
     { ETHERTYPE_IPV6,		"IPv6" },
+    { ETHERTYPE_8021Q,		"802.1Q" },
+    { ETHERTYPE_VMAN,		"VMAN" },
+    { ETHERTYPE_PUP,            "PUP" },
+    { ETHERTYPE_ARP,            "ARP"},
+    { ETHERTYPE_REVARP ,        "Reverse ARP"},
+    { ETHERTYPE_NS,             "NS" },
+    { ETHERTYPE_SPRITE,         "Sprite" },
+    { ETHERTYPE_TRAIL,          "Trail" },
+    { ETHERTYPE_MOPDL,          "MOP DL" },
+    { ETHERTYPE_MOPRC,          "MOP RC" },
+    { ETHERTYPE_DN,             "DN" },
+    { ETHERTYPE_LAT,            "LAT" },
+    { ETHERTYPE_SCA,            "SCA" },
+    { ETHERTYPE_LANBRIDGE,      "Lanbridge" },
+    { ETHERTYPE_DECDNS,         "DEC DNS" },
+    { ETHERTYPE_DECDTS,         "DEC DTS" },
+    { ETHERTYPE_VEXP,           "VEXP" },
+    { ETHERTYPE_VPROD,          "VPROD" },
+    { ETHERTYPE_ATALK,          "Appletalk" },
+    { ETHERTYPE_AARP,           "Appletalk ARP" },
+    { ETHERTYPE_IPX,            "IPX" },
+    { ETHERTYPE_PPP,            "PPP" },
+    { ETHERTYPE_PPPOED,         "PPPoE D" },
+    { ETHERTYPE_PPPOES,         "PPPoE S" },
+    { ETHERTYPE_LOOPBACK,       "Loopback" },
     { 0, NULL}
 };
