@@ -20,14 +20,14 @@
  *
  * AppleTalk protocol formats (courtesy Bill Croft of Stanford/SUMEX).
  *
- * @(#) $Header: /tcpdump/master/tcpdump/appletalk.h,v 1.14 2002-11-09 17:19:17 itojun Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/appletalk.h,v 1.15 2002-12-11 07:13:49 guy Exp $ (LBL)
  */
 
 struct LAP {
 	u_int8_t	dst;
 	u_int8_t	src;
 	u_int8_t	type;
-} __attribute__((packed));
+};
 #define lapShortDDP	1	/* short DDP type */
 #define lapDDP		2	/* DDP type */
 #define lapKLAP		'K'	/* Kinetics KLAP type */
@@ -44,14 +44,14 @@ struct atDDP {
 	u_int8_t	dstSkt;
 	u_int8_t	srcSkt;
 	u_int8_t	type;
-} __attribute__((packed));
+};
 
 struct atShortDDP {
 	u_int16_t	length;
 	u_int8_t	dstSkt;
 	u_int8_t	srcSkt;
 	u_int8_t	type;
-} __attribute__((packed));
+};
 
 #define	ddpMaxWKS	0x7F
 #define	ddpMaxData	586
@@ -77,7 +77,7 @@ struct atATP {
 	u_int8_t	bitmap;
 	u_int16_t	transID;
 	int32_t userData;
-} __attribute__((packed));
+};
 
 #define	atpReqCode	0x40
 #define	atpRspCode	0x80
@@ -96,7 +96,7 @@ struct atATP {
 struct atEcho {
 	u_int8_t	echoFunction;
 	u_int8_t	*echoData;
-} __attribute__((packed));
+};
 
 #define echoSkt		4		/* the echoer socket */
 #define echoSize	1		/* size of echo header */
@@ -109,14 +109,14 @@ struct atEcho {
 struct atNBP {
 	u_int8_t	control;
 	u_int8_t	id;
-} __attribute__((packed));
+};
 
 struct atNBPtuple {
 	u_int16_t	net;
 	u_int8_t	node;
 	u_int8_t	skt;
 	u_int8_t	enumerator;
-} __attribute__((packed));
+};
 
 #define	nbpBrRq		0x10
 #define	nbpLkUp		0x20
@@ -143,7 +143,7 @@ struct atNBPtuple {
 struct zipHeader {
 	u_int8_t	command;
 	u_int8_t	netcount;
-} __attribute__((packed));
+};
 
 #define	zipHeaderSize	2
 #define	zipQuery	1

@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.6 2002-12-11 07:07:25 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.7 2002-12-11 07:13:56 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1991, 1993, 1994, 1995, 1996, 1997
  *	The Regents of the University of California.  All rights reserved.
@@ -112,7 +112,7 @@ struct lsa_hdr {
     u_int32_t ls_seq;
     u_int16_t ls_chksum;
     u_int16_t ls_length;
-}  __attribute__((packed));
+};
 
 /* link state advertisement */
 struct lsa {
@@ -173,7 +173,7 @@ struct lsa {
 	} un_opaque[1];
 
     } lsa_un;
-} __attribute__((packed));
+};
 
 
 /*
@@ -183,7 +183,7 @@ struct tos_metric {
     u_int8_t tos_type;
     u_int8_t tos_zero;
     u_int16_t tos_metric;
-} __attribute__((packed));
+};
 
 #define	OSPF_AUTH_SIZE	8
 
@@ -240,7 +240,7 @@ struct ospfhdr {
 	    struct lsa_hdr lsa_lshdr[1]; /* may repeat	*/
 	} un_lsa ;
     } ospf_un ;
-} __attribute__((packed));
+};
 
 #define	ospf_hello	ospf_un.un_hello
 #define	ospf_db		ospf_un.un_db

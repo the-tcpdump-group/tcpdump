@@ -35,7 +35,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/sll.h,v 1.6 2002-11-09 17:19:32 itojun Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/sll.h,v 1.7 2002-12-11 07:14:11 guy Exp $ (LBL)
  */
 
 /*
@@ -88,7 +88,7 @@ struct sll_header {
 	u_int16_t	sll_halen;	/* link-layer address length */
 	u_int8_t	sll_addr[SLL_ADDRLEN];	/* link-layer address */
 	u_int16_t	sll_protocol;	/* protocol */
-} __attribute__((packed));
+};
 
 /*
  * The LINUX_SLL_ values for "sll_pkttype"; these correspond to the

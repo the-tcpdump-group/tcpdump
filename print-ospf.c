@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.34 2002-11-10 20:41:33 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.35 2002-12-11 07:14:06 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -36,6 +36,7 @@ static const char rcsid[] =
 
 #include "interface.h"
 #include "addrtoname.h"
+#include "extract.h"
 
 #include "ospf.h"
 
@@ -112,8 +113,8 @@ ospf_print_lshdr(register const struct lsa_hdr *lshp) {
                lshp->ls_type,
                ipaddr_string(&lshp->ls_stateid),
                ipaddr_string(&lshp->ls_router),
-               (u_int32_t)ntohl(lshp->ls_seq),
-               ntohs(lshp->ls_age));
+               EXTRACT_32BITS(&lshp->ls_seq),
+               EXTRACT_16BITS(&lshp->ls_age));
         printf("\n\t    Options: %s", bittok2str(ospf_option_values,"none",lshp->ls_options));
 
 	return (0);
@@ -141,12 +142,12 @@ ospf_print_lsa(register const struct lsa *lsap)
                lsap->ls_hdr.ls_type,
                ipaddr_string(&lsap->ls_hdr.ls_stateid),
                ipaddr_string(&lsap->ls_hdr.ls_router),
-               (u_int32_t)ntohl(lsap->ls_hdr.ls_seq),
-               ntohs(lsap->ls_hdr.ls_age));
+               EXTRACT_32BITS(&lsap->ls_hdr.ls_seq),
+               EXTRACT_16BITS(&lsap->ls_hdr.ls_age));
         printf("\n\t    Options: %s", bittok2str(ospf_option_values,"none",lsap->ls_hdr.ls_options));
 
 	TCHECK(lsap->ls_hdr.ls_length);
-	ls_end = (u_char *)lsap + ntohs(lsap->ls_hdr.ls_length);
+	ls_end = (u_char *)lsap + EXTRACT_16BITS(&lsap->ls_hdr.ls_length);
 	switch (lsap->ls_hdr.ls_type) {
 
 	case LS_TYPE_ROUTER:
@@ -154,7 +155,7 @@ ospf_print_lsa(register const struct lsa *lsap)
                 printf("\n\t    Router LSA Options: %s", bittok2str(ospf_rla_flag_values,"unknown (%u)",lsap->lsa_un.un_rla.rla_flags));
 
 		TCHECK(lsap->lsa_un.un_rla.rla_count);
-		j = ntohs(lsap->lsa_un.un_rla.rla_count);
+		j = EXTRACT_16BITS(&lsap->lsa_un.un_rla.rla_count);
 		TCHECK(lsap->lsa_un.un_rla.rla_link);
 		rlp = lsap->lsa_un.un_rla.rla_link;
 		while (j--) {
@@ -190,14 +191,14 @@ ospf_print_lsa(register const struct lsa *lsap)
 				    rlp->link_type);
 				return (0);
 			}
-			printf(", tos 0, metric: %d", ntohs(rlp->link_tos0metric));
+			printf(", tos 0, metric: %d", EXTRACT_16BITS(&rlp->link_tos0metric));
 			tosp = (struct tos_metric *)
 			    ((sizeof rlp->link_tos0metric) + (u_char *) rlp);
 			for (k = 0; k < (int) rlp->link_toscount; ++k, ++tosp) {
 				TCHECK(*tosp);
 				printf(", tos %d, metric: %d",
 				    tosp->tos_type,
-				    ntohs(tosp->tos_metric));
+				    EXTRACT_16BITS(&tosp->tos_metric));
 			}
 			rlp = (struct rlalink *)((u_char *)(rlp + 1) +
 			    ((rlp->link_toscount) * sizeof(*tosp)));
@@ -224,14 +225,14 @@ ospf_print_lsa(register const struct lsa *lsap)
 		lp = lsap->lsa_un.un_sla.sla_tosmetric;
                 /* suppress tos if its not supported */
                 if(!((lsap->ls_hdr.ls_options)&OSPF_OPTION_T)) {
-                    printf(", metric: %u", (u_int32_t)ntohl(*lp)&SLA_MASK_METRIC);
+                    printf(", metric: %u", EXTRACT_32BITS(lp)&SLA_MASK_METRIC);
                     break;
                 }
 		while ((u_char *)lp < ls_end) {
 			register u_int32_t ul;
 
 			TCHECK(*lp);
-			ul = ntohl(*lp);
+			ul = EXTRACT_32BITS(lp);
 			printf(", tos %d metric %d",
 			    (ul & SLA_MASK_TOS) >> SLA_SHIFT_TOS,
 			    ul & SLA_MASK_METRIC);
@@ -244,14 +245,14 @@ ospf_print_lsa(register const struct lsa *lsap)
 		lp = lsap->lsa_un.un_sla.sla_tosmetric;
                 /* suppress tos if its not supported */
                 if(!((lsap->ls_hdr.ls_options)&OSPF_OPTION_T)) {
-                    printf(", metric: %u", (u_int32_t)ntohl(*lp)&SLA_MASK_METRIC);
+                    printf(", metric: %u", EXTRACT_32BITS(lp)&SLA_MASK_METRIC);
                     break;
                 }
 		while ((u_char *)lp < ls_end) {
 			register u_int32_t ul;
 
 			TCHECK(*lp);
-			ul = ntohl(*lp);
+			ul = EXTRACT_32BITS(lp);
 			printf(", tos %d metric %d",
 			    (ul & SLA_MASK_TOS) >> SLA_SHIFT_TOS,
 			    ul & SLA_MASK_METRIC);
@@ -270,7 +271,7 @@ ospf_print_lsa(register const struct lsa *lsap)
 			register u_int32_t ul;
 
 			TCHECK(almp->asla_tosmetric);
-			ul = ntohl(almp->asla_tosmetric);
+			ul = EXTRACT_32BITS(&almp->asla_tosmetric);
 			printf(", type %d, tos %d metric:",
 			    (ul & ASLA_FLAG_EXTERNAL) ? 2 : 1,
 			    (ul & ASLA_MASK_TOS) >> ASLA_SHIFT_TOS);
@@ -298,7 +299,7 @@ ospf_print_lsa(register const struct lsa *lsap)
 		mcp = lsap->lsa_un.un_mcla;
 		while ((u_char *)mcp < ls_end) {
 			TCHECK(mcp->mcla_vid);
-			switch (ntohl(mcp->mcla_vtype)) {
+			switch (EXTRACT_32BITS(&mcp->mcla_vtype)) {
 
 			case MCLA_VERTEX_ROUTER:
 				printf("\n\t    Router Router-ID %s",
@@ -312,7 +313,7 @@ ospf_print_lsa(register const struct lsa *lsap)
 
 			default:
 				printf("\n\t    unknown VertexType (%u)",
-				    (u_int32_t)ntohl(mcp->mcla_vtype));
+				    EXTRACT_32BITS(&mcp->mcla_vtype));
 				break;
 			}
 		++mcp;
@@ -346,8 +347,8 @@ ospf_decode_v2(register const struct ospfhdr *op,
 	case OSPF_TYPE_HELLO:
                 TCHECK(op->ospf_hello.hello_deadint);
                 printf("\n\t  Hello Timer: %us, Dead Timer %us, mask: %s, Priority: %u",
-                       ntohs(op->ospf_hello.hello_helloint),
-                       (u_int32_t)ntohl(op->ospf_hello.hello_deadint),
+                       EXTRACT_16BITS(&op->ospf_hello.hello_helloint),
+                       EXTRACT_32BITS(&op->ospf_hello.hello_deadint),
                        ipaddr_string(&op->ospf_hello.hello_mask),
                        op->ospf_hello.hello_priority);
 
@@ -408,13 +409,13 @@ ospf_decode_v2(register const struct ospfhdr *op,
 	case OSPF_TYPE_LS_UPDATE:
                 lsap = op->ospf_lsu.lsu_lsa;
                 TCHECK(op->ospf_lsu.lsu_count);
-                lsa_count = ntohl(op->ospf_lsu.lsu_count);
+                lsa_count = EXTRACT_32BITS(&op->ospf_lsu.lsu_count);
                 printf(", %d LSA%s",lsa_count, lsa_count > 1 ? "s" : "");
                 while (lsa_count--) {
                         if (ospf_print_lsa(lsap))
                                 goto trunc;
                         lsap = (struct lsa *)((u_char *)lsap +
-                                              ntohs(lsap->ls_hdr.ls_length));
+                                              EXTRACT_16BITS(&lsap->ls_hdr.ls_length));
                 }
 		break;
 
@@ -448,7 +449,7 @@ ospf_print(register const u_char *bp, register u_int length,
 
         /* XXX Before we do anything else, strip off the MD5 trailer */
         TCHECK(op->ospf_authtype);
-        if (ntohs(op->ospf_authtype) == OSPF_AUTH_MD5) {
+        if (EXTRACT_16BITS(&op->ospf_authtype) == OSPF_AUTH_MD5) {
                 length -= OSPF_AUTH_MD5_LEN;
                 snapend -= OSPF_AUTH_MD5_LEN;
         }
@@ -465,8 +466,8 @@ ospf_print(register const u_char *bp, register u_int length,
                 return;
 
 	TCHECK(op->ospf_len);
-	if (length != ntohs(op->ospf_len)) {
-		printf(" [len %d]", ntohs(op->ospf_len));
+	if (length != EXTRACT_16BITS(&op->ospf_len)) {
+		printf(" [len %d]", EXTRACT_16BITS(&op->ospf_len));
 		return;
 	}
 	dataend = bp + length;
@@ -485,7 +486,7 @@ ospf_print(register const u_char *bp, register u_int length,
 	if (vflag) {
 		/* Print authentication data (should we really do this?) */
 		TCHECK2(op->ospf_authdata[0], sizeof(op->ospf_authdata));
-		switch (ntohs(op->ospf_authtype)) {
+		switch (EXTRACT_16BITS(&op->ospf_authtype)) {
 
 		case OSPF_AUTH_NONE:
 			break;
@@ -502,7 +503,7 @@ ospf_print(register const u_char *bp, register u_int length,
 			break;
 
 		default:
-			printf(", unknown Authentication Type %d", ntohs(op->ospf_authtype));
+			printf(", unknown Authentication Type %d", EXTRACT_16BITS(&op->ospf_authtype));
 			return;
 		}
 	}

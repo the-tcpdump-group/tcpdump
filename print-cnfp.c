@@ -34,7 +34,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cnfp.c,v 1.12 2002-11-09 17:19:25 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cnfp.c,v 1.13 2002-12-11 07:13:58 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -47,8 +47,8 @@ static const char rcsid[] =
 #include <string.h>
 
 #include "interface.h"
-
 #include "addrtoname.h"
+#include "extract.h"
 
 #include "tcp.h"
 
@@ -59,7 +59,7 @@ struct nfhdr {
 	u_int32_t	utc_nsec;
 	u_int32_t	sequence;	/* v5 flow sequence number */
 	u_int32_t	reserved;	/* v5 only */
-} __attribute__((packed));
+};
 
 struct nfrec {
 	struct in_addr	src_ina;
@@ -75,7 +75,7 @@ struct nfrec {
 	u_int32_t	asses;		/* v1: flags; v5: src,dst AS */
 	u_int32_t	masks;		/* src,dst addr prefix; v6: encaps */
 	struct in_addr	peer_nexthop;	/* v6: IP address of the nexthop within the peer (FIB)*/
-} __attribute__((packed));
+};
 
 void
 cnfp_print(const u_char *cp, const u_char *bp)
@@ -93,18 +93,18 @@ cnfp_print(const u_char *cp, const u_char *bp)
 	if ((const u_char *)(nh + 1) > snapend)
 		return;
 
-	nrecs = ntohl(nh->ver_cnt) & 0xffff;
-	ver = (ntohl(nh->ver_cnt) & 0xffff0000) >> 16;
-	t = ntohl(nh->utc_sec);
+	nrecs = EXTRACT_32BITS(&nh->ver_cnt) & 0xffff;
+	ver = (EXTRACT_32BITS(&nh->ver_cnt) & 0xffff0000) >> 16;
+	t = EXTRACT_32BITS(&nh->utc_sec);
 /*	(p = ctime(&t))[24] = '\0'; */
 
 	printf("NetFlow v%x, %u.%03u uptime, %u.%09u, ", ver,
-	       (unsigned)ntohl(nh->msys_uptime)/1000,
-	       (unsigned)ntohl(nh->msys_uptime)%1000,
-	       (unsigned)ntohl(nh->utc_sec), (unsigned)ntohl(nh->utc_nsec));
+	       EXTRACT_32BITS(&nh->msys_uptime)/1000,
+	       EXTRACT_32BITS(&nh->msys_uptime)%1000,
+	       EXTRACT_32BITS(&nh->utc_sec), EXTRACT_32BITS(&nh->utc_nsec));
 
 	if (ver == 5 || ver == 6) {
-		printf("#%u, ", (unsigned)htonl(nh->sequence));
+		printf("#%u, ", EXTRACT_32BITS(&nh->sequence));
 		nr = (const struct nfrec *)&nh[1];
 		snaplen -= 24;
 	} else {
@@ -119,36 +119,36 @@ cnfp_print(const u_char *cp, const u_char *bp)
 		char asbuf[20];
 
 		printf("\n  started %u.%03u, last %u.%03u",
-		       (unsigned)ntohl(nr->start_time)/1000,
-		       (unsigned)ntohl(nr->start_time)%1000,
-		       (unsigned)ntohl(nr->last_time)/1000,
-		       (unsigned)ntohl(nr->last_time)%1000);
+		       EXTRACT_32BITS(&nr->start_time)/1000,
+		       EXTRACT_32BITS(&nr->start_time)%1000,
+		       EXTRACT_32BITS(&nr->last_time)/1000,
+		       EXTRACT_32BITS(&nr->last_time)%1000);
 
 		asbuf[0] = buf[0] = '\0';
 		if (ver == 5 || ver == 6) {
 			snprintf(buf, sizeof(buf), "/%u",
-				 (unsigned)(ntohl(nr->masks) >> 24) & 0xff);
+				 (EXTRACT_32BITS(&nr->masks) >> 24) & 0xff);
 			snprintf(asbuf, sizeof(asbuf), ":%u",
-				 (unsigned)(ntohl(nr->asses) >> 16) & 0xffff);
+				 (EXTRACT_32BITS(&nr->asses) >> 16) & 0xffff);
 		}
 		printf("\n    %s%s%s:%u ", intoa(nr->src_ina.s_addr), buf, asbuf,
-			(unsigned)ntohl(nr->ports) >> 16);
+			EXTRACT_32BITS(&nr->ports) >> 16);
 
 		if (ver == 5 || ver ==6) {
 			snprintf(buf, sizeof(buf), "/%d",
-				 (unsigned)(ntohl(nr->masks) >> 16) & 0xff);
+				 (EXTRACT_32BITS(&nr->masks) >> 16) & 0xff);
 			snprintf(asbuf, sizeof(asbuf), ":%u",
-				 (unsigned)ntohl(nr->asses) & 0xffff);
+				 EXTRACT_32BITS(&nr->asses) & 0xffff);
 		}
 		printf("> %s%s%s:%u ", intoa(nr->dst_ina.s_addr), buf, asbuf,
-			(unsigned)ntohl(nr->ports) & 0xffff);
+			EXTRACT_32BITS(&nr->ports) & 0xffff);
 
 		printf(">> %s\n    ", intoa(nr->nhop_ina.s_addr));
 
-		pent = getprotobynumber((ntohl(nr->proto_tos) >> 8) & 0xff);
+		pent = getprotobynumber((EXTRACT_32BITS(&nr->proto_tos) >> 8) & 0xff);
 		if (!pent || nflag)
 			printf("%u ",
-			       (unsigned)(ntohl(nr->proto_tos) >> 8) & 0xff);
+			       (EXTRACT_32BITS(&nr->proto_tos) >> 8) & 0xff);
 		else
 			printf("%s ", pent->p_name);
 
@@ -156,9 +156,9 @@ cnfp_print(const u_char *cp, const u_char *bp)
 		if (pent && pent->p_proto == IPPROTO_TCP) {
 			int flags;
 			if (ver == 1)
-				flags = (ntohl(nr->asses) >> 24) & 0xff;
+				flags = (EXTRACT_32BITS(&nr->asses) >> 24) & 0xff;
 			else
-				flags = (ntohl(nr->proto_tos) >> 16) & 0xff;
+				flags = (EXTRACT_32BITS(&nr->proto_tos) >> 16) & 0xff;
 			if (flags & TH_FIN)	putchar('F');
 			if (flags & TH_SYN)	putchar('S');
 			if (flags & TH_RST)	putchar('R');
@@ -172,12 +172,12 @@ cnfp_print(const u_char *cp, const u_char *bp)
 		buf[0]='\0';
 		if (ver == 6) {
 			snprintf(buf, sizeof(buf), "(%u<>%u encaps)",
-				 (unsigned)(ntohl(nr->masks) >> 8) & 0xff,
-				 (unsigned)(ntohl(nr->masks)) & 0xff);
+				 (EXTRACT_32BITS(&nr->masks) >> 8) & 0xff,
+				 (EXTRACT_32BITS(&nr->masks)) & 0xff);
 		}
 		printf("tos %u, %u (%u octets) %s",
-		       (unsigned)ntohl(nr->proto_tos) & 0xff,
-		       (unsigned)ntohl(nr->packets),
-		       (unsigned)ntohl(nr->octets), buf);
+		       EXTRACT_32BITS(&nr->proto_tos) & 0xff,
+		       EXTRACT_32BITS(&nr->packets),
+		       EXTRACT_32BITS(&nr->octets), buf);
 	}
 }

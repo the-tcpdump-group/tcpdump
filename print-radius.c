@@ -44,7 +44,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "$Id: print-radius.c,v 1.18 2002-11-10 20:37:31 guy Exp $";
+    "$Id: print-radius.c,v 1.19 2002-12-11 07:14:07 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -134,13 +134,13 @@ struct radius_hdr { u_int8_t  code; /* Radius packet code  */
                     u_int8_t  id;   /* Radius packet id    */
                     u_int16_t len;  /* Radius total length */
                     u_int8_t  auth[16]; /* Authenticator   */
-                  } __attribute__((packed));
+                  };
 
 #define MIN_RADIUS_LEN	20
 
 struct radius_attr { u_int8_t type; /* Attribute type   */
                      u_int8_t len;  /* Attribute length */
-                   } __attribute__((packed));
+                   };
 
 
 /* Service-Type Attribute standard values */
@@ -823,7 +823,7 @@ radius_print(const u_char *dat, u_int length)
    }
 
    rad = (struct radius_hdr *)dat;
-   len = ntohs(rad->len);
+   len = EXTRACT_16BITS(&rad->len);
 
    if (len < MIN_RADIUS_LEN)
    {

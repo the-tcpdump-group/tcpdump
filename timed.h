@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/timed.h,v 1.4 2002-11-09 17:19:33 itojun Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/timed.h,v 1.5 2002-12-11 07:14:12 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1983, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -53,7 +53,7 @@ struct tsp {
 		int8_t tspu_hopcnt;
 	} tsp_u;
 	int8_t tsp_name[256];
-} __attribute__((packed));
+};
 
 #define	tsp_time	tsp_u.tspu_time
 #define	tsp_hopcnt	tsp_u.tspu_hopcnt

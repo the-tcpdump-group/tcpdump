@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.72 2002-12-11 06:00:41 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.73 2002-12-11 07:14:04 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -346,7 +346,7 @@ struct isis_tlv_ptp_adj {
     u_int8_t extd_local_circuit_id[4];
     u_int8_t neighbor_sysid[SYSTEM_ID_LEN];
     u_int8_t neighbor_extd_local_circuit_id[4];
-} __attribute__((packed));
+};
 
 static int osi_cksum(const u_int8_t *, u_int);
 static void esis_print(const u_int8_t *, u_int);
@@ -357,23 +357,23 @@ struct isis_metric_block {
     u_int8_t metric_delay;
     u_int8_t metric_expense;
     u_int8_t metric_error;
-} __attribute__((packed));
+};
 
 struct isis_tlv_is_reach {
     struct isis_metric_block isis_metric_block;
     u_int8_t neighbor_nodeid[NODE_ID_LEN];
-} __attribute__((packed));
+};
 
 struct isis_tlv_es_reach {
     struct isis_metric_block isis_metric_block;
     u_int8_t neighbor_sysid[SYSTEM_ID_LEN];
-} __attribute__((packed));
+};
 
 struct isis_tlv_ip_reach {
     struct isis_metric_block isis_metric_block;
     u_int8_t prefix[4];
     u_int8_t mask[4];
-} __attribute__((packed));
+};
 
 static struct tok isis_is_reach_virtual_values[] = {
     { 0,    "IsNotVirtual"},
@@ -390,7 +390,7 @@ struct isis_common_header {
     u_int8_t pdu_version;			/* Packet format version? */
     u_int8_t reserved;
     u_int8_t max_area;
-} __attribute__((packed));
+};
 
 struct isis_iih_lan_header {
     u_int8_t circuit_type;
@@ -399,7 +399,7 @@ struct isis_iih_lan_header {
     u_int8_t pdu_len[2];
     u_int8_t priority;
     u_int8_t lan_id[NODE_ID_LEN];
-} __attribute__((packed));
+};
 
 struct isis_iih_ptp_header {
     u_int8_t circuit_type;
@@ -407,7 +407,7 @@ struct isis_iih_ptp_header {
     u_int8_t holding_time[2];
     u_int8_t pdu_len[2];
     u_int8_t circuit_id;
-} __attribute__((packed));
+};
 
 struct isis_lsp_header {
     u_int8_t pdu_len[2];
@@ -416,26 +416,26 @@ struct isis_lsp_header {
     u_int8_t sequence_number[4];
     u_int8_t checksum[2];
     u_int8_t typeblock;
-} __attribute__((packed));
+};
 
 struct isis_csnp_header {
     u_int8_t pdu_len[2];
     u_int8_t source_id[NODE_ID_LEN];
     u_int8_t start_lsp_id[LSP_ID_LEN];
     u_int8_t end_lsp_id[LSP_ID_LEN];
-} __attribute__((packed));
+};
 
 struct isis_psnp_header {
     u_int8_t pdu_len[2];
     u_int8_t source_id[NODE_ID_LEN];
-} __attribute__((packed));
+};
 
 struct isis_tlv_lsp {
     u_int8_t remaining_lifetime[2];
     u_int8_t lsp_id[LSP_ID_LEN];
     u_int8_t sequence_number[4];
     u_int8_t checksum[2];
-} __attribute__((packed));
+};
 
 
 /* allocate space for the following string

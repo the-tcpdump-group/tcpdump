@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ipcomp.c,v 1.16 2002-11-09 17:19:26 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ipcomp.c,v 1.17 2002-12-11 07:14:03 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -37,7 +37,7 @@ struct ipcomp {
 	u_int8_t comp_nxt;	/* Next Header */
 	u_int8_t comp_flags;	/* Length of data, in 32bit */
 	u_int16_t comp_cpi;	/* Compression parameter index */
-} __attribute__((packed));
+};
 
 #if defined(HAVE_LIBZ) && defined(HAVE_ZLIB_H)
 #include <zlib.h>
@@ -45,6 +45,7 @@ struct ipcomp {
 
 #include "interface.h"
 #include "addrtoname.h"
+#include "extract.h"
 
 int
 ipcomp_print(register const u_char *bp, int *nhdr)
@@ -57,7 +58,7 @@ ipcomp_print(register const u_char *bp, int *nhdr)
 #endif
 
 	ipcomp = (struct ipcomp *)bp;
-	cpi = (u_int16_t)ntohs(ipcomp->comp_cpi);
+	cpi = EXTRACT_16BITS(&ipcomp->comp_cpi);
 
 	/* 'ep' points to the end of available data. */
 	ep = snapend;

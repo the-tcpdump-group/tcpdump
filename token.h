@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/token.h,v 1.5 2002-11-09 17:19:33 itojun Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/token.h,v 1.6 2002-12-11 07:14:12 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1998, Larry Lile
  * All rights reserved.
@@ -49,4 +49,4 @@ struct token_header {
 	u_int8_t  token_shost[TOKEN_RING_MAC_LEN];
 	u_int16_t token_rcf;
 	u_int16_t token_rseg[ROUTING_SEGMENT_MAX];
-} __attribute__((packed));
+};

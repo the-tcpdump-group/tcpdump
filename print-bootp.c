@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.67 2002-12-04 19:09:29 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.68 2002-12-11 07:13:58 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -95,11 +95,11 @@ bootp_print(register const u_char *cp, u_short sport, u_short dport, u_int lengt
 	if (bp->bp_hops)
 		printf(", hops:%d", bp->bp_hops);
 	if (bp->bp_xid)
-		printf(", xid:0x%x", (u_int32_t)ntohl(bp->bp_xid));
+		printf(", xid:0x%x", EXTRACT_32BITS(&bp->bp_xid));
 	if (bp->bp_secs)
-		printf(", secs:%d", ntohs(bp->bp_secs));
+		printf(", secs:%d", EXTRACT_16BITS(&bp->bp_secs));
 	if (bp->bp_flags)
-		printf(", flags:0x%x", ntohs(bp->bp_flags));
+		printf(", flags:0x%x", EXTRACT_16BITS(&bp->bp_flags));
 
 	/* Client's ip address */
 	TCHECK(bp->bp_ciaddr);

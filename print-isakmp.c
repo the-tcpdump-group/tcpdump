@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.35 2002-09-05 21:25:42 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.36 2002-12-11 07:14:03 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -350,28 +350,28 @@ isakmp_attrmap_print(const u_char *p, const u_char *ep,
 	if (p[0] & 0x80)
 		totlen = 4;
 	else
-		totlen = 4 + ntohs(q[1]);
+		totlen = 4 + EXTRACT_16BITS(&q[1]);
 	if (ep < p + totlen) {
 		printf("[|attr]");
 		return ep + 1;
 	}
 
 	printf("(");
-	t = ntohs(q[0]) & 0x7fff;
+	t = EXTRACT_16BITS(&q[0]) & 0x7fff;
 	if (map && t < nmap && map[t].type)
 		printf("type=%s ", map[t].type);
 	else
 		printf("type=#%d ", t);
 	if (p[0] & 0x80) {
 		printf("value=");
-		v = ntohs(q[1]);
+		v = EXTRACT_16BITS(&q[1]);
 		if (map && t < nmap && v < map[t].nvalue && map[t].value[v])
 			printf("%s", map[t].value[v]);
 		else
 			rawprint((caddr_t)&q[1], 2);
 	} else {
-		printf("len=%d value=", ntohs(q[1]));
-		rawprint((caddr_t)&p[4], ntohs(q[1]));
+		printf("len=%d value=", EXTRACT_16BITS(&q[1]));
+		rawprint((caddr_t)&p[4], EXTRACT_16BITS(&q[1]));
 	}
 	printf(")");
 	return p + totlen;
@@ -388,22 +388,22 @@ isakmp_attr_print(const u_char *p, const u_char *ep)
 	if (p[0] & 0x80)
 		totlen = 4;
 	else
-		totlen = 4 + ntohs(q[1]);
+		totlen = 4 + EXTRACT_16BITS(&q[1]);
 	if (ep < p + totlen) {
 		printf("[|attr]");
 		return ep + 1;
 	}
 
 	printf("(");
-	t = ntohs(q[0]) & 0x7fff;
+	t = EXTRACT_16BITS(&q[0]) & 0x7fff;
 	printf("type=#%d ", t);
 	if (p[0] & 0x80) {
 		printf("value=");
 		t = q[1];
 		rawprint((caddr_t)&q[1], 2);
 	} else {
-		printf("len=%d value=", ntohs(q[1]));
-		rawprint((caddr_t)&p[2], ntohs(q[1]));
+		printf("len=%d value=", EXTRACT_16BITS(&q[1]));
+		rawprint((caddr_t)&p[2], EXTRACT_16BITS(&q[1]));
 	}
 	printf(")");
 	return p + totlen;

@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/nameser.h,v 1.12 2002-11-09 17:19:21 itojun Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/nameser.h,v 1.13 2002-12-11 07:13:55 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1983, 1989, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -211,7 +211,7 @@ typedef struct {
 	u_int16_t ancount;	/* number of answer entries */
 	u_int16_t nscount;	/* number of authority entries */
 	u_int16_t arcount;	/* number of resource entries */
-} HEADER __attribute__((packed));
+} HEADER;
 
 /*
  * Macros for subfields of flag fields.

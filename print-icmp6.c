@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.65 2002-09-05 00:52:30 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.66 2002-12-11 07:14:01 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -40,6 +40,7 @@ static const char rcsid[] =
 
 #include "interface.h"
 #include "addrtoname.h"
+#include "extract.h"
 
 #include "udp.h"
 #include "ah.h"
@@ -119,7 +120,7 @@ icmp6_print(const u_char *bp, const u_char *bp2)
 	/* 'ep' points to the end of available data. */
 	ep = snapend;
 	if (ip->ip6_plen)
-		icmp6len = (ntohs(ip->ip6_plen) + sizeof(struct ip6_hdr) -
+		icmp6len = (EXTRACT_16BITS(&ip->ip6_plen) + sizeof(struct ip6_hdr) -
 			    (bp - bp2));
 	else			/* XXX: jumbo payload case... */
 		icmp6len = snapend - bp;
@@ -151,7 +152,7 @@ icmp6_print(const u_char *bp, const u_char *bp2)
 			    == NULL)
 				goto trunc;
 
-			dport = ntohs(ouh->uh_dport);
+			dport = EXTRACT_16BITS(&ouh->uh_dport);
 			switch (prot) {
 			case IPPROTO_TCP:
 				printf("icmp6: %s tcp port %s unreachable",
@@ -179,7 +180,7 @@ icmp6_print(const u_char *bp, const u_char *bp2)
 		break;
 	case ICMP6_PACKET_TOO_BIG:
 		TCHECK(dp->icmp6_mtu);
-		printf("icmp6: too big %u", (u_int32_t)ntohl(dp->icmp6_mtu));
+		printf("icmp6: too big %u", EXTRACT_32BITS(&dp->icmp6_mtu));
 		break;
 	case ICMP6_TIME_EXCEEDED:
 		TCHECK(oip->ip6_dst);
@@ -202,15 +203,15 @@ icmp6_print(const u_char *bp, const u_char *bp2)
 		switch (dp->icmp6_code) {
 		case ICMP6_PARAMPROB_HEADER:
 			printf("icmp6: parameter problem errorneous - octet %u",
-				(u_int32_t)ntohl(dp->icmp6_pptr));
+				EXTRACT_32BITS(&dp->icmp6_pptr));
 			break;
 		case ICMP6_PARAMPROB_NEXTHEADER:
 			printf("icmp6: parameter problem next header - octet %u",
-				(u_int32_t)ntohl(dp->icmp6_pptr));
+				EXTRACT_32BITS(&dp->icmp6_pptr));
 			break;
 		case ICMP6_PARAMPROB_OPTION:
 			printf("icmp6: parameter problem option - octet %u",
-				(u_int32_t)ntohl(dp->icmp6_pptr));
+				EXTRACT_32BITS(&dp->icmp6_pptr));
 			break;
 		default:
 			printf("icmp6: parameter problem code-#%d",
@@ -266,11 +267,11 @@ icmp6_print(const u_char *bp, const u_char *bp2)
 			printf("pref=%s, ",
 			    get_rtpref(p->nd_ra_flags_reserved));
 
-			printf("router_ltime=%d, ", ntohs(p->nd_ra_router_lifetime));
+			printf("router_ltime=%d, ", EXTRACT_16BITS(&p->nd_ra_router_lifetime));
 			printf("reachable_time=%u, ",
-				(u_int32_t)ntohl(p->nd_ra_reachable));
+				EXTRACT_32BITS(&p->nd_ra_reachable));
 			printf("retrans_time=%u)",
-				(u_int32_t)ntohl(p->nd_ra_retransmit));
+				EXTRACT_32BITS(&p->nd_ra_retransmit));
 #define RTADVLEN 16
 			icmp6_opt_print((const u_char *)dp + RTADVLEN,
 					icmp6len - RTADVLEN);
@@ -349,7 +350,7 @@ icmp6_print(const u_char *bp, const u_char *bp2)
 		printf("icmp6: ha discovery request");
 		if (vflag) {
 			TCHECK(dp->icmp6_data16[0]);
-			printf("(id=%d)", ntohs(dp->icmp6_data16[0]));
+			printf("(id=%d)", EXTRACT_16BITS(&dp->icmp6_data16[0]));
 		}
 		break;
 	case ICMP6_HADISCOV_REPLY:
@@ -360,7 +361,7 @@ icmp6_print(const u_char *bp, const u_char *bp2)
 			u_char *cp;
 
 			TCHECK(dp->icmp6_data16[0]);
-			printf("(id=%d", ntohs(dp->icmp6_data16[0]));
+			printf("(id=%d", EXTRACT_16BITS(&dp->icmp6_data16[0]));
 			cp = (u_char *)dp + icmp6len;
 			res = (u_int32_t *)(dp + 1);
 			in6 = (struct in6_addr *)(res + 2);
@@ -375,14 +376,14 @@ icmp6_print(const u_char *bp, const u_char *bp2)
 		printf("icmp6: mobile router solicitation");
 		if (vflag) {
 			TCHECK(dp->icmp6_data16[0]);
-			printf("(id=%d)", ntohs(dp->icmp6_data16[0]));
+			printf("(id=%d)", EXTRACT_16BITS(&dp->icmp6_data16[0]));
 		}
 		break;
 	case ICMP6_MOBILEPREFIX_ADVERT:
 		printf("icmp6: mobile router advertisement");
 		if (vflag) {
 			TCHECK(dp->icmp6_data16[0]);
-			printf("(id=%d)", ntohs(dp->icmp6_data16[0]));
+			printf("(id=%d)", EXTRACT_16BITS(&dp->icmp6_data16[0]));
 #define MPADVLEN 6
 			icmp6_opt_print((const u_char *)dp + MPADVLEN,
 					icmp6len - MPADVLEN);
@@ -538,9 +539,9 @@ icmp6_opt_print(const u_char *bp, int resid)
 			if (opp->nd_opt_pi_flags_reserved)
 				printf(" ");
 			printf("valid_ltime=%s,",
-			    get_lifetime((u_int32_t)ntohl(opp->nd_opt_pi_valid_time)));
+			    get_lifetime(EXTRACT_32BITS(&opp->nd_opt_pi_valid_time)));
 			printf("preferred_ltime=%s,",
-			    get_lifetime((u_int32_t)ntohl(opp->nd_opt_pi_preferred_time)));
+			    get_lifetime(EXTRACT_32BITS(&opp->nd_opt_pi_preferred_time)));
 			printf("prefix=%s/%d",
 			    ip6addr_string(&opp->nd_opt_pi_prefix),
 			    opp->nd_opt_pi_prefix_len);
@@ -564,7 +565,7 @@ icmp6_opt_print(const u_char *bp, int resid)
 				printf(")");
 				break;
 			}
-			printf(" mtu=%u", (u_int32_t)ntohl(opm->nd_opt_mtu_mtu));
+			printf(" mtu=%u", EXTRACT_32BITS(&opm->nd_opt_mtu_mtu));
 			if (opm->nd_opt_mtu_len != 1)
 				printf("!");
 			printf(")");
@@ -574,7 +575,7 @@ icmp6_opt_print(const u_char *bp, int resid)
 			TCHECK(opa->nd_opt_adv_interval);
 			printf("(advint:");	/*)*/
 			printf(" advint=%u",
-			    (u_int32_t)ntohl(opa->nd_opt_adv_interval));
+			    EXTRACT_32BITS(&opa->nd_opt_adv_interval));
 			/*(*/
 			printf(")");
 			break;
@@ -582,8 +583,8 @@ icmp6_opt_print(const u_char *bp, int resid)
 			oph = (struct nd_opt_homeagent_info *)op;
 			TCHECK(oph->nd_opt_hai_lifetime);
 			printf("(ha info:");	/*)*/
-			printf(" pref=%d", ntohs(oph->nd_opt_hai_preference));
-			printf(", lifetime=%u", ntohs(oph->nd_opt_hai_lifetime));
+			printf(" pref=%d", EXTRACT_16BITS(&oph->nd_opt_hai_preference));
+			printf(", lifetime=%u", EXTRACT_16BITS(&oph->nd_opt_hai_lifetime));
 			printf(")");
 			break;
 		case ND_OPT_ROUTE_INFO:
@@ -610,7 +611,7 @@ icmp6_opt_print(const u_char *bp, int resid)
 			    opri->nd_opt_rti_prefixlen);
 			printf(", pref=%s", get_rtpref(opri->nd_opt_rti_flags));
 			printf(", lifetime=%s",
-			    get_lifetime((u_int32_t)ntohl(opri->nd_opt_rti_lifetime)));
+			    get_lifetime(EXTRACT_32BITS(&opri->nd_opt_rti_lifetime)));
 			/*(*/
 			printf(")");
 			break;
@@ -643,7 +644,7 @@ mld6_print(const u_char *bp)
 	if ((u_char *)mp + sizeof(*mp) > ep)
 		return;
 
-	printf("max resp delay: %d ", ntohs(mp->mld6_maxdelay));
+	printf("max resp delay: %d ", EXTRACT_16BITS(&mp->mld6_maxdelay));
 	printf("addr: %s", ip6addr_string(&mp->mld6_addr));
 }
 
@@ -708,13 +709,13 @@ icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
 		TCHECK2(*dp, sizeof(*ni6));
 		ni6 = (struct icmp6_nodeinfo *)dp;
 		printf(" (");	/*)*/
-		switch (ntohs(ni6->ni_qtype)) {
+		switch (EXTRACT_16BITS(&ni6->ni_qtype)) {
 		case NI_QTYPE_NOOP:
 			printf("noop");
 			break;
 		case NI_QTYPE_SUPTYPES:
 			printf("supported qtypes");
-			i = ntohs(ni6->ni_flags);
+			i = EXTRACT_16BITS(&ni6->ni_flags);
 			if (i)
 				printf(" [%s]", (i & 0x01) ? "C" : "");
 			break;
@@ -850,7 +851,7 @@ icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
 			break;
 		}
 
-		switch (ntohs(ni6->ni_qtype)) {
+		switch (EXTRACT_16BITS(&ni6->ni_qtype)) {
 		case NI_QTYPE_NOOP:
 			if (needcomma)
 				printf(", ");
@@ -863,7 +864,7 @@ icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
 			if (needcomma)
 				printf(", ");
 			printf("supported qtypes");
-			i = ntohs(ni6->ni_flags);
+			i = EXTRACT_16BITS(&ni6->ni_flags);
 			if (i)
 				printf(" [%s]", (i & 0x01) ? "C" : "");
 			break;
@@ -885,7 +886,7 @@ icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
 				printf("\"");
 			} else
 				dnsname_print(cp, ep);
-			if ((ntohs(ni6->ni_flags) & 0x01) != 0)
+			if ((EXTRACT_16BITS(&ni6->ni_flags) & 0x01) != 0)
 				printf(" [TTL=%u]", *(u_int32_t *)(ni6 + 1));
 			break;
 		case NI_QTYPE_NODEADDR:
@@ -898,7 +899,7 @@ icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
 					break;
 				printf(" %s", getname6(bp + i));
 				i += sizeof(struct in6_addr);
-				printf("(%d)", (int32_t)ntohl(*(int32_t *)(bp + i)));
+				printf("(%d)", (int32_t)EXTRACT_32BITS(bp + i));
 				i += sizeof(int32_t);
 			}
 			i = ni6->ni_flags;
@@ -963,7 +964,7 @@ icmp6_rrenum_print(int icmp6len, const u_char *bp, const u_char *ep)
 		break;
 	}
 
-	printf(", seq=%u", (u_int32_t)ntohl(rr6->rr_seqnum));
+	printf(", seq=%u", EXTRACT_32BITS(&rr6->rr_seqnum));
 
 	if (vflag) {
 #define F(x, y)	((rr6->rr_flags) & (x) ? (y) : "")
@@ -978,7 +979,7 @@ icmp6_rrenum_print(int icmp6len, const u_char *bp, const u_char *ep)
 		printf("seg=%u,", rr6->rr_segnum);
 		printf("maxdelay=%u", rr6->rr_maxdelay);
 		if (rr6->rr_reserved)
-			printf("rsvd=0x%x", (u_int16_t)ntohs(rr6->rr_reserved));
+			printf("rsvd=0x%x", EXTRACT_16BITS(&rr6->rr_reserved));
 		/*[*/
 		printf("]");
 #undef F
@@ -1043,12 +1044,12 @@ icmp6_rrenum_print(int icmp6len, const u_char *bp, const u_char *ep)
 					printf("vltime=infty,");
 				else
 					printf("vltime=%u,",
-					    (u_int32_t)ntohl(use->rpu_vltime));
+					    EXTRACT_32BITS(&use->rpu_vltime));
 				if (~use->rpu_pltime == 0)
 					printf("pltime=infty,");
 				else
 					printf("pltime=%u,",
-					    (u_int32_t)ntohl(use->rpu_pltime));
+					    EXTRACT_32BITS(&use->rpu_pltime));
 			}
 			if (inet_ntop(AF_INET6, &use->rpu_prefix, hbuf,
 			    sizeof(hbuf)))

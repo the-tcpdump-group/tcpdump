@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ripng.c,v 1.13 2002-08-06 04:42:06 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ripng.c,v 1.14 2002-12-11 07:14:08 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -52,6 +52,7 @@ IN6_ADDR_EQUAL(const struct in6_addr *a, const struct in6_addr *b)
 #include "route6d.h"
 #include "interface.h"
 #include "addrtoname.h"
+#include "extract.h"
 
 static int
 rip6_entry_print(register const struct netinfo6 *ni, int metric)
@@ -59,7 +60,7 @@ rip6_entry_print(register const struct netinfo6 *ni, int metric)
 	int l;
 	l = printf("%s/%d", ip6addr_string(&ni->rip6_dest), ni->rip6_plen);
 	if (ni->rip6_tag)
-		l += printf(" [%d]", ntohs(ni->rip6_tag));
+		l += printf(" [%d]", EXTRACT_16BITS(&ni->rip6_tag));
 	if (metric)
 		l += printf(" (%d)", ni->rip6_metric);
 	return l;

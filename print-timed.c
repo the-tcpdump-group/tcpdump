@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-timed.c,v 1.6 2002-09-05 21:25:50 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-timed.c,v 1.7 2002-12-11 07:14:10 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -35,6 +35,7 @@ static const char rcsid[] =
 
 #include "timed.h"
 #include "interface.h"
+#include "extract.h"
 
 static const char *tsptype[TSPTYPENUMBER] =
   { "ANY", "ADJTIME", "ACK", "MASTERREQ", "MASTERACK", "SETTIME", "MASTERUP",
@@ -85,8 +86,8 @@ timed_print(register const u_char *bp)
 			fputs(" [|timed]", stdout);
 			return;
 		}
-		sec = ntohl((long)tsp->tsp_time.tv_sec);
-		usec = ntohl((long)tsp->tsp_time.tv_usec);
+		sec = EXTRACT_32BITS(&tsp->tsp_time.tv_sec);
+		usec = EXTRACT_32BITS(&tsp->tsp_time.tv_usec);
 		if (usec < 0)
 			/* corrupt, skip the rest of the packet */
 			return;

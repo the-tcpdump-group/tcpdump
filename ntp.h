@@ -1,4 +1,4 @@
-/* $Header: /tcpdump/master/tcpdump/ntp.h,v 1.5 2002-11-09 17:19:22 itojun Exp $ */
+/* $Header: /tcpdump/master/tcpdump/ntp.h,v 1.6 2002-12-11 07:13:56 guy Exp $ */
 
 /*
  * Based on ntp.h from the U of MD implementation
@@ -30,12 +30,12 @@
 struct l_fixedpt {
 	u_int32_t int_part;
 	u_int32_t fraction;
-} __attribute__((packed));
+};
 
 struct s_fixedpt {
 	u_int16_t int_part;
 	u_int16_t fraction;
-} __attribute__((packed));
+};
 
 /*  =================  Table 3.3. Packet Variables   ================= */
 /*
@@ -79,7 +79,7 @@ struct ntpdata {
 	struct l_fixedpt org;
 	struct l_fixedpt rec;
 	struct l_fixedpt xmt;
-} __attribute__((packed));
+};
 /*
  *	Leap Second Codes (high order two bits)
  */

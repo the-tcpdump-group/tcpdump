@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.70 2002-11-09 17:19:26 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.71 2002-12-11 07:14:01 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -93,7 +93,7 @@ struct icmp {
 #define	icmp_ip		icmp_dun.id_ip.idi_ip
 #define	icmp_mask	icmp_dun.id_mask
 #define	icmp_data	icmp_dun.id_data
-} __attribute__((packed));
+};
 
 /*
  * Lower bounds on packet lengths for various types.
@@ -245,19 +245,19 @@ static struct tok type2str[] = {
 struct mtu_discovery {
 	u_int16_t unused;
 	u_int16_t nexthopmtu;
-} __attribute__((packed));
+};
 
 /* rfc1256 */
 struct ih_rdiscovery {
 	u_int8_t ird_addrnum;
 	u_int8_t ird_addrsiz;
 	u_int16_t ird_lifetime;
-} __attribute__((packed));
+};
 
 struct id_rdiscovery {
 	u_int32_t ird_addr;
 	u_int32_t ird_pref;
-} __attribute__((packed));
+};
 
 void
 icmp_print(const u_char *bp, u_int plen, const u_char *bp2)
@@ -284,7 +284,7 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2)
 		(void)snprintf(buf, sizeof(buf), "echo %s seq %u",
 			dp->icmp_type == ICMP_ECHO ?
 			"request" : "reply",
-			(unsigned)ntohs(dp->icmp_seq));
+			EXTRACT_16BITS(&dp->icmp_seq));
 		break;
 
 	case ICMP_UNREACH:
@@ -304,7 +304,7 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2)
 			oip = &dp->icmp_ip;
 			hlen = IP_HL(oip) * 4;
 			ouh = (struct udphdr *)(((u_char *)oip) + hlen);
-			dport = ntohs(ouh->uh_dport);
+			dport = EXTRACT_16BITS(&ouh->uh_dport);
 			switch (oip->ip_p) {
 
 			case IPPROTO_TCP:
@@ -449,26 +449,26 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2)
 	case ICMP_MASKREPLY:
 		TCHECK(dp->icmp_mask);
 		(void)snprintf(buf, sizeof(buf), "address mask is 0x%08x",
-		    (unsigned)ntohl(dp->icmp_mask));
+		    EXTRACT_32BITS(&dp->icmp_mask));
 		break;
 
 	case ICMP_TSTAMP:
 		TCHECK(dp->icmp_seq);
 		(void)snprintf(buf, sizeof(buf),
 		    "time stamp query id %u seq %u",
-		    (unsigned)ntohs(dp->icmp_id),
-		    (unsigned)ntohs(dp->icmp_seq));
+		    EXTRACT_16BITS(&dp->icmp_id),
+		    EXTRACT_16BITS(&dp->icmp_seq));
 		break;
 
 	case ICMP_TSTAMPREPLY:
 		TCHECK(dp->icmp_ttime);
 		(void)snprintf(buf, sizeof(buf),
-		    "time stamp reply id %u seq %u : org 0x%lx recv 0x%lx xmit 0x%lx",
-		    (unsigned)ntohs(dp->icmp_id),
-		    (unsigned)ntohs(dp->icmp_seq),
-		    (unsigned long)ntohl(dp->icmp_otime),
-		    (unsigned long)ntohl(dp->icmp_rtime),
-		    (unsigned long)ntohl(dp->icmp_ttime));
+		    "time stamp reply id %u seq %u : org 0x%x recv 0x%x xmit 0x%x",
+		    EXTRACT_16BITS(&dp->icmp_id),
+		    EXTRACT_16BITS(&dp->icmp_seq),
+		    EXTRACT_32BITS(&dp->icmp_otime),
+		    EXTRACT_32BITS(&dp->icmp_rtime),
+		    EXTRACT_32BITS(&dp->icmp_ttime));
 		break;
 
 	default:
@@ -481,7 +481,7 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2)
 		if (TTEST2(*bp, plen)) {
 			sum = in_cksum((u_short*)dp, plen, 0);
 			if (sum != 0) {
-				icmp_sum = ntohs(dp->icmp_cksum);
+				icmp_sum = EXTRACT_16BITS(&dp->icmp_cksum);
 				(void)printf(" (wrong icmp cksum %x (->%x)!)",
 					     icmp_sum,
 					     in_cksum_shouldbe(icmp_sum, sum));
@@ -493,7 +493,7 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2)
 		(void)printf(" for ");
 		ip = (struct ip *)bp;
 		snaplen = snapend - bp;
-		ip_print(bp, ntohs(ip->ip_len));
+		ip_print(bp, EXTRACT_16BITS(&ip->ip_len));
 	}
 	return;
 trunc:

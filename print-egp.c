@@ -20,7 +20,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-egp.c,v 1.33 2002-11-09 17:19:25 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-egp.c,v 1.34 2002-12-11 07:13:59 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -33,6 +33,7 @@ static const char rcsid[] =
 
 #include "interface.h"
 #include "addrtoname.h"
+#include "extract.h"
 
 #include "ip.h"
 
@@ -91,7 +92,7 @@ struct egp_packet {
 	} egp_pands;
 #define  egp_poll  egp_pands.egpu_poll
 #define  egp_sourcenet  egp_pands.egpu_sourcenet
-} __attribute__((packed));
+};
 
 const char *egp_acquire_codes[] = {
 	"request",
@@ -231,7 +232,7 @@ egp_print(register const u_int8_t *bp)
 		printf("[version %d]", egp->egp_version);
 		return;
 	}
-	printf("as:%d seq:%d", ntohs(egp->egp_as), ntohs(egp->egp_sequence));
+	printf("as:%d seq:%d", EXTRACT_16BITS(&egp->egp_as), EXTRACT_16BITS(&egp->egp_sequence));
 
 	type = egp->egp_type;
 	code = egp->egp_code;
@@ -256,8 +257,8 @@ egp_print(register const u_int8_t *bp)
 				break;
 			}
 			printf(" hello:%d poll:%d",
-			       ntohs(egp->egp_hello),
-			       ntohs(egp->egp_poll));
+			       EXTRACT_16BITS(&egp->egp_hello),
+			       EXTRACT_16BITS(&egp->egp_poll));
 			break;
 
 		case EGPC_REFUSE:
@@ -338,10 +339,10 @@ egp_print(register const u_int8_t *bp)
 		else
 			printf(" [status %d]", status);
 
-		if (ntohs(egp->egp_reason) <= EGPR_UVERSION)
-			printf(" %s", egp_reasons[ntohs(egp->egp_reason)]);
+		if (EXTRACT_16BITS(&egp->egp_reason) <= EGPR_UVERSION)
+			printf(" %s", egp_reasons[EXTRACT_16BITS(&egp->egp_reason)]);
 		else
-			printf(" [reason %d]", ntohs(egp->egp_reason));
+			printf(" [reason %d]", EXTRACT_16BITS(&egp->egp_reason));
 		break;
 
 	default:

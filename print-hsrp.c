@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-hsrp.c,v 1.6 2002-11-09 17:19:25 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-hsrp.c,v 1.7 2002-12-11 07:14:00 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -95,7 +95,7 @@ struct hsrp {
 	u_int8_t	hsrp_reserved;
 	u_int8_t	hsrp_authdata[HSRP_AUTH_SIZE];
 	struct in_addr	hsrp_virtaddr;
-} __attribute__((packed));
+};
 
 void
 hsrp_print(register const u_int8_t *bp, register u_int len)

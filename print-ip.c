@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.116 2002-10-18 04:40:03 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.117 2002-12-11 07:14:02 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -367,7 +367,7 @@ ip_print(register const u_char *bp, register u_int length)
 		return;
 	}
 
-	len = ntohs(ip->ip_len);
+	len = EXTRACT_16BITS(&ip->ip_len);
 	if (length < len)
 		(void)printf("truncated-ip - %d bytes missing! ",
 			len - length);
@@ -376,7 +376,7 @@ ip_print(register const u_char *bp, register u_int length)
 
         printf("IP ");
 
-	off = ntohs(ip->ip_off);
+	off = EXTRACT_16BITS(&ip->ip_off);
 
         if (vflag) {
             (void)printf("(tos 0x%x", (int)ip->ip_tos);
@@ -395,11 +395,11 @@ ip_print(register const u_char *bp, register u_int length)
             }
 
             if (ip->ip_ttl >= 1)
-                (void)printf(", ttl %d", (int)ip->ip_ttl);    
+                (void)printf(", ttl %u", ip->ip_ttl);    
 
             if ((off & 0x3fff) == 0)
-                (void)printf(", id %d", (int)ntohs(ip->ip_id));
-            (void)printf(", len %d) ", (int)ntohs(ip->ip_len));
+                (void)printf(", id %u", EXTRACT_16BITS(&ip->ip_id));
+            (void)printf(", len %u) ", EXTRACT_16BITS(&ip->ip_len));
 	}
 
 	/*
@@ -602,7 +602,7 @@ again:
 #ifndef IP_DF
 #define IP_DF 0x4000
 #endif /* IP_DF */
-		(void)printf(" (frag %d:%u@%d%s)", ntohs(ip->ip_id), len,
+		(void)printf(" (frag %u:%u@%u%s)", EXTRACT_16BITS(&ip->ip_id), len,
 			(off & 0x1fff) * 8,
 			(off & IP_MF)? "+" : "");
 
@@ -616,7 +616,7 @@ again:
 		if ((u_char *)ip + hlen <= snapend) {
 			sum = in_cksum((const u_short *)ip, hlen, 0);
 			if (sum != 0) {
-				ip_sum = ntohs(ip->ip_sum);
+				ip_sum = EXTRACT_16BITS(&ip->ip_sum);
 				(void)printf("%sbad cksum %x (->%x)!", sep,
 					     ip_sum,
 					     in_cksum_shouldbe(ip_sum, sum));

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.81 2002-09-05 21:25:39 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.82 2002-12-11 07:13:59 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -506,19 +506,20 @@ ns_print(register const u_char *bp, u_int length)
 	register const HEADER *np;
 	register int qdcount, ancount, nscount, arcount;
 	register const u_char *cp;
+	u_int16_t b2;
 
 	np = (const HEADER *)bp;
 	TCHECK(*np);
 	/* get the byte-order right */
-	qdcount = ntohs(np->qdcount);
-	ancount = ntohs(np->ancount);
-	nscount = ntohs(np->nscount);
-	arcount = ntohs(np->arcount);
+	qdcount = EXTRACT_16BITS(&np->qdcount);
+	ancount = EXTRACT_16BITS(&np->ancount);
+	nscount = EXTRACT_16BITS(&np->nscount);
+	arcount = EXTRACT_16BITS(&np->arcount);
 
 	if (DNS_QR(np)) {
 		/* this is a response */
 		printf(" %d%s%s%s%s%s%s",
-			ntohs(np->id),
+			EXTRACT_16BITS(&np->id),
 			ns_ops[DNS_OPCODE(np)],
 			ns_resp[DNS_RCODE(np)],
 			DNS_AA(np)? "*" : "",
@@ -531,7 +532,7 @@ ns_print(register const u_char *bp, u_int length)
 		/* Print QUESTION section on -vv */
 		cp = (const u_char *)(np + 1);
 		while (qdcount--) {
-			if (qdcount < ntohs(np->qdcount) - 1)
+			if (qdcount < EXTRACT_16BITS(&np->qdcount) - 1)
 				putchar(',');
 			if (vflag > 1) {
 				fputs(" q:", stdout);
@@ -585,13 +586,14 @@ ns_print(register const u_char *bp, u_int length)
 	}
 	else {
 		/* this is a request */
-		printf(" %d%s%s%s", ntohs(np->id), ns_ops[DNS_OPCODE(np)],
+		printf(" %d%s%s%s", EXTRACT_16BITS(&np->id), ns_ops[DNS_OPCODE(np)],
 		    DNS_RD(np) ? "+" : "",
 		    DNS_AD(np) ? "$" : "");
 
 		/* any weirdness? */
-		if (*(((u_short *)np)+1) & htons(0x6cf))
-			printf(" [b2&3=0x%x]", ntohs(*(((u_short *)np)+1)));
+		b2 = EXTRACT_16BITS(((u_short *)np)+1);
+		if (b2 & 0x6cf)
+			printf(" [b2&3=0x%x]", b2);
 
 		if (DNS_OPCODE(np) == IQUERY) {
 			if (qdcount)

@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-ip6opts.c,v 1.12 2002-08-01 08:53:11 risso Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-ip6opts.c,v 1.13 2002-12-11 07:14:03 guy Exp $";
 #endif
 
 #ifdef INET6
@@ -45,6 +45,7 @@ static const char rcsid[] =
 
 #include "interface.h"
 #include "addrtoname.h"
+#include "extract.h"
 
 /* items outside of rfc2292bis */
 #ifndef IP6OPT_MINLEN
@@ -103,7 +104,7 @@ ip6_sopt_print(const u_char *bp, int len)
 		printf(", ui: trunc");
 		goto trunc;
 	    }
-            printf(", ui: 0x%04x ", ntohs(*(u_int16_t *)&bp[i + 2]));
+            printf(", ui: 0x%04x ", EXTRACT_16BITS(&bp[i + 2]));
 	    break;
         case IP6SOPT_ALTCOA:
              if (len - i < IP6SOPT_ALTCOA_MINLEN) {
@@ -117,8 +118,7 @@ ip6_sopt_print(const u_char *bp, int len)
 		printf(", auth: trunc");
 		goto trunc;
 	    }
-            printf(", auth spi: 0x%08x",
-		   (u_int32_t)ntohl(*(u_int32_t *)&bp[i + 2]));
+            printf(", auth spi: 0x%08x", EXTRACT_32BITS(&bp[i + 2]));
 	    break;
 	default:
 	    if (len - i < IP6OPT_MINLEN) {
@@ -173,7 +173,7 @@ ip6_opt_print(const u_char *bp, int len)
 		printf("(rtalert: invalid len %d)", bp[i + 1]);
 		goto trunc;
 	    }
-	    printf("(rtalert: 0x%04x) ", ntohs(*(u_int16_t *)&bp[i + 2]));
+	    printf("(rtalert: 0x%04x) ", EXTRACT_16BITS(&bp[i + 2]));
 	    break;
 	case IP6OPT_JUMBO:
 	    if (len - i < IP6OPT_JUMBO_LEN) {
@@ -184,7 +184,7 @@ ip6_opt_print(const u_char *bp, int len)
 		printf("(jumbo: invalid len %d)", bp[i + 1]);
 		goto trunc;
 	    }
-	    printf("(jumbo: %u) ", (u_int32_t)ntohl(*(u_int32_t *)&bp[i + 2]));
+	    printf("(jumbo: %u) ", EXTRACT_32BITS(&bp[i + 2]));
 	    break;
         case IP6OPT_HOME_ADDRESS:
 	    if (len - i < IP6OPT_HOMEADDR_MINLEN) {
@@ -223,8 +223,7 @@ ip6_opt_print(const u_char *bp, int len)
 	    if ((bp[i + 2] & 0x0f) || bp[i + 3] || bp[i + 4])
 		    printf("res");
 	    printf(", sequence: %u", bp[i + 5]);
-	    printf(", lifetime: %u",
-		(u_int32_t)ntohl(*(u_int32_t *)&bp[i + 6]));
+	    printf(", lifetime: %u", EXTRACT_32BITS(&bp[i + 6]));
 
 	    if (bp[i + 1] > IP6OPT_BU_MINLEN - 2) {
 		ip6_sopt_print(&bp[i + IP6OPT_BU_MINLEN],
@@ -246,10 +245,8 @@ ip6_opt_print(const u_char *bp, int len)
 	    if (bp[i + 3])
 		    printf("res");
 	    printf(", sequence: %u", bp[i + 4]);
-	    printf(", lifetime: %u",
-		(u_int32_t)ntohl(*(u_int32_t *)&bp[i + 5]));
-	    printf(", refresh: %u",
-		(u_int32_t)ntohl(*(u_int32_t *)&bp[i + 9]));
+	    printf(", lifetime: %u", EXTRACT_32BITS(&bp[i + 5]));
+	    printf(", refresh: %u", EXTRACT_32BITS(&bp[i + 9]));
 
 	    if (bp[i + 1] > IP6OPT_BA_MINLEN - 2) {
 		ip6_sopt_print(&bp[i + IP6OPT_BA_MINLEN],

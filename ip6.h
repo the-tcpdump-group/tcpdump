@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ip6.h,v 1.4 2002-11-09 17:19:19 itojun Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ip6.h,v 1.5 2002-12-11 07:13:53 guy Exp $ (LBL) */
 /*	$NetBSD: ip6.h,v 1.9 2000/07/13 05:34:21 itojun Exp $	*/
 /*	$KAME: ip6.h,v 1.9 2000/07/02 21:01:32 itojun Exp $	*/
 
@@ -86,7 +86,7 @@ struct ip6_hdr {
 	} ip6_ctlun;
 	struct in6_addr ip6_src;	/* source address */
 	struct in6_addr ip6_dst;	/* destination address */
-} __attribute__((packed));
+};
 
 #define ip6_vfc		ip6_ctlun.ip6_un2_vfc
 #define ip6_flow	ip6_ctlun.ip6_un1.ip6_un1_flow
@@ -114,7 +114,7 @@ struct ip6_hdr {
 struct	ip6_ext {
 	u_char	ip6e_nxt;
 	u_char	ip6e_len;
-} __attribute__((packed));
+};
 
 /* Hop-by-Hop options header */
 /* XXX should we pad it to force alignment on an 8-byte boundary? */
@@ -122,7 +122,7 @@ struct ip6_hbh {
 	u_int8_t ip6h_nxt;	/* next header */
 	u_int8_t ip6h_len;	/* length in units of 8 octets */
 	/* followed by options */
-} __attribute__((packed));
+};
 
 /* Destination options header */
 /* XXX should we pad it to force alignment on an 8-byte boundary? */
@@ -130,7 +130,7 @@ struct ip6_dest {
 	u_int8_t ip6d_nxt;	/* next header */
 	u_int8_t ip6d_len;	/* length in units of 8 octets */
 	/* followed by options */
-} __attribute__((packed));
+};
 
 /* Option types and related macros */
 #define IP6OPT_PAD1		0x00	/* 00 0 00000 */
@@ -166,7 +166,7 @@ struct ip6_rthdr {
 	u_int8_t  ip6r_type;	/* routing type */
 	u_int8_t  ip6r_segleft;	/* segments left */
 	/* followed by routing type specific data */
-} __attribute__((packed));
+};
 
 /* Type 0 Routing header */
 struct ip6_rthdr0 {
@@ -177,7 +177,7 @@ struct ip6_rthdr0 {
 	u_int8_t  ip6r0_reserved;	/* reserved field */
 	u_int8_t  ip6r0_slmap[3];	/* strict/loose bit map */
 	struct in6_addr ip6r0_addr[1];	/* up to 23 addresses */
-} __attribute__((packed));
+};
 
 /* Fragment header */
 struct ip6_frag {
@@ -185,7 +185,7 @@ struct ip6_frag {
 	u_int8_t  ip6f_reserved;	/* reserved field */
 	u_int16_t ip6f_offlg;		/* offset, reserved, and flag */
 	u_int32_t ip6f_ident;		/* identification */
-} __attribute__((packed));
+};
 
 /* network endian */
 #define IP6F_OFF_MASK		((u_int16_t)htons(0xfff8))	/* mask out offset from _offlg */

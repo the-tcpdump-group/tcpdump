@@ -26,7 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-/* YIPS @(#)$Id: ipsec_doi.h,v 1.6 2002-11-09 17:19:20 itojun Exp $ */
+/* YIPS @(#)$Id: ipsec_doi.h,v 1.7 2002-12-11 07:13:53 guy Exp $ */
 
 /* refer to RFC 2407 */
 
@@ -114,12 +114,12 @@ struct ipsecdoi_sa {
 	struct isakmp_gen h;
 	u_int32_t doi; /* Domain of Interpretation */
 	u_int32_t sit; /* Situation */
-} __attribute__((packed));
+};
 
 struct ipsecdoi_secrecy_h {
 	u_int16_t len;
 	u_int16_t reserved;
-} __attribute__((packed));
+};
 
 /* 4.6.2.1 Identification Type Values */
 struct ipsecdoi_id {
@@ -128,7 +128,7 @@ struct ipsecdoi_id {
 	u_int8_t  proto_id;	/* Protocol ID */
 	u_int16_t port;		/* Port */
 	/* Identification Data */
-} __attribute__((packed));
+};
 
 #define IPSECDOI_ID_IPV4_ADDR                        1
 #define IPSECDOI_ID_FQDN                             2

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rip.c,v 1.53 2002-11-09 17:19:30 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rip.c,v 1.54 2002-12-11 07:14:07 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -41,7 +41,7 @@ struct rip {
 	u_int8_t rip_cmd;		/* request/response */
 	u_int8_t rip_vers;		/* protocol version # */
 	u_int16_t rip_zero2;		/* unused */
-} __attribute__((packed));
+};
 #define	RIPCMD_REQUEST		1	/* want info */
 #define	RIPCMD_RESPONSE		2	/* responding to request */
 #define	RIPCMD_TRACEON		3	/* turn tracing on */
@@ -58,7 +58,7 @@ struct rip_netinfo {
 	u_int32_t rip_dest_mask;
 	u_int32_t rip_router;
 	u_int32_t rip_metric;		/* cost of route */
-} __attribute__((packed));
+};
 
 static void
 rip_printblk(const u_char *cp, const u_char *ep)
@@ -83,7 +83,9 @@ rip_entry_print_v1(register const struct rip_netinfo *ni)
 		printf("]");
 		return;
 	}
-	if (ni->rip_tag || ni->rip_dest_mask || ni->rip_router) {
+	if (EXTRACT_16BITS(&ni->rip_tag) ||
+	    EXTRACT_32BITS(&ni->rip_dest_mask) ||
+	    EXTRACT_32BITS(&ni->rip_router)) {
 		/* MBZ fields not zero */
 		printf(" [");
 		rip_printblk((u_char *)&ni->rip_family,
@@ -139,11 +141,11 @@ rip_entry_print_v2(register const struct rip_netinfo *ni)
 		return;
 	} else { /* AF_INET */
 		printf(" {%s", ipaddr_string(&ni->rip_dest));
-		if (ni->rip_dest_mask)
+		if (EXTRACT_32BITS(&ni->rip_dest_mask))
 			printf("/%s", ipaddr_string(&ni->rip_dest_mask));
-		if (ni->rip_router)
+		if (EXTRACT_32BITS(&ni->rip_router))
 			printf("->%s", ipaddr_string(&ni->rip_router));
-		if (ni->rip_tag)
+		if (EXTRACT_16BITS(&ni->rip_tag))
 			printf(" tag %04x", EXTRACT_16BITS(&ni->rip_tag));
 		printf("}(%d)", EXTRACT_32BITS(&ni->rip_metric));
 	}

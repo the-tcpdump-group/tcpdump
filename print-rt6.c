@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rt6.c,v 1.21 2002-08-01 08:53:26 risso Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rt6.c,v 1.22 2002-12-11 07:14:08 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -38,6 +38,7 @@ static const char rcsid[] =
 
 #include "interface.h"
 #include "addrtoname.h"
+#include "extract.h"
 
 int
 rt6_print(register const u_char *bp, register const u_char *bp2)
@@ -76,7 +77,7 @@ rt6_print(register const u_char *bp, register const u_char *bp2)
 		TCHECK(dp0->ip6r0_reserved);
 		if (dp0->ip6r0_reserved || vflag) {
 			printf(", rsv=0x%0x",
-			    (u_int32_t)ntohl(dp0->ip6r0_reserved));
+			    EXTRACT_32BITS(&dp0->ip6r0_reserved));
 		}
 
 		if (len % 2 == 1)

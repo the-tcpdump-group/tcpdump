@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-arp.c,v 1.59 2002-11-09 17:19:23 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-arp.c,v 1.60 2002-12-11 07:13:57 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -81,15 +81,15 @@ struct	arp_pkthdr {
 #define ar_spa(ap)	(((const u_char *)((ap)+1))+  (ap)->ar_hln)
 #define ar_tha(ap)	(((const u_char *)((ap)+1))+  (ap)->ar_hln+(ap)->ar_pln)
 #define ar_tpa(ap)	(((const u_char *)((ap)+1))+2*(ap)->ar_hln+(ap)->ar_pln)
-} __attribute__((packed));
+};
 
 #define ARP_HDRLEN	8
 
-#define HRD(ap) ((ap)->ar_hrd)
+#define HRD(ap) EXTRACT_16BITS(&(ap)->ar_hrd)
 #define HLN(ap) ((ap)->ar_hln)
 #define PLN(ap) ((ap)->ar_pln)
-#define OP(ap)  ((ap)->ar_op)
-#define PRO(ap) ((ap)->ar_pro)
+#define OP(ap)  EXTRACT_16BITS(&(ap)->ar_op)
+#define PRO(ap) EXTRACT_16BITS(&(ap)->ar_pro)
 #define SHA(ap) (ar_sha(ap))
 #define SPA(ap) (ar_spa(ap))
 #define THA(ap) (ar_tha(ap))
@@ -131,12 +131,12 @@ struct	atmarp_pkthdr {
 	u_char	aar_tpa[];	/* target protocol address */
 #endif
 
-#define ATMHRD(ap)  ((ap)->aar_hrd)
+#define ATMHRD(ap)  EXTRACT_16BITS(&(ap)->aar_hrd)
 #define ATMSHLN(ap) ((ap)->aar_shtl & ATMARP_LEN_MASK)
 #define ATMSSLN(ap) ((ap)->aar_sstl & ATMARP_LEN_MASK)
 #define ATMSPLN(ap) ((ap)->aar_spln)
-#define ATMOP(ap)   ((ap)->aar_op)
-#define ATMPRO(ap)  ((ap)->aar_pro)
+#define ATMOP(ap)   EXTRACT_16BITS(&(ap)->aar_op)
+#define ATMPRO(ap)  EXTRACT_16BITS(&(ap)->aar_pro)
 #define ATMTHLN(ap) ((ap)->aar_thtl & ATMARP_LEN_MASK)
 #define ATMTSLN(ap) ((ap)->aar_tstl & ATMARP_LEN_MASK)
 #define ATMTPLN(ap) ((ap)->aar_tpln)
@@ -146,7 +146,7 @@ struct	atmarp_pkthdr {
 #define aar_tha(ap)	(aar_spa(ap) + ATMSPLN(ap))
 #define aar_tsa(ap)	(aar_tha(ap) + ATMTHLN(ap))
 #define aar_tpa(ap)	(aar_tsa(ap) + ATMTSLN(ap))
-} __attribute__((packed));
+};
 
 #define ATMSHA(ap) (aar_sha(ap))
 #define ATMSSA(ap) (aar_ssa(ap))
@@ -179,9 +179,9 @@ atmarp_print(const u_char *bp, u_int length, u_int caplen)
 	ap = (const struct atmarp_pkthdr *)bp;
 	TCHECK(*ap);
 
-	hrd = EXTRACT_16BITS(&ATMHRD(ap));
-	pro = EXTRACT_16BITS(&ATMPRO(ap));
-	op = EXTRACT_16BITS(&ATMOP(ap));
+	hrd = ATMHRD(ap);
+	pro = ATMPRO(ap);
+	op = ATMOP(ap);
 
 	if (!TTEST2(*aar_tpa(ap), ATMTPLN(ap))) {
 		(void)printf("truncated-atmarp");
@@ -256,13 +256,13 @@ arp_print(const u_char *bp, u_int length, u_int caplen)
 
 	ap = (const struct arp_pkthdr *)bp;
 	TCHECK(*ap);
-	hrd = EXTRACT_16BITS(&HRD(ap));
+	hrd = HRD(ap);
 	if (hrd == ARPHRD_ATM2225) {
 		atmarp_print(bp, length, caplen);
 		return;
 	}
-	pro = EXTRACT_16BITS(&PRO(ap));
-	op = EXTRACT_16BITS(&OP(ap));
+	pro = PRO(ap);
+	op = OP(ap);
 
 	if (!TTEST2(*ar_tpa(ap), PLN(ap))) {
 		(void)printf("truncated-arp");

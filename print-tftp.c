@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tftp.c,v 1.32 2002-08-01 08:53:32 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tftp.c,v 1.33 2002-12-11 07:14:09 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -42,6 +42,7 @@ static const char rcsid[] =
 
 #include "interface.h"
 #include "addrtoname.h"
+#include "extract.h"
 
 /* op code to string mapping */
 static struct tok op2str[] = {
@@ -85,7 +86,7 @@ tftp_print(register const u_char *bp, u_int length)
 
 	/* Print tftp request type */
 	TCHECK(tp->th_opcode);
-	opcode = ntohs(tp->th_opcode);
+	opcode = EXTRACT_16BITS(&tp->th_opcode);
 	cp = tok2str(op2str, "tftp-#%d", opcode);
 	printf(" %s", cp);
 	/* Bail if bogus opcode */
@@ -115,14 +116,14 @@ tftp_print(register const u_char *bp, u_int length)
 	case ACK:
 	case DATA:
 		TCHECK(tp->th_block);
-		printf(" block %d", ntohs(tp->th_block));
+		printf(" block %d", EXTRACT_16BITS(&tp->th_block));
 		break;
 
 	case ERROR:
 		/* Print error code string */
 		TCHECK(tp->th_code);
 		printf(" %s ", tok2str(err2str, "tftp-err-#%d \"",
-				       ntohs(tp->th_code)));
+				       EXTRACT_16BITS(&tp->th_code)));
 		/* Print error message string */
 		i = fn_print((const u_char *)tp->th_data, snapend);
 		putchar('"');

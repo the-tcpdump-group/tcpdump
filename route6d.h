@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 /*
- * $Header: /tcpdump/master/tcpdump/route6d.h,v 1.4 2002-11-09 17:19:31 itojun Exp $
+ * $Header: /tcpdump/master/tcpdump/route6d.h,v 1.5 2002-12-11 07:14:10 guy Exp $
  */
 
 #define	RIP6_VERSION	1
@@ -40,7 +40,7 @@ struct netinfo6 {
 	u_int16_t	rip6_tag;
 	u_int8_t	rip6_plen;
 	u_int8_t	rip6_metric;
-} __attribute__((packed));
+};
 
 struct	rip6 {
 	u_int8_t	rip6_cmd;
@@ -52,7 +52,7 @@ struct	rip6 {
 	} rip6un;
 #define	rip6_nets	rip6un.ru6_nets
 #define	rip6_tracefile	rip6un.ru6_tracefile
-} __attribute__((packed));
+};
 
 #define	HOPCNT_INFINITY6	16
 #define	MAXRTE			24

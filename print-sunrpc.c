@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sunrpc.c,v 1.42 2002-09-05 00:00:22 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sunrpc.c,v 1.43 2002-12-11 07:14:09 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -43,6 +43,7 @@ static const char rcsid[] =
 
 #include "interface.h"
 #include "addrtoname.h"
+#include "extract.h"
 
 #include "ip.h"
 #ifdef INET6
@@ -78,11 +79,11 @@ sunrpcrequest_print(register const u_char *bp, register u_int length,
 
 	if (!nflag) {
 		snprintf(srcid, sizeof(srcid), "0x%x",
-		    (u_int32_t)ntohl(rp->rm_xid));
+		    EXTRACT_32BITS(&rp->rm_xid));
 		strlcpy(dstid, "sunrpc", sizeof(dstid));
 	} else {
 		snprintf(srcid, sizeof(srcid), "0x%x",
-		    (u_int32_t)ntohl(rp->rm_xid));
+		    EXTRACT_32BITS(&rp->rm_xid));
 		snprintf(dstid, sizeof(dstid), "0x%x", PMAPPORT);
 	}
 
@@ -107,23 +108,23 @@ sunrpcrequest_print(register const u_char *bp, register u_int length,
 	}
 
 	printf(" %s", tok2str(proc2str, " proc #%u",
-	    (u_int32_t)ntohl(rp->rm_call.cb_proc)));
-	x = ntohl(rp->rm_call.cb_rpcvers);
+	    EXTRACT_32BITS(&rp->rm_call.cb_proc)));
+	x = EXTRACT_32BITS(&rp->rm_call.cb_rpcvers);
 	if (x != 2)
 		printf(" [rpcver %u]", x);
 
-	switch (ntohl(rp->rm_call.cb_proc)) {
+	switch (EXTRACT_32BITS(&rp->rm_call.cb_proc)) {
 
 	case PMAPPROC_SET:
 	case PMAPPROC_UNSET:
 	case PMAPPROC_GETPORT:
 	case PMAPPROC_CALLIT:
-		x = ntohl(rp->rm_call.cb_prog);
+		x = EXTRACT_32BITS(&rp->rm_call.cb_prog);
 		if (!nflag)
 			printf(" %s", progstr(x));
 		else
 			printf(" %u", x);
-		printf(".%u", (u_int32_t)ntohl(rp->rm_call.cb_vers));
+		printf(".%u", EXTRACT_32BITS(&rp->rm_call.cb_vers));
 		break;
 	}
 }

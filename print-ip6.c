@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.27 2002-10-18 04:40:03 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.28 2002-12-11 07:14:02 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -38,6 +38,7 @@ static const char rcsid[] =
 
 #include "interface.h"
 #include "addrtoname.h"
+#include "extract.h"
 
 #include "ip6.h"
 
@@ -64,7 +65,7 @@ ip6_print(register const u_char *bp, register u_int length)
 	}
 	advance = sizeof(struct ip6_hdr);
 
-	len = ntohs(ip6->ip6_plen);
+	len = EXTRACT_16BITS(&ip6->ip6_plen);
 	if (length < len + advance)
 		(void)printf("truncated-ip6 - %d bytes missing!",
 			len + advance - length);
@@ -182,7 +183,7 @@ ip6_print(register const u_char *bp, register u_int length)
 
  end:
 
-	flow = ntohl(ip6->ip6_flow);
+	flow = EXTRACT_32BITS(&ip6->ip6_flow);
 #if 0
 	/* rfc1883 */
 	if (flow & 0x0f000000)

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-igmp.c,v 1.10 2002-11-09 17:19:26 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-igmp.c,v 1.11 2002-12-11 07:14:02 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -51,7 +51,7 @@ struct tr_query {
     u_int32_t  tr_dst;          /* traceroute destination */
     u_int32_t  tr_raddr;        /* traceroute response address */
     u_int32_t  tr_rttlqid;      /* response ttl and qid */
-} __attribute__((packed));
+};
 
 #define TR_GETTTL(x)        (int)(((x) >> 24) & 0xff)
 #define TR_GETQID(x)        ((x) & 0x00ffffff)
@@ -72,7 +72,7 @@ struct tr_resp {
     u_int8_t  tr_fttl;        /* ttl required to forward on outvif */
     u_int8_t  tr_smask;       /* subnet mask for src addr */
     u_int8_t  tr_rflags;      /* forwarding error codes */
-} __attribute__((packed));
+};
 
 /* defs within mtrace */
 #define TR_QUERY 1
@@ -116,12 +116,12 @@ print_mtrace(register const u_char *bp, register u_int len)
 	(void)printf(" [invalid len %d]", len);
 	return;
     }
-    printf("mtrace %lu: %s to %s reply-to %s",
-        (u_long)TR_GETQID(ntohl(tr->tr_rttlqid)),
+    printf("mtrace %u: %s to %s reply-to %s",
+        TR_GETQID(EXTRACT_32BITS(&tr->tr_rttlqid)),
         ipaddr_string(&tr->tr_src), ipaddr_string(&tr->tr_dst),
         ipaddr_string(&tr->tr_raddr));
-    if (IN_CLASSD(ntohl(tr->tr_raddr)))
-        printf(" with-ttl %d", TR_GETTTL(ntohl(tr->tr_rttlqid)));
+    if (IN_CLASSD(EXTRACT_32BITS(&tr->tr_raddr)))
+        printf(" with-ttl %d", TR_GETTTL(EXTRACT_32BITS(&tr->tr_rttlqid)));
     return;
 trunc:
     (void)printf("[|igmp]");
@@ -139,11 +139,11 @@ print_mresp(register const u_char *bp, register u_int len)
 	return;
     }
     printf("mresp %lu: %s to %s reply-to %s",
-        (u_long)TR_GETQID(ntohl(tr->tr_rttlqid)),
+        (u_long)TR_GETQID(EXTRACT_32BITS(&tr->tr_rttlqid)),
         ipaddr_string(&tr->tr_src), ipaddr_string(&tr->tr_dst),
         ipaddr_string(&tr->tr_raddr));
-    if (IN_CLASSD(ntohl(tr->tr_raddr)))
-        printf(" with-ttl %d", TR_GETTTL(ntohl(tr->tr_rttlqid)));
+    if (IN_CLASSD(EXTRACT_32BITS(&tr->tr_raddr)))
+        printf(" with-ttl %d", TR_GETTTL(EXTRACT_32BITS(&tr->tr_rttlqid)));
     return;
 trunc:
     (void)printf("[|igmp]");

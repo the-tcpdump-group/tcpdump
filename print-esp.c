@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.30 2002-11-13 09:35:13 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.31 2002-12-11 07:13:59 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -58,6 +58,7 @@ static const char rcsid[] =
 #define AVOID_CHURN 1
 #include "interface.h"
 #include "addrtoname.h"
+#include "extract.h"
 
 static struct esp_algorithm *espsecret_xform=NULL;  /* cache of decoded alg. */
 static char                 *espsecret_key=NULL;
@@ -215,8 +216,8 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 		fputs("[|ESP]", stdout);
 		goto fail;
 	}
-	printf("ESP(spi=0x%08x", (u_int32_t)ntohl(esp->esp_spi));
-	printf(",seq=0x%x", (u_int32_t)ntohl(esp->esp_seq));
+	printf("ESP(spi=0x%08x", EXTRACT_32BITS(&esp->esp_spi));
+	printf(",seq=0x%x", EXTRACT_32BITS(&esp->esp_seq));
 	printf(")");
 
 	/* if we don't have decryption key, we can't decrypt this packet. */
@@ -237,20 +238,20 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 		ip6 = (struct ip6_hdr *)bp2;
 		ip = NULL;
 		/* we do not attempt to decrypt jumbograms */
-		if (!ntohs(ip6->ip6_plen))
+		if (!EXTRACT_16BITS(&ip6->ip6_plen))
 			goto fail;
 		/* if we can't get nexthdr, we do not need to decrypt it */
-		len = sizeof(struct ip6_hdr) + ntohs(ip6->ip6_plen);
+		len = sizeof(struct ip6_hdr) + EXTRACT_16BITS(&ip6->ip6_plen);
 		break;
 #endif /*INET6*/
 	case 4:
 		/* nexthdr & padding are in the last fragment */
-		if (ntohs(ip->ip_off) & IP_MF)
+		if (EXTRACT_16BITS(&ip->ip_off) & IP_MF)
 			goto fail;
 #ifdef INET6
 		ip6 = NULL;
 #endif
-		len = ntohs(ip->ip_len);
+		len = EXTRACT_16BITS(&ip->ip_len);
 		break;
 	default:
 		goto fail;

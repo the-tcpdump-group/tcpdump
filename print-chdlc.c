@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.23 2002-12-04 19:06:50 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.24 2002-12-11 07:13:58 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -155,7 +155,7 @@ struct cisco_slarp {
 			u_int16_t t2;
 		} keep;
 	} un;
-} __attribute__((packed));
+};
 
 #define SLARP_LEN	18
 
@@ -171,7 +171,7 @@ chdlc_slarp_print(const u_char *cp, u_int length)
 
 	slarp = (const struct cisco_slarp *)cp;
         printf("SLARP (length: %u), ",length);
-	switch (ntohl(slarp->code)) {
+	switch (EXTRACT_32BITS(&slarp->code)) {
 	case SLARP_REQUEST:
 		printf("request");
                 /* ok we do not know it - but lets at least dump it */
@@ -184,14 +184,15 @@ chdlc_slarp_print(const u_char *cp, u_int length)
 		break;
 	case SLARP_KEEPALIVE:
 		printf("keepalive: mineseen=0x%08x, yourseen=0x%08x",
-			(u_int32_t)ntohl(slarp->un.keep.myseq),
-			(u_int32_t)ntohl(slarp->un.keep.yourseq));
+			EXTRACT_32BITS(&slarp->un.keep.myseq),
+			EXTRACT_32BITS(&slarp->un.keep.yourseq));
 		printf(", reliability=0x%04x, t1=%d.%d",
-			ntohs(slarp->un.keep.rel), ntohs(slarp->un.keep.t1),
-			ntohs(slarp->un.keep.t2));
+			EXTRACT_16BITS(&slarp->un.keep.rel),
+			EXTRACT_16BITS(&slarp->un.keep.t1),
+			EXTRACT_16BITS(&slarp->un.keep.t2));
 		break;
 	default:
-		printf("0x%02x unknown", (u_int32_t)ntohl(slarp->code));
+		printf("0x%02x unknown", EXTRACT_32BITS(&slarp->code));
                 if (vflag <= 1)
                     print_unknown_data(cp+4,"\n\t",length-4);
 		break;

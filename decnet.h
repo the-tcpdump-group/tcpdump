@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/decnet.h,v 1.10 2002-11-09 17:19:17 itojun Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/decnet.h,v 1.11 2002-12-11 07:13:50 guy Exp $ (LBL)
  */
 
 #ifndef WIN32
@@ -42,7 +42,7 @@ union etheraddress {
 		u_int8_t dne_hiord[4];	/* DECnet HIORD prefix */
 		u_int8_t dne_nodeaddr[2]; /* DECnet node address */
 	} dne_remote;
-} __attribute__((packed));
+};
 
 typedef union etheraddress etheraddr;	/* Ethernet address */
 
@@ -56,7 +56,7 @@ typedef union etheraddress etheraddr;	/* Ethernet address */
 struct dn_naddr {
 	u_int16_t	a_len;		/* length of address */
 	u_int8_t a_addr[DN_MAXADDL]; /* address as bytes */
-} __attribute__((packed));
+};
 
 /*
  * Define long and short header formats.
@@ -67,7 +67,7 @@ struct shorthdr
     word	sh_dst;			/* destination node address */
     word	sh_src;			/* source node address */
     byte	sh_visits;		/* visit count */
-  } __attribute__((packed));
+  };
 
 struct longhdr
   {
@@ -82,13 +82,13 @@ struct longhdr
     byte	lg_visits;		/* visit count */
     byte	lg_service;		/* service class (reserved) */
     byte	lg_pt;			/* protocol type (reserved) */
-  } __attribute__((packed));
+  };
 
 union routehdr
   {
     struct shorthdr rh_short;		/* short route header */
     struct longhdr rh_long;		/* long route header */
-  } __attribute__((packed));
+  };
 
 /*
  * Define the values of various fields in the protocol messages.
@@ -160,7 +160,7 @@ struct initmsgIII			/* phase III initialization message */
     byte	inIII_eco;		/* ECO number */
     byte	inIII_ueco;		/* user ECO number */
     byte	inIII_rsvd;		/* reserved image field */
-  } __attribute__((packed));
+  };
 
 struct initmsg				/* initialization message */
   {
@@ -173,35 +173,35 @@ struct initmsg				/* initialization message */
     byte	in_ueco;		/* user ECO number */
     word	in_hello;		/* hello timer */
     byte	in_rsvd;		/* reserved image field */
-  } __attribute__((packed));
+  };
 
 struct verifmsg				/* verification message */
   {
     byte	ve_flags;		/* route flags */
     word	ve_src;			/* source node address */
     byte	ve_fcnval;		/* function value image field */
-  } __attribute__((packed));
+  };
 
 struct testmsg				/* hello and test message */
   {
     byte	te_flags;		/* route flags */
     word	te_src;			/* source node address */
     byte	te_data;		/* test data image field */
-  } __attribute__((packed));
+  };
 
 struct l1rout				/* level 1 routing message */
   {
     byte	r1_flags;		/* route flags */
     word	r1_src;			/* source node address */
     byte	r1_rsvd;		/* reserved field */
-  } __attribute__((packed));
+  };
 
 struct l2rout				/* level 2 routing message */
   {
     byte	r2_flags;		/* route flags */
     word	r2_src;			/* source node address */
     byte	r2_rsvd;		/* reserved field */
-  } __attribute__((packed));
+  };
 
 struct rhellomsg			/* router hello message */
   {
@@ -216,7 +216,7 @@ struct rhellomsg			/* router hello message */
     byte	rh_area;		/* reserved */
     word	rh_hello;		/* hello timer */
     byte	rh_mpd;			/* reserved */
-  } __attribute__((packed));
+  };
 
 struct ehellomsg			/* endnode hello message */
   {
@@ -233,7 +233,7 @@ struct ehellomsg			/* endnode hello message */
     word	eh_hello;		/* hello timer */
     byte	eh_mpd;			/* (reserved) */
     byte	eh_data;		/* test data image field */
-  } __attribute__((packed));
+  };
 
 union controlmsg
   {
@@ -244,7 +244,7 @@ union controlmsg
     struct l2rout	cm_l2rout;	/* level 2 routing message */
     struct rhellomsg	cm_rhello;	/* router hello message */
     struct ehellomsg	cm_ehello;	/* endnode hello message */
-  } __attribute__((packed));
+  };
 
 /* Macros for decoding routing-info fields */
 #define	RI_COST(x)	((x)&0777)
@@ -366,7 +366,7 @@ struct nsphdr				/* general nsp header */
     byte	nh_flags;		/* message flags */
     word	nh_dst;			/* destination link address */
     word	nh_src;			/* source link address */
-  } __attribute__((packed));
+  };
 
 struct seghdr				/* data segment header */
   {
@@ -374,7 +374,7 @@ struct seghdr				/* data segment header */
     word	sh_dst;			/* destination link address */
     word	sh_src;			/* source link address */
     word	sh_seq[3];		/* sequence numbers */
-  } __attribute__((packed));
+  };
 
 struct minseghdr			/* minimum data segment header */
   {
@@ -382,13 +382,13 @@ struct minseghdr			/* minimum data segment header */
     word	ms_dst;			/* destination link address */
     word	ms_src;			/* source link address */
     word	ms_seq;			/* sequence number */
-  } __attribute__((packed));
+  };
 
 struct lsmsg				/* link service message (after hdr) */
   {
     byte	ls_lsflags;		/* link service flags */
     byte	ls_fcval;		/* flow control value */
-  } __attribute__((packed));
+  };
 
 struct ackmsg				/* acknowledgement message */
   {
@@ -396,7 +396,7 @@ struct ackmsg				/* acknowledgement message */
     word	ak_dst;			/* destination link address */
     word	ak_src;			/* source link address */
     word	ak_acknum[2];		/* acknowledgement numbers */
-  } __attribute__((packed));
+  };
 
 struct minackmsg			/* minimum acknowledgement message */
   {
@@ -404,13 +404,13 @@ struct minackmsg			/* minimum acknowledgement message */
     word	mk_dst;			/* destination link address */
     word	mk_src;			/* source link address */
     word	mk_acknum;		/* acknowledgement number */
-  } __attribute__((packed));
+  };
 
 struct ciackmsg				/* connect acknowledgement message */
   {
     byte	ck_flags;		/* message flags */
     word	ck_dst;			/* destination link address */
-  } __attribute__((packed));
+  };
 
 struct cimsg				/* connect initiate message */
   {
@@ -420,7 +420,7 @@ struct cimsg				/* connect initiate message */
     byte	ci_services;		/* requested services */
     byte	ci_info;		/* information */
     word	ci_segsize;		/* maximum segment size */
-  } __attribute__((packed));
+  };
 
 struct ccmsg				/* connect confirm message */
   {
@@ -431,7 +431,7 @@ struct ccmsg				/* connect confirm message */
     byte	cc_info;		/* information */
     word	cc_segsize;		/* maximum segment size */
     byte	cc_optlen;		/* optional data length */
-  } __attribute__((packed));
+  };
 
 struct cnmsg				/* generic connect message */
   {
@@ -441,7 +441,7 @@ struct cnmsg				/* generic connect message */
     byte	cn_services;		/* requested services */
     byte	cn_info;		/* information */
     word	cn_segsize;		/* maximum segment size */
-  } __attribute__((packed));
+  };
 
 struct dimsg				/* disconnect initiate message */
   {
@@ -450,7 +450,7 @@ struct dimsg				/* disconnect initiate message */
     word	di_src;			/* source link address */
     word	di_reason;		/* reason code */
     byte	di_optlen;		/* optional data length */
-  } __attribute__((packed));
+  };
 
 struct dcmsg				/* disconnect confirm message */
   {
@@ -458,4 +458,4 @@ struct dcmsg				/* disconnect confirm message */
     word	dc_dst;			/* destination link address */
     word	dc_src;			/* source link address */
     word	dc_reason;		/* reason code */
-  } __attribute__((packed));
+  };

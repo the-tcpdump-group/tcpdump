@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.35 2002-11-09 17:19:28 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.36 2002-12-11 07:14:06 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -47,7 +47,7 @@ struct pim {
 #define PIM_TYPE(x)	((x) & 0x0f)
 	u_char  pim_rsv;	/* Reserved */
 	u_short	pim_cksum;	/* IP style check sum */
-} __attribute__((packed));
+};
 
 
 #include <stdio.h>

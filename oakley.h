@@ -26,7 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-/* YIPS @(#)$Id: oakley.h,v 1.3 2002-11-09 17:19:22 itojun Exp $ */
+/* YIPS @(#)$Id: oakley.h,v 1.4 2002-12-11 07:13:56 guy Exp $ */
 
 /* refer to RFC 2409 */
 
@@ -120,7 +120,7 @@ struct oakley_sa {
 	u_int8_t  enc_t;               /* type of cipher */
 	u_int8_t  life_t;              /* type of duration of lifetime */
 	u_int32_t ldur;                /* life duration */
-} __attribute__((packed));
+};
 #endif
 
 #endif /* !defined(_ISAKMP_OAKLEY_H_) */

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.103 2002-09-05 21:25:49 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.104 2002-12-11 07:14:09 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -146,7 +146,7 @@ static int tcp6_cksum(const struct ip6_hdr *ip6, const struct tcphdr *tp,
 		u_int16_t pa[20];
 	} phu;
 
-	tlen = ntohs(ip6->ip6_plen) + sizeof(struct ip6_hdr) -
+	tlen = EXTRACT_16BITS(&ip6->ip6_plen) + sizeof(struct ip6_hdr) -
 	    ((const char *)tp - (const char*)ip6);
 
 	/* pseudo-header */
@@ -208,8 +208,8 @@ tcp_print(register const u_char *bp, register u_int length,
 		return;
 	}
 
-	sport = ntohs(tp->th_sport);
-	dport = ntohs(tp->th_dport);
+	sport = EXTRACT_16BITS(&tp->th_sport);
+	dport = EXTRACT_16BITS(&tp->th_dport);
 
 	hlen = TH_OFF(tp) * 4;
 
@@ -261,10 +261,10 @@ tcp_print(register const u_char *bp, register u_int length,
 
 	TCHECK(*tp);
 
-	seq = (u_int32_t)ntohl(tp->th_seq);
-	ack = (u_int32_t)ntohl(tp->th_ack);
-	win = ntohs(tp->th_win);
-	urp = ntohs(tp->th_urp);
+	seq = EXTRACT_32BITS(&tp->th_seq);
+	ack = EXTRACT_32BITS(&tp->th_ack);
+	win = EXTRACT_16BITS(&tp->th_win);
+	urp = EXTRACT_16BITS(&tp->th_urp);
 
 	if (qflag) {
 		(void)printf("tcp %d", length - TH_OFF(tp) * 4);
@@ -289,6 +289,7 @@ tcp_print(register const u_char *bp, register u_int length,
 
 	if (!Sflag && (flags & TH_ACK)) {
 		register struct tcp_seq_hash *th;
+		const void *src, *dst;
 		register int rev;
 		struct tha tha;
 		/*
@@ -301,63 +302,68 @@ tcp_print(register const u_char *bp, register u_int length,
 		memset(&tha, 0, sizeof(tha));
 		rev = 0;
 		if (ip6) {
+			src = &ip6->ip6_src;
+			dst = &ip6->ip6_dst;
 			if (sport > dport)
 				rev = 1;
 			else if (sport == dport) {
-				int i;
-
-				for (i = 0; i < 4; i++) {
-					if (((u_int32_t *)(&ip6->ip6_src))[i] >
-					    ((u_int32_t *)(&ip6->ip6_dst))[i]) {
-						rev = 1;
-						break;
-					}
-				}
+				if (memcmp(src, dst, sizeof ip6->ip6_dst) > 0)
+					rev = 1;
 			}
 			if (rev) {
-				tha.src = ip6->ip6_dst;
-				tha.dst = ip6->ip6_src;
+				memcpy(&tha.src, dst, sizeof ip6->ip6_dst);
+				memcpy(&tha.dst, src, sizeof ip6->ip6_src);
 				tha.port = dport << 16 | sport;
 			} else {
-				tha.dst = ip6->ip6_dst;
-				tha.src = ip6->ip6_src;
+				memcpy(&tha.dst, dst, sizeof ip6->ip6_dst);
+				memcpy(&tha.src, src, sizeof ip6->ip6_src);
 				tha.port = sport << 16 | dport;
 			}
 		} else {
-			if (sport > dport ||
-			    (sport == dport &&
-			     ip->ip_src.s_addr > ip->ip_dst.s_addr)) {
+			src = &ip->ip_src;
+			dst = &ip->ip_dst;
+			if (sport > dport)
 				rev = 1;
+			else if (sport == dport) {
+				if (memcmp(src, dst, sizeof ip->ip_dst) > 0)
+					rev = 1;
 			}
 			if (rev) {
-				*(struct in_addr *)&tha.src = ip->ip_dst;
-				*(struct in_addr *)&tha.dst = ip->ip_src;
+				memcpy(&tha.src, dst, sizeof ip->ip_dst);
+				memcpy(&tha.dst, src, sizeof ip->ip_src);
 				tha.port = dport << 16 | sport;
 			} else {
-				*(struct in_addr *)&tha.dst = ip->ip_dst;
-				*(struct in_addr *)&tha.src = ip->ip_src;
+				memcpy(&tha.dst, dst, sizeof ip->ip_dst);
+				memcpy(&tha.src, src, sizeof ip->ip_src);
 				tha.port = sport << 16 | dport;
 			}
 		}
 #else
-		if (sport < dport ||
-		    (sport == dport &&
-		     ip->ip_src.s_addr < ip->ip_dst.s_addr)) {
-			tha.src = ip->ip_src, tha.dst = ip->ip_dst;
-			tha.port = sport << 16 | dport;
-			rev = 0;
-		} else {
-			tha.src = ip->ip_dst, tha.dst = ip->ip_src;
-			tha.port = dport << 16 | sport;
+		rev = 0;
+		src = &ip->ip_src;
+		dst = &ip->ip_dst;
+		if (sport > dport)
 			rev = 1;
+		else if (sport == dport) {
+			if (memcmp(src, dst, sizeof ip->ip_dst) > 0)
+				rev = 1;
+		}
+		if (rev) {
+			memcpy(&tha.src, dst, sizeof ip->ip_dst);
+			memcpy(&tha.dst, src, sizeof ip->ip_src);
+			tha.port = dport << 16 | sport;
+		} else {
+			memcpy(&tha.dst, dst, sizeof ip->ip_dst);
+			memcpy(&tha.src, src, sizeof ip->ip_src);
+			tha.port = sport << 16 | dport;
 		}
 #endif
 
 		threv = rev;
 		for (th = &tcp_seq_hash[tha.port % TSEQ_HASHSIZE];
 		     th->nxt; th = th->nxt)
-			if (!memcmp((char *)&tha, (char *)&th->addr,
-				  sizeof(th->addr)))
+			if (memcmp((char *)&tha, (char *)&th->addr,
+				  sizeof(th->addr)) == 0)
 				break;
 
 		if (!th->nxt || (flags & TH_SYN)) {
@@ -396,7 +402,7 @@ tcp_print(register const u_char *bp, register u_int length,
 		if (TTEST2(tp->th_sport, length)) {
 			sum = tcp_cksum(ip, tp, length);
 			if (sum != 0) {
-				tcp_sum = ntohs(tp->th_sum);
+				tcp_sum = EXTRACT_16BITS(&tp->th_sum);
 				(void)printf(" [bad tcp cksum %x (->%x)!]",
 				    tcp_sum, in_cksum_shouldbe(tcp_sum, sum));
 			} else

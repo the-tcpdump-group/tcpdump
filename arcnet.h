@@ -30,7 +30,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * @(#) $Id: arcnet.h,v 1.1 2001-04-17 08:39:18 guy Exp $ (LBL)
+ * @(#) $Id: arcnet.h,v 1.2 2002-12-11 07:13:50 guy Exp $ (LBL)
  *
  * from: NetBSD: if_arc.h,v 1.13 1999/11/19 20:41:19 thorpej Exp
  */
@@ -56,7 +56,7 @@ struct	arc_header {
 	u_int8_t  arc_type2;	/* same as arc_type */
 	u_int8_t  arc_flag2;	/* real flag value */
 	u_int16_t arc_seqid2;	/* real seqid value */
-} __attribute__((__packed__));
+};
 
 #define	ARC_HDRLEN		3
 #define	ARC_HDRNEWLEN		6

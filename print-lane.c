@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lane.c,v 1.16 2002-09-05 21:25:43 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lane.c,v 1.17 2002-12-11 07:14:04 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -36,6 +36,7 @@ static const char rcsid[] =
 
 #include "interface.h"
 #include "addrtoname.h"
+#include "extract.h"
 #include "ether.h"
 #include "lane.h"
 
@@ -67,13 +68,13 @@ lane_hdr_print(register const u_char *bp, int length)
 	ep = (const struct lecdatahdr_8023 *)bp;
 	if (qflag)
 		(void)printf("lecid:%x %s %s %d: ",
-			     ntohs(ep->le_header),
+			     EXTRACT_16BITS(&ep->le_header),
 			     etheraddr_string(ep->h_source),
 			     etheraddr_string(ep->h_dest),
 			     length);
 	else
 		(void)printf("lecid:%x %s %s %s %d: ",
-			     ntohs(ep->le_header),
+			     EXTRACT_16BITS(&ep->le_header),
 			     etheraddr_string(ep->h_source),
 			     etheraddr_string(ep->h_dest),
 			     etherproto_string(ep->h_type),
@@ -102,13 +103,13 @@ lane_print(const u_char *p, u_int length, u_int caplen)
 	}
 
 	lec = (struct lane_controlhdr *)p;
-	if (ntohs(lec->lec_header) == 0xff00) {
+	if (EXTRACT_16BITS(&lec->lec_header) == 0xff00) {
 		/*
 		 * LE Control.
 		 */
 		printf("lec: proto %x vers %x %s",
 		    lec->lec_proto, lec->lec_vers,
-		    tok2str(lecop2str, "opcode-#%u", ntohs(lec->lec_opcode)));
+		    tok2str(lecop2str, "opcode-#%u", EXTRACT_16BITS(&lec->lec_opcode)));
 		return;
 	}
 
@@ -133,7 +134,7 @@ lane_print(const u_char *p, u_int length, u_int caplen)
 	ep = (struct lecdatahdr_8023 *)p;
 	p += sizeof(struct lecdatahdr_8023);
 
-	ether_type = ntohs(ep->h_type);
+	ether_type = EXTRACT_16BITS(&ep->h_type);
 
 	/*
 	 * Is it (gag) an 802.3 encapsulation?

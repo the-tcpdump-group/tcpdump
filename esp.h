@@ -46,7 +46,7 @@ struct esp {
 	/*8bit*/			/* next header */
 	/*8bit*/			/* next header */
 	/*variable size, 32bit bound*/	/* Authentication data (new IPsec) */
-} __attribute__((packed));
+};
 
 struct newesp {
 	u_int32_t	esp_spi;	/* ESP */
@@ -57,12 +57,12 @@ struct newesp {
 	/*8bit*/			/* next header */
 	/*8bit*/			/* next header */
 	/*variable size, 32bit bound*/	/* Authentication data */
-} __attribute__((packed));
+};
 
 struct esptail {
 	u_int8_t	esp_padlen;	/* pad length */
 	u_int8_t	esp_nxt;	/* Next header */
 	/*variable size, 32bit bound*/	/* Authentication data (new IPsec)*/
-} __attribute__((packed));
+};
 
 #endif /*_NETINET6_ESP_H_*/

@@ -32,7 +32,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.22 2002-08-02 04:05:51 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.23 2002-12-11 07:13:59 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -46,6 +46,7 @@ static const char rcsid[] =
 
 #include "interface.h"
 #include "addrtoname.h"
+#include "extract.h"
 
 /* lease duration */
 #define DHCP6_DURATITION_INFINITE 0xffffffff
@@ -74,7 +75,7 @@ struct dhcp6 {
 		u_int32_t x;
 	} dh6_msgtypexid;
 	/* options follow */
-} __attribute__ ((__packed__));
+};
 #define dh6_msgtype	dh6_msgtypexid.m
 #define dh6_xid		dh6_msgtypexid.x
 #define DH6_XIDMASK	0x00ffffff
@@ -127,7 +128,7 @@ struct dhcp6opt {
 	u_int16_t dh6opt_type;
 	u_int16_t dh6opt_len;
 	/* type-dependent data follows */
-} __attribute__ ((__packed__));
+};
 
 static char *
 dhcp6opt_name(int type)
@@ -212,10 +213,10 @@ dhcp6opt_print(u_char *cp, u_char *ep)
 		if (ep - cp < sizeof(*dh6o))
 			goto trunc;
 		dh6o = (struct dhcp6opt *)cp;
-		optlen = ntohs(dh6o->dh6opt_len);
+		optlen = EXTRACT_16BITS(&dh6o->dh6opt_len);
 		if (ep - cp < sizeof(*dh6o) + optlen)
 			goto trunc;
-		opttype = ntohs(dh6o->dh6opt_type);
+		opttype = EXTRACT_16BITS(&dh6o->dh6opt_type);
 		printf(" (%s", dhcp6opt_name(opttype));
 		switch (opttype) {
 		case DH6OPT_CLIENTID:
@@ -226,12 +227,12 @@ dhcp6opt_print(u_char *cp, u_char *ep)
 				break;
 			}
 			tp = (u_char *)(dh6o + 1);
-			switch (ntohs(*(u_int16_t *)tp)) {
+			switch (EXTRACT_16BITS(tp)) {
 			case 1:
 				if (optlen >= 2 + 6) {
 					printf(" hwaddr/time type %u time %u ",
-					    ntohs(*(u_int16_t *)&tp[2]),
-					    ntohl(*(u_int32_t *)&tp[4]));
+					    EXTRACT_16BITS(&tp[2]),
+					    EXTRACT_32BITS(&tp[4]));
 					for (i = 8; i < optlen; i++)
 						printf("%02x", tp[i]);
 					/*(*/
@@ -256,7 +257,7 @@ dhcp6opt_print(u_char *cp, u_char *ep)
 			case 3:
 				if (optlen >= 2 + 2) {
 					printf(" hwaddr type %u ",
-					    ntohs(*(u_int16_t *)&tp[2]));
+					    EXTRACT_16BITS(&tp[2]));
 					for (i = 4; i < optlen; i++)
 						printf("%02x", tp[i]);
 					/*(*/
@@ -267,7 +268,7 @@ dhcp6opt_print(u_char *cp, u_char *ep)
 				}
 				break;
 			default:
-				printf(" type %d)", ntohs(*(u_int16_t *)tp));
+				printf(" type %d)", EXTRACT_16BITS(tp));
 				break;
 			}
 			break;
@@ -406,7 +407,7 @@ dhcp6_print(register const u_char *cp, u_int length,
 		printf(" %s (", name);	/*)*/
 	else
 		printf(" msgtype-%u (", dh6->dh6_msgtype);	/*)*/
-	printf("xid=%x", ntohl(dh6->dh6_xid) & DH6_XIDMASK);
+	printf("xid=%x", EXTRACT_32BITS(&dh6->dh6_xid) & DH6_XIDMASK);
 	extp = (u_char *)(dh6 + 1);
 	dhcp6opt_print(extp, ep);
 	/*(*/

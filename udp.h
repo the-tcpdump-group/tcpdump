@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/udp.h,v 1.3 2002-11-09 17:19:33 itojun Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/udp.h,v 1.4 2002-12-11 07:14:12 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1982, 1986, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -43,4 +43,4 @@ struct udphdr {
 	u_int16_t	uh_dport;		/* destination port */
 	u_int16_t	uh_ulen;		/* udp length */
 	u_int16_t	uh_sum;			/* udp checksum */
-} __attribute__((packed));
+};

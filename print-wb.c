@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-wb.c,v 1.29 2002-11-09 17:19:31 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-wb.c,v 1.30 2002-12-11 07:14:10 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -34,8 +34,10 @@ static const char rcsid[] =
 
 #include "interface.h"
 #include "addrtoname.h"
+#include "extract.h"
 
 /* XXX need to add byte-swapping macros! */
+/* XXX - you mean like the ones in "extract.h"? */
 
 /*
  * Largest packet size.  Everything should fit within this space.
@@ -51,7 +53,7 @@ static const char rcsid[] =
 #define DOP_ROUNDUP(x)	((((int)(x)) + (DOP_ALIGN - 1)) & ~(DOP_ALIGN - 1))
 #define DOP_NEXT(d)\
 	((struct dophdr *)((u_char *)(d) + \
-			  DOP_ROUNDUP(ntohs((d)->dh_len) + sizeof(*(d)))))
+			  DOP_ROUNDUP(EXTRACT_16BITS(&(d)->dh_len) + sizeof(*(d)))))
 
 /*
  * Format of the whiteboard packet header.
@@ -63,7 +65,7 @@ struct pkt_hdr {
 	u_int16_t ph_version;	/* version number */
 	u_char ph_type;		/* message type */
 	u_char ph_flags;	/* message flags */
-} __attribute__((packed));
+};
 
 /* Packet types */
 #define PT_DRAWOP	0	/* drawing operation */
@@ -85,7 +87,7 @@ struct pkt_hdr {
 struct PageID {
 	u_int32_t p_sid;		/* session id of initiator */
 	u_int32_t p_uid;		/* page number */
-} __attribute__((packed));
+};
 
 struct dophdr {
 	u_int32_t  dh_ts;		/* sender's timestamp */
@@ -93,7 +95,7 @@ struct dophdr {
 	u_char	dh_flags;
 	u_char	dh_type;	/* body type */
 	/* body follows */
-} __attribute__((packed));
+};
 /*
  * Drawing op sub-types.
  */
@@ -121,7 +123,7 @@ struct pkt_dop {
 	u_int32_t	pd_sseq;	/* start sequence number */
 	u_int32_t	pd_eseq;	/* end sequence number */
 	/* drawing ops follow */
-} __attribute__((packed));
+};
 
 /*
  * A repair request.
@@ -131,7 +133,7 @@ struct pkt_rreq {
         struct PageID pr_page;           /* page of drawops */
         u_int32_t pr_sseq;         /* start seqno */
         u_int32_t pr_eseq;         /* end seqno */
-} __attribute__((packed));
+};
 
 /*
  * A repair reply.
@@ -140,12 +142,12 @@ struct pkt_rrep {
 	u_int32_t pr_id;	/* original site id of ops  */
 	struct pkt_dop pr_dop;
 	/* drawing ops follow */
-} __attribute__((packed));
+};
 
 struct id_off {
         u_int32_t id;
         u_int32_t off;
-} __attribute__((packed));
+};
 
 struct pgstate {
 	u_int32_t slot;
@@ -153,7 +155,7 @@ struct pgstate {
 	u_int16_t nid;
 	u_int16_t rsvd;
         /* seqptr's */
-} __attribute__((packed));
+};
 
 /*
  * An announcement packet.
@@ -164,18 +166,18 @@ struct pkt_id {
 	struct pgstate pi_ps;
         /* seqptr's */
         /* null-terminated site name */
-} __attribute__((packed));
+};
 
 struct pkt_preq {
         struct PageID  pp_page;
         u_int32_t  pp_low;
         u_int32_t  pp_high;
-} __attribute__((packed));
+};
 
 struct pkt_prep {
         u_int32_t  pp_n;           /* size of pageid array */
         /* pgstate's follow */
-} __attribute__((packed));
+};
 
 static int
 wb_id(const struct pkt_id *id, u_int len)
@@ -192,14 +194,14 @@ wb_id(const struct pkt_id *id, u_int len)
 	len -= sizeof(*id);
 
 	printf(" %u/%s:%u (max %u/%s:%u) ",
-	       (u_int32_t)ntohl(id->pi_ps.slot),
+	       EXTRACT_32BITS(&id->pi_ps.slot),
 	       ipaddr_string(&id->pi_ps.page.p_sid),
-	       (u_int32_t)ntohl(id->pi_ps.page.p_uid),
-	       (u_int32_t)ntohl(id->pi_mslot),
+	       EXTRACT_32BITS(&id->pi_ps.page.p_uid),
+	       EXTRACT_32BITS(&id->pi_mslot),
 	       ipaddr_string(&id->pi_mpage.p_sid),
-	       (u_int32_t)ntohl(id->pi_mpage.p_uid));
+	       EXTRACT_32BITS(&id->pi_mpage.p_uid));
 
-	nid = ntohs(id->pi_ps.nid);
+	nid = EXTRACT_16BITS(&id->pi_ps.nid);
 	len -= sizeof(*io) * nid;
 	io = (struct id_off *)(id + 1);
 	cp = (char *)(io + nid);
@@ -212,7 +214,7 @@ wb_id(const struct pkt_id *id, u_int len)
 	c = '<';
 	for (i = 0; i < nid && (u_char *)io < snapend; ++io, ++i) {
 		printf("%c%s:%u",
-		    c, ipaddr_string(&io->id), (u_int32_t)ntohl(io->off));
+		    c, ipaddr_string(&io->id), EXTRACT_32BITS(&io->off));
 		c = ',';
 	}
 	if (i >= nid) {
@@ -232,9 +234,9 @@ wb_rreq(const struct pkt_rreq *rreq, u_int len)
 	printf(" please repair %s %s:%u<%u:%u>",
 	       ipaddr_string(&rreq->pr_id),
 	       ipaddr_string(&rreq->pr_page.p_sid),
-	       (u_int32_t)ntohl(rreq->pr_page.p_uid),
-	       (u_int32_t)ntohl(rreq->pr_sseq),
-	       (u_int32_t)ntohl(rreq->pr_eseq));
+	       EXTRACT_32BITS(&rreq->pr_page.p_uid),
+	       EXTRACT_32BITS(&rreq->pr_sseq),
+	       EXTRACT_32BITS(&rreq->pr_eseq));
 	return (0);
 }
 
@@ -246,9 +248,9 @@ wb_preq(const struct pkt_preq *preq, u_int len)
 		return (-1);
 
 	printf(" need %u/%s:%u",
-	       (u_int32_t)ntohl(preq->pp_low),
+	       EXTRACT_32BITS(&preq->pp_low),
 	       ipaddr_string(&preq->pp_page.p_sid),
-	       (u_int32_t)ntohl(preq->pp_page.p_uid));
+	       EXTRACT_32BITS(&preq->pp_page.p_uid));
 	return (0);
 }
 
@@ -263,20 +265,20 @@ wb_prep(const struct pkt_prep *prep, u_int len)
 	if (len < sizeof(*prep)) {
 		return (-1);
 	}
-	n = ntohl(prep->pp_n);
+	n = EXTRACT_32BITS(&prep->pp_n);
 	ps = (const struct pgstate *)(prep + 1);
 	while (--n >= 0 && (u_char *)ps < ep) {
 		const struct id_off *io, *ie;
 		char c = '<';
 
 		printf(" %u/%s:%u",
-		    (u_int32_t)ntohl(ps->slot),
+		    EXTRACT_32BITS(&ps->slot),
 		    ipaddr_string(&ps->page.p_sid),
-		    (u_int32_t)ntohl(ps->page.p_uid));
+		    EXTRACT_32BITS(&ps->page.p_uid));
 		io = (struct id_off *)(ps + 1);
 		for (ie = io + ps->nid; io < ie && (u_char *)io < ep; ++io) {
 			printf("%c%s:%u", c, ipaddr_string(&io->id),
-			    (u_int32_t)ntohl(io->off));
+			    EXTRACT_32BITS(&io->off));
 			c = ',';
 		}
 		printf(">");
@@ -317,7 +319,7 @@ wb_dops(const struct dophdr *dh, u_int32_t ss, u_int32_t es)
 		else {
 			printf(" %s", dopstr[t]);
 			if (t == DT_SKIP || t == DT_HOLE) {
-				u_int32_t ts = ntohl(dh->dh_ts);
+				u_int32_t ts = EXTRACT_32BITS(&dh->dh_ts);
 				printf("%d", ts - ss + 1);
 				if (ss > ts || ts > es) {
 					printf("[|]");
@@ -350,13 +352,14 @@ wb_rrep(const struct pkt_rrep *rrep, u_int len)
 	printf(" for %s %s:%u<%u:%u>",
 	    ipaddr_string(&rrep->pr_id),
 	    ipaddr_string(&dop->pd_page.p_sid),
-	    (u_int32_t)ntohl(dop->pd_page.p_uid),
-	    (u_int32_t)ntohl(dop->pd_sseq),
-	    (u_int32_t)ntohl(dop->pd_eseq));
+	    EXTRACT_32BITS(&dop->pd_page.p_uid),
+	    EXTRACT_32BITS(&dop->pd_sseq),
+	    EXTRACT_32BITS(&dop->pd_eseq));
 
 	if (vflag)
 		return (wb_dops((const struct dophdr *)(dop + 1),
-		    ntohl(dop->pd_sseq), ntohl(dop->pd_eseq)));
+		    EXTRACT_32BITS(&dop->pd_sseq),
+		    EXTRACT_32BITS(&dop->pd_eseq)));
 	return (0);
 }
 
@@ -370,13 +373,14 @@ wb_drawop(const struct pkt_dop *dop, u_int len)
 
 	printf(" %s:%u<%u:%u>",
 	    ipaddr_string(&dop->pd_page.p_sid),
-	    (u_int32_t)ntohl(dop->pd_page.p_uid),
-	    (u_int32_t)ntohl(dop->pd_sseq),
-	    (u_int32_t)ntohl(dop->pd_eseq));
+	    EXTRACT_32BITS(&dop->pd_page.p_uid),
+	    EXTRACT_32BITS(&dop->pd_sseq),
+	    EXTRACT_32BITS(&dop->pd_eseq));
 
 	if (vflag)
 		return (wb_dops((const struct dophdr *)(dop + 1),
-				ntohl(dop->pd_sseq), ntohl(dop->pd_eseq)));
+				EXTRACT_32BITS(&dop->pd_sseq),
+				EXTRACT_32BITS(&dop->pd_eseq)));
 	return (0);
 }
 

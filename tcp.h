@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/tcp.h,v 1.9 2002-11-09 17:19:32 itojun Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/tcp.h,v 1.10 2002-12-11 07:14:11 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1982, 1986, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -58,7 +58,7 @@ struct tcphdr {
 	u_int16_t	th_win;			/* window */
 	u_int16_t	th_sum;			/* checksum */
 	u_int16_t	th_urp;			/* urgent pointer */
-} __attribute__((packed));
+};
 
 #define	TCPOPT_EOL		0
 #define	TCPOPT_NOP		1

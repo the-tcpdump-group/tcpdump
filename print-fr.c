@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.7 2002-11-09 17:19:25 itojun Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.8 2002-12-11 07:14:00 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -347,7 +347,7 @@ out:
 struct q933_header {
     u_int8_t call_ref;  /* usually is 0 for framerelay PVC */
     u_int8_t msg_type;  
-} __attribute__((packed));
+};
 
 #define REPORT_TYPE_IE    0x01
 #define LINK_VERIFY_IE_91 0x19
@@ -359,7 +359,7 @@ struct q933_header {
 struct common_ie_header {
     u_int8_t ie_id;
     u_int8_t ie_len;
-} __attribute__((packed));
+};
 
 #define FULL_STATUS 0
 #define LINK_VERIFY 1

@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ether.h,v 1.7 2002-11-09 17:19:18 itojun Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ether.h,v 1.8 2002-12-11 07:13:51 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1982, 1986, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -48,7 +48,7 @@ struct	ether_header {
 	u_int8_t	ether_dhost[ETHER_ADDR_LEN];
 	u_int8_t	ether_shost[ETHER_ADDR_LEN];
 	u_int16_t	ether_type;
-} __attribute__((packed));
+};
 
 /*
  * Length of a DEC/Intel/Xerox or 802.3 Ethernet header; note that some

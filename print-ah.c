@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ah.c,v 1.18 2002-09-05 21:25:36 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ah.c,v 1.19 2002-12-11 07:13:57 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -38,6 +38,7 @@ static const char rcsid[] =
 
 #include "interface.h"
 #include "addrtoname.h"
+#include "extract.h"
 
 int
 ah_print(register const u_char *bp)
@@ -53,12 +54,12 @@ ah_print(register const u_char *bp)
 	TCHECK(*ah);
 
 	sumlen = ah->ah_len << 2;
-	spi = (u_int32_t)ntohl(ah->ah_spi);
+	spi = EXTRACT_32BITS(&ah->ah_spi);
 
 	printf("AH(spi=0x%08x", spi);
 	if (vflag)
 		printf(",sumlen=%d", sumlen);
-	printf(",seq=0x%x", (u_int32_t)ntohl(*(const u_int32_t *)(ah + 1)));
+	printf(",seq=0x%x", EXTRACT_32BITS(ah + 1));
 	if (bp + sizeof(struct ah) + sumlen > ep)
 		fputs("[truncated]", stdout);
 	fputs("): ", stdout);

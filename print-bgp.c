@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.55 2002-11-09 17:19:24 itojun Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.56 2002-12-11 07:13:58 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -52,7 +52,7 @@ struct bgp {
 	u_int8_t bgp_marker[16];
 	u_int16_t bgp_len;
 	u_int8_t bgp_type;
-} __attribute__((packed));
+};
 #define BGP_SIZE		19	/* unaligned */
 
 #define BGP_OPEN		1
@@ -80,14 +80,14 @@ struct bgp_open {
 	u_int32_t bgpo_id;
 	u_int8_t bgpo_optlen;
 	/* options should follow */
-} __attribute__((packed));
+};
 #define BGP_OPEN_SIZE		29	/* unaligned */
 
 struct bgp_opt {
 	u_int8_t bgpopt_type;
 	u_int8_t bgpopt_len;
 	/* variable length */
-} __attribute__((packed));
+};
 #define BGP_OPT_SIZE		2	/* some compilers may pad to 4 bytes */
 
 struct bgp_notification {
@@ -97,7 +97,7 @@ struct bgp_notification {
 	u_int8_t bgpn_major;
 	u_int8_t bgpn_minor;
 	/* data should follow */
-} __attribute__((packed));
+};
 #define BGP_NOTIFICATION_SIZE		21	/* unaligned */
 
 struct bgp_route_refresh {
@@ -107,7 +107,7 @@ struct bgp_route_refresh {
     u_int8_t  afi[2]; /* the compiler messes this structure up               */
     u_int8_t  res;    /* when doing misaligned sequences of int8 and int16   */
     u_int8_t  safi;   /* afi should be int16 - so we have to access it using */
-} __attribute__((packed)); /* EXTRACT_16BITS(&bgp_route_refresh->afi) (sigh) */ 
+};                    /* EXTRACT_16BITS(&bgp_route_refresh->afi) (sigh)      */ 
 #define BGP_ROUTE_REFRESH_SIZE          23
 
 struct bgp_attr {
@@ -119,10 +119,10 @@ struct bgp_attr {
 	} bgpa_len;
 #define bgp_attr_len(p) \
 	(((p)->bgpa_flags & 0x10) ? \
-		ntohs((p)->bgpa_len.elen) : (p)->bgpa_len.len)
+		EXTRACT_16BITS(&(p)->bgpa_len.elen) : (p)->bgpa_len.len)
 #define bgp_attr_off(p) \
 	(((p)->bgpa_flags & 0x10) ? 4 : 3)
-} __attribute__((packed));
+};
 
 #define BGPTYPE_ORIGIN			1
 #define BGPTYPE_AS_PATH			2

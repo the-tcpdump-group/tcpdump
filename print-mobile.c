@@ -42,7 +42,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-mobile.c,v 1.11 2002-11-09 17:19:28 itojun Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-mobile.c,v 1.12 2002-12-11 07:14:05 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -60,7 +60,7 @@ struct mobile_ip {
 	u_int16_t hcheck;
 	u_int32_t odst;
 	u_int32_t osrc;
-} __attribute__((packed));
+};
 
 #define OSRC_PRES	0x0080	/* old source is present */
 

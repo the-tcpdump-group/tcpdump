@@ -25,7 +25,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ntp.c,v 1.34 2002-08-01 08:53:21 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ntp.c,v 1.35 2002-12-11 07:14:06 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -39,6 +39,7 @@ static const char rcsid[] =
 
 #include "interface.h"
 #include "addrtoname.h"
+#include "extract.h"
 #ifdef MODEMASK
 #undef MODEMASK					/* Solaris sucks */
 #endif
@@ -197,8 +198,8 @@ p_sfix(register const struct s_fixedpt *sfp)
 	register int f;
 	register float ff;
 
-	i = ntohs(sfp->int_part);
-	f = ntohs(sfp->fraction);
+	i = EXTRACT_16BITS(&sfp->int_part);
+	f = EXTRACT_16BITS(&sfp->fraction);
 	ff = f / 65536.0;	/* shift radix point by 16 bits */
 	f = ff * 1000000.0;	/* Treat fraction as parts per million */
 	printf("%d.%06d", i, f);
@@ -214,8 +215,8 @@ p_ntp_time(register const struct l_fixedpt *lfp)
 	register u_int32_t f;
 	register float ff;
 
-	i = ntohl(lfp->int_part);
-	uf = ntohl(lfp->fraction);
+	i = EXTRACT_32BITS(&lfp->int_part);
+	uf = EXTRACT_32BITS(&lfp->fraction);
 	ff = uf;
 	if (ff < 0.0)		/* some compilers are buggy */
 		ff += FMAXINT;
@@ -236,10 +237,10 @@ p_ntp_delta(register const struct l_fixedpt *olfp,
 	register float ff;
 	int signbit;
 
-	i = ntohl(lfp->int_part) - ntohl(olfp->int_part);
+	i = EXTRACT_32BITS(&lfp->int_part) - EXTRACT_32BITS(&olfp->int_part);
 
-	uf = ntohl(lfp->fraction);
-	ouf = ntohl(olfp->fraction);
+	uf = EXTRACT_32BITS(&lfp->fraction);
+	ouf = EXTRACT_32BITS(&olfp->fraction);
 
 	if (i > 0) {		/* new is definitely greater than old */
 		signbit = 0;

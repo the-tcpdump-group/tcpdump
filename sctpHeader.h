@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/sctpHeader.h,v 1.5 2002-11-09 17:19:32 itojun Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/sctpHeader.h,v 1.6 2002-12-11 07:14:11 guy Exp $ (LBL) */
 
 /* SCTP reference Implementation Copyright (C) 1999 Cisco And Motorola
  *
@@ -64,7 +64,7 @@ struct sctpHeader{
   u_int16_t destination;
   u_int32_t verificationTag;
   u_int32_t adler32;
-} __attribute__((packed));
+};
 
 /* various descriptor parsers */
 
@@ -72,25 +72,25 @@ struct sctpChunkDesc{
   u_int8_t chunkID;
   u_int8_t chunkFlg;
   u_int16_t chunkLength;
-} __attribute__((packed));
+};
 
 struct sctpParamDesc{
   u_int16_t paramType;
   u_int16_t paramLength;
-} __attribute__((packed));
+};
 
 
 struct sctpRelChunkDesc{
   struct sctpChunkDesc chk;
   u_int32_t serialNumber;
-} __attribute__((packed));
+};
 
 struct sctpVendorSpecificParam {
   struct sctpParamDesc p;  /* type must be 0xfffe */
   u_int32_t vendorId;	   /* vendor ID from RFC 1700 */
   u_int16_t vendorSpecificType;
   u_int16_t vendorSpecificLen;
-} __attribute__((packed));
+};
 
 
 /* Structures for the control parts */
@@ -107,35 +107,35 @@ struct sctpInitiation{
   u_int16_t MaxInboundStreams;     /* MIS */
   u_int32_t initialTSN;
   /* optional param's follow in sctpParamDesc form */
-} __attribute__((packed));
+};
 
 struct sctpV4IpAddress{
   struct sctpParamDesc p;	/* type is set to SCTP_IPV4_PARAM_TYPE, len=10 */
   u_int32_t  ipAddress;
-} __attribute__((packed));
+};
 
 
 struct sctpV6IpAddress{
   struct sctpParamDesc p;	/* type is set to SCTP_IPV6_PARAM_TYPE, len=22 */
   u_int8_t  ipAddress[16];
-} __attribute__((packed));
+};
 
 struct sctpDNSName{
   struct sctpParamDesc param;
   u_int8_t name[1];
-} __attribute__((packed));
+};
 
 
 struct sctpCookiePreserve{
   struct sctpParamDesc p;	/* type is set to SCTP_COOKIE_PRESERVE, len=8 */
   u_int32_t extraTime;
-} __attribute__((packed));
+};
 
 
 struct sctpTimeStamp{
   u_int32_t ts_sec;
   u_int32_t ts_usec;
-} __attribute__((packed));
+};
 
 /* wire structure of my cookie */
 struct cookieMessage{
@@ -152,7 +152,7 @@ struct cookieMessage{
    * its entirety and of course our
    * signature.
    */
-} __attribute__((packed));
+};
 
 
 /* this guy is for use when
@@ -163,12 +163,12 @@ struct cookieMessage{
 struct sctpUnifiedInit{
   struct sctpChunkDesc uh;
   struct sctpInitiation initm;
-} __attribute__((packed));
+};
 
 struct sctpSendableInit{
   struct sctpHeader mh;
   struct sctpUnifiedInit msg;
-} __attribute__((packed));
+};
 
 
 /* Selective Acknowledgement
@@ -183,18 +183,18 @@ struct sctpSelectiveAck{
   u_int32_t updatedRwnd;
   u_int16_t numberOfdesc;
   u_int16_t numDupTsns;
-} __attribute__((packed));
+};
 
 struct sctpSelectiveFrag{
   u_int16_t fragmentStart;
   u_int16_t fragmentEnd;
-} __attribute__((packed));
+};
 
 
 struct sctpUnifiedSack{
   struct sctpChunkDesc uh;
   struct sctpSelectiveAck sack;
-} __attribute__((packed));
+};
 
 /* for both RTT request/response the
  * following is sent
@@ -203,13 +203,13 @@ struct sctpUnifiedSack{
 struct sctpHBrequest {
   u_int32_t time_value_1;
   u_int32_t time_value_2;
-} __attribute__((packed));
+};
 
 /* here is what I read and respond with to. */
 struct sctpHBunified{
   struct sctpChunkDesc hdr;
   struct sctpParamDesc hb;
-} __attribute__((packed));
+};
 
 
 /* here is what I send */
@@ -219,7 +219,7 @@ struct sctpHBsender{
   struct sctpHBrequest rtt;
   int8_t addrFmt[SCTP_ADDRMAX];
   u_int16_t userreq;
-} __attribute__((packed));
+};
 
 
 
@@ -229,31 +229,31 @@ struct sctpHBsender{
  */
 struct sctpUnifiedAbort{
   struct sctpChunkDesc uh;
-} __attribute__((packed));
+};
 
 struct sctpUnifiedAbortLight{
   struct sctpHeader mh;
   struct sctpChunkDesc uh;
-} __attribute__((packed));
+};
 
 struct sctpUnifiedAbortHeavy{
   struct sctpHeader mh;
   struct sctpChunkDesc uh;
   u_int16_t causeCode;
   u_int16_t causeLen;
-} __attribute__((packed));
+};
 
 /* For the graceful shutdown we must carry
  * the tag (in common header)  and the highest consequitive acking value
  */
 struct sctpShutdown {
   u_int32_t TSN_Seen;
-} __attribute__((packed));
+};
 
 struct sctpUnifiedShutdown{
   struct sctpChunkDesc uh;
   struct sctpShutdown shut;
-} __attribute__((packed));
+};
 
 /* in the unified message we add the trailing
  * stream id since it is the only message
@@ -262,12 +262,12 @@ struct sctpUnifiedShutdown{
 struct sctpOpErrorCause{
   u_int16_t cause;
   u_int16_t causeLen;
-} __attribute__((packed));
+};
 
 struct sctpUnifiedOpError{
   struct sctpChunkDesc uh;
   struct sctpOpErrorCause c;
-} __attribute__((packed));
+};
 
 struct sctpUnifiedStreamError{
   struct sctpHeader mh;
@@ -275,14 +275,14 @@ struct sctpUnifiedStreamError{
   struct sctpOpErrorCause c;
   u_int16_t strmNum;
   u_int16_t reserved;
-} __attribute__((packed));
+};
 
 struct staleCookieMsg{
   struct sctpHeader mh;
   struct sctpChunkDesc uh;
   struct sctpOpErrorCause c;
   u_int32_t moretime;
-} __attribute__((packed));
+};
 
 /* the following is used in all sends
  * where nothing is needed except the
@@ -291,30 +291,30 @@ struct staleCookieMsg{
 struct sctpUnifiedSingleMsg{
   struct sctpHeader mh;
   struct sctpChunkDesc uh;
-} __attribute__((packed));
+};
 
 struct sctpDataPart{
   u_int32_t TSN;
   u_int16_t streamId;
   u_int16_t sequence;
   u_int32_t payloadtype;
-} __attribute__((packed));
+};
 
 struct sctpUnifiedDatagram{
   struct sctpChunkDesc uh;
   struct sctpDataPart dp;
-} __attribute__((packed));
+};
 
 struct sctpECN_echo{
   struct sctpChunkDesc uh;
   u_int32_t Lowest_TSN;
-} __attribute__((packed));
+};
 
 
 struct sctpCWR{
   struct sctpChunkDesc uh;
   u_int32_t TSN_reduced_at;
-} __attribute__((packed));
+};
 
 #ifdef	__cplusplus
 }
