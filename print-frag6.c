@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-frag6.c,v 1.16.2.2 2003-11-16 08:51:23 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-frag6.c,v 1.16.2.3 2003-11-19 00:35:43 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -71,7 +71,7 @@ frag6_print(register const u_char *bp, register const u_char *bp2)
 #if 1
 	/* it is meaningless to decode non-first fragment */
 	if ((EXTRACT_16BITS(&dp->ip6f_offlg) & IP6F_OFF_MASK) != 0)
-		return 65535;
+		return -1;
 	else
 #endif
 	{
@@ -80,7 +80,7 @@ frag6_print(register const u_char *bp, register const u_char *bp2)
 	}
 trunc:
 	fputs("[|frag]", stdout);
-	return 65535;
+	return -1;
 #undef TCHECK
 }
 #endif /* INET6 */

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ipcomp.c,v 1.17.2.2 2003-11-16 08:51:27 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ipcomp.c,v 1.17.2.3 2003-11-19 00:35:45 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -48,7 +48,7 @@ struct ipcomp {
 #include "extract.h"
 
 int
-ipcomp_print(register const u_char *bp, int *nhdr)
+ipcomp_print(register const u_char *bp, int *nhdr _U_)
 {
 	register const struct ipcomp *ipcomp;
 	register const u_char *ep;
@@ -87,7 +87,5 @@ ipcomp_print(register const u_char *bp, int *nhdr)
 
 #endif
 fail:
-	if (nhdr)
-		*nhdr = -1;
-	return 65536;
+	return -1;
 }
