@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.9 2004-06-16 06:38:08 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.10 2004-06-16 10:35:29 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -408,6 +408,7 @@ lspping_print(register const u_char *pptr, register u_int len) {
     int tlen,lspping_tlv_len,lspping_tlv_type,tlv_tlen;
     int tlv_hexdump,subtlv_hexdump;
     int lspping_subtlv_len,lspping_subtlv_type;
+    struct timeval timestamp; 
 
     union {
         const struct lspping_tlv_targetfec_subtlv_ldp_ipv4_t *lspping_tlv_targetfec_subtlv_ldp_ipv4;
@@ -478,14 +479,22 @@ lspping_print(register const u_char *pptr, register u_int len) {
                lspping_com_header->return_code,
                lspping_com_header->return_subcode);
  
-    printf("\n\t  Sender Handle: 0x%08x, Sequence: %u" \
-           "\n\t  Sender Timestamp %u.%us, Receiver Timestamp %u.%us",
+    printf("\n\t  Sender Handle: 0x%08x, Sequence: %u",
            EXTRACT_32BITS(lspping_com_header->sender_handle),
-           EXTRACT_32BITS(lspping_com_header->seq_number),
-           EXTRACT_32BITS(lspping_com_header->ts_sent_sec), /* FIXME: replace with ts_print() */
-           EXTRACT_32BITS(lspping_com_header->ts_sent_usec),
-           EXTRACT_32BITS(lspping_com_header->ts_rcvd_sec), /* FIXME: replace with ts_print() */
-           EXTRACT_32BITS(lspping_com_header->ts_rcvd_usec));
+           EXTRACT_32BITS(lspping_com_header->seq_number));
+
+    timestamp.tv_sec=EXTRACT_32BITS(lspping_com_header->ts_sent_sec);
+    timestamp.tv_usec=EXTRACT_32BITS(lspping_com_header->ts_sent_usec);     
+    printf("\n\t  Sender Timestamp: ");
+    ts_print(&timestamp);
+
+    timestamp.tv_sec=EXTRACT_32BITS(lspping_com_header->ts_rcvd_sec);
+    timestamp.tv_usec=EXTRACT_32BITS(lspping_com_header->ts_rcvd_usec); 
+    printf("Receiver Timestamp: ");
+    if ((timestamp.tv_sec != 0) && (timestamp.tv_usec != 0))
+        ts_print(&timestamp);
+    else
+        printf("no timestamp");
 
     tptr+=sizeof(const struct lspping_common_header);
     tlen-=sizeof(const struct lspping_common_header);
