@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.96 2001-05-09 01:06:31 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.97 2001-05-29 15:35:20 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -425,7 +425,7 @@ again:
 #endif
 			ip_print(cp, len);
 			if (! vflag) {
-				printf(" (ipip)");
+				printf(" (ipip-proto-4)");
 				return;
 			}
 			break;
