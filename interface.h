@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.148 2000-12-21 10:43:21 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.149 2001-01-02 22:47:06 guy Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -45,26 +45,6 @@ int snprintf (char *str, size_t sz, const char *format, ...)
 
 #if !defined(HAVE_VSNPRINTF)
 int vsnprintf (char *str, size_t sz, const char *format, va_list ap)
-     __attribute__((format (printf, 3, 0)));
-#endif
-
-#if !defined(HAVE_ASPRINTF)
-int asprintf (char **ret, const char *format, ...)
-     __attribute__ ((format (printf, 2, 3)));
-#endif
-
-#if !defined(HAVE_VASPRINTF)
-int vasprintf (char **ret, const char *format, va_list ap)
-     __attribute__((format (printf, 2, 0)));
-#endif
-
-#if !defined(HAVE_ASNPRINTF)
-int asnprintf (char **ret, size_t max_sz, const char *format, ...)
-     __attribute__ ((format (printf, 3, 4)));
-#endif
-
-#if !defined(HAVE_VASNPRINTF)
-int vasnprintf (char **ret, size_t max_sz, const char *format, va_list ap)
      __attribute__((format (printf, 3, 0)));
 #endif
 

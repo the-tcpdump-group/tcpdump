@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.130 
+# From configure.in Revision: 1.131 
 
 
 
@@ -3010,7 +3010,7 @@ EOF
 fi
 
 needsnprintf=no
-for ac_func in vsnprintf snprintf asprintf asnprintf vasprintf vasnprintf
+for ac_func in vsnprintf snprintf
 do
 echo $ac_n "checking for $ac_func""... $ac_c" 1>&6
 echo "configure:3017: checking for $ac_func" >&5
@@ -4019,7 +4019,7 @@ fi
     else
 	    V_PCAPDEP=$libpcap
 	    if test -r $d/pcap.h; then
-	    V_INCLS="-I$d $V_INCLS"
+		    V_INCLS="-I$d $V_INCLS"
 	    elif test -r $srcdir/../libpcap/pcap.h; then
 		    V_INCLS="-I$d -I$srcdir/../libpcap $V_INCLS"
 	    else

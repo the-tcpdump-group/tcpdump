@@ -98,12 +98,6 @@
 /* The number of bytes in a short.  */
 #undef SIZEOF_SHORT
 
-/* Define if you have the asnprintf function.  */
-#undef HAVE_ASNPRINTF
-
-/* Define if you have the asprintf function.  */
-#undef HAVE_ASPRINTF
-
 /* Define if you have the bpf_dump function.  */
 #undef HAVE_BPF_DUMP
 
@@ -157,12 +151,6 @@
 
 /* Define if you have the strlcpy function.  */
 #undef HAVE_STRLCPY
-
-/* Define if you have the vasnprintf function.  */
-#undef HAVE_VASNPRINTF
-
-/* Define if you have the vasprintf function.  */
-#undef HAVE_VASPRINTF
 
 /* Define if you have the vfprintf function.  */
 #undef HAVE_VFPRINTF
