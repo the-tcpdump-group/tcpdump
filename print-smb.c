@@ -12,12 +12,14 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.20 2002-01-17 04:38:29 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.21 2002-02-06 11:14:51 guy Exp $";
 #endif
 
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
+
+#include <netinet/in.h>
 
 #include "interface.h"
 #include "extract.h"
