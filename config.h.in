@@ -11,9 +11,6 @@
 /* Define if you can safely include both <sys/time.h> and <time.h>.  */
 #undef TIME_WITH_SYS_TIME
 
-/* Define if you have SSLeay 0.9.0b with the buggy cast128. */
-#undef HAVE_BUGGY_CAST128
-
 /* Define if you enable IPv6 support */
 #undef INET6
 
@@ -196,11 +193,8 @@
 /* Define if you have the <netinet/if_ether.h> header file.  */
 #undef HAVE_NETINET_IF_ETHER_H
 
-/* Define if you have the <openssl/cast.h> header file.  */
-#undef HAVE_OPENSSL_CAST_H
-
-/* Define if you have the <openssl/rc5.h> header file.  */
-#undef HAVE_OPENSSL_RC5_H
+/* Define if you have the <openssl/evp.h> header file.  */
+#undef HAVE_OPENSSL_EVP_H
 
 /* Define if you have the <rpc/rpcent.h> header file.  */
 #undef HAVE_RPC_RPCENT_H
