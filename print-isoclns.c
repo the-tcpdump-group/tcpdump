@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.83 2003-05-10 16:33:07 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.84 2003-05-22 16:52:37 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -479,8 +479,7 @@ print_nsap(register const u_int8_t *pptr, register int nsap_length)
 #define ISIS_CSNP_HEADER_SIZE (sizeof(struct isis_csnp_header))
 #define ISIS_PSNP_HEADER_SIZE (sizeof(struct isis_psnp_header))
 
-void isoclns_print(const u_int8_t *p, u_int length, u_int caplen,
-	      const u_int8_t *esrc, const u_int8_t *edst)
+void isoclns_print(const u_int8_t *p, u_int length, u_int caplen)
 {
 	u_int8_t pdu_type;
 	const struct isis_common_header *header;
@@ -488,11 +487,7 @@ void isoclns_print(const u_int8_t *p, u_int length, u_int caplen,
 	header = (const struct isis_common_header *)p;
 	pdu_type = header->pdu_type & PDU_TYPE_MASK;
 
-        printf("%sOSI ", caplen < 1 ? "|" : "");
-        if (!eflag && esrc != NULL && edst != NULL)
-                (void)printf("%s > %s, ",
-                         etheraddr_string(esrc),
-                         etheraddr_string(edst));
+        printf("%sOSI", caplen < 1 ? "|" : "");
 
         if (caplen < 1) /* enough bytes on the wire ? */
                 return;
@@ -500,7 +495,7 @@ void isoclns_print(const u_int8_t *p, u_int length, u_int caplen,
 	switch (*p) {
 
 	case NLPID_CLNS:
-		(void)printf("CLNS, length: %u", length);
+		(void)printf(", CLNS, length %u", length);
 		break;
 
 	case NLPID_ESIS:
@@ -513,11 +508,11 @@ void isoclns_print(const u_int8_t *p, u_int length, u_int caplen,
 		break;
 
 	case NLPID_NULLNS:
-		(void)printf("ISO NULLNS, length: %u", length);
+		(void)printf(", ISO NULLNS, length: %u", length);
 		break;
 
 	default:
-		(void)printf("Unknown NLPID 0x%02x, length: %u", p[0], length);
+		(void)printf(", Unknown NLPID 0x%02x, length: %u", p[0], length);
 		if (caplen > 1)
                         print_unknown_data(p,"\n\t",caplen);
 		break;
@@ -578,7 +573,7 @@ esis_print(const u_int8_t *p, u_int length)
 		return;
 	}
 
-        printf("ES-IS, %s, length: %u",
+        printf(", ES-IS, %s, length %u",
                tok2str(esis_values,"unknown type: %u",eh->type & 0x1f),
                length);
 
@@ -1293,7 +1288,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 
     /* in non-verbose mode just lets print the basic PDU Type*/
     if (vflag < 1) {
-        printf("IS-IS, %s, length: %u",
+        printf(", IS-IS, %s, length %u",
                tok2str(isis_pdu_values,"unknown PDU-Type %u",pdu_type),
                length);
         return(1);

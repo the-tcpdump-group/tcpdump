@@ -38,7 +38,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-gre.c,v 1.21 2002-10-31 07:17:02 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-gre.c,v 1.22 2003-05-22 16:52:37 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -187,7 +187,7 @@ gre_print_0(const u_char *bp, u_int length)
 		ip_print(bp, len);
 		break;
 	case GREPROTO_ISO:
-		isoclns_print(bp, len, len, NULL, NULL);
+		isoclns_print(bp, len, len);
 		break;
 	default:
 		printf("gre-proto-0x%x", prot);

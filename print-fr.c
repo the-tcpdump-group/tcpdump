@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.11 2002-12-19 09:39:12 guy Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.12 2003-05-22 16:52:37 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -245,7 +245,7 @@ fr_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 	case NLPID_CLNP:
 	case NLPID_ESIS:
 	case NLPID_ISIS:
-		isoclns_print(p, length, caplen, NULL, NULL);
+		isoclns_print(p, length, caplen);
 		break;
 
 	case NLPID_SNAP:

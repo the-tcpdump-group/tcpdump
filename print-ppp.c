@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.87 2003-05-22 15:54:53 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.88 2003-05-22 16:52:38 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -990,7 +990,7 @@ handle_ppp(u_int proto, const u_char *p, int length)
 		ipx_print(p, length);
 		break;
 	case PPP_OSI:
-	        isoclns_print(p, length, length, NULL, NULL);
+	        isoclns_print(p, length, length);
 	        break;
 	case PPP_MPLS_UCAST:
 	case PPP_MPLS_MCAST:

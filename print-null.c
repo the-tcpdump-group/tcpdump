@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-null.c,v 1.48 2003-02-05 02:28:45 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-null.c,v 1.49 2003-05-22 16:52:38 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -175,7 +175,7 @@ null_if_print(const struct pcap_pkthdr *h, const u_char *p)
 #endif
 
 	case BSD_AF_ISO:
-		isoclns_print(p, length, caplen, NULL, NULL);
+		isoclns_print(p, length, caplen);
 		break;
 
 	case BSD_AF_APPLETALK:

@@ -28,7 +28,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-mpls.c,v 1.7 2003-05-08 15:05:41 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-mpls.c,v 1.8 2003-05-22 16:52:38 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -168,7 +168,7 @@ mpls_print(const u_char *bp, u_int length)
                     case 0x83:
 		        if (vflag>0) {
                             printf("\n\t");
-                            isoclns_print(p, length - (p - bp), length - (p - bp), NULL, NULL);
+                            isoclns_print(p, length - (p - bp), length - (p - bp));
 			    }
 			else printf(", OSI, length: %u",length);
                         break;
