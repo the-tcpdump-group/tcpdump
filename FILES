@@ -3,7 +3,6 @@ FILES
 INSTALL
 Makefile.in
 README
-README-AFS
 VERSION
 acconfig.h
 aclocal.m4
@@ -33,7 +32,6 @@ ipx.h
 isakmp.h
 l2tp.h
 lane.h
-lbl/gnuc.h
 lbl/os-solaris2.h
 lbl/os-sunos4.h
 lbl/os-ultrix4.h
