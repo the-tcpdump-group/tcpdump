@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.32 2001-12-03 09:17:07 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.33 2001-12-09 03:43:22 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -100,6 +100,7 @@ static const char rcsid[] =
 #define TLV_TE_ROUTER_ID	134
 #define TLV_EXT_IP_REACH	135
 #define	TLV_HOSTNAME		137
+#define TLV_RESTART_SIGNALING   211
 #define	TLV_MT_IS_REACH		222
 #define	TLV_MT_SUPPORTED	229
 #define TLV_IP6ADDR             232
@@ -135,6 +136,9 @@ static const char rcsid[] =
 #define ISIS_MASK_TLV_IP6_UPDOWN(x)        ((x)&0x80)
 #define ISIS_MASK_TLV_IP6_IE(x)            ((x)&0x40)
 #define ISIS_MASK_TLV_IP6_SUBTLV(x)        ((x)&0x20)
+
+#define ISIS_MASK_RESTART_RR(x)            ((x)&0x1)
+#define ISIS_MASK_RESTART_RA(x)            ((x)&0x2)
 
 #define ISIS_LSP_TLV_METRIC_SUPPORTED(x)   ((x)&0x80)
 #define ISIS_LSP_TLV_METRIC_IE(x)          ((x)&0x40)
@@ -1461,6 +1465,19 @@ static int isis_print (const u_char *p, u_int length)
 	    }
 	    break;
 
+	case TLV_RESTART_SIGNALING:
+	    tptr=pptr;
+	    printf("Restart Signaling (%u)",len);
+		    if (!TTEST2(*tptr, 3))
+			goto trunctlv;
+		    
+	    printf("\n\t\t\tRestart Request bit %s, Restart Acknowledgement bit %s\n\t\t\tRemaining holding time: %us",
+                   ISIS_MASK_RESTART_RR(*tptr) ? "set" : "clear",
+		   ISIS_MASK_RESTART_RA(*tptr++) ? "set" : "clear",
+		   EXTRACT_16BITS(tptr));
+
+	    break;
+
 	default:
 	    printf("unknown TLV, type %d, length %d\n\t\t\t", type, len);
 	    tptr=pptr;
@@ -1468,10 +1485,14 @@ static int isis_print (const u_char *p, u_int length)
 	    for(i=0;i<len;i++) {
 		if (!TTEST2(*(tptr+i), 1))
 		    goto trunctlv;
-		printf("%02x",*(tptr+i));
-		if (i/2!=(i+1)/2)
+		printf("%02x",*(tptr+i)); /* formatted hex output of unknown TLV data */
+		if (i%2)
 		    printf(" ");
-	    }	    
+		if (i/16!=(i+1)/16) {
+		  if (i<(len-1))
+		    printf("\n\t\t\t");
+		}
+	    }
 	    break;
 	}
 
