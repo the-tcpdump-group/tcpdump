@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.85 2003-06-06 23:47:53 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.86 2003-06-07 07:12:11 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1257,7 +1257,7 @@ static int isis_print (const u_int8_t *p, u_int length)
     }
 
     /* ok they seem to want to know everything - lets fully decode it */
-    printf("IS-IS, length: %u",length);
+    printf(", IS-IS, length: %u",length);
 
     printf("\n\thlen: %u, v: %u, pdu-v: %u, sys-id-len: %u (%u), max-area: %u (%u)",
            header->fixed_len,
