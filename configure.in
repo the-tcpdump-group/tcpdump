@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.114 2000-04-27 10:50:28 itojun Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.115 2000-05-10 08:20:53 itojun Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.114 $)
+AC_REVISION($Revision: 1.115 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -350,7 +350,6 @@ if test "$ac_cv_struct_icmp6_mld" = "yes"; then
   AC_DEFINE(HAVE_STRUCT_ICMP6_MLD, 1, [define if you have struct icmp6_mld])
 fi
 
-
 AC_CACHE_CHECK([for struct mld6_hdr],
 ac_cv_struct_mld6_hdr,
 [AC_EGREP_CPP([mld6_hdr],[dnl
@@ -363,6 +362,19 @@ if test "$ac_cv_struct_mld6_hdr" = "yes"; then
   AC_DEFINE(HAVE_STRUCT_MLD6_HDR, 1, [define if you have struct mld6hdr])
 fi
 
+dnl check for struct icmp6_nodeinfo
+
+AC_CACHE_CHECK([for struct icmp6_nodeinfo],
+ac_cv_struct_icmp6_nodeinfo,
+[AC_EGREP_CPP([icmp6_nodeinfo],[dnl
+#include <sys/types.h>
+#include <netinet/icmp6.h>
+],
+ac_cv_struct_icmp6_nodeinfo=yes,
+ac_cv_struct_icmp6_nodeinfo=no)])
+if test "$ac_cv_struct_icmp6_nodeinfo" = "yes"; then
+  AC_DEFINE(HAVE_STRUCT_ICMP6_NODEINFO, 1, [define if you have struct icmp6_nodeinfo])
+fi
 
 dnl portability macros for getaddrinfo/getnameinfo
 dnl

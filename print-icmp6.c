@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.7 2000-04-28 11:46:12 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.8 2000-05-10 08:20:52 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -61,11 +61,51 @@ static const char rcsid[] =
 
 void icmp6_opt_print(const u_char *, int);
 void mld6_print(const u_char *);
+#ifdef HAVE_STRUCT_ICMP6_NODEINFO
+void icmp6_nodeinfo_print(int, const u_char *, const u_char *);
+#endif
+
+#ifndef abs
+#define abs(a)	((0 < (a)) ? (a) : -(a))
+#endif
+
+#ifndef HAVE_STRUCT_ICMP6_NODEINFO
+struct icmp6_nodeinfo {
+	struct icmp6_hdr icmp6_ni_hdr;
+	u_int8_t icmp6_ni_nonce[8];
+	/* could be followed by reply data */
+};
+
+#define ni_type		icmp6_ni_hdr.icmp6_type
+#define ni_code		icmp6_ni_hdr.icmp6_code
+#define ni_cksum	icmp6_ni_hdr.icmp6_cksum
+#define ni_qtype	icmp6_ni_hdr.icmp6_data16[0]
+#define ni_flags	icmp6_ni_hdr.icmp6_data16[1]
+#endif
+
+#ifndef ICMP6_NI_SUCCESS
+#define ICMP6_NI_SUCESS		0	/* node information successful reply */
+#define ICMP6_NI_REFUSED	1	/* node information request is refused */
+#define ICMP6_NI_UNKNOWN	2	/* unknown Qtype */
+#endif
+
+#ifdef NI_QTYPE_NOOP
+#define NI_QTYPE_NOOP		0 /* NOOP  */
+#define NI_QTYPE_SUPTYPES	1 /* Supported Qtypes */
+#define NI_QTYPE_FQDN		2 /* FQDN */
+#define NI_QTYPE_NODEADDR	3 /* Node Addresses. XXX: spec says 2, but it may be a typo... */
+#endif
+
+#ifndef ICMP6_NI_SUBJ_IPV6
+#define ICMP6_NI_SUBJ_IPV6	0	/* Query Subject is an IPv6 address */
+#define ICMP6_NI_SUBJ_FQDN	1	/* Query Subject is a Domain name */
+#define ICMP6_NI_SUBJ_IPV4	2	/* Query Subject is an IPv4 address */
+#endif
 
 void
 icmp6_print(register const u_char *bp, register const u_char *bp2)
 {
-	register const struct icmp6_hdr *dp;
+	const struct icmp6_hdr *dp;
 	register const struct ip6_hdr *ip;
 	register const char *str;
 	register const struct ip6_hdr *oip;
@@ -74,6 +114,7 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 	register const u_char *ep;
 	char buf[256];
 	int icmp6len;
+	struct icmp6_nodeinfo *ni6;
 
 #if 0
 #define TCHECK(var) if ((u_char *)&(var) > ep - sizeof(var)) goto trunc
@@ -292,27 +333,25 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 #define NDADVLEN 24
 			icmp6_opt_print((const u_char *)dp + NDADVLEN,
 					icmp6len - NDADVLEN);
+#undef NDADVLEN
 		}
 	    }
 		break;
 	case ND_REDIRECT:
-	{
 #define RDR(i) ((struct nd_redirect *)(i))
-		char tgtbuf[INET6_ADDRSTRLEN], dstbuf[INET6_ADDRSTRLEN];
-
 		TCHECK(RDR(dp)->nd_rd_dst);
-		inet_ntop(AF_INET6, &RDR(dp)->nd_rd_target,
-			  tgtbuf, INET6_ADDRSTRLEN);
-		inet_ntop(AF_INET6, &RDR(dp)->nd_rd_dst,
-			  dstbuf, INET6_ADDRSTRLEN);
-		printf("icmp6: redirect %s to %s", dstbuf, tgtbuf);
+		printf("icmp6: redirect %s",
+		    getname6((const u_char *)&RDR(dp)->nd_rd_dst));
+		printf(" to %s",
+		    getname6((const u_char*)&RDR(dp)->nd_rd_target));
 #define REDIRECTLEN 40
 		if (vflag) {
 			icmp6_opt_print((const u_char *)dp + REDIRECTLEN,
 					icmp6len - REDIRECTLEN);
 		}
 		break;
-	}
+#undef REDIRECTLEN
+#undef RDR
 #ifndef ICMP6_ROUTER_RENUMBERING
 #define ICMP6_ROUTER_RENUMBERING	138	/* router renumbering */
 #endif
@@ -335,105 +374,20 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 			break;
 		}
 		break;
-#ifdef ICMP6_WRUREQUEST
-	case ICMP6_WRUREQUEST:	/*ICMP6_FQDN_QUERY*/
-	    {
-		int siz;
-		siz = ep - (u_char *)(dp + 1);
-		if (icmp6len > ep - (u_char *)dp) {
-			printf("[|icmp6: who-are-you/FQDN request]");
-			break;
-		}
-		if (siz == 4)
-			printf("icmp6: who-are-you request");
-		else {
-			printf("icmp6: FQDN request");
-			if (vflag && icmp6len == ep - (u_char *)dp) {
-				if (siz < 8)
-					printf("?(icmp6_data %d bytes)", siz);
-				else if (8 < siz)
-					printf("?(extra %d bytes)", siz - 8);
-			}
-		}
-		break;
-	    }
-#endif /*ICMP6_WRUREQUEST*/
-#ifdef ICMP6_WRUREPLY
-	case ICMP6_WRUREPLY:	/*ICMP6_FQDN_REPLY*/
-	    {
-		enum { UNKNOWN, WRU, FQDN } mode = UNKNOWN;
-		const u_char *buf;
-		const u_char *cp = NULL;
-		const char *modename = NULL;
-
-		buf = (u_char *)(dp + 1);
-
-		/* fair guess */
-		if (ep - buf > 12 && buf[12] == ep - buf - 13)
-			mode = FQDN;
-		else if (dp->icmp6_code == 1)
-			mode = FQDN;
-
-		/* wild guess */
-		if (mode == UNKNOWN && ep - buf > 4) {
-			cp = buf + 4;
-			while (cp < ep) {
-				if (!isprint(*cp++))
-					mode = FQDN;
-			}
-		}
-#ifndef abs
-#define abs(a)	((0 < (a)) ? (a) : -(a))
+#ifdef HAVE_STRUCT_ICMP6_NODEINFO
+#ifndef ICMP6_NI_QUERY
+#define ICMP6_NI_QUERY	139
 #endif
-		if (mode == UNKNOWN && ep - buf > 12 &&
-		    2 < abs(buf[12] - (ep - buf - 13))) {
-			mode = WRU;
-		}
-		if (mode == UNKNOWN)
-			mode = FQDN;
-
-		if (mode == WRU) {
-			if (ep - buf > 12 && buf[12] == ep - buf - 13)
-				cp = buf + 4;
-			else
-				cp = ep + 1;	/*truncated*/
-			modename = "icmp6: who-are-you reply";
-		} else if (mode == FQDN) {
-			cp = buf + 13;
-			modename = "icmp6: FQDN reply";
-		}
-		if (icmp6len > ep - (u_char *)dp) {
-			printf("[|%s]", modename);
-			break;
-		}
-		printf("%s", modename);
-		printf("(\"");	/*)*/
-		for (; cp < ep; cp++)
-			printf((isprint(*cp) ? "%c" : "\\%03o"), *cp);
-		printf("\"");
-		if (vflag) {
-			printf(",%s", mode == FQDN ? "FQDN" : "WRU");
-			if (mode == FQDN) {
-				long ttl;
-				ttl = (long)ntohl(*(u_long *)&buf[8]);
-				if (dp->icmp6_code == 1)
-					printf(",TTL=unknown");
-				else if (ttl < 0)
-					printf(",TTL=%ld:invalid", ttl);
-				else
-					printf(",TTL=%ld", ttl);
-				if (buf[12] != ep - buf - 13) {
-					(void)printf(",invalid namelen:%d/%u",
-						buf[12],
-						(unsigned int)(ep - buf - 13));
-				}
-			}
-		}
-		/*(*/
-		printf(")");
+	case ICMP6_NI_QUERY:
+		icmp6_nodeinfo_print(icmp6len, bp, ep);
 		break;
-	    }
-#endif /*ICMP6_WRUREPLY*/
+#ifndef ICMP6_NI_REPLY
+#define ICMP6_NI_REPLY	140
+#endif
+	case ICMP6_NI_REPLY:
+		icmp6_nodeinfo_print(icmp6len, bp, ep);
+		break;
+#endif
 	default:
 		printf("icmp6: type-#%d", dp->icmp6_type);
 		break;
@@ -465,9 +419,6 @@ icmp6_opt_print(register const u_char *bp, int resid)
 	char buf[256];
 #endif
 
-#if 0
-#define TCHECK(var) if ((u_char *)&(var) > ep - sizeof(var)) goto trunc
-#endif
 #define ECHECK(var) if ((u_char *)&(var) > ep - sizeof(var)) return
 
 	op = (struct nd_opt_hdr *)bp;
@@ -582,9 +533,6 @@ icmp6_opt_print(register const u_char *bp, int resid)
  trunc:
 	fputs("[ndp opt]", stdout);
 	return;
-#if 0
-#undef TCHECK
-#endif
 #undef ECHECK
 }
 
@@ -627,6 +575,257 @@ mld6_print(register const u_char *bp)
 
 #error unknown mld6 struct
 
+#endif
+
+#ifdef HAVE_STRUCT_ICMP6_NODEINFO
+void
+icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
+{
+#define safeputc(c)	printf((isprint((c)) ? "%c" : "\\%03o"), c)
+	struct icmp6_nodeinfo *ni6;
+	struct icmp6_hdr *dp;
+	const u_char *cp;
+	int siz, i;
+
+	dp = (struct icmp6_hdr *)bp;
+	ni6 = (struct icmp6_nodeinfo *)bp;
+	siz = ep - bp;
+
+	switch (ni6->ni_type) {
+	case ICMP6_NI_QUERY:
+		if (siz == sizeof(*dp) + 4) {
+			/* KAME who-are-you */
+			printf("icmp6: who-are-you request");
+			break;
+		}
+		printf("icmp6: node information query");
+
+		TCHECK2(*dp, sizeof(*ni6));
+		ni6 = (struct icmp6_nodeinfo *)dp;
+		printf(" (");	/*)*/
+		switch (ntohs(ni6->ni_qtype)) {
+		case NI_QTYPE_NOOP:
+			printf("noop");
+			break;
+		case NI_QTYPE_SUPTYPES:
+			printf("supported qtypes");
+			i = ntohs(ni6->ni_flags);
+			if (i)
+				printf(" [%s]", (i & 0x01) ? "C" : "");
+			break;
+			break;
+		case NI_QTYPE_FQDN:
+			printf("DNS name");
+			break;
+		case NI_QTYPE_NODEADDR:
+			printf("node addresses");
+			i = ni6->ni_flags;
+			if (!i)
+				break;
+			/* NI_NODEADDR_FLAG_TRUNCATE undefined for query */
+			printf(" [%s%s%s%s%s%s]",
+			    (i & NI_NODEADDR_FLAG_ANYCAST) ? "a" : "",
+			    (i & NI_NODEADDR_FLAG_GLOBAL) ? "G" : "",
+			    (i & NI_NODEADDR_FLAG_SITELOCAL) ? "S" : "",
+			    (i & NI_NODEADDR_FLAG_LINKLOCAL) ? "L" : "",
+			    (i & NI_NODEADDR_FLAG_COMPAT) ? "C" : "",
+			    (i & NI_NODEADDR_FLAG_ALL) ? "A" : "");
+			break;
+		default:
+			printf("unknown");
+			break;
+		}
+
+		if (ni6->ni_qtype == NI_QTYPE_NOOP ||
+		    ni6->ni_qtype == NI_QTYPE_SUPTYPES) {
+			if (siz != sizeof(*ni6))
+				if (vflag)
+					printf(", invalid len");
+			/*(*/
+			printf(")");
+			break;
+		}
+
+
+		/* XXX backward compat, icmp-name-lookup-03 */
+		if (siz == sizeof(*ni6)) {
+			printf(", 03 draft");
+			/*(*/
+			printf(")");
+			break;
+		}
+
+		switch (ni6->ni_code) {
+		case ICMP6_NI_SUBJ_IPV6:
+			if (!TTEST2(*dp,
+			    sizeof(*ni6) + sizeof(struct in6_addr)))
+				break;
+			if (siz != sizeof(*ni6) + sizeof(struct in6_addr)) {
+				if (vflag)
+					printf(", invalid subject len");
+				break;
+			}
+			printf(", subject=%s",
+			    getname6((const u_char *)(ni6 + 1)));
+			break;
+		case ICMP6_NI_SUBJ_FQDN:
+			printf(", subject=DNS name");
+			cp = (const u_char *)(ni6 + 1) + 4;
+			if (cp[0] == ep - cp - 1) {
+				/* icmp-name-lookup-03, pascal string */
+				if (vflag)
+					printf(", 03 draft");
+				cp++;
+				printf(", \"");
+				while (cp < ep) {
+					safeputc(*cp);
+					cp++;
+				}
+				printf("\"");
+			} else {
+				/* DNS name decoding - no decompression */
+				printf(", \"");
+				while (cp < ep) {
+					i = *cp++;
+					while (i-- && cp < ep) {
+						safeputc(*cp);
+						cp++;
+					}
+					printf(".");
+				}
+				printf("\"");
+			}
+			break;
+		case ICMP6_NI_SUBJ_IPV4:
+			if (!TTEST2(*dp, sizeof(*ni6) + sizeof(struct in_addr)))
+				break;
+			if (siz != sizeof(*ni6) + sizeof(struct in_addr)) {
+				if (vflag)
+					printf(", invalid subject len");
+				break;
+			}
+			printf(", subject=%s",
+			    getname((const u_char *)(ni6 + 1)));
+			break;
+		default:
+			printf(", unknown subject");
+			break;
+		}
+
+		/*(*/
+		printf(")");
+		break;
+
+	case ICMP6_NI_REPLY:
+		if (icmp6len > siz) {
+			printf("[|icmp6: node information reply]");
+			break;
+		}
+
+		ni6 = (struct icmp6_nodeinfo *)dp;
+		printf("icmp6: node information query");
+		printf(" (");	/*)*/
+		switch (ni6->ni_code) {
+		case ICMP6_NI_SUCESS:
+			break;
+		case ICMP6_NI_REFUSED:
+			printf("refused");
+			if (siz != sizeof(*ni6))
+				if (vflag)
+					printf(", invalid length");
+			break;
+		case ICMP6_NI_UNKNOWN:
+			printf("unknown");
+			if (siz != sizeof(*ni6))
+				if (vflag)
+					printf(", invalid length");
+			break;
+		}
+
+		if (ni6->ni_code != ICMP6_NI_SUCESS) {
+			/*(*/
+			printf(")");
+			break;
+		}
+
+		switch (ntohs(ni6->ni_qtype)) {
+		case NI_QTYPE_NOOP:
+			printf("noop");
+			if (siz != sizeof(*ni6))
+				if (vflag)
+					printf(", invalid length");
+			break;
+		case NI_QTYPE_SUPTYPES:
+			printf("supported qtypes");
+			i = ntohs(ni6->ni_flags);
+			if (i)
+				printf(" [%s]", (i & 0x01) ? "C" : "");
+			break;
+		case NI_QTYPE_FQDN:
+			if (vflag)
+				printf("DNS name");
+			cp = (const u_char *)(ni6 + 1) + 4;
+			if (cp[0] == ep - cp - 1) {
+				/* icmp-name-lookup-03, pascal string */
+				if (vflag)
+					printf(", 03 draft");
+				cp++;
+				printf(", \"");
+				while (cp < ep) {
+					safeputc(*cp);
+					cp++;
+				}
+				printf("\"");
+			} else {
+				/* DNS name decoding - no decompression */
+				printf(", \"");
+				while (cp < ep) {
+					i = *cp++;
+					while (i-- && cp < ep) {
+						safeputc(*cp);
+						cp++;
+					}
+					printf(".");
+				}
+				printf("\"");
+			}
+			if ((ntohs(ni6->ni_flags) & 0x01) != 0)
+				printf(" [TTL=%u]", *(u_int32_t *)(ni6 + 1));
+			break;
+		case NI_QTYPE_NODEADDR:
+			printf("node addresses");
+			for (i = sizeof(*ni6);
+			     i < siz;
+			     i += sizeof(struct in6_addr)) {
+				printf(" %s", getname6(bp + i));
+			}
+			i = ni6->ni_flags;
+			if (!i)
+				break;
+			printf(" [%s%s%s%s%s%s%s]",
+			    (i & NI_NODEADDR_FLAG_ANYCAST) ? "a" : "",
+			    (i & NI_NODEADDR_FLAG_GLOBAL) ? "G" : "",
+			    (i & NI_NODEADDR_FLAG_SITELOCAL) ? "S" : "",
+			    (i & NI_NODEADDR_FLAG_LINKLOCAL) ? "L" : "",
+			    (i & NI_NODEADDR_FLAG_COMPAT) ? "C" : "",
+			    (i & NI_NODEADDR_FLAG_ALL) ? "A" : "",
+			    (i & NI_NODEADDR_FLAG_TRUNCATE) ? "T" : "");
+			break;
+		default:
+			printf("unknown");
+			break;
+		}
+
+		/*(*/
+		printf(")");
+		break;
+	}
+	return;
+
+trunc:
+	fputs("[|icmp6]", stdout);
+#undef safeputc
+}
 #endif
 
 #endif /* INET6 */
