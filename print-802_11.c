@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.20 2003-02-04 05:53:22 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.21 2003-07-22 17:35:04 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -114,11 +114,12 @@ static const char *reason_text[] = {
 	NULL
 };
 
-static int wep_print(const u_char *p)
+static int
+wep_print(const u_char *p)
 {
 	u_int32_t iv;
 
-	if (!TTEST2(*p, 4))
+	if (!TTEST2(*p, IEEE802_11_IV_LEN + IEEE802_11_KID_LEN))
 		return 0;
 	iv = EXTRACT_LE_32BITS(p);
 
@@ -128,79 +129,90 @@ static int wep_print(const u_char *p)
 	return 1;
 }
 
-
-static int parse_elements(struct mgmt_body_t *pbody,const u_char *p,int offset)
+static int
+parse_elements(struct mgmt_body_t *pbody, const u_char *p, int offset)
 {
 	for (;;) {
 		if (!TTEST2(*(p + offset), 1))
 			return 1;
 		switch (*(p + offset)) {
 		case E_SSID:
-			if (!TTEST2(*(p+offset), 2))
+			if (!TTEST2(*(p + offset), 2))
 				return 0;
-			memcpy(&(pbody->ssid),p+offset,2); offset += 2;
-			if (pbody->ssid.length > 0)
-			{
-				if (!TTEST2(*(p+offset), pbody->ssid.length))
-					return 0;
-				memcpy(&(pbody->ssid.ssid),p+offset,pbody->ssid.length); offset += pbody->ssid.length;
-				pbody->ssid.ssid[pbody->ssid.length]='\0';
-			}
+			memcpy(&pbody->ssid, p + offset, 2);
+			offset += 2;
+			if (pbody->ssid.length <= 0)
+				break;
+			if (!TTEST2(*(p + offset), pbody->ssid.length))
+				return 0;
+			memcpy(&pbody->ssid.ssid, p + offset,
+			    pbody->ssid.length);
+			offset += pbody->ssid.length;
+			pbody->ssid.ssid[pbody->ssid.length] = '\0';
 			break;
 		case E_CHALLENGE:
-			if (!TTEST2(*(p+offset), 2))
+			if (!TTEST2(*(p + offset), 2))
 				return 0;
-			memcpy(&(pbody->challenge),p+offset,2); offset += 2;
-			if (pbody->challenge.length > 0)
-			{
-				if (!TTEST2(*(p+offset), pbody->challenge.length))
-					return 0;
-				memcpy(&(pbody->challenge.text),p+offset,pbody->challenge.length); offset += pbody->challenge.length;
-				pbody->challenge.text[pbody->challenge.length]='\0';
-			}
+			memcpy(&pbody->challenge, p + offset, 2);
+			offset += 2;
+			if (pbody->challenge.length <= 0)
+				break;
+			if (!TTEST2(*(p + offset), pbody->challenge.length))
+				return 0;
+			memcpy(&pbody->challenge.text, p + offset,
+			    pbody->challenge.length);
+			offset += pbody->challenge.length;
+			pbody->challenge.text[pbody->challenge.length] = '\0';
 			break;
 		case E_RATES:
-			if (!TTEST2(*(p+offset), 2))
+			if (!TTEST2(*(p + offset), 2))
 				return 0;
-			memcpy(&(pbody->rates),p+offset,2); offset += 2;
-			if (pbody->rates.length > 0) {
-				if (!TTEST2(*(p+offset), pbody->rates.length))
-					return 0;
-				memcpy(&(pbody->rates.rate),p+offset,pbody->rates.length); offset += pbody->rates.length;
-			}
+			memcpy(&(pbody->rates), p + offset, 2);
+			offset += 2;
+			if (pbody->rates.length <= 0)
+				break;
+			if (!TTEST2(*(p + offset), pbody->rates.length))
+				return 0;
+			memcpy(&pbody->rates.rate, p + offset,
+			    pbody->rates.length);
+			offset += pbody->rates.length;
 			break;
 		case E_DS:
-			if (!TTEST2(*(p+offset), 3))
+			if (!TTEST2(*(p + offset), 3))
 				return 0;
-			memcpy(&(pbody->ds),p+offset,3); offset +=3;
+			memcpy(&pbody->ds, p + offset, 3);
+			offset += 3;
 			break;
 		case E_CF:
-			if (!TTEST2(*(p+offset), 8))
+			if (!TTEST2(*(p + offset), 8))
 				return 0;
-			memcpy(&(pbody->cf),p+offset,8); offset +=8;
+			memcpy(&pbody->cf, p + offset, 8);
+			offset += 8;
 			break;
 		case E_TIM:
-			if (!TTEST2(*(p+offset), 2))
+			if (!TTEST2(*(p + offset), 2))
 				return 0;
-			memcpy(&(pbody->tim),p+offset,2); offset +=2;
-			if (!TTEST2(*(p+offset), 3))
+			memcpy(&pbody->tim, p + offset, 2);
+			offset += 2;
+			if (!TTEST2(*(p + offset), 3))
 				return 0;
-			memcpy(&(pbody->tim.count),p+offset,3); offset +=3;
+			memcpy(&pbody->tim.count, p + offset, 3);
+			offset += 3;
 
-			if ((pbody->tim.length -3) > 0)
-			{
-				if (!TTEST2(*(p+offset), pbody->tim.length -3))
-					return 0;
-				memcpy((pbody->tim.bitmap),p+(pbody->tim.length -3),(pbody->tim.length -3));
-				offset += pbody->tim.length -3;
-			}
-
+			if (pbody->tim.length <= 3)
+				break;
+			if (!TTEST2(*(p + offset), pbody->tim.length - 3))
+				return 0;
+			memcpy(pbody->tim.bitmap, p + (pbody->tim.length - 3),
+			    (pbody->tim.length - 3));
+			offset += pbody->tim.length - 3;
 			break;
 		default:
 #if 0
-			printf("(1) unhandled element_id (%d)  ", *(p+offset) );
+			printf("(1) unhandled element_id (%d)  ",
+			    *(p + offset) );
 #endif
-			offset+= *(p+offset+1) + 2;
+			offset += *(p + offset + 1) + 2;
 			break;
 		}
 	}
@@ -211,23 +223,25 @@ static int parse_elements(struct mgmt_body_t *pbody,const u_char *p,int offset)
  * Print Handle functions for the management frame types
  *********************************************************************************/
 
-static int handle_beacon(u_int16_t fc, const u_char *p)
+static int
+handle_beacon(u_int16_t fc, const u_char *p)
 {
 	struct mgmt_body_t pbody;
 	int offset = 0;
 
 	memset(&pbody, 0, sizeof(pbody));
 
-	if (!TTEST2(*p, 12))
+	if (!TTEST2(*p, IEEE802_11_TSTAMP_LEN + IEEE802_11_BCNINT_LEN +
+	    IEEE802_11_CAPINFO_LEN))
 		return 0;
 	memcpy(&pbody.timestamp, p, 8);
-	offset += 8;
+	offset += IEEE802_11_TSTAMP_LEN;
 	pbody.beacon_interval = EXTRACT_LE_16BITS(p+offset);
-	offset += 2;
+	offset += IEEE802_11_BCNINT_LEN;
 	pbody.capability_info = EXTRACT_LE_16BITS(p+offset);
-	offset += 2;
+	offset += IEEE802_11_CAPINFO_LEN;
 
-	if (!parse_elements(&pbody,p,offset))
+	if (!parse_elements(&pbody, p, offset))
 		return 0;
 
 	printf("%s (", subtype_text[FC_SUBTYPE(fc)]);
@@ -242,21 +256,22 @@ static int handle_beacon(u_int16_t fc, const u_char *p)
 	return 1;
 }
 
-static int handle_assoc_request(u_int16_t fc, const u_char *p)
+static int
+handle_assoc_request(u_int16_t fc, const u_char *p)
 {
 	struct mgmt_body_t pbody;
 	int offset = 0;
 
 	memset(&pbody, 0, sizeof(pbody));
 
-	if (!TTEST2(*p, 4))
+	if (!TTEST2(*p, IEEE802_11_CAPINFO_LEN + IEEE802_11_LISTENINT_LEN))
 		return 0;
 	pbody.capability_info = EXTRACT_LE_16BITS(p);
-	offset += 2;
+	offset += IEEE802_11_CAPINFO_LEN;
 	pbody.listen_interval = EXTRACT_LE_16BITS(p+offset);
-	offset += 2;
+	offset += IEEE802_11_LISTENINT_LEN;
 
-	if (!parse_elements(&pbody,p,offset))
+	if (!parse_elements(&pbody, p, offset))
 		return 0;
 
 	printf("%s (", subtype_text[FC_SUBTYPE(fc)]);
@@ -266,23 +281,25 @@ static int handle_assoc_request(u_int16_t fc, const u_char *p)
 	return 1;
 }
 
-static int handle_assoc_response(u_int16_t fc, const u_char *p)
+static int
+handle_assoc_response(u_int16_t fc, const u_char *p)
 {
 	struct mgmt_body_t pbody;
 	int offset = 0;
 
 	memset(&pbody, 0, sizeof(pbody));
 
-	if (!TTEST2(*p, 6))
+	if (!TTEST2(*p, IEEE802_11_CAPINFO_LEN + IEEE802_11_STATUS_LEN +
+	    IEEE802_11_AID_LEN))
 		return 0;
 	pbody.capability_info = EXTRACT_LE_16BITS(p);
-	offset += 2;
+	offset += IEEE802_11_CAPINFO_LEN;
 	pbody.status_code = EXTRACT_LE_16BITS(p+offset);
-	offset += 2;
+	offset += IEEE802_11_STATUS_LEN;
 	pbody.aid = EXTRACT_LE_16BITS(p+offset);
-	offset += 2;
+	offset += IEEE802_11_AID_LEN;
 
-	if (!parse_elements(&pbody,p,offset))
+	if (!parse_elements(&pbody, p, offset))
 		return 0;
 
 	printf("%s AID(%x) :%s: %s", subtype_text[FC_SUBTYPE(fc)],
@@ -293,24 +310,25 @@ static int handle_assoc_response(u_int16_t fc, const u_char *p)
 	return 1;
 }
 
-
-static int handle_reassoc_request(u_int16_t fc, const u_char *p)
+static int
+handle_reassoc_request(u_int16_t fc, const u_char *p)
 {
 	struct mgmt_body_t pbody;
 	int offset = 0;
 
 	memset(&pbody, 0, sizeof(pbody));
 
-	if (!TTEST2(*p, 10))
+	if (!TTEST2(*p, IEEE802_11_CAPINFO_LEN + IEEE802_11_LISTENINT_LEN +
+	    IEEE802_11_AP_LEN))
 		return 0;
 	pbody.capability_info = EXTRACT_LE_16BITS(p);
-	offset += 2;
+	offset += IEEE802_11_CAPINFO_LEN;
 	pbody.listen_interval = EXTRACT_LE_16BITS(p+offset);
-	offset += 2;
-	memcpy(&pbody.ap,p+offset,6);
-	offset += 6;
+	offset += IEEE802_11_LISTENINT_LEN;
+	memcpy(&pbody.ap, p+offset, IEEE802_11_AP_LEN);
+	offset += IEEE802_11_AP_LEN;
 
-	if (!parse_elements(&pbody,p,offset))
+	if (!parse_elements(&pbody, p, offset))
 		return 0;
 
 	printf("%s (", subtype_text[FC_SUBTYPE(fc)]);
@@ -320,13 +338,15 @@ static int handle_reassoc_request(u_int16_t fc, const u_char *p)
 	return 1;
 }
 
-static int handle_reassoc_response(u_int16_t fc, const u_char *p)
+static int
+handle_reassoc_response(u_int16_t fc, const u_char *p)
 {
 	/* Same as a Association Reponse */
 	return handle_assoc_response(fc, p);
 }
 
-static int handle_probe_request(u_int16_t fc, const u_char *p)
+static int
+handle_probe_request(u_int16_t fc, const u_char *p)
 {
 	struct mgmt_body_t  pbody;
 	int offset = 0;
@@ -344,21 +364,24 @@ static int handle_probe_request(u_int16_t fc, const u_char *p)
 	return 1;
 }
 
-static int handle_probe_response(u_int16_t fc, const u_char *p)
+static int
+handle_probe_response(u_int16_t fc, const u_char *p)
 {
 	struct mgmt_body_t  pbody;
 	int offset = 0;
 
 	memset(&pbody, 0, sizeof(pbody));
 
-	if (!TTEST2(*p, 12))
+	if (!TTEST2(*p, IEEE802_11_TSTAMP_LEN + IEEE802_11_BCNINT_LEN +
+	    IEEE802_11_CAPINFO_LEN))
 		return 0;
-	memcpy(&pbody.timestamp,p,8);
-	offset += 8;
+
+	memcpy(&pbody.timestamp, p, IEEE802_11_TSTAMP_LEN);
+	offset += IEEE802_11_TSTAMP_LEN;
 	pbody.beacon_interval = EXTRACT_LE_16BITS(p+offset);
-	offset += 2;
+	offset += IEEE802_11_BCNINT_LEN;
 	pbody.capability_info = EXTRACT_LE_16BITS(p+offset);
-	offset += 2;
+	offset += IEEE802_11_CAPINFO_LEN;
 
 	if (!parse_elements(&pbody, p, offset))
 		return 0;
@@ -373,32 +396,34 @@ static int handle_probe_response(u_int16_t fc, const u_char *p)
 	return 1;
 }
 
-static int handle_atim(void)
+static int
+handle_atim(void)
 {
 	/* the frame body for ATIM is null. */
 	printf("ATIM");
 	return 1;
 }
 
-static int handle_disassoc(u_int16_t fc, const u_char *p)
+static int
+handle_disassoc(u_int16_t fc, const u_char *p)
 {
 	struct mgmt_body_t  pbody;
-	int offset = 0;
 
 	memset(&pbody, 0, sizeof(pbody));
 
-	if (!TTEST2(*p, 2))
+	if (!TTEST2(*p, IEEE802_11_REASON_LEN))
 		return 0;
 	pbody.reason_code = EXTRACT_LE_16BITS(p);
-	offset += 2;
 
 	printf("%s: %s", subtype_text[FC_SUBTYPE(fc)],
-	    pbody.reason_code < 10 ? reason_text[pbody.reason_code] : "Reserved" );
+	    (pbody.reason_code < 10) ? reason_text[pbody.reason_code]
+	                             : "Reserved" );
 
 	return 1;
 }
 
-static int handle_auth(u_int16_t fc, const u_char *p)
+static int
+handle_auth(u_int16_t fc, const u_char *p)
 {
 	struct mgmt_body_t  pbody;
 	int offset = 0;
@@ -414,51 +439,60 @@ static int handle_auth(u_int16_t fc, const u_char *p)
 	pbody.status_code = EXTRACT_LE_16BITS(p + offset);
 	offset += 2;
 
-	if (!parse_elements(&pbody,p,offset))
+	if (!parse_elements(&pbody, p, offset))
 		return 0;
 
 	if ((pbody.auth_alg == 1) &&
-	    ((pbody.auth_trans_seq_num == 2) || (pbody.auth_trans_seq_num == 3))) {
+	    ((pbody.auth_trans_seq_num == 2) ||
+	     (pbody.auth_trans_seq_num == 3))) {
 		printf("%s (%s)-%x [Challenge Text] %s",
-			subtype_text[FC_SUBTYPE(fc)],
-			pbody.auth_alg < 4 ? auth_alg_text[pbody.auth_alg] : "Reserved" ,
-			pbody.auth_trans_seq_num,
-			 ((pbody.auth_trans_seq_num % 2) ?
-				(pbody.status_code < 19 ? status_text[pbody.status_code] : "n/a") : "" ));
-	} else {
-		printf("%s (%s)-%x: %s",
 		    subtype_text[FC_SUBTYPE(fc)],
-		    pbody.auth_alg < 4 ? auth_alg_text[pbody.auth_alg] : "Reserved" ,
+		    (pbody.auth_alg < 4) ? auth_alg_text[pbody.auth_alg]
+		                         : "Reserved",
 		    pbody.auth_trans_seq_num,
-		    ((pbody.auth_trans_seq_num % 2) ? (pbody.status_code < 19 ? status_text[pbody.status_code] : "n/a")  : ""));
+		    ((pbody.auth_trans_seq_num % 2)
+		        ? ((pbody.status_code < 19)
+			       ? status_text[pbody.status_code]
+			       : "n/a") : ""));
+		return 1;
 	}
+	printf("%s (%s)-%x: %s",
+	    subtype_text[FC_SUBTYPE(fc)],
+	    (pbody.auth_alg < 4) ? auth_alg_text[pbody.auth_alg] : "Reserved",
+	    pbody.auth_trans_seq_num,
+	    (pbody.auth_trans_seq_num % 2)
+	        ? ((pbody.status_code < 19) ? status_text[pbody.status_code]
+	                                    : "n/a")
+	        : "");
 
 	return 1;
 }
 
-static int handle_deauth(u_int16_t fc, const struct mgmt_header_t *pmh,
+static int
+handle_deauth(u_int16_t fc, const struct mgmt_header_t *pmh,
     const u_char *p)
 {
 	struct mgmt_body_t  pbody;
 	int offset = 0;
+	const char *reason = NULL;
 
 	memset(&pbody, 0, sizeof(pbody));
 
-	if (!TTEST2(*p, 2))
+	if (!TTEST2(*p, IEEE802_11_REASON_LEN))
 		return 0;
 	pbody.reason_code = EXTRACT_LE_16BITS(p);
-	offset += 2;
+	offset += IEEE802_11_REASON_LEN;
+
+	reason = (pbody.reason_code < 10) ? reason_text[pbody.reason_code]
+	                                  : "Reserved";
 
 	if (eflag) {
-		printf("%s: %s",
-		    subtype_text[FC_SUBTYPE(fc)],
-		    pbody.reason_code < 10 ? reason_text[pbody.reason_code] : "Reserved" );
+		printf("%s: %s", subtype_text[FC_SUBTYPE(fc)], reason);
 	} else {
 		printf("%s (%s): %s",
 		    subtype_text[FC_SUBTYPE(fc)], etheraddr_string(pmh->sa),
-		    pbody.reason_code < 10 ? reason_text[pbody.reason_code] : "Reserved" );
+		    reason);
 	}
-
 	return 1;
 }
 
@@ -468,39 +502,39 @@ static int handle_deauth(u_int16_t fc, const struct mgmt_header_t *pmh,
  *********************************************************************************/
 
 
-static int mgmt_body_print(u_int16_t fc, const struct mgmt_header_t *pmh,
+static int
+mgmt_body_print(u_int16_t fc, const struct mgmt_header_t *pmh,
     const u_char *p)
 {
 	switch (FC_SUBTYPE(fc)) {
 	case ST_ASSOC_REQUEST:
-		return (handle_assoc_request(fc, p));
+		return handle_assoc_request(fc, p);
 	case ST_ASSOC_RESPONSE:
-		return (handle_assoc_response(fc, p));
+		return handle_assoc_response(fc, p);
 	case ST_REASSOC_REQUEST:
-		return (handle_reassoc_request(fc, p));
+		return handle_reassoc_request(fc, p);
 	case ST_REASSOC_RESPONSE:
-		return (handle_reassoc_response(fc, p));
+		return handle_reassoc_response(fc, p);
 	case ST_PROBE_REQUEST:
-		return (handle_probe_request(fc, p));
+		return handle_probe_request(fc, p);
 	case ST_PROBE_RESPONSE:
-		return (handle_probe_response(fc, p));
+		return handle_probe_response(fc, p);
 	case ST_BEACON:
-		return (handle_beacon(fc, p));
+		return handle_beacon(fc, p);
 	case ST_ATIM:
-		return (handle_atim());
+		return handle_atim();
 	case ST_DISASSOC:
-		return (handle_disassoc(fc, p));
+		return handle_disassoc(fc, p);
 	case ST_AUTH:
 		if (!TTEST2(*p, 3))
 			return 0;
 		if ((p[0] == 0 ) && (p[1] == 0) && (p[2] == 0)) {
 			printf("Authentication (Shared-Key)-3 ");
-			return (wep_print(p));
+			return wep_print(p);
 		}
-		else
-			return (handle_auth(fc, p));
+		return handle_auth(fc, p);
 	case ST_DEAUTH:
-		return (handle_deauth(fc, pmh, p));
+		return handle_deauth(fc, pmh, p);
 		break;
 	default:
 		printf("Unhandled Managment subtype(%x)",
@@ -514,7 +548,8 @@ static int mgmt_body_print(u_int16_t fc, const struct mgmt_header_t *pmh,
  * Handles printing all the control frame types
  *********************************************************************************/
 
-static int ctrl_body_print(u_int16_t fc, const u_char *p)
+static int
+ctrl_body_print(u_int16_t fc, const u_char *p)
 {
 	switch (FC_SUBTYPE(fc)) {
 	case CTRL_PS_POLL:
@@ -526,55 +561,48 @@ static int ctrl_body_print(u_int16_t fc, const u_char *p)
 	case CTRL_RTS:
 		if (!TTEST2(*p, CTRL_RTS_LEN))
 			return 0;
-		if (eflag)
-			printf("Request-To-Send");
-		else
-			printf("Request-To-Send TA:%s ",
+		printf("Request-To-Send");
+		if (!eflag)
+			printf(" TA:%s ",
 			    etheraddr_string(((const struct ctrl_rts_t *)p)->ta));
 		break;
 	case CTRL_CTS:
 		if (!TTEST2(*p, CTRL_CTS_LEN))
 			return 0;
-		if (eflag)
-			printf("Clear-To-Send");
-		else
-			printf("Clear-To-Send RA:%s ",
+		printf("Clear-To-Send");
+		if (!eflag)
+			printf(" RA:%s ",
 			    etheraddr_string(((const struct ctrl_cts_t *)p)->ra));
 		break;
 	case CTRL_ACK:
 		if (!TTEST2(*p, CTRL_ACK_LEN))
 			return 0;
-		if (eflag)
-			printf("Acknowledgment");
-		else
-			printf("Acknowledgment RA:%s ",
+		printf("Acknowledgment");
+		if (!eflag)
+			printf(" RA:%s ",
 			    etheraddr_string(((const struct ctrl_ack_t *)p)->ra));
 		break;
 	case CTRL_CF_END:
 		if (!TTEST2(*p, CTRL_END_LEN))
 			return 0;
-		if (eflag)
-			printf("CF-End");
-		else
-			printf("CF-End RA:%s ",
+		printf("CF-End");
+		if (!eflag)
+			printf(" RA:%s ",
 			    etheraddr_string(((const struct ctrl_end_t *)p)->ra));
 		break;
 	case CTRL_END_ACK:
 		if (!TTEST2(*p, CTRL_END_ACK_LEN))
 			return 0;
-		if (eflag)
-			printf("CF-End+CF-Ack");
-		else
-			printf("CF-End+CF-Ack RA:%s ",
+		printf("CF-End+CF-Ack");
+		if (!eflag)
+			printf(" RA:%s ",
 			    etheraddr_string(((const struct ctrl_end_ack_t *)p)->ra));
 		break;
 	default:
-		printf("(B) Unknown Ctrl Subtype");
+		printf("Unknown Ctrl Subtype");
 	}
 	return 1;
 }
-
-
 
 /*
  * Print Header funcs
@@ -617,50 +645,46 @@ data_header_print(u_int16_t fc, const u_char *p, const u_int8_t **srcp,
 #define ADDR3  (p + 16)
 #define ADDR4  (p + 24)
 
-	if (!FC_TO_DS(fc)) {
-		if (!FC_FROM_DS(fc)) {
-			if (srcp != NULL)
-				*srcp = ADDR2;
-			if (dstp != NULL)
-				*dstp = ADDR1;
-			if (!eflag)
-				return;
-			printf("DA:%s SA:%s BSSID:%s ",
-			    etheraddr_string(ADDR1), etheraddr_string(ADDR2),
-			    etheraddr_string(ADDR3));
-		} else {
-			if (srcp != NULL)
-				*srcp = ADDR3;
-			if (dstp != NULL)
-				*dstp = ADDR1;
-			if (!eflag)
-				return;
-			printf("DA:%s BSSID:%s SA:%s ",
-			    etheraddr_string(ADDR1), etheraddr_string(ADDR2),
-			    etheraddr_string(ADDR3));
-		}
-	} else {
-		if (!FC_FROM_DS(fc)) {
-			if (srcp != NULL)
-				*srcp = ADDR2;
-			if (dstp != NULL)
-				*dstp = ADDR3;
-			if (!eflag)
-				return;
-			printf("BSSID:%s SA:%s DA:%s ",
-			    etheraddr_string(ADDR1), etheraddr_string(ADDR2),
-			    etheraddr_string(ADDR3));
-		} else {
-			if (srcp != NULL)
-				*srcp = ADDR4;
-			if (dstp != NULL)
-				*dstp = ADDR3;
-			if (!eflag)
-				return;
-			printf("RA:%s TA:%s DA:%s SA:%s ",
-			    etheraddr_string(ADDR1), etheraddr_string(ADDR2),
-			    etheraddr_string(ADDR3), etheraddr_string(ADDR4));
-		}
+	if (!FC_TO_DS(fc) && !FC_FROM_DS(fc)) {
+		if (srcp != NULL)
+			*srcp = ADDR2;
+		if (dstp != NULL)
+			*dstp = ADDR1;
+		if (!eflag)
+			return;
+		printf("DA:%s SA:%s BSSID:%s ",
+		    etheraddr_string(ADDR1), etheraddr_string(ADDR2),
+		    etheraddr_string(ADDR3));
+	} else if (!FC_TO_DS(fc) && FC_FROM_DS(fc)) {
+		if (srcp != NULL)
+			*srcp = ADDR3;
+		if (dstp != NULL)
+			*dstp = ADDR1;
+		if (!eflag)
+			return;
+		printf("DA:%s BSSID:%s SA:%s ",
+		    etheraddr_string(ADDR1), etheraddr_string(ADDR2),
+		    etheraddr_string(ADDR3));
+	} else if (FC_TO_DS(fc) && !FC_FROM_DS(fc)) {
+		if (srcp != NULL)
+			*srcp = ADDR2;
+		if (dstp != NULL)
+			*dstp = ADDR3;
+		if (!eflag)
+			return;
+		printf("BSSID:%s SA:%s DA:%s ",
+		    etheraddr_string(ADDR1), etheraddr_string(ADDR2),
+		    etheraddr_string(ADDR3));
+	} else if (FC_TO_DS(fc) && FC_FROM_DS(fc)) {
+		if (srcp != NULL)
+			*srcp = ADDR4;
+		if (dstp != NULL)
+			*dstp = ADDR3;
+		if (!eflag)
+			return;
+		printf("RA:%s TA:%s DA:%s SA:%s ",
+		    etheraddr_string(ADDR1), etheraddr_string(ADDR2),
+		    etheraddr_string(ADDR3), etheraddr_string(ADDR4));
 	}
 
 #undef ADDR1
@@ -668,7 +692,6 @@ data_header_print(u_int16_t fc, const u_char *p, const u_int8_t **srcp,
 #undef ADDR3
 #undef ADDR4
 }
-
 
 static void
 mgmt_header_print(const u_char *p, const u_int8_t **srcp,
@@ -734,52 +757,35 @@ ctrl_header_print(u_int16_t fc, const u_char *p, const u_int8_t **srcp,
 	}
 }
 
-static int GetHeaderLength(u_int16_t fc)
+static int
+extract_header_length(u_int16_t fc)
 {
-	int iLength=0;
-
 	switch (FC_TYPE(fc)) {
 	case T_MGMT:
-		iLength = MGMT_HEADER_LEN;
-		break;
+		return MGMT_HEADER_LEN;
 	case T_CTRL:
 		switch (FC_SUBTYPE(fc)) {
 		case CTRL_PS_POLL:
-			iLength = CTRL_PS_POLL_LEN;
-			break;
+			return CTRL_PS_POLL_LEN;
 		case CTRL_RTS:
-			iLength = CTRL_RTS_LEN;
-			break;
+			return CTRL_RTS_LEN;
 		case CTRL_CTS:
-			iLength = CTRL_CTS_LEN;
-			break;
+			return CTRL_CTS_LEN;
 		case CTRL_ACK:
-			iLength = CTRL_ACK_LEN;
-			break;
+			return CTRL_ACK_LEN;
 		case CTRL_CF_END:
-			iLength = CTRL_END_LEN;
-			break;
+			return CTRL_END_LEN;
 		case CTRL_END_ACK:
-			iLength = CTRL_END_ACK_LEN;
-			break;
+			return CTRL_END_ACK_LEN;
 		default:
-			iLength = 0;
-			break;
+			return 0;
 		}
-		break;
 	case T_DATA:
-		if (FC_TO_DS(fc) && FC_FROM_DS(fc))
-			iLength = 30;
-		else
-			iLength = 24;
-		break;
+		return (FC_TO_DS(fc) && FC_FROM_DS(fc)) ? 30 : 24;
 	default:
-		printf("unknown IEEE802.11 frame type (%d)",
-		    FC_TYPE(fc));
-		break;
+		printf("unknown IEEE802.11 frame type (%d)", FC_TYPE(fc));
+		return 0;
 	}
-
-	return iLength;
 }
 
 /*
@@ -810,15 +816,12 @@ ieee_802_11_hdr_print(u_int16_t fc, const u_char *p, const u_int8_t **srcp,
 	case T_MGMT:
 		mgmt_header_print(p, srcp, dstp);
 		break;
-
 	case T_CTRL:
 		ctrl_header_print(fc, p, srcp, dstp);
 		break;
-
 	case T_DATA:
 		data_header_print(fc, p, srcp, dstp);
 		break;
-
 	default:
 		printf("(header) unknown IEEE802.11 frame type (%d)",
 		    FC_TYPE(fc));
@@ -832,7 +835,7 @@ static u_int
 ieee802_11_print(const u_char *p, u_int length, u_int caplen)
 {
 	u_int16_t fc;
-	u_int HEADER_LENGTH;
+	u_int hdrlen;
 	const u_int8_t *src, *dst;
 	u_short extracted_ethertype;
 
@@ -842,11 +845,11 @@ ieee802_11_print(const u_char *p, u_int length, u_int caplen)
 	}
 
 	fc = EXTRACT_LE_16BITS(p);
-	HEADER_LENGTH = GetHeaderLength(fc);
+	hdrlen = extract_header_length(fc);
 
-	if (caplen < HEADER_LENGTH) {
+	if (caplen < hdrlen) {
 		printf("[|802.11]");
-		return HEADER_LENGTH;
+		return hdrlen;
 	}
 
 	ieee_802_11_hdr_print(fc, p, &src, &dst);
@@ -854,60 +857,54 @@ ieee802_11_print(const u_char *p, u_int length, u_int caplen)
 	/*
 	 * Go past the 802.11 header.
 	 */
-	length -= HEADER_LENGTH;
-	caplen -= HEADER_LENGTH;
-	p += HEADER_LENGTH;
+	length -= hdrlen;
+	caplen -= hdrlen;
+	p += hdrlen;
 
 	switch (FC_TYPE(fc)) {
 	case T_MGMT:
 		if (!mgmt_body_print(fc,
-		    (const struct mgmt_header_t *)(p - HEADER_LENGTH), p)) {
+		    (const struct mgmt_header_t *)(p - hdrlen), p)) {
 			printf("[|802.11]");
-			return HEADER_LENGTH;
+			return hdrlen;
 		}
 		break;
-
 	case T_CTRL:
-		if (!ctrl_body_print(fc, p - HEADER_LENGTH)) {
+		if (!ctrl_body_print(fc, p - hdrlen)) {
 			printf("[|802.11]");
-			return HEADER_LENGTH;
+			return hdrlen;
 		}
 		break;
-
 	case T_DATA:
 		/* There may be a problem w/ AP not having this bit set */
 		if (FC_WEP(fc)) {
 			if (!wep_print(p)) {
 				printf("[|802.11]");
-				return HEADER_LENGTH;
+				return hdrlen;
 			}
-		} else {
-			if (llc_print(p, length, caplen, dst, src,
-			    &extracted_ethertype) == 0) {
-				/*
-				 * Some kinds of LLC packet we cannot
-				 * handle intelligently
-				 */
-				if (!eflag)
-					ieee_802_11_hdr_print(fc, p - HEADER_LENGTH,
-					    NULL, NULL);
-				if (extracted_ethertype) {
-					printf("(LLC %s) ",
-					    etherproto_string(htons(extracted_ethertype)));
-				}
-				if (!xflag && !qflag)
-					default_print(p, caplen);
-			}
+		} else if (llc_print(p, length, caplen, dst, src,
+		    &extracted_ethertype) == 0) {
+			/*
+			 * Some kinds of LLC packet we cannot
+			 * handle intelligently
+			 */
+			if (!eflag)
+				ieee_802_11_hdr_print(fc, p - hdrlen, NULL,
+				    NULL);
+			if (extracted_ethertype)
+				printf("(LLC %s) ",
+				    etherproto_string(
+				        htons(extracted_ethertype)));
+			if (!xflag && !qflag)
+				default_print(p, caplen);
 		}
 		break;
-
 	default:
-		printf("(body) unhandled IEEE802.11 frame type (%d)",
-		    FC_TYPE(fc));
+		printf("unknown 802.11 frame type (%d)", FC_TYPE(fc));
 		break;
 	}
 
-	return HEADER_LENGTH;
+	return hdrlen;
 }
 
 /*
@@ -968,25 +965,22 @@ prism_if_print(const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;
-	u_int32_t msgcode;
 
 	if (caplen < 4) {
 		printf("[|802.11]");
 		return caplen;
 	}
 
-	msgcode = EXTRACT_32BITS(p);
-	if (msgcode == WLANCAP_MAGIC_COOKIE_V1)
+	if (EXTRACT_32BITS(p) == WLANCAP_MAGIC_COOKIE_V1)
 		return ieee802_11_radio_print(p, length, caplen);
-	else {
-		if (caplen < PRISM_HDR_LEN) {
-			printf("[|802.11]");
-			return caplen;
-		}
 
-		return PRISM_HDR_LEN + ieee802_11_print(p + PRISM_HDR_LEN,
-		    length - PRISM_HDR_LEN, caplen - PRISM_HDR_LEN);
+	if (caplen < PRISM_HDR_LEN) {
+		printf("[|802.11]");
+		return caplen;
 	}
+
+	return PRISM_HDR_LEN + ieee802_11_print(p + PRISM_HDR_LEN,
+	    length - PRISM_HDR_LEN, caplen - PRISM_HDR_LEN);
 }
 
 /*
