@@ -20,10 +20,10 @@
  * 
  */
 
-/* $Id: lane.h,v 1.1 1999-11-21 03:52:11 assar Exp $ */
+/* $Id: lane.h,v 1.2 1999-11-21 16:35:11 assar Exp $ */
 
 #ifndef ETHER_ADDR_LEN
-#define ETHER_ADDR_LEN ETH_ALEN
+#define ETHER_ADDR_LEN 6
 #endif
 
 struct lecdatahdr_8023 {
