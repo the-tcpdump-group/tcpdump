@@ -29,7 +29,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.9 2000-07-01 03:39:02 assar Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.10 2000-07-31 02:47:27 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -153,7 +153,6 @@ dhcp6ext_print(u_char *cp, u_char *ep)
 
 	if (cp == ep)
 		return;
-	printf(" ");
 	while (cp < ep) {
 		if (ep - cp < sizeof(u_int16_t))
 			break;
@@ -191,11 +190,11 @@ dhcp6ext_print(u_char *cp, u_char *ep)
 			break;
 		}
 		if (cp + 4 + len > ep) {
-			printf("[|%s]", p->name);
+			printf(" [|%s]", p->name);
 			return;
 		}
 
-		printf("(%s, ", p->name);
+		printf(" (%s, ", p->name);
 		switch (p->type) {
 		case OT6_V6:
 			for (i = 0; i < len; i += 16) {
@@ -252,7 +251,7 @@ dhcp6_print(register const u_char *cp, u_int length,
 			break;
 		}
 
-		printf(" solicit(");	/*)*/
+		printf(" solicit (");	/*)*/
 		if (dh6->dh6_sol.dh6sol_flags != 0) {
 			u_int8_t f = dh6->dh6_sol.dh6sol_flags;
 			printf("%s%s ",
@@ -279,7 +278,7 @@ dhcp6_print(register const u_char *cp, u_int length,
 			printf(" advert");
 			break;
 		}
-		printf(" advert(");	/*)*/
+		printf(" advert (");	/*)*/
 		memcpy(&field16, &dh6->dh6_adv.dh6adv_rsv_id, sizeof(field16));
 		printf("solicit-ID=%d",
 		       ntohs(field16) & DH6SOL_SOLICIT_ID_MASK); 
@@ -300,7 +299,7 @@ dhcp6_print(register const u_char *cp, u_int length,
 			printf(" request");
 			break;
 		}
-		printf(" request(");	/*)*/
+		printf(" request (");	/*)*/
 		if (dh6->dh6_req.dh6req_flags != 0) {
 			u_int8_t f = dh6->dh6_req.dh6req_flags;
 			printf("%s%s ",
@@ -323,7 +322,7 @@ dhcp6_print(register const u_char *cp, u_int length,
 			printf(" reply");
 			break;
 		}
-		printf(" reply(");	/*)*/
+		printf(" reply (");	/*)*/
 		if ((dh6->dh6_rep.dh6rep_flagandstat & DH6REP_RELAYPRESENT) != 0)
 			printf("R ");
 		printf("stat=0x%02x",
