@@ -1,4 +1,4 @@
-@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.46 2000-12-08 06:59:10 mcr Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.47 2000-12-16 09:07:45 guy Exp $ (LBL)
 
 If you have not built libpcap, do so first.  See the README
 file in this directory for the ftp location.
@@ -76,7 +76,6 @@ l2tp.h		-
 lane.h		-
 lbl/gnuc.h	- gcc macros and defines
 lbl/os-*.h	- os dependent defines and prototypes
-linux-include/*	- network include files missing on Linux
 llc.h		- LLC definitions
 machdep.c	- machine dependent routines
 machdep.h	- machine dependent definitions
