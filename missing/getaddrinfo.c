@@ -76,9 +76,7 @@
 #include "sockstorage.h"
 #endif 
 
-#ifndef HAVE_ADDRINFO
 #include "addrinfo.h"
-#endif
 
 #if defined(__KAME__) && defined(INET6)
 # define FAITH
