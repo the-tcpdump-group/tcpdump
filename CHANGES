@@ -1,5 +1,7 @@
 1999-11-21  Assar Westerlund  <assar@sics.se>
 
+	* Add SMB printing code from Andrew Tridgell <tridge@linuxcare.com>
+
 	* Incorporate NFS parsing code from NetBSD.  Adds support for
 	nfsv3.
 
@@ -541,4 +543,4 @@ v2.0 Sun Jan 13 12:20:40 PST 1991
 
 - Initial public release.
 
-@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.60 1999-11-21 05:45:25 assar Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.61 1999-11-21 15:58:53 assar Exp $ (LBL)
