@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.106 2005-01-25 11:22:57 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.107 2005-01-25 16:27:56 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1163,7 +1163,7 @@ ppp_hdlc(const u_char *p, int length)
         proto = EXTRACT_16BITS(b); /* next guess - load two octets */
 
         switch (proto) {
-        case 0xff03: /* looks like a PPP frame */
+        case (PPP_ADDRESS << 8 | PPP_CONTROL): /* looks like a PPP frame */
             proto = EXTRACT_16BITS(b+2); /* load the PPP proto-id */
             handle_ppp(proto, b+4, t - b - 4);
             break;
