@@ -50,8 +50,10 @@
 #endif
 
 #include <sys/cdefs.h>
+#if 0
 #ifndef lint
 __RCSID("$NetBSD: print-telnet.c,v 1.2 1999/10/11 12:40:12 sjg Exp $");
+#endif
 #endif
 
 #include <sys/param.h>
