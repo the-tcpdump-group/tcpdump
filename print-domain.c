@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.67 2001-01-28 07:56:21 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.68 2001-01-29 20:04:00 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -240,7 +240,7 @@ ns_cprint(register const u_char *cp, register const u_char *bp)
 	return (cp + i);
 }
 
-static struct tok type2str[] = {
+struct tok ns_type2str[] = {
 	{ T_A,		"A" },
 	{ T_NS,		"NS" },
 	{ T_MD,		"MD" },
@@ -291,7 +291,7 @@ static struct tok type2str[] = {
 	{ 0,		NULL }
 };
 
-static struct tok class2str[] = {
+struct tok ns_class2str[] = {
 	{ C_IN,		"IN" },		/* Not used */
 	{ C_CHAOS,	"CHAOS" },
 	{ C_HS,		"HS" },
@@ -314,11 +314,11 @@ ns_qprint(register const u_char *cp, register const u_char *bp)
 	/* print the qtype and qclass (if it's not IN) */
 	i = *cp++ << 8;
 	i |= *cp++;
-	printf(" %s", tok2str(type2str, "Type%d", i));
+	printf(" %s", tok2str(ns_type2str, "Type%d", i));
 	i = *cp++ << 8;
 	i |= *cp++;
 	if (i != C_IN)
-		printf(" %s", tok2str(class2str, "(Class %d)", i));
+		printf(" %s", tok2str(ns_class2str, "(Class %d)", i));
 
 	fputs("? ", stdout);
 	cp = ns_nprint(np, bp);
@@ -349,7 +349,7 @@ ns_rprint(register const u_char *cp, register const u_char *bp)
 	class = *cp++ << 8;
 	class |= *cp++;
 	if (class != C_IN && typ != T_OPT)
-		printf(" %s", tok2str(class2str, "(Class %d)", class));
+		printf(" %s", tok2str(ns_class2str, "(Class %d)", class));
 
 	/* ignore ttl */
 	cp += 4;
@@ -359,7 +359,7 @@ ns_rprint(register const u_char *cp, register const u_char *bp)
 
 	rp = cp + len;
 
-	printf(" %s", tok2str(type2str, "Type%d", typ));
+	printf(" %s", tok2str(ns_type2str, "Type%d", typ));
 	if (rp > snapend)
 		return(NULL);
 
