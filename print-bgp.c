@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.87 2004-06-15 09:42:41 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.88 2004-06-22 15:04:51 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -93,6 +93,8 @@ struct bgp_opt {
 };
 #define BGP_OPT_SIZE		2	/* some compilers may pad to 4 bytes */
 
+#define BGP_UPDATE_MINSIZE      23
+
 struct bgp_notification {
 	u_int8_t bgpn_marker[16];
 	u_int16_t bgpn_len;
@@ -143,6 +145,8 @@ struct bgp_attr {
 #define BGPTYPE_MP_UNREACH_NLRI		15	/* RFC2283 */
 #define BGPTYPE_EXTD_COMMUNITIES        16      /* draft-ietf-idr-bgp-ext-communities */
 #define BGPTYPE_ATTR_SET               128      /* draft-marques-ppvpn-ibgp */
+
+#define BGP_MP_NLRI_MINSIZE              3       /* End of RIB Marker detection */
 
 static struct tok bgp_attr_values[] = {
     { BGPTYPE_ORIGIN,           "Origin"},
@@ -1232,7 +1236,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
 		break;
 
 	case BGPTYPE_MP_UNREACH_NLRI:
-		TCHECK2(tptr[0], 3);
+		TCHECK2(tptr[0], BGP_MP_NLRI_MINSIZE);
 		af = EXTRACT_16BITS(tptr);
 		safi = tptr[2];
 
@@ -1244,6 +1248,9 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                        tok2strbuf(bgp_safi_values, "Unknown SAFI", safi,
 				  tokbuf, sizeof(tokbuf)),
                        safi);
+
+                if (len == BGP_MP_NLRI_MINSIZE)
+                    printf("\n\t      End-of-Rib Marker (empty NLRI)");
 
 		tptr += 3;
                 
@@ -1687,6 +1694,12 @@ bgp_update_print(const u_char *dat, int length)
 
 	TCHECK2(p[0], 2);
 	len = EXTRACT_16BITS(p);
+
+        if (len == 0 && length == BGP_UPDATE_MINSIZE) {
+            printf("\n\t  End-of-Rib Marker (empty NLRI)");
+            return;
+        }
+
 	if (len) {
 		/* do something more useful!*/
 		i = 2;
@@ -1719,7 +1732,7 @@ bgp_update_print(const u_char *dat, int length)
 				goto trunc;
 			i += aoff + alen;
 		}
-	}
+	} 
 	p += 2 + len;
 
 	if (dat + length > p) {
