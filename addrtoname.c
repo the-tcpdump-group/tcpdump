@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.96.2.2 2003-11-16 08:51:04 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.96.2.3 2003-12-15 04:02:53 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -186,7 +186,6 @@ intoa(u_int32_t addr)
 
 static u_int32_t f_netmask;
 static u_int32_t f_localnet;
-static u_int32_t netmask;
 
 /*
  * Return a name for the IP address pointed to by ap.  This address
@@ -1097,7 +1096,6 @@ init_ipxsaparray(void)
 void
 init_addrtoname(u_int32_t localnet, u_int32_t mask)
 {
-	netmask = mask;
 	if (fflag) {
 		f_localnet = localnet;
 		f_netmask = mask;
