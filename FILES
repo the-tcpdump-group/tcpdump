@@ -103,6 +103,7 @@ print-ether.c
 print-fddi.c
 print-frag6.c
 print-gre.c
+print-hsrp.c
 print-icmp.c
 print-icmp6.c
 print-igmp.c

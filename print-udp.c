@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.98 2001-09-09 19:30:23 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.99 2001-09-17 06:22:33 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -384,6 +384,7 @@ static int udp6_cksum(const struct ip6_hdr *ip6, const struct udphdr *up,
 #define RADIUS_NEW_PORT 1812
 #define RADIUS_ACCOUNTING_PORT 1646
 #define RADIUS_NEW_ACCOUNTING_PORT 1813
+#define HSRP_PORT 1985		/*XXX*/
 #define LWRES_PORT		921
 #define ZEPHYR_SRV_PORT		2103
 #define ZEPHYR_CLT_PORT		2104
@@ -665,6 +666,8 @@ udp_print(register const u_char *bp, u_int length,
 			 ISPORT(RADIUS_ACCOUNTING_PORT) || 
 			 ISPORT(RADIUS_NEW_ACCOUNTING_PORT) )
 			radius_print((const u_char *)(up+1), length);
+		else if (dport == HSRP_PORT)
+ 			hsrp_print((const u_char *)(up + 1), length);
 		else if (ISPORT(LWRES_PORT))
 			lwres_print((const u_char *)(up + 1), length);
 		else
