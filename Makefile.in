@@ -17,7 +17,7 @@
 #  WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 #  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.211 1999-10-30 07:36:34 itojun Exp $ (LBL)
+# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.212 1999-10-30 07:53:37 itojun Exp $ (LBL)
 
 #
 # Various configurable paths (remember to edit Makefile.in, not Makefile)
@@ -116,6 +116,12 @@ getnameinfo.o: $(srcdir)/missing/getnameinfo.c
 	$(CC) $(CFLAGS) -o $@ -c $(srcdir)/missing/getnameinfo.c
 getaddrinfo.o: $(srcdir)/missing/getaddrinfo.c
 	$(CC) $(CFLAGS) -o $@ -c $(srcdir)/missing/getaddrinfo.c
+inet_pton.o: $(srcdir)/missing/inet_pton.c
+	$(CC) $(CFLAGS) -o $@ -c $(srcdir)/missing/inet_pton.c
+inet_ntop.o: $(srcdir)/missing/inet_ntop.c
+	$(CC) $(CFLAGS) -o $@ -c $(srcdir)/missing/inet_ntop.c
+inet_aton.o: $(srcdir)/missing/inet_aton.c
+	$(CC) $(CFLAGS) -o $@ -c $(srcdir)/missing/inet_aton.c
 
 version.o: version.c
 	$(CC) $(CFLAGS) -c version.c

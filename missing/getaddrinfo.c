@@ -60,6 +60,7 @@
 #include <ctype.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <errno.h>
 
 #ifndef HAVE_PORTABLE_PROTOTYPE
 #include "cdecl_ext.h"
@@ -364,11 +365,18 @@ getaddrinfo(hostname, servname, hints, res)
 	 * for raw and other inet{,6} sockets.
 	 */
 	if (MATCH_FAMILY(pai->ai_family, PF_INET, 1)
-	 || MATCH_FAMILY(pai->ai_family, PF_INET6, 1)) {
+#ifdef PF_INET6
+	 || MATCH_FAMILY(pai->ai_family, PF_INET6, 1)
+#endif
+	    ) {
 		ai0 = *pai;
 
 		if (pai->ai_family == PF_UNSPEC)
+#ifdef PF_INET6
 			pai->ai_family = PF_INET6;
+#else
+			pai->ai_family = PF_INET;
+#endif
 		error = get_portmatch(pai, servname);
 		if (error)
 			ERR(error);
@@ -529,8 +537,13 @@ explore_fqdn(pai, hostname, servname, res)
 
 #ifdef USE_GETIPNODEBY
 	hp = getipnodebyname(hostname, pai->ai_family, AI_ADDRCONFIG, &h_error);
-#else
+#elif defined(HAVE_GETHOSTBYNAME2)
 	hp = gethostbyname2(hostname, pai->ai_family);
+	h_error = h_errno;
+#else
+	if (pai->ai_family != AF_INET)
+		return 0;
+	hp = gethostbyname(hostname);
 	h_error = h_errno;
 #endif
 
@@ -943,7 +956,11 @@ get_port(ai, servname, matchonly)
 
 	if (servname == NULL)
 		return 0;
-	if (ai->ai_family != AF_INET && ai->ai_family != AF_INET6)
+	if (ai->ai_family != AF_INET
+#ifdef AF_INET6
+	    && ai->ai_family != AF_INET6
+#endif
+	    )
 		return 0;
 
 	switch (ai->ai_socktype) {

@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.77 1999-10-30 07:45:38 itojun Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.78 1999-10-30 07:53:38 itojun Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -299,7 +299,7 @@ if test "$buggygetaddrinfo" = "yes"; then
 		echo '         of GNU C library (aka glibc).'
 	fi
 fi
-AC_REPLACE_FUNCS(getaddrinfo getnameinfo)
+AC_REPLACE_FUNCS(getaddrinfo getnameinfo inet_ntop inet_pton inet_aton)
 
 dnl portability macros for getaddrinfo/getnameinfo
 dnl
