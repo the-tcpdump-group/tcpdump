@@ -16,7 +16,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-eigrp.c,v 1.4 2004-05-01 21:07:39 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-eigrp.c,v 1.5 2004-05-12 22:22:40 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -157,6 +157,44 @@ struct eigrp_tlv_ip_ext_t {
     u_int8_t destination; /* variable length [1-4] bytes encoding */
 }; 
 
+struct eigrp_tlv_at_cable_setup_t {
+    u_int8_t cable_start[2];
+    u_int8_t cable_end[2];
+    u_int8_t router_id[4];
+};
+
+struct eigrp_tlv_at_int_t {
+    u_int8_t nexthop[4];
+    u_int8_t delay[4];
+    u_int8_t bandwidth[4];
+    u_int8_t mtu[3];
+    u_int8_t hopcount;
+    u_int8_t reliability;
+    u_int8_t load;
+    u_int8_t reserved[2];
+    u_int8_t cable_start[2];
+    u_int8_t cable_end[2];
+}; 
+
+struct eigrp_tlv_at_ext_t {
+    u_int8_t nexthop[4];
+    u_int8_t origin_router[4];
+    u_int8_t origin_as[4];
+    u_int8_t tag[4];
+    u_int8_t proto_id;
+    u_int8_t flags;
+    u_int8_t metric[2];
+    u_int8_t delay[4];
+    u_int8_t bandwidth[4];
+    u_int8_t mtu[3];
+    u_int8_t hopcount;
+    u_int8_t reliability;
+    u_int8_t load;
+    u_int8_t reserved2[2];
+    u_int8_t cable_start[2];
+    u_int8_t cable_end[2];
+};
+
 static const struct tok eigrp_ext_proto_id_values[] = {
     { 0x01, "IGRP" },
     { 0x02, "EIGRP" },
@@ -186,6 +224,9 @@ eigrp_print(register const u_char *pptr, register u_int len) {
         const struct eigrp_tlv_sw_version_t *eigrp_tlv_sw_version;
         const struct eigrp_tlv_ip_int_t *eigrp_tlv_ip_int;
         const struct eigrp_tlv_ip_ext_t *eigrp_tlv_ip_ext;
+        const struct eigrp_tlv_at_cable_setup_t *eigrp_tlv_at_cable_setup;
+        const struct eigrp_tlv_at_int_t *eigrp_tlv_at_int;
+        const struct eigrp_tlv_at_ext_t *eigrp_tlv_at_ext;
     } tlv_ptr;
 
     tptr=pptr;
@@ -347,6 +388,69 @@ eigrp_print(register const u_char *pptr, register u_int len) {
                    tlv_ptr.eigrp_tlv_ip_ext->load);
             break;
 
+        case EIGRP_TLV_AT_CABLE_SETUP:
+            tlv_ptr.eigrp_tlv_at_cable_setup = (const struct eigrp_tlv_at_cable_setup_t *)tlv_tptr;
+
+            printf("\n\t    Cable-range: %u-%u, Router-ID %u",
+                   EXTRACT_16BITS(&tlv_ptr.eigrp_tlv_at_cable_setup->cable_start),
+                   EXTRACT_16BITS(&tlv_ptr.eigrp_tlv_at_cable_setup->cable_end),
+                   EXTRACT_32BITS(&tlv_ptr.eigrp_tlv_at_cable_setup->router_id));
+            break;
+
+        case EIGRP_TLV_AT_INT:
+            tlv_ptr.eigrp_tlv_at_int = (const struct eigrp_tlv_at_int_t *)tlv_tptr;
+
+            printf("\n\t     Cable-Range: %u-%u, nexthop: ",
+                   EXTRACT_16BITS(&tlv_ptr.eigrp_tlv_at_int->cable_start),
+                   EXTRACT_16BITS(&tlv_ptr.eigrp_tlv_at_int->cable_end));
+
+            if (EXTRACT_32BITS(&tlv_ptr.eigrp_tlv_at_int->nexthop) == 0)
+                printf("self");
+            else
+                printf("%u.%u",
+                       EXTRACT_16BITS(&tlv_ptr.eigrp_tlv_at_int->nexthop),
+                       EXTRACT_16BITS(&tlv_ptr.eigrp_tlv_at_int->nexthop[2]));
+
+            printf("\n\t      delay %u ms, bandwidth %u Kbps, mtu %u, hop %u, reliability %u, load %u",
+                   (EXTRACT_32BITS(&tlv_ptr.eigrp_tlv_at_int->delay)/100),
+                   EXTRACT_32BITS(&tlv_ptr.eigrp_tlv_at_int->bandwidth),
+                   EXTRACT_24BITS(&tlv_ptr.eigrp_tlv_at_int->mtu),
+                   tlv_ptr.eigrp_tlv_at_int->hopcount,
+                   tlv_ptr.eigrp_tlv_at_int->reliability,
+                   tlv_ptr.eigrp_tlv_at_int->load);
+            break;
+
+        case EIGRP_TLV_AT_EXT:
+            tlv_ptr.eigrp_tlv_at_ext = (const struct eigrp_tlv_at_ext_t *)tlv_tptr;
+
+            printf("\n\t     Cable-Range: %u-%u, nexthop: ",
+                   EXTRACT_16BITS(&tlv_ptr.eigrp_tlv_at_ext->cable_start),
+                   EXTRACT_16BITS(&tlv_ptr.eigrp_tlv_at_ext->cable_end));
+
+            if (EXTRACT_32BITS(&tlv_ptr.eigrp_tlv_at_ext->nexthop) == 0)
+                printf("self");
+            else
+                printf("%u.%u",
+                       EXTRACT_16BITS(&tlv_ptr.eigrp_tlv_at_ext->nexthop),
+                       EXTRACT_16BITS(&tlv_ptr.eigrp_tlv_at_ext->nexthop[2]));
+
+            printf("\n\t      origin-router %u, origin-as %u, origin-proto %s, flags [0x%02x], tag 0x%08x, metric %u",
+                   EXTRACT_32BITS(tlv_ptr.eigrp_tlv_at_ext->origin_router),
+                   EXTRACT_32BITS(tlv_ptr.eigrp_tlv_at_ext->origin_as),
+                   tok2str(eigrp_ext_proto_id_values,"unknown",tlv_ptr.eigrp_tlv_at_ext->proto_id),
+                   tlv_ptr.eigrp_tlv_at_ext->flags,
+                   EXTRACT_32BITS(tlv_ptr.eigrp_tlv_at_ext->tag),
+                   EXTRACT_16BITS(tlv_ptr.eigrp_tlv_at_ext->metric));
+
+            printf("\n\t      delay %u ms, bandwidth %u Kbps, mtu %u, hop %u, reliability %u, load %u",
+                   (EXTRACT_32BITS(&tlv_ptr.eigrp_tlv_at_ext->delay)/100),
+                   EXTRACT_32BITS(&tlv_ptr.eigrp_tlv_at_ext->bandwidth),
+                   EXTRACT_24BITS(&tlv_ptr.eigrp_tlv_at_ext->mtu),
+                   tlv_ptr.eigrp_tlv_at_ext->hopcount,
+                   tlv_ptr.eigrp_tlv_at_ext->reliability,
+                   tlv_ptr.eigrp_tlv_at_ext->load);
+            break;
+
             /*
              * FIXME those are the defined TLVs that lack a decoder
              * you are welcome to contribute code ;-)
@@ -355,9 +459,6 @@ eigrp_print(register const u_char *pptr, register u_int len) {
         case EIGRP_TLV_AUTH:
         case EIGRP_TLV_SEQ:
         case EIGRP_TLV_MCAST_SEQ:
-        case EIGRP_TLV_AT_INT:
-        case EIGRP_TLV_AT_EXT:
-        case EIGRP_TLV_AT_CABLE_SETUP:
         case EIGRP_TLV_IPX_INT:
         case EIGRP_TLV_IPX_EXT:
 
