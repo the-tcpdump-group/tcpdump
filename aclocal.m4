@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.63 1999-10-07 23:47:09 mcr Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.64 1999-10-09 23:57:19 mcr Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -51,7 +51,7 @@ AC_DEFUN(AC_LBL_C_INIT,
     $1="-O"
     $2=""
     if test "${srcdir}" != "." ; then
-	    $2="-I\$\(srcdir\)"
+	    $2="-I\$(srcdir)"
     fi
     if test "${CFLAGS+set}" = set; then
 	    LBL_CFLAGS="$CFLAGS"
@@ -200,7 +200,7 @@ AC_DEFUN(AC_LBL_LIBPCAP,
 		    continue;
 	    fi
 	    lastdir=$dir
-	    if test -r $dir/pcap.c ; then
+	    if test -r $dir/libpcap.a ; then
 		    libpcap=$dir/libpcap.a
 		    d=$dir
 		    dnl continue and select the last one that exists
@@ -214,7 +214,13 @@ AC_DEFUN(AC_LBL_LIBPCAP,
 	    fi
     else
 	    $1=$libpcap
-	    $2="-I$d $$2"
+	    if test -r $d/pcap.h; then
+		    $2="-I$d $$2"
+	    elif test -r $srcdir/../libpcap/pcap.h; then
+		    $2="-I$d -I$srcdir/../libpcap $$2"
+	    else
+                    AC_MSG_ERROR(cannot find pcap.h, see INSTALL)
+ 	    fi
 	    AC_MSG_RESULT($libpcap)
     fi
     LIBS="$libpcap $LIBS"

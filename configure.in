@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.71 1999-10-07 23:47:10 mcr Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.72 1999-10-09 23:57:19 mcr Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -170,16 +170,15 @@ fi
 
 AC_LBL_UNALIGNED_ACCESS
 
-if test "${srcdir}" = "." ; then
-	srcdirprefix=""
-else
-	srcdirprefix="./"
+if test -r ${srcdir}/lbl/gnuc.h ; then
+	rm -f gnuc.h
+	ln -s ${srcdir}/lbl/gnuc.h gnuc.h
 fi
 
-if test -r ${srcdirprefix}lbl/gnuc.h ; then
-	rm -f gnuc.h
-	ln -s ${srcdirprefix}lbl/gnuc.h gnuc.h
-fi
+rm -f bpf_filter.c
+ln -s ${srcdir}/bpf/net/bpf_filter.c bpf_filter.c
+rm -f net
+ln -s ${srcdir}/bpf/net net
 
 AC_SUBST(V_CCOPT)
 AC_SUBST(V_GROUP)
