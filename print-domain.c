@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.84 2003-04-04 03:49:25 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.85 2003-09-25 22:30:22 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -542,7 +542,7 @@ ns_print(register const u_char *bp, u_int length)
 			DNS_AA(np)? "*" : "",
 			DNS_RA(np)? "" : "-",
 			DNS_TC(np)? "|" : "",
-			DNS_CD(np)? "%" : "");
+			DNS_AD(np)? "$" : "");
 
 		if (qdcount != 1)
 			printf(" [%dq]", qdcount);
@@ -605,7 +605,7 @@ ns_print(register const u_char *bp, u_int length)
 		/* this is a request */
 		printf(" %d%s%s%s", EXTRACT_16BITS(&np->id), ns_ops[DNS_OPCODE(np)],
 		    DNS_RD(np) ? "+" : "",
-		    DNS_AD(np) ? "$" : "");
+		    DNS_CD(np) ? "%" : "");
 
 		/* any weirdness? */
 		b2 = EXTRACT_16BITS(((u_short *)np)+1);
