@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sunrpc.c,v 1.38 2000-10-03 02:55:01 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sunrpc.c,v 1.39 2000-10-07 05:53:13 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -36,9 +36,6 @@ struct mbuf;
 struct rtentry;
 
 #include <netinet/in.h>
-#ifdef INET6
-#include <netinet/ip6.h>
-#endif
 
 #include <rpc/rpc.h>
 #ifdef HAVE_RPC_RPCENT_H
@@ -55,6 +52,9 @@ struct rtentry;
 #include "addrtoname.h"
 
 #include "ip.h"
+#ifdef INET6
+#include "ip6.h"
+#endif
 
 static struct tok proc2str[] = {
 	{ PMAPPROC_NULL,	"null" },

@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.24 2000-10-04 02:54:40 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.25 2000-10-07 05:53:12 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -48,10 +48,6 @@ struct rtentry;
 
 #include <netinet/in.h>
 
-#ifdef INET6
-#include <netinet/ip6.h>
-#endif
-
 #include <stdio.h>
 #include <netdb.h>
 
@@ -63,6 +59,9 @@ struct rtentry;
 #include "extract.h"                    /* must come after interface.h */
 
 #include "ip.h"
+#ifdef INET6
+#include "ip6.h"
+#endif
 
 #ifndef HAVE_SOCKADDR_STORAGE
 #define sockaddr_storage sockaddr
