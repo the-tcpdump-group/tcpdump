@@ -21,7 +21,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.6 2004-04-23 19:03:39 mcr Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.7 2004-04-29 02:15:41 mcr Exp $ (LBL)
  */
 
 #ifndef netdissect_h
@@ -67,6 +67,11 @@ struct tok {
 	const char *s;		/* string */
 };
 
+#define TOKBUFSIZE 128
+extern const char *tok2strbuf(const struct tok *, const char *, int,
+			      char *buf, size_t bufsize);
+
+/* tok2str is deprecated */
 extern const char *tok2str(const struct tok *, const char *, int);
 extern char *bittok2str(const struct tok *, const char *, int);
 
