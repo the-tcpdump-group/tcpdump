@@ -43,7 +43,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/missing/getnameinfo.c,v 1.6 2000-01-21 04:06:19 itojun Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/missing/getnameinfo.c,v 1.7 2000-10-07 05:20:24 itojun Exp $";
 #endif
 
 #include <sys/types.h>
@@ -159,12 +159,12 @@ getnameinfo(sa, salen, host, hostlen, serv, servlen, flags)
 				(flags & NI_DGRAM) ? "udp" : "tcp");
 		}
 		if (sp) {
-			if (strlen(sp->s_name) > servlen)
+			if (strlen(sp->s_name) + 1 > servlen)
 				return ENI_MEMORY;
 			strcpy(serv, sp->s_name);
 		} else {
 			snprintf(numserv, sizeof(numserv), "%d", ntohs(port));
-			if (strlen(numserv) > servlen)
+			if (strlen(numserv) + 1 > servlen)
 				return ENI_MEMORY;
 			strcpy(serv, numserv);
 		}
@@ -220,7 +220,7 @@ getnameinfo(sa, salen, host, hostlen, serv, servlen, flags)
 		if (inet_ntop(afd->a_af, addr, numaddr, sizeof(numaddr))
 		    == NULL)
 			return ENI_SYSTEM;
-		if (strlen(numaddr) > hostlen)
+		if (strlen(numaddr) + 1 > hostlen)
 			return ENI_MEMORY;
 		strcpy(host, numaddr);
 #if defined(INET6) && defined(NI_WITHSCOPEID)
@@ -260,7 +260,7 @@ getnameinfo(sa, salen, host, hostlen, serv, servlen, flags)
 				p = strchr(hp->h_name, '.');
 				if (p) *p = '\0';
 			}
-			if (strlen(hp->h_name) > hostlen) {
+			if (strlen(hp->h_name) + 1 > hostlen) {
 #ifdef USE_GETIPNODEBY
 				freehostent(hp);
 #endif
@@ -276,7 +276,7 @@ getnameinfo(sa, salen, host, hostlen, serv, servlen, flags)
 			if (inet_ntop(afd->a_af, addr, numaddr, sizeof(numaddr))
 			    == NULL)
 				return ENI_NOHOSTNAME;
-			if (strlen(numaddr) > hostlen)
+			if (strlen(numaddr) + 1 > hostlen)
 				return ENI_MEMORY;
 			strcpy(host, numaddr);
 		}
