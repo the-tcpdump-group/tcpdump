@@ -13,7 +13,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.19 2000-10-05 04:10:04 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.20 2001-01-10 08:12:01 fenner Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -871,13 +871,14 @@ fs_print(register const u_char *bp, int length)
 			break;
 		case 134:	/* Store ACL */
 		{
-			char a[AFSOPAQUEMAX];
+			char a[AFSOPAQUEMAX+1];
 			FIDOUT();
 			TCHECK2(bp[0], 4);
 			i = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 			TCHECK2(bp[0], i);
-			strncpy(a, (char *) bp, min(AFSOPAQUEMAX, i));
+			i = min(AFSOPAQUEMAX, i);
+			strncpy(a, (char *) bp, i);
 			a[i] = '\0';
 			acl_print((u_char *) a, sizeof(a), (u_char *) a + i);
 			break;
@@ -983,12 +984,13 @@ fs_reply_print(register const u_char *bp, int length, int32_t opcode)
 		switch (opcode) {
 		case 131:	/* Fetch ACL */
 		{
-			char a[AFSOPAQUEMAX];
+			char a[AFSOPAQUEMAX+1];
 			TCHECK2(bp[0], 4);
 			i = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 			TCHECK2(bp[0], i);
-			strncpy(a, (char *) bp, min(AFSOPAQUEMAX, i));
+			i = min(AFSOPAQUEMAX, i);
+			strncpy(a, (char *) bp, i);
 			a[i] = '\0';
 			acl_print((u_char *) a, sizeof(a), (u_char *) a + i);
 			break;
