@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.101 2001-02-21 09:40:42 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.102 2001-02-25 01:00:25 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -655,6 +655,22 @@ index operations.
 For instance, \fBtcp[0]\fP always means the first
 byte of the TCP \fIheader\fP, and never means the first byte of an
 intervening fragment.
+
+Some offsets and field values may be expressed as names rather than
+as numeric values.  The following protocol header field offsets are
+available: \fBicmptype\fP (ICMP type field), \fBicmpcode\fP (ICMP
+code field), and \fBtcpflags\fP (TCP flags field).
+
+The following ICMP type field values are available: \fBicmp-echoreply\fP,
+\fBicmp-unreach\fP, \fBicmp-sourcequench\fP, \fBicmp-redirect\fP,
+\fBicmp-echo\fP, \fBicmp-routeradvert\fP, \fBicmp-routersolicit\fP,
+\fBicmp-timxceed\fP, \fBicmp-paramprob\fP, \fBicmp-tstamp\fP,
+\fBicmp-tstampreply\fP, \fBicmp-ireq\fP, \fBicmp-ireqreply\fP,
+\fBicmp-maskreq\fP, \fBicmp-maskreply\fP.
+
+The following TCP flags field values are available: \fBtcp-fin\fP,
+\fBtcp-syn\fP, \fBtcp-rst\fP, \fBtcp-push\fP, \fBtcp-push\fP,
+\fBtcp-ack\fP, \fBtcp-urg\fP.
 .LP
 Primitives may be combined using:
 .IP
@@ -754,7 +770,7 @@ TCP conversation that involves a non-local host.
 .RS
 .nf
 .B
-tcpdump 'tcp[13] & 3 != 0 and not src and dst net \fIlocalnet\fP'
+tcpdump 'tcp[tcpflags] & (tcp-syn|tcp-fin) != 0 and not src and dst net \fIlocalnet\fP'
 .fi
 .RE
 .LP
@@ -781,7 +797,7 @@ ping packets):
 .RS
 .nf
 .B
-tcpdump 'icmp[0] != 8 and icmp[0] != 0'
+tcpdump 'icmp[icmptype] != icmp-echo and icmp[icmptype] != icmp-echoreply'
 .fi
 .RE
 .SH OUTPUT FORMAT
