@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.76 2000-08-01 17:36:49 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.77 2000-08-03 22:21:19 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -182,7 +182,7 @@ rtp_print(const void *hdr, u_int len, register const struct udphdr *up)
 		i0 & 0xffff,
 		i1);
 	if (vflag) {
-		printf(" %u", i1);
+		printf(" %u", (u_int32_t)ntohl(((u_int *)hdr)[2]));
 		if (hasopt) {
 			u_int i2, optlen;
 			do {
