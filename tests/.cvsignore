@@ -1,3 +1,5 @@
+*.new
+*.pcap
 02-sunrise-sunset-esp.pcap
 08-sunrise-sunset-aes.pcap
 08-sunrise-sunset-esp.pcap

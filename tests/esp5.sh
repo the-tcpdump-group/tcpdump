@@ -3,7 +3,8 @@
 uudecode 08-sunrise-sunset-aes.puu
 
 echo -n test esp5...
-if (../tcpdump -t -n -E "file esp-secrets.txt" -r 08-sunrise-sunset-aes.pcap | diff - esp5.out)
+../tcpdump -t -n -E "file esp-secrets.txt" -r 08-sunrise-sunset-aes.pcap > esp5.new
+if diff esp5.new esp5.out
 then
 	echo passed.
 else

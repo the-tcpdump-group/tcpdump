@@ -1,7 +1,10 @@
 #!/bin/sh
 
+uudecode ospf-gmpls.puu 
+
 echo -n test ospf-gmpls...
-if (../tcpdump -t -n -v -r ospf-gmpls.pcap | diff - ospf-gmpls.out)
+../tcpdump -t -n -v -r ospf-gmpls.pcap > ospf-gmpls.new
+if diff ospf-gmpls.new ospf-gmpls.out
 then
 	echo passed.
 else

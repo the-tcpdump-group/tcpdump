@@ -1,7 +1,10 @@
 #!/bin/sh
 
+uudecode mpls-ldp-hello.puu
+
 echo -n test mpls-ldp-hello ...
-if (../tcpdump -t -n -v -r mpls-ldp-hello.pcap | diff - mpls-ldp-hello.out)
+../tcpdump -t -n -v -r mpls-ldp-hello.pcap >mpls-ldp-hello.new
+if diff mpls-ldp-hello.new mpls-ldp-hello.out
 then
 	echo passed.
 else
