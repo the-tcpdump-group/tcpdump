@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.69 2002-12-18 08:53:20 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.70 2003-03-12 19:25:40 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -376,7 +376,7 @@ rfc1048_print(register const u_char *bp)
 		}
 		len = *bp++;
 		if (bp + len >= snapend) {
-			fputs(tstr, stdout);
+			printf("[|bootp %u]", len);
 			return;
 		}
 
@@ -571,6 +571,8 @@ rfc1048_print(register const u_char *bp)
 					putchar('"');
 					(void)fn_printn(bp, size, NULL);
 					putchar('"');
+					bp += size;
+					size = 0;
 					break;
 				} else {
 					printf("[%s]", tok2str(arp2str, "type-%d", type));
@@ -596,8 +598,10 @@ rfc1048_print(register const u_char *bp)
 			break;
 		}
 		/* Data left over? */
-		if (size)
+		if (size) {
 			printf("[len %u]", len);
+			bp += size;
+		}
 	}
 	return;
 trunc:
