@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.97 2001-08-20 17:53:54 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.98 2001-09-09 19:30:23 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -385,6 +385,8 @@ static int udp6_cksum(const struct ip6_hdr *ip6, const struct udphdr *up,
 #define RADIUS_ACCOUNTING_PORT 1646
 #define RADIUS_NEW_ACCOUNTING_PORT 1813
 #define LWRES_PORT		921
+#define ZEPHYR_SRV_PORT		2103
+#define ZEPHYR_CLT_PORT		2104
 
 #ifdef INET6
 #define RIPNG_PORT 521		/*XXX*/
@@ -633,6 +635,8 @@ udp_print(register const u_char *bp, u_int length,
  			nbt_udp138_print((const u_char *)(up + 1), length);
 		else if (dport == 3456)
 			vat_print((const void *)(up + 1), length, up);
+		else if (ISPORT(ZEPHYR_SRV_PORT) || ISPORT(ZEPHYR_CLT_PORT))
+			zephyr_print((const void *)(up + 1), length);
  		/*
  		 * Since there are 10 possible ports to check, I think
  		 * a <> test would be more efficient
