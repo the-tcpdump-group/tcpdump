@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.74 2002-12-21 18:41:34 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.75 2002-12-23 14:40:46 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -787,18 +787,6 @@ isis_print_metric_block (const struct isis_metric_block *isis_metric_block)
 static int
 isis_print_tlv_ip_reach (const u_int8_t *cp, const char *ident, int length)
 {
-	u_int bitmasks[33] = {
-		0x00000000,
-		0x80000000, 0xc0000000, 0xe0000000, 0xf0000000,
-		0xf8000000, 0xfc000000, 0xfe000000, 0xff000000,
-		0xff800000, 0xffc00000, 0xffe00000, 0xfff00000,
-		0xfff80000, 0xfffc0000, 0xfffe0000, 0xffff0000,
-		0xffff8000, 0xffffc000, 0xffffe000, 0xfffff000,
-		0xfffff800, 0xfffffc00, 0xfffffe00, 0xffffff00,
-		0xffffff80, 0xffffffc0, 0xffffffe0, 0xfffffff0,
-		0xfffffff8, 0xfffffffc, 0xfffffffe, 0xffffffff
-	};
-	u_int mask;
 	int prefix_len;
 	const struct isis_tlv_ip_reach *tlv_ip_reach;
 
@@ -815,22 +803,9 @@ isis_print_tlv_ip_reach (const u_int8_t *cp, const char *ident, int length)
 		if (!TTEST(*tlv_ip_reach))
 		    return (0);
 
-		mask = EXTRACT_32BITS(tlv_ip_reach->mask);
-		prefix_len = 0;
+		prefix_len = mask2plen(EXTRACT_32BITS(tlv_ip_reach->mask));
 
-                /* lets see if we can transform the mask into a prefixlen */
-		while (prefix_len <= 33) {
-			if (bitmasks[prefix_len++] == mask) {
-				prefix_len--;
-				break;
-			}
-		}
-
-		/*
-		 * 34 indicates no match -> must be a discontiguous netmask
-		 * lets dump the mask, otherwise print the prefix_len
-		 */
-		if (prefix_len == 34)
+		if (prefix_len == -1)
 			printf("%sIPv4 prefix: %s mask %s",
                                ident,
 			       ipaddr_string((tlv_ip_reach->prefix)),
