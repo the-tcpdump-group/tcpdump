@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.53.2.2 2003-11-16 08:51:32 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.53.2.3 2003-12-29 22:33:18 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -42,6 +42,23 @@ static const char rcsid[] _U_ =
 
 #include "llc.h"
 #include "ethertype.h"
+
+static struct tok llc_values[] = {
+        { LLCSAP_NULL,     "Null" },
+        { LLCSAP_GLOBAL,   "Global" },
+        { LLCSAP_8021B_I,  "802.1B I" },
+        { LLCSAP_8021B_G,  "802.1B G" },
+        { LLCSAP_IP,       "IP" },
+        { LLCSAP_PROWAYNM, "ProWay NM" },
+        { LLCSAP_8021D,    "STP" },
+        { LLCSAP_RS511,    "RS511" },
+        { LLCSAP_ISO8208,  "ISO8208" },
+        { LLCSAP_PROWAY,   "ProWay" },
+        { LLCSAP_SNAP,     "SNAP" },
+        { LLCSAP_IPX,      "IPX" },
+        { LLCSAP_NETBEUI,  "NetBeui" },
+        { LLCSAP_ISONS,    "OSI" },
+};
 
 static struct tok cmd2str[] = {
 	{ LLC_UI,	"ui" },
@@ -77,8 +94,10 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 	memcpy((char *)&llc, (char *)p, min(caplen, sizeof(llc)));
 
 	if (eflag)
-	  printf("LLC, dsap 0x%02x, ssap 0x%02x, cmd 0x%02x, ",
+	  printf("LLC, dsap %s (0x%02x), ssap %s (0x%02x), cmd 0x%02x, ",
+                 tok2str(llc_values,"Unknown",llc.dsap),
 		 llc.dsap,
+                 tok2str(llc_values,"Unknown",llc.ssap),
 		 llc.ssap,
 		 llc.llcu);
 
@@ -190,8 +209,6 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 			default_print((u_char *)p, caplen);
 			return (0);
 		}
-		if (vflag)
-			(void)printf("snap %s ", protoid_string(llc.llcpi));
 
 		caplen -= sizeof(llc);
 		length -= sizeof(llc);
