@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.95 2003-09-08 15:59:08 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.96 2003-09-08 16:18:06 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -110,7 +110,7 @@ static struct tok isis_pdu_values[] = {
 #define TLV_AUTH                10  /* iso10589, rfc3567 */
 #define TLV_CHECKSUM            12  /* rfc3358 */
 #define TLV_LSP_BUFFERSIZE      14  /* iso10589 rev2 */
-#define TLV_EXT_IS_REACH        22  /* draft-ietf-isis-traffic-04 */
+#define TLV_EXT_IS_REACH        22  /* draft-ietf-isis-traffic-05 */
 #define TLV_IS_ALIAS_ID         24  /* draft-ietf-isis-ext-lsp-frags-02 */
 #define TLV_DECNET_PHASE4       42
 #define TLV_LUCENT_PRIVATE      66
@@ -120,10 +120,10 @@ static struct tok isis_pdu_values[] = {
 #define TLV_IDRP_INFO           131 /* rfc1195 */
 #define TLV_IPADDR              132 /* rfc1195 */
 #define TLV_IPAUTH              133 /* rfc1195 */
-#define TLV_TE_ROUTER_ID        134 /* draft-ietf-isis-traffic-04 */
-#define TLV_EXT_IP_REACH        135 /* draft-ietf-isis-traffic-04 */
+#define TLV_TE_ROUTER_ID        134 /* draft-ietf-isis-traffic-05 */
+#define TLV_EXT_IP_REACH        135 /* draft-ietf-isis-traffic-05 */
 #define TLV_HOSTNAME            137 /* rfc2763 */
-#define TLV_SHARED_RISK_GROUP   138 /* draft-ietf-isis-gmpls-extensions-14 */
+#define TLV_SHARED_RISK_GROUP   138 /* draft-ietf-isis-gmpls-extensions */
 #define TLV_NORTEL_PRIVATE1     176
 #define TLV_NORTEL_PRIVATE2     177
 #define TLV_HOLDTIME            198 /* ES-IS */
@@ -181,21 +181,21 @@ static struct tok isis_tlv_values[] = {
     { 0, NULL }
 };
 
-#define SUBTLV_EXT_IS_REACH_ADMIN_GROUP           3
-#define SUBTLV_EXT_IS_REACH_LINK_LOCAL_ID         4
-#define SUBTLV_EXT_IS_REACH_LINK_REMOTE_ID        5
-#define SUBTLV_EXT_IS_REACH_IPV4_INTF_ADDR        6
-#define SUBTLV_EXT_IS_REACH_IPV4_NEIGHBOR_ADDR    8
-#define SUBTLV_EXT_IS_REACH_MAX_LINK_BW           9
-#define SUBTLV_EXT_IS_REACH_RESERVABLE_BW        10
-#define SUBTLV_EXT_IS_REACH_UNRESERVED_BW        11
-#define SUBTLV_EXT_IS_REACH_TE_METRIC            18
-#define SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE 20
-#define SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR    21
+#define SUBTLV_EXT_IS_REACH_ADMIN_GROUP           3 /* draft-ietf-isis-traffic-05 */
+#define SUBTLV_EXT_IS_REACH_LINK_LOCAL_REMOTE_ID  4 /* draft-ietf-isis-gmpls-extensions */
+#define SUBTLV_EXT_IS_REACH_LINK_REMOTE_ID        5 /* draft-ietf-isis-traffic-05 */
+#define SUBTLV_EXT_IS_REACH_IPV4_INTF_ADDR        6 /* draft-ietf-isis-traffic-05 */
+#define SUBTLV_EXT_IS_REACH_IPV4_NEIGHBOR_ADDR    8 /* draft-ietf-isis-traffic-05 */
+#define SUBTLV_EXT_IS_REACH_MAX_LINK_BW           9 /* draft-ietf-isis-traffic-05 */
+#define SUBTLV_EXT_IS_REACH_RESERVABLE_BW        10 /* draft-ietf-isis-traffic-05 */
+#define SUBTLV_EXT_IS_REACH_UNRESERVED_BW        11 /* draft-ietf-isis-traffic-05 */
+#define SUBTLV_EXT_IS_REACH_TE_METRIC            18 /* draft-ietf-isis-traffic-05 */
+#define SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE 20 /* draft-ietf-isis-gmpls-extensions */
+#define SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR    21 /* draft-ietf-isis-gmpls-extensions */
 
 static struct tok isis_ext_is_reach_subtlv_values[] = {
     { SUBTLV_EXT_IS_REACH_ADMIN_GROUP,            "Administrative groups" },
-    { SUBTLV_EXT_IS_REACH_LINK_LOCAL_ID,          "Link Local Identifier" },
+    { SUBTLV_EXT_IS_REACH_LINK_LOCAL_REMOTE_ID,   "Link Local/Remote Identifier" },
     { SUBTLV_EXT_IS_REACH_LINK_REMOTE_ID,         "Link Remote Identifier" },
     { SUBTLV_EXT_IS_REACH_IPV4_INTF_ADDR,         "IPv4 interface address" },
     { SUBTLV_EXT_IS_REACH_IPV4_NEIGHBOR_ADDR,     "IPv4 neighbor address" },
@@ -876,9 +876,11 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
 
         switch(subt) {
         case SUBTLV_EXT_IS_REACH_ADMIN_GROUP:      
-        case SUBTLV_EXT_IS_REACH_LINK_LOCAL_ID:
+        case SUBTLV_EXT_IS_REACH_LINK_LOCAL_REMOTE_ID:
         case SUBTLV_EXT_IS_REACH_LINK_REMOTE_ID:
             printf(", 0x%08x", EXTRACT_32BITS(tptr));
+	    if (subl == 8) /* draft-ietf-isis-gmpls-extensions */
+	      printf(", 0x%08x", EXTRACT_32BITS(tptr+4));
 	    break;
         case SUBTLV_EXT_IS_REACH_IPV4_INTF_ADDR:
         case SUBTLV_EXT_IS_REACH_IPV4_NEIGHBOR_ADDR:
