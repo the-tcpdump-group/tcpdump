@@ -123,6 +123,7 @@ print-llc.c
 print-lwres.c
 print-mobile.c
 print-mpls.c
+print-msdp.c
 print-netbios.c
 print-nfs.c
 print-ntp.c
