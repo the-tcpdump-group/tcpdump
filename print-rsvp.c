@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.13 2002-12-14 01:38:32 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.14 2002-12-14 02:03:10 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -202,6 +202,8 @@ static const struct tok rsvp_ctype_values[] = {
     { 256*RSVP_OBJ_SESSION+RSVP_CTYPE_IPV4,	             "IPv4" },
     { 256*RSVP_OBJ_SESSION+RSVP_CTYPE_IPV6,	             "IPv6" },
     { 256*RSVP_OBJ_SESSION+RSVP_CTYPE_TUNNEL_IPV4,           "Tunnel IPv4" },
+    { 256*RSVP_OBJ_SENDER_TEMPLATE+RSVP_CTYPE_IPV4,          "IPv4" },
+    { 256*RSVP_OBJ_SENDER_TEMPLATE+RSVP_CTYPE_IPV6,          "IPv6" },
     { 256*RSVP_OBJ_SENDER_TEMPLATE+RSVP_CTYPE_TUNNEL_IPV4,   "Tunnel IPv4" },
     { 256*RSVP_OBJ_STYLE+RSVP_CTYPE_1,                       "1" },
     { 256*RSVP_OBJ_HELLO+RSVP_CTYPE_1,                       "Hello Request" },
@@ -261,6 +263,10 @@ static const struct tok rsvp_intserv_parameter_id_values[] = {
     { 10,                    "Composed MTU" },
     { 127,                   "Token Bucket TSpec" },
     { 130,                   "Guaranteed Service RSpec" },
+    { 133,                   "End-to-end composed value for C" },
+    { 134,                   "End-to-end composed value for D" },
+    { 135,                   "Since-last-reshaping point composed C" },
+    { 136,                   "Since-last-reshaping point composed D" },
     { 0, NULL}
 };
 
@@ -394,14 +400,13 @@ rsvp_intserv_print(const u_char *tptr) {
         printf("\n\t\tRate: %.10g Mbps", bw.f/125000);
         printf("\n\t\tSlack Term: %u", EXTRACT_32BITS(tptr+8));
         break;
-    /*
-     *  FIXME those are the defined paramters that lack a decoder
-     *  you are welcome to contribute code ;-)
-     */
+
     case 133:
     case 134:
     case 135:
     case 136:
+        printf("\n\t\tValue: %u", EXTRACT_32BITS(tptr+4));
+        break;
 
     default:
         if (vflag <= 1)
@@ -596,6 +601,22 @@ rsvp_print(register const u_char *pptr, register u_int len) {
 
         case RSVP_OBJ_SENDER_TEMPLATE:
             switch(rsvp_obj_ctype) {
+            case RSVP_CTYPE_IPV4:
+                printf("\n\t    Source Address: %s, Source Port: %u",
+                       ipaddr_string(obj_tptr),
+                       EXTRACT_16BITS(obj_tptr+6));
+                obj_tlen-=8;
+                obj_tptr+=8;
+                break;
+#ifdef INET6
+            case RSVP_CTYPE_IPV6:
+                printf("\n\t    Source Address: %s, Source Port: %u",
+                       ip6addr_string(obj_tptr),
+                       EXTRACT_16BITS(obj_tptr+18));
+                obj_tlen-=20;
+                obj_tptr+=20;
+                break;
+#endif
             case RSVP_CTYPE_TUNNEL_IPV4:
                 printf("\n\t    IPv4 Tunnel Sender Address: %s, LSP-ID: 0x%04x",
                        ipaddr_string(obj_tptr),
@@ -772,11 +793,12 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 obj_tptr+=4; /* get to the start of the service header */
                 obj_tlen-=4;
 
-                while (obj_tlen >= 8) {
+                while (obj_tlen >= 4) {
                     intserv_serv_tlen=EXTRACT_16BITS(obj_tptr+2)<<2;
-                    printf("\n\t    Service Type: %s (%u), Service length: %u",
+                    printf("\n\t    Service Type: %s (%u), break bit %s set, Service length: %u",
                            tok2str(rsvp_intserv_service_type_values,"unknown",*(obj_tptr)),
                            *(obj_tptr),
+                           (*(obj_tptr+1)&0x80) ? "" : "not",
                            intserv_serv_tlen);
                     
                     obj_tptr+=4; /* get to the start of the parameter list */
