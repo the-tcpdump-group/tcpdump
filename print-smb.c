@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.13 2001-06-25 18:58:07 itojun Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.14 2001-06-26 03:33:44 itojun Exp $";
 #endif
 
 #include <stdio.h>
@@ -46,9 +46,9 @@ struct smbfns
     struct smbdescript descript;
 };
 
-#define DEFDESCRIPT	{NULL,NULL,NULL,NULL,NULL}
+#define DEFDESCRIPT	{ NULL, NULL, NULL, NULL, NULL }
 
-#define FLG_CHAIN	(1<<0)
+#define FLG_CHAIN	(1 << 0)
 
 static struct smbfns *
 smbfind(int id, struct smbfns *list)
@@ -305,384 +305,400 @@ print_ipc(uchar *param, int paramlen, uchar *data, int datalen)
 static void
 print_trans(const uchar *words, const uchar *data1, ...)
 {
-  uchar *f1,*f2,*f3,*f4;
-  uchar *data,*param;
-  int datalen,paramlen;
-  va_list ap;
-  uchar *buf, *maxbuf;
+    uchar *f1, *f2, *f3, *f4;
+    uchar *data, *param;
+    int datalen, paramlen;
+    va_list ap;
+    uchar *buf, *maxbuf;
 
-  va_start(ap, data1);
-  buf = va_arg(ap, uchar *);
-  maxbuf = va_arg(ap, uchar *);
-  va_end(ap);
+    va_start(ap, data1);
+    buf = va_arg(ap, uchar *);
+    maxbuf = va_arg(ap, uchar *);
+    va_end(ap);
 
-  if (request) {
-    paramlen = SVAL(words+1,9*2);
-    param = buf + SVAL(words+1,10*2);
-    datalen = SVAL(words+1,11*2);
-    data = buf + SVAL(words+1,12*2);
-    f1 = "TotParamCnt=[d] \nTotDataCnt=[d] \nMaxParmCnt=[d] \nMaxDataCnt=[d]\nMaxSCnt=[d] \nTransFlags=[w] \nRes1=[w] \nRes2=[w] \nRes3=[w]\nParamCnt=[d] \nParamOff=[d] \nDataCnt=[d] \nDataOff=[d] \nSUCnt=[d]\n";
-    f2 = "|Name=[S]\n";
-    f3 = "|Param ";
-    f4 = "|Data ";
-  } else {
-    paramlen = SVAL(words+1,3*2);
-    param = buf + SVAL(words+1,4*2);
-    datalen = SVAL(words+1,6*2);
-    data = buf + SVAL(words+1,7*2);
-    f1 = "TotParamCnt=[d] \nTotDataCnt=[d] \nRes1=[d]\nParamCnt=[d] \nParamOff=[d] \nRes2=[d] \nDataCnt=[d] \nDataOff=[d] \nRes3=[d]\nLsetup=[d]\n";
-    f2 = "|Unknown ";
-    f3 = "|Param ";
-    f4 = "|Data ";
-  }
+    if (request) {
+	paramlen = SVAL(words + 1, 9 * 2);
+	param = buf + SVAL(words + 1, 10 * 2);
+	datalen = SVAL(words + 1, 11 * 2);
+	data = buf + SVAL(words + 1, 12 * 2);
+	f1 = "TotParamCnt=[d] \nTotDataCnt=[d] \nMaxParmCnt=[d] \nMaxDataCnt=[d]\nMaxSCnt=[d] \nTransFlags=[w] \nRes1=[w] \nRes2=[w] \nRes3=[w]\nParamCnt=[d] \nParamOff=[d] \nDataCnt=[d] \nDataOff=[d] \nSUCnt=[d]\n";
+	f2 = "|Name=[S]\n";
+	f3 = "|Param ";
+	f4 = "|Data ";
+    } else {
+	paramlen = SVAL(words + 1, 3 * 2);
+	param = buf + SVAL(words + 1, 4 * 2);
+	datalen = SVAL(words + 1, 6 * 2);
+	data = buf + SVAL(words + 1, 7 * 2);
+	f1 = "TotParamCnt=[d] \nTotDataCnt=[d] \nRes1=[d]\nParamCnt=[d] \nParamOff=[d] \nRes2=[d] \nDataCnt=[d] \nDataOff=[d] \nRes3=[d]\nLsetup=[d]\n";
+	f2 = "|Unknown ";
+	f3 = "|Param ";
+	f4 = "|Data ";
+    }
 
-  fdata(words+1,f1,MIN(words+1+2*CVAL(words,0),maxbuf));
-  fdata(data1+2,f2,maxbuf - (paramlen + datalen));
+    fdata(words + 1, f1, MIN(words + 1 + 2 * CVAL(words, 0), maxbuf));
+    fdata(data1 + 2, f2, maxbuf - (paramlen + datalen));
 
-  if (!strcmp(data1+2,"\\MAILSLOT\\BROWSE")) {
-    print_browse(param,paramlen,data,datalen);
-    return;
-  }
+    if (!strcmp(data1 + 2, "\\MAILSLOT\\BROWSE")) {
+	print_browse(param, paramlen, data, datalen);
+	return;
+    }
 
-  if (!strcmp(data1+2,"\\PIPE\\LANMAN")) {
-    print_ipc(param,paramlen,data,datalen);
-    return;
-  }
+    if (!strcmp(data1 + 2, "\\PIPE\\LANMAN")) {
+	print_ipc(param, paramlen, data, datalen);
+	return;
+    }
 
-  if (paramlen) fdata(param,f3,MIN(param+paramlen,maxbuf));
-  if (datalen) fdata(data,f4,MIN(data+datalen,maxbuf));
+    if (paramlen)
+	fdata(param, f3, MIN(param + paramlen, maxbuf));
+    if (datalen)
+	fdata(data, f4, MIN(data + datalen, maxbuf));
 }
-
 
 
 static void
 print_negprot(const uchar *words, const uchar *data, ...)
 {
-  uchar *f1=NULL,*f2=NULL;
-  va_list ap;
-  uchar *buf, *maxbuf;
+    uchar *f1 = NULL, *f2 = NULL;
+    va_list ap;
+    uchar *buf, *maxbuf;
 
-  va_start(ap, data);
-  buf = va_arg(ap, uchar *);
-  maxbuf = va_arg(ap, uchar *);
-  va_end(ap);
+    va_start(ap, data);
+    buf = va_arg(ap, uchar *);
+    maxbuf = va_arg(ap, uchar *);
+    va_end(ap);
 
-  if (request) {
-    f2 = "*|Dialect=[Z]\n";
-  } else {
-    if (CVAL(words,0) == 1) {
-      f1 = "Core Protocol\nDialectIndex=[d]";
-    } else if (CVAL(words,0) == 17) {
-      f1 = "NT1 Protocol\nDialectIndex=[d]\nSecMode=[B]\nMaxMux=[d]\nNumVcs=[d]\nMaxBuffer=[D]\nRawSize=[D]\nSessionKey=[W]\nCapabilities=[W]\nServerTime=[T3]TimeZone=[d]\nCryptKey=";
-    } else if (CVAL(words,0) == 13) {
-      f1 = "Coreplus/Lanman1/Lanman2 Protocol\nDialectIndex=[d]\nSecMode=[w]\nMaxXMit=[d]\nMaxMux=[d]\nMaxVcs=[d]\nBlkMode=[w]\nSessionKey=[W]\nServerTime=[T1]TimeZone=[d]\nRes=[W]\nCryptKey=";
+    if (request)
+	f2 = "*|Dialect=[Z]\n";
+    else {
+	if (CVAL(words, 0) == 1)
+	    f1 = "Core Protocol\nDialectIndex=[d]";
+	else if (CVAL(words, 0) == 17)
+	    f1 = "NT1 Protocol\nDialectIndex=[d]\nSecMode=[B]\nMaxMux=[d]\nNumVcs=[d]\nMaxBuffer=[D]\nRawSize=[D]\nSessionKey=[W]\nCapabilities=[W]\nServerTime=[T3]TimeZone=[d]\nCryptKey=";
+	else if (CVAL(words, 0) == 13)
+	    f1 = "Coreplus/Lanman1/Lanman2 Protocol\nDialectIndex=[d]\nSecMode=[w]\nMaxXMit=[d]\nMaxMux=[d]\nMaxVcs=[d]\nBlkMode=[w]\nSessionKey=[W]\nServerTime=[T1]TimeZone=[d]\nRes=[W]\nCryptKey=";
     }
-  }
 
-  if (f1) 
-    fdata(words+1,f1,MIN(words + 1 + CVAL(words,0)*2,maxbuf));
-  else
-    print_data(words+1,MIN(CVAL(words,0)*2,PTR_DIFF(maxbuf,words+1)));
-  
-  if (f2) 
-    fdata(data+2,f2,MIN(data + 2 + SVAL(data,0),maxbuf));
-  else
-    print_data(data+2,MIN(SVAL(data,0),PTR_DIFF(maxbuf,data+2)));
-    
+    if (f1) 
+	fdata(words + 1, f1, MIN(words + 1 + CVAL(words, 0) * 2, maxbuf));
+    else
+	print_data(words + 1, MIN(CVAL(words, 0) * 2,
+	    PTR_DIFF(maxbuf, words + 1)));
+
+    if (f2) 
+	fdata(data + 2, f2, MIN(data + 2 + SVAL(data, 0), maxbuf));
+    else
+	print_data(data + 2, MIN(SVAL(data, 0), PTR_DIFF(maxbuf, data + 2)));
 }
 
 static void
 print_sesssetup(const uchar *words, const uchar *data, ...)
 {
-  int wcnt = CVAL(words,0);
-  uchar *f1=NULL,*f2=NULL;
-  va_list ap;
-  uchar *buf, *maxbuf;
+    int wcnt = CVAL(words, 0);
+    uchar *f1 = NULL, *f2 = NULL;
+    va_list ap;
+    uchar *buf, *maxbuf;
 
-  va_start(ap, data);
-  buf = va_arg(ap, uchar *);
-  maxbuf = va_arg(ap, uchar *);
-  va_end(ap);
+    va_start(ap, data);
+    buf = va_arg(ap, uchar *);
+    maxbuf = va_arg(ap, uchar *);
+    va_end(ap);
 
-  if (request) {
-    if (wcnt==10) {
-      f1 = "Com2=[w]\nOff2=[d]\nBufSize=[d]\nMpxMax=[d]\nVcNum=[d]\nSessionKey=[W]\nPassLen=[d]\nCryptLen=[d]\nCryptOff=[d]\nPass&Name=\n";
+    if (request) {
+	if (wcnt == 10)
+	    f1 = "Com2=[w]\nOff2=[d]\nBufSize=[d]\nMpxMax=[d]\nVcNum=[d]\nSessionKey=[W]\nPassLen=[d]\nCryptLen=[d]\nCryptOff=[d]\nPass&Name=\n";
+	else
+	    f1 = "Com2=[B]\nRes1=[B]\nOff2=[d]\nMaxBuffer=[d]\nMaxMpx=[d]\nVcNumber=[d]\nSessionKey=[W]\nCaseInsensitivePasswordLength=[d]\nCaseSensitivePasswordLength=[d]\nRes=[W]\nCapabilities=[W]\nPass1&Pass2&Account&Domain&OS&LanMan=\n";
     } else {
-      f1 = "Com2=[B]\nRes1=[B]\nOff2=[d]\nMaxBuffer=[d]\nMaxMpx=[d]\nVcNumber=[d]\nSessionKey=[W]\nCaseInsensitivePasswordLength=[d]\nCaseSensitivePasswordLength=[d]\nRes=[W]\nCapabilities=[W]\nPass1&Pass2&Account&Domain&OS&LanMan=\n";
+	if (CVAL(words,0) == 3) {
+	f1 = "Com2=[w]\nOff2=[d]\nAction=[w]\n";
+	} else if (CVAL(words,0) == 13) {
+	f1 = "Com2=[B]\nRes=[B]\nOff2=[d]\nAction=[w]\n";
+	f2 = "NativeOS=[S]\nNativeLanMan=[S]\nPrimaryDomain=[S]\n";
+	}
     }
-  } else {
-    if (CVAL(words,0) == 3) {
-      f1 = "Com2=[w]\nOff2=[d]\nAction=[w]\n";
-    } else if (CVAL(words,0) == 13) {
-      f1 = "Com2=[B]\nRes=[B]\nOff2=[d]\nAction=[w]\n";
-      f2 = "NativeOS=[S]\nNativeLanMan=[S]\nPrimaryDomain=[S]\n";
-    }
-  }
 
-  if (f1) 
-    fdata(words+1,f1,MIN(words + 1 + CVAL(words,0)*2,maxbuf));
-  else
-    print_data(words+1,MIN(CVAL(words,0)*2,PTR_DIFF(maxbuf,words+1)));
-  
-  if (f2) 
-    fdata(data+2,f2,MIN(data + 2 + SVAL(data,0),maxbuf));
-  else
-    print_data(data+2,MIN(SVAL(data,0),PTR_DIFF(maxbuf,data+2))); 
+    if (f1) 
+	fdata(words + 1, f1, MIN(words + 1 + CVAL(words, 0) * 2, maxbuf));
+    else
+	print_data(words + 1, MIN(CVAL(words, 0) * 2,
+	    PTR_DIFF(maxbuf, words + 1)));
+
+    if (f2) 
+	fdata(data + 2, f2, MIN(data + 2 + SVAL(data, 0), maxbuf));
+    else
+	print_data(data + 2, MIN(SVAL(data, 0), PTR_DIFF(maxbuf, data+2))); 
 }
 
 
-static struct smbfns smb_fns[] = 
-{
-{-1,"SMBunknown",0,DEFDESCRIPT},
+static struct smbfns smb_fns[] = {
+    { -1, "SMBunknown", 0, DEFDESCRIPT },
 
-{SMBtcon,"SMBtcon",0,
-   {NULL,"Path=[Z]\nPassword=[Z]\nDevice=[Z]\n",
-    "MaxXmit=[d]\nTreeId=[d]\n",NULL,
-    NULL}},
+    { SMBtcon, "SMBtcon", 0,
+	{ NULL, "Path=[Z]\nPassword=[Z]\nDevice=[Z]\n",
+	  "MaxXmit=[d]\nTreeId=[d]\n", NULL,
+	  NULL } },
 
+    { SMBtdis, "SMBtdis", 0, DEFDESCRIPT },
+    { SMBexit,  "SMBexit", 0, DEFDESCRIPT },
+    { SMBioctl, "SMBioctl", 0, DEFDESCRIPT },
 
-{SMBtdis,"SMBtdis",0,DEFDESCRIPT},
-{SMBexit,"SMBexit",0,DEFDESCRIPT},
-{SMBioctl,"SMBioctl",0,DEFDESCRIPT},
+    { SMBecho, "SMBecho", 0,
+	{ "ReverbCount=[d]\n", NULL,
+	  "SequenceNum=[d]\n", NULL,
+	  NULL } },
 
-{SMBecho,"SMBecho",0,
-   {"ReverbCount=[d]\n",NULL,
-    "SequenceNum=[d]\n",NULL,
-    NULL}},
+    { SMBulogoffX, "SMBulogoffX", FLG_CHAIN, DEFDESCRIPT },
 
-{SMBulogoffX, "SMBulogoffX",FLG_CHAIN,DEFDESCRIPT},
+    { SMBgetatr, "SMBgetatr", 0,
+	{ NULL, "Path=[Z]\n",
+	  "Attribute=[A]\nTime=[T2]Size=[D]\nRes=([w,w,w,w,w])\n", NULL,
+	  NULL } },
 
-{SMBgetatr,"SMBgetatr",0,
-   {NULL,"Path=[Z]\n",
-    "Attribute=[A]\nTime=[T2]Size=[D]\nRes=([w,w,w,w,w])\n",NULL,
-    NULL}},
+    { SMBsetatr, "SMBsetatr", 0,
+	{ "Attribute=[A]\nTime=[T2]Res=([w,w,w,w,w])\n", "Path=[Z]\n",
+	  NULL, NULL, NULL } },
 
-{SMBsetatr,"SMBsetatr",0,
-   {"Attribute=[A]\nTime=[T2]Res=([w,w,w,w,w])\n","Path=[Z]\n",
-    NULL,NULL,NULL}},
+    { SMBchkpth, "SMBchkpth", 0,
+       { NULL, "Path=[Z]\n", NULL, NULL, NULL } },
 
-{SMBchkpth,"SMBchkpth",0,
-   {NULL,"Path=[Z]\n",NULL,NULL,NULL}},
+    { SMBsearch, "SMBsearch", 0,
+	{ "Count=[d]\nAttrib=[A]\n",
+	  "Path=[Z]\nBlkType=[B]\nBlkLen=[d]\n|Res1=[B]\nMask=[s11]\nSrv1=[B]\nDirIndex=[d]\nSrv2=[w]\nRes2=[W]\n",
+	  "Count=[d]\n",
+	  "BlkType=[B]\nBlkLen=[d]\n*\nRes1=[B]\nMask=[s11]\nSrv1=[B]\nDirIndex=[d]\nSrv2=[w]\nRes2=[W]\nAttrib=[a]\nTime=[T1]Size=[D]\nName=[s13]\n",
+	  NULL } },
 
-{SMBsearch,"SMBsearch",0,
-{"Count=[d]\nAttrib=[A]\n","Path=[Z]\nBlkType=[B]\nBlkLen=[d]\n|Res1=[B]\nMask=[s11]\nSrv1=[B]\nDirIndex=[d]\nSrv2=[w]\nRes2=[W]\n",
-"Count=[d]\n","BlkType=[B]\nBlkLen=[d]\n*\nRes1=[B]\nMask=[s11]\nSrv1=[B]\nDirIndex=[d]\nSrv2=[w]\nRes2=[W]\nAttrib=[a]\nTime=[T1]Size=[D]\nName=[s13]\n",NULL}},
+    { SMBopen, "SMBopen", 0,
+	{ "Mode=[w]\nAttribute=[A]\n", "Path=[Z]\n",
+	  "Handle=[d]\nOAttrib=[A]\nTime=[T2]Size=[D]\nAccess=[w]\n",
+	  NULL, NULL } },
 
+    { SMBcreate, "SMBcreate", 0,
+	{ "Attrib=[A]\nTime=[T2]", "Path=[Z]\n", "Handle=[d]\n", NULL, NULL } },
 
-{SMBopen,"SMBopen",0,
-   {"Mode=[w]\nAttribute=[A]\n","Path=[Z]\n",
-    "Handle=[d]\nOAttrib=[A]\nTime=[T2]Size=[D]\nAccess=[w]\n",NULL,
-    NULL}},
+    { SMBmknew, "SMBmknew", 0,
+	{ "Attrib=[A]\nTime=[T2]", "Path=[Z]\n", "Handle=[d]\n", NULL, NULL } },
 
-{SMBcreate,"SMBcreate",0,
-   {"Attrib=[A]\nTime=[T2]","Path=[Z]\n",
-    "Handle=[d]\n",NULL,
-    NULL}},
+    { SMBunlink, "SMBunlink", 0,
+	{ "Attrib=[A]\n", "Path=[Z]\n", NULL, NULL, NULL } },
 
-{SMBmknew,"SMBmknew",0,
-   {"Attrib=[A]\nTime=[T2]","Path=[Z]\n",
-    "Handle=[d]\n",NULL,
-    NULL}},
+    { SMBread, "SMBread", 0,
+	{ "Handle=[d]\nByteCount=[d]\nOffset=[D]\nCountLeft=[d]\n", NULL,
+	  "Count=[d]\nRes=([w,w,w,w])\n", NULL, NULL } },
 
-{SMBunlink,"SMBunlink",0,
-   {"Attrib=[A]\n","Path=[Z]\n",NULL,NULL,NULL}},
+    { SMBwrite, "SMBwrite", 0,
+	{ "Handle=[d]\nByteCount=[d]\nOffset=[D]\nCountLeft=[d]\n", NULL,
+	  "Count=[d]\n", NULL, NULL } },
 
-{SMBread,"SMBread",0,
-   {"Handle=[d]\nByteCount=[d]\nOffset=[D]\nCountLeft=[d]\n",NULL,
-    "Count=[d]\nRes=([w,w,w,w])\n",NULL,NULL}},
+    { SMBclose, "SMBclose", 0,
+	{ "Handle=[d]\nTime=[T2]", NULL, NULL, NULL, NULL } },
 
-{SMBwrite,"SMBwrite",0,
-   {"Handle=[d]\nByteCount=[d]\nOffset=[D]\nCountLeft=[d]\n",NULL,
-    "Count=[d]\n",NULL,NULL}},
+    { SMBmkdir, "SMBmkdir", 0,
+	{ NULL, "Path=[Z]\n", NULL, NULL, NULL } }, 
 
-{SMBclose,"SMBclose",0,
-   {"Handle=[d]\nTime=[T2]",NULL,NULL,NULL,NULL}},
+    { SMBrmdir, "SMBrmdir", 0,
+	{ NULL, "Path=[Z]\n", NULL, NULL, NULL } }, 
 
-{SMBmkdir,"SMBmkdir",0,
-   {NULL,"Path=[Z]\n",NULL,NULL,NULL}},
+    { SMBdskattr, "SMBdskattr", 0,
+	{ NULL, NULL,
+	  "TotalUnits=[d]\nBlocksPerUnit=[d]\nBlockSize=[d]\nFreeUnits=[d]\nMedia=[w]\n",
+	  NULL, NULL } },
 
-{SMBrmdir,"SMBrmdir",0,
-   {NULL,"Path=[Z]\n",NULL,NULL,NULL}},
+    { SMBmv, "SMBmv", 0,
+	{ "Attrib=[A]\n", "OldPath=[Z]\nNewPath=[Z]\n", NULL, NULL, NULL } },
 
-{SMBdskattr,"SMBdskattr",0,
-{NULL,NULL,
-"TotalUnits=[d]\nBlocksPerUnit=[d]\nBlockSize=[d]\nFreeUnits=[d]\nMedia=[w]\n",
-NULL,NULL}},
+    /*
+     * this is a Pathworks specific call, allowing the
+     * changing of the root path
+     */
+    { pSETDIR, "SMBsetdir", 0, { NULL, "Path=[Z]\n", NULL, NULL, NULL } },
 
-{SMBmv,"SMBmv",0,
-   {"Attrib=[A]\n","OldPath=[Z]\nNewPath=[Z]\n",NULL,NULL,NULL}},
+    { SMBlseek, "SMBlseek", 0,
+	{ "Handle=[d]\nMode=[w]\nOffset=[D]\n", "Offset=[D]\n", NULL, NULL } },
+
+    { SMBflush, "SMBflush", 0, { "Handle=[d]\n", NULL, NULL, NULL, NULL } },
 
-/* this is a Pathworks specific call, allowing the 
-   changing of the root path */
-{pSETDIR,"SMBsetdir",0,
-   {NULL,"Path=[Z]\n",NULL,NULL,NULL}},
-
-{SMBlseek,"SMBlseek",0,
-   {"Handle=[d]\nMode=[w]\nOffset=[D]\n","Offset=[D]\n",NULL,NULL}},
-
-{SMBflush,"SMBflush",0,
-   {"Handle=[d]\n",NULL,NULL,NULL,NULL}},
-
-{SMBsplopen,"SMBsplopen",0,
-   {"SetupLen=[d]\nMode=[w]\n","Ident=[Z]\n","Handle=[d]\n",NULL,NULL}},
-
-{SMBsplclose,"SMBsplclose",0,
-   {"Handle=[d]\n",NULL,NULL,NULL,NULL}},
-
-{SMBsplretq,"SMBsplretq",0,
-   {"MaxCount=[d]\nStartIndex=[d]\n",NULL,
-    "Count=[d]\nIndex=[d]\n",
-    "*Time=[T2]Status=[B]\nJobID=[d]\nSize=[D]\nRes=[B]Name=[s16]\n",
-    NULL}},
-
-{SMBsplwr,"SMBsplwr",0,
-   {"Handle=[d]\n",NULL,NULL,NULL,NULL}},
-
-{SMBlock,"SMBlock",0,
-   {"Handle=[d]\nCount=[D]\nOffset=[D]\n",NULL,NULL,NULL,NULL}},
-
-{SMBunlock,"SMBunlock",0,
-   {"Handle=[d]\nCount=[D]\nOffset=[D]\n",NULL,NULL,NULL,NULL}},
-
-/* CORE+ PROTOCOL FOLLOWS */
-
-{SMBreadbraw,"SMBreadbraw",0,
-{"Handle=[d]\nOffset=[D]\nMaxCount=[d]\nMinCount=[d]\nTimeOut=[D]\nRes=[d]\n",
- NULL,NULL,NULL,NULL}},
-
-{SMBwritebraw,"SMBwritebraw",0,
-{"Handle=[d]\nTotalCount=[d]\nRes=[w]\nOffset=[D]\nTimeOut=[D]\nWMode=[w]\nRes2=[W]\n|DataSize=[d]\nDataOff=[d]\n",
-NULL,"WriteRawAck",NULL,NULL}},
-
-{SMBwritec,"SMBwritec",0,
-   {NULL,NULL,"Count=[d]\n",NULL,NULL}},
-
-{SMBwriteclose,"SMBwriteclose",0,
-   {"Handle=[d]\nCount=[d]\nOffset=[D]\nTime=[T2]Res=([w,w,w,w,w,w])",NULL,
-    "Count=[d]\n",NULL,NULL}},
-
-{SMBlockread,"SMBlockread",0,
-   {"Handle=[d]\nByteCount=[d]\nOffset=[D]\nCountLeft=[d]\n",NULL,
-    "Count=[d]\nRes=([w,w,w,w])\n",NULL,NULL}},
-
-{SMBwriteunlock,"SMBwriteunlock",0,
-   {"Handle=[d]\nByteCount=[d]\nOffset=[D]\nCountLeft=[d]\n",NULL,
-    "Count=[d]\n",NULL,NULL}},
-
-{SMBreadBmpx,"SMBreadBmpx",0,
-{"Handle=[d]\nOffset=[D]\nMaxCount=[d]\nMinCount=[d]\nTimeOut=[D]\nRes=[w]\n",
-NULL,
-"Offset=[D]\nTotCount=[d]\nRemaining=[d]\nRes=([w,w])\nDataSize=[d]\nDataOff=[d]\n",
-NULL,NULL}},
-
-{SMBwriteBmpx,"SMBwriteBmpx",0,
-{"Handle=[d]\nTotCount=[d]\nRes=[w]\nOffset=[D]\nTimeOut=[D]\nWMode=[w]\nRes2=[W]\nDataSize=[d]\nDataOff=[d]\n",NULL,
-"Remaining=[d]\n",NULL,NULL}},
-
-{SMBwriteBs,"SMBwriteBs",0,
-   {"Handle=[d]\nTotCount=[d]\nOffset=[D]\nRes=[W]\nDataSize=[d]\nDataOff=[d]\n",NULL,
-    "Count=[d]\n",NULL,NULL}},
-
-{SMBsetattrE,"SMBsetattrE",0,
-   {"Handle=[d]\nCreationTime=[T2]AccessTime=[T2]ModifyTime=[T2]",NULL,
-      NULL,NULL,NULL}},
-
-{SMBgetattrE,"SMBgetattrE",0,
-{"Handle=[d]\n",NULL,
- "CreationTime=[T2]AccessTime=[T2]ModifyTime=[T2]Size=[D]\nAllocSize=[D]\nAttribute=[A]\n",NULL,NULL}},
-
-{SMBtranss,"SMBtranss",0,DEFDESCRIPT},
-{SMBioctls,"SMBioctls",0,DEFDESCRIPT},
-
-{SMBcopy,"SMBcopy",0,
-   {"TreeID2=[d]\nOFun=[w]\nFlags=[w]\n","Path=[S]\nNewPath=[S]\n",
-    "CopyCount=[d]\n","|ErrStr=[S]\n",NULL}},
-
-{SMBmove,"SMBmove",0,
-   {"TreeID2=[d]\nOFun=[w]\nFlags=[w]\n","Path=[S]\nNewPath=[S]\n",
-    "MoveCount=[d]\n","|ErrStr=[S]\n",NULL}},
-
-{SMBopenX,"SMBopenX",FLG_CHAIN,
-{"Com2=[w]\nOff2=[d]\nFlags=[w]\nMode=[w]\nSearchAttrib=[A]\nAttrib=[A]\nTime=[T2]OFun=[w]\nSize=[D]\nTimeOut=[D]\nRes=[W]\n","Path=[S]\n",
-"Com2=[w]\nOff2=[d]\nHandle=[d]\nAttrib=[A]\nTime=[T2]Size=[D]\nAccess=[w]\nType=[w]\nState=[w]\nAction=[w]\nFileID=[W]\nRes=[w]\n",NULL,NULL}},
-
-{SMBreadX,"SMBreadX",FLG_CHAIN,
-{"Com2=[w]\nOff2=[d]\nHandle=[d]\nOffset=[D]\nMaxCount=[d]\nMinCount=[d]\nTimeOut=[D]\nCountLeft=[d]\n",NULL,
-"Com2=[w]\nOff2=[d]\nRemaining=[d]\nRes=[W]\nDataSize=[d]\nDataOff=[d]\nRes=([w,w,w,w])\n",NULL,NULL}},
-
-{SMBwriteX,"SMBwriteX",FLG_CHAIN,
-{"Com2=[w]\nOff2=[d]\nHandle=[d]\nOffset=[D]\nTimeOut=[D]\nWMode=[w]\nCountLeft=[d]\nRes=[w]\nDataSize=[d]\nDataOff=[d]\n",NULL,
-"Com2=[w]\nOff2=[d]\nCount=[d]\nRemaining=[d]\nRes=[W]\n",NULL,NULL}},
-
-{SMBlockingX,"SMBlockingX",FLG_CHAIN,
-{"Com2=[w]\nOff2=[d]\nHandle=[d]\nLockType=[w]\nTimeOut=[D]\nUnlockCount=[d]\nLockCount=[d]\n",
-"*Process=[d]\nOffset=[D]\nLength=[D]\n",
-"Com2=[w]\nOff2=[d]\n"}},
-
-{SMBffirst,"SMBffirst",0,
-{"Count=[d]\nAttrib=[A]\n","Path=[Z]\nBlkType=[B]\nBlkLen=[d]\n|Res1=[B]\nMask=[s11]\nSrv1=[B]\nDirIndex=[d]\nSrv2=[w]\n",
-"Count=[d]\n","BlkType=[B]\nBlkLen=[d]\n*\nRes1=[B]\nMask=[s11]\nSrv1=[B]\nDirIndex=[d]\nSrv2=[w]\nRes2=[W]\nAttrib=[a]\nTime=[T1]Size=[D]\nName=[s13]\n",NULL}},
-
-{SMBfunique,"SMBfunique",0,
-{"Count=[d]\nAttrib=[A]\n","Path=[Z]\nBlkType=[B]\nBlkLen=[d]\n|Res1=[B]\nMask=[s11]\nSrv1=[B]\nDirIndex=[d]\nSrv2=[w]\n",
-"Count=[d]\n","BlkType=[B]\nBlkLen=[d]\n*\nRes1=[B]\nMask=[s11]\nSrv1=[B]\nDirIndex=[d]\nSrv2=[w]\nRes2=[W]\nAttrib=[a]\nTime=[T1]Size=[D]\nName=[s13]\n",NULL}},
-
-{SMBfclose,"SMBfclose",0,
-{"Count=[d]\nAttrib=[A]\n","Path=[Z]\nBlkType=[B]\nBlkLen=[d]\n|Res1=[B]\nMask=[s11]\nSrv1=[B]\nDirIndex=[d]\nSrv2=[w]\n",
-"Count=[d]\n","BlkType=[B]\nBlkLen=[d]\n*\nRes1=[B]\nMask=[s11]\nSrv1=[B]\nDirIndex=[d]\nSrv2=[w]\nRes2=[W]\nAttrib=[a]\nTime=[T1]Size=[D]\nName=[s13]\n",NULL}},
-
-{SMBfindnclose, "SMBfindnclose", 0,
-   {"Handle=[d]\n",NULL,NULL,NULL,NULL}},
-
-{SMBfindclose, "SMBfindclose", 0,
-   {"Handle=[d]\n",NULL,NULL,NULL,NULL}},
-
-{SMBsends,"SMBsends",0,
-   {NULL,"Source=[Z]\nDest=[Z]\n",NULL,NULL,NULL}},
-
-{SMBsendstrt,"SMBsendstrt",0,
-   {NULL,"Source=[Z]\nDest=[Z]\n","GroupID=[d]\n",NULL,NULL}},
-   
-{SMBsendend,"SMBsendend",0,
-   {"GroupID=[d]\n",NULL,NULL,NULL,NULL}},
-
-{SMBsendtxt,"SMBsendtxt",0,
-   {"GroupID=[d]\n",NULL,NULL,NULL,NULL}},
-
-{SMBsendb,"SMBsendb",0,
-   {NULL,"Source=[Z]\nDest=[Z]\n",NULL,NULL,NULL}},
-
-{SMBfwdname,"SMBfwdname",0,DEFDESCRIPT},
-{SMBcancelf,"SMBcancelf",0,DEFDESCRIPT},
-{SMBgetmac,"SMBgetmac",0,DEFDESCRIPT},
-
-{SMBnegprot,"SMBnegprot",0,
-   {NULL,NULL,NULL,NULL,print_negprot}},
-
-{SMBsesssetupX,"SMBsesssetupX",FLG_CHAIN,
-   {NULL,NULL,NULL,NULL,print_sesssetup}},
-
-{SMBtconX,"SMBtconX",FLG_CHAIN,
-{"Com2=[w]\nOff2=[d]\nFlags=[w]\nPassLen=[d]\nPasswd&Path&Device=\n",NULL,
- "Com2=[w]\nOff2=[d]\n","ServiceType=[S]\n",NULL}},
-
-{SMBtrans2, "SMBtrans2",0,{NULL,NULL,NULL,NULL,print_trans2}},
-
-{SMBtranss2, "SMBtranss2", 0,DEFDESCRIPT},
-{SMBctemp,"SMBctemp",0,DEFDESCRIPT},
-{SMBreadBs,"SMBreadBs",0,DEFDESCRIPT},
-{SMBtrans,"SMBtrans",0,{NULL,NULL,NULL,NULL,print_trans}},
-
-{SMBnttrans,"SMBnttrans", 0, DEFDESCRIPT},
-{SMBnttranss,"SMBnttranss", 0, DEFDESCRIPT},
-
-{SMBntcreateX,"SMBntcreateX", FLG_CHAIN, 
-{"Com2=[w]\nOff2=[d]\nRes=[b]\nNameLen=[d]\nFlags=[W]\nRootDirectoryFid=[D]\nAccessMask=[W]\nAllocationSize=[L]\nExtFileAttributes=[W]\nShareAccess=[W]\nCreateDisposition=[W]\nCreateOptions=[W]\nImpersonationLevel=[W]\nSecurityFlags=[b]\n","Path=[S]\n",
-	 "Com2=[w]\nOff2=[d]\nOplockLevel=[b]\nFid=[d]\nCreateAction=[W]\nCreateTime=[T3]LastAccessTime=[T3]LastWriteTime=[T3]ChangeTime=[T3]ExtFileAttributes=[W]\nAllocationSize=[L]\nEndOfFile=[L]\nFileType=[w]\nDeviceState=[w]\nDirectory=[b]\n", NULL}},
-
-{SMBntcancel,"SMBntcancel", 0, DEFDESCRIPT},
-
-{-1,NULL,0,DEFDESCRIPT}};
+    { SMBsplopen, "SMBsplopen", 0,
+	{ "SetupLen=[d]\nMode=[w]\n", "Ident=[Z]\n", "Handle=[d]\n",
+	  NULL, NULL } },
+
+    { SMBsplclose, "SMBsplclose", 0,
+	{ "Handle=[d]\n", NULL, NULL, NULL, NULL } },
+
+    { SMBsplretq, "SMBsplretq", 0,
+	{ "MaxCount=[d]\nStartIndex=[d]\n", NULL,
+	  "Count=[d]\nIndex=[d]\n",
+	  "*Time=[T2]Status=[B]\nJobID=[d]\nSize=[D]\nRes=[B]Name=[s16]\n",
+	  NULL } },
+
+    { SMBsplwr, "SMBsplwr", 0,
+	{ "Handle=[d]\n", NULL, NULL, NULL, NULL } },
+
+    { SMBlock, "SMBlock", 0,
+	{ "Handle=[d]\nCount=[D]\nOffset=[D]\n", NULL, NULL, NULL, NULL } },
+
+    { SMBunlock, "SMBunlock", 0,
+	{ "Handle=[d]\nCount=[D]\nOffset=[D]\n", NULL, NULL, NULL, NULL } },
+
+    /* CORE+ PROTOCOL FOLLOWS */
+
+    { SMBreadbraw, "SMBreadbraw", 0,
+	{ "Handle=[d]\nOffset=[D]\nMaxCount=[d]\nMinCount=[d]\nTimeOut=[D]\nRes=[d]\n",
+	  NULL, NULL, NULL, NULL } },
+
+    { SMBwritebraw, "SMBwritebraw", 0,
+	{ "Handle=[d]\nTotalCount=[d]\nRes=[w]\nOffset=[D]\nTimeOut=[D]\nWMode=[w]\nRes2=[W]\n|DataSize=[d]\nDataOff=[d]\n",
+	  NULL, "WriteRawAck", NULL, NULL } },
+
+    { SMBwritec, "SMBwritec", 0,
+	{ NULL, NULL, "Count=[d]\n", NULL, NULL } },
+
+    { SMBwriteclose, "SMBwriteclose", 0,
+	{ "Handle=[d]\nCount=[d]\nOffset=[D]\nTime=[T2]Res=([w,w,w,w,w,w])",
+	  NULL, "Count=[d]\n", NULL, NULL } },
+
+    { SMBlockread, "SMBlockread", 0,
+	{ "Handle=[d]\nByteCount=[d]\nOffset=[D]\nCountLeft=[d]\n", NULL,
+	  "Count=[d]\nRes=([w,w,w,w])\n", NULL, NULL } },
+
+    { SMBwriteunlock, "SMBwriteunlock", 0,
+	{ "Handle=[d]\nByteCount=[d]\nOffset=[D]\nCountLeft=[d]\n", NULL,
+	  "Count=[d]\n", NULL, NULL } },
+
+    { SMBreadBmpx, "SMBreadBmpx", 0,
+	{ "Handle=[d]\nOffset=[D]\nMaxCount=[d]\nMinCount=[d]\nTimeOut=[D]\nRes=[w]\n",
+	  NULL,
+	  "Offset=[D]\nTotCount=[d]\nRemaining=[d]\nRes=([w,w])\nDataSize=[d]\nDataOff=[d]\n",
+	  NULL, NULL } },
+
+    { SMBwriteBmpx, "SMBwriteBmpx", 0,
+	{ "Handle=[d]\nTotCount=[d]\nRes=[w]\nOffset=[D]\nTimeOut=[D]\nWMode=[w]\nRes2=[W]\nDataSize=[d]\nDataOff=[d]\n", NULL,
+	  "Remaining=[d]\n", NULL, NULL } },
+
+    { SMBwriteBs, "SMBwriteBs", 0,
+	{ "Handle=[d]\nTotCount=[d]\nOffset=[D]\nRes=[W]\nDataSize=[d]\nDataOff=[d]\n",
+	  NULL, "Count=[d]\n", NULL, NULL } },
+
+    { SMBsetattrE, "SMBsetattrE", 0,
+	{ "Handle=[d]\nCreationTime=[T2]AccessTime=[T2]ModifyTime=[T2]", NULL,
+	  NULL, NULL, NULL } },
+
+    { SMBgetattrE, "SMBgetattrE", 0,
+	{ "Handle=[d]\n", NULL,
+	  "CreationTime=[T2]AccessTime=[T2]ModifyTime=[T2]Size=[D]\nAllocSize=[D]\nAttribute=[A]\n",
+	  NULL, NULL } },
+
+    { SMBtranss, "SMBtranss", 0, DEFDESCRIPT },
+    { SMBioctls, "SMBioctls", 0, DEFDESCRIPT },
+
+    { SMBcopy, "SMBcopy", 0,
+	{ "TreeID2=[d]\nOFun=[w]\nFlags=[w]\n", "Path=[S]\nNewPath=[S]\n",
+	  "CopyCount=[d]\n",  "|ErrStr=[S]\n",  NULL } },
+
+    { SMBmove, "SMBmove", 0,
+	{ "TreeID2=[d]\nOFun=[w]\nFlags=[w]\n", "Path=[S]\nNewPath=[S]\n",
+	  "MoveCount=[d]\n",  "|ErrStr=[S]\n",  NULL } },
+
+    { SMBopenX, "SMBopenX", FLG_CHAIN,
+	{ "Com2=[w]\nOff2=[d]\nFlags=[w]\nMode=[w]\nSearchAttrib=[A]\nAttrib=[A]\nTime=[T2]OFun=[w]\nSize=[D]\nTimeOut=[D]\nRes=[W]\n",
+	  "Path=[S]\n",
+	  "Com2=[w]\nOff2=[d]\nHandle=[d]\nAttrib=[A]\nTime=[T2]Size=[D]\nAccess=[w]\nType=[w]\nState=[w]\nAction=[w]\nFileID=[W]\nRes=[w]\n",
+	  NULL, NULL } },
+
+    { SMBreadX, "SMBreadX", FLG_CHAIN,
+	{ "Com2=[w]\nOff2=[d]\nHandle=[d]\nOffset=[D]\nMaxCount=[d]\nMinCount=[d]\nTimeOut=[D]\nCountLeft=[d]\n",
+	  NULL,
+	  "Com2=[w]\nOff2=[d]\nRemaining=[d]\nRes=[W]\nDataSize=[d]\nDataOff=[d]\nRes=([w,w,w,w])\n",
+	  NULL, NULL } },
+
+    { SMBwriteX, "SMBwriteX", FLG_CHAIN,
+	{ "Com2=[w]\nOff2=[d]\nHandle=[d]\nOffset=[D]\nTimeOut=[D]\nWMode=[w]\nCountLeft=[d]\nRes=[w]\nDataSize=[d]\nDataOff=[d]\n",
+	  NULL,
+	  "Com2=[w]\nOff2=[d]\nCount=[d]\nRemaining=[d]\nRes=[W]\n",
+	  NULL, NULL } },
+
+    { SMBlockingX, "SMBlockingX", FLG_CHAIN,
+	{ "Com2=[w]\nOff2=[d]\nHandle=[d]\nLockType=[w]\nTimeOut=[D]\nUnlockCount=[d]\nLockCount=[d]\n",
+	  "*Process=[d]\nOffset=[D]\nLength=[D]\n",
+	  "Com2=[w]\nOff2=[d]\n", NULL, NULL } },
+
+    { SMBffirst, "SMBffirst", 0,
+	{ "Count=[d]\nAttrib=[A]\n",
+	  "Path=[Z]\nBlkType=[B]\nBlkLen=[d]\n|Res1=[B]\nMask=[s11]\nSrv1=[B]\nDirIndex=[d]\nSrv2=[w]\n",
+	  "Count=[d]\n",
+	  "BlkType=[B]\nBlkLen=[d]\n*\nRes1=[B]\nMask=[s11]\nSrv1=[B]\nDirIndex=[d]\nSrv2=[w]\nRes2=[W]\nAttrib=[a]\nTime=[T1]Size=[D]\nName=[s13]\n",
+	  NULL } },
+
+    { SMBfunique, "SMBfunique", 0,
+	{ "Count=[d]\nAttrib=[A]\n",
+	  "Path=[Z]\nBlkType=[B]\nBlkLen=[d]\n|Res1=[B]\nMask=[s11]\nSrv1=[B]\nDirIndex=[d]\nSrv2=[w]\n",
+	  "Count=[d]\n",
+	  "BlkType=[B]\nBlkLen=[d]\n*\nRes1=[B]\nMask=[s11]\nSrv1=[B]\nDirIndex=[d]\nSrv2=[w]\nRes2=[W]\nAttrib=[a]\nTime=[T1]Size=[D]\nName=[s13]\n",
+	  NULL } },
+
+    { SMBfclose, "SMBfclose", 0,
+	{ "Count=[d]\nAttrib=[A]\n",
+	  "Path=[Z]\nBlkType=[B]\nBlkLen=[d]\n|Res1=[B]\nMask=[s11]\nSrv1=[B]\nDirIndex=[d]\nSrv2=[w]\n",
+	  "Count=[d]\n",
+	  "BlkType=[B]\nBlkLen=[d]\n*\nRes1=[B]\nMask=[s11]\nSrv1=[B]\nDirIndex=[d]\nSrv2=[w]\nRes2=[W]\nAttrib=[a]\nTime=[T1]Size=[D]\nName=[s13]\n",
+	  NULL } },
+
+    { SMBfindnclose, "SMBfindnclose", 0,
+	{ "Handle=[d]\n", NULL, NULL, NULL, NULL } },
+
+    { SMBfindclose, "SMBfindclose", 0,
+	{ "Handle=[d]\n", NULL, NULL, NULL, NULL } },
+
+    { SMBsends, "SMBsends", 0,
+	{ NULL, "Source=[Z]\nDest=[Z]\n", NULL, NULL, NULL } },
+
+    { SMBsendstrt, "SMBsendstrt", 0,
+	{ NULL, "Source=[Z]\nDest=[Z]\n", "GroupID=[d]\n", NULL, NULL } },
+      
+    { SMBsendend, "SMBsendend", 0,
+	{ "GroupID=[d]\n", NULL, NULL, NULL, NULL } },
+
+    { SMBsendtxt, "SMBsendtxt", 0,
+	{ "GroupID=[d]\n", NULL, NULL, NULL, NULL } },
+
+    { SMBsendb, "SMBsendb", 0,
+	{ NULL, "Source=[Z]\nDest=[Z]\n", NULL, NULL, NULL } },
+
+    { SMBfwdname, "SMBfwdname", 0, DEFDESCRIPT },
+    { SMBcancelf, "SMBcancelf", 0, DEFDESCRIPT },
+    { SMBgetmac, "SMBgetmac", 0, DEFDESCRIPT },
+
+    { SMBnegprot, "SMBnegprot", 0, 
+	{ NULL, NULL, NULL, NULL, print_negprot } },
+
+    { SMBsesssetupX, "SMBsesssetupX", FLG_CHAIN,
+	{ NULL, NULL, NULL, NULL, print_sesssetup } },
+
+    { SMBtconX, "SMBtconX", FLG_CHAIN,
+	{ "Com2=[w]\nOff2=[d]\nFlags=[w]\nPassLen=[d]\nPasswd&Path&Device=\n",
+	  NULL, "Com2=[w]\nOff2=[d]\n", "ServiceType=[S]\n", NULL } },
+
+    { SMBtrans2, "SMBtrans2", 0, { NULL, NULL, NULL, NULL, print_trans2 } },
+
+    { SMBtranss2, "SMBtranss2", 0, DEFDESCRIPT },
+    { SMBctemp, "SMBctemp", 0, DEFDESCRIPT },
+    { SMBreadBs, "SMBreadBs", 0, DEFDESCRIPT },
+    { SMBtrans, "SMBtrans", 0, { NULL, NULL, NULL, NULL, print_trans } },
+
+    { SMBnttrans, "SMBnttrans", 0, DEFDESCRIPT },
+    { SMBnttranss, "SMBnttranss", 0, DEFDESCRIPT },
+
+    { SMBntcreateX, "SMBntcreateX", FLG_CHAIN,
+	{ "Com2=[w]\nOff2=[d]\nRes=[b]\nNameLen=[d]\nFlags=[W]\nRootDirectoryFid=[D]\nAccessMask=[W]\nAllocationSize=[L]\nExtFileAttributes=[W]\nShareAccess=[W]\nCreateDisposition=[W]\nCreateOptions=[W]\nImpersonationLevel=[W]\nSecurityFlags=[b]\n",
+	  "Path=[S]\n",
+	  "Com2=[w]\nOff2=[d]\nOplockLevel=[b]\nFid=[d]\nCreateAction=[W]\nCreateTime=[T3]LastAccessTime=[T3]LastWriteTime=[T3]ChangeTime=[T3]ExtFileAttributes=[W]\nAllocationSize=[L]\nEndOfFile=[L]\nFileType=[w]\nDeviceState=[w]\nDirectory=[b]\n",
+	  NULL } },
+
+    { SMBntcancel, "SMBntcancel", 0, DEFDESCRIPT },
+
+    { -1, NULL, 0, DEFDESCRIPT }
+};
 
 
 /*
