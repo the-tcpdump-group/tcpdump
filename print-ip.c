@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.91 2000-11-17 19:08:15 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.92 2001-01-02 23:00:01 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -485,6 +485,10 @@ again:
 #define IPPROTO_VRRP	112
 #endif
 		case IPPROTO_VRRP:
+			if (vflag)
+				(void)printf("vrrp %s > %s: ",
+					     ipaddr_string(&ip->ip_src),
+					     ipaddr_string(&ip->ip_dst));
 			vrrp_print(cp, len, ip->ip_ttl);
 			break;
 
