@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.77 2004-06-14 15:08:08 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.78 2004-06-15 07:34:22 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -107,6 +107,7 @@ struct icmp {
 };
 
 #define ICMP_MPLS_EXT_EXTRACT_VERSION(x) (((x)&0xf0)>>4) 
+#define ICMP_MPLS_EXT_VERSION 2
 
 /*
  * Lower bounds on packet lengths for various types.
@@ -171,6 +172,8 @@ struct icmp {
 	(type) == ICMP_TSTAMP || (type) == ICMP_TSTAMPREPLY || \
 	(type) == ICMP_IREQ || (type) == ICMP_IREQREPLY || \
 	(type) == ICMP_MASKREQ || (type) == ICMP_MASKREPLY)
+#define	ICMP_MPLS_EXT_TYPE(type) \
+	((type) == ICMP_UNREACH || (type) == ICMP_TIMXCEED)
 /* rfc1700 */
 #ifndef ICMP_UNREACH_NET_UNKNOWN
 #define ICMP_UNREACH_NET_UNKNOWN	6	/* destination net unknown */
@@ -527,7 +530,17 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
 		ip_print(bp, EXTRACT_16BITS(&ip->ip_len));
 	}
 
-        if (vflag >= 1 && plen > ICMP_EXTD_MINLEN) {
+        if (vflag >= 1 && plen > ICMP_EXTD_MINLEN && ICMP_MPLS_EXT_TYPE(dp->icmp_type)) {
+            
+            /*
+             * Sanity checking of the header.
+             */
+            if (ICMP_MPLS_EXT_EXTRACT_VERSION(*(dp->icmp_mpls_ext_version)) != ICMP_MPLS_EXT_VERSION) {
+                printf("\n\tMPLS extension v%u packet not supported",
+                       ICMP_MPLS_EXT_EXTRACT_VERSION(*(dp->icmp_mpls_ext_version)));
+                return;
+            }
+
             hlen = plen - ICMP_EXTD_MINLEN;
             printf("\n\tMPLS extension v%u, checksum 0x%04x (unverified), length %u", /* FIXME */
                    ICMP_MPLS_EXT_EXTRACT_VERSION(*(dp->icmp_mpls_ext_version)),
