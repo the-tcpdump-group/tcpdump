@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.31 2004-12-28 20:38:27 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.32 2004-12-28 22:29:45 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -329,25 +329,21 @@ write_bits(unsigned int val, const char *fmt)
 
 /* convert a UCS2 string into iso-8859-1 string */
 static const char *
-unistr(const u_char *s, int *len)
+unistr(const u_char *s, int *len, int use_unicode)
 {
     static char buf[1000];
     int l=0;
-    static int use_unicode = -1;
 
-    if (use_unicode == -1) {
-	char *p = getenv("USE_UNICODE");
-	if (p && (atoi(p) == 1))
-	    use_unicode = 1;
-	else
-	    use_unicode = 0;
-    }
-
-    /* maybe it isn't unicode - a cheap trick */
-    if (!use_unicode || (s[0] && s[1])) {
+    if (!use_unicode) {
 	*len = strlen((const char *)s) + 1;
 	return (const char *)s;
     }
+
+    /*
+     * Skip padding that puts the string on an even boundary.
+     */
+    if (((s - startbuf) % 2) != 0)
+	s++;
 
     *len = 0;
 
@@ -368,7 +364,8 @@ unistr(const u_char *s, int *len)
 }
 
 static const u_char *
-smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf)
+smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf,
+    int unicodestr)
 {
     int reverse = 0;
     const char *attrib_fmt = "READONLY|HIDDEN|SYSTEM|VOLUME|DIR|ARCHIVE|";
@@ -513,20 +510,23 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf)
 	    break;
 	  }
 	case 'S':
+	case 'R':	/* like 'S', but always ASCII */
 	  {
 	    /*XXX unistr() */
-	    printf("%.*s", (int)PTR_DIFF(maxbuf, buf), unistr(buf, &len));
+	    printf("%.*s", (int)PTR_DIFF(maxbuf, buf),
+		unistr(buf, &len, (*fmt == 'R') ? 0 : unicodestr));
 	    buf += len;
 	    fmt++;
 	    break;
 	  }
 	case 'Z':
+	case 'Y':	/* like 'Z', but always ASCII */
 	  {
 	    if (*buf != 4 && *buf != 2)
 		printf("Error! ASCIIZ buffer of type %u (safety=%lu)\n", *buf,
 		    (unsigned long)PTR_DIFF(maxbuf, buf));
 	    printf("%.*s", (int)PTR_DIFF(maxbuf, buf + 1),
-		unistr(buf + 1, &len));
+		unistr(buf + 1, &len, (*fmt == 'Y') ? 0 : unicodestr));
 	    buf += len + 1;
 	    fmt++;
 	    break;
@@ -644,7 +644,8 @@ trunc:
 }
 
 const u_char *
-smb_fdata(const u_char *buf, const char *fmt, const u_char *maxbuf)
+smb_fdata(const u_char *buf, const char *fmt, const u_char *maxbuf,
+    int unicodestr)
 {
     static int depth = 0;
     char s[128];
@@ -657,7 +658,7 @@ smb_fdata(const u_char *buf, const char *fmt, const u_char *maxbuf)
 	    while (buf < maxbuf) {
 		const u_char *buf2;
 		depth++;
-		buf2 = smb_fdata(buf, fmt, maxbuf);
+		buf2 = smb_fdata(buf, fmt, maxbuf, unicodestr);
 		depth--;
 		if (buf2 == NULL)
 		    return(NULL);
@@ -696,7 +697,7 @@ smb_fdata(const u_char *buf, const char *fmt, const u_char *maxbuf)
 	    strncpy(s, fmt, p - fmt);
 	    s[p - fmt] = '\0';
 	    fmt = p + 1;
-	    buf = smb_fdata1(buf, s, maxbuf);
+	    buf = smb_fdata1(buf, s, maxbuf, unicodestr);
 	    if (buf == NULL)
 		return(NULL);
 	    break;
