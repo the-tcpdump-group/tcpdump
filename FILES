@@ -171,6 +171,7 @@ strcasecmp.c
 tcp.h
 tcpdump.1
 tcpdump.c
+telnet.h
 timed.h
 token.h
 udp.h
