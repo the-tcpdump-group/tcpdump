@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.105 2004-10-28 11:21:23 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.106 2005-01-25 11:22:57 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -101,6 +101,9 @@ struct tok ppptype2str[] = {
 	{ PPP_PAP,	  "PAP" },
 	{ PPP_LQM,	  "LQM" },
 	{ PPP_CHAP,	  "CHAP" },
+	{ PPP_EAP,	  "EAP" },
+	{ PPP_SPAP,	  "SPAP" },
+	{ PPP_SPAP_OLD,	  "Old-SPAP" },
 	{ PPP_BACP,	  "BACP" },
 	{ PPP_BAP,	  "BAP" },
 	{ PPP_MPCP,	  "MLPPP-CP" },
@@ -323,6 +326,13 @@ struct tok ip6cpopt_values[] = {
 #define AUTHALG_CHAPMD5	5	/* RFC1994 */
 #define AUTHALG_MSCHAP1	128	/* RFC2433 */
 #define AUTHALG_MSCHAP2	129	/* RFC2795 */
+
+struct tok authalg_values[] = {
+        { AUTHALG_CHAPMD5, "MD5" },
+        { AUTHALG_MSCHAP1, "MS-CHAPv1" },
+        { AUTHALG_MSCHAP2, "MS-CHAPv2" },
+	{ 0,		  NULL }
+};
 
 /* FCS Alternatives - to be supported */
 
@@ -588,39 +598,20 @@ print_lcp_config_options(const u_char *p, int length)
 	case LCPOPT_AP:
 		if (len >= 4) {
 		    TCHECK2(*(p + 2), 2);
+                    printf(" %s", tok2str(ppptype2str,"Unknown Auth Proto (0x04x)",EXTRACT_16BITS(p+2)));
+
 		    switch (EXTRACT_16BITS(p+2)) {
-		    case PPP_PAP:
-		        printf(" PAP");
-			break;
 		    case PPP_CHAP:
-		        printf(" CHAP");
 		        TCHECK(p[4]);
-			switch (p[4]) {
-			default:
-			    printf(", unknown-algorithm-%u", p[4]);
-			    break;
-			case AUTHALG_CHAPMD5:
-			    printf(", MD5");
-			    break;
-			case AUTHALG_MSCHAP1:
-			    printf(", MSCHAPv1");
-			    break;
-			case AUTHALG_MSCHAP2:
-			    printf(", MSCHAPv2");
-			    break;
-			}
+                        printf(", %s",tok2str(authalg_values,"Unknown Auth Alg %u",p[4]));
 			break;
+		    case PPP_PAP: /* fall through */
 		    case PPP_EAP:
-		        printf(" EAP");
-			break;
 		    case PPP_SPAP:
-			printf(" SPAP");
-			break;
 		    case PPP_SPAP_OLD:
-			printf(" Old-SPAP");
-			break;
+                        break;
 		    default:
-		      printf("unknown");
+                        print_unknown_data(p,"\n\t",len);
 		    }
 		}
 		break;
