@@ -12,8 +12,8 @@
  */
 
 #ifndef lint
-static char rcsid[] =
-    "@(#) $Id: print-rx.c,v 1.4 1999-11-21 09:37:00 fenner Exp $";
+static const char rcsid[] =
+    "@(#) $Id: print-rx.c,v 1.5 1999-12-15 08:10:18 fenner Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
