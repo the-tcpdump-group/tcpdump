@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "$Id: print-radius.c,v 1.1 2000-10-06 06:49:21 guy Exp $";
+    "$Id: print-radius.c,v 1.2 2000-10-08 08:48:48 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -31,15 +31,8 @@ static const char rcsid[] =
 #endif
 
 #include <sys/param.h>
-#include <sys/time.h>
-#include <sys/socket.h>
 
 #include <netinet/in.h>
-#include <netinet/in_systm.h>
-#include <netinet/ip.h>
-#include <netinet/ip_var.h>
-#include <netinet/udp.h>
-#include <netinet/udp_var.h>
 
 #include <stdio.h>
 
@@ -47,15 +40,15 @@ static const char rcsid[] =
 #include "addrtoname.h"
 #include "extract.h"
 
-#define TAM_SIZE(x) (sizeof(x)/sizeof(x[0]) )
+#include "ip.h"
+#include "udp.h"
 
-#define HEX(a)  ((char)( (a) <= 9 ? (a) + '0' : ((a) - 10) + 'A'))
+#define TAM_SIZE(x) (sizeof(x)/sizeof(x[0]) )
 
 #define PRINT_HEX(bytes_len, ptr_data)                               \
            while(bytes_len)                                          \
            {                                                         \
-              printf("%c%c", HEX( ((u_short)(*ptr_data)) >> 4 ),     \
-                             HEX( ((u_short)(*ptr_data)) & 0x0F ) ); \
+              printf("%02X", *ptr_data );                            \
               ptr_data++;                                            \
               bytes_len--;                                           \
            }
