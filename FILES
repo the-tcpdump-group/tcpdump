@@ -64,7 +64,10 @@ missing/inet_ntop.c
 missing/inet_pton.c
 missing/resolv6.h
 missing/resolv_ext.h
+missing/snprintf.c
 missing/sockstorage.h
+missing/strlcat.c
+missing/strlcpy.c
 mkdep
 nameser.h
 netbios.h
@@ -84,6 +87,7 @@ print-atalk.c
 print-atm.c
 print-bgp.c
 print-bootp.c
+print-cdp.c
 print-chdlc.c
 print-cip.c
 print-cnfp.c
@@ -137,6 +141,7 @@ print-telnet.c
 print-tftp.c
 print-udp.c
 print-vjc.c
+print-vrrp.c
 print-wb.c
 route6d.h
 rx.h
