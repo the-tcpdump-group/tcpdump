@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.72 2001-02-20 06:31:34 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.73 2001-02-20 07:22:17 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -460,6 +460,28 @@ ns_rprint(register const u_char *cp, register const u_char *bp)
 			return(NULL);
 		fn_printn(cp, len, snapend);
 		break;
+
+	case T_TSIG:
+	    {
+		if (cp + len > snapend)
+			return(NULL);
+		if (!vflag)
+			break;
+		putchar(' ');
+		if ((cp = ns_nprint(cp, bp)) == NULL)
+			return(NULL);
+		cp += 6;
+		printf(" fudge=%u", EXTRACT_16BITS(cp));
+		cp += 2;
+		printf(" maclen=%u", EXTRACT_16BITS(cp));
+		cp += 2 + EXTRACT_16BITS(cp);
+		printf(" origid=%u", EXTRACT_16BITS(cp));
+		cp += 2;
+		printf(" error=%u", EXTRACT_16BITS(cp));
+		cp += 2;
+		printf(" otherlen=%u", EXTRACT_16BITS(cp));
+		cp += 2;
+	    }
 	}
 	return (rp);		/* XXX This isn't always right */
 }
