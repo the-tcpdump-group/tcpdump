@@ -13,7 +13,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.22 2001-06-27 05:38:11 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.23 2001-07-09 01:39:43 fenner Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -632,14 +632,16 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 			printf(" fid %d/%d/%d", (int) n1, (int) n2, (int) n3); \
 		}
 
-#define STROUT(MAX) { int i; \
+#define STROUT(MAX) { unsigned int i; \
 			TCHECK2(bp[0], sizeof(int32_t)); \
-			i = (int) EXTRACT_32BITS(bp); \
+			i = EXTRACT_32BITS(bp); \
+			if (i > MAX) \
+				goto trunc; \
 			bp += sizeof(int32_t); \
-			TCHECK2(bp[0], i); \
-			strncpy(s, (char *) bp, min(MAX, i)); \
-			s[i] = '\0'; \
-			printf(" \"%s\"", s); \
+			printf(" \""); \
+			if (fn_printn(bp, i, snapend)) \
+				goto trunc; \
+			printf("\""); \
 			bp += ((i + sizeof(int32_t) - 1) / sizeof(int32_t)) * sizeof(int32_t); \
 		}
 
@@ -724,7 +726,9 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 				bp += sizeof(int32_t); \
 			} \
 			s[MAX] = '\0'; \
-			printf(" \"%s\"", s); \
+			printf(" \""); \
+			fn_print(s, NULL); \
+			printf("\""); \
 		}
 
 static void
@@ -1084,7 +1088,9 @@ acl_print(u_char *s, int maxsize, u_char *end)
 		if (sscanf((char *) s, "%s %d\n%n", user, &acl, &n) != 2)
 			goto finish;
 		s += n;
-		printf(" +{%s ", user);
+		printf(" +{");
+		fn_print(user, NULL);
+		printf(" ");
 		ACLOUT(acl);
 		printf("}");
 		if (s > end)
@@ -1095,7 +1101,9 @@ acl_print(u_char *s, int maxsize, u_char *end)
 		if (sscanf((char *) s, "%s %d\n%n", user, &acl, &n) != 2)
 			goto finish;
 		s += n;
-		printf(" -{%s ", user);
+		printf(" -{");
+		fn_print(user, NULL);
+		printf(" ");
 		ACLOUT(acl);
 		printf("}");
 		if (s > end)
