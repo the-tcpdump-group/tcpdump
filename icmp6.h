@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/icmp6.h,v 1.10 2001-06-01 22:59:45 itojun Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/icmp6.h,v 1.11 2001-06-01 23:01:04 itojun Exp $ (LBL) */
 /*	$NetBSD: icmp6.h,v 1.13 2000/08/03 16:30:37 itojun Exp $	*/
 /*	$KAME: icmp6.h,v 1.22 2000/08/03 15:25:16 jinmei Exp $	*/
 
@@ -199,6 +199,18 @@ struct nd_router_advert {	/* router advertisement */
 #define ND_RA_FLAG_MANAGED	0x80
 #define ND_RA_FLAG_OTHER	0x40
 #define ND_RA_FLAG_HOME_AGENT	0x20
+
+/*
+ * Router preference values based on draft-draves-ipngwg-router-selection-01.
+ * These are non-standard definitions.
+ */
+#define ND_RA_FLAG_RTPREF_MASK	0x18 /* 00011000 */
+
+#define ND_RA_FLAG_RTPREF_HIGH	0x08 /* 00001000 */
+#define ND_RA_FLAG_RTPREF_MEDIUM	0x00 /* 00000000 */
+#define ND_RA_FLAG_RTPREF_LOW	0x18 /* 00011000 */
+#define ND_RA_FLAG_RTPREF_RSV	0x10 /* 00010000 */
+
 #define nd_ra_router_lifetime	nd_ra_hdr.icmp6_data16[1]
 
 struct nd_neighbor_solicit {	/* neighbor solicitation */

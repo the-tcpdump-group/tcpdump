@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.53 2001-06-01 22:59:45 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.54 2001-06-01 23:01:04 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -66,10 +66,6 @@ void icmp6_rrenum_print(int, const u_char *, const u_char *);
 
 #ifndef abs
 #define abs(a)	((0 < (a)) ? (a) : -(a))
-#endif
-
-#ifndef ND_RA_FLAG_RTPREF_MASK
-#define ND_RA_FLAG_RTPREF_MASK	0x18
 #endif
 
 static const char *
