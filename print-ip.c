@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.132 2003-11-19 00:36:07 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.133 2004-03-17 13:24:09 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -434,10 +434,11 @@ ip_print(register const u_char *bp, register u_int length)
 	     * For unfragmented datagrams, note the don't fragment flag.
 	     */
 
-	    (void)printf(", id %u, offset %u, flags [%s]",
+	    (void)printf(", id %u, offset %u, flags [%s], proto %u",
 			     EXTRACT_16BITS(&ip->ip_id),
 			     (off & 0x1fff) * 8,
-			     bittok2str(ip_frag_values, "none", off & 0xe000 ));
+			     bittok2str(ip_frag_values, "none", off & 0xe000 ),
+                             ip->ip_p);
 
             (void)printf(", length: %u", EXTRACT_16BITS(&ip->ip_len));
 
