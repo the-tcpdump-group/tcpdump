@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.116 2004-01-27 12:50:55 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.117 2004-01-27 13:35:57 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1038,7 +1038,7 @@ trunctlv:
 static int
 isis_print_is_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *ident) {
 
-        int priority_level;
+        int priority_level,bandwidth_constraint;
         union { /* int to float conversion buffer for several subTLVs */
             float f; 
             u_int32_t i;
@@ -1089,11 +1089,11 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
             /* for now lets just print the first 8 BCs -
              * FIXME is this dep. on the BC model ?
              */
-            for (priority_level = 0; priority_level < 8; priority_level++) {
+            for (bandwidth_constraint = 0; bandwidth_constraint < 8; bandwidth_constraint++) {
                 bw.i = EXTRACT_32BITS(tptr);
                 printf("%s  Bandwidth constraint %d: %.3f Mbps",
                        ident,
-                       priority_level,
+                       bandwidth_constraint,
                        bw.f*8/1000000 );
 		tptr+=4;
             }
