@@ -25,7 +25,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ntp.c,v 1.36 2002-12-28 17:15:06 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ntp.c,v 1.37 2003-08-01 01:18:24 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -36,6 +36,9 @@ static const char rcsid[] =
 
 #include <stdio.h>
 #include <string.h>
+#ifdef HAVE_STRFTIME
+#include <time.h>
+#endif
 
 #include "interface.h"
 #include "addrtoname.h"
@@ -223,6 +226,21 @@ p_ntp_time(register const struct l_fixedpt *lfp)
 	ff = ff / FMAXINT;	/* shift radix point by 32 bits */
 	f = ff * 1000000000.0;	/* treat fraction as parts per billion */
 	printf("%u.%09d", i, f);
+
+#ifdef HAVE_STRFTIME
+	/*
+	 * For extra verbosity, print the time in human-readable format.
+	 */
+	if (vflag > 1 && i) {
+	    time_t seconds = i - JAN_1970;
+	    struct tm *tm;
+	    char time_buf[128];
+
+	    tm = localtime(&seconds);
+	    strftime(time_buf, sizeof (time_buf), "%Y/%m/%d %H:%M:%S", tm);
+	    printf (" (%s)", time_buf);
+	}
+#endif
 }
 
 /* Prints time difference between *lfp and *olfp */
@@ -231,16 +249,22 @@ p_ntp_delta(register const struct l_fixedpt *olfp,
 	    register const struct l_fixedpt *lfp)
 {
 	register int32_t i;
-	register u_int32_t uf;
-	register u_int32_t ouf;
+	register u_int32_t u, uf;
+	register u_int32_t ou, ouf;
 	register u_int32_t f;
 	register float ff;
 	int signbit;
 
-	i = EXTRACT_32BITS(&lfp->int_part) - EXTRACT_32BITS(&olfp->int_part);
-
+	u = EXTRACT_32BITS(&lfp->int_part);
+	ou = EXTRACT_32BITS(&olfp->int_part);
 	uf = EXTRACT_32BITS(&lfp->fraction);
 	ouf = EXTRACT_32BITS(&olfp->fraction);
+	if (ou == 0 && ouf == 0) {
+		p_ntp_time(lfp);
+		return;
+	}
+
+	i = u - ou;
 
 	if (i > 0) {		/* new is definitely greater than old */
 		signbit = 0;
