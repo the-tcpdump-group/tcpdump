@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.60 1999-11-21 15:57:51 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.61 1999-11-22 04:27:10 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -135,18 +135,15 @@ tcp_print(register const u_char *bp, register u_int length,
 		ip6 = NULL;
 #endif /*INET6*/
 	ch = '\0';
-	TCHECK(*tp);
-	if (length < sizeof(*tp)) {
-		(void)printf("truncated-tcp %d", length);
+	if (!TTEST(tp->th_dport)) {
+		(void)printf("%s > %s: [|tcp]",
+			ipaddr_string(&ip->ip_src),
+			ipaddr_string(&ip->ip_dst));
 		return;
 	}
 
 	sport = ntohs(tp->th_sport);
 	dport = ntohs(tp->th_dport);
-	seq = ntohl(tp->th_seq);
-	ack = ntohl(tp->th_ack);
-	win = ntohs(tp->th_win);
-	urp = ntohs(tp->th_urp);
 
 #ifdef INET6
 	if (ip6) {
@@ -174,6 +171,13 @@ tcp_print(register const u_char *bp, register u_int length,
 				tcpport_string(sport), tcpport_string(dport));
 		}
 	}
+
+	TCHECK(*tp);
+
+	seq = ntohl(tp->th_seq);
+	ack = ntohl(tp->th_ack);
+	win = ntohs(tp->th_win);
+	urp = ntohs(tp->th_urp);
 
 	if (qflag) {
 		(void)printf("tcp %d", length - tp->th_off * 4);
@@ -311,7 +315,7 @@ tcp_print(register const u_char *bp, register u_int length,
 		return;
 	}
 	length -= hlen;
-	if (length > 0 || flags & (TH_SYN | TH_FIN | TH_RST))
+	if (vflag > 1 || length > 0 || flags & (TH_SYN | TH_FIN | TH_RST))
 		(void)printf(" %u:%u(%d)", seq, seq + length, length);
 	if (flags & TH_ACK)
 		(void)printf(" ack %u", ack);
