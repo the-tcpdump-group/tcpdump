@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.45 2001-01-28 09:09:36 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.46 2001-02-20 01:13:56 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -491,7 +491,7 @@ icmp6_opt_print(register const u_char *bp, int resid)
 			printf("%u", (u_int32_t)ntohl(opp->nd_opt_pi_valid_time));
 		}
 		printf(", ");
-		printf("preffered_ltime=");
+		printf("preferred_ltime=");
 		if ((u_int32_t)ntohl(opp->nd_opt_pi_preferred_time) == ~0U)
 			printf("infinity");
 		else {
