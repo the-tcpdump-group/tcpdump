@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ip.h,v 1.6 2000-10-03 03:14:46 itojun Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ip.h,v 1.7 2000-10-03 09:17:40 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1982, 1986, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -33,29 +33,6 @@
  *
  *	@(#)ip.h	8.2 (Berkeley) 6/1/94
  */
-
-#ifndef BYTE_ORDER
-#define	LITTLE_ENDIAN	1234	/* least-significant byte first (vax, pc) */
-#define	BIG_ENDIAN	4321	/* most-significant byte first (IBM, net) */
-#define	PDP_ENDIAN	3412	/* LSB first in word, MSW first in long (pdp)*/
-
-#ifdef WORDS_BIGENDIAN
-#define BYTE_ORDER	BIG_ENDIAN
-#else
-#define BYTE_ORDER	LITTLE_ENDIAN
-#endif /* WORDS_BIGENDIAN */
-#endif /* BYTE_ORDER */
-
-#if !defined(BYTE_ORDER) || \
-    (BYTE_ORDER != BIG_ENDIAN && BYTE_ORDER != LITTLE_ENDIAN && \
-    BYTE_ORDER != PDP_ENDIAN)
-	/* you must determine what the correct bit order is for
-	 * your compiler - the next line is an intentional error
-	 * which will force your compiles to bomb until you fix
-	 * the above macros.
-	 */
-  #error "Undefined or invalid BYTE_ORDER";
-#endif
 
 /*
  * Definitions for internet protocol version 4.
