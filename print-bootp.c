@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.70 2003-03-12 19:25:40 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.71 2003-03-16 23:43:41 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -273,7 +273,7 @@ static struct tok tag2str[] = {
 	{ TAG_NS_SEARCH,	"sNSSEARCH" },	/* XXX 's' */
 /* RFC 3011 */
 	{ TAG_IP4_SUBNET_SELECT, "iSUBNET" },
-/* ftp://ftp.isi.edu/.../assignments/bootp-dhcp-extensions */
+/* http://www.iana.org/assignments/bootp-dhcp-extensions/index.htm */
 	{ TAG_USER_CLASS,	"aCLASS" },
 	{ TAG_SLP_NAMING_AUTH,	"aSLP-NA" },
 	{ TAG_CLIENT_FQDN,	"$FQDN" },
