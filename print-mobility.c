@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-mobility.c,v 1.1 2002-06-27 08:22:41 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-mobility.c,v 1.2 2002-07-08 08:58:37 fenner Exp $";
 #endif
 
 #ifdef INET6
@@ -69,7 +69,6 @@ struct ip6_mobility {
 #define IP6M_MINLEN	8
 
 /* message type */
-#if BYTE_ORDER == BIG_ENDIAN
 #define IP6M_BINDING_REQUEST	0x0000	/* Binding Refresh Request */
 #define IP6M_HOME_TEST_INIT	0x0001	/* Home Test Init */
 #define IP6M_CAREOF_TEST_INIT	0x0002	/* Care-of Test Init */
@@ -78,16 +77,6 @@ struct ip6_mobility {
 #define IP6M_BINDING_UPDATE	0x0005	/* Binding Update */
 #define IP6M_BINDING_ACK	0x0006	/* Binding Acknowledgement */
 #define IP6M_BINDING_ERROR	0x0007	/* Binding Error */
-#else /* BYTE_ORDER == LITTLE_ENDIAN */
-#define IP6M_BINDING_REQUEST	0x0000	/* Binding Refresh Request */
-#define IP6M_HOME_TEST_INIT	0x0100	/* Home Test Init */
-#define IP6M_CAREOF_TEST_INIT	0x0200	/* Care-of Test Init */
-#define IP6M_HOME_TEST		0x0300	/* Home Test */
-#define IP6M_CAREOF_TEST	0x0400	/* Care-of Test */
-#define IP6M_BINDING_UPDATE	0x0500	/* Binding Update */
-#define IP6M_BINDING_ACK	0x0600	/* Binding Acknowledgement */
-#define IP6M_BINDING_ERROR	0x0700	/* Binding Error */
-#endif /* BYTE_ORDER == LITTLE_ENDIAN */
 
 /* Mobility Header Options */
 #define IP6MOPT_MINLEN		2
@@ -138,7 +127,7 @@ mobility_opt_print(const u_char *bp, int len)
 				printf("(ui: trunc)");
 				goto trunc;
 			}
-			printf("(ui: 0x%04x)", ntohs(*(u_int16_t *)&bp[i + 2]));
+			printf("(ui: 0x%04x)", EXTRACT_16BITS(&bp[i+2]));
 			break;
 		case IP6MOPT_ALTCOA:
 			if (len - i < IP6MOPT_ALTCOA_MINLEN) {
@@ -153,8 +142,8 @@ mobility_opt_print(const u_char *bp, int len)
 				goto trunc;
 			}
 			printf("(ni: ho=0x%04x ci=0x%04x)",
-				ntohs(*(u_int16_t *)&bp[i + 2]),
-				ntohs(*(u_int16_t *)&bp[i + 4]));
+				EXTRACT_16BITS(&bp[i+2]),
+				EXTRACT_16BITS(&bp[i+4]));
 			break;
 		case IP6MOPT_AUTH:
 			if (len - i < IP6MOPT_AUTH_MINLEN) {
@@ -162,7 +151,7 @@ mobility_opt_print(const u_char *bp, int len)
 				goto trunc;
 			}
 			printf("(auth spi: 0x%08x)",
-				(u_int32_t)ntohl(*(u_int32_t *)&bp[i + 2]));
+				EXTRACT_32BITS(&bp[i+2]));
 			break;
 		default:
 			if (len - i < IP6MOPT_MINLEN) {
@@ -188,7 +177,7 @@ mobility_print(const u_char *bp, const u_char *bp2)
 	const struct ip6_mobility *mh;
 	const struct ip6_hdr *ip6;
 	const u_char *ep;
-	int mhlen, hlen;
+	int mhlen, hlen, type;
 
 	mh = (struct ip6_mobility *)bp;
 	ip6 = (struct ip6_hdr *)bp2;
@@ -204,7 +193,8 @@ mobility_print(const u_char *bp, const u_char *bp2)
 	/* XXX ip6m_cksum */
 
 	TCHECK(mh->ip6m_type);
-	switch (mh->ip6m_type) {
+	type = ntohs(mh->ip6m_type);
+	switch (type) {
 	case IP6M_BINDING_REQUEST:
 		printf("mobility: BRR");
 		hlen = IP6M_MINLEN;
@@ -212,24 +202,24 @@ mobility_print(const u_char *bp, const u_char *bp2)
 	case IP6M_HOME_TEST_INIT:
 	case IP6M_CAREOF_TEST_INIT:
 		printf("mobility: %soTI",
-			mh->ip6m_type == IP6M_HOME_TEST_INIT ? "H" : "C");
+			type == IP6M_HOME_TEST_INIT ? "H" : "C");
 		hlen = IP6M_MINLEN;
 		TCHECK2(*mh, hlen + 4);
-		printf(" cookie=0x%x", ntohl(*(u_int32_t *)&bp[hlen]));
+		printf(" cookie=0x%x", EXTRACT_32BITS(&bp[hlen]));
 		hlen += 4;
 		break;
 	case IP6M_HOME_TEST:
 	case IP6M_CAREOF_TEST:
 		printf("mobility: %soT",
-			mh->ip6m_type == IP6M_HOME_TEST ? "H" : "C");
+			type == IP6M_HOME_TEST ? "H" : "C");
 		hlen = IP6M_MINLEN;
 		TCHECK2(*mh, hlen + 2);
-		printf(" nonce id=0x%x", ntohs(*(u_int16_t *)&bp[hlen]));
+		printf(" nonce id=0x%x", EXTRACT_16BITS(&bp[hlen]));
 		hlen += 2;
 		/* Reserved (16bits) */
 		hlen += 2;
 		TCHECK2(*mh, hlen + 4);
-		printf(" mobile cookie=0x%x", ntohl(*(u_int32_t *)&bp[hlen]));
+		printf(" mobile cookie=0x%x", EXTRACT_32BITS(&bp[hlen]));
 		hlen += 4;
 		/* Home(Care-of) Cookie (128 bits) */
 		hlen += 16;
@@ -249,12 +239,12 @@ mobility_print(const u_char *bp, const u_char *bp2)
 			printf("D");
 		hlen = IP6M_MINLEN;
 		TCHECK2(*mh, hlen + 2);
-		printf(" seq#=%d", ntohs(*(u_int16_t *)&bp[hlen]));
+		printf(" seq#=%d", EXTRACT_16BITS(&bp[hlen]));
 		hlen += 2;
 		/* Reserved (16bits) */
 		hlen += 2;
 		TCHECK2(*mh, hlen + 4);
-		printf(" lifetime=%d", ntohl(*(u_int32_t *)&bp[hlen]));
+		printf(" lifetime=%d", EXTRACT_32BITS(&bp[hlen]));
 		hlen += 4;
 		TCHECK2(*mh, hlen + 16);
 		printf(" homeaddr %s", ip6addr_string(&bp[hlen]));
@@ -266,12 +256,12 @@ mobility_print(const u_char *bp, const u_char *bp2)
 		printf(" status=%d", mh->ip6m_data8[0]);
 		hlen = IP6M_MINLEN;
 		TCHECK2(*mh, hlen + 2);
-		printf(" seq#=%d", ntohs(*(u_int16_t *)&bp[hlen]));
+		printf(" seq#=%d", EXTRACT_16BITS(&bp[hlen]));
 		hlen += 2;
 		/* Reserved (16bits) */
 		hlen += 2;
 		TCHECK2(*mh, hlen + 4);
-		printf(" lifetime=%d", ntohl(*(u_int32_t *)&bp[hlen]));
+		printf(" lifetime=%d", EXTRACT_32BITS(&bp[hlen]));
 		hlen += 4;
 		TCHECK2(*mh, hlen + 4);
 		printf(" refresh=%d", ntohl(*(u_int32_t *)&bp[hlen]));
@@ -287,8 +277,7 @@ mobility_print(const u_char *bp, const u_char *bp2)
 		hlen += 16;
 		break;
 	default:
-		printf("mobility: type-#%d len=%d", ntohs(mh->ip6m_type),
-			mh->ip6m_len);
+		printf("mobility: type-#%d len=%d", type, mh->ip6m_len);
 		return(mhlen);
 		break;
 	}
