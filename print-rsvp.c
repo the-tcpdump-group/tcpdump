@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.17 2003-03-11 06:40:58 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.18 2003-03-14 10:03:52 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -242,6 +242,15 @@ static const struct tok rsvp_obj_xro_values[] = {
     { 0, NULL}
 };
 
+/* draft-ietf-mpls-rsvp-lsp-fastreroute-02.txt */
+static const struct tok rsvp_obj_rro_flag_values[] = {
+    { 0x01,	              "Local protection available" },
+    { 0x02,                   "Local protection in use" },
+    { 0x04,                   "Bandwidth protection" },
+    { 0x08,                   "Node protection" },
+    { 0, NULL}
+};
+
 static const struct tok rsvp_resstyle_values[] = {
     { 17,	              "Wildcard Filter" },
     { 10,                     "Fixed Filter" },
@@ -274,9 +283,11 @@ static const struct tok rsvp_intserv_parameter_id_values[] = {
 };
 
 static struct tok rsvp_session_attribute_flag_values[] = {
-    { 1,	              "Local Protection desired" },
-    { 2,                      "Label Recording desired" },
-    { 4,                      "SE Style desired" },
+    { 0x01,	              "Local Protection desired" },
+    { 0x02,                   "Label Recording desired" },
+    { 0x04,                   "SE Style desired" },
+    { 0x08,                   "Bandwidth protection desired" }, /* draft-ietf-mpls-rsvp-lsp-fastreroute-02.txt */
+    { 0x10,                   "Node protection desired" },      /* draft-ietf-mpls-rsvp-lsp-fastreroute-02.txt */
     { 0, NULL}
 };
 
@@ -720,10 +731,13 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                                    RSVP_OBJ_XRO_MASK_SUBOBJ(*obj_tptr)));                
                     switch(RSVP_OBJ_XRO_MASK_SUBOBJ(*obj_tptr)) {
                     case RSVP_OBJ_XRO_IPV4:
-                        printf(", %s, %s/%u",
+                        printf(", %s, %s/%u, Flags: [%s]",
                                RSVP_OBJ_XRO_MASK_LOOSE(*obj_tptr) ? "Loose" : "Strict",
                                ipaddr_string(obj_tptr+2),
-                               *(obj_tptr+6));
+                               *(obj_tptr+6),
+                               bittok2str(rsvp_obj_rro_flag_values,
+                                   "none",
+                                   *(obj_tptr+7))); /* rfc3209 says that this field is rsvd. */
                     }
                     obj_tlen-=*(obj_tptr+1);
                     obj_tptr+=*(obj_tptr+1);
