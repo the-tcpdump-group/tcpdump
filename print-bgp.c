@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.76 2003-12-23 22:18:35 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.77 2004-01-15 18:59:15 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -160,6 +160,27 @@ static struct tok bgp_attr_values[] = {
     { BGPTYPE_EXTD_COMMUNITIES, "Extended Community"},
     { BGPTYPE_ATTR_SET,         "Attribute Set"},
     { 255,                      "Reserved for development"},
+    { 0, NULL}
+};
+
+#define BGP_AS_SET             1
+#define BGP_AS_SEQUENCE        2
+#define BGP_CONFED_AS_SEQUENCE 3 /* draft-ietf-idr-rfc3065bis-01 */
+#define BGP_CONFED_AS_SET      4 /* draft-ietf-idr-rfc3065bis-01  */
+
+static struct tok bgp_as_path_segment_open_values[] = {
+    { BGP_AS_SEQUENCE,         ""},
+    { BGP_AS_SET,              "{ "},
+    { BGP_CONFED_AS_SEQUENCE,  "( "},
+    { BGP_CONFED_AS_SET,       "({ "},
+    { 0, NULL}
+};
+
+static struct tok bgp_as_path_segment_close_values[] = {
+    { BGP_AS_SEQUENCE,         ""},
+    { BGP_AS_SET,              "}"},
+    { BGP_CONFED_AS_SEQUENCE,  ")"},
+    { BGP_CONFED_AS_SET,       "})"},
     { 0, NULL}
 };
 
@@ -737,21 +758,14 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
 			printf("empty");
 			break;
                 }
+
 		while (tptr < pptr + len) {
-			/*
-			 * under RFC1965, p[0] means:
-			 * 1: AS_SET 2: AS_SEQUENCE
-			 * 3: AS_CONFED_SET 4: AS_CONFED_SEQUENCE
-			 */
-			if (tptr[0] == 3 || tptr[0] == 4)
-				printf("confed");
-			printf("%s", (tptr[0] & 1) ? "{" : "");
-			for (i = 0; i < tptr[1] * 2; i += 2) {
-				printf("%s%u", i == 0 ? "" : " ",
-					EXTRACT_16BITS(&tptr[2 + i]));
-			}
-			printf("%s", (tptr[0] & 1) ? "}" : "");
-			tptr += 2 + tptr[1] * 2;
+                        printf("%s", tok2str(bgp_as_path_segment_open_values, "?", tptr[0]));
+                        for (i = 0; i < tptr[1] * 2; i += 2) {
+                            printf("%u ", EXTRACT_16BITS(&tptr[2 + i]));
+                        }
+                        printf("%s", tok2str(bgp_as_path_segment_close_values, "?", tptr[0]));
+                        tptr += 2 + tptr[1] * 2;
 		}
 		break;
 	case BGPTYPE_NEXT_HOP:
