@@ -2,6 +2,13 @@
  * Copyright (c) 2000 William C. Fenner.
  *                All rights reserved.
  *
+ * Kevin Steves <ks@hp.se> July 2000
+ * Modified to:
+ * - print version, type string and packet length
+ * - print IP address count if > 1 (-v)
+ * - verify checksum (-v)
+ * - print authentication string (-v)
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that: (1) source code
  * distributions retain the above copyright notice and this paragraph
@@ -18,7 +25,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-vrrp.c,v 1.1 2000-05-01 17:35:44 fenner Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-vrrp.c,v 1.2 2000-07-29 06:22:17 assar Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -58,31 +65,40 @@ static const char rcsid[] =
 void
 vrrp_print(register const u_char *bp, register u_int len, int ttl)
 {
-	printf("vrrp ");
+	int version, type, auth_type;
+	char *type_s;
+
+	TCHECK(bp[0]);
+	version = (bp[0] & 0xf0) >> 4;
+	type = bp[0] & 0x0f;
+	if (type == 1)
+		type_s = "advertise";
+	else
+		type_s = "unknown";
+	printf("VRRPv%d-%s %d: ", version, type_s, len);
 	if (ttl != 255)
 		printf("[ttl=%d!] ", ttl);
-	TCHECK(bp[3]);
-	if ((bp[0] & 0xf0) != 0x20) {
-		printf("[v=%d]", bp[0] >> 4);
+	if (version != 2 || type != 1)
 		return;
-	}
-	if ((bp[0] & 0x0f) != 1) {
-		printf("[t=%d]", bp[0] & 0x0f);
-		return;
-	}
+	TCHECK(bp[2]);
 	printf("vrid=%d prio=%d", bp[1], bp[2]);
 	TCHECK(bp[5]);
-	if (bp[4] != 0) {
-		printf(" [authtype %d]", bp[4]);
-	}
+	auth_type = bp[4];
+	if (auth_type != 0)
+		printf(" authtype=%d", auth_type);
 	printf(" intvl=%d", bp[5]);
 	if (vflag) {
 		int naddrs = bp[3];
 		int i;
 		char c;
 
-		/* check checksum? */
-		printf(" addrs:");
+		if (TTEST2(bp[0], len) && in_cksum((const u_short*)bp, len, 0))
+			printf(" (bad vrrp cksum %x!)",
+				EXTRACT_16BITS(&bp[6]));
+		printf(" addrs");
+		if (naddrs > 1)
+			printf("(%d)", naddrs);
+		printf(":");
 		c = ' ';
 		bp += 8;
 		for (i = 0; i < naddrs; i++) {
@@ -91,7 +107,10 @@ vrrp_print(register const u_char *bp, register u_int len, int ttl)
 			c = ',';
 			bp += 4;
 		}
-		/* auth data? */
+		if (auth_type == 1) { /* simple text password */
+			TCHECK(bp[7]);
+			printf(" auth %.8s", bp);
+		}
 	}
 	return;
 trunc:
