@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/extract.h,v 1.20 2004-09-23 21:30:12 dyoung Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/extract.h,v 1.21 2004-09-24 18:21:25 guy Exp $ (LBL)
  */
 
 /* Network to host order macros */
@@ -84,6 +84,10 @@ typedef struct {
 	((u_int32_t)((u_int32_t)*((const u_int8_t *)(p) + 0) << 16 | \
 		     (u_int32_t)*((const u_int8_t *)(p) + 1) << 8 | \
 		     (u_int32_t)*((const u_int8_t *)(p) + 2)))
+
+#define EXTRACT_64BITS(p) \
+	((u_int64_t)(u_int64_t)(EXTRACT_32BITS((p) + 0)) << 32 | \
+		    (u_int64_t)(EXTRACT_32BITS((p) + 4)))
 
 /* Little endian protocol host order macros */
 

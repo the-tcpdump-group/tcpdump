@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.102 2004-04-17 08:56:14 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.103 2004-09-24 18:21:25 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -174,7 +174,7 @@ static int print_int64(const u_int32_t *dp, int how)
 {
 	u_int64_t res;
 
-	res = ((u_int64_t)EXTRACT_32BITS(&dp[0]) << 32) | (u_int64_t)EXTRACT_32BITS(&dp[1]);
+	res = EXTRACT_64BITS((u_int8_t *)dp);
 	switch (how) {
 	case SIGNED:
 		printf("%" PRId64, res);
