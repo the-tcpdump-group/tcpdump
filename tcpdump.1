@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.89 2000-10-28 10:10:54 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.90 2000-10-28 10:23:38 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -304,7 +304,7 @@ qualifier,
 is assumed.
 .IP \fIdir\fP
 qualifiers specify a particular transfer direction to and/or from
-.I id.
+.IR id .
 Possible directions are
 .BR src ,
 .BR dst ,
@@ -332,7 +332,6 @@ protos are:
 .BR arp ,
 .BR rarp ,
 .BR decnet ,
-.BR iso ,
 .B tcp
 and
 .BR udp .
@@ -474,7 +473,7 @@ This is equivalent to:
 .fi
 .in -.5i
 .IP "\fBip proto \fIprotocol\fR"
-True if the packet is an ip packet (see
+True if the packet is an IP packet (see
 .IR ip (4P))
 of protocol type \fIprotocol\fP.
 \fIProtocol\fP can be a number or one of the names
@@ -582,8 +581,8 @@ where \fIp\fR is one of the above protocols.
 .IP "\fBiso proto \fIprotocol\fR"
 True if the packet is an OSI packet of protocol type \fIprotocol\fP.
 \fIProtocol\fP can be a number or one of the names
-\fIesis\fP,or \fisis\fP.
-.IP "\fBesis\fR, \fBisis\fR"
+\fIclnp\fP, \fIesis\fP, or \fIisis\fP.
+.IP "\fBclnp\fR, \fBesis\fR, \fBisis\fR"
 Abbreviations for:
 .in +.5i
 .nf
