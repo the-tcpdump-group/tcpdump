@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.77 2001-06-24 21:35:53 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.78 2001-06-24 21:49:25 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -177,8 +177,8 @@ getname(const u_char *ap)
 	u_int32_t addr;
 	static struct hnamemem *p;		/* static for longjmp() */
 
-	addr = (u_int32_t)ap[0] << 24 | (u_int32_t)ap[1] << 16 |
-	    (u_int32_t)ap[2] << 8 | (u_int32_t)ap[3] << 0;
+	addr = ((u_int32_t)ap[0] << 24) | ((u_int32_t)ap[1] << 16) |
+	    ((u_int32_t)ap[2] << 8) | ((u_int32_t)ap[3] << 0);
 
 	p = &hnametable[addr & (HASHNAMESIZE-1)];
 	for (; p->nxt; p = p->nxt) {
