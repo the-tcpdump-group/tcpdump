@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.79 2004-06-15 07:43:03 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.80 2004-12-23 10:51:47 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -532,6 +532,7 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
 
         if (vflag >= 1 && plen > ICMP_EXTD_MINLEN && ICMP_MPLS_EXT_TYPE(dp->icmp_type)) {
 
+            TCHECK(*(dp->icmp_mpls_ext_version));
             printf("\n\tMPLS extension v%u",ICMP_MPLS_EXT_EXTRACT_VERSION(*(dp->icmp_mpls_ext_version)));
             
             /*
@@ -543,6 +544,7 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
             }
 
             hlen = plen - ICMP_EXTD_MINLEN;
+            TCHECK2(*(dp->icmp_mpls_ext_checksum), 2);
             printf(", checksum 0x%04x (unverified), length %u", /* FIXME */
                    EXTRACT_16BITS(dp->icmp_mpls_ext_checksum),
                    hlen);
@@ -553,6 +555,7 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
             while (hlen > sizeof(struct icmp_mpls_ext_object_header_t)) {
 
                 icmp_mpls_ext_object_header = (struct icmp_mpls_ext_object_header_t *)obj_tptr;
+                TCHECK(*icmp_mpls_ext_object_header);
                 obj_tlen = EXTRACT_16BITS(icmp_mpls_ext_object_header->length);
                 obj_class_num = icmp_mpls_ext_object_header->class_num;
                 obj_ctype = icmp_mpls_ext_object_header->ctype;
@@ -565,12 +568,15 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
                        obj_tlen);
 
                 hlen-=sizeof(struct icmp_mpls_ext_object_header_t); /* length field includes tlv header */
-                obj_tlen-=sizeof(struct icmp_mpls_ext_object_header_t); 
+                if (obj_tlen < sizeof(struct icmp_mpls_ext_object_header_t))
+                    break;
+                obj_tlen-=sizeof(struct icmp_mpls_ext_object_header_t);
 
                 switch (obj_class_num) {
                 case 1:
                     switch(obj_ctype) {
                     case 1:
+                        TCHECK2(*obj_tptr, 4);
                         raw_label = EXTRACT_32BITS(obj_tptr);
                         printf("\n\t    label %u, exp %u", MPLS_LABEL(raw_label), MPLS_EXP(raw_label));
                         if (MPLS_STACK(raw_label))
@@ -591,6 +597,8 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
                     print_unknown_data(obj_tptr, "\n\t    ", obj_tlen);
                     break;
                 }
+                if (hlen < obj_tlen)
+                    break;
                 hlen -= obj_tlen;
                 obj_tptr += obj_tlen;
             }
