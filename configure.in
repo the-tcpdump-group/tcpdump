@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.169.2.3 2004-03-28 21:04:48 fenner Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.169.2.4 2004-04-22 19:07:10 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.169.2.3 $)
+AC_REVISION($Revision: 1.169.2.4 $)
 AC_PREREQ(2.50)
 AC_INIT(tcpdump.c)
 
@@ -513,7 +513,7 @@ needsnprintf=no
 AC_CHECK_FUNCS(vsnprintf snprintf,,
 	[needsnprintf=yes])
 if test $needsnprintf = yes; then
-	AC_LIBOBJ(snprintf.o)
+	AC_LIBOBJ(snprintf)
 fi
 
 AC_LBL_TYPE_SIGNAL
@@ -550,7 +550,7 @@ AC_TRY_LINK([#include <sys/types.h>
 #include <arpa/inet.h>], [char src[4], dst[128];
 inet_ntop(AF_INET, src, dst, sizeof(dst));],
 	[AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)
-	AC_LIBOBJ(inet_ntop.o)])
+	AC_LIBOBJ(inet_ntop)])
 AC_MSG_CHECKING(for inet_pton)
 AC_TRY_LINK([#include <sys/types.h>
 #include <sys/socket.h>
@@ -558,7 +558,7 @@ AC_TRY_LINK([#include <sys/types.h>
 #include <arpa/inet.h>], [char src[128], dst[4];
 inet_pton(AF_INET, src, dst);],
 	[AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)
-	AC_LIBOBJ(inet_pton.o)])
+	AC_LIBOBJ(inet_pton)])
 AC_MSG_CHECKING(for inet_aton)
 AC_TRY_LINK([#include <sys/types.h>
 #include <netinet/in.h>
@@ -566,7 +566,7 @@ AC_TRY_LINK([#include <sys/types.h>
 struct in_addr dst;
 inet_aton(src, &dst);],
 	[AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)
-	AC_LIBOBJ(inet_aton.o)])
+	AC_LIBOBJ(inet_aton)])
 
 dnl portability macros for getaddrinfo/getnameinfo
 dnl
