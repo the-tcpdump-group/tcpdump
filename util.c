@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.58 1999-10-07 23:47:13 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.59 1999-11-21 03:51:05 assar Exp $ (LBL)";
 #endif
 
 #include <sys/types.h>
@@ -132,9 +132,30 @@ ts_print(register const struct timeval *tvp)
 		(void)printf("%02d:%02d:%02d.%06u ",
 		    s / 3600, (s % 3600) / 60, s % 60, (u_int32_t)tvp->tv_usec);
 	} else if (tflag < 0) {
-		/* Unix timeval style */
-		(void)printf("%u.%06u ",
-		    (u_int32_t)tvp->tv_sec, (u_int32_t)tvp->tv_usec);
+		if (tflag < -1) {
+			static unsigned b_sec;
+			static unsigned b_usec;
+			if (b_sec == 0) {
+				printf("000000 ");
+			} else {
+				int d_usec = tvp->tv_usec - b_usec;
+				int d_sec = tvp->tv_sec - b_sec;
+
+				while (d_usec < 0) {
+					d_usec += 1000000;
+					d_sec--;
+				}
+				if (d_sec)
+					printf("%d. ", d_sec);
+				printf("%06d ", d_usec);
+			}
+			b_sec = tvp->tv_sec;
+			b_usec = tvp->tv_usec;
+		} else {
+			/* Unix timeval style */
+			(void)printf("%u.%06u ",
+				     (u_int32_t)tvp->tv_sec, (u_int32_t)tvp->tv_usec);
+		}
 	}
 }
 
