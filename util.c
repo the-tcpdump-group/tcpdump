@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.86 2003-07-30 00:20:28 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.87 2003-10-02 13:16:14 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -217,7 +217,7 @@ print_unknown_data(const u_char *cp,const char *lf,int len)
 	        printf(" ");
 	    if (i/16!=(i+1)/16) {
 	        if (i<(len-1))
-		    printf("%s0x%04x: ",lf,i);
+		    printf("%s0x%04x: ",lf,i+1);
 	    }
 	}
 	return(1); /* everything is ok */
