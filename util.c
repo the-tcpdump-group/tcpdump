@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.91 2004-04-28 22:06:33 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.92 2004-04-29 01:32:47 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -209,13 +209,9 @@ print_unknown_data(const u_char *cp,const char *ident,int len)
  * Convert a token value to a string; use "fmt" if not found.
  */
 const char *
-tok2str(register const struct tok *lp, register const char *fmt,
-	register int v)
+tok2strbuf(register const struct tok *lp, register const char *fmt,
+	   register int v, char *buf, size_t bufsize)
 {
-	static char buf[4][128];
-	static int idx = 0;
-	char *ret;
-
 	while (lp->s != NULL) {
 		if (lp->v == v)
 			return (lp->s);
@@ -223,10 +219,23 @@ tok2str(register const struct tok *lp, register const char *fmt,
 	}
 	if (fmt == NULL)
 		fmt = "#%d";
-	ret = buf[idx];
-	(void)snprintf(ret, sizeof(buf[0]), fmt, v);
-	idx = (idx+1) & 3;
-	return (ret);
+
+	(void)snprintf(buf, bufsize, fmt, v);
+	return (const char *)buf;
+}
+
+/*
+ * Convert a token value to a string; use "fmt" if not found.
+ */
+const char *
+tok2str(register const struct tok *lp, register const char *fmt,
+	register int v)
+{
+	static char buf[4][128];
+	static int idx = 0;
+	char *ret;
+
+	return tok2strbuf(lp, fmt, v, ret, sizeof(buf[0]));
 }
 
 /*
