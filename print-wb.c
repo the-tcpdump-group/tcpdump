@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-wb.c,v 1.32 2003-11-16 09:36:42 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-wb.c,v 1.33 2004-03-24 04:06:28 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -212,7 +212,7 @@ wb_id(const struct pkt_id *id, u_int len)
 	}
 
 	c = '<';
-	for (i = 0; i < nid && (u_char *)io < snapend; ++io, ++i) {
+	for (i = 0; i < nid && (u_char *)(io + 1) <= snapend; ++io, ++i) {
 		printf("%c%s:%u",
 		    c, ipaddr_string(&io->id), EXTRACT_32BITS(&io->off));
 		c = ',';
@@ -267,7 +267,7 @@ wb_prep(const struct pkt_prep *prep, u_int len)
 	}
 	n = EXTRACT_32BITS(&prep->pp_n);
 	ps = (const struct pgstate *)(prep + 1);
-	while (--n >= 0 && (u_char *)ps < ep) {
+	while (--n >= 0 && (u_char *)(ps + 1) <= ep) {
 		const struct id_off *io, *ie;
 		char c = '<';
 
@@ -276,7 +276,7 @@ wb_prep(const struct pkt_prep *prep, u_int len)
 		    ipaddr_string(&ps->page.p_sid),
 		    EXTRACT_32BITS(&ps->page.p_uid));
 		io = (struct id_off *)(ps + 1);
-		for (ie = io + ps->nid; io < ie && (u_char *)io < ep; ++io) {
+		for (ie = io + ps->nid; io < ie && (u_char *)(io + 1) <= ep; ++io) {
 			printf("%c%s:%u", c, ipaddr_string(&io->id),
 			    EXTRACT_32BITS(&io->off));
 			c = ',';
