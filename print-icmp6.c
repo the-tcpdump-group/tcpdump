@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.10 2000-05-10 09:24:15 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.11 2000-05-15 06:22:16 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -690,7 +690,8 @@ icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
 						safeputc(*cp);
 						cp++;
 					}
-					printf(".");
+					if (cp + 1 < ep && *cp)
+						printf(".");
 				}
 				printf("\"");
 			}
@@ -788,7 +789,8 @@ icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
 						safeputc(*cp);
 						cp++;
 					}
-					printf(".");
+					if (cp + 1 < ep && *cp)
+						printf(".");
 				}
 				printf("\"");
 			}
