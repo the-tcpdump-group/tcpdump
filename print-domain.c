@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.49 2000-09-23 08:54:27 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.50 2000-09-24 07:43:26 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -193,7 +193,7 @@ ns_nprint(register const u_char *cp, register const u_char *bp)
 				 * which means we're looping.
 				 */
 				if (chars_processed >= data_size) {
-					fn_printn(cp, 6, "<LOOP>");
+					fn_printn(cp, 6, (u_char *)"<LOOP>");
 					if (!compress)
 						rp += i + 1;
 					return (rp);
