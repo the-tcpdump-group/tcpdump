@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.45 2002-04-25 04:47:42 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.46 2002-04-30 09:04:35 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -182,7 +182,8 @@ static struct tok isis_tlv_values[] = {
 #define SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE 20
 #define SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR    21
 
-#define SUBTLV_EXT_IP_REACH_ADMIN_TAG             1
+#define SUBTLV_IP_REACH_ADMIN_TAG32               1
+#define SUBTLV_IP_REACH_ADMIN_TAG64               2
 
 #define SUBTLV_AUTH_SIMPLE        1
 #define SUBTLV_AUTH_MD5          54
@@ -196,6 +197,16 @@ static struct tok isis_subtlv_auth_values[] = {
     { 0, NULL }
 };
 
+#define SUBTLV_IDRP_RES           0
+#define SUBTLV_IDRP_LOCAL         1
+#define SUBTLV_IDRP_ASN           2
+
+static struct tok isis_subtlv_idrp_values[] = {
+    { SUBTLV_IDRP_RES,         "Reserved"},
+    { SUBTLV_IDRP_LOCAL,       "Routing-Domain Specific"},
+    { SUBTLV_IDRP_ASN,         "AS Number Tag"},
+    { 0, NULL}
+};
 
 #define ISIS_8BIT_MASK(x)                  ((x)&0xff) 
 
@@ -848,19 +859,27 @@ isis_print_tlv_ip_reach (const u_char *cp, int length)
 
 /*
  * this is the common IP-REACH subTLV decoder it is called
- * from various EXTD-IP REACH TLVs (135,236)
+ * from various EXTD-IP REACH TLVs (135,235,236,237)
  */
 
 static int
 isis_print_ip_reach_subtlv (const u_char *tptr,int subt,int subl,const char *lf) {
 
         switch(subt) {
-        case SUBTLV_EXT_IP_REACH_ADMIN_TAG:
+        case SUBTLV_IP_REACH_ADMIN_TAG32:
             if (!TTEST2(*tptr,4))
                 goto trunctlv;
-            printf("%sAdministrative tag: 0x%08x",
+            printf("%s32-Bit Administrative tag: 0x%08x",
                    lf,
                    EXTRACT_32BITS(tptr));
+            break;
+        case SUBTLV_IP_REACH_ADMIN_TAG64:
+            if (!TTEST2(*tptr,8))
+                goto trunctlv;
+            printf("%s64-Bit Administrative tag: 0x%08x%08x",
+                   lf,
+                   EXTRACT_32BITS(tptr),
+                   EXTRACT_32BITS(tptr+4));
             break;
         default:
             printf("%sunknown subTLV, type %d, length %d",
@@ -881,7 +900,7 @@ trunctlv:
 
 /*
  * this is the common IS-REACH subTLV decoder it is called
- * from various EXTD-IS REACH TLVs (22,222)
+ * from various EXTD-IS REACH TLVs (22,24,222)
  */
 
 static int
@@ -1192,7 +1211,7 @@ static int isis_print (const u_char *p, u_int length)
                        "unknown circuit type 0x%02x",
                        header_iih_lan->circuit_type));
 
-	printf("\n\t\t  lan-id:    %s, Priority: %u, PDU Length: %u",
+	printf("\n\t\t  lan-id:    %s, Priority: %u, PDU length: %u",
                isis_print_nodeid(header_iih_lan->lan_id),
                (header_iih_lan->priority) & PRIORITY_MASK,
                pdu_len);            
@@ -1215,7 +1234,7 @@ static int isis_print (const u_char *p, u_int length)
 	}
 	
 	TCHECK(*header_iih_ptp);
-	printf("\n\t\t  source-id: %s, holding time: %us, circuit-id: 0x%02x, %s, PDU Length: %u",
+	printf("\n\t\t  source-id: %s, holding time: %us, circuit-id: 0x%02x, %s, PDU length: %u",
                isis_print_sysid(header_iih_ptp->source_id),
                EXTRACT_16BITS(header_iih_ptp->holding_time),
                header_iih_ptp->circuit_id,
@@ -1247,16 +1266,13 @@ static int isis_print (const u_char *p, u_int length)
                isis_print_lspid(header_lsp->lsp_id),
                EXTRACT_32BITS(header_lsp->sequence_number),
                EXTRACT_16BITS(header_lsp->remaining_lifetime));
-	printf("\n\t\t  chksum: 0x%04x, PDU Length: %u",
-               EXTRACT_16BITS(header_lsp->checksum),
-               pdu_len);
         /* verify the checksum -
          * checking starts at the lsp-id field
          * which is 12 bytes after the packet start*/
-        if (osi_cksum(optr+12, length-12))
-            printf(" (incorrect)");
-        else
-            printf(" (correct)");
+	printf("\n\t\t  chksum: 0x%04x (%s), PDU length: %u",
+               EXTRACT_16BITS(header_lsp->checksum),
+               (osi_cksum(optr+12, length-12)) ? "incorrect" : "correct",
+               pdu_len);
 	      
 	printf(", %s", ISIS_MASK_LSP_OL_BIT(header_lsp->typeblock) ? "Overload bit set, " : "");
 
@@ -1289,7 +1305,7 @@ static int isis_print (const u_char *p, u_int length)
 	}
 
 	TCHECK(*header_csnp);
-	printf("\n\t\t  source-id:    %s, PDU Length: %u",
+	printf("\n\t\t  source-id:    %s, PDU length: %u",
                isis_print_nodeid(header_csnp->source_id),
                pdu_len);		
 	printf("\n\t\t  start lsp-id: %s",
@@ -1353,10 +1369,11 @@ static int isis_print (const u_char *p, u_int length)
 	}
         
         /* first lets see if we know the TLVs name*/
-	printf("\n\t\t    %s (%u)",
+	printf("\n\t\t    %s TLV #%u, length: %u",
                tok2str(isis_tlv_values,
-                       "unknown TLV, type %d, length",
+                       "unknown",
                        type),
+               type,
                len);
 
         /* now check if we have a decoder otherwise do a hexdump at the end*/
@@ -1870,12 +1887,9 @@ static int isis_print (const u_char *p, u_int length)
 	case TLV_CHECKSUM:
 	    if (!TTEST2(*tptr, 2))
 		goto trunctlv;
-	    printf("\n\t\t\tchecksum: 0x%04x", 
-		   EXTRACT_16BITS(tptr));
-	    if (osi_cksum(optr, length))
-		printf(" (incorrect)");
-	    else
-		printf(" (correct)");
+	    printf("\n\t\t\tchecksum: 0x%04x (%s)", 
+		   EXTRACT_16BITS(tptr),
+                   (osi_cksum(optr, length)) ? "incorrect" : "correct");
 	    break;
 
 	case TLV_MT_SUPPORTED:
@@ -1914,6 +1928,28 @@ static int isis_print (const u_char *p, u_int length)
 		   rr ? "set" : "clear", ra ? "set" : "clear", time_remain);
 	    break;
 
+        case TLV_IDRP_INFO:
+            if (!TTEST2(*tptr, 1))
+                goto trunctlv;
+            printf("\n\t\t\tInter-Domain Information Type: %s",
+                   tok2str(isis_subtlv_idrp_values,
+                           "Unknown (0x%02x)",
+                           *tptr));            
+            switch (*tptr++) {
+            case SUBTLV_IDRP_ASN:
+                if (!TTEST2(*tptr, 2)) /* fetch AS number */
+                    goto trunctlv;
+                printf("AS Number: %u",EXTRACT_16BITS(tptr));
+                break;
+            case SUBTLV_IDRP_LOCAL:
+            case SUBTLV_IDRP_RES:
+            default:
+                if(!isis_print_unknown_data(tptr,"\n\t\t\t",len-1))
+                    return(0);
+                break;
+            }
+            break;
+
             /*
              * FIXME those are the defined TLVs that lack a decoder
              * you are welcome to contribute code ;-)
@@ -1926,7 +1962,6 @@ static int isis_print (const u_char *p, u_int length)
         case TLV_IS_ALIAS_ID:
         case TLV_DECNET_PHASE4:
         case TLV_LUCENT_PRIVATE:
-        case TLV_IDRP_INFO:
         case TLV_IPAUTH:
         case TLV_NORTEL_PRIVATE1:
         case TLV_NORTEL_PRIVATE2:
