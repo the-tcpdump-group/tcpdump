@@ -1,5 +1,7 @@
+/*	$NetBSD: interface.h,v 1.2 1995/03/06 19:10:18 mycroft Exp $	*/
+
 /*
- * Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997
+ * Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994
  *	The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -18,26 +20,33 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.106 1999-10-17 21:37:10 mcr Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.107 1999-10-17 21:56:53 mcr Exp $ (LBL)
  */
 
-#ifndef tcpdump_interface_h
-#define tcpdump_interface_h
-
-#include "gnuc.h"
-#ifdef HAVE_OS_PROTO_H
-#include "os-proto.h"
+#ifdef __GNUC__
+#define inline __inline
+#ifndef __dead
+#define __dead volatile
+#endif
+#else
+#define inline
+#define __dead
 #endif
 
-struct tok {
+#include "os.h"			/* operating system stuff */
+#include "md.h"			/* machine dependent stuff */
+
+#ifndef SIGRET
+#define SIGRET void		/* default */
+#endif
+
+struct token {
 	int v;			/* value */
 	char *s;		/* string */
 };
 
-extern int aflag;		/* translate network and broadcast addresses */
 extern int dflag;		/* print filter code */
 extern int eflag;		/* print ethernet header */
-extern int fflag;		/* don't translate "foreign" IP address */
 extern int nflag;		/* leave addresses as numbers */
 extern int Nflag;		/* remove domains from printed host names */
 extern int qflag;		/* quick (shorter) output */
@@ -109,47 +118,38 @@ extern int packettype;		/* as specified by -T */
 
 extern char *program_name;	/* used to generate self-identifying messages */
 
-extern int32_t thiszone;	/* seconds offset from gmt to local time */
-
 extern int snaplen;
 /* global pointers to beginning and end of current packet (during printing) */
 extern const u_char *packetp;
 extern const u_char *snapend;
 
-/* True if  "l" bytes of "var" were captured */
-#define TTEST2(var, l) ((u_char *)&(var) <= snapend - (l))
+extern int fddipad;	/* alignment offset for FDDI headers, in bytes */
 
-/* True if "var" was captured */
-#define TTEST(var) TTEST2(var, sizeof(var))
-
-/* Bail if "l" bytes of "var" were not captured */
-#define TCHECK2(var, l) if (!TTEST2(var, l)) goto trunc
-
-/* Bail if "var" was not captured */
-#define TCHECK(var) TCHECK2(var, sizeof(var))
-
-#ifdef __STDC__
+/* Eliminate some bogus warnings. */
 struct timeval;
-#endif
+
+typedef void (*printfunc)(u_char *, struct timeval *, int, int);
 
 extern void ts_print(const struct timeval *);
+extern int clock_sigfigs(void);
+int gmt2local(void);
 
 extern int fn_print(const u_char *, const u_char *);
 extern int fn_printn(const u_char *, u_int, const u_char *);
-extern const char *tok2str(const struct tok *, const char *, int);
+extern const char *tok2str(const struct token *, const char *, int);
 extern char *dnaddr_string(u_short);
+extern char *savestr(const char *);
 
+extern int initdevice(char *, int, int *);
 extern void wrapup(int);
 
-#if __STDC__
-extern __dead void error(const char *, ...)
-    __attribute__((volatile, format (printf, 1, 2)));
-extern void warning(const char *, ...) __attribute__ ((format (printf, 1, 2)));
-#endif
+extern __dead void error(char *, ...);
+extern void warning(char *, ...);
 
 extern char *read_infile(char *);
 extern char *copy_argv(char **);
 
+extern void usage(void);
 extern char *isonsap_string(const u_char *);
 extern char *llcsap_string(u_char);
 extern char *protoid_string(const u_char *);
@@ -158,52 +158,57 @@ extern char *dnnum_string(u_short);
 
 /* The printer routines. */
 
-#ifdef __STDC__
 struct pcap_pkthdr;
-#endif
 
-extern int ether_encap_print(u_short, const u_char *, u_int, u_int);
-extern int llc_print(const u_char *, u_int, u_int, const u_char *,
-	const u_char *);
-extern void aarp_print(const u_char *, u_int);
-extern void arp_print(const u_char *, u_int, u_int);
-extern void atalk_print(const u_char *, u_int);
-extern void atm_if_print(u_char *, const struct pcap_pkthdr *, const u_char *);
-extern void bootp_print(const u_char *, u_int, u_short, u_short);
-extern void decnet_print(const u_char *, u_int, u_int);
-extern void default_print(const u_char *, u_int);
-extern void default_print_unaligned(const u_char *, u_int);
-extern void dvmrp_print(const u_char *, u_int);
-extern void egp_print(const u_char *, u_int, const u_char *);
 extern void ether_if_print(u_char *, const struct pcap_pkthdr *,
-	const u_char *);
-extern void fddi_if_print(u_char *, const struct pcap_pkthdr *, const u_char *);
-extern void gre_print(const u_char *, u_int);
-extern void icmp_print(const u_char *, const u_char *);
-extern void igrp_print(const u_char *, u_int, const u_char *);
-extern void ip_print(const u_char *, u_int);
-extern void ipx_print(const u_char *, u_int);
-extern void isoclns_print(const u_char *, u_int, u_int, const u_char *,
-	const u_char *);
-extern void krb_print(const u_char *, u_int);
-extern void nfsreply_print(const u_char *, u_int, const u_char *);
-extern void nfsreq_print(const u_char *, u_int, const u_char *);
-extern void ns_print(const u_char *, u_int);
-extern void ntp_print(const u_char *, u_int);
-extern void null_if_print(u_char *, const struct pcap_pkthdr *, const u_char *);
-extern void ospf_print(const u_char *, u_int, const u_char *);
-extern void pim_print(const u_char *, u_int);
+			   const u_char *);
+extern void fddi_if_print(u_char *, const struct pcap_pkthdr *, const u_char*);
+extern void null_if_print(u_char *, const struct pcap_pkthdr *, const u_char*);
 extern void ppp_if_print(u_char *, const struct pcap_pkthdr *, const u_char *);
-extern void ppp_bsdos_if_print(u_char *, const struct pcap_pkthdr *,
-	const u_char *);
-extern void raw_if_print(u_char *, const struct pcap_pkthdr *, const u_char *);
-extern void rip_print(const u_char *, u_int);
 extern void sl_if_print(u_char *, const struct pcap_pkthdr *, const u_char *);
-extern void sl_bsdos_if_print(u_char *, const struct pcap_pkthdr *,
-    const u_char *);
-extern void snmp_print(const u_char *, u_int);
-extern void sunrpcrequest_print(const u_char *, u_int, const u_char *);
-extern void tcp_print(const u_char *, u_int, const u_char *);
-extern void tftp_print(const u_char *, u_int);
-extern void udp_print(const u_char *, u_int, const u_char *);
-extern void wb_print(const void *, u_int);
+
+extern void arp_print(const u_char *, int, int);
+extern void ip_print(const u_char *, int);
+extern void tcp_print(const u_char *, int, const u_char *);
+extern void udp_print(const u_char *, int, const u_char *);
+extern void icmp_print(const u_char *, const u_char *);
+extern void default_print(const u_char *, int);
+extern void default_print_unaligned(const u_char *, int);
+
+extern void aarp_print(const u_char *, int);
+extern void atalk_print(const u_char *, int);
+extern void bootp_print(const u_char *, int, u_short, u_short);
+extern void decnet_print(const u_char *, int, int);
+extern void egp_print(const u_char *, int, const u_char *);
+extern int ether_encap_print(u_short, const u_char *, int, int);
+extern void ipx_print(const u_char *, int length);
+extern void isoclns_print(const u_char *, int, int,
+			  const u_char *, const u_char *);
+extern int llc_print(const u_char *, int, int, const u_char *, const u_char *);
+extern void nfsreply_print(const u_char *, int, const u_char *);
+extern void nfsreq_print(const u_char *, int, const u_char *);
+extern void ns_print(const u_char *, int);
+extern void ntp_print(const u_char *, int);
+extern void ospf_print(const u_char *, int, const u_char *);
+extern void rip_print(const u_char *, int);
+extern void snmp_print(const u_char *, int);
+extern void sunrpcrequest_print(const u_char *, int, const u_char *);
+extern void tftp_print(const u_char *, int);
+extern void wb_print(const void *, int);
+extern void print_ipproto(u_int proto, const struct ip *ip, const u_char *cp,  int len);
+
+#define min(a,b) ((a)>(b)?(b):(a))
+#define max(a,b) ((b)>(a)?(b):(a))
+
+/*
+ * The default snapshot length.  This value allows most printers to print
+ * useful information while keeping the amount of unwanted data down.
+ * In particular, it allows for an ethernet header, tcp/ip header, and
+ * 14 bytes of data (assuming no ip options).
+ */
+#define DEFAULT_SNAPLEN 512
+
+#ifndef BIG_ENDIAN
+#define BIG_ENDIAN 4321
+#define LITTLE_ENDIAN 1234
+#endif

@@ -24,7 +24,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.130 1999-10-17 21:37:17 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.131 1999-10-17 21:56:54 mcr Exp $ (LBL)";
 #endif
 
 /*
@@ -46,6 +46,9 @@ static const char rcsid[] =
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+#include <netinet/in_systm.h>
+#include <netinet/ip.h>
 
 #include "interface.h"
 #include "addrtoname.h"
@@ -387,22 +390,42 @@ cleanup(int signo)
 void
 default_print_unaligned(register const u_char *cp, register u_int length)
 {
-	register u_int i, s;
-	register int nshorts;
+  register u_int i, s;
+  register int nshorts;
 
-	nshorts = (u_int) length / sizeof(u_short);
-	i = 0;
-	while (--nshorts >= 0) {
-		if ((i++ % 8) == 0)
-			(void)printf("\n\t\t\t");
-		s = *cp++;
-		(void)printf(" %02x%02x", s, *cp++);
-	}
-	if (length & 1) {
-		if ((i % 8) == 0)
-			(void)printf("\n\t\t\t");
-		(void)printf(" %02x", *cp);
-	}
+  char line[81];
+  
+  nshorts = (u_int) length / sizeof(u_short);
+  i = 0;
+  memset(line, ' ', 80);
+  line[81]='\0';
+
+  putchar('\n');
+  while (nshorts >= 0) {
+    
+    snprintf(line+20+i*5, 7, "%02x%02x  ", cp[0], cp[1]);
+
+    if(isprint(cp[0])) {
+      line[62+i*2]=cp[0];
+    } else {
+      line[62+i*2]='.';
+    }
+    if(isprint(cp[1])) {
+      line[62+i*2+1]=cp[1];
+    } else {
+      line[62+i*2+1]='.';
+    }
+    i++;
+    if (i == 8) {
+      line[60]=' ';
+      line[61]=' ';
+      line[62+16]='\0';
+      puts(line);
+      i=0;
+    }
+    cp += 2;
+    nshorts--;
+  }
 }
 
 /*
@@ -417,23 +440,7 @@ default_print(register const u_char *bp, register u_int length)
 	register u_int i;
 	register int nshorts;
 
-	if ((long)bp & 1) {
-		default_print_unaligned(bp, length);
-		return;
-	}
-	sp = (u_short *)bp;
-	nshorts = (u_int) length / sizeof(u_short);
-	i = 0;
-	while (--nshorts >= 0) {
-		if ((i++ % 8) == 0)
-			(void)printf("\n\t\t\t");
-		(void)printf(" %04x", ntohs(*sp++));
-	}
-	if (length & 1) {
-		if ((i % 8) == 0)
-			(void)printf("\n\t\t\t");
-		(void)printf(" %02x", *(u_char *)sp);
-	}
+	default_print_unaligned(bp, length);
 }
 
 __dead void
