@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.78 2000-07-01 03:39:06 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.79 2000-07-16 14:32:48 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -826,7 +826,7 @@ xid_map_find(const struct rpc_msg *rp, const u_char *bp, u_int32_t *proc,
 	int i;
 	struct xid_map_entry *xmep;
 	u_int32_t xid = rp->rm_xid;
-	struct ip *ip = (struct ip *)ip;
+	struct ip *ip = (struct ip *)bp;
 #ifdef INET6
 	struct ip6_hdr *ip6 = (struct ip6_hdr *)bp;
 #endif
