@@ -31,13 +31,13 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
+#if defined(LIBC_SCCS) && !defined(lint)
+static const char rcsid[] =
+    "@(#) $Header: /tcpdump/master/tcpdump/missing/strsep.c,v 1.2 2003-03-03 00:56:31 guy Exp $ (LBL)";
+#endif /* LIBC_SCCS and not lint */
+
 #include <string.h>
 #include <stdio.h>
-
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)strsep.c	8.1 (Berkeley) 6/4/93";
-#endif /* LIBC_SCCS and not lint */
 
 /*
  * Get next token from string *stringp, where tokens are possibly-empty
