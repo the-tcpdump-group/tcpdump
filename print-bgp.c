@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.81 2004-03-24 00:01:00 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.82 2004-04-29 02:16:01 mcr Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -796,6 +796,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
 	int tlen;
 	const u_char *tptr;
 	char buf[MAXHOSTNAMELEN + 100];
+	char tokbuf[TOKBUFSIZE];
 
         tptr = pptr;
         tlen=len;
@@ -806,9 +807,13 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
 			printf("invalid len");
 		else {
 			TCHECK(*tptr);
-			printf("%s", tok2str(bgp_origin_values, "Unknown Origin Typecode", tptr[0]));
+			printf("%s", tok2strbuf(bgp_origin_values,
+						"Unknown Origin Typecode",
+						tptr[0],
+						tokbuf, sizeof(tokbuf)));
 		}
 		break;
+
 	case BGPTYPE_AS_PATH:
 		if (len % 2) {
 			printf("invalid len");
@@ -821,13 +826,17 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
 
 		while (tptr < pptr + len) {
 			TCHECK(tptr[0]);
-                        printf("%s", tok2str(bgp_as_path_segment_open_values, "?", tptr[0]));
+                        printf("%s", tok2strbuf(bgp_as_path_segment_open_values,
+						"?", tptr[0],
+						tokbuf, sizeof(tokbuf)));
                         for (i = 0; i < tptr[1] * 2; i += 2) {
                             TCHECK2(tptr[2 + i], 2);
                             printf("%u ", EXTRACT_16BITS(&tptr[2 + i]));
                         }
 			TCHECK(tptr[0]);
-                        printf("%s", tok2str(bgp_as_path_segment_close_values, "?", tptr[0]));
+                        printf("%s", tok2strbuf(bgp_as_path_segment_close_values,
+						"?", tptr[0],
+						tokbuf, sizeof(tokbuf)));
                         TCHECK(tptr[1]);
                         tptr += 2 + tptr[1] * 2;
 		}
@@ -920,10 +929,12 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
 		safi = tptr[2];
 	
                 printf("\n\t    AFI: %s (%u), %sSAFI: %s (%u)",
-                       tok2str(bgp_afi_values, "Unknown AFI", af),
+                       tok2strbuf(bgp_afi_values, "Unknown AFI", af,
+				  tokbuf, sizeof(tokbuf)),
                        af,
                        (safi>128) ? "vendor specific " : "", /* 128 is meanwhile wellknown */
-                       tok2str(bgp_safi_values, "Unknown SAFI", safi),
+                       tok2strbuf(bgp_safi_values, "Unknown SAFI", safi,
+				  tokbuf, sizeof(tokbuf)),
                        safi);
 
 		if (af == AFNUM_INET || af==AFNUM_L2VPN)
@@ -1241,10 +1252,12 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
 		safi = tptr[2];
 
                 printf("\n\t    AFI: %s (%u), %sSAFI: %s (%u)",
-                       tok2str(bgp_afi_values, "Unknown AFI", af),
+                       tok2strbuf(bgp_afi_values, "Unknown AFI", af,
+				  tokbuf, sizeof(tokbuf)),
                        af,
                        (safi>128) ? "vendor specific " : "", /* 128 is meanwhile wellknown */
-                       tok2str(bgp_safi_values, "Unknown SAFI", safi),
+                       tok2strbuf(bgp_safi_values, "Unknown SAFI", safi,
+				  tokbuf, sizeof(tokbuf)),
                        safi);
 
 		tptr += 3;
@@ -1390,7 +1403,9 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                     extd_comm=EXTRACT_16BITS(tptr);
 
 		    printf("\n\t    %s (0x%04x), Flags [%s]",
-			   tok2str(bgp_extd_comm_subtype_values, "unknown extd community typecode", extd_comm),
+			   tok2strbuf(bgp_extd_comm_subtype_values,
+				      "unknown extd community typecode",
+				      extd_comm, tokbuf, sizeof(tokbuf)),
 			   extd_comm,
 			   bittok2str(bgp_extd_comm_flag_values, "none", extd_comm));
 
@@ -1436,17 +1451,19 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                     case BGP_EXT_COM_OSPF_RTYPE2: 
                         printf(": area:%s, router-type:%s, metric-type:%s%s",
                                getname(tptr+2),
-                               tok2str(bgp_extd_comm_ospf_rtype_values,
-                                       "unknown (0x%02x)",
-                                       *(tptr+6)),
+                               tok2strbuf(bgp_extd_comm_ospf_rtype_values,
+					  "unknown (0x%02x)",
+					  *(tptr+6),
+					  tokbuf, sizeof(tokbuf)),
                                (*(tptr+7) &  BGP_OSPF_RTYPE_METRIC_TYPE) ? "E2" : "",
                                (*(tptr+6) == (BGP_OSPF_RTYPE_EXT ||BGP_OSPF_RTYPE_NSSA )) ? "E1" : "");
                         break;
                     case BGP_EXT_COM_L2INFO:
                         printf(": %s Control Flags [0x%02x]:MTU %u",
-                               tok2str(bgp_l2vpn_encaps_values,
-                                       "unknown encaps",
-                                       *(tptr+2)),
+                               tok2strbuf(bgp_l2vpn_encaps_values,
+					  "unknown encaps",
+					  *(tptr+2),
+					  tokbuf, sizeof(tokbuf)),
                                        *(tptr+3),
                                EXTRACT_16BITS(tptr+4));
                         break;
@@ -1476,7 +1493,9 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                     len -= bgp_attr_off(&bgpa);
                     
                     printf("\n\t      %s (%u), length: %u",
-                           tok2str(bgp_attr_values, "Unknown Attribute", bgpa.bgpa_type),
+                           tok2strbuf(bgp_attr_values,
+				      "Unknown Attribute", bgpa.bgpa_type,
+				      tokbuf, sizeof(tokbuf)),
                            bgpa.bgpa_type,
                            alen);
                     
@@ -1522,6 +1541,8 @@ bgp_open_print(const u_char *dat, int length)
 	int hlen;
 	const u_char *opt;
 	int i,cap_type,cap_len,tcap_len,cap_offset;
+	char tokbuf[TOKBUFSIZE];
+	char tokbuf2[TOKBUFSIZE];
 
 	TCHECK2(dat[0], BGP_OPEN_SIZE);
 	memcpy(&bgpo, dat, BGP_OPEN_SIZE);
@@ -1551,7 +1572,9 @@ bgp_open_print(const u_char *dat, int length)
 		}
 
 		printf("\n\t    Option %s (%u), length: %u",
-                       tok2str(bgp_opt_values,"Unknown", bgpopt.bgpopt_type),
+                       tok2strbuf(bgp_opt_values,"Unknown",
+				  bgpopt.bgpopt_type,
+				  tokbuf, sizeof(tokbuf)),
                        bgpopt.bgpopt_type,
                        bgpopt.bgpopt_len);
 
@@ -1562,14 +1585,19 @@ bgp_open_print(const u_char *dat, int length)
                     cap_len=opt[i+BGP_OPT_SIZE+1];
                     tcap_len=cap_len;
                     printf("\n\t      %s, length: %u",
-                           tok2str(bgp_capcode_values,"Unknown", cap_type),
+                           tok2strbuf(bgp_capcode_values, "Unknown",
+				      cap_type, tokbuf, sizeof(tokbuf)),
                            cap_len);
                     switch(cap_type) {
                     case BGP_CAPCODE_MP:
                         printf("\n\t\tAFI %s (%u), SAFI %s (%u)",
-                               tok2str(bgp_afi_values,"Unknown", EXTRACT_16BITS(opt+i+BGP_OPT_SIZE+2)),
+                               tok2strbuf(bgp_afi_values, "Unknown",
+					  EXTRACT_16BITS(opt+i+BGP_OPT_SIZE+2),
+					  tokbuf, sizeof(tokbuf)),
                                EXTRACT_16BITS(opt+i+BGP_OPT_SIZE+2),
-                               tok2str(bgp_safi_values,"Unknown", opt[i+BGP_OPT_SIZE+5]),
+                               tok2strbuf(bgp_safi_values, "Unknown",
+					  opt[i+BGP_OPT_SIZE+5],
+					  tokbuf, sizeof(tokbuf)),
                                opt[i+BGP_OPT_SIZE+5]);
                         break;
                     case BGP_CAPCODE_RESTART:
@@ -1580,9 +1608,13 @@ bgp_open_print(const u_char *dat, int length)
                         cap_offset=4;
                         while(tcap_len>=4) {
                             printf("\n\t\t  AFI %s (%u), SAFI %s (%u), Forwarding state preserved: %s",
-                                   tok2str(bgp_afi_values,"Unknown", EXTRACT_16BITS(opt+i+BGP_OPT_SIZE+cap_offset)),
+                                   tok2strbuf(bgp_afi_values,"Unknown",
+					      EXTRACT_16BITS(opt+i+BGP_OPT_SIZE+cap_offset),
+					      tokbuf, sizeof(tokbuf)),
                                    EXTRACT_16BITS(opt+i+BGP_OPT_SIZE+cap_offset),
-                                   tok2str(bgp_safi_values,"Unknown", opt[i+BGP_OPT_SIZE+cap_offset+2]),
+                                   tok2strbuf(bgp_safi_values,"Unknown",
+					      opt[i+BGP_OPT_SIZE+cap_offset+2],
+					      tokbuf2, sizeof(tokbuf2)),
                                    opt[i+BGP_OPT_SIZE+cap_offset+2],
                                    ((opt[i+BGP_OPT_SIZE+cap_offset+3])&0x80) ? "yes" : "no" );
                             tcap_len-=4;
@@ -1625,6 +1657,7 @@ bgp_update_print(const u_char *dat, int length)
 	const u_char *p;
 	int len;
 	int i;
+	char tokbuf[TOKBUFSIZE];
 
 	TCHECK2(dat[0], BGP_SIZE);
 	memcpy(&bgp, dat, BGP_SIZE);
@@ -1680,7 +1713,9 @@ bgp_update_print(const u_char *dat, int length)
 			aoff = bgp_attr_off(&bgpa);
 
 		       printf("\n\t  %s (%u), length: %u",
-                              tok2str(bgp_attr_values, "Unknown Attribute", bgpa.bgpa_type),
+                              tok2strbuf(bgp_attr_values, "Unknown Attribute",
+					 bgpa.bgpa_type,
+					 tokbuf, sizeof(tokbuf)),
                               bgpa.bgpa_type,
                               alen);
 
@@ -1727,6 +1762,8 @@ bgp_notification_print(const u_char *dat, int length)
 	struct bgp_notification bgpn;
 	int hlen;
 	const u_char *tptr;
+	char tokbuf[TOKBUFSIZE];
+	char tokbuf2[TOKBUFSIZE];
 
 	TCHECK2(dat[0], BGP_NOTIFICATION_SIZE);
 	memcpy(&bgpn, dat, BGP_NOTIFICATION_SIZE);
@@ -1737,33 +1774,39 @@ bgp_notification_print(const u_char *dat, int length)
             return;
 
 	printf(", %s (%u)",
-	       tok2str(bgp_notify_major_values, "Unknown Error", bgpn.bgpn_major),
+	       tok2strbuf(bgp_notify_major_values, "Unknown Error",
+			  bgpn.bgpn_major, tokbuf, sizeof(tokbuf)),
 	       bgpn.bgpn_major);
 
         switch (bgpn.bgpn_major) {
 
         case BGP_NOTIFY_MAJOR_MSG:
             printf(", subcode %s (%u)",
-		   tok2str(bgp_notify_minor_msg_values, "Unknown", bgpn.bgpn_minor),
+		   tok2strbuf(bgp_notify_minor_msg_values, "Unknown",
+			      bgpn.bgpn_minor, tokbuf, sizeof(tokbuf)),
 		   bgpn.bgpn_minor);
             break;
         case BGP_NOTIFY_MAJOR_OPEN:
             printf(", subcode %s (%u)",
-		   tok2str(bgp_notify_minor_open_values, "Unknown", bgpn.bgpn_minor),
+		   tok2strbuf(bgp_notify_minor_open_values, "Unknown",
+			      bgpn.bgpn_minor, tokbuf, sizeof(tokbuf)),
 		   bgpn.bgpn_minor);
             break;
         case BGP_NOTIFY_MAJOR_UPDATE:
             printf(", subcode %s (%u)",
-		   tok2str(bgp_notify_minor_update_values, "Unknown", bgpn.bgpn_minor),
+		   tok2strbuf(bgp_notify_minor_update_values, "Unknown",
+			      bgpn.bgpn_minor, tokbuf, sizeof(tokbuf)),
 		   bgpn.bgpn_minor);
             break;
         case BGP_NOTIFY_MAJOR_CAP:
             printf(" subcode %s (%u)",
-		   tok2str(bgp_notify_minor_cap_values, "Unknown", bgpn.bgpn_minor),
+		   tok2strbuf(bgp_notify_minor_cap_values, "Unknown",
+			      bgpn.bgpn_minor, tokbuf, sizeof(tokbuf)),
 		   bgpn.bgpn_minor);
         case BGP_NOTIFY_MAJOR_CEASE:
             printf(", subcode %s (%u)",
-		   tok2str(bgp_notify_minor_cease_values, "Unknown", bgpn.bgpn_minor),
+		   tok2strbuf(bgp_notify_minor_cease_values, "Unknown",
+			      bgpn.bgpn_minor, tokbuf, sizeof(tokbuf)),
 		   bgpn.bgpn_minor);
 
 	    /* draft-ietf-idr-cease-subcode-02 mentions optionally 7 bytes
@@ -1773,9 +1816,11 @@ bgp_notification_print(const u_char *dat, int length)
 		tptr = dat + BGP_NOTIFICATION_SIZE;
 		TCHECK2(*tptr, 7);
 		printf(", AFI %s (%u), SAFI %s (%u), Max Prefixes: %u",
-		       tok2str(bgp_afi_values, "Unknown", EXTRACT_16BITS(tptr)),
+		       tok2strbuf(bgp_afi_values, "Unknown",
+				  EXTRACT_16BITS(tptr), tokbuf, sizeof(tokbuf)),
 		       EXTRACT_16BITS(tptr),
-		       tok2str(bgp_safi_values, "Unknown", *(tptr+2)),
+		       tok2strbuf(bgp_safi_values, "Unknown", *(tptr+2),
+				  tokbuf2, sizeof(tokbuf)),
 		       *(tptr+2),
 		       EXTRACT_32BITS(tptr+3));
 	    }
@@ -1793,14 +1838,21 @@ static void
 bgp_route_refresh_print(const u_char *pptr, int len) {
 
         const struct bgp_route_refresh *bgp_route_refresh_header;
+	char tokbuf[TOKBUFSIZE];
+	char tokbuf2[TOKBUFSIZE];
+
         bgp_route_refresh_header = (const struct bgp_route_refresh *)pptr;
 
         printf("\n\t  AFI %s (%u), SAFI %s (%u)",
-               tok2str(bgp_afi_values,"Unknown",
-                       EXTRACT_16BITS(&bgp_route_refresh_header->afi)), /* this stinks but the compiler pads the structure weird */
+               tok2strbuf(bgp_afi_values,"Unknown",
+			  /* this stinks but the compiler pads the structure
+			   * weird */
+			  EXTRACT_16BITS(&bgp_route_refresh_header->afi),
+			  tokbuf, sizeof(tokbuf)), 
                EXTRACT_16BITS(&bgp_route_refresh_header->afi),
-               tok2str(bgp_safi_values,"Unknown",
-                       bgp_route_refresh_header->safi),
+               tok2strbuf(bgp_safi_values,"Unknown",
+			  bgp_route_refresh_header->safi,
+			  tokbuf2, sizeof(tokbuf2)),
                bgp_route_refresh_header->safi);
 
         if (vflag > 1)
@@ -1813,11 +1865,13 @@ static int
 bgp_header_print(const u_char *dat, int length)
 {
 	struct bgp bgp;
+	char tokbuf[TOKBUFSIZE];
 
 	TCHECK2(dat[0], BGP_SIZE);
 	memcpy(&bgp, dat, BGP_SIZE);
 	printf("\n\t%s Message (%u), length: %u",
-               tok2str(bgp_msg_values, "Unknown", bgp.bgp_type),
+               tok2strbuf(bgp_msg_values, "Unknown", bgp.bgp_type,
+			  tokbuf, sizeof(tokbuf)),
                bgp.bgp_type,
                length);
 
@@ -1860,6 +1914,7 @@ bgp_print(const u_char *dat, int length)
 	};
 	struct bgp bgp;
 	u_int16_t hlen;
+	char tokbuf[TOKBUFSIZE];
 
 	ep = dat + length;
 	if (snapend < dat + length)
@@ -1907,7 +1962,11 @@ bgp_print(const u_char *dat, int length)
 			p += hlen;
 			start = p;
 		} else {
-			printf("\n[|BGP %s]", tok2str(bgp_msg_values, "Unknown Message Type",bgp.bgp_type));
+			printf("\n[|BGP %s]",
+			       tok2strbuf(bgp_msg_values,
+					  "Unknown Message Type",
+					  bgp.bgp_type,
+					  tokbuf, sizeof(tokbuf)));
 			break;
 		}
 	}
