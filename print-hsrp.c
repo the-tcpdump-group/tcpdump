@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-hsrp.c,v 1.1 2001-09-17 06:22:33 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-hsrp.c,v 1.2 2001-10-08 16:12:37 fenner Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -47,23 +47,21 @@ static const char rcsid[] =
 #include "addrtoname.h"
 
 /* HSRP op code types. */
-static char *op_code_str[] = {
+static const char *op_code_str[] = {
 	"hello",
 	"coup",
 	"resign"
 };
 
 /* HSRP states and associated names. */
-static struct {
-	u_int value;
-	char *str;
-} states[] = {
+static struct tok states[] = {
 	{  0, "initial" },
 	{  1, "learn" },
 	{  2, "listen" },
 	{  4, "speak" },
 	{  8, "standby" },
-	{ 16, "active" }
+	{ 16, "active" },
+	{  0, NULL }
 };
 
 /*
@@ -103,9 +101,7 @@ struct hsrp {
 void
 hsrp_print(register const u_char *bp, register u_int len)
 {
-	int op_code, state;
 	struct hsrp *hp = (struct hsrp *) bp;
-	int i;
 
 	TCHECK(hp->hsrp_version);
 	printf("HSRPv%d", hp->hsrp_version);
@@ -113,24 +109,10 @@ hsrp_print(register const u_char *bp, register u_int len)
 		return;
 	TCHECK(hp->hsrp_op_code);
 	printf("-");
-	op_code = hp->hsrp_op_code;
-	if (op_code < (sizeof(op_code_str) / sizeof(op_code_str[0]))) {
-		printf("%s ", op_code_str[op_code]);
-	} else {
-		printf("unknown (%d) ", op_code);
-	}
+	printf("%s ", tok2strary(op_code_str, "unknown (%d)", hp->hsrp_op_code));
 	printf("%d: ", len);
 	TCHECK(hp->hsrp_state);
-	state = hp->hsrp_state;
-	for (i = 0; i < (sizeof(states) / sizeof(states[0])); i++) {
-		if (state == states[i].value)
-			break;
-	}
-	if (i < (sizeof(states) / sizeof(states[0]))) {
-		printf("state=%s ", states[i].str);
-	} else {
-		printf("state=Unknown (%d) ", state);
-	}
+	printf("state=%s ", tok2str(states, "Unknown (%d)", hp->hsrp_state));
 	TCHECK(hp->hsrp_group);
 	printf("group=%d ", hp->hsrp_group);
 	TCHECK(hp->hsrp_reserved);
