@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.41 2003-10-20 16:11:45 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.42 2003-10-22 15:47:44 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -154,13 +154,39 @@ ospf_print_lshdr(register const struct lsa_hdr *lshp) {
 	TCHECK(lshp->ls_type);
 	TCHECK(lshp->ls_options);
 
-        printf("\n\t  %s LSA (%d), LSA-ID: %s, Advertising Router: %s, seq 0x%08x, age %us",
-               tok2str(lsa_values,"unknown",lshp->ls_type),
-               lshp->ls_type,
-               ipaddr_string(&lshp->un_lsa_id.lsa_id),
-               ipaddr_string(&lshp->ls_router),
-               EXTRACT_32BITS(&lshp->ls_seq),
-               EXTRACT_16BITS(&lshp->ls_age));
+	printf("\n\t  Advertising Router: %s, seq 0x%08x, age %us, length: %u",
+	       ipaddr_string(&lshp->ls_router),
+	       EXTRACT_32BITS(&lshp->ls_seq),
+	       EXTRACT_16BITS(&lshp->ls_age),
+               EXTRACT_16BITS(&lshp->ls_length)-sizeof(struct lsa_hdr));
+
+        switch (lshp->ls_type) {
+	/* the LSA header for opaque LSAs was slightly changed */
+        case LS_TYPE_OPAQUE_LL:
+        case LS_TYPE_OPAQUE_AL:
+        case LS_TYPE_OPAQUE_DW:
+            printf("\n\t    %s LSA (%d), Opaque-Type: %s LSA (%u), Opaque-ID: %u",
+                   tok2str(lsa_values,"unknown",lshp->ls_type),
+                   lshp->ls_type,
+
+		   tok2str(lsa_opaque_values,
+			   "unknown",
+			   *(&lshp->un_lsa_id.opaque_field.opaque_type)),
+		   *(&lshp->un_lsa_id.opaque_field.opaque_type),
+		   EXTRACT_24BITS(&lshp->un_lsa_id.opaque_field.opaque_id)
+                   
+                   );
+            break;
+
+	/* all other LSA types use regular style LSA headers */
+	default:
+            printf("\n\t  %s LSA (%d), LSA-ID: %s",
+                   tok2str(lsa_values,"unknown",lshp->ls_type),
+                   lshp->ls_type,
+                   ipaddr_string(&lshp->un_lsa_id.lsa_id));
+            break;
+        }
+
         printf("\n\t    Options: %s", bittok2str(ospf_option_values,"none",lshp->ls_options));
 
 return (0);
@@ -183,6 +209,7 @@ ospf_print_lsa(register const struct lsa *lsap)
 	register const u_int32_t *lp;
 	register int j, k,ls_length, tlv_type, tlv_length, subtlv_type, subtlv_length, priority_level;
 	const u_int8_t *tptr;
+	int count_srlg;
         union { /* int to float conversion buffer for several subTLVs */
             float f; 
             u_int32_t i;
@@ -191,38 +218,7 @@ ospf_print_lsa(register const struct lsa *lsap)
 	tptr = (u_int8_t *)lsap->lsa_un.un_unknown; /* squelch compiler warnings */
         ls_length = EXTRACT_16BITS(&lsap->ls_hdr.ls_length)-sizeof(struct lsa_hdr);
 
-	printf(", Advertising Router: %s, seq 0x%08x, age %us, length: %u",
-	       ipaddr_string(&lsap->ls_hdr.ls_router),
-	       EXTRACT_32BITS(&lsap->ls_hdr.ls_seq),
-	       EXTRACT_16BITS(&lsap->ls_hdr.ls_age),
-               ls_length);
-
-        switch (lsap->ls_hdr.ls_type) {
-	/* the LSA header for opaque LSAs was slightly changed */
-        case LS_TYPE_OPAQUE_LL:
-        case LS_TYPE_OPAQUE_AL:
-        case LS_TYPE_OPAQUE_DW:
-
-            printf("\n\t  %s LSA (%d), Opaque-Type: %s LSA (%u), Opaque-ID: %u",
-		   tok2str(lsa_values,"unknown",lsap->ls_hdr.ls_type),
-		   (lsap->ls_hdr.ls_type),
-		   tok2str(lsa_opaque_values,
-			   "unknown",
-			   *(&lsap->ls_hdr.un_lsa_id.opaque_field.opaque_type)),
-		   *(&lsap->ls_hdr.un_lsa_id.opaque_field.opaque_type),
-		   EXTRACT_24BITS(&lsap->ls_hdr.un_lsa_id.opaque_field.opaque_id));
-	    break;
-
-	/* all other LSA types use regular style LSA headers */
-	default:
-	    printf("\n\t  %s LSA (%d), LSA-ID: %s",
-		   tok2str(lsa_values,"unknown",lsap->ls_hdr.ls_type),
-		   lsap->ls_hdr.ls_type,
-		   ipaddr_string(&lsap->ls_hdr.un_lsa_id.lsa_id));
-	    break;
-	}
-
-        printf("\n\t  Options: %s", bittok2str(ospf_option_values,"none",lsap->ls_hdr.ls_options));
+        ospf_print_lshdr(&lsap->ls_hdr);
 
 	TCHECK(lsap->ls_hdr.ls_length);
 	ls_end = (u_char *)lsap + EXTRACT_16BITS(&lsap->ls_hdr.ls_length);
@@ -448,7 +444,9 @@ ospf_print_lsa(register const struct lsa *lsap)
                                        ipaddr_string(tptr),
                                        EXTRACT_32BITS(tptr));
                                 if (subtlv_length == 8) /* draft-ietf-ccamp-ospf-gmpls-extensions */
-                                    printf(", 0x%08x", EXTRACT_32BITS(tptr+4));
+                                    printf(", %s (0x%08x)",
+                                           ipaddr_string(tptr+4),
+                                           EXTRACT_32BITS(tptr+4));
                                 break;
                             case LS_OPAQUE_TE_LINK_SUBTLV_LOCAL_IP:
                             case LS_OPAQUE_TE_LINK_SUBTLV_REMOTE_IP:
@@ -493,11 +491,19 @@ ospf_print_lsa(register const struct lsa *lsap)
                                        *tptr);
                                 break;
 
-                                /*
-                                 * FIXME those are the defined subTLVs that lack a decoder
-                                 * you are welcome to contribute code ;-)
-                                 */
                             case LS_OPAQUE_TE_LINK_SUBTLV_SHARED_RISK_GROUP:
+                                count_srlg = subtlv_length / 4;
+                                if (count_srlg != 0)
+                                     printf("\n\t\t  Shared risk group: ");
+                                while (count_srlg > 0) {
+                                        bw.i = EXTRACT_32BITS(tptr);
+                                        printf("%d",bw.i);
+                                        tptr+=4;
+                                        count_srlg--;
+                                        if (count_srlg > 0)
+                                            printf(", ");
+                                }
+                                break;
 
                             default:
                                 if (vflag <= 1) {
