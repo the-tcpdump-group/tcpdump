@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.45 2004-03-12 01:26:59 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.46 2004-03-12 02:17:18 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -321,7 +321,7 @@ cookie_sidecheck(int i, const u_char *bp2, int initiator)
 	return 0;
 }
 
-static void
+static int
 rawprint(caddr_t loc, size_t len)
 {
 	static u_char *p;
@@ -332,8 +332,9 @@ rawprint(caddr_t loc, size_t len)
 	p = (u_char *)loc;
 	for (i = 0; i < len; i++)
 		printf("%02x", p[i] & 0xff);
+	return 1;
 trunc:
-	;
+	return 0;
 }
 
 struct attrmap {
@@ -428,6 +429,7 @@ isakmp_sa_print(const struct isakmp_gen *ext, u_int item_len,
 	printf("%s:", NPSTR(ISAKMP_NPTYPE_SA));
 
 	p = (struct isakmp_pl_sa *)ext;
+	TCHECK(*p);
 	safememcpy(&sa, ext, sizeof(sa));
 	doi = ntohl(sa.doi);
 	sit = ntohl(sa.sit);
@@ -454,17 +456,22 @@ isakmp_sa_print(const struct isakmp_gen *ext, u_int item_len,
 
 	np = (u_char *)ext + sizeof(sa);
 	if (sit != 0x01) {
+		TCHECK2(*(ext + 1), sizeof(ident));
 		safememcpy(&ident, ext + 1, sizeof(ident));
 		printf(" ident=%u", (u_int32_t)ntohl(ident));
 		np += sizeof(ident);
 	}
 
 	ext = (struct isakmp_gen *)np;
+	TCHECK(*ext);
 
 	cp = isakmp_sub_print(ISAKMP_NPTYPE_P, ext, ep, phase, doi, proto0,
 		depth);
 
 	return cp;
+trunc:
+	printf(" [|%s]", NPSTR(ISAKMP_NPTYPE_SA));
+	return NULL;
 }
 
 static const u_char *
@@ -479,20 +486,26 @@ isakmp_p_print(const struct isakmp_gen *ext, u_int item_len,
 	printf("%s:", NPSTR(ISAKMP_NPTYPE_P));
 
 	p = (struct isakmp_pl_p *)ext;
+	TCHECK(*p);
 	safememcpy(&prop, ext, sizeof(prop));
 	printf(" #%d protoid=%s transform=%d",
 		prop.p_no, PROTOIDSTR(prop.prot_id), prop.num_t);
 	if (prop.spi_size) {
 		printf(" spi=");
-		rawprint((caddr_t)(p + 1), prop.spi_size);
+		if (!rawprint((caddr_t)(p + 1), prop.spi_size))
+			goto trunc;
 	}
 
 	ext = (struct isakmp_gen *)((u_char *)(p + 1) + prop.spi_size);
+	TCHECK(*ext);
 
 	cp = isakmp_sub_print(ISAKMP_NPTYPE_T, ext, ep, phase, doi0,
 		prop.prot_id, depth);
 
 	return cp;
+trunc:
+	printf(" [|%s]", NPSTR(ISAKMP_NPTYPE_P));
+	return NULL;
 }
 
 static const char *isakmp_p_map[] = {
@@ -567,6 +580,7 @@ isakmp_t_print(const struct isakmp_gen *ext, u_int item_len,
 	printf("%s:", NPSTR(ISAKMP_NPTYPE_T));
 
 	p = (struct isakmp_pl_t *)ext;
+	TCHECK(*p);
 	safememcpy(&t, ext, sizeof(t));
 
 	switch (proto) {
@@ -613,6 +627,9 @@ isakmp_t_print(const struct isakmp_gen *ext, u_int item_len,
 	if (ep < ep2)
 		printf("...");
 	return cp;
+trunc:
+	printf(" [|%s]", NPSTR(ISAKMP_NPTYPE_T));
+	return NULL;
 }
 
 static const u_char *
@@ -624,13 +641,18 @@ isakmp_ke_print(const struct isakmp_gen *ext, u_int item_len,
 
 	printf("%s:", NPSTR(ISAKMP_NPTYPE_KE));
 
+	TCHECK(*ext);
 	safememcpy(&e, ext, sizeof(e));
 	printf(" key len=%d", ntohs(e.len) - 4);
 	if (2 < vflag && 4 < ntohs(e.len)) {
 		printf(" ");
-		rawprint((caddr_t)(ext + 1), ntohs(e.len) - 4);
+		if (!rawprint((caddr_t)(ext + 1), ntohs(e.len) - 4))
+			goto trunc;
 	}
 	return (u_char *)ext + ntohs(e.len);
+trunc:
+	printf(" [|%s]", NPSTR(ISAKMP_NPTYPE_KE));
+	return NULL;
 }
 
 static const u_char *
@@ -655,6 +677,7 @@ isakmp_id_print(const struct isakmp_gen *ext, u_int item_len,
 	printf("%s:", NPSTR(ISAKMP_NPTYPE_ID));
 
 	p = (struct isakmp_pl_id *)ext;
+	TCHECK(*p);
 	safememcpy(&id, ext, sizeof(id));
 	if (sizeof(*p) < item_len) {
 		data = (u_char *)(p + 1);
@@ -687,6 +710,7 @@ isakmp_id_print(const struct isakmp_gen *ext, u_int item_len,
 		struct protoent *pe;
 
 		p = (struct ipsecdoi_id *)ext;
+		TCHECK(*p);
 		safememcpy(&id, ext, sizeof(id));
 		printf(" idtype=%s", STR_OR_ID(id.type, ipsecidtypestr));
 		if (id.proto_id) {
@@ -706,6 +730,9 @@ isakmp_id_print(const struct isakmp_gen *ext, u_int item_len,
 		printf(" port=%d", ntohs(id.port));
 		if (!len)
 			break;
+		if (data == NULL)
+			goto trunc;
+		TCHECK2(*data, len);
 		switch (id.type) {
 		case IPSECDOI_ID_IPV4_ADDR:
 			printf(" len=%d %s", len, ipaddr_string(data));
@@ -772,10 +799,14 @@ isakmp_id_print(const struct isakmp_gen *ext, u_int item_len,
 		printf(" len=%d", len);
 		if (2 < vflag) {
 			printf(" ");
-			rawprint((caddr_t)data, len);
+			if (!rawprint((caddr_t)data, len))
+				goto trunc;
 		}
 	}
 	return (u_char *)ext + item_len;
+trunc:
+	printf(" [|%s]", NPSTR(ISAKMP_NPTYPE_ID));
+	return NULL;
 }
 
 static const u_char *
@@ -794,14 +825,19 @@ isakmp_cert_print(const struct isakmp_gen *ext, u_int item_len,
 	printf("%s:", NPSTR(ISAKMP_NPTYPE_CERT));
 
 	p = (struct isakmp_pl_cert *)ext;
+	TCHECK(*p);
 	safememcpy(&cert, ext, sizeof(cert));
 	printf(" len=%d", item_len - 4);
 	printf(" type=%s", STR_OR_ID((cert.encode), certstr));
 	if (2 < vflag && 4 < item_len) {
 		printf(" ");
-		rawprint((caddr_t)(ext + 1), item_len - 4);
+		if (!rawprint((caddr_t)(ext + 1), item_len - 4))
+			goto trunc;
 	}
 	return (u_char *)ext + item_len;
+trunc:
+	printf(" [|%s]", NPSTR(ISAKMP_NPTYPE_CERT));
+	return NULL;
 }
 
 static const u_char *
@@ -820,14 +856,19 @@ isakmp_cr_print(const struct isakmp_gen *ext, u_int item_len,
 	printf("%s:", NPSTR(ISAKMP_NPTYPE_CR));
 
 	p = (struct isakmp_pl_cert *)ext;
+	TCHECK(*p);
 	safememcpy(&cert, ext, sizeof(cert));
 	printf(" len=%d", item_len - 4);
 	printf(" type=%s", STR_OR_ID((cert.encode), certstr));
 	if (2 < vflag && 4 < item_len) {
 		printf(" ");
-		rawprint((caddr_t)(ext + 1), item_len - 4);
+		if (!rawprint((caddr_t)(ext + 1), item_len - 4))
+			goto trunc;
 	}
 	return (u_char *)ext + item_len;
+trunc:
+	printf(" [|%s]", NPSTR(ISAKMP_NPTYPE_CR));
+	return NULL;
 }
 
 static const u_char *
@@ -839,13 +880,18 @@ isakmp_hash_print(const struct isakmp_gen *ext, u_int item_len,
 
 	printf("%s:", NPSTR(ISAKMP_NPTYPE_HASH));
 
+	TCHECK(*ext);
 	safememcpy(&e, ext, sizeof(e));
 	printf(" len=%d", ntohs(e.len) - 4);
 	if (2 < vflag && 4 < ntohs(e.len)) {
 		printf(" ");
-		rawprint((caddr_t)(ext + 1), ntohs(e.len) - 4);
+		if (!rawprint((caddr_t)(ext + 1), ntohs(e.len) - 4))
+			goto trunc;
 	}
 	return (u_char *)ext + ntohs(e.len);
+trunc:
+	printf(" [|%s]", NPSTR(ISAKMP_NPTYPE_HASH));
+	return NULL;
 }
 
 static const u_char *
@@ -857,13 +903,18 @@ isakmp_sig_print(const struct isakmp_gen *ext, u_int item_len,
 
 	printf("%s:", NPSTR(ISAKMP_NPTYPE_SIG));
 
+	TCHECK(*ext);
 	safememcpy(&e, ext, sizeof(e));
 	printf(" len=%d", ntohs(e.len) - 4);
 	if (2 < vflag && 4 < ntohs(e.len)) {
 		printf(" ");
-		rawprint((caddr_t)(ext + 1), ntohs(e.len) - 4);
+		if (!rawprint((caddr_t)(ext + 1), ntohs(e.len) - 4))
+			goto trunc;
 	}
 	return (u_char *)ext + ntohs(e.len);
+trunc:
+	printf(" [|%s]", NPSTR(ISAKMP_NPTYPE_SIG));
+	return NULL;
 }
 
 static const u_char *
@@ -875,13 +926,18 @@ isakmp_nonce_print(const struct isakmp_gen *ext, u_int item_len,
 
 	printf("%s:", NPSTR(ISAKMP_NPTYPE_NONCE));
 
+	TCHECK(*ext);
 	safememcpy(&e, ext, sizeof(e));
 	printf(" n len=%d", ntohs(e.len) - 4);
 	if (2 < vflag && 4 < ntohs(e.len)) {
 		printf(" ");
-		rawprint((caddr_t)(ext + 1), ntohs(e.len) - 4);
+		if (!rawprint((caddr_t)(ext + 1), ntohs(e.len) - 4))
+			goto trunc;
 	}
 	return (u_char *)ext + ntohs(e.len);
+trunc:
+	printf(" [|%s]", NPSTR(ISAKMP_NPTYPE_NONCE));
+	return NULL;
 }
 
 static const u_char *
@@ -943,6 +999,7 @@ isakmp_n_print(const struct isakmp_gen *ext, u_int item_len,
 	printf("%s:", NPSTR(ISAKMP_NPTYPE_N));
 
 	p = (struct isakmp_pl_n *)ext;
+	TCHECK(*p);
 	safememcpy(&n, ext, sizeof(n));
 	doi = ntohl(n.doi);
 	proto = n.prot_id;
@@ -959,7 +1016,8 @@ isakmp_n_print(const struct isakmp_gen *ext, u_int item_len,
 			printf(" type=%s", numstr(ntohs(n.type)));
 		if (n.spi_size) {
 			printf(" spi=");
-			rawprint((caddr_t)(p + 1), n.spi_size);
+			if (!rawprint((caddr_t)(p + 1), n.spi_size))
+				goto trunc;
 		}
 		return (u_char *)(p + 1) + n.spi_size;
 	}
@@ -978,7 +1036,8 @@ isakmp_n_print(const struct isakmp_gen *ext, u_int item_len,
 		printf(" type=%s", numstr(ntohs(n.type)));
 	if (n.spi_size) {
 		printf(" spi=");
-		rawprint((caddr_t)(p + 1), n.spi_size);
+		if (!rawprint((caddr_t)(p + 1), n.spi_size))
+			goto trunc;
 	}
 
 	cp = (u_char *)(p + 1) + n.spi_size;
@@ -1015,6 +1074,9 @@ isakmp_n_print(const struct isakmp_gen *ext, u_int item_len,
 		printf(")");
 	}
 	return (u_char *)ext + item_len;
+trunc:
+	printf(" [|%s]", NPSTR(ISAKMP_NPTYPE_N));
+	return NULL;
 }
 
 static const u_char *
@@ -1032,6 +1094,7 @@ isakmp_d_print(const struct isakmp_gen *ext, u_int item_len,
 	printf("%s:", NPSTR(ISAKMP_NPTYPE_D));
 
 	p = (struct isakmp_pl_d *)ext;
+	TCHECK(*p);
 	safememcpy(&d, ext, sizeof(d));
 	doi = ntohl(d.doi);
 	proto = d.prot_id;
@@ -1049,10 +1112,14 @@ isakmp_d_print(const struct isakmp_gen *ext, u_int item_len,
 	for (i = 0; i < ntohs(d.num_spi); i++) {
 		if (i != 0)
 			printf(",");
-		rawprint((caddr_t)q, d.spi_size);
+		if (!rawprint((caddr_t)q, d.spi_size))
+			goto trunc;
 		q += d.spi_size;
 	}
 	return q;
+trunc:
+	printf(" [|%s]", NPSTR(ISAKMP_NPTYPE_D));
+	return NULL;
 }
 
 static const u_char *
@@ -1064,13 +1131,18 @@ isakmp_vid_print(const struct isakmp_gen *ext, u_int item_len,
 
 	printf("%s:", NPSTR(ISAKMP_NPTYPE_VID));
 
+	TCHECK(*ext);
 	safememcpy(&e, ext, sizeof(e));
 	printf(" len=%d", ntohs(e.len) - 4);
 	if (2 < vflag && 4 < ntohs(e.len)) {
 		printf(" ");
-		rawprint((caddr_t)(ext + 1), ntohs(e.len) - 4);
+		if (!rawprint((caddr_t)(ext + 1), ntohs(e.len) - 4))
+			goto trunc;
 	}
 	return (u_char *)ext + ntohs(e.len);
+trunc:
+	printf(" [|%s]", NPSTR(ISAKMP_NPTYPE_VID));
+	return NULL;
 }
 
 static const u_char *
@@ -1082,6 +1154,7 @@ isakmp_sub0_print(u_char np, const struct isakmp_gen *ext, const u_char *ep,
 	u_int item_len;
 
 	cp = (u_char *)ext;
+	TCHECK(*ext);
 	safememcpy(&e, ext, sizeof(e));
 
 	/*
@@ -1106,6 +1179,9 @@ isakmp_sub0_print(u_char np, const struct isakmp_gen *ext, const u_char *ep,
 	}
 
 	return cp;
+trunc:
+	printf(" [|isakmp]");
+	return NULL;
 }
 
 static const u_char *
@@ -1119,15 +1195,12 @@ isakmp_sub_print(u_char np, const struct isakmp_gen *ext, const u_char *ep,
 	cp = (const u_char *)ext;
 
 	while (np) {
-		TCHECK2(*ext, sizeof(e));
+		TCHECK(*ext);
 		
 		safememcpy(&e, ext, sizeof(e));
 
-		if (ep < (u_char *)ext + ntohs(e.len)) {
-			printf(" [|%s]", NPSTR(np));
-			cp = ep + 1;
-			break;
-		}
+		TCHECK2(*ext, ntohs(e.len));
+
 		depth++;
 		printf("\n");
 		for (i = 0; i < depth; i++)
@@ -1147,6 +1220,7 @@ isakmp_sub_print(u_char np, const struct isakmp_gen *ext, const u_char *ep,
 	}
 	return cp;
 trunc:
+	printf(" [|%s]", NPSTR(np));
 	return NULL;
 }
 
