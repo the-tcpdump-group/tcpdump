@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.90 2003-07-01 08:34:30 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.91 2003-07-19 08:54:28 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -193,8 +193,35 @@ static struct tok isis_tlv_values[] = {
 #define SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE 20
 #define SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR    21
 
+static struct tok isis_ext_is_reach_subtlv_values[] = {
+    { SUBTLV_EXT_IS_REACH_ADMIN_GROUP,            "Administrative groups" },
+    { SUBTLV_EXT_IS_REACH_LINK_LOCAL_ID,          "Link Local Identifier" },
+    { SUBTLV_EXT_IS_REACH_LINK_REMOTE_ID,         "Link Remote Identifier" },
+    { SUBTLV_EXT_IS_REACH_IPV4_INTF_ADDR,         "IPv4 interface address" },
+    { SUBTLV_EXT_IS_REACH_IPV4_NEIGHBOR_ADDR,     "IPv4 neighbor address" },
+    { SUBTLV_EXT_IS_REACH_MAX_LINK_BW,            "Maximum link bandwidth" },
+    { SUBTLV_EXT_IS_REACH_RESERVABLE_BW,          "Reservable link bandwidth" },
+    { SUBTLV_EXT_IS_REACH_UNRESERVED_BW,          "Unreserved bandwidth" },
+    { SUBTLV_EXT_IS_REACH_TE_METRIC,              "Traffic Engineering Metric" },
+    { SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE,   "Link Protection Type" },
+    { SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR,      "Interface Switching Capability" },
+    { 250,                                        "Reserved for cisco specific extensions" },
+    { 251,                                        "Reserved for cisco specific extensions" },
+    { 252,                                        "Reserved for cisco specific extensions" },
+    { 253,                                        "Reserved for cisco specific extensions" },
+    { 254,                                        "Reserved for cisco specific extensions" },
+    { 255,                                        "Reserved for future expansion" },
+    { 0, NULL }
+};
+
 #define SUBTLV_IP_REACH_ADMIN_TAG32               1
 #define SUBTLV_IP_REACH_ADMIN_TAG64               2
+
+static struct tok isis_ext_ip_reach_subtlv_values[] = {
+    { SUBTLV_IP_REACH_ADMIN_TAG32,                "32-Bit Administrative tag" },
+    { SUBTLV_IP_REACH_ADMIN_TAG64,                "64-Bit Administrative tag" },
+    { 0, NULL }
+};
 
 #define SUBTLV_AUTH_SIMPLE        1
 #define SUBTLV_AUTH_MD5          54
@@ -774,13 +801,22 @@ isis_print_tlv_ip_reach (const u_int8_t *cp, const char *ident, int length)
 static int
 isis_print_ip_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *ident) {
 
+        /* first lets see if we know the subTLVs name*/
+	printf("%s%s (subTLV #%u), length: %u",
+	       ident,
+               tok2str(isis_ext_ip_reach_subtlv_values,
+                       "unknown",
+                       subt),
+               subt,
+               subl);
+
+	if (!TTEST2(*tptr,subl))
+	    goto trunctlv;
+
     switch(subt) {
     case SUBTLV_IP_REACH_ADMIN_TAG32:
         while (subl >= 4) {
-	    if (!TTEST2(*tptr,4))
-	        goto trunctlv;
-	    printf("%s32-Bit Administrative tag: 0x%08x (=%u)",
-		   ident,
+	    printf(", 0x%08x (=%u)",
 		   EXTRACT_32BITS(tptr),
 		   EXTRACT_32BITS(tptr));
 	    tptr+=4;
@@ -789,10 +825,7 @@ isis_print_ip_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
 	break;
     case SUBTLV_IP_REACH_ADMIN_TAG64:
         while (subl >= 8) {
-	    if (!TTEST2(*tptr,8))
-	        goto trunctlv;
-	    printf("%s64-Bit Administrative tag: 0x%08x%08x",
-		   ident,
+	    printf(", 0x%08x%08x",
 		   EXTRACT_32BITS(tptr),
 		   EXTRACT_32BITS(tptr+4));
 	    tptr+=8;
@@ -800,10 +833,6 @@ isis_print_ip_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
 	}
 	break;
     default:
-        printf("%sunknown subTLV, type %d, length %d",
-	       ident,
-	       subt,
-	       subl);
 	if(!print_unknown_data(tptr,"\n\t\t    ",
 			       subl))
 	  return(0);
@@ -830,49 +859,35 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
             u_int32_t i;
         } bw;
 
+        /* first lets see if we know the subTLVs name*/
+	printf("%s%s (subTLV #%u), length: %u",
+	       ident,
+               tok2str(isis_ext_is_reach_subtlv_values,
+                       "unknown",
+                       subt),
+               subt,
+               subl);
+
+	if (!TTEST2(*tptr,subl))
+	    goto trunctlv;
+
         switch(subt) {
-        case SUBTLV_EXT_IS_REACH_ADMIN_GROUP:
-            if (!TTEST2(*tptr,4))
-                goto trunctlv;
-            printf("%sAdministrative groups: 0x%08x",
-                   ident,
-                   EXTRACT_32BITS(tptr));
-            break;
+        case SUBTLV_EXT_IS_REACH_ADMIN_GROUP:      
         case SUBTLV_EXT_IS_REACH_LINK_LOCAL_ID:
-            if (!TTEST2(*tptr,4))
-                goto trunctlv;
-            printf("%sLink Local Identifier: 0x%08x",
-                   ident,
-                   EXTRACT_32BITS(tptr));
-            break;
         case SUBTLV_EXT_IS_REACH_LINK_REMOTE_ID:
-            if (!TTEST2(*tptr,4))
-                goto trunctlv;
-            printf("%sLink Remote Identifier: 0x%08x",
-                   ident,
-                   EXTRACT_32BITS(tptr));
+            printf(", 0x%08x", EXTRACT_32BITS(tptr));
+	    break;
+        case SUBTLV_EXT_IS_REACH_IPV4_INTF_ADDR:
+        case SUBTLV_EXT_IS_REACH_IPV4_NEIGHBOR_ADDR:
+            printf(", %s", ipaddr_string(tptr));
             break;
         case SUBTLV_EXT_IS_REACH_MAX_LINK_BW :
-            if (!TTEST2(*tptr,4))
-                goto trunctlv;
+	case SUBTLV_EXT_IS_REACH_RESERVABLE_BW:  
             bw.i = EXTRACT_32BITS(tptr);
-            printf("%sMaximum link bandwidth : %.3f Mbps",
-                   ident,
-                   bw.f*8/1000000 );
-            break;
-        case SUBTLV_EXT_IS_REACH_RESERVABLE_BW :
-            if (!TTEST2(*tptr,4))
-                goto trunctlv;
-            bw.i = EXTRACT_32BITS(tptr);
-            printf("%sReservable link bandwidth: %.3f Mbps",
-                   ident,
-                   bw.f*8/1000000  );
+            printf(", %.3f Mbps", bw.f*8/1000000 );
             break;
         case SUBTLV_EXT_IS_REACH_UNRESERVED_BW :
-            printf("%sUnreserved bandwidth:",ident);
             for (i = 0; i < 8; i++) {
-                if (!TTEST2(*(tptr+i*4),4))
-                    goto trunctlv;
                 bw.i = EXTRACT_32BITS(tptr);
                 printf("%s  priority level %d: %.3f Mbps",
                        ident,
@@ -881,55 +896,21 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
             }
             break;
         case SUBTLV_EXT_IS_REACH_TE_METRIC:
-            if (!TTEST2(*tptr,3))
-                goto trunctlv;
-            printf("%sTraffic Engineering Metric: %d",
-                   ident,
-                   EXTRACT_24BITS(tptr));
-            break;
-        case SUBTLV_EXT_IS_REACH_IPV4_INTF_ADDR:
-            if (!TTEST2(*tptr,4))
-                goto trunctlv;
-            printf("%sIPv4 interface address: %s",
-                   ident,
-                   ipaddr_string(tptr));
-            break;
-        case SUBTLV_EXT_IS_REACH_IPV4_NEIGHBOR_ADDR:
-            if (!TTEST2(*tptr,4))
-                goto trunctlv;
-            printf("%sIPv4 neighbor address: %s",
-                   ident,
-                   ipaddr_string(tptr));
+            printf(", %u", EXTRACT_24BITS(tptr));
             break;
         case SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE:
-            if (!TTEST2(*tptr,2))
-                goto trunctlv;
-            printf("%sLink Protection Type: %s, Priority %u",
-                   ident,
-                   bittok2str(gmpls_link_prot_values, "none", *tptr),
+            printf(", %s, Priority %u",
+		   bittok2str(gmpls_link_prot_values, "none", *tptr),
                    *(tptr+1));
             break;
         case SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR:
-            printf("%sInterface Switching Capability",ident);
-
-            if (!TTEST2(*tptr,1))
-                goto trunctlv;
             printf("%s  Interface Switching Capability:%s",
                    ident,
                    tok2str(gmpls_switch_cap_values, "Unknown", *(tptr)));
-
-            if (!TTEST2(*(tptr+1),1))
-                goto trunctlv;
             printf(", LSP Encoding: %s",
                    tok2str(gmpls_encoding_values, "Unknown", *(tptr+1)));
-
-            if (!TTEST2(*(tptr+2),2)) /* skip 2 res. bytes */
-                goto trunctlv;
-
             printf("%s  Max LSP Bandwidth:",ident);
             for (i = 0; i < 8; i++) {
-                if (!TTEST2(*(tptr+(i*4)+4),4))
-                    goto trunctlv;
                 bw.i = EXTRACT_32BITS(tptr);
                 printf("%s    priority level %d: %.3f Mbps",
                        ident,
@@ -941,33 +922,13 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
                not specified so just lets hexdump what is left */
             if(subl>0){
                 if(!print_unknown_data(tptr,"\n\t\t    ",
-                                           subl-36))
+				       subl-36))
                     return(0);
             }
             break;
-        case 250:
-        case 251:
-        case 252:
-        case 253:
-        case 254:
-            printf("%sReserved for cisco specific extensions, type %d, length %d",
-                   ident,
-                   subt,
-                   subl);
-            break;
-        case 255:
-            printf("%sReserved for future expansion, type %d, length %d",
-                   ident,
-                   subt,
-                   subl);
-            break;
         default:
-            printf("%sunknown subTLV, type %d, length %d",
-                   ident,
-                   subt,
-                   subl);
             if(!print_unknown_data(tptr,"\n\t\t    ",
-                                       subl))
+				   subl))
                 return(0);
             break;
         }
