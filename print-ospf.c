@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.50 2004-01-27 13:33:24 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.51 2004-03-24 02:32:27 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -429,8 +429,7 @@ ospf_print_lsa(register const struct lsa *lsap)
 		tptr = (u_int8_t *)(&lsap->lsa_un.un_grace_tlv.type);
 
 		while (ls_length != 0) {
-                    if (!TTEST2(*tptr, 4))
-                        goto trunc;
+                    TCHECK2(*tptr, 4);
 		    if (ls_length < 4) {
                         printf("\n\t    Remaining LS length %u < 4", ls_length);
                         return(ls_end);
@@ -451,6 +450,7 @@ ospf_print_lsa(register const struct lsa *lsap)
                         return(ls_end);
                     }
                     ls_length-=tlv_length;
+                    TCHECK2(*tptr, tlv_length);
                     switch(tlv_type) {
 
                     case LS_OPAQUE_GRACE_TLV_PERIOD:
@@ -492,8 +492,7 @@ ospf_print_lsa(register const struct lsa *lsap)
 		tptr = (u_int8_t *)(&lsap->lsa_un.un_te_lsa_tlv.type);
 
 		while (ls_length != 0) {
-                    if (!TTEST2(*tptr, 4))
-                        goto trunc;
+                    TCHECK2(*tptr, 4);
 		    if (ls_length < 4) {
                         printf("\n\t    Remaining LS length %u < 4", ls_length);
                         return(ls_end);
@@ -522,8 +521,7 @@ ospf_print_lsa(register const struct lsa *lsap)
                                     tlv_length);
                                 return(ls_end);
                             }
-                            if (!TTEST2(*tptr, 4))
-                                goto trunc;
+                            TCHECK2(*tptr, 4);
                             subtlv_type = EXTRACT_16BITS(tptr);
                             subtlv_length = EXTRACT_16BITS(tptr+2);
                             tptr+=4;
@@ -534,8 +532,7 @@ ospf_print_lsa(register const struct lsa *lsap)
                                    subtlv_type,
                                    subtlv_length);
                             
-                            if (!TTEST2(*tptr, subtlv_length))
-                                goto trunc;
+                            TCHECK2(*tptr, subtlv_length);
                             switch(subtlv_type) {
                             case LS_OPAQUE_TE_LINK_SUBTLV_ADMIN_GROUP:
                                 printf(", 0x%08x", EXTRACT_32BITS(tptr));
@@ -634,6 +631,11 @@ ospf_print_lsa(register const struct lsa *lsap)
                         break;
                         
                     case LS_OPAQUE_TE_TLV_ROUTER:
+                        if (tlv_length < 4) {
+                            printf("\n\t    TLV length %u < 4", tlv_length);
+                            return(ls_end);
+                        }
+                        TCHECK2(*tptr, 4);
                         printf(", %s", ipaddr_string(tptr));
                         break;
                         
