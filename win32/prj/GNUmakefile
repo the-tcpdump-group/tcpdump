@@ -15,8 +15,8 @@ CFLAGS = -I ${PCAP_DIR}/wpcap/libpcap/bpf \
 	-I ../../Win32/Include -I ../../linux-Include \
 	-I ../../lbl -I../.. \
 	-DWIN32 -DHAVE_ADDRINFO_H -DHAVE_PCAP_FINDALLDEVS \
-	-DINET6 -DSIZEOF_CHAR=1 -DSIZEOF_SHORT=2 -DSIZEOF_INT=4 \
-	-mno-cygwin ${OPTFLAGS}
+	-DHAVE_PCAP_DUMP_FLUSH -DINET6 -DSIZEOF_CHAR=1 \
+	-DSIZEOF_SHORT=2 -DSIZEOF_INT=4 -mno-cygwin ${OPTFLAGS}
 LDFLAGS = 
 LIBS = -L ${PCAP_DIR}/WPCAP/LIB -lwpcap -lwsock32
 OBJS = \
@@ -69,6 +69,7 @@ OBJS = \
 	../../print-krb.o \
 	../../print-l2tp.o \
 	../../print-lane.o \
+	../../print-ldp.o \
 	../../print-llc.o \
 	../../print-lwres.o \
 	../../print-mobile.o \
@@ -90,6 +91,7 @@ OBJS = \
 	../../print-raw.o \
 	../../print-rip.o \
 	../../print-ripng.o \
+	../../print-rsvp.o \
 	../../print-rt6.o \
 	../../print-rx.o \
 	../../print-sctp.o \
