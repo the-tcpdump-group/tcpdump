@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.102 2004-02-18 15:14:09 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.103 2004-03-18 21:01:39 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -475,7 +475,7 @@ etheraddr_string(register const u_char *ep)
 const char *
 linkaddr_string(const u_char *ep, const unsigned int len)
 {
-	register u_int i, j;
+	register u_int i;
 	register char *cp;
 	register struct enamemem *tp;
 
@@ -489,13 +489,11 @@ linkaddr_string(const u_char *ep, const unsigned int len)
 	tp->e_name = cp = (char *)malloc(len*3);
 	if (tp->e_name == NULL)
 		error("linkaddr_string: malloc");
-	if ((j = *ep >> 4) != 0)
-		*cp++ = hex[j];
+	*cp++ = hex[*ep >> 4];
 	*cp++ = hex[*ep++ & 0xf];
 	for (i = len-1; i > 0 ; --i) {
 		*cp++ = ':';
-		if ((j = *ep >> 4) != 0)
-			*cp++ = hex[j];
+		*cp++ = hex[*ep >> 4];
 		*cp++ = hex[*ep++ & 0xf];
 	}
 	*cp = '\0';
