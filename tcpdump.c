@@ -24,7 +24,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.143 2000-01-29 21:00:59 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.144 2000-04-21 10:32:03 assar Exp $ (LBL)";
 #endif
 
 /*
@@ -263,11 +263,17 @@ main(int argc, char **argv)
 			Rflag = 0;
 			break;
 
-		case 's':
-			snaplen = atoi(optarg);
-			if (snaplen <= 0)
+		case 's': {
+			char *end;
+
+			snaplen = strtol(optarg, &end, 0);
+			if (optarg == end || *end != '\0'
+			    || snaplen < 0 || snaplen > 65535)
 				error("invalid snaplen %s", optarg);
+			else if (snaplen == 0)
+				snaplen = 65535;
 			break;
+		}
 
 		case 'S':
 			++Sflag;
