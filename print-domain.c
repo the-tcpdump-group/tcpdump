@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.73 2001-02-20 07:22:17 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.74 2001-02-21 08:52:30 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -494,6 +494,7 @@ ns_print(register const u_char *bp, u_int length)
 	register const u_char *cp = NULL;
 
 	np = (const HEADER *)bp;
+	TCHECK(*np);
 	/* get the byte-order right */
 	qdcount = ntohs(np->qdcount);
 	ancount = ntohs(np->ancount);
