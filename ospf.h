@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.15 2004-09-20 14:36:16 hannes Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.16 2004-09-20 14:56:34 hannes Exp $ (LBL) */
 /*
  * Copyright (c) 1991, 1993, 1994, 1995, 1996, 1997
  *	The Regents of the University of California.  All rights reserved.
@@ -43,6 +43,7 @@
 #define	OSPF_OPTION_EA	0x10	/* EA bit: External Attribute capable */
 #define	OSPF_OPTION_DC	0x20	/* DC bit: Demand circuit capable */
 #define	OSPF_OPTION_O	0x40	/* O bit: Opaque LSA capable */
+#define	OSPF_OPTION_DN	0x80	/* DN bit: Up/Down Bit capable - draft-ietf-ospf-2547-dnbit-04 */
 
 /* ospf_authtype	*/
 #define	OSPF_AUTH_NONE		0	/* No auth-data */

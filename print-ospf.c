@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.54 2004-09-20 14:36:16 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.55 2004-09-20 14:56:34 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -51,6 +51,7 @@ static struct tok ospf_option_values[] = {
 	{ OSPF_OPTION_EA,	"Advertise External" },
 	{ OSPF_OPTION_DC,	"Demand Circuit" },
 	{ OSPF_OPTION_O,	"Opaque" },
+	{ OSPF_OPTION_DN,	"Up/Down" },
 	{ 0,			NULL }
 };
 
