@@ -28,10 +28,6 @@
  *
  */
 
-#ifndef lint
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.36 2002-12-11 07:14:03 guy Exp $ (LBL)";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -50,6 +46,10 @@ static const char rcsid[] =
 #include "addrtoname.h"
 #include "extract.h"                    /* must come after interface.h */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.37 2003-11-15 00:39:28 guy Exp $ (LBL)";
+#endif
 #include "ip.h"
 #ifdef INET6
 #include "ip6.h"

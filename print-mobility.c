@@ -31,10 +31,6 @@
 #include "config.h"
 #endif
 
-#ifndef lint
-static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-mobility.c,v 1.9 2003-02-05 02:36:25 guy Exp $";
-#endif
 
 #ifdef INET6
 #include <tcpdump-stdinc.h>
@@ -47,6 +43,10 @@ static const char rcsid[] =
 #include "addrtoname.h"
 #include "extract.h"		/* must come after interface.h */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+     "@(#) $Header: /tcpdump/master/tcpdump/print-mobility.c,v 1.10 2003-11-15 00:39:31 guy Exp $";
+#endif
 /* Mobility header */
 struct ip6_mobility {
 	u_int8_t ip6m_pproto;	/* following payload protocol (for PG) */

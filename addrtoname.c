@@ -21,10 +21,6 @@
  *  Internet, ethernet, port, and protocol string to address
  *  and address to string conversion routines
  */
-#ifndef lint
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.96 2003-07-31 22:36:44 fenner Exp $ (LBL)";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -56,6 +52,10 @@ struct rtentry;		/* declarations in <net/if.h> */
 #include "llc.h"
 #include "setsignal.h"
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.97 2003-11-15 00:39:12 guy Exp $ (LBL)";
+#endif
 /*
  * hash tables for whatever-to-name translations
  *

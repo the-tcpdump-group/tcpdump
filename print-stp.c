@@ -9,10 +9,6 @@
  * Contributed by Lennert Buytenhek <buytenh@gnu.org>
  */
 
-#ifndef lint
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-stp.c,v 1.11 2003-09-12 20:53:19 guy Exp $";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -28,6 +24,10 @@ static const char rcsid[] =
 #include "addrtoname.h"
 #include "extract.h"
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-stp.c,v 1.12 2003-11-15 00:39:41 guy Exp $";
+#endif
 static void
 stp_print_bridge_id(const u_char *p)
 {

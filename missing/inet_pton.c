@@ -36,14 +36,18 @@
  * SUCH DAMAGE.
  */
 
-/* $Id: inet_pton.c,v 1.4 2002-08-01 08:53:40 risso Exp $ */
+/* $Id: inet_pton.c,v 1.5 2003-11-15 00:39:48 guy Exp $ */
 
-#ifndef lint
-static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/missing/inet_pton.c,v 1.4 2002-08-01 08:53:40 risso Exp $";
-#endif
 
 #include <tcpdump-stdinc.h>
+
+
+#include "interface.h"
+
+#ifndef lint
+static const char rcsid[] _U_ =
+     "@(#) $Header: /tcpdump/master/tcpdump/missing/inet_pton.c,v 1.5 2003-11-15 00:39:48 guy Exp $";
+#endif
 
 #include <errno.h>
 

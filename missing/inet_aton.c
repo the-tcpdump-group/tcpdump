@@ -36,14 +36,18 @@
  * SUCH DAMAGE.
  */
 
-/* $Id: inet_aton.c,v 1.4 2002-08-01 08:53:38 risso Exp $ */
+/* $Id: inet_aton.c,v 1.5 2003-11-15 00:39:47 guy Exp $ */
 
-#ifndef lint
-static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/missing/inet_aton.c,v 1.4 2002-08-01 08:53:38 risso Exp $";
-#endif
 
 #include <tcpdump-stdinc.h>
+
+
+#include "interface.h"
+
+#ifndef lint
+static const char rcsid[] _U_ =
+     "@(#) $Header: /tcpdump/master/tcpdump/missing/inet_aton.c,v 1.5 2003-11-15 00:39:47 guy Exp $";
+#endif
 
 /* Minimal implementation of inet_aton.
  * Cannot distinguish between failure and a local broadcast address. */

@@ -18,10 +18,6 @@
  * Initial contribution from Jeff Honig (jch@MITCHELL.CIT.CORNELL.EDU).
  */
 
-#ifndef lint
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-egp.c,v 1.34 2002-12-11 07:13:59 guy Exp $ (LBL)";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -35,6 +31,10 @@ static const char rcsid[] =
 #include "addrtoname.h"
 #include "extract.h"
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-egp.c,v 1.35 2003-11-15 00:39:20 guy Exp $ (LBL)";
+#endif
 #include "ip.h"
 
 struct egp_packet {

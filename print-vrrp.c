@@ -23,10 +23,6 @@
  * FOR A PARTICULAR PURPOSE.
  */
 
-#ifndef lint
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-vrrp.c,v 1.7 2003-09-05 17:42:41 hannes Exp $";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -41,6 +37,10 @@ static const char rcsid[] =
 #include "extract.h"
 #include "addrtoname.h"
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-vrrp.c,v 1.8 2003-11-15 00:39:44 guy Exp $";
+#endif
 /*
  * RFC 2338:
  *     0                   1                   2                   3

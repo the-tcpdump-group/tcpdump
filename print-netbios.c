@@ -22,10 +22,6 @@
  * Contributed by Brad Parker (brad@fcr.com).
  */
 
-#ifndef lint
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-netbios.c,v 1.18 2002-08-01 08:53:20 risso Exp $";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -42,6 +38,10 @@ static const char rcsid[] =
 #include "netbios.h"
 #include "extract.h"
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-netbios.c,v 1.19 2003-11-15 00:39:33 guy Exp $";
+#endif
 /*
  * Print NETBIOS packets.
  */

@@ -19,10 +19,6 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#ifndef lint
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/vfprintf.c,v 1.4 2000-07-01 03:39:12 assar Exp $ (LBL)";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -37,6 +33,10 @@ static const char rcsid[] =
 
 #include "interface.h"
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/vfprintf.c,v 1.5 2003-11-15 00:39:46 guy Exp $ (LBL)";
+#endif
 /*
  * Stock 4.3 doesn't have vfprintf.
  * This routine is due to Chris Torek.

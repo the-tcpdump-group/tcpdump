@@ -19,10 +19,6 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#ifndef lint
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sunrpc.c,v 1.43 2002-12-11 07:14:09 guy Exp $ (LBL)";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -45,6 +41,10 @@ static const char rcsid[] =
 #include "addrtoname.h"
 #include "extract.h"
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sunrpc.c,v 1.44 2003-11-15 00:39:41 guy Exp $ (LBL)";
+#endif
 #include "ip.h"
 #ifdef INET6
 #include "ip6.h"

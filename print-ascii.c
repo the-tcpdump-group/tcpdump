@@ -40,15 +40,15 @@
 #include "config.h"
 #endif
 
-#ifndef lint
-static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-ascii.c,v 1.10 2002-09-05 00:00:10 guy Exp $";
-#endif
 #include <tcpdump-stdinc.h>
 #include <stdio.h>
 
 #include "interface.h"
 
+#ifndef lint
+static const char rcsid[] _U_ =
+     "@(#) $Header: /tcpdump/master/tcpdump/print-ascii.c,v 1.11 2003-11-15 00:39:15 guy Exp $";
+#endif
 #define ASCII_LINELENGTH 300
 #define HEXDUMP_BYTES_PER_LINE 16
 #define HEXDUMP_SHORTS_PER_LINE (HEXDUMP_BYTES_PER_LINE / 2)

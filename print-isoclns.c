@@ -24,10 +24,6 @@
  * complete IS-IS support.
  */
 
-#ifndef lint
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.106 2003-11-05 23:11:03 hannes Exp $ (LBL)";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -45,6 +41,10 @@ static const char rcsid[] =
 #include "extract.h"
 #include "gmpls.h"
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.107 2003-11-15 00:39:29 guy Exp $ (LBL)";
+#endif
 #define	NLPID_CLNS	129	/* 0x81 */
 #define	NLPID_ESIS	130	/* 0x82 */
 #define	NLPID_ISIS	131	/* 0x83 */

@@ -24,10 +24,6 @@
  *    http://www.cisco.com/univercd/cc/td/doc/product/lan/trsrb/frames.htm
  */
 
-#ifndef lint
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.19 2003-01-08 12:45:26 hannes Exp $";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -42,6 +38,10 @@ static const char rcsid[] =
 #include "addrtoname.h"
 #include "extract.h"			/* must come after interface.h */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.20 2003-11-15 00:39:17 guy Exp $";
+#endif
 #define CDP_HEADER_LEN  4
 
 static struct tok cdp_tlv_values[] = {

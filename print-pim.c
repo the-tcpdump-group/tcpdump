@@ -19,10 +19,6 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#ifndef lint
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.37 2003-10-29 02:07:57 itojun Exp $ (LBL)";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -57,6 +53,10 @@ struct pim {
 #include "addrtoname.h"
 #include "extract.h"
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.38 2003-11-15 00:39:35 guy Exp $ (LBL)";
+#endif
 #include "ip.h"
 
 static void pimv2_print(register const u_char *bp, register u_int len);

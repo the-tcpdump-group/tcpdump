@@ -42,10 +42,6 @@
  * TODO: Among other things to print ok MacIntosh and Vendor values
  */
 
-#ifndef lint
-static const char rcsid[] =
-    "$Id: print-radius.c,v 1.19 2002-12-11 07:14:07 guy Exp $";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -61,6 +57,10 @@ static const char rcsid[] =
 #include "addrtoname.h"
 #include "extract.h"
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "$Id: print-radius.c,v 1.20 2003-11-15 00:39:37 guy Exp $";
+#endif
 #define TAM_SIZE(x) (sizeof(x)/sizeof(x[0]) )
 
 #define PRINT_HEX(bytes_len, ptr_data)                               \

@@ -25,13 +25,6 @@
  *	Seth Webster <swebster@sst.ll.mit.edu>
  */
 
-#ifndef lint
-static const char copyright[] =
-    "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
-The Regents of the University of California.  All rights reserved.\n";
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.216 2003-11-04 07:29:16 guy Exp $ (LBL)";
-#endif
 
 /*
  * tcpdump - monitor tcp/ip traffic on an ethernet.
@@ -69,6 +62,13 @@ extern int SIZE_BUF;
 #include "gmt2local.h"
 #include "pcap-missing.h"
 
+#ifndef lint
+static const char copyright[] _U_ =
+    "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
+The Regents of the University of California.  All rights reserved.\n";
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.217 2003-11-15 00:39:45 guy Exp $ (LBL)";
+#endif
 int dflag;			/* print filter code */
 int eflag;			/* print ethernet header */
 int fflag;			/* don't translate "foreign" IP address */

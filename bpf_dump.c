@@ -18,10 +18,6 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-#ifndef lint
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/bpf_dump.c,v 1.14 2002-08-01 08:52:56 risso Exp $ (LBL)";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -34,6 +30,10 @@ static const char rcsid[] =
 
 #include "interface.h"
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/bpf_dump.c,v 1.15 2003-11-15 00:39:12 guy Exp $ (LBL)";
+#endif
 void
 bpf_dump(struct bpf_program *p, int option)
 {

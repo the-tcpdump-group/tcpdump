@@ -29,10 +29,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef lint
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sunatm.c,v 1.5 2002-12-19 09:39:16 guy Exp $ (LBL)";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -50,6 +46,10 @@ struct rtentry;
 #include "extract.h"
 #include "addrtoname.h"
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sunatm.c,v 1.6 2003-11-15 00:39:41 guy Exp $ (LBL)";
+#endif
 #include "atm.h"
 #include "atmuni31.h"
 

@@ -19,10 +19,6 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#ifndef lint
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-null.c,v 1.49 2003-05-22 16:52:38 hannes Exp $ (LBL)";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -37,6 +33,10 @@ static const char rcsid[] =
 #include "interface.h"
 #include "addrtoname.h"
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-null.c,v 1.50 2003-11-15 00:39:34 guy Exp $ (LBL)";
+#endif
 #include "ip.h"
 #ifdef INET6
 #include "ip6.h"

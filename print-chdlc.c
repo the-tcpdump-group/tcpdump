@@ -19,10 +19,6 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#ifndef lint
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.28 2003-05-22 16:52:36 hannes Exp $ (LBL)";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -40,6 +36,10 @@ static const char rcsid[] =
 #include "ppp.h"
 #include "chdlc.h"
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.29 2003-11-15 00:39:18 guy Exp $ (LBL)";
+#endif
 static void chdlc_slarp_print(const u_char *, u_int);
 
 /* Standard CHDLC printer */

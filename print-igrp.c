@@ -21,10 +21,6 @@
  * Initial contribution from Francis Dupont (francis.dupont@inria.fr)
  */
 
-#ifndef lint
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-igrp.c,v 1.18 2002-08-06 04:42:05 guy Exp $ (LBL)";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -40,6 +36,10 @@ static const char rcsid[] =
 #include "ip.h"
 #include "extract.h"			/* must come after interface.h */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-igrp.c,v 1.19 2003-11-15 00:39:26 guy Exp $ (LBL)";
+#endif
 static void
 igrp_entry_print(register struct igrprte *igr, register int is_interior,
     register int is_exterior)

@@ -35,10 +35,6 @@
  *  draft-ietf-dhc-dhcpv6-opt-timeconfig-02.txt,
  */
 
-#ifndef lint
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.27 2003-10-29 03:54:14 itojun Exp $";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -53,6 +49,10 @@ static const char rcsid[] =
 #include "addrtoname.h"
 #include "extract.h"
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.28 2003-11-15 00:39:19 guy Exp $";
+#endif
 /* lease duration */
 #define DHCP6_DURATITION_INFINITE 0xffffffff
 

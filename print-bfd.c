@@ -13,10 +13,6 @@
  * Original code by Hannes Gredler (hannes@juniper.net)
  */
 
-#ifndef lint
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bfd.c,v 1.3 2003-10-27 22:44:37 hannes Exp $";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -31,6 +27,10 @@ static const char rcsid[] =
 #include "extract.h"
 #include "addrtoname.h"
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bfd.c,v 1.4 2003-11-15 00:39:16 guy Exp $";
+#endif
 #include "udp.h"
 
 /*

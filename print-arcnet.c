@@ -20,10 +20,6 @@
  *
  * From: NetBSD: print-arcnet.c,v 1.2 2000/04/24 13:02:28 itojun Exp
  */
-#ifndef lint
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-arcnet.c,v 1.15 2003-01-23 09:15:14 guy Exp $ (LBL)";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -37,6 +33,10 @@ static const char rcsid[] =
 #include "interface.h"
 #include "arcnet.h"
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-arcnet.c,v 1.16 2003-11-15 00:39:15 guy Exp $ (LBL)";
+#endif
 static int arcnet_encap_print(u_char arctype, const u_char *p,
     u_int length, u_int caplen);
 

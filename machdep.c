@@ -19,10 +19,6 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#ifndef lint
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/machdep.c,v 1.10 2002-09-05 21:25:36 guy Exp $ (LBL)";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -35,6 +31,14 @@ static const char rcsid[] =
  * have to include UNIX or Windows system header files to get it.
  */
 #include <tcpdump-stdinc.h>
+
+
+#include "interface.h"
+
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/machdep.c,v 1.11 2003-11-15 00:39:13 guy Exp $ (LBL)";
+#endif
 
 #ifndef HAVE___ATTRIBUTE__
 #define __attribute__(x)

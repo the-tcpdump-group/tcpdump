@@ -23,10 +23,6 @@
 #include "config.h"
 #endif
 
-#ifndef lint
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-vjc.c,v 1.11 2002-09-05 21:25:51 guy Exp $ (LBL)";
-#endif
 
 #include <tcpdump-stdinc.h>
 
@@ -36,6 +32,10 @@ static const char rcsid[] =
 #include "interface.h"
 #include "addrtoname.h"
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-vjc.c,v 1.12 2003-11-15 00:39:43 guy Exp $ (LBL)";
+#endif
 #include "slcompress.h"
 #include "ppp.h"
 

@@ -21,10 +21,6 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#ifndef lint
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.44 2003-10-28 03:16:36 itojun Exp $ (LBL)";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -58,6 +54,10 @@ extern char *strsep(char **stringp, const char *delim); /* Missing/strsep.c */
 #include "addrtoname.h"
 #include "extract.h"
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.45 2003-11-15 00:39:22 guy Exp $ (LBL)";
+#endif
 #ifndef HAVE_SOCKADDR_STORAGE
 #ifdef INET6
 struct sockaddr_storage {

@@ -18,10 +18,6 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-#ifndef lint
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.82 2003-07-01 19:10:26 guy Exp $ (LBL)";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -36,6 +32,10 @@ static const char rcsid[] =
 #include "addrtoname.h"
 #include "ethertype.h"
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.83 2003-11-15 00:39:22 guy Exp $ (LBL)";
+#endif
 #include "ether.h"
 
 const u_char *snapend;

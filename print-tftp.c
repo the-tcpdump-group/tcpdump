@@ -21,10 +21,6 @@
  * Format and print trivial file transfer protocol packets.
  */
 
-#ifndef lint
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tftp.c,v 1.35 2003-05-02 08:45:21 guy Exp $ (LBL)";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -44,6 +40,10 @@ static const char rcsid[] =
 #include "addrtoname.h"
 #include "extract.h"
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tftp.c,v 1.36 2003-11-15 00:39:42 guy Exp $ (LBL)";
+#endif
 /* op code to string mapping */
 static struct tok op2str[] = {
 	{ RRQ,		"RRQ" },	/* read request */

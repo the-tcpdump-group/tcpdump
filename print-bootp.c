@@ -20,10 +20,6 @@
  *
  * Format and print bootp packets.
  */
-#ifndef lint
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.75 2003-08-01 03:10:11 fenner Exp $ (LBL)";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -40,6 +36,10 @@ static const char rcsid[] =
 #include "ether.h"
 #include "bootp.h"
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.76 2003-11-15 00:39:17 guy Exp $ (LBL)";
+#endif
 static void rfc1048_print(const u_char *);
 static void cmu_print(const u_char *);
 

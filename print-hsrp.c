@@ -29,10 +29,6 @@
 
 /* Cisco Hot Standby Router Protocol (HSRP). */
 
-#ifndef lint
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-hsrp.c,v 1.7 2002-12-11 07:14:00 guy Exp $";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -45,6 +41,10 @@ static const char rcsid[] =
 #include "interface.h"
 #include "addrtoname.h"
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-hsrp.c,v 1.8 2003-11-15 00:39:24 guy Exp $";
+#endif
 /* HSRP op code types. */
 static const char *op_code_str[] = {
 	"hello",

@@ -19,10 +19,6 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#ifndef lint
-static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-decnet.c,v 1.36 2002-09-05 21:25:39 guy Exp $ (LBL)";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -46,6 +42,10 @@ struct rtentry;
 #include "interface.h"
 #include "addrtoname.h"
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-decnet.c,v 1.37 2003-11-15 00:39:19 guy Exp $ (LBL)";
+#endif
 /* Forwards */
 static void print_decnet_ctlmsg(const union routehdr *, u_int);
 static void print_t_info(int);
