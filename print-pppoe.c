@@ -17,11 +17,13 @@
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ * 
+ * Original code by Greg Stark <gsstark@mit.edu> 
  */
 
 #ifndef lint
 static const char rcsid[] =
-"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.22 2003-06-13 05:55:22 hannes Exp $ (LBL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.23 2003-06-14 06:05:52 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
