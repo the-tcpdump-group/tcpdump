@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/icmp6.h,v 1.14 2002-12-11 07:13:52 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/icmp6.h,v 1.15 2004-06-16 00:06:28 guy Exp $ (LBL) */
 /*	$NetBSD: icmp6.h,v 1.13 2000/08/03 16:30:37 itojun Exp $	*/
 /*	$KAME: icmp6.h,v 1.22 2000/08/03 15:25:16 jinmei Exp $	*/
 
@@ -117,18 +117,20 @@ struct icmp6_hdr {
 #define ICMP6_FQDN_REPLY		140	/* FQDN reply */
 #define ICMP6_NI_QUERY			139	/* node information request */
 #define ICMP6_NI_REPLY			140	/* node information reply */
+#define IND_SOLICIT			141	/* inverse neighbor solicitation */
+#define IND_ADVERT			142	/* inverse neighbor advertisement */
 
-/* The definitions below are experimental. TBA */
-#define MLD6_MTRACE_RESP		141	/* mtrace response(to sender) */
-#define MLD6_MTRACE			142	/* mtrace messages */
+#define ICMP6_V2_MEMBERSHIP_REPORT	143	/* v2 membership report */
+#define MLDV2_LISTENER_REPORT		143	/* v2 multicast listener report */
+#define ICMP6_HADISCOV_REQUEST		144
+#define ICMP6_HADISCOV_REPLY		145
+#define ICMP6_MOBILEPREFIX_SOLICIT	146
+#define ICMP6_MOBILEPREFIX_ADVERT	147
 
-/* Folloing numbers are defined in the mobile-ip draft. */
-#define ICMP6_HADISCOV_REQUEST		150	/* XXX To be authorized */
-#define ICMP6_HADISCOV_REPLY		151	/* XXX To be authorized */
-#define ICMP6_MOBILEPREFIX_SOLICIT	152	/* XXX To be authorized */
-#define ICMP6_MOBILEPREFIX_ADVERT	153	/* XXX To be authorized */
+#define MLD6_MTRACE_RESP		200	/* mtrace response(to sender) */
+#define MLD6_MTRACE			201	/* mtrace messages */
 
-#define ICMP6_MAXTYPE			153
+#define ICMP6_MAXTYPE			201
 
 #define ICMP6_DST_UNREACH_NOROUTE	0	/* no route to destination */
 #define ICMP6_DST_UNREACH_ADMIN	 	1	/* administratively prohibited */
@@ -175,6 +177,9 @@ struct mld6_hdr {
 #define mld6_cksum	mld6_hdr.icmp6_cksum
 #define mld6_maxdelay	mld6_hdr.icmp6_data16[0]
 #define mld6_reserved	mld6_hdr.icmp6_data16[1]
+
+#define MLD_MINLEN	24
+#define MLDV2_MINLEN	28
 
 /*
  * Neighbor Discovery
