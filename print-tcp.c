@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.59 1999-11-21 09:37:02 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.60 1999-11-21 15:57:51 assar Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -107,6 +107,8 @@ struct tcp_seq_hash {
 
 static struct tcp_seq_hash tcp_seq_hash[TSEQ_HASHSIZE];
 
+
+#define NETBIOS_SSN_PORT 139
 
 void
 tcp_print(register const u_char *bp, register u_int length,
@@ -483,6 +485,8 @@ tcp_print(register const u_char *bp, register u_int length,
 	bp += (tp->th_off * 4);
 	if (sport == 179 || dport == 179)
 		bgp_print(bp, length);
+	if (sport == NETBIOS_SSN_PORT || dport == NETBIOS_SSN_PORT)
+		nbt_tcp_print(bp, length);
 	return;
 bad:
 	fputs("[bad opt]", stdout);

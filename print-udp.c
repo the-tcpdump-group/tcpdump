@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.66 1999-11-21 12:38:24 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.67 1999-11-21 15:57:51 assar Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -307,6 +307,8 @@ rtcp_print(const u_char *hdr, const u_char *ep)
 #define ISAKMP_PORT_USER2 8500	/*??? - nonstandard*/
 #define RX_PORT_LOW 7000	/*XXX*/
 #define RX_PORT_HIGH 7009	/*XXX*/
+#define NETBIOS_NS_PORT   137
+#define NETBIOS_DGRAM_PORT   138
 
 #ifdef INET6
 #define RIPNG_PORT 521		/*XXX*/
@@ -507,6 +509,12 @@ udp_print(register const u_char *bp, u_int length, register const u_char *bp2)
 			krb_print((const void *)(up + 1), length);
 		else if (ISPORT(L2TP_PORT))
 			l2tp_print((const u_char *)(up + 1), length);
+ 		else if (ISPORT(NETBIOS_NS_PORT)) {
+ 		  nbt_udp137_print((const u_char *)(up + 1), length);
+ 		}
+ 		else if (ISPORT(NETBIOS_DGRAM_PORT)) {
+ 		  nbt_udp138_print((const u_char *)(up + 1), length);
+ 		}
 		else if (dport == 3456)
 			vat_print((const void *)(up + 1), length, up);
  		/*

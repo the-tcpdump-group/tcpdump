@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.69 1999-10-30 05:11:22 itojun Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.70 1999-11-21 15:57:50 assar Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -964,6 +964,27 @@ default \fIsnaplen\fP of 68 bytes may not capture enough of the packet
 to print.  Use the \fB\-s\fP flag to increase the snaplen if you
 need to seriously investigate name server traffic.  `\fB\-s 128\fP'
 has worked well for me.
+
+.HD
+SMB/CIFS decoding
+.LP
+tcpdump now includes fairly extensive SMB/CIFS/NBT decoding for data
+on UDP/137, UDP/138 and TCP/139. Some primitive decoding of IPX and
+NetBEUI SMB data is also done. 
+
+By default a fairly minimal decode is done, with a much more detailed
+decode done if -v is used. Be warned that with -v a single SMB packet
+may take up a page or more, so only use -v if you really want all the
+gory details.
+
+If you are decoding SMB sessions containing unicode strings then you
+may wish to set the environment variable USE_UNICODE to 1. A patch to
+auto-detect unicode srings would be welcome.
+
+For information on SMB packet formats and what all te fields mean see
+www.cifs.org or the pub/samba/specs/ directory on your favourite
+samba.org mirror site. The SMB patches were written by Andrew Tridgell
+(tridge@samba.org).
 
 .HD
 NFS Requests and Replies
