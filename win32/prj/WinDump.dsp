@@ -507,9 +507,5 @@ SOURCE=..\..\Tcpdump.c
 
 SOURCE=..\..\util.c
 # End Source File
-# Begin Source File
-
-SOURCE="..\..\Win32\Src\w32_fzs.c"
-# End Source File
 # End Target
 # End Project
