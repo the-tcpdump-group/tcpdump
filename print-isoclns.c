@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.33 2001-12-09 03:43:22 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.34 2001-12-13 09:31:21 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -226,7 +226,7 @@ struct isis_iih_lan_header {
     u_char circuit_type;
     u_char source_id[SYSTEM_ID_LEN];
     u_char holding_time[2];
-    u_char packet_len[2];
+    u_char pdu_len[2];
     u_char priority;
     u_char lan_id[SYSTEM_ID_LEN+1];
 };
@@ -235,7 +235,7 @@ struct isis_iih_ptp_header {
     u_char circuit_type;
     u_char source_id[SYSTEM_ID_LEN];
     u_char holding_time[2];
-    u_char packet_len[2];
+    u_char pdu_len[2];
     u_char circuit_id;
 };
 
@@ -677,7 +677,7 @@ static int isis_print (const u_char *p, u_int length)
 
     u_char pdu_type, max_area, type, len, tmp, alen, subl, subt, tslen, ttslen;
     const u_char *optr, *pptr, *tptr;
-    u_short packet_len;
+    u_short packet_len,pdu_len;
     u_int i,j,bit_length,byte_length,metric;
     u_char prefix[4]; /* copy buffer for ipv4 prefixes */
 #ifdef INET6
@@ -750,8 +750,15 @@ static int isis_print (const u_char *p, u_int length)
 		   header->fixed_len, (unsigned long)ISIS_IIH_LAN_HEADER_SIZE);
 	    return (0);
 	}
-	printf(", L%s Lan IIH",
-	       ISIS_MASK_LEVEL_BITS(pdu_type) ? "1" : "2"); 
+
+	pdu_len=EXTRACT_16BITS(header_iih_lan->pdu_len);
+	if (packet_len>pdu_len)
+	  packet_len=pdu_len; /* do TLV decoding as long as it makes sense */
+
+	printf(", L%s Lan IIH (%u)",
+	       ISIS_MASK_LEVEL_BITS(pdu_type) ? "1" : "2",
+	       pdu_len);
+ 
 	TCHECK(*header_iih_lan);
 	printf("\n\t\t  source-id: ");
 	isis_print_sysid(header_iih_lan->source_id);
@@ -788,7 +795,12 @@ static int isis_print (const u_char *p, u_int length)
 		   header->fixed_len, (unsigned long)ISIS_IIH_PTP_HEADER_SIZE);
 	    return (0);
 	}
-	printf(", PTP IIH");
+	
+	pdu_len=EXTRACT_16BITS(header_iih_ptp->pdu_len);
+	if (packet_len>pdu_len)
+	  packet_len=pdu_len; /* do TLV decoding as long as it makes sense */
+	
+	printf(", PTP IIH (%u)",pdu_len);
 	TCHECK(*header_iih_ptp);
 	printf("\n\t\t  source-id: ");
 	isis_print_sysid(header_iih_ptp->source_id);
@@ -824,10 +836,15 @@ static int isis_print (const u_char *p, u_int length)
 		   header->fixed_len, (unsigned long)ISIS_LSP_HEADER_SIZE);
 	    return (0);
 	}
+	
+	pdu_len=EXTRACT_16BITS(header_lsp->pdu_len);
+	if (packet_len>pdu_len)
+	  packet_len=pdu_len; /* do TLV decoding as long as it makes sense */
+	
 	if (pdu_type == L1_LSP)	
-	    printf(", L1 LSP");
+	    printf(", L1 LSP (%u)",pdu_len);
 	else if (pdu_type == L2_LSP)	
-	    printf(", L2 LSP");   
+	    printf(", L2 LSP (%u)",pdu_len);   
 
 	TCHECK(*header_lsp);
 	printf("\n\t\t  lsp-id: ");
@@ -859,7 +876,12 @@ static int isis_print (const u_char *p, u_int length)
 		   header->fixed_len, (unsigned long)ISIS_CSNP_HEADER_SIZE);
 	    return (0);
 	}
-	printf(", L%s CSNP", ISIS_MASK_LEVEL_BITS(pdu_type) ? "2" : "1");
+	
+	pdu_len=EXTRACT_16BITS(header_csnp->pdu_len);
+	if (packet_len>pdu_len)
+	  packet_len=pdu_len; /* do TLV decoding as long as it makes sense */
+	
+	printf(", L%s CSNP (%u)", ISIS_MASK_LEVEL_BITS(pdu_type) ? "2" : "1", pdu_len);
 	TCHECK(*header_csnp);
 	printf("\n\t\t  source-id:    ");
 	isis_print_nodeid(header_csnp->source_id);		
@@ -879,7 +901,12 @@ static int isis_print (const u_char *p, u_int length)
 		   header->fixed_len, (unsigned long)ISIS_PSNP_HEADER_SIZE);
 	    return (0);
 	}
-	printf(", L%s PSNP", ISIS_MASK_LEVEL_BITS(pdu_type) ? "2" : "1");
+
+	pdu_len=EXTRACT_16BITS(header_psnp->pdu_len);
+	if (packet_len>pdu_len)
+	  packet_len=pdu_len; /* do TLV decoding as long as it makes sense */
+	  	
+	printf(", L%s PSNP (%u)", ISIS_MASK_LEVEL_BITS(pdu_type) ? "2" : "1", pdu_len);
 	TCHECK(*header_psnp);
 	printf("\n\t\t  source-id:    ");
 	isis_print_nodeid(header_psnp->source_id); 
