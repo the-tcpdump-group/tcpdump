@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.114 2003-12-22 19:41:51 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.115 2004-01-02 09:32:13 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -142,7 +142,6 @@ static struct tok isis_pdu_values[] = {
 #define ISIS_TLV_SHARED_RISK_GROUP   138 /* draft-ietf-isis-gmpls-extensions */
 #define ISIS_TLV_NORTEL_PRIVATE1     176
 #define ISIS_TLV_NORTEL_PRIVATE2     177
-#define ISIS_TLV_HOLDTIME            198 /* ES-IS */
 #define ISIS_TLV_RESTART_SIGNALING   211 /* draft-ietf-isis-restart-01 */
 #define ISIS_TLV_MT_IS_REACH         222 /* draft-ietf-isis-wg-multi-topology-05 */
 #define ISIS_TLV_MT_SUPPORTED        229 /* draft-ietf-isis-wg-multi-topology-05 */
@@ -152,7 +151,7 @@ static struct tok isis_pdu_values[] = {
 #define ISIS_TLV_MT_IP6_REACH        237 /* draft-ietf-isis-wg-multi-topology-05 */
 #define ISIS_TLV_PTP_ADJ             240 /* rfc3373 */
 #define ISIS_TLV_IIH_SEQNR           241 /* draft-shen-isis-iih-sequence-00 */
-#define ISIS_TLV_VENDOR_PRIVATE      250 /* draft-ietf-isis-proprietary-tlv-00 */
+#define ISIS_TLV_VENDOR_PRIVATE      250 /* draft-ietf-isis-experimental-tlv-01 */
 
 static struct tok isis_tlv_values[] = {
     { ISIS_TLV_AREA_ADDR,	   "Area address(es)"},
