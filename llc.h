@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/llc.h,v 1.11 2001-05-09 01:08:47 fenner Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/llc.h,v 1.12 2001-05-10 02:57:57 fenner Exp $ (LBL)
  */
 
 /*
@@ -51,8 +51,8 @@ struct llc {
 
 #define	llcui		ctl.snap.snap_ui
 #define	llcpi		ctl.snap.snap_pi
-#define	orgcode		ctl.snap_ether.snap_orgcode
-#define	ethertype	ctl.snap_ether.snap_ethertype
+#define	llc_orgcode	ctl.snap_ether.snap_orgcode
+#define	llc_ethertype	ctl.snap_ether.snap_ethertype
 #define	llcis		ctl.is_ctl
 #define	llcu		ctl.u_ctl
 
@@ -124,3 +124,7 @@ struct llc {
 #ifndef LLCSAP_ISONS
 #define	LLCSAP_ISONS		0xfe
 #endif
+
+#define	OUI_CISCO	0x00000c
+#define	ETHERTYPE_CISCO_CDP	0x2000	/* Cisco Discovery Protocol */
+#define	OUI_APPLETALK	0x080007

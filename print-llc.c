@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.36 2001-01-28 09:46:43 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.37 2001-05-10 02:57:57 fenner Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -46,6 +46,7 @@ static const char rcsid[] =
 #include "extract.h"			/* must come after interface.h */
 
 #include "llc.h"
+#include "ethertype.h"
 
 static struct tok cmd2str[] = {
 	{ LLC_UI,	"ui" },
@@ -92,14 +93,6 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 		 */
 		ipx_print(p, length);
 		return (1);
-	}
-
-	/* Cisco Discovery Protocol  - SNAP & ether type 0x2000 */
-	if(llc.ssap == LLCSAP_SNAP && llc.dsap == LLCSAP_SNAP &&
-		llc.llcui == LLC_UI && 
-		llc.ethertype[0] == 0x20 && llc.ethertype[1] == 0x00 ) {
-		    cdp_print( p, length, caplen, esrc, edst);
-		    return (1);
 	}
 
 	if (llc.ssap == LLCSAP_8021D && llc.dsap == LLCSAP_8021D) {
@@ -175,6 +168,8 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 
 	if (llc.ssap == LLCSAP_SNAP && llc.dsap == LLCSAP_SNAP
 	    && llc.llcui == LLC_UI) {
+		u_int32_t orgcode;
+
 		if (caplen < sizeof(llc)) {
 			(void)printf("[|llc-snap]");
 			default_print((u_char *)p, caplen);
@@ -187,12 +182,41 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 		length -= sizeof(llc);
 		p += sizeof(llc);
 
-		/* This is an encapsulated Ethernet packet */
-		et = EXTRACT_16BITS(&llc.ethertype[0]);
-		ret = ether_encap_print(et, p, length, caplen,
-		    extracted_ethertype);
-		if (ret)
-			return (ret);
+		orgcode = EXTRACT_24BITS(&llc.llc_orgcode[0]);
+		et = EXTRACT_16BITS(&llc.llc_ethertype[0]);
+		switch (orgcode) {
+		case 0x000000:
+			/* This is an encapsulated Ethernet packet */
+			ret = ether_encap_print(et, p, length, caplen,
+			    extracted_ethertype);
+			if (ret)
+				return (ret);
+			break;
+
+		case OUI_APPLETALK:
+			if (et == ETHERTYPE_ATALK) {
+				/*
+				 * No, I have no idea why Apple used one
+				 * of their own OUIs, rather than
+				 * 0x000000, and an Ethernet packet
+				 * type, for Appletalk data packets,
+				 * but used 0x000000 and an Ethernet
+				 * packet type for AARP packets.
+				 */
+				ret = ether_encap_print(et, p, length, caplen,
+				    extracted_ethertype);
+				if (ret)
+					return (ret);
+			}
+			break;
+
+		case OUI_CISCO:
+			if (et == ETHERTYPE_CISCO_CDP) {
+				cdp_print( p, length, caplen, esrc, edst);
+				return 1;
+			}
+			break;
+		}
 	}
 
 	if ((llc.ssap & ~LLC_GSAP) == llc.dsap) {
