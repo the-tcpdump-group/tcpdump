@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.169.2.2 2004-03-28 21:01:41 fenner Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.169.2.3 2004-03-28 21:04:48 fenner Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.169.2.2 $)
+AC_REVISION($Revision: 1.169.2.3 $)
 AC_PREREQ(2.50)
 AC_INIT(tcpdump.c)
 
@@ -151,8 +151,8 @@ if test "$ipv6" = "yes"; then
 		case $i in
 		inria)
 			dnl http://www.kame.net/
-			AC_EGREP_CPP(yes, [dnl
-#include <netinet/in.h>
+			AC_EGREP_CPP(yes,
+[#include <netinet/in.h>
 #ifdef IPV6_INRIA_VERSION
 yes
 #endif],
@@ -161,8 +161,8 @@ yes
 			;;
 		kame)
 			dnl http://www.kame.net/
-			AC_EGREP_CPP(yes, [dnl
-#include <netinet/in.h>
+			AC_EGREP_CPP(yes,
+[#include <netinet/in.h>
 #ifdef __KAME__
 yes
 #endif],
@@ -174,8 +174,8 @@ yes
 			;;
 		linux-glibc)
 			dnl http://www.v6.linux.or.jp/
-			AC_EGREP_CPP(yes, [dnl
-#include <features.h>
+			AC_EGREP_CPP(yes,
+[#include <features.h>
 #if defined(__GLIBC__) && __GLIBC__ >= 2 && __GLIBC_MINOR__ >= 1
 yes
 #endif],
@@ -197,8 +197,8 @@ yes
 			fi
 			;;
 		toshiba)
-			AC_EGREP_CPP(yes, [dnl
-#include <sys/param.h>
+			AC_EGREP_CPP(yes,
+[#include <sys/param.h>
 #ifdef _TOSHIBA_INET6
 yes
 #endif],
@@ -208,8 +208,8 @@ yes
 				CFLAGS="-DINET6 $CFLAGS"])
 			;;
 		v6d)
-			AC_EGREP_CPP(yes, [dnl
-#include </usr/local/v6/include/sys/v6config.h>
+			AC_EGREP_CPP(yes,
+[#include </usr/local/v6/include/sys/v6config.h>
 #ifdef __V6D__
 yes
 #endif],
@@ -219,8 +219,8 @@ yes
 				CFLAGS="-I/usr/local/v6/include $CFLAGS"])
 			;;
 		zeta)
-			AC_EGREP_CPP(yes, [dnl
-#include <sys/param.h>
+			AC_EGREP_CPP(yes,
+[#include <sys/param.h>
 #ifdef _ZETA_MINAMI_INET6
 yes
 #endif],
@@ -513,7 +513,7 @@ needsnprintf=no
 AC_CHECK_FUNCS(vsnprintf snprintf,,
 	[needsnprintf=yes])
 if test $needsnprintf = yes; then
-	LIBOBJS="$LIBOBJS snprintf.o"
+	AC_LIBOBJ(snprintf.o)
 fi
 
 AC_LBL_TYPE_SIGNAL
@@ -550,7 +550,7 @@ AC_TRY_LINK([#include <sys/types.h>
 #include <arpa/inet.h>], [char src[4], dst[128];
 inet_ntop(AF_INET, src, dst, sizeof(dst));],
 	[AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)
-	LIBOBJS="$LIBOBJS inet_ntop.o"])
+	AC_LIBOBJ(inet_ntop.o)])
 AC_MSG_CHECKING(for inet_pton)
 AC_TRY_LINK([#include <sys/types.h>
 #include <sys/socket.h>
@@ -558,7 +558,7 @@ AC_TRY_LINK([#include <sys/types.h>
 #include <arpa/inet.h>], [char src[128], dst[4];
 inet_pton(AF_INET, src, dst);],
 	[AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)
-	LIBOBJS="$LIBOBJS inet_pton.o"])
+	AC_LIBOBJ(inet_pton.o)])
 AC_MSG_CHECKING(for inet_aton)
 AC_TRY_LINK([#include <sys/types.h>
 #include <netinet/in.h>
@@ -566,7 +566,7 @@ AC_TRY_LINK([#include <sys/types.h>
 struct in_addr dst;
 inet_aton(src, &dst);],
 	[AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)
-	LIBOBJS="$LIBOBJS inet_aton.o"])
+	AC_LIBOBJ(inet_aton.o)])
 
 dnl portability macros for getaddrinfo/getnameinfo
 dnl

@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.98.2.3 2003-11-18 23:12:10 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.98.2.4 2004-03-28 21:04:49 fenner Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -327,7 +327,7 @@ AC_DEFUN(AC_LBL_LIBPCAP,
     dnl
     AC_CHECK_FUNC(pcap_list_datalinks,
 	AC_DEFINE(HAVE_PCAP_LIST_DATALINKS),
-	LIBOBJS="$LIBOBJS datalinks.o")
+	AC_LIBOBJ(datalinks))
     AC_CHECK_FUNC(pcap_set_datalink,
 	AC_DEFINE(HAVE_PCAP_SET_DATALINK))
     AC_CHECK_FUNC(pcap_datalink_name_to_val,
@@ -335,9 +335,9 @@ AC_DEFUN(AC_LBL_LIBPCAP,
 	    AC_DEFINE(HAVE_PCAP_DATALINK_NAME_TO_VAL)
 	    AC_CHECK_FUNC(pcap_datalink_val_to_description,
 		AC_DEFINE(HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION),
-		LIBOBJS="$LIBOBJS dlnames.o")
+		AC_LIBOBJ(dlnames))
 	],
-	LIBOBJS="$LIBOBJS dlnames.o")
+	AC_LIBOBJ(dlnames))
 
     dnl
     dnl Check for "pcap_breakloop()"; you can't substitute for it if
