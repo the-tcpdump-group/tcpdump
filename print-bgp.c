@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.21 2000-12-05 05:48:35 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.22 2001-01-28 09:52:47 itojun Exp $";
 #endif
 
 #include <sys/param.h>
@@ -192,7 +192,7 @@ static const char *bgpattr_type[] = {
 
 /* Subsequent address family identifier, RFC2283 section 7 */
 static const char *bgpattr_nlri_safi[] = {
-    "Reserved", "Unicast", "Multicast", "Unicast+Multicast",
+	"Reserved", "Unicast", "Multicast", "Unicast+Multicast",
 };
 #define bgp_attr_nlri_safi(x) \
 	num_or_str(bgpattr_nlri_safi, \
@@ -584,9 +584,10 @@ bgp_update_print(const u_char *dat, int length)
 	/* Unfeasible routes */
 	len = EXTRACT_16BITS(p);
 	if (len) {
-		/*  Without keeping state from the original NLRI message,
-		 *  it's not possible to tell if this a v4 or v6 route,
-		 *  so only try to decode it if we're not v6 enabled.
+		/*
+		 * Without keeping state from the original NLRI message,
+		 * it's not possible to tell if this a v4 or v6 route,
+		 * so only try to decode it if we're not v6 enabled.
 	         */
 #ifdef INET6
 		printf(" (Withdrawn routes: %d bytes)", len);

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.57 2000-10-10 05:03:32 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.58 2001-01-28 09:53:18 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -284,7 +284,7 @@ icmp_print(register const u_char *bp, u_int plen, register const u_char *bp2)
 	str = buf;
 
 #if 0
-        (void)printf("%s > %s: ",
+	(void)printf("%s > %s: ",
 		ipaddr_string(&ip->ip_src),
 		ipaddr_string(&ip->ip_dst));
 #endif
@@ -339,12 +339,12 @@ icmp_print(register const u_char *bp, u_int plen, register const u_char *bp2)
 		    {
 			register const struct mtu_discovery *mp;
 			mp = (struct mtu_discovery *)&dp->icmp_void;
-                        mtu = EXTRACT_16BITS(&mp->nexthopmtu);
-                        if (mtu) {
+			mtu = EXTRACT_16BITS(&mp->nexthopmtu);
+			if (mtu) {
 				(void)snprintf(buf, sizeof(buf),
 				    "%s unreachable - need to frag (mtu %d)",
 				    ipaddr_string(&dp->icmp_ip.ip_dst), mtu);
-                        } else {
+			} else {
 				(void)snprintf(buf, sizeof(buf),
 				    "%s unreachable - need to frag",
 				    ipaddr_string(&dp->icmp_ip.ip_dst));
@@ -480,7 +480,7 @@ icmp_print(register const u_char *bp, u_int plen, register const u_char *bp2)
 		str = tok2str(icmp2str, "type-#%d", dp->icmp_type);
 		break;
 	}
-        (void)printf("icmp: %s", str);
+	(void)printf("icmp: %s", str);
 	if (vflag) {
 		if (TTEST2(*bp, plen)) {
 			if (in_cksum((u_short*)dp, plen, 0))
