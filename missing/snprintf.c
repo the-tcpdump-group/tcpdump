@@ -31,7 +31,7 @@
  * SUCH DAMAGE.
  */
 
-/* $Id: snprintf.c,v 1.3 2000-01-10 16:57:44 fenner Exp $ */
+/* $Id: snprintf.c,v 1.4 2001-01-02 22:33:04 guy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -39,7 +39,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/missing/snprintf.c,v 1.3 2000-01-10 16:57:44 fenner Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/missing/snprintf.c,v 1.4 2001-01-02 22:33:04 guy Exp $";
 #endif
 
 #include <stdio.h>
@@ -274,7 +274,7 @@ append_char(struct state *state,
 if (long_flag) \
      res = (unsig long)va_arg(arg, unsig long); \
 else if (short_flag) \
-     res = (unsig short)va_arg(arg, unsig short); \
+     res = (unsig short)va_arg(arg, unsig int); \
 else \
      res = (unsig int)va_arg(arg, unsig int)
 
