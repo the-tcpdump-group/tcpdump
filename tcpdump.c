@@ -24,7 +24,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.166 2001-07-04 22:03:13 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.167 2001-10-01 01:12:01 mcr Exp $ (LBL)";
 #endif
 
 /*
@@ -76,6 +76,7 @@ int uflag = 0;			/* Print undecoded NFS handles */
 int vflag;			/* verbose */
 int xflag;			/* print packet in hex */
 int Xflag;			/* print packet in ascii as well as hex */
+off_t Cflag = 0;                /* rotate dump files after this many bytes */
 
 char *espsecret = NULL;		/* ESP secret key */
 
@@ -85,12 +86,16 @@ int infodelay;
 int infoprint;
 
 char *program_name;
+char *WFileName;
 
 int32_t thiszone;		/* seconds offset from gmt to local time */
 
 /* Forwards */
 static RETSIGTYPE cleanup(int);
 static void usage(void) __attribute__((noreturn));
+
+extern void dump_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *sp);
+
 #ifdef SIGINFO
 RETSIGTYPE requestinfo(int);
 #endif
@@ -164,7 +169,7 @@ lookup_printer(int type)
 	/* NOTREACHED */
 }
 
-static pcap_t *pd;
+pcap_t *pd;
 
 extern int optind;
 extern int opterr;
@@ -175,7 +180,8 @@ main(int argc, char **argv)
 {
 	register int cnt, op, i;
 	bpf_u_int32 localnet, netmask;
-	register char *cp, *infile, *cmdbuf, *device, *RFileName, *WFileName;
+	register char *cp, *infile, *cmdbuf, *device, *RFileName;
+	extern char *WFileName;
 	pcap_handler printer;
 	struct bpf_program fcode;
 	RETSIGTYPE (*oldhandler)(int);
@@ -201,7 +207,7 @@ main(int argc, char **argv)
 	
 	opterr = 0;
 	while (
-	    (op = getopt(argc, argv, "ac:deE:fF:i:lm:nNOpqr:Rs:StT:uvw:xXY")) != -1)
+	    (op = getopt(argc, argv, "ac:C:deE:fF:i:lm:nNOpqr:Rs:StT:uvw:xXY")) != -1)
 		switch (op) {
 
 		case 'a':
@@ -212,6 +218,12 @@ main(int argc, char **argv)
 			cnt = atoi(optarg);
 			if (cnt <= 0)
 				error("invalid packet count %s", optarg);
+			break;
+
+		case 'C':
+			Cflag = atoi(optarg) * 1000000;
+			if (Cflag < 0) 
+				error("invalid file size %s", optarg);
 			break;
 
 		case 'd':
@@ -436,7 +448,7 @@ main(int argc, char **argv)
 		pcap_dumper_t *p = pcap_dump_open(pd, WFileName);
 		if (p == NULL)
 			error("%s", pcap_geterr(pd));
-		printer = pcap_dump;
+		printer = dump_and_trunc;
 		pcap_userdata = (u_char *)p;
 	} else {
 		printer = lookup_printer(pcap_datalink(pd));
@@ -445,6 +457,7 @@ main(int argc, char **argv)
 		(void)setsignal(SIGINFO, requestinfo);
 #endif
 	}
+
 	if (RFileName == NULL) {
 		(void)fprintf(stderr, "%s: listening on %s\n",
 		    program_name, device);
