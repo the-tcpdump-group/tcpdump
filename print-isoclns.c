@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.71 2002-12-10 23:51:46 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.72 2002-12-11 06:00:41 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1100,7 +1100,7 @@ isis_print_ext_is_reach (const u_int8_t *tptr,const char *ident) {
             subl=*(tptr++);
             /* prepend the ident string */
             snprintf(ident_buffer, sizeof(ident_buffer), "%s  ",ident);
-            if(!isis_print_is_reach_subtlv(tptr,subt,subl,(u_int8_t *)ident_buffer))
+            if(!isis_print_is_reach_subtlv(tptr,subt,subl,ident_buffer))
                 return(0);
             tptr+=subl;
             tslen-=(subl+2);
