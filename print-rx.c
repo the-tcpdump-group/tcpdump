@@ -13,7 +13,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.10 2000-02-09 16:29:00 kenh Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.11 2000-02-10 17:56:13 kenh Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -417,28 +417,35 @@ rx_print(register const u_char *bp, int length, int sport, int dport,
 
 	printf(" rx %s", tok2str(rx_types, "type %d", rxh->type));
 
-	if (vflag > 1) {
+	if (vflag) {
 		int firstflag = 0;
-		printf(" cid %08x call# %d seq %d ser %d",
-		       (int) EXTRACT_32BITS(&rxh->cid),
-		       (int) EXTRACT_32BITS(&rxh->callNumber),
+
+		if (vflag > 1)
+			printf(" cid %08x call# %d",
+			       (int) EXTRACT_32BITS(&rxh->cid),
+			       (int) EXTRACT_32BITS(&rxh->callNumber));
+
+		printf(" seq %d ser %d",
 		       (int) EXTRACT_32BITS(&rxh->seq),
 		       (int) EXTRACT_32BITS(&rxh->serial));
+
 		if (vflag > 2)
 			printf(" secindex %d serviceid %hu",
 				(int) rxh->securityIndex,
 				EXTRACT_16BITS(&rxh->serviceId));
-		for (i = 0; i < NUM_RX_FLAGS; i++) {
-			if (rxh->flags & rx_flags[i].v) {
-				if (!firstflag) {
-					firstflag = 1;
-					printf(" ");
-				} else {
-					printf(",");
+
+		if (vflag > 1)
+			for (i = 0; i < NUM_RX_FLAGS; i++) {
+				if (rxh->flags & rx_flags[i].v) {
+					if (!firstflag) {
+						firstflag = 1;
+						printf(" ");
+					} else {
+						printf(",");
+					}
+					printf("<%s>", rx_flags[i].s);
 				}
-				printf("<%s>", rx_flags[i].s);
 			}
-		}
 	}
 
 	/*
