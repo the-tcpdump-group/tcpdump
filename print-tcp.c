@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.115 2004-05-27 21:20:50 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.116 2004-07-08 10:25:08 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -219,11 +219,12 @@ tcp_print(register const u_char *bp, register u_int length,
 	hlen = TH_OFF(tp) * 4;
 
 	/*
-	 * If data present and NFS port used, assume NFS.
+	 * If data present, header length valid, and NFS port used,
+	 * assume NFS.
 	 * Pass offset of data plus 4 bytes for RPC TCP msg length
 	 * to NFS print routines.
 	 */
-	if (!qflag) {
+	if (!qflag && hlen >= sizeof(*tp) && hlen <= length) {
 		if ((u_char *)tp + 4 + sizeof(struct rpc_msg) <= snapend &&
 		    dport == NFS_PORT) {
 			nfsreq_print((u_char *)tp + hlen + 4, length - hlen,
@@ -264,6 +265,12 @@ tcp_print(register const u_char *bp, register u_int length,
 		}
 	}
 
+	if (hlen < sizeof(*tp)) {
+		(void)printf(" tcp %d [bad hdr length %u - too short, < %u]",
+		    length - hlen, hlen, sizeof(*tp));
+		return;
+	}
+
 	TCHECK(*tp);
 
 	seq = EXTRACT_32BITS(&tp->th_seq);
@@ -272,7 +279,11 @@ tcp_print(register const u_char *bp, register u_int length,
 	urp = EXTRACT_16BITS(&tp->th_urp);
 
 	if (qflag) {
-		(void)printf("tcp %d", length - TH_OFF(tp) * 4);
+		(void)printf("tcp %d", length - hlen);
+		if (hlen > length) {
+			(void)printf(" [bad hdr length %u - too long, > %u]",
+			    hlen, length);
+		}
 		return;
 	}
 	if ((flags = tp->th_flags) & (TH_SYN|TH_FIN|TH_RST|TH_PUSH|
@@ -398,7 +409,8 @@ tcp_print(register const u_char *bp, register u_int length,
 		thseq = thack = threv = 0;
 	}
 	if (hlen > length) {
-		(void)printf(" [bad hdr length]");
+		(void)printf(" [bad hdr length %u - too long, > %u]",
+		    hlen, length);
 		return;
 	}
 
