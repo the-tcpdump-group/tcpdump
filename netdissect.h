@@ -21,7 +21,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.2 2004-03-25 03:29:53 mcr Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.3 2004-04-02 06:52:06 guy Exp $ (LBL)
  */
 
 #ifndef netdissect_h
@@ -85,6 +85,7 @@ struct netdissect_options {
   int ndo_sflag;		/* use the libsmi to translate OIDs */
   int ndo_Sflag;		/* print raw TCP sequence numbers */
   int ndo_tflag;		/* print packet arrival time */
+  int ndo_Uflag;		/* "unbuffered" output of dump files */
   int ndo_uflag;		/* Print undecoded NFS handles */
   int ndo_vflag;		/* verbose */
   int ndo_xflag;		/* print packet in hex */
@@ -100,7 +101,7 @@ struct netdissect_options {
   int ndo_Cflag_count;      /* Keep track of which file number we're writing */
   int ndo_Wflag;          /* recycle output files after this number of files */
   int ndo_WflagChars;     
-  char *ndo_dltname;
+  const char *ndo_dltname;
 
   char *ndo_espsecret;
   char *ndo_tcpmd5secret;     	/* TCP-MD5 secret key */
