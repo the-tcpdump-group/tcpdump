@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.181 2002-04-24 06:55:55 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.182 2002-04-25 04:31:42 guy Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -81,8 +81,6 @@ extern int xflag;		/* print packet in hex */
 extern int Xflag;		/* print packet in hex/ascii */
 extern int Aflag;		/* print packet only in ascii observing TAB, LF, CR and SPACE as graphical chars */
 extern char *espsecret;
-extern struct esp_algorithm *espsecret_xform;   /* cache of decoded alg. */
-extern char                 *espsecret_key;
 
 extern int packettype;		/* as specified by -T */
 #define PT_VAT		1	/* Visual Audio Tool */
