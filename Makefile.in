@@ -17,7 +17,7 @@
 #  WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 #  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.227 2000-01-19 05:34:18 itojun Exp $ (LBL)
+# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.228 2000-04-27 10:05:30 itojun Exp $ (LBL)
 
 #
 # Various configurable paths (remember to edit Makefile.in, not Makefile)
@@ -76,7 +76,7 @@ CSRC =	tcpdump.c \
 	print-esp.c print-ah.c print-vjc.c print-isakmp.c print-chdlc.c \
 	print-ipcomp.c print-mobile.c print-l2tp.c print-bgp.c print-rx.c \
 	print-lane.c print-cip.c print-pppoe.c print-lcp.c \
-	print-smb.c smbutil.c print-ascii.c print-telnet.c
+	print-smb.c smbutil.c print-ascii.c print-telnet.c print-cnfp.c
 
 LOCALSRC = @LOCALSRC@
 GENSRC = version.c

@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.122 2000-04-01 12:10:21 assar Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.123 2000-04-27 10:05:31 itojun Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -105,6 +105,7 @@ extern int packettype;		/* as specified by -T */
 #define PT_RTP		4	/* Real-Time Applications protocol */
 #define PT_RTCP		5	/* Real-Time Applications control protocol */
 #define PT_SNMP		6	/* Simple Network Management Protocol */
+#define PT_CNFP		7	/* Cisco NetFlow protocol */
 
 #ifndef min
 #define min(a,b) ((a)>(b)?(b):(a))
@@ -233,6 +234,7 @@ extern void atalk_print(const u_char *, u_int);
 extern void atm_if_print(u_char *, const struct pcap_pkthdr *, const u_char *);
 extern void bootp_print(const u_char *, u_int, u_short, u_short);
 extern void bgp_print(const u_char *, int);
+extern void cnfp_print(const u_char *cp, u_int len, const u_char *bp);
 extern void decnet_print(const u_char *, u_int, u_int);
 extern void default_print(const u_char *, u_int);
 extern void default_print_unaligned(const u_char *, u_int);
