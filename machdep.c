@@ -21,13 +21,19 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/machdep.c,v 1.8 2002-08-01 08:52:58 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/machdep.c,v 1.9 2002-08-06 04:40:11 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
+/*
+ * XXX - all we need, on platforms other than DEC OSF/1 (a/k/a Digital UNIX,
+ * a/k/a Tru64 UNIX), is "size_t", which is a standard C type; what do we
+ * need to do to get it defined?  This is clearly wrong, as we shouldn't
+ * have to include UNIX or Windows system header files to get it.
+ */
 #include <tcpdump-stdinc.h>
 
 #ifdef __osf__
