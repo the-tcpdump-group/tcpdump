@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.70 2002-12-10 17:17:14 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.71 2002-12-10 23:51:46 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -50,6 +50,9 @@ static const char rcsid[] =
 #define NLPID_IP6       0x8e
 #define NLPID_IP        0xcc
 #define	NLPID_NULLNS	0
+
+#define IPV4            1       /* AFI value */
+#define IPV6            2       /* AFI value */
 
 /*
  * IS-IS is defined in ISO 10589.  Look there for protocol definitions.
@@ -233,9 +236,8 @@ static struct tok isis_subtlv_idrp_values[] = {
 #define ISIS_MASK_TLV_EXT_IP_UPDOWN(x)     ((x)&0x80)
 #define ISIS_MASK_TLV_EXT_IP_SUBTLV(x)     ((x)&0x40)
 
-#define ISIS_MASK_TLV_IP6_UPDOWN(x)        ((x)&0x80)
-#define ISIS_MASK_TLV_IP6_IE(x)            ((x)&0x40)
-#define ISIS_MASK_TLV_IP6_SUBTLV(x)        ((x)&0x20)
+#define ISIS_MASK_TLV_EXT_IP6_IE(x)        ((x)&0x40)
+#define ISIS_MASK_TLV_EXT_IP6_SUBTLV(x)    ((x)&0x20)
 
 #define ISIS_MASK_TLV_RESTART_RR(x)        ((x)&0x1)
 #define ISIS_MASK_TLV_RESTART_RA(x)        ((x)&0x2)
@@ -1098,7 +1100,7 @@ isis_print_ext_is_reach (const u_int8_t *tptr,const char *ident) {
             subl=*(tptr++);
             /* prepend the ident string */
             snprintf(ident_buffer, sizeof(ident_buffer), "%s  ",ident);
-            if(!isis_print_is_reach_subtlv(tptr,subt,subl,(char *)ident_buffer))
+            if(!isis_print_is_reach_subtlv(tptr,subt,subl,(u_int8_t *)ident_buffer))
                 return(0);
             tptr+=subl;
             tslen-=(subl+2);
@@ -1134,6 +1136,108 @@ isis_print_mtid (const u_int8_t *tptr,const char *ident) {
 }
 
 /*
+ * this is the common extended IP reach decoder
+ * it is called from TLVs (135,235,236,237)
+ * we process the TLV and optional subTLVs and return
+ * the amount of processed bytes
+ */
+
+static int
+isis_print_extd_ip_reach (const u_int8_t *tptr, const char *ident, u_int16_t afi) {
+
+    char ident_buffer[20];
+    u_int8_t prefix[14]; /* shared copy buffer for IPv4 and IPv6 prefixes */
+    u_int metric, status_byte, bit_length, byte_length, sublen, processed, subtlvtype, subtlvlen;
+
+    if (!TTEST2(*tptr, 4))
+        return (0);
+    metric = EXTRACT_32BITS(tptr);
+    processed=4;
+    tptr+=4;
+    
+    if (afi == IPV4) {
+        if (!TTEST2(*tptr, 1)) /* fetch status byte */
+            return (0);
+        status_byte=*(tptr++);
+        bit_length = status_byte&0x3f;
+        processed++;
+#ifdef INET6
+    } else if (afi == IPV6) {
+        if (!TTEST2(*tptr, 1)) /* fetch status & prefix_len byte */
+            return (0);
+        status_byte=*(tptr++);
+        bit_length=*(tptr++);
+        processed+=2;
+#endif
+    } else
+        return (0); /* somebody is fooling us */
+
+    byte_length = (bit_length + 7) / 8; /* prefix has variable length encoding */
+   
+    if (!TTEST2(*tptr, byte_length))
+        return (0);
+    memset(prefix, 0, 16);              /* clear the copy buffer */
+    memcpy(prefix,tptr,byte_length);    /* copy as much as is stored in the TLV */
+    tptr+=byte_length;
+    processed+=byte_length;
+
+    if (afi == IPV4)
+        printf("%sIPv4 prefix: %s/%d",
+               ident,
+               ipaddr_string(prefix),
+               bit_length);
+#ifdef INET6
+    if (afi == IPV6)
+        printf("%sIPv6 prefix: %s/%d",
+               ident,
+               ip6addr_string(prefix),
+               bit_length);
+#endif 
+   
+    printf("%s  Metric: %u, Distribution: %s",
+           ident,
+           metric,
+           ISIS_MASK_TLV_EXT_IP_UPDOWN(status_byte) ? "down" : "up");
+
+    if (afi == IPV4)
+        printf(", %ssub-TLVs present",
+               ISIS_MASK_TLV_EXT_IP_SUBTLV(status_byte) ? "" : "no ");
+#ifdef INET6
+    if (afi == IPV6)
+        printf(", %s, %ssub-TLVs present",
+               ISIS_MASK_TLV_EXT_IP6_IE(status_byte) ? "External" : "Internal",
+               ISIS_MASK_TLV_EXT_IP6_SUBTLV(status_byte) ? "" : "no ");
+#endif
+    
+    if ((ISIS_MASK_TLV_EXT_IP_SUBTLV(status_byte)  && afi == IPV4) ||
+        (ISIS_MASK_TLV_EXT_IP6_SUBTLV(status_byte) && afi == IPV6)) {
+        /* assume that one prefix can hold more
+           than one subTLV - therefore the first byte must reflect
+           the aggregate bytecount of the subTLVs for this prefix
+        */
+        if (!TTEST2(*tptr, 1))
+            return (0);
+        sublen=*(tptr++);
+        processed+=sublen;
+        printf(" (%u)",sublen);   /* print out subTLV length */
+        
+        while (sublen>0) {
+            if (!TTEST2(*tptr,2))
+                return (0);
+            subtlvtype=*(tptr++);
+            subtlvlen=*(tptr++);
+            /* prepend the ident string */
+            snprintf(ident_buffer, sizeof(ident_buffer), "%s  ",ident);
+            if(!isis_print_ip_reach_subtlv(tptr,subtlvtype,subtlvlen,ident_buffer))
+                return(0);
+            tptr+=subtlvlen;
+            sublen-=(subtlvlen+2);
+        }
+    }
+    return (processed);
+}
+
+/*
  * isis_print
  * Decode IS-IS packets.  Return 0 on error.
  */
@@ -1153,14 +1257,12 @@ static int isis_print (const u_int8_t *p, u_int length)
     const struct isis_tlv_is_reach *tlv_is_reach;
     const struct isis_tlv_es_reach *tlv_es_reach;
 
-    u_int8_t pdu_type, max_area, id_length, type, len, tmp, alen, lan_alen, prefix_len, ext_is_len, mt_len, subl, subt, tslen;
+    u_int8_t pdu_type, max_area, id_length, type, len, tmp, alen, lan_alen, prefix_len;
+    u_int8_t ext_is_len, ext_ip_len, mt_len;
     const u_int8_t *optr, *pptr, *tptr;
     u_short packet_len,pdu_len,time_remain;
-    u_int i,j,bit_length,byte_length,metric,ra,rr;
-    u_int8_t prefix[4]; /* copy buffer for ipv4 prefixes */
-#ifdef INET6
-    u_int8_t prefix6[16]; /* copy buffer for ipv6 prefixes */
-#endif
+    u_int i,ra,rr;
+
     packet_len=length;
     optr = p; /* initialize the _o_riginal pointer to the packet start -
                  need it for parsing the checksum TLV */
@@ -1596,6 +1698,16 @@ static int isis_print (const u_int8_t *p, u_int length)
 		return (1);
 	    break;
 
+	case TLV_EXT_IP_REACH:
+	    while (tmp>0) {
+                ext_ip_len = isis_print_extd_ip_reach(tptr, "\n\t\t", IPV4);
+                if (ext_ip_len == 0) /* did something go wrong ? */
+                    goto trunctlv;
+                tptr+=ext_ip_len;
+		tmp-=ext_ip_len;
+	    }
+	    break;
+
         case TLV_MT_IP_REACH:
 	    while (tmp>0) {
                 mt_len = isis_print_mtid(tptr, "\n\t\t");
@@ -1604,173 +1716,23 @@ static int isis_print (const u_int8_t *p, u_int length)
                 tptr+=mt_len;
                 tmp-=mt_len;
 
-		if (!TTEST2(*tptr, 4))
-		    return (1);
-	        metric = EXTRACT_32BITS(tptr);
-		tptr+=4;
-
-		if (!TTEST2(*tptr, 1)) /* fetch status byte */
-		    return (1);
-		j=*(tptr);
-		bit_length = (*(tptr)++&0x3f);
-		byte_length = (bit_length + 7) / 8; /* prefix has variable length encoding */
-
-		if (!TTEST2(*tptr, byte_length))
-		    return (1);
-
-		memset (prefix, 0, 4);
-		memcpy(prefix,tptr,byte_length);
-                tptr+=byte_length;
-		printf("\n\t\tIPv4 prefix: %s/%d",
-		       ipaddr_string(prefix),
-		       bit_length);
-
-		printf("\n\t\t  Metric: %u, Distribution: %s",
-		       metric,
-		       ISIS_MASK_TLV_EXT_IP_UPDOWN(j) ? "down" : "up");
-
-		printf(", %ssub-TLVs present",
-		       ISIS_MASK_TLV_EXT_IP_SUBTLV(j) ? "" : "no ");
-
-		if (ISIS_MASK_TLV_EXT_IP_SUBTLV(j)) {
-                    /* assume that one prefix can hold more
-                       than one subTLV - therefore the first byte must reflect
-                       the aggregate bytecount of the subTLVs for this prefix
-                    */
-		    if (!TTEST2(*tptr, 1))
-                        return (1);
-                    tslen=*(tptr++);
-                    tmp--;
-		    printf(" (%u)",tslen);   /* print out subTLV length */
-
-                    while (tslen>0) {
-                        if (!TTEST2(*tptr,2))
-                            goto trunctlv;
-			subt=*(tptr++);
-			subl=*(tptr++);
-			if(!isis_print_ip_reach_subtlv(tptr,subt,subl,"\n\t\t  "))
-			    return(0);
-			tptr+=subl;
-			tslen-=(subl+2);
-                        tmp-=(subl+2);
-                    }
-		}
-		tmp-=(7+byte_length);
-	    }
-	    break;
-
-	case TLV_EXT_IP_REACH:
-	    while (tmp>0) {
-		memset (prefix, 0, 4);
-		if (!TTEST2(*tptr, 4))
-		    return (1);
-	        metric = EXTRACT_32BITS(tptr);
-		tptr+=4;
-
-		if (!TTEST2(*tptr, 1)) /* fetch status byte */
-		    return (1);
-		j=*(tptr);
-		bit_length = (*(tptr)++&0x3f);
-		byte_length = (bit_length + 7) / 8; /* prefix has variable length encoding */
-
-		if (!TTEST2(*tptr, byte_length))
-		    return (1);
-		memcpy(prefix,tptr,byte_length);
-                tptr+=byte_length;
-		printf("\n\t\tIPv4 prefix: %s/%d",
-		       ipaddr_string(prefix),
-		       bit_length);
-
-		printf("\n\t\t  Metric: %u, Distribution: %s",
-		       metric,
-		       ISIS_MASK_TLV_EXT_IP_UPDOWN(j) ? "down" : "up");
-
-		printf(", %ssub-TLVs present",
-		       ISIS_MASK_TLV_EXT_IP_SUBTLV(j) ? "" : "no ");
-
-		if (ISIS_MASK_TLV_EXT_IP_SUBTLV(j)) {
-                    /* assume that one prefix can hold more
-                       than one subTLV - therefore the first byte must reflect
-                       the aggregate bytecount of the subTLVs for this prefix
-                    */
-		    if (!TTEST2(*tptr, 1))
-                        return (1);
-                    tslen=*(tptr++);
-                    tmp--;
-		    printf(" (%u)",tslen);   /* print out subTLV length */
-
-                    while (tslen>0) {
-                        if (!TTEST2(*tptr,2))
-                            goto trunctlv;
-			subt=*(tptr++);
-			subl=*(tptr++);
-			if(!isis_print_ip_reach_subtlv(tptr,subt,subl,"\n\t\t  "))
-			    return(0);
-			tptr+=subl;
-			tslen-=(subl+2);
-                        tmp-=(subl+2);
-                    }
-		}
-		tmp-=(5+byte_length);
+                ext_ip_len = isis_print_extd_ip_reach(tptr, "\n\t\t", IPV4);
+                if (ext_ip_len == 0) /* did something go wrong ? */
+                    goto trunctlv;
+                tptr+=ext_ip_len;
+		tmp-=ext_ip_len;
 	    }
 	    break;
 
 #ifdef INET6
-
 	case TLV_IP6_REACH:
 	    while (tmp>0) {
-		if (!TTEST2(*tptr, 4))
-		    return (1);
-	        metric = EXTRACT_32BITS(tptr);
-		tptr+=4;
-
-		if (!TTEST2(*tptr, 2))
-		    return (1);
-		j=*(tptr++);
-		bit_length = (*(tptr)++);
-		byte_length = (bit_length + 7) / 8;
-		if (!TTEST2(*tptr, byte_length))
-		    return (1);
-
-		memset(prefix6, 0, 16);
-		memcpy(prefix6,tptr,byte_length);
-                tptr+=byte_length;
-		printf("\n\t\tIPv6 prefix: %s/%u",
-		       ip6addr_string(prefix6),
-		       bit_length);
-
-		printf("\n\t\t  Metric: %u, %s, Distribution: %s, %ssub-TLVs present",
-                       metric,
-                       ISIS_MASK_TLV_IP6_IE(j) ? "External" : "Internal",
-                       ISIS_MASK_TLV_IP6_UPDOWN(j) ? "down" : "up",
-                       ISIS_MASK_TLV_IP6_SUBTLV(j) ? "" : "no ");
-
-		if (ISIS_MASK_TLV_IP6_SUBTLV(j)) {
-                    /* assume that one prefix can hold more
-                       than one subTLV - therefore the first byte must reflect
-                       the aggregate bytecount of the subTLVs for this prefix
-                    */
-		    if (!TTEST2(*tptr, 1))
-                        return (1);
-                    tslen=*(tptr++);
-                    tmp--;
-		    printf(" (%u)",tslen);   /* print out subTLV length */
-
-                    while (tslen>0) {
-                        if (!TTEST2(*tptr,2))
-                            goto trunctlv;
-			subt=*(tptr++);
-			subl=*(tptr++);
-			if(!isis_print_ip_reach_subtlv(tptr,subt,subl,"\n\t\t  "))
-			    return(0);
-			tptr+=subl;
-			tslen-=(subl+2);
-                        tmp-=(subl+2);
-                    }
-		}
-		tmp-=(6+byte_length);
+                ext_ip_len = isis_print_extd_ip_reach(tptr, "\n\t\t", IPV6);
+                if (ext_ip_len == 0) /* did something go wrong ? */
+                    goto trunctlv;
+                tptr+=ext_ip_len;
+		tmp-=ext_ip_len;
 	    }
-
 	    break;
 
 	case TLV_MT_IP6_REACH:
@@ -1781,63 +1743,14 @@ static int isis_print (const u_int8_t *p, u_int length)
                 tptr+=mt_len;
                 tmp-=mt_len;
 
-		if (!TTEST2(*tptr, 4))
-		    return (1);
-	        metric = EXTRACT_32BITS(tptr);
-		tptr+=4;
-
-		if (!TTEST2(*tptr, 2))
-		    return (1);
-		j=*(tptr++);
-		bit_length = (*(tptr)++);
-		byte_length = (bit_length + 7) / 8;
-		if (!TTEST2(*tptr, byte_length))
-		    return (1);
-
-		memset(prefix6, 0, 16);
-		memcpy(prefix6,tptr,byte_length);
-                tptr+=byte_length;
-		printf("\n\t\tIPv6 prefix: %s/%u",
-		       ip6addr_string(prefix6),
-		       bit_length);
-
-		printf("\n\t\t  Metric: %u, %s, Distribution: %s, %ssub-TLVs present",
-                       metric,
-                       ISIS_MASK_TLV_IP6_IE(j) ? "External" : "Internal",
-                       ISIS_MASK_TLV_IP6_UPDOWN(j) ? "down" : "up",
-                       ISIS_MASK_TLV_IP6_SUBTLV(j) ? "" : "no ");
-
-		if (ISIS_MASK_TLV_IP6_SUBTLV(j)) {
-                    /* assume that one prefix can hold more
-                       than one subTLV - therefore the first byte must reflect
-                       the aggregate bytecount of the subTLVs for this prefix
-                    */
-		    if (!TTEST2(*tptr, 1))
-                        return (1);
-                    tslen=*(tptr++);
-                    tmp--;
-		    printf(" (%u)",tslen);   /* print out subTLV length */
-
-                    while (tslen>0) {
-                        if (!TTEST2(*tptr,2))
-                            goto trunctlv;
-			subt=*(tptr++);
-			subl=*(tptr++);
-			if(!isis_print_ip_reach_subtlv(tptr,subt,subl,"\n\t\t  "))
-			    return(0);
-			tptr+=subl;
-			tslen-=(subl+2);
-                        tmp-=(subl+2);
-                    }
-		}
-		tmp-=(6+byte_length);
+                ext_ip_len = isis_print_extd_ip_reach(tptr, "\n\t\t", IPV6);
+                if (ext_ip_len == 0) /* did something go wrong ? */
+                    goto trunctlv;
+                tptr+=ext_ip_len;
+		tmp-=ext_ip_len;
 	    }
-
 	    break;
 
-#endif
-
-#ifdef INET6
 	case TLV_IP6ADDR:
 	    while (tmp>0) {
 		if (!TTEST2(*tptr, 16))
