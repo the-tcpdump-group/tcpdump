@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sll.c,v 1.4 2001-01-15 00:33:59 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sll.c,v 1.5 2001-06-08 04:48:23 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -46,9 +46,6 @@ struct rtentry;
 
 #include "ether.h"
 #include "sll.h"
-
-const u_char *packetp;
-const u_char *snapend;
 
 static inline void
 sll_print(register const struct sll_header *sllp, u_int length)

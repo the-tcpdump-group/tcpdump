@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cip.c,v 1.12 2001-03-19 03:58:10 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cip.c,v 1.13 2001-06-08 04:48:23 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -46,9 +46,6 @@ static const char rcsid[] =
 #include "addrtoname.h"
 #include "ethertype.h"
 #include "ether.h"
-
-const u_char *packetp;
-const u_char *snapend;
 
 #define RFC1483LLC_LEN	8 
 
