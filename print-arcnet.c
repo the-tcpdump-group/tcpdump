@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-arcnet.c,v 1.2 2001-04-24 02:26:14 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-arcnet.c,v 1.3 2001-05-22 06:23:29 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -137,7 +137,7 @@ arcnet_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	u_int length = h->len;
 	struct arc_header *ap;
 
-	int phds, flag = 0, archdrlen;
+	int phds, flag = 0, archdrlen = 0;
 	u_int seqid = 0;
 	u_char arc_type;
 
