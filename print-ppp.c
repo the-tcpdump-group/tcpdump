@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.57 2000-12-04 06:47:18 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.58 2000-12-27 11:09:08 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -347,6 +347,7 @@ ppp_protoname(u_int proto)
 
 	switch (proto) {
 	case PPP_IP:	return "IP";
+	case PPP_IPV6:	return "IPv6";
 #ifdef PPP_XNS
 	case PPP_XNS:	return "XNS";
 #endif
@@ -357,7 +358,7 @@ ppp_protoname(u_int proto)
 	case PPP_COMP:	return "COMP";
 #endif
 	case PPP_IPCP:	return "IPCP";
-	case PPP_IPV6CP: return "IPV6CP";
+	case PPP_IPV6CP: return "IPv6CP";
 	case PPP_IPXCP:	return "IPXCP";
 	case PPP_CCP:	return "CCP";
 	case PPP_LCP:	return "LCP";
