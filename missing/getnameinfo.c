@@ -54,9 +54,7 @@
 #include "cdecl_ext.h"
 #endif 
 
-#ifndef HAVE_ADDRINFO
 #include "addrinfo.h"
-#endif
 
 #define SUCCESS 0
 #define ANY 0
