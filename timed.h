@@ -1,3 +1,4 @@
+/* @(#) $Header: /tcpdump/master/tcpdump/timed.h,v 1.3 2000-12-17 23:07:51 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1983, 1993
  *	The Regents of the University of California.  All rights reserved.

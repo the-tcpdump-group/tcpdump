@@ -1,3 +1,4 @@
+/* @(#) $Header: /tcpdump/master/tcpdump/ospf6.h,v 1.3 2000-12-17 23:07:50 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1991, 1993, 1994, 1995, 1996, 1997
  *	The Regents of the University of California.  All rights reserved.

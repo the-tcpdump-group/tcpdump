@@ -1,3 +1,4 @@
+/* @(#) $Header: /tcpdump/master/tcpdump/nameser.h,v 1.4 2000-12-17 23:07:49 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1983, 1989, 1993
  *	The Regents of the University of California.  All rights reserved.
