@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.32.2.8 2003-11-24 20:31:22 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.32.2.9 2004-08-27 03:56:22 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -63,14 +63,14 @@ ip6_print(register const u_char *bp, register u_int length)
 
 	TCHECK(*ip6);
 	if (length < sizeof (struct ip6_hdr)) {
-		(void)printf("truncated-ip6 %d", length);
+		(void)printf("truncated-ip6 %u", length);
 		return;
 	}
 
 	payload_len = EXTRACT_16BITS(&ip6->ip6_plen);
 	len = payload_len + sizeof(struct ip6_hdr);
 	if (length < len)
-		(void)printf("truncated-ip6 - %d bytes missing!",
+		(void)printf("truncated-ip6 - %u bytes missing!",
 			len - length);
 
 	/*

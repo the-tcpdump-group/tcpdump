@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.128.2.7 2004-06-25 01:21:06 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.128.2.8 2004-08-27 03:56:21 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -396,7 +396,7 @@ ip_print(register const u_char *bp, register u_int length)
 		return;
 	}
 	if (length < sizeof (struct ip)) {
-		(void)printf("truncated-ip %d", length);
+		(void)printf("truncated-ip %u", length);
 		return;
 	}
 	hlen = IP_HL(ip) * 4;
