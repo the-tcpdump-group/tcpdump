@@ -29,7 +29,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @(#) $Header: /tcpdump/master/tcpdump/tcpdump-stdinc.h,v 1.8 2003-11-16 09:57:04 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/tcpdump-stdinc.h,v 1.9 2004-04-17 08:56:15 guy Exp $ (LBL)
  */
 
 /*
@@ -95,6 +95,9 @@ typedef short ino_t;
 #include <ctype.h>
 #include <unistd.h>
 #include <netdb.h>
+#ifdef INTTYPES_H_DEFINES_FORMATS
+#include <inttypes.h>
+#endif
 #include <sys/param.h>
 #include <sys/types.h>			/* concession to AIX */
 #include <sys/time.h>

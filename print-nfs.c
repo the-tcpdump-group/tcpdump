@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.101 2003-11-16 09:36:30 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.102 2004-04-17 08:56:14 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -162,8 +162,8 @@ static struct tok type2str[] = {
  * try to make the best of it. The integer stored as 2 consecutive XDR
  * encoded 32-bit integers, to which a pointer is passed.
  *
- * Assume that a system that has INT64_FORMAT defined, has a 64-bit
- * integer datatype and can print it.
+ * We assume that PRId64, PRIu64, and PRIx64 are defined, and that
+ * u_int64_t is defined.
  */
 
 #define UNSIGNED 0
@@ -172,42 +172,23 @@ static struct tok type2str[] = {
 
 static int print_int64(const u_int32_t *dp, int how)
 {
-#ifdef INT64_FORMAT
 	u_int64_t res;
 
 	res = ((u_int64_t)EXTRACT_32BITS(&dp[0]) << 32) | (u_int64_t)EXTRACT_32BITS(&dp[1]);
 	switch (how) {
 	case SIGNED:
-		printf(INT64_FORMAT, res);
+		printf("%" PRId64, res);
 		break;
 	case UNSIGNED:
-		printf(U_INT64_FORMAT, res);
+		printf("%" PRIu64, res);
 		break;
 	case HEX:
-		printf(HEX_INT64_FORMAT, res);
+		printf("%" PRIx64, res);
 		break;
 	default:
 		return (0);
 	}
-#else
-	u_int32_t high;
-
-	high = EXTRACT_32BITS(&dp[0]);
-
-	switch (how) {
-	case SIGNED:
-	case UNSIGNED:
-	case HEX:
-		if (high != 0)
-			printf("0x%x%08x", high, EXTRACT_32BITS(&dp[1]));
-		else
-			printf("0x%x", EXTRACT_32BITS(&dp[1]));
-		break;
-	default:
-		return (0);
-	}
-#endif
-	return 1;
+	return (1);
 }
 
 static void
