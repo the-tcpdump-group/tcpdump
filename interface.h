@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.110 1999-11-17 05:45:57 assar Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.111 1999-11-21 03:43:23 assar Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -187,7 +187,7 @@ extern void ether_if_print(u_char *, const struct pcap_pkthdr *,
 	const u_char *);
 extern void fddi_if_print(u_char *, const struct pcap_pkthdr *, const u_char *);
 extern void gre_print(const u_char *, u_int);
-extern void icmp_print(const u_char *, const u_char *);
+extern void icmp_print(const u_char *, u_int, const u_char *);
 extern void igrp_print(const u_char *, u_int, const u_char *);
 extern void ip_print(const u_char *, u_int);
 extern void ipx_print(const u_char *, u_int);
@@ -210,6 +210,8 @@ extern int vjc_print(register const char *, register u_int, u_short);
 extern void raw_if_print(u_char *, const struct pcap_pkthdr *, const u_char *);
 extern void rip_print(const u_char *, u_int);
 extern void sl_if_print(u_char *, const struct pcap_pkthdr *, const u_char *);
+extern void lane_if_print(u_char *, const struct pcap_pkthdr *,const u_char *);
+extern void cip_if_print(u_char *, const struct pcap_pkthdr *,const u_char *);
 extern void sl_bsdos_if_print(u_char *, const struct pcap_pkthdr *,
     const u_char *);
 extern void chdlc_if_print(u_char *, const struct pcap_pkthdr *,
@@ -237,3 +239,4 @@ extern int rt6_print(const u_char *, const u_char *);
 extern void ospf6_print(const u_char *, u_int);
 extern void dhcp6_print(const u_char *, u_int, u_short, u_short);
 #endif /*INET6*/
+extern u_short in_cksum(const u_short *addr, register int len, u_short csum);
