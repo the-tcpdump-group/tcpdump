@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.36 2004-03-17 23:24:36 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.37 2004-10-18 16:26:20 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -42,6 +42,40 @@ static const char rcsid[] _U_ =
 #include "llc.h"
 
 #include "ether.h"
+
+struct tok oam_celltype_values[] = {
+    { 0x1, "Fault Management" },
+    { 0x2, "Performance Management" },
+    { 0x8, "activate/deactivate" },
+    { 0xf, "System Management" },
+    { 0, NULL }
+};
+
+struct tok oam_fm_functype_values[] = {
+    { 0x0, "AIS" },
+    { 0x1, "RDI" },
+    { 0x8, "Loopback" },
+    { 0, NULL }
+};
+
+static const struct tok *oam_functype_values[16] = {
+    NULL,
+    oam_fm_functype_values,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+};
 
 /*
  * Print an RFC 1483 LLC-encapsulated ATM frame.
@@ -207,12 +241,9 @@ atm_print(u_int vpi, u_int vci, u_int traftype, const u_char *p, u_int length,
 			printf("broadcast sig: ");
 			return;
 
-		case OAMF4SC:
-			printf("oamF4(segment): ");
-			return;
-
+		case OAMF4SC: /* fall through */
 		case OAMF4EC:
-			printf("oamF4(end): ");
+                        oam_print(p, length);
 			return;
 
 		case METAC:
@@ -240,4 +271,48 @@ atm_print(u_int vpi, u_int vci, u_int traftype, const u_char *p, u_int length,
 		lane_print(p, length, caplen);
 		break;
 	}
+}
+
+int 
+oam_print (const u_char *p, u_int length) {
+
+    u_int16_t cell_header, cell_type, func_type,vpi,vci,payload,clp;
+
+    cell_header = EXTRACT_32BITS(p);
+    cell_type = ((*(p+4))>>4) & 0x0f;
+    func_type = *(p) & 0x0f;
+
+    vpi = (cell_header>>20)&0xff;
+    vci = (cell_header>>4)&0xffff;
+    payload = (cell_header>>1)&0x7;
+    clp = cell_header&0x1;
+
+    switch (vci) {
+    case OAMF4SC:
+        printf("OAM F4 (segment), ");
+            break;
+    case OAMF4EC:
+        printf("OAM F4 (end), ");
+        break;
+    default:
+        printf("OAM F5, ");
+        break;
+    }
+
+    if (eflag)
+        printf("vpi %u, vci %u, payload %u, clp %u, ",vpi,vci,payload,clp);
+
+    printf("cell-type %s (%u)",
+           tok2str(oam_celltype_values, "unknown", cell_type),
+           cell_type);
+
+    if (oam_functype_values[cell_type] == NULL)
+        printf(", func-type unknown (%u)", func_type);
+    else
+        printf(", func-type %s (%u)",
+               bittok2str(oam_functype_values[cell_type],"none",func_type),
+               func_type);
+
+    printf(", length %u",length);
+    return 1;
 }
