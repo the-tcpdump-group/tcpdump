@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.66 1999-10-30 07:36:35 itojun Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.67 1999-10-30 23:45:50 itojun Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -975,3 +975,19 @@ AC_DEFUN(AC_STRUCT_RES_STATE, [
 	fi
 ])
 
+dnl
+dnl check for h_errno
+AC_DEFUN(AC_VAR_H_ERRNO, [
+	AC_MSG_CHECKING(for h_errno)
+	AC_CACHE_VAL(ac_cv_var_h_errno,
+	AC_TRY_COMPILE([
+#		include <sys/types.h>
+#		include <netdb.h>],
+		[int foo = h_errno;],
+		ac_cv_var_h_errno=yes,
+		ac_cv_var_h_errno=no))
+	AC_MSG_RESULT($ac_cv_var_h_errno)
+	if test "$ac_cv_var_h_errno" = "yes"; then
+		AC_DEFINE(HAVE_H_ERRNO)
+	fi
+])

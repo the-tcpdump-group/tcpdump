@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.79 1999-10-30 23:43:57 itojun Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.80 1999-10-30 23:45:51 itojun Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -518,6 +518,8 @@ if test $ac_cv_struct_ether_arp_x = yes ; then
 fi
 
 AC_LBL_UNALIGNED_ACCESS
+
+AC_VAR_H_ERRNO
 
 AC_MSG_CHECKING(for SSLeay)
 ac_cv_ssleay_path=no

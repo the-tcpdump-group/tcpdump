@@ -36,8 +36,9 @@
  * SUCH DAMAGE.
  */
 
-/* $Id: inet_ntop.c,v 1.1 1999-10-30 07:53:39 itojun Exp $ */
+/* $Id: inet_ntop.c,v 1.2 1999-10-30 23:45:52 itojun Exp $ */
 
+#include <stdio.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/socket.h>

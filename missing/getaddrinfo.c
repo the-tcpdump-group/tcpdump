@@ -539,12 +539,20 @@ explore_fqdn(pai, hostname, servname, res)
 	hp = getipnodebyname(hostname, pai->ai_family, AI_ADDRCONFIG, &h_error);
 #elif defined(HAVE_GETHOSTBYNAME2)
 	hp = gethostbyname2(hostname, pai->ai_family);
+#ifdef HAVE_H_ERRNO
 	h_error = h_errno;
+#else
+	h_error = EINVAL;
+#endif
 #else
 	if (pai->ai_family != AF_INET)
 		return 0;
 	hp = gethostbyname(hostname);
+#ifdef HAVE_H_ERRNO
 	h_error = h_errno;
+#else
+	h_error = EINVAL;
+#endif
 #endif
 
 	if (hp == NULL) {

@@ -211,7 +211,7 @@ num_or_str(const char **table, size_t siz, int value)
 {
 	static char buf[20];
 	if (value < 0 || siz <= value || table[value] == NULL) {
-		snprintf(buf, sizeof(buf), "#%d", value);
+		sprintf(buf, "#%d", value);
 		return buf;
 	} else
 		return table[value];
@@ -237,7 +237,7 @@ bgp_notify_minor(int major, int minor)
 	} else
 		p = NULL;
 	if (p == NULL) {
-		snprintf(buf, sizeof(buf), "#%d", minor);
+		sprintf(buf, "#%d", minor);
 		return buf;
 	} else
 		return p;
@@ -259,7 +259,7 @@ decode_prefix4(const u_char *pd, char *buf, int buflen)
 		((u_char *)&addr)[(plen + 7) / 8 - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
 	}
-	snprintf(buf, buflen, "%s/%d", getname((char *)&addr), plen);
+	sprintf(buf, "%s/%d", getname((char *)&addr), plen);
 	return 1 + (plen + 7) / 8;
 }
 
@@ -280,7 +280,7 @@ decode_prefix6(const u_char *pd, char *buf, int buflen)
 		addr.s6_addr[(plen + 7) / 8 - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
 	}
-	snprintf(buf, buflen, "%s/%d", getname6((char *)&addr), plen);
+	sprintf(buf, "%s/%d", getname6((char *)&addr), plen);
 	return 1 + (plen + 7) / 8;
 }
 #endif

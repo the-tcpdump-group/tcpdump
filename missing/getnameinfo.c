@@ -48,6 +48,7 @@
 #include <resolv.h>
 #include <string.h>
 #include <stddef.h>
+#include <errno.h>
 
 #ifndef HAVE_PORTABLE_PROTOTYPE
 #include "cdecl_ext.h"
@@ -149,7 +150,7 @@ getnameinfo(sa, salen, host, hostlen, serv, servlen, flags)
 				return ENI_MEMORY;
 			strcpy(serv, sp->s_name);
 		} else {
-			snprintf(numserv, sizeof(numserv), "%d", ntohs(port));
+			sprintf(numserv, "%d", ntohs(port));
 			if (strlen(numserv) > servlen)
 				return ENI_MEMORY;
 			strcpy(serv, numserv);
@@ -228,7 +229,11 @@ getnameinfo(sa, salen, host, hostlen, serv, servlen, flags)
 		hp = getipnodebyaddr(addr, afd->a_addrlen, afd->a_af, &h_error);
 #else
 		hp = gethostbyaddr(addr, afd->a_addrlen, afd->a_af);
+#ifdef HAVE_H_ERRNO
 		h_error = h_errno;
+#else
+		h_error = EINVAL;
+#endif
 #endif
 
 		if (hp) {

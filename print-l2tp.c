@@ -23,11 +23,13 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-l2tp.c,v 1.1 1999-10-30 05:11:18 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-l2tp.c,v 1.2 1999-10-30 23:45:51 itojun Exp $";
 #endif
 
 #include <sys/types.h>
 #include <sys/param.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #include "l2tp.h"
 #include "interface.h"
