@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.78 2003-05-08 14:40:54 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.79 2003-05-22 14:24:31 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -37,6 +37,7 @@ static const char rcsid[] =
 #include "ethertype.h"
 
 #include "ether.h"
+#include "extract.h"
 
 const u_char *snapend;
 
@@ -46,17 +47,20 @@ ether_hdr_print(register const u_char *bp, u_int length)
 	register const struct ether_header *ep;
 
 	ep = (const struct ether_header *)bp;
-	if (qflag)
-		(void)printf("%s > %s (length: %u): ",
-			     etheraddr_string(ESRC(ep)),
-			     etheraddr_string(EDST(ep)),
-			     length);
-	else
-		(void)printf("%s > %s %s (length: %u): ",
-			     etheraddr_string(ESRC(ep)),
-			     etheraddr_string(EDST(ep)),
-			     etherproto_string(ep->ether_type),
-			     length);
+
+	(void)printf("%s > %s",
+		     etheraddr_string(ESRC(ep)),
+		     etheraddr_string(EDST(ep)));
+
+	if (!qflag) {
+	        if (ntohs(ep->ether_type) <= ETHERMTU)
+		          (void)printf(", 802.2");
+                else 
+		          (void)printf(", ethertype %s",
+				       etherproto_string(ep->ether_type));	      
+        }
+
+	(void)printf(", length %u: ", length);
 }
 
 void
