@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.80.2.2 2002-06-29 04:22:54 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.80.2.3 2002-07-02 02:22:08 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -171,12 +171,12 @@ AC_DEFUN(AC_LBL_C_INLINE,
     AC_CACHE_VAL(ac_cv_lbl_inline, [
 	ac_cv_lbl_inline=""
 	ac_lbl_cc_inline=no
-	for i in inline __inline__ __inline
+	for ac_lbl_inline in inline __inline__ __inline
 	do
 	    AC_TRY_COMPILE(
-		[#define inline $i
-		static inline struct iltest *foo(void);],
-		[struct iltest {
+		[#define inline $ac_lbl_inline
+		static inline struct iltest *foo(void);
+		struct iltest {
 		    int iltest1;
 		    int iltest2;
 		};
@@ -187,18 +187,18 @@ AC_DEFUN(AC_LBL_C_INLINE,
 		    struct iltest xxx;
 
 		    return &xxx;
-		}],ac_lbl_cc_inline=yes,)
+		}],,ac_lbl_cc_inline=yes,)
 	    if test "$ac_lbl_cc_inline" = yes ; then
 		break;
 	    fi
 	done
 	if test "$ac_lbl_cc_inline" = yes ; then
-	    ac_cv_lbl_inline=$i
+	    ac_cv_lbl_inline=$ac_lbl_inline
 	fi])
     if test ! -z "$ac_cv_lbl_inline" ; then
 	AC_MSG_RESULT($ac_cv_lbl_inline)
     else
-	AC_MSG_RESULT(not supported)
+	AC_MSG_RESULT(no)
     fi
     AC_DEFINE_UNQUOTED(inline, $ac_cv_lbl_inline, [Define as token for inline if inlining supported])])
 
