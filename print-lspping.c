@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.5 2004-06-12 08:54:57 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.6 2004-06-15 07:58:45 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -469,7 +469,7 @@ lspping_print(register const u_char *pptr, register u_int len) {
     tptr+=sizeof(const struct lspping_common_header);
     tlen-=sizeof(const struct lspping_common_header);
 
-    while(tlen>0) {
+    while(tlen>(int)sizeof(struct lspping_tlv_header)) {
         /* did we capture enough for fully decoding the tlv header ? */
         if (!TTEST2(*tptr, sizeof(struct lspping_tlv_header)))
             goto trunc;
@@ -677,7 +677,7 @@ lspping_print(register const u_char *pptr, register u_int len) {
                                lspping_tlv_len);
 
         tptr+=lspping_tlv_len;
-        tlen-=lspping_tlv_len;
+        tlen-=lspping_tlv_len+sizeof(struct lspping_tlv_header);
     }
     return;
 trunc:
