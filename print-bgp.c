@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.83 2004-05-17 12:10:05 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.84 2004-05-27 21:20:50 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -45,6 +45,7 @@ static const char rcsid[] _U_ =
 #include <string.h>
 
 #include "interface.h"
+#include "decode_prefix.h"
 #include "addrtoname.h"
 #include "extract.h"
 
@@ -460,7 +461,7 @@ static struct tok bgp_l2vpn_encaps_values[] = {
     { 0, NULL},
 };
 
-static int
+int
 decode_prefix4(const u_char *pptr, char *buf, u_int buflen)
 {
 	struct in_addr addr;
@@ -688,7 +689,7 @@ trunc:
 }
 
 #ifdef INET6
-static int
+int
 decode_prefix6(const u_char *pd, char *buf, u_int buflen)
 {
 	struct in6_addr addr;

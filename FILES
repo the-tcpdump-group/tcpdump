@@ -27,6 +27,7 @@ config.sub
 configure
 configure.in
 decnet.h
+decode_prefix.h
 enc.h
 esp.h
 ether.h
