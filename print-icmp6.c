@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.41 2000-11-12 15:16:16 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.42 2000-12-13 07:57:05 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -411,6 +411,7 @@ icmp6_opt_print(register const u_char *bp, int resid)
 	register const struct nd_opt_prefix_info *opp;
 	register const struct icmp6_opts_redirect *opr;
 	register const struct nd_opt_mtu *opm;
+	register const struct nd_opt_advint *opa;
 	register const u_char *ep;
 	int	opts_len;
 #if 0
@@ -476,9 +477,11 @@ icmp6_opt_print(register const u_char *bp, int resid)
 		TCHECK(opp->nd_opt_pi_prefix);
 		printf("(prefix info: ");	/*)*/
 		if (opp->nd_opt_pi_flags_reserved & ND_OPT_PI_FLAG_ONLINK)
-		       printf("L");
+			printf("L");
 		if (opp->nd_opt_pi_flags_reserved & ND_OPT_PI_FLAG_AUTO)
-		       printf("A");
+			printf("A");
+		if (opp->nd_opt_pi_flags_reserved & ND_OPT_PI_FLAG_ROUTER)
+			printf("R");
 		if (opp->nd_opt_pi_flags_reserved)
 			printf(" ");
 		printf("valid_ltime=");
@@ -522,6 +525,17 @@ icmp6_opt_print(register const u_char *bp, int resid)
 		icmp6_opt_print((const u_char *)op + (op->nd_opt_len << 3),
 				resid - (op->nd_opt_len << 3));
 		break;
+        case ND_OPT_ADVINT:
+		opa = (struct nd_opt_advint *)op;
+		TCHECK(opa->nd_opt_advint_advint);
+		printf("(advint: ");	/*)*/
+		printf("advint=%u",
+		    (u_int32_t)ntohl(opa->nd_opt_advint_advint));
+		/*(*/
+		printf(")");
+		icmp6_opt_print((const u_char *)op + (op->nd_opt_len << 3),
+				resid - (op->nd_opt_len << 3));
+		break;                
 	default:
 		opts_len = op->nd_opt_len;
 		printf("(unknwon opt_type=%d, opt_len=%d)",

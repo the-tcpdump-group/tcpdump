@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rt6.c,v 1.16 2000-10-07 05:53:13 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rt6.c,v 1.17 2000-12-13 07:57:05 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -53,6 +53,7 @@ rt6_print(register const u_char *bp, register const u_char *bp2)
 	register const struct ip6_hdr *ip;
 	register const u_char *ep;
 	int i, len;
+	register const struct in6_addr *addr;
 
 	dp = (struct ip6_rthdr *)bp;
 	ip = (struct ip6_hdr *)bp2;
@@ -89,14 +90,13 @@ rt6_print(register const u_char *bp, register const u_char *bp2)
 		if (len % 2 == 1)
 			goto trunc;
 		len >>= 1;
+		addr = &dp0->ip6r0_addr[0];
 		for (i = 0; i < len; i++) {
-			struct in6_addr *addr;
-
-			addr = ((struct in6_addr *)(dp0 + 1)) + i;
-			if ((u_char *)addr > ep - sizeof(*addr))
+			if ((u_char *)(addr + 1) > ep)
 				goto trunc;
-
-			printf(", [%d]%s", i, ip6addr_string((u_char *)addr));
+		
+			printf(", [%d]%s", i, ip6addr_string(addr));
+			addr++;
 		}
 		/*(*/
 		printf(") ");

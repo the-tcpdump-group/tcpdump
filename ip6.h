@@ -136,12 +136,19 @@ struct ip6_dest {
 #define IP6OPT_PADN		0x01	/* 00 0 00001 */
 #define IP6OPT_JUMBO		0xC2	/* 11 0 00010 = 194 */
 #define IP6OPT_JUMBO_LEN	6
-#define IP6OPT_RTALERT		0x05	/* 00 0 00101 */
+#define IP6OPT_ROUTER_ALERT	0x05	/* 00 0 00101 */
+
 #define IP6OPT_RTALERT_LEN	4
 #define IP6OPT_RTALERT_MLD	0	/* Datagram contains an MLD message */
 #define IP6OPT_RTALERT_RSVP	1	/* Datagram contains an RSVP message */
 #define IP6OPT_RTALERT_ACTNET	2 	/* contains an Active Networks msg */
 #define IP6OPT_MINLEN		2
+
+#define IP6OPT_BINDING_UPDATE	0xc6	/* 11 0 00110 */
+#define IP6OPT_BINDING_ACK	0x07	/* 00 0 00111 */
+#define IP6OPT_BINDING_REQ	0x08	/* 00 0 01000 */
+#define IP6OPT_HOME_ADDRESS	0xc9	/* 11 0 01001 */
+#define IP6OPT_EID		0x8a	/* 10 0 01010 */
 
 #define IP6OPT_TYPE(o)		((o) & 0xC0)
 #define IP6OPT_TYPE_SKIP	0x00
@@ -168,7 +175,7 @@ struct ip6_rthdr0 {
 	u_int8_t  ip6r0_segleft;	/* segments left */
 	u_int8_t  ip6r0_reserved;	/* reserved field */
 	u_int8_t  ip6r0_slmap[3];	/* strict/loose bit map */
-	struct in6_addr  ip6r0_addr[1];	/* up to 23 addresses */
+	struct in6_addr ip6r0_addr[1];	/* up to 23 addresses */
 };
 
 /* Fragment header */
