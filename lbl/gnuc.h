@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/lbl/Attic/gnuc.h,v 1.3 1999-10-07 23:47:13 mcr Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/lbl/Attic/gnuc.h,v 1.4 2000-07-10 04:29:27 assar Exp $ (LBL) */
 
 /* Define __P() macro, if necessary */
 #ifndef __P
@@ -7,13 +7,6 @@
 #else
 #define __P(protos) ()
 #endif
-#endif
-
-/* inline foo */
-#ifdef __GNUC__
-#define inline __inline
-#else
-#define inline
 #endif
 
 /*
@@ -28,16 +21,8 @@
 #ifndef __dead
 #define __dead volatile
 #endif
-#if __GNUC__ < 2  || (__GNUC__ == 2 && __GNUC_MINOR__ < 5)
-#ifndef __attribute__
-#define __attribute__(args)
-#endif
-#endif
 #else
 #ifndef __dead
 #define __dead
-#endif
-#ifndef __attribute__
-#define __attribute__(args)
 #endif
 #endif
