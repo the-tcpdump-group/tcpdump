@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.57 2002-12-15 08:33:23 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.58 2003-01-17 11:07:49 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -1514,7 +1514,7 @@ bgp_print(const u_char *dat, int length)
 			p += hlen;
 			start = p;
 		} else {
-			printf("[|BGP %s]", tok2str(bgp_msg_values, "Unknown Message Type",bgp.bgp_type));
+			printf("\n[|BGP %s]", tok2str(bgp_msg_values, "Unknown Message Type",bgp.bgp_type));
 			break;
 		}
 	}
