@@ -23,12 +23,14 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "$Id: print-radius.c,v 1.5 2000-12-18 08:16:58 guy Exp $";
+    "$Id: print-radius.c,v 1.6 2001-03-19 03:58:11 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+
+#include <string.h>
 
 #include <sys/param.h>
 
