@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.18.2.1 2002-04-20 09:43:28 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.18.2.2 2002-07-10 07:27:52 guy Exp $";
 #endif
 
 #include <sys/param.h>
@@ -338,7 +338,7 @@ write_bits(unsigned int val, char *fmt)
 
 /* convert a UCS2 string into iso-8859-1 string */
 static const char *
-unistr(const char *s, int *len)
+unistr(const u_char *s, int *len)
 {
     static char buf[1000];
     int l=0;
@@ -354,8 +354,8 @@ unistr(const char *s, int *len)
 
     /* maybe it isn't unicode - a cheap trick */
     if (!use_unicode || (s[0] && s[1])) {
-	*len = strlen(s) + 1;
-	return s;
+	*len = strlen((const char *)s) + 1;
+	return (const char *)s;
     }
 
     *len = 0;
@@ -400,8 +400,11 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf)
 	case '{':
 	  {
 	    char bitfmt[128];
-	    char *p = strchr(++fmt, '}');
-	    int l = PTR_DIFF(p, fmt);
+	    char *p;
+	    int l;
+
+	    p = strchr(++fmt, '}');
+	    l = PTR_DIFF(p, fmt);
 	    strncpy(bitfmt, fmt, l);
 	    bitfmt[l] = 0;
 	    fmt = p + 1;
