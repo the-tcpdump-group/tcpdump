@@ -29,7 +29,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lwres.c,v 1.3 2001-02-02 19:13:42 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lwres.c,v 1.4 2001-02-09 05:16:48 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -308,7 +308,7 @@ lwres_print(register const u_char *bp, u_int length)
 	const char *s;
 	int response;
 	int advance;
-	int unsupported;
+	int unsupported = 0;
 
 	np = (const struct lwres_lwpacket *)bp;
 	TCHECK(np->authlength);
@@ -323,7 +323,6 @@ lwres_print(register const u_char *bp, u_int length)
 	}
 
 	response = ntohs(np->pktflags) & LWRES_LWPACKETFLAG_RESPONSE;
-	unsupported = 0;
 
 	/* opcode and pktflags */
 	v = (u_int32_t)ntohl(np->opcode);
