@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.168 2001-10-03 07:35:44 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.169 2001-10-03 08:05:47 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -459,11 +459,16 @@ main(int argc, char **argv)
 		pcap_dumper_t *p = pcap_dump_open(pd, WFileName);
 		if (p == NULL)
 			error("%s", pcap_geterr(pd));
-		printer = dump_and_trunc;
-		info.WFileName = WFileName;
-		info.pd = pd;
-		info.p = p;
-		pcap_userdata = (u_char *)&info;
+		if (Cflag != 0) {
+			printer = dump_and_trunc;
+			info.WFileName = WFileName;
+			info.pd = pd;
+			info.p = p;
+			pcap_userdata = (u_char *)&info;
+		} else {
+			printer = pcap_dump;
+			pcap_userdata = (u_char *)p;
+		}
 	} else {
 		printer = lookup_printer(pcap_datalink(pd));
 		pcap_userdata = 0;
@@ -560,7 +565,7 @@ dump_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	 * larger than Cflag - the last packet written to the
 	 * file could put it over Cflag.
 	 */
-	if (Cflag && ftell((FILE *)info->p) > Cflag) {
+	if (ftell((FILE *)info->p) > Cflag) {
 		name = (char *) malloc(strlen(info->WFileName) + 4);
 		strcpy(name, info->WFileName);
 		swebitoa(cnt, name + strlen(info->WFileName));
