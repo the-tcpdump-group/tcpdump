@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/sctpHeader.h,v 1.2 2001-06-28 10:17:24 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/sctpHeader.h,v 1.3 2001-08-01 03:34:00 guy Exp $ (LBL) */
 
 /* SCTP reference Implementation Copyright (C) 1999 Cisco And Motorola
  *
@@ -132,12 +132,17 @@ struct sctpCookiePreserve{
 };
 
 
+struct sctpTimeStamp{
+  u_int ts_sec;
+  u_int ts_usec;
+};
+
 /* wire structure of my cookie */
 struct cookieMessage{
   u_int TieTag_curTag;			/* copied from assoc if present */
   u_int TieTag_hisTag; 		/* copied from assoc if present */
   int cookieLife;			/* life I will award this cookie */
-  struct timespec timeEnteringState;	/* the time I built cookie */
+  struct sctpTimeStamp timeEnteringState; /* the time I built cookie */
   struct sctpInitiation initAckISent;	/* the INIT-ACK that I sent to my peer */
   u_int addressWhereISent[4];		/* I make this 4 ints so I get 128bits for future */
   int addrtype;				/* address type */
