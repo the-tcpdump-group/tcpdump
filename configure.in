@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.159 2002-12-22 00:15:27 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.160 2003-02-11 07:41:52 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.159 $)
+AC_REVISION($Revision: 1.160 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -559,10 +559,11 @@ dnl AC_CHECK_HEADERS(zlib.h)
 
 AC_LBL_LIBPCAP(V_PCAPDEP, V_INCLS)
 
-AC_CHECK_FUNCS(pcap_findalldevs pcap_dump_flush)
-AC_MSG_CHECKING(whether pcap_version is defined by libpcap)
-AC_TRY_LINK([],
-   [
+AC_CHECK_FUNCS(pcap_findalldevs pcap_dump_flush pcap_lib_version)
+if test $ac_cv_func_pcap_lib_version = "no" ; then
+    AC_MSG_CHECKING(whether pcap_version is defined by libpcap)
+    AC_TRY_LINK([],
+       [
 char *
 return_pcap_version(void)
 {
@@ -570,14 +571,15 @@ return_pcap_version(void)
 
 	return pcap_version;
 }
-   ],
-   ac_lbl_cv_pcap_version_defined=yes,
-   ac_lbl_cv_pcap_version_defined=no)
-if test "$ac_lbl_cv_pcap_version_defined" = yes ; then
-	AC_MSG_RESULT(yes)
+       ],
+       ac_lbl_cv_pcap_version_defined=yes,
+       ac_lbl_cv_pcap_version_defined=no)
+    if test "$ac_lbl_cv_pcap_version_defined" = yes ; then
+    	AC_MSG_RESULT(yes)
 	AC_DEFINE(HAVE_PCAP_VERSION)
-else
+    else
 	AC_MSG_RESULT(no)
+    fi
 fi
 AC_MSG_CHECKING(whether pcap_debug is defined by libpcap)
 AC_TRY_LINK([],

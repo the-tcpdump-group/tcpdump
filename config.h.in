@@ -154,6 +154,9 @@
 /* Define if you have the pcap_findalldevs function.  */
 #undef HAVE_PCAP_FINDALLDEVS
 
+/* Define if you have the pcap_lib_version function.  */
+#undef HAVE_PCAP_LIB_VERSION
+
 /* Define if you have the pfopen function.  */
 #undef HAVE_PFOPEN
 

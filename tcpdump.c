@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.201 2003-01-23 09:05:38 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.202 2003-02-11 07:41:52 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -996,19 +996,26 @@ static void
 usage(void)
 {
 	extern char version[];
+#ifndef HAVE_PCAP_LIB_VERSION
 #if defined(WIN32) || defined(HAVE_PCAP_VERSION)
 	extern char pcap_version[];
-#else
+#else /* defined(WIN32) || defined(HAVE_PCAP_VERSION) */
 	static char pcap_version[] = "unknown";
-#endif
+#endif /* defined(WIN32) || defined(HAVE_PCAP_VERSION) */
+#endif /* HAVE_PCAP_LIB_VERSION */
 
+#ifdef HAVE_PCAP_LIB_VERSION
+	(void)fprintf(stderr, "%s version %s\n", program_name, version);
+	(void)fprintf(stderr, "libpcap version %s\n", pcap_lib_version());
+#else /* HAVE_PCAP_LIB_VERSION */
 #ifdef WIN32
 	(void)fprintf(stderr, "%s version %s, based on tcpdump version %s\n", program_name, WDversion, version);
 	(void)fprintf(stderr, "WinPcap version %s, based on libpcap version %s\n",Wpcap_version, pcap_version);
-#else	
+#else /* WIN32 */
 	(void)fprintf(stderr, "%s version %s\n", program_name, version);
 	(void)fprintf(stderr, "libpcap version %s\n", pcap_version);
 #endif /* WIN32 */
+#endif /* HAVE_PCAP_LIB_VERSION */
 	(void)fprintf(stderr,
 "Usage: %s [-aAd" D_FLAG "eflLnNOpqRStu" U_FLAG "vxX]" B_FLAG_USAGE " [-c count] [ -C file_size ]\n", program_name);
 	(void)fprintf(stderr,
