@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.77 2004-06-16 00:06:28 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.78 2004-07-28 19:59:24 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -764,7 +764,7 @@ mldv2_report_print(const u_char *bp, u_int len)
 		printf(" [invalid number of groups]");
 		return;
 	    }
-            TCHECK(bp[group + 4]);
+            TCHECK2(bp[group + 4], 16);
             printf(" [gaddr %s", ip6addr_string(&bp[group + 4]));
 	    printf(" %s", tok2str(mldv2report2str, " [v2-report-#%d]",
 								bp[group]));
@@ -820,6 +820,7 @@ mldv2_query_print(const u_char *bp, u_int len)
     if (vflag) {
 	(void)printf(" [max resp delay=%d]", mrt);
     }
+    TCHECK2(bp[8], 16);
     printf(" [gaddr %s", ip6addr_string(&bp[8]));
 
     if (vflag) {
@@ -838,6 +839,7 @@ mldv2_query_print(const u_char *bp, u_int len)
 	printf(" qqi=%d", qqi);
     }
 
+    TCHECK2(bp[26], 2);
     nsrcs = ntohs(*(u_short *)&bp[26]);
     if (nsrcs > 0) {
 	if (len < 28 + nsrcs * 16)
