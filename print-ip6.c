@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.3 2000-01-09 21:34:18 fenner Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.4 2000-02-17 02:21:20 fenner Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -168,7 +168,6 @@ ip6_print(register const u_char *bp, register int length)
 			break;
 		    }
 		case IPPROTO_PIM:
-			(void)printf("PIM");
 			pim_print(cp, len);
 			goto end;
 #ifndef IPPROTO_OSPF
