@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.37 2000-11-08 09:28:43 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.38 2000-11-08 10:10:59 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -886,7 +886,7 @@ icmp6_rrenum_print(int icmp6len, const u_char *bp, const u_char *ep)
 		printf("segnum=%u,", rr6->rr_segnum);
 		printf("maxdelay=%u", rr6->rr_maxdelay);
 		if (rr6->rr_reserved)
-			printf("rsvd=%u", rr6->rr_reserved);
+			printf("rsvd=0x%x", (u_int16_t)ntohs(rr6->rr_reserved));
 		/*[*/
 		printf("]");
 #undef F
@@ -946,7 +946,7 @@ icmp6_rrenum_print(int icmp6len, const u_char *bp, const u_char *ep)
 			}
 			if (vflag) {
 				printf("mask=0x%x,", use->rpu_ramask);
-				printf("flags=0x%x,", use->rpu_raflags);
+				printf("raflags=0x%x,", use->rpu_raflags);
 				if (~use->rpu_vltime == 0)
 					printf("vltime=infty,");
 				else
