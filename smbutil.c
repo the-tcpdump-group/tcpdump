@@ -11,7 +11,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.8 2000-07-10 04:47:36 assar Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.9 2000-07-29 08:03:06 assar Exp $";
 #endif
 
 #include <sys/param.h>
@@ -526,7 +526,7 @@ const uchar *fdata(const uchar *buf, const char *fmt, const uchar *maxbuf)
     case '[':
       fmt++;
       if (buf>=maxbuf) return(buf);
-      bzero(s,sizeof(s));
+      memset(s, 0, sizeof(s));
       p = strchr(fmt,']');
       strncpy(s,fmt,p-fmt);
       fmt = p+1;

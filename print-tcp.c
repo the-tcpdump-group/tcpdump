@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.67 2000-07-01 03:39:10 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.68 2000-07-29 08:03:05 assar Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -252,7 +252,7 @@ tcp_print(register const u_char *bp, register u_int length,
 		 * both directions).
 		 */
 #ifdef INET6
-		bzero(&tha, sizeof(tha));
+		memset(&tha, 0, sizeof(tha));
 		rev = 0;
 		if (ip6) {
 			if (sport > dport) {
