@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.82 2002-12-22 01:26:49 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.83 2003-02-08 19:32:00 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -412,14 +412,24 @@ copy_argv(register char **argv)
 	return buf;
 }
 
+/*
+ * On Windows, we need to open the file in binary mode, so that
+ * we get all the bytes specified by the size we get from "fstat()".
+ * On UNIX, that's not necessary.  O_BINARY is defined on Windows;
+ * we define it as 0 if it's not defined, so it does nothing.
+ */
+#ifndef O_BINARY
+#define O_BINARY	0
+#endif
+
 char *
 read_infile(char *fname)
 {
-	register int fd, cc;
+	register int i, fd, cc;
 	register char *cp;
 	struct stat buf;
 
-	fd = open(fname, O_RDONLY);
+	fd = open(fname, O_RDONLY|O_BINARY);
 	if (fd < 0)
 		error("can't open %s: %s", fname, pcap_strerror(errno));
 
@@ -434,18 +444,16 @@ read_infile(char *fname)
 	if (cc < 0)
 		error("read %s: %s", fname, pcap_strerror(errno));
 	if (cc != buf.st_size)
-#ifndef WIN32
 		error("short read %s (%d != %d)", fname, cc, (int)buf.st_size);
-#else
-/* Windows seems not to like the final \xa character */
-	{
-		char *pdest;
-		pdest=strchr( cp, '\xa');
-		*pdest=0;
-	}
-#endif /* WIN32 */
-	cp[(int)buf.st_size] = '\0';
 
+	close(fd);
+	/* replace "# comment" with spaces */
+	for (i = 0; i < cc; i++) {
+		if (cp[i] == '#')
+			while (i < cc && cp[i] != '\n')
+				cp[i++] = ' ';
+	}
+	cp[cc] = '\0';
 	return (cp);
 }
 
