@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.75 2001-10-08 16:17:02 fenner Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.76 2001-10-08 16:43:44 fenner Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -132,11 +132,11 @@ AC_DEFUN(AC_LBL_C_INIT,
 	    case "$target_os" in
 
 	    irix*)
-		    V_CCOPT="$V_CCOPT -xansi -signed -g3"
+		    V_CCOPT="$V_CCOPT -xansi -signed -O"
 		    ;;
 
 	    osf*)
-		    V_CCOPT="$V_CCOPT -std1 -g3"
+		    V_CCOPT="$V_CCOPT -std1 -O"
 		    ;;
 
 	    ultrix*)
