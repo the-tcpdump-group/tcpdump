@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.8 2001-06-15 20:52:12 fenner Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.9 2001-07-04 20:56:39 fenner Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -167,7 +167,7 @@ cdp_print_addr(const u_char * p, int l)
 
 			if (p + 4 > endp)
 				goto trunc;
-			printf("IPv4 %u.%u.%u.%u ", p[0], p[1], p[2], p[3]);
+			printf("IPv4 %u.%u.%u.%u", p[0], p[1], p[2], p[3]);
 			p += 4;
 		} else {	/* generic case: just print raw data */
 			if (p + pl > endp)
@@ -175,16 +175,19 @@ cdp_print_addr(const u_char * p, int l)
 			printf("pt=0x%02x, pl=%d, pb=", *(p - 2), pl);
 			while (pl-- > 0)
 				printf(" %02x", *p++);
-			al = (*p << 8) + *(p + 1);
-			if (p + 2 + al > endp)
+			if (p + 2 > endp)
 				goto trunc;
+			al = (*p << 8) + *(p + 1);
 			printf(", al=%d, a=", al);
 			p += 2;
+			if (p + al > endp)
+				goto trunc;
 			while (al-- > 0)
 				printf(" %02x", *p++);
 		}
-		printf("  ");
 		num--;
+		if (num)
+			printf(" ");
 	}
 
 	return 0;
