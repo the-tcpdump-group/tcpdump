@@ -13,7 +13,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.25 2001-07-09 09:24:09 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.26 2001-09-09 01:41:49 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -53,12 +53,18 @@ static struct tok rx_types[] = {
 	{ 0,				NULL },
 };
 
-static struct tok rx_flags[] = {
-	{ RX_CLIENT_INITIATED,	"client-init" },
-	{ RX_REQUEST_ACK,	"req-ack" },
-	{ RX_LAST_PACKET,	"last-pckt" },
-	{ RX_MORE_PACKETS,	"more-pckts" },
-	{ RX_FREE_PACKET,	"free-pckt" }
+static struct double_tok {
+	int flag;		/* Rx flag */
+	int packetType;		/* Packet type */
+	char *s;		/* Flag string */
+} rx_flags[] = {
+	{ RX_CLIENT_INITIATED,	0,			"client-init" },
+	{ RX_REQUEST_ACK,	0,			"req-ack" },
+	{ RX_LAST_PACKET,	0,			"last-pckt" },
+	{ RX_MORE_PACKETS,	0,			"more-pckts" },
+	{ RX_FREE_PACKET,	0,			"free-pckt" },
+	{ RX_SLOW_START_OK,	RX_PACKET_TYPE_ACK,	"slow-start" },
+	{ RX_JUMBO_PACKET,	RX_PACKET_TYPE_DATA,	"jumbogram" }
 };
 
 static struct tok fs_req[] = {
@@ -96,6 +102,7 @@ static struct tok fs_req[] = {
 	{ 161,		"dfs-lookup" },
 	{ 162,		"dfs-flushcps" },
 	{ 163,		"dfs-symlink" },
+	{ 220,		"residency" },
 	{ 0,		NULL },
 };
 
@@ -111,6 +118,10 @@ static struct tok cb_req[] = {
 	{ 212,		"whoareyou" },
 	{ 213,		"initcb3" },
 	{ 214,		"probeuuid" },
+	{ 215,		"getsrvprefs" },
+	{ 216,		"getcellservdb" },
+	{ 217,		"getlocalcell" },
+	{ 218,		"getcacheconf" },
 	{ 0,		NULL },
 };
 
@@ -136,6 +147,7 @@ static struct tok pt_req[] = {
 	{ 518,		"get-cps2" },
 	{ 519,		"get-host-cps" },
 	{ 520,		"update-entry" },
+	{ 521,		"list-entries" },
 	{ 0,		NULL },
 };
 
@@ -173,6 +185,7 @@ static struct tok vldb_req[] = {
 	{ 531,		"linked-list-u" },
 	{ 532,		"regaddr" },
 	{ 533,		"get-addrs-u" },
+	{ 534,		"list-attrib-n2" },
 	{ 0,		NULL },
 };
 
@@ -267,6 +280,8 @@ static struct tok bos_req[] = {
 	{ 112,		"start-bozo-log" },
 	{ 113,		"wait-all" },
 	{ 114,		"get-instance-strings" },
+	{ 115,		"get-restricted" },
+	{ 116,		"set-restricted" },
 	{ 0,		NULL },
 };
 
@@ -436,7 +451,9 @@ rx_print(register const u_char *bp, int length, int sport, int dport,
 
 		if (vflag > 1)
 			for (i = 0; i < NUM_RX_FLAGS; i++) {
-				if (rxh->flags & rx_flags[i].v) {
+				if (rxh->flags & rx_flags[i].flag &&
+				    (!rx_flags[i].packetType ||
+				     rxh->type == rx_flags[i].packetType)) {
 					if (!firstflag) {
 						firstflag = 1;
 						printf(" ");
