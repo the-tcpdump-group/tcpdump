@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.191 2002-12-19 05:44:47 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.192 2002-12-19 09:27:57 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -62,17 +62,18 @@ extern int SIZE_BUF;
 #include <stdlib.h>
 #include <string.h>
 
-
 #include "interface.h"
 #include "addrtoname.h"
 #include "machdep.h"
 #include "setsignal.h"
 #include "gmt2local.h"
+#include "pcap-missing.h"
 
 int aflag;			/* translate network and broadcast addresses */
 int dflag;			/* print filter code */
 int eflag;			/* print ethernet header */
 int fflag;			/* don't translate "foreign" IP address */
+int Lflag;			/* list available data link types and exit */
 int nflag;			/* leave addresses as numbers */
 int Nflag;			/* remove domains from printed host names */
 int Oflag = 1;			/* run filter code optimizer */
@@ -88,6 +89,9 @@ int xflag;			/* print packet in hex */
 int Xflag;			/* print packet in ascii as well as hex */
 off_t Cflag = 0;                /* rotate dump files after this many bytes */
 int Aflag = 0;                  /* print packet only in ascii observing LF, CR, TAB, SPACE */
+int dlt = -1;		/* if != -1, ask libpcap for the DLT it names */
+
+const char *dlt_name = NULL;
 
 char *espsecret = NULL;		/* ESP secret key */
 
@@ -103,6 +107,7 @@ int32_t thiszone;		/* seconds offset from gmt to local time */
 /* Forwards */
 static RETSIGTYPE cleanup(int);
 static void usage(void) __attribute__((noreturn));
+static void show_dlts_and_exit(pcap_t *pd) __attribute__((noreturn));
 
 static void dump_packet_and_trunc(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void dump_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
@@ -197,7 +202,7 @@ lookup_printer(int type)
 		if (type == p->type)
 			return p->f;
 
-	error("unknown data link type %d", type);
+	return NULL;
 	/* NOTREACHED */
 }
 
@@ -213,12 +218,48 @@ struct dump_info {
 	pcap_dumper_t *p;
 };
 
+static void
+show_dlts_and_exit(pcap_t *pd)
+{
+	int n_dlts;
+	int *dlts = 0;
+	const char *dlt_name;
+
+	n_dlts = pcap_list_datalinks(pd, &dlts);
+	if (n_dlts < 0)
+		error("%s", pcap_geterr(pd));
+	else if (n_dlts == 0 || !dlts)
+		error("No data link types.");
+
+	(void) fprintf(stderr, "Data link types (use option -y to set):\n");
+
+	while (--n_dlts >= 0) {
+		dlt_name = pcap_datalink_val_to_name(dlts[n_dlts]);
+		if (dlt_name != NULL) {
+			(void) fprintf(stderr, "  %s", dlt_name);
+
+			/*
+			 * OK, does tcpdump handle that type?
+			 */
+			if (lookup_printer(dlts[n_dlts]) == NULL)
+				(void) fprintf(stderr, " (not supported)");
+			putchar('\n');
+		} else {
+			(void) fprintf(stderr, "  DLT %d (not supported)\n",
+			    dlts[n_dlts]);
+		}
+	}
+	free(dlts);
+	exit(0);
+}
+
 int
 main(int argc, char **argv)
 {
 	register int cnt, op, i;
 	bpf_u_int32 localnet, netmask;
 	register char *cp, *infile, *cmdbuf, *device, *RFileName, *WFileName;
+	int type;
 	pcap_handler printer;
 	struct bpf_program fcode;
 #ifndef WIN32
@@ -263,12 +304,12 @@ main(int argc, char **argv)
 	opterr = 0;
 	while (
 #ifdef WIN32
-	    (op = getopt(argc, argv, "aAB:c:C:dDeE:fF:i:lm:nNOpqr:Rs:StT:uvw:xXY")) != -1)
+	    (op = getopt(argc, argv, "aAB:c:C:dDeE:fF:i:lLm:nNOpqr:Rs:StT:uvw:xXy:Y")) != -1)
 #else /* WIN32 */
 #ifdef HAVE_PCAP_FINDALLDEVS
-	    (op = getopt(argc, argv, "aAc:C:dDeE:fF:i:lm:nNOpqr:Rs:StT:uvw:xXY")) != -1)
+	    (op = getopt(argc, argv, "aAc:C:dDeE:fF:i:lLm:nNOpqr:Rs:StT:uvw:xXy:Y")) != -1)
 #else /* HAVE_PCAP_FINDALLDEVS */
-	    (op = getopt(argc, argv, "aAc:C:deE:fF:i:lm:nNOpqr:Rs:StT:uvw:xXY")) != -1)
+	    (op = getopt(argc, argv, "aAc:C:deE:fF:i:lLm:nNOpqr:Rs:StT:uvw:xXy:Y")) != -1)
 #endif /* HAVE_PCAP_FINDALLDEVS */
 #endif /* WIN32 */
 		switch (op) {
@@ -277,11 +318,11 @@ main(int argc, char **argv)
 			++aflag;
 			break;
 
-               case 'A':
-                       ++xflag;
-                       ++Xflag;
-                       ++Aflag;
-                       break;
+		case 'A':
+			++xflag;
+			++Xflag;
+			++Aflag;
+			break;
 
 #ifdef WIN32
 		case 'B':
@@ -322,6 +363,10 @@ main(int argc, char **argv)
 			}
 			return 0;
 #endif /* HAVE_PCAP_FINDALLDEVS */
+
+		case 'L':
+			Lflag++;
+			break;
 
 		case 'e':
 			++eflag;
@@ -485,6 +530,13 @@ main(int argc, char **argv)
 			++Xflag;
 			break;
 
+		case 'y':
+			dlt_name = optarg;
+			dlt = pcap_datalink_name_to_val(dlt_name);
+			if (dlt < 0)
+				error("invalid data link type %s", dlt_name);
+			break;
+
 #if defined(HAVE_PCAP_DEBUG) || defined(HAVE_YYDEBUG)
 		case 'Y':
 			{
@@ -548,6 +600,27 @@ main(int argc, char **argv)
 				error("%s", pcap_geterr(pd));
 			}
 #endif /* WIN32 */
+		if (Lflag)
+			show_dlts_and_exit(pd);
+		if (dlt >= 0) {
+#ifdef HAVE_PCAP_SET_DATALINK
+			if (pcap_set_datalink(pd, dlt) < 0)
+				error("%s", pcap_geterr(pd));
+#else
+			/*
+			 * We don't actually support changing the
+			 * data link type, so we only let them
+			 * set it to what it already is.
+			 */
+			if (dlt != pcap_datalink(pd)) {
+				error("%s is not one of the DLTs supported by this device\n",
+				    dlt_name);
+			}
+#endif
+			(void)fprintf(stderr, "%s: data link type %s\n",
+			              program_name, dlt_name);
+			(void)fflush(stderr);
+		}
 		i = pcap_snapshot(pd);
 		if (snaplen < i) {
 			warning("snaplen raised from %d to %d", snaplen, i);
@@ -604,7 +677,15 @@ main(int argc, char **argv)
 			pcap_userdata = (u_char *)p;
 		}
 	} else {
-		printer = lookup_printer(pcap_datalink(pd));
+		type = pcap_datalink(pd);
+		printer = lookup_printer(type);
+		if (printer == NULL) {
+			dlt_name = pcap_datalink_val_to_name(type);
+			if (dlt_name != NULL)
+				error("unsupported data link type %s", dlt_name);
+			else
+				error("unsupported data link type %d", type);
+		}
 		pcap_userdata = 0;
 	}
 #ifdef SIGINFO
@@ -857,17 +938,19 @@ usage(void)
 #endif /* WIN32 */
 	(void)fprintf(stderr,
 #ifdef WIN32
-"Usage: %s [-aAdDeflnNOpqRStuvxX] [-B size] [-c count] [ -C file_size ]\n", program_name);
+"Usage: %s [-aAdDeflLnNOpqRStuvxX] [-B size] [-c count] [ -C file_size ]\n", program_name);
 #else /* WIN32 */
 #ifdef HAVE_PCAP_FINDALLDEVS
-"Usage: %s [-aAdDeflnNOpqRStuvxX] [-c count] [ -C file_size ]\n", program_name);
+"Usage: %s [-aAdDeflLnNOpqRStuvxX] [-c count] [ -C file_size ]\n", program_name);
 #else /* HAVE_PCAP_FINDALLDEVS */
-"Usage: %s [-aAdeflnNOpqRStuvxX] [-c count] [ -C file_size ]\n", program_name);
+"Usage: %s [-aAdeflLnNOpqRStuvxX] [-c count] [ -C file_size ]\n", program_name);
 #endif /* HAVE_PCAP_FINDALLDEVS */
 #endif /* WIN32 */
 	(void)fprintf(stderr,
-"\t\t[ -F file ] [ -i interface ] [ -r file ] [ -s snaplen ]\n");
+"\t\t[ -E algo:secret ] [ -F file ] [ -i interface ] [ -r file ]\n");
 	(void)fprintf(stderr,
-"\t\t[ -T type ] [ -w file ] [ -E algo:secret ] [ expression ]\n");
+"\t\t[ -s snaplen ] [ -T type ] [ -w file ] [ -y datalinktype ]\n");
+	(void)fprintf(stderr,
+"\t\t[ expression ]\n");
 	exit(1);
 }

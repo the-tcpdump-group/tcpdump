@@ -17,7 +17,7 @@
 #  WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 #  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.269 2002-12-13 00:40:34 hannes Exp $ (LBL)
+# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.270 2002-12-19 09:27:55 guy Exp $ (LBL)
 
 #
 # Various configurable paths (remember to edit Makefile.in, not Makefile)
@@ -123,6 +123,10 @@ $(PROG): $(OBJ) @V_PCAPDEP@
 	@rm -f $@
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJ) $(LIBS)
 
+datalinks.o: $(srcdir)/missing/datalinks.c
+	$(CC) $(CFLAGS) -o $@ -c $(srcdir)/missing/datalinks.c
+dlnames.o: $(srcdir)/missing/dlnames.c
+	$(CC) $(CFLAGS) -o $@ -c $(srcdir)/missing/dlnames.c
 getnameinfo.o: $(srcdir)/missing/getnameinfo.c
 	$(CC) $(CFLAGS) -o $@ -c $(srcdir)/missing/getnameinfo.c
 getaddrinfo.o: $(srcdir)/missing/getaddrinfo.c

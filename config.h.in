@@ -65,6 +65,15 @@
 /* define if libpcap has yydebug */
 #undef HAVE_YYDEBUG
 
+/* define if libpcap has pcap_list_datalinks() */
+#undef HAVE_PCAP_LIST_DATALINKS
+
+/* define if libpcap has pcap_set_datalink() */
+#undef HAVE_PCAP_SET_DATALINK
+
+/* define if libpcap has pcap_datalink_name_to_val() */
+#undef HAVE_PCAP_DATALINK_NAME_TO_VAL
+
 /* define if unaligned memory accesses fail */
 #undef LBL_ALIGN
 

@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.90 2002-12-17 09:55:14 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.91 2002-12-19 09:27:56 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -257,21 +257,21 @@ AC_DEFUN(AC_LBL_LIBPCAP,
 	    if test $libpcap = FAIL ; then
 		    AC_MSG_ERROR(see the INSTALL doc for more info)
 	    fi
-	    #
-	    # Good old Red Hat Linux puts "pcap.h" in
-	    # "/usr/include/pcap"; had the LBL folks done so,
-	    # that would have been a good idea, but for
-	    # the Red Hat folks to do so just breaks source
-	    # compatibility with other systems.
-	    #
-	    # We work around this by assuming that, as we didn't
-	    # find a local libpcap, libpcap is in /usr/lib or
-	    # /usr/local/lib and that the corresponding header
-	    # file is under one of those directories; if we don't
-	    # find it in either of those directories, we check to
-	    # see if it's in a "pcap" subdirectory of them and,
-	    # if so, add that subdirectory to the "-I" list.
-	    #
+	    dnl
+	    dnl Good old Red Hat Linux puts "pcap.h" in
+	    dnl "/usr/include/pcap"; had the LBL folks done so,
+	    dnl that would have been a good idea, but for
+	    dnl the Red Hat folks to do so just breaks source
+	    dnl compatibility with other systems.
+	    dnl
+	    dnl We work around this by assuming that, as we didn't
+	    dnl find a local libpcap, libpcap is in /usr/lib or
+	    dnl /usr/local/lib and that the corresponding header
+	    dnl file is under one of those directories; if we don't
+	    dnl find it in either of those directories, we check to
+	    dnl see if it's in a "pcap" subdirectory of them and,
+	    dnl if so, add that subdirectory to the "-I" list.
+	    dnl
 	    AC_MSG_CHECKING(for extraneous pcap header directories)
 	    if ! test \( -r /usr/local/include/pcap.h -o \
 			 -r /usr/include/pcap.h \); then
@@ -311,7 +311,21 @@ AC_DEFUN(AC_LBL_LIBPCAP,
 		    LIBS="$LIBS -I:$pseexe"
 	    fi
 	    ;;
-    esac])
+    esac
+
+    dnl
+    dnl Check for "pcap_list_datalinks()", "pcap_set_datalink()",
+    dnl and "pcap_datalink_name_to_val()".
+    dnl
+    AC_CHECK_LIB(pcap, pcap_list_datalinks,
+	AC_DEFINE(HAVE_PCAP_LIST_DATALINKS),
+	LIBOBJS="$LIBOBJS datalinks.o")
+    AC_CHECK_LIB(pcap, pcap_set_datalink,
+	AC_DEFINE(HAVE_PCAP_SET_DATALINK))
+    AC_CHECK_LIB(pcap, pcap_datalink_name_to_val,
+	AC_DEFINE(HAVE_PCAP_DATALINK_NAME_TO_VAL),
+	LIBOBJS="$LIBOBJS dlnames.o")
+])
 
 dnl
 dnl Define RETSIGTYPE and RETSIGVAL

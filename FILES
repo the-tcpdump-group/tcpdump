@@ -57,6 +57,8 @@ mib.h
 missing/addrinfo.h
 missing/addrsize.h
 missing/bittypes.h
+missing/dlnames.c
+missing/datalinks.c
 missing/getaddrinfo.c
 missing/getnameinfo.c
 missing/inet_aton.c
@@ -80,6 +82,7 @@ ospf.h
 ospf6.h
 packetdat.awk
 parsenfsfh.c
+pcap-missing.h
 ppp.h
 print-802_11.c
 print-ah.c
