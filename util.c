@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.61 1999-11-22 07:25:27 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.62 1999-12-15 06:58:03 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -175,8 +175,6 @@ relts_print(int secs)
     static int seconds[]={31536000,604800,86400,3600,60,1};
     char **l = lengths;
     int *s = seconds;
-    int len;
-    int i;
 
     if (secs == 0) {
 	(void)printf("0s");
