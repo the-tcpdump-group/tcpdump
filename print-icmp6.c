@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.49 2001-05-10 05:30:21 fenner Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.50 2001-06-01 03:32:28 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -73,15 +73,15 @@ static char *rtpref_str[] = {
 };
 
 void
-icmp6_print(register const u_char *bp, register const u_char *bp2)
+icmp6_print(const u_char *bp, const u_char *bp2)
 {
 	const struct icmp6_hdr *dp;
-	register const struct ip6_hdr *ip;
-	register const char *str;
-	register const struct ip6_hdr *oip;
-	register const struct udphdr *ouh;
-	register int dport;
-	register const u_char *ep;
+	const struct ip6_hdr *ip;
+	const char *str;
+	const struct ip6_hdr *oip;
+	const struct udphdr *ouh;
+	int dport;
+	const u_char *ep;
 	char buf[256];
 	int icmp6len, prot;
 
@@ -348,9 +348,9 @@ trunc:
 }
 
 static struct udphdr *
-get_upperlayer(register u_char *bp, int *prot)
+get_upperlayer(u_char *bp, int *prot)
 {
-	register const u_char *ep;
+	const u_char *ep;
 	struct ip6_hdr *ip6 = (struct ip6_hdr *)bp;
 	struct udphdr *uh;
 	struct ip6_hbh *hbh;
@@ -421,22 +421,25 @@ get_upperlayer(register u_char *bp, int *prot)
 }
 
 void
-icmp6_opt_print(register const u_char *bp, int resid)
+icmp6_opt_print(const u_char *bp, int resid)
 {
-	register const struct nd_opt_hdr *op;
-	register const struct nd_opt_hdr *opl;	/* why there's no struct? */
-	register const struct nd_opt_prefix_info *opp;
-	register const struct icmp6_opts_redirect *opr;
-	register const struct nd_opt_mtu *opm;
-	register const struct nd_opt_advinterval *opa;
-	register const u_char *ep;
+	const struct nd_opt_hdr *op;
+	const struct nd_opt_hdr *opl;	/* why there's no struct? */
+	const struct nd_opt_prefix_info *opp;
+	const struct icmp6_opts_redirect *opr;
+	const struct nd_opt_mtu *opm;
+	const struct nd_opt_advinterval *opa;
+	const struct nd_opt_route_info *opri;
+	const u_char *ep;
 	int	opts_len;
+	struct in6_addr in6, *in6p;
+	u_int32_t lifetime;
 #if 0
-	register const struct ip6_hdr *ip;
-	register const char *str;
-	register const struct ip6_hdr *oip;
-	register const struct udphdr *ouh;
-	register int hlen, dport;
+	const struct ip6_hdr *ip;
+	const char *str;
+	const struct ip6_hdr *oip;
+	const struct udphdr *ouh;
+	int hlen, dport;
 	char buf[256];
 #endif
 
@@ -534,8 +537,8 @@ icmp6_opt_print(register const u_char *bp, int resid)
 	case ND_OPT_MTU:
 		opm = (struct nd_opt_mtu *)op;
 		TCHECK(opm->nd_opt_mtu_mtu);
-		printf("(mtu: ");	/*)*/
-		printf("mtu=%u", (u_int32_t)ntohl(opm->nd_opt_mtu_mtu));
+		printf("(mtu:");	/*)*/
+		printf(" mtu=%u", (u_int32_t)ntohl(opm->nd_opt_mtu_mtu));
 		if (opm->nd_opt_mtu_len != 1)
 			printf("!");
 		printf(")");
@@ -545,14 +548,49 @@ icmp6_opt_print(register const u_char *bp, int resid)
         case ND_OPT_ADVINTERVAL:
 		opa = (struct nd_opt_advinterval *)op;
 		TCHECK(opa->nd_opt_adv_interval);
-		printf("(advint: ");	/*)*/
-		printf("advint=%u",
+		printf("(advint:");	/*)*/
+		printf(" advint=%u",
 		    (u_int32_t)ntohl(opa->nd_opt_adv_interval));
 		/*(*/
 		printf(")");
 		icmp6_opt_print((const u_char *)op + (op->nd_opt_len << 3),
 				resid - (op->nd_opt_len << 3));
 		break;                
+	case ND_OPT_ROUTE_INFO:
+		opri = (struct nd_opt_route_info *)op;
+		TCHECK(opri->nd_opt_rti_lifetime);
+		memset(&in6, 0, sizeof(in6));
+		in6p = (struct in6_addr *)(opri + 1);
+		switch (op->nd_opt_len) {
+		case 1:
+			break;
+		case 2:
+			TCHECK2(*in6p, 8);
+			memcpy(&in6, opri + 1, 8);
+			break;
+		case 3:
+			TCHECK(*in6p);
+			memcpy(&in6, opri + 1, sizeof(in6));
+			break;
+		default:
+			goto trunc;
+		}
+		printf("(rtinfo:");	/*)*/
+		printf(" %s/%u", ip6addr_string(&in6),
+		    opri->nd_opt_rti_prefixlen);
+		printf(", pref=%s",
+		    rtpref_str[((opri->nd_opt_rti_flags & ND_RA_FLAG_RTPREF_MASK) >> 3) & 0xff]);
+		printf(", lifetime=");
+		lifetime = (u_int32_t)ntohl(opri->nd_opt_rti_lifetime);
+		if (lifetime == ~0UL)
+			printf("infinity");
+		else
+			printf("%u", lifetime);
+		/*(*/
+		printf(")");
+		icmp6_opt_print((const u_char *)op + (op->nd_opt_len << 3),
+				resid - (op->nd_opt_len << 3));
+		break;
 	default:
 		opts_len = op->nd_opt_len;
 		printf("(unknwon opt_type=%d, opt_len=%d)",
@@ -571,10 +609,10 @@ icmp6_opt_print(register const u_char *bp, int resid)
 }
 
 void
-mld6_print(register const u_char *bp)
+mld6_print(const u_char *bp)
 {
-	register struct mld6_hdr *mp = (struct mld6_hdr *)bp;
-	register const u_char *ep;
+	struct mld6_hdr *mp = (struct mld6_hdr *)bp;
+	const u_char *ep;
 
 	/* 'ep' points to the end of available data. */
 	ep = snapend;
