@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.30 2001-10-29 09:06:48 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.31 2001-11-10 21:35:04 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -916,6 +916,8 @@ static int isis_print (const u_char *p, u_int length)
 		    return (1);
 		tptr += alen;
 		tmp -= alen + 1;
+		if (tmp==0) /* if this is the last area address do not attemt a boundary check */
+		  break;
 		if (!TTEST2(*tptr, 1))
 		    goto trunctlv;
 		alen = *tptr++;
