@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.76 2002-12-19 09:39:12 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.77 2003-05-08 14:39:05 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -47,12 +47,12 @@ ether_hdr_print(register const u_char *bp, u_int length)
 
 	ep = (const struct ether_header *)bp;
 	if (qflag)
-		(void)printf("%s %s %d: ",
+		(void)printf("%s > %s (length: %u): ",
 			     etheraddr_string(ESRC(ep)),
 			     etheraddr_string(EDST(ep)),
 			     length);
 	else
-		(void)printf("%s %s %s %d: ",
+		(void)printf("%s > %s %s (lenght: %u): ",
 			     etheraddr_string(ESRC(ep)),
 			     etheraddr_string(EDST(ep)),
 			     etherproto_string(ep->ether_type),
