@@ -35,7 +35,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-"@(#) $Header: /tcpdump/master/tcpdump/print-sctp.c,v 1.1 2001-05-09 00:34:35 fenner Exp $ (NETLAB/PEL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-sctp.c,v 1.2 2001-05-09 01:25:44 fenner Exp $ (NETLAB/PEL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -206,7 +206,7 @@ void sctp_print(const u_char *bp,        /* beginning of sctp packet */
 	    printf("[TSN: %lu] ", ntohl(dataHdrPtr->TSN));
 	    printf("[SID: %u] ", ntohs(dataHdrPtr->streamId));
 	    printf("[SSEQ %u] ", ntohs(dataHdrPtr->sequence));
-	    printf("[PPID 0x%x] ", ntohl(dataHdrPtr->payloadtype));
+	    printf("[PPID 0x%x] ", (u_int32_t)ntohl(dataHdrPtr->payloadtype));
 	    fflush(stdout);
 
 	    if (vflag)		/* if verbose output is specified */
@@ -286,8 +286,8 @@ void sctp_print(const u_char *bp,        /* beginning of sctp packet */
 		 frag++, fragNo++)
 	      printf("\n\t\t[gap ack block #%d: start = %u, end = %u] ", 
 		     fragNo+1,
-		     ntohl(sack->highestConseqTSN) + ntohs(frag->fragmentStart),
-		     ntohl(sack->highestConseqTSN) + ntohs(frag->fragmentEnd));
+		     (u_int32_t)(ntohl(sack->highestConseqTSN) + ntohs(frag->fragmentStart)),
+		     (u_int32_t)(ntohl(sack->highestConseqTSN) + ntohs(frag->fragmentEnd)));
 	    
 
 	    /* print duplicate TSNs */
