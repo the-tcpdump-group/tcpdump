@@ -1,59 +1,37 @@
-Sun Dec 17 07:14:08 PST 2000 fenner@research.att.com
-        * Updated config.guess and config.sub from
-	  ftp://ftp.gnu.org/gnu/config/
+Tuesday January 9, 2001. mcr@sandelman.ottawa.on.ca. Summary for 3.6 release
+	Cleaned up documentation.
+	Promisc mode fixes for Linux
+	IPsec changes/cleanups.
+	Alignment fixes for picky architectures
 
-Fri Aug 18 16:43:03 JST 2000  itjun@iijlab.net
-	* improved PPP/L2TP/PPPoE decoder.
-	  From: Motonori Shindo <mshindo@mshindo.net>
+	Removed dependancy on native headers for packet dissectors.
+	Removed Linux specific headers that were shipped
 
-Wed Aug  2 05:28:45 JST 2000  itojun@iijlab.net
-	* tcp/udp pseudo header checksum code, from netbsd-current.
+	libpcap changes provide for exchanging capture files between
+	  systems. Save files now have well known PACKET_ values instead of
+	  depending upon system dependant mappings of DLT_* types.
 
-Tue Jul 11 01:14:41 GMT 2000 Assar Westerlund  <assar@sics.se>
-	* (ip6_print): rewrite the alignment code to be for v6 and not v4.
-	based on a patch from Love <lha@stacken.kth.se>
+	Support for computing/checking IP and UDP/TCP checksums.
 
-Tue Jul 11 01:22:38 GMT 2000 Love <lha@stacken.kth.se>
-	* check the ip protocol version on printing raw packets
+	Updated autoconf stock files.
 
-2000-05-15  Assar Westerlund  <assar@sics.se>
+	IPv6 improvements: dhcp (draft-15), mobile-ip6, ppp, ospf6, 
 
-	* print cdp packets, code contributed by Gert Doering
-	<gert@greenie.muc.de>
+	Added dissector support for: ISOCLNS, Token Ring, IGMPv3, bxxp,
+		timed, vrrp, radius, chdlc, cnfp, cdp, IEEE802.1d, raw-AppleTalk
 
-2000-04-09  Assar Westerlund  <assar@sics.se>
+	Added filtering support for: VLANs, ESIS, ISIS
 
-	* make it work on Solaris 8, including ipv6
+	Improvemenets to: print-telnet, IPTalk, bootp/dhcp, ECN, PPP, L2TP, PPPoE
 
-Wed Jan 19 JST 2000  itojun@iijlab.net
-	* fix get{addr,name}info portability issues.
-	* improve linux portability for IPv6 enabled case.  pull in structure
-	  defs from KAME include files into tcpdump tree itself.
-	* fix pim structure def.
-	* string buffer overrun prevention, using snprintf(), strlcpy and
-	  others (not complete).
+	HP-UX 11.0 -- find the right dlpi device.
+	Solaris 8 - IPv6 works
+	Linux - Added support for an "any" device to capture on all interfaces
+	
+	Security fixes: buffer overrun audit done. Strcpy replaced with strlcpy, sprintf
+		repalced with snprintf.
+	Look for lex problems, and warn about them.
 
-2000-01-09  Assar Westerlund  <assar@sics.se>
-
-	* remove some <netinet/tcpip.h>, it's not needed and causes
-	problems when compiling with v6 support if v6 headers have not been
-	included before
-
-2000-01-07  Assar Westerlund  <assar@sics.se>
-
-	* check for sys/cdefs.h
-
-	* missing/snprintf.c: snprintf implementation
-	* interface.h: add prototypes for snprintf et al
-	* Makefile.in: add snprintf.c
-	* configure.in: check for vsnprintf snprintf asprintf asnprintf
-	vasprintf vasnprintf
-
-	* print-rx.c: add printing of fs error messages
-
-Wed Dec 22 13:06:17 JST 1999  itojun@iijlab.net
-	* print-rt6.c: make IPv6 routing header printing work with new 2292bis
-	  API.
 
 v3.5 Fri Jan 28 18:00:00 PST 2000
 
@@ -614,4 +592,4 @@ v2.0 Sun Jan 13 12:20:40 PST 1991
 
 - Initial public release.
 
-@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.76 2000-12-17 19:37:57 guy Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.77 2001-01-10 00:14:30 mcr Exp $ (LBL)
