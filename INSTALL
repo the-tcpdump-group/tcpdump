@@ -1,4 +1,4 @@
-@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.54 2003-06-07 11:57:52 guy Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.55 2003-06-09 23:28:08 guy Exp $ (LBL)
 
 If you have not built libpcap, do so first.  See the README
 file in this directory for the ftp location.
@@ -73,7 +73,8 @@ ether.h		- Ethernet definitions
 ethertype.h	- Ethernet type value definitions
 extract.h	- alignment definitions
 fddi.h		- Fiber Distributed Data Interface definitions
-gmpls.h		- GMPLS definitions
+gmpls.c		- GMPLS definitions
+gmpls.h		- GMPLS declarations
 gmt2local.c	- time conversion routines
 gmt2local.h	- time conversion prototypes
 icmp6.h		- ICMPv6 definitiions
