@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.73 2001-01-02 22:18:27 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.74 2001-09-14 08:11:33 torsten Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -492,7 +492,7 @@ AC_DEFUN(AC_LBL_UNALIGNED_ACCESS,
 	[case "$target_cpu" in
 
 	# XXX: should also check that they don't do weird things (like on arm)
-	alpha*|arm*|hp*|mips|sparc)
+	alpha*|arm*|hp*|mips|ia64|sparc)
 		ac_cv_lbl_unaligned_fail=yes
 		;;
 
