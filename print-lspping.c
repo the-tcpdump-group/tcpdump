@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.3 2004-06-09 05:14:42 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.4 2004-06-12 08:23:45 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -31,6 +31,7 @@ static const char rcsid[] _U_ =
 #include "interface.h"
 #include "extract.h"
 #include "addrtoname.h"
+#include "bgp.h"
 
 /*
  * LSPPING common header
@@ -154,6 +155,7 @@ static const struct tok lspping_tlv_values[] = {
 #define	LSPPING_TLV_TARGETFEC_SUBTLV_L2VPN_ENDPT   8
 #define	LSPPING_TLV_TARGETFEC_SUBTLV_L2VPN_VCID    9
 #define	LSPPING_TLV_TARGETFEC_SUBTLV_BGP_IPV4     10
+#define	LSPPING_TLV_TARGETFEC_SUBTLV_BGP_IPV6     11
 
 static const struct tok lspping_tlvtargetfec_subtlv_values[] = {
     { LSPPING_TLV_TARGETFEC_SUBTLV_LDP_IPV4, "LDP IPv4 prefix"},
@@ -166,7 +168,175 @@ static const struct tok lspping_tlvtargetfec_subtlv_values[] = {
     { LSPPING_TLV_TARGETFEC_SUBTLV_L2VPN_ENDPT, "L2 VPN endpoint"},
     { LSPPING_TLV_TARGETFEC_SUBTLV_L2VPN_VCID, "L2 circuit ID"},
     { LSPPING_TLV_TARGETFEC_SUBTLV_BGP_IPV4, "BGP labeled IPv4 prefix"},
+    { LSPPING_TLV_TARGETFEC_SUBTLV_BGP_IPV6, "BGP labeled IPv6 prefix"},
     { 0, NULL}
+};
+
+/*
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                          IPv4 prefix                          |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * | Prefix Length |         Must Be Zero                          |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ */
+struct lspping_tlv_targetfec_subtlv_ldp_ipv4_t {
+    u_int8_t prefix [4];
+    u_int8_t prefix_len;
+};
+
+/*
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                          IPv6 prefix                          |
+ * |                          (16 octets)                          |
+ * |                                                               |
+ * |                                                               |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * | Prefix Length |         Must Be Zero                          |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ */
+struct lspping_tlv_targetfec_subtlv_ldp_ipv6_t {
+    u_int8_t prefix [16];
+    u_int8_t prefix_len;
+};
+
+/*
+ * 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                    Sender identifier                          |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                         IPv4 prefix                           |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * | Prefix Length |                 Must Be Zero                  |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ */
+struct lspping_tlv_targetfec_subtlv_bgp_ipv4_t {
+    u_int8_t sender_id [4];
+    u_int8_t prefix [4];
+    u_int8_t prefix_len;
+};
+
+/*
+ * 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                    Sender identifier                          |
+ * |                          (16 octets)                          |
+ * |                                                               |
+ * |                                                               |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                          IPv6 prefix                          |
+ * |                          (16 octets)                          |
+ * |                                                               |
+ * |                                                               |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * | Prefix Length |                 Must Be Zero                  |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ */
+struct lspping_tlv_targetfec_subtlv_bgp_ipv6_t {
+    u_int8_t sender_id [16];
+    u_int8_t prefix [16];
+    u_int8_t prefix_len;
+};
+
+/*
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                 IPv4 tunnel end point address                 |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |          Must Be Zero         |     Tunnel ID                 |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                       Extended Tunnel ID                      |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                   IPv4 tunnel sender address                  |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |          Must Be Zero         |            LSP ID             |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ */
+struct lspping_tlv_targetfec_subtlv_rsvp_ipv4_t {
+    u_int8_t tunnel_endpoint [4];
+    u_int8_t res[2];
+    u_int8_t tunnel_id[2];
+    u_int8_t extended_tunnel_id[4];
+    u_int8_t tunnel_sender [4];
+    u_int8_t res2[2];
+    u_int8_t lsp_id [2];
+};
+
+/*
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                 IPv6 tunnel end point address                 |
+ * |                                                               |
+ * |                                                               |
+ * |                                                               |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |          Must Be Zero         |          Tunnel ID            |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                       Extended Tunnel ID                      |
+ * |                                                               |
+ * |                                                               |
+ * |                                                               |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                   IPv6 tunnel sender address                  |
+ * |                                                               |
+ * |                                                               |
+ * |                                                               |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |          Must Be Zero         |            LSP ID             |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ */
+struct lspping_tlv_targetfec_subtlv_rsvp_ipv6_t {
+    u_int8_t tunnel_endpoint [16];
+    u_int8_t res[2];
+    u_int8_t tunnel_id[2];
+    u_int8_t extended_tunnel_id[16];
+    u_int8_t tunnel_sender [16];
+    u_int8_t res2[2];
+    u_int8_t lsp_id [2];
+};
+
+/*
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                      Route Distinguisher                      |
+ * |                          (8 octets)                           |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                         IPv4 prefix                           |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * | Prefix Length |                 Must Be Zero                  |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ */
+struct lspping_tlv_targetfec_subtlv_l3vpn_ipv4_t {
+    u_int8_t rd [8];
+    u_int8_t prefix [4];
+    u_int8_t prefix_len;
+};
+
+/*
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                      Route Distinguisher                      |
+ * |                          (8 octets)                           |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                          IPv6 prefix                          |
+ * |                          (16 octets)                          |
+ * |                                                               |
+ * |                                                               |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * | Prefix Length |                 Must Be Zero                  |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ */
+struct lspping_tlv_targetfec_subtlv_l3vpn_ipv6_t {
+    u_int8_t rd [8];
+    u_int8_t prefix [16];
+    u_int8_t prefix_len;
 };
 
 void
@@ -179,6 +349,17 @@ lspping_print(register const u_char *pptr, register u_int len) {
     int tlen,lspping_tlv_len,lspping_tlv_type,tlv_tlen;
     int tlv_hexdump,subtlv_hexdump;
     int lspping_subtlv_len,lspping_subtlv_type;
+
+    union {
+        const struct lspping_tlv_targetfec_subtlv_ldp_ipv4_t *lspping_tlv_targetfec_subtlv_ldp_ipv4;
+        const struct lspping_tlv_targetfec_subtlv_ldp_ipv6_t *lspping_tlv_targetfec_subtlv_ldp_ipv6;
+        const struct lspping_tlv_targetfec_subtlv_rsvp_ipv4_t *lspping_tlv_targetfec_subtlv_rsvp_ipv4;
+        const struct lspping_tlv_targetfec_subtlv_rsvp_ipv6_t *lspping_tlv_targetfec_subtlv_rsvp_ipv6;
+        const struct lspping_tlv_targetfec_subtlv_l3vpn_ipv4_t *lspping_tlv_targetfec_subtlv_l3vpn_ipv4;
+        const struct lspping_tlv_targetfec_subtlv_l3vpn_ipv6_t *lspping_tlv_targetfec_subtlv_l3vpn_ipv6;
+        const struct lspping_tlv_targetfec_subtlv_bgp_ipv4_t *lspping_tlv_targetfec_subtlv_bgp_ipv4;
+        const struct lspping_tlv_targetfec_subtlv_bgp_ipv6_t *lspping_tlv_targetfec_subtlv_bgp_ipv6;
+    } subtlv_ptr;
 
     tptr=pptr;
     lspping_com_header = (const struct lspping_common_header *)pptr;
@@ -306,70 +487,95 @@ lspping_print(register const u_char *pptr, register u_int len) {
                 switch(lspping_subtlv_type) {
 
                 case LSPPING_TLV_TARGETFEC_SUBTLV_LDP_IPV4:
-
-                   /*
-                    *  0                   1                   2                   3
-                    *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-                    * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                    * |                          IPv4 prefix                          |
-                    * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                    * | Prefix Length |         Must Be Zero                          |
-                    * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                    */
-
+                    subtlv_ptr.lspping_tlv_targetfec_subtlv_ldp_ipv4 = \
+                        (const struct lspping_tlv_targetfec_subtlv_ldp_ipv4_t *)subtlv_tptr;
                     printf("\n\t      %s/%u",
-                           ipaddr_string(subtlv_tptr),
-                           *(subtlv_tptr+4));
+                           ipaddr_string(subtlv_ptr.lspping_tlv_targetfec_subtlv_ldp_ipv4->prefix),
+                           subtlv_ptr.lspping_tlv_targetfec_subtlv_ldp_ipv4->prefix_len);
                     break;
 
 #ifdef INET6
                 case LSPPING_TLV_TARGETFEC_SUBTLV_LDP_IPV6:
-                   /*
-                    *  0                   1                   2                   3
-                    *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-                    * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                    * |                          IPv6 prefix                          |
-                    * |                          (16 octets)                          |
-                    * |                                                               |
-                    * |                                                               |
-                    * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                    * | Prefix Length |         Must Be Zero                          |
-                    * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                    */
-
+                    subtlv_ptr.lspping_tlv_targetfec_subtlv_ldp_ipv6 = \
+                        (const struct lspping_tlv_targetfec_subtlv_ldp_ipv6_t *)subtlv_tptr;
                     printf("\n\t      %s/%u",
-                           ip6addr_string(subtlv_tptr),
-                           *(subtlv_tptr+16));
+                           ip6addr_string(subtlv_ptr.lspping_tlv_targetfec_subtlv_ldp_ipv6->prefix),
+                           subtlv_ptr.lspping_tlv_targetfec_subtlv_ldp_ipv6->prefix_len);
                     break;
 #endif
 
                 case LSPPING_TLV_TARGETFEC_SUBTLV_BGP_IPV4:
-                   /*
-                    * 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-                    * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                    * |                    Sender identifier                          |
-                    * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                    * |                         IPv4 prefix                           |
-                    * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                    * | Prefix Length |                 Must Be Zero                  |
-                    * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                    */
-
-                    printf("\n\t      %s/%u, sender-ID %s",
-                           ipaddr_string(subtlv_tptr+4),
-                           *(subtlv_tptr+8),
-                           ipaddr_string(subtlv_tptr));
+                    subtlv_ptr.lspping_tlv_targetfec_subtlv_bgp_ipv4 = \
+                        (const struct lspping_tlv_targetfec_subtlv_bgp_ipv4_t *)subtlv_tptr;
+                    printf("\n\t      %s/%u, sender-id %s",
+                           ipaddr_string(subtlv_ptr.lspping_tlv_targetfec_subtlv_bgp_ipv4->prefix),
+                           subtlv_ptr.lspping_tlv_targetfec_subtlv_bgp_ipv4->prefix_len,
+                           ipaddr_string(subtlv_ptr.lspping_tlv_targetfec_subtlv_bgp_ipv4->sender_id));
                     break;
+
+#ifdef INET6
+                case LSPPING_TLV_TARGETFEC_SUBTLV_BGP_IPV6:
+                    subtlv_ptr.lspping_tlv_targetfec_subtlv_bgp_ipv6 = \
+                        (const struct lspping_tlv_targetfec_subtlv_bgp_ipv6_t *)subtlv_tptr;
+                    printf("\n\t      %s/%u, sender-id %s",
+                           ip6addr_string(subtlv_ptr.lspping_tlv_targetfec_subtlv_bgp_ipv6->prefix),
+                           subtlv_ptr.lspping_tlv_targetfec_subtlv_bgp_ipv6->prefix_len,
+                           ip6addr_string(subtlv_ptr.lspping_tlv_targetfec_subtlv_bgp_ipv6->sender_id));
+                    break;
+#endif
+
+                case LSPPING_TLV_TARGETFEC_SUBTLV_RSVP_IPV4:
+                    subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv4 = \
+                        (const struct lspping_tlv_targetfec_subtlv_rsvp_ipv4_t *)subtlv_tptr;
+                    printf("\n\t      tunnel end-point %s, tunnel sender %s, lsp-id 0x%04x" \
+                           "\n\t      tunnel-id 0x%04x, extended tunnel-id %s",
+                           ipaddr_string(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv4->tunnel_endpoint),
+                           ipaddr_string(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv4->tunnel_sender),
+                           EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv4->lsp_id),
+                           EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv4->tunnel_id),
+                           ipaddr_string(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv4->extended_tunnel_id));
+                    break;
+
+#ifdef INET6
+                case LSPPING_TLV_TARGETFEC_SUBTLV_RSVP_IPV6:
+                    subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv6 = \
+                        (const struct lspping_tlv_targetfec_subtlv_rsvp_ipv6_t *)subtlv_tptr;
+                    printf("\n\t      tunnel end-point %s, tunnel sender %s, lsp-id 0x%04x" \
+                           "\n\t      tunnel-id 0x%04x, extended tunnel-id %s",
+                           ip6addr_string(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv6->tunnel_endpoint),
+                           ip6addr_string(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv6->tunnel_sender),
+                           EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv6->lsp_id),
+                           EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv6->tunnel_id),
+                           ip6addr_string(subtlv_ptr.lspping_tlv_targetfec_subtlv_rsvp_ipv6->extended_tunnel_id));
+                    break;
+#endif
+
+                case LSPPING_TLV_TARGETFEC_SUBTLV_L3VPN_IPV4:
+                    subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv4 = \
+                        (const struct lspping_tlv_targetfec_subtlv_l3vpn_ipv4_t *)subtlv_tptr;
+                    printf("\n\t      RD: %s :%s/%u",
+                           bgp_vpn_rd_print(subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv4->rd),
+                           ipaddr_string(subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv4->prefix),
+                           subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv4->prefix_len);
+                    break;
+
+#ifdef INET6
+                case LSPPING_TLV_TARGETFEC_SUBTLV_L3VPN_IPV6:
+                    subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv6 = \
+                        (const struct lspping_tlv_targetfec_subtlv_l3vpn_ipv6_t *)subtlv_tptr;
+                    printf("\n\t      RD: %s :%s/%u",
+                           bgp_vpn_rd_print(subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv6->rd),
+                           ip6addr_string(subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv6->prefix),
+                           subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv6->prefix_len);
+                    break;
+#endif
+
 
                     /*
                      *  FIXME those are the defined subTLVs that lack a decoder
                      *  you are welcome to contribute code ;-)
                      */
 
-                case LSPPING_TLV_TARGETFEC_SUBTLV_RSVP_IPV4:
-                case LSPPING_TLV_TARGETFEC_SUBTLV_RSVP_IPV6:
-                case LSPPING_TLV_TARGETFEC_SUBTLV_L3VPN_IPV4:
-                case LSPPING_TLV_TARGETFEC_SUBTLV_L3VPN_IPV6:
                 case LSPPING_TLV_TARGETFEC_SUBTLV_L2VPN_ENDPT:
                 case LSPPING_TLV_TARGETFEC_SUBTLV_L2VPN_VCID:
 
