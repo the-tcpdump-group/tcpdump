@@ -1,3 +1,6 @@
+Tue Jul 11 01:22:38 GMT 2000 Love <lha@stacken.kth.se>
+	* check the ip protocol version on printing raw packets
+
 2000-05-15  Assar Westerlund  <assar@sics.se>
 
 	* print cdp packets, code contributed by Gert Doering
@@ -33,51 +36,54 @@ Wed Jan 19 JST 2000  itojun@iijlab.net
 
 	* print-rx.c: add printing of fs error messages
 
-Thu Dec 23 00:45:44 JST 1999  itojun@iijlab.net
-	* -X will make a ascii dump.  from netbsd.
-	* telnet command sequence decoder (ff xx xx).  from netbsd.
-
 Wed Dec 22 13:06:17 JST 1999  itojun@iijlab.net
 	* print-rt6.c: make IPv6 routing header printing work with new 2292bis
 	  API.
-	* print-bgp.c: improve options printing.  ugly code exists for
-	  unaligned option parsing (need some fix).
-	* const poisoning in SMB decoder.
-	* make dump format back to original.  someone may want to add an
-	  option to do ascii printing, but keep the default behavior as is
-	  for scripts used in many places.
-	* -Wall -Werror clean checks.
 
-1999-11-21  Assar Westerlund  <assar@sics.se>
+v3.5 Fri Jan 28 18:00:00 PST 2000
 
-	* Add SMB printing code from Andrew Tridgell <tridge@linuxcare.com>
+Bill Fenner <fenner@research.att.com>
+- switch to config.h for autoconf
+- unify RCSID strings
+- Updated PIMv1, PIMv2, DVMRP, IGMP parsers, add Cisco Auto-RP parser
+- Really fix the RIP printer
+- Fix MAC address -> name translation.
+- some -Wall -Wformat fixes
+- update makemib to parse much of SMIv2
+- Print TCP sequence # with -vv even if you normally wouldn't
+- Print as much of IP/TCP/UDP headers as possible even if truncated.
 
-	* Incorporate NFS parsing code from NetBSD.  Adds support for
-	nfsv3.
+itojun@iijlab.net
+- -X will make a ascii dump.  from netbsd.
+- telnet command sequence decoder (ff xx xx).  from netbsd.
+- print-bgp.c: improve options printing.  ugly code exists for
+  unaligned option parsing (need some fix).
+- const poisoning in SMB decoder.
+- -Wall -Werror clean checks.
+- bring in KAME IPv6/IPsec decoding code.
 
-1999-11-17  Assar Westerlund  <assar@sics.se>
+Assar Westerlund  <assar@sics.se>
+- SNMPv2 and SNMPv3 printer
+- If compiled with libsmi, tcpdump can load MIBs on the fly to decode
+  SNMP packets.
+- Incorporate NFS parsing code from NetBSD.  Adds support for nfsv3.
+- portability fixes
+- permit building in different directories.
 
-	* print-rx.c: add code for printing MakeDir and StoreStatus.  Also
-	change date format to the right one.  From: Love
-	<lha@stacken.kth.se>
+Ken Hornstein <kenh@cmf.nrl.navy.mil>
+- bring in code at
+  /afs/transarc.com/public/afs-contrib/tools/tcpdump for parsing
+  AFS3 packets
 
-	* Also add Ken's README as README-AFS
-	
-	* bring in code from Ken Hornstein <kenh@cmf.nrl.navy.mil> at
-	/afs/transarc.com/public/afs-contrib/tools/tcpdump for parsing
-	AFS3 packets
+Andrew Tridgell <tridge@linuxcare.com>
+- SMB printing code
 
-Sun Oct 30 JST 1999  itojun@iijlab.net
-	* bring in KAME IPv6/IPsec decoding code.
-	* bring in more portability fixes from Assar Westerlund <assar@sics.se>.
+Love <lha@stacken.kth.se>
+- print-rx.c: add code for printing MakeDir and StoreStatus.  Also
+  change date format to the right one.
 
-1999-10-09  Michael C. Richardson  <mcr@sandelman.ottawa.on.ca>
-
-	* Added patches from Assar Westerlund <assar@sics.se> to permit
-	  building in different directories.
-		
-
-	* Incorporated LBL 3.4 into CVS.
+Michael C. Richardson  <mcr@sandelman.ottawa.on.ca>
+- Created tcpdump.org repository
 
 v3.4 Sat Jul 25 12:40:55 PDT 1998
 
@@ -593,4 +599,4 @@ v2.0 Sun Jan 13 12:20:40 PST 1991
 
 - Initial public release.
 
-@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.70 2000-05-15 00:41:34 assar Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.71 2000-07-14 02:31:24 guy Exp $ (LBL)
