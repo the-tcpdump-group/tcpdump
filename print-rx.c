@@ -34,7 +34,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.34 2002-09-05 21:25:46 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.35 2003-01-25 23:49:04 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -375,6 +375,7 @@ static struct tok rx_ack_reasons[] = {
 	{ 6,		"ping" },
 	{ 7,		"ping response" },
 	{ 8,		"delay" },
+	{ 9,		"idle" },
 	{ 0,		NULL },
 };
 
@@ -402,7 +403,6 @@ static void	rx_cache_insert(const u_char *, const struct ip *, int);
 static int	rx_cache_find(const struct rx_header *, const struct ip *,
 			      int, int32_t *);
 
-static void ack_print(const u_char *, int);
 static void fs_print(const u_char *, int);
 static void fs_reply_print(const u_char *, int, int32_t);
 static void acl_print(u_char *, int, u_char *);
@@ -489,9 +489,7 @@ rx_print(register const u_char *bp, int length, int sport, int dport,
 	 * as well.
 	 */
 
-	if (rxh->type == RX_PACKET_TYPE_ACK)
-	    ack_print(bp, length);
-	else if (rxh->type == RX_PACKET_TYPE_DATA &&
+	if (rxh->type == RX_PACKET_TYPE_DATA &&
 	    EXTRACT_32BITS(&rxh->seq) == 1 &&
 	    rxh->flags & RX_CLIENT_INITIATED) {
 
@@ -764,75 +762,6 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 			fn_print(s, NULL); \
 			printf("\""); \
 		}
-
-static void
-ack_print(register const u_char *bp, int length)
-{
-        u_char nAcks;
-	int i;
-
-	if (vflag <= 1)
-	        return;
-
-	if (length <= (int)sizeof(struct rx_header))
-		return;
-
-	bp += sizeof(struct rx_header);
-
-	/*
-	 * Packets < firstPacket are implicitly acknowledged and may
-	 * be discarded by the sender.
-	 *
-	 * Packets >= firstPacket+nAcks are implicitly NOT acknowledged.
-	 *
-	 * No packets with sequence numbers >= firstPacket should be
-	 * discarded by the sender (they may thrown out at any time by
-	 * the receiver)
-	 */
-#define RX_ACK_REASONS "RDOXSprn"
-	/* Requested, Duplicate, Out_of_sequence, eXceeds_window, no_Space,
-	 * Ping, ping_Response, No_{progress, particular_reason}.
-	 */
-#if 0
-	struct rx_ackPacket {
-	  u_short bufferSpace;	/* Skip! */
-	  u_short maxSkew;	/* Skip! */
-	  u_long  firstPacket;
-	  u_long  previousPacket; /* Obsolete! */
-	  u_long  serial;	/* Serial that prompted the ack, */
-	  u_char  reason;	/* and the reason why. */
-	  u_char  nAcks;
-	  u_char  acks[RX_MAXACKS]; /* Selective acks (not a bitmap). */
-	};
-#endif
-#define RX_ACK_TYPE_NACK 0
-
-	TCHECK2(bp[0], 8);	/* bufferSpace and maxSkew */
-	bp += 4;
-	printf(" fir %u", (unsigned)EXTRACT_32BITS(bp));
-	bp += 4;
-	TCHECK2(bp[0], 8);	/* previousPacket and serial */
-	bp += 4;
-	printf(" %u", (unsigned)EXTRACT_32BITS(bp));
-	bp += 4;
-	TCHECK2(bp[0], 1);
-	printf("%c", RX_ACK_REASONS[(*bp - 1) & 07u]);
-	bp += 1;		/* reason */
-	TCHECK2(bp[0], 1);
-	nAcks = *bp;
-	bp += 1;		/* nAcks */
-
-	for (i = 0; i < nAcks; i++) {
-	    TCHECK2(bp[0], 1);
-	    putchar(*bp == RX_ACK_TYPE_NACK? '-' : '*');
-	    bp += 1;
-	}
-
-	return;
-
-trunc:
-	printf(" [|ack]");
-}
 
 /*
  * Handle calls to the AFS file service (fs)
