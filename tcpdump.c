@@ -24,7 +24,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.164 2001-06-20 07:40:45 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.165 2001-06-24 20:38:52 itojun Exp $ (LBL)";
 #endif
 
 /*
@@ -523,5 +523,5 @@ usage(void)
 "\t\t[ -i interface ] [ -r file ] [ -s snaplen ]\n");
 	(void)fprintf(stderr,
 "\t\t[ -T type ] [ -w file ] [ expression ]\n");
-	exit(-1);
+	exit(1);
 }
