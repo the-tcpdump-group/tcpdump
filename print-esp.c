@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.16 2000-10-07 05:53:10 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.17 2000-12-12 09:58:41 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -87,7 +87,7 @@ esp_print(register const u_char *bp, register const u_char *bp2, int *nhdr)
 		fputs("[|ESP]", stdout);
 		goto fail;
 	}
-	printf("ESP(spi=%u", spi);
+	printf("ESP(spi=0x%08x", spi);
 	printf(",seq=0x%x", (u_int32_t)ntohl(*(u_int32_t *)(esp + 1)));
 	printf(")");
 

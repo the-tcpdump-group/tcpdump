@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ipcomp.c,v 1.12 2000-10-07 05:46:21 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ipcomp.c,v 1.13 2000-12-12 09:58:41 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -71,7 +71,7 @@ ipcomp_print(register const u_char *bp, register const u_char *bp2, int *nhdr)
 		fputs("[|IPCOMP]", stdout);
 		goto fail;
 	}
-	printf("IPComp(cpi=%u)", cpi);
+	printf("IPComp(cpi=0x%04x)", cpi);
 
 #if defined(HAVE_LIBZ) && defined(HAVE_ZLIB_H)
 	if (1)

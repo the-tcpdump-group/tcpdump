@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ah.c,v 1.13 2000-10-06 11:32:18 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ah.c,v 1.14 2000-12-12 09:58:40 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -61,7 +61,7 @@ ah_print(register const u_char *bp, register const u_char *bp2)
 	sumlen = ah->ah_len << 2;
 	spi = (u_int32_t)ntohl(ah->ah_spi);
 
-	printf("AH(spi=%u", spi);
+	printf("AH(spi=0x%08x", spi);
 	if (vflag)
 		printf(",sumlen=%d", sumlen);
 	printf(",seq=0x%x", (u_int32_t)ntohl(*(u_int32_t *)(ah + 1)));
