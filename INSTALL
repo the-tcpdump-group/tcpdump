@@ -1,4 +1,4 @@
-@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.45 2000-09-23 08:03:27 guy Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.46 2000-12-08 06:59:10 mcr Exp $ (LBL)
 
 If you have not built libpcap, do so first.  See the README
 file in this directory for the ftp location.
@@ -34,10 +34,7 @@ If your system is not one which we have tested tcpdump on, you may have
 to modify the configure script and Makefile.in. Please send us patches
 for any modifications you need to make.
 
-== Tested platforms ==
-NetBSD 		1.4.1/i386	(mcr, itojun)
-RedHat Linux 	6.1/i386	(assar)
-FreeBSD		2.2.8/i386	(itojun)
+Please see "PLATFORMS" for notes about tested platforms.
 
 
 FILES
