@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.15 2001-07-05 18:54:17 guy Exp $ (LBL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.16 2002-05-29 10:32:01 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -99,6 +99,7 @@ pppoe_if_print(u_char *user, const struct pcap_pkthdr *h,
 {
 	register u_int length = h->len;
 	register u_int caplen = h->caplen;
+	u_int hdr_len;
 
 	++infodelay;
 	ts_print(&h->ts);
@@ -111,14 +112,23 @@ pppoe_if_print(u_char *user, const struct pcap_pkthdr *h,
 	packetp = p;
 	snapend = p + caplen;
 
-	pppoe_print(p, length);
+	hdr_len = pppoe_print(p, length);
+
+	/*
+	 * If "-x" was specified, print stuff past the PPPoE and PPP headers,
+	 * if there's anything to print.
+	 */
+	if (xflag && caplen > hdr_len)
+		default_print(p + hdr_len, caplen - hdr_len);
+
 	putchar('\n');
+
 	--infodelay;
 	if (infoprint)
 		info(0);
 }
 
-void
+u_int
 pppoe_print(register const u_char *bp, u_int length)
 {
 	u_short pppoe_ver, pppoe_type, pppoe_code, pppoe_sessionid, pppoe_length;
@@ -127,7 +137,7 @@ pppoe_print(register const u_char *bp, u_int length)
 	pppoe_packet = bp;
 	if (pppoe_packet > snapend) {
 		printf("[|pppoe]");
-		return;
+		return (PPPOE_HDRLEN);
 	}
 
 	pppoe_ver  = (pppoe_packet[0] & 0xF0) >> 4;
@@ -139,7 +149,7 @@ pppoe_print(register const u_char *bp, u_int length)
 
 	if (snapend < pppoe_payload) {
 		printf(" truncated PPPoE");
-		return;
+		return (PPPOE_HDRLEN);
 	}
 
 	if (pppoe_ver != 1) {
@@ -211,9 +221,10 @@ pppoe_print(register const u_char *bp, u_int length)
 			p += tag_len;
 			/* p points to next tag */
 		}
+		return (0);
 	} else {
+		/* PPPoE data */
 		printf(" ");
-		ppp_print(pppoe_payload, pppoe_length);
+		return (PPPOE_HDRLEN + ppp_print(pppoe_payload, pppoe_length));
 	}
-	return;
 }
