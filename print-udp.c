@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.115 2003-05-01 18:02:13 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.116 2003-05-08 15:05:42 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -390,6 +390,7 @@ static int udp6_cksum(const struct ip6_hdr *ip6, const struct udphdr *up,
 #define LWRES_PORT		921
 #define ZEPHYR_SRV_PORT		2103
 #define ZEPHYR_CLT_PORT		2104
+#define MPLS_LSP_PING_PORT      3503 /* draft-ietf-mpls-lsp-ping-02.txt */
 
 #ifdef INET6
 #define RIPNG_PORT 521		/*XXX*/
@@ -664,6 +665,8 @@ udp_print(register const u_char *bp, u_int length,
 			lwres_print((const u_char *)(up + 1), length);
                 else if (ISPORT(LDP_PORT))
 			ldp_print((const u_char *)(up + 1), length);
+                else if (ISPORT(MPLS_LSP_PING_PORT))
+			mpls_lsp_ping_print((const u_char *)(up + 1), length);
 		else
 			(void)printf("udp %u",
 			    (u_int32_t)(ulen - sizeof(*up)));

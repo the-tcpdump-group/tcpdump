@@ -28,7 +28,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-mpls.c,v 1.6 2003-02-04 06:26:59 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-mpls.c,v 1.7 2003-05-08 15:05:41 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -184,3 +184,13 @@ trunc:
 	printf("[|MPLS]");
 }
 
+/*
+ * draft-ietf-mpls-lsp-ping-02.txt
+ */
+void
+mpls_lsp_ping_print(const u_char *pptr, u_int length)
+{
+    printf("UDP, LSP-PING, length: %u", length);
+    if (vflag >1)
+	print_unknown_data(pptr,"\n\t  ", length);
+}
