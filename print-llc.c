@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.32 2000-12-18 07:55:36 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.33 2001-01-15 00:33:59 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -81,6 +81,15 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 	memcpy((char *)&llc, (char *)p, min(caplen, sizeof(llc)));
 
 	if (llc.ssap == LLCSAP_GLOBAL && llc.dsap == LLCSAP_GLOBAL) {
+		/*
+		 * This is an Ethernet_802.3 IPX frame; it has an
+		 * 802.3 header (i.e., an Ethernet header where the
+		 * type/length field is <= ETHERMTU, i.e. it's a length
+		 * field, not a type field), but has no 802.2 header -
+		 * the IPX packet starts right after the Ethernet header,
+		 * with a signature of two bytes of 0xFF (which is
+		 * LLCSAP_GLOBAL).
+		 */
 		ipx_print(p, length);
 		return (1);
 	}
@@ -97,6 +106,23 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 		stp_print(p, length);
 		return (1);
 	}
+
+	if (llc.ssap == LLCSAP_IPX && llc.dsap == LLCSAP_IPX &&
+	    llc.llcui == LLC_UI) {
+		/*
+		 * This is an Ethernet_802.2 IPX frame, with an 802.3
+		 * header and an 802.2 LLC header with the source and
+		 * destination SAPs being the IPX SAP.
+		 *
+		 * Skip DSAP, LSAP, and control field.
+		 */
+		p += 3;
+		length -= 3;
+		caplen -= 3;
+		ipx_print(p, length);
+		return (1);
+	}
+
 	if (llc.ssap == 0xf0 && llc.dsap == 0xf0
 	    && (!(llc.llcu & LLC_S_FMT) || llc.llcu == LLC_U_FMT)) {
 		/*

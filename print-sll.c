@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sll.c,v 1.3 2000-12-23 20:49:34 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sll.c,v 1.4 2001-01-15 00:33:59 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -199,6 +199,13 @@ sll_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 		 * Yes - what type is it?
 		 */
 		switch (ether_type) {
+
+		case LINUX_SLL_P_802_3:
+			/*
+			 * Ethernet_802.3 IPX frame.
+			 */
+			ipx_print(p, length);
+			break;
 
 		case LINUX_SLL_P_802_2:
 			/*

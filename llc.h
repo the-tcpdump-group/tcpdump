@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/llc.h,v 1.8 2000-12-18 07:55:36 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/llc.h,v 1.9 2001-01-15 00:33:59 guy Exp $ (LBL)
  */
 
 /*
@@ -117,4 +117,7 @@ struct llc {
 #endif
 #ifndef LLCSAP_ISONS
 #define	LLCSAP_ISONS		0xfe
+#endif
+#ifndef LLCSAP_IPX
+#define LLCSAP_IPX		0xe0
 #endif
