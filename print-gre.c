@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-gre.c,v 1.10 2001-02-03 20:21:28 fenner Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-gre.c,v 1.11 2001-03-12 00:24:55 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -45,31 +45,9 @@ static const char rcsid[] =
 #include "addrtoname.h"
 #include "extract.h"		/* must come after interface.h */
 
-#define GRE_SIZE (20)
-
 struct gre {
-	u_short flags;
-	u_short proto;
-	union {
-		struct gre_ckof {
-			u_short cksum;
-			u_short offset;
-		}        gre_ckof;
-		u_int32_t key;
-		u_int32_t seq;
-	}     gre_void1;
-	union {
-		u_int32_t key;
-		u_int32_t seq;
-		u_int32_t routing;
-	}     gre_void2;
-	union {
-		u_int32_t seq;
-		u_int32_t routing;
-	}     gre_void3;
-	union {
-		u_int32_t routing;
-	}     gre_void4;
+	u_int16_t flags;
+	u_int16_t proto;
 };
 
 /* RFC 2784 - GRE */
@@ -85,6 +63,7 @@ struct gre {
 #define GRE_sP		0x0800	/* strict source route present */
 #define GRE_RECUR_MASK	0x0700  /* Recursion Control */
 #define GRE_RECUR_SHIFT	8
+#define GRE_OP		0xc000	/* Offset Present */
 
 /* "Enhanced GRE" from RFC2637 - PPTP */
 #define GRE_AP		0x0080	/* Ack present */
@@ -93,15 +72,15 @@ struct gre {
 
 /*
  * Deencapsulate and print a GRE-tunneled IP datagram
- *
- * XXX PPTP needs to interpret the "key" field...
  */
 void
 gre_print(const u_char *bp, u_int length)
 {
 	const u_char *cp = bp + 4;
 	const struct gre *gre;
-	u_short flags, proto, extracted_ethertype;
+	u_int16_t flags, proto;
+	u_short ver=0;
+	u_short extracted_ethertype;
 
 	gre = (const struct gre *)bp;
 
@@ -126,38 +105,50 @@ gre_print(const u_char *bp, u_int length)
 			putchar('A');
 		if (flags & GRE_RECUR_MASK)
 			printf("R%x", (flags & GRE_RECUR_MASK) >> GRE_RECUR_SHIFT);
-		if (flags & GRE_VER_MASK)
-			printf("v%x", flags & GRE_VER_MASK);
+		ver = flags & GRE_VER_MASK;
+		printf("v%u", ver);
+		
 		if (flags & GRE_MBZ_MASK)
 			printf("!%x", flags & GRE_MBZ_MASK);
 		fputs("] ", stdout);
 	}
-	/* Checksum & Offset are present */
-	if ((flags & GRE_CP) | (flags & GRE_RP))
-		cp += 4;
 
-	/* We don't support routing fields (variable length) now. Punt. */
-	if (flags & GRE_RP)
-		return;
-
-	if (flags & GRE_KP) {
+	if (flags & GRE_CP) {
 		TCHECK2(*cp, 4);
 		if (vflag > 1)
+			printf("C:%08x ", EXTRACT_32BITS(cp));
+		cp += 4;	/* skip checksum */
+	}
+	if (flags & GRE_OP) {
+		TCHECK2(*cp, 4);
+		if (vflag > 1)
+			printf("O:%08x ", EXTRACT_32BITS(cp));
+		cp += 4;	/* skip offset */
+	}
+	if (flags & GRE_KP) {
+		TCHECK2(*cp, 4);
+		if (ver == 1) { 	/* PPTP */
+			if (vflag > 1)
+				printf("PL:%u ", EXTRACT_16BITS(cp));
+			printf("ID:%04x ", EXTRACT_16BITS(cp+2));
+		}
+		else 
 			printf("K:%08x ", EXTRACT_32BITS(cp));
 		cp += 4;	/* skip key */
 	}
 	if (flags & GRE_SP) {
 		TCHECK2(*cp, 4);
-		if (vflag > 1)
-			printf("S:%08x ", EXTRACT_32BITS(cp));
+		printf("S:%u ", EXTRACT_32BITS(cp));
 		cp += 4;	/* skip seq */
 	}
-	if (flags & GRE_AP && (flags & GRE_VER_MASK) >= 1) {
+	if (flags & GRE_AP && ver >= 1) {
 		TCHECK2(*cp, 4);
-		if (vflag > 1)
-			printf("A:%08x ", EXTRACT_32BITS(cp));
+		printf("A:%u ", EXTRACT_32BITS(cp));
 		cp += 4;	/* skip ack */
 	}
+	/* We don't support routing fields (variable length) now. Punt. */
+	if (flags & GRE_RP)
+		return;
 
 	TCHECK(cp[0]);
 
