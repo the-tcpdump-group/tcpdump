@@ -170,6 +170,7 @@ print-snmp.c
 print-stp.c
 print-sunatm.c
 print-sunrpc.c
+print-symantec.c
 print-tcp.c
 print-telnet.c
 print-tftp.c
