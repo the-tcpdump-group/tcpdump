@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.43 2004-03-24 02:51:10 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.44 2004-09-29 16:49:31 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -415,18 +415,16 @@ pim_print(register const u_char *bp, register u_int len)
 	switch (PIM_VER(pim->pim_typever)) {
 	case 2:
             if (!vflag) {
-                printf("PIMv%u, %s (%u), length: %u",
+                printf("PIMv%u, %s, length: %u",
                        PIM_VER(pim->pim_typever),
                        tok2str(pimv2_type_values,"Unknown Type",PIM_TYPE(pim->pim_typever)),
-                       PIM_TYPE(pim->pim_typever),
                        len);
                 return;
             } else {
-                printf("PIMv%u, length: %u\n\t%s (%u)",
+                printf("PIMv%u, length: %u\n\t%s",
                        PIM_VER(pim->pim_typever),
                        len,
-                       tok2str(pimv2_type_values,"Unknown Type",PIM_TYPE(pim->pim_typever)),
-                       PIM_TYPE(pim->pim_typever));
+                       tok2str(pimv2_type_values,"Unknown Type",PIM_TYPE(pim->pim_typever)));
                 pimv2_print(bp, len);
             }
             break;

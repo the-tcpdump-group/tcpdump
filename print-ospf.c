@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.55 2004-09-20 14:56:34 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.56 2004-09-29 16:49:31 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -894,10 +894,9 @@ ospf_print(register const u_char *bp, register u_int length,
 	/* value.  If it's not valid, say so and return */
 	TCHECK(op->ospf_type);
 	cp = tok2str(type2str, "unknown LS-type", op->ospf_type);
-	printf("OSPFv%u, %s (%u), length: %u",
+	printf("OSPFv%u, %s, length: %u",
 	       op->ospf_version,
 	       cp,
-	       op->ospf_type,
 	       length);
 	if (*cp == 'u')
 		return;
