@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.75 2003-11-19 01:27:55 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.76 2004-03-24 00:06:26 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -383,6 +383,7 @@ icmp6_print(const u_char *bp, u_int length, const u_char *bp2, int fragmented)
 		TCHECK(RDR(dp)->nd_rd_dst);
 		printf("icmp6: redirect %s",
 		    getname6((const u_char *)&RDR(dp)->nd_rd_dst));
+		TCHECK(RDR(dp)->nd_rd_target);
 		printf(" to %s",
 		    getname6((const u_char*)&RDR(dp)->nd_rd_target));
 #define REDIRECTLEN 40
