@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.24.2.2 2003-11-16 08:51:42 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.24.2.3 2004-03-24 04:01:08 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -367,7 +367,7 @@ static struct tok rsvp_obj_error_code_routing_values[] = {
 #define TRUE  1
 
 
-int rsvp_intserv_print(const u_char *);
+static int rsvp_intserv_print(const u_char *, u_short);
 
 /* 
  * this is a dissector for all the intserv defined
@@ -375,8 +375,8 @@ int rsvp_intserv_print(const u_char *);
  * it is called from various rsvp objects;
  * returns the amount of bytes being processed
  */
-int
-rsvp_intserv_print(const u_char *tptr) {
+static int
+rsvp_intserv_print(const u_char *tptr, u_short obj_tlen) {
 
     int parameter_id,parameter_length;
     union {
@@ -384,6 +384,8 @@ rsvp_intserv_print(const u_char *tptr) {
 	u_int32_t i;
     } bw;
 
+    if (obj_tlen < 4)
+        return 0;
     parameter_id = *(tptr);
     parameter_length = EXTRACT_16BITS(tptr+2)<<2; /* convert wordcount to bytecount */
 
@@ -393,6 +395,8 @@ rsvp_intserv_print(const u_char *tptr) {
            parameter_length,
            *(tptr+1));
 
+    if (obj_tlen < parameter_length+4)
+        return 0;
     switch(parameter_id) { /* parameter_id */
 
     case 4:
@@ -403,7 +407,8 @@ rsvp_intserv_print(const u_char *tptr) {
         * |        IS hop cnt (32-bit unsigned integer)                   |
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         */
-        printf("\n\t\tIS hop count: %u", EXTRACT_32BITS(tptr+4));
+        if (parameter_length == 4)
+            printf("\n\t\tIS hop count: %u", EXTRACT_32BITS(tptr+4));
         break;
 
     case 6:
@@ -414,8 +419,10 @@ rsvp_intserv_print(const u_char *tptr) {
         * |  Path b/w estimate  (32-bit IEEE floating point number)       |
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         */
-        bw.i = EXTRACT_32BITS(tptr+4);
-        printf("\n\t\tPath b/w estimate: %.10g Mbps", bw.f/125000);
+        if (parameter_length == 4) {
+            bw.i = EXTRACT_32BITS(tptr+4);
+            printf("\n\t\tPath b/w estimate: %.10g Mbps", bw.f/125000);
+        }
         break;
 
     case 8:
@@ -426,11 +433,13 @@ rsvp_intserv_print(const u_char *tptr) {
         * |        Minimum path latency (32-bit integer)                  |
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         */
-        printf("\n\t\tMinimum path latency: ");
-        if (EXTRACT_32BITS(tptr+4) == 0xffffffff)
-            printf("don't care");
-        else
-            printf("%u", EXTRACT_32BITS(tptr+4));
+        if (parameter_length == 4) {
+            printf("\n\t\tMinimum path latency: ");
+            if (EXTRACT_32BITS(tptr+4) == 0xffffffff)
+                printf("don't care");
+            else
+                printf("%u", EXTRACT_32BITS(tptr+4));
+        }
         break;
 
     case 10:
@@ -442,7 +451,8 @@ rsvp_intserv_print(const u_char *tptr) {
         * |      Composed MTU (32-bit unsigned integer)                   |
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         */
-        printf("\n\t\tComposed MTU: %u bytes", EXTRACT_32BITS(tptr+4));
+        if (parameter_length == 4)
+            printf("\n\t\tComposed MTU: %u bytes", EXTRACT_32BITS(tptr+4));
         break;
     case 127:
        /* 
@@ -461,14 +471,16 @@ rsvp_intserv_print(const u_char *tptr) {
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         */
 
-        bw.i = EXTRACT_32BITS(tptr+4);
-        printf("\n\t\tToken Bucket Rate: %.10g Mbps", bw.f/125000);
-        bw.i = EXTRACT_32BITS(tptr+8);
-        printf("\n\t\tToken Bucket Size: %.10g bytes", bw.f);
-        bw.i = EXTRACT_32BITS(tptr+12);
-        printf("\n\t\tPeak Data Rate: %.10g Mbps", bw.f/125000);
-        printf("\n\t\tMinimum Policed Unit: %u bytes", EXTRACT_32BITS(tptr+16));
-        printf("\n\t\tMaximum Packet Size: %u bytes", EXTRACT_32BITS(tptr+20));
+        if (parameter_length == 20) {
+            bw.i = EXTRACT_32BITS(tptr+4);
+            printf("\n\t\tToken Bucket Rate: %.10g Mbps", bw.f/125000);
+            bw.i = EXTRACT_32BITS(tptr+8);
+            printf("\n\t\tToken Bucket Size: %.10g bytes", bw.f);
+            bw.i = EXTRACT_32BITS(tptr+12);
+            printf("\n\t\tPeak Data Rate: %.10g Mbps", bw.f/125000);
+            printf("\n\t\tMinimum Policed Unit: %u bytes", EXTRACT_32BITS(tptr+16));
+            printf("\n\t\tMaximum Packet Size: %u bytes", EXTRACT_32BITS(tptr+20));
+        }
         break;
 
     case 130:
@@ -482,16 +494,19 @@ rsvp_intserv_print(const u_char *tptr) {
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         */
 
-        bw.i = EXTRACT_32BITS(tptr+4);
-        printf("\n\t\tRate: %.10g Mbps", bw.f/125000);
-        printf("\n\t\tSlack Term: %u", EXTRACT_32BITS(tptr+8));
+        if (parameter_length == 8) {
+            bw.i = EXTRACT_32BITS(tptr+4);
+            printf("\n\t\tRate: %.10g Mbps", bw.f/125000);
+            printf("\n\t\tSlack Term: %u", EXTRACT_32BITS(tptr+8));
+        }
         break;
 
     case 133:
     case 134:
     case 135:
     case 136:
-        printf("\n\t\tValue: %u", EXTRACT_32BITS(tptr+4));
+        if (parameter_length == 4)
+            printf("\n\t\tValue: %u", EXTRACT_32BITS(tptr+4));
         break;
 
     default:
@@ -513,6 +528,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
 	float f;
 	u_int32_t i;
     } bw;
+    u_int8_t namelen;
+    u_int i;
 
     tptr=pptr;
     rsvp_com_header = (const struct rsvp_common_header *)pptr;
@@ -547,6 +564,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
            rsvp_com_header->ttl,
            EXTRACT_16BITS(rsvp_com_header->checksum));
 
+    if (tlen < sizeof(const struct rsvp_common_header))
+        return;
     tptr+=sizeof(const struct rsvp_common_header);
     tlen-=sizeof(const struct rsvp_common_header);
 
@@ -559,7 +578,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         rsvp_obj_len=EXTRACT_16BITS(rsvp_obj_header->length);
         rsvp_obj_ctype=rsvp_obj_header->ctype;
 
-        if(rsvp_obj_len % 4 || rsvp_obj_len < 4)
+        if(rsvp_obj_len % 4 || rsvp_obj_len < sizeof(struct rsvp_object_header))
             return;
 
         printf("\n\t  %s Object (%u) Flags: [%s",
@@ -592,6 +611,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         case RSVP_OBJ_SESSION:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_IPV4:
+                if (obj_tlen < 8)
+                    return;
                 printf("\n\t    IPv4 DestAddress: %s, Protocol ID: 0x%02x",
                        ipaddr_string(obj_tptr),
                        *(obj_tptr+4));
@@ -603,6 +624,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 break;
 #ifdef INET6
             case RSVP_CTYPE_IPV6:
+                if (obj_tlen < 20)
+                    return;
                 printf("\n\t    IPv6 DestAddress: %s, Protocol ID: 0x%02x",
                        ip6addr_string(obj_tptr),
                        *(obj_tptr+16));
@@ -614,6 +637,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 break;
 
             case RSVP_CTYPE_TUNNEL_IPV6:
+                if (obj_tlen < 36)
+                    return;
                 printf("\n\t    IPv6 Tunnel EndPoint: %s, Tunnel ID: 0x%04x, Extended Tunnel ID: %s",
                        ip6addr_string(obj_tptr),
                        EXTRACT_16BITS(obj_tptr+18),
@@ -623,6 +648,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 break;
 #endif
             case RSVP_CTYPE_TUNNEL_IPV4:
+                if (obj_tlen < 12)
+                    return;
                 printf("\n\t    IPv4 Tunnel EndPoint: %s, Tunnel ID: 0x%04x, Extended Tunnel ID: %s",
                        ipaddr_string(obj_tptr),
                        EXTRACT_16BITS(obj_tptr+6),
@@ -638,6 +665,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         case RSVP_OBJ_CONFIRM:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_IPV4:
+                if (obj_tlen < 4)
+                    return;
                 printf("\n\t    IPv4 Receiver Address: %s",
                        ipaddr_string(obj_tptr));
                 obj_tlen-=4;
@@ -645,6 +674,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 break;
 #ifdef INET6
             case RSVP_CTYPE_IPV6:
+                if (obj_tlen < 16)
+                    return;
                 printf("\n\t    IPv6 Receiver Address: %s",
                        ip6addr_string(obj_tptr));
                 obj_tlen-=16;
@@ -659,6 +690,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         case RSVP_OBJ_NOTIFY_REQ:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_IPV4:
+                if (obj_tlen < 4)
+                    return;
                 printf("\n\t    IPv4 Notify Node Address: %s",
                        ipaddr_string(obj_tptr));
                 obj_tlen-=4;
@@ -666,6 +699,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 break;
 #ifdef INET6
             case RSVP_CTYPE_IPV6:
+                if (obj_tlen < 16)
+                    return;
                 printf("\n\t    IPv6 Notify Node Address: %s",
                        ip6addr_string(obj_tptr));
                 obj_tlen-=16;
@@ -690,12 +725,16 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 }
                 break;
             case RSVP_CTYPE_2:
+                if (obj_tlen < 4)
+                    return;
                 printf("\n\t    Generalized Label: %u",
                        EXTRACT_32BITS(obj_tptr));
                 obj_tlen-=4;
                 obj_tptr+=4;
                 break;
             case RSVP_CTYPE_3:
+                if (obj_tlen < 12)
+                    return;
                 printf("\n\t    Waveband ID: %u\n\t    Start Label: %u, Stop Label: %u",
                        EXTRACT_32BITS(obj_tptr),
                        EXTRACT_32BITS(obj_tptr+4),
@@ -711,6 +750,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         case RSVP_OBJ_STYLE:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_1:
+                if (obj_tlen < 4)
+                    return;
                 printf("\n\t    Reservation Style: %s, Flags: [0x%02x]",
                        tok2str(rsvp_resstyle_values,
                                "Unknown",
@@ -727,6 +768,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         case RSVP_OBJ_SENDER_TEMPLATE:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_IPV4:
+                if (obj_tlen < 8)
+                    return;
                 printf("\n\t    Source Address: %s, Source Port: %u",
                        ipaddr_string(obj_tptr),
                        EXTRACT_16BITS(obj_tptr+6));
@@ -735,6 +778,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 break;
 #ifdef INET6
             case RSVP_CTYPE_IPV6:
+                if (obj_tlen < 20)
+                    return;
                 printf("\n\t    Source Address: %s, Source Port: %u",
                        ip6addr_string(obj_tptr),
                        EXTRACT_16BITS(obj_tptr+18));
@@ -743,6 +788,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 break;
 #endif
             case RSVP_CTYPE_TUNNEL_IPV4:
+                if (obj_tlen < 8)
+                    return;
                 printf("\n\t    IPv4 Tunnel Sender Address: %s, LSP-ID: 0x%04x",
                        ipaddr_string(obj_tptr),
                        EXTRACT_16BITS(obj_tptr+6));
@@ -767,6 +814,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 }
                 break;
             case RSVP_CTYPE_2:
+                if (obj_tlen < 12)
+                    return;
                 printf("\n\t    L3 Protocol ID: %s",
                        tok2str(ethertype_values,
                                "Unknown Protocol (0x%04x)",
@@ -782,6 +831,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 obj_tptr+=12;
                 break;
             case RSVP_CTYPE_3:
+                if (obj_tlen < 12)
+                    return;
                 printf("\n\t    L3 Protocol ID: %s",
                        tok2str(ethertype_values,
                                "Unknown Protocol (0x%04x)",
@@ -795,6 +846,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 obj_tptr+=12;
                 break;
             case RSVP_CTYPE_4:
+                if (obj_tlen < 8)
+                    return;
                 printf("\n\t    LSP Encoding Type: %s (%u)",
                        tok2str(gmpls_encoding_values,
                                "Unknown",
@@ -849,6 +902,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_1:
             case RSVP_CTYPE_2:
+                if (obj_tlen < 8)
+                    return;
                 printf("\n\t    Source Instance: 0x%08x, Destination Instance: 0x%08x",
                        EXTRACT_32BITS(obj_tptr),
                        EXTRACT_32BITS(obj_tptr+4));
@@ -863,9 +918,13 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         case RSVP_OBJ_RESTART_CAPABILITY:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_1:
+                if (obj_tlen < 8)
+                    return;
                 printf("\n\t    Restart  Time: %ums, Recovery Time: %ums",
                        EXTRACT_16BITS(obj_tptr),
                        EXTRACT_16BITS(obj_tptr+4));
+                obj_tlen-=8;
+                obj_tptr+=8;
                 break;
             default:
                 hexdump=TRUE;
@@ -875,7 +934,14 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         case RSVP_OBJ_SESSION_ATTRIBUTE:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_TUNNEL_IPV4:
-                printf("\n\t    Session Name: %s",(obj_tptr+4));
+                if (obj_tlen < 4)
+                    return;
+                namelen = *(obj_tptr+3);
+                if (obj_tlen < 4+namelen)
+                    return;
+                printf("\n\t    Session Name: ");
+                for (i = 0; i < namelen; i++)
+                    safeputchar(*(obj_tptr+4+i));
                 printf("\n\t    Setup Priority: %u, Holding Priority: %u, Flags: [%s]",
                        (int)*obj_tptr,
                        (int)*(obj_tptr+1),
@@ -895,6 +961,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_3: /* fall through - FIXME add TLV parser */
             case RSVP_CTYPE_IPV4:
+                if (obj_tlen < 8)
+                    return;
                 printf("\n\t    Previous/Next Interface: %s, Logical Interface Handle: 0x%08x",
                        ipaddr_string(obj_tptr),
                        EXTRACT_32BITS(obj_tptr+4));
@@ -905,6 +973,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
 #ifdef INET6
             case RSVP_CTYPE_4: /* fall through - FIXME add TLV parser */
             case RSVP_CTYPE_IPV6:
+                if (obj_tlen < 20)
+                    return;
                 printf("\n\t    Previous/Next Interface: %s, Logical Interface Handle: 0x%08x",
                        ip6addr_string(obj_tptr),
                        EXTRACT_32BITS(obj_tptr+16));
@@ -921,6 +991,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         case RSVP_OBJ_TIME_VALUES:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_1:
+                if (obj_tlen < 4)
+                    return;
                 printf("\n\t    Refresh Period: %ums",
                        EXTRACT_32BITS(obj_tptr));
                 obj_tlen-=4;
@@ -937,6 +1009,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         case RSVP_OBJ_FLOWSPEC:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_2:
+                if (obj_tlen < 4)
+                    return;
                 printf("\n\t    Msg-Version: %u, length: %u",
                        (*obj_tptr & 0xf0) >> 4,
                        EXTRACT_16BITS(obj_tptr+2)<<2);
@@ -955,7 +1029,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                     obj_tlen-=4;
 
                     while (intserv_serv_tlen>=4) {
-                        processed = rsvp_intserv_print(obj_tptr);
+                        processed = rsvp_intserv_print(obj_tptr, obj_tlen);
                         if (processed == 0)
                             break;
                         obj_tlen-=processed;
@@ -972,6 +1046,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         case RSVP_OBJ_FILTERSPEC:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_IPV4:
+                if (obj_tlen < 8)
+                    return;
                 printf("\n\t    Source Address: %s, Source Port: %u",
                        ipaddr_string(obj_tptr),
                        EXTRACT_16BITS(obj_tptr+6));
@@ -980,6 +1056,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 break;
 #ifdef INET6
             case RSVP_CTYPE_IPV6:
+                if (obj_tlen < 20)
+                    return;
                 printf("\n\t    Source Address: %s, Source Port: %u",
                        ip6addr_string(obj_tptr),
                        EXTRACT_16BITS(obj_tptr+18));
@@ -987,6 +1065,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 obj_tptr+=20;
                 break;
             case RSVP_CTYPE_3:
+                if (obj_tlen < 20)
+                    return;
                 printf("\n\t    Source Address: %s, Flow Label: %u",
                        ip6addr_string(obj_tptr),
                        EXTRACT_24BITS(obj_tptr+17));
@@ -994,6 +1074,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 obj_tptr+=20;
                 break;
             case RSVP_CTYPE_TUNNEL_IPV6:
+                if (obj_tlen < 20)
+                    return;
                 printf("\n\t    Source Address: %s, LSP-ID: 0x%04x",
                        ipaddr_string(obj_tptr),
                        EXTRACT_16BITS(obj_tptr+18));
@@ -1002,6 +1084,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 break;
 #endif
             case RSVP_CTYPE_TUNNEL_IPV4:
+                if (obj_tlen < 8)
+                    return;
                 printf("\n\t    Source Address: %s, LSP-ID: 0x%04x",
                        ipaddr_string(obj_tptr),
                        EXTRACT_16BITS(obj_tptr+6));
@@ -1016,6 +1100,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         case RSVP_OBJ_FASTREROUTE:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_TUNNEL_IPV4:
+                if (obj_tlen < 16)
+                    return;
                 bw.i = EXTRACT_32BITS(obj_tptr+4);
                 printf("\n\t    Setup Priority: %u, Holding Priority: %u, Hop-limit: %u, Bandwidth: %.10g Mbps",
                        (int)*obj_tptr,
@@ -1053,6 +1139,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_3: /* fall through - FIXME add TLV parser */
             case RSVP_CTYPE_IPV4:
+                if (obj_tlen < 8)
+                    return;
                 error_code=*(obj_tptr+5);
                 error_value=EXTRACT_16BITS(obj_tptr+6);
                 printf("\n\t    Error Node Adress: %s, Flags: [0x%02x]\n\t    Error Code: %s (%u)",
@@ -1070,10 +1158,14 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                     printf(", Unknown Error Value (%u)", error_value);
                     break;
                 }
+                obj_tlen-=8;
+                obj_tptr+=8;
                 break;
 #ifdef INET6
             case RSVP_CTYPE_4: /* fall through - FIXME add TLV parser */
             case RSVP_CTYPE_IPV6:
+                if (obj_tlen < 20)
+                    return;
                 error_code=*(obj_tptr+17);
                 error_value=EXTRACT_16BITS(obj_tptr+18);
                 printf("\n\t    Error Node Adress: %s, Flags: [0x%02x]\n\t    Error Code: %s (%u)",
@@ -1091,7 +1183,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 default:
                     break;
                 }
-
+                obj_tlen-=20;
+                obj_tptr+=20;
                 break;
 #endif
             default:
@@ -1102,18 +1195,22 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         case RSVP_OBJ_PROPERTIES:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_1:
+                if (obj_tlen < 4)
+                    return;
                 padbytes = EXTRACT_16BITS(obj_tptr+2);
                 printf("\n\t    TLV count: %u, padding bytes: %u",
                        EXTRACT_16BITS(obj_tptr),
                        padbytes);
-                       obj_tlen-=4;
-                       obj_tptr+=4;
+                obj_tlen-=4;
+                obj_tptr+=4;
                 /* loop through as long there is anything longer than the TLV header (2) */
                 while(obj_tlen >= 2 + padbytes) {
                     printf("\n\t      %s TLV (0x%02x), length: %u", /* length includes header */
                            tok2str(rsvp_obj_prop_tlv_values,"unknown",*obj_tptr),
                            *obj_tptr,
                            *(obj_tptr+1));
+                    if (obj_tlen < *(obj_tptr+1))
+                        return;
                     print_unknown_data(obj_tptr+2,"\n\t\t",*(obj_tptr+1)-2);
                     obj_tlen-=*(obj_tptr+1);
                     obj_tptr+=*(obj_tptr+1);
