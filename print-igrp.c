@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-igrp.c,v 1.11 1999-11-21 09:36:53 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-igrp.c,v 1.12 2000-04-28 11:01:49 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -107,8 +107,8 @@ igrp_print(register const u_char *bp, u_int length, register const u_char *bp2)
 	next = EXTRACT_16BITS(&hdr->ig_nx);
 
 	(void)printf(" %s V%d edit=%d AS=%d (%d/%d/%d)",
-	    tok2str(op2str, "op-#%d", hdr->ig_op),
-	    hdr->ig_v,
+	    tok2str(op2str, "op-#%d", IGRP_OP(hdr->ig_vop)),
+	    IGRP_V(hdr->ig_vop),
 	    hdr->ig_ed,
 	    EXTRACT_16BITS(&hdr->ig_as),
 	    nint,
