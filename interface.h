@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.132 2000-07-11 00:49:02 assar Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.133 2000-07-11 01:22:38 assar Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -244,6 +244,7 @@ extern void gre_print(const u_char *, u_int);
 extern void icmp_print(const u_char *, u_int, const u_char *);
 extern void igrp_print(const u_char *, u_int, const u_char *);
 extern void ip_print(const u_char *, u_int);
+extern void ipN_print(const u_char *, u_int);
 extern void ipx_print(const u_char *, u_int);
 extern void isoclns_print(const u_char *, u_int, u_int, const u_char *,
 	const u_char *);

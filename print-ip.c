@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.83 2000-07-01 03:39:03 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.84 2000-07-11 01:22:39 assar Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -724,5 +724,31 @@ again:
 			ip_optprint((u_char *)(ip + 1), hlen);
 		}
 		printf(")");
+	}
+}
+
+void
+ipN_print(register const u_char *bp, register u_int length)
+{
+	struct ip *ip, hdr;
+
+	ip = (struct ip *)bp;
+	if (length < 4) {
+		(void)printf("truncated-ip %d", length);
+		return;
+	}
+	memcpy (&hdr, (char *)ip, 4);
+	switch (hdr.ip_v) {
+	case 4:
+	    ip_print (bp, length);
+	    return;
+#ifdef INET6
+	case 6:
+	    ip6_print (bp, length);
+	    return;
+#endif
+	default:
+	    (void)printf("unknown ip %d", hdr.ip_v);
+	    return;
 	}
 }
