@@ -25,7 +25,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ntp.c,v 1.40 2004-01-28 14:34:50 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ntp.c,v 1.41 2004-01-28 14:54:50 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -82,9 +82,6 @@ ntp_print(register const u_char *cp, u_int length)
 	int mode, version, leapind;
 
 	bp = (struct ntpdata *)cp;
-	/* Note funny sized packets */
-	if (length != sizeof(struct ntpdata))
-		(void)printf(" [len=%d]", length);
 
 	TCHECK(bp->status);
 

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.129 2003-11-19 00:19:56 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.130 2004-01-28 14:54:49 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -568,7 +568,7 @@ udp_print(register const u_char *bp, u_int length,
 	}
 	udpipaddr_print(ip, sport, dport);
 
-	if (IP_V(ip) == 4 && vflag && !fragmented) {
+	if (IP_V(ip) == 4 && (vflag > 1) && !fragmented) {
 		int sum = up->uh_sum;
 		if (sum == 0) {
 			(void)printf("[no cksum] ");
@@ -678,9 +678,9 @@ udp_print(register const u_char *bp, u_int length,
 			 dport == BFD_ECHO_PORT )
 			bfd_print((const u_char *)(up+1), length, dport);
 		else
-			(void)printf("UDP, length: %u",
+			(void)printf("UDP, length %u",
 			    (u_int32_t)(ulen - sizeof(*up)));
 #undef ISPORT
 	} else
-		(void)printf("UDP, length: %u", (u_int32_t)(ulen - sizeof(*up)));
+		(void)printf("UDP, length %u", (u_int32_t)(ulen - sizeof(*up)));
 }
