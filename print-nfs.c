@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.79 2000-07-16 14:32:48 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.80 2000-07-29 08:05:04 assar Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -407,7 +407,7 @@ nfsreq_print(register const u_char *bp, u_int length,
 {
 	register const struct rpc_msg *rp;
 	register const u_int32_t *dp;
-	nfstype type;
+	nfs_type type;
 	int v3;
 	u_int32_t proc;
 	struct nfsv3_sattr sa3;
@@ -561,7 +561,7 @@ nfsreq_print(register const u_char *bp, u_int length,
 		if ((dp = parsereq(rp, length)) != 0 &&
 		    (dp = parsefhn(dp, v3)) != 0) {
 			TCHECK(*dp);
-			type = (nfstype)ntohl(*dp++);
+			type = (nfs_type)ntohl(*dp++);
 			if ((dp = parse_sattr3(dp, &sa3)) == 0)
 				break;
 			printf(" %s", tok2str(type2str, "unk-ft %d", type));
