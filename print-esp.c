@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.25 2002-06-11 17:08:45 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.26 2002-07-27 19:30:36 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -94,6 +94,7 @@ struct esp_algorithm esp_xforms[]={
 	{"cast128-cbc",           CAST128, 8,  0, 0},
 	{"cast128-cbc-hmac96",    CAST128, 8, 12, 4},
 	{"3des-cbc-hmac96",       DES3CBC, 8, 12, 4},
+	{NULL,                    NONE,    0,  0, 0}
 };
 
 static int hexdigit(char hex)
@@ -125,10 +126,12 @@ static void esp_print_decodesecret(void)
 	char *colon;
 	int   len, i;
 	struct esp_algorithm *xf;
+	struct esp_algorithm *null_xf =
+		&esp_xforms[sizeof(esp_xforms)/sizeof(esp_xforms[0]) - 1];
 
 	if(espsecret == NULL) {
-		/* set to NONE transform */
-		espsecret_xform = esp_xforms;
+		/* set to NULL transform */
+		espsecret_xform = null_xf;
 		return;
 	}
 
@@ -140,11 +143,12 @@ static void esp_print_decodesecret(void)
 	if(colon == NULL) {
 		printf("failed to decode espsecret: %s\n",
 		       espsecret);
-		/* set to NONE transform */
-		espsecret_xform = esp_xforms;
+		/* set to NULL transform */
+		espsecret_xform = null_xf;
+		return;
 	}
 
-	len   = colon - espsecret;
+	len = colon - espsecret;
 	xf = esp_xforms;
 	while(xf->name && strncasecmp(espsecret, xf->name, len)!=0) {
 		xf++;
@@ -152,7 +156,8 @@ static void esp_print_decodesecret(void)
 	if(xf->name == NULL) {
 		printf("failed to find cipher algo %s\n",
 		       espsecret);
-		espsecret_xform = esp_xforms;
+		/* set to NULL transform */
+		espsecret_xform = null_xf;
 		return;
 	}
 	espsecret_xform = xf;
@@ -183,9 +188,8 @@ int
 esp_print(register const u_char *bp, register const u_char *bp2,
 	  int *nhdr, int *padlen)
 {
-	register const struct esp *esp;
+	register const struct newesp *esp;
 	register const u_char *ep;
-	u_int32_t spi;
 	struct ip *ip = NULL;
 #ifdef INET6
 	struct ip6_hdr *ip6 = NULL;
@@ -199,8 +203,7 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 	u_char *p;
 #endif
 
-	esp = (struct esp *)bp;
-	spi = (u_int32_t)ntohl(esp->esp_spi);
+	esp = (struct newesp *)bp;
 	secret = NULL;
 
 #if 0
@@ -211,12 +214,12 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 	/* 'ep' points to the end of available data. */
 	ep = snapend;
 
-	if ((u_char *)(esp + 1) >= ep - sizeof(struct esp)) {
+	if ((u_char *)(esp + 1) >= ep) {
 		fputs("[|ESP]", stdout);
 		goto fail;
 	}
-	printf("ESP(spi=0x%08x", spi);
-	printf(",seq=0x%x", (u_int32_t)ntohl(*(u_int32_t *)(esp + 1)));
+	printf("ESP(spi=0x%08x", (u_int32_t)ntohl(esp->esp_spi));
+	printf(",seq=0x%x", (u_int32_t)ntohl(esp->esp_seq));
 	printf(")");
 
 	/* if we don't have decryption key, we can't decrypt this packet. */
@@ -226,7 +229,7 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 	if(!espsecret_xform) {
 		esp_print_decodesecret();
 	}
-	if(espsecret_xform->algo == NONE) {
+	if(espsecret_xform->name == NULL) {
 		goto fail;
 	}
 
@@ -387,7 +390,7 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 
 	case NONE:
 	default:
-		advance = sizeof(struct esp) + espsecret_xform->replaysize;
+		advance = sizeof(struct newesp) + espsecret_xform->replaysize;
 		break;
 	}
 
