@@ -143,6 +143,7 @@ print-lane.c
 print-ldp.c
 print-llc.c
 print-lmp.c
+print-lspping.c
 print-lwres.c
 print-mobile.c
 print-mobility.c
