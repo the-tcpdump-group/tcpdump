@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.80 2002-10-11 10:34:07 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.81 2002-11-07 20:07:58 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -244,6 +244,51 @@ tok2str(register const struct tok *lp, register const char *fmt,
 		fmt = "#%d";
 	(void)snprintf(buf, sizeof(buf), fmt, v);
 	return (buf);
+}
+
+/*
+ * Convert a bit token value to a string; use "fmt" if not found.
+ * this is useful for parsing bitfields, the output strings are comma seperated
+ */
+char *
+bittok2str(register const struct tok *lp, register const char *fmt,
+	register int v)
+{
+        static char buf[256]; /* our stringbuffer */
+        int buflen=0;
+        register int rotbit; /* this is the bit we rotate through all bitpositions */
+        register int tokval;
+
+	while (lp->s != NULL) {
+            tokval=lp->v;   /* load our first value */
+            rotbit=1;
+            while (rotbit != 0) {
+                /*
+                 * lets AND the rotating bit with our token value
+                 * and see if we have got a match
+                 */
+		if (tokval == (v&rotbit)) {
+                    /* ok we have found something */
+                    buflen+=snprintf(buf+buflen, sizeof(buf)-buflen, "%s, ",lp->s);
+                    break;
+                }
+                rotbit=rotbit<<1; /* no match - lets shift and try again */
+            }
+            lp++;
+	}
+
+        if (buflen != 0) { /* did we find anything */
+            /* yep, set the the trailing zero 2 bytes before to eliminate the last comma & whitespace */
+            buf[buflen-2] = '\0';
+            return (buf);
+        }
+        else {
+            /* bummer - lets print the "unknown" message as advised in the fmt string if we got one */
+            if (fmt == NULL)
+		fmt = "#%d";
+            (void)snprintf(buf, sizeof(buf), fmt, v);
+            return (buf);
+        }
 }
 
 /*
