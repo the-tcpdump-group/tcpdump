@@ -45,7 +45,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.44 2000-11-10 17:34:10 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.45 2001-01-24 21:50:58 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -837,25 +837,6 @@ asn1_decode(u_char *p, u_int length)
 
 #ifdef LIBSMI
 
-#if (SMI_VERSION_MAJOR == 0 && SMI_VERSION_MINOR >= 2) || (SMI_VERSION_MAJOR > 0)
-#define LIBSMI_API_V2
-#else
-#define LIBSMI_API_V1
-#endif
-
-#ifdef LIBSMI_API_V1
-/* Some of the API revisions introduced new calls that can be
- * represented by macros.
- */
-#define	smiGetNodeType(n)	smiGetType((n)->typemodule, (n)->typename)
-
-#else
-/* These calls in the V1 API were removed in V2. */
-#define	smiFreeRange(r)
-#define	smiFreeType(r)
-#define	smiFreeNode(r)
-#endif
-
 struct smi2be {
     SmiBasetype basetype;
     int be;
@@ -966,37 +947,22 @@ static int smi_check_range(SmiType *smiType, struct be *elem)
         SmiRange *smiRange;
 	int ok = 1;
 
-#ifdef LIBSMI_API_V1
-	for (smiRange = smiGetFirstRange(smiType->module, smiType->name);
-#else
 	for (smiRange = smiGetFirstRange(smiType);
-#endif
 	     smiRange;
 	     smiRange = smiGetNextRange(smiRange)) {
 
 	    ok = smi_check_a_range(smiType, smiRange, elem);
 
 	    if (ok) {
-		smiFreeRange(smiRange);
 		break;
 	    }
 	}
 
-	if (ok
-#ifdef LIBSMI_API_V1
-		&& smiType->parentmodule && smiType->parentname
-#endif
-		) {
+	if (ok) {
 	    SmiType *parentType;
-#ifdef LIBSMI_API_V1
-	    parentType = smiGetType(smiType->parentmodule,
-				    smiType->parentname);
-#else
 	    parentType = smiGetParentType(smiType);
-#endif
 	    if (parentType) {
 		ok = smi_check_range(parentType, elem);
-		smiFreeType(parentType);
 	    }
 	}
 
@@ -1016,11 +982,7 @@ static SmiNode *smi_print_variable(struct be *elem)
 		return NULL;
 	}
 	if (vflag) {
-#ifdef LIBSMI_API_V1
-		fputs(smiNode->module, stdout);
-#else
 		fputs(smiGetNodeModule(smiNode)->name, stdout);
-#endif
 		fputs("::", stdout);
 	}
 	fputs(smiNode->name, stdout);
@@ -1069,21 +1031,13 @@ static void smi_print_value(SmiNode *smiNode, u_char pduid, struct be *elem)
 	    fputs("[noAccess]", stdout);
 	}
 
-#ifdef LIBSMI_API_V1
-	smiType = smiGetType(smiNode->typemodule, smiNode->typename);
-#else
 	smiType = smiGetNodeType(smiNode);
-#endif
 	if (! smiType) {
 	    asn1_print(elem);
 	    return;
 	}
 
-#ifdef LIBSMI_API_V1
-	if (! smi_check_type(smiNode->basetype, elem->type)) {
-#else
 	if (! smi_check_type(smiType->basetype, elem->type)) {
-#endif
 	    fputs("[wrongType]", stdout);
 	}
 
@@ -1108,11 +1062,7 @@ static void smi_print_value(SmiNode *smiNode, u_char pduid, struct be *elem)
 			smiNode = smiGetNodeByOID(oidlen, oid);
 			if (smiNode) {
 			        if (vflag) {
-#ifdef LIBSMI_API_V1
-					fputs(smiNode->module, stdout);
-#else
 					fputs(smiGetNodeModule(smiNode)->name, stdout);
-#endif
 					fputs("::", stdout);
 				}
 				fputs(smiNode->name, stdout);
@@ -1128,15 +1078,8 @@ static void smi_print_value(SmiNode *smiNode, u_char pduid, struct be *elem)
 		break;
 
 	case BE_INT:
-#ifdef LIBSMI_API_V1
-	        if (smiNode->basetype == SMI_BASETYPE_ENUM
-		    && smiNode->typemodule && smiNode->typename) {
-		        for (nn = smiGetFirstNamedNumber(smiNode->typemodule,
-							 smiNode->typename);
-#else
 	        if (smiType->basetype == SMI_BASETYPE_ENUM) {
 		        for (nn = smiGetFirstNamedNumber(smiType);
-#endif
 			     nn;
 			     nn = smiGetNextNamedNumber(nn)) {
 			         if (nn->value.value.integer32
@@ -1153,10 +1096,6 @@ static void smi_print_value(SmiNode *smiNode, u_char pduid, struct be *elem)
 
 	if (! done) {
 	        asn1_print(elem);
-	}
-
-	if (smiType) {
-		smiFreeType(smiType);
 	}
 }
 #endif
@@ -1273,7 +1212,6 @@ varbind_print(u_char pduid, const u_char *np, u_int length)
 		        if (elem.type != BE_NULL) {
 #ifdef LIBSMI
 			        smi_print_value(smiNode, pduid, &elem);
-				smiFreeNode(smiNode);
 #else
 				asn1_print(&elem);
 #endif
