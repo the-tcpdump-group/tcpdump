@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rt6.c,v 1.14 2000-09-29 04:58:48 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rt6.c,v 1.15 2000-10-03 02:19:07 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -58,7 +58,7 @@ rt6_print(register const u_char *bp, register const u_char *bp2)
 	ip = (struct ip6_hdr *)bp2;
 	len = dp->ip6r_len;
 
-	/* 'ep' points to the end of avaible data. */
+	/* 'ep' points to the end of available data. */
 	ep = snapend;
 
 #if 0

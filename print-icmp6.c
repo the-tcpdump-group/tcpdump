@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.29 2000-10-03 02:17:50 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.30 2000-10-03 02:19:05 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -124,7 +124,7 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 	ip = (struct ip6_hdr *)bp2;
 	oip = (struct ip6_hdr *)(dp + 1);
 	str = buf;
-	/* 'ep' points to the end of avaible data. */
+	/* 'ep' points to the end of available data. */
 	ep = snapend;
 	if (ip->ip6_plen)
 		icmp6len = (ntohs(ip->ip6_plen) + sizeof(struct ip6_hdr) -
@@ -503,7 +503,7 @@ icmp6_opt_print(register const u_char *bp, int resid)
 	oip = &dp->icmp6_ip6;
 	str = buf;
 #endif
-	/* 'ep' points to the end of avaible data. */
+	/* 'ep' points to the end of available data. */
 	ep = snapend;
 
 	ECHECK(op->nd_opt_len);
@@ -619,7 +619,7 @@ mld6_print(register const u_char *bp)
 	register struct mld6_hdr *mp = (struct mld6_hdr *)bp;
 	register const u_char *ep;
 
-	/* 'ep' points to the end of avaible data. */
+	/* 'ep' points to the end of available data. */
 	ep = snapend;
 
 	if ((u_char *)mp + sizeof(*mp) > ep)
@@ -637,7 +637,7 @@ mld6_print(register const u_char *bp)
 	register struct icmp6_mld *mp = (struct icmp6_mld *)bp;
 	register const u_char *ep;
 
-	/* 'ep' points to the end of avaible data. */
+	/* 'ep' points to the end of available data. */
 	ep = snapend;
 
 	if ((u_char *)mp + sizeof(*mp) > ep)

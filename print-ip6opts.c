@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-ip6opts.c,v 1.5 2000-04-28 11:14:48 itojun Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-ip6opts.c,v 1.6 2000-10-03 02:19:06 itojun Exp $";
 #endif
 
 #ifdef INET6
@@ -140,7 +140,7 @@ hbhopt_print(register const u_char *bp)
     register const u_char *ep;
     int hbhlen = 0;
 
-    /* 'ep' points to the end of avaible data. */
+    /* 'ep' points to the end of available data. */
     ep = snapend;
     TCHECK(dp->ip6h_len);
     hbhlen = (int)((dp->ip6h_len + 1) << 3);
@@ -163,7 +163,7 @@ dstopt_print(register const u_char *bp)
     register const u_char *ep;
     int dstoptlen = 0;
 
-    /* 'ep' points to the end of avaible data. */
+    /* 'ep' points to the end of available data. */
     ep = snapend;
     TCHECK(dp->ip6d_len);
     dstoptlen = (int)((dp->ip6d_len + 1) << 3);

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ipcomp.c,v 1.9 2000-09-29 04:58:41 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ipcomp.c,v 1.10 2000-10-03 02:19:06 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -70,7 +70,7 @@ ipcomp_print(register const u_char *bp, register const u_char *bp2, int *nhdr)
 	ipcomp = (struct ipcomp *)bp;
 	cpi = (u_int16_t)ntohs(ipcomp->comp_cpi);
 
-	/* 'ep' points to the end of avaible data. */
+	/* 'ep' points to the end of available data. */
 	ep = snapend;
 
 	if ((u_char *)(ipcomp + 1) >= ep - sizeof(struct ipcomp)) {

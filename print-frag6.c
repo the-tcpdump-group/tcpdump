@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-frag6.c,v 1.10 2000-09-29 04:58:39 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-frag6.c,v 1.11 2000-10-03 02:19:05 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -59,7 +59,7 @@ frag6_print(register const u_char *bp, register const u_char *bp2)
 	dp = (struct ip6_frag *)bp;
 	ip6 = (struct ip6_hdr *)bp2;
 
-	/* 'ep' points to the end of avaible data. */
+	/* 'ep' points to the end of available data. */
 	ep = snapend;
 
 	TCHECK(dp->ip6f_offlg);
