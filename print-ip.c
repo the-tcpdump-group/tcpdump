@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.93 2001-01-28 08:18:27 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.94 2001-02-20 18:55:47 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -301,7 +301,7 @@ ip_print(register const u_char *bp, register u_int length)
 
 	len = ntohs(ip->ip_len);
 	if (length < len)
-		(void)printf("truncated-ip - %d bytes missing!",
+		(void)printf("truncated-ip - %d bytes missing! ",
 			len - length);
 	len -= hlen;
 	len0 = len;
