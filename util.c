@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.84 2003-03-04 08:53:26 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.85 2003-04-21 16:59:52 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -85,15 +85,10 @@ int
 fn_printn(register const u_char *s, register u_int n,
 	  register const u_char *ep)
 {
-	register int ret;
 	register u_char c;
 
-	ret = 1;			/* assume truncated */
-	while (ep == NULL || s < ep) {
-		if (n-- <= 0) {
-			ret = 0;
-			break;
-		}
+	while (n > 0 && (ep == NULL || s < ep)) {
+		n--;
 		c = *s++;
 		if (!isascii(c)) {
 			c = toascii(c);
@@ -106,7 +101,7 @@ fn_printn(register const u_char *s, register u_int n,
 		}
 		putchar(c);
 	}
-	return(ret);
+	return (n == 0) ? 0 : 1;
 }
 
 /*
