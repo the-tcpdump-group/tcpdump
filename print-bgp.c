@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.15 2000-09-23 08:54:26 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.16 2000-09-24 07:48:19 guy Exp $";
 #endif
 
 #include <sys/param.h>
@@ -284,7 +284,7 @@ decode_prefix4(const u_char *pd, char *buf, int buflen)
 		((u_char *)&addr)[(plen + 7) / 8 - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
 	}
-	snprintf(buf, buflen, "%s/%d", getname((char *)&addr), plen);
+	snprintf(buf, buflen, "%s/%d", getname((u_char *)&addr), plen);
 	return 1 + (plen + 7) / 8;
 }
 
@@ -539,7 +539,7 @@ bgp_open_print(const u_char *dat, int length)
 	printf(": Version %d,", bgpo.bgpo_version);
 	printf(" AS #%u,", ntohs(bgpo.bgpo_myas));
 	printf(" Holdtime %u,", ntohs(bgpo.bgpo_holdtime));
-	printf(" ID %s,", getname((char *)&bgpo.bgpo_id));
+	printf(" ID %s,", getname((u_char *)&bgpo.bgpo_id));
 	printf(" Option length %u", bgpo.bgpo_optlen);
 
 	/* ugly! */
