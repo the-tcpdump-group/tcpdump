@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.33 2004-12-29 03:10:25 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.34 2004-12-29 05:27:27 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -107,8 +107,6 @@ interpret_long_date(const u_char *p)
     double d;
     time_t ret;
 
-    TCHECK2(p[4], 4);
-
     /* this gives us seconds since jan 1st 1601 (approx) */
     d = (EXTRACT_LE_32BITS(p + 4) * 256.0 + p[3]) * (1.0e-7 * (1 << 24));
 
@@ -124,8 +122,6 @@ interpret_long_date(const u_char *p)
     ret = (time_t)d;
 
     return(ret);
-trunc:
-    return(0);
 }
 
 /*
@@ -187,7 +183,12 @@ name_ptr(const u_char *buf, int ofs, const u_char *maxbuf)
 
     /* XXX - this should use the same code that the DNS dissector does */
     if ((c & 0xC0) == 0xC0) {
-	u_int16_t l = EXTRACT_16BITS(buf + ofs) & 0x3FFF;
+	u_int16_t l;
+
+	TCHECK2(*p, 2);
+	if ((p + 1) >= maxbuf)
+	    return(NULL);	/* name goes past the end of the buffer */
+	l = EXTRACT_16BITS(p) & 0x3FFF;
 	if (l == 0) {
 	    /* We have a pointer that points to itself. */
 	    return(NULL);
@@ -196,9 +197,8 @@ name_ptr(const u_char *buf, int ofs, const u_char *maxbuf)
 	if (p >= maxbuf)
 	    return(NULL);	/* name goes past the end of the buffer */
 	TCHECK2(*p, 1);
-	return(buf + l);
-    } else
-	return(buf + ofs);
+    }
+    return(p);
 
 trunc:
     return(NULL);	/* name goes past the end of the buffer */
@@ -342,8 +342,10 @@ unistr(const u_char *s, u_int32_t *len, int use_unicode)
 	/*
 	 * Skip padding that puts the string on an even boundary.
 	 */
-	if (((s - startbuf) % 2) != 0)
+	if (((s - startbuf) % 2) != 0) {
+	    TCHECK(s[0]);
 	    s++;
+	}
     }
     if (*len == 0) {
 	/*
@@ -353,6 +355,7 @@ unistr(const u_char *s, u_int32_t *len, int use_unicode)
 	sp = s;
 	if (!use_unicode) {
 	    for (;;) {
+		TCHECK(sp[0]);
 		*len += 1;
 		if (sp[0] == 0)
 		    break;
@@ -361,6 +364,7 @@ unistr(const u_char *s, u_int32_t *len, int use_unicode)
 	    strsize = *len - 1;
 	} else {
 	    for (;;) {
+		TCHECK2(sp[0], 2);
 		*len += 2;
 		if (sp[0] == 0 && sp[1] == 0)
 		    break;
@@ -376,6 +380,7 @@ unistr(const u_char *s, u_int32_t *len, int use_unicode)
     }
     if (!use_unicode) {
     	while (strsize != 0) {
+    	    TCHECK(s[0]);
 	    if (l >= MAX_UNISTR_SIZE)
 		break;
 	    if (isprint(s[0]))
@@ -391,6 +396,7 @@ unistr(const u_char *s, u_int32_t *len, int use_unicode)
 	}
     } else {
 	while (strsize != 0) {
+	    TCHECK2(s[0], 2);
 	    if (l >= MAX_UNISTR_SIZE)
 		break;
 	    if (s[1] == 0 && isprint(s[0])) {
@@ -411,6 +417,9 @@ unistr(const u_char *s, u_int32_t *len, int use_unicode)
     }
     buf[l] = 0;
     return buf;
+
+trunc:
+    return NULL;
 }
 
 static const u_char *
@@ -424,12 +433,14 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf,
     while (*fmt && buf<maxbuf) {
 	switch (*fmt) {
 	case 'a':
+	    TCHECK(buf[0]);
 	    write_bits(buf[0], attrib_fmt);
 	    buf++;
 	    fmt++;
 	    break;
 
 	case 'A':
+	    TCHECK2(buf[0], 2);
 	    write_bits(EXTRACT_LE_16BITS(buf), attrib_fmt);
 	    buf += 2;
 	    fmt++;
@@ -450,6 +461,7 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf,
 	    strncpy(bitfmt, fmt, l);
 	    bitfmt[l] = '\0';
 	    fmt = p + 1;
+	    TCHECK(buf[0]);
 	    write_bits(buf[0], bitfmt);
 	    buf++;
 	    break;
@@ -458,6 +470,7 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf,
 	case 'P':
 	  {
 	    int l = atoi(fmt + 1);
+	    TCHECK2(buf[0], l);
 	    buf += l;
 	    fmt++;
 	    while (isdigit((unsigned char)*fmt))
@@ -594,8 +607,12 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf,
 	case 'R':	/* like 'S', but always ASCII */
 	  {
 	    /*XXX unistr() */
+	    const char *s;
 	    len = 0;
-	    printf("%s", unistr(buf, &len, (*fmt == 'R') ? 0 : unicodestr));
+	    s = unistr(buf, &len, (*fmt == 'R') ? 0 : unicodestr);
+	    if (s == NULL)
+		goto trunc;
+	    printf("%s", s);
 	    buf += len;
 	    fmt++;
 	    break;
@@ -603,11 +620,17 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf,
 	case 'Z':
 	case 'Y':	/* like 'Z', but always ASCII */
 	  {
-	    if (*buf != 4 && *buf != 2)
-		printf("Error! ASCIIZ buffer of type %u (safety=%lu)\n", *buf,
-		    (unsigned long)PTR_DIFF(maxbuf, buf));
+	    const char *s;
+	    TCHECK(*buf);
+	    if (*buf != 4 && *buf != 2) {
+		printf("Error! ASCIIZ buffer of type %u", *buf);
+		return maxbuf;	/* give up */
+	    }
 	    len = 0;
-	    printf("%s", unistr(buf + 1, &len, (*fmt == 'Y') ? 0 : unicodestr));
+	    s = unistr(buf + 1, &len, (*fmt == 'Y') ? 0 : unicodestr);
+	    if (s == NULL)
+		goto trunc;
+	    printf("%s", s);
 	    buf += len + 1;
 	    fmt++;
 	    break;
@@ -615,6 +638,7 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf,
 	case 's':
 	  {
 	    int l = atoi(fmt + 1);
+	    TCHECK2(*buf, l);
 	    printf("%-*.*s", l, l, buf);
 	    buf += l;
 	    fmt++;
@@ -646,6 +670,7 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf,
 	case 'h':
 	  {
 	    int l = atoi(fmt + 1);
+	    TCHECK2(*buf, l);
 	    while (l--)
 		printf("%02x", *buf++);
 	    fmt++;
@@ -674,6 +699,7 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf,
 		    name_type_str(name_type));
 		break;
 	    case 2:
+		TCHECK(buf[15]);
 		name_type = buf[15];
 		printf("%-15.15s NameType=0x%02X (%s)", buf, name_type,
 		    name_type_str(name_type));
@@ -691,10 +717,11 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf,
 	    struct tm *lt;
 	    const char *tstring;
 	    u_int32_t x;
-	    x = EXTRACT_LE_32BITS(buf);
 
 	    switch (atoi(fmt + 1)) {
 	    case 1:
+		TCHECK2(buf[0], 4);
+		x = EXTRACT_LE_32BITS(buf);
 		if (x == 0 || x == 0xFFFFFFFF)
 		    t = 0;
 		else
@@ -702,6 +729,8 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf,
 		buf += 4;
 		break;
 	    case 2:
+		TCHECK2(buf[0], 4);
+		x = EXTRACT_LE_32BITS(buf);
 		if (x == 0 || x == 0xFFFFFFFF)
 		    t = 0;
 		else
@@ -709,6 +738,7 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf,
 		buf += 4;
 		break;
 	    case 3:
+		TCHECK2(buf[0], 8);
 		t = interpret_long_date(buf);
 		buf += 8;
 		break;
