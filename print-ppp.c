@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.91 2003-11-16 09:36:32 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.92 2003-11-30 00:18:04 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -54,6 +54,7 @@ static const char rcsid[] _U_ =
 #include "ppp.h"
 #include "chdlc.h"
 #include "ethertype.h"
+#include "oui.h"
 
 /*
  * The following constatns are defined by IANA. Please refer to
@@ -405,7 +406,9 @@ handle_ctrl_proto(u_int proto, const u_char *pptr, int length)
 			break;
 		printf(", Magic-Num 0x%08x", EXTRACT_32BITS(tptr));
 		tptr += 4;
-		printf(" OUI 0x%06x", EXTRACT_24BITS(tptr));
+		printf(" Vendor: %s (%u)",
+                       tok2str(oui_values,"Unknown",EXTRACT_24BITS(tptr)),
+                       EXTRACT_24BITS(tptr));
 		/* XXX: need to decode Kind and Value(s)? */
 		break;
 	case CPCODES_CONF_REQ:
@@ -501,7 +504,7 @@ print_lcp_config_options(const u_char *p, int length)
 	if (length < len)
 		return 0;
 	if ((opt >= LCPOPT_MIN) && (opt <= LCPOPT_MAX))
-		printf(", %s ", lcpconfopts[opt]);
+		printf(", %s (%u)", lcpconfopts[opt],opt);
 	else {
 		printf(", unknown LCP option 0x%02x", opt);
 		return len;
@@ -510,10 +513,12 @@ print_lcp_config_options(const u_char *p, int length)
 	switch (opt) {
 	case LCPOPT_VEXT:
 		if (len >= 6) {
-			printf(" OUI 0x%06x", EXTRACT_24BITS(p+2));
+			printf(" Vendor: %s (%u)",
+                               tok2str(oui_values,"Unknown",EXTRACT_24BITS(p+2)),
+                               EXTRACT_24BITS(p+2));
 #if 0
-			printf(" kind 0x%02x", p[5]);
-			printf(" val 0x")
+			printf(", kind: 0x%02x", p[5]);
+			printf(", Value: 0x")
 			for (i = 0; i < len - 6; i++) {
 				printf("%02x", p[6 + i]);
 			}
@@ -526,7 +531,7 @@ print_lcp_config_options(const u_char *p, int length)
 		break;
 	case LCPOPT_ACCM:
 		if (len == 6)
-			printf(" %08x", EXTRACT_32BITS(p + 2));
+			printf(" 0x%08x", EXTRACT_32BITS(p + 2));
 		break;
 	case LCPOPT_AP:
 		if (len >= 4) {
