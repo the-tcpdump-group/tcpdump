@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.157 2004-01-15 19:55:56 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.158 2004-01-22 09:35:50 hannes Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -82,6 +82,10 @@ tcpdump \- dump traffic on a network
 [
 .B \-y
 .I datalinktype
+]
+[
+.B \-Z
+.I user
 ]
 .ti +8
 [
@@ -541,6 +545,12 @@ its link level header, in hex and ASCII.
 .TP
 .B \-y
 Set the data link type to use while capturing packets to \fIdatalinktype\fP.
+.TP
+.B \-Z
+Drops privileges (if root) and changes user ID to
+.I user
+and the group ID to the primary group of
+.IR user .
 .IP "\fI expression\fP"
 .RS
 selects which packets will be dumped.

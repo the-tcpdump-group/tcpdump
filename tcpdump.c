@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.225 2004-01-15 19:56:50 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.226 2004-01-22 09:35:50 hannes Exp $ (LBL)";
 #endif
 
 /*
@@ -65,6 +65,8 @@ extern int SIZE_BUF;
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pwd.h>
+#include <grp.h>
 
 #include "interface.h"
 #include "addrtoname.h"
@@ -116,6 +118,7 @@ static void show_dlts_and_exit(pcap_t *pd) __attribute__((noreturn));
 static void print_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void dump_packet_and_trunc(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void dump_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
+static void droproot(const char *);
 
 #ifdef SIGINFO
 RETSIGTYPE requestinfo(int);
@@ -310,6 +313,25 @@ show_dlts_and_exit(pcap_t *pd)
 #define U_FLAG
 #endif
 
+/* Drop root privileges */
+void droproot(const char *username)
+{
+	struct passwd *pw = NULL;
+	pw = getpwnam(username);
+	if (pw) {
+		if (initgroups(pw->pw_name, 0) != 0 || setgid(pw->pw_gid) != 0 ||
+				 setuid(pw->pw_uid) != 0) {
+			fprintf(stderr, "Couldn't change to '%.32s' uid=%d gid=%d\n", username, 
+							pw->pw_uid, pw->pw_gid);
+			exit(1);
+		}
+	}
+	else {
+		fprintf(stderr, "Couldn't find user '%.32s'\n", username);
+		exit(1);
+	}
+}
+
 int
 main(int argc, char **argv)
 {
@@ -326,6 +348,7 @@ main(int argc, char **argv)
 	struct dump_info dumpinfo;
 	u_char *pcap_userdata;
 	char ebuf[PCAP_ERRBUF_SIZE];
+	char *username = NULL;
 #ifdef HAVE_PCAP_FINDALLDEVS
 	pcap_if_t *devpointer;
 	int devnum;
@@ -355,7 +378,7 @@ main(int argc, char **argv)
 
 	opterr = 0;
 	while (
-	    (op = getopt(argc, argv, "aA" B_FLAG "c:C:d" D_FLAG "eE:fF:i:lLm:nNOpqr:Rs:StT:u" U_FLAG "vw:xXy:Y")) != -1)
+	    (op = getopt(argc, argv, "aA" B_FLAG "c:C:d" D_FLAG "eE:fF:i:lLm:nNOpqr:Rs:StT:u" U_FLAG "vw:xXy:YZ:")) != -1)
 		switch (op) {
 
 		case 'a':
@@ -619,6 +642,16 @@ main(int argc, char **argv)
 			}
 			break;
 #endif
+		case 'Z':
+			if (optarg) {
+				username = strdup(optarg);
+			}
+			else {
+				usage();
+				/* NOTREACHED */
+			}
+			break;
+
 		default:
 			usage();
 			/* NOTREACHED */
@@ -641,7 +674,13 @@ main(int argc, char **argv)
 		 * people's trace files (especially if we're set-UID
 		 * root).
 		 */
-		setuid(getuid());
+		if (username) {
+			droproot(username);
+		}
+		else {
+			if (setgid(getgid()) != 0 || setuid(getuid()) != 0 )
+				fprintf(stderr, "Warning: setgid/setuid failed !\n");
+		}
 #endif /* WIN32 */
 		pd = pcap_open_offline(RFileName, ebuf);
 		if (pd == NULL)
@@ -729,7 +768,13 @@ main(int argc, char **argv)
 		 * Let user own process after socket has been opened.
 		 */
 #ifndef WIN32
-		setuid(getuid());
+		if (username) {
+			droproot(username);
+		}
+		else {
+			if (setgid(getgid()) != 0 || setuid(getuid()) != 0)
+				fprintf(stderr, "Warning: setgid/setuid failed !\n");
+		}
 #endif /* WIN32 */
 	}
 	if (infile)
@@ -1167,7 +1212,7 @@ usage(void)
 	(void)fprintf(stderr,
 "\t\t[ -E algo:secret ] [ -F file ] [ -i interface ] [ -r file ]\n");
 	(void)fprintf(stderr,
-"\t\t[ -s snaplen ] [ -T type ] [ -w file ] [ -y datalinktype ]\n");
+"\t\t[ -s snaplen ] [ -T type ] [ -w file ] [ -y datalinktype ] [ -Z user ]\n");
 	(void)fprintf(stderr,
 "\t\t[ expression ]\n");
 	exit(1);
