@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.117 2002-12-11 07:14:02 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.118 2002-12-28 17:59:09 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -397,9 +397,17 @@ ip_print(register const u_char *bp, register u_int length)
             if (ip->ip_ttl >= 1)
                 (void)printf(", ttl %u", ip->ip_ttl);    
 
-            if ((off & 0x3fff) == 0)
+            if ((off & 0x3fff) != 0)
                 (void)printf(", id %u", EXTRACT_16BITS(&ip->ip_id));
-            (void)printf(", len %u) ", EXTRACT_16BITS(&ip->ip_len));
+
+            (void)printf(", length: %u", EXTRACT_16BITS(&ip->ip_len));
+
+            if ((hlen - sizeof(struct ip)) > 0) {
+                (void)printf(", optlength: %u (", hlen - sizeof(struct ip));
+                ip_optprint((u_char *)(ip + 1), hlen - sizeof(struct ip));
+                printf(" )");
+            }
+            printf(") ");
 	}
 
 	/*
@@ -623,12 +631,7 @@ again:
 				sep = ", ";
 			}
 		}
-		if ((hlen -= sizeof(struct ip)) > 0) {
-			(void)printf("%soptlen=%d", sep, hlen);
-			ip_optprint((u_char *)(ip + 1), hlen);
-		}
 	}
-
 }
 
 void
