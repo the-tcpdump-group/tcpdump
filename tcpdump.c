@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.224 2004-01-15 19:53:49 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.225 2004-01-15 19:56:50 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -797,7 +797,7 @@ main(int argc, char **argv)
 		 * packets captured.
 		 */
 #ifdef USE_WIN32_MM_TIMER
-		/* call requestinfo() each 1000 +/-100msec */
+		/* call verbose_stats_dump() each 1000 +/-100msec */
 		timer_id = timeSetEvent(1000, 100, verbose_stats_dump, 0, TIME_PERIODIC);
 		setvbuf(stderr, NULL, _IONBF, 0);
 #elif defined(HAVE_ALARM)
