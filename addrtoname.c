@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.72 2001-04-27 02:33:43 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.73 2001-05-09 18:17:50 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -617,6 +617,14 @@ init_eprotoarray(void)
 	}
 }
 
+static struct protoidlist {
+	u_char protoid[5];
+	char *name;
+} protoidlist[] = {
+	{{ 0x00, 0xe0, 0x2b, 0x00, 0xbb }, "ExtremeDiscoveryProtocol" },
+	{{ 0x00, 0x00, 0x00, 0x00, 0x00 }, NULL }
+};
+
 /*
  * SNAP proto IDs with org code 0:0:0 are actually encapsulated Ethernet
  * types.
@@ -626,6 +634,7 @@ init_protoidarray(void)
 {
 	register int i;
 	register struct protoidmem *tp;
+	struct protoidlist *pl;
 	u_char protoid[5];
 
 	protoid[0] = 0;
@@ -637,6 +646,15 @@ init_protoidarray(void)
 		memcpy((char *)&protoid[3], (char *)&etype, 2);
 		tp = lookup_protoid(protoid);
 		tp->p_name = strdup(eproto_db[i].s);
+	}
+	/* Hardwire some SNAP proto ID names */
+	for (pl = protoidlist; pl->name != NULL; ++pl) {
+		tp = lookup_protoid(pl->protoid);
+		/* Don't override existing name */
+		if (tp->p_name != NULL)
+			continue;
+
+		tp->p_name = pl->name;
 	}
 }
 
@@ -712,6 +730,9 @@ static struct tok llcsap_db[] = {
 	{ LLCSAP_RS511,		"eia-rs511" },
 	{ LLCSAP_ISO8208,	"x.25/llc2" },
 	{ LLCSAP_PROWAY,	"proway" },
+	{ LLCSAP_SNAP,		"snap" },
+	{ LLCSAP_IPX,		"IPX" },
+	{ LLCSAP_NETBEUI,	"netbeui" },
 	{ LLCSAP_ISONS,		"iso-clns" },
 	{ LLCSAP_GLOBAL,	"global" },
 	{ 0,			NULL }
