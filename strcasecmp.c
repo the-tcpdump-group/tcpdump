@@ -14,11 +14,6 @@
 #include "config.h"
 #endif
 
-#ifndef lint
-static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/strcasecmp.c,v 1.2.2.1 2000-01-11 06:58:28 fenner Exp $";
-#endif
-
 #include <sys/types.h>
 
 #include "interface.h"
