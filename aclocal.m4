@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.70 2000-06-10 14:17:38 assar Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.71 2000-07-30 10:53:20 assar Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -192,7 +192,7 @@ AC_DEFUN(AC_LBL_LIBPCAP,
     libpcap=FAIL
     lastdir=FAIL
     places=`ls .. | sed -e 's,/$,,' -e 's,^,../,' | \
-	egrep '/libpcap-[[0-9]]*\.[[0-9]]*(\.[[0-9]]*)?([[ab]][[0-9]]*)?$'`
+	egrep '/libpcap-[[0-9]]*.[[0-9]]*(.[[0-9]]*)?([[ab]][[0-9]]*)?$'`
     for dir in $places ../libpcap libpcap ; do
 	    basedir=`echo $dir | sed -e 's/[[ab]][[0-9]]*$//'`
 	    if test $lastdir = $basedir ; then
