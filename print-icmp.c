@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.52 2000-09-28 06:43:00 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.53 2000-09-29 04:58:39 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -36,7 +36,6 @@ struct mbuf;
 struct rtentry;
 
 #include <netinet/in.h>
-#include <netinet/in_systm.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -64,15 +63,15 @@ struct icmp {
 		u_char ih_pptr;			/* ICMP_PARAMPROB */
 		struct in_addr ih_gwaddr;	/* ICMP_REDIRECT */
 		struct ih_idseq {
-			n_short	icd_id;
-			n_short	icd_seq;
+			u_short	icd_id;
+			u_short	icd_seq;
 		} ih_idseq;
 		int ih_void;
 
 		/* ICMP_UNREACH_NEEDFRAG -- Path MTU Discovery (RFC1191) */
 		struct ih_pmtu {
-			n_short ipm_void;    
-			n_short ipm_nextmtu;
+			u_short ipm_void;    
+			u_short ipm_nextmtu;
 		} ih_pmtu;
 	} icmp_hun;
 #define	icmp_pptr	icmp_hun.ih_pptr
@@ -84,9 +83,9 @@ struct icmp {
 #define	icmp_nextmtu	icmp_hun.ih_pmtu.ipm_nextmtu
 	union {
 		struct id_ts {
-			n_time its_otime;
-			n_time its_rtime;
-			n_time its_ttime;
+			u_int its_otime;
+			u_int its_rtime;
+			u_int its_ttime;
 		} id_ts;
 		struct id_ip  {
 			struct ip idi_ip;
@@ -112,7 +111,7 @@ struct icmp {
  * ip header length.
  */
 #define	ICMP_MINLEN	8				/* abs minimum */
-#define	ICMP_TSLEN	(8 + 3 * sizeof (n_time))	/* timestamp */
+#define	ICMP_TSLEN	(8 + 3 * sizeof (u_int))	/* timestamp */
 #define	ICMP_MASKLEN	12				/* address mask */
 #define	ICMP_ADVLENMIN	(8 + sizeof (struct ip) + 8)	/* min */
 #define	ICMP_ADVLEN(p)	(8 + ((p)->icmp_ip.ip_hl << 2) + 8)

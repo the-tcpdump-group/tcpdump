@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ip.h,v 1.2 2000-09-24 07:40:45 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ip.h,v 1.3 2000-09-29 04:58:33 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1982, 1986, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -159,10 +159,10 @@ struct	ip_timestamp {
 		ipt_flg:4;		/* flags, see below */
 #endif
 	union ipt_timestamp {
-		n_long	ipt_time[1];
+		u_int32_t ipt_time[1];
 		struct	ipt_ta {
 			struct in_addr ipt_addr;
-			n_long ipt_time;
+			u_int32_t ipt_time;
 		} ipt_ta[1];
 	} ipt_timestamp;
 };

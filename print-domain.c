@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.51 2000-09-28 06:42:58 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.52 2000-09-29 04:58:35 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -36,7 +36,6 @@ struct mbuf;
 struct rtentry;
 
 #include <netinet/in.h>
-#include <netinet/in_systm.h>
 
 #ifdef NOERROR
 #undef NOERROR					/* Solaris sucks */
