@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/nameser.h,v 1.4 2000-12-17 23:07:49 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/nameser.h,v 1.5 2000-12-28 20:30:41 itojun Exp $ (LBL) */
 /*
  * Copyright (c) 1983, 1989, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -188,9 +188,11 @@ typedef struct {
 #define DNS_RCODE(np)	((np)->flags2 & 0xF)	/* response code */
 
 /*
- * Defines for handling compressed domain names
+ * Defines for handling compressed domain names, EDNS0 labels, etc.
  */
-#define INDIR_MASK	0xc0
+#define INDIR_MASK	0xc0	/* 11.... */
+#define EDNS0_MASK	0x40	/* 01.... */
+#  define EDNS0_ELT_BITLABEL 0x01 
 
 /*
  * Structure for passing resource records around.
