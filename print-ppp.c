@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.83 2003-05-15 15:25:19 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.84 2003-05-22 12:02:24 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -452,7 +452,9 @@ handle_ctrl_proto(u_int proto, const u_char *pptr, int length)
 	case CPCODES_PROT_REJ:
 		if (length < 6)
 			break;
-		printf(", Rejected-Protocol=%04x", EXTRACT_16BITS(tptr));
+		printf(", Rejected %s Protocol (0x%04x)",
+		       tok2str(ppptype2str,"unknown", EXTRACT_16BITS(tptr)),
+		       EXTRACT_16BITS(tptr));
 		/* XXX: need to decode Rejected-Information? */
 		break;
 	case CPCODES_ECHO_REQ:
@@ -950,6 +952,9 @@ handle_ppp(u_int proto, const u_char *p, int length)
 	switch (proto) {
 	case PPP_LCP:
 	case PPP_IPCP:
+	case PPP_OSICP:
+	case PPP_MPLSCP:
+	case PPP_IPV6CP:
 	case PPP_CCP:
 	case PPP_BACP:
 		handle_ctrl_proto(proto, p, length);
