@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.96 2001-06-26 06:19:06 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.97 2001-08-20 17:53:54 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -288,7 +288,6 @@ static int udp_cksum(register const struct ip *ip,
 		     register const struct udphdr *up,
 		     register int len)
 {
-	int i, tlen;
 	union phu {
 		struct phdr {
 			u_int32_t src;
@@ -300,33 +299,17 @@ static int udp_cksum(register const struct ip *ip,
 		u_int16_t pa[6];
 	} phu;
 	register const u_int16_t *sp;
-	u_int32_t sum;
-	tlen = ntohs(ip->ip_len) - ((const char *)up-(const char*)ip);
 
 	/* pseudo-header.. */
-	phu.ph.len = htons(tlen);
+	phu.ph.len = htons(len);
 	phu.ph.mbz = 0;
 	phu.ph.proto = IPPROTO_UDP;
 	memcpy(&phu.ph.src, &ip->ip_src.s_addr, sizeof(u_int32_t));
 	memcpy(&phu.ph.dst, &ip->ip_dst.s_addr, sizeof(u_int32_t));
 
 	sp = &phu.pa[0];
-	sum = sp[0]+sp[1]+sp[2]+sp[3]+sp[4]+sp[5];
-
-	sp = (const u_int16_t *)up;
-
-	for (i=0; i<(tlen&~1); i+= 2)
-		sum += *sp++;
-
-	if (tlen & 1) {
-		sum += htons( (*(const u_int8_t *)sp) << 8);
-	}
-
-	while (sum > 0xffff)
-		sum = (sum & 0xffff) + (sum >> 16);
-	sum = ~sum & 0xffff;
-
-	return (sum);
+	return in_cksum((u_short *)up, len,
+			sp[0]+sp[1]+sp[2]+sp[3]+sp[4]+sp[5]);
 }
 
 #ifdef INET6
@@ -596,7 +579,7 @@ udp_print(register const u_char *bp, u_int length,
 		if (sum == 0) {
 			(void)printf("[no cksum] ");
 		} else if (TTEST2(cp[0], length)) {
-			sum = udp_cksum(ip, up, length);
+			sum = udp_cksum(ip, up, length + sizeof(struct udphdr));
 			if (sum != 0)
 				(void)printf("[bad udp cksum %x!] ", sum);
 			else

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.87 2001-06-25 21:38:50 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.88 2001-08-20 17:53:53 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -104,7 +104,6 @@ static int tcp_cksum(register const struct ip *ip,
 		     register const struct tcphdr *tp,
 		     register int len)
 {
-	int i, tlen;
 	union phu {
 		struct phdr {
 			u_int32_t src;
@@ -115,34 +114,18 @@ static int tcp_cksum(register const struct ip *ip,
 		} ph;
 		u_int16_t pa[6];
 	} phu;
-	register const u_int16_t *sp;
-	u_int32_t sum;
-	tlen = ntohs(ip->ip_len) - ((const char *)tp-(const char*)ip);
+	const u_int16_t *sp;
 
 	/* pseudo-header.. */
-	phu.ph.len = htons(tlen);
+	phu.ph.len = htons(len);	/* XXX */
 	phu.ph.mbz = 0;
 	phu.ph.proto = IPPROTO_TCP;
 	memcpy(&phu.ph.src, &ip->ip_src.s_addr, sizeof(u_int32_t));
 	memcpy(&phu.ph.dst, &ip->ip_dst.s_addr, sizeof(u_int32_t));
 
 	sp = &phu.pa[0];
-	sum = sp[0]+sp[1]+sp[2]+sp[3]+sp[4]+sp[5];
-
-	sp = (const u_int16_t *)tp;
-
-	for (i=0; i<(tlen&~1); i+= 2)
-		sum += *sp++;
-
-	if (tlen & 1) {
-		sum += htons( (*(const u_int8_t *)sp) << 8);
-	}
-
-	while (sum > 0xffff)
-		sum = (sum & 0xffff) + (sum >> 16);
-	sum = ~sum & 0xffff;
-
-	return (sum);
+	return in_cksum((u_short *)tp, len,
+			sp[0]+sp[1]+sp[2]+sp[3]+sp[4]+sp[5]);
 }
 
 #ifdef INET6
