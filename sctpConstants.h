@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/sctpConstants.h,v 1.3 2002-06-11 17:08:59 itojun Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/sctpConstants.h,v 1.4 2003-06-03 23:49:23 guy Exp $ (LBL) */
 
 /* SCTP reference Implementation Copyright (C) 1999 Cisco And Motorola
  *
@@ -513,11 +513,6 @@
 
 
 #define SCTP_DEAMON_PORT 9899
-
-
-#ifndef IPPROTO_SCTP
-#define IPPROTO_SCTP 132	/* the Official IANA number :-) */
-#endif
 
 /* Deamon registration message types/responses */
 #define DEAMON_REGISTER       0x01

@@ -35,7 +35,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-"@(#) $Header: /tcpdump/master/tcpdump/print-sctp.c,v 1.11 2002-12-11 07:14:08 guy Exp $ (NETLAB/PEL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-sctp.c,v 1.12 2003-06-03 23:49:23 guy Exp $ (NETLAB/PEL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -109,29 +109,19 @@ void sctp_print(const u_char *bp,        /* beginning of sctp packet */
 
 #ifdef INET6
   if (ip6) {
-    if (ip6->ip6_nxt == IPPROTO_SCTP) {
-      (void)printf("%s.%d > %s.%d: sctp",
-        ip6addr_string(&ip6->ip6_src),
-        sourcePort,
-        ip6addr_string(&ip6->ip6_dst),
-        destPort);
-    } else {
-      (void)printf("%d > %d: sctp",
-        sourcePort, destPort);
-    }
+    (void)printf("%s.%d > %s.%d: sctp",
+      ip6addr_string(&ip6->ip6_src),
+      sourcePort,
+      ip6addr_string(&ip6->ip6_dst),
+      destPort);
   } else
 #endif /*INET6*/
   {
-    if (ip->ip_p == IPPROTO_SCTP) {
-      (void)printf("%s.%d > %s.%d: sctp",
-        ipaddr_string(&ip->ip_src),
-        sourcePort,
-        ipaddr_string(&ip->ip_dst),
-        destPort);
-    } else {
-      (void)printf("%d > %d: sctp",
-        sourcePort, destPort);
-    }
+    (void)printf("%s.%d > %s.%d: sctp",
+      ipaddr_string(&ip->ip_src),
+      sourcePort,
+      ipaddr_string(&ip->ip_dst),
+      destPort);
   }
   fflush(stdout);
 
