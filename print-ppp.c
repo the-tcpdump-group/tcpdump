@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.56 2000-11-08 09:41:39 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.57 2000-12-04 06:47:18 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -988,6 +988,7 @@ void
 ppp_print(register const u_char *p, u_int length)
 {
 	u_int proto;
+	u_int full_length = length;
 
 	/*
 	 * Here, we assume that p points to the Address and Control
@@ -1012,7 +1013,7 @@ ppp_print(register const u_char *p, u_int length)
 		length -= 2;
 	}
 
-	printf("%s: ", ppp_protoname(proto));
+	printf("%s %d: ", ppp_protoname(proto), full_length);
 
 	handle_ppp(proto, p, length);
 	return;
@@ -1296,9 +1297,9 @@ ppp_bsdos_if_print(u_char *user, const struct pcap_pkthdr *h,
 				printf("] ");
 			}
 		}
-		if (eflag)
-			printf("%d ", length);
 	}
+	if (eflag)
+		printf("%d ", length);
 	if (p[SLC_CHL]) {
 		q = p + SLC_BPFHDRLEN + p[SLC_LLHL];
 

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-null.c,v 1.38 2000-10-07 05:53:13 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-null.c,v 1.39 2000-12-04 06:47:17 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -68,30 +68,31 @@ null_print(const u_char *p, const struct ip *ip, u_int length)
 
 	memcpy((char *)&family, (char *)p, sizeof(family));
 
-	if (nflag) {
-		/* XXX just dump the header */
-		return;
-	}
-	switch (family) {
+	if (nflag)
+		printf("AF %d ", family);
+	else {
+		switch (family) {
 
-	case AF_INET:
-		printf("ip: ");
-		break;
+		case AF_INET:
+			printf("ip ");
+			break;
 
 #ifdef INET6
-	case AF_INET6:
-		printf("ip6: ");
-		break;
+		case AF_INET6:
+			printf("ip6 ");
+			break;
 #endif
 
-	case AF_NS:
-		printf("ns: ");
-		break;
+		case AF_NS:
+			printf("ns ");
+			break;
 
-	default:
-		printf("AF %d: ", family);
-		break;
+		default:
+			printf("AF %d ", family);
+			break;
+		}
 	}
+	printf("%d: ", length);
 }
 
 void
