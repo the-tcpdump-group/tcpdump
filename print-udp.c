@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.71 2000-04-27 10:05:31 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.72 2000-04-27 10:57:07 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -67,14 +67,14 @@ static const char rcsid[] =
 #include "bootp.h"
 
 struct rtcphdr {
-	u_short rh_flags;	/* T:2 P:1 CNT:5 PT:8 */
-	u_short rh_len;		/* length of message (in words) */
-	u_int rh_ssrc;		/* synchronization src id */
+	u_int16_t rh_flags;	/* T:2 P:1 CNT:5 PT:8 */
+	u_int16_t rh_len;	/* length of message (in words) */
+	u_int32_t rh_ssrc;	/* synchronization src id */
 };
 
 typedef struct {
-	u_int upper;		/* more significant 32 bits */
-	u_int lower;		/* less significant 32 bits */
+	u_int32_t upper;	/* more significant 32 bits */
+	u_int32_t lower;	/* less significant 32 bits */
 } ntp64;
 
 /*
@@ -82,9 +82,9 @@ typedef struct {
  */
 struct rtcp_sr {
 	ntp64 sr_ntp;		/* 64-bit ntp timestamp */
-	u_int sr_ts;		/* reference media timestamp */
-	u_int sr_np;		/* no. packets sent */
-	u_int sr_nb;		/* no. bytes sent */
+	u_int32_t sr_ts;	/* reference media timestamp */
+	u_int32_t sr_np;	/* no. packets sent */
+	u_int32_t sr_nb;	/* no. bytes sent */
 };
 
 /*
@@ -92,12 +92,12 @@ struct rtcp_sr {
  * Time stamps are middle 32-bits of ntp timestamp.
  */
 struct rtcp_rr {
-	u_int rr_srcid;		/* sender being reported */
-	u_int rr_nl;		/* no. packets lost */
-	u_int rr_ls;		/* extended last seq number received */
-	u_int rr_dv;		/* jitter (delay variance) */
-	u_int rr_lsr;		/* orig. ts from last rr from this src  */
-	u_int rr_dlsr;		/* time from recpt of last rr to xmit time */
+	u_int32_t rr_srcid;	/* sender being reported */
+	u_int32_t rr_nl;	/* no. packets lost */
+	u_int32_t rr_ls;	/* extended last seq number received */
+	u_int32_t rr_dv;	/* jitter (delay variance) */
+	u_int32_t rr_lsr;	/* orig. ts from last rr from this src  */
+	u_int32_t rr_dlsr;	/* time from recpt of last rr to xmit time */
 };
 
 /*XXX*/
@@ -119,7 +119,7 @@ static void
 vat_print(const void *hdr, u_int len, register const struct udphdr *up)
 {
 	/* vat/vt audio */
-	u_int ts = *(u_short *)hdr;
+	u_int ts = *(u_int16_t *)hdr;
 	if ((ts & 0xf060) != 0) {
 		/* probably vt */
 		(void)printf(" udp/vt %u %d / %d",
@@ -219,7 +219,7 @@ rtcp_print(const u_char *hdr, const u_char *ep)
 	struct rtcp_sr *sr;
 	struct rtcphdr *rh = (struct rtcphdr *)hdr;
 	u_int len;
-	u_short flags;
+	u_int16_t flags;
 	int cnt;
 	double ts, dts;
 	if ((u_char *)(rh + 1) > ep) {
@@ -324,7 +324,7 @@ udp_print(register const u_char *bp, u_int length, register const u_char *bp2)
 	register const struct ip *ip;
 	register const u_char *cp;
 	register const u_char *ep = bp + length;
-	u_short sport, dport, ulen;
+	u_int16_t sport, dport, ulen;
 #ifdef INET6
 	register const struct ip6_hdr *ip6;
 #endif
@@ -425,7 +425,7 @@ udp_print(register const u_char *bp, u_int length, register const u_char *bp2)
 				udpport_string(sport),
 				ipaddr_string(&ip->ip_dst),
 				udpport_string(dport));
-			cnfp_print(cp, length, ip);
+			cnfp_print(cp, length, (const u_char *)ip);
 			break;
 		}
 		return;
