@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.19 2002-10-04 08:15:35 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.20 2002-10-06 16:35:45 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -116,7 +116,8 @@ chdlc_print(register const u_char *p, u_int length, u_int caplen)
 		break;
 #endif
         case ETHERTYPE_ISO:
-                if (*(p+CHDLC_HDRLEN) == 0) /* is the fudge byte set ? if yes lets skip a byte */
+                /* is the fudge byte set ? if yes lets skip a byte */
+                if (*(p+CHDLC_HDRLEN) == 0)
                     isoclns_print(p+CHDLC_HDRLEN+1, length-1, length-1, NULL, NULL);
                 else
                     isoclns_print(p+CHDLC_HDRLEN, length, length, NULL, NULL);
@@ -163,17 +164,20 @@ chdlc_slarp_print(const u_char *cp, u_int length)
 	}
 
 	slarp = (const struct cisco_slarp *)cp;
+        printf("SLARP (length: %u), ",length);
 	switch (ntohl(slarp->code)) {
 	case SLARP_REQUEST:
-		printf("slarp-request");
+		printf("request");
+                /* ok we do not know it - but lets at least dump it */
+                print_unknown_data(cp+4,"\n\t",length-4);
 		break;
 	case SLARP_REPLY:
-		printf("slarp-reply %s/%s",
+		printf("reply %s/%s",
 			ipaddr_string(&slarp->un.addr.addr),
 			ipaddr_string(&slarp->un.addr.mask));
 		break;
 	case SLARP_KEEPALIVE:
-		printf("slarp-keepalive my=0x%x your=0x%x ",
+		printf("keepalive: mineseen=0x%08x yourseen=0x%08x ",
 			(u_int32_t)ntohl(slarp->un.keep.myseq),
 			(u_int32_t)ntohl(slarp->un.keep.yourseq));
 		printf("reliability=0x%04x t1=%d.%d",
@@ -181,10 +185,14 @@ chdlc_slarp_print(const u_char *cp, u_int length)
 			ntohs(slarp->un.keep.t2));
 		break;
 	default:
-		printf("slarp-0x%x unknown", (u_int32_t)ntohl(slarp->code));
+		printf("0x%02x unknown", (u_int32_t)ntohl(slarp->code));
+                if (vflag <= 1)
+                    print_unknown_data(cp+4,"\n\t",length-4);
 		break;
 	}
 
 	if (SLARP_LEN < length && vflag)
-		printf("(trailing junk: %d bytes)", length - SLARP_LEN);
+		printf(", (trailing junk: %d bytes)", length - SLARP_LEN);
+        if (vflag > 1)
+            print_unknown_data(cp+4,"\n\t",length-4);
 }
