@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.44 2001-11-25 02:01:48 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.45 2002-04-07 09:50:33 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -226,11 +226,78 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 			break;
 
 		case OUI_CISCO:
-			if (et == ETHERTYPE_CISCO_CDP) {
+			if (et == PID_CISCO_CDP) {
 				cdp_print(p, length, caplen, esrc, edst);
 				return 1;
 			}
 			break;
+
+		case OUI_RFC2684:
+			switch (et) {
+
+			case PID_RFC2684_ETH_FCS:
+			case PID_RFC2684_ETH_NOFCS:
+				/*
+				 * XXX - remove the last two bytes for
+				 * PID_RFC2684_ETH_FCS?
+				 */
+				/*
+				 * Skip the padding.
+				 */
+				caplen -= 2;
+				length -= 2;
+				p += 2;
+
+				/*
+				 * What remains is an Ethernet packet.
+				 */
+				ether_print(p, length, caplen);
+				return (1);
+
+			case PID_RFC2684_802_5_FCS:
+			case PID_RFC2684_802_5_NOFCS:
+				/*
+				 * XXX - remove the last two bytes for
+				 * PID_RFC2684_ETH_FCS?
+				 */
+				/*
+				 * Skip the padding, but not the Access
+				 * Control field.
+				 */
+				caplen -= 2;
+				length -= 2;
+				p += 2;
+
+				/*
+				 * What remains is an 802.5 Token Ring
+				 * packet.
+				 */
+				token_print(p, length, caplen);
+				return (1);
+
+			case PID_RFC2684_FDDI_FCS:
+			case PID_RFC2684_FDDI_NOFCS:
+				/*
+				 * XXX - remove the last two bytes for
+				 * PID_RFC2684_ETH_FCS?
+				 */
+				/*
+				 * Skip the padding.
+				 */
+				caplen -= 3;
+				length -= 3;
+				p += 3;
+
+				/*
+				 * What remains is an FDDI packet.
+				 */
+				fddi_print(p, length, caplen);
+				return (1);
+
+			case PID_RFC2684_BPDU:
+				stp_print(p, length);
+				return (1);
+			}
 		}
 	}
 

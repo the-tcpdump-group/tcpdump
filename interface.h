@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.179 2002-02-05 10:07:39 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.180 2002-04-07 09:50:30 guy Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -208,10 +208,13 @@ extern void pflog_if_print(u_char *, const struct pcap_pkthdr *,
         const u_char *);
 extern void arcnet_if_print(u_char *, const struct pcap_pkthdr *,
 	const u_char *);
+extern void ether_print(const u_char *, u_int, u_int);
 extern void ether_if_print(u_char *, const struct pcap_pkthdr *,
 	const u_char *);
+extern void token_print(const u_char *, u_int, u_int);
 extern void token_if_print(u_char *, const struct pcap_pkthdr *,
 	const u_char *);
+extern void fddi_print(const u_char *, u_int, u_int);
 extern void fddi_if_print(u_char *, const struct pcap_pkthdr *, const u_char *);
 extern void ieee802_11_if_print(u_char *, const struct pcap_pkthdr *,
 	const u_char *);
