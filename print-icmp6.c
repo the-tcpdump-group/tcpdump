@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.58 2002-03-28 10:02:34 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.59 2002-04-02 02:57:39 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -362,7 +362,6 @@ icmp6_print(const u_char *bp, const u_char *bp2)
 		struct in6_addr *in6;
 		u_int32_t *res;
 		u_char *cp;
-		int cnt, i;
 		printf("icmp6: ha discovery %s: ",
 		       dp->icmp6_type == ICMP6_HADISCOV_REQUEST ?
 		       "request" : "reply");
