@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.65 2003-05-30 11:09:39 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.66 2003-06-03 22:15:58 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -96,7 +96,6 @@ struct bgp_notification {
 	u_int8_t bgpn_type;
 	u_int8_t bgpn_major;
 	u_int8_t bgpn_minor;
-        u_int8_t bgpn_data[0];          /* data should follow */
 };
 #define BGP_NOTIFICATION_SIZE		21	/* unaligned */
 
@@ -1420,6 +1419,7 @@ bgp_notification_print(const u_char *dat, int length)
 {
 	struct bgp_notification bgpn;
 	int hlen;
+	const u_char *datap;
 
 	TCHECK2(dat[0], BGP_NOTIFICATION_SIZE);
 	memcpy(&bgpn, dat, BGP_NOTIFICATION_SIZE);
@@ -1462,13 +1462,16 @@ bgp_notification_print(const u_char *dat, int length)
 	    /* draft-ietf-idr-cease-subcode-02 mentions optionally 7 bytes
              * for the maxprefix subtype, which may contain AFI, SAFI and MAXPREFIXES
              */
-	    if(bgpn.bgpn_minor == BGP_NOTIFY_MINOR_CEASE_MAXPRFX && length >= BGP_NOTIFICATION_SIZE + 7)
+	    if(bgpn.bgpn_minor == BGP_NOTIFY_MINOR_CEASE_MAXPRFX && length >= BGP_NOTIFICATION_SIZE + 7) {
+		datap = dat + BGP_NOTIFICATION_SIZE;
+		TCHECK2(*datap, 7);
 		printf(", AFI %s (%u), SAFI %s (%u), Max Prefixes: %u",
-		       tok2str(bgp_afi_values, "Unknown", EXTRACT_16BITS(&bgpn.bgpn_data)),
-		       EXTRACT_16BITS(&bgpn.bgpn_data),
-		       tok2str(bgp_safi_values, "Unknown", *(bgpn.bgpn_data+2)),
-		       *(bgpn.bgpn_data+2),
-		       EXTRACT_32BITS(&bgpn.bgpn_data+3));
+		       tok2str(bgp_afi_values, "Unknown", EXTRACT_16BITS(datap)),
+		       EXTRACT_16BITS(datap),
+		       tok2str(bgp_safi_values, "Unknown", *(datap+2)),
+		       *(datap+2),
+		       EXTRACT_32BITS(datap+3));
+	    }
             break;
         default:
             break;
