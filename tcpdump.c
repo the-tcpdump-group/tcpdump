@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997
+ * Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000
  *	The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -21,10 +21,10 @@
 
 #ifndef lint
 static const char copyright[] =
-    "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997\n\
+    "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.165 2001-06-24 20:38:52 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.166 2001-07-04 22:03:13 fenner Exp $ (LBL)";
 #endif
 
 /*
@@ -81,6 +81,8 @@ char *espsecret = NULL;		/* ESP secret key */
 
 int packettype;
 
+int infodelay;
+int infoprint;
 
 char *program_name;
 
@@ -89,6 +91,9 @@ int32_t thiszone;		/* seconds offset from gmt to local time */
 /* Forwards */
 static RETSIGTYPE cleanup(int);
 static void usage(void) __attribute__((noreturn));
+#ifdef SIGINFO
+RETSIGTYPE requestinfo(int);
+#endif
 
 /* Length of saved portion of packet. */
 int snaplen = DEFAULT_SNAPLEN;
@@ -436,6 +441,9 @@ main(int argc, char **argv)
 	} else {
 		printer = lookup_printer(pcap_datalink(pd));
 		pcap_userdata = 0;
+#ifdef SIGINFO
+		(void)setsignal(SIGINFO, requestinfo);
+#endif
 	}
 	if (RFileName == NULL) {
 		(void)fprintf(stderr, "%s: listening on %s\n",
@@ -455,23 +463,34 @@ main(int argc, char **argv)
 static RETSIGTYPE
 cleanup(int signo)
 {
-	struct pcap_stat stat;
 
 	/* Can't print the summary if reading from a savefile */
 	if (pd != NULL && pcap_file(pd) == NULL) {
 		(void)fflush(stdout);
 		putc('\n', stderr);
-		if (pcap_stats(pd, &stat) < 0)
-			(void)fprintf(stderr, "pcap_stats: %s\n",
-			    pcap_geterr(pd));
-		else {
-			(void)fprintf(stderr, "%d packets received by filter\n",
-			    stat.ps_recv);
-			(void)fprintf(stderr, "%d packets dropped by kernel\n",
-			    stat.ps_drop);
-		}
+		info(1);
 	}
 	exit(0);
+}
+
+void
+info(register int verbose)
+{
+	struct pcap_stat stat;
+
+	if (pcap_stats(pd, &stat) < 0) {
+		(void)fprintf(stderr, "pcap_stats: %s\n", pcap_geterr(pd));
+		return;
+	}
+	if (!verbose)
+		fprintf(stderr, "%s: ", program_name);
+	(void)fprintf(stderr, "%d packets received by filter", stat.ps_recv);
+	if (!verbose)
+		fputs(", ", stderr);
+	else
+		putc('\n', stderr);
+	(void)fprintf(stderr, "%d packets dropped by kernel\n", stat.ps_drop);
+	infoprint = 0;
 }
 
 /* Like default_print() but data need not be aligned */
@@ -508,6 +527,16 @@ default_print(register const u_char *bp, register u_int length)
 {
 	default_print_unaligned(bp, length);
 }
+
+#ifdef SIGINFO
+RETSIGTYPE requestinfo(int signo)
+{
+	if (infodelay)
+		++infoprint;
+	else
+		info(0);
+}
+#endif
 
 static void
 usage(void)

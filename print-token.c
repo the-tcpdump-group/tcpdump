@@ -25,7 +25,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-token.c,v 1.11 2000-12-23 20:48:13 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-token.c,v 1.12 2001-07-04 22:03:14 fenner Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -119,6 +119,7 @@ token_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 
 	trp = (struct token_header *)p;
 
+	++infodelay;
 	ts_print(&h->ts);
 
 	if (caplen < TOKEN_HDRLEN) {
@@ -207,4 +208,7 @@ token_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 		default_print(p, caplen);
 out:
 	putchar('\n');
+	--infodelay;
+	if (infoprint)
+		info(0);
 }

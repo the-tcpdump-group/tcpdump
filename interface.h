@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997
+ * Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1999, 2000
  *	The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.164 2001-06-24 21:55:00 itojun Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.165 2001-07-04 22:03:13 fenner Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -153,7 +153,9 @@ extern int fn_printn(const u_char *, u_int, const u_char *);
 extern const char *tok2str(const struct tok *, const char *, int);
 extern char *dnaddr_string(u_short);
 
-extern void wrapup(int);
+extern void info(int);
+extern int infodelay;
+extern int infoprint;
 
 extern void error(const char *, ...)
     __attribute__((noreturn, format (printf, 1, 2)));

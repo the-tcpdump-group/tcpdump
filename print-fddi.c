@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-fddi.c,v 1.50 2000-12-23 20:48:13 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-fddi.c,v 1.51 2001-07-04 22:03:14 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -262,6 +262,7 @@ fddi_if_print(u_char *pcap, const struct pcap_pkthdr *h,
 	struct ether_header ehdr;
 	u_short extracted_ethertype;
 
+	++infodelay;
 	ts_print(&h->ts);
 
 	if (caplen < FDDI_HDRLEN) {
@@ -328,4 +329,7 @@ fddi_if_print(u_char *pcap, const struct pcap_pkthdr *h,
 		default_print(p, caplen);
 out:
 	putchar('\n');
+	--infodelay;
+	if (infoprint)
+		info(0);
 }
