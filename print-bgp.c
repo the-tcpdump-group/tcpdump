@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.9.2.1 2000-01-11 06:58:24 fenner Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.9.2.2 2000-01-25 18:32:53 itojun Exp $";
 #endif
 
 #include <sys/param.h>
@@ -387,7 +387,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 			printf(" invalid len");
 			break;
 		}
-		for (i = 0; i < len; i++) {
+		for (i = 0; i < len; i += 4) {
 			u_int32_t comm;
 			comm = (u_int32_t)ntohl(*(u_int32_t *)&p[i]);
 			switch (comm) {
@@ -402,7 +402,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 				break;
 			default:
 				printf(" (AS #%d value 0x%04x)",
-					(comm >> 16) & 0xffff, comm & 0xfffff);
+					(comm >> 16) & 0xffff, comm & 0xffff);
 				break;
 			}
 		}
