@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.215 2003-09-16 21:02:52 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.216 2003-11-04 07:29:16 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -317,6 +317,7 @@ main(int argc, char **argv)
 	pcap_if_t *devpointer;
 	int devnum;
 #endif
+	int status;
 #ifdef WIN32
 	u_int UserBufferSize = 1000000;
 	if(wsockinit() != 0) return 1;
@@ -650,7 +651,7 @@ main(int argc, char **argv)
 		fflush(stderr);	
 #endif /* WIN32 */
 		*ebuf = '\0';
-		pd = pcap_open_live(device, snaplen, !pflag, 1000, ebuf);
+		pd = pcap_open_live(device, snaplen, !pflag, 10000, ebuf);
 		if (pd == NULL)
 			error("%s", ebuf);
 		else if (*ebuf)
@@ -776,32 +777,71 @@ main(int argc, char **argv)
 		(void)fflush(stderr);
 	}
 #endif /* WIN32 */
-	if (pcap_loop(pd, cnt, callback, pcap_userdata) < 0) {
+	status = pcap_loop(pd, cnt, callback, pcap_userdata);
+	if (WFileName == NULL) {
+		/*
+		 * We're printing packets.  Flush the printed output,
+		 * so it doesn't get intermingled with error output.
+		 */
+		if (status == -2) {
+			/*
+			 * We got interrupted, so perhaps we didn't
+			 * manage to finish a line we were printing.
+			 * Print an extra newline, just in case.
+			 */
+			putchar('\n');
+		}
+		(void)fflush(stdout);
+	}
+	if (status == -1) {
+		/*
+		 * Error.  Report it.
+		 */
 		(void)fprintf(stderr, "%s: pcap_loop: %s\n",
 		    program_name, pcap_geterr(pd));
-		cleanup(0);
-		pcap_close(pd);
-		exit(1);
 	}
-	if (RFileName == NULL)
+	if (RFileName == NULL) {
+		/*
+		 * We're doing a live capture.  Report the capture
+		 * statistics.
+		 */
 		info(1);
+	}
 	pcap_close(pd);
-	exit(0);
+	exit(status == -1 ? 1 : 0);
 }
 
 /* make a clean exit on interrupts */
 static RETSIGTYPE
-cleanup(int signo)
+cleanup(int signo _U_)
 {
-
-	/* Can't print the summary if reading from a savefile */
+#ifdef HAVE_PCAP_BREAKLOOP
+	/*
+	 * We have "pcap_breakloop()"; use it, so that we do as little
+	 * as possible in the signal handler (it's probably not safe
+	 * to do anything with standard I/O streams in a signal handler -
+	 * the ANSI C standard doesn't say it is).
+	 */
+	pcap_breakloop(pd);
+#else
+	/*
+	 * We don't have "pcap_breakloop()"; this isn't safe, but
+	 * it's the best we can do.  Print the summary if we're
+	 * not reading from a savefile - i.e., if we're doing a
+	 * live capture - and exit.
+	 */
 	if (pd != NULL && pcap_file(pd) == NULL) {
+		/*
+		 * We got interrupted, so perhaps we didn't
+		 * manage to finish a line we were printing.
+		 * Print an extra newline, just in case.
+		 */
+		putchar('\n');
 		(void)fflush(stdout);
-		putc('\n', stderr);
 		info(1);
 	}
-	if (signo)
-		exit(0);
+	exit(0);
+#endif
 }
 
 static void

@@ -136,6 +136,9 @@
 /* Define if you have the getnameinfo function.  */
 #undef HAVE_GETNAMEINFO
 
+/* Define if you have the pcap_breakloop function.  */
+#undef HAVE_PCAP_BREAKLOOP
+
 /* Define if you have the pcap_dump_flush function.  */
 #undef HAVE_PCAP_DUMP_FLUSH
 

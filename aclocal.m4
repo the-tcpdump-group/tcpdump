@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.97 2003-05-02 08:41:01 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.98 2003-11-04 07:29:15 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -322,7 +322,8 @@ AC_DEFUN(AC_LBL_LIBPCAP,
 
     dnl
     dnl Check for "pcap_list_datalinks()", "pcap_set_datalink()",
-    dnl and "pcap_datalink_name_to_val()".
+    dnl and "pcap_datalink_name_to_val()", and use substitute versions
+    dnl if they're not present
     dnl
     AC_CHECK_FUNC(pcap_list_datalinks,
 	AC_DEFINE(HAVE_PCAP_LIST_DATALINKS),
@@ -332,6 +333,13 @@ AC_DEFUN(AC_LBL_LIBPCAP,
     AC_CHECK_FUNC(pcap_datalink_name_to_val,
 	AC_DEFINE(HAVE_PCAP_DATALINK_NAME_TO_VAL),
 	LIBOBJS="$LIBOBJS dlnames.o")
+
+    dnl
+    dnl Check for "pcap_breakloop()"; you can't substitute for it if
+    dnl it's absent (it has hooks into the live capture routines),
+    dnl so just define the HAVE_ value if it's there.
+    dnl
+    AC_CHECK_FUNCS(pcap_breakloop)
 ])
 
 dnl
