@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.35 2002-12-11 07:14:06 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.36 2002-12-23 19:57:49 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -50,6 +50,13 @@ static struct tok ospf_option_values[] = {
 	{ OSPF_OPTION_EA,	"Advertise External" },
 	{ OSPF_OPTION_DC,	"Demand Circuit" },
 	{ OSPF_OPTION_O,	"Opaque" },
+	{ 0,			NULL }
+};
+
+static struct tok ospf_authtype_values[] = {
+	{ OSPF_AUTH_NONE,	"none" },
+	{ OSPF_AUTH_NONE,	"simple" },
+	{ OSPF_AUTH_MD5,	"MD5" },
 	{ 0,			NULL }
 };
 
@@ -117,7 +124,7 @@ ospf_print_lshdr(register const struct lsa_hdr *lshp) {
                EXTRACT_16BITS(&lshp->ls_age));
         printf("\n\t    Options: %s", bittok2str(ospf_option_values,"none",lshp->ls_options));
 
-	return (0);
+return (0);
 trunc:
 	return (1);
 }
@@ -472,10 +479,8 @@ ospf_print(register const u_char *bp, register u_int length,
 	}
 	dataend = bp + length;
 
-	/* Print the routerid if it is not the same as the source */
 	TCHECK(op->ospf_routerid);
-	if (ip->ip_src.s_addr != op->ospf_routerid.s_addr)
-		printf("\n\tRouter-ID: %s", ipaddr_string(&op->ospf_routerid));
+        printf("\n\tRouter-ID: %s", ipaddr_string(&op->ospf_routerid));
 
 	TCHECK(op->ospf_areaid);
 	if (op->ospf_areaid.s_addr != 0)
@@ -486,24 +491,30 @@ ospf_print(register const u_char *bp, register u_int length,
 	if (vflag) {
 		/* Print authentication data (should we really do this?) */
 		TCHECK2(op->ospf_authdata[0], sizeof(op->ospf_authdata));
+
+                printf(", Authentication Type: %s (%u)",
+                       tok2str(ospf_authtype_values,"unknown",EXTRACT_16BITS(&op->ospf_authtype)),
+                       EXTRACT_16BITS(&op->ospf_authtype));
+
 		switch (EXTRACT_16BITS(&op->ospf_authtype)) {
 
 		case OSPF_AUTH_NONE:
 			break;
 
 		case OSPF_AUTH_SIMPLE:
-			printf(", simple Authentication \"");
 			(void)fn_printn(op->ospf_authdata,
 			    sizeof(op->ospf_authdata), NULL);
 			printf("\"");
 			break;
 
 		case OSPF_AUTH_MD5:
-			printf(", MD5 Authentication");
+                        printf("\n\tKey-ID: %u, Auth-Length: %u, Crypto Sequence Number: 0x%08x",
+                               *((op->ospf_authdata)+2),
+                               *((op->ospf_authdata)+3),
+                               EXTRACT_32BITS((op->ospf_authdata)+4));
 			break;
 
 		default:
-			printf(", unknown Authentication Type %d", EXTRACT_16BITS(&op->ospf_authtype));
 			return;
 		}
 	}
