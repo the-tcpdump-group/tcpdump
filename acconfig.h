@@ -83,6 +83,9 @@
 /* define if libpcap has pcap_datalink_name_to_val() */
 #undef HAVE_PCAP_DATALINK_NAME_TO_VAL
 
+/* define if libpcap has pcap_datalink_val_to_description() */
+#undef HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION
+
 /* define if unaligned memory accesses fail */
 #undef LBL_ALIGN
 
