@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.2 2004-10-20 16:14:16 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.3 2004-10-28 09:36:16 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -31,16 +31,16 @@ static const char rcsid[] _U_ =
 #include "extract.h"
 #include "ppp.h"
 
-#define BPF_OUT           0       /* Outgoing packet */
-#define BPF_IN            1       /* Incoming packet */
-#define BPF_PKT_IN        0x1     /* Incoming packet */
-#define BPF_NO_L2         0x2     /* L2 header stripped */
+#define JUNIPER_BPF_OUT           0       /* Outgoing packet */
+#define JUNIPER_BPF_IN            1       /* Incoming packet */
+#define JUNIPER_BPF_PKT_IN        0x1     /* Incoming packet */
+#define JUNIPER_BPF_NO_L2         0x2     /* L2 header stripped */
 
 #define ATM2_PKT_TYPE_MASK  0x70
 #define ATM2_GAP_COUNT_MASK 0x3F
 
 int ip_heuristic_guess(register const u_char *, u_int);
-int ppp_heuristic_guess(register const u_char *, u_int);
+int juniper_ppp_heuristic_guess(register const u_char *, u_int);
 static int juniper_parse_header (const u_char *, u_int8_t *, u_int);
 
 /*
@@ -157,7 +157,7 @@ juniper_atm2_print(const struct pcap_pkthdr *h, register const u_char *p)
                 return 12;
         }
 
-        if (direction != BPF_PKT_IN && /* ether-over-1483 encaps ? */
+        if (direction != JUNIPER_BPF_PKT_IN && /* ether-over-1483 encaps ? */
             (cookie1 & ATM2_GAP_COUNT_MASK)) {
             ether_print(p, length, caplen);
             return 12;
@@ -169,7 +169,7 @@ juniper_atm2_print(const struct pcap_pkthdr *h, register const u_char *p)
             return 12;
         }
 
-        if(ppp_heuristic_guess(p, length) != 0) /* PPPoA vcmux encaps ? */
+        if(juniper_ppp_heuristic_guess(p, length) != 0) /* PPPoA vcmux encaps ? */
             return 12;
 
         if(ip_heuristic_guess(p, length) != 0) /* last try - vcmux encaps ? */
@@ -179,8 +179,10 @@ juniper_atm2_print(const struct pcap_pkthdr *h, register const u_char *p)
 }
 
 
+/* try to guess, based on all PPP protos that are supported in
+ * a juniper router if the payload data is encapsulated using PPP */
 int
-ppp_heuristic_guess(register const u_char *p, u_int length) {
+juniper_ppp_heuristic_guess(register const u_char *p, u_int length) {
 
     switch(EXTRACT_16BITS(p)) {
     case PPP_IP :
@@ -255,12 +257,12 @@ ip_heuristic_guess(register const u_char *p, u_int length) {
 static int
 juniper_parse_header (const u_char *p, u_int8_t *direction, u_int length) {
 
-    *direction = p[3]&BPF_PKT_IN;
+    *direction = p[3]&JUNIPER_BPF_PKT_IN;
     
     if (EXTRACT_24BITS(p) != 0x4d4743) /* magic number found ? */
         return -1;
     
-    if (*direction == BPF_PKT_IN) {
+    if (*direction == JUNIPER_BPF_PKT_IN) {
         if (eflag)
             printf("%3s ", "In");
     }
@@ -269,7 +271,7 @@ juniper_parse_header (const u_char *p, u_int8_t *direction, u_int length) {
             printf("%3s ", "Out");
     }
 
-    if ((p[3] & BPF_NO_L2 ) == BPF_NO_L2 ) {            
+    if ((p[3] & JUNIPER_BPF_NO_L2 ) == JUNIPER_BPF_NO_L2 ) {            
         if (eflag)
             printf("no-L2-hdr, ");
 
