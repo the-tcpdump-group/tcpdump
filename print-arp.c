@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-arp.c,v 1.55 2002-08-01 08:53:00 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-arp.c,v 1.56 2002-09-04 10:11:44 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -154,7 +154,8 @@ atmarp_print(const u_char *bp, u_int length, u_int caplen)
 	pro = EXTRACT_16BITS(&PRO(ap));
 	op = EXTRACT_16BITS(&OP(ap));
 
-	if (pro != ETHERTYPE_IP && pro != ETHERTYPE_TRAIL) {
+	if ((pro != ETHERTYPE_IP && pro != ETHERTYPE_TRAIL) ||
+	    PLN(ap) != 4 || HLN(ap) == 0) {
 		(void)printf("arp-#%d for proto #%d (%d) hardware #%d (%d)",
 				op, pro, PLN(ap), hrd, HLN(ap));
 		return;
@@ -232,7 +233,8 @@ arp_print(const u_char *bp, u_int length, u_int caplen)
 	pro = EXTRACT_16BITS(&PRO(ap));
 	op = EXTRACT_16BITS(&OP(ap));
 
-	if (pro != ETHERTYPE_IP && pro != ETHERTYPE_TRAIL) {
+	if ((pro != ETHERTYPE_IP && pro != ETHERTYPE_TRAIL) ||
+	    PLN(ap) != 4 || HLN(ap) == 0) {
 		(void)printf("arp-#%d for proto #%d (%d) hardware #%d (%d)",
 				op, pro, PLN(ap), hrd, HLN(ap));
 		return;
