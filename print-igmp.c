@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-igmp.c,v 1.11.2.2 2003-11-16 08:51:25 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-igmp.c,v 1.11.2.3 2003-11-19 09:41:29 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -218,6 +218,7 @@ print_igmpv3_query(register const u_char *bp, register u_int len)
 	(void)printf(" [invalid len %d]", len);
 	return;
     }
+    TCHECK(bp[1]);
     mrc = bp[1];
     if (mrc < 128) {
 	mrt = mrc;
@@ -263,19 +264,21 @@ igmp_print(register const u_char *bp, register u_int len)
         return;
     }
 
-    TCHECK2(bp[0], 8);
+    TCHECK(bp[0]);
     switch (bp[0]) {
     case 0x11:
         (void)printf("igmp query");
 	if (len >= 12)
 	    print_igmpv3_query(bp, len);
 	else {
+            TCHECK(bp[1]);
 	    if (bp[1]) {
 		(void)printf(" v2");
 		if (bp[1] != 100)
 		    (void)printf(" [max resp time %d]", bp[1]);
 	    } else
 		(void)printf(" v1");
+            TCHECK2(bp[4], 4);
 	    if (EXTRACT_32BITS(&bp[4]))
                 (void)printf(" [gaddr %s]", ipaddr_string(&bp[4]));
             if (len != 8)
@@ -283,11 +286,13 @@ igmp_print(register const u_char *bp, register u_int len)
 	}
         break;
     case 0x12:
+        TCHECK2(bp[4], 4);
         (void)printf("igmp v1 report %s", ipaddr_string(&bp[4]));
         if (len != 8)
             (void)printf(" [len %d]", len);
         break;
     case 0x16:
+        TCHECK2(bp[4], 4);
         (void)printf("igmp v2 report %s", ipaddr_string(&bp[4]));
         break;
     case 0x22:

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.37.2.2 2003-11-16 08:51:38 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.37.2.3 2003-11-19 09:41:29 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -154,6 +154,7 @@ pimv1_print(register const u_char *bp, register u_int len)
 	if (bp >= ep)
 		return;
 
+	TCHECK(bp[1]);
 	type = bp[1];
 
 	switch (type) {
