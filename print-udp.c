@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.136 2004-12-27 01:13:44 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.137 2005-04-06 21:33:28 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -615,11 +615,11 @@ udp_print(register const u_char *bp, u_int length,
 #else
 			    0);
 #endif
-		else if (ISPORT(ISAKMP_PORT))
-			isakmp_print((const u_char *)(up + 1), length, bp2);
+	        else if (ISPORT(ISAKMP_PORT) || ISPORT(ISAKMP_PORT_NATT))
+			 isakmp_print(gndo, (const u_char *)(up + 1), length, bp2);
 #if 1 /*???*/
-		else if (ISPORT(ISAKMP_PORT_USER1) || ISPORT(ISAKMP_PORT_USER2))
-			isakmp_print((const u_char *)(up + 1), length, bp2);
+   	        else if (ISPORT(ISAKMP_PORT_USER1) || ISPORT(ISAKMP_PORT_USER2))
+			isakmp_print(gndo, (const u_char *)(up + 1), length, bp2);
 #endif
 		else if (ISPORT(SNMP_PORT) || ISPORT(SNMPTRAP_PORT))
 			snmp_print((const u_char *)(up + 1), length);
@@ -690,3 +690,12 @@ udp_print(register const u_char *bp, u_int length,
 	} else
 		(void)printf("UDP, length %u", (u_int32_t)(ulen - sizeof(*up)));
 }
+
+
+/*
+ * Local Variables:
+ * c-style: whitesmith
+ * c-basic-offset: 8
+ * End:
+ */
+

@@ -21,7 +21,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.14 2004-12-30 03:36:51 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.15 2005-04-06 21:33:27 mcr Exp $ (LBL)
  */
 
 #ifndef netdissect_h
@@ -250,6 +250,11 @@ extern int esp_print(netdissect_options *,
 		     register const u_char *bp, int len, register const u_char *bp2,
 		     int *nhdr, int *padlen);
 extern void arp_print(netdissect_options *,const u_char *, u_int, u_int);
+extern void isakmp_print(netdissect_options *,const u_char *,
+			 u_int, const u_char *);
+extern void isakmp_rfc3948_print(netdissect_options *,const u_char *,
+				 u_int, const u_char *);
+extern void ip_print(netdissect_options *,const u_char *, u_int);
 
 #if 0
 extern void ascii_print_with_offset(netdissect_options *, const char *,
@@ -301,7 +306,6 @@ extern void igmp_print(netdissect_options *,
 		       register const u_char *, u_int);
 extern void igrp_print(netdissect_options *,const u_char *, u_int,
 		       const u_char *);
-extern void ip_print(netdissect_options *,const u_char *, u_int);
 extern void ipN_print(netdissect_options *,const u_char *, u_int);
 extern void ipx_print(netdissect_options *,const u_char *, u_int);
 extern void isoclns_print(netdissect_options *,const u_char *,
@@ -374,8 +378,6 @@ extern void wb_print(netdissect_options *,const void *, u_int);
 extern int ah_print(netdissect_options *,register const u_char *,
 		    register const u_char *);
 extern void esp_print_decodesecret(netdissect_options *ndo);
-extern void isakmp_print(netdissect_options *,const u_char *,
-			 u_int, const u_char *);
 extern int ipcomp_print(netdissect_options *,register const u_char *,
 			register const u_char *, int *);
 extern void rx_print(netdissect_options *,register const u_char *,

@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/udp.h,v 1.7 2004-07-27 17:04:21 hannes Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/udp.h,v 1.8 2005-04-06 21:33:28 mcr Exp $ (LBL) */
 /*
  * Copyright (c) 1982, 1986, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -60,6 +60,7 @@ struct udphdr {
 #define KERBEROS_SEC_PORT 750	/*XXX*/
 #define L2TP_PORT 1701		/*XXX*/
 #define SIP_PORT 5060
+#define ISAKMP_PORT_NATT  4500  /* rfc3948 */
 #define ISAKMP_PORT_USER1 7500	/*XXX - nonstandard*/
 #define ISAKMP_PORT_USER2 8500	/*XXX - nonstandard*/
 #define RX_PORT_LOW 7000	/*XXX*/

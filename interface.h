@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.243 2005-03-08 08:52:38 hannes Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.244 2005-04-06 21:33:27 mcr Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -205,7 +205,6 @@ extern void gre_print(const u_char *, u_int);
 extern void icmp_print(const u_char *, u_int, const u_char *, int);
 extern void igmp_print(const u_char *, u_int);
 extern void igrp_print(const u_char *, u_int, const u_char *);
-extern void ip_print(const u_char *, u_int);
 extern void ipN_print(const u_char *, u_int);
 extern u_int ipfc_if_print(const struct pcap_pkthdr *, const u_char *);
 extern void ipx_print(const u_char *, u_int);
@@ -260,7 +259,6 @@ extern void timed_print(const u_char *);
 extern void udp_print(const u_char *, u_int, const u_char *, int);
 extern void wb_print(const void *, u_int);
 extern int ah_print(register const u_char *);
-extern void isakmp_print(const u_char *, u_int, const u_char *);
 extern int ipcomp_print(register const u_char *, int *);
 extern void rx_print(register const u_char *, int, int, int, u_char *);
 extern void netbeui_print(u_short, const u_char *, int);

@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.49 2004-11-04 07:49:14 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.50 2005-04-06 21:33:27 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1096,8 +1096,9 @@ isakmp_n_print(const struct isakmp_gen *ext, u_int item_len,
 			break;
 		default:
 			/* NULL is dummy */
-			isakmp_print(cp, item_len - sizeof(*p) - n.spi_size,
-				NULL);
+			isakmp_print(gndo, cp,
+				     item_len - sizeof(*p) - n.spi_size,
+				     NULL);
 		}
 		printf(")");
 	}
@@ -1273,7 +1274,9 @@ safememcpy(void *p, const void *q, size_t l)
 }
 
 void
-isakmp_print(const u_char *bp, u_int length, const u_char *bp2)
+isakmp_print(netdissect_options *ndo,
+	     const u_char *bp, u_int length,
+	     const u_char *bp2)
 {
 	const struct isakmp *p;
 	struct isakmp base;
@@ -1284,7 +1287,7 @@ isakmp_print(const u_char *bp, u_int length, const u_char *bp2)
 	int major, minor;
 
 	p = (const struct isakmp *)bp;
-	ep = snapend;
+	ep = ndo->ndo_snapend;
 
 	if ((struct isakmp *)ep < p + 1) {
 		printf("[|isakmp]");
@@ -1383,3 +1386,51 @@ done:
 		}
 	}
 }
+
+void
+isakmp_rfc3948_print(netdissect_options *ndo,
+		     const u_char *bp, u_int length,
+		     const u_char *bp2)
+{
+	const u_char *ep;
+	ep = ndo->ndo_snapend;
+
+	if(length == 1 && bp[0]==0xff) {
+		ND_PRINT((ndo, "isakmp-nat-keep-alive"));
+		return;
+	}
+
+	ND_TCHECK2(bp, 4);
+
+	/*
+	 * see if this is an IKE packet
+	 */
+	if(bp[0]==0 && bp[1]==0 && bp[2]==0 && bp[3]==0) {
+		isakmp_print(ndo, bp+4, length-4, bp2);
+		return;
+	}
+
+	/* must be an ESP packet */
+	{
+		int nh, enh, padlen;
+		int advance;
+
+		advance = esp_print(ndo, bp, length, bp2, &enh, &padlen);
+		if(advance <= 0)
+			return;
+
+		bp += advance;
+		length -= advance + padlen;
+		nh = enh & 0xff;
+	     
+		/* now need to jump into ip_print(). */
+		return;
+	}
+
+trunc:
+	printf("[|isakmp]");
+	return;
+}
+
+  
+
