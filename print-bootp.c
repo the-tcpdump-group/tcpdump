@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.54 2000-12-03 23:42:24 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.55 2000-12-03 23:45:37 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -264,7 +264,7 @@ static struct tok tag2str[] = {
 	{ TAG_RENEWAL_TIME,	"lRN" },
 	{ TAG_REBIND_TIME,	"lRB" },
 	{ TAG_VENDOR_CLASS,	"bVC" },
-	{ TAG_CLIENT_ID,	"bCID" },
+	{ TAG_CLIENT_ID,	"xCID" },
 /* RFC 2485 */
 	{ TAG_OPEN_GROUP_UAP,	"aUAP" },
 /* RFC 2563 */
