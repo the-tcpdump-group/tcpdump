@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.63 2002-10-03 16:00:34 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.64 2002-10-05 11:10:56 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -478,58 +478,38 @@ void isoclns_print(const u_char *p, u_int length, u_int caplen,
 	header = (const struct isis_common_header *)p;
 	pdu_type = header->pdu_type & PDU_TYPE_MASK;
 
-	if (caplen < 1) {
-		printf("[|iso-clns] ");
-		if (!eflag && esrc != NULL && edst != NULL)
-			printf("%s > %s",
-			       etheraddr_string(esrc),
-			       etheraddr_string(edst));
-		return;
-	}
+        printf("%sOSI", caplen < 1 ? "|" : "");
+        if (!eflag && esrc != NULL && edst != NULL)
+                (void)printf(" %s > %s, ",
+                         etheraddr_string(esrc),
+                         etheraddr_string(edst));
+
+        if (caplen < 1) /* enough bytes on the wire ? */
+                return;
 
 	switch (*p) {
 
 	case NLPID_CLNS:
 		(void)printf("CLNS, length: %u", length);
-		if (!eflag && esrc != NULL && edst != NULL)
-			(void)printf(", %s > %s",
-				     etheraddr_string(esrc),
-				     etheraddr_string(edst));
 		break;
 
 	case NLPID_ESIS:
-		if (!eflag && esrc != NULL && edst != NULL)
-			(void)printf("%s > %s, ",
-				     etheraddr_string(esrc),
-				     etheraddr_string(edst));
 		esis_print(p, length);
 		return;
 
 	case NLPID_ISIS:
-		if (!eflag && esrc != NULL && edst != NULL)
-			(void)printf("%s > %s, ",
-			     etheraddr_string(esrc),
-			     etheraddr_string(edst));
 		if (!isis_print(p, length))
-			default_print_unaligned(p, caplen);
+                        print_unknown_data(p,"\n\t",caplen);
 		break;
 
 	case NLPID_NULLNS:
 		(void)printf("ISO NULLNS, length: %u", length);
-		if (!eflag && esrc != NULL && edst != NULL)
-			(void)printf(", %s > %s",
-				     etheraddr_string(esrc),
-				     etheraddr_string(edst));
 		break;
 
 	default:
-		(void)printf("CLNS 0x%02x, length: %u", p[0], length);
-		if (!eflag && esrc != NULL && edst != NULL)
-			(void)printf(", %s > %s",
-				     etheraddr_string(esrc),
-				     etheraddr_string(edst));
+		(void)printf("Unknown NLPID 0x%02x, length: %u", p[0], length);
 		if (caplen > 1)
-			default_print_unaligned(p, caplen);
+                        print_unknown_data(p,"\n\t",caplen);
 		break;
 	}
 }
