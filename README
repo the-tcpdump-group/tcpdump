@@ -1,6 +1,6 @@
-@(#) $Header: /tcpdump/master/tcpdump/README,v 1.62 2002-05-29 07:04:09 guy Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/README,v 1.63 2002-08-02 04:43:57 guy Exp $ (LBL)
 
-TCPDUMP 3.7.1
+TCPDUMP 3.8
 Now maintained by "The Tcpdump Group"
 See 		www.tcpdump.org
 
