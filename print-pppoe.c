@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.2 1999-11-21 09:36:59 fenner Exp $ (LBL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.3 1999-12-15 00:23:06 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -103,7 +103,7 @@ static struct tok pppoetag2str[] = {
 #define PPPOE_HDRLEN 6
 
 void
-pppoe_print(register const u_char *bp, u_int length, u_int caplen)
+pppoe_print(register const u_char *bp, u_int length)
 {
   register const struct ether_header *eh;
   register u_short pppoe_ver, pppoe_type, pppoe_code, pppoe_sessionid, pppoe_length;

@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.113 1999-12-13 18:06:14 mcr Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.114 1999-12-15 00:23:06 fenner Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -206,6 +206,7 @@ extern void pimv1_print(const u_char *, u_int);
 extern void cisco_autorp_print(const u_char *, u_int);
 extern void mobile_print(const u_char *, u_int);
 extern void pim_print(const u_char *, u_int);
+extern void pppoe_print(const u_char *, u_int);
 extern void ppp_if_print(u_char *, const struct pcap_pkthdr *, const u_char *);
 extern void ppp_bsdos_if_print(u_char *, const struct pcap_pkthdr *,
 	const u_char *);
