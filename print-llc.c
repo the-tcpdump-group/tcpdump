@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.56 2003-12-29 19:57:30 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.57 2004-05-01 09:38:24 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -216,6 +216,13 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 
 		orgcode = EXTRACT_24BITS(&llc.llc_orgcode[0]);
 		et = EXTRACT_16BITS(&llc.llc_ethertype[0]);
+
+                if (eflag)
+                    (void)printf("oui 0x%06x, ethertype %s (0x%04x): ",
+                                 orgcode,
+                                 tok2str(ethertype_values,"Unknown", et),
+                                 et);
+
 		/*
 		 * XXX - what *is* the right bridge pad value here?
 		 * Does anybody ever bridge one form of LAN traffic
@@ -308,7 +315,6 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 		length -= 4;
 		caplen -= 4;
 	}
-	(void)printf(" len=%d", length);
 	return(1);
 }
 
