@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.65 2000-04-28 11:34:13 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.66 2000-06-01 01:09:32 assar Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -30,6 +30,8 @@ static const char rcsid[] =
 
 #include <sys/param.h>
 #include <sys/time.h>
+
+#include <rpc/rpc.h>
 
 #include <netinet/in.h>
 #include <netinet/in_systm.h>
@@ -126,6 +128,9 @@ static struct tcp_seq_hash tcp_seq_hash[TSEQ_HASHSIZE];
 #define BGP_PORT	179
 #endif
 #define NETBIOS_SSN_PORT 139
+#ifndef NFS_PORT
+#define NFS_PORT	2049
+#endif
 
 void
 tcp_print(register const u_char *bp, register u_int length,
@@ -162,6 +167,28 @@ tcp_print(register const u_char *bp, register u_int length,
 	sport = ntohs(tp->th_sport);
 	dport = ntohs(tp->th_dport);
 
+
+	hlen = tp->th_off * 4;
+
+	/*
+	 * If data present and NFS port used, assume NFS.
+	 * Pass offset of data plus 4 bytes for RPC TCP msg length
+	 * to NFS print routines.
+	 */
+	if (!qflag) {
+		if ((u_char *)tp + 4 + sizeof(struct rpc_msg) <= snapend &&
+		    dport == NFS_PORT) {
+			nfsreq_print((u_char *)tp + hlen + 4, length-hlen,
+				     (u_char *)ip);
+			return;
+		} else if ((u_char *)tp + 4 + sizeof(struct rpc_msg)
+			   <= snapend &&
+			   sport == NFS_PORT) {
+			nfsreply_print((u_char *)tp + hlen + 4,length-hlen,
+				       (u_char *)ip);
+			return;
+		}
+	}
 #ifdef INET6
 	if (ip6) {
 		if (ip6->ip6_nxt == IPPROTO_TCP) {
@@ -317,7 +344,6 @@ tcp_print(register const u_char *bp, register u_int length,
 		/*fool gcc*/
 		thseq = thack = threv = 0;
 	}
-	hlen = tp->th_off * 4;
 	if (hlen > length) {
 		(void)printf(" [bad hdr length]");
 		return;
