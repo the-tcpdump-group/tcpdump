@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.49 2002-05-29 09:48:16 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.50 2002-05-31 23:23:35 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -60,6 +60,9 @@ static const char rcsid[] =
  */
 
 #define SYSTEM_ID_LEN	ETHER_ADDR_LEN
+#define NODE_ID_LEN     SYSTEM_ID_LEN+1
+#define LSP_ID_LEN      SYSTEM_ID_LEN+2
+
 #define ISIS_VERSION	1
 #define PDU_TYPE_MASK	0x1F
 #define PRIORITY_MASK	0x7F
@@ -99,8 +102,9 @@ static struct tok isis_pdu_values[] = {
 #define TLV_IS_REACH            2
 #define TLV_ESNEIGH             3
 #define TLV_PART_DIS            4
-#define TLV_SUMMARY             5
+#define TLV_PREFIX_NEIGH        5
 #define TLV_ISNEIGH             6
+#define TLV_ISNEIGH_VARLEN      7
 #define TLV_PADDING             8
 #define TLV_LSP                 9
 #define TLV_AUTH                10
@@ -134,10 +138,11 @@ static struct tok isis_pdu_values[] = {
 static struct tok isis_tlv_values[] = {
     { TLV_AREA_ADDR,	     "Area address(es)"},
     { TLV_IS_REACH,          "IS Reachability"},           
-    { TLV_ESNEIGH,           "IS Neighbor(s)"},           
+    { TLV_ESNEIGH,           "ES Neighbor(s)"},           
     { TLV_PART_DIS,          "Partition DIS"},           
-    { TLV_SUMMARY,           "Prefix Neighbors"},          
+    { TLV_PREFIX_NEIGH,      "Prefix Neighbors"},          
     { TLV_ISNEIGH,           "IS Neighbor(s)"},   
+    { TLV_ISNEIGH_VARLEN,    "IS Neighbor(s) (variable length)"},
     { TLV_PADDING,           "Padding"},            
     { TLV_LSP,               "LSP entries"},            
     { TLV_AUTH,              "Authentication"},               
@@ -333,30 +338,36 @@ static struct tok isis_ptp_adjancey_values[] = {
 
 struct isis_tlv_ptp_adj {
     u_char adjacency_state;
-    u_char ext_local_circuit_id[4];
+    u_char extd_local_circuit_id[4];
     u_char neighbor_sysid[SYSTEM_ID_LEN];
-    u_char neighbor_ext_local_circuit_id[4]; 
+    u_char neighbor_extd_local_circuit_id[4]; 
 };
 
 static int osi_cksum(const u_char *, u_int);
 static void esis_print(const u_char *, u_int);
 static int isis_print(const u_char *, u_int);
 
-struct isis_tlv_ip_reach {
+struct isis_metric_block {
     u_char metric_default;
     u_char metric_delay;
     u_char metric_expense;
     u_char metric_error;
-    u_char prefix[4];
-    u_char mask[4];
 };
 
 struct isis_tlv_is_reach {
-    u_char metric_default;
-    u_char metric_delay;
-    u_char metric_expense;
-    u_char metric_error;
-    u_char neighbor_nodeid[SYSTEM_ID_LEN+1];
+    struct isis_metric_block isis_metric_block;
+    u_char neighbor_nodeid[NODE_ID_LEN];
+};
+
+struct isis_tlv_es_reach {
+    struct isis_metric_block isis_metric_block;
+    u_char neighbor_sysid[SYSTEM_ID_LEN];
+};
+
+struct isis_tlv_ip_reach {
+    struct isis_metric_block isis_metric_block;
+    u_char prefix[4];
+    u_char mask[4];
 };
 
 static struct tok isis_is_reach_virtual_values[] = {
@@ -382,7 +393,7 @@ struct isis_iih_lan_header {
     u_char holding_time[2];
     u_char pdu_len[2];
     u_char priority;
-    u_char lan_id[SYSTEM_ID_LEN+1];
+    u_char lan_id[NODE_ID_LEN];
 };
 
 struct isis_iih_ptp_header {
@@ -396,7 +407,7 @@ struct isis_iih_ptp_header {
 struct isis_lsp_header {
     u_char pdu_len[2];
     u_char remaining_lifetime[2];
-    u_char lsp_id[SYSTEM_ID_LEN+2];
+    u_char lsp_id[LSP_ID_LEN];
     u_char sequence_number[4];
     u_char checksum[2];
     u_char typeblock;
@@ -404,19 +415,19 @@ struct isis_lsp_header {
 
 struct isis_csnp_header {
     u_char pdu_len[2];
-    u_char source_id[SYSTEM_ID_LEN+1];
-    u_char start_lsp_id[SYSTEM_ID_LEN+2];
-    u_char end_lsp_id[SYSTEM_ID_LEN+2];
+    u_char source_id[NODE_ID_LEN];
+    u_char start_lsp_id[LSP_ID_LEN];
+    u_char end_lsp_id[LSP_ID_LEN];
 };
 
 struct isis_psnp_header {
     u_char pdu_len[2];
-    u_char source_id[SYSTEM_ID_LEN+1];
+    u_char source_id[NODE_ID_LEN];
 };
 
 struct isis_tlv_lsp {
     u_char remaining_lifetime[2];
-    u_char lsp_id[SYSTEM_ID_LEN+2];
+    u_char lsp_id[LSP_ID_LEN];
     u_char sequence_number[4];
     u_char checksum[2];
 };
@@ -668,6 +679,12 @@ print_nsap(register const u_char *cp, register int length)
 	static char nsap[33];
         char *pos = nsap;
 
+        if (length==0) {
+		*(pos) = '0';
+                *(pos+1) = '\0';
+                return (nsap);
+        }
+
 	for (i = 0; i < length; i++) {
 		if (!TTEST2(*cp, 1))
 			return (0);
@@ -684,13 +701,13 @@ print_nsap(register const u_char *cp, register int length)
  * xxxx.xxxx.xxxx
  * 14 bytes plus one termination byte */
 static char *
-isis_print_sysid(const u_char *cp)
+isis_print_sysid(const u_char *cp, int sysid_len)
 {
 	int i;
 	static char sysid[15];
         char *pos = sysid;
 
-	for (i = 1; i <= 6; i++) {
+	for (i = 1; i <= sysid_len; i++) {
 		if (!TTEST2(*cp, 1))
 			return (0);
 		pos+=sprintf(pos, "%02x", *cp++);
@@ -776,6 +793,30 @@ trunctlv:
 
 }
 
+/* print the 4-byte metric block which is common found in the old-style TLVs */
+
+static int
+isis_print_metric_block (const struct isis_metric_block *isis_metric_block)
+{
+    printf(", Default Metric: %d, %s",
+           ISIS_LSP_TLV_METRIC_VALUE(isis_metric_block->metric_default),
+           ISIS_LSP_TLV_METRIC_IE(isis_metric_block->metric_default) ? "External" : "Internal");
+    if (!ISIS_LSP_TLV_METRIC_SUPPORTED(isis_metric_block->metric_delay))
+        printf("\n\t\t\t  Delay Metric: %d, %s",
+               ISIS_LSP_TLV_METRIC_VALUE(isis_metric_block->metric_delay),
+               ISIS_LSP_TLV_METRIC_IE(isis_metric_block->metric_delay) ? "External" : "Internal");
+    if (!ISIS_LSP_TLV_METRIC_SUPPORTED(isis_metric_block->metric_expense))
+        printf("\n\t\t\t  Expense Metric: %d, %s",
+               ISIS_LSP_TLV_METRIC_VALUE(isis_metric_block->metric_expense),
+               ISIS_LSP_TLV_METRIC_IE(isis_metric_block->metric_expense) ? "External" : "Internal");
+    if (!ISIS_LSP_TLV_METRIC_SUPPORTED(isis_metric_block->metric_error))
+        printf("\n\t\t\t  Error Metric: %d, %s",
+               ISIS_LSP_TLV_METRIC_VALUE(isis_metric_block->metric_error),
+               ISIS_LSP_TLV_METRIC_IE(isis_metric_block->metric_error) ? "External" : "Internal");
+
+    return(1); /* everything is ok */
+}
+
 static int
 isis_print_tlv_ip_reach (const u_char *cp, int length)
 {
@@ -831,24 +872,24 @@ isis_print_tlv_ip_reach (const u_char *cp, int length)
 			       prefix_len);
 
 		printf("\n\t\t\t  Default Metric: %02d, %s, Distribution: %s",
-		    ISIS_LSP_TLV_METRIC_VALUE(tlv_ip_reach->metric_default),
-		    ISIS_LSP_TLV_METRIC_IE(tlv_ip_reach->metric_default) ? "External" : "Internal",
-		    ISIS_LSP_TLV_METRIC_UPDOWN(tlv_ip_reach->metric_default) ? "down" : "up");
+		    ISIS_LSP_TLV_METRIC_VALUE(tlv_ip_reach->isis_metric_block.metric_default),
+		    ISIS_LSP_TLV_METRIC_IE(tlv_ip_reach->isis_metric_block.metric_default) ? "External" : "Internal",
+		    ISIS_LSP_TLV_METRIC_UPDOWN(tlv_ip_reach->isis_metric_block.metric_default) ? "down" : "up");
 
-		if (!ISIS_LSP_TLV_METRIC_SUPPORTED(tlv_ip_reach->metric_delay))
+		if (!ISIS_LSP_TLV_METRIC_SUPPORTED(tlv_ip_reach->isis_metric_block.metric_delay))
 			printf("\n\t\t\t  Delay Metric: %02d, %s",
-			    ISIS_LSP_TLV_METRIC_VALUE(tlv_ip_reach->metric_delay),
-			    ISIS_LSP_TLV_METRIC_IE(tlv_ip_reach->metric_delay) ? "External" : "Internal");
+			    ISIS_LSP_TLV_METRIC_VALUE(tlv_ip_reach->isis_metric_block.metric_delay),
+			    ISIS_LSP_TLV_METRIC_IE(tlv_ip_reach->isis_metric_block.metric_delay) ? "External" : "Internal");
 
-		if (!ISIS_LSP_TLV_METRIC_SUPPORTED(tlv_ip_reach->metric_expense))
+		if (!ISIS_LSP_TLV_METRIC_SUPPORTED(tlv_ip_reach->isis_metric_block.metric_expense))
 			printf("\n\t\t\t  Expense Metric: %02d, %s",
-			    ISIS_LSP_TLV_METRIC_VALUE(tlv_ip_reach->metric_expense),
-			    ISIS_LSP_TLV_METRIC_IE(tlv_ip_reach->metric_expense) ? "External" : "Internal");
+			    ISIS_LSP_TLV_METRIC_VALUE(tlv_ip_reach->isis_metric_block.metric_expense),
+			    ISIS_LSP_TLV_METRIC_IE(tlv_ip_reach->isis_metric_block.metric_expense) ? "External" : "Internal");
 
-		if (!ISIS_LSP_TLV_METRIC_SUPPORTED(tlv_ip_reach->metric_error))
+		if (!ISIS_LSP_TLV_METRIC_SUPPORTED(tlv_ip_reach->isis_metric_block.metric_error))
 			printf("\n\t\t\t  Error Metric: %02d, %s",
-			    ISIS_LSP_TLV_METRIC_VALUE(tlv_ip_reach->metric_error),
-			    ISIS_LSP_TLV_METRIC_IE(tlv_ip_reach->metric_error) ? "External" : "Internal");
+			    ISIS_LSP_TLV_METRIC_VALUE(tlv_ip_reach->isis_metric_block.metric_error),
+			    ISIS_LSP_TLV_METRIC_IE(tlv_ip_reach->isis_metric_block.metric_error) ? "External" : "Internal");
 
 		length -= sizeof(struct isis_tlv_ip_reach);
 		tlv_ip_reach++;
@@ -1090,8 +1131,9 @@ static int isis_print (const u_char *p, u_int length)
     const struct isis_tlv_lsp *tlv_lsp;
     const struct isis_tlv_ptp_adj *tlv_ptp_adj;
     const struct isis_tlv_is_reach *tlv_is_reach;
+    const struct isis_tlv_es_reach *tlv_es_reach;
 
-    u_char pdu_type, max_area, id_length, type, len, tmp, alen, subl, subt, tslen;
+    u_char pdu_type, max_area, id_length, type, len, tmp, alen, lan_alen, prefix_len, subl, subt, tslen;
     const u_char *optr, *pptr, *tptr;
     u_short packet_len,pdu_len,time_remain;
     u_int i,j,bit_length,byte_length,metric,ra,rr;
@@ -1204,7 +1246,7 @@ static int isis_print (const u_char *p, u_int length)
 
 	TCHECK(*header_iih_lan);
 	printf("\n\t\t  source-id: %s,  holding time: %u, %s",
-               isis_print_sysid(header_iih_lan->source_id),
+               isis_print_sysid(header_iih_lan->source_id,SYSTEM_ID_LEN),
                EXTRACT_16BITS(header_iih_lan->holding_time),
                tok2str(isis_iih_circuit_type_values,
                        "unknown circuit type 0x%02x",
@@ -1234,7 +1276,7 @@ static int isis_print (const u_char *p, u_int length)
 	
 	TCHECK(*header_iih_ptp);
 	printf("\n\t\t  source-id: %s, holding time: %us, circuit-id: 0x%02x, %s, PDU length: %u",
-               isis_print_sysid(header_iih_ptp->source_id),
+               isis_print_sysid(header_iih_ptp->source_id,SYSTEM_ID_LEN),
                EXTRACT_16BITS(header_iih_ptp->holding_time),
                header_iih_ptp->circuit_id,
                tok2str(isis_iih_circuit_type_values,
@@ -1396,11 +1438,28 @@ static int isis_print (const u_char *p, u_int length)
 	    break;
 	case TLV_ISNEIGH:
 	    while (tmp >= ETHER_ADDR_LEN) {
-		printf("\n\t\t\tIS Neighbor: %s",isis_print_sysid(tptr));
-		tmp -= ETHER_ADDR_LEN;
-		tptr += ETHER_ADDR_LEN;
+            if (!TTEST2(*tptr, ETHER_ADDR_LEN))
+		goto trunctlv;
+            printf("\n\t\t\tIS Neighbor: %s",isis_print_sysid(tptr,ETHER_ADDR_LEN));
+            tmp -= ETHER_ADDR_LEN;
+            tptr += ETHER_ADDR_LEN;
 	    }
 	    break;
+
+        case TLV_ISNEIGH_VARLEN:
+            if (!TTEST2(*tptr, 1))
+		goto trunctlv;
+	    lan_alen = *tptr++; /* LAN adress length */
+            tmp --;
+            printf("\n\t\t\tLAN address length %u bytes ",lan_alen);
+	    while (tmp >= lan_alen) {
+            if (!TTEST2(*tptr, lan_alen))
+		goto trunctlv;
+            printf("\n\t\t\tIS Neighbor: %s",isis_print_sysid(tptr,lan_alen));
+            tmp -= lan_alen;
+            tptr +=lan_alen;
+            }
+            break;
 
 	case TLV_PADDING:
 	    break;
@@ -1417,8 +1476,10 @@ static int isis_print (const u_char *p, u_int length)
 		printf(" Topology (0x%03x)",
                        ISIS_MASK_MTID(EXTRACT_16BITS(tptr)));
                 tptr+=2;
+                if (!TTEST2(*tptr, NODE_ID_LEN))
+		    goto trunctlv;
             	printf("\n\t\t\t  IS Neighbor: %s", isis_print_nodeid(tptr));
-                tptr+=(SYSTEM_ID_LEN+1);
+                tptr+=(NODE_ID_LEN);
                 if (!TTEST2(*tptr, 3))
                     goto trunctlv;
                 printf(", Metric: %d",EXTRACT_24BITS(tptr));
@@ -1447,10 +1508,10 @@ static int isis_print (const u_char *p, u_int length)
 
         case TLV_EXT_IS_REACH:
             while (tmp>0) {
-                if (!TTEST2(*tptr, SYSTEM_ID_LEN+1))
+                if (!TTEST2(*tptr, NODE_ID_LEN))
                     goto trunctlv;
             	printf("\n\t\t\tIS Neighbor: %s", isis_print_nodeid(tptr));
-                tptr+=(SYSTEM_ID_LEN+1);
+                tptr+=(NODE_ID_LEN);
 
                 if (!TTEST2(*tptr, 3))
                     goto trunctlv;
@@ -1481,40 +1542,31 @@ static int isis_print (const u_char *p, u_int length)
         case TLV_IS_REACH:
 	    if (!TTEST2(*tptr,1))  /* check if there is one byte left to read out the virtual flag */
 		 goto trunctlv;
-
             printf("\n\t\t\t%s",
                    tok2str(isis_is_reach_virtual_values,
                            "bogus virtual flag 0x%02x",
                            *tptr++));
-
 	    tlv_is_reach = (const struct isis_tlv_is_reach *)tptr;
-
             while (tmp >= sizeof(struct isis_tlv_is_reach)) {
 		if (!TTEST(*tlv_is_reach))
 		    goto trunctlv;
-
 		printf("\n\t\t\tIS Neighbor: %s", isis_print_nodeid(tlv_is_reach->neighbor_nodeid));
-		printf(", Default Metric: %d, %s",
-			   ISIS_LSP_TLV_METRIC_VALUE(tlv_is_reach->metric_default),
-			   ISIS_LSP_TLV_METRIC_IE(tlv_is_reach->metric_default) ? "External" : "Internal");
-
-		if (!ISIS_LSP_TLV_METRIC_SUPPORTED(tlv_is_reach->metric_delay))
-		    printf("\n\t\t\t  Delay Metric: %d, %s",
-				   ISIS_LSP_TLV_METRIC_VALUE(tlv_is_reach->metric_delay),
-				   ISIS_LSP_TLV_METRIC_IE(tlv_is_reach->metric_delay) ? "External" : "Internal");
-               
-		if (!ISIS_LSP_TLV_METRIC_SUPPORTED(tlv_is_reach->metric_expense))
-		    printf("\n\t\t\t  Expense Metric: %d, %s",
-				   ISIS_LSP_TLV_METRIC_VALUE(tlv_is_reach->metric_expense),
-				   ISIS_LSP_TLV_METRIC_IE(tlv_is_reach->metric_expense) ? "External" : "Internal");
-
-		if (!ISIS_LSP_TLV_METRIC_SUPPORTED(tlv_is_reach->metric_error))
-		    printf("\n\t\t\t  Error Metric: %d, %s",
-				   ISIS_LSP_TLV_METRIC_VALUE(tlv_is_reach->metric_error),
-				   ISIS_LSP_TLV_METRIC_IE(tlv_is_reach->metric_error) ? "External" : "Internal");
-
+                isis_print_metric_block(&tlv_is_reach->isis_metric_block);
 		tmp -= sizeof(struct isis_tlv_is_reach);
 		tlv_is_reach++;
+	    }
+            break;
+
+        case TLV_ESNEIGH:
+	    tlv_es_reach = (const struct isis_tlv_es_reach *)tptr;
+            while (tmp >= sizeof(struct isis_tlv_es_reach)) {
+		if (!TTEST(*tlv_es_reach))
+		    goto trunctlv;
+		printf("\n\t\t\tES Neighbor: %s",
+                       isis_print_sysid(tlv_es_reach->neighbor_sysid,SYSTEM_ID_LEN));
+                isis_print_metric_block(&tlv_es_reach->isis_metric_block);
+		tmp -= sizeof(struct isis_tlv_es_reach);
+		tlv_es_reach++;
 	    }
             break;
 
@@ -1765,25 +1817,27 @@ static int isis_print (const u_char *p, u_int length)
 		       tok2str(isis_ptp_adjancey_values, "0x%02x", *tptr));
 		tmp--;
 	    }
-	    if(tmp>=4) {
-		if (!TTEST2(tlv_ptp_adj->ext_local_circuit_id, 4))
+	    if(tmp>sizeof(tlv_ptp_adj->extd_local_circuit_id)) {
+		if (!TTEST2(tlv_ptp_adj->extd_local_circuit_id,
+                            sizeof(tlv_ptp_adj->extd_local_circuit_id)))
 		    goto trunctlv;
 		printf("\n\t\t\tExtended Local circuit ID: 0x%08x",
-		       EXTRACT_32BITS(tlv_ptp_adj->ext_local_circuit_id));
-		tmp-=4;
+		       EXTRACT_32BITS(tlv_ptp_adj->extd_local_circuit_id));
+		tmp-=sizeof(tlv_ptp_adj->extd_local_circuit_id);
 	    }
-	    if(tmp>=6) {
-		if (!TTEST2(tlv_ptp_adj->neighbor_sysid, 6))
+	    if(tmp>=SYSTEM_ID_LEN) {
+		if (!TTEST2(tlv_ptp_adj->neighbor_sysid, SYSTEM_ID_LEN))
 		    goto trunctlv;
 		printf("\n\t\t\tNeighbor SystemID: %s",
-		       isis_print_sysid(tlv_ptp_adj->neighbor_sysid));
-		tmp-=6;
+		       isis_print_sysid(tlv_ptp_adj->neighbor_sysid,SYSTEM_ID_LEN));
+		tmp-=SYSTEM_ID_LEN;
 	    }
-	    if(tmp>=4) {
-		if (!TTEST2(tlv_ptp_adj->neighbor_ext_local_circuit_id, 4))
+	    if(tmp>=sizeof(tlv_ptp_adj->neighbor_extd_local_circuit_id)) {
+		if (!TTEST2(tlv_ptp_adj->neighbor_extd_local_circuit_id,
+                            sizeof(tlv_ptp_adj->neighbor_extd_local_circuit_id)))
 		    goto trunctlv;
 		printf("\n\t\t\tNeighbor Extended Local circuit ID: 0x%08x",
-		       EXTRACT_32BITS(tlv_ptp_adj->neighbor_ext_local_circuit_id));
+		       EXTRACT_32BITS(tlv_ptp_adj->neighbor_extd_local_circuit_id));
 	    }
 	    break;
 
@@ -1829,11 +1883,11 @@ static int isis_print (const u_char *p, u_int length)
 	    break;
 
 	case TLV_SHARED_RISK_GROUP:
-	    if (!TTEST2(*tptr, 7))
+	    if (!TTEST2(*tptr, NODE_ID_LEN))
 	      goto trunctlv;
 	    printf("\n\t\t\tIS Neighbor: %s", isis_print_nodeid(tptr));
-	    tptr+=(SYSTEM_ID_LEN+1);
-	    len-=(SYSTEM_ID_LEN+1);
+	    tptr+=(NODE_ID_LEN);
+	    len-=(NODE_ID_LEN);
 
 	    if (!TTEST2(*tptr, 1))
 	      goto trunctlv;
@@ -1866,9 +1920,9 @@ static int isis_print (const u_char *p, u_int length)
 	    while(tmp>0) {
 		printf("\n\t\t\tlsp-id: %s",
                        isis_print_nodeid(tlv_lsp->lsp_id));
-		if (!TTEST((tlv_lsp->lsp_id)[SYSTEM_ID_LEN+1]))
+		if (!TTEST((tlv_lsp->lsp_id)[NODE_ID_LEN]))
 		    goto trunctlv;
-		printf("-%02x",(tlv_lsp->lsp_id)[SYSTEM_ID_LEN+1]);
+		printf("-%02x",(tlv_lsp->lsp_id)[NODE_ID_LEN]);
 		if (!TTEST2(tlv_lsp->sequence_number, 4))
 		    goto trunctlv;
 		printf(", seq: 0x%08x",EXTRACT_32BITS(tlv_lsp->sequence_number));
@@ -1955,14 +2009,44 @@ static int isis_print (const u_char *p, u_int length)
                 printf("LSP Buffersize: %u",EXTRACT_16BITS(tptr));
             break;
 
+        case TLV_PART_DIS:
+            while (tmp >= SYSTEM_ID_LEN) {
+            if (!TTEST2(*tptr, SYSTEM_ID_LEN))
+                goto trunctlv;
+            printf("%s",isis_print_sysid(tptr,SYSTEM_ID_LEN));
+            tptr+=SYSTEM_ID_LEN;
+            tmp-=SYSTEM_ID_LEN;
+            }
+            break;
+
+        case TLV_PREFIX_NEIGH:
+            if (!TTEST2(*tptr, sizeof(struct isis_metric_block)))
+                goto trunctlv;
+            printf("Metric Block");
+            isis_print_metric_block((const struct isis_metric_block *)tptr);
+            tptr+=sizeof(struct isis_metric_block);
+            tmp-=sizeof(struct isis_metric_block);
+            
+            while(tmp>0) {
+                if (!TTEST2(*tptr, 1))
+                    goto trunctlv;
+                prefix_len=*tptr++; /* read out prefix length in semioctets*/
+                tmp--;
+                if (!TTEST2(*tptr, prefix_len/2))
+                    goto trunctlv;                
+                printf("\n\t\t\tAddress: %s/%u",
+                       print_nsap(tptr,prefix_len/2),
+                       prefix_len*4);
+                tptr+=prefix_len/2;
+                tmp-=prefix_len/2;
+            }
+            break;
+
             /*
              * FIXME those are the defined TLVs that lack a decoder
              * you are welcome to contribute code ;-)
              */
 
-        case TLV_ESNEIGH:
-        case TLV_PART_DIS:
-        case TLV_SUMMARY:
         case TLV_IS_ALIAS_ID:
         case TLV_DECNET_PHASE4:
         case TLV_LUCENT_PRIVATE:
