@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.46 2004-03-12 02:17:18 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.47 2004-03-24 01:32:20 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -735,7 +735,10 @@ isakmp_id_print(const struct isakmp_gen *ext, u_int item_len,
 		TCHECK2(*data, len);
 		switch (id.type) {
 		case IPSECDOI_ID_IPV4_ADDR:
-			printf(" len=%d %s", len, ipaddr_string(data));
+			if (len < 4)
+				printf(" len=%d [bad: < 4]", len);
+			else
+				printf(" len=%d %s", len, ipaddr_string(data));
 			len = 0;
 			break;
 		case IPSECDOI_ID_FQDN:
@@ -751,39 +754,60 @@ isakmp_id_print(const struct isakmp_gen *ext, u_int item_len,
 		case IPSECDOI_ID_IPV4_ADDR_SUBNET:
 		    {
 			const u_char *mask;
-			mask = data + sizeof(struct in_addr);
-			printf(" len=%d %s/%u.%u.%u.%u", len,
-				ipaddr_string(data),
-				mask[0], mask[1], mask[2], mask[3]);
+			if (len < 8)
+				printf(" len=%d [bad: < 8]", len);
+			else {
+				mask = data + sizeof(struct in_addr);
+				printf(" len=%d %s/%u.%u.%u.%u", len,
+					ipaddr_string(data),
+					mask[0], mask[1], mask[2], mask[3]);
+			}
 			len = 0;
 			break;
 		    }
 #ifdef INET6
 		case IPSECDOI_ID_IPV6_ADDR:
-			printf(" len=%d %s", len, ip6addr_string(data));
+			if (len < 16)
+				printf(" len=%d [bad: < 16]", len);
+			else
+				printf(" len=%d %s", len, ip6addr_string(data));
 			len = 0;
 			break;
 		case IPSECDOI_ID_IPV6_ADDR_SUBNET:
 		    {
 			const u_int32_t *mask;
-			mask = (u_int32_t *)(data + sizeof(struct in6_addr));
-			/*XXX*/
-			printf(" len=%d %s/0x%08x%08x%08x%08x", len,
-				ip6addr_string(data),
-				mask[0], mask[1], mask[2], mask[3]);
+			if (len < 20)
+				printf(" len=%d [bad: < 20]", len);
+			else {
+				mask = (u_int32_t *)(data + sizeof(struct in6_addr));
+				/*XXX*/
+				printf(" len=%d %s/0x%08x%08x%08x%08x", len,
+					ip6addr_string(data),
+					mask[0], mask[1], mask[2], mask[3]);
+			}
 			len = 0;
 			break;
 		    }
 #endif /*INET6*/
 		case IPSECDOI_ID_IPV4_ADDR_RANGE:
-			printf(" len=%d %s-%s", len, ipaddr_string(data),
-				ipaddr_string(data + sizeof(struct in_addr)));
+			if (len < 8)
+				printf(" len=%d [bad: < 8]", len);
+			else {
+				printf(" len=%d %s-%s", len,
+					ipaddr_string(data),
+					ipaddr_string(data + sizeof(struct in_addr)));
+			}
 			len = 0;
 			break;
 #ifdef INET6
 		case IPSECDOI_ID_IPV6_ADDR_RANGE:
-			printf(" len=%d %s-%s", len, ip6addr_string(data),
-				ip6addr_string(data + sizeof(struct in6_addr)));
+			if (len < 32)
+				printf(" len=%d [bad: < 32]", len);
+			else {
+				printf(" len=%d %s-%s", len,
+					ip6addr_string(data),
+					ip6addr_string(data + sizeof(struct in6_addr)));
+			}
 			len = 0;
 			break;
 #endif /*INET6*/
