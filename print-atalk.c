@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.65 2001-01-20 07:22:23 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.66 2001-06-18 08:52:53 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -40,6 +40,7 @@ static const char rcsid[] =
 #include <stdlib.h>
 #include <string.h>
 #include <netdb.h>		/* for MAXHOSTNAMELEN on some platforms */
+#include <pcap.h>
 
 #include "interface.h"
 #include "addrtoname.h"
@@ -81,6 +82,20 @@ static const struct atNBPtuple *nbp_name_print(const struct atNBPtuple *,
 static const char *ataddr_string(u_short, u_char);
 static void ddp_print(const u_char *, u_int, int, u_short, u_char, u_char);
 static const char *ddpskt_string(int);
+
+/*
+ * Print LLAP packets received on a physical LocalTalk interface.
+ */
+void
+ltalk_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
+{
+	snapend = p + h->caplen;
+	ts_print(&h->ts);
+	llap_print(p, h->caplen);
+	if(xflag)
+		default_print(p, h->caplen);
+	putchar('\n');
+}
 
 /*
  * Print AppleTalk LLAP packets.

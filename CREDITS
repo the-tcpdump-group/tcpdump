@@ -16,6 +16,7 @@ Additional people who have contributed patches:
 	Andrew Tridgell			<tridge@linuxcare.com>
 	Arkadiusz Miskiewicz 		<misiek@pld.org.pl>
 	Armando L. Caro Jr.		<acaro@mail.eecis.udel.edu>
+	Ben Smithurst			<ben@scientia.demon.co.uk>
 	Charlie Lenahan			<clenahan@fortresstech.com>
 	Chris G. Demetriou		<cgd@netbsd.org>
 	Craig Rodrigues			<rodrigc@mediaone.net>
@@ -34,6 +35,7 @@ Additional people who have contributed patches:
 	Juergen Schoenwaelder		<schoenw@ibr.cs.tu-bs.de>
 	Ken Hornstein			<kenh@cmf.nrl.navy.mil>
 	Kevin Steves			<stevesk@sweden.hp.com>
+ 	Kris Kennaway			<kris@freebsd.org>
 	Larry Lile			<lile@stdio.com>
 	Lennert Buytenhek 		<buytenh@gnu.org>
 	Love Hörnquist-Åstrand		<lha@stacken.kth.se>
@@ -55,9 +57,8 @@ Additional people who have contributed patches:
 	Sebastian Krahmer		<krahmer@cs.uni-potsdam.de>
 	Timo Koskiahde
 	Tony Li				<tli@jnx.com>
+	Uns Lider			<unslider@miranda.org>
 	Wilbert de Graaf		<wilbertdg@hetnet.nl>
- 	Kris Kennaway			<kris@freebsd.org>
-        Ben Smithurst			<ben@scientia.demon.co.uk>
 
 The original LBL crew:
 	Steve McCanne
