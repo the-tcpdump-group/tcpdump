@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.130 2005-03-21 12:26:04 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.131 2005-03-22 08:18:10 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -802,15 +802,15 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
 
         switch (clnp_pdu_type) {
 
+        case    CLNP_PDU_ER: /* fall through */
         case 	CLNP_PDU_ERP:
             if (*(pptr) == NLPID_CLNP) {
-                printf("\n\t-----request packet-----\n\t");
+                printf("\n\t-----original packet-----\n\t");
                 /* FIXME recursion protection */
                 clnp_print(pptr, length-clnp_header->length_indicator);
                 break;
             } 
 
-        case 	CLNP_PDU_ER:
         case 	CLNP_PDU_DT:
         case 	CLNP_PDU_MD:
         case 	CLNP_PDU_ERQ:
