@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.165 2003-07-04 23:19:54 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.166 2003-07-08 01:19:10 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.165 $)
+AC_REVISION($Revision: 1.166 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -700,7 +700,7 @@ for dir in /usr/${host_alias} /usr /usr/local /usr/local/ssl /usr/pkg; do
 	if test -d $dir/lib -a \( -f $dir/lib/libcrypto.a -o \
 			          -f $dir/lib/libcrypto.so -o \
 			          -f $dir/lib/libcrypto.sl -o \
-				  -f $dir/lib/libcrypto.dylib); then
+				  -f $dir/lib/libcrypto.dylib \); then
 		ac_cv_ssleay_path=$dir
 	fi
 	if test -d $dir/include/openssl -a -f $dir/include/openssl/des.h; then
