@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.30 2004-05-31 01:19:10 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.31 2004-05-31 01:55:07 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -846,52 +846,30 @@ void
 nbt_tcp_print(const u_char *data, int length)
 {
     const u_char *maxbuf = data + length;
-    int flags;
+    int type;
     u_int nbt_len;
 
     TCHECK2(data[2], 2);
-    flags = data[0];
+    type = data[0];
     nbt_len = EXTRACT_16BITS(data + 2);
 
     startbuf = data;
     if (maxbuf <= data)
 	return;
 
-    if (vflag > 1)
-	printf ("\n>>>");
-
-    printf(" NBT Packet");
-
-    if (vflag < 2)
-	return;
-
-    printf("\n");
-
-    switch (flags) {
-    case 1:
-	printf("flags=0x%x\n", flags);
-    case 0:
-	data = smb_fdata(data, "NBT Session Packet\nFlags=[rw]\nLength=[rd]\n",
-	    data + 4);
-	if (data == NULL)
+    if (vflag < 2) {
+	printf(" NBT Session Packet: ");
+	switch (type) {
+	case 0x00:
+	    printf("Session Message");
 	    break;
-	if (memcmp(data,"\377SMB",4) == 0) {
-	    if (nbt_len > PTR_DIFF(maxbuf, data))
-	    printf("WARNING: Short packet. Try increasing the snap length (%lu)\n",
-	       (unsigned long)PTR_DIFF(maxbuf, data));
-	    print_smb(data, maxbuf > data + nbt_len ? data + nbt_len : maxbuf);
-	} else
-	    printf("Session packet:(raw data?)\n");
-	break;
 
 	case 0x81:
-	    data = smb_fdata(data,
-		"NBT Session Request\nFlags=[rW]\nDestination=[n1]\nSource=[n1]\n",
-		maxbuf);
+	    printf("Session Request");
 	    break;
 
 	case 0x82:
-	    data = smb_fdata(data, "NBT Session Granted\nFlags=[rW]\n", maxbuf);
+	    printf("Session Granted");
 	    break;
 
 	case 0x83:
@@ -901,7 +879,70 @@ nbt_tcp_print(const u_char *data, int length)
 	    TCHECK(data[4]);
 	    ecode = data[4];
 
-	    data = smb_fdata(data, "NBT SessionReject\nFlags=[rW]\nReason=[B]\n",
+	    printf("Session Reject, ");
+	    switch (ecode) {
+	    case 0x80:
+		printf("Not listening on called name");
+		break;
+	    case 0x81:
+		printf("Not listening for calling name");
+		break;
+	    case 0x82:
+		printf("Called name not present");
+		break;
+	    case 0x83:
+		printf("Called name present, but insufficient resources");
+		break;
+	    default:
+		printf("Unspecified error 0x%X", ecode);
+		break;
+	    }
+	  }
+	    break;
+
+	case 0x85:
+	    printf("Session Keepalive");
+	    break;
+
+	default:
+	    data = smb_fdata(data, "Unknown packet type [rB]", maxbuf);
+	    break;
+	}
+    } else {
+	printf ("\n>>> NBT Session Packet\n");
+	switch (type) {
+	case 0x00:
+	    data = smb_fdata(data, "[P1]NBT Session Message\nFlags=[rB]\nLength=[d]\n",
+		data + 4);
+	    if (data == NULL)
+		break;
+	    if (memcmp(data,"\377SMB",4) == 0) {
+		if (nbt_len > PTR_DIFF(maxbuf, data))
+		    printf("WARNING: Short packet. Try increasing the snap length (%lu)\n",
+			(unsigned long)PTR_DIFF(maxbuf, data));
+		print_smb(data, maxbuf > data + nbt_len ? data + nbt_len : maxbuf);
+	    } else
+		printf("Session packet:(raw data?)\n");
+	    break;
+
+	case 0x81:
+	    data = smb_fdata(data,
+		"[P1]NBT Session Request\nFlags=[rB]\nDestination=[n1]\nSource=[n1]\n",
+		maxbuf);
+	    break;
+
+	case 0x82:
+	    data = smb_fdata(data, "[P1]NBT Session Granted\nFlags=[rB]\n", maxbuf);
+	    break;
+
+	case 0x83:
+	  {
+	    int ecode;
+
+	    TCHECK(data[4]);
+	    ecode = data[4];
+
+	    data = smb_fdata(data, "[P1]NBT SessionReject\nFlags=[rB]\nReason=[B]\n",
 		maxbuf);
 	    switch (ecode) {
 	    case 0x80:
@@ -924,15 +965,16 @@ nbt_tcp_print(const u_char *data, int length)
 	    break;
 
 	case 0x85:
-	    data = smb_fdata(data, "NBT Session Keepalive\nFlags=[rW]\n", maxbuf);
+	    data = smb_fdata(data, "[P1]NBT Session Keepalive\nFlags=[rB]\n", maxbuf);
 	    break;
 
 	default:
-	    printf("flags=0x%x\n", flags);
-	    data = smb_fdata(data, "NBT - Unknown packet type\nType=[rW]\n", maxbuf);
+	    data = smb_fdata(data, "NBT - Unknown packet type\nType=[rB]\n", maxbuf);
+	    break;
+	}
+	printf("\n");
+	fflush(stdout);
     }
-    printf("\n");
-    fflush(stdout);
     return;
 trunc:
     printf("[|SMB]");
