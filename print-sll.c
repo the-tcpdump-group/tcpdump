@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sll.c,v 1.2 2000-12-22 22:45:11 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sll.c,v 1.3 2000-12-23 20:49:34 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -51,12 +51,9 @@ const u_char *packetp;
 const u_char *snapend;
 
 static inline void
-sll_print(register const u_char *bp, u_int length)
+sll_print(register const struct sll_header *sllp, u_int length)
 {
-	register const struct sll_header *sllp;
 	u_short halen;
-
-	sllp = (const struct sll_header *)bp;
 
 	switch (ntohs(sllp->sll_pkttype)) {
 
@@ -170,15 +167,21 @@ sll_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	}
 
 	if (eflag)
-		sll_print(p, length);
+		sll_print(sllp, length);
 
 	/*
 	 * Some printers want to get back at the ethernet addresses,
 	 * and/or check that they're not walking off the end of the packet.
 	 * Rather than pass them all the way down, we set these globals.
 	 */
-	packetp = p;
 	snapend = p + caplen;
+	/*
+	 * Actually, the only printers that use packetp are print-arp.c
+	 * and print-bootp.c, and they assume that packetp points to an
+	 * Ethernet header.  The right thing to do is to fix them to know
+	 * which link type is in use when they excavate. XXX
+	 */
+	packetp = (u_char *)&ehdr;
 
 	length -= SLL_HDR_LEN;
 	caplen -= SLL_HDR_LEN;
@@ -211,7 +214,7 @@ sll_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 		unknown:
 			/* ether_type not known, print raw packet */
 			if (!eflag)
-				sll_print(packetp, length + SLL_HDR_LEN);
+				sll_print(sllp, length + SLL_HDR_LEN);
 			if (extracted_ethertype) {
 				printf("(LLC %s) ",
 			       etherproto_string(htons(extracted_ethertype)));
@@ -224,7 +227,7 @@ sll_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	    &extracted_ethertype) == 0) {
 		/* ether_type not known, print raw packet */
 		if (!eflag)
-			sll_print(packetp, length + SLL_HDR_LEN);
+			sll_print(sllp, length + SLL_HDR_LEN);
 		if (!xflag && !qflag)
 			default_print(p, caplen);
 	}
