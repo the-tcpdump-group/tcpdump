@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.8 2004-06-15 09:42:42 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.9 2004-06-16 06:38:08 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -155,9 +155,10 @@ static const struct tok lspping_tlv_values[] = {
 #define	LSPPING_TLV_TARGETFEC_SUBTLV_L3VPN_IPV4    6
 #define	LSPPING_TLV_TARGETFEC_SUBTLV_L3VPN_IPV6    7
 #define	LSPPING_TLV_TARGETFEC_SUBTLV_L2VPN_ENDPT   8
-#define	LSPPING_TLV_TARGETFEC_SUBTLV_L2VPN_VCID    9
-#define	LSPPING_TLV_TARGETFEC_SUBTLV_BGP_IPV4     10
-#define	LSPPING_TLV_TARGETFEC_SUBTLV_BGP_IPV6     11
+#define	LSPPING_TLV_TARGETFEC_SUBTLV_L2VPN_VCID_OLD 9
+#define	LSPPING_TLV_TARGETFEC_SUBTLV_L2VPN_VCID   10
+#define	LSPPING_TLV_TARGETFEC_SUBTLV_BGP_IPV4     11
+#define	LSPPING_TLV_TARGETFEC_SUBTLV_BGP_IPV6     12
 
 static const struct tok lspping_tlvtargetfec_subtlv_values[] = {
     { LSPPING_TLV_TARGETFEC_SUBTLV_LDP_IPV4, "LDP IPv4 prefix"},
@@ -168,6 +169,7 @@ static const struct tok lspping_tlvtargetfec_subtlv_values[] = {
     { LSPPING_TLV_TARGETFEC_SUBTLV_L3VPN_IPV4, "VPN IPv4 prefix"},
     { LSPPING_TLV_TARGETFEC_SUBTLV_L3VPN_IPV6, "VPN IPv6 prefix"},
     { LSPPING_TLV_TARGETFEC_SUBTLV_L2VPN_ENDPT, "L2 VPN endpoint"},
+    { LSPPING_TLV_TARGETFEC_SUBTLV_L2VPN_VCID_OLD, "L2 circuit ID (old)"},
     { LSPPING_TLV_TARGETFEC_SUBTLV_L2VPN_VCID, "L2 circuit ID"},
     { LSPPING_TLV_TARGETFEC_SUBTLV_BGP_IPV4, "BGP labeled IPv4 prefix"},
     { LSPPING_TLV_TARGETFEC_SUBTLV_BGP_IPV6, "BGP labeled IPv6 prefix"},
@@ -364,6 +366,22 @@ struct lspping_tlv_targetfec_subtlv_l2vpn_endpt_t {
 /*
  *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                      Remote PE Address                        |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                             VC ID                             |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |      Encapsulation Type       |         Must Be Zero          |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ */
+struct lspping_tlv_targetfec_subtlv_l2vpn_vcid_old_t {
+    u_int8_t remote_pe_address [4];
+    u_int8_t vc_id [4];
+    u_int8_t encapsulation[2];
+};
+
+/*
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * |                     Sender's PE Address                       |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * |                      Remote PE Address                        |
@@ -399,6 +417,7 @@ lspping_print(register const u_char *pptr, register u_int len) {
         const struct lspping_tlv_targetfec_subtlv_l3vpn_ipv4_t *lspping_tlv_targetfec_subtlv_l3vpn_ipv4;
         const struct lspping_tlv_targetfec_subtlv_l3vpn_ipv6_t *lspping_tlv_targetfec_subtlv_l3vpn_ipv6;
         const struct lspping_tlv_targetfec_subtlv_l2vpn_endpt_t *lspping_tlv_targetfec_subtlv_l2vpn_endpt;
+        const struct lspping_tlv_targetfec_subtlv_l2vpn_vcid_old_t *lspping_tlv_targetfec_subtlv_l2vpn_vcid_old;
         const struct lspping_tlv_targetfec_subtlv_l2vpn_vcid_t *lspping_tlv_targetfec_subtlv_l2vpn_vcid;
         const struct lspping_tlv_targetfec_subtlv_bgp_ipv4_t *lspping_tlv_targetfec_subtlv_bgp_ipv4;
         const struct lspping_tlv_targetfec_subtlv_bgp_ipv6_t *lspping_tlv_targetfec_subtlv_bgp_ipv6;
@@ -628,6 +647,21 @@ lspping_print(register const u_char *pptr, register u_int len) {
                     
                     break;
 
+                    /* the old L2VPN VCID subTLV does not have support for the sender field */
+                case LSPPING_TLV_TARGETFEC_SUBTLV_L2VPN_VCID_OLD:
+                    subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid_old = \
+                        (const struct lspping_tlv_targetfec_subtlv_l2vpn_vcid_old_t *)subtlv_tptr;
+                    printf("\n\t      Remote PE: %s" \
+                           "\n\t      VC-ID: 0x%08x, Encapsulation Type: %s (%u)",
+                           ipaddr_string(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid_old->remote_pe_address),
+                           EXTRACT_32BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid_old->vc_id),
+                           tok2str(l2vpn_encaps_values,
+                                   "unknown",
+                                   EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid_old->encapsulation)),
+                           EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid_old->encapsulation));
+                    
+                    break;
+
                 case LSPPING_TLV_TARGETFEC_SUBTLV_L2VPN_VCID:
                     subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid = \
                         (const struct lspping_tlv_targetfec_subtlv_l2vpn_vcid_t *)subtlv_tptr;
@@ -638,8 +672,8 @@ lspping_print(register const u_char *pptr, register u_int len) {
                            EXTRACT_32BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid->vc_id),
                            tok2str(l2vpn_encaps_values,
                                    "unknown",
-                                   EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->encapsulation)),
-                           EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->encapsulation));
+                                   EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid->encapsulation)),
+                           EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid->encapsulation));
                     
                     break;
 
