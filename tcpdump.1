@@ -176,7 +176,14 @@ must be installed setuid to root.
 .B Under Linux:
 You must be root or
 .I tcpdump
-must be installed setuid to root.
+must be installed setuid to root (unless your distribution has a kernel
+that supports capability bits such as CAP_NET_RAW and code to allow
+those capability bits to be given to particular accounts and to cause
+those bits to be set on a user's initial processes when they log in, in
+which case you  must have CAP_NET_RAW in order to capture and
+CAP_NET_ADMIN to enumerate network devices with, for example, the
+.B \-D
+flag).
 .TP
 .B Under Ultrix and Digital UNIX/Tru64 UNIX:
 Any user may capture network traffic with
@@ -195,9 +202,15 @@ packet capture on an interface probably requires that either
 promiscuous-mode or copy-all-mode operation, or both modes of
 operation, be enabled on that interface.
 .TP
-.B Under BSD:
+.B Under BSD (this includes Mac OS X):
 You must have read access to
 .IR /dev/bpf* .
+On BSDs with a devfs (this includes Mac OS X), this might involve more
+than just having somebody with super-user access setting the ownership
+or permissions on the BPF devices - it might involve configuring devfs
+to set the ownership or permissions every time the system is booted,
+if the system even supports that; if it doesn't support that, you might
+have to find some other way to make that happen at boot time.
 .LP
 Reading a saved packet file doesn't require special privileges.
 .SH OPTIONS
