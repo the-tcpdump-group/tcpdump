@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.9 2000-09-29 04:58:35 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.10 2000-09-29 05:33:48 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -125,7 +125,7 @@ out:
 }
 
 struct cisco_slarp {
-	long code;
+	u_int code;
 #define SLARP_REQUEST	0
 #define SLARP_REPLY	1
 #define SLARP_KEEPALIVE	2
@@ -136,11 +136,11 @@ struct cisco_slarp {
 			u_short unused[3];
 		} addr;
 		struct {
-			long myseq;
-			long yourseq;
-			short rel;
-			short t1;
-			short t2;
+			u_int myseq;
+			u_int yourseq;
+			u_short rel;
+			u_short t1;
+			u_short t2;
 		} keep;
 	} un;
 };
