@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.91 2002-08-02 04:17:43 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.92 2002-08-07 13:53:21 risso Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -663,7 +663,11 @@ init_servarray(void)
 }
 
 /*XXX from libbpfc.a */
+#ifndef WIN32
 extern struct eproto {
+#else
+__declspec( dllimport) struct eproto {
+#endif
 	char *s;
 	u_short p;
 } eproto_db[];
