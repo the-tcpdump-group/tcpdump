@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.39 2001-06-15 07:59:14 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.40 2001-07-21 23:14:23 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -90,6 +90,11 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 		 * the IPX packet starts right after the Ethernet header,
 		 * with a signature of two bytes of 0xFF (which is
 		 * LLCSAP_GLOBAL).
+		 *
+		 * (It might also have been an Ethernet_802.3 IPX at
+		 * one time, but got bridged onto another network,
+		 * such as an 802.11 network; this has appeared in at
+		 * least one capture file.)
 		 */
 		ipx_print(p, length);
 		return (1);
