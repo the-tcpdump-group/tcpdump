@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.27 2003-11-27 02:51:04 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.28 2003-12-10 09:51:03 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -224,7 +224,7 @@ parse_elements(struct mgmt_body_t *pbody, const u_char *p, int offset)
  *********************************************************************************/
 
 static int
-handle_beacon(u_int16_t fc, const u_char *p)
+handle_beacon(const u_char *p)
 {
 	struct mgmt_body_t pbody;
 	int offset = 0;
@@ -257,7 +257,7 @@ handle_beacon(u_int16_t fc, const u_char *p)
 }
 
 static int
-handle_assoc_request(u_int16_t fc, const u_char *p)
+handle_assoc_request(const u_char *p)
 {
 	struct mgmt_body_t pbody;
 	int offset = 0;
@@ -282,7 +282,7 @@ handle_assoc_request(u_int16_t fc, const u_char *p)
 }
 
 static int
-handle_assoc_response(u_int16_t fc, const u_char *p)
+handle_assoc_response(const u_char *p)
 {
 	struct mgmt_body_t pbody;
 	int offset = 0;
@@ -310,7 +310,7 @@ handle_assoc_response(u_int16_t fc, const u_char *p)
 }
 
 static int
-handle_reassoc_request(u_int16_t fc, const u_char *p)
+handle_reassoc_request(const u_char *p)
 {
 	struct mgmt_body_t pbody;
 	int offset = 0;
@@ -338,14 +338,14 @@ handle_reassoc_request(u_int16_t fc, const u_char *p)
 }
 
 static int
-handle_reassoc_response(u_int16_t fc, const u_char *p)
+handle_reassoc_response(const u_char *p)
 {
 	/* Same as a Association Reponse */
-	return handle_assoc_response(fc, p);
+	return handle_assoc_response(p);
 }
 
 static int
-handle_probe_request(u_int16_t fc, const u_char *p)
+handle_probe_request(const u_char *p)
 {
 	struct mgmt_body_t  pbody;
 	int offset = 0;
@@ -364,7 +364,7 @@ handle_probe_request(u_int16_t fc, const u_char *p)
 }
 
 static int
-handle_probe_response(u_int16_t fc, const u_char *p)
+handle_probe_response(const u_char *p)
 {
 	struct mgmt_body_t  pbody;
 	int offset = 0;
@@ -403,7 +403,7 @@ handle_atim(void)
 }
 
 static int
-handle_disassoc(u_int16_t fc, const u_char *p)
+handle_disassoc(const u_char *p)
 {
 	struct mgmt_body_t  pbody;
 
@@ -421,7 +421,7 @@ handle_disassoc(u_int16_t fc, const u_char *p)
 }
 
 static int
-handle_auth(u_int16_t fc, const u_char *p)
+handle_auth(const u_char *p)
 {
 	struct mgmt_body_t  pbody;
 	int offset = 0;
@@ -465,8 +465,7 @@ handle_auth(u_int16_t fc, const u_char *p)
 }
 
 static int
-handle_deauth(u_int16_t fc, const struct mgmt_header_t *pmh,
-    const u_char *p)
+handle_deauth(const struct mgmt_header_t *pmh, const u_char *p)
 {
 	struct mgmt_body_t  pbody;
 	int offset = 0;
@@ -504,23 +503,23 @@ mgmt_body_print(u_int16_t fc, const struct mgmt_header_t *pmh,
 
 	switch (FC_SUBTYPE(fc)) {
 	case ST_ASSOC_REQUEST:
-		return handle_assoc_request(fc, p);
+		return handle_assoc_request(p);
 	case ST_ASSOC_RESPONSE:
-		return handle_assoc_response(fc, p);
+		return handle_assoc_response(p);
 	case ST_REASSOC_REQUEST:
-		return handle_reassoc_request(fc, p);
+		return handle_reassoc_request(p);
 	case ST_REASSOC_RESPONSE:
-		return handle_reassoc_response(fc, p);
+		return handle_reassoc_response(p);
 	case ST_PROBE_REQUEST:
-		return handle_probe_request(fc, p);
+		return handle_probe_request(p);
 	case ST_PROBE_RESPONSE:
-		return handle_probe_response(fc, p);
+		return handle_probe_response(p);
 	case ST_BEACON:
-		return handle_beacon(fc, p);
+		return handle_beacon(p);
 	case ST_ATIM:
 		return handle_atim();
 	case ST_DISASSOC:
-		return handle_disassoc(fc, p);
+		return handle_disassoc(p);
 	case ST_AUTH:
 		if (!TTEST2(*p, 3))
 			return 0;
@@ -528,9 +527,9 @@ mgmt_body_print(u_int16_t fc, const struct mgmt_header_t *pmh,
 			printf("Authentication (Shared-Key)-3 ");
 			return wep_print(p);
 		}
-		return handle_auth(fc, p);
+		return handle_auth(p);
 	case ST_DEAUTH:
-		return handle_deauth(fc, pmh, p);
+		return handle_deauth(pmh, p);
 		break;
 	default:
 		printf("Unhandled Management subtype(%x)",
