@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.62 2000-10-10 05:03:32 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.63 2000-10-30 05:41:30 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -84,10 +84,11 @@ static void ddp_print(const u_char *, u_int, int, u_short, u_char, u_char);
 static const char *ddpskt_string(int);
 
 /*
- * Print AppleTalk Datagram Delivery Protocol packets.
+ * Print AppleTalk-inside-UDP (Kinetics IPTalk, CAP) Datagram Delivery
+ * Protocol packets.
  */
 void
-atalk_print(register const u_char *bp, u_int length)
+iptalk_print(register const u_char *bp, u_int length)
 {
 	register const struct LAP *lp;
 	register const struct atDDP *dp;
@@ -142,6 +143,31 @@ atalk_print(register const u_char *bp, u_int length)
 		    lp->src, lp->dst, lp->type, length);
 		break;
 	}
+}
+
+/*
+ * Print AppleTalk Datagram Delivery Protocol packets.
+ */
+void
+atalk_print(register const u_char *bp, u_int length)
+{
+	register const struct atDDP *dp;
+	u_short snet;
+
+	if (length < ddpSize) {
+	  (void)printf(" [|ddp %d]", length);
+	  return;
+	}
+	dp = (const struct atDDP *)bp;
+	snet = EXTRACT_16BITS(&dp->srcNet);
+	printf("%s.%s", ataddr_string(snet, dp->srcNode),
+	       ddpskt_string(dp->srcSkt));
+	printf(" > %s.%s:",
+	       ataddr_string(EXTRACT_16BITS(&dp->dstNet), dp->dstNode),
+	       ddpskt_string(dp->dstSkt));
+	bp += ddpSize;
+	length -= ddpSize;
+	ddp_print(bp, length, dp->type, snet, dp->srcNode, dp->srcSkt);
 }
 
 /* XXX should probably pass in the snap header and do checks like arp_print() */

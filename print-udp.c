@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.86 2000-10-10 05:05:07 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.87 2000-10-30 05:41:31 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -564,7 +564,7 @@ udp_print(register const u_char *bp, u_int length, register const u_char *bp2)
 		    (atalk_port(sport) || atalk_port(dport))) {
 			if (vflag)
 				fputs("kip ", stdout);
-			atalk_print(cp, length);
+			iptalk_print(cp, length);
 			return;
 		}
 	}
