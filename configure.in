@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.115 2000-05-10 08:20:53 itojun Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.116 2000-06-10 14:19:02 assar Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.115 $)
+AC_REVISION($Revision: 1.116 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -29,10 +29,18 @@ case "$target_os" in
 
 linux*)
 	AC_MSG_CHECKING(Linux kernel version)
-	AC_CACHE_VAL(ac_cv_linux_vers,
-	    ac_cv_linux_vers=`uname -r 2>&1 | \
-		sed -n -e '$s/.* //' -e '$s/\..*//p'`)
+ 	if test "$cross_compiling" = yes; then
+ 		AC_CACHE_VAL(ac_cv_linux_vers,
+ 		    ac_cv_linux_vers=unknown)
+ 	else
+ 		AC_CACHE_VAL(ac_cv_linux_vers,
+ 		    ac_cv_linux_vers=`uname -r 2>&1 | \
+ 			sed -n -e '$s/.* //' -e '$s/\..*//p'`)
+ 	fi
 	AC_MSG_RESULT($ac_cv_linux_vers)
+ 	if test $ac_cv_linux_vers = unknown ; then
+ 		AC_MSG_ERROR(cannot determine linux version when cross-compiling)
+ 	fi
 	if test $ac_cv_linux_vers -lt 2 ; then
 		AC_MSG_ERROR(version 2 or higher required; see the INSTALL doc for more info)
 	fi
