@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.48 2002-05-25 15:11:37 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.49 2002-05-29 09:48:16 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -661,11 +661,11 @@ esis_print(const u_char *p, u_int length)
 /* allocate space for the following string
  * xx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx
  * 32 bytes plus one termination byte */
-char nsap[33];
-char *
+static char *
 print_nsap(register const u_char *cp, register int length)
 {
 	int i;
+	static char nsap[33];
         char *pos = nsap;
 
 	for (i = 0; i < length; i++) {
@@ -680,15 +680,14 @@ print_nsap(register const u_char *cp, register int length)
 	return (nsap);
 }
 
-char *isis_print_sysid (const u_char *);
 /* allocate space for the following string
  * xxxx.xxxx.xxxx
  * 14 bytes plus one termination byte */
-char sysid[15];
-char *
+static char *
 isis_print_sysid(const u_char *cp)
 {
 	int i;
+	static char sysid[15];
         char *pos = sysid;
 
 	for (i = 1; i <= 6; i++) {
@@ -704,15 +703,14 @@ isis_print_sysid(const u_char *cp)
 }
 
 
-char *isis_print_nodeid (const u_char *);
 /* allocate space for the following string
  * xxxx.xxxx.xxxx.yy
  * 17 bytes plus one termination byte */
-char nodeid[18];
-char *
+static char *
 isis_print_nodeid(const u_char *cp)
 {
 	int i;
+	static char nodeid[18];
         char *pos = nodeid;
 
 	for (i = 1; i <= 7; i++) {
@@ -727,15 +725,14 @@ isis_print_nodeid(const u_char *cp)
 	return (nodeid);
 }
 
-char *isis_print_lspid (const u_char *);
 /* allocate space for the following string
  * xxxx.xxxx.xxxx.yy-zz
  * 20 bytes plus one termination byte */
-char lspid[21];
-char *
+static char *
 isis_print_lspid(const u_char *cp)
 {
 	int i;
+	static char lspid[21];
         char *pos = lspid;
 
 	for (i = 1; i <= 7; i++) {
