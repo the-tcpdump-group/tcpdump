@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.64 2002-08-06 04:42:05 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.65 2002-09-05 00:52:30 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -373,11 +373,17 @@ icmp6_print(const u_char *bp, const u_char *bp2)
 		break;
 	case ICMP6_MOBILEPREFIX_SOLICIT:
 		printf("icmp6: mobile router solicitation");
+		if (vflag) {
+			TCHECK(dp->icmp6_data16[0]);
+			printf("(id=%d)", ntohs(dp->icmp6_data16[0]));
+		}
 		break;
 	case ICMP6_MOBILEPREFIX_ADVERT:
 		printf("icmp6: mobile router advertisement");
 		if (vflag) {
-#define MPADVLEN 4
+			TCHECK(dp->icmp6_data16[0]);
+			printf("(id=%d)", ntohs(dp->icmp6_data16[0]));
+#define MPADVLEN 6
 			icmp6_opt_print((const u_char *)dp + MPADVLEN,
 					icmp6len - MPADVLEN);
 		}
