@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.73 2001-05-09 18:17:50 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.74 2001-05-10 02:55:45 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -621,7 +621,9 @@ static struct protoidlist {
 	u_char protoid[5];
 	char *name;
 } protoidlist[] = {
-	{{ 0x00, 0xe0, 0x2b, 0x00, 0xbb }, "ExtremeDiscoveryProtocol" },
+	{{ 0x00, 0x00, 0x0c, 0x20, 0x00 }, "CiscoCDP" },
+	{{ 0x00, 0x00, 0x0c, 0x20, 0x01 }, "CiscoCGMP" },
+	{{ 0x00, 0xe0, 0x2b, 0x00, 0xbb }, "ExtremeEDP" },
 	{{ 0x00, 0x00, 0x00, 0x00, 0x00 }, NULL }
 };
 
