@@ -30,7 +30,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/ipproto.h,v 1.1 2003-06-07 11:57:52 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/ipproto.h,v 1.1.2.1 2003-11-24 20:31:22 guy Exp $ (LBL)
  *
  * From:
  *	@(#)in.h	8.3 (Berkeley) 1/3/94
@@ -97,8 +97,18 @@
 #ifndef IPPROTO_DSTOPTS
 #define IPPROTO_DSTOPTS		60		/* IPv6 destination options */
 #endif
-#ifndef IPPROTO_MOBILITY
-#define IPPROTO_MOBILITY	62
+#ifndef IPPROTO_MOBILITY_OLD
+/*
+ * The current Protocol Numbers list says that the IP protocol number for
+ * mobility headers is 135; it cites draft-ietf-mobileip-ipv6-24, but
+ * that draft doesn't actually give a number.
+ *
+ * It appears that 62 used to be used, even though that's assigned to
+ * a protocol called CFTP; however, the only reference for CFTP is a
+ * Network Message from BBN back in 1982, so, for now, we support 62,
+ * aas well as 135, as a protocol number for mobility headers.
+ */
+#define IPPROTO_MOBILITY_OLD	62
 #endif
 #ifndef IPPROTO_ND
 #define	IPPROTO_ND		77		/* Sun net disk proto (temp.) */
@@ -120,4 +130,7 @@
 #endif
 #ifndef IPPROTO_SCTP
 #define IPPROTO_SCTP		132
+#endif
+#ifndef IPPROTO_MOBILITY
+#define IPPROTO_MOBILITY	135
 #endif
