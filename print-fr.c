@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.16 2003-10-18 00:27:16 guy Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.17 2003-11-08 09:00:51 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -372,7 +372,7 @@ static const char * parse_dlci_ie(const u_char *p, u_int ie_len, char *buffer,
 	    ((ie_len == 3) && !(p[1] & 0x80)) ||
 	    ((ie_len == 4) && ((p[1] & 0x80) || !(p[2] & 0x80))) ||
 	    ((ie_len == 5) && ((p[1] & 0x80) || (p[2] & 0x80) ||
-			       !(p[2] & 0x80))) ||
+			       !(p[3] & 0x80))) ||
 	    (ie_len > 5) ||
 	    !(p[ie_len - 1] & 0x80))
 		return "Invalid DLCI IE";
