@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.104 2004-03-24 04:13:38 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.105 2004-12-13 05:55:37 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -108,8 +108,8 @@ win32_gethostbyaddr(const char *addr, int len, int type)
 		return NULL;
 #else
 		if (getnameinfo((struct sockaddr *)&addr6, sizeof(addr6),
-			hname, sizeof(hname), NULL, 0, 0)) {
-		    return NULL;
+		    hname, sizeof(hname), NULL, 0, 0)) {
+			return NULL;
 		} else {
 			strcpy(host.h_name, hname);
 			return &host;
