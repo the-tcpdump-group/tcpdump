@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.217.2.4 2003-12-29 22:42:21 hannes Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.217.2.5 2004-03-17 19:47:48 guy Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -222,8 +222,7 @@ extern u_int pflog_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int arcnet_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int arcnet_linux_if_print(const struct pcap_pkthdr *, const u_char *);
 extern void ether_print(const u_char *, u_int, u_int);
-extern u_int ether_if_print(const struct pcap_pkthdr *,
-	const u_char *);
+extern u_int ether_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int token_print(const u_char *, u_int, u_int);
 extern u_int token_if_print(const struct pcap_pkthdr *, const u_char *);
 extern void fddi_print(const u_char *, u_int, u_int);
@@ -232,6 +231,7 @@ extern u_int fr_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int ieee802_11_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int ieee802_11_radio_if_print(const struct pcap_pkthdr *,
 	const u_char *);
+extern u_int ap1394_if_print(const struct pcap_pkthdr *, const u_char *);
 extern void gre_print(const u_char *, u_int);
 extern void icmp_print(const u_char *, u_int, const u_char *, int);
 extern void igmp_print(const u_char *, u_int);
