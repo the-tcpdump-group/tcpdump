@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.153 2002-08-02 04:01:33 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.154 2002-08-03 20:28:05 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.153 $)
+AC_REVISION($Revision: 1.154 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -182,6 +182,10 @@ yes
 			;;
 		linux-libinet6)
 			dnl http://www.v6.linux.or.jp/
+			dnl
+			dnl This also matches Solaris 8 and Tru64 UNIX 5.1,
+			dnl and possibly other versions of those OSes
+			dnl
 			if test -d /usr/inet6 -o -f /usr/include/netinet/ip6.h; then
 				ipv6type=$i
 				ipv6lib=inet6
@@ -249,6 +253,19 @@ fi
 
 
 if test "$ipv6" = "yes"; then
+	#
+	# XXX - on Tru64 UNIX 5.1, there is no "getaddrinfo()"
+	# function in libc; there are "ngetaddrinfo()" and
+	# "ogetaddrinfo()" functions, and <netdb.h> #defines
+	# "getaddrinfo" to be either "ngetaddrinfo" or
+	# "ogetaddrinfo", depending on whether _SOCKADDR_LEN
+	# or _XOPEN_SOURCE_EXTENDED are defined or not.
+	#
+	# So this test doesn't work on Tru64 5.1, and possibly
+	# on other 5.x releases.  This causes the configure
+	# script to become confused, and results in libpcap
+	# being unbuildable.
+	#
 	AC_SEARCH_LIBS(getaddrinfo, socket, [dnl
 	AC_MSG_CHECKING(getaddrinfo bug)
 	AC_CACHE_VAL(td_cv_buggygetaddrinfo, [AC_TRY_RUN([
@@ -355,6 +372,13 @@ main()
 	fi
 
 	if test "$td_cv_buggygetaddrinfo" = "yes"; then
+		#
+		# XXX - it doesn't appear that "ipv6type" can ever be
+		# set to "linux".  Should this be testing for
+		# "linux-glibc", or for that *or* "linux-libinet6"?
+		# If the latter, note that "linux-libinet6" is also
+		# the type given to some non-Linux OSes.
+		#
 		if test "$ipv6type" != "linux"; then
 			echo 'Fatal: You must get working getaddrinfo() function.'
 			echo '       or you can specify "--disable-ipv6"'.
