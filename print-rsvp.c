@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.20 2003-06-07 22:41:31 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.21 2003-06-07 23:05:19 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -232,12 +232,18 @@ static const struct tok rsvp_ctype_values[] = {
     { 256*RSVP_OBJ_LABEL_REQ+RSVP_CTYPE_2,	             "with ATM label range" },
     { 256*RSVP_OBJ_LABEL_REQ+RSVP_CTYPE_3,                   "with FR label range" },
     { 256*RSVP_OBJ_LABEL_REQ+RSVP_CTYPE_4,                   "generalized" },
-    { 256*RSVP_OBJ_LABEL+RSVP_CTYPE_1,                       "1" },
+    { 256*RSVP_OBJ_LABEL+RSVP_CTYPE_1,                       "Label" },
+    { 256*RSVP_OBJ_LABEL+RSVP_CTYPE_2,                       "Generalized Label" },
     { 256*RSVP_OBJ_LABEL+RSVP_CTYPE_3,                       "Waveband Switching" },
-    { 256*RSVP_OBJ_SUGGESTED_LABEL+RSVP_CTYPE_1,             "1" },
+    { 256*RSVP_OBJ_SUGGESTED_LABEL+RSVP_CTYPE_1,             "Label" },
+    { 256*RSVP_OBJ_SUGGESTED_LABEL+RSVP_CTYPE_2,             "Generalized Label" },
     { 256*RSVP_OBJ_SUGGESTED_LABEL+RSVP_CTYPE_3,             "Waveband Switching" },
-    { 256*RSVP_OBJ_UPSTREAM_LABEL+RSVP_CTYPE_1,              "1" },
+    { 256*RSVP_OBJ_UPSTREAM_LABEL+RSVP_CTYPE_1,              "Label" },
+    { 256*RSVP_OBJ_UPSTREAM_LABEL+RSVP_CTYPE_2,              "Generalized Label" },
     { 256*RSVP_OBJ_UPSTREAM_LABEL+RSVP_CTYPE_3,              "Waveband Switching" },
+    { 256*RSVP_OBJ_RECOVERY_LABEL+RSVP_CTYPE_1,              "Label" },
+    { 256*RSVP_OBJ_RECOVERY_LABEL+RSVP_CTYPE_2,              "Generalized Label" },
+    { 256*RSVP_OBJ_RECOVERY_LABEL+RSVP_CTYPE_3,              "Waveband Switching" },
     { 256*RSVP_OBJ_ERO+RSVP_CTYPE_IPV4,                      "IPv4" },
     { 256*RSVP_OBJ_RRO+RSVP_CTYPE_IPV4,                      "IPv4" },
     { 256*RSVP_OBJ_ERROR_SPEC+RSVP_CTYPE_IPV4,               "IPv4" },
@@ -625,14 +631,14 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         case RSVP_OBJ_CONFIRM:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_IPV4:
-                printf("\n\t    IPv4 ReceiverAddress: %s",
+                printf("\n\t    IPv4 Receiver Address %s",
                        ipaddr_string(obj_tptr));
                 obj_tlen-=4;
                 obj_tptr+=4;                
                 break;
 #ifdef INET6
             case RSVP_CTYPE_IPV6:
-                printf("\n\t    IPv6 ReceiverAddress: %s",
+                printf("\n\t    IPv6 Receiver Address %s",
                        ip6addr_string(obj_tptr));
                 obj_tlen-=16;
                 obj_tptr+=16;                
@@ -666,6 +672,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
 
         case RSVP_OBJ_SUGGESTED_LABEL: /* fall through */
         case RSVP_OBJ_UPSTREAM_LABEL:  /* fall through */
+        case RSVP_OBJ_RECOVERY_LABEL:  /* fall through */
         case RSVP_OBJ_LABEL:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_1:
@@ -675,13 +682,19 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                     obj_tptr+=4;
                 }
                 break;
+            case RSVP_CTYPE_2:
+                printf("\n\t    Generalized Label %u",
+                       EXTRACT_32BITS(obj_tptr));
+                obj_tlen-=4;
+                obj_tptr+=4;
+                break;
             case RSVP_CTYPE_3:
                 printf("\n\t    Waveband ID %u\n\t    Start Label %u, Stop Label %u",
                        EXTRACT_32BITS(obj_tptr),
                        EXTRACT_32BITS(obj_tptr+4),
                        EXTRACT_32BITS(obj_tptr+8));
-                obj_tlen-=16;
-                obj_tptr+=16;
+                obj_tlen-=12;
+                obj_tptr+=12;
                 break;
             default:
                 hexdump=TRUE;
@@ -1110,7 +1123,6 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         case RSVP_OBJ_MESSAGE_ID:
         case RSVP_OBJ_MESSAGE_ID_ACK:
         case RSVP_OBJ_MESSAGE_ID_LIST:
-        case RSVP_OBJ_RECOVERY_LABEL:
         case RSVP_OBJ_LABEL_SET:
         case RSVP_OBJ_ACCEPT_LABEL_SET:
         case RSVP_OBJ_PROTECTION:
