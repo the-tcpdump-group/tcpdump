@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.1 2002-07-11 08:09:47 guy Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.2 2002-07-11 08:27:03 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -269,7 +269,7 @@ fr_if_print(u_char *user, const struct pcap_pkthdr *h,
 		et = EXTRACT_16BITS(p + 3);
 		if (snap_print((const u_char *)(p + 5), length - 5,
 			   caplen - 5, NULL, NULL,
-			   &extracted_ethertype, orgcode, et) == 0) {
+			   &extracted_ethertype, orgcode, et, 0) == 0) {
 			/* ether_type not known, print raw packet */
 			if (!eflag)
 				fr_hdr_print(p - layer2_len, length + layer2_len);

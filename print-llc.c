@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.46 2002-07-11 08:09:47 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.47 2002-07-11 08:27:03 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -193,8 +193,13 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 
 		orgcode = EXTRACT_24BITS(&llc.llc_orgcode[0]);
 		et = EXTRACT_16BITS(&llc.llc_ethertype[0]);
+		/*
+		 * XXX - what *is* the right bridge pad value here?
+		 * Does anybody ever bridge one form of LAN traffic
+		 * over a networking type that uses 802.2 LLC?
+		 */
 		ret = snap_print(p, length, caplen, esrc, edst,
-		    extracted_ethertype, orgcode, et);
+		    extracted_ethertype, orgcode, et, 2);
 		if (ret)
 			return (ret);
 	}
@@ -287,7 +292,7 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 int
 snap_print(const u_char *p, u_int length, u_int caplen,
     const u_char *esrc, const u_char *edst, u_short *extracted_ethertype,
-    u_int32_t orgcode, u_short et)
+    u_int32_t orgcode, u_short et, u_int bridge_pad)
 {
 	register int ret;
 
@@ -342,9 +347,9 @@ snap_print(const u_char *p, u_int length, u_int caplen,
 			/*
 			 * Skip the padding.
 			 */
-			caplen -= 2;
-			length -= 2;
-			p += 2;
+			caplen -= bridge_pad;
+			length -= bridge_pad;
+			p += bridge_pad;
 
 			/*
 			 * What remains is an Ethernet packet.
@@ -362,9 +367,9 @@ snap_print(const u_char *p, u_int length, u_int caplen,
 			 * Skip the padding, but not the Access
 			 * Control field.
 			 */
-			caplen -= 2;
-			length -= 2;
-			p += 2;
+			caplen -= bridge_pad;
+			length -= bridge_pad;
+			p += bridge_pad;
 
 			/*
 			 * What remains is an 802.5 Token Ring
@@ -382,9 +387,9 @@ snap_print(const u_char *p, u_int length, u_int caplen,
 			/*
 			 * Skip the padding.
 			 */
-			caplen -= 3;
-			length -= 3;
-			p += 3;
+			caplen -= bridge_pad + 1;
+			length -= bridge_pad + 1;
+			p += bridge_pad + 1;
 
 			/*
 			 * What remains is an FDDI packet.
