@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.112 2001-10-19 20:03:08 fenner Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.113 2001-10-27 08:18:44 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -27,7 +27,7 @@ tcpdump \- dump traffic on a network
 .na
 .B tcpdump
 [
-.B \-adeflnNOpqRStvxX
+.B \-adeflnNOpqRStuvxX
 ] [
 .B \-c
 .I count
@@ -266,6 +266,11 @@ E.g.,
 ``tcpdump\ \ \-l\ \ |\ \ tee dat'' or
 ``tcpdump\ \ \-l \ \ > dat\ \ &\ \ tail\ \ \-f\ \ dat''.
 .TP
+.B \-m
+Load SMI MIB module definitions from file \fImodule\fR.
+This option
+can be used several times to load several MIB modules into \fItcpdump\fP.
+.TP
 .B \-n
 Don't convert addresses (i.e., host addresses, port numbers, etc.) to names.
 .TP
@@ -274,11 +279,6 @@ Don't print domain name qualification of host names.
 E.g.,
 if you give this flag then \fItcpdump\fP will print ``nic''
 instead of ``nic.ddn.mil''.
-.TP
-.B \-m
-Load SMI MIB module definitions from file \fImodule\fR.
-This option
-can be used several times to load several MIB modules into \fItcpdump\fP.
 .TP
 .B \-O
 Do not run the packet-matching code optimizer.
@@ -297,9 +297,18 @@ Quick (quiet?) output.
 Print less protocol information so output
 lines are shorter.
 .TP
+.B \-R
+Assume ESP/AH packets to be based on old specification (RFC1825 to RFC1829).
+If specified, \fItcpdump\fP will not print replay prevention field.
+Since there is no protocol version field in ESP/AH specification,
+\fItcpdump\fP cannot deduce the version of ESP/AH protocol.
+.TP
 .B \-r
 Read packets from \fIfile\fR (which was created with the -w option).
 Standard input is used if \fIfile\fR is ``-''.
+.TP
+.B \-S
+Print absolute, rather than relative, TCP sequence numbers.
 .TP
 .B \-s
 Snarf \fIsnaplen\fP bytes of data from each packet rather than the
@@ -333,15 +342,6 @@ Currently known types are
 and
 \fBwb\fR (distributed White Board).
 .TP
-.B \-R
-Assume ESP/AH packets to be based on old specification (RFC1825 to RFC1829).
-If specified, \fItcpdump\fP will not print replay prevention field.
-Since there is no protocol version field in ESP/AH specification,
-\fItcpdump\fP cannot deduce the version of ESP/AH protocol.
-.TP
-.B \-S
-Print absolute, rather than relative, TCP sequence numbers.
-.TP
 .B \-t
 \fIDon't\fP print a timestamp on each dump line.
 .TP
@@ -354,6 +354,8 @@ on each dump line.
 .TP
 .B \-tttt
 Print a timestamp in default format proceeded by date on each dump line.
+.B \-u
+Print undecoded NFS handles.
 .TP
 .B \-v
 (Slightly more) verbose output.
