@@ -33,15 +33,13 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.45 2002-08-02 04:04:37 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.46 2002-08-06 04:42:04 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
 
-#include <errno.h>
 #include <stdio.h>
 #include <string.h>
-#include <netdb.h>
 
 #include "interface.h"
 #include "addrtoname.h"

@@ -44,7 +44,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "$Id: print-radius.c,v 1.14 2002-08-01 08:53:25 risso Exp $";
+    "$Id: print-radius.c,v 1.15 2002-08-06 04:42:06 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -56,10 +56,6 @@ static const char rcsid[] =
 #include <string.h>
 
 #include <stdio.h>
-
-#ifdef TIME_WITH_SYS_TIME
-#include <time.h>
-#endif
 
 #include "interface.h"
 #include "addrtoname.h"

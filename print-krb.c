@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-krb.c,v 1.16 2002-08-01 08:53:14 risso Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-krb.c,v 1.17 2002-08-06 04:42:05 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -32,7 +32,6 @@ static const char rcsid[] =
 
 #include <tcpdump-stdinc.h>
 
-#include <errno.h>
 #include <stdio.h>
 
 #include "interface.h"

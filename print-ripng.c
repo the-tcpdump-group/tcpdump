@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ripng.c,v 1.12 2002-08-02 14:01:09 risso Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ripng.c,v 1.13 2002-08-06 04:42:06 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -47,7 +47,6 @@ IN6_ADDR_EQUAL(const struct in6_addr *a, const struct in6_addr *b)
 
 #endif /* __MINGW32__ */
 
-#include <errno.h>
 #include <stdio.h>
 
 #include "route6d.h"
