@@ -126,3 +126,6 @@
 
 /* Define if you have a dnet_htoa declaration in <netdnet/dnetdb.h>.  */
 #undef HAVE_NETDNET_DNETDB_H_DNET_HTOA
+
+/* define if should drop privileges by default */
+#undef WITH_USER

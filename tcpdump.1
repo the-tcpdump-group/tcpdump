@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.158 2004-01-22 09:35:50 hannes Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.159 2004-01-22 09:51:31 hannes Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -551,6 +551,8 @@ Drops privileges (if root) and changes user ID to
 .I user
 and the group ID to the primary group of
 .IR user .
+.IP
+This behavior can also be enabled by default at compile time.
 .IP "\fI expression\fP"
 .RS
 selects which packets will be dumped.

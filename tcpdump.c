@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.226 2004-01-22 09:35:50 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.227 2004-01-22 09:51:31 hannes Exp $ (LBL)";
 #endif
 
 /*
@@ -898,6 +898,16 @@ main(int argc, char **argv)
 		(void)fprintf(stderr, "%s: pcap_loop: %s\n",
 		    program_name, pcap_geterr(pd));
 	}
+#ifdef WITH_USER
+	/* if run as root, drop root; protect against remote sec problems */
+	if (getuid() == 0 || geteuid() == 0) {
+		/* Run with '-Z root' to restore old behaviour */ 
+		if (!username) {
+			droproot(WITH_USER);
+			/* does not return if fails */
+		}
+	}
+#endif
 	if (RFileName == NULL) {
 		/*
 		 * We're doing a live capture.  Report the capture
