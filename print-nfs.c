@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.76 2000-06-10 05:26:42 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.77 2000-06-12 15:45:05 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -174,6 +174,9 @@ print_nfsaddr(const u_char *bp, const char *s, const char *d)
 	struct ip6_hdr *ip6;
 	char srcaddr[INET6_ADDRSTRLEN], dstaddr[INET6_ADDRSTRLEN];
 #else
+#ifndef INET_ADDRSTRLEN
+#define INET_ADDRSTRLEN	16
+#endif
 	char srcaddr[INET_ADDRSTRLEN], dstaddr[INET_ADDRSTRLEN];
 #endif
 
