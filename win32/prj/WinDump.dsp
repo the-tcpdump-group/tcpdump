@@ -257,6 +257,10 @@ SOURCE="..\..\print-ipcomp.c"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\print-ipfc.c"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\print-ipx.c"
 # End Source File
 # Begin Source File

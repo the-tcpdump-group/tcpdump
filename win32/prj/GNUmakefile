@@ -62,6 +62,7 @@ OBJS = \
 	../../print-ip6.o \
 	../../print-ip6opts.o \
 	../../print-ipcomp.o \
+	../../print-ipfc.o \
 	../../print-ipx.o \
 	../../print-isakmp.o \
 	../../print-isoclns.o \

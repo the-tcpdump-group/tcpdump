@@ -39,6 +39,7 @@ install-sh
 interface.h
 ip.h
 ip6.h
+ipfc.h
 ipsec_doi.h
 ipx.h
 isakmp.h
@@ -113,6 +114,7 @@ print-ip.c
 print-ip6.c
 print-ip6opts.c
 print-ipcomp.c
+print-ipfc.c
 print-ipx.c
 print-isakmp.c
 print-isoclns.c
