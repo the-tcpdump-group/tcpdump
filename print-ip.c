@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.103 2002-05-29 03:09:48 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.104 2002-05-29 09:47:04 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -549,7 +549,7 @@ again:
 			if (sum != 0) {
 				(void)printf("%sbad cksum %x (->%x)!", sep,
 					     ntohs(ip->ip_sum),
-					     nthos(ip->ip_sum)-sum);
+					     ntohs(ip->ip_sum)-sum);
 				sep = ", ";
 			}
 		}
