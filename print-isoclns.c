@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.104 2003-10-30 00:55:51 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.105 2003-11-05 16:40:57 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -114,14 +114,14 @@ static struct tok isis_pdu_values[] = {
 #define TLV_IS_ALIAS_ID         24  /* draft-ietf-isis-ext-lsp-frags-02 */
 #define TLV_DECNET_PHASE4       42
 #define TLV_LUCENT_PRIVATE      66
-#define TLV_IP_REACH            128 /* rfc1195, rfc2966 */
+#define TLV_INT_IP_REACH        128 /* rfc1195, rfc2966 */
 #define TLV_PROTOCOLS           129 /* rfc1195 */
-#define TLV_IP_REACH_EXT        130 /* rfc1195, rfc2966 */
+#define TLV_EXT_IP_REACH        130 /* rfc1195, rfc2966 */
 #define TLV_IDRP_INFO           131 /* rfc1195 */
 #define TLV_IPADDR              132 /* rfc1195 */
 #define TLV_IPAUTH              133 /* rfc1195 */
 #define TLV_TE_ROUTER_ID        134 /* draft-ietf-isis-traffic-05 */
-#define TLV_EXT_IP_REACH        135 /* draft-ietf-isis-traffic-05 */
+#define TLV_EXTD_IP_REACH       135 /* draft-ietf-isis-traffic-05 */
 #define TLV_HOSTNAME            137 /* rfc2763 */
 #define TLV_SHARED_RISK_GROUP   138 /* draft-ietf-isis-gmpls-extensions */
 #define TLV_NORTEL_PRIVATE1     176
@@ -155,14 +155,14 @@ static struct tok isis_tlv_values[] = {
     { TLV_IS_ALIAS_ID,       "IS Alias ID"},
     { TLV_DECNET_PHASE4,     "DECnet Phase IV"},
     { TLV_LUCENT_PRIVATE,    "Lucent Proprietary"},
-    { TLV_IP_REACH,          "IPv4 Internal Reachability"},
+    { TLV_INT_IP_REACH,      "IPv4 Internal Reachability"},
     { TLV_PROTOCOLS,         "Protocols supported"},
-    { TLV_IP_REACH_EXT,      "IPv4 External Reachability"},
+    { TLV_EXT_IP_REACH,      "IPv4 External Reachability"},
     { TLV_IDRP_INFO,         "Inter-Domain Information Type"},
     { TLV_IPADDR,            "IPv4 Interface address(es)"},
     { TLV_IPAUTH,            "IPv4 authentication (deprecated)"},
     { TLV_TE_ROUTER_ID,      "Traffic Engineering Router ID"},
-    { TLV_EXT_IP_REACH,      "Extended IPv4 Reachability"},
+    { TLV_EXTD_IP_REACH,      "Extended IPv4 Reachability"},
     { TLV_HOSTNAME,          "Hostname"},
     { TLV_SHARED_RISK_GROUP, "Shared Risk Link Group"},
     { TLV_NORTEL_PRIVATE1,   "Nortel Proprietary"},
@@ -214,12 +214,12 @@ static struct tok isis_ext_is_reach_subtlv_values[] = {
     { 0, NULL }
 };
 
-#define SUBTLV_IP_REACH_ADMIN_TAG32               1
-#define SUBTLV_IP_REACH_ADMIN_TAG64               2
+#define SUBTLV_EXTD_IP_REACH_ADMIN_TAG32          1
+#define SUBTLV_EXTD_IP_REACH_ADMIN_TAG64          2
 
 static struct tok isis_ext_ip_reach_subtlv_values[] = {
-    { SUBTLV_IP_REACH_ADMIN_TAG32,                "32-Bit Administrative tag" },
-    { SUBTLV_IP_REACH_ADMIN_TAG64,                "64-Bit Administrative tag" },
+    { SUBTLV_EXTD_IP_REACH_ADMIN_TAG32,           "32-Bit Administrative tag" },
+    { SUBTLV_EXTD_IP_REACH_ADMIN_TAG64,           "64-Bit Administrative tag" },
     { 0, NULL }
 };
 
@@ -266,11 +266,11 @@ static struct tok isis_mt_flag_values[] = {
     { 0, NULL}
 };
 
-#define ISIS_MASK_TLV_EXT_IP_UPDOWN(x)     ((x)&0x80)
-#define ISIS_MASK_TLV_EXT_IP_SUBTLV(x)     ((x)&0x40)
+#define ISIS_MASK_TLV_EXTD_IP_UPDOWN(x)     ((x)&0x80)
+#define ISIS_MASK_TLV_EXTD_IP_SUBTLV(x)     ((x)&0x40)
 
-#define ISIS_MASK_TLV_EXT_IP6_IE(x)        ((x)&0x40)
-#define ISIS_MASK_TLV_EXT_IP6_SUBTLV(x)    ((x)&0x20)
+#define ISIS_MASK_TLV_EXTD_IP6_IE(x)        ((x)&0x40)
+#define ISIS_MASK_TLV_EXTD_IP6_SUBTLV(x)    ((x)&0x20)
 
 #define ISIS_LSP_TLV_METRIC_SUPPORTED(x)   ((x)&0x80)
 #define ISIS_LSP_TLV_METRIC_IE(x)          ((x)&0x40)
@@ -810,7 +810,7 @@ isis_print_ip_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
 	    goto trunctlv;
 
     switch(subt) {
-    case SUBTLV_IP_REACH_ADMIN_TAG32:
+    case SUBTLV_EXTD_IP_REACH_ADMIN_TAG32:
         while (subl >= 4) {
 	    printf(", 0x%08x (=%u)",
 		   EXTRACT_32BITS(tptr),
@@ -819,7 +819,7 @@ isis_print_ip_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
 	    subl-=4;
 	}
 	break;
-    case SUBTLV_IP_REACH_ADMIN_TAG64:
+    case SUBTLV_EXTD_IP_REACH_ADMIN_TAG64:
         while (subl >= 8) {
 	    printf(", 0x%08x%08x",
 		   EXTRACT_32BITS(tptr),
@@ -947,10 +947,10 @@ trunctlv:
  */
 
 static int
-isis_print_ext_is_reach (const u_int8_t *tptr,const char *ident, int tlv) {
+isis_print_ext_is_reach (const u_int8_t *tptr,const char *ident, int tlv_type) {
 
     char ident_buffer[20];
-    int subt,subl,tslen;
+    int subtlv_type,subtlv_len,subtlv_sum_len;
     int proc_bytes = 0; /* how many bytes did we process ? */
     
     if (!TTEST2(*tptr, NODE_ID_LEN))
@@ -959,8 +959,8 @@ isis_print_ext_is_reach (const u_int8_t *tptr,const char *ident, int tlv) {
     printf("%sIS Neighbor: %s", ident, isis_print_id(tptr, NODE_ID_LEN));
     tptr+=(NODE_ID_LEN);
 
-    if (tlv != TLV_IS_ALIAS_ID) {
-        if (!TTEST2(*tptr, 3))
+    if (tlv_type != TLV_IS_ALIAS_ID) { /* the Alias TLV Metric field is implicit 0 */
+        if (!TTEST2(*tptr, 3))    /* and is therefore skipped */
 	    return(0);
 	printf(", Metric: %d",EXTRACT_24BITS(tptr));
 	tptr+=3;
@@ -968,23 +968,23 @@ isis_print_ext_is_reach (const u_int8_t *tptr,const char *ident, int tlv) {
         
     if (!TTEST2(*tptr, 1))
         return(0);
-    tslen=*(tptr++); /* read out subTLV length */
+    subtlv_sum_len=*(tptr++); /* read out subTLV length */
     proc_bytes=NODE_ID_LEN+3+1;
-    printf(", %ssub-TLVs present",tslen ? "" : "no ");
-    if (tslen) {
-        printf(" (%u)",tslen);
-        while (tslen>0) {
+    printf(", %ssub-TLVs present",subtlv_sum_len ? "" : "no ");
+    if (subtlv_sum_len) {
+        printf(" (%u)",subtlv_sum_len);
+        while (subtlv_sum_len>0) {
             if (!TTEST2(*tptr,2))
                 return(0);
-            subt=*(tptr++);
-            subl=*(tptr++);
+            subtlv_type=*(tptr++);
+            subtlv_len=*(tptr++);
             /* prepend the ident string */
             snprintf(ident_buffer, sizeof(ident_buffer), "%s  ",ident);
-            if(!isis_print_is_reach_subtlv(tptr,subt,subl,ident_buffer))
+            if(!isis_print_is_reach_subtlv(tptr,subtlv_type,subtlv_len,ident_buffer))
                 return(0);
-            tptr+=subl;
-            tslen-=(subl+2);
-            proc_bytes+=(subl+2);
+            tptr+=subtlv_len;
+            subtlv_sum_len-=(subtlv_len+2);
+            proc_bytes+=(subtlv_len+2);
         }
     }
     return(proc_bytes);
@@ -1074,20 +1074,20 @@ isis_print_extd_ip_reach (const u_int8_t *tptr, const char *ident, u_int16_t afi
 #endif 
    
     printf(", Distribution: %s, Metric: %u",
-           ISIS_MASK_TLV_EXT_IP_UPDOWN(status_byte) ? "down" : "up",
+           ISIS_MASK_TLV_EXTD_IP_UPDOWN(status_byte) ? "down" : "up",
            metric);
 
-    if (afi == IPV4 && ISIS_MASK_TLV_EXT_IP_SUBTLV(status_byte))
+    if (afi == IPV4 && ISIS_MASK_TLV_EXTD_IP_SUBTLV(status_byte))
         printf(", sub-TLVs present");
 #ifdef INET6
     if (afi == IPV6)
         printf(", %s%s",
-               ISIS_MASK_TLV_EXT_IP6_IE(status_byte) ? "External" : "Internal",
-               ISIS_MASK_TLV_EXT_IP6_SUBTLV(status_byte) ? ", sub-TLVs present" : "");
+               ISIS_MASK_TLV_EXTD_IP6_IE(status_byte) ? "External" : "Internal",
+               ISIS_MASK_TLV_EXTD_IP6_SUBTLV(status_byte) ? ", sub-TLVs present" : "");
 #endif
     
-    if ((ISIS_MASK_TLV_EXT_IP_SUBTLV(status_byte)  && afi == IPV4) ||
-        (ISIS_MASK_TLV_EXT_IP6_SUBTLV(status_byte) && afi == IPV6)) {
+    if ((ISIS_MASK_TLV_EXTD_IP_SUBTLV(status_byte)  && afi == IPV4) ||
+        (ISIS_MASK_TLV_EXTD_IP6_SUBTLV(status_byte) && afi == IPV6)) {
         /* assume that one prefix can hold more
            than one subTLV - therefore the first byte must reflect
            the aggregate bytecount of the subTLVs for this prefix
@@ -1612,13 +1612,13 @@ static int isis_print (const u_int8_t *p, u_int length)
             break;
 
             /* those two TLVs share the same format */
-	case TLV_IP_REACH:
-	case TLV_IP_REACH_EXT:
+	case TLV_INT_IP_REACH:
+	case TLV_EXT_IP_REACH:
 	    if (!isis_print_tlv_ip_reach(pptr, "\n\t      ", tlv_len))
 		return (1);
 	    break;
 
-	case TLV_EXT_IP_REACH:
+	case TLV_EXTD_IP_REACH:
 	    while (tmp>0) {
                 ext_ip_len = isis_print_extd_ip_reach(tptr, "\n\t      ", IPV4);
                 if (ext_ip_len == 0) /* did something go wrong ? */
