@@ -1108,7 +1108,7 @@ else
 		static inline struct iltest *
 		foo()
 		{
-		    struct iltest xxx;
+		    static struct iltest xxx;
 
 		    return &xxx;
 		}
