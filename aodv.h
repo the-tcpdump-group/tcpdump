@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/aodv.h,v 1.2 2003-09-12 22:05:56 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/aodv.h,v 1.3 2003-09-13 01:34:42 guy Exp $ (LBL) */
 /*
  * Copyright (c) 2003 Bruce M. Simpson <bms@spc.org>
  * All rights reserved.
@@ -56,6 +56,17 @@ struct aodv_rreq6 {
 	struct in6_addr	rreq_oa;	/* originator IPv6 address */
 	u_int32_t	rreq_os;	/* originator sequence number */
 };
+struct aodv_rreq6_draft_01 {
+	u_int8_t	rreq_type;	/* AODV message type (16) */
+	u_int8_t	rreq_flags;	/* various flags */
+	u_int8_t	rreq_zero0;	/* reserved, set to zero */
+	u_int8_t	rreq_hops;	/* number of hops from originator */
+	u_int32_t	rreq_id;	/* request ID */
+	u_int32_t	rreq_ds;	/* destination sequence number */
+	u_int32_t	rreq_os;	/* originator sequence number */
+	struct in6_addr	rreq_da;	/* destination IPv6 address */
+	struct in6_addr	rreq_oa;	/* originator IPv6 address */
+};
 #endif
 
 #define	RREQ_JOIN	0x80		/* join (reserved for multicast */
@@ -86,6 +97,16 @@ struct aodv_rrep6 {
 	struct in6_addr	rrep_oa;	/* originator IPv6 address */
 	u_int32_t	rrep_life;	/* lifetime of this route */
 };
+struct aodv_rrep6_draft_01 {
+	u_int8_t	rrep_type;	/* AODV message type (17) */
+	u_int8_t	rrep_flags;	/* various flags */
+	u_int8_t	rrep_ps;	/* prefix size */
+	u_int8_t	rrep_hops;	/* number of hops from o to d */
+	u_int32_t	rrep_ds;	/* destination sequence number */
+	struct in6_addr	rrep_da;	/* destination IPv6 address */
+	struct in6_addr	rrep_oa;	/* originator IPv6 address */
+	u_int32_t	rrep_life;	/* lifetime of this route */
+};
 #endif
 
 #define	RREP_REPAIR		0x80	/* repair (reserved for multicast */
@@ -102,10 +123,14 @@ struct rerr_unreach6 {
 	struct in6_addr	u_da;	/* IPv6 address */
 	u_int32_t	u_ds;	/* sequence number */
 };
+struct rerr_unreach6_draft_01 {
+	struct in6_addr	u_da;	/* IPv6 address */
+	u_int32_t	u_ds;	/* sequence number */
+};
 #endif
 
 struct aodv_rerr {
-	u_int8_t	rerr_type;	/* AODV message type (3) */
+	u_int8_t	rerr_type;	/* AODV message type (3 or 18) */
 	u_int8_t	rerr_flags;	/* various flags */
 	u_int8_t	rerr_zero0;	/* reserved, set to zero */
 	u_int8_t	rerr_dc;	/* destination count */
@@ -113,6 +138,7 @@ struct aodv_rerr {
 		struct	rerr_unreach dest[1];
 #ifdef INET6
 		struct	rerr_unreach6 dest6[1];
+		struct	rerr_unreach6_draft_01 dest6_draft_01[1];
 #endif
 	} r;
 };
@@ -132,7 +158,9 @@ union aodv {
 	struct aodv_rrep_ack rrep_ack;
 #ifdef INET6
 	struct aodv_rreq6 rreq6;
+	struct aodv_rreq6_draft_01 rreq6_draft_01;
 	struct aodv_rrep6 rrep6;
+	struct aodv_rrep6_draft_01 rrep6_draft_01;
 #endif
 };
 
@@ -141,10 +169,10 @@ union aodv {
 #define	AODV_RERR		3	/* error report */
 #define	AODV_RREP_ACK		4	/* route response acknowledgement */
 
-#define AODV_V6_RREQ		16	/* IPv6 route request */
-#define AODV_V6_RREP		17	/* IPv6 route response */
-#define AODV_V6_RERR		18	/* IPv6 error report */
-#define AODV_V6_RREP_ACK	19	/* IPV6 route response acknowledgment */
+#define AODV_V6_DRAFT_01_RREQ		16	/* IPv6 route request */
+#define AODV_V6_DRAFT_01_RREP		17	/* IPv6 route response */
+#define AODV_V6_DRAFT_01_RERR		18	/* IPv6 error report */
+#define AODV_V6_DRAFT_01_RREP_ACK	19	/* IPV6 route response acknowledgment */
 
 struct aodv_ext {
 	u_int8_t	type;		/* extension type */
