@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.116 2000-06-10 14:19:02 assar Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.117 2000-06-26 04:19:43 assar Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.116 $)
+AC_REVISION($Revision: 1.117 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -476,7 +476,7 @@ fi
 
 
 AC_REPLACE_FUNCS(vfprintf strcasecmp strlcat strlcpy)
-AC_CHECK_FUNCS(ether_ntohost setlinebuf gethostbyname2)
+AC_CHECK_FUNCS(ether_ntohost setlinebuf)
 
 usegetipnodeby=yes
 AC_CHECK_FUNCS(getipnodebyname getipnodebyaddr freeaddrinfo,
