@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.36.2.5 2003-12-20 10:02:46 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.36.2.6 2004-01-07 07:53:17 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -327,9 +327,13 @@ rawprint(caddr_t loc, size_t len)
 	static u_char *p;
 	size_t i;
 
+	TCHECK2(*loc, len);
+	
 	p = (u_char *)loc;
 	for (i = 0; i < len; i++)
 		printf("%02x", p[i] & 0xff);
+trunc:
+
 }
 
 struct attrmap {
@@ -1111,6 +1115,8 @@ isakmp_sub_print(u_char np, const struct isakmp_gen *ext, const u_char *ep,
 	cp = (const u_char *)ext;
 
 	while (np) {
+		TCHECK2(*ext, sizeof(e));
+		
 		safememcpy(&e, ext, sizeof(e));
 
 		if (ep < (u_char *)ext + ntohs(e.len)) {
@@ -1136,6 +1142,8 @@ isakmp_sub_print(u_char np, const struct isakmp_gen *ext, const u_char *ep,
 		ext = (struct isakmp_gen *)cp;
 	}
 	return cp;
+trunc:
+	return NULL;
 }
 
 static char *

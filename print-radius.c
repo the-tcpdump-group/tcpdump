@@ -44,7 +44,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "$Id: print-radius.c,v 1.19.2.2 2003-11-16 08:51:40 guy Exp $";
+    "$Id: print-radius.c,v 1.19.2.3 2004-01-07 07:53:17 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -467,7 +467,7 @@ print_attr_string(register u_char *data, u_int length, u_short attr_code )
         break;
    }
 
-   for (i=0; i < length ; i++, data++)
+   for (i=0; *data && i < length ; i++, data++)
        printf("%c",(*data < 32 || *data > 128) ? '.' : *data );
 
    printf("}");
