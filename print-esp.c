@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.22 2002-01-25 05:51:51 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.23 2002-02-18 08:54:56 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -361,8 +361,8 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 
 		des_check_key = 1;
 		des_set_odd_parity((void *)secret);
-		des_set_odd_parity((void *)secret+8);
-		des_set_odd_parity((void *)secret+16);
+		des_set_odd_parity((void *)(secret + 8));
+		des_set_odd_parity((void *)(secret + 16));
 		if(des_set_key((void *)secret, s1) != 0) {
 		  printf("failed to schedule key 1\n");
 		}
