@@ -38,7 +38,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.34 2004-07-05 07:49:30 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.35 2004-07-06 22:16:03 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -302,7 +302,7 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 	struct dhcp6_ia ia;
 	struct dhcp6_ia_prefix ia_prefix;
 	struct dhcp6_auth authopt;
-	int authinfolen, authrealmlen;
+	u_int authinfolen, authrealmlen;
 
 	if (cp == ep)
 		return;
@@ -452,11 +452,11 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 			case DH6OPT_AUTHPROTO_DELAYED:
 				if (authinfolen == 0)
 					break;
-				authrealmlen = authinfolen - 20;
-				if (authrealmlen < 0) {
+				if (authinfolen < 20) {
 					printf(" ??");
 					break;
 				}
+				authrealmlen = authinfolen - 20;
 				if (authrealmlen > 0) {
 					printf(", realm: ");
 				}
