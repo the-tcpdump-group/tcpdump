@@ -32,6 +32,7 @@
 #endif
 
 #include <stdlib.h>
+#include <string.h>
 #include <tcpdump-stdinc.h>
 
 #include "cpack.h"
@@ -132,7 +133,7 @@ int
 cpack_uint8(struct cpack_state *cs, u_int8_t *u)
 {
 	/* No space left? */
-	if (cs->c_next - cs->c_buf >= cs->c_len)
+	if ((size_t)(cs->c_next - cs->c_buf) >= cs->c_len)
 		return -1;
 
 	*u = *cs->c_next;
