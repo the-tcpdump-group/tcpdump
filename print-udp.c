@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.68 1999-11-22 07:25:27 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.69 1999-11-23 08:27:41 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -341,11 +341,14 @@ udp_print(register const u_char *bp, u_int length, register const u_char *bp2)
 #endif /*INET6*/
 	cp = (u_char *)(up + 1);
 	if (cp > snapend) {
-		printf("[|udp]");
+		(void)printf("%s > %s: [|udp]",
+			ipaddr_string(&ip->ip_src), ipaddr_string(&ip->ip_dst));
 		return;
 	}
 	if (length < sizeof(struct udphdr)) {
-		(void)printf(" truncated-udp %d", length);
+		(void)printf("%s > %s: truncated-udp %d",
+			ipaddr_string(&ip->ip_src), ipaddr_string(&ip->ip_dst),
+			length);
 		return;
 	}
 	length -= sizeof(struct udphdr);
