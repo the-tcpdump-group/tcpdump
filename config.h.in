@@ -79,15 +79,6 @@
 /* define if you have both getipnodebyname() and getipnodebyaddr() */
 #undef USE_GETIPNODEBY
 
-/* Define if you have the inet_aton function.  */
-#undef HAVE_INET_ATON
-
-/* Define if you have the inet_ntop function.  */
-#undef HAVE_INET_NTOP
-
-/* Define if you have the inet_pton function.  */
-#undef HAVE_INET_PTON
-
 /* define if unaligned memory accesses fail */
 #undef LBL_ALIGN
 
@@ -102,9 +93,6 @@
 
 /* AIX hack. */
 #undef _SUN
-
-/* OSF hack: "Workaround around ip_hl vs. ip_vhl problem in netinet/ip.h" */
-#undef __STDC__
 
 /* Workaround for missing sized types */
 /* XXX this should move to the more standard uint*_t */
@@ -203,6 +191,9 @@
 
 /* Define if you have the <net/slip.h> header file.  */
 #undef HAVE_NET_SLIP_H
+
+/* Define if you have the <rc5.h> header file.  */
+#undef HAVE_RC5_H
 
 /* Define if you have the <rpc/rpcent.h> header file.  */
 #undef HAVE_RPC_RPCENT_H

@@ -99,9 +99,6 @@
 /* AIX hack. */
 #undef _SUN
 
-/* OSF hack: "Workaround around ip_hl vs. ip_vhl problem in netinet/ip.h" */
-#undef __STDC__
-
 /* Workaround for missing sized types */
 /* XXX this should move to the more standard uint*_t */
 #undef int16_t
