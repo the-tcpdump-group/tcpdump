@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.71 2001-02-20 06:22:57 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.72 2001-02-20 06:31:34 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -284,6 +284,9 @@ struct tok ns_type2str[] = {
 	{ T_GID,	"GID" },
 	{ T_UNSPEC,	"UNSPEC" },
 	{ T_UNSPECA,	"UNSPECA" },
+	{ T_TKEY,	"TKEY" },
+	{ T_TSIG,	"TSIG" },
+	{ T_IXFR,	"IXFR" },
 	{ T_AXFR,	"AXFR" },
 	{ T_MAILB,	"MAILB" },
 	{ T_MAILA,	"MAILA" },
