@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-gre.c,v 1.11 2001-03-12 00:24:55 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-gre.c,v 1.12 2001-03-13 01:03:17 fenner Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -63,7 +63,8 @@ struct gre {
 #define GRE_sP		0x0800	/* strict source route present */
 #define GRE_RECUR_MASK	0x0700  /* Recursion Control */
 #define GRE_RECUR_SHIFT	8
-#define GRE_OP		0xc000	/* Offset Present */
+
+#define GRE_COP		(GRE_RP|GRE_CP)	/* Checksum & Offset Present */
 
 /* "Enhanced GRE" from RFC2637 - PPTP */
 #define GRE_AP		0x0080	/* Ack present */
@@ -113,17 +114,27 @@ gre_print(const u_char *bp, u_int length)
 		fputs("] ", stdout);
 	}
 
-	if (flags & GRE_CP) {
+	if (flags & GRE_COP) {
+		int checksum, offset;
+
 		TCHECK2(*cp, 4);
-		if (vflag > 1)
-			printf("C:%08x ", EXTRACT_32BITS(cp));
-		cp += 4;	/* skip checksum */
-	}
-	if (flags & GRE_OP) {
-		TCHECK2(*cp, 4);
-		if (vflag > 1)
-			printf("O:%08x ", EXTRACT_32BITS(cp));
-		cp += 4;	/* skip offset */
+		checksum = EXTRACT_16BITS(cp);
+		offset = EXTRACT_16BITS(cp + 2);
+
+		if (flags & GRE_CP) {
+			/* Checksum present */
+
+			/* todo: check checksum */
+			if (vflag > 1)
+				printf("C:%04x ", checksum);
+		}
+		if (flags & GRE_RP) {
+			/* Offset present */
+
+			if (vflag > 1)
+				printf("O:%04x ", offset);
+		}
+		cp += 4;	/* skip checksum and offset */
 	}
 	if (flags & GRE_KP) {
 		TCHECK2(*cp, 4);
