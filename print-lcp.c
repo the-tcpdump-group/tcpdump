@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-"@(#) $Header: /tcpdump/master/tcpdump/Attic/print-lcp.c,v 1.4 2000-04-24 12:59:39 itojun Exp $ (LBL)";
+"@(#) $Header: /tcpdump/master/tcpdump/Attic/print-lcp.c,v 1.5 2000-05-15 00:38:37 assar Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -181,7 +181,7 @@ lcp_print(register const u_char *bp, u_int length)
 	  case LCP_ASYNCMAP:
 	  case LCP_MAGICNUM:
 	    if (snapend < p+4) return;
-	    printf("%#x",ntohl(*(u_long*)p));
+	    printf("%#x", (unsigned)ntohl(*(u_long*)p));
 	    if (lcpopt_length != 6) printf(" len=%d!",lcpopt_length);
 	    break;
 	  case LCP_PCOMP:
@@ -202,7 +202,7 @@ lcp_print(register const u_char *bp, u_int length)
   case LCP_ECHOREP:
   case LCP_DISCARD:
     if (snapend < lcp_data+4) return;
-    printf(" magic=%#x", ntohl(*(u_long *) lcp_data));
+    printf(" magic=%#x", (unsigned)ntohl(*(u_long *) lcp_data));
     lcp_data +=4;
     break;
   case LCP_PROTREJ:

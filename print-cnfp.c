@@ -34,7 +34,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cnfp.c,v 1.4 2000-04-28 11:17:36 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cnfp.c,v 1.5 2000-05-15 00:37:34 assar Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -103,11 +103,12 @@ cnfp_print(const u_char *cp, u_int len, const u_char *bp)
 /*	(p = ctime(&t))[24] = '\0'; */
 
 	printf("NetFlow v%x, %u.%03u uptime, %u.%09u, ", ver,
-	       ntohl(nh->msys_uptime)/1000, ntohl(nh->msys_uptime)%1000,
-	       ntohl(nh->utc_sec), ntohl(nh->utc_nsec));
+	       (unsigned)ntohl(nh->msys_uptime)/1000,
+	       (unsigned)ntohl(nh->msys_uptime)%1000,
+	       (unsigned)ntohl(nh->utc_sec), (unsigned)ntohl(nh->utc_nsec));
 
 	if (ver == 5) {
-		printf("#%u, ", htonl(nh->sequence));
+		printf("#%u, ", (unsigned)htonl(nh->sequence));
 		nr = (struct nfrec *)&nh[1];
 		snaplen -= 24;
 	} else {
@@ -122,33 +123,36 @@ cnfp_print(const u_char *cp, u_int len, const u_char *bp)
 		char asbuf[20];
 
 		printf("\n  started %u.%03u, last %u.%03u",
-			ntohl(nr->start_time)/1000, ntohl(nr->start_time)%1000,
-			ntohl(nr->last_time)/1000, ntohl(nr->last_time)%1000);
+		       (unsigned)ntohl(nr->start_time)/1000,
+		       (unsigned)ntohl(nr->start_time)%1000,
+		       (unsigned)ntohl(nr->last_time)/1000,
+		       (unsigned)ntohl(nr->last_time)%1000);
 
 		asbuf[0] = buf[0] = '\0';
 		if (ver == 5) {
 			snprintf(buf, sizeof(buf), "/%u",
-			    (ntohl(nr->masks) >> 24) & 0xff);
+				 (unsigned)(ntohl(nr->masks) >> 24) & 0xff);
 			snprintf(asbuf, sizeof(asbuf), "%u:",
-			    (ntohl(nr->asses) >> 16) & 0xffff);
+				 (unsigned)(ntohl(nr->asses) >> 16) & 0xffff);
 		}
 		printf("\n    %s%s%s:%u ", inet_ntoa(nr->src_ina), buf, asbuf,
-			ntohl(nr->ports) >> 16);
+			(unsigned)ntohl(nr->ports) >> 16);
 
 		if (ver == 5) {
 			snprintf(buf, sizeof(buf), "/%d",
-			    (ntohl(nr->masks) >> 16) & 0xff);
+				 (unsigned)(ntohl(nr->masks) >> 16) & 0xff);
 			snprintf(asbuf, sizeof(asbuf), "%u:",
-			    ntohl(nr->asses) & 0xffff);
+				 (unsigned)ntohl(nr->asses) & 0xffff);
 		}
 		printf("> %s%s%s:%u ", inet_ntoa(nr->dst_ina), buf, asbuf,
-			ntohl(nr->ports) & 0xffff);
+			(unsigned)ntohl(nr->ports) & 0xffff);
 
 		printf(">> %s\n    ", inet_ntoa(nr->nhop_ina));
 
 		pent = getprotobynumber((ntohl(nr->proto_tos) >> 8) & 0xff);
 		if (!pent || nflag)
-			printf("%u ", (ntohl(nr->proto_tos) >> 8) & 0xff);
+			printf("%u ",
+			       (unsigned)(ntohl(nr->proto_tos) >> 8) & 0xff);
 		else
 			printf("%s ", pent->p_name);
 
@@ -168,7 +172,9 @@ cnfp_print(const u_char *cp, u_int len, const u_char *bp)
 			if (flags)
 				putchar(' ');
 		}
-		printf("tos %u, %u (%u octets)", ntohl(nr->proto_tos) & 0xff,
-			ntohl(nr->packets), ntohl(nr->octets));
+		printf("tos %u, %u (%u octets)",
+		       (unsigned)ntohl(nr->proto_tos) & 0xff,
+		       (unsigned)ntohl(nr->packets),
+		       (unsigned)ntohl(nr->octets));
 	}
 }
