@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * L2TP support contributed by Motonori Shindo (mshindo@ascend.co.jp)
+ * L2TP support contributed by Motonori Shindo (mshindo@mshindo.net)
  */
 
 
