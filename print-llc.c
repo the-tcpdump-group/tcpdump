@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.52 2003-05-22 16:52:38 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.53 2003-05-28 12:53:00 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -75,6 +75,12 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 
 	/* Watch out for possible alignment problems */
 	memcpy((char *)&llc, (char *)p, min(caplen, sizeof(llc)));
+
+	if (eflag)
+	  printf("LLC, dsap 0x%02x, ssap 0x%02x, cmd 0x%02x, ",
+		 llc.dsap,
+		 llc.ssap,
+		 llc.llcu);
 
 	if (llc.ssap == LLCSAP_GLOBAL && llc.dsap == LLCSAP_GLOBAL) {
 		/*
