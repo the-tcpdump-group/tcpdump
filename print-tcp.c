@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.107.2.4 2004-07-08 10:29:40 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.107.2.5 2004-07-28 20:11:31 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -259,8 +259,8 @@ tcp_print(register const u_char *bp, register u_int length,
 	}
 
 	if (hlen < sizeof(*tp)) {
-		(void)printf(" tcp %d [bad hdr length %u - too short, < %u]",
-		    length - hlen, hlen, sizeof(*tp));
+		(void)printf(" tcp %d [bad hdr length %u - too short, < %lu]",
+		    length - hlen, hlen, (unsigned long)sizeof(*tp));
 		return;
 	}
 
