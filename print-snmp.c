@@ -45,7 +45,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.41 2000-07-01 03:39:09 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.42 2000-10-06 05:54:51 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -653,7 +653,7 @@ asn1_print(struct be *elem)
 	switch (elem->type) {
 
 	case BE_OCTET:
-		for (i = asnlen; i-- > 0; p++);
+		for (i = asnlen; i-- > 0; p++)
 			printf("_%.2x", *p);
 		break;
 
