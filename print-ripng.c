@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ripng.c,v 1.8 2001-05-10 05:30:22 fenner Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ripng.c,v 1.9 2001-11-16 08:48:33 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -108,7 +108,7 @@ ripng_print(const u_char *dat, int length)
 			rip6_entry_print(ni, ni->rip6_metric);
 		}
 		if (trunc)
-			printf("[|rip]");
+			printf("[|ripng]");
 		break;
 	default:
 		printf(" ripng-%d ?? %d", rp->rip6_cmd, length);
