@@ -29,7 +29,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lwres.c,v 1.2 2001-01-29 20:04:01 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lwres.c,v 1.3 2001-02-02 19:13:42 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -425,7 +425,7 @@ lwres_print(register const u_char *bp, u_int length)
 			/* BIND910: not used */
 			if (vflag > 2) {
 				printf(" flags:0x%lx",
-				    (unsigned long)ntohl(gnba->flags));
+				    (unsigned long)ntohl(grbn->flags));
 			}
 
 			printf(" %s", tok2str(ns_type2str, "Type%d",
@@ -543,7 +543,7 @@ lwres_print(register const u_char *bp, u_int length)
 			/* BIND910: not used */
 			if (vflag > 2) {
 				printf(" flags:0x%lx",
-				    (unsigned long)ntohl(gnba->flags));
+				    (unsigned long)ntohl(grbn->flags));
 			}
 
 			printf(" %s", tok2str(ns_type2str, "Type%d",
