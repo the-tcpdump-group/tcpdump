@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.20 2000-08-29 16:04:55 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.21 2000-08-30 14:28:44 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -752,7 +752,7 @@ icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
 		needcomma = 0;
 
 		ni6 = (struct icmp6_nodeinfo *)dp;
-		printf("icmp6: node information query");
+		printf("icmp6: node information reply");
 		printf(" (");	/*)*/
 		switch (ni6->ni_code) {
 		case ICMP6_NI_SUCCESS:
