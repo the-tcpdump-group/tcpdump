@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.2 2004-06-07 06:13:04 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.3 2004-06-09 05:14:42 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -175,7 +175,7 @@ lspping_print(register const u_char *pptr, register u_int len) {
     const struct lspping_common_header *lspping_com_header;
     const struct lspping_tlv_header *lspping_tlv_header;
     const struct lspping_tlv_header *lspping_subtlv_header;
-    const u_char *tptr,*tlv_tptr;
+    const u_char *tptr,*tlv_tptr,*subtlv_tptr;
     int tlen,lspping_tlv_len,lspping_tlv_type,tlv_tlen;
     int tlv_hexdump,subtlv_hexdump;
     int lspping_subtlv_len,lspping_subtlv_type;
@@ -291,7 +291,8 @@ lspping_print(register const u_char *pptr, register u_int len) {
                 lspping_subtlv_header = (const struct lspping_tlv_header *)tlv_tptr;
                 lspping_subtlv_type=EXTRACT_16BITS(lspping_subtlv_header->type);
                 lspping_subtlv_len=EXTRACT_16BITS(lspping_subtlv_header->length);
-
+                subtlv_tptr=tlv_tptr+sizeof(struct lspping_tlv_header);
+                
                 if (lspping_subtlv_len == 0)
                     break;
 
@@ -304,20 +305,73 @@ lspping_print(register const u_char *pptr, register u_int len) {
 
                 switch(lspping_subtlv_type) {
 
+                case LSPPING_TLV_TARGETFEC_SUBTLV_LDP_IPV4:
+
+                   /*
+                    *  0                   1                   2                   3
+                    *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+                    * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                    * |                          IPv4 prefix                          |
+                    * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                    * | Prefix Length |         Must Be Zero                          |
+                    * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                    */
+
+                    printf("\n\t      %s/%u",
+                           ipaddr_string(subtlv_tptr),
+                           *(subtlv_tptr+4));
+                    break;
+
+#ifdef INET6
+                case LSPPING_TLV_TARGETFEC_SUBTLV_LDP_IPV6:
+                   /*
+                    *  0                   1                   2                   3
+                    *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+                    * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                    * |                          IPv6 prefix                          |
+                    * |                          (16 octets)                          |
+                    * |                                                               |
+                    * |                                                               |
+                    * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                    * | Prefix Length |         Must Be Zero                          |
+                    * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                    */
+
+                    printf("\n\t      %s/%u",
+                           ip6addr_string(subtlv_tptr),
+                           *(subtlv_tptr+16));
+                    break;
+#endif
+
+                case LSPPING_TLV_TARGETFEC_SUBTLV_BGP_IPV4:
+                   /*
+                    * 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+                    * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                    * |                    Sender identifier                          |
+                    * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                    * |                         IPv4 prefix                           |
+                    * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                    * | Prefix Length |                 Must Be Zero                  |
+                    * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                    */
+
+                    printf("\n\t      %s/%u, sender-ID %s",
+                           ipaddr_string(subtlv_tptr+4),
+                           *(subtlv_tptr+8),
+                           ipaddr_string(subtlv_tptr));
+                    break;
+
                     /*
                      *  FIXME those are the defined subTLVs that lack a decoder
                      *  you are welcome to contribute code ;-)
                      */
 
-                case LSPPING_TLV_TARGETFEC_SUBTLV_LDP_IPV4:
-                case LSPPING_TLV_TARGETFEC_SUBTLV_LDP_IPV6:
                 case LSPPING_TLV_TARGETFEC_SUBTLV_RSVP_IPV4:
                 case LSPPING_TLV_TARGETFEC_SUBTLV_RSVP_IPV6:
                 case LSPPING_TLV_TARGETFEC_SUBTLV_L3VPN_IPV4:
                 case LSPPING_TLV_TARGETFEC_SUBTLV_L3VPN_IPV6:
                 case LSPPING_TLV_TARGETFEC_SUBTLV_L2VPN_ENDPT:
                 case LSPPING_TLV_TARGETFEC_SUBTLV_L2VPN_VCID:
-                case LSPPING_TLV_TARGETFEC_SUBTLV_BGP_IPV4:
 
                 default:
                     subtlv_hexdump=TRUE; /* unknown subTLV just hexdump it */
