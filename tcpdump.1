@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.134 2002-12-19 05:44:47 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.135 2002-12-22 00:15:27 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -20,14 +20,14 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "8 August 2002"
+.TH TCPDUMP 1  "21 December 2002"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
 .na
 .B tcpdump
 [
-.B \-aAdDeflnNOpqRStuvxX
+.B \-aAdDeflnNOpqRStuUvxXy
 ] [
 .B \-c
 .I count
@@ -75,6 +75,11 @@ tcpdump \- dump traffic on a network
 .B \-E
 .I algo:secret
 ]
+[
+.B \-y
+.I datalinktype
+]
+.ti +8
 [
 .I expression
 ]
@@ -325,6 +330,9 @@ E.g.,
 ``tcpdump\ \ \-l\ \ |\ \ tee dat'' or
 ``tcpdump\ \ \-l \ \ > dat\ \ &\ \ tail\ \ \-f\ \ dat''.
 .TP
+.B \-L
+List the known data link types for the interface and exit.
+.TP
 .B \-m
 Load SMI MIB module definitions from file \fImodule\fR.
 This option
@@ -363,7 +371,9 @@ Since there is no protocol version field in ESP/AH specification,
 \fItcpdump\fP cannot deduce the version of ESP/AH protocol.
 .TP
 .B \-r
-Read packets from \fIfile\fR (which was created with the -w option).
+Read packets from \fIfile\fR (which was created with the
+.B \-w
+option).
 Standard input is used if \fIfile\fR is ``-''.
 .TP
 .B \-S
@@ -417,6 +427,23 @@ Print a timestamp in default format proceeded by date on each dump line.
 .B \-u
 Print undecoded NFS handles.
 .TP
+.B \-U
+Make output saved via the
+.B \-w
+option ``packet-buffered''; i.e., as each packet is saved, it will be
+written to the output file, rather than being written only when the
+output buffer fills.
+.IP
+The
+.B \-U
+flag will not be supported if
+.I tcpdump
+was built with an older version of
+.I libpcap
+that lacks the
+.B pcap_dump_flush()
+function.
+.TP
 .B \-v
 (Slightly more) verbose output.
 For example, the time to live,
@@ -466,6 +493,9 @@ This is very handy for analysing new protocols.
 Print each packet,
 .I including
 its link level header, in hex and ASCII.
+.TP
+.B \-y
+Set the data link type to use while capturing packets to \fIdatalinktype\fP.
 .IP "\fI expression\fP"
 .RS
 selects which packets will be dumped.

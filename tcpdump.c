@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.193 2002-12-19 09:39:17 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.194 2002-12-22 00:15:28 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -83,6 +83,7 @@ int Rflag = 1;			/* print sequence # field in AH/ESP*/
 int sflag = 0;			/* use the libsmi to translate OIDs */
 int Sflag;			/* print raw TCP sequence numbers */
 int tflag = 1;			/* print packet arrival time */
+int Uflag = 0;			/* "unbuffered" output of dump files */
 int uflag = 0;			/* Print undecoded NFS handles */
 int vflag;			/* verbose */
 int xflag;			/* print packet in hex */
@@ -262,6 +263,36 @@ show_dlts_and_exit(pcap_t *pd)
 	exit(0);
 }
 
+/*
+ * Set up flags that might or might not be supported depending on the
+ * version of libpcap we're using.
+ *
+ * Win32 builds are assumed to be done with the latest version of WinPcap.
+ */
+#ifdef WIN32
+#define B_FLAG		"B:"
+#define B_FLAG_USAGE	" [ -B size ]"
+#define D_FLAG		"D"
+#define U_FLAG		"U"
+#else /* WIN32 */
+
+#define B_FLAG
+#define B_FLAG_USAGE
+
+#ifdef HAVE_PCAP_FINDALLDEVS
+#define D_FLAG	"D"
+#else
+#define D_FLAG
+#endif
+
+#ifdef HAVE_PCAP_DUMP_FLUSH
+#define U_FLAG	"U"
+#else
+#define U_FLAG
+#endif
+
+#endif /* WIN32 */
+
 int
 main(int argc, char **argv)
 {
@@ -313,15 +344,7 @@ main(int argc, char **argv)
 
 	opterr = 0;
 	while (
-#ifdef WIN32
-	    (op = getopt(argc, argv, "aAB:c:C:dDeE:fF:i:lLm:nNOpqr:Rs:StT:uvw:xXy:Y")) != -1)
-#else /* WIN32 */
-#ifdef HAVE_PCAP_FINDALLDEVS
-	    (op = getopt(argc, argv, "aAc:C:dDeE:fF:i:lLm:nNOpqr:Rs:StT:uvw:xXy:Y")) != -1)
-#else /* HAVE_PCAP_FINDALLDEVS */
-	    (op = getopt(argc, argv, "aAc:C:deE:fF:i:lLm:nNOpqr:Rs:StT:uvw:xXy:Y")) != -1)
-#endif /* HAVE_PCAP_FINDALLDEVS */
-#endif /* WIN32 */
+	    (op = getopt(argc, argv, "aA" B_FLAG "c:C:d" D_FLAG "eE:fF:i:lLm:nNOpqr:Rs:StT:u" U_FLAG "vw:xXy:Y")) != -1)
 		switch (op) {
 
 		case 'a':
@@ -522,6 +545,12 @@ main(int argc, char **argv)
 		case 'u':
 			++uflag;
 			break;
+
+#ifdef HAVE_PCAP_DUMP_FLUSH
+		case 'U':
+			++Uflag;
+			break;
+#endif
 
 		case 'v':
 			++vflag;
@@ -817,6 +846,10 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 	}
 
 	pcap_dump((u_char *)dump_info->p, h, sp);
+#ifdef HAVE_PCAP_FINDALLDEVS
+	if (Uflag)
+		pcap_dump_flush(dump_info->p);
+#endif
 
 	--infodelay;
 	if (infoprint)
@@ -829,6 +862,10 @@ dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	++infodelay;
 
 	pcap_dump(user, h, sp);
+#ifdef HAVE_PCAP_FINDALLDEVS
+	if (Uflag)
+		pcap_dump_flush((pcap_dumper_t *)user);
+#endif
 
 	--infodelay;
 	if (infoprint)
@@ -970,15 +1007,7 @@ usage(void)
 	(void)fprintf(stderr, "libpcap version %s\n", pcap_version);
 #endif /* WIN32 */
 	(void)fprintf(stderr,
-#ifdef WIN32
-"Usage: %s [-aAdDeflLnNOpqRStuvxX] [-B size] [-c count] [ -C file_size ]\n", program_name);
-#else /* WIN32 */
-#ifdef HAVE_PCAP_FINDALLDEVS
-"Usage: %s [-aAdDeflLnNOpqRStuvxX] [-c count] [ -C file_size ]\n", program_name);
-#else /* HAVE_PCAP_FINDALLDEVS */
-"Usage: %s [-aAdeflLnNOpqRStuvxX] [-c count] [ -C file_size ]\n", program_name);
-#endif /* HAVE_PCAP_FINDALLDEVS */
-#endif /* WIN32 */
+"Usage: %s [-aAd" D_FLAG "eflLnNOpqRStu" U_FLAG "vxXy]" B_FLAG_USAGE " [-c count] [ -C file_size ]\n", program_name);
 	(void)fprintf(stderr,
 "\t\t[ -E algo:secret ] [ -F file ] [ -i interface ] [ -r file ]\n");
 	(void)fprintf(stderr,
