@@ -33,11 +33,12 @@
  *  RFC3633,
  *  RFC3646,
  *  draft-ietf-dhc-dhcpv6-opt-timeconfig-03.txt,
+ *  draft-ietf-dhc-lifetime-00.txt,
  */
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.32 2004-01-21 03:53:08 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.33 2004-06-16 00:12:35 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -146,9 +147,10 @@ struct dhcp6_relay {
 
 /*
  * The following one is an unassigned number.
- * We temporarily use values as of KAME snap 20031013.
+ * We temporarily use values as of KAME snap 20040322.
  */
 #define DH6OPT_NTP_SERVERS 35
+#define DH6OPT_LIFETIME 36
 
 struct dhcp6opt {
 	u_int16_t dh6opt_type;
@@ -196,10 +198,20 @@ dhcp6opt_name(int type)
 		return "elapsed time";
 	case DH6OPT_RELAY_MSG:
 		return "relay message";
+	case DH6OPT_AUTH:
+		return "authentication";
+	case DH6OPT_UNICAST:
+		return "server unicast";
 	case DH6OPT_STATUS_CODE:
 		return "status code";
 	case DH6OPT_RAPID_COMMIT:
 		return "rapid commit";
+	case DH6OPT_USER_CLASS:
+		return "user class";
+	case DH6OPT_VENDOR_CLASS:
+		return "vendor class";
+	case DH6OPT_VENDOR_OPTS:
+		return "vendor-specific info";
 	case DH6OPT_INTERFACE_ID:
 		return "interface ID";
 	case DH6OPT_RECONF_MSG:
@@ -207,11 +219,13 @@ dhcp6opt_name(int type)
 	case DH6OPT_RECONF_ACCEPT:
 		return "reconfigure accept";
 	case DH6OPT_SIP_SERVER_D:
-		return "SIP Servers Domain";
+		return "SIP servers domain";
 	case DH6OPT_SIP_SERVER_A:
-		return "SIP Servers Address";
+		return "SIP servers address";
 	case DH6OPT_DNS:
 		return "DNS";
+	case DH6OPT_DNSNAME:
+		return "DNS name";
 	case DH6OPT_PREFIX_DELEGATION:
 		return "prefix delegation";
 	case DH6OPT_PREFIX_INFORMATION:
@@ -222,6 +236,8 @@ dhcp6opt_name(int type)
 		return "IA_PD prefix";
 	case DH6OPT_NTP_SERVERS:
 		return "NTP Server";
+	case DH6OPT_LIFETIME:
+		return "lifetime";
 	default:
 		snprintf(genstr, sizeof(genstr), "opt_%d", type);
 		return(genstr);
@@ -483,6 +499,15 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 				    (u_char *)(dh6o + 1) + optlen);
 			}
 			printf(")");
+			break;
+		case DH6OPT_LIFETIME:
+			if (optlen != 4) {
+				printf(" ?)");
+				break;
+			}
+			memcpy(&val32, dh6o + 1, sizeof(val32));
+			val32 = ntohl(val32);
+			printf(" %d)", (int)val32);
 			break;
 		default:
 			printf(")");
