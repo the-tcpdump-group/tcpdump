@@ -32,7 +32,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.19 2002-06-14 15:45:59 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.20 2002-06-15 02:49:54 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -228,7 +228,7 @@ dhcp6opt_print(u_char *cp, u_char *ep)
 		case DH6OPT_SERVERID:
 			if (optlen < 2) {
 				/*(*/
-				printf(" ??)");
+				printf(" ?)");
 				break;
 			}
 			tp = (u_char *)(dh6o + 1);
@@ -244,7 +244,7 @@ dhcp6opt_print(u_char *cp, u_char *ep)
 					printf(")");
 				} else {
 					/*(*/
-					printf(" ??)");
+					printf(" ?)");
 				}
 				break;
 			case 2:
@@ -256,7 +256,7 @@ dhcp6opt_print(u_char *cp, u_char *ep)
 					printf(")");
 				} else {
 					/*(*/
-					printf(" ??)");
+					printf(" ?)");
 				}
 				break;
 			case 3:
@@ -269,7 +269,7 @@ dhcp6opt_print(u_char *cp, u_char *ep)
 					printf(")");
 				} else {
 					/*(*/
-					printf(" ??)");
+					printf(" ?)");
 				}
 				break;
 			default:
@@ -279,7 +279,7 @@ dhcp6opt_print(u_char *cp, u_char *ep)
 			break;
 		case DH6OPT_ORO:
 			if (optlen % 2) {
-				printf(" ??)");
+				printf(" ?)");
 				break;
 			}
 			tp = (u_char *)(dh6o + 1);
@@ -293,7 +293,7 @@ dhcp6opt_print(u_char *cp, u_char *ep)
 			break;
 		case DH6OPT_PREFERENCE:
 			if (optlen != 1) {
-				printf(" ??)");
+				printf(" ?)");
 				break;
 			}
 			printf(" %d)", *((u_char *)(dh6o + 1) + 1));
@@ -303,7 +303,7 @@ dhcp6opt_print(u_char *cp, u_char *ep)
 			break;
 		case DH6OPT_DNS:
 			if (optlen % 16) {
-				printf(" ??)");
+				printf(" ?)");
 				break;
 			}
 			tp = (u_char *)(dh6o + 1);
@@ -318,7 +318,7 @@ dhcp6opt_print(u_char *cp, u_char *ep)
 			break;
 		case DH6OPT_PREFIX_INFORMATION:
 			if (optlen % 21)
-				printf(" ??)");
+				printf(" ?)");
 			memcpy(&addr6, (u_char *)(dh6o + 1) + 5,
 			    sizeof(addr6));
 			printf(" %s/%d", ip6addr_string(&addr6),
@@ -332,7 +332,7 @@ dhcp6opt_print(u_char *cp, u_char *ep)
 			break;
 		case DH6OPT_STATUS_CODE:
 			if (optlen < 2)
-				printf(" ??)");
+				printf(" ?)");
 			memcpy(&val16, (u_char *)(dh6o + 1), sizeof(val16));
 			val16 = ntohs(val16);
 			printf(" %s)", dhcp6stcode(val16));
