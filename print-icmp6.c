@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.57 2001-12-09 05:22:27 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.58 2002-03-28 10:02:34 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -356,6 +356,29 @@ icmp6_print(const u_char *bp, const u_char *bp2)
 	case ICMP6_NI_REPLY:
 		icmp6_nodeinfo_print(icmp6len, bp, ep);
 		break;
+	case ICMP6_HADISCOV_REQUEST:
+	case ICMP6_HADISCOV_REPLY:
+	{
+		struct in6_addr *in6;
+		u_int32_t *res;
+		u_char *cp;
+		int cnt, i;
+		printf("icmp6: ha discovery %s: ",
+		       dp->icmp6_type == ICMP6_HADISCOV_REQUEST ?
+		       "request" : "reply");
+		TCHECK(dp->icmp6_data16[0]);
+		printf("id=%d", ntohs(dp->icmp6_data16[0]));
+		cp = (u_char *)dp + icmp6len;
+		res = (u_int32_t *)(dp + 1);
+		in6 = (struct in6_addr *)(res + 2);
+		for (; (u_char *)in6 < cp; in6++) {
+			TCHECK(*in6);
+			printf(", %s", ip6addr_string(in6));
+		}
+		break;
+	}
+	case ICMP6_MOBILEPREFIX_SOLICIT:
+	case ICMP6_MOBILEPREFIX_ADVERT:
 	default:
 		printf("icmp6: type-#%d", dp->icmp6_type);
 		break;
