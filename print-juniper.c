@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.4 2005-01-24 03:27:26 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.5 2005-01-25 09:59:40 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -80,9 +80,7 @@ juniper_atm1_print(const struct pcap_pkthdr *h, register const u_char *p)
         length-=4;
         caplen-=4;
 
-        if (cookie1 & 0x80000000) { /* OAM cell ? */
-            /* XXX - at least some packets are mis-identified as OAM
-               cells by this test */
+        if ((cookie1 >> 24) == 0x80) { /* OAM cell ? */
             oam_print(p,length);
             return 0;
         }
