@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.74 1999-11-21 09:36:53 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.75 1999-11-21 16:26:59 assar Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -259,10 +259,16 @@ ip_printts(register const u_char *cp, u_int length)
 	case IPOPT_TS_TSANDADDR:
 		printf("TS+ADDR");
 		break;
+	/*
+	 * prespecified should really be 3, but some ones might send 2
+	 * instead, and the IPOPT_TS_PRESPEC constant can apparently
+	 * have both values, so we have to hard-code it here.
+	 */
+
 	case 2:
 		printf("PRESPEC2.0");
 		break;
-	case IPOPT_TS_PRESPEC:
+	case 3:			/* IPOPT_TS_PRESPEC */
 		printf("PRESPEC");
 		break;
 	default:	
@@ -635,6 +641,11 @@ again:
 			break;
 		}
 	}
+
+ 	/* Ultra quiet now means that all this stuff should be suppressed */
+ 	/* res 3-Nov-98 */
+ 	if (qflag > 1) return;
+
 
 	/*
 	 * for fragmented datagrams, print id:size@offset.  On all
