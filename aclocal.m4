@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.93 2003-02-12 10:17:08 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.94 2003-03-13 08:04:25 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -236,9 +236,9 @@ AC_DEFUN(AC_LBL_LIBPCAP,
     AC_MSG_CHECKING(for local pcap library)
     libpcap=FAIL
     lastdir=FAIL
-    places=`ls .. | sed -e 's,/$,,' -e 's,^,../,' | \
+    places=`ls $srcdir/.. | sed -e 's,/$,,' -e "s,^,$srcdir/../," | \
 	egrep '/libpcap-[[0-9]]*.[[0-9]]*(.[[0-9]]*)?([[ab]][[0-9]]*)?$'`
-    for dir in $places ../libpcap libpcap ; do
+    for dir in $places $srcdir/../libpcap $srcdir/libpcap ; do
 	    basedir=`echo $dir | sed -e 's/[[ab]][[0-9]]*$//'`
 	    if test $lastdir = $basedir ; then
 		    dnl skip alphas when an actual release is present
