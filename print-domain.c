@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.61 2000-12-30 15:47:58 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.62 2000-12-31 07:12:18 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -197,16 +197,16 @@ blabel_print(const u_char *cp)
 
 	/* print the bit string as a hex string */
 	printf("\\[x");
-	for (bitp = cp + 1, b = bitlen; bitp < lim && b > 3; b -= 8, bitp++)
+	for (bitp = cp + 1, b = bitlen; bitp < lim && b > 7; b -= 8, bitp++)
 		printf("%02x", *bitp);
 	if (bitp == lim)
 		printf("...");
 	else if (b > 4) {
 		tc = *bitp++;
-		printf("%02x", tc & (0xff << (8 - tc)));
+		printf("%02x", tc & (0xff << (8 - b)));
 	} else if (b > 0) {
 		tc = *bitp++;
-		printf("%1x", (tc >> 4) & 0x0f);
+		printf("%1x", ((tc >> 4) & 0x0f) & (0x0f << (4 - b)));
 	}
 	printf("/%d]", bitlen);
 
