@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.52 2002-06-29 04:33:31 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.53 2002-07-19 09:34:05 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -761,38 +761,6 @@ isis_print_lspid(const u_char *cp)
         return (lspid);
 }
 
-/*
- *  this is a generic routine for printing unknown data;
- *  as it is called from various places (TLV and subTLV parsing routines)
- *  we pass on the linefeed plus indentation string to
- *  get a proper output - returns 0 on error
- */
-
-static int
-isis_print_unknown_data(const u_char *cp,const char *lf,int len)
-{
-        int i;
-
-	printf("%s0x0000: ",lf);
-	for(i=0;i<len;i++) {
-	    if (!TTEST2(*(cp+i), 1))
-	      goto trunctlv;
-	    printf("%02x",*(cp+i));
-	    if (i%2)
-	        printf(" ");
-	    if (i/16!=(i+1)/16) {
-	        if (i<(len-1))
-		    printf("%s0x%04x: ",lf,i);
-	    }
-	}
-	return(1); /* everything is ok */
-
-trunctlv:
-    printf("%spacket exceeded snapshot",lf);
-    return(0);
-
-}
-
 /* print the 4-byte metric block which is common found in the old-style TLVs */
 
 static int
@@ -926,7 +894,7 @@ isis_print_ip_reach_subtlv (const u_char *tptr,int subt,int subl,const char *lf)
                    lf,
                    subt,
                    subl);
-            if(!isis_print_unknown_data(tptr,"\n\t\t\t    ",
+            if(!print_unknown_data(tptr,"\n\t\t\t    ",
                                        subl))
                 return(0);
             break;
@@ -1074,7 +1042,7 @@ isis_print_is_reach_subtlv (const u_char *tptr,int subt,int subl,const char *lf)
             /* there is some optional stuff left to decode but this is as of yet
                not specified so just lets hexdump what is left */
             if(subl>0){
-                if(!isis_print_unknown_data(tptr,"\n\t\t\t    ",
+                if(!print_unknown_data(tptr,"\n\t\t\t    ",
                                            subl-36))
                     return(0);
             }
@@ -1100,7 +1068,7 @@ isis_print_is_reach_subtlv (const u_char *tptr,int subt,int subl,const char *lf)
                    lf,
                    subt,
                    subl);
-            if(!isis_print_unknown_data(tptr,"\n\t\t\t    ",
+            if(!print_unknown_data(tptr,"\n\t\t\t    ",
                                        subl))
                 return(0);
             break;
@@ -1381,7 +1349,7 @@ static int isis_print (const u_char *p, u_int length)
 	break;
 
     default:
-	if(!isis_print_unknown_data(pptr,"\n\t\t  ",length))
+	if(!print_unknown_data(pptr,"\n\t\t  ",length))
 	    return(0);
 	return (0);
     }
@@ -1802,7 +1770,7 @@ static int isis_print (const u_char *p, u_int length)
 		break;
 	    case SUBTLV_AUTH_PRIVATE:
 	    default:
-		if(!isis_print_unknown_data(tptr+1,"\n\t\t\t    ",len-1))
+		if(!print_unknown_data(tptr+1,"\n\t\t\t    ",len-1))
 		    return(0);
 		break;
 	    }
@@ -1997,7 +1965,7 @@ static int isis_print (const u_char *p, u_int length)
             case SUBTLV_IDRP_LOCAL:
             case SUBTLV_IDRP_RES:
             default:
-                if(!isis_print_unknown_data(tptr,"\n\t\t\t",len-1))
+                if(!print_unknown_data(tptr,"\n\t\t\t",len-1))
                     return(0);
                 break;
             }
@@ -2056,7 +2024,7 @@ static int isis_print (const u_char *p, u_int length)
         case TLV_MT_IP6_REACH:
 
 	default:
-	    if(!isis_print_unknown_data(pptr,"\n\t\t\t",len))
+	    if(!print_unknown_data(pptr,"\n\t\t\t",len))
 	        return(0);
 	    break;
 	}
