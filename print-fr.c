@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.29 2005-01-27 10:13:51 hannes Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.30 2005-03-21 11:35:55 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -429,7 +429,7 @@ struct tok fr_q933_msg_values[] = {
 #define FR_LMI_CCITT_LINK_VERIFY_IE	0x53
 #define FR_LMI_CCITT_PVC_STATUS_IE	0x57
 
-struct tok fr_q933_ie_values[] = {
+struct tok fr_q933_ie_values_codeset5[] = {
     { FR_LMI_ANSI_REPORT_TYPE_IE, "ANSI Report Type" },
     { FR_LMI_ANSI_LINK_VERIFY_IE_91, "ANSI Link Verify" },
     { FR_LMI_ANSI_LINK_VERIFY_IE, "ANSI Link Verify" },
@@ -451,6 +451,27 @@ struct tok fr_lmi_report_type_ie_values[] = {
     { 0, NULL }
 };
 
+/* array of 16 codepages - currently we only support codepage 5 */
+static struct tok *fr_q933_ie_codesets[] = {
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    fr_q933_ie_values_codeset5,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+};
+
+
 struct common_ie_header {
     u_int8_t ie_id;
     u_int8_t ie_len;
@@ -463,12 +484,14 @@ q933_print(const u_char *p, u_int length)
 	struct common_ie_header *ie_p;
         int olen;
 	int is_ansi = 0;
-        u_int dlci;
+        u_int dlci,codeset;
 
 	if (length < 9) {	/* shortest: Q.933a LINK VERIFY */
 		printf("[|q.933]");
 		return;
 	}
+
+        codeset = p[2]&0x0f;   /* extract the codeset */
 
 	if (p[2] == MSG_ANSI_LOCKING_SHIFT)
 		is_ansi = 1;
@@ -500,7 +523,7 @@ q933_print(const u_char *p, u_int length)
 	ptemp += 2 + is_ansi;
 	
 	/* Loop through the rest of IE */
-	while (length > 0) {
+	while (length > sizeof(struct common_ie_header)) {
 		ie_p = (struct common_ie_header *)ptemp;
 		if (length < sizeof(struct common_ie_header) ||
 		    length < sizeof(struct common_ie_header) + ie_p->ie_len) {
@@ -516,7 +539,7 @@ q933_print(const u_char *p, u_int length)
                  * are also intereststing in non-verbose mode */
                 if (vflag)
                     printf("\n\t%s IE (%u), length %u: ",
-                           tok2str(fr_q933_ie_values,"unknown",ie_p->ie_id),
+                           tok2str(fr_q933_ie_codesets[codeset],"unknown",ie_p->ie_id),
                            ie_p->ie_id,
                            ie_p->ie_len);
                     

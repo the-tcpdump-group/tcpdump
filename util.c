@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.94 2004-06-15 23:05:06 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.95 2005-03-21 11:35:55 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -219,7 +219,7 @@ const char *
 tok2strbuf(register const struct tok *lp, register const char *fmt,
 	   register int v, char *buf, size_t bufsize)
 {
-	while (lp->s != NULL) {
+	while (lp->s != NULL && lp != NULL) {
 		if (lp->v == v)
 			return (lp->s);
 		++lp;
@@ -260,7 +260,7 @@ bittok2str(register const struct tok *lp, register const char *fmt,
         register int rotbit; /* this is the bit we rotate through all bitpositions */
         register int tokval;
 
-	while (lp->s != NULL) {
+	while (lp->s != NULL && lp != NULL) {
             tokval=lp->v;   /* load our first value */
             rotbit=1;
             while (rotbit != 0) {
