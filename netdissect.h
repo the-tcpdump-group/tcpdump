@@ -21,7 +21,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.4 2004-04-05 00:15:50 mcr Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.5 2004-04-05 04:27:41 mcr Exp $ (LBL)
  */
 
 #ifndef netdissect_h
@@ -414,4 +414,3 @@ extern u_short in_cksum(const u_short *,
 #endif
 
 #endif  /* netdissect_h */
-\
