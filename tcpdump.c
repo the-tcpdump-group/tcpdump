@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.236 2004-03-19 21:36:35 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.237 2004-03-23 07:15:38 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -113,6 +113,7 @@ static int WflagChars = 0;
 const char *dlt_name = NULL;
 
 char *espsecret = NULL;		/* ESP secret key */
+char *tcpmd5secret = NULL;	/* TCP-MD5 secret key */
 
 int packettype;
 
@@ -437,7 +438,7 @@ main(int argc, char **argv)
 
 	opterr = 0;
 	while (
-	    (op = getopt(argc, argv, "aA" B_FLAG "c:C:d" D_FLAG "eE:fF:i:lLm:nNOpqr:Rs:StT:u" U_FLAG "vw:W:xXy:YZ:")) != -1)
+	    (op = getopt(argc, argv, "aA" B_FLAG "c:C:d" D_FLAG "eE:fF:i:lLm:M:nNOpqr:Rs:StT:u" U_FLAG "vw:W:xXy:YZ:")) != -1)
 		switch (op) {
 
 		case 'a':
@@ -588,6 +589,14 @@ main(int argc, char **argv)
 				      program_name, optarg);
 			(void)fprintf(stderr, "(no libsmi support)\n");
 #endif
+			break;
+
+		case 'M':
+			/* TCP-MD5 shared secret */
+#ifndef HAVE_LIBCRYPTO
+			warning("crypto code not compiled in");
+#endif
+			tcpmd5secret = optarg;
 			break;
 
 		case 'O':
@@ -1281,9 +1290,9 @@ usage(void)
 	(void)fprintf(stderr,
 "Usage: %s [-aAd" D_FLAG "eflLnNOpqRStu" U_FLAG "vxX]" B_FLAG_USAGE " [-c count] [ -C file_size ]\n", program_name);
 	(void)fprintf(stderr,
-"\t\t[ -E algo:secret ] [ -F file ] [ -i interface ] [ -r file ]\n");
+"\t\t[ -E algo:secret ] [ -F file ] [ -i interface ] [ -M secret ]\n");
 	(void)fprintf(stderr,
-"\t\t[ -s snaplen ] [ -T type ] [ -w file ] [ -W filecount ]\n");
+"\t\t[ -r file ] [ -s snaplen ] [ -T type ] [ -w file ] [ -W filecount ]\n");
 	(void)fprintf(stderr,
 "\t\t[ -y datalinktype ] [ -Z user ]\n");
 	(void)fprintf(stderr,

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.110 2003-11-19 00:17:32 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.111 2004-03-23 07:15:36 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -49,6 +49,13 @@ static const char rcsid[] _U_ =
 #include "ipproto.h"
 
 #include "nameser.h"
+
+#ifdef HAVE_LIBCRYPTO
+#include <openssl/md5.h>
+
+static int tcp_verify_signature(const struct ip *ip, struct tcphdr *tp,
+    const u_char *data, int length, const u_char *rcvsig);
+#endif
 
 static void print_tcp_rst_data(register const u_char *sp, u_int length);
 
@@ -561,6 +568,26 @@ tcp_print(register const u_char *bp, register u_int length,
 				(void)printf(" %u", EXTRACT_32BITS(cp));
 				break;
 
+			case TCPOPT_SIGNATURE:
+				(void)printf("md5:");
+				if (IP_V(ip) != 4) {
+					(void)printf("!ipv4");
+					break;
+				}
+				datalen = TCP_SIGLEN;
+				LENCHECK(datalen);
+#ifdef HAVE_LIBCRYPTO
+				if (tcp_verify_signature(ip, tp,
+				    bp + TH_OFF(tp) * 4, length, cp) == 0)
+					(void)printf("valid");
+				else
+					(void)printf("invalid");
+#else
+				for (i = 0; i < TCP_SIGLEN; ++i)
+					(void)printf("%02x", cp[i]);
+#endif
+				break;
+
 			default:
 				(void)printf("opt-%u:", opt);
 				datalen = len - 2;
@@ -673,3 +700,50 @@ print_tcp_rst_data(register const u_char *sp, u_int length)
 	}
 	putchar(']');
 }
+
+#ifdef HAVE_LIBCRYPTO
+static int
+tcp_verify_signature(const struct ip *ip, struct tcphdr *tp,
+    const u_char *data, int length, const u_char *rcvsig)
+{
+	char sig[TCP_SIGLEN];
+	char zero_proto = 0;
+	MD5_CTX ctx;
+	u_short savecsum, tlen;
+
+	if (tcpmd5secret == NULL)
+		return (-1);
+
+	MD5_Init(&ctx);
+	/*
+	 * Step 1: Update MD5 hash with IP pseudo-header.
+	 */
+	MD5_Update(&ctx, (char *)&ip->ip_src, sizeof(ip->ip_src));
+	MD5_Update(&ctx, (char *)&ip->ip_dst, sizeof(ip->ip_dst));
+	MD5_Update(&ctx, (char *)&zero_proto, sizeof(zero_proto));
+	MD5_Update(&ctx, (char *)&ip->ip_p, sizeof(ip->ip_p));
+	tlen = EXTRACT_16BITS(&ip->ip_len) - IP_HL(ip) * 4;
+	tlen = htons(tlen);
+	MD5_Update(&ctx, (char *)&tlen, sizeof(tlen));
+	/*
+	 * Step 2: Update MD5 hash with TCP header, excluding options.
+	 * The TCP checksum must be set to zero.
+	 */
+	savecsum = tp->th_sum;
+	tp->th_sum = 0;
+	MD5_Update(&ctx, (char *)tp, sizeof(struct tcphdr));
+	tp->th_sum = savecsum;
+	/*
+	 * Step 3: Update MD5 hash with TCP segment data, if present.
+	 */
+	if (length > 0)
+		MD5_Update(&ctx, data, length);
+	/*
+	 * Step 4: Update MD5 hash with shared secret.
+	 */
+	MD5_Update(&ctx, tcpmd5secret, strlen(tcpmd5secret));
+	MD5_Final(sig, &ctx);
+
+	return (memcmp(rcvsig, sig, 16));
+}
+#endif /* HAVE_LIBCRYPTO */

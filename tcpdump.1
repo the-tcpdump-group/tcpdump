@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.160 2004-01-26 02:05:18 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.161 2004-03-23 07:15:37 guy Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -22,7 +22,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "25 January 2004"
+.TH TCPDUMP 1  "22 March 2004"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -52,6 +52,10 @@ tcpdump \- dump traffic on a network
 [
 .B \-m
 .I module
+]
+[
+.B \-M
+.I secret
 ]
 [
 .B \-r
@@ -384,6 +388,10 @@ List the known data link types for the interface and exit.
 Load SMI MIB module definitions from file \fImodule\fR.
 This option
 can be used several times to load several MIB modules into \fItcpdump\fP.
+.TP
+.B \-M
+Use \fIsecret\fP as a shared secret for validating the digests found in
+TCP segments with the TCP-MD5 option (RFC 2385), if present.
 .TP
 .B \-n
 Don't convert addresses (i.e., host addresses, port numbers, etc.) to names.
