@@ -39,6 +39,8 @@ static const char rcsid[] _U_ =
 #ifdef HAVE_LIBCRYPTO
 #ifdef HAVE_OPENSSL_EVP_H
 #include <openssl/evp.h>
+#else
+#undef HAVE_LIBCRYPTO
 #endif
 #endif
 
