@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.137 2004-04-26 18:27:57 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.138 2004-04-28 22:02:23 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -544,8 +544,28 @@ again:
 			icmp_print(cp, len, (const u_char *)ip, (off & 0x3fff));
 			break;
 
-                case IPPROTO_IGRP:
+		case IPPROTO_PIGP:
 		case IPPROTO_EIGRP:
+			/*
+			 * XXX - the current IANA protocol number assignments
+			 * page lists 9 as "any private interior gateway
+			 * (used by Cisco for their IGRP)" and 88 as
+			 * "EIGRP" from Cisco.
+			 *
+			 * Recent BSD <netinet/in.h> headers define
+			 * IP_PROTO_PIGP as 9 and IP_PROTO_IGRP as 88.
+			 * We define IP_PROTO_PIGP as 9 and
+			 * IP_PROTO_EIGRP as 88; those names better
+			 * match was the current protocol number
+			 * assignments say.
+			 *
+			 * XXX - at least according to the Ethereal
+			 * dissectors, Cisco IGRP and Cisco EIGRP are
+			 * *not* the same, so it's not clear that both
+			 * IPPROTO_PIGP and IPPROTO_EIGRP should be
+			 * handed to the same print routine; "igrp_print()"
+			 * appears to be for IGRP, not EIGRP.
+			 */
 			igrp_print(cp, len, (const u_char *)ip);
 			break;
 
