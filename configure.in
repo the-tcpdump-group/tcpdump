@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.95 2000-01-15 00:43:17 fenner Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.96 2000-01-15 01:58:56 mcr Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.95 $)
+AC_REVISION($Revision: 1.96 $)
 AC_INIT(tcpdump.c)
 
 AC_CANONICAL_SYSTEM
@@ -584,7 +584,6 @@ if test "$ac_cv_ssleay_path" != no; then
 		LIBS="$LIBS -lrsaref"
 	fi
 	AC_CHECK_LIB(crypto, des_cbc_encrypt)
-	AC_DEFINE(HAVE_LIBCRYPTO)
 
 	bak_CPPFLAGS=$CPPFLAGS
 	CPPFLAGS="$CPPFLAGS $V_INCLS"

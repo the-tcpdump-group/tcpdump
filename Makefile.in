@@ -17,7 +17,7 @@
 #  WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 #  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.221 2000-01-15 00:43:17 fenner Exp $ (LBL)
+# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.222 2000-01-15 01:59:17 mcr Exp $ (LBL)
 
 #
 # Various configurable paths (remember to edit Makefile.in, not Makefile)
@@ -33,7 +33,7 @@ MANDEST = @mandir@
 
 # VPATH
 srcdir = @srcdir@
-VPATH = @srcdir@
+VPATH = @srcdir@:@srcdir@/missing
 
 #
 # You shouldn't need to edit anything below here.

@@ -2,9 +2,6 @@
  * make them to acconfig.h and rerun autoheader */
 @TOP@
 
-/* Define if you have SSLeay XXX why isn't this HAVE_LIBCRYPTO? */
-#undef CRYPTO
-
 /* Define if you have SSLeay 0.9.0b with the buggy cast128. */
 #undef HAVE_BUGGY_CAST128
 

@@ -4305,10 +4305,6 @@ else
   echo "$ac_t""no" 1>&6
 fi
 
-	cat >> confdefs.h <<\EOF
-#define HAVE_LIBCRYPTO 1
-EOF
-
 
 	bak_CPPFLAGS=$CPPFLAGS
 	CPPFLAGS="$CPPFLAGS $V_INCLS"
@@ -4316,17 +4312,17 @@ EOF
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:4320: checking for $ac_hdr" >&5
+echo "configure:4316: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 4325 "configure"
+#line 4321 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:4330: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:4326: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -4355,12 +4351,12 @@ done
 
 	if test "$ac_cv_header_cast_h" = "yes"; then
 		echo $ac_n "checking for buggy CAST128""... $ac_c" 1>&6
-echo "configure:4359: checking for buggy CAST128" >&5
+echo "configure:4355: checking for buggy CAST128" >&5
 		if test "$cross_compiling" = yes; then
   buggy_cast128="cross-compiling, assume yes"
 else
   cat > conftest.$ac_ext <<EOF
-#line 4364 "configure"
+#line 4360 "configure"
 #include "confdefs.h"
 
 #include <cast.h>
@@ -4379,7 +4375,7 @@ main()
 		return 1;
 }
 EOF
-if { (eval echo configure:4383: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:4379: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
 then
   buggy_cast128=yes
 else
@@ -4428,7 +4424,7 @@ fi
 # SVR4 /usr/ucb/install, which tries to use the nonexistent group "staff"
 # ./install, which can be erroneously created by make from ./install.sh.
 echo $ac_n "checking for a BSD compatible install""... $ac_c" 1>&6
-echo "configure:4432: checking for a BSD compatible install" >&5
+echo "configure:4428: checking for a BSD compatible install" >&5
 if test -z "$INSTALL"; then
 if eval "test \"`echo '$''{'ac_cv_path_install'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
