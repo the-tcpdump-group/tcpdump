@@ -15,7 +15,7 @@ CFLAGS = -I ${PCAP_DIR}/wpcap/libpcap/bpf \
 	-I ../../Win32/Include -I ../../linux-Include \
 	-I ../../lbl -I../.. \
 	-DWIN32 -DHAVE_ADDRINFO_H -DHAVE_PCAP_FINDALLDEVS \
-	-DHAVE_PCAP_DUMP_FLUSH -DINET6 -DSIZEOF_CHAR=1 \
+	-DINET6 -DSIZEOF_CHAR=1 -DHAVE_SOCKADDR_STORAGE -DHAVE_PCAP_DUMP_FLUSH\
 	-DSIZEOF_SHORT=2 -DSIZEOF_INT=4 -mno-cygwin ${OPTFLAGS}
 LDFLAGS = 
 LIBS = -L ${PCAP_DIR}/WPCAP/LIB -lwpcap -lwsock32
@@ -26,6 +26,10 @@ OBJS = \
 	../../missing/inet_aton.o \
 	../../missing/inet_ntop.o \
 	../../missing/strlcpy.o \
+	../../missing/dlnames.o \
+	../../missing/datalinks.o \
+	../../missing/strsep.o \
+	../../missing/inet_pton.o \
 	../../machdep.o \
 	../../parsenfsfh.o \
 	../../print-802_11.o \
@@ -47,6 +51,7 @@ OBJS = \
 	../../print-domain.o \
 	../../print-dvmrp.o \
 	../../print-egp.o \
+	../../print-enc.o \
 	../../print-esp.o \
 	../../print-ether.o \
 	../../print-fddi.o \
