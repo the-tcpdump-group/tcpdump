@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.183 2004-12-27 00:41:30 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.184 2005-03-27 22:38:09 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.183 $)
+AC_REVISION($Revision: 1.184 $)
 AC_PREREQ(2.50)
 AC_INIT(tcpdump.c)
 
@@ -18,6 +18,24 @@ AC_C___ATTRIBUTE__
 AC_CHECK_HEADERS(fcntl.h rpc/rpcent.h netdnet/dnetdb.h netinet/ether.h)
 AC_CHECK_HEADERS(netinet/if_ether.h, , , [#include <sys/types.h>
 #include <sys/socket.h>])
+if test "$ac_cv_header_netinet_if_ether_h" != yes; then
+	#
+	# The simple test didn't work.
+	# Do we need to include <net/if.h> first?
+	# Unset ac_cv_header_netinet_if_ether_h so we don't
+	# treat the previous failure as a cached value and
+	# suppress the next test.
+	#
+	AC_MSG_NOTICE([Rechecking with some additional includes])
+	unset ac_cv_header_netinet_if_ether_h
+	AC_CHECK_HEADERS(netinet/if_ether.h, , , [#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+struct mbuf;
+struct rtentry;
+#include <net/if.h>])
+fi
+
 AC_HEADER_TIME
 
 case "$host_os" in
@@ -494,6 +512,18 @@ AC_STRUCT_RES_STATE(ac_cv_res_state)
 
 AC_REPLACE_FUNCS(vfprintf strcasecmp strlcat strlcpy strdup strsep)
 AC_CHECK_FUNCS(strftime)
+
+#
+# You are in a twisty little maze of UN*Xes, all different.
+# Some might not have ether_ntohost().
+# Some might have it, but not declare it in any header file.
+# Some might have it, but declare it in <netinet/if_ether.h>.
+# Some might have it, but declare it in <netinet/ether.h>
+# (And some might have it but document it as something declared in
+# <netinet/ethernet.h>, although <netinet/if_ether.h> appears to work.)
+#
+# Before you is a C compiler.
+#
 AC_CHECK_FUNCS(ether_ntohost, [
     AC_CACHE_CHECK(for buggy ether_ntohost, ac_cv_buggy_ether_ntohost, [
 	AC_TRY_RUN([
@@ -518,6 +548,57 @@ AC_CHECK_FUNCS(ether_ntohost, [
 	AC_DEFINE(USE_ETHER_NTOHOST)
     fi
 ])
+if test "$ac_cv_func_ether_ntohost" = yes; then
+	#
+	# OK, we have ether_ntohost().  Do we have <netinet/if_ether.h>?
+	#
+	if test "$ac_cv_header_netinet_if_ether_h" = yes; then
+		#
+		# Yes.  Does it declare ether_ntohost()?
+		#
+		AC_CHECK_DECLS(ether_ntohost,
+		    [
+			AC_DEFINE(NETINET_IF_ETHER_H_DECLARES_ETHER_ntohost,,
+			    [Define to 1 if netinet/if_ether.h declares `ether_ntohost'])
+		    ],,
+		    [
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+struct mbuf;
+struct rtentry;
+#include <net/if.h>
+#include <netinet/if_ether.h>
+		    ])
+	fi
+	#
+	# Did that succeed?
+	#
+	if test "$ac_cv_have_decl_ether_ntohost" != yes; then
+		#
+		# No, how about <netinet/ether.h>, as on Linux?
+		#
+		AC_CHECK_HEADERS(netinet/ether.h)
+		if test "$ac_cv_header_netinet_ether_h" = yes; then
+			#
+			# We have it - does it declare ether_ntohost()?
+			# Unset ac_cv_have_decl_ether_ntohost so we don't
+			# treat the previous failure as a cached value and
+			# suppress the next test.
+			#
+			unset ac_cv_have_decl_ether_ntohost
+			AC_CHECK_DECLS(ether_ntohost,
+			    [
+				AC_DEFINE(NETINET_ETHER_H_DECLARES_ETHER_ntohost,,
+				    [Define to 1 if netinet/ether.h declares `ether_ntohost'])
+			    ],,
+			    [
+#include <netinet/ether.h>
+			    ])
+		fi
+	fi
+fi
+
 AC_CHECK_FUNCS(setlinebuf alarm)
 
 needsnprintf=no

@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.107 2005-03-08 08:52:38 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.108 2005-03-27 22:38:09 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -39,10 +39,14 @@ struct rtentry;		/* declarations in <net/if.h> */
 #include <net/if.h>	/* for "struct ifnet" in "struct arpcom" on Solaris */
 #include <netinet/if_ether.h>
 #endif /* HAVE_NETINET_IF_ETHER_H */
-#ifdef HAVE_NETINET_ETHER_H
-#include <netinet/ether.h>  /* ether_ntohost on linux */
-#endif /* HAVE_NETINET_ETHER_H */
+#ifdef NETINET_ETHER_H_DECLARES_ETHER_NTOHOST
+#include <netinet/ether.h>
+#endif /* NETINET_ETHER_H_DECLARES_ETHER_NTOHOST */
 #endif /* USE_ETHER_NTOHOST */
+
+#if !defined(HAVE_DECL_ETHER_NTOHOST) || !HAVE_DECL_ETHER_NTOHOST
+extern int ether_ntohost(char *, const struct ether_addr *);
+#endif
 
 #include <pcap.h>
 #include <pcap-namedb.h>
@@ -459,18 +463,25 @@ etheraddr_string(register const u_char *ep)
 #ifdef USE_ETHER_NTOHOST
 	if (!nflag) {
 		char buf2[128];
-		if (ether_ntohost(buf2, (const struct ether_addr *)ep) == 0) {
+
+		/*
+		 * We don't cast it to "const struct ether_addr *"
+		 * because some systems don't modify the Ethernet
+		 * address but fail to declare the second argument
+		 * as a "const" pointer.
+		 */
+		if (ether_ntohost(buf2, (struct ether_addr *)ep) == 0) {
 			tp->e_name = strdup(buf2);
 			return (tp->e_name);
 		}
 	}
 #endif
 	cp = buf;
-        *cp++ = hex[*ep >> 4 ];
+	*cp++ = hex[*ep >> 4 ];
 	*cp++ = hex[*ep++ & 0xf];
 	for (i = 5; (int)--i >= 0;) {
 		*cp++ = ':';
-                *cp++ = hex[*ep >> 4 ];
+		*cp++ = hex[*ep >> 4 ];
 		*cp++ = hex[*ep++ & 0xf];
 	}
 	*cp = '\0';
@@ -586,7 +597,7 @@ isonsap_string(const u_char *nsap, register u_int nsap_length)
 	register char *cp;
 	register struct enamemem *tp;
 
-        if (nsap_length < 1 || nsap_length > ISONSAP_MAX_LENGTH)
+	if (nsap_length < 1 || nsap_length > ISONSAP_MAX_LENGTH)
 		error("isonsap_string: illegal length");
 
 	tp = lookup_nsap(nsap);
@@ -601,8 +612,8 @@ isonsap_string(const u_char *nsap, register u_int nsap_length)
 		*cp++ = hex[*nsap >> 4];
 		*cp++ = hex[*nsap++ & 0xf];
 		if (((nsap_idx & 1) == 0) &&
-                     (nsap_idx + 1 < nsap_length)) {
-                     	*cp++ = '.';
+		     (nsap_idx + 1 < nsap_length)) {
+		     	*cp++ = '.';
 		}
 	}
 	*cp = '\0';
@@ -829,9 +840,16 @@ init_etherarray(void)
 			continue;
 
 #ifdef USE_ETHER_NTOHOST
-                /* Use yp/nis version of name if available */
-                if (ether_ntohost(name, (const struct ether_addr *)el->addr) == 0) {
-                        tp->e_name = strdup(name);
+		/*
+		 * Use YP/NIS version of name if available.
+		 *
+		 * We don't cast it to "const struct ether_addr *"
+		 * because some systems don't modify the Ethernet
+		 * address but fail to declare the second argument
+		 * as a "const" pointer.
+		 */
+		if (ether_ntohost(name, (struct ether_addr *)el->addr) == 0) {
+			tp->e_name = strdup(name);
 			continue;
 		}
 #endif

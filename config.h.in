@@ -152,6 +152,10 @@
 /* Define to 1 if you have the `bpf_dump' function. */
 #undef HAVE_BPF_DUMP
 
+/* Define to 1 if you have the declaration of `ether_ntohost', and to 0 if you
+   don't. */
+#undef HAVE_DECL_ETHER_NTOHOST
+
 /* Define to 1 if you have the `ether_ntohost' function. */
 #undef HAVE_ETHER_NTOHOST
 
@@ -274,6 +278,12 @@
 
 /* define if your compiler has __attribute__ */
 #undef HAVE___ATTRIBUTE__
+
+/* Define to 1 if netinet/ether.h declares `ether_ntohost' */
+#undef NETINET_ETHER_H_DECLARES_ETHER_ntohost
+
+/* Define to 1 if netinet/if_ether.h declares `ether_ntohost' */
+#undef NETINET_IF_ETHER_H_DECLARES_ETHER_ntohost
 
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT
