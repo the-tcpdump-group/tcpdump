@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.125 2005-01-25 15:35:11 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.126 2005-01-27 10:13:52 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -494,7 +494,7 @@ void isoclns_print(const u_int8_t *p, u_int length, u_int caplen)
         }
 
         if (eflag)
-            printf("OSI NLPID %s (0x%02x)",
+            printf("OSI NLPID %s (0x%02x): ",
                    tok2str(nlpid_values,"Unknown",*p),
                    *p);
         
@@ -517,6 +517,10 @@ void isoclns_print(const u_int8_t *p, u_int length, u_int caplen)
 	case NLPID_NULLNS:
 		(void)printf(", length: %u", length);
 		break;
+
+        case NLPID_Q933:
+                q933_print(p+1, length-1);
+                break;
 
         case NLPID_IP:
                 ip_print(p+1, length-1);
@@ -604,13 +608,14 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
         pptr += (1 + source_address_length);
 
         if (vflag < 1) {
-            printf(", %s > %s, length %u",
+            printf("%s%s > %s, length %u",
+                   eflag ? "" : ", ",
                    print_nsap(source_address, source_address_length),
                    print_nsap(dest_address, dest_address_length),
                    length);
             return (1);
         }
-        printf(", length %u", length);
+        printf("%slength %u",eflag ? "" : ", ",length);
 
     printf("\n\t%s PDU, hlen: %u, v: %u, lifetime: %u.%us, PDU length: %u, checksum: 0x%04x ",
            tok2str(clnp_pdu_values,
@@ -729,12 +734,14 @@ esis_print(const u_int8_t *pptr, u_int length)
         esis_pdu_type = esis_header->type & ESIS_PDU_TYPE_MASK;
 
         if (vflag < 1) {
-            printf(", %s, length %u",
+            printf("%s%s, length %u",
+                   eflag ? "" : ", ",
                    tok2str(esis_pdu_values,"unknown type (%u)",esis_pdu_type),
                    length);
             return;
         } else
-            printf(", length %u\n\t%s (%u)",
+            printf("%slength %u\n\t%s (%u)",
+                   eflag ? "" : ", ",
                    length,
                    tok2str(esis_pdu_values,"unknown type: %u", esis_pdu_type),
                    esis_pdu_type);
@@ -1446,7 +1453,9 @@ static int isis_print (const u_int8_t *p, u_int length)
 
     /* in non-verbose mode print the basic PDU Type plus PDU specific brief information*/
     if (vflag < 1) {
-        printf(", %s", tok2str(isis_pdu_values,"unknown PDU-Type %u",pdu_type));
+        printf("%s%s",
+               eflag ? "" : ", ",
+               tok2str(isis_pdu_values,"unknown PDU-Type %u",pdu_type));
 
 	switch (pdu_type) {
 
@@ -1484,7 +1493,7 @@ static int isis_print (const u_int8_t *p, u_int length)
     }
 
     /* ok they seem to want to know everything - lets fully decode it */
-    printf(", length: %u",length);
+    printf("%slength %u", eflag ? "" : ", ",length);
 
     printf("\n\t%s, hlen: %u, v: %u, pdu-v: %u, sys-id-len: %u (%u), max-area: %u (%u)",
            tok2str(isis_pdu_values,

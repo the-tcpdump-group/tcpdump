@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.28 2005-01-25 15:02:59 hannes Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.29 2005-01-27 10:13:51 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -40,7 +40,6 @@ static const char rcsid[] _U_ =
 #include "nlpid.h"
 #include "extract.h"
 
-static void q933_print(const u_char *, u_int);
 static void frf15_print(const u_char *, u_int);
 
 /*
@@ -457,7 +456,7 @@ struct common_ie_header {
     u_int8_t ie_len;
 };
 
-static void
+void
 q933_print(const u_char *p, u_int length)
 {
 	const u_char *ptemp = p;
@@ -474,8 +473,7 @@ q933_print(const u_char *p, u_int length)
 	if (p[2] == MSG_ANSI_LOCKING_SHIFT)
 		is_ansi = 1;
     
-        if (!eflag)
-            printf("Q.933, ");
+        printf("%s", eflag ? "" : "Q.933, ");
 
 	/* printing out header part */
 	printf(is_ansi ? "ANSI" : "CCITT ");
