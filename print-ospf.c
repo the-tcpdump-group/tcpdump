@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.30 2001-06-15 22:17:34 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.31 2001-06-28 04:34:51 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -403,8 +403,9 @@ ospf_decode_v2(register const struct ospfhdr *op,
 			printf(" bdr %s",
 			    ipaddr_string(&op->ospf_hello.hello_bdr));
 		if (vflag) {
-			printf(" nbrs");
 			ap = op->ospf_hello.hello_neighbor;
+			if ((u_char *)ap < dataend)
+				printf(" nbrs");
 			while ((u_char *)ap < dataend) {
 				TCHECK(*ap);
 				printf(" %s", ipaddr_string(ap));
@@ -521,7 +522,7 @@ ospf_print(register const u_char *bp, register u_int length,
 	/* value.  If it's not valid, say so and return */
 	TCHECK(op->ospf_type);
 	cp = tok2str(type2str, "type%d", op->ospf_type);
-	printf(" OSPFv%d-%s %d:", op->ospf_version, cp, length);
+	printf("OSPFv%d-%s %d:", op->ospf_version, cp, length);
 	if (*cp == 't')
 		return;
 
