@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-arcnet.c,v 1.13 2002-12-19 09:39:10 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-arcnet.c,v 1.14 2003-01-23 09:05:38 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -171,8 +171,71 @@ arcnet_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	caplen -= archdrlen;
 	p += archdrlen;
 
-	if (phds && flag && (flag & 1) == 0)
+	if (phds && flag && (flag & 1) == 0) {
+		/*
+		 * This is a middle fragment.
+		 */
 		return (archdrlen);
+	}
+
+	if (!arcnet_encap_print(arc_type, p, length, caplen))
+		default_print(p, caplen);
+
+	return (archdrlen);
+}
+
+/*
+ * This is the top level routine of the printer.  'p' points
+ * to the ARCNET header of the packet, 'h->ts' is the timestamp,
+ * 'h->length' is the length of the packet off the wire, and 'h->caplen'
+ * is the number of bytes actually captured.  It is quite similar
+ * to the non-Linux style printer except that Linux doesn't ever
+ * supply packets that look like exception frames, and headers have an
+ * extra "offset" field between the src/dest and packet type.
+ */
+u_int
+arcnet_linux_if_print(const struct pcap_pkthdr *h, const u_char *p)
+{
+	u_int caplen = h->caplen;
+	u_int length = h->len;
+	const struct arc_linux_header *ap;
+
+	int flag = 0, archdrlen = 0;
+	u_int seqid = 0;
+	u_char arc_type;
+
+	if (caplen < ARC_LINUX_HDRLEN) {
+		printf("[|arcnet]");
+		return (caplen);
+	}
+
+	ap = (const struct arc_linux_header *)p;
+	arc_type = ap->arc_type;
+
+	switch (arc_type) {
+	default:
+		archdrlen = ARC_LINUX_HDRNEWLEN;
+		if (caplen < ARC_LINUX_HDRNEWLEN) {
+			printf("[|arcnet]");
+			return (caplen);
+		}
+		break;
+	case ARCTYPE_IP_OLD:
+	case ARCTYPE_ARP_OLD:
+	case ARCTYPE_DIAGNOSE:
+		archdrlen = ARC_LINUX_HDRLEN;
+		break;
+	}
+
+	if (eflag)
+		arcnet_print(p, length, 0, flag, seqid);
+
+	/*
+	 * Go past the ARCNET header.
+	 */
+	length -= archdrlen;
+	caplen -= archdrlen;
+	p += archdrlen;
 
 	if (!arcnet_encap_print(arc_type, p, length, caplen))
 		default_print(p, caplen);
@@ -215,6 +278,10 @@ arcnet_encap_print(u_char arctype, const u_char *p,
 		if (vflag)
 			fputs("et1 ", stdout);
 		atalk_print(p, length);
+		return (1);
+
+	case ARCTYPE_IPX:
+		ipx_print(p, length);
 		return (1);
 
 	default:
