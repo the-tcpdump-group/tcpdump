@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/missing/dlnames.c,v 1.1 2002-12-19 09:27:58 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/missing/dlnames.c,v 1.2 2003-05-02 08:46:29 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -59,7 +59,9 @@ static struct dlt_choice dlt_choices[] = {
 	DLT_CHOICE(DLT_ARCNET),
 	DLT_CHOICE(DLT_EN10MB),
 	DLT_CHOICE(DLT_SLIP),
+#ifdef DLT_SLIP_BSDOS
 	DLT_CHOICE(DLT_SLIP_BSDOS),
+#endif
 	DLT_CHOICE(DLT_NULL),
 #ifdef DLT_LOOP
 	DLT_CHOICE(DLT_LOOP),
@@ -74,7 +76,9 @@ static struct dlt_choice dlt_choices[] = {
 #ifdef DLT_PPP_ETHER
 	DLT_CHOICE(DLT_PPP_ETHER),
 #endif
+#ifdef DLT_PPP_BSDOS
 	DLT_CHOICE(DLT_PPP_BSDOS),
+#endif
 	DLT_CHOICE(DLT_FDDI),
 	DLT_CHOICE(DLT_IEEE802),
 #ifdef DLT_IEEE802_11
