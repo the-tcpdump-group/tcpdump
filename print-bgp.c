@@ -615,7 +615,6 @@ bgp_print(const u_char *dat, int length)
 		else
 			printf(" ");
 		if (TTEST2(p[0], hlen)) {
-			if (vflag && newline)
 			bgp_header_print(p, hlen);
 			newline = 1;
 			p += hlen;
