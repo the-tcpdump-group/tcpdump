@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.48 2002-08-24 13:55:31 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.49 2002-08-25 18:25:57 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -570,6 +570,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
 	int i;
 	u_int16_t af;
 	u_int8_t safi, snpa;
+        float bw; /* copy buffer for bandwidth values */
 	int advance;
 	int tlen;
 	const u_char *tptr;
@@ -1010,6 +1011,16 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                                        extd_comm),
                                getname(tptr+2),
                                EXTRACT_16BITS(tptr+6));
+                        break;
+                    case BGP_EXT_COM_LINKBAND:
+                        memcpy (&bw, tptr+2, 4);
+                        printf("\n\t    %s%s%s:bandwidth: %.3f Mbps",
+                               (extd_comm&0x8000) ? "vendor-specific: " : "",
+                               (extd_comm&0x4000) ? "non-transitive: " : "",
+                               tok2str(bgp_extd_comm_subtype_values,
+                                       "unknown",
+                                       extd_comm),
+                               bw*8/1000000);
                         break;
                     case BGP_EXT_COM_VPN_ORIGIN:
                     case BGP_EXT_COM_OSPF_RID:
