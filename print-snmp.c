@@ -58,7 +58,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.61 2004-12-27 22:14:12 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.62 2005-01-05 04:05:04 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1025,7 +1025,7 @@ static SmiNode *smi_print_variable(struct be *elem, int *status)
 {
 	unsigned int oid[128], oidlen;
 	SmiNode *smiNode = NULL;
-	int i;
+	unsigned int i;
 
 	*status = smi_decode_oid(elem, oid, sizeof(oid)/sizeof(unsigned int),
 	    &oidlen);
@@ -1053,10 +1053,10 @@ static SmiNode *smi_print_variable(struct be *elem, int *status)
 static int
 smi_print_value(SmiNode *smiNode, u_char pduid, struct be *elem)
 {
-	unsigned int oid[128], oidlen;
+	unsigned int i, oid[128], oidlen;
 	SmiType *smiType;
 	SmiNamedNumber *nn;
-	int i, done = 0;
+	int done = 0;
 
 	if (! smiNode || ! (smiNode->nodekind
 			    & (SMI_NODEKIND_SCALAR | SMI_NODEKIND_COLUMN))) {
@@ -1290,7 +1290,7 @@ varbind_print(u_char pduid, const u_char *np, u_int length)
  * GetBulk, Inform, V2Trap, and Report
  */
 static void
-snmppdu_print(u_char pduid, const u_char *np, u_int length)
+snmppdu_print(u_short pduid, const u_char *np, u_int length)
 {
 	struct be elem;
 	int count = 0, error;
