@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.92 2004-04-29 01:32:47 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.93 2004-04-29 02:15:16 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -235,6 +235,8 @@ tok2str(register const struct tok *lp, register const char *fmt,
 	static int idx = 0;
 	char *ret;
 
+	ret = buf[idx];
+	idx = (idx+1) & 3;
 	return tok2strbuf(lp, fmt, v, ret, sizeof(buf[0]));
 }
 
@@ -244,7 +246,7 @@ tok2str(register const struct tok *lp, register const char *fmt,
  */
 char *
 bittok2str(register const struct tok *lp, register const char *fmt,
-	register int v)
+	   register int v)
 {
         static char buf[256]; /* our stringbuffer */
         int buflen=0;
