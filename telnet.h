@@ -1,3 +1,5 @@
+/* @(#) $Header: /tcpdump/master/tcpdump/telnet.h,v 1.2 2001-06-28 10:17:25 guy Exp $ (LBL) */
+
 /*	$NetBSD: telnet.h,v 1.9 2001/06/11 01:50:50 wiz Exp $	*/
 
 /*

@@ -1,3 +1,5 @@
+/* @(#) $Header: /tcpdump/master/tcpdump/nfsfh.h,v 1.11 2001-06-28 10:17:21 guy Exp $ (LBL) */
+
 /*
  * Copyright (c) 1993, 1994 Jeffrey C. Mogul, Digital Equipment Corporation,
  * Western Research Laboratory. All rights reserved.

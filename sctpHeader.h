@@ -1,3 +1,5 @@
+/* @(#) $Header: /tcpdump/master/tcpdump/sctpHeader.h,v 1.2 2001-06-28 10:17:24 guy Exp $ (LBL) */
+
 /* SCTP reference Implementation Copyright (C) 1999 Cisco And Motorola
  *
  * Redistribution and use in source and binary forms, with or without
