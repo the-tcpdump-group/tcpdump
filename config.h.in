@@ -240,3 +240,7 @@
 
 /* Define if you have the str library (-lstr).  */
 #undef HAVE_LIBSTR
+
+/* define if your compiler has __attribute__ */
+#undef HAVE___ATTRIBUTE__
+
