@@ -32,7 +32,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.25 2003-07-16 16:15:53 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.26 2003-08-13 02:26:53 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -204,7 +204,7 @@ dhcp6opt_name(int type)
 	case DH6OPT_IA_PD_PREFIX:
 		return "IA_PD prefix";
 	default:
-		sprintf(genstr, "opt_%d", type);
+		snprintf(genstr, sizeof(genstr), "opt_%d", type);
 		return(genstr);
 	}
 }
@@ -233,7 +233,7 @@ dhcp6stcode(int code)
 	case DH6OPT_STCODE_NOPREFIXAVAIL:
 		return "no prefixes";
 	default:
-		sprintf(genstr, "code%d", code);
+		snprintf(genstr, sizeof(genstr), "code%d", code);
 		return(genstr);
 	}
 }

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.12 2003-05-22 16:52:37 hannes Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.13 2003-08-13 02:26:52 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -187,7 +187,7 @@ fr_protostring(u_int8_t proto)
 	static char buf[5+1+2+1];
 
 	if (nflag || fr_nlpids[proto] == NULL) {
-		sprintf(buf, "proto-%02x", proto);
+		snprintf(buf, sizeof(buf), "proto-%02x", proto);
 		return buf;
 	}
 	return fr_nlpids[proto];

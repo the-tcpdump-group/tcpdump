@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.93 2003-07-29 09:21:16 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.94 2003-08-13 02:26:52 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -446,14 +446,17 @@ print_nsap(register const u_int8_t *pptr, register int nsap_length)
         char *junk_buf = nsap_ascii_output;
 
         if (nsap_length < 1 || nsap_length > 20) {
-                sprintf(junk_buf, "illegal length");
+                snprintf(nsap_ascii_output, sizeof(nsap_ascii_output),
+                    "illegal length");
                 return (nsap_ascii_output);
         }
 
 	for (nsap_idx = 0; nsap_idx < nsap_length; nsap_idx++) {
 		if (!TTEST2(*pptr, 1))
 			return (0);
-		sprintf(junk_buf, "%02x", *pptr++);
+		snprintf(junk_buf,
+		    sizeof(nsap_ascii_output) - (junk_buf - nsap_ascii_output),
+		    "%02x", *pptr++);
 		junk_buf += strlen(junk_buf);
 		if (((nsap_idx & 1) == 0) &&
                      (nsap_idx + 1 < nsap_length)) {
@@ -695,17 +698,17 @@ isis_print_id(const u_int8_t *cp, int id_len)
     char *pos = id;
 
     for (i = 1; i <= SYSTEM_ID_LEN; i++) {
-        sprintf(pos, "%02x", *cp++);
+        snprintf(pos, sizeof(id) - (pos - id), "%02x", *cp++);
 	pos += strlen(pos);
 	if (i == 2 || i == 4)
 	    *pos++ = '.';
 	}
     if (id_len >= NODE_ID_LEN) {
-        sprintf(pos, ".%02x", *cp++);
+        snprintf(pos, sizeof(id) - (pos - id), ".%02x", *cp++);
 	pos += strlen(pos);
     }
     if (id_len == LSP_ID_LEN)
-        sprintf(pos, "-%02x", *cp);
+        snprintf(pos, sizeof(id) - (pos - id), "-%02x", *cp);
     return (id);
 }
 
