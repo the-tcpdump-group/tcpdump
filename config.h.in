@@ -130,6 +130,9 @@
 /* define if should drop privileges by default */
 #undef WITH_USER
 
+/* define if should chroot when dropping privileges */
+#undef WITH_CHROOT
+
 /* Define to 1 if you have the `alarm' function. */
 #undef HAVE_ALARM
 
