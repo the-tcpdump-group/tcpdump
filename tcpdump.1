@@ -118,14 +118,23 @@ When
 .I tcpdump
 finishes capturing packets, it will report counts of:
 .IP
+packets ``captured'' (this is the number of packets that
+.I tcpdump
+has received and processed);
+.IP
 packets ``received by filter'' (the meaning of this depends on the OS on
 which you're running
 .IR tcpdump ,
 and possibly on the way the OS was configured - if a filter was
 specified on the command line, on some OSes it counts packets regardless
-of whether they were matched by the filter expression, and on other OSes
-it counts only packets that were matched by the filter expression and
-were processed by
+of whether they were matched by the filter expression and, even if they
+were matched by the filter expression, regardless of whether
+.I tcpdump
+has read and processed them yet, on other OSes it counts only packets that were
+matched by the filter expression regardless of whether
+.I tcpdump
+has read and processed them yet, and on other OSes it counts only
+packets that were matched by the filter expression and were processed by
 .IR tcpdump );
 .IP
 packets ``dropped by kernel'' (this is the number of packets that were

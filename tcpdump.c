@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.214 2003-08-08 09:47:45 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.215 2003-09-16 21:02:52 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -118,6 +118,7 @@ RETSIGTYPE requestinfo(int);
 #endif
 
 static void info(int);
+static u_int packets_captured;
 
 /* Length of saved portion of packet. */
 int snaplen = DEFAULT_SNAPLEN;
@@ -816,6 +817,11 @@ info(register int verbose)
 	if (!verbose)
 		fprintf(stderr, "%s: ", program_name);
 
+	(void)fprintf(stderr, "%u packets captured", packets_captured);
+	if (!verbose)
+		fputs(", ", stderr);
+	else
+		putc('\n', stderr);
 	(void)fprintf(stderr, "%d packets received by filter", stat.ps_recv);
 	if (!verbose)
 		fputs(", ", stderr);
@@ -859,6 +865,8 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 	static uint cnt = 2;
 	char *name;
 
+	++packets_captured;
+
 	++infodelay;
 
 	dump_info = (struct dump_info *)user;
@@ -896,6 +904,8 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 static void
 dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
+	++packets_captured;
+
 	++infodelay;
 
 	pcap_dump(user, h, sp);
@@ -914,6 +924,8 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
 	struct print_info *print_info;
 	u_int hdrlen;
+
+	++packets_captured;
 
 	++infodelay;
 	ts_print(&h->ts);
