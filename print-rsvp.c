@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.23 2003-10-20 10:50:09 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.24 2003-10-22 11:43:04 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -77,6 +77,7 @@ struct rsvp_object_header {
 
 #define RSVP_VERSION            1
 #define	RSVP_EXTRACT_VERSION(x) (((x)&0xf0)>>4) 
+#define	RSVP_EXTRACT_FLAGS(x)   ((x)&0x0f)
 
 #define	RSVP_MSGTYPE_PATH       1
 #define	RSVP_MSGTYPE_RESV       2
@@ -104,6 +105,11 @@ static const struct tok rsvp_msg_type_values[] = {
     { RSVP_MSGTYPE_HELLO_OLD,	"Hello (Old)" },
     { RSVP_MSGTYPE_SREFRESH,	"Refresh" },
     { RSVP_MSGTYPE_HELLO,	"Hello" },
+    { 0, NULL}
+};
+
+static const struct tok rsvp_header_flag_values[] = {
+    { 0x01,	              "Refresh reduction capable" }, /* rfc2961 */
     { 0, NULL}
 };
 
@@ -533,9 +539,10 @@ rsvp_print(register const u_char *pptr, register u_int len) {
 
     tlen=EXTRACT_16BITS(rsvp_com_header->length);
 
-    printf("RSVP\n\tv: %u, msg-type: %s, length: %u, ttl: %u, checksum: 0x%04x",
+    printf("RSVP\n\tv: %u, msg-type: %s, Flags: [%s], length: %u, ttl: %u, checksum: 0x%04x",
            RSVP_EXTRACT_VERSION(rsvp_com_header->version_flags),
            tok2str(rsvp_msg_type_values, "unknown, type: %u",rsvp_com_header->msg_type),
+           bittok2str(rsvp_header_flag_values,"none",RSVP_EXTRACT_FLAGS(rsvp_com_header->version_flags)),
            tlen,
            rsvp_com_header->ttl,
            EXTRACT_16BITS(rsvp_com_header->checksum));
