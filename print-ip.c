@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.106 2002-07-14 14:14:50 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.107 2002-07-14 19:46:51 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -309,22 +309,21 @@ ip_print(register const u_char *bp, register u_int length)
         printf("IP ");
 
         if (vflag) {
-            if (ip->ip_tos) {
-		(void)printf("(tos 0x%x", (int)ip->ip_tos);
-		/* ECN bits */
-		if (ip->ip_tos & 0x03) {
-                    switch (ip->ip_tos & 0x03) {
-                    case 1:
-                        (void)printf(",ECT(1)");
-                        break;
-                    case 2:
-                        (void)printf(",ECT(0)");
-                        break;
-                    case 3:
-                        (void)printf(",CE");
-                    }
-		}
+            (void)printf("(tos 0x%x", (int)ip->ip_tos);
+            /* ECN bits */
+            if (ip->ip_tos & 0x03) {
+                switch (ip->ip_tos & 0x03) {
+                case 1:
+                    (void)printf(",ECT(1)");
+                    break;
+                case 2:
+                    (void)printf(",ECT(0)");
+                    break;
+                case 3:
+                    (void)printf(",CE");
+                }
             }
+
             if (ip->ip_ttl >= 1)
                 (void)printf(", ttl %d", (int)ip->ip_ttl);    
 
