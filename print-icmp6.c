@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.69 2003-03-13 07:36:56 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.70 2003-05-02 08:13:55 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -100,8 +100,51 @@ print_lladdr(const u_int8_t *p, size_t l)
 	}
 }
 
+static int icmp6_cksum(const struct ip6_hdr *ip6, const struct icmp6_hdr *icp,
+	int len)
+{
+	int i;
+	register const u_int16_t *sp;
+	u_int32_t sum;
+	union {
+		struct {
+			struct in6_addr ph_src;
+			struct in6_addr ph_dst;
+			u_int32_t	ph_len;
+			u_int8_t	ph_zero[3];
+			u_int8_t	ph_nxt;
+		} ph;
+		u_int16_t pa[20];
+	} phu;
+
+	/* pseudo-header */
+	memset(&phu, 0, sizeof(phu));
+	phu.ph.ph_src = ip6->ip6_src;
+	phu.ph.ph_dst = ip6->ip6_dst;
+	phu.ph.ph_len = htonl(len);
+	phu.ph.ph_nxt = IPPROTO_ICMPV6;
+
+	sum = 0;
+	for (i = 0; i < sizeof(phu.pa) / sizeof(phu.pa[0]); i++)
+		sum += phu.pa[i];
+
+	sp = (const u_int16_t *)icp;
+
+	for (i = 0; i < (len & ~1); i += 2)
+		sum += *sp++;
+
+	if (len & 1)
+		sum += htons((*(const u_int8_t *)sp) << 8);
+
+	while (sum > 0xffff)
+		sum = (sum & 0xffff) + (sum >> 16);
+	sum = ~sum & 0xffff;
+
+	return (sum);
+}
+
 void
-icmp6_print(const u_char *bp, const u_char *bp2)
+icmp6_print(const u_char *bp, const u_char *bp2, int fragmented)
 {
 	const struct icmp6_hdr *dp;
 	const struct ip6_hdr *ip;
@@ -125,7 +168,20 @@ icmp6_print(const u_char *bp, const u_char *bp2)
 	else			/* XXX: jumbo payload case... */
 		icmp6len = snapend - bp;
 
-	TCHECK(dp->icmp6_code);
+	TCHECK(dp->icmp6_cksum);
+
+	if (vflag && !fragmented) {
+		int sum = dp->icmp6_cksum;
+
+		if (TTEST2(bp[0], icmp6len)) {
+			sum = icmp6_cksum(ip, dp, icmp6len);
+			if (sum != 0)
+				(void)printf("[bad icmp6 cksum %x!] ", sum);
+			else
+				(void)printf("[icmp6 sum ok] ");
+		}
+	}
+
 	switch (dp->icmp6_type) {
 	case ICMP6_DST_UNREACH:
 		TCHECK(oip->ip6_dst);
