@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.75 2002-09-15 16:28:28 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.76 2002-10-10 17:50:22 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -476,12 +476,12 @@ handle_ctrl_proto(u_int proto, const u_char *pptr, int length)
             /* XXX this is dirty but we do not get the
              * original pointer passed to the begin
              * the PPP packet */
-                if (!vflag)
+                if (vflag <= 1)
                     print_unknown_data(pptr-2,"\n\t",length+2);
 		break;
 	}
 
-        if (vflag)
+        if (vflag >1)
             print_unknown_data(pptr-2,"\n\t",length+2);
 }
 
