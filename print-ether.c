@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.74 2002-12-18 08:53:21 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.75 2002-12-18 09:41:15 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -134,11 +134,10 @@ ether_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 	ether_print(p, length, caplen);
 
 	/*
-	 * If "-x" was specified, print stuff past the Ethernet header,
-	 * if there's anything to print.
+	 * If "-x" was specified, print packet data in hex.
 	 */
-	if (xflag && caplen > ETHER_HDRLEN)
-		default_print(p + ETHER_HDRLEN, caplen - ETHER_HDRLEN);
+	if (xflag)
+		default_print_packet(p, caplen, ETHER_HDRLEN);
 
 	putchar('\n');
 

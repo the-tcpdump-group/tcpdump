@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sl.c,v 1.60 2002-12-18 08:53:24 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sl.c,v 1.61 2002-12-18 09:41:17 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -91,7 +91,7 @@ sl_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 	}
 
 	if (xflag)
-		default_print((u_char *)ip, caplen - SLIP_HDRLEN);
+		default_print_packet(p, caplen, SLIP_HDRLEN);
  out:
 	putchar('\n');
 	--infodelay;
@@ -134,7 +134,7 @@ sl_bsdos_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p
 	ip_print((u_char *)ip, length);
 
 	if (xflag)
-		default_print((u_char *)ip, caplen - SLIP_HDRLEN);
+		default_print_packet(p, caplen, SLIP_HDRLEN);
  out:
 	putchar('\n');
 	--infodelay;

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-fddi.c,v 1.59 2002-12-18 08:53:21 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-fddi.c,v 1.60 2002-12-18 09:41:15 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -321,11 +321,10 @@ fddi_if_print(u_char *pcap _U_, const struct pcap_pkthdr *h,
 	fddi_print(p, length, caplen);
 
 	/*
-	 * If "-x" was specified, print stuff past the FDDI header,
-	 * if there's anything to print.
+	 * If "-x" was specified, print packet data in hex.
 	 */
-	if (xflag && caplen > FDDI_HDRLEN)
-		default_print(p + FDDI_HDRLEN, caplen - FDDI_HDRLEN);
+	if (xflag)
+		default_print_packet(p, caplen, FDDI_HDRLEN);
 
 	putchar('\n');
 

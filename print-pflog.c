@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pflog.c,v 1.5 2002-12-18 08:53:22 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pflog.c,v 1.6 2002-12-18 09:41:17 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -102,6 +102,8 @@ pflog_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
 {
 	u_int length = h->len;
 	u_int caplen = h->caplen;
+	const u_char *orig_p;
+	u_int orig_caplen;
 	const struct pfloghdr *hdr;
 	u_int8_t af;
 
@@ -118,6 +120,13 @@ pflog_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
 	 * Rather than pass it all the way down, we set this global.
 	 */
 	snapend = p + caplen;
+
+	/*
+	 * Save the information for the full packet, so we can print
+	 * everything if "-e" and "-x" are both specified.
+	 */
+	orig_p = p;
+	orig_caplen = caplen;
 
 	hdr = (const struct pfloghdr *)p;
 	if (eflag)
@@ -147,7 +156,7 @@ pflog_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
 	}
 
 	if (xflag)
-		default_print(p, caplen);
+		default_print_packet(orig_p, orig_caplen, PFLOG_HDRLEN);
 out:
 	putchar('\n');
 	--infodelay;

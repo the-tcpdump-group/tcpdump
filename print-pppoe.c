@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.19 2002-12-18 08:53:23 guy Exp $ (LBL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.20 2002-12-18 09:41:17 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -110,11 +110,10 @@ pppoe_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
 	hdr_len = pppoe_print(p, length);
 
 	/*
-	 * If "-x" was specified, print stuff past the PPPoE and PPP headers,
-	 * if there's anything to print.
+	 * If "-x" was specified, print packet data in hex.
 	 */
-	if (xflag && caplen > hdr_len)
-		default_print(p + hdr_len, caplen - hdr_len);
+	if (xflag)
+		default_print_packet(p, caplen, hdr_len);
 
 	putchar('\n');
 

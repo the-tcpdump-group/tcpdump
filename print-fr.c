@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.9 2002-12-18 08:53:21 guy Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.10 2002-12-18 09:41:16 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -217,6 +217,8 @@ fr_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
 {
 	register u_int length = h->len;
 	register u_int caplen = h->caplen;
+	const u_char *orig_p;
+	u_int orig_caplen;
 	u_char protocol;
 	int layer2_len;
 	u_short extracted_ethertype;
@@ -239,6 +241,13 @@ fr_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
 
 	if (eflag)
 		fr_hdr_print(p, length);
+
+	/*
+	 * Save the information for the full packet, so we can print
+	 * everything if "-e" and "-x" are both specified.
+	 */
+	orig_p = p;
+	orig_caplen = caplen;
 
 	protocol = FR_PROTOCOL(p);
 	layer2_len = LAYER2_LEN(p);
@@ -288,7 +297,7 @@ fr_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
 	}
 
 	if (xflag)
-		default_print(p, caplen);
+		default_print_packet(orig_p, orig_caplen, layer2_len);
 out:
 	putchar('\n');
 }

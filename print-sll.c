@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sll.c,v 1.10 2002-12-18 08:53:24 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sll.c,v 1.11 2002-12-18 09:41:18 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -97,6 +97,8 @@ sll_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;
+	const u_char *orig_p;
+	u_int orig_caplen;
 	register const struct sll_header *sllp;
 	u_short ether_type;
 	u_short extracted_ethertype;
@@ -126,6 +128,16 @@ sll_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 	 */
 	snapend = p + caplen;
 
+	/*
+	 * Save the information for the full packet, so we can print
+	 * everything if "-e" and "-x" are both specified.
+	 */
+	orig_p = p;
+	orig_caplen = caplen;
+
+	/*
+	 * Go past the cooked-mode header.
+	 */
 	length -= SLL_HDR_LEN;
 	caplen -= SLL_HDR_LEN;
 	p += SLL_HDR_LEN;
@@ -182,7 +194,7 @@ sll_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 			default_print(p, caplen);
 	}
 	if (xflag)
-		default_print(p, caplen);
+		default_print_packet(orig_p, orig_caplen, SLL_HDR_LEN);
  out:
 	putchar('\n');
 	--infodelay;

@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.17 2002-12-18 08:53:19 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.18 2002-12-18 09:41:14 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -800,6 +800,8 @@ ieee802_11_print(const u_char *p, u_int length, u_int caplen)
 {
 	u_int16_t fc;
 	u_int HEADER_LENGTH;
+	const u_char *orig_p;
+	u_int orig_caplen;
 	const u_int8_t *src, *dst;
 	u_short extracted_ethertype;
 
@@ -825,6 +827,16 @@ ieee802_11_print(const u_char *p, u_int length, u_int caplen)
 	 */
 	snapend = p + caplen;
 
+	/*
+	 * Save the information for the full packet, so we can print
+	 * everything if "-e" and "-x" are both specified.
+	 */
+	orig_p = p;
+	orig_caplen = caplen;
+
+	/*
+	 * Go past the 802.11 header.
+	 */
 	length -= HEADER_LENGTH;
 	caplen -= HEADER_LENGTH;
 	p += HEADER_LENGTH;
@@ -879,7 +891,7 @@ ieee802_11_print(const u_char *p, u_int length, u_int caplen)
 	}
 
 	if (xflag)
-		default_print(p, caplen);
+		default_print_packet(orig_p, orig_caplen, HEADER_LENGTH);
 }
 
 /*

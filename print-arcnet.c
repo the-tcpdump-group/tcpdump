@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-arcnet.c,v 1.11 2002-12-18 08:53:19 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-arcnet.c,v 1.12 2002-12-18 09:41:14 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -37,7 +37,7 @@ static const char rcsid[] =
 #include "interface.h"
 #include "arcnet.h"
 
-int arcnet_encap_print(u_char arctype, const u_char *p,
+static int arcnet_encap_print(u_char arctype, const u_char *p,
     u_int length, u_int caplen);
 
 struct tok arctypemap[] = {
@@ -111,6 +111,8 @@ arcnet_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;
+	const u_char *orig_p;
+	u_int orig_caplen;
 	const struct arc_header *ap;
 
 	int phds, flag = 0, archdrlen = 0;
@@ -174,6 +176,16 @@ arcnet_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 	 */
 	snapend = p + caplen;
 
+	/*
+	 * Save the information for the full packet, so we can print
+	 * everything if "-e" and "-x" are both specified.
+	 */
+	orig_p = p;
+	orig_caplen = caplen;
+
+	/*
+	 * Go past the ARCNET header.
+	 */
 	length -= archdrlen;
 	caplen -= archdrlen;
 	p += archdrlen;
@@ -188,7 +200,7 @@ arcnet_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 
  out2:
 	if (xflag)
-		default_print(p, caplen);
+		default_print_packet(orig_p, orig_caplen, archdrlen);
 
  out:
 	putchar('\n');
@@ -205,7 +217,7 @@ arcnet_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
  */
 
 
-int
+static int
 arcnet_encap_print(u_char arctype, const u_char *p,
     u_int length, u_int caplen)
 {

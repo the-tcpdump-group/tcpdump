@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.131 2002-12-05 23:59:42 hannes Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.132 2002-12-18 09:41:18 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -446,7 +446,10 @@ They can later be printed with the \-r option.
 Standard output is used if \fIfile\fR is ``-''.
 .TP
 .B \-x
-Print each packet (minus its link level header) in hex.
+Print each packet (minus its link level header, unless
+.B \-e
+is specified)
+in hex.
 The smaller of the entire packet or
 .I snaplen
 bytes will be printed.  Note that this is the entire link-layer

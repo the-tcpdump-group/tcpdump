@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.189 2002-12-12 07:28:36 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.190 2002-12-18 09:41:19 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -795,12 +795,37 @@ default_print_unaligned(register const u_char *cp, register u_int length)
 #endif
 
 /*
- * By default, print the packet out in hex.
+ * By default, print the specified data out in hex.
  */
 void
 default_print(register const u_char *bp, register u_int length)
 {
 	default_print_unaligned(bp, length);
+}
+
+/*
+ * By default, print the packet out in hex; if eflag is set, print
+ * everything, otherwise print everything except for the link-layer
+ * header.
+ */
+void
+default_print_packet(register const u_char *bp, register u_int length,
+    u_int hdr_length)
+{
+	if (eflag) {
+		/*
+		 * Include the link-layer header.
+		 */
+		default_print_unaligned(bp, length);
+	} else {
+		/*
+		 * Don't include the link-layer header - and if we have
+		 * nothing past the link-layer header, print nothing.
+		 */
+		if (length > hdr_length)
+			default_print_unaligned(bp + hdr_length,
+			    length - hdr_length);
+	}
 }
 
 #ifdef SIGINFO

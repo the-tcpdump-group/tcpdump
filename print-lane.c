@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lane.c,v 1.18 2002-12-18 08:53:22 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lane.c,v 1.19 2002-12-18 09:41:16 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -128,6 +128,9 @@ lane_print(const u_char *p, u_int length, u_int caplen)
 	 */
 	snapend = p + caplen;
 
+	/*
+	 * Go past the LANE header.
+	 */
 	length -= sizeof(struct lecdatahdr_8023);
 	caplen -= sizeof(struct lecdatahdr_8023);
 	ep = (struct lecdatahdr_8023 *)p;
@@ -161,8 +164,6 @@ lane_print(const u_char *p, u_int length, u_int caplen)
 		if (!xflag && !qflag)
 			default_print(p, caplen);
 	}
-	if (xflag)
-		default_print(p, caplen);
 }
 
 void
@@ -175,6 +176,13 @@ lane_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 	ts_print(&h->ts);
 
 	lane_print(p, length, caplen);
+
+	/*
+	 * If "-x" was specified, print packet data in hex.
+	 */
+	if (xflag)
+		default_print_packet(p, caplen,
+		    sizeof(struct lecdatahdr_8023));
 
 	putchar('\n');
 	--infodelay;

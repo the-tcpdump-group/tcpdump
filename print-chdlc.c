@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.25 2002-12-18 08:53:20 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.26 2002-12-18 09:41:15 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -132,7 +132,7 @@ chdlc_print(register const u_char *p, u_int length, u_int caplen)
                 break;
 	}
 	if (xflag)
-		default_print((const u_char *)ip, caplen - CHDLC_HDRLEN);
+		default_print_packet(p, caplen, CHDLC_HDRLEN);
 }
 
 struct cisco_slarp {

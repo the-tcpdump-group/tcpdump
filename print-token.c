@@ -25,7 +25,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-token.c,v 1.20 2002-12-18 08:53:24 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-token.c,v 1.21 2002-12-18 09:41:18 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -208,11 +208,10 @@ token_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 	hdr_len = token_print(p, length, caplen);
 
 	/*
-	 * If "-x" was specified, print stuff past the Token Ring header,
-	 * if there's anything to print.
+	 * If "-x" was specified, print packet data in hex.
 	 */
-	if (xflag && caplen > hdr_len)
-		default_print(p + hdr_len, caplen - hdr_len);
+	if (xflag)
+		default_print_packet(p, caplen, hdr_len);
 
 	putchar('\n');
 
