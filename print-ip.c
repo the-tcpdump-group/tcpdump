@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.105 2002-06-11 17:08:49 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.106 2002-07-14 14:14:50 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -306,6 +306,34 @@ ip_print(register const u_char *bp, register u_int length)
 	len -= hlen;
 	len0 = len;
 
+        printf("IP ");
+
+        if (vflag) {
+            if (ip->ip_tos) {
+		(void)printf("(tos 0x%x", (int)ip->ip_tos);
+		/* ECN bits */
+		if (ip->ip_tos & 0x03) {
+                    switch (ip->ip_tos & 0x03) {
+                    case 1:
+                        (void)printf(",ECT(1)");
+                        break;
+                    case 2:
+                        (void)printf(",ECT(0)");
+                        break;
+                    case 3:
+                        (void)printf(",CE");
+                    }
+		}
+            }
+            if (ip->ip_ttl >= 1)
+                (void)printf(", ttl %d", (int)ip->ip_ttl);    
+
+            if ((off & 0x3fff) == 0)
+                (void)printf(", id %d", (int)ntohs(ip->ip_id));
+            (void)printf(", len %d) ", (int)ntohs(ip->ip_len));
+	}
+
+
 	/*
 	 * If this is fragment zero, hand it to the next higher
 	 * level protocol.
@@ -508,42 +536,10 @@ again:
 	} else if (off & IP_DF)
 		(void)printf(" (DF)");
 
-	if (ip->ip_tos) {
-		(void)printf(" [tos 0x%x", (int)ip->ip_tos);
-		/* ECN bits */
-		if (ip->ip_tos & 0x03) {
-			switch (ip->ip_tos & 0x03) {
-			case 1:
-				(void)printf(",ECT(1)");
-				break;
-			case 2:
-				(void)printf(",ECT(0)");
-				break;
-			case 3:
-				(void)printf(",CE");
-			}
-		}
-		(void)printf("] ");
-	}
-
-	if (ip->ip_ttl <= 1)
-		(void)printf(" [ttl %d]", (int)ip->ip_ttl);
-
 	if (vflag) {
 		int sum;
 		char *sep = "";
 
-		printf(" (");
-		if (ip->ip_ttl > 1) {
-			(void)printf("%sttl %d", sep, (int)ip->ip_ttl);
-			sep = ", ";
-		}
-		if ((off & 0x3fff) == 0) {
-			(void)printf("%sid %d", sep, (int)ntohs(ip->ip_id));
-			sep = ", ";
-		}
-		(void)printf("%slen %d", sep, (int)ntohs(ip->ip_len));
-		sep = ", ";
 		if ((u_char *)ip + hlen <= snapend) {
 			sum = in_cksum((const u_short *)ip, hlen, 0);
 			if (sum != 0) {
@@ -557,8 +553,8 @@ again:
 			(void)printf("%soptlen=%d", sep, hlen);
 			ip_optprint((u_char *)(ip + 1), hlen);
 		}
-		printf(")");
 	}
+
 }
 
 void
@@ -586,3 +582,5 @@ ipN_print(register const u_char *bp, register u_int length)
 		return;
 	}
 }
+
+
