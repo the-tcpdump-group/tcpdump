@@ -3,15 +3,15 @@ This file lists people who have contributed to tcpdump:
 The current maintainers:
 	Bill Fenner			<fenner@research.att.com>
 	Assar Westerlund 		<assar@sics.se>
-	Alexei				<kuznet@ms2.inr.ac.ru>
+	Alexey Kuznetsov		<kuznet@ms2.inr.ac.ru>
 	Jun-ichiro itojun Hagino	<itojun@iijlab.net>
-	Guy Harris 			<gharris@flashcom.net>
+	Guy Harris 			<guy@alum.mit.edu>
 	Torsten Landschoff 		<t.landschoff@gmx.net>
 	Michael Richardson 		<mcr@sandelman.ottawa.on.ca>
 
 Additional people who have contributed patches:
 
-					<aandres@mfom.es>
+	Alfredo Andres			<aandres@mfom.es>
 	Andrew Tridgell			<tridge@linuxcare.com>
 	Chris G. Demetriou		<cgd@netbsd.org>
 	Craig Rodrigues			<rodrigc@mediaone.net>
