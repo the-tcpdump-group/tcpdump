@@ -13,7 +13,7 @@
 
 #ifndef lint
 static char rcsid[] =
-    "@(#) $Id: print-rx.c,v 1.1 1999-11-17 05:45:58 assar Exp $";
+    "@(#) $Id: print-rx.c,v 1.2 1999-11-17 20:28:50 assar Exp $";
 #endif
 
 #include <sys/param.h>
@@ -603,8 +603,26 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 			t = (time_t) ntohl(*((int *) bp)); \
 			bp += sizeof(int32_t); \
 			tm = localtime(&t); \
-			strftime(str, 256, "%D %T", tm); \
+			strftime(str, 256, "%Y/%m/%d %T", tm); \
 			printf(" %s", str); \
+		}
+
+#define STOREATTROUT() { unsigned long mask, i; \
+			TRUNC((sizeof(int32_t)*6)); \
+			mask = ntohl(*((int *) bp)); bp += sizeof(int32_t); \
+			if (mask) printf (" StoreStatus"); \
+  		        if (mask & 1) { printf(" date"); DATEOUT(); } \
+			else bp += sizeof(int32_t); \
+			i = ntohl(*((int *) bp)); bp += sizeof(int32_t); \
+  		        if (mask & 2) printf(" owner %lu", i);  \
+			i = ntohl(*((int32_t *) bp)); bp += sizeof(int32_t); \
+  		        if (mask & 4) printf(" group %lu", i); \
+			i = ntohl(*((int32_t *) bp)); bp += sizeof(int32_t); \
+  		        if (mask & 8) printf(" mode %lo", i & 07777); \
+			i = ntohl(*((int32_t *) bp)); bp += sizeof(int32_t); \
+  		        if (mask & 16) printf(" segsize %lu", i); \
+			/* undocumented in 3.3 docu */ \
+  		        if (mask & 1024) printf(" fsync");  \
 		}
 
 #define UBIK_VERSIONOUT() {int32_t epoch; int32_t counter; \
@@ -698,7 +716,6 @@ fs_print(register const u_char *bp, int length)
 			break;
 		case 131:	/* Fetch ACL */
 		case 132:	/* Fetch Status */
-		case 135:	/* Store status */
 		case 143:	/* Old set lock */
 		case 144:	/* Old extend lock */
 		case 145:	/* Old release lock */
@@ -707,10 +724,13 @@ fs_print(register const u_char *bp, int length)
 		case 158:	/* Release lock */
 			FIDOUT();
 			break;
+		case 135:	/* Store status */
+			FIDOUT();
+			STOREATTROUT();
+			break;
 		case 133:	/* Store data */
 			FIDOUT();
-			TRUNC(sizeof(int32_t)*6); /* Skip past this */
-			bp += sizeof(int32_t) * 6;
+			STOREATTROUT();
 			printf(" offset");
 			UINTOUT();
 			printf(" length");
@@ -731,9 +751,13 @@ fs_print(register const u_char *bp, int length)
 			acl_print((u_char *) a, (u_char *) a + i);
 			break;
 		}
-		case 136:	/* Remove file */
 		case 137:	/* Create file */
 		case 141:	/* MakeDir */
+			FIDOUT();
+			STROUT(AFSNAMEMAX);
+			STOREATTROUT();
+			break;
+		case 136:	/* Remove file */
 		case 142:	/* Remove directory */
 			FIDOUT();
 			STROUT(AFSNAMEMAX);
