@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.59 2002-09-01 21:08:02 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.60 2002-09-03 14:21:42 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -130,6 +130,7 @@ static struct tok isis_pdu_values[] = {
 #define TLV_IP6_REACH           236
 #define TLV_MT_IP6_REACH        237
 #define TLV_PTP_ADJ             240
+#define TLV_IIH_SEQNR           241 /* draft-shen-isis-iih-sequence-00.txt */
 
 static struct tok isis_tlv_values[] = {
     { TLV_AREA_ADDR,	     "Area address(es)"},
@@ -168,6 +169,7 @@ static struct tok isis_tlv_values[] = {
     { TLV_IP6_REACH,         "IPv6 reachability"},
     { TLV_MT_IP6_REACH,      "Multi-Topology IP6 reachability"},
     { TLV_PTP_ADJ,           "Point-to-point Adjacency State"},
+    { TLV_IIH_SEQNR,         "Hello PDU Sequence Number"},
     { 0, NULL }
 };
 
@@ -2007,6 +2009,12 @@ static int isis_print (const u_char *p, u_int length)
                 tptr+=prefix_len/2;
                 tmp-=prefix_len/2;
             }
+            break;
+
+        case TLV_IIH_SEQNR:
+            if (!TTEST2(*tptr, 4)) /* check if four bytes are on the wire */
+                goto trunctlv;
+            printf("\n\t\tSequence number: %u", EXTRACT_32BITS(tptr) );
             break;
 
             /*
