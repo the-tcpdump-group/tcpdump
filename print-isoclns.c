@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.102 2003-10-28 19:10:15 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.103 2003-10-28 20:52:25 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -434,15 +434,11 @@ struct isis_tlv_lsp {
     u_int8_t checksum[2];
 };
 
-
-/* allocate space for the following string
- * xx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xx
- * 50 bytes plus one termination byte */
 static char *
 print_nsap(register const u_int8_t *pptr, register int nsap_length)
 {
 	int nsap_idx;
-	static char nsap_ascii_output[51];
+	static char nsap_ascii_output[sizeof("xx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xx")];
         char *junk_buf = nsap_ascii_output;
 
         if (nsap_length < 1 || nsap_length > 20) {
@@ -686,10 +682,7 @@ esis_print(const u_int8_t *p, u_int length)
 		}
 }
 
-/* shared routine for printing system, node and lsp-ids
- * allocate space for the worst-case string
- * xxxx.xxxx.xxxx.yy-zz
- * 20 bytes plus one termination byte */
+/* shared routine for printing system, node and lsp-ids */
 static char *
 isis_print_id(const u_int8_t *cp, int id_len)
 {
@@ -1229,13 +1222,14 @@ static int isis_print (const u_int8_t *p, u_int length)
 
 	case L1_LAN_IIH:
 	case L2_LAN_IIH:
-	    printf(", source-id %s",
+	    printf(", src-id %s",
                    isis_print_id(header_iih_lan->source_id,SYSTEM_ID_LEN));
-	    printf(", DIS lan-id %s",
-                   isis_print_id(header_iih_lan->lan_id,NODE_ID_LEN));
+	    printf(", lan-id %s, prio %u",
+                   isis_print_id(header_iih_lan->lan_id,NODE_ID_LEN),
+                   header_iih_lan->priority);
 	    break;
 	case PTP_IIH:
-	    printf(", source-id %s", isis_print_id(header_iih_ptp->source_id,SYSTEM_ID_LEN));
+	    printf(", src-id %s", isis_print_id(header_iih_ptp->source_id,SYSTEM_ID_LEN));
 	    break;
 	case L1_LSP:
 	case L2_LSP:
@@ -1246,11 +1240,11 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    break;
 	case L1_CSNP:
 	case L2_CSNP:
-	    printf(", source-id %s", isis_print_id(header_csnp->source_id,SYSTEM_ID_LEN));
+	    printf(", src-id %s", isis_print_id(header_csnp->source_id,SYSTEM_ID_LEN));
 	    break;
 	case L1_PSNP:
 	case L2_PSNP:
-	    printf(", source-id %s", isis_print_id(header_psnp->source_id,SYSTEM_ID_LEN));
+	    printf(", src-id %s", isis_print_id(header_psnp->source_id,SYSTEM_ID_LEN));
 	    break;
 
 	}
@@ -1296,14 +1290,14 @@ static int isis_print (const u_int8_t *p, u_int length)
 	}
 
 	TCHECK(*header_iih_lan);
-	printf("\n\t  source-id:  %s,  holding time: %us, Flags: [%s]",
+	printf("\n\t  source-id: %s,  holding time: %us, Flags: [%s]",
                isis_print_id(header_iih_lan->source_id,SYSTEM_ID_LEN),
                EXTRACT_16BITS(header_iih_lan->holding_time),
                tok2str(isis_iih_circuit_type_values,
                        "unknown circuit type 0x%02x",
                        header_iih_lan->circuit_type));
 
-	printf("\n\t  DIS lan-id: %s, Priority: %u, PDU length: %u",
+	printf("\n\t  lan-id:    %s, Priority: %u, PDU length: %u",
                isis_print_id(header_iih_lan->lan_id, NODE_ID_LEN),
                (header_iih_lan->priority) & PRIORITY_MASK,
                pdu_len);
@@ -1723,22 +1717,23 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    if(tmp>=1) {
 		if (!TTEST2(*tptr, 1))
 		    goto trunctlv;
-		printf("\n\t      Adjacency State: %s",
-		       tok2str(isis_ptp_adjancey_values, "0x%02x", *tptr));
+		printf("\n\t      Adjacency State: %s (%u)",
+		       tok2str(isis_ptp_adjancey_values, "unknown", *tptr),
+                        *tptr);
 		tmp--;
 	    }
 	    if(tmp>sizeof(tlv_ptp_adj->extd_local_circuit_id)) {
 		if (!TTEST2(tlv_ptp_adj->extd_local_circuit_id,
                             sizeof(tlv_ptp_adj->extd_local_circuit_id)))
 		    goto trunctlv;
-		printf("\n\t      Extended Local circuit ID: 0x%08x",
+		printf("\n\t      Extended Local circuit-ID: 0x%08x",
 		       EXTRACT_32BITS(tlv_ptp_adj->extd_local_circuit_id));
 		tmp-=sizeof(tlv_ptp_adj->extd_local_circuit_id);
 	    }
 	    if(tmp>=SYSTEM_ID_LEN) {
 		if (!TTEST2(tlv_ptp_adj->neighbor_sysid, SYSTEM_ID_LEN))
 		    goto trunctlv;
-		printf("\n\t      Neighbor SystemID: %s",
+		printf("\n\t      Neighbor System-ID: %s",
 		       isis_print_id(tlv_ptp_adj->neighbor_sysid,SYSTEM_ID_LEN));
 		tmp-=SYSTEM_ID_LEN;
 	    }
@@ -1746,7 +1741,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 		if (!TTEST2(tlv_ptp_adj->neighbor_extd_local_circuit_id,
                             sizeof(tlv_ptp_adj->neighbor_extd_local_circuit_id)))
 		    goto trunctlv;
-		printf("\n\t      Neighbor Extended Local circuit ID: 0x%08x",
+		printf("\n\t      Neighbor Extended Local circuit-ID: 0x%08x",
 		       EXTRACT_32BITS(tlv_ptp_adj->neighbor_extd_local_circuit_id));
 	    }
 	    break;
@@ -1756,12 +1751,14 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    while (tmp>0) {
 		if (!TTEST2(*(tptr), 1))
 		    goto trunctlv;
-		printf("%s",
+		printf("%s (0x%02x)",
                        tok2str(osi_nlpid_values,
-                               "Unknown 0x%02x",
-                               *tptr++));
+                               "unknown",
+                               *tptr),
+                       *tptr);
 		if (tmp>1) /* further NPLIDs ? - put comma */
 		    printf(", ");
+                tptr++;
                 tmp--;
 	    }
 	    break;
