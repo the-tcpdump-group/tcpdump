@@ -30,23 +30,18 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.31 2002-06-11 17:08:50 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.32 2002-08-01 08:53:13 risso Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include <string.h>
-#include <ctype.h>
-#include <sys/param.h>
-#include <sys/time.h>
-#include <sys/socket.h>
+#include <tcpdump-stdinc.h>
 
-#include <netinet/in.h>
+#include <string.h>
 
 #include <stdio.h>
-#include <netdb.h>
 
 #include "isakmp.h"
 #include "ipsec_doi.h"
@@ -677,11 +672,15 @@ isakmp_id_print(struct isakmp_gen *ext, u_char *ep, u_int32_t phase,
 		safememcpy(&id, ext, sizeof(id));
 		printf(" idtype=%s", STR_OR_ID(id.type, ipsecidtypestr));
 		if (id.proto_id) {
+#ifndef WIN32
 			setprotoent(1);
+#endif /* WIN32 */
 			pe = getprotobynumber(id.proto_id);
 			if (pe)
 				printf(" protoid=%s", pe->p_name);
+#ifndef WIN32
 			endprotoent();
+#endif /* WIN32 */
 		} else {
 			/* it DOES NOT mean IPPROTO_IP! */
 			printf(" protoid=%s", "0");

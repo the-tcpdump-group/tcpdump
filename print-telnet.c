@@ -51,19 +51,13 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.19 2002-06-11 17:08:57 itojun Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.20 2002-08-01 08:53:32 risso Exp $";
 #endif
 
-#include <sys/param.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <ctype.h>
-
-#include <netinet/in.h>
+#include <tcpdump-stdinc.h>
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
 
 #include "interface.h"

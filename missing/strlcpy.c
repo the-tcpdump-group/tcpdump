@@ -30,15 +30,16 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/missing/strlcpy.c,v 1.1 2000-01-19 05:34:19 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/missing/strlcpy.c,v 1.2 2002-08-01 08:53:40 risso Exp $ (LBL)";
 #endif
 
+#ifdef HAVE_CONFIG_H 
 #include <config.h>
+#endif
 
-#include <sys/types.h>
+#include <tcpdump-stdinc.h>
+
 #include <string.h>
-
-#include "interface.h"
 
 /*
  * Copy src to string dst of size siz.  At most siz-1 characters

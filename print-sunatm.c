@@ -34,14 +34,10 @@
 #include "config.h"
 #endif
 
-#include <sys/param.h>
-#include <sys/time.h>
-#include <sys/socket.h>
+#include <tcpdump-stdinc.h>
  
 struct mbuf;
 struct rtentry;
- 
-#include <netinet/in.h>
  
 #include <stdio.h>
 #include <pcap.h>

@@ -21,19 +21,17 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.76 2002-07-18 00:04:12 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.77 2002-08-01 08:53:37 risso Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include <sys/types.h>
-#include <sys/time.h>
-#include <sys/file.h>
+#include <tcpdump-stdinc.h>
+
 #include <sys/stat.h>
 
-#include <ctype.h>
 #include <errno.h>
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
@@ -46,7 +44,6 @@ static const char rcsid[] =
 #ifdef TIME_WITH_SYS_TIME
 #include <time.h>
 #endif
-#include <unistd.h>
 
 #include "interface.h"
 
@@ -361,7 +358,16 @@ read_infile(char *fname)
 	if (cc < 0)
 		error("read %s: %s", fname, pcap_strerror(errno));
 	if (cc != buf.st_size)
+#ifndef WIN32
 		error("short read %s (%d != %d)", fname, cc, (int)buf.st_size);
+#else
+/* Windows seems not to like the final \xa character */
+	{
+		char *pdest;
+		pdest=strchr( cp, '\xa');
+		*pdest=0;
+	}
+#endif WIN32
 	cp[(int)buf.st_size] = '\0';
 
 	return (cp);

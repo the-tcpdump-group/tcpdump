@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ripng.c,v 1.10 2001-11-16 08:59:22 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ripng.c,v 1.11 2002-08-01 08:53:26 risso Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -30,12 +30,17 @@ static const char rcsid[] =
 
 #ifdef INET6
 
-#include <sys/param.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/socket.h>
+#include <tcpdump-stdinc.h>
 
-#include <netinet/in.h>
+#ifdef __MINGW32__
+int
+IN6_ADDR_EQUAL(const struct in6_addr *a, const struct in6_addr *b)
+{
+    return (memcmp(a, b, sizeof(struct in6_addr)) == 0);
+}
+
+#define IN6_IS_ADDR_UNSPECIFIED(a) IN6_ADDR_EQUAL((a), &in6addr_any)
+#endif /* __MINGW32__ */
 
 #include <errno.h>
 #include <stdio.h>

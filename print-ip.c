@@ -21,24 +21,18 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.110 2002-07-28 04:14:21 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.111 2002-08-01 08:53:10 risso Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include <sys/param.h>
-#include <sys/time.h>
-#include <sys/socket.h>
+#include <tcpdump-stdinc.h>
 
-#include <netinet/in.h>
-
-#include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #include "addrtoname.h"
 #include "interface.h"
@@ -89,7 +83,7 @@ ip_finddst(const struct ip *ip)
 	int length;
 	int len;
 	const u_char *cp;
-	uint32_t retval;
+	u_int32_t retval;
 
 	cp = (const u_char *)(ip + 1);
 	length = (IP_HL(ip) << 2) - sizeof(struct ip);

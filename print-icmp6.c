@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.62 2002-06-27 08:21:40 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.63 2002-08-01 08:53:09 risso Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -32,19 +32,10 @@ static const char rcsid[] =
 
 #include <ctype.h>
 
-#include <sys/param.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-
-
-#include <netinet/in.h>
-
-#include <arpa/inet.h>
+#include <tcpdump-stdinc.h>
 
 #include <stdio.h>
 #include <string.h>
-#include <netdb.h>
 
 #include "ip6.h"
 #include "icmp6.h"

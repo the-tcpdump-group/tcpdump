@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.192 2002-07-21 20:48:26 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.193 2002-08-01 08:52:57 risso Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -27,8 +27,6 @@
 #ifdef HAVE_OS_PROTO_H
 #include "os-proto.h"
 #endif
-#include <sys/types.h>
-#include <sys/time.h>
 
 #ifndef HAVE___ATTRIBUTE__
 #define __attribute__(x)

@@ -21,27 +21,23 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sunrpc.c,v 1.40 2002-06-01 23:50:33 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sunrpc.c,v 1.41 2002-08-01 08:53:31 risso Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include <sys/param.h>
-#include <sys/time.h>
-#include <sys/socket.h>
-
-#include <netinet/in.h>
+#include <tcpdump-stdinc.h>
 
 #include <rpc/rpc.h>
 #ifdef HAVE_RPC_RPCENT_H
 #include <rpc/rpcent.h>
 #endif
+#ifndef WIN32
 #include <rpc/pmap_prot.h>
+#endif /* WIN32 */
 
-#include <ctype.h>
-#include <netdb.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -136,16 +132,22 @@ static char *
 progstr(prog)
 	u_int32_t prog;
 {
+#ifndef WIN32
 	register struct rpcent *rp;
+#endif
 	static char buf[32];
 	static int lastprog = 0;
 
 	if (lastprog != 0 && prog == lastprog)
 		return (buf);
+#ifndef WIN32
 	rp = getrpcbynumber(prog);
 	if (rp == NULL)
+#endif /* WIN32 */
 		(void) snprintf(buf, sizeof(buf), "#%u", prog);
+#ifndef WIN32
 	else
 		strlcpy(buf, rp->r_name, sizeof(buf));
+#endif
 	return (buf);
 }

@@ -17,18 +17,17 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-msdp.c,v 1.2 2001-12-10 08:06:40 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-msdp.c,v 1.3 2002-08-01 08:53:20 risso Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
+#include <tcpdump-stdinc.h>
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-
-#include <netinet/in.h>
 
 #include "interface.h"
 #include "addrtoname.h"

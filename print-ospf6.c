@@ -23,20 +23,15 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf6.c,v 1.8 2002-06-11 17:08:53 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf6.c,v 1.9 2002-08-01 08:53:23 risso Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include <sys/param.h>
-#include <sys/time.h>
-#include <sys/socket.h>
+#include <tcpdump-stdinc.h>
 
-#include <netinet/in.h>
-
-#include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -86,6 +81,10 @@ static struct tok type2str[] = {
 };
 
 static char tstr[] = " [|ospf]";
+
+#ifdef WIN32
+#define inline __inline
+#endif /* WIN32 */
 
 /* Forwards */
 static inline void ospf6_print_seqage(u_int32_t, time_t);

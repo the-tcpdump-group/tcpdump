@@ -35,23 +35,18 @@
 
 #ifndef lint
 static const char rcsid[] =
-"@(#) $Header: /tcpdump/master/tcpdump/print-sctp.c,v 1.9 2002-06-11 17:08:56 itojun Exp $ (NETLAB/PEL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-sctp.c,v 1.10 2002-08-01 08:53:27 risso Exp $ (NETLAB/PEL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include <sys/param.h>
-#include <sys/time.h>
-#include <sys/socket.h>
+#include <tcpdump-stdinc.h>
 
-#include <unistd.h>
 #include "sctpHeader.h"
 #include "sctpConstants.h"
 #include <assert.h>
-
-#include <netinet/in.h>
 
 #include <stdio.h>
 #include <string.h>

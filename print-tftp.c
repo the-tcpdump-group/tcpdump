@@ -23,24 +23,20 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tftp.c,v 1.31 1999-11-21 09:37:03 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tftp.c,v 1.32 2002-08-01 08:53:32 risso Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include <sys/param.h>
-#include <sys/time.h>
-
-#include <netinet/in.h>
+#include <tcpdump-stdinc.h>
 
 #ifdef SEGSIZE
 #undef SEGSIZE					/* SINIX sucks */
 #endif
 #include <arpa/tftp.h>
 
-#include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 

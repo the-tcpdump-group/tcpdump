@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.179 2002-07-11 09:17:25 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.180 2002-08-01 08:53:37 risso Exp $ (LBL)";
 #endif
 
 /*
@@ -45,18 +45,22 @@ static const char rcsid[] =
 #include "config.h"
 #endif
 
-#include <sys/types.h>
-#include <sys/time.h>
+#include <tcpdump-stdinc.h>
 
-#include <netinet/in.h>
+#ifdef WIN32
+#include "getopt.h"
+#include "w32_fzs.h"
+extern int strcasecmp (const char *__s1, const char *__s2);
+extern int SIZE_BUF;
+#define off_t long
+#define uint UINT
+#endif /* WIN32 */
 
 #include <pcap.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <ctype.h>
 
 
 #include "interface.h"
@@ -207,10 +211,26 @@ main(int argc, char **argv)
 	register char *cp, *infile, *cmdbuf, *device, *RFileName, *WFileName;
 	pcap_handler printer;
 	struct bpf_program fcode;
+#ifndef WIN32
 	RETSIGTYPE (*oldhandler)(int);
+#endif
 	struct dump_info dumpinfo;
 	u_char *pcap_userdata;
 	char ebuf[PCAP_ERRBUF_SIZE];
+	pcap_if_t *devpointer;
+	int devnum;
+#ifdef WIN32
+	int ii;
+	DWORD dwVersion;
+	DWORD dwWindowsMajorVersion;
+	u_int UserBufferSize=1000000;
+#endif
+
+#ifdef WIN32
+	dwVersion=GetVersion();		/* get the OS version */
+	dwWindowsMajorVersion =  (DWORD)(LOBYTE(LOWORD(dwVersion)));
+	if(wsockinit()!=0) return 1;
+#endif /* WIN32 */
 
 	cnt = -1;
 	device = NULL;
@@ -231,7 +251,11 @@ main(int argc, char **argv)
 
 	opterr = 0;
 	while (
-	    (op = getopt(argc, argv, "aAc:C:deE:fF:i:lm:nNOpqr:Rs:StT:uvw:xXY")) != -1)
+#ifdef WIN32
+	    (op = getopt(argc, argv, "aB:c:C:dDeE:fF:i:lm:nNOpqr:Rs:StT:uvw:xXY")) != -1)
+#else
+	    (op = getopt(argc, argv, "ac:C:dDeE:fF:i:lm:nNOpqr:Rs:StT:uvw:xXY")) != -1)
+#endif /* WIN32 */
 		switch (op) {
 
 		case 'a':
@@ -243,6 +267,14 @@ main(int argc, char **argv)
                        ++Xflag;
                        ++Aflag;
                        break;
+
+#ifdef WIN32
+		case 'B':
+			UserBufferSize = atoi(optarg)*1024;
+			if (UserBufferSize < 0)
+				error("invalid packet buffer size %s", optarg);
+			break;
+#endif /* WIN32 */
 
 		case 'c':
 			cnt = atoi(optarg);
@@ -259,6 +291,20 @@ main(int argc, char **argv)
 		case 'd':
 			++dflag;
 			break;
+
+		case 'D':
+			if (pcap_findalldevs(&devpointer, ebuf) < 0)
+				error("%s", ebuf);
+			else {
+				for (i = 0; devpointer != 0; i++) {
+					printf("%d.%s", i+1, devpointer->name);
+					if (devpointer->description != NULL)
+						printf(" (%s)", devpointer->description);
+					printf("\n");
+					devpointer = devpointer->next;
+				}
+			}
+			return 0;
 
 		case 'e':
 			++eflag;
@@ -280,6 +326,35 @@ main(int argc, char **argv)
 			break;
 
 		case 'i':
+			if (optarg[0] == '0' && optarg[1] == 0)
+				error("Invalid adapter index");
+			
+			/*
+			 * If the argument is a number, treat it as
+			 * an index into the list of adapters, as
+			 * printed by "tcpdump -D".
+			 *
+			 * This should be OK on UNIX systems, as interfaces
+			 * shouldn't have names that begin with digits.
+			 * It can be useful on Windows, where more than
+			 * one interface can have the same name.
+			 */
+			if ((devnum = atoi(optarg)) != 0) {
+				if (devnum < 0)
+					error("Invalid adapter index");
+
+				if (pcap_findalldevs(&devpointer, ebuf) < 0)
+					error("%s", ebuf);
+				else {
+					for (i = 0; i < devnum-1; i++){
+						devpointer = devpointer->next;
+						if (devpointer == NULL)
+							error("Invalid adapter index");
+					}
+				}
+				device = devpointer->name;
+				break;
+			}
 			device = optarg;
 			break;
 
@@ -417,7 +492,9 @@ main(int argc, char **argv)
 		 * Also, this prevents the user from reading anyone's
 		 * trace file.
 		 */
+#ifndef WIN32
 		setuid(getuid());
+#endif /* WIN32 */
 
 		pd = pcap_open_offline(RFileName, ebuf);
 		if (pd == NULL)
@@ -432,12 +509,35 @@ main(int argc, char **argv)
 			if (device == NULL)
 				error("%s", ebuf);
 		}
+#ifdef WIN32
+		else
+		{
+			if (!(dwVersion >= 0x80000000 && dwWindowsMajorVersion >= 4))			/* Windows '95 */
+			{
+				if(device[1]!=0)
+					device=(char*)SChar2WChar(device);
+			}
+			else{
+				for (ii=0;ii<(signed)strlen(device);ii++)
+				for (ii=strlen(device)-1;ii>0&&(device[ii]==' '||device[ii]=='\t');ii--)device[ii]='\0';
+				for (ii=0;ii<(signed)strlen(device)&&(device[ii]==' '||device[ii]=='\t');ii++);
+				strcpy(device,device+ii);
+			}
+		}
+		PrintCapBegins (program_name,device);
+#endif /* WIN32 */
 		*ebuf = '\0';
 		pd = pcap_open_live(device, snaplen, !pflag, 1000, ebuf);
 		if (pd == NULL)
 			error("%s", ebuf);
 		else if (*ebuf)
 			warning("%s", ebuf);
+#ifdef WIN32
+		if(UserBufferSize != 1000000)
+			if(pcap_setbuff(pd, UserBufferSize)==-1){
+				error("%s", pcap_geterr(pd));
+			}
+#endif /* WIN32 */
 		i = pcap_snapshot(pd);
 		if (snaplen < i) {
 			warning("snaplen raised from %d to %d", snaplen, i);
@@ -451,7 +551,9 @@ main(int argc, char **argv)
 		/*
 		 * Let user own process after socket has been opened.
 		 */
+#ifndef WIN32
 		setuid(getuid());
+#endif /* WIN32 */
 	}
 	if (infile)
 		cmdbuf = read_infile(infile);
@@ -462,6 +564,9 @@ main(int argc, char **argv)
 		error("%s", pcap_geterr(pd));
 	if (dflag) {
 		bpf_dump(&fcode, dflag);
+#ifdef WIN32
+	    pcap_close(pd);
+#endif /* WIN32 */
 		exit(0);
 	}
 	init_addrtoname(localnet, netmask);
@@ -469,8 +574,10 @@ main(int argc, char **argv)
 	(void)setsignal(SIGTERM, cleanup);
 	(void)setsignal(SIGINT, cleanup);
 	/* Cooperate with nohup(1) */
+#ifndef WIN32	
 	if ((oldhandler = setsignal(SIGHUP, cleanup)) != SIG_DFL)
 		(void)setsignal(SIGHUP, oldhandler);
+#endif /* WIN32 */
 
 	if (pcap_setfilter(pd, &fcode) < 0)
 		error("%s", pcap_geterr(pd));
@@ -495,11 +602,13 @@ main(int argc, char **argv)
 		(void)setsignal(SIGINFO, requestinfo);
 #endif
 	}
+#ifndef WIN32
 	if (RFileName == NULL) {
 		(void)fprintf(stderr, "%s: listening on %s\n",
 		    program_name, device);
 		(void)fflush(stderr);
 	}
+#endif /* WIN32 */
 	if (pcap_loop(pd, cnt, printer, pcap_userdata) < 0) {
 		(void)fprintf(stderr, "%s: pcap_loop: %s\n",
 		    program_name, pcap_geterr(pd));
@@ -537,8 +646,10 @@ info(register int verbose)
 		(void)fprintf(stderr, "pcap_stats: %s\n", pcap_geterr(pd));
 		return;
 	}
+
 	if (!verbose)
 		fprintf(stderr, "%s: ", program_name);
+
 	(void)fprintf(stderr, "%d packets received by filter", stat.ps_recv);
 	if (!verbose)
 		fputs(", ", stderr);
@@ -632,6 +743,13 @@ default_print_unaligned(register const u_char *cp, register u_int length)
 	}
 }
 
+#ifdef WIN32
+	char WDversion[]="current-cvs.tcpdump.org";
+	char version[]="current-cvs.tcpdump.org";
+	char pcap_version[]="current-cvs.tcpdump.org";
+	char Wpcap_version[]="3.0 alpha";
+#endif
+
 /*
  * By default, print the packet out in hex.
  */
@@ -657,10 +775,19 @@ usage(void)
 	extern char version[];
 	extern char pcap_version[];
 
+#ifdef WIN32
+	(void)fprintf(stderr, "%s version %s, based on tcpdump version %s\n", program_name, WDversion, version);
+	(void)fprintf(stderr, "WinPcap version %s, based on libpcap version %s\n",Wpcap_version, pcap_version);
+#else	
 	(void)fprintf(stderr, "%s version %s\n", program_name, version);
 	(void)fprintf(stderr, "libpcap version %s\n", pcap_version);
+#endif /* WIN32 */
 	(void)fprintf(stderr,
-"Usage: %s [-aAdeflnNOpqRStuvxX] [ -c count ] [ -C file_size ]\n", program_name);
+#ifdef WIN32
+"Usage: %s [-adDeflnNOpqStuvxX] [-B size] [-c count] [ -C file_size ]\n", program_name);
+#else
+"Usage: %s [-adDeflnNOpqStuvxX] [-c count] [ -C file_size ]\n", program_name);
+#endif /* WIN32 */
 	(void)fprintf(stderr,
 "\t\t[ -F file ] [ -i interface ] [ -r file ] [ -s snaplen ]\n");
 	(void)fprintf(stderr,

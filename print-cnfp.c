@@ -34,21 +34,14 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cnfp.c,v 1.8 2001-09-17 21:57:58 fenner Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cnfp.c,v 1.9 2002-08-01 08:53:03 risso Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include <sys/types.h>
-#include <sys/time.h>
-#include <sys/socket.h>
-#include <netdb.h>
-
-#include <netinet/in.h>
-
-#include <arpa/inet.h>
+#include <tcpdump-stdinc.h>
 
 #include <stdio.h>
 #include <string.h>
