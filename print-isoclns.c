@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.87 2003-06-16 07:06:28 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.88 2003-06-17 06:05:22 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1248,7 +1248,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 
     pdu_type=header->pdu_type;
 
-    /* in non-verbose mode just lets print the basic PDU Type*/
+    /* in non-verbose mode print the basic PDU Type plus PDU specific brief information*/
     if (vflag < 1) {
         printf(", IS-IS, %s",
                tok2str(isis_pdu_values,"unknown PDU-Type %u",pdu_type));
