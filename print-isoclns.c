@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.66 2002-10-06 08:15:21 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.67 2002-10-09 14:04:07 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -91,47 +91,48 @@ static struct tok isis_pdu_values[] = {
  * encoding information in all sorts of places.  This is an enumeration of
  * the well known types.
  *
- * list taken from draft-ietf-isis-wg-tlv-codepoints-01.txt
+ * list taken from rfc3359 plus some memory from veterans ;-)
  */
 
-#define TLV_AREA_ADDR           1
-#define TLV_IS_REACH            2
-#define TLV_ESNEIGH             3
-#define TLV_PART_DIS            4
-#define TLV_PREFIX_NEIGH        5
-#define TLV_ISNEIGH             6
-#define TLV_ISNEIGH_VARLEN      7
-#define TLV_PADDING             8
-#define TLV_LSP                 9
-#define TLV_AUTH                10
-#define TLV_CHECKSUM            12
-#define TLV_LSP_BUFFERSIZE      14
-#define TLV_EXT_IS_REACH        22
-#define TLV_IS_ALIAS_ID         24 /* draft-ietf-isis-ext-lsp-frags */
+#define TLV_AREA_ADDR           1   /* iso10589 */
+#define TLV_IS_REACH            2   /* iso10589 */
+#define TLV_ESNEIGH             3   /* iso10589 */
+#define TLV_PART_DIS            4   /* iso10589 */
+#define TLV_PREFIX_NEIGH        5   /* iso10589 */
+#define TLV_ISNEIGH             6   /* iso10589 */
+#define TLV_ISNEIGH_VARLEN      7   /* iso10589 */
+#define TLV_PADDING             8   /* iso10589 */
+#define TLV_LSP                 9   /* iso10589 */
+#define TLV_AUTH                10  /* iso10589, draft-ietf-isis-hmac-03 */
+#define TLV_CHECKSUM            12  /* rfc3358 */
+#define TLV_LSP_BUFFERSIZE      14  /* iso10589 rev2 */
+#define TLV_EXT_IS_REACH        22  /* draft-ietf-isis-traffic-04 */
+#define TLV_IS_ALIAS_ID         24  /* draft-ietf-isis-ext-lsp-frags-02 */
 #define TLV_DECNET_PHASE4       42
 #define TLV_LUCENT_PRIVATE      66
-#define TLV_IP_REACH            128
-#define TLV_PROTOCOLS           129
-#define TLV_IP_REACH_EXT        130
-#define TLV_IDRP_INFO           131
-#define TLV_IPADDR              132
-#define TLV_IPAUTH              133
-#define TLV_TE_ROUTER_ID        134
-#define TLV_EXT_IP_REACH        135
-#define TLV_HOSTNAME            137
-#define TLV_SHARED_RISK_GROUP   138
+#define TLV_IP_REACH            128 /* rfc1195, rfc2966 */
+#define TLV_PROTOCOLS           129 /* rfc1195 */
+#define TLV_IP_REACH_EXT        130 /* rfc1195, rfc2966 */
+#define TLV_IDRP_INFO           131 /* rfc1195 */
+#define TLV_IPADDR              132 /* rfc1195 */
+#define TLV_IPAUTH              133 /* rfc1195 */
+#define TLV_TE_ROUTER_ID        134 /* draft-ietf-isis-traffic-04 */
+#define TLV_EXT_IP_REACH        135 /* draft-ietf-isis-traffic-04 */
+#define TLV_HOSTNAME            137 /* rfc2763 */
+#define TLV_SHARED_RISK_GROUP   138 /* draft-ietf-isis-gmpls-extensions-14 */
 #define TLV_NORTEL_PRIVATE1     176
 #define TLV_NORTEL_PRIVATE2     177
 #define TLV_HOLDTIME            198 /* ES-IS */
-#define TLV_RESTART_SIGNALING   211
-#define TLV_MT_IS_REACH         222
-#define TLV_MT_SUPPORTED        229
-#define TLV_IP6ADDR             232
-#define TLV_MT_IP_REACH         235
-#define TLV_IP6_REACH           236
-#define TLV_MT_IP6_REACH        237
-#define TLV_PTP_ADJ             240
-#define TLV_IIH_SEQNR           241 /* draft-shen-isis-iih-sequence-00.txt */
+#define TLV_RESTART_SIGNALING   211 /* draft-ietf-isis-restart-01 */
+#define TLV_MT_IS_REACH         222 /* draft-ietf-isis-wg-multi-topology-05 */
+#define TLV_MT_SUPPORTED        229 /* draft-ietf-isis-wg-multi-topology-05 */
+#define TLV_IP6ADDR             232 /* draft-ietf-isis-ipv6-02 */
+#define TLV_MT_IP_REACH         235 /* draft-ietf-isis-wg-multi-topology-05 */
+#define TLV_IP6_REACH           236 /* draft-ietf-isis-ipv6-02 */
+#define TLV_MT_IP6_REACH        237 /* draft-ietf-isis-wg-multi-topology-05 */
+#define TLV_PTP_ADJ             240 /* rfc3373 */
+#define TLV_IIH_SEQNR           241 /* draft-shen-isis-iih-sequence-00 */
+#define TLV_VENDOR_PRIVATE      250 /* draft-ietf-isis-proprietary-tlv-00 */
 
 static struct tok isis_tlv_values[] = {
     { TLV_AREA_ADDR,	     "Area address(es)"},
@@ -172,6 +173,7 @@ static struct tok isis_tlv_values[] = {
     { TLV_MT_IP6_REACH,      "Multi-Topology IP6 reachability"},
     { TLV_PTP_ADJ,           "Point-to-point Adjacency State"},
     { TLV_IIH_SEQNR,         "Hello PDU Sequence Number"},
+    { TLV_VENDOR_PRIVATE,    "Vendor Private"},
     { 0, NULL }
 };
 
@@ -2126,6 +2128,16 @@ static int isis_print (const u_char *p, u_int length)
             printf("\n\t\tSequence number: %u", EXTRACT_32BITS(tptr) );
             break;
 
+        case TLV_VENDOR_PRIVATE:
+            if (!TTEST2(*tptr, 3)) /* check if enough byte for a full oui */
+                goto trunctlv;
+            printf("\n\t\tVendor OUI Code: 0x%06x", EXTRACT_24BITS(tptr) );
+            tptr+=3;
+            tmp-=3;
+            if (tmp > 0) /* hexdump the rest */
+                if(!print_unknown_data(tptr,"\n\t\t",tmp))
+                    return(0);
+            break;
             /*
              * FIXME those are the defined TLVs that lack a decoder
              * you are welcome to contribute code ;-)
