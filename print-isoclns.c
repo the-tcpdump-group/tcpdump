@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.94 2003-08-13 02:26:52 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.95 2003-09-08 15:59:08 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -856,7 +856,7 @@ trunctlv:
 static int
 isis_print_is_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *ident) {
 
-        int i;
+        int priority_level;
         union { /* int to float conversion buffer for several subTLVs */
             float f; 
             u_int32_t i;
@@ -890,12 +890,13 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
             printf(", %.3f Mbps", bw.f*8/1000000 );
             break;
         case SUBTLV_EXT_IS_REACH_UNRESERVED_BW :
-            for (i = 0; i < 8; i++) {
+            for (priority_level = 0; priority_level < 8; priority_level++) {
                 bw.i = EXTRACT_32BITS(tptr);
                 printf("%s  priority level %d: %.3f Mbps",
                        ident,
-                       i,
+                       priority_level,
                        bw.f*8/1000000 );
+		tptr+=4;
             }
             break;
         case SUBTLV_EXT_IS_REACH_TE_METRIC:
@@ -912,13 +913,15 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
                    tok2str(gmpls_switch_cap_values, "Unknown", *(tptr)));
             printf(", LSP Encoding: %s",
                    tok2str(gmpls_encoding_values, "Unknown", *(tptr+1)));
+	    tptr+=4;
             printf("%s  Max LSP Bandwidth:",ident);
-            for (i = 0; i < 8; i++) {
+            for (priority_level = 0; priority_level < 8; priority_level++) {
                 bw.i = EXTRACT_32BITS(tptr);
                 printf("%s    priority level %d: %.3f Mbps",
                        ident,
-                       i,
+                       priority_level,
                        bw.f*8/1000000 );
+		tptr+=4;
             }
             subl-=36;
             /* there is some optional stuff left to decode but this is as of yet
