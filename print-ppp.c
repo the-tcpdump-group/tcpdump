@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.92 2003-11-30 00:18:04 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.93 2004-03-18 10:59:15 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1044,7 +1044,7 @@ ppp_print(register const u_char *p, u_int length)
 	}
 
         if (eflag)
-            printf("PPP-%s (0x%04x), length %u: ",
+            printf("%s (0x%04x), length %u: ",
                    tok2str(ppptype2str, "unknown", proto),
                    proto,
                    olen);
