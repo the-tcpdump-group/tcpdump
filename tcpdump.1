@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.109 2001-09-03 21:59:28 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.110 2001-10-03 07:41:31 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -31,6 +31,12 @@ tcpdump \- dump traffic on a network
 ] [
 .B \-c
 .I count
+]
+.br
+.ti +8
+[
+.B \-C
+.I max_file_size
 ] [
 .B \-F
 .I file
@@ -181,6 +187,16 @@ Attempt to convert network and broadcast addresses to names.
 .TP
 .B \-c
 Exit after receiving \fIcount\fP packets.
+.TP
+.B \-C
+Before writing a raw packet to a savefile, check whether the file is
+larger than \fImax_file_size\fP and, if so, close the current savefile
+and open a new one.  Savefiles after the first savefile will have the
+name specified with the
+.B \-w
+flag, with a number after it, starting at 2 and continuing upward.
+The units of \fImax_file_size\fP are millions of bytes (1,000,000 bytes,
+not 1,048,576 bytes).
 .TP
 .B \-d
 Dump the compiled packet-matching code in a human readable form to
