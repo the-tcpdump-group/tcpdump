@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.183 2002-08-06 04:36:12 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.184 2002-08-09 13:50:15 risso Exp $ (LBL)";
 #endif
 
 /*
@@ -222,7 +222,6 @@ main(int argc, char **argv)
 	int devnum;
 #endif
 #ifdef WIN32
-	int ii;
 	DWORD dwVersion;
 	DWORD dwWindowsMajorVersion;
 	u_int UserBufferSize=1000000;
@@ -520,21 +519,7 @@ main(int argc, char **argv)
 				error("%s", ebuf);
 		}
 #ifdef WIN32
-		else
-		{
-			if (!(dwVersion >= 0x80000000 && dwWindowsMajorVersion >= 4))			/* Windows '95 */
-			{
-				if(device[1]!=0)
-					device=(char*)SChar2WChar(device);
-			}
-			else{
-				for (ii=0;ii<(signed)strlen(device);ii++)
-				for (ii=strlen(device)-1;ii>0&&(device[ii]==' '||device[ii]=='\t');ii--)device[ii]='\0';
-				for (ii=0;ii<(signed)strlen(device)&&(device[ii]==' '||device[ii]=='\t');ii++);
-				strcpy(device,device+ii);
-			}
-		}
-		PrintCapBegins (program_name,device);
+		PrintCapBegins(program_name,device);
 #endif /* WIN32 */
 		*ebuf = '\0';
 		pd = pcap_open_live(device, snaplen, !pflag, 1000, ebuf);
