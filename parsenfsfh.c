@@ -42,7 +42,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/parsenfsfh.c,v 1.19 2001-06-15 00:17:58 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/parsenfsfh.c,v 1.20 2001-06-15 07:42:19 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -411,7 +411,7 @@ int ourself;		/* true if file handle was generated on this host */
 
 	    /* Save the actual handle, so it can be display with -u */
 	    for (i = 0; i < 32; i++)
-	    	(void)sprintf(&(fsidp->Opaque_Handle[i*2]), "%.2X", fhp[i]);
+	    	(void)snprintf(&(fsidp->Opaque_Handle[i*2]), 3, "%.2X", fhp[i]);
 
 	    fsidp->fsid_code = 0;
 	    fsidp->Fsid_dev.Minor = 257;
