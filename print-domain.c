@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.70 2001-02-20 06:03:42 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.71 2001-02-20 06:22:57 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -49,15 +49,15 @@ static const char rcsid[] =
 #include "extract.h"                    /* must come after interface.h */
 
 static char *ns_ops[] = {
-	"", " inv_q", " stat", " op3", " notify", " op5", " op6", " op7",
+	"", " inv_q", " stat", " op3", " notify", " update", " op6", " op7",
 	" op8", " updataA", " updateD", " updateDA",
 	" updateM", " updateMA", " zoneInit", " zoneRef",
 };
 
 static char *ns_resp[] = {
 	"", " FormErr", " ServFail", " NXDomain",
-	" NotImp", " Refused", " Resp6", " Resp7",
-	" Resp8", " Resp9", " Resp10", " Resp11",
+	" NotImp", " Refused", " YXDomain", " YXRRSet",
+	" NXRRSet", " NotAuth", " NotZone", " Resp11",
 	" Resp12", " Resp13", " Resp14", " NoChange",
 };
 
