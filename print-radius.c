@@ -44,7 +44,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "$Id: print-radius.c,v 1.24 2004-01-07 08:00:52 hannes Exp $";
+    "$Id: print-radius.c,v 1.25 2004-01-25 09:31:14 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -507,9 +507,16 @@ print_vendor_attr(register u_char *data, u_int length, u_short attr_code _U_)
            vendor_id);
 
     while (length >= 2) {
+	if(!TTEST2(*data, 2)) 
+		return;
+
         vendor_type = *(data);
         vendor_length = *(data+1);
+
         data+=2;
+	if(!TTEST2(*data, vendor_length))
+		return;
+
         printf("\n\t    Vendor Attribute: %u, Length: %u, Value: ",
                vendor_type,
                vendor_length);
@@ -803,14 +810,14 @@ radius_attr_print(register const u_char *attr, u_int length)
 
    while (length > 0)
    {
-     if (rad_attr->len == 0)
+     if (rad_attr->len == 0 && rad_attr->type < (TAM_SIZE(attr_type)-1))
      {
 	printf("\n\t  %s Attribute (%u), zero-length",
                attr_type[rad_attr->type].name,
                rad_attr->type);
 	return;
      }
-     if ( rad_attr->len <= length )
+     if ( rad_attr->len <= length && rad_attr->type < (TAM_SIZE(attr_type)-1))
      {
          printf("\n\t  %s Attribute (%u), length: %u, Value: ",
                 attr_type[rad_attr->type].name,
@@ -834,7 +841,7 @@ radius_attr_print(register const u_char *attr, u_int length)
         return;
      }
      /* do we want to see an additionally hexdump ? */
-     if (vflag> 1)
+     if (vflag> 1 && rad_attr->len >= 2)
          print_unknown_data((char *)rad_attr+2,"\n\t    ",(rad_attr->len)-2);
 
      length-=(rad_attr->len);
