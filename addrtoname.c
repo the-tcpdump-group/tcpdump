@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.93 2002-09-05 00:00:08 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.94 2002-10-05 19:19:24 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -411,7 +411,7 @@ lookup_protoid(const u_char *pi)
 const char *
 etheraddr_string(register const u_char *ep)
 {
-	register u_int i, j;
+	register u_int i;
 	register char *cp;
 	register struct enamemem *tp;
 	char buf[sizeof("00:00:00:00:00:00")];
@@ -429,13 +429,11 @@ etheraddr_string(register const u_char *ep)
 	}
 #endif
 	cp = buf;
-	if ((j = *ep >> 4) != 0)
-		*cp++ = hex[j];
+        *cp++ = hex[*ep >> 4 ];
 	*cp++ = hex[*ep++ & 0xf];
 	for (i = 5; (int)--i >= 0;) {
 		*cp++ = ':';
-		if ((j = *ep >> 4) != 0)
-			*cp++ = hex[j];
+                *cp++ = hex[*ep >> 4 ];
 		*cp++ = hex[*ep++ & 0xf];
 	}
 	*cp = '\0';
