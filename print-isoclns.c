@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.109 2003-11-26 08:50:48 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.110 2003-11-30 00:19:21 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -44,6 +44,7 @@ static const char rcsid[] _U_ =
 #include "ether.h"
 #include "extract.h"
 #include "gmpls.h"
+#include "oui.h"
 
 #define	NLPID_CLNS	129	/* 0x81 */
 #define	NLPID_ESIS	130	/* 0x82 */
@@ -1141,7 +1142,7 @@ static int isis_print (const u_int8_t *p, u_int length)
     u_int8_t ext_is_len, ext_ip_len, mt_len;
     const u_int8_t *optr, *pptr, *tptr;
     u_short packet_len,pdu_len;
-    u_int i;
+    u_int i,vendor_id;
 
     packet_len=length;
     optr = p; /* initialize the _o_riginal pointer to the packet start -
@@ -1962,7 +1963,10 @@ static int isis_print (const u_int8_t *p, u_int length)
         case TLV_VENDOR_PRIVATE:
             if (!TTEST2(*tptr, 3)) /* check if enough byte for a full oui */
                 goto trunctlv;
-            printf("\n\t      Vendor OUI Code: 0x%06x", EXTRACT_24BITS(tptr) );
+            vendor_id = EXTRACT_24BITS(tptr);
+            printf("\n\t      Vendor: %s (%u)",
+                   tok2str(oui_values,"Unknown",vendor_id),
+                   vendor_id);
             tptr+=3;
             tmp-=3;
             if (tmp > 0) /* hexdump the rest */
