@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.22 2002-04-07 02:54:03 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.23 2002-04-07 10:05:40 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -107,7 +107,12 @@ atm_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 		goto out;
 	}
 	if (p[0] != 0xaa || p[1] != 0xaa || p[2] != 0x03) {
-		/*XXX assume 802.6 MAC header from fore driver */
+		/*
+		 * XXX - assume 802.6 MAC header from Fore driver.
+		 * XXX - should we also assume it's not a MAC header
+		 * if it begins with 0xfe 0xfe 0x03, for RFC 2684
+		 * routed NLPID-formatted PDUs?
+		 */
 		if (eflag)
 			printf("%04x%04x %04x%04x ",
 			       p[0] << 24 | p[1] << 16 | p[2] << 8 | p[3],
