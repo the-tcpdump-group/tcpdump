@@ -1,3 +1,9 @@
+1999-11-17  Assar Westerlund  <assar@sics.se>
+
+	* bring in code from Ken Hornstein <kenh@cmf.nrl.navy.mil> at
+	/afs/transarc.com/public/afs-contrib/tools/tcpdump for parsing
+	AFS3 packets
+
 Sun Oct 30 JST 1999  itojun@iijlab.net
 	* bring in KAME IPv6/IPsec decoding code.
 	* bring in more portability fixes from Assar Westerlund <assar@sics.se>.
@@ -524,4 +530,4 @@ v2.0 Sun Jan 13 12:20:40 PST 1991
 
 - Initial public release.
 
-@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.56 1999-10-30 23:49:31 itojun Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.57 1999-11-17 05:47:36 assar Exp $ (LBL)
