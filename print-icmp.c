@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.62 2001-07-24 16:56:11 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.63 2001-10-27 07:21:34 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -285,6 +285,18 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2)
 
 	TCHECK(dp->icmp_code);
 	switch (dp->icmp_type) {
+	
+	case ICMP_ECHO:
+		TCHECK(dp->icmp_seq);
+		(void)snprintf(buf, sizeof(buf), "echo request seq %u", 
+			(unsigned)ntohs(dp->icmp_seq));
+		break;
+
+	case ICMP_ECHOREPLY:
+		TCHECK(dp->icmp_seq);
+		(void)snprintf(buf, sizeof(buf), "echo reply seq %u", 
+			(unsigned)ntohs(dp->icmp_seq));
+		break;
 
 	case ICMP_UNREACH:
 		TCHECK(dp->icmp_ip.ip_dst);
