@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.99 2001-09-17 06:22:33 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.100 2001-10-04 09:18:47 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -630,10 +630,12 @@ udp_print(register const u_char *bp, u_int length,
 			krb_print((const void *)(up + 1), length);
 		else if (ISPORT(L2TP_PORT))
 			l2tp_print((const u_char *)(up + 1), length);
+#if 0
  		else if (ISPORT(NETBIOS_NS_PORT))
 			nbt_udp137_print((const u_char *)(up + 1), length);
  		else if (ISPORT(NETBIOS_DGRAM_PORT))
  			nbt_udp138_print((const u_char *)(up + 1), length);
+#endif
 		else if (dport == 3456)
 			vat_print((const void *)(up + 1), length, up);
 		else if (ISPORT(ZEPHYR_SRV_PORT) || ISPORT(ZEPHYR_CLT_PORT))

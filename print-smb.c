@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.18 2001-09-17 21:58:04 fenner Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.19 2001-10-04 09:18:47 itojun Exp $";
 #endif
 
 #include <stdio.h>
@@ -209,7 +209,7 @@ print_trans2(const u_char *words, const u_char *dat, ...)
     }
 
     if (fn->descript.fn)
-	fn->descript.fn(param, data, pcnt, dcnt);
+	(*fn->descript.fn)(param, data, pcnt, dcnt);
     else {
 	smb_fdata(param, f1 ? f1 : (u_char *)"Paramaters=\n", param + pcnt);
 	smb_fdata(data, f2 ? f2 : (u_char *)"Data=\n", data + dcnt);
@@ -752,7 +752,7 @@ print_smb(const u_char *buf, const u_char *maxbuf)
 	}
 
 	if (fn->descript.fn)
-	    fn->descript.fn(words, data, buf, maxbuf);
+	    (*fn->descript.fn)(words, data, buf, maxbuf);
 	else {
 	    if (f1) {
 		printf("smbvwv[]=\n");
