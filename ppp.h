@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ppp.h,v 1.14 2003-05-22 15:29:22 hannes Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ppp.h,v 1.15 2004-08-18 14:56:28 hannes Exp $ (LBL) */
 /*
  * Point to Point Protocol (PPP) RFC1331
  *
@@ -19,6 +19,9 @@
 
 #define PPP_ADDRESS	0xff	/* The address byte value */
 #define PPP_CONTROL	0x03	/* The control byte value */
+
+#define PPP_WITHDIRECTION_IN  0x00 /* non-standard for DLT_PPP_WITHDIRECTION */
+#define PPP_WITHDIRECTION_OUT 0x01 /* non-standard for DLT_PPP_WITHDIRECTION */
 
 /* Protocol numbers */
 #define PPP_IP		0x0021	/* Raw IP */

@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.100 2004-07-15 00:16:49 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.101 2004-08-18 14:56:28 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1188,7 +1188,7 @@ handle_ppp(u_int proto, const u_char *p, int length)
 u_int
 ppp_print(register const u_char *p, u_int length)
 {
-	u_int proto;
+	u_int proto,ppp_header;
         u_int olen = length; /* _o_riginal length */
 	u_int hdr_len = 0;
 
@@ -1199,11 +1199,30 @@ ppp_print(register const u_char *p, u_int length)
 	if (length < 2)
 		goto trunc;
 	TCHECK2(*p, 2);
-	if (*p == PPP_ADDRESS && *(p + 1) == PPP_CONTROL) {
-		p += 2;			/* ACFC not used */
-		length -= 2;
-		hdr_len += 2;
-	}
+        ppp_header = EXTRACT_16BITS(p);
+
+        switch(ppp_header) {
+        case (PPP_WITHDIRECTION_IN  << 8 | PPP_CONTROL):
+            if (eflag) printf("In  ");
+            p += 2;
+            length -= 2;
+            hdr_len += 2;
+            break;
+        case (PPP_WITHDIRECTION_OUT << 8 | PPP_CONTROL):
+            if (eflag) printf("Out ");
+            p += 2;
+            length -= 2;
+            hdr_len += 2;
+            break;
+        case (PPP_ADDRESS << 8 | PPP_CONTROL):
+            p += 2;			/* ACFC not used */
+            length -= 2;
+            hdr_len += 2;
+            break;
+
+        default:
+            break;
+        }
 
 	if (length < 2)
 		goto trunc;
