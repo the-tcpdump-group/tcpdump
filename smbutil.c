@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.18 2002-01-17 04:38:29 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.18.2.1 2002-04-20 09:43:28 guy Exp $";
 #endif
 
 #include <sys/param.h>
@@ -26,7 +26,9 @@ static const char rcsid[] =
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef TIME_WITH_SYS_TIME
 #include <time.h>
+#endif
 
 #include "interface.h"
 #include "extract.h"
