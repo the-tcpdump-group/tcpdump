@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.86 2001-05-09 01:16:57 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.87 2001-06-25 21:38:50 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -245,7 +245,7 @@ tcp_print(register const u_char *bp, register u_int length,
 		} else if ((u_char *)tp + 4 + sizeof(struct rpc_msg)
 			   <= snapend &&
 			   sport == NFS_PORT) {
-			nfsreply_print((u_char *)tp + hlen + 4,length-hlen,
+			nfsreply_print((u_char *)tp + hlen + 4, length - hlen,
 				       (u_char *)ip);
 			return;
 		}
