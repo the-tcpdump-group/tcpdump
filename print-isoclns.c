@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.65 2002-10-05 19:37:28 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.66 2002-10-06 08:15:21 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -107,7 +107,7 @@ static struct tok isis_pdu_values[] = {
 #define TLV_CHECKSUM            12
 #define TLV_LSP_BUFFERSIZE      14
 #define TLV_EXT_IS_REACH        22
-#define TLV_IS_ALIAS_ID         24
+#define TLV_IS_ALIAS_ID         24 /* draft-ietf-isis-ext-lsp-frags */
 #define TLV_DECNET_PHASE4       42
 #define TLV_LUCENT_PRIVATE      66
 #define TLV_IP_REACH            128
@@ -478,9 +478,9 @@ void isoclns_print(const u_char *p, u_int length, u_int caplen,
 	header = (const struct isis_common_header *)p;
 	pdu_type = header->pdu_type & PDU_TYPE_MASK;
 
-        printf("%sOSI", caplen < 1 ? "|" : "");
+        printf("%sOSI ", caplen < 1 ? "|" : "");
         if (!eflag && esrc != NULL && edst != NULL)
-                (void)printf(" %s > %s, ",
+                (void)printf("%s > %s, ",
                          etheraddr_string(esrc),
                          etheraddr_string(edst));
 
@@ -1548,6 +1548,16 @@ static int isis_print (const u_char *p, u_int length)
             }
             break;
 
+        case TLV_IS_ALIAS_ID:
+            while (tmp >= NODE_ID_LEN+3+1) { /* is it worth attempting a decode ? */
+                ext_is_len = isis_print_ext_is_reach(tptr,"\n\t\t");
+                if (ext_is_len == 0) /* did something go wrong ? */
+                    goto trunctlv;                   
+                tmp-=ext_is_len;
+                tptr+=ext_is_len;
+            }
+            break;
+
         case TLV_EXT_IS_REACH:
             while (tmp >= NODE_ID_LEN+3+1) { /* is it worth attempting a decode ? */
                 ext_is_len = isis_print_ext_is_reach(tptr,"\n\t\t");
@@ -2121,7 +2131,6 @@ static int isis_print (const u_char *p, u_int length)
              * you are welcome to contribute code ;-)
              */
 
-        case TLV_IS_ALIAS_ID:
         case TLV_DECNET_PHASE4:
         case TLV_LUCENT_PRIVATE:
         case TLV_IPAUTH:
