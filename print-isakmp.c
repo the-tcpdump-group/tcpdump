@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.11 2000-04-24 12:49:11 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.12 2000-04-28 11:14:48 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -355,11 +355,11 @@ struct attrmap {
 static u_char *
 isakmp_attrmap_print(u_char *p, u_char *ep, struct attrmap *map, size_t nmap)
 {
-	u_short *q;
+	u_int16_t *q;
 	int totlen;
 	u_int32_t t, v;
 
-	q = (u_short *)p;
+	q = (u_int16_t *)p;
 	if (p[0] & 0x80)
 		totlen = 4;
 	else
@@ -393,11 +393,11 @@ isakmp_attrmap_print(u_char *p, u_char *ep, struct attrmap *map, size_t nmap)
 static u_char *
 isakmp_attr_print(u_char *p, u_char *ep)
 {
-	u_short *q;
+	u_int16_t *q;
 	int totlen;
 	u_int32_t t;
 
-	q = (u_short *)p;
+	q = (u_int16_t *)p;
 	if (p[0] & 0x80)
 		totlen = 4;
 	else

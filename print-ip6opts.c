@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-ip6opts.c,v 1.4 2000-04-09 19:15:59 assar Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-ip6opts.c,v 1.5 2000-04-28 11:14:48 itojun Exp $";
 #endif
 
 #ifdef INET6
@@ -92,7 +92,7 @@ ip6_opt_print(const u_char *bp, int len)
 		printf("(rtalert: invalid len %d)", bp[i + 1]);
 		goto trunc;
 	    }
-	    printf("(rtalert: 0x%04x) ", ntohs(*(u_short *)&bp[i + 2]));
+	    printf("(rtalert: 0x%04x) ", ntohs(*(u_int16_t *)&bp[i + 2]));
 	    optlen = IP6OPT_RTALERT_LEN;
 	    break;
 #ifndef IP6OPT_JUMBO
@@ -110,7 +110,7 @@ ip6_opt_print(const u_char *bp, int len)
 		printf("(jumbo: invalid len %d)", bp[i + 1]);
 		goto trunc;
 	    }
-	    printf("(jumbo: %u) ", (u_int32_t)ntohl(*(u_int *)&bp[i + 2]));
+	    printf("(jumbo: %u) ", (u_int32_t)ntohl(*(u_int32_t *)&bp[i + 2]));
 	    optlen = IP6OPT_JUMBO_LEN;
 	    break;
 	default:

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.35 2000-01-27 23:56:05 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.36 2000-04-28 11:14:48 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -470,7 +470,7 @@ ppp_if_print(u_char *user, const struct pcap_pkthdr *h,
 	 * and/or check that they're not walking off the end of the packet.
 	 * Rather than pass them all the way down, we set these globals.
 	 */
-	proto = ntohs(*(u_short *)&p[2]);
+	proto = ntohs(*(u_int16_t *)&p[2]);
 	packetp = p;
 	snapend = p + caplen;
 
@@ -555,7 +555,7 @@ ppp_bsdos_if_print(u_char *user, const struct pcap_pkthdr *h,
 	register u_int length = h->len;
 	register u_int caplen = h->caplen;
 	register int hdrlength;
-	u_short ptype;
+	u_int16_t ptype;
 	const u_char *q;
 	int i;
 
@@ -595,7 +595,7 @@ ppp_bsdos_if_print(u_char *user, const struct pcap_pkthdr *h,
 		hdrlength += 1;
 	} else {
 		/* Un-compressed protocol field */
-		ptype = ntohs(*(u_short *)p);
+		ptype = ntohs(*(u_int16_t *)p);
 		if (eflag) 
 			printf("%04x ", ptype);
 		p += 2;

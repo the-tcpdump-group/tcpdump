@@ -29,7 +29,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.3 1999-12-22 06:27:20 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.4 2000-04-28 11:14:47 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -232,7 +232,7 @@ trunc:
  */
 void
 dhcp6_print(register const u_char *cp, u_int length,
-	    u_short sport, u_short dport)
+	    u_int16_t sport, u_int16_t dport)
 {
 	union dhcp6 *dh6;
 	u_char *ep;
