@@ -1,5 +1,9 @@
 1999-11-17  Assar Westerlund  <assar@sics.se>
 
+	* print-rx.c: add code for printing MakeDir and StoreStatus.  Also
+	change date format to the right one.  From: Love
+	<lha@stacken.kth.se>
+
 	* Also add Ken's README as README-AFS
 	
 	* bring in code from Ken Hornstein <kenh@cmf.nrl.navy.mil> at
@@ -532,4 +536,4 @@ v2.0 Sun Jan 13 12:20:40 PST 1991
 
 - Initial public release.
 
-@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.58 1999-11-17 20:23:13 assar Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.59 1999-11-17 20:30:30 assar Exp $ (LBL)
