@@ -88,6 +88,9 @@
 /* define if libpcap has pcap_datalink_val_to_description() */
 #undef HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION
 
+/* define if you have getrpcbynumber() */
+#undef HAVE_GETRPCBYNUMBER
+
 /* define if unaligned memory accesses fail */
 #undef LBL_ALIGN
 

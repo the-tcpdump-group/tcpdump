@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.118 2004-09-15 01:21:17 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.119 2004-12-27 00:41:31 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -29,8 +29,6 @@ static const char rcsid[] _U_ =
 #endif
 
 #include <tcpdump-stdinc.h>
-
-#include <rpc/rpc.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -47,6 +45,8 @@ static const char rcsid[] _U_ =
 #include "ip6.h"
 #endif
 #include "ipproto.h"
+#include "rpc_auth.h"
+#include "rpc_msg.h"
 
 #include "nameser.h"
 
@@ -229,12 +229,12 @@ tcp_print(register const u_char *bp, register u_int length,
 	 * to NFS print routines.
 	 */
 	if (!qflag && hlen >= sizeof(*tp) && hlen <= length) {
-		if ((u_char *)tp + 4 + sizeof(struct rpc_msg) <= snapend &&
+		if ((u_char *)tp + 4 + sizeof(struct sunrpc_msg) <= snapend &&
 		    dport == NFS_PORT) {
 			nfsreq_print((u_char *)tp + hlen + 4, length - hlen,
 				     (u_char *)ip);
 			return;
-		} else if ((u_char *)tp + 4 + sizeof(struct rpc_msg)
+		} else if ((u_char *)tp + 4 + sizeof(struct sunrpc_msg)
 			   <= snapend &&
 			   sport == NFS_PORT) {
 			nfsreply_print((u_char *)tp + hlen + 4, length - hlen,

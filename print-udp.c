@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.134 2004-10-29 11:42:54 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.135 2004-12-27 00:41:32 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -34,8 +34,6 @@ static const char rcsid[] _U_ =
 #undef SEGSIZE
 #endif
 #include <arpa/tftp.h>
-
-#include <rpc/rpc.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -52,6 +50,8 @@ static const char rcsid[] _U_ =
 #include "ip6.h"
 #endif
 #include "ipproto.h"
+#include "rpc_auth.h"
+#include "rpc_msg.h"
 
 #include "nameser.h"
 #include "nfs.h"
@@ -468,8 +468,8 @@ udp_print(register const u_char *bp, u_int length,
 		return;
 	}
 	if (packettype) {
-		register struct rpc_msg *rp;
-		enum msg_type direction;
+		register struct sunrpc_msg *rp;
+		enum sunrpc_msg_type direction;
 
 		switch (packettype) {
 
@@ -484,9 +484,9 @@ udp_print(register const u_char *bp, u_int length,
 			break;
 
 		case PT_RPC:
-			rp = (struct rpc_msg *)(up + 1);
-			direction = (enum msg_type)EXTRACT_32BITS(&rp->rm_direction);
-			if (direction == CALL)
+			rp = (struct sunrpc_msg *)(up + 1);
+			direction = (enum sunrpc_msg_type)EXTRACT_32BITS(&rp->rm_direction);
+			if (direction == SUNRPC_CALL)
 				sunrpcrequest_print((u_char *)rp, length,
 				    (u_char *)ip);
 			else
@@ -534,24 +534,24 @@ udp_print(register const u_char *bp, u_int length,
 	}
 
 	if (!qflag) {
-		register struct rpc_msg *rp;
-		enum msg_type direction;
+		register struct sunrpc_msg *rp;
+		enum sunrpc_msg_type direction;
 
-		rp = (struct rpc_msg *)(up + 1);
+		rp = (struct sunrpc_msg *)(up + 1);
 		if (TTEST(rp->rm_direction)) {
-			direction = (enum msg_type)EXTRACT_32BITS(&rp->rm_direction);
-			if (dport == NFS_PORT && direction == CALL) {
+			direction = (enum sunrpc_msg_type)EXTRACT_32BITS(&rp->rm_direction);
+			if (dport == NFS_PORT && direction == SUNRPC_CALL) {
 				nfsreq_print((u_char *)rp, length,
 				    (u_char *)ip);
 				return;
 			}
-			if (sport == NFS_PORT && direction == REPLY) {
+			if (sport == NFS_PORT && direction == SUNRPC_REPLY) {
 				nfsreply_print((u_char *)rp, length,
 				    (u_char *)ip);
 				return;
 			}
 #ifdef notdef
-			if (dport == SUNRPC_PORT && direction == CALL) {
+			if (dport == SUNRPC_PORT && direction == SUNRPC_CALL) {
 				sunrpcrequest_print((u_char *)rp, length, (u_char *)ip);
 				return;
 			}

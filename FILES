@@ -105,6 +105,7 @@ packetdat.awk
 parsenfsfh.c
 pcap-missing.h
 pf.h
+pmap_prot.h
 ppp.h
 print-802_11.c
 print-ah.c
@@ -203,6 +204,8 @@ print-vrrp.c
 print-wb.c
 print-zephyr.c
 route6d.h
+rpc_auth.h
+rpc_msg.h
 rx.h
 sctpConstants.h
 sctpHeader.h
@@ -234,7 +237,6 @@ win32/Include/telnet.h
 win32/Include/w32_fzs.h
 win32/Include/Netinet/in_systm.h
 win32/Include/Netinet/ip.h
-win32/Include/Rpc/rpc.h
 win32/Src/getopt.c
 win32/prj/GNUmakefile
 win32/prj/WinDump.dsp

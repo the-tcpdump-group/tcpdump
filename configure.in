@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.182 2004-08-27 07:17:04 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.183 2004-12-27 00:41:30 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.182 $)
+AC_REVISION($Revision: 1.183 $)
 AC_PREREQ(2.50)
 AC_INIT(tcpdump.c)
 
@@ -533,8 +533,8 @@ AC_SEARCH_LIBS(dnet_htoa, dnet, AC_DEFINE(HAVE_DNET_HTOA))
 
 AC_CHECK_LIB(rpc, main)		dnl It's unclear why we might need -lrpc
 
-dnl HP/UX may need -lnsl for getrpcbynumber.
-AC_SEARCH_LIBS(getrpcbynumber, nsl)
+dnl Some platforms may need -lnsl for getrpcbynumber.
+AC_SEARCH_LIBS(getrpcbynumber, nsl, AC_DEFINE(HAVE_GETRPCBYNUMBER))
 
 dnl AC_CHECK_LIB(z, uncompress)
 dnl AC_CHECK_HEADERS(zlib.h)

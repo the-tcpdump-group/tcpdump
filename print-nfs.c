@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.103 2004-09-24 18:21:25 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.104 2004-12-27 00:41:31 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -29,8 +29,6 @@ static const char rcsid[] _U_ =
 #endif
 
 #include <tcpdump-stdinc.h>
-
-#include <rpc/rpc.h>
 
 #include <pcap.h>
 #include <stdio.h>
@@ -47,12 +45,14 @@ static const char rcsid[] _U_ =
 #ifdef INET6
 #include "ip6.h"
 #endif
+#include "rpc_auth.h"
+#include "rpc_msg.h"
 
 static void nfs_printfh(const u_int32_t *, const u_int);
-static void xid_map_enter(const struct rpc_msg *, const u_char *);
-static int32_t xid_map_find(const struct rpc_msg *, const u_char *,
+static void xid_map_enter(const struct sunrpc_msg *, const u_char *);
+static int32_t xid_map_find(const struct sunrpc_msg *, const u_char *,
 			    u_int32_t *, u_int32_t *);
-static void interp_reply(const struct rpc_msg *, u_int32_t, u_int32_t, int);
+static void interp_reply(const struct sunrpc_msg *, u_int32_t, u_int32_t, int);
 static const u_int32_t *parse_post_op_attr(const u_int32_t *, int);
 static void print_sattr3(const struct nfsv3_sattr *sa3, int verbose);
 static int print_int64(const u_int32_t *dp, int how);
@@ -321,12 +321,12 @@ void
 nfsreply_print(register const u_char *bp, u_int length,
 	       register const u_char *bp2)
 {
-	register const struct rpc_msg *rp;
+	register const struct sunrpc_msg *rp;
 	u_int32_t proc, vers;
 	char srcid[20], dstid[20];	/*fits 32bit*/
 
 	nfserr = 0;		/* assume no error */
-	rp = (const struct rpc_msg *)bp;
+	rp = (const struct sunrpc_msg *)bp;
 
 	if (!nflag) {
 		strlcpy(srcid, "nfs", sizeof(srcid));
@@ -339,9 +339,9 @@ nfsreply_print(register const u_char *bp, u_int length,
 	}
 	print_nfsaddr(bp2, srcid, dstid);
 	(void)printf("reply %s %d",
-		     EXTRACT_32BITS(&rp->rm_reply.rp_stat) == MSG_ACCEPTED?
-			     "ok":"ERR",
-			     length);
+	     EXTRACT_32BITS(&rp->rm_reply.rp_stat) == SUNRPC_MSG_ACCEPTED?
+		     "ok":"ERR",
+	     length);
 
 	if (xid_map_find(rp, bp2, &proc, &vers) >= 0)
 		interp_reply(rp, proc, vers, length);
@@ -352,7 +352,7 @@ nfsreply_print(register const u_char *bp, u_int length,
  * If the packet was truncated, return 0.
  */
 static const u_int32_t *
-parsereq(register const struct rpc_msg *rp, register u_int length)
+parsereq(register const struct sunrpc_msg *rp, register u_int length)
 {
 	register const u_int32_t *dp;
 	register u_int len;
@@ -452,7 +452,7 @@ void
 nfsreq_print(register const u_char *bp, u_int length,
     register const u_char *bp2)
 {
-	register const struct rpc_msg *rp;
+	register const struct sunrpc_msg *rp;
 	register const u_int32_t *dp;
 	nfs_type type;
 	int v3;
@@ -461,7 +461,7 @@ nfsreq_print(register const u_char *bp, u_int length,
 	char srcid[20], dstid[20];	/*fits 32bit*/
 
 	nfserr = 0;		/* assume no error */
-	rp = (const struct rpc_msg *)bp;
+	rp = (const struct sunrpc_msg *)bp;
 	if (!nflag) {
 		snprintf(srcid, sizeof(srcid), "%u",
 		    EXTRACT_32BITS(&rp->rm_xid));
@@ -840,7 +840,7 @@ int	xid_map_next = 0;
 int	xid_map_hint = 0;
 
 static void
-xid_map_enter(const struct rpc_msg *rp, const u_char *bp)
+xid_map_enter(const struct sunrpc_msg *rp, const u_char *bp)
 {
 	struct ip *ip = NULL;
 #ifdef INET6
@@ -888,7 +888,7 @@ xid_map_enter(const struct rpc_msg *rp, const u_char *bp)
  * version in vers return, or returns -1 on failure
  */
 static int
-xid_map_find(const struct rpc_msg *rp, const u_char *bp, u_int32_t *proc,
+xid_map_find(const struct sunrpc_msg *rp, const u_char *bp, u_int32_t *proc,
 	     u_int32_t *vers)
 {
 	int i;
@@ -955,11 +955,11 @@ xid_map_find(const struct rpc_msg *rp, const u_char *bp, u_int32_t *proc,
  * If the packet was truncated, return 0.
  */
 static const u_int32_t *
-parserep(register const struct rpc_msg *rp, register u_int length)
+parserep(register const struct sunrpc_msg *rp, register u_int length)
 {
 	register const u_int32_t *dp;
 	u_int len;
-	enum accept_stat astat;
+	enum sunrpc_accept_stat astat;
 
 	/*
 	 * Portability note:
@@ -993,30 +993,30 @@ parserep(register const struct rpc_msg *rp, register u_int length)
 	astat = EXTRACT_32BITS(dp);
 	switch (astat) {
 
-	case SUCCESS:
+	case SUNRPC_SUCCESS:
 		break;
 
-	case PROG_UNAVAIL:
+	case SUNRPC_PROG_UNAVAIL:
 		printf(" PROG_UNAVAIL");
 		nfserr = 1;		/* suppress trunc string */
 		return (NULL);
 
-	case PROG_MISMATCH:
+	case SUNRPC_PROG_MISMATCH:
 		printf(" PROG_MISMATCH");
 		nfserr = 1;		/* suppress trunc string */
 		return (NULL);
 
-	case PROC_UNAVAIL:
+	case SUNRPC_PROC_UNAVAIL:
 		printf(" PROC_UNAVAIL");
 		nfserr = 1;		/* suppress trunc string */
 		return (NULL);
 
-	case GARBAGE_ARGS:
+	case SUNRPC_GARBAGE_ARGS:
 		printf(" GARBAGE_ARGS");
 		nfserr = 1;		/* suppress trunc string */
 		return (NULL);
 
-	case SYSTEM_ERR:
+	case SUNRPC_SYSTEM_ERR:
 		printf(" SYSTEM_ERR");
 		nfserr = 1;		/* suppress trunc string */
 		return (NULL);
@@ -1444,7 +1444,7 @@ trunc:
 }
 
 static void
-interp_reply(const struct rpc_msg *rp, u_int32_t proc, u_int32_t vers, int length)
+interp_reply(const struct sunrpc_msg *rp, u_int32_t proc, u_int32_t vers, int length)
 {
 	register const u_int32_t *dp;
 	register int v3;
