@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.140 2003-02-26 18:58:04 mcr Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.141 2003-03-11 06:37:26 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -854,6 +854,42 @@ True if the DECNET destination address is
 .IP "\fBdecnet host \fIhost\fR"
 True if either the DECNET source or destination address is
 .IR host .
+.IP "\fBifname \fIinterface\fR"
+True if the packet was logged as coming from the specified interface (applies
+only to packets logged by OpenBSD's
+.BR pf (4)).
+.IP "\fBon \fIinterface\fR"
+Synonymous with the
+.B ifname
+modifier.
+.IP "\fBrnr \fInum\fR"
+True if the packet was logged as matching the specified PF rule number
+(applies only to packets logged by OpenBSD's
+.BR pf (4)).
+.IP "\fBrulenum \fInum\fR"
+Synonomous with the
+.B rnr
+modifier.
+.IP "\fBreason \fIcode\fR"
+True if the packet was logged with the specified PF reason code.  The known
+codes are:
+.BR match ,
+.BR bad-offset ,
+.BR fragment ,
+.BR short ,
+.BR normalize ,
+and
+.B memory
+(applies only to packets logged by OpenBSD's
+.BR pf (4)).
+.IP "\fBaction \fIact\fR"
+True if PF took the specified action when the packet was logged.  Known actions
+are:
+.B pass
+and
+.B block
+(applies only to packets logged by OpenBSD's
+.BR pf(4)).
 .IP "\fBip\fR, \fBip6\fR, \fBarp\fR, \fBrarp\fR, \fBatalk\fR, \fBaarp\fR, \fBdecnet\fR, \fBiso\fR, \fBstp\fR, \fBipx\fR, \fInetbeui\fP"
 Abbreviations for:
 .in +.5i
