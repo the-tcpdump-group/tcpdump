@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.67 2001-07-05 18:54:14 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.68 2001-07-18 09:19:47 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -186,6 +186,21 @@ atalk_print(register const u_char *bp, u_int length)
 	       ddpskt_string(dp->dstSkt));
 	bp += ddpSize;
 	length -= ddpSize;
+#ifdef LBL_ALIGN
+	if ((long)bp & 3) {
+		static u_char *abuf = NULL;
+
+		if (abuf == NULL) {
+			abuf = (u_char *)malloc(snaplen);
+			if (abuf == NULL)
+				error("atalk_print: malloc");
+		}
+		memcpy((char *)abuf, (char *)bp, min(length, snaplen));
+		snapend += abuf - (u_char *)bp;
+		packetp = abuf;
+		bp = abuf;
+	}
+#endif
 	ddp_print(bp, length, dp->type, snet, dp->srcNode, dp->srcSkt);
 }
 
