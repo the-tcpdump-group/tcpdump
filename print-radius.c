@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "$Id: print-radius.c,v 1.3 2000-10-10 05:14:35 guy Exp $";
+    "$Id: print-radius.c,v 1.4 2000-12-03 20:31:26 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -470,6 +470,12 @@ print_attr_num(register u_char *data, u_int length, u_short attr_code )
    u_int8_t tag;
    u_int32_t timeout;
    
+   if (length != 4)
+   {
+       printf("{length %u != 4}", length);
+       return;
+   }
+
    TCHECK2(data[0],4);
                           /* This attribute has standard values */
    if (attr_type[attr_code].siz_subtypes) 
@@ -577,6 +583,12 @@ print_attr_num(register u_char *data, u_int length, u_short attr_code )
 static void
 print_attr_address(register u_char *data, u_int length, u_short attr_code )
 {
+   if (length != 4)
+   {
+       printf("{length %u != 4}", length);
+       return;
+   }
+
    TCHECK2(data[0],4);
    
    switch(attr_code)
@@ -615,11 +627,21 @@ print_attr_address(register u_char *data, u_int length, u_short attr_code )
 static void print_attr_time(register u_char *data, u_int length, u_short attr_code)
 {
    time_t attr_time;
+   char string[26];
+
+   if (length != 4)
+   {
+       printf("{length %u != 4}", length);
+       return;
+   }
 
    TCHECK2(data[0],4);
    
    attr_time = EXTRACT_32BITS(data);
-   printf("{%.24s}", ctime(&attr_time));
+   strcpy(string, ctime(&attr_time));
+   /* Get rid of the newline */
+   string[24] = '\0';
+   printf("{%.24s}", string);
    return;
    
    trunc:
@@ -636,43 +658,66 @@ static void print_attr_time(register u_char *data, u_int length, u_short attr_co
 /***********************************/
 static void print_attr_strange(register u_char *data, u_int length, u_short attr_code)
 {
-   u_short len_data = 8;
+   u_short len_data;
    
    switch(attr_code)
    {
       case ARAP_PASS:
+           if (length != 16)
+           {
+               printf("{length %u != 16}", length);
+               return;
+           }
            printf("{User_challenge[");
            TCHECK2(data[0],8);
+           len_data = 8;
            PRINT_HEX(len_data, data);
            printf("] User_resp[");
            TCHECK2(data[0],8);
+           len_data = 8;
            PRINT_HEX(len_data, data);
            printf("]}");
         break;
         
       case ARAP_FEATURES:
+           if (length != 14)
+           {
+               printf("{length %u != 14}", length);
+               return;
+           }
+           TCHECK2(data[0],1);
            if (*data)
               printf("{User_can_change_pass");
            else
               printf("{User_cant_change_pass");
-           TCHECK2(data[0],1);
            data++;
+           TCHECK2(data[0],1);
            printf(" Min_pass_len[%d]",*data);
+           data++;
            printf(" Pass_created_at[");
-           TCHECK2(data[0],8);
+           TCHECK2(data[0],4);
+           len_data = 4;
            PRINT_HEX(len_data, data);
            printf("] Pass_expired_in[");
-           TCHECK2(data[0],8);
+           TCHECK2(data[0],4);
+           len_data = 4;
            PRINT_HEX(len_data, data);
            printf("] Current_time[");
-           TCHECK2(data[0],8);
+           len_data = 4;
+           TCHECK2(data[0],4);
            PRINT_HEX(len_data, data);
            printf("]}");
         break;
 
       case ARAP_CHALLENGE_RESP:
+           if (length < 8)
+           {
+               printf("{length %u != 8}", length);
+               return;
+           }
            printf("{");
            TCHECK2(data[0],8);
+           len_data = 8;
            PRINT_HEX(len_data, data);
            printf("}");
         break;
@@ -706,9 +751,13 @@ radius_attr_print(register u_char *attr, u_int length)
         {
            printf(" %s",attr_type[rad_attr->type].name);
 
-           if ( attr_type[rad_attr->type].print_func )
-              (*attr_type[rad_attr->type].print_func)( ((u_char *)(rad_attr+1)),
+           if (rad_attr->len > 2)
+           {
+               if ( attr_type[rad_attr->type].print_func )
+                  (*attr_type[rad_attr->type].print_func)( 
+		                           ((u_char *)(rad_attr+1)),
                                            rad_attr->len - 2, rad_attr->type);
+           }
         }
      }
      else
