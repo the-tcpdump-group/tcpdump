@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-null.c,v 1.25 1999-10-17 21:37:14 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-null.c,v 1.26 1999-10-30 05:11:18 itojun Exp $ (LBL)";
 #endif
 
 #include <sys/param.h>
@@ -40,12 +40,18 @@ struct rtentry;
 #include <netinet/in_systm.h>
 #include <netinet/ip.h>
 #include <netinet/if_ether.h>
+#include <netinet/ip_var.h>
 #include <netinet/udp.h>
+#include <netinet/udp_var.h>
 #include <netinet/tcp.h>
 
 #include <pcap.h>
 #include <stdio.h>
 #include <string.h>
+
+#ifdef INET6
+#include <netinet/ip6.h>
+#endif
 
 #include "interface.h"
 #include "addrtoname.h"
@@ -76,6 +82,12 @@ null_print(const u_char *p, const struct ip *ip, u_int length)
 	case AF_INET:
 		printf("ip: ");
 		break;
+
+#ifdef INET6
+	case AF_INET6:
+		printf("ip6: ");
+		break;
+#endif
 
 	case AF_NS:
 		printf("ns: ");
@@ -111,7 +123,14 @@ null_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	if (eflag)
 		null_print(p, ip, length);
 
+#ifndef INET6
 	ip_print((const u_char *)ip, length);
+#else
+	if (ip->ip_v == IPVERSION)
+		ip_print((const u_char *)ip, length);
+	else if (ip->ip_v == 6)
+		ip6_print((const u_char *)ip, length);
+#endif /*INET6*/
 
 	if (xflag)
 		default_print((const u_char *)ip, caplen - NULL_HDRLEN);

@@ -31,70 +31,69 @@ static char rcsid[] =
 #include <sys/types.h>
 #include <sys/socket.h>
 
+#include <net/route.h>
+#include <net/if.h>
+
 #include <netinet/in.h>
+#include <netinet/if_ether.h>
 #include <netinet/in_systm.h>
 #include <netinet/ip.h>
+#include <netinet/ip_icmp.h>
 #include <netinet/ip_var.h>
 #include <netinet/udp.h>
 #include <netinet/udp_var.h>
+#include <netinet/tcp.h>
 
-#undef NOERROR					/* Solaris sucks */
-#include <arpa/nameser.h>
-#include <arpa/tftp.h>
-
-#ifdef SOLARIS
-#include <tiuser.h>
-#endif
-#include <rpc/rpc.h>
-
-#include <errno.h>
 #include <stdio.h>
+
+/* there's no standard definition so we are on our own */
+struct ah {
+	u_int8_t	ah_nxt;		/* Next Header */
+	u_int8_t	ah_len;		/* Length of data, in 32bit */
+	u_int16_t	ah_reserve;	/* Reserved for future use */
+	u_int32_t	ah_spi;		/* Security parameter index */
+	/* variable size, 32bit bound*/	/* Authentication data */
+};
+
+struct newah {
+	u_int8_t	ah_nxt;		/* Next Header */
+	u_int8_t	ah_len;		/* Length of data + 1, in 32bit */
+	u_int16_t	ah_reserve;	/* Reserved for future use */
+	u_int32_t	ah_spi;		/* Security parameter index */
+	u_int32_t	ah_seq;		/* Sequence number field */
+	/* variable size, 32bit bound*/	/* Authentication data */
+};
 
 #include "interface.h"
 #include "addrtoname.h"
 
-extern int packettype;
-
-
-void
-ah_print(register const u_char *bp, int length, register const u_char *bp2)
+int
+ah_print(register const u_char *bp, register const u_char *bp2)
 {
-  register const struct ip *ip;
-  register const u_char *cp, *nh;
-  u_short nextheader;
-  u_short ahlen, authlen;
-  u_long  spi, seqno;
+	register const struct ah *ah;
+	register const u_char *ep;
+	int sumlen;
+	u_int32_t spi;
 
-  ip = (struct ip *)bp2;
+	ah = (struct ah *)bp;
+	ep = snapend;		/* 'ep' points to the end of avaible data. */
 
-  (void)printf("AH %s > %s\n\t\t",
-	       ipaddr_string(&ip->ip_src),
-	       ipaddr_string(&ip->ip_dst));
+	if ((u_char *)(ah + 1) >= ep - sizeof(struct ah))
+		goto trunc;
 
-  if (length < 8) {
-    (void)printf(" [|ah] truncated-ah %d", length);
-    return;
-  }
+	sumlen = ah->ah_len << 2;
+	spi = (u_int32_t)ntohl(ah->ah_spi);
 
-  nextheader = bp[0];
-  ahlen      = bp[1];
-  spi        = ntohl(*((u_long *)(bp+4)));
-  seqno      = ntohl(*((u_long *)(bp+8)));
-  authlen    = ahlen - 12;
-
-  nh         = bp+ahlen;
-
-  if(authlen > length || authlen == 0)
-    {
-      authlen = length;
-    }
-
-  (void)printf("spi:%08x seqno:%d authlen: %d authdata: ", spi,
-	       seqno, authlen);
-  (void)default_print_unaligned(bp+12, authlen);
-
-  /* PRINT rest of packet, requires some reorg of print-ip.c */
-#if XXX  
-  (void)ip_print(nextheader, ip, nh, length-authlen);
-#endif
+	printf("AH(spi=%u", spi);
+	if (vflag)
+		printf(",sumlen=%d", sumlen);
+	printf(",seq=0x%x", (u_int32_t)ntohl(*(u_int32_t *)(ah + 1)));
+	if (bp + sizeof(struct ah) + sumlen > ep)
+		fputs("[truncated]", stdout);
+	fputs("): ", stdout);
+	
+	return sizeof(struct ah) + sumlen;
+ trunc:
+	fputs("[|AH]", stdout);
+	return 65535;
 }

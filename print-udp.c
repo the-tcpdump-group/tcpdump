@@ -21,19 +21,19 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.62 1999-10-17 21:56:54 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.63 1999-10-30 05:11:21 itojun Exp $ (LBL)";
 #endif
 
 #include <sys/param.h>
 #include <sys/time.h>
 #include <sys/socket.h>
 
-#define __FAVOR_BSD
-
 #include <netinet/in.h>
 #include <netinet/in_systm.h>
 #include <netinet/ip.h>
+#include <netinet/ip_var.h>
 #include <netinet/udp.h>
+#include <netinet/udp_var.h>
 
 #ifdef NOERROR
 #undef NOERROR					/* Solaris sucks */
@@ -50,6 +50,10 @@ static const char rcsid[] =
 #include <rpc/rpc.h>
 
 #include <stdio.h>
+
+#ifdef INET6
+#include <netinet/ip6.h>
+#endif
 
 #include "interface.h"
 #include "addrtoname.h"
@@ -291,12 +295,18 @@ rtcp_print(const u_char *hdr, const u_char *ep)
 #define SNMP_PORT 161		/*XXX*/
 #define NTP_PORT 123		/*XXX*/
 #define SNMPTRAP_PORT 162	/*XXX*/
+#define ISAKMP_PORT 500		/*XXX*/
 #define RIP_PORT 520		/*XXX*/
 #define KERBEROS_SEC_PORT 750	/*XXX*/
+#define L2TP_PORT 1701		/*XXX*/
+#define ISAKMP_PORT_USER1 7500	/*??? - nonstandard*/
+#define ISAKMP_PORT_USER2 8500	/*??? - nonstandard*/
 
-#define ISAKMP_PORT 500
-#define ISAKMP_UPORT1 7500
-#define ISAKMP_UPORT2 8500
+#ifdef INET6
+#define RIPNG_PORT 521		/*XXX*/
+#define DHCP6_SERV_PORT 546	/*XXX*/
+#define DHCP6_CLI_PORT 547	/*XXX*/
+#endif
 
 void
 udp_print(register const u_char *bp, u_int length, register const u_char *bp2)
@@ -306,11 +316,20 @@ udp_print(register const u_char *bp, u_int length, register const u_char *bp2)
 	register const u_char *cp;
 	register const u_char *ep = bp + length;
 	u_short sport, dport, ulen;
+#ifdef INET6
+	register const struct ip6_hdr *ip6;
+#endif
 
 	if (ep > snapend)
 		ep = snapend;
 	up = (struct udphdr *)bp;
 	ip = (struct ip *)bp2;
+#ifdef INET6
+	if (ip->ip_v == 6)
+		ip6 = (struct ip6_hdr *)bp2;
+	else
+		ip6 = NULL;
+#endif /*INET6*/
 	cp = (u_char *)(up + 1);
 	if (cp > snapend) {
 		printf("[|udp]");
@@ -381,10 +400,10 @@ udp_print(register const u_char *bp, u_int length, register const u_char *bp2)
 
 		case PT_SNMP:
 			(void)printf("%s.%s > %s.%s:",
-                                ipaddr_string(&ip->ip_src),
-                                udpport_string(sport),
-                                ipaddr_string(&ip->ip_dst),
-                                udpport_string(dport));
+				ipaddr_string(&ip->ip_src),
+				udpport_string(sport),
+				ipaddr_string(&ip->ip_dst),
+				udpport_string(dport));
 			snmp_print((const u_char *)(up + 1), length);
 			break;
 		}
@@ -424,9 +443,38 @@ udp_print(register const u_char *bp, u_int length, register const u_char *bp2)
 			return;
 		}
 	}
+#if 0
 	(void)printf("%s.%s > %s.%s:",
 		ipaddr_string(&ip->ip_src), udpport_string(sport),
 		ipaddr_string(&ip->ip_dst), udpport_string(dport));
+#else
+#ifdef INET6
+	if (ip6) {
+		if (ip6->ip6_nxt == IPPROTO_UDP) {
+			(void)printf("%s.%s > %s.%s: ",
+				ip6addr_string(&ip6->ip6_src),
+				udpport_string(sport),
+				ip6addr_string(&ip6->ip6_dst),
+				udpport_string(dport));
+		} else {
+			(void)printf("%s > %s: ",
+				udpport_string(sport), udpport_string(dport));
+		}
+	} else
+#endif /*INET6*/
+	{
+		if (ip->ip_p == IPPROTO_UDP) {
+			(void)printf("%s.%s > %s.%s: ",
+				ipaddr_string(&ip->ip_src),
+				udpport_string(sport),
+				ipaddr_string(&ip->ip_dst),
+				udpport_string(dport));
+		} else {
+			(void)printf("%s > %s: ",
+				udpport_string(sport), udpport_string(dport));
+		}
+	}
+#endif
 
 	if (!qflag) {
 #define ISPORT(p) (dport == (p) || sport == (p))
@@ -439,19 +487,30 @@ udp_print(register const u_char *bp, u_int length, register const u_char *bp2)
 			    sport, dport);
 		else if (ISPORT(RIP_PORT))
 			rip_print((const u_char *)(up + 1), length);
+		else if (ISPORT(ISAKMP_PORT))
+			isakmp_print((const u_char *)(up + 1), length, bp2);
+#if 1 /*???*/
+		else if (ISPORT(ISAKMP_PORT_USER1) || ISPORT(ISAKMP_PORT_USER2))
+			isakmp_print((const u_char *)(up + 1), length, bp2);
+#endif
 		else if (ISPORT(SNMP_PORT) || ISPORT(SNMPTRAP_PORT))
 			snmp_print((const u_char *)(up + 1), length);
 		else if (ISPORT(NTP_PORT))
 			ntp_print((const u_char *)(up + 1), length);
 		else if (ISPORT(KERBEROS_PORT) || ISPORT(KERBEROS_SEC_PORT))
 			krb_print((const void *)(up + 1), length);
-                else if (ISPORT(ISAKMP_PORT) ||
-                         ISPORT(ISAKMP_UPORT1) ||
-                         ISPORT(ISAKMP_UPORT2)) {
-                       isakmp_print((const u_char *)(up + 1), length);
-		}
+		else if (ISPORT(L2TP_PORT))
+			l2tp_print((const u_char *)(up + 1), length);
 		else if (dport == 3456)
 			vat_print((const void *)(up + 1), length, up);
+#ifdef INET6
+		else if (ISPORT(RIPNG_PORT))
+			ripng_print((const u_char *)(up + 1), length);
+		else if (ISPORT(DHCP6_SERV_PORT) || ISPORT(DHCP6_CLI_PORT)) {
+			dhcp6_print((const u_char *)(up + 1), length,
+				sport, dport);
+		}
+#endif /*INET6*/
 		/*
 		 * Kludge in test for whiteboard packets.
 		 */

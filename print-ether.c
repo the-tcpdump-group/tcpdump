@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.45 1999-10-17 21:37:12 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.46 1999-10-30 05:11:13 itojun Exp $ (LBL)";
 #endif
 
 #include <sys/param.h>
@@ -37,11 +37,17 @@ struct rtentry;
 #include <netinet/if_ether.h>
 #include <netinet/in_systm.h>
 #include <netinet/ip.h>
+#include <netinet/ip_var.h>
 #include <netinet/udp.h>
+#include <netinet/udp_var.h>
 #include <netinet/tcp.h>
 
 #include <stdio.h>
 #include <pcap.h>
+
+#ifdef INET6
+#include <netinet/ip6.h>
+#endif
 
 #include "interface.h"
 #include "addrtoname.h"
@@ -162,6 +168,12 @@ ether_encap_print(u_short ethertype, const u_char *p,
 	case ETHERTYPE_IP:
 		ip_print(p, length);
 		return (1);
+
+#ifdef INET6
+	case ETHERTYPE_IPV6:
+		ip6_print(p, length);
+		return (1);
+#endif /*INET6*/
 
 	case ETHERTYPE_ARP:
 	case ETHERTYPE_REVARP:

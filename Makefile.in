@@ -17,7 +17,7 @@
 #  WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 #  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.209 1999-10-17 21:56:53 mcr Exp $ (LBL)
+# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.210 1999-10-30 05:11:06 itojun Exp $ (LBL)
 
 #
 # Various configurable paths (remember to edit Makefile.in, not Makefile)
@@ -61,21 +61,23 @@ INSTALL = @INSTALL@
 # problem if you don't own the file but can write to the directory.
 .c.o:
 	@rm -f $@
-	$(CC) $(CFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $(srcdir)/$*.c
 
 CSRC =	tcpdump.c \
 	print-arp.c print-atalk.c print-atm.c print-bootp.c \
 	print-decnet.c print-domain.c print-dvmrp.c print-egp.c \
-	print-ether.c print-fddi.c print-isakmp.c print-ah.c print-esp.c \
-	print-gre.c print-icmp.c \
+	print-ether.c print-fddi.c print-gre.c print-icmp.c \
 	print-igrp.c print-ip.c print-ipx.c print-isoclns.c print-krb.c \
 	print-llc.c print-nfs.c print-ntp.c print-null.c print-ospf.c \
 	print-pim.c print-ppp.c print-raw.c print-rip.c print-sl.c \
 	print-snmp.c print-sunrpc.c print-tcp.c print-tftp.c print-udp.c \
 	print-wb.c addrtoname.c bpf_dump.c gmt2local.c machdep.c \
-	parsenfsfh.c util.c savestr.c setsignal.c
-LOCALSRC =
+	parsenfsfh.c util.c savestr.c setsignal.c \
+	print-esp.c print-ah.c print-vjc.c print-isakmp.c print-chdlc.c \
+	print-ipcomp.c print-mobile.c print-l2tp.c print-bgp.c
+LOCALSRC = @LOCALSRC@
 GENSRC = version.c
+LIBOBJS = @LIBOBJS@
 
 SRC =	$(CSRC) $(GENSRC) $(LOCALSRC)
 
@@ -83,9 +85,11 @@ SRC =	$(CSRC) $(GENSRC) $(LOCALSRC)
 # hack the extra indirection
 OBJ =	$(CSRC:.c=.o) $(GENSRC:.c=.o) $(LOCALSRC:.c=.o) @LIBOBJS@
 HDR =   addrtoname.h appletalk.h bootp.h decnet.h \
-	ethertype.h extract.h fddi.h gmt2local.h interface.h igrp.h \
+	ethertype.h extract.h fddi.h gmt2local.h igrp.h interface.h \
 	ipx.h llc.h machdep.h mib.h nfsfh.h nfsv2.h ntp.h ospf.h \
-	savestr.c setsignal.h
+	savestr.c setsignal.h \
+	gnuc.h ipsec_doi.h isakmp.h l2tp.h netbios.h oakley.h ospf6.h ppp.h \
+	route6d.h
 
 TAGHDR = \
 	/usr/include/arpa/tftp.h \
@@ -107,6 +111,11 @@ all: $(PROG)
 $(PROG): $(OBJ) @V_PCAPDEP@
 	@rm -f $@
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJ) $(LIBS)
+
+getnameinfo.o: $(srcdir)/missing/getnameinfo.c
+	$(CC) $(CFLAGS) -o $@ -c $(srcdir)/missing/getnameinfo.c
+getaddrinfo.o: $(srcdir)/missing/getaddrinfo.c
+	$(CC) $(CFLAGS) -o $@ -c $(srcdir)/missing/getaddrinfo.c
 
 version.o: version.c
 version.c: $(srcdir)/VERSION

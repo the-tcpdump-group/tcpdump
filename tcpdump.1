@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.68 1999-10-17 21:37:16 mcr Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.69 1999-10-30 05:11:22 itojun Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -27,7 +27,7 @@ tcpdump \- dump traffic on a network
 .na
 .B tcpdump
 [
-.B \-adeflnNOpqStvx
+.B \-adeflnNOpqRStvx
 ] [
 .B \-c
 .I count
@@ -185,9 +185,14 @@ specified \fItype\fR. Currently known types are
 \fBrtp\fR (Real-Time Applications protocol),
 \fBrtcp\fR (Real-Time Applications control protocol),
 \fBvat\fR (Visual Audio Tool),
-\fBwb\fR (distributed White Board),
 and
-\fBsnmp\fR (Simple Network Management Protocol).
+\fBwb\fR (distributed White Board).
+.TP
+.B \-R
+Assume ESP/AH packets to be based on old specification (RFC1825 to RFC1829).
+If specified, \fItcpdump\fP will not print replay prevention field.
+Since there is no protocol version field in ESP/AH specification,
+\fItcpdump\fP cannot deduce the version of ESP/AH protocol.
 .TP
 .B \-S
 Print absolute, rather than relative, TCP sequence numbers.
@@ -264,6 +269,7 @@ protos are:
 .BR ether ,
 .BR fddi ,
 .BR ip ,
+.BR ip6 ,
 .BR arp ,
 .BR rarp ,
 .BR decnet ,
@@ -271,6 +277,8 @@ protos are:
 .BR sca ,
 .BR moprc ,
 .BR mopdl ,
+.BR icmp ,
+.BR icmp6 ,
 .B tcp
 and
 .BR udp .
@@ -308,14 +316,14 @@ To save typing, identical qualifier lists can be omitted.  E.g.,
 .LP
 Allowable primitives are:
 .IP "\fBdst host \fIhost\fR"
-True if the IP destination field of the packet is \fIhost\fP,
+True if the IPv4/v6 destination field of the packet is \fIhost\fP,
 which may be either an address or a name.
 .IP "\fBsrc host \fIhost\fR"
-True if the IP source field of the packet is \fIhost\fP.
+True if the IPv4/v6 source field of the packet is \fIhost\fP.
 .IP "\fBhost \fIhost\fP
-True if either the IP source or destination of the packet is \fIhost\fP.
+True if either the IPv4/v6 source or destination of the packet is \fIhost\fP.
 Any of the above host expressions can be prepended with the keywords,
-\fBip\fP, \fBarp\fP, or \fBrarp\fP as in:
+\fBip\fP, \fBarp\fP, \fBrarp\fP, or \fBip6\fP as in:
 .in +.5i
 .nf
 \fBip host \fIhost\fR
@@ -350,24 +358,26 @@ expression is
 .fi
 .in -.5i
 which can be used with either names or numbers for \fIhost / ehost\fP.)
+This syntax does not work in IPv6-enabled configuration at this moment.
 .IP "\fBdst net \fInet\fR"
-True if the IP destination address of the packet has a network
+True if the IPv4/v6 destination address of the packet has a network
 number of \fInet\fP. \fINet\fP may be either a name from /etc/networks
 or a network number (see \fInetworks(4)\fP for details).
 .IP "\fBsrc net \fInet\fR"
-True if the IP source address of the packet has a network
+True if the IPv4/v6 source address of the packet has a network
 number of \fInet\fP.
 .IP "\fBnet \fInet\fR"
-True if either the IP source or destination address of the packet has a network
+True if either the IPv4/v6 source or destination address of the packet has a network
 number of \fInet\fP.
 .IP "\fBnet \fInet\fR \fBmask \fImask\fR"
 True if the IP address matches \fInet\fR with the specific netmask.
 May be qualified with \fBsrc\fR or \fBdst\fR.
+Note that this syntax is not valid for IPv6 \fInet\fR.
 .IP "\fBnet \fInet\fR/\fIlen\fR"
-True if the IP address matches \fInet\fR a netmask \fIlen\fR bits wide.
+True if the IPv4/v6 address matches \fInet\fR a netmask \fIlen\fR bits wide.
 May be qualified with \fBsrc\fR or \fBdst\fR.
 .IP "\fBdst port \fIport\fR"
-True if the packet is ip/tcp or ip/udp and has a
+True if the packet is ip/tcp, ip/udp, ip6/tcp or ip6/udp and has a
 destination port value of \fIport\fP.
 The \fIport\fP can be a number or a name used in /etc/services (see
 .IR tcp (4P)
@@ -414,6 +424,29 @@ of protocol type \fIprotocol\fP.
 \fIicmp\fP, \fIigrp\fP, \fIudp\fP, \fInd\fP, or \fItcp\fP.
 Note that the identifiers \fItcp\fP, \fIudp\fP, and \fIicmp\fP are also
 keywords and must be escaped via backslash (\\), which is \\\\ in the C-shell.
+Note that this primitive does not chase protocol header chain.
+.IP "\fBip6 proto \fIprotocol\fR"
+True if the packet is an IPv6 packet of protocol type \fIprotocol\fP.
+Note that this primitive does not chase protocol header chain.
+.IP "\fBip6 protochain \fIprotocol\fR"
+True if the packet is IPv6 packet,
+and contains protocol header with type \fIprotocol\fR
+in its protocol header chain.
+For example,
+.in +.5i
+.nf
+\fBip6 protochain 6\fR
+.fi
+.in -.5i
+matches any IPv6 packet with TCP protocol header in the protocol header chain.
+The packet may contain, for example,
+authentication header, routing header, or hop-by-hop option header,
+between IPv6 header and TCP header.
+The BPF code emitted by this primitive is complex and
+cannot be optimized by BPF optimizer code in \fItcpdump\fP,
+so this can be somewhat slow.
+.IP "\fBip protochain \fIprotocol\fR"
+Equivalent to \fBip6 protochain \fIprotocol\fR, but this is for IPv4.
 .IP "\fBether broadcast\fR"
 True if the packet is an ethernet broadcast packet.  The \fIether\fP
 keyword is optional.
@@ -427,10 +460,12 @@ keyword is optional.
 This is shorthand for `\fBether[0] & 1 != 0\fP'.
 .IP "\fBip multicast\fR"
 True if the packet is an IP multicast packet.
+.IP "\fBip6 multicast\fR"
+True if the packet is an IPv6 multicast packet.
 .IP  "\fBether proto \fIprotocol\fR"
 True if the packet is of ether type \fIprotocol\fR.
 \fIProtocol\fP can be a number or a name like
-\fIip\fP, \fIarp\fP, or \fIrarp\fP.
+\fIip\fP, \fIip6\fP, \fIarp\fP, or \fIrarp\fP.
 Note these identifiers are also keywords
 and must be escaped via backslash (\\).
 [In the case of FDDI (e.g., `\fBfddi protocol arp\fR'), the
@@ -451,7 +486,7 @@ True if the DECNET destination address is
 .IP "\fBdecnet host \fIhost\fR"
 True if either the DECNET source or destination address is
 .IR host .
-.IP "\fBip\fR, \fBarp\fR, \fBrarp\fR, \fBdecnet\fR"
+.IP "\fBip\fR, \fBip6\fR, \fBarp\fR, \fBrarp\fR, \fBdecnet\fR"
 Abbreviations for:
 .in +.5i
 .nf
@@ -473,7 +508,7 @@ Note that
 Abbreviations for:
 .in +.5i
 .nf
-\fBip proto \fIp\fR
+\fBip proto \fIp\fR\fB or ip6 proto \fIp\fR
 .fi
 .in -.5i
 where \fIp\fR is one of the above protocols.
@@ -490,8 +525,10 @@ data inside the packet, use the following syntax:
 .fi
 .in -.5i
 \fIProto\fR is one of \fBether, fddi,
-ip, arp, rarp, tcp, udp, \fRor \fBicmp\fR, and
+ip, arp, rarp, tcp, udp, icmp\fR or \fBip6\fR, and
 indicates the protocol layer for the index operation.
+Note that \fItcp, udp\fR and other upper-layer protocol types only
+apply to IPv4, not IPv6 (this will be fixed in the future).
 The byte offset, relative to the indicated protocol layer, is
 given by \fIexpr\fR.
 \fISize\fR is optional and indicates the number of bytes in the
@@ -1191,6 +1228,9 @@ The current version is available via anonymous ftp:
 .RS
 .I ftp://ftp.ee.lbl.gov/tcpdump.tar.Z
 .RE
+.LP
+IPv6/IPsec support is added by WIDE/KAME project.
+This program uses Eric Young's SSLeay library, under specific configuration.
 .SH BUGS
 Please send bug reports to tcpdump@ee.lbl.gov.
 .LP
@@ -1219,3 +1259,10 @@ packets are encapsulated Ethernet packets.  This is true for IP, ARP,
 and DECNET Phase IV, but is not true for protocols such as ISO CLNS.
 Therefore, the filter may inadvertently accept certain packets that
 do not properly match the filter expression.
+.LP
+.BR "ip6 proto"
+should chase header chain, but at this moment it does not.
+.BR tcp
+or
+.BR udp
+should chase header chain too.

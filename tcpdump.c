@@ -24,7 +24,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.131 1999-10-17 21:56:54 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.132 1999-10-30 05:11:23 itojun Exp $ (LBL)";
 #endif
 
 /*
@@ -65,10 +65,14 @@ int Nflag;			/* remove domains from printed host names */
 int Oflag = 1;			/* run filter code optimizer */
 int pflag;			/* don't go promiscuous */
 int qflag;			/* quick (shorter) output */
+int Rflag = 1;			/* print sequence # field in AH/ESP*/
 int Sflag;			/* print raw TCP sequence numbers */
 int tflag = 1;			/* print packet arrival time */
 int vflag;			/* verbose */
 int xflag;			/* print packet in hex */
+
+char *ahsecret = NULL;		/* AH secret key */
+char *espsecret = NULL;		/* ESP secret key */
 
 int packettype;
 
@@ -103,6 +107,9 @@ static struct printer printers[] = {
 	{ null_if_print,	DLT_NULL },
 	{ raw_if_print,		DLT_RAW },
 	{ atm_if_print,		DLT_ATM_RFC1483 },
+#ifdef DLT_CHDLC
+	{ chdlc_if_print,	DLT_CHDLC },
+#endif
 	{ NULL,			0 },
 };
 
@@ -152,12 +159,21 @@ main(int argc, char **argv)
 
 	opterr = 0;
 	while (
-	    (op = getopt(argc, argv, "ac:defF:i:lnNOpqr:s:StT:vw:xY")) != EOF)
+	    (op = getopt(argc, argv, "ac:deE:fF:i:lnNOpqr:Rs:StT:vw:xY")) != EOF)
 		switch (op) {
 
 		case 'a':
 			++aflag;
 			break;
+
+#if 0
+		case 'A':
+#ifndef CRYPTO
+			warning("crypto code not compiled in");
+#endif
+			ahsecret = optarg;
+			break;
+#endif
 
 		case 'c':
 			cnt = atoi(optarg);
@@ -171,6 +187,13 @@ main(int argc, char **argv)
 
 		case 'e':
 			++eflag;
+			break;
+
+		case 'E':
+#ifndef CRYPTO
+			warning("crypto code not compiled in");
+#endif
+			espsecret = optarg;
 			break;
 
 		case 'f':
@@ -215,6 +238,10 @@ main(int argc, char **argv)
 
 		case 'r':
 			RFileName = optarg;
+			break;
+
+		case 'R':
+			Rflag = 0;
 			break;
 
 		case 's':

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.39 1999-10-17 21:37:12 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.40 1999-10-30 05:11:13 itojun Exp $ (LBL)";
 #endif
 
 #include <sys/param.h>
@@ -34,14 +34,14 @@ struct rtentry;
 #endif
 #include <net/if.h>
 
-#define __FAVOR_BSD
-
 #include <netinet/in.h>
 #include <netinet/if_ether.h>
 #include <netinet/in_systm.h>
 #include <netinet/ip.h>
 #include <netinet/ip_icmp.h>
+#include <netinet/ip_var.h>
 #include <netinet/udp.h>
+#include <netinet/udp_var.h>
 #include <netinet/tcp.h>
 
 #include <stdio.h>
@@ -177,9 +177,11 @@ icmp_print(register const u_char *bp, register const u_char *bp2)
 	ip = (struct ip *)bp2;
 	str = buf;
 
+#if 0
         (void)printf("%s > %s: ",
 		ipaddr_string(&ip->ip_src),
 		ipaddr_string(&ip->ip_dst));
+#endif
 
 	TCHECK(dp->icmp_code);
 	switch (dp->icmp_type) {

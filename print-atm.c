@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.10 1999-10-17 21:37:11 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.11 1999-10-30 05:11:11 itojun Exp $ (LBL)";
 #endif
 
 #include <sys/param.h>
@@ -37,7 +37,9 @@ struct rtentry;
 #include <netinet/if_ether.h>
 #include <netinet/in_systm.h>
 #include <netinet/ip.h>
+#include <netinet/ip_var.h>
 #include <netinet/udp.h>
+#include <netinet/udp_var.h>
 #include <netinet/tcp.h>
 
 #include <stdio.h>
@@ -102,6 +104,12 @@ atm_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	case ETHERTYPE_IP:
 		ip_print(p, length);
 		break;
+
+#ifdef INET6
+	case ETHERTYPE_IPV6:
+		ip6_print(p, length);
+		break;
+#endif /*INET6*/
 
 		/*XXX this probably isn't right */
 	case ETHERTYPE_ARP:

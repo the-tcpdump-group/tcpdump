@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sunrpc.c,v 1.27 1999-10-17 21:37:16 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sunrpc.c,v 1.28 1999-10-30 05:11:21 itojun Exp $ (LBL)";
 #endif
 
 #include <sys/param.h>
@@ -38,6 +38,7 @@ struct rtentry;
 #include <netinet/if_ether.h>
 #include <netinet/in_systm.h>
 #include <netinet/ip.h>
+#include <netinet/ip_var.h>
 
 #include <rpc/rpc.h>
 #ifdef HAVE_RPC_RPCENT_H
