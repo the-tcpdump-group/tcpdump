@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sl.c,v 1.45 1999-11-21 09:37:01 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sl.c,v 1.46 1999-11-21 12:38:24 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -111,7 +111,7 @@ sl_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 		break;
 #ifdef INET6
 	case 6:
-		ipv6_print((u_char *)ip, length);
+		ip6_print((u_char *)ip, length);
 		break;
 #endif
 	default:

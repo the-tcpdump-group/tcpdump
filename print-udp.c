@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.65 1999-11-21 09:37:03 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.66 1999-11-21 12:38:24 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -63,7 +63,7 @@ static const char rcsid[] =
 #include "addrtoname.h"
 #include "appletalk.h"
 
-#include "nfsv2.h"
+#include "nfs.h"
 #include "bootp.h"
 
 struct rtcphdr {
