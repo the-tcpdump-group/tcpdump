@@ -449,10 +449,6 @@ SOURCE="..\..\print-sunrpc.c"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\print-symantec.c"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\print-tcp.c"
 # End Source File
 # Begin Source File

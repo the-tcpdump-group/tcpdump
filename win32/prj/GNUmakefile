@@ -111,7 +111,6 @@ OBJS = \
 	../../print-stp.o \
 	../../print-sunatm.o \
 	../../print-sunrpc.o \
-	../../print-symantec.o \
 	../../print-tcp.o \
 	../../print-telnet.o \
 	../../print-tftp.o \
