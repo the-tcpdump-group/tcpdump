@@ -1,3 +1,4 @@
+/* @(#) $Header: /tcpdump/master/tcpdump/token.h,v 1.2 2000-09-18 04:40:46 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1998, Larry Lile
  * All rights reserved.
