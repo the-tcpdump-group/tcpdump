@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.1 2004-06-06 19:20:03 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.2 2004-06-07 06:13:04 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -93,6 +93,23 @@ static const struct tok lspping_reply_mode_values[] = {
     { 0, NULL}
 };
 
+static const struct tok lspping_return_code_values[] = {
+    {  0, "No return code or return code contained in the Error Code TLV"},
+    {  1, "Malformed echo request received"},
+    {  2, "One or more of the TLVs was not understood"},
+    {  3, "Replying router is an egress for the FEC at stack depth"},
+    {  4, "Replying router has no mapping for the FEC at stack depth"},
+    {  5, "Reserved"},
+    {  6, "Reserved"},
+    {  7, "Reserved"},
+    {  8, "Label switched at stack-depth"},
+    {  9, "Label switched but no MPLS forwarding at stack-depth"},
+    { 10, "Mapping for this FEC is not the given label at stack depth"},
+    { 11, "No label entry at stack-depth"},
+    { 12, "Protocol not associated with interface at FEC stack depth"},
+};
+
+
 /* 
  * LSPPING TLV header
  *  0                   1                   2                   3
@@ -128,14 +145,40 @@ static const struct tok lspping_tlv_values[] = {
     { 0, NULL}
 };
 
+#define	LSPPING_TLV_TARGETFEC_SUBTLV_LDP_IPV4      1
+#define	LSPPING_TLV_TARGETFEC_SUBTLV_LDP_IPV6      2
+#define	LSPPING_TLV_TARGETFEC_SUBTLV_RSVP_IPV4     3
+#define	LSPPING_TLV_TARGETFEC_SUBTLV_RSVP_IPV6     4
+#define	LSPPING_TLV_TARGETFEC_SUBTLV_L3VPN_IPV4    6
+#define	LSPPING_TLV_TARGETFEC_SUBTLV_L3VPN_IPV6    7
+#define	LSPPING_TLV_TARGETFEC_SUBTLV_L2VPN_ENDPT   8
+#define	LSPPING_TLV_TARGETFEC_SUBTLV_L2VPN_VCID    9
+#define	LSPPING_TLV_TARGETFEC_SUBTLV_BGP_IPV4     10
+
+static const struct tok lspping_tlvtargetfec_subtlv_values[] = {
+    { LSPPING_TLV_TARGETFEC_SUBTLV_LDP_IPV4, "LDP IPv4 prefix"},
+    { LSPPING_TLV_TARGETFEC_SUBTLV_LDP_IPV6, "LDP IPv6 prefix"},
+    { LSPPING_TLV_TARGETFEC_SUBTLV_RSVP_IPV4, "RSVP IPv4 Session Query"},
+    { LSPPING_TLV_TARGETFEC_SUBTLV_RSVP_IPV6, "RSVP IPv6 Session Query"},
+    { 5, "Reserved"},
+    { LSPPING_TLV_TARGETFEC_SUBTLV_L3VPN_IPV4, "VPN IPv4 prefix"},
+    { LSPPING_TLV_TARGETFEC_SUBTLV_L3VPN_IPV6, "VPN IPv6 prefix"},
+    { LSPPING_TLV_TARGETFEC_SUBTLV_L2VPN_ENDPT, "L2 VPN endpoint"},
+    { LSPPING_TLV_TARGETFEC_SUBTLV_L2VPN_VCID, "L2 circuit ID"},
+    { LSPPING_TLV_TARGETFEC_SUBTLV_BGP_IPV4, "BGP labeled IPv4 prefix"},
+    { 0, NULL}
+};
+
 void
 lspping_print(register const u_char *pptr, register u_int len) {
 
     const struct lspping_common_header *lspping_com_header;
     const struct lspping_tlv_header *lspping_tlv_header;
+    const struct lspping_tlv_header *lspping_subtlv_header;
     const u_char *tptr,*tlv_tptr;
     int tlen,lspping_tlv_len,lspping_tlv_type,tlv_tlen;
-    int hexdump;
+    int tlv_hexdump,subtlv_hexdump;
+    int lspping_subtlv_len,lspping_subtlv_type;
 
     tptr=pptr;
     lspping_com_header = (const struct lspping_common_header *)pptr;
@@ -164,22 +207,41 @@ lspping_print(register const u_char *pptr, register u_int len) {
 
     tlen=len;
 
-    printf("\n\tLSP-PINGv%u, msg-type: %s (%u), reply-mode: %s (%u)" \
-           "\n\t  Return Code: (%u), Return Subcode: (%u)" \
-           "\n\t  Sender Handle: 0x%08x, Sequence: %u" \
-           "\n\t  Sender Timestamp %u.%us, Receiver Timestamp %u.%us",
+    printf("\n\tLSP-PINGv%u, msg-type: %s (%u), reply-mode: %s (%u)",
            EXTRACT_16BITS(&lspping_com_header->version[0]),
            tok2str(lspping_msg_type_values, "unknown",lspping_com_header->msg_type),
            lspping_com_header->msg_type,
            tok2str(lspping_reply_mode_values, "unknown",lspping_com_header->reply_mode),
-           lspping_com_header->reply_mode,
-           lspping_com_header->return_code,
-           lspping_com_header->return_subcode,
+           lspping_com_header->reply_mode);
+
+    /*
+     *  the following return codes require that the subcode is attached
+     *  at the end of the translated token output
+     */
+    if (lspping_com_header->return_code == 3 ||
+        lspping_com_header->return_code == 4 ||
+        lspping_com_header->return_code == 8 ||
+        lspping_com_header->return_code == 10 ||
+        lspping_com_header->return_code == 11 ||
+        lspping_com_header->return_code == 12 )
+        printf("\n\t  Return Code: %s %u (%u), Return Subcode: (%u)",
+               tok2str(lspping_return_code_values, "unknown",lspping_com_header->return_code),
+               lspping_com_header->return_subcode,    
+               lspping_com_header->return_code,
+               lspping_com_header->return_subcode);
+    else
+        printf("\n\t  Return Code: %s (%u), Return Subcode: (%u)",
+               tok2str(lspping_return_code_values, "unknown",lspping_com_header->return_code),   
+               lspping_com_header->return_code,
+               lspping_com_header->return_subcode);
+ 
+    printf("\n\t  Sender Handle: 0x%08x, Sequence: %u" \
+           "\n\t  Sender Timestamp %u.%us, Receiver Timestamp %u.%us",
            EXTRACT_32BITS(lspping_com_header->sender_handle),
            EXTRACT_32BITS(lspping_com_header->seq_number),
-           EXTRACT_32BITS(lspping_com_header->ts_sent_sec),
+           EXTRACT_32BITS(lspping_com_header->ts_sent_sec), /* FIXME: replace with ts_print() */
            EXTRACT_32BITS(lspping_com_header->ts_sent_usec),
-           EXTRACT_32BITS(lspping_com_header->ts_rcvd_sec),
+           EXTRACT_32BITS(lspping_com_header->ts_rcvd_sec), /* FIXME: replace with ts_print() */
            EXTRACT_32BITS(lspping_com_header->ts_rcvd_usec));
 
     tptr+=sizeof(const struct lspping_common_header);
@@ -194,8 +256,13 @@ lspping_print(register const u_char *pptr, register u_int len) {
         lspping_tlv_type=EXTRACT_16BITS(lspping_tlv_header->type);
         lspping_tlv_len=EXTRACT_16BITS(lspping_tlv_header->length);
 
-        if(lspping_tlv_len % 4 || lspping_tlv_len < 4)
+        if (lspping_tlv_len == 0)
             return;
+
+        if(lspping_tlv_len % 4 || lspping_tlv_len < 4) { /* aligned to four octet boundary */
+            printf("\n\t  ERROR: TLV %u bogus size %u",lspping_tlv_type,lspping_tlv_len);
+            return;
+        }
 
         printf("\n\t  %s TLV (%u), length: %u",
                tok2str(lspping_tlv_values,
@@ -205,21 +272,73 @@ lspping_print(register const u_char *pptr, register u_int len) {
                lspping_tlv_len);
 
         tlv_tptr=tptr+sizeof(struct lspping_tlv_header);
-        tlv_tlen=lspping_tlv_len-sizeof(struct lspping_tlv_header);
+        tlv_tlen=lspping_tlv_len; /* header not included -> no adjustment */
 
         /* did we capture enough for fully decoding the tlv ? */
         if (!TTEST2(*tptr, lspping_tlv_len))
             goto trunc;
-        hexdump=FALSE;
+        tlv_hexdump=FALSE;
 
         switch(lspping_tlv_type) {
-
-        /*
-         *  FIXME those are the defined messages that lack a decoder
-         *  you are welcome to contribute code ;-)
-         */
-
         case LSPPING_TLV_TARGET_FEC_STACK:
+            while(tlv_tlen>(int)sizeof(struct lspping_tlv_header)) {
+
+                /* did we capture enough for fully decoding the subtlv header ? */
+                if (!TTEST2(*tptr, sizeof(struct lspping_tlv_header)))
+                    goto trunc;
+                subtlv_hexdump=FALSE;
+
+                lspping_subtlv_header = (const struct lspping_tlv_header *)tlv_tptr;
+                lspping_subtlv_type=EXTRACT_16BITS(lspping_subtlv_header->type);
+                lspping_subtlv_len=EXTRACT_16BITS(lspping_subtlv_header->length);
+
+                if (lspping_subtlv_len == 0)
+                    break;
+
+                printf("\n\t    %s subTLV (%u), length: %u",
+                       tok2str(lspping_tlvtargetfec_subtlv_values,
+                               "Unknown",
+                               lspping_subtlv_type),
+                       lspping_subtlv_type,
+                       lspping_subtlv_len);
+
+                switch(lspping_subtlv_type) {
+
+                    /*
+                     *  FIXME those are the defined subTLVs that lack a decoder
+                     *  you are welcome to contribute code ;-)
+                     */
+
+                case LSPPING_TLV_TARGETFEC_SUBTLV_LDP_IPV4:
+                case LSPPING_TLV_TARGETFEC_SUBTLV_LDP_IPV6:
+                case LSPPING_TLV_TARGETFEC_SUBTLV_RSVP_IPV4:
+                case LSPPING_TLV_TARGETFEC_SUBTLV_RSVP_IPV6:
+                case LSPPING_TLV_TARGETFEC_SUBTLV_L3VPN_IPV4:
+                case LSPPING_TLV_TARGETFEC_SUBTLV_L3VPN_IPV6:
+                case LSPPING_TLV_TARGETFEC_SUBTLV_L2VPN_ENDPT:
+                case LSPPING_TLV_TARGETFEC_SUBTLV_L2VPN_VCID:
+                case LSPPING_TLV_TARGETFEC_SUBTLV_BGP_IPV4:
+
+                default:
+                    subtlv_hexdump=TRUE; /* unknown subTLV just hexdump it */
+                    break;
+                }
+                /* do we want to see an additionally subtlv hexdump ? */
+                if (vflag > 1 || subtlv_hexdump==TRUE)
+                    print_unknown_data(tlv_tptr+sizeof(struct lspping_tlv_header), \
+                                       "\n\t      ",
+                                       lspping_subtlv_len);
+
+                tlv_tptr+=lspping_subtlv_len;
+                tlv_tlen-=lspping_subtlv_len+sizeof(struct lspping_tlv_header);
+            }
+            break;
+
+            /*
+             *  FIXME those are the defined TLVs that lack a decoder
+             *  you are welcome to contribute code ;-)
+             */
+
         case LSPPING_TLV_DOWNSTREAM_MAPPING:
         case LSPPING_TLV_PAD:
         case LSPPING_TLV_ERROR_CODE:
@@ -230,10 +349,10 @@ lspping_print(register const u_char *pptr, register u_int len) {
                 print_unknown_data(tlv_tptr,"\n\t    ",tlv_tlen);
             break;
         }
-        /* do we want to see an additionally hexdump ? */
-        if (vflag > 1 || hexdump==TRUE)
+        /* do we want to see an additionally tlv hexdump ? */
+        if (vflag > 1 || tlv_hexdump==TRUE)
             print_unknown_data(tptr+sizeof(sizeof(struct lspping_tlv_header)),"\n\t    ",
-                               lspping_tlv_len-sizeof(struct lspping_tlv_header));
+                               lspping_tlv_len);
 
         tptr+=lspping_tlv_len;
         tlen-=lspping_tlv_len;
