@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.165 
+# From configure.in Revision: 1.166 
 
 
 
@@ -4689,7 +4689,7 @@ for dir in /usr/${host_alias} /usr /usr/local /usr/local/ssl /usr/pkg; do
 	if test -d $dir/lib -a \( -f $dir/lib/libcrypto.a -o \
 			          -f $dir/lib/libcrypto.so -o \
 			          -f $dir/lib/libcrypto.sl -o \
-				  -f $dir/lib/libcrypto.dylib); then
+				  -f $dir/lib/libcrypto.dylib \); then
 		ac_cv_ssleay_path=$dir
 	fi
 	if test -d $dir/include/openssl -a -f $dir/include/openssl/des.h; then
