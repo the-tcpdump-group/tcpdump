@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.28 2002-12-09 05:12:25 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.29 2002-12-10 08:03:36 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -39,6 +39,7 @@ static const char rcsid[] =
 #include "ethertype.h"
 #include "atm.h"
 #include "atmuni31.h"
+#include "llc.h"
 
 #include "ether.h"
 
@@ -81,6 +82,12 @@ atm_llc_print(const u_char *p, int length, int caplen)
 }
 
 /*
+ * Given a SAP value, generate the LLC header value for a UI packet
+ * with that SAP as the source and destination SAP.
+ */
+#define LLC_UI_HDR(sap)	((sap)<<16 | (sap<<8) | 0x03)
+
+/*
  * This is the top level routine of the printer.  'p' points
  * to the LLC/SNAP header of the packet, 'h->ts' is the timestamp,
  * 'h->length' is the length of the packet off the wire, and 'h->caplen'
@@ -112,12 +119,28 @@ atm_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 	 * Extract the presumed LLC header into a variable, for quick
 	 * testing.
 	 * Then check for a header that's neither a header for a SNAP
-	 * packet nor an RFC 2684 routed NLPID-formatted PDU.
+	 * packet nor an RFC 2684 routed NLPID-formatted PDU nor
+	 * an 802.2-but-no-SNAP IP packet.
 	 */
 	llchdr = EXTRACT_24BITS(p);
-	if (llchdr != 0xaaaa03 && llchdr != 0xfefe03) {
+	if (llchdr != LLC_UI_HDR(LLCSAP_SNAP) &&
+	    llchdr != LLC_UI_HDR(LLCSAP_ISONS) &&
+	    llchdr != LLC_UI_HDR(LLCSAP_IP)) {
 		/*
 		 * XXX - assume 802.6 MAC header from Fore driver.
+		 *
+		 * Unfortunately, the above list doesn't check for
+		 * all known SAPs, doesn't check for headers where
+		 * the source and destination SAP aren't the same,
+		 * and doesn't check for non-UI frames.  It also
+		 * runs the risk of an 802.6 MAC header that happens
+		 * to begin with one of those values being
+		 * incorrectly treated as an 802.2 header.
+		 *
+		 * So is that Fore driver still around?  And, if so,
+		 * is it still putting 802.6 MAC headers on ATM
+		 * packets?  If so, could it be changed to use a
+		 * new DLT_IEEE802_6 value if we added it?
 		 */
 		if (eflag)
 			printf("%08x%08x %08x%08x ",
