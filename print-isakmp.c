@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.8 1999-11-21 09:36:54 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.9 2000-01-07 14:09:02 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1001,6 +1001,7 @@ isakmp_print(const u_char *bp, u_int length, const u_char *bp2)
 	u_char np;
 	int i;
 	int phase;
+	int major, minor;
 
 	base = (struct isakmp *)bp;
 	ep = (u_char *)snapend;
@@ -1011,8 +1012,13 @@ isakmp_print(const u_char *bp, u_int length, const u_char *bp2)
 	}
 
 	printf("isakmp");
-	if (vflag)
-		printf(" %d.%d", base->v_maj, base->v_min);
+	if (vflag) {
+		major = (base->vers & ISAKMP_VERS_MAJOR)
+				>> ISAKMP_VERS_MAJOR_SHIFT;
+		minor = (base->vers & ISAKMP_VERS_MINOR)
+				>> ISAKMP_VERS_MINOR_SHIFT;
+		printf(" %d.%d", major, minor);
+	}
 
 	if (vflag) {
 		printf(" msgid ");
