@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.28 2004-07-16 00:13:51 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.29 2004-07-21 21:43:26 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -542,7 +542,8 @@ rsvp_obj_print (const u_char *tptr, const u_char *ident, u_int tlen) {
         rsvp_obj_ctype=rsvp_obj_header->ctype;
 
         if(rsvp_obj_len % 4 || rsvp_obj_len < sizeof(struct rsvp_object_header)) {
-            printf("ERROR: object header too short %u < %u", rsvp_obj_len, sizeof(const struct rsvp_object_header));
+            printf("ERROR: object header too short %u < %lu", rsvp_obj_len,
+                   (unsigned long)sizeof(const struct rsvp_object_header));
             return -1;
         }
 
@@ -1338,7 +1339,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
            EXTRACT_16BITS(rsvp_com_header->checksum));
 
     if (tlen < sizeof(const struct rsvp_common_header)) {
-        printf("ERROR: common header too short %u < %u", tlen, sizeof(const struct rsvp_common_header));
+        printf("ERROR: common header too short %u < %lu", tlen,
+               (unsigned long)sizeof(const struct rsvp_common_header));
         return;
     }
 
@@ -1373,7 +1375,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                    EXTRACT_16BITS(rsvp_com_header->checksum));
             
             if (subtlen < sizeof(const struct rsvp_common_header)) {
-                printf("ERROR: common header too short %u < %u", subtlen, sizeof(const struct rsvp_common_header));
+                printf("ERROR: common header too short %u < %lu", subtlen,
+                       (unsigned long)sizeof(const struct rsvp_common_header));
                 return;
             }
 
