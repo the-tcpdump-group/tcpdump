@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.17 2000-09-29 04:58:34 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.18 2000-11-10 17:52:02 fenner Exp $";
 #endif
 
 #include <sys/param.h>
@@ -318,7 +318,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 	int advance;
 	int tlen;
 	const u_char *p;
-	char buf[256];
+	char buf[MAXHOSTNAMELEN + 100];
 
 	p = dat;
 
@@ -627,7 +627,7 @@ bgp_update_print(const u_char *dat, int length)
 	if (dat + length > p) {
 		printf("(NLRI:");	/* ) */
 		while (dat + length > p) {
-			char buf[256];
+			char buf[MAXHOSTNAMELEN + 100];
 			i = decode_prefix4(p, buf, sizeof(buf));
 			printf(" %s", buf);
 			if (i < 0)
