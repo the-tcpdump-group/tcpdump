@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.83 2001-01-28 08:09:23 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.84 2001-02-03 05:04:49 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -51,6 +51,8 @@ static const char rcsid[] =
 #ifdef INET6
 #include "ip6.h"
 #endif
+
+#include "nameser.h"
 
 static void print_tcp_rst_data(register const u_char *sp, u_int length);
 
@@ -273,7 +275,7 @@ tcp_print(register const u_char *bp, register u_int length,
 	if (!qflag) {
 		if ((u_char *)tp + 4 + sizeof(struct rpc_msg) <= snapend &&
 		    dport == NFS_PORT) {
-			nfsreq_print((u_char *)tp + hlen + 4, length-hlen,
+			nfsreq_print((u_char *)tp + hlen + 4, length - hlen,
 				     (u_char *)ip);
 			return;
 		} else if ((u_char *)tp + 4 + sizeof(struct rpc_msg)
@@ -353,18 +355,18 @@ tcp_print(register const u_char *bp, register u_int length,
 		memset(&tha, 0, sizeof(tha));
 		rev = 0;
 		if (ip6) {
-			if (sport > dport) {
+			if (sport > dport)
 				rev = 1;
-			} else if (sport == dport) {
-			    int i;
+			else if (sport == dport) {
+				int i;
 
-			    for (i = 0; i < 4; i++) {
-				if (((u_int32_t *)(&ip6->ip6_src))[i] >
-				    ((u_int32_t *)(&ip6->ip6_dst))[i]) {
-					rev = 1;
-					break;
+				for (i = 0; i < 4; i++) {
+					if (((u_int32_t *)(&ip6->ip6_src))[i] >
+					    ((u_int32_t *)(&ip6->ip6_dst))[i]) {
+						rev = 1;
+						break;
+					}
 				}
-			    }
 			}
 			if (rev) {
 				tha.src = ip6->ip6_dst;
@@ -652,6 +654,11 @@ tcp_print(register const u_char *bp, register u_int length,
 			nbt_tcp_print(bp, length);
 		else if (sport == BXXP_PORT || dport == BXXP_PORT)
 			bxxp_print(bp, length);
+		else if (length > 2 &&
+		    (sport == NAMESERVER_PORT || dport == NAMESERVER_PORT)) {
+			/* TCP DNS query has 2byte length at the head */
+			ns_print(bp + 2, length - 2);
+		}
 	}
 	return;
 bad:
