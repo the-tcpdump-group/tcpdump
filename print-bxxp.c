@@ -11,7 +11,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-  "@(#) $Header: /tcpdump/master/tcpdump/Attic/print-bxxp.c,v 1.1 2000-09-30 03:35:56 guy Exp $";
+  "@(#) $Header: /tcpdump/master/tcpdump/Attic/print-bxxp.c,v 1.2 2000-09-30 08:37:44 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -29,6 +29,7 @@ static const char rcsid[] =
 #include <string.h>
 #include <unistd.h>
 
+#include "interface.h"
 #include "extract.h"
 
 /* Check for a string but not go beyond length
