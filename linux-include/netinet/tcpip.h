@@ -39,7 +39,7 @@
 struct tcpiphdr {
 	struct 	ipovly ti_i;		/* overlaid ip structure */
 	struct	tcphdr ti_t;		/* tcp header */
-};
+} __attribute__ ((packed));
 #define	ti_next		ti_i.ih_next
 #define	ti_prev		ti_i.ih_prev
 #define	ti_x1		ti_i.ih_x1

@@ -86,7 +86,7 @@ struct icmp {
 #define	icmp_ip		icmp_dun.id_ip.idi_ip
 #define	icmp_mask	icmp_dun.id_mask
 #define	icmp_data	icmp_dun.id_data
-};
+} __attribute__ ((packed));
 
 /*
  * Lower bounds on packet lengths for various types.

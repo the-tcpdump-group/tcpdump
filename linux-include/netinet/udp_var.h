@@ -39,7 +39,7 @@
 struct	udpiphdr {
 	struct 	ipovly ui_i;		/* overlaid ip structure */
 	struct	udphdr ui_u;		/* udp header */
-};
+} __attribute__ ((packed));
 #define	ui_next		ui_i.ih_next
 #define	ui_prev		ui_i.ih_prev
 #define	ui_x1		ui_i.ih_x1

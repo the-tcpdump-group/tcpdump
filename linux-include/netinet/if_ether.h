@@ -45,7 +45,7 @@
  */
 struct ether_addr {
 	u_char	ether_addr_octet[ETHER_ADDR_LEN];
-};
+} __attribute__ ((packed));
 
 /*
  * Structure of a 10Mb/s Ethernet header.
@@ -54,7 +54,7 @@ struct	ether_header {
 	u_char	ether_dhost[ETHER_ADDR_LEN];
 	u_char	ether_shost[ETHER_ADDR_LEN];
 	u_short	ether_type;
-};
+} __attribute__ ((packed));
 
 #define	ETHERTYPE_PUP		0x0200	/* PUP protocol */
 #define	ETHERTYPE_IP		0x0800	/* IP protocol */
@@ -86,7 +86,7 @@ struct	ether_arp {
 	u_char	arp_spa[4];	/* sender protocol address */
 	u_char	arp_tha[6];	/* target hardware address */
 	u_char	arp_tpa[4];	/* target protocol address */
-};
+} __attribute__ ((packed));
 #define	arp_hrd	ea_hdr.ar_hrd
 #define	arp_pro	ea_hdr.ar_pro
 #define	arp_hln	ea_hdr.ar_hln

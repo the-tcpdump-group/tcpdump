@@ -45,7 +45,7 @@ struct ipovly {
 	short	ih_len;			/* protocol length */
 	struct	in_addr ih_src;		/* source internet address */
 	struct	in_addr ih_dst;		/* destination internet address */
-};
+} __attribute__ ((packed));
 
 /*
  * Ip reassembly queue structure.  Each fragment
@@ -61,7 +61,7 @@ struct ipq {
 	struct	ipasfrag *ipq_next,*ipq_prev;
 					/* to ip headers of fragments */
 	struct	in_addr ipq_src,ipq_dst;
-};
+} __attribute__ ((packed));
 
 /*
  * Ip header, when holding a fragment.
@@ -88,7 +88,7 @@ struct	ipasfrag {
 	u_short	ip_sum;
 	struct	ipasfrag *ipf_next;	/* next fragment */
 	struct	ipasfrag *ipf_prev;	/* previous fragment */
-};
+} __attribute__ ((packed));
 
 /*
  * Structure stored in mbuf in inpcb.ip_options
