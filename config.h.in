@@ -80,6 +80,9 @@
 /* define if you have struct sockaddr_storage */
 #undef HAVE_SOCKADDR_STORAGE
 
+/* define if you have both getipnodebyname() and getipnodebyaddr() */
+#undef USE_GETIPNODEBY
+
 /* define if unaligned memory accesses fail */
 #undef LBL_ALIGN
 
@@ -127,11 +130,20 @@
 /* Define if you have the ether_ntohost function.  */
 #undef HAVE_ETHER_NTOHOST
 
+/* Define if you have the freeaddrinfo function.  */
+#undef HAVE_FREEADDRINFO
+
 /* Define if you have the getaddrinfo function.  */
 #undef HAVE_GETADDRINFO
 
 /* Define if you have the gethostbyname2 function.  */
 #undef HAVE_GETHOSTBYNAME2
+
+/* Define if you have the getipnodebyaddr function.  */
+#undef HAVE_GETIPNODEBYADDR
+
+/* Define if you have the getipnodebyname function.  */
+#undef HAVE_GETIPNODEBYNAME
 
 /* Define if you have the getnameinfo function.  */
 #undef HAVE_GETNAMEINFO
@@ -205,9 +217,6 @@
 /* Define if you have the <smi.h> header file.  */
 #undef HAVE_SMI_H
 
-/* Define if you have the <zlib.h> header file.  */
-#undef HAVE_ZLIB_H
-
 /* Define if you have the crypto library (-lcrypto).  */
 #undef HAVE_LIBCRYPTO
 
@@ -228,6 +237,3 @@
 
 /* Define if you have the str library (-lstr).  */
 #undef HAVE_LIBSTR
-
-/* Define if you have the z library (-lz).  */
-#undef HAVE_LIBZ
