@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.65 2000-06-03 16:40:36 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.66 2000-06-10 08:11:12 assar Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -166,8 +166,8 @@ ts_print(register const struct timeval *tvp)
 		break;
 	case -3: /* Default + Date*/
 		s = (tvp->tv_sec + thiszone) % 86400;
-		time(&Time);
-		tm = localtime(&Time);
+		Time = (tvp->tv_sec + thiszone) - s;
+		tm  = gmtime (&Time);
 		(void)printf("%02d/%02d/%04d %02d:%02d:%02d.%06u ",
 			     tm->tm_mon+1, tm->tm_mday,
 			     tm->tm_year+1900,
