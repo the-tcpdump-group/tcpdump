@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.14 2002-12-12 07:39:19 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.15 2002-12-12 07:47:38 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -49,6 +49,7 @@ do { \
 	const char *sep = " ["; \
 	for (z = 0; z < p.rates.length ; z++) { \
 		printf("%s%2.1f", sep, (.5 * (p.rates.rate[z] & 0x7f))); \
+		if (p.rates.rate[z] & 0x80) printf("*"); \
 		sep = " "; \
 	} \
 	if (p.rates.length != 0) \
