@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/nlpid.h,v 1.1 2004-10-07 14:53:10 hannes Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/nlpid.h,v 1.2 2004-10-12 21:02:00 hannes Exp $ (LBL) */
 /* 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that: (1) source code
@@ -25,6 +25,7 @@ extern struct tok nlpid_values[];
 #define	NLPID_ISIS	0x83 /* iso9577 */
 #define NLPID_CONS      0x84
 #define NLPID_IDRP      0x85
+#define NLPID_MFR       0xb1 /* FRF.15 */
 #define NLPID_IP        0xcc
 #define NLPID_X25_ESIS  0x8a
 #define NLPID_IP6       0x8e

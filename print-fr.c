@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.25 2004-10-09 17:55:26 hannes Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.26 2004-10-12 21:02:00 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -41,6 +41,7 @@ static const char rcsid[] _U_ =
 #include "extract.h"
 
 static void lmi_print(const u_char *, u_int);
+static void frf15_print(const u_char *, u_int);
 
 /*
  * the frame relay header has a variable length
@@ -61,7 +62,6 @@ static void lmi_print(const u_char *, u_int);
  *    +----+----+----+----+----+----+----+----+
  *    |        DLCI (6 bits)        |SDLC| EA |
  *    +----+----+----+----+----+----+----+----+
-
  */
 
 #define FR_EA_BIT	0x01
@@ -95,7 +95,7 @@ static int parse_q922_addr(const u_char *p, u_int *dlci, u_int *sdlcore,
 	*addr_len = 2;
 	*dlci = ((p[0] & 0xFC) << 2) | ((p[1] & 0xF0) >> 4);
 
-        flags[0] = p[0] & 0x02; /* populate the frist flag fields */
+        flags[0] = p[0] & 0x02; /* populate the first flag fields */
         flags[1] = p[1] & 0x0c;
 
 	if (p[1] & FR_EA_BIT)
@@ -290,6 +290,10 @@ fr_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 		lmi_print(p, length);
 		break;
 
+        case NLPID_MFR:
+                frf15_print(p, length);
+                break;
+
 	default:
 		if (!eflag)
                     fr_hdr_print(length + hdr_len, addr_len,
@@ -299,6 +303,55 @@ fr_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 	}
 
 	return hdr_len;
+}
+
+/* an NLPID of 0xb1 indicates a 2-byte
+ * FRF.15 header
+ * 
+ *      7    6    5    4    3    2    1    0
+ *    +----+----+----+----+----+----+----+----+
+ *    ~              Q.922 header             ~
+ *    +----+----+----+----+----+----+----+----+
+ *    |             NLPID (8 bits)            | NLPID=0xb1
+ *    +----+----+----+----+----+----+----+----+
+ *    | B  | E  | C  |seq. (high 4 bits) | R  |
+ *    +----+----+----+----+----+----+----+----+
+ *    |        sequence  (low 8 bits)         |
+ *    +----+----+----+----+----+----+----+----+
+ */
+
+struct tok frf15_flag_values[] = {
+    { 0x80, "Begin" },
+    { 0x40, "End" },
+    { 0x20, "Control" },
+    { 0, NULL }
+};
+
+#define FR_FRF15_FRAGTYPE 0x01
+
+static void
+frf15_print (const u_char *p, u_int length) {
+    
+    u_int16_t sequence_num, flags;
+
+    flags = p[0]&0xe0;
+    sequence_num = (p[0]&0x1e)<<7 | p[1];
+
+    printf("FRF.15, seq 0x%03x, Flags [%s],%s Fragmentation, length %u",
+           sequence_num,
+           bittok2str(frf15_flag_values,"none",flags),
+           flags&FR_FRF15_FRAGTYPE ? "Interface" : "End-to-End",
+           length);
+
+/* TODO:
+ * depending on all permutations of the B, E and C bit
+ * dig as deep as we can - e.g. on the first (B) fragment
+ * there is enough payload to print the IP header
+ * on non (B) fragments it depends if the fragmentation
+ * model is end-to-end or interface based wether we want to print
+ * another Q.922 header
+ */
+
 }
 
 /*
