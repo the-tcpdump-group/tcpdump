@@ -45,7 +45,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.46 2001-03-17 04:41:50 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.47 2001-03-22 02:06:43 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -428,16 +428,11 @@ asn1_parse(register const u_char *p, u_int len, struct be *elem)
 	elem->form = form;
 	elem->class = class;
 	elem->id = id;
-	if (vflag > 1)
-		printf("|%.2x", *p);
 	p++; len--; hdr = 1;
 	/* extended tag field */
 	if (id == ASN_ID_EXT) {
-		for (id = 0; *p & ASN_BIT8 && len > 0; len--, hdr++, p++) {
-			if (vflag > 1)
-				printf("|%.2x", *p);
+		for (id = 0; *p & ASN_BIT8 && len > 0; len--, hdr++, p++)
 			id = (id << 7) | (*p & ~ASN_BIT8);
-		}
 		if (len == 0 && *p & ASN_BIT8) {
 			ifNotTruncated fputs("[Xtagfield?]", stdout);
 			return -1;
@@ -452,8 +447,6 @@ asn1_parse(register const u_char *p, u_int len, struct be *elem)
 		return -1;
 	}
 	elem->asnlen = *p;
-	if (vflag > 1)
-		printf("|%.2x", *p);
 	p++; len--; hdr++;
 	if (elem->asnlen & ASN_BIT8) {
 		int noct = elem->asnlen % ASN_BIT8;
@@ -462,11 +455,8 @@ asn1_parse(register const u_char *p, u_int len, struct be *elem)
 			ifNotTruncated printf("[asnlen? %d<%d]", len, noct);
 			return -1;
 		}
-		for (; noct-- > 0; len--, hdr++) {
-			if (vflag > 1)
-				printf("|%.2x", *p);
+		for (; noct-- > 0; len--, hdr++)
 			elem->asnlen = (elem->asnlen << ASN_SHIFT8) | *p++;
-		}
 	}
 	if (len < elem->asnlen) {
 		if (!truncated) {
