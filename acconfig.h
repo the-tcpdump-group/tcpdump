@@ -75,15 +75,6 @@
 /* define if you have both getipnodebyname() and getipnodebyaddr() */
 #undef USE_GETIPNODEBY
 
-/* Define if you have the inet_aton function.  */
-#undef HAVE_INET_ATON
-
-/* Define if you have the inet_ntop function.  */
-#undef HAVE_INET_NTOP
-
-/* Define if you have the inet_pton function.  */
-#undef HAVE_INET_PTON
-
 /* define if unaligned memory accesses fail */
 #undef LBL_ALIGN
 
