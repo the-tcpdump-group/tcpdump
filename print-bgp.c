@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.70 2003-08-13 02:26:53 itojun Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.71 2003-10-27 08:04:52 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -274,6 +274,8 @@ static struct tok bgp_origin_values[] = {
 #define SAFNUM_VPNUNICAST               128
 #define SAFNUM_VPNMULTICAST             129
 #define SAFNUM_VPNUNIMULTICAST          130
+/* draft-marques-ppvpn-rt-constrain-01.txt */
+#define SAFNUM_RT_ROUTING_INFO          132
 
 #define BGP_VPN_RD_LEN                  8
 
@@ -286,6 +288,7 @@ static struct tok bgp_safi_values[] = {
     { SAFNUM_VPNUNICAST,        "labeled VPN Unicast"},
     { SAFNUM_VPNMULTICAST,      "labeled VPN Multicast"},
     { SAFNUM_VPNUNIMULTICAST,   "labeled VPN Unicast+Multicast"},
+    { SAFNUM_RT_ROUTING_INFO,   "Route Target Routing Information"},
     { 0, NULL }
 };
 
@@ -477,6 +480,9 @@ decode_labeled_prefix4(const u_char *pptr, char *buf, u_int buflen)
 	return 4 + (plen + 7) / 8;
 }
 
+/* RDs and RTs share the same semantics
+ * we use bgp_vpn_rd_print for
+ * printing route targets inside a NLRI */
 static char *
 bgp_vpn_rd_print (const u_char *pptr) {
 
@@ -488,15 +494,23 @@ bgp_vpn_rd_print (const u_char *pptr) {
 
     /* ok lets load the RD format */
     switch (EXTRACT_16BITS(pptr)) {
+
         /* AS:IP-address fmt*/
     case 0:
         snprintf(pos, sizeof(rd) - (pos - rd), "%u:%u.%u.%u.%u",
             EXTRACT_16BITS(pptr+2), *(pptr+4), *(pptr+5), *(pptr+6), *(pptr+7));
         break;
         /* IP-address:AS fmt*/
+
     case 1:
         snprintf(pos, sizeof(rd) - (pos - rd), "%u.%u.%u.%u:%u",
             *(pptr+2), *(pptr+3), *(pptr+4), *(pptr+5), EXTRACT_16BITS(pptr+6));
+        break;
+
+        /* 4-byte-AS:number fmt*/
+    case 2:
+        snprintf(pos, sizeof(rd) - (pos - rd), "%u:%u",
+            EXTRACT_32BITS(pptr+2), EXTRACT_16BITS(pptr+6));
         break;
     default:
         snprintf(pos, sizeof(rd) - (pos - rd), "unknown RD format");
@@ -505,6 +519,32 @@ bgp_vpn_rd_print (const u_char *pptr) {
     pos += strlen(pos);
     *(pos) = '\0';
     return (rd);
+}
+
+static int
+decode_rt_routing_info(const u_char *pptr, char *buf, u_int buflen)
+{
+	u_int8_t route_target[8];
+	u_int plen;
+
+	plen = pptr[0];   /* get prefix length */
+
+        plen-=32; /* adjust prefix length */
+
+	if (0 < plen)
+		return -1;
+
+	memset(&route_target, 0, sizeof(route_target));
+	memcpy(&route_target, &pptr[1], (plen + 7) / 8);
+	if (plen % 8) {
+		((u_char *)&route_target)[(plen + 7) / 8 - 1] &=
+			((0xff00 >> (plen % 8)) & 0xff);
+	}
+	snprintf(buf, buflen, "origin AS: %u, route target %s",
+                 EXTRACT_32BITS(pptr+1),
+                 bgp_vpn_rd_print(pptr+5));
+
+	return 5 + (plen + 7) / 8;
 }
 
 static int
@@ -821,6 +861,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                                     case SAFNUM_MULTICAST:
                                     case SAFNUM_UNIMULTICAST:
                                     case SAFNUM_LABUNICAST:
+                                    case SAFNUM_RT_ROUTING_INFO:
 					printf("%s",getname(tptr));
 					tlen -= sizeof(struct in_addr);
                                         tptr += sizeof(struct in_addr);
@@ -848,6 +889,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                                     case SAFNUM_MULTICAST:
                                     case SAFNUM_UNIMULTICAST:
                                     case SAFNUM_LABUNICAST:
+                                    case SAFNUM_RT_ROUTING_INFO:
                                         printf("%s", getname6(tptr));
                                         tlen -= sizeof(struct in6_addr);
                                         tptr += sizeof(struct in6_addr);
@@ -932,6 +974,10 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                                 advance = decode_labeled_vpn_prefix4(tptr, buf, sizeof(buf));
                                 printf("\n\t      %s", buf);
                                 break;
+                            case SAFNUM_RT_ROUTING_INFO:
+                                advance = decode_rt_routing_info(tptr, buf, sizeof(buf));
+                                printf("\n\t      %s", buf);
+                                break;
                             default:
                                 printf("\n\t      no SAFI %u decoder",safi);
                                 if (vflag <= 1)
@@ -958,6 +1004,10 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                             case SAFNUM_VPNMULTICAST:
                             case SAFNUM_VPNUNIMULTICAST:
                                 advance = decode_labeled_vpn_prefix6(tptr, buf, sizeof(buf));
+                                printf("\n\t      %s", buf);
+                                break;
+                            case SAFNUM_RT_ROUTING_INFO:
+                                advance = decode_rt_routing_info(tptr, buf, sizeof(buf));
                                 printf("\n\t      %s", buf);
                                 break;
                             default:
