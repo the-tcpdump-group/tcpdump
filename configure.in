@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.147 2002-04-07 02:09:04 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.148 2002-04-07 02:12:01 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.147 $)
+AC_REVISION($Revision: 1.148 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -508,7 +508,7 @@ AC_CHECK_FUNCS(ether_ntohost, [
 		}
 	], [ac_cv_buggy_ether_ntohost=no],
 	   [ac_cv_buggy_ether_ntohost=yes],
-	   [ac_cv_buggy_ether_ntohost=not while cross-compiling])])
+	   [ac_cv_buggy_ether_ntohost="not while cross-compiling"])])
     if test "$ac_cv_buggy_ether_ntohost" = "no"; then
 	AC_DEFINE(USE_ETHER_NTOHOST)
     fi

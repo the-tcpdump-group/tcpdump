@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.147 
+# From configure.in Revision: 1.148 
 
 
 
@@ -2956,7 +2956,7 @@ if eval "test \"`echo '$''{'ac_cv_buggy_ether_ntohost'+set}'`\" = set"; then
 else
   
 	if test "$cross_compiling" = yes; then
-  ac_cv_buggy_ether_ntohost=not while cross-compiling
+  ac_cv_buggy_ether_ntohost="not while cross-compiling"
 else
   cat > conftest.$ac_ext <<EOF
 #line 2963 "configure"
