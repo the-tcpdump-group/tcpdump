@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.59 2002-04-02 02:57:39 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.60 2002-05-30 22:01:34 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -605,7 +605,7 @@ icmp6_opt_print(const u_char *bp, int resid)
 			printf(")");
 			break;
 		default:
-			printf("(unknwon opt_type=%d, opt_len=%d)",
+			printf("(unknown opt_type=%d, opt_len=%d)",
 			       op->nd_opt_type, op->nd_opt_len);
 			break;
 		}
