@@ -49,7 +49,9 @@
 #include "config.h"
 #endif
 
+#ifdef HAVE_SYS_CDEFS_H
 #include <sys/cdefs.h>
+#endif
 #if 0
 #ifndef lint
 __RCSID("$NetBSD: print-telnet.c,v 1.2 1999/10/11 12:40:12 sjg Exp $");
