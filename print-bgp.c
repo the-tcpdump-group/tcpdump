@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.23 2001-09-17 21:57:55 fenner Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.24 2001-10-15 23:27:31 fenner Exp $";
 #endif
 
 #include <sys/param.h>
@@ -346,7 +346,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 			if (p[0] == 3 || p[0] == 4)
 				printf("confed");
 			printf("%s", (p[0] & 1) ? "{" : "");
-			for (i = 0; i < p[1]; i += 2) {
+			for (i = 0; i < p[1] * 2; i += 2) {
 				printf("%s%u", i == 0 ? "" : " ",
 					EXTRACT_16BITS(&p[2 + i]));
 			}
