@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.112 2000-04-09 19:13:27 assar Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.113 2000-04-27 09:16:09 itojun Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.112 $)
+AC_REVISION($Revision: 1.113 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -609,6 +609,8 @@ AC_LBL_UNALIGNED_ACCESS
 
 AC_VAR_H_ERRNO
 
+AC_ARG_WITH(crypto, [  --without-crypto         disable crypto support],
+	[], [
 AC_MSG_CHECKING(for SSLeay)
 ac_cv_ssleay_path=no
 incdir=no
@@ -678,6 +680,7 @@ main()
 
 	CPPFLAGS=$bak_CPPFLAGS
 fi
+])
 
 if test -r ${srcdir}/lbl/gnuc.h ; then
 	rm -f gnuc.h
