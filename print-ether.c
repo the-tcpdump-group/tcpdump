@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.57 2000-10-07 05:46:21 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.58 2000-10-09 02:59:39 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -85,7 +85,7 @@ ether_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 
 	ts_print(&h->ts);
 
-	if (caplen < sizeof(struct ether_header)) {
+	if (caplen < ETHER_HDRLEN) {
 		printf("[|ether]");
 		goto out;
 	}
@@ -101,10 +101,10 @@ ether_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	packetp = p;
 	snapend = p + caplen;
 
-	length -= sizeof(struct ether_header);
-	caplen -= sizeof(struct ether_header);
+	length -= ETHER_HDRLEN;
+	caplen -= ETHER_HDRLEN;
 	ep = (struct ether_header *)p;
-	p += sizeof(struct ether_header);
+	p += ETHER_HDRLEN;
 
 	ether_type = ntohs(ep->ether_type);
 
@@ -128,7 +128,7 @@ ether_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	} else if (ether_encap_print(ether_type, p, length, caplen) == 0) {
 		/* ether_type not known, print raw packet */
 		if (!eflag)
-			ether_print((u_char *)ep, length + sizeof(*ep));
+			ether_print((u_char *)ep, length + ETHER_HDRLEN);
 		if (!xflag && !qflag)
 			default_print(p, caplen);
 	}

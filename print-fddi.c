@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-fddi.c,v 1.46 2000-10-06 04:23:11 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-fddi.c,v 1.47 2000-10-09 02:59:40 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -87,8 +87,6 @@ int	fddi_bitswap = 1;
  *
  *  - vj
  */
-
-#define FDDI_HDRLEN (sizeof(struct fddi_header))
 
 static u_char fddi_bit_swap[] = {
 	0x00, 0x80, 0x40, 0xc0, 0x20, 0xa0, 0x60, 0xe0,

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.11 2000-10-06 04:23:13 guy Exp $ (LBL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.12 2000-10-09 02:59:40 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -101,7 +101,7 @@ pppoe_print(register const u_char *bp, u_int length)
   const u_char *pppoe_packet, *pppoe_payload;
 
   eh = (struct ether_header *)packetp;
-  pppoe_packet = packetp+sizeof(struct ether_header);
+  pppoe_packet = packetp+ETHER_HDRLEN;
   if (pppoe_packet > snapend) {
     printf("[|pppoe]");
     return;
