@@ -29,7 +29,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lwres.c,v 1.10.2.2 2003-11-16 08:51:32 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lwres.c,v 1.10.2.3 2004-03-24 01:54:58 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -265,16 +265,19 @@ lwres_printaddr(lwres_addr_t *ap)
 	l = EXTRACT_16BITS(&ap->length);
 	/* XXX ap points to packed struct */
 	p = (const char *)&ap->length + sizeof(ap->length);
-	if (p + l > (const char *)snapend)
-		goto trunc;
+	TCHECK2(*p, l);
 
 	switch (EXTRACT_32BITS(&ap->family)) {
 	case 1:	/* IPv4 */
+		if (l < 4)
+			return -1;
 		printf(" %s", ipaddr_string(p));
 		p += sizeof(struct in_addr);
 		break;
 #ifdef INET6
 	case 2:	/* IPv6 */
+		if (l < 16)
+			return -1;
 		printf(" %s", ip6addr_string(p));
 		p += sizeof(struct in6_addr);
 		break;
