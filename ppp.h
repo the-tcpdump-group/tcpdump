@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ppp.h,v 1.8 1999-11-21 03:43:56 assar Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ppp.h,v 1.9 2000-05-23 16:56:07 itojun Exp $ (LBL) */
 /*
  * Point to Point Protocol (PPP) RFC1331
  *
@@ -30,6 +30,7 @@
 #define PPP_BRPDU	0x0031	/* Bridging PDU */
 #define PPP_STII	0x0033	/* Stream Protocol (ST-II) */
 #define PPP_VINES	0x0035	/* Banyan Vines */
+#define PPP_IPV6	0x0057	/* IPv6 */
 
 #define PPP_HELLO	0x0201	/* 802.1d Hello Packets */
 #define PPP_LUXCOM	0x0231	/* Luxcom */
@@ -43,6 +44,7 @@
 #define PPP_IPXCP	0x802b	/* Novell IPX Control Protocol */
 #define PPP_STIICP	0x8033	/* Strean Protocol Control Protocol */
 #define PPP_VINESCP	0x8035	/* Banyan Vines Control Protocol */
+#define PPP_IPV6CP	0x8057	/* IPv6 Control Protocol */
 
 #define PPP_LCP		0xc021	/* Link Control Protocol */
 #define PPP_PAP		0xc023	/* Password Authentication Protocol */

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.36 2000-04-28 11:14:48 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.37 2000-05-23 16:56:08 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -499,9 +499,7 @@ ppp_if_print(u_char *user, const struct pcap_pkthdr *h,
 		break;
 #ifdef INET6
 	case ETHERTYPE_IPV6:	/*XXX*/
-#ifdef PPP_IPV6
 	case PPP_IPV6:
-#endif
 		ip6_print((const u_char *)ip, length);
 		break;
 #endif
@@ -639,15 +637,31 @@ ppp_bsdos_if_print(u_char *user, const struct pcap_pkthdr *h,
 			ptype = vjc_print(q, length - (q - p), ptype);
 			hdrlength = PPP_BSDI_HDRLEN;
 			p += hdrlength;
-			if (ptype == PPP_IP)
+			switch (ptype) {
+			case PPP_IP:
 				ip_print(p, length);
+				break;
+#ifdef INET6
+			case PPP_IPV6:
+				ip6_print(p, length);
+				break;
+#endif
+			}
 			goto printx;
 		case PPP_VJNC:
 			ptype = vjc_print(q, length - (q - p), ptype);
 			hdrlength = PPP_BSDI_HDRLEN;
 			p += hdrlength;
-			if (ptype == PPP_IP)
+			switch (ptype) {
+			case PPP_IP:
 				ip_print(p, length);
+				break;
+#ifdef INET6
+			case PPP_IPV6:
+				ip6_print(p, length);
+				break;
+#endif
+			}
 			goto printx;
 		default:
 			if (eflag) {
@@ -666,10 +680,18 @@ ppp_bsdos_if_print(u_char *user, const struct pcap_pkthdr *h,
 	length -= hdrlength;
 	p += hdrlength;
 
-	if (ptype == PPP_IP)
+	switch (ptype) {
+	case PPP_IP:
 		ip_print(p, length);
-	else
+		break;
+#ifdef INET6
+	case PPP_IPV6:
+		ip6_print(p, length);
+		break;
+#endif
+	default:
 		printf("%s ", tok2str(ppptype2str, "proto-#%d", ptype));
+	}
 
 printx:
 	if (xflag)
