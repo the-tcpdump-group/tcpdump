@@ -24,7 +24,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.147 2000-06-01 01:10:31 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.148 2000-06-18 11:12:06 assar Exp $ (LBL)";
 #endif
 
 /*
@@ -88,11 +88,8 @@ char *program_name;
 
 int32_t thiszone;		/* seconds offset from gmt to local time */
 
-/* Externs */
-extern void bpf_dump(struct bpf_program *, int);
-
 /* Forwards */
-RETSIGTYPE cleanup(int);
+static RETSIGTYPE cleanup(int);
 extern __dead void usage(void) __attribute__((volatile));
 
 /* Length of saved portion of packet. */
@@ -429,7 +426,7 @@ main(int argc, char **argv)
 }
 
 /* make a clean exit on interrupts */
-RETSIGTYPE
+static RETSIGTYPE
 cleanup(int signo)
 {
 	struct pcap_stat stat;
