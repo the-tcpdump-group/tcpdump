@@ -1,4 +1,4 @@
-@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.36.1.1.2.1 2000-01-29 07:33:24 fenner Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.36.1.1.2.2 2000-01-29 17:02:09 itojun Exp $ (LBL)
 
 If you have not built libpcap, do so first.  See the README
 file in this directory for the ftp location.
@@ -90,9 +90,9 @@ gmt2local.h	- time conversion prototypes
 igrp.h		- Interior Gateway Routing Protocol definitions
 install-sh	- BSD style install script
 interface.h	- globals, prototypes and definitions
-ipsec_doi.h	-
+ipsec_doi.h	- ISAKMP packet definitions - RFC2407
 ipx.h		- IPX definitions
-isakmp.h	-
+isakmp.h	- ISAKMP packet definitions - RFC2408
 l2tp.h		-
 lane.h		-
 lbl/gnuc.h	- gcc macros and defines
@@ -109,7 +109,7 @@ netbios.h	- NETBIOS definitions
 nfs.h		- Network File System V2 definitions
 nfsfh.h		- Network File System file handle definitions
 ntp.h		- Network Time Protocol definitions
-oakley.h	-
+oakley.h	- ISAKMP packet definitions - RFC2409
 ospf.h		- Open Shortest Path First definitions
 ospf6.h		- IPv6 Open Shortest Path First definitions
 packetdat.awk	- TCP chunk summary awk script
@@ -149,7 +149,7 @@ print-l2tp.c	- Layer Two Tunneling Protocol printer routines
 print-lane.c	-
 print-lcp.c	-
 print-llc.c	- llc printer routines
-print-mobile.c	-
+print-mobile.c	- IPv4 mobility printer routines
 print-netbios.c	- netbios printer routines
 print-nfs.c	- Network File System printer routines
 print-ntp.c	- Network Time Protocol printer routines
@@ -162,7 +162,7 @@ print-pppoe.c	-
 print-raw.c	- raw printer routines
 print-rip.c	- Routing Information Protocol printer routines
 print-ripng.c	- IPv6 Routing Information Protocol printer routines
-print-rt6.c	-
+print-rt6.c	- IPv6 routing header printer routines
 print-rx.c	- AFS RX printer routines
 print-sl.c	- Compressed Serial Line Internet Protocol printer routines
 print-smb.c	- SMB (samba) printer routines
@@ -172,9 +172,9 @@ print-tcp.c	- TCP printer routines
 print-telnet.c	- Telnet option printer routines
 print-tftp.c	- Trivial File Transfer Protocol printer routines
 print-udp.c	- UDP printer routines
-print-vjc.c	-
+print-vjc.c	- PPP Van Jacovson compression (RFC1144) printer routines
 print-wb.c	- white board printer routines
-route6d.h	-
+route6d.h	- packet definition for IPv6 Routing Information Protocol
 rx.h		-
 savestr.c	- strdup() replacement
 savestr.h	- savestr prototypes
