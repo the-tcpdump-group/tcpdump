@@ -111,6 +111,7 @@ print-dhcp6.c
 print-domain.c
 print-dvmrp.c
 print-egp.c
+print-enc.c
 print-esp.c
 print-ether.c
 print-fddi.c
