@@ -16,7 +16,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-eigrp.c,v 1.3 2004-05-01 09:07:01 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-eigrp.c,v 1.4 2004-05-01 21:07:39 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -134,8 +134,43 @@ struct eigrp_tlv_ip_int_t {
     u_int8_t load;
     u_int8_t reserved[2];
     u_int8_t plen;
-    u_int8_t destination; /* variable length [0-4] bytes encoding */
+    u_int8_t destination; /* variable length [1-4] bytes encoding */
 }; 
+
+struct eigrp_tlv_ip_ext_t {
+    u_int8_t nexthop[4];
+    u_int8_t origin_router[4];
+    u_int8_t origin_as[4];
+    u_int8_t tag[4];
+    u_int8_t metric[4];
+    u_int8_t reserved[2];
+    u_int8_t proto_id;
+    u_int8_t flags;
+    u_int8_t delay[4];
+    u_int8_t bandwidth[4];
+    u_int8_t mtu[3];
+    u_int8_t hopcount;
+    u_int8_t reliability;
+    u_int8_t load;
+    u_int8_t reserved2[2];
+    u_int8_t plen;
+    u_int8_t destination; /* variable length [1-4] bytes encoding */
+}; 
+
+static const struct tok eigrp_ext_proto_id_values[] = {
+    { 0x01, "IGRP" },
+    { 0x02, "EIGRP" },
+    { 0x03, "Static" },
+    { 0x04, "RIP" },
+    { 0x05, "Hello" },
+    { 0x06, "OSPF" },
+    { 0x07, "IS-IS" },
+    { 0x08, "EGP" },
+    { 0x09, "BGP" },
+    { 0x0a, "IDRP" },
+    { 0x0b, "Connected" },
+    { 0, NULL}
+};
 
 void
 eigrp_print(register const u_char *pptr, register u_int len) {
@@ -150,6 +185,7 @@ eigrp_print(register const u_char *pptr, register u_int len) {
         const struct eigrp_tlv_general_parm_t *eigrp_tlv_general_parm;
         const struct eigrp_tlv_sw_version_t *eigrp_tlv_sw_version;
         const struct eigrp_tlv_ip_int_t *eigrp_tlv_ip_int;
+        const struct eigrp_tlv_ip_ext_t *eigrp_tlv_ip_ext;
     } tlv_ptr;
 
     tptr=pptr;
@@ -274,6 +310,43 @@ eigrp_print(register const u_char *pptr, register u_int len) {
                    tlv_ptr.eigrp_tlv_ip_int->load);
             break;
 
+        case EIGRP_TLV_IP_EXT:
+            tlv_ptr.eigrp_tlv_ip_ext = (const struct eigrp_tlv_ip_ext_t *)tlv_tptr;
+
+            bit_length = tlv_ptr.eigrp_tlv_ip_ext->plen;
+            if (bit_length < 0 || bit_length > 32) {
+                printf("\n\t    illegal prefix length %u",bit_length);
+                break;
+            }
+            byte_length = (bit_length + 7) / 8; /* variable length encoding */
+            memset(prefix, 0, 4);
+            memcpy(prefix,&tlv_ptr.eigrp_tlv_ip_ext->destination,byte_length);
+
+            printf("\n\t    IPv4 prefix: %15s/%u, nexthop: ",
+                   ipaddr_string(prefix),
+                   bit_length);
+            if (EXTRACT_32BITS(&tlv_ptr.eigrp_tlv_ip_ext->nexthop) == 0)
+                printf("self");
+            else
+                printf("%s",ipaddr_string(EXTRACT_32BITS(&tlv_ptr.eigrp_tlv_ip_ext->nexthop)));
+
+            printf("\n\t      origin-router %s, origin-as %u, origin-proto %s, flags [0x%02x], tag 0x%08x, metric %u",
+                   ipaddr_string(tlv_ptr.eigrp_tlv_ip_ext->origin_router),
+                   EXTRACT_32BITS(tlv_ptr.eigrp_tlv_ip_ext->origin_as),
+                   tok2str(eigrp_ext_proto_id_values,"unknown",tlv_ptr.eigrp_tlv_ip_ext->proto_id),
+                   tlv_ptr.eigrp_tlv_ip_ext->flags,
+                   EXTRACT_32BITS(tlv_ptr.eigrp_tlv_ip_ext->tag),
+                   EXTRACT_32BITS(tlv_ptr.eigrp_tlv_ip_ext->metric));
+
+            printf("\n\t      delay %u ms, bandwidth %u Kbps, mtu %u, hop %u, reliability %u, load %u",
+                   (EXTRACT_32BITS(&tlv_ptr.eigrp_tlv_ip_ext->delay)/100),
+                   EXTRACT_32BITS(&tlv_ptr.eigrp_tlv_ip_ext->bandwidth),
+                   EXTRACT_24BITS(&tlv_ptr.eigrp_tlv_ip_ext->mtu),
+                   tlv_ptr.eigrp_tlv_ip_ext->hopcount,
+                   tlv_ptr.eigrp_tlv_ip_ext->reliability,
+                   tlv_ptr.eigrp_tlv_ip_ext->load);
+            break;
+
             /*
              * FIXME those are the defined TLVs that lack a decoder
              * you are welcome to contribute code ;-)
@@ -282,7 +355,6 @@ eigrp_print(register const u_char *pptr, register u_int len) {
         case EIGRP_TLV_AUTH:
         case EIGRP_TLV_SEQ:
         case EIGRP_TLV_MCAST_SEQ:
-        case EIGRP_TLV_IP_EXT:
         case EIGRP_TLV_AT_INT:
         case EIGRP_TLV_AT_EXT:
         case EIGRP_TLV_AT_CABLE_SETUP:
