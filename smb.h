@@ -1,10 +1,11 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/smb.h,v 1.3 2000-12-17 23:07:50 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/smb.h,v 1.4 2001-06-25 03:07:31 itojun Exp $ (LBL) */
 /* 
-   Copyright (C) Andrew Tridgell 1995-1999
-
-   This software may be distributed either under the terms of the
-   BSD-style license that accompanies tcpdump or the GNU GPL version 2
-   or later */
+ * Copyright (C) Andrew Tridgell 1995-1999
+ *
+ * This software may be distributed either under the terms of the
+ * BSD-style license that accompanies tcpdump or the GNU GPL version 2
+ * or later
+ */
 
 #define CVAL(buf,pos) (((unsigned char *)(buf))[pos])
 #define PVAL(buf,pos) ((unsigned)CVAL(buf,pos))
@@ -147,7 +148,7 @@
 #define TRANSACT2_FINDNOTIFYNEXT  12
 #define TRANSACT2_MKDIR           13
 
-#define PTR_DIFF(p1,p2) ((unsigned long)(((char *)(p1)) - (char *)(p2)))
+#define PTR_DIFF(p1, p2) ((unsigned long)(((char *)(p1)) - (char *)(p2)))
 
 /* some protos */
-const uchar *fdata(const uchar *buf, const char *fmt, const uchar *maxbuf);
+const uchar *fdata(const uchar *, const char *, const uchar *);

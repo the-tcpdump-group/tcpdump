@@ -1,9 +1,10 @@
 /* 
-   Copyright (C) Andrew Tridgell 1995-1999
-
-   This software may be distributed either under the terms of the
-   BSD-style license that accompanies tcpdump or the GNU GPL version 2
-   or later */
+ * Copyright (C) Andrew Tridgell 1995-1999
+ *
+ * This software may be distributed either under the terms of the
+ * BSD-style license that accompanies tcpdump or the GNU GPL version 2
+ * or later
+ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -11,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.11 2001-04-03 22:55:33 fenner Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.12 2001-06-25 03:07:30 itojun Exp $";
 #endif
 
 #include <stdio.h>
@@ -21,238 +22,299 @@ static const char rcsid[] =
 #include "interface.h"
 #include "smb.h"
 
-static int request=0;
+static int request = 0;
 
-const uchar *startbuf=NULL;
+const uchar *startbuf = NULL;
 
-struct smbdescript
-{
-  char *req_f1;
-  char *req_f2;
-  char *rep_f1;
-  char *rep_f2;
-  void (*fn)(); /* sometimes (u_char *, u_char *, u_char *, u_char *)
-		and sometimes (u_char *, u_char *, int, int) */
+struct smbdescript {
+    char *req_f1;
+    char *req_f2;
+    char *rep_f1;
+    char *rep_f2;
+    /*
+     * sometimes (u_char *, u_char *, u_char *, u_char *) and
+     * sometimes (u_char *, u_char *, int, int)
+     */
+    void (*fn)(const u_char *, const u_char *, ...);
 };
 
 struct smbfns
 {
-  int id;
-  char *name;
-  int flags;
-  struct smbdescript descript;
+    int id;
+    char *name;
+    int flags;
+    struct smbdescript descript;
 };
 
-#define DEFDESCRIPT  {NULL,NULL,NULL,NULL,NULL}
+#define DEFDESCRIPT	{NULL,NULL,NULL,NULL,NULL}
 
-#define FLG_CHAIN (1<<0)
+#define FLG_CHAIN	(1<<0)
 
-static struct smbfns *smbfind(int id,struct smbfns *list)
+static struct smbfns *
+smbfind(int id, struct smbfns *list)
 {
-  int sindex;
+    int sindex;
 
-  for (sindex=0;list[sindex].name;sindex++) 
-    if (list[sindex].id == id) return(&list[sindex]);
+    for (sindex = 0; list[sindex].name; sindex++) 
+	if (list[sindex].id == id)
+	    return(&list[sindex]);
 
-  return(&list[0]);
+    return(&list[0]);
 }
 
-static void trans2_findfirst(uchar *param,uchar *data,int pcnt,int dcnt)
+static void
+trans2_findfirst(const uchar *param, const uchar *data, ...)
 {
-  char *fmt;
+    char *fmt;
+    va_list ap;
+    int pcnt, dcnt;
 
-  if (request) {
-    fmt = "Attribute=[A]\nSearchCount=[d]\nFlags=[w]\nLevel=[dP5]\nFile=[S]\n";
-  } else {
-    fmt = "Handle=[w]\nCount=[d]\nEOS=[w]\nEoffset=[d]\nLastNameOfs=[w]\n";
-  }
+    va_start(ap, data);
+    pcnt = va_arg(ap, int);
+    dcnt = va_arg(ap, int);
+    va_end(ap);
 
-  fdata(param,fmt,param+pcnt);
-  if (dcnt) {
-    printf("data:\n");
-    print_data(data,dcnt);
-  }
-}
+    if (request)
+	fmt = "Attribute=[A]\nSearchCount=[d]\nFlags=[w]\nLevel=[dP5]\nFile=[S]\n";
+    else
+	fmt = "Handle=[w]\nCount=[d]\nEOS=[w]\nEoffset=[d]\nLastNameOfs=[w]\n";
 
-static void trans2_qfsinfo(uchar *param,uchar *data,int pcnt,int dcnt)
-{
-  static int level=0;
-  char *fmt="";
-
-  if (request) {
-    level = SVAL(param,0);
-    fmt = "InfoLevel=[d]\n";
-    fdata(param,fmt,param+pcnt);
-  } else {
-    switch (level) {
-    case 1:
-      fmt = "idFileSystem=[W]\nSectorUnit=[D]\nUnit=[D]\nAvail=[D]\nSectorSize=[d]\n";
-      break;
-    case 2:
-      fmt = "CreationTime=[T2]VolNameLength=[B]\nVolumeLabel=[s12]\n";
-      break;
-    case 0x105:
-      fmt = "Capabilities=[W]\nMaxFileLen=[D]\nVolNameLen=[D]\nVolume=[S]\n";
-      break;
-    default:
-      fmt = "UnknownLevel\n";
+    fdata(param, fmt, param + pcnt);
+    if (dcnt) {
+	printf("data:\n");
+	print_data(data, dcnt);
     }
-    fdata(data,fmt,data+dcnt);
-  }
-  if (dcnt) {
-    printf("data:\n");
-    print_data(data,dcnt);
-  }
+}
+
+static void
+trans2_qfsinfo(const uchar *param, const uchar *data, ...)
+{
+    static int level = 0;
+    char *fmt="";
+    va_list ap;
+    int pcnt, dcnt;
+
+    va_start(ap, data);
+    pcnt = va_arg(ap, int);
+    dcnt = va_arg(ap, int);
+    va_end(ap);
+
+    if (request) {
+	level = SVAL(param, 0);
+	fmt = "InfoLevel=[d]\n";
+	fdata(param, fmt, param + pcnt);
+    } else {
+	switch (level) {
+	case 1:
+	    fmt = "idFileSystem=[W]\nSectorUnit=[D]\nUnit=[D]\nAvail=[D]\nSectorSize=[d]\n";
+	    break;
+	case 2:
+	    fmt = "CreationTime=[T2]VolNameLength=[B]\nVolumeLabel=[s12]\n";
+	    break;
+	case 0x105:
+	    fmt = "Capabilities=[W]\nMaxFileLen=[D]\nVolNameLen=[D]\nVolume=[S]\n";
+	    break;
+	default:
+	    fmt = "UnknownLevel\n";
+	    break;
+	}
+	fdata(data, fmt, data + dcnt);
+    }
+    if (dcnt) {
+	printf("data:\n");
+	print_data(data, dcnt);
+    }
 }
 
 struct smbfns trans2_fns[] = {
-{0,"TRANSACT2_OPEN",0,
-   {"Flags2=[w]\nMode=[w]\nSearchAttrib=[A]\nAttrib=[A]\nTime=[T2]\nOFun=[w]\nSize=[D]\nRes=([w,w,w,w,w])\nPath=[S]",NULL,
-    "Handle=[d]\nAttrib=[A]\nTime=[T2]\nSize=[D]\nAccess=[w]\nType=[w]\nState=[w]\nAction=[w]\nInode=[W]\nOffErr=[d]\n|EALength=[d]\n",NULL,NULL}},
+    { 0, "TRANSACT2_OPEN", 0, 
+	{ "Flags2=[w]\nMode=[w]\nSearchAttrib=[A]\nAttrib=[A]\nTime=[T2]\nOFun=[w]\nSize=[D]\nRes=([w, w, w, w, w])\nPath=[S]",
+	  NULL, 
+	  "Handle=[d]\nAttrib=[A]\nTime=[T2]\nSize=[D]\nAccess=[w]\nType=[w]\nState=[w]\nAction=[w]\nInode=[W]\nOffErr=[d]\n|EALength=[d]\n",
+	  NULL, NULL }}, 
+    { 1, "TRANSACT2_FINDFIRST", 0, 
+	{ NULL, NULL, NULL, NULL, trans2_findfirst }}, 
+    { 2, "TRANSACT2_FINDNEXT", 0, DEFDESCRIPT }, 
+    { 3, "TRANSACT2_QFSINFO", 0, 
+	{ NULL, NULL, NULL, NULL, trans2_qfsinfo }}, 
+    { 4, "TRANSACT2_SETFSINFO", 0, DEFDESCRIPT }, 
+    { 5, "TRANSACT2_QPATHINFO", 0, DEFDESCRIPT }, 
+    { 6, "TRANSACT2_SETPATHINFO", 0, DEFDESCRIPT }, 
+    { 7, "TRANSACT2_QFILEINFO", 0, DEFDESCRIPT }, 
+    { 8, "TRANSACT2_SETFILEINFO", 0, DEFDESCRIPT }, 
+    { 9, "TRANSACT2_FSCTL", 0, DEFDESCRIPT }, 
+    { 10, "TRANSACT2_IOCTL", 0, DEFDESCRIPT }, 
+    { 11, "TRANSACT2_FINDNOTIFYFIRST", 0, DEFDESCRIPT }, 
+    { 12, "TRANSACT2_FINDNOTIFYNEXT", 0, DEFDESCRIPT }, 
+    { 13, "TRANSACT2_MKDIR", 0, DEFDESCRIPT }, 
+    { -1, NULL, 0, DEFDESCRIPT }
+};
 
-{1,"TRANSACT2_FINDFIRST",0,
-   {NULL,NULL,NULL,NULL,trans2_findfirst}},
 
-{2,"TRANSACT2_FINDNEXT",0,DEFDESCRIPT},
-
-{3,"TRANSACT2_QFSINFO",0,
-   {NULL,NULL,NULL,NULL,trans2_qfsinfo}},
-
-{4,"TRANSACT2_SETFSINFO",0,DEFDESCRIPT},
-{5,"TRANSACT2_QPATHINFO",0,DEFDESCRIPT},
-{6,"TRANSACT2_SETPATHINFO",0,DEFDESCRIPT},
-{7,"TRANSACT2_QFILEINFO",0,DEFDESCRIPT},
-{8,"TRANSACT2_SETFILEINFO",0,DEFDESCRIPT},
-{9,"TRANSACT2_FSCTL",0,DEFDESCRIPT},
-{10,"TRANSACT2_IOCTL",0,DEFDESCRIPT},
-{11,"TRANSACT2_FINDNOTIFYFIRST",0,DEFDESCRIPT},
-{12,"TRANSACT2_FINDNOTIFYNEXT",0,DEFDESCRIPT},
-{13,"TRANSACT2_MKDIR",0,DEFDESCRIPT},
-{-1,NULL,0,DEFDESCRIPT}};
-
-
-static void print_trans2(uchar *words,uchar *dat,uchar *buf,uchar *maxbuf)
+static void
+print_trans2(const uchar *words, const uchar *dat, ...)
 {
-  static struct smbfns *fn = &trans2_fns[0];
-  uchar *data,*param;
-  uchar *f1=NULL,*f2=NULL;
-  int pcnt,dcnt;
+    static struct smbfns *fn = &trans2_fns[0];
+    uchar *data, *param;
+    uchar *f1 = NULL, *f2 = NULL;
+    int pcnt, dcnt;
+    va_list ap;
+    uchar *buf, *maxbuf;
 
-  if (request) {
-    fn = smbfind(SVAL(words+1,14*2),trans2_fns);
-    data = buf+SVAL(words+1,12*2);
-    param = buf+SVAL(words+1,10*2);
-    pcnt = SVAL(words+1,9*2);
-    dcnt = SVAL(words+1,11*2);
-  } else {
-    data = buf+SVAL(words+1,7*2);
-    param = buf+SVAL(words+1,4*2);
-    pcnt = SVAL(words+1,3*2);
-    dcnt = SVAL(words+1,6*2);
-  }
+    va_start(ap, dat);
+    buf = va_arg(ap, uchar *);
+    maxbuf = va_arg(ap, uchar *);
+    va_end(ap);
 
-  printf("%s param_length=%d data_length=%d\n",
-	 fn->name,pcnt,dcnt);
-
-  if (request) {
-    if (CVAL(words,0) == 8) {
-      fdata(words+1,"Trans2Secondary\nTotParam=[d]\nTotData=[d]\nParamCnt=[d]\nParamOff=[d]\nParamDisp=[d]\nDataCnt=[d]\nDataOff=[d]\nDataDisp=[d]\nHandle=[d]\n",maxbuf);
-      return;	    
+    if (request) {
+	fn = smbfind(SVAL(words + 1, 14 * 2), trans2_fns);
+	data = buf+SVAL(words + 1, 12 * 2);
+	param = buf+SVAL(words + 1, 10 * 2);
+	pcnt = SVAL(words + 1, 9 * 2);
+	dcnt = SVAL(words + 1, 11 * 2);
     } else {
-      fdata(words+1,"TotParam=[d]\nTotData=[d]\nMaxParam=[d]\nMaxData=[d]\nMaxSetup=[d]\nFlags=[w]\nTimeOut=[D]\nRes1=[w]\nParamCnt=[d]\nParamOff=[d]\nDataCnt=[d]\nDataOff=[d]\nSetupCnt=[d]\n",words+1+14*2);
-      fdata(data+1,"TransactionName=[S]\n%",maxbuf);
+	data = buf+SVAL(words + 1, 7 * 2);
+	param = buf+SVAL(words + 1, 4 * 2);
+	pcnt = SVAL(words + 1, 3 * 2);
+	dcnt = SVAL(words + 1, 6 * 2);
     }
-    f1 = fn->descript.req_f1;
-    f2 = fn->descript.req_f2;
-  } else {
-    if (CVAL(words,0) == 0) {
-      printf("Trans2Interim\n");
-      return;
+
+    printf("%s param_length=%d data_length=%d\n", fn->name, pcnt, dcnt);
+
+    if (request) {
+	if (CVAL(words, 0) == 8) {
+	    fdata(words + 1,
+		"Trans2Secondary\nTotParam=[d]\nTotData=[d]\nParamCnt=[d]\nParamOff=[d]\nParamDisp=[d]\nDataCnt=[d]\nDataOff=[d]\nDataDisp=[d]\nHandle=[d]\n",
+		maxbuf);
+	    return;	    
+	} else {
+	    fdata(words + 1,
+		"TotParam=[d]\nTotData=[d]\nMaxParam=[d]\nMaxData=[d]\nMaxSetup=[d]\nFlags=[w]\nTimeOut=[D]\nRes1=[w]\nParamCnt=[d]\nParamOff=[d]\nDataCnt=[d]\nDataOff=[d]\nSetupCnt=[d]\n",
+		words + 1 + 14 * 2);
+	    fdata(data + 1, "TransactionName=[S]\n%", maxbuf);
+	}
+	f1 = fn->descript.req_f1;
+	f2 = fn->descript.req_f2;
     } else {
-      fdata(words+1,"TotParam=[d]\nTotData=[d]\nRes1=[w]\nParamCnt=[d]\nParamOff=[d]\nParamDisp[d]\nDataCnt=[d]\nDataOff=[d]\nDataDisp=[d]\nSetupCnt=[d]\n",words+1+10*2);
+	if (CVAL(words, 0) == 0) {
+	    printf("Trans2Interim\n");
+	    return;
+	} else {
+	    fdata(words + 1,
+		"TotParam=[d]\nTotData=[d]\nRes1=[w]\nParamCnt=[d]\nParamOff=[d]\nParamDisp[d]\nDataCnt=[d]\nDataOff=[d]\nDataDisp=[d]\nSetupCnt=[d]\n",
+		words + 1 + 10 * 2);
+	}
+	f1 = fn->descript.rep_f1;
+	f2 = fn->descript.rep_f2;
     }
-    f1 = fn->descript.rep_f1;
-    f2 = fn->descript.rep_f2;
-  }
 
-  if (fn->descript.fn) {
-    fn->descript.fn(param,data,pcnt,dcnt);
-  } else {
-    fdata(param,f1?f1:(uchar*)"Paramaters=\n",param+pcnt);
-    fdata(data,f2?f2:(uchar*)"Data=\n",data+dcnt);      
-  }
+    if (fn->descript.fn)
+	fn->descript.fn(param, data, pcnt, dcnt);
+    else {
+	fdata(param, f1 ? f1 : (uchar *)"Paramaters=\n", param + pcnt);
+	fdata(data, f2 ? f2 : (uchar *)"Data=\n", data + dcnt);      
+    }
 }
 
 
-static void print_browse(uchar *param,int paramlen,const uchar *data,int datalen)
+static void
+print_browse(uchar *param, int paramlen, const uchar *data, int datalen)
 {
-  const uchar *maxbuf = data + datalen;
-  int command = CVAL(data,0);
+    const uchar *maxbuf = data + datalen;
+    int command = CVAL(data, 0);
 
-  fdata(param,"BROWSE PACKET\n|Param ",param+paramlen);
+    fdata(param, "BROWSE PACKET\n|Param ", param+paramlen);
 
-  switch (command) {
-  case 0xF:
-    data = fdata(data,"BROWSE PACKET:\nType=[B] (LocalMasterAnnouncement)\nUpdateCount=[w]\nRes1=[B]\nAnnounceInterval=[d]\nName=[n2]\nMajorVersion=[B]\nMinorVersion=[B]\nServerType=[W]\nElectionVersion=[w]\nBrowserConstant=[w]\n",maxbuf);
-    break;
-    
-  case 0x1:
-    data = fdata(data,"BROWSE PACKET:\nType=[B] (HostAnnouncement)\nUpdateCount=[w]\nRes1=[B]\nAnnounceInterval=[d]\nName=[n2]\nMajorVersion=[B]\nMinorVersion=[B]\nServerType=[W]\nElectionVersion=[w]\nBrowserConstant=[w]\n",maxbuf);
-    break;
-    
-  case 0x2:
-    data = fdata(data,"BROWSE PACKET:\nType=[B] (AnnouncementRequest)\nFlags=[B]\nReplySystemName=[S]\n",maxbuf);
-    break;
-    
-  case 0xc:
-    data = fdata(data,"BROWSE PACKET:\nType=[B] (WorkgroupAnnouncement)\nUpdateCount=[w]\nRes1=[B]\nAnnounceInterval=[d]\nName=[n2]\nMajorVersion=[B]\nMinorVersion=[B]\nServerType=[W]\nCommentPointer=[W]\nServerName=[S]\n",maxbuf);
-    break;
+    switch (command) {
+    case 0xF:
+	data = fdata(data,
+	    "BROWSE PACKET:\nType=[B] (LocalMasterAnnouncement)\nUpdateCount=[w]\nRes1=[B]\nAnnounceInterval=[d]\nName=[n2]\nMajorVersion=[B]\nMinorVersion=[B]\nServerType=[W]\nElectionVersion=[w]\nBrowserConstant=[w]\n",
+	    maxbuf);
+	break;
 
-  case 0x8:
-    data = fdata(data,"BROWSE PACKET:\nType=[B] (ElectionFrame)\nElectionVersion=[B]\nOSSummary=[W]\nUptime=[(W,W)]\nServerName=[S]\n",maxbuf);
-    break;
-    
-  case 0xb:
-    data = fdata(data,"BROWSE PACKET:\nType=[B] (BecomeBackupBrowser)\nName=[S]\n",maxbuf);
-    break;
-    
-  case 0x9:
-    data = fdata(data,"BROWSE PACKET:\nType=[B] (GetBackupList)\nListCount?=[B]\nToken?=[B]\n",maxbuf);
-    break;
-    
-  case 0xa:
-    data = fdata(data,"BROWSE PACKET:\nType=[B] (BackupListResponse)\nServerCount?=[B]\nToken?=[B]*Name=[S]\n",maxbuf);
-    break;
-    
-  case 0xd:
-    data = fdata(data,"BROWSE PACKET:\nType=[B] (MasterAnnouncement)\nMasterName=[S]\n",maxbuf);
-    break;
-    
-  case 0xe:
-    data = fdata(data,"BROWSE PACKET:\nType=[B] (ResetBrowser)\nOptions=[B]\n",maxbuf);
-    break;
-    
-  default:
-    data = fdata(data,"Unknown Browser Frame ",maxbuf);
-    break;
-  }
+    case 0x1:
+	data = fdata(data,
+	    "BROWSE PACKET:\nType=[B] (HostAnnouncement)\nUpdateCount=[w]\nRes1=[B]\nAnnounceInterval=[d]\nName=[n2]\nMajorVersion=[B]\nMinorVersion=[B]\nServerType=[W]\nElectionVersion=[w]\nBrowserConstant=[w]\n",
+	    maxbuf);
+	break;
+
+    case 0x2:
+	data = fdata(data,
+	    "BROWSE PACKET:\nType=[B] (AnnouncementRequest)\nFlags=[B]\nReplySystemName=[S]\n",
+	    maxbuf);
+	break;
+
+    case 0xc:
+	data = fdata(data,
+	    "BROWSE PACKET:\nType=[B] (WorkgroupAnnouncement)\nUpdateCount=[w]\nRes1=[B]\nAnnounceInterval=[d]\nName=[n2]\nMajorVersion=[B]\nMinorVersion=[B]\nServerType=[W]\nCommentPointer=[W]\nServerName=[S]\n",
+	    maxbuf);
+	break;
+
+    case 0x8:
+	data = fdata(data,
+	    "BROWSE PACKET:\nType=[B] (ElectionFrame)\nElectionVersion=[B]\nOSSummary=[W]\nUptime=[(W, W)]\nServerName=[S]\n",
+	    maxbuf);
+	break;
+
+    case 0xb:
+	data = fdata(data,
+	    "BROWSE PACKET:\nType=[B] (BecomeBackupBrowser)\nName=[S]\n",
+	    maxbuf);
+	break;
+
+    case 0x9:
+	data = fdata(data,
+	    "BROWSE PACKET:\nType=[B] (GetBackupList)\nListCount?=[B]\nToken?=[B]\n",
+	    maxbuf);
+	break;
+
+    case 0xa:
+	data = fdata(data,
+	    "BROWSE PACKET:\nType=[B] (BackupListResponse)\nServerCount?=[B]\nToken?=[B]*Name=[S]\n",
+	    maxbuf);
+	break;
+
+    case 0xd:
+	data = fdata(data,
+	    "BROWSE PACKET:\nType=[B] (MasterAnnouncement)\nMasterName=[S]\n",
+	    maxbuf);
+	break;
+
+    case 0xe:
+	data = fdata(data,
+	    "BROWSE PACKET:\nType=[B] (ResetBrowser)\nOptions=[B]\n", maxbuf);
+	break;
+
+    default:
+	data = fdata(data, "Unknown Browser Frame ", maxbuf);
+	break;
+    }
 }
 
 
-static void print_ipc(uchar *param,int paramlen,uchar *data,int datalen)
+static void
+print_ipc(uchar *param, int paramlen, uchar *data, int datalen)
 {
-  if (paramlen)
-    fdata(param,"Command=[w]\nStr1=[S]\nStr2=[S]\n",param+paramlen);
-  if (datalen)
-    fdata(data,"IPC ",data+datalen);
+    if (paramlen)
+	fdata(param, "Command=[w]\nStr1=[S]\nStr2=[S]\n", param + paramlen);
+    if (datalen)
+	fdata(data, "IPC ", data + datalen);
 }
 
 
-static void print_trans(uchar *words,uchar *data1,uchar *buf,uchar *maxbuf)
+static void
+print_trans(const uchar *words, const uchar *data1, ...)
 {
   uchar *f1,*f2,*f3,*f4;
   uchar *data,*param;
   int datalen,paramlen;
+  va_list ap;
+  uchar *buf, *maxbuf;
+
+  va_start(ap, data1);
+  buf = va_arg(ap, uchar *);
+  maxbuf = va_arg(ap, uchar *);
+  va_end(ap);
 
   if (request) {
     paramlen = SVAL(words+1,9*2);
@@ -293,9 +355,17 @@ static void print_trans(uchar *words,uchar *data1,uchar *buf,uchar *maxbuf)
 
 
 
-static void print_negprot(uchar *words,uchar *data,uchar *buf,uchar *maxbuf)
+static void
+print_negprot(const uchar *words, const uchar *data, ...)
 {
   uchar *f1=NULL,*f2=NULL;
+  va_list ap;
+  uchar *buf, *maxbuf;
+
+  va_start(ap, data);
+  buf = va_arg(ap, uchar *);
+  maxbuf = va_arg(ap, uchar *);
+  va_end(ap);
 
   if (request) {
     f2 = "*|Dialect=[Z]\n";
@@ -321,10 +391,18 @@ static void print_negprot(uchar *words,uchar *data,uchar *buf,uchar *maxbuf)
     
 }
 
-static void print_sesssetup(uchar *words,uchar *data,uchar *buf,uchar *maxbuf)
+static void
+print_sesssetup(const uchar *words, const uchar *data, ...)
 {
   int wcnt = CVAL(words,0);
   uchar *f1=NULL,*f2=NULL;
+  va_list ap;
+  uchar *buf, *maxbuf;
+
+  va_start(ap, data);
+  buf = va_arg(ap, uchar *);
+  maxbuf = va_arg(ap, uchar *);
+  va_end(ap);
 
   if (request) {
     if (wcnt==10) {
@@ -607,191 +685,198 @@ NULL,NULL}},
 {-1,NULL,0,DEFDESCRIPT}};
 
 
-/*******************************************************************
-print a SMB message
-********************************************************************/
-static void print_smb(const uchar *buf, const uchar *maxbuf)
+/*
+ * print a SMB message
+ */
+static void
+print_smb(const uchar *buf, const uchar *maxbuf)
 {
-  int command;
-  const uchar *words, *data;
-  struct smbfns *fn;
-  char *fmt_smbheader = 
-"[P4]SMB Command   =  [B]\nError class   =  [BP1]\nError code    =  [d]\nFlags1        =  [B]\nFlags2        =  [B][P13]\nTree ID       =  [d]\nProc ID       =  [d]\nUID           =  [d]\nMID           =  [d]\nWord Count    =  [b]\n";
+    int command;
+    const uchar *words, *data;
+    struct smbfns *fn;
+    char *fmt_smbheader =
+        "[P4]SMB Command   =  [B]\nError class   =  [BP1]\nError code    =  [d]\nFlags1        =  [B]\nFlags2        =  [B][P13]\nTree ID       =  [d]\nProc ID       =  [d]\nUID           =  [d]\nMID           =  [d]\nWord Count    =  [b]\n";
 
-  request = (CVAL(buf,9)&0x80)?0:1;
+    request = (CVAL(buf, 9) & 0x80) ? 0 : 1;
 
-  command = CVAL(buf,4);
+    command = CVAL(buf, 4);
 
-  fn = smbfind(command,smb_fns);
+    fn = smbfind(command, smb_fns);
 
-  if (vflag > 1)
+    if (vflag > 1)
+	printf("\n");
+
+    printf("SMB PACKET: %s (%s)\n", fn->name, request ? "REQUEST" : "REPLY");
+
+    if (vflag < 2)
+	return;
+
+    /* print out the header */
+    fdata(buf, fmt_smbheader, buf + 33);
+
+    if (CVAL(buf, 5)) {
+	int class = CVAL(buf, 5);
+	int num = SVAL(buf, 7);
+	printf("SMBError = %s\n", smb_errstr(class, num));
+    }
+
+    words = buf + 32;
+    data = words + 1 + CVAL(words,0)*2;
+
+    while (words && data) {
+	char *f1, *f2;
+	int wct = CVAL(words, 0);
+
+	if (request) {
+	    f1 = fn->descript.req_f1;
+	    f2 = fn->descript.req_f2;
+	} else {
+	    f1 = fn->descript.rep_f1;
+	    f2 = fn->descript.rep_f2;
+	}
+
+	if (fn->descript.fn)
+	    fn->descript.fn(words, data, buf, maxbuf);
+	else {
+	    if (f1) {
+		printf("smbvwv[]=\n");
+		fdata(words + 1, f1, words + 1 + wct * 2);
+	    } else if (wct) {
+		int i;
+		int v;
+		printf("smbvwv[]=\n");
+		for (i = 0; i < wct; i++) {
+		    v = SVAL(words + 1, 2 * i);
+		    printf("smb_vwv[%d]=%d (0x%X)\n", i, v, v);
+		}
+	    }
+
+	    if (f2) {
+		printf("smbbuf[]=\n");
+		fdata(data + 2, f2, maxbuf);
+	    } else {
+		int bcc = SVAL(data, 0);
+		printf("smb_bcc=%d\n", bcc);
+		if (bcc > 0) {
+		    printf("smb_buf[]=\n");
+		    print_data(data + 2, MIN(bcc, PTR_DIFF(maxbuf, data + 2)));
+		}
+	    }
+	}
+
+	if ((fn->flags & FLG_CHAIN) != 0&& CVAL(words, 0) &&
+	    SVAL(words, 1) != 0xFF) {
+	    command = SVAL(words, 1);
+	    words = buf + SVAL(words, 3);
+	    data = words + 1 + CVAL(words, 0) * 2;
+
+	    fn = smbfind(command, smb_fns);
+
+	    printf("\nSMB PACKET: %s (%s) (CHAINED)\n",
+		fn->name, request ? "REQUEST" : "REPLY");
+	} else
+	    words = data = NULL;
+    }
+
+    printf("\n");  
+}
+
+
+/*
+ * print a NBT packet received across tcp on port 139
+ */
+void
+nbt_tcp_print(const uchar *data, int length)
+{
+    const uchar *maxbuf = data + length;
+    int flags = CVAL(data, 0);
+    int nbt_len = RSVAL(data, 2);
+
+    startbuf = data;
+    if (maxbuf <= data)
+	return;
+
+    if (vflag > 1)
+	printf ("\n>>> ");
+
+    printf("NBT Packet");
+
+    if (vflag < 2)
+	return;
+
     printf("\n");
 
-  printf("SMB PACKET: %s (%s)\n",fn->name,request?"REQUEST":"REPLY");
-
-  if (vflag < 2)
-    return;
-
-  /* print out the header */
-  fdata(buf,fmt_smbheader,buf+33);
-
-  if (CVAL(buf,5)) {
-    int class = CVAL(buf,5);
-    int num = SVAL(buf,7);
-    printf("SMBError = %s\n",smb_errstr(class,num));
-  }
-
-  words = buf+32;
-  data = words + 1 + CVAL(words,0)*2;
-
-
-  while (words && data)
-    {
-      char *f1,*f2;
-      int wct = CVAL(words,0);
-
-      if (request) {
-	f1 = fn->descript.req_f1;
-	f2 = fn->descript.req_f2;
-      } else {
-	f1 = fn->descript.rep_f1;
-	f2 = fn->descript.rep_f2;
-      }
-
-      if (fn->descript.fn) {
-	fn->descript.fn(words,data,buf,maxbuf);
-      } else {
-	if (f1) {
-	  printf("smbvwv[]=\n");
-	  fdata(words+1,f1,words + 1 + wct*2);
-	} else if (wct) {
-	  int i;
-	  int v;
-	  printf("smbvwv[]=\n");
-	  for (i=0;i<wct;i++) {
-	    v = SVAL(words+1,2*i);
-	    printf("smb_vwv[%d]=%d (0x%X)\n",i,v,v);
-	  }
-	}
-	
-	if (f2) {
-	  printf("smbbuf[]=\n");
-	  fdata(data+2,f2,maxbuf);
-	} else {
-	  int bcc = SVAL(data,0);
-	  printf("smb_bcc=%d\n",bcc);
-	  if (bcc>0) {
-	    printf("smb_buf[]=\n");
-	    print_data(data + 2, MIN(bcc,PTR_DIFF(maxbuf,data+2)));
-	  }
-	}
-      }
-
-      if ((fn->flags & FLG_CHAIN) && CVAL(words,0) && SVAL(words,1)!=0xFF) {
-	command = SVAL(words,1);
-	words = buf + SVAL(words,3);
-	data = words + 1 + CVAL(words,0)*2;
-
-	fn = smbfind(command,smb_fns);
-
-	printf("\nSMB PACKET: %s (%s) (CHAINED)\n",fn->name,request?"REQUEST":"REPLY");
-      } else {
-	words = data = NULL;
-      }
-    }
-
-  printf("\n");  
-}
-
-
-/*
-   print a NBT packet received across tcp on port 139
-*/
-void nbt_tcp_print(const uchar *data,int length)
-{
-  const uchar *maxbuf = data + length;
-  int flags = CVAL(data,0);
-  int nbt_len = RSVAL(data,2);
-
-  startbuf = data;
-  if (maxbuf <= data) return;
-
-  if (vflag > 1)
-    printf ("\n>>> ");
-
-  printf("NBT Packet");
-
-  if (vflag < 2)
-    return;
-
-  printf("\n");
-  
-  switch (flags) {
-  case 1:    
-    printf("flags=0x%x\n", flags);
-  case 0:    
-    data = fdata(data,"NBT Session Packet\nFlags=[rw]\nLength=[rd]\n",data+4);
-    if (data == NULL)
-      break;
-    if (memcmp(data,"\377SMB",4)==0) {
-      if (nbt_len>PTR_DIFF(maxbuf,data))
-	printf("WARNING: Short packet. Try increasing the snap length (%ld)\n",
-	       PTR_DIFF(maxbuf,data));
-      print_smb(data,maxbuf>data+nbt_len?data+nbt_len:maxbuf);
-    } else {
+    switch (flags) {
+    case 1:    
+	printf("flags=0x%x\n", flags);
+    case 0:    
+	data = fdata(data, "NBT Session Packet\nFlags=[rw]\nLength=[rd]\n",
+	    data + 4);
+	if (data == NULL)
+	    break;
+	if (memcmp(data,"\377SMB",4) == 0) {
+	    if (nbt_len > PTR_DIFF(maxbuf, data))
+	    printf("WARNING: Short packet. Try increasing the snap length (%ld)\n",
+	       PTR_DIFF(maxbuf, data));
+	    print_smb(data, maxbuf > data + nbt_len ? data + nbt_len : maxbuf);
+	} else
 	    printf("Session packet:(raw data?)\n");
+	break;
+
+	case 0x81:
+	    data = fdata(data,
+		"NBT Session Request\nFlags=[rW]\nDestination=[n1]\nSource=[n1]\n",
+		maxbuf);
+	    break;
+
+	case 0x82:
+	    data = fdata(data, "NBT Session Granted\nFlags=[rW]\n", maxbuf);
+	    break;
+
+	case 0x83:
+	  {
+	    int ecode = CVAL(data,4);
+
+	    data = fdata(data, "NBT SessionReject\nFlags=[rW]\nReason=[B]\n",
+		maxbuf);
+	    switch (ecode) {
+	    case 0x80: 
+		printf("Not listening on called name\n"); 
+		break;
+	    case 0x81: 
+		printf("Not listening for calling name\n"); 
+		break;
+	    case 0x82: 
+		printf("Called name not present\n"); 
+		break;
+	    case 0x83: 
+		printf("Called name present, but insufficient resources\n"); 
+		break;
+	    default:
+		printf("Unspecified error 0x%X\n", ecode); 
+		break;	  
+	    }
+	  }
+	    break;
+
+	case 0x85:
+	    data = fdata(data, "NBT Session Keepalive\nFlags=[rW]\n", maxbuf);
+	    break;
+
+	default:
+	    printf("flags=0x%x\n", flags);
+	    data = fdata(data, "NBT - Unknown packet type\nType=[rW]\n", maxbuf);
     }
-    break;
-
-  case 0x81:
-    data = fdata(data,"NBT Session Request\nFlags=[rW]\nDestination=[n1]\nSource=[n1]\n",maxbuf);
-    break;
-
-  case 0x82:
-    data = fdata(data,"NBT Session Granted\nFlags=[rW]\n",maxbuf);
-    break;
-
-  case 0x83:
-    {
-      int ecode = CVAL(data,4);
-      data = fdata(data,"NBT SessionReject\nFlags=[rW]\nReason=[B]\n",maxbuf);
-      switch (ecode) {
-      case 0x80: 
-	printf("Not listening on called name\n"); 
-	break;
-      case 0x81: 
-	printf("Not listening for calling name\n"); 
-	break;
-      case 0x82: 
-	printf("Called name not present\n"); 
-	break;
-      case 0x83: 
-	printf("Called name present, but insufficient resources\n"); 
-	break;
-      default:
-	printf("Unspecified error 0x%X\n",ecode); 
-	break;	  
-      }
-    }
-    break;
-
-  case 0x85:
-    data = fdata(data,"NBT Session Keepalive\nFlags=[rW]\n",maxbuf);
-    break;
-
-  default:
-    printf("flags=0x%x\n", flags);
-    data = fdata(data,"NBT - Unknown packet type\nType=[rW]\n",maxbuf);
-  }
-  printf("\n");
-  fflush(stdout);
+    printf("\n");
+    fflush(stdout);
 }
 
 
 /*
-   print a NBT packet received across udp on port 137
-*/
-void nbt_udp137_print(const uchar *data, int length)
+ * print a NBT packet received across udp on port 137
+ */
+void
+nbt_udp137_print(const uchar *data, int length)
 {
   const uchar *maxbuf = data + length;
   int name_trn_id = RSVAL(data,0);
@@ -929,8 +1014,8 @@ out:
 
 
 /*
-   print a NBT packet received across udp on port 138
-*/
+ * print a NBT packet received across udp on port 138
+ */
 void nbt_udp138_print(const uchar *data, int length)
 {
   const uchar *maxbuf = data + length;
@@ -1064,32 +1149,34 @@ out:
 
 
 /*
-   print IPX-Netbios frames 
-*/
+ * print IPX-Netbios frames 
+ */
 void ipx_netbios_print(const uchar *data, u_int length)
 {
-  /* this is a hack till I work out how to parse the rest of the
-     NetBIOS-over-IPX stuff */
-  int i;
-  const uchar *maxbuf;
+    /*
+     * this is a hack till I work out how to parse the rest of the
+     * NetBIOS-over-IPX stuff
+     */
+    int i;
+    const uchar *maxbuf;
 
-  maxbuf = data + length;
-  /* Don't go past the end of the captured data in the packet. */
-  if (maxbuf > snapend)
-    maxbuf = snapend;
-  startbuf = data;
-  for (i=0;i<128;i++) {
-    if (&data[i+3] >= maxbuf)
-      break;
-    if (memcmp(&data[i],"\377SMB",4)==0) {
-      fdata(data,"\n>>> IPX transport ",&data[i]);
-      if (data != NULL)
-	print_smb(&data[i],maxbuf);
-      printf("\n");
-      fflush(stdout);
-      break;
+    maxbuf = data + length;
+    /* Don't go past the end of the captured data in the packet. */
+    if (maxbuf > snapend)
+	maxbuf = snapend;
+    startbuf = data;
+    for (i = 0; i < 128; i++) {
+	if (&data[i + 4] > maxbuf)
+	    break;
+	if (memcmp(&data[i], "\377SMB", 4) == 0) {
+	    fdata(data, "\n>>> IPX transport ", &data[i]);
+	    if (data != NULL)
+		print_smb(&data[i], maxbuf);
+	    printf("\n");
+	    fflush(stdout);
+	    break;
+	}
     }
-  }
-  if (i==128)
-    fdata(data,"\n>>> Unknown IPX ",maxbuf);
+    if (i == 128)
+	fdata(data, "\n>>> Unknown IPX ", maxbuf);
 }
