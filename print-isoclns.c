@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.118 2004-03-18 10:58:17 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.119 2004-03-24 01:40:44 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1060,75 +1060,89 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
         case ISIS_SUBTLV_EXT_IS_REACH_ADMIN_GROUP:      
         case ISIS_SUBTLV_EXT_IS_REACH_LINK_LOCAL_REMOTE_ID:
         case ISIS_SUBTLV_EXT_IS_REACH_LINK_REMOTE_ID:
-            printf(", 0x%08x", EXTRACT_32BITS(tptr));
-	    if (subl == 8) /* draft-ietf-isis-gmpls-extensions */
-	      printf(", 0x%08x", EXTRACT_32BITS(tptr+4));
+	    if (subl >= 4) {
+	      printf(", 0x%08x", EXTRACT_32BITS(tptr));
+	      if (subl == 8) /* draft-ietf-isis-gmpls-extensions */
+	        printf(", 0x%08x", EXTRACT_32BITS(tptr+4));
+	    }
 	    break;
         case ISIS_SUBTLV_EXT_IS_REACH_IPV4_INTF_ADDR:
         case ISIS_SUBTLV_EXT_IS_REACH_IPV4_NEIGHBOR_ADDR:
-            printf(", %s", ipaddr_string(tptr));
+            if (subl >= 4)
+              printf(", %s", ipaddr_string(tptr));
             break;
         case ISIS_SUBTLV_EXT_IS_REACH_MAX_LINK_BW :
 	case ISIS_SUBTLV_EXT_IS_REACH_RESERVABLE_BW:  
-            bw.i = EXTRACT_32BITS(tptr);
-            printf(", %.3f Mbps", bw.f*8/1000000 );
+            if (subl >= 4) {
+              bw.i = EXTRACT_32BITS(tptr);
+              printf(", %.3f Mbps", bw.f*8/1000000 );
+            }
             break;
         case ISIS_SUBTLV_EXT_IS_REACH_UNRESERVED_BW :
-            for (priority_level = 0; priority_level < 8; priority_level++) {
+            if (subl >= 32) {
+              for (priority_level = 0; priority_level < 8; priority_level++) {
                 bw.i = EXTRACT_32BITS(tptr);
                 printf("%s  priority level %d: %.3f Mbps",
                        ident,
                        priority_level,
                        bw.f*8/1000000 );
 		tptr+=4;
+	      }
             }
             break;
         case ISIS_SUBTLV_EXT_IS_REACH_DIFFSERV_TE:
-            printf("%sBandwidth Constraints Model ID: (%u)",ident, *tptr);
-            tptr+=4;
-            /* for now lets just print the first 8 BCs -
-             * FIXME is this dep. on the BC model ?
-             */
-            for (bandwidth_constraint = 0; bandwidth_constraint < 8; bandwidth_constraint++) {
+            if (subl >= 36) {
+              printf("%sBandwidth Constraints Model ID: (%u)",ident, *tptr);
+              tptr+=4;
+              /* for now lets just print the first 8 BCs -
+               * FIXME is this dep. on the BC model ?
+               */
+              for (bandwidth_constraint = 0; bandwidth_constraint < 8; bandwidth_constraint++) {
                 bw.i = EXTRACT_32BITS(tptr);
                 printf("%s  Bandwidth constraint %d: %.3f Mbps",
                        ident,
                        bandwidth_constraint,
                        bw.f*8/1000000 );
 		tptr+=4;
+	      }
             }
             break;
         case ISIS_SUBTLV_EXT_IS_REACH_TE_METRIC:
-            printf(", %u", EXTRACT_24BITS(tptr));
+            if (subl >= 3)
+              printf(", %u", EXTRACT_24BITS(tptr));
             break;
         case ISIS_SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE:
-            printf(", %s, Priority %u",
+            if (subl >= 2) {
+              printf(", %s, Priority %u",
 		   bittok2str(gmpls_link_prot_values, "none", *tptr),
                    *(tptr+1));
+            }
             break;
         case ISIS_SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR:
-            printf("%s  Interface Switching Capability:%s",
+            if (subl >= 36) {
+              printf("%s  Interface Switching Capability:%s",
                    ident,
                    tok2str(gmpls_switch_cap_values, "Unknown", *(tptr)));
-            printf(", LSP Encoding: %s",
+              printf(", LSP Encoding: %s",
                    tok2str(gmpls_encoding_values, "Unknown", *(tptr+1)));
-	    tptr+=4;
-            printf("%s  Max LSP Bandwidth:",ident);
-            for (priority_level = 0; priority_level < 8; priority_level++) {
+	      tptr+=4;
+              printf("%s  Max LSP Bandwidth:",ident);
+              for (priority_level = 0; priority_level < 8; priority_level++) {
                 bw.i = EXTRACT_32BITS(tptr);
                 printf("%s    priority level %d: %.3f Mbps",
                        ident,
                        priority_level,
                        bw.f*8/1000000 );
 		tptr+=4;
-            }
-            subl-=36;
-            /* there is some optional stuff left to decode but this is as of yet
-               not specified so just lets hexdump what is left */
-            if(subl>0){
+              }
+              subl-=36;
+              /* there is some optional stuff left to decode but this is as of yet
+                 not specified so just lets hexdump what is left */
+              if(subl>0){
                 if(!print_unknown_data(tptr,"\n\t\t    ",
 				       subl-36))
                     return(0);
+              }
             }
             break;
         default:
