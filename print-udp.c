@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.74 2000-07-14 02:49:00 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.75 2000-07-22 23:58:01 assar Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -356,6 +356,13 @@ udp_print(register const u_char *bp, u_int length, register const u_char *bp2)
 	sport = ntohs(up->uh_sport);
 	dport = ntohs(up->uh_dport);
 	ulen = ntohs(up->uh_ulen);
+	if (ulen < 8) {
+		(void)printf("%s > %s: truncated-udplength %d",
+			     ipaddr_string(&ip->ip_src),
+			     ipaddr_string(&ip->ip_dst),
+			     ulen);
+		return;
+	}
 	if (packettype) {
 		register struct rpc_msg *rp;
 		enum msg_type direction;
