@@ -51,7 +51,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.7 2000-05-28 04:23:14 itojun Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.8 2000-06-03 16:40:35 itojun Exp $";
 #endif
 
 #include <sys/param.h>
@@ -82,22 +82,6 @@ static const char rcsid[] =
 #ifndef TELCMD_FIRST
 # define TELCMD_FIRST SE
 #endif
-
-static void safeputs __P((const char *));
-
-#define safeputc(c) \
-    printf((((unsigned char)c) < 0x80 && isprint((c)) ? "%c" : "\\%03o"), \
-	((unsigned char)c) & 0xff)
-
-static void
-safeputs(s)
-	const char *s;
-{
-	while (*s) {
-		safeputc(*s);
-		s++;
-	}
-}
 
 void
 telnet_print(register const u_char *sp, u_int length)

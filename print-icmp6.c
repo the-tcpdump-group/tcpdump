@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.15 2000-05-28 04:23:14 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.16 2000-06-03 16:40:35 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -578,10 +578,6 @@ mld6_print(register const u_char *bp)
 #endif
 
 #ifdef HAVE_STRUCT_ICMP6_NODEINFO
-#define safeputc(c) \
-    printf((((unsigned char)c) < 0x80 && isprint((c)) ? "%c" : "\\%03o"), \
-	((unsigned char)c) & 0xff)
-
 static void
 dnsname_print(const u_char *cp, const u_char *ep)
 {
@@ -597,7 +593,7 @@ dnsname_print(const u_char *cp, const u_char *ep)
 				break;
 			}
 			while (i-- && cp < ep) {
-				safeputc(*cp);
+				safeputchar(*cp);
 				cp++;
 			}
 			if (cp + 1 < ep && *cp)
@@ -717,7 +713,7 @@ icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
 				cp++;
 				printf(", \"");
 				while (cp < ep) {
-					safeputc(*cp);
+					safeputchar(*cp);
 					cp++;
 				}
 				printf("\"");
@@ -800,7 +796,7 @@ icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
 				cp++;
 				printf(", \"");
 				while (cp < ep) {
-					safeputc(*cp);
+					safeputchar(*cp);
 					cp++;
 				}
 				printf("\"");
@@ -842,7 +838,6 @@ icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
 trunc:
 	fputs("[|icmp6]", stdout);
 }
-#undef safeputc
 #endif
 
 #endif /* INET6 */

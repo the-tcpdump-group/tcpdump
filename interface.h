@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.126 2000-06-01 01:14:43 assar Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.127 2000-06-03 16:40:35 itojun Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -208,6 +208,9 @@ extern void warning(const char *, ...) __attribute__ ((format (printf, 1, 2)));
 
 extern char *read_infile(char *);
 extern char *copy_argv(char **);
+
+extern void safeputchar(int);
+extern void safeputs(const char *);
 
 extern char *isonsap_string(const u_char *);
 extern char *llcsap_string(u_char);

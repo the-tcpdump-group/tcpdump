@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.64 2000-06-01 01:13:53 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.65 2000-06-03 16:40:36 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -134,47 +134,46 @@ ts_print(register const struct timeval *tvp)
 	static unsigned b_sec;
 	static unsigned b_usec;
 
-	switch(tflag)
-	{
-		case 1: /* Default */
-			s = (tvp->tv_sec + thiszone) % 86400;
-			(void)printf("%02d:%02d:%02d.%06u ",
-				     s / 3600, (s % 3600) / 60, s % 60,
-				     (unsigned)tvp->tv_usec);
-			break;
-		case -1: /* Unix timeval style */
-			(void)printf("%u.%06u ",
-				     (unsigned)tvp->tv_sec,
-				     (unsigned)tvp->tv_usec);
-			break;
-		case -2:
-			if (b_sec == 0) {
-				printf("000000 ");
-			} else {
-				int d_usec = tvp->tv_usec - b_usec;
-				int d_sec = tvp->tv_sec - b_sec;
-				
-				while (d_usec < 0) {
-					d_usec += 1000000;
-					d_sec--;
-				}
-				if (d_sec)
-					printf("%d. ", d_sec);
-				printf("%06d ", d_usec);
+	switch(tflag) {
+	case 1: /* Default */
+		s = (tvp->tv_sec + thiszone) % 86400;
+		(void)printf("%02d:%02d:%02d.%06u ",
+			     s / 3600, (s % 3600) / 60, s % 60,
+			     (unsigned)tvp->tv_usec);
+		break;
+	case -1: /* Unix timeval style */
+		(void)printf("%u.%06u ",
+			     (unsigned)tvp->tv_sec,
+			     (unsigned)tvp->tv_usec);
+		break;
+	case -2:
+		if (b_sec == 0) {
+			printf("000000 ");
+		} else {
+			int d_usec = tvp->tv_usec - b_usec;
+			int d_sec = tvp->tv_sec - b_sec;
+			
+			while (d_usec < 0) {
+				d_usec += 1000000;
+				d_sec--;
 			}
-			b_sec = tvp->tv_sec;
-			b_usec = tvp->tv_usec;
-			break;
-		case -3: /* Default + Date*/
-			s = (tvp->tv_sec + thiszone) % 86400;
-			time(&Time);
-			tm = localtime(&Time);
-			(void)printf("%02d/%02d/%04d %02d:%02d:%02d.%06u ",
-				     tm->tm_mon+1, tm->tm_mday,
-				     tm->tm_year+1900,
-				     s / 3600, (s % 3600) / 60,
-				     s % 60, (unsigned)tvp->tv_usec);
-			break;
+			if (d_sec)
+				printf("%d. ", d_sec);
+			printf("%06d ", d_usec);
+		}
+		b_sec = tvp->tv_sec;
+		b_usec = tvp->tv_usec;
+		break;
+	case -3: /* Default + Date*/
+		s = (tvp->tv_sec + thiszone) % 86400;
+		time(&Time);
+		tm = localtime(&Time);
+		(void)printf("%02d/%02d/%04d %02d:%02d:%02d.%06u ",
+			     tm->tm_mon+1, tm->tm_mday,
+			     tm->tm_year+1900,
+			     s / 3600, (s % 3600) / 60,
+			     s % 60, (unsigned)tvp->tv_usec);
+		break;
 	}
 }
 
@@ -186,22 +185,23 @@ ts_print(register const struct timeval *tvp)
 void
 relts_print(int secs)
 {
-    static char *lengths[]={"y","w","d","h","m","s"};
-    static int seconds[]={31536000,604800,86400,3600,60,1};
-    char **l = lengths;
-    int *s = seconds;
+	static char *lengths[] = {"y", "w", "d", "h", "m", "s"};
+	static int seconds[] = {31536000, 604800, 86400, 3600, 60, 1};
+	char **l = lengths;
+	int *s = seconds;
 
-    if (secs == 0) {
-	(void)printf("0s");
-	return;
-    }
-    while (secs) {
-	if (secs >= *s) {
-	    (void)printf("%d%s", secs / *s, *l);
-	    secs -= (secs / *s) * *s;
+	if (secs <= 0) {
+		(void)printf("0s");
+		return;
 	}
-	s++; l++;
-    }
+	while (secs > 0) {
+		if (secs >= *s) {
+			(void)printf("%d%s", secs / *s, *l);
+			secs -= (secs / *s) * *s;
+		}
+		s++;
+		l++;
+	}
 }
 
 /*
@@ -338,4 +338,25 @@ read_infile(char *fname)
 	cp[(int)buf.st_size] = '\0';
 
 	return (cp);
+}
+
+void
+safeputs(const char *s)
+{
+	while (*s) {
+		safeputchar(*s);
+		s++;
+	}
+}
+
+void
+safeputchar(int c)
+{
+	unsigned char ch;
+
+	ch = (unsigned char)(c & 0xff);
+	if (c < 0x80 && isprint(c))
+		printf("\\%03o", c & 0xff);
+	else
+		printf("%c", c & 0xff);
 }
