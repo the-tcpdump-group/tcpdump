@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.50 2000-09-29 04:58:46 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.51 2000-10-04 22:37:29 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -835,7 +835,7 @@ print_ipcp_config_options(const u_char *p, int length)
 		       ipaddr_string(p + 6));
 		break;
 	case IPCPOPT_IPCOMP:
-		if (len != 4)
+		if (len < 4)
 			goto invlen;
 		printf(", IP-Comp");
 		if (EXTRACT_16BITS(p + 2) == PPP_VJC) {
