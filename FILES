@@ -61,6 +61,7 @@ missing/snprintf.c
 missing/sockstorage.h
 missing/strlcat.c
 missing/strlcpy.c
+missing/strdup.c
 mkdep
 nameser.h
 netbios.h
@@ -144,8 +145,6 @@ print-vrrp.c
 print-wb.c
 route6d.h
 rx.h
-savestr.c
-savestr.h
 send-ack.awk
 setsignal.c
 setsignal.h

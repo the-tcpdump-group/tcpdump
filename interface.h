@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.151 2001-01-15 03:59:13 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.152 2001-01-20 07:22:22 guy Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -53,6 +53,10 @@ extern size_t strlcat (char *, const char *, size_t);
 #endif
 #ifndef HAVE_STRLCPY
 extern size_t strlcpy (char *, const char *, size_t);
+#endif
+
+#ifndef HAVE_STRDUP
+extern char *strdup (const char *str);
 #endif
 
 struct tok {

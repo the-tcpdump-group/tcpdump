@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.70 2001-01-17 18:27:36 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.71 2001-01-20 07:22:21 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -58,7 +58,6 @@ struct rtentry;
 #include "interface.h"
 #include "addrtoname.h"
 #include "llc.h"
-#include "savestr.h"
 #include "setsignal.h"
 
 /* Forwards */
@@ -210,7 +209,7 @@ getname(const u_char *ap)
 			if (hp) {
 				char *dotp;
 
-				p->name = savestr(hp->h_name);
+				p->name = strdup(hp->h_name);
 				if (Nflag) {
 					/* Remove domain qualifications */
 					dotp = strchr(p->name, '.');
@@ -221,7 +220,7 @@ getname(const u_char *ap)
 			}
 		}
 	}
-	p->name = savestr(intoa(addr));
+	p->name = strdup(intoa(addr));
 	return (p->name);
 }
 
@@ -273,7 +272,7 @@ getname6(const u_char *ap)
 			if (hp) {
 				char *dotp;
 
-				p->name = savestr(hp->h_name);
+				p->name = strdup(hp->h_name);
 				if (Nflag) {
 					/* Remove domain qualifications */
 					dotp = strchr(p->name, '.');
@@ -285,7 +284,7 @@ getname6(const u_char *ap)
 		}
 	}
 	cp = (char *)inet_ntop(AF_INET6, &addr, ntop_buf, sizeof(ntop_buf));
-	p->name = savestr(cp);
+	p->name = strdup(cp);
 	return (p->name);
 }
 #endif /* INET6 */
@@ -409,7 +408,7 @@ etheraddr_string(register const u_char *ep)
 	if (!nflag) {
 		char buf[128];
 		if (ether_ntohost(buf, (struct ether_addr *)ep) == 0) {
-			tp->e_name = savestr(buf);
+			tp->e_name = strdup(buf);
 			return (tp->e_name);
 		}
 	}
@@ -425,7 +424,7 @@ etheraddr_string(register const u_char *ep)
 		*cp++ = hex[*ep++ & 0xf];
 	}
 	*cp = '\0';
-	tp->e_name = savestr(buf);
+	tp->e_name = strdup(buf);
 	return (tp->e_name);
 }
 
@@ -451,7 +450,7 @@ etherproto_string(u_short port)
 	*cp++ = hex[port >> 4 & 0xf];
 	*cp++ = hex[port & 0xf];
 	*cp++ = '\0';
-	tp->name = savestr(buf);
+	tp->name = strdup(buf);
 	return (tp->name);
 }
 
@@ -478,7 +477,7 @@ protoid_string(register const u_char *pi)
 		*cp++ = hex[*pi++ & 0xf];
 	}
 	*cp = '\0';
-	tp->p_name = savestr(buf);
+	tp->p_name = strdup(buf);
 	return (tp->p_name);
 }
 
@@ -497,7 +496,7 @@ llcsap_string(u_char sap)
 	tp->nxt = newhnamemem();
 
 	snprintf(buf, sizeof(buf), "sap %02x", sap & 0xff);
-	tp->name = savestr(buf);
+	tp->name = strdup(buf);
 	return (tp->name);
 }
 
@@ -541,7 +540,7 @@ tcpport_string(u_short port)
 	tp->nxt = newhnamemem();
 
 	(void)snprintf(buf, sizeof(buf), "%u", i);
-	tp->name = savestr(buf);
+	tp->name = strdup(buf);
 	return (tp->name);
 }
 
@@ -560,7 +559,7 @@ udpport_string(register u_short port)
 	tp->nxt = newhnamemem();
 
 	(void)snprintf(buf, sizeof(buf), "%u", i);
-	tp->name = savestr(buf);
+	tp->name = strdup(buf);
 	return (tp->name);
 }
 
@@ -586,9 +585,9 @@ init_servarray(void)
 			table = table->nxt;
 		if (nflag) {
 			(void)snprintf(buf, sizeof(buf), "%d", port);
-			table->name = savestr(buf);
+			table->name = strdup(buf);
 		} else
-			table->name = savestr(sv->s_name);
+			table->name = strdup(sv->s_name);
 		table->addr = port;
 		table->nxt = newhnamemem();
 	}
@@ -637,7 +636,7 @@ init_protoidarray(void)
 
 		memcpy((char *)&protoid[3], (char *)&etype, 2);
 		tp = lookup_protoid(protoid);
-		tp->p_name = savestr(eproto_db[i].s);
+		tp->p_name = strdup(eproto_db[i].s);
 	}
 }
 
@@ -679,7 +678,7 @@ init_etherarray(void)
 	if (fp != NULL) {
 		while ((ep = pcap_next_etherent(fp)) != NULL) {
 			tp = lookup_emem(ep->addr);
-			tp->e_name = savestr(ep->name);
+			tp->e_name = strdup(ep->name);
 		}
 		(void)fclose(fp);
 	}
@@ -695,7 +694,7 @@ init_etherarray(void)
 #ifdef HAVE_ETHER_NTOHOST
                 /* Use yp/nis version of name if available */
                 if (ether_ntohost(name, (struct ether_addr *)el->addr) == 0) {
-                        tp->e_name = savestr(name);
+                        tp->e_name = strdup(name);
 			continue;
 		}
 #endif

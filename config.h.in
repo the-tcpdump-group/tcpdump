@@ -146,6 +146,9 @@
 /* Define if you have the strcasecmp function.  */
 #undef HAVE_STRCASECMP
 
+/* Define if you have the strdup function.  */
+#undef HAVE_STRDUP
+
 /* Define if you have the strlcat function.  */
 #undef HAVE_STRLCAT
 

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-decnet.c,v 1.30 2000-09-28 06:42:57 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-decnet.c,v 1.31 2001-01-20 07:22:24 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -753,7 +753,7 @@ dnname_string(u_short dnaddr)
 
 	dna.a_len = sizeof(short);
 	memcpy((char *)dna.a_addr, (char *)&dnaddr, sizeof(short));
-	return (savestr(dnet_htoa(&dna)));
+	return (strdup(dnet_htoa(&dna)));
 #else
 	return(dnnum_string(dnaddr));	/* punt */
 #endif

@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.64 2000-10-30 06:22:14 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.65 2001-01-20 07:22:23 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -46,7 +46,6 @@ static const char rcsid[] =
 #include "ethertype.h"
 #include "extract.h"			/* must come after interface.h */
 #include "appletalk.h"
-#include "savestr.h"
 
 static struct tok type2str[] = {
 	{ ddpRTMP,		"rtmp" },
@@ -542,7 +541,7 @@ ataddr_string(u_short atnet, u_char athost)
 				;
 			tp->addr = i3;
 			tp->nxt = newhnamemem();
-			tp->name = savestr(nambuf);
+			tp->name = strdup(nambuf);
 		}
 		fclose(fp);
 	}
@@ -559,7 +558,7 @@ ataddr_string(u_short atnet, u_char athost)
 			tp->nxt = newhnamemem();
 			(void)snprintf(nambuf, sizeof(nambuf), "%s.%d",
 			    tp2->name, athost);
-			tp->name = savestr(nambuf);
+			tp->name = strdup(nambuf);
 			return (tp->name);
 		}
 
@@ -571,7 +570,7 @@ ataddr_string(u_short atnet, u_char athost)
 	else
 		(void)snprintf(nambuf, sizeof(nambuf), "%d.%d", atnet >> 8,
 		    atnet & 0xff);
-	tp->name = savestr(nambuf);
+	tp->name = strdup(nambuf);
 
 	return (tp->name);
 }
