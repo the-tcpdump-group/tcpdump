@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.29 2004-12-27 22:45:44 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.30 2004-12-28 03:34:08 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -421,31 +421,13 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf)
 	    reverse = !reverse;
 	    fmt++;
 	    break;
-	case 'D':
+	case 'b':
 	  {
 	    unsigned int x;
-
-	    TCHECK2(buf[0], 4);
-	    x = reverse ? EXTRACT_32BITS(buf) : EXTRACT_LE_32BITS(buf);
-	    printf("%d (0x%x)", x, x);
-	    buf += 4;
-	    fmt++;
-	    break;
-	  }
-	case 'L':
-	  {
-	    unsigned int x1, x2;
-
-	    TCHECK2(buf[4], 4);
-	    x1 = reverse ? EXTRACT_32BITS(buf) :
-			   EXTRACT_LE_32BITS(buf);
-	    x2 = reverse ? EXTRACT_32BITS(buf + 4) :
-			   EXTRACT_LE_32BITS(buf + 4);
-	    if (x2)
-		printf("0x%08x:%08x", x2, x1);
-	    else
-		printf("%d (0x%08x%08x)", x1, x2, x1);
-	    buf += 8;
+	    TCHECK(buf[0]);
+	    x = buf[0];
+	    printf("%u (0x%x)", x, x);
+	    buf += 1;
 	    fmt++;
 	    break;
 	  }
@@ -460,14 +442,35 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf)
 	    fmt++;
 	    break;
 	  }
-	case 'W':
+	case 'D':
 	  {
 	    unsigned int x;
 	    TCHECK2(buf[0], 4);
 	    x = reverse ? EXTRACT_32BITS(buf) :
 			  EXTRACT_LE_32BITS(buf);
-	    printf("0x%X", x);
+	    printf("%d (0x%x)", x, x);
 	    buf += 4;
+	    fmt++;
+	    break;
+	  }
+	case 'L':
+	  {
+	    u_int64_t x;
+	    TCHECK2(buf[0], 8);
+	    x = reverse ? EXTRACT_64BITS(buf) :
+			  EXTRACT_LE_64BITS(buf);
+	    printf("%" PRIu64 " (0x%" PRIx64 ")", x, x);
+	    buf += 8;
+	    fmt++;
+	    break;
+	  }
+	case 'B':
+	  {
+	    unsigned int x;
+	    TCHECK(buf[0]);
+	    x = buf[0];
+	    printf("0x%X", x);
+	    buf += 1;
 	    fmt++;
 	    break;
 	  }
@@ -482,23 +485,14 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf)
 	    fmt++;
 	    break;
 	  }
-	case 'B':
+	case 'W':
 	  {
 	    unsigned int x;
-	    TCHECK(buf[0]);
-	    x = buf[0];
+	    TCHECK2(buf[0], 4);
+	    x = reverse ? EXTRACT_32BITS(buf) :
+			  EXTRACT_LE_32BITS(buf);
 	    printf("0x%X", x);
-	    buf += 1;
-	    fmt++;
-	    break;
-	  }
-	case 'b':
-	  {
-	    unsigned int x;
-	    TCHECK(buf[0]);
-	    x = buf[0];
-	    printf("%u (0x%x)", x, x);
-	    buf += 1;
+	    buf += 4;
 	    fmt++;
 	    break;
 	  }
