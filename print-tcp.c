@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.99 2002-08-16 22:40:33 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.100 2002-08-20 00:01:38 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -95,6 +95,7 @@ static struct tcp_seq_hash tcp_seq_hash[TSEQ_HASHSIZE];
 #define NFS_PORT	2049
 #endif
 #define MSDP_PORT	639
+#define LDP_PORT        646
 
 static int tcp_cksum(register const struct ip *ip,
 		     register const struct tcphdr *tp,
@@ -616,6 +617,8 @@ tcp_print(register const u_char *bp, register u_int length,
 		} else if (sport == MSDP_PORT || dport == MSDP_PORT) {
 			msdp_print(bp, length);
 		}
+                else if (sport == LDP_PORT || dport == LDP_PORT)
+                        printf("LDP, length: %u", length);
 	}
 	return;
 bad:

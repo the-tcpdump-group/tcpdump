@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.107 2002-08-16 22:40:34 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.108 2002-08-20 00:01:38 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -371,6 +371,7 @@ static int udp6_cksum(const struct ip6_hdr *ip6, const struct udphdr *up,
 #define ISAKMP_PORT 500		/*XXX*/
 #define TIMED_PORT 525		/*XXX*/
 #define RIP_PORT 520		/*XXX*/
+#define LDP_PORT 646
 #define KERBEROS_SEC_PORT 750	/*XXX*/
 #define L2TP_PORT 1701		/*XXX*/
 #define ISAKMP_PORT_USER1 7500	/*XXX - nonstandard*/
@@ -661,6 +662,8 @@ udp_print(register const u_char *bp, u_int length,
 			hsrp_print((const u_char *)(up + 1), length);
 		else if (ISPORT(LWRES_PORT))
 			lwres_print((const u_char *)(up + 1), length);
+                else if (ISPORT(LDP_PORT))
+                        printf("LDP, length: %u", length);
 		else
 			(void)printf("udp %u",
 			    (u_int32_t)(ulen - sizeof(*up)));
@@ -668,3 +671,9 @@ udp_print(register const u_char *bp, u_int length,
 	} else
 		(void)printf("udp %u", (u_int32_t)(ulen - sizeof(*up)));
 }
+
+
+
+
+
+
