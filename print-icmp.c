@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.61 2001-07-19 19:37:31 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.62 2001-07-24 16:56:11 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -245,7 +245,7 @@ static struct tok type2str[] = {
 	{ ICMP_REDIRECT_NET,		"redirect %s to net %s" },
 	{ ICMP_REDIRECT_HOST,		"redirect %s to host %s" },
 	{ ICMP_REDIRECT_TOSNET,		"redirect-tos %s to net %s" },
-	{ ICMP_REDIRECT_TOSHOST,	"redirect-tos %s to net %s" },
+	{ ICMP_REDIRECT_TOSHOST,	"redirect-tos %s to host %s" },
 	{ 0,				NULL }
 };
 
