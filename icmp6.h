@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/icmp6.h,v 1.7 2001-01-28 09:09:36 itojun Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/icmp6.h,v 1.8 2001-02-15 03:03:33 itojun Exp $ (LBL) */
 /*	$NetBSD: icmp6.h,v 1.13 2000/08/03 16:30:37 itojun Exp $	*/
 /*	$KAME: icmp6.h,v 1.22 2000/08/03 15:25:16 jinmei Exp $	*/
 
@@ -290,11 +290,11 @@ struct nd_opt_advinterval {	/* Advertisement interval option */
 };
 
 struct nd_opt_homeagent_info {	/* Home Agent info */
-	uint8_t		nd_opt_hai_type;
-	uint8_t		nd_opt_hai_len;
-	uint16_t	nd_opt_hai_reserved;
+	u_int8_t	nd_opt_hai_type;
+	u_int8_t	nd_opt_hai_len;
+	u_int16_t	nd_opt_hai_reserved;
 	int16_t		nd_opt_hai_preference;
-	uint16_t	nd_opt_hai_lifetime;
+	u_int16_t	nd_opt_hai_lifetime;
 };
 
 /*
