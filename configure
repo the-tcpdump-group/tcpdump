@@ -3854,8 +3854,8 @@ fi
 	    fi
     else
 	    V_PCAPDEP=$libpcap
-	    places=`ls $srcdir/.. | sed -e 's,/$,,' -e 's,^,$srcdir/../,' | \
-    	 		egrep '/libpcap-0-9*.0-9*(.0-9*)?(ab0-9*)?$'`
+	    places=`ls $srcdir/.. | sed -e 's,/$,,' -e "s,^,$srcdir/../," | \
+    	 		egrep '/libpcap-[0-9]*.[0-9]*(.[0-9]*)?([ab][0-9]*)?$'`
 	    if test -r $d/pcap.h; then
 		    V_INCLS="-I$d $V_INCLS"
 	    elif test -r $places/pcap.h; then
