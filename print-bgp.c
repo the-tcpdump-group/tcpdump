@@ -45,6 +45,7 @@
 
 #include <errno.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "interface.h"
 #include "addrtoname.h"
@@ -293,7 +294,6 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 	u_int8_t safi, snpa;
 	int advance;
 	int tlen;
-	const char *s;
 	const u_char *p;
 	char buf[256];
 
@@ -460,7 +460,7 @@ bgp_update_print(const u_char *dat, int length)
 	int hlen;
 	const u_char *p;
 	int len;
-	int i, j;
+	int i;
 	int newline;
 
 	memcpy(&bgp, dat, sizeof(bgp));
@@ -569,7 +569,7 @@ bgp_print(const u_char *dat, int length)
 {
 	const u_char *p;
 	const u_char *ep;
-	const u_char *start, *end;
+	const u_char *start;
 	const u_char marker[] = {
 		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
 		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
