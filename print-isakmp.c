@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.21 2000-09-29 04:58:42 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.22 2000-10-03 02:54:59 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -200,7 +200,7 @@ cookie_record(cookie_t *in, const u_char *bp2)
 	}
 
 	ip = (struct ip *)bp2;
-	switch (ip->ip_v) {
+	switch (IP_V(ip)) {
 	case 4:
 		memset(&cookiecache[ninitiator].iaddr, 0,
 			sizeof(cookiecache[ninitiator].iaddr));
@@ -266,7 +266,7 @@ cookie_sidecheck(int i, const u_char *bp2, int initiator)
 
 	memset(&ss, 0, sizeof(ss));
 	ip = (struct ip *)bp2;
-	switch (ip->ip_v) {
+	switch (IP_V(ip)) {
 	case 4:
 		sin = (struct sockaddr_in *)&ss;
 #ifdef HAVE_SOCKADDR_SA_LEN

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sunrpc.c,v 1.37 2000-09-29 04:58:50 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sunrpc.c,v 1.38 2000-10-03 02:55:01 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -93,7 +93,7 @@ sunrpcrequest_print(register const u_char *bp, register u_int length,
 		snprintf(dstid, sizeof(dstid), "0x%x", PMAPPORT);
 	}
 
-	switch (((struct ip *)bp2)->ip_v) {
+	switch (IP_V((struct ip *)bp2)) {
 	case 4:
 		ip = (struct ip *)bp2;
 		printf("%s.%s > %s.%s: %d",

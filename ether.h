@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ether.h,v 1.3 2000-09-23 08:54:25 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ether.h,v 1.4 2000-10-03 02:54:55 itojun Exp $ (LBL) */
 /*
  * Copyright (c) 1982, 1986, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -45,14 +45,14 @@
  * Ethernet address - 6 octets
  */
 struct ether_addr {
-	u_char	ether_addr_octet[ETHER_ADDR_LEN];
+	u_int8_t	ether_addr_octet[ETHER_ADDR_LEN];
 };
 
 /*
  * Structure of a 10Mb/s Ethernet header.
  */
 struct	ether_header {
-	u_char	ether_dhost[ETHER_ADDR_LEN];
-	u_char	ether_shost[ETHER_ADDR_LEN];
-	u_short	ether_type;
+	u_int8_t	ether_dhost[ETHER_ADDR_LEN];
+	u_int8_t	ether_shost[ETHER_ADDR_LEN];
+	u_int16_t	ether_type;
 };

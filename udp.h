@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/udp.h,v 1.1 2000-09-23 08:26:39 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/udp.h,v 1.2 2000-10-03 02:55:03 itojun Exp $ (LBL) */
 /*
  * Copyright (c) 1982, 1986, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -39,8 +39,8 @@
  * Per RFC 768, September, 1981.
  */
 struct udphdr {
-	u_short	uh_sport;		/* source port */
-	u_short	uh_dport;		/* destination port */
-	short	uh_ulen;		/* udp length */
-	u_short	uh_sum;			/* udp checksum */
+	u_int16_t	uh_sport;		/* source port */
+	u_int16_t	uh_dport;		/* destination port */
+	u_int16_t	uh_ulen;		/* udp length */
+	u_int16_t	uh_sum;			/* udp checksum */
 };

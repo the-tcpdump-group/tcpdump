@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.12 2000-10-03 02:19:04 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.13 2000-10-03 02:54:58 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -157,7 +157,7 @@ esp_print(register const u_char *bp, register const u_char *bp2, int *nhdr)
 	}
 
 	ip = (struct ip *)bp2;
-	switch (ip->ip_v) {
+	switch (IP_V(ip)) {
 #ifdef INET6
 	case 6:
 		ip6 = (struct ip6_hdr *)bp2;

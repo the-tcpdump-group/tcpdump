@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.22 2000-09-29 04:58:45 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.23 2000-10-03 02:55:00 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -634,7 +634,7 @@ pimv2_print(register const u_char *bp, register u_int len)
 		if (bp >= ep)
 			break;
 		ip = (struct ip *)bp;
-		switch (ip->ip_v) {
+		switch (IP_V(ip)) {
 		 case 4:	/* IPv4 */
 			printf(" ");
 			ip_print(bp, len);
@@ -646,7 +646,7 @@ pimv2_print(register const u_char *bp, register u_int len)
 			break;
 #endif
 		 default:
-			(void)printf(" IP ver %d", ip->ip_v);
+			(void)printf(" IP ver %d", IP_V(ip));
 			break;
 		}
 		break;

@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/token.h,v 1.2 2000-09-18 04:40:46 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/token.h,v 1.3 2000-10-03 02:55:03 itojun Exp $ (LBL) */
 /*
  * Copyright (c) 1998, Larry Lile
  * All rights reserved.
@@ -43,10 +43,10 @@
 #define SEGMENT_COUNT(trp)	((RIF_LENGTH(trp) - 2) / 2)
 
 struct token_header {
-	u_char  token_ac;
-	u_char  token_fc;
-	u_char  token_dhost[TOKEN_RING_MAC_LEN];
-	u_char  token_shost[TOKEN_RING_MAC_LEN];
-	u_short token_rcf;
-	u_short token_rseg[ROUTING_SEGMENT_MAX];
+	u_int8_t  token_ac;
+	u_int8_t  token_fc;
+	u_int8_t  token_dhost[TOKEN_RING_MAC_LEN];
+	u_int8_t  token_shost[TOKEN_RING_MAC_LEN];
+	u_int16_t token_rcf;
+	u_int16_t token_rseg[ROUTING_SEGMENT_MAX];
 };

@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/llc.h,v 1.6 1999-10-07 23:47:10 mcr Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/llc.h,v 1.7 2000-10-03 02:54:57 itojun Exp $ (LBL)
  */
 
 /*
@@ -32,19 +32,19 @@
  */
 
 struct llc {
-	u_char dsap;
-	u_char ssap;
+	u_int8_t dsap;
+	u_int8_t ssap;
 	union {
-		u_char u_ctl;
-		u_short is_ctl;
+		u_int8_t u_ctl;
+		u_int16_t is_ctl;
 		struct {
-			u_char snap_ui;
-			u_char snap_pi[5];
+			u_int8_t snap_ui;
+			u_int8_t snap_pi[5];
 		} snap;
 		struct {
-			u_char snap_ui;
-			u_char snap_orgcode[3];
-			u_char snap_ethertype[2];
+			u_int8_t snap_ui;
+			u_int8_t snap_orgcode[3];
+			u_int8_t snap_ethertype[2];
 		} snap_ether;
 	} ctl;
 };

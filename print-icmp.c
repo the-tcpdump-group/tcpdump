@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.53 2000-09-29 04:58:39 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.54 2000-10-03 02:54:58 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -114,7 +114,7 @@ struct icmp {
 #define	ICMP_TSLEN	(8 + 3 * sizeof (u_int))	/* timestamp */
 #define	ICMP_MASKLEN	12				/* address mask */
 #define	ICMP_ADVLENMIN	(8 + sizeof (struct ip) + 8)	/* min */
-#define	ICMP_ADVLEN(p)	(8 + ((p)->icmp_ip.ip_hl << 2) + 8)
+#define	ICMP_ADVLEN(p)	(8 + (IP_HL(&(p)->icmp_ip) << 2) + 8)
 	/* N.B.: must separately check that ip_hl >= 5 */
 
 /*
@@ -306,7 +306,7 @@ icmp_print(register const u_char *bp, u_int plen, register const u_char *bp2)
 		case ICMP_UNREACH_PORT:
 			TCHECK(dp->icmp_ip.ip_p);
 			oip = &dp->icmp_ip;
-			hlen = oip->ip_hl * 4;
+			hlen = IP_HL(oip) * 4;
 			ouh = (struct udphdr *)(((u_char *)oip) + hlen);
 			dport = ntohs(ouh->uh_dport);
 			switch (oip->ip_p) {

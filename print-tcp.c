@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.77 2000-10-03 02:26:53 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.78 2000-10-03 02:55:01 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -247,7 +247,7 @@ tcp_print(register const u_char *bp, register u_int length,
 	tp = (struct tcphdr *)bp;
 	ip = (struct ip *)bp2;
 #ifdef INET6
-	if (ip->ip_v == 6)
+	if (IP_V(ip) == 6)
 		ip6 = (struct ip6_hdr *)bp2;
 	else
 		ip6 = NULL;
@@ -445,7 +445,7 @@ tcp_print(register const u_char *bp, register u_int length,
 		return;
 	}
 
-	if (ip->ip_v == 4 && vflag) {
+	if (IP_V(ip) == 4 && vflag) {
 		int sum;
 		if (TTEST2(tp->th_sport, length)) {
 			sum = tcp_cksum(ip, tp, length);
@@ -456,7 +456,7 @@ tcp_print(register const u_char *bp, register u_int length,
 		}
 	}
 #ifdef INET6
-	if (ip->ip_v == 6 && ip6->ip6_plen && vflag) {
+	if (IP_V(ip) == 6 && ip6->ip6_plen && vflag) {
 		int sum;
 		if (TTEST2(tp->th_sport, length)) {
 			sum = tcp6_cksum(ip6, tp, length);

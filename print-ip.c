@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.88 2000-09-29 04:58:40 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.89 2000-10-03 02:54:58 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -443,7 +443,7 @@ ip_print(register const u_char *bp, register u_int length)
 		(void)printf("truncated-ip %d", length);
 		return;
 	}
-	hlen = ip->ip_hl * 4;
+	hlen = IP_HL(ip) * 4;
 	if (hlen < sizeof (struct ip)) {
 		(void)printf("bad-hlen %d", hlen);
 		return;
@@ -736,7 +736,7 @@ ipN_print(register const u_char *bp, register u_int length)
 		return;
 	}
 	memcpy (&hdr, (char *)ip, 4);
-	switch (hdr.ip_v) {
+	switch (IP_V(&hdr)) {
 	case 4:
 	    ip_print (bp, length);
 	    return;
@@ -746,7 +746,7 @@ ipN_print(register const u_char *bp, register u_int length)
 	    return;
 #endif
 	default:
-	    (void)printf("unknown ip %d", hdr.ip_v);
+	    (void)printf("unknown ip %d", IP_V(&hdr));
 	    return;
 	}
 }

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.85 2000-09-29 04:58:44 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.86 2000-10-03 02:54:59 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -226,7 +226,7 @@ print_nfsaddr(const u_char *bp, const char *s, const char *d)
 #endif
 
 	srcaddr[0] = dstaddr[0] = '\0';
-	switch (((struct ip *)bp)->ip_v) {
+	switch (IP_V((struct ip *)bp)) {
 	case 4:
 		ip = (struct ip *)bp;
 		strlcpy(srcaddr, ipaddr_string(&ip->ip_src), sizeof(srcaddr));
@@ -827,7 +827,7 @@ xid_map_enter(const struct rpc_msg *rp, const u_char *bp)
 #endif
 	struct xid_map_entry *xmep;
 
-	switch (((struct ip *)bp)->ip_v) {
+	switch (IP_V((struct ip *)bp)) {
 	case 4:
 		ip = (struct ip *)bp;
 		break;
@@ -884,7 +884,7 @@ xid_map_find(const struct rpc_msg *rp, const u_char *bp, u_int32_t *proc,
 	do {
 		xmep = &xid_map[i];
 		cmp = 1;
-		if (xmep->ipver != ip->ip_v || xmep->xid != xid)
+		if (xmep->ipver != IP_V(ip) || xmep->xid != xid)
 			goto nextitem;
 		switch (xmep->ipver) {
 		case 4:

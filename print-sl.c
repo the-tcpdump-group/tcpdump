@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sl.c,v 1.53 2000-10-03 02:26:53 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sl.c,v 1.54 2000-10-03 02:55:01 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -101,7 +101,7 @@ sl_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	if (eflag)
 		sliplink_print(p, ip, length);
 
-	switch (ip->ip_v) {
+	switch (IP_V(ip)) {
 	case 4:
 		ip_print((u_char *)ip, length);
 		break;
@@ -111,7 +111,7 @@ sl_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 		break;
 #endif
 	default:
-		printf ("ip v%d", ip->ip_v);
+		printf ("ip v%d", IP_V(ip));
 	}
 
 	if (xflag)
@@ -192,7 +192,7 @@ sliplink_print(register const u_char *p, register const struct ip *ip,
 		 * has restored the IP header copy to IPPROTO_TCP.
 		 */
 		lastconn = ((struct ip *)&p[SLX_CHDR])->ip_p;
-		hlen = ip->ip_hl;
+		hlen = IP_HL(ip);
 		hlen += TH_OFF((struct tcphdr *)&((int *)ip)[hlen]);
 		lastlen[dir][lastconn] = length - (hlen << 2);
 		printf("utcp %d: ", lastconn);
@@ -282,7 +282,7 @@ compressed_sl_print(const u_char *chdr, const struct ip *ip,
 	 * 'cp - chdr' is the length of the compressed header.
 	 * 'length - hlen' is the amount of data in the packet.
 	 */
-	hlen = ip->ip_hl;
+	hlen = IP_HL(ip);
 	hlen += TH_OFF((struct tcphdr *)&((int32_t *)ip)[hlen]);
 	lastlen[dir][lastconn] = length - (hlen << 2);
 	printf(" %d (%d)", lastlen[dir][lastconn], cp - chdr);
