@@ -27,12 +27,17 @@
  * SUCH DAMAGE.
  */
 /*
- * draft-ietf-dhc-dhcpv6-28.txt
+ * RFC3315: DHCPv6
+ * supported DHCPv6 options: 
+ *  RFC3319,
+ *  draft-ietf-dhc-dhcpv6-opt-dnsconfig-04.txt,
+ *  draft-ietf-dhc-dhcpv6-opt-prefix-delegation-05.txt
+ *  draft-ietf-dhc-dhcpv6-opt-timeconfig-02.txt,
  */
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.26 2003-08-13 02:26:53 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.27 2003-10-29 03:54:14 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -67,6 +72,8 @@ static const char rcsid[] =
 #define DH6_REBIND	6
 #define DH6_REPLY	7
 #define DH6_RELEASE	8
+#define DH6_DECLINE	9
+#define DH6_RECONFIGURE	10
 #define DH6_INFORM_REQ	11
 #define DH6_RELAY_FORW	12
 #define DH6_RELAY_REPLY	13
@@ -121,6 +128,11 @@ struct dhcp6_relay {
 #define DH6OPT_VENDOR_OPTS 17
 #define DH6OPT_INTERFACE_ID 18
 #define DH6OPT_RECONF_MSG 19
+#define DH6OPT_RECONF_ACCEPT 20
+#define DH6OPT_SIP_SERVER_D 21
+#define DH6OPT_SIP_SERVER_A 22
+#define DH6OPT_DNS 23
+#define DH6OPT_DNSNAME 24
 
 /*
  * The option type has not been assigned for the following options.
@@ -129,17 +141,17 @@ struct dhcp6_relay {
  * Note that we'll change the following definitions if different type values
  * are officially assigned.
  */
-#define DH6OPT_DNS 25
 #define DH6OPT_PREFIX_DELEGATION 30
 #define DH6OPT_PREFIX_INFORMATION 31
 #define DH6OPT_PREFIX_REQUEST 32
 
 /*
  * The followings are also unassigned numbers.
- * We temporarily use values as of KAME snap 20030106.
+ * We temporarily use values as of KAME snap 20031013.
  */
 #define DH6OPT_IA_PD 33
 #define DH6OPT_IA_PD_PREFIX 34
+#define DH6OPT_NTP_SERVERS 35
 
 struct dhcp6opt {
 	u_int16_t dh6opt_type;
@@ -193,6 +205,14 @@ dhcp6opt_name(int type)
 		return "rapid commit";
 	case DH6OPT_INTERFACE_ID:
 		return "interface ID";
+	case DH6OPT_RECONF_MSG:
+		return "reconfigure message";
+	case DH6OPT_RECONF_ACCEPT:
+		return "reconfigure accept";
+	case DH6OPT_SIP_SERVER_D:
+		return "SIP Servers Domain";
+	case DH6OPT_SIP_SERVER_A:
+		return "SIP Servers Address";
 	case DH6OPT_DNS:
 		return "DNS";
 	case DH6OPT_PREFIX_DELEGATION:
@@ -203,6 +223,8 @@ dhcp6opt_name(int type)
 		return "IA_PD";
 	case DH6OPT_IA_PD_PREFIX:
 		return "IA_PD prefix";
+	case DH6OPT_NTP_SERVERS:
+		return "NTP Server";
 	default:
 		snprintf(genstr, sizeof(genstr), "opt_%d", type);
 		return(genstr);
@@ -363,7 +385,26 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 			for (i = 0; i < optlen && i < 10; i++)
 				printf("%02x", ((u_char *)(dh6o + 1))[i]);
 			break;
+		case DH6OPT_RECONF_MSG:
+			tp = (u_char *)(dh6o + 1);
+			switch (*tp) {
+			case DH6_RENEW:
+				printf(" for renew)");
+				break;
+			case DH6_INFORM_REQ:
+				printf(" for inf-req)");
+				break;
+			default:
+				printf(" for ???(%02x))", *tp);
+				break;
+			}
+			break;
+		case DH6OPT_RECONF_ACCEPT: /* nothing todo */
+			printf(")");
+			break;
+		case DH6OPT_SIP_SERVER_A:
 		case DH6OPT_DNS:
+		case DH6OPT_NTP_SERVERS:
 			if (optlen % 16) {
 				printf(" ?)");
 				break;
@@ -505,6 +546,12 @@ dhcp6_print(const u_char *cp, u_int length,
 		break;
 	case DH6_RELEASE:
 		name = "release";
+		break;
+	case DH6_DECLINE:
+		name = "decline";
+		break;
+	case DH6_RECONFIGURE:
+		name = "reconfigure";
 		break;
 	case DH6_INFORM_REQ:
 		name= "inf-req";
