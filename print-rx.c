@@ -34,7 +34,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.28 2002-04-20 09:42:57 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.29 2002-04-30 06:45:08 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -757,15 +757,15 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
  * This is the sickest one of all
  */
 
-#define VECOUT(MAX) { char *sp; \
-			char s[AFSNAMEMAX]; \
+#define VECOUT(MAX) { u_char *sp; \
+			u_char s[AFSNAMEMAX]; \
 			int k; \
 			if ((MAX) + 1 > sizeof(s)) \
 				goto trunc; \
 			TCHECK2(bp[0], (MAX) * sizeof(int32_t)); \
 			sp = s; \
 			for (k = 0; k < (MAX); k++) { \
-				*sp++ = (char) EXTRACT_32BITS(bp); \
+				*sp++ = (u_char) EXTRACT_32BITS(bp); \
 				bp += sizeof(int32_t); \
 			} \
 			s[(MAX)] = '\0'; \
@@ -1130,7 +1130,7 @@ acl_print(u_char *s, int maxsize, u_char *end)
 			goto finish;
 		s += n;
 		printf(" +{");
-		fn_print(user, NULL);
+		fn_print((u_char *)user, NULL);
 		printf(" ");
 		ACLOUT(acl);
 		printf("}");
@@ -1143,7 +1143,7 @@ acl_print(u_char *s, int maxsize, u_char *end)
 			goto finish;
 		s += n;
 		printf(" -{");
-		fn_print(user, NULL);
+		fn_print((u_char *)user, NULL);
 		printf(" ");
 		ACLOUT(acl);
 		printf("}");
