@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.34 2001-12-13 09:31:21 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.35 2001-12-18 09:00:14 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -152,9 +152,9 @@ static const char rcsid[] =
 
 static struct tok isis_lsp_istype_values[] = {
 	{ ISIS_LSP_TYPE_UNUSED0,	"Unused 0x0 (invalid)"},
-	{ ISIS_LSP_TYPE_LEVEL_1,	"Level 1 IS"},
+	{ ISIS_LSP_TYPE_LEVEL_1,	"L1 IS"},
 	{ ISIS_LSP_TYPE_UNUSED2,	"Unused 0x2 (invalid)"},
-	{ ISIS_LSP_TYPE_LEVEL_2,	"Level 2 IS"},
+	{ ISIS_LSP_TYPE_LEVEL_2,	"L1L2 IS"},
 	{ 0, NULL }
 };
 
@@ -752,8 +752,10 @@ static int isis_print (const u_char *p, u_int length)
 	}
 
 	pdu_len=EXTRACT_16BITS(header_iih_lan->pdu_len);
-	if (packet_len>pdu_len)
+	if (packet_len>pdu_len) {
 	  packet_len=pdu_len; /* do TLV decoding as long as it makes sense */
+	  length=pdu_len;
+	}
 
 	printf(", L%s Lan IIH (%u)",
 	       ISIS_MASK_LEVEL_BITS(pdu_type) ? "1" : "2",
@@ -797,8 +799,10 @@ static int isis_print (const u_char *p, u_int length)
 	}
 	
 	pdu_len=EXTRACT_16BITS(header_iih_ptp->pdu_len);
-	if (packet_len>pdu_len)
+	if (packet_len>pdu_len) {
 	  packet_len=pdu_len; /* do TLV decoding as long as it makes sense */
+	  length=pdu_len;
+	}
 	
 	printf(", PTP IIH (%u)",pdu_len);
 	TCHECK(*header_iih_ptp);
@@ -838,9 +842,11 @@ static int isis_print (const u_char *p, u_int length)
 	}
 	
 	pdu_len=EXTRACT_16BITS(header_lsp->pdu_len);
-	if (packet_len>pdu_len)
+	if (packet_len>pdu_len) {
 	  packet_len=pdu_len; /* do TLV decoding as long as it makes sense */
-	
+	  length=pdu_len;
+	}
+
 	if (pdu_type == L1_LSP)	
 	    printf(", L1 LSP (%u)",pdu_len);
 	else if (pdu_type == L2_LSP)	
@@ -878,9 +884,11 @@ static int isis_print (const u_char *p, u_int length)
 	}
 	
 	pdu_len=EXTRACT_16BITS(header_csnp->pdu_len);
-	if (packet_len>pdu_len)
+	if (packet_len>pdu_len) {
 	  packet_len=pdu_len; /* do TLV decoding as long as it makes sense */
-	
+	  length=pdu_len;
+	}
+
 	printf(", L%s CSNP (%u)", ISIS_MASK_LEVEL_BITS(pdu_type) ? "2" : "1", pdu_len);
 	TCHECK(*header_csnp);
 	printf("\n\t\t  source-id:    ");
@@ -903,9 +911,11 @@ static int isis_print (const u_char *p, u_int length)
 	}
 
 	pdu_len=EXTRACT_16BITS(header_psnp->pdu_len);
-	if (packet_len>pdu_len)
+	if (packet_len>pdu_len) {
 	  packet_len=pdu_len; /* do TLV decoding as long as it makes sense */
-	  	
+	  length=pdu_len;
+	}
+
 	printf(", L%s PSNP (%u)", ISIS_MASK_LEVEL_BITS(pdu_type) ? "2" : "1", pdu_len);
 	TCHECK(*header_psnp);
 	printf("\n\t\t  source-id:    ");
