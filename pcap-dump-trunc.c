@@ -24,19 +24,13 @@
  *
  */
 
-#include <sys/param.h>
-#include <sys/time.h>
-
-#include <netinet/in.h>
-
 #include <stdio.h>
 #include <pcap.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "interface.h"
-#include "addrtoname.h"
-#include "ethertype.h"
 
 static void reverse(char *s);
 static void swebitoa(unsigned int n, char s[]);
