@@ -1,3 +1,6 @@
+Wed Aug  2 05:28:45 JST 2000  itojun@iijlab.net
+	* tcp/udp pseudo header checksum code, from netbsd-current.
+
 Tue Jul 11 01:22:38 GMT 2000 Love <lha@stacken.kth.se>
 	* check the ip protocol version on printing raw packets
 
@@ -599,4 +602,4 @@ v2.0 Sun Jan 13 12:20:40 PST 1991
 
 - Initial public release.
 
-@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.71 2000-07-14 02:31:24 guy Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.72 2000-08-01 20:29:26 itojun Exp $ (LBL)
