@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.29 
+# From configure.in Revision: 1.30 
 
 
 
@@ -4485,6 +4485,7 @@ test -z "$INSTALL_DATA" && INSTALL_DATA='${INSTALL} -m 644'
 
 
 
+
 trap '' 1 2 15
 cat > confcache <<\EOF
 # This file is a shell script that caches the results of configure
@@ -4855,8 +4856,14 @@ fi; done
 EOF
 cat >> $CONFIG_STATUS <<EOF
 
+
 EOF
 cat >> $CONFIG_STATUS <<\EOF
+if test -f .devel; then
+	echo timestamp > stamp-h
+	cat Makefile-devel-adds >> Makefile
+	make depend
+fi
 
 exit 0
 EOF
@@ -4864,8 +4871,4 @@ chmod +x $CONFIG_STATUS
 rm -fr confdefs* $ac_clean_files
 test "$no_create" = yes || ${CONFIG_SHELL-/bin/sh} $CONFIG_STATUS || exit 1
 
-if test -f .devel ; then
-	mv -f Makefile Makefile.normal
-	cat Makefile.normal Makefile-devel-adds > Makefile
-	make depend
-fi
+exit 0
