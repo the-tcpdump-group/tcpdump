@@ -32,6 +32,15 @@
 
 /* Cisco NetFlow protocol */
 
+#ifndef lint
+static const char rcsid[] =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cnfp.c,v 1.2 2000-04-27 10:41:40 itojun Exp $";
+#endif
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/socket.h>
