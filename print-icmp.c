@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.59 2001-06-15 22:17:32 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.60 2001-06-28 19:53:42 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -268,15 +268,15 @@ struct id_rdiscovery {
 };
 
 void
-icmp_print(register const u_char *bp, u_int plen, register const u_char *bp2)
+icmp_print(const u_char *bp, u_int plen, const u_char *bp2)
 {
-	register char *cp;
-	register const struct icmp *dp;
-	register const struct ip *ip;
-	register const char *str, *fmt;
-	register const struct ip *oip;
-	register const struct udphdr *ouh;
-	register u_int hlen, dport, mtu;
+	char *cp;
+	const struct icmp *dp;
+	const struct ip *ip;
+	const char *str, *fmt;
+	const struct ip *oip;
+	const struct udphdr *ouh;
+	u_int hlen, dport, mtu;
 	char buf[MAXHOSTNAMELEN + 100];
 
 	dp = (struct icmp *)bp;
@@ -347,20 +347,19 @@ icmp_print(register const u_char *bp, u_int plen, register const u_char *bp2)
 			break;
 
 		default:
-			fmt = tok2str(unreach2str, "#%d %%s unreachable",
+			fmt = tok2str(unreach2str, "#%d",
 			    dp->icmp_code);
-			(void)snprintf(buf, sizeof(buf), fmt,
-			    ipaddr_string(&dp->icmp_ip.ip_dst));
+			(void)snprintf(buf, sizeof(buf), "%s %s unreachable",
+			    fmt, ipaddr_string(&dp->icmp_ip.ip_dst));
 			break;
 		}
 		break;
 
 	case ICMP_REDIRECT:
 		TCHECK(dp->icmp_ip.ip_dst);
-		fmt = tok2str(type2str, "redirect-#%d %%s to net %%s",
-		    dp->icmp_code);
-		(void)snprintf(buf, sizeof(buf), fmt,
-		    ipaddr_string(&dp->icmp_ip.ip_dst),
+		fmt = tok2str(type2str, "#%d", dp->icmp_code);
+		(void)snprintf(buf, sizeof(buf), "redirect-%s %s to net %s",
+		    fmt, ipaddr_string(&dp->icmp_ip.ip_dst),
 		    ipaddr_string(&dp->icmp_gwaddr));
 		break;
 
@@ -375,7 +374,7 @@ icmp_print(register const u_char *bp, u_int plen, register const u_char *bp2)
 
 		ihp = (struct ih_rdiscovery *)&dp->icmp_void;
 		TCHECK(*ihp);
-		(void)strncpy(cp, " lifetime ", sizeof(buf) - (cp - buf));
+		(void)snprintf(cp, sizeof(buf) - (cp - buf), " lifetime ");
 		cp = buf + strlen(buf);
 		lifetime = EXTRACT_16BITS(&ihp->ird_lifetime);
 		if (lifetime < 60) {
