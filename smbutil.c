@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.30 2004-12-28 03:34:08 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.31 2004-12-28 20:38:27 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -459,6 +459,22 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf)
 	    TCHECK2(buf[0], 8);
 	    x = reverse ? EXTRACT_64BITS(buf) :
 			  EXTRACT_LE_64BITS(buf);
+	    printf("%" PRIu64 " (0x%" PRIx64 ")", x, x);
+	    buf += 8;
+	    fmt++;
+	    break;
+	  }
+	case 'M':
+	  {
+	    /* Weird mixed-endian length values in 64-bit locks */
+	    u_int32_t x1, x2;
+	    u_int64_t x;
+	    TCHECK2(buf[0], 8);
+	    x1 = reverse ? EXTRACT_32BITS(buf) :
+			   EXTRACT_LE_32BITS(buf);
+	    x2 = reverse ? EXTRACT_32BITS(buf + 4) :
+			   EXTRACT_LE_32BITS(buf + 4);
+	    x = (((u_int64_t)x1) << 32) | x2;
 	    printf("%" PRIu64 " (0x%" PRIx64 ")", x, x);
 	    buf += 8;
 	    fmt++;

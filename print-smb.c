@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.35 2004-12-28 11:18:29 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.36 2004-12-28 20:38:27 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -469,6 +469,45 @@ trunc:
     return;
 }
 
+static void
+print_lockingandx(const u_char *words, const u_char *data, const u_char *buf _U_, const u_char *maxbuf)
+{
+    u_int wct, bcc;
+    const u_char *maxwords;
+    const char *f1 = NULL, *f2 = NULL;
+
+    TCHECK(words[0]);
+    wct = words[0];
+    if (request) {
+	f1 = "Com2=[w]\nOff2=[d]\nHandle=[d]\nLockType=[w]\nTimeOut=[D]\nUnlockCount=[d]\nLockCount=[d]\n";
+	TCHECK(words[7]);
+	if (words[7] & 0x10)
+	    f2 = "*Process=[d]\n[P2]Offset=[M]\nLength=[M]\n";
+	else
+	    f2 = "*Process=[d]\nOffset=[D]\nLength=[D]\n";
+    } else {
+	f1 = "Com2=[w]\nOff2=[d]\n";
+    }
+
+    maxwords = SMBMIN(words + 1 + wct * 2, maxbuf);
+    if (wct)
+	smb_fdata(words + 1, f1, maxwords);
+
+    TCHECK2(*data, 2);
+    bcc = EXTRACT_LE_16BITS(data);
+    printf("smb_bcc=%u\n", bcc);
+    if (bcc > 0) {
+	if (f2)
+	    smb_fdata(data + 2, f2, SMBMIN(data + 2 + EXTRACT_LE_16BITS(data), maxbuf));
+	else
+	    print_data(data + 2, SMBMIN(EXTRACT_LE_16BITS(data), PTR_DIFF(maxbuf, data + 2)));
+    }
+    return;
+trunc:
+    printf("[|SMB]");
+    return;
+}
+
 
 static struct smbfns smb_fns[] = {
     { -1, "SMBunknown", 0, DEFDESCRIPT },
@@ -657,11 +696,6 @@ static struct smbfns smb_fns[] = {
 	  "Com2=[w]\nOff2=[d]\nCount=[d]\nRemaining=[d]\nRes=[W]\n",
 	  NULL, NULL } },
 
-    { SMBlockingX, "SMBlockingX", FLG_CHAIN,
-	{ "Com2=[w]\nOff2=[d]\nHandle=[d]\nLockType=[w]\nTimeOut=[D]\nUnlockCount=[d]\nLockCount=[d]\n",
-	  "*Process=[d]\nOffset=[D]\nLength=[D]\n",
-	  "Com2=[w]\nOff2=[d]\n", NULL, NULL } },
-
     { SMBffirst, "SMBffirst", 0,
 	{ "Count=[d]\nAttrib=[A]\n",
 	  "Path=[Z]\nBlkType=[B]\nBlkLen=[d]\n|Res1=[B]\nMask=[s11]\nSrv1=[B]\nDirIndex=[d]\nSrv2=[w]\n",
@@ -717,6 +751,9 @@ static struct smbfns smb_fns[] = {
     { SMBtconX, "SMBtconX", FLG_CHAIN,
 	{ "Com2=[w]\nOff2=[d]\nFlags=[w]\nPassLen=[d]\nPasswd&Path&Device=\n",
 	  NULL, "Com2=[w]\nOff2=[d]\n", "ServiceType=[S]\n", NULL } },
+
+    { SMBlockingX, "SMBlockingX", FLG_CHAIN,
+	{ NULL, NULL, NULL, NULL, print_lockingandx } },
 
     { SMBtrans2, "SMBtrans2", 0, { NULL, NULL, NULL, NULL, print_trans2 } },
 
