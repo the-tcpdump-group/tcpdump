@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.85 2004-06-12 08:17:50 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.86 2004-06-12 08:52:21 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -444,7 +444,7 @@ static struct tok bgp_extd_comm_ospf_rtype_values[] = {
   { 0, NULL },
 };
 
-static struct tok bgp_l2vpn_encaps_values[] = {
+struct tok bgp_l2vpn_encaps_values[] = {
     { 0,                      "Reserved"},
     { 1,                      "Frame Relay"},
     { 2,                      "ATM AAL5 VCC transport"},

@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/bgp.h,v 1.1 2004-06-12 08:17:51 hannes Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/bgp.h,v 1.2 2004-06-12 08:52:22 hannes Exp $ (LBL) */
 /* 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that: (1) source code
@@ -15,3 +15,4 @@
  */
 
 extern char *bgp_vpn_rd_print (const u_char *);
+extern struct tok bgp_l2vpn_encaps_values[];
