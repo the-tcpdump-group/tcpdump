@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.55 2000-10-10 05:05:07 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.56 2000-12-20 05:09:56 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -384,9 +384,9 @@ ns_rprint(register const u_char *cp, register const u_char *bp)
 
 		pbyte = (*cp + 7) / 8;
 		memset(&a, 0, sizeof(a));
-		memcpy(&a, cp + 1, pbyte);
+		memcpy(&a, cp + 1 + pbyte, sizeof(a) - pbyte);
 		printf(" %u %s ", *cp, ip6addr_string(&a));
-		(void)ns_nprint(cp + 1 + pbyte, bp);
+		(void)ns_nprint(cp + 1 + sizeof(a) - pbyte, bp);
 		break;
 	    }
 #endif /*INET6*/
