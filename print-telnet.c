@@ -51,7 +51,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.15 2001-06-25 23:03:57 itojun Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.16 2001-06-26 03:01:10 itojun Exp $";
 #endif
 
 #include <sys/param.h>
@@ -76,6 +76,44 @@ static const char rcsid[] =
 #ifndef TELCMD_FIRST
 # define TELCMD_FIRST SE
 #endif
+
+/* normal */
+static const char *cmds[] = {
+	"IS", "SEND", "INFO",
+};
+
+/* 37: Authentication */
+static const char *authcmd[] = {
+	"IS", "SEND", "REPLY", "NAME",
+};
+static const char *authtype[] = {
+	"NULL", "KERBEROS_V4", "KERBEROS_V5", "SPX", "MINK",
+	"SRP", "RSA", "SSL", NULL, NULL,
+	"LOKI", "SSA", "KEA_SJ", "KEA_SJ_INTEG", "DSS",
+	"NTLM",
+};
+
+/* 38: Encryption */
+static const char *enccmd[] = {
+	"IS", "SUPPORT", "REPLY", "START", "END",
+	"REQUEST-START", "REQUEST-END", "END_KEYID", "DEC_KEYID",
+};
+static const char *enctype[] = {
+	"NULL", "DES_CFB64", "DES_OFB64", "DES3_CFB64", "DES3_OFB64",
+	NULL, "CAST5_40_CFB64", "CAST5_40_OFB64", "CAST128_CFB64", "CAST128_OFB64",
+};
+
+#define STR_OR_ID(x, tab) \
+	(((x) < sizeof(tab)/sizeof(tab[0]) && tab[(x)]) ? tab[(x)] : numstr(x))
+
+static char *
+numstr(int x)
+{
+	static char buf[20];
+
+	snprintf(buf, sizeof(buf), "%#x", x);
+	return buf;
+}
 
 /* sp points to IAB byte */
 static int
@@ -139,25 +177,43 @@ telnet_parse(const u_char *sp, u_int length, int print)
 		if (*p != IAC)
 			goto trunc;
 
-		PEEK(c, sp, length);
-		if (c) {
-			while (p > sp) {
-				FETCH(x, sp, length);
-				if (print)
-					(void)printf(" %#x", x);
-			}
-		} else {
+		switch (x) {
+		case TELOPT_AUTHENTICATION:
+			if (p <= sp)
+				break;
 			FETCH(c, sp, length);
 			if (print)
-				(void)printf(" IS '");
-			while (p > sp) {
-				FETCH(x, sp, length);
-				if (print)
-					safeputchar(x);
-			}
-			/* terminating IAC SE */
+				(void)printf(" %s", STR_OR_ID(c, authcmd));
+			if (p <= sp)
+				break;
+			FETCH(c, sp, length);
 			if (print)
-				(void)printf("'");
+				(void)printf(" %s", STR_OR_ID(c, authtype));
+			break;
+		case TELOPT_ENCRYPT:
+			if (p <= sp)
+				break;
+			FETCH(c, sp, length);
+			if (print)
+				(void)printf(" %s", STR_OR_ID(c, enccmd));
+			if (p <= sp)
+				break;
+			FETCH(c, sp, length);
+			if (print)
+				(void)printf(" %s", STR_OR_ID(c, enctype));
+			break;
+		default:
+			if (p <= sp)
+				break;
+			FETCH(c, sp, length);
+			if (print)
+				(void)printf(" %s", STR_OR_ID(c, cmds));
+			break;
+		}
+		while (p > sp) {
+			FETCH(x, sp, length);
+			if (print)
+				(void)printf(" %#x", x);
 		}
 		/* terminating IAC SE */
 		if (print)
