@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ipx.c,v 1.38 2004-04-30 23:50:59 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ipx.c,v 1.39 2004-05-01 10:06:55 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -54,6 +54,9 @@ void ipx_rip_print(const u_short *, u_int);
 void
 ipx_print(const u_char *p, u_int length)
 {
+        if (!eflag)
+            printf("IPX ");
+
 	const struct ipxHdr *ipx = (const struct ipxHdr *)p;
 
 	TCHECK(ipx->srcSkt);
