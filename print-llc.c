@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.27 1999-12-22 06:27:21 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.28 2000-05-15 00:40:04 assar Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -83,6 +83,15 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 		ipx_print(p, length);
 		return (1);
 	}
+
+	/* Cisco Discovery Protocol  - SNAP & ether type 0x2000 */
+	if(llc.ssap == LLCSAP_SNAP && llc.dsap == LLCSAP_SNAP &&
+		llc.llcui == LLC_UI && 
+		llc.ethertype[0] == 0x20 && llc.ethertype[1] == 0x00 ) {
+		    cdp_print( p, length, caplen, esrc, edst);
+		    return (1);
+	}
+
 	if (llc.ssap == 0xf0 && llc.dsap == 0xf0) {
 		/*
 		 * we don't actually have a full netbeui parser yet, but the
