@@ -24,7 +24,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.148 2000-06-18 11:12:06 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.149 2000-07-11 00:49:17 assar Exp $ (LBL)";
 #endif
 
 /*
@@ -90,7 +90,7 @@ int32_t thiszone;		/* seconds offset from gmt to local time */
 
 /* Forwards */
 static RETSIGTYPE cleanup(int);
-extern __dead void usage(void) __attribute__((volatile));
+static void usage(void) __attribute__((noreturn));
 
 /* Length of saved portion of packet. */
 int snaplen = DEFAULT_SNAPLEN;
@@ -483,7 +483,7 @@ default_print(register const u_char *bp, register u_int length)
 	default_print_unaligned(bp, length);
 }
 
-__dead void
+static void
 usage(void)
 {
 	extern char version[];

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.68 2000-07-01 03:39:12 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.69 2000-07-11 00:49:03 assar Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -219,7 +219,7 @@ tok2str(register const struct tok *lp, register const char *fmt,
 
 
 /* VARARGS */
-__dead void
+void
 error(const char *fmt, ...)
 {
 	va_list ap;

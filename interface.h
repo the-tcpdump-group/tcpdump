@@ -18,13 +18,12 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.131 2000-07-01 03:39:00 assar Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.132 2000-07-11 00:49:02 assar Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
 #define tcpdump_interface_h
 
-#include "gnuc.h"
 #ifdef HAVE_OS_PROTO_H
 #include "os-proto.h"
 #endif
@@ -198,8 +197,8 @@ extern char *dnaddr_string(u_short);
 
 extern void wrapup(int);
 
-extern __dead void error(const char *, ...)
-    __attribute__((volatile, format (printf, 1, 2)));
+extern void error(const char *, ...)
+    __attribute__((noreturn, format (printf, 1, 2)));
 extern void warning(const char *, ...) __attribute__ ((format (printf, 1, 2)));
 
 extern char *read_infile(char *);
