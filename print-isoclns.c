@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.44 2002-04-12 07:56:49 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.45 2002-04-25 04:47:42 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -742,7 +742,7 @@ isis_print_lspid(const u_char *cp)
  */
 
 static int
-isis_print_unknown_data(const u_char *cp,const u_char *lf,int len)
+isis_print_unknown_data(const u_char *cp,const char *lf,int len)
 {
         int i;
 	
@@ -852,7 +852,7 @@ isis_print_tlv_ip_reach (const u_char *cp, int length)
  */
 
 static int
-isis_print_ip_reach_subtlv (const u_char *tptr,int subt,int subl,const u_char *lf) {
+isis_print_ip_reach_subtlv (const u_char *tptr,int subt,int subl,const char *lf) {
 
         switch(subt) {
         case SUBTLV_EXT_IP_REACH_ADMIN_TAG:
@@ -885,7 +885,7 @@ trunctlv:
  */
 
 static int
-isis_print_is_reach_subtlv (const u_char *tptr,int subt,int subl,const u_char *lf) {
+isis_print_is_reach_subtlv (const u_char *tptr,int subt,int subl,const char *lf) {
 
         int i,j;
         float bw; /* copy buffer for several subTLVs */
