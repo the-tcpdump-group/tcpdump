@@ -28,7 +28,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-mpls.c,v 1.5 2002-08-08 19:52:48 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-mpls.c,v 1.6 2003-02-04 06:26:59 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -86,8 +86,7 @@ mpls_print(const u_char *bp, u_int length)
 		if (vflag &&
 		    MPLS_LABEL(v) < sizeof(mpls_labelname) / sizeof(mpls_labelname[0]))
 			printf(" (%s)", mpls_labelname[MPLS_LABEL(v)]);
-		if (MPLS_EXP(v))
-			printf(", exp %u", MPLS_EXP(v));
+		printf(", exp %u", MPLS_EXP(v));
 		if (MPLS_STACK(v))
 			printf(", [S]");
 		printf(", ttl %u", MPLS_TTL(v));
@@ -115,7 +114,7 @@ mpls_print(const u_char *bp, u_int length)
                  * bit is set and tries to determine the network layer protocol
                  * 0x45-0x4f is IPv4
                  * 0x60-0x6f is IPv6
-                 * 0x83      is IS-IS
+                 * 0x81-0x83 is OSI (CLNP,ES-IS,IS-IS)
                  * this technique is sometimes known as NULL encapsulation
                  * and decoding is particularly useful for control-plane traffic [BGP]
                  * which cisco by default sends MPLS encapsulated
@@ -134,8 +133,11 @@ mpls_print(const u_char *bp, u_int length)
                     case 0x4d:
                     case 0x4e:
                     case 0x4f:
-                        printf("\n\t");
-                        ip_print(p, length - (p - bp));
+		        if (vflag>0) {
+                            printf("\n\t");
+                            ip_print(p, length - (p - bp));
+			    }
+                        else printf(", IP, length: %u",length);
                         break;
 #ifdef INET6
                     case 0x60:
@@ -154,13 +156,21 @@ mpls_print(const u_char *bp, u_int length)
                     case 0x6d:
                     case 0x6e:
                     case 0x6f:
-                        printf("\n\t");
-                        ip6_print(p, length - (p - bp));
+		        if (vflag>0) {
+                            printf("\n\t");
+                            ip6_print(p, length - (p - bp));
+                            }
+			else printf(", IPv6, length: %u",length);
                         break;
 #endif
+                    case 0x81:
+                    case 0x82:
                     case 0x83:
-                        printf("\n\t");
-                        isoclns_print(p, length - (p - bp), length - (p - bp), NULL, NULL);
+		        if (vflag>0) {
+                            printf("\n\t");
+                            isoclns_print(p, length - (p - bp), length - (p - bp), NULL, NULL);
+			    }
+			else printf(", OSI, length: %u",length);
                         break;
                     default:
                         /* ok bail out - we did not figure out what it is*/
