@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.51 2004-04-10 08:41:22 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.52 2004-07-16 14:05:59 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -330,7 +330,7 @@ static void esp_init(netdissect_options *ndo _U_)
 
 int
 esp_print(netdissect_options *ndo,
-	  const u_char *bp, const u_char *bp2
+	  const u_char *bp, const int length, const u_char *bp2
 #ifndef HAVE_LIBCRYPTO
 	_U_
 #endif
@@ -392,6 +392,7 @@ esp_print(netdissect_options *ndo,
 	}
 	(*ndo->ndo_printf)(ndo, "ESP(spi=0x%08x", EXTRACT_32BITS(&esp->esp_spi));
 	(*ndo->ndo_printf)(ndo, ",seq=0x%x)", EXTRACT_32BITS(&esp->esp_seq));
+        (*ndo->ndo_printf)(ndo, ", length %u", length);
 
 #ifndef HAVE_LIBCRYPTO
 	goto fail;

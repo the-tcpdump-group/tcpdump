@@ -21,7 +21,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.8 2004-04-30 16:42:14 mcr Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.9 2004-07-16 14:06:00 hannes Exp $ (LBL)
  */
 
 #ifndef netdissect_h
@@ -239,7 +239,7 @@ extern const char *dnnum_string(netdissect_options *, u_short);
 
 extern void eap_print(netdissect_options *,const u_char *, u_int);    
 extern int esp_print(netdissect_options *,
-		     register const u_char *bp, register const u_char *bp2,
+		     register const u_char *bp, int len, register const u_char *bp2,
 		     int *nhdr, int *padlen);
 extern void arp_print(netdissect_options *,const u_char *, u_int, u_int);
 

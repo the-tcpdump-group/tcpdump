@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.141 2004-06-25 01:20:09 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.142 2004-07-16 14:05:59 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -506,7 +506,7 @@ again:
 		case IPPROTO_ESP:
 		    {
 			int enh, padlen;
-			advance = esp_print(gndo, cp, (const u_char *)ip, &enh, &padlen);
+			advance = esp_print(gndo, cp, len, (const u_char *)ip, &enh, &padlen);
 			if (advance <= 0)
 				break;
 			cp += advance;
