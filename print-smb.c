@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.38 2004-12-29 00:06:28 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.39 2004-12-29 02:43:24 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -289,13 +289,13 @@ print_browse(const u_char *param, int paramlen, const u_char *data, int datalen)
 
     case 0x9:
 	data = smb_fdata(data,
-	    "BROWSE PACKET:\nType=[B] (GetBackupList)\nListCount?=[B]\nToken?=[B]\n",
+	    "BROWSE PACKET:\nType=[B] (GetBackupList)\nListCount?=[B]\nToken=[W]\n",
 	    maxbuf, unicodestr);
 	break;
 
     case 0xa:
 	data = smb_fdata(data,
-	    "BROWSE PACKET:\nType=[B] (BackupListResponse)\nServerCount?=[B]\nToken?=[B]*Name=[S]\n",
+	    "BROWSE PACKET:\nType=[B] (BackupListResponse)\nServerCount?=[B]\nToken=[W]\n*Name=[S]\n",
 	    maxbuf, unicodestr);
 	break;
 
