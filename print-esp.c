@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.40 2003-07-17 11:01:06 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.41 2003-07-17 13:31:02 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -37,13 +37,8 @@ static const char rcsid[] =
 #include <stdlib.h>
 
 #ifdef HAVE_LIBCRYPTO
-#include <openssl/des.h>
-#include <openssl/blowfish.h>
-#ifdef HAVE_OPENSSL_RC5_H
-#include <openssl/rc5.h>
-#endif
-#ifdef HAVE_OPENSSL_CAST_H
-#include <openssl/cast.h>
+#ifdef HAVE_OPENSSL_EVP_H
+#include <openssl/evp.h>
 #endif
 #endif
 
@@ -56,40 +51,12 @@ static const char rcsid[] =
 #endif
 
 #if defined(__MINGW32__) || defined(__WATCOMC__)
-extern char *strsep (char **stringp, const char *delim); /* Missing/strsep.c */
+extern char *strsep(char **stringp, const char *delim); /* Missing/strsep.c */
 #endif
 
 #include "interface.h"
 #include "addrtoname.h"
 #include "extract.h"
-
-enum cipher { NONE, DESCBC, BLOWFISH, RC5, CAST128, DES3CBC};
-
-struct esp_algorithm {
-	const char	*name;
-	enum cipher	algo;
-	int		ivlen;
-	int		authlen;
-	int		replaysize;	/* number of bytes, in excess of 4,
-					   may be negative */
-};
-
-struct esp_algorithm esp_xforms[]={
-	{"none",                  NONE,    0,  0, 0},
-	{"des-cbc",               DESCBC,  8,  0, 0},
-	{"des-cbc-hmac96",        DESCBC,  8, 12, 0},
-	{"blowfish-cbc",          BLOWFISH,8,  0, 0},
-	{"blowfish-cbc-hmac96",   BLOWFISH,8, 12, 0},
-	{"rc5-cbc",               RC5,     8,  0, 0},
-	{"rc5-cbc-hmac96",        RC5,     8, 12, 0},
-	{"cast128-cbc",           CAST128, 8,  0, 0},
-	{"cast128-cbc-hmac96",    CAST128, 8, 12, 0},
-	{"3des-cbc-hmac96",       DES3CBC, 8, 12, 0},
-	{NULL,                    NONE,    0,  0, 0}
-};
-
-struct esp_algorithm *null_xf =
-  &esp_xforms[sizeof(esp_xforms)/sizeof(esp_xforms[0]) - 1];
 
 #ifndef HAVE_SOCKADDR_STORAGE
 #ifdef INET6
@@ -108,7 +75,9 @@ struct sa_list {
 	struct sa_list	*next;
 	struct sockaddr_storage daddr;
 	u_int32_t	spi;
-	struct esp_algorithm *xform;
+	const EVP_CIPHER *evp;
+	int		ivlen;
+	int		authlen;
 	char		secret[256];  /* is that big enough for all secrets? */
 	int		secretlen;
 };
@@ -134,7 +103,7 @@ static void esp_print_addsa(struct sa_list *sa, int sa_def)
 	nsa->next = sa_list_head;
 	sa_list_head = nsa;
 }
- 
+
 
 static int hexdigit(char hex)
 {
@@ -158,16 +127,15 @@ static int hex2byte(char *hexstring)
 	return byte;
 }
 
-/* 
+/*
  * decode the form:    SPINUM@IP <tab> ALGONAME:0xsecret
  *
- * special form: file /name 
+ * special form: file /name
  * causes us to go read from this file instead.
  *
  */
 static void esp_print_decode_onesecret(char *line)
 {
-	struct esp_algorithm *xf;
 	struct sa_list sa1;
 	int sa_def;
 
@@ -255,9 +223,12 @@ static void esp_print_decode_onesecret(char *line)
 	}
 
 	if (decode) {
-		char *colon;
+		char *colon, *p;
 		char  espsecret_key[256];
-		unsigned int   len, i;
+		int len, i;
+		const EVP_CIPHER *evp;
+		int ivlen = 8;
+		int authlen = 0;
 
 		/* skip any blank spaces */
 		while (isspace((unsigned char)*decode))
@@ -268,17 +239,33 @@ static void esp_print_decode_onesecret(char *line)
 			printf("failed to decode espsecret: %s\n", decode);
 			return;
 		}
+		*colon = '\0';
 
 		len = colon - decode;
-		xf = esp_xforms;
-		while (xf->name && strncasecmp(decode, xf->name, len) != 0)
-			xf++;
-		if (xf->name == NULL) {
+		if (strlen(decode) > strlen("-hmac96") &&
+		    !strcmp(decode + strlen(decode) - strlen("-hmac96"),
+		    "-hmac96")) {
+			p = strstr(decode, "-hmac96");
+			*p = '\0';
+			authlen = 12;
+		}
+		if (strlen(decode) > strlen("-cbc") &&
+		    !strcmp(decode + strlen(decode) - strlen("-cbc"), "-cbc")) {
+			p = strstr(decode, "-cbc");
+			*p = '\0';
+		}
+		evp = EVP_get_cipherbyname(decode);
+		if (!evp) {
 			printf("failed to find cipher algo %s\n", decode);
-			/* set to NULL transform */
+			sa1.evp = NULL;
+			sa1.authlen = 0;
+			sa1.ivlen = 0;
 			return;
 		}
-		sa1.xform = xf;
+
+		sa1.evp = evp;
+		sa1.authlen = authlen;
+		sa1.ivlen = ivlen;
 
 		colon++;
 		if (colon[0] == '0' && colon[1] == 'x') {
@@ -297,16 +284,17 @@ static void esp_print_decode_onesecret(char *line)
 				colon += 2;
 				i++;
 			}
+
 			memcpy(sa1.secret, espsecret_key, i);
-			sa1.secretlen=i;
+			sa1.secretlen = i;
 		} else {
 			i = strlen(colon);
+
 			if (i < sizeof(sa1.secret)) {
-				memcpy(sa1.secret, espsecret_key, i);
+				memcpy(sa1.secret, colon, i);
 				sa1.secretlen = i;
 			} else {
-				memcpy(sa1.secret, espsecret_key,
-				    sizeof(sa1.secret));
+				memcpy(sa1.secret, colon, sizeof(sa1.secret));
 				sa1.secretlen = sizeof(sa1.secret);
 			}
 		}
@@ -315,23 +303,14 @@ static void esp_print_decode_onesecret(char *line)
 	esp_print_addsa(&sa1, sa_def);
 }
 
-
 static void esp_print_decodesecret(void)
 {
 	char *line;
 	char *p;
 
-	if (espsecret == NULL) {
-		sa_list_head = NULL;
-		return;
-	}
-
-	if (sa_list_head != NULL)
-		return;
-
 	p = espsecret;
 
-	while (espsecret && espsecret[0] != '\0') { 
+	while (espsecret && espsecret[0] != '\0') {
 		/* pick out the first line or first thing until a comma */
 		if ((line = strsep(&espsecret, "\n,")) == NULL) {
 			line = espsecret;
@@ -342,9 +321,15 @@ static void esp_print_decodesecret(void)
 	}
 }
 
+static void esp_init(void)
+{
+
+	OpenSSL_add_all_algorithms();
+	EVP_add_cipher_alias(SN_des_ede3_cbc, "3des");
+}
+
 int
-esp_print(register const u_char *bp, register const u_char *bp2,
-	  int *nhdr, int *padlen)
+esp_print(const u_char *bp, const u_char *bp2, int *nhdr, int *padlen)
 {
 	register const struct newesp *esp;
 	register const u_char *ep;
@@ -360,12 +345,22 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 	int ivlen = 0;
 	u_char *ivoff;
 #ifdef HAVE_LIBCRYPTO
-	u_char *p;
+	const u_char *p;
+	EVP_CIPHER_CTX ctx;
+	int blocksz;
+	static int initialized = 0;
 #endif
 
 	esp = (struct newesp *)bp;
 	secret = NULL;
 	advance = 0;
+
+#ifdef HAVE_LIBCRYPTO
+	if (!initialized) {
+		esp_init();
+		initialized = 1;
+	}
+#endif
 
 #if 0
 	/* keep secret out of a register */
@@ -383,10 +378,11 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 	printf(",seq=0x%x", EXTRACT_32BITS(&esp->esp_seq));
 	printf(")");
 
-	/* if we don't have decryption key, we can't decrypt this packet. */
+	/* initiailize SAs */
 	if (sa_list_head == NULL) {
 		if (!espsecret)
 			goto fail;
+
 		esp_print_decodesecret();
 	}
 
@@ -439,9 +435,8 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 	/* if we didn't find the specific one, then look for
 	 * an unspecified one.
 	 */
-	if (sa == NULL) {
+	if (sa == NULL)
 		sa = sa_default;
-	}
 	
 	/* if not found fail */
 	if (sa == NULL)
@@ -455,191 +450,26 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 		ep = bp2 + len;
 	}
 
-	ivoff = (u_char *)(esp + 1) + sa->xform->replaysize;
-	ivlen = sa->xform->ivlen;
+	ivoff = (u_char *)(esp + 1) + 0;
+	ivlen = sa->ivlen;
 	secret = sa->secret;
 	espsecret_keylen = sa->secretlen;
 
-	switch (sa->xform->algo) {
-	case DESCBC:
-#ifdef HAVE_LIBCRYPTO
-	    {
-		u_char iv[8];
-#if OPENSSL_VERSION_NUMBER >= 0x00907000L
-		DES_key_schedule schedule;
-#else
-		des_key_schedule schedule;
-#endif
+	if (sa->evp) {
+		memset(&ctx, 0, sizeof(ctx));
+		if (EVP_CipherInit(&ctx, sa->evp, secret, NULL, 0) < 0)
+			printf("espkey init failed");
 
-		switch (ivlen) {
-		case 4:
-			memcpy(iv, ivoff, 4);
-			memcpy(&iv[4], ivoff, 4);
-			p = &iv[4];
-			*p++ ^= 0xff;
-			*p++ ^= 0xff;
-			*p++ ^= 0xff;
-			*p++ ^= 0xff;
-			break;
-		case 8:
-			memcpy(iv, ivoff, 8);
-			break;
-		default:
-			goto fail;
-		}
-		p = ivoff + ivlen;
+		blocksz = EVP_CIPHER_CTX_block_size(&ctx);
 
-		if (espsecret_keylen != 8)
-			goto fail;
-
-#if OPENSSL_VERSION_NUMBER >= 0x00908000L
-		DES_set_key_unchecked((const_DES_cblock *)secret, &schedule);
-
-		DES_cbc_encrypt((const unsigned char *)p, p,
-		    (long)(ep - p), &schedule, (DES_cblock *)iv, DES_DECRYPT);
-
-#elif OPENSSL_VERSION_NUMBER >= 0x00907000L
-		DES_set_key_unchecked((DES_cblock *)secret, schedule);
-
-		DES_cbc_encrypt((const unsigned char *)p, p,
-		    (long)(ep - p), schedule, (DES_cblock *)iv, DES_DECRYPT);
-#else
-		des_check_key = 0;
-		des_set_key((void *)secret, schedule);
-
-		des_cbc_encrypt((void *)p, (void *)p,
-		    (long)(ep - p), schedule, (void *)iv, DES_DECRYPT);
-#endif
+		p = ivoff;
+		EVP_CipherInit(&ctx, NULL, NULL, p, 0);
+		EVP_Cipher(&ctx, p + ivlen, p + ivlen, ep - (p + ivlen));
 		advance = ivoff - (u_char *)esp + ivlen;
-		break;
-	    }
-#else
-		goto fail;
-#endif /*HAVE_LIBCRYPTO*/
+	} else
+		advance = sizeof(struct newesp);
 
-	case BLOWFISH:
-#ifdef HAVE_LIBCRYPTO
-	    {
-		BF_KEY schedule;
-
-		if (espsecret_keylen < 5 || espsecret_keylen > 56)
-			goto fail;
-		BF_set_key(&schedule, espsecret_keylen, secret);
-
-		p = ivoff + ivlen;
-		BF_cbc_encrypt(p, p, (long)(ep - p), &schedule, ivoff,
-			BF_DECRYPT);
-		advance = ivoff - (u_char *)esp + ivlen;
-		break;
-	    }
-#else
-		goto fail;
-#endif /*HAVE_LIBCRYPTO*/
-
-	case RC5:
-#if defined(HAVE_LIBCRYPTO) && defined(HAVE_RC5_H)
-	    {
-		RC5_32_KEY schedule;
-
-		if (espsecret_keylen < 5 || espsecret_keylen > 255)
-			goto fail;
-		RC5_32_set_key(&schedule, espsecret_keylen, secret,
-			RC5_16_ROUNDS);
-
-		p = ivoff + ivlen;
-		RC5_32_cbc_encrypt(p, p, (long)(ep - p), &schedule, ivoff,
-			RC5_DECRYPT);
-		advance = ivoff - (u_char *)esp + ivlen;
-		break;
-	    }
-#else
-		goto fail;
-#endif /*HAVE_LIBCRYPTO*/
-
-	case CAST128:
-#if defined(HAVE_LIBCRYPTO) && defined(HAVE_CAST_H) && !defined(HAVE_BUGGY_CAST128)
-	    {
-		CAST_KEY schedule;
-
-		if (espsecret_keylen < 5 || espsecret_keylen > 16)
-			goto fail;
-		CAST_set_key(&schedule, espsecret_keylen, secret);
-
-		p = ivoff + ivlen;
-		CAST_cbc_encrypt(p, p, (long)(ep - p), &schedule, ivoff,
-			CAST_DECRYPT);
-		advance = ivoff - (u_char *)esp + ivlen;
-		break;
-	    }
-#else
-		goto fail;
-#endif /*HAVE_LIBCRYPTO*/
-
-	case DES3CBC:
-#if defined(HAVE_LIBCRYPTO)
-	    {
-#if OPENSSL_VERSION_NUMBER >= 0x00907000L
-		DES_key_schedule s1, s2, s3;
-
-		if (espsecret_keylen != 24)
-			goto fail;
-		DES_set_odd_parity((DES_cblock *)secret);
-		DES_set_odd_parity((DES_cblock *)(secret + 8));
-		DES_set_odd_parity((DES_cblock *)(secret + 16));
-#if OPENSSL_VERSION_NUMBER >= 0x00908000L
-		if (DES_set_key_checked((const_DES_cblock *)secret, &s1) != 0)
-			printf("failed to schedule key 1\n");
-		if (DES_set_key_checked((const_DES_cblock *)(secret + 8), &s2) != 0)
-			printf("failed to schedule key 2\n");
-		if (DES_set_key_checked((const_DES_cblock *)(secret + 16), &s3) != 0)
-			printf("failed to schedule key 3\n");
-#else
-		if (DES_set_key_checked((DES_cblock *)secret, s1) != 0)
-			printf("failed to schedule key 1\n");
-		if (DES_set_key_checked((DES_cblock *)(secret + 8), s2) != 0)
-			printf("failed to schedule key 2\n");
-		if (DES_set_key_checked((DES_cblock *)(secret + 16), s3) != 0)
-			printf("failed to schedule key 3\n");
-#endif
-
-		p = ivoff + ivlen;
-		DES_ede3_cbc_encrypt((const unsigned char *)p, p,
-		    (long)(ep - p), &s1, &s2, &s3, (DES_cblock *)ivoff,
-		    DES_DECRYPT);
-#else
-		des_key_schedule s1, s2, s3;
-
-		if (espsecret_keylen != 24)
-			goto fail;
-		des_check_key = 1;
-		des_set_odd_parity((void *)secret);
-		des_set_odd_parity((void *)(secret + 8));
-		des_set_odd_parity((void *)(secret + 16));
-		if (des_set_key((void *)secret, s1) != 0)
-			printf("failed to schedule key 1\n");
-		if (des_set_key((void *)(secret + 8), s2) != 0)
-			printf("failed to schedule key 2\n");
-		if (des_set_key((void *)(secret + 16), s3) != 0)
-			printf("failed to schedule key 3\n");
-
-		p = ivoff + ivlen;
-		des_ede3_cbc_encrypt((void *)p, (void *)p,
-		    (long)(ep - p), s1, s2, s3, (void *)ivoff, DES_DECRYPT);
-#endif
-		advance = ivoff - (u_char *)esp + ivlen;
-		break;
-	    }
-#else
-		goto fail;
-#endif /*HAVE_LIBCRYPTO*/
-
-	case NONE:
-	default:
-		advance = sizeof(struct newesp) + sa->xform->replaysize;
-		break;
-	}
-
-	ep = ep - sa->xform->authlen;
+	ep = ep - sa->authlen;
 	/* sanity check for pad length */
 	if (ep - bp < *(ep - 2))
 		goto fail;
