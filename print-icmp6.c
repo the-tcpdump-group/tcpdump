@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.31 2000-10-03 02:55:39 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.32 2000-10-06 06:18:35 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -111,7 +111,7 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 	register const char *str;
 	register const struct ip6_hdr *oip;
 	register const struct udphdr *ouh;
-	register int hlen, dport;
+	register int dport;
 	register const u_char *ep;
 	char buf[256];
 	int icmp6len, prot;
