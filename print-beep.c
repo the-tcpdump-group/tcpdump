@@ -5,13 +5,13 @@
  * BSD-style licence that accompanies tcpdump or under the GNU GPL 
  * version 2 or later.
  *
- * print-bxxp.c
+ * print-beep.c
  *
  */
 
 #ifndef lint
 static const char rcsid[] =
-  "@(#) $Header: /tcpdump/master/tcpdump/Attic/print-bxxp.c,v 1.5 2001-09-17 21:57:56 fenner Exp $";
+  "@(#) $Header: /tcpdump/master/tcpdump/print-beep.c,v 1.1 2001-12-10 08:21:24 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -51,17 +51,23 @@ l_strnstart(const char *tstr1, u_int tl1, const char *str2, u_int l2)
 }
 
 void
-bxxp_print(const u_char *bp, u_int length)
+beep_print(const u_char *bp, u_int length)
 {
 
-	if (l_strnstart("REQ ", 4, bp, length)) /* A REQuest */
-		printf(" BXXP REQ");
-	else if (l_strnstart("RSP ", 4, bp, length))
-		printf(" BXXP RSP");
+	if (l_strnstart("MSG", 4, bp, length)) /* A REQuest */
+		printf(" BEEP MSG");
+	else if (l_strnstart("RPY ", 4, bp, length))
+		printf(" BEEP RPY");
+	else if (l_strnstart("ERR ", 4, bp, length))
+		printf(" BEEP ERR");
+	else if (l_strnstart("ANS ", 4, bp, length))
+		printf(" BEEP ANS");
+	else if (l_strnstart("NUL ", 4, bp, length))
+		printf(" BEEP NUL");
 	else if (l_strnstart("SEQ ", 4, bp, length))
-		printf(" BXXP SEQ");
+		printf(" BEEP SEQ");
 	else if (l_strnstart("END", 4, bp, length))
-		printf(" BXXP END");
+		printf(" BEEP END");
 	else 
-		printf(" BXXP (payload or undecoded)");
+		printf(" BEEP (payload or undecoded)");
 }

@@ -88,7 +88,7 @@ print-atalk.c
 print-atm.c
 print-bgp.c
 print-bootp.c
-print-bxxp.c
+print-beep.c
 print-cdp.c
 print-chdlc.c
 print-cip.c
