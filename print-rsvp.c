@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.3 2002-10-10 19:34:51 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.4 2002-10-18 13:53:42 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -133,7 +133,7 @@ static const struct tok rsvp_msg_type_values[] = {
 #define	RSVP_OBJ_SUGGESTED_LABEL    129
 #define	RSVP_OBJ_PROPERTIES         204
 #define	RSVP_OBJ_FASTREROUTE        205
-#define	RSVP_OBJ_SESSION_ATTTRIBUTE 207
+#define	RSVP_OBJ_SESSION_ATTRIBUTE  207 /* rfc3209 */
 #define	RSVP_OBJ_RESTART_CAPABILITY 131 /* draft-pan-rsvp-te-restart */
 
 static const struct tok rsvp_obj_values[] = {
@@ -165,7 +165,7 @@ static const struct tok rsvp_obj_values[] = {
     { RSVP_OBJ_SUGGESTED_LABEL,    "Suggested Label" },
     { RSVP_OBJ_PROPERTIES,         "Properties" },
     { RSVP_OBJ_FASTREROUTE,        "Fast Re-Route" },
-    { RSVP_OBJ_SESSION_ATTTRIBUTE, "Session Attribute" },
+    { RSVP_OBJ_SESSION_ATTRIBUTE,  "Session Attribute" },
     { RSVP_OBJ_RESTART_CAPABILITY, "Restart Capability" },
     { 0, NULL}
 };
@@ -185,20 +185,21 @@ static const struct tok rsvp_obj_values[] = {
  */
 
 static const struct tok rsvp_ctype_values[] = {
-    { 256*RSVP_OBJ_SESSION+RSVP_CTYPE_IPV4,	           "IPv4" },
-    { 256*RSVP_OBJ_SESSION+RSVP_CTYPE_IPV6,	           "IPv6" },
-    { 256*RSVP_OBJ_SESSION+RSVP_CTYPE_TUNNEL_IPV4,         "Tunnel IPv4" },
-    { 256*RSVP_OBJ_SENDER_TEMPLATE+RSVP_CTYPE_TUNNEL_IPV4, "Tunnel IPv4" },
-    { 256*RSVP_OBJ_STYLE+RSVP_CTYPE_1,                     "1" },
-    { 256*RSVP_OBJ_HELLO+RSVP_CTYPE_1,                     "Hello Request" },
-    { 256*RSVP_OBJ_HELLO+RSVP_CTYPE_2,                     "Hello Ack" },
-    { 256*RSVP_OBJ_LABEL_REQ+RSVP_CTYPE_1,	           "without label range" },
-    { 256*RSVP_OBJ_LABEL_REQ+RSVP_CTYPE_2,	           "with ATM label range" },
-    { 256*RSVP_OBJ_LABEL_REQ+RSVP_CTYPE_3,                 "with FR label range" },
-    { 256*RSVP_OBJ_LABEL+RSVP_CTYPE_1,                     "1" },
-    { 256*RSVP_OBJ_ERO+RSVP_CTYPE_IPV4,                    "IPv4" },
-    { 256*RSVP_OBJ_RRO+RSVP_CTYPE_IPV4,                    "IPv4" },
-    { 256*RSVP_OBJ_RESTART_CAPABILITY+RSVP_CTYPE_1,        "IPv4" },
+    { 256*RSVP_OBJ_SESSION+RSVP_CTYPE_IPV4,	             "IPv4" },
+    { 256*RSVP_OBJ_SESSION+RSVP_CTYPE_IPV6,	             "IPv6" },
+    { 256*RSVP_OBJ_SESSION+RSVP_CTYPE_TUNNEL_IPV4,           "Tunnel IPv4" },
+    { 256*RSVP_OBJ_SENDER_TEMPLATE+RSVP_CTYPE_TUNNEL_IPV4,   "Tunnel IPv4" },
+    { 256*RSVP_OBJ_STYLE+RSVP_CTYPE_1,                       "1" },
+    { 256*RSVP_OBJ_HELLO+RSVP_CTYPE_1,                       "Hello Request" },
+    { 256*RSVP_OBJ_HELLO+RSVP_CTYPE_2,                       "Hello Ack" },
+    { 256*RSVP_OBJ_LABEL_REQ+RSVP_CTYPE_1,	             "without label range" },
+    { 256*RSVP_OBJ_LABEL_REQ+RSVP_CTYPE_2,	             "with ATM label range" },
+    { 256*RSVP_OBJ_LABEL_REQ+RSVP_CTYPE_3,                   "with FR label range" },
+    { 256*RSVP_OBJ_LABEL+RSVP_CTYPE_1,                       "1" },
+    { 256*RSVP_OBJ_ERO+RSVP_CTYPE_IPV4,                      "IPv4" },
+    { 256*RSVP_OBJ_RRO+RSVP_CTYPE_IPV4,                      "IPv4" },
+    { 256*RSVP_OBJ_RESTART_CAPABILITY+RSVP_CTYPE_1,          "IPv4" },
+    { 256*RSVP_OBJ_SESSION_ATTRIBUTE+RSVP_CTYPE_TUNNEL_IPV4, "Tunnel IPv4" },
     { 0, NULL}
 };
 
@@ -224,6 +225,13 @@ static const struct tok rsvp_resstyle_values[] = {
     { 17,	              "Wildcard Filter" },
     { 10,                     "Fixed Filter" },
     { 18,                     "Shared Explicit" },
+    { 0, NULL}
+};
+
+static struct tok rsvp_session_attribute_flag_values[] = {
+    { 1,	              "Local Protection desired" },
+    { 2,                      "Label Recording desired" },
+    { 4,                      "SE Style desired" },
     { 0, NULL}
 };
 
@@ -493,6 +501,23 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 hexdump=TRUE;
             }
             break;
+        case RSVP_OBJ_SESSION_ATTRIBUTE:
+            switch(rsvp_obj_ctype) {
+            case RSVP_CTYPE_TUNNEL_IPV4:
+                printf("\n\t    Session Name: %s",(obj_tptr+3));
+                printf("\n\t    Setup Priority: %u, Holding Priority: %u, Flags: [%s]",
+                       (int)*obj_tptr,
+                       (int)*(obj_tptr+1),
+                       tok2str(rsvp_session_attribute_flag_values,
+                                  "none",
+                                  *(obj_tptr+2)));
+
+                obj_tptr+=4+*(obj_tptr+3);
+                break;
+            default:
+                hexdump=TRUE;
+            }
+            break;
         /*
          *  FIXME those are the defined objects that lack a decoder
          *  you are welcome to contribute code ;-)
@@ -516,7 +541,6 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         case RSVP_OBJ_SUGGESTED_LABEL:
         case RSVP_OBJ_PROPERTIES:
         case RSVP_OBJ_FASTREROUTE:
-        case RSVP_OBJ_SESSION_ATTTRIBUTE:
         default:
             if (vflag <= 1)
                 print_unknown_data(obj_tptr,"\n\t    ",obj_tlen);
