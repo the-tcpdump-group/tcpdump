@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.142 2001-10-08 21:25:18 fenner Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.143 2001-10-09 06:56:24 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.142 $)
+AC_REVISION($Revision: 1.143 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -99,7 +99,7 @@ yes)	AC_MSG_RESULT(yes)
 *)	AC_MSG_RESULT(no)
 	;;
   esac
-])
+], AC_MSG_RESULT(no))
 
 CFLAGS="$CFLAGS -Dss_family=__ss_family -Dss_len=__ss_len"
 AC_MSG_CHECKING([whether to enable ipv6])
