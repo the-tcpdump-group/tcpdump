@@ -16,7 +16,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-eigrp.c,v 1.1 2004-04-30 22:22:04 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-eigrp.c,v 1.2 2004-04-30 23:52:00 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -73,6 +73,7 @@ struct eigrp_tlv_header {
 };
 
 #define EIGRP_TLV_GENERAL_PARM   0x0001
+#define EIGRP_TLV_AUTH           0x0002
 #define EIGRP_TLV_SEQ            0x0003
 #define EIGRP_TLV_SW_VERSION     0x0004
 #define EIGRP_TLV_MCAST_SEQ      0x0005
@@ -86,6 +87,7 @@ struct eigrp_tlv_header {
 
 static const struct tok eigrp_tlv_values[] = {
     { EIGRP_TLV_GENERAL_PARM, "General Parameters"},
+    { EIGRP_TLV_AUTH, "Authentication"},
     { EIGRP_TLV_SEQ, "Sequence"},
     { EIGRP_TLV_SW_VERSION, "Software Version"},
     { EIGRP_TLV_MCAST_SEQ, "Next Multicast Sequence"},
@@ -99,13 +101,35 @@ static const struct tok eigrp_tlv_values[] = {
     { 0, NULL}
 };
 
+struct eigrp_tlv_general_parm {
+    u_int8_t k1;
+    u_int8_t k2;
+    u_int8_t k3;
+    u_int8_t k4;
+    u_int8_t k5;
+    u_int8_t res;
+    u_int8_t holdtime[2];
+};          
+
+struct eigrp_tlv_sw_version {
+    u_int8_t ios_major;
+    u_int8_t ios_minor;
+    u_int8_t eigrp_major;
+    u_int8_t eigrp_minor;
+}; 
+
 void
 eigrp_print(register const u_char *pptr, register u_int len) {
 
     const struct eigrp_common_header *eigrp_com_header;
     const struct eigrp_tlv_header *eigrp_tlv_header;
-    const u_char *tptr,*obj_tptr;
-    int tlen,eigrp_tlv_len,eigrp_tlv_type,obj_tlen;
+    const u_char *tptr,*tlv_tptr;
+    int tlen,eigrp_tlv_len,eigrp_tlv_type,tlv_tlen;
+
+    union {
+        const struct eigrp_tlv_general_parm *eigrp_tlv_general_parm;
+        const struct eigrp_tlv_sw_version *eigrp_tlv_sw_version;
+    } tlv_ptr;
 
     tptr=pptr;
     eigrp_com_header = (const struct eigrp_common_header *)pptr;
@@ -167,8 +191,8 @@ eigrp_print(register const u_char *pptr, register u_int len) {
                eigrp_tlv_type,
                eigrp_tlv_len);
 
-        obj_tptr=tptr+sizeof(struct eigrp_tlv_header);
-        obj_tlen=eigrp_tlv_len-sizeof(struct eigrp_tlv_header);
+        tlv_tptr=tptr+sizeof(struct eigrp_tlv_header);
+        tlv_tlen=eigrp_tlv_len-sizeof(struct eigrp_tlv_header);
 
         /* did we capture enough for fully decoding the object ? */
         if (!TTEST2(*tptr, eigrp_tlv_len))
@@ -176,14 +200,33 @@ eigrp_print(register const u_char *pptr, register u_int len) {
 
         switch(eigrp_tlv_type) {
 
+        case EIGRP_TLV_GENERAL_PARM:
+            tlv_ptr.eigrp_tlv_general_parm = (const struct eigrp_tlv_general_parm *)tlv_tptr;
+            printf("\n\t    holdtime: %us, k1 %u, k2 %u, k3 %u, k4 %u, k5 %u",
+                   EXTRACT_16BITS(tlv_ptr.eigrp_tlv_general_parm->holdtime),
+                   tlv_ptr.eigrp_tlv_general_parm->k1,
+                   tlv_ptr.eigrp_tlv_general_parm->k2,
+                   tlv_ptr.eigrp_tlv_general_parm->k3,
+                   tlv_ptr.eigrp_tlv_general_parm->k4,
+                   tlv_ptr.eigrp_tlv_general_parm->k5);
+            break;
+
+        case EIGRP_TLV_SW_VERSION:
+            tlv_ptr.eigrp_tlv_sw_version = (const struct eigrp_tlv_sw_version *)tlv_tptr;
+            printf("\n\t    IOS version: %u.%u, EIGRP version %u.%u",
+                   tlv_ptr.eigrp_tlv_sw_version->ios_major,
+                   tlv_ptr.eigrp_tlv_sw_version->ios_minor,
+                   tlv_ptr.eigrp_tlv_sw_version->eigrp_major,
+                   tlv_ptr.eigrp_tlv_sw_version->eigrp_minor);
+            break;
+
             /*
              * FIXME those are the defined TLVs that lack a decoder
              * you are welcome to contribute code ;-)
              */
 
-        case EIGRP_TLV_GENERAL_PARM:
+        case EIGRP_TLV_AUTH:
         case EIGRP_TLV_SEQ:
-        case EIGRP_TLV_SW_VERSION:
         case EIGRP_TLV_MCAST_SEQ:
         case EIGRP_TLV_IP_INT:
         case EIGRP_TLV_IP_EXT:
@@ -195,7 +238,7 @@ eigrp_print(register const u_char *pptr, register u_int len) {
 
         default:
             if (vflag <= 1)
-                print_unknown_data(obj_tptr,"\n\t    ",obj_tlen);
+                print_unknown_data(tlv_tptr,"\n\t    ",tlv_tlen);
             break;
         }
         /* do we want to see an additionally hexdump ? */
