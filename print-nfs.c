@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.87 2000-10-07 05:53:12 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.88 2001-07-04 19:24:10 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1487,7 +1487,8 @@ interp_reply(const struct rpc_msg *rp, u_int32_t proc, u_int32_t vers, int lengt
 
 	case NFSPROC_ACCESS:
 		printf(" access");
-		dp = parserep(rp, length);
+		if (!(dp = parserep(rp, length)))
+			break;
 		if (!(dp = parsestatus(dp, &er)))
 			break;
 		if (vflag)
