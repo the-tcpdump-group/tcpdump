@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/icmp6.h,v 1.15 2004-06-16 00:06:28 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/icmp6.h,v 1.16 2005-01-14 10:41:50 hannes Exp $ (LBL) */
 /*	$NetBSD: icmp6.h,v 1.13 2000/08/03 16:30:37 itojun Exp $	*/
 /*	$KAME: icmp6.h,v 1.22 2000/08/03 15:25:16 jinmei Exp $	*/
 
@@ -245,10 +245,10 @@ struct nd_neighbor_advert {	/* neighbor advertisement */
 #define nd_na_code		nd_na_hdr.icmp6_code
 #define nd_na_cksum		nd_na_hdr.icmp6_cksum
 #define nd_na_flags_reserved	nd_na_hdr.icmp6_data32[0]
-/* netowkr endian */
-#define ND_NA_FLAG_ROUTER		((u_int32_t)htonl(0x80000000))
-#define ND_NA_FLAG_SOLICITED		((u_int32_t)htonl(0x40000000))
-#define ND_NA_FLAG_OVERRIDE		((u_int32_t)htonl(0x20000000))
+
+#define ND_NA_FLAG_ROUTER		0x80000000
+#define ND_NA_FLAG_SOLICITED		0x40000000
+#define ND_NA_FLAG_OVERRIDE		0x20000000
 
 struct nd_redirect {		/* redirect */
 	struct icmp6_hdr	nd_rd_hdr;
@@ -283,9 +283,9 @@ struct nd_opt_prefix_info {	/* prefix information */
 	u_int8_t	nd_opt_pi_len;
 	u_int8_t	nd_opt_pi_prefix_len;
 	u_int8_t	nd_opt_pi_flags_reserved;
-	u_int32_t	nd_opt_pi_valid_time;
-	u_int32_t	nd_opt_pi_preferred_time;
-	u_int32_t	nd_opt_pi_reserved2;
+	u_int8_t	nd_opt_pi_valid_time[4];
+	u_int8_t	nd_opt_pi_preferred_time[4];
+	u_int8_t	nd_opt_pi_reserved2[4];
 	struct in6_addr	nd_opt_pi_prefix;
 };
 
