@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.21 2002-01-23 05:23:16 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.22 2002-01-25 05:51:51 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -195,7 +195,9 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 	char *secret;
 	int ivlen = 0;
 	u_char *ivoff;
+#ifdef HAVE_LIBCRYPTO
 	u_char *p;
+#endif
 	
 	esp = (struct esp *)bp;
 	spi = (u_int32_t)ntohl(esp->esp_spi);
