@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.22 2003-12-29 19:26:28 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.23 2004-03-24 00:41:13 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -247,12 +247,14 @@ cdp_print_addr(const u_char * p, int l)
 	p += 4;
 
 	while (p < endp && num >= 0) {
+		TCHECK2(p, 2);
 		if (p + 2 > endp)
 			goto trunc;
 		pt = p[0];		/* type of "protocol" field */
 		pl = p[1];		/* length of "protocol" field */
 		p += 2;
 
+		TCHECK2(p[pl], 2);
 		if (p + pl + 2 > endp)
 			goto trunc;
 		al = EXTRACT_16BITS(&p[pl]);	/* address length */
@@ -265,6 +267,7 @@ cdp_print_addr(const u_char * p, int l)
 			 */
 			p += 3;
 
+			TCHECK2(*p, 4);
 			if (p + 4 > endp)
 				goto trunc;
 			printf("IPv4 (%u) %s",
@@ -282,6 +285,7 @@ cdp_print_addr(const u_char * p, int l)
 			 * Ethertype, address length = 16
 			 */
 			p += 10;
+			TCHECK2(*p, al);
 			if (p + al > endp)
 				goto trunc;
 
@@ -295,16 +299,19 @@ cdp_print_addr(const u_char * p, int l)
 			/*
 			 * Generic case: just print raw data
 			 */
+			TCHECK2(*p, pl);
 			if (p + pl > endp)
 				goto trunc;
 			printf("pt=0x%02x, pl=%d, pb=", *(p - 2), pl);
 			while (pl-- > 0)
 				printf(" %02x", *p++);
+			TCHECK2(*p, 2);
 			if (p + 2 > endp)
 				goto trunc;
 			al = (*p << 8) + *(p + 1);
 			printf(", al=%d, a=", al);
 			p += 2;
+			TCHECK2(*p, al);
 			if (p + al > endp)
 				goto trunc;
 			while (al-- > 0)
