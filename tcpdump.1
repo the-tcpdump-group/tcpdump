@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.123 2002-07-11 09:17:24 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.124 2002-08-05 08:27:07 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -27,7 +27,7 @@ tcpdump \- dump traffic on a network
 .na
 .B tcpdump
 [
-.B \-aAdeflnNOpqRStuvxX
+.B \-aADdeflnNOpqRStuvxX
 ] [
 .B \-c
 .I count
@@ -227,6 +227,27 @@ program fragment.
 .B \-ddd
 Dump packet-matching code as decimal numbers (preceded with a count).
 .TP
+.B \-D
+Print the list of the network interfaces available on the system on
+which
+.I tcpdump
+can capture packets.  For each network interface, a number and an
+interface name, possibly followed by a text description of the
+interface, is printed.  The interface name or the number can be supplied
+to the
+.B \-i
+flag to specify an interface on which to capture.
+.IP
+The
+.B \-D
+flag will not be supported if
+.I tcpdump
+was built with an older version of
+.I libpcap
+that lacks the
+.B pcap_findalldevs()
+function.
+.TP
 .B \-e
 Print the link-level header on each dump line.
 .TP
@@ -242,7 +263,7 @@ Algorithms may be
 The default is \fBdes-cbc\fP.
 The ability to decrypt packets is only present if \fItcpdump\fP was compiled
 with cryptography enabled.
-\fIsecret\fP the ascii text for ESP secret key.
+\fIsecret\fP the ASCII text for ESP secret key.
 We cannot take arbitrary binary value at this moment.
 The option assumes RFC2406 ESP, not RFC1827 ESP.
 The option is only for debugging purposes, and
@@ -273,6 +294,13 @@ On Linux systems with 2.2 or later kernels, an
 argument of ``any'' can be used to capture packets from all interfaces.
 Note that captures on the ``any'' device will not be done in promiscuous
 mode.
+.IP
+If the
+.B \-D
+flag is supported, an interface number as printed by that flag can be
+used as the
+.I interface
+argument.
 .TP
 .B \-l
 Make stdout line buffered.
@@ -412,15 +440,15 @@ will also be printed when the higher layer packet is shorter than the
 required padding.
 .TP
 .B \-X
-When printing hex, print ascii too.
+When printing hex, print ASCII too.
 Thus if
 .B \-x
-is also set, the packet is printed in hex/ascii.
+is also set, the packet is printed in hex/ASCII.
 This is very handy for analysing new protocols.
 Even if
 .B \-x
 is not also set, some parts of some packets may be printed
-in hex/ascii.
+in hex/ASCII.
 .IP "\fI expression\fP"
 .RS
 selects which packets will be dumped.
