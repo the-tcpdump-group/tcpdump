@@ -369,6 +369,10 @@ SOURCE="..\..\print-ripng.c"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\print-rsvp.c"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\print-rt6.c"
 # End Source File
 # Begin Source File
