@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-arcnet.c,v 1.17 2003-11-16 09:36:12 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-arcnet.c,v 1.18 2004-03-17 23:24:35 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -103,7 +103,7 @@ arcnet_print(const u_char *bp, u_int length, int phds, int flag, u_int seqid)
 /*
  * This is the top level routine of the printer.  'p' points
  * to the ARCNET header of the packet, 'h->ts' is the timestamp,
- * 'h->length' is the length of the packet off the wire, and 'h->caplen'
+ * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  */
 u_int
@@ -187,7 +187,7 @@ arcnet_if_print(const struct pcap_pkthdr *h, const u_char *p)
 /*
  * This is the top level routine of the printer.  'p' points
  * to the ARCNET header of the packet, 'h->ts' is the timestamp,
- * 'h->length' is the length of the packet off the wire, and 'h->caplen'
+ * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.  It is quite similar
  * to the non-Linux style printer except that Linux doesn't ever
  * supply packets that look like exception frames, it always supplies
