@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.26 2002-09-05 21:25:37 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.27 2002-12-04 19:12:39 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -41,47 +41,6 @@ static const char rcsid[] =
 #include "atmuni31.h"
 
 #include "ether.h"
-
-/*
- * Print an RFC 1483 LLC-encapsulated ATM frame.
- */
-static void
-atm_llc_print(const u_char *p, int length, int caplen)
-{
-	struct ether_header ehdr;
-	u_short ether_type;
-	u_short extracted_ethertype;
-
-	ether_type = p[6] << 8 | p[7];
-
-	/*
-	 * Fake up an Ethernet header for the benefit of printers that
-	 * insist on "packetp" pointing to an Ethernet header.
-	 */
-	memset(&ehdr, '\0', sizeof ehdr);
-
-	/*
-	 * Some printers want to get back at the ethernet addresses.
-	 * Rather than pass it all the way down, we set this global.
-	 *
-	 * Actually, the only printers that use packetp are print-arp.c
-	 * and print-bootp.c, and they assume that packetp points to an
-	 * Ethernet header.  The right thing to do is to fix them to know
-	 * which link type is in use when they excavate. XXX
-	 */
-	packetp = (u_char *)&ehdr;
-
-	if (!llc_print(p, length, caplen, ESRC(&ehdr), EDST(&ehdr),
-	    &extracted_ethertype)) {
-		/* ether_type not known, print raw packet */
-		if (extracted_ethertype) {
-			printf("(LLC %s) ",
-		etherproto_string(htons(extracted_ethertype)));
-		}
-		if (!xflag && !qflag)
-			default_print(p, caplen);
-	}
-}
 
 /*
  * This is the top level routine of the printer.  'p' points
@@ -110,7 +69,7 @@ atm_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 	 */
 	snapend = p + caplen;
 
-	if (p[0] != 0xaa || p[1] != 0xaa || p[2] != 0x03) {
+	if (EXTRACT_24BITS(p) == 0xaaaa03) {
 		/*
 		 * XXX - assume 802.6 MAC header from Fore driver.
 		 * XXX - should we also assume it's not a MAC header
@@ -118,16 +77,19 @@ atm_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
 		 * routed NLPID-formatted PDUs?
 		 */
 		if (eflag)
-			printf("%04x%04x %04x%04x ",
-			       p[0] << 24 | p[1] << 16 | p[2] << 8 | p[3],
-			       p[4] << 24 | p[5] << 16 | p[6] << 8 | p[7],
-			       p[8] << 24 | p[9] << 16 | p[10] << 8 | p[11],
-			       p[12] << 24 | p[13] << 16 | p[14] << 8 | p[15]);
+			printf("%08x%08x %08x%08x ",
+			       EXTRACT_32BITS(p),
+			       EXTRACT_32BITS(p+4),
+			       EXTRACT_32BITS(p+8),
+			       EXTRACT_32BITS(p+12));
 		p += 20;
 		length -= 20;
 		caplen -= 20;
 	}
-	atm_llc_print(p, length, caplen);
+
+        /* lets call into the generic LLC handler */
+	llc_print(p, length, caplen, NULL, NULL, NULL);
+
 	if (xflag)
 		default_print(p, caplen);
  out:
@@ -243,8 +205,9 @@ atm_print(u_int vpi, u_int vci, u_int traftype, const u_char *p, u_int length,
 	default:
 		/*
 		 * Assumes traffic is LLC if unknown.
+                 * call into the generic LLC handler
 		 */
-		atm_llc_print(p, length, caplen);
+		llc_print(p, length, caplen, NULL, NULL, NULL);
 		break;
 
 	case ATM_LANE:
