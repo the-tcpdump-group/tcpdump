@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.89 2002-09-05 21:25:35 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.90 2002-12-17 09:55:14 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -256,6 +256,36 @@ AC_DEFUN(AC_LBL_LIBPCAP,
 	    AC_CHECK_LIB(pcap, main, libpcap="-lpcap")
 	    if test $libpcap = FAIL ; then
 		    AC_MSG_ERROR(see the INSTALL doc for more info)
+	    fi
+	    #
+	    # Good old Red Hat Linux puts "pcap.h" in
+	    # "/usr/include/pcap"; had the LBL folks done so,
+	    # that would have been a good idea, but for
+	    # the Red Hat folks to do so just breaks source
+	    # compatibility with other systems.
+	    #
+	    # We work around this by assuming that, as we didn't
+	    # find a local libpcap, libpcap is in /usr/lib or
+	    # /usr/local/lib and that the corresponding header
+	    # file is under one of those directories; if we don't
+	    # find it in either of those directories, we check to
+	    # see if it's in a "pcap" subdirectory of them and,
+	    # if so, add that subdirectory to the "-I" list.
+	    #
+	    AC_MSG_CHECKING(for extraneous pcap header directories)
+	    if ! test \( -r /usr/local/include/pcap.h -o \
+			 -r /usr/include/pcap.h \); then
+		if test -r /usr/local/include/pcap/pcap.h; then
+		    d="/usr/local/include/pcap"
+		elif test -r /usr/include/pcap/pcap.h; then
+		    d="/usr/include/pcap"
+		fi
+	    fi
+	    if test -z $d ; then
+		AC_MSG_RESULT(not found)
+	    else
+		$2="-I$d $$2"
+		AC_MSG_RESULT(found -- -I$d added)
 	    fi
     else
 	    $1=$libpcap
