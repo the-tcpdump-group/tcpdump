@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-timed.c,v 1.1 2000-10-06 05:35:37 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-timed.c,v 1.2 2001-05-09 01:21:43 fenner Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -30,20 +30,11 @@ static const char rcsid[] =
 
 #include <sys/param.h>
 #include <sys/time.h>
-
-#include <netinet/in.h>
-#include "ip.h"
-#include "udp.h"
-#include "tcp.h"
-
-#include "timed.h"
-
 #include <stdio.h>
 #include <string.h>
 
+#include "timed.h"
 #include "interface.h"
-#include "addrtoname.h"
-#include "extract.h"                    /* must come after interface.h */
 
 static char *tsptype[TSPTYPENUMBER] =
   { "ANY", "ADJTIME", "ACK", "MASTERREQ", "MASTERACK", "SETTIME", "MASTERUP",
