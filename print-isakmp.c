@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.36.2.4 2003-12-20 09:58:58 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.36.2.5 2003-12-20 10:02:46 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1229,7 +1229,6 @@ isakmp_print(const u_char *bp, u_int length, const u_char *bp2)
 		printf("[%s%s]", base.flags & ISAKMP_FLAG_E ? "E" : "",
 			base.flags & ISAKMP_FLAG_C ? "C" : "");
 	}
-	printf(":");
 
 	if (vflag) {
 		const struct isakmp_gen *ext;
@@ -1240,6 +1239,8 @@ isakmp_print(const u_char *bp, u_int length, const u_char *bp2)
 			printf(" [|%s]", NPSTR(np));			\
 			goto done;					\
 		}
+
+		printf(":");
 
 		/* regardless of phase... */
 		if (base.flags & ISAKMP_FLAG_E) {
