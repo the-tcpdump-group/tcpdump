@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.218 2003-11-16 09:36:44 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.219 2003-11-18 08:53:19 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -454,11 +454,24 @@ main(int argc, char **argv)
 			break;
 
 		case 'l':
+#ifdef WIN32
+			/*
+			 * _IOLBF is the same as _IOFBF in Microsoft's C
+			 * libraries; the only alternative they offer
+			 * is _IONBF.
+			 *
+			 * XXX - this should really be checking for MSVC++,
+			 * not WIN32, if, for example, MinGW has its own
+			 * C library that is more UNIX-compatible.
+			 */
+			setvbuf(stdout, NULL, _IONBF, 0);
+#else /* WIN32 */
 #ifdef HAVE_SETLINEBUF
 			setlinebuf(stdout);
 #else
 			setvbuf(stdout, NULL, _IOLBF, 0);
 #endif
+#endif /* WIN32 */
 			break;
 
 		case 'n':
@@ -651,7 +664,7 @@ main(int argc, char **argv)
 		fflush(stderr);	
 #endif /* WIN32 */
 		*ebuf = '\0';
-		pd = pcap_open_live(device, snaplen, !pflag, 10000, ebuf);
+		pd = pcap_open_live(device, snaplen, !pflag, 1000, ebuf);
 		if (pd == NULL)
 			error("%s", ebuf);
 		else if (*ebuf)
