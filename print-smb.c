@@ -11,7 +11,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.4 2000-01-09 21:34:19 fenner Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.5 2000-01-19 05:17:13 itojun Exp $";
 #endif
 
 #include <stdio.h>
@@ -789,15 +789,14 @@ void nbt_udp137_print(const uchar *data, int length)
   int ancount = RSVAL(data,6);
   int nscount = RSVAL(data,8);
   int arcount = RSVAL(data,10);
-  char des[1024];
-  char *opcodestr="OPUNKNOWN";  
+  char *opcodestr;  
   const char *p;
 
   startbuf = data;
 
   if (maxbuf <= data) return;
 
-  strcpy(des,"\n>>> NBT UDP PACKET(137): ");
+  printf("\n>>> NBT UDP PACKET(137): ");
 
   switch (opcode) {
   case 0: opcodestr = "QUERY"; break;
@@ -806,27 +805,26 @@ void nbt_udp137_print(const uchar *data, int length)
   case 7: opcodestr = "WACK"; break;
   case 8: opcodestr = "REFRESH(8)"; break;
   case 9: opcodestr = "REFRESH"; break;
+  default: opcodestr = "OPUNKNOWN"; break;
   }
-  strcat(des,opcodestr);
+  printf("%s", opcodestr);
   if (response) {
     if (rcode)
-      strcat(des,"; NEGATIVE");
+      printf("; NEGATIVE");
     else
-      strcat(des,"; POSITIVE");
+      printf("; POSITIVE");
   }
     
   if (response) 
-    strcat(des,"; RESPONSE");
+    printf("; RESPONSE");
   else
-    strcat(des,"; REQUEST");
+    printf("; REQUEST");
 
   if (nm_flags&1)
-    strcat(des,"; BROADCAST");
+    printf("; BROADCAST");
   else
-    strcat(des,"; UNICAST");
+    printf("; UNICAST");
   
-  printf("%s", des);
-
   if (vflag == 0) return;
 
   printf("\nTrnID=0x%X\nOpCode=%d\nNmFlags=0x%X\nRcode=%d\nQueryCount=%d\nAnswerCount=%d\nAuthorityCount=%d\nAddressRecCount=%d\n",
@@ -867,18 +865,19 @@ void nbt_udp137_print(const uchar *data, int length)
 	    int numnames = CVAL(p,0);
 	    p = fdata(p,"NumNames=[B]\n",p+1);
 	    while (numnames--) {
-	      char flags[128]="";
 	      p = fdata(p,"Name=[n2]\t#",maxbuf);
-	      if (p[0] & 0x80) strcat(flags,"<GROUP> ");
-	      if ((p[0] & 0x60) == 0x00) strcat(flags,"B ");
-	      if ((p[0] & 0x60) == 0x20) strcat(flags,"P ");
-	      if ((p[0] & 0x60) == 0x40) strcat(flags,"M ");
-	      if ((p[0] & 0x60) == 0x60) strcat(flags,"_ ");
-	      if (p[0] & 0x10) strcat(flags,"<DEREGISTERING> ");
-	      if (p[0] & 0x08) strcat(flags,"<CONFLICT> ");
-	      if (p[0] & 0x04) strcat(flags,"<ACTIVE> ");
-	      if (p[0] & 0x02) strcat(flags,"<PERMANENT> ");
-	      printf("%s\n",flags);
+	      if (p[0] & 0x80) printf("<GROUP> ");
+	      switch (p[0] & 0x60) {
+	      case 0x00: printf("B "); break;
+	      case 0x20: printf("P "); break;
+	      case 0x40: printf("M "); break;
+	      case 0x60: printf("_ "); break;
+	      }
+	      if (p[0] & 0x10) printf("<DEREGISTERING> ");
+	      if (p[0] & 0x08) printf("<CONFLICT> ");
+	      if (p[0] & 0x04) printf("<ACTIVE> ");
+	      if (p[0] & 0x02) printf("<PERMANENT> ");
+	      printf("\n");
 	      p += 2;
 	    }
 	  } else {
