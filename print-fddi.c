@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-fddi.c,v 1.36 1999-10-07 23:47:11 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-fddi.c,v 1.37 1999-11-21 03:45:35 assar Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_FDDI
@@ -266,8 +266,8 @@ fddi_if_print(u_char *pcap, const struct pcap_pkthdr *h,
 	u_int caplen = h->caplen;
 	u_int length = h->len;
 	const struct fddi_header *fddip = (struct fddi_header *)p;
-	extern u_short extracted_ethertype;
 	struct ether_header ehdr;
+	u_short extracted_ethertype;
 
 	ts_print(&h->ts);
 
