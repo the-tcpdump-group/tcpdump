@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.7 2000-09-23 08:03:40 guy Exp $ (LBL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.8 2000-09-24 07:46:05 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -152,12 +152,12 @@ pppoe_print(register const u_char *bp, u_int length)
   
   if (pppoe_code) {
     /* PPP session packets don't contain tags */
-    u_short tag_type = -1, tag_len;
+    u_short tag_type = 0xffff, tag_len;
     const u_char *p = pppoe_payload;
 
     /* loop invariant: 
        p points to next tag, 
-       tag_type is previous tag or -1 for first iteration 
+       tag_type is previous tag or 0xffff for first iteration 
     */
     while (tag_type && 
 	   p+4 < pppoe_payload + length && 
