@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.92 2004-04-30 16:42:15 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.93 2004-06-12 16:32:56 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -71,6 +71,7 @@ const struct tok ethertype_values[] = {
     { ETHERTYPE_JUMBO,          "Jumbo" },
     { ETHERTYPE_LOOPBACK,       "Loopback" },
     { ETHERTYPE_ISO,            "OSI" },
+    { ETHERTYPE_GRE_ISO,        "GRE-OSI" },
     { 0, NULL}
 };
 

@@ -38,7 +38,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-gre.c,v 1.24 2003-11-16 09:36:21 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-gre.c,v 1.25 2004-06-12 16:32:56 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -55,6 +55,7 @@ static const char rcsid[] _U_ =
 #include "extract.h"
 
 #include "ip.h"
+#include "ethertype.h"
 
 #define	GRE_CP		0x8000		/* checksum present */
 #define	GRE_RP		0x4000		/* routing present */
@@ -63,11 +64,7 @@ static const char rcsid[] _U_ =
 #define	GRE_sP		0x0800		/* source routing */
 #define	GRE_RECRS	0x0700		/* recursion count */
 #define	GRE_AP		0x0080		/* acknowledgment# present */
-#define	GRE_VERS	0x0007		/* protocol version */
-
-#define	GREPROTO_IP	0x0800		/* IP */
-#define	GREPROTO_PPP	0x880b		/* PPTP */
-#define	GREPROTO_ISO	0x00fe		/* OSI */
+#define	GRE_VERS_MASK	0x0007		/* protocol version */
 
 /* source route entry types */
 #define	GRESRE_IP	0x0800		/* IP */
@@ -88,14 +85,20 @@ gre_print(const u_char *bp, u_int length)
 		printf("[|gre]");
 		return;
 	}
-	vers = EXTRACT_16BITS(bp) & 7;
+	vers = EXTRACT_16BITS(bp) & GRE_VERS_MASK;
+        printf("GREv%u",vers);
 
-	if (vers == 0)
-		gre_print_0(bp, len);
-	else if (vers == 1)
-		gre_print_1(bp, len);
-	else
-		printf("gre-unknown-version=%u", vers);
+        switch(vers) {
+        case 0:
+            gre_print_0(bp, len);
+            break;
+        case 1:
+            gre_print_1(bp, len);
+            break;
+	default:
+            printf(" ERROR: unknown-version");
+            break;
+        }
 	return;
 
 }
@@ -107,7 +110,7 @@ gre_print_0(const u_char *bp, u_int length)
 	u_int16_t flags, prot;
 
 	flags = EXTRACT_16BITS(bp);
-	if (vflag) {
+	if (vflag && flags) {
 		printf("[%s%s%s%s%s] ",
 		    (flags & GRE_CP) ? "C" : "",
 		    (flags & GRE_RP) ? "R" : "",
@@ -182,11 +185,29 @@ gre_print_0(const u_char *bp, u_int length)
 		}
 	}
 
+        if (eflag)
+            printf(", proto %s (0x%04x)",
+                   tok2str(ethertype_values,"unknown",prot),
+                   prot);
+        printf(": ");
+
 	switch (prot) {
-	case GREPROTO_IP:
+	case ETHERTYPE_IP:
 		ip_print(bp, len);
 		break;
-	case GREPROTO_ISO:
+	case ETHERTYPE_IPV6:
+		ip6_print(bp, len);
+		break;
+	case ETHERTYPE_MPLS:
+		mpls_print(bp, len);
+		break;
+	case ETHERTYPE_IPX:
+		ipx_print(bp, len);
+		break;
+	case ETHERTYPE_ATALK:
+		atalk_print(bp, len);
+		break;
+	case ETHERTYPE_GRE_ISO:
 		isoclns_print(bp, len, len);
 		break;
 	default:
@@ -274,7 +295,7 @@ gre_print_1(const u_char *bp, u_int length)
 	}
 
 	switch (prot) {
-	case GREPROTO_PPP:
+	case ETHERTYPE_PPP:
 		printf("gre-ppp-payload");
 		break;
 	default:
