@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.249 2004-10-19 15:59:40 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.250 2004-11-07 22:05:20 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -90,7 +90,8 @@ netdissect_options *gndo = &Gndo;
 #define MAX_CFLAG	1000000
 #define MAX_CFLAG_CHARS	6
 
-int Lflag;          /* list available data link types and exit */
+int dflag;			/* print filter code */
+int Lflag;			/* list available data link types and exit */
 
 static int infodelay;
 static int infoprint;
