@@ -5,6 +5,10 @@
    BSD-style license that accompanies tcpdump or the GNU GPL version 2
    or later */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <sys/param.h>
 #include <sys/time.h>
 #include <sys/types.h>
