@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.70 2000-07-30 05:56:11 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.71 2000-08-01 17:28:09 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -132,6 +132,99 @@ static struct tcp_seq_hash tcp_seq_hash[TSEQ_HASHSIZE];
 #define NETBIOS_SSN_PORT 139
 #ifndef NFS_PORT
 #define NFS_PORT	2049
+#endif
+
+static int tcp_cksum(register const struct ip *ip,
+		     register const struct tcphdr *tp,
+		     register int len)
+{
+	int i, tlen;
+	union phu {
+		struct phdr {
+			u_int32_t src;
+			u_int32_t dst;
+			u_char mbz;
+			u_char proto;
+			u_int16_t len;
+		} ph;
+		u_int16_t pa[6];
+	} phu;
+	register const u_int16_t *sp;
+	u_int32_t sum;
+	tlen = ntohs(ip->ip_len) - ((const char *)tp-(const char*)ip);
+
+	/* pseudo-header.. */
+	phu.ph.len = htons(tlen);
+	phu.ph.mbz = 0;
+	phu.ph.proto = ip->ip_p;
+	memcpy(&phu.ph.src, &ip->ip_src.s_addr, sizeof(u_int32_t));
+	memcpy(&phu.ph.dst, &ip->ip_dst.s_addr, sizeof(u_int32_t));
+
+	sp = &phu.pa[0];
+	sum = sp[0]+sp[1]+sp[2]+sp[3]+sp[4]+sp[5];
+
+	sp = (const u_int16_t *)tp;
+
+	for (i=0; i<(tlen&~1); i+= 2)
+		sum += *sp++;
+
+	if (tlen & 1) {
+		sum += htons( (*(const char *)sp) << 8);
+	}
+
+	while (sum > 0xffff)
+		sum = (sum & 0xffff) + (sum >> 16);
+	sum = ~sum & 0xffff;
+
+	return (sum);
+}
+
+#ifdef INET6
+static int tcp6_cksum(const struct ip6_hdr *ip6, const struct tcphdr *tp,
+	int len)
+{
+	int i, tlen;
+	register const u_int16_t *sp;
+	u_int32_t sum;
+	union {
+		struct {
+			struct in6_addr ph_src;
+			struct in6_addr ph_dst;
+			u_int32_t	ph_len;
+			u_int8_t	ph_zero[3];
+			u_int8_t	ph_nxt;
+		} ph;
+		u_int16_t pa[20];
+	} phu;
+
+	tlen = ntohs(ip6->ip6_plen) + sizeof(struct ip6_hdr) -
+	    ((const char *)tp - (const char*)ip6);
+
+	/* pseudo-header */
+	memset(&phu, 0, sizeof(phu));
+	phu.ph.ph_src = ip6->ip6_src;
+	phu.ph.ph_dst = ip6->ip6_dst;
+	phu.ph.ph_len = htonl(tlen);
+	phu.ph.ph_nxt = IPPROTO_TCP;
+
+	sum = 0;
+	for (i = 0; i < sizeof(phu.pa) / sizeof(phu.pa[0]); i++)
+		sum += phu.pa[i];
+
+	sp = (const u_int16_t *)tp;
+
+	for (i = 0; i < (tlen & ~1); i += 2)
+		sum += *sp++;
+
+	if (tlen & 1)
+		sum += htons((*(const char *)sp) << 8);
+
+	while (sum > 0xffff)
+		sum = (sum & 0xffff) + (sum >> 16);
+	sum = ~sum & 0xffff;
+
+	return (sum);
+}
 #endif
 
 void
@@ -350,6 +443,30 @@ tcp_print(register const u_char *bp, register u_int length,
 		(void)printf(" [bad hdr length]");
 		return;
 	}
+
+	if (ip->ip_v == 4 && vflag) {
+		int sum;
+		if (TTEST2(tp->th_sport, length)) {
+			sum = tcp_cksum(ip, tp, length);
+			if (sum != 0)
+				(void)printf(" [bad tcp cksum %x!]", sum);
+			else
+				(void)printf(" [tcp sum ok]");
+		}
+	}
+#ifdef INET6
+	if (ip->ip_v == 6 && ip6->ip6_plen && vflag) {
+		int sum;
+		if (TTEST2(tp->th_sport, length)) {
+			sum = tcp6_cksum(ip6, tp, length);
+			if (sum != 0)
+				(void)printf(" [bad tcp cksum %x!]", sum);
+			else
+				(void)printf(" [tcp sum ok]");
+		}
+	}
+#endif
+
 	length -= hlen;
 	if (vflag > 1 || length > 0 || flags & (TH_SYN | TH_FIN | TH_RST))
 		(void)printf(" %u:%u(%d)", seq, seq + length, length);
