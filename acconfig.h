@@ -1,3 +1,7 @@
+/* "generated automatically" means DO NOT MAKE CHANGES TO config.h.in --
+ * make them to acconfig.h and rerun autoheader */
+@TOP@
+
 /* Define if you have SSLeay XXX why isn't this HAVE_LIBCRYPTO? */
 #undef CRYPTO
 
@@ -7,6 +11,12 @@
 /* Define both to enable IPv6 support XXX why 2? ENABLE_IPV6 is not used. */
 #undef ENABLE_IPV6
 #undef INET6
+
+/* Define if you enable support for the libsmi. */
+#undef LIBSMI
+
+/* Define if you have the <smi.h> header file.  */
+#undef HAVE_SMI_H
 
 /* Is T_AAAA predefined? */
 #undef HAVE_AAAA

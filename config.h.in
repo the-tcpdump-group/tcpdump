@@ -1,7 +1,12 @@
 /* config.h.in.  Generated automatically from configure.in by autoheader.  */
+/* "generated automatically" means DO NOT MAKE CHANGES TO config.h.in --
+ * make them to acconfig.h and rerun autoheader */
 
 /* Define to empty if the keyword does not work.  */
 #undef const
+
+/* Define as __inline if that's what the C compiler calls it.  */
+#undef inline
 
 /* Define as the return type of signal handlers (int or void).  */
 #undef RETSIGTYPE
@@ -25,9 +30,6 @@
 
 /* Define if you enable support for the libsmi. */
 #undef LIBSMI
-
-/* Define if you have the <smi.h> header file.  */
-#undef HAVE_SMI_H
 
 /* Is T_AAAA predefined? */
 #undef HAVE_AAAA
@@ -124,8 +126,8 @@
 /* The number of bytes in a short.  */
 #undef SIZEOF_SHORT
 
-/* Define if you have the ether_ntoa function.  */
-#undef HAVE_ETHER_NTOA
+/* Define if you have the ether_ntohost function.  */
+#undef HAVE_ETHER_NTOHOST
 
 /* Define if you have the getaddrinfo function.  */
 #undef HAVE_GETADDRINFO
@@ -187,6 +189,9 @@
 /* Define if you have the <rpc/rpcent.h> header file.  */
 #undef HAVE_RPC_RPCENT_H
 
+/* Define if you have the <smi.h> header file.  */
+#undef HAVE_SMI_H
+
 /* Define if you have the <zlib.h> header file.  */
 #undef HAVE_ZLIB_H
 
@@ -201,6 +206,9 @@
 
 /* Define if you have the rpc library (-lrpc).  */
 #undef HAVE_LIBRPC
+
+/* Define if you have the smi library (-lsmi).  */
+#undef HAVE_LIBSMI
 
 /* Define if you have the socket library (-lsocket).  */
 #undef HAVE_LIBSOCKET
