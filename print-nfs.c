@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.104 2004-12-27 00:41:31 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.105 2005-01-05 03:55:05 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -55,7 +55,6 @@ static int32_t xid_map_find(const struct sunrpc_msg *, const u_char *,
 static void interp_reply(const struct sunrpc_msg *, u_int32_t, u_int32_t, int);
 static const u_int32_t *parse_post_op_attr(const u_int32_t *, int);
 static void print_sattr3(const struct nfsv3_sattr *sa3, int verbose);
-static int print_int64(const u_int32_t *dp, int how);
 static void print_nfsaddr(const u_char *, const char *, const char *);
 
 /*
@@ -156,40 +155,6 @@ static struct tok type2str[] = {
 	{ NFFIFO,	"FIFO" },
 	{ 0,		NULL }
 };
-
-/*
- * Print out a 64-bit integer. This appears to be different on each system,
- * try to make the best of it. The integer stored as 2 consecutive XDR
- * encoded 32-bit integers, to which a pointer is passed.
- *
- * We assume that PRId64, PRIu64, and PRIx64 are defined, and that
- * u_int64_t is defined.
- */
-
-#define UNSIGNED 0
-#define SIGNED   1
-#define HEX      2
-
-static int print_int64(const u_int32_t *dp, int how)
-{
-	u_int64_t res;
-
-	res = EXTRACT_64BITS((u_int8_t *)dp);
-	switch (how) {
-	case SIGNED:
-		printf("%" PRId64, res);
-		break;
-	case UNSIGNED:
-		printf("%" PRIu64, res);
-		break;
-	case HEX:
-		printf("%" PRIx64, res);
-		break;
-	default:
-		return (0);
-	}
-	return (1);
-}
 
 static void
 print_nfsaddr(const u_char *bp, const char *s, const char *d)
@@ -534,9 +499,9 @@ nfsreq_print(register const u_char *bp, u_int length,
 		    (dp = parsefh(dp, v3)) != NULL) {
 			if (v3) {
 				TCHECK(dp[2]);
-				printf(" %u bytes @ ",
-				       EXTRACT_32BITS(&dp[2]));
-				print_int64(dp, UNSIGNED);
+				printf(" %u bytes @ %" PRIu64,
+				       EXTRACT_32BITS(&dp[2]),
+				       EXTRACT_64BITS(&dp[0]));
 			} else {
 				TCHECK(dp[1]);
 				printf(" %u bytes @ %u",
@@ -552,10 +517,10 @@ nfsreq_print(register const u_char *bp, u_int length,
 		if ((dp = parsereq(rp, length)) != NULL &&
 		    (dp = parsefh(dp, v3)) != NULL) {
 			if (v3) {
-				TCHECK(dp[4]);
-				printf(" %u bytes @ ",
-						EXTRACT_32BITS(&dp[4]));
-				print_int64(dp, UNSIGNED);
+				TCHECK(dp[3]);
+				printf(" %u bytes @ %" PRIu64,
+						EXTRACT_32BITS(&dp[3]),
+						EXTRACT_64BITS(&dp[0]));
 				if (vflag) {
 					dp += 3;
 					TCHECK(dp[0]);
@@ -670,9 +635,9 @@ nfsreq_print(register const u_char *bp, u_int length,
 				 * We shouldn't really try to interpret the
 				 * offset cookie here.
 				 */
-				printf(" %u bytes @ ",
-				    EXTRACT_32BITS(&dp[4]));
-				print_int64(dp, SIGNED);
+				printf(" %u bytes @ %" PRId64,
+				    EXTRACT_32BITS(&dp[4]),
+				    EXTRACT_64BITS(&dp[0]));
 				if (vflag)
 					printf(" verf %08x%08x", dp[2],
 					       dp[3]);
@@ -699,11 +664,14 @@ nfsreq_print(register const u_char *bp, u_int length,
 			 * We don't try to interpret the offset
 			 * cookie here.
 			 */
-			printf(" %u bytes @ ", EXTRACT_32BITS(&dp[4]));
-			print_int64(dp, SIGNED);
-			if (vflag)
+			printf(" %u bytes @ %" PRId64,
+				EXTRACT_32BITS(&dp[4]),
+				EXTRACT_64BITS(&dp[0]));
+			if (vflag) {
+				TCHECK(dp[5]);
 				printf(" max %u verf %08x%08x",
 				       EXTRACT_32BITS(&dp[5]), dp[2], dp[3]);
+			}
 			return;
 		}
 		break;
@@ -733,8 +701,10 @@ nfsreq_print(register const u_char *bp, u_int length,
 		printf(" commit");
 		if ((dp = parsereq(rp, length)) != NULL &&
 		    (dp = parsefh(dp, v3)) != NULL) {
-			printf(" %u bytes @ ", EXTRACT_32BITS(&dp[2]));
-			print_int64(dp, UNSIGNED);
+			TCHECK(dp[2]);
+			printf(" %u bytes @ %" PRIu64,
+				EXTRACT_32BITS(&dp[2]),
+				EXTRACT_64BITS(&dp[0]));
 			return;
 		}
 		break;
@@ -1070,8 +1040,8 @@ parsefattr(const u_int32_t *dp, int verbose, int v3)
 		    EXTRACT_32BITS(&fap->fa_gid));
 		if (v3) {
 			TCHECK(fap->fa3_size);
-			printf(" sz ");
-			print_int64((u_int32_t *)&fap->fa3_size, UNSIGNED);
+			printf(" sz %" PRIu64,
+				EXTRACT_64BITS((u_int32_t *)&fap->fa3_size));
 		} else {
 			TCHECK(fap->fa2_size);
 			printf(" sz %d", EXTRACT_32BITS(&fap->fa2_size));
@@ -1085,10 +1055,10 @@ parsefattr(const u_int32_t *dp, int verbose, int v3)
 			       EXTRACT_32BITS(&fap->fa_nlink),
 			       EXTRACT_32BITS(&fap->fa3_rdev.specdata1),
 			       EXTRACT_32BITS(&fap->fa3_rdev.specdata2));
-			printf(" fsid ");
-			print_int64((u_int32_t *)&fap->fa3_fsid, HEX);
-			printf(" fileid ");
-			print_int64((u_int32_t *)&fap->fa3_fileid, HEX);
+			printf(" fsid %" PRIx64,
+				EXTRACT_64BITS((u_int32_t *)&fap->fa3_fsid));
+			printf(" fileid %" PRIx64,
+				EXTRACT_64BITS((u_int32_t *)&fap->fa3_fileid));
 			printf(" a/m/ctime %u.%06u",
 			       EXTRACT_32BITS(&fap->fa3_atime.nfsv3_sec),
 			       EXTRACT_32BITS(&fap->fa3_atime.nfsv3_nsec));
@@ -1196,20 +1166,15 @@ parsestatfs(const u_int32_t *dp, int v3)
 	sfsp = (const struct nfs_statfs *)dp;
 
 	if (v3) {
-		printf(" tbytes ");
-		print_int64((u_int32_t *)&sfsp->sf_tbytes, UNSIGNED);
-		printf(" fbytes ");
-		print_int64((u_int32_t *)&sfsp->sf_fbytes, UNSIGNED);
-		printf(" abytes ");
-		print_int64((u_int32_t *)&sfsp->sf_abytes, UNSIGNED);
+		printf(" tbytes %" PRIu64 " fbytes %" PRIu64 " abytes %" PRIu64,
+			EXTRACT_64BITS((u_int32_t *)&sfsp->sf_tbytes),
+			EXTRACT_64BITS((u_int32_t *)&sfsp->sf_fbytes),
+			EXTRACT_64BITS((u_int32_t *)&sfsp->sf_abytes));
 		if (vflag) {
-			printf(" tfiles ");
-			print_int64((u_int32_t *)&sfsp->sf_tfiles, UNSIGNED);
-			printf(" ffiles ");
-			print_int64((u_int32_t *)&sfsp->sf_ffiles, UNSIGNED);
-			printf(" afiles ");
-			print_int64((u_int32_t *)&sfsp->sf_afiles, UNSIGNED);
-			printf(" invar %u",
+			printf(" tfiles %" PRIu64 " ffiles %" PRIu64 " afiles %" PRIu64 " invar %u",
+			       EXTRACT_64BITS((u_int32_t *)&sfsp->sf_tfiles),
+			       EXTRACT_64BITS((u_int32_t *)&sfsp->sf_ffiles),
+			       EXTRACT_64BITS((u_int32_t *)&sfsp->sf_afiles),
 			       EXTRACT_32BITS(&sfsp->sf_invarsec));
 		}
 	} else {
@@ -1253,8 +1218,7 @@ trunc:
 static const u_int32_t *
 parse_wcc_attr(const u_int32_t *dp)
 {
-	printf(" sz ");
-	print_int64(dp, UNSIGNED);
+	printf(" sz %" PRIu64, EXTRACT_64BITS(&dp[0]));
 	printf(" mtime %u.%06u ctime %u.%06u",
 	       EXTRACT_32BITS(&dp[2]), EXTRACT_32BITS(&dp[3]),
 	       EXTRACT_32BITS(&dp[4]), EXTRACT_32BITS(&dp[5]));
@@ -1400,10 +1364,10 @@ parsefsinfo(const u_int32_t *dp)
 	       EXTRACT_32BITS(&sfp->fs_wtpref),
 	       EXTRACT_32BITS(&sfp->fs_dtpref));
 	if (vflag) {
-		printf(" rtmult %u wtmult %u maxfsz ",
+		printf(" rtmult %u wtmult %u maxfsz %" PRIu64,
 		       EXTRACT_32BITS(&sfp->fs_rtmult),
-		       EXTRACT_32BITS(&sfp->fs_wtmult));
-		print_int64((u_int32_t *)&sfp->fs_maxfilesize, UNSIGNED);
+		       EXTRACT_32BITS(&sfp->fs_wtmult),
+		       EXTRACT_64BITS((u_int32_t *)&sfp->fs_maxfilesize));
 		printf(" delta %u.%06u ",
 		       EXTRACT_32BITS(&sfp->fs_timedelta.nfsv3_sec),
 		       EXTRACT_32BITS(&sfp->fs_timedelta.nfsv3_nsec));
