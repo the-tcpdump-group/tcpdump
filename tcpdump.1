@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.81 2000-07-13 06:36:58 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.82 2000-07-25 06:09:32 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -128,22 +128,24 @@ Print the link-level header on each dump line.
 .TP
 .B \-E
 Use \fIalgo:secret\fP for decrypting IPsec ESP packets. Algorithms may be 
-\fIdes-cbc\fP, 
-\fI3des-cbc\fP, 
-\fIblowfish-cbc\fP, 
-\fIrc3-cbc\fP, 
-\fIcast128-cbc\fP, or 
-\fInone\fP.
-The default is \fIdes-cbc\fP.
-The ability to decrypt packets is only present if tcpdump was compiled
+\fBdes-cbc\fP, 
+\fB3des-cbc\fP, 
+\fBblowfish-cbc\fP, 
+\fBrc3-cbc\fP, 
+\fBcast128-cbc\fP, or 
+\fBnone\fP.
+The default is \fBdes-cbc\fP.
+The ability to decrypt packets is only present if \fItcpdump\fP was compiled
 with cryptography enabled.
 \fIsecret\fP the ascii text for ESP secret key.
 We cannot take arbitrary binary value at this moment.
 The option assumes RFC2406 ESP, not RFC1827 ESP.
 The option is only for debugging purposes, and
-the use of this option with truely `secret' key is discouraged.
+the use of this option with truly `secret' key is discouraged.
 By presenting IPsec secret key onto command line
-you make it visible to others, via ps(1) and other occasions.
+you make it visible to others, via
+.IR ps (1)
+and other occasions.
 .TP
 .B \-f
 Print `foreign' internet addresses numerically rather than symbolically
@@ -178,7 +180,7 @@ instead of ``nic.ddn.mil''.
 .TP
 .B \-m
 Load SMI MIB module definitions from file \fImodule\fR. This option 
-can be used several times to load several MIB modules into tcpdump.
+can be used several times to load several MIB modules into \fItcpdump\fP.
 .TP
 .B \-O
 Do not run the packet-matching code optimizer.  This is useful only
@@ -322,6 +324,7 @@ qualifiers restrict the match to a particular protocol.  Possible
 protos are:
 .BR ether ,
 .BR fddi ,
+.BR tr ,
 .BR ip ,
 .BR ip6 ,
 .BR arp ,
@@ -348,7 +351,10 @@ network interface.''  FDDI headers contain Ethernet-like source
 and destination addresses, and often contain Ethernet-like packet
 types, so you can filter on these FDDI fields just as with the
 analogous Ethernet fields.  FDDI headers also contain other fields,
-but you cannot name them explicitly in a filter expression.]
+but you cannot name them explicitly in a filter expression.
+.LP
+Similarly, `tr' is an alias for `ether'; the previous paragraph's
+statements about FDDI headers also apply to Token Ring headers.]
 .LP
 In addition to the above, there are some special `primitive' keywords
 that don't follow the pattern:
@@ -527,7 +533,7 @@ protocol identification comes from the 802.2 Logical Link Control
 (LLC) header, which is usually layered on top of the FDDI header.
 \fITcpdump\fP assumes, when filtering on the protocol identifier,
 that all FDDI packets include an LLC header, and that the LLC header
-is in so-called SNAP format.]
+is in so-called SNAP format.  The same applies to Token Ring.]
 .IP "\fBdecnet src \fIhost\fR"
 True if the DECNET source address is
 .IR host ,
@@ -578,7 +584,7 @@ data inside the packet, use the following syntax:
 \fIproto\fB [ \fIexpr\fB : \fIsize\fB ]\fR
 .fi
 .in -.5i
-\fIProto\fR is one of \fBether, fddi,
+\fIProto\fR is one of \fBether, fddi, tr,
 ip, arp, rarp, tcp, udp, icmp\fR or \fBip6\fR, and
 indicates the protocol layer for the index operation.
 Note that \fItcp, udp\fR and other upper-layer protocol types only
@@ -638,8 +644,8 @@ which should not be confused with
 .fi
 .in -.5i
 .LP
-Expression arguments can be passed to tcpdump as either a single argument
-or as multiple arguments, whichever is more convenient.
+Expression arguments can be passed to \fItcpdump\fP as either a single
+argument or as multiple arguments, whichever is more convenient.
 Generally, if the expression contains Shell metacharacters, it is
 easier to pass it as a single, quoted argument.
 Multiple arguments are concatenated with spaces before being parsed.
@@ -754,6 +760,13 @@ are assumed to contain an 802.2 Logical Link Control (LLC) packet;
 the LLC header is printed if it is \fInot\fR an ISO datagram or a
 so-called SNAP packet.
 .LP
+On Token Ring networks, the '-e' option causes \fItcpdump\fP to print
+the `access control' and `frame control' fields, the source and
+destination addresses, and the packet length.  As on FDDI networks,
+packets are assumed to contain an LLC packet.  Regardless of whether
+the '-e' option is specified or not, the source routing information is
+printed for source-routed packets.
+.LP
 \fI(N.B.: The following description assumes familiarity with
 the SLIP compression algorithm described in RFC-1144.)\fP
 .LP
@@ -831,7 +844,7 @@ TCP Packets
 .LP
 \fI(N.B.:The following description assumes familiarity with
 the TCP protocol described in RFC-793.  If you are not familiar
-with the protocol, neither this description nor tcpdump will
+with the protocol, neither this description nor \fItcpdump\fP will
 be of much use to you.)\fP
 .LP
 The general format of a tcp protocol line is:
@@ -891,7 +904,7 @@ ack for rtsg's SYN.  Rtsg then acks csam's SYN.  The `.' means no
 flags were set.
 The packet contained no data so there is no data sequence number.
 Note that the ack sequence
-number is a small integer (1).  The first time \fBtcpdump\fP sees a
+number is a small integer (1).  The first time \fItcpdump\fP sees a
 tcp `conversation', it prints the sequence number from the packet.
 On subsequent packets of the conversation, the difference between
 the current packet's sequence number and this initial sequence number
@@ -911,15 +924,16 @@ Csam also sends one byte of data to rtsg in this packet.
 On the 8th and 9th lines,
 csam sends two bytes of urgent, pushed data to rtsg.
 .LP
-If the snapshot was small enough that \fBtcpdump\fP didn't capture
+If the snapshot was small enough that \fItcpdump\fP didn't capture
 the full TCP header, it interprets as much of the header as it can
 and then reports ``[|\fItcp\fP]'' to indicate the remainder could not
 be interpreted.  If the header contains a bogus option (one with a length
-that's either too small or beyond the end of the header), tcpdump reports
-it as ``[\fIbad opt\fP]'' and does not interpret any further options (since
-it's impossible to tell where they start).  If the header length indicates
-options are present but the IP datagram length is not long enough for the
-options to actually be there, tcpdump reports it as ``[\fIbad hdr length\fP]''.
+that's either too small or beyond the end of the header), \fItcpdump\fP
+reports it as ``[\fIbad opt\fP]'' and does not interpret any further
+options (since it's impossible to tell where they start).  If the header
+length indicates options are present but the IP datagram length is not
+long enough for the options to actually be there, \fItcpdump\fP reports
+it as ``[\fIbad hdr length\fP]''.
 .HD
 .B Capturing TCP packets with particular flag combinations (SYN-ACK, URG-ACK, etc.)
 .PP
@@ -945,7 +959,7 @@ regard to the TCP control bits is
 Now we're interested in capturing packets that have only the
 SYN bit set (Step 1). Note that we don't want packets from step 2
 (SYN-ACK), just a plain initial SYN. What we need is a correct filter
-expression for tcpdump.
+expression for \fItcpdump\fP.
 .PP
 Recall the structure of a TCP header without options:
 .PP
@@ -1033,7 +1047,7 @@ This relationship can be expressed as
 tcp[13] == 2
 .RE
 .PP
-We can use this expression as the filter for tcpdump in order
+We can use this expression as the filter for \fItcpdump\fP in order
 to watch packets which have only SYN set:
 .RS
 .B
@@ -1068,9 +1082,9 @@ which translates to decimal
 0*2 + 0*2 + 0*2 + 1*2 + 0*2 + 0*2 + 1*2 + 0*2   = 18
 .fi
 .PP
-Now we can't just use 'tcp[13] == 18' in the tcpdump filter expression,
-because that would select only those packets that have SYN-ACK set,
-but not those with only SYN set. Remember that we don't care
+Now we can't just use 'tcp[13] == 18' in the \fItcpdump\fP filter
+expression, because that would select only those packets that have
+SYN-ACK set, but not those with only SYN set. Remember that we don't care
 if ACK or any other control bit is set as long as SYN is set.
 .PP
 In order to achieve our goal, we need to logically AND the
@@ -1096,7 +1110,7 @@ relation must hold true:
 .IP
 ( ( value of octet 13 ) AND ( 2 ) ) == ( 2 )
 .PP
-This points us to the tcpdump filter expression
+This points us to the \fItcpdump\fP filter expression
 .RS
 .B
      tcpdump -i xl0 'tcp[13] & 2 == 2'
@@ -1207,7 +1221,7 @@ has worked well for me.
 .HD
 SMB/CIFS decoding
 .LP
-tcpdump now includes fairly extensive SMB/CIFS/NBT decoding for data
+\fItcpdump\fP now includes fairly extensive SMB/CIFS/NBT decoding for data
 on UDP/137, UDP/138 and TCP/139. Some primitive decoding of IPX and
 NetBEUI SMB data is also done. 
 
@@ -1582,10 +1596,10 @@ We recommend that you use the latter.
 Some attempt should be made to reassemble IP fragments or, at least
 to compute the right length for the higher level protocol.
 .LP
-Name server inverse queries are not dumped correctly: The (empty)
+Name server inverse queries are not dumped correctly: the (empty)
 question section is printed rather than real query in the answer
 section.  Some believe that inverse queries are themselves a bug and
-prefer to fix the program generating them rather than tcpdump.
+prefer to fix the program generating them rather than \fItcpdump\fP.
 .LP
 Apple Ethertalk DDP packets could be dumped as easily as KIP DDP
 packets but aren't.
@@ -1596,11 +1610,14 @@ networks so we'd would have no way of testing this code.
 A packet trace that crosses a daylight savings time change will give
 skewed time stamps (the time change is ignored).
 .LP
-Filters expressions that manipulate FDDI headers assume that all FDDI
-packets are encapsulated Ethernet packets.  This is true for IP, ARP,
-and DECNET Phase IV, but is not true for protocols such as ISO CLNS.
-Therefore, the filter may inadvertently accept certain packets that
-do not properly match the filter expression.
+Filter expressions that manipulate FDDI or Token Ring headers assume
+that all FDDI and Token Ring packets are SNAP-encapsulated Ethernet
+packets.  This is true for IP, ARP, and DECNET Phase IV, but is not true
+for protocols such as ISO CLNS.  Therefore, the filter may inadvertently
+accept certain packets that do not properly match the filter expression.
+.LP
+Filter expressions on fields other than those that manipulate Token Ring
+headers will not correctly handle source-routed Token Ring packets.
 .LP
 .BR "ip6 proto"
 should chase header chain, but at this moment it does not.
