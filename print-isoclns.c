@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.47 2002-05-16 10:19:23 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.48 2002-05-25 15:11:37 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -658,24 +658,26 @@ esis_print(const u_char *p, u_int length)
 		}
 }
 
-/*
- * print_nsap
- * Print out an NSAP. 
- */
-static int
+/* allocate space for the following string
+ * xx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx
+ * 32 bytes plus one termination byte */
+char nsap[33];
+char *
 print_nsap(register const u_char *cp, register int length)
 {
 	int i;
+        char *pos = nsap;
 
 	for (i = 0; i < length; i++) {
 		if (!TTEST2(*cp, 1))
 			return (0);
-		printf("%02x", *cp++);
+		pos+=sprintf(pos, "%02x", *cp++);
 		if (((i & 1) == 0) && (i + 1 < length)) {
-			printf(".");
+			pos+=sprintf(pos, ".");
 		}
 	}
-	return (1);
+        *(pos) = '\0';
+	return (nsap);
 }
 
 char *isis_print_sysid (const u_char *);
@@ -1383,9 +1385,9 @@ static int isis_print (const u_char *p, u_int length)
 		goto trunctlv;
 	    alen = *tptr++;
 	    while (tmp && alen < tmp) {
-		printf("\n\t\t\tArea address (%u): ",alen);
-		if (!print_nsap(tptr, alen))
-		    return (1);
+		printf("\n\t\t\tArea address (%u): %s",
+                       alen,
+                       print_nsap(tptr, alen));
 		tptr += alen;
 		tmp -= alen + 1;
 		if (tmp==0) /* if this is the last area address do not attemt a boundary check */
