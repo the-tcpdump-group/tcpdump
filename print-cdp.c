@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.9 2001-07-04 20:56:39 fenner Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.10 2001-08-25 09:46:33 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -142,13 +142,29 @@ trunc:
 	printf("[|cdp]");
 }
 
+/*
+ * Protocol type values.
+ *
+ * PT_NLPID means that the protocol type field contains an OSI NLPID.
+ *
+ * PT_IEEE_802_2 means that the protocol type field contains an IEEE 802.2
+ * LLC header that specifies that the payload is for that protocol.
+ */
+#define PT_NLPID		1	/* OSI NLPID */
+#define PT_IEEE_802_2		2	/* IEEE 802.2 LLC header */
+
 static int
 cdp_print_addr(const u_char * p, int l)
 {
-	int pl, al, num;
+	int pt, pl, al, num;
 	const u_char *endp = p + l;
+#ifdef INET6
+	static u_char prot_ipv6[] = {
+		0xaa, 0xaa, 0x03, 0x00, 0x00, 0x00, 0x86, 0xdd
+	};
+#endif
 
-	num = (p[0] << 24) + (p[1] << 16) + (p[2] << 8) + p[3];
+	num = EXTRACT_32BITS(p);
 	p += 4;
 
 	printf(" (%d): ", num);
@@ -156,20 +172,48 @@ cdp_print_addr(const u_char * p, int l)
 	while (p < endp && num >= 0) {
 		if (p + 2 > endp)
 			goto trunc;
-		pl = p[1];
+		pt = p[0];		/* type of "protocol" field */
+		pl = p[1];		/* length of "protocol" field */
 		p += 2;
 
-		/* special case: IPv4, protocol type=0xcc, addr. length=4 */
-		if (p + 3 > endp)
+		if (p + pl + 2 > endp)
 			goto trunc;
-		if (pl == 1 && *p == 0xcc && p[1] == 0 && p[2] == 4) {
+		al = EXTRACT_16BITS(&p[pl]);	/* address length */
+
+		if (pt == PT_NLPID && pl == 1 && *p == 0xcc && al == 4) {
+			/*
+			 * IPv4: protocol type = NLPID, protocol length = 1
+			 * (1-byte NLPID), protocol = 0xcc (NLPID for IPv4),
+			 * address length = 4
+			 */
 			p += 3;
 
 			if (p + 4 > endp)
 				goto trunc;
 			printf("IPv4 %u.%u.%u.%u", p[0], p[1], p[2], p[3]);
 			p += 4;
-		} else {	/* generic case: just print raw data */
+		}
+#ifdef INET6
+		else if (pt == PT_IEEE_802_2 && pl == 8 &&
+		    memcmp(p, prot_ipv6, 8) == 0 && al == 16) {
+			/*
+			 * IPv6: protocol type = IEEE 802.2 header,
+			 * protocol length = 8 (size of LLC+SNAP header),
+			 * protocol = LLC+SNAP header with the IPv6
+			 * Ethertype, address length = 16
+			 */
+			p += 10; 
+			if (p + al > endp)
+				goto trunc;
+
+			printf("IPv6 %s", ip6addr_string(p));
+			p += al;
+		}
+#endif
+		else {
+			/*
+			 * Generic case: just print raw data
+			 */
 			if (p + pl > endp)
 				goto trunc;
 			printf("pt=0x%02x, pl=%d, pb=", *(p - 2), pl);
