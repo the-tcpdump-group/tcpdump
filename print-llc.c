@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.50 2002-09-05 21:25:44 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.51 2002-11-13 16:08:39 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -98,6 +98,11 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 
 	if (llc.ssap == LLCSAP_8021D && llc.dsap == LLCSAP_8021D) {
 		stp_print(p, length);
+		return (1);
+	}
+
+	if (llc.ssap == LLCSAP_IP && llc.dsap == LLCSAP_IP) {
+		ip_print(p+4, length-4);
 		return (1);
 	}
 
