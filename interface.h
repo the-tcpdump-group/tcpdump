@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.155 2001-03-09 05:38:20 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.156 2001-04-12 09:05:07 guy Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -147,8 +147,6 @@ extern const u_char *snapend;
 /* Bail if "var" was not captured */
 #define TCHECK(var) TCHECK2(var, sizeof(var))
 
-struct timeval;
-
 extern void ts_print(const struct timeval *);
 extern void relts_print(int);
 
@@ -177,7 +175,7 @@ extern char *dnnum_string(u_short);
 
 /* The printer routines. */
 
-struct pcap_pkthdr;
+#include <pcap.h>
 
 extern void ascii_print_with_offset(const u_char *, u_int, u_int);    
 extern void ascii_print(const u_char *, u_int);    
