@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.66 2003-06-03 22:15:58 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.67 2003-06-03 23:23:50 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -1587,6 +1587,11 @@ bgp_print(const u_char *dat, int length)
 			printf(" [|BGP]");
 
 		hlen = ntohs(bgp.bgp_len);
+		if (hlen < BGP_SIZE) {
+			printf("\n[|BGP Bogus header length %u < %u]", hlen,
+			    BGP_SIZE);
+			break;
+		}
 
 		if (TTEST2(p[0], hlen)) {
 			bgp_header_print(p, hlen);
@@ -1603,14 +1608,3 @@ bgp_print(const u_char *dat, int length)
 trunc:
 	printf(" [|BGP]");
 }
-
-
-
-
-
-
-
-
-
-
-
