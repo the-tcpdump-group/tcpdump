@@ -195,9 +195,6 @@
 /* Define if you have the <net/slip.h> header file.  */
 #undef HAVE_NET_SLIP_H
 
-/* Define if you have the <netinet6/ipcomp.h> header file.  */
-#undef HAVE_NETINET6_IPCOMP_H
-
 /* Define if you have the <rc5.h> header file.  */
 #undef HAVE_RC5_H
 
