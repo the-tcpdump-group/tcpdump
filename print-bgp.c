@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.89 2005-03-22 19:30:59 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.90 2005-03-23 09:22:58 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -1139,6 +1139,9 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                                 /* rfc986 mapped IPv4 address ? */
                                 if (EXTRACT_32BITS(tptr+BGP_VPN_RD_LEN) ==  0x47000601)
                                     printf(" = %s", getname(tptr+BGP_VPN_RD_LEN+4));
+                                /* rfc1888 mapped IPv6 address ? */
+                                else if (EXTRACT_24BITS(tptr+BGP_VPN_RD_LEN) ==  0x350000)
+                                    printf(" = %s", getname6(tptr+BGP_VPN_RD_LEN+3));
                                 tptr += tlen;
                                 tlen = 0;
                             }
