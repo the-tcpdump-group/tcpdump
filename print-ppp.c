@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.76 2002-10-10 17:50:22 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.77 2002-11-03 23:04:07 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -986,8 +986,8 @@ handle_ppp(u_int proto, const u_char *p, int length)
 		mpls_print(p, length);
 		break;
 	default:
-                if (!vflag)
-                    printf("unknown PPP protocol (0x%04x)", proto);
+                printf("unknown PPP protocol (0x%04x)", proto);
+                print_unknown_data(p,"\n\t",length);
                 break;
 	}
 }
