@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.82 2001-01-28 08:06:07 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.83 2001-01-28 08:09:23 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -425,7 +425,6 @@ tcp_print(register const u_char *bp, register u_int length,
 				th->ack = seq, th->seq = ack - 1;
 			else
 				th->seq = seq, th->ack = ack - 1;
-
 		} else {
 			if (rev)
 				seq -= th->ack, ack -= th->seq;
