@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.78 2004-06-15 07:34:22 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.79 2004-06-15 07:43:03 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -531,23 +531,23 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
 	}
 
         if (vflag >= 1 && plen > ICMP_EXTD_MINLEN && ICMP_MPLS_EXT_TYPE(dp->icmp_type)) {
+
+            printf("\n\tMPLS extension v%u",ICMP_MPLS_EXT_EXTRACT_VERSION(*(dp->icmp_mpls_ext_version)));
             
             /*
              * Sanity checking of the header.
              */
             if (ICMP_MPLS_EXT_EXTRACT_VERSION(*(dp->icmp_mpls_ext_version)) != ICMP_MPLS_EXT_VERSION) {
-                printf("\n\tMPLS extension v%u packet not supported",
-                       ICMP_MPLS_EXT_EXTRACT_VERSION(*(dp->icmp_mpls_ext_version)));
+                printf(" packet not supported");
                 return;
             }
 
             hlen = plen - ICMP_EXTD_MINLEN;
-            printf("\n\tMPLS extension v%u, checksum 0x%04x (unverified), length %u", /* FIXME */
-                   ICMP_MPLS_EXT_EXTRACT_VERSION(*(dp->icmp_mpls_ext_version)),
+            printf(", checksum 0x%04x (unverified), length %u", /* FIXME */
                    EXTRACT_16BITS(dp->icmp_mpls_ext_checksum),
                    hlen);
-            hlen -= 4; /* subtract common header size */
 
+            hlen -= 4; /* subtract common header size */
             obj_tptr = (u_int8_t *)dp->icmp_mpls_ext_data;
 
             while (hlen > sizeof(struct icmp_mpls_ext_object_header_t)) {
