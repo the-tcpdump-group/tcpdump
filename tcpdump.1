@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.95 2001-01-14 21:04:45 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.96 2001-01-15 00:36:51 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -554,9 +554,9 @@ the Appletalk etype in an Ethernet frame and for a SNAP-format packet as
 it does for FDDI and Token Ring, \fIaarp\fP, where it checks for the
 Appletalk ARP etype in either an Ethernet frame or an 802.2 SNAP frame
 with an OUI of 0x000000, and \fIipx\fP, where it checks for the IPX
-etype in an Ethernet frame, the IPX DSAP in the LLC header, and the old
-802.3 with no LLC header encapsulation of IPX, but not for the IPX etype
-in a SNAP frame.]
+etype in an Ethernet frame, the IPX DSAP in the LLC header, the
+802.3 with no LLC header encapsulation of IPX, and the IPX etype in
+a SNAP frame.]
 .IP "\fBdecnet src \fIhost\fR"
 True if the DECNET source address is
 .IR host ,
