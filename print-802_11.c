@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.11 2002-09-05 21:25:36 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.12 2002-12-11 04:56:44 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -233,7 +233,7 @@ static int handle_beacon(u_int16_t fc, const u_char *p)
 	fn_print(pbody.ssid.ssid, NULL);
 	printf(")");
 	PRINT_RATES(pbody);
-	printf(" %s CH: %u %s",
+	printf(" %s CH: %u%s",
 	    CAPABILITY_ESS(pbody.capability_info) ? "ESS" : "IBSS",
 	    pbody.ds.channel,
 	    CAPABILITY_PRIVACY(pbody.capability_info) ? ", PRIVACY" : "" );
