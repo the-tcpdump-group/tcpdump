@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.49 2004-01-08 22:08:40 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.50 2004-01-27 13:33:24 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -126,6 +126,7 @@ static struct tok lsa_opaque_te_link_tlv_subtlv_values[] = {
 	{ LS_OPAQUE_TE_LINK_SUBTLV_LINK_PROTECTION_TYPE, "Link Protection Type" },
 	{ LS_OPAQUE_TE_LINK_SUBTLV_INTF_SW_CAP_DESCR,    "Interface Switching Capability" },
 	{ LS_OPAQUE_TE_LINK_SUBTLV_SHARED_RISK_GROUP,    "Shared Risk Link Group" },
+	{ LS_OPAQUE_TE_LINK_SUBTLV_DIFFSERV_TE,          "Diffserv TE" },
 	{ 0,			NULL }
 };
 
@@ -231,7 +232,7 @@ ospf_print_lsa(register const struct lsa *lsap)
 	register const struct aslametric *almp;
 	register const struct mcla *mcp;
 	register const u_int32_t *lp;
-	register int j, k, tlv_type, tlv_length, subtlv_type, subtlv_length, priority_level;
+	register int j, k, tlv_type, tlv_length, subtlv_type, subtlv_length, priority_level, bandwidth_constraint;
 	register int ls_length;
 	const u_int8_t *tptr;
 	int count_srlg;
@@ -563,6 +564,15 @@ ospf_print_lsa(register const struct lsa *lsap)
                                     bw.i = EXTRACT_32BITS(tptr+priority_level*4);
                                     printf("\n\t\tpriority level %d: %.3f Mbps",
                                            priority_level,
+                                           bw.f*8/1000000 );
+                                }
+                                break;
+                            case LS_OPAQUE_TE_LINK_SUBTLV_DIFFSERV_TE:
+                                printf("\n\t\tBandwidth Constraints Model ID: (%u)", *tptr);
+                                for (bandwidth_constraint = 0; bandwidth_constraint < 8; bandwidth_constraint++) {
+                                    bw.i = EXTRACT_32BITS(tptr+4+bandwidth_constraint*4);
+                                    printf("\n\t\t  Bandwidth constraint %d: %.3f Mbps",
+                                           bandwidth_constraint,
                                            bw.f*8/1000000 );
                                 }
                                 break;
