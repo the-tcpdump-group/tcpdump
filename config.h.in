@@ -136,9 +136,6 @@
 /* Define if you have the getaddrinfo function.  */
 #undef HAVE_GETADDRINFO
 
-/* Define if you have the gethostbyname2 function.  */
-#undef HAVE_GETHOSTBYNAME2
-
 /* Define if you have the getipnodebyaddr function.  */
 #undef HAVE_GETIPNODEBYADDR
 
@@ -198,12 +195,6 @@
 
 /* Define if you have the <fcntl.h> header file.  */
 #undef HAVE_FCNTL_H
-
-/* Define if you have the <malloc.h> header file.  */
-#undef HAVE_MALLOC_H
-
-/* Define if you have the <memory.h> header file.  */
-#undef HAVE_MEMORY_H
 
 /* Define if you have the <net/slip.h> header file.  */
 #undef HAVE_NET_SLIP_H
