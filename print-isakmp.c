@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.13 2000-07-01 03:39:05 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.14 2000-09-22 20:35:34 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -670,13 +670,16 @@ isakmp_id_print(struct isakmp_gen *ext, u_char *ep, u_int32_t phase,
 
 		p = (struct ipsecdoi_id *)ext;
 		printf(" idtype=%s", STR_OR_ID(p->type, ipsecidtypestr));
-		setprotoent(1);
-		pe = getprotobynumber(p->proto_id);
-		if (pe)
-			printf(" protoid=%s", pe->p_name);
-		else
-			printf(" protoid=%s", PROTOIDSTR(p->proto_id));
-		endprotoent();
+		if (p->proto_id) {
+			setprotoent(1);
+			pe = getprotobynumber(p->proto_id);
+			if (pe)
+				printf(" protoid=%s", pe->p_name);
+			endprotoent();
+		} else {
+			/* it DOES NOT mean IPPROTO_IP! */
+			printf(" protoid=%s", "0");
+		}
 		printf(" port=%d", ntohs(p->port));
 		if (!len)
 			break;
