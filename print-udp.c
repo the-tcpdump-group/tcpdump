@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.73 2000-04-27 11:09:08 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.74 2000-07-14 02:49:00 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -39,13 +39,6 @@ static const char rcsid[] =
 #include <netinet/udp.h>
 #include <netinet/udp_var.h>
 
-#ifdef NOERROR
-#undef NOERROR					/* Solaris sucks */
-#endif
-#ifdef T_UNSPEC
-#undef T_UNSPEC					/* SINIX does too */
-#endif
-#include <arpa/nameser.h>
 #ifdef SEGSIZE
 #undef SEGSIZE
 #endif
@@ -63,6 +56,13 @@ static const char rcsid[] =
 #include "addrtoname.h"
 #include "appletalk.h"
 
+#ifdef NOERROR
+#undef NOERROR					/* Solaris sucks */
+#endif
+#ifdef T_UNSPEC
+#undef T_UNSPEC					/* SINIX does too */
+#endif
+#include "nameser.h"
 #include "nfs.h"
 #include "bootp.h"
 
