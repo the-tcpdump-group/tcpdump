@@ -1,5 +1,7 @@
 1999-11-17  Assar Westerlund  <assar@sics.se>
 
+	* Also add Ken's README as README-AFS
+	
 	* bring in code from Ken Hornstein <kenh@cmf.nrl.navy.mil> at
 	/afs/transarc.com/public/afs-contrib/tools/tcpdump for parsing
 	AFS3 packets
@@ -530,4 +532,4 @@ v2.0 Sun Jan 13 12:20:40 PST 1991
 
 - Initial public release.
 
-@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.57 1999-11-17 05:47:36 assar Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.58 1999-11-17 20:23:13 assar Exp $ (LBL)
