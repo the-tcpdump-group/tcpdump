@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-l2tp.c,v 1.9 2001-11-05 10:03:27 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-l2tp.c,v 1.10 2001-11-10 21:37:58 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -368,7 +368,7 @@ l2tp_framing_type_print(const u_char *dat)
 }
 
 static void
-l2tp_packet_proc_delay_print()
+l2tp_packet_proc_delay_print(void)
 {
 	printf("obsolete");
 }
