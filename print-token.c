@@ -25,7 +25,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-token.c,v 1.10 2000-12-22 22:45:12 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-token.c,v 1.11 2000-12-23 20:48:13 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -136,10 +136,10 @@ token_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	 */
 	snapend = p + caplen;
 	/*
-	 * Actually, the only printer that uses packetp is print-bootp.c,
-	 * and it assumes that packetp points to an Ethernet header.  The
-	 * right thing to do is to fix print-bootp.c to know which link
-	 * type is in use when it excavates. XXX
+	 * Actually, the only printers that use packetp are print-arp.c
+	 * and print-bootp.c, and they assume that packetp points to an
+	 * Ethernet header.  The right thing to do is to fix them to know
+	 * which link type is in use when they excavate. XXX
 	 */
 	packetp = (u_char *)&ehdr;
 
