@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.13 2001-06-15 07:24:51 itojun Exp $ (LBL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.14 2001-06-20 07:40:44 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -94,14 +94,32 @@ static struct tok pppoetag2str[] = {
 #define PPPOE_HDRLEN 6
 
 void
+pppoe_if_print(u_char *user, const struct pcap_pkthdr *h,
+	     register const u_char *p)
+{
+	register u_int length = h->len;
+	register u_int caplen = h->caplen;
+
+	ts_print(&h->ts);
+
+	/*
+	 * Some printers want to get back at the link level addresses,
+	 * and/or check that they're not walking off the end of the packet.
+	 * Rather than pass them all the way down, we set these globals.
+	 */
+	packetp = p;
+	snapend = p + caplen;
+
+	pppoe_print(p, length);
+}
+
+void
 pppoe_print(register const u_char *bp, u_int length)
 {
-	const struct ether_header *eh;
 	u_short pppoe_ver, pppoe_type, pppoe_code, pppoe_sessionid, pppoe_length;
 	const u_char *pppoe_packet, *pppoe_payload;
 
-	eh = (struct ether_header *)packetp;
-	pppoe_packet = packetp + ETHER_HDRLEN;
+	pppoe_packet = bp;
 	if (pppoe_packet > snapend) {
 		printf("[|pppoe]");
 		return;
@@ -112,7 +130,7 @@ pppoe_print(register const u_char *bp, u_int length)
 	pppoe_code = pppoe_packet[1];
 	pppoe_sessionid = EXTRACT_16BITS(pppoe_packet + 2);
 	pppoe_length    = EXTRACT_16BITS(pppoe_packet + 4);
-	pppoe_payload = pppoe_packet + 6;
+	pppoe_payload = pppoe_packet + PPPOE_HDRLEN;
 
 	if (snapend < pppoe_payload) {
 		printf(" truncated PPPoE");
