@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.154 2003-11-23 23:42:17 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.155 2004-01-07 22:50:40 guy Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -146,10 +146,14 @@ in the OS on which
 is running, if the OS reports that information to applications; if not,
 it will be reported as 0).
 .LP
-On platforms that support the SIGINFO signal, such as most BSDs, it will
-report those counts when it receives a SIGINFO signal (generated, for
-example, by typing your ``status'' character, typically control-T) and
-will continue capturing packets.
+On platforms that support the SIGINFO signal, such as most BSDs
+(including Mac OS X) and Digital/Tru64 UNIX, it will report those counts
+when it receives a SIGINFO signal (generated, for example, by typing
+your ``status'' character, typically control-T, although on some
+platforms, such as Mac OS X, the ``status'' character is not set by
+default, so you must set it with
+.BR stty (1)
+in order to use it) and will continue capturing packets.
 .LP
 Reading packets from a network interface may require that you have
 special privileges:
@@ -2103,7 +2107,7 @@ is made to account for the time lag between when the
 ethernet interface removed the packet from the wire and when the kernel
 serviced the `new packet' interrupt.
 .SH "SEE ALSO"
-traffic(1C), nit(4P), bpf(4), pcap(3)
+stty(1), pcap(3), bpf(4), nit(4P), pfconfig(8)
 .SH AUTHORS
 The original authors are:
 .LP
