@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.82.2.2 2003-11-16 08:51:20 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.82.2.3 2003-12-29 22:42:21 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -87,8 +87,14 @@ ether_hdr_print(register const u_char *bp, u_int length)
 	        if (ntohs(ep->ether_type) <= ETHERMTU)
 		          (void)printf(", 802.3");
                 else 
-		          (void)printf(", ethertype %s",
-				       tok2str(ethertype_values,"0x%04x", ntohs(ep->ether_type)));	      
+		          (void)printf(", ethertype %s (0x%04x)",
+				       tok2str(ethertype_values,"Unknown", ntohs(ep->ether_type)),
+                                       ntohs(ep->ether_type));	      
+        } else {
+                if (ntohs(ep->ether_type) <= ETHERMTU)
+                          (void)printf(", 802.3");
+                else 
+                          (void)printf(", %s", tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", ntohs(ep->ether_type)));  
         }
 
 	(void)printf(", length %u: ", length);
@@ -139,7 +145,7 @@ ether_print(const u_char *p, u_int length, u_int caplen)
 
 		if (!xflag && !qflag)
 			default_print(p, caplen);
-	}
+	} 
 }
 
 /*
@@ -255,7 +261,7 @@ ether_encap_print(u_short ether_type, const u_char *p,
 		return (1);
 
         case ETHERTYPE_LOOPBACK:
-                return (1);
+                return (0);
 
 	case ETHERTYPE_MPLS:
 	case ETHERTYPE_MPLS_MULTI:

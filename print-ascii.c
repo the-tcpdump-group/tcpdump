@@ -42,7 +42,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-ascii.c,v 1.10.2.2 2003-11-16 08:51:11 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-ascii.c,v 1.10.2.3 2003-12-29 22:42:20 hannes Exp $";
 #endif
 #include <tcpdump-stdinc.h>
 #include <stdio.h>
@@ -57,7 +57,7 @@ static const char rcsid[] _U_ =
 		(HEXDUMP_HEXSTUFF_PER_SHORT * HEXDUMP_SHORTS_PER_LINE)
 
 void
-ascii_print_with_offset(register const u_char *cp, register u_int length,
+ascii_print_with_offset(register const u_char *ident, register const u_char *cp, register u_int length,
 			register u_int oset)
 {
 	register u_int i;
@@ -93,8 +93,8 @@ ascii_print_with_offset(register const u_char *cp, register u_int length,
 			if (Aflag) {
 				(void)printf("%s", asciistuff);
 			} else {
-				(void)printf("\n0x%04x\t%-*s\t%s",
-				    oset, HEXDUMP_HEXSTUFF_PER_LINE,
+				(void)printf("%s0x%04x: %-*s  %s",
+				    ident, oset, HEXDUMP_HEXSTUFF_PER_LINE,
 				    hexstuff, asciistuff);
 			}
 			i = 0; hsp = hexstuff; asp = asciistuff;
@@ -116,26 +116,26 @@ ascii_print_with_offset(register const u_char *cp, register u_int length,
 	if (i > 0) {
 		*hsp = *asp = '\0';
 		if (Aflag) {
-			(void)printf("\n%s", asciistuff);
+			(void)printf("%s%s", ident, asciistuff);
 		} else {
-			(void)printf("\n0x%04x\t%-*s\t%s",
-			     oset, HEXDUMP_HEXSTUFF_PER_LINE,
+			(void)printf("%s0x%04x: %-*s  %s",
+			     ident, oset, HEXDUMP_HEXSTUFF_PER_LINE,
 			     hexstuff, asciistuff);
 		}
 	}
 }
 
 void
-ascii_print(register const u_char *cp, register u_int length)
+ascii_print(register const u_char *ident, register const u_char *cp, register u_int length)
 {
-	ascii_print_with_offset(cp, length, 0);
+	ascii_print_with_offset(ident, cp, length, 0);
 }
 
 /*
  * telnet_print() wants this.  It is essentially default_print_unaligned()
  */
 void
-hex_print_with_offset(register const u_char *cp, register u_int length,
+hex_print_with_offset(register const u_char *ident, register const u_char *cp, register u_int length,
 		      register u_int oset)
 {
 	register u_int i, s;
@@ -145,7 +145,7 @@ hex_print_with_offset(register const u_char *cp, register u_int length,
 	i = 0;
 	while (--nshorts >= 0) {
 		if ((i++ % 8) == 0) {
-			(void)printf("\n0x%04x\t", oset);
+			(void)printf("%s0x%04x: ", ident, oset);
 			oset += HEXDUMP_BYTES_PER_LINE;
 		}
 		s = *cp++;
@@ -153,7 +153,7 @@ hex_print_with_offset(register const u_char *cp, register u_int length,
 	}
 	if (length & 1) {
 		if ((i % 8) == 0)
-			(void)printf("\n0x%04x\t", oset);
+			(void)printf("%s0x%04x: ", ident, oset);
 		(void)printf(" %02x", *cp);
 	}
 }
@@ -162,9 +162,9 @@ hex_print_with_offset(register const u_char *cp, register u_int length,
  * just for completeness
  */
 void
-hex_print(register const u_char *cp, register u_int length)
+hex_print(register const u_char *ident, register const u_char *cp, register u_int length)
 {
-	hex_print_with_offset(cp, length, 0);
+	hex_print_with_offset(ident, cp, length, 0);
 }
 
 #ifdef MAIN
@@ -181,3 +181,5 @@ main(int argc, char *argv[])
 	exit(0);
 }
 #endif /* MAIN */
+
+

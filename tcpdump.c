@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.216.2.5 2003-12-18 01:22:57 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.216.2.6 2003-12-29 22:42:22 hannes Exp $ (LBL)";
 #endif
 
 /*
@@ -1011,7 +1011,7 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 			/*
 			 * Include the link-layer header.
 			 */
-			default_print_unaligned(sp, h->caplen);
+			default_print(sp, h->caplen);
 		} else {
 			/*
 			 * Don't include the link-layer header - and if
@@ -1019,7 +1019,7 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 			 * print nothing.
 			 */
 			if (h->caplen > hdrlen)
-				default_print_unaligned(sp + hdrlen,
+				default_print(sp + hdrlen,
 				    h->caplen - hdrlen);
 		}
 	}
@@ -1029,32 +1029,6 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	--infodelay;
 	if (infoprint)
 		info(0);
-}
-
-/* Like default_print() but data need not be aligned */
-void
-default_print_unaligned(register const u_char *cp, register u_int length)
-{
-	register u_int i, s;
-	register int nshorts;
-
-	if (Xflag) {
-		ascii_print(cp, length);
-		return;
-	}
-	nshorts = (u_int) length / sizeof(u_short);
-	i = 0;
-	while (--nshorts >= 0) {
-		if ((i++ % 8) == 0)
-			(void)printf("\n\t\t\t");
-		s = *cp++;
-		(void)printf(" %02x%02x", s, *cp++);
-	}
-	if (length & 1) {
-		if ((i % 8) == 0)
-			(void)printf("\n\t\t\t");
-		(void)printf(" %02x", *cp);
-	}
 }
 
 #ifdef WIN32
@@ -1088,7 +1062,7 @@ default_print_unaligned(register const u_char *cp, register u_int length)
 void
 default_print(register const u_char *bp, register u_int length)
 {
-	default_print_unaligned(bp, length);
+    ascii_print("\n\t", bp, length); /* pass on lf and identation string */
 }
 
 #ifdef SIGINFO
