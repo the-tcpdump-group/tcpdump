@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.24 2001-01-28 08:27:28 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.25 2001-04-27 02:18:27 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -577,20 +577,13 @@ pimv2_print(register const u_char *bp, register u_int len)
 				(void)printf(")");
 				break;
 
-			/* XXX
-			 * draft-ietf-idmr-pimv2-dr-priority-00.txt
-			 * says that DR-Priority is option 19.
-			 * draft-ietf-pim-v2-sm-00.txt says it's 18.
-			 */
-			case 18:	/* DR-Priority */
-				(void)printf(" (DR-Priority: %d)", EXTRACT_32BITS(&bp[4]));
-				break;
-
-			case 19:	/* Bidir-Capable */
-				if (olen == 4)
-					(void)printf(" (OLD-DR-Priority: %d)", EXTRACT_32BITS(&bp[4]));
-				else
-					(void)printf(" (bidir-capable)");
+			case 19:	/* DR-Priority */
+				(void)printf(" (DR-Priority: ");
+				if (olen != 4) {
+					(void)printf("!olen=%d!)", olen);
+				} else {
+					(void)printf("%d)", EXTRACT_32BITS(&bp[4]));
+				}
 				break;
 
 			case 20:
@@ -603,6 +596,10 @@ pimv2_print(register const u_char *bp, register u_int len)
 					(void)printf(" ?0x%x?", EXTRACT_32BITS(&bp[4]));
 				}
 				(void)printf(")");
+				break;
+
+			case 22:	/* Bidir-Capable */
+				(void)printf(" (bidir-capable)");
 				break;
 
 			default:
