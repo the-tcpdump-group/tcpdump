@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.20.2.3 2002-07-10 07:24:43 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.20.2.4 2002-07-11 07:47:01 guy Exp $";
 #endif
 
 #include <stdio.h>
@@ -361,12 +361,12 @@ print_trans(const u_char *words, const u_char *data1, const u_char *buf, const u
     smb_fdata(words + 1, f1, SMBMIN(words + 1 + 2 * words[0], maxbuf));
     smb_fdata(data1 + 2, f2, maxbuf - (paramlen + datalen));
 
-    if (!strcmp(data1 + 2, "\\MAILSLOT\\BROWSE")) {
+    if (strcmp((const char *)(data1 + 2), "\\MAILSLOT\\BROWSE") == 0) {
 	print_browse(param, paramlen, data, datalen);
 	return;
     }
 
-    if (!strcmp(data1 + 2, "\\PIPE\\LANMAN")) {
+    if (strcmp((const char *)(data1 + 2), "\\PIPE\\LANMAN") == 0) {
 	print_ipc(param, paramlen, data, datalen);
 	return;
     }
