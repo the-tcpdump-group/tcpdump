@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.108 2001-07-25 04:35:10 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.109 2001-09-03 21:59:28 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -546,12 +546,13 @@ number of \fInet\fP.
 .IP "\fBnet \fInet\fR"
 True if either the IPv4/v6 source or destination address of the packet has a network
 number of \fInet\fP.
-.IP "\fBnet \fInet\fR \fBmask \fImask\fR"
-True if the IP address matches \fInet\fR with the specific netmask.
+.IP "\fBnet \fInet\fR \fBmask \fInetmask\fR"
+True if the IP address matches \fInet\fR with the specific \fInetmask\fR.
 May be qualified with \fBsrc\fR or \fBdst\fR.
 Note that this syntax is not valid for IPv6 \fInet\fR.
 .IP "\fBnet \fInet\fR/\fIlen\fR"
-True if the IPv4/v6 address matches \fInet\fR a netmask \fIlen\fR bits wide.
+True if the IPv4/v6 address matches \fInet\fR with a netmask \fIlen\fR
+bits wide.
 May be qualified with \fBsrc\fR or \fBdst\fR.
 .IP "\fBdst port \fIport\fR"
 True if the packet is ip/tcp, ip/udp, ip6/tcp or ip6/udp and has a
