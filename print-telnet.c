@@ -51,7 +51,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.12 2000-09-29 04:58:51 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.13 2001-06-15 07:43:13 itojun Exp $";
 #endif
 
 #include <sys/param.h>
@@ -98,7 +98,7 @@ telnet_print(register const u_char *sp, u_int length)
 		switch (*sp) {
 		case IAC:			/* <IAC><IAC>! */
 			if (length > 1 && sp[1] == IAC) {
-				(void)strcpy(tnet, "IAC IAC");
+				(void)strlcpy(tnet, "IAC IAC", sizeof(tnet));
 			} else {
 				length = 0;
 				continue;

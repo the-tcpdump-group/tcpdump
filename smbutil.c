@@ -1,4 +1,4 @@
-/* 
+/*
    Copyright (C) Andrew Tridgell 1995-1999
 
    This software may be distributed either under the terms of the
@@ -11,7 +11,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.13 2001-01-28 08:06:08 itojun Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.14 2001-06-15 07:43:13 itojun Exp $";
 #endif
 
 #include <sys/param.h>
@@ -40,7 +40,7 @@ static void interpret_dos_date(uint32 date,int *year,int *month,int *day,int *ho
 {
   uint32 p0,p1,p2,p3;
 
-  p0=date&0xFF; p1=((date&0xFF00)>>8)&0xFF; 
+  p0=date&0xFF; p1=((date&0xFF00)>>8)&0xFF;
   p2=((date&0xFF0000)>>16)&0xFF; p3=((date&0xFF000000)>>24)&0xFF;
 
   *second = 2*(p0 & 0x1F);
@@ -62,7 +62,7 @@ static time_t make_unix_date(const void *date_ptr)
   dos_date = IVAL(date_ptr,0);
 
   if (dos_date == 0) return(0);
-  
+
   interpret_dos_date(dos_date,&t.tm_year,&t.tm_mon,
 		     &t.tm_mday,&t.tm_hour,&t.tm_min,&t.tm_sec);
   t.tm_wday = 1;
@@ -97,7 +97,7 @@ static time_t interpret_long_date(const char *p)
 
   /* this gives us seconds since jan 1st 1601 (approx) */
   d = (IVAL(p,4)*256.0 + CVAL(p,3)) * (1.0e-7 * (1<<24));
- 
+
   /* now adjust by 369 years to make the secs since 1970 */
   d -= 369.0*365.25*24*60*60;
 
@@ -188,7 +188,7 @@ static const uchar *name_ptr(const uchar *buf,int ofs,const uchar *maxbuf)
 
 trunc:
   return(NULL);	/* name goes past the end of the buffer */
-}  
+}
 
 /****************************************************************************
 extract a netbios name from a buf
@@ -198,10 +198,10 @@ static int name_extract(const uchar *buf,int ofs,const uchar *maxbuf,char *name)
   const uchar *p = name_ptr(buf,ofs,maxbuf);
   if (p == NULL)
     return(-1);	/* error (probably name going past end of buffer) */
-  strcpy(name,"");
+  name[0] = '\0';
   return(name_interpret(p,maxbuf,name));
-}  
-  
+}
+
 
 /****************************************************************************
 return the total storage length of a mangled name
@@ -261,7 +261,7 @@ void print_data(const unsigned char *buf, int len)
     printf("%02X ",(int)buf[i]);
     i++;
     if (i%8 == 0) printf(" ");
-    if (i%16 == 0) {      
+    if (i%16 == 0) {
       print_asc(&buf[i-16],8); printf(" ");
       print_asc(&buf[i-8],8); printf("\n");
       if (i<len) printf("[%03X] ",i);
@@ -278,8 +278,8 @@ void print_data(const unsigned char *buf, int len)
     n = MIN(8,i%16);
     print_asc(&buf[i-(i%16)],n); printf(" ");
     n = (i%16) - n;
-    if (n>0) print_asc(&buf[i-n],n); 
-    printf("\n");    
+    if (n>0) print_asc(&buf[i-n],n);
+    printf("\n");
   }
 }
 
@@ -291,7 +291,7 @@ static void write_bits(unsigned int val,char *fmt)
 
   while ((p=strchr(fmt,'|'))) {
     int l = PTR_DIFF(p,fmt);
-    if (l && (val & (1<<i))) 
+    if (l && (val & (1<<i)))
       printf("%.*s ",l,fmt);
     fmt = p+1;
     i++;
@@ -307,7 +307,7 @@ static const char *unistr(const char *s, int *len)
 
 	if (use_unicode == -1) {
 		char *p = getenv("USE_UNICODE");
-		if (p && (atoi(p) == 1)) 
+		if (p && (atoi(p) == 1))
 			use_unicode = 1;
 		else
 			use_unicode = 0;
@@ -441,15 +441,15 @@ static const uchar *fdata1(const uchar *buf, const char *fmt, const uchar *maxbu
 	break;
       }
     case 'S':
-      {	
+      {
 	      printf("%.*s",(int)PTR_DIFF(maxbuf,buf),unistr(buf, &len));
 	      buf += len;
 	      fmt++;
 	      break;
       }
     case 'Z':
-      {	
-	if (*buf != 4 && *buf != 2) 
+      {
+	if (*buf != 4 && *buf != 2)
 	  printf("Error! ASCIIZ buffer of type %d (safety=%d)\n",
 		 *buf,(int)PTR_DIFF(maxbuf,buf));
 	printf("%.*s",(int)PTR_DIFF(maxbuf,buf+1),unistr(buf+1, &len));
@@ -458,22 +458,22 @@ static const uchar *fdata1(const uchar *buf, const char *fmt, const uchar *maxbu
 	break;
       }
     case 's':
-      {	
+      {
 	int l = atoi(fmt+1);
 	printf("%-*.*s",l,l,buf);
-	buf += l;	
+	buf += l;
 	fmt++; while (isdigit(*fmt)) fmt++;
 	break;
       }
     case 'h':
-      {	
+      {
 	int l = atoi(fmt+1);
 	while (l--) printf("%02x",*buf++);
 	fmt++; while (isdigit(*fmt)) fmt++;
 	break;
       }
     case 'n':
-      {	
+      {
 	int t = atoi(fmt+1);
 	char nbuf[255];
 	int name_type;
@@ -502,7 +502,7 @@ static const uchar *fdata1(const uchar *buf, const char *fmt, const uchar *maxbu
 	break;
       }
     case 'T':
-      {	
+      {
 	time_t t;
 	int x = IVAL(buf,0);
 	switch (atoi(fmt+1)) {
@@ -510,18 +510,18 @@ static const uchar *fdata1(const uchar *buf, const char *fmt, const uchar *maxbu
 	  if (x==0 || x==-1 || x==0xFFFFFFFF)
 	    t = 0;
 	  else
-	    t = make_unix_date(buf); 
+	    t = make_unix_date(buf);
 	  buf+=4;
 	  break;
 	case 2:
 	  if (x==0 || x==-1 || x==0xFFFFFFFF)
 	    t = 0;
 	  else
-	    t = make_unix_date2(buf); 
+	    t = make_unix_date2(buf);
 	  buf+=4;
 	  break;
 	case 3:
-	  t = interpret_long_date(buf); 
+	  t = interpret_long_date(buf);
 	  buf+=8;
 	  break;
 	}
@@ -532,7 +532,7 @@ static const uchar *fdata1(const uchar *buf, const char *fmt, const uchar *maxbu
     default:
       putchar(*fmt);
       fmt++;
-      break;      
+      break;
     }
   }
 
@@ -710,7 +710,7 @@ static struct
   int code;
   char *class;
   err_code_struct *err_msgs;
-} err_classes[] = { 
+} err_classes[] = {
   {0,"SUCCESS",NULL},
   {0x01,"ERRDOS",dos_msgs},
   {0x02,"ERRSRV",server_msgs},
@@ -751,7 +751,7 @@ char *smb_errstr(int class,int num)
 	snprintf(ret,sizeof(ret),"%s - %d",err_classes[i].class,num);
 	return ret;
       }
-  
+
   snprintf(ret,sizeof(ret),"ERROR: Unknown error (%d,%d)",class,num);
   return(ret);
 }
