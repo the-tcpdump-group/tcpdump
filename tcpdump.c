@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.235 2004-03-17 19:40:42 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.236 2004-03-19 21:36:35 risso Exp $ (LBL)";
 #endif
 
 /*
@@ -65,8 +65,10 @@ extern int SIZE_BUF;
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifndef WIN32
 #include <pwd.h>
 #include <grp.h>
+#endif /* WIN32 */
 
 #include "interface.h"
 #include "addrtoname.h"
@@ -330,6 +332,7 @@ show_dlts_and_exit(pcap_t *pd)
 #define U_FLAG
 #endif
 
+#ifndef WIN32
 /* Drop root privileges and chroot if necessary */
 static void
 droproot(const char *username, const char *chroot_dir)
@@ -361,6 +364,7 @@ droproot(const char *username, const char *chroot_dir)
 		exit(1);
 	}
 }
+#endif /* WIN32 */
 
 static int
 getWflagChars(int x)
