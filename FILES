@@ -91,9 +91,9 @@ print-arp.c
 print-ascii.c
 print-atalk.c
 print-atm.c
+print-beep.c
 print-bgp.c
 print-bootp.c
-print-beep.c
 print-cdp.c
 print-chdlc.c
 print-cip.c
