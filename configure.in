@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.107 2000-01-21 04:06:17 itojun Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.108 2000-01-25 05:05:21 itojun Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.107 $)
+AC_REVISION($Revision: 1.108 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -216,9 +216,10 @@ if test "$ipv6" = "yes" -a "$ipv6lib" != "none"; then
 fi
 
 
-AC_CHECK_FUNCS(getaddrinfo, [dnl
-AC_MSG_CHECKING(getaddrinfo bug)
-AC_TRY_RUN([
+if test "$ipv6" = "yes"; then
+	AC_CHECK_FUNCS(getaddrinfo, [dnl
+	AC_MSG_CHECKING(getaddrinfo bug)
+	AC_TRY_RUN([
 #include <sys/types.h>
 #include <netdb.h>
 #include <string.h>
@@ -312,25 +313,27 @@ main()
   exit(1);
 }
 ],
-AC_MSG_RESULT(good)
-buggygetaddrinfo=no,
-AC_MSG_RESULT(buggy)
-buggygetaddrinfo=yes,
-AC_MSG_RESULT(buggy)
-buggygetaddrinfo=yes)], [buggygetaddrinfo=yes])
+	AC_MSG_RESULT(good)
+	buggygetaddrinfo=no,
+	AC_MSG_RESULT(buggy)
+	buggygetaddrinfo=yes,
+	AC_MSG_RESULT(buggy)
+	buggygetaddrinfo=yes)], [buggygetaddrinfo=yes])
 
-if test "$buggygetaddrinfo" = "yes"; then
-	if test "$ipv6" = "yes" -a "$ipv6type" != "linux"; then
-		echo 'Fatal: You must get working getaddrinfo() function.'
-		echo '       or you can specify "--disable-ipv6"'.
-		exit 1
-	elif test "$ipv6type" = "linux"; then
-		echo 'Warning: getaddrinfo() implementation on your system seems be buggy.'
-		echo '         Better upgreade your system library to newest version'
-		echo '         of GNU C library (aka glibc).'
+	if test "$buggygetaddrinfo" = "yes"; then
+		if test "$ipv6type" != "linux"; then
+			echo 'Fatal: You must get working getaddrinfo() function.'
+			echo '       or you can specify "--disable-ipv6"'.
+			exit 1
+		else
+			echo 'Warning: getaddrinfo() implementation on your system seems be buggy.'
+			echo '         Better upgreade your system library to newest version'
+			echo '         of GNU C library (aka glibc).'
+		fi
 	fi
+	AC_REPLACE_FUNCS(getaddrinfo getnameinfo)
 fi
-AC_REPLACE_FUNCS(getaddrinfo getnameinfo inet_ntop inet_pton inet_aton)
+AC_REPLACE_FUNCS(inet_ntop inet_pton inet_aton)
 
 dnl portability macros for getaddrinfo/getnameinfo
 dnl
