@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.1 2004-10-19 15:59:41 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.2 2004-10-20 16:14:16 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -193,7 +193,7 @@ ppp_heuristic_guess(register const u_char *p, u_int length) {
     case PPP_LCP :
     case PPP_PAP :
     case PPP_CHAP :
-    case PPP_MP :
+    case PPP_ML :
 #ifdef INET6
     case PPP_IPV6 :
     case PPP_IPV6CP :

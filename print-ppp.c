@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.103 2004-09-11 14:23:28 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.104 2004-10-20 16:14:15 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -80,6 +80,8 @@ struct tok ppptype2str[] = {
 	{ PPP_MPLS_UCAST, "MPLS" },
 	{ PPP_MPLS_MCAST, "MPLS" },
         { PPP_COMP,       "Compressed"},
+        { PPP_ML,         "MLPPP"},
+        { PPP_IPV6,       "IP6"},
 
 	{ PPP_HELLO,	  "HELLO" },
 	{ PPP_LUXCOM,	  "LUXCOM" },
@@ -101,7 +103,7 @@ struct tok ppptype2str[] = {
 	{ PPP_CHAP,	  "CHAP" },
 	{ PPP_BACP,	  "BACP" },
 	{ PPP_BAP,	  "BAP" },
-	{ PPP_MP,	  "ML" },
+	{ PPP_MPCP,	  "MLPPP-CP" },
 	{ 0,		  NULL }
 };
 
@@ -200,7 +202,7 @@ static const char *lcpconfopts[] = {
 	"deprecated(15)",	/* used to be a Compund-Frames */
 	"deprecated(16)",	/* used to be a Nominal-Data-Encap */
 	"MRRU",			/* (17) */
-	"SSNHF",		/* (18) */
+	"12-Bit seq #",		/* (18) */
 	"End-Disc",		/* (19) */
 	"Proprietary",		/* (20) */
 	"DCE-Id",		/* (21) */
@@ -382,6 +384,7 @@ static void handle_ctrl_proto (u_int proto,const u_char *p, int length);
 static void handle_chap (const u_char *p, int length);
 static void handle_pap (const u_char *p, int length);
 static void handle_bap (const u_char *p, int length);
+static void handle_mlppp(const u_char *p, int length);
 static int print_lcp_config_options (const u_char *p, int);
 static int print_ipcp_config_options (const u_char *p, int);
 static int print_ip6cp_config_options (const u_char *p, int);
@@ -723,7 +726,7 @@ print_lcp_config_options(const u_char *p, int length)
 	case LCPOPT_DEP14:
 	case LCPOPT_DEP15:
 	case LCPOPT_DEP16:
-	case LCPOPT_MLSSNHF:
+        case LCPOPT_MLSSNHF:
 	case LCPOPT_PROP:
 	case LCPOPT_DCEID:
 	case LCPOPT_MPP:
@@ -742,6 +745,27 @@ print_lcp_config_options(const u_char *p, int length)
 trunc:
 	printf("[|lcp]");
 	return 0;
+}
+
+/* ML-PPP*/
+struct tok ppp_ml_flag_values[] = {
+    { 0x80, "begin" },
+    { 0x40, "end" },
+    { 0, NULL }
+};
+
+static void
+handle_mlppp(const u_char *p, int length) {
+
+    if (!eflag)
+        printf("MLPPP, ");
+
+    printf("seq 0x%03x, Flags [%s], length %u",
+           (EXTRACT_16BITS(p))&0x0fff, /* only support 12-Bit sequence space for now */
+           bittok2str(ppp_ml_flag_values, "none", *p & 0xc0),
+           length);
+
+    return;
 }
 
 /* CHAP */
@@ -1180,6 +1204,8 @@ handle_ppp(u_int proto, const u_char *p, int length)
 	case PPP_MPLSCP:
 	case PPP_IPV6CP:
 	case PPP_CCP:
+        case PPP_ML:
+                handle_mlppp(p, length);
 	case PPP_BACP:
 		handle_ctrl_proto(proto, p, length);
 		break;
