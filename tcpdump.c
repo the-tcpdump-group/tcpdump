@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.230 2004-01-31 06:14:59 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.231 2004-02-24 08:12:18 hannes Exp $ (LBL)";
 #endif
 
 /*
@@ -704,6 +704,15 @@ main(int argc, char **argv)
 	if (tflag > 0)
 		thiszone = gmt2local(0);
 
+#ifdef WITH_USER
+	/* if run as root, prepare for dropping root privileges */
+	if (getuid() == 0 || geteuid() == 0) {
+		/* Run with '-Z root' to restore old behaviour */ 
+		if (!username)
+			username = WITH_USER;
+	}
+#endif
+
 	if (RFileName != NULL) {
 		int dlt;
 		const char *dlt_name;
@@ -718,13 +727,8 @@ main(int argc, char **argv)
 		 * people's trace files (especially if we're set-UID
 		 * root).
 		 */
-		if (username) {
-			droproot(username);
-		}
-		else {
-			if (setgid(getgid()) != 0 || setuid(getuid()) != 0 )
-				fprintf(stderr, "Warning: setgid/setuid failed !\n");
-		}
+		if (setgid(getgid()) != 0 || setuid(getuid()) != 0 )
+			fprintf(stderr, "Warning: setgid/setuid failed !\n");
 #endif /* WIN32 */
 		pd = pcap_open_offline(RFileName, ebuf);
 		if (pd == NULL)
@@ -771,6 +775,13 @@ main(int argc, char **argv)
 			error("%s", ebuf);
 		else if (*ebuf)
 			warning("%s", ebuf);
+		/*
+		 * Let user own process after socket has been opened.
+		 */
+#ifndef WIN32
+		if (setgid(getgid()) != 0 || setuid(getuid()) != 0)
+			fprintf(stderr, "Warning: setgid/setuid failed !\n");
+#endif /* WIN32 */
 #ifdef WIN32
 		if(UserBufferSize != 1000000)
 			if(pcap_setbuff(pd, UserBufferSize)==-1){
@@ -808,18 +819,6 @@ main(int argc, char **argv)
 			netmask = 0;
 			warning("%s", ebuf);
 		}
-		/*
-		 * Let user own process after socket has been opened.
-		 */
-#ifndef WIN32
-		if (username) {
-			droproot(username);
-		}
-		else {
-			if (setgid(getgid()) != 0 || setuid(getuid()) != 0)
-				fprintf(stderr, "Warning: setgid/setuid failed !\n");
-		}
-#endif /* WIN32 */
 	}
 	if (infile)
 		cmdbuf = read_infile(infile);
@@ -881,6 +880,15 @@ main(int argc, char **argv)
 		callback = print_packet;
 		pcap_userdata = (u_char *)&printinfo;
 	}
+#ifndef WIN32
+	/*
+	 * We cannot do this earlier, because we want to be able to open
+	 * the file (if done) for writing before giving up permissions.
+	 */
+	if (username) {
+		droproot(username);
+	}
+#endif /* WIN32 */
 #ifdef SIGINFO
 	(void)setsignal(SIGINFO, requestinfo);
 #endif
@@ -948,16 +956,6 @@ main(int argc, char **argv)
 		(void)fprintf(stderr, "%s: pcap_loop: %s\n",
 		    program_name, pcap_geterr(pd));
 	}
-#ifdef WITH_USER
-	/* if run as root, drop root; protect against remote sec problems */
-	if (getuid() == 0 || geteuid() == 0) {
-		/* Run with '-Z root' to restore old behaviour */ 
-		if (!username) {
-			droproot(WITH_USER);
-			/* does not return if fails */
-		}
-	}
-#endif
 	if (RFileName == NULL) {
 		/*
 		 * We're doing a live capture.  Report the capture
