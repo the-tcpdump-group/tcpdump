@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.114.2.6 2002-06-16 21:52:17 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.114.2.7 2002-06-26 04:36:20 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -402,7 +402,10 @@ Standard output is used if \fIfile\fR is ``-''.
 Print each packet (minus its link level header) in hex.
 The smaller of the entire packet or
 .I snaplen
-bytes will be printed.
+bytes will be printed.  Note that this is the entire link-layer
+packet, so for link layers that pad (e.g. Ethernet), the padding bytes
+will also be printed when the higher layer packet is shorter than the
+required padding.
 .TP
 .B \-X
 When printing hex, print ascii too.
