@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.207 2003-05-22 16:33:07 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.208 2003-05-25 16:26:57 hannes Exp $ (LBL)";
 #endif
 
 /*
@@ -749,7 +749,7 @@ main(int argc, char **argv)
 		} else
 			(void)fprintf(stderr, "%s: ", program_name);
 		(void)fprintf(stderr, "listening on %s, link-type %u, capture size %u bytes\n",
-		    device, type, snaplen);
+		    device, pcap_datalink(pd), snaplen);
 		(void)fflush(stderr);
 	}
 #endif /* WIN32 */
