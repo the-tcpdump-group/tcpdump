@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.20 2002-01-21 11:39:59 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.21 2002-01-23 05:23:16 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -35,6 +35,7 @@ static const char rcsid[] =
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <stdlib.h>
 
 #include <netinet/in.h>
 
@@ -119,7 +120,7 @@ static int hex2byte(char *hexstring)
 }
 
 
-void esp_print_decodesecret()
+static void esp_print_decodesecret(void)
 {
 	char *colon;
 	int   len, i;
