@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lmp.c,v 1.1 2004-04-19 21:17:13 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lmp.c,v 1.2 2004-04-23 18:29:44 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -58,6 +58,19 @@ struct lmp_common_header {
 static const struct tok lmp_header_flag_values[] = {
     { 0x00, "Control Channel Down"},
     { 0x02, "LMP restart"},
+    { 0, NULL}
+};
+
+static const struct tok lmp_obj_te_link_flag_values[] = {
+    { 0x01, "Fault Management Supported"},
+    { 0x02, "Link Verification Supported"},
+    { 0, NULL}
+};
+
+static const struct tok lmp_obj_data_link_flag_values[] = {
+    { 0x01, "Data Link Port"},
+    { 0x02, "Allocated for user traffic"},
+    { 0x04, "Failed link"},
     { 0, NULL}
 };
 
@@ -178,6 +191,9 @@ static const struct tok lmp_obj_values[] = {
 #define	LMP_CTYPE_1          1
 #define	LMP_CTYPE_2          2
 
+#define LMP_CTYPE_HELLO_CONFIG  1
+#define LMP_CTYPE_HELLO         1
+
 #define FALSE 0
 #define TRUE  1
 
@@ -236,7 +252,7 @@ lmp_print(register const u_char *pptr, register u_int len) {
     const u_char *tptr,*obj_tptr;
     u_short tlen,lmp_obj_len,lmp_obj_ctype,obj_tlen;
     int hexdump;
-
+    
     tptr=pptr;
     lmp_com_header = (const struct lmp_common_header *)pptr;
     TCHECK(*lmp_com_header);
@@ -385,12 +401,86 @@ lmp_print(register const u_char *pptr, register u_int len) {
          */
 
         case LMP_OBJ_CONFIG:
+            switch(lmp_obj_ctype) {
+            case LMP_CTYPE_HELLO_CONFIG:
+                printf("\n\t    Hello Interval: %u\n\t    Hello Dead Interval: %u",
+                       EXTRACT_16BITS(obj_tptr),
+                       EXTRACT_16BITS(obj_tptr+2));
+                break;
+
+            default:
+                hexdump=TRUE;
+            }
+            break;
+	
         case LMP_OBJ_HELLO:
+            switch(lmp_obj_ctype) {
+	    case LMP_CTYPE_HELLO:
+                printf("\n\t    TxSeqNum: %u\n\t    RcvSeqNum: %u",
+                       EXTRACT_32BITS(obj_tptr),
+                       EXTRACT_32BITS(obj_tptr+4));
+                break;
+
+            default:
+                hexdump=TRUE;
+            }
+            break;      
+	    
+        case LMP_OBJ_TE_LINK:
+		printf("\n\t    Flags: [%s]",
+		bittok2str(lmp_obj_te_link_flag_values,
+			"none",
+			EXTRACT_16BITS(obj_tptr)>>8));
+            
+	    switch(lmp_obj_ctype) {
+	    case LMP_CTYPE_IPV4:
+		printf("\n\t    Local Link-ID: %s (0x%08x) \
+			\n\t    Remote Link-ID: %s (0x%08x)",
+                       ipaddr_string(obj_tptr+4),
+                       EXTRACT_32BITS(obj_tptr+4),
+                       ipaddr_string(obj_tptr+8),
+                       EXTRACT_32BITS(obj_tptr+8));
+		break;
+		
+#ifdef INET6
+	    case LMP_CTYPE_IPV6:
+#endif
+	    case LMP_CTYPE_UNMD:
+            default:
+                hexdump=TRUE;
+            }
+            break;
+	
+        case LMP_OBJ_DATA_LINK:
+		printf("\n\t    Flags: [%s]",
+		bittok2str(lmp_obj_data_link_flag_values,
+			"none",
+			EXTRACT_16BITS(obj_tptr)>>8));
+            
+	    switch(lmp_obj_ctype) {
+	    case LMP_CTYPE_IPV4:
+	    case LMP_CTYPE_UNMD:
+                printf("\n\t    Local Interface ID: %s (0x%08x) \
+			\n\t    Remote Interface ID: %s (0x%08x)",
+                       ipaddr_string(obj_tptr+4),
+                       EXTRACT_32BITS(obj_tptr+4),
+                       ipaddr_string(obj_tptr+8),
+                       EXTRACT_32BITS(obj_tptr+8));
+		
+		/* FIXME: Missing Data link Subobjects decoder */
+		
+		break;
+#ifdef INET6   
+	    case LMP_CTYPE_IPV6:
+#endif
+            default:
+                hexdump=TRUE;
+            }
+            break;      
+	    
         case LMP_OBJ_VERIFY_BEGIN:
         case LMP_OBJ_VERIFY_BEGIN_ACK:
         case LMP_OBJ_VERIFY_ID:
-        case LMP_OBJ_TE_LINK:
-        case LMP_OBJ_DATA_LINK:
         case LMP_OBJ_CHANNEL_STATUS:
         case LMP_OBJ_CHANNEL_STATUS_REQ:
         case LMP_OBJ_ERROR_CODE:
