@@ -25,7 +25,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-token.c,v 1.1 2000-07-25 05:28:11 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-token.c,v 1.2 2000-07-30 05:55:44 assar Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -118,7 +118,6 @@ token_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	u_int caplen = h->caplen;
 	u_int length = h->len;
 	struct token_header *trp;
-	u_short ether_type;
 	u_short extracted_ethertype;
 	struct ether_header ehdr;
 	u_int route_len = 0, seg;
