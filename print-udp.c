@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.102 2001-11-26 06:48:12 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.103 2001-12-03 02:06:10 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -407,7 +407,7 @@ udpipaddr_print(const struct ip *ip, u_int16_t sport, u_int16_t dport)
 		ip6 = NULL;
 
 	if (ip6) {
-		if (dport && ip6->ip6_nxt == IPPROTO_UDP) {
+		if (ip6->ip6_nxt == IPPROTO_UDP) {
 			(void)printf("%s.%s > %s.%s: ",
 				ip6addr_string(&ip6->ip6_src),
 				udpport_string(sport),
@@ -420,7 +420,7 @@ udpipaddr_print(const struct ip *ip, u_int16_t sport, u_int16_t dport)
 	} else
 #endif /*INET6*/
 	{
-		if (dport && ip->ip_p == IPPROTO_UDP) {
+		if (ip->ip_p == IPPROTO_UDP) {
 			(void)printf("%s.%s > %s.%s: ",
 				ipaddr_string(&ip->ip_src),
 				udpport_string(sport),
@@ -458,13 +458,14 @@ udp_print(register const u_char *bp, u_int length,
 #endif /*INET6*/
 	cp = (u_char *)(up + 1);
 	if (cp > snapend) {
-		udpipaddr_print(ip, 0, 0);
-		(void)printf("[|udp]");
+		(void)printf("%s > %s: [|udp]",
+			ipaddr_string(&ip->ip_src), ipaddr_string(&ip->ip_dst));
 		return;
 	}
 	if (length < sizeof(struct udphdr)) {
-		udpipaddr_print(ip, 0, 0);
-		(void)printf("truncated-udp %u", length);
+		(void)printf("%s > %s: truncated-udp %d",
+			ipaddr_string(&ip->ip_src), ipaddr_string(&ip->ip_dst),
+			length);
 		return;
 	}
 	length -= sizeof(struct udphdr);
@@ -473,8 +474,10 @@ udp_print(register const u_char *bp, u_int length,
 	dport = ntohs(up->uh_dport);
 	ulen = ntohs(up->uh_ulen);
 	if (ulen < 8) {
-		udpipaddr_print(ip, sport, dport);
-		(void)printf("truncated-udplength %u", ulen);
+		(void)printf("%s > %s: truncated-udplength %d",
+			     ipaddr_string(&ip->ip_src),
+			     ipaddr_string(&ip->ip_dst),
+			     ulen);
 		return;
 	}
 	if (packettype) {
