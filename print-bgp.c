@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.64 2003-05-27 14:34:04 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.65 2003-05-30 11:09:39 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -1429,22 +1429,24 @@ bgp_notification_print(const u_char *dat, int length)
         if (length<BGP_NOTIFICATION_SIZE)
             return;
 
-	printf(", Error - %s", tok2str(bgp_notify_major_values, "Unknown", bgpn.bgpn_major));
+	printf(", %s (%u)",
+	       tok2str(bgp_notify_major_values, "Unknown Error", bgpn.bgpn_major),
+	       bgpn.bgpn_major);
 
         switch (bgpn.bgpn_major) {
 
         case BGP_NOTIFY_MAJOR_MSG:
-            printf(" subcode %s (%u)",
+            printf(", subcode %s (%u)",
 		   tok2str(bgp_notify_minor_msg_values, "Unknown", bgpn.bgpn_minor),
 		   bgpn.bgpn_minor);
             break;
         case BGP_NOTIFY_MAJOR_OPEN:
-            printf(" subcode %s (%u)",
+            printf(", subcode %s (%u)",
 		   tok2str(bgp_notify_minor_open_values, "Unknown", bgpn.bgpn_minor),
 		   bgpn.bgpn_minor);
             break;
         case BGP_NOTIFY_MAJOR_UPDATE:
-            printf(" subcode %s (%u)",
+            printf(", subcode %s (%u)",
 		   tok2str(bgp_notify_minor_update_values, "Unknown", bgpn.bgpn_minor),
 		   bgpn.bgpn_minor);
             break;
@@ -1453,7 +1455,7 @@ bgp_notification_print(const u_char *dat, int length)
 		   tok2str(bgp_notify_minor_cap_values, "Unknown", bgpn.bgpn_minor),
 		   bgpn.bgpn_minor);
         case BGP_NOTIFY_MAJOR_CEASE:
-            printf(" subcode %s (%u)",
+            printf(", subcode %s (%u)",
 		   tok2str(bgp_notify_minor_cease_values, "Unknown", bgpn.bgpn_minor),
 		   bgpn.bgpn_minor);
 
