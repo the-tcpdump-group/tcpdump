@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.80 2000-01-25 01:03:23 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.81 2000-05-01 17:35:45 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -628,6 +628,13 @@ again:
 #endif
 		case IPPROTO_PIM:
 			pim_print(cp, len);
+			break;
+
+#ifndef IPPROTO_VRRP
+#define IPPROTO_VRRP	112
+#endif
+		case IPPROTO_VRRP:
+			vrrp_print(cp, len, ip->ip_ttl);
 			break;
 
 		default:
