@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.26 2002-09-05 21:25:42 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.27 2002-10-18 04:40:03 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -57,25 +57,6 @@ ip6_print(register const u_char *bp, register u_int length)
 
 	ip6 = (const struct ip6_hdr *)bp;
 
-#ifdef LBL_ALIGN
-	/*
-	 * The IP6 header is not 16-byte aligned, so copy into abuf.
-	 */
-	if ((u_long)ip6 & 15) {
-		static u_char *abuf;
-
-		if (abuf == NULL) {
-			abuf = malloc(snaplen);
-			if (abuf == NULL)
-				error("ip6_print: malloc");
-		}
-		memcpy(abuf, ip6, min(length, snaplen));
-		snapend += abuf - (u_char *)ip6;
-		packetp = abuf;
-		ip6 = (struct ip6_hdr *)abuf;
-		bp = abuf;
-	}
-#endif
 	TCHECK(*ip6);
 	if (length < sizeof (struct ip6_hdr)) {
 		(void)printf("truncated-ip6 %d", length);
