@@ -51,7 +51,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.14 2001-06-25 22:49:36 itojun Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.15 2001-06-25 23:03:57 itojun Exp $";
 #endif
 
 #include <sys/param.h>
@@ -109,10 +109,8 @@ telnet_parse(const u_char *sp, u_int length, int print)
 	}
 
 	i = c - TELCMD_FIRST;
-	if (i < 0 || i > IAC - TELCMD_FIRST) {
-		(void)printf("unknown: ff%02x\n", c);
+	if (i < 0 || i > IAC - TELCMD_FIRST)
 		goto trunc;
-	}
 
 	switch (c) {
 	case DONT:
