@@ -1088,11 +1088,11 @@ EOF
 	    case "$target_os" in
 
 	    irix*)
-		    V_CCOPT="$V_CCOPT -xansi -signed -g3"
+		    V_CCOPT="$V_CCOPT -xansi -signed -O"
 		    ;;
 
 	    osf*)
-		    V_CCOPT="$V_CCOPT -std1 -g3"
+		    V_CCOPT="$V_CCOPT -std1 -O"
 		    ;;
 
 	    ultrix*)
