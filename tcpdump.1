@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.79 2000-06-11 16:51:09 mcr Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.80 2000-06-12 06:50:50 assar Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -1539,12 +1539,22 @@ serviced the `new packet' interrupt.
 .SH "SEE ALSO"
 traffic(1C), nit(4P), bpf(4), pcap(3)
 .SH AUTHORS
+The original authors are:
+.LP
 Van Jacobson,
 Craig Leres and
 Steven McCanne, all of the
 Lawrence Berkeley National Laboratory, University of California, Berkeley, CA.
 .LP
-The current version is available via anonymous ftp:
+It is currently being maintained by tcpdump.org.
+.LP
+The current version is available via http:
+.LP
+.RS
+.I http://www.tcpdump.org/
+.RE
+.LP
+The original distribution is available via anonymous ftp:
 .LP
 .RS
 .I ftp://ftp.ee.lbl.gov/tcpdump.tar.Z
@@ -1553,7 +1563,12 @@ The current version is available via anonymous ftp:
 IPv6/IPsec support is added by WIDE/KAME project.
 This program uses Eric Young's SSLeay library, under specific configuration.
 .SH BUGS
-Please send bug reports to tcpdump@ee.lbl.gov.
+Please send problems, bugs, questions, desirable enhancements, source
+code contributions, etc. to:
+.LP
+.RS
+tcpdump-workers@tcpdump.org
+.RE
 .LP
 NIT doesn't let you watch your own outbound traffic, BPF will.
 We recommend that you use the latter.
