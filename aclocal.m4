@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.85 2002-07-13 09:36:36 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.86 2002-08-03 22:32:36 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -657,6 +657,8 @@ dnl
 dnl results:
 dnl
 dnl	LIBS
+dnl
+dnl XXX - not used; why not?
 dnl
 
 define(AC_LBL_CHECK_LIB,
