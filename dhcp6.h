@@ -81,7 +81,14 @@ struct dhcp6_solicit {
 #define DH6SOL_CLOSE	0x80
 #define DH6SOL_PREFIX	0x40
 	/* XXX: solicit-ID is a 9-bit field...ugly! */
-#define DH6SOL_SOLICIT_ID_MASK 0x1fff
+#define DH6SOL_SOLICIT_ID_MASK 0x01ff
+#define DH6SOL_SOLICIT_ID_SHIFT 0
+#define DH6SOL_SOLICIT_ID(x) \
+    (((x) & DH6SOL_SOLICIT_ID_MASK) >> DH6SOL_SOLICIT_ID_SHIFT)
+#define DH6SOL_SOLICIT_PLEN_MASK 0xfe00
+#define DH6SOL_SOLICIT_PLEN_SHIFT 9
+#define DH6SOL_SOLICIT_PLEN(x) \
+    (((x) & DH6SOL_SOLICIT_PLEN_MASK) >> DH6SOL_SOLICIT_PLEN_SHIFT)
 	u_int16_t dh6sol_plen_id; /* prefix-len and solict-ID */
 	struct in6_addr dh6sol_cliaddr;	/* client's lladdr */
 	struct in6_addr dh6sol_relayaddr; /* relay agent's lladdr */
