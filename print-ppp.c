@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.47 2000-09-23 08:54:37 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.48 2000-09-24 08:08:56 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -736,7 +736,7 @@ handle_chap(const u_char *p, int length)
 	}
 }
 
-/* PAP */
+/* PAP (see RFC 1334) */
 static void
 handle_pap(const u_char *p, int length)
 {
@@ -798,7 +798,7 @@ handle_pap(const u_char *p, int length)
 			return;
 		msg_len = *p;		/* Msg-Length */
 		p++;
-		if (length - (p - p0) < passwd_len)
+		if (length - (p - p0) < msg_len)
 			return;
 		printf(", Msg=");
 		for (i = 0; i< msg_len; i++)
