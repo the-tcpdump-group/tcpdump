@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.208 2003-05-25 16:26:57 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.209 2003-06-03 23:32:42 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -608,21 +608,24 @@ main(int argc, char **argv)
 		thiszone = gmt2local(0);
 
 	if (RFileName != NULL) {
-		/*
-		 * We don't need network access, so set it back to the user id.
-		 * Also, this prevents the user from reading anyone's
-		 * trace file.
-		 */
 #ifndef WIN32
+		/*
+		 * We don't need network access, so relinquish any set-UID
+		 * or set-GID privileges we have (if any).
+		 *
+		 * We do *not* want set-UID privileges when opening a
+		 * trace file, as that might let the user read other
+		 * people's trace files (especially if we're set-UID
+		 * root).
+		 */
 		setuid(getuid());
 #endif /* WIN32 */
-
 		pd = pcap_open_offline(RFileName, ebuf);
+		if (pd == NULL)
+			error("%s", ebuf);
                 printf("reading from file %s, link-type %u\n",
 		       RFileName,
 		       pcap_datalink(pd));
-		if (pd == NULL)
-			error("%s", ebuf);
 		localnet = 0;
 		netmask = 0;
 		if (fflag != 0)
