@@ -139,15 +139,6 @@
 /* Define if you have the getnameinfo function.  */
 #undef HAVE_GETNAMEINFO
 
-/* Define if you have the inet_aton function.  */
-#undef HAVE_INET_ATON
-
-/* Define if you have the inet_ntop function.  */
-#undef HAVE_INET_NTOP
-
-/* Define if you have the inet_pton function.  */
-#undef HAVE_INET_PTON
-
 /* Define if you have the pcap_dump_flush function.  */
 #undef HAVE_PCAP_DUMP_FLUSH
 

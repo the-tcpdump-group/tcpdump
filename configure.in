@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.162 2003-05-02 08:15:18 itojun Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.163 2003-05-02 08:48:25 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.162 $)
+AC_REVISION($Revision: 1.163 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -393,39 +393,6 @@ main()
 	])
 	AC_REPLACE_FUNCS(getaddrinfo getnameinfo)
 fi
-dnl AC_TRY_COMPILE(inet_ntop inet_pton inet_aton)
-AC_MSG_CHECKING(for inet_ntop)
-AC_TRY_COMPILE([#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>], [char src[4], dst[128];
-inet_ntop(AF_INET, src, dst, sizeof(dst));],
-	[AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)
-	AC_REPLACE_FUNCS(inet_ntop)])
-AC_MSG_CHECKING(for inet_pton)
-AC_TRY_COMPILE([#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>], [char src[128], dst[4];
-inet_pton(AF_INET, src, dst);],
-	[AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)
-	AC_REPLACE_FUNCS(inet_pton)])
-AC_MSG_CHECKING(for inet_aton)
-AC_TRY_COMPILE([#include <sys/types.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>], [char src[128];
-struct in_addr dst;
-inet_aton(src, &dst);],
-	[AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)
-	AC_REPLACE_FUNCS(inet_aton)])
-
-dnl portability macros for getaddrinfo/getnameinfo
-dnl
-dnl Check for sa_len
-AC_CHECK_SA_LEN(ac_cv_sockaddr_has_sa_len)
-if test "$ac_cv_sockaddr_has_sa_len" = no; then
-	missing_includes=yes
-fi
 
 AC_CACHE_CHECK([for dnet_htoa declaration in netdnet/dnetdb.h],
 [td_cv_decl_netdnet_dnetdb_h_dnet_htoa],
@@ -559,6 +526,52 @@ dnl AC_CHECK_LIB(z, uncompress)
 dnl AC_CHECK_HEADERS(zlib.h)
 
 AC_LBL_LIBPCAP(V_PCAPDEP, V_INCLS)
+
+#
+# Check for these after AC_LBL_LIBPCAP, so we link with the appropriate
+# libraries (e.g., "-lsocket -lnsl" on Solaris).
+#
+# We don't use AC_REPLACE_FUNCS because that uses AC_CHECK_FUNCS which
+# use AC_CHECK_FUNC which doesn't let us specify the right #includes
+# to make this work on BSD/OS 4.x.  BSD/OS 4.x ships with the BIND8
+# resolver, and the way it defines inet_{ntop,pton} is rather strange;
+# it does not ship with a libc symbol "inet_ntop()", it ships with
+# "_inet_ntop()", and has a #define macro in one of the system headers
+# to rename it.
+#
+dnl AC_TRY_COMPILE(inet_ntop inet_pton inet_aton)
+AC_MSG_CHECKING(for inet_ntop)
+AC_TRY_LINK([#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>], [char src[4], dst[128];
+inet_ntop(AF_INET, src, dst, sizeof(dst));],
+	[AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)
+	LIBOBJS="$LIBOBJS inet_ntop.o"])
+AC_MSG_CHECKING(for inet_pton)
+AC_TRY_LINK([#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>], [char src[128], dst[4];
+inet_pton(AF_INET, src, dst);],
+	[AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)
+	LIBOBJS="$LIBOBJS inet_pton.o"])
+AC_MSG_CHECKING(for inet_aton)
+AC_TRY_LINK([#include <sys/types.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>], [char src[128];
+struct in_addr dst;
+inet_aton(src, &dst);],
+	[AC_MSG_RESULT(yes)], [AC_MSG_RESULT(no)
+	LIBOBJS="$LIBOBJS inet_aton.o"])
+
+dnl portability macros for getaddrinfo/getnameinfo
+dnl
+dnl Check for sa_len
+AC_CHECK_SA_LEN(ac_cv_sockaddr_has_sa_len)
+if test "$ac_cv_sockaddr_has_sa_len" = no; then
+	missing_includes=yes
+fi
 
 AC_CHECK_FUNCS(pcap_findalldevs pcap_dump_flush pcap_lib_version)
 if test $ac_cv_func_pcap_lib_version = "no" ; then
