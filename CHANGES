@@ -1,4 +1,7 @@
-$Header: /tcpdump/master/tcpdump/CHANGES,v 1.79 2001-01-10 20:13:58 mcr Exp $
+$Header: /tcpdump/master/tcpdump/CHANGES,v 1.80 2001-01-29 09:20:15 itojun Exp $
+
+itojun@iijlab.net
+- BIND9 lwres dissector (Jan 29 2001)
 
 Tuesday January 9, 2001. mcr@sandelman.ottawa.on.ca. Summary for 3.6 release
 	Cleaned up documentation.
@@ -595,4 +598,4 @@ v2.0 Sun Jan 13 12:20:40 PST 1991
 
 - Initial public release.
 
-@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.79 2001-01-10 20:13:58 mcr Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.80 2001-01-29 09:20:15 itojun Exp $ (LBL)
