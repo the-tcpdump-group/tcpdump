@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ip.h,v 1.5 2000-10-03 02:54:56 itojun Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ip.h,v 1.6 2000-10-03 03:14:46 itojun Exp $ (LBL) */
 /*
  * Copyright (c) 1982, 1986, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -145,9 +145,9 @@ struct	ip_timestamp {
 	u_int8_t	ipt_code;	/* IPOPT_TS */
 	u_int8_t	ipt_len;	/* size of structure (variable) */
 	u_int8_t	ipt_ptr;	/* index of current entry */
-	u_int8_t	ipt_flgoflw;	/* flags, overflow counter */
-#define IPTS_FLG(ip)	(((ipt)->ipt_flgoflw & 0xf0) >> 4)
-#define IPTS_OFLW(ip)	((ipt)->ipt_flgoflw & 0x0f)
+	u_int8_t	ipt_oflwflg;	/* flags, overflow counter */
+#define IPTS_OFLW(ip)	(((ipt)->ipt_oflwflg & 0xf0) >> 4)
+#define IPTS_FLG(ip)	((ipt)->ipt_oflwflg & 0x0f)
 	union ipt_timestamp {
 		u_int32_t ipt_time[1];
 		struct	ipt_ta {

@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/tcp.h,v 1.5 2000-10-03 02:55:02 itojun Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/tcp.h,v 1.6 2000-10-03 03:14:47 itojun Exp $ (LBL) */
 /*
  * Copyright (c) 1982, 1986, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -67,8 +67,8 @@ struct tcphdr {
 	u_int16_t	th_dport;		/* destination port */
 	tcp_seq		th_seq;			/* sequence number */
 	tcp_seq		th_ack;			/* acknowledgement number */
-	u_int8_t	th_x2off;
-#define TH_OFF(th)	((th)->th_x2off & 0x0f)	/* data offset, th_off */
+	u_int8_t	th_offx2;		/* data offset, rsvd */
+#define TH_OFF(th)	(((th)->th_offx2 & 0xf0) >> 4)
 	u_int8_t	th_flags;
 #define	TH_FIN	0x01
 #define	TH_SYN	0x02
