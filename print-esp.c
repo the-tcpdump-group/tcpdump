@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.34 2003-03-02 23:19:38 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.35 2003-03-13 07:40:48 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -100,9 +100,22 @@ struct esp_algorithm esp_xforms[]={
 struct esp_algorithm *null_xf =
   &esp_xforms[sizeof(esp_xforms)/sizeof(esp_xforms[0]) - 1];
 
+#ifndef HAVE_SOCKADDR_STORAGE
+#ifdef INET6
+struct sockaddr_storage {
+	union {
+		struct sockaddr_in sin;
+		struct sockaddr_in6 sin6;
+	} un;
+};
+#else
+#define sockaddr_storage sockaddr
+#endif
+#endif /* HAVE_SOCKADDR_STORAGE */
+
 struct sa_list {
   struct sa_list *next;
-  uint32_t       daddr;
+  struct sockaddr_storage daddr;
   uint32_t         spi;
   struct         esp_algorithm *xform;
   char           secret[256];  /* is that big enough for all secrets? */
@@ -184,8 +197,8 @@ static void esp_print_decode_onesecret(char *line)
   if(line == NULL) {
     decode = spikey;
     spikey = NULL;
-    sa1.daddr = 0;
-    sa1.spi   = 0;
+    /* memset(&sa1.daddr, 0, sizeof(sa1.daddr)); */
+    /* sa1.spi = 0; */
     sa_def    = 1;
   } else {
     decode = line;
@@ -223,23 +236,40 @@ static void esp_print_decode_onesecret(char *line)
   if(spikey) {
     char *spistr, *foo;
     u_int32_t spino;
-    struct in_addr ina;
+    struct sockaddr_in *sin;
+#ifdef INET6
+    struct sockaddr_in6 *sin6;
+#endif
 
     spistr = strsep(&spikey, "@");
    
     spino = strtoul(spistr, &foo, 0);
-    if(spistr == foo) {
+    if(spistr == foo || !spikey) {
       printf("print_esp: failed to decode spi# %s\n", foo);
       return;
     }
 
-    if(inet_pton(AF_INET, spikey, &ina) <= 0) {
+    sa1.spi = spino;
+
+    sin = (struct sockaddr_in *)&sa1.daddr;
+#ifdef INET6
+    sin6 = (struct sockaddr_in6 *)&sa1.daddr;
+    if(inet_pton(AF_INET6, spikey, &sin6->sin6_addr) == 1) {
+#ifdef HAVE_SOCKADDR_SA_LEN
+      sin6->sin6_len = sizeof(struct sockaddr_in6);
+#endif
+      sin6->sin6_family = AF_INET6;
+    } else
+#endif
+    if(inet_pton(AF_INET, spikey, &sin->sin_addr) == 1) {
+#ifdef HAVE_SOCKADDR_SA_LEN
+      sin->sin_len = sizeof(struct sockaddr_in);
+#endif
+      sin->sin_family = AF_INET;
+    } else {
       printf("print_esp: can not decode IP# %s\n", spikey);
       return;
     }
-
-    sa1.daddr = ina.s_addr;
-    sa1.spi = spino;
   }
 
   if(decode) {
@@ -337,8 +367,8 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 {
 	register const struct newesp *esp;
 	register const u_char *ep;
-	struct ip *ip = NULL;
-	struct sa_list *sa;
+	struct ip *ip;
+	struct sa_list *sa = NULL;
 	int espsecret_keylen;
 #ifdef INET6
 	struct ip6_hdr *ip6 = NULL;
@@ -389,26 +419,54 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 #ifdef INET6
 	case 6:
 		ip6 = (struct ip6_hdr *)bp2;
-		ip = NULL;
 		/* we do not attempt to decrypt jumbograms */
 		if (!EXTRACT_16BITS(&ip6->ip6_plen))
 			goto fail;
 		/* if we can't get nexthdr, we do not need to decrypt it */
 		len = sizeof(struct ip6_hdr) + EXTRACT_16BITS(&ip6->ip6_plen);
+
+		/* see if we can find the SA, and if so, decode it */
+		for (sa = sa_list_head; sa != NULL; sa = sa->next) {
+			struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *)&sa->daddr;
+			if (sa->spi == ntohl(esp->esp_spi) &&
+			    sin6->sin6_family == AF_INET6 &&
+			    memcmp(&sin6->sin6_addr, &ip6->ip6_dst,
+				   sizeof(struct in6_addr)) == 0) {
+				break;
+			}
+		}
 		break;
 #endif /*INET6*/
 	case 4:
 		/* nexthdr & padding are in the last fragment */
 		if (EXTRACT_16BITS(&ip->ip_off) & IP_MF)
 			goto fail;
-#ifdef INET6
-		ip6 = NULL;
-#endif
 		len = EXTRACT_16BITS(&ip->ip_len);
+
+		/* see if we can find the SA, and if so, decode it */
+		for (sa = sa_list_head; sa != NULL; sa = sa->next) {
+			struct sockaddr_in *sin = (struct sockaddr_in *)&sa->daddr;
+			if (sa->spi == ntohl(esp->esp_spi) &&
+			    sin->sin_family == AF_INET &&
+			    sin->sin_addr.s_addr == ip->ip_dst.s_addr) {
+				break;
+			}
+		}
 		break;
 	default:
 		goto fail;
 	}
+
+	/* if we didn't find the specific one, then look for
+	 * an unspecified one.
+	 */
+	if(sa == NULL) {
+		sa = sa_default;
+	}
+	
+	/* if not found fail */
+	if(sa == NULL)
+		goto fail;
 
 	/* if we can't get nexthdr, we do not need to decrypt it */
 	if (ep - bp2 < len)
@@ -417,24 +475,6 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 		/* FCS included at end of frame (NetBSD 1.6 or later) */
 		ep = bp2 + len;
 	}
-
-	/* see if we can find the SA, and if so, decode it */
-	sa = sa_list_head;
-	while(sa != NULL &&
-	      sa->daddr != ip->ip_dst.s_addr &&
-	      sa->spi   != ntohl(esp->esp_spi)) {
-	  sa = sa->next;
-	}
-
-	/* if we didn't find the specific one, then look for
-	 * an unspecified one.
-	 */
-	if(sa == NULL) {
-	  sa = sa_default;
-	}
-	
-	/* if not found fail */
-	if(sa == NULL) goto fail;
 
 	ivoff = (u_char *)(esp + 1) + sa->xform->replaysize;
 	ivlen = sa->xform->ivlen;
