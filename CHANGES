@@ -1,3 +1,8 @@
+2000-05-15  Assar Westerlund  <assar@sics.se>
+
+	* print cdp packets, code contributed by Gert Doering
+	<gert@greenie.muc.de>
+
 2000-04-09  Assar Westerlund  <assar@sics.se>
 
 	* make it work on Solaris 8, including ipv6
@@ -588,4 +593,4 @@ v2.0 Sun Jan 13 12:20:40 PST 1991
 
 - Initial public release.
 
-@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.69 2000-04-09 19:17:29 assar Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.70 2000-05-15 00:41:34 assar Exp $ (LBL)
