@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.22 2003-10-20 10:35:20 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.23 2003-10-20 10:50:09 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -788,10 +788,11 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 obj_tptr+=12;
                 break;
             case RSVP_CTYPE_4:
-                printf("\n\t    LSP Encoding Type: %s",
+                printf("\n\t    LSP Encoding Type: %s (%u)",
                        tok2str(gmpls_encoding_values,
-                               "Unknown (0x%02x)",
-                               *obj_tptr));
+                               "Unknown",
+                               *obj_tptr),
+		       *obj_tptr);
                 printf("\n\t    Switching Type: %s (%u), Payload ID: %s (0x%04x)",
                        tok2str(gmpls_switch_cap_values,
                                "Unknown",
@@ -892,6 +893,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                        EXTRACT_32BITS(obj_tptr+4));
                 obj_tlen-=8;
                 obj_tptr+=8;
+                hexdump=TRUE; /* unless we have a TLV parser lets just hexdump */
                 break;
 #ifdef INET6
             case RSVP_CTYPE_4: /* fall through - FIXME add TLV parser */
@@ -901,6 +903,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                        EXTRACT_32BITS(obj_tptr+16));
                 obj_tlen-=20;
                 obj_tptr+=20;
+                hexdump=TRUE; /* unless we have a TLV parser lets just hexdump */
                 break;
 #endif
             default:
