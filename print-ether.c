@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.58 2000-10-09 02:59:39 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.59 2000-10-22 04:17:53 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -191,7 +191,7 @@ ether_encap_print(u_short ethertype, const u_char *p,
 		return (1);
 
 	case ETHERTYPE_8021Q:
-		printf("802.1Q vlan#%d P%d%s",
+		printf("802.1Q vlan#%d P%d%s ",
 		       ntohs(*(u_int16_t *)p) & 0xfff,
 		       ntohs(*(u_int16_t *)p) >> 13,
 		       (ntohs(*(u_int16_t *)p) & 0x1000) ? " CFI" : "");

@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.85 2000-07-29 08:10:06 assar Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.86 2000-10-22 04:17:53 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -566,6 +566,13 @@ Abbreviations for:
 where \fIp\fR is one of the above protocols.
 Note that
 \fItcpdump\fP does not currently know how to parse these protocols.
+.IP "\fBvlan \fI[vlan_id]\fR"
+True if the packet is an IEEE 802.1Q VLAN packet.
+If \fI[vlan_id]\fR is specified, only true is the packet has the specified
+\fIvlan_id\fR.
+Note that the first \fBvlan\fR keyword encountered in \fIexpression\fR
+changes the decoding offsets for the remainder of \fIexpression\fR
+on the assumption that the packet is a VLAN packet.
 .IP  "\fBtcp\fR, \fBudp\fR, \fBicmp\fR"
 Abbreviations for:
 .in +.5i
