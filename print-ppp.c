@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.44 2000-09-18 05:11:44 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.45 2000-09-18 05:23:31 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -67,6 +67,7 @@ struct rtentry;
 #include "addrtoname.h"
 #include "ppp.h"
 #include "chdlc.h"
+#include "ethertype.h"
 
 /* XXX This goes somewhere else. */
 #define PPP_HDRLEN 4
@@ -361,42 +362,24 @@ ppp_protoname(u_int proto)
 #ifdef PPP_XNS
 	case PPP_XNS:	return "XNS";
 #endif
-#ifdef PPP_IPX
 	case PPP_IPX:	return "IPX";
-#endif
+	case PPP_VJC:	return "VJC";
+	case PPP_VJNC:	return "VJNC";
 #ifdef PPP_COMP
 	case PPP_COMP:	return "COMP";
 #endif
-#ifdef PPP_IPCP
 	case PPP_IPCP:	return "IPCP";
-#endif
-#ifdef PPP_IPV6CP
 	case PPP_IPV6CP: return "IPV6CP";
-#endif
-#ifdef PPP_IPXCP
 	case PPP_IPXCP:	return "IPXCP";
-#endif
-#ifdef PPP_CCP
 	case PPP_CCP:	return "CCP";
-#endif
-#ifdef PPP_LCP
 	case PPP_LCP:	return "LCP";
-#endif
-#ifdef PPP_PAP
 	case PPP_PAP:	return "PAP";
-#endif
 #ifdef PPP_LQR
 	case PPP_LQR:	return "LQR";
 #endif
-#ifdef PPP_CHAP
 	case PPP_CHAP:	return "CHAP";
-#endif
-#ifdef PPP_BACP
 	case PPP_BACP:	return "BACP";
-#endif
-#ifdef PPP_BAP
 	case PPP_BAP:	return "BAP";
-#endif
 	default:
 		snprintf(buf, sizeof(buf), "unknown-0x%04x", proto);
 		return buf;
@@ -999,6 +982,10 @@ handle_ppp(u_int proto, const u_char *p, int length)
 		ip6_print(p, length);
 		break;
 #endif
+	case ETHERTYPE_IPX:	/*XXX*/
+	case PPP_IPX:
+		ipx_print(p, length);
+		break;
 	}
 }
 
