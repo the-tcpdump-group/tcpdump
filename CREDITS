@@ -1,14 +1,17 @@
 This file lists people who have contributed to tcpdump:
 
 The current maintainers:
-	Bill Fenner			<fenner@research.att.com>
-	Assar Westerlund 		<assar@sics.se>
 	Alexey Kuznetsov		<kuznet@ms2.inr.ac.ru>
-	Jun-ichiro itojun Hagino	<itojun@iijlab.net>
+	Assar Westerlund 		<assar@sics.se>
+	Bill Fenner			<fenner@research.att.com>
+	Fulvio Risso			<risso@polito.it>
 	Guy Harris 			<guy@alum.mit.edu>
-	Torsten Landschoff 		<t.landschoff@gmx.net>
-	Michael Richardson 		<mcr@sandelman.ottawa.on.ca>
+	Hannes Gredler			<hannes@juniper.net>
+	Juergen Schoenwaelder		<schoenw@ibr.cs.tu-bs.de>
+	Jun-ichiro itojun Hagino	<itojun@iijlab.net>
 	Ken Hornstein			<kenh@cmf.nrl.navy.mil>
+	Michael Richardson 		<mcr@sandelman.ottawa.on.ca>
+	Torsten Landschoff 		<t.landschoff@gmx.net>
 
 Additional people who have contributed patches:
 
@@ -32,7 +35,6 @@ Additional people who have contributed patches:
 	Gert Doering			<gert@greenie.muc.de>
 	Gilbert Ramirez Jr.		<gram@xiexie.org>
 	Gisle Vanem			<gvanem@eunet.no>
-	Hannes Gredler			<hannes@juniper.net>
 	Harry Raaymakers		<harryr@connect.com.au>
 	Heinz-Ado Arnolds		<Ado.Arnolds@dhm-systems.de>
 	Hendrik Scholz			<hendrik@scholz.net>
@@ -44,7 +46,6 @@ Additional people who have contributed patches:
 	Jim Hutchins			<jim@ca.sandia.gov>
 	Tatuya Jinmei			<jinmei@kame.net>
 	Jørgen Thomsen			<jth@jth.net> 
-	Juergen Schoenwaelder		<schoenw@ibr.cs.tu-bs.de>
 	Julian Cowley			<julian@lava.net>
 	Kaarthik Sivakumar		<kaarthik@torrentnet.com>
 	Kazushi Sugyo			<sugyo@pb.jp.nec.com>
