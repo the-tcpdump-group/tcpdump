@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.31 2002-12-11 07:13:59 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.32 2003-02-05 02:38:45 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -62,6 +62,7 @@ static const char rcsid[] =
 
 static struct esp_algorithm *espsecret_xform=NULL;  /* cache of decoded alg. */
 static char                 *espsecret_key=NULL;
+static int                   espsecret_keylen=0;
 
 
 enum cipher { NONE,
@@ -177,8 +178,10 @@ static void esp_print_decodesecret(void)
 			colon+=2;
 			i++;
 		}
+		espsecret_keylen = len;
 	} else {
 		espsecret_key = colon;
+		espsecret_keylen = strlen(colon);
 	}
 }
 
@@ -298,6 +301,8 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 		}
 		p = ivoff + ivlen;
 
+		if (espsecret_keylen != 8)
+			goto fail;
 #if OPENSSL_VERSION_NUMBER >= 0x00907000L
 		DES_set_key_unchecked((DES_cblock *)secret, schedule);
 
@@ -324,7 +329,9 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 	    {
 		BF_KEY schedule;
 
-		BF_set_key(&schedule, strlen(secret), secret);
+		if (espsecret_keylen < 5 || espsecret_keylen > 56)
+			goto fail;
+		BF_set_key(&schedule, espsecret_keylen, secret);
 
 		p = ivoff + ivlen;
 		BF_cbc_encrypt(p, p, (long)(ep - p), &schedule, ivoff,
@@ -341,7 +348,9 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 	    {
 		RC5_32_KEY schedule;
 
-		RC5_32_set_key(&schedule, strlen(secret), secret,
+		if (espsecret_keylen < 5 || espsecret_keylen > 255)
+			goto fail;
+		RC5_32_set_key(&schedule, espsecret_keylen, secret,
 			RC5_16_ROUNDS);
 
 		p = ivoff + ivlen;
@@ -359,7 +368,9 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 	    {
 		CAST_KEY schedule;
 
-		CAST_set_key(&schedule, strlen(secret), secret);
+		if (espsecret_keylen < 5 || espsecret_keylen > 16)
+			goto fail;
+		CAST_set_key(&schedule, espsecret_keylen, secret);
 
 		p = ivoff + ivlen;
 		CAST_cbc_encrypt(p, p, (long)(ep - p), &schedule, ivoff,
@@ -377,6 +388,8 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 #if OPENSSL_VERSION_NUMBER >= 0x00907000L
 		DES_key_schedule s1, s2, s3;
 
+		if (espsecret_keylen != 24)
+			goto fail;
 		DES_set_odd_parity((DES_cblock *)secret);
 		DES_set_odd_parity((DES_cblock *)(secret + 8));
 		DES_set_odd_parity((DES_cblock *)(secret + 16));
@@ -398,6 +411,8 @@ esp_print(register const u_char *bp, register const u_char *bp2,
 #else
 		des_key_schedule s1, s2, s3;
 
+		if (espsecret_keylen != 24)
+			goto fail;
 		des_check_key = 1;
 		des_set_odd_parity((void *)secret);
 		des_set_odd_parity((void *)(secret + 8));
