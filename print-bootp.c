@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.52 2000-09-28 06:42:56 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.53 2000-10-27 23:26:30 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -188,7 +188,7 @@ static struct tok tag2str[] = {
 /* RFC1048 tags */
 	{ TAG_PAD,		" PAD" },
 	{ TAG_SUBNET_MASK,	"iSM" },	/* subnet mask (RFC950) */
-	{ TAG_TIME_OFFSET,	"lTZ" },	/* seconds from UTC */
+	{ TAG_TIME_OFFSET,	"LTZ" },	/* seconds from UTC */
 	{ TAG_GATEWAY,		"iDG" },	/* default gateway */
 	{ TAG_TIME_SERVER,	"iTS" },	/* time servers (RFC868) */
 	{ TAG_NAME_SERVER,	"iIEN" },	/* IEN name servers (IEN116) */
@@ -359,6 +359,7 @@ rfc1048_print(register const u_char *bp, register u_int length)
 
 		case 'i':
 		case 'l':
+		case 'L':
 			/* ip addresses/32-bit words */
 			while (size >= sizeof(ul)) {
 				if (!first)
@@ -366,6 +367,8 @@ rfc1048_print(register const u_char *bp, register u_int length)
 				memcpy((char *)&ul, (char *)bp, sizeof(ul));
 				if (c == 'i')
 					printf("%s", ipaddr_string(&ul));
+				else if (c == 'L')
+					printf("%d", ul);
 				else
 					printf("%u", ul);
 				bp += sizeof(ul);
