@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.39 2002-07-22 14:09:07 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.40 2002-07-22 23:00:22 hannes Exp $";
 #endif
 
 #include <sys/param.h>
@@ -245,6 +245,8 @@ static struct tok bgp_origin_values[] = {
 #define SAFNUM_VPNMULTICAST             129
 #define SAFNUM_VPNUNIMULTICAST          130
 
+#define BGP_VPN_RD_LEN                  8
+
 static struct tok bgp_safi_values[] = {
     { SAFNUM_RES,               "Reserved"},
     { SAFNUM_UNICAST,           "Unicast"},
@@ -310,17 +312,17 @@ static struct tok bgp_extd_comm_subtype_values[] = {
 };
 
 static int
-decode_prefix4(const u_char *pd, char *buf, u_int buflen)
+decode_prefix4(const u_char *pptr, char *buf, u_int buflen)
 {
 	struct in_addr addr;
 	u_int plen;
 
-	plen = pd[0];
+	plen = pptr[0];
 	if (plen < 0 || 32 < plen)
 		return -1;
 
 	memset(&addr, 0, sizeof(addr));
-	memcpy(&addr, &pd[1], (plen + 7) / 8);
+	memcpy(&addr, &pptr[1], (plen + 7) / 8);
 	if (plen % 8) {
 		((u_char *)&addr)[(plen + 7) / 8 - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
@@ -330,18 +332,18 @@ decode_prefix4(const u_char *pd, char *buf, u_int buflen)
 }
 
 static int
-decode_labeled_prefix4(const u_char *pd, char *buf, u_int buflen)
+decode_labeled_prefix4(const u_char *pptr, char *buf, u_int buflen)
 {
 	struct in_addr addr;
 	u_int plen;
 
-	plen = pd[0];   /* get prefix length */
+	plen = pptr[0];   /* get prefix length */
 
         /* this is one of the weirdnesses of rfc3107
            the label length (actually the label + COS bits)
-           is added of the prefix length;
+           is added to the prefix length;
            we also do only read out just one label -
-           there is no real application for advertisment of
+           there is no real application for advertisement of
            stacked labels in a a single BGP message
         */
 
@@ -351,19 +353,81 @@ decode_labeled_prefix4(const u_char *pd, char *buf, u_int buflen)
 		return -1;
 
 	memset(&addr, 0, sizeof(addr));
-	memcpy(&addr, &pd[4], (plen + 7) / 8);
+	memcpy(&addr, &pptr[4], (plen + 7) / 8);
 	if (plen % 8) {
 		((u_char *)&addr)[(plen + 7) / 8 - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
 	}
         /* the label may get offsetted by 4 bits so lets shift it right */
-	snprintf(buf, buflen, "%s/%d label:%u %s",
+	snprintf(buf, buflen, "%s/%d, label:%u %s",
                  getname((u_char *)&addr),
                  plen,
-                 EXTRACT_24BITS(pd+1)>>4,
-                 ((pd[3]&1)==0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
+                 EXTRACT_24BITS(pptr+1)>>4,
+                 ((pptr[3]&1)==0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
 
 	return 4 + (plen + 7) / 8;
+}
+
+
+static u_char *
+bgp_vpn_rd_print (const u_char *pptr) {
+
+   /* allocate space for the following string
+    * xxx.xxx.xxx.xxx:xxxxx
+    * 21 bytes plus one termination byte */
+    static char rd[22];
+    char *pos = rd;
+
+    /* ok lets load the RD format */
+    switch (EXTRACT_16BITS(pptr)) {
+        /* AS:IP-address fmt*/
+    case 0:
+        pos+=sprintf(pos, "%u:%s",
+                     EXTRACT_16BITS(pptr+2),
+                     getname(pptr+4));
+        break;
+        /* IP-address:AS fmt*/
+    case 1:
+        pos+=sprintf(pos, "%s:%u",
+                     getname(pptr+2),
+                     EXTRACT_16BITS(pptr+6));
+        break;
+    default:
+        pos+=sprintf(pos, "unknown RD format");
+        break;
+    }
+    *(pos) = '\0';
+    return (rd);
+}
+
+static int
+decode_labeled_vpn_prefix4(const u_char *pptr, char *buf, u_int buflen)
+{
+	struct in_addr addr;
+	u_int plen;
+
+	plen = pptr[0];   /* get prefix length */
+
+        plen-=(24+64); /* adjust prefixlen - labellength - RD len*/
+
+	if (plen < 0 || 32 < plen)
+		return -1;
+
+	memset(&addr, 0, sizeof(addr));
+	memcpy(&addr, &pptr[12], (plen + 7) / 8);
+	if (plen % 8) {
+		((u_char *)&addr)[(plen + 7) / 8 - 1] &=
+			((0xff00 >> (plen % 8)) & 0xff);
+	}
+        /* the label may get offsetted by 4 bits so lets shift it right */
+	snprintf(buf, buflen, "RD: %s, %s/%d, label:%u %s",
+                 bgp_vpn_rd_print(pptr+4),
+                 getname((u_char *)&addr),
+                 plen,
+                 EXTRACT_24BITS(pptr+1)>>4,
+                 ((pptr[3]&1)==0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
+
+	return 12 + (plen + 7) / 8;
 }
 
 #ifdef INET6
@@ -544,10 +608,19 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                                     case SAFNUM_MULTICAST:
                                     case SAFNUM_UNIMULTICAST:
                                     case SAFNUM_LABUNICAST:
-					printf("%s", getname(tptr));
+					printf("%s",getname(tptr));
 					tlen -= sizeof(struct in_addr);
                                         tptr += sizeof(struct in_addr);
 					break;
+                                    case SAFNUM_VPNUNICAST:
+                                    case SAFNUM_VPNMULTICAST:
+                                    case SAFNUM_VPNUNIMULTICAST:
+                                        printf("RD: %s, %s",
+                                               bgp_vpn_rd_print(tptr),
+                                               getname(tptr+BGP_VPN_RD_LEN));
+					tlen -= (sizeof(struct in_addr)+BGP_VPN_RD_LEN);
+                                        tptr += (sizeof(struct in_addr)+BGP_VPN_RD_LEN);
+                                        break;
                                     default:
                                         printf("no SAFI %u decoder",safi);                                        
                                         if (!vflag)
@@ -565,7 +638,15 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                                         printf("%s", getname6(tptr));
                                         tlen -= sizeof(struct in6_addr);
                                         tptr += sizeof(struct in6_addr);
-                                        break;
+                                    case SAFNUM_VPNUNICAST:
+                                    case SAFNUM_VPNMULTICAST:
+                                    case SAFNUM_VPNUNIMULTICAST:
+                                        printf("RD: %s, %s",
+                                               bgp_vpn_rd_print(tptr),
+                                               getname6(tptr+BGP_VPN_RD_LEN));
+					tlen -= (sizeof(struct in6_addr)+BGP_VPN_RD_LEN);
+                                        tptr += (sizeof(struct in6_addr)+BGP_VPN_RD_LEN);
+                                        break;                                        break;
                                     default:
                                         printf("no SAFI %u decoder",safi);
                                         if (!vflag)
@@ -608,6 +689,12 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                                 break;
                             case SAFNUM_LABUNICAST:
                                 advance = decode_labeled_prefix4(tptr, buf, sizeof(buf));
+                                printf("\n\t      %s", buf);
+                                break;
+                            case SAFNUM_VPNUNICAST:
+                            case SAFNUM_VPNMULTICAST:
+                            case SAFNUM_VPNUNIMULTICAST:
+                                advance = decode_labeled_vpn_prefix4(tptr, buf, sizeof(buf));
                                 printf("\n\t      %s", buf);
                                 break;
                             default:
@@ -677,6 +764,12 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                                 break;
                             case SAFNUM_LABUNICAST:
                                 advance = decode_labeled_prefix4(tptr, buf, sizeof(buf));
+                                printf("\n\t      %s", buf);
+                                break;
+                            case SAFNUM_VPNUNICAST:
+                            case SAFNUM_VPNMULTICAST:
+                            case SAFNUM_VPNUNIMULTICAST:
+                                advance = decode_labeled_vpn_prefix4(tptr, buf, sizeof(buf));
                                 printf("\n\t      %s", buf);
                                 break;
                             default:
@@ -803,7 +896,7 @@ bgp_open_print(const u_char *dat, int length)
 	printf("my AS %u, ", ntohs(bgpo.bgpo_myas));
 	printf("Holdtime %us, ", ntohs(bgpo.bgpo_holdtime));
 	printf("ID %s", getname((u_char *)&bgpo.bgpo_id));
-	printf("\n\t  Optional parameters, length %u", bgpo.bgpo_optlen);
+	printf("\n\t  Optional parameters, length: %u", bgpo.bgpo_optlen);
 
 	/* ugly! */
 	opt = &((const struct bgp_open *)dat)->bgpo_optlen;
@@ -814,11 +907,11 @@ bgp_open_print(const u_char *dat, int length)
 		TCHECK2(opt[i], BGP_OPT_SIZE);
 		memcpy(&bgpopt, &opt[i], BGP_OPT_SIZE);
 		if (i + 2 + bgpopt.bgpopt_len > bgpo.bgpo_optlen) {
-                        printf("\n\t     Option %d, length %d", bgpopt.bgpopt_type, bgpopt.bgpopt_len);
+                        printf("\n\t     Option %d, length: %u", bgpopt.bgpopt_type, bgpopt.bgpopt_len);
 			break;
 		}
 
-		printf("\n\t    Option %s (%u), length %d",
+		printf("\n\t    Option %s (%u), length: %u",
                        tok2str(bgp_opt_values,"Unknown", bgpopt.bgpopt_type),
                        bgpopt.bgpopt_type,
                        bgpopt.bgpopt_len);
@@ -828,7 +921,7 @@ bgp_open_print(const u_char *dat, int length)
                 case BGP_OPT_CAP:
                     cap_type=opt[i+BGP_OPT_SIZE];
                     cap_len=opt[i+BGP_OPT_SIZE+1];
-                    printf("\n\t      %s, length %u",
+                    printf("\n\t      %s, length: %u",
                            tok2str(bgp_capcode_values,"Unknown", cap_type),
                            cap_len);
                     switch(cap_type) {
