@@ -10,6 +10,7 @@
 #endif
 
 #include <stdio.h>
+#include <string.h>
 #include <sys/types.h>
 
 #include "interface.h"
@@ -25,7 +26,8 @@ struct smbdescript
   char *req_f2;
   char *rep_f1;
   char *rep_f2;
-  void (*fn)();
+  void (*fn)(); /* sometimes (u_char *, u_char *, u_char *, u_char *)
+		and sometimes (u_char *, u_char *, int, int) */
 };
 
 struct smbfns
@@ -234,7 +236,6 @@ static void print_browse(uchar *param,int paramlen,uchar *data,int datalen)
 
 static void print_ipc(uchar *param,int paramlen,uchar *data,int datalen)
 {
-  int command = SVAL(param,0);
   if (paramlen)
     fdata(param,"Command=[w]\nStr1=[S]\nStr2=[S]\n",param+paramlen);
   if (datalen)
@@ -247,7 +248,6 @@ static void print_trans(uchar *words,uchar *data1,uchar *buf,uchar *maxbuf)
   uchar *f1,*f2,*f3,*f4;
   uchar *data,*param;
   int datalen,paramlen;
-  int buflen = SVAL(data1,0);
 
   if (request) {
     paramlen = SVAL(words+1,9*2);
@@ -288,7 +288,7 @@ static void print_trans(uchar *words,uchar *data1,uchar *buf,uchar *maxbuf)
 
 
 
-void print_negprot(uchar *words,uchar *data,uchar *buf,uchar *maxbuf)
+static void print_negprot(uchar *words,uchar *data,uchar *buf,uchar *maxbuf)
 {
   uchar *f1=NULL,*f2=NULL;
 
@@ -316,7 +316,7 @@ void print_negprot(uchar *words,uchar *data,uchar *buf,uchar *maxbuf)
     
 }
 
-void print_sesssetup(uchar *words,uchar *data,uchar *buf,uchar *maxbuf)
+static void print_sesssetup(uchar *words,uchar *data,uchar *buf,uchar *maxbuf)
 {
   int wcnt = CVAL(words,0);
   uchar *f1=NULL,*f2=NULL;
@@ -605,7 +605,7 @@ NULL,NULL}},
 /*******************************************************************
 print a SMB message
 ********************************************************************/
-void print_smb(uchar *buf,uchar *maxbuf)
+static void print_smb(uchar *buf,uchar *maxbuf)
 {
   int command;
   uchar *words, *data;
@@ -864,10 +864,10 @@ void nbt_udp137_print(uchar *data,int length)
 	      char flags[128]="";
 	      p = fdata(p,"Name=[n2]\t#",maxbuf);
 	      if (p[0] & 0x80) strcat(flags,"<GROUP> ");
-	      if (p[0] & 0x60 == 0) strcat(flags,"B ");
-	      if (p[0] & 0x60 == 1) strcat(flags,"P ");
-	      if (p[0] & 0x60 == 2) strcat(flags,"M ");
-	      if (p[0] & 0x60 == 3) strcat(flags,"_ ");
+	      if ((p[0] & 0x60) == 0x00) strcat(flags,"B ");
+	      if ((p[0] & 0x60) == 0x20) strcat(flags,"P ");
+	      if ((p[0] & 0x60) == 0x40) strcat(flags,"M ");
+	      if ((p[0] & 0x60) == 0x60) strcat(flags,"_ ");
 	      if (p[0] & 0x10) strcat(flags,"<DEREGISTERING> ");
 	      if (p[0] & 0x08) strcat(flags,"<CONFLICT> ");
 	      if (p[0] & 0x04) strcat(flags,"<ACTIVE> ");
