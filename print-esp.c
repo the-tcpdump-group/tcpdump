@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.42 2003-07-17 13:43:24 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.43 2003-08-06 04:59:48 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -331,10 +331,20 @@ static void esp_init(void)
 #endif
 
 int
-esp_print(const u_char *bp, const u_char *bp2, int *nhdr, int *padlen)
+esp_print(const u_char *bp, const u_char *bp2
+#ifndef HAVE_LIBCRYPTO
+	_U_
+#endif
+	,
+	int *nhdr, int *padlen
+#ifndef HAVE_LIBCRYPTO
+	_U_
+#endif
+	)
 {
 	register const struct newesp *esp;
 	register const u_char *ep;
+#ifdef HAVE_LIBCRYPTO
 	struct ip *ip;
 	struct sa_list *sa = NULL;
 	int espsecret_keylen;
@@ -346,7 +356,6 @@ esp_print(const u_char *bp, const u_char *bp2, int *nhdr, int *padlen)
 	char *secret;
 	int ivlen = 0;
 	u_char *ivoff;
-#ifdef HAVE_LIBCRYPTO
 	const u_char *p;
 	EVP_CIPHER_CTX ctx;
 	int blocksz;
@@ -354,10 +363,11 @@ esp_print(const u_char *bp, const u_char *bp2, int *nhdr, int *padlen)
 #endif
 
 	esp = (struct newesp *)bp;
+
+#ifdef HAVE_LIBCRYPTO
 	secret = NULL;
 	advance = 0;
 
-#ifdef HAVE_LIBCRYPTO
 	if (!initialized) {
 		esp_init();
 		initialized = 1;
