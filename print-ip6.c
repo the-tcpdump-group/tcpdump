@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.18 2001-09-17 21:58:03 fenner Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.19 2001-11-15 07:43:31 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -72,8 +72,11 @@ ip6_print(register const u_char *bp, register u_int length)
 	if ((u_long)ip6 & 15) {
 		static u_char *abuf;
 
-		if (abuf == NULL)
+		if (abuf == NULL) {
 			abuf = malloc(snaplen);
+			if (abuf == NULL)
+				error("ip6_print: malloc");
+		}
 		memcpy(abuf, ip6, min(length, snaplen));
 		snapend += abuf - (u_char *)ip6;
 		packetp = abuf;
