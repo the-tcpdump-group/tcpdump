@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.24 2001-09-09 19:26:46 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.25 2001-09-11 02:38:04 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -733,8 +733,8 @@ static int isis_print (const u_char *p, u_int length)
     case L1_LAN_IIH:    
     case L2_LAN_IIH:
     	    if (header->fixed_len != (ISIS_COMMON_HEADER_SIZE+ISIS_IIH_LAN_HEADER_SIZE)) {
-	    	printf(", bogus fixed header length %u should be %u",
-			header->fixed_len, ISIS_IIH_LAN_HEADER_SIZE);
+	    	printf(", bogus fixed header length %u should be %lu",
+			header->fixed_len, (unsigned long)ISIS_IIH_LAN_HEADER_SIZE);
 		    return(0);
     		}
             printf(", L%s Lan IIH",
@@ -766,8 +766,8 @@ static int isis_print (const u_char *p, u_int length)
 
     case PTP_IIH:
     	    if (header->fixed_len != (ISIS_COMMON_HEADER_SIZE+ISIS_IIH_PTP_HEADER_SIZE)) {
-	    	printf(", bogus fixed header length %u should be %u",
-			header->fixed_len, ISIS_IIH_PTP_HEADER_SIZE);
+	    	printf(", bogus fixed header length %u should be %lu",
+			header->fixed_len, (unsigned long)ISIS_IIH_PTP_HEADER_SIZE);
 		    return(0);
     		}
 	    printf(", PTP IIH");
@@ -798,8 +798,8 @@ static int isis_print (const u_char *p, u_int length)
     case L1_LSP:
     case L2_LSP:
      	    if (header->fixed_len != (ISIS_COMMON_HEADER_SIZE+ISIS_LSP_HEADER_SIZE)) {
-	    	printf(", bogus fixed header length %u should be %u",
-			header->fixed_len, ISIS_LSP_HEADER_SIZE);
+	    	printf(", bogus fixed header length %u should be %lu",
+			header->fixed_len, (unsigned long)ISIS_LSP_HEADER_SIZE);
 		    return(0);
     		}
     	    if ( pdu_type == L1_LSP)	
@@ -832,8 +832,8 @@ static int isis_print (const u_char *p, u_int length)
     case L1_CSNP:
     case L2_CSNP:
     	    if (header->fixed_len != (ISIS_COMMON_HEADER_SIZE+ISIS_CSNP_HEADER_SIZE)) {
-	    	printf(", bogus fixed header length %u should be %u",
-			header->fixed_len, ISIS_CSNP_HEADER_SIZE);
+	    	printf(", bogus fixed header length %u should be %lu",
+			header->fixed_len, (unsigned long)ISIS_CSNP_HEADER_SIZE);
 		    return(0);
     		}
             printf(", L%s CSNP", ISIS_MASK_LEVEL_BITS(pdu_type) ? "2" : "1");
@@ -851,8 +851,8 @@ static int isis_print (const u_char *p, u_int length)
     case L1_PSNP:
     case L2_PSNP:
        	    if (header->fixed_len != (ISIS_COMMON_HEADER_SIZE+ISIS_PSNP_HEADER_SIZE)) {
-	    	printf("- bogus fixed header length %u should be %u",
-			header->fixed_len, ISIS_PSNP_HEADER_SIZE);
+	    	printf("- bogus fixed header length %u should be %lu",
+			header->fixed_len, (unsigned long)ISIS_PSNP_HEADER_SIZE);
 		    return(0);
     		}
 	    printf(", L%s PSNP", ISIS_MASK_LEVEL_BITS(pdu_type) ? "2" : "1");
@@ -877,7 +877,8 @@ static int isis_print (const u_char *p, u_int length)
         }
 
 	if (pptr >= snapend) {
-	    printf("\n\t\t\t packet exceeded snapshot (%d) bytes",pptr-snapend);
+	    printf("\n\t\t\t packet exceeded snapshot (%ld) bytes",
+	        (long)(pptr-snapend));
 	    return(1);
 	}
 	type = *pptr++;
