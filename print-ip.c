@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.77 1999-11-23 08:31:10 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.78 1999-12-15 00:34:10 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -73,7 +73,7 @@ struct tr_query {
  	u_int  tr_rttlqid;		/* response ttl and qid */
 };
 
-#define TR_GETTTL(x)		(((x) >> 24) & 0xff)
+#define TR_GETTTL(x)		(int)(((x) >> 24) & 0xff)
 #define TR_GETQID(x)		((x) & 0x00ffffff)
 
 /*
@@ -119,7 +119,7 @@ static void print_mtrace(register const u_char *bp, register u_int len)
 {
 	register struct tr_query *tr = (struct tr_query *)(bp + 8);
 
-	printf("mtrace %d: %s to %s reply-to %s",
+	printf("mtrace %ld: %s to %s reply-to %s",
 		TR_GETQID(ntohl(tr->tr_rttlqid)),
 		ipaddr_string(&tr->tr_src), ipaddr_string(&tr->tr_dst),
 		ipaddr_string(&tr->tr_raddr));
@@ -131,7 +131,7 @@ static void print_mresp(register const u_char *bp, register u_int len)
 {
 	register struct tr_query *tr = (struct tr_query *)(bp + 8);
 
-	printf("mresp %d: %s to %s reply-to %s",
+	printf("mresp %ld: %s to %s reply-to %s",
 		TR_GETQID(ntohl(tr->tr_rttlqid)),
 		ipaddr_string(&tr->tr_src), ipaddr_string(&tr->tr_dst),
 		ipaddr_string(&tr->tr_raddr));
@@ -236,7 +236,7 @@ static void
 ip_printts(register const u_char *cp, u_int length)
 {
 	register u_int ptr = cp[2] - 1;
-	register u_int len;
+	register u_int len = 0;
 	int hoplen;
 	char *type;
 
@@ -274,7 +274,7 @@ ip_printts(register const u_char *cp, u_int length)
 	for (len = 4; len < length; len += hoplen) {
 		if (ptr == len)
 			type = " ^ ";
-		printf("%s%d@%s", type, ntohl(*(u_int32_t *)&cp[len+hoplen-4]),
+		printf("%s%d@%s", type, EXTRACT_32BITS(&cp[len+hoplen-4]),
 		       hoplen!=8 ? "" : ipaddr_string(&cp[len]));
 		type = " ";
 	}
