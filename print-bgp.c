@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.42 2002-07-24 00:10:46 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.43 2002-07-24 21:07:20 hannes Exp $";
 #endif
 
 #include <sys/param.h>
@@ -108,11 +108,10 @@ struct bgp_route_refresh {
     u_int8_t  bgp_marker[16];
     u_int16_t len;
     u_int8_t  type;
-    u_int8_t  afi;    /* the compiler messes this structure up               */
-    u_int8_t  pad;    /* when doing misaligned sequences of int8 and int16   */
-    u_int8_t  res;    /* afi should be int16 - so we have to access it using */
-    u_int8_t  safi;   /* EXTRACT_16BITS(&bgp_route_refresh->afi) (sigh)      */ 
-};
+    u_int8_t  afi[2]; /* the compiler messes this structure up               */
+    u_int8_t  res;    /* when doing misaligned sequences of int8 and int16   */
+    u_int8_t  safi;   /* afi should be int16 - so we have to access it using */
+};                    /* EXTRACT_16BITS(&bgp_route_refresh->afi) (sigh)      */ 
 #define BGP_ROUTE_REFRESH_SIZE          23
 
 struct bgp_attr {
@@ -319,6 +318,25 @@ static struct tok bgp_extd_comm_subtype_values[] = {
     { 2,                      "target"},
     { 3,                      "origin"},
     { 4,                      "link-BW"},
+    { 10,                     "layer2-info"}, 
+    { 0, NULL},
+};
+
+static struct tok bgp_l2vpn_encaps_values[] = {
+    { 0,                      "Reserved"},
+    { 1,                      "Frame Relay"},
+    { 2,                      "ATM AAL5 VCC transport"},
+    { 3,                      "ATM transparent cell transport"}, 
+    { 4,                      "Ethernet VLAN"}, 
+    { 5,                      "Ethernet"}, 
+    { 6,                      "Cisco-HDLC"}, 
+    { 7,                      "PPP"}, 
+    { 8,                      "CEM"}, 
+    { 9,                      "ATM VCC cell transport"}, 
+    { 10,                     "ATM VPC cell transport"}, 
+    { 11,                     "MPLS"}, 
+    { 12,                     "VPLS"}, 
+    { 64,                     "IP-interworking"}, 
     { 0, NULL},
 };
 
@@ -445,6 +463,50 @@ decode_labeled_vpn_prefix4(const u_char *pptr, char *buf, u_int buflen)
                  ((pptr[3]&1)==0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
 
 	return 12 + (plen + 7) / 8;
+}
+
+static int
+decode_labeled_vpn_l2(const u_char *pptr, char *buf, u_int buflen)
+{
+        int plen,tlen,strlen,tlv_type,tlv_len,ttlv_len;
+        plen=EXTRACT_16BITS(pptr);
+        tlen=plen;
+        pptr+=2;
+        strlen=snprintf(buf, buflen, "RD: %s, CE-ID: %u, Label-Block Offset: %u, Label Base %u",
+                        bgp_vpn_rd_print(pptr),
+                        EXTRACT_16BITS(pptr+8),
+                        EXTRACT_16BITS(pptr+10),
+                        EXTRACT_24BITS(pptr+12)>>4); /* the label is offsetted by 4 bits so lets shift it right */
+        pptr+=15;
+        tlen-=15;
+
+        /* ok now the variable part - lets read out TLVs*/
+        while (tlen>0) {
+            tlv_type=*pptr++;
+            tlv_len=EXTRACT_16BITS(pptr);
+            ttlv_len=tlv_len;
+            pptr+=2;
+
+            switch(tlv_type) {
+            case 1:
+                strlen+=snprintf(buf+strlen,buflen-strlen, "\n\t\tcircuit status vector (%u) length: %u: 0x",
+                                 tlv_type,
+                                 tlv_len);
+                ttlv_len=ttlv_len/8+1; /* how many bytes do we need to read ? */
+                while (ttlv_len>0) {
+                    strlen+=snprintf(buf+strlen,buflen-strlen, "%02x",*pptr++);
+                    ttlv_len--;
+                }
+                break;
+            default:
+                snprintf(buf+strlen,buflen-strlen, "\n\t\tunknown TLV #%u, length: %u",
+                         tlv_type,
+                         tlv_len);
+                break;
+            }
+            tlen-=(tlv_len<<3); /* the tlv-length is expressed in bits so lets shift it tright */
+        }
+        return plen+2;
 }
 
 #ifdef INET6
@@ -597,7 +659,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                        tok2str(bgp_safi_values, "Unknown SAFI", safi),
                        safi);
 
-		if (af == AFNUM_INET)
+		if (af == AFNUM_INET || af==AFNUM_L2VPN)
 			;
 #ifdef INET6
 		else if (af == AFNUM_INET6)
@@ -655,6 +717,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                                         printf("%s", getname6(tptr));
                                         tlen -= sizeof(struct in6_addr);
                                         tptr += sizeof(struct in6_addr);
+                                        break;
                                     case SAFNUM_VPNUNICAST:
                                     case SAFNUM_VPNMULTICAST:
                                     case SAFNUM_VPNUNIMULTICAST:
@@ -663,14 +726,32 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                                                getname6(tptr+BGP_VPN_RD_LEN));
 					tlen -= (sizeof(struct in6_addr)+BGP_VPN_RD_LEN);
                                         tptr += (sizeof(struct in6_addr)+BGP_VPN_RD_LEN);
-                                        break;                                        break;
+                                        break;
                                     default:
                                         printf("no SAFI %u decoder",safi);
                                         if (!vflag)
                                             print_unknown_data(tptr,"\n\t    ",tlen);                                        
                                         break;
                                     }
+                                    break;
 #endif
+                                case AFNUM_L2VPN:
+                                   switch(safi) {
+                                    case SAFNUM_VPNUNICAST:
+                                    case SAFNUM_VPNMULTICAST:
+                                    case SAFNUM_VPNUNIMULTICAST:
+                                        printf("%s", getname(tptr));
+					tlen -= (sizeof(struct in_addr));
+                                        tptr += (sizeof(struct in_addr));
+                                        break;                                   
+                                   default:
+                                        printf("no SAFI %u decoder",safi);
+                                        if (!vflag)
+                                            print_unknown_data(tptr,"\n\t    ",tlen);                                        
+                                        break;
+                                   }
+                                   break;
+
 				default:
                                     printf("no AFI %u decoder",af);
                                     if (!vflag)
@@ -737,11 +818,30 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                                 if (!vflag)
                                     print_unknown_data(tptr-3,"\n\t    ",tlen);
                                 advance = 0;
-				tptr = ptr + len;
+				tptr = pptr + len;
 				break;
                             }
                             break;
 #endif
+                        case AFNUM_L2VPN:
+                            switch(safi) {
+                            case SAFNUM_VPNUNICAST:
+                            case SAFNUM_VPNMULTICAST:
+                            case SAFNUM_VPNUNIMULTICAST:
+				advance = decode_labeled_vpn_l2(tptr, buf, sizeof(buf));
+                                printf("\n\t      %s", buf);         
+                                break;                                   
+                            default:
+                                printf("no SAFI %u decoder",safi);
+                                if (!vflag)
+                                    print_unknown_data(tptr,"\n\t    ",tlen);                                        
+                                advance = 0;
+				tptr = pptr + len;
+                                break;
+                            }
+                            break;
+
+
 			default:
                             printf("\n\t      no AFI %u decoder ",af);
                             if (!vflag)
@@ -750,10 +850,8 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                             tptr = pptr + len;
                             break;
 			}
-
 			tptr += advance;
 		}
-
 		break;
 
 	case BGPTYPE_MP_UNREACH_NLRI:
@@ -818,6 +916,25 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                             }
                             break;
 #endif
+
+                        case AFNUM_L2VPN:
+                            switch(safi) {
+                            case SAFNUM_VPNUNICAST:
+                            case SAFNUM_VPNMULTICAST:
+                            case SAFNUM_VPNUNIMULTICAST:
+				advance = decode_labeled_vpn_l2(tptr, buf, sizeof(buf));
+                                printf("\n\t      %s", buf);         
+                                break;                                   
+                            default:
+                                printf("no SAFI %u decoder",safi);
+                                if (!vflag)
+                                    print_unknown_data(tptr-3,"\n\t    ",tlen);                                        
+                                advance = 0;
+				tptr = pptr + len;
+                                break;
+                            }
+                            break;
+
 			default:
 				printf("\n\t    no AFI %u decoder",af);
                                 if (!vflag)
@@ -842,39 +959,54 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                     extd_comm_subtype=*(tptr+1);
                     switch(extd_comm_type) {
                         case 0:
-                            printf("%s%s%s:%u:%s%s",
-                                   (extd_comm&0x80) ? "vendor-specific: " : "",
-                                   (extd_comm&0x40) ? "non-transitive:" : "",
-                                   tok2str(bgp_extd_comm_subtype_values,
-                                           "unknown",
-                                           extd_comm_subtype&0x3f),
-                                   EXTRACT_16BITS(tptr+2),
-                                   getname(tptr+4),
-                                   (tlen>8) ? ", " : "");
+                            switch (extd_comm_subtype) {
+                            case 2:
+                            case 3:
+                            case 4:
+                                printf("\n\t    %s%s%s:%u:%s",
+                                       (extd_comm&0x80) ? "vendor-specific: " : "",
+                                       (extd_comm&0x40) ? "non-transitive: " : "",
+                                       tok2str(bgp_extd_comm_subtype_values,
+                                               "unknown",
+                                               extd_comm_subtype&0x3f),
+                                       EXTRACT_16BITS(tptr+2),
+                                       getname(tptr+4));
+                                break;
+                            /* juniper has allocated typecode 10 to convey l2 information */
+                            case 10:
+                                printf("\n\t    %s%s:%s:Control Flags [0x%02x]:MTU %u",
+                                       (extd_comm&0x40) ? "non-transitive: " : "",
+                                       tok2str(bgp_extd_comm_subtype_values,
+                                               "unknown",
+                                               extd_comm_subtype&0x3f),
+                                       tok2str(bgp_l2vpn_encaps_values,
+                                               "unknown encaps",
+                                               *(tptr+2)),
+                                       *(tptr+3),
+                                       EXTRACT_16BITS(tptr+4));
+                                break;
+                            }
                             break;
                         case 1:
-                            printf("%s%s%s:%s:%u%s",
+                            printf("\n\t    %s%s%s:%s:%u",
                                    (extd_comm&0x80) ? "vendor-specific: " : "",
-                                   (extd_comm&0x40) ? "non-transitive:" : "",
+                                   (extd_comm&0x40) ? "non-transitive: " : "",
                                    tok2str(bgp_extd_comm_subtype_values,
                                            "unknown",
                                            extd_comm_subtype&0x3f),
                                    getname(tptr+2),
-                                   EXTRACT_16BITS(tptr+6),
-                                   (tlen>8) ? ", " : "");
+                                   EXTRACT_16BITS(tptr+6));
                             break;
                         case 2:
-                            printf("%s%s%s:%u:%u%s",
+                            printf("\n\t    %s%s%s:%u:%u",
                                    (extd_comm&0x80) ? "vendor-specific: " : "",
-                                   (extd_comm&0x40) ? "non-transitive:" : "",
+                                   (extd_comm&0x40) ? "non-transitive: " : "",
                                    tok2str(bgp_extd_comm_subtype_values,
                                            "unknown",
                                            extd_comm_subtype&0x3f),
                                    EXTRACT_32BITS(tptr+2),
-                                   EXTRACT_16BITS(tptr+6),
-                                   (tlen>8) ? ", " : "");
+                                   EXTRACT_16BITS(tptr+6));
                             break;
-
                         default:
                             printf("\n\t      no typecode %u decoder",
                                extd_comm_type);
