@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.65 2002-06-11 17:08:48 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.66 2002-07-05 15:58:20 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -483,7 +483,7 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2)
 		str = tok2str(icmp2str, "type-#%d", dp->icmp_type);
 		break;
 	}
-	(void)printf("icmp: %s", str);
+	(void)printf("icmp %d: %s", plen, str);
 	if (vflag) {
 		if (TTEST2(*bp, plen)) {
 			if (in_cksum((u_short*)dp, plen, 0))
