@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.23 2000-10-03 05:16:38 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.24 2000-10-04 02:54:40 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -497,11 +497,12 @@ static char *isakmp_p_map[] = {
 
 static char *ah_p_map[] = {
 	NULL, "(reserved)", "md5", "sha", "1des",
+	"sha2-256", "sha2-384", "sha2-512",
 };
 
 static char *esp_p_map[] = {
 	NULL, "1des-iv64", "1des", "3des", "rc5", "idea", "cast",
-	"blowfish", "3idea", "1des-iv32", "rc4", "null"
+	"blowfish", "3idea", "1des-iv32", "rc4", "null", "aes"
 };
 
 static char *ipcomp_p_map[] = {
@@ -524,9 +525,10 @@ struct attrmap ipsec_t_map[] = {
 
 struct attrmap oakley_t_map[] = {
 	{ NULL,	0 },
-	{ "enc", 7,	{ NULL, "1des", "idea", "blowfish", "rc5",
-		 	  "3des", "cast"}, },
-	{ "hash", 4,	{ NULL, "md5", "sha1", "tiger", }, },
+	{ "enc", 8,	{ NULL, "1des", "idea", "blowfish", "rc5",
+		 	  "3des", "cast", "aes", }, },
+	{ "hash", 7,	{ NULL, "md5", "sha1", "tiger",
+			  "sha2-256", "sha2-384", "sha2-512", }, },
 	{ "auth", 6,	{ NULL, "preshared", "dss", "rsa sig", "rsa enc",
 			  "rsa enc revised", }, },
 	{ "group desc", 5,	{ NULL, "modp768", "modp1024", "EC2N 2^155",
