@@ -51,7 +51,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.17 2001-06-26 15:19:41 itojun Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.18 2001-09-10 06:40:08 fenner Exp $";
 #endif
 
 #include <sys/param.h>
@@ -111,22 +111,18 @@ numstr(int x)
 	return buf;
 }
 
-/* sp points to IAB byte */
+/* sp points to IAC byte */
 static int
 telnet_parse(const u_char *sp, u_int length, int print)
 {
 	int i, c, x;
 	const u_char *osp, *p;
-#define PEEK(c, sp, length) \
-	do { \
-		if (length < 1) \
-			goto trunc; \
-		c = *sp; \
-	} while (0)
 #define FETCH(c, sp, length) \
 	do { \
-		PEEK((c), (sp), (length)); \
-		sp++; \
+		if (length < 1) \
+			goto pktend; \
+		TCHECK(*sp); \
+		c = *sp++; \
 		length--; \
 	} while (0)
 
@@ -134,7 +130,7 @@ telnet_parse(const u_char *sp, u_int length, int print)
 
 	FETCH(c, sp, length);
 	if (c != IAC)
-		goto trunc;
+		goto pktend;
 	FETCH(c, sp, length);
 	if (c == IAC) {		/* <IAC><IAC>! */
 		if (print)
@@ -144,7 +140,7 @@ telnet_parse(const u_char *sp, u_int length, int print)
 
 	i = c - TELCMD_FIRST;
 	if (i < 0 || i > IAC - TELCMD_FIRST)
-		goto trunc;
+		goto pktend;
 
 	switch (c) {
 	case DONT:
@@ -171,7 +167,7 @@ telnet_parse(const u_char *sp, u_int length, int print)
 			p++;
 		}
 		if (*p != IAC)
-			goto trunc;
+			goto pktend;
 
 		switch (x) {
 		case TELOPT_AUTHENTICATION:
@@ -227,8 +223,9 @@ done:
 	return sp - osp;
 
 trunc:
+	(void)printf("[|telnet]");
+pktend:
 	return -1;
-#undef PEEK
 #undef FETCH
 }
 
