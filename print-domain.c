@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.58 2000-12-28 20:30:42 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.59 2000-12-30 09:06:21 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -114,6 +114,10 @@ static const char rcsid[] =
 #endif
 #ifndef T_DNAME
 #define T_DNAME		39		/* non-terminal redirection */
+#endif
+
+#ifndef T_OPT
+#define T_OPT		41		/* EDNS0 option (meta-RR) */
 #endif
 
 #ifndef T_UNSPEC
@@ -352,6 +356,7 @@ static struct tok type2str[] = {
 	{ T_NAPTR,	"NAPTR " },
 	{ T_A6,		"A6 " },
 	{ T_DNAME,	"DNAME " },
+	{ T_OPT,	"OPT " },
 	{ T_UINFO,	"UINFO" },
 	{ T_UID,	"UID" },
 	{ T_GID,	"GID" },
@@ -402,7 +407,7 @@ ns_qprint(register const u_char *cp, register const u_char *bp)
 static const u_char *
 ns_rprint(register const u_char *cp, register const u_char *bp)
 {
-	register u_int i;
+	register u_int class;
 	register u_short typ, len;
 	register const u_char *rp;
 
@@ -419,10 +424,10 @@ ns_rprint(register const u_char *cp, register const u_char *bp)
 	/* print the type/qtype and class (if it's not IN) */
 	typ = *cp++ << 8;
 	typ |= *cp++;
-	i = *cp++ << 8;
-	i |= *cp++;
-	if (i != C_IN)
-		printf(" %s", tok2str(class2str, "(Class %d)", i));
+	class = *cp++ << 8;
+	class |= *cp++;
+	if (class != C_IN && typ != T_OPT)
+		printf(" %s", tok2str(class2str, "(Class %d)", class));
 
 	/* ignore ttl */
 	cp += 4;
@@ -510,7 +515,7 @@ ns_rprint(register const u_char *cp, register const u_char *bp)
 		} else if (pbit < 128) {
 			memset(&a, 0, sizeof(a));
 			memcpy(&a.s6_addr[pbyte], cp + 1, sizeof(a) - pbyte);
-			printf(" %u %s ", pbit, ip6addr_string(&a));
+			printf(" %u %s", pbit, ip6addr_string(&a));
 		}
 		if (pbit > 0)
 			if (ns_nprint(cp + 1 + sizeof(a) - pbyte, bp) == NULL)
@@ -518,6 +523,10 @@ ns_rprint(register const u_char *cp, register const u_char *bp)
 		break;
 	    }
 #endif /*INET6*/
+
+	case T_OPT:
+		printf(" UDPsize=%u", class);
+		break;
 
 	case T_UNSPECA:		/* One long string */
 		if (cp + len > snapend)
@@ -628,7 +637,51 @@ ns_print(register const u_char *bp, u_int length)
 		if (arcount)
 			printf(" [%dau]", arcount);
 
-		ns_qprint((const u_char *)(np + 1), (const u_char *)np);
+		if (qdcount--) {
+			cp = ns_qprint((const u_char *)(np + 1),
+				       (const u_char *)np);
+			if ((cp = ns_rprint(cp, bp)) == NULL)
+				goto trunc;
+			while (qdcount-- && cp < snapend) {
+				cp = ns_qprint((const u_char *)cp,
+					       (const u_char *)np);
+				if ((cp = ns_rprint(cp, bp)) == NULL)
+					goto trunc;
+			}
+		}
+
+		/* Print remaining sections on -vv */
+		if (vflag > 1) {
+			if (ancount--) {
+				if ((cp = ns_rprint(cp, bp)) == NULL)
+					goto trunc;
+				while (ancount-- && cp < snapend) {
+					putchar(',');
+					if ((cp = ns_rprint(cp, bp)) == NULL)
+						goto trunc;
+				}
+			}
+			if (nscount-- && cp < snapend) {
+				fputs(" ns:", stdout);
+				if ((cp = ns_rprint(cp, bp)) == NULL)
+					goto trunc;
+				while (nscount-- && cp < snapend) {
+					putchar(',');
+					if ((cp = ns_rprint(cp, bp)) == NULL)
+						goto trunc;
+				}
+			}
+			if (arcount-- && cp < snapend) {
+				fputs(" ar:", stdout);
+				if ((cp = ns_rprint(cp, bp)) == NULL)
+					goto trunc;
+				while (arcount-- && cp < snapend) {
+					putchar(',');
+					if ((cp = ns_rprint(cp, bp)) == NULL)
+						goto trunc;
+				}
+			}
+		}
 	}
 	printf(" (%d)", length);
 	return;
