@@ -3660,7 +3660,7 @@ fi
     echo "$ac_t""$ac_cv_lbl_have_int16_t" 1>&6
     if test $ac_cv_lbl_have_int16_t = no ; then
 	    cat >> confdefs.h <<\EOF
-#define int16_t u_short
+#define int16_t short
 EOF
 
     fi
@@ -3698,7 +3698,7 @@ fi
     echo "$ac_t""$ac_cv_lbl_have_u_int16_t" 1>&6
     if test $ac_cv_lbl_have_u_int16_t = no ; then
 	    cat >> confdefs.h <<\EOF
-#define u_int16_t short
+#define u_int16_t u_short
 EOF
 
     fi
