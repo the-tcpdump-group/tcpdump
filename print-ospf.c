@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.33 2002-11-07 23:46:23 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.34 2002-11-10 20:41:33 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -107,12 +107,12 @@ ospf_print_lshdr(register const struct lsa_hdr *lshp) {
 	TCHECK(lshp->ls_type);
 	TCHECK(lshp->ls_options);
 
-        printf("\n\t  %s LSA (%d), LSA-ID: %s, Advertising Router: %s, seq 0x%08x, age %ds",
+        printf("\n\t  %s LSA (%d), LSA-ID: %s, Advertising Router: %s, seq 0x%08x, age %us",
                tok2str(lsa_values,"unknown",lshp->ls_type),
                lshp->ls_type,
                ipaddr_string(&lshp->ls_stateid),
                ipaddr_string(&lshp->ls_router),
-               ntohl(lshp->ls_seq),
+               (u_int32_t)ntohl(lshp->ls_seq),
                ntohs(lshp->ls_age));
         printf("\n\t    Options: %s", bittok2str(ospf_option_values,"none",lshp->ls_options));
 
@@ -136,12 +136,12 @@ ospf_print_lsa(register const struct lsa *lsap)
 	register const u_int32_t *lp;
 	register int j, k;
 
-        printf("\n\t  %s LSA (%d), LSA-ID: %s, Advertising Router: %s, seq 0x%08x, age %ds",
+        printf("\n\t  %s LSA (%d), LSA-ID: %s, Advertising Router: %s, seq 0x%08x, age %us",
                tok2str(lsa_values,"unknown",lsap->ls_hdr.ls_type),
                lsap->ls_hdr.ls_type,
                ipaddr_string(&lsap->ls_hdr.ls_stateid),
                ipaddr_string(&lsap->ls_hdr.ls_router),
-               ntohl(lsap->ls_hdr.ls_seq),
+               (u_int32_t)ntohl(lsap->ls_hdr.ls_seq),
                ntohs(lsap->ls_hdr.ls_age));
         printf("\n\t    Options: %s", bittok2str(ospf_option_values,"none",lsap->ls_hdr.ls_options));
 
@@ -224,7 +224,7 @@ ospf_print_lsa(register const struct lsa *lsap)
 		lp = lsap->lsa_un.un_sla.sla_tosmetric;
                 /* suppress tos if its not supported */
                 if(!((lsap->ls_hdr.ls_options)&OSPF_OPTION_T)) {
-                    printf(", metric: %d", ntohl(*lp)&SLA_MASK_METRIC);
+                    printf(", metric: %u", (u_int32_t)ntohl(*lp)&SLA_MASK_METRIC);
                     break;
                 }
 		while ((u_char *)lp < ls_end) {
@@ -244,7 +244,7 @@ ospf_print_lsa(register const struct lsa *lsap)
 		lp = lsap->lsa_un.un_sla.sla_tosmetric;
                 /* suppress tos if its not supported */
                 if(!((lsap->ls_hdr.ls_options)&OSPF_OPTION_T)) {
-                    printf(", metric: %d", ntohl(*lp)&SLA_MASK_METRIC);
+                    printf(", metric: %u", (u_int32_t)ntohl(*lp)&SLA_MASK_METRIC);
                     break;
                 }
 		while ((u_char *)lp < ls_end) {
