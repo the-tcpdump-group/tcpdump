@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.32 2002-07-03 19:47:53 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.33 2002-07-04 09:24:43 hannes Exp $";
 #endif
 
 #include <sys/param.h>
@@ -63,6 +63,14 @@ struct bgp {
 #define BGP_UPDATE		2
 #define BGP_NOTIFICATION	3
 #define BGP_KEEPALIVE		4
+
+static struct tok bgp_msg_values[] = {
+    { BGP_OPEN,                 "Open"},
+    { BGP_UPDATE,               "Update"},
+    { BGP_NOTIFICATION,         "Notification"},
+    { BGP_KEEPALIVE,            "Keepalive"},
+    { 0, NULL}
+};
 
 struct bgp_open {
 	u_int8_t bgpo_marker[16];
@@ -118,102 +126,117 @@ struct bgp_attr {
 #define	BGPTYPE_COMMUNITIES		8	/* RFC1997 */
 #define	BGPTYPE_ORIGINATOR_ID		9	/* RFC1998 */
 #define	BGPTYPE_CLUSTER_LIST		10	/* RFC1998 */
-#define	BGPTYPE_DPA			11	/* work in progress */
+#define	BGPTYPE_DPA			11	/* draft-ietf-idr-bgp-dpa */
 #define	BGPTYPE_ADVERTISERS		12	/* RFC1863 */
 #define	BGPTYPE_RCID_PATH		13	/* RFC1863 */
 #define BGPTYPE_MP_REACH_NLRI		14	/* RFC2283 */
 #define BGPTYPE_MP_UNREACH_NLRI		15	/* RFC2283 */
+#define BGPTYPE_EXTD_COMMUNITIES        16      /* draft-ietf-idr-bgp-ext-communities */
 
-
-static const char *bgptype[] = {
-	NULL, "OPEN", "UPDATE", "NOTIFICATION", "KEEPALIVE",
-};
-#define bgp_type(x) num_or_str(bgptype, sizeof(bgptype)/sizeof(bgptype[0]), (x))
-
-static const char *bgpopt_type[] = {
-	NULL, "Authentication Information", "Capabilities Advertisement",
-};
-#define bgp_opttype(x) \
-	num_or_str(bgpopt_type, sizeof(bgpopt_type)/sizeof(bgpopt_type[0]), (x))
-
-static const char *bgpnotify_major[] = {
-	NULL, "Message Header Error",
-	"OPEN Message Error", "UPDATE Message Error",
-	"Hold Timer Expired", "Finite State Machine Error",
-	"Cease",
-};
-#define bgp_notify_major(x) \
-	num_or_str(bgpnotify_major, \
-		sizeof(bgpnotify_major)/sizeof(bgpnotify_major[0]), (x))
-
-static const char *bgpnotify_minor_1[] = {
-	NULL, "Connection Not Synchronized",
-	"Bad Message Length", "Bad Message Type",
+static struct tok bgp_attr_values[] = {
+    { BGPTYPE_ORIGIN,           "Origin"},
+    { BGPTYPE_AS_PATH,          "AS Path"},
+    { BGPTYPE_NEXT_HOP,         "Next Hop"},
+    { BGPTYPE_MULTI_EXIT_DISC,  "Multi Exit Discriminator"},
+    { BGPTYPE_LOCAL_PREF,       "Local Preference"},
+    { BGPTYPE_ATOMIC_AGGREGATE, "Atomic Aggregate"},
+    { BGPTYPE_AGGREGATOR,       "Aggregator"},
+    { BGPTYPE_COMMUNITIES,      "Community"},
+    { BGPTYPE_ORIGINATOR_ID,    "Originator ID"},
+    { BGPTYPE_CLUSTER_LIST,     "Cluster List"},
+    { BGPTYPE_DPA,              "DPA"},
+    { BGPTYPE_ADVERTISERS,      "Advertisers"},
+    { BGPTYPE_RCID_PATH,        "RCID Path / Cluster ID"},
+    { BGPTYPE_MP_REACH_NLRI,    "Multi-Protocol Reach NLRI"},
+    { BGPTYPE_MP_UNREACH_NLRI,  "Multi-Protocol Unreach NLRI"},
+    { BGPTYPE_EXTD_COMMUNITIES, "Extended Community"},
+    { 255,                      "Reserved for development"},
+    { 0, NULL}
 };
 
-static const char *bgpnotify_minor_2[] = {
-	NULL, "Unsupported Version Number",
-	"Bad Peer AS", "Bad BGP Identifier",
-	"Unsupported Optional Parameter", "Authentication Failure",
-	"Unacceptable Hold Time",
+static struct tok bgp_opt_values[] = {
+    { 1,                        "Authentication Information"},
+    { 2,                        "Capabilities Advertisement"},
+    { 0, NULL}
 };
 
-static const char *bgpnotify_minor_3[] = {
-	NULL, "Malformed Attribute List",
-	"Unrecognized Well-known Attribute", "Missing Well-known Attribute",
-	"Attribute Flags Error", "Attribute Length Error",
-	"Invalid ORIGIN Attribute", "AS Routing Loop",
-	"Invalid NEXT_HOP Attribute", "Optional Attribute Error",
-	"Invalid Network Field", "Malformed AS_PATH",
+#define BGP_NOTIFY_MAJOR_MSG            1
+#define BGP_NOTIFY_MAJOR_OPEN           2
+#define BGP_NOTIFY_MAJOR_UPDATE         3
+#define BGP_NOTIFY_MAJOR_HOLDTIME       4
+#define BGP_NOTIFY_MAJOR_FSM            5
+#define BGP_NOTIFY_MAJOR_CEASE          6
+
+static struct tok bgp_notify_major_values[] = {
+    { BGP_NOTIFY_MAJOR_MSG,     "Message Header Error"},
+    { BGP_NOTIFY_MAJOR_OPEN,    "OPEN Message Error"},
+    { BGP_NOTIFY_MAJOR_UPDATE,  "UPDATE Message Error"},
+    { BGP_NOTIFY_MAJOR_HOLDTIME,"Hold Timer Expired"},
+    { BGP_NOTIFY_MAJOR_FSM,     "Finite State Machine Error"},
+    { BGP_NOTIFY_MAJOR_CEASE,   "Cease"},
+    { 0, NULL}
 };
 
-static const char **bgpnotify_minor[] = {
-	NULL, bgpnotify_minor_1, bgpnotify_minor_2, bgpnotify_minor_3,
-};
-static const int bgpnotify_minor_siz[] = {
-	0, sizeof(bgpnotify_minor_1)/sizeof(bgpnotify_minor_1[0]),
-	sizeof(bgpnotify_minor_2)/sizeof(bgpnotify_minor_2[0]),
-	sizeof(bgpnotify_minor_3)/sizeof(bgpnotify_minor_3[0]),
+static struct tok bgp_notify_minor_msg_values[] = {
+    { 1,                        "Connection Not Synchronized"},
+    { 2,                        "Bad Message Length"},
+    { 3,                        "Bad Message Type"},
+    { 0, NULL}
 };
 
-static const char *bgpattr_origin[] = {
-	"IGP", "EGP", "INCOMPLETE",
+static struct tok bgp_notify_minor_open_values[] = {
+    { 1,                        "Unsupported Version Number"},
+    { 2,                        "Bad Peer AS"},
+    { 3,                        "Bad BGP Identifier"},
+    { 4,                        "Unsupported Optional Parameter"},
+    { 5,                        "Authentication Failure"},
+    { 6,                        "Unacceptable Hold Time"},
+    { 0, NULL}
 };
-#define bgp_attr_origin(x) \
-	num_or_str(bgpattr_origin, \
-		sizeof(bgpattr_origin)/sizeof(bgpattr_origin[0]), (x))
 
-static const char *bgpattr_type[] = {
-	NULL, "ORIGIN", "AS_PATH", "NEXT_HOP",
-	"MULTI_EXIT_DISC", "LOCAL_PREF", "ATOMIC_AGGREGATE", "AGGREGATOR",
-	"COMMUNITIES", "ORIGINATOR_ID", "CLUSTER_LIST", "DPA",
-	"ADVERTISERS", "RCID_PATH", "MP_REACH_NLRI", "MP_UNREACH_NLRI",
+static struct tok bgp_notify_minor_update_values[] = {
+    { 1,                        "Malformed Attribute List"},
+    { 2,                        "Unrecognized Well-known Attribute"},
+    { 3,                        "Missing Well-known Attribute"},
+    { 4,                        "Attribute Flags Error"},
+    { 5,                        "Attribute Length Error"},
+    { 6,                        "Invalid ORIGIN Attribute"},
+    { 7,                        "AS Routing Loop"},
+    { 8,                        "Invalid NEXT_HOP Attribute"},
+    { 9,                        "Optional Attribute Error"},
+    { 10,                       "Invalid Network Field"},
+    { 11,                       "Malformed AS_PATH"},
+    { 0, NULL}
 };
-#define bgp_attr_type(x) \
-	num_or_str(bgpattr_type, \
-		sizeof(bgpattr_type)/sizeof(bgpattr_type[0]), (x))
+
+static struct tok bgp_origin_values[] = {
+    { 1,                        "IGP"},
+    { 2,                        "EGP"},
+    { 3,                        "Incomplete"},
+    { 0, NULL}
+};
 
 /* Subsequent address family identifier, RFC2283 section 7 */
-#define SAFNUM_RES               0
-#define SAFNUM_UNICAST           1
-#define SAFNUM_MULTICAST         2
-#define SAFNUM_UNIMULTICAST      3
+#define SAFNUM_RES                      0
+#define SAFNUM_UNICAST                  1
+#define SAFNUM_MULTICAST                2
+#define SAFNUM_UNIMULTICAST             3
 /* labeled BGP RFC3107 */
-#define SAFNUM_LABUNICAST        4
+#define SAFNUM_LABUNICAST               4
 /* Section 4.3.4 of draft-rosen-rfc2547bis-03.txt  */
-#define SAFNUM_VPNUNICAST      128
-#define SAFNUM_VPNMULTICAST    129
-#define SAFNUM_VPNUNIMULTICAST 130
+#define SAFNUM_VPNUNICAST               128
+#define SAFNUM_VPNMULTICAST             129
+#define SAFNUM_VPNUNIMULTICAST          130
 
 static struct tok bgp_safi_values[] = {
-    { SAFNUM_RES,             "Reserved"},
-    { SAFNUM_UNICAST,         "Unicast"},
-    { SAFNUM_MULTICAST,       "Multicast"},
-    { SAFNUM_UNIMULTICAST,    "Unicast+Multicast"},
-    { SAFNUM_LABUNICAST,      "labeled Unicast"},
-    { SAFNUM_VPNUNICAST,      "labeled VPN Unicast"},
-    { SAFNUM_VPNMULTICAST,    "labeled VPN Multicast"},
-    { SAFNUM_VPNUNIMULTICAST, "labeled VPN Unicast+Multicast"},
+    { SAFNUM_RES,               "Reserved"},
+    { SAFNUM_UNICAST,           "Unicast"},
+    { SAFNUM_MULTICAST,         "Multicast"},
+    { SAFNUM_UNIMULTICAST,      "Unicast+Multicast"},
+    { SAFNUM_LABUNICAST,        "labeled Unicast"},
+    { SAFNUM_VPNUNICAST,        "labeled VPN Unicast"},
+    { SAFNUM_VPNMULTICAST,      "labeled VPN Multicast"},
+    { SAFNUM_VPNUNIMULTICAST,   "labeled VPN Unicast+Multicast"},
     { 0, NULL }
 };
 
@@ -271,32 +294,6 @@ num_or_str(const char **table, size_t siz, int value)
 		return buf;
 	} else
 		return table[value];
-}
-
-static const char *
-bgp_notify_minor(int major, int minor)
-{
-	static const char **table;
-	int siz;
-	static char buf[20];
-	const char *p;
-
-	if (0 <= major
-	 && major < sizeof(bgpnotify_minor)/sizeof(bgpnotify_minor[0])
-	 && bgpnotify_minor[major]) {
-		table = bgpnotify_minor[major];
-		siz = bgpnotify_minor_siz[major];
-		if (0 <= minor && minor < siz && table[minor])
-			p = table[minor];
-		else
-			p = NULL;
-	} else
-		p = NULL;
-	if (p == NULL) {
-		snprintf(buf, sizeof(buf), "#%d", minor);
-		return buf;
-	} else
-		return p;
 }
 
 static int
@@ -396,7 +393,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 		if (len != 1)
 			printf(" invalid len");
 		else
-			printf(" %s", bgp_attr_origin(p[0]));
+			printf(" %s", tok2str(bgp_origin_values, "Unknown Origin Typecode", p[0]));
 		break;
 	case BGPTYPE_AS_PATH:
 		if (len % 2) {
@@ -476,11 +473,11 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 		safi = p[2];
 		if (safi >= 128)
 			printf(" %s vendor specific,",
-                               tok2str(bgp_afi_values, "Unknown", af));
+                               tok2str(bgp_afi_values, "Unknown AFI", af));
 		else {
 			printf(" AFI %s SAFI %s,",
-                               tok2str(bgp_afi_values, "Unknown", af),
-                               tok2str(bgp_safi_values, "Unknown", safi));
+                               tok2str(bgp_afi_values, "Unknown AFI", af),
+                               tok2str(bgp_safi_values, "Unknown SAFI", safi));
 		}
 		p += 3;
 
@@ -568,11 +565,11 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 		safi = p[2];
 		if (safi >= 128)
 			printf(" %s vendor specific,",
-                               tok2str(bgp_afi_values, "Unknown", af));
+                               tok2str(bgp_afi_values, "Unknown AFI", af));
 		else {
 			printf(" AFI %s SAFI %s,",
-                               tok2str(bgp_afi_values, "Unknown", af),
-                               tok2str(bgp_safi_values, "Unknown", safi));
+                               tok2str(bgp_afi_values, "Unknown AFI", af),
+                               tok2str(bgp_safi_values, "Unknown SAFI", safi));
 		}
 		p += 3;
 
@@ -642,8 +639,9 @@ bgp_open_print(const u_char *dat, int length)
 			break;
 		}
 
-		printf(" (option %s, len=%d)", bgp_opttype(bgpopt.bgpopt_type),
-			bgpopt.bgpopt_len);
+		printf(" (option %s, len=%d)",
+                       tok2str(bgp_opt_values,"Unknown", bgpopt.bgpopt_type),
+                       bgpopt.bgpopt_len);
 		i += BGP_OPT_SIZE + bgpopt.bgpopt_len;
 	}
 	return;
@@ -714,8 +712,8 @@ bgp_update_print(const u_char *dat, int length)
 				printf("\n\t\t");
 			else
 				printf(" ");
-			printf("(");		/* ) */
-			printf("%s", bgp_attr_type(bgpa.bgpa_type));
+
+			printf("(%s", tok2str(bgp_attr_values, "Unknown Attribute", bgpa.bgpa_type));
 			if (bgpa.bgpa_flags) {
 				printf("[%s%s%s%s",
 					bgpa.bgpa_flags & 0x80 ? "O" : "",
@@ -772,9 +770,23 @@ bgp_notification_print(const u_char *dat, int length)
 	memcpy(&bgpn, dat, BGP_NOTIFICATION_SIZE);
 	hlen = ntohs(bgpn.bgpn_len);
 
-	printf(": error %s,", bgp_notify_major(bgpn.bgpn_major));
-	printf(" subcode %s",
-		bgp_notify_minor(bgpn.bgpn_major, bgpn.bgpn_minor));
+	printf(": error %s,", tok2str(bgp_notify_major_values, "Unknown", bgpn.bgpn_major));
+
+        switch (bgpn.bgpn_major) {
+
+        case BGP_NOTIFY_MAJOR_MSG:
+            printf(" subcode %s", tok2str(bgp_notify_minor_msg_values, "Unknown", bgpn.bgpn_minor));
+            break;
+        case BGP_NOTIFY_MAJOR_OPEN:
+            printf(" subcode %s", tok2str(bgp_notify_minor_open_values, "Unknown", bgpn.bgpn_minor));
+            break;
+        case BGP_NOTIFY_MAJOR_UPDATE:
+            printf(" subcode %s", tok2str(bgp_notify_minor_update_values, "Unknown", bgpn.bgpn_minor));
+            break;
+        default:
+            break;
+        }
+
 	return;
 trunc:
 	printf("[|BGP]");
@@ -787,7 +799,7 @@ bgp_header_print(const u_char *dat, int length)
 
 	TCHECK2(dat[0], BGP_SIZE);
 	memcpy(&bgp, dat, BGP_SIZE);
-	printf("(%s", bgp_type(bgp.bgp_type));		/* ) */
+	printf("(%s", tok2str(bgp_msg_values, "Unknown Message Type", bgp.bgp_type));
 
 	switch (bgp.bgp_type) {
 	case BGP_OPEN:
@@ -864,7 +876,7 @@ bgp_print(const u_char *dat, int length)
 			p += hlen;
 			start = p;
 		} else {
-			printf("[|BGP %s]", bgp_type(bgp.bgp_type));
+			printf("[|BGP %s]", tok2str(bgp_msg_values, "Unknown Message Type",bgp.bgp_type));
 			break;
 		}
 	}
