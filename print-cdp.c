@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.7 2001-06-15 07:58:28 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.8 2001-06-15 20:52:12 fenner Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -84,6 +84,9 @@ cdp_print(const u_char *p, u_int length, u_int caplen,
 			goto trunc;
 
 		switch (type) {
+		case 0x00:
+			printf(" Goodbye");
+			break;
 		case 0x01:
 			printf(" DevID '%.*s'", len - 4, p + i + 4);
 			break;
@@ -151,29 +154,29 @@ cdp_print_addr(const u_char * p, int l)
 	printf(" (%d): ", num);
 
 	while (p < endp && num >= 0) {
-		if (p + 2 >= endp)
+		if (p + 2 > endp)
 			goto trunc;
 		pl = p[1];
 		p += 2;
 
 		/* special case: IPv4, protocol type=0xcc, addr. length=4 */
-		if (p + 3 >= endp)
+		if (p + 3 > endp)
 			goto trunc;
 		if (pl == 1 && *p == 0xcc && p[1] == 0 && p[2] == 4) {
-			if (p + 7 >= endp)
-				goto trunc;
 			p += 3;
 
+			if (p + 4 > endp)
+				goto trunc;
 			printf("IPv4 %u.%u.%u.%u ", p[0], p[1], p[2], p[3]);
 			p += 4;
 		} else {	/* generic case: just print raw data */
-			if (p + pl >= endp)
+			if (p + pl > endp)
 				goto trunc;
 			printf("pt=0x%02x, pl=%d, pb=", *(p - 2), pl);
 			while (pl-- > 0)
 				printf(" %02x", *p++);
 			al = (*p << 8) + *(p + 1);
-			if (p + 2 + al >= endp)
+			if (p + 2 + al > endp)
 				goto trunc;
 			printf(", al=%d, a=", al);
 			p += 2;
