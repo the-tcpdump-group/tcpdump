@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-symantec.c,v 1.2 2004-03-17 23:24:38 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-symantec.c,v 1.3 2004-03-22 20:02:01 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -57,16 +57,16 @@ symantec_hdr_print(register const u_char *bp, u_int length)
 	etype = ntohs(sp->ether_type);
 	if (!qflag) {
 	        if (etype <= ETHERMTU)
-		          (void)printf(", invalid ethertype %u", etype);
+		          (void)printf("invalid ethertype %u", etype);
                 else 
-		          (void)printf(", ethertype %s (0x%04x)",
+		          (void)printf("ethertype %s (0x%04x)",
 				       tok2str(ethertype_values,"Unknown", etype),
                                        etype);
         } else {
                 if (etype <= ETHERMTU)
-                          (void)printf(", invalid ethertype %u", etype);
+                          (void)printf("invalid ethertype %u", etype);
                 else 
-                          (void)printf(", %s", tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", etype));  
+                          (void)printf("%s", tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", etype));  
         }
 
 	(void)printf(", length %u: ", length);
@@ -88,7 +88,7 @@ symantec_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	u_short extracted_ether_type;
 
 	if (caplen < sizeof (struct symantec_header)) {
-		printf("[|syhmantec]");
+		printf("[|symantec]");
 		return caplen;
 	}
 
