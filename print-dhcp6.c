@@ -32,7 +32,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.16 2002-01-19 08:05:54 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.14.4.1 2002-01-25 05:44:11 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
