@@ -17,7 +17,7 @@
 #  WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 #  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.232 2000-06-26 04:15:34 assar Exp $ (LBL)
+# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.233 2000-07-05 23:50:37 assar Exp $ (LBL)
 
 #
 # Various configurable paths (remember to edit Makefile.in, not Makefile)
@@ -87,13 +87,13 @@ SRC =	$(CSRC) $(GENSRC) $(LOCALSRC)
 
 # We would like to say "OBJ = $(SRC:.c=.o)" but Ultrix's make cannot
 # hack the extra indirection
-OBJ =	$(CSRC:.c=.o) $(GENSRC:.c=.o) $(LOCALSRC:.c=.o) @LIBOBJS@
+OBJ =	$(CSRC:.c=.o) $(GENSRC:.c=.o) $(LOCALSRC:.c=.o) $(LIBOBJS)
 HDR =   addrtoname.h appletalk.h bootp.h decnet.h \
 	ethertype.h extract.h fddi.h gmt2local.h igrp.h interface.h \
 	ipx.h llc.h machdep.h mib.h nfsfh.h nfsv2.h ntp.h ospf.h \
 	savestr.c setsignal.h \
-	gnuc.h ipsec_doi.h isakmp.h l2tp.h netbios.h oakley.h ospf6.h ppp.h \
-	route6d.h
+	gnuc.h ipsec_doi.h isakmp.h l2tp.h nameser.h \
+	netbios.h oakley.h ospf6.h ppp.h route6d.h
 
 TAGHDR = \
 	/usr/include/arpa/tftp.h \

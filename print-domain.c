@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.45 2000-07-01 03:39:02 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.46 2000-07-05 23:50:37 assar Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -51,7 +51,7 @@ struct rtentry;
 #ifdef NOERROR
 #undef T_UNSPEC					/* SINIX does too */
 #endif
-#include <arpa/nameser.h>
+#include "nameser.h"
 
 #include <stdio.h>
 #include <string.h>
