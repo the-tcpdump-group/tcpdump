@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bfd.c,v 1.1 2003-10-27 10:13:44 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bfd.c,v 1.2 2003-10-27 17:21:32 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -105,27 +105,35 @@ bfd_print(register const u_char *pptr, register u_int len, register u_int port)
         bfd_header = (const struct bfd_header_t *)pptr;
         TCHECK(*bfd_header);
 
-        printf("BFDv%u, %s, Flags: [%s], length: %u",
+        if (vflag < 1 )
+        {
+            printf("BFDv%u, %s, Flags: [%s], length: %u",
+                   BFD_EXTRACT_VERSION(bfd_header->version_diag),
+                   tok2str(bfd_port_values, "unknown (%u)", port),
+                   bittok2str(bfd_flag_values, "none", bfd_header->flags),
+                   len);
+            return;
+        }
+
+        printf("BFDv%u, length: %u\n\t%s, Flags: [%s], Diagnostic: %s (0x%02x)",
                BFD_EXTRACT_VERSION(bfd_header->version_diag),
+               len,
                tok2str(bfd_port_values, "unknown (%u)", port),
                bittok2str(bfd_flag_values, "none", bfd_header->flags),
-               len);
-
-        if (vflag >= 1) {
-            printf("\n\tDiagnostic: %s (0x%02x), Detection Timer Multiplier: %u (%u ms Detection time), BFD Length: %u",
-                   tok2str(bfd_diag_values,"unknown",BFD_EXTRACT_DIAG(bfd_header->version_diag)),
-                   BFD_EXTRACT_DIAG(bfd_header->version_diag),
-                   bfd_header->detect_time_multiplier,
-                   bfd_header->detect_time_multiplier * EXTRACT_32BITS(bfd_header->desired_min_tx_interval)/1000,
-                   bfd_header->length);
+               tok2str(bfd_diag_values,"unknown",BFD_EXTRACT_DIAG(bfd_header->version_diag)),
+               BFD_EXTRACT_DIAG(bfd_header->version_diag));
+        
+        printf("\n\tDetection Timer Multiplier: %u (%u ms Detection time), BFD Length: %u",
+               bfd_header->detect_time_multiplier,
+               bfd_header->detect_time_multiplier * EXTRACT_32BITS(bfd_header->desired_min_tx_interval)/1000,
+               bfd_header->length);
 
 
-            printf("\n\tMy Discriminator: 0x%08x", EXTRACT_32BITS(bfd_header->my_discriminator));
-            printf(", Your Discriminator: 0x%08x", EXTRACT_32BITS(bfd_header->your_discriminator));
-            printf("\n\t  Desired min Tx Interval:    %4u ms", EXTRACT_32BITS(bfd_header->desired_min_tx_interval)/1000);
-            printf("\n\t  Required min Rx Interval:   %4u ms", EXTRACT_32BITS(bfd_header->required_min_rx_interval)/1000);
-            printf("\n\t  Required min Echo Interval: %4u ms", EXTRACT_32BITS(bfd_header->required_min_echo_interval)/1000);
-        }
+        printf("\n\tMy Discriminator: 0x%08x", EXTRACT_32BITS(bfd_header->my_discriminator));
+        printf(", Your Discriminator: 0x%08x", EXTRACT_32BITS(bfd_header->your_discriminator));
+        printf("\n\t  Desired min Tx Interval:    %4u ms", EXTRACT_32BITS(bfd_header->desired_min_tx_interval)/1000);
+        printf("\n\t  Required min Rx Interval:   %4u ms", EXTRACT_32BITS(bfd_header->required_min_rx_interval)/1000);
+        printf("\n\t  Required min Echo Interval: %4u ms", EXTRACT_32BITS(bfd_header->required_min_echo_interval)/1000);
 
         return;
 
