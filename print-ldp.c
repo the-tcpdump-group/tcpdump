@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.3 2002-12-14 13:27:56 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.4 2002-12-14 13:50:16 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -223,15 +223,15 @@ ldp_tlv_print(register const u_char *tptr) {
         printf("\n\t      Hold Time: %us, Flags: [%s Hello%s]",
                EXTRACT_16BITS(tptr),
                (EXTRACT_16BITS(tptr+2)&0x8000) ? "Targeted" : "Link",
-               (EXTRACT_16BITS(tptr+2)&0x4000) ? ", Request for trageted Hellos" : "");
+               (EXTRACT_16BITS(tptr+2)&0x4000) ? ", Request for targeted Hellos" : "");
         break;
 
     case LDP_TLV_IPV4_TRANSPORT_ADDR:
-        printf("\n\t      %s", ipaddr_string(tptr));
+        printf("\n\t      IPv4 Transport Address: %s", ipaddr_string(tptr));
         break;
 #ifdef INET6
     case LDP_TLV_IPV6_TRANSPORT_ADDR:
-        printf("\n\t      %s", ip6addr_string(tptr));
+        printf("\n\t      IPv6 Transport Address: %s", ip6addr_string(tptr));
         break;
 #endif
     case LDP_TLV_CONFIG_SEQ_NUMBER:
@@ -364,13 +364,13 @@ ldp_print(register const u_char *pptr, register u_int len) {
 
         default:
             if (vflag <= 1)
-                print_unknown_data(msg_tptr,"\n\t    ",msg_tlen);
+                print_unknown_data(msg_tptr,"\n\t  ",msg_tlen);
             break;
         }
         /* do we want to see an additionally hexdump ? */
         if (vflag > 1 || hexdump==TRUE)
-            print_unknown_data(tptr+sizeof(sizeof(struct ldp_msg_header)),"\n\t    ",
-                               msg_len-sizeof(struct ldp_msg_header));
+            print_unknown_data(tptr+sizeof(sizeof(struct ldp_msg_header)),"\n\t  ",
+                               msg_len);
 
         tptr+=msg_len;
         tlen-=msg_len;
