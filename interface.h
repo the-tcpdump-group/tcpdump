@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.210 2003-05-08 15:05:42 hannes Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.211 2003-05-11 06:01:16 guy Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -94,6 +94,7 @@ extern int packettype;		/* as specified by -T */
 #define PT_RTCP		5	/* Real-Time Applications control protocol */
 #define PT_SNMP		6	/* Simple Network Management Protocol */
 #define PT_CNFP		7	/* Cisco NetFlow protocol */
+#define PT_TFTP		8	/* trivial file transfer protocol */
 
 #ifndef min
 #define min(a,b) ((a)>(b)?(b):(a))

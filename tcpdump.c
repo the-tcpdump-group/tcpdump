@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.205 2003-05-02 08:46:28 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.206 2003-05-11 06:01:17 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -542,6 +542,8 @@ main(int argc, char **argv)
 				packettype = PT_SNMP;
 			else if (strcasecmp(optarg, "cnfp") == 0)
 				packettype = PT_CNFP;
+			else if (strcasecmp(optarg, "tftp") == 0)
+				packettype = PT_TFTP;
 			else
 				error("unknown packet type `%s'", optarg);
 			break;

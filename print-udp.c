@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.116 2003-05-08 15:05:42 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.117 2003-05-11 06:01:17 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -529,6 +529,11 @@ udp_print(register const u_char *bp, u_int length,
 		case PT_CNFP:
 			udpipaddr_print(ip, sport, dport);
 			cnfp_print(cp, (const u_char *)ip);
+			break;
+
+		case PT_TFTP:
+			udpipaddr_print(ip, sport, dport);
+			tftp_print(cp, length);
 			break;
 		}
 		return;
