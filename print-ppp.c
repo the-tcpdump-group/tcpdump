@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.74 2002-09-15 00:56:25 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.75 2002-09-15 16:28:28 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -97,7 +97,7 @@ struct tok ppptype2str[] = {
 	{ PPP_CHAP,	  "CHAP" },
 	{ PPP_BACP,	  "BACP" },
 	{ PPP_BAP,	  "BAP" },
-	{ PPP_MP,	  "PPP" },
+	{ PPP_MP,	  "ML" },
 	{ 0,		  NULL }
 };
 
