@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.83 2000-07-25 06:23:05 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.84 2000-07-29 06:06:28 assar Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -243,8 +243,10 @@ Print absolute, rather than relative, TCP sequence numbers.
 Print an unformatted timestamp on each dump line.
 .TP
 .B \-v
-(Slightly more) verbose output.  For example, the time to live
-and type of service information in an IP packet is printed.
+(Slightly more) verbose output.  For example, the time to live,
+identification, total length and options in an IP packet are printed.
+Also enables additional packet integrity checks such as verifying the
+IP and ICMP header checksum.
 .TP
 .B \-vv
 Even more verbose output.  For example, additional fields are
@@ -1290,7 +1292,7 @@ wrl.nfs > sushi.1372a:
 .sp .5
 .fi
 .RE
-(\-v also prints the IP header TTL, ID, and fragmentation fields,
+(\-v also prints the IP header TTL, ID, length, and fragmentation fields,
 which have been omitted from this example.)  In the first line,
 \fIsushi\fP asks \fIwrl\fP to read 8192 bytes from file 21,11/12.195,
 at byte offset 24576.  \fIWrl\fP replies `ok'; the packet shown on the
