@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.72.2.4 2004-03-24 00:14:09 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.72.2.5 2004-06-16 00:07:31 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -51,6 +51,8 @@ static const char *get_lifetime(u_int32_t);
 static void print_lladdr(const u_char *, size_t);
 static void icmp6_opt_print(const u_char *, int);
 static void mld6_print(const u_char *);
+static void mldv2_report_print(const u_char *, u_int);
+static void mldv2_query_print(const u_char *, u_int);
 static struct udphdr *get_upperlayer(u_char *, u_int *);
 static void dnsname_print(const u_char *, const u_char *);
 static void icmp6_nodeinfo_print(u_int, const u_char *, const u_char *);
@@ -59,6 +61,17 @@ static void icmp6_rrenum_print(const u_char *, const u_char *);
 #ifndef abs
 #define abs(a)	((0 < (a)) ? (a) : -(a))
 #endif
+
+/* mldv2 report types */
+static struct tok mldv2report2str[] = {
+	{ 1,	"is_in" },
+	{ 2,	"is_ex" },
+	{ 3,	"to_in" },
+	{ 4,	"to_ex" },
+	{ 5,	"allow" },
+	{ 6,	"block" },
+	{ 0,	NULL }
+};
 
 static const char *
 get_rtpref(u_int v)
@@ -281,7 +294,14 @@ icmp6_print(const u_char *bp, u_int length, const u_char *bp2, int fragmented)
 		break;
 	case ICMP6_MEMBERSHIP_QUERY:
 		printf("icmp6: multicast listener query ");
-		mld6_print((const u_char *)dp);
+		if (length == MLD_MINLEN) {
+			mld6_print((const u_char *)dp);
+		} else if (length >= MLDV2_MINLEN) {
+			printf("v2 ");
+			mldv2_query_print((const u_char *)dp, length);
+		} else {
+			printf(" unknown-version(len=%d) ", length);
+		}
 		break;
 	case ICMP6_MEMBERSHIP_REPORT:
 		printf("icmp6: multicast listener report ");
@@ -400,6 +420,16 @@ icmp6_print(const u_char *bp, u_int length, const u_char *bp2, int fragmented)
 	case ICMP6_NI_QUERY:
 	case ICMP6_NI_REPLY:
 		icmp6_nodeinfo_print(length, bp, ep);
+		break;
+	case IND_SOLICIT:
+		printf("icmp6: inverse neighbor solicitation");
+		break;
+	case IND_ADVERT:
+		printf("icmp6: inverse neighbor advertisement");
+		break;
+	case ICMP6_V2_MEMBERSHIP_REPORT:
+		printf("icmp6: multicast listener report v2 ");
+		mldv2_report_print((const u_char *) dp, length);
 		break;
 	case ICMP6_HADISCOV_REQUEST:
 		printf("icmp6: ha discovery request");
@@ -710,6 +740,126 @@ mld6_print(const u_char *bp)
 }
 
 static void
+mldv2_report_print(const u_char *bp, u_int len)
+{
+    struct icmp6_hdr *icp = (struct icmp6_hdr *) bp;
+    u_int group, nsrcs, ngroups;
+    u_int i, j;
+
+    /* Minimum len is 8 */
+    if (len < 8) {
+	printf(" [invalid len %d]", len);
+	return;
+    }
+
+    TCHECK(icp->icmp6_data16[1]);
+    ngroups = ntohs(icp->icmp6_data16[1]);
+    printf(", %d group record(s)", ngroups);
+    if (vflag > 0) {
+	/* Print the group records */
+	group = 8;
+        for (i = 0; i < ngroups; i++) {
+	    /* type(1) + auxlen(1) + numsrc(2) + grp(16) */
+	    if (len < group + 20) {
+		printf(" [invalid number of groups]");
+		return;
+	    }
+            TCHECK(bp[group + 4]);
+            printf(" [gaddr %s", ip6addr_string(&bp[group + 4]));
+	    printf(" %s", tok2str(mldv2report2str, " [v2-report-#%d]",
+								bp[group]));
+            nsrcs = (bp[group + 2] << 8) + bp[group + 3];
+	    /* Check the number of sources and print them */
+	    if (len < group + 20 + (nsrcs * 16)) {
+		printf(" [invalid number of sources %d]", nsrcs);
+		return;
+	    }
+            if (vflag == 1)
+                printf(", %d source(s)", nsrcs);
+            else {
+		/* Print the sources */
+                (void)printf(" {");
+                for (j = 0; j < nsrcs; j++) {
+                    TCHECK2(bp[group + 20 + j * 16], 16);
+		    printf(" %s", ip6addr_string(&bp[group + 20 + j * 16]));
+		}
+                (void)printf(" }");
+            }
+	    /* Next group record */
+            group += 20 + nsrcs * 16;
+	    printf("]");
+        }
+    }
+    return;
+trunc:
+    (void)printf("[|icmp6]");
+    return;
+}
+
+static void
+mldv2_query_print(const u_char *bp, u_int len)
+{
+    struct icmp6_hdr *icp = (struct icmp6_hdr *) bp;
+    u_int mrc;
+    int mrt, qqi;
+    u_int nsrcs;
+    register u_int i;
+
+    /* Minimum len is 28 */
+    if (len < 28) {
+	printf(" [invalid len %d]", len);
+	return;
+    }
+    TCHECK(icp->icmp6_data16[0]);
+    mrc = ntohs(icp->icmp6_data16[0]);
+    if (mrc < 32768) {
+	mrt = mrc;
+    } else {
+        mrt = ((mrc & 0x0fff) | 0x1000) << (((mrc & 0x7000) >> 12) + 3);
+    }
+    if (vflag) {
+	(void)printf(" [max resp delay=%d]", mrt);
+    }
+    printf(" [gaddr %s", ip6addr_string(&bp[8]));
+
+    if (vflag) {
+        TCHECK(bp[25]);
+	if (bp[24] & 0x08) {
+		printf(" sflag");
+	}
+	if (bp[24] & 0x07) {
+		printf(" robustness=%d", bp[24] & 0x07);
+	}
+	if (bp[25] < 128) {
+		qqi = bp[25];
+	} else {
+		qqi = ((bp[25] & 0x0f) | 0x10) << (((bp[25] & 0x70) >> 4) + 3);
+	}
+	printf(" qqi=%d", qqi);
+    }
+
+    nsrcs = ntohs(*(u_short *)&bp[26]);
+    if (nsrcs > 0) {
+	if (len < 28 + nsrcs * 16)
+	    printf(" [invalid number of sources]");
+	else if (vflag > 1) {
+	    printf(" {");
+	    for (i = 0; i < nsrcs; i++) {
+		TCHECK2(bp[28 + i * 16], 16);
+		printf(" %s", ip6addr_string(&bp[28 + i * 16]));
+	    }
+	    printf(" }");
+	} else
+	    printf(", %d source(s)", nsrcs);
+    }
+    printf("]");
+    return;
+trunc:
+    (void)printf("[|icmp6]");
+    return;
+}
+
+void
 dnsname_print(const u_char *cp, const u_char *ep)
 {
 	int i;
