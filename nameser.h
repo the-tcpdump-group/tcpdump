@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/nameser.h,v 1.10 2002-06-11 17:08:40 itojun Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/nameser.h,v 1.11 2002-08-16 22:40:33 itojun Exp $ (LBL) */
 /*
  * Copyright (c) 1983, 1989, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -75,6 +75,7 @@
  * Internet nameserver port number
  */
 #define NAMESERVER_PORT	53
+#define MULTICASTDNS_PORT	5353
 
 /*
  * Currently defined opcodes
