@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.69 2000-07-11 00:49:03 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.70 2001-09-10 00:28:54 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -178,10 +178,10 @@ ts_print(register const struct timeval *tvp)
 void
 relts_print(int secs)
 {
-	static char *lengths[] = {"y", "w", "d", "h", "m", "s"};
-	static int seconds[] = {31536000, 604800, 86400, 3600, 60, 1};
-	char **l = lengths;
-	int *s = seconds;
+	static const char *lengths[] = {"y", "w", "d", "h", "m", "s"};
+	static const int seconds[] = {31536000, 604800, 86400, 3600, 60, 1};
+	const char **l = lengths;
+	const int *s = seconds;
 
 	if (secs <= 0) {
 		(void)printf("0s");
@@ -303,7 +303,10 @@ read_infile(char *fname)
 		error("can't stat %s: %s", fname, pcap_strerror(errno));
 
 	cp = malloc((u_int)buf.st_size + 1);
-	cc = read(fd, cp, (int)buf.st_size);
+	if (cp == NULL)
+		error("malloc(%d) for %s: %s", (u_int)buf.st_size + 1,
+			fname, pcap_strerror(errno));
+	cc = read(fd, cp, (u_int)buf.st_size);
 	if (cc < 0)
 		error("read %s: %s", fname, pcap_strerror(errno));
 	if (cc != buf.st_size)
