@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.74 2003-11-16 09:36:15 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.75 2003-12-23 22:07:56 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -139,6 +139,7 @@ struct bgp_attr {
 #define BGPTYPE_MP_REACH_NLRI		14	/* RFC2283 */
 #define BGPTYPE_MP_UNREACH_NLRI		15	/* RFC2283 */
 #define BGPTYPE_EXTD_COMMUNITIES        16      /* draft-ietf-idr-bgp-ext-communities */
+#define BGPTYPE_ATTR_SET               128      /* draft-marques-ppvpn-ibgp */
 
 static struct tok bgp_attr_values[] = {
     { BGPTYPE_ORIGIN,           "Origin"},
@@ -157,6 +158,7 @@ static struct tok bgp_attr_values[] = {
     { BGPTYPE_MP_REACH_NLRI,    "Multi-Protocol Reach NLRI"},
     { BGPTYPE_MP_UNREACH_NLRI,  "Multi-Protocol Unreach NLRI"},
     { BGPTYPE_EXTD_COMMUNITIES, "Extended Community"},
+    { BGPTYPE_ATTR_SET,         "Attribute Set"},
     { 255,                      "Reserved for development"},
     { 0, NULL}
 };
@@ -288,7 +290,7 @@ static struct tok bgp_safi_values[] = {
     { SAFNUM_VPNUNICAST,        "labeled VPN Unicast"},
     { SAFNUM_VPNMULTICAST,      "labeled VPN Multicast"},
     { SAFNUM_VPNUNIMULTICAST,   "labeled VPN Unicast+Multicast"},
-    { SAFNUM_RT_ROUTING_INFO,   "Route Target Routing Information"},
+    { SAFNUM_RT_ROUTING_INFO,   "Route Target Routing Information"}, /* draft-marques-ppvpn-rt-constrain-01.txt */
     { 0, NULL }
 };
 
@@ -1229,6 +1231,42 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                     tptr +=8;
                 }
                 break;
+
+        case BGPTYPE_ATTR_SET:
+                printf("\n\t    Origin AS: %u", EXTRACT_32BITS(tptr));
+                tptr+=4;
+                len -=4;
+
+                while (len >= 2 ) {
+                    int alen;
+                    struct bgp_attr bgpa;
+                    
+                    memcpy(&bgpa, tptr, sizeof(bgpa));
+                    alen = bgp_attr_len(&bgpa);
+                    tptr += bgp_attr_off(&bgpa);
+                    len -= bgp_attr_off(&bgpa);
+                    
+                    printf("\n\t      %s (%u), length: %u",
+                           tok2str(bgp_attr_values, "Unknown Attribute", bgpa.bgpa_type),
+                           bgpa.bgpa_type,
+                           alen);
+                    
+                    if (bgpa.bgpa_flags) {
+                        printf(", Flags [%s%s%s%s",
+                               bgpa.bgpa_flags & 0x80 ? "O" : "",
+                               bgpa.bgpa_flags & 0x40 ? "T" : "",
+                               bgpa.bgpa_flags & 0x20 ? "P" : "",
+                               bgpa.bgpa_flags & 0x10 ? "E" : "");
+                        if (bgpa.bgpa_flags & 0xf)
+                            printf("+%x", bgpa.bgpa_flags & 0xf);
+                        printf("]: ");
+                    }
+                    bgp_attr_print(&bgpa, tptr, alen); /* FIXME check for recursion */
+                    tptr += alen;
+                    len -= alen;
+		}
+
+           
 
 	default:
             printf("\n\t    no Attribute %u decoder",attr->bgpa_type); /* we have no decoder for the attribute */
