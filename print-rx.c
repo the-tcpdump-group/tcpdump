@@ -13,7 +13,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.14 2000-07-29 08:10:05 assar Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.15 2000-07-29 09:20:26 assar Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -771,25 +771,25 @@ ack_print(register const u_char *bp, int length)
 #endif
 #define RX_ACK_TYPE_NACK 0
 
-	TRUNC(4); bp += 4;	/* bufferSpace and maxSkew */
-	TRUNC(4);
-	printf(" fir %u", ntohl(*(u_int32_t*)bp));
-	bp += 4;		/* firstPacket */
-	TRUNC(4); bp += 4;	/* previousPacket */
-	TRUNC(4);
-	printf(" %u", ntohl(*(u_int32_t*)bp));
-	bp += 4;		/* serial */
-	TRUNC(1);
+	TCHECK2(bp[0], 8);	/* bufferSpace and maxSkew */
+	bp += 4;
+	printf(" fir %u", (unsigned)EXTRACT_32BITS(bp));
+	bp += 4;
+	TCHECK2(bp[0], 8);	/* previousPacket and serial */
+	bp += 4;
+	printf(" %u", (unsigned)EXTRACT_32BITS(bp));
+	bp += 4;
+	TCHECK2(bp[0], 1);
 	printf("%c", RX_ACK_REASONS[(*bp - 1) & 07u]);
 	bp += 1;		/* reason */
-	TRUNC(1);
+	TCHECK2(bp[0], 1);
 	nAcks = *bp;
 	bp += 1;		/* nAcks */
 
 	for (i = 0; i < nAcks; i++) {
-	  TRUNC(1);
-	  putchar(*bp == RX_ACK_TYPE_NACK? '-' : '*');
-	  bp += 1;
+	    TCHECK2(bp[0], 1);
+	    putchar(*bp == RX_ACK_TYPE_NACK? '-' : '*');
+	    bp += 1;
 	}
 	
 	return;
