@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/gmpls.c,v 1.1 2003-06-09 23:28:09 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/gmpls.c,v 1.2 2003-10-20 10:32:46 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -26,6 +26,7 @@ static const char rcsid[] =
 
 #include "interface.h"
 
+/* rfc3471 */
 struct tok gmpls_link_prot_values[] = {
     { 0x01, "Extra Traffic"},
     { 0x02, "Unprotected"},
@@ -38,6 +39,7 @@ struct tok gmpls_link_prot_values[] = {
     { 0, NULL }
 };
 
+/* rfc3471 */
 struct tok gmpls_switch_cap_values[] = {
     { 1,	"Packet-Switch Capable-1"},
     { 2,	"Packet-Switch Capable-2"},
@@ -50,6 +52,7 @@ struct tok gmpls_switch_cap_values[] = {
     { 0, NULL }
 };
 
+/* rfc3471 */
 struct tok gmpls_encoding_values[] = {
     { 1,    "Packet"},
     { 2,    "Ethernet V2/DIX"},
@@ -65,6 +68,7 @@ struct tok gmpls_encoding_values[] = {
     { 0, NULL }
 };
 
+/* rfc3471 */
 struct tok gmpls_payload_values[] = {
     {  0,   "Unknown"},
     {  1,   "Reserved"},
@@ -99,7 +103,7 @@ struct tok gmpls_payload_values[] = {
     { 30,   "POS - Scrambling, 16 bit CRC"},
     { 31,   "POS - Scrambling, 32 bit CRC"},
     { 32,   "ATM mapping"},
-    { 33,   "Ethernet"},
+    { 33,   "Ethernet PHY"},
     { 34,   "SONET/SDH"},
     { 35,   "Reserved (SONET deprecated)"},
     { 36,   "Digital Wrapper"},
@@ -113,5 +117,18 @@ struct tok gmpls_payload_values[] = {
     { 44,   "HDLC"},
     { 45,   "Ethernet V2/DIX (only)"},
     { 46,   "Ethernet 802.3 (only)"},
+/* draft-ietf-ccamp-gmpls-g709-04.txt */
+    { 47,   "G.709 ODUj"},
+    { 48,   "G.709 OTUk(v)"},
+    { 49,   "CBR/CBRa"},
+    { 50,   "CBRb"},
+    { 51,   "BSOT"},
+    { 52,   "BSNT"},
+    { 53,   "IP/PPP (GFP)"},
+    { 54,   "Ethernet MAC (framed GFP)"},
+    { 55,   "Ethernet PHY (transparent GFP)"},
+    { 56,   "ESCON"},
+    { 57,   "FICON"},
+    { 58,   "Fiber Channel"},
     { 0, NULL }
 };
