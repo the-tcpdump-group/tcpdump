@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.86 2000-10-22 04:17:53 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.87 2000-10-25 07:49:28 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -1602,6 +1602,17 @@ patches@tcpdump.org
 .LP
 NIT doesn't let you watch your own outbound traffic, BPF will.
 We recommend that you use the latter.
+.LP
+On Linux systems with 2.0[.x] kernels, packets on the loopback device
+will be seen twice.  In addition, if the interface is put into
+promiscuous mode, it will not be taken out of promiscuous mode when
+.I tcpdump
+exits; you will have to take it out of promiscuous mode, if appropriate,
+with the
+.IR ifconfig (1)
+command.  Also, packet filtering cannot be done in the kernel, so that
+all packets must be copied from the kernel in order to be filtered in
+user mode.  We recommend that you upgrade to a 2.2 or later kernel.
 .LP
 Some attempt should be made to reassemble IP fragments or, at least
 to compute the right length for the higher level protocol.
