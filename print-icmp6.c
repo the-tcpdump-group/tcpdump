@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.13 2000-05-15 09:23:49 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.14 2000-05-17 14:54:03 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -62,6 +62,7 @@ static const char rcsid[] =
 void icmp6_opt_print(const u_char *, int);
 void mld6_print(const u_char *);
 #ifdef HAVE_STRUCT_ICMP6_NODEINFO
+static void dnsname_print(const u_char *, const u_char *);
 void icmp6_nodeinfo_print(int, const u_char *, const u_char *);
 #endif
 
@@ -577,10 +578,47 @@ mld6_print(register const u_char *bp)
 #endif
 
 #ifdef HAVE_STRUCT_ICMP6_NODEINFO
+#define safeputc(c)	printf((isprint((c)) ? "%c" : "\\%03o"), c)
+
+static void
+dnsname_print(const u_char *cp, const u_char *ep)
+{
+	int i;
+
+	/* DNS name decoding - no decompression */
+	printf(", \"");
+	while (cp < ep) {
+		i = *cp++;
+		if (i) {
+			if (i > ep - cp) {
+				printf("???");
+				break;
+			}
+			while (i-- && cp < ep) {
+				safeputc(*cp);
+				cp++;
+			}
+			if (cp + 1 < ep && *cp)
+				printf(".");
+		} else {
+			if (cp == ep) {
+				/* FQDN */
+				printf(".");
+			} else if (cp + 1 == ep && *cp == '\0') {
+				/* truncated */
+			} else {
+				/* invalid */
+				printf("???");
+			}
+			break;
+		}
+	}
+	printf("\"");
+}
+
 void
 icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
 {
-#define safeputc(c)	printf((isprint((c)) ? "%c" : "\\%03o"), c)
 	struct icmp6_nodeinfo *ni6;
 	struct icmp6_hdr *dp;
 	const u_char *cp;
@@ -681,29 +719,8 @@ icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
 					cp++;
 				}
 				printf("\"");
-			} else {
-				/* DNS name decoding - no decompression */
-				printf(", \"");
-				while (cp < ep) {
-					i = *cp++;
-					if (i) {
-						if (i > ep - cp) {
-							printf("???");
-							break;
-						}
-						while (i-- && cp < ep) {
-							safeputc(*cp);
-							cp++;
-						}
-						if (cp + 1 < ep && *cp)
-							printf(".");
-					} else {
-						/* terminating dot */
-						printf(".");
-					}
-				}
-				printf("\"");
-			}
+			} else
+				dnsname_print(cp, ep);
 			break;
 		case ICMP6_NI_SUBJ_IPV4:
 			if (!TTEST2(*dp, sizeof(*ni6) + sizeof(struct in_addr)))
@@ -785,29 +802,8 @@ icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
 					cp++;
 				}
 				printf("\"");
-			} else {
-				/* DNS name decoding - no decompression */
-				printf(", \"");
-				while (cp < ep) {
-					i = *cp++;
-					if (i) {
-						if (i > ep - cp) {
-							printf("???");
-							break;
-						}
-						while (i-- && cp < ep) {
-							safeputc(*cp);
-							cp++;
-						}
-						if (cp + 1 < ep && *cp)
-							printf(".");
-					} else {
-						/* terminating dot */
-						printf(".");
-					}
-				}
-				printf("\"");
-			}
+			} else
+				dnsname_print(cp, ep);
 			if ((ntohs(ni6->ni_flags) & 0x01) != 0)
 				printf(" [TTL=%u]", *(u_int32_t *)(ni6 + 1));
 			break;
@@ -843,8 +839,8 @@ icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
 
 trunc:
 	fputs("[|icmp6]", stdout);
-#undef safeputc
 }
+#undef safeputc
 #endif
 
 #endif /* INET6 */
