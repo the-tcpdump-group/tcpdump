@@ -4,6 +4,3 @@
 4. get PLATFORMS filled in
 5. update CHANGES file
 6. do same for libpcap
-7. add DLT_LINUX_COOKED
-8. generate BPF for link layer headers with negative offsets (Linux)
-
