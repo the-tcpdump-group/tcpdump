@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.29 1999-11-17 05:18:27 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.30 1999-11-21 03:48:53 assar Exp $ (LBL)";
 #endif
 
 #include <sys/param.h>
@@ -475,7 +475,7 @@ ppp_if_print(u_char *user, const struct pcap_pkthdr *h,
 	ip = (struct ip *)(p + PPP_HDRLEN);
 	switch (proto) {
 	case PPP_LCP:
-		handle_lcp(p, length);
+		handle_lcp (p, length);
 		break;
 	case PPP_CHAP:
 		handle_chap(p, length);
@@ -505,17 +505,37 @@ out:
 	putchar('\n');
 }
 
-#ifdef __bsdi__
-/* proto type to string mapping */
-static struct tok ptype2str[] = {
-	{ PPP_VJC,	"VJC" },
-	{ PPP_VJNC,	"VJNC" },
-	{ PPP_OSI,	"OSI" },
-	{ PPP_LCP,	"LCP" },
-	{ PPP_IPCP,	"IPCP" },
-	{ 0,		NULL }
-};
-#endif
+struct tok ppptype2str[] = {
+  { PPP_IP,	"IP" },
+  { PPP_OSI,	"OSI" },
+  { PPP_NS,	"NS" },
+  { PPP_DECNET,	"DECNET" },
+  { PPP_APPLE,	"APPLE" },
+  { PPP_IPX,	"IPX" },
+  { PPP_VJC,	"VJC" },
+  { PPP_VJNC,	"VJNC" },
+  { PPP_BRPDU,	"BRPDU" },
+  { PPP_STII,	"STII" },
+  { PPP_VINES,	"VINES" },
+
+  { PPP_HELLO,	"HELLO" },
+  { PPP_LUXCOM,	"LUXCOM" },
+  { PPP_SNS,	"SNS" },
+  { PPP_IPCP,	"IPCP" },
+  { PPP_OSICP,	"OSICP" },
+  { PPP_NSCP,	"NSCP" },
+  { PPP_DECNETCP, "DECNETCP" },
+  { PPP_APPLECP, "APPLECP" },
+  { PPP_IPXCP,	"IPXCP" },
+  { PPP_STIICP,	"STIICP" },
+  { PPP_VINESCP, "VINESCP" },
+
+  { PPP_LCP,	"LCP" },
+  { PPP_PAP,	"PAP" },
+  { PPP_LQM,	"LQM" },
+  { PPP_CHAP,	"CHAP" },
+  { 0,		NULL }
+ };
 
 #define PPP_BSDI_HDRLEN 24
 
@@ -590,7 +610,7 @@ ppp_bsdos_if_print(u_char *user, const struct pcap_pkthdr *h,
 				printf("%02x %02x ", q[0], q[1]);
 			ptype = ntohs(ph->phdr_type);
 			if (eflag && (ptype == PPP_VJC || ptype == PPP_VJNC)) {
-				printf("%s ", tok2str(ptype2str,
+				printf("%s ", tok2str(ppptype2str,
 						"proto-#%d", ptype));
 			}
 		} else {
@@ -642,7 +662,7 @@ ppp_bsdos_if_print(u_char *user, const struct pcap_pkthdr *h,
 	if (ptype == PPP_IP)
 		ip_print(p, length);
 	else
-		printf("%s ", tok2str(ptype2str, "proto-#%d", ptype));
+		printf("%s ", tok2str(ppptype2str, "proto-#%d", ptype));
 
 printx:
 	if (xflag)
