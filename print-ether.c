@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.48 1999-11-21 09:36:51 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.49 2000-04-28 11:38:38 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -200,28 +200,28 @@ ether_encap_print(u_short ethertype, const u_char *p,
 
 	case ETHERTYPE_8021Q:
 		printf("802.1Q vlan#%d P%d%s",
-		       ntohs(*(unsigned short*)p)&0xFFF,
-		       ntohs(*(unsigned short*)p)>>13,
-		       (ntohs(*(unsigned short*)p)&0x1000) ? " CFI" : "");
-		ethertype = ntohs(*(unsigned short*)(p+2));
+		       ntohs(*(u_int16_t *)p) & 0xfff,
+		       ntohs(*(u_int16_t *)p) >> 13,
+		       (ntohs(*(u_int16_t *)p) & 0x1000) ? " CFI" : "");
+		ethertype = ntohs(*(u_int16_t *)(p + 2));
 		p += 4;
 		length -= 4;
 		caplen -= 4;
-		if (ethertype > ETHERMTU) 
+		if (ethertype > ETHERMTU)
 			goto recurse;
 
 		extracted_ethertype = 0;
 
-		if (llc_print(p, length, caplen, p-18, p-12) == 0) {
+		if (llc_print(p, length, caplen, p - 18, p - 12) == 0) {
 			/* ether_type not known, print raw packet */
 			if (!eflag)
-				ether_print(p-18, length+4);
+				ether_print(p - 18, length + 4);
 			if (extracted_ethertype) {
 				printf("(LLC %s) ",
 			       etherproto_string(htons(extracted_ethertype)));
 			}
 			if (!xflag && !qflag)
-				default_print(p-18, caplen+4);
+				default_print(p - 18, caplen + 4);
 		}
 		return (1);
 
