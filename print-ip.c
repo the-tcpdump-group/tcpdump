@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.139 2004-04-30 22:22:05 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.140 2004-05-01 10:15:33 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -388,7 +388,7 @@ ip_print(register const u_char *bp, register u_int length)
 	    if (IP_V(ip) == 6)
 		printf(", wrong link-layer encapsulation");
 	}
-        else
+        else if (!eflag)
 	    printf("IP ");
 
 	if ((u_char *)(ip + 1) > snapend) {

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.42 2004-04-26 17:59:37 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.43 2004-05-01 10:15:33 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -67,7 +67,8 @@ ip6_print(register const u_char *bp, register u_int length)
 		return;
 	}
 
-        printf("IP6 ");
+        if (!eflag)
+            printf("IP6 ");
 
 	payload_len = EXTRACT_16BITS(&ip6->ip6_plen);
 	len = payload_len + sizeof(struct ip6_hdr);
