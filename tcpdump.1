@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.88 2000-10-28 08:22:01 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.89 2000-10-28 10:10:54 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -331,15 +331,8 @@ protos are:
 .BR ip6 ,
 .BR arp ,
 .BR rarp ,
-.BR atalk ,
-.BR aarp ,
 .BR decnet ,
-.BR lat ,
-.BR sca ,
-.BR moprc ,
-.BR mopdl ,
-.BR icmp ,
-.BR icmp6 ,
+.BR iso ,
 .B tcp
 and
 .BR udp .
@@ -485,7 +478,8 @@ True if the packet is an ip packet (see
 .IR ip (4P))
 of protocol type \fIprotocol\fP.
 \fIProtocol\fP can be a number or one of the names
-\fIicmp\fP, \fIigrp\fP, \fIudp\fP, \fInd\fP, or \fItcp\fP.
+\fIicmp\fP, \fIicmp6\fP, \fIigmp\fP, \fIigrp\fP, \fIpim\fP, \fIah\fP,
+\fIesp\fP, \fIudp\fP, or \fItcp\fP.
 Note that the identifiers \fItcp\fP, \fIudp\fP, and \fIicmp\fP are also
 keywords and must be escaped via backslash (\\), which is \\\\ in the C-shell.
 Note that this primitive does not chase protocol header chain.
@@ -528,8 +522,10 @@ True if the packet is an IP multicast packet.
 True if the packet is an IPv6 multicast packet.
 .IP  "\fBether proto \fIprotocol\fR"
 True if the packet is of ether type \fIprotocol\fR.
-\fIProtocol\fP can be a number or a name like
-\fIip\fP, \fIip6\fP, \fIarp\fP, or \fIrarp\fP.
+\fIProtocol\fP can be a number or one of the names
+\fIip\fP, \fIip6\fP, \fIarp\fP, \fIrarp\fP, \fIatalk\fP, \fIaarp\fP,
+\fIdecnet\fP, \fIsca\fP, \fIlat\fP, \fImopdl\fP, \fImoprc\fP, or
+\fIiso\fP.
 Note these identifiers are also keywords
 and must be escaped via backslash (\\).
 [In the case of FDDI (e.g., `\fBfddi protocol arp\fR'), the
@@ -550,7 +546,7 @@ True if the DECNET destination address is
 .IP "\fBdecnet host \fIhost\fR"
 True if either the DECNET source or destination address is
 .IR host .
-.IP "\fBip\fR, \fBip6\fR, \fBarp\fR, \fBrarp\fR, \fBatalk\fR, \fBaarp\fR, \fBdecnet\fR"
+.IP "\fBip\fR, \fBip6\fR, \fBarp\fR, \fBrarp\fR, \fBatalk\fR, \fBaarp\fR, \fBdecnet\fR, \fBiso\fR"
 Abbreviations for:
 .in +.5i
 .nf
@@ -583,6 +579,19 @@ Abbreviations for:
 .fi
 .in -.5i
 where \fIp\fR is one of the above protocols.
+.IP "\fBiso proto \fIprotocol\fR"
+True if the packet is an OSI packet of protocol type \fIprotocol\fP.
+\fIProtocol\fP can be a number or one of the names
+\fIesis\fP,or \fisis\fP.
+.IP "\fBesis\fR, \fBisis\fR"
+Abbreviations for:
+.in +.5i
+.nf
+\fBiso proto \fIp\fR
+.fi
+.in -.5i
+where \fIp\fR is one of the above protocols.
+Note that \fItcpdump\fR does an incomplete job of parsing these protocols.
 .IP  "\fIexpr relop expr\fR"
 True if the relation holds, where \fIrelop\fR is one of >, <, >=, <=, =, !=,
 and \fIexpr\fR is an arithmetic expression composed of integer constants
