@@ -21,24 +21,15 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sl.c,v 1.54 2000-10-03 02:55:01 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sl.c,v 1.55 2000-10-09 01:53:20 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#ifdef HAVE_NET_SLIP_H
 #include <sys/param.h>
 #include <sys/time.h>
-#include <sys/timeb.h>
-#include <sys/file.h>
-#include <sys/ioctl.h>
-#include <sys/mbuf.h>
-#include <sys/socket.h>
-
-struct mbuf;
-struct rtentry;
 
 #include <netinet/in.h>
 
@@ -53,25 +44,14 @@ struct rtentry;
 
 #include "ip.h"
 #include "tcp.h"
-
-#include <net/slcompress.h>
-#include <net/slip.h>
+#include "slip.h"
+#include "slcompress.h"
 
 static u_int lastlen[2][256];
 static u_int lastconn = 255;
 
 static void sliplink_print(const u_char *, const struct ip *, u_int);
 static void compressed_sl_print(const u_char *, const struct ip *, u_int, int);
-
-/* XXX BSD/OS 2.1 compatibility */
-#if !defined(SLIP_HDRLEN) && defined(SLC_BPFHDR)
-#define SLIP_HDRLEN SLC_BPFHDR
-#define SLX_DIR 0
-#define SLX_CHDR (SLC_BPFHDRLEN - 1)
-#define CHDR_LEN (SLC_BPFHDR - SLC_BPFHDRLEN)
-#endif
-
-/* XXX needs more hacking to work right */
 
 void
 sl_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
@@ -287,28 +267,3 @@ compressed_sl_print(const u_char *chdr, const struct ip *ip,
 	lastlen[dir][lastconn] = length - (hlen << 2);
 	printf(" %d (%d)", lastlen[dir][lastconn], cp - chdr);
 }
-#else
-#include <sys/types.h>
-#include <sys/time.h>
-
-#include <pcap.h>
-#include <stdio.h>
-
-#include "interface.h"
-
-void
-sl_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
-{
-
-	error("not configured for slip");
-	/* NOTREACHED */
-}
-
-void
-sl_bsdos_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
-{
-
-	error("not configured for slip");
-	/* NOTREACHED */
-}
-#endif

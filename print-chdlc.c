@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.10 2000-09-29 05:33:48 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.11 2000-10-09 01:53:19 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -31,12 +31,6 @@ static const char rcsid[] =
 
 #include <sys/param.h>
 #include <sys/time.h>
-#include <sys/socket.h>
-#include <sys/file.h>
-#include <sys/ioctl.h>
-
-struct mbuf;
-struct rtentry;
 
 #include <netinet/in.h>
 
@@ -44,10 +38,6 @@ struct rtentry;
 #include <netdb.h>
 #include <pcap.h>
 #include <stdio.h>
-#ifdef __bsdi__
-#include <net/slcompress.h>
-#include <net/if_ppp.h>
-#endif
 
 #include "interface.h"
 #include "addrtoname.h"
@@ -125,7 +115,7 @@ out:
 }
 
 struct cisco_slarp {
-	u_int code;
+	u_int32_t code;
 #define SLARP_REQUEST	0
 #define SLARP_REPLY	1
 #define SLARP_KEEPALIVE	2
@@ -133,14 +123,14 @@ struct cisco_slarp {
 		struct {
 			struct in_addr addr;
 			struct in_addr mask;
-			u_short unused[3];
+			u_int16_t unused[3];
 		} addr;
 		struct {
-			u_int myseq;
-			u_int yourseq;
-			u_short rel;
-			u_short t1;
-			u_short t2;
+			u_int32_t myseq;
+			u_int32_t yourseq;
+			u_int16_t rel;
+			u_int16_t t1;
+			u_int16_t t2;
 		} keep;
 	} un;
 };

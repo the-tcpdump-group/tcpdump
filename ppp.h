@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ppp.h,v 1.10 2000-08-18 07:44:45 itojun Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ppp.h,v 1.11 2000-10-09 01:53:19 guy Exp $ (LBL) */
 /*
  * Point to Point Protocol (PPP) RFC1331
  *
@@ -15,6 +15,8 @@
  * suitability of this software for any purpose.  It is provided "as is"
  * without express or implied warranty.
  */
+#define PPP_HDRLEN	4	/* length of PPP header */
+
 #define PPP_ADDRESS	0xff	/* The address byte value */
 #define PPP_CONTROL	0x03	/* The control byte value */
 

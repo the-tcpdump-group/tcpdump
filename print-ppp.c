@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.53 2000-10-06 04:25:59 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.54 2000-10-09 01:53:20 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -40,12 +40,6 @@ static const char rcsid[] =
 
 #include <sys/param.h>
 #include <sys/time.h>
-#include <sys/socket.h>
-#include <sys/file.h>
-#include <sys/ioctl.h>
-
-struct mbuf;
-struct rtentry;
 
 #include <netinet/in.h>
 
@@ -53,10 +47,6 @@ struct rtentry;
 #include <netdb.h>
 #include <pcap.h>
 #include <stdio.h>
-#ifdef __bsdi__
-#include <net/slcompress.h>
-#include <net/if_ppp.h>
-#endif
 
 #include "interface.h"
 #include "extract.h"
@@ -64,9 +54,6 @@ struct rtentry;
 #include "ppp.h"
 #include "chdlc.h"
 #include "ethertype.h"
-
-/* XXX This goes somewhere else. */
-#define PPP_HDRLEN 4
 
 /*
  * The following constatns are defined by IANA. Please refer to

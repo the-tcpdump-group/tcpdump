@@ -160,6 +160,8 @@ savestr.h
 send-ack.awk
 setsignal.c
 setsignal.h
+slip.h
+slcompress.h
 smb.h
 smbutil.c
 stime.awk
