@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sunrpc.c,v 1.31 2000-04-27 11:10:59 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sunrpc.c,v 1.32 2000-06-10 05:38:00 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -43,6 +43,9 @@ struct rtentry;
 #include <netinet/in_systm.h>
 #include <netinet/ip.h>
 #include <netinet/ip_var.h>
+#ifdef INET6
+#include <netinet/ip6.h>
+#endif
 
 #include <rpc/rpc.h>
 #ifdef HAVE_RPC_RPCENT_H
@@ -77,24 +80,44 @@ sunrpcrequest_print(register const u_char *bp, register u_int length,
 {
 	register const struct rpc_msg *rp;
 	register const struct ip *ip;
+#ifdef INET6
+	register const struct ip6_hdr *ip6;
+#endif
 	u_int32_t x;
+	char srcid[20], dstid[20];	/*fits 32bit*/
 
 	rp = (struct rpc_msg *)bp;
-	ip = (struct ip *)bp2;
 
-	if (!nflag)
-		(void)printf("%s.%x > %s.sunrpc: %d",
-			     ipaddr_string(&ip->ip_src),
-			     (u_int32_t)ntohl(rp->rm_xid),
-			     ipaddr_string(&ip->ip_dst),
-			     length);
-	else
-		(void)printf("%s.%x > %s.%x: %d",
-			     ipaddr_string(&ip->ip_src),
-			     (u_int32_t)ntohl(rp->rm_xid),
-			     ipaddr_string(&ip->ip_dst),
-			     PMAPPORT,
-			     length);
+	if (!nflag) {
+		snprintf(srcid, sizeof(srcid), "0x%x",
+		    (u_int32_t)ntohl(rp->rm_xid));
+		strlcpy(dstid, "sunrpc", sizeof(dstid));
+	} else {
+		snprintf(srcid, sizeof(srcid), "0x%x",
+		    (u_int32_t)ntohl(rp->rm_xid));
+		snprintf(dstid, sizeof(dstid), "0x%x", PMAPPORT);
+	}
+
+	switch (((struct ip *)bp2)->ip_v) {
+	case 4:
+		ip = (struct ip *)bp2;
+		printf("%s.%s > %s.%s: %d",
+		    ipaddr_string(&ip->ip_src), srcid,
+		    ipaddr_string(&ip->ip_dst), dstid, length);
+		break;
+#ifdef INET6
+	case 6:
+		ip6 = (struct ip6_hdr *)bp2;
+		printf("%s.%s > %s.%s: %d",
+		    ip6addr_string(&ip6->ip6_src), srcid,
+		    ip6addr_string(&ip6->ip6_dst), dstid, length);
+		break;
+#endif
+	default:
+		printf("%s.%s > %s.%s: %d", "?", srcid, "?", dstid, length);
+		break;
+	}
+
 	printf(" %s", tok2str(proc2str, " proc #%u",
 	    (u_int32_t)ntohl(rp->rm_call.cb_proc)));
 	x = ntohl(rp->rm_call.cb_rpcvers);
