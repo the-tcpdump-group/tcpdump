@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.190 2002-07-11 09:17:22 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.191 2002-07-18 00:04:13 hannes Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -189,6 +189,7 @@ extern const char *dnnum_string(u_short);
 
 #include <pcap.h>
 
+extern int print_unknown_data(const u_char *,const char *,int);
 extern void ascii_print_with_offset(const u_char *, u_int, u_int);
 extern void ascii_print(const u_char *, u_int);
 extern void hex_print_with_offset(const u_char *, u_int, u_int);
@@ -329,3 +330,13 @@ struct bpf_program;
 
 extern void bpf_dump(struct bpf_program *, int);
 #endif
+
+
+
+
+
+
+
+
+
+

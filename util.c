@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.75 2002-07-16 04:03:16 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.76 2002-07-18 00:04:12 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -199,6 +199,34 @@ relts_print(int secs)
 		s++;
 		l++;
 	}
+}
+
+/*
+ *  this is a generic routine for printing unknown data;
+ *  we pass on the linefeed plus indentation string to
+ *  get a proper output - returns 0 on error
+ */
+
+int
+print_unknown_data(const u_char *cp,const char *lf,int len)
+{
+        int i;
+
+	printf("%s0x0000: ",lf);
+	for(i=0;i<len;i++) {
+	    if (!TTEST2(*(cp+i), 1)) {
+              printf("%spacket exceeded snapshot",lf);
+              return(0);
+            }
+	    printf("%02x",*(cp+i));
+	    if (i%2)
+	        printf(" ");
+	    if (i/16!=(i+1)/16) {
+	        if (i<(len-1))
+		    printf("%s0x%04x: ",lf,i);
+	    }
+	}
+	return(1); /* everything is ok */
 }
 
 /*
