@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.121 2003-04-24 12:51:35 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.122 2003-05-08 14:26:54 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -368,6 +368,8 @@ ip_print(register const u_char *bp, register u_int length)
 	struct protoent *proto;
 	u_int16_t sum, ip_sum;
 	const char *sep = "";
+
+	printf("IP%s ", (((*bp >> 4) & 0xf) == 4) ? "" : "4"); /* print version if != 4 */
 
 	ip = (const struct ip *)bp;
 	if ((u_char *)(ip + 1) > snapend) {
