@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.119 2000-01-07 15:59:28 assar Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.120 2000-01-15 07:42:32 itojun Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -85,7 +85,6 @@ extern int vflag;		/* verbose */
 extern int xflag;		/* print packet in hex */
 extern int Xflag;		/* print packet in hex/ascii */
 
-extern char *ahsecret;
 extern char *espsecret;
 
 extern int packettype;		/* as specified by -T */

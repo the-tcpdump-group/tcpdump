@@ -24,7 +24,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.140 2000-01-15 02:33:06 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.141 2000-01-15 07:42:32 itojun Exp $ (LBL)";
 #endif
 
 /*
@@ -78,7 +78,6 @@ int vflag;			/* verbose */
 int xflag;			/* print packet in hex */
 int Xflag;			/* print packet in ascii as well as hex */
 
-char *ahsecret = NULL;		/* AH secret key */
 char *espsecret = NULL;		/* ESP secret key */
 
 int packettype;
@@ -182,15 +181,6 @@ main(int argc, char **argv)
 		case 'a':
 			++aflag;
 			break;
-
-#if 0
-		case 'A':
-#ifndef HAVE_LIBCRYPTO
-			warning("crypto code not compiled in");
-#endif
-			ahsecret = optarg;
-			break;
-#endif
 
 		case 'c':
 			cnt = atoi(optarg);
