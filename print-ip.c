@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.72 1999-10-30 07:36:37 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.73 1999-11-21 03:47:35 assar Exp $ (LBL)";
 #endif
 
 #include <sys/param.h>
@@ -201,18 +201,7 @@ igmp_print(register const u_char *bp, register u_int len,
 	TCHECK2(bp[0], len);
 	if (vflag) {
 		/* Check the IGMP checksum */
-		u_int32_t sum = 0;
-		int count;
-		const u_short *sp = (u_short *)bp;
-		
-		for (count = len / 2; --count >= 0; )
-			sum += *sp++;
-		if (len & 1)
-			sum += ntohs(*(u_char *) sp << 8);
-		while (sum >> 16)
-			sum = (sum & 0xffff) + (sum >> 16);
-		sum = 0xffff & ~sum;
-		if (sum != 0)
+		if (in_cksum((const u_short*)bp, len, 0))
 			printf(" bad igmp cksum %x!", EXTRACT_16BITS(&bp[2]));
 	}
 	return;
@@ -243,6 +232,56 @@ ip_printroute(const char *type, register const u_char *cp, u_int length)
 		type = " ";
 	}
 	printf("%s}", ptr == len? "#" : "");
+}
+
+static void
+ip_printts(register const u_char *cp, u_int length)
+{
+	register u_int ptr = cp[2] - 1;
+	register u_int len;
+	int hoplen;
+	char *type;
+
+	printf(" TS{");
+	hoplen = ((cp[3]&0xF) != IPOPT_TS_TSONLY) ? 8 : 4;
+	if ((length - 4) & (hoplen-1))
+		printf("[bad length %d]", length);
+	if (ptr < 4 || ((ptr - 4) & (hoplen-1)) || ptr > length + 1)
+		printf("[bad ptr %d]", cp[2]);
+	switch (cp[3]&0xF) {
+	case IPOPT_TS_TSONLY:
+		printf("TSONLY");
+		break;
+	case IPOPT_TS_TSANDADDR:
+		printf("TS+ADDR");
+		break;
+	case 2:
+		printf("PRESPEC2.0");
+		break;
+	case IPOPT_TS_PRESPEC:
+		printf("PRESPEC");
+		break;
+	default:	
+		printf("[bad ts type %d]", cp[3]&0xF);
+		goto done;
+	}
+
+	type = " ";
+	for (len = 4; len < length; len += hoplen) {
+		if (ptr == len)
+			type = " ^ ";
+		printf("%s%d@%s", type, ntohl(*(u_int32_t *)&cp[len+hoplen-4]),
+		       hoplen!=8 ? "" : ipaddr_string(&cp[len]));
+		type = " ";
+	}
+
+done:
+	printf("%s", ptr == len ? " ^ " : "");
+
+	if (cp[3]>>4)
+		printf(" [%d hops not recorded]} ", cp[3]>>4);
+	else
+		printf("}");
 }
 
 /*
@@ -278,15 +317,17 @@ ip_optprint(register const u_char *cp, u_int length)
 			break;
 
 		case IPOPT_TS:
-			printf(" TS{%d}", len);
+			ip_printts(cp, len);
 			break;
 
+#ifndef IPOPT_SECURITY
+#define IPOPT_SECURITY 130
+#endif /* IPOPT_SECURITY */
 		case IPOPT_SECURITY:
 			printf(" SECURITY{%d}", len);
 			break;
 
 		case IPOPT_RR:
-			printf(" RR{%d}=", len);
 			ip_printroute("RR", cp, len);
 			break;
 
@@ -297,6 +338,17 @@ ip_optprint(register const u_char *cp, u_int length)
 		case IPOPT_LSRR:
 			ip_printroute("LSRR", cp, len);
 			break;
+
+#ifndef IPOPT_RA
+#define IPOPT_RA 148		/* router alert */
+#endif
+		case IPOPT_RA:
+			printf(" RA");
+			if (len != 4)
+				printf("{%d}", len);
+			else if (cp[2] || cp[3])
+				printf("%d.%d", cp[2], cp[3]);
+ 			break;
 
 		default:
 			printf(" IPOPT-%d{%d}", cp[0], len);
@@ -309,23 +361,34 @@ ip_optprint(register const u_char *cp, u_int length)
  * compute an IP header checksum.
  * don't modifiy the packet.
  */
-static int
-in_cksum(const struct ip *ip)
+u_short
+in_cksum(const u_short *addr, register int len, u_short csum)
 {
-	register const u_short *sp = (u_short *)ip;
-	register u_int32_t sum = 0;
-	register int count;
+	int nleft = len;
+	const u_short *w = addr;
+	u_short answer;
+	int sum = csum;
+
+ 	/*
+	 *  Our algorithm is simple, using a 32 bit accumulator (sum),
+	 *  we add sequential 16 bit words to it, and at the end, fold
+	 *  back all the carry bits from the top 16 bits into the lower
+	 *  16 bits.
+ 	 */
+	while (nleft > 1)  {
+		sum += *w++;
+		nleft -= 2;
+	}
+	if (nleft == 1)
+		sum += htons(*(u_char *)w<<8);
 
 	/*
-	 * No need for endian conversions.
+	 * add back carry outs from top 16 bits to low 16 bits
 	 */
-	for (count = ip->ip_hl * 2; --count >= 0; )
-		sum += *sp++;
-	while (sum > 0xffff)
-		sum = (sum & 0xffff) + (sum >> 16);
-	sum = ~sum & 0xffff;
-
-	return (sum);
+	sum = (sum >> 16) + (sum & 0xffff);	/* add hi 16 to low 16 */
+	sum += (sum >> 16);			/* add carry */
+	answer = ~sum;				/* truncate to 16 bits */
+	return (answer);
 }
 
 /*
@@ -449,7 +512,7 @@ again:
 			break;
 
 		case IPPROTO_ICMP:
-			icmp_print(cp, (const u_char *)ip);
+			icmp_print(cp, len, (const u_char *)ip);
 			break;
 
 #ifndef IPPROTO_IGRP
@@ -583,14 +646,30 @@ again:
 		if (off & 0x1fff)
 			(void)printf("%s > %s:", ipaddr_string(&ip->ip_src),
 				      ipaddr_string(&ip->ip_dst));
+#ifndef IP_MF
+#define IP_MF 0x2000
+#endif /* IP_MF */
+#ifndef IP_DF
+#define IP_DF 0x4000
+#endif /* IP_DF */
 		(void)printf(" (frag %d:%u@%d%s)", ntohs(ip->ip_id), len,
 			(off & 0x1fff) * 8,
 			(off & IP_MF)? "+" : "");
+
 	} else if (off & IP_DF)
 		(void)printf(" (DF)");
 
-	if (ip->ip_tos)
-		(void)printf(" [tos 0x%x]", (int)ip->ip_tos);
+	if (ip->ip_tos) {
+		(void)printf(" [tos 0x%x", (int)ip->ip_tos);
+		/* ECN bits */
+		if (ip->ip_tos&0x02) {
+			(void)printf(",ECT");
+			if (ip->ip_tos&0x01)
+				(void)printf(",CE");
+		}
+		(void)printf("] ");
+	}
+
 	if (ip->ip_ttl <= 1)
 		(void)printf(" [ttl %d]", (int)ip->ip_ttl);
 
@@ -608,7 +687,7 @@ again:
 			sep = ", ";
 		}
 		if ((u_char *)ip + hlen <= snapend) {
-			sum = in_cksum(ip);
+			sum = in_cksum((const u_short *)ip, hlen, 0);
 			if (sum != 0) {
 				(void)printf("%sbad cksum %x!", sep,
 					     ntohs(ip->ip_sum));
