@@ -42,7 +42,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-ascii.c,v 1.13 2003-12-29 10:30:40 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-ascii.c,v 1.14 2003-12-29 10:51:34 hannes Exp $";
 #endif
 #include <tcpdump-stdinc.h>
 #include <stdio.h>
@@ -93,7 +93,7 @@ ascii_print_with_offset(register const u_char *ident, register const u_char *cp,
 			if (Aflag) {
 				(void)printf("%s", asciistuff);
 			} else {
-				(void)printf("%s0x%04x:\t%-*s\t%s",
+				(void)printf("%s0x%04x: %-*s  %s",
 				    ident, oset, HEXDUMP_HEXSTUFF_PER_LINE,
 				    hexstuff, asciistuff);
 			}
@@ -118,7 +118,7 @@ ascii_print_with_offset(register const u_char *ident, register const u_char *cp,
 		if (Aflag) {
 			(void)printf("%s%s", ident, asciistuff);
 		} else {
-			(void)printf("%s0x%04x:\t%-*s\t%s",
+			(void)printf("%s0x%04x: %-*s  %s",
 			     ident, oset, HEXDUMP_HEXSTUFF_PER_LINE,
 			     hexstuff, asciistuff);
 		}
