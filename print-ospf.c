@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.48 2003-11-19 09:44:10 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.49 2004-01-08 22:08:40 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -129,8 +129,20 @@ static struct tok lsa_opaque_te_link_tlv_subtlv_values[] = {
 	{ 0,			NULL }
 };
 
-#define LS_OPAQUE_TE_LINK_SUBTLV_LINK_TYPE_PTP        1  /* rfc3630 */
-#define LS_OPAQUE_TE_LINK_SUBTLV_LINK_TYPE_MA         2  /* rfc3630 */
+static struct tok lsa_opaque_grace_tlv_values[] = {
+	{ LS_OPAQUE_GRACE_TLV_PERIOD,             "Grace Period" },
+	{ LS_OPAQUE_GRACE_TLV_REASON,             "Graceful restart Reason" },
+	{ LS_OPAQUE_GRACE_TLV_INT_ADDRESS,        "IPv4 interface address" },
+	{ 0,		        NULL }
+};
+
+static struct tok lsa_opaque_grace_tlv_reason_values[] = {
+	{ LS_OPAQUE_GRACE_TLV_REASON_UNKNOWN,     "Unknown" },
+	{ LS_OPAQUE_GRACE_TLV_REASON_SW_RESTART,  "Software Restart" },
+	{ LS_OPAQUE_GRACE_TLV_REASON_SW_UPGRADE,  "Software Reload/Upgrade" },
+	{ LS_OPAQUE_GRACE_TLV_REASON_CP_SWITCH,   "Control Processor Switch" },
+	{ 0,		        NULL }
+};
 
 static struct tok lsa_opaque_te_tlv_link_type_sub_tlv_values[] = {
 	{ LS_OPAQUE_TE_LINK_SUBTLV_LINK_TYPE_PTP, "Point-to-point" },
@@ -412,6 +424,69 @@ ospf_print_lsa(register const struct lsa *lsap)
 	case LS_TYPE_OPAQUE_DW:
 
 	    switch (*(&lsap->ls_hdr.un_lsa_id.opaque_field.opaque_type)) {
+            case LS_OPAQUE_TYPE_GRACE:
+		tptr = (u_int8_t *)(&lsap->lsa_un.un_grace_tlv.type);
+
+		while (ls_length != 0) {
+                    if (!TTEST2(*tptr, 4))
+                        goto trunc;
+		    if (ls_length < 4) {
+                        printf("\n\t    Remaining LS length %u < 4", ls_length);
+                        return(ls_end);
+                    }
+                    tlv_type = EXTRACT_16BITS(tptr);
+                    tlv_length = EXTRACT_16BITS(tptr+2);
+                    tptr+=4;
+                    ls_length-=4;
+                    
+                    printf("\n\t    %s TLV (%u), length: %u, value: ",
+                           tok2str(lsa_opaque_grace_tlv_values,"unknown",tlv_type),
+                           tlv_type,
+                           tlv_length);
+
+                    if (tlv_length > ls_length) {
+                        printf("\n\t    Bogus length %u > %u", tlv_length,
+                            ls_length);
+                        return(ls_end);
+                    }
+                    ls_length-=tlv_length;
+                    switch(tlv_type) {
+
+                    case LS_OPAQUE_GRACE_TLV_PERIOD:
+                        if (tlv_length != 4) {
+                            printf("\n\t    Bogus length %u != 4", tlv_length);
+                            return(ls_end);
+                        }
+                        printf("%us",EXTRACT_32BITS(tptr));
+                        break;
+                    case LS_OPAQUE_GRACE_TLV_REASON:
+                        if (tlv_length != 1) {
+                            printf("\n\t    Bogus length %u != 1", tlv_length);
+                            return(ls_end);
+                        }
+                        printf("%s (%u)",
+                               tok2str(lsa_opaque_grace_tlv_reason_values, "Unknown", *tptr),
+                               *tptr);
+                        break;
+                    case LS_OPAQUE_GRACE_TLV_INT_ADDRESS:
+                        if (tlv_length != 4) {
+                            printf("\n\t    Bogus length %u != 4", tlv_length);
+                            return(ls_end);
+                        }
+                        printf("%s", ipaddr_string(tptr));
+                        break;
+                    default:
+                        if (vflag <= 1) {
+                            if(!print_unknown_data(tptr,"\n\t      ",tlv_length))
+                                return(ls_end);
+                        }
+                        break;
+
+                    }
+                    tptr+=tlv_length;
+                }
+
+                break;
 	    case LS_OPAQUE_TYPE_TE:
 		tptr = (u_int8_t *)(&lsap->lsa_un.un_te_lsa_tlv.type);
 

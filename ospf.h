@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.11 2003-10-22 17:08:46 hannes Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.12 2004-01-08 22:08:40 hannes Exp $ (LBL) */
 /*
  * Copyright (c) 1991, 1993, 1994, 1995, 1996, 1997
  *	The Regents of the University of California.  All rights reserved.
@@ -69,7 +69,7 @@
 #define	LS_TYPE_OPAQUE_DW      11   /* rfc2370 - Opaque Domain Wide */
 
 #define LS_OPAQUE_TYPE_TE       1   /* rfc3630 */
-#define LS_OPAQUE_TYPE_GRACE    3   /* draft-ietf-ospf-hitless-restart */
+#define LS_OPAQUE_TYPE_GRACE    3   /* rfc3623 */
 
 #define LS_OPAQUE_TE_TLV_ROUTER 1   /* rfc3630 */
 #define LS_OPAQUE_TE_TLV_LINK   2   /* rfc3630 */
@@ -90,6 +90,15 @@
 
 #define LS_OPAQUE_TE_LINK_SUBTLV_LINK_TYPE_PTP        1  /* rfc3630 */
 #define LS_OPAQUE_TE_LINK_SUBTLV_LINK_TYPE_MA         2  /* rfc3630 */
+
+#define LS_OPAQUE_GRACE_TLV_PERIOD       1 /* rfc3623 */
+#define LS_OPAQUE_GRACE_TLV_REASON       2 /* rfc3623 */
+#define LS_OPAQUE_GRACE_TLV_INT_ADDRESS  3 /* rfc3623 */
+
+#define LS_OPAQUE_GRACE_TLV_REASON_UNKNOWN     0 /* rfc3623 */
+#define LS_OPAQUE_GRACE_TLV_REASON_SW_RESTART  1 /* rfc3623 */
+#define LS_OPAQUE_GRACE_TLV_REASON_SW_UPGRADE  2 /* rfc3623 */
+#define LS_OPAQUE_GRACE_TLV_REASON_CP_SWITCH   3 /* rfc3623 */
 
 /*************************************************
  *
@@ -197,6 +206,13 @@ struct lsa {
 	    u_int16_t length;
 	    u_int8_t data[1]; /* may repeat   */
 	} un_te_lsa_tlv;
+
+        /* Grace LSA */
+        struct {
+	    u_int16_t type;
+	    u_int16_t length;
+	    u_int8_t data[1]; /* may repeat   */
+	} un_grace_tlv;
 
         /* Unknown LSA */
         struct unknown {
