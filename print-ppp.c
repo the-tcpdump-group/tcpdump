@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.86 2003-05-22 15:40:08 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.87 2003-05-22 15:54:53 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -470,7 +470,7 @@ handle_ctrl_proto(u_int proto, const u_char *pptr, int length)
 		if (length < 12)
 			break;
 		printf(", Magic-Num 0x%08x", EXTRACT_32BITS(tptr));
-		printf(" Seconds-Remaining=%u", EXTRACT_32BITS(tptr + 4));
+		printf(", Seconds-Remaining %us", EXTRACT_32BITS(tptr + 4));
 		/* XXX: need to decode Message? */
 		break;
 	default:
@@ -481,6 +481,7 @@ handle_ctrl_proto(u_int proto, const u_char *pptr, int length)
                     print_unknown_data(pptr-2,"\n\t",length+2);
 		break;
 	}
+	printf(", length %u", length);
 
         if (vflag >1)
             print_unknown_data(pptr-2,"\n\t",length+2);
