@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.83 2000-10-06 05:35:37 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.84 2000-10-06 06:49:22 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -405,6 +405,10 @@ static int udp6_cksum(const struct ip6_hdr *ip6, const struct udphdr *up,
 #define NETBIOS_NS_PORT   137
 #define NETBIOS_DGRAM_PORT   138
 #define CISCO_AUTORP_PORT 496	/*XXX*/
+#define RADIUS_PORT 1645
+#define RADIUS_NEW_PORT 1812
+#define RADIUS_ACCOUNTING_PORT 1646
+#define RADIUS_NEW_ACCOUNTING_PORT 1813
 
 #ifdef INET6
 #define RIPNG_PORT 521		/*XXX*/
@@ -683,6 +687,11 @@ udp_print(register const u_char *bp, u_int length, register const u_char *bp2)
 			wb_print((const void *)(up + 1), length);
 		else if (ISPORT(CISCO_AUTORP_PORT))
 			cisco_autorp_print((const void *)(up + 1), length);
+		else if (ISPORT(RADIUS_PORT) ||
+		         ISPORT(RADIUS_NEW_PORT) ||
+		         ISPORT(RADIUS_ACCOUNTING_PORT) || 
+		         ISPORT(RADIUS_NEW_ACCOUNTING_PORT) )
+		         radius_print((const u_char *)(up+1), length);
 		else
 			(void)printf(" udp %u",
 			    (u_int32_t)(ulen - sizeof(*up)));
