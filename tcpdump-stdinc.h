@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/tcpdump-stdinc.h,v 1.4 2003-03-02 23:19:38 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/tcpdump-stdinc.h,v 1.5 2003-03-22 06:30:39 guy Exp $ (LBL)
  */
 
 /*
@@ -110,7 +110,7 @@ typedef short ino_t;
   #define FOPEN_WRITE_BIN  "wb"
 #else
   #define FOPEN_READ_TXT   "r"
-  #define FOPEN_READ_BIN   FOPEN_READ_BIN
+  #define FOPEN_READ_BIN   FOPEN_READ_TXT
   #define FOPEN_WRITE_TXT  "w"
   #define FOPEN_WRITE_BIN  FOPEN_WRITE_TXT
 #endif
