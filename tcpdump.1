@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.90 2000-10-28 10:23:38 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.91 2000-12-16 10:57:26 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -1613,16 +1613,21 @@ patches@tcpdump.org
 NIT doesn't let you watch your own outbound traffic, BPF will.
 We recommend that you use the latter.
 .LP
-On Linux systems with 2.0[.x] kernels, packets on the loopback device
-will be seen twice.  In addition, if the interface is put into
-promiscuous mode, it will not be taken out of promiscuous mode when
-.I tcpdump
-exits; you will have to take it out of promiscuous mode, if appropriate,
-with the
-.IR ifconfig (1)
-command.  Also, packet filtering cannot be done in the kernel, so that
-all packets must be copied from the kernel in order to be filtered in
-user mode.  We recommend that you upgrade to a 2.2 or later kernel.
+On Linux systems with 2.0[.x] kernels:
+.IP
+packets on the loopback device will be seen twice;
+.IP
+packet filtering cannot be done in the kernel, so that all packets must
+be copied from the kernel in order to be filtered in user mode;
+.IP
+all of a packet, not just the part that's within the snapshot length,
+will be copied from the kernel (the 2.0[.x] packet capture mechanism, if
+asked to copy only part of a packet to userland, will not report the
+true length of the packet; this would cause most IP packets to get an
+error from
+.BR tcpdump ).
+.LP
+We recommend that you upgrade to a 2.2 or later kernel.
 .LP
 Some attempt should be made to reassemble IP fragments or, at least
 to compute the right length for the higher level protocol.
@@ -1631,12 +1636,6 @@ Name server inverse queries are not dumped correctly: the (empty)
 question section is printed rather than real query in the answer
 section.  Some believe that inverse queries are themselves a bug and
 prefer to fix the program generating them rather than \fItcpdump\fP.
-.LP
-Apple Ethertalk DDP packets could be dumped as easily as KIP DDP
-packets but aren't.
-Even if we were inclined to do anything to promote the use of
-Ethertalk (we aren't), LBL doesn't allow Ethertalk on any of its
-networks so we'd would have no way of testing this code.
 .LP
 A packet trace that crosses a daylight savings time change will give
 skewed time stamps (the time change is ignored).
