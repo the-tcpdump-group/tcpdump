@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.166 2001-07-05 18:54:13 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.167 2001-08-20 17:52:39 fenner Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -259,7 +259,7 @@ extern void timed_print(const u_char *, u_int);
 extern void udp_print(const u_char *, u_int, const u_char *, int);
 extern void wb_print(const void *, u_int);
 extern int ah_print(register const u_char *, register const u_char *);
-extern int esp_print(register const u_char *, register const u_char *, int *);
+extern int esp_print(register const u_char *, register const u_char *, int *, int *);
 extern void isakmp_print(const u_char *, u_int, const u_char *);
 extern int ipcomp_print(register const u_char *, register const u_char *, int *);
 extern void rx_print(register const u_char *, int, int, int, u_char *);
@@ -294,7 +294,7 @@ extern int rt6_print(const u_char *, const u_char *);
 extern void ospf6_print(const u_char *, u_int);
 extern void dhcp6_print(const u_char *, u_int, u_int16_t, u_int16_t);
 #endif /*INET6*/
-extern u_short in_cksum(const u_short *, register int, u_short);
+extern u_short in_cksum(const u_short *, register int, int);
 
 #ifndef HAVE_BPF_DUMP
 struct bpf_program;

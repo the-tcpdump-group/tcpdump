@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.16 2000-11-17 19:08:15 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.17 2001-08-20 17:52:40 fenner Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -143,11 +143,12 @@ ip6_print(register const u_char *bp, register int length)
 			break;
 		case IPPROTO_ESP:
 		    {
-			int enh;
-			advance = esp_print(cp, (const u_char *)ip6, &enh);
+			int enh, padlen;
+			advance = esp_print(cp, (const u_char *)ip6, &enh, &padlen);
 			if (enh < 0)
 				goto end;
 			nh = enh & 0xff;
+			len -= padlen;
 			break;
 		    }
 #ifndef IPPROTO_IPCOMP

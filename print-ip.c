@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.98 2001-06-15 22:17:33 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.99 2001-08-20 17:52:39 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -217,7 +217,7 @@ ip_optprint(register const u_char *cp, u_int length)
  * don't modifiy the packet.
  */
 u_short
-in_cksum(const u_short *addr, register int len, u_short csum)
+in_cksum(const u_short *addr, register int len, int csum)
 {
 	int nleft = len;
 	const u_short *w = addr;
@@ -341,10 +341,10 @@ again:
 #endif
 		case IPPROTO_ESP:
 		    {
-			int enh;
-			advance = esp_print(cp, (const u_char *)ip, &enh);
+			int enh, padlen;
+			advance = esp_print(cp, (const u_char *)ip, &enh, &padlen);
 			cp += advance;
-			len -= advance;
+			len -= advance + padlen;
 			if (enh < 0)
 				break;
 			nh = enh & 0xff;

@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.18 2001-04-13 02:56:38 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.19 2001-08-20 17:52:38 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -61,7 +61,7 @@ static const char rcsid[] =
 #include "addrtoname.h"
 
 int
-esp_print(register const u_char *bp, register const u_char *bp2, int *nhdr)
+esp_print(register const u_char *bp, register const u_char *bp2, int *nhdr, int *padlen)
 {
 	register const struct esp *esp;
 	register const u_char *ep;
@@ -145,6 +145,9 @@ esp_print(register const u_char *bp, register const u_char *bp2, int *nhdr)
 		break;
 #endif /*INET6*/
 	case 4:
+		/* nexthdr & padding are in the last fragment */
+		if (ntohs(ip->ip_off) & IP_MF)
+			goto fail;
 #ifdef INET6
 		ip6 = NULL;
 #endif
@@ -290,6 +293,9 @@ esp_print(register const u_char *bp, register const u_char *bp2, int *nhdr)
 	/* sanity check for pad length */
 	if (ep - bp < *(ep - 2))
 		goto fail;
+
+	if (padlen)
+		*padlen = *(ep - 2) + 2;
 
 	if (nhdr)
 		*nhdr = *(ep - 1);
