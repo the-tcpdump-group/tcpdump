@@ -99,6 +99,7 @@ print-egp.c
 print-esp.c
 print-ether.c
 print-fddi.c
+print-fr.c
 print-frag6.c
 print-gre.c
 print-hsrp.c

@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.45 2002-04-07 09:50:33 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.46 2002-07-11 08:09:47 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -193,112 +193,10 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 
 		orgcode = EXTRACT_24BITS(&llc.llc_orgcode[0]);
 		et = EXTRACT_16BITS(&llc.llc_ethertype[0]);
-		switch (orgcode) {
-		case OUI_ENCAP_ETHER:
-		case OUI_CISCO_90:
-			/*
-			 * This is an encapsulated Ethernet packet,
-			 * or a packet bridged by some piece of
-			 * Cisco hardware; the protocol ID is
-			 * an Ethernet protocol type.
-			 */
-			ret = ether_encap_print(et, p, length, caplen,
-			    extracted_ethertype);
-			if (ret)
-				return (ret);
-			break;
-
-		case OUI_APPLETALK:
-			if (et == ETHERTYPE_ATALK) {
-				/*
-				 * No, I have no idea why Apple used one
-				 * of their own OUIs, rather than
-				 * 0x000000, and an Ethernet packet
-				 * type, for Appletalk data packets,
-				 * but used 0x000000 and an Ethernet
-				 * packet type for AARP packets.
-				 */
-				ret = ether_encap_print(et, p, length, caplen,
-				    extracted_ethertype);
-				if (ret)
-					return (ret);
-			}
-			break;
-
-		case OUI_CISCO:
-			if (et == PID_CISCO_CDP) {
-				cdp_print(p, length, caplen, esrc, edst);
-				return 1;
-			}
-			break;
-
-		case OUI_RFC2684:
-			switch (et) {
-
-			case PID_RFC2684_ETH_FCS:
-			case PID_RFC2684_ETH_NOFCS:
-				/*
-				 * XXX - remove the last two bytes for
-				 * PID_RFC2684_ETH_FCS?
-				 */
-				/*
-				 * Skip the padding.
-				 */
-				caplen -= 2;
-				length -= 2;
-				p += 2;
-
-				/*
-				 * What remains is an Ethernet packet.
-				 */
-				ether_print(p, length, caplen);
-				return (1);
-
-			case PID_RFC2684_802_5_FCS:
-			case PID_RFC2684_802_5_NOFCS:
-				/*
-				 * XXX - remove the last two bytes for
-				 * PID_RFC2684_ETH_FCS?
-				 */
-				/*
-				 * Skip the padding, but not the Access
-				 * Control field.
-				 */
-				caplen -= 2;
-				length -= 2;
-				p += 2;
-
-				/*
-				 * What remains is an 802.5 Token Ring
-				 * packet.
-				 */
-				token_print(p, length, caplen);
-				return (1);
-
-			case PID_RFC2684_FDDI_FCS:
-			case PID_RFC2684_FDDI_NOFCS:
-				/*
-				 * XXX - remove the last two bytes for
-				 * PID_RFC2684_ETH_FCS?
-				 */
-				/*
-				 * Skip the padding.
-				 */
-				caplen -= 3;
-				length -= 3;
-				p += 3;
-
-				/*
-				 * What remains is an FDDI packet.
-				 */
-				fddi_print(p, length, caplen);
-				return (1);
-
-			case PID_RFC2684_BPDU:
-				stp_print(p, length);
-				return (1);
-			}
-		}
+		ret = snap_print(p, length, caplen, esrc, edst,
+		    extracted_ethertype, orgcode, et);
+		if (ret)
+			return (ret);
 	}
 
 	if ((llc.ssap & ~LLC_GSAP) == llc.dsap) {
@@ -384,4 +282,120 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 	}
 	(void)printf(" len=%d", length);
 	return(1);
+}
+
+int
+snap_print(const u_char *p, u_int length, u_int caplen,
+    const u_char *esrc, const u_char *edst, u_short *extracted_ethertype,
+    u_int32_t orgcode, u_short et)
+{
+	register int ret;
+
+	switch (orgcode) {
+	case OUI_ENCAP_ETHER:
+	case OUI_CISCO_90:
+		/*
+		 * This is an encapsulated Ethernet packet,
+		 * or a packet bridged by some piece of
+		 * Cisco hardware; the protocol ID is
+		 * an Ethernet protocol type.
+		 */
+		ret = ether_encap_print(et, p, length, caplen,
+		    extracted_ethertype);
+		if (ret)
+			return (ret);
+		break;
+
+	case OUI_APPLETALK:
+		if (et == ETHERTYPE_ATALK) {
+			/*
+			 * No, I have no idea why Apple used one
+			 * of their own OUIs, rather than
+			 * 0x000000, and an Ethernet packet
+			 * type, for Appletalk data packets,
+			 * but used 0x000000 and an Ethernet
+			 * packet type for AARP packets.
+			 */
+			ret = ether_encap_print(et, p, length, caplen,
+			    extracted_ethertype);
+			if (ret)
+				return (ret);
+		}
+		break;
+
+	case OUI_CISCO:
+		if (et == PID_CISCO_CDP) {
+			cdp_print(p, length, caplen, esrc, edst);
+			return (1);
+		}
+		break;
+
+	case OUI_RFC2684:
+		switch (et) {
+
+		case PID_RFC2684_ETH_FCS:
+		case PID_RFC2684_ETH_NOFCS:
+			/*
+			 * XXX - remove the last two bytes for
+			 * PID_RFC2684_ETH_FCS?
+			 */
+			/*
+			 * Skip the padding.
+			 */
+			caplen -= 2;
+			length -= 2;
+			p += 2;
+
+			/*
+			 * What remains is an Ethernet packet.
+			 */
+			ether_print(p, length, caplen);
+			return (1);
+
+		case PID_RFC2684_802_5_FCS:
+		case PID_RFC2684_802_5_NOFCS:
+			/*
+			 * XXX - remove the last two bytes for
+			 * PID_RFC2684_ETH_FCS?
+			 */
+			/*
+			 * Skip the padding, but not the Access
+			 * Control field.
+			 */
+			caplen -= 2;
+			length -= 2;
+			p += 2;
+
+			/*
+			 * What remains is an 802.5 Token Ring
+			 * packet.
+			 */
+			token_print(p, length, caplen);
+			return (1);
+
+		case PID_RFC2684_FDDI_FCS:
+		case PID_RFC2684_FDDI_NOFCS:
+			/*
+			 * XXX - remove the last two bytes for
+			 * PID_RFC2684_ETH_FCS?
+			 */
+			/*
+			 * Skip the padding.
+			 */
+			caplen -= 3;
+			length -= 3;
+			p += 3;
+
+			/*
+			 * What remains is an FDDI packet.
+			 */
+			fddi_print(p, length, caplen);
+			return (1);
+
+		case PID_RFC2684_BPDU:
+			stp_print(p, length);
+			return (1);
+		}
+	}
+	return (0);
 }
