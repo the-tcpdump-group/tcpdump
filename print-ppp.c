@@ -22,15 +22,16 @@
  * complete PPP support.
  */
 
-/* TODO: 
-   o resolve XXX as much as possible
-   o MP support
-   o BAP support 
+/*
+ * TODO:
+ * o resolve XXX as much as possible
+ * o MP support
+ * o BAP support
  */
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.40 2000-08-18 07:44:46 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.41 2000-08-18 07:53:35 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -69,9 +70,11 @@ struct rtentry;
 /* XXX This goes somewhere else. */
 #define PPP_HDRLEN 4
 
-/* The following constatns are defined by IANA. Please refer to 
-      http://www.isi.edu/in-notes/iana/assignments/ppp-numbers
-   for the up-to-date information. */
+/*
+ * The following constatns are defined by IANA. Please refer to
+ *    http://www.isi.edu/in-notes/iana/assignments/ppp-numbers
+ * for the up-to-date information.
+ */
 
 /* Control Protocols (LCP/IPCP/CCP etc.) Codes */
 
@@ -271,7 +274,7 @@ static const char *ccpconfopts[] = {
 
 /* Auth Algorithms */
 
-/* 0-4 Reserved (RFC1994) */ 
+/* 0-4 Reserved (RFC1994) */
 #define AUTHALG_CHAPMD5	5	/* RFC1994 */
 #define AUTHALG_MSCHAP1	128	/* RFC2433 */
 #define AUTHALG_MSCHAP2	129	/* RFC2795 */
@@ -431,7 +434,7 @@ handle_ctrl_proto(u_int proto, const u_char *p, int length)
 		printf(", Magic-Num=%08x", EXTRACT_32BITS(p));
 		p += 4;
 		printf(" OUI=%02x%02x%02x", p[0], p[1], p[2]);
-		/* XXX: need to decode Kind and Value(s)? */ 
+		/* XXX: need to decode Kind and Value(s)? */
 		break;
 	case CPCODES_CONF_REQ:
 	case CPCODES_CONF_ACK:
@@ -480,7 +483,7 @@ handle_ctrl_proto(u_int proto, const u_char *p, int length)
 		break;
 	case CPCODES_TIME_REM:
 		printf(", Magic-Num=%08x", EXTRACT_32BITS(p));
-		printf(" Seconds-Remaining=%u", EXTRACT_32BITS(p+4));
+		printf(" Seconds-Remaining=%u", EXTRACT_32BITS(p + 4));
 		/* XXX: need to decode Message? */
 		break;
 	default:
@@ -496,7 +499,7 @@ print_lcp_config_options(const u_char *p)
 	int len	= p[1];
 	int opt = p[0];
 	int i;
-	
+
 	if ((opt >= LCPOPT_MIN) && (opt <= LCPOPT_MAX))
 		printf(", %s", lcpconfopts[opt]);
 
@@ -504,22 +507,22 @@ print_lcp_config_options(const u_char *p)
 	case LCPOPT_VEXT:
 		if (len >= 6) {
 			printf(" OUI=%02x%02x%02x", p[2], p[3], p[4]);
-#if 0		      
+#if 0		
 			printf(" kind=%02x", p[5]);
 			printf(" val=")
-			for (i=0; i<len-6; i++) {
-				printf("%02x", p[6+i]);
+			for (i = 0; i < len - 6; i++) {
+				printf("%02x", p[6 + i]);
 			}
 #endif
 		}
 		break;
 	case LCPOPT_MRU:
 		if (len == 4)
-			printf("=%u", EXTRACT_16BITS(p+2));
+			printf("=%u", EXTRACT_16BITS(p + 2));
 		break;
 	case LCPOPT_ACCM:
 		if (len == 6)
-			printf("=%08x", EXTRACT_32BITS(p+2));
+			printf("=%08x", EXTRACT_32BITS(p + 2));
 		break;
 	case LCPOPT_AP:
 		if (len >= 4) {
@@ -562,7 +565,7 @@ print_lcp_config_options(const u_char *p)
 		break;
 	case LCPOPT_MN:
 		if (len == 6)
-			printf("=%08x", EXTRACT_32BITS(p+2));
+			printf("=%08x", EXTRACT_32BITS(p + 2));
 		break;
 	case LCPOPT_PFC:
 		break;
@@ -570,7 +573,7 @@ print_lcp_config_options(const u_char *p)
 		break;
 	case LCPOPT_LD:
 		if (len == 4)
-			printf("=%04x", EXTRACT_16BITS(p+2));
+			printf("=%04x", EXTRACT_16BITS(p + 2));
 		break;
 	case LCPOPT_CBACK:
 		switch (p[2]) {		/* Operation */
@@ -598,8 +601,8 @@ print_lcp_config_options(const u_char *p)
 		}
 		break;
 	case LCPOPT_MLMRRU:
-		if (len == 4) 
-			printf("=%u", EXTRACT_16BITS(p+2));
+		if (len == 4)
+			printf("=%u", EXTRACT_16BITS(p + 2));
 		break;
 	case LCPOPT_MLED:
 		switch (p[2]) {		/* class */
@@ -626,7 +629,7 @@ print_lcp_config_options(const u_char *p)
 		break;
 
 /* XXX: to be supported */
-#if 0 
+#if 0
 	case LCPOPT_DEP6:
 	case LCPOPT_FCSALT:
 	case LCPOPT_SDP:
@@ -675,19 +678,20 @@ handle_chap(const u_char *p, int length)
 	len = EXTRACT_16BITS(p);
 	p += 2;
 
-	/* Note that this is a generic CHAP decoding routine. Since we
-	   don't know which flavor of CHAP (i.e. CHAP-MD5, MS-CHAPv1,
-	   MS-CHAPv2) is used at this point, we can't decode packet
-	   specifically to each algorithms. Instead, we simply decode
-	   the GCD (Gratest Common Denominator) for all algorithms. */
-	
+	/*
+	 * Note that this is a generic CHAP decoding routine. Since we
+	 * don't know which flavor of CHAP (i.e. CHAP-MD5, MS-CHAPv1,
+	 * MS-CHAPv2) is used at this point, we can't decode packet
+	 * specifically to each algorithms. Instead, we simply decode
+	 * the GCD (Gratest Common Denominator) for all algorithms.
+	 */
 	switch (code) {
 	case CHAP_CHAL:
 	case CHAP_RESP:
 		val_size = *p;		/* value size */
 		p++;
 		printf(", Value=");
-		for (i = 0; i < val_size; i++) 
+		for (i = 0; i < val_size; i++)
 			printf("%02x", *p++);
 		name_size = len - val_size - 5;
 		printf(", Name=");
@@ -794,18 +798,16 @@ print_ipcp_config_options(const u_char *p)
 	switch (opt) {
 	case IPCPOPT_2ADDR:		/* deprecated */
 		printf(", IP-Addrs src=%s dst=%s",
-		       ipaddr_string(p + 2), 
+		       ipaddr_string(p + 2),
 		       ipaddr_string(p + 6));
 		break;		
 	case IPCPOPT_IPCOMP:
 		printf(", IP-Comp");
-		if (EXTRACT_16BITS(p+2) == PPP_VJC) {
+		if (EXTRACT_16BITS(p + 2) == PPP_VJC) {
 			printf(" VJ-Comp");
 			/* XXX: VJ-Comp parameters should be decoded */
-		} else {
-			printf(" unknown-comp-proto=%04x", 
-			       EXTRACT_16BITS(p+2));
-		}
+		} else
+			printf(" unknown-comp-proto=%04x", EXTRACT_16BITS(p + 2));
 		break;
 	case IPCPOPT_ADDR:
 		printf(", IP-Addr=%s", ipaddr_string(p + 2));
@@ -877,10 +879,10 @@ print_bacp_config_options(const u_char *p)
 
 	if (opt == BACPOPT_FPEER) {
 		printf(", Favored-Peer");
-		printf(" Magic-Num=%08x", EXTRACT_32BITS(p+2));
+		printf(" Magic-Num=%08x", EXTRACT_32BITS(p + 2));
 	} else {
 		printf(", unknown-option-%d", opt);
-	} 
+	}
 	return len;
 }
 
@@ -924,18 +926,19 @@ ppp_print(register const u_char *p, u_int length)
 {
 	u_int proto;
 
-	/* Here, we assume that p points to the Address and Control
-	   field (if they present). */
-
-	if (*p == PPP_ADDRESS && *(p+1) == PPP_CONTROL) { 
+	/*
+	 * Here, we assume that p points to the Address and Control
+	 * field (if they present).
+	 */
+	if (*p == PPP_ADDRESS && *(p + 1) == PPP_CONTROL) {
 		p += 2;			/* ACFC not used */
 		length -= 2;
 	}
 		
-	if (*p % 2) {			
+	if (*p % 2) {
 		proto = *p;		/* PFC is used */
 		p++;
-		length--; 
+		length--;
 	} else {
 		proto = EXTRACT_16BITS(p);
 		p += 2;
@@ -974,11 +977,12 @@ ppp_if_print(u_char *user, const struct pcap_pkthdr *h,
 	snapend = p + caplen;
 
 #if 0
-	/* XXX: seems to assume that there are 2 octets prepended to an 
-	   actual PPP frame. The 1st octet looks like Input/Output flag 
-	   while 2nd octet is unknown, at least to me 
-	   (mshindo@mshindo.net). */
-
+	/*
+	 * XXX: seems to assume that there are 2 octets prepended to an
+	 * actual PPP frame. The 1st octet looks like Input/Output flag
+	 * while 2nd octet is unknown, at least to me
+	 * (mshindo@mshindo.net).
+	 */
 	if (eflag)
 		printf("%c %4d %02x ", p[0] ? 'O' : 'I', length, p[1]);
 #endif
@@ -1061,26 +1065,26 @@ ppp_bsdos_if_print(u_char *user, const struct pcap_pkthdr *h,
 
 #if 0
 	if (p[0] == PPP_ADDRESS && p[1] == PPP_CONTROL) {
-		if (eflag) 
+		if (eflag)
 			printf("%02x %02x ", p[0], p[1]);
 		p += 2;
 		hdrlength = 2;
 	}
 
-	if (eflag) 
+	if (eflag)
 		printf("%d ", length);
 	/* Retrieve the protocol type */
 	if (*p & 01) {
 		/* Compressed protocol field */
 		ptype = *p;
-		if (eflag) 
+		if (eflag)
 			printf("%02x ", ptype);
 		p++;
 		hdrlength += 1;
 	} else {
 		/* Un-compressed protocol field */
 		ptype = ntohs(*(u_int16_t *)p);
-		if (eflag) 
+		if (eflag)
 			printf("%04x ", ptype);
 		p += 2;
 		hdrlength += 2;
@@ -1097,7 +1101,7 @@ ppp_bsdos_if_print(u_char *user, const struct pcap_pkthdr *h,
 		ph = (struct ppp_header *)q;
 		if (ph->phdr_addr == PPP_ADDRESS
 		 && ph->phdr_ctl == PPP_CONTROL) {
-			if (eflag) 
+			if (eflag)
 				printf("%02x %02x ", q[0], q[1]);
 			ptype = ntohs(ph->phdr_type);
 			if (eflag && (ptype == PPP_VJC || ptype == PPP_VJNC)) {
@@ -1112,7 +1116,7 @@ ppp_bsdos_if_print(u_char *user, const struct pcap_pkthdr *h,
 				printf("] ");
 			}
 		}
-		if (eflag) 
+		if (eflag)
 			printf("%d ", length);
 	}
 	if (p[SLC_CHL]) {
