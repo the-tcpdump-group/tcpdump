@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-symantec.c,v 1.3 2004-03-22 20:02:01 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-symantec.c,v 1.4 2004-04-05 00:13:59 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -37,8 +37,6 @@ static const char rcsid[] _U_ =
 #include "ethertype.h"
 
 #include "ether.h"
-
-const u_char *snapend;
 
 struct symantec_header {
 	u_int8_t  stuff1[6];

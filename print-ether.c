@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.90 2004-03-30 14:42:40 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.91 2004-04-05 00:14:08 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -37,8 +37,6 @@ static const char rcsid[] _U_ =
 #include "ethertype.h"
 
 #include "ether.h"
-
-const u_char *snapend;
 
 const struct tok ethertype_values[] = { 
     { ETHERTYPE_IP,		"IPv4" },
