@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.66 2000-06-10 08:11:12 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.67 2000-06-21 09:08:34 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -356,7 +356,7 @@ safeputchar(int c)
 
 	ch = (unsigned char)(c & 0xff);
 	if (c < 0x80 && isprint(c))
-		printf("\\%03o", c & 0xff);
-	else
 		printf("%c", c & 0xff);
+	else
+		printf("\\%03o", c & 0xff);
 }
