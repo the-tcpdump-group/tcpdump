@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.211 2003-07-31 22:36:43 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.212 2003-08-01 01:01:40 fenner Exp $ (LBL)";
 #endif
 
 /*
@@ -604,6 +604,9 @@ main(int argc, char **argv)
 		thiszone = gmt2local(0);
 
 	if (RFileName != NULL) {
+		int dlt;
+		const char *dlt_name;
+
 #ifndef WIN32
 		/*
 		 * We don't need network access, so relinquish any set-UID
@@ -619,9 +622,12 @@ main(int argc, char **argv)
 		pd = pcap_open_offline(RFileName, ebuf);
 		if (pd == NULL)
 			error("%s", ebuf);
-                printf("reading from file %s, link-type %u\n",
-		       RFileName,
-		       pcap_datalink(pd));
+		dlt = pcap_datalink(pd);
+		dlt_name = pcap_datalink_val_to_name(dlt);
+		if (dlt_name == NULL)
+			dlt_name = "???";
+                printf("reading from file %s, link-type %u (%s)\n",
+		       RFileName, dlt, dlt_name);
 		localnet = 0;
 		netmask = 0;
 		if (fflag != 0)
@@ -744,14 +750,21 @@ main(int argc, char **argv)
 #endif
 #ifndef WIN32
 	if (RFileName == NULL) {
+		int dlt;
+		const char *dlt_name;
+
 		if (!vflag && !WFileName) {
 			(void)fprintf(stderr,
 			    "%s: verbose output suppressed, use -v or -vv for full protocol decode\n",
 			    program_name);
 		} else
 			(void)fprintf(stderr, "%s: ", program_name);
-		(void)fprintf(stderr, "listening on %s, link-type %u, capture size %u bytes\n",
-		    device, pcap_datalink(pd), snaplen);
+		dlt = pcap_datalink(pd);
+		dlt_name = pcap_datalink_val_to_name(dlt);
+		if (dlt_name == NULL)
+			dlt_name = "???";
+		(void)fprintf(stderr, "listening on %s, link-type %u (%s), capture size %u bytes\n",
+		    device, dlt, dlt_name, snaplen);
 		(void)fflush(stderr);
 	}
 #endif /* WIN32 */
