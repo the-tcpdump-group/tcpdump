@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.12 2002-12-11 04:56:44 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.13 2002-12-12 07:28:35 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -720,7 +720,7 @@ static int GetHeaderLength(u_int16_t fc)
  * Print the 802.11 MAC header
  */
 static inline void
-ieee_802_11_print(u_int16_t fc, const u_char *p)
+ieee_802_11_hdr_print(u_int16_t fc, const u_char *p)
 {
 	switch (FC_TYPE(fc)) {
 	case T_MGMT:
@@ -742,39 +742,23 @@ ieee_802_11_print(u_int16_t fc, const u_char *p)
 	}
 }
 
-/*
- * This is the top level routine of the printer.  'p' points
- * to the 802.11 header of the packet, 'h->ts' is the timestamp,
- * 'h->length' is the length of the packet off the wire, and 'h->caplen'
- * is the number of bytes actually captured.
- */
-void
-ieee802_11_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
+static void
+ieee802_11_print(const u_char *p, u_int length, u_int caplen)
 {
-	u_int caplen = h->caplen;
-	u_int length = h->len;
 	u_int16_t fc;
 	u_int HEADER_LENGTH;
 	u_short extracted_ethertype;
-
-	++infodelay;
-	ts_print(&h->ts);
-
-	if (caplen < IEEE802_11_FC_LEN) {
-		printf("[|802.11]");
-		goto out;
-	}
 
 	fc = EXTRACT_LE_16BITS(p);
 	HEADER_LENGTH = GetHeaderLength(fc);
 
 	if (caplen < HEADER_LENGTH) {
 		printf("[|802.11]");
-		goto out;
+		return;
 	}
 
 	if (eflag)
-		ieee_802_11_print(fc, p);
+		ieee_802_11_hdr_print(fc, p);
 
 	/*
 	 * Some printers want to get back at the ethernet addresses,
@@ -793,14 +777,14 @@ ieee802_11_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char 
 		if (!mgmt_body_print(fc, (const struct mgmt_header_t *)packetp,
 		    p)) {
 			printf("[|802.11]");
-			goto out;
+			return;
 		}
 		break;
 
 	case T_CTRL:
 		if (!ctrl_body_print(fc, p - HEADER_LENGTH)) {
 			printf("[|802.11]");
-			goto out;
+			return;
 		}
 		break;
 
@@ -809,7 +793,7 @@ ieee802_11_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char 
 		if (FC_WEP(fc)) {
 			if (!wep_print(p)) {
 				printf("[|802.11]");
-				goto out;
+				return;
 			}
 		} else {
 			if (llc_print(p, length, caplen, packetp + 10,
@@ -819,7 +803,7 @@ ieee802_11_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char 
 				 * handle intelligently
 				 */
 				if (!eflag)
-					ieee_802_11_print(fc, p - HEADER_LENGTH);
+					ieee_802_11_hdr_print(fc, p - HEADER_LENGTH);
 				if (extracted_ethertype) {
 					printf("(LLC %s) ",
 					    etherproto_string(htons(extracted_ethertype)));
@@ -838,7 +822,95 @@ ieee802_11_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char 
 
 	if (xflag)
 		default_print(p, caplen);
- out:
+}
+
+/*
+ * This is the top level routine of the printer.  'p' points
+ * to the 802.11 header of the packet, 'h->ts' is the timestamp,
+ * 'h->length' is the length of the packet off the wire, and 'h->caplen'
+ * is the number of bytes actually captured.
+ */
+void
+ieee802_11_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
+{
+	u_int caplen = h->caplen;
+	u_int length = h->len;
+
+	++infodelay;
+	ts_print(&h->ts);
+
+	if (caplen < IEEE802_11_FC_LEN) {
+		printf("[|802.11]");
+		goto out;
+	}
+
+	ieee802_11_print(p, length, caplen);
+
+out:
+	putchar('\n');
+	--infodelay;
+	if (infoprint)
+		info(0);
+}
+
+#define PRISM_HDR_LEN	144
+
+/*
+ * For DLT_PRISM_HEADER; like DLT_IEEE802_11, but with an extra header,
+ * containing information such as radio information, which we
+ * currently ignore.
+ */
+void
+prism_if_print(u_char *user _U_, const struct pcap_pkthdr *h, const u_char *p)
+{
+	u_int caplen = h->caplen;
+	u_int length = h->len;
+
+	++infodelay;
+	ts_print(&h->ts);
+
+	if (caplen < PRISM_HDR_LEN + IEEE802_11_FC_LEN) {
+		printf("[|802.11]");
+		goto out;
+	}
+
+	ieee802_11_print(p + PRISM_HDR_LEN, length - PRISM_HDR_LEN,
+	    caplen - PRISM_HDR_LEN);
+
+out:
+	putchar('\n');
+	--infodelay;
+	if (infoprint)
+		info(0);
+}
+
+#define IEEE802_11_RADIO_HDR_LEN	146
+
+/*
+ * For DLT_IEEE802_11_RADIO; like DLT_IEEE802_11, but with an extra
+ * header, containing information such as radio information, which we
+ * currently ignore.
+ */
+void
+ieee802_11_radio_if_print(u_char *user _U_, const struct pcap_pkthdr *h,
+    const u_char *p)
+{
+	u_int caplen = h->caplen;
+	u_int length = h->len;
+
+	++infodelay;
+	ts_print(&h->ts);
+
+	if (caplen < IEEE802_11_RADIO_HDR_LEN + IEEE802_11_FC_LEN) {
+		printf("[|802.11]");
+		goto out;
+	}
+
+	ieee802_11_print(p + IEEE802_11_RADIO_HDR_LEN,
+	    length - IEEE802_11_RADIO_HDR_LEN,
+	    caplen - IEEE802_11_RADIO_HDR_LEN);
+
+out:
 	putchar('\n');
 	--infodelay;
 	if (infoprint)
