@@ -12,6 +12,7 @@ addrtoname.c
 addrtoname.h
 ah.h
 appletalk.h
+arcnet.h
 atime.awk
 bootp.h
 chdlc.h
@@ -75,6 +76,7 @@ packetdat.awk
 parsenfsfh.c
 ppp.h
 print-ah.c
+print-arcnet.c
 print-arp.c
 print-ascii.c
 print-atalk.c
