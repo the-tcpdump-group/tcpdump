@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.55 2000-10-24 00:56:50 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.56 2000-11-08 09:41:39 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -40,6 +40,11 @@ static const char rcsid[] =
 
 #include <sys/param.h>
 #include <sys/time.h>
+
+#ifdef __bsdi__
+#include <net/slcompress.h>
+#include <net/if_ppp.h>
+#endif
 
 #include <netinet/in.h>
 
