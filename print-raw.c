@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-raw.c,v 1.32 2000-09-29 04:58:47 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-raw.c,v 1.33 2000-10-06 04:23:13 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -34,9 +34,6 @@ static const char rcsid[] =
 #include <sys/file.h>
 #include <sys/ioctl.h>
 
-struct mbuf;
-struct rtentry;
-
 #include <netinet/in.h>
 
 #include <pcap.h>
@@ -45,10 +42,6 @@ struct rtentry;
 
 #include "addrtoname.h"
 #include "interface.h"
-
-#ifndef AF_NS
-#define AF_NS		6		/* XEROX NS protocols */
-#endif
 
 /*
  * The DLT_RAW packet has no header. It contains a raw IP packet.
