@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.41 2003-12-15 13:15:25 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.42 2004-03-18 14:12:18 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -638,9 +638,10 @@ pimv2_print(register const u_char *bp, register u_int len)
 			olen = EXTRACT_16BITS(&bp[2]);
 			TCHECK2(bp[0], 4 + olen);
 
-                        printf("\n\t  %s Option (%u), Value: ",
+                        printf("\n\t  %s Option (%u), length: %u, Value: ",
                                tok2str( pimv2_hello_option_values,"Unknown",otype),
-                               otype);
+                               otype,
+                               olen);
 			bp += 4;
 
 			switch (otype) {
@@ -781,6 +782,43 @@ pimv2_print(register const u_char *bp, register u_int len)
 	case PIMV2_TYPE_JOIN_PRUNE:
 	case PIMV2_TYPE_GRAFT:
 	case PIMV2_TYPE_GRAFT_ACK:
+
+
+        /*
+         * 0                   1                   2                   3
+         *   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+         *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         *  |PIM Ver| Type  | Addr length   |           Checksum            |
+         *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         *  |             Unicast-Upstream Neighbor Address                 |
+         *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         *  |  Reserved     | Num groups    |          Holdtime             |
+         *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         *  |            Encoded-Multicast Group Address-1                  |
+         *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         *  |   Number of Joined  Sources   |   Number of Pruned Sources    |
+         *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         *  |               Encoded-Joined Source Address-1                 |
+         *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         *  |                             .                                 |
+         *  |                             .                                 |
+         *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         *  |               Encoded-Joined Source Address-n                 |
+         *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         *  |               Encoded-Pruned Source Address-1                 |
+         *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         *  |                             .                                 |
+         *  |                             .                                 |
+         *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         *  |               Encoded-Pruned Source Address-n                 |
+         *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         *  |                           .                                   |
+         *  |                           .                                   |
+         *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         *  |                Encoded-Multicast Group Address-n              |
+         *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         */
+
 	    {
 		u_int8_t ngroup;
 		u_int16_t holdtime;
@@ -792,7 +830,7 @@ pimv2_print(register const u_char *bp, register u_int len)
 		if (PIM_TYPE(pim->pim_typever) != 7) {	/*not for Graft-ACK*/
 			if (bp >= ep)
 				break;
-			(void)printf(" upstream-neighbor=");
+			(void)printf(", upstream-neighbor: ");
 			if ((advance = pimv2_addr_print(bp, pimv2_unicast, 0)) < 0) {
 				(void)printf("...");
 				break;
@@ -803,11 +841,11 @@ pimv2_print(register const u_char *bp, register u_int len)
 			break;
 		ngroup = bp[1];
 		holdtime = EXTRACT_16BITS(&bp[2]);
-		(void)printf(" groups=%u", ngroup);
+		(void)printf("\n\t  %u group(s)", ngroup);
 		if (PIM_TYPE(pim->pim_typever) != 7) {	/*not for Graft-ACK*/
-			(void)printf(" holdtime=");
+			(void)printf(", holdtime: ");
 			if (holdtime == 0xffff)
-				(void)printf("infty");
+				(void)printf("infinite");
 			else
 				relts_print(holdtime);
 		}
@@ -815,7 +853,7 @@ pimv2_print(register const u_char *bp, register u_int len)
 		for (i = 0; i < ngroup; i++) {
 			if (bp >= ep)
 				goto jp_done;
-			(void)printf(" (group%d: ", i);
+			(void)printf("\n\t    group #%u: ", i+1);
 			if ((advance = pimv2_addr_print(bp, pimv2_group, 0)) < 0) {
 				(void)printf("...)");
 				goto jp_done;
@@ -827,26 +865,24 @@ pimv2_print(register const u_char *bp, register u_int len)
 			}
 			njoin = EXTRACT_16BITS(&bp[0]);
 			nprune = EXTRACT_16BITS(&bp[2]);
-			(void)printf(" join=%u", njoin);
+			(void)printf(", joined sources: %u, pruned sources: %u", njoin,nprune);
 			bp += 4; len -= 4;
 			for (j = 0; j < njoin; j++) {
-				(void)printf(" ");
+				(void)printf("\n\t      joined source #%u: ",j+1);
 				if ((advance = pimv2_addr_print(bp, pimv2_source, 0)) < 0) {
 					(void)printf("...)");
 					goto jp_done;
 				}
 				bp += advance; len -= advance;
 			}
-			(void)printf(" prune=%u", nprune);
 			for (j = 0; j < nprune; j++) {
-				(void)printf(" ");
+				(void)printf("\n\t      pruned source #%u: ",j+1);
 				if ((advance = pimv2_addr_print(bp, pimv2_source, 0)) < 0) {
 					(void)printf("...)");
 					goto jp_done;
 				}
 				bp += advance; len -= advance;
 			}
-			(void)printf(")");
 		}
 	jp_done:
 		break;
