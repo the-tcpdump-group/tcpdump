@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.19 2001-10-04 09:18:47 itojun Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.20 2002-01-17 04:38:29 guy Exp $";
 #endif
 
 #include <stdio.h>
@@ -20,6 +20,7 @@ static const char rcsid[] =
 #include <sys/types.h>
 
 #include "interface.h"
+#include "extract.h"
 #include "smb.h"
 
 static int request = 0;
@@ -27,23 +28,35 @@ static int request = 0;
 const u_char *startbuf = NULL;
 
 struct smbdescript {
-    char *req_f1;
-    char *req_f2;
-    char *rep_f1;
-    char *rep_f2;
-    /*
-     * sometimes (u_char *, u_char *, u_char *, u_char *) and
-     * sometimes (u_char *, u_char *, int, int)
-     */
-    void (*fn)(const u_char *, const u_char *, ...);
+    const char *req_f1;
+    const char *req_f2;
+    const char *rep_f1;
+    const char *rep_f2;
+    void (*fn)(const u_char *, const u_char *, const u_char *, const u_char *);
+};
+
+struct smbdescriptint {
+    const char *req_f1;
+    const char *req_f2;
+    const char *rep_f1;
+    const char *rep_f2;
+    void (*fn)(const u_char *, const u_char *, int, int);
 };
 
 struct smbfns
 {
     int id;
-    char *name;
+    const char *name;
     int flags;
     struct smbdescript descript;
+};
+
+struct smbfnsint
+{
+    int id;
+    const char *name;
+    int flags;
+    struct smbdescriptint descript;
 };
 
 #define DEFDESCRIPT	{ NULL, NULL, NULL, NULL, NULL }
@@ -62,17 +75,22 @@ smbfind(int id, struct smbfns *list)
     return(&list[0]);
 }
 
-static void
-trans2_findfirst(const u_char *param, const u_char *data, ...)
+static struct smbfnsint *
+smbfindint(int id, struct smbfnsint *list)
 {
-    char *fmt;
-    va_list ap;
-    int pcnt, dcnt;
+    int sindex;
 
-    va_start(ap, data);
-    pcnt = va_arg(ap, int);
-    dcnt = va_arg(ap, int);
-    va_end(ap);
+    for (sindex = 0; list[sindex].name; sindex++)
+	if (list[sindex].id == id)
+	    return(&list[sindex]);
+
+    return(&list[0]);
+}
+
+static void
+trans2_findfirst(const u_char *param, const u_char *data, int pcnt, int dcnt)
+{
+    const char *fmt;
 
     if (request)
 	fmt = "Attribute=[A]\nSearchCount=[d]\nFlags=[w]\nLevel=[dP5]\nFile=[S]\n";
@@ -87,20 +105,14 @@ trans2_findfirst(const u_char *param, const u_char *data, ...)
 }
 
 static void
-trans2_qfsinfo(const u_char *param, const u_char *data, ...)
+trans2_qfsinfo(const u_char *param, const u_char *data, int pcnt, int dcnt)
 {
     static int level = 0;
-    char *fmt="";
-    va_list ap;
-    int pcnt, dcnt;
-
-    va_start(ap, data);
-    pcnt = va_arg(ap, int);
-    dcnt = va_arg(ap, int);
-    va_end(ap);
+    const char *fmt="";
 
     if (request) {
-	level = SVAL(param, 0);
+	TCHECK2(*param, 2);
+	level = EXTRACT_LE_16BITS(param);
 	fmt = "InfoLevel=[d]\n";
 	smb_fdata(param, fmt, param + pcnt);
     } else {
@@ -124,9 +136,13 @@ trans2_qfsinfo(const u_char *param, const u_char *data, ...)
 	printf("data:\n");
 	print_data(data, dcnt);
     }
+    return;
+trunc:
+    printf("[|SMB]");
+    return;
 }
 
-struct smbfns trans2_fns[] = {
+struct smbfnsint trans2_fns[] = {
     { 0, "TRANSACT2_OPEN", 0,
 	{ "Flags2=[w]\nMode=[w]\nSearchAttrib=[A]\nAttrib=[A]\nTime=[T2]\nOFun=[w]\nSize=[D]\nRes=([w, w, w, w, w])\nPath=[S]",
 	  NULL,
@@ -152,37 +168,39 @@ struct smbfns trans2_fns[] = {
 
 
 static void
-print_trans2(const u_char *words, const u_char *dat, ...)
+print_trans2(const u_char *words, const u_char *dat, const u_char *buf, const u_char *maxbuf)
 {
-    static struct smbfns *fn = &trans2_fns[0];
-    u_char *data, *param;
-    u_char *f1 = NULL, *f2 = NULL;
+    static struct smbfnsint *fn = &trans2_fns[0];
+    const u_char *data, *param;
+    const u_char *w = words + 1;
+    const u_char *f1 = NULL, *f2 = NULL;
     int pcnt, dcnt;
-    va_list ap;
-    u_char *buf, *maxbuf;
 
-    va_start(ap, dat);
-    buf = va_arg(ap, u_char *);
-    maxbuf = va_arg(ap, u_char *);
-    va_end(ap);
-
+    TCHECK(words[0]);
     if (request) {
-	fn = smbfind(SVAL(words + 1, 14 * 2), trans2_fns);
-	data = buf+SVAL(words + 1, 12 * 2);
-	param = buf+SVAL(words + 1, 10 * 2);
-	pcnt = SVAL(words + 1, 9 * 2);
-	dcnt = SVAL(words + 1, 11 * 2);
+	TCHECK2(w[14 * 2], 2);
+	pcnt = EXTRACT_LE_16BITS(w + 9 * 2);
+	param = buf + EXTRACT_LE_16BITS(w + 10 * 2);
+	dcnt = EXTRACT_LE_16BITS(w + 11 * 2);
+	data = buf + EXTRACT_LE_16BITS(w + 12 * 2);
+	fn = smbfindint(EXTRACT_LE_16BITS(w + 14 * 2), trans2_fns);
     } else {
-	data = buf+SVAL(words + 1, 7 * 2);
-	param = buf+SVAL(words + 1, 4 * 2);
-	pcnt = SVAL(words + 1, 3 * 2);
-	dcnt = SVAL(words + 1, 6 * 2);
+	if (words[0] == 0) {
+	    printf("%s\n", fn->name);
+	    printf("Trans2Interim\n");
+	    return;
+	}
+	TCHECK2(w[7 * 2], 2);
+	pcnt = EXTRACT_LE_16BITS(w + 3 * 2);
+	param = buf + EXTRACT_LE_16BITS(w + 4 * 2);
+	dcnt = EXTRACT_LE_16BITS(w + 6 * 2);
+	data = buf + EXTRACT_LE_16BITS(w + 7 * 2);
     }
 
     printf("%s param_length=%d data_length=%d\n", fn->name, pcnt, dcnt);
 
     if (request) {
-	if (CVAL(words, 0) == 8) {
+	if (words[0] == 8) {
 	    smb_fdata(words + 1,
 		"Trans2Secondary\nTotParam=[d]\nTotData=[d]\nParamCnt=[d]\nParamOff=[d]\nParamDisp=[d]\nDataCnt=[d]\nDataOff=[d]\nDataDisp=[d]\nHandle=[d]\n",
 		maxbuf);
@@ -196,14 +214,9 @@ print_trans2(const u_char *words, const u_char *dat, ...)
 	f1 = fn->descript.req_f1;
 	f2 = fn->descript.req_f2;
     } else {
-	if (CVAL(words, 0) == 0) {
-	    printf("Trans2Interim\n");
-	    return;
-	} else {
-	    smb_fdata(words + 1,
-		"TotParam=[d]\nTotData=[d]\nRes1=[w]\nParamCnt=[d]\nParamOff=[d]\nParamDisp[d]\nDataCnt=[d]\nDataOff=[d]\nDataDisp=[d]\nSetupCnt=[d]\n",
-		words + 1 + 10 * 2);
-	}
+	smb_fdata(words + 1,
+	    "TotParam=[d]\nTotData=[d]\nRes1=[w]\nParamCnt=[d]\nParamOff=[d]\nParamDisp[d]\nDataCnt=[d]\nDataOff=[d]\nDataDisp=[d]\nSetupCnt=[d]\n",
+	    words + 1 + 10 * 2);
 	f1 = fn->descript.rep_f1;
 	f2 = fn->descript.rep_f2;
     }
@@ -214,14 +227,21 @@ print_trans2(const u_char *words, const u_char *dat, ...)
 	smb_fdata(param, f1 ? f1 : (u_char *)"Paramaters=\n", param + pcnt);
 	smb_fdata(data, f2 ? f2 : (u_char *)"Data=\n", data + dcnt);
     }
+    return;
+trunc:
+    printf("[|SMB]");
+    return;
 }
 
 
 static void
-print_browse(u_char *param, int paramlen, const u_char *data, int datalen)
+print_browse(const u_char *param, int paramlen, const u_char *data, int datalen)
 {
     const u_char *maxbuf = data + datalen;
-    int command = CVAL(data, 0);
+    int command;
+
+    TCHECK(data[0]);
+    command = data[0];
 
     smb_fdata(param, "BROWSE PACKET\n|Param ", param+paramlen);
 
@@ -289,11 +309,15 @@ print_browse(u_char *param, int paramlen, const u_char *data, int datalen)
 	data = smb_fdata(data, "Unknown Browser Frame ", maxbuf);
 	break;
     }
+    return;
+trunc:
+    printf("[|SMB]");
+    return;
 }
 
 
 static void
-print_ipc(u_char *param, int paramlen, u_char *data, int datalen)
+print_ipc(const u_char *param, int paramlen, const u_char *data, int datalen)
 {
     if (paramlen)
 	smb_fdata(param, "Command=[w]\nStr1=[S]\nStr2=[S]\n", param + paramlen);
@@ -303,40 +327,36 @@ print_ipc(u_char *param, int paramlen, u_char *data, int datalen)
 
 
 static void
-print_trans(const u_char *words, const u_char *data1, ...)
+print_trans(const u_char *words, const u_char *data1, const u_char *buf, const u_char *maxbuf)
 {
-    u_char *f1, *f2, *f3, *f4;
-    u_char *data, *param;
+    const u_char *f1, *f2, *f3, *f4;
+    const u_char *data, *param;
+    const u_char *w = words + 1;
     int datalen, paramlen;
-    va_list ap;
-    u_char *buf, *maxbuf;
-
-    va_start(ap, data1);
-    buf = va_arg(ap, u_char *);
-    maxbuf = va_arg(ap, u_char *);
-    va_end(ap);
 
     if (request) {
-	paramlen = SVAL(words + 1, 9 * 2);
-	param = buf + SVAL(words + 1, 10 * 2);
-	datalen = SVAL(words + 1, 11 * 2);
-	data = buf + SVAL(words + 1, 12 * 2);
+	TCHECK2(w[12 * 2], 2);
+	paramlen = EXTRACT_LE_16BITS(w + 9 * 2);
+	param = buf + EXTRACT_LE_16BITS(w + 10 * 2);
+	datalen = EXTRACT_LE_16BITS(w + 11 * 2);
+	data = buf + EXTRACT_LE_16BITS(w + 12 * 2);
 	f1 = "TotParamCnt=[d] \nTotDataCnt=[d] \nMaxParmCnt=[d] \nMaxDataCnt=[d]\nMaxSCnt=[d] \nTransFlags=[w] \nRes1=[w] \nRes2=[w] \nRes3=[w]\nParamCnt=[d] \nParamOff=[d] \nDataCnt=[d] \nDataOff=[d] \nSUCnt=[d]\n";
 	f2 = "|Name=[S]\n";
 	f3 = "|Param ";
 	f4 = "|Data ";
     } else {
-	paramlen = SVAL(words + 1, 3 * 2);
-	param = buf + SVAL(words + 1, 4 * 2);
-	datalen = SVAL(words + 1, 6 * 2);
-	data = buf + SVAL(words + 1, 7 * 2);
+	TCHECK2(w[7 * 2], 2);
+	paramlen = EXTRACT_LE_16BITS(w + 3 * 2);
+	param = buf + EXTRACT_LE_16BITS(w + 4 * 2);
+	datalen = EXTRACT_LE_16BITS(w + 6 * 2);
+	data = buf + EXTRACT_LE_16BITS(w + 7 * 2);
 	f1 = "TotParamCnt=[d] \nTotDataCnt=[d] \nRes1=[d]\nParamCnt=[d] \nParamOff=[d] \nRes2=[d] \nDataCnt=[d] \nDataOff=[d] \nRes3=[d]\nLsetup=[d]\n";
 	f2 = "|Unknown ";
 	f3 = "|Param ";
 	f4 = "|Data ";
     }
 
-    smb_fdata(words + 1, f1, MIN(words + 1 + 2 * CVAL(words, 0), maxbuf));
+    smb_fdata(words + 1, f1, SMBMIN(words + 1 + 2 * words[0], maxbuf));
     smb_fdata(data1 + 2, f2, maxbuf - (paramlen + datalen));
 
     if (!strcmp(data1 + 2, "\\MAILSLOT\\BROWSE")) {
@@ -350,84 +370,87 @@ print_trans(const u_char *words, const u_char *data1, ...)
     }
 
     if (paramlen)
-	smb_fdata(param, f3, MIN(param + paramlen, maxbuf));
+	smb_fdata(param, f3, SMBMIN(param + paramlen, maxbuf));
     if (datalen)
-	smb_fdata(data, f4, MIN(data + datalen, maxbuf));
+	smb_fdata(data, f4, SMBMIN(data + datalen, maxbuf));
+    return;
+trunc:
+    printf("[|SMB]");
+    return;
 }
 
 
 static void
-print_negprot(const u_char *words, const u_char *data, ...)
+print_negprot(const u_char *words, const u_char *data, const u_char *buf, const u_char *maxbuf)
 {
     u_char *f1 = NULL, *f2 = NULL;
-    va_list ap;
-    u_char *buf, *maxbuf;
 
-    va_start(ap, data);
-    buf = va_arg(ap, u_char *);
-    maxbuf = va_arg(ap, u_char *);
-    va_end(ap);
-
+    TCHECK(words[0]);
     if (request)
 	f2 = "*|Dialect=[Z]\n";
     else {
-	if (CVAL(words, 0) == 1)
+	if (words[0] == 1)
 	    f1 = "Core Protocol\nDialectIndex=[d]";
-	else if (CVAL(words, 0) == 17)
+	else if (words[0] == 17)
 	    f1 = "NT1 Protocol\nDialectIndex=[d]\nSecMode=[B]\nMaxMux=[d]\nNumVcs=[d]\nMaxBuffer=[D]\nRawSize=[D]\nSessionKey=[W]\nCapabilities=[W]\nServerTime=[T3]TimeZone=[d]\nCryptKey=";
-	else if (CVAL(words, 0) == 13)
+	else if (words[0] == 13)
 	    f1 = "Coreplus/Lanman1/Lanman2 Protocol\nDialectIndex=[d]\nSecMode=[w]\nMaxXMit=[d]\nMaxMux=[d]\nMaxVcs=[d]\nBlkMode=[w]\nSessionKey=[W]\nServerTime=[T1]TimeZone=[d]\nRes=[W]\nCryptKey=";
     }
 
     if (f1)
-	smb_fdata(words + 1, f1, MIN(words + 1 + CVAL(words, 0) * 2, maxbuf));
+	smb_fdata(words + 1, f1, SMBMIN(words + 1 + words[0] * 2, maxbuf));
     else
-	print_data(words + 1, MIN(CVAL(words, 0) * 2,
+	print_data(words + 1, SMBMIN(words[0] * 2,
 	    PTR_DIFF(maxbuf, words + 1)));
 
+    TCHECK2(*data, 2);
     if (f2)
-	smb_fdata(data + 2, f2, MIN(data + 2 + SVAL(data, 0), maxbuf));
+	smb_fdata(data + 2, f2, SMBMIN(data + 2 + EXTRACT_LE_16BITS(data), maxbuf));
     else
-	print_data(data + 2, MIN(SVAL(data, 0), PTR_DIFF(maxbuf, data + 2)));
+	print_data(data + 2, SMBMIN(EXTRACT_LE_16BITS(data), PTR_DIFF(maxbuf, data + 2)));
+    return;
+trunc:
+    printf("[|SMB]");
+    return;
 }
 
 static void
-print_sesssetup(const u_char *words, const u_char *data, ...)
+print_sesssetup(const u_char *words, const u_char *data, const u_char *buf, const u_char *maxbuf)
 {
-    int wcnt = CVAL(words, 0);
+    int wcnt;
     u_char *f1 = NULL, *f2 = NULL;
-    va_list ap;
-    u_char *buf, *maxbuf;
 
-    va_start(ap, data);
-    buf = va_arg(ap, u_char *);
-    maxbuf = va_arg(ap, u_char *);
-    va_end(ap);
-
+    TCHECK(words[0]);
+    wcnt = words[0];
     if (request) {
 	if (wcnt == 10)
 	    f1 = "Com2=[w]\nOff2=[d]\nBufSize=[d]\nMpxMax=[d]\nVcNum=[d]\nSessionKey=[W]\nPassLen=[d]\nCryptLen=[d]\nCryptOff=[d]\nPass&Name=\n";
 	else
 	    f1 = "Com2=[B]\nRes1=[B]\nOff2=[d]\nMaxBuffer=[d]\nMaxMpx=[d]\nVcNumber=[d]\nSessionKey=[W]\nCaseInsensitivePasswordLength=[d]\nCaseSensitivePasswordLength=[d]\nRes=[W]\nCapabilities=[W]\nPass1&Pass2&Account&Domain&OS&LanMan=\n";
     } else {
-	if (CVAL(words,0) == 3) {
-	f1 = "Com2=[w]\nOff2=[d]\nAction=[w]\n";
-	} else if (CVAL(words,0) == 13) {
-	f1 = "Com2=[B]\nRes=[B]\nOff2=[d]\nAction=[w]\n";
-	f2 = "NativeOS=[S]\nNativeLanMan=[S]\nPrimaryDomain=[S]\n";
+	if (words[0] == 3) {
+	    f1 = "Com2=[w]\nOff2=[d]\nAction=[w]\n";
+	} else if (words[0] == 13) {
+	    f1 = "Com2=[B]\nRes=[B]\nOff2=[d]\nAction=[w]\n";
+	    f2 = "NativeOS=[S]\nNativeLanMan=[S]\nPrimaryDomain=[S]\n";
 	}
     }
 
     if (f1)
-	smb_fdata(words + 1, f1, MIN(words + 1 + CVAL(words, 0) * 2, maxbuf));
+	smb_fdata(words + 1, f1, SMBMIN(words + 1 + words[0] * 2, maxbuf));
     else
-	print_data(words + 1, MIN(CVAL(words, 0) * 2,
+	print_data(words + 1, SMBMIN(words[0] * 2,
 	    PTR_DIFF(maxbuf, words + 1)));
 
+    TCHECK2(*data, 2);
     if (f2)
-	smb_fdata(data + 2, f2, MIN(data + 2 + SVAL(data, 0), maxbuf));
+	smb_fdata(data + 2, f2, SMBMIN(data + 2 + EXTRACT_LE_16BITS(data), maxbuf));
     else
-	print_data(data + 2, MIN(SVAL(data, 0), PTR_DIFF(maxbuf, data+2)));
+	print_data(data + 2, SMBMIN(EXTRACT_LE_16BITS(data), PTR_DIFF(maxbuf, data + 2)));
+    return;
+trunc:
+    printf("[|SMB]");
+    return;
 }
 
 
@@ -713,9 +736,11 @@ print_smb(const u_char *buf, const u_char *maxbuf)
     char *fmt_smbheader =
         "[P4]SMB Command   =  [B]\nError class   =  [BP1]\nError code    =  [d]\nFlags1        =  [B]\nFlags2        =  [B][P13]\nTree ID       =  [d]\nProc ID       =  [d]\nUID           =  [d]\nMID           =  [d]\nWord Count    =  [b]\n";
 
-    request = (CVAL(buf, 9) & 0x80) ? 0 : 1;
 
-    command = CVAL(buf, 4);
+    TCHECK(buf[9]);
+    request = (buf[9] & 0x80) ? 0 : 1;
+
+    command = buf[4];
 
     fn = smbfind(command, smb_fns);
 
@@ -730,18 +755,20 @@ print_smb(const u_char *buf, const u_char *maxbuf)
     /* print out the header */
     smb_fdata(buf, fmt_smbheader, buf + 33);
 
-    if (CVAL(buf, 5)) {
-	int class = CVAL(buf, 5);
-	int num = SVAL(buf, 7);
-	printf("SMBError = %s\n", smb_errstr(class, num));
-    }
+    if (buf[5])
+	printf("SMBError = %s\n", smb_errstr(buf[5], EXTRACT_LE_16BITS(&buf[7])));
 
     words = buf + 32;
-    data = words + 1 + CVAL(words,0)*2;
+    TCHECK(words[0]);
 
-    while (words && data) {
-	char *f1, *f2;
-	int wct = CVAL(words, 0);
+    for (;;) {
+	const u_char *f1, *f2;
+	int wct;
+	int bcc;
+
+	TCHECK(words[0]);
+	wct = words[0];
+	data = words + 1 + wct * 2;
 
 	if (request) {
 	    f1 = fn->descript.req_f1;
@@ -754,47 +781,60 @@ print_smb(const u_char *buf, const u_char *maxbuf)
 	if (fn->descript.fn)
 	    (*fn->descript.fn)(words, data, buf, maxbuf);
 	else {
-	    if (f1) {
+	    if (wct) {
 		printf("smbvwv[]=\n");
-		smb_fdata(words + 1, f1, words + 1 + wct * 2);
-	    } else if (wct) {
-		int i;
-		int v;
-		printf("smbvwv[]=\n");
-		for (i = 0; i < wct; i++) {
-		    v = SVAL(words + 1, 2 * i);
-		    printf("smb_vwv[%d]=%d (0x%X)\n", i, v, v);
+		if (f1)
+		    smb_fdata(words + 1, f1, words + 1 + wct * 2);
+		else {
+		    int i;
+		    int v;
+
+		    for (i = 0; i < wct; i++) {
+			TCHECK2(words[1 + 2 * i], 2);
+			v = EXTRACT_LE_16BITS(words + 1 + 2 * i);
+			printf("smb_vwv[%d]=%d (0x%X)\n", i, v, v);
+		    }
 		}
 	    }
 
+	    TCHECK2(*data, 2);
+	    bcc = EXTRACT_LE_16BITS(data);
 	    if (f2) {
-		printf("smbbuf[]=\n");
-		smb_fdata(data + 2, f2, maxbuf);
+		if (bcc > 0) {
+		    printf("smbbuf[]=\n");
+		    smb_fdata(data + 2, f2, data + 2 + bcc);
+		}
 	    } else {
-		int bcc = SVAL(data, 0);
 		printf("smb_bcc=%d\n", bcc);
 		if (bcc > 0) {
 		    printf("smb_buf[]=\n");
-		    print_data(data + 2, MIN(bcc, PTR_DIFF(maxbuf, data + 2)));
+		    print_data(data + 2, SMBMIN(bcc, PTR_DIFF(maxbuf, data + 2)));
 		}
 	    }
 	}
 
-	if ((fn->flags & FLG_CHAIN) != 0&& CVAL(words, 0) &&
-	    SVAL(words, 1) != 0xFF) {
-	    command = SVAL(words, 1);
-	    words = buf + SVAL(words, 3);
-	    data = words + 1 + CVAL(words, 0) * 2;
+	if ((fn->flags & FLG_CHAIN) == 0)
+	    break;
+	if (wct == 0)
+	    break;
+	TCHECK(words[1]);
+	command = EXTRACT_LE_16BITS(words + 1);
+	if (command == 0xFF)
+	    break;
+	TCHECK2(words[3], 2);
+	words = buf + EXTRACT_LE_16BITS(words + 3);
 
-	    fn = smbfind(command, smb_fns);
+	fn = smbfind(command, smb_fns);
 
-	    printf("\nSMB PACKET: %s (%s) (CHAINED)\n",
-		fn->name, request ? "REQUEST" : "REPLY");
-	} else
-	    words = data = NULL;
+	printf("\nSMB PACKET: %s (%s) (CHAINED)\n",
+	    fn->name, request ? "REQUEST" : "REPLY");
     }
 
     printf("\n");
+    return;
+trunc:
+    printf("[|SMB]");
+    return;
 }
 
 
@@ -805,8 +845,12 @@ void
 nbt_tcp_print(const u_char *data, int length)
 {
     const u_char *maxbuf = data + length;
-    int flags = CVAL(data, 0);
-    int nbt_len = RSVAL(data, 2);
+    int flags;
+    int nbt_len;
+
+    TCHECK2(data[2], 2);
+    flags = data[0];
+    nbt_len = EXTRACT_16BITS(data + 2);
 
     startbuf = data;
     if (maxbuf <= data)
@@ -851,7 +895,10 @@ nbt_tcp_print(const u_char *data, int length)
 
 	case 0x83:
 	  {
-	    int ecode = CVAL(data,4);
+	    int ecode;
+
+	    TCHECK(data[4]);
+	    ecode = data[4];
 
 	    data = smb_fdata(data, "NBT SessionReject\nFlags=[rW]\nReason=[B]\n",
 		maxbuf);
@@ -885,6 +932,10 @@ nbt_tcp_print(const u_char *data, int length)
     }
     printf("\n");
     fflush(stdout);
+    return;
+trunc:
+    printf("[|SMB]");
+    return;
 }
 
 
@@ -895,19 +946,22 @@ void
 nbt_udp137_print(const u_char *data, int length)
 {
     const u_char *maxbuf = data + length;
-    int name_trn_id = RSVAL(data, 0);
-    int response = (CVAL(data, 2) >> 7);
-    int opcode = (CVAL(data, 2) >> 3) & 0xF;
-    int nm_flags = ((CVAL(data, 2) & 0x7) << 4) + (CVAL(data, 3) >> 4);
-    int rcode = CVAL(data, 3) & 0xF;
-    int qdcount = RSVAL(data, 4);
-    int ancount = RSVAL(data, 6);
-    int nscount = RSVAL(data, 8);
-    int arcount = RSVAL(data, 10);
+    int name_trn_id, response, opcode, nm_flags, rcode;
+    int qdcount, ancount, nscount, arcount;
     char *opcodestr;
     const char *p;
     int total, i;
 
+    TCHECK2(data[10], 2);
+    name_trn_id = EXTRACT_16BITS(data);
+    response = (data[2] >> 7);
+    opcode = (data[2] >> 3) & 0xF;
+    nm_flags = ((data[2] & 0x7) << 4) + (data[3] >> 4);
+    rcode = data[3] & 0xF;
+    qdcount = EXTRACT_16BITS(data + 4);
+    ancount = EXTRACT_16BITS(data + 6);
+    nscount = EXTRACT_16BITS(data + 8);
+    arcount = EXTRACT_16BITS(data + 10);
     startbuf = data;
 
     if (maxbuf <= data)
@@ -981,11 +1035,11 @@ nbt_udp137_print(const u_char *data, int length)
 	    p = smb_fdata(p, "Name=[n1]\n#", maxbuf);
 	    if (p == NULL)
 		goto out;
-	    restype = RSVAL(p, 0);
+	    restype = EXTRACT_16BITS(p);
 	    p = smb_fdata(p, "ResType=[rw]\nResClass=[rw]\nTTL=[rD]\n", p + 8);
 	    if (p == NULL)
 		goto out;
-	    rdlen = RSVAL(p, 0);
+	    rdlen = EXTRACT_16BITS(p);
 	    printf("ResourceLength=%d\nResourceData=\n", rdlen);
 	    p += 2;
 	    if (rdlen == 6) {
@@ -994,12 +1048,16 @@ nbt_udp137_print(const u_char *data, int length)
 		    goto out;
 	    } else {
 		if (restype == 0x21) {
-		    int numnames = CVAL(p, 0);
+		    int numnames;
+
+		    TCHECK(*p);
+		    numnames = p[0];
 		    p = smb_fdata(p, "NumNames=[B]\n", p + 1);
 		    if (p == NULL)
 			goto out;
 		    while (numnames--) {
 			p = smb_fdata(p, "Name=[n2]\t#", maxbuf);
+			TCHECK(*p);
 			if (p[0] & 0x80)
 			    printf("<GROUP> ");
 			switch (p[0] & 0x60) {
@@ -1033,6 +1091,10 @@ nbt_udp137_print(const u_char *data, int length)
 out:
     printf("\n");
     fflush(stdout);
+    return;
+trunc:
+    printf("[|SMB]");
+    return;
 }
 
 
@@ -1060,9 +1122,15 @@ nbt_udp138_print(const u_char *data, int length)
 	"\n>>> NBT UDP PACKET(138) Res=[rw] ID=[rw] IP=[b.b.b.b] Port=[rd] Length=[rd] Res2=[rw]\nSourceName=[n1]\nDestName=[n1]\n#",
 	maxbuf);
 
-    if (data != NULL)
-	print_smb(data, maxbuf);
+    if (data != NULL) {
+	/* If there isn't enough data for "\377SMB", don't check for it. */
+	if (&data[3] >= maxbuf)
+	    goto out;
 
+	if (memcmp(data, "\377SMB",4) == 0)
+	    print_smb(data, maxbuf);
+    }
+out:
     printf("\n");
     fflush(stdout);
 }
@@ -1082,10 +1150,9 @@ netbeui_print(u_short control, const u_char *data, int length)
 
     if (maxbuf > snapend)
 	maxbuf = snapend;
-    if (&data[7] >= maxbuf)
-	goto out;
-    len = SVAL(data,0);
-    command = CVAL(data,4);
+    TCHECK(data[4]);
+    len = EXTRACT_LE_16BITS(data);
+    command = data[4];
     data2 = data + len;
     if (data2 >= maxbuf) {
 	data2 = maxbuf;
@@ -1187,6 +1254,10 @@ netbeui_print(u_short control, const u_char *data, int length)
 
 out:
     printf("\n");
+    return;
+trunc:
+    printf("[|SMB]");
+    return;
 }
 
 

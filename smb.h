@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/smb.h,v 1.6 2001-09-17 21:58:05 fenner Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/smb.h,v 1.7 2002-01-17 04:38:29 guy Exp $ (LBL) */
 /* 
  * Copyright (C) Andrew Tridgell 1995-1999
  *
@@ -7,33 +7,7 @@
  * or later
  */
 
-#define CVAL(buf,pos) (((unsigned char *)(buf))[pos])
-#define PVAL(buf,pos) ((unsigned)CVAL(buf,pos))
-#define SCVAL(buf,pos,val) (CVAL(buf,pos) = (val))
-
-#define SVAL(buf,pos) (PVAL(buf,pos)|PVAL(buf,(pos)+1)<<8)
-#define IVAL(buf,pos) (SVAL(buf,pos)|SVAL(buf,(pos)+2)<<16)
-#define SSVALX(buf,pos,val) (CVAL(buf,pos)=(val)&0xFF,CVAL(buf,pos+1)=(val)>>8)
-#define SIVALX(buf,pos,val) (SSVALX(buf,pos,val&0xFFFF),SSVALX(buf,pos+2,val>>16))
-#define SVALS(buf,pos) ((int16_t)SVAL(buf,pos))
-#define IVALS(buf,pos) ((int32_t)IVAL(buf,pos))
-#define SSVAL(buf,pos,val) SSVALX((buf),(pos),((u_int16_t)(val)))
-#define SIVAL(buf,pos,val) SIVALX((buf),(pos),((u_int32_t)(val)))
-#define SSVALS(buf,pos,val) SSVALX((buf),(pos),((int16_t)(val)))
-#define SIVALS(buf,pos,val) SIVALX((buf),(pos),((int32_t)(val)))
-
-/* now the reverse routines - these are used in nmb packets (mostly) */
-#define SREV(x) ((((x)&0xFF)<<8) | (((x)>>8)&0xFF))
-#define IREV(x) ((SREV(x)<<16) | (SREV((x)>>16)))
-
-#define RSVAL(buf,pos) SREV(SVAL(buf,pos))
-#define RIVAL(buf,pos) IREV(IVAL(buf,pos))
-#define RSSVAL(buf,pos,val) SSVAL(buf,pos,SREV(val))
-#define RSIVAL(buf,pos,val) SIVAL(buf,pos,IREV(val))
-
-#ifndef MIN
-#define MIN(a,b) ((a)<(b)?(a):(b))
-#endif
+#define SMBMIN(a,b) ((a)<(b)?(a):(b))
 
 /* the complete */
 #define SMBmkdir      0x00   /* create directory */

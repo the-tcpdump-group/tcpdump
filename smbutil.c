@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.17 2001-09-17 21:58:05 fenner Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.18 2002-01-17 04:38:29 guy Exp $";
 #endif
 
 #include <sys/param.h>
@@ -29,6 +29,7 @@ static const char rcsid[] =
 #include <time.h>
 
 #include "interface.h"
+#include "extract.h"
 #include "smb.h"
 
 extern const u_char *startbuf;
@@ -55,15 +56,13 @@ interpret_dos_date(u_int32_t date, struct tm *tp)
 }
 
 /*
+ * common portion:
  * create a unix date from a dos date
  */
 static time_t
-make_unix_date(const u_char *date_ptr)
+int_unix_date(u_int32_t dos_date)
 {
-    u_int32_t dos_date = 0;
     struct tm t;
-
-    dos_date = IVAL(date_ptr, 0);
 
     if (dos_date == 0)
 	return(0);
@@ -78,17 +77,30 @@ make_unix_date(const u_char *date_ptr)
 
 /*
  * create a unix date from a dos date
+ * in network byte order
+ */
+static time_t
+make_unix_date(const u_char *date_ptr)
+{
+    u_int32_t dos_date = 0;
+
+    dos_date = EXTRACT_LE_32BITS(date_ptr);
+
+    return int_unix_date(dos_date);
+}
+
+/*
+ * create a unix date from a dos date
+ * in halfword-swapped network byte order!
  */
 static time_t
 make_unix_date2(const u_char *date_ptr)
 {
     u_int32_t x, x2;
 
-    x = IVAL(date_ptr, 0);
+    x = EXTRACT_LE_32BITS(date_ptr);
     x2 = ((x & 0xFFFF) << 16) | ((x & 0xFFFF0000) >> 16);
-    SIVAL(&x, 0, x2);
-
-    return(make_unix_date((void *)&x));
+    return int_unix_date(x2);
 }
 
 /*
@@ -96,13 +108,15 @@ make_unix_date2(const u_char *date_ptr)
  * It's originally in "100ns units since jan 1st 1601"
  */
 static time_t
-interpret_long_date(const char *p)
+interpret_long_date(const u_char *p)
 {
     double d;
     time_t ret;
 
+    TCHECK2(p[4], 4);
+
     /* this gives us seconds since jan 1st 1601 (approx) */
-    d = (IVAL(p, 4) * 256.0 + CVAL(p, 3)) * (1.0e-7 * (1 << 24));
+    d = (EXTRACT_LE_32BITS(p + 4) * 256.0 + p[3]) * (1.0e-7 * (1 << 24));
 
     /* now adjust by 369 years to make the secs since 1970 */
     d -= 369.0 * 365.25 * 24 * 60 * 60;
@@ -116,6 +130,8 @@ interpret_long_date(const char *p)
     ret = (time_t)d;
 
     return(ret);
+trunc:
+    return(0);
 }
 
 /*
@@ -139,9 +155,9 @@ name_interpret(const u_char *in, const u_char *maxbuf, char *out)
 	return(0);
 
     while (len--) {
+	TCHECK2(*in, 2);
 	if (in + 1 >= maxbuf)
 	    return(-1);	/* name goes past the end of the buffer */
-	TCHECK2(*in, 2);
 	if (in[0] < 'A' || in[0] > 'P' || in[1] < 'A' || in[1] > 'P') {
 	    *out = 0;
 	    return(0);
@@ -177,7 +193,7 @@ name_ptr(const u_char *buf, int ofs, const u_char *maxbuf)
 
     /* XXX - this should use the same code that the DNS dissector does */
     if ((c & 0xC0) == 0xC0) {
-	u_int16_t l = RSVAL(buf, ofs) & 0x3FFF;
+	u_int16_t l = EXTRACT_16BITS(buf + ofs) & 0x3FFF;
 	if (l == 0) {
 	    /* We have a pointer that points to itself. */
 	    return(NULL);
@@ -292,7 +308,7 @@ print_data(const unsigned char *buf, int len)
 	while (n--)
 	    printf("   ");
 
-	n = MIN(8, i % 16);
+	n = SMBMIN(8, i % 16);
 	print_asc(&buf[i - (i % 16)], n);
 	printf(" ");
 	n = (i % 16) - n;
@@ -368,13 +384,13 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf)
     while (*fmt && buf<maxbuf) {
 	switch (*fmt) {
 	case 'a':
-	    write_bits(CVAL(buf,0), attrib_fmt);
+	    write_bits(buf[0], attrib_fmt);
 	    buf++;
 	    fmt++;
 	    break;
 
 	case 'A':
-	    write_bits(SVAL(buf, 0), attrib_fmt);
+	    write_bits(EXTRACT_LE_16BITS(buf), attrib_fmt);
 	    buf += 2;
 	    fmt++;
 	    break;
@@ -387,7 +403,7 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf)
 	    strncpy(bitfmt, fmt, l);
 	    bitfmt[l] = 0;
 	    fmt = p + 1;
-	    write_bits(CVAL(buf, 0), bitfmt);
+	    write_bits(buf[0], bitfmt);
 	    buf++;
 	    break;
 	  }
@@ -407,7 +423,10 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf)
 	    break;
 	case 'D':
 	  {
-	    unsigned int x = reverse ? RIVAL(buf, 0) : IVAL(buf, 0);
+	    unsigned int x;
+
+	    TCHECK2(buf[0], 4);
+	    x = reverse ? EXTRACT_32BITS(buf) : EXTRACT_LE_32BITS(buf);
 	    printf("%d (0x%x)", x, x);
 	    buf += 4;
 	    fmt++;
@@ -415,8 +434,13 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf)
 	  }
 	case 'L':
 	  {
-	    unsigned int x1 = reverse ? RIVAL(buf, 0) : IVAL(buf, 0);
-	    unsigned int x2 = reverse ? RIVAL(buf, 4) : IVAL(buf, 4);
+	    unsigned int x1, x2;
+
+	    TCHECK2(buf[4], 4);
+	    x1 = reverse ? EXTRACT_32BITS(buf) :
+			   EXTRACT_LE_32BITS(buf);
+	    x2 = reverse ? EXTRACT_32BITS(buf + 4) :
+			   EXTRACT_LE_32BITS(buf + 4);
 	    if (x2)
 		printf("0x%08x:%08x", x2, x1);
 	    else
@@ -427,7 +451,10 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf)
 	  }
 	case 'd':
 	  {
-	    unsigned int x = reverse ? RSVAL(buf, 0) : SVAL(buf, 0);
+	    unsigned int x;
+	    TCHECK2(buf[0], 2);
+	    x = reverse ? EXTRACT_16BITS(buf) :
+			  EXTRACT_LE_16BITS(buf);
 	    printf("%d (0x%x)", x, x);
 	    buf += 2;
 	    fmt++;
@@ -435,7 +462,10 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf)
 	  }
 	case 'W':
 	  {
-	    unsigned int x = reverse ? RIVAL(buf, 0) : IVAL(buf, 0);
+	    unsigned int x;
+	    TCHECK2(buf[0], 4);
+	    x = reverse ? EXTRACT_32BITS(buf) :
+			  EXTRACT_LE_32BITS(buf);
 	    printf("0x%X", x);
 	    buf += 4;
 	    fmt++;
@@ -443,7 +473,10 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf)
 	  }
 	case 'w':
 	  {
-	    unsigned int x = reverse ? RSVAL(buf, 0) : SVAL(buf, 0);
+	    unsigned int x;
+	    TCHECK2(buf[0], 2);
+	    x = reverse ? EXTRACT_16BITS(buf) :
+			  EXTRACT_LE_16BITS(buf);
 	    printf("0x%X", x);
 	    buf += 2;
 	    fmt++;
@@ -451,7 +484,9 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf)
 	  }
 	case 'B':
 	  {
-	    unsigned int x = CVAL(buf,0);
+	    unsigned int x;
+	    TCHECK(buf[0]);
+	    x = buf[0];
 	    printf("0x%X", x);
 	    buf += 1;
 	    fmt++;
@@ -459,7 +494,9 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf)
 	  }
 	case 'b':
 	  {
-	    unsigned int x = CVAL(buf, 0);
+	    unsigned int x;
+	    TCHECK(buf[0]);
+	    x = buf[0];
 	    printf("%u (0x%x)", x, x);
 	    buf += 1;
 	    fmt++;
@@ -467,6 +504,7 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf)
 	  }
 	case 'S':
 	  {
+	    /*XXX unistr() */
 	    printf("%.*s", (int)PTR_DIFF(maxbuf, buf), unistr(buf, &len));
 	    buf += len;
 	    fmt++;
@@ -538,7 +576,8 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf)
 	case 'T':
 	  {
 	    time_t t;
-	    int x = IVAL(buf,0);
+	    int x;
+	    x = EXTRACT_LE_32BITS(buf);
 
 	    switch (atoi(fmt + 1)) {
 	    case 1:
@@ -600,11 +639,13 @@ smb_fdata(const u_char *buf, const char *fmt, const u_char *maxbuf)
 		depth++;
 		buf2 = smb_fdata(buf, fmt, maxbuf);
 		depth--;
+		if (buf2 == NULL)
+		    return(NULL);
 		if (buf2 == buf)
 		    return(buf);
 		buf = buf2;
 	    }
-	    break;
+	    return(buf);
 
 	case '|':
 	    fmt++;
