@@ -71,7 +71,6 @@ typedef char* caddr_t;
 
 #define MAXHOSTNAMELEN	64
 #define	NI_MAXHOST	1025
-#define IPPROTO_EGP 8		/* Exterior Gateway Protocol */
 #define snprintf _snprintf
 #define vsnprintf _vsnprintf
 #define RETSIGTYPE void

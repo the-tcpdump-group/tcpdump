@@ -34,7 +34,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cnfp.c,v 1.13 2002-12-11 07:13:58 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cnfp.c,v 1.14 2003-06-07 11:57:52 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -51,6 +51,7 @@ static const char rcsid[] =
 #include "extract.h"
 
 #include "tcp.h"
+#include "ipproto.h"
 
 struct nfhdr {
 	u_int32_t	ver_cnt;	/* version [15], and # of records */

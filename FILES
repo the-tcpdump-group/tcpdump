@@ -31,6 +31,7 @@ ether.h
 ethertype.h
 extract.h
 fddi.h
+gmpls.h
 gmt2local.c
 gmt2local.h
 icmp6.h
@@ -41,6 +42,7 @@ interface.h
 ip.h
 ip6.h
 ipfc.h
+ipproto.h
 ipsec_doi.h
 ipx.h
 isakmp.h

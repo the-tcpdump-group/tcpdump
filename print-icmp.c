@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.72 2003-05-15 16:58:04 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.73 2003-06-07 11:57:53 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -39,6 +39,7 @@ static const char rcsid[] =
 
 #include "ip.h"
 #include "udp.h"
+#include "ipproto.h"
 
 /*
  * Interface Control Message Protocol Definitions.

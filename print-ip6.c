@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.30 2003-06-03 23:49:22 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.31 2003-06-07 11:57:54 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -41,6 +41,7 @@ static const char rcsid[] =
 #include "extract.h"
 
 #include "ip6.h"
+#include "ipproto.h"
 
 /*
  * print an IP6 datagram.
@@ -75,9 +76,6 @@ ip6_print(register const u_char *bp, register u_int length)
 	while (cp < snapend) {
 		cp += advance;
 
-#ifndef IPPROTO_SCTP
-#define IPPROTO_SCTP 132
-#endif
 		if (cp == (const u_char *)(ip6 + 1)
 		 && nh != IPPROTO_TCP && nh != IPPROTO_UDP
 		 && nh != IPPROTO_SCTP) {
@@ -101,9 +99,7 @@ ip6_print(register const u_char *bp, register u_int length)
 			nh = *cp;
 			fragmented = 1;
 			break;
-#ifndef IPPROTO_MOBILITY
-#define IPPROTO_MOBILITY 62
-#endif
+
 		case IPPROTO_MOBILITY:
 			/*
 			 * XXX - we don't use "advance"; is this
@@ -145,9 +141,6 @@ ip6_print(register const u_char *bp, register u_int length)
 			len -= padlen;
 			break;
 		    }
-#ifndef IPPROTO_IPCOMP
-#define IPPROTO_IPCOMP	108
-#endif
 		case IPPROTO_IPCOMP:
 		    {
 			int enh;
@@ -158,27 +151,21 @@ ip6_print(register const u_char *bp, register u_int length)
 			break;
 		    }
 
-#ifndef IPPROTO_PIM
-#define IPPROTO_PIM	103
-#endif
 		case IPPROTO_PIM:
 			pim_print(cp, len);
 			goto end;
-#ifndef IPPROTO_OSPF
-#define IPPROTO_OSPF 89
-#endif
 		case IPPROTO_OSPF:
 			ospf6_print(cp, len);
 			goto end;
+
 		case IPPROTO_IPV6:
 			ip6_print(cp, len);
 			goto end;
-#ifndef IPPROTO_IPV4
-#define IPPROTO_IPV4	4
-#endif
+
 		case IPPROTO_IPV4:
 			ip_print(cp, len);
 			goto end;
+
 		case IPPROTO_NONE:
 			(void)printf("no next header");
 			goto end;

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.126 2003-05-25 16:40:48 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.127 2003-06-07 11:57:53 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -39,11 +39,7 @@ static const char rcsid[] =
 #include "extract.h"			/* must come after interface.h */
 
 #include "ip.h"
-
-/* Compatibility */
-#ifndef	IPPROTO_ND
-#define	IPPROTO_ND	77
-#endif
+#include "ipproto.h"
 
 /*
  * print the recorded route in an IP RR, LSRR or SSRR option.
@@ -461,9 +457,6 @@ ip_print(register const u_char *bp, register u_int length)
 		cp = (const u_char *)ip + hlen;
 		nh = ip->ip_p;
 
-#ifndef IPPROTO_SCTP
-#define IPPROTO_SCTP 132
-#endif
 		if (nh != IPPROTO_TCP && nh != IPPROTO_UDP &&
 		    nh != IPPROTO_SCTP) {
 			(void)printf("%s > %s: ", ipaddr_string(&ip->ip_src),
@@ -472,9 +465,6 @@ ip_print(register const u_char *bp, register u_int length)
 again:
 		switch (nh) {
 
-#ifndef IPPROTO_AH
-#define IPPROTO_AH	51
-#endif
 		case IPPROTO_AH:
 			nh = *cp;
 			advance = ah_print(cp);
@@ -482,9 +472,6 @@ again:
 			len -= advance;
 			goto again;
 
-#ifndef IPPROTO_ESP
-#define IPPROTO_ESP	50
-#endif
 		case IPPROTO_ESP:
 		    {
 			int enh, padlen;
@@ -497,9 +484,6 @@ again:
 			goto again;
 		    }
 
-#ifndef IPPROTO_IPCOMP
-#define IPPROTO_IPCOMP	108
-#endif
 		case IPPROTO_IPCOMP:
 		    {
 			int enh;
@@ -529,9 +513,6 @@ again:
 			icmp_print(cp, len, (const u_char *)ip, (off & 0x3fff));
 			break;
 
-#ifndef IPPROTO_IGRP
-#define IPPROTO_IGRP 9
-#endif
 		case IPPROTO_IGRP:
 			igrp_print(cp, len, (const u_char *)ip);
 			break;
@@ -544,21 +525,15 @@ again:
 			egp_print(cp);
 			break;
 
-#ifndef IPPROTO_OSPF
-#define IPPROTO_OSPF 89
-#endif
 		case IPPROTO_OSPF:
 			ospf_print(cp, len, (const u_char *)ip);
 			break;
 
-#ifndef IPPROTO_IGMP
-#define IPPROTO_IGMP 2
-#endif
 		case IPPROTO_IGMP:
 			igmp_print(cp, len);
 			break;
 
-		case 4:
+		case IPPROTO_IPV4:
 			/* DVMRP multicast tunnel (ip-in-ip encapsulation) */
 			ip_print(cp, len);
 			if (! vflag) {
@@ -568,47 +543,29 @@ again:
 			break;
 
 #ifdef INET6
-#ifndef IP6PROTO_ENCAP
-#define IP6PROTO_ENCAP 41
-#endif
-		case IP6PROTO_ENCAP:
+		case IPPROTO_IPV6:
 			/* ip6-in-ip encapsulation */
 			ip6_print(cp, len);
 			break;
 #endif /*INET6*/
 
-#ifndef IPPROTO_RSVP
-#define IPPROTO_RSVP 46
-#endif
 		case IPPROTO_RSVP:
 			rsvp_print(cp, len);
 			break;
 
-#ifndef IPPROTO_GRE
-#define IPPROTO_GRE 47
-#endif
 		case IPPROTO_GRE:
 			/* do it */
 			gre_print(cp, len);
 			break;
 
-#ifndef IPPROTO_MOBILE
-#define IPPROTO_MOBILE 55
-#endif
 		case IPPROTO_MOBILE:
 			mobile_print(cp, len);
 			break;
 
-#ifndef IPPROTO_PIM
-#define IPPROTO_PIM	103
-#endif
 		case IPPROTO_PIM:
 			pim_print(cp, len);
 			break;
 
-#ifndef IPPROTO_VRRP
-#define IPPROTO_VRRP	112
-#endif
 		case IPPROTO_VRRP:
 			vrrp_print(cp, len, ip->ip_ttl);
 			break;
