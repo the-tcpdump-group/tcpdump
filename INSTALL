@@ -1,4 +1,4 @@
-@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.41 2000-04-27 10:09:35 itojun Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.42 2000-06-10 20:57:56 assar Exp $ (LBL)
 
 If you have not built libpcap, do so first.  See the README
 file in this directory for the ftp location.
@@ -169,6 +169,7 @@ print-rx.c	- AFS RX printer routines
 print-sl.c	- Compressed Serial Line Internet Protocol printer routines
 print-smb.c	- SMB (samba) printer routines
 print-snmp.c	- Simple Network Management Protocol printer routines
+print-stp.c	- IEEE 802.1d spanning tree protocol printer routines
 print-sunrpc.c	- Sun Remote Procedure Call printer routines
 print-tcp.c	- TCP printer routines
 print-telnet.c	- Telnet option printer routines

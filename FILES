@@ -132,6 +132,7 @@ print-rx.c
 print-sl.c
 print-smb.c
 print-snmp.c
+print-stp.c
 print-sunrpc.c
 print-tcp.c
 print-telnet.c
