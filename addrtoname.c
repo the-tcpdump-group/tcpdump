@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.84 2001-11-05 02:02:41 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.85 2001-11-15 08:06:37 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -62,6 +62,8 @@ struct rtentry;
 
 /*
  * hash tables for whatever-to-name translations
+ *
+ * XXX there has to be error checks against strdup(3) failure
  */
 
 #define HASHNAMESIZE 4096
