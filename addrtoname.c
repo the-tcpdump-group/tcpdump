@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.78 2001-06-24 21:49:25 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.79 2001-06-26 06:36:08 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -54,6 +54,9 @@ struct rtentry;
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#ifdef HAVE_STRINGS_H
+#include <strings.h>	/* declare "bcmp()" and "bcopy()" */
+#endif
 
 #include "interface.h"
 #include "addrtoname.h"
