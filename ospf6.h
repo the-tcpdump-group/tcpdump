@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ospf6.h,v 1.4 2002-06-11 17:08:40 itojun Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ospf6.h,v 1.5 2002-11-09 17:19:23 itojun Exp $ (LBL) */
 /*
  * Copyright (c) 1991, 1993, 1994, 1995, 1996, 1997
  *	The Regents of the University of California.  All rights reserved.
@@ -105,14 +105,14 @@ struct lsa_hdr {
     u_int32_t ls_seq;
     u_int16_t ls_chksum;
     u_int16_t ls_length;
-} ;
+} __attribute__((packed));
 
 struct lsa_prefix {
     u_int8_t lsa_p_len;
     u_int8_t lsa_p_opt;
     u_int16_t lsa_p_mbz;
     u_int8_t lsa_p_prefix[4];
-};
+} __attribute__((packed));
 
 /* link state advertisement */
 struct lsa {
@@ -195,7 +195,7 @@ struct lsa {
 	    struct lsa_prefix intra_ap_prefix[1];
 	} un_intra_ap;
     } lsa_un;
-} ;
+} __attribute__((packed));
 
 
 /*
@@ -205,7 +205,7 @@ struct tos_metric {
     u_int8_t tos_type;
     u_int8_t tos_zero;
     u_int16_t tos_metric;
-} ;
+} __attribute__((packed));
 
 #define	OSPF_AUTH_SIZE	8
 
@@ -268,7 +268,7 @@ struct ospf6hdr {
 	    struct lsa_hdr lsa_lshdr[1]; /* may repeat	*/
 	} un_lsa ;
     } ospf6_un ;
-} ;
+} __attribute__((packed));
 
 #define	ospf6_hello	ospf6_un.un_hello
 #define	ospf6_db	ospf6_un.un_db

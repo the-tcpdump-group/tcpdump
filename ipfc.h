@@ -18,13 +18,13 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/ipfc.h,v 1.1 2002-10-18 09:17:47 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/ipfc.h,v 1.2 2002-11-09 17:19:19 itojun Exp $ (LBL)
  */
 
 struct ipfc_header {
 	u_char  ipfc_dhost[8];
 	u_char  ipfc_shost[8];
-};
+} __attribute__((packed));
 
 #define IPFC_HDRLEN 16
 

@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/bootp.h,v 1.11 2001-01-09 07:39:13 fenner Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/bootp.h,v 1.12 2002-11-09 17:19:17 itojun Exp $ (LBL) */
 /*
  * Bootstrap Protocol (BOOTP).  RFC951 and RFC1048.
  *
@@ -36,7 +36,7 @@ struct bootp {
 	u_int8_t	bp_sname[64];	/* server host name */
 	u_int8_t	bp_file[128];	/* boot file name */
 	u_int8_t	bp_vend[64];	/* vendor-specific area */
-};
+} __attribute__((packed));
 
 /*
  * UDP port numbers, server and client.
@@ -214,7 +214,7 @@ struct cmu_vend {
 	struct in_addr	v_ins1, v_ins2; /* IEN-116 name servers */
 	struct in_addr	v_ts1, v_ts2;	/* Time servers */
 	u_int8_t	v_unused[24];	/* currently unused */
-};
+} __attribute__((packed));
 
 
 /* v_flags values */

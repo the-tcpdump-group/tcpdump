@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-krb.c,v 1.18 2002-09-05 21:25:43 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-krb.c,v 1.19 2002-11-09 17:19:27 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -64,9 +64,9 @@ static void krb4_print(const u_char *);
 #define KERB_ERR_NULL_KEY			10
 
 struct krb {
-	u_char pvno;		/* Protocol Version */
-	u_char type;		/* Type+B */
-};
+	u_int8_t pvno;		/* Protocol Version */
+	u_int8_t type;		/* Type+B */
+} __attribute__((packed));
 
 static char tstr[] = " [|kerberos]";
 

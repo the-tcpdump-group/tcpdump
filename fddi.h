@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/fddi.h,v 1.9 2000-10-09 02:59:39 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/fddi.h,v 1.10 2002-11-09 17:19:18 itojun Exp $ (LBL)
  */
 
 /*
@@ -35,7 +35,7 @@ struct fddi_header {
 	u_char  fddi_fc;		/* frame control */
 	u_char  fddi_dhost[6];
 	u_char  fddi_shost[6];
-};
+} __attribute__((packed));
 
 /*
  * Length of an FDDI header; note that some compilers may pad

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.69 2002-08-01 08:53:08 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.70 2002-11-09 17:19:26 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -93,7 +93,7 @@ struct icmp {
 #define	icmp_ip		icmp_dun.id_ip.idi_ip
 #define	icmp_mask	icmp_dun.id_mask
 #define	icmp_data	icmp_dun.id_data
-};
+} __attribute__((packed));
 
 /*
  * Lower bounds on packet lengths for various types.
@@ -245,19 +245,19 @@ static struct tok type2str[] = {
 struct mtu_discovery {
 	u_int16_t unused;
 	u_int16_t nexthopmtu;
-};
+} __attribute__((packed));
 
 /* rfc1256 */
 struct ih_rdiscovery {
 	u_int8_t ird_addrnum;
 	u_int8_t ird_addrsiz;
 	u_int16_t ird_lifetime;
-};
+} __attribute__((packed));
 
 struct id_rdiscovery {
 	u_int32_t ird_addr;
 	u_int32_t ird_pref;
-};
+} __attribute__((packed));
 
 void
 icmp_print(const u_char *bp, u_int plen, const u_char *bp2)

@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/igrp.h,v 1.4 2000-12-17 23:07:49 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/igrp.h,v 1.5 2002-11-09 17:19:19 itojun Exp $ (LBL) */
 /* Cisco IGRP definitions */
 
 /* IGRP Header */
@@ -13,7 +13,7 @@ struct igrphdr {
 	u_int16_t ig_ns;	/* number of networks in AS */
 	u_int16_t ig_nx;	/* number of networks ouside AS */
 	u_int16_t ig_sum;	/* checksum of IGRP header & data */
-};
+} __attribute__((packed));
 
 #define IGRP_UPDATE	1
 #define IGRP_REQUEST	2
@@ -28,6 +28,6 @@ struct igrprte {
 	u_int8_t igr_rel;	/* percent packets successfully tx/rx */
 	u_int8_t igr_ld;	/* percent of channel occupied */
 	u_int8_t igr_hct;	/* hop count */
-};
+} __attribute__((packed));
 
 #define IGRP_RTE_SIZE	14	/* don't believe sizeof ! */

@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/sctpHeader.h,v 1.4 2002-06-11 17:08:59 itojun Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/sctpHeader.h,v 1.5 2002-11-09 17:19:32 itojun Exp $ (LBL) */
 
 /* SCTP reference Implementation Copyright (C) 1999 Cisco And Motorola
  *
@@ -60,37 +60,37 @@ extern "C" {
 #endif
 
 struct sctpHeader{
-  u_short source;
-  u_short destination;
-  u_int verificationTag;
-  u_int adler32;
-};
+  u_int16_t source;
+  u_int16_t destination;
+  u_int32_t verificationTag;
+  u_int32_t adler32;
+} __attribute__((packed));
 
 /* various descriptor parsers */
 
 struct sctpChunkDesc{
-  u_char chunkID;
-  u_char chunkFlg;
-  u_short chunkLength;
-};
+  u_int8_t chunkID;
+  u_int8_t chunkFlg;
+  u_int16_t chunkLength;
+} __attribute__((packed));
 
 struct sctpParamDesc{
-  u_short paramType;
-  u_short paramLength;
-};
+  u_int16_t paramType;
+  u_int16_t paramLength;
+} __attribute__((packed));
 
 
 struct sctpRelChunkDesc{
   struct sctpChunkDesc chk;
-  u_int serialNumber;
-};
+  u_int32_t serialNumber;
+} __attribute__((packed));
 
 struct sctpVendorSpecificParam {
   struct sctpParamDesc p;  /* type must be 0xfffe */
-  u_int vendorId;	   /* vendor ID from RFC 1700 */
-  u_short vendorSpecificType;
-  u_short vendorSpecificLen;
-};
+  u_int32_t vendorId;	   /* vendor ID from RFC 1700 */
+  u_int16_t vendorSpecificType;
+  u_int16_t vendorSpecificLen;
+} __attribute__((packed));
 
 
 /* Structures for the control parts */
@@ -101,58 +101,58 @@ struct sctpVendorSpecificParam {
 
 /* this is used for init ack, too */
 struct sctpInitiation{
-  u_int initTag;		/* tag of mine */
-  u_int rcvWindowCredit;	/* rwnd */
-  u_short NumPreopenStreams;	/* OS */
-  u_short MaxInboundStreams;     /* MIS */
-  u_int initialTSN;
+  u_int32_t initTag;		/* tag of mine */
+  u_int32_t rcvWindowCredit;	/* rwnd */
+  u_int16_t NumPreopenStreams;	/* OS */
+  u_int16_t MaxInboundStreams;     /* MIS */
+  u_int32_t initialTSN;
   /* optional param's follow in sctpParamDesc form */
-};
+} __attribute__((packed));
 
 struct sctpV4IpAddress{
   struct sctpParamDesc p;	/* type is set to SCTP_IPV4_PARAM_TYPE, len=10 */
-  u_int  ipAddress;
-};
+  u_int32_t  ipAddress;
+} __attribute__((packed));
 
 
 struct sctpV6IpAddress{
   struct sctpParamDesc p;	/* type is set to SCTP_IPV6_PARAM_TYPE, len=22 */
-  u_char  ipAddress[16];
-};
+  u_int8_t  ipAddress[16];
+} __attribute__((packed));
 
 struct sctpDNSName{
   struct sctpParamDesc param;
-  u_char name[1];
-};
+  u_int8_t name[1];
+} __attribute__((packed));
 
 
 struct sctpCookiePreserve{
   struct sctpParamDesc p;	/* type is set to SCTP_COOKIE_PRESERVE, len=8 */
-  u_int extraTime;
-};
+  u_int32_t extraTime;
+} __attribute__((packed));
 
 
 struct sctpTimeStamp{
-  u_int ts_sec;
-  u_int ts_usec;
-};
+  u_int32_t ts_sec;
+  u_int32_t ts_usec;
+} __attribute__((packed));
 
 /* wire structure of my cookie */
 struct cookieMessage{
-  u_int TieTag_curTag;			/* copied from assoc if present */
-  u_int TieTag_hisTag; 		/* copied from assoc if present */
-  int cookieLife;			/* life I will award this cookie */
+  u_int32_t TieTag_curTag;		/* copied from assoc if present */
+  u_int32_t TieTag_hisTag; 		/* copied from assoc if present */
+  int32_t cookieLife;			/* life I will award this cookie */
   struct sctpTimeStamp timeEnteringState; /* the time I built cookie */
   struct sctpInitiation initAckISent;	/* the INIT-ACK that I sent to my peer */
-  u_int addressWhereISent[4];		/* I make this 4 ints so I get 128bits for future */
-  int addrtype;				/* address type */
-  u_short locScope;			/* V6 local scope flag */
-  u_short siteScope;			/* V6 site scope flag */
+  u_int32_t addressWhereISent[4];	/* I make this 4 ints so I get 128bits for future */
+  int32_t addrtype;			/* address type */
+  u_int16_t locScope;			/* V6 local scope flag */
+  u_int16_t siteScope;			/* V6 site scope flag */
   /* at the end is tacked on the INIT chunk sent in
    * its entirety and of course our
    * signature.
    */
-};
+} __attribute__((packed));
 
 
 /* this guy is for use when
@@ -163,12 +163,12 @@ struct cookieMessage{
 struct sctpUnifiedInit{
   struct sctpChunkDesc uh;
   struct sctpInitiation initm;
-};
+} __attribute__((packed));
 
 struct sctpSendableInit{
   struct sctpHeader mh;
   struct sctpUnifiedInit msg;
-};
+} __attribute__((packed));
 
 
 /* Selective Acknowledgement
@@ -179,37 +179,37 @@ struct sctpSendableInit{
  */
 
 struct sctpSelectiveAck{
-  u_int highestConseqTSN;
-  u_int updatedRwnd;
-  u_short numberOfdesc;
-  u_short numDupTsns;
-};
+  u_int32_t highestConseqTSN;
+  u_int32_t updatedRwnd;
+  u_int16_t numberOfdesc;
+  u_int16_t numDupTsns;
+} __attribute__((packed));
 
 struct sctpSelectiveFrag{
-  u_short fragmentStart;
-  u_short fragmentEnd;
-};
+  u_int16_t fragmentStart;
+  u_int16_t fragmentEnd;
+} __attribute__((packed));
 
 
 struct sctpUnifiedSack{
   struct sctpChunkDesc uh;
   struct sctpSelectiveAck sack;
-};
+} __attribute__((packed));
 
 /* for both RTT request/response the
  * following is sent
  */
 
 struct sctpHBrequest {
-  u_int time_value_1;
-  u_int time_value_2;
-};
+  u_int32_t time_value_1;
+  u_int32_t time_value_2;
+} __attribute__((packed));
 
 /* here is what I read and respond with to. */
 struct sctpHBunified{
   struct sctpChunkDesc hdr;
   struct sctpParamDesc hb;
-};
+} __attribute__((packed));
 
 
 /* here is what I send */
@@ -217,9 +217,9 @@ struct sctpHBsender{
   struct sctpChunkDesc hdr;
   struct sctpParamDesc hb;
   struct sctpHBrequest rtt;
-  char addrFmt[SCTP_ADDRMAX];
-  unsigned short userreq;
-};
+  int8_t addrFmt[SCTP_ADDRMAX];
+  u_int16_t userreq;
+} __attribute__((packed));
 
 
 
@@ -229,60 +229,60 @@ struct sctpHBsender{
  */
 struct sctpUnifiedAbort{
   struct sctpChunkDesc uh;
-};
+} __attribute__((packed));
 
 struct sctpUnifiedAbortLight{
   struct sctpHeader mh;
   struct sctpChunkDesc uh;
-};
+} __attribute__((packed));
 
 struct sctpUnifiedAbortHeavy{
   struct sctpHeader mh;
   struct sctpChunkDesc uh;
-  unsigned short causeCode;
-  unsigned short causeLen;
-};
+  u_int16_t causeCode;
+  u_int16_t causeLen;
+} __attribute__((packed));
 
 /* For the graceful shutdown we must carry
  * the tag (in common header)  and the highest consequitive acking value
  */
 struct sctpShutdown {
-  u_int TSN_Seen;
-};
+  u_int32_t TSN_Seen;
+} __attribute__((packed));
 
 struct sctpUnifiedShutdown{
   struct sctpChunkDesc uh;
   struct sctpShutdown shut;
-};
+} __attribute__((packed));
 
 /* in the unified message we add the trailing
  * stream id since it is the only message
  * that is defined as a operation error.
  */
 struct sctpOpErrorCause{
-  u_short cause;
-  u_short causeLen;
-};
+  u_int16_t cause;
+  u_int16_t causeLen;
+} __attribute__((packed));
 
 struct sctpUnifiedOpError{
   struct sctpChunkDesc uh;
   struct sctpOpErrorCause c;
-};
+} __attribute__((packed));
 
 struct sctpUnifiedStreamError{
   struct sctpHeader mh;
   struct sctpChunkDesc uh;
   struct sctpOpErrorCause c;
-  u_short strmNum;
-  u_short reserved;
-};
+  u_int16_t strmNum;
+  u_int16_t reserved;
+} __attribute__((packed));
 
 struct staleCookieMsg{
   struct sctpHeader mh;
   struct sctpChunkDesc uh;
   struct sctpOpErrorCause c;
-  u_int moretime;
-};
+  u_int32_t moretime;
+} __attribute__((packed));
 
 /* the following is used in all sends
  * where nothing is needed except the
@@ -291,30 +291,30 @@ struct staleCookieMsg{
 struct sctpUnifiedSingleMsg{
   struct sctpHeader mh;
   struct sctpChunkDesc uh;
-};
+} __attribute__((packed));
 
 struct sctpDataPart{
-  u_int TSN;
-  u_short streamId;
-  u_short sequence;
-  u_int payloadtype;
-};
+  u_int32_t TSN;
+  u_int16_t streamId;
+  u_int16_t sequence;
+  u_int32_t payloadtype;
+} __attribute__((packed));
 
 struct sctpUnifiedDatagram{
   struct sctpChunkDesc uh;
   struct sctpDataPart dp;
-};
+} __attribute__((packed));
 
 struct sctpECN_echo{
   struct sctpChunkDesc uh;
-  u_int Lowest_TSN;
-};
+  u_int32_t Lowest_TSN;
+} __attribute__((packed));
 
 
 struct sctpCWR{
   struct sctpChunkDesc uh;
-  u_int TSN_reduced_at;
-};
+  u_int32_t TSN_reduced_at;
+} __attribute__((packed));
 
 #ifdef	__cplusplus
 }

@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-mobility.c,v 1.5 2002-09-05 00:52:30 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-mobility.c,v 1.6 2002-11-09 17:19:28 itojun Exp $";
 #endif
 
 #ifdef INET6
@@ -57,7 +57,7 @@ struct ip6_mobility {
 		u_int16_t	ip6m_un_data16[1]; /* type-specific field */
 		u_int8_t	ip6m_un_data8[2];  /* type-specific fiedl */
 	} ip6m_dataun;
-};
+} __attribute__((packed));
 
 #define ip6m_data16	ip6m_dataun.ip6m_un_data16
 #define ip6m_data8	ip6m_dataun.ip6m_un_data8

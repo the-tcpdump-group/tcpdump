@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ieee802_11.h,v 1.4 2002-06-11 17:08:38 itojun Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ieee802_11.h,v 1.5 2002-11-09 17:19:18 itojun Exp $ (LBL) */
 /*
  * Copyright (c) 2001
  *	Fortress Technologies
@@ -75,7 +75,7 @@ struct mgmt_header_t {
 	u_int8_t	sa[6];
 	u_int8_t	bssid[6];
 	u_int16_t	seq_ctrl;
-};
+} __attribute__((packed));
 
 #define MGMT_HEADER_LEN	(2+2+6+6+6+2)
 
@@ -89,19 +89,19 @@ struct ssid_t {
 	u_int8_t	element_id;
 	u_int8_t	length;
 	u_char		ssid[33];  /* 32 + 1 for null */
-} ;
+}  __attribute__((packed));
 
 struct rates_t {
 	u_int8_t	element_id;
 	u_int8_t	length;
 	u_int8_t	rate[8];
-};
+} __attribute__((packed));
 
 struct challenge_t {
 	u_int8_t	element_id;
 	u_int8_t	length;
 	u_int8_t	text[254]; /* 1-253 + 1 for null */
-};
+} __attribute__((packed));
 struct fh_t {
 	u_int8_t	element_id;
 	u_int8_t	length;
@@ -109,13 +109,13 @@ struct fh_t {
 	u_int8_t	hop_set;
 	u_int8_t 	hop_pattern;
 	u_int8_t	hop_index;
-};
+} __attribute__((packed));
 
 struct ds_t {
 	u_int8_t	element_id;
 	u_int8_t	length;
 	u_int8_t	channel;
-};
+} __attribute__((packed));
 
 struct cf_t {
 	u_int8_t	element_id;
@@ -124,7 +124,7 @@ struct cf_t {
 	u_int8_t	period;
 	u_int16_t	max_duration;
 	u_int16_t	dur_remaing;
-};
+} __attribute__((packed));
 
 struct tim_t {
 	u_int8_t	element_id;
@@ -133,7 +133,7 @@ struct tim_t {
 	u_int8_t	period;
 	u_int8_t	bitmap_control;
 	u_int8_t	bitmap[251];
-};
+} __attribute__((packed));
 
 #define E_SSID 		0
 #define E_RATES 	1
@@ -179,7 +179,7 @@ struct mgmt_body_t {
 	struct cf_t	cf;
 	struct fh_t	fh;
 	struct tim_t	tim;
-};
+} __attribute__((packed));
 
 struct ctrl_rts_t {
 	u_int16_t	fc;
@@ -187,7 +187,7 @@ struct ctrl_rts_t {
 	u_int8_t	ra[6];
 	u_int8_t	ta[6];
 	u_int8_t	fcs[4];
-};
+} __attribute__((packed));
 
 #define CTRL_RTS_LEN	(2+2+6+6+4)
 
@@ -196,7 +196,7 @@ struct ctrl_cts_t {
 	u_int16_t	duration;
 	u_int8_t	ra[6];
 	u_int8_t	fcs[4];
-};
+} __attribute__((packed));
 
 #define CTRL_CTS_LEN	(2+2+6+4)
 
@@ -205,7 +205,7 @@ struct ctrl_ack_t {
 	u_int16_t	duration;
 	u_int8_t	ra[6];
 	u_int8_t	fcs[4];
-};
+} __attribute__((packed));
 
 #define CTRL_ACK_LEN	(2+2+6+4)
 
@@ -215,7 +215,7 @@ struct ctrl_ps_poll_t {
 	u_int8_t	bssid[6];
 	u_int8_t	ta[6];
 	u_int8_t	fcs[4];
-};
+} __attribute__((packed));
 
 #define CTRL_PS_POLL_LEN	(2+2+6+6+4)
 
@@ -225,7 +225,7 @@ struct ctrl_end_t {
 	u_int8_t	ra[6];
 	u_int8_t	bssid[6];
 	u_int8_t	fcs[4];
-};
+} __attribute__((packed));
 
 #define CTRL_END_LEN	(2+2+6+6+4)
 
@@ -235,7 +235,7 @@ struct ctrl_end_ack_t {
 	u_int8_t	ra[6];
 	u_int8_t	bssid[6];
 	u_int8_t	fcs[4];
-};
+} __attribute__((packed));
 
 #define CTRL_END_ACK_LEN	(2+2+6+6+4)
 

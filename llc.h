@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/llc.h,v 1.14 2002-04-07 09:50:30 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/llc.h,v 1.15 2002-11-09 17:19:21 itojun Exp $ (LBL)
  */
 
 /*
@@ -47,7 +47,7 @@ struct llc {
 			u_int8_t snap_ethertype[2];
 		} snap_ether;
 	} ctl;
-};
+} __attribute__((packed));
 
 #define	llcui		ctl.snap.snap_ui
 #define	llcpi		ctl.snap.snap_pi

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.110 2002-09-10 01:45:33 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.111 2002-11-09 17:19:30 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -59,12 +59,12 @@ struct rtcphdr {
 	u_int16_t rh_flags;	/* T:2 P:1 CNT:5 PT:8 */
 	u_int16_t rh_len;	/* length of message (in words) */
 	u_int32_t rh_ssrc;	/* synchronization src id */
-};
+} __attribute__((packed));
 
 typedef struct {
 	u_int32_t upper;	/* more significant 32 bits */
 	u_int32_t lower;	/* less significant 32 bits */
-} ntp64;
+} ntp64 __attribute__((packed));
 
 /*
  * Sender report.
@@ -74,7 +74,7 @@ struct rtcp_sr {
 	u_int32_t sr_ts;	/* reference media timestamp */
 	u_int32_t sr_np;	/* no. packets sent */
 	u_int32_t sr_nb;	/* no. bytes sent */
-};
+} __attribute__((packed));
 
 /*
  * Receiver report.
@@ -87,7 +87,7 @@ struct rtcp_rr {
 	u_int32_t rr_dv;	/* jitter (delay variance) */
 	u_int32_t rr_lsr;	/* orig. ts from last rr from this src  */
 	u_int32_t rr_dlsr;	/* time from recpt of last rr to xmit time */
-};
+} __attribute__((packed));
 
 /*XXX*/
 #define RTCP_PT_SR	200

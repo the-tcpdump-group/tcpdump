@@ -23,7 +23,7 @@
 /*
  * Rx protocol format
  *
- * $Id: rx.h,v 1.6 2002-06-11 17:08:59 itojun Exp $
+ * $Id: rx.h,v 1.7 2002-11-09 17:19:31 itojun Exp $
  */
 
 #define FS_RX_PORT	7000
@@ -85,7 +85,7 @@ struct rx_header {
 	u_int8_t securityIndex;
 	u_int16_t spare;		/* How clever: even though the AFS */
 	u_int16_t serviceId;		/* header files indicate that the */
-};					/* serviceId is first, it's really */
+} __attribute__((packed));		/* serviceId is first, it's really */
 					/* encoded _after_ the spare field */
 					/* I wasted a day figuring that out! */
 
@@ -103,7 +103,7 @@ struct rx_ackPacket {
 	u_int8_t reason;		/* Reason for acknowledgement */
 	u_int8_t nAcks;			/* Number of acknowledgements */
 	u_int8_t acks[RX_MAXACKS];	/* Up to RX_MAXACKS acknowledgements */
-};
+} __attribute__((packed));
 
 /*
  * Values for the acks array

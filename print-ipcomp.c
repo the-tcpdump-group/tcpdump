@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ipcomp.c,v 1.15 2002-09-05 21:25:42 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ipcomp.c,v 1.16 2002-11-09 17:19:26 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -37,7 +37,7 @@ struct ipcomp {
 	u_int8_t comp_nxt;	/* Next Header */
 	u_int8_t comp_flags;	/* Length of data, in 32bit */
 	u_int16_t comp_cpi;	/* Compression parameter index */
-};
+} __attribute__((packed));
 
 #if defined(HAVE_LIBZ) && defined(HAVE_ZLIB_H)
 #include <zlib.h>

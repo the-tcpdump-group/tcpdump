@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-arp.c,v 1.58 2002-09-04 18:56:11 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-arp.c,v 1.59 2002-11-09 17:19:23 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -81,7 +81,7 @@ struct	arp_pkthdr {
 #define ar_spa(ap)	(((const u_char *)((ap)+1))+  (ap)->ar_hln)
 #define ar_tha(ap)	(((const u_char *)((ap)+1))+  (ap)->ar_hln+(ap)->ar_pln)
 #define ar_tpa(ap)	(((const u_char *)((ap)+1))+2*(ap)->ar_hln+(ap)->ar_pln)
-};
+} __attribute__((packed));
 
 #define ARP_HDRLEN	8
 
@@ -146,7 +146,7 @@ struct	atmarp_pkthdr {
 #define aar_tha(ap)	(aar_spa(ap) + ATMSPLN(ap))
 #define aar_tsa(ap)	(aar_tha(ap) + ATMTHLN(ap))
 #define aar_tpa(ap)	(aar_tsa(ap) + ATMTSLN(ap))
-};
+} __attribute__((packed));
 
 #define ATMSHA(ap) (aar_sha(ap))
 #define ATMSSA(ap) (aar_ssa(ap))

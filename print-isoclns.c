@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.67 2002-10-09 14:04:07 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.68 2002-11-09 17:19:27 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -339,38 +339,38 @@ static struct tok isis_ptp_adjancey_values[] = {
 };
 
 struct isis_tlv_ptp_adj {
-    u_char adjacency_state;
-    u_char extd_local_circuit_id[4];
-    u_char neighbor_sysid[SYSTEM_ID_LEN];
-    u_char neighbor_extd_local_circuit_id[4];
-};
+    u_int8_t adjacency_state;
+    u_int8_t extd_local_circuit_id[4];
+    u_int8_t neighbor_sysid[SYSTEM_ID_LEN];
+    u_int8_t neighbor_extd_local_circuit_id[4];
+} __attribute__((packed));
 
-static int osi_cksum(const u_char *, u_int);
-static void esis_print(const u_char *, u_int);
-static int isis_print(const u_char *, u_int);
+static int osi_cksum(const u_int8_t *, u_int);
+static void esis_print(const u_int8_t *, u_int);
+static int isis_print(const u_int8_t *, u_int);
 
 struct isis_metric_block {
-    u_char metric_default;
-    u_char metric_delay;
-    u_char metric_expense;
-    u_char metric_error;
-};
+    u_int8_t metric_default;
+    u_int8_t metric_delay;
+    u_int8_t metric_expense;
+    u_int8_t metric_error;
+} __attribute__((packed));
 
 struct isis_tlv_is_reach {
     struct isis_metric_block isis_metric_block;
-    u_char neighbor_nodeid[NODE_ID_LEN];
-};
+    u_int8_t neighbor_nodeid[NODE_ID_LEN];
+} __attribute__((packed));
 
 struct isis_tlv_es_reach {
     struct isis_metric_block isis_metric_block;
-    u_char neighbor_sysid[SYSTEM_ID_LEN];
-};
+    u_int8_t neighbor_sysid[SYSTEM_ID_LEN];
+} __attribute__((packed));
 
 struct isis_tlv_ip_reach {
     struct isis_metric_block isis_metric_block;
-    u_char prefix[4];
-    u_char mask[4];
-};
+    u_int8_t prefix[4];
+    u_int8_t mask[4];
+} __attribute__((packed));
 
 static struct tok isis_is_reach_virtual_values[] = {
     { 0,    "IsNotVirtual"},
@@ -379,67 +379,67 @@ static struct tok isis_is_reach_virtual_values[] = {
 };
 
 struct isis_common_header {
-    u_char nlpid;
-    u_char fixed_len;
-    u_char version;			/* Protocol version? */
-    u_char id_length;
-    u_char pdu_type;		        /* 3 MSbs are reserved */
-    u_char pdu_version;			/* Packet format version? */
-    u_char reserved;
-    u_char max_area;
-};
+    u_int8_t nlpid;
+    u_int8_t fixed_len;
+    u_int8_t version;			/* Protocol version? */
+    u_int8_t id_length;
+    u_int8_t pdu_type;		        /* 3 MSbs are reserved */
+    u_int8_t pdu_version;			/* Packet format version? */
+    u_int8_t reserved;
+    u_int8_t max_area;
+} __attribute__((packed));
 
 struct isis_iih_lan_header {
-    u_char circuit_type;
-    u_char source_id[SYSTEM_ID_LEN];
-    u_char holding_time[2];
-    u_char pdu_len[2];
-    u_char priority;
-    u_char lan_id[NODE_ID_LEN];
-};
+    u_int8_t circuit_type;
+    u_int8_t source_id[SYSTEM_ID_LEN];
+    u_int8_t holding_time[2];
+    u_int8_t pdu_len[2];
+    u_int8_t priority;
+    u_int8_t lan_id[NODE_ID_LEN];
+} __attribute__((packed));
 
 struct isis_iih_ptp_header {
-    u_char circuit_type;
-    u_char source_id[SYSTEM_ID_LEN];
-    u_char holding_time[2];
-    u_char pdu_len[2];
-    u_char circuit_id;
-};
+    u_int8_t circuit_type;
+    u_int8_t source_id[SYSTEM_ID_LEN];
+    u_int8_t holding_time[2];
+    u_int8_t pdu_len[2];
+    u_int8_t circuit_id;
+} __attribute__((packed));
 
 struct isis_lsp_header {
-    u_char pdu_len[2];
-    u_char remaining_lifetime[2];
-    u_char lsp_id[LSP_ID_LEN];
-    u_char sequence_number[4];
-    u_char checksum[2];
-    u_char typeblock;
-};
+    u_int8_t pdu_len[2];
+    u_int8_t remaining_lifetime[2];
+    u_int8_t lsp_id[LSP_ID_LEN];
+    u_int8_t sequence_number[4];
+    u_int8_t checksum[2];
+    u_int8_t typeblock;
+} __attribute__((packed));
 
 struct isis_csnp_header {
-    u_char pdu_len[2];
-    u_char source_id[NODE_ID_LEN];
-    u_char start_lsp_id[LSP_ID_LEN];
-    u_char end_lsp_id[LSP_ID_LEN];
-};
+    u_int8_t pdu_len[2];
+    u_int8_t source_id[NODE_ID_LEN];
+    u_int8_t start_lsp_id[LSP_ID_LEN];
+    u_int8_t end_lsp_id[LSP_ID_LEN];
+} __attribute__((packed));
 
 struct isis_psnp_header {
-    u_char pdu_len[2];
-    u_char source_id[NODE_ID_LEN];
-};
+    u_int8_t pdu_len[2];
+    u_int8_t source_id[NODE_ID_LEN];
+} __attribute__((packed));
 
 struct isis_tlv_lsp {
-    u_char remaining_lifetime[2];
-    u_char lsp_id[LSP_ID_LEN];
-    u_char sequence_number[4];
-    u_char checksum[2];
-};
+    u_int8_t remaining_lifetime[2];
+    u_int8_t lsp_id[LSP_ID_LEN];
+    u_int8_t sequence_number[4];
+    u_int8_t checksum[2];
+} __attribute__((packed));
 
 
 /* allocate space for the following string
  * xx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx
  * 32 bytes plus one termination byte */
 static char *
-print_nsap(register const u_char *pptr, register int nsap_length)
+print_nsap(register const u_int8_t *pptr, register int nsap_length)
 {
 	int nsap_idx;
 	static char nsap_ascii_output[33];
@@ -471,10 +471,10 @@ print_nsap(register const u_char *pptr, register int nsap_length)
 #define ISIS_CSNP_HEADER_SIZE (sizeof(struct isis_csnp_header))
 #define ISIS_PSNP_HEADER_SIZE (sizeof(struct isis_psnp_header))
 
-void isoclns_print(const u_char *p, u_int length, u_int caplen,
-	      const u_char *esrc, const u_char *edst)
+void isoclns_print(const u_int8_t *p, u_int length, u_int caplen,
+	      const u_int8_t *esrc, const u_int8_t *edst)
 {
-	u_char pdu_type;
+	u_int8_t pdu_type;
 	const struct isis_common_header *header;
 
 	header = (const struct isis_common_header *)p;
@@ -528,17 +528,17 @@ static struct tok esis_values[] = {
 };
 
 struct esis_hdr {
-	u_char version;
-	u_char reserved;
-	u_char type;
-	u_char tmo[2];
-	u_char cksum[2];
+	u_int8_t version;
+	u_int8_t reserved;
+	u_int8_t type;
+	u_int8_t tmo[2];
+	u_int8_t cksum[2];
 };
 
 static void
-esis_print(const u_char *p, u_int length)
+esis_print(const u_int8_t *p, u_int length)
 {
-	const u_char *ep;
+	const u_int8_t *ep;
 	u_int li;
 	const struct esis_hdr *eh;
 
@@ -592,7 +592,7 @@ esis_print(const u_char *p, u_int length)
 
 	switch (eh->type & 0x1f) {
 	case ESIS_REDIRECT: {
-		const u_char *dst, *snpa, *is;
+		const u_int8_t *dst, *snpa, *is;
 
 		dst = p; p += *p + 1;
 		if (p > snapend)
@@ -618,7 +618,7 @@ esis_print(const u_char *p, u_int length)
 		break;
 
 	case ESIS_ISH: {
-		const u_char *is;
+		const u_int8_t *is;
 
 		is = p; p += *p + 1;
 		if (p > ep) {
@@ -649,7 +649,7 @@ esis_print(const u_char *p, u_int length)
 	if (vflag)
 		while (p < ep && li) {
 			u_int op, opli;
-			const u_char *q;
+			const u_int8_t *q;
 
 			if (snapend - p < 2)
 				return;
@@ -692,7 +692,7 @@ esis_print(const u_char *p, u_int length)
  * xxxx.xxxx.xxxx
  * 14 bytes plus one termination byte */
 static char *
-isis_print_sysid(const u_char *cp, int sysid_len)
+isis_print_sysid(const u_int8_t *cp, int sysid_len)
 {
 	int i;
 	static char sysid[15];
@@ -715,7 +715,7 @@ isis_print_sysid(const u_char *cp, int sysid_len)
  * xxxx.xxxx.xxxx.yy
  * 17 bytes plus one termination byte */
 static char *
-isis_print_nodeid(const u_char *cp)
+isis_print_nodeid(const u_int8_t *cp)
 {
 	int i;
 	static char nodeid[18];
@@ -737,7 +737,7 @@ isis_print_nodeid(const u_char *cp)
  * xxxx.xxxx.xxxx.yy-zz
  * 20 bytes plus one termination byte */
 static char *
-isis_print_lspid(const u_char *cp)
+isis_print_lspid(const u_int8_t *cp)
 {
 	int i;
 	static char lspid[21];
@@ -777,7 +777,7 @@ isis_print_metric_block (const struct isis_metric_block *isis_metric_block)
 }
 
 static int
-isis_print_tlv_ip_reach (const u_char *cp, int length)
+isis_print_tlv_ip_reach (const u_int8_t *cp, int length)
 {
 	u_int bitmasks[33] = {
 		0x00000000,
@@ -862,7 +862,7 @@ isis_print_tlv_ip_reach (const u_char *cp, int length)
  */
 
 static int
-isis_print_ip_reach_subtlv (const u_char *tptr,int subt,int subl,const char *ident) {
+isis_print_ip_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *ident) {
 
         switch(subt) {
         case SUBTLV_IP_REACH_ADMIN_TAG32:
@@ -903,7 +903,7 @@ trunctlv:
  */
 
 static int
-isis_print_is_reach_subtlv (const u_char *tptr,int subt,int subl,const char *ident) {
+isis_print_is_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *ident) {
 
         int i,j;
         float bw; /* copy buffer for several subTLVs */
@@ -1078,7 +1078,7 @@ trunctlv:
  */
 
 static int
-isis_print_ext_is_reach (const u_char *tptr,const char *ident) {
+isis_print_ext_is_reach (const u_int8_t *tptr,const char *ident) {
 
     char ident_buffer[20];
     int subt,subl,tslen;
@@ -1125,7 +1125,7 @@ isis_print_ext_is_reach (const u_char *tptr,const char *ident) {
  */
 
 static int
-isis_print_mtid (const u_char *tptr,const char *ident) {
+isis_print_mtid (const u_int8_t *tptr,const char *ident) {
     
     if (!TTEST2(*tptr, 2))
         return(0);
@@ -1149,7 +1149,7 @@ isis_print_mtid (const u_char *tptr,const char *ident) {
  * Decode IS-IS packets.  Return 0 on error.
  */
 
-static int isis_print (const u_char *p, u_int length)
+static int isis_print (const u_int8_t *p, u_int length)
 {
     const struct isis_common_header *header;
 
@@ -1164,13 +1164,13 @@ static int isis_print (const u_char *p, u_int length)
     const struct isis_tlv_is_reach *tlv_is_reach;
     const struct isis_tlv_es_reach *tlv_es_reach;
 
-    u_char pdu_type, max_area, id_length, type, len, tmp, alen, lan_alen, prefix_len, ext_is_len, mt_len, subl, subt, tslen;
-    const u_char *optr, *pptr, *tptr;
+    u_int8_t pdu_type, max_area, id_length, type, len, tmp, alen, lan_alen, prefix_len, ext_is_len, mt_len, subl, subt, tslen;
+    const u_int8_t *optr, *pptr, *tptr;
     u_short packet_len,pdu_len,time_remain;
     u_int i,j,bit_length,byte_length,metric,ra,rr;
-    u_char prefix[4]; /* copy buffer for ipv4 prefixes */
+    u_int8_t prefix[4]; /* copy buffer for ipv4 prefixes */
 #ifdef INET6
-    u_char prefix6[16]; /* copy buffer for ipv6 prefixes */
+    u_int8_t prefix6[16]; /* copy buffer for ipv6 prefixes */
 #endif
     packet_len=length;
     optr = p; /* initialize the _o_riginal pointer to the packet start -
@@ -2185,7 +2185,7 @@ static int isis_print (const u_char *p, u_int length)
  */
 
 static int
-osi_cksum(const u_char *tptr, u_int len)
+osi_cksum(const u_int8_t *tptr, u_int len)
 {
 	int32_t c0 = 0, c1 = 0;
 

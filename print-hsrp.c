@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-hsrp.c,v 1.5 2002-08-01 08:53:08 risso Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-hsrp.c,v 1.6 2002-11-09 17:19:25 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -85,20 +85,20 @@ static struct tok states[] = {
 
 /* HSRP protocol header. */
 struct hsrp {
-	u_char		hsrp_version;
-	u_char		hsrp_op_code;
-	u_char		hsrp_state;
-	u_char		hsrp_hellotime;
-	u_char		hsrp_holdtime;
-	u_char		hsrp_priority;
-	u_char		hsrp_group;
-	u_char		hsrp_reserved;
-	u_char		hsrp_authdata[HSRP_AUTH_SIZE];
+	u_int8_t	hsrp_version;
+	u_int8_t	hsrp_op_code;
+	u_int8_t	hsrp_state;
+	u_int8_t	hsrp_hellotime;
+	u_int8_t	hsrp_holdtime;
+	u_int8_t	hsrp_priority;
+	u_int8_t	hsrp_group;
+	u_int8_t	hsrp_reserved;
+	u_int8_t	hsrp_authdata[HSRP_AUTH_SIZE];
 	struct in_addr	hsrp_virtaddr;
-};
+} __attribute__((packed));
 
 void
-hsrp_print(register const u_char *bp, register u_int len)
+hsrp_print(register const u_int8_t *bp, register u_int len)
 {
 	struct hsrp *hp = (struct hsrp *) bp;
 

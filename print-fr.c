@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.6 2002-09-05 21:25:41 guy Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.7 2002-11-09 17:19:25 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -345,9 +345,9 @@ out:
 
 /* See L2 protocol ID picture above */
 struct q933_header {
-    u_char call_ref;  /* usually is 0 for framerelay PVC */
-    u_char msg_type;  
-};
+    u_int8_t call_ref;  /* usually is 0 for framerelay PVC */
+    u_int8_t msg_type;  
+} __attribute__((packed));
 
 #define REPORT_TYPE_IE    0x01
 #define LINK_VERIFY_IE_91 0x19
@@ -357,9 +357,9 @@ struct q933_header {
 #define MAX_IE_SIZE
 
 struct common_ie_header {
-    u_char ie_id;
-    u_char ie_len;
-};
+    u_int8_t ie_id;
+    u_int8_t ie_len;
+} __attribute__((packed));
 
 #define FULL_STATUS 0
 #define LINK_VERIFY 1

@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-pptp.c,v 1.7 2002-09-05 21:25:45 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-pptp.c,v 1.8 2002-11-09 17:19:29 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -103,7 +103,7 @@ struct pptp_hdr {
 	u_int32_t magic_cookie;
 	u_int16_t ctrl_msg_type;
 	u_int16_t reserved0;
-};
+} __attribute__((packed));
 
 struct pptp_msg_sccrq {
 	u_int16_t proto_ver;
@@ -114,7 +114,7 @@ struct pptp_msg_sccrq {
 	u_int16_t firm_rev;
 	u_char hostname[64];
 	u_char vendor[64];
-};
+} __attribute__((packed));
 
 struct pptp_msg_sccrp {
 	u_int16_t proto_ver;
@@ -126,30 +126,30 @@ struct pptp_msg_sccrp {
 	u_int16_t firm_rev;
 	u_char hostname[64];
 	u_char vendor[64];
-};
+} __attribute__((packed));
 
 struct pptp_msg_stopccrq {
 	u_int8_t reason;
 	u_int8_t reserved1;
 	u_int16_t reserved2;
-};
+} __attribute__((packed));
 
 struct pptp_msg_stopccrp {
 	u_int8_t result_code;
 	u_int8_t err_code;
 	u_int16_t reserved1;
-};
+} __attribute__((packed));
 
 struct pptp_msg_echorq {
 	u_int32_t id;
-};
+} __attribute__((packed));
 
 struct pptp_msg_echorp {
 	u_int32_t id;
 	u_int8_t result_code;
 	u_int8_t err_code;
 	u_int16_t reserved1;
-};
+} __attribute__((packed));
 
 struct pptp_msg_ocrq {
 	u_int16_t call_id;
@@ -164,7 +164,7 @@ struct pptp_msg_ocrq {
 	u_int16_t reserved1;
 	u_char phone_no[64];
 	u_char subaddr[64];
-};
+} __attribute__((packed));
 
 struct pptp_msg_ocrp {
 	u_int16_t call_id;
@@ -176,7 +176,7 @@ struct pptp_msg_ocrp {
 	u_int16_t recv_winsiz;
 	u_int16_t pkt_proc_delay;
 	u_int32_t phy_chan_id;
-};
+} __attribute__((packed));
 
 struct pptp_msg_icrq {
 	u_int16_t call_id;
@@ -188,7 +188,7 @@ struct pptp_msg_icrq {
 	u_char dialed_no[64];		/* DNIS */
 	u_char dialing_no[64];		/* CLID */
 	u_char subaddr[64];
-};
+} __attribute__((packed));
 
 struct pptp_msg_icrp {
 	u_int16_t call_id;
@@ -198,7 +198,7 @@ struct pptp_msg_icrp {
 	u_int16_t recv_winsiz;
 	u_int16_t pkt_proc_delay;
 	u_int16_t reserved1;
-};
+} __attribute__((packed));
 
 struct pptp_msg_iccn {
 	u_int16_t peer_call_id;
@@ -207,12 +207,12 @@ struct pptp_msg_iccn {
 	u_int16_t recv_winsiz;
 	u_int16_t pkt_proc_delay;
 	u_int32_t framing_type;
-};
+} __attribute__((packed));
 
 struct pptp_msg_ccrq {
 	u_int16_t call_id;
 	u_int16_t reserved1;
-};
+} __attribute__((packed));
 
 struct pptp_msg_cdn {
 	u_int16_t call_id;
@@ -221,7 +221,7 @@ struct pptp_msg_cdn {
 	u_int16_t cause_code;
 	u_int16_t reserved1;
 	u_char call_stats[128];
-};
+} __attribute__((packed));
 
 struct pptp_msg_wen {
 	u_int16_t peer_call_id;
@@ -232,14 +232,14 @@ struct pptp_msg_wen {
 	u_int32_t buffer_overrun;
 	u_int32_t timeout_err;
 	u_int32_t align_err;
-};
+} __attribute__((packed));
 
 struct pptp_msg_sli {
 	u_int16_t peer_call_id;
 	u_int16_t reserved1;
 	u_int32_t send_accm;
 	u_int32_t recv_accm;
-};
+} __attribute__((packed));
 
 /* attributes that appear more than once in above messages:
 

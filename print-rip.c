@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rip.c,v 1.52 2002-09-05 21:25:46 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rip.c,v 1.53 2002-11-09 17:19:30 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -38,10 +38,10 @@ static const char rcsid[] =
 #include "extract.h"			/* must come after interface.h */
 
 struct rip {
-	u_char rip_cmd;			/* request/response */
-	u_char rip_vers;		/* protocol version # */
-	u_short rip_zero2;		/* unused */
-};
+	u_int8_t rip_cmd;		/* request/response */
+	u_int8_t rip_vers;		/* protocol version # */
+	u_int16_t rip_zero2;		/* unused */
+} __attribute__((packed));
 #define	RIPCMD_REQUEST		1	/* want info */
 #define	RIPCMD_RESPONSE		2	/* responding to request */
 #define	RIPCMD_TRACEON		3	/* turn tracing on */
@@ -52,13 +52,13 @@ struct rip {
 #define RIP_AUTHLEN 16
 
 struct rip_netinfo {
-	u_short rip_family;
-	u_short rip_tag;
+	u_int16_t rip_family;
+	u_int16_t rip_tag;
 	u_int32_t rip_dest;
 	u_int32_t rip_dest_mask;
 	u_int32_t rip_router;
 	u_int32_t rip_metric;		/* cost of route */
-};
+} __attribute__((packed));
 
 static void
 rip_printblk(const u_char *cp, const u_char *ep)

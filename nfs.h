@@ -261,19 +261,19 @@ typedef enum { NFNON=0, NFREG=1, NFDIR=2, NFBLK=3, NFCHR=4, NFLNK=5,
 union nfsfh {
 /*	fhandle_t fh_generic; */
 	u_char    fh_bytes[NFS_SMALLFH];
-};
+} __attribute__((packed));
 typedef union nfsfh nfsfh_t;
 
 struct nfsv2_time {
 	u_int32_t nfsv2_sec;
 	u_int32_t nfsv2_usec;
-};
+} __attribute__((packed));
 typedef struct nfsv2_time	nfstime2;
 
 struct nfsv3_time {
 	u_int32_t nfsv3_sec;
 	u_int32_t nfsv3_nsec;
-};
+} __attribute__((packed));
 typedef struct nfsv3_time	nfstime3;
 
 /*
@@ -282,7 +282,7 @@ typedef struct nfsv3_time	nfstime3;
  */
 struct nfs_uquad {
 	u_int32_t nfsuquad[2];
-};
+} __attribute__((packed));
 typedef	struct nfs_uquad	nfsuint64;
 
 #if 0 /* XXX - this doesn't seemed to be used and it doesn't work
@@ -295,7 +295,7 @@ typedef	struct nfs_uquad	nfsuint64;
 union nfs_quadconvert {
 	u_int32_t lval[2];
 	u_int64_t qval;
-};
+} __attribute__((packed));
 typedef union nfs_quadconvert	nfsquad_t;
 
 #endif
@@ -306,7 +306,7 @@ typedef union nfs_quadconvert	nfsquad_t;
 struct nfsv3_spec {
 	u_int32_t specdata1;
 	u_int32_t specdata2;
-};
+} __attribute__((packed));
 typedef	struct nfsv3_spec	nfsv3spec;
 
 /*
@@ -347,7 +347,7 @@ struct nfs_fattr {
 			nfstime3  nfsv3fa_ctime;
 		} fa_nfsv3;
 	} fa_un;
-};
+} __attribute__((packed));
 
 /* and some ugly defines for accessing union components */
 #define	fa2_size		fa_un.fa_nfsv2.nfsv2fa_size
@@ -375,7 +375,7 @@ struct nfsv2_sattr {
 	u_int32_t sa_size;
 	nfstime2  sa_atime;
 	nfstime2  sa_mtime;
-};
+} __attribute__((packed));
 
 /*
  * NFS Version 3 sattr structure for the new node creation case.
@@ -393,7 +393,7 @@ struct nfsv3_sattr {
 	nfstime3  sa_atime;
 	u_int32_t   sa_mtimetype;
 	nfstime3  sa_mtime;
-};
+} __attribute__((packed));
 
 struct nfs_statfs {
 	union {
@@ -414,7 +414,7 @@ struct nfs_statfs {
 			u_int32_t nfsv3sf_invarsec;
 		} sf_nfsv3;
 	} sf_un;
-};
+} __attribute__((packed));
 
 #define sf_tsize	sf_un.sf_nfsv2.nfsv2sf_tsize
 #define sf_bsize	sf_un.sf_nfsv2.nfsv2sf_bsize
@@ -440,7 +440,7 @@ struct nfsv3_fsinfo {
 	nfsuint64 fs_maxfilesize;
 	nfstime3  fs_timedelta;
 	u_int32_t fs_properties;
-};
+} __attribute__((packed));
 
 struct nfsv3_pathconf {
 	u_int32_t pc_linkmax;
@@ -449,4 +449,4 @@ struct nfsv3_pathconf {
 	u_int32_t pc_chownrestricted;
 	u_int32_t pc_caseinsensitive;
 	u_int32_t pc_casepreserving;
-};
+} __attribute__((packed));

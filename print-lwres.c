@@ -29,7 +29,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lwres.c,v 1.7 2002-09-05 00:00:15 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lwres.c,v 1.8 2002-11-09 17:19:28 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -62,7 +62,7 @@ struct lwres_lwpacket {
 	lwres_uint32_t		recvlength;
 	lwres_uint16_t		authtype;
 	lwres_uint16_t		authlength;
-};
+} __attribute__((packed));
 
 #define LWRES_LWPACKETFLAG_RESPONSE	0x0001U	/* if set, pkt is a response */
 
@@ -80,13 +80,13 @@ typedef struct {
 	/* public */
 	lwres_uint16_t			datalength;
 	/* data follows */
-} lwres_nooprequest_t;
+} lwres_nooprequest_t __attribute__((packed));
 
 typedef struct {
 	/* public */
 	lwres_uint16_t			datalength;
 	/* data follows */
-} lwres_noopresponse_t;
+} lwres_noopresponse_t __attribute__((packed));
 
 /*
  * get addresses by name
@@ -99,7 +99,7 @@ struct lwres_addr {
 	lwres_uint32_t			family;
 	lwres_uint16_t			length;
 	/* address folows */
-};
+} __attribute__((packed));
 
 typedef struct {
 	/* public */
@@ -107,7 +107,7 @@ typedef struct {
 	lwres_uint32_t			addrtypes;
 	lwres_uint16_t			namelen;
 	/* name follows */
-} lwres_gabnrequest_t;
+} lwres_gabnrequest_t __attribute__((packed));
 
 typedef struct {
 	/* public */
@@ -118,7 +118,7 @@ typedef struct {
 	/* aliases follows */
 	/* addrs follows */
 	/* realname follows */
-} lwres_gabnresponse_t;
+} lwres_gabnresponse_t __attribute__((packed));
 
 /*
  * get name by address
@@ -138,7 +138,7 @@ typedef struct {
 	lwres_uint16_t			realnamelen;
 	/* aliases follows */
 	/* realname follows */
-} lwres_gnbaresponse_t;
+} lwres_gnbaresponse_t __attribute__((packed));
 
 /*
  * get rdata by name
@@ -152,7 +152,7 @@ typedef struct {
 	lwres_uint16_t			rdtype;
 	lwres_uint16_t			namelen;
 	/* name follows */
-} lwres_grbnrequest_t;
+} lwres_grbnrequest_t __attribute__((packed));
 
 typedef struct {
 	/* public */
@@ -165,7 +165,7 @@ typedef struct {
 	/* realname here (len + name) */
 	/* rdata here (len + name) */
 	/* signatures here (len + name) */
-} lwres_grbnresponse_t;
+} lwres_grbnresponse_t __attribute__((packed));
 
 #define LWRDATA_VALIDATED	0x00000001
 

@@ -34,7 +34,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cnfp.c,v 1.11 2002-09-05 21:25:39 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cnfp.c,v 1.12 2002-11-09 17:19:25 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -59,7 +59,7 @@ struct nfhdr {
 	u_int32_t	utc_nsec;
 	u_int32_t	sequence;	/* v5 flow sequence number */
 	u_int32_t	reserved;	/* v5 only */
-};
+} __attribute__((packed));
 
 struct nfrec {
 	struct in_addr	src_ina;
@@ -75,7 +75,7 @@ struct nfrec {
 	u_int32_t	asses;		/* v1: flags; v5: src,dst AS */
 	u_int32_t	masks;		/* src,dst addr prefix; v6: encaps */
 	struct in_addr	peer_nexthop;	/* v6: IP address of the nexthop within the peer (FIB)*/
-};
+} __attribute__((packed));
 
 void
 cnfp_print(const u_char *cp, const u_char *bp)

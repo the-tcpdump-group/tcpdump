@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-igmp.c,v 1.9 2002-09-05 21:25:41 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-igmp.c,v 1.10 2002-11-09 17:19:26 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -47,11 +47,11 @@ static const char rcsid[] =
  * The packet format for a traceroute request.
  */
 struct tr_query {
-    u_int  tr_src;          /* traceroute source */
-    u_int  tr_dst;          /* traceroute destination */
-    u_int  tr_raddr;        /* traceroute response address */
-    u_int  tr_rttlqid;      /* response ttl and qid */
-};
+    u_int32_t  tr_src;          /* traceroute source */
+    u_int32_t  tr_dst;          /* traceroute destination */
+    u_int32_t  tr_raddr;        /* traceroute response address */
+    u_int32_t  tr_rttlqid;      /* response ttl and qid */
+} __attribute__((packed));
 
 #define TR_GETTTL(x)        (int)(((x) >> 24) & 0xff)
 #define TR_GETQID(x)        ((x) & 0x00ffffff)
@@ -61,18 +61,18 @@ struct tr_query {
  * beginning, followed by one tr_resp for each hop taken.
  */
 struct tr_resp {
-    u_int tr_qarr;          /* query arrival time */
-    u_int tr_inaddr;        /* incoming interface address */
-    u_int tr_outaddr;       /* outgoing interface address */
-    u_int tr_rmtaddr;       /* parent address in source tree */
-    u_int tr_vifin;         /* input packet count on interface */
-    u_int tr_vifout;        /* output packet count on interface */
-    u_int tr_pktcnt;        /* total incoming packets for src-grp */
-    u_char  tr_rproto;      /* routing proto deployed on router */
-    u_char  tr_fttl;        /* ttl required to forward on outvif */
-    u_char  tr_smask;       /* subnet mask for src addr */
-    u_char  tr_rflags;      /* forwarding error codes */
-};
+    u_int32_t tr_qarr;          /* query arrival time */
+    u_int32_t tr_inaddr;        /* incoming interface address */
+    u_int32_t tr_outaddr;       /* outgoing interface address */
+    u_int32_t tr_rmtaddr;       /* parent address in source tree */
+    u_int32_t tr_vifin;         /* input packet count on interface */
+    u_int32_t tr_vifout;        /* output packet count on interface */
+    u_int32_t tr_pktcnt;        /* total incoming packets for src-grp */
+    u_int8_t  tr_rproto;      /* routing proto deployed on router */
+    u_int8_t  tr_fttl;        /* ttl required to forward on outvif */
+    u_int8_t  tr_smask;       /* subnet mask for src addr */
+    u_int8_t  tr_rflags;      /* forwarding error codes */
+} __attribute__((packed));
 
 /* defs within mtrace */
 #define TR_QUERY 1

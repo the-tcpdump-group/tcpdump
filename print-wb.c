@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-wb.c,v 1.28 2002-09-05 00:00:24 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-wb.c,v 1.29 2002-11-09 17:19:31 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -60,10 +60,10 @@ static const char rcsid[] =
 struct pkt_hdr {
 	u_int32_t ph_src;		/* site id of source */
 	u_int32_t ph_ts;		/* time stamp (for skew computation) */
-	u_short ph_version;	/* version number */
+	u_int16_t ph_version;	/* version number */
 	u_char ph_type;		/* message type */
 	u_char ph_flags;	/* message flags */
-};
+} __attribute__((packed));
 
 /* Packet types */
 #define PT_DRAWOP	0	/* drawing operation */
@@ -85,15 +85,15 @@ struct pkt_hdr {
 struct PageID {
 	u_int32_t p_sid;		/* session id of initiator */
 	u_int32_t p_uid;		/* page number */
-};
+} __attribute__((packed));
 
 struct dophdr {
 	u_int32_t  dh_ts;		/* sender's timestamp */
-	u_short	dh_len;		/* body length */
+	u_int16_t	dh_len;		/* body length */
 	u_char	dh_flags;
 	u_char	dh_type;	/* body type */
 	/* body follows */
-};
+} __attribute__((packed));
 /*
  * Drawing op sub-types.
  */
@@ -121,7 +121,7 @@ struct pkt_dop {
 	u_int32_t	pd_sseq;	/* start sequence number */
 	u_int32_t	pd_eseq;	/* end sequence number */
 	/* drawing ops follow */
-};
+} __attribute__((packed));
 
 /*
  * A repair request.
@@ -131,7 +131,7 @@ struct pkt_rreq {
         struct PageID pr_page;           /* page of drawops */
         u_int32_t pr_sseq;         /* start seqno */
         u_int32_t pr_eseq;         /* end seqno */
-};
+} __attribute__((packed));
 
 /*
  * A repair reply.
@@ -140,20 +140,20 @@ struct pkt_rrep {
 	u_int32_t pr_id;	/* original site id of ops  */
 	struct pkt_dop pr_dop;
 	/* drawing ops follow */
-};
+} __attribute__((packed));
 
 struct id_off {
         u_int32_t id;
         u_int32_t off;
-};
+} __attribute__((packed));
 
 struct pgstate {
 	u_int32_t slot;
 	struct PageID page;
-	u_short nid;
-	u_short rsvd;
+	u_int16_t nid;
+	u_int16_t rsvd;
         /* seqptr's */
-};
+} __attribute__((packed));
 
 /*
  * An announcement packet.
@@ -164,18 +164,18 @@ struct pkt_id {
 	struct pgstate pi_ps;
         /* seqptr's */
         /* null-terminated site name */
-};
+} __attribute__((packed));
 
 struct pkt_preq {
         struct PageID  pp_page;
         u_int32_t  pp_low;
         u_int32_t  pp_high;
-};
+} __attribute__((packed));
 
 struct pkt_prep {
         u_int32_t  pp_n;           /* size of pageid array */
         /* pgstate's follow */
-};
+} __attribute__((packed));
 
 static int
 wb_id(const struct pkt_id *id, u_int len)

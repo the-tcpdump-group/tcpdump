@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.75 2002-10-18 04:40:02 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.76 2002-11-09 17:19:24 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -61,7 +61,7 @@ struct aarp {
 	u_int8_t	psaddr[4];
 	u_int8_t	hdaddr[6];
 	u_int8_t	pdaddr[4];
-};
+} __attribute__((packed));
 
 static char tstr[] = "[|atalk]";
 

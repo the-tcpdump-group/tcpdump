@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.4 2002-10-18 13:53:42 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.5 2002-11-09 17:19:30 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -45,13 +45,13 @@ static const char rcsid[] =
  */
 
 struct rsvp_common_header {
-    u_char version_flags;
-    u_char msg_type;
-    u_char checksum[2];
-    u_char ttl;
-    u_char reserved;
-    u_char length[2];
-};
+    u_int8_t version_flags;
+    u_int8_t msg_type;
+    u_int8_t checksum[2];
+    u_int8_t ttl;
+    u_int8_t reserved;
+    u_int8_t length[2];
+} __attribute__((packed));
 
 /* 
  * RFC2205 object header
@@ -68,10 +68,10 @@ struct rsvp_common_header {
  */
 
 struct rsvp_object_header {
-    u_char length[2];
-    u_char class_num;
-    u_char ctype;
-};
+    u_int8_t length[2];
+    u_int8_t class_num;
+    u_int8_t ctype;
+} __attribute__((packed));
 
 #define RSVP_VERSION            1
 #define	RSVP_EXTRACT_VERSION(x) (((x)&0xf0)>>4) 

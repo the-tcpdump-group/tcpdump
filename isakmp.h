@@ -26,7 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-/* YIPS @(#)$Id: isakmp.h,v 1.8 2002-06-11 17:08:39 itojun Exp $ */
+/* YIPS @(#)$Id: isakmp.h,v 1.9 2002-11-09 17:19:21 itojun Exp $ */
 
 /* refer to RFC 2408 */
 
@@ -110,7 +110,7 @@ struct isakmp {
 	u_int8_t flags;		/* Flags */
 	msgid_t msgid;
 	u_int32_t len;		/* Length */
-};
+} __attribute__((packed));
 
 /* Next Payload Type */
 #define ISAKMP_NPTYPE_NONE   0 /* NONE*/
@@ -153,7 +153,7 @@ struct isakmp_gen {
 	u_int8_t  np;       /* Next Payload */
 	u_int8_t  reserved; /* RESERVED, unused, must set to 0 */
 	u_int16_t len;      /* Payload Length */
-};
+} __attribute__((packed));
 
 /* 3.3 Data Attributes
          0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -170,7 +170,7 @@ struct isakmp_data {
 	u_int16_t lorv;     /* if f equal 1, Attribute Length */
 	                  /* if f equal 0, Attribute Value */
 	/* if f equal 1, Attribute Value */
-};
+} __attribute__((packed));
 #define ISAKMP_GEN_TLV 0x0000
 #define ISAKMP_GEN_TV  0x8000
 	/* mask for type of attribute format */
@@ -192,7 +192,7 @@ struct isakmp_pl_sa {
 	struct isakmp_gen h;
 	u_int32_t doi; /* Domain of Interpretation */
 	u_int32_t sit; /* Situation */
-};
+} __attribute__((packed));
 
 /* 3.5 Proposal Payload */
 	/*
@@ -209,7 +209,7 @@ struct isakmp_pl_p {
 	u_int8_t spi_size;  /* SPI Size */
 	u_int8_t num_t;     /* Number of Transforms */
 	/* SPI */
-};
+} __attribute__((packed));
 
 /* 3.6 Transform Payload */
 	/*
@@ -224,13 +224,13 @@ struct isakmp_pl_t {
 	u_int8_t  t_id;     /* Transform-Id */
 	u_int16_t reserved; /* RESERVED2 */
 	/* SA Attributes */
-};
+} __attribute__((packed));
 
 /* 3.7 Key Exchange Payload */
 struct isakmp_pl_ke {
 	struct isakmp_gen h;
 	/* Key Exchange Data */
-};
+} __attribute__((packed));
 
 /* 3.8 Identification Payload */
 	/* MUST NOT to be used, because of being defined in ipsec-doi. */
@@ -241,7 +241,7 @@ struct isakmp_pl_id {
 		u_int32_t doi_data;  /* DOI Specific ID Data */
 	} d;
 	/* Identification Data */
-};
+} __attribute__((packed));
 
 /* 3.9 Certificate Payload */
 struct isakmp_pl_cert {
@@ -253,7 +253,7 @@ struct isakmp_pl_cert {
 		certificate or certificate-related information contained in the
 		Certificate Data field.
 		*/
-};
+} __attribute__((packed));
 
 /* Certificate Type */
 #define ISAKMP_CERT_NONE   0
@@ -279,28 +279,28 @@ struct isakmp_pl_cr {
 	*/
 	/* # Certificate Authorities (1 octet) */
 	/* Certificate Authorities (variable length) */
-};
+} __attribute__((packed));
 
 /* 3.11 Hash Payload */
 	/* may not be used, because of having only data. */
 struct isakmp_pl_hash {
 	struct isakmp_gen h;
 	/* Hash Data */
-};
+} __attribute__((packed));
 
 /* 3.12 Signature Payload */
 	/* may not be used, because of having only data. */
 struct isakmp_pl_sig {
 	struct isakmp_gen h;
 	/* Signature Data */
-};
+} __attribute__((packed));
 
 /* 3.13 Nonce Payload */
 	/* may not be used, because of having only data. */
 struct isakmp_pl_nonce {
 	struct isakmp_gen h;
 	/* Nonce Data */
-};
+} __attribute__((packed));
 
 /* 3.14 Notification Payload */
 struct isakmp_pl_n {
@@ -311,7 +311,7 @@ struct isakmp_pl_n {
 	u_int16_t type;     /* Notify Message Type */
 	/* SPI */
 	/* Notification Data */
-};
+} __attribute__((packed));
 
 /* 3.14.1 Notify Message Types */
 /* NOTIFY MESSAGES - ERROR TYPES */
@@ -354,20 +354,20 @@ struct isakmp_pl_d {
 	u_int8_t  spi_size; /* SPI Size */
 	u_int16_t num_spi;  /* # of SPIs */
 	/* SPI(es) */
-};
+} __attribute__((packed));
 
 
 struct isakmp_ph1tab {
 	struct isakmp_ph1 *head;
 	struct isakmp_ph1 *tail;
 	int len;
-};
+} __attribute__((packed));
 
 struct isakmp_ph2tab {
 	struct isakmp_ph2 *head;
 	struct isakmp_ph2 *tail;
 	int len;
-};
+} __attribute__((packed));
 
 #define EXCHANGE_PROXY   1
 #define EXCHANGE_MYSELF  0
