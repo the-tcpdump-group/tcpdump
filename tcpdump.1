@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.103 2001-03-04 00:17:28 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.104 2001-06-22 08:52:05 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -419,8 +419,10 @@ True if either the ethernet source or destination address is \fIehost\fP.
 True if the packet used \fIhost\fP as a gateway.  I.e., the ethernet
 source or destination address was \fIhost\fP but neither the IP source
 nor the IP destination was \fIhost\fP.  \fIHost\fP must be a name and
-must be found in both /etc/hosts and /etc/ethers.  (An equivalent
-expression is
+must be found both by the machine's host-name-to-IP-address resolution
+mechanisms (host name file, DNS, NIS, etc.) and by the machine's
+host-name-to-Ethernet-address resolution mechanism (/etc/ethers, etc.). 
+(An equivalent expression is
 .in +.5i
 .nf
 \fBether host \fIehost \fBand not host \fIhost\fR
