@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.44 2002-08-01 08:53:01 risso Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.45 2002-08-02 04:04:37 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -393,7 +393,7 @@ decode_labeled_prefix4(const u_char *pptr, char *buf, u_int buflen)
 }
 
 
-static u_char *
+static char *
 bgp_vpn_rd_print (const u_char *pptr) {
 
    /* allocate space for the following string
