@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.52 2000-09-29 04:58:35 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.53 2000-10-03 09:13:25 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -416,16 +416,16 @@ ns_print(register const u_char *bp, u_int length)
 	nscount = ntohs(np->nscount);
 	arcount = ntohs(np->arcount);
 
-	if (np->qr) {
+	if (DNS_QR(np)) {
 		/* this is a response */
 		printf(" %d%s%s%s%s%s%s",
 			ntohs(np->id),
-			ns_ops[np->opcode],
-			ns_resp[np->rcode],
-			np->aa? "*" : "",
-			np->ra? "" : "-",
-			np->tc? "|" : "",
-			np->cd? "%" : "");
+			ns_ops[DNS_OPCODE(np)],
+			ns_resp[DNS_RCODE(np)],
+			DNS_AA(np)? "*" : "",
+			DNS_RA(np)? "" : "-",
+			DNS_TC(np)? "|" : "",
+			DNS_CD(np)? "%" : "");
 
 		if (qdcount != 1)
 			printf(" [%dq]", qdcount);
@@ -448,15 +448,15 @@ ns_print(register const u_char *bp, u_int length)
 		/* this is a request */
 		printf(" %d%s%s%s",
 		        ntohs(np->id),
-			ns_ops[np->opcode],
-			np->rd? "+" : "",
-			np->ad? "$" : "");
+			ns_ops[DNS_OPCODE(np)],
+			DNS_RD(np)? "+" : "",
+			DNS_AD(np)? "$" : "");
 
 		/* any weirdness? */
 		if (*(((u_short *)np)+1) & htons(0x6cf))
 			printf(" [b2&3=0x%x]", ntohs(*(((u_short *)np)+1)));
 
-		if (np->opcode == IQUERY) {
+		if (DNS_OPCODE(np) == IQUERY) {
 			if (qdcount)
 				printf(" [%dq]", qdcount);
 			if (ancount != 1)

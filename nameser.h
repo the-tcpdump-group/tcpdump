@@ -157,72 +157,32 @@
 #define CONV_BADCKSUM -3
 #define CONV_BADBUFLEN -4
 
-#ifndef BYTE_ORDER
-#define	LITTLE_ENDIAN	1234	/* least-significant byte first (vax, pc) */
-#define	BIG_ENDIAN	4321	/* most-significant byte first (IBM, net) */
-#define	PDP_ENDIAN	3412	/* LSB first in word, MSW first in long (pdp)*/
-
-#ifdef WORDS_BIGENDIAN
-#define BYTE_ORDER	BIG_ENDIAN
-#else
-#define BYTE_ORDER	LITTLE_ENDIAN
-#endif /* WORDS_BIGENDIAN */
-#endif /* BYTE_ORDER */
-
-#if !defined(BYTE_ORDER) || \
-    (BYTE_ORDER != BIG_ENDIAN && BYTE_ORDER != LITTLE_ENDIAN && \
-    BYTE_ORDER != PDP_ENDIAN)
-	/* you must determine what the correct bit order is for
-	 * your compiler - the next line is an intentional error
-	 * which will force your compiles to bomb until you fix
-	 * the above macros.
-	 */
-  #error "Undefined or invalid BYTE_ORDER";
-#endif
-
 /*
- * Structure for query header.  The order of the fields is machine- and
- * compiler-dependent, depending on the byte/bit order and the layout
- * of bit fields.  We use bit fields only in int variables, as this
- * is all ANSI requires.  This requires a somewhat confusing rearrangement.
+ * Structure for query header.
  */
-
 typedef struct {
 	u_int16_t id;		/* query identification number */
-#if BYTE_ORDER == BIG_ENDIAN
-			/* fields in third byte */
-	u_int	qr:1;		/* response flag */
-	u_int	opcode:4;	/* purpose of message */
-	u_int	aa:1;		/* authoritive answer */
-	u_int	tc:1;		/* truncated message */
-	u_int	rd:1;		/* recursion desired */
-			/* fields in fourth byte */
-	u_int	ra:1;		/* recursion available */
-	u_int	pr:1;		/* primary server required (non standard) */
-	u_int	ad: 1;		/* authentic data from named */
-	u_int	cd: 1;		/* checking disabled by resolver */
-	u_int	rcode:4;	/* response code */
-#endif
-#if BYTE_ORDER == LITTLE_ENDIAN || BYTE_ORDER == PDP_ENDIAN
-			/* fields in third byte */
-	u_int	rd:1;		/* recursion desired */
-	u_int	tc:1;		/* truncated message */
-	u_int	aa:1;		/* authoritive answer */
-	u_int	opcode:4;	/* purpose of message */
-	u_int	qr:1;		/* response flag */
-			/* fields in fourth byte */
-	u_int	rcode:4;	/* response code */
-	u_int	cd: 1;		/* checking disabled by resolver */
-	u_int	ad: 1;		/* authentic data from named */
-	u_int	pr:1;		/* primary server required (non standard) */
-	u_int	ra:1;		/* recursion available */
-#endif
-			/* remaining bytes */
+	u_int8_t  flags1;	/* first byte of flags */
+	u_int8_t  flags2;	/* second byte of flags */
 	u_int16_t qdcount;	/* number of question entries */
 	u_int16_t ancount;	/* number of answer entries */
 	u_int16_t nscount;	/* number of authority entries */
 	u_int16_t arcount;	/* number of resource entries */
 } HEADER;
+
+/*
+ * Macros for subfields of flag fields.
+ */
+#define DNS_QR(np)	((np)->flags1 & 0x80)		/* response flag */
+#define DNS_OPCODE(np)	((((np)->flags1) >> 3) & 0xF)	/* purpose of message */
+#define DNS_AA(np)	((np)->flags1 & 0x04)		/* authoritative answer */
+#define DNS_TC(np)	((np)->flags1 & 0x02)		/* truncated message */
+#define DNS_RD(np)	((np)->flags1 & 0x01)		/* recursion desired */
+
+#define DNS_RA(np)	((np)->flags2 & 0x80)	/* recursion available */
+#define DNS_AD(np)	((np)->flags2 & 0x20)	/* authentic data from named */
+#define DNS_CD(np)	((np)->flags2 & 0x10)	/* checking disabled by resolver */
+#define DNS_RCODE(np)	((np)->flags2 & 0xF)	/* response code */
 
 /*
  * Defines for handling compressed domain names
