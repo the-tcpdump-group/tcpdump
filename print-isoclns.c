@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.129 2005-03-09 18:42:51 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.130 2005-03-21 12:26:04 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -209,6 +209,83 @@ static struct tok clnp_option_values[] = {
     { CLNP_OPTION_QOS_MAINTENANCE, "QoS Maintenance"},
     { 0, NULL }
 };
+
+static struct tok clnp_option_rfd_class_values[] = {
+    { 0x0, "General"},
+    { 0x8, "Address"},
+    { 0x9, "Source Routeing"},
+    { 0xa, "Lifetime"},
+    { 0xb, "PDU Discarded"},
+    { 0xc, "Reassembly"},
+    { 0, NULL }
+};
+
+static struct tok clnp_option_rfd_general_values[] = {
+    { 0x0, "Reason not specified"},
+    { 0x1, "Protocol procedure error"},
+    { 0x2, "Incorrect checksum"},
+    { 0x3, "PDU discarded due to congestion"},
+    { 0x4, "Header syntax error (cannot be parsed)"},
+    { 0x5, "Segmentation needed but not permitted"},
+    { 0x6, "Incomplete PDU received"},
+    { 0x7, "Duplicate option"},
+    { 0, NULL }
+};
+
+static struct tok clnp_option_rfd_address_values[] = {
+    { 0x0, "Destination address unreachable"},
+    { 0x1, "Destination address unknown"},
+    { 0, NULL }
+};
+
+static struct tok clnp_option_rfd_source_routeing_values[] = {
+    { 0x0, "Unspecified source routeing error"},
+    { 0x1, "Syntax error in source routeing field"},
+    { 0x2, "Unknown address in source routeing field"},
+    { 0x3, "Path not acceptable"},
+    { 0, NULL }
+};
+
+static struct tok clnp_option_rfd_lifetime_values[] = {
+    { 0x0, "Lifetime expired while data unit in transit"},
+    { 0x1, "Lifetime expired during reassembly"},
+    { 0, NULL }
+};
+
+static struct tok clnp_option_rfd_pdu_discard_values[] = {
+    { 0x0, "Unsupported option not specified"},
+    { 0x1, "Unsupported protocol version"},
+    { 0x2, "Unsupported security option"},
+    { 0x3, "Unsupported source routeing option"},
+    { 0x4, "Unsupported recording of route option"},
+    { 0, NULL }
+};
+
+static struct tok clnp_option_rfd_reassembly_values[] = {
+    { 0x0, "Reassembly interference"},
+    { 0, NULL }
+};
+
+/* array of 16 error-classes */
+static struct tok *clnp_option_rfd_error_class[] = {
+    clnp_option_rfd_general_values,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    clnp_option_rfd_address_values,
+    clnp_option_rfd_source_routeing_values,
+    clnp_option_rfd_lifetime_values,
+    clnp_option_rfd_pdu_discard_values,
+    clnp_option_rfd_reassembly_values,
+    NULL,
+    NULL,
+    NULL
+};
+
 
 #define ISIS_SUBTLV_EXT_IS_REACH_ADMIN_GROUP           3 /* draft-ietf-isis-traffic-05 */
 #define ISIS_SUBTLV_EXT_IS_REACH_LINK_LOCAL_REMOTE_ID  4 /* draft-ietf-isis-gmpls-extensions */
@@ -582,6 +659,7 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
         u_int li,source_address_length,dest_address_length, clnp_pdu_type, clnp_flags;
 	const struct clnp_header_t *clnp_header;
 	const struct clnp_segment_header_t *clnp_segment_header;
+        u_int8_t rfd_error_major,rfd_error_minor;
 
 	clnp_header = (const struct clnp_header_t *) pptr;
         TCHECK(*clnp_header);
@@ -698,12 +776,20 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
                 printf("%u", *tptr);
                 break;
 
+            case CLNP_OPTION_DISCARD_REASON:
+                rfd_error_major = (*tptr&0xf0) >> 4;
+                rfd_error_minor = *tptr&0x0f;
+                printf("\n\t    Class: %s Error (0x%01x), %s (0x%01x)",
+                       tok2str(clnp_option_rfd_class_values,"Unknown",rfd_error_major),
+                       rfd_error_major,
+                       tok2str(clnp_option_rfd_error_class[rfd_error_major],"Unknown",rfd_error_minor),
+                       rfd_error_minor);
+                break;
+
                 /*
                  * FIXME those are the defined Options that lack a decoder
                  * you are welcome to contribute code ;-)
                  */
-
-            case CLNP_OPTION_DISCARD_REASON:
 
             default:
                 print_unknown_data(tptr,"\n\t  ",opli);
