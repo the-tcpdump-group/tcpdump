@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/missing/strlcpy.c,v 1.2 2002-08-01 08:53:40 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/missing/strlcpy.c,v 1.3 2002-08-02 04:38:13 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H 
@@ -47,10 +47,7 @@ static const char rcsid[] =
  * Returns strlen(src); if retval >= siz, truncation occurred.
  */
 size_t
-strlcpy(dst, src, siz)
-	char *dst;
-	const char *src;
-	size_t siz;
+strlcpy(char *dst, const char *src, size_t siz)
 {
 	register char *d = dst;
 	register const char *s = src;
