@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.57 1999-10-30 05:11:21 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.58 1999-11-21 03:50:02 assar Exp $ (LBL)";
 #endif
 
 #include <sys/param.h>
@@ -114,7 +114,8 @@ tcp_print(register const u_char *bp, register u_int length,
 	register int hlen;
 	register char ch;
 	u_short sport, dport, win, urp;
-	u_int32_t seq, ack;
+	u_int32_t seq, ack, thseq, thack;
+	int threv;
 #ifdef INET6
 	register const struct ip6_hdr *ip6;
 #endif
@@ -192,6 +193,15 @@ tcp_print(register const u_char *bp, register u_int length,
 	} else
 		putchar('.');
 
+	if (flags&0xc0) {
+		printf(" [");
+		if (flags&0x40)
+			printf("ECN-Echo");
+		if (flags&0x80)
+			printf("%sCWR", (flags&0x40) ? "," : "");
+		printf("]");
+	}
+
 	if (!Sflag && (flags & TH_ACK)) {
 		register struct tcp_seq_hash *th;
 		register int rev;
@@ -258,6 +268,7 @@ tcp_print(register const u_char *bp, register u_int length,
 		}
 #endif
 
+		threv = rev;
 		for (th = &tcp_seq_hash[tha.port % TSEQ_HASHSIZE];
 		     th->nxt; th = th->nxt)
 			if (!memcmp((char *)&tha, (char *)&th->addr,
@@ -278,6 +289,10 @@ tcp_print(register const u_char *bp, register u_int length,
 			else
 				th->seq = seq, th->ack = ack - 1;
 		} else {
+	  
+			thseq = th->seq;
+			thack = th->ack;
+
 			if (rev)
 				seq -= th->ack, ack -= th->seq;
 			else
@@ -360,15 +375,28 @@ tcp_print(register const u_char *bp, register u_int length,
 			case TCPOPT_SACK:
 				(void)printf("sack");
 				datalen = len - 2;
-				for (i = 0; i < datalen; i += 4) {
-					LENCHECK(i + 4);
-					/* block-size@relative-origin */
-					(void)printf(" %u@%u",
-					    EXTRACT_16BITS(cp + i + 2),
-					    EXTRACT_16BITS(cp + i));
+				if (datalen % 8 != 0) {
+					(void)printf(" malformed sack ");
+				} else {
+					u_int32_t s, e;
+
+					(void)printf(" sack %d ", datalen / 8);
+					for (i = 0; i < datalen; i += 8) {
+						LENCHECK(i + 4);
+						s = EXTRACT_32BITS(cp + i);
+						LENCHECK(i + 8);
+						e = EXTRACT_32BITS(cp + i + 4);
+						if (threv) {
+							s -= thseq;
+							e -= thseq;
+						} else {
+							s -= thack;
+							e -= thack;
+						}
+						(void)printf("{%u:%u}", s, e);
+					}
+					(void)printf(" ");
 				}
-				if (datalen % 4)
-					(void)printf("[len %d]", len);
 				break;
 
 			case TCPOPT_ECHO:
