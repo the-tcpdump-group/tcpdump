@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.217.2.5 2004-03-17 19:47:48 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.217.2.6 2005-01-12 11:27:07 hannes Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -216,7 +216,7 @@ extern void decnet_print(const u_char *, u_int, u_int);
 extern void default_print(const u_char *, u_int);
 extern void default_print_unaligned(const u_char *, u_int);
 extern void dvmrp_print(const u_char *, u_int);
-extern void egp_print(const u_char *);
+extern void egp_print(const u_char *, u_int);
 extern u_int enc_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int pflog_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int arcnet_if_print(const struct pcap_pkthdr *, const u_char *);

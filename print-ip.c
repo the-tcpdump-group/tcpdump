@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.128.2.8 2004-08-27 03:56:21 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.128.2.9 2005-01-12 11:27:07 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -551,7 +551,7 @@ again:
 			break;
 
 		case IPPROTO_EGP:
-			egp_print(cp);
+			egp_print(cp, len);
 			break;
 
 		case IPPROTO_OSPF:
