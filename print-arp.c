@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-arp.c,v 1.57 2002-09-04 11:22:13 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-arp.c,v 1.58 2002-09-04 18:56:11 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -161,9 +161,13 @@ static void
 atmarp_addr_print(const u_char *ha, u_int ha_len, const u_char *sa,
     u_int sa_len)
 {
-	(void)printf("%s", linkaddr_string(ha, ha_len));
-	if (sa_len != 0)
-		(void)printf(",%s", linkaddr_string(sa, sa_len));
+	if (ha_len == 0)
+		(void)printf("<No address>");
+	else {
+		(void)printf("%s", linkaddr_string(ha, ha_len));
+		if (sa_len != 0)
+			(void)printf(",%s", linkaddr_string(sa, sa_len));
+	}
 }
 
 static void
@@ -209,35 +213,23 @@ atmarp_print(const u_char *bp, u_int length, u_int caplen)
 	case ARPOP_REPLY:
 		(void)printf("arp reply %s", ipaddr_string(ATMSPA(ap)));
 		(void)printf(" is-at ");
-		if (ATMSHLN(ap) != 0)
-			atmarp_addr_print(ATMSHA(ap), ATMSHLN(ap),
-			    ATMSSA(ap), ATMSSLN(ap));
-		else
-			(void)printf("<No address>");
+		atmarp_addr_print(ATMSHA(ap), ATMSHLN(ap), ATMSSA(ap),
+		    ATMSSLN(ap));
 		break;
 
 	case ARPOP_INVREQUEST:
 		(void)printf("invarp who-is ");
-		if (ATMTHLN(ap) != 0)
-			atmarp_addr_print(ATMTHA(ap), ATMTHLN(ap),
-			    ATMTSA(ap), ATMTSLN(ap));
-		else
-			(void)printf("<No address>");
+		atmarp_addr_print(ATMTHA(ap), ATMTHLN(ap), ATMTSA(ap),
+		    ATMTSLN(ap));
 		(void)printf(" tell ");
-		if (ATMSHLN(ap) != 0)
-			atmarp_addr_print(ATMSHA(ap), ATMSHLN(ap),
-			    ATMSSA(ap), ATMSSLN(ap));
-		else
-			(void)printf("<No address>");
+		atmarp_addr_print(ATMSHA(ap), ATMSHLN(ap), ATMSSA(ap),
+		    ATMSSLN(ap));
 		break;
 
 	case ARPOP_INVREPLY:
 		(void)printf("invarp reply ");
-		if (ATMSHLN(ap) != 0)
-			atmarp_addr_print(ATMSHA(ap), ATMSHLN(ap),
-			    ATMSSA(ap), ATMSSLN(ap));
-		else
-			(void)printf("<No address>");
+		atmarp_addr_print(ATMSHA(ap), ATMSHLN(ap), ATMSSA(ap),
+		    ATMSSLN(ap));
 		(void)printf(" at %s", ipaddr_string(ATMSPA(ap)));
 		break;
 
