@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.102 2000-01-19 04:34:55 itojun Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.103 2000-01-19 04:42:20 itojun Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.102 $)
+AC_REVISION($Revision: 1.103 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -216,6 +216,7 @@ if test "$ipv6" = "yes" -a "$ipv6lib" != "none"; then
 fi
 
 
+AC_CHECK_FUNCS(getaddrinfo, [dnl
 AC_MSG_CHECKING(getaddrinfo bug)
 AC_TRY_RUN([
 #include <sys/types.h>
@@ -316,7 +317,7 @@ buggygetaddrinfo=no,
 AC_MSG_RESULT(buggy)
 buggygetaddrinfo=yes,
 AC_MSG_RESULT(buggy)
-buggygetaddrinfo=yes)
+buggygetaddrinfo=yes)], [buggygetaddrinfo=yes])
 
 if test "$buggygetaddrinfo" = "yes"; then
 	if test "$ipv6" = "yes" -a "$ipv6type" != "linux"; then

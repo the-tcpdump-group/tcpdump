@@ -35,16 +35,23 @@
  * - Return values.  There are nonstandard return values defined and used
  *   in the source code.  This is because RFC2553 is silent about which error
  *   code must be returned for which situation.
- * - PF_UNSPEC case would be handled in getipnodebyname() with the AI_ALL flag.
+ * Note:
+ * - We use getipnodebyname() just for thread-safeness.  There's no intent
+ *   to let it do PF_UNSPEC (actually we never pass PF_UNSPEC to
+ *   getipnodebyname().
+ * - The code filters out AFs that are not supported by the kernel,
+ *   when globbing NULL hostname (to loopback, or wildcard).  Is it the right
+ *   thing to do?  What is the relationship with post-RFC2553 AI_ADDRCONFIG
+ *   in ai_flags?
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif 
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/missing/getaddrinfo.c,v 1.7 2000-01-09 21:35:44 fenner Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/missing/getaddrinfo.c,v 1.8 2000-01-19 04:42:21 itojun Exp $";
 #endif
 
 #include <sys/types.h>
@@ -71,17 +78,17 @@ static const char rcsid[] =
 #include "cdecl_ext.h"
 #endif 
 
-#if 0
 #ifndef HAVE_U_INT32_T
 #include "bittypes.h"
 #endif 
-#endif
 
 #ifndef HAVE_SOCKADDR_STORAGE
 #include "sockstorage.h"
 #endif 
 
+#ifndef HAVE_ADDRINFO
 #include "addrinfo.h"
+#endif
 
 #if defined(__KAME__) && defined(INET6)
 # define FAITH
@@ -374,12 +381,13 @@ getaddrinfo(hostname, servname, hints, res)
 	    ) {
 		ai0 = *pai;
 
-		if (pai->ai_family == PF_UNSPEC)
+		if (pai->ai_family == PF_UNSPEC) {
 #ifdef PF_INET6
 			pai->ai_family = PF_INET6;
 #else
 			pai->ai_family = PF_INET;
 #endif
+		}
 		error = get_portmatch(pai, servname);
 		if (error)
 			ERR(error);
@@ -507,13 +515,16 @@ explore_fqdn(pai, hostname, servname, res)
 	const char *servname;
 	struct addrinfo **res;
 {
-	int s;
 	struct hostent *hp;
 	int h_error;
 	int af;
+	char **aplist = NULL, *apbuf = NULL;
 	char *ap;
 	struct addrinfo sentinel, *cur;
 	int i;
+#ifndef USE_GETIPNODEBY
+	int naddrs;
+#endif
 	const struct afd *afd;
 	int error;
 
@@ -522,13 +533,10 @@ explore_fqdn(pai, hostname, servname, res)
 	cur = &sentinel;
 
 	/*
-	 * filter out AFs that are not supported by the kernel
-	 * XXX errno?
+	 * Do not filter unsupported AFs here.  We need to honor content of
+	 * databases (/etc/hosts, DNS and others).  Otherwise we cannot
+	 * replace gethostbyname() by getaddrinfo().
 	 */
-	s = socket(pai->ai_family, SOCK_DGRAM, 0);
-	if (s < 0)
-		return 0;
-	close(s);
 
 	/*
 	 * if the servname does not match socktype/protocol, ignore it.
@@ -538,15 +546,16 @@ explore_fqdn(pai, hostname, servname, res)
 
 	afd = find_afd(pai->ai_family);
 
+	/*
+	 * post-RFC2553: should look at (pai->ai_flags & AI_ADDRCONFIG)
+	 * rather than hardcoding it.  we may need to add AI_ADDRCONFIG
+	 * handling code by ourselves in case we don't have getipnodebyname().
+	 */
 #ifdef USE_GETIPNODEBY
 	hp = getipnodebyname(hostname, pai->ai_family, AI_ADDRCONFIG, &h_error);
-#elif defined(HAVE_GETHOSTBYNAME2)
-	hp = gethostbyname2(hostname, pai->ai_family);
-#ifdef HAVE_H_ERRNO
-	h_error = h_errno;
 #else
-	h_error = EINVAL;
-#endif
+#ifdef HAVE_GETHOSTBYNAME2
+	hp = gethostbyname2(hostname, pai->ai_family);
 #else
 	if (pai->ai_family != AF_INET)
 		return 0;
@@ -556,7 +565,8 @@ explore_fqdn(pai, hostname, servname, res)
 #else
 	h_error = EINVAL;
 #endif
-#endif
+#endif /*HAVE_GETHOSTBYNAME2*/
+#endif /*USE_GETIPNODEBY*/
 
 	if (hp == NULL) {
 		switch (h_error) {
@@ -585,10 +595,38 @@ explore_fqdn(pai, hostname, servname, res)
 	if (hp == NULL)
 		goto free;
 
-	for (i = 0; hp->h_addr_list[i] != NULL; i++) {
+#ifdef USE_GETIPNODEBY
+	aplist = hp->h_addr_list;
+#else
+	/*
+	 * hp will be overwritten if we use gethostbyname2().
+	 * always deep copy for simplification.
+	 */
+	for (naddrs = 0; hp->h_addr_list[naddrs] != NULL; naddrs++)
+		;
+	naddrs++;
+	aplist = (char **)malloc(sizeof(aplist[0]) * naddrs);
+	apbuf = (char *)malloc(hp->h_length * naddrs);
+	if (aplist == NULL || apbuf == NULL) {
+		error = EAI_MEMORY;
+		goto free;
+	}
+	memset(aplist, 0, sizeof(aplist[0]) * naddrs);
+	for (i = 0; i < naddrs; i++) {
+		if (hp->h_addr_list[i] == NULL) {
+			aplist[i] = NULL;
+			continue;
+		}
+		memcpy(&apbuf[i * hp->h_length], hp->h_addr_list[i],
+			hp->h_length);
+		aplist[i] = &apbuf[i * hp->h_length];
+	}
+#endif
+
+	for (i = 0; aplist[i] != NULL; i++) {
 		af = hp->h_addrtype;
-		ap = hp->h_addr_list[i];
-#ifdef INET6
+		ap = aplist[i];
+#ifdef AF_INET6
 		if (af == AF_INET6
 		 && IN6_IS_ADDR_V4MAPPED((struct in6_addr *)ap)) {
 			af = AF_INET;
@@ -630,6 +668,10 @@ free:
 	if (hp)
 		freehostent(hp);
 #endif
+	if (aplist)
+		free(aplist);
+	if (apbuf)
+		free(apbuf);
 	if (sentinel.ai_next)
 		freeaddrinfo(sentinel.ai_next);
 	return error;
@@ -662,9 +704,11 @@ explore_null(pai, hostname, servname, res)
 	 * XXX errno?
 	 */
 	s = socket(pai->ai_family, SOCK_DGRAM, 0);
-	if (s < 0)
-		return 0;
-	close(s);
+	if (s < 0) {
+		if (errno != EMFILE)
+			return 0;
+	} else
+		close(s);
 
 	/*
 	 * if the servname does not match socktype/protocol, ignore it.
@@ -835,6 +879,10 @@ explore_numeric_scope(pai, hostname, servname, res)
 #ifdef INET6
 	case AF_INET6:
 		scope = if_nametoindex(cp);
+		if (scope == 0) {
+			free(hostname2);
+			return (EAI_NONAME);
+		}
 		break;
 #endif
 	}
@@ -866,9 +914,10 @@ get_name(addr, afd, res, numaddr, pai, servname)
 	const struct addrinfo *pai;
 	const char *servname;
 {
-	struct hostent *hp;
-	struct addrinfo *cur;
+	struct hostent *hp = NULL;
+	struct addrinfo *cur = NULL;
 	int error = 0;
+	char *ap = NULL, *cn = NULL;
 #ifdef USE_GETIPNODEBY
 	int h_error;
 
@@ -877,9 +926,28 @@ get_name(addr, afd, res, numaddr, pai, servname)
 	hp = gethostbyaddr(addr, afd->a_addrlen, afd->a_af);
 #endif
 	if (hp && hp->h_name && hp->h_name[0] && hp->h_addr_list[0]) {
+#ifdef USE_GETIPNODEBY
 		GET_AI(cur, afd, hp->h_addr_list[0]);
 		GET_PORT(cur, servname);
 		GET_CANONNAME(cur, hp->h_name);
+#else
+		/* hp will be damaged if we use gethostbyaddr() */
+		if ((ap = (char *)malloc(hp->h_length)) == NULL) {
+			error = EAI_MEMORY;
+			goto free;
+		}
+		memcpy(ap, hp->h_addr_list[0], hp->h_length);
+		if ((cn = strdup(hp->h_name)) == NULL) {
+			error = EAI_MEMORY;
+			goto free;
+		}
+
+		GET_AI(cur, afd, ap);
+		GET_PORT(cur, servname);
+		GET_CANONNAME(cur, cn);
+		free(ap); ap = NULL;
+		free(cn); cn = NULL;
+#endif
 	} else {
 		GET_AI(cur, afd, numaddr);
 		GET_PORT(cur, servname);
@@ -894,11 +962,14 @@ get_name(addr, afd, res, numaddr, pai, servname)
  free:
 	if (cur)
 		freeaddrinfo(cur);
+	if (ap)
+		free(ap);
+	if (cn)
+		free(cn);
 #ifdef USE_GETIPNODEBY
 	if (hp)
 		freehostent(hp);
 #endif
- /* bad: */
 	*res = NULL;
 	return error;
 }
@@ -950,6 +1021,7 @@ get_portmatch(ai, servname)
 	const struct addrinfo *ai;
 	const char *servname;
 {
+
 	/* get_port does not touch first argument. when matchonly == 1. */
 	return get_port((struct addrinfo *)ai, servname, 1);
 }
@@ -967,12 +1039,15 @@ get_port(ai, servname, matchonly)
 
 	if (servname == NULL)
 		return 0;
-	if (ai->ai_family != AF_INET
+	switch (ai->ai_family) {
+	case AF_INET:
 #ifdef AF_INET6
-	    && ai->ai_family != AF_INET6
+	case AF_INET6:
 #endif
-	    )
+		break;
+	default:
 		return 0;
+	}
 
 	switch (ai->ai_socktype) {
 	case SOCK_RAW:
