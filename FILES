@@ -110,6 +110,7 @@ print-frag6.c
 print-gre.c
 print-icmp.c
 print-icmp6.c
+print-igmp.c
 print-igrp.c
 print-ip.c
 print-ip6.c
