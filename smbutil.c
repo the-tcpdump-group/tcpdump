@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.35 2004-12-30 03:36:51 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.36 2005-01-29 10:37:02 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -649,7 +649,7 @@ smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf,
 	case 'c':
 	  {
 	    TCHECK2(*buf, stringlen);
-	    printf("%-*.*s", stringlen, stringlen, buf);
+	    printf("%-*.*s", (int)stringlen, (int)stringlen, buf);
 	    buf += stringlen;
 	    fmt++;
 	    while (isdigit((unsigned char)*fmt))
