@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.110 2003-11-30 00:19:21 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.111 2003-12-15 03:42:48 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1835,7 +1835,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	case TLV_LSP:
 	    tlv_lsp = (const struct isis_tlv_lsp *)tptr;
 	    while(tmp>0) {
-		if (!TTEST((tlv_lsp->lsp_id)[LSP_ID_LEN]))
+		if (!TTEST((tlv_lsp->lsp_id)[LSP_ID_LEN-1]))
 		    goto trunctlv;
 		printf("\n\t      lsp-id: %s",
                        isis_print_id(tlv_lsp->lsp_id, LSP_ID_LEN));
