@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.4 2000-03-13 05:00:04 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.5 2000-04-09 19:14:52 assar Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -232,6 +232,9 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 				printf("M");
 			if (p->nd_ra_flags_reserved & ND_RA_FLAG_OTHER)
 				printf("O");
+#ifndef ND_RA_FLAG_HA
+#define ND_RA_FLAG_HA	0x20
+#endif
 			if (p->nd_ra_flags_reserved & ND_RA_FLAG_HA)
 				printf("H");
 			if (p->nd_ra_flags_reserved != 0)
@@ -310,11 +313,20 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 		}
 		break;
 	}
+#ifndef	ICMP6_ROUTER_RENUMBERING
+#define ICMP6_ROUTER_RENUMBERING	138	/* router renumbering */
+#endif
 	case ICMP6_ROUTER_RENUMBERING:
 		switch (dp->icmp6_code) {
+#ifndef ICMP6_ROUTER_RENUMBERING_COMMAND
+#define ICMP6_ROUTER_RENUMBERING_COMMAND  0	/* rr command */
+#endif
 		case ICMP6_ROUTER_RENUMBERING_COMMAND:
 			printf("icmp6: router renum command");
 			break;
+#ifndef ICMP6_ROUTER_RENUMBERING_RESULT
+#define ICMP6_ROUTER_RENUMBERING_RESULT   1	/* rr result */
+#endif
 		case ICMP6_ROUTER_RENUMBERING_RESULT:
 			printf("icmp6: router renum result");
 			break;
@@ -576,6 +588,7 @@ icmp6_opt_print(register const u_char *bp, int resid)
 #undef ECHECK
 }
 
+#if defined(HAVE_STRUCT_MLD6_HDR)
 void
 mld6_print(register const u_char *bp)
 {
@@ -590,7 +603,30 @@ mld6_print(register const u_char *bp)
 
 	printf("max resp delay: %d ", ntohs(mp->mld6_maxdelay));
 	printf("addr: %s", ip6addr_string(&mp->mld6_addr));
-
-	return;
 }
+
+#elif defined(HAVE_STRUCT_ICMP6_MLD)
+
+void
+mld6_print(register const u_char *bp)
+{
+	register struct icmp6_mld *mp = (struct icmp6_mld *)bp;
+	register const u_char *ep;
+
+	/* 'ep' points to the end of avaible data. */
+	ep = snapend;
+
+	if ((u_char *)mp + sizeof(*mp) > ep)
+		return;
+
+	printf("max resp delay: %d ", ntohs(mp->icmp6m_hdr.icmp6_maxdelay));
+	printf("addr: %s", ip6addr_string(&mp->icmp6m_group));
+}
+
+#else
+
+#error unknown mld6 struct
+
+#endif
+
 #endif /* INET6 */
