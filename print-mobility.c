@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-mobility.c,v 1.8 2002-12-11 07:14:05 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-mobility.c,v 1.9 2003-02-05 02:36:25 guy Exp $";
 #endif
 
 #ifdef INET6
@@ -79,15 +79,14 @@ struct ip6_mobility {
 #define IP6MOPT_MINLEN		2
 #define IP6MOPT_PAD1          0x0	/* Pad1 */
 #define IP6MOPT_PADN          0x1	/* PadN */
-/*			      0x2	/* reserved */
+#define IP6MOPT_REFRESH	      0x2	/* Binding Refresh Advice */
+#define IP6MOPT_REFRESH_MINLEN  4
 #define IP6MOPT_ALTCOA        0x3	/* Alternate Care-of Address */
 #define IP6MOPT_ALTCOA_MINLEN  18
 #define IP6MOPT_NONCEID       0x4	/* Nonce Indices */
 #define IP6MOPT_NONCEID_MINLEN  6
 #define IP6MOPT_AUTH          0x5	/* Binding Authorization Data */
 #define IP6MOPT_AUTH_MINLEN    12
-#define IP6MOPT_REFRESH	      0x6	/* Binding Refresh Advice */
-#define IP6MOPT_REFRESH_MINLEN  4
 
 static void
 mobility_opt_print(const u_char *bp, int len)
@@ -118,6 +117,15 @@ mobility_opt_print(const u_char *bp, int len)
 			}
 			printf("(padn)");
 			break;
+		case IP6MOPT_REFRESH:
+			if (len - i < IP6MOPT_REFRESH_MINLEN) {
+				printf("(refresh: trunc)");
+				goto trunc;
+			}
+			/* units of 4 secs */
+			printf("(refresh: %d)",
+				EXTRACT_16BITS(&bp[i+2]) << 2);
+			break;
 		case IP6MOPT_ALTCOA:
 			if (len - i < IP6MOPT_ALTCOA_MINLEN) {
 				printf("(altcoa: trunc)");
@@ -130,7 +138,7 @@ mobility_opt_print(const u_char *bp, int len)
 				printf("(ni: trunc)");
 				goto trunc;
 			}
-			printf("(ni: ho=0x%04x ci=0x%04x)",
+			printf("(ni: ho=0x%04x co=0x%04x)",
 				EXTRACT_16BITS(&bp[i+2]),
 				EXTRACT_16BITS(&bp[i+4]));
 			break;
@@ -140,15 +148,6 @@ mobility_opt_print(const u_char *bp, int len)
 				goto trunc;
 			}
 			printf("(auth)");
-			break;
-		case IP6MOPT_REFRESH:
-			if (len - i < IP6MOPT_REFRESH_MINLEN) {
-				printf("(refresh: trunc)");
-				goto trunc;
-			}
-			/* units of 4 secs */
-			printf("(refresh: %d)",
-				EXTRACT_16BITS(&bp[i+2]) << 2);
 			break;
 		default:
 			if (len - i < IP6MOPT_MINLEN) {
@@ -216,8 +215,8 @@ mobility_print(const u_char *bp, const u_char *bp2)
 		hlen = IP6M_MINLEN;
     		if (vflag) {
 			TCHECK2(*mh, hlen + 8);
-			printf(" %soT cookie=%08x:%08x",
-			       type == IP6M_HOME_TEST_INIT ? "H" : "C",
+			printf(" %s Init Cookie=%08x:%08x",
+			       type == IP6M_HOME_TEST_INIT ? "Home" : "Care-of",
 			       EXTRACT_32BITS(&bp[hlen]),
 			       EXTRACT_32BITS(&bp[hlen + 4]));
 		}
@@ -232,15 +231,15 @@ mobility_print(const u_char *bp, const u_char *bp2)
 		hlen = IP6M_MINLEN;
     		if (vflag) {
 			TCHECK2(*mh, hlen + 8);
-			printf(" %soTI cookie=%08x:%08x",
-			       type == IP6M_HOME_TEST ? "H" : "C",
+			printf(" %s Init Cookie=%08x:%08x",
+			       type == IP6M_HOME_TEST ? "Home" : "Care-of",
 			       EXTRACT_32BITS(&bp[hlen]),
 			       EXTRACT_32BITS(&bp[hlen + 4]));
 		}
 		hlen += 8;
     		if (vflag) {
 			TCHECK2(*mh, hlen + 8);
-			printf(" %s KN=%08x:%08x",
+			printf(" %s Keygen Token=%08x:%08x",
 			       type == IP6M_HOME_TEST ? "Home" : "Care-of",
 			       EXTRACT_32BITS(&bp[hlen]),
 			       EXTRACT_32BITS(&bp[hlen + 4]));
@@ -253,19 +252,17 @@ mobility_print(const u_char *bp, const u_char *bp2)
 		printf(" seq#=%d", EXTRACT_16BITS(&mh->ip6m_data16[0]));
 		hlen = IP6M_MINLEN;
 		TCHECK2(*mh, hlen + 1);
-		if (bp[hlen] & 0xf8)
+		if (bp[hlen] & 0xf0)
 			printf(" ");
 		if (bp[hlen] & 0x80)
 			printf("A");
 		if (bp[hlen] & 0x40)
 			printf("H");
 		if (bp[hlen] & 0x20)
-			printf("S");
-		if (bp[hlen] & 0x10)
-			printf("D");
-		if (bp[hlen] & 0x08)
 			printf("L");
-		/* Reserved (3bits) */
+		if (bp[hlen] & 0x10)
+			printf("K");
+		/* Reserved (4bits) */
 		hlen += 1;
 		/* Reserved (8bits) */
 		hlen += 1;
@@ -278,7 +275,9 @@ mobility_print(const u_char *bp, const u_char *bp2)
 		printf("mobility: BA");
 		TCHECK(mh->ip6m_data8[0]);
 		printf(" status=%d", mh->ip6m_data8[0]);
-		/* Reserved */
+		if (mh->ip6m_data8[1] & 0x80)
+			printf(" K");
+		/* Reserved (7bits) */
 		hlen = IP6M_MINLEN;
 		TCHECK2(*mh, hlen + 2);
 		printf(" seq#=%d", EXTRACT_16BITS(&bp[hlen]));

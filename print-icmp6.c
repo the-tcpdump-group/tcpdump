@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.67 2002-12-11 22:29:21 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.68 2003-02-05 02:36:25 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -357,14 +357,12 @@ icmp6_print(const u_char *bp, const u_char *bp2)
 		printf("icmp6: ha discovery reply");
 		if (vflag) {
 			struct in6_addr *in6;
-			u_int32_t *res;
 			u_char *cp;
 
 			TCHECK(dp->icmp6_data16[0]);
 			printf("(id=%d", EXTRACT_16BITS(&dp->icmp6_data16[0]));
 			cp = (u_char *)dp + icmp6len;
-			res = (u_int32_t *)(dp + 1);
-			in6 = (struct in6_addr *)(res + 2);
+			in6 = (struct in6_addr *)(dp + 1);
 			for (; (u_char *)in6 < cp; in6++) {
 				TCHECK(*in6);
 				printf(", %s", ip6addr_string(in6));
@@ -383,8 +381,15 @@ icmp6_print(const u_char *bp, const u_char *bp2)
 		printf("icmp6: mobile router advertisement");
 		if (vflag) {
 			TCHECK(dp->icmp6_data16[0]);
-			printf("(id=%d)", EXTRACT_16BITS(&dp->icmp6_data16[0]));
-#define MPADVLEN 6
+			printf("(id=%d", EXTRACT_16BITS(&dp->icmp6_data16[0]));
+			if (dp->icmp6_data16[1] & 0xc0)
+				printf(" ");
+			if (dp->icmp6_data16[1] & 0x80)
+				printf("M");
+			if (dp->icmp6_data16[1] & 0x40)
+				printf("O");
+			printf(")");
+#define MPADVLEN 8
 			icmp6_opt_print((const u_char *)dp + MPADVLEN,
 					icmp6len - MPADVLEN);
 		}
