@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.58 2000-12-27 11:09:08 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.59 2001-02-04 02:17:54 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -354,9 +354,7 @@ ppp_protoname(u_int proto)
 	case PPP_IPX:	return "IPX";
 	case PPP_VJC:	return "VJC";
 	case PPP_VJNC:	return "VJNC";
-#ifdef PPP_COMP
 	case PPP_COMP:	return "COMP";
-#endif
 	case PPP_IPCP:	return "IPCP";
 	case PPP_IPV6CP: return "IPv6CP";
 	case PPP_IPXCP:	return "IPXCP";
@@ -980,6 +978,9 @@ handle_ppp(u_int proto, const u_char *p, int length)
 	case ETHERTYPE_IPX:	/*XXX*/
 	case PPP_IPX:
 		ipx_print(p, length);
+		break;
+	default:
+		printf("[???]");
 		break;
 	}
 }
