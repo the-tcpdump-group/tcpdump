@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/bootp.h,v 1.13 2002-12-11 07:13:50 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/bootp.h,v 1.14 2003-04-28 07:43:03 hannes Exp $ (LBL) */
 /*
  * Bootstrap Protocol (BOOTP).  RFC951 and RFC1048.
  *
@@ -27,7 +27,7 @@ struct bootp {
 	u_int8_t	bp_hops;	/* gateway hops */
 	u_int32_t	bp_xid;		/* transaction ID */
 	u_int16_t	bp_secs;	/* seconds since boot began */
-	u_int16_t	bp_flags;	/* flags: 0x8000 is broadcast */
+	u_int16_t	bp_flags;	/* flags - see bootp_flag_values[] */
 	struct in_addr	bp_ciaddr;	/* client IP address */
 	struct in_addr	bp_yiaddr;	/* 'your' IP address */
 	struct in_addr	bp_siaddr;	/* server IP address */
@@ -38,15 +38,25 @@ struct bootp {
 	u_int8_t	bp_vend[64];	/* vendor-specific area */
 };
 
+static const struct tok bootp_flag_values[] = {
+    { 0x8000,                   "Broadcast" },
+    { 0, NULL}
+};
+
 /*
  * UDP port numbers, server and client.
  */
 #define	IPPORT_BOOTPS		67
 #define	IPPORT_BOOTPC		68
 
-#define BOOTREPLY		2
-#define BOOTREQUEST		1
+#define BOOTPREPLY		2
+#define BOOTPREQUEST		1
 
+static const struct tok bootp_op_values[] = {
+    { BOOTPREQUEST,             "Request" },
+    { BOOTPREPLY,               "Reply" },
+    { 0, NULL}
+};
 
 /*
  * Vendor magic cookie (v_magic) for CMU
