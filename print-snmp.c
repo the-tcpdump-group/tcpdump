@@ -58,7 +58,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.50.4.1 2002-05-07 07:40:03 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.50.4.2 2002-07-20 23:33:08 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1537,8 +1537,9 @@ community_print(const u_char *np, u_int length, int version)
 		return;
 	}
 	/* default community */
-	if (strncmp((char *)elem.data.str, DEF_COMMUNITY,
-	    sizeof(DEF_COMMUNITY) - 1))
+	if (!(elem.asnlen == sizeof(DEF_COMMUNITY) - 1 &&
+	    strncmp((char *)elem.data.str, DEF_COMMUNITY,
+	            sizeof(DEF_COMMUNITY) - 1) == 0))
 		/* ! "public" */
 		printf("C=%.*s ", (int)elem.asnlen, elem.data.str);
 	length -= count;
