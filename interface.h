@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.221 2003-12-29 10:30:40 hannes Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.222 2003-12-29 11:05:09 hannes Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -193,9 +193,9 @@ extern const char *dnnum_string(u_short);
 extern int print_unknown_data(const u_char *, const char *,int);
 extern void ascii_print_with_offset(const u_char *, const u_char *, u_int, u_int);
 extern void ascii_print(const u_char *, const u_char *, u_int);
-extern void hex_print_with_offset(const u_char *, u_int, u_int);
+extern void hex_print_with_offset(const u_char *, const u_char *, u_int, u_int);
 extern void telnet_print(const u_char *, u_int);
-extern void hex_print(const u_char *, u_int);
+extern void hex_print(const u_char *, const u_char *, u_int);
 extern int ether_encap_print(u_short, const u_char *, u_int, u_int, u_short *);
 extern int llc_print(const u_char *, u_int, u_int, const u_char *,
 	const u_char *, u_short *);

@@ -42,7 +42,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-ascii.c,v 1.14 2003-12-29 10:51:34 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-ascii.c,v 1.15 2003-12-29 11:05:10 hannes Exp $";
 #endif
 #include <tcpdump-stdinc.h>
 #include <stdio.h>
@@ -135,7 +135,7 @@ ascii_print(register const u_char *ident, register const u_char *cp, register u_
  * telnet_print() wants this.  It is essentially default_print_unaligned()
  */
 void
-hex_print_with_offset(register const u_char *cp, register u_int length,
+hex_print_with_offset(register const u_char *ident, register const u_char *cp, register u_int length,
 		      register u_int oset)
 {
 	register u_int i, s;
@@ -145,7 +145,7 @@ hex_print_with_offset(register const u_char *cp, register u_int length,
 	i = 0;
 	while (--nshorts >= 0) {
 		if ((i++ % 8) == 0) {
-			(void)printf("\n0x%04x\t", oset);
+			(void)printf("%s0x%04x: ", ident, oset);
 			oset += HEXDUMP_BYTES_PER_LINE;
 		}
 		s = *cp++;
@@ -153,7 +153,7 @@ hex_print_with_offset(register const u_char *cp, register u_int length,
 	}
 	if (length & 1) {
 		if ((i % 8) == 0)
-			(void)printf("\n0x%04x\t", oset);
+			(void)printf("%s0x%04x: ", ident, oset);
 		(void)printf(" %02x", *cp);
 	}
 }
@@ -162,9 +162,9 @@ hex_print_with_offset(register const u_char *cp, register u_int length,
  * just for completeness
  */
 void
-hex_print(register const u_char *cp, register u_int length)
+hex_print(register const u_char *ident, register const u_char *cp, register u_int length)
 {
-	hex_print_with_offset(cp, length, 0);
+	hex_print_with_offset(ident, cp, length, 0);
 }
 
 #ifdef MAIN
