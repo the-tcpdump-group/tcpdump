@@ -1,4 +1,23 @@
-$Header: /tcpdump/master/tcpdump/CHANGES,v 1.85 2004-01-26 17:44:29 hannes Exp $
+$Header: /tcpdump/master/tcpdump/CHANGES,v 1.86 2004-03-29 17:29:41 mcr Exp $
+
+Mon.   March 29, 2004. mcr@sandelman.ottawa.on.ca. Summary for 3.8.2 release
+
+	Fixes for print-isakmp.c      CVE:    CAN-2004-0183, CAN-2004-0184
+	  		     http://www.rapid7.com/advisories/R7-0017.html
+	IP-over-IEEE1394 printing.
+	some MINGW32 changes.
+	updates for autoconf 2.5
+	fixes for print-aodv.c - check for too short packets
+	formatting changes to print-ascii for hex output.
+	check for too short packets: print-bgp.c, print-bootp.c, print-cdp.c,
+		print-chdlc.c, print-domain.c, print-icmp.c, print-icmp6.c,
+		print-ip.c, print-lwres.c, print-ospf.c, print-pim.c,
+		print-ppp.c,print-pppoe.c, print-rsvp.c, print-wb.c
+	print-ether.c - better handling of unknown types.
+	print-isoclns.c - additional decoding of types.
+	print-llc.c - strings for LLC names added.
+	print-pfloc.c - various enhancements
+	print-radius.c - better decoding to strings.
 
 Wed.   November 12, 2003. mcr@sandelman.ottawa.on.ca. Summary for 3.8 release
 
