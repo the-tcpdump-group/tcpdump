@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.59 2005-01-25 16:22:57 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.60 2005-04-06 20:09:08 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -42,6 +42,7 @@ static const char rcsid[] _U_ =
 
 #include "llc.h"
 #include "ethertype.h"
+#include "oui.h"
 
 static struct tok llc_values[] = {
         { LLCSAP_NULL,     "Null" },
@@ -70,15 +71,6 @@ static struct tok cmd2str[] = {
 	{ LLC_SABME,	"sabme" },
 	{ LLC_FRMR,	"frmr" },
 	{ 0,		NULL }
-};
-
-static struct tok snap_oui_values[] = {
-        { OUI_ENCAP_ETHER, "Ethernet" },
-        { OUI_CISCO, "Cisco" },
-        { OUI_CISCO_90, "Cisco bridged" },
-        { OUI_RFC2684, "Ethernet bridged" },
-        { OUI_APPLETALK, "Appletalk" },
-        { 0,		NULL }
 };
 
 /*
@@ -231,7 +223,7 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 
                 if (eflag)
                     (void)printf("oui %s (0x%06x), ethertype %s (0x%04x): ",
-                                 tok2str(snap_oui_values,"Unknown",orgcode),
+                                 tok2str(oui_values,"Unknown",orgcode),
                                  orgcode,
                                  tok2str(ethertype_values,"Unknown", et),
                                  et);

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.30 2005-03-21 11:35:55 hannes Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.31 2005-04-06 20:09:08 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -39,6 +39,7 @@ static const char rcsid[] _U_ =
 #include "ethertype.h"
 #include "nlpid.h"
 #include "extract.h"
+#include "oui.h"
 
 static void frf15_print(const u_char *, u_int);
 
@@ -269,19 +270,23 @@ fr_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 	case NLPID_SNAP:
 		orgcode = EXTRACT_24BITS(p);
 		et = EXTRACT_16BITS(p + 3);
+
+                if (eflag)
+                    (void)printf("SNAP, oui %s (0x%06x), ethertype %s (0x%04x): ",
+                                 tok2str(oui_values,"Unknown",orgcode),
+                                 orgcode,
+                                 tok2str(ethertype_values,"Unknown", et),
+                                 et);
+
 		if (snap_print((const u_char *)(p + 5), length - 5,
 			   caplen - 5, &extracted_ethertype, orgcode, et,
 			   0) == 0) {
 			/* ether_type not known, print raw packet */
-			if (!eflag)
+                        if (!eflag)
                             fr_hdr_print(length + hdr_len, hdr_len,
-					     dlci, flags, nlpid);
-			if (extracted_ethertype) {
-				printf("(SNAP %s) ",
-			       etherproto_string(htons(extracted_ethertype)));
-			}
+                                         dlci, flags, nlpid);
 			if (!xflag && !qflag)
-				default_print(p - hdr_len, caplen + hdr_len);
+                            default_print(p - hdr_len, caplen + hdr_len);
 		}
 		break;
 
