@@ -140,6 +140,7 @@ print-sunrpc.c
 print-tcp.c
 print-telnet.c
 print-tftp.c
+print-token.c
 print-udp.c
 print-vjc.c
 print-vrrp.c
@@ -157,5 +158,6 @@ stime.awk
 strcasecmp.c
 tcpdump.1
 tcpdump.c
+token.h
 util.c
 vfprintf.c
