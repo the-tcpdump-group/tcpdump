@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.18 2002-11-10 21:32:53 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.19 2003-01-08 12:45:26 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -141,9 +141,9 @@ cdp_print(const u_char *pptr, u_int length, u_int caplen)
 			printf("'%.*s'", len, tptr);
 			break;
                     case 0x04: /* Capabilities */
-			printf("(0x%02x): %s",
-                               *(tptr + 3),
-                               bittok2str(cdp_capability_values, "none",*(tptr + 3)));
+			printf("(0x%08x): %s",
+                               EXTRACT_32BITS(tptr),
+                               bittok2str(cdp_capability_values, "none",EXTRACT_32BITS(tptr)));
 			break;
                     case 0x05: /* Version */
                         printf("\n\t  ");
