@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-arcnet.c,v 1.18 2004-03-17 23:24:35 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-arcnet.c,v 1.19 2004-04-30 16:42:14 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -271,7 +271,7 @@ arcnet_encap_print(u_char arctype, const u_char *p,
 	case ARCTYPE_ARP_OLD:
 	case ARCTYPE_ARP:
 	case ARCTYPE_REVARP:
-		arp_print(p, length, caplen);
+	  arp_print(gndo, p, length, caplen);
 		return (1);
 
 	case ARCTYPE_ATALK:	/* XXX was this ever used? */
@@ -288,3 +288,10 @@ arcnet_encap_print(u_char arctype, const u_char *p,
 		return (0);
 	}
 }
+
+/*
+ * Local Variables:
+ * c-style: bsd
+ * End:
+ */
+

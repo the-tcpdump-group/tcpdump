@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.91 2004-04-05 00:14:08 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.92 2004-04-30 16:42:15 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -196,7 +196,7 @@ ether_encap_print(u_short ether_type, const u_char *p,
 
 	case ETHERTYPE_ARP:
 	case ETHERTYPE_REVARP:
-		arp_print(p, length, caplen);
+  	        arp_print(gndo, p, length, caplen);
 		return (1);
 
 	case ETHERTYPE_DN:
@@ -311,3 +311,10 @@ ether_encap_print(u_short ether_type, const u_char *p,
 		return (0);
 	}
 }
+
+/*
+ * Local Variables:
+ * c-style: bsd
+ * End:
+ */
+

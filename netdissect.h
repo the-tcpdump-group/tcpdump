@@ -21,7 +21,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.7 2004-04-29 02:15:41 mcr Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.8 2004-04-30 16:42:14 mcr Exp $ (LBL)
  */
 
 #ifndef netdissect_h
@@ -202,6 +202,7 @@ struct netdissect_options {
 #define ND_TCHECK(var) ND_TCHECK2(var, sizeof(var))
 
 #define ND_PRINT(STUFF) (*ndo->ndo_printf)STUFF
+#define ND_DEFAULTPRINT(ap, length) (*ndo->ndo_default_print)(ndo, ap, length)
 
 #if 0	
 extern void ts_print(netdissect_options *ipdo,
@@ -240,6 +241,7 @@ extern void eap_print(netdissect_options *,const u_char *, u_int);
 extern int esp_print(netdissect_options *,
 		     register const u_char *bp, register const u_char *bp2,
 		     int *nhdr, int *padlen);
+extern void arp_print(netdissect_options *,const u_char *, u_int, u_int);
 
 #if 0
 extern void ascii_print_with_offset(netdissect_options *, const u_char *,
@@ -255,7 +257,6 @@ extern int llc_print(netdissect_options *,
 		     const u_char *, u_int, u_int, const u_char *,
 		     const u_char *, u_short *);
 extern void aarp_print(netdissect_options *,const u_char *, u_int);
-extern void arp_print(netdissect_options *,const u_char *, u_int, u_int);
 extern void atalk_print(netdissect_options *,const u_char *, u_int);
 extern void atm_if_print(u_char *,const struct pcap_pkthdr *, const u_char *);
 extern void bootp_print(netdissect_options *,const u_char *,
