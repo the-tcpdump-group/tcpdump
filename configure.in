@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.117 2000-06-26 04:19:43 assar Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.118 2000-06-26 21:27:17 assar Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.117 $)
+AC_REVISION($Revision: 1.118 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -54,16 +54,24 @@ esac
 
 
 AC_CHECK_HEADERS(smi.h)
-AC_CHECK_LIB(smi, main)
+AC_CHECK_LIB(smi, smiInit)
 AC_MSG_CHECKING([whether to enable libsmi])
         AC_TRY_RUN([ /* libsmi available check */
 #include <smi.h>
 main()
 {
+  int current, revision, age, n;
+  const int required = 2;
   if (smiInit("")) 
     exit(1);
-  else
-    exit(0);
+  if (strcmp(SMI_LIBRARY_VERSION, smi_library_version))
+    exit(2);
+  n = sscanf(smi_library_version, "%d:%d:%d", &current, &revision, &age);
+  if (n != 3)
+    exit(3);
+  if (required < current - age || required > current)
+    exit(4);
+  exit(0);
 }
 ],
 [ AC_MSG_RESULT(yes)
