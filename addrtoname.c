@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.95 2003-06-05 13:36:33 risso Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.96 2003-07-31 22:36:44 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -209,18 +209,14 @@ getname(const u_char *ap)
 	p->nxt = newhnamemem();
 
 	/*
-	 * Only print names when:
-	 *	(1) -n was not given.
+	 * Print names unless:
+	 *	(1) -n was given.
 	 *      (2) Address is foreign and -f was given. (If -f was not
-	 *	    give, f_netmask and f_local are 0 and the test
+	 *	    given, f_netmask and f_localnet are 0 and the test
 	 *	    evaluates to true)
-	 *      (3) -a was given or the host portion is not all ones
-	 *          nor all zeros (i.e. not a network or broadcast address)
 	 */
 	if (!nflag &&
-	    (addr & f_netmask) == f_localnet &&
-	    (aflag ||
-	    !((addr & ~netmask) == 0 || (addr | netmask) == 0xffffffff))) {
+	    (addr & f_netmask) == f_localnet) {
 		hp = gethostbyaddr((char *)&addr, 4, AF_INET);
 		if (hp) {
 			char *dotp;
@@ -263,22 +259,9 @@ getname6(const u_char *ap)
 	p->nxt = newh6namemem();
 
 	/*
-	 * Only print names when:
-	 *	(1) -n was not given.
-	 *      (2) Address is foreign and -f was given. (If -f was not
-	 *	    give, f_netmask and f_local are 0 and the test
-	 *	    evaluates to true)
-	 *      (3) -a was given or the host portion is not all ones
-	 *          nor all zeros (i.e. not a network or broadcast address)
+	 * Do not print names if -n was given.
 	 */
-	if (!nflag
-#if 0
-	&&
-	    (addr & f_netmask) == f_localnet &&
-	    (aflag ||
-	    !((addr & ~netmask) == 0 || (addr | netmask) == 0xffffffff))
-#endif
-	    ) {
+	if (!nflag) {
 		hp = gethostbyaddr((char *)&addr, sizeof(addr), AF_INET6);
 		if (hp) {
 			char *dotp;

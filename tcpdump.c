@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.210 2003-07-30 05:51:40 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.211 2003-07-31 22:36:43 fenner Exp $ (LBL)";
 #endif
 
 /*
@@ -69,7 +69,6 @@ extern int SIZE_BUF;
 #include "gmt2local.h"
 #include "pcap-missing.h"
 
-int aflag;			/* translate network and broadcast addresses */
 int dflag;			/* print filter code */
 int eflag;			/* print ethernet header */
 int fflag;			/* don't translate "foreign" IP address */
@@ -352,7 +351,7 @@ main(int argc, char **argv)
 		switch (op) {
 
 		case 'a':
-			++aflag;
+			/* compatibility for old -a */
 			break;
 
 		case 'A':
@@ -600,9 +599,6 @@ main(int argc, char **argv)
 			usage();
 			/* NOTREACHED */
 		}
-
-	if (aflag && nflag)
-		error("-a and -n options are incompatible");
 
 	if (tflag > 0)
 		thiszone = gmt2local(0);
