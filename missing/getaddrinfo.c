@@ -562,12 +562,14 @@ explore_fqdn(pai, hostname, servname, res)
 	for (i = 0; hp->h_addr_list[i] != NULL; i++) {
 		af = hp->h_addrtype;
 		ap = hp->h_addr_list[i];
+#ifdef INET6
 		if (af == AF_INET6
 		 && IN6_IS_ADDR_V4MAPPED((struct in6_addr *)ap)) {
 			af = AF_INET;
 			ap = ap + sizeof(struct in6_addr)
 				- sizeof(struct in_addr);
 		}
+#endif
 
 		if (af != pai->ai_family)
 			continue;

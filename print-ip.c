@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.70 1999-10-30 05:11:14 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.71 1999-10-30 05:30:20 itojun Exp $ (LBL)";
 #endif
 
 #include <sys/param.h>
@@ -546,6 +546,9 @@ again:
 			}
 			break;
 
+#ifndef IPPROTO_PIM
+#define IPPROTO_PIM	103
+#endif
 		case IPPROTO_PIM:
 			pim_print(cp, len);
 			break;

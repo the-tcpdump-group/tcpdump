@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.3 1999-10-30 05:11:17 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.4 1999-10-30 05:30:20 itojun Exp $ (LBL)";
 #endif
 
 #include <string.h>
@@ -67,6 +67,10 @@ struct rtentry;
 #include "interface.h"
 #include "addrtoname.h"
 #include "extract.h"                    /* must come after interface.h */
+
+#ifndef HAVE_SOCKADDR_STORAGE
+#define sockaddr_storage sockaddr
+#endif
 
 static u_char *isakmp_sa_print __P((struct isakmp_gen *, u_char *, u_int32_t,
 	u_int32_t, u_int32_t));
@@ -241,6 +245,7 @@ static int
 cookie_sidecheck(int i, const u_char *bp2, int initiator)
 {
 	struct sockaddr_storage ss;
+	struct sockaddr *sa;
 	struct ip *ip;
 	struct sockaddr_in *sin;
 #ifdef INET6
@@ -270,19 +275,20 @@ cookie_sidecheck(int i, const u_char *bp2, int initiator)
 		return 0;
 	}
 
+	sa = (struct sockaddr *)&ss;
 	if (initiator) {
-		if (ss.__ss_family != cookiecache[i].iaddr.__ss_family)
+		if (sa->sa_family != ((struct sockaddr *)&cookiecache[i].iaddr)->sa_family)
 			return 0;
-		if (ss.__ss_len != cookiecache[i].iaddr.__ss_len)
+		if (sa->sa_len != ((struct sockaddr *)&cookiecache[i].iaddr)->sa_len)
 			return 0;
-		if (memcmp(&ss, &cookiecache[i].iaddr, ss.__ss_len) == 0)
+		if (memcmp(&ss, &cookiecache[i].iaddr, sa->sa_len) == 0)
 			return 1;
 	} else {
-		if (ss.__ss_family != cookiecache[i].raddr.__ss_family)
+		if (sa->sa_family != ((struct sockaddr *)&cookiecache[i].raddr)->sa_family)
 			return 0;
-		if (ss.__ss_len != cookiecache[i].raddr.__ss_len)
+		if (sa->sa_len != ((struct sockaddr *)&cookiecache[i].raddr)->sa_len)
 			return 0;
-		if (memcmp(&ss, &cookiecache[i].raddr, ss.__ss_len) == 0)
+		if (memcmp(&ss, &cookiecache[i].raddr, sa->sa_len) == 0)
 			return 1;
 	}
 	return 0;
