@@ -42,7 +42,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.33 1999-10-07 23:47:12 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.34 1999-10-17 21:12:42 mcr Exp $ (LBL)";
 #endif
 
 #include <sys/param.h>
@@ -94,7 +94,11 @@ char *Application[] = {
 #define GAUGE 2
 	"TimeTicks",
 #define TIMETICKS 3
-	"Opaque"
+	"Opaque",
+#define OPAQUE 4
+	"C-5",
+	"Counter64"
+#define COUNTER64 6
 };
 
 /*
@@ -109,8 +113,28 @@ char *Context[] = {
 #define GETRESP 2
 	"SetRequest",
 #define SETREQ 3
-	"Trap"
+	"Trap",
 #define TRAP 4
+	"GetBulk",
+#define GETBULKREQ 5
+	"Inform",
+#define INFORMREQ 6
+	"V2Trap",
+#define V2TRAP 7
+	"Report"
+#define REPORT 8
+};
+
+/*
+ * Context-specific ASN.1 types for the SNMP Exceptions and their tags
+ */
+char *Exceptions[] = {
+	"noSuchObject",
+#define NOSUCHOBJECT 0
+	"noSuchInstance",
+#define NOSUCHINSTANCE 1
+	"endOfMibView",
+#define ENDOFMIBVIEW 2
 };
 
 /*
@@ -130,10 +154,23 @@ char *ErrorStatus[] = {
 	"noSuchName",
 	"badValue",
 	"readOnly",
-	"genErr"
+	"genErr",
+	"noAccess",
+	"wrongType",
+	"wrongLength",
+	"wrongEncoding",
+	"wrongValue",
+	"noCreation",
+	"inconsistentValue",
+	"resourceUnavailable",
+	"commitFailed",
+	"undoFailed",
+	"authorizationError",
+	"notWritable",
+	"inconsistentName"
 };
 #define DECODE_ErrorStatus(e) \
-	( e >= 0 && e <= sizeof(ErrorStatus)/sizeof(ErrorStatus[0]) \
+	( e >= 0 && e < sizeof(ErrorStatus)/sizeof(ErrorStatus[0]) \
 	? ErrorStatus[e] : (sprintf(errbuf, "err=%u", e), errbuf))
 
 /*
@@ -150,7 +187,7 @@ char *GenericTrap[] = {
 #define GT_ENTERPRISE 7
 };
 #define DECODE_GenericTrap(t) \
-	( t >= 0 && t <= sizeof(GenericTrap)/sizeof(GenericTrap[0]) \
+	( t >= 0 && t < sizeof(GenericTrap)/sizeof(GenericTrap[0]) \
 	? GenericTrap[t] : (sprintf(buf, "gt=%d", t), buf))
 
 /*
@@ -172,6 +209,8 @@ struct {
 #define	CONTEXT		2
 	defineCLASS(Private),
 #define	PRIVATE		3
+	defineCLASS(Exceptions),
+#define EXCEPTIONS	4
 };
 
 /*
@@ -260,6 +299,10 @@ struct be {
 		int32_t integer;
 		u_int32_t uns;
 		const u_char *str;
+	        struct {
+		        u_int32_t high;
+		        u_int32_t low;
+		} uns64;
 	} data;
 	u_short id;
 	u_char form, class;		/* tag info */
@@ -275,13 +318,29 @@ struct be {
 #define BE_SEQ		7
 #define BE_INETADDR	8
 #define BE_PDU		9
+#define BE_UNS64	10
+#define BE_NOSUCHOBJECT	128
+#define BE_NOSUCHINST	129
+#define BE_ENDOFMIBVIEW	130
 };
+
+/*
+ * SNMP versions recognized by this module
+ */
+char *SnmpVersion[] = {
+	"SNMPv1",
+#define SNMP_VERSION_1	0
+	"SNMPv2"
+#define SNMP_VERSION_2	1
+};
+#define DECODE_SnmpVersion(v) \
+	( v >= 0 && v < sizeof(SnmpVersion)/sizeof(SnmpVersion[0]) \
+	? SnmpVersion[v] : (sprintf(versionbuf, "version=%u", v), versionbuf))
 
 /*
  * Defaults for SNMP PDU components
  */
 #define DEF_COMMUNITY "public"
-#define DEF_VERSION 0
 
 /*
  * constants for ASN.1 decoding
@@ -471,11 +530,44 @@ asn1_parse(register const u_char *p, u_int len, struct be *elem)
 				break;
 			}
 
+			case COUNTER64: {
+				register u_int32_t high, low;
+			        elem->type = BE_UNS64;
+				high = 0, low = 0;
+				for (i = elem->asnlen; i-- > 0; p++) {
+				        high = (high << 8) | 
+					    ((low & 0xFF000000) >> 24);
+					low = (low << 8) | *p;
+				}
+				elem->data.uns64.high = high;
+				elem->data.uns64.low = low;
+				break;
+			}
+
 			default:
 				elem->type = BE_OCTET;
 				elem->data.raw = (caddr_t)p;
 				printf("[P/A/%s]",
 					Class[class].Id[id]);
+				break;
+			}
+			break;
+
+		case CONTEXT:
+			switch (id) {
+			case NOSUCHOBJECT:
+				elem->type = BE_NOSUCHOBJECT;
+				elem->data.raw = NULL;
+				break;
+
+			case NOSUCHINSTANCE:
+				elem->type = BE_NOSUCHINST;
+				elem->data.raw = NULL;
+				break;
+
+			case ENDOFMIBVIEW:
+				elem->type = BE_ENDOFMIBVIEW;
+				elem->data.raw = NULL;
 				break;
 			}
 			break;
@@ -595,6 +687,39 @@ asn1_print(struct be *elem)
 		printf("%d", elem->data.uns);
 		break;
 
+	case BE_UNS64: {	/* idea borrowed from by Marshall Rose */
+	        double d;
+		int j, carry;
+		char *cpf, *cpl, last[6], first[30];
+		if (elem->data.uns64.high == 0) {
+		        printf("%u", elem->data.uns64.low);
+		        break;
+		}
+		d = elem->data.uns64.high * 4294967296.0;	/* 2^32 */
+		if (elem->data.uns64.high <= 0x1fffff) { 
+		        d += elem->data.uns64.low;
+			printf("%.f", d);
+			break;
+		}
+		d += (elem->data.uns64.low & 0xfffff000);
+		sprintf(first, "%.f", d);
+		sprintf(last, "%5.5d", elem->data.uns64.low & 0xfff);
+		for (carry = 0, cpf = first+strlen(first)-1, cpl = last+4;
+		     cpl >= last;
+		     cpf--, cpl--) {
+		        j = carry + (*cpf - '0') + (*cpl - '0');
+			if (j > 9) {
+			        j -= 10;
+				carry = 1;
+			} else {
+			        carry = 0;
+		        }
+			*cpf = j + '0';
+		}
+		fputs(first, stdout);
+		break;
+	}
+
 	case BE_STR: {
 		register int printable = 1, first = 1;
 		const u_char *p = elem->data.str;
@@ -629,6 +754,12 @@ asn1_print(struct be *elem)
 		putchar(']');
 		break;
 	}
+
+	case BE_NOSUCHOBJECT:
+	case BE_NOSUCHINST:
+	case BE_ENDOFMIBVIEW:
+	        printf("[%s]", Class[EXCEPTIONS].Id[elem->id]);
+		break;
 
 	case BE_PDU:
 		printf("%s(%u)",
@@ -768,13 +899,15 @@ varbind_print(u_char pduid, const u_char *np, u_int length, int error)
 		length -= count;
 		np += count;
 
-		if (pduid != GETREQ && pduid != GETNEXTREQ && !error)
+		if (pduid != GETREQ && pduid != GETNEXTREQ
+		    && pduid != GETBULKREQ && !error)
 				fputs("=", stdout);
 
 		/* objVal (ANY) */
 		if ((count = asn1_parse(np, length, &elem)) < 0)
 			return;
-		if (pduid == GETREQ || pduid == GETNEXTREQ) {
+		if (pduid == GETREQ || pduid == GETNEXTREQ
+		    || pduid == GETBULKREQ) {
 			if (elem.type != BE_NULL) {
 				fputs("[objVal!=NULL]", stdout);
 				asn1_print(&elem);
@@ -791,7 +924,8 @@ varbind_print(u_char pduid, const u_char *np, u_int length, int error)
 }
 
 /*
- * Decode SNMP PDUs: GetRequest, GetNextRequest, GetResponse, and SetRequest
+ * Decode SNMP PDUs: GetRequest, GetNextRequest, GetResponse, SetRequest,
+ * GetBulk, Inform, V2Trap, and Report
  */
 static void
 snmppdu_print(u_char pduid, const u_char *np, u_int length)
@@ -820,11 +954,14 @@ snmppdu_print(u_char pduid, const u_char *np, u_int length)
 		return;
 	}
 	error = 0;
-	if ((pduid == GETREQ || pduid == GETNEXTREQ)
+	if ((pduid == GETREQ || pduid == GETNEXTREQ || pduid == SETREQ
+	    || pduid == INFORMREQ || pduid == V2TRAP || pduid == REPORT)
 	    && elem.data.integer != 0) {
 		char errbuf[10];
 		printf("[errorStatus(%s)!=0]",
 			DECODE_ErrorStatus(elem.data.integer));
+	} else if (pduid == GETBULKREQ) {
+	        printf(" N=%d", elem.data.integer);
 	} else if (elem.data.integer != 0) {
 		char errbuf[10];
 		printf(" %s", DECODE_ErrorStatus(elem.data.integer));
@@ -841,9 +978,12 @@ snmppdu_print(u_char pduid, const u_char *np, u_int length)
 		asn1_print(&elem);
 		return;
 	}
-	if ((pduid == GETREQ || pduid == GETNEXTREQ)
+	if ((pduid == GETREQ || pduid == GETNEXTREQ || pduid == SETREQ
+	    || pduid == INFORMREQ || pduid == V2TRAP || pduid == REPORT)
 	    && elem.data.integer != 0)
 		printf("[errorIndex(%d)!=0]", elem.data.integer);
+	else if (pduid == GETBULKREQ)
+	        printf(" M=%d", elem.data.integer);
 	else if (elem.data.integer != 0) {
 		if (!error)
 			printf("[errorIndex(%d) w/o errorStatus]",
@@ -958,6 +1098,7 @@ snmp_print(const u_char *np, u_int length)
 {
 	struct be elem, pdu;
 	int count = 0;
+	int version = 0;
 
 	truncated = 0;
 
@@ -990,11 +1131,22 @@ snmp_print(const u_char *np, u_int length)
 		asn1_print(&elem);
 		return;
 	}
-	/* only handle version==0 */
-	if (elem.data.integer != DEF_VERSION) {
-		printf("[version(%d)!=0]", elem.data.integer);
+	/* only handle version==0 || version==1 */
+	switch (elem.data.integer) {
+	case SNMP_VERSION_1:
+	case SNMP_VERSION_2: {
+	        char versionbuf[10];
+	        if (vflag)
+		        printf("%s ", DECODE_SnmpVersion(elem.data.integer));
+		break;
+	}
+	default: {
+	        char versionbuf[10];
+		printf("[%s]", DECODE_SnmpVersion(elem.data.integer));
 		return;
 	}
+	}
+	version = elem.data.integer;
 	length -= count;
 	np += count;
 
@@ -1028,6 +1180,18 @@ snmp_print(const u_char *np, u_int length)
 	length = pdu.asnlen;
 	np = (u_char *)pdu.data.raw;
 
+	if (version == SNMP_VERSION_1 &&
+	    (pdu.id == GETBULKREQ || pdu.id == INFORMREQ || 
+	     pdu.id == V2TRAP || pdu.id == REPORT)) {
+	        printf("[v2 PDU in v1 message]");
+		return;
+	}
+
+	if (version == SNMP_VERSION_2 && pdu.id == TRAP) {
+	        printf("[v1 PDU in v2 message]");
+		return;
+	}
+
 	switch (pdu.id) {
 	case TRAP:
 		trap_print(np, length);
@@ -1036,6 +1200,10 @@ snmp_print(const u_char *np, u_int length)
 	case GETNEXTREQ:
 	case GETRESP:
 	case SETREQ:
+	case GETBULKREQ:
+	case INFORMREQ:
+	case V2TRAP:
+	case REPORT:
 		snmppdu_print(pdu.id, np, length);
 		break;
 	}
