@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.92 2001-01-02 23:00:01 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.93 2001-01-28 08:18:27 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -203,7 +203,7 @@ ip_optprint(register const u_char *cp, u_int length)
 				printf("{%d}", len);
 			else if (cp[2] || cp[3])
 				printf("%d.%d", cp[2], cp[3]);
- 			break;
+			break;
 
 		default:
 			printf(" IPOPT-%d{%d}", cp[0], len);
@@ -456,8 +456,8 @@ again:
 			if (! vflag) {
 				printf(" (gre encap)");
 				return;
-  			}
-  			break;
+			}
+			break;
 
 #ifndef IPPROTO_MOBILE
 #define IPPROTO_MOBILE 55
@@ -592,15 +592,15 @@ ipN_print(register const u_char *bp, register u_int length)
 	memcpy (&hdr, (char *)ip, 4);
 	switch (IP_V(&hdr)) {
 	case 4:
-	    ip_print (bp, length);
-	    return;
+		ip_print (bp, length);
+		return;
 #ifdef INET6
 	case 6:
-	    ip6_print (bp, length);
-	    return;
+		ip6_print (bp, length);
+		return;
 #endif
 	default:
-	    (void)printf("unknown ip %d", IP_V(&hdr));
-	    return;
+		(void)printf("unknown ip %d", IP_V(&hdr));
+		return;
 	}
 }
