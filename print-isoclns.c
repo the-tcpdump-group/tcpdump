@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.124 2004-10-19 15:27:55 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.125 2005-01-25 15:35:11 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -494,8 +494,8 @@ void isoclns_print(const u_int8_t *p, u_int length, u_int caplen)
         }
 
         if (eflag)
-            printf("nlpid %s (0x%02x), ",
-                   tok2str(nlpid_values,"Unknown NLPID (0x%02x)",*p),
+            printf("OSI NLPID %s (0x%02x)",
+                   tok2str(nlpid_values,"Unknown",*p),
                    *p);
         
 	switch (*p) {
@@ -533,6 +533,8 @@ void isoclns_print(const u_int8_t *p, u_int length, u_int caplen)
                 break;
 
 	default:
+                if (!eflag)
+                    printf("OSI NLPID 0x%02x unknown",*p);
 		(void)printf(", length: %u", length);
 		if (caplen > 1)
                         print_unknown_data(p,"\n\t",caplen);
@@ -581,7 +583,7 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
         optr = pptr;
 
         if (!eflag)
-            printf("CLNP, ");
+            printf("CLNP");
 
         /*
          * Sanity checking of the header.
@@ -602,13 +604,13 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
         pptr += (1 + source_address_length);
 
         if (vflag < 1) {
-            printf("%s > %s, length %u",
+            printf(", %s > %s, length %u",
                    print_nsap(source_address, source_address_length),
                    print_nsap(dest_address, dest_address_length),
                    length);
             return (1);
         }
-        printf("length %u", length);
+        printf(", length %u", length);
 
     printf("\n\t%s PDU, hlen: %u, v: %u, lifetime: %u.%us, PDU length: %u, checksum: 0x%04x ",
            tok2str(clnp_pdu_values,
@@ -633,6 +635,7 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
                print_nsap(dest_address, dest_address_length));
 
         /* dump the remaining header data */
+        printf("\n\tundecoded header data");
         print_unknown_data(pptr,"\n\t",clnp_header->length_indicator-(pptr-optr));
 
         switch (clnp_pdu_type) {
@@ -645,6 +648,7 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
 
         default:
             /* dump the PDU specific data */
+            printf("\n\t  undecoded non-header data");
             print_unknown_data(optr+clnp_header->length_indicator,"\n\t  ",length-clnp_header->length_indicator);
 
         }
@@ -682,7 +686,7 @@ esis_print(const u_int8_t *pptr, u_int length)
 	const struct esis_header_t *esis_header;
 
         if (!eflag)
-            printf("ES-IS, ");
+            printf("ES-IS");
 
 	if (length <= 2) {
 		if (qflag)
@@ -701,22 +705,22 @@ esis_print(const u_int8_t *pptr, u_int length)
          */
 
         if (esis_header->nlpid != NLPID_ESIS) {
-            printf("nlpid 0x%02x packet not supported", esis_header->nlpid);
+            printf(" nlpid 0x%02x packet not supported", esis_header->nlpid);
             return;
         }
 
         if (esis_header->version != ESIS_VERSION) {
-            printf("version %d packet not supported", esis_header->version);
+            printf(" version %d packet not supported", esis_header->version);
             return;
         }
                 
 	if (li > length) {
-            printf("length indicator(%d) > PDU size (%d)!", li, length);
+            printf(" length indicator(%d) > PDU size (%d)!", li, length);
             return;
 	}
 
 	if (li < sizeof(struct esis_header_t) + 2) {
-            printf("length indicator < min PDU size %d:", li);
+            printf(" length indicator < min PDU size %d:", li);
             while (--length != 0)
                 printf("%02X", *pptr++);
             return;
@@ -725,12 +729,12 @@ esis_print(const u_int8_t *pptr, u_int length)
         esis_pdu_type = esis_header->type & ESIS_PDU_TYPE_MASK;
 
         if (vflag < 1) {
-            printf("%s, length %u",
+            printf(", %s, length %u",
                    tok2str(esis_pdu_values,"unknown type (%u)",esis_pdu_type),
                    length);
             return;
         } else
-            printf("length %u\n\t%s (%u)",
+            printf(", length %u\n\t%s (%u)",
                    length,
                    tok2str(esis_pdu_values,"unknown type: %u", esis_pdu_type),
                    esis_pdu_type);
@@ -1377,7 +1381,7 @@ static int isis_print (const u_int8_t *p, u_int length)
     header_psnp = (const struct isis_psnp_header *)pptr;
 
     if (!eflag)
-        printf("IS-IS, ");
+        printf("IS-IS");
 
     /*
      * Sanity checking of the header.
@@ -1442,7 +1446,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 
     /* in non-verbose mode print the basic PDU Type plus PDU specific brief information*/
     if (vflag < 1) {
-        printf("%s", tok2str(isis_pdu_values,"unknown PDU-Type %u",pdu_type));
+        printf(", %s", tok2str(isis_pdu_values,"unknown PDU-Type %u",pdu_type));
 
 	switch (pdu_type) {
 
