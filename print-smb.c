@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.32 2004-05-31 02:08:27 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.33 2004-12-28 09:16:09 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -330,6 +330,7 @@ print_ipc(const u_char *param, int paramlen, const u_char *data, int datalen)
 static void
 print_trans(const u_char *words, const u_char *data1, const u_char *buf, const u_char *maxbuf)
 {
+    u_int bcc;
     const char *f1, *f2, *f3, *f4;
     const u_char *data, *param;
     const u_char *w = words + 1;
@@ -358,6 +359,10 @@ print_trans(const u_char *words, const u_char *data1, const u_char *buf, const u
     }
 
     smb_fdata(words + 1, f1, SMBMIN(words + 1 + 2 * words[0], maxbuf));
+
+    TCHECK2(*data, 2);
+    bcc = EXTRACT_LE_16BITS(data);
+    printf("smb_bcc=%u\n", bcc);
     smb_fdata(data1 + 2, f2, maxbuf - (paramlen + datalen));
 
     if (strcmp((const char *)(data1 + 2), "\\MAILSLOT\\BROWSE") == 0) {
@@ -384,28 +389,30 @@ trunc:
 static void
 print_negprot(const u_char *words, const u_char *data, const u_char *buf _U_, const u_char *maxbuf)
 {
-    u_int wcnt;
+    u_int wct, bcc;
     const char *f1 = NULL, *f2 = NULL;
 
     TCHECK(words[0]);
-    wcnt = words[0];
+    wct = words[0];
     if (request)
 	f2 = "*|Dialect=[Z]\n";
     else {
-	if (wcnt == 1)
+	if (wct == 1)
 	    f1 = "Core Protocol\nDialectIndex=[d]";
-	else if (wcnt == 17)
+	else if (wct == 17)
 	    f1 = "NT1 Protocol\nDialectIndex=[d]\nSecMode=[B]\nMaxMux=[d]\nNumVcs=[d]\nMaxBuffer=[D]\nRawSize=[D]\nSessionKey=[W]\nCapabilities=[W]\nServerTime=[T3]TimeZone=[d]\nCryptKey=";
-	else if (wcnt == 13)
+	else if (wct == 13)
 	    f1 = "Coreplus/Lanman1/Lanman2 Protocol\nDialectIndex=[d]\nSecMode=[w]\nMaxXMit=[d]\nMaxMux=[d]\nMaxVcs=[d]\nBlkMode=[w]\nSessionKey=[W]\nServerTime=[T1]TimeZone=[d]\nRes=[W]\nCryptKey=";
     }
 
     if (f1)
-	smb_fdata(words + 1, f1, SMBMIN(words + 1 + wcnt * 2, maxbuf));
+	smb_fdata(words + 1, f1, SMBMIN(words + 1 + wct * 2, maxbuf));
     else
-	print_data(words + 1, SMBMIN(wcnt * 2, PTR_DIFF(maxbuf, words + 1)));
+	print_data(words + 1, SMBMIN(wct * 2, PTR_DIFF(maxbuf, words + 1)));
 
     TCHECK2(*data, 2);
+    bcc = EXTRACT_LE_16BITS(data);
+    printf("smb_bcc=%u\n", bcc);
     if (f2)
 	smb_fdata(data + 2, f2, SMBMIN(data + 2 + EXTRACT_LE_16BITS(data), maxbuf));
     else
@@ -419,31 +426,33 @@ trunc:
 static void
 print_sesssetup(const u_char *words, const u_char *data, const u_char *buf _U_, const u_char *maxbuf)
 {
-    u_int wcnt;
+    u_int wct, bcc;
     const char *f1 = NULL, *f2 = NULL;
 
     TCHECK(words[0]);
-    wcnt = words[0];
+    wct = words[0];
     if (request) {
-	if (wcnt == 10)
+	if (wct == 10)
 	    f1 = "Com2=[w]\nOff2=[d]\nBufSize=[d]\nMpxMax=[d]\nVcNum=[d]\nSessionKey=[W]\nPassLen=[d]\nCryptLen=[d]\nCryptOff=[d]\nPass&Name=\n";
 	else
 	    f1 = "Com2=[B]\nRes1=[B]\nOff2=[d]\nMaxBuffer=[d]\nMaxMpx=[d]\nVcNumber=[d]\nSessionKey=[W]\nCaseInsensitivePasswordLength=[d]\nCaseSensitivePasswordLength=[d]\nRes=[W]\nCapabilities=[W]\nPass1&Pass2&Account&Domain&OS&LanMan=\n";
     } else {
-	if (wcnt == 3) {
+	if (wct == 3) {
 	    f1 = "Com2=[w]\nOff2=[d]\nAction=[w]\n";
-	} else if (wcnt == 13) {
+	} else if (wct == 13) {
 	    f1 = "Com2=[B]\nRes=[B]\nOff2=[d]\nAction=[w]\n";
 	    f2 = "NativeOS=[S]\nNativeLanMan=[S]\nPrimaryDomain=[S]\n";
 	}
     }
 
     if (f1)
-	smb_fdata(words + 1, f1, SMBMIN(words + 1 + wcnt * 2, maxbuf));
+	smb_fdata(words + 1, f1, SMBMIN(words + 1 + wct * 2, maxbuf));
     else
-	print_data(words + 1, SMBMIN(wcnt * 2, PTR_DIFF(maxbuf, words + 1)));
+	print_data(words + 1, SMBMIN(wct * 2, PTR_DIFF(maxbuf, words + 1)));
 
     TCHECK2(*data, 2);
+    bcc = EXTRACT_LE_16BITS(data);
+    printf("smb_bcc=%u\n", bcc);
     if (f2)
 	smb_fdata(data + 2, f2, SMBMIN(data + 2 + EXTRACT_LE_16BITS(data), maxbuf));
     else
@@ -783,7 +792,6 @@ print_smb(const u_char *buf, const u_char *maxbuf)
 	    (*fn->descript.fn)(words, data, buf, maxbuf);
 	else {
 	    if (wct) {
-		printf("smbvwv[]=\n");
 		if (f1)
 		    smb_fdata(words + 1, f1, words + 1 + wct * 2);
 		else {
@@ -800,13 +808,11 @@ print_smb(const u_char *buf, const u_char *maxbuf)
 
 	    TCHECK2(*data, 2);
 	    bcc = EXTRACT_LE_16BITS(data);
+	    printf("smb_bcc=%u\n", bcc);
 	    if (f2) {
-		if (bcc > 0) {
-		    printf("smbbuf[]=\n");
+		if (bcc > 0)
 		    smb_fdata(data + 2, f2, data + 2 + bcc);
-		}
 	    } else {
-		printf("smb_bcc=%u\n", bcc);
 		if (bcc > 0) {
 		    printf("smb_buf[]=\n");
 		    print_data(data + 2, SMBMIN(bcc, PTR_DIFF(maxbuf, data + 2)));
