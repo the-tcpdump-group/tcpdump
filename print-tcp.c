@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.113 2004-04-24 17:19:00 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.114 2004-04-26 06:17:31 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -574,10 +574,6 @@ tcp_print(register const u_char *bp, register u_int length,
 
 			case TCPOPT_SIGNATURE:
 				(void)printf("md5:");
-				if (IP_V(ip) != 4) {
-					(void)printf("!ipv4");
-					break;
-				}
 				datalen = TCP_SIGLEN;
 				LENCHECK(datalen);
 #ifdef HAVE_LIBCRYPTO
@@ -714,7 +710,10 @@ tcp_verify_signature(const struct ip *ip, const struct tcphdr *tp,
 	char sig[TCP_SIGLEN];
 	char zero_proto = 0;
 	MD5_CTX ctx;
-	u_short savecsum, tlen;
+	u_int16_t savecsum, tlen;
+	struct ip6_hdr *ip6;
+	u_int32_t len32;
+	u_int8_t nxt;
 
 	tp1 = *tp;
 
@@ -725,13 +724,28 @@ tcp_verify_signature(const struct ip *ip, const struct tcphdr *tp,
 	/*
 	 * Step 1: Update MD5 hash with IP pseudo-header.
 	 */
-	MD5_Update(&ctx, (char *)&ip->ip_src, sizeof(ip->ip_src));
-	MD5_Update(&ctx, (char *)&ip->ip_dst, sizeof(ip->ip_dst));
-	MD5_Update(&ctx, (char *)&zero_proto, sizeof(zero_proto));
-	MD5_Update(&ctx, (char *)&ip->ip_p, sizeof(ip->ip_p));
-	tlen = EXTRACT_16BITS(&ip->ip_len) - IP_HL(ip) * 4;
-	tlen = htons(tlen);
-	MD5_Update(&ctx, (char *)&tlen, sizeof(tlen));
+	if (IP_V(ip) == 4) {
+		MD5_Update(&ctx, (char *)&ip->ip_src, sizeof(ip->ip_src));
+		MD5_Update(&ctx, (char *)&ip->ip_dst, sizeof(ip->ip_dst));
+		MD5_Update(&ctx, (char *)&zero_proto, sizeof(zero_proto));
+		MD5_Update(&ctx, (char *)&ip->ip_p, sizeof(ip->ip_p));
+		tlen = EXTRACT_16BITS(&ip->ip_len) - IP_HL(ip) * 4;
+		tlen = htons(tlen);
+		MD5_Update(&ctx, (char *)&tlen, sizeof(tlen));
+	} else if (IP_V(ip) == 6) {
+		ip6 = (struct ip6_hdr *)ip;
+		MD5_Update(&ctx, (char *)&ip6->ip6_src, sizeof(ip6->ip6_src));
+		MD5_Update(&ctx, (char *)&ip6->ip6_dst, sizeof(ip6->ip6_dst));
+		len32 = htonl(ntohs(ip6->ip6_plen));
+		MD5_Update(&ctx, (char *)&len32, sizeof(len32));
+		nxt = 0;
+		MD5_Update(&ctx, (char *)&nxt, sizeof(nxt));
+		MD5_Update(&ctx, (char *)&nxt, sizeof(nxt));
+		MD5_Update(&ctx, (char *)&nxt, sizeof(nxt));
+		nxt = IPPROTO_TCP;
+		MD5_Update(&ctx, (char *)&nxt, sizeof(nxt));
+	} else
+		return (-1);
 
 	/*
 	 * Step 2: Update MD5 hash with TCP header, excluding options.
