@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.131 2005-03-22 08:18:10 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.132 2005-04-02 18:32:41 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -817,9 +817,10 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
             
         default:
             /* dump the PDU specific data */
-            printf("\n\t  undecoded non-header data, length %u",length-clnp_header->length_indicator);
-            print_unknown_data(pptr,"\n\t  ",length-(pptr-optr));
-
+            if (length-(pptr-optr) > 0) {
+                printf("\n\t  undecoded non-header data, length %u",length-clnp_header->length_indicator);
+                print_unknown_data(pptr,"\n\t  ",length-(pptr-optr));
+            }
         }
 
         return (1);
