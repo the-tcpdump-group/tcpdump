@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.71 2002-09-14 13:14:04 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.72 2002-09-14 13:25:36 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -391,16 +391,11 @@ handle_ctrl_proto(u_int proto, const u_char *p, int length)
 		return;
 	}
 
-	code = *p;
-	p++;
-	if (code > CPCODES_MAX)
-            return;
+	code = *p++;
 	
         printf("%s (%u)",
                tok2str(cpcodes, "unknown opcode 0x%02x",code),
-               *p); /* ID */
-
-	p++;
+               *p++); /* ID */
 
 	len = EXTRACT_16BITS(p);
 	p += 2;
@@ -482,7 +477,7 @@ handle_ctrl_proto(u_int proto, const u_char *p, int length)
 		/* XXX: need to decode Message? */
 		break;
 	default:
-		printf(", unknown-Codes-0x%02x", code);
+                print_unknown_data(p,"\n\t",len);
 		break;
 	}
 }
