@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.190 2002-12-18 09:41:19 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.191 2002-12-19 05:44:47 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -812,7 +812,7 @@ void
 default_print_packet(register const u_char *bp, register u_int length,
     u_int hdr_length)
 {
-	if (eflag) {
+	if (xflag > 1) {
 		/*
 		 * Include the link-layer header.
 		 */

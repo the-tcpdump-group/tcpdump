@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.133 2002-12-19 05:35:57 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.134 2002-12-19 05:44:47 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -436,7 +436,7 @@ telnet \fBSB\fP ... \fBSE\fP options
 are printed in full.
 With
 .B \-X
-telnet options are printed in hex as well.
+Telnet options are printed in hex as well.
 .TP
 .B \-w
 Write the raw packets to \fIfile\fR rather than parsing and printing
@@ -445,10 +445,7 @@ They can later be printed with the \-r option.
 Standard output is used if \fIfile\fR is ``-''.
 .TP
 .B \-x
-Print each packet (minus its link level header, unless
-.B \-e
-is specified)
-in hex.
+Print each packet (minus its link level header) in hex.
 The smaller of the entire packet or
 .I snaplen
 bytes will be printed.  Note that this is the entire link-layer
@@ -456,16 +453,19 @@ packet, so for link layers that pad (e.g. Ethernet), the padding bytes
 will also be printed when the higher layer packet is shorter than the
 required padding.
 .TP
+.B \-xx
+Print each packet,
+.I including
+its link level header, in hex.
+.TP
 .B \-X
-When printing hex, print ASCII too.
-Thus if
-.B \-x
-is also set, the packet is printed in hex/ASCII.
+Print each packet (minus its link level header) in hex and ASCII.
 This is very handy for analysing new protocols.
-Even if
-.B \-x
-is not also set, some parts of some packets may be printed
-in hex/ASCII.
+.TP
+.B \-XX
+Print each packet,
+.I including
+its link level header, in hex and ASCII.
 .IP "\fI expression\fP"
 .RS
 selects which packets will be dumped.
