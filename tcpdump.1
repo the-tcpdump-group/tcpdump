@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.166 2004-11-26 00:17:26 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.167 2004-12-28 22:31:25 guy Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -1811,11 +1811,6 @@ decode done if -v is used.
 Be warned that with -v a single SMB packet
 may take up a page or more, so only use -v if you really want all the
 gory details.
-
-If you are decoding SMB sessions containing unicode strings then you
-may wish to set the environment variable USE_UNICODE to 1.
-A patch to
-auto-detect unicode strings would be welcome.
 
 For information on SMB packet formats and what all te fields mean see
 www.cifs.org or the pub/samba/specs/ directory on your favorite
