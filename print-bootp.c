@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.73 2003-05-01 18:02:12 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.74 2003-07-01 19:16:06 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -44,6 +44,17 @@ static void rfc1048_print(const u_char *);
 static void cmu_print(const u_char *);
 
 static char tstr[] = " [|bootp]";
+
+static const struct tok bootp_flag_values[] = {
+    { 0x8000,                   "Broadcast" },
+    { 0, NULL}
+};
+
+static const struct tok bootp_op_values[] = {
+    { BOOTPREQUEST,             "Request" },
+    { BOOTPREPLY,               "Reply" },
+    { 0, NULL}
+};
 
 /*
  * Print bootp requests
