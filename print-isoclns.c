@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.123 2004-10-18 12:34:36 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.124 2004-10-19 15:27:55 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -527,6 +527,10 @@ void isoclns_print(const u_int8_t *p, u_int length, u_int caplen)
                 ip6_print(p+1, length-1);
                 break;
 #endif
+
+        case NLPID_PPP:
+                ppp_print(p+1, length-1);
+                break;
 
 	default:
 		(void)printf(", length: %u", length);
