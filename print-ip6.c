@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.19 2001-11-15 07:43:31 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.20 2001-11-15 07:51:09 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -81,6 +81,7 @@ ip6_print(register const u_char *bp, register u_int length)
 		snapend += abuf - (u_char *)ip6;
 		packetp = abuf;
 		ip6 = (struct ip6_hdr *)abuf;
+		bp = abuf;
 	}
 #endif
 	TCHECK(*ip6);
