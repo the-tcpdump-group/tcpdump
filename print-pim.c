@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.11 1999-11-17 04:14:50 assar Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.12 1999-11-17 14:58:13 itojun Exp $ (LBL)";
 #endif
 
 #include <sys/param.h>
@@ -492,17 +492,17 @@ pimv2_print(register const u_char *bp, register u_int len)
 				}
 				bp += advance;
 
-				if (bp + 2 >= ep) {
+				if (bp + 1 >= ep) {
 					(void)printf("...)");
 					goto bs_done;
 				}
 				(void)printf(",holdtime=%d",
 					     ntohs(*(u_int16_t *)bp));
-				if (bp + 3 >= ep) {
+				if (bp + 2 >= ep) {
 					(void)printf("...)");
 					goto bs_done;
 				}
-				(void)printf(",prio=%d", bp[3]);
+				(void)printf(",prio=%d", bp[2]);
 				bp += 4;
 			}
 			(void)printf(")");
