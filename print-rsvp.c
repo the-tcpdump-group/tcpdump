@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.30 2004-07-21 21:50:46 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.31 2004-09-16 06:34:01 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -140,6 +140,7 @@ static const struct tok rsvp_header_flag_values[] = {
 #define	RSVP_OBJ_LABEL_SET          36  /* rfc3473 */
 #define	RSVP_OBJ_PROTECTION         37  /* rfc3473 */
 #define	RSVP_OBJ_DETOUR             63  /* draft-ietf-mpls-rsvp-lsp-fastreroute-01 */
+#define	RSVP_OBJ_CLASSTYPE          125 /* draft-ietf-tewg-diff-te-proto-07 */
 #define	RSVP_OBJ_SUGGESTED_LABEL    129 /* rfc3473 */
 #define	RSVP_OBJ_ACCEPT_LABEL_SET   130 /* rfc3473 */
 #define	RSVP_OBJ_RESTART_CAPABILITY 131 /* rfc3473 */
@@ -179,6 +180,7 @@ static const struct tok rsvp_obj_values[] = {
     { RSVP_OBJ_LABEL_SET,          "Label Set" },
     { RSVP_OBJ_ACCEPT_LABEL_SET,   "Acceptable Label Set" },
     { RSVP_OBJ_DETOUR,             "Detour" },
+    { RSVP_OBJ_CLASSTYPE,          "Class Type" },
     { RSVP_OBJ_SUGGESTED_LABEL,    "Suggested Label" },
     { RSVP_OBJ_PROPERTIES,         "Properties" },
     { RSVP_OBJ_FASTREROUTE,        "Fast Re-Route" },
@@ -264,6 +266,7 @@ static const struct tok rsvp_ctype_values[] = {
     { 256*RSVP_OBJ_FASTREROUTE+RSVP_CTYPE_TUNNEL_IPV4,       "Tunnel IPv4" },
     { 256*RSVP_OBJ_DETOUR+RSVP_CTYPE_TUNNEL_IPV4,            "Tunnel IPv4" },
     { 256*RSVP_OBJ_PROPERTIES+RSVP_CTYPE_1,                  "1" },
+    { 256*RSVP_OBJ_CLASSTYPE+RSVP_CTYPE_1,                   "1" },
     { 0, NULL}
 };
 
@@ -1138,6 +1141,20 @@ rsvp_obj_print (const u_char *tptr, const char *ident, u_int tlen) {
                     obj_tlen-=8;
                     obj_tptr+=8;
                 }
+                break;
+            default:
+                hexdump=TRUE;
+            }
+            break;
+
+        case RSVP_OBJ_CLASSTYPE:
+            switch(rsvp_obj_ctype) {
+            case RSVP_CTYPE_1:
+                printf("%s  Class Type: %u",
+                       ident,
+                       EXTRACT_32BITS(obj_tptr)&0x7);              
+                obj_tlen-=4;
+                obj_tptr+=4;
                 break;
             default:
                 hexdump=TRUE;
