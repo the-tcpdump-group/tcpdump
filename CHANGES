@@ -4,7 +4,7 @@ Tuesday January 9, 2001. mcr@sandelman.ottawa.on.ca. Summary for 3.6 release
 	IPsec changes/cleanups.
 	Alignment fixes for picky architectures
 
-	Removed dependancy on native headers for packet dissectors.
+	Removed dependency on native headers for packet dissectors.
 	Removed Linux specific headers that were shipped
 
 	libpcap changes provide for exchanging capture files between
@@ -22,14 +22,15 @@ Tuesday January 9, 2001. mcr@sandelman.ottawa.on.ca. Summary for 3.6 release
 
 	Added filtering support for: VLANs, ESIS, ISIS
 
-	Improvemenets to: print-telnet, IPTalk, bootp/dhcp, ECN, PPP, L2TP, PPPoE
+	Improvements to: print-telnet, IPTalk, bootp/dhcp, ECN, PPP,
+		L2TP, PPPoE
 
 	HP-UX 11.0 -- find the right dlpi device.
 	Solaris 8 - IPv6 works
 	Linux - Added support for an "any" device to capture on all interfaces
 	
-	Security fixes: buffer overrun audit done. Strcpy replaced with strlcpy, sprintf
-		repalced with snprintf.
+	Security fixes: buffer overrun audit done. Strcpy replaced with
+		strlcpy, sprintf replaced with snprintf.
 	Look for lex problems, and warn about them.
 
 
@@ -592,4 +593,4 @@ v2.0 Sun Jan 13 12:20:40 PST 1991
 
 - Initial public release.
 
-@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.77 2001-01-10 00:14:30 mcr Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.78 2001-01-10 05:30:07 guy Exp $ (LBL)
