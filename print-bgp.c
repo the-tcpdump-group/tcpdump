@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.51 2002-10-05 10:45:27 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.52 2002-10-11 10:33:09 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -174,11 +174,13 @@ static struct tok bgp_opt_values[] = {
 
 #define BGP_CAPCODE_MP                  1
 #define BGP_CAPCODE_RR                  2
+#define BGP_CAPCODE_RESTART            64 /* draft-ietf-idr-restart-05  */
 #define BGP_CAPCODE_RR_CISCO          128
 
 static struct tok bgp_capcode_values[] = {
     { BGP_CAPCODE_MP,           "Multiprotocol Extensions"},
     { BGP_CAPCODE_RR,           "Route Refresh"},
+    { BGP_CAPCODE_RESTART,      "Graceful Restart"},
     { BGP_CAPCODE_RR_CISCO,     "Route Refresh (Cisco)"},
     { 0, NULL}
 };
@@ -1086,7 +1088,7 @@ bgp_open_print(const u_char *dat, int length)
 	struct bgp_opt bgpopt;
 	int hlen;
 	const u_char *opt;
-	int i,cap_type,cap_len;
+	int i,cap_type,cap_len,tcap_len,cap_offset;
 
 	TCHECK2(dat[0], BGP_OPEN_SIZE);
 	memcpy(&bgpo, dat, BGP_OPEN_SIZE);
@@ -1125,6 +1127,7 @@ bgp_open_print(const u_char *dat, int length)
                 case BGP_OPT_CAP:
                     cap_type=opt[i+BGP_OPT_SIZE];
                     cap_len=opt[i+BGP_OPT_SIZE+1];
+                    tcap_len=cap_len;
                     printf("\n\t      %s, length: %u",
                            tok2str(bgp_capcode_values,"Unknown", cap_type),
                            cap_len);
@@ -1136,14 +1139,35 @@ bgp_open_print(const u_char *dat, int length)
                                tok2str(bgp_safi_values,"Unknown", opt[i+BGP_OPT_SIZE+5]),
                                opt[i+BGP_OPT_SIZE+5]);
                         break;
+                    case BGP_CAPCODE_RESTART:
+                        printf("\n\t\tRestart Flags: [%s], Restart Time %us",
+                               (opt[i+BGP_OPT_SIZE+2]) ? "R" : "none",
+                               EXTRACT_16BITS(opt+i+BGP_OPT_SIZE+2)&0xfff);
+                        tcap_len-=2;
+                        cap_offset=4;
+                        while(tcap_len>=4) {
+                            printf("\n\t\t  AFI %s (%u), SAFI %s (%u), Forwarding state preserved: %s",
+                                   tok2str(bgp_afi_values,"Unknown", EXTRACT_16BITS(opt+i+BGP_OPT_SIZE+cap_offset)),
+                                   EXTRACT_16BITS(opt+i+BGP_OPT_SIZE+cap_offset),
+                                   tok2str(bgp_safi_values,"Unknown", opt[i+BGP_OPT_SIZE+cap_offset+2]),
+                                   opt[i+BGP_OPT_SIZE+cap_offset+2],
+                                   ((opt[i+BGP_OPT_SIZE+cap_offset+3])&0x80) ? "yes" : "no" );
+                            tcap_len-=4;
+                            cap_offset+=4;
+                        }
+                        break;
                     case BGP_CAPCODE_RR:
                     case BGP_CAPCODE_RR_CISCO:
                         break;
                     default:
                         printf("\n\t\tno decoder for Capability %u",
                                cap_type);
+                        if (vflag <= 1)
+                            print_unknown_data(&opt[i+BGP_OPT_SIZE+2],"\n\t\t",cap_len);
                         break;
                     }
+                    if (vflag > 1)
+                        print_unknown_data(&opt[i+BGP_OPT_SIZE+2],"\n\t\t",cap_len);
                     break;
                 case BGP_OPT_AUTH:
                 default:
