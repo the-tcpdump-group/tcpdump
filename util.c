@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.85 2003-04-21 16:59:52 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.86 2003-07-30 00:20:28 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -328,15 +328,15 @@ mask2plen (u_int32_t mask)
 		0xffffff80, 0xffffffc0, 0xffffffe0, 0xfffffff0,
 		0xfffffff8, 0xfffffffc, 0xfffffffe, 0xffffffff
 	};
-	int prefix_len = 33;
+	int prefix_len = 32;
 
-        /* lets see if we can transform the mask into a prefixlen */
-        while (prefix_len >= 0) {
-            if (bitmasks[prefix_len] == mask)
-                break;
-            prefix_len--;
-        }
-        return (prefix_len);
+	/* let's see if we can transform the mask into a prefixlen */
+	while (prefix_len >= 0) {
+		if (bitmasks[prefix_len] == mask)
+			break;
+		prefix_len--;
+	}
+	return (prefix_len);
 }
 
 /* VARARGS */
