@@ -1,4 +1,4 @@
-$Header: /tcpdump/master/tcpdump/CHANGES,v 1.84 2003-11-13 04:06:02 mcr Exp $
+$Header: /tcpdump/master/tcpdump/CHANGES,v 1.85 2004-01-26 17:44:29 hannes Exp $
 
 Wed.   November 12, 2003. mcr@sandelman.ottawa.on.ca. Summary for 3.8 release
 
@@ -708,9 +708,3 @@ v2.0.1 Sun Jan 26 21:10:10 PDT
 v2.0 Sun Jan 13 12:20:40 PST 1991
 
 - Initial public release.
-
-<<<<<<< CHANGES
-@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.84 2003-11-13 04:06:02 mcr Exp $ (LBL)
-=======
-@(#) $Header: /tcpdump/master/tcpdump/CHANGES,v 1.84 2003-11-13 04:06:02 mcr Exp $ (LBL)
->>>>>>> 1.81.2.1
