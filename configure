@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.119 
+# From configure.in Revision: 1.120 
 
 
 
@@ -4775,11 +4775,6 @@ fi
 fi
 
 
-if test -r ${srcdir}/lbl/gnuc.h ; then
-	rm -f gnuc.h
-	ln -s ${srcdir}/lbl/gnuc.h gnuc.h
-fi
-
 
 
 
@@ -4798,7 +4793,7 @@ fi
 # SVR4 /usr/ucb/install, which tries to use the nonexistent group "staff"
 # ./install, which can be erroneously created by make from ./install.sh.
 echo $ac_n "checking for a BSD compatible install""... $ac_c" 1>&6
-echo "configure:4802: checking for a BSD compatible install" >&5
+echo "configure:4797: checking for a BSD compatible install" >&5
 if test -z "$INSTALL"; then
 if eval "test \"`echo '$''{'ac_cv_path_install'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
