@@ -33,7 +33,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.31 2002-07-02 10:05:09 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.32 2002-07-03 19:47:53 hannes Exp $";
 #endif
 
 #include <sys/param.h>
@@ -194,23 +194,28 @@ static const char *bgpattr_type[] = {
 		sizeof(bgpattr_type)/sizeof(bgpattr_type[0]), (x))
 
 /* Subsequent address family identifier, RFC2283 section 7 */
-#define SAFNUM_RES          0
-#define SAFNUM_UNICAST      1
-#define SAFNUM_MULTICAST    2
-#define SAFNUM_UNIMULTICAST 3
+#define SAFNUM_RES               0
+#define SAFNUM_UNICAST           1
+#define SAFNUM_MULTICAST         2
+#define SAFNUM_UNIMULTICAST      3
 /* labeled BGP RFC3107 */
-#define SAFNUM_LABUNICAST   4
+#define SAFNUM_LABUNICAST        4
 /* Section 4.3.4 of draft-rosen-rfc2547bis-03.txt  */
-#define SAFNUM_VPNUNICAST   128
-#define SAFNUM_VPNMULTICAST 129
-#define SAFNUM_VPNANYCAST   130
+#define SAFNUM_VPNUNICAST      128
+#define SAFNUM_VPNMULTICAST    129
+#define SAFNUM_VPNUNIMULTICAST 130
 
-static const char *bgpattr_nlri_safi[] = {
-    "Reserved", "Unicast", "Multicast", "Unicast+Multicast", "labeled Unicast"
+static struct tok bgp_safi_values[] = {
+    { SAFNUM_RES,             "Reserved"},
+    { SAFNUM_UNICAST,         "Unicast"},
+    { SAFNUM_MULTICAST,       "Multicast"},
+    { SAFNUM_UNIMULTICAST,    "Unicast+Multicast"},
+    { SAFNUM_LABUNICAST,      "labeled Unicast"},
+    { SAFNUM_VPNUNICAST,      "labeled VPN Unicast"},
+    { SAFNUM_VPNMULTICAST,    "labeled VPN Multicast"},
+    { SAFNUM_VPNUNIMULTICAST, "labeled VPN Unicast+Multicast"},
+    { 0, NULL }
 };
-#define bgp_attr_nlri_safi(x) \
-	num_or_str(bgpattr_nlri_safi, \
-		sizeof(bgpattr_nlri_safi)/sizeof(bgpattr_nlri_safi[0]), (x))
 
 /* well-known community */
 #define BGP_COMMUNITY_NO_EXPORT			0xffffff01
@@ -233,18 +238,29 @@ static const char *bgpattr_nlri_safi[] = {
 #define AFNUM_DECNET	13
 #define AFNUM_BANYAN	14
 #define AFNUM_E164NSAP	15
+/* draft-kompella-ppvpn-l2vpn */
+#define AFNUM_L2VPN     196 /* still to be approved by IANA */
 
-static const char *afnumber[] = {
-	"Reserved", "IPv4", "IPv6", "NSAP", "HDLC",
-	"BBN 1822", "802", "E.163", "E.164", "F.69",
-	"X.121", "IPX", "Appletalk", "Decnet IV", "Banyan Vines",
-	"E.164 with NSAP subaddress",
+static struct tok bgp_afi_values[] = {
+    { 0,                      "Reserved"},
+    { AFNUM_INET,             "IPv4"},
+    { AFNUM_INET6,            "IPv6"},
+    { AFNUM_NSAP,             "NSAP"},
+    { AFNUM_HDLC,             "HDLC"},
+    { AFNUM_BBN1822,          "BBN 1822"},
+    { AFNUM_802,              "802"},
+    { AFNUM_E163,             "E.163"},
+    { AFNUM_E164,             "E.164"},
+    { AFNUM_F69,              "F.69"},
+    { AFNUM_X121,             "X.121"},
+    { AFNUM_IPX,              "Novell IPX"},
+    { AFNUM_ATALK,            "Appletalk"},
+    { AFNUM_DECNET,           "Decnet IV"},
+    { AFNUM_BANYAN,           "Banyan Vines"},
+    { AFNUM_E164NSAP,         "E.164 with NSAP subaddress"},
+    { AFNUM_L2VPN,            "Layer-2 VPN"},
+    { 0, NULL},
 };
-#define af_name(x) \
-	(((x) == 65535) ? afnumber[0] : \
-		num_or_str(afnumber, \
-			sizeof(afnumber)/sizeof(afnumber[0]), (x)))
-
 
 static const char *
 num_or_str(const char **table, size_t siz, int value)
@@ -459,10 +475,12 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 		af = EXTRACT_16BITS(p);
 		safi = p[2];
 		if (safi >= 128)
-			printf(" %s vendor specific,", af_name(af));
+			printf(" %s vendor specific,",
+                               tok2str(bgp_afi_values, "Unknown", af));
 		else {
-			printf(" AFI %s SAFI %s,", af_name(af),
-				bgp_attr_nlri_safi(safi));
+			printf(" AFI %s SAFI %s,",
+                               tok2str(bgp_afi_values, "Unknown", af),
+                               tok2str(bgp_safi_values, "Unknown", safi));
 		}
 		p += 3;
 
@@ -549,10 +567,12 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *dat, int len)
 		af = EXTRACT_16BITS(p);
 		safi = p[2];
 		if (safi >= 128)
-			printf(" %s vendor specific,", af_name(af));
+			printf(" %s vendor specific,",
+                               tok2str(bgp_afi_values, "Unknown", af));
 		else {
-			printf(" AFI %s SAFI %s,", af_name(af),
-				bgp_attr_nlri_safi(safi));
+			printf(" AFI %s SAFI %s,",
+                               tok2str(bgp_afi_values, "Unknown", af),
+                               tok2str(bgp_safi_values, "Unknown", safi));
 		}
 		p += 3;
 
