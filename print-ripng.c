@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ripng.c,v 1.9 2001-11-16 08:48:33 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ripng.c,v 1.10 2001-11-16 08:59:22 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -57,7 +57,7 @@ rip6_entry_print(register const struct netinfo6 *ni, int metric)
 }
 
 void
-ripng_print(const u_char *dat, int length)
+ripng_print(const u_char *dat, unsigned int length)
 {
 	register const struct rip6 *rp = (struct rip6 *)dat;
 	register const struct netinfo6 *ni;
@@ -81,7 +81,7 @@ ripng_print(const u_char *dat, int length)
 			break;
 		}
 		if (j * sizeof(*ni) != length - 4)
-			printf(" ripng-req %d[%d]:", j, length);
+			printf(" ripng-req %d[%u]:", j, length);
 		else
 			printf(" ripng-req %d:", j);
 		trunc = ((i / sizeof(*ni)) * sizeof(*ni) != i);
@@ -96,7 +96,7 @@ ripng_print(const u_char *dat, int length)
 	case RIP6_RESPONSE:
 		j = length / sizeof(*ni);
 		if (j * sizeof(*ni) != length - 4)
-			printf(" ripng-resp %d[%d]:", j, length);
+			printf(" ripng-resp %d[%u]:", j, length);
 		else
 			printf(" ripng-resp %d:", j);
 		trunc = ((i / sizeof(*ni)) * sizeof(*ni) != i);
@@ -111,7 +111,7 @@ ripng_print(const u_char *dat, int length)
 			printf("[|ripng]");
 		break;
 	default:
-		printf(" ripng-%d ?? %d", rp->rip6_cmd, length);
+		printf(" ripng-%d ?? %u", rp->rip6_cmd, length);
 		break;
 	}
 	if (rp->rip6_vers != RIP6_VERSION)
