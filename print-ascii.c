@@ -42,7 +42,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-ascii.c,v 1.12 2003-11-16 09:36:12 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-ascii.c,v 1.13 2003-12-29 10:30:40 hannes Exp $";
 #endif
 #include <tcpdump-stdinc.h>
 #include <stdio.h>
@@ -57,7 +57,7 @@ static const char rcsid[] _U_ =
 		(HEXDUMP_HEXSTUFF_PER_SHORT * HEXDUMP_SHORTS_PER_LINE)
 
 void
-ascii_print_with_offset(register const u_char *cp, register u_int length,
+ascii_print_with_offset(register const u_char *ident, register const u_char *cp, register u_int length,
 			register u_int oset)
 {
 	register u_int i;
@@ -93,8 +93,8 @@ ascii_print_with_offset(register const u_char *cp, register u_int length,
 			if (Aflag) {
 				(void)printf("%s", asciistuff);
 			} else {
-				(void)printf("\n0x%04x\t%-*s\t%s",
-				    oset, HEXDUMP_HEXSTUFF_PER_LINE,
+				(void)printf("%s0x%04x:\t%-*s\t%s",
+				    ident, oset, HEXDUMP_HEXSTUFF_PER_LINE,
 				    hexstuff, asciistuff);
 			}
 			i = 0; hsp = hexstuff; asp = asciistuff;
@@ -116,19 +116,19 @@ ascii_print_with_offset(register const u_char *cp, register u_int length,
 	if (i > 0) {
 		*hsp = *asp = '\0';
 		if (Aflag) {
-			(void)printf("\n%s", asciistuff);
+			(void)printf("%s%s", ident, asciistuff);
 		} else {
-			(void)printf("\n0x%04x\t%-*s\t%s",
-			     oset, HEXDUMP_HEXSTUFF_PER_LINE,
+			(void)printf("%s0x%04x:\t%-*s\t%s",
+			     ident, oset, HEXDUMP_HEXSTUFF_PER_LINE,
 			     hexstuff, asciistuff);
 		}
 	}
 }
 
 void
-ascii_print(register const u_char *cp, register u_int length)
+ascii_print(register const u_char *ident, register const u_char *cp, register u_int length)
 {
-	ascii_print_with_offset(cp, length, 0);
+	ascii_print_with_offset(ident, cp, length, 0);
 }
 
 /*
@@ -181,3 +181,5 @@ main(int argc, char *argv[])
 	exit(0);
 }
 #endif /* MAIN */
+
+
