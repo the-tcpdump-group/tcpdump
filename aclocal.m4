@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.67 1999-10-30 23:45:50 itojun Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.68 2000-01-21 04:06:18 itojun Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -848,6 +848,42 @@ AC_DEFUN(AC_STRUCT_ADDRINFO, [
 	AC_MSG_RESULT($$1)
 	if test $$1 = yes; then
 		AC_DEFINE(HAVE_ADDRINFO)
+	else
+		AC_DEFINE(NEED_ADDRINFO_H)
+	fi
+])
+
+dnl
+dnl Checks for NI_MAXSERV
+AC_DEFUN(AC_NI_MAXSERV, [
+	AC_MSG_CHECKING(for NI_MAXSERV)
+	AC_CACHE_VAL($1,
+	AC_EGREP_CPP(yes, [#include <netdb.h>
+#ifdef NI_MAXSERV
+yes
+#endif],
+		$1=yes,
+		$1=no))
+	AC_MSG_RESULT($$1)
+	if test $$1 != yes; then
+		AC_DEFINE(NEED_ADDRINFO_H)
+	fi
+])
+
+dnl
+dnl Checks for NI_NAMEREQD
+AC_DEFUN(AC_NI_NAMEREQD, [
+	AC_MSG_CHECKING(for NI_NAMEREQD)
+	AC_CACHE_VAL($1,
+	AC_EGREP_CPP(yes, [#include <netdb.h>
+#ifdef NI_NOFQDN
+yes
+#endif],
+		$1=yes,
+		$1=no))
+	AC_MSG_RESULT($$1)
+	if test $$1 != yes; then
+		AC_DEFINE(NEED_ADDRINFO_H)
 	fi
 ])
 

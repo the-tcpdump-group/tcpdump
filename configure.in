@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.106 2000-01-20 06:50:57 fenner Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.107 2000-01-21 04:06:17 itojun Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.106 $)
+AC_REVISION($Revision: 1.107 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -366,6 +366,20 @@ dnl
 dnl Checks for addrinfo structure
 AC_STRUCT_ADDRINFO(ac_cv_addrinfo)
 if test "$ac_cv_addrinfo" = no; then
+	missing_includes=yes
+fi
+
+dnl
+dnl Checks for NI_MAXSERV
+AC_NI_MAXSERV(ac_cv_maxserv)
+if test "$ac_cv_maxserv" = no; then
+	missing_includes=yes
+fi
+
+dnl
+dnl Checks for NI_NAMEREQD
+AC_NI_NAMEREQD(ac_cv_namereqd)
+if test "$ac_cv_namereqd" = no; then
 	missing_includes=yes
 fi
 

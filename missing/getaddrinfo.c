@@ -51,7 +51,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/missing/getaddrinfo.c,v 1.8 2000-01-19 04:42:21 itojun Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/missing/getaddrinfo.c,v 1.9 2000-01-21 04:06:18 itojun Exp $";
 #endif
 
 #include <sys/types.h>
@@ -86,7 +86,7 @@ static const char rcsid[] =
 #include "sockstorage.h"
 #endif 
 
-#ifndef HAVE_ADDRINFO
+#ifdef NEED_ADDRINFO_H
 #include "addrinfo.h"
 #endif
 
