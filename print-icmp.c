@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.54 2000-10-03 02:54:58 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.55 2000-10-03 09:30:37 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -56,22 +56,22 @@ struct rtentry;
  * Structure of an icmp header.
  */
 struct icmp {
-	u_char	icmp_type;		/* type of message, see below */
-	u_char	icmp_code;		/* type sub code */
-	u_short	icmp_cksum;		/* ones complement cksum of struct */
+	u_int8_t  icmp_type;		/* type of message, see below */
+	u_int8_t  icmp_code;		/* type sub code */
+	u_int16_t icmp_cksum;		/* ones complement cksum of struct */
 	union {
-		u_char ih_pptr;			/* ICMP_PARAMPROB */
+		u_int8_t ih_pptr;			/* ICMP_PARAMPROB */
 		struct in_addr ih_gwaddr;	/* ICMP_REDIRECT */
 		struct ih_idseq {
-			u_short	icd_id;
-			u_short	icd_seq;
+			u_int16_t icd_id;
+			u_int16_t icd_seq;
 		} ih_idseq;
-		int ih_void;
+		u_int32_t ih_void;
 
 		/* ICMP_UNREACH_NEEDFRAG -- Path MTU Discovery (RFC1191) */
 		struct ih_pmtu {
-			u_short ipm_void;    
-			u_short ipm_nextmtu;
+			u_int16_t ipm_void;    
+			u_int16_t ipm_nextmtu;
 		} ih_pmtu;
 	} icmp_hun;
 #define	icmp_pptr	icmp_hun.ih_pptr
@@ -83,16 +83,16 @@ struct icmp {
 #define	icmp_nextmtu	icmp_hun.ih_pmtu.ipm_nextmtu
 	union {
 		struct id_ts {
-			u_int its_otime;
-			u_int its_rtime;
-			u_int its_ttime;
+			u_int32_t its_otime;
+			u_int32_t its_rtime;
+			u_int32_t its_ttime;
 		} id_ts;
 		struct id_ip  {
 			struct ip idi_ip;
 			/* options and then 64 bits of data */
 		} id_ip;
-		u_int	id_mask;
-		char	id_data[1];
+		u_int32_t id_mask;
+		u_int8_t id_data[1];
 	} icmp_dun;
 #define	icmp_otime	icmp_dun.id_ts.its_otime
 #define	icmp_rtime	icmp_dun.id_ts.its_rtime
@@ -111,7 +111,7 @@ struct icmp {
  * ip header length.
  */
 #define	ICMP_MINLEN	8				/* abs minimum */
-#define	ICMP_TSLEN	(8 + 3 * sizeof (u_int))	/* timestamp */
+#define	ICMP_TSLEN	(8 + 3 * sizeof (u_int32_t))	/* timestamp */
 #define	ICMP_MASKLEN	12				/* address mask */
 #define	ICMP_ADVLENMIN	(8 + sizeof (struct ip) + 8)	/* min */
 #define	ICMP_ADVLEN(p)	(8 + (IP_HL(&(p)->icmp_ip) << 2) + 8)
@@ -250,15 +250,15 @@ static struct tok type2str[] = {
 
 /* rfc1191 */
 struct mtu_discovery {
-	short unused;
-	short nexthopmtu;
+	u_int16_t unused;
+	u_int16_t nexthopmtu;
 };
 
 /* rfc1256 */
 struct ih_rdiscovery {
-	u_char ird_addrnum;
-	u_char ird_addrsiz;
-	u_short ird_lifetime;
+	u_int8_t ird_addrnum;
+	u_int8_t ird_addrsiz;
+	u_int16_t ird_lifetime;
 };
 
 struct id_rdiscovery {
