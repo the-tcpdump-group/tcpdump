@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.23 2003-06-14 06:05:52 hannes Exp $ (LBL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.24 2003-07-01 08:36:53 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -172,10 +172,10 @@ pppoe_print(register const u_char *bp, u_int length)
 			if (tag_len) {
 				unsigned isascii = 0, isgarbage = 0;
 				const u_char *v = p;
-				u_short l;
 				char tag_str[MAXTAGPRINT];
 				unsigned tag_str_len = 0;
 
+				/* TODO print UTF-8 decoded text */
 				for (v = p; v < p + tag_len && tag_str_len < MAXTAGPRINT-1; v++)
 					if (*v >= 32 && *v < 127) {
 						tag_str[tag_str_len++] = *v;
@@ -189,7 +189,9 @@ pppoe_print(register const u_char *bp, u_int length)
 				if (isascii > isgarbage) {
 					printf(" [%s \"%*.*s\"]",
 					       tok2str(pppoetag2str, "TAG-0x%x", tag_type),
-					       tag_str_len, tag_str_len, tag_str);
+					       (int)tag_str_len,
+					       (int)tag_str_len,
+					       tag_str);
 				} else {
 					/* Print hex, not fast to abuse printf but this doesn't get used much */
 					printf(" [%s 0x", tok2str(pppoetag2str, "TAG-0x%x", tag_type));
