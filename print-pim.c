@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.18 2000-02-16 21:49:23 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.19 2000-04-24 12:59:39 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -316,7 +316,7 @@ cisco_autorp_print(register const u_char *bp, register u_int len)
 	TCHECK2(bp[0], 4);
 	(void)printf(" RP %s", ipaddr_string(bp));
 	TCHECK(bp[4]);
-	switch(bp[4] & 0x3) {
+	switch (bp[4] & 0x3) {
 	case 0:	printf(" PIMv?");
 		break;
 	case 1:	printf(" PIMv1");
@@ -358,7 +358,7 @@ pim_print(register const u_char *bp, register u_int len)
 	TCHECK(pim->pim_rsv);
 #endif
 
-	switch(PIM_VER(pim->pim_typever)) {
+	switch (PIM_VER(pim->pim_typever)) {
 	 case 2:		/* avoid hardcoding? */
 		(void)printf("pim v2");
 		pimv2_print(bp, len);
@@ -634,7 +634,7 @@ pimv2_print(register const u_char *bp, register u_int len)
 		if (bp >= ep)
 			break;
 		ip = (struct ip *)bp;
-		switch(ip->ip_v) {
+		switch (ip->ip_v) {
 		 case 4:	/* IPv4 */
 			printf(" ");
 			ip_print(bp, len);

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.5 2000-04-09 19:14:52 assar Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.6 2000-04-24 12:59:39 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -98,7 +98,7 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 #endif
 
 	TCHECK(dp->icmp6_code);
-	switch(dp->icmp6_type) {
+	switch (dp->icmp6_type) {
 	case ICMP6_DST_UNREACH:
 		TCHECK(oip->ip6_dst);
 		switch (dp->icmp6_code) {
@@ -482,7 +482,7 @@ icmp6_opt_print(register const u_char *bp, int resid)
 	ECHECK(op->nd_opt_len);
 	if (resid <= 0)
 		return;
-	switch(op->nd_opt_type) {
+	switch (op->nd_opt_type) {
 	case ND_OPT_SOURCE_LINKADDR:
 		opl = (struct nd_opt_hdr *)op;
 #if 1

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-"@(#) $Header: /tcpdump/master/tcpdump/Attic/print-lcp.c,v 1.3 1999-12-15 07:55:42 fenner Exp $ (LBL)";
+"@(#) $Header: /tcpdump/master/tcpdump/Attic/print-lcp.c,v 1.4 2000-04-24 12:59:39 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -144,7 +144,7 @@ lcp_print(register const u_char *bp, u_int length)
 
   printf("LCP %s id=0x%x", tok2str(lcpcode2str, "LCP-#%d", lcp_code), lcp_id);
   
-  switch(lcp_code) {
+  switch (lcp_code) {
   case LCP_CONFREQ:
   case LCP_CONFACK:
   case LCP_CONFNAK:

@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.2 1999-11-21 09:36:49 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.3 2000-04-24 12:59:39 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -111,7 +111,7 @@ chdlc_if_print(u_char *user, const struct pcap_pkthdr *h,
 
 	length -= CHDLC_HDRLEN;
 	ip = (struct ip *)(p + CHDLC_HDRLEN);
-	switch(proto) {
+	switch (proto) {
 	case ETHERTYPE_IP:
 		ip_print((const u_char *)ip, length);
 		break;
