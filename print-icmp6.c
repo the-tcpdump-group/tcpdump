@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.68 2003-02-05 02:36:25 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.69 2003-03-13 07:36:56 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -220,10 +220,12 @@ icmp6_print(const u_char *bp, const u_char *bp2)
 		}
 		break;
 	case ICMP6_ECHO_REQUEST:
-		printf("icmp6: echo request");
-		break;
 	case ICMP6_ECHO_REPLY:
-		printf("icmp6: echo reply");
+		TCHECK(dp->icmp6_seq);
+		printf("icmp6: echo %s seq %u",
+			dp->icmp6_type == ICMP6_ECHO_REQUEST ?
+			"request" : "reply",
+			EXTRACT_16BITS(&dp->icmp6_seq));
 		break;
 	case ICMP6_MEMBERSHIP_QUERY:
 		printf("icmp6: multicast listener query ");
