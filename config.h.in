@@ -227,12 +227,3 @@
 /* define if your compiler has __attribute__ */
 #undef HAVE___ATTRIBUTE__
 
-/* define if you have struct icmp6_mld */
-#undef HAVE_STRUCT_ICMP6_MLD
-
-/* define if you have struct mld6hdr */
-#undef HAVE_STRUCT_MLD6_HDR
-
-/* define if you have struct icmp6_nodeinfo */
-#undef HAVE_STRUCT_ICMP6_NODEINFO
-
