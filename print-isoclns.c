@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.91 2003-07-19 08:54:28 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.92 2003-07-19 09:02:45 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -107,7 +107,7 @@ static struct tok isis_pdu_values[] = {
 #define TLV_ISNEIGH_VARLEN      7   /* iso10589 */
 #define TLV_PADDING             8   /* iso10589 */
 #define TLV_LSP                 9   /* iso10589 */
-#define TLV_AUTH                10  /* iso10589, draft-ietf-isis-hmac-03 */
+#define TLV_AUTH                10  /* iso10589, rfc3567 */
 #define TLV_CHECKSUM            12  /* rfc3358 */
 #define TLV_LSP_BUFFERSIZE      14  /* iso10589 rev2 */
 #define TLV_EXT_IS_REACH        22  /* draft-ietf-isis-traffic-04 */
