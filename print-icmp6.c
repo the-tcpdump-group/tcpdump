@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.36 2000-11-08 07:03:04 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.37 2000-11-08 09:28:43 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -43,6 +43,7 @@ static const char rcsid[] =
 #include <arpa/inet.h>
 
 #include <stdio.h>
+#include <netdb.h>
 
 #include "ip6.h"
 #include "icmp6.h"
@@ -58,6 +59,7 @@ void mld6_print(const u_char *);
 static struct udphdr *get_upperlayer(u_char *, int *);
 static void dnsname_print(const u_char *, const u_char *);
 void icmp6_nodeinfo_print(int, const u_char *, const u_char *);
+void icmp6_rrenum_print(int, const u_char *, const u_char *);
 
 #ifndef abs
 #define abs(a)	((0 < (a)) ? (a) : -(a))
@@ -310,17 +312,7 @@ icmp6_print(register const u_char *bp, register const u_char *bp2)
 #undef REDIRECTLEN
 #undef RDR
 	case ICMP6_ROUTER_RENUMBERING:
-		switch (dp->icmp6_code) {
-		case ICMP6_ROUTER_RENUMBERING_COMMAND:
-			printf("icmp6: router renum command");
-			break;
-		case ICMP6_ROUTER_RENUMBERING_RESULT:
-			printf("icmp6: router renum result");
-			break;
-		default:
-			printf("icmp6: router renum code-#%d", dp->icmp6_code);
-			break;
-		}
+		icmp6_rrenum_print(icmp6len, bp, ep);
 		break;
 	case ICMP6_NI_QUERY:
 		icmp6_nodeinfo_print(icmp6len, bp, ep);
@@ -842,6 +834,142 @@ icmp6_nodeinfo_print(int icmp6len, const u_char *bp, const u_char *ep)
 		printf(")");
 		break;
 	}
+	return;
+
+trunc:
+	fputs("[|icmp6]", stdout);
+}
+
+void
+icmp6_rrenum_print(int icmp6len, const u_char *bp, const u_char *ep)
+{
+	struct icmp6_router_renum *rr6;
+	struct icmp6_hdr *dp;
+	size_t siz;
+	const char *cp;
+	struct rr_pco_match *match;
+	struct rr_pco_use *use;
+	char hbuf[NI_MAXHOST];
+	int n;
+
+	dp = (struct icmp6_hdr *)bp;
+	rr6 = (struct icmp6_router_renum *)bp;
+	siz = ep - bp;
+	cp = (const char *)(rr6 + 1);
+
+	TCHECK(rr6->rr_reserved);
+	switch (rr6->rr_code) {
+	case ICMP6_ROUTER_RENUMBERING_COMMAND:
+		printf("router renum: command");
+		break;
+	case ICMP6_ROUTER_RENUMBERING_RESULT:
+		printf("router renum: result");
+		break;
+	case ICMP6_ROUTER_RENUMBERING_SEQNUM_RESET:
+		printf("router renum: sequence number reset");
+		break;
+	default:
+		printf("router renum: code-#%d", rr6->rr_code);
+		break;
+	}
+
+	if (vflag) {
+#define F(x, y)	((rr6->rr_flags) & (x) ? (y) : "")
+		printf("[");	/*]*/
+		if (rr6->rr_flags) {
+			printf("%s%s%s%s%s,", F(ICMP6_RR_FLAGS_TEST, "T"),
+			    F(ICMP6_RR_FLAGS_REQRESULT, "R"),
+			    F(ICMP6_RR_FLAGS_ALLIF, "A"),
+			    F(ICMP6_RR_FLAGS_SPECSITE, "S"),
+			    F(ICMP6_RR_FLAGS_PREVDONE, "P"));
+		}
+		printf("segnum=%u,", rr6->rr_segnum);
+		printf("maxdelay=%u", rr6->rr_maxdelay);
+		if (rr6->rr_reserved)
+			printf("rsvd=%u", rr6->rr_reserved);
+		/*[*/
+		printf("]");
+#undef F
+	}
+
+	if (rr6->rr_code == ICMP6_ROUTER_RENUMBERING_COMMAND) {
+		match = (struct rr_pco_match *)cp;
+		cp = (const char *)(match + 1);
+
+		TCHECK(match->rpm_prefix);
+
+		if (vflag)
+			printf("\n\t");
+		else
+			printf(" ");
+		printf("match(");	/*)*/
+		switch (match->rpm_code) {
+		case RPM_PCO_ADD:	printf("add"); break;
+		case RPM_PCO_CHANGE:	printf("change"); break;
+		case RPM_PCO_SETGLOBAL:	printf("setglobal"); break;
+		default:		printf("#%u", match->rpm_code); break;
+		}
+
+		if (vflag) {
+			printf(",ord=%u", match->rpm_ordinal);
+			printf(",min=%u", match->rpm_minlen);
+			printf(",max=%u", match->rpm_maxlen);
+		}
+		if (inet_ntop(AF_INET6, &match->rpm_prefix, hbuf, sizeof(hbuf)))
+			printf(",%s/%u", hbuf, match->rpm_matchlen);
+		else
+			printf(",?/%u", match->rpm_matchlen);
+		/*(*/
+		printf(")");
+
+		n = match->rpm_len - 3;
+		if (n % 4)
+			goto trunc;
+		n /= 4;
+		while (n-- > 0) {
+			use = (struct rr_pco_use *)cp;
+			cp = (const char *)(use + 1);
+
+			TCHECK(use->rpu_prefix);
+
+			if (vflag)
+				printf("\n\t");
+			else
+				printf(" ");
+			printf("use(");	/*)*/
+			if (use->rpu_flags) {
+#define F(x, y)	((use->rpu_flags) & (x) ? (y) : "")
+				printf("%s%s,",
+				    F(ICMP6_RR_PCOUSE_FLAGS_DECRVLTIME, "V"),
+				    F(ICMP6_RR_PCOUSE_FLAGS_DECRPLTIME, "P"));
+#undef F
+			}
+			if (vflag) {
+				printf("mask=0x%x,", use->rpu_ramask);
+				printf("flags=0x%x,", use->rpu_raflags);
+				if (~use->rpu_vltime == 0)
+					printf("vltime=infty,");
+				else
+					printf("vltime=%u,",
+					    (u_int32_t)ntohl(use->rpu_vltime));
+				if (~use->rpu_pltime == 0)
+					printf("pltime=infty,");
+				else
+					printf("pltime=%u,",
+					    (u_int32_t)ntohl(use->rpu_pltime));
+			}
+			if (inet_ntop(AF_INET6, &use->rpu_prefix, hbuf,
+			    sizeof(hbuf)))
+				printf("%s/%u/%u", hbuf, use->rpu_uselen,
+				    use->rpu_keeplen);
+			else
+				printf("?/%u/%u", use->rpu_uselen,
+				    use->rpu_keeplen);
+			/*(*/
+			printf(")");
+		}
+	}
+
 	return;
 
 trunc:
