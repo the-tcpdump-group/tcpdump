@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.73 2000-06-10 05:12:20 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.74 2000-06-10 05:21:08 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -153,13 +153,14 @@ static int print_int64(const u_int32_t *dp, int how)
 	}
 #else
 	switch (how) {
-	case SIGNED :
-	case UNSIGNED :
-	case HEX :
-	    printf ("0x%x%08x", dp[0], dp[1]);
-	    break;
-	default :
-	    return (0);
+	case SIGNED:
+	case UNSIGNED:
+	case HEX:
+		printf("0x%x%08x", (u_int32_t)ntohl(dp[0]),
+		    (u_int32_t)ntohl(dp[1]));
+		break;
+	default:
+		return (0);
 	}
 #endif
 	return 1;
