@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.226 2004-03-30 14:42:40 mcr Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.227 2004-04-05 00:15:50 mcr Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -107,10 +107,6 @@ extern char *strsep(char **, const char *);
 extern char *program_name;	/* used to generate self-identifying messages */
 
 extern int32_t thiszone;	/* seconds offset from gmt to local time */
-
-extern int snaplen;
-/* global pointer to end of current packet (during printing) */
-extern const u_char *snapend;
 
 /*
  * True if  "l" bytes of "var" were captured.
@@ -257,7 +253,6 @@ extern void timed_print(const u_char *);
 extern void udp_print(const u_char *, u_int, const u_char *, int);
 extern void wb_print(const void *, u_int);
 extern int ah_print(register const u_char *);
-extern int esp_print(register const u_char *, register const u_char *, int *, int *);
 extern void isakmp_print(const u_char *, u_int, const u_char *);
 extern int ipcomp_print(register const u_char *, int *);
 extern void rx_print(register const u_char *, int, int, int, u_char *);
@@ -331,8 +326,10 @@ netdissect_options *gndo;
 #define Cflag gndo->ndo_Cflag 
 #define Aflag gndo->ndo_Aflag 
 #define packettype gndo->ndo_packettype
-#define espsecret  gndo->ndo_espsecret
 #define tcpmd5secret gndo->ndo_tcpmd5secret
 #define Wflag gndo->ndo_Wflag
 #define WflagChars gndo->ndo_WflagChars
 #define Cflag_count gndo->ndo_Cflag_count
+#define snaplen     gndo->ndo_snaplen
+#define snapend     gndo->ndo_snapend
+

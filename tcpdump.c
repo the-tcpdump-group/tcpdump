@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.239 2004-03-30 14:42:40 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.240 2004-04-05 00:15:52 mcr Exp $ (LBL)";
 #endif
 
 /*
@@ -107,6 +107,8 @@ static void print_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void dump_packet_and_trunc(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void dump_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void droproot(const char *, const char *);
+static void ndo_error(netdissect_options *ndo, const char *fmt, ...);
+static void ndo_warning(netdissect_options *ndo, const char *fmt, ...);
 
 #ifdef SIGINFO
 RETSIGTYPE requestinfo(int);
@@ -122,9 +124,6 @@ RETSIGTYPE requestinfo(int);
 
 static void info(int);
 static u_int packets_captured;
-
-/* Length of saved portion of packet. */
-int snaplen = DEFAULT_SNAPLEN;
 
 typedef u_int (*if_printer)(const struct pcap_pkthdr *, const u_char *);
 
@@ -418,6 +417,9 @@ main(int argc, char **argv)
 	gndo->ndo_tflag=1;
 	gndo->ndo_dlt=-1;
 	gndo->ndo_printf=tcpdump_printf;
+	gndo->ndo_error=ndo_error;
+	gndo->ndo_warning=ndo_warning;
+	gndo->ndo_snaplen = DEFAULT_SNAPLEN;
   
 	cnt = -1;
 	device = NULL;
@@ -503,7 +505,7 @@ main(int argc, char **argv)
 #ifndef HAVE_LIBCRYPTO
 			warning("crypto code not compiled in");
 #endif
-			espsecret = optarg;
+			gndo->ndo_espsecret = optarg;
 			break;
 
 		case 'f':
@@ -1301,3 +1303,42 @@ usage(void)
 "\t\t[ expression ]\n");
 	exit(1);
 }
+
+
+
+/* VARARGS */
+void
+ndo_error(netdissect_options *ndo _U_, const char *fmt, ...)
+{
+	va_list ap;
+
+	(void)fprintf(stderr, "%s: ", program_name);
+	va_start(ap, fmt);
+	(void)vfprintf(stderr, fmt, ap);
+	va_end(ap);
+	if (*fmt) {
+		fmt += strlen(fmt);
+		if (fmt[-1] != '\n')
+			(void)fputc('\n', stderr);
+	}
+	exit(1);
+	/* NOTREACHED */
+}
+
+/* VARARGS */
+void
+ndo_warning(netdissect_options *ndo _U_, const char *fmt, ...)
+{
+	va_list ap;
+
+	(void)fprintf(stderr, "%s: WARNING: ", program_name);
+	va_start(ap, fmt);
+	(void)vfprintf(stderr, fmt, ap);
+	va_end(ap);
+	if (*fmt) {
+		fmt += strlen(fmt);
+		if (fmt[-1] != '\n')
+			(void)fputc('\n', stderr);
+	}
+}
+

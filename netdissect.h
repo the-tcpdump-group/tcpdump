@@ -21,7 +21,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.3 2004-04-02 06:52:06 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.4 2004-04-05 00:15:50 mcr Exp $ (LBL)
  */
 
 #ifndef netdissect_h
@@ -104,6 +104,9 @@ struct netdissect_options {
   const char *ndo_dltname;
 
   char *ndo_espsecret;
+  struct sa_list *ndo_sa_list_head;  /* used by print-esp.c */
+  struct sa_list *ndo_sa_default;
+
   char *ndo_tcpmd5secret;     	/* TCP-MD5 secret key */
 
   struct esp_algorithm *ndo_espsecret_xform;   /* cache of decoded  */
@@ -133,6 +136,10 @@ struct netdissect_options {
 
   int  (*ndo_printf)(netdissect_options *,
 		     const char *fmt, ...);
+  void (*ndo_error)(netdissect_options *,
+		    const char *fmt, ...);
+  void (*ndo_warning)(netdissect_options *,
+		      const char *fmt, ...);
 };
 
 #define PT_VAT		1	/* Visual Audio Tool */
@@ -204,11 +211,6 @@ extern const char *tok2str(const struct tok *, const char *, int);
 extern void wrapup(int);
 
 #if 0
-extern void error(netdissect_options *, const char *, ...)
-     __attribute__((noreturn, format (printf, 2, 3)));
-extern void warning(netdissect_options *, const char *, ...)
-     __attribute__ ((format (printf, 2, 3)));
-
 extern char *read_infile(netdissect_options *, char *);
 extern char *copy_argv(netdissect_options *, char **);
 #endif
@@ -230,6 +232,9 @@ extern const char *dnnum_string(netdissect_options *, u_short);
 
 
 extern void eap_print(netdissect_options *,const u_char *, u_int);    
+extern int esp_print(netdissect_options *,
+		     register const u_char *bp, register const u_char *bp2,
+		     int *nhdr, int *padlen);
 
 #if 0
 extern void ascii_print_with_offset(netdissect_options *, const u_char *,
@@ -356,9 +361,6 @@ extern void udp_print(netdissect_options *,const u_char *, u_int,
 extern void wb_print(netdissect_options *,const void *, u_int);
 extern int ah_print(netdissect_options *,register const u_char *,
 		    register const u_char *);
-extern int esp_print(netdissect_options *,
-		     register const u_char *bp, register const u_char *bp2,
-		     int *nhdr, int *padlen);
 extern void esp_print_decodesecret(netdissect_options *ndo);
 extern void isakmp_print(netdissect_options *,const u_char *,
 			 u_int, const u_char *);
