@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.94 2001-02-20 18:55:47 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.95 2001-05-09 00:34:34 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -315,7 +315,11 @@ ip_print(register const u_char *bp, register u_int length)
 		cp = (const u_char *)ip + hlen;
 		nh = ip->ip_p;
 
-		if (nh != IPPROTO_TCP && nh != IPPROTO_UDP) {
+#ifndef IPPROTO_SCTP
+#define IPPROTO_SCTP 132
+#endif
+		if (nh != IPPROTO_TCP && nh != IPPROTO_UDP &&
+		    nh != IPPROTO_SCTP) {
 			(void)printf("%s > %s: ", ipaddr_string(&ip->ip_src),
 				ipaddr_string(&ip->ip_dst));
 		}
@@ -361,6 +365,10 @@ again:
 			nh = enh & 0xff;
 			goto again;
 		    }
+
+		case IPPROTO_SCTP:
+  			sctp_print(cp, (const u_char *)ip, len);
+			break;
 
 		case IPPROTO_TCP:
 			tcp_print(cp, len, (const u_char *)ip, (off &~ 0x6000));
