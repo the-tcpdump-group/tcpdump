@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.216.2.6 2003-12-29 22:42:22 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.216.2.7 2004-01-14 03:25:28 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -494,6 +494,7 @@ main(int argc, char **argv)
 				      program_name, optarg);
 			(void)fprintf(stderr, "(no libsmi support)\n");
 #endif
+			break;
 
 		case 'O':
 			Oflag = 0;
