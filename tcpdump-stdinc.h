@@ -29,7 +29,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @(#) $Header: /tcpdump/master/tcpdump/tcpdump-stdinc.h,v 1.10 2005-02-09 02:25:45 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/tcpdump-stdinc.h,v 1.11 2005-03-27 01:26:54 guy Exp $ (LBL)
  */
 
 /*
@@ -131,6 +131,9 @@ typedef char* caddr_t;
   #undef ntohs
   #undef htonl
   #undef htons
+
+  extern __inline__ unsigned long __ntohl (unsigned long x);
+  extern __inline__ unsigned short __ntohs (unsigned short x);
 
   #define ntohl(x)  __ntohl(x)
   #define ntohs(x)  __ntohs(x)
