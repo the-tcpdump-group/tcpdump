@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.26 2001-09-17 21:58:04 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.27 2001-10-04 09:26:37 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -308,7 +308,7 @@ void isoclns_print(const u_char *p, u_int length, u_int caplen,
 			     etheraddr_string(esrc),
 			     etheraddr_string(edst));
 		if (!isis_print(p, length))
-		    default_print_unaligned(p, caplen);
+			default_print_unaligned(p, caplen);
 		break;
 
 	case NLPID_NULLNS:
@@ -347,17 +347,19 @@ static void
 esis_print(const u_char *p, u_int length)
 {
 	const u_char *ep;
-	u_int li = p[1];
-	const struct esis_hdr *eh = (const struct esis_hdr *) &p[2];
+	u_int li;
+	const struct esis_hdr *eh;
 	u_char off[2];
 
-	if (length == 2) {
+	if (length <= 2) {
 		if (qflag)
 			printf(" bad pkt!");
 		else
 			printf(" no header at all!");
 		return;
 	}
+	li = p[1];
+	eh = (const struct esis_hdr *) &p[2];
 	ep = p + li;
 	if (li > length) {
 		if (qflag)
