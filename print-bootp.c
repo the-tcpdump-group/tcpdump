@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.57 2001-02-21 05:59:37 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.58 2001-04-27 02:17:10 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -522,11 +522,10 @@ static void
 cmu_print(register const u_char *bp, register u_int length)
 {
 	register const struct cmu_vend *cmu;
-	const char *fmt = " %s:%s";
 
 #define PRINTCMUADDR(m, s) { TCHECK(cmu->m); \
     if (cmu->m.s_addr != 0) \
-	printf(fmt, s, ipaddr_string(&cmu->m.s_addr)); }
+	printf(" %s:%s", s, ipaddr_string(&cmu->m.s_addr)); }
 
 	printf(" vend-cmu");
 	cmu = (struct cmu_vend *)bp;
