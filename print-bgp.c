@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.82 2004-04-29 02:16:01 mcr Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.83 2004-05-17 12:10:05 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -1584,9 +1584,10 @@ bgp_open_print(const u_char *dat, int length)
                     cap_type=opt[i+BGP_OPT_SIZE];
                     cap_len=opt[i+BGP_OPT_SIZE+1];
                     tcap_len=cap_len;
-                    printf("\n\t      %s, length: %u",
+                    printf("\n\t      %s (%u), length: %u",
                            tok2strbuf(bgp_capcode_values, "Unknown",
 				      cap_type, tokbuf, sizeof(tokbuf)),
+                           cap_type,
                            cap_len);
                     switch(cap_type) {
                     case BGP_CAPCODE_MP:
