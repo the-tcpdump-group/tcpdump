@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.77 2004-01-15 18:59:15 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.78 2004-03-14 21:10:37 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -369,6 +369,7 @@ static struct tok bgp_afi_values[] = {
 #define BGP_EXT_COM_RO_2        0x0203  /* Route Origin,Format AN(4bytes):local(2bytes) */
 #define BGP_EXT_COM_LINKBAND    0x4004  /* Link Bandwidth,Format AS(2B):Bandwidth(4B) */
                                         /* rfc2547 bgp-mpls-vpns */
+#define BGP_EXT_COM_CISCO_MCAST 0x0009  /* cisco proprietary */
 
 #define BGP_EXT_COM_VPN_ORIGIN  0x0005  /* OSPF Domain ID / VPN of Origin  - draft-rosen-vpns-ospf-bgp-mpls */
 #define BGP_EXT_COM_VPN_ORIGIN2 0x0105  /* duplicate - keep for backwards compatability */
@@ -397,6 +398,7 @@ static struct tok bgp_extd_comm_subtype_values[] = {
     { BGP_EXT_COM_RO_1,        "origin"},
     { BGP_EXT_COM_RO_2,        "origin"},
     { BGP_EXT_COM_LINKBAND,    "link-BW"},
+    { BGP_EXT_COM_CISCO_MCAST, "mdt-group"},
     { BGP_EXT_COM_VPN_ORIGIN,  "ospf-domain"},
     { BGP_EXT_COM_VPN_ORIGIN2, "ospf-domain"},
     { BGP_EXT_COM_VPN_ORIGIN3, "ospf-domain"},
@@ -1210,6 +1212,11 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
 		        bw.i = EXTRACT_32BITS(tptr+2);
                         printf(": bandwidth: %.3f Mbps",
                                bw.f*8/1000000);
+                        break;
+                    case BGP_EXT_COM_CISCO_MCAST:
+                        printf(": AS %u, group %s",
+                               EXTRACT_16BITS(tptr+2),
+                               getname(tptr+4));
                         break;
                     case BGP_EXT_COM_VPN_ORIGIN:
                     case BGP_EXT_COM_VPN_ORIGIN2:
