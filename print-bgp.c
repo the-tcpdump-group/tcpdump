@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.63 2003-05-27 13:09:02 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.64 2003-05-27 14:34:04 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -191,6 +191,7 @@ static struct tok bgp_capcode_values[] = {
 #define BGP_NOTIFY_MAJOR_HOLDTIME       4
 #define BGP_NOTIFY_MAJOR_FSM            5
 #define BGP_NOTIFY_MAJOR_CEASE          6
+#define BGP_NOTIFY_MAJOR_CAP            7
 
 static struct tok bgp_notify_major_values[] = {
     { BGP_NOTIFY_MAJOR_MSG,     "Message Header Error"},
@@ -199,6 +200,7 @@ static struct tok bgp_notify_major_values[] = {
     { BGP_NOTIFY_MAJOR_HOLDTIME,"Hold Timer Expired"},
     { BGP_NOTIFY_MAJOR_FSM,     "Finite State Machine Error"},
     { BGP_NOTIFY_MAJOR_CEASE,   "Cease"},
+    { BGP_NOTIFY_MAJOR_CAP,     "Capability Message Error"},
     { 0, NULL}
 };
 
@@ -245,6 +247,14 @@ static struct tok bgp_notify_minor_update_values[] = {
     { 10,                       "Invalid Network Field"},
     { 11,                       "Malformed AS_PATH"},
     { 0, NULL}
+};
+
+static struct tok bgp_notify_minor_cap_values[] = {
+    { 1,                        "Invalid Action Value" },
+    { 2,                        "Invalid Capability Length" },
+    { 3,                        "Malformed Capability Value" },
+    { 4,                        "Unsupported Capability Code" },
+    { 0, NULL }
 };
 
 static struct tok bgp_origin_values[] = {
@@ -1438,6 +1448,10 @@ bgp_notification_print(const u_char *dat, int length)
 		   tok2str(bgp_notify_minor_update_values, "Unknown", bgpn.bgpn_minor),
 		   bgpn.bgpn_minor);
             break;
+        case BGP_NOTIFY_MAJOR_CAP:
+            printf(" subcode %s (%u)",
+		   tok2str(bgp_notify_minor_cap_values, "Unknown", bgpn.bgpn_minor),
+		   bgpn.bgpn_minor);
         case BGP_NOTIFY_MAJOR_CEASE:
             printf(" subcode %s (%u)",
 		   tok2str(bgp_notify_minor_cease_values, "Unknown", bgpn.bgpn_minor),
