@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.28 2003-11-16 09:36:43 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.29 2004-12-27 22:45:44 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -730,12 +730,12 @@ static err_code_struct dos_msgs[] = {
     { "ERRbaddata", 13, "Invalid data." },
     { "ERR", 14, "reserved." },
     { "ERRbaddrive", 15, "Invalid drive specified." },
-    { "ERRremcd", 16, "A Delete Directory request attempted  to  remove  the  server's  current directory." },
+    { "ERRremcd", 16, "A Delete Directory request attempted to remove the server's current directory." },
     { "ERRdiffdevice", 17, "Not same device." },
     { "ERRnofiles", 18, "A File Search command can find no more files matching the specified criteria." },
-    { "ERRbadshare", 32, "The sharing mode specified for an Open conflicts with existing  FIDs  on the file." },
-    { "ERRlock", 33, "A Lock request conflicted with an existing lock or specified an  invalid mode,   or an Unlock requested attempted to remove a lock held by another process." },
-    { "ERRfilexists", 80, "The file named in a Create Directory,  Make  New  File  or  Link  request already exists." },
+    { "ERRbadshare", 32, "The sharing mode specified for an Open conflicts with existing FIDs on the file." },
+    { "ERRlock", 33, "A Lock request conflicted with an existing lock or specified an invalid mode, or an Unlock requested attempted to remove a lock held by another process." },
+    { "ERRfilexists", 80, "The file named in a Create Directory, Make New File or Link request already exists." },
     { "ERRbadpipe", 230, "Pipe invalid." },
     { "ERRpipebusy", 231, "All instances of the requested pipe are busy." },
     { "ERRpipeclosing", 232, "Pipe close in progress." },
@@ -749,17 +749,17 @@ err_code_struct server_msgs[] = {
     { "ERRerror", 1, "Non-specific error code." },
     { "ERRbadpw", 2, "Bad password - name/password pair in a Tree Connect or Session Setup are invalid." },
     { "ERRbadtype", 3, "reserved." },
-    { "ERRaccess", 4, "The requester does not have  the  necessary  access  rights  within  the specified  context for the requested function. The context is defined by the TID or the UID." },
+    { "ERRaccess", 4, "The requester does not have the necessary access rights within the specified context for the requested function. The context is defined by the TID or the UID." },
     { "ERRinvnid", 5, "The tree ID (TID) specified in a command was invalid." },
     { "ERRinvnetname", 6, "Invalid network name in tree connect." },
-    { "ERRinvdevice", 7, "Invalid device - printer request made to non-printer connection or  non-printer request made to printer connection." },
+    { "ERRinvdevice", 7, "Invalid device - printer request made to non-printer connection or non-printer request made to printer connection." },
     { "ERRqfull", 49, "Print queue full (files) -- returned by open print file." },
     { "ERRqtoobig", 50, "Print queue full -- no space." },
     { "ERRqeof", 51, "EOF on print queue dump." },
     { "ERRinvpfid", 52, "Invalid print file FID." },
     { "ERRsmbcmd", 64, "The server did not recognize the command received." },
-    { "ERRsrverror", 65, "The server encountered an internal error,  e.g.,  system file unavailable." },
-    { "ERRfilespecs", 67, "The file handle (FID) and pathname parameters contained an invalid  combination of values." },
+    { "ERRsrverror", 65, "The server encountered an internal error, e.g., system file unavailable." },
+    { "ERRfilespecs", 67, "The file handle (FID) and pathname parameters contained an invalid combination of values." },
     { "ERRreserved", 68, "reserved." },
     { "ERRbadpermits", 69, "The access permissions specified for a file or directory are not a valid combination.  The server cannot set the requested attribute." },
     { "ERRreserved", 70, "reserved." },
@@ -772,8 +772,8 @@ err_code_struct server_msgs[] = {
     { "ERRnoresource", 89, "No resources currently available for request." },
     { "ERRtoomanyuids", 90, "Too many UIDs active on this session." },
     { "ERRbaduid", 91, "The UID is not known as a valid ID on this session." },
-    { "ERRusempx", 250, "Temp unable to support Raw,  use MPX mode." },
-    { "ERRusestd", 251, "Temp unable to support Raw,  use standard read/write." },
+    { "ERRusempx", 250, "Temp unable to support Raw, use MPX mode." },
+    { "ERRusestd", 251, "Temp unable to support Raw, use standard read/write." },
     { "ERRcontmpx", 252, "Continue in MPX mode." },
     { "ERRreserved", 253, "reserved." },
     { "ERRreserved", 254, "reserved." },
@@ -797,7 +797,7 @@ err_code_struct hard_msgs[] = {
     { "ERRread", 30, "Read fault." },
     { "ERRgeneral", 31, "General failure." },
     { "ERRbadshare", 32, "A open conflicts with an existing open." },
-    { "ERRlock", 33, "A Lock request conflicted with an existing lock or specified an invalid mode,  or an Unlock requested attempted to remove a lock held by another process." },
+    { "ERRlock", 33, "A Lock request conflicted with an existing lock or specified an invalid mode, or an Unlock requested attempted to remove a lock held by another process." },
     { "ERRwrongdisk", 34, "The wrong disk was found in a drive." },
     { "ERRFCBUnavail", 35, "No FCBs are available to process request." },
     { "ERRsharebufexc", 36, "A sharing buffer has been exceeded." },
