@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.95 2004-07-02 06:32:47 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.96 2004-07-02 20:17:47 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -47,6 +47,7 @@ static const char rcsid[] _U_ =
 
 #include <pcap.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "interface.h"
 #include "extract.h"
@@ -370,6 +371,7 @@ static int print_ipcp_config_options (const u_char *p, int);
 static int print_ccp_config_options (const u_char *p, int);
 static int print_bacp_config_options (const u_char *p, int);
 static void handle_ppp (u_int proto, const u_char *p, int length);
+static void ppp_hdlc(const u_char *p, int length);
 
 /* generic Control Protocol (e.g. LCP, IPCP, CCP, etc.) handler */
 static void
@@ -1052,10 +1054,81 @@ trunc:
 }
 
 
+static void
+ppp_hdlc(const u_char *p, int length)
+{
+	u_char *b, *s, *t, c;
+	int i, proto;
+	const void *se;
+
+	b = (u_int8_t *)malloc(length);
+	if (b == NULL)
+		return;
+
+	/*
+	 * Unescape all the data into a temporary, private, buffer.
+	 * Do this so that we dont overwrite the original packet
+	 * contents.
+	 */
+	for (s = (u_char *)p, t = b, i = length; i > 0; i--) {
+		c = *s++;
+		if (c == 0x7d) {
+			if (i > 1) {
+				i--;
+				c = *s++ ^ 0x20;
+			} else
+				continue;
+		}
+		*t++ = c;
+	}
+
+	se = snapend;
+	snapend = t;
+
+        /* now lets guess about the payload codepoint format */
+        proto = *b; /* start with a one-octet codepoint guess */
+        
+        switch (proto) {
+        case PPP_IP:
+            ip_print(b+1, t - b - 1);
+            goto cleanup;
+#ifdef INET6
+        case PPP_IPV6:
+            ip6_print(b+1, t - b - 1);
+            goto cleanup;
+#endif
+        default: /* no luck - try next guess */
+            break;
+        }
+
+        proto = EXTRACT_16BITS(b); /* next guess - load two octets */
+
+        switch (proto) {
+        case 0xff03: /* looks like a PPP frame */
+            proto = EXTRACT_16BITS(b+2); /* load the PPP proto-id */
+            handle_ppp(proto, b+4, t - b - 4);
+            break;
+        default: /* last guess - proto must be a PPP proto-id */
+            handle_ppp(proto, b+2, t - b - 2);
+            break;
+        }
+
+cleanup:
+        snapend = se;
+	free(b);
+        return;
+}
+
+
 /* PPP */
 static void
 handle_ppp(u_int proto, const u_char *p, int length)
 {
+        if ((proto & 0xff00) == 0x7e00) {/* is this an escape code ? */
+            ppp_hdlc(p-1, length);
+            return;
+        }
+
 	switch (proto) {
 	case PPP_LCP:
 	case PPP_IPCP:
