@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.161 2004-03-23 07:15:37 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.162 2004-03-28 20:33:28 fenner Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -947,6 +947,22 @@ and
 .B memory
 (applies only to packets logged by OpenBSD's
 .BR pf (4)).
+.IP "\fBrset \fIname\fR"
+True if the packet was logged as matching the specified PF ruleset
+name of an anchored ruleset (applies only to packets logged by
+.BR pf (4)).
+.IP "\fBruleset \fIname\fR"
+Synonomous with the
+.B rset
+modifier.
+.IP "\fBsrnr \fInum\fR"
+True if the packet was logged as matching the specified PF rule number
+of an anchored ruleset (applies only to packets logged by
+.BR pf (4)).
+.IP "\fBsubrulenum \fInum\fR"
+Synonomous with the
+.B srnr
+modifier.
 .IP "\fBaction \fIact\fR"
 True if PF took the specified action when the packet was logged.  Known actions
 are:
@@ -954,7 +970,7 @@ are:
 and
 .B block
 (applies only to packets logged by OpenBSD's
-.BR pf(4)).
+.BR pf (4)).
 .IP "\fBip\fR, \fBip6\fR, \fBarp\fR, \fBrarp\fR, \fBatalk\fR, \fBaarp\fR, \fBdecnet\fR, \fBiso\fR, \fBstp\fR, \fBipx\fR, \fInetbeui\fP"
 Abbreviations for:
 .in +.5i
