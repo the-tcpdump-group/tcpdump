@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.131 
+# From configure.in Revision: 1.132 
 
 
 
@@ -4525,7 +4525,7 @@ done
 echo "$ac_t""$ac_cv_ssleay_path" 1>&6
 if test "$ac_cv_ssleay_path" != no; then
 	V_INCLS="$V_INCLS $incdir"
-	LIBS="$LIBS -L$dir/lib"
+	LDFLAGS="-L$dir/lib $LDFLAGS"
 	if test -f $ac_cv_ssleay_path/lib/libRSAglue.a; then
 		LIBS="$LIBS -lRSAglue"
 	fi
