@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.135 2001-04-13 02:56:38 itojun Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.136 2001-04-27 02:33:43 fenner Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.135 $)
+AC_REVISION($Revision: 1.136 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -47,6 +47,8 @@ esac
 
 AC_CHECK_HEADERS(smi.h)
 AC_CHECK_LIB(smi, smiInit)
+if test "$ac_cv_header_smi_h" = yes -a "$ac_cv_lib_smi_smiInit" = yes
+then
 AC_MSG_CHECKING([whether to enable libsmi])
         AC_TRY_RUN([ /* libsmi available check */
 #include <smi.h>
@@ -69,12 +71,21 @@ main()
 [ AC_MSG_RESULT(yes)
   AC_DEFINE(LIBSMI)
   libsmi=yes],
-[ AC_MSG_RESULT(no)
+dnl autoconf documentation says that $? contains the exit value.
+dnl reality is that it does not.  We leave this in just in case
+dnl autoconf ever comes back to match the documentation.
+[ case $? in
+  1) AC_MSG_RESULT(no - smiInit failed) ;;
+  2) AC_MSG_RESULT(no - header/library version mismatch) ;;
+  3) AC_MSG_RESULT(no - can't determine library version) ;;
+  4) AC_MSG_RESULT(no - too old) ;;
+  *) AC_MSG_RESULT(no) ;;
+  esac
   libsmi=no],
 [ AC_MSG_RESULT(not when cross-compiling)
   libsmi=no]
 )
-
+fi
 
 CFLAGS="$CFLAGS -Dss_family=__ss_family -Dss_len=__ss_len"
 AC_MSG_CHECKING([whether to enable ipv6])
@@ -451,7 +462,32 @@ fi
 
 
 AC_REPLACE_FUNCS(vfprintf strcasecmp strlcat strlcpy strdup)
-AC_CHECK_FUNCS(ether_ntohost setlinebuf)
+AC_CHECK_FUNCS(ether_ntohost, [
+    AC_CACHE_CHECK(for buggy ether_ntohost, ac_cv_buggy_ether_ntohost, [
+	AC_TRY_RUN([
+		#include <netdb.h>
+		#include <sys/types.h>
+		#include <sys/param.h>
+		#include <sys/socket.h>
+		#include <net/ethernet.h>
+
+		int
+		main(int argc, char **argv)
+		{
+			u_char ea[6] = { 0xff, 0xff, 0xff, 0xff, 0xff };
+			char name[MAXHOSTNAMELEN];
+
+			ether_ntohost(name, (struct ether_addr *)ea);
+			exit(0);
+		}
+	], [ac_cv_buggy_ether_ntohost=no],
+	   [ac_cv_buggy_ether_ntohost=yes],
+	   [ac_cv_buggy_ether_ntohost=not while cross-compiling])])
+    if test "$ac_cv_buggy_ether_ntohost" = "no"; then
+	AC_DEFINE(USE_ETHER_NTOHOST)
+    fi
+])
+AC_CHECK_FUNCS(setlinebuf)
 
 usegetipnodeby=yes
 AC_CHECK_FUNCS(getipnodebyname getipnodebyaddr freeaddrinfo,

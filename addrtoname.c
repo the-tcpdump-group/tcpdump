@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.71 2001-01-20 07:22:21 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.72 2001-04-27 02:33:43 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -404,7 +404,7 @@ etheraddr_string(register const u_char *ep)
 	tp = lookup_emem(ep);
 	if (tp->e_name)
 		return (tp->e_name);
-#ifdef HAVE_ETHER_NTOHOST
+#ifdef USE_ETHER_NTOHOST
 	if (!nflag) {
 		char buf[128];
 		if (ether_ntohost(buf, (struct ether_addr *)ep) == 0) {
@@ -667,7 +667,7 @@ init_etherarray(void)
 {
 	register struct etherlist *el;
 	register struct enamemem *tp;
-#ifdef HAVE_ETHER_NTOHOST
+#ifdef USE_ETHER_NTOHOST
 	char name[256];
 #else
 	register struct pcap_etherent *ep;
@@ -691,7 +691,7 @@ init_etherarray(void)
 		if (tp->e_name != NULL)
 			continue;
 
-#ifdef HAVE_ETHER_NTOHOST
+#ifdef USE_ETHER_NTOHOST
                 /* Use yp/nis version of name if available */
                 if (ether_ntohost(name, (struct ether_addr *)el->addr) == 0) {
                         tp->e_name = strdup(name);

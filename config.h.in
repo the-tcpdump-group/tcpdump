@@ -63,6 +63,9 @@
 /* define if you have both getipnodebyname() and getipnodebyaddr() */
 #undef USE_GETIPNODEBY
 
+/* define if you have ether_ntohost() and it works */
+#undef USE_ETHER_NTOHOST
+
 /* define if unaligned memory accesses fail */
 #undef LBL_ALIGN
 
