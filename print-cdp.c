@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.2 2000-05-16 23:54:55 assar Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.3 2000-05-26 09:32:00 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -120,8 +120,11 @@ cdp_print(const u_char *p, u_int length, u_int caplen,
 	    default:
 		printf( " unknown field type %02x, len %d", type, len );
 	    }
-	    i+=len;
 
+	    /* avoid infinite loop */
+	    if (len == 0)
+		break;
+	    i+=len;
 	}
 }
 
