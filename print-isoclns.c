@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.97 2003-10-21 23:02:41 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.98 2003-10-21 23:04:23 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -863,7 +863,7 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
         } bw;
 
         /* first lets see if we know the subTLVs name*/
-	printf("%s%s (subTLV #%u), length: %u",
+	printf("%s%s subTLV #%u, length: %u",
 	       ident,
                tok2str(isis_ext_is_reach_subtlv_values,
                        "unknown",
