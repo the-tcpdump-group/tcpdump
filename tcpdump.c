@@ -24,7 +24,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.150 2000-07-25 05:28:12 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.151 2000-09-17 04:13:13 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -100,26 +100,66 @@ struct printer {
 	int type;
 };
 
+/*
+ * This table checks some DLT_* codes as well as checking PCAP_ENCAP_*
+ * codes, so that those DLT_* codes that aren't the same on all platforms
+ * (and thus don't have values identical to the values of the corresponding
+ * PCAP_ENCAP_* codes) are, at least, handled on the platform that wrote
+ * the capture file.
+ *
+ * (This may result in two identical entries in the table, if there's
+ * a DLT_* code defined to have the same value as the corresponding
+ * PCAP_ENCAP_* code.  Those duplicate entries are harmless.)
+ */
 static struct printer printers[] = {
-	{ ether_if_print,	DLT_EN10MB },
-	{ token_if_print,	DLT_IEEE802 },
-#ifdef DLT_LANE8023
-	{ lane_if_print,        DLT_LANE8023 },
+	/*
+	 * PCAP_ENCAP_* codes that correspond to DLT_* codes whose values
+	 * are the same on all platforms (the PCAP_ENCAP_* code values
+	 * are the same as the DLT_* code values).
+	 */
+	{ null_if_print,	PCAP_ENCAP_NULL },
+	{ ether_if_print,	PCAP_ENCAP_ETHERNET },
+	{ token_if_print,	PCAP_ENCAP_TOKEN_RING },
+	{ sl_if_print,		PCAP_ENCAP_SLIP },
+	{ ppp_if_print,		PCAP_ENCAP_PPP },
+	{ fddi_if_print,	PCAP_ENCAP_FDDI },
+
+	/*
+	 * DLT_* codes that aren't the same on all platforms.
+	 */
+#ifdef DLT_ATM_RFC1483
+	{ atm_if_print,		DLT_ATM_RFC1483 },
+#endif
+#ifdef DLT_RAW
+	{ raw_if_print,		DLT_RAW },
+#endif
+#ifdef DLT_SLIP_BSDOS
+	{ sl_bsdos_if_print,	DLT_SLIP_BSDOS },
+#endif
+#ifdef DLT_PPP_BSDOS
+	{ ppp_bsdos_if_print,	DLT_PPP_BSDOS },
 #endif
 #ifdef DLT_CIP
 	{ cip_if_print,         DLT_CIP },
 #endif
-	{ sl_if_print,		DLT_SLIP },
-	{ sl_bsdos_if_print,	DLT_SLIP_BSDOS },
-	{ ppp_if_print,		DLT_PPP },
-	{ ppp_bsdos_if_print,	DLT_PPP_BSDOS },
-	{ fddi_if_print,	DLT_FDDI },
-	{ null_if_print,	DLT_NULL },
-	{ raw_if_print,		DLT_RAW },
-	{ atm_if_print,		DLT_ATM_RFC1483 },
-#ifdef DLT_CHDLC
-	{ chdlc_if_print,	DLT_CHDLC },
+#ifdef DLT_ATM_CLIP
+	{ cip_if_print,         DLT_ATM_CLIP },
 #endif
+#ifdef DLT_LANE8023
+	{ lane_if_print,        DLT_LANE8023 },
+#endif
+
+	/*
+	 * PCAP_ENCAP_* codes corresponding to DLT_* codes that aren't
+	 * necessarily the same on all platforms, and PCAP_ENCAP_* codes
+	 * for which there aren't DLT_* codes.
+	 */
+	{ atm_if_print,		PCAP_ENCAP_ATM_RFC1483 },
+	{ raw_if_print,		PCAP_ENCAP_RAW },
+	{ sl_bsdos_if_print,	PCAP_ENCAP_SLIP_BSDOS },
+	{ ppp_bsdos_if_print,	PCAP_ENCAP_PPP_BSDOS },
+	{ chdlc_if_print,	PCAP_ENCAP_C_HDLC },
+	{ cip_if_print,         PCAP_ENCAP_ATM_CLIP },
 	{ NULL,			0 },
 };
 
@@ -132,7 +172,7 @@ lookup_printer(int type)
 		if (type == p->type)
 			return p->f;
 
-	error("unknown data link type 0x%x", type);
+	error("unknown data link type %d", type);
 	/* NOTREACHED */
 }
 
