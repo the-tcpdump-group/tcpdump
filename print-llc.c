@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.58 2004-05-01 10:06:00 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.59 2005-01-25 16:22:57 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -72,6 +72,15 @@ static struct tok cmd2str[] = {
 	{ 0,		NULL }
 };
 
+static struct tok snap_oui_values[] = {
+        { OUI_ENCAP_ETHER, "Ethernet" },
+        { OUI_CISCO, "Cisco" },
+        { OUI_CISCO_90, "Cisco bridged" },
+        { OUI_RFC2684, "Ethernet bridged" },
+        { OUI_APPLETALK, "Appletalk" },
+        { 0,		NULL }
+};
+
 /*
  * Returns non-zero IFF it succeeds in printing the header
  */
@@ -94,7 +103,7 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 	memcpy((char *)&llc, (char *)p, min(caplen, sizeof(llc)));
 
 	if (eflag)
-	  printf("LLC, dsap %s (0x%02x), ssap %s (0x%02x), cmd 0x%02x, ",
+	  printf("LLC, dsap %s (0x%02x), ssap %s (0x%02x), cmd 0x%02x: ",
                  tok2str(llc_values,"Unknown",llc.dsap),
 		 llc.dsap,
                  tok2str(llc_values,"Unknown",llc.ssap),
@@ -221,7 +230,8 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 		et = EXTRACT_16BITS(&llc.llc_ethertype[0]);
 
                 if (eflag)
-                    (void)printf("oui 0x%06x, ethertype %s (0x%04x): ",
+                    (void)printf("oui %s (0x%06x), ethertype %s (0x%04x): ",
+                                 tok2str(snap_oui_values,"Unknown",orgcode),
                                  orgcode,
                                  tok2str(ethertype_values,"Unknown", et),
                                  et);
