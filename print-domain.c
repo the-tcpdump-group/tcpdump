@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.65 2001-01-12 15:06:06 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.66 2001-01-28 07:47:56 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -47,92 +47,6 @@ static const char rcsid[] =
 #include "interface.h"
 #include "addrtoname.h"
 #include "extract.h"                    /* must come after interface.h */
-
-/* Compatibility */
-#ifndef T_TXT
-#define T_TXT		16		/* text strings */
-#endif
-#ifndef T_RP
-#define T_RP		17		/* responsible person */
-#endif
-#ifndef T_AFSDB
-#define T_AFSDB		18		/* AFS cell database */
-#endif
-#ifndef T_X25
-#define T_X25		19		/* X_25 calling address */
-#endif
-#ifndef T_ISDN
-#define T_ISDN		20		/* ISDN calling address */
-#endif
-#ifndef T_RT
-#define T_RT		21		/* router */
-#endif
-#ifndef T_NSAP
-#define T_NSAP		22		/* NSAP address */
-#endif
-#ifndef T_NSAP_PTR
-#define T_NSAP_PTR	23		/* reverse NSAP lookup (deprecated) */
-#endif
-#ifndef T_SIG
-#define T_SIG		24		/* security signature */
-#endif
-#ifndef T_KEY
-#define T_KEY		25		/* security key */
-#endif
-#ifndef T_PX
-#define T_PX		26		/* X.400 mail mapping */
-#endif
-#ifndef T_GPOS
-#define T_GPOS		27		/* geographical position (withdrawn) */
-#endif
-#ifndef T_AAAA
-#define T_AAAA		28		/* IP6 Address */
-#endif
-#ifndef T_LOC
-#define T_LOC		29		/* Location Information */
-#endif
-#ifndef T_NXT
-#define T_NXT		30		/* Next Valid Name in Zone */
-#endif
-#ifndef T_EID
-#define T_EID		31		/* Endpoint identifier */
-#endif
-#ifndef T_NIMLOC
-#define T_NIMLOC	32		/* Nimrod locator */
-#endif
-#ifndef T_SRV
-#define T_SRV		33		/* Server selection */
-#endif
-#ifndef T_ATMA
-#define T_ATMA		34		/* ATM Address */
-#endif
-#ifndef T_NAPTR
-#define T_NAPTR		35		/* Naming Authority PoinTeR */
-#endif
-#ifndef T_A6
-#define T_A6		38		/* IP6 address */
-#endif
-#ifndef T_DNAME
-#define T_DNAME		39		/* non-terminal redirection */
-#endif
-
-#ifndef T_OPT
-#define T_OPT		41		/* EDNS0 option (meta-RR) */
-#endif
-
-#ifndef T_UNSPEC
-#define T_UNSPEC	103		/* Unspecified format (binary data) */
-#endif
-#ifndef T_UNSPECA
-#define T_UNSPECA	104		/* "unspecified ascii". Ugly MIT hack */
-#endif
-
-#ifndef C_CHAOS
-#define C_CHAOS		3		/* for chaos net (MIT) */
-#endif
-#ifndef C_HS
-#define C_HS		4		/* for Hesiod name server (MIT) (XXX) */
-#endif
 
 static char *ns_ops[] = {
 	"", " inv_q", " stat", " op3", " notify", " op5", " op6", " op7",
