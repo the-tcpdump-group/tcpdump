@@ -58,7 +58,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.59 2004-03-23 06:59:15 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.60 2004-11-04 07:53:56 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -76,6 +76,8 @@ static const char rcsid[] _U_ =
 
 #include "interface.h"
 #include "addrtoname.h"
+
+#undef OPAQUE  /* defined in <wingdi.h> */
 
 /*
  * Universal ASN.1 types
@@ -948,6 +950,10 @@ static int smi_check_a_range(SmiType *smiType, SmiRange *smiRange,
     case SMI_BASETYPE_BITS:
     case SMI_BASETYPE_UNKNOWN:
 	ok = 1;
+	break;
+
+    default:
+	ok = 0;
 	break;
     }
 
