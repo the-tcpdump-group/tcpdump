@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-arp.c,v 1.60 2002-12-11 07:13:57 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-arp.c,v 1.61 2003-01-25 23:27:09 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -158,15 +158,15 @@ struct	atmarp_pkthdr {
 static u_char ezero[6];
 
 static void
-atmarp_addr_print(const u_char *ha, u_int ha_len, const u_char *sa,
-    u_int sa_len)
+atmarp_addr_print(const u_char *ha, u_int ha_len, const u_char *srca,
+    u_int srca_len)
 {
 	if (ha_len == 0)
 		(void)printf("<No address>");
 	else {
 		(void)printf("%s", linkaddr_string(ha, ha_len));
-		if (sa_len != 0)
-			(void)printf(",%s", linkaddr_string(sa, sa_len));
+		if (srca_len != 0)
+			(void)printf(",%s", linkaddr_string(srca, srca_len));
 	}
 }
 
