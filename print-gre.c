@@ -38,7 +38,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-gre.c,v 1.26 2004-06-29 08:12:06 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-gre.c,v 1.27 2004-07-02 06:39:11 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -208,9 +208,11 @@ gre_print_0(const u_char *bp, u_int length)
 	case ETHERTYPE_IP:
 		ip_print(bp, len);
 		break;
+#ifdef INET6
 	case ETHERTYPE_IPV6:
 		ip6_print(bp, len);
 		break;
+#endif
 	case ETHERTYPE_MPLS:
 		mpls_print(bp, len);
 		break;
@@ -280,10 +282,8 @@ gre_print_1(const u_char *bp, u_int length)
 		len -= 4;
 	}
 
-	if ((flags & GRE_SP) == 0) {
+	if ((flags & GRE_SP) == 0)
 		printf(", no-payload");
-		return;
-	}
 
         if (eflag)
             printf(", proto %s (0x%04x)",
@@ -291,6 +291,9 @@ gre_print_1(const u_char *bp, u_int length)
                    prot);
 
         printf(", length %u",length);
+
+        if ((flags & GRE_SP) == 0)
+            return;
 
         if (vflag < 1)
             printf(": "); /* put in a colon as protocol demarc */
