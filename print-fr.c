@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.21 2004-04-02 06:53:19 guy Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.22 2004-10-07 14:53:10 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -37,21 +37,10 @@ static const char rcsid[] _U_ =
 #include "addrtoname.h"
 #include "interface.h"
 #include "ethertype.h"
+#include "nlpid.h"
 #include "extract.h"
 
 static void lmi_print(const u_char *, u_int);
-
-#define NLPID_LMI       0x08   /* ANSI T1.617 Annex D or ITU-T Q.933 Annex A */
-#define NLPID_CISCO_LMI 0x09   /* The original, aka Cisco, aka Gang of Four */
-#define NLPID_SNAP      0x80
-#define NLPID_CLNP      0x81
-#define NLPID_ESIS      0x82
-#define NLPID_ISIS      0x83
-#define NLPID_CONS      0x84
-#define NLPID_IDRP      0x85
-#define NLPID_X25_ESIS  0x8a
-#define NLPID_IPV6      0x8e
-#define NLPID_IP        0xcc
 
 #define FR_EA_BIT	0x01
 
@@ -106,32 +95,6 @@ static int parse_q922_addr(const u_char *p, u_int *dlci, u_int *addr_len,
 	return 0;
 }
 
-
-static const char *fr_nlpids[256];
-
-static void
-init_fr_nlpids(void)
-{
-	int i;
-	static int fr_nlpid_flag = 0;
-
-	if (!fr_nlpid_flag) {
-		for (i=0; i < 256; i++)
-			fr_nlpids[i] = NULL;
-		fr_nlpids[NLPID_LMI] = "LMI";
-		fr_nlpids[NLPID_CISCO_LMI] = "Cisco LMI";
-		fr_nlpids[NLPID_SNAP] = "SNAP";
-		fr_nlpids[NLPID_CLNP] = "CLNP";
-		fr_nlpids[NLPID_ESIS] = "ESIS";
-		fr_nlpids[NLPID_ISIS] = "ISIS";
-		fr_nlpids[NLPID_CONS] = "CONS";
-		fr_nlpids[NLPID_IDRP] = "IDRP";
-		fr_nlpids[NLPID_X25_ESIS] = "X25_ESIS";
-		fr_nlpids[NLPID_IP] = "IP";
-	}
-	fr_nlpid_flag = 1;
-}
-
 /* Frame Relay packet structure, with flags and CRC removed
 
                   +---------------------------+
@@ -168,30 +131,18 @@ fr_hdrlen(const u_char *p, u_int addr_len, u_int caplen)
 		return addr_len + 1 /* UI */ + 1 /* NLPID */;
 }
 
-static const char *
-fr_protostring(u_int8_t proto)
-{
-	static char buf[5+1+2+1];
-
-	init_fr_nlpids();
-
-	if (nflag || fr_nlpids[proto] == NULL) {
-		snprintf(buf, sizeof(buf), "proto %02x", proto);
-		return buf;
-	}
-	return fr_nlpids[proto];
-}
-
 static void
 fr_hdr_print(int length, u_int dlci, char *flags, u_char nlpid)
 {
 	if (qflag)
-		(void)printf("DLCI %u, %s%slength %d: ",
+		(void)printf("DLCI %u, %s%slength %u: ",
 			     dlci, flags, *flags ? ", " : "", length);
 	else
-		(void)printf("DLCI %u, %s%s%s, length %d: ",
+		(void)printf("DLCI %u, %s%sNLPID %s (0x%02x), length %u: ",
 			     dlci, flags, *flags ? ", " : "",
-			     fr_protostring(nlpid), length);
+			     tok2str(nlpid_values,"unknown", nlpid),
+                             nlpid,
+                             length);
 }
 
 u_int
@@ -249,7 +200,7 @@ fr_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 		break;
 
 #ifdef INET6
-	case NLPID_IPV6:
+	case NLPID_IP6:
 		ip6_print(p, length);
 		break;
 #endif

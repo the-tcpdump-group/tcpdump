@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.121 2004-09-15 17:54:11 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.122 2004-10-07 14:53:09 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -42,26 +42,10 @@ static const char rcsid[] _U_ =
 #include "addrtoname.h"
 #include "ethertype.h"
 #include "ether.h"
+#include "nlpid.h"
 #include "extract.h"
 #include "gmpls.h"
 #include "oui.h"
-
-#define	NLPID_CLNP	0x81 /* iso9577 */
-#define	NLPID_ESIS	0x82 /* iso9577 */
-#define	NLPID_ISIS	0x83 /* iso9577 */
-#define NLPID_IP6       0x8e
-#define NLPID_IP        0xcc
-#define	NLPID_NULLNS	0
-
-static struct tok osi_nlpid_values[] = {
-    { NLPID_NULLNS, "NULL-NS"},
-    { NLPID_CLNP,   "CLNP"},
-    { NLPID_ESIS,   "ES-IS"},
-    { NLPID_ISIS,   "IS-IS"},
-    { NLPID_IP,     "IPv4"},
-    { NLPID_IP6,    "IPv6"},
-    { 0, NULL }
-};
 
 #define IPV4            1       /* AFI value */
 #define IPV6            2       /* AFI value */
@@ -509,7 +493,7 @@ void isoclns_print(const u_int8_t *p, u_int length, u_int caplen)
             return;
         }
 
-        printf("%s",tok2str(osi_nlpid_values,"Unknown NLPID (0x%02x)",*p));
+        printf("%s",tok2str(nlpid_values,"Unknown NLPID (0x%02x)",*p));
         
 	switch (*p) {
 
@@ -838,7 +822,7 @@ esis_print(const u_int8_t *pptr, u_int length)
             case ESIS_OPTION_PROTOCOLS:
                 while (opli>0) {
                     printf("%s (0x%02x)",
-                           tok2str(osi_nlpid_values,
+                           tok2str(nlpid_values,
                                    "unknown",
                                    *tptr),
                            *tptr);
@@ -1974,7 +1958,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 		if (!TTEST2(*(tptr), 1))
 		    goto trunctlv;
 		printf("%s (0x%02x)",
-                       tok2str(osi_nlpid_values,
+                       tok2str(nlpid_values,
                                "unknown",
                                *tptr),
                        *tptr);
