@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.81 2003-05-28 12:56:52 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.82 2003-07-01 19:10:26 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -39,6 +39,39 @@ static const char rcsid[] =
 #include "ether.h"
 
 const u_char *snapend;
+
+const struct tok ethertype_values[] = { 
+    { ETHERTYPE_IP,		"IPv4" },
+    { ETHERTYPE_MPLS,		"MPLS unicast" },
+    { ETHERTYPE_MPLS_MULTI,	"MPLS multicast" },
+    { ETHERTYPE_IPV6,		"IPv6" },
+    { ETHERTYPE_8021Q,		"802.1Q" },
+    { ETHERTYPE_VMAN,		"VMAN" },
+    { ETHERTYPE_PUP,            "PUP" },
+    { ETHERTYPE_ARP,            "ARP"},
+    { ETHERTYPE_REVARP ,        "Reverse ARP"},
+    { ETHERTYPE_NS,             "NS" },
+    { ETHERTYPE_SPRITE,         "Sprite" },
+    { ETHERTYPE_TRAIL,          "Trail" },
+    { ETHERTYPE_MOPDL,          "MOP DL" },
+    { ETHERTYPE_MOPRC,          "MOP RC" },
+    { ETHERTYPE_DN,             "DN" },
+    { ETHERTYPE_LAT,            "LAT" },
+    { ETHERTYPE_SCA,            "SCA" },
+    { ETHERTYPE_LANBRIDGE,      "Lanbridge" },
+    { ETHERTYPE_DECDNS,         "DEC DNS" },
+    { ETHERTYPE_DECDTS,         "DEC DTS" },
+    { ETHERTYPE_VEXP,           "VEXP" },
+    { ETHERTYPE_VPROD,          "VPROD" },
+    { ETHERTYPE_ATALK,          "Appletalk" },
+    { ETHERTYPE_AARP,           "Appletalk ARP" },
+    { ETHERTYPE_IPX,            "IPX" },
+    { ETHERTYPE_PPP,            "PPP" },
+    { ETHERTYPE_PPPOED,         "PPPoE D" },
+    { ETHERTYPE_PPPOES,         "PPPoE S" },
+    { ETHERTYPE_LOOPBACK,       "Loopback" },
+    { 0, NULL}
+};
 
 static inline void
 ether_hdr_print(register const u_char *bp, u_int length)
