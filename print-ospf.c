@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.38 2003-10-03 13:00:33 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.39 2003-10-03 13:20:46 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -144,33 +144,30 @@ ospf_print_lsa(register const struct lsa *lsap)
 	register const u_int32_t *lp;
 	register int j, k;
 
-        switch (lsap->ls_hdr.ls_type) {
+	printf("\n\t  Advertising Router: %s, seq 0x%08x, age %us",
+	       ipaddr_string(&lsap->ls_hdr.ls_router),
+	       EXTRACT_32BITS(&lsap->ls_hdr.ls_seq),
+	       EXTRACT_16BITS(&lsap->ls_hdr.ls_age));
 
+        switch (lsap->ls_hdr.ls_type) {
 	/* the LSA header for opaque LSAs was slightly changed */
         case LS_TYPE_OPAQUE_LL:
         case LS_TYPE_OPAQUE_AL:
         case LS_TYPE_OPAQUE_DW:
 
-            printf("\n\t  %s LSA (%d), Opaque-Type: %u, Opaque-ID: %u, Adv. Router: %s, seq 0x%08x, age %us",
+            printf("\n\t  %s LSA (%d), Opaque-Type: %u, Opaque-ID: %u",
 		   tok2str(lsa_values,"unknown",lsap->ls_hdr.ls_type),
 		   (lsap->ls_hdr.ls_type),
 		   *(&lsap->ls_hdr.opaque_type),
-		   EXTRACT_24BITS(&lsap->ls_hdr.opaque_id),
-		   ipaddr_string(&lsap->ls_hdr.ls_router),
-		   EXTRACT_32BITS(&lsap->ls_hdr.ls_seq),
-		   EXTRACT_16BITS(&lsap->ls_hdr.ls_age));
-
+		   EXTRACT_24BITS(&lsap->ls_hdr.opaque_id));
 	    break;
 
 	/* all other LSA types use regular style LSA headers */
 	default:
-	    printf("\n\t  %s LSA (%d), LSA-ID: %s, Adv. Router: %s, seq 0x%08x, age %us",
+	    printf("\n\t  %s LSA (%d), LSA-ID: %s",
 		   tok2str(lsa_values,"unknown",lsap->ls_hdr.ls_type),
 		   lsap->ls_hdr.ls_type,
-		   ipaddr_string(&lsap->ls_hdr.ls_stateid),
-		   ipaddr_string(&lsap->ls_hdr.ls_router),
-		   EXTRACT_32BITS(&lsap->ls_hdr.ls_seq),
-		   EXTRACT_16BITS(&lsap->ls_hdr.ls_age));
+		   ipaddr_string(&lsap->ls_hdr.ls_stateid));
 	    break;
 	}
 
