@@ -14,8 +14,7 @@
 /* Define if you have SSLeay 0.9.0b with the buggy cast128. */
 #undef HAVE_BUGGY_CAST128
 
-/* Define both to enable IPv6 support XXX why 2? ENABLE_IPV6 is not used. */
-#undef ENABLE_IPV6
+/* Define if you enable IPv6 support */
 #undef INET6
 
 /* Define if you enable support for the libsmi. */
