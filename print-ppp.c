@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.82 2003-05-11 08:59:22 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.83 2003-05-15 15:25:19 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -388,7 +388,7 @@ handle_ctrl_proto(u_int proto, const u_char *pptr, int length)
 
 	code = *tptr++;
 	
-        printf("%s (%u)",
+        printf("%s, id %u",
                tok2str(cpcodes, "Unknown Opcode 0x%02x",code),
                *tptr++); /* ID */
 
