@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.80 2001-12-10 08:41:15 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.81 2002-04-24 06:34:18 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -265,10 +265,10 @@ AC_DEFUN(AC_LBL_TYPE_SIGNAL,
 	    ;;
 
     *)
-	    dnl prefer sigset() to sigaction()
-	    AC_CHECK_FUNCS(sigset)
-	    if test $ac_cv_func_sigset = no ; then
-		    AC_CHECK_FUNCS(sigaction)
+	    dnl prefer sigaction() to sigset()
+	    AC_CHECK_FUNCS(sigaction)
+	    if test $ac_cv_func_sigaction = no ; then
+		    AC_CHECK_FUNCS(sigset)
 	    fi
 	    ;;
     esac])
