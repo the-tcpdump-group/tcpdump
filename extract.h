@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/extract.h,v 1.22 2004-09-25 06:48:14 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/extract.h,v 1.23 2004-09-25 07:41:44 guy Exp $ (LBL)
  */
 
 /*
@@ -56,7 +56,7 @@ typedef struct {
 #define EXTRACT_32BITS(p) \
 	((u_int32_t)ntohl(((const unaligned_u_int32_t *)(p))->val))
 #define EXTRACT_64BITS(p) \
-	((u_int64_t)(((u_int64_t)ntohl(((const unaligned_u_int32_t *)(p))->val) << 32 | \
+	((u_int64_t)(((u_int64_t)ntohl(((const unaligned_u_int32_t *)(p) + 0)->val)) << 32 | \
 		     ((u_int64_t)ntohl(((const unaligned_u_int32_t *)(p) + 1)->val)) << 0))
 
 #else /* HAVE___ATTRIBUTE__ */
@@ -80,7 +80,7 @@ typedef struct {
 		     (u_int64_t)*((const u_int8_t *)(p) + 3) << 32 | \
 	             (u_int64_t)*((const u_int8_t *)(p) + 4) << 24 | \
 		     (u_int64_t)*((const u_int8_t *)(p) + 5) << 16 | \
-		     (u_int64_t)*((const u_int8_t *)(p) + 7) << 8 | \
+		     (u_int64_t)*((const u_int8_t *)(p) + 6) << 8 | \
 		     (u_int64_t)*((const u_int8_t *)(p) + 7)))
 #endif /* HAVE___ATTRIBUTE__ */
 #else /* LBL_ALIGN */
