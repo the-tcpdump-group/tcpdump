@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.120 
+# From configure.in Revision: 1.122 
 
 
 
@@ -4539,7 +4539,7 @@ fi
 
 	bak_CPPFLAGS=$CPPFLAGS
 	CPPFLAGS="$CPPFLAGS $V_INCLS"
-	for ac_hdr in cast.h rc5.h
+	for ac_hdr in cast.h
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
