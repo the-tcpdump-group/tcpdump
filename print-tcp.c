@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.63 1999-12-22 15:44:10 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.64 2000-04-27 11:09:08 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -82,6 +82,17 @@ static const char rcsid[] =
 #define TCPOPT_CCECHO		13	/* T/TCP CC options (rfc1644) */
 #endif
 
+/*
+ * Definitions required for ECN
+ * for use if the OS running tcpdump does not have ECN
+ */
+#ifndef TH_ECNECHO
+#define TH_ECNECHO		0x40	/* ECN Echo in tcp header */
+#endif
+#ifndef TH_CWR
+#define TH_CWR			0x80	/* ECN Cwnd Reduced in tcp header*/
+#endif
+
 struct tha {
 #ifndef INET6
 	struct in_addr src;
@@ -125,7 +136,7 @@ tcp_print(register const u_char *bp, register u_int length,
 	register u_char flags;
 	register int hlen;
 	register char ch;
-	u_short sport, dport, win, urp;
+	u_int16_t sport, dport, win, urp;
 	u_int32_t seq, ack, thseq, thack;
 	int threv;
 #ifdef INET6
@@ -180,8 +191,8 @@ tcp_print(register const u_char *bp, register u_int length,
 
 	TCHECK(*tp);
 
-	seq = ntohl(tp->th_seq);
-	ack = ntohl(tp->th_ack);
+	seq = (u_int32_t)ntohl(tp->th_seq);
+	ack = (u_int32_t)ntohl(tp->th_ack);
 	win = ntohs(tp->th_win);
 	urp = ntohs(tp->th_urp);
 
@@ -189,12 +200,8 @@ tcp_print(register const u_char *bp, register u_int length,
 		(void)printf("tcp %d", length - tp->th_off * 4);
 		return;
 	}
-#ifdef TH_ECN
-	if ((flags = tp->th_flags) & (TH_SYN|TH_FIN|TH_RST|TH_PUSH|TH_ECN))
-#else
-	if ((flags = tp->th_flags) & (TH_SYN|TH_FIN|TH_RST|TH_PUSH))
-#endif
-	{
+	if ((flags = tp->th_flags) & (TH_SYN|TH_FIN|TH_RST|TH_PUSH|
+				      TH_ECNECHO|TH_CWR)) {
 		if (flags & TH_SYN)
 			putchar('S');
 		if (flags & TH_FIN)
@@ -203,21 +210,12 @@ tcp_print(register const u_char *bp, register u_int length,
 			putchar('R');
 		if (flags & TH_PUSH)
 			putchar('P');
-#ifdef TH_ECN
-		if (flags & TH_ECN)
-			putchar('C');
-#endif
+		if (flags & TH_CWR)
+			putchar('W');	/* congestion _W_indow reduced (ECN) */
+		if (flags & TH_ECNECHO)
+			putchar('E');	/* ecn _E_cho sent (ECN) */
 	} else
 		putchar('.');
-
-	if (flags&0xc0) {
-		printf(" [");
-		if (flags&0x40)
-			printf("ECN-Echo");
-		if (flags&0x80)
-			printf("%sCWR", (flags&0x40) ? "," : "");
-		printf("]");
-	}
 
 	if (!Sflag && (flags & TH_ACK)) {
 		register struct tcp_seq_hash *th;

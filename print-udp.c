@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.72 2000-04-27 10:57:07 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.73 2000-04-27 11:09:08 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -127,8 +127,8 @@ vat_print(const void *hdr, u_int len, register const struct udphdr *up)
 			     ts & 0x3ff, ts >> 10);
 	} else {
 		/* probably vat */
-		u_int i0 = ntohl(((u_int *)hdr)[0]);
-		u_int i1 = ntohl(((u_int *)hdr)[1]);
+		u_int32_t i0 = (u_int32_t)ntohl(((u_int *)hdr)[0]);
+		u_int32_t i1 = (u_int32_t)ntohl(((u_int *)hdr)[1]);
 		printf(" udp/vat %u c%d %u%s",
 			(u_int32_t)(ntohs(up->uh_ulen) - sizeof(*up) - 8),
 			i0 & 0xffff,
@@ -147,8 +147,8 @@ rtp_print(const void *hdr, u_int len, register const struct udphdr *up)
 	/* rtp v1 or v2 */
 	u_int *ip = (u_int *)hdr;
 	u_int hasopt, hasext, contype, hasmarker;
-	u_int i0 = ntohl(((u_int *)hdr)[0]);
-	u_int i1 = ntohl(((u_int *)hdr)[1]);
+	u_int32_t i0 = (u_int32_t)ntohl(((u_int *)hdr)[0]);
+	u_int32_t i1 = (u_int32_t)ntohl(((u_int *)hdr)[1]);
 	u_int dlen = ntohs(up->uh_ulen) - sizeof(*up) - 8;
 	const char * ptype;
 
@@ -236,7 +236,7 @@ rtcp_print(const u_char *hdr, const u_char *ep)
 		if (len != cnt * sizeof(*rr) + sizeof(*sr) + sizeof(*rh))
 			printf(" [%d]", len);
 		if (vflag)
-		  printf(" %u", (u_int32_t)ntohl(rh->rh_ssrc));
+			printf(" %u", (u_int32_t)ntohl(rh->rh_ssrc));
 		if ((u_char *)(sr + 1) > ep) {
 			printf(" [|rtcp]");
 			return (ep);
@@ -254,18 +254,18 @@ rtcp_print(const u_char *hdr, const u_char *ep)
 			printf(" [%d]", len);
 		rr = (struct rtcp_rr *)(rh + 1);
 		if (vflag)
-		  printf(" %u", (u_int32_t)ntohl(rh->rh_ssrc));
+			printf(" %u", (u_int32_t)ntohl(rh->rh_ssrc));
 		break;
 	case RTCP_PT_SDES:
 		printf(" sdes %d", len);
 		if (vflag)
-		  printf(" %u", (u_int32_t)ntohl(rh->rh_ssrc));
+			printf(" %u", (u_int32_t)ntohl(rh->rh_ssrc));
 		cnt = 0;
 		break;
 	case RTCP_PT_BYE:
 		printf(" bye %d", len);
 		if (vflag)
-		  printf(" %u", (u_int32_t)ntohl(rh->rh_ssrc));
+			printf(" %u", (u_int32_t)ntohl(rh->rh_ssrc));
 		cnt = 0;
 		break;
 	default:
