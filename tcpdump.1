@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.106 2001-06-25 03:23:19 itojun Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.107 2001-07-05 22:58:29 guy Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -77,32 +77,103 @@ tcpdump \- dump traffic on a network
 .SH DESCRIPTION
 .LP
 \fITcpdump\fP prints out the headers of packets on a network interface
-that match the boolean \fIexpression\fP.
+that match the boolean \fIexpression\fP.  It can also be run with the
+.B \-w
+flag, which causes it to save the packet data to a file for later
+analysis, and/or with the
+.B \-b
+flag, which causes it to read from a saved packet file rather than to
+read packets from a network interface.  In all cases, only packets that
+match
+.I expression
+will be processed by
+.IR tcpdump .
 .LP
-.B Under SunOS with nit or bpf:
-To run
+.I Tcpdump
+will, if not run with the
+.B \-c
+flag, continue capturing packets until it is interrupted by a SIGINT
+signal (generated, for example, by typing your interrupt character,
+typically control-C) or a SIGTERM signal (typically generated with the
+.BR kill (1)
+command); if run with the
+.B \-c
+flag, it will capture packets until it is interrupted by a SIGINT or
+SIGTERM signal or the specified number of packets have been processed.
+.LP
+When
 .I tcpdump
-you must have read access to
+finishes capturing packets, it will report counts of:
+.IP
+packets ``received by filter'' (the meaning of this depends on the OS on
+which you're running
+.IR tcpdump ,
+and possibly on the way the OS was configured - if a filter was
+specified on the command line, on some OSes it counts packets regardless
+of whether they were matched by the filter expression, and on other OSes
+it counts only packets that were matched by the filter expression and
+were processed by
+.IR tcpdump );
+.IP
+packets ``dropped by kernel'' (this is the number of packets that were
+dropped, due to a lack of buffer space, by the packet capture mechanism
+in the OS on which
+.I tcpdump
+is running, if the OS reports that information to applications; if not,
+it will be reported as 0).
+.LP
+On platforms that support the SIGINFO signal, such as most BSDs, it will
+report those counts when it receives a SIGINFO signal (generated, for
+example, by typing your ``status'' character, typically control-T) and
+will continue capturing packets.
+.LP
+Reading packets from a network interface may require that you have
+special privileges:
+.TP
+.B Under SunOS 3.x or 4.x with NIT or BPF:
+You must have read access to
 .I /dev/nit
 or
 .IR /dev/bpf* .
-.B Under Solaris with dlpi:
+.TP
+.B Under Solaris with DLPI:
 You must have read/write access to the network pseudo device, e.g.
 .IR /dev/le .
-.B Under HP-UX with dlpi:
-You must be root or it must be installed setuid to root.
+On at least some versions of Solaris, however, this is not sufficient to
+allow
+.I tcpdump
+to capture in promiscuous mode; on those versions of Solaris, you must
+be root, or
+.I tcpdump
+must be installed setuid to root, in order to capture in promiscuous
+mode.
+.TP
+.B Under HP-UX with DLPI:
+You must be root or
+.I tcpdump
+must be installed setuid to root.
+.TP
 .B Under IRIX with snoop:
-You must be root or it must be installed setuid to root.
+You must be root or
+.I tcpdump
+must be installed setuid to root.
+.TP
 .B Under Linux:
-You must be root or it must be installed setuid to root.
+You must be root or
+.I tcpdump
+must be installed setuid to root.
+.TP
 .B Under Ultrix and Digital UNIX:
 Once the super-user has enabled promiscuous-mode operation using
 .IR pfconfig (8),
-any user may run
-.BR tcpdump .
+any user may capture network traffic with
+.IR tcpdump .
+.TP
 .B Under BSD:
 You must have read access to
 .IR /dev/bpf* .
+.LP
+Reading a saved packet file doesn't require special privileges.
 .SH OPTIONS
 .TP
 .B \-a
@@ -589,7 +660,7 @@ header, which is usually layered on top of the FDDI or Token Ring
 header.
 .IP
 When filtering for most protocol identifiers on FDDI or Token Ring,
-\fBtcpdump\fR checks only the protocol ID field of an LLC header in
+\fItcpdump\fR checks only the protocol ID field of an LLC header in
 so-called SNAP format with an Organizational Unit Identifier (OUI) of
 0x000000, for encapsulated Ethernet; it doesn't check whether the packet
 is in SNAP format with an OUI of 0x000000.
@@ -600,7 +671,7 @@ the LLC header, \fIstp\fP and \fInetbeui\fP, where it checks the DSAP of
 the LLC header, and \fIatalk\fP, where it checks for a SNAP-format
 packet with an OUI of 0x080007 and the Appletalk etype.
 .IP
-In the case of Ethernet, \fBtcpdump\fR checks the Ethernet type field
+In the case of Ethernet, \fItcpdump\fR checks the Ethernet type field
 for most of those protocols; the exceptions are \fIiso\fP, \fIsap\fP,
 and \fInetbeui\fP, for which it checks for an 802.3 frame and then
 checks the LLC header as it does for FDDI and Token Ring, \fIatalk\fP,
@@ -942,7 +1013,7 @@ Csam
 replies with its ethernet address (in this example, ethernet addresses
 are in caps and internet addresses in lower case).
 .LP
-This would look less redundant if we had done \fBtcpdump \-n\fP:
+This would look less redundant if we had done \fItcpdump \-n\fP:
 .RS
 .nf
 .sp .5
@@ -951,7 +1022,7 @@ arp reply 128.3.254.6 is-at 02:07:01:00:01:c4\fP
 .fi
 .RE
 .LP
-If we had done \fBtcpdump \-e\fP, the fact that the first packet is
+If we had done \fItcpdump \-e\fP, the fact that the first packet is
 broadcast and the second is point-to-point would be visible:
 .RS
 .nf
