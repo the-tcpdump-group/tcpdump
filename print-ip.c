@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.113 2002-09-05 21:25:41 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.114 2002-10-03 16:00:34 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -549,6 +549,12 @@ again:
 			break;
 #endif /*INET6*/
 
+#ifndef IPPROTO_RSVP
+#define IPPROTO_RSVP 46
+#endif
+		case IPPROTO_RSVP:
+			rsvp_print(cp, len);
+			break;
 
 #ifndef IPPROTO_GRE
 #define IPPROTO_GRE 47
@@ -674,5 +680,6 @@ ipN_print(register const u_char *bp, register u_int length)
 		return;
 	}
 }
+
 
 

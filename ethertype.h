@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/ethertype.h,v 1.17 2002-09-11 22:15:16 hannes Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/ethertype.h,v 1.18 2002-10-03 16:00:33 hannes Exp $ (LBL)
  */
 
 /*
@@ -123,3 +123,12 @@
 #ifndef	ETHERTYPE_ISO
 #define	ETHERTYPE_ISO           0xfefe  /* nonstandard - used in Cisco HDLC encapsulation */
 #endif
+
+/* FIXME complete the proto-id to string mapping */
+static const struct tok ethertype_values[] = { 
+    { ETHERTYPE_IP,		"IPv4" },
+    { ETHERTYPE_MPLS,		"MPLS unicast" },
+    { ETHERTYPE_MPLS_MULTI,	"MPLS multicast" },
+    { ETHERTYPE_IPV6,		"IPv6" },
+    { 0, NULL}
+};

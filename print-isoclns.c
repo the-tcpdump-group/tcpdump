@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.62 2002-09-15 00:58:43 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.63 2002-10-03 16:00:34 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -122,6 +122,7 @@ static struct tok isis_pdu_values[] = {
 #define TLV_SHARED_RISK_GROUP   138
 #define TLV_NORTEL_PRIVATE1     176
 #define TLV_NORTEL_PRIVATE2     177
+#define TLV_HOLDTIME            198 /* ES-IS */
 #define TLV_RESTART_SIGNALING   211
 #define TLV_MT_IS_REACH         222
 #define TLV_MT_SUPPORTED        229
@@ -161,6 +162,7 @@ static struct tok isis_tlv_values[] = {
     { TLV_SHARED_RISK_GROUP, "Shared Risk Link Group"},
     { TLV_NORTEL_PRIVATE1,   "Nortel Proprietary"},
     { TLV_NORTEL_PRIVATE2,   "Nortel Proprietary"},
+    { TLV_HOLDTIME,          "Holdtime"},
     { TLV_RESTART_SIGNALING, "Restart Signaling"},
     { TLV_MT_IS_REACH,       "Multi Topology IS Reachability"},
     { TLV_MT_SUPPORTED,      "Multi Topology"},
@@ -310,7 +312,7 @@ static struct tok isis_lsp_istype_values[] = {
     { 0, NULL }
 };
 
-static struct tok isis_nlpid_values[] = {
+static struct tok osi_nlpid_values[] = {
     { NLPID_CLNS,   "CLNS"},
     { NLPID_IP,     "IPv4"},
     { NLPID_IP6,    "IPv6"},
@@ -496,18 +498,16 @@ void isoclns_print(const u_char *p, u_int length, u_int caplen,
 		break;
 
 	case NLPID_ESIS:
-		(void)printf("ESIS, length: %u", length);
 		if (!eflag && esrc != NULL && edst != NULL)
-			(void)printf(", %s > %s",
+			(void)printf("%s > %s, ",
 				     etheraddr_string(esrc),
 				     etheraddr_string(edst));
 		esis_print(p, length);
 		return;
 
 	case NLPID_ISIS:
-		(void)printf("ISIS, length: %u", length);
 		if (!eflag && esrc != NULL && edst != NULL)
-			(void)printf(", %s > %s",
+			(void)printf("%s > %s, ",
 			     etheraddr_string(esrc),
 			     etheraddr_string(edst));
 		if (!isis_print(p, length))
@@ -537,6 +537,13 @@ void isoclns_print(const u_char *p, u_int length, u_int caplen,
 #define	ESIS_REDIRECT	6
 #define	ESIS_ESH	2
 #define	ESIS_ISH	4
+
+static struct tok esis_values[] = {
+    { ESIS_REDIRECT, "redirect"},
+    { ESIS_ESH,      "ESH"},
+    { ESIS_ISH,      "ISH"},
+    { 0, NULL }
+};
 
 struct esis_hdr {
 	u_char version;
@@ -580,24 +587,14 @@ esis_print(const u_char *p, u_int length)
 		}
 		return;
 	}
-	switch (eh->type & 0x1f) {
 
-	case ESIS_REDIRECT:
-		printf(" redirect");
-		break;
+        printf("ES-IS, %s, length: %u",
+               tok2str(esis_values,"unknown type: %u",eh->type & 0x1f),
+               length);
 
-	case ESIS_ESH:
-		printf(" ESH");
-		break;
+        if(vflag < 1)
+               return;
 
-	case ESIS_ISH:
-		printf(" ISH");
-		break;
-
-	default:
-		printf(" type %d", eh->type & 0x1f);
-		break;
-	}
 	if (vflag && osi_cksum(p, li)) {
 		printf(" bad cksum (got 0x%02x%02x)",
 		       eh->cksum[1], eh->cksum[0]);
@@ -634,11 +631,10 @@ esis_print(const u_char *p, u_int length)
 		li = ep - p;
 		break;
 	}
-#if 0
+
 	case ESIS_ESH:
-		printf(" ESH");
 		break;
-#endif
+
 	case ESIS_ISH: {
 		const u_char *is;
 
@@ -656,13 +652,18 @@ esis_print(const u_char *p, u_int length)
 	}
 
 	default:
-		(void)printf(" len=%d", length);
-		if (length && p < snapend) {
-			length = snapend - p;
-			default_print(p, length);
-		}
-		return;
+            if (vflag <= 1) {
+		    if (p < snapend) 
+                            print_unknown_data(p,"\n\t  ",snapend-p);
+            }
+            return;
 	}
+
+        /* hexdump - FIXME ? */
+        if (vflag > 1) {
+                    if (p < snapend)
+                            print_unknown_data(p,"\n\t  ",snapend-p);
+        }
 	if (vflag)
 		while (p < ep && li) {
 			u_int op, opli;
@@ -671,29 +672,37 @@ esis_print(const u_char *p, u_int length)
 			if (snapend - p < 2)
 				return;
 			if (li < 2) {
-				printf(" bad opts/li");
+				printf(", bad opts/li");
 				return;
 			}
 			op = *p++;
 			opli = *p++;
 			li -= 2;
 			if (opli > li) {
-				printf(" opt (%d) too long", op);
+				printf(", opt (%d) too long", op);
 				return;
 			}
 			li -= opli;
 			q = p;
 			p += opli;
+
 			if (snapend < p)
 				return;
-			if (op == 198 && opli == 2) {
-				printf(" tmo=%d", q[0] * 256 + q[1]);
+
+			if (op == TLV_HOLDTIME && opli == 2) {
+				printf("\n\tholdtime: %us", EXTRACT_16BITS(q));
 				continue;
 			}
-			printf (" %d:<", op);
-			while (opli-- > 0)
-				printf("%02x", *q++);
-			printf (">");
+
+			if (op == TLV_PROTOCOLS && opli >= 1) {
+				printf("\n\t%s (length: %u): %s",
+                                       tok2str(isis_tlv_values, "unknown", op),
+                                       opli,
+                                       tok2str(osi_nlpid_values,"Unknown 0x%02x",*q));
+				continue;
+			}
+
+                        print_unknown_data(q,"\n\t  ",opli);
 		}
 }
 
@@ -1180,6 +1189,19 @@ static int isis_print (const u_char *p, u_int length)
 	break;
     }
 
+    pdu_type=header->pdu_type;
+
+    /* in non-verbose mode just lets print the basic PDU Type*/
+    if (vflag < 1) {
+        printf("IS-IS, %s, length: %u",
+               tok2str(isis_pdu_values,"unknown PDU-Type %u",pdu_type),
+               length);
+        return(1);
+    }
+
+    /* ok they seem to want to know everything - lets fully decode it */
+    printf("IS-IS, length: %u",length);
+
     printf("\n\thlen: %u, v: %u, pdu-v: %u, sys-id-len: %u (%u), max-area: %u (%u)",
            header->fixed_len,
            header->version,
@@ -1189,12 +1211,10 @@ static int isis_print (const u_char *p, u_int length)
            max_area,
            header->max_area);
 
-    pdu_type=header->pdu_type;
-
     /* first lets see if we know the PDU name*/
     printf(", pdu-type: %s",
            tok2str(isis_pdu_values,
-                   "unknown, type %d",
+                   "unknown, type %u",
                    pdu_type));
 
     if (vflag) {
@@ -1846,7 +1866,7 @@ static int isis_print (const u_char *p, u_int length)
 		if (!TTEST2(*(tptr), 1))
 		    goto trunctlv;
 		printf("%s",
-                       tok2str(isis_nlpid_values,
+                       tok2str(osi_nlpid_values,
                                "Unknown 0x%02x",
                                *tptr++));
 		if (tmp>1) /* further NPLIDs ? - put comma */
@@ -2061,13 +2081,14 @@ static int isis_print (const u_char *p, u_int length)
         case TLV_MT_IP6_REACH:
 
 	default:
-            if (!vflag) {
+            if (vflag <= 1) {
                 if(!print_unknown_data(pptr,"\n\t\t",len))
                     return(0);
             }
 	    break;
 	}
-        if (vflag) {
+        /* do we want to see an additionally hexdump ? */
+        if (vflag> 1) {
 	    if(!print_unknown_data(pptr,"\n\t\t",len))
 	        return(0);
         }
