@@ -9,7 +9,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/parsenfsfh.c,v 1.16 1999-11-21 09:36:47 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/parsenfsfh.c,v 1.17 2000-06-01 01:02:15 assar Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -93,6 +93,7 @@ int ourself;		/* true if file handle was generated on this host */
 	register unsigned char *fhp = (unsigned char *)fh;
 	u_int32_t temp;
 	int fhtype = FHT_UNKNOWN;
+	int i;
 
 	if (ourself) {
 	    /* File handle generated on this host, no need for guessing */
@@ -370,15 +371,18 @@ int ourself;		/* true if file handle was generated on this host */
 
 	case FHT_UNKNOWN:
 #ifdef DEBUG
-	    {
-		/* XXX debugging */
-		int i;
-		for (i = 0; i < 32; i++)
-			(void)fprintf(stderr, "%x.", fhp[i]);
-		(void)fprintf(stderr, "\n");
-	    }
+	    /* XXX debugging */
+	    int i;
+	    for (i = 0; i < 32; i++)
+		(void)fprintf(stderr, "%x.", fhp[i]);
+	    (void)fprintf(stderr, "\n");
 #endif
 	    /* XXX for now, give "bogus" values to aid debugging */
+
+	    /* Save the actual handle, so it can be display with -u */
+	    for (i = 0; i < 32; i++)
+	    	(void)sprintf(&(fsidp->Opaque_Handle[i*2]), "%.2X", fhp[i]);
+
 	    fsidp->fsid_code = 0;
 	    fsidp->Fsid_dev.Minor = 257;
 	    fsidp->Fsid_dev.Major = 257;
