@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.4 2000-07-01 03:39:08 assar Exp $ (LBL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-pppoe.c,v 1.5 2000-07-10 04:36:19 assar Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -78,7 +78,7 @@ enum {
   PPPOE_RELAY_SID = 0x0110,
   PPPOE_SERVICE_NAME_ERROR = 0x0201,
   PPPOE_AC_SYSTEM_ERROR = 0x0202,
-  PPPOE_GENERIC_ERROR = 0x0203,
+  PPPOE_GENERIC_ERROR = 0x0203
 };
 
 static struct tok pppoetag2str[] = {
