@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.105 2003-11-05 16:40:57 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.106 2003-11-05 23:11:03 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1372,9 +1372,9 @@ static int isis_print (const u_int8_t *p, u_int length)
             printf(" (purged)");
         else
             /* verify the checksum -
-             * checking starts at the lsp-id field
-             * which is 12 bytes after the packet start*/
-            printf(" (%s)", (osi_cksum(optr+12, length-12)) ? "incorrect" : "correct");
+             * checking starts at the lsp-id field at byte position [12]
+             * hence the length needs to be reduced by 12 bytes */
+            printf(" (%s)", (osi_cksum((u_int8_t *)header_lsp->lsp_id, length-12)) ? "incorrect" : "correct");
 
 	printf(", PDU length: %u, Flags: [ %s",
                pdu_len,
@@ -1852,9 +1852,15 @@ static int isis_print (const u_int8_t *p, u_int length)
 	case TLV_CHECKSUM:
 	    if (!TTEST2(*tptr, 2))
 		goto trunctlv;
-	    printf("\n\t      checksum: 0x%04x (%s)",
-		   EXTRACT_16BITS(tptr),
-                   (osi_cksum(optr, length)) ? "incorrect" : "correct");
+	    printf("\n\t      checksum: 0x%04x ", EXTRACT_16BITS(tptr));
+            /* do not attempt to verify the checksum if it is zero
+             * most likely a HMAC-MD5 TLV is also present and
+             * to avoid conflicts the checksum TLV is zeroed.
+             * see rfc3358 for details
+             */
+            if (EXTRACT_16BITS(tptr) == 0)
+                printf("(unverified)");
+            else printf("(%s)", osi_cksum(optr, length) ? "incorrect" : "correct");
 	    break;
 
 	case TLV_MT_SUPPORTED:
