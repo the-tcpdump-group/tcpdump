@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.10 2004-06-16 10:35:29 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.11 2004-10-20 16:17:29 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -398,6 +398,64 @@ struct lspping_tlv_targetfec_subtlv_l2vpn_vcid_t {
     u_int8_t encapsulation[2];
 };
 
+/*
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |               MTU             | Address Type  |  Resvd (SBZ)  |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |             Downstream IP Address (4 or 16 octets)            |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |         Downstream Interface Address (4 or 16 octets)         |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * | Hash Key Type | Depth Limit   |        Multipath Length       |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * .                                                               .
+ * .                     (Multipath Information)                   .
+ * .                                                               .
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |               Downstream Label                |    Protocol   |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * .                                                               .
+ * .                                                               .
+ * .                                                               .
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |               Downstream Label                |    Protocol   |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ */
+struct lspping_tlv_downstream_map_ipv4_t {
+    u_int8_t mtu [2];
+    u_int8_t address_type;
+    u_int8_t res;
+    u_int8_t downstream_ip[4];
+    u_int8_t downstream_interface[4];
+};
+
+struct lspping_tlv_downstream_map_ipv6_t {
+    u_int8_t mtu [2];
+    u_int8_t address_type;
+    u_int8_t res;
+    u_int8_t downstream_ip[16];
+    u_int8_t downstream_interface[16];
+};
+
+struct lspping_tlv_downstream_map_info_t {
+    u_int8_t hash_key_type;
+    u_int8_t depth_limit;
+    u_int8_t multipath_length [2];
+};
+
+#define LSPPING_AFI_IPV4 1
+#define LSPPING_AFI_UNMB 2
+#define LSPPING_AFI_IPV6 3
+
+static const struct tok lspping_tlv_downstream_addr_values[] = {
+    { LSPPING_AFI_IPV4, "IPv4"},
+    { LSPPING_AFI_IPV6, "IPv6"},
+    { LSPPING_AFI_UNMB, "Unnumbered"},
+    { 0, NULL}
+};
+
 void
 lspping_print(register const u_char *pptr, register u_int len) {
 
@@ -409,6 +467,12 @@ lspping_print(register const u_char *pptr, register u_int len) {
     int tlv_hexdump,subtlv_hexdump;
     int lspping_subtlv_len,lspping_subtlv_type;
     struct timeval timestamp; 
+
+    union {
+        const struct lspping_tlv_downstream_map_ipv4_t *lspping_tlv_downstream_map_ipv4;
+        const struct lspping_tlv_downstream_map_ipv6_t *lspping_tlv_downstream_map_ipv6;
+        const struct lspping_tlv_downstream_map_info_t  *lspping_tlv_downstream_map_info;
+    } tlv_ptr;
 
     union {
         const struct lspping_tlv_targetfec_subtlv_ldp_ipv4_t *lspping_tlv_targetfec_subtlv_ldp_ipv4;
@@ -701,12 +765,76 @@ lspping_print(register const u_char *pptr, register u_int len) {
             }
             break;
 
+        case LSPPING_TLV_DOWNSTREAM_MAPPING:
+            /* that strange thing with the downstream map TLV is that until now
+             * we do not know if its IPv4 or IPv6 , after we found the adress-type
+             * lets recast the tlv_tptr and move on */
+
+            tlv_ptr.lspping_tlv_downstream_map_ipv4= \
+                (const struct lspping_tlv_downstream_map_ipv4_t *)tlv_tptr;
+            tlv_ptr.lspping_tlv_downstream_map_ipv6= \
+                (const struct lspping_tlv_downstream_map_ipv6_t *)tlv_tptr;
+            printf("\n\t    MTU: %u, Address-Type: %s (%u)",
+                   EXTRACT_16BITS(tlv_ptr.lspping_tlv_downstream_map_ipv4->mtu),
+                   tok2str(lspping_tlv_downstream_addr_values,
+                           "unknown",
+                           tlv_ptr.lspping_tlv_downstream_map_ipv4->address_type),
+                   tlv_ptr.lspping_tlv_downstream_map_ipv4->address_type);
+
+            switch(tlv_ptr.lspping_tlv_downstream_map_ipv4->address_type) {
+
+            case LSPPING_AFI_IPV4:
+                printf("\n\t    Downstream IP: %s" \
+                       "\n\t    Downstream Interface IP: %s",
+                       ipaddr_string(tlv_ptr.lspping_tlv_downstream_map_ipv4->downstream_ip),
+                       ipaddr_string(tlv_ptr.lspping_tlv_downstream_map_ipv4->downstream_interface));
+                tlv_tptr+=sizeof(struct lspping_tlv_downstream_map_ipv4_t);
+                tlv_tlen-=sizeof(struct lspping_tlv_downstream_map_ipv4_t);
+                break;
+            case LSPPING_AFI_IPV6:
+                printf("\n\t    Downstream IP: %s" \
+                       "\n\t    Downstream Interface IP: %s",
+                       ip6addr_string(tlv_ptr.lspping_tlv_downstream_map_ipv6->downstream_ip),
+                       ip6addr_string(tlv_ptr.lspping_tlv_downstream_map_ipv6->downstream_interface));
+                tlv_tptr+=sizeof(struct lspping_tlv_downstream_map_ipv6_t);
+                tlv_tlen-=sizeof(struct lspping_tlv_downstream_map_ipv6_t);
+                break;
+
+            case LSPPING_AFI_UNMB:
+                printf("\n\t    Downstream IP: %s" \
+                       "\n\t    Downstream Interface Index: 0x%08x",
+                       ipaddr_string(tlv_ptr.lspping_tlv_downstream_map_ipv4->downstream_ip),
+                       EXTRACT_32BITS(tlv_ptr.lspping_tlv_downstream_map_ipv4->downstream_interface));
+                tlv_tptr+=sizeof(struct lspping_tlv_downstream_map_ipv4_t);
+                tlv_tlen-=sizeof(struct lspping_tlv_downstream_map_ipv4_t);
+                break;
+
+            default:
+                /* should not happen ! - no error message - tok2str() has barked already */
+                break;
+            }
+
+            tlv_ptr.lspping_tlv_downstream_map_info= \
+                (const struct lspping_tlv_downstream_map_info_t *)tlv_tptr;
+            
+            /* FIXME add hash-key type, depth limit, multipath processing */
+
+
+            tlv_tptr+=sizeof(struct lspping_tlv_downstream_map_info_t);
+            tlv_tlen-=sizeof(struct lspping_tlv_downstream_map_info_t);
+
+            /* FIXME print downstream labels */
+
+
+            tlv_hexdump=TRUE; /* dump the TLV until code complete */
+
+            break;
+
             /*
              *  FIXME those are the defined TLVs that lack a decoder
              *  you are welcome to contribute code ;-)
              */
 
-        case LSPPING_TLV_DOWNSTREAM_MAPPING:
         case LSPPING_TLV_PAD:
         case LSPPING_TLV_ERROR_CODE:
         case LSPPING_TLV_VENDOR_PRIVATE:
