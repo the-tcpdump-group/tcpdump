@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.43 2001-01-22 02:31:18 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.44 2001-01-28 09:02:14 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -525,7 +525,7 @@ icmp6_opt_print(register const u_char *bp, int resid)
 		icmp6_opt_print((const u_char *)op + (op->nd_opt_len << 3),
 				resid - (op->nd_opt_len << 3));
 		break;
-        case ND_OPT_ADVINT:
+        case ND_OPT_ADVINTERVAL:
 		opa = (struct nd_opt_advint *)op;
 		TCHECK(opa->nd_opt_advint_advint);
 		printf("(advint: ");	/*)*/
