@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.119 2003-07-31 23:38:20 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.120 2003-08-06 06:49:40 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -374,6 +374,7 @@ static int udp6_cksum(const struct ip6_hdr *ip6, const struct udphdr *up,
 #define TIMED_PORT 525		/*XXX*/
 #define RIP_PORT 520		/*XXX*/
 #define LDP_PORT 646
+#define AODV_PORT 654		/*XXX*/
 #define KERBEROS_SEC_PORT 750	/*XXX*/
 #define L2TP_PORT 1701		/*XXX*/
 #define ISAKMP_PORT_USER1 7500	/*XXX - nonstandard*/
@@ -559,6 +560,19 @@ udp_print(register const u_char *bp, u_int length,
 			udpipaddr_print(ip, sport, dport);
 			tftp_print(cp, length);
 			break;
+
+		case PT_AODV:
+			(void)printf("%s.%s > %s.%s: ",
+				ipaddr_string(&ip->ip_src),
+				udpport_string(sport),
+				ipaddr_string(&ip->ip_dst),
+				udpport_string(dport));
+#ifdef INET6
+			aodv_print((void *)(up + 1), length, (void *) ip6);
+#else
+			aodv_print((void *)(up + 1), length, NULL);
+#endif
+			break;
 		}
 		return;
 	}
@@ -636,6 +650,12 @@ udp_print(register const u_char *bp, u_int length,
 			bootp_print((const u_char *)(up + 1), length);
 		else if (ISPORT(RIP_PORT))
 			rip_print((const u_char *)(up + 1), length);
+		else if (ISPORT(AODV_PORT))
+#ifdef INET6
+			aodv_print((const u_char *)(up + 1), length, (void *) ip6);
+#else
+			aodv_print((const u_char *)(up + 1), length, NULL);
+#endif
 		else if (ISPORT(ISAKMP_PORT))
 			isakmp_print((const u_char *)(up + 1), length, bp2);
 #if 1 /*???*/

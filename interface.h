@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.213 2003-05-25 16:23:08 hannes Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.214 2003-08-06 06:49:40 guy Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -95,6 +95,7 @@ extern int packettype;		/* as specified by -T */
 #define PT_SNMP		6	/* Simple Network Management Protocol */
 #define PT_CNFP		7	/* Cisco NetFlow protocol */
 #define PT_TFTP		8	/* trivial file transfer protocol */
+#define PT_AODV		9	/* Ad-hoc On-demand Distance Vector Protocol */
 
 #ifndef min
 #define min(a,b) ((a)>(b)?(b):(a))
@@ -203,6 +204,7 @@ extern int llc_print(const u_char *, u_int, u_int, const u_char *,
 extern int snap_print(const u_char *, u_int, u_int, u_short *, u_int32_t,
 	u_short, u_int);
 extern void aarp_print(const u_char *, u_int);
+extern void aodv_print(const u_char *, u_int, void *);
 extern void arp_print(const u_char *, u_int, u_int);
 extern void atalk_print(const u_char *, u_int);
 extern void atm_print(u_int, u_int, u_int, const u_char *, u_int, u_int);

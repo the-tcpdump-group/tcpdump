@@ -11,6 +11,7 @@ aclocal.m4
 addrtoname.c
 addrtoname.h
 ah.h
+aodv.h
 appletalk.h
 arcnet.h
 atime.awk
@@ -91,6 +92,7 @@ pcap-missing.h
 ppp.h
 print-802_11.c
 print-ah.c
+print-aodv.c
 print-arcnet.c
 print-arp.c
 print-ascii.c
