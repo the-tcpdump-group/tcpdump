@@ -30,12 +30,14 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/ipproto.h,v 1.2 2003-11-24 20:30:51 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/ipproto.h,v 1.3 2004-04-26 17:49:44 hannes Exp $ (LBL)
  *
  * From:
  *	@(#)in.h	8.3 (Berkeley) 1/3/94
  * $FreeBSD: src/sys/netinet/in.h,v 1.38.2.3 1999/08/29 16:29:34 peter Exp $
  */
+
+extern struct tok ipproto_values[];
 
 #ifndef IPPROTO_IP
 #define	IPPROTO_IP		0		/* dummy for IP */
@@ -113,8 +115,8 @@
 #ifndef IPPROTO_ND
 #define	IPPROTO_ND		77		/* Sun net disk proto (temp.) */
 #endif
-#ifndef IPPROTO_IGRP
-#define	IPPROTO_IGRP		88		/* Cisco/GXS IGRP */
+#ifndef IPPROTO_EIGRP
+#define	IPPROTO_EIGRP		88		/* Cisco/GXS IGRP */
 #endif
 #ifndef IPPROTO_OSPF
 #define IPPROTO_OSPF		89
