@@ -24,7 +24,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.138 1999-12-22 15:44:11 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.139 1999-12-29 01:12:55 mcr Exp $ (LBL)";
 #endif
 
 /*
@@ -317,6 +317,7 @@ main(int argc, char **argv)
 			break;
 
 		case 'X':
+    		        ++xflag;
 			++Xflag;
 			break;
 
@@ -475,13 +476,11 @@ default_print_unaligned(register const u_char *cp, register u_int length)
 
 /*
  * By default, print the packet out in hex.
- *
- * (BTW, please don't send us patches to print the packet out in ascii)
  */
 void
 default_print(register const u_char *bp, register u_int length)
 {
-	default_print_unaligned(bp, length);
+  default_print_unaligned(bp, length);
 }
 
 __dead void
