@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.60 2003-02-10 16:59:30 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.61 2003-02-11 06:28:39 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -1156,7 +1156,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                                (*(tptr+6) == (BGP_OSPF_RTYPE_EXT ||BGP_OSPF_RTYPE_NSSA )) ? "E1" : "");
                         break;
                     case BGP_EXT_COM_L2INFO:
-                        printf("\n\t    %s%s:%s(0x%04x):Control Flags [0x%02x]:MTU %u",
+                        printf("\n\t    %s%s(0x%04x):%s Control Flags [0x%02x]:MTU %u",
                                (extd_comm&0x4000) ? "non-transitive: " : "",
                                tok2str(bgp_extd_comm_subtype_values,
                                        "unknown",
