@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.85 2001-11-15 08:06:37 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.86 2001-11-25 01:48:46 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -80,6 +80,7 @@ struct hnamemem uporttable[HASHNAMESIZE];
 struct hnamemem eprototable[HASHNAMESIZE];
 struct hnamemem dnaddrtable[HASHNAMESIZE];
 struct hnamemem llcsaptable[HASHNAMESIZE];
+struct hnamemem ipxsaptable[HASHNAMESIZE];
 
 #ifdef INET6
 struct h6namemem {
@@ -611,6 +612,32 @@ udpport_string(register u_short port)
 	return (tp->name);
 }
 
+const char *
+ipxsap_string(u_short port)
+{
+	register char *cp;
+	register struct hnamemem *tp;
+	register u_int32_t i = port;
+	char buf[sizeof("0000")];
+
+	for (tp = &ipxsaptable[i & (HASHNAMESIZE-1)]; tp->nxt; tp = tp->nxt)
+		if (tp->addr == i)
+			return (tp->name);
+
+	tp->addr = i;
+	tp->nxt = newhnamemem();
+
+	cp = buf;
+	NTOHS(port);
+	*cp++ = hex[port >> 12 & 0xf];
+	*cp++ = hex[port >> 8 & 0xf];
+	*cp++ = hex[port >> 4 & 0xf];
+	*cp++ = hex[port & 0xf];
+	*cp++ = '\0';
+	tp->name = strdup(buf);
+	return (tp->name);
+}
+
 static void
 init_servarray(void)
 {
@@ -655,12 +682,12 @@ init_eprotoarray(void)
 	register struct hnamemem *table;
 
 	for (i = 0; eproto_db[i].s; i++) {
-		int j = ntohs(eproto_db[i].p) & (HASHNAMESIZE-1);
+		int j = htons(eproto_db[i].p) & (HASHNAMESIZE-1);
 		table = &eprototable[j];
 		while (table->name)
 			table = table->nxt;
 		table->name = eproto_db[i].s;
-		table->addr = ntohs(eproto_db[i].p);
+		table->addr = htons(eproto_db[i].p);
 		table->nxt = newhnamemem();
 	}
 }
@@ -806,6 +833,240 @@ init_llcsaparray(void)
 	}
 }
 
+static struct tok ipxsap_db[] = {
+	{ 0x0000, "Unknown" },
+	{ 0x0001, "User" },
+	{ 0x0002, "User Group" },
+	{ 0x0003, "PrintQueue" },
+	{ 0x0004, "FileServer" },
+	{ 0x0005, "JobServer" },
+	{ 0x0006, "Gateway" },
+	{ 0x0007, "PrintServer" },
+	{ 0x0008, "ArchiveQueue" },
+	{ 0x0009, "ArchiveServer" },
+	{ 0x000a, "JobQueue" },
+	{ 0x000b, "Administration" },
+	{ 0x000F, "Novell TI-RPC" },
+	{ 0x0017, "Diagnostics" },
+	{ 0x0020, "NetBIOS" },
+	{ 0x0021, "NAS SNA Gateway" },
+	{ 0x0023, "NACS AsyncGateway" },
+	{ 0x0024, "RemoteBridge/RoutingService" },
+	{ 0x0026, "BridgeServer" },
+	{ 0x0027, "TCP/IP Gateway" },
+	{ 0x0028, "Point-to-point X.25 BridgeServer" },
+	{ 0x0029, "3270 Gateway" },
+	{ 0x002a, "CHI Corp" },
+	{ 0x002c, "PC Chalkboard" },
+	{ 0x002d, "TimeSynchServer" },
+	{ 0x002e, "ARCserve5.0/PalindromeBackup" },
+	{ 0x0045, "DI3270 Gateway" },
+	{ 0x0047, "AdvertisingPrintServer" },
+	{ 0x004a, "NetBlazerModems" },
+	{ 0x004b, "BtrieveVAP" },
+	{ 0x004c, "NetwareSQL" },
+	{ 0x004d, "XtreeNetwork" },
+	{ 0x0050, "BtrieveVAP4.11" },
+	{ 0x0052, "QuickLink" },
+	{ 0x0053, "PrintQueueUser" },
+	{ 0x0058, "Multipoint X.25 Router" },
+	{ 0x0060, "STLB/NLM" },
+	{ 0x0064, "ARCserve" },
+	{ 0x0066, "ARCserve3.0" },
+	{ 0x0072, "WAN CopyUtility" },
+	{ 0x007a, "TES-NetwareVMS" },
+	{ 0x0092, "WATCOM Debugger/EmeraldTapeBackupServer" },
+	{ 0x0095, "DDA OBGYN" },
+	{ 0x0098, "NetwareAccessServer" },
+	{ 0x009a, "Netware for VMS II/NamedPipeServer" },
+	{ 0x009b, "NetwareAccessServer" },
+	{ 0x009e, "PortableNetwareServer/SunLinkNVT" },
+	{ 0x00a1, "PowerchuteAPC UPS" },
+	{ 0x00aa, "LAWserve" },
+	{ 0x00ac, "CompaqIDA StatusMonitor" },
+	{ 0x0100, "PIPE STAIL" },
+	{ 0x0102, "LAN ProtectBindery" },
+	{ 0x0103, "OracleDataBaseServer" },
+	{ 0x0107, "Netware386/RSPX RemoteConsole" },
+	{ 0x010f, "NovellSNA Gateway" },
+	{ 0x0111, "TestServer" },
+	{ 0x0112, "HP PrintServer" },
+	{ 0x0114, "CSA MUX" },
+	{ 0x0115, "CSA LCA" },
+	{ 0x0116, "CSA CM" },
+	{ 0x0117, "CSA SMA" },
+	{ 0x0118, "CSA DBA" },
+	{ 0x0119, "CSA NMA" },
+	{ 0x011a, "CSA SSA" },
+	{ 0x011b, "CSA STATUS" },
+	{ 0x011e, "CSA APPC" },
+	{ 0x0126, "SNA TEST SSA Profile" },
+	{ 0x012a, "CSA TRACE" },
+	{ 0x012b, "NetwareSAA" },
+	{ 0x012e, "IKARUS VirusScan" },
+	{ 0x0130, "CommunicationsExecutive" },
+	{ 0x0133, "NNS DomainServer/NetwareNamingServicesDomain" },
+	{ 0x0135, "NetwareNamingServicesProfile" },
+	{ 0x0137, "Netware386 PrintQueue/NNS PrintQueue" },
+	{ 0x0141, "LAN SpoolServer" },
+	{ 0x0152, "IRMALAN Gateway" },
+	{ 0x0154, "NamedPipeServer" },
+	{ 0x0166, "NetWareManagement" },
+	{ 0x0168, "Intel PICKIT CommServer/Intel CAS TalkServer" },
+	{ 0x0173, "Compaq" },
+	{ 0x0174, "Compaq SNMP Agent" },
+	{ 0x0175, "Compaq" },
+	{ 0x0180, "XTreeServer/XTreeTools" },
+	{ 0x018A, "NASI ServicesBroadcastServer" },
+	{ 0x01b0, "GARP Gateway" },
+	{ 0x01b1, "Binfview" },
+	{ 0x01bf, "IntelLanDeskManager" },
+	{ 0x01ca, "AXTEC" },
+	{ 0x01cb, "ShivaNetModem/E" },
+	{ 0x01cc, "ShivaLanRover/E" },
+	{ 0x01cd, "ShivaLanRover/T" },
+	{ 0x01ce, "ShivaUniversal" },
+	{ 0x01d8, "CastelleFAXPressServer" },
+	{ 0x01da, "CastelleLANPressPrintServer" },
+	{ 0x01dc, "CastelleFAX/Xerox7033 FaxServer/ExcelLanFax" },
+	{ 0x01f0, "LEGATO" },
+	{ 0x01f5, "LEGATO" },
+	{ 0x0233, "NMS Agent/NetwareManagementAgent" },
+	{ 0x0237, "NMS IPX Discovery/LANternReadWriteChannel" },
+	{ 0x0238, "NMS IP Discovery/LANternTrapAlarmChannel" },
+	{ 0x023a, "LANtern" },
+	{ 0x023c, "MAVERICK" },
+	{ 0x023f, "NovellSMDR" },
+	{ 0x024e, "NetwareConnect" },
+	{ 0x024f, "NASI ServerBroadcast Cisco" },
+	{ 0x026a, "NMS ServiceConsole" },
+	{ 0x026b, "TimeSynchronizationServer Netware 4.x" },
+	{ 0x0278, "DirectoryServer Netware 4.x" },
+	{ 0x027b, "NetwareManagementAgent" },
+	{ 0x0280, "Novell File and Printer Sharing Service for PC" },
+	{ 0x0304, "NovellSAA Gateway" },
+	{ 0x0308, "COM/VERMED" },
+	{ 0x030a, "GalacticommWorldgroupServer" },
+	{ 0x030c, "IntelNetport2/HP JetDirect/HP Quicksilver" },
+	{ 0x0320, "AttachmateGateway" },
+	{ 0x0327, "MicrosoftDiagnostiocs" },
+	{ 0x0328, "WATCOM SQL Server" },
+	{ 0x0335, "MultiTechSystems MultisynchCommServer" },
+	{ 0x0343, "Xylogics RemoteAccessServer/LANModem" },
+	{ 0x0355, "ArcadaBackupExec" },
+	{ 0x0358, "MSLCD1" },
+	{ 0x0361, "NETINELO" },
+	{ 0x037e, "Powerchute UPS Monitoring" },
+	{ 0x037f, "ViruSafeNotify" },
+	{ 0x0386, "HP Bridge" },
+	{ 0x0387, "HP Hub" },
+	{ 0x0394, "NetWare SAA Gateway" },
+	{ 0x039b, "LotusNotes" },
+	{ 0x03b7, "CertusAntiVirus" },
+	{ 0x03c4, "ARCserve4.0" },
+	{ 0x03c7, "LANspool3.5" },
+	{ 0x03d7, "LexmarkPrinterServer" },
+	{ 0x03d8, "LexmarkXLE PrinterServer" },
+	{ 0x03dd, "BanyanENS NetwareClient" },
+	{ 0x03de, "GuptaSequelBaseServer/NetWareSQL" },
+	{ 0x03e1, "UnivelUnixware" },
+	{ 0x03e4, "UnivelUnixware" },
+	{ 0x03fc, "IntelNetport" },
+	{ 0x03fd, "PrintServerQueue" },
+	{ 0x040A, "ipnServer" },
+	{ 0x040D, "LVERRMAN" },
+	{ 0x040E, "LVLIC" },
+	{ 0x0414, "NET Silicon (DPI)/Kyocera" },
+	{ 0x0429, "SiteLockVirus" },
+	{ 0x0432, "UFHELPR???" },
+	{ 0x0433, "Synoptics281xAdvancedSNMPAgent" },
+	{ 0x0444, "MicrosoftNT SNA Server" },
+	{ 0x0448, "Oracle" },
+	{ 0x044c, "ARCserve5.01" },
+	{ 0x0457, "CanonGP55" },
+	{ 0x045a, "QMS Printers" },
+	{ 0x045b, "DellSCSI Array" },
+	{ 0x0491, "NetBlazerModems" },
+	{ 0x04ac, "OnTimeScheduler" },
+	{ 0x04b0, "CD-Net" },
+	{ 0x0513, "EmulexNQA" },
+	{ 0x0520, "SiteLockChecks" },
+	{ 0x0529, "SiteLockChecks" },
+	{ 0x052d, "CitrixOS2 AppServer" },
+	{ 0x0535, "Tektronix" },
+	{ 0x0536, "Milan" },
+	{ 0x055d, "Attachmate SNA gateway" },
+	{ 0x056b, "IBM8235 ModemServer" },
+	{ 0x056c, "ShivaLanRover/E PLUS" },
+	{ 0x056d, "ShivaLanRover/T PLUS" },
+	{ 0x0580, "McAfeeNetShield" },
+	{ 0x05B8, "NLM to workstation communication (Revelation Software)" },
+	{ 0x05BA, "CompatibleSystemsRouters" },
+	{ 0x05BE, "CheyenneHierarchicalStorageManager" },
+	{ 0x0606, "JCWatermarkImaging" },
+	{ 0x060c, "AXISNetworkPrinter" },
+	{ 0x0610, "AdaptecSCSIManagement" },
+	{ 0x0621, "IBM AntiVirus" },
+	{ 0x0640, "Windows95 RemoteRegistryService" },
+	{ 0x064e, "MicrosoftIIS" },
+	{ 0x067b, "Microsoft Win95/98 File and Print Sharing for NetWare" },
+	{ 0x067c, "Microsoft Win95/98 File and Print Sharing for NetWare" },
+	{ 0x076C, "Xerox" },
+	{ 0x079b, "ShivaLanRover/E 115" },
+	{ 0x079c, "ShivaLanRover/T 115" },
+	{ 0x07B4, "CubixWorldDesk" },
+	{ 0x07c2, "Quarterdeck IWare Connect V2.x NLM" },
+	{ 0x07c1, "Quarterdeck IWare Connect V3.x NLM" },
+	{ 0x0810, "ELAN License Server Demo" },
+	{ 0x0824, "ShivaLanRoverAccessSwitch/E" },
+	{ 0x086a, "ISSC Collector" },
+	{ 0x087f, "ISSC DAS AgentAIX" },
+	{ 0x0880, "Intel Netport PRO" },
+	{ 0x0881, "Intel Netport PRO" },
+	{ 0x0b29, "SiteLock" },
+	{ 0x0c29, "SiteLockApplications" },
+	{ 0x0c2c, "LicensingServer" },
+	{ 0x2101, "PerformanceTechnologyInstantInternet" },
+	{ 0x2380, "LAI SiteLock" },
+	{ 0x238c, "MeetingMaker" },
+	{ 0x4808, "SiteLockServer/SiteLockMetering" },
+	{ 0x5555, "SiteLockUser" },
+	{ 0x6312, "Tapeware" },
+	{ 0x6f00, "RabbitGateway" },
+	{ 0x7703, "MODEM" },
+	{ 0x8002, "NetPortPrinters" },
+	{ 0x8008, "WordPerfectNetworkVersion" },
+	{ 0x85BE, "Cisco EIGRP" },
+	{ 0x8888, "WordPerfectNetworkVersion/QuickNetworkManagement" },
+	{ 0x9000, "McAfeeNetShield" },
+	{ 0x9604, "CSA-NT_MON" },
+	{ 0xb6a8, "OceanIsleReachoutRemoteControl" },
+	{ 0xf11f, "SiteLockMetering" },
+	{ 0xf1ff, "SiteLock" },
+	{ 0xf503, "Microsoft SQL Server" },
+	{ 0xF905, "IBM TimeAndPlace" },
+	{ 0xfbfb, "TopCallIII FaxServer" },
+	{ 0xffff, "AnyService/Wildcard" },
+	{ 0, (char *)0 }
+};
+
+static void
+init_ipxsaparray(void)
+{
+	register int i;
+	register struct hnamemem *table;
+
+	for (i = 0; ipxsap_db[i].s != NULL; i++) {
+		int j = htons(ipxsap_db[i].v) & (HASHNAMESIZE-1);
+		table = &ipxsaptable[j];
+		while (table->name)
+			table = table->nxt;
+		table->name = ipxsap_db[i].s;
+		table->addr = htons(ipxsap_db[i].v);
+		table->nxt = newhnamemem();
+	}
+}
+
 /*
  * Initialize the address to name translation machinery.  We map all
  * non-local IP addresses to numeric addresses if fflag is true (i.e.,
@@ -831,6 +1092,7 @@ init_addrtoname(u_int32_t localnet, u_int32_t mask)
 	init_eprotoarray();
 	init_llcsaparray();
 	init_protoidarray();
+	init_ipxsaparray();
 }
 
 const char *
