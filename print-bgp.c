@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.62 2003-05-27 12:43:37 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.63 2003-05-27 13:09:02 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -96,7 +96,7 @@ struct bgp_notification {
 	u_int8_t bgpn_type;
 	u_int8_t bgpn_major;
 	u_int8_t bgpn_minor;
-	/* data should follow */
+        u_int8_t bgpn_data[0];          /* data should follow */
 };
 #define BGP_NOTIFICATION_SIZE		21	/* unaligned */
 
@@ -203,8 +203,9 @@ static struct tok bgp_notify_major_values[] = {
 };
 
 /* draft-ietf-idr-cease-subcode-02 */
+#define BGP_NOTIFY_MINOR_CEASE_MAXPRFX  1
 static struct tok bgp_notify_minor_cease_values[] = {
-    { 1,                        "Maximum Number of Prefixes Reached"},
+    { BGP_NOTIFY_MINOR_CEASE_MAXPRFX, "Maximum Number of Prefixes Reached"},
     { 2,                        "Administratively Shutdown"},
     { 3,                        "Peer Unconfigured"},
     { 4,                        "Administratively Reset"},
@@ -1423,16 +1424,35 @@ bgp_notification_print(const u_char *dat, int length)
         switch (bgpn.bgpn_major) {
 
         case BGP_NOTIFY_MAJOR_MSG:
-            printf(" subcode %s", tok2str(bgp_notify_minor_msg_values, "Unknown", bgpn.bgpn_minor));
+            printf(" subcode %s (%u)",
+		   tok2str(bgp_notify_minor_msg_values, "Unknown", bgpn.bgpn_minor),
+		   bgpn.bgpn_minor);
             break;
         case BGP_NOTIFY_MAJOR_OPEN:
-            printf(" subcode %s", tok2str(bgp_notify_minor_open_values, "Unknown", bgpn.bgpn_minor));
+            printf(" subcode %s (%u)",
+		   tok2str(bgp_notify_minor_open_values, "Unknown", bgpn.bgpn_minor),
+		   bgpn.bgpn_minor);
             break;
         case BGP_NOTIFY_MAJOR_UPDATE:
-            printf(" subcode %s", tok2str(bgp_notify_minor_update_values, "Unknown", bgpn.bgpn_minor));
+            printf(" subcode %s (%u)",
+		   tok2str(bgp_notify_minor_update_values, "Unknown", bgpn.bgpn_minor),
+		   bgpn.bgpn_minor);
             break;
         case BGP_NOTIFY_MAJOR_CEASE:
-            printf(" subcode %s", tok2str(bgp_notify_minor_cease_values, "Unknown", bgpn.bgpn_minor));
+            printf(" subcode %s (%u)",
+		   tok2str(bgp_notify_minor_cease_values, "Unknown", bgpn.bgpn_minor),
+		   bgpn.bgpn_minor);
+
+	    /* draft-ietf-idr-cease-subcode-02 mentions optionally 7 bytes
+             * for the maxprefix subtype, which may contain AFI, SAFI and MAXPREFIXES
+             */
+	    if(bgpn.bgpn_minor == BGP_NOTIFY_MINOR_CEASE_MAXPRFX && length >= BGP_NOTIFICATION_SIZE + 7)
+		printf(", AFI %s (%u), SAFI %s (%u), Max Prefixes: %u",
+		       tok2str(bgp_afi_values, "Unknown", EXTRACT_16BITS(&bgpn.bgpn_data)),
+		       EXTRACT_16BITS(&bgpn.bgpn_data),
+		       tok2str(bgp_safi_values, "Unknown", *(bgpn.bgpn_data+2)),
+		       *(bgpn.bgpn_data+2),
+		       EXTRACT_32BITS(&bgpn.bgpn_data+3));
             break;
         default:
             break;
