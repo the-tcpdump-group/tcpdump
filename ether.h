@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ether.h,v 1.5 2000-10-09 02:59:39 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ether.h,v 1.6 2000-10-09 03:24:24 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1982, 1986, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -40,13 +40,6 @@
  * The number of bytes in an ethernet (MAC) address.
  */
 #define	ETHER_ADDR_LEN		6
-
-/*
- * Ethernet address - 6 octets
- */
-struct ether_addr {
-	u_int8_t	ether_addr_octet[ETHER_ADDR_LEN];
-};
 
 /*
  * Structure of a DEC/Intel/Xerox or 802.3 Ethernet header.

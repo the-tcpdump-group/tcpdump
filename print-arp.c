@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-arp.c,v 1.47 2000-09-24 07:42:31 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-arp.c,v 1.48 2000-10-09 03:24:25 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -78,6 +78,8 @@ struct	arphdr {
 #endif
 };
 
+#define ARP_HDRLEN	8
+
 /*
  * Ethernet Address Resolution Protocol.
  *
@@ -97,6 +99,8 @@ struct	ether_arp {
 #define	arp_hln	ea_hdr.ar_hln
 #define	arp_pln	ea_hdr.ar_pln
 #define	arp_op	ea_hdr.ar_op
+
+#define ETHER_ARP_HDRLEN	(ARP_HDRLEN + 6 + 4 + 6 + 4)	
 
 #define SHA(ap) ((ap)->arp_sha)
 #define THA(ap) ((ap)->arp_tha)
@@ -125,7 +129,7 @@ arp_print(register const u_char *bp, u_int length, u_int caplen)
 		printf("[|arp]");
 		return;
 	}
-	if (length < sizeof(struct ether_arp)) {
+	if (length < ETHER_ARP_HDRLEN) {
 		(void)printf("truncated-arp");
 		default_print((u_char *)ap, length);
 		return;
