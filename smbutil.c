@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.16 2001-06-25 21:04:01 itojun Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/smbutil.c,v 1.17 2001-09-17 21:58:05 fenner Exp $";
 #endif
 
 #include <sys/param.h>
@@ -31,15 +31,15 @@ static const char rcsid[] =
 #include "interface.h"
 #include "smb.h"
 
-extern const uchar *startbuf;
+extern const u_char *startbuf;
 
 /*
  * interpret a 32 bit dos packed date/time to some parameters
  */
 static void
-interpret_dos_date(uint32 date, struct tm *tp)
+interpret_dos_date(u_int32_t date, struct tm *tp)
 {
-    uint32 p0, p1, p2, p3;
+    u_int32_t p0, p1, p2, p3;
 
     p0 = date & 0xFF;
     p1 = ((date & 0xFF00) >> 8) & 0xFF;
@@ -58,9 +58,9 @@ interpret_dos_date(uint32 date, struct tm *tp)
  * create a unix date from a dos date
  */
 static time_t
-make_unix_date(const void *date_ptr)
+make_unix_date(const u_char *date_ptr)
 {
-    uint32 dos_date = 0;
+    u_int32_t dos_date = 0;
     struct tm t;
 
     dos_date = IVAL(date_ptr, 0);
@@ -80,9 +80,9 @@ make_unix_date(const void *date_ptr)
  * create a unix date from a dos date
  */
 static time_t
-make_unix_date2(const void *date_ptr)
+make_unix_date2(const u_char *date_ptr)
 {
-    uint32 x, x2;
+    u_int32_t x, x2;
 
     x = IVAL(date_ptr, 0);
     x2 = ((x & 0xFFFF) << 16) | ((x & 0xFFFF0000) >> 16);
@@ -123,7 +123,7 @@ interpret_long_date(const char *p)
  * we run past the end of the buffer
  */
 static int
-name_interpret(const uchar *in, const uchar *maxbuf, char *out)
+name_interpret(const u_char *in, const u_char *maxbuf, char *out)
 {
     int ret;
     int len;
@@ -162,11 +162,11 @@ trunc:
 /*
  * find a pointer to a netbios name
  */
-static const uchar *
-name_ptr(const uchar *buf, int ofs, const uchar *maxbuf)
+static const u_char *
+name_ptr(const u_char *buf, int ofs, const u_char *maxbuf)
 {
-    const uchar *p;
-    uchar c;
+    const u_char *p;
+    u_char c;
 
     p = buf + ofs;
     if (p >= maxbuf)
@@ -177,7 +177,7 @@ name_ptr(const uchar *buf, int ofs, const uchar *maxbuf)
 
     /* XXX - this should use the same code that the DNS dissector does */
     if ((c & 0xC0) == 0xC0) {
-	uint16 l = RSVAL(buf, ofs) & 0x3FFF;
+	u_int16_t l = RSVAL(buf, ofs) & 0x3FFF;
 	if (l == 0) {
 	    /* We have a pointer that points to itself. */
 	    return(NULL);
@@ -198,9 +198,9 @@ trunc:
  * extract a netbios name from a buf
  */
 static int
-name_extract(const uchar *buf, int ofs, const uchar *maxbuf, char *name)
+name_extract(const u_char *buf, int ofs, const u_char *maxbuf, char *name)
 {
-    const uchar *p = name_ptr(buf, ofs, maxbuf);
+    const u_char *p = name_ptr(buf, ofs, maxbuf);
     if (p == NULL)
 	return(-1);	/* error (probably name going past end of buffer) */
     name[0] = '\0';
@@ -358,8 +358,8 @@ unistr(const char *s, int *len)
     return buf;
 }
 
-static const uchar *
-fdata1(const uchar *buf, const char *fmt, const uchar *maxbuf)
+static const u_char *
+smb_fdata1(const u_char *buf, const char *fmt, const u_char *maxbuf)
 {
     int reverse = 0;
     char *attrib_fmt = "READONLY|HIDDEN|SYSTEM|VOLUME|DIR|ARCHIVE|";
@@ -584,8 +584,8 @@ trunc:
     return(NULL);
 }
 
-const uchar *
-fdata(const uchar *buf, const char *fmt, const uchar *maxbuf)
+const u_char *
+smb_fdata(const u_char *buf, const char *fmt, const u_char *maxbuf)
 {
     static int depth = 0;
     char s[128];
@@ -596,9 +596,9 @@ fdata(const uchar *buf, const char *fmt, const uchar *maxbuf)
 	case '*':
 	    fmt++;
 	    while (buf < maxbuf) {
-		const uchar *buf2;
+		const u_char *buf2;
 		depth++;
-		buf2 = fdata(buf, fmt, maxbuf);
+		buf2 = smb_fdata(buf, fmt, maxbuf);
 		depth--;
 		if (buf2 == buf)
 		    return(buf);
@@ -635,7 +635,7 @@ fdata(const uchar *buf, const char *fmt, const uchar *maxbuf)
 	    strncpy(s, fmt, p - fmt);
 	    s[p - fmt] = '\0';
 	    fmt = p + 1;
-	    buf = fdata1(buf, s, maxbuf);
+	    buf = smb_fdata1(buf, s, maxbuf);
 	    if (buf == NULL)
 		return(NULL);
 	    break;
@@ -657,9 +657,9 @@ fdata(const uchar *buf, const char *fmt, const uchar *maxbuf)
 }
 
 typedef struct {
-    char *name;
+    const char *name;
     int code;
-    char *message;
+    const char *message;
 } err_code_struct;
 
 /* Dos Error Messages */

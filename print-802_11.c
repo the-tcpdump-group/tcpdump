@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.5 2001-07-05 18:54:13 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.6 2001-09-17 21:57:53 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -534,7 +534,7 @@ static int ctrl_body_print(u_int16_t fc,const u_char *p, u_int length)
 		if (!TTEST2(*p, CTRL_PS_POLL_LEN))
 			return 0;
 		printf("Power Save-Poll AID(%x)",
-		    EXTRACT_LE_16BITS(&(((struct ctrl_ps_poll_t *)p)->aid)));
+		    EXTRACT_LE_16BITS(&(((const struct ctrl_ps_poll_t *)p)->aid)));
 		break;
 	case CTRL_RTS:
 		if (!TTEST2(*p, CTRL_RTS_LEN))
@@ -543,7 +543,7 @@ static int ctrl_body_print(u_int16_t fc,const u_char *p, u_int length)
 			printf("Request-To-Send");
 		else
 			printf("Request-To-Send TA:%s ",
-			    etheraddr_string(((struct ctrl_rts_t *)p)->ta));
+			    etheraddr_string(((const struct ctrl_rts_t *)p)->ta));
 		break;
 	case CTRL_CTS:
 		if (!TTEST2(*p, CTRL_CTS_LEN))
@@ -552,7 +552,7 @@ static int ctrl_body_print(u_int16_t fc,const u_char *p, u_int length)
 			printf("Clear-To-Send");
 		else
 			printf("Clear-To-Send RA:%s ",
-			    etheraddr_string(((struct ctrl_cts_t *)p)->ra));
+			    etheraddr_string(((const struct ctrl_cts_t *)p)->ra));
 		break;
 	case CTRL_ACK:
 		if (!TTEST2(*p, CTRL_ACK_LEN))
@@ -561,7 +561,7 @@ static int ctrl_body_print(u_int16_t fc,const u_char *p, u_int length)
 			printf("Acknowledgment");
 		else
 			printf("Acknowledgment RA:%s ",
-			    etheraddr_string(((struct ctrl_ack_t *)p)->ra));
+			    etheraddr_string(((const struct ctrl_ack_t *)p)->ra));
 		break;
 	case CTRL_CF_END:
 		if (!TTEST2(*p, CTRL_END_LEN))
@@ -570,7 +570,7 @@ static int ctrl_body_print(u_int16_t fc,const u_char *p, u_int length)
 			printf("CF-End");
 		else
 			printf("CF-End RA:%s ",
-			    etheraddr_string(((struct ctrl_end_t *)p)->ra));
+			    etheraddr_string(((const struct ctrl_end_t *)p)->ra));
 		break;
 	case CTRL_END_ACK:
 		if (!TTEST2(*p, CTRL_END_ACK_LEN))
@@ -579,7 +579,7 @@ static int ctrl_body_print(u_int16_t fc,const u_char *p, u_int length)
 			printf("CF-End+CF-Ack");
 		else
 			printf("CF-End+CF-Ack RA:%s ",
-			    etheraddr_string(((struct ctrl_end_ack_t *)p)->ra));
+			    etheraddr_string(((const struct ctrl_end_ack_t *)p)->ra));
 		break;
 	default:
 		printf("(B) Unknown Ctrl Subtype");
@@ -651,31 +651,31 @@ static void ctrl_header_print(u_int16_t fc,const u_char *p, u_int length)
 	switch (FC_SUBTYPE(fc)) {
 	case CTRL_PS_POLL:
 		printf("BSSID:%s TA:%s ",
-		    etheraddr_string(((struct ctrl_ps_poll_t *)p)->bssid),
-		    etheraddr_string(((struct ctrl_ps_poll_t *)p)->ta));
+		    etheraddr_string(((const struct ctrl_ps_poll_t *)p)->bssid),
+		    etheraddr_string(((const struct ctrl_ps_poll_t *)p)->ta));
 		break;
 	case CTRL_RTS:
 		printf("RA:%s TA:%s ",
-		    etheraddr_string(((struct ctrl_rts_t *)p)->ra),
-		    etheraddr_string(((struct ctrl_rts_t *)p)->ta));
+		    etheraddr_string(((const struct ctrl_rts_t *)p)->ra),
+		    etheraddr_string(((const struct ctrl_rts_t *)p)->ta));
 		break;
 	case CTRL_CTS:
 		printf("RA:%s ",
-		    etheraddr_string(((struct ctrl_cts_t *)p)->ra));
+		    etheraddr_string(((const struct ctrl_cts_t *)p)->ra));
 		break;
 	case CTRL_ACK:
 		printf("RA:%s ",
-		    etheraddr_string(((struct ctrl_ack_t *)p)->ra));
+		    etheraddr_string(((const struct ctrl_ack_t *)p)->ra));
 		break;
 	case CTRL_CF_END:
 		printf("RA:%s BSSID:%s ",
-		    etheraddr_string(((struct ctrl_end_t *)p)->ra),
-		    etheraddr_string(((struct ctrl_end_t *)p)->bssid));
+		    etheraddr_string(((const struct ctrl_end_t *)p)->ra),
+		    etheraddr_string(((const struct ctrl_end_t *)p)->bssid));
 		break;
 	case CTRL_END_ACK:
 		printf("RA:%s BSSID:%s ",
-		    etheraddr_string(((struct ctrl_end_ack_t *)p)->ra),
-		    etheraddr_string(((struct ctrl_end_ack_t *)p)->bssid));
+		    etheraddr_string(((const struct ctrl_end_ack_t *)p)->ra),
+		    etheraddr_string(((const struct ctrl_end_ack_t *)p)->bssid));
 		break;
 	default:
 		printf("(H) Unknown Ctrl Subtype");

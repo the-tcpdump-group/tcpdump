@@ -34,7 +34,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cnfp.c,v 1.7 2001-02-21 09:05:39 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cnfp.c,v 1.8 2001-09-17 21:57:58 fenner Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -92,10 +92,10 @@ cnfp_print(const u_char *cp, u_int len, const u_char *bp)
 	int nrecs, ver;
 	time_t t;
 
-	ip = (struct ip *)bp;
-	nh = (struct nfhdr *)cp;
+	ip = (const struct ip *)bp;
+	nh = (const struct nfhdr *)cp;
 
-	if ((u_char *)(nh + 1) > snapend)
+	if ((const u_char *)(nh + 1) > snapend)
 		return;
 
 	nrecs = ntohl(nh->ver_cnt) & 0xffff;
@@ -110,16 +110,16 @@ cnfp_print(const u_char *cp, u_int len, const u_char *bp)
 
 	if (ver == 5 || ver == 6) {
 		printf("#%u, ", (unsigned)htonl(nh->sequence));
-		nr = (struct nfrec *)&nh[1];
+		nr = (const struct nfrec *)&nh[1];
 		snaplen -= 24;
 	} else {
-		nr = (struct nfrec *)&nh->sequence;
+		nr = (const struct nfrec *)&nh->sequence;
 		snaplen -= 16;
 	}
 
 	printf("%2u recs", nrecs);
 
-	for (; nrecs-- && (u_char *)(nr + 1) <= snapend; nr++) {
+	for (; nrecs-- && (const u_char *)(nr + 1) <= snapend; nr++) {
 		char buf[20];
 		char asbuf[20];
 

@@ -29,7 +29,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.13 2001-01-28 09:49:49 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.14 2001-09-17 21:57:59 fenner Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -61,7 +61,7 @@ static struct dhcp6_opt *dhcp6opttab_byname(char *);
 #endif
 static struct dhcp6_opt *dhcp6opttab_bycode(u_int);
 
-static char tstr[] = " [|dhcp6]";
+static const char tstr[] = " [|dhcp6]";
 
 static struct dhcp6_opt dh6opttab[] = {
 	/* IP Address Extension */

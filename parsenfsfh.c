@@ -42,7 +42,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/parsenfsfh.c,v 1.22 2001-06-24 21:41:29 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/parsenfsfh.c,v 1.23 2001-09-17 21:57:53 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -116,8 +116,8 @@ register caddr_t *fh;
 int len;
 my_fsid *fsidp;
 ino_t *inop;
-char **osnamep;		/* if non-NULL, return OS name here */
-char **fsnamep;		/* if non-NULL, return server fs name here (for VMS) */
+const char **osnamep;		/* if non-NULL, return OS name here */
+const char **fsnamep;		/* if non-NULL, return server fs name here (for VMS) */
 int ourself;		/* true if file handle was generated on this host */
 {
 	register unsigned char *fhp = (unsigned char *)fh;

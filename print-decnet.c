@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-decnet.c,v 1.32 2001-01-28 08:06:06 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-decnet.c,v 1.33 2001-09-17 21:57:59 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -730,7 +730,7 @@ print_reason(register int reason)
 	printf("%s ", tok2str(reason2str, "reason-%d", reason));
 }
 
-char *
+const char *
 dnnum_string(u_short dnaddr)
 {
 	char *str;
@@ -745,7 +745,7 @@ dnnum_string(u_short dnaddr)
 	return(str);
 }
 
-char *
+const char *
 dnname_string(u_short dnaddr)
 {
 #ifdef	HAVE_LIBDNET

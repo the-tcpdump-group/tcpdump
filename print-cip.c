@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cip.c,v 1.14 2001-07-05 18:54:15 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cip.c,v 1.15 2001-09-17 21:57:58 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -69,7 +69,7 @@ cip_print(register const u_char *bp, int length)
 		} else {
 			for (i = 0;i < RFC1483LLC_LEN - 2; i++)
 				(void)printf("%2.2x ",bp[i]);
-			etherproto_string(((u_short*)bp)[3]);
+			etherproto_string(((const u_short *)bp)[3]);
 		} 
 	} else {
 		if (qflag)
@@ -90,11 +90,11 @@ cip_print(register const u_char *bp, int length)
 void
 cip_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 {
-	int caplen = h->caplen;
-	int length = h->len;
+	u_int caplen = h->caplen;
+	u_int length = h->len;
 	u_short ether_type;
 	u_short extracted_ethertype;
-	u_short *bp;
+	const u_short *bp;
 
 	++infodelay;
 	ts_print(&h->ts);
@@ -118,12 +118,12 @@ cip_if_print(u_char *user, const struct pcap_pkthdr *h, const u_char *p)
 	if (memcmp(rfcllc, p, sizeof(rfcllc))==0) {
 		length -= RFC1483LLC_LEN;
 		caplen -= RFC1483LLC_LEN;
-		bp = (u_short *)p;
+		bp = (const u_short *)p;
 		p += RFC1483LLC_LEN;
 		ether_type = ntohs(bp[3]);
 	} else {
 		ether_type = ETHERTYPE_IP;
-		bp = (u_short *)p;
+		bp = (const u_short *)p;
 	}
 
 	/*

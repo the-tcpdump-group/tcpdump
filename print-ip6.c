@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.17 2001-08-20 17:52:40 fenner Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.18 2001-09-17 21:58:03 fenner Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -51,11 +51,11 @@ static const char rcsid[] =
  * print an IP6 datagram.
  */
 void
-ip6_print(register const u_char *bp, register int length)
+ip6_print(register const u_char *bp, register u_int length)
 {
 	register const struct ip6_hdr *ip6;
 	register int advance;
-	register int len;
+	register u_int len;
 	register const u_char *cp;
 	int nh;
 	int fragmented = 0;
@@ -80,10 +80,7 @@ ip6_print(register const u_char *bp, register int length)
 		ip6 = (struct ip6_hdr *)abuf;
 	}
 #endif
-	if ((u_char *)(ip6 + 1) > snapend) {
-		printf("[|ip6]");
-		return;
-	}
+	TCHECK(*ip6);
 	if (length < sizeof (struct ip6_hdr)) {
 		(void)printf("truncated-ip6 %d", length);
 		return;
@@ -100,7 +97,7 @@ ip6_print(register const u_char *bp, register int length)
 	while (cp < snapend) {
 		cp += advance;
 
-		if (cp == (u_char *)(ip6 + 1)
+		if (cp == (const u_char *)(ip6 + 1)
 		 && nh != IPPROTO_TCP && nh != IPPROTO_UDP) {
 			(void)printf("%s > %s: ", ip6addr_string(&ip6->ip6_src),
 				     ip6addr_string(&ip6->ip6_dst));
@@ -222,6 +219,9 @@ ip6_print(register const u_char *bp, register int length)
 			(void)printf(", hlim %d", (int)ip6->ip6_hlim);
 		printf(")");
 	}
+	return;
+trunc:
+	(void)printf("[|ip6]");
 }
 
 #endif /* INET6 */

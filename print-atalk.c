@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.68 2001-07-18 09:19:47 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atalk.c,v 1.69 2001-09-17 21:57:55 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -112,7 +112,7 @@ llap_print(register const u_char *bp, u_int length)
 	register const struct atShortDDP *sdp;
 	u_short snet;
 
-	lp = (struct LAP *)bp;
+	lp = (const struct LAP *)bp;
 	bp += sizeof(*lp);
 	length -= sizeof(*lp);
 	switch (lp->type) {
@@ -390,7 +390,7 @@ nbp_print(register const struct atNBP *np, u_int length, register u_short snet,
 	  register u_char snode, register u_char skt)
 {
 	register const struct atNBPtuple *tp =
-			(struct atNBPtuple *)((u_char *)np + nbpHeaderSize);
+		(const struct atNBPtuple *)((u_char *)np + nbpHeaderSize);
 	int i;
 	const u_char *ep;
 
@@ -466,7 +466,7 @@ print_cstring(register const char *cp, register const u_char *ep)
 		return (0);
 	}
 	while ((int)--length >= 0) {
-		if (cp >= (char *)ep) {
+		if (cp >= (const char *)ep) {
 			fputs(tstr, stdout);
 			return (0);
 		}

@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.10 2001-08-25 09:46:33 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.11 2001-09-17 21:57:56 fenner Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -54,7 +54,7 @@ void
 cdp_print(const u_char *p, u_int length, u_int caplen,
 	  const u_char *esrc, const u_char *edst)
 {
-	int i;
+	u_int i;
 	int type, len;
 
 	/* Cisco Discovery Protocol */

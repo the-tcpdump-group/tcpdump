@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.25 2001-09-11 02:38:04 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.26 2001-09-17 21:58:04 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -140,12 +140,7 @@ static const char rcsid[] =
 #define ISIS_LSP_TYPE_UNUSED2   2
 #define ISIS_LSP_TYPE_LEVEL_2   3
 
-struct isis_lsp_istype_values {
-	u_char id;
-	char   *name;
-};
-
-static struct isis_lsp_istype_values isis_lsp_istype_values[] = {
+static struct tok isis_lsp_istype_values[] = {
 	{ ISIS_LSP_TYPE_UNUSED0,	"Unused 0x0 (invalid)"},
 	{ ISIS_LSP_TYPE_LEVEL_1,	"Level 1 IS"},
 	{ ISIS_LSP_TYPE_UNUSED2,	"Unused 0x2 (invalid)"},
@@ -153,12 +148,7 @@ static struct isis_lsp_istype_values isis_lsp_istype_values[] = {
 	{ 0, NULL }
 };
 
-struct isis_nlpid_values {
-	u_char id;
-	char   *name;
-};
-
-static struct isis_nlpid_values isis_nlpid_values[] = {
+static struct tok isis_nlpid_values[] = {
 	{ NLPID_CLNS,	"CLNS"},
 	{ NLPID_IP,     "IPv4"},
 	{ NLPID_IP6,	"IPv6"},
@@ -174,17 +164,12 @@ static struct isis_nlpid_values isis_nlpid_values[] = {
 #define ISIS_PTP_ADJ_INIT 1
 #define ISIS_PTP_ADJ_DOWN 2
 
-static int osi_cksum(const u_char *, int, u_char *);
+static int osi_cksum(const u_char *, u_int, u_char *);
 static void esis_print(const u_char *, u_int);
 static int isis_print(const u_char *, u_int);
 
 
-struct isis_ptp_adjancey_values {
-	u_char id;
-	char   *name;
-};
-
-static struct isis_ptp_adjancey_values isis_ptp_adjancey_values[] = {
+static struct tok isis_ptp_adjancey_values[] = {
 	{ ISIS_PTP_ADJ_UP,    "Up" },
 	{ ISIS_PTP_ADJ_INIT,  "Initializing" },
 	{ ISIS_PTP_ADJ_DOWN,  "Down" }
@@ -283,9 +268,9 @@ void isoclns_print(const u_char *p, u_int length, u_int caplen,
 	      const u_char *esrc, const u_char *edst)
 {
 	u_char pdu_type;
-	struct isis_common_header *header;
+	const struct isis_common_header *header;
 	
-	header = (struct isis_common_header *)p;
+	header = (const struct isis_common_header *)p;
 	pdu_type = header->pdu_type & PDU_TYPE_MASK;
 
 	if (caplen < 1) {
@@ -362,7 +347,7 @@ static void
 esis_print(const u_char *p, u_int length)
 {
 	const u_char *ep;
-	int li = p[1];
+	u_int li = p[1];
 	const struct esis_hdr *eh = (const struct esis_hdr *) &p[2];
 	u_char off[2];
 
@@ -478,7 +463,7 @@ esis_print(const u_char *p, u_int length)
 	}
 	if (vflag)
 		while (p < ep && li) {
-			int op, opli;
+			u_int op, opli;
 			const u_char *q;
 
 			if (snapend - p < 2)
@@ -504,7 +489,7 @@ esis_print(const u_char *p, u_int length)
 				continue;
 			}
 			printf (" %d:<", op);
-			while (--opli >= 0)
+			while (opli-- > 0)
 				printf("%02x", *q++);
 			printf (">");
 		}
@@ -582,8 +567,8 @@ isis_print_tlv_ip_reach (const u_char *cp, int length)
 
 	  int mask,prefix_len;
 
-	  struct isis_tlv_ip_reach *tlv_ip_reach;
-	  tlv_ip_reach = (struct isis_tlv_ip_reach *)cp;
+	  const struct isis_tlv_ip_reach *tlv_ip_reach;
+	  tlv_ip_reach = (const struct isis_tlv_ip_reach *)cp;
 
 	  while ( length > 0 ) {
 		if (length<12) {
@@ -654,35 +639,35 @@ isis_print_tlv_ip_reach (const u_char *cp, int length)
 
 static int isis_print (const u_char *p, u_int length)
 {
-    struct isis_common_header *header;
+    const struct isis_common_header *header;
 
-    struct isis_iih_lan_header *header_iih_lan;
-    struct isis_iih_ptp_header *header_iih_ptp;
-    struct isis_lsp_header *header_lsp;
-    struct isis_csnp_header *header_csnp;
-    struct isis_psnp_header *header_psnp;
+    const struct isis_iih_lan_header *header_iih_lan;
+    const struct isis_iih_ptp_header *header_iih_ptp;
+    const struct isis_lsp_header *header_lsp;
+    const struct isis_csnp_header *header_csnp;
+    const struct isis_psnp_header *header_psnp;
 
-    struct isis_tlv_lsp *tlv_lsp;
-    struct isis_tlv_ptp_adj *tlv_ptp_adj;
-    struct isis_tlv_is_reach *tlv_is_reach;
+    const struct isis_tlv_lsp *tlv_lsp;
+    const struct isis_tlv_ptp_adj *tlv_ptp_adj;
+    const struct isis_tlv_is_reach *tlv_is_reach;
 
     u_char pdu_type, max_area, type, len, tmp, alen, subl, subt, tslen, ttslen;
     const u_char *optr, *pptr, *tptr;
     u_short packet_len;
-    int i,j,bit_length,byte_length,metric;
+    u_int i,j,bit_length,byte_length,metric;
     u_char prefix[4];
     u_char off[2];
     float bw;
 
     packet_len=length;
     optr = p; /* initialize the _o_riginal pointer - need it for parsing the checksum TLV */
-    header = (struct isis_common_header *)p; 
+    header = (const struct isis_common_header *)p; 
     pptr = p+(ISIS_COMMON_HEADER_SIZE);    
-    header_iih_lan = (struct isis_iih_lan_header *)pptr;
-    header_iih_ptp = (struct isis_iih_ptp_header *)pptr;
-    header_lsp = (struct isis_lsp_header *)pptr;
-    header_csnp = (struct isis_csnp_header *)pptr;
-    header_psnp = (struct isis_psnp_header *)pptr;
+    header_iih_lan = (const struct isis_iih_lan_header *)pptr;
+    header_iih_ptp = (const struct isis_iih_ptp_header *)pptr;
+    header_lsp = (const struct isis_lsp_header *)pptr;
+    header_csnp = (const struct isis_csnp_header *)pptr;
+    header_psnp = (const struct isis_psnp_header *)pptr;
     
     /*
      * Sanity checking of the header.
@@ -823,7 +808,7 @@ static int isis_print (const u_char *p, u_int length)
 		printf("ATT bit set, ");
             }
             printf("%s", ISIS_MASK_LSP_PARTITION_BIT(header_lsp->typeblock) ? "P bit set, " : "");
-            printf("%s", isis_lsp_istype_values[ISIS_MASK_LSP_ISTYPE_BITS(header_lsp->typeblock)].name);
+            printf("%s", tok2str(isis_lsp_istype_values,"Unknown(0x%x)",ISIS_MASK_LSP_ISTYPE_BITS(header_lsp->typeblock)));
 
             packet_len -= (ISIS_COMMON_HEADER_SIZE+ISIS_LSP_HEADER_SIZE);
             pptr = p + (ISIS_COMMON_HEADER_SIZE+ISIS_LSP_HEADER_SIZE);
@@ -1037,7 +1022,7 @@ static int isis_print (const u_char *p, u_int length)
             break;
         case TLV_IS_REACH:
             printf("IS Reachability (%u)",len);
-	    tlv_is_reach = (struct isis_tlv_is_reach *)pptr;
+	    tlv_is_reach = (const struct isis_tlv_is_reach *)pptr;
 	    printf("\n\t\t\tIS Neighbor: ");
             isis_print_nodeid(tlv_is_reach->neighbor_nodeid);
 
@@ -1142,11 +1127,11 @@ static int isis_print (const u_char *p, u_int length)
 	    break;
 	case TLV_PTP_ADJ:
 	  printf("point-to-point Adjacency State (%u)",len);
-	  tlv_ptp_adj = (struct isis_tlv_ptp_adj *)pptr;
+	  tlv_ptp_adj = (const struct isis_tlv_ptp_adj *)pptr;
 	  i=len;
 	    if(i>=1) {
 		  printf("\n\t\t\tAdjacency State: %s",
-				 isis_ptp_adjancey_values[*pptr].name);
+				 tok2str(isis_ptp_adjancey_values, "#0x%x", *pptr));
 		  i--;
 		}
 	    if(i>=4) {
@@ -1169,13 +1154,7 @@ static int isis_print (const u_char *p, u_int length)
 	    printf("Protocols supported (%u)", len);
 	    printf("\n\t\t\tNLPID(s): ");
 	    for(i=0;i<len;i++) {
-	        j=0;
-	        while(isis_nlpid_values[j].id) {
-	        if (*(pptr+i) == isis_nlpid_values[j].id)
-		  break;
-		j++;
-		}
-		printf("%s (0x%02x)",isis_nlpid_values[j].name,*(pptr+i));	    
+		printf("%s (0x%02x)",tok2str(isis_nlpid_values, "Unknown", *(pptr+i)),*(pptr+i));	    
 	        if(i<len-1)
 	        printf(", ");
 	    }
@@ -1202,7 +1181,7 @@ static int isis_print (const u_char *p, u_int length)
 	  break;
 
 	case TLV_LSP:    
-	  tlv_lsp = (struct isis_tlv_lsp *)pptr;
+	  tlv_lsp = (const struct isis_tlv_lsp *)pptr;
 	    printf("LSP entries (%u)", len); 
 	    i=0;
 		while(i<len) {
@@ -1293,7 +1272,7 @@ static int isis_print (const u_char *p, u_int length)
  */
 
 static int
-osi_cksum(register const u_char *p, register int len, u_char *off)
+osi_cksum(register const u_char *p, register u_int len, u_char *off)
 {
 	int32_t c0 = 0, c1 = 0;
 

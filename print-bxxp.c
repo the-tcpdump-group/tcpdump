@@ -11,7 +11,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-  "@(#) $Header: /tcpdump/master/tcpdump/Attic/print-bxxp.c,v 1.4 2001-06-15 07:45:42 itojun Exp $";
+  "@(#) $Header: /tcpdump/master/tcpdump/Attic/print-bxxp.c,v 1.5 2001-09-17 21:57:56 fenner Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -38,10 +38,10 @@ static const char rcsid[] =
  * Looks at the first few chars up to tl1 ...
  */
 
-static int l_strnstart(const u_char *, u_int, const u_char *, u_int);
+static int l_strnstart(const char *, u_int, const char *, u_int);
 
 static int
-l_strnstart(const u_char *tstr1, u_int tl1, const u_char *str2, u_int l2)
+l_strnstart(const char *tstr1, u_int tl1, const char *str2, u_int l2)
 {
 
 	if (tl1 > l2)

@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.170 2001-09-17 20:06:17 fenner Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.171 2001-09-17 21:57:52 fenner Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -61,7 +61,7 @@ extern char *strdup(const char *);
 
 struct tok {
 	int v;			/* value */
-	char *s;		/* string */
+	const char *s;		/* string */
 };
 
 extern int aflag;		/* translate network and broadcast addresses */
@@ -134,7 +134,7 @@ extern const u_char *packetp;
 extern const u_char *snapend;
 
 /* True if  "l" bytes of "var" were captured */
-#define TTEST2(var, l) ((u_char *)&(var) <= snapend - (l))
+#define TTEST2(var, l) ((const u_char *)&(var) <= snapend - (l))
 
 /* True if "var" was captured */
 #define TTEST(var) TTEST2(var, sizeof(var))
@@ -151,7 +151,7 @@ extern void relts_print(int);
 extern int fn_print(const u_char *, const u_char *);
 extern int fn_printn(const u_char *, u_int, const u_char *);
 extern const char *tok2str(const struct tok *, const char *, int);
-extern char *dnaddr_string(u_short);
+extern const char *dnaddr_string(u_short);
 
 extern void info(int);
 extern int infodelay;
@@ -167,11 +167,11 @@ extern char *copy_argv(char **);
 extern void safeputchar(int);
 extern void safeputs(const char *);
 
-extern char *isonsap_string(const u_char *);
-extern char *llcsap_string(u_char);
-extern char *protoid_string(const u_char *);
-extern char *dnname_string(u_short);
-extern char *dnnum_string(u_short);
+extern const char *isonsap_string(const u_char *);
+extern const char *llcsap_string(u_char);
+extern const char *protoid_string(const u_char *);
+extern const char *dnname_string(u_short);
+extern const char *dnnum_string(u_short);
 
 /* The printer routines. */
 
@@ -209,7 +209,7 @@ extern void ieee802_11_if_print(u_char *, const struct pcap_pkthdr *,
 	const u_char *);
 extern void gre_print(const u_char *, u_int);
 extern void icmp_print(const u_char *, u_int, const u_char *);
-extern void igmp_print(const u_char *, u_int, const u_char *);
+extern void igmp_print(const u_char *, u_int);
 extern void igrp_print(const u_char *, u_int, const u_char *);
 extern void ip_print(const u_char *, u_int);
 extern void ipN_print(const u_char *, u_int);
@@ -286,7 +286,7 @@ extern void zephyr_print(const u_char *, int);
 extern void hsrp_print(const u_char *, u_int);
 
 #ifdef INET6
-extern void ip6_print(const u_char *, int);
+extern void ip6_print(const u_char *, u_int);
 extern void ip6_opt_print(const u_char *, int);
 extern int hbhopt_print(const u_char *);
 extern int dstopt_print(const u_char *);
@@ -297,7 +297,7 @@ extern int rt6_print(const u_char *, const u_char *);
 extern void ospf6_print(const u_char *, u_int);
 extern void dhcp6_print(const u_char *, u_int, u_int16_t, u_int16_t);
 #endif /*INET6*/
-extern u_short in_cksum(const u_short *, register int, int);
+extern u_short in_cksum(const u_short *, register u_int, int);
 
 #ifndef HAVE_BPF_DUMP
 struct bpf_program;
