@@ -1,4 +1,9 @@
-$Header: /tcpdump/master/tcpdump/CHANGES,v 1.86 2004-03-29 17:29:41 mcr Exp $
+$Header: /tcpdump/master/tcpdump/CHANGES,v 1.87 2004-03-30 14:42:38 mcr Exp $
+
+Tue.   March 30, 2004. mcr@sandelman.ottawa.on.ca. Summary for 3.8.3 release
+
+	No changes from 3.8.2. Version bumped only to maintain consistency
+	with libpcap 0.8.3.
 
 Mon.   March 29, 2004. mcr@sandelman.ottawa.on.ca. Summary for 3.8.2 release
 

@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.238 2004-03-23 18:57:33 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.239 2004-03-30 14:42:40 mcr Exp $ (LBL)";
 #endif
 
 /*
@@ -70,6 +70,7 @@ extern int SIZE_BUF;
 #include <grp.h>
 #endif /* WIN32 */
 
+#include "netdissect.h"
 #include "interface.h"
 #include "addrtoname.h"
 #include "machdep.h"
@@ -77,30 +78,8 @@ extern int SIZE_BUF;
 #include "gmt2local.h"
 #include "pcap-missing.h"
 
-int dflag;			/* print filter code */
-int eflag;			/* print ethernet header */
-int fflag;			/* don't translate "foreign" IP address */
-static int Lflag;		/* list available data link types and exit */
-int nflag;			/* leave addresses as numbers */
-int Nflag;			/* remove domains from printed host names */
-static int Oflag = 1;		/* run filter code optimizer */
-static int pflag;		/* don't go promiscuous */
-int qflag;			/* quick (shorter) output */
-int Rflag = 1;			/* print sequence # field in AH/ESP*/
-int sflag = 0;			/* use the libsmi to translate OIDs */
-int Sflag;			/* print raw TCP sequence numbers */
-int tflag = 1;			/* print packet arrival time */
-int Uflag = 0;			/* "unbuffered" output of dump files */
-int uflag = 0;			/* Print undecoded NFS handles */
-int vflag;			/* verbose */
-int xflag;			/* print packet in hex */
-int Xflag;			/* print packet in ascii as well as hex */
-static off_t Cflag = 0;		/* rotate dump files after this many bytes */
-int Aflag = 0;                  /* print packet only in ascii observing LF, CR, TAB, SPACE */
-static int dlt = -1;		/* if != -1, ask libpcap for the DLT it names */
-static int Cflag_count = 0;	/* Keep track of which file number we're writing */
-static int Wflag = 0;		/* recycle output files after this number of files */
-static int WflagChars = 0;
+netdissect_options Gndo;
+netdissect_options *gndo = &Gndo;
 
 /*
  * Define the maximum number of files for the -C flag, and how many
@@ -110,12 +89,7 @@ static int WflagChars = 0;
 #define MAX_CFLAG	1000000
 #define MAX_CFLAG_CHARS	6
 
-const char *dlt_name = NULL;
-
-char *espsecret = NULL;		/* ESP secret key */
-char *tcpmd5secret = NULL;	/* TCP-MD5 secret key */
-
-int packettype;
+int Lflag;          /* list available data link types and exit */
 
 static int infodelay;
 static int infoprint;
@@ -397,6 +371,20 @@ MakeFilename(char *buffer, char *orig_name, int cnt, int max_chars)
 		sprintf(buffer, "%s%0*d", orig_name, max_chars, cnt);
 }
 
+static int tcpdump_printf(netdissect_options *ndo _U_,
+			  const char *fmt, ...)
+{
+  
+  va_list args;
+  int ret;
+
+  va_start(args, fmt);
+  ret=vfprintf(stdout, fmt, args);
+  va_end(args);
+
+  return ret;
+};
+
 int
 main(int argc, char **argv)
 {
@@ -425,6 +413,12 @@ main(int argc, char **argv)
 	if(wsockinit() != 0) return 1;
 #endif /* WIN32 */
 
+        gndo->ndo_Oflag=1;
+	gndo->ndo_Rflag=1;
+	gndo->ndo_tflag=1;
+	gndo->ndo_dlt=-1;
+	gndo->ndo_printf=tcpdump_printf;
+  
 	cnt = -1;
 	device = NULL;
 	infile = NULL;
@@ -703,10 +697,11 @@ main(int argc, char **argv)
 			break;
 
 		case 'y':
-			dlt_name = optarg;
-			dlt = pcap_datalink_name_to_val(dlt_name);
-			if (dlt < 0)
-				error("invalid data link type %s", dlt_name);
+			gndo->ndo_dltname = optarg;
+			gndo->ndo_dlt =
+			  pcap_datalink_name_to_val(gndo->ndo_dltname);
+			if (gndo->ndo_dlt < 0)
+				error("invalid data link type %s", gndo->ndo_dltname);
 			break;
 
 #if defined(HAVE_PCAP_DEBUG) || defined(HAVE_YYDEBUG)
@@ -836,9 +831,9 @@ main(int argc, char **argv)
 #endif /* WIN32 */
 		if (Lflag)
 			show_dlts_and_exit(pd);
-		if (dlt >= 0) {
+		if (gndo->ndo_dlt >= 0) {
 #ifdef HAVE_PCAP_SET_DATALINK
-			if (pcap_set_datalink(pd, dlt) < 0)
+			if (pcap_set_datalink(pd, gndo->ndo_dlt) < 0)
 				error("%s", pcap_geterr(pd));
 #else
 			/*
@@ -846,13 +841,13 @@ main(int argc, char **argv)
 			 * data link type, so we only let them
 			 * set it to what it already is.
 			 */
-			if (dlt != pcap_datalink(pd)) {
+			if (gndo->ndo_dlt != pcap_datalink(pd)) {
 				error("%s is not one of the DLTs supported by this device\n",
-				    dlt_name);
+				      gndo->ndo_dltname);
 			}
 #endif
 			(void)fprintf(stderr, "%s: data link type %s\n",
-			              program_name, dlt_name);
+			              program_name, gndo->ndo_dltname);
 			(void)fflush(stderr);
 		}
 		i = pcap_snapshot(pd);
@@ -917,9 +912,10 @@ main(int argc, char **argv)
 		type = pcap_datalink(pd);
 		printinfo.printer = lookup_printer(type);
 		if (printinfo.printer == NULL) {
-			dlt_name = pcap_datalink_val_to_name(type);
-			if (dlt_name != NULL)
-				error("unsupported data link type %s", dlt_name);
+			gndo->ndo_dltname = pcap_datalink_val_to_name(type);
+			if (gndo->ndo_dltname != NULL)
+				error("unsupported data link type %s",
+				      gndo->ndo_dltname);
 			else
 				error("unsupported data link type %d", type);
 		}

@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.225 2004-03-23 07:15:36 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.226 2004-03-30 14:42:40 mcr Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -61,31 +61,6 @@ extern char *strdup(const char *);
 extern char *strsep(char **, const char *);
 #endif
 
-struct tok {
-	int v;			/* value */
-	const char *s;		/* string */
-};
-
-extern int aflag;		/* translate network and broadcast addresses */
-extern int dflag;		/* print filter code */
-extern int eflag;		/* print ethernet header */
-extern int fflag;		/* don't translate "foreign" IP address */
-extern int nflag;		/* leave addresses as numbers */
-extern int Nflag;		/* remove domains from printed host names */
-extern int qflag;		/* quick (shorter) output */
-extern int Rflag;		/* print sequence # field in AH/ESP*/
-extern int sflag;		/* use the libsmi to translate OIDs */
-extern int Sflag;		/* print raw TCP sequence numbers */
-extern int tflag;		/* print packet arrival time */
-extern int uflag;		/* Print undecoded NFS handles */
-extern int vflag;		/* verbose */
-extern int xflag;		/* print packet in hex */
-extern int Xflag;		/* print packet in hex/ascii */
-extern int Aflag;		/* print packet only in ascii observing TAB, LF, CR and SPACE as graphical chars */
-extern char *espsecret;
-extern char *tcpmd5secret;
-
-extern int packettype;		/* as specified by -T */
 #define PT_VAT		1	/* Visual Audio Tool */
 #define PT_WB		2	/* distributed White Board */
 #define PT_RPC		3	/* Remote Procedure Call */
@@ -162,9 +137,7 @@ extern void relts_print(int);
 
 extern int fn_print(const u_char *, const u_char *);
 extern int fn_printn(const u_char *, u_int, const u_char *);
-extern const char *tok2str(const struct tok *, const char *, int);
 extern int mask2plen(u_int32_t);
-extern char *bittok2str(const struct tok *, const char *, int);
 extern const char *tok2strary_internal(const char **, int, const char *, int);
 #define	tok2strary(a,f,i) tok2strary_internal(a, sizeof(a)/sizeof(a[0]),f,i)
 
@@ -329,4 +302,37 @@ extern u_int16_t in_cksum_shouldbe(u_int16_t, u_int16_t);
 struct bpf_program;
 
 extern void bpf_dump(struct bpf_program *, int);
+
 #endif
+
+#include "netdissect.h"
+
+/* forward compatibility */
+
+netdissect_options *gndo;
+
+#define dflag gndo->ndo_dflag
+#define eflag gndo->ndo_eflag 
+#define fflag gndo->ndo_fflag 
+#define nflag gndo->ndo_nflag 
+#define Nflag gndo->ndo_Nflag 
+#define Oflag gndo->ndo_Oflag 
+#define pflag gndo->ndo_pflag 
+#define qflag gndo->ndo_qflag 
+#define Rflag gndo->ndo_Rflag 
+#define sflag gndo->ndo_sflag 
+#define Sflag gndo->ndo_Sflag 
+#define tflag gndo->ndo_tflag 
+#define Uflag gndo->ndo_Uflag 
+#define uflag gndo->ndo_uflag 
+#define vflag gndo->ndo_vflag 
+#define xflag gndo->ndo_xflag 
+#define Xflag gndo->ndo_Xflag 
+#define Cflag gndo->ndo_Cflag 
+#define Aflag gndo->ndo_Aflag 
+#define packettype gndo->ndo_packettype
+#define espsecret  gndo->ndo_espsecret
+#define tcpmd5secret gndo->ndo_tcpmd5secret
+#define Wflag gndo->ndo_Wflag
+#define WflagChars gndo->ndo_WflagChars
+#define Cflag_count gndo->ndo_Cflag_count
