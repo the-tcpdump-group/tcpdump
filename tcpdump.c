@@ -30,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.181 2002-08-03 22:37:02 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.182 2002-08-03 23:16:57 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -255,8 +255,12 @@ main(int argc, char **argv)
 	while (
 #ifdef WIN32
 	    (op = getopt(argc, argv, "aB:c:C:dDeE:fF:i:lm:nNOpqr:Rs:StT:uvw:xXY")) != -1)
-#else
+#else /* WIN32 */
+#ifdef HAVE_PCAP_FINDALLDEVS
 	    (op = getopt(argc, argv, "ac:C:dDeE:fF:i:lm:nNOpqr:Rs:StT:uvw:xXY")) != -1)
+#else /* HAVE_PCAP_FINDALLDEVS */
+	    (op = getopt(argc, argv, "ac:C:deE:fF:i:lm:nNOpqr:Rs:StT:uvw:xXY")) != -1)
+#endif /* HAVE_PCAP_FINDALLDEVS */
 #endif /* WIN32 */
 		switch (op) {
 
@@ -791,8 +795,12 @@ usage(void)
 	(void)fprintf(stderr,
 #ifdef WIN32
 "Usage: %s [-adDeflnNOpqStuvxX] [-B size] [-c count] [ -C file_size ]\n", program_name);
-#else
+#else /* WIN32 */
+#ifdef HAVE_PCAP_FINDALLDEVS
 "Usage: %s [-adDeflnNOpqStuvxX] [-c count] [ -C file_size ]\n", program_name);
+#else /* HAVE_PCAP_FINDALLDEVS */
+"Usage: %s [-adeflnNOpqStuvxX] [-c count] [ -C file_size ]\n", program_name);
+#endif /* HAVE_PCAP_FINDALLDEVS */
 #endif /* WIN32 */
 	(void)fprintf(stderr,
 "\t\t[ -F file ] [ -i interface ] [ -r file ] [ -s snaplen ]\n");
