@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.101 2001-10-27 07:42:46 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.102 2001-11-16 02:17:36 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -264,8 +264,6 @@ ip_print(register const u_char *bp, register u_int length)
 #ifdef LBL_ALIGN
 	/*
 	 * If the IP header is not aligned, copy into abuf.
-	 * This will never happen with BPF.  It does happen raw packet
-	 * dumps from -r.
 	 */
 	if ((long)ip & 3) {
 		static u_char *abuf = NULL;

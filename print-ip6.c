@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.20 2001-11-15 07:51:09 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.21 2001-11-16 02:17:36 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -66,8 +66,6 @@ ip6_print(register const u_char *bp, register u_int length)
 #ifdef LBL_ALIGN
 	/*
 	 * The IP6 header is not 16-byte aligned, so copy into abuf.
-	 * This will never happen with BPF.  It does happen raw packet
-	 * dumps from -r.
 	 */
 	if ((u_long)ip6 & 15) {
 		static u_char *abuf;
