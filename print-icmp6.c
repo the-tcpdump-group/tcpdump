@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.52 2001-06-01 04:08:57 itojun Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.53 2001-06-01 22:59:45 itojun Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -280,10 +280,7 @@ icmp6_print(const u_char *bp, const u_char *bp2)
 				printf("M");
 			if (p->nd_ra_flags_reserved & ND_RA_FLAG_OTHER)
 				printf("O");
-#ifndef ND_RA_FLAG_HA
-#define ND_RA_FLAG_HA	0x20
-#endif
-			if (p->nd_ra_flags_reserved & ND_RA_FLAG_HA)
+			if (p->nd_ra_flags_reserved & ND_RA_FLAG_HOME_AGENT)
 				printf("H");
 
 			if ((p->nd_ra_flags_reserved & ~ND_RA_FLAG_RTPREF_MASK)
