@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.29 2001-10-16 06:09:01 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.30 2001-10-29 09:06:48 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1267,11 +1267,12 @@ static int isis_print (const u_char *p, u_int length)
 	case TLV_IPADDR:
 	    printf("IP Interface address(es) (%u)",len); 
 	    i=len;
+	    tptr=pptr;
 	    while (i>0) {
-		if (!TTEST2(*pptr, 4))
+		if (!TTEST2(*tptr, 4))
 		    goto trunctlv;
-		printf("\n\t\t\tIPv4 interface address: %s", ipaddr_string(pptr));
-		pptr += 4;
+		printf("\n\t\t\tIPv4 interface address: %s", ipaddr_string(tptr));
+		tptr += 4;
 		i -= 4;
 	    }
 	    break;
