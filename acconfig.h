@@ -98,3 +98,9 @@
  * in config.h but that should be OK since they're the same.
  */
 #undef const
+
+/* Define if you have the dnet_htoa function.  */
+#undef HAVE_DNET_HTOA
+
+/* Define if you have a dnet_htoa declaration in <netdnet/dnetdb.h>.  */
+#undef HAVE_NETDNET_DNETDB_H_DNET_HTOA

@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.146 2002-04-07 02:01:36 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.147 2002-04-07 02:09:04 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.146 $)
+AC_REVISION($Revision: 1.147 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -16,7 +16,7 @@ AC_LBL_C_INIT(V_CCOPT, V_INCLS)
 AC_C_INLINE
 AC_C___ATTRIBUTE__
 
-AC_CHECK_HEADERS(fcntl.h rpc/rpcent.h netinet/if_ether.h)
+AC_CHECK_HEADERS(fcntl.h rpc/rpcent.h netinet/if_ether.h netdnet/dnetdb.h)
 AC_HEADER_TIME
 
 case "$host_os" in
@@ -403,6 +403,15 @@ if test "$ac_cv_sockaddr_has_sa_len" = no; then
 	missing_includes=yes
 fi
 
+AC_CACHE_CHECK([for dnet_htoa declaration in netdnet/dnetdb.h],
+[td_cv_decl_netdnet_dnetdb_h_dnet_htoa],
+[AC_EGREP_HEADER(dnet_htoa, netdnet/dnetdb.h,
+	td_cv_decl_netdnet_dnetdb_h_dnet_htoa=yes,
+	td_cv_decl_netdnet_dnetdb_h_dnet_htoa=no)])
+if test "$td_cv_decl_netdnet_dnetdb_h_dnet_htoa" = yes; then
+	AC_DEFINE(HAVE_NETDNET_DNETDB_H_DNET_HTOA)
+fi
+
 dnl
 dnl check sizeof basic types.
 dnl They're very likely to be wrong for cross-compiling.
@@ -515,7 +524,7 @@ fi
 
 AC_LBL_TYPE_SIGNAL
 
-AC_CHECK_LIB(dnet, dnet_htoa)
+AC_SEARCH_LIBS(dnet_htoa, dnet, AC_DEFINE(HAVE_DNET_HTOA))
 
 AC_CHECK_LIB(rpc, main)		dnl It's unclear why we might need -lrpc
 

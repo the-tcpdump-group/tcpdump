@@ -93,6 +93,12 @@
  */
 #undef const
 
+/* Define if you have the dnet_htoa function.  */
+#undef HAVE_DNET_HTOA
+
+/* Define if you have a dnet_htoa declaration in <netdnet/dnetdb.h>.  */
+#undef HAVE_NETDNET_DNETDB_H_DNET_HTOA
+
 /* The number of bytes in a char.  */
 #undef SIZEOF_CHAR
 
@@ -165,6 +171,9 @@
 /* Define if you have the <fcntl.h> header file.  */
 #undef HAVE_FCNTL_H
 
+/* Define if you have the <netdnet/dnetdb.h> header file.  */
+#undef HAVE_NETDNET_DNETDB_H
+
 /* Define if you have the <netinet/if_ether.h> header file.  */
 #undef HAVE_NETINET_IF_ETHER_H
 
@@ -179,9 +188,6 @@
 
 /* Define if you have the crypto library (-lcrypto).  */
 #undef HAVE_LIBCRYPTO
-
-/* Define if you have the dnet library (-ldnet).  */
-#undef HAVE_LIBDNET
 
 /* Define if you have the rpc library (-lrpc).  */
 #undef HAVE_LIBRPC
