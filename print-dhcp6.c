@@ -32,7 +32,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.21 2002-08-01 08:53:04 risso Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.22 2002-08-02 04:05:51 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -332,7 +332,7 @@ dhcp6opt_print(u_char *cp, u_char *ep)
 			printf(" %s)", dhcp6stcode(val16));
 			break;
 		default:
-			printf(")", ntohs(dh6o->dh6opt_type));
+			printf(")");
 			break;
 		}
 
