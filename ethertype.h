@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/ethertype.h,v 1.15 2001-04-03 05:21:24 fenner Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/ethertype.h,v 1.16 2001-06-21 17:56:02 itojun Exp $ (LBL)
  */
 
 /*
@@ -104,6 +104,12 @@
 #endif
 #ifndef ETHERTYPE_PPP
 #define	ETHERTYPE_PPP		0x880b
+#endif
+#ifndef	ETHERTYPE_MPLS
+#define	ETHERTYPE_MPLS		0x8847
+#endif
+#ifndef	ETHERTYPE_MPLS_MULTI
+#define	ETHERTYPE_MPLS_MULTI	0x8848
 #endif
 #ifndef ETHERTYPE_PPPOED
 #define ETHERTYPE_PPPOED	0x8863
