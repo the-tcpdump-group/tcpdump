@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-krb.c,v 1.13 2000-09-23 08:26:36 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-krb.c,v 1.14 2000-09-23 08:54:34 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -36,8 +36,6 @@ static const char rcsid[] =
 
 #include <netinet/in.h>
 #include <netinet/in_systm.h>
-#include <netinet/ip.h>
-#include <netinet/ip_var.h>
 
 #include <ctype.h>
 #include <errno.h>

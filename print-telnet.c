@@ -51,7 +51,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.10 2000-09-23 08:26:38 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-telnet.c,v 1.11 2000-09-23 08:54:42 guy Exp $";
 #endif
 
 #include <sys/param.h>
@@ -61,8 +61,6 @@ static const char rcsid[] =
 
 #include <netinet/in.h>
 #include <netinet/in_systm.h>
-#include <netinet/ip.h>
-#include <netinet/ip_var.h>
 
 #define TELCMDS
 #define TELOPTS

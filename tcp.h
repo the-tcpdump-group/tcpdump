@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/tcp.h,v 1.1 2000-09-23 08:26:39 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/tcp.h,v 1.2 2000-09-23 08:54:43 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1982, 1986, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -33,6 +33,29 @@
  *
  *	@(#)tcp.h	8.1 (Berkeley) 6/10/93
  */
+
+#ifndef BYTE_ORDER
+#define	LITTLE_ENDIAN	1234	/* least-significant byte first (vax, pc) */
+#define	BIG_ENDIAN	4321	/* most-significant byte first (IBM, net) */
+#define	PDP_ENDIAN	3412	/* LSB first in word, MSW first in long (pdp)*/
+
+#ifdef WORDS_BIGENDIAN
+#define BYTE_ORDER	BIG_ENDIAN
+#else
+#define BYTE_ORDER	LITTLE_ENDIAN
+#endif /* WORDS_BIGENDIAN */
+#endif /* BYTE_ORDER */
+
+#if !defined(BYTE_ORDER) || \
+    (BYTE_ORDER != BIG_ENDIAN && BYTE_ORDER != LITTLE_ENDIAN && \
+    BYTE_ORDER != PDP_ENDIAN)
+	/* you must determine what the correct bit order is for
+	 * your compiler - the next line is an intentional error
+	 * which will force your compiles to bomb until you fix
+	 * the above macros.
+	 */
+  #error "Undefined or invalid BYTE_ORDER";
+#endif
 
 typedef	u_int	tcp_seq;
 /*

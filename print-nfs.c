@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.82 2000-09-23 08:03:38 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.83 2000-09-23 08:54:35 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -38,7 +38,6 @@ struct rtentry;
 
 #include <netinet/in.h>
 #include <netinet/in_systm.h>
-#include <netinet/ip.h>
 #ifdef INET6
 #include <netinet/ip6.h>
 #endif
@@ -55,6 +54,8 @@ struct rtentry;
 
 #include "nfs.h"
 #include "nfsfh.h"
+
+#include "ip.h"
 
 static void nfs_printfh(const u_int32_t *, const u_int);
 static void xid_map_enter(const struct rpc_msg *, const u_char *);

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.20 2000-08-17 18:38:24 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.21 2000-09-23 08:54:37 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -34,7 +34,6 @@ static const char rcsid[] =
 
 #include <netinet/in.h>
 #include <netinet/in_systm.h>
-#include <netinet/ip.h>
 
 /*
  * XXX: We consider a case where IPv6 is not ready yet for portability,
@@ -63,6 +62,8 @@ struct pim {
 #include "interface.h"
 #include "addrtoname.h"
 #include "extract.h"
+
+#include "ip.h"
 
 static void pimv2_print(register const u_char *bp, register u_int len);
 

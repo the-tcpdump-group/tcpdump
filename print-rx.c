@@ -13,7 +13,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.15 2000-07-29 09:20:26 assar Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.16 2000-09-23 08:54:39 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -29,7 +29,6 @@ static const char rcsid[] =
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/in_systm.h>
-#include <netinet/ip.h>
 #include <arpa/inet.h>
 
 #include "interface.h"
@@ -40,6 +39,8 @@ static const char rcsid[] =
 #include <arpa/nameser.h>
 
 #include "rx.h"
+
+#include "ip.h"
 
 static struct tok rx_types[] = {
 	{ RX_PACKET_TYPE_DATA,		"data" },

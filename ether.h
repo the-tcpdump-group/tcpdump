@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ether.h,v 1.2 2000-09-23 08:26:30 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ether.h,v 1.3 2000-09-23 08:54:25 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1982, 1986, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -33,10 +33,6 @@
  *
  *	@(#)if_ether.h	8.3 (Berkeley) 5/2/95
  */
-
-#if 0
-#include <net/if_arp.h>
-#endif
 
 #define	ETHERMTU	1500
 

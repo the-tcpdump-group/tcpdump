@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.86 2000-09-23 08:26:34 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.87 2000-09-23 08:54:31 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -34,8 +34,6 @@ static const char rcsid[] =
 
 #include <netinet/in.h>
 #include <netinet/in_systm.h>
-#include <netinet/ip.h>
-#include <netinet/ip_var.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,6 +43,8 @@ static const char rcsid[] =
 #include "addrtoname.h"
 #include "interface.h"
 #include "extract.h"			/* must come after interface.h */
+
+#include "ip.h"
 
 /* Compatibility */
 #ifndef	IPPROTO_ND

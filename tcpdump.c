@@ -24,7 +24,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.152 2000-09-18 05:11:44 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.153 2000-09-23 08:54:44 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -53,7 +53,6 @@ static const char rcsid[] =
 #include <ctype.h>
 
 #include <netinet/in_systm.h>
-#include <netinet/ip.h>
 
 #include "interface.h"
 #include "addrtoname.h"
