@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.17.2.2 2003-11-16 08:51:23 guy Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.17.2.3 2003-12-15 03:37:45 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -202,7 +202,8 @@ fr_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 	u_short extracted_ethertype;
 	u_int32_t orgcode;
 	register u_short et;
-	int dlci, addr_len;
+	u_int dlci;
+	int addr_len;
 	u_char nlpid;
 	u_int hdr_len;
 	char *flags;
