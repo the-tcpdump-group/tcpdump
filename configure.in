@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.136 2001-04-27 02:33:43 fenner Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.137 2001-06-24 21:39:10 itojun Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.136 $)
+AC_REVISION($Revision: 1.137 $)
 AC_PREREQ(2.13)
 AC_INIT(tcpdump.c)
 
@@ -506,7 +506,6 @@ fi
 dnl The following generates a warning from autoconf...
 errprint(__file__:__line__: please ignore the next warning:
 )dnl
-AC_C_BIGENDIAN
 
 AC_CHECK_LIB(dnet, main)
 AC_CHECK_LIB(rpc, main)
