@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.101 2001-10-08 21:25:24 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.102 2001-11-26 06:48:12 itojun Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -395,6 +395,44 @@ static int udp6_cksum(const struct ip6_hdr *ip6, const struct udphdr *up,
 #define DHCP6_CLI_PORT 547	/*XXX*/
 #endif
 
+static void
+udpipaddr_print(const struct ip *ip, u_int16_t sport, u_int16_t dport)
+{
+#ifdef INET6
+	const struct ip6_hdr *ip6;
+
+	if (IP_V(ip) == 6)
+		ip6 = (const struct ip6_hdr *)ip;
+	else
+		ip6 = NULL;
+
+	if (ip6) {
+		if (dport && ip6->ip6_nxt == IPPROTO_UDP) {
+			(void)printf("%s.%s > %s.%s: ",
+				ip6addr_string(&ip6->ip6_src),
+				udpport_string(sport),
+				ip6addr_string(&ip6->ip6_dst),
+				udpport_string(dport));
+		} else {
+			(void)printf("%s > %s: ",
+				udpport_string(sport), udpport_string(dport));
+		}
+	} else
+#endif /*INET6*/
+	{
+		if (dport && ip->ip_p == IPPROTO_UDP) {
+			(void)printf("%s.%s > %s.%s: ",
+				ipaddr_string(&ip->ip_src),
+				udpport_string(sport),
+				ipaddr_string(&ip->ip_dst),
+				udpport_string(dport));
+		} else {
+			(void)printf("%s > %s: ",
+				udpport_string(sport), udpport_string(dport));
+		}
+	}
+}
+
 void
 udp_print(register const u_char *bp, u_int length,
 	  register const u_char *bp2, int fragmented)
@@ -420,14 +458,13 @@ udp_print(register const u_char *bp, u_int length,
 #endif /*INET6*/
 	cp = (u_char *)(up + 1);
 	if (cp > snapend) {
-		(void)printf("%s > %s: [|udp]",
-			ipaddr_string(&ip->ip_src), ipaddr_string(&ip->ip_dst));
+		udpipaddr_print(ip, 0, 0);
+		(void)printf("[|udp]");
 		return;
 	}
 	if (length < sizeof(struct udphdr)) {
-		(void)printf("%s > %s: truncated-udp %d",
-			ipaddr_string(&ip->ip_src), ipaddr_string(&ip->ip_dst),
-			length);
+		udpipaddr_print(ip, 0, 0);
+		(void)printf("truncated-udp %u", length);
 		return;
 	}
 	length -= sizeof(struct udphdr);
@@ -436,10 +473,8 @@ udp_print(register const u_char *bp, u_int length,
 	dport = ntohs(up->uh_dport);
 	ulen = ntohs(up->uh_ulen);
 	if (ulen < 8) {
-		(void)printf("%s > %s: truncated-udplength %d",
-			     ipaddr_string(&ip->ip_src),
-			     ipaddr_string(&ip->ip_dst),
-			     ulen);
+		udpipaddr_print(ip, sport, dport);
+		(void)printf("truncated-udplength %u", ulen);
 		return;
 	}
 	if (packettype) {
@@ -449,20 +484,12 @@ udp_print(register const u_char *bp, u_int length,
 		switch (packettype) {
 
 		case PT_VAT:
-			(void)printf("%s.%s > %s.%s: ",
-				ipaddr_string(&ip->ip_src),
-				udpport_string(sport),
-				ipaddr_string(&ip->ip_dst),
-				udpport_string(dport));
+			udpipaddr_print(ip, sport, dport);
 			vat_print((void *)(up + 1), length, up);
 			break;
 
 		case PT_WB:
-			(void)printf("%s.%s > %s.%s: ",
-				ipaddr_string(&ip->ip_src),
-				udpport_string(sport),
-				ipaddr_string(&ip->ip_dst),
-				udpport_string(dport));
+			udpipaddr_print(ip, sport, dport);
 			wb_print((void *)(up + 1), length);
 			break;
 
@@ -478,39 +505,23 @@ udp_print(register const u_char *bp, u_int length,
 			break;
 
 		case PT_RTP:
-			(void)printf("%s.%s > %s.%s: ",
-				ipaddr_string(&ip->ip_src),
-				udpport_string(sport),
-				ipaddr_string(&ip->ip_dst),
-				udpport_string(dport));
+			udpipaddr_print(ip, sport, dport);
 			rtp_print((void *)(up + 1), length, up);
 			break;
 
 		case PT_RTCP:
-			(void)printf("%s.%s > %s.%s:",
-				ipaddr_string(&ip->ip_src),
-				udpport_string(sport),
-				ipaddr_string(&ip->ip_dst),
-				udpport_string(dport));
+			udpipaddr_print(ip, sport, dport);
 			while (cp < ep)
 				cp = rtcp_print(cp, ep);
 			break;
 
 		case PT_SNMP:
-			(void)printf("%s.%s > %s.%s:",
-				ipaddr_string(&ip->ip_src),
-				udpport_string(sport),
-				ipaddr_string(&ip->ip_dst),
-				udpport_string(dport));
+			udpipaddr_print(ip, sport, dport);
 			snmp_print((const u_char *)(up + 1), length);
 			break;
 
 		case PT_CNFP:
-			(void)printf("%s.%s > %s.%s:",
-				ipaddr_string(&ip->ip_src),
-				udpport_string(sport),
-				ipaddr_string(&ip->ip_dst),
-				udpport_string(dport));
+			udpipaddr_print(ip, sport, dport);
 			cnfp_print(cp, length, (const u_char *)ip);
 			break;
 		}
@@ -550,32 +561,7 @@ udp_print(register const u_char *bp, u_int length,
 			return;
 		}
 	}
-#ifdef INET6
-	if (ip6) {
-		if (ip6->ip6_nxt == IPPROTO_UDP) {
-			(void)printf("%s.%s > %s.%s: ",
-				ip6addr_string(&ip6->ip6_src),
-				udpport_string(sport),
-				ip6addr_string(&ip6->ip6_dst),
-				udpport_string(dport));
-		} else {
-			(void)printf("%s > %s: ",
-				udpport_string(sport), udpport_string(dport));
-		}
-	} else
-#endif /*INET6*/
-	{
-		if (ip->ip_p == IPPROTO_UDP) {
-			(void)printf("%s.%s > %s.%s: ",
-				ipaddr_string(&ip->ip_src),
-				udpport_string(sport),
-				ipaddr_string(&ip->ip_dst),
-				udpport_string(dport));
-		} else {
-			(void)printf("%s > %s: ",
-				udpport_string(sport), udpport_string(dport));
-		}
-	}
+	udpipaddr_print(ip, sport, dport);
 
 	if (IP_V(ip) == 4 && vflag && !fragmented) {
 		int sum = up->uh_sum;
