@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.172 2001-10-01 01:12:00 mcr Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.173 2001-10-03 07:35:42 guy Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -124,9 +124,7 @@ extern int packettype;		/* as specified by -T */
 #endif
 #endif
 
-extern char *program_name;	/*used to generate self-identifying messages */
-
-extern char *WFileName;
+extern char *program_name;	/* used to generate self-identifying messages */
 
 extern int32_t thiszone;	/* seconds offset from gmt to local time */
 
@@ -179,8 +177,6 @@ extern const char *dnnum_string(u_short);
 
 #include <pcap.h>
 
-extern void dump_and_trunc(u_char *, const struct pcap_pkthdr *, 
-			  const u_char *);
 extern void ascii_print_with_offset(const u_char *, u_int, u_int);    
 extern void ascii_print(const u_char *, u_int);    
 extern void hex_print_with_offset(const u_char *, u_int, u_int);    
@@ -307,7 +303,4 @@ extern u_short in_cksum(const u_short *, register u_int, int);
 struct bpf_program;
 
 extern void bpf_dump(struct bpf_program *, int);
-
-extern pcap_t *pd;
-
 #endif

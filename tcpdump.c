@@ -17,6 +17,12 @@
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * Support for splitting captures into multiple files with a maximum
+ * file size:
+ *
+ * Copyright (c) 2001
+ *	Seth Webster <swebster@sst.ll.mit.edu>
  */
 
 #ifndef lint
@@ -24,7 +30,7 @@ static const char copyright[] =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.167 2001-10-01 01:12:01 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.168 2001-10-03 07:35:44 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -86,7 +92,6 @@ int infodelay;
 int infoprint;
 
 char *program_name;
-char *WFileName;
 
 int32_t thiszone;		/* seconds offset from gmt to local time */
 
@@ -94,7 +99,7 @@ int32_t thiszone;		/* seconds offset from gmt to local time */
 static RETSIGTYPE cleanup(int);
 static void usage(void) __attribute__((noreturn));
 
-extern void dump_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *sp);
+static void dump_and_trunc(u_char *, const struct pcap_pkthdr *, const u_char *);
 
 #ifdef SIGINFO
 RETSIGTYPE requestinfo(int);
@@ -169,22 +174,28 @@ lookup_printer(int type)
 	/* NOTREACHED */
 }
 
-pcap_t *pd;
+static pcap_t *pd;
 
 extern int optind;
 extern int opterr;
 extern char *optarg;
+
+struct dump_info {
+	char	*WFileName;
+	pcap_t	*pd;
+	pcap_dumper_t *p;
+};
 
 int
 main(int argc, char **argv)
 {
 	register int cnt, op, i;
 	bpf_u_int32 localnet, netmask;
-	register char *cp, *infile, *cmdbuf, *device, *RFileName;
-	extern char *WFileName;
+	register char *cp, *infile, *cmdbuf, *device, *RFileName, *WFileName;
 	pcap_handler printer;
 	struct bpf_program fcode;
 	RETSIGTYPE (*oldhandler)(int);
+	struct dump_info info;
 	u_char *pcap_userdata;
 	char ebuf[PCAP_ERRBUF_SIZE];
 
@@ -449,7 +460,10 @@ main(int argc, char **argv)
 		if (p == NULL)
 			error("%s", pcap_geterr(pd));
 		printer = dump_and_trunc;
-		pcap_userdata = (u_char *)p;
+		info.WFileName = WFileName;
+		info.pd = pd;
+		info.p = p;
+		pcap_userdata = (u_char *)&info;
 	} else {
 		printer = lookup_printer(pcap_datalink(pd));
 		pcap_userdata = 0;
@@ -457,7 +471,6 @@ main(int argc, char **argv)
 		(void)setsignal(SIGINFO, requestinfo);
 #endif
 	}
-
 	if (RFileName == NULL) {
 		(void)fprintf(stderr, "%s: listening on %s\n",
 		    program_name, device);
@@ -504,6 +517,60 @@ info(register int verbose)
 		putc('\n', stderr);
 	(void)fprintf(stderr, "%d packets dropped by kernel\n", stat.ps_drop);
 	infoprint = 0;
+}
+
+static void
+reverse(char *s)
+{
+	int i, j, c;
+
+	for (i = 0, j = strlen(s) - 1; i < j; i++, j--) {
+		c = s[i];
+		s[i] = s[j];
+		s[j] = c;
+	}
+}
+
+
+static void
+swebitoa(unsigned int n, char *s)
+{
+	unsigned int i;
+
+	i = 0;
+	do {
+		s[i++] = n % 10 + '0';
+	} while ((n /= 10) > 0);
+
+	s[i] = '\0';
+	reverse(s);
+}
+
+static void
+dump_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
+{
+	struct dump_info *info;
+	static uint cnt = 2;
+	char *name;
+
+	info = (struct dump_info *)user;
+	
+	/*
+	 * XXX - this won't prevent capture files from getting
+	 * larger than Cflag - the last packet written to the
+	 * file could put it over Cflag.
+	 */
+	if (Cflag && ftell((FILE *)info->p) > Cflag) {
+		name = (char *) malloc(strlen(info->WFileName) + 4);
+		strcpy(name, info->WFileName);
+		swebitoa(cnt, name + strlen(info->WFileName));
+		cnt++;
+		pcap_dump_close(info->p);
+		info->p = pcap_dump_open(info->pd, name);
+		free(name);
+	}
+
+	pcap_dump((u_char *)info->p, h, sp);
 }
 
 /* Like default_print() but data need not be aligned */
