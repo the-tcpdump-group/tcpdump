@@ -11,7 +11,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.8 2001-01-15 03:24:00 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.9 2001-01-15 03:59:14 guy Exp $";
 #endif
 
 #include <stdio.h>
@@ -918,8 +918,10 @@ out:
 void nbt_udp138_print(const uchar *data, int length)
 {
   const uchar *maxbuf = data + length;
-  startbuf = data;
+
+  if (maxbuf > snapend) maxbuf = snapend;
   if (maxbuf <= data) return;
+  startbuf = data;
 
   data = fdata(data,"\n>>> NBT UDP PACKET(138) Res=[rw] ID=[rw] IP=[b.b.b.b] Port=[rd] Length=[rd] Res2=[rw]\nSourceName=[n1]\nDestName=[n1]\n#",maxbuf);
 
@@ -935,13 +937,21 @@ void nbt_udp138_print(const uchar *data, int length)
 /*
    print netbeui frames 
 */
-void netbeui_print(u_short control, const uchar *data, const uchar *maxbuf)
+void netbeui_print(u_short control, const uchar *data, int length)
 {
-  int len = SVAL(data,0);
-  int command = CVAL(data,4);
-  const uchar *data2 = data + len;
+  const uchar *maxbuf = data + length;
+  int len;
+  int command;
+  const uchar *data2;
   int is_truncated = 0;
 
+  if (maxbuf > snapend)
+    maxbuf = snapend;
+  if (&data[7] >= maxbuf)
+    goto out;
+  len = SVAL(data,0);
+  command = CVAL(data,4);
+  data2 = data + len;
   if (data2 >= maxbuf) {
     data2 = maxbuf;
     is_truncated = 1;
@@ -1004,7 +1014,7 @@ void netbeui_print(u_short control, const uchar *data, const uchar *maxbuf)
   }
 
   /* If there isn't enough data for "\377SMB", don't look for it. */
-  if (!TTEST2(data2[3], 4))
+  if (&data2[3] >= maxbuf)
     goto out;
 
   if (memcmp(data2,"\377SMB",4)==0) {
@@ -1012,8 +1022,6 @@ void netbeui_print(u_short control, const uchar *data, const uchar *maxbuf)
   } else {
     int i;
     for (i=0;i<128;i++) {
-      if (!TTEST2(data2[i], 4))
-        break;
       if (&data2[i+3] >= maxbuf)
         break;
       if (memcmp(&data2[i],"\377SMB",4)==0) {
@@ -1040,10 +1048,11 @@ void ipx_netbios_print(const uchar *data, u_int length)
   const uchar *maxbuf;
 
   maxbuf = data + length;
+  /* Don't go past the end of the captured data in the packet. */
+  if (maxbuf > snapend)
+    maxbuf = snapend;
   startbuf = data;
   for (i=0;i<128;i++) {
-    if (!TTEST2(data[i], 4))
-      break;
     if (&data[i+3] >= maxbuf)
       break;
     if (memcmp(&data[i],"\377SMB",4)==0) {

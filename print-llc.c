@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.34 2001-01-15 03:24:00 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.35 2001-01-15 03:59:13 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -164,7 +164,7 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 			length -= 2;
 			caplen -= 2;
 		}
-		netbeui_print(control, p, p + min(caplen, length));
+		netbeui_print(control, p, length);
 		return (1);
 	}
 	if (llc.ssap == LLCSAP_ISONS && llc.dsap == LLCSAP_ISONS
