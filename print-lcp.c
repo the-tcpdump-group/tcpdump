@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-"@(#) $Header: /tcpdump/master/tcpdump/Attic/print-lcp.c,v 1.2 1999-11-21 09:36:56 fenner Exp $ (LBL)";
+"@(#) $Header: /tcpdump/master/tcpdump/Attic/print-lcp.c,v 1.3 1999-12-15 07:55:42 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -126,7 +126,7 @@ static struct tok lcpchap2str[] = {
 };
 
 void
-lcp_print(register const u_char *bp, u_int length, u_int caplen)
+lcp_print(register const u_char *bp, u_int length)
 {
   u_short lcp_code, lcp_id, lcp_length;
   const u_char *lcp_data;
@@ -157,7 +157,7 @@ lcp_print(register const u_char *bp, u_int length, u_int caplen)
 	lcpopt_type = p[0];
 	lcpopt_length = p[1];
 	p+=2;
-	printf(" <%s ",tok2str(lcpoption2str, "option-#%d", lcpopt_type), lcpopt_length);
+	printf(" <%s ",tok2str(lcpoption2str, "option-#%d", lcpopt_type));
 	if (lcpopt_length)
 	  switch (lcpopt_type) {
 	  case LCP_MRU:
@@ -213,8 +213,7 @@ lcp_print(register const u_char *bp, u_int length, u_int caplen)
   case LCP_CODEREJ:
     if (snapend < lcp_data+4) return;
     printf(" ");
-    /* XXX What's caplen? (lcp_print doesn't use it so it doesn't matter here) */
-    lcp_print(lcp_data, (lcp_length+lcp_data > snapend ? snapend-lcp_data : lcp_length), 0);
+    lcp_print(lcp_data, (lcp_length+lcp_data > snapend ? snapend-lcp_data : lcp_length));
     break;
   case LCP_TERMREQ:
   case LCP_TERMACK:
