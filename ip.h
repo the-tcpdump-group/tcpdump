@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ip.h,v 1.1 2000-09-23 08:54:25 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ip.h,v 1.2 2000-09-24 07:40:45 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1982, 1986, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -90,7 +90,7 @@ struct ip {
 	u_char	ip_p;			/* protocol */
 	u_short	ip_sum;			/* checksum */
 	struct	in_addr ip_src,ip_dst;	/* source and dest address */
-} __attribute__ ((packed));
+};
 
 #define	IP_MAXPACKET	65535		/* maximum packet size */
 
@@ -165,7 +165,7 @@ struct	ip_timestamp {
 			n_long ipt_time;
 		} ipt_ta[1];
 	} ipt_timestamp;
-} __attribute__ ((packed));
+};
 
 /* flag bits for ipt_flg */
 #define	IPOPT_TS_TSONLY		0		/* timestamps only */
