@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "interface.h"
 #include "smb.h"
 
 extern uchar *startbuf;
@@ -49,7 +50,7 @@ static void interpret_dos_date(uint32 date,int *year,int *month,int *day,int *ho
 /*******************************************************************
   create a unix date from a dos date
 ********************************************************************/
-time_t make_unix_date(void *date_ptr)
+static time_t make_unix_date(void *date_ptr)
 {
   uint32 dos_date=0;
   struct tm t;
@@ -70,7 +71,7 @@ time_t make_unix_date(void *date_ptr)
 /*******************************************************************
   create a unix date from a dos date
 ********************************************************************/
-time_t make_unix_date2(void *date_ptr)
+static time_t make_unix_date2(void *date_ptr)
 {
   uint32 x,x2;
 
@@ -85,7 +86,7 @@ time_t make_unix_date2(void *date_ptr)
 interpret an 8 byte "filetime" structure to a time_t
 It's originally in "100ns units since jan 1st 1601"
 ****************************************************************************/
-time_t interpret_long_date(char *p)
+static time_t interpret_long_date(char *p)
 {
   double d;
   time_t ret;
@@ -158,7 +159,6 @@ extract a netbios name from a buf
 static int name_extract(char *buf,int ofs,char *name)
 {
   char *p = name_ptr(buf,ofs);
-  int d = PTR_DIFF(p,buf+ofs);
   strcpy(name,"");
   return(name_interpret(p,name));
 }  
@@ -177,7 +177,7 @@ static int name_len(unsigned char *s)
   return(PTR_DIFF(s,s0)+1);
 }
 
-void print_asc(unsigned char *buf,int len)
+static void print_asc(unsigned char *buf,int len)
 {
   int i;
   for (i=0;i<len;i++)
@@ -283,7 +283,7 @@ static char *unistr(char *s, int *len)
 	return buf;
 }
 
-uchar *fdata1(uchar *buf,char *fmt,uchar *maxbuf)
+static uchar *fdata1(uchar *buf,char *fmt,uchar *maxbuf)
 {
   int reverse=0;
   char *attrib_fmt = "READONLY|HIDDEN|SYSTEM|VOLUME|DIR|ARCHIVE|";
@@ -389,7 +389,7 @@ uchar *fdata1(uchar *buf,char *fmt,uchar *maxbuf)
       }
     case 'S':
       {	
-	      printf("%.*s",PTR_DIFF(maxbuf,buf),unistr(buf, &len));
+	      printf("%.*s",(int)PTR_DIFF(maxbuf,buf),unistr(buf, &len));
 	      buf += len;
 	      fmt++;
 	      break;
@@ -398,8 +398,8 @@ uchar *fdata1(uchar *buf,char *fmt,uchar *maxbuf)
       {	
 	if (*buf != 4 && *buf != 2) 
 	  printf("Error! ASCIIZ buffer of type %d (safety=%d)\n",
-		 *buf,PTR_DIFF(maxbuf,buf));
-	printf("%.*s",PTR_DIFF(maxbuf,buf+1),unistr(buf+1, &len));
+		 *buf,(int)PTR_DIFF(maxbuf,buf));
+	printf("%.*s",(int)PTR_DIFF(maxbuf,buf+1),unistr(buf+1, &len));
 	buf += len+1;
 	fmt++;
 	break;
