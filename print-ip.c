@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.95 2001-05-09 00:34:34 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.96 2001-05-09 01:06:31 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -545,10 +545,17 @@ again:
 	if (ip->ip_tos) {
 		(void)printf(" [tos 0x%x", (int)ip->ip_tos);
 		/* ECN bits */
-		if (ip->ip_tos&0x02) {
-			(void)printf(",ECT");
-			if (ip->ip_tos&0x01)
+		if (ip->ip_tos & 0x03) {
+			switch (ip->ip_tos & 0x03) {
+			case 1:
+				(void)printf(",ECT(1)");
+				break;
+			case 2:
+				(void)printf(",ECT(0)");
+				break;
+			case 3:
 				(void)printf(",CE");
+			}
 		}
 		(void)printf("] ");
 	}
