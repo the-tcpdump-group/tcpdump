@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.28 1999-10-30 23:45:51 itojun Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.29 1999-11-17 05:18:27 assar Exp $ (LBL)";
 #endif
 
 #include <sys/param.h>
@@ -365,7 +365,7 @@ handle_chap(const u_char *p, int length)
 			if (isprint(*ptr))
 				printf("%c", *ptr);
 			else
-				printf("\%03o", *ptr);
+				printf("\\%03o", *ptr);
 			ptr++;
 		}
 		break;
@@ -399,7 +399,7 @@ handle_pap(const u_char *p, int length)
 			if (isprint(*ptr))
 				printf("%c", *ptr);
 			else
-				printf("\%03o", *ptr);
+				printf("\\%03o", *ptr);
 			ptr++;
 		}
 		x = *ptr++;
@@ -408,7 +408,7 @@ handle_pap(const u_char *p, int length)
 			if (isprint(*ptr))
 				printf("%c", *ptr);
 			else
-				printf("\%03o", *ptr);
+				printf("\\%03o", *ptr);
 			ptr++;
 		}
 		break;
