@@ -19,6 +19,13 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+/*
+ * Include the appropriate OS header files on Windows and various flavors
+ * of UNIX, and also define some additional items and include various
+ * non-OS header files on Windows, and; this isolates most of the platform
+ * differences to this one file.
+ */
+
 #ifdef WIN32
 
 #include <winsock2.h>
@@ -58,29 +65,26 @@ typedef char* caddr_t;
 #define O_RDONLY _O_RDONLY
 
 typedef short ino_t;
-#endif
+#endif /* __MINGW32__ */
 
-#else
+#else /* WIN32 */
 
 #include <ctype.h>
 #include <unistd.h>
 #include <netdb.h>
-#include <sys/socket.h>
 #include <sys/param.h>
-#include <sys/types.h>
+#include <sys/types.h>			/* concession to AIX */
 #include <sys/time.h>
-#include <net/if.h>
+#include <sys/socket.h>
 #include <netinet/in.h>
-#include <sys/file.h>
-#include <sys/ioctl.h>
-#include <sys/uio.h>
 
-#ifdef HAVE_SYS_SOCKIO_H
-#include <sys/sockio.h>
-#include <arpa/inet.h>
-#endif /* HAVE_SYS_SOCKIO_H */
-
+#ifdef TIME_WITH_SYS_TIME
+#include <time.h>
 #endif
+
+#include <arpa/inet.h>
+
+#endif /* WIN32 */
 
 #ifdef INET6
 #include "ip6.h"
