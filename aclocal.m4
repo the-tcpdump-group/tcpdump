@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.80.2.1 2002-06-28 10:48:30 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.80.2.2 2002-06-29 04:22:54 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -188,14 +188,14 @@ AC_DEFUN(AC_LBL_C_INLINE,
 
 		    return &xxx;
 		}],ac_lbl_cc_inline=yes,)
-	    if test $ac_lbl_cc_inline = yes ; then
+	    if test "$ac_lbl_cc_inline" = yes ; then
 		break;
 	    fi
 	done
-	if test $ac_lbl_cc_inline = yes ; then
+	if test "$ac_lbl_cc_inline" = yes ; then
 	    ac_cv_lbl_inline=$i
 	fi])
-    if test ! -z $ac_cv_lbl_inline ; then
+    if test ! -z "$ac_cv_lbl_inline" ; then
 	AC_MSG_RESULT($ac_cv_lbl_inline)
     else
 	AC_MSG_RESULT(not supported)

@@ -1123,16 +1123,16 @@ else
   cat conftest.$ac_ext >&5
 fi
 rm -f conftest*
-	    if test $ac_lbl_cc_inline = yes ; then
+	    if test "$ac_lbl_cc_inline" = yes ; then
 		break;
 	    fi
 	done
-	if test $ac_lbl_cc_inline = yes ; then
+	if test "$ac_lbl_cc_inline" = yes ; then
 	    ac_cv_lbl_inline=$i
 	fi
 fi
 
-    if test ! -z $ac_cv_lbl_inline ; then
+    if test ! -z "$ac_cv_lbl_inline" ; then
 	echo "$ac_t""$ac_cv_lbl_inline" 1>&6
     else
 	echo "$ac_t""not supported" 1>&6
