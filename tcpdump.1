@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.72.2.1 2000-01-29 07:36:50 fenner Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.72.2.2 2000-01-29 16:42:03 itojun Exp $ (LBL)
 .\"
 .\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
 .\"	The Regents of the University of California.  All rights reserved.
@@ -1374,3 +1374,7 @@ should chase header chain, but at this moment it does not.
 or
 .BR udp
 should chase header chain too.
+.LP
+Arithmetic expression against transport layer headers, like \fBtcp[0]\fP,
+does not work against IPv6 packets.
+It only looks at IPv4 packets.
