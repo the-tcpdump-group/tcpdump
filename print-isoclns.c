@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.115 2004-01-02 09:32:13 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.116 2004-01-27 12:50:55 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -222,6 +222,7 @@ static struct tok esis_option_values[] = {
 #define ISIS_SUBTLV_EXT_IS_REACH_MAX_LINK_BW           9 /* draft-ietf-isis-traffic-05 */
 #define ISIS_SUBTLV_EXT_IS_REACH_RESERVABLE_BW        10 /* draft-ietf-isis-traffic-05 */
 #define ISIS_SUBTLV_EXT_IS_REACH_UNRESERVED_BW        11 /* draft-ietf-isis-traffic-05 */
+#define ISIS_SUBTLV_EXT_IS_REACH_DIFFSERV_TE          12 /* draft-ietf-tewg-diff-te-proto-06 */
 #define ISIS_SUBTLV_EXT_IS_REACH_TE_METRIC            18 /* draft-ietf-isis-traffic-05 */
 #define ISIS_SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE 20 /* draft-ietf-isis-gmpls-extensions */
 #define ISIS_SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR    21 /* draft-ietf-isis-gmpls-extensions */
@@ -235,6 +236,7 @@ static struct tok isis_ext_is_reach_subtlv_values[] = {
     { ISIS_SUBTLV_EXT_IS_REACH_MAX_LINK_BW,            "Maximum link bandwidth" },
     { ISIS_SUBTLV_EXT_IS_REACH_RESERVABLE_BW,          "Reservable link bandwidth" },
     { ISIS_SUBTLV_EXT_IS_REACH_UNRESERVED_BW,          "Unreserved bandwidth" },
+    { ISIS_SUBTLV_EXT_IS_REACH_DIFFSERV_TE,            "Diffserv TE" },
     { ISIS_SUBTLV_EXT_IS_REACH_TE_METRIC,              "Traffic Engineering Metric" },
     { ISIS_SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE,   "Link Protection Type" },
     { ISIS_SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR,      "Interface Switching Capability" },
@@ -1075,6 +1077,21 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
             for (priority_level = 0; priority_level < 8; priority_level++) {
                 bw.i = EXTRACT_32BITS(tptr);
                 printf("%s  priority level %d: %.3f Mbps",
+                       ident,
+                       priority_level,
+                       bw.f*8/1000000 );
+		tptr+=4;
+            }
+            break;
+        case ISIS_SUBTLV_EXT_IS_REACH_DIFFSERV_TE:
+            printf("%sBandwidth Constraints Model ID: (%u)",ident, *tptr);
+            tptr+=4;
+            /* for now lets just print the first 8 BCs -
+             * FIXME is this dep. on the BC model ?
+             */
+            for (priority_level = 0; priority_level < 8; priority_level++) {
+                bw.i = EXTRACT_32BITS(tptr);
+                printf("%s  Bandwidth constraint %d: %.3f Mbps",
                        ident,
                        priority_level,
                        bw.f*8/1000000 );
