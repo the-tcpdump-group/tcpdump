@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.47 2003-11-16 09:36:31 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.48 2003-11-19 09:44:10 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -413,12 +413,11 @@ ospf_print_lsa(register const struct lsa *lsap)
 
 	    switch (*(&lsap->ls_hdr.un_lsa_id.opaque_field.opaque_type)) {
 	    case LS_OPAQUE_TYPE_TE:
- 	        if (!TTEST2(*tptr, 4))
-		    goto trunc;
-
 		tptr = (u_int8_t *)(&lsap->lsa_un.un_te_lsa_tlv.type);
 
 		while (ls_length != 0) {
+                    if (!TTEST2(*tptr, 4))
+                        goto trunc;
 		    if (ls_length < 4) {
                         printf("\n\t    Remaining LS length %u < 4", ls_length);
                         return(ls_end);
