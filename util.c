@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.71 2001-09-17 21:05:43 fenner Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.72 2001-10-08 16:12:13 fenner Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -221,6 +221,25 @@ tok2str(register const struct tok *lp, register const char *fmt,
 	return (buf);
 }
 
+/*
+ * Convert a value to a string using an array; the macro
+ * tok2strary() in <interface.h> is the public interface to
+ * this function and ensures that the second argument is
+ * correct for bounds-checking.
+ */
+const char *
+tok2strary_internal(register const char **lp, int n, register const char *fmt,
+	register int v)
+{
+	static char buf[128];
+
+	if (v >= 0 && v < n && lp[v] != NULL)
+		return lp[v];
+	if (fmt == NULL)
+		fmt = "#%d";
+	(void)snprintf(buf, sizeof(buf), fmt, v);
+	return (buf);
+}
 
 /* VARARGS */
 void

@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.173 2001-10-03 07:35:42 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.174 2001-10-08 16:12:12 fenner Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -151,6 +151,9 @@ extern void relts_print(int);
 extern int fn_print(const u_char *, const u_char *);
 extern int fn_printn(const u_char *, u_int, const u_char *);
 extern const char *tok2str(const struct tok *, const char *, int);
+extern const char *tok2strary_internal(const char **, int, const char *, int);
+#define	tok2strary(a,f,i) tok2strary_internal(a, sizeof(a)/sizeof(a[0]),f,i)
+
 extern const char *dnaddr_string(u_short);
 
 extern void info(int);
