@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.13 2004-01-27 13:33:24 hannes Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.14 2004-09-09 16:17:38 hannes Exp $ (LBL) */
 /*
  * Copyright (c) 1991, 1993, 1994, 1995, 1996, 1997
  *	The Regents of the University of California.  All rights reserved.
@@ -63,7 +63,7 @@
 #define	LS_TYPE_ASE		5   /* ASE  */
 #define	LS_TYPE_GROUP		6   /* Group membership (multicast */
 				    /* extensions 23 July 1991) */
-#define	LS_TYPE_NSSA            7   /* rfc1587 - Not so Stubby Areas */
+#define	LS_TYPE_NSSA            7   /* rfc3101 - Not so Stubby Areas */
 #define	LS_TYPE_OPAQUE_LL       9   /* rfc2370 - Opaque Link Local */
 #define	LS_TYPE_OPAQUE_AL      10   /* rfc2370 - Opaque Link Local */
 #define	LS_TYPE_OPAQUE_DW      11   /* rfc2370 - Opaque Domain Wide */

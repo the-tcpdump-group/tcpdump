@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.51 2004-03-24 02:32:27 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.52 2004-09-09 16:17:38 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -361,6 +361,7 @@ ospf_print_lsa(register const struct lsa *lsap)
 		break;
 
 	case LS_TYPE_ASE:
+        case LS_TYPE_NSSA: /* fall through - those LSAs share the same format */
 		TCHECK(lsap->lsa_un.un_nla.nla_mask);
 		printf("\n\t    Mask %s",
 		    ipaddr_string(&lsap->lsa_un.un_asla.asla_mask));
