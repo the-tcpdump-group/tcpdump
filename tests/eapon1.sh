@@ -3,7 +3,8 @@
 uudecode eapon1.puu
 
 echo -n test eapon1...
-if (../tcpdump -r eapon1.pcap | diff - eapon1.out)
+../tcpdump -t -N -r eapon1.pcap > eapon1.new
+if diff eapon1.new eapon1.out
 then
 	echo passed.
 else
