@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/pmap_prot.h,v 1.1 2004-12-27 00:41:30 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/pmap_prot.h,v 1.2 2005-04-07 01:27:52 mcr Exp $ (LBL) */
 /*
  * Sun RPC is a product of Sun Microsystems, Inc. and is provided for
  * unrestricted use provided that this legend is included on all tape
@@ -69,7 +69,10 @@
  * The service supports remote procedure calls on udp/ip or tcp/ip socket 111.
  */
 
-#ifndef _RPC_PMAPPROT_H
+#if !defined(_RPC_PMAP_PROT_H_) && !defined(_RPC_PMAPPROT_H)
+
+/* two defines, for NetBSD and FreeBSD */
+#define _RPC_PMAP_PROT_H_
 #define _RPC_PMAPPROT_H
 
 #define PMAPPORT		((u_int16_t)111)
