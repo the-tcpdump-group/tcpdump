@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.50 2005-04-06 21:33:27 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.51 2005-04-07 00:28:17 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1400,12 +1400,15 @@ isakmp_rfc3948_print(netdissect_options *ndo,
 		return;
 	}
 
-	ND_TCHECK2(bp, 4);
+	if(length < 4) {
+		goto trunc;
+	}
 
 	/*
 	 * see if this is an IKE packet
 	 */
 	if(bp[0]==0 && bp[1]==0 && bp[2]==0 && bp[3]==0) {
+		ND_PRINT((ndo, "NONESP-encap: "));
 		isakmp_print(ndo, bp+4, length-4, bp2);
 		return;
 	}
@@ -1415,6 +1418,8 @@ isakmp_rfc3948_print(netdissect_options *ndo,
 		int nh, enh, padlen;
 		int advance;
 
+		ND_PRINT((ndo, "UDP-encap: "));
+
 		advance = esp_print(ndo, bp, length, bp2, &enh, &padlen);
 		if(advance <= 0)
 			return;
@@ -1423,7 +1428,7 @@ isakmp_rfc3948_print(netdissect_options *ndo,
 		length -= advance + padlen;
 		nh = enh & 0xff;
 	     
-		/* now need to jump into ip_print(). */
+		ip_print_inner(ndo, bp, length, nh, bp2);
 		return;
 	}
 
@@ -1431,6 +1436,14 @@ trunc:
 	printf("[|isakmp]");
 	return;
 }
+
+/*
+ * Local Variables:
+ * c-style: whitesmith
+ * c-basic-offset: 8
+ * End:
+ */
+
 
   
 

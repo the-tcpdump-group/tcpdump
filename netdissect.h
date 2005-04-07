@@ -21,7 +21,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.15 2005-04-06 21:33:27 mcr Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.16 2005-04-07 00:28:17 mcr Exp $ (LBL)
  */
 
 #ifndef netdissect_h
@@ -255,7 +255,11 @@ extern void isakmp_print(netdissect_options *,const u_char *,
 extern void isakmp_rfc3948_print(netdissect_options *,const u_char *,
 				 u_int, const u_char *);
 extern void ip_print(netdissect_options *,const u_char *, u_int);
+extern void ip_print_inner(netdissect_options *ndo,
+			   const u_char *bp, u_int length, u_int nh,
+			   const u_char *bp2);
 
+/* stuff that has not yet been rototiled */
 #if 0
 extern void ascii_print_with_offset(netdissect_options *, const char *,
 				    u_int, u_int);    

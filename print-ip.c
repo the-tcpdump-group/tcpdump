@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.148 2005-04-06 21:33:02 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.149 2005-04-07 00:28:17 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -359,7 +359,7 @@ static struct tok ip_frag_values[] = {
 struct ip_print_demux_state {
 	const struct ip *ip;
 	const u_char *cp;
-	u_int   hlen, len, off;
+	u_int   len, off;
 	u_char  nh;
 	int     advance;
 };
@@ -512,6 +512,24 @@ again:
 	}
 }
 	       
+void
+ip_print_inner(netdissect_options *ndo,
+	       const u_char *bp,
+	       u_int length, u_int nh,
+	       const u_char *bp2)
+{
+	struct ip_print_demux_state  ipd;
+
+	ipd.ip = (const struct ip *)bp2;
+	ipd.cp = bp;
+	ipd.len  = length;
+	ipd.off  = 0;
+	ipd.nh   = nh;
+	ipd.advance = 0;
+
+	ip_print_demux(ndo, &ipd);
+}
+
 
 /*
  * print an IP datagram.
@@ -524,6 +542,7 @@ ip_print(netdissect_options *ndo,
 	struct ip_print_demux_state  ipd;
 	struct ip_print_demux_state *ipds=&ipd;
 	const u_char *ipend;
+	u_int hlen;
 	u_int16_t sum, ip_sum;
 	struct protoent *proto;
 
@@ -544,9 +563,9 @@ ip_print(netdissect_options *ndo,
 		(void)printf("truncated-ip %u", length);
 		return;
 	}
-	ipds->hlen = IP_HL(ipds->ip) * 4;
-	if (ipds->hlen < sizeof (struct ip)) {
-		(void)printf("bad-hlen %u", ipds->hlen);
+	hlen = IP_HL(ipds->ip) * 4;
+	if (hlen < sizeof (struct ip)) {
+		(void)printf("bad-hlen %u", hlen);
 		return;
 	}
 
@@ -554,7 +573,7 @@ ip_print(netdissect_options *ndo,
 	if (length < ipds->len)
 		(void)printf("truncated-ip - %u bytes missing! ",
 			ipds->len - length);
-	if (ipds->len < ipds->hlen) {
+	if (ipds->len < hlen) {
 #ifdef GUESS_TSO
             if (ipds->len) {
                 (void)printf("bad-len %u", ipds->len);
@@ -577,7 +596,7 @@ ip_print(netdissect_options *ndo,
 	if (ipend < snapend)
 		snapend = ipend;
 
-	ipds->len -= ipds->hlen;
+	ipds->len -= hlen;
 
 	ipds->off = EXTRACT_16BITS(&ipds->ip->ip_off);
 
@@ -615,14 +634,14 @@ ip_print(netdissect_options *ndo,
 
             (void)printf(", length: %u", EXTRACT_16BITS(&ipds->ip->ip_len));
 
-            if ((ipds->hlen - sizeof(struct ip)) > 0) {
+            if ((hlen - sizeof(struct ip)) > 0) {
                 printf(", options ( ");
-                ip_optprint((u_char *)(ipds->ip + 1), ipds->hlen - sizeof(struct ip));
+                ip_optprint((u_char *)(ipds->ip + 1), hlen - sizeof(struct ip));
                 printf(" )");
             }
 
-	    if ((u_char *)ipds->ip + ipds->hlen <= snapend) {
-	        sum = in_cksum((const u_short *)ipds->ip, ipds->hlen, 0);
+	    if ((u_char *)ipds->ip + hlen <= snapend) {
+	        sum = in_cksum((const u_short *)ipds->ip, hlen, 0);
 		if (sum != 0) {
 		    ip_sum = EXTRACT_16BITS(&ipds->ip->ip_sum);
 		    (void)printf(", bad cksum %x (->%x)!", ip_sum,
@@ -638,7 +657,7 @@ ip_print(netdissect_options *ndo,
 	 * level protocol.
 	 */
 	if ((ipds->off & 0x1fff) == 0) {
-		ipds->cp = (const u_char *)ipds->ip + ipds->hlen;
+		ipds->cp = (const u_char *)ipds->ip + hlen;
 		ipds->nh = ipds->ip->ip_p;
 
 		if (ipds->nh != IPPROTO_TCP && ipds->nh != IPPROTO_UDP &&
@@ -694,5 +713,11 @@ ipN_print(register const u_char *bp, register u_int length)
 	}
 }
 
+/*
+ * Local Variables:
+ * c-style: whitesmith
+ * c-basic-offset: 8
+ * End:
+ */
 
 
