@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.32 2005-04-06 21:32:38 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.33 2005-04-07 23:07:33 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -113,22 +113,22 @@ chdlc_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 }
 
 struct cisco_slarp {
-	u_int32_t code;
+	u_int8_t code[4];
 #define SLARP_REQUEST	0
 #define SLARP_REPLY	1
 #define SLARP_KEEPALIVE	2
 	union {
 		struct {
-			struct in_addr addr;
-			struct in_addr mask;
-			u_int16_t unused[3];
+			u_int8_t addr[4];
+			u_int8_t mask[4];
+			u_int8_t unused[6];
 		} addr;
 		struct {
-			u_int32_t myseq;
-			u_int32_t yourseq;
-			u_int16_t rel;
-			u_int16_t t1;
-			u_int16_t t2;
+			u_int8_t myseq[4];
+			u_int8_t yourseq[4];
+			u_int8_t rel[2];
+			u_int8_t t1[2];
+			u_int8_t t2[2];
 		} keep;
 	} un;
 };
@@ -140,12 +140,12 @@ chdlc_slarp_print(const u_char *cp, u_int length)
 {
 	const struct cisco_slarp *slarp;
 
+        printf("SLARP (length: %u), ",length);
 	if (length < SLARP_LEN)
 		goto trunc;
 
 	slarp = (const struct cisco_slarp *)cp;
 	TCHECK(*slarp);
-        printf("SLARP (length: %u), ",length);
 	switch (EXTRACT_32BITS(&slarp->code)) {
 	case SLARP_REQUEST:
 		printf("request");
