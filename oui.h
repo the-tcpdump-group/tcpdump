@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/oui.h,v 1.4 2005-04-09 21:43:49 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/oui.h,v 1.5 2005-04-09 21:49:49 guy Exp $ (LBL) */
 /* 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that: (1) source code
@@ -19,10 +19,14 @@ extern struct tok smi_values[];
 
 #define OUI_ENCAP_ETHER 0x000000        /* encapsulated Ethernet */
 #define OUI_CISCO       0x00000c        /* Cisco protocols */
+#define OUI_NORTEL      0x000081        /* Nortel SONMP */
 #define OUI_CISCO_90    0x0000f8        /* Cisco bridging */
-#define OUI_RFC2684     0x0080c2        /* RFC 2684 bridged Ethernet */
+#define OUI_RFC2684     0x0080c2        /* RFC 2427/2684 bridged Ethernet */
+#define OUI_ATM_FORUM   0x00A03E        /* ATM Forum */
+#define OUI_CABLE_BPDU  0x00E02F        /* DOCSIS spanning tree BPDU */
 #define OUI_APPLETALK   0x080007        /* Appletalk */
 #define OUI_JUNIPER     0x009069        /* Juniper */
+#define OUI_HP          0x080009        /* Hewlett-Packard */
 
 /*
  * These are SMI Network Management Private Enterprise Codes for
