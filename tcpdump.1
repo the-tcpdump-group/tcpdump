@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.167 2004-12-28 22:31:25 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.167.2.1 2005-04-09 15:17:42 hannes Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -998,6 +998,15 @@ If \fI[vlan_id]\fR is specified, only true is the packet has the specified
 Note that the first \fBvlan\fR keyword encountered in \fIexpression\fR
 changes the decoding offsets for the remainder of \fIexpression\fR
 on the assumption that the packet is a VLAN packet.
+the \fI[vlan_id]\fR statement may be used more than once, to filter on vlan hierarchies.
+each use of the \fI[vlan_id]\fR \fIexpression\fR increments the filter offsets by 4.
+.fi
+example(s):
+.fi
+"vlan 100 && vlan 200" filters on vlan 200 encapsulated within vlan 100
+.fi
+"vlan && vlan 300 && ip" filters IP protocols encapsulated in vlan 300 encapsulated within any higher order vlan
+.fi
 .IP  "\fBtcp\fR, \fBudp\fR, \fBicmp\fR"
 Abbreviations for:
 .in +.5i
