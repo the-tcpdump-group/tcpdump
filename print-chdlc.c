@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.33 2005-04-07 23:07:33 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.34 2005-04-09 09:40:32 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -121,14 +121,12 @@ struct cisco_slarp {
 		struct {
 			u_int8_t addr[4];
 			u_int8_t mask[4];
-			u_int8_t unused[6];
 		} addr;
 		struct {
 			u_int8_t myseq[4];
 			u_int8_t yourseq[4];
 			u_int8_t rel[2];
-			u_int8_t t1[2];
-			u_int8_t t2[2];
+                        u_int8_t time[0];
 		} keep;
 	} un;
 };
@@ -139,6 +137,7 @@ static void
 chdlc_slarp_print(const u_char *cp, u_int length)
 {
 	const struct cisco_slarp *slarp;
+        u_int sec,min,hrs,days;
 
         printf("SLARP (length: %u), ",length);
 	if (length < SLARP_LEN)
@@ -158,13 +157,18 @@ chdlc_slarp_print(const u_char *cp, u_int length)
 			ipaddr_string(&slarp->un.addr.mask));
 		break;
 	case SLARP_KEEPALIVE:
-		printf("keepalive: mineseen=0x%08x, yourseen=0x%08x",
-			EXTRACT_32BITS(&slarp->un.keep.myseq),
-			EXTRACT_32BITS(&slarp->un.keep.yourseq));
-		printf(", reliability=0x%04x, t1=%d.%d",
-			EXTRACT_16BITS(&slarp->un.keep.rel),
-			EXTRACT_16BITS(&slarp->un.keep.t1),
-			EXTRACT_16BITS(&slarp->un.keep.t2));
+		printf("keepalive: mineseen=0x%08x, yourseen=0x%08x, reliability=0x%04x",
+                       EXTRACT_32BITS(&slarp->un.keep.myseq),
+                       EXTRACT_32BITS(&slarp->un.keep.yourseq),
+                       EXTRACT_16BITS(&slarp->un.keep.rel));
+
+                if (length >= SLARP_LEN) { /* uptime-stamp is optional */
+                        sec = EXTRACT_32BITS(&slarp->un.keep.time) / 1000;
+                        min = sec / 60; sec -= min * 60;
+                        hrs = min / 60; min -= hrs * 60;
+                        days = hrs / 24; hrs -= days * 24;
+                        printf(", link uptime=%ud%uh%um%us",days,hrs,min,sec);
+                }
 		break;
 	default:
 		printf("0x%02x unknown", EXTRACT_32BITS(&slarp->code));
