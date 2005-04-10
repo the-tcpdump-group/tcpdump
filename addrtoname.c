@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.108 2005-03-27 22:38:09 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.108.2.1 2005-04-10 07:18:26 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -59,6 +59,8 @@ extern int ether_ntohost(char *, const struct ether_addr *);
 #include "addrtoname.h"
 #include "llc.h"
 #include "setsignal.h"
+#include "extract.h"
+#include "oui.h"
 
 /*
  * hash tables for whatever-to-name translations
@@ -67,6 +69,7 @@ extern int ether_ntohost(char *, const struct ether_addr *);
  */
 
 #define HASHNAMESIZE 4096
+#define BUFSIZE 128
 
 struct hnamemem {
 	u_int32_t addr;
@@ -452,17 +455,17 @@ lookup_protoid(const u_char *pi)
 const char *
 etheraddr_string(register const u_char *ep)
 {
-	register u_int i;
+	register u_int i, oui;
 	register char *cp;
 	register struct enamemem *tp;
-	char buf[sizeof("00:00:00:00:00:00")];
+	char buf[BUFSIZE];
 
 	tp = lookup_emem(ep);
 	if (tp->e_name)
 		return (tp->e_name);
 #ifdef USE_ETHER_NTOHOST
 	if (!nflag) {
-		char buf2[128];
+		char buf2[BUFSIZE];
 
 		/*
 		 * We don't cast it to "const struct ether_addr *"
@@ -477,14 +480,20 @@ etheraddr_string(register const u_char *ep)
 	}
 #endif
 	cp = buf;
+        oui=EXTRACT_24BITS(ep);
 	*cp++ = hex[*ep >> 4 ];
 	*cp++ = hex[*ep++ & 0xf];
-	for (i = 5; (int)--i >= 0;) {
-		*cp++ = ':';
-		*cp++ = hex[*ep >> 4 ];
-		*cp++ = hex[*ep++ & 0xf];
-	}
-	*cp = '\0';
+        for (i = 5; (int)--i >= 0;) {
+            *cp++ = ':';
+            *cp++ = hex[*ep >> 4 ];
+            *cp++ = hex[*ep++ & 0xf];
+        }
+
+        if (!nflag) {
+            snprintf(cp,BUFSIZE," (oui %s)",
+                     tok2str(oui_values,"Unknown",oui));
+        } else
+            *cp = '\0';
 	tp->e_name = strdup(buf);
 	return (tp->e_name);
 }
