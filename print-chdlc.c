@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.32.2.2 2005-04-09 09:42:25 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.32.2.3 2005-04-10 06:42:54 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -163,6 +163,8 @@ chdlc_slarp_print(const u_char *cp, u_int length)
                        EXTRACT_16BITS(&slarp->un.keep.rel));
 
                 if (length >= SLARP_LEN) { /* uptime-stamp is optional */
+                        if (!TTEST2(slarp->un.keep.time, 4))
+                                goto trunc;
                         sec = EXTRACT_32BITS(&slarp->un.keep.time) / 1000;
                         min = sec / 60; sec -= min * 60;
                         hrs = min / 60; min -= hrs * 60;
