@@ -35,7 +35,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-sctp.c,v 1.16 2004-12-15 08:43:23 guy Exp $ (NETLAB/PEL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-sctp.c,v 1.16.2.1 2005-04-13 08:37:08 guy Exp $ (NETLAB/PEL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -259,7 +259,7 @@ void sctp_print(const u_char *bp,        /* beginning of sctp packet */
 	    const struct sctpSelectiveAck *sack;
 	    const struct sctpSelectiveFrag *frag;
 	    int fragNo, tsnNo;
-	    const u_long *dupTSN;
+	    const u_char *dupTSN;
 
 	    printf("[SACK] ");
 	    sack=(const struct sctpSelectiveAck*)(chunkDescPtr+1);
@@ -282,9 +282,9 @@ void sctp_print(const u_char *bp,        /* beginning of sctp packet */
 
 
 	    /* print duplicate TSNs */
-	    for (dupTSN = (const u_long*)frag, tsnNo=0;
+	    for (dupTSN = (const u_char *)frag, tsnNo=0;
 		 (const void *) dupTSN < nextChunk && tsnNo<EXTRACT_16BITS(&sack->numDupTsns);
-		 dupTSN++, tsnNo++)
+		 dupTSN += 4, tsnNo++)
 	      printf("\n\t\t[dup TSN #%u: %u] ", tsnNo+1,
 	          EXTRACT_32BITS(dupTSN));
 
