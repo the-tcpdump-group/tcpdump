@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.168 2005-04-09 15:17:01 hannes Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.169 2005-04-18 01:38:01 guy Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -747,7 +747,7 @@ number of \fInet\fP.
 True if either the IPv4/v6 source or destination address of the packet has a network
 number of \fInet\fP.
 .IP "\fBnet \fInet\fR \fBmask \fInetmask\fR"
-True if the IP address matches \fInet\fR with the specific \fInetmask\fR.
+True if the IPv4 address matches \fInet\fR with the specific \fInetmask\fR.
 May be qualified with \fBsrc\fR or \fBdst\fR.
 Note that this syntax is not valid for IPv6 \fInet\fR.
 .IP "\fBnet \fInet\fR/\fIlen\fR"
@@ -796,7 +796,7 @@ This is equivalent to:
 .fi
 .in -.5i
 .IP "\fBip proto \fIprotocol\fR"
-True if the packet is an IP packet (see
+True if the packet is an IPv4 packet (see
 .IR ip (4P))
 of protocol type \fIprotocol\fP.
 \fIProtocol\fP can be a number or one of the names
@@ -848,7 +848,7 @@ The \fBether\fP
 keyword is optional.
 This is shorthand for `\fBether[0] & 1 != 0\fP'.
 .IP "\fBip multicast\fR"
-True if the packet is an IP multicast packet.
+True if the packet is an IPv4 multicast packet.
 .IP "\fBip6 multicast\fR"
 True if the packet is an IPv6 multicast packet.
 .IP  "\fBether proto \fIprotocol\fR"
@@ -1005,7 +1005,7 @@ example(s):
 .fi
 "vlan 100 && vlan 200" filters on vlan 200 encapsulated within vlan 100
 .fi
-"vlan && vlan 300 && ip" filters IP protocols encapsulated in vlan 300 encapsulated within any higher order vlan
+"vlan && vlan 300 && ip" filters IPv4 protocols encapsulated in vlan 300 encapsulated within any higher order vlan
 .fi
 .IP  "\fBtcp\fR, \fBudp\fR, \fBicmp\fR"
 Abbreviations for:
@@ -1111,10 +1111,11 @@ length of the packet.
 
 For example, `\fBether[0] & 1 != 0\fP' catches all multicast traffic.
 The expression `\fBip[0] & 0xf != 5\fP'
-catches all IP packets with options.
+catches all IPv4 packets with options.
 The expression
 `\fBip[6:2] & 0x1fff = 0\fP'
-catches only unfragmented datagrams and frag zero of fragmented datagrams.
+catches only unfragmented IPv4 datagrams and frag zero of fragmented
+IPv4 datagrams.
 This check is implicitly applied to the \fBtcp\fP and \fBudp\fP
 index operations.
 For instance, \fBtcp[0]\fP always means the first
