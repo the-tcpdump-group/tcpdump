@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.167.2.2 2005-04-18 01:38:30 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.167.2.3 2005-04-19 04:40:30 guy Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -22,7 +22,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "22 March 2004"
+.TH TCPDUMP 1  "18 April 2005"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -596,10 +596,11 @@ different kinds of qualifier:
 qualifiers say what kind of thing the id name or number refers to.
 Possible types are
 .BR host ,
-.B net
+.B net ,
+.B port
 and
-.BR port .
-E.g., `host foo', `net 128.3', `port 20'.
+.BR portrange .
+E.g., `host foo', `net 128.3', `port 20', `portrange 6000-6008'.
 If there is no type
 qualifier,
 .B host
@@ -641,7 +642,8 @@ protos are:
 .B tcp
 and
 .BR udp .
-E.g., `ether src foo', `arp net 128.3', `tcp port 21'.
+E.g., `ether src foo', `arp net 128.3', `tcp port 21', `udp portrange
+7000-7009'.
 If there is
 no proto qualifier, all protocols consistent with the type are
 assumed.
@@ -693,6 +695,7 @@ which may be either an address or a name.
 True if the IPv4/v6 source field of the packet is \fIhost\fP.
 .IP "\fBhost \fIhost\fP
 True if either the IPv4/v6 source or destination of the packet is \fIhost\fP.
+.IP
 Any of the above host expressions can be prepended with the keywords,
 \fBip\fP, \fBarp\fP, \fBrarp\fP, or \fBip6\fP as in:
 .in +.5i
@@ -771,8 +774,25 @@ both tcp/domain and udp/domain traffic).
 True if the packet has a source port value of \fIport\fP.
 .IP "\fBport \fIport\fR"
 True if either the source or destination port of the packet is \fIport\fP.
-Any of the above port expressions can be prepended with the keywords,
-\fBtcp\fP or \fBudp\fP, as in:
+.IP "\fBdst portrange \fIport1\fB-\fIport2\fR"
+True if the packet is ip/tcp, ip/udp, ip6/tcp or ip6/udp and has a
+destination port value between \fIport1\fP and \fIport2\fP.
+.I port1
+and
+.I port2
+are interpreted in the same fashion as the
+.I port
+parameter for
+.BR port .
+.IP "\fBsrc portrange \fIport1\fB-\fIport2\fR"
+True if the packet has a source port value between \fIport1\fP and
+\fIport2\fP.
+.IP "\fBportrange \fIport1\fB-\fIport2\fR"
+True if either the source or destination port of the packet is between
+\fIport1\fP and \fIport2\fP.
+.IP
+Any of the above port or port range expressions can be prepended with
+the keywords, \fBtcp\fP or \fBudp\fP, as in:
 .in +.5i
 .nf
 \fBtcp src port \fIport\fR
