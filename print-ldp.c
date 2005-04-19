@@ -16,7 +16,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.8.2.1 2005-04-19 19:42:08 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.8.2.2 2005-04-19 20:19:50 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -384,9 +384,12 @@ ldp_tlv_print(register const u_char *tptr) {
                     break;
 
                 case LDP_FEC_MARTINI_IFPARM_VCCV:
-                    printf("\n\t\t  Control Channel Flags [%s]\n\t\t  CV Types [%s]",
-                           bittok2str(ldp_fec_martini_ifparm_vccv_cc_values,"none",*tptr+2),
-                           bittok2str(ldp_fec_martini_ifparm_vccv_cc_values,"none",*tptr+3));
+                    printf("\n\t\t  Control Channels (0x%02x) = [%s]",
+                           *(tptr+2),
+                           bittok2str(ldp_fec_martini_ifparm_vccv_cc_values,"none",*(tptr+2)));
+                    printf("\n\t\t  CV Types (0x%02x) = [%s]",
+                           *(tptr+3),
+                           bittok2str(ldp_fec_martini_ifparm_vccv_cv_values,"none",*(tptr+3)));
                     break;
 
                 default:
