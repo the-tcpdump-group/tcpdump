@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.12 2004-11-11 12:02:31 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.12.2.1 2005-04-19 12:18:28 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -515,10 +515,12 @@ lspping_print(register const u_char *pptr, register u_int len) {
 
     tlen=len;
 
-    printf("\n\tLSP-PINGv%u, msg-type: %s (%u), reply-mode: %s (%u)",
+    printf("\n\tLSP-PINGv%u, msg-type: %s (%u), seq %u, length: %u\n\t  reply-mode: %s (%u)",
            EXTRACT_16BITS(&lspping_com_header->version[0]),
            tok2str(lspping_msg_type_values, "unknown",lspping_com_header->msg_type),
            lspping_com_header->msg_type,
+           EXTRACT_32BITS(lspping_com_header->seq_number),
+           len,
            tok2str(lspping_reply_mode_values, "unknown",lspping_com_header->reply_mode),
            lspping_com_header->reply_mode);
 
@@ -532,13 +534,13 @@ lspping_print(register const u_char *pptr, register u_int len) {
         lspping_com_header->return_code == 10 ||
         lspping_com_header->return_code == 11 ||
         lspping_com_header->return_code == 12 )
-        printf("\n\t  Return Code: %s %u (%u), Return Subcode: (%u)",
+        printf("\n\t  Return Code: %s %u (%u)\n\t  Return Subcode: (%u)",
                tok2str(lspping_return_code_values, "unknown",lspping_com_header->return_code),
                lspping_com_header->return_subcode,    
                lspping_com_header->return_code,
                lspping_com_header->return_subcode);
     else
-        printf("\n\t  Return Code: %s (%u), Return Subcode: (%u)",
+        printf("\n\t  Return Code: %s (%u)\n\t  Return Subcode: (%u)",
                tok2str(lspping_return_code_values, "unknown",lspping_com_header->return_code),   
                lspping_com_header->return_code,
                lspping_com_header->return_subcode);
@@ -850,7 +852,7 @@ lspping_print(register const u_char *pptr, register u_int len) {
             print_unknown_data(tptr+sizeof(sizeof(struct lspping_tlv_header)),"\n\t    ",
                                lspping_tlv_len);
 
-        tptr+=lspping_tlv_len;
+        tptr+=lspping_tlv_len+sizeof(struct lspping_tlv_header);
         tlen-=lspping_tlv_len+sizeof(struct lspping_tlv_header);
     }
     return;
