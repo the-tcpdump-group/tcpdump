@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.13 2005-04-19 12:17:27 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.14 2005-04-19 12:44:05 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -515,11 +515,10 @@ lspping_print(register const u_char *pptr, register u_int len) {
 
     tlen=len;
 
-    printf("\n\tLSP-PINGv%u, msg-type: %s (%u), seq %u, length: %u\n\t  reply-mode: %s (%u)",
+    printf("\n\tLSP-PINGv%u, msg-type: %s (%u), length: %u\n\t  reply-mode: %s (%u)",
            EXTRACT_16BITS(&lspping_com_header->version[0]),
            tok2str(lspping_msg_type_values, "unknown",lspping_com_header->msg_type),
            lspping_com_header->msg_type,
-           EXTRACT_32BITS(lspping_com_header->seq_number),
            len,
            tok2str(lspping_reply_mode_values, "unknown",lspping_com_header->reply_mode),
            lspping_com_header->reply_mode);
