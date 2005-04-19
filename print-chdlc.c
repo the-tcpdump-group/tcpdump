@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.35 2005-04-10 06:39:59 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.36 2005-04-19 08:06:09 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -112,6 +112,9 @@ chdlc_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 	return (CHDLC_HDRLEN);
 }
 
+/*
+ * The fixed-length portion of a SLARP packet.
+ */
 struct cisco_slarp {
 	u_int8_t code[4];
 #define SLARP_REQUEST	0
@@ -126,12 +129,11 @@ struct cisco_slarp {
 			u_int8_t myseq[4];
 			u_int8_t yourseq[4];
 			u_int8_t rel[2];
-                        u_int8_t time[0];
 		} keep;
 	} un;
 };
 
-#define SLARP_LEN	18
+#define SLARP_LEN	14
 
 static void
 chdlc_slarp_print(const u_char *cp, u_int length)
@@ -144,12 +146,19 @@ chdlc_slarp_print(const u_char *cp, u_int length)
 		goto trunc;
 
 	slarp = (const struct cisco_slarp *)cp;
-	TCHECK(*slarp);
+	TCHECK2(*slarp, SLARP_LEN);
 	switch (EXTRACT_32BITS(&slarp->code)) {
 	case SLARP_REQUEST:
 		printf("request");
-                /* ok we do not know it - but lets at least dump it */
-                print_unknown_data(cp+4,"\n\t",length-4);
+		/*
+		 * At least according to William "Chops" Westfield's
+		 * message in
+		 *
+		 *	http://www.nethelp.no/net/cisco-hdlc.txt
+		 *
+		 * the address and mask aren't used in requests -
+		 * they're just zero.
+		 */
 		break;
 	case SLARP_REPLY:
 		printf("reply %s/%s",
@@ -163,9 +172,10 @@ chdlc_slarp_print(const u_char *cp, u_int length)
                        EXTRACT_16BITS(&slarp->un.keep.rel));
 
                 if (length >= SLARP_LEN) { /* uptime-stamp is optional */
-                        if (!TTEST2(slarp->un.keep.time, 4))
+                        cp += SLARP_LEN;
+                        if (!TTEST2(*cp, 4))
                                 goto trunc;
-                        sec = EXTRACT_32BITS(&slarp->un.keep.time) / 1000;
+                        sec = EXTRACT_32BITS(cp) / 1000;
                         min = sec / 60; sec -= min * 60;
                         hrs = min / 60; min -= hrs * 60;
                         days = hrs / 24; hrs -= days * 24;
