@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-l2tp.c,v 1.17.2.1 2005-04-20 21:36:27 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-l2tp.c,v 1.17.2.2 2005-04-20 21:50:16 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -688,7 +688,22 @@ l2tp_print(const u_char *dat, u_int length)
 		cnt += (2 + pad);
 	}
 
+	if (flag_l) {
+		if (length < l2tp_len) {
+			printf(" Length %u larger than packet", l2tp_len);
+			return;
+		}
+		length = l2tp_len;
+	}
+	if (length < cnt) {
+		printf(" Length %u smaller than header length", length);
+		return;
+	}
 	if (flag_t) {
+		if (!flag_l) {
+			printf(" No length");
+			return;
+		}
 		if (length - cnt == 0) {
 			printf(" ZLB");
 		} else {
