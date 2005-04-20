@@ -247,6 +247,9 @@
 /* Define to 1 if you have the `strsep' function. */
 #undef HAVE_STRSEP
 
+/* Define to 1 if the system has the type `struct ether_addr'. */
+#undef HAVE_STRUCT_ETHER_ADDR
+
 /* Define to 1 if you have the <sys/bitypes.h> header file. */
 #undef HAVE_SYS_BITYPES_H
 
