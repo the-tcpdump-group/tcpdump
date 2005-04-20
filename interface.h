@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.245 2005-04-19 20:33:15 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.246 2005-04-20 09:44:31 guy Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -35,6 +35,10 @@
 /* snprintf et al */
 
 #include <stdarg.h>
+
+#if HAVE_STDINT_H
+#include <stdint.h>
+#endif
 
 #if !defined(HAVE_SNPRINTF)
 int snprintf(char *, size_t, const char *, ...)

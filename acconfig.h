@@ -20,9 +20,6 @@
 /* define if your struct __res_state has the nsort member */
 #undef HAVE_NEW_RES_STATE
 
-/* define if <inttypes.h> defines PRI[doxu]64 macros */
-#undef INTTYPES_H_DEFINES_FORMATS
-
 /*
  * define if struct ether_header.ether_dhost is a struct with ether_addr_octet
  */
@@ -105,17 +102,6 @@
 
 /* AIX hack. */
 #undef _SUN
-
-/* Workaround for missing sized types */
-/* XXX this should move to the more standard uint*_t */
-#undef int8_t
-#undef int16_t
-#undef int32_t
-#undef int64_t
-#undef u_int8_t
-#undef u_int16_t
-#undef u_int32_t
-#undef u_int64_t
 
 /* Workaround for missing 64-bit formats */
 #undef PRId64

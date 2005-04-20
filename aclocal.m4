@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.106 2005-03-27 03:31:01 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.107 2005-04-20 09:44:30 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -156,57 +156,6 @@ AC_DEFUN(AC_LBL_C_INIT,
 	    esac
     fi
 ])
-
-#
-# Try compiling a sample of the type of code that appears in
-# gencode.c with "inline", "__inline__", and "__inline".
-#
-# Autoconf's AC_C_INLINE, at least in autoconf 2.13, isn't good enough,
-# as it just tests whether a function returning "int" can be inlined;
-# at least some versions of HP's C compiler can inline that, but can't
-# inline a function that returns a struct pointer.
-#
-# Make sure we use the V_CCOPT flags, because some of those might
-# disable inlining.
-#
-AC_DEFUN(AC_LBL_C_INLINE,
-    [AC_MSG_CHECKING(for inline)
-    save_CFLAGS="$CFLAGS"
-    CFLAGS="$V_CCOPT"
-    AC_CACHE_VAL(ac_cv_lbl_inline, [
-	ac_cv_lbl_inline=""
-	ac_lbl_cc_inline=no
-	for ac_lbl_inline in inline __inline__ __inline
-	do
-	    AC_TRY_COMPILE(
-		[#define inline $ac_lbl_inline
-		static inline struct iltest *foo(void);
-		struct iltest {
-		    int iltest1;
-		    int iltest2;
-		};
-
-		static inline struct iltest *
-		foo()
-		{
-		    static struct iltest xxx;
-
-		    return &xxx;
-		}],,ac_lbl_cc_inline=yes,)
-	    if test "$ac_lbl_cc_inline" = yes ; then
-		break;
-	    fi
-	done
-	if test "$ac_lbl_cc_inline" = yes ; then
-	    ac_cv_lbl_inline=$ac_lbl_inline
-	fi])
-    CFLAGS="$save_CFLAGS"
-    if test ! -z "$ac_cv_lbl_inline" ; then
-	AC_MSG_RESULT($ac_cv_lbl_inline)
-    else
-	AC_MSG_RESULT(no)
-    fi
-    AC_DEFINE_UNQUOTED(inline, $ac_cv_lbl_inline, [Define as token for inline if inlining supported])])
 
 dnl
 dnl Use pfopen.c if available and pfopen() not in standard libraries
@@ -561,36 +510,6 @@ AC_DEFUN(AC_LBL_HAVE_RUN_PATH,
 	rm -f conftest*])
     AC_MSG_RESULT($ac_cv_lbl_have_run_path)
     ])
-
-dnl
-dnl Due to the stupid way it's implemented, AC_CHECK_TYPE is nearly useless.
-dnl
-dnl usage:
-dnl
-dnl	AC_LBL_CHECK_TYPE
-dnl
-dnl results:
-dnl
-dnl	int32_t (defined)
-dnl	u_int32_t (defined)
-dnl
-AC_DEFUN(AC_LBL_CHECK_TYPE,
-    [AC_MSG_CHECKING(for $1 using $CC)
-    AC_CACHE_VAL(ac_cv_lbl_have_$1,
-	AC_TRY_COMPILE([
-#	include "confdefs.h"
-#	include <sys/types.h>
-#	if STDC_HEADERS
-#	include <stdlib.h>
-#	include <stddef.h>
-#	endif],
-	[$1 i],
-	ac_cv_lbl_have_$1=yes,
-	ac_cv_lbl_have_$1=no))
-    AC_MSG_RESULT($ac_cv_lbl_have_$1)
-    if test $ac_cv_lbl_have_$1 = no ; then
-	    AC_DEFINE($1, $2)
-    fi])
 
 dnl
 dnl Check whether a given format can be used to print 64-bit integers
