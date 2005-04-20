@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.106 2005-01-05 08:16:45 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.106.2.1 2005-04-20 21:52:31 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -961,7 +961,7 @@ parserep(register const struct sunrpc_msg *rp, register u_int length)
 	/*
 	 * now we can check the ar_stat field
 	 */
-	astat = EXTRACT_32BITS(dp);
+	astat = (enum sunrpc_accept_stat) EXTRACT_32BITS(dp);
 	switch (astat) {
 
 	case SUNRPC_SUCCESS:
