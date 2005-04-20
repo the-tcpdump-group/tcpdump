@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.108.2.1 2005-04-10 07:18:26 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.108.2.2 2005-04-20 02:59:49 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -170,7 +170,7 @@ intoa(u_int32_t addr)
 	static char buf[sizeof(".xxx.xxx.xxx.xxx")];
 
 	NTOHL(addr);
-	cp = &buf[sizeof buf];
+	cp = buf + sizeof(buf);
 	*--cp = '\0';
 
 	n = 4;
