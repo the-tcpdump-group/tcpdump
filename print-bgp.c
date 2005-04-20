@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.91 2005-03-27 01:31:25 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.92 2005-04-20 10:29:39 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -1303,9 +1303,8 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                         tptr = pptr + len;
                         break;
                     }
-                    break;
-                    
                     tptr += advance;
+                    break;
 		}
         done:
 		break;
@@ -1437,8 +1436,8 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                         tptr = pptr + len;
                         break;
                     }
-                    break;
                     tptr += advance;
+                    break;
 		}
 		break;
         case BGPTYPE_EXTD_COMMUNITIES:
