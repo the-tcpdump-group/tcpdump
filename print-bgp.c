@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.92 2005-04-20 10:29:39 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.93 2005-04-20 20:22:11 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -1587,7 +1587,6 @@ bgp_open_print(const u_char *dat, int length)
 {
 	struct bgp_open bgpo;
 	struct bgp_opt bgpopt;
-	int hlen;
 	const u_char *opt;
 	int i,cap_type,cap_len,tcap_len,cap_offset;
 	char tokbuf[TOKBUFSIZE];
@@ -1595,7 +1594,6 @@ bgp_open_print(const u_char *dat, int length)
 
 	TCHECK2(dat[0], BGP_OPEN_SIZE);
 	memcpy(&bgpo, dat, BGP_OPEN_SIZE);
-	hlen = ntohs(bgpo.bgpo_len);
 
 	printf("\n\t  Version %d, ", bgpo.bgpo_version);
 	printf("my AS %u, ", ntohs(bgpo.bgpo_myas));
@@ -1703,7 +1701,6 @@ bgp_update_print(const u_char *dat, int length)
 {
 	struct bgp bgp;
 	struct bgp_attr bgpa;
-	int hlen;
 	const u_char *p;
 	int len;
 	int i;
@@ -1711,7 +1708,6 @@ bgp_update_print(const u_char *dat, int length)
 
 	TCHECK2(dat[0], BGP_SIZE);
 	memcpy(&bgp, dat, BGP_SIZE);
-	hlen = ntohs(bgp.bgp_len);
 	p = dat + BGP_SIZE;	/*XXX*/
 
 	/* Unfeasible routes */
@@ -1816,14 +1812,12 @@ static void
 bgp_notification_print(const u_char *dat, int length)
 {
 	struct bgp_notification bgpn;
-	int hlen;
 	const u_char *tptr;
 	char tokbuf[TOKBUFSIZE];
 	char tokbuf2[TOKBUFSIZE];
 
 	TCHECK2(dat[0], BGP_NOTIFICATION_SIZE);
 	memcpy(&bgpn, dat, BGP_NOTIFICATION_SIZE);
-	hlen = ntohs(bgpn.bgpn_len);
 
         /* some little sanity checking */
         if (length<BGP_NOTIFICATION_SIZE)
