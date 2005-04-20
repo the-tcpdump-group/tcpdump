@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.46 2005-04-20 22:05:08 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pim.c,v 1.47 2005-04-20 22:08:27 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -511,7 +511,6 @@ static int
 pimv2_addr_print(const u_char *bp, enum pimv2_addrtype at, int silent)
 {
 	int af;
-	const char *afstr;
 	int len, hdrlen;
 
 	TCHECK(bp[0]);
@@ -521,13 +520,11 @@ pimv2_addr_print(const u_char *bp, enum pimv2_addrtype at, int silent)
 		switch (bp[0]) {
 		case 1:
 			af = AF_INET;
-			afstr = "IPv4";
 			len = 4;
 			break;
 #ifdef INET6
 		case 2:
 			af = AF_INET6;
-			afstr = "IPv6";
 			len = 16;
 			break;
 #endif
@@ -541,12 +538,10 @@ pimv2_addr_print(const u_char *bp, enum pimv2_addrtype at, int silent)
 		switch (pimv2_addr_len) {
 		case 4:
 			af = AF_INET;
-			afstr = "IPv4";
 			break;
 #ifdef INET6
 		case 16:
 			af = AF_INET6;
-			afstr = "IPv6";
 			break;
 #endif
 		default:
