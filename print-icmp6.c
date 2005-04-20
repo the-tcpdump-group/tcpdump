@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.79.2.1 2005-04-20 22:23:55 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.79.2.2 2005-04-20 22:31:09 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -539,7 +539,7 @@ get_upperlayer(u_char *bp, u_int *prot)
 	nh = ip6->ip6_nxt;
 	hlen = sizeof(struct ip6_hdr);
 
-	while (bp < snapend) {
+	while (bp < ep) {
 		bp += hlen;
 
 		switch(nh) {
@@ -1150,8 +1150,6 @@ static void
 icmp6_rrenum_print(const u_char *bp, const u_char *ep)
 {
 	struct icmp6_router_renum *rr6;
-	struct icmp6_hdr *dp;
-	size_t siz;
 	const char *cp;
 	struct rr_pco_match *match;
 	struct rr_pco_use *use;
@@ -1160,9 +1158,7 @@ icmp6_rrenum_print(const u_char *bp, const u_char *ep)
 
 	if (ep < bp)
 		return;
-	dp = (struct icmp6_hdr *)bp;
 	rr6 = (struct icmp6_router_renum *)bp;
-	siz = ep - bp;
 	cp = (const char *)(rr6 + 1);
 
 	TCHECK(rr6->rr_reserved);
