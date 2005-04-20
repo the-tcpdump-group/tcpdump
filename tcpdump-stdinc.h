@@ -29,7 +29,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @(#) $Header: /tcpdump/master/tcpdump/tcpdump-stdinc.h,v 1.12 2005-03-27 01:35:45 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/tcpdump-stdinc.h,v 1.12.2.1 2005-04-20 09:46:45 guy Exp $ (LBL)
  */
 
 /*
@@ -89,8 +89,15 @@ typedef char* caddr_t;
 #include <ctype.h>
 #include <unistd.h>
 #include <netdb.h>
-#ifdef INTTYPES_H_DEFINES_FORMATS
+#if HAVE_INTTYPES_H
 #include <inttypes.h>
+#else
+#if HAVE_STDINT_H
+#include <stdint.h>
+#endif
+#endif
+#ifdef HAVE_SYS_BITYPES_H
+#include <sys/bitypes.h>
 #endif
 #include <sys/param.h>
 #include <sys/types.h>			/* concession to AIX */
