@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.79 2005-01-14 10:41:50 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.79.2.1 2005-04-20 22:23:55 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -237,18 +237,15 @@ icmp6_print(const u_char *bp, u_int length, const u_char *bp2, int fragmented)
 {
 	const struct icmp6_hdr *dp;
 	const struct ip6_hdr *ip;
-	const char *str;
 	const struct ip6_hdr *oip;
 	const struct udphdr *ouh;
 	int dport;
 	const u_char *ep;
-	char buf[256];
 	u_int prot;
 
 	dp = (struct icmp6_hdr *)bp;
 	ip = (struct ip6_hdr *)bp2;
 	oip = (struct ip6_hdr *)(dp + 1);
-	str = buf;
 	/* 'ep' points to the end of available data. */
 	ep = snapend;
 
