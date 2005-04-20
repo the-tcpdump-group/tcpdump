@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.107 2005-04-20 09:44:30 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.108 2005-04-20 09:49:52 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -523,6 +523,9 @@ AC_DEFUN(AC_LBL_CHECK_64BIT_FORMAT,
 	  [[
 #	    ifdef HAVE_INTTYPES_H
 	    #include <inttypes.h>
+#	    endif
+#	    ifdef HAVE_SYS_BITYPES_H
+            #include <sys/bitypes.h>
 #	    endif
 	    #include <stdio.h>
 	    #include <sys/types.h>
