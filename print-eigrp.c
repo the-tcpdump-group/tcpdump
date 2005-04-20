@@ -16,7 +16,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-eigrp.c,v 1.5 2004-05-12 22:22:40 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-eigrp.c,v 1.6 2005-04-20 10:16:56 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -340,7 +340,7 @@ eigrp_print(register const u_char *pptr, register u_int len) {
             if (EXTRACT_32BITS(&tlv_ptr.eigrp_tlv_ip_int->nexthop) == 0)
                 printf("self");
             else
-                printf("%s",ipaddr_string(EXTRACT_32BITS(&tlv_ptr.eigrp_tlv_ip_int->nexthop)));
+                printf("%s",ipaddr_string(&tlv_ptr.eigrp_tlv_ip_int->nexthop));
 
             printf("\n\t      delay %u ms, bandwidth %u Kbps, mtu %u, hop %u, reliability %u, load %u",
                    (EXTRACT_32BITS(&tlv_ptr.eigrp_tlv_ip_int->delay)/100),
@@ -369,7 +369,7 @@ eigrp_print(register const u_char *pptr, register u_int len) {
             if (EXTRACT_32BITS(&tlv_ptr.eigrp_tlv_ip_ext->nexthop) == 0)
                 printf("self");
             else
-                printf("%s",ipaddr_string(EXTRACT_32BITS(&tlv_ptr.eigrp_tlv_ip_ext->nexthop)));
+                printf("%s",ipaddr_string(&tlv_ptr.eigrp_tlv_ip_ext->nexthop));
 
             printf("\n\t      origin-router %s, origin-as %u, origin-proto %s, flags [0x%02x], tag 0x%08x, metric %u",
                    ipaddr_string(tlv_ptr.eigrp_tlv_ip_ext->origin_router),
