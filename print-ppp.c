@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.108 2005-04-06 21:32:42 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.108.2.1 2005-04-20 22:15:34 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -871,6 +871,16 @@ handle_pap(const u_char *p, int length)
 	TCHECK2(*p, 2);
 	len = EXTRACT_16BITS(p);
 	p += 2;
+
+	if ((int)len > length) {
+		printf(", length %u > packet size", len);
+		return;
+	}
+	length = len;
+	if (length < (p - p0)) {
+		printf(", length %u < PAP header length", length);
+		return;
+	}
 
 	switch (code) {
 	case PAP_AREQ:
