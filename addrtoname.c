@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.111 2005-04-20 10:50:41 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.112 2005-04-20 11:17:18 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -44,6 +44,11 @@ struct rtentry;		/* declarations in <net/if.h> */
 #endif /* NETINET_ETHER_H_DECLARES_ETHER_NTOHOST */
 
 #if !defined(HAVE_DECL_ETHER_NTOHOST) || !HAVE_DECL_ETHER_NTOHOST
+#ifndef HAVE_STRUCT_ETHER_ADDR
+struct ether_addr {
+	unsigned char ether_addr_octet[6];
+};
+#endif
 extern int ether_ntohost(char *, const struct ether_addr *);
 #endif
 

@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.190 2005-04-20 09:49:53 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.191 2005-04-20 11:17:19 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.190 $)
+AC_REVISION($Revision: 1.191 $)
 AC_PREREQ(2.50)
 AC_INIT(tcpdump.c)
 
@@ -660,6 +660,26 @@ struct rtentry;
 #include <netinet/ether.h>
 			    ])
 		fi
+	fi
+	#
+	# Is ether_ntohost() declared?
+	#
+	if test "$ac_cv_have_decl_ether_ntohost" != yes; then
+		#
+		# No, we'll have to declare it ourselves.
+		# Do we have "struct ether_addr"?
+		#
+		AC_CHECK_TYPES(struct ether_addr,,,
+		    [
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+struct mbuf;
+struct rtentry;
+#include <net/if.h>
+#include <netinet/if_ether.h>
+		    ])
 	fi
 fi
 
