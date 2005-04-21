@@ -316,8 +316,7 @@
 /* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
 #undef TIME_WITH_SYS_TIME
 
-/* Define as `__inline' if that's what the C compiler calls it, or to nothing
-   if it is not supported. */
+/* Define as token for inline if inlining supported */
 #undef inline
 
 /* Define to `short' if int16_t not defined. */
