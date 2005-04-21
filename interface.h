@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.246 2005-04-20 09:44:31 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.247 2005-04-21 03:57:43 guy Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -251,6 +251,7 @@ extern u_int sl_bsdos_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int chdlc_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int juniper_atm1_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int juniper_atm2_print(const struct pcap_pkthdr *, const u_char *);
+extern u_int juniper_mfr_print(const struct pcap_pkthdr *, register const u_char *);
 extern u_int juniper_mlfr_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int juniper_mlppp_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int sll_if_print(const struct pcap_pkthdr *, const u_char *);
