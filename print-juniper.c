@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.9 2005-04-20 12:41:45 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.10 2005-04-21 04:03:43 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -62,7 +62,7 @@ enum {
 struct juniper_cookie_table_t {
     u_int32_t pictype;		/* pic type */
     u_int8_t  cookie_len;       /* cookie len */
-    const u_int8_t *s;		/* pic name */
+    const char *s;		/* pic name */
 };
 
 static struct juniper_cookie_table_t juniper_cookie_table[] = {
