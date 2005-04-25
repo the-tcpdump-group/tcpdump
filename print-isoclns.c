@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.135 2005-04-25 09:09:11 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.136 2005-04-25 10:41:06 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1938,7 +1938,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    break;
 
         case ISIS_TLV_ISNEIGH_VARLEN:
-            if (!TTEST2(*tptr, 1) && tmp > 1)
+            if (!TTEST2(*tptr, 1) || tmp < 3) /* min. TLV length */
 		goto trunctlv;
 	    lan_alen = *tptr++; /* LAN address length */
 	    if (lan_alen == 0) {
