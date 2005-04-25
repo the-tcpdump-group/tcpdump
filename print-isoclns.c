@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.133 2005-04-06 21:32:40 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.134 2005-04-25 08:42:30 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1937,7 +1937,11 @@ static int isis_print (const u_int8_t *p, u_int length)
         case ISIS_TLV_ISNEIGH_VARLEN:
             if (!TTEST2(*tptr, 1))
 		goto trunctlv;
-	    lan_alen = *tptr++; /* LAN adress length */
+	    lan_alen = *tptr++; /* LAN address length */
+	    if (lan_alen == 0) {
+                printf("\n\t      LAN address length 0 bytes (invalid)");
+                break;
+            }
             tmp --;
             printf("\n\t      LAN address length %u bytes ",lan_alen);
 	    while (tmp >= lan_alen) {
@@ -2348,6 +2352,10 @@ static int isis_print (const u_int8_t *p, u_int length)
                 if (!TTEST2(*tptr, 1))
                     goto trunctlv;
                 prefix_len=*tptr++; /* read out prefix length in semioctets*/
+                if (prefix_len < 2) {
+                    printf("\n\t\tAddress: prefix length %u < 2", prefix_len);
+                    break;
+                }
                 tmp--;
                 if (!TTEST2(*tptr, prefix_len/2))
                     goto trunctlv;
