@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.81 2005-04-20 22:30:53 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.82 2005-04-25 17:29:51 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -69,10 +69,10 @@ static struct tok icmp6_type_values[] = {
     { ICMP6_PARAM_PROB, "parameter problem"},
     { ICMP6_ECHO_REQUEST, "echo request"},
     { ICMP6_ECHO_REPLY, "echo reply"},
-    { MLD6_LISTENER_QUERY, "multicast listener query "},
-    { MLD6_LISTENER_REPORT, "multicast listener report "},
-    { MLD6_LISTENER_DONE, "multicast listener done "},
-    { ND_ROUTER_SOLICIT, "router solicitation "},
+    { MLD6_LISTENER_QUERY, "multicast listener query"},
+    { MLD6_LISTENER_REPORT, "multicast listener report"},
+    { MLD6_LISTENER_DONE, "multicast listener done"},
+    { ND_ROUTER_SOLICIT, "router solicitation"},
     { ND_ROUTER_ADVERT, "router advertisement"},
     { ND_NEIGHBOR_SOLICIT, "neighbor solicitation"},
     { ND_NEIGHBOR_ADVERT, "neighbor advertisment"},
@@ -80,7 +80,7 @@ static struct tok icmp6_type_values[] = {
     { ICMP6_ROUTER_RENUMBERING, "router renumbering"},
     { IND_SOLICIT, "inverse neighbor solicitation"},
     { IND_ADVERT, "inverse neighbor advertisement"},
-    { MLDV2_LISTENER_REPORT, "multicast listener report v2 "},
+    { MLDV2_LISTENER_REPORT, "multicast listener report v2"},
     { ICMP6_HADISCOV_REQUEST, "ha discovery request"},
     { ICMP6_HADISCOV_REPLY, "ha discovery reply"},
     { ICMP6_MOBILEPREFIX_SOLICIT, "mobile router solicitation"},
