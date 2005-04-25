@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.61 2005-04-06 21:32:41 mcr Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.61.2.1 2005-04-25 17:57:15 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -71,6 +71,32 @@ static struct tok cmd2str[] = {
 	{ LLC_SABME,	"sabme" },
 	{ LLC_FRMR,	"frmr" },
 	{ 0,		NULL }
+};
+
+struct oui_tok {
+	u_int32_t	oui;
+	const struct tok *tok;
+};
+
+static const struct tok bridged_values[] = { 
+    { PID_RFC2684_ETH_FCS,      "Ethernet + FCS" },
+    { PID_RFC2684_ETH_NOFCS,    "Ethernet w/o FCS" },
+    { PID_RFC2684_802_4_FCS,    "802.4 + FCS" },
+    { PID_RFC2684_802_4_NOFCS,  "802.4 w/o FCS" },
+    { PID_RFC2684_802_5_FCS,    "Token Ring + FCS" },
+    { PID_RFC2684_802_5_NOFCS,  "Token Ring w/o FCS" },
+    { PID_RFC2684_FDDI_FCS,     "FDDI + FCS" },
+    { PID_RFC2684_FDDI_NOFCS,   "FDDI w/o FCS" },
+    { PID_RFC2684_802_6_FCS,    "802.6 + FCS" },
+    { PID_RFC2684_802_6_NOFCS,  "802.6 w/o FCS" },
+    { PID_RFC2684_BPDU,         "BPDU" },
+    { 0,                        NULL },
+};
+
+static const struct oui_tok oui_to_tok[] = {
+	{ 0x000000, ethertype_values },
+	{ 0x0080C2, bridged_values },	/* bridged, RFC 2427 FR or RFC 2864 ATM */
+	{ 0, NULL }
 };
 
 /*
@@ -221,12 +247,23 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 		orgcode = EXTRACT_24BITS(&llc.llc_orgcode[0]);
 		et = EXTRACT_16BITS(&llc.llc_ethertype[0]);
 
-                if (eflag)
-                    (void)printf("oui %s (0x%06x), ethertype %s (0x%04x): ",
-                                 tok2str(oui_values,"Unknown",orgcode),
-                                 orgcode,
-                                 tok2str(ethertype_values,"Unknown", et),
-                                 et);
+		if (eflag) {
+			const struct tok *tok = NULL;
+			const struct oui_tok *otp;
+
+			for (otp = &oui_to_tok[0]; otp->tok != NULL; otp++) {
+				if (otp->oui == orgcode) {
+					tok = otp->tok;
+					break;
+				}
+			}
+			(void)printf("oui %s (0x%06x), %s %s (0x%04x): ",
+			     tok2str(oui_values, "Unknown", orgcode),
+			     orgcode,
+			     (orgcode == 0x000000 ? "ethertype" : "pid"),
+			     tok2str(tok, "Unknown", et),
+			     et);
+		}
 
 		/*
 		 * XXX - what *is* the right bridge pad value here?
