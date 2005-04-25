@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.108.2.4 2005-04-20 11:20:51 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.108.2.5 2005-04-25 08:43:05 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -613,7 +613,7 @@ isonsap_string(const u_char *nsap, register u_int nsap_length)
 	register struct enamemem *tp;
 
 	if (nsap_length < 1 || nsap_length > ISONSAP_MAX_LENGTH)
-		error("isonsap_string: illegal length");
+		return ("isonsap_string: illegal length");
 
 	tp = lookup_nsap(nsap);
 	if (tp->e_name)
