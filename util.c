@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.95 2005-03-21 11:35:55 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.95.2.1 2005-04-25 16:15:07 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -219,10 +219,12 @@ const char *
 tok2strbuf(register const struct tok *lp, register const char *fmt,
 	   register int v, char *buf, size_t bufsize)
 {
-	while (lp->s != NULL && lp != NULL) {
-		if (lp->v == v)
-			return (lp->s);
-		++lp;
+	if (lp != NULL) {
+		while (lp->s != NULL) {
+			if (lp->v == v)
+				return (lp->s);
+			++lp;
+		}
 	}
 	if (fmt == NULL)
 		fmt = "#%d";
