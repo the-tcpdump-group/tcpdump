@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.32 2005-04-06 21:32:39 mcr Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.32.2.1 2005-04-25 16:29:18 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -482,6 +482,32 @@ struct common_ie_header {
     u_int8_t ie_len;
 };
 
+static int fr_q933_print_ie_codeset5(const struct common_ie_header *ie_p,
+    const u_char *p);
+
+typedef int (*codeset_pr_func_t)(const struct common_ie_header *ie_p,
+    const u_char *p);
+
+/* array of 16 codepages - currently we only support codepage 5 */
+static codeset_pr_func_t fr_q933_print_ie_codeset[] = {
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    fr_q933_print_ie_codeset5,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+};
+
 void
 q933_print(const u_char *p, u_int length)
 {
@@ -489,7 +515,7 @@ q933_print(const u_char *p, u_int length)
 	struct common_ie_header *ie_p;
         int olen;
 	int is_ansi = 0;
-        u_int dlci,codeset;
+        u_int codeset;
 
 	if (length < 9) {	/* shortest: Q.933a LINK VERIFY */
 		printf("[|q.933]");
@@ -504,7 +530,7 @@ q933_print(const u_char *p, u_int length)
         printf("%s", eflag ? "" : "Q.933, ");
 
 	/* printing out header part */
-	printf(is_ansi ? "ANSI" : "CCITT ");
+	printf(is_ansi ? "ANSI" : "CCITT");
 
 	if (p[0])
 		printf(", Call Ref: 0x%02x", p[0]);
@@ -548,53 +574,10 @@ q933_print(const u_char *p, u_int length)
                            ie_p->ie_id,
                            ie_p->ie_len);
                     
-                switch (ie_p->ie_id) {
-
-                case FR_LMI_ANSI_REPORT_TYPE_IE: /* fall through */
-                case FR_LMI_CCITT_REPORT_TYPE_IE:
-                    if (vflag)
-                        printf("%s (%u)",
-                               tok2str(fr_lmi_report_type_ie_values,"unknown",ptemp[2]),
-                               ptemp[2]);
-                    break;
-
-                case FR_LMI_ANSI_LINK_VERIFY_IE: /* fall through */
-                case FR_LMI_CCITT_LINK_VERIFY_IE:
-                case FR_LMI_ANSI_LINK_VERIFY_IE_91:
-                    if (!vflag)
-                        printf(", ");
-                    printf("TX Seq: %3d, RX Seq: %3d", ptemp[2], ptemp[3]);
-                    break;
-                case FR_LMI_ANSI_PVC_STATUS_IE: /* fall through */
-                case FR_LMI_CCITT_PVC_STATUS_IE:
-                    if (!vflag)
-                        printf(", ");
-                    /* now parse the DLCI information element. */                    
-                    if ((ie_p->ie_len < 3) ||
-                        (ptemp[2] & 0x80) ||
-                        ((ie_p->ie_len == 3) && !(ptemp[3] & 0x80)) ||
-                        ((ie_p->ie_len == 4) && ((ptemp[3] & 0x80) || !(ptemp[4] & 0x80))) ||
-                        ((ie_p->ie_len == 5) && ((ptemp[3] & 0x80) || (ptemp[4] & 0x80) ||
-                                           !(ptemp[5] & 0x80))) ||
-                        (ie_p->ie_len > 5) ||
-                        !(ptemp[ie_p->ie_len + 1] & 0x80))
-                        printf("Invalid DLCI IE");
-                    
-                    dlci = ((ptemp[2] & 0x3F) << 4) | ((ptemp[3] & 0x78) >> 3);
-                    if (ie_p->ie_len == 4)
-                        dlci = (dlci << 6) | ((ptemp[4] & 0x7E) >> 1);
-                    else if (ie_p->ie_len == 5)
-                        dlci = (dlci << 13) | (ptemp[4] & 0x7F) | ((ptemp[5] & 0x7E) >> 1);
-
-                    printf("DLCI %u: status %s%s", dlci,
-                             ptemp[ie_p->ie_len + 1] & 0x8 ? "New, " : "",
-                             ptemp[ie_p->ie_len + 1] & 0x2 ? "Active" : "Inactive");
-                    break;
-                    
-                default:
+                if (!fr_q933_print_ie_codeset[codeset] ||
+                    (*fr_q933_print_ie_codeset)(ie_p, ptemp)) {
                     if (vflag <= 1)
                         print_unknown_data(ptemp+2,"\n\t",ie_p->ie_len);
-                    break;
                 }
 
                 /* do we want to see a hexdump of the IE ? */
@@ -606,4 +589,57 @@ q933_print(const u_char *p, u_int length)
 	}
         if (!vflag)
             printf(", length %u",olen);
+}
+
+static int
+fr_q933_print_ie_codeset5(const struct common_ie_header *ie_p, const u_char *p)
+{
+        u_int dlci;
+
+        switch (ie_p->ie_id) {
+
+        case FR_LMI_ANSI_REPORT_TYPE_IE: /* fall through */
+        case FR_LMI_CCITT_REPORT_TYPE_IE:
+            if (vflag)
+                printf("%s (%u)",
+                       tok2str(fr_lmi_report_type_ie_values,"unknown",p[2]),
+                       p[2]);
+            return 1;
+
+        case FR_LMI_ANSI_LINK_VERIFY_IE: /* fall through */
+        case FR_LMI_CCITT_LINK_VERIFY_IE:
+        case FR_LMI_ANSI_LINK_VERIFY_IE_91:
+            if (!vflag)
+                printf(", ");
+            printf("TX Seq: %3d, RX Seq: %3d", p[2], p[3]);
+            return 1;
+
+        case FR_LMI_ANSI_PVC_STATUS_IE: /* fall through */
+        case FR_LMI_CCITT_PVC_STATUS_IE:
+            if (!vflag)
+                printf(", ");
+            /* now parse the DLCI information element. */                    
+            if ((ie_p->ie_len < 3) ||
+                (p[2] & 0x80) ||
+                ((ie_p->ie_len == 3) && !(p[3] & 0x80)) ||
+                ((ie_p->ie_len == 4) && ((p[3] & 0x80) || !(p[4] & 0x80))) ||
+                ((ie_p->ie_len == 5) && ((p[3] & 0x80) || (p[4] & 0x80) ||
+                                   !(p[5] & 0x80))) ||
+                (ie_p->ie_len > 5) ||
+                !(p[ie_p->ie_len + 1] & 0x80))
+                printf("Invalid DLCI IE");
+                    
+            dlci = ((p[2] & 0x3F) << 4) | ((p[3] & 0x78) >> 3);
+            if (ie_p->ie_len == 4)
+                dlci = (dlci << 6) | ((p[4] & 0x7E) >> 1);
+            else if (ie_p->ie_len == 5)
+                dlci = (dlci << 13) | (p[4] & 0x7F) | ((p[5] & 0x7E) >> 1);
+
+            printf("DLCI %u: status %s%s", dlci,
+                    p[ie_p->ie_len + 1] & 0x8 ? "New, " : "",
+                    p[ie_p->ie_len + 1] & 0x2 ? "Active" : "Inactive");
+            return 1;
+	}
+
+        return 0;
 }
