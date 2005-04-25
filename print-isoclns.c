@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.136 2005-04-25 10:41:06 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.137 2005-04-25 18:50:35 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -872,6 +872,7 @@ esis_print(const u_int8_t *pptr, u_int length)
 	}
 
 	esis_header = (const struct esis_header_t *) pptr;
+        TCHECK(*esis_header);
         li = esis_header->length_indicator;
         optr = pptr;
 
@@ -921,7 +922,8 @@ esis_print(const u_int8_t *pptr, u_int length)
         /* do not attempt to verify the checksum if it is zero */
         if (EXTRACT_16BITS(esis_header->cksum) == 0)
                 printf("(unverified)");
-            else printf("(%s)", osi_cksum(pptr, li) ? "incorrect" : "correct");
+        else
+                printf("(%s)", osi_cksum(pptr, li) ? "incorrect" : "correct");
 
         printf(", holding time: %us, length indicator: %u",EXTRACT_16BITS(esis_header->holdtime),li);
 
@@ -933,25 +935,72 @@ esis_print(const u_int8_t *pptr, u_int length)
 
 	switch (esis_pdu_type) {
 	case ESIS_PDU_REDIRECT: {
-		const u_int8_t *dst, *snpa, *tptr;
+		const u_int8_t *dst, *snpa, *neta;
+		u_int dstl, snpal, netal;
 
-		dst = pptr; pptr += *pptr + 1;
-		if (pptr > snapend)
+		TCHECK(*pptr);
+		if (li < 1) {
+			printf(", bad redirect/li");
 			return;
-		printf("\n\t  %s", isonsap_string(dst+1,*dst));
-		snpa = pptr; pptr += *pptr + 1;
-		tptr = pptr;   pptr += *pptr + 1;
-		if (pptr > snapend)
+		}
+		dstl = *pptr;
+		pptr++;
+		li--;
+		TCHECK2(*pptr, dstl);
+		if (li < dstl) {
+			printf(", bad redirect/li");
 			return;
+		}
+		dst = pptr;
+		pptr += dstl;
+                li -= dstl;
+		printf("\n\t  %s", isonsap_string(dst,dstl));
 
-		if (tptr[0] == 0)
-			printf("\n\t  %s", etheraddr_string(&snpa[1]));
+		TCHECK(*pptr);
+		if (li < 1) {
+			printf(", bad redirect/li");
+			return;
+		}
+		snpal = *pptr;
+		pptr++;
+		li--;
+		TCHECK2(*pptr, snpal);
+		if (li < snpal) {
+			printf(", bad redirect/li");
+			return;
+		}
+		snpa = pptr;
+		pptr += snpal;
+                li -= snpal;
+		TCHECK(*pptr);
+		if (li < 1) {
+			printf(", bad redirect/li");
+			return;
+		}
+		netal = *pptr;
+		pptr++;
+		TCHECK2(*pptr, netal);
+		if (li < netal) {
+			printf(", bad redirect/li");
+			return;
+		}
+		neta = pptr;
+		pptr += netal;
+                li -= netal;
+
+		if (netal == 0)
+			printf("\n\t  %s", etheraddr_string(snpa));
 		else
-			printf("\n\t  %s", isonsap_string(tptr+1,*tptr));
+			printf("\n\t  %s", isonsap_string(neta,netal));
 		break;
 	}
 
 	case ESIS_PDU_ESH:
+            TCHECK(*pptr);
+            if (li < 1) {
+                printf(", bad esh/li");
+                return;
+            }
             source_address_number = *pptr;
             pptr++;
             li--;
@@ -959,23 +1008,47 @@ esis_print(const u_int8_t *pptr, u_int length)
             printf("\n\t  Number of Source Addresses: %u", source_address_number);
            
             while (source_address_number > 0) {
+                TCHECK(*pptr);
+            	if (li < 1) {
+                    printf(", bad esh/li");
+            	    return;
+            	}
                 source_address_length = *pptr;
+                pptr++;
+            	li--;
+
+                TCHECK2(*pptr, source_address_length);
+            	if (li < source_address_length) {
+                    printf(", bad esh/li");
+            	    return;
+            	}
                 printf("\n\t  NET (length: %u): %s",
                        source_address_length,
-                       isonsap_string(pptr+1,source_address_length));
-
-                pptr += source_address_length+1;
-                li -= source_address_length+1;
+                       isonsap_string(pptr,source_address_length));
+                pptr += source_address_length;
+                li -= source_address_length;
                 source_address_number--;
             }
 
             break;
 
 	case ESIS_PDU_ISH: {
+            TCHECK(*pptr);
+            if (li < 1) {
+                printf(", bad ish/li");
+                return;
+            }
             source_address_length = *pptr;
-            printf("\n\t  NET (length: %u): %s", source_address_length, isonsap_string(pptr+1, source_address_length));
-            pptr += source_address_length+1;
-            li -= source_address_length +1;
+            pptr++;
+            li--;
+            TCHECK2(*pptr, source_address_length);
+            if (li < source_address_length) {
+                printf(", bad ish/li");
+                return;
+            }
+            printf("\n\t  NET (length: %u): %s", source_address_length, isonsap_string(pptr, source_address_length));
+            pptr += source_address_length;
+            li -= source_address_length;
             break;
 	}
 
@@ -992,8 +1065,7 @@ esis_print(const u_int8_t *pptr, u_int length)
             u_int op, opli;
             const u_int8_t *tptr;
             
-            if (snapend - pptr < 2)
-                return;
+            TCHECK2(*pptr, 2);
             if (li < 2) {
                 printf(", bad opts/li");
                 return;
@@ -1008,9 +1080,6 @@ esis_print(const u_int8_t *pptr, u_int length)
             li -= opli;
             tptr = pptr;
             
-            if (snapend < pptr)
-                return;
-            
             printf("\n\t  %s Option #%u, length %u, value: ",
                    tok2str(esis_option_values,"Unknown",op),
                    op,
@@ -1019,12 +1088,13 @@ esis_print(const u_int8_t *pptr, u_int length)
             switch (op) {
 
             case ESIS_OPTION_ES_CONF_TIME:
+                TCHECK2(*pptr, 2);
                 printf("%us", EXTRACT_16BITS(tptr));
                 break;
-                
 
             case ESIS_OPTION_PROTOCOLS:
                 while (opli>0) {
+                    TCHECK(*pptr);
                     printf("%s (0x%02x)",
                            tok2str(nlpid_values,
                                    "unknown",
@@ -1056,6 +1126,8 @@ esis_print(const u_int8_t *pptr, u_int length)
                 print_unknown_data(pptr,"\n\t  ",opli);
             pptr += opli;
         }
+trunc:
+	return;
 }   
 
 /* shared routine for printing system, node and lsp-ids */
