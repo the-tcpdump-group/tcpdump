@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.34 2005-04-25 13:18:30 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.35 2005-04-25 19:28:30 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -890,9 +890,10 @@ rsvp_obj_print (const u_char *tptr, const char *ident, u_int tlen) {
                                    RSVP_OBJ_XRO_MASK_SUBOBJ(*obj_tptr)),
                            *(obj_tptr+1));                
 
-                    if (*(obj_tptr+1) == 0) /* prevent infinite loops */
+                    if (*(obj_tptr+1) == 0) { /* prevent infinite loops */
                         printf("%s  ERROR: zero length ERO subtype",ident);
                         break;
+                    }
 
                     switch(RSVP_OBJ_XRO_MASK_SUBOBJ(*obj_tptr)) {
                     case RSVP_OBJ_XRO_IPV4:
