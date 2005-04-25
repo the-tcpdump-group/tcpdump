@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.32.2.1 2005-04-25 16:29:18 guy Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.32.2.2 2005-04-25 19:17:50 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -575,7 +575,7 @@ q933_print(const u_char *p, u_int length)
                            ie_p->ie_len);
                     
                 if (!fr_q933_print_ie_codeset[codeset] ||
-                    (*fr_q933_print_ie_codeset)(ie_p, ptemp)) {
+                    (*fr_q933_print_ie_codeset[codeset])(ie_p, ptemp)) {
                     if (vflag <= 1)
                         print_unknown_data(ptemp+2,"\n\t",ie_p->ie_len);
                 }
