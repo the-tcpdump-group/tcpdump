@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.63 2005-04-26 03:38:09 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.64 2005-04-26 03:51:38 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -129,14 +129,6 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 	/* Watch out for possible alignment problems */
 	memcpy((char *)&llc, (char *)p, min(caplen, sizeof(llc)));
 
-	if (eflag)
-	  printf("LLC, dsap %s (0x%02x), ssap %s (0x%02x), cmd 0x%02x: ",
-                 tok2str(llc_values,"Unknown",llc.dsap),
-		 llc.dsap,
-                 tok2str(llc_values,"Unknown",llc.ssap),
-		 llc.ssap,
-		 llc.llcu);
-
 	if (llc.ssap == LLCSAP_GLOBAL && llc.dsap == LLCSAP_GLOBAL) {
 		/*
 		 * This is an Ethernet_802.3 IPX frame; it has an
@@ -159,6 +151,14 @@ llc_print(const u_char *p, u_int length, u_int caplen,
             ipx_print(p, length);
             return (1);
 	}
+
+	if (eflag)
+	  printf("LLC, dsap %s (0x%02x), ssap %s (0x%02x), cmd 0x%02x: ",
+                 tok2str(llc_values,"Unknown",llc.dsap),
+		 llc.dsap,
+                 tok2str(llc_values,"Unknown",llc.ssap),
+		 llc.ssap,
+		 llc.llcu);
 
 	if (llc.ssap == LLCSAP_8021D && llc.dsap == LLCSAP_8021D) {
 		stp_print(p, length);
