@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.137 2005-04-25 18:50:35 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.138 2005-04-26 07:14:07 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -586,7 +586,9 @@ void isoclns_print(const u_int8_t *p, u_int length, u_int caplen)
 		break;
 
 	case NLPID_NULLNS:
-		(void)printf(", length: %u", length);
+		(void)printf("%slength: %u",
+		             eflag ? "" : ", ",
+                             length);
 		break;
 
         case NLPID_Q933:
@@ -610,7 +612,9 @@ void isoclns_print(const u_int8_t *p, u_int length, u_int caplen)
 	default:
                 if (!eflag)
                     printf("OSI NLPID 0x%02x unknown",*p);
-		(void)printf(", length: %u", length);
+		(void)printf("%slength: %u",
+		             eflag ? "" : ", ",
+                             length);
 		if (caplen > 1)
                         print_unknown_data(p,"\n\t",caplen);
 		break;
@@ -746,8 +750,7 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
             u_int op, opli;
             const u_int8_t *tptr;
             
-            if (snapend - pptr < 2)
-                return (0);
+            TCHECK2(*pptr, 2);
             if (li < 2) {
                 printf(", bad opts/li");
                 return (0);
@@ -755,15 +758,13 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
             op = *pptr++;
             opli = *pptr++;
             li -= 2;
+            TCHECK2(*pptr, opli);
             if (opli > li) {
                 printf(", opt (%d) too long", op);
                 return (0);
             }
             li -= opli;
             tptr = pptr;
-            
-            if (snapend < pptr)
-                return(0);
             
             printf("\n\t  %s Option #%u, length %u, value: ",
                    tok2str(clnp_option_values,"Unknown",op),
@@ -804,6 +805,7 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
 
         case    CLNP_PDU_ER: /* fall through */
         case 	CLNP_PDU_ERP:
+            TCHECK(*pptr);
             if (*(pptr) == NLPID_CLNP) {
                 printf("\n\t-----original packet-----\n\t");
                 /* FIXME recursion protection */
