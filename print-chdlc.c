@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.36 2005-04-19 08:06:09 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.37 2005-04-26 09:40:21 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -133,7 +133,8 @@ struct cisco_slarp {
 	} un;
 };
 
-#define SLARP_LEN	14
+#define SLARP_MIN_LEN	14
+#define SLARP_LEN	18
 
 static void
 chdlc_slarp_print(const u_char *cp, u_int length)
@@ -142,11 +143,11 @@ chdlc_slarp_print(const u_char *cp, u_int length)
         u_int sec,min,hrs,days;
 
         printf("SLARP (length: %u), ",length);
-	if (length < SLARP_LEN)
+	if (length < SLARP_MIN_LEN)
 		goto trunc;
 
 	slarp = (const struct cisco_slarp *)cp;
-	TCHECK2(*slarp, SLARP_LEN);
+	TCHECK2(*slarp, SLARP_MIN_LEN);
 	switch (EXTRACT_32BITS(&slarp->code)) {
 	case SLARP_REQUEST:
 		printf("request");
@@ -171,8 +172,8 @@ chdlc_slarp_print(const u_char *cp, u_int length)
                        EXTRACT_32BITS(&slarp->un.keep.yourseq),
                        EXTRACT_16BITS(&slarp->un.keep.rel));
 
-                if (length >= SLARP_LEN) { /* uptime-stamp is optional */
-                        cp += SLARP_LEN;
+                if (length >= SLARP_MIN_LEN) { /* uptime-stamp is optional */
+                        cp += SLARP_MIN_LEN;
                         if (!TTEST2(*cp, 4))
                                 goto trunc;
                         sec = EXTRACT_32BITS(cp) / 1000;
