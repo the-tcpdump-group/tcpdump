@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.96 2005-04-25 16:14:43 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.97 2005-04-26 03:43:27 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -208,6 +208,8 @@ relts_print(int secs)
 int
 print_unknown_data(const u_char *cp,const char *ident,int len)
 {
+	if (snapend - cp < len)
+		len = snapend - cp;
         hex_print(ident,cp,len);
 	return(1); /* everything is ok */
 }
