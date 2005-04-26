@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.34 2005-04-25 19:17:25 guy Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.35 2005-04-26 07:26:34 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -191,8 +191,6 @@ fr_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 	register u_int length = h->len;
 	register u_int caplen = h->caplen;
 	u_int16_t extracted_ethertype;
-	u_int32_t orgcode;
-	register u_short et;
 	u_int dlci;
         u_int sdlcore;
 	u_int addr_len;
@@ -268,19 +266,7 @@ fr_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 		break;
 
 	case NLPID_SNAP:
-		orgcode = EXTRACT_24BITS(p);
-		et = EXTRACT_16BITS(p + 3);
-
-                if (eflag)
-                    (void)printf("SNAP, oui %s (0x%06x), ethertype %s (0x%04x): ",
-                                 tok2str(oui_values,"Unknown",orgcode),
-                                 orgcode,
-                                 tok2str(ethertype_values,"Unknown", et),
-                                 et);
-
-		if (snap_print((const u_char *)(p + 5), length - 5,
-			   caplen - 5, &extracted_ethertype, orgcode, et,
-			   0) == 0) {
+		if (snap_print(p, length, caplen, &extracted_ethertype, 0) == 0) {
 			/* ether_type not known, print raw packet */
                         if (!eflag)
                             fr_hdr_print(length + hdr_len, hdr_len,
