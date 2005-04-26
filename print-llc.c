@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.61.2.3 2005-04-26 03:52:00 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.61.2.4 2005-04-26 07:27:16 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -115,9 +115,9 @@ int
 llc_print(const u_char *p, u_int length, u_int caplen,
 	  const u_char *esrc, const u_char *edst, u_short *extracted_ethertype)
 {
-	struct llc llc;
-	register u_short et;
+	u_int8_t dsap, ssap;
 	u_int16_t control;
+	int is_u;
 	register int ret;
 
 	if (caplen < 3) {
@@ -126,10 +126,40 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 		return(0);
 	}
 
-	/* Watch out for possible alignment problems */
-	memcpy((char *)&llc, (char *)p, min(caplen, sizeof(llc)));
+	dsap = *p;
+	ssap = *(p + 1);
 
-	if (llc.ssap == LLCSAP_GLOBAL && llc.dsap == LLCSAP_GLOBAL) {
+	/*
+	 * OK, what type of LLC frame is this?  The length
+	 * of the control field depends on that - I frames
+	 * have a two-byte control field, and U frames have
+	 * a one-byte control field.
+	 */
+	control = *(p + 2);
+	if ((control & LLC_U_FMT) == LLC_U_FMT) {
+		/*
+		 * U frame.
+		 */
+		is_u = 1;
+	} else {
+		/*
+		 * The control field in I and S frames is
+		 * 2 bytes...
+		 */
+		if (caplen < 4) {
+			(void)printf("[|llc]");
+			default_print((u_char *)p, caplen);
+			return(0);
+		}
+
+		/*
+		 * ...and is little-endian.
+		 */
+		control = EXTRACT_LE_16BITS(p + 2);
+		is_u = 0;
+	}
+
+	if (ssap == LLCSAP_GLOBAL && dsap == LLCSAP_GLOBAL) {
 		/*
 		 * This is an Ethernet_802.3 IPX frame; it has an
 		 * 802.3 header (i.e., an Ethernet header where the
@@ -152,26 +182,38 @@ llc_print(const u_char *p, u_int length, u_int caplen,
             return (1);
 	}
 
-	if (eflag)
-	  printf("LLC, dsap %s (0x%02x), ssap %s (0x%02x), cmd 0x%02x: ",
-                 tok2str(llc_values,"Unknown",llc.dsap),
-		 llc.dsap,
-                 tok2str(llc_values,"Unknown",llc.ssap),
-		 llc.ssap,
-		 llc.llcu);
+	if (eflag) {
+		if (is_u) {
+			printf("LLC, dsap %s (0x%02x), ssap %s (0x%02x), cmd 0x%02x: ",
+			    tok2str(llc_values, "Unknown", dsap),
+			    dsap,
+			    tok2str(llc_values, "Unknown", ssap),
+			    ssap,
+			    control);
+		} else {
+			printf("LLC, dsap %s (0x%02x), ssap %s (0x%02x), cmd 0x%04x: ",
+			    tok2str(llc_values, "Unknown", dsap),
+			    dsap,
+			    tok2str(llc_values, "Unknown", ssap),
+			    ssap,
+			    control);
+		}
+	}
 
-	if (llc.ssap == LLCSAP_8021D && llc.dsap == LLCSAP_8021D) {
-		stp_print(p, length);
+	if (ssap == LLCSAP_8021D && dsap == LLCSAP_8021D &&
+	    control == LLC_UI) {
+		stp_print(p+3, length-3);
 		return (1);
 	}
 
-	if (llc.ssap == LLCSAP_IP && llc.dsap == LLCSAP_IP) {
+	if (ssap == LLCSAP_IP && dsap == LLCSAP_IP &&
+	    control == LLC_UI) {
 		ip_print(gndo, p+4, length-4);
 		return (1);
 	}
 
-	if (llc.ssap == LLCSAP_IPX && llc.dsap == LLCSAP_IPX &&
-	    llc.llcui == LLC_UI) {
+	if (ssap == LLCSAP_IPX && dsap == LLCSAP_IPX &&
+	    control == LLC_UI) {
 		/*
 		 * This is an Ethernet_802.2 IPX frame, with an 802.3
 		 * header and an 802.2 LLC header with the source and
@@ -180,16 +222,13 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 		 * Skip DSAP, LSAP, and control field.
 		 */
 		printf("(NOV-802.2) ");
-		p += 3;
-		length -= 3;
-		caplen -= 3;
-		ipx_print(p, length);
+		ipx_print(p+3, length-3);
 		return (1);
 	}
 
 #ifdef TCPDUMP_DO_SMB
-	if (llc.ssap == LLCSAP_NETBEUI && llc.dsap == LLCSAP_NETBEUI
-	    && (!(llc.llcu & LLC_S_FMT) || llc.llcu == LLC_U_FMT)) {
+	if (ssap == LLCSAP_NETBEUI && dsap == LLCSAP_NETBEUI
+	    && (!(control & LLC_S_FMT) || control == LLC_U_FMT)) {
 		/*
 		 * we don't actually have a full netbeui parser yet, but the
 		 * smb parser can handle many smb-in-netbeui packets, which
@@ -202,120 +241,69 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 		 */
 
 		/*
-		 * Skip the DSAP and LSAP.
+		 * Skip the LLC header.
 		 */
-		p += 2;
-		length -= 2;
-		caplen -= 2;
-
-		/*
-		 * OK, what type of LLC frame is this?  The length
-		 * of the control field depends on that - I frames
-		 * have a two-byte control field, and U frames have
-		 * a one-byte control field.
-		 */
-		if (llc.llcu == LLC_U_FMT) {
-			control = llc.llcu;
-			p += 1;
-			length -= 1;
-			caplen -= 1;
+		if (is_u) {
+			p += 3;
+			length -= 3;
+			caplen -= 3;
 		} else {
-			/*
-			 * The control field in I and S frames is
-			 * little-endian.
-			 */
-			control = EXTRACT_LE_16BITS(&llc.llcu);
-			p += 2;
-			length -= 2;
-			caplen -= 2;
+			p += 4;
+			length -= 4;
+			caplen -= 4;
 		}
 		netbeui_print(control, p, length);
 		return (1);
 	}
 #endif
-	if (llc.ssap == LLCSAP_ISONS && llc.dsap == LLCSAP_ISONS
-	    && llc.llcui == LLC_UI) {
+	if (ssap == LLCSAP_ISONS && dsap == LLCSAP_ISONS
+	    && control == LLC_UI) {
 		isoclns_print(p + 3, length - 3, caplen - 3);
 		return (1);
 	}
 
-	if (llc.ssap == LLCSAP_SNAP && llc.dsap == LLCSAP_SNAP
-	    && llc.llcui == LLC_UI) {
-		u_int32_t orgcode;
-
-		if (caplen < sizeof(llc)) {
-			(void)printf("[|llc-snap]");
-			default_print((u_char *)p, caplen);
-			return (0);
-		}
-
-		caplen -= sizeof(llc);
-		length -= sizeof(llc);
-		p += sizeof(llc);
-
-		orgcode = EXTRACT_24BITS(&llc.llc_orgcode[0]);
-		et = EXTRACT_16BITS(&llc.llc_ethertype[0]);
-
-		if (eflag) {
-			const struct tok *tok = NULL;
-			const struct oui_tok *otp;
-
-			for (otp = &oui_to_tok[0]; otp->tok != NULL; otp++) {
-				if (otp->oui == orgcode) {
-					tok = otp->tok;
-					break;
-				}
-			}
-			(void)printf("oui %s (0x%06x), %s %s (0x%04x): ",
-			     tok2str(oui_values, "Unknown", orgcode),
-			     orgcode,
-			     (orgcode == 0x000000 ? "ethertype" : "pid"),
-			     tok2str(tok, "Unknown", et),
-			     et);
-		}
-
+	if (ssap == LLCSAP_SNAP && dsap == LLCSAP_SNAP
+	    && control == LLC_UI) {
 		/*
 		 * XXX - what *is* the right bridge pad value here?
 		 * Does anybody ever bridge one form of LAN traffic
 		 * over a networking type that uses 802.2 LLC?
 		 */
-		ret = snap_print(p, length, caplen, extracted_ethertype,
-		    orgcode, et, 2);
+		ret = snap_print(p+3, length-3, caplen-3, extracted_ethertype,
+		    2);
 		if (ret)
 			return (ret);
 	}
 
 	if (!eflag) {
-		if ((llc.ssap & ~LLC_GSAP) == llc.dsap) {
+		if ((ssap & ~LLC_GSAP) == dsap) {
 			if (esrc == NULL || edst == NULL)
-				(void)printf("%s ", llcsap_string(llc.dsap));
+				(void)printf("%s ", llcsap_string(dsap));
 			else
 				(void)printf("%s > %s %s ",
 						etheraddr_string(esrc),
 						etheraddr_string(edst),
-						llcsap_string(llc.dsap));
+						llcsap_string(dsap));
 		} else {
 			if (esrc == NULL || edst == NULL)
 				(void)printf("%s > %s ",
-					llcsap_string(llc.ssap & ~LLC_GSAP),
-					llcsap_string(llc.dsap));
+					llcsap_string(ssap & ~LLC_GSAP),
+					llcsap_string(dsap));
 			else
 				(void)printf("%s %s > %s %s ",
 					etheraddr_string(esrc),
-					llcsap_string(llc.ssap & ~LLC_GSAP),
+					llcsap_string(ssap & ~LLC_GSAP),
 					etheraddr_string(edst),
-					llcsap_string(llc.dsap));
+					llcsap_string(dsap));
 		}
 	}
 
-	if ((llc.llcu & LLC_U_FMT) == LLC_U_FMT) {
-		u_int16_t cmd;
+	if (is_u) {
 		const char *m;
 		char f;
 
-		cmd = LLC_U_CMD(llc.llcu);
-		m = tok2str(cmd2str, "%02x", cmd);
-		switch ((llc.ssap & LLC_GSAP) | (llc.llcu & LLC_U_POLL)) {
+		m = tok2str(cmd2str, "%02x", LLC_U_CMD(control));
+		switch ((ssap & LLC_GSAP) | (control & LLC_U_POLL)) {
 			case 0:			f = 'C'; break;
 			case LLC_GSAP:		f = 'R'; break;
 			case LLC_U_POLL:	f = 'P'; break;
@@ -329,7 +317,7 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 		length -= 3;
 		caplen -= 3;
 
-		if ((llc.llcu & ~LLC_U_POLL) == LLC_XID) {
+		if ((control & ~LLC_U_POLL) == LLC_XID) {
 			if (*p == LLC_XID_FI) {
 				printf(": %02x %02x", p[1], p[2]);
 				p += 3;
@@ -340,11 +328,7 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 	} else {
 		char f;
 
-		/*
-		 * The control field in I and S frames is little-endian.
-		 */
-		control = EXTRACT_LE_16BITS(&llc.llcu);
-		switch ((llc.ssap & LLC_GSAP) | (control & LLC_IS_POLL)) {
+		switch ((ssap & LLC_GSAP) | (control & LLC_IS_POLL)) {
 			case 0:			f = 'C'; break;
 			case LLC_GSAP:		f = 'R'; break;
 			case LLC_IS_POLL:	f = 'P'; break;
@@ -373,10 +357,36 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 
 int
 snap_print(const u_char *p, u_int length, u_int caplen,
-    u_short *extracted_ethertype, u_int32_t orgcode, u_short et,
-    u_int bridge_pad)
+    u_short *extracted_ethertype, u_int bridge_pad)
 {
+	u_int32_t orgcode;
+	register u_short et;
 	register int ret;
+
+	TCHECK2(*p, 5);
+	orgcode = EXTRACT_24BITS(p);
+	et = EXTRACT_16BITS(p + 3);
+
+	if (eflag) {
+		const struct tok *tok = NULL;
+		const struct oui_tok *otp;
+
+		for (otp = &oui_to_tok[0]; otp->tok != NULL; otp++) {
+			if (otp->oui == orgcode) {
+				tok = otp->tok;
+				break;
+			}
+		}
+		(void)printf("oui %s (0x%06x), %s %s (0x%04x): ",
+		     tok2str(oui_values, "Unknown", orgcode),
+		     orgcode,
+		     (orgcode == 0x000000 ? "ethertype" : "pid"),
+		     tok2str(tok, "Unknown", et),
+		     et);
+	}
+	p += 5;
+	length -= 5;
+	caplen -= 5;
 
 	switch (orgcode) {
 	case OUI_ENCAP_ETHER:
@@ -429,6 +439,7 @@ snap_print(const u_char *p, u_int length, u_int caplen,
 			/*
 			 * Skip the padding.
 			 */
+			TCHECK2(*p, bridge_pad);
 			caplen -= bridge_pad;
 			length -= bridge_pad;
 			p += bridge_pad;
@@ -449,6 +460,7 @@ snap_print(const u_char *p, u_int length, u_int caplen,
 			 * Skip the padding, but not the Access
 			 * Control field.
 			 */
+			TCHECK2(*p, bridge_pad);
 			caplen -= bridge_pad;
 			length -= bridge_pad;
 			p += bridge_pad;
@@ -469,6 +481,7 @@ snap_print(const u_char *p, u_int length, u_int caplen,
 			/*
 			 * Skip the padding.
 			 */
+			TCHECK2(*p, bridge_pad + 1);
 			caplen -= bridge_pad + 1;
 			length -= bridge_pad + 1;
 			p += bridge_pad + 1;
@@ -485,6 +498,10 @@ snap_print(const u_char *p, u_int length, u_int caplen,
 		}
 	}
 	return (0);
+
+trunc:
+	(void)printf("[|snap]");
+	return (1);
 }
 
 

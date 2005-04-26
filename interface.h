@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.244.2.3 2005-04-21 03:59:25 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.244.2.4 2005-04-26 07:27:15 guy Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -173,8 +173,7 @@ extern void hex_print(const char *, const u_char *, u_int);
 extern int ether_encap_print(u_short, const u_char *, u_int, u_int, u_short *);
 extern int llc_print(const u_char *, u_int, u_int, const u_char *,
 	const u_char *, u_short *);
-extern int snap_print(const u_char *, u_int, u_int, u_short *, u_int32_t,
-	u_short, u_int);
+extern int snap_print(const u_char *, u_int, u_int, u_short *, u_int);
 extern void aarp_print(const u_char *, u_int);
 extern void aodv_print(const u_char *, u_int, int);
 extern void atalk_print(const u_char *, u_int);
