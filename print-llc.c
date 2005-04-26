@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.62 2005-04-25 17:56:43 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.63 2005-04-26 03:38:09 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -59,6 +59,7 @@ static struct tok llc_values[] = {
         { LLCSAP_IPX,      "IPX" },
         { LLCSAP_NETBEUI,  "NetBeui" },
         { LLCSAP_ISONS,    "OSI" },
+        { 0,               NULL },
 };
 
 static struct tok cmd2str[] = {
@@ -73,29 +74,37 @@ static struct tok cmd2str[] = {
 	{ 0,		NULL }
 };
 
+static const struct tok cisco_values[] = { 
+	{ PID_CISCO_CDP, "CDP" },
+	{ 0,             NULL }
+};
+
+static const struct tok bridged_values[] = { 
+	{ PID_RFC2684_ETH_FCS,     "Ethernet + FCS" },
+	{ PID_RFC2684_ETH_NOFCS,   "Ethernet w/o FCS" },
+	{ PID_RFC2684_802_4_FCS,   "802.4 + FCS" },
+	{ PID_RFC2684_802_4_NOFCS, "802.4 w/o FCS" },
+	{ PID_RFC2684_802_5_FCS,   "Token Ring + FCS" },
+	{ PID_RFC2684_802_5_NOFCS, "Token Ring w/o FCS" },
+	{ PID_RFC2684_FDDI_FCS,    "FDDI + FCS" },
+	{ PID_RFC2684_FDDI_NOFCS,  "FDDI w/o FCS" },
+	{ PID_RFC2684_802_6_FCS,   "802.6 + FCS" },
+	{ PID_RFC2684_802_6_NOFCS, "802.6 w/o FCS" },
+	{ PID_RFC2684_BPDU,        "BPDU" },
+	{ 0,                       NULL },
+};
+
 struct oui_tok {
 	u_int32_t	oui;
 	const struct tok *tok;
 };
 
-static const struct tok bridged_values[] = { 
-    { PID_RFC2684_ETH_FCS,      "Ethernet + FCS" },
-    { PID_RFC2684_ETH_NOFCS,    "Ethernet w/o FCS" },
-    { PID_RFC2684_802_4_FCS,    "802.4 + FCS" },
-    { PID_RFC2684_802_4_NOFCS,  "802.4 w/o FCS" },
-    { PID_RFC2684_802_5_FCS,    "Token Ring + FCS" },
-    { PID_RFC2684_802_5_NOFCS,  "Token Ring w/o FCS" },
-    { PID_RFC2684_FDDI_FCS,     "FDDI + FCS" },
-    { PID_RFC2684_FDDI_NOFCS,   "FDDI w/o FCS" },
-    { PID_RFC2684_802_6_FCS,    "802.6 + FCS" },
-    { PID_RFC2684_802_6_NOFCS,  "802.6 w/o FCS" },
-    { PID_RFC2684_BPDU,         "BPDU" },
-    { 0,                        NULL },
-};
-
 static const struct oui_tok oui_to_tok[] = {
-	{ 0x000000, ethertype_values },
-	{ 0x0080C2, bridged_values },	/* bridged, RFC 2427 FR or RFC 2864 ATM */
+	{ OUI_ENCAP_ETHER, ethertype_values },
+	{ OUI_CISCO_90, ethertype_values },	/* uses some Ethertype values */
+	{ OUI_APPLETALK, ethertype_values },	/* uses some Ethertype values */
+	{ OUI_CISCO, cisco_values },
+	{ OUI_RFC2684, bridged_values },	/* bridged, RFC 2427 FR or RFC 2864 ATM */
 	{ 0, NULL }
 };
 
@@ -276,25 +285,27 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 			return (ret);
 	}
 
-	if ((llc.ssap & ~LLC_GSAP) == llc.dsap) {
-		if (eflag || esrc == NULL || edst == NULL)
-			(void)printf("%s ", llcsap_string(llc.dsap));
-		else
-			(void)printf("%s > %s %s ",
+	if (!eflag) {
+		if ((llc.ssap & ~LLC_GSAP) == llc.dsap) {
+			if (esrc == NULL || edst == NULL)
+				(void)printf("%s ", llcsap_string(llc.dsap));
+			else
+				(void)printf("%s > %s %s ",
+						etheraddr_string(esrc),
+						etheraddr_string(edst),
+						llcsap_string(llc.dsap));
+		} else {
+			if (esrc == NULL || edst == NULL)
+				(void)printf("%s > %s ",
+					llcsap_string(llc.ssap & ~LLC_GSAP),
+					llcsap_string(llc.dsap));
+			else
+				(void)printf("%s %s > %s %s ",
 					etheraddr_string(esrc),
+					llcsap_string(llc.ssap & ~LLC_GSAP),
 					etheraddr_string(edst),
 					llcsap_string(llc.dsap));
-	} else {
-		if (eflag || esrc == NULL || edst == NULL)
-			(void)printf("%s > %s ",
-				llcsap_string(llc.ssap & ~LLC_GSAP),
-				llcsap_string(llc.dsap));
-		else
-			(void)printf("%s %s > %s %s ",
-				etheraddr_string(esrc),
-				llcsap_string(llc.ssap & ~LLC_GSAP),
-				etheraddr_string(edst),
-				llcsap_string(llc.dsap));
+		}
 	}
 
 	if ((llc.llcu & LLC_U_FMT) == LLC_U_FMT) {
