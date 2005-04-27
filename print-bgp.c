@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.72.2.4 2004-03-24 00:04:04 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.72.2.5 2005-04-27 18:42:28 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -1216,6 +1216,8 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                             tptr = pptr + len;
                             break;
 			}
+                        if (advance < 0) /* infinite loop protection */
+                            break;
 			tptr += advance;
 		}
 		break;

@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.4.2.2 2003-11-16 08:51:31 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.4.2.3 2005-04-27 18:42:29 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -325,6 +325,9 @@ ldp_print(register const u_char *pptr, register u_int len) {
                msg_len,
                EXTRACT_32BITS(&ldp_msg_header->id),
                LDP_MASK_U_BIT(EXTRACT_16BITS(&ldp_msg_header->type)) ? "continue processing" : "ignore");
+
+        if (msg_len == 0) /* infinite loop protection */
+            break;
 
         msg_tptr=tptr+sizeof(struct ldp_msg_header);
         msg_tlen=msg_len-sizeof(struct ldp_msg_header)+4; /* Type & Length fields not included */
