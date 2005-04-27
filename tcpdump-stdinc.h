@@ -29,7 +29,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @(#) $Header: /tcpdump/master/tcpdump/tcpdump-stdinc.h,v 1.12.2.1 2005-04-20 09:46:45 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/tcpdump-stdinc.h,v 1.12.2.2 2005-04-27 01:13:46 guy Exp $ (LBL)
  */
 
 /*
@@ -129,7 +129,7 @@ typedef char* caddr_t;
   #define FOPEN_WRITE_BIN  FOPEN_WRITE_TXT
 #endif
 
-#if defined(__GNUC__) && defined(__i386__)
+#if defined(__GNUC__) && defined(__i386__) && !defined(__ntohl)
   #undef ntohl
   #undef ntohs
   #undef htonl
