@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bfd.c,v 1.5.2.1 2005-04-27 23:01:38 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bfd.c,v 1.5.2.2 2005-04-27 23:15:27 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -247,7 +247,9 @@ bfd_print(register const u_char *pptr, register u_int len, register u_int port)
             printf("\n\t  Required min Echo Interval: %4u ms", EXTRACT_32BITS(bfd_header->required_min_echo_interval)/1000);
 
             if (bfd_header->flags & BFD_FLAG_AUTH) {
-                bfd_auth_header = (const struct bfd_auth_header_t *)(pptr + sizeof (const struct bfd_header_t));
+                pptr += sizeof (const struct bfd_header_t);
+                bfd_auth_header = (const struct bfd_auth_header_t *)pptr;
+                TCHECK2(*bfd_auth_header, sizeof(const struct bfd_auth_header_t));
                 printf("\n\t%s (%u) Authentication, length %u present",
                        tok2str(bfd_v1_authentication_values,"Unknown",bfd_auth_header->auth_type),
                        bfd_auth_header->auth_type,
