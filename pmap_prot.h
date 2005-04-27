@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/pmap_prot.h,v 1.2 2005-04-07 01:27:52 mcr Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/pmap_prot.h,v 1.3 2005-04-27 21:43:48 guy Exp $ (LBL) */
 /*
  * Sun RPC is a product of Sun Microsystems, Inc. and is provided for
  * unrestricted use provided that this legend is included on all tape
@@ -69,29 +69,21 @@
  * The service supports remote procedure calls on udp/ip or tcp/ip socket 111.
  */
 
-#if !defined(_RPC_PMAP_PROT_H_) && !defined(_RPC_PMAPPROT_H)
+#define SUNRPC_PMAPPORT		((u_int16_t)111)
+#define SUNRPC_PMAPPROG		((u_int32_t)100000)
+#define SUNRPC_PMAPVERS		((u_int32_t)2)
+#define SUNRPC_PMAPVERS_PROTO	((u_int32_t)2)
+#define SUNRPC_PMAPVERS_ORIG	((u_int32_t)1)
+#define SUNRPC_PMAPPROC_NULL	((u_int32_t)0)
+#define SUNRPC_PMAPPROC_SET	((u_int32_t)1)
+#define SUNRPC_PMAPPROC_UNSET	((u_int32_t)2)
+#define SUNRPC_PMAPPROC_GETPORT	((u_int32_t)3)
+#define SUNRPC_PMAPPROC_DUMP	((u_int32_t)4)
+#define SUNRPC_PMAPPROC_CALLIT	((u_int32_t)5)
 
-/* two defines, for NetBSD and FreeBSD */
-#define _RPC_PMAP_PROT_H_
-#define _RPC_PMAPPROT_H
-
-#define PMAPPORT		((u_int16_t)111)
-#define PMAPPROG		((u_int32_t)100000)
-#define PMAPVERS		((u_int32_t)2)
-#define PMAPVERS_PROTO		((u_int32_t)2)
-#define PMAPVERS_ORIG		((u_int32_t)1)
-#define PMAPPROC_NULL		((u_int32_t)0)
-#define PMAPPROC_SET		((u_int32_t)1)
-#define PMAPPROC_UNSET		((u_int32_t)2)
-#define PMAPPROC_GETPORT	((u_int32_t)3)
-#define PMAPPROC_DUMP		((u_int32_t)4)
-#define PMAPPROC_CALLIT		((u_int32_t)5)
-
-struct pmap {
+struct sunrpc_pmap {
 	u_int32_t pm_prog;
 	u_int32_t pm_vers;
 	u_int32_t pm_prot;
 	u_int32_t pm_port;
 };
-
-#endif /* !_RPC_PMAPPROT_H */
