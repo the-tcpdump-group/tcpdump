@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bfd.c,v 1.8 2005-04-28 07:29:13 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bfd.c,v 1.9 2005-04-28 09:27:35 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -146,7 +146,7 @@ static const struct tok bfd_v0_flag_values[] = {
     { 0, NULL }
 };
 
-#define BFD_FLAG_AUTH 0x40
+#define BFD_FLAG_AUTH 0x04
 
 static const struct tok bfd_v1_flag_values[] = {
     { 0x20, "Poll" },
