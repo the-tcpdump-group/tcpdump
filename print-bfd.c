@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bfd.c,v 1.7 2005-04-27 23:14:02 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bfd.c,v 1.8 2005-04-28 07:29:13 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -220,7 +220,7 @@ bfd_print(register const u_char *pptr, register u_int len, register u_int port)
                        version,
                        tok2str(bfd_port_values, "unknown (%u)", port),
                        tok2str(bfd_v1_state_values, "unknown (%u)", bfd_header->flags & 0xc0),
-                       bittok2str(bfd_v1_flag_values, "none", bfd_header->flags),
+                       bittok2str(bfd_v1_flag_values, "none", bfd_header->flags & 0x3f),
                        len);
                 return;
             }
@@ -229,8 +229,8 @@ bfd_print(register const u_char *pptr, register u_int len, register u_int port)
                    version,
                    len,
                    tok2str(bfd_port_values, "unknown (%u)", port),
-                   tok2str(bfd_v1_state_values, "unknown (%u)", bfd_header->flags & 0xc0),
-                   bittok2str(bfd_v1_flag_values, "none", bfd_header->flags),
+                   tok2str(bfd_v1_state_values, "unknown (%u)", (bfd_header->flags & 0xc0) >> 6),
+                   bittok2str(bfd_v1_flag_values, "none", bfd_header->flags & 0x3f),
                    tok2str(bfd_diag_values,"unknown",BFD_EXTRACT_DIAG(bfd_header->version_diag)),
                    BFD_EXTRACT_DIAG(bfd_header->version_diag));
             
