@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.170 2005-04-19 04:39:50 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.171 2005-05-02 21:27:49 guy Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -1116,10 +1116,11 @@ data inside the packet, use the following syntax:
 .fi
 .in -.5i
 \fIProto\fR is one of \fBether, fddi, tr, wlan, ppp, slip, link,
-ip, arp, rarp, tcp, udp, icmp\fR or \fBip6\fR, and
+ip, arp, rarp, tcp, udp, icmp, ip6\fR or \fBradio\fR, and
 indicates the protocol layer for the index operation.
 (\fBether, fddi, wlan, tr, ppp, slip\fR and \fBlink\fR all refer to the
-link layer.)
+link layer. \fBradio\fR refers to the "radio header" added to some
+802.11 captures.)
 Note that \fItcp, udp\fR and other upper-layer protocol types only
 apply to IPv4, not IPv6 (this will be fixed in the future).
 The byte offset, relative to the indicated protocol layer, is
