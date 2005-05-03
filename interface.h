@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.244.2.4 2005-04-26 07:27:15 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.244.2.5 2005-05-03 20:39:25 hannes Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -253,6 +253,7 @@ extern u_int juniper_atm2_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int juniper_mfr_print(const struct pcap_pkthdr *, register const u_char *);
 extern u_int juniper_mlfr_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int juniper_mlppp_print(const struct pcap_pkthdr *, const u_char *);
+extern u_int juniper_pppoe_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int sll_if_print(const struct pcap_pkthdr *, const u_char *);
 extern void snmp_print(const u_char *, u_int);
 extern void sunrpcrequest_print(const u_char *, u_int, const u_char *);
