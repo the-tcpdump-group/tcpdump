@@ -16,7 +16,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.8.2.3 2005-04-27 18:56:51 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.8.2.4 2005-05-03 08:23:07 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -352,14 +352,23 @@ ldp_tlv_print(register const u_char *tptr) {
 	case LDP_FEC_HOSTADDRESS:
 	    break;
 	case LDP_FEC_MARTINI_VC:
+            if (!TTEST2(*tptr, 11))
+                goto trunc;
             vc_info_len = *(tptr+2);
+
 	    printf(": %s, %scontrol word, group-ID %u, VC-ID %u, VC-info-length: %u",
 		   tok2str(l2vpn_encaps_values, "Unknown", EXTRACT_16BITS(tptr)&0x7fff),
 		   EXTRACT_16BITS(tptr)&0x8000 ? "" : "no ",
                    EXTRACT_32BITS(tptr+3),
 		   EXTRACT_32BITS(tptr+7),
                    vc_info_len);
+
+            if (vc_info_len == 0) /* infinite loop protection */
+                break;
+
             tptr+=11;
+            if (!TTEST2(*tptr, vc_info_len))
+                goto trunc;
 
             while (vc_info_len > 2) {
                 vc_info_tlv_type = *tptr;
@@ -463,6 +472,10 @@ ldp_tlv_print(register const u_char *tptr) {
         break;
     }
     return(tlv_len+4); /* Type & Length fields not included */
+ 
+trunc:
+    printf("\n\t\t packet exceeded snapshot");
+    return 0;
 }
 
 void
