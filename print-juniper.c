@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.11 2005-04-25 18:53:27 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.12 2005-05-03 20:35:42 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -51,7 +51,8 @@ enum {
     JUNIPER_ATM2,
     JUNIPER_MLPPP,
     JUNIPER_MLFR,
-    JUNIPER_MFR
+    JUNIPER_MFR,
+    JUNIPER_PPPOE
 };
 
 enum {
@@ -71,6 +72,7 @@ static struct juniper_cookie_table_t juniper_cookie_table[] = {
     { JUNIPER_MLPPP, 2, "MLPPP"},
     { JUNIPER_MLFR,  2, "MLFR"},
     { JUNIPER_MFR,   4, "MFR"},
+    { JUNIPER_PPPOE, 0, "PPPoE"},
 };
 
 struct juniper_l2info_t {
@@ -99,6 +101,22 @@ struct juniper_l2info_t {
 int ip_heuristic_guess(register const u_char *, u_int);
 int juniper_ppp_heuristic_guess(register const u_char *, u_int);
 static int juniper_parse_header (const u_char *, const struct pcap_pkthdr *, struct juniper_l2info_t *);
+
+u_int
+juniper_pppoe_print(const struct pcap_pkthdr *h, register const u_char *p)
+{
+        struct juniper_l2info_t l2info;
+
+        l2info.pictype = JUNIPER_PPPOE;
+        if(juniper_parse_header(p, h, &l2info) == 0)
+            return l2info.header_len;
+
+        p+=l2info.header_len;
+        /* this DLT contains nothing but raw ethernet frames */
+        ether_print(p, l2info.length, l2info.caplen);
+        return l2info.header_len;
+}
+
 
 u_int
 juniper_mlppp_print(const struct pcap_pkthdr *h, register const u_char *p)
@@ -427,15 +445,18 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
             } else l2info->bundle = l2info->cookie[0];
 
             if (eflag)
-                printf("%s-PIC, cookie-len %u, cookie 0x",
+                printf("%s-PIC, cookie-len %u",
                        lp->s,
                        l2info->cookie_len);
-            
-            for (idx = 0; idx < l2info->cookie_len; idx++) {
-                l2info->cookie[idx] = p[idx]; /* copy cookie data */
-                if (eflag) printf("%02x",p[idx]);
+
+            if (eflag && l2info->cookie_len > 0) {
+                printf(", cookie 0x");
+                for (idx = 0; idx < l2info->cookie_len; idx++) {
+                    l2info->cookie[idx] = p[idx]; /* copy cookie data */
+                    if (eflag) printf("%02x",p[idx]);
+                }
             }
-            
+
             if (eflag) printf(": "); /* print demarc b/w L2/L3*/
             
 
