@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.12.2.2 2005-04-19 12:49:21 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.12.2.3 2005-05-03 08:12:31 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -137,7 +137,7 @@ struct lspping_tlv_header {
 #define	LSPPING_TLV_DOWNSTREAM_MAPPING    2
 #define	LSPPING_TLV_PAD                   3
 #define	LSPPING_TLV_ERROR_CODE            4
-#define	LSPPING_TLV_VENDOR_PRIVATE        5 
+#define	LSPPING_TLV_VENDOR_PRIVATE        0xfc00
 
 static const struct tok lspping_tlv_values[] = {
     { LSPPING_TLV_TARGET_FEC_STACK, "Target FEC Stack" },
