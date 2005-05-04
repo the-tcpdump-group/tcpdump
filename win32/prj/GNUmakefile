@@ -2,7 +2,7 @@
 # Nate Lawson <nate@rootlabs.oom>
 
 # Location of your pcap src tree, build it first
-PCAP_DIR = ../../../winpcap
+PCAP_DIR = ../../../winpcap_cvs20
 
 # OPTFLAGS = -g
 OPTFLAGS = -O
@@ -16,6 +16,7 @@ CFLAGS = -I ${PCAP_DIR}/wpcap/libpcap/bpf \
 	-I ../../lbl -I../.. \
 	-DWIN32 -DHAVE_ADDRINFO_H -DHAVE_PCAP_FINDALLDEVS \
 	-DINET6 -DSIZEOF_CHAR=1 -DHAVE_SOCKADDR_STORAGE -DHAVE_PCAP_DUMP_FLUSH\
+	-DSIZEOF_LONG_LONG=8 \
 	-DSIZEOF_SHORT=2 -DSIZEOF_INT=4 -D_U_="__attribute__((unused))" \
 	-mno-cygwin ${OPTFLAGS}
 LDFLAGS = 
@@ -126,7 +127,18 @@ OBJS = \
 	../../smbutil.o \
 	../../tcpdump.o \
 	../../util.o \
-	../../Win32/src/getopt.o
+	../../Win32/src/getopt.o \
+	../../cpack.o \
+	../../ipproto.o \
+	../../l2vpn.o \
+	../../nlpid.o \
+	../../print-eigrp.o \
+	../../print-juniper.o \
+	../../print-lspping.o \
+	../../print-sip.o \
+	../../print-eap.o \
+	../../print-lmp.o \
+	../../print-syslog.o
 
 main: ${OBJS}
 	${CC} ${CFLAGS} ${LDFLAGS} -o windump.exe ${OBJS} ${LIBS}
