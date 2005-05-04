@@ -93,6 +93,10 @@ SOURCE=..\..\bpf_dump.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\cpack.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\missing\datalinks.c
 # End Source File
 # Begin Source File
@@ -125,7 +129,19 @@ SOURCE=..\..\missing\inet_pton.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\ipproto.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\l2vpn.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\machdep.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\nlpid.c
 # End Source File
 # Begin Source File
 
@@ -229,6 +245,10 @@ SOURCE="..\..\print-egp.c"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\print-eigrp.c"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\print-enc.c"
 # End Source File
 # Begin Source File
@@ -309,6 +329,10 @@ SOURCE="..\..\print-isoclns.c"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\print-juniper.c"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\print-krb.c"
 # End Source File
 # Begin Source File
@@ -330,6 +354,10 @@ SOURCE="..\..\print-llc.c"
 # Begin Source File
 
 SOURCE="..\..\print-lmp.c"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\print-lspping.c"
 # End Source File
 # Begin Source File
 
@@ -429,6 +457,10 @@ SOURCE="..\..\print-sctp.c"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\print-sip.c"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\print-sl.c"
 # End Source File
 # Begin Source File
@@ -458,6 +490,10 @@ SOURCE="..\..\print-sunrpc.c"
 # Begin Source File
 
 SOURCE="..\..\print-symantec.c"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\print-syslog.c"
 # End Source File
 # Begin Source File
 
