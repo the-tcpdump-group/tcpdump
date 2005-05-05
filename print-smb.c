@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.41 2004-12-30 03:36:51 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.41.2.1 2005-05-05 22:30:40 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -1141,12 +1141,13 @@ nbt_udp137_print(const u_char *data, int length)
 
     if (qdcount) {
 	printf("QuestionRecords:\n");
-	for (i = 0; i < qdcount; i++)
+	for (i = 0; i < qdcount; i++) {
 	    p = smb_fdata(p,
 		"|Name=[n1]\nQuestionType=[rw]\nQuestionClass=[rw]\n#",
 		maxbuf, 0);
-	if (p == NULL)
-	    goto out;
+	    if (p == NULL)
+		goto out;
+	}
     }
 
     if (total) {
@@ -1180,6 +1181,8 @@ nbt_udp137_print(const u_char *data, int length)
 			goto out;
 		    while (numnames--) {
 			p = smb_fdata(p, "Name=[n2]\t#", maxbuf, 0);
+			if (p == NULL)
+			    goto out;
 			TCHECK(*p);
 			if (p[0] & 0x80)
 			    printf("<GROUP> ");
