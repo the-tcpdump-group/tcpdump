@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.91.2.3 2005-04-20 20:46:05 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.91.2.4 2005-05-05 22:49:34 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -1024,6 +1024,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                 case (AFNUM_L2VPN<<8 | SAFNUM_VPNUNIMULTICAST):
                     break;
                 default:
+                    TCHECK2(tptr[0], tlen);
                     printf("\n\t    no AFI %u / SAFI %u decoder",af,safi);
                     if (vflag <= 1)
                         print_unknown_data(tptr,"\n\t    ",tlen);
@@ -1519,6 +1520,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                                EXTRACT_16BITS(tptr+4));
                         break;
                     default:
+                        TCHECK2(*tptr,8);
                         print_unknown_data(tptr,"\n\t      ",8);
                         break;
                     }
@@ -1576,8 +1578,10 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                 print_unknown_data(pptr,"\n\t    ",len);
             break;
 	}
-        if (vflag > 1 && len) /* omit zero length attributes*/
+        if (vflag > 1 && len) { /* omit zero length attributes*/
+            TCHECK2(*pptr,len);
             print_unknown_data(pptr,"\n\t    ",len);
+        }
         return 1;
 
 trunc:
@@ -1675,14 +1679,17 @@ bgp_open_print(const u_char *dat, int length)
                     case BGP_CAPCODE_RR_CISCO:
                         break;
                     default:
+                        TCHECK2(opt[i+BGP_OPT_SIZE+2],cap_len);
                         printf("\n\t\tno decoder for Capability %u",
                                cap_type);
                         if (vflag <= 1)
                             print_unknown_data(&opt[i+BGP_OPT_SIZE+2],"\n\t\t",cap_len);
                         break;
                     }
-                    if (vflag > 1)
+                    if (vflag > 1) {
+                        TCHECK2(opt[i+BGP_OPT_SIZE+2],cap_len);
                         print_unknown_data(&opt[i+BGP_OPT_SIZE+2],"\n\t\t",cap_len);
+                    }
                     break;
                 case BGP_OPT_AUTH:
                 default:
@@ -1791,13 +1798,14 @@ bgp_update_print(const u_char *dat, int length)
 	p += 2 + len;
 
 	if (dat + length > p) {
-            printf("\n\t  Updated routes:");
+		printf("\n\t  Updated routes:");
 		while (dat + length > p) {
 			char buf[MAXHOSTNAMELEN + 100];
 			i = decode_prefix4(p, buf, sizeof(buf));
-			if (i == -1)
+			if (i == -1) {
 				printf("\n\t    (illegal prefix length)");
-			else if (i == -2)
+				break;
+			} else if (i == -2)
 				goto trunc;
 			else {
 				printf("\n\t    %s", buf);
@@ -1893,6 +1901,12 @@ bgp_route_refresh_print(const u_char *pptr, int len) {
 	char tokbuf[TOKBUFSIZE];
 	char tokbuf2[TOKBUFSIZE];
 
+	TCHECK2(pptr[0], BGP_ROUTE_REFRESH_SIZE);
+
+        /* some little sanity checking */
+        if (len<BGP_ROUTE_REFRESH_SIZE)
+            return;
+
         bgp_route_refresh_header = (const struct bgp_route_refresh *)pptr;
 
         printf("\n\t  AFI %s (%u), SAFI %s (%u)",
@@ -1907,10 +1921,14 @@ bgp_route_refresh_print(const u_char *pptr, int len) {
 			  tokbuf2, sizeof(tokbuf2)),
                bgp_route_refresh_header->safi);
 
-        if (vflag > 1)
+        if (vflag > 1) {
+            TCHECK2(*pptr, len);
             print_unknown_data(pptr,"\n\t  ", len);
+        }
         
         return;
+trunc:
+	printf("[|BGP]");
 }
 
 static int
@@ -1943,9 +1961,10 @@ bgp_header_print(const u_char *dat, int length)
                 bgp_route_refresh_print(dat, length);
                 break;
         default:
-            /* we have no decoder for the BGP message */
-            printf("\n\t  no Message %u decoder",bgp.bgp_type);
-            print_unknown_data(dat,"\n\t  ",length);
+                /* we have no decoder for the BGP message */
+                TCHECK2(*dat, length);
+                printf("\n\t  no Message %u decoder",bgp.bgp_type);
+                print_unknown_data(dat,"\n\t  ",length);
                 break;
 	}
 	return 1;
