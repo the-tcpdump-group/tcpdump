@@ -35,7 +35,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-sctp.c,v 1.16.2.2 2005-05-05 23:08:59 guy Exp $ (NETLAB/PEL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-sctp.c,v 1.16.2.3 2005-05-06 10:53:20 guy Exp $ (NETLAB/PEL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -146,7 +146,7 @@ void sctp_print(const u_char *bp,        /* beginning of sctp packet */
       	break;
       }
 
-      TCHECK2(*(((u_int8_t *)chunkDescPtr) + chunkLength), chunkLength);
+      TCHECK2(*((u_int8_t *)chunkDescPtr), chunkLength);
       chunkEnd = ((const u_char*)chunkDescPtr + chunkLength);
 
       align=chunkLength % 4;
