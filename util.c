@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.95.2.3 2005-05-06 07:57:20 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.95.2.4 2005-05-06 08:27:00 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -135,7 +135,7 @@ fn_printzp(register const u_char *s, register u_int n,
 		}
 		putchar(c);
 	}
-	return (n == 0) ? 0 : 1;
+	return (n == 0) ? 0 : ret;
 }
 
 /*
