@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.78.2.1 2005-04-20 10:31:16 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.78.2.2 2005-05-06 04:19:39 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -444,7 +444,10 @@ rfc1048_print(register const u_char *bp)
 		case 'a':
 			/* ascii strings */
 			putchar('"');
-			(void)fn_printn(bp, size, NULL);
+			if (fn_printn(bp, size, snapend)) {
+				putchar('"');
+				goto trunc;
+			}
 			putchar('"');
 			bp += size;
 			size = 0;
@@ -567,7 +570,10 @@ rfc1048_print(register const u_char *bp)
 					printf("%u/%u/", *bp, *(bp+1));
 				bp += 2;
 				putchar('"');
-				(void)fn_printn(bp, size - 3, NULL);
+				if (fn_printn(bp, size - 3, snapend)) {
+					putchar('"');
+					goto trunc;
+				}
 				putchar('"');
 				bp += size - 3;
 				size = 0;
@@ -578,7 +584,10 @@ rfc1048_print(register const u_char *bp)
 				size--;
 				if (type == 0) {
 					putchar('"');
-					(void)fn_printn(bp, size, NULL);
+					if (fn_printn(bp, size, snapend)) {
+						putchar('"');
+						goto trunc;
+					}
 					putchar('"');
 					bp += size;
 					size = 0;
