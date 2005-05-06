@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.56.2.1 2005-04-20 21:55:32 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.56.2.2 2005-05-06 07:57:19 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -932,8 +932,11 @@ ospf_print(register const u_char *bp, register u_int length,
 			break;
 
 		case OSPF_AUTH_SIMPLE:
-			(void)fn_printn(op->ospf_authdata,
-			    sizeof(op->ospf_authdata), NULL);
+			if (fn_printn(op->ospf_authdata,
+			    sizeof(op->ospf_authdata), snapend)) {
+				printf("\"");
+				goto trunc;
+			}
 			printf("\"");
 			break;
 

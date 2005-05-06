@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.95.2.2 2005-04-26 03:44:36 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.95.2.3 2005-05-06 07:57:20 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -45,7 +45,7 @@ static const char rcsid[] _U_ =
 #include "interface.h"
 
 /*
- * Print out a filename (or other ascii string).
+ * Print out a null-terminated filename (or other ascii string).
  * If ep is NULL, assume no truncation check is needed.
  * Return true if truncated.
  */
@@ -90,6 +90,40 @@ fn_printn(register const u_char *s, register u_int n,
 	while (n > 0 && (ep == NULL || s < ep)) {
 		n--;
 		c = *s++;
+		if (!isascii(c)) {
+			c = toascii(c);
+			putchar('M');
+			putchar('-');
+		}
+		if (!isprint(c)) {
+			c ^= 0x40;	/* DEL to ?, others to alpha */
+			putchar('^');
+		}
+		putchar(c);
+	}
+	return (n == 0) ? 0 : 1;
+}
+
+/*
+ * Print out a null-padded filename (or other ascii string).
+ * If ep is NULL, assume no truncation check is needed.
+ * Return true if truncated.
+ */
+int
+fn_printzp(register const u_char *s, register u_int n,
+	  register const u_char *ep)
+{
+	register int ret;
+	register u_char c;
+
+	ret = 1;			/* assume truncated */
+	while (n > 0 && (ep == NULL || s < ep)) {
+		n--;
+		c = *s++;
+		if (c == '\0') {
+			ret = 0;
+			break;
+		}
 		if (!isascii(c)) {
 			c = toascii(c);
 			putchar('M');
