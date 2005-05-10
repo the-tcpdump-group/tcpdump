@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.12 2005-05-03 20:35:42 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.13 2005-05-10 10:41:40 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -449,8 +449,9 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
                        lp->s,
                        l2info->cookie_len);
 
-            if (eflag && l2info->cookie_len > 0) {
-                printf(", cookie 0x");
+            if (l2info->cookie_len > 0) {
+                if (eflag)
+                    printf(", cookie 0x");
                 for (idx = 0; idx < l2info->cookie_len; idx++) {
                     l2info->cookie[idx] = p[idx]; /* copy cookie data */
                     if (eflag) printf("%02x",p[idx]);
