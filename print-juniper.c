@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.13 2005-05-10 10:41:40 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.14 2005-05-12 07:10:55 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -32,6 +32,7 @@ static const char rcsid[] _U_ =
 #include "ppp.h"
 #include "llc.h"
 #include "nlpid.h"
+#include "ethertype.h"
 
 #define JUNIPER_BPF_OUT           0       /* Outgoing packet */
 #define JUNIPER_BPF_IN            1       /* Incoming packet */
@@ -43,16 +44,6 @@ static struct tok juniper_direction_values[] = {
     { JUNIPER_BPF_IN,  "In"},
     { JUNIPER_BPF_OUT, "Out"},
     { 0, NULL}
-};
-
-/* FIXME change enums to real DLT_s */
-enum {
-    JUNIPER_ATM1,
-    JUNIPER_ATM2,
-    JUNIPER_MLPPP,
-    JUNIPER_MLFR,
-    JUNIPER_MFR,
-    JUNIPER_PPPOE
 };
 
 enum {
@@ -67,12 +58,13 @@ struct juniper_cookie_table_t {
 };
 
 static struct juniper_cookie_table_t juniper_cookie_table[] = {
-    { JUNIPER_ATM1,  4, "ATM1"},
-    { JUNIPER_ATM2,  8, "ATM2"},
-    { JUNIPER_MLPPP, 2, "MLPPP"},
-    { JUNIPER_MLFR,  2, "MLFR"},
-    { JUNIPER_MFR,   4, "MFR"},
-    { JUNIPER_PPPOE, 0, "PPPoE"},
+    { DLT_JUNIPER_ATM1,  4, "ATM1"},
+    { DLT_JUNIPER_ATM2,  8, "ATM2"},
+    { DLT_JUNIPER_MLPPP, 2, "MLPPP"},
+    { DLT_JUNIPER_MLFR,  2, "MLFR"},
+    { DLT_JUNIPER_MFR,   4, "MFR"},
+    { DLT_JUNIPER_PPPOE, 0, "PPPoE"},
+    { DLT_JUNIPER_PPPOE_ATM, 0, "PPPoE ATM"},
 };
 
 struct juniper_l2info_t {
@@ -107,7 +99,7 @@ juniper_pppoe_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
         struct juniper_l2info_t l2info;
 
-        l2info.pictype = JUNIPER_PPPOE;
+        l2info.pictype = DLT_JUNIPER_PPPOE;
         if(juniper_parse_header(p, h, &l2info) == 0)
             return l2info.header_len;
 
@@ -117,13 +109,38 @@ juniper_pppoe_print(const struct pcap_pkthdr *h, register const u_char *p)
         return l2info.header_len;
 }
 
+u_int
+juniper_pppoe_atm_print(const struct pcap_pkthdr *h, register const u_char *p)
+{
+        struct juniper_l2info_t l2info;
+	u_int16_t extracted_ethertype;
+
+        l2info.pictype = DLT_JUNIPER_PPPOE_ATM;
+        if(juniper_parse_header(p, h, &l2info) == 0)
+            return l2info.header_len;
+
+        p+=l2info.header_len;
+
+        extracted_ethertype = EXTRACT_16BITS(p);
+        /* this DLT contains nothing but raw PPPoE frames,
+         * prepended with a type field*/
+        if (ether_encap_print(extracted_ethertype,
+                              p+ETHERTYPE_LEN,
+                              l2info.length-ETHERTYPE_LEN,
+                              l2info.caplen-ETHERTYPE_LEN,
+                              &extracted_ethertype) == 0)
+            /* ether_type not known, probably it wasn't one */
+            printf("unknown ethertype 0x%04x", extracted_ethertype);
+        
+        return l2info.header_len;
+}
 
 u_int
 juniper_mlppp_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
         struct juniper_l2info_t l2info;
 
-        l2info.pictype = JUNIPER_MLPPP;
+        l2info.pictype = DLT_JUNIPER_MLPPP;
         if(juniper_parse_header(p, h, &l2info) == 0)
             return l2info.header_len;
 
@@ -155,7 +172,7 @@ juniper_mfr_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
         struct juniper_l2info_t l2info;
 
-        l2info.pictype = JUNIPER_MFR;
+        l2info.pictype = DLT_JUNIPER_MFR;
         if(juniper_parse_header(p, h, &l2info) == 0)
             return l2info.header_len;
         
@@ -184,7 +201,7 @@ juniper_mlfr_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
         struct juniper_l2info_t l2info;
 
-        l2info.pictype = JUNIPER_MLFR;
+        l2info.pictype = DLT_JUNIPER_MLFR;
         if(juniper_parse_header(p, h, &l2info) == 0)
             return l2info.header_len;
 
@@ -225,7 +242,7 @@ juniper_atm1_print(const struct pcap_pkthdr *h, register const u_char *p)
 
         struct juniper_l2info_t l2info;
 
-        l2info.pictype = JUNIPER_ATM1;
+        l2info.pictype = DLT_JUNIPER_ATM1;
         if(juniper_parse_header(p, h, &l2info) == 0)
             return l2info.header_len;
 
@@ -271,7 +288,7 @@ juniper_atm2_print(const struct pcap_pkthdr *h, register const u_char *p)
 
         struct juniper_l2info_t l2info;
 
-        l2info.pictype = JUNIPER_ATM2;
+        l2info.pictype = DLT_JUNIPER_ATM2;
         if(juniper_parse_header(p, h, &l2info) == 0)
             return l2info.header_len;
 
@@ -470,15 +487,15 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
 
     /* DLT_ specific parsing */
     switch(l2info->pictype) {
-    case JUNIPER_MLPPP:
+    case DLT_JUNIPER_MLPPP:
         if (l2info->cookie_type == LS_COOKIE) {
             l2info->bundle = l2info->cookie[1];
         } else {
             l2info->bundle = l2info->cookie[0];
         }
         break;
-    case JUNIPER_MLFR: /* fall through */
-    case JUNIPER_MFR:
+    case DLT_JUNIPER_MLFR: /* fall through */
+    case DLT_JUNIPER_MFR:
         if (l2info->cookie_type == LS_COOKIE) {
             l2info->bundle = l2info->cookie[1];
         } else {
@@ -489,8 +506,8 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
         l2info->length -= 2;
         l2info->caplen -= 2;
         break;
-    case JUNIPER_ATM2:
-    case JUNIPER_ATM1:
+    case DLT_JUNIPER_ATM2:
+    case DLT_JUNIPER_ATM1:
     default:
 
         break;
