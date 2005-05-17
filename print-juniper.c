@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.8.2.7 2005-05-12 08:42:46 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.8.2.8 2005-05-17 09:38:49 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -552,9 +552,15 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
         l2info->caplen -= 2;
         break;
     case DLT_JUNIPER_ATM2:
+        /* ATM cell relay control word present ? */
+        if (l2info->cookie[7] & ATM2_PKT_TYPE_MASK && *p & 0x08) {
+            l2info->header_len += 4;
+            if (eflag)
+                printf("control-word 0x%08x ",EXTRACT_32BITS(p));
+        }
+        break;
     case DLT_JUNIPER_ATM1:
     default:
-
         break;
     }
     
