@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.38 2005-01-19 16:46:27 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.39 2005-05-18 20:24:04 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -294,7 +294,7 @@ oam_print (const u_char *p, u_int length) {
 
     cell_header = EXTRACT_32BITS(p);
     cell_type = ((*(p+4))>>4) & 0x0f;
-    func_type = *(p) & 0x0f;
+    func_type = *(p+4) & 0x0f;
 
     vpi = (cell_header>>20)&0xff;
     vci = (cell_header>>4)&0xffff;
