@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.91.2.4 2005-05-05 22:49:34 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.91.2.5 2005-05-18 20:03:19 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -772,14 +772,13 @@ trunc:
 #endif
 
 static int
-decode_labeled_clnp_prefix(const u_char *pptr, char *buf, u_int buflen)
+decode_clnp_prefix(const u_char *pptr, char *buf, u_int buflen)
 {
         u_int8_t addr[19];
 	u_int plen;
 
 	TCHECK(pptr[0]);
 	plen = pptr[0]; /* get prefix length */
-        plen-=24; /* adjust prefixlen - labellength */
 
 	if (152 < plen)
 		return -1;
@@ -791,14 +790,11 @@ decode_labeled_clnp_prefix(const u_char *pptr, char *buf, u_int buflen)
 		addr[(plen + 7) / 8 - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
 	}
-        /* the label may get offsetted by 4 bits so lets shift it right */
-	snprintf(buf, buflen, "%s/%d, label:%u %s",
+	snprintf(buf, buflen, "%s/%d",
                  isonsap_string(addr,(plen + 7) / 8 - 1),
-                 plen,
-                 EXTRACT_24BITS(pptr+1)>>4,
-                 ((pptr[3]&1)==0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
+                 plen);
 
-	return 4 + (plen + 7) / 8;
+	return 1 + (plen + 7) / 8;
 
 trunc:
 	return -2;
@@ -1276,7 +1272,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                     case (AFNUM_NSAP<<8 | SAFNUM_UNICAST):
                     case (AFNUM_NSAP<<8 | SAFNUM_MULTICAST):
                     case (AFNUM_NSAP<<8 | SAFNUM_UNIMULTICAST):
-                        advance = decode_labeled_clnp_prefix(tptr, buf, sizeof(buf));
+                        advance = decode_clnp_prefix(tptr, buf, sizeof(buf));
                         if (advance == -1)
                             printf("\n\t    (illegal prefix length)");
                         else if (advance == -2)
@@ -1410,7 +1406,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                     case (AFNUM_NSAP<<8 | SAFNUM_UNICAST):
                     case (AFNUM_NSAP<<8 | SAFNUM_MULTICAST):
                     case (AFNUM_NSAP<<8 | SAFNUM_UNIMULTICAST):
-                        advance = decode_labeled_clnp_prefix(tptr, buf, sizeof(buf));
+                        advance = decode_clnp_prefix(tptr, buf, sizeof(buf));
                         if (advance == -1)
                             printf("\n\t    (illegal prefix length)");
                         else if (advance == -2)
