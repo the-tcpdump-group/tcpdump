@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-null.c,v 1.54 2005-05-18 13:50:52 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-null.c,v 1.55 2005-05-19 07:25:49 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -91,6 +91,20 @@ const struct tok bsd_af_values[] = {
 #define	SWAPLONG(y) \
 ((((y)&0xff)<<24) | (((y)&0xff00)<<8) | (((y)&0xff0000)>>8) | (((y)>>24)&0xff))
 
+static inline void
+null_hdr_print(u_int family, u_int length)
+{
+	if (!qflag) {
+		(void)printf("AF %s (%u)",
+			tok2str(bsd_af_values,"Unknown",family),family);
+	} else {
+		(void)printf("%s",
+			tok2str(bsd_af_values,"Unknown AF %u",family));
+	}
+
+	(void)printf(", length %u: ", length);
+}
+
 /*
  * This is the top level routine of the printer.  'p' points
  * to the ether header of the packet, 'h->ts' is the timestamp,
@@ -122,17 +136,17 @@ null_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	if ((family & 0xFFFF0000) != 0)
 		family = SWAPLONG(family);
 
+	if (eflag)
+		null_hdr_print(family, length);
+
 	length -= NULL_HDRLEN;
 	caplen -= NULL_HDRLEN;
 	p += NULL_HDRLEN;
 
-	if (eflag)
-		printf("AF %s (%u)",tok2str(bsd_af_values,"Unknown",family),family);
-
 	switch (family) {
 
 	case BSD_AF_INET:
-	        ip_print(gndo, p, length);
+		ip_print(gndo, p, length);
 		break;
 
 #ifdef INET6
@@ -157,6 +171,8 @@ null_if_print(const struct pcap_pkthdr *h, const u_char *p)
 
 	default:
 		/* unknown AF_ value */
+		if (!eflag)
+			null_hdr_print(family, length + NULL_HDRLEN);
 		if (!xflag && !qflag)
 			default_print(p, caplen);
 	}
