@@ -171,6 +171,7 @@ print-null.c
 print-ospf.c
 print-ospf6.c
 print-pflog.c
+print-pgm.c
 print-pim.c
 print-ppp.c
 print-pppoe.c
