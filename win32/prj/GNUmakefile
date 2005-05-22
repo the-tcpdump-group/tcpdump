@@ -94,6 +94,7 @@ OBJS = \
 	../../print-ospf6.o \
 	../../print-pflog.o \
 	../../print-pim.o \
+	../../print-pgm.o \
 	../../print-ppp.o \
 	../../print-pppoe.o \
 	../../print-pptp.o \
