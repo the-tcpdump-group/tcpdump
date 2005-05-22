@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.8.2.8 2005-05-17 09:38:49 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.8.2.9 2005-05-22 21:25:41 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -28,6 +28,7 @@ static const char rcsid[] _U_ =
 #include <stdio.h>
 
 #include "interface.h"
+#include "addrtoname.h"
 #include "extract.h"
 #include "ppp.h"
 #include "llc.h"
@@ -42,10 +43,25 @@ static const char rcsid[] _U_ =
 
 #define JUNIPER_LSQ_L3_PROTO_SHIFT     4
 #define JUNIPER_LSQ_L3_PROTO_MASK     (0x17 << JUNIPER_LSQ_L3_PROTO_SHIFT)
-#define JUNIPER_LSQ_L3_PROTO_IPV4     (0 << JUNIPER_LSQ_L3_PROTO_SHIFT)   /* must be 0! */
+#define JUNIPER_LSQ_L3_PROTO_IPV4     (0 << JUNIPER_LSQ_L3_PROTO_SHIFT)
 #define JUNIPER_LSQ_L3_PROTO_IPV6     (1 << JUNIPER_LSQ_L3_PROTO_SHIFT)
 #define JUNIPER_LSQ_L3_PROTO_MPLS     (2 << JUNIPER_LSQ_L3_PROTO_SHIFT)
 #define JUNIPER_LSQ_L3_PROTO_ISO      (3 << JUNIPER_LSQ_L3_PROTO_SHIFT)
+
+#define JUNIPER_IPSEC_O_ESP_ENCRYPT_ESP_AUTHEN_TYPE 1
+#define JUNIPER_IPSEC_O_ESP_ENCRYPT_AH_AUTHEN_TYPE 2
+#define JUNIPER_IPSEC_O_ESP_AUTHENTICATION_TYPE 3
+#define JUNIPER_IPSEC_O_AH_AUTHENTICATION_TYPE 4
+#define JUNIPER_IPSEC_O_ESP_ENCRYPTION_TYPE 5
+
+static struct tok juniper_ipsec_type_values[] = {
+    { JUNIPER_IPSEC_O_ESP_ENCRYPT_ESP_AUTHEN_TYPE, "ESP ENCR-AUTH" },
+    { JUNIPER_IPSEC_O_ESP_ENCRYPT_AH_AUTHEN_TYPE, "ESP ENCR-AH AUTH" },
+    { JUNIPER_IPSEC_O_ESP_AUTHENTICATION_TYPE, "ESP AUTH" },
+    { JUNIPER_IPSEC_O_AH_AUTHENTICATION_TYPE, "AH AUTH" },
+    { JUNIPER_IPSEC_O_ESP_ENCRYPTION_TYPE, "ESP ENCR" },
+    { 0, NULL}
+};
 
 static struct tok juniper_direction_values[] = {
     { JUNIPER_BPF_IN,  "In"},
@@ -67,6 +83,10 @@ static struct juniper_cookie_table_t juniper_cookie_table[] = {
     { DLT_JUNIPER_MFR,   4, "MFR"},
     { DLT_JUNIPER_PPPOE, 0, "PPPoE"},
     { DLT_JUNIPER_PPPOE_ATM, 0, "PPPoE ATM"},
+    { DLT_JUNIPER_GGSN, 8, "GGSN"},
+    { DLT_JUNIPER_MONITOR, 8, "MONITOR"},
+    { DLT_JUNIPER_SERVICES, 8, "AS"},
+    { DLT_JUNIPER_ES, 0, "ES"},
 };
 
 struct juniper_l2info_t {
@@ -93,9 +113,195 @@ struct juniper_l2info_t {
 #define ATM2_PKT_TYPE_MASK  0x70
 #define ATM2_GAP_COUNT_MASK 0x3F
 
+#define JUNIPER_PROTO_NULL          1
+#define JUNIPER_PROTO_IPV4          2
+#define JUNIPER_PROTO_IPV6          6
+
+static struct tok juniper_protocol_values[] = {
+    { JUNIPER_PROTO_NULL, "Null" },
+    { JUNIPER_PROTO_IPV4, "IPv4" },
+    { JUNIPER_PROTO_IPV6, "IPv6" },
+    { 0, NULL}
+};
+
 int ip_heuristic_guess(register const u_char *, u_int);
 int juniper_ppp_heuristic_guess(register const u_char *, u_int);
 static int juniper_parse_header (const u_char *, const struct pcap_pkthdr *, struct juniper_l2info_t *);
+
+u_int
+juniper_ggsn_print(const struct pcap_pkthdr *h, register const u_char *p)
+{
+        struct juniper_l2info_t l2info;
+        struct juniper_ggsn_header {
+            u_int8_t svc_id;
+            u_int8_t flags_len;
+            u_int8_t proto;
+            u_int8_t flags;
+            u_int8_t vlan_id[2];
+            u_int8_t res[2];
+        };
+        const struct juniper_ggsn_header *gh;
+
+        l2info.pictype = DLT_JUNIPER_GGSN;
+        if(juniper_parse_header(p, h, &l2info) == 0)
+            return l2info.header_len;
+
+        p+=l2info.header_len;
+        gh = (struct juniper_ggsn_header *)p;
+
+        if (eflag)
+            printf("proto %s (%u), vlan %u: ",
+                   tok2str(juniper_protocol_values,"Unknown",gh->proto),
+                   gh->proto,
+                   EXTRACT_16BITS(&gh->vlan_id[0]));
+
+        switch (gh->proto) {
+        case JUNIPER_PROTO_IPV4:
+            ip_print(gndo, p, l2info.length);
+            break;
+#ifdef INET6
+        case JUNIPER_PROTO_IPV6:
+            ip6_print(p, l2info.length);
+            break;
+#endif /* INET6 */
+        default:
+            if (!eflag)
+                printf("unknown GGSN proto (%u)", gh->proto);
+        }
+
+        return l2info.header_len;
+}
+
+u_int
+juniper_es_print(const struct pcap_pkthdr *h, register const u_char *p)
+{
+        struct juniper_l2info_t l2info;
+        struct juniper_ipsec_header {
+            u_int8_t sa_index[2];
+            u_int8_t ttl;
+            u_int8_t type;
+            u_int8_t spi[4];
+            u_int8_t src_ip[4];
+            u_int8_t dst_ip[4];
+        };
+        u_int rewrite_len,es_type_bundle;
+        const struct juniper_ipsec_header *ih;
+
+        l2info.pictype = DLT_JUNIPER_ES;
+        if(juniper_parse_header(p, h, &l2info) == 0)
+            return l2info.header_len;
+
+        p+=l2info.header_len;
+        ih = (struct juniper_ipsec_header *)p;
+
+        switch (ih->type) {
+        case JUNIPER_IPSEC_O_ESP_ENCRYPT_ESP_AUTHEN_TYPE:
+        case JUNIPER_IPSEC_O_ESP_ENCRYPT_AH_AUTHEN_TYPE:
+            rewrite_len = 0;
+            es_type_bundle = 1;
+            break;
+        case JUNIPER_IPSEC_O_ESP_AUTHENTICATION_TYPE:
+        case JUNIPER_IPSEC_O_AH_AUTHENTICATION_TYPE:
+        case JUNIPER_IPSEC_O_ESP_ENCRYPTION_TYPE:
+            rewrite_len = 16;
+            es_type_bundle = 0;
+        default:
+            printf("ES Invalid type %u, length %u",
+                   ih->type,
+                   l2info.length);
+            return l2info.header_len;
+        }
+
+        l2info.length-=rewrite_len;
+        p+=rewrite_len;
+
+        if (eflag) {
+            if (!es_type_bundle) {
+                printf("ES SA, index %u, ttl %u type %s (%u), spi %u, Tunnel %s > %s, length %u\n", 
+                       EXTRACT_16BITS(&ih->sa_index),
+                       ih->ttl, 
+                       tok2str(juniper_ipsec_type_values,"Unknown",ih->type),
+                       ih->type,
+                       EXTRACT_32BITS(&ih->spi),
+                       ipaddr_string(EXTRACT_32BITS(&ih->src_ip)),
+                       ipaddr_string(EXTRACT_32BITS(&ih->dst_ip)),
+                       l2info.length);
+            } else {
+                printf("ES SA, index %u, ttl %u type %s (%u), length %u\n", 
+                       EXTRACT_16BITS(&ih->sa_index),
+                       ih->ttl, 
+                       tok2str(juniper_ipsec_type_values,"Unknown",ih->type),
+                       ih->type,
+                       l2info.length);
+            }
+        }
+
+        ip_print(gndo, p, l2info.length);
+        return l2info.header_len;
+}
+
+u_int
+juniper_monitor_print(const struct pcap_pkthdr *h, register const u_char *p)
+{
+        struct juniper_l2info_t l2info;
+        struct juniper_monitor_header {
+            u_int8_t pkt_type;
+            u_int8_t padding;
+            u_int8_t iif[2];
+            u_int8_t service_id[4];
+        };
+        const struct juniper_monitor_header *mh;
+
+        l2info.pictype = DLT_JUNIPER_MONITOR;
+        if(juniper_parse_header(p, h, &l2info) == 0)
+            return l2info.header_len;
+
+        p+=l2info.header_len;
+        mh = (struct juniper_monitor_header *)p;
+
+        if (eflag)
+            printf("service-id %u, iif %u, pkt-type %u: ",
+                   EXTRACT_32BITS(&mh->service_id),
+                   EXTRACT_16BITS(&mh->iif),
+                   mh->pkt_type);
+
+        /* no proto field - lets guess by first byte of IP header*/
+        ip_heuristic_guess(p, l2info.length);
+
+        return l2info.header_len;
+}
+
+u_int
+juniper_services_print(const struct pcap_pkthdr *h, register const u_char *p)
+{
+        struct juniper_l2info_t l2info;
+        struct juniper_services_header {
+            u_int8_t svc_id;
+            u_int8_t flags_len;
+            u_int8_t svc_set_id[2];
+            u_int8_t dir_iif[4];
+        };
+        const struct juniper_services_header *sh;
+
+        l2info.pictype = DLT_JUNIPER_SERVICES;
+        if(juniper_parse_header(p, h, &l2info) == 0)
+            return l2info.header_len;
+
+        p+=l2info.header_len;
+        sh = (struct juniper_services_header *)p;
+
+        if (eflag)
+            printf("service-id %u flags 0x%02x service-set-id 0x%04x iif %u: ",
+                   sh->svc_id,
+                   sh->flags_len,
+                   EXTRACT_16BITS(&sh->svc_set_id),
+                   EXTRACT_24BITS(&sh->dir_iif[1]));
+
+        /* no proto field - lets guess by first byte of IP header*/
+        ip_heuristic_guess(p, l2info.length);
+
+        return l2info.header_len;
+}
 
 u_int
 juniper_pppoe_print(const struct pcap_pkthdr *h, register const u_char *p)
@@ -441,6 +647,7 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
     l2info->caplen = h->caplen;
     l2info->direction = p[3]&JUNIPER_BPF_PKT_IN;
     
+    TCHECK2(p[0],4);
     if (EXTRACT_24BITS(p) != JUNIPER_MGC_NUMBER) /* magic number found ? */
         return 0;
     else
@@ -457,6 +664,7 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
          * perform the v4/v6 heuristics
          * to figure out what it is
          */
+        TCHECK2(p[8],1);
         if(ip_heuristic_guess(p+8,l2info->length-8) == 0)
             printf("no IP-hdr found!");
 
@@ -499,6 +707,7 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
                        l2info->cookie_len);
 
             if (l2info->cookie_len > 0) {
+                TCHECK2(p[0],l2info->cookie_len);
                 if (eflag)
                     printf(", cookie 0x");
                 for (idx = 0; idx < l2info->cookie_len; idx++) {
@@ -552,6 +761,7 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
         l2info->caplen -= 2;
         break;
     case DLT_JUNIPER_ATM2:
+        TCHECK2(p[0],4);
         /* ATM cell relay control word present ? */
         if (l2info->cookie[7] & ATM2_PKT_TYPE_MASK && *p & 0x08) {
             l2info->header_len += 4;
@@ -568,6 +778,9 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
         printf("hlen %u, proto 0x%04x, ",l2info->header_len,l2info->proto);
 
     return 1; /* everything went ok so far. continue parsing */
+ trunc:
+    printf("[|juniper_hdr], length %u",h->len);
+    return 0;
 }
 
 
