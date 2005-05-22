@@ -409,6 +409,10 @@ SOURCE="..\..\print-pflog.c"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\print-pgm.c"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\print-pim.c"
 # End Source File
 # Begin Source File
