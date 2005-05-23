@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pgm.c,v 1.1.2.1 2005-05-20 21:15:47 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pgm.c,v 1.1.2.2 2005-05-23 21:39:16 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -158,6 +158,8 @@ pgm_print(register const u_char *bp, register u_int length,
 #ifdef INET6
 	register const struct ip6_hdr *ip6;
 #endif
+	u_int8_t opt_type, opt_len, flags1, flags2;
+	u_int32_t seq, opts_len, len, offset;
 
 	pgm = (struct pgm_header *)bp;
 	ip = (struct ip *)bp2;
@@ -436,21 +438,67 @@ pgm_print(register const u_char *bp, register u_int length,
 		(void)printf("[|OPT]");
 		return;
 	    } 
-	    while (TTEST2(*bp, PGM_MIN_OPT_LEN)) {
-		u_int8_t opt_type, opt_len, flags1, flags2;
-		u_int32_t seq, len, offset;
 
+	    /*
+	     * That option header MUST be an OPT_LENGTH option
+	     * (see the first paragraph of section 9.1 in RFC 3208).
+	     */
+	    opt_type = *bp++;
+	    if ((opt_type & PGM_OPT_MASK) != PGM_OPT_LENGTH) {
+		(void)printf("[First option bad, should be PGM_OPT_LENGTH, is %u]", opt_type);
+		return;
+	    }
+	    opt_len = *bp++;
+	    if (opt_len != 4) {
+		(void)printf("[Bad OPT_LENGTH option, length %u != 4]", opt_len);
+		return;
+	    }
+	    opts_len = EXTRACT_16BITS(bp);
+	    if (opts_len < 4) {
+		(void)printf("[Bad total option length %u < 4]", opts_len);
+		return;
+	    }
+	    bp += sizeof(u_int16_t);
+	    (void)printf(" OPTS LEN %d", opts_len);
+	    opts_len -= 4;
+
+	    while (opts_len) {
+		if (opts_len < PGM_MIN_OPT_LEN) {
+		    (void)printf("[Total option length leaves no room for final option]");
+		    return;
+		}
 		opt_type = *bp++;
 		opt_len = *bp++;
+		if (opt_len < PGM_MIN_OPT_LEN) {
+		    (void)printf("[Bad option, length %u < %u]", opt_len,
+		        PGM_MIN_OPT_LEN);
+		    break;
+		}
+		if (opts_len < opt_len) {
+		    (void)printf("[Total option length leaves no room for final option]");
+		    return;
+		}
+		if (!TTEST2(*bp, opt_len - 2)) {
+		    (void)printf(" [|OPT]");
+		    return;
+		} 
 
 		switch (opt_type & PGM_OPT_MASK) {
 		case PGM_OPT_LENGTH:
-		    len = EXTRACT_16BITS(bp);
+		    if (opt_len != 4) {
+			(void)printf("[Bad OPT_LENGTH option, length %u != 4]", opt_len);
+			return;
+		    }
+		    (void)printf(" OPTS LEN (extra?) %d", EXTRACT_16BITS(bp));
 		    bp += sizeof(u_int16_t);
-		    (void)printf(" OPT[%d] %d", opt_len, len);
+		    opts_len -= 4;
 		    break;
 
 		case PGM_OPT_FRAGMENT:
+		    if (opt_len != 12) {
+			(void)printf("[Bad OPT_FRAGMENT option, length %u != 12]", opt_len);
+			return;
+		    }
 		    flags1 = *bp++;
 		    flags2 = *bp++;
 		    seq = EXTRACT_32BITS(*(u_int32_t *)bp);
@@ -460,6 +508,7 @@ pgm_print(register const u_char *bp, register u_int length,
 		    len = EXTRACT_32BITS(*(u_int32_t *)bp);
 		    bp += sizeof(u_int32_t);
 		    (void)printf(" FRAG seq %u off %u len %u", seq, offset, len);
+		    opts_len -= 12;
 		    break;
 
 		case PGM_OPT_NAK_LIST:
@@ -468,22 +517,36 @@ pgm_print(register const u_char *bp, register u_int length,
 		    opt_len -= sizeof(u_int32_t);	/* option header */
 		    (void)printf(" NAK LIST");
 		    while (opt_len) {
+			if (opt_len < sizeof(u_int32_t)) {
+			    (void)printf("[Option length not a multiple of 4]");
+			    return;
+			}
 			TCHECK2(*bp, sizeof(u_int32_t));
 			(void)printf(" %u", EXTRACT_32BITS(*(u_int32_t *)bp));
 			bp += sizeof(u_int32_t);
 			opt_len -= sizeof(u_int32_t);
+			opts_len -= sizeof(u_int32_t);
 		    }
 		    break;
 
 		case PGM_OPT_JOIN:
+		    if (opt_len != 8) {
+			(void)printf("[Bad OPT_JOIN option, length %u != 8]", opt_len);
+			return;
+		    }
 		    flags1 = *bp++;
 		    flags2 = *bp++;
 		    seq = EXTRACT_32BITS(*(u_int32_t *)bp);
 		    bp += sizeof(u_int32_t);
 		    (void)printf(" JOIN %u", seq);
+		    opts_len -= 8;
 		    break;
 
 		case PGM_OPT_NAK_BO_IVL:
+		    if (opt_len != 12) {
+			(void)printf("[Bad OPT_FRAGMENT option, length %u != 12]", opt_len);
+			return;
+		    }
 		    flags1 = *bp++;
 		    flags2 = *bp++;
 		    offset = EXTRACT_32BITS(*(u_int32_t *)bp);
@@ -491,9 +554,14 @@ pgm_print(register const u_char *bp, register u_int length,
 		    seq = EXTRACT_32BITS(*(u_int32_t *)bp);
 		    bp += sizeof(u_int32_t);
 		    (void)printf(" BACKOFF ivl %u ivlseq %u", offset, seq);
+		    opts_len -= 12;
 		    break;
 
 		case PGM_OPT_NAK_BO_RNG:
+		    if (opt_len != 12) {
+			(void)printf("[Bad OPT_FRAGMENT option, length %u != 12]", opt_len);
+			return;
+		    }
 		    flags1 = *bp++;
 		    flags2 = *bp++;
 		    offset = EXTRACT_32BITS(*(u_int32_t *)bp);
@@ -501,6 +569,7 @@ pgm_print(register const u_char *bp, register u_int length,
 		    seq = EXTRACT_32BITS(*(u_int32_t *)bp);
 		    bp += sizeof(u_int32_t);
 		    (void)printf(" BACKOFF max %u min %u", offset, seq);
+		    opts_len -= 12;
 		    break;
 
 		case PGM_OPT_REDIRECT:
@@ -520,85 +589,129 @@ pgm_print(register const u_char *bp, register u_int length,
 			break;
 		    }
 		    bp += (2 * sizeof(u_int16_t));
+		    if (opt_len != 4 + addr_size) {
+			(void)printf("[Bad OPT_REDIRECT option, length %u != 4 + address size]", opt_len);
+			return;
+		    }
 		    TCHECK2(*bp, addr_size);
 		    nla = bp;
 		    bp += addr_size;
 
 		    inet_ntop(nla_af, nla, nla_buf, sizeof(nla_buf));
 		    (void)printf(" REDIRECT %s",  (char *)nla);
+		    opts_len -= 4 + addr_size;
 		    break;
 
 		case PGM_OPT_PARITY_PRM:
+		    if (opt_len != 8) {
+			(void)printf("[Bad OPT_PARITY_PRM option, length %u != 8]", opt_len);
+			return;
+		    }
 		    flags1 = *bp++;
 		    flags2 = *bp++;
 		    len = EXTRACT_32BITS(*(u_int32_t *)bp);
 		    bp += sizeof(u_int32_t);
 		    (void)printf(" PARITY MAXTGS %u", len);
+		    opts_len -= 8;
 		    break;
 
 		case PGM_OPT_PARITY_GRP:
+		    if (opt_len != 8) {
+			(void)printf("[Bad OPT_PARITY_GRP option, length %u != 8]", opt_len);
+			return;
+		    }
 		    flags1 = *bp++;
 		    flags2 = *bp++;
 		    seq = EXTRACT_32BITS(*(u_int32_t *)bp);
 		    bp += sizeof(u_int32_t);
 		    (void)printf(" PARITY GROUP %u", seq);
+		    opts_len -= 8;
 		    break;
 
 		case PGM_OPT_CURR_TGSIZE:
+		    if (opt_len != 8) {
+			(void)printf("[Bad OPT_PARITY_GRP option, length %u != 8]", opt_len);
+			return;
+		    }
 		    flags1 = *bp++;
 		    flags2 = *bp++;
 		    len = EXTRACT_32BITS(*(u_int32_t *)bp);
 		    bp += sizeof(u_int32_t);
 		    (void)printf(" PARITY ATGS %u", len);
+		    opts_len -= 8;
 		    break;
 
 		case PGM_OPT_NBR_UNREACH:
+		    if (opt_len != 4) {
+			(void)printf("[Bad OPT_NBR_UNREACH option, length %u != 4]", opt_len);
+			return;
+		    }
 		    flags1 = *bp++;
 		    flags2 = *bp++;
 		    (void)printf(" NBR_UNREACH");
+		    opts_len -= 4;
 		    break;
 
 		case PGM_OPT_PATH_NLA:
 		    (void)printf(" PATH_NLA [%d]", opt_len);
 		    bp += opt_len;
+		    opts_len -= opt_len;
 		    break;
 
 		case PGM_OPT_SYN:
+		    if (opt_len != 4) {
+			(void)printf("[Bad OPT_SYN option, length %u != 4]", opt_len);
+			return;
+		    }
 		    flags1 = *bp++;
 		    flags2 = *bp++;
 		    (void)printf(" SYN");
+		    opts_len -= 4;
 		    break;
 
 		case PGM_OPT_FIN:
+		    if (opt_len != 4) {
+			(void)printf("[Bad OPT_RST option, length %u != 4]", opt_len);
+			return;
+		    }
 		    flags1 = *bp++;
 		    flags2 = *bp++;
 		    (void)printf(" FIN");
+		    opts_len -= 4;
 		    break;
 
 		case PGM_OPT_RST:
+		    if (opt_len != 4) {
+			(void)printf("[Bad OPT_RST option, length %u != 4]", opt_len);
+			return;
+		    }
 		    flags1 = *bp++;
 		    flags2 = *bp++;
 		    (void)printf(" RST");
+		    opts_len -= 4;
 		    break;
 
 		case PGM_OPT_CR:
 		    (void)printf(" CR");
 		    bp += opt_len;
+		    opts_len -= opt_len;
 		    break;
 
 		case PGM_OPT_CRQST:
+		    if (opt_len != 4) {
+			(void)printf("[Bad OPT_CRQST option, length %u != 4]", opt_len);
+			return;
+		    }
 		    flags1 = *bp++;
 		    flags2 = *bp++;
 		    (void)printf(" CRQST");
+		    opts_len -= 4;
 		    break;
 
 		default:
-		    if (!TTEST2(*bp, opt_len)) {
-			(void)printf(" [|OPT]");
-			return;
-		    } 
 		    (void)printf(" OPT_%02X [%d] ", opt_type, opt_len);
 		    bp += opt_len;
+		    opts_len -= opt_len;
 		    break;
 		}
 
