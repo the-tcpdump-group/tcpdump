@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pgm.c,v 1.1.2.2 2005-05-23 21:39:16 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pgm.c,v 1.1.2.3 2005-05-24 07:57:27 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -276,6 +276,7 @@ pgm_print(register const u_char *bp, register u_int length,
 	    (void)printf("POLL seq %u round %u",
 			 EXTRACT_32BITS(&poll->pgmp_seq),
                          EXTRACT_16BITS(&poll->pgmp_round));
+	    bp = (u_char *) (poll + 1);
 	    break;
 	}
 	case PGM_POLR: {
@@ -306,19 +307,19 @@ pgm_print(register const u_char *bp, register u_int length,
 	    inet_ntop(nla_af, nla, nla_buf, sizeof(nla_buf));
 
 	    TCHECK2(*bp, sizeof(u_int32_t));
-	    ivl = EXTRACT_32BITS(*(u_int32_t *)bp);
+	    ivl = EXTRACT_32BITS(bp);
 	    bp += sizeof(u_int32_t);
 
 	    TCHECK2(*bp, sizeof(u_int32_t));
-	    rnd = EXTRACT_32BITS(*(u_int32_t *)bp);
+	    rnd = EXTRACT_32BITS(bp);
 	    bp += sizeof(u_int32_t);
 
 	    TCHECK2(*bp, sizeof(u_int32_t));
-	    mask = EXTRACT_32BITS(*(u_int32_t *)bp);
+	    mask = EXTRACT_32BITS(bp);
 	    bp += sizeof(u_int32_t);
 
 	    (void)printf("POLR seq %u round %u nla %s ivl %u rnd 0x%08x "
-			 "mask 0x%08x", EXTRACT_32BITS(polr->pgmp_seq),
+			 "mask 0x%08x", EXTRACT_32BITS(&polr->pgmp_seq),
 			 EXTRACT_16BITS(&polr->pgmp_round), nla_buf, ivl, rnd, mask);
 	    break;
 	}
@@ -328,7 +329,9 @@ pgm_print(register const u_char *bp, register u_int length,
 	    odata = (struct pgm_data *)(pgm + 1);
 	    TCHECK(*odata);
 	    (void)printf("ODATA trail %u seq %u",
-			 EXTRACT_32BITS(odata->pgmd_trailseq), EXTRACT_32BITS(odata->pgmd_seq));
+			 EXTRACT_32BITS(&odata->pgmd_trailseq),
+			 EXTRACT_32BITS(&odata->pgmd_seq));
+	    bp = (u_char *) (odata + 1);
 	    break;
 	}
 
@@ -338,7 +341,9 @@ pgm_print(register const u_char *bp, register u_int length,
 	    rdata = (struct pgm_data *)(pgm + 1);
 	    TCHECK(*rdata);
 	    (void)printf("RDATA trail %u seq %u",
-			 EXTRACT_32BITS(rdata->pgmd_trailseq), EXTRACT_32BITS(rdata->pgmd_seq));
+			 EXTRACT_32BITS(&rdata->pgmd_trailseq),
+			 EXTRACT_32BITS(&rdata->pgmd_seq));
+	    bp = (u_char *) (rdata + 1);
 	    break;
 	}
 
@@ -416,7 +421,7 @@ pgm_print(register const u_char *bp, register u_int length,
                     break;
 	    }
 	    (void)printf("(%s -> %s), seq %u",
-			 source_buf, group_buf, EXTRACT_32BITS(nak->pgmn_seq));
+			 source_buf, group_buf, EXTRACT_32BITS(&nak->pgmn_seq));
 	    break;
 	}
 
@@ -445,7 +450,7 @@ pgm_print(register const u_char *bp, register u_int length,
 	     */
 	    opt_type = *bp++;
 	    if ((opt_type & PGM_OPT_MASK) != PGM_OPT_LENGTH) {
-		(void)printf("[First option bad, should be PGM_OPT_LENGTH, is %u]", opt_type);
+		(void)printf("[First option bad, should be PGM_OPT_LENGTH, is %u]", opt_type & PGM_OPT_MASK);
 		return;
 	    }
 	    opt_len = *bp++;
@@ -495,20 +500,20 @@ pgm_print(register const u_char *bp, register u_int length,
 		    break;
 
 		case PGM_OPT_FRAGMENT:
-		    if (opt_len != 12) {
-			(void)printf("[Bad OPT_FRAGMENT option, length %u != 12]", opt_len);
+		    if (opt_len != 16) {
+			(void)printf("[Bad OPT_FRAGMENT option, length %u != 16]", opt_len);
 			return;
 		    }
 		    flags1 = *bp++;
 		    flags2 = *bp++;
-		    seq = EXTRACT_32BITS(*(u_int32_t *)bp);
+		    seq = EXTRACT_32BITS(bp);
 		    bp += sizeof(u_int32_t);
-		    offset = EXTRACT_32BITS(*(u_int32_t *)bp);
+		    offset = EXTRACT_32BITS(bp);
 		    bp += sizeof(u_int32_t);
-		    len = EXTRACT_32BITS(*(u_int32_t *)bp);
+		    len = EXTRACT_32BITS(bp);
 		    bp += sizeof(u_int32_t);
 		    (void)printf(" FRAG seq %u off %u len %u", seq, offset, len);
-		    opts_len -= 12;
+		    opts_len -= 16;
 		    break;
 
 		case PGM_OPT_NAK_LIST:
@@ -522,7 +527,7 @@ pgm_print(register const u_char *bp, register u_int length,
 			    return;
 			}
 			TCHECK2(*bp, sizeof(u_int32_t));
-			(void)printf(" %u", EXTRACT_32BITS(*(u_int32_t *)bp));
+			(void)printf(" %u", EXTRACT_32BITS(bp));
 			bp += sizeof(u_int32_t);
 			opt_len -= sizeof(u_int32_t);
 			opts_len -= sizeof(u_int32_t);
@@ -536,7 +541,7 @@ pgm_print(register const u_char *bp, register u_int length,
 		    }
 		    flags1 = *bp++;
 		    flags2 = *bp++;
-		    seq = EXTRACT_32BITS(*(u_int32_t *)bp);
+		    seq = EXTRACT_32BITS(bp);
 		    bp += sizeof(u_int32_t);
 		    (void)printf(" JOIN %u", seq);
 		    opts_len -= 8;
@@ -544,14 +549,14 @@ pgm_print(register const u_char *bp, register u_int length,
 
 		case PGM_OPT_NAK_BO_IVL:
 		    if (opt_len != 12) {
-			(void)printf("[Bad OPT_FRAGMENT option, length %u != 12]", opt_len);
+			(void)printf("[Bad OPT_NAK_BO_IVL option, length %u != 12]", opt_len);
 			return;
 		    }
 		    flags1 = *bp++;
 		    flags2 = *bp++;
-		    offset = EXTRACT_32BITS(*(u_int32_t *)bp);
+		    offset = EXTRACT_32BITS(bp);
 		    bp += sizeof(u_int32_t);
-		    seq = EXTRACT_32BITS(*(u_int32_t *)bp);
+		    seq = EXTRACT_32BITS(bp);
 		    bp += sizeof(u_int32_t);
 		    (void)printf(" BACKOFF ivl %u ivlseq %u", offset, seq);
 		    opts_len -= 12;
@@ -559,14 +564,14 @@ pgm_print(register const u_char *bp, register u_int length,
 
 		case PGM_OPT_NAK_BO_RNG:
 		    if (opt_len != 12) {
-			(void)printf("[Bad OPT_FRAGMENT option, length %u != 12]", opt_len);
+			(void)printf("[Bad OPT_NAK_BO_RNG option, length %u != 12]", opt_len);
 			return;
 		    }
 		    flags1 = *bp++;
 		    flags2 = *bp++;
-		    offset = EXTRACT_32BITS(*(u_int32_t *)bp);
+		    offset = EXTRACT_32BITS(bp);
 		    bp += sizeof(u_int32_t);
-		    seq = EXTRACT_32BITS(*(u_int32_t *)bp);
+		    seq = EXTRACT_32BITS(bp);
 		    bp += sizeof(u_int32_t);
 		    (void)printf(" BACKOFF max %u min %u", offset, seq);
 		    opts_len -= 12;
@@ -609,7 +614,7 @@ pgm_print(register const u_char *bp, register u_int length,
 		    }
 		    flags1 = *bp++;
 		    flags2 = *bp++;
-		    len = EXTRACT_32BITS(*(u_int32_t *)bp);
+		    len = EXTRACT_32BITS(bp);
 		    bp += sizeof(u_int32_t);
 		    (void)printf(" PARITY MAXTGS %u", len);
 		    opts_len -= 8;
@@ -622,7 +627,7 @@ pgm_print(register const u_char *bp, register u_int length,
 		    }
 		    flags1 = *bp++;
 		    flags2 = *bp++;
-		    seq = EXTRACT_32BITS(*(u_int32_t *)bp);
+		    seq = EXTRACT_32BITS(bp);
 		    bp += sizeof(u_int32_t);
 		    (void)printf(" PARITY GROUP %u", seq);
 		    opts_len -= 8;
@@ -630,12 +635,12 @@ pgm_print(register const u_char *bp, register u_int length,
 
 		case PGM_OPT_CURR_TGSIZE:
 		    if (opt_len != 8) {
-			(void)printf("[Bad OPT_PARITY_GRP option, length %u != 8]", opt_len);
+			(void)printf("[Bad OPT_CURR_TGSIZE option, length %u != 8]", opt_len);
 			return;
 		    }
 		    flags1 = *bp++;
 		    flags2 = *bp++;
-		    len = EXTRACT_32BITS(*(u_int32_t *)bp);
+		    len = EXTRACT_32BITS(bp);
 		    bp += sizeof(u_int32_t);
 		    (void)printf(" PARITY ATGS %u", len);
 		    opts_len -= 8;
@@ -671,7 +676,7 @@ pgm_print(register const u_char *bp, register u_int length,
 
 		case PGM_OPT_FIN:
 		    if (opt_len != 4) {
-			(void)printf("[Bad OPT_RST option, length %u != 4]", opt_len);
+			(void)printf("[Bad OPT_FIN option, length %u != 4]", opt_len);
 			return;
 		    }
 		    flags1 = *bp++;
