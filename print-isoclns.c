@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.133.2.5 2005-04-26 07:14:25 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.133.2.6 2005-05-25 07:24:32 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -201,12 +201,20 @@ static struct tok esis_option_values[] = {
 
 #define CLNP_OPTION_DISCARD_REASON   193
 #define CLNP_OPTION_QOS_MAINTENANCE  195 /* iso8473 */
+#define CLNP_OPTION_SECURITY         197 /* iso8473 */
+#define CLNP_OPTION_SOURCE_ROUTING   200 /* iso8473 */
+#define CLNP_OPTION_ROUTE_RECORDING  203 /* iso8473 */
+#define CLNP_OPTION_PADDING          204 /* iso8473 */
 #define CLNP_OPTION_PRIORITY         205 /* iso8473 */
 
 static struct tok clnp_option_values[] = {
     { CLNP_OPTION_DISCARD_REASON,  "Discard Reason"},
     { CLNP_OPTION_PRIORITY,        "Priority"},
     { CLNP_OPTION_QOS_MAINTENANCE, "QoS Maintenance"},
+    { CLNP_OPTION_SECURITY, "Security"},
+    { CLNP_OPTION_SOURCE_ROUTING, "Source Routing"},
+    { CLNP_OPTION_ROUTE_RECORDING, "Route Recording"},
+    { CLNP_OPTION_PADDING, "Padding"},
     { 0, NULL }
 };
 
@@ -286,6 +294,40 @@ static struct tok *clnp_option_rfd_error_class[] = {
     NULL
 };
 
+#define CLNP_OPTION_OPTION_QOS_MASK 0x3f
+#define CLNP_OPTION_SCOPE_MASK      0xc0
+#define CLNP_OPTION_SCOPE_SA_SPEC   0x40
+#define CLNP_OPTION_SCOPE_DA_SPEC   0x80
+#define CLNP_OPTION_SCOPE_GLOBAL    0xc0
+
+static struct tok clnp_option_scope_values[] = {
+    { CLNP_OPTION_SCOPE_SA_SPEC, "Source Address Specific"},
+    { CLNP_OPTION_SCOPE_DA_SPEC, "Destination Address Specific"},
+    { CLNP_OPTION_SCOPE_GLOBAL, "Globally unique"},
+    { 0, NULL }
+};
+
+static struct tok clnp_option_sr_rr_values[] = {
+    { 0x0, "partial"},
+    { 0x0, "complete"},
+    { 0, NULL }
+};
+
+static struct tok clnp_option_sr_rr_string_values[] = {
+    { CLNP_OPTION_SOURCE_ROUTING, "source routing"},
+    { CLNP_OPTION_ROUTE_RECORDING, "recording of route in progress"},
+    { 0, NULL }
+};
+
+static struct tok clnp_option_qos_global_values[] = {
+    { 0x20, "reserved"},
+    { 0x10, "sequencing vs. delay"},
+    { 0x08, "congested"},
+    { 0x04, "delay vs. cost"},
+    { 0x02, "error vs. delay"},
+    { 0x01, "error vs. cost"},
+    { 0, NULL }
+};
 
 #define ISIS_SUBTLV_EXT_IS_REACH_ADMIN_GROUP           3 /* draft-ietf-isis-traffic-05 */
 #define ISIS_SUBTLV_EXT_IS_REACH_LINK_LOCAL_REMOTE_ID  4 /* draft-ietf-isis-gmpls-extensions */
@@ -660,7 +702,7 @@ struct clnp_segment_header_t {
 static int clnp_print (const u_int8_t *pptr, u_int length)
 {
 	const u_int8_t *optr,*source_address,*dest_address;
-        u_int li,source_address_length,dest_address_length, clnp_pdu_type, clnp_flags;
+        u_int li,tlen,nsap_offset,source_address_length,dest_address_length, clnp_pdu_type, clnp_flags;
 	const struct clnp_header_t *clnp_header;
 	const struct clnp_segment_header_t *clnp_segment_header;
         u_int8_t rfd_error_major,rfd_error_minor;
@@ -765,6 +807,7 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
             }
             li -= opli;
             tptr = pptr;
+            tlen = opli;
             
             printf("\n\t  %s Option #%u, length %u, value: ",
                    tok2str(clnp_option_values,"Unknown",op),
@@ -773,9 +816,46 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
 
             switch (op) {
 
+
+            case CLNP_OPTION_ROUTE_RECORDING: /* those two options share the format */
+            case CLNP_OPTION_SOURCE_ROUTING:  
+                    printf("%s %s",
+                           tok2str(clnp_option_sr_rr_values,"Unknown",*tptr),
+                           tok2str(clnp_option_sr_rr_string_values,"Unknown Option %u",op));
+                    nsap_offset=*(tptr+1)-1; /* offset to nsap list */
+                    tptr+=nsap_offset;
+                    tlen-=nsap_offset;
+                    while (tlen > 2) {
+                            source_address_length=*tptr;
+                            source_address=(tptr+1);
+                            TCHECK2(*source_address, source_address_length);
+                            printf("\n\t    NSAP address (length %u): %s",
+                                   source_address_length,
+                                   isonsap_string(source_address, source_address_length));
+                            tlen-=source_address_length+1;
+                    }
+                    break;
+
             case CLNP_OPTION_PRIORITY:
-                printf("%u", *tptr);
-                break;
+                    printf("0x%1x", *tptr&0x0f);
+                    break;
+
+            case CLNP_OPTION_QOS_MAINTENANCE:
+                    printf("\n\t    Format Code: %s",
+                           tok2str(clnp_option_scope_values,"Reserved",*tptr&CLNP_OPTION_SCOPE_MASK));
+
+                    if ((*tptr&CLNP_OPTION_SCOPE_MASK) == CLNP_OPTION_SCOPE_GLOBAL)
+                            printf("\n\t    QoS Flags [%s]",
+                                   bittok2str(clnp_option_qos_global_values,
+                                              "none",
+                                              *tptr&CLNP_OPTION_OPTION_QOS_MASK));
+                    break;
+
+            case CLNP_OPTION_SECURITY:
+                    printf("\n\t    Format Code: %s, Security-Level %u",
+                           tok2str(clnp_option_scope_values,"Reserved",*tptr&CLNP_OPTION_SCOPE_MASK),
+                           *(tptr+1));
+                    break;
 
             case CLNP_OPTION_DISCARD_REASON:
                 rfd_error_major = (*tptr&0xf0) >> 4;
@@ -785,6 +865,10 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
                        rfd_error_major,
                        tok2str(clnp_option_rfd_error_class[rfd_error_major],"Unknown",rfd_error_minor),
                        rfd_error_minor);
+                break;
+
+            case CLNP_OPTION_PADDING:
+                    printf("padding data");
                 break;
 
                 /*
