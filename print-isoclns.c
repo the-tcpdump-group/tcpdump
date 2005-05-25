@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.133.2.6 2005-05-25 07:24:32 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.133.2.7 2005-05-25 22:00:00 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -825,13 +825,19 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
                     nsap_offset=*(tptr+1)-1; /* offset to nsap list */
                     tptr+=nsap_offset;
                     tlen-=nsap_offset;
-                    while (tlen > 2) {
+                    while (tlen > 0) {
                             source_address_length=*tptr;
-                            source_address=(tptr+1);
-                            TCHECK2(*source_address, source_address_length);
-                            printf("\n\t    NSAP address (length %u): %s",
-                                   source_address_length,
-                                   isonsap_string(source_address, source_address_length));
+                            if (tlen < source_address_length+1) {
+                                    printf("\n\t    NSAP address goes past end of option");
+                                    break;
+                    	    }
+                            if (source_address_length > 0) {
+                                    source_address=(tptr+1);
+                                    TCHECK2(*source_address, source_address_length);
+                                    printf("\n\t    NSAP address (length %u): %s",
+                                           source_address_length,
+                                           isonsap_string(source_address, source_address_length));
+                            }
                             tlen-=source_address_length+1;
                     }
                     break;
