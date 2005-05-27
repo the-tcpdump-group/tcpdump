@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.32.2.3 2005-04-26 07:27:16 guy Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.32.2.4 2005-05-27 14:56:52 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -149,10 +149,9 @@ static int parse_q922_addr(const u_char *p, u_int *dlci, u_int *sdlcore,
 */
 
 static u_int
-fr_hdrlen(const u_char *p, u_int addr_len, u_int caplen)
+fr_hdrlen(const u_char *p, u_int addr_len)
 {
-	if ((caplen > addr_len + 1 /* UI */ + 1 /* pad */) &&
-	    !p[addr_len + 1] /* pad exist */)
+	if (!p[addr_len + 1] /* pad exist */)
 		return addr_len + 1 /* UI */ + 1 /* pad */ + 1 /* NLPID */;
 	else 
 		return addr_len + 1 /* UI */ + 1 /* NLPID */;
@@ -190,6 +189,21 @@ fr_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
 	register u_int length = h->len;
 	register u_int caplen = h->caplen;
+
+        TCHECK2(*p, 4); /* minimum frame header length */
+
+        if ((length = fr_print(p, length)) == 0)
+            return (0);
+        else
+            return length;
+ trunc:
+        printf("[|fr]");
+        return caplen;
+}
+
+u_int
+fr_print(register const u_char *p, u_int length)
+{
 	u_int16_t extracted_ethertype;
 	u_int dlci;
         u_int sdlcore;
@@ -198,22 +212,14 @@ fr_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 	u_int hdr_len;
 	u_int8_t flags[4];
 
-	if (caplen < 4) {	/* minimum frame header length */
-		printf("[|fr]");
-		return caplen;
-	}
-
 	if (parse_q922_addr(p, &dlci, &sdlcore, &addr_len, flags)) {
 		printf("Q.922, invalid address");
-		return caplen;
+		return 0;
 	}
 
-	hdr_len = fr_hdrlen(p, addr_len, caplen);
-
-	if (caplen < hdr_len) {
-		printf("[|fr]");
-		return caplen;
-	}
+        TCHECK2(*p,addr_len+1+1);
+	hdr_len = fr_hdrlen(p, addr_len);
+        TCHECK2(*p,hdr_len);
 
 	if (p[addr_len] != 0x03 && dlci != 0) {
 
@@ -226,7 +232,7 @@ fr_if_print(const struct pcap_pkthdr *h, register const u_char *p)
                 if (ether_encap_print(extracted_ethertype,
                                       p+addr_len+ETHERTYPE_LEN,
                                       length-addr_len-ETHERTYPE_LEN,
-                                      caplen-addr_len-ETHERTYPE_LEN,
+                                      length-addr_len-ETHERTYPE_LEN,
                                       &extracted_ethertype) == 0)
                     /* ether_type not known, probably it wasn't one */
                     printf("UI %02x! ", p[addr_len]);
@@ -247,7 +253,6 @@ fr_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 
 	p += hdr_len;
 	length -= hdr_len;
-	caplen -= hdr_len;
 
 	switch (nlpid) {
 	case NLPID_IP:
@@ -262,17 +267,17 @@ fr_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 	case NLPID_CLNP:
 	case NLPID_ESIS:
 	case NLPID_ISIS:
-                isoclns_print(p-1, length+1, caplen+1); /* OSI printers need the NLPID field */
+                isoclns_print(p-1, length+1, length+1); /* OSI printers need the NLPID field */
 		break;
 
 	case NLPID_SNAP:
-		if (snap_print(p, length, caplen, &extracted_ethertype, 0) == 0) {
+		if (snap_print(p, length, length, &extracted_ethertype, 0) == 0) {
 			/* ether_type not known, print raw packet */
                         if (!eflag)
                             fr_hdr_print(length + hdr_len, hdr_len,
                                          dlci, flags, nlpid);
 			if (!xflag && !qflag)
-                            default_print(p - hdr_len, caplen + hdr_len);
+                            default_print(p - hdr_len, length + hdr_len);
 		}
 		break;
 
@@ -289,10 +294,15 @@ fr_if_print(const struct pcap_pkthdr *h, register const u_char *p)
                     fr_hdr_print(length + hdr_len, addr_len,
 				     dlci, flags, nlpid);
 		if (!xflag)
-			default_print(p, caplen);
+			default_print(p, length);
 	}
 
 	return hdr_len;
+
+ trunc:
+        printf("[|fr]");
+        return 0;
+
 }
 
 /* an NLPID of 0xb1 indicates a 2-byte
