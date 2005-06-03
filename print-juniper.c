@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.17 2005-05-22 21:18:17 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.18 2005-06-03 22:03:02 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -76,17 +76,40 @@ struct juniper_cookie_table_t {
 };
 
 static struct juniper_cookie_table_t juniper_cookie_table[] = {
+#ifdef DLT_JUNIPER_ATM1
     { DLT_JUNIPER_ATM1,  4, "ATM1"},
+#endif
+#ifdef DLT_JUNIPER_ATM2
     { DLT_JUNIPER_ATM2,  8, "ATM2"},
+#endif
+#ifdef DLT_JUNIPER_MLPPP
     { DLT_JUNIPER_MLPPP, 2, "MLPPP"},
+#endif
+#ifdef DLT_JUNIPER_MLFR
     { DLT_JUNIPER_MLFR,  2, "MLFR"},
+#endif
+#ifdef DLT_JUNIPER_MFR
     { DLT_JUNIPER_MFR,   4, "MFR"},
+#endif
+#ifdef DLT_JUNIPER_PPPOE
     { DLT_JUNIPER_PPPOE, 0, "PPPoE"},
+#endif
+#ifdef DLT_JUNIPER_PPPOE_ATM
     { DLT_JUNIPER_PPPOE_ATM, 0, "PPPoE ATM"},
+#endif
+#ifdef DLT_JUNIPER_GGSN
     { DLT_JUNIPER_GGSN, 8, "GGSN"},
+#endif
+#ifdef DLT_JUNIPER_MONITOR
     { DLT_JUNIPER_MONITOR, 8, "MONITOR"},
+#endif
+#ifdef DLT_JUNIPER_SERVICES
     { DLT_JUNIPER_SERVICES, 8, "AS"},
+#endif
+#ifdef DLT_JUNIPER_ES
     { DLT_JUNIPER_ES, 0, "ES"},
+#endif
+    { 0, 0, NULL }
 };
 
 struct juniper_l2info_t {
@@ -128,6 +151,7 @@ int ip_heuristic_guess(register const u_char *, u_int);
 int juniper_ppp_heuristic_guess(register const u_char *, u_int);
 static int juniper_parse_header (const u_char *, const struct pcap_pkthdr *, struct juniper_l2info_t *);
 
+#ifdef DLT_JUNIPER_GGSN
 u_int
 juniper_ggsn_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
@@ -171,7 +195,9 @@ juniper_ggsn_print(const struct pcap_pkthdr *h, register const u_char *p)
 
         return l2info.header_len;
 }
+#endif
 
+#ifdef DLT_JUNIPER_ES
 u_int
 juniper_es_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
@@ -239,7 +265,9 @@ juniper_es_print(const struct pcap_pkthdr *h, register const u_char *p)
         ip_print(gndo, p, l2info.length);
         return l2info.header_len;
 }
+#endif
 
+#ifdef DLT_JUNIPER_MONITOR
 u_int
 juniper_monitor_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
@@ -270,7 +298,9 @@ juniper_monitor_print(const struct pcap_pkthdr *h, register const u_char *p)
 
         return l2info.header_len;
 }
+#endif
 
+#ifdef DLT_JUNIPER_SERVICES
 u_int
 juniper_services_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
@@ -302,7 +332,9 @@ juniper_services_print(const struct pcap_pkthdr *h, register const u_char *p)
 
         return l2info.header_len;
 }
+#endif
 
+#ifdef DLT_JUNIPER_PPPOE
 u_int
 juniper_pppoe_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
@@ -317,7 +349,9 @@ juniper_pppoe_print(const struct pcap_pkthdr *h, register const u_char *p)
         ether_print(p, l2info.length, l2info.caplen);
         return l2info.header_len;
 }
+#endif
 
+#ifdef DLT_JUNIPER_PPPOE_ATM
 u_int
 juniper_pppoe_atm_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
@@ -343,7 +377,9 @@ juniper_pppoe_atm_print(const struct pcap_pkthdr *h, register const u_char *p)
         
         return l2info.header_len;
 }
+#endif
 
+#ifdef DLT_JUNIPER_MLPPP
 u_int
 juniper_mlppp_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
@@ -393,8 +429,10 @@ juniper_mlppp_print(const struct pcap_pkthdr *h, register const u_char *p)
 
         return l2info.header_len;
 }
+#endif
 
 
+#ifdef DLT_JUNIPER_MFR
 u_int
 juniper_mfr_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
@@ -423,7 +461,9 @@ juniper_mfr_print(const struct pcap_pkthdr *h, register const u_char *p)
 
         return l2info.header_len;
 }
+#endif
 
+#ifdef DLT_JUNIPER_MLFR
 u_int
 juniper_mlfr_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
@@ -454,6 +494,7 @@ juniper_mlfr_print(const struct pcap_pkthdr *h, register const u_char *p)
 
         return l2info.header_len;
 }
+#endif
 
 /*
  *     ATM1 PIC cookie format
@@ -463,6 +504,7 @@ juniper_mlfr_print(const struct pcap_pkthdr *h, register const u_char *p)
  *     +-----+-------------------------+-------------------------------+
  */
 
+#ifdef DLT_JUNIPER_ATM1
 u_int
 juniper_atm1_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
@@ -500,6 +542,7 @@ juniper_atm1_print(const struct pcap_pkthdr *h, register const u_char *p)
 
 	return l2info.header_len;
 }
+#endif
 
 /*
  *     ATM2 PIC cookie format
@@ -509,6 +552,7 @@ juniper_atm1_print(const struct pcap_pkthdr *h, register const u_char *p)
  *     +-------------------------------+---------+---+-----+-----------+
  */
 
+#ifdef DLT_JUNIPER_ATM2
 u_int
 juniper_atm2_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
@@ -555,6 +599,7 @@ juniper_atm2_print(const struct pcap_pkthdr *h, register const u_char *p)
 
 	return l2info.header_len;
 }
+#endif
 
 
 /* try to guess, based on all PPP protos that are supported in
