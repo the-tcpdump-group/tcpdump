@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.91.2.5 2005-05-18 20:03:19 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.91.2.6 2005-06-03 07:31:43 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -791,7 +791,7 @@ decode_clnp_prefix(const u_char *pptr, char *buf, u_int buflen)
 			((0xff00 >> (plen % 8)) & 0xff);
 	}
 	snprintf(buf, buflen, "%s/%d",
-                 isonsap_string(addr,(plen + 7) / 8 - 1),
+                 isonsap_string(addr,(plen + 7) / 8),
                  plen);
 
 	return 1 + (plen + 7) / 8;
@@ -824,7 +824,7 @@ decode_labeled_vpn_clnp_prefix(const u_char *pptr, char *buf, u_int buflen)
         /* the label may get offsetted by 4 bits so lets shift it right */
 	snprintf(buf, buflen, "RD: %s, %s/%d, label:%u %s",
                  bgp_vpn_rd_print(pptr+4),
-                 isonsap_string(addr,(plen + 7) / 8 - 1),
+                 isonsap_string(addr,(plen + 7) / 8),
                  plen,
                  EXTRACT_24BITS(pptr+1)>>4,
                  ((pptr[3]&1)==0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
@@ -840,7 +840,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
 {
 	int i;
 	u_int16_t af;
-	u_int8_t safi, snpa;
+	u_int8_t safi, snpa, nhlen;
         union { /* copy buffer for bandwidth values */
             float f; 
             u_int32_t i;
@@ -1031,7 +1031,8 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                 tptr +=3;
 
 		TCHECK(tptr[0]);
-		tlen = tptr[0];
+		nhlen = tptr[0];
+                tlen = nhlen;
                 tptr++;
 
 		if (tlen) {
@@ -1157,6 +1158,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                         }
                     }
 		}
+                printf(", nh-length: %u", nhlen);
 		tptr += tlen;
 
 		TCHECK(tptr[0]);
