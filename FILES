@@ -103,6 +103,7 @@ oui.c
 oui.h
 packetdat.awk
 parsenfsfh.c
+pcap_dump_ftell.c
 pcap-missing.h
 pf.h
 pmap_prot.h

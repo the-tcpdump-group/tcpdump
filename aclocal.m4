@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.111 2005-06-03 21:36:41 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.112 2005-06-03 22:08:51 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -352,6 +352,15 @@ AC_DEFUN(AC_LBL_LIBPCAP,
     dnl so just define the HAVE_ value if it's there.
     dnl
     AC_CHECK_FUNCS(pcap_breakloop)
+
+    dnl
+    dnl Check for "pcap_dump_ftell()" and use a substitute version
+    dnl if it's not present.
+    AC_CHECK_FUNC(pcap_dump_ftell,
+	AC_DEFINE(HAVE_PCAP_DUMP_FTELL),
+	[
+	    AC_LIBOBJ(pcap_dump_ftell)
+	])
 ])
 
 dnl

@@ -1,4 +1,4 @@
-@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.64 2005-05-21 20:18:12 guy Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.65 2005-06-03 22:08:51 guy Exp $ (LBL)
 
 If you have not built libpcap, do so first.  See the README
 file in this directory for the ftp location.
@@ -124,6 +124,8 @@ ospf.h		- Open Shortest Path First definitions
 ospf6.h		- IPv6 Open Shortest Path First definitions
 packetdat.awk	- TCP chunk summary awk script
 parsenfsfh.c	- Network File System file parser routines
+pcap_dump_ftell.c - pcap_dump_ftell() implementation, in case libpcap
+		doesn't have it
 pcap-missing.h	- declarations of functions possibly missing from libpcap
 pf.h		- OpenBSD PF definitions
 pmap_prot.h	- definitions for ONC RPC portmapper protocol
