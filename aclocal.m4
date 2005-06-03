@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.110 2005-04-21 03:50:29 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.111 2005-06-03 21:36:41 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -324,11 +324,13 @@ AC_DEFUN(AC_LBL_LIBPCAP,
     dnl
     dnl Check for "pcap_list_datalinks()", "pcap_set_datalink()",
     dnl and "pcap_datalink_name_to_val()", and use substitute versions
-    dnl if they're not present
+    dnl if they're not present.
     dnl
     AC_CHECK_FUNC(pcap_list_datalinks,
 	AC_DEFINE(HAVE_PCAP_LIST_DATALINKS),
-	AC_LIBOBJ(datalinks))
+	[
+	    AC_LIBOBJ(datalinks)
+	])
     AC_CHECK_FUNC(pcap_set_datalink,
 	AC_DEFINE(HAVE_PCAP_SET_DATALINK))
     AC_CHECK_FUNC(pcap_datalink_name_to_val,
@@ -336,9 +338,13 @@ AC_DEFUN(AC_LBL_LIBPCAP,
 	    AC_DEFINE(HAVE_PCAP_DATALINK_NAME_TO_VAL)
 	    AC_CHECK_FUNC(pcap_datalink_val_to_description,
 		AC_DEFINE(HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION),
-		AC_LIBOBJ(dlnames))
+		[
+		    AC_LIBOBJ(dlnames)
+		])
 	],
-	AC_LIBOBJ(dlnames))
+	[
+	    AC_LIBOBJ(dlnames)
+	])
 
     dnl
     dnl Check for "pcap_breakloop()"; you can't substitute for it if
