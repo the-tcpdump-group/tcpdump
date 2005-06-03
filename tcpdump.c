@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.253.2.5 2005-05-23 06:28:56 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.253.2.6 2005-06-03 22:10:18 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -1151,7 +1151,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 	 * larger than Cflag - the last packet written to the
 	 * file could put it over Cflag.
 	 */
-	if (ftell((FILE *)dump_info->p) > Cflag) {
+	if (pcap_dump_ftell(dump_info->p) > Cflag) {
 		/*
 		 * Close the current file and open a new one.
 		 */

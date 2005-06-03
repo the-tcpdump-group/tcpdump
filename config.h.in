@@ -85,6 +85,9 @@
 /* define if libpcap has pcap_datalink_val_to_description() */
 #undef HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION
 
+/* define if libpcap has pcap_dump_ftell() */
+#undef HAVE_PCAP_DUMP_FTELL
+
 /* define if you have getrpcbynumber() */
 #undef HAVE_GETRPCBYNUMBER
 
