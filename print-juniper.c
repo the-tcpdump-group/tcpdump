@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.18 2005-06-03 22:03:02 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.19 2005-06-07 21:53:50 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -403,9 +403,11 @@ juniper_mlppp_print(const struct pcap_pkthdr *h, register const u_char *p)
         case JUNIPER_LSQ_L3_PROTO_IPV4:
             ip_print(gndo, p, l2info.length);
             return l2info.header_len;
+#ifdef INET6
         case JUNIPER_LSQ_L3_PROTO_IPV6:
             ip6_print(p,l2info.length);
             return l2info.header_len;
+#endif
         case JUNIPER_LSQ_L3_PROTO_MPLS:
             mpls_print(p,l2info.length);
             return l2info.header_len;
