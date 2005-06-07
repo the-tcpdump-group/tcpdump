@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pgm.c,v 1.1.2.4 2005-06-07 21:58:47 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pgm.c,v 1.1.2.5 2005-06-07 22:06:16 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -33,7 +33,9 @@ static const char rcsid[] _U_ =
 #include "addrtoname.h"
 
 #include "ip.h"
+#ifdef INET6
 #include "ip6.h"
+#endif
 #include "ipproto.h"
 
 /*
@@ -154,9 +156,11 @@ pgm_print(register const u_char *bp, register u_int length,
 	int addr_size;
 	const void *nla;
 	int nla_af;
-	char nla_buf[INET6_ADDRSTRLEN];
 #ifdef INET6
+	char nla_buf[INET6_ADDRSTRLEN];
 	register const struct ip6_hdr *ip6;
+#else
+	char nla_buf[INET_ADDRSTRLEN];
 #endif
 	u_int8_t opt_type, opt_len, flags1, flags2;
 	u_int32_t seq, opts_len, len, offset;
@@ -168,7 +172,12 @@ pgm_print(register const u_char *bp, register u_int length,
 		ip6 = (struct ip6_hdr *)bp2;
 	else
 		ip6 = NULL;
-#endif /*INET6*/
+#else /* INET6 */
+	if (IP_V(ip) == 6) {
+		(void)printf("Can't handle IPv6");
+		return;
+	}
+#endif /* INET6 */
 	ch = '\0';
 	if (!TTEST(pgm->pgm_dport)) {
 #ifdef INET6
@@ -246,10 +255,12 @@ pgm_print(register const u_char *bp, register u_int length,
 		addr_size = sizeof(struct in_addr);
 		nla_af = AF_INET;
 		break;
+#ifdef INET6
 	    case AFI_IP6:
 		addr_size = sizeof(struct in6_addr);
 		nla_af = AF_INET6;
 		break;
+#endif
 	    default:
 		goto trunc;
 		break;
@@ -291,10 +302,12 @@ pgm_print(register const u_char *bp, register u_int length,
 		addr_size = sizeof(struct in_addr);
 		nla_af = AF_INET;
 		break;
+#ifdef INET6
 	    case AFI_IP6:
 		addr_size = sizeof(struct in6_addr);
 		nla_af = AF_INET6;
 		break;
+#endif
 	    default:
 		goto trunc;
 		break;
@@ -353,7 +366,11 @@ pgm_print(register const u_char *bp, register u_int length,
 	    struct pgm_nak *nak;
 	    const void *source, *group;
 	    int source_af, group_af;
+#ifdef INET6
 	    char source_buf[INET6_ADDRSTRLEN], group_buf[INET6_ADDRSTRLEN];
+#else
+	    char source_buf[INET_ADDRSTRLEN], group_buf[INET_ADDRSTRLEN];
+#endif
 
 	    nak = (struct pgm_nak *)(pgm + 1);
 	    TCHECK(*nak);
@@ -367,10 +384,12 @@ pgm_print(register const u_char *bp, register u_int length,
 		addr_size = sizeof(struct in_addr);
 		source_af = AF_INET;
 		break;
+#ifdef INET6
 	    case AFI_IP6:
 		addr_size = sizeof(struct in6_addr);
 		source_af = AF_INET6;
 		break;
+#endif
 	    default:
 		goto trunc;
 		break;
@@ -389,10 +408,12 @@ pgm_print(register const u_char *bp, register u_int length,
 		addr_size = sizeof(struct in_addr);
 		group_af = AF_INET;
 		break;
+#ifdef INET6
 	    case AFI_IP6:
 		addr_size = sizeof(struct in6_addr);
 		group_af = AF_INET6;
 		break;
+#endif
 	    default:
 		goto trunc;
 		break;
@@ -585,10 +606,12 @@ pgm_print(register const u_char *bp, register u_int length,
 			addr_size = sizeof(struct in_addr);
 			nla_af = AF_INET;
 			break;
+#ifdef INET6
 		    case AFI_IP6:
 			addr_size = sizeof(struct in6_addr);
 			nla_af = AF_INET6;
 			break;
+#endif
 		    default:
 			goto trunc;
 			break;
