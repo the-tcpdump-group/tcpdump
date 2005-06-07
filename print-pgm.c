@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pgm.c,v 1.1.2.3 2005-05-24 07:57:27 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pgm.c,v 1.1.2.4 2005-06-07 21:58:47 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -55,7 +55,7 @@ struct pgm_spm {
     u_int32_t	pgms_leadseq;
     u_int16_t	pgms_nla_afi;
     u_int16_t	pgms_reserved;
-    u_int8_t	pgms_nla[0];
+    /* ... u_int8_t	pgms_nla[0]; */
     /* ... options */
 };
 
@@ -63,7 +63,7 @@ struct pgm_nak {
     u_int32_t	pgmn_seq;
     u_int16_t	pgmn_source_afi;
     u_int16_t	pgmn_reserved;
-    u_int8_t	pgmn_source[0];
+    /* ... u_int8_t	pgmn_source[0]; */
     /* ... u_int16_t	pgmn_group_afi */
     /* ... u_int16_t	pgmn_reserved2; */
     /* ... u_int8_t	pgmn_group[0]; */
@@ -83,7 +83,7 @@ struct pgm_polr {
     u_int16_t	pgmp_subtype;
     u_int16_t	pgmp_nla_afi;
     u_int16_t	pgmp_reserved;
-    u_int8_t	pgmp_nla[0];
+    /* ... u_int8_t	pgmp_nla[0]; */
     /* ... options */
 };
 
