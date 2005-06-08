@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.133.2.8 2005-05-25 22:06:41 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.133.2.9 2005-06-08 06:41:41 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -309,7 +309,7 @@ static struct tok clnp_option_scope_values[] = {
 
 static struct tok clnp_option_sr_rr_values[] = {
     { 0x0, "partial"},
-    { 0x0, "complete"},
+    { 0x1, "complete"},
     { 0, NULL }
 };
 
