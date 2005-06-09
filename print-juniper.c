@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.19 2005-06-07 21:53:50 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.20 2005-06-09 07:56:26 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -559,6 +559,7 @@ u_int
 juniper_atm2_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
         u_int16_t extracted_ethertype;
+        u_int32_t control_word;
 
         struct juniper_l2info_t l2info;
 
@@ -569,6 +570,12 @@ juniper_atm2_print(const struct pcap_pkthdr *h, register const u_char *p)
         p+=l2info.header_len;
 
         if (l2info.cookie[7] & ATM2_PKT_TYPE_MASK) { /* OAM cell ? */
+            control_word = EXTRACT_32BITS(p);
+            if(control_word == 0 || control_word == 0x08000000) {
+                l2info.header_len += 4;
+                l2info.length -= 4;
+                p += 4;
+            }
             oam_print(p,l2info.length);
             return l2info.header_len;
         }
