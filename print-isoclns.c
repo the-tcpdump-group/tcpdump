@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.142 2005-06-08 06:40:10 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.143 2005-06-13 12:56:43 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -127,7 +127,7 @@ static struct tok isis_pdu_values[] = {
 #define ISIS_TLV_SHARED_RISK_GROUP   138 /* draft-ietf-isis-gmpls-extensions */
 #define ISIS_TLV_NORTEL_PRIVATE1     176
 #define ISIS_TLV_NORTEL_PRIVATE2     177
-#define ISIS_TLV_RESTART_SIGNALING   211 /* draft-ietf-isis-restart-01 */
+#define ISIS_TLV_RESTART_SIGNALING   211 /* rfc3847 */
 #define ISIS_TLV_MT_IS_REACH         222 /* draft-ietf-isis-wg-multi-topology-05 */
 #define ISIS_TLV_MT_SUPPORTED        229 /* draft-ietf-isis-wg-multi-topology-05 */
 #define ISIS_TLV_IP6ADDR             232 /* draft-ietf-isis-ipv6-02 */
@@ -529,6 +529,7 @@ static struct tok isis_is_reach_virtual_values[] = {
 static struct tok isis_restart_flag_values[] = {
     { 0x1,  "Restart Request"},
     { 0x2,  "Restart Acknowledgement"},
+    { 0x4,  "Suppress adjacency advertisement"},
     { 0, NULL }
 };
 
@@ -2476,6 +2477,16 @@ static int isis_print (const u_int8_t *p, u_int length)
                    bittok2str(isis_restart_flag_values, "none", *tptr),
                    EXTRACT_16BITS(tptr+1));
 	    tptr+=3;
+            tmp-=3;
+            if (tmp == SYSTEM_ID_LEN) {
+                    if (!TTEST2(*tptr, SYSTEM_ID_LEN))
+                            goto trunctlv;
+                    printf(", for %s",isis_print_id(tptr,SYSTEM_ID_LEN));
+            } else if (tmp == NODE_ID_LEN) {
+                    if (!TTEST2(*tptr, NODE_ID_LEN))
+                            goto trunctlv;
+                                    printf(", for %s",isis_print_id(tptr,NODE_ID_LEN));
+            }
 	    break;
 
         case ISIS_TLV_IDRP_INFO:
