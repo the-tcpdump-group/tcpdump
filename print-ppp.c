@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.110 2005-05-08 20:35:20 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.111 2005-06-16 00:33:20 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -572,6 +572,13 @@ print_lcp_config_options(const u_char *p, int length)
 	opt = p[0];
 	if (length < len)
 		return 0;
+	if (len < 2) {
+		if ((opt >= LCPOPT_MIN) && (opt <= LCPOPT_MAX))
+			printf("\n\t  %s Option (0x%02x), length %u (bogus, should be >= 2)", lcpconfopts[opt],opt,len);
+		else
+			printf("\n\tunknown LCP option 0x%02x", opt);
+		return 0;
+	}
 	if ((opt >= LCPOPT_MIN) && (opt <= LCPOPT_MAX))
 		printf("\n\t  %s Option (0x%02x), length %u: ", lcpconfopts[opt],opt,len);
 	else {
@@ -955,6 +962,13 @@ print_ipcp_config_options(const u_char *p, int length)
 	opt = p[0];
 	if (length < len)
 		return 0;
+	if (len < 2) {
+		printf("\n\t  %s Option (0x%02x), length %u (bogus, should be >= 2)",
+		       tok2str(ipcpopt_values,"unknown",opt),
+		       opt,
+        	       len);
+		return 0;
+	}
 
 	printf("\n\t  %s Option (0x%02x), length %u: ",
 	       tok2str(ipcpopt_values,"unknown",opt),
@@ -1023,6 +1037,13 @@ print_ip6cp_config_options(const u_char *p, int length)
 	opt = p[0];
 	if (length < len)
 		return 0;
+	if (len < 2) {
+		printf("\n\t  %s Option (0x%02x), length %u (bogus, should be >= 2)",
+		       tok2str(ip6cpopt_values,"unknown",opt),
+		       opt,
+	               len);
+	        return 0;
+	}
 
 	printf("\n\t  %s Option (0x%02x), length %u: ",
 	       tok2str(ip6cpopt_values,"unknown",opt),
@@ -1073,6 +1094,13 @@ print_ccp_config_options(const u_char *p, int length)
 	opt = p[0];
 	if (length < len)
 		return 0;
+	if (len < 2) {
+	        printf("\n\t  %s Option (0x%02x), length %u (bogus, should be >= 2)",
+        	       tok2str(ccpconfopts_values, "Unknown", opt),
+	               opt,
+        	       len);
+        	return 0;
+        }
 
         printf("\n\t  %s Option (0x%02x), length %u:",
                tok2str(ccpconfopts_values, "Unknown", opt),
@@ -1124,6 +1152,13 @@ print_bacp_config_options(const u_char *p, int length)
 	opt = p[0];
 	if (length < len)
 		return 0;
+	if (len < 2) {
+	        printf("\n\t  %s Option (0x%02x), length %u (bogus, should be >= 2)",
+        	       tok2str(bacconfopts_values, "Unknown", opt),
+	               opt,
+        	       len);
+        	return 0;
+        }
 
         printf("\n\t  %s Option (0x%02x), length %u:",
                tok2str(bacconfopts_values, "Unknown", opt),
