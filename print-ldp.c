@@ -16,7 +16,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.13 2005-05-03 08:21:09 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.14 2005-06-16 01:10:21 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -374,6 +374,8 @@ ldp_tlv_print(register const u_char *tptr) {
                 vc_info_tlv_type = *tptr;
                 vc_info_tlv_len = *(tptr+1);
                 if (vc_info_tlv_len < 2)
+                    break;
+                if (vc_info_len < vc_info_tlv_len)
                     break;
 
                 printf("\n\t\tInterface Parameter: %s (0x%02x), len %u",
