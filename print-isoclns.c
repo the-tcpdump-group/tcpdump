@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.143 2005-06-13 12:56:43 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.144 2005-06-16 01:07:28 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1501,7 +1501,7 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
                  not specified so just lets hexdump what is left */
               if(subl>0){
                 if(!print_unknown_data(tptr,"\n\t\t    ",
-				       subl-36))
+				       subl))
                     return(0);
               }
             }
