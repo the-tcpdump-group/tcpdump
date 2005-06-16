@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.95.2.4 2005-05-06 08:27:00 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.95.2.5 2005-06-16 01:19:57 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -242,8 +242,18 @@ relts_print(int secs)
 int
 print_unknown_data(const u_char *cp,const char *ident,int len)
 {
+	if (len < 0) {
+		printf("%sDissector error: print_unknown_data called with negative length",
+		    ident);
+		return(0);
+	}
 	if (snapend - cp < len)
 		len = snapend - cp;
+	if (len < 0) {
+		printf("%sDissector error: print_unknown_data called with pointer past end of packet",
+		    ident);
+		return(0);
+	}
         hex_print(ident,cp,len);
 	return(1); /* everything is ok */
 }
