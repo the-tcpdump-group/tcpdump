@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.111 2005-06-16 00:33:20 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.112 2005-06-18 23:55:24 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -518,22 +518,32 @@ handle_ctrl_proto(u_int proto, const u_char *pptr, int length)
 		       EXTRACT_16BITS(tptr));
 		/* XXX: need to decode Rejected-Information? - hexdump for now */
                 if (len > 6) {
-                        printf("\n\t  Unknown Data");
+                        printf("\n\t  Rejected Packet");
                         print_unknown_data(tptr+2,"\n\t    ",len-2);
                 }
 		break;
 	case CPCODES_ECHO_REQ:
 	case CPCODES_ECHO_RPL:
 	case CPCODES_DISC_REQ:
-	case CPCODES_ID:
 		if (length < 8)
 			break;
 		TCHECK2(*tptr, 4);
 		printf("\n\t  Magic-Num 0x%08x", EXTRACT_32BITS(tptr));
 		/* XXX: need to decode Data? - hexdump for now */
                 if (len > 8) {
-                        printf("\n\t  Unknown Data");
+                        printf("\n\t  Data");
                         print_unknown_data(tptr+4,"\n\t    ",len-4);
+                }
+		break;
+	case CPCODES_ID:
+		if (length < 8)
+			break;
+		TCHECK2(*tptr, 4);
+		printf("\n\t  Magic-Num 0x%08x", EXTRACT_32BITS(tptr));
+		/* RFC 1661 says this is intended to be human readable */
+                if (len > 8) {
+                        printf("\n\t  Message\n\t    ");
+                        fn_printn(tptr+4,len-4,snapend);
                 }
 		break;
 	case CPCODES_TIME_REM:
