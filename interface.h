@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.254 2005-05-27 14:52:35 hannes Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.255 2005-06-20 07:39:21 hannes Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -181,7 +181,7 @@ extern void atalk_print(const u_char *, u_int);
 extern void atm_print(u_int, u_int, u_int, const u_char *, u_int, u_int);
 extern u_int atm_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int sunatm_if_print(const struct pcap_pkthdr *, const u_char *);
-extern int oam_print(const u_char *, u_int);
+extern int oam_print(const u_char *, u_int, u_int);
 extern void bootp_print(const u_char *, u_int);
 extern void bgp_print(const u_char *, int);
 extern void beep_print(const u_char *, u_int);
