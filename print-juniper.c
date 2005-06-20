@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.8.2.12 2005-06-09 08:01:33 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.8.2.13 2005-06-20 07:45:05 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -34,6 +34,7 @@ static const char rcsid[] _U_ =
 #include "llc.h"
 #include "nlpid.h"
 #include "ethertype.h"
+#include "atm.h"
 
 #define JUNIPER_BPF_OUT           0       /* Outgoing packet */
 #define JUNIPER_BPF_IN            1       /* Incoming packet */
@@ -521,7 +522,7 @@ juniper_atm1_print(const struct pcap_pkthdr *h, register const u_char *p)
         p+=l2info.header_len;
 
         if (l2info.cookie[0] == 0x80) { /* OAM cell ? */
-            oam_print(p,l2info.length);
+            oam_print(p,l2info.length,ATM_OAM_NOHEC);
             return l2info.header_len;
         }
 
@@ -576,7 +577,7 @@ juniper_atm2_print(const struct pcap_pkthdr *h, register const u_char *p)
                 l2info.length -= 4;
                 p += 4;
             }
-            oam_print(p,l2info.length);
+            oam_print(p,l2info.length,ATM_OAM_NOHEC);
             return l2info.header_len;
         }
 
