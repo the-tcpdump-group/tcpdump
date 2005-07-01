@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.96 2005-04-25 17:56:43 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.97 2005-07-01 16:15:59 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -296,7 +296,7 @@ ether_encap_print(u_short ether_type, const u_char *p,
 		return (1);
 
         case ETHERTYPE_LOOPBACK:
-                return (0);
+                return (1);
 
 	case ETHERTYPE_MPLS:
 	case ETHERTYPE_MPLS_MULTI:
