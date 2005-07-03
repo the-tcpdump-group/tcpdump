@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.48 2005-05-20 21:02:30 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.49 2005-07-03 20:33:06 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -192,6 +192,7 @@ ip6_print(register const u_char *bp, register u_int length)
 		case IPPROTO_PIM:
 			pim_print(cp, len);
 			return;
+
 		case IPPROTO_OSPF:
 			ospf6_print(cp, len);
 			return;
@@ -207,6 +208,14 @@ ip6_print(register const u_char *bp, register u_int length)
                 case IPPROTO_PGM:
                         pgm_print(cp, len, (const u_char *)ip6);
                         return;
+
+		case IPPROTO_GRE:
+			gre_print(cp, len);
+			return;
+
+		case IPPROTO_RSVP:
+			rsvp_print(cp, len);
+			return;
 
 		case IPPROTO_NONE:
 			(void)printf("no next header");
