@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.253.2.6 2005-06-03 22:10:18 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.253.2.7 2005-07-05 21:08:02 mcr Exp $ (LBL)";
 #endif
 
 /*
@@ -484,7 +484,7 @@ main(int argc, char **argv)
 
 	opterr = 0;
 	while (
-	    (op = getopt(argc, argv, "aA" B_FLAG "c:C:d" D_FLAG "eE:fF:i:lLm:M:nNOpqr:Rs:StT:u" U_FLAG "vw:W:xXy:YZ:")) != -1)
+	    (op = getopt(argc, argv, "aA" B_FLAG "c:C:d" D_FLAG "eE:fF:i:lLm:M:nNOpP:qr:Rs:StT:u" U_FLAG "vw:W:xXy:YZ:")) != -1)
 		switch (op) {
 
 		case 'a':
