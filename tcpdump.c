@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.253.2.9 2005-07-06 20:54:49 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.253.2.10 2005-07-07 01:24:40 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -653,6 +653,7 @@ main(int argc, char **argv)
 
 		case 'q':
 			++qflag;
+			++suppress_default_print;
 			break;
 
 		case 'r':
@@ -733,10 +734,12 @@ main(int argc, char **argv)
 
 		case 'x':
 			++xflag;
+			++suppress_default_print;
 			break;
 
 		case 'X':
 			++Xflag;
+			++suppress_default_print;
 			break;
 
 		case 'y':

@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.31.2.1 2005-04-20 19:32:41 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.31.2.2 2005-07-07 01:24:33 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -900,7 +900,7 @@ ieee802_11_print(const u_char *p, u_int length, u_int caplen)
 				printf("(LLC %s) ",
 				    etherproto_string(
 				        htons(extracted_ethertype)));
-			if (!xflag && !qflag)
+			if (!suppress_default_print)
 				default_print(p, caplen);
 		}
 		break;
