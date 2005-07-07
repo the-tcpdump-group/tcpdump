@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-sll.c,v 1.17 2005-04-26 00:16:28 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-sll.c,v 1.18 2005-07-07 01:22:21 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -181,7 +181,7 @@ sll_if_print(const struct pcap_pkthdr *h, const u_char *p)
 				printf("(LLC %s) ",
 			       etherproto_string(htons(extracted_ethertype)));
 			}
-			if (!xflag && !qflag)
+			if (!suppress_default_print)
 				default_print(p, caplen);
 			break;
 		}
@@ -190,7 +190,7 @@ sll_if_print(const struct pcap_pkthdr *h, const u_char *p)
 		/* ether_type not known, print raw packet */
 		if (!eflag)
 			sll_print(sllp, length + SLL_HDR_LEN);
-		if (!xflag && !qflag)
+		if (!suppress_default_print)
 			default_print(p, caplen);
 	}
 

@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.36 2005-05-27 14:53:48 hannes Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.37 2005-07-07 01:22:18 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -276,7 +276,7 @@ fr_print(register const u_char *p, u_int length)
                         if (!eflag)
                             fr_hdr_print(length + hdr_len, hdr_len,
                                          dlci, flags, nlpid);
-			if (!xflag && !qflag)
+			if (!suppress_default_print)
                             default_print(p - hdr_len, length + hdr_len);
 		}
 		break;
