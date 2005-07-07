@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.133.2.12 2005-06-16 01:14:52 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.133.2.13 2005-07-07 01:26:01 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -840,7 +840,7 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
                             if (tlen < source_address_length+1) {
                                     printf("\n\t    NSAP address goes past end of option");
                                     break;
-                    	    }
+                            }
                             if (source_address_length > 0) {
                                     source_address=(tptr+1);
                                     TCHECK2(*source_address, source_address_length);
