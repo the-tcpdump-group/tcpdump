@@ -26,7 +26,7 @@ CFLAGS = -I ${PCAP_DIR}/wpcap/libpcap/bpf \
 	-D_U_="__attribute__((unused))" \
 	-mno-cygwin ${OPTFLAGS}
 LDFLAGS = 
-LIBS = -L ${PCAP_DIR}/WPCAP/LIB -lwpcap -lwsock32
+LIBS = -L ${PCAP_DIR}/WPCAP/LIB -lwpcap -lws2_32
 OBJS = \
 	../../addrtoname.o \
 	../../gmpls.o \
