@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.33.2.3 2005-06-16 00:50:12 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.33.2.4 2005-07-11 20:24:35 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -608,7 +608,7 @@ rsvp_obj_print (const u_char *tptr, const char *ident, u_int tlen) {
                 printf("%s  IPv4 DestAddress: %s, Protocol ID: 0x%02x",
                        ident,
                        ipaddr_string(obj_tptr),
-                       *(obj_tptr+4));
+                       *(obj_tptr+sizeof(struct in_addr)));
                 printf("%s  Flags: [0x%02x], DestPort %u",
                        ident,
                        *(obj_tptr+5),
@@ -623,11 +623,11 @@ rsvp_obj_print (const u_char *tptr, const char *ident, u_int tlen) {
                 printf("%s  IPv6 DestAddress: %s, Protocol ID: 0x%02x",
                        ident,
                        ip6addr_string(obj_tptr),
-                       *(obj_tptr+16));
+                       *(obj_tptr+sizeof(struct in6_addr)));
                 printf("%s  Flags: [0x%02x], DestPort %u",
                        ident,
-                       *(obj_tptr+17),
-                       EXTRACT_16BITS(obj_tptr+18));
+                       *(obj_tptr+sizeof(struct in6_addr)+1),
+                       EXTRACT_16BITS(obj_tptr+sizeof(struct in6_addr)+2));
                 obj_tlen-=20;
                 obj_tptr+=20;                
                 break;
@@ -663,23 +663,23 @@ rsvp_obj_print (const u_char *tptr, const char *ident, u_int tlen) {
         case RSVP_OBJ_CONFIRM:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_IPV4:
-                if (obj_tlen < 4)
+                if (obj_tlen < sizeof(struct in_addr))
                     return -1;
                 printf("%s  IPv4 Receiver Address: %s",
                        ident,
                        ipaddr_string(obj_tptr));
-                obj_tlen-=4;
-                obj_tptr+=4;                
+                obj_tlen-=sizeof(struct in_addr);
+                obj_tptr+=sizeof(struct in_addr);                
                 break;
 #ifdef INET6
             case RSVP_CTYPE_IPV6:
-                if (obj_tlen < 16)
+                if (obj_tlen < sizeof(struct in6_addr))
                     return -1;
                 printf("%s  IPv6 Receiver Address: %s",
                        ident,
                        ip6addr_string(obj_tptr));
-                obj_tlen-=16;
-                obj_tptr+=16;                
+                obj_tlen-=sizeof(struct in6_addr);
+                obj_tptr+=sizeof(struct in6_addr);                
                 break;
 #endif
             default:
@@ -690,23 +690,23 @@ rsvp_obj_print (const u_char *tptr, const char *ident, u_int tlen) {
         case RSVP_OBJ_NOTIFY_REQ:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_IPV4:
-                if (obj_tlen < 4)
+                if (obj_tlen < sizeof(struct in_addr))
                     return -1;
                 printf("%s  IPv4 Notify Node Address: %s",
                        ident,
                        ipaddr_string(obj_tptr));
-                obj_tlen-=4;
-                obj_tptr+=4;                
+                obj_tlen-=sizeof(struct in_addr);
+                obj_tptr+=sizeof(struct in_addr);                
                 break;
 #ifdef INET6
             case RSVP_CTYPE_IPV6:
-                if (obj_tlen < 16)
+                if (obj_tlen < sizeof(struct in6_addr))
                     return-1;
                 printf("%s  IPv6 Notify Node Address: %s",
                        ident,
                        ip6addr_string(obj_tptr));
-                obj_tlen-=16;
-                obj_tptr+=16;                
+                obj_tlen-=sizeof(struct in6_addr);
+                obj_tptr+=sizeof(struct in6_addr);                
                 break;
 #endif
             default:
