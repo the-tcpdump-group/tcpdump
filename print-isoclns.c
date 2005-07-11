@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.145 2005-06-16 01:14:26 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.146 2005-07-11 12:58:12 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -780,6 +780,7 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
 
         if (clnp_flags & CLNP_SEGMENT_PART) {
             	clnp_segment_header = (const struct clnp_segment_header_t *) pptr;
+                TCHECK(*clnp_segment_header);
                 printf("\n\tData Unit ID: 0x%04x, Segment Offset: %u, Total PDU Length: %u",
                        EXTRACT_16BITS(clnp_segment_header->data_unit_id),
                        EXTRACT_16BITS(clnp_segment_header->segment_offset),
