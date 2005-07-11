@@ -1,4 +1,4 @@
-@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.65 2005-06-03 22:08:51 guy Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.66 2005-07-11 17:36:27 guy Exp $ (LBL)
 
 If you have not built libpcap, do so first.  See the README
 file in this directory for the ftp location.
@@ -204,6 +204,7 @@ print-sctp.c	- Stream Control Transmission Protocol printer routines
 print-sip.c	- SIP printer routines
 print-sl.c	- Compressed Serial Line Internet Protocol printer routines
 print-sll.c	- Linux "cooked" capture printer routines
+print-slow.c	- IEEE "slow protocol" (802.3ad) printer routines
 print-smb.c	- SMB/CIFS printer routines
 print-snmp.c	- Simple Network Management Protocol printer routines
 print-stp.c	- IEEE 802.1d spanning tree protocol printer routines
