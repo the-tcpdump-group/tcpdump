@@ -114,6 +114,7 @@ OBJS = \
 	../../print-sctp.o \
 	../../print-sl.o \
 	../../print-sll.o \
+	../../print-slow.o \
 	../../print-smb.o \
 	../../print-snmp.o \
 	../../print-stp.o \
