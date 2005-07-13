@@ -473,6 +473,10 @@ SOURCE="..\..\print-sll.c"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\print-slow.c"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\print-smb.c"
 # End Source File
 # Begin Source File
