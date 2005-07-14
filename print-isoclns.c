@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.147 2005-07-11 20:15:32 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.148 2005-07-14 20:10:03 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -110,7 +110,9 @@ static struct tok isis_pdu_values[] = {
 #define ISIS_TLV_LSP                 9   /* iso10589 */
 #define ISIS_TLV_AUTH                10  /* iso10589, rfc3567 */
 #define ISIS_TLV_CHECKSUM            12  /* rfc3358 */
+#define ISIS_TLV_CHECKSUM_MINLEN 2
 #define ISIS_TLV_LSP_BUFFERSIZE      14  /* iso10589 rev2 */
+#define ISIS_TLV_LSP_BUFFERSIZE_MINLEN 2
 #define ISIS_TLV_EXT_IS_REACH        22  /* draft-ietf-isis-traffic-05 */
 #define ISIS_TLV_IS_ALIAS_ID         24  /* draft-ietf-isis-ext-lsp-frags-02 */
 #define ISIS_TLV_DECNET_PHASE4       42
@@ -119,6 +121,7 @@ static struct tok isis_pdu_values[] = {
 #define ISIS_TLV_PROTOCOLS           129 /* rfc1195 */
 #define ISIS_TLV_EXT_IP_REACH        130 /* rfc1195, rfc2966 */
 #define ISIS_TLV_IDRP_INFO           131 /* rfc1195 */
+#define ISIS_TLV_IDRP_INFO_MINLEN      1
 #define ISIS_TLV_IPADDR              132 /* rfc1195 */
 #define ISIS_TLV_IPAUTH              133 /* rfc1195 */
 #define ISIS_TLV_TE_ROUTER_ID        134 /* draft-ietf-isis-traffic-05 */
@@ -128,15 +131,19 @@ static struct tok isis_pdu_values[] = {
 #define ISIS_TLV_NORTEL_PRIVATE1     176
 #define ISIS_TLV_NORTEL_PRIVATE2     177
 #define ISIS_TLV_RESTART_SIGNALING   211 /* rfc3847 */
+#define ISIS_TLV_RESTART_SIGNALING_MINLEN 3
 #define ISIS_TLV_MT_IS_REACH         222 /* draft-ietf-isis-wg-multi-topology-05 */
 #define ISIS_TLV_MT_SUPPORTED        229 /* draft-ietf-isis-wg-multi-topology-05 */
+#define ISIS_TLV_MT_SUPPORTED_MINLEN 2
 #define ISIS_TLV_IP6ADDR             232 /* draft-ietf-isis-ipv6-02 */
 #define ISIS_TLV_MT_IP_REACH         235 /* draft-ietf-isis-wg-multi-topology-05 */
 #define ISIS_TLV_IP6_REACH           236 /* draft-ietf-isis-ipv6-02 */
 #define ISIS_TLV_MT_IP6_REACH        237 /* draft-ietf-isis-wg-multi-topology-05 */
 #define ISIS_TLV_PTP_ADJ             240 /* rfc3373 */
 #define ISIS_TLV_IIH_SEQNR           241 /* draft-shen-isis-iih-sequence-00 */
+#define ISIS_TLV_IIH_SEQNR_MINLEN 4
 #define ISIS_TLV_VENDOR_PRIVATE      250 /* draft-ietf-isis-experimental-tlv-01 */
+#define ISIS_TLV_VENDOR_PRIVATE_MINLEN 3
 
 static struct tok isis_tlv_values[] = {
     { ISIS_TLV_AREA_ADDR,	   "Area address(es)"},
@@ -2449,9 +2456,9 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    break;
 
 	case ISIS_TLV_CHECKSUM:
-	    if (tmp < 2)
+	    if (tmp < ISIS_TLV_CHECKSUM_MINLEN)
 	        break;
-	    if (!TTEST2(*tptr, 2))
+	    if (!TTEST2(*tptr, ISIS_TLV_CHECKSUM_MINLEN))
 		goto trunctlv;
 	    printf("\n\t      checksum: 0x%04x ", EXTRACT_16BITS(tptr));
             /* do not attempt to verify the checksum if it is zero
@@ -2465,6 +2472,8 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    break;
 
 	case ISIS_TLV_MT_SUPPORTED:
+            if (tmp < ISIS_TLV_MT_SUPPORTED_MINLEN)
+                break;
 	    while (tmp>1) {
 		/* length can only be a multiple of 2, otherwise there is
 		   something broken -> so decode down until length is 1 */
@@ -2482,9 +2491,9 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    break;
 
 	case ISIS_TLV_RESTART_SIGNALING:
-	    if (tmp < 3)
+	    if (tmp < ISIS_TLV_RESTART_SIGNALING_MINLEN)
 	        break;
-            if (!TTEST2(*tptr, 3))
+            if (!TTEST2(*tptr, ISIS_TLV_RESTART_SIGNALING_MINLEN))
                 goto trunctlv;
             printf("\n\t      Flags [%s], Remaining holding time %us",
                    bittok2str(isis_restart_flag_values, "none", *tptr),
@@ -2503,9 +2512,9 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    break;
 
         case ISIS_TLV_IDRP_INFO:
-	    if (tmp < 1)
+	    if (tmp < ISIS_TLV_IDRP_INFO_MINLEN)
 	        break;
-            if (!TTEST2(*tptr, 1))
+            if (!TTEST2(*tptr, ISIS_TLV_IDRP_INFO_MINLEN))
                 goto trunctlv;
             printf("\n\t      Inter-Domain Information Type: %s",
                    tok2str(isis_subtlv_idrp_values,
@@ -2527,9 +2536,9 @@ static int isis_print (const u_int8_t *p, u_int length)
             break;
 
         case ISIS_TLV_LSP_BUFFERSIZE:
-	    if (tmp < 2)
+	    if (tmp < ISIS_TLV_LSP_BUFFERSIZE_MINLEN)
 	        break;
-            if (!TTEST2(*tptr, 2))
+            if (!TTEST2(*tptr, ISIS_TLV_LSP_BUFFERSIZE_MINLEN))
                 goto trunctlv;
             printf("\n\t      LSP Buffersize: %u",EXTRACT_16BITS(tptr));
             break;
@@ -2576,17 +2585,17 @@ static int isis_print (const u_int8_t *p, u_int length)
             break;
 
         case ISIS_TLV_IIH_SEQNR:
-	    if (tmp < 4)
+	    if (tmp < ISIS_TLV_IIH_SEQNR_MINLEN)
 	        break;
-            if (!TTEST2(*tptr, 4)) /* check if four bytes are on the wire */
+            if (!TTEST2(*tptr, ISIS_TLV_IIH_SEQNR_MINLEN)) /* check if four bytes are on the wire */
                 goto trunctlv;
             printf("\n\t      Sequence number: %u", EXTRACT_32BITS(tptr) );
             break;
 
         case ISIS_TLV_VENDOR_PRIVATE:
-	    if (tmp < 3)
+	    if (tmp < ISIS_TLV_VENDOR_PRIVATE_MINLEN)
 	        break;
-            if (!TTEST2(*tptr, 3)) /* check if enough byte for a full oui */
+            if (!TTEST2(*tptr, ISIS_TLV_VENDOR_PRIVATE_MINLEN)) /* check if enough byte for a full oui */
                 goto trunctlv;
             vendor_id = EXTRACT_24BITS(tptr);
             printf("\n\t      Vendor: %s (%u)",
