@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.32.2.5 2005-07-07 01:24:35 guy Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.32.2.6 2005-07-20 22:18:47 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -305,6 +305,97 @@ fr_print(register const u_char *p, u_int length)
 
 }
 
+#define MFR_B_BIT 0x80
+#define MFR_E_BIT 0x40
+#define MFR_C_BIT 0x20
+#define MFR_BEC_MASK    (MFR_B_BIT | MFR_E_BIT | MFR_C_BIT)
+#define MFR_CTRL_FRAME  (MFR_B_BIT | MFR_E_BIT | MFR_C_BIT)
+#define MFR_FRAG_FRAME  (MFR_B_BIT | MFR_E_BIT )
+
+#define MFR_CTRL_MSG_ADD_LINK        1
+#define MFR_CTRL_MSG_ADD_LINK_ACK    2
+#define MFR_CTRL_MSG_ADD_LINK_REJ    3
+#define MFR_CTRL_MSG_HELLO           4
+#define MFR_CTRL_MSG_HELLO_ACK       5
+#define MFR_CTRL_MSG_REMOVE_LINK     6
+#define MFR_CTRL_MSG_REMOVE_LINK_ACK 7
+
+struct tok mfr_ctrl_msg_values[] = {
+    { MFR_CTRL_MSG_ADD_LINK, "Add Link" },
+    { MFR_CTRL_MSG_ADD_LINK_ACK, "Add Link ACK" },
+    { MFR_CTRL_MSG_ADD_LINK_REJ, "Add Link Reject" },
+    { MFR_CTRL_MSG_HELLO, "Hello" },
+    { MFR_CTRL_MSG_HELLO_ACK, "Hello ACK" },
+    { MFR_CTRL_MSG_REMOVE_LINK, "Remove Link" },
+    { MFR_CTRL_MSG_REMOVE_LINK_ACK, "Remove Link ACK" },
+    { 0, NULL }
+};
+
+u_int
+mfr_print(register const u_char *p, u_int length)
+{
+    u_int hdr_len = 0;
+    u_int16_t sequence_num;
+
+/*
+ * FRF.16 Link Integrity Control Frame
+ * 
+ *      7    6    5    4    3    2    1    0
+ *    +----+----+----+----+----+----+----+----+
+ *    | B  | E  | C=1| 0    0    0    0  | EA |
+ *    +----+----+----+----+----+----+----+----+
+ *    | 0    0    0    0    0    0    0    0  |
+ *    +----+----+----+----+----+----+----+----+
+ *    |              message type             |
+ *    +----+----+----+----+----+----+----+----+
+ */
+
+    if ((p[0] & MFR_BEC_MASK) == MFR_CTRL_FRAME && p[1] == 0) {
+        printf("FRF.16 Control, %s, length %u",
+               tok2str(mfr_ctrl_msg_values,"Unknown Message (0x%02x)",p[2]),
+               length);
+        switch (p[2]) {
+            /* no decoder yet - so fall through */
+        case MFR_CTRL_MSG_ADD_LINK:
+        case MFR_CTRL_MSG_ADD_LINK_ACK:
+        case MFR_CTRL_MSG_ADD_LINK_REJ:
+        case MFR_CTRL_MSG_HELLO:
+        case MFR_CTRL_MSG_HELLO_ACK:
+        case MFR_CTRL_MSG_REMOVE_LINK:
+        case MFR_CTRL_MSG_REMOVE_LINK_ACK:
+        default:
+            if (vflag >= 1)
+                print_unknown_data(p+3,"\n\t",length-3);
+            break;
+        }
+        return hdr_len;
+    }
+/*
+ * FRF.16 Fragmentation Frame
+ * 
+ *      7    6    5    4    3    2    1    0
+ *    +----+----+----+----+----+----+----+----+
+ *    | B  | E  | C=0|seq. (high 4 bits) | EA  |
+ *    +----+----+----+----+----+----+----+----+
+ *    |        sequence  (low 8 bits)         |
+ *    +----+----+----+----+----+----+----+----+
+ *    |        DLCI (6 bits)        | CR | EA  |
+ *    +----+----+----+----+----+----+----+----+
+ *    |   DLCI (4 bits)   |FECN|BECN| DE | EA |
+ *    +----+----+----+----+----+----+----+----+
+ */
+
+    if ((p[0] & MFR_BEC_MASK) == MFR_FRAG_FRAME) {
+        sequence_num = (p[0]&0x1e)<<7 | p[1];
+        if (eflag)
+            printf("FRF.16 Frag, seq %u, ", sequence_num);
+        hdr_len = 2;
+        fr_print(p+hdr_len,length-hdr_len);
+    }
+
+    return hdr_len;
+}
+
 /* an NLPID of 0xb1 indicates a 2-byte
  * FRF.15 header
  * 
@@ -512,6 +603,7 @@ q933_print(const u_char *p, u_int length)
         int olen;
 	int is_ansi = 0;
         u_int codeset;
+        u_int ie_is_known = 0;
 
 	if (length < 9) {	/* shortest: Q.933a LINK VERIFY */
 		printf("[|q.933]");
@@ -569,15 +661,15 @@ q933_print(const u_char *p, u_int length)
                            tok2str(fr_q933_ie_codesets[codeset],"unknown",ie_p->ie_id),
                            ie_p->ie_id,
                            ie_p->ie_len);
-                    
-                if (!fr_q933_print_ie_codeset[codeset] ||
-                    (*fr_q933_print_ie_codeset[codeset])(ie_p, ptemp)) {
-                    if (vflag <= 1)
-                        print_unknown_data(ptemp+2,"\n\t",ie_p->ie_len);
-                }
+ 
+                if (fr_q933_print_ie_codeset[codeset] != NULL)
+                    ie_is_known = fr_q933_print_ie_codeset[codeset](ie_p, ptemp);
+               
+                if (vflag >= 1 && !ie_is_known)
+                    print_unknown_data(ptemp+2,"\n\t",ie_p->ie_len);
 
                 /* do we want to see a hexdump of the IE ? */
-                if (vflag> 1)
+                if (vflag> 1 && ie_is_known)
                     print_unknown_data(ptemp+2,"\n\t  ",ie_p->ie_len);
 
 		length = length - ie_p->ie_len - 2;
