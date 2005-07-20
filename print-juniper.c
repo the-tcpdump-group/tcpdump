@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.22 2005-07-20 13:09:59 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.23 2005-07-20 22:17:00 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -50,6 +50,7 @@ static const char rcsid[] _U_ =
 #define JUNIPER_LSQ_L3_PROTO_IPV6     (1 << JUNIPER_LSQ_L3_PROTO_SHIFT)
 #define JUNIPER_LSQ_L3_PROTO_MPLS     (2 << JUNIPER_LSQ_L3_PROTO_SHIFT)
 #define JUNIPER_LSQ_L3_PROTO_ISO      (3 << JUNIPER_LSQ_L3_PROTO_SHIFT)
+#define AS_PIC_COOKIE_LEN 8
 
 #define JUNIPER_IPSEC_O_ESP_ENCRYPT_ESP_AUTHEN_TYPE 1
 #define JUNIPER_IPSEC_O_ESP_ENCRYPT_AH_AUTHEN_TYPE 2
@@ -142,6 +143,8 @@ struct juniper_l2info_t {
 #define JUNIPER_PROTO_NULL          1
 #define JUNIPER_PROTO_IPV4          2
 #define JUNIPER_PROTO_IPV6          6
+
+#define MFR_BE_MASK 0xc0
 
 static struct tok juniper_protocol_values[] = {
     { JUNIPER_PROTO_NULL, "Null" },
@@ -454,6 +457,36 @@ juniper_mfr_print(const struct pcap_pkthdr *h, register const u_char *p)
             return l2info.header_len;
         
         p+=l2info.header_len;
+
+        /* child-link ? */
+        if (l2info.cookie_len == 0) {
+            mfr_print(p,l2info.length);
+            return l2info.header_len;
+        }
+
+        /* first try the LSQ protos */
+        if (l2info.cookie_len == AS_PIC_COOKIE_LEN) {
+            switch(l2info.proto) {
+            case JUNIPER_LSQ_L3_PROTO_IPV4:
+                ip_print(gndo, p, l2info.length);
+                return l2info.header_len;
+#ifdef INET6
+            case JUNIPER_LSQ_L3_PROTO_IPV6:
+                ip6_print(p,l2info.length);
+                return l2info.header_len;
+#endif
+            case JUNIPER_LSQ_L3_PROTO_MPLS:
+                mpls_print(p,l2info.length);
+                return l2info.header_len;
+            case JUNIPER_LSQ_L3_PROTO_ISO:
+                isoclns_print(p,l2info.length,l2info.caplen);
+                return l2info.header_len;
+            default:
+                break;
+            }
+            return l2info.header_len;
+        }
+
         /* suppress Bundle-ID if frame was captured on a child-link */
         if (eflag && EXTRACT_32BITS(l2info.cookie) != 1) printf("Bundle-ID %u, ",l2info.bundle);
         switch (l2info.proto) {
@@ -711,9 +744,10 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
     l2info->direction = p[3]&JUNIPER_BPF_PKT_IN;
     
     TCHECK2(p[0],4);
-    if (EXTRACT_24BITS(p) != JUNIPER_MGC_NUMBER) /* magic number found ? */
+    if (EXTRACT_24BITS(p) != JUNIPER_MGC_NUMBER) { /* magic number found ? */
+        printf("no magic-number found!");
         return 0;
-    else
+    } else
         l2info->header_len = 4;
 
     if (eflag) /* print direction */
@@ -744,25 +778,33 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
     while (lp->s != NULL) {
         if (lp->pictype == l2info->pictype) {
 
-            l2info->cookie_len = lp->cookie_len;
-            l2info->header_len += lp->cookie_len;
+            l2info->cookie_len += lp->cookie_len;
 
             switch (p[0]) {
             case LS_COOKIE_ID:
                 l2info->cookie_type = LS_COOKIE_ID;
                 l2info->cookie_len += 2;
-                l2info->header_len += 2;
                 break;
             case AS_COOKIE_ID:
                 l2info->cookie_type = AS_COOKIE_ID;
-                l2info->cookie_len += 6;
-                l2info->header_len += 6;
+                l2info->cookie_len = 8;
                 break;
             
             default:
                 l2info->bundle = l2info->cookie[0];
                 break;
             }
+
+
+#ifdef DLT_JUNIPER_MFR
+            /* MFR child links don't carry cookies */
+            if (l2info->pictype == DLT_JUNIPER_MFR &&
+                (p[0] & MFR_BE_MASK) == MFR_BE_MASK) {
+                l2info->cookie_len = 0;
+            }
+#endif
+
+            l2info->header_len += l2info->cookie_len;
 
             if (eflag)
                 printf("%s-PIC, cookie-len %u",
@@ -805,23 +847,44 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
             break;
         }
         break;
-    case DLT_JUNIPER_MLFR: /* fall through */
+    case DLT_JUNIPER_MLFR:
+        switch (l2info->cookie_type) {
+        case LS_COOKIE_ID:
+            l2info->bundle = l2info->cookie[1];
+            l2info->proto = EXTRACT_16BITS(p);        
+            l2info->header_len += 2;
+            l2info->length -= 2;
+            l2info->caplen -= 2;
+            break;
+        case AS_COOKIE_ID:
+            l2info->bundle = (EXTRACT_16BITS(&l2info->cookie[6])>>3)&0xfff;
+            l2info->proto = (l2info->cookie[5])&JUNIPER_LSQ_L3_PROTO_MASK;
+            break;
+        default:
+            l2info->bundle = l2info->cookie[0];
+            l2info->header_len += 2;
+            l2info->length -= 2;
+            l2info->caplen -= 2;
+            break;
+        }
+        break;
     case DLT_JUNIPER_MFR:
         switch (l2info->cookie_type) {
         case LS_COOKIE_ID:
             l2info->bundle = l2info->cookie[1];
+            l2info->proto = EXTRACT_16BITS(p);        
+            l2info->header_len += 2;
+            l2info->length -= 2;
+            l2info->caplen -= 2;
             break;
         case AS_COOKIE_ID:
             l2info->bundle = (EXTRACT_16BITS(&l2info->cookie[6])>>3)&0xfff;
+            l2info->proto = (l2info->cookie[5])&JUNIPER_LSQ_L3_PROTO_MASK;
             break;
         default:
             l2info->bundle = l2info->cookie[0];
             break;
         }
-        l2info->proto = EXTRACT_16BITS(p);        
-        l2info->header_len += 2;
-        l2info->length -= 2;
-        l2info->caplen -= 2;
         break;
     case DLT_JUNIPER_ATM2:
         TCHECK2(p[0],4);
