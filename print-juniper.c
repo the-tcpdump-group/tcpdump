@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.21 2005-06-20 07:37:02 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.22 2005-07-20 13:09:59 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -42,6 +42,8 @@ static const char rcsid[] _U_ =
 #define JUNIPER_BPF_NO_L2         0x2     /* L2 header stripped */
 #define JUNIPER_MGC_NUMBER        0x4d4743 /* = "MGC" */
 
+#define JUNIPER_LSQ_COOKIE_RE         (1 << 3)
+#define JUNIPER_LSQ_COOKIE_DIR        (1 << 2)
 #define JUNIPER_LSQ_L3_PROTO_SHIFT     4
 #define JUNIPER_LSQ_L3_PROTO_MASK     (0x17 << JUNIPER_LSQ_L3_PROTO_SHIFT)
 #define JUNIPER_LSQ_L3_PROTO_IPV4     (0 << JUNIPER_LSQ_L3_PROTO_SHIFT)
@@ -402,7 +404,13 @@ juniper_mlppp_print(const struct pcap_pkthdr *h, register const u_char *p)
         /* first try the LSQ protos */
         switch(l2info.proto) {
         case JUNIPER_LSQ_L3_PROTO_IPV4:
-            ip_print(gndo, p, l2info.length);
+            /* IP traffic going to the RE would not have a cookie
+             * -> this must be incoming IS-IS over PPP
+             */
+            if (l2info.cookie[4] == (JUNIPER_LSQ_COOKIE_RE|JUNIPER_LSQ_COOKIE_DIR))
+                ppp_print(p, l2info.length);
+            else
+                ip_print(gndo, p, l2info.length);
             return l2info.header_len;
 #ifdef INET6
         case JUNIPER_LSQ_L3_PROTO_IPV6:
