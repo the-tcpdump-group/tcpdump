@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.32.2.7 2005-07-21 08:28:28 hannes Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.32.2.8 2005-07-21 11:50:45 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -250,7 +250,6 @@ fr_print(register const u_char *p, u_int length)
 
 	if (eflag)
 		fr_hdr_print(length, addr_len, dlci, flags, nlpid);
-
 	p += hdr_len;
 	length -= hdr_len;
 
@@ -385,6 +384,11 @@ mfr_print(register const u_char *p, u_int length)
                length);
         tptr = p + 3;
         tlen = length -3;
+        hdr_len = 3;
+
+        if (!vflag)
+            return hdr_len;
+
         while (tlen>sizeof(struct ie_tlv_header_t)) {
             TCHECK2(*tptr, sizeof(struct ie_tlv_header_t));
             ie_type=tptr[0];
@@ -411,15 +415,18 @@ mfr_print(register const u_char *p, u_int length)
                 printf("0x%08x",EXTRACT_32BITS(tptr));
                 break;
 
-            case MFR_CTRL_IE_TIMESTAMP:
-                ts_print((const struct timeval *)tptr);
-                break;
-
             case MFR_CTRL_IE_BUNDLE_ID: /* same message format */
             case MFR_CTRL_IE_LINK_ID:
                 for (idx = 0; idx < ie_len && idx < MFR_ID_STRING_MAXLEN; idx++)
                     safeputchar(*(tptr+idx));
                 break;
+
+            case MFR_CTRL_IE_TIMESTAMP:
+                if (ie_len == sizeof(struct timeval)) {
+                    ts_print((const struct timeval *)tptr);
+                    break;
+                }
+                /* fall through and hexdump if no unix timestamp */
 
                 /*
                  * FIXME those are the defined IEs that lack a decoder
@@ -430,10 +437,15 @@ mfr_print(register const u_char *p, u_int length)
             case MFR_CTRL_IE_CAUSE:
 
             default:
-                if (vflag >= 1)
+                if (vflag <= 1)
                     print_unknown_data(tptr,"\n\t  ",ie_len);
                 break;
             }
+
+            /* do we want to see a hexdump of the IE ? */
+            if (vflag > 1 )
+                print_unknown_data(tptr,"\n\t  ",ie_len);
+            
             tlen-=ie_len;
             tptr+=ie_len;
         }
@@ -616,10 +628,10 @@ struct tok fr_lmi_report_type_ie_values[] = {
     { 0, NULL }
 };
 
-/* array of 16 codepages - currently we only support codepage 5 */
+/* array of 16 codepages - currently we only support codepage 1,5 */
 static struct tok *fr_q933_ie_codesets[] = {
     NULL,
-    NULL,
+    fr_q933_ie_values_codeset5,
     NULL,
     NULL,
     NULL,
@@ -636,22 +648,16 @@ static struct tok *fr_q933_ie_codesets[] = {
     NULL
 };
 
-
-struct common_ie_header {
-    u_int8_t ie_id;
-    u_int8_t ie_len;
-};
-
-static int fr_q933_print_ie_codeset5(const struct common_ie_header *ie_p,
+static int fr_q933_print_ie_codeset5(const struct ie_tlv_header_t  *ie_p,
     const u_char *p);
 
-typedef int (*codeset_pr_func_t)(const struct common_ie_header *ie_p,
+typedef int (*codeset_pr_func_t)(const struct ie_tlv_header_t  *ie_p,
     const u_char *p);
 
-/* array of 16 codepages - currently we only support codepage 5 */
+/* array of 16 codepages - currently we only support codepage 1,5 */
 static codeset_pr_func_t fr_q933_print_ie_codeset[] = {
     NULL,
-    NULL,
+    fr_q933_print_ie_codeset5,
     NULL,
     NULL,
     NULL,
@@ -672,7 +678,7 @@ void
 q933_print(const u_char *p, u_int length)
 {
 	const u_char *ptemp = p;
-	struct common_ie_header *ie_p;
+	struct ie_tlv_header_t  *ie_p;
         int olen;
 	int is_ansi = 0;
         u_int codeset;
@@ -691,7 +697,7 @@ q933_print(const u_char *p, u_int length)
         printf("%s", eflag ? "" : "Q.933, ");
 
 	/* printing out header part */
-	printf(is_ansi ? "ANSI" : "CCITT");
+	printf("%s, codeset %u", is_ansi ? "ANSI" : "CCITT", codeset);
 
 	if (p[0])
 		printf(", Call Ref: 0x%02x", p[0]);
@@ -715,10 +721,10 @@ q933_print(const u_char *p, u_int length)
 	ptemp += 2 + is_ansi;
 	
 	/* Loop through the rest of IE */
-	while (length > sizeof(struct common_ie_header)) {
-		ie_p = (struct common_ie_header *)ptemp;
-		if (length < sizeof(struct common_ie_header) ||
-		    length < sizeof(struct common_ie_header) + ie_p->ie_len) {
+	while (length > sizeof(struct ie_tlv_header_t )) {
+		ie_p = (struct ie_tlv_header_t  *)ptemp;
+		if (length < sizeof(struct ie_tlv_header_t ) ||
+		    length < sizeof(struct ie_tlv_header_t ) + ie_p->ie_len) {
                     if (vflag) /* not bark if there is just a trailer */
                         printf("\n[|q.933]");
                     else
@@ -730,11 +736,15 @@ q933_print(const u_char *p, u_int length)
                  * however some IEs (DLCI Status, Link Verify)
                  * are also intereststing in non-verbose mode */
                 if (vflag)
-                    printf("\n\t%s IE (%u), length %u: ",
-                           tok2str(fr_q933_ie_codesets[codeset],"unknown",ie_p->ie_id),
-                           ie_p->ie_id,
+                    printf("\n\t%s IE (0x%02x), length %u: ",
+                           tok2str(fr_q933_ie_codesets[codeset],"unknown",ie_p->ie_type),
+                           ie_p->ie_type,
                            ie_p->ie_len);
  
+                /* sanity check */
+                if (ie_p->ie_type == 0 || ie_p->ie_len == 0)
+                    return;
+
                 if (fr_q933_print_ie_codeset[codeset] != NULL)
                     ie_is_known = fr_q933_print_ie_codeset[codeset](ie_p, ptemp);
                
@@ -753,11 +763,11 @@ q933_print(const u_char *p, u_int length)
 }
 
 static int
-fr_q933_print_ie_codeset5(const struct common_ie_header *ie_p, const u_char *p)
+fr_q933_print_ie_codeset5(const struct ie_tlv_header_t  *ie_p, const u_char *p)
 {
         u_int dlci;
 
-        switch (ie_p->ie_id) {
+        switch (ie_p->ie_type) {
 
         case FR_LMI_ANSI_REPORT_TYPE_IE: /* fall through */
         case FR_LMI_CCITT_REPORT_TYPE_IE:
