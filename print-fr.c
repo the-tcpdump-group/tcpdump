@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.38 2005-07-20 22:12:38 hannes Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.39 2005-07-21 08:26:45 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -331,11 +331,38 @@ struct tok mfr_ctrl_msg_values[] = {
     { 0, NULL }
 };
 
+#define MFR_CTRL_IE_BUNDLE_ID  1
+#define MFR_CTRL_IE_LINK_ID    2
+#define MFR_CTRL_IE_MAGIC_NUM  3
+#define MFR_CTRL_IE_TIMESTAMP  5
+#define MFR_CTRL_IE_VENDOR_EXT 6
+#define MFR_CTRL_IE_CAUSE      7
+
+struct tok mfr_ctrl_ie_values[] = {
+    { MFR_CTRL_IE_BUNDLE_ID, "Bundel ID"},
+    { MFR_CTRL_IE_LINK_ID, "Link ID"},
+    { MFR_CTRL_IE_MAGIC_NUM, "Magic Number"},
+    { MFR_CTRL_IE_TIMESTAMP, "Timestamp"},
+    { MFR_CTRL_IE_VENDOR_EXT, "Vendor Extension"},
+    { MFR_CTRL_IE_CAUSE, "Cause"},
+    { 0, NULL }
+};
+
+#define MFR_ID_STRING_MAXLEN 50
+
+struct ie_tlv_header_t {
+    u_int8_t ie_type;
+    u_int8_t ie_len;
+};
+
 u_int
 mfr_print(register const u_char *p, u_int length)
 {
-    u_int hdr_len = 0;
+    u_int tlen,idx,hdr_len = 0;
     u_int16_t sequence_num;
+    u_int8_t ie_type,ie_len;
+    const char *tptr;
+
 
 /*
  * FRF.16 Link Integrity Control Frame
@@ -350,23 +377,65 @@ mfr_print(register const u_char *p, u_int length)
  *    +----+----+----+----+----+----+----+----+
  */
 
+    TCHECK2(*p, 4); /* minimum frame header length */
+
     if ((p[0] & MFR_BEC_MASK) == MFR_CTRL_FRAME && p[1] == 0) {
         printf("FRF.16 Control, %s, length %u",
                tok2str(mfr_ctrl_msg_values,"Unknown Message (0x%02x)",p[2]),
                length);
-        switch (p[2]) {
-            /* no decoder yet - so fall through */
-        case MFR_CTRL_MSG_ADD_LINK:
-        case MFR_CTRL_MSG_ADD_LINK_ACK:
-        case MFR_CTRL_MSG_ADD_LINK_REJ:
-        case MFR_CTRL_MSG_HELLO:
-        case MFR_CTRL_MSG_HELLO_ACK:
-        case MFR_CTRL_MSG_REMOVE_LINK:
-        case MFR_CTRL_MSG_REMOVE_LINK_ACK:
-        default:
-            if (vflag >= 1)
-                print_unknown_data(p+3,"\n\t",length-3);
-            break;
+        tptr = p + 3;
+        tlen = length -3;
+        while (tlen>sizeof(struct ie_tlv_header_t)) {
+            TCHECK2(*tptr, sizeof(struct ie_tlv_header_t));
+            ie_type=tptr[0];
+            ie_len=tptr[1];
+
+            printf("\n\tIE %s (%u), length %u: ",
+                   tok2str(mfr_ctrl_ie_values,"Unknown",ie_type),
+                   ie_type,
+                   ie_len);
+
+            /* infinite loop check */
+            if (ie_type == 0 || ie_len <= sizeof(struct ie_tlv_header_t))
+                return hdr_len;
+
+            TCHECK2(*tptr,ie_len);
+            tptr+=sizeof(struct ie_tlv_header_t);
+            /* tlv len includes header */
+            ie_len-=sizeof(struct ie_tlv_header_t);
+            tlen-=sizeof(struct ie_tlv_header_t);
+
+            switch (ie_type) {
+
+            case MFR_CTRL_IE_MAGIC_NUM:
+                printf("0x%08x",EXTRACT_32BITS(tptr));
+                break;
+
+            case MFR_CTRL_IE_TIMESTAMP:
+                ts_print((const struct timeval *)tptr);
+                break;
+
+            case MFR_CTRL_IE_BUNDLE_ID: /* same message format */
+            case MFR_CTRL_IE_LINK_ID:
+                for (idx = 0; idx < ie_len && idx < MFR_ID_STRING_MAXLEN; idx++)
+                    safeputchar(*(tptr+idx));
+                break;
+
+                /*
+                 * FIXME those are the defined IEs that lack a decoder
+                 * you are welcome to contribute code ;-)
+                 */
+
+            case MFR_CTRL_IE_VENDOR_EXT:
+            case MFR_CTRL_IE_CAUSE:
+
+            default:
+                if (vflag >= 1)
+                    print_unknown_data(tptr,"\n\t  ",ie_len);
+                break;
+            }
+            tlen-=ie_len;
+            tptr+=ie_len;
         }
         return hdr_len;
     }
@@ -394,6 +463,10 @@ mfr_print(register const u_char *p, u_int length)
     }
 
     return hdr_len;
+
+ trunc:
+    printf("[|mfr]");
+    return length;
 }
 
 /* an NLPID of 0xb1 indicates a 2-byte
