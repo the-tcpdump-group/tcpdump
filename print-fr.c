@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.40 2005-07-21 11:48:43 hannes Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.41 2005-07-21 11:52:00 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -338,7 +338,7 @@ struct tok mfr_ctrl_msg_values[] = {
 #define MFR_CTRL_IE_CAUSE      7
 
 struct tok mfr_ctrl_ie_values[] = {
-    { MFR_CTRL_IE_BUNDLE_ID, "Bundel ID"},
+    { MFR_CTRL_IE_BUNDLE_ID, "Bundle ID"},
     { MFR_CTRL_IE_LINK_ID, "Link ID"},
     { MFR_CTRL_IE_MAGIC_NUM, "Magic Number"},
     { MFR_CTRL_IE_TIMESTAMP, "Timestamp"},
