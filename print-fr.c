@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.32.2.8 2005-07-21 11:50:45 hannes Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.32.2.9 2005-07-26 13:22:30 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -417,8 +417,12 @@ mfr_print(register const u_char *p, u_int length)
 
             case MFR_CTRL_IE_BUNDLE_ID: /* same message format */
             case MFR_CTRL_IE_LINK_ID:
-                for (idx = 0; idx < ie_len && idx < MFR_ID_STRING_MAXLEN; idx++)
-                    safeputchar(*(tptr+idx));
+                for (idx = 0; idx < ie_len && idx < MFR_ID_STRING_MAXLEN; idx++) {
+                    if (*(tptr+idx) != 0) /* don't print null termination */
+                        safeputchar(*(tptr+idx));
+                    else
+                        break;
+                }
                 break;
 
             case MFR_CTRL_IE_TIMESTAMP:
