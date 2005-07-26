@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.108.2.5 2005-04-25 08:43:05 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.108.2.6 2005-07-26 17:34:54 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -461,9 +461,10 @@ lookup_protoid(const u_char *pi)
 const char *
 etheraddr_string(register const u_char *ep)
 {
-	register u_int i, oui;
+	register int i;
 	register char *cp;
 	register struct enamemem *tp;
+	int oui;
 	char buf[BUFSIZE];
 
 	tp = lookup_emem(ep);
@@ -475,9 +476,9 @@ etheraddr_string(register const u_char *ep)
 
 		/*
 		 * We don't cast it to "const struct ether_addr *"
-		 * because some systems don't modify the Ethernet
-		 * address but fail to declare the second argument
-		 * as a "const" pointer.
+		 * because some systems fail to declare the second
+		 * argument as a "const" pointer, even though they
+		 * don't modify what it points to.
 		 */
 		if (ether_ntohost(buf2, (struct ether_addr *)ep) == 0) {
 			tp->e_name = strdup(buf2);
@@ -486,20 +487,20 @@ etheraddr_string(register const u_char *ep)
 	}
 #endif
 	cp = buf;
-        oui=EXTRACT_24BITS(ep);
+	oui = EXTRACT_24BITS(ep);
 	*cp++ = hex[*ep >> 4 ];
 	*cp++ = hex[*ep++ & 0xf];
-        for (i = 5; (int)--i >= 0;) {
-            *cp++ = ':';
-            *cp++ = hex[*ep >> 4 ];
-            *cp++ = hex[*ep++ & 0xf];
-        }
+	for (i = 5; --i >= 0;) {
+		*cp++ = ':';
+		*cp++ = hex[*ep >> 4 ];
+		*cp++ = hex[*ep++ & 0xf];
+	}
 
-        if (!nflag) {
-            snprintf(cp,BUFSIZE," (oui %s)",
-                     tok2str(oui_values,"Unknown",oui));
-        } else
-            *cp = '\0';
+	if (!nflag) {
+		snprintf(cp, BUFSIZE - (2 + 5*3), " (oui %s)",
+		    tok2str(oui_values, "Unknown", oui));
+	} else
+		*cp = '\0';
 	tp->e_name = strdup(buf);
 	return (tp->e_name);
 }
