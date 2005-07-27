@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.32.2.9 2005-07-26 13:22:30 hannes Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.32.2.10 2005-07-27 00:26:39 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -360,7 +360,7 @@ mfr_print(register const u_char *p, u_int length)
     u_int tlen,idx,hdr_len = 0;
     u_int16_t sequence_num;
     u_int8_t ie_type,ie_len;
-    const char *tptr;
+    const u_int8_t *tptr;
 
 
 /*
