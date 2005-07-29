@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.8.2.16 2005-07-21 11:43:12 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.8.2.17 2005-07-29 23:51:37 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -835,6 +835,7 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
 
     /* DLT_ specific parsing */
     switch(l2info->pictype) {
+#ifdef DLT_JUNIPER_MLPPP
     case DLT_JUNIPER_MLPPP:
         switch (l2info->cookie_type) {
         case LS_COOKIE_ID:
@@ -849,6 +850,8 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
             break;
         }
         break;
+#endif
+#ifdef DLT_JUNIPER_MLFR
     case DLT_JUNIPER_MLFR:
         switch (l2info->cookie_type) {
         case LS_COOKIE_ID:
@@ -870,6 +873,8 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
             break;
         }
         break;
+#endif
+#ifdef DLT_JUNIPER_MFR
     case DLT_JUNIPER_MFR:
         switch (l2info->cookie_type) {
         case LS_COOKIE_ID:
@@ -888,6 +893,8 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
             break;
         }
         break;
+#endif
+#ifdef DLT_JUNIPER_ATM2
     case DLT_JUNIPER_ATM2:
         TCHECK2(p[0],4);
         /* ATM cell relay control word present ? */
@@ -897,8 +904,13 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
                 printf("control-word 0x%08x ",EXTRACT_32BITS(p));
         }
         break;
+#endif
+#ifdef DLT_JUNIPER_ATM1
     case DLT_JUNIPER_ATM1:
+        break;
+#endif
     default:
+        printf("Unknown Juniper DLT_ type %u: ", l2info->pictype);
         break;
     }
     
