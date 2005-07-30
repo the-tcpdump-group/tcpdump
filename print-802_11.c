@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.34 2005-07-30 00:05:32 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.35 2005-07-30 18:48:35 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -71,16 +71,16 @@ static const char *subtype_text[16]={
 	"ReAssoc Response",
 	"Probe Request",
 	"Probe Response",
-	NULL,
-	NULL,
+	"",
+	"",
 	"Beacon",
 	"ATIM",
 	"Disassociation",
 	"Authentication",
 	"DeAuthentication",
-	NULL,
-	NULL,
-	NULL
+	"",
+	"",
+	""
 };
 
 static const char *status_text[] = {
@@ -515,10 +515,7 @@ static int
 mgmt_body_print(u_int16_t fc, const struct mgmt_header_t *pmh,
     const u_char *p)
 {
-	if (subtype_text[FC_SUBTYPE(fc)] != NULL)
-		printf("%s", subtype_text[FC_SUBTYPE(fc)]);
-	else
-		printf("Unknown subtype %u", FC_SUBTYPE(fc));
+	printf("%s", subtype_text[FC_SUBTYPE(fc)]);
 
 	switch (FC_SUBTYPE(fc)) {
 	case ST_ASSOC_REQUEST:
