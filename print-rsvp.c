@@ -1,4 +1,6 @@
 /*
+ * Copyright (c) 1998-2005 The TCPDUMP project
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that: (1) source code
  * distributions retain the above copyright notice and this paragraph
@@ -15,7 +17,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.33.2.4 2005-07-11 20:24:35 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.33.2.5 2005-08-01 09:12:39 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -115,7 +117,7 @@ static const struct tok rsvp_header_flag_values[] = {
 
 #define	RSVP_OBJ_SESSION            1   /* rfc2205 */
 #define	RSVP_OBJ_RSVP_HOP           3   /* rfc2205, rfc3473 */
-#define	RSVP_OBJ_INTEGRITY          4
+#define	RSVP_OBJ_INTEGRITY          4   /* rfc2747 */
 #define	RSVP_OBJ_TIME_VALUES        5   /* rfc2205 */
 #define	RSVP_OBJ_ERROR_SPEC         6 
 #define	RSVP_OBJ_SCOPE              7
@@ -139,7 +141,7 @@ static const struct tok rsvp_header_flag_values[] = {
 #define	RSVP_OBJ_UPSTREAM_LABEL     35  /* rfc3473 */
 #define	RSVP_OBJ_LABEL_SET          36  /* rfc3473 */
 #define	RSVP_OBJ_PROTECTION         37  /* rfc3473 */
-#define	RSVP_OBJ_DETOUR             63  /* draft-ietf-mpls-rsvp-lsp-fastreroute-01 */
+#define	RSVP_OBJ_DETOUR             63  /* draft-ietf-mpls-rsvp-lsp-fastreroute-07 */
 #define	RSVP_OBJ_CLASSTYPE          125 /* draft-ietf-tewg-diff-te-proto-07 */
 #define	RSVP_OBJ_SUGGESTED_LABEL    129 /* rfc3473 */
 #define	RSVP_OBJ_ACCEPT_LABEL_SET   130 /* rfc3473 */
@@ -147,7 +149,7 @@ static const struct tok rsvp_header_flag_values[] = {
 #define	RSVP_OBJ_NOTIFY_REQ         195 /* rfc3473 */
 #define	RSVP_OBJ_ADMIN_STATUS       196 /* rfc3473 */
 #define	RSVP_OBJ_PROPERTIES         204 /* juniper proprietary */
-#define	RSVP_OBJ_FASTREROUTE        205 /* draft-ietf-mpls-rsvp-lsp-fastreroute-01 */
+#define	RSVP_OBJ_FASTREROUTE        205 /* draft-ietf-mpls-rsvp-lsp-fastreroute-07 */
 #define	RSVP_OBJ_SESSION_ATTRIBUTE  207 /* rfc3209 */
 #define RSVP_OBJ_CALL_ID            230 /* rfc3474 */
 #define RSVP_OBJ_CALL_OPS           236 /* rfc3474 */
@@ -263,12 +265,38 @@ static const struct tok rsvp_ctype_values[] = {
     { 256*RSVP_OBJ_ERROR_SPEC+RSVP_CTYPE_4,                  "IPv6 plus opt. TLVs" },
     { 256*RSVP_OBJ_RESTART_CAPABILITY+RSVP_CTYPE_1,          "IPv4" },
     { 256*RSVP_OBJ_SESSION_ATTRIBUTE+RSVP_CTYPE_TUNNEL_IPV4, "Tunnel IPv4" },
-    { 256*RSVP_OBJ_FASTREROUTE+RSVP_CTYPE_TUNNEL_IPV4,       "Tunnel IPv4" },
+    { 256*RSVP_OBJ_FASTREROUTE+RSVP_CTYPE_TUNNEL_IPV4,       "Tunnel IPv4" }, /* old style*/
+    { 256*RSVP_OBJ_FASTREROUTE+RSVP_CTYPE_1,                 "1" }, /* new style */
     { 256*RSVP_OBJ_DETOUR+RSVP_CTYPE_TUNNEL_IPV4,            "Tunnel IPv4" },
     { 256*RSVP_OBJ_PROPERTIES+RSVP_CTYPE_1,                  "1" },
     { 256*RSVP_OBJ_CLASSTYPE+RSVP_CTYPE_1,                   "1" },
     { 0, NULL}
 };
+
+struct rsvp_obj_integrity_t {
+    u_int8_t flags;
+    u_int8_t res;
+    u_int8_t key_id[6];
+    u_int8_t sequence[8];
+    u_int8_t digest[16];
+};
+
+static const struct tok rsvp_obj_integrity_flag_values[] = {
+    { 0x80, "Handshake" },
+    { 0, NULL}
+};
+
+struct rsvp_obj_frr_t {
+    u_int8_t setup_prio;
+    u_int8_t hold_prio;
+    u_int8_t hop_limit;
+    u_int8_t flags;
+    u_int8_t bandwidth[4];
+    u_int8_t include_any[4];
+    u_int8_t exclude_any[4];
+    u_int8_t include_all[4];
+};
+
 
 #define RSVP_OBJ_XRO_MASK_SUBOBJ(x)   ((x)&0x7f)
 #define RSVP_OBJ_XRO_MASK_LOOSE(x)    ((x)&0x80)
@@ -288,7 +316,7 @@ static const struct tok rsvp_obj_xro_values[] = {
     { 0, NULL}
 };
 
-/* draft-ietf-mpls-rsvp-lsp-fastreroute-02.txt */
+/* draft-ietf-mpls-rsvp-lsp-fastreroute-07.txt */
 static const struct tok rsvp_obj_rro_flag_values[] = {
     { 0x01,	              "Local protection available" },
     { 0x02,                   "Local protection in use" },
@@ -540,6 +568,11 @@ rsvp_obj_print (const u_char *tptr, const char *ident, u_int tlen) {
 
     const struct rsvp_object_header *rsvp_obj_header;
     const u_char *obj_tptr;
+    union {
+        const struct rsvp_obj_integrity_t *rsvp_obj_integrity;
+        const struct rsvp_obj_frr_t *rsvp_obj_frr;
+    } obj_ptr;
+
     u_short rsvp_obj_len,rsvp_obj_ctype,obj_tlen,intserv_serv_tlen;
     int hexdump,processed,padbytes,error_code,error_value,i;
     union {
@@ -997,7 +1030,8 @@ rsvp_obj_print (const u_char *tptr, const char *ident, u_int tlen) {
                        EXTRACT_32BITS(obj_tptr+4));
                 obj_tlen-=8;
                 obj_tptr+=8;
-                hexdump=TRUE; /* unless we have a TLV parser lets just hexdump */
+                if (obj_tlen)
+                    hexdump=TRUE; /* unless we have a TLV parser lets just hexdump */
                 break;
 #ifdef INET6
             case RSVP_CTYPE_4: /* fall through - FIXME add TLV parser */
@@ -1136,24 +1170,46 @@ rsvp_obj_print (const u_char *tptr, const char *ident, u_int tlen) {
             break;
 
         case RSVP_OBJ_FASTREROUTE:
+            /* the differences between c-type 1 and 7 are minor */
+            obj_ptr.rsvp_obj_frr = (const struct rsvp_obj_frr_t *)obj_tptr;
+            bw.i = EXTRACT_32BITS(obj_ptr.rsvp_obj_frr->bandwidth);
+
             switch(rsvp_obj_ctype) {
-            case RSVP_CTYPE_TUNNEL_IPV4:
-                if (obj_tlen < 16)
+            case RSVP_CTYPE_1: /* new style */
+                if (obj_tlen < sizeof(struct rsvp_obj_frr_t))
                     return-1;
-                bw.i = EXTRACT_32BITS(obj_tptr+4);
                 printf("%s  Setup Priority: %u, Holding Priority: %u, Hop-limit: %u, Bandwidth: %.10g Mbps",
                        ident,
-                       (int)*obj_tptr,
-                       (int)*(obj_tptr+1),
-                       (int)*(obj_tptr+2),
+                       (int)obj_ptr.rsvp_obj_frr->setup_prio,
+                       (int)obj_ptr.rsvp_obj_frr->hold_prio,
+                       (int)obj_ptr.rsvp_obj_frr->hop_limit,
+                        bw.f*8/1000000);              
+                printf("%s  Include-any: 0x%08x, Exclude-any: 0x%08x, Include-all: 0x%08x",
+                       ident,
+                       EXTRACT_32BITS(obj_ptr.rsvp_obj_frr->include_any),
+                       EXTRACT_32BITS(obj_ptr.rsvp_obj_frr->exclude_any),
+                       EXTRACT_32BITS(obj_ptr.rsvp_obj_frr->include_all));
+                obj_tlen-=sizeof(struct rsvp_obj_frr_t);
+                obj_tptr+=sizeof(struct rsvp_obj_frr_t);
+                break;
+
+            case RSVP_CTYPE_TUNNEL_IPV4: /* old style */
+                if (obj_tlen < 16)
+                    return-1;
+                printf("%s  Setup Priority: %u, Holding Priority: %u, Hop-limit: %u, Bandwidth: %.10g Mbps",
+                       ident,
+                       (int)obj_ptr.rsvp_obj_frr->setup_prio,
+                       (int)obj_ptr.rsvp_obj_frr->hold_prio,
+                       (int)obj_ptr.rsvp_obj_frr->hop_limit,
                         bw.f*8/1000000);              
                 printf("%s  Include Colors: 0x%08x, Exclude Colors: 0x%08x",
                        ident,
-                       EXTRACT_32BITS(obj_tptr+8),
-                       EXTRACT_32BITS(obj_tptr+12));
+                       EXTRACT_32BITS(obj_ptr.rsvp_obj_frr->include_any),
+                       EXTRACT_32BITS(obj_ptr.rsvp_obj_frr->exclude_any));
                 obj_tlen-=16;
                 obj_tptr+=16;
                 break;
+
             default:
                 hexdump=TRUE;
             }
@@ -1317,12 +1373,40 @@ rsvp_obj_print (const u_char *tptr, const char *ident, u_int tlen) {
             }
             break;
 
+        case RSVP_OBJ_INTEGRITY:
+            switch(rsvp_obj_ctype) {
+            case RSVP_CTYPE_1:
+                if (obj_tlen < sizeof(struct rsvp_obj_integrity_t))
+                    return-1;
+                obj_ptr.rsvp_obj_integrity = (const struct rsvp_obj_integrity_t *)obj_tptr;
+                printf("%s  Key-ID 0x%04x%08x, Sequence 0x%08x%08x, Flags [%s]",
+                       ident,
+                       EXTRACT_16BITS(obj_ptr.rsvp_obj_integrity->key_id),
+                       EXTRACT_32BITS(obj_ptr.rsvp_obj_integrity->key_id+2),
+                       EXTRACT_32BITS(obj_ptr.rsvp_obj_integrity->sequence),
+                       EXTRACT_32BITS(obj_ptr.rsvp_obj_integrity->sequence+4),
+                       bittok2str(rsvp_obj_integrity_flag_values,
+                                  "none",
+                                  obj_ptr.rsvp_obj_integrity->flags));
+                printf("%s  MD5-sum 0x%08x%08x%08x%08x (unverified)",
+                       ident,
+                       EXTRACT_32BITS(obj_ptr.rsvp_obj_integrity->digest),
+                       EXTRACT_32BITS(obj_ptr.rsvp_obj_integrity->digest+4),
+                       EXTRACT_32BITS(obj_ptr.rsvp_obj_integrity->digest+8),
+                       EXTRACT_32BITS(obj_ptr.rsvp_obj_integrity->digest+12));
+                obj_tlen+=sizeof(struct rsvp_obj_integrity_t);
+                obj_tptr+=sizeof(struct rsvp_obj_integrity_t);
+                break;
+            default:
+                hexdump=TRUE;
+            }
+            break;           
+
         /*
          *  FIXME those are the defined objects that lack a decoder
          *  you are welcome to contribute code ;-)
          */
 
-        case RSVP_OBJ_INTEGRITY:
         case RSVP_OBJ_SCOPE:
         case RSVP_OBJ_POLICY_DATA:
         case RSVP_OBJ_LABEL_SET:
