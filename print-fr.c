@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.44 2005-07-27 09:01:03 hannes Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.45 2005-08-09 20:06:34 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -478,15 +478,23 @@ mfr_print(register const u_char *p, u_int length)
  *    +----+----+----+----+----+----+----+----+
  */
 
-    if ((p[0] & MFR_BEC_MASK) == MFR_FRAG_FRAME) {
-        sequence_num = (p[0]&0x1e)<<7 | p[1];
-        if (eflag)
-            printf("FRF.16 Frag, seq %u, Flags [%s], ",
-                   sequence_num,
-                   bittok2str(frf_flag_values,"none",(p[0] & MFR_BEC_MASK)));
+    sequence_num = (p[0]&0x1e)<<7 | p[1];
+    /* whole packet or first fragment ? */
+    if ((p[0] & MFR_BEC_MASK) == MFR_FRAG_FRAME ||
+        p[0] & MFR_BEC_MASK == MFR_B_BIT) {
+        printf("FRF.16 Frag, seq %u, Flags [%s], ",
+               sequence_num,
+               bittok2str(frf_flag_values,"none",(p[0] & MFR_BEC_MASK)));
         hdr_len = 2;
         fr_print(p+hdr_len,length-hdr_len);
+        return hdr_len;
     }
+
+    /* must be a middle or the last fragment */
+    printf("FRF.16 Frag, seq %u, Flags [%s]",
+           sequence_num,
+           bittok2str(frf_flag_values,"none",(p[0] & MFR_BEC_MASK)));
+    print_unknown_data(p,"\n\t",length);
 
     return hdr_len;
 
