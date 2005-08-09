@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.32.2.10 2005-07-27 00:26:39 guy Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.32.2.11 2005-08-09 20:10:32 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -82,6 +82,20 @@ struct tok fr_header_flag_values[] = {
     { 0, NULL }
 };
 
+/* FRF.15 / FRF.16 */
+#define MFR_B_BIT 0x80
+#define MFR_E_BIT 0x40
+#define MFR_C_BIT 0x20
+#define MFR_BEC_MASK    (MFR_B_BIT | MFR_E_BIT | MFR_C_BIT)
+#define MFR_CTRL_FRAME  (MFR_B_BIT | MFR_E_BIT | MFR_C_BIT)
+#define MFR_FRAG_FRAME  (MFR_B_BIT | MFR_E_BIT )
+
+struct tok frf_flag_values[] = {
+    { MFR_B_BIT, "Begin" },
+    { MFR_E_BIT, "End" },
+    { MFR_C_BIT, "Control" },
+    { 0, NULL }
+};
 
 /* Finds out Q.922 address length, DLCI and flags. Returns 0 on success
  * save the flags dep. on address length
@@ -304,13 +318,6 @@ fr_print(register const u_char *p, u_int length)
 
 }
 
-#define MFR_B_BIT 0x80
-#define MFR_E_BIT 0x40
-#define MFR_C_BIT 0x20
-#define MFR_BEC_MASK    (MFR_B_BIT | MFR_E_BIT | MFR_C_BIT)
-#define MFR_CTRL_FRAME  (MFR_B_BIT | MFR_E_BIT | MFR_C_BIT)
-#define MFR_FRAG_FRAME  (MFR_B_BIT | MFR_E_BIT )
-
 #define MFR_CTRL_MSG_ADD_LINK        1
 #define MFR_CTRL_MSG_ADD_LINK_ACK    2
 #define MFR_CTRL_MSG_ADD_LINK_REJ    3
@@ -379,7 +386,8 @@ mfr_print(register const u_char *p, u_int length)
     TCHECK2(*p, 4); /* minimum frame header length */
 
     if ((p[0] & MFR_BEC_MASK) == MFR_CTRL_FRAME && p[1] == 0) {
-        printf("FRF.16 Control, %s, length %u",
+        printf("FRF.16 Control, Flags [%s], %s, length %u",
+               bittok2str(frf_flag_values,"none",(p[0] & MFR_BEC_MASK)),
                tok2str(mfr_ctrl_msg_values,"Unknown Message (0x%02x)",p[2]),
                length);
         tptr = p + 3;
@@ -470,13 +478,23 @@ mfr_print(register const u_char *p, u_int length)
  *    +----+----+----+----+----+----+----+----+
  */
 
-    if ((p[0] & MFR_BEC_MASK) == MFR_FRAG_FRAME) {
-        sequence_num = (p[0]&0x1e)<<7 | p[1];
-        if (eflag)
-            printf("FRF.16 Frag, seq %u, ", sequence_num);
+    sequence_num = (p[0]&0x1e)<<7 | p[1];
+    /* whole packet or first fragment ? */
+    if ((p[0] & MFR_BEC_MASK) == MFR_FRAG_FRAME ||
+        p[0] & MFR_BEC_MASK == MFR_B_BIT) {
+        printf("FRF.16 Frag, seq %u, Flags [%s], ",
+               sequence_num,
+               bittok2str(frf_flag_values,"none",(p[0] & MFR_BEC_MASK)));
         hdr_len = 2;
         fr_print(p+hdr_len,length-hdr_len);
+        return hdr_len;
     }
+
+    /* must be a middle or the last fragment */
+    printf("FRF.16 Frag, seq %u, Flags [%s]",
+           sequence_num,
+           bittok2str(frf_flag_values,"none",(p[0] & MFR_BEC_MASK)));
+    print_unknown_data(p,"\n\t",length);
 
     return hdr_len;
 
@@ -500,13 +518,6 @@ mfr_print(register const u_char *p, u_int length)
  *    +----+----+----+----+----+----+----+----+
  */
 
-struct tok frf15_flag_values[] = {
-    { 0x80, "Begin" },
-    { 0x40, "End" },
-    { 0x20, "Control" },
-    { 0, NULL }
-};
-
 #define FR_FRF15_FRAGTYPE 0x01
 
 static void
@@ -514,13 +525,13 @@ frf15_print (const u_char *p, u_int length) {
     
     u_int16_t sequence_num, flags;
 
-    flags = p[0]&0xe0;
+    flags = p[0]&MFR_BEC_MASK;
     sequence_num = (p[0]&0x1e)<<7 | p[1];
 
     printf("FRF.15, seq 0x%03x, Flags [%s],%s Fragmentation, length %u",
            sequence_num,
-           bittok2str(frf15_flag_values,"none",flags),
-           flags&FR_FRF15_FRAGTYPE ? "Interface" : "End-to-End",
+           bittok2str(frf_flag_values,"none",flags),
+           p[0]&FR_FRF15_FRAGTYPE ? "Interface" : "End-to-End",
            length);
 
 /* TODO:
