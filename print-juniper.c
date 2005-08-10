@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.25 2005-07-29 23:51:16 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.26 2005-08-10 14:18:57 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -40,6 +40,7 @@ static const char rcsid[] _U_ =
 #define JUNIPER_BPF_IN            1       /* Incoming packet */
 #define JUNIPER_BPF_PKT_IN        0x1     /* Incoming packet */
 #define JUNIPER_BPF_NO_L2         0x2     /* L2 header stripped */
+#define JUNIPER_BPF_EXT           0x80    /* extensions present */
 #define JUNIPER_MGC_NUMBER        0x4d4743 /* = "MGC" */
 
 #define JUNIPER_LSQ_COOKIE_RE         (1 << 3)
@@ -732,7 +733,7 @@ static int
 juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct juniper_l2info_t *l2info) {
 
     struct juniper_cookie_table_t *lp = juniper_cookie_table;
-    u_int idx;
+    u_int idx, offset;
 
     l2info->header_len = 0;
     l2info->cookie_len = 0;
@@ -747,11 +748,18 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
     if (EXTRACT_24BITS(p) != JUNIPER_MGC_NUMBER) { /* magic number found ? */
         printf("no magic-number found!");
         return 0;
-    } else
-        l2info->header_len = 4;
+    } 
 
     if (eflag) /* print direction */
         printf("%3s ",tok2str(juniper_direction_values,"---",l2info->direction));
+
+    /* extensions present ?  - calculate how much bytes to skip */
+    if ((p[3] & JUNIPER_BPF_EXT ) == JUNIPER_BPF_EXT ) {
+        offset = 6 + EXTRACT_16BITS(p+4);
+        if (eflag>1)
+            printf("ext-len %u, ",EXTRACT_16BITS(p+4));
+    } else
+        offset = 4;
 
     if ((p[3] & JUNIPER_BPF_NO_L2 ) == JUNIPER_BPF_NO_L2 ) {            
         if (eflag)
@@ -761,15 +769,15 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
          * perform the v4/v6 heuristics
          * to figure out what it is
          */
-        TCHECK2(p[8],1);
-        if(ip_heuristic_guess(p+8,l2info->length-8) == 0)
+        TCHECK2(p[offset+4],1);
+        if(ip_heuristic_guess(p+offset+4,l2info->length-(offset+4)) == 0)
             printf("no IP-hdr found!");
 
-        l2info->header_len+=4;
+        l2info->header_len=offset+4;
         return 0; /* stop parsing the output further */
         
     }
-
+    l2info->header_len = offset;
     p+=l2info->header_len;
     l2info->length -= l2info->header_len;
     l2info->caplen -= l2info->header_len;
