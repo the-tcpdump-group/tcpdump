@@ -1,6 +1,9 @@
-$Header: /tcpdump/master/tcpdump/CHANGES,v 1.87.2.2 2005-07-11 13:29:58 hannes Exp $
+$Header: /tcpdump/master/tcpdump/CHANGES,v 1.87.2.3 2005-08-19 15:28:06 ken Exp $
 
-Tue. 	July 5, 2005.  ken@xelerance.com. Summary for 3.9.x tcpdump
+Mon. 	August 22, 2005.  ken@xelerance.com. Summary for 3.9.4 tcpdump release
+	Decoder support for more Juniper link-layer types	
+
+Tue. 	July 5, 2005.  ken@xelerance.com. Summary for 3.9.3 tcpdump release
 
 	Option to chroot() when dropping privs  
 	Fixes for compiling on nearly every platform,
