@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.259 2005-07-20 22:12:39 hannes Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.260 2005-08-23 10:24:58 hannes Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -253,6 +253,7 @@ extern u_int lane_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int cip_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int sl_bsdos_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int chdlc_if_print(const struct pcap_pkthdr *, const u_char *);
+extern u_int chdlc_print(register const u_char *, u_int);
 extern u_int juniper_atm1_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int juniper_atm2_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int juniper_mfr_print(const struct pcap_pkthdr *, register const u_char *);
@@ -264,6 +265,10 @@ extern u_int juniper_ggsn_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int juniper_es_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int juniper_monitor_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int juniper_services_print(const struct pcap_pkthdr *, const u_char *);
+extern u_int juniper_ether_print(const struct pcap_pkthdr *, const u_char *);
+extern u_int juniper_ppp_print(const struct pcap_pkthdr *, const u_char *);
+extern u_int juniper_frelay_print(const struct pcap_pkthdr *, const u_char *);
+extern u_int juniper_chdlc_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int sll_if_print(const struct pcap_pkthdr *, const u_char *);
 extern void snmp_print(const u_char *, u_int);
 extern void sunrpcrequest_print(const u_char *, u_int, const u_char *);

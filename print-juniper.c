@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.26 2005-08-10 14:18:57 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.27 2005-08-23 10:24:59 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -354,6 +354,74 @@ juniper_pppoe_print(const struct pcap_pkthdr *h, register const u_char *p)
         p+=l2info.header_len;
         /* this DLT contains nothing but raw ethernet frames */
         ether_print(p, l2info.length, l2info.caplen);
+        return l2info.header_len;
+}
+#endif
+
+#ifdef DLT_JUNIPER_ETHER
+u_int
+juniper_ether_print(const struct pcap_pkthdr *h, register const u_char *p)
+{
+        struct juniper_l2info_t l2info;
+
+        l2info.pictype = DLT_JUNIPER_ETHER;
+        if(juniper_parse_header(p, h, &l2info) == 0)
+            return l2info.header_len;
+
+        p+=l2info.header_len;
+        /* this DLT contains nothing but raw Ethernet frames */
+        ether_print(p, l2info.length, l2info.caplen);
+        return l2info.header_len;
+}
+#endif
+
+#ifdef DLT_JUNIPER_PPP
+u_int
+juniper_ppp_print(const struct pcap_pkthdr *h, register const u_char *p)
+{
+        struct juniper_l2info_t l2info;
+
+        l2info.pictype = DLT_JUNIPER_PPP;
+        if(juniper_parse_header(p, h, &l2info) == 0)
+            return l2info.header_len;
+
+        p+=l2info.header_len;
+        /* this DLT contains nothing but raw ppp frames */
+        ppp_print(p, l2info.length);
+        return l2info.header_len;
+}
+#endif
+
+#ifdef DLT_JUNIPER_FRELAY
+u_int
+juniper_frelay_print(const struct pcap_pkthdr *h, register const u_char *p)
+{
+        struct juniper_l2info_t l2info;
+
+        l2info.pictype = DLT_JUNIPER_FRELAY;
+        if(juniper_parse_header(p, h, &l2info) == 0)
+            return l2info.header_len;
+
+        p+=l2info.header_len;
+        /* this DLT contains nothing but raw frame-relay frames */
+        fr_print(p, l2info.length);
+        return l2info.header_len;
+}
+#endif
+
+#ifdef DLT_JUNIPER_CHDLC
+u_int
+juniper_chdlc_print(const struct pcap_pkthdr *h, register const u_char *p)
+{
+        struct juniper_l2info_t l2info;
+
+        l2info.pictype = DLT_JUNIPER_CHDLC;
+        if(juniper_parse_header(p, h, &l2info) == 0)
+            return l2info.header_len;
+
+        p+=l2info.header_len;
+        /* this DLT contains nothing but raw c-hdlc frames */
+        chdlc_print(p, l2info.length);
         return l2info.header_len;
 }
 #endif
