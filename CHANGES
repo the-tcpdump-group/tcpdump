@@ -1,4 +1,4 @@
-$Header: /tcpdump/master/tcpdump/CHANGES,v 1.87.2.3 2005-08-19 15:28:06 ken Exp $
+$Header: /tcpdump/master/tcpdump/CHANGES,v 1.87.2.4 2005-08-23 03:18:46 guy Exp $
 
 Mon. 	August 22, 2005.  ken@xelerance.com. Summary for 3.9.4 tcpdump release
 	Decoder support for more Juniper link-layer types	
@@ -30,7 +30,7 @@ Tue. 	July 5, 2005.  ken@xelerance.com. Summary for 3.9.3 tcpdump release
 		BACnet MS/TP
 		SS7
 		LDP over TCP
-                LACP, MARKER as per 802.3ad
+		LACP, MARKER as per 802.3ad
 		PGM (RFC 3208)
 		LSP-PING
 		G.7041/Y.1303 Generic Framing Procedure
