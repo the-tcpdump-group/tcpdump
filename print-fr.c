@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.45 2005-08-09 20:06:34 hannes Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.46 2005-08-23 03:15:32 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -481,7 +481,7 @@ mfr_print(register const u_char *p, u_int length)
     sequence_num = (p[0]&0x1e)<<7 | p[1];
     /* whole packet or first fragment ? */
     if ((p[0] & MFR_BEC_MASK) == MFR_FRAG_FRAME ||
-        p[0] & MFR_BEC_MASK == MFR_B_BIT) {
+        (p[0] & MFR_BEC_MASK) == MFR_B_BIT) {
         printf("FRF.16 Frag, seq %u, Flags [%s], ",
                sequence_num,
                bittok2str(frf_flag_values,"none",(p[0] & MFR_BEC_MASK)));
