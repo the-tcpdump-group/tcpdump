@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.148 2005-07-14 20:10:03 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.149 2005-08-23 11:07:35 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -343,11 +343,11 @@ static struct tok clnp_option_qos_global_values[] = {
 #define ISIS_SUBTLV_EXT_IS_REACH_IPV4_NEIGHBOR_ADDR    8 /* draft-ietf-isis-traffic-05 */
 #define ISIS_SUBTLV_EXT_IS_REACH_MAX_LINK_BW           9 /* draft-ietf-isis-traffic-05 */
 #define ISIS_SUBTLV_EXT_IS_REACH_RESERVABLE_BW        10 /* draft-ietf-isis-traffic-05 */
-#define ISIS_SUBTLV_EXT_IS_REACH_UNRESERVED_BW        11 /* draft-ietf-isis-traffic-05 */
-#define ISIS_SUBTLV_EXT_IS_REACH_DIFFSERV_TE          12 /* draft-ietf-tewg-diff-te-proto-06 */
+#define ISIS_SUBTLV_EXT_IS_REACH_UNRESERVED_BW        11 /* rfc4124 */
 #define ISIS_SUBTLV_EXT_IS_REACH_TE_METRIC            18 /* draft-ietf-isis-traffic-05 */
 #define ISIS_SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE 20 /* draft-ietf-isis-gmpls-extensions */
 #define ISIS_SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR    21 /* draft-ietf-isis-gmpls-extensions */
+#define ISIS_SUBTLV_EXT_IS_REACH_BW_CONSTRAINTS       22 /* rfc4124 */
 
 static struct tok isis_ext_is_reach_subtlv_values[] = {
     { ISIS_SUBTLV_EXT_IS_REACH_ADMIN_GROUP,            "Administrative groups" },
@@ -358,10 +358,10 @@ static struct tok isis_ext_is_reach_subtlv_values[] = {
     { ISIS_SUBTLV_EXT_IS_REACH_MAX_LINK_BW,            "Maximum link bandwidth" },
     { ISIS_SUBTLV_EXT_IS_REACH_RESERVABLE_BW,          "Reservable link bandwidth" },
     { ISIS_SUBTLV_EXT_IS_REACH_UNRESERVED_BW,          "Unreserved bandwidth" },
-    { ISIS_SUBTLV_EXT_IS_REACH_DIFFSERV_TE,            "Diffserv TE" },
     { ISIS_SUBTLV_EXT_IS_REACH_TE_METRIC,              "Traffic Engineering Metric" },
     { ISIS_SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE,   "Link Protection Type" },
     { ISIS_SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR,      "Interface Switching Capability" },
+    { ISIS_SUBTLV_EXT_IS_REACH_BW_CONSTRAINTS,         "Bandwidth Constraints" },
     { 250,                                             "Reserved for cisco specific extensions" },
     { 251,                                             "Reserved for cisco specific extensions" },
     { 252,                                             "Reserved for cisco specific extensions" },
@@ -1408,7 +1408,7 @@ trunctlv:
 static int
 isis_print_is_reach_subtlv (const u_int8_t *tptr,u_int subt,u_int subl,const char *ident) {
 
-        u_int priority_level,bandwidth_constraint;
+        u_int te_class,priority_level;
         union { /* int to float conversion buffer for several subTLVs */
             float f; 
             u_int32_t i;
@@ -1450,28 +1450,28 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,u_int subt,u_int subl,const cha
             break;
         case ISIS_SUBTLV_EXT_IS_REACH_UNRESERVED_BW :
             if (subl >= 32) {
-              for (priority_level = 0; priority_level < 8; priority_level++) {
+              for (te_class = 0; te_class < 8; te_class++) {
                 bw.i = EXTRACT_32BITS(tptr);
-                printf("%s  priority level %d: %.3f Mbps",
+                printf("%s  TE-Class %u: %.3f Mbps",
                        ident,
-                       priority_level,
+                       te_class,
                        bw.f*8/1000000 );
 		tptr+=4;
 	      }
             }
             break;
-        case ISIS_SUBTLV_EXT_IS_REACH_DIFFSERV_TE:
+        case ISIS_SUBTLV_EXT_IS_REACH_BW_CONSTRAINTS:
             printf("%sBandwidth Constraints Model ID: %s (%u)",
                    ident,
                    tok2str(diffserv_te_bc_values, "unknown", *tptr),
                    *tptr);
             tptr++;
             /* decode BCs until the subTLV ends */
-            for (bandwidth_constraint = 0; bandwidth_constraint < (subl-1)/4; bandwidth_constraint++) {
+            for (te_class = 0; te_class < (subl-1)/4; te_class++) {
                 bw.i = EXTRACT_32BITS(tptr);
-                printf("%s  Bandwidth constraint %d: %.3f Mbps",
+                printf("%s  Bandwidth constraint CT%u: %.3f Mbps",
                        ident,
-                       bandwidth_constraint,
+                       te_class,
                        bw.f*8/1000000 );
 		tptr+=4;
             }

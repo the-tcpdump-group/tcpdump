@@ -17,7 +17,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.38 2005-08-01 09:10:23 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.39 2005-08-23 11:07:35 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -142,7 +142,7 @@ static const struct tok rsvp_header_flag_values[] = {
 #define	RSVP_OBJ_LABEL_SET          36  /* rfc3473 */
 #define	RSVP_OBJ_PROTECTION         37  /* rfc3473 */
 #define	RSVP_OBJ_DETOUR             63  /* draft-ietf-mpls-rsvp-lsp-fastreroute-07 */
-#define	RSVP_OBJ_CLASSTYPE          125 /* draft-ietf-tewg-diff-te-proto-07 */
+#define	RSVP_OBJ_CLASSTYPE          66  /* rfc4124 */
 #define	RSVP_OBJ_SUGGESTED_LABEL    129 /* rfc3473 */
 #define	RSVP_OBJ_ACCEPT_LABEL_SET   130 /* rfc3473 */
 #define	RSVP_OBJ_RESTART_CAPABILITY 131 /* rfc3473 */
@@ -400,14 +400,15 @@ static struct tok rsvp_obj_error_code_routing_values[] = {
 };
 
 static struct tok rsvp_obj_error_code_diffserv_te_values[] = {
-    { 1,                      "Unexpected CLASSTYPE object" },
-    { 2,                      "Unsupported Class-Type" },
-    { 3,                      "Invalid Class-Type value" },
-    { 4,                      "Class-Type and setup priority do not form a configured TE-Class" },
-    { 5,                      "Class-Type and holding priority do not form a configured TE-Class" },
-    { 6,                      "Inconsistency between signaled PSC and signaled Class-Type" },
-    { 7,                      "Inconsistency between signaled PHBs and signaled Class-Type" },
-    { 0, NULL}
+    { 1,                      "Unexpected CT object" },
+    { 2,                      "Unsupported CT" },
+    { 3,                      "Invalid CT value" },
+    { 4,                      "CT/setup priority do not form a configured TE-Class" },
+    { 5,                      "CT/holding priority do not form a configured TE-Class" },
+    { 6,                      "CT/setup priority and CT/holding priority do not form a configured TE-Class" },
+    { 7,                      "Inconsistency between signaled PSC and signaled CT" }, 
+    { 8,                      "Inconsistency between signaled PHBs and signaled CT" },
+   { 0, NULL}
 };
 
 #define FALSE 0
@@ -1235,7 +1236,7 @@ rsvp_obj_print (const u_char *tptr, const char *ident, u_int tlen) {
         case RSVP_OBJ_CLASSTYPE:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_1:
-                printf("%s  Class Type: %u",
+                printf("%s  CT: %u",
                        ident,
                        EXTRACT_32BITS(obj_tptr)&0x7);              
                 obj_tlen-=4;
