@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.133.2.17 2005-09-05 11:16:25 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.133.2.18 2005-09-05 18:21:22 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -2493,22 +2493,27 @@ static int isis_print (const u_int8_t *p, u_int length)
 
 	case ISIS_TLV_RESTART_SIGNALING:
             /* first attempt to decode the flags */
+            if (tmp < ISIS_TLV_RESTART_SIGNALING_FLAGLEN)
+                break;
             if (!TTEST2(*tptr, ISIS_TLV_RESTART_SIGNALING_FLAGLEN))
                 goto trunctlv;
             printf("\n\t      Flags [%s]",
                    bittok2str(isis_restart_flag_values, "none", *tptr));
-	    tptr+=1;
-            tmp-=1;
+            tptr+=ISIS_TLV_RESTART_SIGNALING_FLAGLEN;
+            tmp-=ISIS_TLV_RESTART_SIGNALING_FLAGLEN;
 
-            /* is there an additional remaining holdtime */
-            if (tmp >= ISIS_TLV_RESTART_SIGNALING_HOLDTIMELEN) {
-                    if (!TTEST2(*tptr, ISIS_TLV_RESTART_SIGNALING_HOLDTIMELEN))
-                            goto trunctlv;
+            /* is there anything other than the flags field? */
+            if (tmp == 0)
+                break;
 
-                    printf(", Remaining holding time %us", EXTRACT_16BITS(tptr+1));
-                    tptr+=2;
-                    tmp-=2;
-            }
+            if (tmp < ISIS_TLV_RESTART_SIGNALING_HOLDTIMELEN)
+                break;
+            if (!TTEST2(*tptr, ISIS_TLV_RESTART_SIGNALING_HOLDTIMELEN))
+                goto trunctlv;
+
+            printf(", Remaining holding time %us", EXTRACT_16BITS(tptr+1));
+            tptr+=ISIS_TLV_RESTART_SIGNALING_HOLDTIMELEN;
+            tmp-=ISIS_TLV_RESTART_SIGNALING_HOLDTIMELEN;
 
             /* is there an additional sysid field present ?*/
             if (tmp == SYSTEM_ID_LEN) {
