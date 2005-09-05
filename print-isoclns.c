@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.149 2005-08-23 11:07:35 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.150 2005-09-05 11:12:33 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -131,7 +131,8 @@ static struct tok isis_pdu_values[] = {
 #define ISIS_TLV_NORTEL_PRIVATE1     176
 #define ISIS_TLV_NORTEL_PRIVATE2     177
 #define ISIS_TLV_RESTART_SIGNALING   211 /* rfc3847 */
-#define ISIS_TLV_RESTART_SIGNALING_MINLEN 3
+#define ISIS_TLV_RESTART_SIGNALING_FLAGLEN 1
+#define ISIS_TLV_RESTART_SIGNALING_HOLDTIMELEN 2
 #define ISIS_TLV_MT_IS_REACH         222 /* draft-ietf-isis-wg-multi-topology-05 */
 #define ISIS_TLV_MT_SUPPORTED        229 /* draft-ietf-isis-wg-multi-topology-05 */
 #define ISIS_TLV_MT_SUPPORTED_MINLEN 2
@@ -2491,24 +2492,30 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    break;
 
 	case ISIS_TLV_RESTART_SIGNALING:
-	    if (tmp < ISIS_TLV_RESTART_SIGNALING_MINLEN)
-	        break;
-            if (!TTEST2(*tptr, ISIS_TLV_RESTART_SIGNALING_MINLEN))
+            /* first attempt to decode the flags */
+            if (!TTEST2(*tptr, ISIS_TLV_RESTART_SIGNALING_FLAGLEN))
                 goto trunctlv;
-            printf("\n\t      Flags [%s], Remaining holding time %us",
-                   bittok2str(isis_restart_flag_values, "none", *tptr),
-                   EXTRACT_16BITS(tptr+1));
-	    tptr+=3;
-            tmp-=3;
+            printf("\n\t      Flags [%s]",
+                   bittok2str(isis_restart_flag_values, "none", *tptr));
+	    tptr+=1;
+            tmp-=1;
+
+            /* is there an additional remaining holdtime */
+            if (tmp >= ISIS_TLV_RESTART_SIGNALING_HOLDTIMELEN) {
+                    if (!TTEST2(*tptr, ISIS_TLV_RESTART_SIGNALING_HOLDTIMELEN))
+                            goto trunctlv;
+
+                    printf(", Remaining holding time %us", EXTRACT_16BITS(tptr+1));
+                    tptr+=2;
+                    tmp-=2;
+            }
+
+            /* is there an additional sysid field present ?*/
             if (tmp == SYSTEM_ID_LEN) {
                     if (!TTEST2(*tptr, SYSTEM_ID_LEN))
                             goto trunctlv;
                     printf(", for %s",isis_print_id(tptr,SYSTEM_ID_LEN));
-            } else if (tmp == NODE_ID_LEN) {
-                    if (!TTEST2(*tptr, NODE_ID_LEN))
-                            goto trunctlv;
-                    printf(", for %s",isis_print_id(tptr,NODE_ID_LEN));
-            }
+            } 
 	    break;
 
         case ISIS_TLV_IDRP_INFO:
