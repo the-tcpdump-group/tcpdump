@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.172 2005-09-05 08:56:09 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.173 2005-09-05 09:14:15 guy Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -1062,6 +1062,23 @@ filters packets with an outer label of 100000 and an inner label of
 .in -.5i
 filters packets to or from 192.9.200.1 with an inner label of 1024 and
 any outer label.
+.IP \fBpppoed\fP
+True if the packet is a PPP-over-Ethernet Discovery packet (Ethernet
+type 0x8863).
+.IP \fBpppoes\fP
+True if the packet is a PPP-over-Ethernet Session packet (Ethernet
+type 0x8864).
+Note that the first \fBpppoes\fR keyword encountered in \fIexpression\fR
+changes the decoding offsets for the remainder of \fIexpression\fR on
+the assumption that the packet is a PPPoE session packet.
+.IP
+For example:
+.in +.5i
+.nf
+\fBpppoes && ip\fR
+.fi
+.in -.5i
+filters IPv4 protocols encapsulated in PPPoE.
 .IP  "\fBtcp\fR, \fBudp\fR, \fBicmp\fR"
 Abbreviations for:
 .in +.5i
