@@ -1,4 +1,4 @@
-$Header: /tcpdump/master/tcpdump/CHANGES,v 1.87.2.6 2005-09-05 08:57:11 guy Exp $
+$Header: /tcpdump/master/tcpdump/CHANGES,v 1.87.2.7 2005-09-05 09:19:32 guy Exp $
 
 Mon. 	September 5, 2005.  ken@xelerance.com. Summary for 3.9.4 tcpdump release
 	Decoder support for more Juniper link-layer types
@@ -11,6 +11,7 @@ Mon. 	September 5, 2005.  ken@xelerance.com. Summary for 3.9.4 tcpdump release
 		object printer to latest spec.
 	Clean up documentation of vlan filter expression, document mpls
 		filter expression.
+	Document new pppoed and pppoes filter expressions.
 
 Tue. 	July 5, 2005.  ken@xelerance.com. Summary for 3.9.3 tcpdump release
 
