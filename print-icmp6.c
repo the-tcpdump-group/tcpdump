@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.79.2.5 2005-07-11 20:24:32 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.79.2.6 2005-09-05 09:29:28 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -75,7 +75,7 @@ static struct tok icmp6_type_values[] = {
     { ND_ROUTER_SOLICIT, "router solicitation"},
     { ND_ROUTER_ADVERT, "router advertisement"},
     { ND_NEIGHBOR_SOLICIT, "neighbor solicitation"},
-    { ND_NEIGHBOR_ADVERT, "neighbor advertisment"},
+    { ND_NEIGHBOR_ADVERT, "neighbor advertisement"},
     { ND_REDIRECT, "redirect"},
     { ICMP6_ROUTER_RENUMBERING, "router renumbering"},
     { IND_SOLICIT, "inverse neighbor solicitation"},
@@ -131,7 +131,7 @@ static struct tok icmp6_opt_values[] = {
    { ND_OPT_PREFIX_INFORMATION, "prefix info"},
    { ND_OPT_REDIRECTED_HEADER, "redirected header"},
    { ND_OPT_MTU, "mtu"},
-   { ND_OPT_ADVINTERVAL, "advertisment interval"},
+   { ND_OPT_ADVINTERVAL, "advertisement interval"},
    { ND_OPT_HOMEAGENT_INFO, "homeagent information"},
    { ND_OPT_ROUTE_INFO, "route info"},
    { 0,	NULL }
