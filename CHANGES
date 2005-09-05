@@ -1,6 +1,6 @@
-$Header: /tcpdump/master/tcpdump/CHANGES,v 1.87.2.5 2005-08-23 03:40:34 guy Exp $
+$Header: /tcpdump/master/tcpdump/CHANGES,v 1.87.2.6 2005-09-05 08:57:11 guy Exp $
 
-Mon. 	August 22, 2005.  ken@xelerance.com. Summary for 3.9.4 tcpdump release
+Mon. 	September 5, 2005.  ken@xelerance.com. Summary for 3.9.4 tcpdump release
 	Decoder support for more Juniper link-layer types
 	Fix a potential buffer overflow (although it can't occur in
 		practice).
@@ -9,6 +9,8 @@ Mon. 	August 22, 2005.  ken@xelerance.com. Summary for 3.9.4 tcpdump release
 	Add FRF.16 support, fix various Frame Relay bugs.
 	Add support for RSVP integrity objects, update fast-reroute
 		object printer to latest spec.
+	Clean up documentation of vlan filter expression, document mpls
+		filter expression.
 
 Tue. 	July 5, 2005.  ken@xelerance.com. Summary for 3.9.3 tcpdump release
 
