@@ -1,6 +1,6 @@
-$Header: /tcpdump/master/tcpdump/CHANGES,v 1.87.2.8 2005-09-05 09:29:27 guy Exp $
+$Header: /tcpdump/master/tcpdump/CHANGES,v 1.87.2.9 2005-09-06 21:17:11 guy Exp $
 
-Mon. 	September 5, 2005.  ken@xelerance.com. Summary for 3.9.4 tcpdump release
+Tue. 	September 6, 2005.  ken@xelerance.com. Summary for 3.9.4 tcpdump release
 	Decoder support for more Juniper link-layer types
 	Fix a potential buffer overflow (although it can't occur in
 		practice).
@@ -13,6 +13,9 @@ Mon. 	September 5, 2005.  ken@xelerance.com. Summary for 3.9.4 tcpdump release
 		filter expression.
 	Document new pppoed and pppoes filter expressions.
 	Spelling fixes in ICMPv6.
+	Don't require any fields other than flags to be present in IS-IS
+		restart signaling TLVs, and only print the system ID in
+		those TLVs as system IDs, not as node IDs.
 
 Tue. 	July 5, 2005.  ken@xelerance.com. Summary for 3.9.3 tcpdump release
 
