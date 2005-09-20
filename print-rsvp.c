@@ -17,7 +17,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.39 2005-08-23 11:07:35 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.40 2005-09-20 10:04:26 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -143,6 +143,7 @@ static const struct tok rsvp_header_flag_values[] = {
 #define	RSVP_OBJ_PROTECTION         37  /* rfc3473 */
 #define	RSVP_OBJ_DETOUR             63  /* draft-ietf-mpls-rsvp-lsp-fastreroute-07 */
 #define	RSVP_OBJ_CLASSTYPE          66  /* rfc4124 */
+#define RSVP_OBJ_CLASSTYPE_OLD      125 /* draft-ietf-tewg-diff-te-proto-07 */
 #define	RSVP_OBJ_SUGGESTED_LABEL    129 /* rfc3473 */
 #define	RSVP_OBJ_ACCEPT_LABEL_SET   130 /* rfc3473 */
 #define	RSVP_OBJ_RESTART_CAPABILITY 131 /* rfc3473 */
@@ -183,6 +184,7 @@ static const struct tok rsvp_obj_values[] = {
     { RSVP_OBJ_ACCEPT_LABEL_SET,   "Acceptable Label Set" },
     { RSVP_OBJ_DETOUR,             "Detour" },
     { RSVP_OBJ_CLASSTYPE,          "Class Type" },
+    { RSVP_OBJ_CLASSTYPE_OLD,      "Class Type (old)" },
     { RSVP_OBJ_SUGGESTED_LABEL,    "Suggested Label" },
     { RSVP_OBJ_PROPERTIES,         "Properties" },
     { RSVP_OBJ_FASTREROUTE,        "Fast Re-Route" },
@@ -270,6 +272,7 @@ static const struct tok rsvp_ctype_values[] = {
     { 256*RSVP_OBJ_DETOUR+RSVP_CTYPE_TUNNEL_IPV4,            "Tunnel IPv4" },
     { 256*RSVP_OBJ_PROPERTIES+RSVP_CTYPE_1,                  "1" },
     { 256*RSVP_OBJ_CLASSTYPE+RSVP_CTYPE_1,                   "1" },
+    { 256*RSVP_OBJ_CLASSTYPE_OLD+RSVP_CTYPE_1,               "1" },
     { 0, NULL}
 };
 
@@ -1234,6 +1237,7 @@ rsvp_obj_print (const u_char *tptr, const char *ident, u_int tlen) {
             break;
 
         case RSVP_OBJ_CLASSTYPE:
+        case RSVP_OBJ_CLASSTYPE_OLD: /* fall through */
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_1:
                 printf("%s  CT: %u",
