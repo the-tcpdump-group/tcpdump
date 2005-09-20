@@ -1,5 +1,4 @@
-#ifndef __DCCP_HDR__
-#define __DCCP_HDR__
+/* @(#) $Header: /tcpdump/master/tcpdump/dccp.h,v 1.2 2005-09-20 06:25:19 guy Exp $ (LBL) */
 /*
  * Copyright (C) Arnaldo Carvalho de Melo 2004
  * Copyright (C) Ian McDonald 2005 <iam4@cs.waikato.ac.nz>
@@ -8,6 +7,9 @@
  * This software may be distributed either under the terms of the
  * BSD-style license that accompanies tcpdump or the GNU GPL version 2
  */
+
+#ifndef __DCCP_HDR__
+#define __DCCP_HDR__
 
 /**
  * struct dccp_hdr - generic part of DCCP packet header
