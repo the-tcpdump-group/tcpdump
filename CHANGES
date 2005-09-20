@@ -1,6 +1,6 @@
-$Header: /tcpdump/master/tcpdump/CHANGES,v 1.87.2.10 2005-09-06 21:22:11 guy Exp $
+$Header: /tcpdump/master/tcpdump/CHANGES,v 1.87.2.11 2005-09-20 06:05:34 guy Exp $
 
-Tue. 	September 6, 2005.  ken@xelerance.com. Summary for 3.9.4 tcpdump release
+Mon. 	September 19, 2005.  ken@xelerance.com. Summary for 3.9.4 tcpdump release
 	Decoder support for more Juniper link-layer types
 	Fix a potential buffer overflow (although it can't occur in
 		practice).
@@ -17,6 +17,7 @@ Tue. 	September 6, 2005.  ken@xelerance.com. Summary for 3.9.4 tcpdump release
 	Don't require any fields other than flags to be present in IS-IS
 		restart signaling TLVs, and only print the system ID in
 		those TLVs as system IDs, not as node IDs.
+	Support for DCCP.
 
 Tue. 	July 5, 2005.  ken@xelerance.com. Summary for 3.9.3 tcpdump release
 
