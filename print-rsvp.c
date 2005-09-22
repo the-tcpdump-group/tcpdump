@@ -17,7 +17,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.40 2005-09-20 10:04:26 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.41 2005-09-22 14:47:04 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -379,12 +379,14 @@ static struct tok rsvp_obj_prop_tlv_values[] = {
 
 #define RSVP_OBJ_ERROR_SPEC_CODE_ROUTING 24
 #define RSVP_OBJ_ERROR_SPEC_CODE_NOTIFY  25
-#define RSVP_OBJ_ERROR_SPEC_CODE_DIFFSERV_TE 125
+#define RSVP_OBJ_ERROR_SPEC_CODE_DIFFSERV_TE 28
+#define RSVP_OBJ_ERROR_SPEC_CODE_DIFFSERV_TE_OLD 125
 
 static struct tok rsvp_obj_error_code_values[] = {
     { RSVP_OBJ_ERROR_SPEC_CODE_ROUTING, "Routing Problem" },
     { RSVP_OBJ_ERROR_SPEC_CODE_NOTIFY,  "Notify Error" },
     { RSVP_OBJ_ERROR_SPEC_CODE_DIFFSERV_TE, "Diffserv TE Error" },
+    { RSVP_OBJ_ERROR_SPEC_CODE_DIFFSERV_TE_OLD, "Diffserv TE Error (Old)" },
     { 0, NULL}
 };
 
@@ -1272,7 +1274,8 @@ rsvp_obj_print (const u_char *tptr, const char *ident, u_int tlen) {
                            tok2str(rsvp_obj_error_code_routing_values,"unknown",error_value),
                            error_value);
                     break;
-                case RSVP_OBJ_ERROR_SPEC_CODE_DIFFSERV_TE:
+                case RSVP_OBJ_ERROR_SPEC_CODE_DIFFSERV_TE: /* fall through */
+                case RSVP_OBJ_ERROR_SPEC_CODE_DIFFSERV_TE_OLD:
                     printf(", Error Value: %s (%u)",
                            tok2str(rsvp_obj_error_code_diffserv_te_values,"unknown",error_value),
                            error_value);
