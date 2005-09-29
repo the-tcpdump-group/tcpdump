@@ -21,7 +21,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.18 2005-07-07 01:22:16 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.19 2005-09-29 07:45:22 hannes Exp $ (LBL)
  */
 
 #ifndef netdissect_h
@@ -235,7 +235,6 @@ extern void safeputs(const char *);
 
 #if 0
 extern const char *isonsap_string(netdissect_options *, const u_char *);
-extern const char *llcsap_string(netdissect_options *, u_char);
 extern const char *protoid_string(netdissect_options *, const u_char *);
 extern const char *dnname_string(netdissect_options *, u_short);
 extern const char *dnnum_string(netdissect_options *, u_short);
