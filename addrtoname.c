@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.108.2.6 2005-07-26 17:34:54 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.108.2.7 2005-09-29 07:46:45 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -88,7 +88,6 @@ struct hnamemem tporttable[HASHNAMESIZE];
 struct hnamemem uporttable[HASHNAMESIZE];
 struct hnamemem eprototable[HASHNAMESIZE];
 struct hnamemem dnaddrtable[HASHNAMESIZE];
-struct hnamemem llcsaptable[HASHNAMESIZE];
 struct hnamemem ipxsaptable[HASHNAMESIZE];
 
 #if defined(INET6) && defined(WIN32)
@@ -586,25 +585,6 @@ protoid_string(register const u_char *pi)
 	return (tp->p_name);
 }
 
-const char *
-llcsap_string(u_char sap)
-{
-	register struct hnamemem *tp;
-	register u_int32_t i = sap;
-	char buf[sizeof("sap 00")];
-
-	for (tp = &llcsaptable[i & (HASHNAMESIZE-1)]; tp->nxt; tp = tp->nxt)
-		if (tp->addr == i)
-			return (tp->name);
-
-	tp->addr = i;
-	tp->nxt = newhnamemem();
-
-	snprintf(buf, sizeof(buf), "sap %02x", sap & 0xff);
-	tp->name = strdup(buf);
-	return (tp->name);
-}
-
 #define ISONSAP_MAX_LENGTH 20
 const char *
 isonsap_string(const u_char *nsap, register u_int nsap_length)
@@ -873,40 +853,6 @@ init_etherarray(void)
 	}
 }
 
-static struct tok llcsap_db[] = {
-	{ LLCSAP_NULL,		"null" },
-	{ LLCSAP_8021B_I,	"802.1b-gsap" },
-	{ LLCSAP_8021B_G,	"802.1b-isap" },
-	{ LLCSAP_IP,		"ip-sap" },
-	{ LLCSAP_PROWAYNM,	"proway-nm" },
-	{ LLCSAP_8021D,		"802.1d" },
-	{ LLCSAP_RS511,		"eia-rs511" },
-	{ LLCSAP_ISO8208,	"x.25/llc2" },
-	{ LLCSAP_PROWAY,	"proway" },
-	{ LLCSAP_SNAP,		"snap" },
-	{ LLCSAP_IPX,		"IPX" },
-	{ LLCSAP_NETBEUI,	"netbeui" },
-	{ LLCSAP_ISONS,		"iso-clns" },
-	{ LLCSAP_GLOBAL,	"global" },
-	{ 0,			NULL }
-};
-
-static void
-init_llcsaparray(void)
-{
-	register int i;
-	register struct hnamemem *table;
-
-	for (i = 0; llcsap_db[i].s != NULL; i++) {
-		table = &llcsaptable[llcsap_db[i].v];
-		while (table->name)
-			table = table->nxt;
-		table->name = llcsap_db[i].s;
-		table->addr = llcsap_db[i].v;
-		table->nxt = newhnamemem();
-	}
-}
-
 static struct tok ipxsap_db[] = {
 	{ 0x0000, "Unknown" },
 	{ 0x0001, "User" },
@@ -1163,7 +1109,6 @@ init_addrtoname(u_int32_t localnet, u_int32_t mask)
 	init_etherarray();
 	init_servarray();
 	init_eprotoarray();
-	init_llcsaparray();
 	init_protoidarray();
 	init_ipxsaparray();
 }
