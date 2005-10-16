@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.91.2.6 2005-06-03 07:31:43 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.91.2.7 2005-10-16 18:17:12 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -491,6 +491,9 @@ decode_labeled_prefix4(const u_char *pptr, char *buf, u_int buflen)
            stacked labels in a a single BGP message
         */
 
+	if (24 > plen)
+		return -1;
+
         plen-=24; /* adjust prefixlen - labellength */
 
 	if (32 < plen)
@@ -565,9 +568,15 @@ decode_rt_routing_info(const u_char *pptr, char *buf, u_int buflen)
 	TCHECK(pptr[0]);
 	plen = pptr[0];   /* get prefix length */
 
+	if (0 == plen)
+		return 1; /* default route target */
+
+	if (32 > plen)
+		return -1;
+
         plen-=32; /* adjust prefix length */
 
-	if (0 < plen)
+	if (64 < plen)
 		return -1;
 
 	memset(&route_target, 0, sizeof(route_target));
@@ -595,6 +604,9 @@ decode_labeled_vpn_prefix4(const u_char *pptr, char *buf, u_int buflen)
 
 	TCHECK(pptr[0]);
 	plen = pptr[0];   /* get prefix length */
+
+	if ((24+64) > plen)
+		return -1;
 
         plen-=(24+64); /* adjust prefixlen - labellength - RD len*/
 
@@ -710,6 +722,10 @@ decode_labeled_prefix6(const u_char *pptr, char *buf, u_int buflen)
 
 	TCHECK(pptr[0]);
 	plen = pptr[0]; /* get prefix length */
+
+	if (24 > plen)
+		return -1;
+
         plen-=24; /* adjust prefixlen - labellength */
 
 	if (128 < plen)
@@ -743,6 +759,9 @@ decode_labeled_vpn_prefix6(const u_char *pptr, char *buf, u_int buflen)
 
 	TCHECK(pptr[0]);
 	plen = pptr[0];   /* get prefix length */
+
+	if ((24+64) > plen)
+		return -1;
 
         plen-=(24+64); /* adjust prefixlen - labellength - RD len*/
 
@@ -808,6 +827,9 @@ decode_labeled_vpn_clnp_prefix(const u_char *pptr, char *buf, u_int buflen)
 
 	TCHECK(pptr[0]);
 	plen = pptr[0];   /* get prefix length */
+
+	if ((24+64) > plen)
+		return -1;
 
         plen-=(24+64); /* adjust prefixlen - labellength - RD len*/
 
