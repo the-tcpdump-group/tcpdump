@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ieee802_11.h,v 1.9 2003-07-22 17:36:57 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ieee802_11.h,v 1.9.4.1 2005-10-17 07:59:17 guy Exp $ (LBL) */
 /*
  * Copyright (c) 2001
  *	Fortress Technologies
@@ -199,12 +199,12 @@ struct tim_t {
 
 
 struct mgmt_body_t {
-	u_int8_t   	timestamp[8];
+	u_int8_t   	timestamp[IEEE802_11_TSTAMP_LEN];
 	u_int16_t  	beacon_interval;
 	u_int16_t 	listen_interval;
 	u_int16_t 	status_code;
 	u_int16_t 	aid;
-	u_char		ap[6];
+	u_char		ap[IEEE802_11_AP_LEN];
 	u_int16_t	reason_code;
 	u_int16_t	auth_alg;
 	u_int16_t	auth_trans_seq_num;

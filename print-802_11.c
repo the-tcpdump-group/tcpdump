@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.31.2.5 2005-07-30 21:37:50 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.31.2.6 2005-10-17 07:59:18 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -132,6 +132,8 @@ parse_elements(struct mgmt_body_t *pbody, const u_char *p, int offset)
 			offset += 2;
 			if (pbody->ssid.length <= 0)
 				break;
+			if (pbody->ssid.length > 32)
+				return 0;
 			if (!TTEST2(*(p + offset), pbody->ssid.length))
 				return 0;
 			memcpy(&pbody->ssid.ssid, p + offset,
@@ -146,6 +148,8 @@ parse_elements(struct mgmt_body_t *pbody, const u_char *p, int offset)
 			offset += 2;
 			if (pbody->challenge.length <= 0)
 				break;
+			if (pbody->challenge.length > 253)
+				return 0;
 			if (!TTEST2(*(p + offset), pbody->challenge.length))
 				return 0;
 			memcpy(&pbody->challenge.text, p + offset,
@@ -160,6 +164,8 @@ parse_elements(struct mgmt_body_t *pbody, const u_char *p, int offset)
 			offset += 2;
 			if (pbody->rates.length <= 0)
 				break;
+			if (pbody->rates.length > 8)
+				return 0;
 			if (!TTEST2(*(p + offset), pbody->rates.length))
 				return 0;
 			memcpy(&pbody->rates.rate, p + offset,
@@ -190,6 +196,8 @@ parse_elements(struct mgmt_body_t *pbody, const u_char *p, int offset)
 
 			if (pbody->tim.length <= 3)
 				break;
+			if (pbody->rates.length > 251)
+				return 0;
 			if (!TTEST2(*(p + offset), pbody->tim.length - 3))
 				return 0;
 			memcpy(pbody->tim.bitmap, p + (pbody->tim.length - 3),
@@ -223,7 +231,7 @@ handle_beacon(const u_char *p)
 	if (!TTEST2(*p, IEEE802_11_TSTAMP_LEN + IEEE802_11_BCNINT_LEN +
 	    IEEE802_11_CAPINFO_LEN))
 		return 0;
-	memcpy(&pbody.timestamp, p, 8);
+	memcpy(&pbody.timestamp, p, IEEE802_11_TSTAMP_LEN);
 	offset += IEEE802_11_TSTAMP_LEN;
 	pbody.beacon_interval = EXTRACT_LE_16BITS(p+offset);
 	offset += IEEE802_11_BCNINT_LEN;
