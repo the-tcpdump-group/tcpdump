@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.91.2.7 2005-10-16 18:17:12 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.91.2.8 2005-10-19 09:28:13 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -403,6 +403,14 @@ static struct tok bgp_afi_values[] = {
 
 #define BGP_EXT_COM_L2INFO      0x800a  /* draft-kompella-ppvpn-l2vpn */
 
+/* http://www.cisco.com/en/US/tech/tk436/tk428/technologies_tech_note09186a00801eb09a.shtml  */
+#define BGP_EXT_COM_EIGRP_GEN   0x8800
+#define BGP_EXT_COM_EIGRP_METRIC_AS_DELAY  0x8801
+#define BGP_EXT_COM_EIGRP_METRIC_REL_NH_BW 0x8802
+#define BGP_EXT_COM_EIGRP_METRIC_LOAD_MTU  0x8803
+#define BGP_EXT_COM_EIGRP_EXT_REMAS_REMID  0x8804
+#define BGP_EXT_COM_EIGRP_EXT_REMPROTO_REMMETRIC 0x8805
+
 static struct tok bgp_extd_comm_flag_values[] = {
     { 0x8000,                  "vendor-specific"},
     { 0x4000,                  "non-transitive"},
@@ -427,6 +435,12 @@ static struct tok bgp_extd_comm_subtype_values[] = {
     { BGP_EXT_COM_OSPF_RID,    "ospf-router-id"},
     { BGP_EXT_COM_OSPF_RID2,   "ospf-router-id"},
     { BGP_EXT_COM_L2INFO,      "layer2-info"}, 
+    { BGP_EXT_COM_EIGRP_GEN , "eigrp-general-route (flag, tag)" },
+    { BGP_EXT_COM_EIGRP_METRIC_AS_DELAY , "eigrp-route-metric (AS, delay)" },
+    { BGP_EXT_COM_EIGRP_METRIC_REL_NH_BW , "eigrp-route-metric (reliability, nexthop, bandwidth)" },
+    { BGP_EXT_COM_EIGRP_METRIC_LOAD_MTU , "eigrp-route-metric (load, MTU)" },
+    { BGP_EXT_COM_EIGRP_EXT_REMAS_REMID , "eigrp-external-route (remote-AS, remote-ID)" },
+    { BGP_EXT_COM_EIGRP_EXT_REMPROTO_REMMETRIC , "eigrp-external-route (remote-proto, remote-metric)" },
     { 0, NULL},
 };
 
