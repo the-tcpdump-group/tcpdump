@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.173 2005-09-05 09:14:15 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.174 2005-10-20 07:43:51 hannes Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -80,7 +80,7 @@ tcpdump \- dump traffic on a network
 [
 .B \-W
 .I filecount
-]
+] 
 .br
 .ti +8
 [
@@ -89,6 +89,10 @@ tcpdump \- dump traffic on a network
 ]
 .br
 .ti +8
+[
+.B \-G
+.I seconds
+]
 [
 .B \-y
 .I datalinktype
@@ -355,6 +359,19 @@ correctly.
 Use \fIfile\fP as input for the filter expression.
 An additional expression given on the command line is ignored.
 .TP
+.B \-G
+If specified, rotates the dump file specified with the
+.B \-w
+option every \fIrotate_seconds\fP. Savefiles will have the name specified by
+.B \-w
+which should include a time format as defined by
+.B strftime
+(3). If no time format is specified, each new file will overwrite the previous.
+.br
+If used in conjunction with the
+.B \-C
+option, filenames will take the form of `\fIfile\fP<count>'.
+.TP
 .B \-i
 Listen on \fIinterface\fP.
 If unspecified, \fItcpdump\fP searches the system interface list for the
@@ -543,6 +560,12 @@ from the beginning, thus creating a 'rotating' buffer.
 In addition, it will name
 the files with enough leading 0s to support the maximum number of
 files, allowing them to sort correctly.
+.br
+Used in conjunction with the 
+.I \-G
+option, this will limit the number of rotated dump files that get
+created exitting with status 0 when reaching the limit. If used with
+\-C as well, the behavior will result in cyclical files per timeslice.
 .TP
 .B \-x
 Print each packet (minus its link level header) in hex.

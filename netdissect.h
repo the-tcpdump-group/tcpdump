@@ -21,7 +21,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.19 2005-09-29 07:45:22 hannes Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.20 2005-10-20 07:43:51 hannes Exp $ (LBL)
  */
 
 #ifndef netdissect_h
@@ -106,6 +106,9 @@ struct netdissect_options {
 
   int ndo_Cflag;                /* rotate dump files after this many bytes */ 
   int ndo_Cflag_count;      /* Keep track of which file number we're writing */
+  int ndo_Gflag;            /* rotate dump files after this many seconds */
+  int ndo_Gflag_count;      /* number of files created with Gflag rotation */
+  time_t ndo_Gflag_time;    /* The last time_t the dump file was rotated. */
   int ndo_Wflag;          /* recycle output files after this number of files */
   int ndo_WflagChars;
   int ndo_suppress_default_print; /* don't use default_print() for unknown packet types */
