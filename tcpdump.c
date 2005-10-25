@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.262 2005-10-20 07:43:52 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.263 2005-10-25 09:29:44 hannes Exp $ (LBL)";
 #endif
 
 /*
@@ -441,6 +441,7 @@ MakeFilename(char *buffer, char *orig_name, int cnt, int max_chars)
 		if (snprintf(buffer, NAME_MAX + 1, "%s%0*d", filename, max_chars, cnt) > NAME_MAX)
                   /* Report an error if the filename is too large */
                   error("too many output files or filename is too long (> %d)", NAME_MAX);
+        free(filename);
 }
 
 static int tcpdump_printf(netdissect_options *ndo _U_,
@@ -1005,6 +1006,7 @@ main(int argc, char **argv)
 		  MakeFilename(WFileNameAlt, WFileName, 0, 0);
 
 		p = pcap_dump_open(pd, WFileNameAlt);
+		free(WFileNameAlt);
 		if (p == NULL)
 			error("%s", pcap_geterr(pd));
 		if (Cflag != 0 || Gflag != 0) {
