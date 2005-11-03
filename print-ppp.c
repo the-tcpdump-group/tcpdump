@@ -31,7 +31,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.112 2005-06-18 23:55:24 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ppp.c,v 1.113 2005-11-03 07:30:25 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -531,8 +531,9 @@ handle_ctrl_proto(u_int proto, const u_char *pptr, int length)
 		printf("\n\t  Magic-Num 0x%08x", EXTRACT_32BITS(tptr));
 		/* XXX: need to decode Data? - hexdump for now */
                 if (len > 8) {
-                        printf("\n\t  Data");
-                        print_unknown_data(tptr+4,"\n\t    ",len-4);
+                        printf("\n\t  -----trailing data-----");
+                        TCHECK2(tptr[4], len-8);
+                        print_unknown_data(tptr+4,"\n\t  ",len-8);
                 }
 		break;
 	case CPCODES_ID:
