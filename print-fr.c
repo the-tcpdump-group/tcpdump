@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.46 2005-08-23 03:15:32 guy Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.47 2005-11-04 07:16:58 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -300,6 +300,10 @@ fr_print(register const u_char *p, u_int length)
 
         case NLPID_MFR:
                 frf15_print(p, length);
+                break;
+
+        case NLPID_PPP:
+                ppp_print(p, length);
                 break;
 
 	default:
