@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.32.2.8 2005-08-23 10:29:42 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.32.2.9 2005-11-04 18:31:08 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -41,6 +41,13 @@ static const char rcsid[] _U_ =
 #include "chdlc.h"
 
 static void chdlc_slarp_print(const u_char *, u_int);
+
+const struct tok chdlc_cast_values[] = { 
+    { CHDLC_UNICAST, "unicast" },
+    { CHDLC_BCAST, "bcast" },
+    { 0, NULL}
+};
+
 
 /* Standard CHDLC printer */
 u_int
@@ -63,18 +70,11 @@ chdlc_print(register const u_char *p, u_int length) {
 
 	proto = EXTRACT_16BITS(&p[2]);
 	if (eflag) {
-		switch (p[0]) {
-		case CHDLC_UNICAST:
-			printf("unicast ");
-			break;
-		case CHDLC_BCAST:
-			printf("bcast ");
-			break;
-		default:
-			printf("0x%02x ", p[0]);
-			break;
-		}
-		printf("%d %04x: ", length, proto);
+                printf("%s, ethertype %s (0x%04x), length %u: ",
+                       tok2str(chdlc_cast_values, "0x%02x", p[0]),
+                       tok2str(ethertype_values, "Unknown", proto),
+                       proto,
+                       length);
 	}
 
 	length -= CHDLC_HDRLEN;
