@@ -9,7 +9,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dccp.c,v 1.2 2005-09-20 06:25:20 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dccp.c,v 1.3 2005-11-04 00:45:39 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -155,25 +155,32 @@ static u_int64_t dccp_seqno(const struct dccp_hdr *dh)
 	return seqno;
 }
 
-static u_int64_t dccp_ack_no(const struct dccp_hdr *dh,
-		const struct dccp_hdr_ack_bits *dh_ack)
+static inline unsigned int dccp_basic_hdr_len(const struct dccp_hdr *dh)
 {
+	return sizeof(*dh) + (DCCPH_X(dh) ? sizeof(struct dccp_hdr_ext) : 0);
+}
+
+static void dccp_print_ack_no(const u_char *bp)
+{
+	const struct dccp_hdr *dh = (const struct dccp_hdr *)bp;
+	const struct dccp_hdr_ack_bits *dh_ack =
+		(struct dccp_hdr_ack_bits *)(bp + dccp_basic_hdr_len(dh));
+
+	TCHECK2(*dh_ack,4);
 	u_int32_t ack_high = DCCPH_ACK(dh_ack);
 	u_int64_t ackno = EXTRACT_24BITS(&ack_high) & 0xFFFFFF;
 
 	if (DCCPH_X(dh) != 0) {
+		TCHECK2(*dh_ack,8);
 		u_int32_t ack_low = dh_ack->dccph_ack_nr_low;
 		
 		ackno &= 0x00FFFF;  /* clear reserved field */
 		ackno = (ackno << 32) + EXTRACT_32BITS(&ack_low);
 	}
 
-	return ackno;
-}
-
-static inline unsigned int dccp_basic_hdr_len(const struct dccp_hdr *dh)
-{
-	return sizeof(*dh) + (DCCPH_X(dh) ? sizeof(struct dccp_hdr_ext) : 0);
+	(void)printf("(ack=%" PRIu64 ") ", ackno);
+trunc:
+	return;
 }
 
 static inline unsigned int dccp_packet_hdr_len(const u_int8_t type)
@@ -309,9 +316,7 @@ void dccp_print(const u_char *bp, const u_char *data2, u_int len)
 		struct dccp_hdr_response *dhr =
 			(struct dccp_hdr_response *)(bp + dccp_basic_hdr_len(dh));
 		TCHECK(*dhr);
-		(void)printf("response (service=%d, ack=%" PRIu64 ") ",
-			     dhr->dccph_resp_service,
-			     dccp_ack_no(dh,&(dhr->dccph_resp_ack)));
+		(void)printf("response (service=%d) ", dhr->dccph_resp_service);
 		extlen += 12;
 		break;
 	}
@@ -319,20 +324,12 @@ void dccp_print(const u_char *bp, const u_char *data2, u_int len)
 		(void)printf("data ");
 		break;
 	case DCCP_PKT_ACK: {
-		struct dccp_hdr_ack_bits *dha =
-			(struct dccp_hdr_ack_bits *)(bp + dccp_basic_hdr_len(dh));
-		TCHECK(*dha);
-		(void)printf("ack (ack=%" PRIu64 ") ",
-			     dccp_ack_no(dh,dha));
+		(void)printf("ack ");
 		extlen += 8;
 		break;
 	}
 	case DCCP_PKT_DATAACK: {
-		struct dccp_hdr_ack_bits *dha =
-			(struct dccp_hdr_ack_bits *)(bp + dccp_basic_hdr_len(dh));
-		TCHECK(*dha);
-		(void)printf("dataack (ack=%" PRIu64 ") ",
-			     dccp_ack_no(dh,dha));
+		(void)printf("dataack ");
 		extlen += 8;
 		break;
 	}
@@ -365,6 +362,10 @@ void dccp_print(const u_char *bp, const u_char *data2, u_int len)
 		(void)printf("invalid ");
 		break;
 	}
+
+	if ((DCCPH_TYPE(dh) != DCCP_PKT_DATA) && 
+			(DCCPH_TYPE(dh) != DCCP_PKT_REQUEST))
+		dccp_print_ack_no(bp);
 
 	if (vflag < 2)
 		return;
