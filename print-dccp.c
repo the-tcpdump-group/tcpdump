@@ -9,7 +9,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dccp.c,v 1.3 2005-11-04 00:45:39 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dccp.c,v 1.4 2005-11-08 02:48:14 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -146,7 +146,7 @@ static u_int64_t dccp_seqno(const struct dccp_hdr *dh)
 	u_int64_t seqno = EXTRACT_24BITS(&seq_high) & 0xFFFFFF;
 
 	if (DCCPH_X(dh) != 0) {
-		const struct dccp_hdr_ext *dhx = (void *)dh + sizeof(*dh);
+		const struct dccp_hdr_ext *dhx = (void *)(dh + 1);
 		u_int32_t seq_low = dhx->dccph_seq_low;
 		seqno &= 0x00FFFF;  /* clear reserved field */
 		seqno = (seqno << 32) + EXTRACT_32BITS(&seq_low);
