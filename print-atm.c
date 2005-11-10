@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.41 2005-07-07 01:22:17 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.42 2005-11-10 00:43:24 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -290,7 +290,8 @@ atm_print(u_int vpi, u_int vci, u_int traftype, const u_char *p, u_int length,
 int 
 oam_print (const u_char *p, u_int length, u_int hec) {
 
-    u_int16_t cell_header, cell_type, func_type,vpi,vci,payload,clp;
+    u_int32_t cell_header;
+    u_int16_t cell_type, func_type,vpi,vci,payload,clp;
 
     cell_header = EXTRACT_32BITS(p);
     cell_type = ((*(p+4+hec))>>4) & 0x0f;
@@ -304,7 +305,7 @@ oam_print (const u_char *p, u_int length, u_int hec) {
     switch (vci) {
     case OAMF4SC:
         printf("OAM F4 (segment), ");
-            break;
+        break;
     case OAMF4EC:
         printf("OAM F4 (end), ");
         break;
