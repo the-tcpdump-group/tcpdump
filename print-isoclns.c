@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.133.2.20 2005-10-16 08:18:18 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.133.2.21 2005-11-12 22:23:23 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1662,11 +1662,7 @@ isis_print_extd_ip_reach (const u_int8_t *tptr, const char *ident, u_int16_t afi
    
     if (!TTEST2(*tptr, byte_length))
         return (0);
-#ifdef INET6
-    memset(prefix, 0, sizeof(struct in6_addr));              /* clear the copy buffer */
-#else
-    memset(prefix, 0, sizeof(struct in_addr));               /* clear the copy buffer */
-#endif
+    memset(prefix, 0, sizeof prefix);   /* clear the copy buffer */
     memcpy(prefix,tptr,byte_length);    /* copy as much as is stored in the TLV */
     tptr+=byte_length;
     processed+=byte_length;
