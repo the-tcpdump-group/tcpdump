@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.31.2.6 2005-10-17 07:59:18 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.31.2.7 2005-11-13 12:07:44 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -46,20 +46,54 @@ static const char rcsid[] _U_ =
 #include "ieee802_11.h"
 #include "ieee802_11_radio.h"
 
+#define PRINT_SSID(p) \
+	switch (p.ssid_status) { \
+	case TRUNCATED: \
+		return 0; \
+	case PRESENT: \
+		printf(" ("); \
+		fn_print(p.ssid.ssid, NULL); \
+		printf(")"); \
+		break; \
+	case NOT_PRESENT: \
+		break; \
+	}
+
 #define PRINT_RATE(_sep, _r, _suf) \
 	printf("%s%2.1f%s", _sep, (.5 * ((_r) & 0x7f)), _suf)
 #define PRINT_RATES(p) \
-do { \
-	int z; \
-	const char *sep = " ["; \
-	for (z = 0; z < p.rates.length ; z++) { \
-		PRINT_RATE(sep, p.rates.rate[z], \
-			(p.rates.rate[z] & 0x80 ? "*" : "")); \
-		sep = " "; \
+	switch (p.rates_status) { \
+	case TRUNCATED: \
+		return 0; \
+	case PRESENT: \
+		do { \
+			int z; \
+			const char *sep = " ["; \
+			for (z = 0; z < p.rates.length ; z++) { \
+				PRINT_RATE(sep, p.rates.rate[z], \
+					(p.rates.rate[z] & 0x80 ? "*" : "")); \
+				sep = " "; \
+			} \
+			if (p.rates.length != 0) \
+				printf(" Mbit]"); \
+		} while (0); \
+		break; \
+	case NOT_PRESENT: \
+		break; \
+	}
+
+#define PRINT_DS_CHANNEL(p) \
+	switch (p.ds_status) { \
+	case TRUNCATED: \
+		return 0; \
+	case PRESENT: \
+		printf(" CH: %u", p.ds.channel); \
+		break; \
+	case NOT_PRESENT: \
+		break; \
 	} \
-	if (p.rates.length != 0) \
-		printf(" Mbit]"); \
-} while (0)
+	printf("%s", \
+	    CAPABILITY_PRIVACY(p.capability_info) ? ", PRIVACY" : "" );
 
 static const char *auth_alg_text[]={"Open System","Shared Key","EAP"};
 #define NUM_AUTH_ALGS	(sizeof auth_alg_text / sizeof auth_alg_text[0])
@@ -118,102 +152,139 @@ wep_print(const u_char *p)
 	return 1;
 }
 
-static int
+static void
 parse_elements(struct mgmt_body_t *pbody, const u_char *p, int offset)
 {
+	/*
+	 * We haven't seen any elements yet.
+	 */
+	pbody->challenge_status = NOT_PRESENT;
+	pbody->ssid_status = NOT_PRESENT;
+	pbody->rates_status = NOT_PRESENT;
+	pbody->ds_status = NOT_PRESENT;
+	pbody->cf_status = NOT_PRESENT;
+	pbody->tim_status = NOT_PRESENT;
+
 	for (;;) {
 		if (!TTEST2(*(p + offset), 1))
 			return 1;
 		switch (*(p + offset)) {
 		case E_SSID:
+			/* Present, possibly truncated */
+			pbody->ssid_status = TRUNCATED;
 			if (!TTEST2(*(p + offset), 2))
-				return 0;
+				return;
 			memcpy(&pbody->ssid, p + offset, 2);
 			offset += 2;
-			if (pbody->ssid.length <= 0)
-				break;
-			if (pbody->ssid.length > 32)
-				return 0;
-			if (!TTEST2(*(p + offset), pbody->ssid.length))
-				return 0;
-			memcpy(&pbody->ssid.ssid, p + offset,
-			    pbody->ssid.length);
-			offset += pbody->ssid.length;
+			if (pbody->ssid.length != 0) {
+				if (pbody->ssid.length > 32)
+					return;
+				if (!TTEST2(*(p + offset), pbody->ssid.length))
+					return;
+				memcpy(&pbody->ssid.ssid, p + offset,
+				    pbody->ssid.length);
+				offset += pbody->ssid.length;
+			}
 			pbody->ssid.ssid[pbody->ssid.length] = '\0';
+			/* Present and not truncated */
+			pbody->ssid_status = PRESENT;
 			break;
 		case E_CHALLENGE:
+			/* Present, possibly truncated */
+			pbody->challenge_status = TRUNCATED;
 			if (!TTEST2(*(p + offset), 2))
-				return 0;
+				return;
 			memcpy(&pbody->challenge, p + offset, 2);
 			offset += 2;
-			if (pbody->challenge.length <= 0)
-				break;
-			if (pbody->challenge.length > 253)
-				return 0;
-			if (!TTEST2(*(p + offset), pbody->challenge.length))
-				return 0;
-			memcpy(&pbody->challenge.text, p + offset,
-			    pbody->challenge.length);
-			offset += pbody->challenge.length;
+			if (pbody->challenge.length == 0) {
+				if (pbody->challenge.length > 253)
+					return;
+				if (!TTEST2(*(p + offset), pbody->challenge.length))
+					return;
+				memcpy(&pbody->challenge.text, p + offset,
+				    pbody->challenge.length);
+				offset += pbody->challenge.length;
+			}
 			pbody->challenge.text[pbody->challenge.length] = '\0';
+			/* Present and not truncated */
+			pbody->challenge_status = PRESENT;
 			break;
 		case E_RATES:
+			/* Present, possibly truncated */
+			pbody->rates_status = TRUNCATED;
 			if (!TTEST2(*(p + offset), 2))
-				return 0;
+				return;
 			memcpy(&(pbody->rates), p + offset, 2);
 			offset += 2;
-			if (pbody->rates.length <= 0)
-				break;
-			if (pbody->rates.length > 8)
-				return 0;
-			if (!TTEST2(*(p + offset), pbody->rates.length))
-				return 0;
-			memcpy(&pbody->rates.rate, p + offset,
-			    pbody->rates.length);
-			offset += pbody->rates.length;
+			if (pbody->rates.length != 0) {
+				if (pbody->rates.length > sizeof pbody->rates.rate)
+					return;
+				if (!TTEST2(*(p + offset), pbody->rates.length))
+					return;
+				memcpy(&pbody->rates.rate, p + offset,
+				    pbody->rates.length);
+				offset += pbody->rates.length;
+			}
+			/* Present and not truncated */
+			pbody->rates_status = PRESENT;
 			break;
 		case E_DS:
+			/* Present, possibly truncated */
+			pbody->ds_status = TRUNCATED;
 			if (!TTEST2(*(p + offset), 3))
-				return 0;
+				return;
 			memcpy(&pbody->ds, p + offset, 3);
 			offset += 3;
+			/* Present and not truncated */
+			pbody->ds_status = PRESENT;
 			break;
 		case E_CF:
+			/* Present, possibly truncated */
+			pbody->cf_status = TRUNCATED;
 			if (!TTEST2(*(p + offset), 8))
-				return 0;
+				return;
 			memcpy(&pbody->cf, p + offset, 8);
 			offset += 8;
+			/* Present and not truncated */
+			pbody->cf_status = PRESENT;
 			break;
 		case E_TIM:
+			/* Present, possibly truncated */
+			pbody->tim_status = TRUNCATED;
 			if (!TTEST2(*(p + offset), 2))
-				return 0;
+				return;
 			memcpy(&pbody->tim, p + offset, 2);
 			offset += 2;
 			if (!TTEST2(*(p + offset), 3))
-				return 0;
+				return;
 			memcpy(&pbody->tim.count, p + offset, 3);
 			offset += 3;
 
 			if (pbody->tim.length <= 3)
 				break;
 			if (pbody->rates.length > 251)
-				return 0;
+				return;
 			if (!TTEST2(*(p + offset), pbody->tim.length - 3))
-				return 0;
+				return;
 			memcpy(pbody->tim.bitmap, p + (pbody->tim.length - 3),
 			    (pbody->tim.length - 3));
 			offset += pbody->tim.length - 3;
+			/* Present and not truncated */
+			pbody->tim_status = PRESENT;
 			break;
 		default:
 #if 0
 			printf("(1) unhandled element_id (%d)  ",
 			    *(p + offset) );
 #endif
+			if (!TTEST2(*(p + offset), 2))
+				return;
+			if (!TTEST2(*(p + offset + 2), *(p + offset + 1)))
+				return;
 			offset += *(p + offset + 1) + 2;
 			break;
 		}
 	}
-	return 1;
 }
 
 /*********************************************************************************
@@ -238,17 +309,13 @@ handle_beacon(const u_char *p)
 	pbody.capability_info = EXTRACT_LE_16BITS(p+offset);
 	offset += IEEE802_11_CAPINFO_LEN;
 
-	if (!parse_elements(&pbody, p, offset))
-		return 0;
+	parse_elements(&pbody, p, offset);
 
-	printf(" (");
-	fn_print(pbody.ssid.ssid, NULL);
-	printf(")");
+	PRINT_SSID(pbody);
 	PRINT_RATES(pbody);
-	printf(" %s CH: %u%s",
-	    CAPABILITY_ESS(pbody.capability_info) ? "ESS" : "IBSS",
-	    pbody.ds.channel,
-	    CAPABILITY_PRIVACY(pbody.capability_info) ? ", PRIVACY" : "" );
+	printf(" %s",
+	    CAPABILITY_ESS(pbody.capability_info) ? "ESS" : "IBSS");
+	PRINT_DS_CHANNEL(pbody);
 
 	return 1;
 }
@@ -268,12 +335,9 @@ handle_assoc_request(const u_char *p)
 	pbody.listen_interval = EXTRACT_LE_16BITS(p+offset);
 	offset += IEEE802_11_LISTENINT_LEN;
 
-	if (!parse_elements(&pbody, p, offset))
-		return 0;
+	parse_elements(&pbody, p, offset);
 
-	printf(" (");
-	fn_print(pbody.ssid.ssid, NULL);
-	printf(")");
+	PRINT_SSID(pbody);
 	PRINT_RATES(pbody);
 	return 1;
 }
@@ -296,8 +360,7 @@ handle_assoc_response(const u_char *p)
 	pbody.aid = EXTRACT_LE_16BITS(p+offset);
 	offset += IEEE802_11_AID_LEN;
 
-	if (!parse_elements(&pbody, p, offset))
-		return 0;
+	parse_elements(&pbody, p, offset);
 
 	printf(" AID(%x) :%s: %s", ((u_int16_t)(pbody.aid << 2 )) >> 2 ,
 	    CAPABILITY_PRIVACY(pbody.capability_info) ? " PRIVACY " : "",
@@ -326,12 +389,10 @@ handle_reassoc_request(const u_char *p)
 	memcpy(&pbody.ap, p+offset, IEEE802_11_AP_LEN);
 	offset += IEEE802_11_AP_LEN;
 
-	if (!parse_elements(&pbody, p, offset))
-		return 0;
+	parse_elements(&pbody, p, offset);
 
-	printf(" (");
-	fn_print(pbody.ssid.ssid, NULL);
-	printf(") AP : %s", etheraddr_string( pbody.ap ));
+	PRINT_SSID(pbody);
+	printf(" AP : %s", etheraddr_string( pbody.ap ));
 
 	return 1;
 }
@@ -351,12 +412,9 @@ handle_probe_request(const u_char *p)
 
 	memset(&pbody, 0, sizeof(pbody));
 
-	if (!parse_elements(&pbody, p, offset))
-		return 0;
+	parse_elements(&pbody, p, offset);
 
-	printf(" (");
-	fn_print(pbody.ssid.ssid, NULL);
-	printf(")");
+	PRINT_SSID(pbody);
 	PRINT_RATES(pbody);
 
 	return 1;
@@ -381,15 +439,11 @@ handle_probe_response(const u_char *p)
 	pbody.capability_info = EXTRACT_LE_16BITS(p+offset);
 	offset += IEEE802_11_CAPINFO_LEN;
 
-	if (!parse_elements(&pbody, p, offset))
-		return 0;
+	parse_elements(&pbody, p, offset);
 
-	printf(" (");
-	fn_print(pbody.ssid.ssid, NULL);
-	printf(") ");
+	PRINT_SSID(pbody);
 	PRINT_RATES(pbody);
-	printf(" CH: %u%s", pbody.ds.channel,
-	    CAPABILITY_PRIVACY(pbody.capability_info) ? ", PRIVACY" : "" );
+	PRINT_DS_CHANNEL(pbody);
 
 	return 1;
 }
@@ -437,8 +491,7 @@ handle_auth(const u_char *p)
 	pbody.status_code = EXTRACT_LE_16BITS(p + offset);
 	offset += 2;
 
-	if (!parse_elements(&pbody, p, offset))
-		return 0;
+	parse_elements(&pbody, p, offset);
 
 	if ((pbody.auth_alg == 1) &&
 	    ((pbody.auth_trans_seq_num == 2) ||
