@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.149.2.4 2005-11-13 11:51:52 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.149.2.5 2005-11-13 20:30:18 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -341,12 +341,6 @@ in_cksum_shouldbe(u_int16_t sum, u_int16_t computed_sum)
 	return shouldbe;
 }
 
-#ifndef IP_MF
-#define IP_MF 0x2000
-#endif /* IP_MF */
-#ifndef IP_DF
-#define IP_DF 0x4000
-#endif /* IP_DF */
 #define IP_RES 0x8000
 
 static struct tok ip_frag_values[] = {
