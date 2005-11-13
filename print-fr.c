@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.32.2.13 2005-11-04 07:17:40 hannes Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.32.2.14 2005-11-13 11:53:56 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -111,6 +111,8 @@ static int parse_q922_addr(const u_char *p, u_int *dlci, u_int *sdlcore,
 
         flags[0] = p[0] & 0x02; /* populate the first flag fields */
         flags[1] = p[1] & 0x0c;
+        flags[2] = 0;           /* clear the rest of the flags */
+        flags[3] = 0;
 
 	if (p[1] & FR_EA_BIT)
 		return 0;	/* 2-byte Q.922 address */
