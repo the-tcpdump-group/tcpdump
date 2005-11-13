@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.40 2005-11-13 20:03:21 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.41 2005-11-13 20:13:58 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -177,7 +177,8 @@ parse_elements(struct mgmt_body_t *pbody, const u_char *p, int offset)
 			memcpy(&pbody->ssid, p + offset, 2);
 			offset += 2;
 			if (pbody->ssid.length != 0) {
-				if (pbody->ssid.length > 32)
+				if (pbody->ssid.length >
+				    sizeof(pbody->ssid.ssid) - 1)
 					return;
 				if (!TTEST2(*(p + offset), pbody->ssid.length))
 					return;
@@ -197,7 +198,8 @@ parse_elements(struct mgmt_body_t *pbody, const u_char *p, int offset)
 			memcpy(&pbody->challenge, p + offset, 2);
 			offset += 2;
 			if (pbody->challenge.length != 0) {
-				if (pbody->challenge.length > 253)
+				if (pbody->challenge.length >
+				    sizeof(pbody->challenge.text) - 1)
 					return;
 				if (!TTEST2(*(p + offset), pbody->challenge.length))
 					return;
@@ -262,7 +264,7 @@ parse_elements(struct mgmt_body_t *pbody, const u_char *p, int offset)
 
 			if (pbody->tim.length <= 3)
 				break;
-			if (pbody->rates.length > 251)
+			if (pbody->rates.length > sizeof pbody->tim.bitmap)
 				return;
 			if (!TTEST2(*(p + offset), pbody->tim.length - 3))
 				return;
