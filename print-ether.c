@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.99 2005-07-10 14:41:34 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.100 2005-11-13 12:12:41 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -47,7 +47,7 @@ const struct tok ethertype_values[] = {
     { ETHERTYPE_VMAN,		"VMAN" },
     { ETHERTYPE_PUP,            "PUP" },
     { ETHERTYPE_ARP,            "ARP"},
-    { ETHERTYPE_REVARP ,        "Reverse ARP"},
+    { ETHERTYPE_REVARP,         "Reverse ARP"},
     { ETHERTYPE_NS,             "NS" },
     { ETHERTYPE_SPRITE,         "Sprite" },
     { ETHERTYPE_TRAIL,          "Trail" },
@@ -128,7 +128,6 @@ ether_print(const u_char *p, u_int length, u_int caplen)
 	/*
 	 * Is it (gag) an 802.3 encapsulation?
 	 */
-	extracted_ether_type = 0;
 	if (ether_type <= ETHERMTU) {
 		/* Try to print the LLC-layer header & higher layers */
 		if (llc_print(p, length, caplen, ESRC(ep), EDST(ep),
