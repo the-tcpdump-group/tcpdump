@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.31.2.8 2005-11-13 19:59:39 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.31.2.9 2005-11-13 20:03:53 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -196,7 +196,7 @@ parse_elements(struct mgmt_body_t *pbody, const u_char *p, int offset)
 				return;
 			memcpy(&pbody->challenge, p + offset, 2);
 			offset += 2;
-			if (pbody->challenge.length == 0) {
+			if (pbody->challenge.length != 0) {
 				if (pbody->challenge.length > 253)
 					return;
 				if (!TTEST2(*(p + offset), pbody->challenge.length))
