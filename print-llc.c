@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.61.2.5 2005-09-29 07:40:13 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.61.2.6 2005-11-13 12:13:00 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -138,6 +138,8 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 	int is_u;
 	register int ret;
 
+	*extracted_ethertype = 0;
+
 	if (caplen < 3) {
 		(void)printf("[|llc]");
 		default_print((u_char *)p, caplen);
@@ -145,9 +147,7 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 	}
 
 	dsap_field = *p;
-        dsap = dsap_field & ~LLC_IG;
 	ssap_field = *(p + 1);
-	ssap = ssap_field & ~LLC_GSAP;
 
 	/*
 	 * OK, what type of LLC frame is this?  The length
@@ -179,7 +179,7 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 		is_u = 0;
 	}
 
-	if (ssap == LLCSAP_GLOBAL && dsap == LLCSAP_GLOBAL) {
+	if (ssap_field == LLCSAP_GLOBAL && dsap_field == LLCSAP_GLOBAL) {
 		/*
 		 * This is an Ethernet_802.3 IPX frame; it has an
 		 * 802.3 header (i.e., an Ethernet header where the
@@ -201,6 +201,9 @@ llc_print(const u_char *p, u_int length, u_int caplen,
             ipx_print(p, length);
             return (1);
 	}
+
+	dsap = dsap_field & ~LLC_IG;
+	ssap = ssap_field & ~LLC_GSAP;
 
 	if (eflag) {
                 printf("LLC, dsap %s (0x%02x), ssap %s (0x%02x)",
@@ -319,7 +322,7 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 	if (is_u) {
 		printf("Unnumbered, %s, Flags [%s], length %u",
                        tok2str(llc_cmd_values, "%02x", LLC_U_CMD(control)),
-                       bittok2str(llc_flag_values,"?",(ssap) | (control & LLC_U_POLL)),
+                       tok2str(llc_flag_values,"?",(ssap_field & LLC_GSAP) | (control & LLC_U_POLL)),
                        length);
 
 		p += 3;
@@ -335,18 +338,17 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 			}
 		}
 	} else {
-
 		if ((control & LLC_S_FMT) == LLC_S_FMT) {
 			(void)printf("Supervisory, %s, rcv seq %u, Flags [%s], length %u",
 				tok2str(llc_supervisory_values,"?",LLC_S_CMD(control)),
 				LLC_IS_NR(control),
-				bittok2str(llc_flag_values,"?",(ssap) | (control & LLC_IS_POLL)),
+				tok2str(llc_flag_values,"?",(ssap_field & LLC_GSAP) | (control & LLC_IS_POLL)),
                                 length);
 		} else {
 			(void)printf("Information, send seq %u, rcv seq %u, Flags [%s], length %u",
 				LLC_I_NS(control),
 				LLC_IS_NR(control),
-				bittok2str(llc_flag_values,"?",(ssap) | (control & LLC_IS_POLL)),
+				tok2str(llc_flag_values,"?",(ssap_field & LLC_GSAP) | (control & LLC_IS_POLL)),
                                 length);
 		}
 		p += 4;
