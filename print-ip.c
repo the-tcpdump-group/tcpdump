@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.152 2005-10-07 10:48:14 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.153 2005-11-13 11:51:32 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -417,19 +417,21 @@ again:
 		break;
 		
 	case IPPROTO_TCP:
+		/* pass on the MF bit plus the offset to detect fragments */
 		tcp_print(ipds->cp, ipds->len, (const u_char *)ipds->ip,
-			  (ipds->off &~ 0x6000));
+			  ipds->off & (IP_MF|IP_OFFMASK));
 		break;
 		
 	case IPPROTO_UDP:
+		/* pass on the MF bit plus the offset to detect fragments */
 		udp_print(ipds->cp, ipds->len, (const u_char *)ipds->ip,
-			  (ipds->off &~ 0x6000));
+			  ipds->off & (IP_MF|IP_OFFMASK));
 		break;
 		
 	case IPPROTO_ICMP:
 		/* pass on the MF bit plus the offset to detect fragments */
 		icmp_print(ipds->cp, ipds->len, (const u_char *)ipds->ip,
-			   (ipds->off &~ 0x6000));
+			   ipds->off & (IP_MF|IP_OFFMASK));
 		break;
 		
 	case IPPROTO_PIGP:
