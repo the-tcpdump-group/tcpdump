@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.174 2005-10-20 07:43:51 hannes Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.175 2005-11-23 04:14:09 guy Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -764,8 +764,16 @@ This syntax does not work in IPv6-enabled configuration at this moment.
 .IP "\fBdst net \fInet\fR"
 True if the IPv4/v6 destination address of the packet has a network
 number of \fInet\fP.
-\fINet\fP may be either a name from /etc/networks
-or a network number (see \fInetworks(4)\fP for details).
+\fINet\fP may be either a name from the networks database
+(/etc/networks, etc.) or a network number.
+An IPv4 network number can be written as a dotted quad (e.g., 192.168.1.0),
+dotted triple (e.g., 192.168.1), dotted pair (e.g, 172.16), or single
+number (e.g., 10); the netmask is 255.255.255.255 for a dotted quad
+(which means that it's really a host match), 255.255.255.0 for a dotted
+triple, 255.255.0.0 for a dotted pair, or 255.0.0.0 for a single number.
+An IPv6 network number must be written out fully; the netmask is
+ff:ff:ff:ff:ff:ff:ff:ff, so IPv6 "network" matches are really always
+host matches, and a network match requires a netmask length.
 .IP "\fBsrc net \fInet\fR"
 True if the IPv4/v6 source address of the packet has a network
 number of \fInet\fP.
