@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.175 2005-11-23 04:14:09 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.176 2005-11-23 04:24:32 guy Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -80,7 +80,7 @@ tcpdump \- dump traffic on a network
 [
 .B \-W
 .I filecount
-] 
+]
 .br
 .ti +8
 [
@@ -365,9 +365,9 @@ If specified, rotates the dump file specified with the
 option every \fIrotate_seconds\fP. Savefiles will have the name specified by
 .B \-w
 which should include a time format as defined by
-.B strftime
-(3). If no time format is specified, each new file will overwrite the previous.
-.br
+.BR strftime (3).
+If no time format is specified, each new file will overwrite the previous.
+.IP
 If used in conjunction with the
 .B \-C
 option, filenames will take the form of `\fIfile\fP<count>'.
