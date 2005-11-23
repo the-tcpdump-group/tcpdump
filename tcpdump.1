@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.176 2005-11-23 04:24:32 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.177 2005-11-23 05:16:15 guy Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -568,7 +568,9 @@ created exitting with status 0 when reaching the limit. If used with
 \-C as well, the behavior will result in cyclical files per timeslice.
 .TP
 .B \-x
-Print each packet (minus its link level header) in hex.
+When parsing and printing,
+in addition to printing the headers of each packet, print the data of
+each packet (minus its link level header) in hex. 
 The smaller of the entire packet or
 .I snaplen
 bytes will be printed.  Note that this is the entire link-layer
@@ -577,16 +579,22 @@ will also be printed when the higher layer packet is shorter than the
 required padding.
 .TP
 .B \-xx
-Print each packet,
+When parsing and printing,
+in addition to printing the headers of each packet, print the data of
+each packet,
 .I including
 its link level header, in hex.
 .TP
 .B \-X
-Print each packet (minus its link level header) in hex and ASCII.
+When parsing and printing,
+in addition to printing the headers of each packet, print the data of
+each packet (minus its link level header) in hex and ASCII.
 This is very handy for analysing new protocols.
 .TP
 .B \-XX
-Print each packet,
+When parsing and printing,
+in addition to printing the headers of each packet, print the data of
+each packet,
 .I including
 its link level header, in hex and ASCII.
 .TP
