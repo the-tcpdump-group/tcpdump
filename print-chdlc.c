@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.32.2.9 2005-11-04 18:31:08 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-chdlc.c,v 1.32.2.10 2005-11-24 07:43:57 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -110,7 +110,8 @@ chdlc_print(register const u_char *p, u_int length) {
                     isoclns_print(p+CHDLC_HDRLEN, length, length);
                 break;
 	default:
-                printf("unknown CHDLC protocol (0x%04x)", proto);
+                if (!eflag)
+                        printf("unknown CHDLC protocol (0x%04x)", proto);
                 break;
 	}
 
