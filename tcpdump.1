@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.177 2005-11-23 05:16:15 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.178 2005-11-24 08:15:09 guy Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -109,8 +109,9 @@ tcpdump \- dump traffic on a network
 .ad
 .SH DESCRIPTION
 .LP
-\fITcpdump\fP prints out the headers of packets on a network interface
-that match the boolean \fIexpression\fP.  It can also be run with the
+\fITcpdump\fP prints out a description of the contents of packets on a
+network interface that match the boolean \fIexpression\fP.  It can also
+be run with the
 .B \-w
 flag, which causes it to save the packet data to a file for later
 analysis, and/or with the
