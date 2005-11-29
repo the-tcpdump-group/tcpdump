@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.123 2005-10-16 06:05:03 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.124 2005-11-29 09:07:47 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -615,6 +615,15 @@ tcp_print(register const u_char *bp, register u_int length,
 					(void)printf("%02x", cp[i]);
 #endif
 				break;
+
+                        case TCPOPT_AUTH:
+                                (void)printf("Enhanced Auth: keyid %d", *cp++);
+                                datalen = len - 3;
+                                for (i = 0; i < datalen; ++i) {
+                                    LENCHECK(i);
+                                    (void)printf("%02x", cp[i]);
+                                }
+                            break;
 
 			default:
 				(void)printf("opt-%u:", opt);
