@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.68 2005-12-01 17:45:45 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.69 2005-12-01 18:05:12 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -82,6 +82,13 @@ static const struct tok llc_flag_values[] = {
         { LLC_GSAP|LLC_U_POLL, "Final" },
         { LLC_IS_POLL, "Poll" },
         { LLC_GSAP|LLC_IS_POLL, "Final" },
+	{ 0, NULL }
+};
+
+
+static const struct tok llc_ig_flag_values[] = { 
+        { 0, "Individual" },
+        { LLC_IG, "Group" },
 	{ 0, NULL }
 };
 
@@ -208,9 +215,10 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 	ssap = ssap_field & ~LLC_GSAP;
 
 	if (eflag) {
-                printf("LLC, dsap %s (0x%02x), ssap %s (0x%02x) %s",
+                printf("LLC, dsap %s (0x%02x) %s, ssap %s (0x%02x) %s",
                        tok2str(llc_values, "Unknown", dsap),
                        dsap,
+                       tok2str(llc_ig_flag_values, "Unknown", dsap_field & LLC_IG),
                        tok2str(llc_values, "Unknown", ssap),
                        ssap,
                        tok2str(llc_flag_values, "Unknown", ssap_field & LLC_GSAP));
