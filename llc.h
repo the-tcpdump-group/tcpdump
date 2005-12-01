@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/llc.h,v 1.17.2.2 2005-09-29 07:40:12 hannes Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/llc.h,v 1.17.2.3 2005-12-01 17:48:25 hannes Exp $ (LBL)
  */
 
 /*
@@ -44,7 +44,7 @@
 #define	LLC_XID		0xaf
 #define	LLC_FRMR	0x87
 
-#define	LLC_S_CMD(is)	(((is) >> 1) & 0x03)
+#define	LLC_S_CMD(is)	(((is) >> 2) & 0x03)
 #define	LLC_RR		0x0001
 #define	LLC_RNR		0x0005
 #define	LLC_REJ		0x0009
