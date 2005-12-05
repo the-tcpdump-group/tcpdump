@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.178 2005-11-24 08:15:09 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.179 2005-12-05 20:10:58 guy Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -91,7 +91,7 @@ tcpdump \- dump traffic on a network
 .ti +8
 [
 .B \-G
-.I seconds
+.I rotate_seconds
 ]
 [
 .B \-y
@@ -363,7 +363,8 @@ An additional expression given on the command line is ignored.
 .B \-G
 If specified, rotates the dump file specified with the
 .B \-w
-option every \fIrotate_seconds\fP. Savefiles will have the name specified by
+option every \fIrotate_seconds\fP seconds.
+Savefiles will have the name specified by
 .B \-w
 which should include a time format as defined by
 .BR strftime (3).
@@ -554,19 +555,20 @@ Standard output is used if \fIfile\fR is ``-''.
 .TP
 .B \-W
 Used in conjunction with the 
-.I \-C 
+.B \-C 
 option, this will limit the number
 of files created to the specified number, and begin overwriting files
 from the beginning, thus creating a 'rotating' buffer. 
 In addition, it will name
 the files with enough leading 0s to support the maximum number of
 files, allowing them to sort correctly.
-.br
+.IP
 Used in conjunction with the 
-.I \-G
+.B \-G
 option, this will limit the number of rotated dump files that get
-created exitting with status 0 when reaching the limit. If used with
-\-C as well, the behavior will result in cyclical files per timeslice.
+created, exiting with status 0 when reaching the limit. If used with
+.B \-C
+as well, the behavior will result in cyclical files per timeslice.
 .TP
 .B \-x
 When parsing and printing,
