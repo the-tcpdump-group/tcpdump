@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.263 2005-10-25 09:29:44 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.264 2005-12-05 20:24:48 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -590,18 +590,17 @@ main(int argc, char **argv)
 
 		case 'G':
 			Gflag = atoi(optarg);
-                        /* We will create one file initially. */
-                        Gflag_count = 0;
-                        /* Grab the current time for rotation use. */
-                        {
-	                  struct timeval t;
-                          if (gettimeofday(&t, NULL) != 0) {
-                                  error("main: gettimeofday");
-                          }
-                          Gflag_time = t.tv_sec;
-                        }
 			if (Gflag < 0)
 				error("invalid number of seconds %s", optarg);
+
+                        /* We will create one file initially. */
+                        Gflag_count = 0;
+
+			/* Grab the current time for rotation use. */
+			if ((Gflag_time = time(NULL)) == (time_t)-1) {
+				error("main: can't get current time: %s",
+				    pcap_strerror(errno));
+			}
 			break;
 
 		case 'i':
@@ -670,9 +669,9 @@ main(int argc, char **argv)
 
 		case 'm':
 #ifdef LIBSMI
-		        if (smiLoadModule(optarg) == 0) {
+			if (smiLoadModule(optarg) == 0) {
 				error("could not load MIB module %s", optarg);
-		        }
+			}
 			sflag = 1;
 #else
 			(void)fprintf(stderr, "%s: ignoring option `-m %s' ",
@@ -950,7 +949,7 @@ main(int argc, char **argv)
 			}
 #endif
 			(void)fprintf(stderr, "%s: data link type %s\n",
-			              program_name, gndo->ndo_dltname);
+				      program_name, gndo->ndo_dltname);
 			(void)fflush(stderr);
 		}
 		i = pcap_snapshot(pd);
@@ -993,16 +992,16 @@ main(int argc, char **argv)
 		error("%s", pcap_geterr(pd));
 	if (WFileName) {
 		pcap_dumper_t *p;
-                /* Do not exceed the default NAME_MAX for files. */
+		/* Do not exceed the default NAME_MAX for files. */
 		WFileNameAlt = (char *)malloc(NAME_MAX + 1);
 
 		if (WFileNameAlt == NULL)
 			error("malloc of WFileNameAlt");
 
-                /* We do not need numbering for dumpfiles if Cflag isn't set. */
-                if (Cflag != 0)
+		/* We do not need numbering for dumpfiles if Cflag isn't set. */
+		if (Cflag != 0)
 		  MakeFilename(WFileNameAlt, WFileName, 0, WflagChars);
-                else
+		else
 		  MakeFilename(WFileNameAlt, WFileName, 0, 0);
 
 		p = pcap_dump_open(pd, WFileNameAlt);
@@ -1202,60 +1201,66 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 	dump_info = (struct dump_info *)user;
 
 	/*
-         * XXX - this won't force the file to rotate on the specified time
-         * boundary, but it will rotate on the first packet received after the
-         * specified Gflag number of seconds. Note: if a Gflag time boundary
-         * and a Cflag size boundary coincide, the time rotation will occur
-         * first thereby cancelling the Cflag boundary (since the file should
-         * be 0).
+	 * XXX - this won't force the file to rotate on the specified time
+	 * boundary, but it will rotate on the first packet received after the
+	 * specified Gflag number of seconds. Note: if a Gflag time boundary
+	 * and a Cflag size boundary coincide, the time rotation will occur
+	 * first thereby cancelling the Cflag boundary (since the file should
+	 * be 0).
 	 */
-        if (Gflag != 0) {
-          /* Check if it is time to rotate */
-	  struct timeval t;
+	if (Gflag != 0) {
+		/* Check if it is time to rotate */
+		time_t t;
 
-          /* Get the current time */
-          if (gettimeofday(&t, NULL) != 0) {
-                  error("dump_and_trunc_packet: gettimeofday");
-          }
+		/* Get the current time */
+		if ((t = time(NULL)) == (time_t)-1) {
+			error("dump_and_trunc_packet: can't get current_time: %s",
+			    pcap_strerror(errno));
+		}
 
 
-          /* If the time is greater than the specified window, rotate */
-          if (t.tv_sec - Gflag_time >= Gflag) {
-              /* Update the Gflag_time */
-              Gflag_time = t.tv_sec;
-              /* Update Gflag_count */
-              Gflag_count++;
-              /*
-               * Close the current file and open a new one.
-               */
-              pcap_dump_close(dump_info->p);
+		/* If the time is greater than the specified window, rotate */
+		if (t - Gflag_time >= Gflag) {
+			/* Update the Gflag_time */
+			Gflag_time = t;
+			/* Update Gflag_count */
+			Gflag_count++;
+			/*
+			 * Close the current file and open a new one.
+			 */
+			pcap_dump_close(dump_info->p);
 
-              /* Check to see if we've exceeded the Wflag (when not using Cflag). */
-	      if (Cflag == 0 && Wflag > 0 && Gflag_count >= Wflag) {
-	        (void)fprintf(stderr, "Maximum file limit reached: %d\n", Wflag);
-		(void)fflush(stderr);
-                exit(0);
-                /* NOTREACHED */
-              }
-              /* Allocate space for max filename + \0. */
-              name = (char *)malloc(NAME_MAX + 1);
-              if (name == NULL)
-                      error("dump_packet_and_trunc: malloc");
-              /* This is always the first file in the Cflag rotation: e.g. 0
-               * We also don't need numbering if Cflag is not set.
-               */
-              if (Cflag != 0)
-                MakeFilename(name, dump_info->WFileName, 0, WflagChars);
-              else
-                MakeFilename(name, dump_info->WFileName, 0, 0);
+			/*
+			 * Check to see if we've exceeded the Wflag (when
+			 * not using Cflag).
+			 */
+			if (Cflag == 0 && Wflag > 0 && Gflag_count >= Wflag) {
+				(void)fprintf(stderr, "Maximum file limit reached: %d\n",
+				    Wflag);
+				exit(0);
+				/* NOTREACHED */
+			}
+			/* Allocate space for max filename + \0. */
+			name = (char *)malloc(NAME_MAX + 1);
+			if (name == NULL)
+				error("dump_packet_and_trunc: malloc");
+			/*
+			 * This is always the first file in the Cflag
+			 * rotation: e.g. 0
+			 * We also don't need numbering if Cflag is not set.
+			 */
+			if (Cflag != 0)
+				MakeFilename(name, dump_info->WFileName, 0,
+				    WflagChars);
+			else
+				MakeFilename(name, dump_info->WFileName, 0, 0);
 
-              dump_info->p = pcap_dump_open(dump_info->pd, name);
-              free(name);
-              if (dump_info->p == NULL)
-                      error("%s", pcap_geterr(pd));
-
-          }
-        }
+			dump_info->p = pcap_dump_open(dump_info->pd, name);
+			free(name);
+			if (dump_info->p == NULL)
+				error("%s", pcap_geterr(pd));
+		}
+	}
 
 	/*
 	 * XXX - this won't prevent capture files from getting
@@ -1454,7 +1459,7 @@ RETSIGTYPE requestinfo(int signo _U_)
  */
 #ifdef USE_WIN32_MM_TIMER
 void CALLBACK verbose_stats_dump (UINT timer_id _U_, UINT msg _U_, DWORD_PTR arg _U_,
-                                  DWORD_PTR dw1 _U_, DWORD_PTR dw2 _U_)
+				  DWORD_PTR dw1 _U_, DWORD_PTR dw2 _U_)
 {
 	struct pcap_stat stat;
 
