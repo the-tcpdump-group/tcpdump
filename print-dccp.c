@@ -9,7 +9,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dccp.c,v 1.4 2005-11-08 02:48:14 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dccp.c,v 1.5 2005-12-05 21:36:24 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -165,15 +165,19 @@ static void dccp_print_ack_no(const u_char *bp)
 	const struct dccp_hdr *dh = (const struct dccp_hdr *)bp;
 	const struct dccp_hdr_ack_bits *dh_ack =
 		(struct dccp_hdr_ack_bits *)(bp + dccp_basic_hdr_len(dh));
+	u_int32_t ack_high;
+	u_int64_t ackno;
 
 	TCHECK2(*dh_ack,4);
-	u_int32_t ack_high = DCCPH_ACK(dh_ack);
-	u_int64_t ackno = EXTRACT_24BITS(&ack_high) & 0xFFFFFF;
+	ack_high = DCCPH_ACK(dh_ack);
+	ackno = EXTRACT_24BITS(&ack_high) & 0xFFFFFF;
 
 	if (DCCPH_X(dh) != 0) {
+		u_int32_t ack_low;
+
 		TCHECK2(*dh_ack,8);
-		u_int32_t ack_low = dh_ack->dccph_ack_nr_low;
-		
+		ack_low = dh_ack->dccph_ack_nr_low;
+
 		ackno &= 0x00FFFF;  /* clear reserved field */
 		ackno = (ackno << 32) + EXTRACT_32BITS(&ack_low);
 	}

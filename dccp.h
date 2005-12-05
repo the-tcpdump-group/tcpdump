@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/dccp.h,v 1.2 2005-09-20 06:25:19 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/dccp.h,v 1.3 2005-12-05 21:36:24 guy Exp $ (LBL) */
 /*
  * Copyright (C) Arnaldo Carvalho de Melo 2004
  * Copyright (C) Ian McDonald 2005 <iam4@cs.waikato.ac.nz>
@@ -86,12 +86,14 @@ struct dccp_hdr_response {
 	u_int32_t			dccph_resp_service;
 };
 
+#if 0
 static inline struct dccp_hdr_data *dccp_hdr_data(struct dccp_hdr *hdrg)
 {
 	const int ext = DCCPH_X(hdrg) ? sizeof(struct dccp_hdr_ext) : 0;
 
 	return (struct dccp_hdr_data *)(((u_char *)hdrg) + sizeof(hdrg) + ext);
 }
+#endif
 
 /**
  * struct dccp_hdr_reset - Unconditionally shut down a connection
