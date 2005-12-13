@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.103 2005-12-13 08:37:23 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.104 2005-12-13 08:47:10 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -183,7 +183,7 @@ ts_print(register const struct timeval *tvp)
 
 	case 3: /* Microseconds since previous packet */
         case 5: /* Microseconds since first packet */
-		if (b_sec == 0 && tflag == 5) {
+		if (b_sec == 0) {
                         /* init timestamp for first packet */
                         b_usec = tvp->tv_usec;
                         b_sec = tvp->tv_sec;                        
