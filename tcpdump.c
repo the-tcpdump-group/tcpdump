@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.264 2005-12-05 20:24:48 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.265 2005-12-13 08:37:22 hannes Exp $ (LBL)";
 #endif
 
 /*
@@ -834,10 +834,11 @@ main(int argc, char **argv)
 	case 1: /* No time stamp */
 	case 2: /* Unix timeval style */
 	case 3: /* Microseconds since previous packet */
+        case 5: /* Microseconds since first packet */
 		break;
 
 	default: /* Not supported */
-		error("only -t, -tt, -ttt, and -tttt are supported");
+		error("only -t, -tt, -ttt, -tttt and -ttttt are supported");
 		break;
 	}
 

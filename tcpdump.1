@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.179 2005-12-05 20:10:58 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.180 2005-12-13 08:37:23 hannes Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -496,11 +496,15 @@ and
 Print an unformatted timestamp on each dump line.
 .TP
 .B \-ttt
-Print a delta (in micro-seconds) between current and previous line
+Print a delta (micro-second resolution) between current and previous line
 on each dump line.
 .TP
 .B \-tttt
 Print a timestamp in default format proceeded by date on each dump line.
+.TP
+.B \-ttttt
+Print a delta (micro-second resolution) between current and first line
+on each dump line.
 .TP
 .B \-u
 Print undecoded NFS handles.

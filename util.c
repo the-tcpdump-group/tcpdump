@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.102 2005-12-05 20:24:48 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.103 2005-12-13 08:37:23 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -43,6 +43,8 @@ static const char rcsid[] _U_ =
 #include <string.h>
 
 #include "interface.h"
+
+char * ts_format(register int, register int);
 
 /*
  * Print out a null-terminated filename (or other ascii string).
@@ -139,6 +141,19 @@ fn_printzp(register const u_char *s, register u_int n,
 }
 
 /*
+ * Format the timestamp
+ */
+char *
+ts_format(register int sec, register int usec)
+{
+        static char buf[sizeof("00:00:00.000000")];
+        (void)snprintf(buf, sizeof(buf), "%02d:%02d:%02d.%06u",
+               sec / 3600, (sec % 3600) / 60, sec % 60, usec);
+
+        return buf;
+}
+
+/*
  * Print the timestamp
  */
 void
@@ -154,9 +169,7 @@ ts_print(register const struct timeval *tvp)
 
 	case 0: /* Default */
 		s = (tvp->tv_sec + thiszone) % 86400;
-		(void)printf("%02d:%02d:%02d.%06u ",
-			     s / 3600, (s % 3600) / 60, s % 60,
-			     (unsigned)tvp->tv_usec);
+                (void)printf("%s ", ts_format(s, tvp->tv_usec));
 		break;
 
 	case 1: /* No time stamp */
@@ -169,22 +182,27 @@ ts_print(register const struct timeval *tvp)
 		break;
 
 	case 3: /* Microseconds since previous packet */
-		if (b_sec == 0) {
-			printf("000000 ");
-		} else {
-			int d_usec = tvp->tv_usec - b_usec;
-			int d_sec = tvp->tv_sec - b_sec;
+        case 5: /* Microseconds since first packet */
+		if (b_sec == 0 && tflag == 5) {
+                        /* init timestamp for first packet */
+                        b_usec = tvp->tv_usec;
+                        b_sec = tvp->tv_sec;                        
+                }
 
-			while (d_usec < 0) {
-				d_usec += 1000000;
-				d_sec--;
-			}
-			if (d_sec)
-				printf("%d. ", d_sec);
-			printf("%06d ", d_usec);
-		}
-		b_sec = tvp->tv_sec;
-		b_usec = tvp->tv_usec;
+                int d_usec = tvp->tv_usec - b_usec;
+                int d_sec = tvp->tv_sec - b_sec;
+                
+                while (d_usec < 0) {
+                    d_usec += 1000000;
+                    d_sec--;
+                }
+
+                (void)printf("%s ", ts_format(d_sec, d_usec));
+
+                if (tflag == 3) { /* set timestamp for last packet */
+                    b_sec = tvp->tv_sec;
+                    b_usec = tvp->tv_usec;
+                }
 		break;
 
 	case 4: /* Default + Date*/
@@ -194,10 +212,9 @@ ts_print(register const struct timeval *tvp)
 		if (!tm)
 			printf("Date fail  ");
 		else
-			printf("%04d-%02d-%02d ",
-				   tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday);
-		printf("%02d:%02d:%02d.%06u ",
-			   s / 3600, (s % 3600) / 60, s % 60, (unsigned)tvp->tv_usec);
+			printf("%04d-%02d-%02d %s ",
+                               tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday,
+                               ts_format(s, tvp->tv_usec));
 		break;
 	}
 }
