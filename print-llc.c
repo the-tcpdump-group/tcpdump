@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.69 2005-12-01 18:05:12 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.70 2006-01-17 17:43:55 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -119,6 +119,10 @@ static const struct tok bridged_values[] = {
 	{ PID_RFC2684_802_6_NOFCS, "802.6 w/o FCS" },
 	{ PID_RFC2684_BPDU,        "BPDU" },
 	{ 0,                       NULL },
+};
+
+static const struct tok null_values[] = { 
+	{ 0,             NULL }
 };
 
 struct oui_tok {
@@ -382,7 +386,7 @@ snap_print(const u_char *p, u_int length, u_int caplen,
 	et = EXTRACT_16BITS(p + 3);
 
 	if (eflag) {
-		const struct tok *tok = NULL;
+		const struct tok *tok = null_values;
 		const struct oui_tok *otp;
 
 		for (otp = &oui_to_tok[0]; otp->tok != NULL; otp++) {
