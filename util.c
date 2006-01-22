@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.104 2005-12-13 08:47:10 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.105 2006-01-22 19:06:37 gianluca Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -164,6 +164,8 @@ ts_print(register const struct timeval *tvp)
 	time_t Time;
 	static unsigned b_sec;
 	static unsigned b_usec;
+	int d_usec;
+	int d_sec;
 
 	switch (tflag) {
 
@@ -189,8 +191,8 @@ ts_print(register const struct timeval *tvp)
                         b_sec = tvp->tv_sec;                        
                 }
 
-                int d_usec = tvp->tv_usec - b_usec;
-                int d_sec = tvp->tv_sec - b_sec;
+                d_usec = tvp->tv_usec - b_usec;
+                d_sec = tvp->tv_sec - b_sec;
                 
                 while (d_usec < 0) {
                     d_usec += 1000000;
