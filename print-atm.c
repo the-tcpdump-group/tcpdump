@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.38.2.5 2006-01-22 10:23:57 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.38.2.6 2006-01-25 13:27:24 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -141,6 +141,14 @@ atm_if_print(const struct pcap_pkthdr *h, const u_char *p)
 		printf("[|atm]");
 		return (caplen);
 	}
+
+        /* Cisco Style NLPID ? */
+        if (*p == LLC_UI) {
+            if (eflag)
+                printf("CNLPID ");
+            isoclns_print(p+1, length-1, caplen-1);
+            return hdrlen;
+        }
 
 	/*
 	 * Extract the presumed LLC header into a variable, for quick
