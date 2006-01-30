@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.27 2005-08-23 10:24:59 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.28 2006-01-30 16:20:06 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -40,6 +40,8 @@ static const char rcsid[] _U_ =
 #define JUNIPER_BPF_IN            1       /* Incoming packet */
 #define JUNIPER_BPF_PKT_IN        0x1     /* Incoming packet */
 #define JUNIPER_BPF_NO_L2         0x2     /* L2 header stripped */
+#define JUNIPER_BPF_IIF           0x4     /* IIF is valid */
+#define JUNIPER_BPF_FILTER        0x40    /* BPF filtering is supported */
 #define JUNIPER_BPF_EXT           0x80    /* extensions present */
 #define JUNIPER_MGC_NUMBER        0x4d4743 /* = "MGC" */
 
@@ -72,6 +74,42 @@ static struct tok juniper_direction_values[] = {
     { JUNIPER_BPF_IN,  "In"},
     { JUNIPER_BPF_OUT, "Out"},
     { 0, NULL}
+};
+
+/* codepoints for encoding extensions to a .pcap file */
+enum {
+    JUNIPER_EXT_TLV_IFD_IDX = 1,
+    JUNIPER_EXT_TLV_IFD_NAME = 2,
+    JUNIPER_EXT_TLV_IFD_MEDIATYPE = 3,
+    JUNIPER_EXT_TLV_IFL_IDX = 4,
+    JUNIPER_EXT_TLV_IFL_UNIT = 5,
+    JUNIPER_EXT_TLV_IFL_ENCAPS = 6, 
+    JUNIPER_EXT_TLV_TTP_IFD_MEDIATYPE = 7,  
+    JUNIPER_EXT_TLV_TTP_IFL_ENCAPS = 8
+};
+
+/* 1 byte type and 1-byte length */
+#define JUNIPER_EXT_TLV_OVERHEAD 2
+
+struct tok jnx_ext_tlv_values[] = {
+    { JUNIPER_EXT_TLV_IFD_IDX, "Device Interface Index" },
+    { JUNIPER_EXT_TLV_IFD_NAME,"Device Interface Name" },
+    { JUNIPER_EXT_TLV_IFD_MEDIATYPE, "Device Media Type" },
+    { JUNIPER_EXT_TLV_IFL_IDX, "Logical Interface Index" },
+    { JUNIPER_EXT_TLV_IFL_UNIT,"Logical Unit Number" },
+    { JUNIPER_EXT_TLV_IFL_ENCAPS, "Logical Interface Encapsulation" },
+    { JUNIPER_EXT_TLV_TTP_IFD_MEDIATYPE, "TTP derived Device Media Type" },
+    { JUNIPER_EXT_TLV_TTP_IFL_ENCAPS, "TTP derived Logical Interface Encapsulation" },
+    { 0, NULL }
+};
+
+struct tok jnx_flag_values[] = {
+    { JUNIPER_BPF_EXT, "Ext" },
+    { JUNIPER_BPF_FILTER, "Filter" },
+    { JUNIPER_BPF_IIF, "IIF" },
+    { JUNIPER_BPF_NO_L2, "no-L2" },
+    { JUNIPER_BPF_PKT_IN, "In" },
+    { 0, NULL }
 };
 
 struct juniper_cookie_table_t {
@@ -128,6 +166,7 @@ struct juniper_l2info_t {
     u_int8_t cookie[8];
     u_int8_t bundle;
     u_int16_t proto;
+    u_int8_t flags;
 };
 
 #define LS_COOKIE_ID            0x54
@@ -156,6 +195,7 @@ static struct tok juniper_protocol_values[] = {
 
 int ip_heuristic_guess(register const u_char *, u_int);
 int juniper_ppp_heuristic_guess(register const u_char *, u_int);
+int juniper_read_tlv_value(const u_char *, u_int, u_int);
 static int juniper_parse_header (const u_char *, const struct pcap_pkthdr *, struct juniper_l2info_t *);
 
 #ifdef DLT_JUNIPER_GGSN
@@ -797,11 +837,62 @@ ip_heuristic_guess(register const u_char *p, u_int length) {
     return 1; /* we printed an v4/v6 packet */
 }
 
+int
+juniper_read_tlv_value(const u_char *p, u_int tlv_type, u_int tlv_len) {
+
+   int tlv_value;
+
+   /* TLVs < 128 are little endian encoded */
+   if (tlv_type < 128) {
+       switch (tlv_len) {
+       case 1:
+           tlv_value = *p;
+           break;
+       case 2:
+           tlv_value = EXTRACT_LE_16BITS(p);
+           break;
+       case 3:
+           tlv_value = EXTRACT_LE_24BITS(p);
+           break;
+       case 4:
+           tlv_value = EXTRACT_LE_32BITS(p);
+           break;
+       default:
+           tlv_value = -1;
+           break;
+       }
+   } else {
+       /* TLVs >= 128 are big endian encoded */
+       switch (tlv_len) {
+       case 1:
+           tlv_value = *p;
+           break;
+       case 2:
+           tlv_value = EXTRACT_16BITS(p);
+           break;
+       case 3:
+           tlv_value = EXTRACT_24BITS(p);
+           break;
+       case 4:
+           tlv_value = EXTRACT_32BITS(p);
+           break;
+       default:
+           tlv_value = -1;
+           break;
+       }
+   }
+   return tlv_value;
+}
+
 static int
 juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct juniper_l2info_t *l2info) {
 
     struct juniper_cookie_table_t *lp = juniper_cookie_table;
-    u_int idx, offset;
+    u_int idx, jnx_ext_len, jnx_header_len = 0;
+    u_int8_t tlv_type,tlv_len;
+    int tlv_value;
+    const u_char *tptr;
+
 
     l2info->header_len = 0;
     l2info->cookie_len = 0;
@@ -810,9 +901,10 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
 
     l2info->length = h->len;
     l2info->caplen = h->caplen;
+    TCHECK2(p[0],4);
+    l2info->flags = p[3];
     l2info->direction = p[3]&JUNIPER_BPF_PKT_IN;
     
-    TCHECK2(p[0],4);
     if (EXTRACT_24BITS(p) != JUNIPER_MGC_NUMBER) { /* magic number found ? */
         printf("no magic-number found!");
         return 0;
@@ -821,15 +913,79 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
     if (eflag) /* print direction */
         printf("%3s ",tok2str(juniper_direction_values,"---",l2info->direction));
 
-    /* extensions present ?  - calculate how much bytes to skip */
-    if ((p[3] & JUNIPER_BPF_EXT ) == JUNIPER_BPF_EXT ) {
-        offset = 6 + EXTRACT_16BITS(p+4);
-        if (eflag>1)
-            printf("ext-len %u, ",EXTRACT_16BITS(p+4));
-    } else
-        offset = 4;
+    /* magic number + flags */
+    jnx_header_len = 4;
 
-    if ((p[3] & JUNIPER_BPF_NO_L2 ) == JUNIPER_BPF_NO_L2 ) {            
+    if (vflag>1)
+        printf("\n\tJuniper PCAP Flags [%s]",
+               bittok2str(jnx_flag_values, "none", l2info->flags));
+
+    /* extensions present ?  - calculate how much bytes to skip */
+    if ((l2info->flags & JUNIPER_BPF_EXT ) == JUNIPER_BPF_EXT ) {
+
+        tptr = p+jnx_header_len;
+
+        /* ok to read extension length ? */
+        TCHECK2(tptr[0], 2);
+        jnx_ext_len = EXTRACT_16BITS(tptr);
+        jnx_header_len += 2;
+        tptr +=2;
+        
+        /* nail up the total length -
+         * just in case something goes wrong
+         * with TLV parsing */
+        jnx_header_len += jnx_ext_len;
+        
+        if (vflag>1)
+            printf(", PCAP Extension(s) total length %u",
+                   jnx_ext_len);
+        
+        TCHECK2(tptr[0], jnx_ext_len);
+        while (jnx_ext_len > JUNIPER_EXT_TLV_OVERHEAD) {
+            tlv_type = *(tptr++);
+            tlv_len = *(tptr++);
+            tlv_value = 0;
+            
+            /* sanity check */
+            if (tlv_type == 0 || tlv_len == 0)
+                break;
+            
+            if (vflag>1)
+                printf("\n\t  %s Extension TLV #%u, length %u, value ",
+                       tok2str(jnx_ext_tlv_values,"Unknown",tlv_type),
+                       tlv_type,
+                       tlv_len);
+            
+            tlv_value = juniper_read_tlv_value(tptr, tlv_type, tlv_len);
+            switch (tlv_type) {
+            case JUNIPER_EXT_TLV_IFD_NAME:
+                /* FIXME */
+                break;
+                
+            case JUNIPER_EXT_TLV_IFD_MEDIATYPE: /* fall through */
+            case JUNIPER_EXT_TLV_IFL_ENCAPS:
+            case JUNIPER_EXT_TLV_TTP_IFD_MEDIATYPE:
+            case JUNIPER_EXT_TLV_TTP_IFL_ENCAPS:
+            case JUNIPER_EXT_TLV_IFL_IDX:
+            case JUNIPER_EXT_TLV_IFL_UNIT:
+            case JUNIPER_EXT_TLV_IFD_IDX:
+            default:
+                if (tlv_value != -1) {
+                    if (vflag>1)
+                        printf("%u",tlv_value);
+                }
+                break;
+            }
+            
+            tptr+=tlv_len;
+            jnx_ext_len -= tlv_len+JUNIPER_EXT_TLV_OVERHEAD;
+        }
+        
+        if (vflag>1)
+            printf("\n\t-----original packet-----\n\t");
+    } 
+    
+    if ((l2info->flags & JUNIPER_BPF_NO_L2 ) == JUNIPER_BPF_NO_L2 ) {            
         if (eflag)
             printf("no-L2-hdr, ");
 
@@ -837,15 +993,15 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
          * perform the v4/v6 heuristics
          * to figure out what it is
          */
-        TCHECK2(p[offset+4],1);
-        if(ip_heuristic_guess(p+offset+4,l2info->length-(offset+4)) == 0)
+        TCHECK2(p[jnx_header_len+4],1);
+        if(ip_heuristic_guess(p+jnx_header_len+4,l2info->length-(jnx_header_len+4)) == 0)
             printf("no IP-hdr found!");
 
-        l2info->header_len=offset+4;
+        l2info->header_len=jnx_header_len+4;
         return 0; /* stop parsing the output further */
         
     }
-    l2info->header_len = offset;
+    l2info->header_len = jnx_header_len;
     p+=l2info->header_len;
     l2info->length -= l2info->header_len;
     l2info->caplen -= l2info->header_len;
