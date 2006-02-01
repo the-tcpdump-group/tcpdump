@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.32.2.14 2005-11-13 11:53:56 guy Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.32.2.15 2006-02-01 14:39:56 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -323,6 +323,24 @@ fr_print(register const u_char *p, u_int length)
         return 0;
 
 }
+
+u_int
+mfr_if_print(const struct pcap_pkthdr *h, register const u_char *p)
+{
+	register u_int length = h->len;
+	register u_int caplen = h->caplen;
+
+        TCHECK2(*p, 2); /* minimum frame header length */
+
+        if ((length = mfr_print(p, length)) == 0)
+            return (0);
+        else
+            return length;
+ trunc:
+        printf("[|mfr]");
+        return caplen;
+}
+
 
 #define MFR_CTRL_MSG_ADD_LINK        1
 #define MFR_CTRL_MSG_ADD_LINK_ACK    2
