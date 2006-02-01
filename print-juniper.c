@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.28 2006-01-30 16:20:06 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.29 2006-02-01 14:42:17 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1141,6 +1141,23 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
     case DLT_JUNIPER_ATM1:
         break;
 #endif
+#ifdef DLT_JUNIPER_PPP
+    case DLT_JUNIPER_PPP:
+        break;
+#endif
+#ifdef DLT_JUNIPER_CHDLC
+    case DLT_JUNIPER_CHDLC:
+        break;
+#endif
+#ifdef DLT_JUNIPER_ETHER
+    case DLT_JUNIPER_ETHER:
+        break;
+#endif
+#ifdef DLT_JUNIPER_FRELAY
+    case DLT_JUNIPER_FRELAY:
+        break;
+#endif
+
     default:
         printf("Unknown Juniper DLT_ type %u: ", l2info->pictype);
         break;
