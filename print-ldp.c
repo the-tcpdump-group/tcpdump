@@ -16,7 +16,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.8.2.6 2005-07-11 20:24:34 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.8.2.7 2006-02-01 14:57:43 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -116,7 +116,7 @@ static const struct tok ldp_msg_values[] = {
     { LDP_MSG_INIT,	             "Initialization" },
     { LDP_MSG_KEEPALIVE,             "Keepalive" },
     { LDP_MSG_ADDRESS,	             "Address" },
-    { LDP_MSG_ADDRESS_WITHDRAW,	     "Address Widthdraw" },
+    { LDP_MSG_ADDRESS_WITHDRAW,	     "Address Withdraw" },
     { LDP_MSG_LABEL_MAPPING,	     "Label Mapping" },
     { LDP_MSG_LABEL_REQUEST,	     "Label Request" },
     { LDP_MSG_LABEL_WITHDRAW,	     "Label Withdraw" },
@@ -297,7 +297,7 @@ ldp_tlv_print(register const u_char *tptr) {
     case LDP_TLV_ADDRESS_LIST:
 	af = EXTRACT_16BITS(tptr);
 	tptr+=2;
-	printf("\n\t      Adress Family: ");
+	printf("\n\t      Address Family: ");
 	if (af == AFNUM_INET) {
 	    printf("IPv4, addresses:");
 	    for (i=0; i<(tlv_tlen-2)/4; i++) {
@@ -574,6 +574,8 @@ ldp_msg_print(register const u_char *pptr) {
         case LDP_MSG_KEEPALIVE:
         case LDP_MSG_ADDRESS:
         case LDP_MSG_LABEL_MAPPING:
+        case LDP_MSG_ADDRESS_WITHDRAW:
+        case LDP_MSG_LABEL_WITHDRAW:
             while(msg_tlen >= 4) {
                 processed = ldp_tlv_print(msg_tptr);
                 if (processed == 0)
@@ -588,9 +590,7 @@ ldp_msg_print(register const u_char *pptr) {
          *  you are welcome to contribute code ;-)
          */
 
-        case LDP_MSG_ADDRESS_WITHDRAW:
         case LDP_MSG_LABEL_REQUEST:
-        case LDP_MSG_LABEL_WITHDRAW:
         case LDP_MSG_LABEL_RELEASE:
         case LDP_MSG_LABEL_ABORT_REQUEST:
 
