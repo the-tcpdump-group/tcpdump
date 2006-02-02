@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.91.2.8 2005-10-19 09:28:13 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.91.2.9 2006-02-02 12:36:46 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -355,6 +355,7 @@ static struct tok bgp_safi_values[] = {
 #define AFNUM_DECNET	13
 #define AFNUM_BANYAN	14
 #define AFNUM_E164NSAP	15
+#define AFNUM_VPLS      25
 /* draft-kompella-ppvpn-l2vpn */
 #define AFNUM_L2VPN     196 /* still to be approved by IANA */
 
@@ -376,6 +377,7 @@ static struct tok bgp_afi_values[] = {
     { AFNUM_BANYAN,           "Banyan Vines"},
     { AFNUM_E164NSAP,         "E.164 with NSAP subaddress"},
     { AFNUM_L2VPN,            "Layer-2 VPN"},
+    { AFNUM_VPLS,             "VPLS"},
     { 0, NULL},
 };
 
@@ -1054,6 +1056,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                 case (AFNUM_L2VPN<<8 | SAFNUM_VPNUNICAST):
                 case (AFNUM_L2VPN<<8 | SAFNUM_VPNMULTICAST):
                 case (AFNUM_L2VPN<<8 | SAFNUM_VPNUNIMULTICAST):
+                case (AFNUM_VPLS<<8 | SAFNUM_VPLS):
                     break;
                 default:
                     TCHECK2(tptr[0], tlen);
@@ -1137,6 +1140,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                             }
                             break;
 #endif
+                        case (AFNUM_VPLS<<8 | SAFNUM_VPLS):
                         case (AFNUM_L2VPN<<8 | SAFNUM_VPNUNICAST):
                         case (AFNUM_L2VPN<<8 | SAFNUM_VPNMULTICAST):
                         case (AFNUM_L2VPN<<8 | SAFNUM_VPNUNIMULTICAST):
@@ -1296,6 +1300,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                             printf("\n\t      %s", buf);
                         break;
 #endif
+                    case (AFNUM_VPLS<<8 | SAFNUM_VPLS):
                     case (AFNUM_L2VPN<<8 | SAFNUM_VPNUNICAST):
                     case (AFNUM_L2VPN<<8 | SAFNUM_VPNMULTICAST):
                     case (AFNUM_L2VPN<<8 | SAFNUM_VPNUNIMULTICAST):
@@ -1430,6 +1435,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                             printf("\n\t      %s", buf);
                         break;
 #endif
+                    case (AFNUM_VPLS<<8 | SAFNUM_VPLS):
                     case (AFNUM_L2VPN<<8 | SAFNUM_VPNUNICAST):
                     case (AFNUM_L2VPN<<8 | SAFNUM_VPNMULTICAST):
                     case (AFNUM_L2VPN<<8 | SAFNUM_VPNUNIMULTICAST):
