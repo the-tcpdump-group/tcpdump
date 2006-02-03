@@ -16,7 +16,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.8.2.7 2006-02-01 14:57:43 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.8.2.8 2006-02-03 08:42:30 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -215,8 +215,10 @@ static const struct tok ldp_fec_martini_ifparm_vccv_cv_values[] = {
 };
 
 /* RFC1700 address family numbers, same definition in print-bgp.c */
+/* FIXME: move all AF stuff into dedicated files */
 #define AFNUM_INET	1
 #define AFNUM_INET6	2
+#define AFNUM_LEN       2 
 
 #define FALSE 0
 #define TRUE  1
@@ -296,21 +298,24 @@ ldp_tlv_print(register const u_char *tptr) {
 
     case LDP_TLV_ADDRESS_LIST:
 	af = EXTRACT_16BITS(tptr);
-	tptr+=2;
+	tptr+=AFNUM_LEN;
+        tlv_tlen -= AFNUM_LEN;
 	printf("\n\t      Address Family: ");
 	if (af == AFNUM_INET) {
 	    printf("IPv4, addresses:");
-	    for (i=0; i<(tlv_tlen-2)/4; i++) {
+	    while(tlv_tlen >= sizeof(struct in_addr)) {
 		printf(" %s",ipaddr_string(tptr));
-		tptr+=sizeof(struct in_addr);
+		tlv_tlen-=sizeof(struct in_addr);
+		tptr+=sizeof(struct in_addr);                
 	    }
 	}
 #ifdef INET6
 	else if (af == AFNUM_INET6) {
 	    printf("IPv6, addresses:");
-	    for (i=0; i<(tlv_tlen-2)/16; i++) {
+	    while(tlv_tlen >= sizeof(struct in6_addr)) {
 		printf(" %s",ip6addr_string(tptr));
-		tptr+=sizeof(struct in6_addr);
+		tlv_tlen-=sizeof(struct in6_addr);
+		tptr+=sizeof(struct in6_addr);                
 	    }
 	}
 #endif
