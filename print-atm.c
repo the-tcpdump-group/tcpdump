@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.45 2006-02-08 01:43:00 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.46 2006-02-08 16:18:56 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -378,7 +378,7 @@ int
 oam_print (const u_char *p, u_int length, u_int hec) {
 
     u_int32_t cell_header;
-    u_int16_t vpi, vci, cksum, cksum_shouldbe;
+    u_int16_t vpi, vci, cksum, cksum_shouldbe, idx;
     u_int8_t  cell_type, func_type, payload, clp;
 
     union {
@@ -426,28 +426,41 @@ oam_print (const u_char *p, u_int length, u_int hec) {
                        oam_ptr.oam_fm_loopback->loopback_indicator & OAM_FM_LOOPBACK_INDICATOR_MASK),
                EXTRACT_LE_32BITS(&oam_ptr.oam_fm_loopback->correlation_tag));
         printf("\n\tLocation-ID ");
-        safeputs((const char *)&oam_ptr.oam_fm_loopback->loopback_id,
-                 sizeof(oam_ptr.oam_fm_loopback->loopback_id));
+        for (idx = 0; idx < sizeof(oam_ptr.oam_fm_loopback->loopback_id); idx++) {
+            printf("0x%02x ", oam_ptr.oam_fm_loopback->loopback_id[idx]);
+        }
         printf("\n\tSource-ID   ");
-        safeputs((const char *)&oam_ptr.oam_fm_loopback->source_id,
-                 sizeof(oam_ptr.oam_fm_loopback->source_id));
+        for (idx = 0; idx < sizeof(oam_ptr.oam_fm_loopback->source_id); idx++) {
+            printf("0x%02x ", oam_ptr.oam_fm_loopback->source_id[idx]);
+        }
         break;
+
+    case (OAM_CELLTYPE_FM << 4 | OAM_FM_FUNCTYPE_AIS):
+    case (OAM_CELLTYPE_FM << 4 | OAM_FM_FUNCTYPE_RDI):
+        oam_ptr.oam_fm_ais_rdi = (const struct oam_fm_ais_rdi_t *)(p + OAM_CELLTYPE_FUNCTYPE_LEN);
+        printf("\n\tFailure-type 0x%02x", oam_ptr.oam_fm_ais_rdi->failure_type);
+        printf("\n\tLocation-ID ");
+        for (idx = 0; idx < sizeof(oam_ptr.oam_fm_ais_rdi->failure_location); idx++) {
+            printf("0x%02x ", oam_ptr.oam_fm_ais_rdi->failure_location[idx]);
+        }
+        break;
+
+    case (OAM_CELLTYPE_FM << 4 | OAM_FM_FUNCTYPE_CONTCHECK):
+        break;
+
     default:
         break;
     }
 
     /* crc10 checksum verification */
     gen_crc10_table();
-    cksum = EXTRACT_16BITS(p + OAM_CELLTYPE_FUNCTYPE_LEN + OAM_FUNCTION_SPECIFIC_LEN) & OAM_CRC10_MASK;
+    cksum = EXTRACT_16BITS(p + OAM_CELLTYPE_FUNCTYPE_LEN + OAM_FUNCTION_SPECIFIC_LEN)
+        & OAM_CRC10_MASK;
     cksum_shouldbe = verify_crc10_cksum(0, p, OAM_PAYLOAD_LEN);
     
-    printf("\n\tcksum 0x%03x", cksum);
-
-    if (cksum_shouldbe == 0) {
-        printf(" (correct)");
-    } else {
-        printf(" (incorrect (-> 0x%03x))", cksum_shouldbe);
-    }
+    printf("\n\tcksum 0x%03x (%scorrect)",
+           cksum,
+           cksum_shouldbe == 0 ? "" : "in");
 
     return 1;
 }
