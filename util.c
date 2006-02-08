@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.105 2006-01-22 19:06:37 gianluca Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.106 2006-02-08 01:38:16 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -526,10 +526,12 @@ read_infile(char *fname)
 }
 
 void
-safeputs(const char *s)
+safeputs(const char *s, int maxlen)
 {
-	while (*s) {
+    int idx = 0;
+	while (*s && idx < maxlen) {
 		safeputchar(*s);
+                idx++;
 		s++;
 	}
 }
@@ -543,5 +545,5 @@ safeputchar(int c)
 	if (ch < 0x80 && isprint(ch))
 		printf("%c", ch);
 	else
-		printf("\\%03o", ch);
+		printf("\\0x%02x ", ch);
 }
