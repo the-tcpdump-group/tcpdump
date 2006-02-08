@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.46 2006-02-08 16:18:56 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.47 2006-02-08 16:50:16 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -51,6 +51,17 @@ static const char rcsid[] _U_ =
 struct tok oam_f_values[] = {
     { OAMF4SC, "OAM F4 (segment)" },
     { OAMF4EC, "OAM F4 (end)" },
+    { 0, NULL }
+};
+
+struct tok atm_pty_values[] = {
+    { 0x0, "user data, uncongested, SDU 0" },
+    { 0x1, "user data, uncongested, SDU 1" },
+    { 0x2, "user data, congested, SDU 0" },
+    { 0x3, "user data, congested, SDU 1" },
+    { 0x4, "VCC OAM F5 flow segment" },
+    { 0x5, "VCC OAM F5 flow end-to-end" },
+    { 0x6, "Traffic Control and resource Mgmt" },
     { 0, NULL }
 };
 
@@ -396,9 +407,11 @@ oam_print (const u_char *p, u_int length, u_int hec) {
     payload = (cell_header>>1)&0x7;
     clp = cell_header&0x1;
 
-    printf("%s, vpi %u, vci %u, payload %u, clp %u, length %u",
+    printf("%s, vpi %u, vci %u, payload [ %s ], clp %u, length %u",
            tok2str(oam_f_values, "OAM F5", vci),
-           vpi, vci, payload, clp, length);
+           vpi, vci,
+           tok2str(atm_pty_values, "Unknown", payload),
+           clp, length);
 
     if (!vflag) {
         return 1;
@@ -427,11 +440,15 @@ oam_print (const u_char *p, u_int length, u_int hec) {
                EXTRACT_LE_32BITS(&oam_ptr.oam_fm_loopback->correlation_tag));
         printf("\n\tLocation-ID ");
         for (idx = 0; idx < sizeof(oam_ptr.oam_fm_loopback->loopback_id); idx++) {
-            printf("0x%02x ", oam_ptr.oam_fm_loopback->loopback_id[idx]);
+            if (idx % 2) {
+                printf("%04x ", EXTRACT_16BITS(&oam_ptr.oam_fm_loopback->loopback_id[idx]));
+            }
         }
         printf("\n\tSource-ID   ");
         for (idx = 0; idx < sizeof(oam_ptr.oam_fm_loopback->source_id); idx++) {
-            printf("0x%02x ", oam_ptr.oam_fm_loopback->source_id[idx]);
+            if (idx % 2) {
+                printf("%04x ", EXTRACT_16BITS(&oam_ptr.oam_fm_loopback->source_id[idx]));
+            }
         }
         break;
 
@@ -441,7 +458,9 @@ oam_print (const u_char *p, u_int length, u_int hec) {
         printf("\n\tFailure-type 0x%02x", oam_ptr.oam_fm_ais_rdi->failure_type);
         printf("\n\tLocation-ID ");
         for (idx = 0; idx < sizeof(oam_ptr.oam_fm_ais_rdi->failure_location); idx++) {
-            printf("0x%02x ", oam_ptr.oam_fm_ais_rdi->failure_location[idx]);
+            if (idx % 2) {
+                printf("%04x ", EXTRACT_16BITS(&oam_ptr.oam_fm_ais_rdi->failure_location[idx]));
+            }
         }
         break;
 
