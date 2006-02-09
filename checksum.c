@@ -19,7 +19,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/checksum.c,v 1.1 2006-02-09 20:33:49 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/checksum.c,v 1.2 2006-02-09 20:35:38 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -40,7 +40,7 @@ static const char rcsid[] _U_ =
 static u_int16_t crc10_table[256];
 
 static void
-gen_crc10_table(void)
+init_crc10_table(void)
 {   
     register int i, j;
     register u_int16_t accum;
@@ -71,10 +71,10 @@ verify_crc10_cksum(u_int16_t accum, const u_char *p, int length)
     return accum;
 }
 
-/* precomputed checksum tables */
+/* precompute checksum tables */
 void
 init_checksum(void) {
 
-    gen_crc10_table();
+    init_crc10_table();
 
 }
