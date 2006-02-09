@@ -22,6 +22,7 @@ bootp.h
 bpf_dump.c
 bgp.h
 chdlc.h
+checksum.c
 config.guess
 config.h.in
 config.sub

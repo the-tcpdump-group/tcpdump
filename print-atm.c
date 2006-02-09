@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.47 2006-02-08 16:50:16 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.48 2006-02-09 20:33:49 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -349,42 +349,6 @@ struct oam_fm_ais_rdi_t {
     u_int8_t unused[28];
 };
 
-
-#define CRC10_POLYNOMIAL 0x633
-static u_int16_t crc10_table[256];
-
-static void
-gen_crc10_table(void)
-{   
-    register int i, j;
-    register u_int16_t accum;
-    
-    for ( i = 0;  i < 256;  i++ )
-    {
-        accum = ((unsigned short) i << 2);
-        for ( j = 0;  j < 8;  j++ )
-        {
-            if ((accum <<= 1) & 0x400) accum ^= CRC10_POLYNOMIAL;
-        }
-        crc10_table[i] = accum;
-    }
-    return;
-}
-
-static u_int16_t
-verify_crc10_cksum(u_int16_t accum, const u_char *p, int length)
-{
-    register int i;
-
-    for ( i = 0;  i < length;  i++ )
-    {
-        accum = ((accum << 8) & 0x3ff)
-            ^ crc10_table[( accum >> 2) & 0xff]
-            ^ *p++;
-    }
-    return accum;
-}
-
 int 
 oam_print (const u_char *p, u_int length, u_int hec) {
 
@@ -437,7 +401,7 @@ oam_print (const u_char *p, u_int length, u_int hec) {
                tok2str(oam_fm_loopback_indicator_values,
                        "Unknown",
                        oam_ptr.oam_fm_loopback->loopback_indicator & OAM_FM_LOOPBACK_INDICATOR_MASK),
-               EXTRACT_LE_32BITS(&oam_ptr.oam_fm_loopback->correlation_tag));
+               EXTRACT_32BITS(&oam_ptr.oam_fm_loopback->correlation_tag));
         printf("\n\tLocation-ID ");
         for (idx = 0; idx < sizeof(oam_ptr.oam_fm_loopback->loopback_id); idx++) {
             if (idx % 2) {
@@ -465,6 +429,7 @@ oam_print (const u_char *p, u_int length, u_int hec) {
         break;
 
     case (OAM_CELLTYPE_FM << 4 | OAM_FM_FUNCTYPE_CONTCHECK):
+        /* FIXME */
         break;
 
     default:
@@ -472,7 +437,6 @@ oam_print (const u_char *p, u_int length, u_int hec) {
     }
 
     /* crc10 checksum verification */
-    gen_crc10_table();
     cksum = EXTRACT_16BITS(p + OAM_CELLTYPE_FUNCTYPE_LEN + OAM_FUNCTION_SPECIFIC_LEN)
         & OAM_CRC10_MASK;
     cksum_shouldbe = verify_crc10_cksum(0, p, OAM_PAYLOAD_LEN);

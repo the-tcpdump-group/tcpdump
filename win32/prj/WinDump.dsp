@@ -97,6 +97,10 @@ SOURCE=..\..\cpack.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\checksum.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\missing\datalinks.c
 # End Source File
 # Begin Source File

@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.266 2005-12-13 13:44:30 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.267 2006-02-09 20:33:49 hannes Exp $ (LBL)";
 #endif
 
 /*
@@ -980,6 +980,7 @@ main(int argc, char **argv)
 		exit(0);
 	}
 	init_addrtoname(localnet, netmask);
+        init_checksum();
 
 #ifndef WIN32	
 	(void)setsignal(SIGPIPE, cleanup);

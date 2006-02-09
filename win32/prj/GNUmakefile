@@ -29,6 +29,7 @@ LDFLAGS =
 LIBS = -L ${PCAP_DIR}/WPCAP/LIB -lwpcap -lws2_32
 OBJS = \
 	../../addrtoname.o \
+	../../checksum.o \
 	../../gmpls.o \
 	../../gmt2local.o \
 	../../missing/inet_aton.o \
