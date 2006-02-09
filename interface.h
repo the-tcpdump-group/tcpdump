@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.265 2006-02-08 01:38:17 hannes Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.266 2006-02-09 21:16:47 hannes Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -159,6 +159,10 @@ extern const char *protoid_string(const u_char *);
 extern const char *ipxsap_string(u_short);
 extern const char *dnname_string(u_short);
 extern const char *dnnum_string(u_short);
+
+/* checksum routines */
+extern void init_checksum(void);
+extern u_int16_t verify_crc10_cksum(u_int16_t, const u_char *, int);
 
 /* The printer routines. */
 
