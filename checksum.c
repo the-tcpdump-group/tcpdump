@@ -19,7 +19,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/checksum.c,v 1.2 2006-02-09 20:35:38 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/checksum.c,v 1.3 2006-02-09 21:34:38 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -33,8 +33,6 @@ static const char rcsid[] _U_ =
 #include <string.h>
 
 #include "interface.h"
-#include "extract.h"
-#include "addrtoname.h"
 
 #define CRC10_POLYNOMIAL 0x633
 static u_int16_t crc10_table[256];
