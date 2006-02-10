@@ -92,6 +92,7 @@ OBJS = \
 	../../print-lwres.o \
 	../../print-mobile.o \
 	../../print-mobility.o \
+	../../print-mpcp.o \
 	../../print-mpls.o \
 	../../print-msdp.o \
 	../../print-nfs.o \

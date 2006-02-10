@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.100 2005-11-13 12:12:41 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.101 2006-02-10 04:52:25 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -65,6 +65,7 @@ const struct tok ethertype_values[] = {
     { ETHERTYPE_AARP,           "Appletalk ARP" },
     { ETHERTYPE_IPX,            "IPX" },
     { ETHERTYPE_PPP,            "PPP" },
+    { ETHERTYPE_MPCP,           "MPCP" },
     { ETHERTYPE_SLOW,           "Slow Protocols" },
     { ETHERTYPE_PPPOED,         "PPPoE D" },
     { ETHERTYPE_PPPOES,         "PPPoE S" },
@@ -293,6 +294,10 @@ ether_encap_print(u_short ether_type, const u_char *p,
 			printf(": ");
 			ppp_print(p, length);
 		}
+		return (1);
+
+	case ETHERTYPE_MPCP:
+	        mpcp_print(p, length);
 		return (1);
 
 	case ETHERTYPE_SLOW:
