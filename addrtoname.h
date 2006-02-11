@@ -18,12 +18,19 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/addrtoname.h,v 1.18 2001-09-17 21:57:51 fenner Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/addrtoname.h,v 1.19 2006-02-11 22:11:40 hannes Exp $ (LBL)
  */
 
 /* Name to address translation routines. */
 
-extern const char *linkaddr_string(const u_char *, const unsigned int);
+enum {
+    LINKADDR_ETHER,
+    LINKADDR_FRELAY,
+    LINKADDR_IEEE1394,
+    LINKADDR_ATM
+};
+
+extern const char *linkaddr_string(const u_char *, const unsigned int, const unsigned int);
 extern const char *etheraddr_string(const u_char *);
 extern const char *etherproto_string(u_short);
 extern const char *tcpport_string(u_short);

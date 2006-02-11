@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.49 2005-12-13 13:44:30 hannes Exp $ (LBL)";
+	"@(#)$Header: /tcpdump/master/tcpdump/print-fr.c,v 1.50 2006-02-11 22:11:40 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -100,7 +100,7 @@ struct tok frf_flag_values[] = {
 /* Finds out Q.922 address length, DLCI and flags. Returns 0 on success
  * save the flags dep. on address length
  */
-static int parse_q922_addr(const u_char *p, u_int *dlci, u_int *sdlcore,
+static int parse_q922_addr(const u_char *p, u_int *dlci,
                            u_int *addr_len, u_int8_t *flags)
 {
 	if ((p[0] & FR_EA_BIT))
@@ -130,13 +130,25 @@ static int parse_q922_addr(const u_char *p, u_int *dlci, u_int *sdlcore,
 
         flags[3] = p[0] & 0x02;
 
-	if (p[0] & 0x02)
-                *sdlcore =  p[0] >> 2;
-	else
-		*dlci = (*dlci << 6) | (p[0] >> 2);
+        *dlci = (*dlci << 6) | (p[0] >> 2);
 
 	return 0;
 }
+
+char *q922_string(const u_char *p) {
+
+    static u_int dlci, addr_len;
+    static u_int8_t flags[4];
+    static char buffer[sizeof("DLCI xxxxxxxxxx")];
+    memset(buffer, 0, sizeof(buffer));
+
+    if (parse_q922_addr(p, &dlci, &addr_len, flags) == 0){
+        snprintf(buffer, sizeof(buffer), "DLCI %u", dlci);
+    }
+
+    return buffer;
+}
+
 
 /* Frame Relay packet structure, with flags and CRC removed
 
@@ -222,13 +234,12 @@ fr_print(register const u_char *p, u_int length)
 {
 	u_int16_t extracted_ethertype;
 	u_int dlci;
-        u_int sdlcore;
 	u_int addr_len;
 	u_int16_t nlpid;
 	u_int hdr_len;
 	u_int8_t flags[4];
 
-	if (parse_q922_addr(p, &dlci, &sdlcore, &addr_len, flags)) {
+	if (parse_q922_addr(p, &dlci, &addr_len, flags)) {
 		printf("Q.922, invalid address");
 		return 0;
 	}
