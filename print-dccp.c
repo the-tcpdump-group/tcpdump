@@ -9,7 +9,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dccp.c,v 1.5 2005-12-05 21:36:24 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dccp.c,v 1.6 2006-02-19 05:08:25 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -312,7 +312,8 @@ void dccp_print(const u_char *bp, const u_char *data2, u_int len)
 		struct dccp_hdr_request *dhr =
 			(struct dccp_hdr_request *)(bp + dccp_basic_hdr_len(dh));
 		TCHECK(*dhr);
-		(void)printf("request (service=%d) ", dhr->dccph_req_service);
+		(void)printf("request (service=%d) ",
+			     EXTRACT_32BITS(&dhr->dccph_req_service));
 		extlen += 4;
 		break;
 	}
@@ -320,7 +321,8 @@ void dccp_print(const u_char *bp, const u_char *data2, u_int len)
 		struct dccp_hdr_response *dhr =
 			(struct dccp_hdr_response *)(bp + dccp_basic_hdr_len(dh));
 		TCHECK(*dhr);
-		(void)printf("response (service=%d) ", dhr->dccph_resp_service);
+		(void)printf("response (service=%d) ",
+			     EXTRACT_32BITS(&dhr->dccph_resp_service));
 		extlen += 12;
 		break;
 	}
