@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.149.2.5 2005-11-13 20:30:18 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.149.2.6 2006-02-19 05:01:07 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -73,9 +73,9 @@ ip_printroute(register const u_char *cp, u_int length)
 		printf(" [bad ptr %u]", cp[2]);
 
 	for (len = 3; len < length; len += 4) {
-		printf("%s", ipaddr_string(&cp[len]));
+		printf(" %s", ipaddr_string(&cp[len]));
                 if (ptr > len)
-                    printf (", ");
+                        printf(",");
 	}
 }
 
@@ -137,17 +137,17 @@ ip_printts(register const u_char *cp, u_int length)
 	const char *type;
 
 	if (length < 4) {
-		printf("[bad length %d]", length);
+		printf("[bad length %u]", length);
 		return;
 	}
 	printf(" TS{");
 	hoplen = ((cp[3]&0xF) != IPOPT_TS_TSONLY) ? 8 : 4;
 	if ((length - 4) & (hoplen-1))
-		printf("[bad length %d]", length);
+		printf("[bad length %u]", length);
 	ptr = cp[2] - 1;
 	len = 0;
 	if (ptr < 4 || ((ptr - 4) & (hoplen-1)) || ptr > length + 1)
-		printf("[bad ptr %d]", cp[2]);
+		printf("[bad ptr %u]", cp[2]);
 	switch (cp[3]&0xF) {
 	case IPOPT_TS_TSONLY:
 		printf("TSONLY");
@@ -197,12 +197,19 @@ static void
 ip_optprint(register const u_char *cp, u_int length)
 {
 	register u_int option_len;
+	const char *sep = "";
 
 	for (; length > 0; cp += option_len, length -= option_len) {
 		u_int option_code;
 
+		printf("%s", sep);
+		sep = ",";
+
 		TCHECK(*cp);
 		option_code = *cp;
+
+                printf("%s",
+                        tok2str(ip_option_values,"unknown %u",option_code));
 
 		if (option_code == IPOPT_NOP ||
                     option_code == IPOPT_EOL)
@@ -210,16 +217,17 @@ ip_optprint(register const u_char *cp, u_int length)
 
 		else {
 			TCHECK(cp[1]);
-			option_len = cp[1];			
+			option_len = cp[1];
+			if (option_len < 2) {
+		                printf(" [bad length %u]", option_len);
+				return;
+			}
 		}
 
-                printf("%s (%u) len %u",
-                       tok2str(ip_option_values,"unknown",option_code),
-                       option_code,
-                       option_len);
-
-                if (option_len < 2)
-                        return;
+		if (option_len > length) {
+	                printf(" [bad length %u]", option_len);
+			return;
+		}
 
                 TCHECK2(*cp, option_len);
 
@@ -234,13 +242,17 @@ ip_optprint(register const u_char *cp, u_int length)
 		case IPOPT_RR:       /* fall through */
 		case IPOPT_SSRR:
 		case IPOPT_LSRR:
-			ip_printroute( cp, option_len);
+			ip_printroute(cp, option_len);
 			break;
 
 		case IPOPT_RA:
+			if (option_len < 4) {
+				printf(" [bad length %u]", option_len);
+				break;
+			}
                         TCHECK(cp[3]);
                         if (EXTRACT_16BITS(&cp[2]) != 0)
-                            printf("value %u", EXTRACT_16BITS(&cp[2]));
+                            printf(" value %u", EXTRACT_16BITS(&cp[2]));
 			break;
 
 		case IPOPT_NOP:       /* nothing to print - fall through */
@@ -639,9 +651,9 @@ ip_print(netdissect_options *ndo,
             (void)printf(", length: %u", EXTRACT_16BITS(&ipds->ip->ip_len));
 
             if ((hlen - sizeof(struct ip)) > 0) {
-                printf(", options ( ");
+                printf(", options (");
                 ip_optprint((u_char *)(ipds->ip + 1), hlen - sizeof(struct ip));
-                printf(" )");
+                printf(")");
             }
 
 	    if ((u_char *)ipds->ip + hlen <= snapend) {
