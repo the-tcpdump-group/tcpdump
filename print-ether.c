@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.101 2006-02-10 04:52:25 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.102 2006-02-20 18:13:55 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -243,11 +243,13 @@ ether_encap_print(u_short ether_type, const u_char *p,
 
 		if (llc_print(p, length, caplen, p - 18, p - 12,
 		    extracted_ether_type) == 0) {
-				ether_hdr_print(p - 18, length + 4);
+                        ether_hdr_print(p - 18, length + 4);
+
+                        if (!suppress_default_print) {
+                                default_print(p - 18, caplen + 4);
+                        }
 		}
 
-		if (!suppress_default_print)
-		        default_print(p - 18, caplen + 4);
 
 		return (1);
 
@@ -269,10 +271,11 @@ ether_encap_print(u_short ether_type, const u_char *p,
                 if (llc_print(p, length, caplen, p - 16, p - 10,
                               extracted_ether_type) == 0) {
                     ether_hdr_print(p - 16, length + 2);
-                }
 
-                if (!suppress_default_print)
-                    default_print(p - 16, caplen + 2);
+                    if (!suppress_default_print) {
+                            default_print(p - 16, caplen + 2);
+                    }
+                }
 
                 return (1);
 
