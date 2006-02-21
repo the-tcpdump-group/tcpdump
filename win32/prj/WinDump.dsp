@@ -89,6 +89,10 @@ SOURCE=..\..\addrtoname.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\af.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\bpf_dump.c
 # End Source File
 # Begin Source File

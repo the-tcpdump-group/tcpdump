@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.154 2005-11-12 22:22:59 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.155 2006-02-21 10:27:40 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -46,9 +46,6 @@ static const char rcsid[] _U_ =
 #include "extract.h"
 #include "gmpls.h"
 #include "oui.h"
-
-#define IPV4            1       /* AFI value */
-#define IPV6            2       /* AFI value */
 
 /*
  * IS-IS is defined in ISO 10589.  Look there for protocol definitions.
@@ -1629,7 +1626,7 @@ isis_print_extd_ip_reach (const u_int8_t *tptr, const char *ident, u_int16_t afi
     processed=4;
     tptr+=4;
     
-    if (afi == IPV4) {
+    if (afi == AF_INET) {
         if (!TTEST2(*tptr, 1)) /* fetch status byte */
             return (0);
         status_byte=*(tptr++);
@@ -1642,7 +1639,7 @@ isis_print_extd_ip_reach (const u_int8_t *tptr, const char *ident, u_int16_t afi
         }
         processed++;
 #ifdef INET6
-    } else if (afi == IPV6) {
+    } else if (afi == AF_INET6) {
         if (!TTEST2(*tptr, 1)) /* fetch status & prefix_len byte */
             return (0);
         status_byte=*(tptr++);
@@ -1667,13 +1664,13 @@ isis_print_extd_ip_reach (const u_int8_t *tptr, const char *ident, u_int16_t afi
     tptr+=byte_length;
     processed+=byte_length;
 
-    if (afi == IPV4)
+    if (afi == AF_INET)
         printf("%sIPv4 prefix: %15s/%u",
                ident,
                ipaddr_string(prefix),
                bit_length);
 #ifdef INET6
-    if (afi == IPV6)
+    if (afi == AF_INET6)
         printf("%sIPv6 prefix: %s/%u",
                ident,
                ip6addr_string(prefix),
@@ -1684,17 +1681,17 @@ isis_print_extd_ip_reach (const u_int8_t *tptr, const char *ident, u_int16_t afi
            ISIS_MASK_TLV_EXTD_IP_UPDOWN(status_byte) ? "down" : "up",
            metric);
 
-    if (afi == IPV4 && ISIS_MASK_TLV_EXTD_IP_SUBTLV(status_byte))
+    if (afi == AF_INET && ISIS_MASK_TLV_EXTD_IP_SUBTLV(status_byte))
         printf(", sub-TLVs present");
 #ifdef INET6
-    if (afi == IPV6)
+    if (afi == AF_INET6)
         printf(", %s%s",
                ISIS_MASK_TLV_EXTD_IP6_IE(status_byte) ? "External" : "Internal",
                ISIS_MASK_TLV_EXTD_IP6_SUBTLV(status_byte) ? ", sub-TLVs present" : "");
 #endif
     
-    if ((ISIS_MASK_TLV_EXTD_IP_SUBTLV(status_byte)  && afi == IPV4) ||
-        (ISIS_MASK_TLV_EXTD_IP6_SUBTLV(status_byte) && afi == IPV6)) {
+    if ((ISIS_MASK_TLV_EXTD_IP_SUBTLV(status_byte)  && afi == AF_INET) ||
+        (ISIS_MASK_TLV_EXTD_IP6_SUBTLV(status_byte) && afi == AF_INET6)) {
         /* assume that one prefix can hold more
            than one subTLV - therefore the first byte must reflect
            the aggregate bytecount of the subTLVs for this prefix
@@ -2238,7 +2235,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 
 	case ISIS_TLV_EXTD_IP_REACH:
 	    while (tmp>0) {
-                ext_ip_len = isis_print_extd_ip_reach(tptr, "\n\t      ", IPV4);
+                ext_ip_len = isis_print_extd_ip_reach(tptr, "\n\t      ", AF_INET);
                 if (ext_ip_len == 0) /* did something go wrong ? */
                     goto trunctlv;
                 tptr+=ext_ip_len;
@@ -2254,7 +2251,7 @@ static int isis_print (const u_int8_t *p, u_int length)
                 tptr+=mt_len;
                 tmp-=mt_len;
 
-                ext_ip_len = isis_print_extd_ip_reach(tptr, "\n\t      ", IPV4);
+                ext_ip_len = isis_print_extd_ip_reach(tptr, "\n\t      ", AF_INET);
                 if (ext_ip_len == 0) /* did something go wrong ? */
                     goto trunctlv;
                 tptr+=ext_ip_len;
@@ -2265,7 +2262,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 #ifdef INET6
 	case ISIS_TLV_IP6_REACH:
 	    while (tmp>0) {
-                ext_ip_len = isis_print_extd_ip_reach(tptr, "\n\t      ", IPV6);
+                ext_ip_len = isis_print_extd_ip_reach(tptr, "\n\t      ", AF_INET6);
                 if (ext_ip_len == 0) /* did something go wrong ? */
                     goto trunctlv;
                 tptr+=ext_ip_len;
@@ -2281,7 +2278,7 @@ static int isis_print (const u_int8_t *p, u_int length)
                 tptr+=mt_len;
                 tmp-=mt_len;
 
-                ext_ip_len = isis_print_extd_ip_reach(tptr, "\n\t      ", IPV6);
+                ext_ip_len = isis_print_extd_ip_reach(tptr, "\n\t      ", AF_INET6);
                 if (ext_ip_len == 0) /* did something go wrong ? */
                     goto trunctlv;
                 tptr+=ext_ip_len;

@@ -11,6 +11,8 @@ acconfig.h
 aclocal.m4
 addrtoname.c
 addrtoname.h
+af.c
+af.h
 ah.h
 aodv.h
 appletalk.h

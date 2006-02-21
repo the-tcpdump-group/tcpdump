@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rip.c,v 1.57 2003-11-16 09:36:34 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rip.c,v 1.58 2006-02-21 10:27:40 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -36,6 +36,8 @@ static const char rcsid[] _U_ =
 #include "interface.h"
 #include "addrtoname.h"
 #include "extract.h"			/* must come after interface.h */
+
+#include "af.h"
 
 struct rip {
 	u_int8_t rip_cmd;		/* request/response */
@@ -101,7 +103,7 @@ rip_entry_print_v1(register const struct rip_netinfo *ni)
 	/* RFC 1058 */
 	family = EXTRACT_16BITS(&ni->rip_family);
 	if (family != AF_INET) {
-		printf("\n\t AFI: %u:", family);
+		printf("\n\t AFI %s, ", tok2str(af_values, "Unknown (%u)", family));
                 print_unknown_data((u_int8_t *)&ni->rip_family,"\n\t  ",RIP_ROUTELEN);
 		return;
 	}
@@ -140,11 +142,12 @@ rip_entry_print_v2(register const struct rip_netinfo *ni)
                         print_unknown_data((u_int8_t *)&ni->rip_dest,"\n\t  ",RIP_AUTHLEN);
 		}
 	} else if (family != AF_INET) {
-		printf("\n\t  AFI: %u", family);
+		printf("\n\t  AFI %s", tok2str(af_values, "Unknown (%u)", family));
                 print_unknown_data((u_int8_t *)&ni->rip_tag,"\n\t  ",RIP_ROUTELEN-2);
 		return;
 	} else { /* AF_INET */
-		printf("\n\t  AFI: IPv4: %15s/%-2d, tag 0x%04x, metric: %u, next-hop: ",
+		printf("\n\t  AFI %s, %15s/%-2d, tag 0x%04x, metric: %u, next-hop: ",
+                       tok2str(af_values, "Unknown (%u)", family),
                        ipaddr_string(&ni->rip_dest),
 		       mask2plen(EXTRACT_32BITS(&ni->rip_dest_mask)),
                        EXTRACT_16BITS(&ni->rip_tag),

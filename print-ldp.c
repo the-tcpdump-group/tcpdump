@@ -16,7 +16,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.17 2006-02-03 08:32:39 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.18 2006-02-21 10:27:40 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -35,6 +35,7 @@ static const char rcsid[] _U_ =
 #include "addrtoname.h"
 
 #include "l2vpn.h"
+#include "af.h"
 
 /*
  * ldp common header
@@ -130,6 +131,7 @@ static const struct tok ldp_msg_values[] = {
 
 #define	LDP_TLV_FEC                  0x0100
 #define	LDP_TLV_ADDRESS_LIST         0x0101
+#define LDP_TLV_ADDRESS_LIST_AFNUM_LEN 2
 #define	LDP_TLV_HOP_COUNT            0x0103
 #define	LDP_TLV_PATH_VECTOR          0x0104
 #define	LDP_TLV_GENERIC_LABEL        0x0200
@@ -214,12 +216,6 @@ static const struct tok ldp_fec_martini_ifparm_vccv_cv_values[] = {
     { 0, NULL}
 };
 
-/* RFC1700 address family numbers, same definition in print-bgp.c */
-/* FIXME: move all AF stuff into dedicated files */
-#define AFNUM_INET	1
-#define AFNUM_INET6	2
-#define AFNUM_LEN       2 
-
 #define FALSE 0
 #define TRUE  1
 
@@ -298,27 +294,31 @@ ldp_tlv_print(register const u_char *tptr) {
 
     case LDP_TLV_ADDRESS_LIST:
 	af = EXTRACT_16BITS(tptr);
-	tptr+=AFNUM_LEN;
-        tlv_tlen -= AFNUM_LEN;
-	printf("\n\t      Address Family: ");
-	if (af == AFNUM_INET) {
-	    printf("IPv4, addresses:");
+	tptr+=LDP_TLV_ADDRESS_LIST_AFNUM_LEN;
+        tlv_tlen -= LDP_TLV_ADDRESS_LIST_AFNUM_LEN;
+	printf("\n\t      Address Family: %s, addresses",
+               tok2str(af_values, "Unknown (%u)", af));
+        switch (af) {
+        case AFNUM_INET:
 	    while(tlv_tlen >= sizeof(struct in_addr)) {
 		printf(" %s",ipaddr_string(tptr));
 		tlv_tlen-=sizeof(struct in_addr);
 		tptr+=sizeof(struct in_addr);                
 	    }
-	}
+            break;
 #ifdef INET6
-	else if (af == AFNUM_INET6) {
-	    printf("IPv6, addresses:");
+        case AFNUM_INET6:
 	    while(tlv_tlen >= sizeof(struct in6_addr)) {
 		printf(" %s",ip6addr_string(tptr));
 		tlv_tlen-=sizeof(struct in6_addr);
 		tptr+=sizeof(struct in6_addr);                
 	    }
-	}
+            break;
 #endif
+        default:
+            /* unknown AF */
+            break;
+        }
 	break;
 
     case LDP_TLV_COMMON_SESSION:
