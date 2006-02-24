@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.29 2006-02-01 14:42:17 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.30 2006-02-24 12:18:03 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -710,7 +710,6 @@ u_int
 juniper_atm2_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
         u_int16_t extracted_ethertype;
-        u_int32_t control_word;
 
         struct juniper_l2info_t l2info;
 
@@ -721,12 +720,6 @@ juniper_atm2_print(const struct pcap_pkthdr *h, register const u_char *p)
         p+=l2info.header_len;
 
         if (l2info.cookie[7] & ATM2_PKT_TYPE_MASK) { /* OAM cell ? */
-            control_word = EXTRACT_32BITS(p);
-            if(control_word == 0 || control_word == 0x08000000) {
-                l2info.header_len += 4;
-                l2info.length -= 4;
-                p += 4;
-            }
             oam_print(p,l2info.length,ATM_OAM_NOHEC);
             return l2info.header_len;
         }
@@ -890,6 +883,7 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
     struct juniper_cookie_table_t *lp = juniper_cookie_table;
     u_int idx, jnx_ext_len, jnx_header_len = 0;
     u_int8_t tlv_type,tlv_len;
+    u_int32_t control_word;
     int tlv_value;
     const u_char *tptr;
 
@@ -1130,10 +1124,21 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
     case DLT_JUNIPER_ATM2:
         TCHECK2(p[0],4);
         /* ATM cell relay control word present ? */
-        if (l2info->cookie[7] & ATM2_PKT_TYPE_MASK && *p & 0x08) {
-            l2info->header_len += 4;
+        if (l2info->cookie[7] & ATM2_PKT_TYPE_MASK) {
+            control_word = EXTRACT_32BITS(p);
+            /* some control word heuristics */
+            switch(control_word) {
+            case 0: /* zero control word */
+            case 0x08000000: /* < JUNOS 7.4 control-word */
+            case 0x08380000: /* cntl word plus cell length (56) >= JUNOS 7.4*/
+                l2info->header_len += 4;
+                break;
+            default:
+                break;
+            }
+            
             if (eflag)
-                printf("control-word 0x%08x ",EXTRACT_32BITS(p));
+                printf("control-word 0x%08x ", control_word);
         }
         break;
 #endif
