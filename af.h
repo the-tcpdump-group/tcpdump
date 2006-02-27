@@ -1,32 +1,23 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/af.h,v 1.1 2006-02-25 20:42:32 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/af.h,v 1.2 2006-02-27 07:25:27 hannes Exp $ (LBL) */
+
 /*
- * Copyright (C) 1999 WIDE Project.
- * All rights reserved.
+ * Copyright (c) 1998-2006 The TCPDUMP project
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the project nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
+ * modification, are permitted provided that: (1) source code
+ * distributions retain the above copyright notice and this paragraph
+ * in its entirety, and (2) distributions including binary code include
+ * the above copyright notice and this paragraph in its entirety in
+ * the documentation or other materials provided with the distribution.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND
+ * WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT
+ * LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE.
  *
- * THIS SOFTWARE IS PROVIDED BY THE PROJECT AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE PROJECT OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * Original code by Hannes Gredler (hannes@juniper.net)
  */
+
+extern struct tok af_values[];
 
 /* RFC1700 address family numbers */
 #define AFNUM_INET	1
@@ -47,5 +38,3 @@
 #define AFNUM_VPLS      25
 /* draft-kompella-ppvpn-l2vpn */
 #define AFNUM_L2VPN     196 /* still to be approved by IANA */
-
-extern struct tok af_values[];
