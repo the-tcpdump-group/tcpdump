@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/udp.h,v 1.9 2006-02-09 23:33:36 hannes Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/udp.h,v 1.10 2006-03-03 22:31:16 hannes Exp $ (LBL) */
 /*
  * Copyright (c) 1982, 1986, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -75,6 +75,7 @@ struct udphdr {
 #define HSRP_PORT 1985		/*XXX*/
 #define LMP_PORT                701 /* rfc4204 */
 #define LWRES_PORT		921
+#define VQP_PORT		1589
 #define ZEPHYR_SRV_PORT		2103
 #define ZEPHYR_CLT_PORT		2104
 #define MPLS_LSP_PING_PORT      3503 /* draft-ietf-mpls-lsp-ping-02.txt */

@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.268 2006-02-11 22:11:40 hannes Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.269 2006-03-03 22:31:16 hannes Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -250,6 +250,7 @@ extern u_int pppoe_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int prism_if_print(const struct pcap_pkthdr *, const u_char *);
 extern void q933_print(const u_char *, u_int);
 extern int vjc_print(register const char *, u_short);
+extern void vqp_print(register const u_char *, register u_int);
 extern u_int raw_if_print(const struct pcap_pkthdr *, const u_char *);
 extern void rip_print(const u_char *, u_int);
 extern u_int sl_if_print(const struct pcap_pkthdr *, const u_char *);

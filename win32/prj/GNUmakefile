@@ -131,6 +131,7 @@ OBJS = \
 	../../print-token.o \
 	../../print-udp.o \
 	../../print-vjc.o \
+	../../print-vqp.o \
 	../../print-vrrp.o \
 	../../print-wb.o \
 	../../print-zephyr.o \

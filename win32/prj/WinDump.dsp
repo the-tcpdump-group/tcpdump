@@ -545,6 +545,10 @@ SOURCE="..\..\print-udp.c"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\print-vqp.c"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\print-vjc.c"
 # End Source File
 # Begin Source File
