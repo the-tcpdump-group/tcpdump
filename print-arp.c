@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-arp.c,v 1.65 2006-02-11 22:11:40 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-arp.c,v 1.66 2006-03-03 22:53:21 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -217,15 +217,14 @@ atmarp_print(netdissect_options *ndo,
 	}
 
         if (!ndo->ndo_eflag) {
-            ND_PRINT((ndo, "ARP"));
+            ND_PRINT((ndo, "ARP, "));
         }
 
 	if ((pro != ETHERTYPE_IP && pro != ETHERTYPE_TRAIL) ||
 	    ATMSPROTO_LEN(ap) != 4 ||
             ATMTPROTO_LEN(ap) != 4 ||
             ndo->ndo_vflag) {
-                ND_PRINT((ndo, "%s%s, %s (len %u/%u)",
-                          ndo->ndo_eflag ? "" : ", ",
+                ND_PRINT((ndo, "%s, %s (len %u/%u)",
                           tok2str(arphrd_values, "Unknown Hardware (%u)", hrd),
                           tok2str(ethertype_values, "Unknown Protocol (0x%04x)", pro),
                           ATMSPROTO_LEN(ap),
@@ -238,7 +237,9 @@ atmarp_print(netdissect_options *ndo,
 	}
 
         /* print operation */
-        printf(", %s ", tok2str(arpop_values, "Unknown (%u)", op));
+        printf("%s%s ",
+               ndo->ndo_vflag ? ", " : "", 
+               tok2str(arpop_values, "Unknown (%u)", op));
 
 	switch (op) {
 
@@ -329,7 +330,7 @@ arp_print(netdissect_options *ndo,
 	}
 
         if (!ndo->ndo_eflag) {
-            ND_PRINT((ndo, "ARP"));
+            ND_PRINT((ndo, "ARP, "));
         }
 
         /* print hardware type/len and proto type/len */
@@ -337,8 +338,7 @@ arp_print(netdissect_options *ndo,
 	    PROTO_LEN(ap) != 4 ||
             HRD_LEN(ap) == 0 ||
             ndo->ndo_vflag) {
-            ND_PRINT((ndo, "%s%s (len %u), %s (len %u)",
-                      ndo->ndo_eflag ? "" : ", ",
+            ND_PRINT((ndo, "%s (len %u), %s (len %u)",
                       tok2str(arphrd_values, "Unknown Hardware (%u)", hrd),
                       HRD_LEN(ap),
                       tok2str(ethertype_values, "Unknown Protocol (0x%04x)", pro),
@@ -351,7 +351,9 @@ arp_print(netdissect_options *ndo,
 	}
 
         /* print operation */
-        printf(", %s ", tok2str(arpop_values, "Unknown (%u)", op));
+        printf("%s%s ",
+               ndo->ndo_vflag ? ", " : "", 
+               tok2str(arpop_values, "Unknown (%u)", op));
 
 	switch (op) {
 
