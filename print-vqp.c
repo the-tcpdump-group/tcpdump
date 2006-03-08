@@ -19,7 +19,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-vqp.c,v 1.1 2006-03-03 22:31:16 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-vqp.c,v 1.2 2006-03-08 14:30:12 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -59,16 +59,9 @@ struct vqp_common_header_t {
     u_int8_t sequence[4];
 };
 
-struct vqp_tlv_reqjoinport_t {
+struct vqp_obj_tlv_t {
     u_int8_t obj_type[4];
     u_int8_t obj_length[2];
-};
-
-struct vqp_tlv_respvlan_t {
-    u_int8_t obj_type[4];
-    u_int8_t unknown1[8]; /* XXX */
-    u_int8_t obj_length[2];
-    u_int8_t unknown2[4]; /* XXX */
 };
 
 #define VQP_OBJ_REQ_JOIN_PORT  0x01
@@ -112,22 +105,16 @@ static const struct tok vqp_obj_values[] = {
     { 0, NULL}
 };
 
-#define FALSE 0
-#define TRUE  1
-
 void
 vqp_print(register const u_char *pptr, register u_int len) 
 {
     const struct vqp_common_header_t *vqp_common_header;
-    union {
-        const struct vqp_tlv_reqjoinport_t *reqjoinport;
-        const struct vqp_tlv_respvlan_t *respvlan;
-    } vqp_tlv;
+    const struct vqp_obj_tlv_t *vqp_obj_tlv;
 
     const u_char *tptr;
     u_int16_t vqp_obj_len;
     u_int32_t vqp_obj_type;
-    int tlen, hexdump;
+    int tlen;
     u_int8_t nitems;
 
     tptr=pptr;
@@ -170,32 +157,13 @@ vqp_print(register const u_char *pptr, register u_int len)
     tptr+=sizeof(const struct vqp_common_header_t);
     tlen-=sizeof(const struct vqp_common_header_t);
 
-    while (nitems > 0) {
+    while (nitems > 0 && tlen > 0) {
 
-        switch (vqp_common_header->msg_type) {
-        case VQP_OBJ_REQ_JOIN_PORT:
-            vqp_tlv.reqjoinport = (const struct vqp_tlv_reqjoinport_t *)tptr;
-            vqp_obj_type = EXTRACT_32BITS(vqp_tlv.reqjoinport->obj_type);
-            vqp_obj_len = EXTRACT_16BITS(vqp_tlv.reqjoinport->obj_length);
-            tptr+=sizeof(struct vqp_tlv_reqjoinport_t);
-            tlen-=sizeof(struct vqp_tlv_reqjoinport_t);
-            break;
-        case VQP_OBJ_RESP_VLAN:
-            vqp_tlv.respvlan = (const struct vqp_tlv_respvlan_t *)tptr;
-            vqp_obj_type = EXTRACT_32BITS(vqp_tlv.respvlan->obj_type);
-            vqp_obj_len = EXTRACT_16BITS(vqp_tlv.respvlan->obj_length);
-            tptr+=sizeof(struct vqp_tlv_respvlan_t);
-            tlen-=sizeof(struct vqp_tlv_respvlan_t);
-            break;
-        default:
-            /* bail - don't know the TLV format of the message type */
-            return;
-        }
-
-        /* did we capture enough for fully decoding the object ? */
-        if (!TTEST2(*tptr, vqp_obj_len)) 
-            goto trunc;
-        hexdump=FALSE;
+        vqp_obj_tlv = (const struct vqp_obj_tlv_t *)tptr;
+        vqp_obj_type = EXTRACT_32BITS(vqp_obj_tlv->obj_type);
+        vqp_obj_len = EXTRACT_16BITS(vqp_obj_tlv->obj_length);
+        tptr+=sizeof(struct vqp_obj_tlv_t);
+        tlen-=sizeof(struct vqp_obj_tlv_t);
 
         printf("\n\t  %s Object (0x%08x), length %u, value: ",
                tok2str(vqp_obj_values, "Unknown", vqp_obj_type),
@@ -205,6 +173,10 @@ vqp_print(register const u_char *pptr, register u_int len)
         if (vqp_obj_type == 0 || vqp_obj_len ==0) {
             return;
         }
+
+        /* did we capture enough for fully decoding the object ? */
+        if (!TTEST2(*tptr, vqp_obj_len)) 
+            goto trunc;
 
         switch(vqp_obj_type) {
 	case VQP_OBJ_IP_ADDRESS:
