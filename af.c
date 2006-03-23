@@ -17,7 +17,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/af.c,v 1.2 2006-02-27 07:25:27 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/af.c,v 1.3 2006-03-23 14:58:44 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -48,4 +48,16 @@ struct tok af_values[] = {
     { AFNUM_L2VPN,            "Layer-2 VPN"},
     { AFNUM_VPLS,             "VPLS"},
     { 0, NULL},
+};
+
+struct tok bsd_af_values[] = {
+    { BSD_AFNUM_INET, "IPv4" },
+    { BSD_AFNUM_NS, "NS" },
+    { BSD_AFNUM_ISO, "ISO" },
+    { BSD_AFNUM_APPLETALK, "Appletalk" },
+    { BSD_AFNUM_IPX, "IPX" },
+    { BSD_AFNUM_INET6_BSD, "IPv6" },
+    { BSD_AFNUM_INET6_FREEBSD, "IPv6" },
+    { BSD_AFNUM_INET6_DARWIN, "IPv6" },
+    { 0, NULL}
 };

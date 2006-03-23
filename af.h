@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/af.h,v 1.2 2006-02-27 07:25:27 hannes Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/af.h,v 1.3 2006-03-23 14:58:44 hannes Exp $ (LBL) */
 
 /*
  * Copyright (c) 1998-2006 The TCPDUMP project
@@ -18,6 +18,7 @@
  */
 
 extern struct tok af_values[];
+extern struct tok bsd_af_values[];
 
 /* RFC1700 address family numbers */
 #define AFNUM_INET	1
@@ -38,3 +39,19 @@ extern struct tok af_values[];
 #define AFNUM_VPLS      25
 /* draft-kompella-ppvpn-l2vpn */
 #define AFNUM_L2VPN     196 /* still to be approved by IANA */
+
+/*
+ * BSD AF_ values.
+ *
+ * Unfortunately, the BSDs don't all use the same value for AF_INET6,
+ * so, because we want to be able to read captures from all of the BSDs,
+ * we check for all of them.
+ */
+#define BSD_AFNUM_INET		2
+#define BSD_AFNUM_NS		6		/* XEROX NS protocols */
+#define BSD_AFNUM_ISO		7
+#define BSD_AFNUM_APPLETALK	16
+#define BSD_AFNUM_IPX		23
+#define BSD_AFNUM_INET6_BSD	24	/* OpenBSD (and probably NetBSD), BSD/OS */
+#define BSD_AFNUM_INET6_FREEBSD	28
+#define BSD_AFNUM_INET6_DARWIN	30
