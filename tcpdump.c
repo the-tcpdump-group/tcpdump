@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.267 2006-02-09 20:33:49 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.268 2006-03-23 17:33:01 hannes Exp $ (LBL)";
 #endif
 
 /*
@@ -65,6 +65,9 @@ extern int SIZE_BUF;
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
+#include <sys/resource.h>
+#include <sys/wait.h>
 #ifndef WIN32
 #include <pwd.h>
 #include <grp.h>
@@ -88,6 +91,7 @@ netdissect_options *gndo = &Gndo;
 
 int dflag;			/* print filter code */
 int Lflag;			/* list available data link types and exit */
+char *zflag = NULL;		/* compress each savefile using a specified command (like gzip or bzip2) */
 
 static int infodelay;
 static int infoprint;
@@ -98,6 +102,7 @@ int32_t thiszone;		/* seconds offset from gmt to local time */
 
 /* Forwards */
 static RETSIGTYPE cleanup(int);
+static RETSIGTYPE child_cleanup(int);
 static void usage(void) __attribute__((noreturn));
 static void show_dlts_and_exit(pcap_t *pd) __attribute__((noreturn));
 
@@ -292,6 +297,7 @@ struct print_info {
 
 struct dump_info {
 	char	*WFileName;
+	char	*CurrentFileName;
 	pcap_t	*pd;
 	pcap_dumper_t *p;
 };
@@ -466,7 +472,7 @@ main(int argc, char **argv)
 {
 	register int cnt, op, i;
 	bpf_u_int32 localnet, netmask;
-	register char *cp, *infile, *cmdbuf, *device, *RFileName, *WFileName, *WFileNameAlt;
+	register char *cp, *infile, *cmdbuf, *device, *RFileName, *WFileName;
 	pcap_handler callback;
 	int type;
 	struct bpf_program fcode;
@@ -517,7 +523,7 @@ main(int argc, char **argv)
 
 	opterr = 0;
 	while (
-	    (op = getopt(argc, argv, "aA" B_FLAG "c:C:d" D_FLAG "eE:fF:G:i:lLm:M:nNOpqr:Rs:StT:u" U_FLAG "vw:W:xXy:YZ:")) != -1)
+	    (op = getopt(argc, argv, "aA" B_FLAG "c:C:d" D_FLAG "eE:fF:G:i:lLm:M:nNOpqr:Rs:StT:u" U_FLAG "vw:W:xXy:Yz:Z:")) != -1)
 		switch (op) {
 
 		case 'a':
@@ -812,6 +818,15 @@ main(int argc, char **argv)
 			}
 			break;
 #endif
+		case 'z':
+			if (optarg) {
+				zflag = strdup(optarg);
+			} else {
+				usage();
+				/* NOTREACHED */
+			}
+			break;
+
 		case 'Z':
 			if (optarg) {
 				username = strdup(optarg);
@@ -987,6 +1002,7 @@ main(int argc, char **argv)
 #endif /* WIN32 */
 	(void)setsignal(SIGTERM, cleanup);
 	(void)setsignal(SIGINT, cleanup);
+	(void)setsignal(SIGCHLD, child_cleanup);
 	/* Cooperate with nohup(1) */
 #ifndef WIN32	
 	if ((oldhandler = setsignal(SIGHUP, cleanup)) != SIG_DFL)
@@ -998,19 +1014,18 @@ main(int argc, char **argv)
 	if (WFileName) {
 		pcap_dumper_t *p;
 		/* Do not exceed the default NAME_MAX for files. */
-		WFileNameAlt = (char *)malloc(NAME_MAX + 1);
+		dumpinfo.CurrentFileName = (char *)malloc(NAME_MAX + 1);
 
-		if (WFileNameAlt == NULL)
-			error("malloc of WFileNameAlt");
+		if (dumpinfo.CurrentFileName == NULL)
+			error("malloc of dumpinfo.CurrentFileName");
 
 		/* We do not need numbering for dumpfiles if Cflag isn't set. */
 		if (Cflag != 0)
-		  MakeFilename(WFileNameAlt, WFileName, 0, WflagChars);
+		  MakeFilename(dumpinfo.CurrentFileName, WFileName, 0, WflagChars);
 		else
-		  MakeFilename(WFileNameAlt, WFileName, 0, 0);
+		  MakeFilename(dumpinfo.CurrentFileName, WFileName, 0, 0);
 
-		p = pcap_dump_open(pd, WFileNameAlt);
-		free(WFileNameAlt);
+		p = pcap_dump_open(pd, dumpinfo.CurrentFileName);
 		if (p == NULL)
 			error("%s", pcap_geterr(pd));
 		if (Cflag != 0 || Gflag != 0) {
@@ -1166,6 +1181,12 @@ cleanup(int signo _U_)
 #endif
 }
 
+static RETSIGTYPE
+child_cleanup(int signo _U_)
+{
+  wait(NULL);
+}
+
 static void
 info(register int verbose)
 {
@@ -1194,10 +1215,30 @@ info(register int verbose)
 }
 
 static void
+compress_savefile(const char *filename)
+{
+	if (fork())
+		return;
+	/*
+	 * Set to lowest priority so that this doesn't disturb the capture
+	 */
+#ifdef NZERO
+	setpriority(PRIO_PROCESS, 0, NZERO - 1);
+#else
+	setpriority(PRIO_PROCESS, 0, 19);
+#endif
+	if (execlp(zflag, zflag, filename, NULL) == -1)
+		fprintf(stderr,
+			"compress_savefile:execlp(%s, %s): %s\n",
+			zflag,
+			filename,
+			strerror(errno));
+}
+
+static void
 dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
 	struct dump_info *dump_info;
-	char *name;
 
 	++packets_captured;
 
@@ -1236,6 +1277,12 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			pcap_dump_close(dump_info->p);
 
 			/*
+			 * Compress the file we just closed, if the user asked for it
+			 */
+			if (zflag != NULL)
+				compress_savefile(dump_info->CurrentFileName);
+
+			/*
 			 * Check to see if we've exceeded the Wflag (when
 			 * not using Cflag).
 			 */
@@ -1245,9 +1292,11 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 				exit(0);
 				/* NOTREACHED */
 			}
+			if (dump_info->CurrentFileName != NULL)
+				free(dump_info->CurrentFileName);
 			/* Allocate space for max filename + \0. */
-			name = (char *)malloc(NAME_MAX + 1);
-			if (name == NULL)
+			dump_info->CurrentFileName = (char *)malloc(NAME_MAX + 1);
+			if (dump_info->CurrentFileName == NULL)
 				error("dump_packet_and_trunc: malloc");
 			/*
 			 * This is always the first file in the Cflag
@@ -1255,13 +1304,12 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			 * We also don't need numbering if Cflag is not set.
 			 */
 			if (Cflag != 0)
-				MakeFilename(name, dump_info->WFileName, 0,
+				MakeFilename(dump_info->CurrentFileName, dump_info->WFileName, 0,
 				    WflagChars);
 			else
-				MakeFilename(name, dump_info->WFileName, 0, 0);
+				MakeFilename(dump_info->CurrentFileName, dump_info->WFileName, 0, 0);
 
-			dump_info->p = pcap_dump_open(dump_info->pd, name);
-			free(name);
+			dump_info->p = pcap_dump_open(dump_info->pd, dump_info->CurrentFileName);
 			if (dump_info->p == NULL)
 				error("%s", pcap_geterr(pd));
 		}
@@ -1277,17 +1325,25 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 		 * Close the current file and open a new one.
 		 */
 		pcap_dump_close(dump_info->p);
+
+		/*
+		 * Compress the file we just closed, if the user asked for it
+		 */
+		if (zflag != NULL)
+			compress_savefile(dump_info->CurrentFileName);
+
 		Cflag_count++;
 		if (Wflag > 0) {
 			if (Cflag_count >= Wflag)
 				Cflag_count = 0;
 		}
-		name = (char *)malloc(NAME_MAX + 1);
-		if (name == NULL)
+		if (dump_info->CurrentFileName != NULL)
+			free(dump_info->CurrentFileName);
+		dump_info->CurrentFileName = (char *)malloc(NAME_MAX + 1);
+		if (dump_info->CurrentFileName == NULL)
 			error("dump_packet_and_trunc: malloc");
-		MakeFilename(name, dump_info->WFileName, Cflag_count, WflagChars);
-		dump_info->p = pcap_dump_open(dump_info->pd, name);
-		free(name);
+		MakeFilename(dump_info->CurrentFileName, dump_info->WFileName, Cflag_count, WflagChars);
+		dump_info->p = pcap_dump_open(dump_info->pd, dump_info->CurrentFileName);
 		if (dump_info->p == NULL)
 			error("%s", pcap_geterr(pd));
 	}
@@ -1517,7 +1573,7 @@ usage(void)
 	(void)fprintf(stderr,
 "\t\t[ -M secret ] [ -r file ] [ -s snaplen ] [ -T type ] [ -w file ]\n");
 	(void)fprintf(stderr,
-"\t\t[ -W filecount ] [ -y datalinktype ] [ -Z user ]\n");
+"\t\t[ -W filecount ] [ -y datalinktype ] [ -z command ] [ -Z user ]\n");
 	(void)fprintf(stderr,
 "\t\t[ expression ]\n");
 	exit(1);

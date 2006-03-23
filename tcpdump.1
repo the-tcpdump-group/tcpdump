@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.180 2005-12-13 08:37:23 hannes Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.181 2006-03-23 17:33:02 hannes Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -39,6 +39,9 @@ tcpdump \- dump traffic on a network
 [
 .B \-C
 .I file_size
+] [
+.B \-G
+.I rotate_seconds
 ] [
 .B \-F
 .I file
@@ -90,12 +93,12 @@ tcpdump \- dump traffic on a network
 .br
 .ti +8
 [
-.B \-G
-.I rotate_seconds
-]
-[
 .B \-y
 .I datalinktype
+]
+[
+.B \-z
+.I postrotate-command
 ]
 [
 .B \-Z
@@ -607,6 +610,31 @@ its link level header, in hex and ASCII.
 .TP
 .B \-y
 Set the data link type to use while capturing packets to \fIdatalinktype\fP.
+.TP
+.B \-z
+Used in conjunction with the
+.B -C
+or
+.B -G
+options, this will make
+.I tcpdump
+run "
+.I command file
+" where
+.I file
+is the savefile being closed after each rotation. For example, specifying
+.B \-z gzip
+or
+.B \-z bzip2
+will compress each savefile using gzip or bzip2.
+.IP
+Note that tcpdump will run the command in parallel to the capture, using
+the lowest priority so that this doesn't disturb the capture process.
+.IP
+And in case you would like to use a command that itself takes flags or
+different arguments, you can always write a shell script that will take the
+savefile name as the only argument, make the flags & arguments arrangements
+and execute the command that you want.
 .TP
 .B \-Z
 Drops privileges (if root) and changes user ID to
