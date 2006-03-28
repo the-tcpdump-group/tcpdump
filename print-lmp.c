@@ -17,7 +17,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lmp.c,v 1.5.2.2 2006-03-28 07:34:44 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lmp.c,v 1.5.2.3 2006-03-28 08:05:59 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -611,10 +611,10 @@ lmp_print(register const u_char *pptr, register u_int len) {
 					EXTRACT_16BITS(obj_tptr+offset+2)&0x00FF);
 				bw.i = EXTRACT_32BITS(obj_tptr+offset+4);
 				printf("\n\t      Min Reservable Bandwidth: %.3f Mbps",
-					bw.f);
+                                       bw.f*8/1000000);
 				bw.i = EXTRACT_32BITS(obj_tptr+offset+8);
 				printf("\n\t      Max Reservable Bandwidth: %.3f Mbps",
-					bw.f);
+                                       bw.f*8/1000000);
 				break;	
 			case WAVELENGTH_SUBOBJ:
 				printf("\n\t      Wavelength: %u",
@@ -656,7 +656,7 @@ lmp_print(register const u_char *pptr, register u_int len) {
 			EXTRACT_16BITS(obj_tptr+10),
 			EXTRACT_16BITS(obj_tptr+10)&8000 ? "(Payload test messages capable)" : "");
                 bw.i = EXTRACT_32BITS(obj_tptr+12);
-		printf("\n\t    Transmission Rate: %.3f Mbps",bw.f);
+		printf("\n\t    Transmission Rate: %.3f Mbps",bw.f*8/1000000);
 		printf("\n\t    Wavelength: %u",
 			EXTRACT_32BITS(obj_tptr+16));
 		break;
