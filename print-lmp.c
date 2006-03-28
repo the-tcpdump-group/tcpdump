@@ -17,7 +17,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lmp.c,v 1.5.2.1 2005-05-19 06:44:03 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lmp.c,v 1.5.2.2 2006-03-28 07:34:44 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -59,7 +59,7 @@ struct lmp_common_header {
 #define	LMP_EXTRACT_VERSION(x) (((x)&0xf0)>>4) 
 
 static const struct tok lmp_header_flag_values[] = {
-    { 0x00, "Control Channel Down"},
+    { 0x01, "Control Channel Down"},
     { 0x02, "LMP restart"},
     { 0, NULL}
 };
@@ -599,25 +599,25 @@ lmp_print(register const u_char *pptr, register u_int len) {
 					subobj_len);
 			switch(subobj_type) {
 			case INT_SWITCHING_TYPE_SUBOBJ:
-				printf("\n\t\t    Switching Type: %s (%u)",
+				printf("\n\t      Switching Type: %s (%u)",
 					tok2str(gmpls_switch_cap_values, 
 						"Unknown", 
 						EXTRACT_16BITS(obj_tptr+offset+2)>>8),
 					EXTRACT_16BITS(obj_tptr+offset+2)>>8);
-				printf("\n\t\t    Encoding Type: %s (%u)",
+				printf("\n\t      Encoding Type: %s (%u)",
 					tok2str(gmpls_encoding_values, 
 						"Unknown", 
 						EXTRACT_16BITS(obj_tptr+offset+2)&0x00FF),
 					EXTRACT_16BITS(obj_tptr+offset+2)&0x00FF);
 				bw.i = EXTRACT_32BITS(obj_tptr+offset+4);
-				printf("\n\t\t    Min Reservable Bandwidth: %.3f Mbps",
+				printf("\n\t      Min Reservable Bandwidth: %.3f Mbps",
 					bw.f);
 				bw.i = EXTRACT_32BITS(obj_tptr+offset+8);
-				printf("\n\t\t    Max Reservable Bandwidth: %.3f Mbps",
+				printf("\n\t      Max Reservable Bandwidth: %.3f Mbps",
 					bw.f);
 				break;	
 			case WAVELENGTH_SUBOBJ:
-				printf("\n\t\t    Wavelength: %u",
+				printf("\n\t      Wavelength: %u",
 					EXTRACT_32BITS(obj_tptr+offset+4));
 				break;
 			default:
