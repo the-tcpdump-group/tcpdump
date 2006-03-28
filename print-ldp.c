@@ -16,7 +16,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.18 2006-02-21 10:27:40 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.19 2006-03-28 07:06:21 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -150,6 +150,7 @@ static const struct tok ldp_msg_values[] = {
 #define	LDP_TLV_FR_SESSION_PARM      0x0502
 #define LDP_TLV_FT_SESSION	     0x0503
 #define	LDP_TLV_LABEL_REQUEST_MSG_ID 0x0600
+#define LDP_TLV_MTU                  0x0601 /* rfc 3988 */
 
 static const struct tok ldp_tlv_values[] = {
     { LDP_TLV_FEC,	             "FEC" },
@@ -172,6 +173,7 @@ static const struct tok ldp_tlv_values[] = {
     { LDP_TLV_FR_SESSION_PARM,       "Frame-Relay Session Parameters" },
     { LDP_TLV_FT_SESSION,            "Fault-Tolerant Session Parameters" },
     { LDP_TLV_LABEL_REQUEST_MSG_ID,  "Label Request Message ID" },
+    { LDP_TLV_MTU,                   "MTU" },
     { 0, NULL}
 };
 
@@ -454,6 +456,10 @@ ldp_tlv_print(register const u_char *tptr) {
 	ui = EXTRACT_32BITS(tptr);
 	if (ui)
 	    printf(", Recovery Time: %ums", ui);
+	break;
+
+    case LDP_TLV_MTU:
+	printf("\n\t      MTU: %u", EXTRACT_16BITS(tptr));
 	break;
 
 
