@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.133.2.21 2005-11-12 22:23:23 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.133.2.22 2006-04-06 13:44:19 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -2530,7 +2530,7 @@ static int isis_print (const u_int8_t *p, u_int length)
             if (!TTEST2(*tptr, ISIS_TLV_RESTART_SIGNALING_HOLDTIMELEN))
                 goto trunctlv;
 
-            printf(", Remaining holding time %us", EXTRACT_16BITS(tptr+1));
+            printf(", Remaining holding time %us", EXTRACT_16BITS(tptr));
             tptr+=ISIS_TLV_RESTART_SIGNALING_HOLDTIMELEN;
             tmp-=ISIS_TLV_RESTART_SIGNALING_HOLDTIMELEN;
 
