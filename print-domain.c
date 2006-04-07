@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.89.2.1 2005-04-20 20:59:00 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.89.2.2 2006-04-07 08:48:09 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -278,9 +278,20 @@ struct tok ns_type2str[] = {
 	{ T_SRV,	"SRV" },		/* RFC 2782 */
 	{ T_ATMA,	"ATMA" },		/* ATM Forum */
 	{ T_NAPTR,	"NAPTR" },		/* RFC 2168, RFC 2915 */
+	{ T_KX,		"KX" },			/* RFC 2230 */
+	{ T_CERT,	"CERT" },		/* RFC 2538 */
 	{ T_A6,		"A6" },			/* RFC 2874 */
 	{ T_DNAME,	"DNAME" },		/* RFC 2672 */
+	{ T_SINK, 	"SINK" },
 	{ T_OPT,	"OPT" },		/* RFC 2671 */
+	{ T_APL, 	"APL" },		/* RFC 3123 */
+	{ T_DS,		"DS" },			/* RFC 4034 */
+	{ T_SSHFP,	"SSHFP" },		/* RFC 4255 */
+	{ T_IPSECKEY,	"IPSECKEY" },		/* RFC 4025 */
+	{ T_RRSIG, 	"RRSIG" },		/* RFC 4034 */
+	{ T_NSEC,	"NSEC" },		/* RFC 4034 */
+	{ T_DNSKEY,	"DNSKEY" },		/* RFC 4034 */
+	{ T_SPF,	"SPF" },		/* RFC-schlitt-spf-classic-02.txt */
 	{ T_UINFO,	"UINFO" },
 	{ T_UID,	"UID" },
 	{ T_GID,	"GID" },
