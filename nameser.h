@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/nameser.h,v 1.14 2003-11-05 06:02:59 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/nameser.h,v 1.15 2006-04-07 08:47:34 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1983, 1989, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -163,10 +163,21 @@
 #define T_SRV		33		/* Server selection */
 #define T_ATMA		34		/* ATM Address */
 #define T_NAPTR		35		/* Naming Authority PoinTeR */
+#define T_KX		36		/* Key Exchanger */
+#define T_CERT		37		/* Certificates in the DNS */
 #define T_A6		38		/* IP6 address */
 #define T_DNAME		39		/* non-terminal redirection */
+#define T_SINK		40		/* unknown */
 #define T_OPT		41		/* EDNS0 option (meta-RR) */
+#define T_APL		42		/* lists of address prefixes */
+#define T_DS		43		/* Delegation Signer */
+#define T_SSHFP		44		/* SSH Fingerprint */
+#define T_IPSECKEY	45		/* IPsec keying material */
+#define T_RRSIG		46		/* new security signature */
+#define T_NSEC		47		/* provable insecure information */
+#define T_DNSKEY	48		/* new security key */
 	/* non standard */
+#define T_SPF		99		/* sender policy framework */
 #define T_UINFO		100		/* user (finger) information */
 #define T_UID		101		/* user ID */
 #define T_GID		102		/* group ID */
