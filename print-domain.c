@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.91 2006-04-07 08:47:34 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.92 2006-04-07 08:58:29 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -347,7 +347,7 @@ ns_qprint(register const u_char *cp, register const u_char *bp, int is_mdns)
 static const u_char *
 ns_rprint(register const u_char *cp, register const u_char *bp, int is_mdns)
 {
-	register u_int class;
+	register u_int class, opt_flags = 0;
 	register u_short typ, len;
 	register const u_char *rp;
 
@@ -372,7 +372,12 @@ ns_rprint(register const u_char *cp, register const u_char *bp, int is_mdns)
 		printf(" %s", tok2str(ns_class2str, "(Class %d)", class));
 
 	/* ignore ttl */
-	cp += 4;
+	cp += 2;
+	/* if T_OPT, save opt_flags */
+	if (typ == T_OPT)
+		opt_flags = EXTRACT_16BITS(cp);
+	/* ignore rest of ttl */
+	cp += 2;
 
 	len = EXTRACT_16BITS(cp);
 	cp += 2;
@@ -489,6 +494,8 @@ ns_rprint(register const u_char *cp, register const u_char *bp, int is_mdns)
 
 	case T_OPT:
 		printf(" UDPsize=%u", class);
+		if (opt_flags & 0x8000)
+			printf(" OK");
 		break;
 
 	case T_UNSPECA:		/* One long string */
