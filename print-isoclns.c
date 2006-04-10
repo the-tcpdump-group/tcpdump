@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.156 2006-04-06 13:43:30 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.157 2006-04-10 21:07:35 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -335,7 +335,7 @@ static struct tok clnp_option_qos_global_values[] = {
 };
 
 #define ISIS_SUBTLV_EXT_IS_REACH_ADMIN_GROUP           3 /* draft-ietf-isis-traffic-05 */
-#define ISIS_SUBTLV_EXT_IS_REACH_LINK_LOCAL_REMOTE_ID  4 /* draft-ietf-isis-gmpls-extensions */
+#define ISIS_SUBTLV_EXT_IS_REACH_LINK_LOCAL_REMOTE_ID  4 /* rfc4205 */
 #define ISIS_SUBTLV_EXT_IS_REACH_LINK_REMOTE_ID        5 /* draft-ietf-isis-traffic-05 */
 #define ISIS_SUBTLV_EXT_IS_REACH_IPV4_INTF_ADDR        6 /* draft-ietf-isis-traffic-05 */
 #define ISIS_SUBTLV_EXT_IS_REACH_IPV4_NEIGHBOR_ADDR    8 /* draft-ietf-isis-traffic-05 */
@@ -344,8 +344,9 @@ static struct tok clnp_option_qos_global_values[] = {
 #define ISIS_SUBTLV_EXT_IS_REACH_UNRESERVED_BW        11 /* rfc4124 */
 #define ISIS_SUBTLV_EXT_IS_REACH_BW_CONSTRAINTS_OLD   12 /* draft-ietf-tewg-diff-te-proto-06 */
 #define ISIS_SUBTLV_EXT_IS_REACH_TE_METRIC            18 /* draft-ietf-isis-traffic-05 */
-#define ISIS_SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE 20 /* draft-ietf-isis-gmpls-extensions */
-#define ISIS_SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR    21 /* draft-ietf-isis-gmpls-extensions */
+#define ISIS_SUBTLV_EXT_IS_REACH_LINK_ATTRIBUTE       19 /* draft-ietf-isis-link-attr-01 */
+#define ISIS_SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE 20 /* rfc4205 */
+#define ISIS_SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR    21 /* rfc4205 */
 #define ISIS_SUBTLV_EXT_IS_REACH_BW_CONSTRAINTS       22 /* rfc4124 */
 
 static struct tok isis_ext_is_reach_subtlv_values[] = {
@@ -358,6 +359,7 @@ static struct tok isis_ext_is_reach_subtlv_values[] = {
     { ISIS_SUBTLV_EXT_IS_REACH_RESERVABLE_BW,          "Reservable link bandwidth" },
     { ISIS_SUBTLV_EXT_IS_REACH_UNRESERVED_BW,          "Unreserved bandwidth" },
     { ISIS_SUBTLV_EXT_IS_REACH_TE_METRIC,              "Traffic Engineering Metric" },
+    { ISIS_SUBTLV_EXT_IS_REACH_LINK_ATTRIBUTE,         "Link Attribute" },
     { ISIS_SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE,   "Link Protection Type" },
     { ISIS_SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR,      "Interface Switching Capability" },
     { ISIS_SUBTLV_EXT_IS_REACH_BW_CONSTRAINTS_OLD,     "Bandwidth Constraints (old)" },
@@ -379,6 +381,13 @@ static struct tok isis_ext_ip_reach_subtlv_values[] = {
     { ISIS_SUBTLV_EXTD_IP_REACH_ADMIN_TAG32,           "32-Bit Administrative tag" },
     { ISIS_SUBTLV_EXTD_IP_REACH_ADMIN_TAG64,           "64-Bit Administrative tag" },
     { ISIS_SUBTLV_EXTD_IP_REACH_MGMT_PREFIX_COLOR,     "Management Prefix Color" },
+    { 0, NULL }
+};
+
+static struct tok isis_subtlv_link_attribute_values[] = {
+    { 0x01, "Local Protection Available" },
+    { 0x02, "Link excluded from local protection path" },
+    { 0x04, "Local maintenance required"},
     { 0, NULL }
 };
 
@@ -1408,7 +1417,7 @@ trunctlv:
 static int
 isis_print_is_reach_subtlv (const u_int8_t *tptr,u_int subt,u_int subl,const char *ident) {
 
-        u_int te_class,priority_level;
+        u_int te_class,priority_level,gmpls_switch_cap;
         union { /* int to float conversion buffer for several subTLVs */
             float f; 
             u_int32_t i;
@@ -1432,7 +1441,7 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,u_int subt,u_int subl,const cha
         case ISIS_SUBTLV_EXT_IS_REACH_LINK_REMOTE_ID:
 	    if (subl >= 4) {
 	      printf(", 0x%08x", EXTRACT_32BITS(tptr));
-	      if (subl == 8) /* draft-ietf-isis-gmpls-extensions */
+	      if (subl == 8) /* rfc4205 */
 	        printf(", 0x%08x", EXTRACT_32BITS(tptr+4));
 	    }
 	    break;
@@ -1481,6 +1490,15 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,u_int subt,u_int subl,const cha
             if (subl >= 3)
               printf(", %u", EXTRACT_24BITS(tptr));
             break;
+        case ISIS_SUBTLV_EXT_IS_REACH_LINK_ATTRIBUTE:
+            if (subl == 2) {
+               printf(", [ %s ] (0x%04x)",
+                      bittok2str(isis_subtlv_link_attribute_values,
+                                 "Unknown",
+                                 EXTRACT_16BITS(tptr)),
+                      EXTRACT_16BITS(tptr);
+            }
+            break;
         case ISIS_SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE:
             if (subl >= 2) {
               printf(", %s, Priority %u",
@@ -1490,9 +1508,10 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,u_int subt,u_int subl,const cha
             break;
         case ISIS_SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR:
             if (subl >= 36) {
+              gmpls_switch_cap = *tptr;
               printf("%s  Interface Switching Capability:%s",
                    ident,
-                   tok2str(gmpls_switch_cap_values, "Unknown", *(tptr)));
+                   tok2str(gmpls_switch_cap_values, "Unknown", gmpls_switch_cap));
               printf(", LSP Encoding: %s",
                    tok2str(gmpls_encoding_values, "Unknown", *(tptr+1)));
 	      tptr+=4;
@@ -1506,12 +1525,29 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,u_int subt,u_int subl,const cha
 		tptr+=4;
               }
               subl-=36;
-              /* there is some optional stuff left to decode but this is as of yet
-                 not specified so just lets hexdump what is left */
-              if(subl>0){
-                if(!print_unknown_data(tptr,"\n\t\t    ",
-				       subl))
+              switch (gmpls_switch_cap) {
+              case GMPLS_PSC1:
+              case GMPLS_PSC2:
+              case GMPLS_PSC3:
+              case GMPLS_PSC4:
+                bw.i = EXTRACT_32BITS(tptr);
+                printf("%s  Min LSP Bandwidth: %.3f Mbps", ident, bw.f*8/1000000);
+                printf("%s  Interface MTU: %u", ident, EXTRACT_16BITS(tptr+4));
+                break;
+              case GMPLS_TSC:
+                bw.i = EXTRACT_32BITS(tptr);
+                printf("%s  Min LSP Bandwidth: %.3f Mbps", ident, bw.f*8/1000000);
+                printf("%s  Indication %s", ident,
+                       tok2str(gmpls_switch_cap_tsc_indication_values, "Unknown (%u)", *(tptr+4)));
+                break;
+              default:
+                /* there is some optional stuff left to decode but this is as of yet
+                   not specified so just lets hexdump what is left */
+                if(subl>0){
+                  if(!print_unknown_data(tptr,"\n\t\t    ",
+                                         subl))
                     return(0);
+                }
               }
             }
             break;
