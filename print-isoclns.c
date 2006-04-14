@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.157 2006-04-10 21:07:35 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.158 2006-04-14 07:12:46 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1496,7 +1496,7 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,u_int subt,u_int subl,const cha
                       bittok2str(isis_subtlv_link_attribute_values,
                                  "Unknown",
                                  EXTRACT_16BITS(tptr)),
-                      EXTRACT_16BITS(tptr);
+                      EXTRACT_16BITS(tptr));
             }
             break;
         case ISIS_SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE:
