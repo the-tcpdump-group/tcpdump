@@ -21,7 +21,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.21 2006-02-08 01:38:17 hannes Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.22 2006-05-05 23:13:00 guy Exp $ (LBL)
  */
 
 #ifndef netdissect_h
@@ -85,6 +85,7 @@ struct netdissect_options {
   int ndo_aflag;		/* translate network and broadcast addresses */
   int ndo_eflag;		/* print ethernet header */
   int ndo_fflag;		/* don't translate "foreign" IP address */
+  int ndo_Kflag;		/* don't check TCP checksums */
   int ndo_nflag;		/* leave addresses as numbers */
   int ndo_Nflag;		/* remove domains from printed host names */
   int ndo_qflag;		/* quick (shorter) output */

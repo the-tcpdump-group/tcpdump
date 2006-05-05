@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.269 2006-03-03 22:31:16 hannes Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.270 2006-05-05 23:13:00 guy Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -346,6 +346,7 @@ extern netdissect_options *gndo;
 
 #define eflag gndo->ndo_eflag 
 #define fflag gndo->ndo_fflag 
+#define Kflag gndo->ndo_Kflag 
 #define nflag gndo->ndo_nflag 
 #define Nflag gndo->ndo_Nflag 
 #define Oflag gndo->ndo_Oflag 

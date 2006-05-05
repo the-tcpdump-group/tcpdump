@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.268 2006-03-23 17:33:01 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.269 2006-05-05 23:13:01 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -523,7 +523,7 @@ main(int argc, char **argv)
 
 	opterr = 0;
 	while (
-	    (op = getopt(argc, argv, "aA" B_FLAG "c:C:d" D_FLAG "eE:fF:G:i:lLm:M:nNOpqr:Rs:StT:u" U_FLAG "vw:W:xXy:Yz:Z:")) != -1)
+	    (op = getopt(argc, argv, "aA" B_FLAG "c:C:d" D_FLAG "eE:fF:G:i:KlLm:M:nNOpqr:Rs:StT:u" U_FLAG "vw:W:xXy:Yz:Z:")) != -1)
 		switch (op) {
 
 		case 'a':
@@ -668,12 +668,8 @@ main(int argc, char **argv)
 #endif /* WIN32 */
 			break;
 
-		case 'n':
-			++nflag;
-			break;
-
-		case 'N':
-			++Nflag;
+		case 'K':
+			++Kflag;
 			break;
 
 		case 'm':
@@ -695,6 +691,14 @@ main(int argc, char **argv)
 			warning("crypto code not compiled in");
 #endif
 			tcpmd5secret = optarg;
+			break;
+
+		case 'n':
+			++nflag;
+			break;
+
+		case 'N':
+			++Nflag;
 			break;
 
 		case 'O':
@@ -1567,7 +1571,7 @@ usage(void)
 #endif /* WIN32 */
 #endif /* HAVE_PCAP_LIB_VERSION */
 	(void)fprintf(stderr,
-"Usage: %s [-aAd" D_FLAG "eflLnNOpqRStu" U_FLAG "vxX]" B_FLAG_USAGE " [-c count] [ -C file_size ]\n", program_name);
+"Usage: %s [-aAd" D_FLAG "efKlLnNOpqRStu" U_FLAG "vxX]" B_FLAG_USAGE " [-c count] [ -C file_size ]\n", program_name);
 	(void)fprintf(stderr,
 "\t\t[ -E algo:secret ] [ -F file ] [ -G seconds ] [ -i interface ]\n");
 	(void)fprintf(stderr,

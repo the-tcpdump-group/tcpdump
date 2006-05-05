@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.181 2006-03-23 17:33:02 hannes Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.182 2006-05-05 23:13:00 guy Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -29,7 +29,7 @@ tcpdump \- dump traffic on a network
 .na
 .B tcpdump
 [
-.B \-AdDeflLnNOpqRStuUvxX
+.B \-AdDefKlLnNOpqRStuUvxX
 ] [
 .B \-c
 .I count
@@ -395,6 +395,11 @@ flag is supported, an interface number as printed by that flag can be
 used as the
 .I interface
 argument.
+.TP
+.B \-K
+Don't attempt to verify TCP checksums.  This is useful for interfaces
+that perform the TCP checksum calculation in hardware; otherwise,
+all outgoing TCP checksums will be flagged as bad.
 .TP
 .B \-l
 Make stdout line buffered.

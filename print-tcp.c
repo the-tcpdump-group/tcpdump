@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.124 2005-11-29 09:07:47 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.125 2006-05-05 23:13:00 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -420,7 +420,7 @@ tcp_print(register const u_char *bp, register u_int length,
 		return;
 	}
 
-	if (IP_V(ip) == 4 && vflag && !fragmented) {
+	if (IP_V(ip) == 4 && vflag && !Kflag && !fragmented) {
 		u_int16_t sum, tcp_sum;
 		if (TTEST2(tp->th_sport, length)) {
 			sum = tcp_cksum(ip, tp, length);
@@ -434,7 +434,7 @@ tcp_print(register const u_char *bp, register u_int length,
 		}
 	}
 #ifdef INET6
-	if (IP_V(ip) == 6 && ip6->ip6_plen && vflag && !fragmented) {
+	if (IP_V(ip) == 6 && ip6->ip6_plen && vflag && !Kflag && !fragmented) {
 		u_int16_t sum,tcp_sum;
 		if (TTEST2(tp->th_sport, length)) {
 			sum = tcp6_cksum(ip6, tp, length);
