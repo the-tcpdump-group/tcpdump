@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.117 2006-02-27 07:17:34 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.118 2006-05-12 02:14:55 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -69,7 +69,7 @@ extern int ether_ntohost(char *, const struct ether_addr *);
 #include "oui.h"
 
 #ifndef ETHER_ADDR_LEN
-#include "ether.h"
+#define ETHER_ADDR_LEN	6
 #endif
 
 /*
