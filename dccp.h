@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/dccp.h,v 1.1.2.3 2005-12-05 21:48:10 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/dccp.h,v 1.1.2.4 2006-05-12 01:46:17 guy Exp $ (LBL) */
 /*
  * Copyright (C) Arnaldo Carvalho de Melo 2004
  * Copyright (C) Ian McDonald 2005 <iam4@cs.waikato.ac.nz>
@@ -117,7 +117,7 @@ enum dccp_pkt_type {
 	DCCP_PKT_RESET,
 	DCCP_PKT_SYNC,
 	DCCP_PKT_SYNCACK,
-	DCCP_PKT_INVALID,
+	DCCP_PKT_INVALID
 };
 
 enum dccp_reset_codes {
@@ -133,7 +133,7 @@ enum dccp_reset_codes {
 	DCCP_RESET_CODE_TOO_BUSY,
 	DCCP_RESET_CODE_BAD_INIT_COOKIE,
 	DCCP_RESET_CODE_AGGRESSION_PENALTY,
-	__DCCP_RESET_CODE_LAST,
+	__DCCP_RESET_CODE_LAST
 };
 
 #endif /* __DCCP_HDR__ */
