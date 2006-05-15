@@ -20,7 +20,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-slow.c,v 1.2 2006-02-16 16:42:44 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-slow.c,v 1.3 2006-05-15 02:02:53 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -37,6 +37,7 @@ static const char rcsid[] _U_ =
 #include "extract.h"
 #include "addrtoname.h"
 #include "ether.h"
+#include "oui.h"
 
 struct slow_common_header_t {
     u_int8_t proto_subtype;
@@ -82,6 +83,89 @@ static const struct tok slow_oam_code_values[] = {
     { SLOW_OAM_CODE_VAR_RESPONSE, "Variable Response" },
     { SLOW_OAM_CODE_LOOPBACK_CTRL, "Loopback Control" },
     { SLOW_OAM_CODE_PRIVATE, "Vendor Private" },
+    { 0, NULL}
+};
+
+struct slow_oam_info_t {
+    u_int8_t info_type;
+    u_int8_t info_len;
+    u_int8_t oam_version;
+    u_int8_t revision[2];
+    u_int8_t state;
+    u_int8_t oam_config;
+    u_int8_t oam_pdu_config;
+    u_int8_t oui[3];
+    u_int8_t vendor_private[4];
+};
+
+#define SLOW_OAM_INFO_TYPE_END_OF_TLV 0x00
+#define SLOW_OAM_INFO_TYPE_LOCAL 0x01
+#define SLOW_OAM_INFO_TYPE_REMOTE 0x02
+#define SLOW_OAM_INFO_TYPE_ORG_SPECIFIC 0xfe
+
+static const struct tok slow_oam_info_type_values[] = {
+    { SLOW_OAM_INFO_TYPE_END_OF_TLV, "End of TLV marker" },
+    { SLOW_OAM_INFO_TYPE_LOCAL, "Local" },
+    { SLOW_OAM_INFO_TYPE_REMOTE, "Remote" },
+    { SLOW_OAM_INFO_TYPE_ORG_SPECIFIC, "Organization specific" },
+    { 0, NULL}
+};
+
+#define SLOW_OAM_INFO_TYPE_LOCAL_REMOTE_MINLEN 16
+
+#define OAM_INFO_TYPE_PARSER_MASK 0x3
+static const struct tok slow_oam_info_type_state_parser_values[] = {
+    { 0x00, "forwarding" },
+    { 0x01, "looping back" },
+    { 0x02, "discarding" },
+    { 0x03, "reserved" },
+    { 0, NULL}
+};
+
+#define OAM_INFO_TYPE_MUX_MASK 0x4
+static const struct tok slow_oam_info_type_state_mux_values[] = {
+    { 0x00, "forwarding" },
+    { 0x04, "discarding" },
+    { 0, NULL}
+};
+
+static const struct tok slow_oam_info_type_oam_config_values[] = {
+    { 0x01, "Active" },
+    { 0x02, "Unidirectional" },
+    { 0x04, "Remote-Loopback" },
+    { 0x08, "Link-Events" },
+    { 0x10, "Variable-Retrieval" },
+    { 0, NULL}
+};
+
+/* 11 Bits */
+#define OAM_INFO_TYPE_PDU_SIZE_MASK 0x7ff
+
+struct slow_oam_eventnotification_t {
+    u_int8_t event_type;
+    u_int8_t event_length;
+    u_int8_t event_time_stamp[2];
+    u_int8_t window[8];
+    u_int8_t threshold[8];
+    u_int8_t errors[8];
+    u_int8_t errors_running_total[8];
+    u_int8_t event_running_total[4];
+};
+
+struct slow_oam_variablerequest_t {
+    u_int8_t branch;
+    u_int8_t leaf[2];
+};
+
+struct slow_oam_variableresponse_t {
+    u_int8_t branch;
+    u_int8_t leaf[2];
+    u_int8_t length;
+};
+
+static const struct tok slow_oam_loopbackctrl_cmd_values[] = {
+    { 0x01, "Enable OAM Remote Loopback" },
+    { 0x02, "Disable OAM Remote Loopback" },
     { 0, NULL}
 };
 
@@ -357,18 +441,87 @@ void slow_oam_print(register const u_char *tptr, register u_int tlen) {
         u_int8_t code;
     };
     const struct slow_oam_common_header_t *slow_oam_common_header;
+
+    union {
+	const struct slow_oam_info_t *slow_oam_info;
+        const struct slow_oam_eventnotification_t *slow_oam_eventnotification;
+        const struct slow_oam_variablerequest_t *slow_oam_variablerequest;
+        const struct slow_oam_variableresponse_t *slow_oam_variableresponse;
+    } tlv;
     
     slow_oam_common_header = (struct slow_oam_common_header_t *)tptr;
+    tptr += sizeof(struct slow_oam_common_header_t);
+    tlen -= sizeof(struct slow_oam_common_header_t);
 
-    printf("Flags [ %s ], Code %s",
+    printf("\n\tCode %s OAM PDU, Flags [%s]",
+           tok2str(slow_oam_code_values, "Unknown (%u)", slow_oam_common_header->code),
            bittok2str(slow_oam_flag_values,
                       "none",
-                      EXTRACT_16BITS(&slow_oam_common_header->flags)),
-           tok2str(slow_oam_code_values, "Unknown (%u)", slow_oam_common_header->code));
+                      EXTRACT_16BITS(&slow_oam_common_header->flags)));
 
     switch (slow_oam_common_header->code) {
-        /* FIXME no codes yet known - just hexdump for now */
     case SLOW_OAM_CODE_INFO:
+        tlv.slow_oam_info = (const struct slow_oam_info_t *)tptr;
+        while (tlen > 0) {
+            printf("\n\t  %s Information Type (%u), Version %u, Rev %u, length %u",
+                   tok2str(slow_oam_info_type_values, "Reserved", tlv.slow_oam_info->info_type),
+                   tlv.slow_oam_info->info_type,
+                   tlv.slow_oam_info->oam_version,
+                   EXTRACT_16BITS(&tlv.slow_oam_info->revision),
+                   tlv.slow_oam_info->info_len);
+
+            switch (tlv.slow_oam_info->info_type) {
+            case SLOW_OAM_INFO_TYPE_END_OF_TLV:
+                
+                if (tlv.slow_oam_info->info_len != 0) {
+                    printf("\n\t    ERROR: illegal length - should be 0");
+                }
+                return;
+                
+            case SLOW_OAM_INFO_TYPE_LOCAL: /* identical format - fall through */
+            case SLOW_OAM_INFO_TYPE_REMOTE:
+                
+                if (tlv.slow_oam_info->info_len !=
+                    SLOW_OAM_INFO_TYPE_LOCAL_REMOTE_MINLEN) {
+                    printf("\n\t    ERROR: illegal length - should be %u",
+                           SLOW_OAM_INFO_TYPE_LOCAL_REMOTE_MINLEN);
+                    return;
+                }
+                
+                printf("\n\t    State-MUX-Action %s, State-Parser-Action %s",
+                       tok2str(slow_oam_info_type_state_parser_values, "Reserved",
+                               tlv.slow_oam_info->state & OAM_INFO_TYPE_PARSER_MASK),
+                       tok2str(slow_oam_info_type_state_mux_values, "Reserved",
+                               tlv.slow_oam_info->state & OAM_INFO_TYPE_MUX_MASK));
+                printf("\n\t    OAM-Config Flags [%s], OAM-PDU-Config max-PDU size %u",
+                       bittok2str(slow_oam_info_type_oam_config_values, "none",
+                                  tlv.slow_oam_info->oam_config),
+                       EXTRACT_16BITS(&tlv.slow_oam_info->oam_pdu_config) &
+                       OAM_INFO_TYPE_PDU_SIZE_MASK);
+                printf("\n\t    OUI %s (0x%06x), Vendor-Private 0x%08x",
+                       tok2str(oui_values, "Unknown",
+                               EXTRACT_24BITS(&tlv.slow_oam_info->oui)),
+                       EXTRACT_24BITS(&tlv.slow_oam_info->oui),
+                       EXTRACT_32BITS(&tlv.slow_oam_info->vendor_private));
+                break;
+                
+            case SLOW_OAM_INFO_TYPE_ORG_SPECIFIC:
+                /* FIXME hexdump */
+                break;
+                
+            default:
+                break;
+            }
+
+            /* infinite loop check */
+            if (!tlv.slow_oam_info->info_len) {
+                return;
+            }
+            tlen -= tlv.slow_oam_info->info_len;
+            tptr += tlv.slow_oam_info->info_len;
+        }
+        break;
+        /* FIXME no codes yet known - just hexdump for now */
     case SLOW_OAM_CODE_EVENT_NOTIF:
     case SLOW_OAM_CODE_VAR_REQUEST:
     case SLOW_OAM_CODE_VAR_RESPONSE:
