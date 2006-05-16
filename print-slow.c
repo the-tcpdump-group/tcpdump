@@ -20,7 +20,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-slow.c,v 1.3 2006-05-15 02:02:53 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-slow.c,v 1.4 2006-05-16 21:57:26 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -461,8 +461,8 @@ void slow_oam_print(register const u_char *tptr, register u_int tlen) {
 
     switch (slow_oam_common_header->code) {
     case SLOW_OAM_CODE_INFO:
-        tlv.slow_oam_info = (const struct slow_oam_info_t *)tptr;
         while (tlen > 0) {
+	    tlv.slow_oam_info = (const struct slow_oam_info_t *)tptr;
             printf("\n\t  %s Information Type (%u), Version %u, Rev %u, length %u",
                    tok2str(slow_oam_info_type_values, "Reserved", tlv.slow_oam_info->info_type),
                    tlv.slow_oam_info->info_type,
