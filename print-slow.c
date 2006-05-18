@@ -20,7 +20,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-slow.c,v 1.4 2006-05-16 21:57:26 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-slow.c,v 1.5 2006-05-18 08:23:26 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -88,7 +88,7 @@ static const struct tok slow_oam_code_values[] = {
 
 struct slow_oam_info_t {
     u_int8_t info_type;
-    u_int8_t info_len;
+    u_int8_t info_length;
     u_int8_t oam_version;
     u_int8_t revision[2];
     u_int8_t state;
@@ -110,8 +110,6 @@ static const struct tok slow_oam_info_type_values[] = {
     { SLOW_OAM_INFO_TYPE_ORG_SPECIFIC, "Organization specific" },
     { 0, NULL}
 };
-
-#define SLOW_OAM_INFO_TYPE_LOCAL_REMOTE_MINLEN 16
 
 #define OAM_INFO_TYPE_PARSER_MASK 0x3
 static const struct tok slow_oam_info_type_state_parser_values[] = {
@@ -141,10 +139,27 @@ static const struct tok slow_oam_info_type_oam_config_values[] = {
 /* 11 Bits */
 #define OAM_INFO_TYPE_PDU_SIZE_MASK 0x7ff
 
-struct slow_oam_eventnotification_t {
+#define SLOW_OAM_LINK_EVENT_END_OF_TLV 0x00
+#define SLOW_OAM_LINK_EVENT_ERR_SYM_PER 0x01
+#define SLOW_OAM_LINK_EVENT_ERR_FRM 0x02
+#define SLOW_OAM_LINK_EVENT_ERR_FRM_PER 0x03
+#define SLOW_OAM_LINK_EVENT_ERR_FRM_SUMM 0x04
+#define SLOW_OAM_LINK_EVENT_ORG_SPECIFIC 0xfe
+
+static const struct tok slow_oam_link_event_values[] = {
+    { SLOW_OAM_LINK_EVENT_END_OF_TLV, "End of TLV marker" },
+    { SLOW_OAM_LINK_EVENT_ERR_SYM_PER, "Errored Symbol Period Event" },
+    { SLOW_OAM_LINK_EVENT_ERR_FRM, "Errored Frame Event" },
+    { SLOW_OAM_LINK_EVENT_ERR_FRM_PER, "Errored Frame Period Event" },
+    { SLOW_OAM_LINK_EVENT_ERR_FRM_SUMM, "Errored Frame Seconds Summary Event" },
+    { SLOW_OAM_LINK_EVENT_ORG_SPECIFIC, "Organization specific" },
+    { 0, NULL}
+};
+
+struct slow_oam_link_event_t {
     u_int8_t event_type;
     u_int8_t event_length;
-    u_int8_t event_time_stamp[2];
+    u_int8_t time_stamp[2];
     u_int8_t window[8];
     u_int8_t threshold[8];
     u_int8_t errors[8];
@@ -436,58 +451,73 @@ trunc:
 
 void slow_oam_print(register const u_char *tptr, register u_int tlen) {
 
+    u_int hexdump;
+
     struct slow_oam_common_header_t {
         u_int8_t flags[2];
         u_int8_t code;
     };
-    const struct slow_oam_common_header_t *slow_oam_common_header;
+
+    struct slow_oam_tlv_header_t {
+        u_int8_t type;
+        u_int8_t length;
+    };
+
+    union {
+        const struct slow_oam_common_header_t *slow_oam_common_header;
+        const struct slow_oam_tlv_header_t *slow_oam_tlv_header;
+    } ptr;
 
     union {
 	const struct slow_oam_info_t *slow_oam_info;
-        const struct slow_oam_eventnotification_t *slow_oam_eventnotification;
+        const struct slow_oam_link_event_t *slow_oam_link_event;
         const struct slow_oam_variablerequest_t *slow_oam_variablerequest;
         const struct slow_oam_variableresponse_t *slow_oam_variableresponse;
     } tlv;
     
-    slow_oam_common_header = (struct slow_oam_common_header_t *)tptr;
+    ptr.slow_oam_common_header = (struct slow_oam_common_header_t *)tptr;
     tptr += sizeof(struct slow_oam_common_header_t);
     tlen -= sizeof(struct slow_oam_common_header_t);
 
     printf("\n\tCode %s OAM PDU, Flags [%s]",
-           tok2str(slow_oam_code_values, "Unknown (%u)", slow_oam_common_header->code),
+           tok2str(slow_oam_code_values, "Unknown (%u)", ptr.slow_oam_common_header->code),
            bittok2str(slow_oam_flag_values,
                       "none",
-                      EXTRACT_16BITS(&slow_oam_common_header->flags)));
+                      EXTRACT_16BITS(&ptr.slow_oam_common_header->flags)));
 
-    switch (slow_oam_common_header->code) {
+    switch (ptr.slow_oam_common_header->code) {
     case SLOW_OAM_CODE_INFO:
         while (tlen > 0) {
-	    tlv.slow_oam_info = (const struct slow_oam_info_t *)tptr;
-            printf("\n\t  %s Information Type (%u), Version %u, Rev %u, length %u",
-                   tok2str(slow_oam_info_type_values, "Reserved", tlv.slow_oam_info->info_type),
-                   tlv.slow_oam_info->info_type,
-                   tlv.slow_oam_info->oam_version,
-                   EXTRACT_16BITS(&tlv.slow_oam_info->revision),
-                   tlv.slow_oam_info->info_len);
+            ptr.slow_oam_tlv_header = (const struct slow_oam_tlv_header_t *)tptr;
+            printf("\n\t  %s Information Type (%u), length %u",
+                   tok2str(slow_oam_info_type_values, "Reserved",
+                           ptr.slow_oam_tlv_header->type),
+                   ptr.slow_oam_tlv_header->type,
+                   ptr.slow_oam_tlv_header->length);
 
-            switch (tlv.slow_oam_info->info_type) {
+            hexdump = FALSE;
+            switch (ptr.slow_oam_tlv_header->type) {
             case SLOW_OAM_INFO_TYPE_END_OF_TLV:
-                
-                if (tlv.slow_oam_info->info_len != 0) {
+                if (ptr.slow_oam_tlv_header->length != 0) {
                     printf("\n\t    ERROR: illegal length - should be 0");
                 }
                 return;
                 
             case SLOW_OAM_INFO_TYPE_LOCAL: /* identical format - fall through */
             case SLOW_OAM_INFO_TYPE_REMOTE:
+                tlv.slow_oam_info = (const struct slow_oam_info_t *)tptr;
                 
-                if (tlv.slow_oam_info->info_len !=
-                    SLOW_OAM_INFO_TYPE_LOCAL_REMOTE_MINLEN) {
+                if (tlv.slow_oam_info->info_length !=
+                    sizeof(struct slow_oam_info_t)) {
                     printf("\n\t    ERROR: illegal length - should be %u",
-                           SLOW_OAM_INFO_TYPE_LOCAL_REMOTE_MINLEN);
+                           sizeof(struct slow_oam_info_t));
                     return;
                 }
-                
+
+                printf("\n\t    OAM-Version %u, Revision %u",
+                       tlv.slow_oam_info->oam_version,
+                       EXTRACT_16BITS(&tlv.slow_oam_info->revision));
+
                 printf("\n\t    State-MUX-Action %s, State-Parser-Action %s",
                        tok2str(slow_oam_info_type_state_parser_values, "Reserved",
                                tlv.slow_oam_info->state & OAM_INFO_TYPE_PARSER_MASK),
@@ -506,23 +536,102 @@ void slow_oam_print(register const u_char *tptr, register u_int tlen) {
                 break;
                 
             case SLOW_OAM_INFO_TYPE_ORG_SPECIFIC:
-                /* FIXME hexdump */
+                hexdump = TRUE;
                 break;
                 
             default:
+                hexdump = TRUE;
                 break;
             }
 
             /* infinite loop check */
-            if (!tlv.slow_oam_info->info_len) {
+            if (!ptr.slow_oam_tlv_header->length) {
                 return;
             }
-            tlen -= tlv.slow_oam_info->info_len;
-            tptr += tlv.slow_oam_info->info_len;
+
+            /* do we also want to see a hex dump ? */
+            if (vflag > 1 || hexdump==TRUE) {
+                print_unknown_data(tptr,"\n\t  ",
+                                   ptr.slow_oam_tlv_header->length);
+            }
+
+            tlen -= ptr.slow_oam_tlv_header->length;
+            tptr += ptr.slow_oam_tlv_header->length;
         }
         break;
-        /* FIXME no codes yet known - just hexdump for now */
+
     case SLOW_OAM_CODE_EVENT_NOTIF:
+        while (tlen > 0) {
+            ptr.slow_oam_tlv_header = (const struct slow_oam_tlv_header_t *)tptr;
+            printf("\n\t  %s Link Event Type (%u), length %u",
+                   tok2str(slow_oam_link_event_values, "Reserved",
+                           ptr.slow_oam_tlv_header->type),
+                   ptr.slow_oam_tlv_header->type,
+                   ptr.slow_oam_tlv_header->length);
+
+            hexdump = FALSE;
+            switch (ptr.slow_oam_tlv_header->type) {
+            case SLOW_OAM_LINK_EVENT_END_OF_TLV:
+                if (ptr.slow_oam_tlv_header->length != 0) {
+                    printf("\n\t    ERROR: illegal length - should be 0");
+                }
+                return;
+                
+            case SLOW_OAM_LINK_EVENT_ERR_SYM_PER: /* identical format - fall through */
+            case SLOW_OAM_LINK_EVENT_ERR_FRM:
+            case SLOW_OAM_LINK_EVENT_ERR_FRM_PER:
+            case SLOW_OAM_LINK_EVENT_ERR_FRM_SUMM:
+                tlv.slow_oam_link_event = (const struct slow_oam_link_event_t *)tptr;
+                
+                if (tlv.slow_oam_link_event->event_length !=
+                    sizeof(struct slow_oam_link_event_t)) {
+                    printf("\n\t    ERROR: illegal length - should be %u",
+                           sizeof(struct slow_oam_link_event_t));
+                    return;
+                }
+
+                printf("\n\t    Timestamp %u ms, Errored Window %" PRIu64
+                       "\n\t    Errored Threshold %" PRIu64
+                       "\n\t    Errors %" PRIu64
+                       "\n\t    Error Running Total %" PRIu64
+                       "\n\t    Event Running Total %u",
+                       EXTRACT_16BITS(&tlv.slow_oam_link_event->time_stamp)*100,
+                       EXTRACT_64BITS(&tlv.slow_oam_link_event->window),
+                       EXTRACT_64BITS(&tlv.slow_oam_link_event->threshold),
+                       EXTRACT_64BITS(&tlv.slow_oam_link_event->errors),
+                       EXTRACT_64BITS(&tlv.slow_oam_link_event->errors_running_total),
+                       EXTRACT_32BITS(&tlv.slow_oam_link_event->event_running_total));
+                break;
+                
+            case SLOW_OAM_LINK_EVENT_ORG_SPECIFIC:
+                hexdump = TRUE;
+                break;
+                
+            default:
+                hexdump = TRUE;
+                break;
+            }
+
+            /* infinite loop check */
+            if (!ptr.slow_oam_tlv_header->length) {
+                return;
+            }
+
+            /* do we also want to see a hex dump ? */
+            if (vflag > 1 || hexdump==TRUE) {
+                print_unknown_data(tptr,"\n\t  ",
+                                   ptr.slow_oam_tlv_header->length);
+            }
+
+            tlen -= ptr.slow_oam_tlv_header->length;
+            tptr += ptr.slow_oam_tlv_header->length;
+        }
+        break;
+
+        /*
+         * FIXME those are the defined codes that lack a decoder
+         * you are welcome to contribute code ;-)
+         */
     case SLOW_OAM_CODE_VAR_REQUEST:
     case SLOW_OAM_CODE_VAR_RESPONSE:
     case SLOW_OAM_CODE_LOOPBACK_CTRL:
@@ -533,10 +642,5 @@ void slow_oam_print(register const u_char *tptr, register u_int tlen) {
         }
         break;
     }
-    /* do we want to see an additional hexdump ? */
-    if (vflag > 1) {
-        print_unknown_data(tptr,"\n\t  ", tlen);
-    }
-
     return;
 }
