@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.101 2006-02-21 10:27:40 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.102 2006-06-13 17:15:28 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -267,6 +267,7 @@ static struct tok bgp_notify_minor_open_values[] = {
     { 4,                        "Unsupported Optional Parameter"},
     { 5,                        "Authentication Failure"},
     { 6,                        "Unacceptable Hold Time"},
+    { 7,                        "Capability Message Error"},
     { 0, NULL}
 };
 
