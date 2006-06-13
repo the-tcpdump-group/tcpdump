@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.41 2005-11-13 20:13:58 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.42 2006-06-13 22:25:30 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1092,6 +1092,8 @@ print_radiotap_field(struct cpack_state *s, u_int32_t bit)
 			printf("wep ");
 		if (u.u8 & IEEE80211_RADIOTAP_F_FRAG)
 			printf("fragmented ");
+		if (u.u8 & IEEE80211_RADIOTAP_F_BADFCS)
+			printf("bad-fcs ");
 		break;
 	case IEEE80211_RADIOTAP_ANTENNA:
 		printf("antenna %d ", u.u8);
