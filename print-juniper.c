@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.31 2006-03-10 23:43:29 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.32 2006-06-14 16:13:51 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1402,6 +1402,10 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
             if (eflag)
                 printf("control-word 0x%08x ", control_word);
         }
+        break;
+#endif
+#ifdef DLT_JUNIPER_GGSN
+    case DLT_JUNIPER_GGSN:
         break;
 #endif
 #ifdef DLT_JUNIPER_ATM1
