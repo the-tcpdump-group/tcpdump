@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.32 2006-06-14 16:13:51 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.33 2006-06-14 21:40:00 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -467,13 +467,14 @@ juniper_ggsn_print(const struct pcap_pkthdr *h, register const u_char *p)
             return l2info.header_len;
 
         p+=l2info.header_len;
-        gh = (struct juniper_ggsn_header *)p;
+        gh = (struct juniper_ggsn_header *)&l2info.cookie;
 
-        if (eflag)
+        if (eflag) {
             printf("proto %s (%u), vlan %u: ",
                    tok2str(juniper_protocol_values,"Unknown",gh->proto),
                    gh->proto,
                    EXTRACT_16BITS(&gh->vlan_id[0]));
+        }
 
         switch (gh->proto) {
         case JUNIPER_PROTO_IPV4:
