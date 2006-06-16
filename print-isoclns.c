@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.133.2.22 2006-04-06 13:44:19 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.133.2.23 2006-06-16 18:22:56 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -2108,7 +2108,7 @@ static int isis_print (const u_int8_t *p, u_int length)
                tlv_len);
 
         if (tlv_len == 0) /* something is malformed */
-            break;
+	    continue;
 
         /* now check if we have a decoder otherwise do a hexdump at the end*/
 	switch (tlv_type) {
