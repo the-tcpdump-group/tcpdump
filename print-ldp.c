@@ -16,7 +16,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.19 2006-03-28 07:06:21 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.20 2006-06-23 02:03:09 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -217,9 +217,6 @@ static const struct tok ldp_fec_martini_ifparm_vccv_cv_values[] = {
     { 0x04, "BFD" },
     { 0, NULL}
 };
-
-#define FALSE 0
-#define TRUE  1
 
 int ldp_msg_print(register const u_char *);
 int ldp_tlv_print(register const u_char *);

@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.17 2006-02-03 08:33:12 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lspping.c,v 1.18 2006-06-23 02:03:09 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -79,8 +79,6 @@ struct lspping_common_header {
 };
 
 #define LSPPING_VERSION            1
-#define FALSE 0
-#define TRUE  1
 
 static const struct tok lspping_msg_type_values[] = {
     { 1, "MPLS Echo Request"},
