@@ -17,7 +17,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lmp.c,v 1.5.2.3 2006-03-28 08:05:59 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lmp.c,v 1.5.2.4 2006-06-23 02:07:27 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -306,9 +306,6 @@ static const struct tok lmp_data_link_subobj[] = {
  */
 #define LMP_SD_SERVICE_CONFIG_CPSA_LINK_TYPE_SDH     5 /* UNI 1.0 Sec 9.4.2 */
 #define LMP_SD_SERVICE_CONFIG_CPSA_LINK_TYPE_SONET   6 /* UNI 1.0 Sec 9.4.2 */
-
-#define FALSE 0
-#define TRUE  1
 
 /*
  * the ctypes are not globally unique so for

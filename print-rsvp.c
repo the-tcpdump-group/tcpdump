@@ -17,7 +17,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.33.2.8 2005-09-22 14:52:40 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.33.2.9 2006-06-23 02:07:27 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -415,10 +415,6 @@ static struct tok rsvp_obj_error_code_diffserv_te_values[] = {
     { 8,                      "Inconsistency between signaled PHBs and signaled CT" },
    { 0, NULL}
 };
-
-#define FALSE 0
-#define TRUE  1
-
 
 static int rsvp_intserv_print(const u_char *, u_short);
 
