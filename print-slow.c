@@ -20,7 +20,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-slow.c,v 1.5 2006-05-18 08:23:26 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-slow.c,v 1.6 2006-06-23 01:53:28 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -93,7 +93,7 @@ struct slow_oam_info_t {
     u_int8_t revision[2];
     u_int8_t state;
     u_int8_t oam_config;
-    u_int8_t oam_pdu_config;
+    u_int8_t oam_pdu_config[2];
     u_int8_t oui[3];
     u_int8_t vendor_private[4];
 };
@@ -518,7 +518,7 @@ void slow_oam_print(register const u_char *tptr, register u_int tlen) {
                        tlv.slow_oam_info->oam_version,
                        EXTRACT_16BITS(&tlv.slow_oam_info->revision));
 
-                printf("\n\t    State-MUX-Action %s, State-Parser-Action %s",
+                printf("\n\t    State-Parser-Action %s, State-MUX-Action %s",
                        tok2str(slow_oam_info_type_state_parser_values, "Reserved",
                                tlv.slow_oam_info->state & OAM_INFO_TYPE_PARSER_MASK),
                        tok2str(slow_oam_info_type_state_mux_values, "Reserved",
