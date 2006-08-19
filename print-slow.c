@@ -20,7 +20,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-slow.c,v 1.6 2006-06-23 01:53:28 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-slow.c,v 1.7 2006-08-19 06:59:17 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -509,8 +509,8 @@ void slow_oam_print(register const u_char *tptr, register u_int tlen) {
                 
                 if (tlv.slow_oam_info->info_length !=
                     sizeof(struct slow_oam_info_t)) {
-                    printf("\n\t    ERROR: illegal length - should be %u",
-                           sizeof(struct slow_oam_info_t));
+                    printf("\n\t    ERROR: illegal length - should be %lu",
+                           (unsigned long) sizeof(struct slow_oam_info_t));
                     return;
                 }
 
@@ -585,8 +585,8 @@ void slow_oam_print(register const u_char *tptr, register u_int tlen) {
                 
                 if (tlv.slow_oam_link_event->event_length !=
                     sizeof(struct slow_oam_link_event_t)) {
-                    printf("\n\t    ERROR: illegal length - should be %u",
-                           sizeof(struct slow_oam_link_event_t));
+                    printf("\n\t    ERROR: illegal length - should be %lu",
+                           (unsigned long) sizeof(struct slow_oam_link_event_t));
                     return;
                 }
 
