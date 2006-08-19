@@ -19,7 +19,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-vqp.c,v 1.2 2006-03-08 14:30:12 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-vqp.c,v 1.3 2006-08-19 06:51:13 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -187,7 +187,7 @@ vqp_print(register const u_char *pptr, register u_int len)
 	case VQP_OBJ_VLAN_NAME:
 	case VQP_OBJ_VTP_DOMAIN:
 	case VQP_OBJ_ETHERNET_PKT:
-            safeputs(tptr, vqp_obj_len);
+            safeputs((const char *)tptr, vqp_obj_len);
             break;
             /* those objects have similar semantics - fall through */
 	case VQP_OBJ_MAC_ADDRESS:
