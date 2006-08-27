@@ -17,7 +17,7 @@
 #  WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 #  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.301 2006-06-15 21:44:36 mcr Exp $ (LBL)
+# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.302 2006-08-27 18:44:09 mcr Exp $ (LBL)
 
 #
 # Various configurable paths (remember to edit Makefile.in, not Makefile)
@@ -154,12 +154,14 @@ version.o: version.c
 
 version.c: $(srcdir)/VERSION
 	@rm -f $@
-	sed -e 's/.*/char version[] = "&";/' $(srcdir)/VERSION > $@
+	if grep CVS ${srcdir}/VERSION >/dev/null; then read ver <${srcdir}/VERSION; echo -n $$ver; date +_%Y_%m_%d; else cat ${srcdir}/VERSION; fi | sed -e 's/.*/char version[] = "&";/' - > $@
+
 
 install:
 	[ -d $(DESTDIR)$(sbindir) ] || \
 	    (mkdir -p $(DESTDIR)$(sbindir); chmod 755 $(DESTDIR)$(sbindir))
 	$(INSTALL_PROGRAM) $(PROG) $(DESTDIR)$(sbindir)/$(PROG)
+	$(INSTALL_PROGRAM) $(PROG) $(DESTDIR)$(sbindir)/$(PROG).`cat ${srcdir}/VERSION`
 	[ -d $(DESTDIR)$(mandir)/man1 ] || \
 	    (mkdir -p $(DESTDIR)$(mandir)/man1; chmod 755 $(DESTDIR)$(mandir)/man1)
 	$(INSTALL_DATA) $(srcdir)/$(PROG).1 $(DESTDIR)$(mandir)/man1/$(PROG).1
