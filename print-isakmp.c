@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.51 2005-04-07 00:28:17 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.52 2006-08-27 18:46:39 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -531,8 +531,21 @@ const struct attrmap ipsec_t_map[] = {
 	{ NULL,	0, { NULL } },
 	{ "lifetype", 3, { NULL, "sec", "kb", }, },
 	{ "life", 0, { NULL } },
-	{ "group desc", 5,	{ NULL, "modp768", "modp1024", "EC2N 2^155",
-				  "EC2N 2^185", }, },
+	{ "group desc", 5,	{ NULL, "modp768",
+				  "modp1024",    /* group 2 */
+				  "EC2N 2^155",  /* group 3 */
+				  "EC2N 2^185",  /* group 4 */
+				  "modp1536",    /* group 5 */
+				  "iana-grp06", "iana-grp07", /* reserved */
+				  "iana-grp08", "iana-grp09",
+				  "iana-grp10", "iana-grp11",
+				  "iana-grp12", "iana-grp13",
+				  "modp2048",    /* group 14 */
+				  "modp3072",    /* group 15 */
+				  "modp4096",    /* group 16 */
+				  "modp6144",    /* group 17 */
+				  "modp8192",    /* group 18 */
+		}, },
 	{ "enc mode", 3, { NULL, "tunnel", "transport", }, },
 	{ "auth", 5, { NULL, "hmac-md5", "hmac-sha1", "1des-mac", "keyed", }, },
 	{ "keylen", 0, { NULL } },
@@ -549,8 +562,21 @@ const struct attrmap oakley_t_map[] = {
 			  "sha2-256", "sha2-384", "sha2-512", }, },
 	{ "auth", 6,	{ NULL, "preshared", "dss", "rsa sig", "rsa enc",
 			  "rsa enc revised", }, },
-	{ "group desc", 5,	{ NULL, "modp768", "modp1024", "EC2N 2^155",
-				  "EC2N 2^185", }, },
+	{ "group desc", 5,	{ NULL, "modp768",
+				  "modp1024",    /* group 2 */
+				  "EC2N 2^155",  /* group 3 */
+				  "EC2N 2^185",  /* group 4 */
+				  "modp1536",    /* group 5 */
+				  "iana-grp06", "iana-grp07", /* reserved */
+				  "iana-grp08", "iana-grp09",
+				  "iana-grp10", "iana-grp11",
+				  "iana-grp12", "iana-grp13",
+				  "modp2048",    /* group 14 */
+				  "modp3072",    /* group 15 */
+				  "modp4096",    /* group 16 */
+				  "modp6144",    /* group 17 */
+				  "modp8192",    /* group 18 */
+		}, },
 	{ "group type", 4,	{ NULL, "MODP", "ECP", "EC2N", }, },
 	{ "group prime", 0, { NULL } },
 	{ "group gen1", 0, { NULL } },
