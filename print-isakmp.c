@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.52 2006-08-27 18:46:39 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.53 2006-08-27 18:48:29 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -531,7 +531,7 @@ const struct attrmap ipsec_t_map[] = {
 	{ NULL,	0, { NULL } },
 	{ "lifetype", 3, { NULL, "sec", "kb", }, },
 	{ "life", 0, { NULL } },
-	{ "group desc", 5,	{ NULL, "modp768",
+	{ "group desc", 18,	{ NULL, "modp768",
 				  "modp1024",    /* group 2 */
 				  "EC2N 2^155",  /* group 3 */
 				  "EC2N 2^185",  /* group 4 */
@@ -562,7 +562,7 @@ const struct attrmap oakley_t_map[] = {
 			  "sha2-256", "sha2-384", "sha2-512", }, },
 	{ "auth", 6,	{ NULL, "preshared", "dss", "rsa sig", "rsa enc",
 			  "rsa enc revised", }, },
-	{ "group desc", 5,	{ NULL, "modp768",
+	{ "group desc", 18,	{ NULL, "modp768",
 				  "modp1024",    /* group 2 */
 				  "EC2N 2^155",  /* group 3 */
 				  "EC2N 2^185",  /* group 4 */
