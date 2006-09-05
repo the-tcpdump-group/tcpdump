@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.17 2005-08-23 11:07:34 hannes Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.18 2006-09-05 15:46:42 hannes Exp $ (LBL) */
 /*
  * Copyright (c) 1991, 1993, 1994, 1995, 1996, 1997
  *	The Regents of the University of California.  All rights reserved.
@@ -85,10 +85,10 @@
 #define LS_OPAQUE_TE_LINK_SUBTLV_MAX_RES_BW            7 /* rfc3630 */
 #define LS_OPAQUE_TE_LINK_SUBTLV_UNRES_BW              8 /* rfc3630 */
 #define LS_OPAQUE_TE_LINK_SUBTLV_ADMIN_GROUP           9 /* rfc3630 */
-#define LS_OPAQUE_TE_LINK_SUBTLV_LINK_LOCAL_REMOTE_ID 11 /* draft-ietf-ccamp-ospf-gmpls-extensions */
-#define LS_OPAQUE_TE_LINK_SUBTLV_LINK_PROTECTION_TYPE 14 /* draft-ietf-ccamp-ospf-gmpls-extensions */
-#define LS_OPAQUE_TE_LINK_SUBTLV_INTF_SW_CAP_DESCR    15 /* draft-ietf-ccamp-ospf-gmpls-extensions */
-#define LS_OPAQUE_TE_LINK_SUBTLV_SHARED_RISK_GROUP    16 /* draft-ietf-ccamp-ospf-gmpls-extensions */
+#define LS_OPAQUE_TE_LINK_SUBTLV_LINK_LOCAL_REMOTE_ID 11 /* rfc4203 */
+#define LS_OPAQUE_TE_LINK_SUBTLV_LINK_PROTECTION_TYPE 14 /* rfc4203 */
+#define LS_OPAQUE_TE_LINK_SUBTLV_INTF_SW_CAP_DESCR    15 /* rfc4203 */
+#define LS_OPAQUE_TE_LINK_SUBTLV_SHARED_RISK_GROUP    16 /* rfc4203 */
 #define LS_OPAQUE_TE_LINK_SUBTLV_BW_CONSTRAINTS       17 /* rfc4124 */
 
 #define LS_OPAQUE_TE_LINK_SUBTLV_LINK_TYPE_PTP        1  /* rfc3630 */
@@ -104,12 +104,6 @@
 #define LS_OPAQUE_GRACE_TLV_REASON_CP_SWITCH   3 /* rfc3623 */
 
 #define LS_OPAQUE_RI_TLV_CAP             1 /* draft-ietf-ospf-cap-03 */
-
-/*************************************************
- *
- * is the above a bug in the documentation?
- *
- *************************************************/
 
 
 /* rla_link.link_type	*/
@@ -313,3 +307,6 @@ struct ospfhdr {
 #define	ospf_lsu	ospf_un.un_lsu
 #define	ospf_lsa	ospf_un.un_lsa
 
+/* Functions shared by ospf and ospf6 */
+extern int ospf_print_te_lsa(u_int8_t *, u_int);
+extern int ospf_print_grace_lsa(u_int8_t *, u_int);

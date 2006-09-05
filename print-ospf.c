@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.59 2005-08-23 11:07:34 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.60 2006-09-05 15:46:42 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -172,7 +172,7 @@ static struct tok lsa_opaque_ri_tlv_cap_values[] = {
 	{ 0,		        NULL }
 };
 
-static char tstr[] = " [|ospf]";
+static char tstr[] = " [|ospf2]";
 
 #ifdef WIN32
 #define inline __inline
@@ -181,6 +181,273 @@ static char tstr[] = " [|ospf]";
 static int ospf_print_lshdr(const struct lsa_hdr *);
 static const u_char *ospf_print_lsa(const struct lsa *);
 static int ospf_decode_v2(const struct ospfhdr *, const u_char *);
+
+int
+ospf_print_grace_lsa (u_int8_t *tptr, u_int ls_length) {
+
+    u_int tlv_type, tlv_length;
+
+
+    while (ls_length > 0) {
+        TCHECK2(*tptr, 4);
+        if (ls_length < 4) {
+            printf("\n\t    Remaining LS length %u < 4", ls_length);
+            return -1;
+        }
+        tlv_type = EXTRACT_16BITS(tptr);
+        tlv_length = EXTRACT_16BITS(tptr+2);
+        tptr+=4;
+        ls_length-=4;
+                    
+        printf("\n\t    %s TLV (%u), length %u, value: ",
+               tok2str(lsa_opaque_grace_tlv_values,"unknown",tlv_type),
+               tlv_type,
+               tlv_length);
+
+        if (tlv_length > ls_length) {
+            printf("\n\t    Bogus length %u > %u", tlv_length,
+                   ls_length);
+            return -1;
+        }
+
+        /* Infinite loop protection. */
+        if (tlv_type == 0 || tlv_length ==0) {
+            return -1;
+        }
+
+        TCHECK2(*tptr, tlv_length);
+        switch(tlv_type) {
+
+        case LS_OPAQUE_GRACE_TLV_PERIOD:
+            if (tlv_length != 4) {
+                printf("\n\t    Bogus length %u != 4", tlv_length);
+                return -1;
+            }
+            printf("%us",EXTRACT_32BITS(tptr));
+            break;
+
+        case LS_OPAQUE_GRACE_TLV_REASON:
+            if (tlv_length != 1) {
+                printf("\n\t    Bogus length %u != 1", tlv_length);
+                return -1;
+            }
+            printf("%s (%u)",
+                   tok2str(lsa_opaque_grace_tlv_reason_values, "Unknown", *tptr),
+                   *tptr);
+            break;
+
+        case LS_OPAQUE_GRACE_TLV_INT_ADDRESS:
+            if (tlv_length != 4) {
+                printf("\n\t    Bogus length %u != 4", tlv_length);
+                return -1;
+            }
+            printf("%s", ipaddr_string(tptr));
+            break;
+
+        default:
+            if (vflag <= 1) {
+                if(!print_unknown_data(tptr,"\n\t      ",tlv_length))
+                    return -1;
+            }
+            break;
+
+        }
+        /* in OSPF everything has to be 32-bit aligned, including TLVs */
+        if (tlv_length%4 != 0)
+            tlv_length+=4-(tlv_length%4);
+        ls_length-=tlv_length;
+        tptr+=tlv_length;
+    }
+
+    return 0;
+trunc:
+    return -1;
+}
+
+int
+ospf_print_te_lsa (u_int8_t *tptr, u_int ls_length) {
+
+    u_int tlv_type, tlv_length, subtlv_type, subtlv_length;
+    u_int priority_level, te_class, count_srlg;
+    union { /* int to float conversion buffer for several subTLVs */
+        float f; 
+        u_int32_t i;
+    } bw;
+
+    while (ls_length != 0) {
+        TCHECK2(*tptr, 4);
+        if (ls_length < 4) {
+            printf("\n\t    Remaining LS length %u < 4", ls_length);
+            return -1;
+        }
+        tlv_type = EXTRACT_16BITS(tptr);
+        tlv_length = EXTRACT_16BITS(tptr+2);
+        tptr+=4;
+        ls_length-=4;
+                    
+        printf("\n\t    %s TLV (%u), length: %u",
+               tok2str(lsa_opaque_te_tlv_values,"unknown",tlv_type),
+               tlv_type,
+               tlv_length);
+
+        if (tlv_length > ls_length) {
+            printf("\n\t    Bogus length %u > %u", tlv_length,
+                   ls_length);
+            return -1;
+        }
+
+        /* Infinite loop protection. */
+        if (tlv_type == 0 || tlv_length ==0) {
+            return -1;
+        }
+
+        switch(tlv_type) {
+        case LS_OPAQUE_TE_TLV_LINK:
+            while (tlv_length >= sizeof(subtlv_type) + sizeof(subtlv_length)) {
+                if (tlv_length < 4) {
+                    printf("\n\t    Remaining TLV length %u < 4",
+                           tlv_length);
+                    return -1;
+                }
+                TCHECK2(*tptr, 4);
+                subtlv_type = EXTRACT_16BITS(tptr);
+                subtlv_length = EXTRACT_16BITS(tptr+2);
+                tptr+=4;
+                tlv_length-=4;
+                            
+                printf("\n\t      %s subTLV (%u), length: %u",
+                       tok2str(lsa_opaque_te_link_tlv_subtlv_values,"unknown",subtlv_type),
+                       subtlv_type,
+                       subtlv_length);
+                            
+                TCHECK2(*tptr, subtlv_length);
+                switch(subtlv_type) {
+                case LS_OPAQUE_TE_LINK_SUBTLV_ADMIN_GROUP:
+                    printf(", 0x%08x", EXTRACT_32BITS(tptr));
+                    break;
+                case LS_OPAQUE_TE_LINK_SUBTLV_LINK_ID:
+                case LS_OPAQUE_TE_LINK_SUBTLV_LINK_LOCAL_REMOTE_ID:
+                    printf(", %s (0x%08x)",
+                           ipaddr_string(tptr),
+                           EXTRACT_32BITS(tptr));
+                    if (subtlv_length == 8) /* rfc4203 */
+                        printf(", %s (0x%08x)",
+                               ipaddr_string(tptr+4),
+                               EXTRACT_32BITS(tptr+4));
+                    break;
+                case LS_OPAQUE_TE_LINK_SUBTLV_LOCAL_IP:
+                case LS_OPAQUE_TE_LINK_SUBTLV_REMOTE_IP:
+                    printf(", %s", ipaddr_string(tptr));
+                    break;
+                case LS_OPAQUE_TE_LINK_SUBTLV_MAX_BW:
+                case LS_OPAQUE_TE_LINK_SUBTLV_MAX_RES_BW:
+                    bw.i = EXTRACT_32BITS(tptr);
+                    printf(", %.3f Mbps", bw.f*8/1000000 );
+                    break;
+                case LS_OPAQUE_TE_LINK_SUBTLV_UNRES_BW:
+                    for (te_class = 0; te_class < 8; te_class++) {
+                        bw.i = EXTRACT_32BITS(tptr+te_class*4);
+                        printf("\n\t\tTE-Class %u: %.3f Mbps",
+                               te_class,
+                               bw.f*8/1000000 );
+                    }
+                    break;
+                case LS_OPAQUE_TE_LINK_SUBTLV_BW_CONSTRAINTS:
+                    printf("\n\t\tBandwidth Constraints Model ID: %s (%u)",
+                           tok2str(diffserv_te_bc_values, "unknown", *tptr),
+                           *tptr);
+                    /* decode BCs until the subTLV ends */
+                    for (te_class = 0; te_class < (subtlv_length-4)/4; te_class++) {
+                        bw.i = EXTRACT_32BITS(tptr+4+te_class*4);
+                        printf("\n\t\t  Bandwidth constraint CT%u: %.3f Mbps",
+                               te_class,
+                               bw.f*8/1000000 );
+                    }
+                    break;
+                case LS_OPAQUE_TE_LINK_SUBTLV_TE_METRIC:
+                    printf(", Metric %u", EXTRACT_32BITS(tptr));
+                    break;
+                case LS_OPAQUE_TE_LINK_SUBTLV_LINK_PROTECTION_TYPE:
+                    printf(", %s, Priority %u",
+                           bittok2str(gmpls_link_prot_values, "none", *tptr),
+                           *(tptr+1));
+                    break;
+                case LS_OPAQUE_TE_LINK_SUBTLV_INTF_SW_CAP_DESCR:
+                    printf("\n\t\tInterface Switching Capability: %s",
+                           tok2str(gmpls_switch_cap_values, "Unknown", *(tptr)));
+                    printf("\n\t\tLSP Encoding: %s\n\t\tMax LSP Bandwidth:",
+                           tok2str(gmpls_encoding_values, "Unknown", *(tptr+1)));
+                    for (priority_level = 0; priority_level < 8; priority_level++) {
+                        bw.i = EXTRACT_32BITS(tptr+4+(priority_level*4));
+                        printf("\n\t\t  priority level %d: %.3f Mbps",
+                               priority_level,
+                               bw.f*8/1000000 );
+                    }
+                    break;
+                case LS_OPAQUE_TE_LINK_SUBTLV_LINK_TYPE:
+                    printf(", %s (%u)",
+                           tok2str(lsa_opaque_te_tlv_link_type_sub_tlv_values,"unknown",*tptr),
+                           *tptr);
+                    break;
+
+                case LS_OPAQUE_TE_LINK_SUBTLV_SHARED_RISK_GROUP:
+                    count_srlg = subtlv_length / 4;
+                    if (count_srlg != 0)
+                        printf("\n\t\t  Shared risk group: ");
+                    while (count_srlg > 0) {
+                        bw.i = EXTRACT_32BITS(tptr);
+                        printf("%d",bw.i);
+                        tptr+=4;
+                        count_srlg--;
+                        if (count_srlg > 0)
+                            printf(", ");
+                    }
+                    break;
+
+                default:
+                    if (vflag <= 1) {
+                        if(!print_unknown_data(tptr,"\n\t\t",subtlv_length))
+                            return -1;
+                    }
+                    break;
+                }
+                /* in OSPF everything has to be 32-bit aligned, including subTLVs */
+                if (subtlv_length%4 != 0)
+                    subtlv_length+=4-(subtlv_length%4);
+                            
+                tlv_length-=subtlv_length;
+                tptr+=subtlv_length;
+                            
+            }
+            break;
+                        
+        case LS_OPAQUE_TE_TLV_ROUTER:
+            if (tlv_length < 4) {
+                printf("\n\t    TLV length %u < 4", tlv_length);
+                return -1;
+            }
+            TCHECK2(*tptr, 4);
+            printf(", %s", ipaddr_string(tptr));
+            break;
+                        
+        default:
+            if (vflag <= 1) {
+                if(!print_unknown_data(tptr,"\n\t      ",tlv_length))
+                    return -1;
+            }
+            break;
+        }
+        /* in OSPF everything has to be 32-bit aligned, including TLVs */
+        if (tlv_length%4 != 0)
+            tlv_length+=4-(tlv_length%4);
+        ls_length-=tlv_length;
+        tptr+=tlv_length;
+    }
+    return 0;
+trunc:
+    return -1;
+}
+
 
 static int
 ospf_print_lshdr(register const struct lsa_hdr *lshp)
@@ -196,7 +463,7 @@ ospf_print_lshdr(register const struct lsa_hdr *lshp)
         }
 
         TCHECK(lshp->ls_seq);	/* XXX - ls_length check checked this */
-	printf("\n\t  Advertising Router: %s, seq 0x%08x, age %us, length: %u",
+	printf("\n\t  Advertising Router %s, seq 0x%08x, age %us, length %u",
 	       ipaddr_string(&lshp->ls_router),
 	       EXTRACT_32BITS(&lshp->ls_seq),
 	       EXTRACT_16BITS(&lshp->ls_age),
@@ -208,7 +475,7 @@ ospf_print_lshdr(register const struct lsa_hdr *lshp)
         case LS_TYPE_OPAQUE_LL:
         case LS_TYPE_OPAQUE_AL:
         case LS_TYPE_OPAQUE_DW:
-            printf("\n\t    %s LSA (%d), Opaque-Type: %s LSA (%u), Opaque-ID: %u",
+            printf("\n\t    %s LSA (%d), Opaque-Type %s LSA (%u), Opaque-ID %u",
                    tok2str(lsa_values,"unknown",lshp->ls_type),
                    lshp->ls_type,
 
@@ -253,14 +520,9 @@ ospf_print_lsa(register const struct lsa *lsap)
 	register const struct aslametric *almp;
 	register const struct mcla *mcp;
 	register const u_int32_t *lp;
-	register int j, k, tlv_type, tlv_length, subtlv_type, subtlv_length, priority_level, te_class;
+	register int j, k, tlv_type, tlv_length;
 	register int ls_length;
 	const u_int8_t *tptr;
-	int count_srlg;
-        union { /* int to float conversion buffer for several subTLVs */
-            float f; 
-            u_int32_t i;
-        } bw;
 
 	tptr = (u_int8_t *)lsap->lsa_un.un_unknown; /* squelch compiler warnings */
         ls_length = ospf_print_lshdr(&lsap->ls_hdr);
@@ -346,7 +608,7 @@ ospf_print_lsa(register const struct lsa *lsap)
 		lp = lsap->lsa_un.un_sla.sla_tosmetric;
                 /* suppress tos if its not supported */
                 if(!((lsap->ls_hdr.ls_options)&OSPF_OPTION_T)) {
-                    printf(", metric: %u", EXTRACT_32BITS(lp)&SLA_MASK_METRIC);
+                    printf(", metric %u", EXTRACT_32BITS(lp)&SLA_MASK_METRIC);
                     break;
                 }
 		while ((u_char *)lp < ls_end) {
@@ -493,244 +755,30 @@ ospf_print_lsa(register const struct lsa *lsap)
                     }
                     tptr+=tlv_length;
                 }
-
                 break;
+
             case LS_OPAQUE_TYPE_GRACE:
-		tptr = (u_int8_t *)(&lsap->lsa_un.un_grace_tlv.type);
-
-		while (ls_length != 0) {
-                    TCHECK2(*tptr, 4);
-		    if (ls_length < 4) {
-                        printf("\n\t    Remaining LS length %u < 4", ls_length);
-                        return(ls_end);
-                    }
-                    tlv_type = EXTRACT_16BITS(tptr);
-                    tlv_length = EXTRACT_16BITS(tptr+2);
-                    tptr+=4;
-                    ls_length-=4;
-                    
-                    printf("\n\t    %s TLV (%u), length: %u, value: ",
-                           tok2str(lsa_opaque_grace_tlv_values,"unknown",tlv_type),
-                           tlv_type,
-                           tlv_length);
-
-                    if (tlv_length > ls_length) {
-                        printf("\n\t    Bogus length %u > %u", tlv_length,
-                            ls_length);
-                        return(ls_end);
-                    }
-                    ls_length-=tlv_length;
-                    TCHECK2(*tptr, tlv_length);
-                    switch(tlv_type) {
-
-                    case LS_OPAQUE_GRACE_TLV_PERIOD:
-                        if (tlv_length != 4) {
-                            printf("\n\t    Bogus length %u != 4", tlv_length);
-                            return(ls_end);
-                        }
-                        printf("%us",EXTRACT_32BITS(tptr));
-                        break;
-                    case LS_OPAQUE_GRACE_TLV_REASON:
-                        if (tlv_length != 1) {
-                            printf("\n\t    Bogus length %u != 1", tlv_length);
-                            return(ls_end);
-                        }
-                        printf("%s (%u)",
-                               tok2str(lsa_opaque_grace_tlv_reason_values, "Unknown", *tptr),
-                               *tptr);
-                        break;
-                    case LS_OPAQUE_GRACE_TLV_INT_ADDRESS:
-                        if (tlv_length != 4) {
-                            printf("\n\t    Bogus length %u != 4", tlv_length);
-                            return(ls_end);
-                        }
-                        printf("%s", ipaddr_string(tptr));
-                        break;
-                    default:
-                        if (vflag <= 1) {
-                            if(!print_unknown_data(tptr,"\n\t      ",tlv_length))
-                                return(ls_end);
-                        }
-                        break;
-
-                    }
-                    tptr+=tlv_length;
-                }
-
-                break;
-	    case LS_OPAQUE_TYPE_TE:
-		tptr = (u_int8_t *)(&lsap->lsa_un.un_te_lsa_tlv.type);
-
-		while (ls_length != 0) {
-                    TCHECK2(*tptr, 4);
-		    if (ls_length < 4) {
-                        printf("\n\t    Remaining LS length %u < 4", ls_length);
-                        return(ls_end);
-                    }
-                    tlv_type = EXTRACT_16BITS(tptr);
-                    tlv_length = EXTRACT_16BITS(tptr+2);
-                    tptr+=4;
-                    ls_length-=4;
-                    
-                    printf("\n\t    %s TLV (%u), length: %u",
-                           tok2str(lsa_opaque_te_tlv_values,"unknown",tlv_type),
-                           tlv_type,
-                           tlv_length);
-
-                    if (tlv_length > ls_length) {
-                        printf("\n\t    Bogus length %u > %u", tlv_length,
-                            ls_length);
-                        return(ls_end);
-                    }
-                    ls_length-=tlv_length;
-                    switch(tlv_type) {
-                    case LS_OPAQUE_TE_TLV_LINK:
-                        while (tlv_length != 0) {
-                            if (tlv_length < 4) {
-                                printf("\n\t    Remaining TLV length %u < 4",
-                                    tlv_length);
-                                return(ls_end);
-                            }
-                            TCHECK2(*tptr, 4);
-                            subtlv_type = EXTRACT_16BITS(tptr);
-                            subtlv_length = EXTRACT_16BITS(tptr+2);
-                            tptr+=4;
-                            tlv_length-=4;
-                            
-                            printf("\n\t      %s subTLV (%u), length: %u",
-                                   tok2str(lsa_opaque_te_link_tlv_subtlv_values,"unknown",subtlv_type),
-                                   subtlv_type,
-                                   subtlv_length);
-                            
-                            TCHECK2(*tptr, subtlv_length);
-                            switch(subtlv_type) {
-                            case LS_OPAQUE_TE_LINK_SUBTLV_ADMIN_GROUP:
-                                printf(", 0x%08x", EXTRACT_32BITS(tptr));
-                                break;
-                            case LS_OPAQUE_TE_LINK_SUBTLV_LINK_ID:
-                            case LS_OPAQUE_TE_LINK_SUBTLV_LINK_LOCAL_REMOTE_ID:
-                                printf(", %s (0x%08x)",
-                                       ipaddr_string(tptr),
-                                       EXTRACT_32BITS(tptr));
-                                if (subtlv_length == 8) /* draft-ietf-ccamp-ospf-gmpls-extensions */
-                                    printf(", %s (0x%08x)",
-                                           ipaddr_string(tptr+4),
-                                           EXTRACT_32BITS(tptr+4));
-                                break;
-                            case LS_OPAQUE_TE_LINK_SUBTLV_LOCAL_IP:
-                            case LS_OPAQUE_TE_LINK_SUBTLV_REMOTE_IP:
-                                printf(", %s", ipaddr_string(tptr));
-                                break;
-                            case LS_OPAQUE_TE_LINK_SUBTLV_MAX_BW:
-                            case LS_OPAQUE_TE_LINK_SUBTLV_MAX_RES_BW:
-                                bw.i = EXTRACT_32BITS(tptr);
-                                printf(", %.3f Mbps", bw.f*8/1000000 );
-                                break;
-                            case LS_OPAQUE_TE_LINK_SUBTLV_UNRES_BW:
-                                for (te_class = 0; te_class < 8; te_class++) {
-                                    bw.i = EXTRACT_32BITS(tptr+te_class*4);
-                                    printf("\n\t\tTE-Class %u: %.3f Mbps",
-                                           te_class,
-                                           bw.f*8/1000000 );
-                                }
-                                break;
-                            case LS_OPAQUE_TE_LINK_SUBTLV_BW_CONSTRAINTS:
-                                printf("\n\t\tBandwidth Constraints Model ID: %s (%u)",
-                                       tok2str(diffserv_te_bc_values, "unknown", *tptr),
-                                       *tptr);
-                                /* decode BCs until the subTLV ends */
-                                for (te_class = 0; te_class < (subtlv_length-4)/4; te_class++) {
-                                    bw.i = EXTRACT_32BITS(tptr+4+te_class*4);
-                                    printf("\n\t\t  Bandwidth constraint CT%u: %.3f Mbps",
-                                           te_class,
-                                           bw.f*8/1000000 );
-                                }
-                                break;
-                            case LS_OPAQUE_TE_LINK_SUBTLV_TE_METRIC:
-                                printf(", Metric %u", EXTRACT_32BITS(tptr));
-                                break;
-                            case LS_OPAQUE_TE_LINK_SUBTLV_LINK_PROTECTION_TYPE:
-                                printf(", %s, Priority %u",
-                                       bittok2str(gmpls_link_prot_values, "none", *tptr),
-                                       *(tptr+1));
-                                break;
-                            case LS_OPAQUE_TE_LINK_SUBTLV_INTF_SW_CAP_DESCR:
-                                printf("\n\t\tInterface Switching Capability: %s",
-                                       tok2str(gmpls_switch_cap_values, "Unknown", *(tptr)));
-                                printf("\n\t\tLSP Encoding: %s\n\t\tMax LSP Bandwidth:",
-                                       tok2str(gmpls_encoding_values, "Unknown", *(tptr+1)));
-                                for (priority_level = 0; priority_level < 8; priority_level++) {
-                                    bw.i = EXTRACT_32BITS(tptr+4+(priority_level*4));
-                                    printf("\n\t\t  priority level %d: %.3f Mbps",
-                                           priority_level,
-                                           bw.f*8/1000000 );
-                                }
-                                break;
-                            case LS_OPAQUE_TE_LINK_SUBTLV_LINK_TYPE:
-                                printf(", %s (%u)",
-                                       tok2str(lsa_opaque_te_tlv_link_type_sub_tlv_values,"unknown",*tptr),
-                                       *tptr);
-                                break;
-
-                            case LS_OPAQUE_TE_LINK_SUBTLV_SHARED_RISK_GROUP:
-                                count_srlg = subtlv_length / 4;
-                                if (count_srlg != 0)
-                                     printf("\n\t\t  Shared risk group: ");
-                                while (count_srlg > 0) {
-                                        bw.i = EXTRACT_32BITS(tptr);
-                                        printf("%d",bw.i);
-                                        tptr+=4;
-                                        count_srlg--;
-                                        if (count_srlg > 0)
-                                            printf(", ");
-                                }
-                                break;
-
-                            default:
-                                if (vflag <= 1) {
-                                    if(!print_unknown_data(tptr,"\n\t\t",subtlv_length))
-                                        return(ls_end);
-                                }
-                                break;
-                            }
-                            /* in OSPF everything has to be 32-bit aligned, including TLVs */
-                            if (subtlv_length%4 != 0)
-                                subtlv_length+=4-(subtlv_length%4);
-                            
-                            tlv_length-=subtlv_length;
-                            tptr+=subtlv_length;
-                            
-                        }
-                        break;
-                        
-                    case LS_OPAQUE_TE_TLV_ROUTER:
-                        if (tlv_length < 4) {
-                            printf("\n\t    TLV length %u < 4", tlv_length);
-                            return(ls_end);
-                        }
-                        TCHECK2(*tptr, 4);
-                        printf(", %s", ipaddr_string(tptr));
-                        break;
-                        
-                    default:
-                        if (vflag <= 1) {
-                            if(!print_unknown_data(tptr,"\n\t      ",tlv_length))
-                                return(ls_end);
-                        }
-                        break;
-                    }
-                    tptr+=tlv_length;
-		}
-                break;
-	    }
-	    break;
-        default:
-            if (vflag <= 1) {
-                if(!print_unknown_data((u_int8_t *)lsap->lsa_un.un_unknown,
-                                       "\n\t    ", ls_length))
+                if (ospf_print_grace_lsa((u_int8_t *)(&lsap->lsa_un.un_grace_tlv.type),
+                                         ls_length) == -1) {
                     return(ls_end);
-            } 
-            break;
+                }
+                break;
+
+	    case LS_OPAQUE_TYPE_TE:
+                if (ospf_print_te_lsa((u_int8_t *)(&lsap->lsa_un.un_te_lsa_tlv.type),
+                                      ls_length) == -1) {
+                    return(ls_end);
+                }
+                break;
+
+            default:
+                if (vflag <= 1) {
+                    if(!print_unknown_data((u_int8_t *)lsap->lsa_un.un_unknown,
+                                           "\n\t    ", ls_length))
+                        return(ls_end);
+                } 
+                break;
+            }
         }
 
         /* do we want to see an additionally hexdump ? */
@@ -765,11 +813,11 @@ ospf_decode_v2(register const struct ospfhdr *op,
 		break;
 
 	case OSPF_TYPE_HELLO:
-                printf("\n\tOptions: [%s]",
+                printf("\n\tOptions [%s]",
                        bittok2str(ospf_option_values,"none",op->ospf_hello.hello_options));
 
                 TCHECK(op->ospf_hello.hello_deadint);
-                printf("\n\t  Hello Timer: %us, Dead Timer %us, Mask: %s, Priority: %u",
+                printf("\n\t  Hello Timer %us, Dead Timer %us, Mask %s, Priority %u",
                        EXTRACT_16BITS(&op->ospf_hello.hello_helloint),
                        EXTRACT_32BITS(&op->ospf_hello.hello_deadint),
                        ipaddr_string(&op->ospf_hello.hello_mask),
@@ -797,19 +845,17 @@ ospf_decode_v2(register const struct ospfhdr *op,
 
 	case OSPF_TYPE_DD:
 		TCHECK(op->ospf_db.db_options);
-                printf("\n\tOptions: [%s]",
+                printf("\n\tOptions [%s]",
                        bittok2str(ospf_option_values,"none",op->ospf_db.db_options));
 		TCHECK(op->ospf_db.db_flags);
-                printf(", DD Flags: [%s]",
+                printf(", DD Flags [%s]",
                        bittok2str(ospf_dd_flag_values,"none",op->ospf_db.db_flags));
 
-		if (vflag) {
-			/* Print all the LS adv's */
-			lshp = op->ospf_db.db_lshdr;
-			while (ospf_print_lshdr(lshp) != -1) {
-				++lshp;
-			}
-		}
+                /* Print all the LS adv's */
+                lshp = op->ospf_db.db_lshdr;
+                while (ospf_print_lshdr(lshp) != -1) {
+                    ++lshp;
+                }
 		break;
 
 	case OSPF_TYPE_LS_REQ:
@@ -863,7 +909,6 @@ ospf_decode_v2(register const struct ospfhdr *op,
                 break;
 
 	default:
-		printf("v2 type (%d)", op->ospf_type);
 		break;
 	}
 	return (0);
@@ -892,15 +937,16 @@ ospf_print(register const u_char *bp, register u_int length,
 	/* value.  If it's not valid, say so and return */
 	TCHECK(op->ospf_type);
 	cp = tok2str(type2str, "unknown LS-type", op->ospf_type);
-	printf("OSPFv%u, %s, length: %u",
+	printf("OSPFv%u, %s, length %u",
 	       op->ospf_version,
 	       cp,
 	       length);
 	if (*cp == 'u')
 		return;
 
-        if(!vflag) /* non verbose - so lets bail out here */
+        if(!vflag) { /* non verbose - so lets bail out here */
                 return;
+        }
 
 	TCHECK(op->ospf_len);
 	if (length != EXTRACT_16BITS(&op->ospf_len)) {
@@ -910,7 +956,7 @@ ospf_print(register const u_char *bp, register u_int length,
 	dataend = bp + length;
 
 	TCHECK(op->ospf_routerid);
-        printf("\n\tRouter-ID: %s", ipaddr_string(&op->ospf_routerid));
+        printf("\n\tRouter-ID %s", ipaddr_string(&op->ospf_routerid));
 
 	TCHECK(op->ospf_areaid);
 	if (op->ospf_areaid.s_addr != 0)
