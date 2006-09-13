@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf6.c,v 1.14 2006-09-05 15:50:26 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf6.c,v 1.15 2006-09-13 06:31:11 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -150,7 +150,7 @@ ospf6_print_lshdr(register const struct lsa6_hdr *lshp)
                ipaddr_string(&lshp->ls_router),
                EXTRACT_32BITS(&lshp->ls_seq),
                EXTRACT_16BITS(&lshp->ls_age),
-               EXTRACT_16BITS(&lshp->ls_length)-sizeof(struct lsa6_hdr));
+               EXTRACT_16BITS(&lshp->ls_length)-(u_int)sizeof(struct lsa6_hdr));
 
 	ospf6_print_ls_type(EXTRACT_16BITS(&lshp->ls_type), &lshp->ls_stateid);
 
