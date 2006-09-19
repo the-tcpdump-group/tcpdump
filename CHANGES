@@ -1,4 +1,33 @@
-$Header: /tcpdump/master/tcpdump/CHANGES,v 1.87.2.11 2005-09-20 06:05:34 guy Exp $
+$Header: /tcpdump/master/tcpdump/CHANGES,v 1.87.2.12 2006-09-19 18:24:44 ken Exp $
+
+Tue.	September 19, 2006. ken@xelerance.com. Summary for 3.9.5 tcpdump release
+	
+	Fix compiling on AIX (, at end of ENUM)
+	Updated list of DNS RR typecodes
+	Use local Ethernet defs on WIN32
+	Add support for Frame-Relay ARP
+	Fixes for compiling under MSVC++
+	Add support for parsing Juniper .pcap files
+	Add support for FRF.16 Multilink Frame-Relay (DLT_MFR)
+	Rework the OSPFv3 printer
+	Fix printing for 4.4BSD/NetBSD NFS Filehandles
+	Add support for Cisco style NLPID encapsulation
+	Add cisco prop. eigrp related, extended communities
+	Add support for BGP signaled VPLS
+	Cleanup the bootp printer
+	Add support for PPP over Frame-Relay
+	Add some bounds checking to the IP options code, and clean up 
+	 the options output a bit.
+	Add additional modp groups to ISAKMP printer
+	Add support for Address-Withdraw and Label-Withdraw Msgs
+	Add support for the BFD Discriminator TLV
+	Fixes for 64bit compiling
+	Add support for PIMv2 checksum verification
+	Add support for further dissection of the IPCP Compression Option
+	Add support for Cisco's proposed VQP protocol
+	Add basic support for keyed authentication TCP option
+	Lots of minor cosmetic changes to output printers
+
 
 Mon. 	September 19, 2005.  ken@xelerance.com. Summary for 3.9.4 tcpdump release
 	Decoder support for more Juniper link-layer types
