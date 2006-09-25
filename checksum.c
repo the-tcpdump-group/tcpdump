@@ -19,7 +19,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/checksum.c,v 1.3 2006-02-09 21:34:38 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/checksum.c,v 1.4 2006-09-25 09:23:32 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -75,4 +75,63 @@ init_checksum(void) {
 
     init_crc10_table();
 
+}
+
+/*
+ * Creates the OSI Fletcher checksum. See 8473-1, Appendix C, section C.3.
+ * The checksum field of the passed PDU does not need to be reset to zero.
+ */
+u_int16_t
+create_osi_cksum (const u_int8_t *pptr, int checksum_offset, int length)
+{
+
+    int x;
+    int y;
+    u_int32_t mul;
+    u_int32_t c0;
+    u_int32_t c1;
+    u_int16_t checksum;
+    int index;
+
+    checksum = 0;
+
+    c0 = 0;
+    c1 = 0;
+
+    for (index = 0; index < length; index++) {
+        /*
+         * Ignore the contents of the checksum field.
+         */
+        if (index == checksum_offset ||
+            index == checksum_offset+1) {
+            c1 += c0;
+            pptr++;
+        } else {
+            c0 = c0 + *(pptr++);
+            c1 += c0;
+        } 
+    }
+
+    c0 = c0 % 255;
+    c1 = c1 % 255;
+
+    mul = (length - checksum_offset)*(c0);
+  
+    x = mul - c0 - c1;
+    y = c1 - mul - 1;
+
+    if ( y >= 0 ) y++;
+    if ( x < 0 ) x--;
+
+    x %= 255;
+    y %= 255;
+
+
+    if (x == 0) x = 255;
+    if (y == 0) y = 255;
+
+    y &= 0x00FF;
+    checksum = ((x << 8) | y);
+  
+    return checksum;
 }

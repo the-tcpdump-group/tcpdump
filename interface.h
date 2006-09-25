@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.270 2006-05-05 23:13:00 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.271 2006-09-25 09:23:32 hannes Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -163,6 +163,7 @@ extern const char *dnnum_string(u_short);
 /* checksum routines */
 extern void init_checksum(void);
 extern u_int16_t verify_crc10_cksum(u_int16_t, const u_char *, int);
+extern u_int16_t create_osi_cksum(const u_int8_t *, int, int);
 
 /* The printer routines. */
 

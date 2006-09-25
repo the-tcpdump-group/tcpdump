@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.160 2006-06-16 18:08:35 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.161 2006-09-25 09:23:32 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -508,7 +508,8 @@ struct isis_tlv_ptp_adj {
     u_int8_t neighbor_extd_local_circuit_id[4];
 };
 
-static int osi_cksum(const u_int8_t *, u_int);
+static void osi_print_cksum(const u_int8_t *pptr, u_int16_t checksum,
+                            u_int checksum_offset, u_int length);
 static int clnp_print(const u_int8_t *, u_int);
 static void esis_print(const u_int8_t *, u_int);
 static int isis_print(const u_int8_t *, u_int);
@@ -771,7 +772,7 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
         }
         printf("%slength %u",eflag ? "" : ", ",length);
 
-        printf("\n\t%s PDU, hlen: %u, v: %u, lifetime: %u.%us, Segment PDU length: %u, checksum: 0x%04x ",
+        printf("\n\t%s PDU, hlen: %u, v: %u, lifetime: %u.%us, Segment PDU length: %u, checksum: 0x%04x",
                tok2str(clnp_pdu_values, "unknown (%u)",clnp_pdu_type),
                clnp_header->length_indicator,
                clnp_header->version,
@@ -780,10 +781,8 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
                EXTRACT_16BITS(clnp_header->segment_length),
                EXTRACT_16BITS(clnp_header->cksum));
 
-        /* do not attempt to verify the checksum if it is zero */
-        if (EXTRACT_16BITS(clnp_header->cksum) == 0)
-                printf("(unverified)");
-            else printf("(%s)", osi_cksum(optr, clnp_header->length_indicator) ? "incorrect" : "correct");
+        osi_print_cksum(optr, EXTRACT_16BITS(clnp_header->cksum), 7,
+                        clnp_header->length_indicator);
 
         printf("\n\tFlags [%s]",
                bittok2str(clnp_flag_values,"none",clnp_flags));
@@ -1037,12 +1036,9 @@ esis_print(const u_int8_t *pptr, u_int length)
                    esis_pdu_type);
 
         printf(", v: %u%s", esis_header->version, esis_header->version == ESIS_VERSION ? "" : "unsupported" );
-        printf(", checksum: 0x%04x ", EXTRACT_16BITS(esis_header->cksum));
-        /* do not attempt to verify the checksum if it is zero */
-        if (EXTRACT_16BITS(esis_header->cksum) == 0)
-                printf("(unverified)");
-        else
-                printf("(%s)", osi_cksum(pptr, li) ? "incorrect" : "correct");
+        printf(", checksum: 0x%04x", EXTRACT_16BITS(esis_header->cksum));
+
+        osi_print_cksum(pptr, EXTRACT_16BITS(esis_header->cksum), 7, li);
 
         printf(", holding time: %us, length indicator: %u",EXTRACT_16BITS(esis_header->holdtime),li);
 
@@ -2013,15 +2009,9 @@ static int isis_print (const u_int8_t *p, u_int length)
                EXTRACT_16BITS(header_lsp->remaining_lifetime),
                EXTRACT_16BITS(header_lsp->checksum));
 
-        /* if this is a purge do not attempt to verify the checksum */
-        if ( EXTRACT_16BITS(header_lsp->remaining_lifetime) == 0 &&
-             EXTRACT_16BITS(header_lsp->checksum) == 0)
-            printf(" (purged)");
-        else
-            /* verify the checksum -
-             * checking starts at the lsp-id field at byte position [12]
-             * hence the length needs to be reduced by 12 bytes */
-            printf(" (%s)", (osi_cksum((u_int8_t *)header_lsp->lsp_id, length-12)) ? "incorrect" : "correct");
+
+        osi_print_cksum((u_int8_t *)header_lsp->lsp_id,
+                        EXTRACT_16BITS(header_lsp->checksum), 12, length-12);
 
 	printf(", PDU length: %u, Flags: [ %s",
                pdu_len,
@@ -2522,9 +2512,7 @@ static int isis_print (const u_int8_t *p, u_int length)
              * to avoid conflicts the checksum TLV is zeroed.
              * see rfc3358 for details
              */
-            if (EXTRACT_16BITS(tptr) == 0)
-                printf("(unverified)");
-            else printf("(%s)", osi_cksum(optr, length) ? "incorrect" : "correct");
+            osi_print_cksum(optr, EXTRACT_16BITS(tptr), tptr-optr, length);
 	    break;
 
 	case ISIS_TLV_MT_SUPPORTED:
@@ -2716,24 +2704,24 @@ static int isis_print (const u_int8_t *p, u_int length)
     return(1);
 }
 
-/*
- * Verify the checksum.  See 8473-1, Appendix C, section C.4.
- */
-
-static int
-osi_cksum(const u_int8_t *tptr, u_int len)
+static void
+osi_print_cksum (const u_int8_t *pptr, u_int16_t checksum,
+                    u_int checksum_offset, u_int length)
 {
-	int32_t c0 = 0, c1 = 0;
+        u_int16_t calculated_checksum;
 
-	while ((int)--len >= 0) {
-		c0 += *tptr++;
-		c0 %= 255;
-		c1 += c0;
-		c1 %= 255;
-	}
-	return (c0 | c1);
+        /* do not attempt to verify the checksum if it is zero */
+        if (!checksum) {
+                printf("(unverified)");
+        } else {
+                calculated_checksum = create_osi_cksum(pptr, checksum_offset, length);
+                if (checksum == calculated_checksum) {
+                        printf(" (correct)");
+                } else {
+                        printf(" (incorrect should be 0x%04x)", calculated_checksum);
+                }
+        }
 }
-
 
 /*
  * Local Variables:
