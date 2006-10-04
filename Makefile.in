@@ -17,7 +17,7 @@
 #  WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 #  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.302 2006-08-27 18:44:09 mcr Exp $ (LBL)
+# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.303 2006-10-04 18:03:15 guy Exp $ (LBL)
 
 #
 # Various configurable paths (remember to edit Makefile.in, not Makefile)
@@ -154,7 +154,7 @@ version.o: version.c
 
 version.c: $(srcdir)/VERSION
 	@rm -f $@
-	if grep CVS ${srcdir}/VERSION >/dev/null; then read ver <${srcdir}/VERSION; echo -n $$ver; date +_%Y_%m_%d; else cat ${srcdir}/VERSION; fi | sed -e 's/.*/char version[] = "&";/' - > $@
+	if grep CVS ${srcdir}/VERSION >/dev/null; then read ver <${srcdir}/VERSION; echo -n $$ver; date +_%Y_%m_%d; else cat ${srcdir}/VERSION; fi | sed -e 's/.*/char version[] = "&";/' > $@
 
 
 install:
