@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.91.2.9 2006-02-02 12:36:46 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.91.2.10 2006-10-06 06:26:40 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -1548,7 +1548,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
 					  *(tptr+6),
 					  tokbuf, sizeof(tokbuf)),
                                (*(tptr+7) &  BGP_OSPF_RTYPE_METRIC_TYPE) ? "E2" : "",
-                               (*(tptr+6) == (BGP_OSPF_RTYPE_EXT ||BGP_OSPF_RTYPE_NSSA )) ? "E1" : "");
+                               ((*(tptr+6) == BGP_OSPF_RTYPE_EXT) || (*(tptr+6) == BGP_OSPF_RTYPE_NSSA)) ? "E1" : "");
                         break;
                     case BGP_EXT_COM_L2INFO:
                         printf(": %s Control Flags [0x%02x]:MTU %u",
