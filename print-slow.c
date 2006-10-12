@@ -20,7 +20,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-slow.c,v 1.7 2006-08-19 06:59:17 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-slow.c,v 1.8 2006-10-12 05:44:33 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -176,6 +176,10 @@ struct slow_oam_variableresponse_t {
     u_int8_t branch;
     u_int8_t leaf[2];
     u_int8_t length;
+};
+
+struct slow_oam_loopbackctrl_t {
+    u_int8_t command;
 };
 
 static const struct tok slow_oam_loopbackctrl_cmd_values[] = {
@@ -473,6 +477,7 @@ void slow_oam_print(register const u_char *tptr, register u_int tlen) {
         const struct slow_oam_link_event_t *slow_oam_link_event;
         const struct slow_oam_variablerequest_t *slow_oam_variablerequest;
         const struct slow_oam_variableresponse_t *slow_oam_variableresponse;
+        const struct slow_oam_loopbackctrl_t *slow_oam_loopbackctrl;
     } tlv;
     
     ptr.slow_oam_common_header = (struct slow_oam_common_header_t *)tptr;
@@ -627,6 +632,17 @@ void slow_oam_print(register const u_char *tptr, register u_int tlen) {
             tptr += ptr.slow_oam_tlv_header->length;
         }
         break;
+ 
+    case SLOW_OAM_CODE_LOOPBACK_CTRL:
+        tlv.slow_oam_loopbackctrl = (const struct slow_oam_loopbackctrl_t *)tptr;
+        printf("\n\t  Command %s (%u)",
+               tok2str(slow_oam_loopbackctrl_cmd_values,
+                       "Unknown",
+                       tlv.slow_oam_loopbackctrl->command),
+               tlv.slow_oam_loopbackctrl->command);
+               tptr ++;
+               tlen --;
+        break;
 
         /*
          * FIXME those are the defined codes that lack a decoder
@@ -634,7 +650,6 @@ void slow_oam_print(register const u_char *tptr, register u_int tlen) {
          */
     case SLOW_OAM_CODE_VAR_REQUEST:
     case SLOW_OAM_CODE_VAR_RESPONSE:
-    case SLOW_OAM_CODE_LOOPBACK_CTRL:
     case SLOW_OAM_CODE_PRIVATE:
     default:
         if (vflag <= 1) {
