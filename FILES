@@ -126,6 +126,7 @@ print-bfd.c
 print-bgp.c
 print-bootp.c
 print-cdp.c
+print-cfm.c
 print-chdlc.c
 print-cip.c
 print-cnfp.c

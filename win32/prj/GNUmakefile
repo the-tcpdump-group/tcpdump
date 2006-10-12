@@ -57,6 +57,7 @@ OBJS = \
 	../../print-bgp.o \
 	../../print-bootp.o \
 	../../print-cdp.o \
+	../../print-cfm.o \
 	../../print-chdlc.o \
 	../../print-cip.o \
 	../../print-cnfp.o \

@@ -217,6 +217,10 @@ SOURCE="..\..\print-cdp.c"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\print-cfm.c"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\print-chdlc.c"
 # End Source File
 # Begin Source File

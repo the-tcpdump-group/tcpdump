@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/ethertype.h,v 1.26 2006-02-10 04:52:25 hannes Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/ethertype.h,v 1.27 2006-10-12 10:26:12 hannes Exp $ (LBL)
  */
 
 /*
@@ -138,6 +138,9 @@
 #endif
 #ifndef	ETHERTYPE_VMAN
 #define	ETHERTYPE_VMAN	        0x9100 /* Extreme VMAN Protocol */ 
+#endif
+#ifndef	ETHERTYPE_CFM
+#define	ETHERTYPE_CFM           0xabcd /* 802.1ag - Ethertype is not yet assigned */
 #endif
 #ifndef	ETHERTYPE_ISO
 #define	ETHERTYPE_ISO           0xfefe  /* nonstandard - used in Cisco HDLC encapsulation */
