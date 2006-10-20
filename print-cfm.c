@@ -19,7 +19,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cfm.c,v 1.1 2006-10-12 10:26:12 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cfm.c,v 1.2 2006-10-20 18:07:55 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -140,15 +140,6 @@ struct cfm_ltr_t {
     u_int8_t reserved[6];
 };
 
-/*
- * TLVs
- */
-
-struct cfm_tlv_header_t {
-    u_int8_t type;
-    u_int8_t length[2];
-};
-
 #define CFM_TLV_END 0
 #define CFM_TLV_SENDER_ID 1
 #define CFM_TLV_PORT_STATUS 2
@@ -170,15 +161,40 @@ static const struct tok cfm_tlv_values[] = {
     { 0, NULL}
 };
 
+/*
+ * TLVs
+ */
+
+struct cfm_tlv_header_t {
+    u_int8_t type;
+    u_int8_t length[2];
+};
+
 /* FIXME define TLV formats */
+
+static const struct tok cfm_tlv_port_status_values[] = {
+    { 1, "Blocked"},
+    { 2, "Up"},
+    { 0, NULL}
+};
+
+static const struct tok cfm_tlv_interface_status_values[] = {
+    { 1, "Up"},
+    { 2, "Down"},
+    { 3, "Testing"},
+    { 5, "Dormant"},
+    { 6, "not present"},
+    { 7, "lower Layer down"},
+    { 0, NULL}
+};
 
 void
 cfm_print(register const u_char *pptr, register u_int length) {
 
     const struct cfm_common_header_t *cfm_common_header;
     const struct cfm_tlv_header_t *cfm_tlv_header;
-    const u_int8_t *tptr, *tlv_tptr, *ma_name, *ma_nameformat, *ma_namelength;
-    u_int tlen, cfm_tlv_len, cfm_tlv_type, tlv_tlen, ccm_interval;
+    const u_int8_t *tptr, *ma_name, *ma_nameformat, *ma_namelength;
+    u_int tlen, cfm_tlv_len, cfm_tlv_type, ccm_interval;
 
 
     union {
@@ -329,56 +345,76 @@ cfm_print(register const u_char *pptr, register u_int length) {
     tlen -= cfm_common_header->first_tlv_offset;
     
     while (tlen > 0) {
-        /* did we capture enough for fully decoding the object header ? */
-        TCHECK2(*tptr, sizeof(struct cfm_tlv_header_t));
-
         cfm_tlv_header = (const struct cfm_tlv_header_t *)tptr;
-        cfm_tlv_len=EXTRACT_16BITS(&cfm_tlv_header->length);
+
+        /* Enough to read the tlv type ? */
+        TCHECK2(*tptr, 1);
         cfm_tlv_type=cfm_tlv_header->type;
 
-        if (cfm_tlv_len < sizeof(struct cfm_tlv_header_t) ||
-            cfm_tlv_len > tlen) {
-            print_unknown_data(tptr+sizeof(sizeof(struct cfm_tlv_header_t)),"\n\t    ",tlen);
-            return;
+        if (cfm_tlv_type != CFM_TLV_END) {
+            /* did we capture enough for fully decoding the object header ? */
+            TCHECK2(*tptr, sizeof(struct cfm_tlv_header_t));            
+            cfm_tlv_len=EXTRACT_16BITS(&cfm_tlv_header->length);
+        } else {
+            cfm_tlv_len = 0;
         }
 
-        printf("\n\t  %s TLV (0x%04x), length: %u",
+        printf("\n\t%s TLV (0x%02x), length %u",
                tok2str(cfm_tlv_values,
                        "Unknown",
                        cfm_tlv_type),
                cfm_tlv_type,
                cfm_tlv_len);
 
-        tlv_tptr=tptr+sizeof(struct cfm_tlv_header_t);
-        tlv_tlen=cfm_tlv_len-sizeof(struct cfm_tlv_header_t);
+        /* sanity check for not walking off and infinite loop check. */
+        if ((cfm_tlv_type != CFM_TLV_END) &&
+            ((cfm_tlv_len + sizeof(struct cfm_tlv_header_t) > tlen) ||
+             (!cfm_tlv_len))) {
+            print_unknown_data(tptr,"\n\t  ",tlen);
+            return;
+        }
+
+        tptr += sizeof(struct cfm_tlv_header_t);
+        tlen -= sizeof(struct cfm_tlv_header_t);
 
         /* did we capture enough for fully decoding the object ? */
-        TCHECK2(*tptr, cfm_tlv_len);
+        if (cfm_tlv_type != CFM_TLV_END) {
+            TCHECK2(*tptr, cfm_tlv_len);
+        }
 
         switch(cfm_tlv_type) {
+        case CFM_TLV_END:
+            /* we are done - bail out */
+            return;
+        case CFM_TLV_PORT_STATUS:
+            printf(", Status: %s (%u)",
+                   tok2str(cfm_tlv_port_status_values, "Unknown", *tptr),
+                   *tptr);
+            break;
+        case CFM_TLV_INTERFACE_STATUS:
+            printf(", Status: %s (%u)",
+                   tok2str(cfm_tlv_interface_status_values, "Unknown", *tptr),
+                   *tptr);
+            break;
 
             /*
              * FIXME those are the defined TLVs that lack a decoder
              * you are welcome to contribute code ;-)
              */
 
-        case CFM_TLV_END:
         case CFM_TLV_SENDER_ID:
-        case CFM_TLV_PORT_STATUS:
-        case CFM_TLV_INTERFACE_STATUS:
         case CFM_TLV_DATA:
         case CFM_TLV_REPLY_INGRESS:
         case CFM_TLV_REPLY_EGRESS:
         case CFM_TLV_PRIVATE:
         default:
             if (vflag <= 1)
-                print_unknown_data(tlv_tptr,"\n\t    ",tlv_tlen);
+                print_unknown_data(tptr,"\n\t  ",cfm_tlv_len);
             break;
         }
         /* do we want to see an additional hexdump ? */
         if (vflag > 1)
-            print_unknown_data(tptr+sizeof(sizeof(struct cfm_tlv_header_t)),"\n\t    ",
-                               cfm_tlv_len-sizeof(struct cfm_tlv_header_t));
+            print_unknown_data(tptr, "\n\t  ", cfm_tlv_len);
 
         tptr+=cfm_tlv_len;
         tlen-=cfm_tlv_len;
