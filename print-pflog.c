@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pflog.c,v 1.14 2005-07-07 01:22:20 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pflog.c,v 1.15 2006-10-25 22:13:10 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -44,6 +44,15 @@ static struct tok pf_reasons[] = {
 	{ 3,	"3(short)" },
 	{ 4,	"4(normalize)" },
 	{ 5,	"5(memory)" },
+	{ 6,	"6(bad-timestamp)" },
+	{ 7,	"7(congestion)" },
+	{ 8,	"8(ip-option)" },
+	{ 9,	"9(proto-cksum)" },
+	{ 10,	"10(state-mismatch)" },
+	{ 11,	"11(state-insert)" },
+	{ 12,	"12(state-limit)" },
+	{ 13,	"13(src-limit)" },
+	{ 14,	"14(synproxy)" },
 	{ 0,	NULL }
 };
 
