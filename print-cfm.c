@@ -19,7 +19,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cfm.c,v 1.2 2006-10-20 18:07:55 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cfm.c,v 1.3 2006-10-29 23:10:07 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -36,6 +36,14 @@ static const char rcsid[] _U_ =
 #include "extract.h"
 #include "ether.h"
 #include "addrtoname.h"
+#include "oui.h"
+#include "af.h"
+
+/*
+ * Prototypes
+ */
+const char * cfm_egress_id_string(register const u_char *);
+int cfm_mgmt_addr_print(register const u_char *);
 
 struct cfm_common_header_t {
     u_int8_t mdlevel_version;
@@ -131,6 +139,11 @@ struct cfm_ltm_t {
     u_int8_t reserved[3];
 };
 
+static const struct tok cfm_ltm_flag_values[] = {
+    { 0x80, "Use Forwarding-DB only"},
+    { 0, NULL}
+};
+
 struct cfm_ltr_t {
     u_int8_t transaction_id[4];
     u_int8_t last_egress_id[8];
@@ -139,6 +152,20 @@ struct cfm_ltr_t {
     u_int8_t replay_action;
     u_int8_t reserved[6];
 };
+
+static const struct tok cfm_ltr_flag_values[] = {
+    { 0x80, "Forwarded"},
+    { 0x40, "Terminal MEP"},
+    { 0, NULL}
+};
+
+static const struct tok cfm_ltr_replay_action_values[] = {
+    { 1, "Exact Match"},
+    { 2, "Filtering DB"},
+    { 3, "MIP CCM DB"},
+    { 0, NULL}
+};
+
 
 #define CFM_TLV_END 0
 #define CFM_TLV_SENDER_ID 1
@@ -188,13 +215,85 @@ static const struct tok cfm_tlv_interface_status_values[] = {
     { 0, NULL}
 };
 
+#define CFM_CHASSIS_ID_CHASSIS_COMPONENT 1
+#define CFM_CHASSIS_ID_INTERFACE_ALIAS 2
+#define CFM_CHASSIS_ID_PORT_COMPONENT 3
+#define CFM_CHASSIS_ID_MAC_ADDRESS 4
+#define CFM_CHASSIS_ID_NETWORK_ADDRESS 5
+#define CFM_CHASSIS_ID_INTERFACE_NAME 6
+#define CFM_CHASSIS_ID_LOCAL 7
+
+static const struct tok cfm_tlv_senderid_chassisid_values[] = {
+    { 0, "Reserved"},
+    { CFM_CHASSIS_ID_CHASSIS_COMPONENT, "Chassis component"},
+    { CFM_CHASSIS_ID_INTERFACE_ALIAS, "Interface alias"},
+    { CFM_CHASSIS_ID_PORT_COMPONENT, "Port component"},
+    { CFM_CHASSIS_ID_MAC_ADDRESS, "MAC address"},
+    { CFM_CHASSIS_ID_NETWORK_ADDRESS, "Network address"},
+    { CFM_CHASSIS_ID_INTERFACE_NAME, "Interface name"},
+    { CFM_CHASSIS_ID_LOCAL, "Locally assigned"},
+    { 0, NULL}
+};
+
+
+int
+cfm_mgmt_addr_print(register const u_char *tptr) {
+
+    u_int mgmt_addr_type;
+    u_int hexdump =  FALSE;
+
+    /*
+     * Altough AFIs are tpically 2 octects wide,
+     * 802.1ab specifies that this field width
+     * is only once octet
+     */
+    mgmt_addr_type = *tptr;
+    printf("\n\t  Management Address Type %s (%u)",
+           tok2str(af_values, "Unknown", mgmt_addr_type),
+           mgmt_addr_type);
+
+    /*
+     * Resolve the passed in Address.
+     */
+    switch(mgmt_addr_type) {
+    case AFNUM_INET:
+        printf(", %s", ipaddr_string(tptr + 1));
+        break;
+
+    case AFNUM_INET6:
+        printf(", %s", ip6addr_string(tptr + 1));
+        break;
+
+    default:
+        hexdump = TRUE;
+        break;
+    }
+
+    return hexdump;
+}
+
+/*
+ * The egress-ID string is a 16-Bit string plus a MAC address.
+ */
+const char *
+cfm_egress_id_string(register const u_char *tptr) {
+    static char egress_id_buffer[80];
+    
+    snprintf(egress_id_buffer, sizeof(egress_id_buffer),
+             "MAC %0x4x-%s",
+             EXTRACT_16BITS(tptr),
+             etheraddr_string(tptr+2));
+
+    return egress_id_buffer;
+}
+
 void
 cfm_print(register const u_char *pptr, register u_int length) {
 
     const struct cfm_common_header_t *cfm_common_header;
     const struct cfm_tlv_header_t *cfm_tlv_header;
-    const u_int8_t *tptr, *ma_name, *ma_nameformat, *ma_namelength;
-    u_int tlen, cfm_tlv_len, cfm_tlv_type, ccm_interval;
+    const u_int8_t *tptr, *tlv_ptr, *ma_name, *ma_nameformat, *ma_namelength;
+    u_int hexdump, tlen, cfm_tlv_len, cfm_tlv_type, ccm_interval;
 
 
     union {
@@ -217,21 +316,20 @@ cfm_print(register const u_char *pptr, register u_int length) {
 	return;
     }
 
-    printf("CFMv%u %s, length %u",
+    printf("CFMv%u %s, MD Level %u, length %u",
            CFM_EXTRACT_VERSION(cfm_common_header->mdlevel_version),
            tok2str(cfm_opcode_values, "unknown (%u)", cfm_common_header->opcode),
+           CFM_EXTRACT_MD_LEVEL(cfm_common_header->mdlevel_version),
            length);
 
     /*
-     * In non-verbose mode just lets print the opcode and bail.
+     * In non-verbose mode just print the opcode and md-level.
      */
     if (vflag < 1) {
         return;
     }
 
-    printf("\n\tMD Level %u, First TLV offset %u",
-           CFM_EXTRACT_MD_LEVEL(cfm_common_header->mdlevel_version),
-           cfm_common_header->first_tlv_offset);
+    printf("\n\tFirst TLV offset %u", cfm_common_header->first_tlv_offset);
 
     tptr += sizeof(const struct cfm_common_header_t);
     tlen = length - sizeof(struct cfm_common_header_t);
@@ -279,9 +377,13 @@ cfm_print(register const u_char *pptr, register u_int length) {
                 safeputs(msg_ptr.cfm_ccm->md_name, msg_ptr.cfm_ccm->md_namelength);
                 break;
 
+            case CFM_CCM_MD_FORMAT_MAC:
+                printf("\n\t  MAC %s", etheraddr_string(
+                           msg_ptr.cfm_ccm->md_name));
+                break;
+
                 /* FIXME add printers for those MD formats - hexdump for now */
             case CFM_CCM_MA_FORMAT_8021:
-            case CFM_CCM_MD_FORMAT_MAC:
             default:
                 print_unknown_data(msg_ptr.cfm_ccm->md_name, "\n\t    ",
                                    msg_ptr.cfm_ccm->md_namelength);
@@ -318,14 +420,45 @@ cfm_print(register const u_char *pptr, register u_int length) {
         }
         break;
 
+    case CFM_OPCODE_LTM:
+        printf(", Flags [%s]",
+               bittok2str(cfm_ltm_flag_values, "none",  cfm_common_header->flags));
+
+        printf("\n\t  Transaction-ID 0x%08x, Egress-ID %s, ttl %u",
+               EXTRACT_32BITS(msg_ptr.cfm_ltm->transaction_id),
+               cfm_egress_id_string(msg_ptr.cfm_ltm->egress_id),
+               msg_ptr.cfm_ltm->ttl);
+
+        printf("\n\t  Original-MAC %s, Target-MAC %s",
+               etheraddr_string(msg_ptr.cfm_ltm->original_mac),
+               etheraddr_string(msg_ptr.cfm_ltm->target_mac));
+        break;
+
+    case CFM_OPCODE_LTR:
+        printf(", Flags [%s]",
+               bittok2str(cfm_ltr_flag_values, "none",  cfm_common_header->flags));
+
+        printf("\n\t  Transaction-ID 0x%08x, Last-Egress-ID %s",
+               EXTRACT_32BITS(msg_ptr.cfm_ltr->transaction_id),
+               cfm_egress_id_string(msg_ptr.cfm_ltr->last_egress_id));
+
+        printf("\n\t  Next-Egress-ID %s, ttl %u",
+               cfm_egress_id_string(msg_ptr.cfm_ltr->next_egress_id),
+               msg_ptr.cfm_ltr->ttl);
+
+        printf("\n\t  Replay-Action %s (%u)",
+               tok2str(cfm_ltr_replay_action_values,
+                       "Unknown",
+                       msg_ptr.cfm_ltr->replay_action),
+               msg_ptr.cfm_ltr->replay_action);
+        break;
+
         /*
          * No message decoder yet.
          * Hexdump everything up until the start of the TLVs
          */
     case CFM_OPCODE_LBR:
     case CFM_OPCODE_LBM:
-    case CFM_OPCODE_LTR:
-    case CFM_OPCODE_LTM:
     default:
         if (tlen > cfm_common_header->first_tlv_offset) {
             print_unknown_data(tptr, "\n\t  ",
@@ -360,9 +493,7 @@ cfm_print(register const u_char *pptr, register u_int length) {
         }
 
         printf("\n\t%s TLV (0x%02x), length %u",
-               tok2str(cfm_tlv_values,
-                       "Unknown",
-                       cfm_tlv_type),
+               tok2str(cfm_tlv_values, "Unknown", cfm_tlv_type),
                cfm_tlv_type,
                cfm_tlv_len);
 
@@ -376,45 +507,128 @@ cfm_print(register const u_char *pptr, register u_int length) {
 
         tptr += sizeof(struct cfm_tlv_header_t);
         tlen -= sizeof(struct cfm_tlv_header_t);
+        tlv_ptr = tptr;
 
         /* did we capture enough for fully decoding the object ? */
         if (cfm_tlv_type != CFM_TLV_END) {
             TCHECK2(*tptr, cfm_tlv_len);
         }
+        hexdump = FALSE;
 
         switch(cfm_tlv_type) {
         case CFM_TLV_END:
             /* we are done - bail out */
             return;
+
         case CFM_TLV_PORT_STATUS:
             printf(", Status: %s (%u)",
                    tok2str(cfm_tlv_port_status_values, "Unknown", *tptr),
                    *tptr);
             break;
+
         case CFM_TLV_INTERFACE_STATUS:
             printf(", Status: %s (%u)",
                    tok2str(cfm_tlv_interface_status_values, "Unknown", *tptr),
                    *tptr);
             break;
 
+        case CFM_TLV_PRIVATE:
+            printf(", Vendor: %s (%u), Sub-Type %u",
+                   tok2str(oui_values,"Unknown", EXTRACT_24BITS(tptr)),
+                   EXTRACT_24BITS(tptr),
+                   *(tptr+3));
+            hexdump = TRUE;
+            break;
+
+        case CFM_TLV_SENDER_ID:
+        {
+            u_int chassis_id_type, chassis_id_length;
+            u_int mgmt_addr_length;
+
+            /*
+             * Check if there is a Chassis-ID.
+             */
+            chassis_id_length = *tptr;
+            if (chassis_id_length > tlen) {
+                hexdump = TRUE;
+                break;
+            }
+
+            tptr++;
+            tlen--;
+
+            if (chassis_id_length) {
+                chassis_id_type = *tptr;
+                printf("\n\t  Chassis-ID Type %s (%u), Chassis-ID length %u",
+                       tok2str(cfm_tlv_senderid_chassisid_values,
+                               "Unknown",
+                               chassis_id_type),
+                       chassis_id_type,
+                       chassis_id_length);
+
+                switch (chassis_id_type) {
+                case CFM_CHASSIS_ID_MAC_ADDRESS:
+                    printf("\n\t  MAC %s", etheraddr_string(tptr+1));
+                    break;
+
+                case CFM_CHASSIS_ID_NETWORK_ADDRESS:
+                    hexdump |= cfm_mgmt_addr_print(tptr);
+                    break;
+
+                case CFM_CHASSIS_ID_INTERFACE_NAME: /* fall through */
+                case CFM_CHASSIS_ID_INTERFACE_ALIAS:
+                case CFM_CHASSIS_ID_LOCAL:
+                case CFM_CHASSIS_ID_CHASSIS_COMPONENT:
+                case CFM_CHASSIS_ID_PORT_COMPONENT:
+                    safeputs(tptr+1, chassis_id_length);
+                    break;
+
+                default:
+                    hexdump = TRUE;
+                    break;
+                }
+            }
+
+            tptr += chassis_id_length;
+            tlen -= chassis_id_length;
+
+            /*
+             * Check if there is a Management Address.
+             */
+            mgmt_addr_length = *tptr;
+            if (mgmt_addr_length > tlen) {
+                hexdump = TRUE;
+                break;
+            }
+
+            tptr++;
+            tlen--;
+
+            if (mgmt_addr_length) {
+                hexdump |= cfm_mgmt_addr_print(tptr);
+            }
+
+            tptr += mgmt_addr_length;
+            tlen -= mgmt_addr_length;
+
+        }
+        break;
+
             /*
              * FIXME those are the defined TLVs that lack a decoder
              * you are welcome to contribute code ;-)
              */
 
-        case CFM_TLV_SENDER_ID:
         case CFM_TLV_DATA:
         case CFM_TLV_REPLY_INGRESS:
         case CFM_TLV_REPLY_EGRESS:
-        case CFM_TLV_PRIVATE:
         default:
-            if (vflag <= 1)
-                print_unknown_data(tptr,"\n\t  ",cfm_tlv_len);
+            hexdump = TRUE;
             break;
         }
         /* do we want to see an additional hexdump ? */
-        if (vflag > 1)
-            print_unknown_data(tptr, "\n\t  ", cfm_tlv_len);
+        if (hexdump || vflag > 1)
+            print_unknown_data(tlv_ptr, "\n\t  ", cfm_tlv_len);
 
         tptr+=cfm_tlv_len;
         tlen-=cfm_tlv_len;
