@@ -9,7 +9,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dccp.c,v 1.6 2006-02-19 05:08:25 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dccp.c,v 1.7 2006-11-02 09:05:23 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -60,9 +60,20 @@ static const char *dccp_feature_nums[] = {
 	"check data checksum",
 };
 
+static inline int dccp_csum_coverage(const struct dccp_hdr* dh, u_int len)
+{
+	u_int cov;
+	
+	if (DCCPH_CSCOV(dh) == 0)
+		return len;
+	cov = (dh->dccph_doff + DCCPH_CSCOV(dh) - 1) * sizeof(u_int32_t);
+	return (cov > len)? len : cov;
+}
+
 static int dccp_cksum(const struct ip *ip,
 	const struct dccp_hdr *dh, u_int len)
 {
+	int cov = dccp_csum_coverage(dh, len);
 	union phu {
 		struct phdr {
 			u_int32_t src;
@@ -86,15 +97,15 @@ static int dccp_cksum(const struct ip *ip,
 		phu.ph.dst = ip_finddst(ip);
 
 	sp = &phu.pa[0];
-	return in_cksum((u_short *)dh, len, sp[0]+sp[1]+sp[2]+sp[3]+sp[4]+sp[5]);
+	return in_cksum((u_short *)dh, cov, sp[0]+sp[1]+sp[2]+sp[3]+sp[4]+sp[5]);
 }
 
 #ifdef INET6
 static int dccp6_cksum(const struct ip6_hdr *ip6, const struct dccp_hdr *dh, u_int len)
 {
 	size_t i;
-	const u_int16_t *sp;
-	u_int32_t sum;
+	u_int32_t sum = 0;
+	int cov = dccp_csum_coverage(dh, len);
 	union {
 		struct {
 			struct in6_addr ph_src;
@@ -113,23 +124,10 @@ static int dccp6_cksum(const struct ip6_hdr *ip6, const struct dccp_hdr *dh, u_i
 	phu.ph.ph_len = htonl(len);
 	phu.ph.ph_nxt = IPPROTO_DCCP;
 
-	sum = 0;
 	for (i = 0; i < sizeof(phu.pa) / sizeof(phu.pa[0]); i++)
 		sum += phu.pa[i];
 
-	sp = (const u_int16_t *)dh;
-
-	for (i = 0; i < (len & ~1); i += 2)
-		sum += *sp++;
-
-	if (len & 1)
-		sum += htons((*(const u_int8_t *)sp) << 8);
-
-	while (sum > 0xffff)
-		sum = (sum & 0xffff) + (sum >> 16);
-	sum = ~sum & 0xffff;
-
-	return (sum);
+	return in_cksum((u_short *)dh, cov, sum);
 }
 #endif
 
@@ -288,7 +286,7 @@ void dccp_print(const u_char *bp, const u_char *data2, u_int len)
 			dccp_sum = EXTRACT_16BITS(&dh->dccph_checksum);		
 			printf("cksum 0x%04x", dccp_sum);		
 			if (sum != 0) {
-				(void)printf(" (incorrect (-> 0x%04x), ",in_cksum_shouldbe(dccp_sum, sum));
+				(void)printf(" (incorrect -> 0x%04x), ",in_cksum_shouldbe(dccp_sum, sum));
 			} else
 				(void)printf(" (correct), ");
 		}					
