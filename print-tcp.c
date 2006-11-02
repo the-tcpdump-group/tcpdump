@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.125 2006-05-05 23:13:00 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.126 2006-11-02 08:56:16 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -147,8 +147,7 @@ static int tcp6_cksum(const struct ip6_hdr *ip6, const struct tcphdr *tp,
 	u_int len)
 {
 	size_t i;
-	register const u_int16_t *sp;
-	u_int32_t sum;
+	u_int32_t sum = 0;
 	union {
 		struct {
 			struct in6_addr ph_src;
@@ -167,23 +166,10 @@ static int tcp6_cksum(const struct ip6_hdr *ip6, const struct tcphdr *tp,
 	phu.ph.ph_len = htonl(len);
 	phu.ph.ph_nxt = IPPROTO_TCP;
 
-	sum = 0;
 	for (i = 0; i < sizeof(phu.pa) / sizeof(phu.pa[0]); i++)
 		sum += phu.pa[i];
 
-	sp = (const u_int16_t *)tp;
-
-	for (i = 0; i < (len & ~1); i += 2)
-		sum += *sp++;
-
-	if (len & 1)
-		sum += htons((*(const u_int8_t *)sp) << 8);
-
-	while (sum > 0xffff)
-		sum = (sum & 0xffff) + (sum >> 16);
-	sum = ~sum & 0xffff;
-
-	return (sum);
+	return in_cksum((u_short *)tp, len, sum);
 }
 #endif
 
@@ -428,7 +414,7 @@ tcp_print(register const u_char *bp, register u_int length,
                         (void)printf(", cksum 0x%04x",EXTRACT_16BITS(&tp->th_sum));
 			if (sum != 0) {
 				tcp_sum = EXTRACT_16BITS(&tp->th_sum);
-				(void)printf(" (incorrect (-> 0x%04x),",in_cksum_shouldbe(tcp_sum, sum));
+				(void)printf(" (incorrect -> 0x%04x),",in_cksum_shouldbe(tcp_sum, sum));
 			} else
 				(void)printf(" (correct),");
 		}
