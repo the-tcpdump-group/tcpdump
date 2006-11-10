@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.89.2.3 2006-04-07 08:58:43 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.89.2.4 2006-11-10 03:15:35 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -320,23 +320,33 @@ static const u_char *
 ns_qprint(register const u_char *cp, register const u_char *bp, int is_mdns)
 {
 	register const u_char *np = cp;
-	register u_int i;
+	register u_int i, class, qu;
 
 	cp = ns_nskip(cp);
 
 	if (cp == NULL || !TTEST2(*cp, 4))
 		return(NULL);
 
-	/* print the qtype and qclass (if it's not IN) */
+	/* print the qtype */
 	i = EXTRACT_16BITS(cp);
 	cp += 2;
 	printf(" %s", tok2str(ns_type2str, "Type%d", i));
+	/* print the qclass (if it's not IN) */
 	i = EXTRACT_16BITS(cp);
 	cp += 2;
-	if (is_mdns && i == (C_IN|C_CACHE_FLUSH))
-		printf(" (Cache flush)");
-	else if (i != C_IN)
-		printf(" %s", tok2str(ns_class2str, "(Class %d)", i));
+	if (is_mdns) {
+		class = (i & ~C_QU);
+		qu = (i & C_QU);
+	} else {
+		class = i;
+		qu = 0;
+	}
+	if (class != C_IN)
+		printf(" %s", tok2str(ns_class2str, "(Class %d)", class));
+	if (qu)
+		printf(" (QU)");
+	else
+		printf(" (QM)");
 
 	fputs("? ", stdout);
 	cp = ns_nprint(np, bp);
@@ -347,7 +357,7 @@ ns_qprint(register const u_char *cp, register const u_char *bp, int is_mdns)
 static const u_char *
 ns_rprint(register const u_char *cp, register const u_char *bp, int is_mdns)
 {
-	register u_int class, opt_flags = 0;
+	register u_int i, class, cache_flush, opt_flags = 0;
 	register u_short typ, len;
 	register const u_char *rp;
 
@@ -361,15 +371,23 @@ ns_rprint(register const u_char *cp, register const u_char *bp, int is_mdns)
 	if (cp == NULL || !TTEST2(*cp, 10))
 		return (snapend);
 
-	/* print the type/qtype and class (if it's not IN) */
+	/* print the type/qtype */
 	typ = EXTRACT_16BITS(cp);
 	cp += 2;
-	class = EXTRACT_16BITS(cp);
+	/* print the class (if it's not IN and the type isn't OPT) */
+	i = EXTRACT_16BITS(cp);
 	cp += 2;
-	if (is_mdns && class == (C_IN|C_CACHE_FLUSH))
-		printf(" (Cache flush)");
-	else if (class != C_IN && typ != T_OPT)
+	if (is_mdns) {
+		class = (i & ~C_CACHE_FLUSH);
+		cache_flush = i & C_CACHE_FLUSH;
+	} else {
+		class = i;
+		cache_flush = 0;
+	}
+	if (class != C_IN && typ != T_OPT)
 		printf(" %s", tok2str(ns_class2str, "(Class %d)", class));
+	if (cache_flush)
+		printf(" (Cache flush)");
 
 	/* ignore ttl */
 	cp += 2;
