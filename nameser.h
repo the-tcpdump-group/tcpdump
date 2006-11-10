@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/nameser.h,v 1.15 2006-04-07 08:47:34 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/nameser.h,v 1.16 2006-11-10 03:18:21 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1983, 1989, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -75,6 +75,14 @@
  * Internet nameserver port number
  */
 #define NAMESERVER_PORT	53
+
+/*
+ * Port for multicast DNS; see
+ *
+ *	http://files.multicastdns.org/draft-cheshire-dnsext-multicastdns.txt
+ *
+ * for the current mDNS spec.
+ */
 #define MULTICASTDNS_PORT	5353
 
 /*
@@ -201,7 +209,8 @@
 #define C_HS		4		/* for Hesiod name server (MIT) (XXX) */
 	/* Query class values which do not appear in resource records */
 #define C_ANY		255		/* wildcard match */
-#define C_CACHE_FLUSH	0x8000		/* mDNS cache flush flag */
+#define C_QU		0x8000		/* mDNS QU flag in queries */
+#define C_CACHE_FLUSH	0x8000		/* mDNS cache flush flag in replies */
 
 /*
  * Status return codes for T_UNSPEC conversion routines
