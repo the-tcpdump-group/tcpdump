@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.93 2006-11-10 03:18:21 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.94 2006-11-12 22:21:44 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -377,7 +377,7 @@ ns_rprint(register const u_char *cp, register const u_char *bp, int is_mdns)
 	/* print the class (if it's not IN and the type isn't OPT) */
 	i = EXTRACT_16BITS(cp);
 	cp += 2;
-	if (is_mdns) {
+	if (is_mdns && typ != T_OPT) {
 		class = (i & ~C_CACHE_FLUSH);
 		cache_flush = i & C_CACHE_FLUSH;
 	} else {
