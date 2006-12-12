@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.84 2006-12-12 10:48:43 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.85 2006-12-12 14:31:51 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -589,13 +589,24 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
 	}
 
         /*
-         * Check if the extended ICMP header indicates that there is
-         * MPLS extension header present for the "interesting" ICMP types.
+         * Attempt to decode the MPLS extensions only for some ICMP types.
          */
-        if (vflag >= 1 && plen > ICMP_EXTD_MINLEN &&
-            ext_dp->icmp_length && ICMP_MPLS_EXT_TYPE(dp->icmp_type)) {
+        if (vflag >= 1 && plen > ICMP_EXTD_MINLEN && ICMP_MPLS_EXT_TYPE(dp->icmp_type)) {
 
             TCHECK(*ext_dp);
+
+            /*
+             * Check first if the mpls extension header shows a non-zero length.
+             * If the length field is not set then silently verify the checksum
+             * to check if an extension header is present. This is expedient,
+             * however not all implementations set the length field proper.
+             */
+            if (!ext_dp->icmp_length &&
+                in_cksum((const u_short *)&ext_dp->icmp_ext_version_res,
+                         plen - ICMP_EXTD_MINLEN, 0)) {
+                return;
+            }
+
             printf("\n\tMPLS extension v%u",
                    ICMP_MPLS_EXT_EXTRACT_VERSION(*(ext_dp->icmp_ext_version_res)));
             
@@ -609,8 +620,10 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
             }
 
             hlen = plen - ICMP_EXTD_MINLEN;
-            printf(", checksum 0x%04x (unverified), length %u", /* FIXME */
+            printf(", checksum 0x%04x (%scorrect), length %u",
                    EXTRACT_16BITS(ext_dp->icmp_ext_checksum),
+                   in_cksum((const u_short *)&ext_dp->icmp_ext_version_res,
+                            plen - ICMP_EXTD_MINLEN, 0) ? "in" : "",
                    hlen);
 
             hlen -= 4; /* subtract common header size */
