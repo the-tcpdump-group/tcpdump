@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.81 2006-02-13 18:59:29 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.82 2007-01-14 21:22:05 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -413,22 +413,20 @@ rfc1048_print(register const u_char *bp)
 		}
 
 		if (tag == TAG_PARM_REQUEST) {
-			first = 1;
-                        idx = 0;
-                        printf("\n\t      ");
+			idx = 0;
 			while (len-- > 0) {
 				uc = *bp++;
 				cp = tok2str(tag2str, "?Option %u", uc);
-				printf("%s%s", (first || (!(idx %4))) ? "" : ", ", cp + 1);
-
-                                if ((idx %4) == 3) {
-                                    printf("\n\t      ");
-                                }
-				first = 0;
-                                idx ++;
+				if (idx % 4 == 0)
+					printf("\n\t      ");
+				else
+					printf(", ");
+				printf("%s", cp + 1);
+				idx++;
 			}
 			continue;
 		}
+
 		if (tag == TAG_EXTENDED_REQUEST) {
 			first = 1;
 			while (len > 1) {
