@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.78.2.4 2007-01-14 21:23:31 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.78.2.5 2007-01-14 21:29:53 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -374,11 +374,11 @@ rfc1048_print(register const u_char *bp)
 	bp += sizeof(int32_t);
 
 	/* Loop while we there is a tag left in the buffer */
-	while (bp + 1 < snapend) {
+	while (TTEST2(*bp, 1)) {
 		tag = *bp++;
-		if (tag == TAG_PAD)
+		if (tag == TAG_PAD && vflag < 3)
 			continue;
-		if (tag == TAG_END)
+		if (tag == TAG_END && vflag < 3)
 			return;
 		if (tag == TAG_EXTENDED_OPTION) {
 			TCHECK2(*(bp + 1), 2);
@@ -392,17 +392,29 @@ rfc1048_print(register const u_char *bp)
 			cp = tok2str(tag2str, "?T%u", tag);
 		c = *cp++;
 
-		/* Get the length; check for truncation */
-		if (bp + 1 >= snapend) {
-			fputs(tstr, stdout);
-			return;
+		if (tag == TAG_PAD || tag == TAG_END)
+			len = 0;
+		else {
+			/* Get the length; check for truncation */
+			TCHECK2(*bp, 1);
+			len = *bp++;
 		}
-		len = *bp++;
 
-		printf("\n\t    %s Option %u, length %u: ", cp, tag, len);
+		printf("\n\t    %s Option %u, length %u%s", cp, tag, len,
+		    len > 0 ? ": " : "");
 
-		if (bp + len >= snapend) {
-			printf("[|bootp %u]", len);
+		if (tag == TAG_PAD && vflag > 2) {
+			u_int ntag = 1;
+			while (TTEST2(*bp, 1) && *bp == TAG_PAD) {
+				bp++;
+				ntag++;
+			}
+			if (ntag > 1)
+				printf(", occurs %u", ntag);
+		}
+
+		if (!TTEST2(*bp, len)) {
+			printf("[|rfc1048 %u]", len);
 			return;
 		}
 
