@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.83 2007-01-14 21:29:22 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.84 2007-01-14 22:40:40 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -100,10 +100,10 @@ bootp_print(register const u_char *cp, u_int length)
 	if (bp->bp_secs)
 		printf(", secs %d", EXTRACT_16BITS(&bp->bp_secs));
 
-	printf(", Flags [ %s ]",
-	       bittok2str(bootp_flag_values, "none", EXTRACT_16BITS(&bp->bp_flags)));
-	if (vflag>1)
-	  printf( " (0x%04x)", EXTRACT_16BITS(&bp->bp_flags));
+	printf(", Flags [%s]",
+		bittok2str(bootp_flag_values, "none", EXTRACT_16BITS(&bp->bp_flags)));
+	if (vflag > 1)
+		printf(" (0x%04x)", EXTRACT_16BITS(&bp->bp_flags));
 
 	/* Client's ip address */
 	TCHECK(bp->bp_ciaddr);
