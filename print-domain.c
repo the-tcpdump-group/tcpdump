@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.89.2.6 2006-11-12 23:12:22 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.89.2.7 2007-01-15 11:15:54 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -576,7 +576,7 @@ ns_print(register const u_char *bp, u_int length, int is_mdns)
 
 	if (DNS_QR(np)) {
 		/* this is a response */
-		printf(" %d%s%s%s%s%s%s",
+		printf("%d%s%s%s%s%s%s",
 			EXTRACT_16BITS(&np->id),
 			ns_ops[DNS_OPCODE(np)],
 			ns_resp[DNS_RCODE(np)],
@@ -644,7 +644,7 @@ ns_print(register const u_char *bp, u_int length, int is_mdns)
 	}
 	else {
 		/* this is a request */
-		printf(" %d%s%s%s", EXTRACT_16BITS(&np->id), ns_ops[DNS_OPCODE(np)],
+		printf("%d%s%s%s", EXTRACT_16BITS(&np->id), ns_ops[DNS_OPCODE(np)],
 		    DNS_RD(np) ? "+" : "",
 		    DNS_CD(np) ? "%" : "");
 
