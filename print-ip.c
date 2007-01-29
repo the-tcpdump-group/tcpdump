@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.149.2.7 2007-01-17 14:09:38 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.149.2.8 2007-01-29 20:57:47 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -633,7 +633,7 @@ ip_print(netdissect_options *ndo,
             }
 
             if (ipds->ip->ip_ttl >= 1)
-                (void)printf(", ttl %3u", ipds->ip->ip_ttl);    
+                (void)printf(", ttl %u", ipds->ip->ip_ttl);    
 
 	    /*
 	     * for the firewall guys, print id, offset.
