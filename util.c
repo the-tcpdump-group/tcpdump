@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.108 2006-08-19 06:47:39 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/util.c,v 1.109 2007-01-29 09:59:42 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -316,11 +316,12 @@ tok2str(register const struct tok *lp, register const char *fmt,
 
 /*
  * Convert a bit token value to a string; use "fmt" if not found.
- * this is useful for parsing bitfields, the output strings are comma seperated
+ * this is useful for parsing bitfields, the output strings are seperated
+ * if the s field is positive.
  */
-char *
-bittok2str(register const struct tok *lp, register const char *fmt,
-	   register int v)
+static char *
+bittok2str_internal(register const struct tok *lp, register const char *fmt,
+	   register int v, register int sep)
 {
         static char buf[256]; /* our stringbuffer */
         int buflen=0;
@@ -337,13 +338,19 @@ bittok2str(register const struct tok *lp, register const char *fmt,
                  */
 		if (tokval == (v&rotbit)) {
                     /* ok we have found something */
-                    buflen+=snprintf(buf+buflen, sizeof(buf)-buflen, "%s, ",lp->s);
+                    buflen+=snprintf(buf+buflen, sizeof(buf)-buflen, "%s%s",
+                                     lp->s, sep ? ", " : "");
                     break;
                 }
                 rotbit=rotbit<<1; /* no match - lets shift and try again */
             }
             lp++;
 	}
+
+        /* user didn't want string seperation - no need to cut off trailing seperators */
+        if (!sep) {
+            return (buf);
+        }
 
         if (buflen != 0) { /* did we find anything */
             /* yep, set the the trailing zero 2 bytes before to eliminate the last comma & whitespace */
@@ -357,6 +364,28 @@ bittok2str(register const struct tok *lp, register const char *fmt,
             (void)snprintf(buf, sizeof(buf), fmt, v);
             return (buf);
         }
+}
+
+/*
+ * Convert a bit token value to a string; use "fmt" if not found.
+ * this is useful for parsing bitfields, the output strings are not seperated.
+ */
+char *
+bittok2str_nosep(register const struct tok *lp, register const char *fmt,
+	   register int v)
+{
+    return (bittok2str_internal(lp, fmt, v, 0));
+}
+
+/*
+ * Convert a bit token value to a string; use "fmt" if not found.
+ * this is useful for parsing bitfields, the output strings are comma seperated.
+ */
+char *
+bittok2str(register const struct tok *lp, register const char *fmt,
+	   register int v)
+{
+    return (bittok2str_internal(lp, fmt, v, 1));
 }
 
 /*
