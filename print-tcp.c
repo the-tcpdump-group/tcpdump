@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.127 2007-01-29 09:59:42 hannes Exp $ (LBL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.128 2007-01-29 19:19:51 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -413,9 +413,9 @@ tcp_print(register const u_char *bp, register u_int length,
                         (void)printf(", cksum 0x%04x",EXTRACT_16BITS(&tp->th_sum));
                         if (sum != 0) {
                                 tcp_sum = EXTRACT_16BITS(&tp->th_sum);
-                                (void)printf(" (incorrect -> 0x%04x),",in_cksum_shouldbe(tcp_sum, sum));
+                                (void)printf(" (incorrect -> 0x%04x)",in_cksum_shouldbe(tcp_sum, sum));
                         } else
-                                (void)printf(" (correct),");
+                                (void)printf(" (correct)");
                 }
         }
 #ifdef INET6
@@ -426,9 +426,9 @@ tcp_print(register const u_char *bp, register u_int length,
                         (void)printf(", cksum 0x%04x",EXTRACT_16BITS(&tp->th_sum));
                         if (sum != 0) {
                                 tcp_sum = EXTRACT_16BITS(&tp->th_sum);
-                                (void)printf(" (incorrect (-> 0x%04x),",in_cksum_shouldbe(tcp_sum, sum));
+                                (void)printf(" (incorrect (-> 0x%04x)",in_cksum_shouldbe(tcp_sum, sum));
                         } else
-                                (void)printf(" (correct),");
+                                (void)printf(" (correct)");
 
                 }
         }
