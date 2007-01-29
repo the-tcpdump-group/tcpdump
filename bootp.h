@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/bootp.h,v 1.15 2003-07-01 19:16:06 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/bootp.h,v 1.16 2007-01-29 20:55:01 guy Exp $ (LBL) */
 /*
  * Bootstrap Protocol (BOOTP).  RFC951 and RFC1048.
  *
@@ -218,3 +218,10 @@ struct cmu_vend {
 
 /* v_flags values */
 #define VF_SMASK	1	/* Subnet mask field contains valid data */
+
+/* RFC 4702 DHCP Client FQDN Option */
+
+#define CLIENT_FQDN_FLAGS_S	0x01
+#define CLIENT_FQDN_FLAGS_O	0x02
+#define CLIENT_FQDN_FLAGS_E	0x04
+#define CLIENT_FQDN_FLAGS_N	0x08

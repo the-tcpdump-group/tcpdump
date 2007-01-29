@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.84 2007-01-14 22:40:40 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.85 2007-01-29 20:55:01 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -42,6 +42,7 @@ static const char rcsid[] _U_ =
 
 static void rfc1048_print(const u_char *);
 static void cmu_print(const u_char *);
+static char *client_fqdn_flags(u_int flags);
 
 static char tstr[] = " [|bootp]";
 
@@ -586,15 +587,16 @@ rfc1048_print(register const u_char *bp)
 				break;
 
 			case TAG_CLIENT_FQDN:
-				/* option 81 should be at least 4 bytes long */
-				if (len < 4)  {
-                                        printf("ERROR: options 81 len %u < 4 bytes", len);
+				/* option 81 should be at least 3 bytes long */
+				if (len < 3)  {
+					printf("ERROR: option 81 len %u < 3 bytes", len);
 					break;
 				}
-				if (*bp++)
-					printf("[svrreg]");
 				if (*bp)
-					printf("%u/%u/", *bp, *(bp+1));
+					printf("[%s] ", client_fqdn_flags(*bp));
+				bp++;
+				if (*bp || *(bp+1))
+					printf("%u/%u ", *bp, *(bp+1));
 				bp += 2;
 				putchar('"');
 				if (fn_printn(bp, size - 3, snapend)) {
@@ -713,4 +715,23 @@ cmu_print(register const u_char *bp)
 trunc:
 	fputs(tstr, stdout);
 #undef PRINTCMUADDR
+}
+
+static char *
+client_fqdn_flags(u_int flags)
+{
+	static char buf[8+1];
+	int i = 0;
+
+	if (flags & CLIENT_FQDN_FLAGS_S)
+		buf[i++] = 'S';
+	if (flags & CLIENT_FQDN_FLAGS_O)
+		buf[i++] = 'O';
+	if (flags & CLIENT_FQDN_FLAGS_E)
+		buf[i++] = 'E';
+	if (flags & CLIENT_FQDN_FLAGS_N)
+		buf[i++] = 'N';
+	buf[i] = '\0';
+
+	return buf;
 }
