@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.42 2006-06-13 22:25:30 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.43 2007-02-01 02:18:18 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -264,7 +264,7 @@ parse_elements(struct mgmt_body_t *pbody, const u_char *p, int offset)
 
 			if (pbody->tim.length <= 3)
 				break;
-			if (pbody->rates.length > sizeof pbody->tim.bitmap)
+			if (pbody->tim.length - 3 > sizeof pbody->tim.bitmap)
 				return;
 			if (!TTEST2(*(p + offset), pbody->tim.length - 3))
 				return;
