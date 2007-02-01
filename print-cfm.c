@@ -19,7 +19,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cfm.c,v 1.3 2006-10-29 23:10:07 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-cfm.c,v 1.4 2007-02-01 02:28:38 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -260,9 +260,11 @@ cfm_mgmt_addr_print(register const u_char *tptr) {
         printf(", %s", ipaddr_string(tptr + 1));
         break;
 
+#ifdef INET6
     case AFNUM_INET6:
         printf(", %s", ip6addr_string(tptr + 1));
         break;
+#endif
 
     default:
         hexdump = TRUE;
