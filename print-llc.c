@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.61.2.9 2006-01-17 17:44:46 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.61.2.10 2007-02-08 07:07:51 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -103,6 +103,8 @@ static const struct tok llc_supervisory_values[] = {
 
 static const struct tok cisco_values[] = { 
 	{ PID_CISCO_CDP, "CDP" },
+	{ PID_CISCO_VTP, "VTP" },
+	{ PID_CISCO_DTP, "DTP" },
 	{ 0,             NULL }
 };
 
