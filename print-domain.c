@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.96 2007-01-15 11:15:26 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.97 2007-02-13 19:19:00 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -320,7 +320,7 @@ static const u_char *
 ns_qprint(register const u_char *cp, register const u_char *bp, int is_mdns)
 {
 	register const u_char *np = cp;
-	register u_int i, class, qu;
+	register u_int i, class;
 
 	cp = ns_nskip(cp);
 
@@ -334,19 +334,18 @@ ns_qprint(register const u_char *cp, register const u_char *bp, int is_mdns)
 	/* print the qclass (if it's not IN) */
 	i = EXTRACT_16BITS(cp);
 	cp += 2;
-	if (is_mdns) {
+	if (is_mdns)
 		class = (i & ~C_QU);
-		qu = (i & C_QU);
-	} else {
+	else
 		class = i;
-		qu = 0;
-	}
 	if (class != C_IN)
 		printf(" %s", tok2str(ns_class2str, "(Class %d)", class));
-	if (qu)
-		printf(" (QU)");
-	else
-		printf(" (QM)");
+	if (is_mdns) {
+		if (i & C_QU)
+			printf(" (QU)");
+		else
+			printf(" (QM)");
+	}
 
 	fputs("? ", stdout);
 	cp = ns_nprint(np, bp);
@@ -357,7 +356,7 @@ ns_qprint(register const u_char *cp, register const u_char *bp, int is_mdns)
 static const u_char *
 ns_rprint(register const u_char *cp, register const u_char *bp, int is_mdns)
 {
-	register u_int i, class, cache_flush, opt_flags = 0;
+	register u_int i, class, opt_flags = 0;
 	register u_short typ, len;
 	register const u_char *rp;
 
@@ -377,17 +376,16 @@ ns_rprint(register const u_char *cp, register const u_char *bp, int is_mdns)
 	/* print the class (if it's not IN and the type isn't OPT) */
 	i = EXTRACT_16BITS(cp);
 	cp += 2;
-	if (is_mdns) {
+	if (is_mdns)
 		class = (i & ~C_CACHE_FLUSH);
-		cache_flush = i & C_CACHE_FLUSH;
-	} else {
+	else
 		class = i;
-		cache_flush = 0;
-	}
 	if (class != C_IN && typ != T_OPT)
 		printf(" %s", tok2str(ns_class2str, "(Class %d)", class));
-	if (cache_flush)
-		printf(" (Cache flush)");
+	if (is_mdns) {
+		if (i & C_CACHE_FLUSH)
+			printf(" (Cache flush)");
+	}
 
 	/* ignore ttl */
 	cp += 2;
