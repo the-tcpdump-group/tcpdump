@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.133.2.23 2006-06-16 18:22:56 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.133.2.24 2007-02-22 11:31:05 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -475,7 +475,7 @@ static struct tok isis_lsp_istype_values[] = {
     { ISIS_LSP_TYPE_UNUSED0,	"Unused 0x0 (invalid)"},
     { ISIS_LSP_TYPE_LEVEL_1,	"L1 IS"},
     { ISIS_LSP_TYPE_UNUSED2,	"Unused 0x2 (invalid)"},
-    { ISIS_LSP_TYPE_LEVEL_2,	"L1L2 IS"},
+    { ISIS_LSP_TYPE_LEVEL_2,	"L2 IS"},
     { 0, NULL }
 };
 
