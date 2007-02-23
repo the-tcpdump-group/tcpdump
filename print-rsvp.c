@@ -17,7 +17,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.33.2.9 2006-06-23 02:07:27 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.33.2.10 2007-02-23 10:48:09 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -134,9 +134,9 @@ static const struct tok rsvp_header_flag_values[] = {
 #define	RSVP_OBJ_ERO                20  /* rfc3209 */
 #define	RSVP_OBJ_RRO                21  /* rfc3209 */
 #define	RSVP_OBJ_HELLO              22  /* rfc3209 */
-#define	RSVP_OBJ_MESSAGE_ID         23
-#define	RSVP_OBJ_MESSAGE_ID_ACK     24
-#define	RSVP_OBJ_MESSAGE_ID_LIST    25
+#define	RSVP_OBJ_MESSAGE_ID         23  /* rfc2961 */
+#define	RSVP_OBJ_MESSAGE_ID_ACK     24  /* rfc2961 */
+#define	RSVP_OBJ_MESSAGE_ID_LIST    25  /* rfc2961 */
 #define	RSVP_OBJ_RECOVERY_LABEL     34  /* rfc3473 */
 #define	RSVP_OBJ_UPSTREAM_LABEL     35  /* rfc3473 */
 #define	RSVP_OBJ_LABEL_SET          36  /* rfc3473 */
@@ -238,7 +238,8 @@ static const struct tok rsvp_ctype_values[] = {
     { 256*RSVP_OBJ_SENDER_TEMPLATE+RSVP_CTYPE_IPV6,          "IPv6" },
     { 256*RSVP_OBJ_SENDER_TEMPLATE+RSVP_CTYPE_TUNNEL_IPV4,   "Tunnel IPv4" },
     { 256*RSVP_OBJ_MESSAGE_ID+RSVP_CTYPE_1,                  "1" },
-    { 256*RSVP_OBJ_MESSAGE_ID_ACK+RSVP_CTYPE_1,              "1" },
+    { 256*RSVP_OBJ_MESSAGE_ID_ACK+RSVP_CTYPE_1,              "Message id ack" },
+    { 256*RSVP_OBJ_MESSAGE_ID_ACK+RSVP_CTYPE_2,              "Message id nack" },
     { 256*RSVP_OBJ_MESSAGE_ID_LIST+RSVP_CTYPE_1,             "1" },
     { 256*RSVP_OBJ_STYLE+RSVP_CTYPE_1,                       "1" },
     { 256*RSVP_OBJ_HELLO+RSVP_CTYPE_1,                       "Hello Request" },
@@ -1354,6 +1355,7 @@ rsvp_obj_print (const u_char *tptr, const char *ident, u_int tlen) {
         case RSVP_OBJ_MESSAGE_ID_LIST:
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_1:
+            case RSVP_CTYPE_2:
                 if (obj_tlen < 8)
                     return-1;
                 printf("%s  Flags [0x%02x], epoch: %u",
