@@ -16,7 +16,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.8.2.9 2006-06-23 02:07:27 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ldp.c,v 1.8.2.10 2007-02-26 13:31:33 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -33,6 +33,7 @@ static const char rcsid[] _U_ =
 #include "decode_prefix.h"
 #include "extract.h"
 #include "addrtoname.h"
+#include "af.h"
 
 #include "l2vpn.h"
 
@@ -214,10 +215,6 @@ static const struct tok ldp_fec_martini_ifparm_vccv_cv_values[] = {
     { 0, NULL}
 };
 
-/* RFC1700 address family numbers, same definition in print-bgp.c */
-/* FIXME: move all AF stuff into dedicated files */
-#define AFNUM_INET	1
-#define AFNUM_INET6	2
 #define AFNUM_LEN       2 
 
 int ldp_msg_print(register const u_char *);
