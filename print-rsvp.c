@@ -17,7 +17,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.45 2007-02-26 07:23:02 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.46 2007-02-26 11:07:06 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -275,6 +275,7 @@ static const struct tok rsvp_ctype_values[] = {
     { 256*RSVP_OBJ_ADMIN_STATUS+RSVP_CTYPE_1,                "1" },
     { 256*RSVP_OBJ_CLASSTYPE+RSVP_CTYPE_1,                   "1" },
     { 256*RSVP_OBJ_CLASSTYPE_OLD+RSVP_CTYPE_1,               "1" },
+    { 256*RSVP_OBJ_LABEL_SET+RSVP_CTYPE_1,                   "1" },
     { 0, NULL}
 };
 
@@ -424,6 +425,20 @@ static const struct tok rsvp_obj_admin_status_flag_values[] = {
     { 0x00000004, "Testing" },
     { 0x00000002, "Admin-down" },
     { 0x00000001, "Delete-in-progress" },
+    { 0, NULL}
+};
+
+/* label set actions - rfc3471 */
+#define LABEL_SET_INCLUSIVE_LIST  0
+#define LABEL_SET_EXCLUSIVE_LIST  1
+#define LABEL_SET_INCLUSIVE_RANGE 2
+#define LABEL_SET_EXCLUSIVE_RANGE 3
+
+static const struct tok label_set_action_values[] = {
+    { LABEL_SET_INCLUSIVE_LIST, "Inclusive list" },
+    { LABEL_SET_EXCLUSIVE_LIST, "Exclusive list" },
+    { LABEL_SET_INCLUSIVE_RANGE, "Inclusive range" },
+    { LABEL_SET_EXCLUSIVE_RANGE, "Exclusive range" },
     { 0, NULL}
 };
 
@@ -1434,6 +1449,52 @@ rsvp_obj_print (const u_char *tptr, const char *ident, u_int tlen) {
             }
             break;
 
+        case RSVP_OBJ_LABEL_SET:
+            switch(rsvp_obj_ctype) {
+            case RSVP_CTYPE_1: 
+                if (obj_tlen < 4)
+                    return-1;
+
+                u_int action, subchannel;
+                action = (EXTRACT_16BITS(obj_tptr)>>8);
+
+                printf("%s  Action: %s (%u), Label type: %u", ident,
+                       tok2str(label_set_action_values, "Unknown", action),
+                       action, ((EXTRACT_32BITS(obj_tptr) & 0x7F)));
+
+                switch (action) {
+                case LABEL_SET_INCLUSIVE_RANGE:
+                case LABEL_SET_EXCLUSIVE_RANGE: /* fall through */
+
+		    /* only a couple of subchannels are expected */
+		    if (obj_tlen < 12)
+			return -1;
+		    printf("%s  Start range: %u, End range: %u", ident,
+                           EXTRACT_32BITS(obj_tptr+4),
+                           EXTRACT_32BITS(obj_tptr+8));
+		    obj_tlen-=12;
+		    obj_tptr+=12;
+                    break;
+
+                default:
+                    obj_tlen-=4;
+                    obj_tptr+=4;
+                    subchannel = 1;
+                    while(obj_tlen >= 4 ) {
+                        printf("%s  Subchannel #%u: %u", ident, subchannel,
+                               EXTRACT_32BITS(obj_tptr));
+                        obj_tptr+=4;
+                        obj_tlen-=4;
+                        subchannel++;
+                    }
+                    break;
+                }
+                break;
+
+            default:
+                hexdump=TRUE;
+            }
+
         /*
          *  FIXME those are the defined objects that lack a decoder
          *  you are welcome to contribute code ;-)
@@ -1441,7 +1502,6 @@ rsvp_obj_print (const u_char *tptr, const char *ident, u_int tlen) {
 
         case RSVP_OBJ_SCOPE:
         case RSVP_OBJ_POLICY_DATA:
-        case RSVP_OBJ_LABEL_SET:
         case RSVP_OBJ_ACCEPT_LABEL_SET:
         case RSVP_OBJ_PROTECTION:
         default:
