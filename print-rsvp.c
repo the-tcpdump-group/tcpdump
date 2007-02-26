@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1998-2005 The TCPDUMP project
+ * Copyright (c) 1998-2007 The TCPDUMP project
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that: (1) source code
@@ -17,7 +17,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.33.2.11 2007-02-26 07:08:33 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.33.2.12 2007-02-26 07:32:55 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -907,7 +907,7 @@ rsvp_obj_print (const u_char *tptr, const char *ident, u_int tlen) {
                 obj_tptr+=12;
                 break;
             case RSVP_CTYPE_4:
-                if (obj_tlen < 8)
+                if (obj_tlen < 4)
                     return-1;
                 printf("%s  LSP Encoding Type: %s (%u)",
                        ident,
@@ -925,8 +925,8 @@ rsvp_obj_print (const u_char *tptr, const char *ident, u_int tlen) {
                                "Unknown",
                                EXTRACT_16BITS(obj_tptr+2)),
 		       EXTRACT_16BITS(obj_tptr+2));
-                obj_tlen-=8;
-                obj_tptr+=8;
+                obj_tlen-=4;
+                obj_tptr+=4;
                 break;
             default:
                 hexdump=TRUE;
