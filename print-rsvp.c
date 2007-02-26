@@ -17,7 +17,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.33.2.10 2007-02-23 10:48:09 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.33.2.11 2007-02-26 07:08:33 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -272,6 +272,7 @@ static const struct tok rsvp_ctype_values[] = {
     { 256*RSVP_OBJ_FASTREROUTE+RSVP_CTYPE_1,                 "1" }, /* new style */
     { 256*RSVP_OBJ_DETOUR+RSVP_CTYPE_TUNNEL_IPV4,            "Tunnel IPv4" },
     { 256*RSVP_OBJ_PROPERTIES+RSVP_CTYPE_1,                  "1" },
+    { 256*RSVP_OBJ_ADMIN_STATUS+RSVP_CTYPE_1,                "1" },
     { 256*RSVP_OBJ_CLASSTYPE+RSVP_CTYPE_1,                   "1" },
     { 256*RSVP_OBJ_CLASSTYPE_OLD+RSVP_CTYPE_1,               "1" },
     { 0, NULL}
@@ -415,6 +416,15 @@ static struct tok rsvp_obj_error_code_diffserv_te_values[] = {
     { 7,                      "Inconsistency between signaled PSC and signaled CT" }, 
     { 8,                      "Inconsistency between signaled PHBs and signaled CT" },
    { 0, NULL}
+};
+
+/* rfc3473 / rfc 3471 */
+static const struct tok rsvp_obj_admin_status_flag_values[] = {
+    { 0x80000000, "Reflect" },
+    { 0x00000004, "Testing" },
+    { 0x00000002, "Admin-down" },
+    { 0x00000001, "Delete-in-progress" },
+    { 0, NULL}
 };
 
 static int rsvp_intserv_print(const u_char *, u_short);
@@ -1407,6 +1417,22 @@ rsvp_obj_print (const u_char *tptr, const char *ident, u_int tlen) {
                 hexdump=TRUE;
             }
             break;           
+
+        case RSVP_OBJ_ADMIN_STATUS:
+            switch(rsvp_obj_ctype) {
+            case RSVP_CTYPE_1: 
+                if (obj_tlen < 4)
+                    return-1;
+                printf("%s  Flags [%s]", ident,
+                       bittok2str(rsvp_obj_admin_status_flag_values, "none",
+                                  EXTRACT_32BITS(obj_tptr)));
+                obj_tlen-=4;
+                obj_tptr+=4;
+                break;
+            default:
+                hexdump=TRUE;
+            }
+            break;
 
         /*
          *  FIXME those are the defined objects that lack a decoder
