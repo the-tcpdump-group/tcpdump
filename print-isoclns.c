@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.133.2.24 2007-02-22 11:31:05 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.133.2.25 2007-03-02 09:20:27 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -2247,13 +2247,14 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    break;
 
         case ISIS_TLV_MT_IP_REACH:
-	    while (tmp>0) {
-                mt_len = isis_print_mtid(tptr, "\n\t      ");
-                if (mt_len == 0) /* did something go wrong ? */
-                    goto trunctlv;
-                tptr+=mt_len;
-                tmp-=mt_len;
+            mt_len = isis_print_mtid(tptr, "\n\t      ");
+            if (mt_len == 0) { /* did something go wrong ? */
+                goto trunctlv;
+            }
+            tptr+=mt_len;
+            tmp-=mt_len;
 
+            while (tmp>0) {
                 ext_ip_len = isis_print_extd_ip_reach(tptr, "\n\t      ", IPV4);
                 if (ext_ip_len == 0) /* did something go wrong ? */
                     goto trunctlv;
@@ -2274,13 +2275,14 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    break;
 
 	case ISIS_TLV_MT_IP6_REACH:
-	    while (tmp>0) {
-                mt_len = isis_print_mtid(tptr, "\n\t      ");
-                if (mt_len == 0) /* did something go wrong ? */
-                    goto trunctlv;
-                tptr+=mt_len;
-                tmp-=mt_len;
+            mt_len = isis_print_mtid(tptr, "\n\t      ");
+            if (mt_len == 0) { /* did something go wrong ? */
+                goto trunctlv;
+            }
+            tptr+=mt_len;
+            tmp-=mt_len;
 
+	    while (tmp>0) {
                 ext_ip_len = isis_print_extd_ip_reach(tptr, "\n\t      ", IPV6);
                 if (ext_ip_len == 0) /* did something go wrong ? */
                     goto trunctlv;
