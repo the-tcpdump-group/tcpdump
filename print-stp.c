@@ -11,7 +11,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-stp.c,v 1.14 2005-04-26 07:26:34 guy Exp $";
+"@(#) $Header: /tcpdump/master/tcpdump/print-stp.c,v 1.15 2007-03-06 15:03:51 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -28,75 +28,174 @@ static const char rcsid[] _U_ =
 #include "addrtoname.h"
 #include "extract.h"
 
-static void
+#define	RSTP_EXTRACT_PORT_ROLE(x) (((x)&0x0C)>>2) 
+/* STP timers are expressed in multiples of 1/256th second */
+#define STP_TIME_BASE 256
+
+struct stp_bpdu_ {
+    u_int8_t protocol_id[2];
+    u_int8_t protocol_version;
+    u_int8_t bpdu_type;
+    u_int8_t flags;
+    u_int8_t root_id[8];
+    u_int8_t root_path_cost[4];
+    u_int8_t bridge_id[8];
+    u_int8_t port_id[2];
+    u_int8_t message_age[2];
+    u_int8_t max_age[2];
+    u_int8_t hello_time[2];
+    u_int8_t forward_delay[2];
+    u_int8_t v1_length;
+};
+
+#define STP_PROTO_REGULAR 0x00
+#define STP_PROTO_RAPID   0x02
+
+struct tok stp_proto_values[] = {
+    { STP_PROTO_REGULAR, "802.1d" },
+    { STP_PROTO_RAPID, "802.1w" },
+    { 0, NULL}
+};
+
+#define STP_BPDU_TYPE_CONFIG      0x00
+#define STP_BPDU_TYPE_RSTP        0x02
+#define STP_BPDU_TYPE_TOPO_CHANGE 0x80
+
+struct tok stp_bpdu_flag_values[] = {
+    { 0x01, "Topology change" },
+    { 0x02, "Proposal" },
+    { 0x10, "Learn" },
+    { 0x20, "Forward" },
+    { 0x40, "Agreement" },
+    { 0x80, "Topology change ACK" },
+    { 0, NULL}
+};
+
+struct tok stp_bpdu_type_values[] = {
+    { STP_BPDU_TYPE_CONFIG, "Config" },
+    { STP_BPDU_TYPE_RSTP, "Rapid SPT" },
+    { STP_BPDU_TYPE_TOPO_CHANGE, "Topology Change" },
+    { 0, NULL}
+};
+
+struct tok rstp_obj_port_role_values[] = {
+    { 0x00, "Unknown" },
+    { 0x01, "Alternate" },
+    { 0x02, "Root" },
+    { 0x03, "Designated" },
+    { 0, NULL}
+};
+
+static char *
 stp_print_bridge_id(const u_char *p)
 {
-	printf("%.2x%.2x.%.2x:%.2x:%.2x:%.2x:%.2x:%.2x",
-	       p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]);
+    static char bridge_id_str[sizeof("pppp.aa:bb:cc:dd:ee:ff")];
+
+    snprintf(bridge_id_str, sizeof(bridge_id_str),
+             "%.2x%.2x.%.2x:%.2x:%.2x:%.2x:%.2x:%.2x",
+             p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]);
+
+    return bridge_id_str;
 }
 
 static void
-stp_print_config_bpdu(const u_char *p)
+stp_print_config_bpdu(const struct stp_bpdu_ *stp_bpdu, u_int length)
 {
-	printf("config ");
-	if (p[4] & 1)
-		printf("TOP_CHANGE ");
-	if (p[4] & 0x80)
-		printf("TOP_CHANGE_ACK ");
+    printf(", Flags [%s]",
+           bittok2str(stp_bpdu_flag_values, "none", stp_bpdu->flags));
 
-	stp_print_bridge_id(p+17);
-	printf(".%.2x%.2x ", p[25], p[26]);
+    printf(", bridge-id %s.%04x, length %u",
+           stp_print_bridge_id((const u_char *)&stp_bpdu->bridge_id),
+           EXTRACT_16BITS(&stp_bpdu->port_id), length);
 
-	printf("root ");
-	stp_print_bridge_id(p+5);
+    /* in non-verbose mode just print the bridge-id */
+    if (!vflag) {
+        return;
+    }
 
-	printf(" pathcost %i ", (p[13] << 24) | (p[14] << 16) | (p[15] << 8) | p[16]);
+    printf("\n\tmessage-age %.2fs, max-age %.2fs"
+           ", hello-time %.2fs, forwarding-delay %.2fs",
+           (float)EXTRACT_16BITS(&stp_bpdu->message_age) / STP_TIME_BASE,
+           (float)EXTRACT_16BITS(&stp_bpdu->max_age) / STP_TIME_BASE,
+           (float)EXTRACT_16BITS(&stp_bpdu->hello_time) / STP_TIME_BASE,
+           (float)EXTRACT_16BITS(&stp_bpdu->forward_delay) / STP_TIME_BASE);
 
-	printf("age %i ", p[27]);
-	printf("max %i ", p[29]);
-	printf("hello %i ", p[31]);
-	printf("fdelay %i ", p[33]);
-}
+    printf("\n\troot-id %s, root-pathcost %u",
+           stp_print_bridge_id((const u_char *)&stp_bpdu->root_id),
+           EXTRACT_32BITS(&stp_bpdu->root_path_cost) / STP_TIME_BASE);
 
-static void
-stp_print_tcn_bpdu(void)
-{
-	printf("tcn");
+    /* Port role is only valid for 802.1w */
+    if (stp_bpdu->protocol_version == STP_PROTO_RAPID) {
+        printf(", port-role %s",
+               tok2str(rstp_obj_port_role_values, "Unknown",
+                       RSTP_EXTRACT_PORT_ROLE(stp_bpdu->flags)));
+    }
 }
 
 /*
- * Print 802.1d packets.
+ * Print 802.1d / 802.1w packets.
  */
 void
 stp_print(const u_char *p, u_int length)
 {
-	if (length < 4)
-		goto trunc;
+    const struct stp_bpdu_ *stp_bpdu;
+    
+    stp_bpdu = (struct stp_bpdu_*)p;
 
-	printf("802.1d ");
-	if (p[0] || p[1] || p[2]) {
-		printf("unknown version");
-		return;
-	}
+    /* Minimum SPT Frame size. */
+    if (length < 4)
+        goto trunc;
+	
+    if (EXTRACT_16BITS(&stp_bpdu->protocol_id)) {
+        printf("unknown STP version, length %u", length);
+        return;
+    }
 
-	switch (p[3])
-	{
-	case 0x00:
-		if (length < 10)
-			goto trunc;
-		stp_print_config_bpdu(p);
-		break;
+    printf("STP %s", tok2str(stp_proto_values, "Unknown STP protocol (0x%02x)",
+                         stp_bpdu->protocol_version));
 
-	case 0x80:
-		stp_print_tcn_bpdu();
-		break;
+    switch (stp_bpdu->protocol_version) {
+    case STP_PROTO_REGULAR:
+    case STP_PROTO_RAPID:
+        break;
+    default:
+        return;
+    }
 
-	default:
-		printf("unknown type %i", p[3]);
-		break;
-	}
+    printf(", %s", tok2str(stp_bpdu_type_values, "Unknown BPDU Type (0x%02x)",
+                           stp_bpdu->bpdu_type));
 
-	return;
-trunc:
-	printf("[|stp %d]", length);
+    switch (stp_bpdu->bpdu_type) {
+    case STP_BPDU_TYPE_CONFIG:
+        if (length < sizeof(struct stp_bpdu_) - 1) {
+            goto trunc;
+        }
+        stp_print_config_bpdu(stp_bpdu, length);
+        break;
+
+    case STP_BPDU_TYPE_RSTP:
+        if (length < sizeof(struct stp_bpdu_)) {
+            goto trunc;
+        }
+        stp_print_config_bpdu(stp_bpdu, length);
+        break;
+
+    case STP_BPDU_TYPE_TOPO_CHANGE:
+        /* always empty message - just break out */
+        break;
+
+    default:
+        break;
+    }
+
+    return;
+ trunc:
+    printf("[|stp %d]", length);
 }
+
+/*
+ * Local Variables:
+ * c-style: whitesmith
+ * c-basic-offset: 4
+ * End:
+ */
