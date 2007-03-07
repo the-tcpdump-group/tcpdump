@@ -11,7 +11,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-stp.c,v 1.13.2.3 2007-03-07 11:22:14 hannes Exp $";
+"@(#) $Header: /tcpdump/master/tcpdump/print-stp.c,v 1.13.2.4 2007-03-07 12:11:43 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -73,7 +73,7 @@ struct tok stp_bpdu_flag_values[] = {
 
 struct tok stp_bpdu_type_values[] = {
     { STP_BPDU_TYPE_CONFIG, "Config" },
-    { STP_BPDU_TYPE_RSTP, "Rapid SPT" },
+    { STP_BPDU_TYPE_RSTP, "Rapid STP" },
     { STP_BPDU_TYPE_TOPO_CHANGE, "Topology Change" },
     { 0, NULL}
 };
@@ -142,7 +142,7 @@ stp_print(const u_char *p, u_int length)
     
     stp_bpdu = (struct stp_bpdu_*)p;
 
-    /* Minimum SPT Frame size. */
+    /* Minimum STP Frame size. */
     if (length < 4)
         goto trunc;
 	
