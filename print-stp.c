@@ -11,7 +11,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-stp.c,v 1.13.2.2 2007-03-06 15:07:05 hannes Exp $";
+"@(#) $Header: /tcpdump/master/tcpdump/print-stp.c,v 1.13.2.3 2007-03-07 11:22:14 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -122,7 +122,7 @@ stp_print_config_bpdu(const struct stp_bpdu_ *stp_bpdu, u_int length)
 
     printf("\n\troot-id %s, root-pathcost %u",
            stp_print_bridge_id((const u_char *)&stp_bpdu->root_id),
-           EXTRACT_32BITS(&stp_bpdu->root_path_cost) / STP_TIME_BASE);
+           EXTRACT_32BITS(&stp_bpdu->root_path_cost));
 
     /* Port role is only valid for 802.1w */
     if (stp_bpdu->protocol_version == STP_PROTO_RAPID) {
