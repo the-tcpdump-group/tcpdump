@@ -11,7 +11,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-stp.c,v 1.13.2.5 2007-03-08 13:53:35 hannes Exp $";
+"@(#) $Header: /tcpdump/master/tcpdump/print-stp.c,v 1.13.2.6 2007-03-09 18:59:48 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -180,6 +180,7 @@ stp_print_config_bpdu(const struct stp_bpdu_ *stp_bpdu, u_int length)
 /* Offsets of fields from the begginning for the packet */
 #define MST_BPDU_VER3_LEN_OFFSET	    36
 #define MST_BPDU_CONFIG_NAME_OFFSET	    39
+#define MST_BPDU_CONFIG_DIGEST_OFFSET	    73
 #define MST_BPDU_CIST_INT_PATH_COST_OFFSET  89
 #define MST_BPDU_CIST_BRIDGE_ID_OFFSET	    93
 #define MST_BPDU_CIST_REMAIN_HOPS_OFFSET    101
@@ -236,8 +237,13 @@ stp_print_mstp_bpdu(const struct stp_bpdu_ *stp_bpdu, u_int length)
     printf("\n\tCIST regional-root-id %s",
            stp_print_bridge_id((const u_char *)&stp_bpdu->bridge_id));
 
-    printf("\n\tMSTP Configuration Name %s",
-           ptr + MST_BPDU_CONFIG_NAME_OFFSET);
+    printf("\n\tMSTP Configuration Name %s, revision %u, digest %08x%08x%08x%08x",
+           ptr + MST_BPDU_CONFIG_NAME_OFFSET,
+	   EXTRACT_16BITS(ptr + MST_BPDU_CONFIG_NAME_OFFSET + 32),
+	   EXTRACT_32BITS(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET),
+	   EXTRACT_32BITS(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 4),
+	   EXTRACT_32BITS(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 8),
+	   EXTRACT_32BITS(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 12));
 
     printf("\n\tCIST remaining-hops %d", ptr[MST_BPDU_CIST_REMAIN_HOPS_OFFSET]);
 
