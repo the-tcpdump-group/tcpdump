@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.182 2006-05-05 23:13:00 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.183 2007-03-11 04:38:19 guy Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -1090,6 +1090,59 @@ Abbreviations for:
 where \fIp\fR is one of the above protocols.
 Note that
 \fItcpdump\fP does not currently know how to parse these protocols.
+.IP "\fBtype \fIwlan_type\fR"
+True if the IEEE 802.11 frame type matches the specified \fIwlan_type\fR.
+Valid \fIwlan_type\fRs are:
+\fBmgt\fP,
+\fBctl\fP
+and \fBdata\fP.
+.IP "\fBtype \fIwlan_type \fBsubtype \fIwlan_subtype\fR"
+True if the IEEE 802.11 frame type matches the specified \fIwlan_type\fR
+and frame subtype matches the specified \fIwlan_subtype\fR.
+.IP
+If the specified \fIwlan_type\fR is \fBmgt\fP,
+then valid \fIwlan_subtype\fRs are:
+\fBassoc-req\fP,
+\fBassoc-resp\fP,
+\fBreassoc-req\fP,
+\fBreassoc-resp\fP,
+\fBprobe-req\fP,
+\fBprobe-resp\fP,
+\fBbeacon\fP,
+\fBatim\fP,
+\fBdisassoc\fP,
+\fBauth\fP and
+\fBdeauth\fP.
+.IP
+If the specified \fIwlan_type\fR is \fBctl\fP,
+then valid \fIwlan_subtype\fRs are:
+\fBps-poll\fP,
+\fBrts\fP,
+\fBcts\fP,
+\fBack\fP,
+\fBcf-end\fP and
+\fBcf-end-ack\fP.
+.IP
+If the specified \fIwlan_type\fR is \fBdata\fP,
+then valid \fIwlan_subtype\fRs are:
+\fBdata\fP,
+\fBdata-cf-ack\fP,
+\fBdata-cf-poll\fP,
+\fBdata-cf-ack-poll\fP,
+\fBnull\fP,
+\fBcf-ack\fP,
+\fBcf-poll\fP,
+\fBcf-ack-poll\fP,
+\fBqos-data\fP,
+\fBqos-data-cf-ack\fP,
+\fBqos-data-cf-poll\fP,
+\fBqos-data-cf-ack-poll\fP,
+\fBqos\fP,
+\fBqos-cf-poll\fP and
+\fBqos-cf-ack-poll\fP.
+.IP "\fBsubtype \fIwlan_subtype\fR"
+True if the IEEE 802.11 frame subtype matches the specified \fIwlan_subtype\fR
+and frame has the type to which the specified \fIwlan_subtype\fR belongs.
 .IP "\fBvlan \fI[vlan_id]\fR"
 True if the packet is an IEEE 802.1Q VLAN packet.
 If \fI[vlan_id]\fR is specified, only true if the packet has the specified
