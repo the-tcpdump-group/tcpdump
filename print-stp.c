@@ -11,7 +11,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-stp.c,v 1.19 2007-03-09 18:58:48 hannes Exp $";
+"@(#) $Header: /tcpdump/master/tcpdump/print-stp.c,v 1.20 2007-03-18 17:11:46 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -267,8 +267,8 @@ stp_print_mstp_bpdu(const struct stp_bpdu_ *stp_bpdu, u_int length)
                    EXTRACT_32BITS(ptr + offset +
                                   MST_BPDU_MSTI_ROOT_PATH_COST_OFFSET));
             printf("\n\t\tMSTI bridge-prio %d, port-prio %d, hops %d",
-                   ptr[offset + MST_BPDU_MSTI_BRIDGE_PRIO_OFFSET],
-                   ptr[offset + MST_BPDU_MSTI_PORT_PRIO_OFFSET],
+                   ptr[offset + MST_BPDU_MSTI_BRIDGE_PRIO_OFFSET] >> 4,
+                   ptr[offset + MST_BPDU_MSTI_PORT_PRIO_OFFSET] >> 4,
                    ptr[offset + MST_BPDU_MSTI_REMAIN_HOPS_OFFSET]);
 
             len -= MST_BPDU_MSTI_LENGTH;
