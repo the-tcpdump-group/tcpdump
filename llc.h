@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/llc.h,v 1.21 2007-02-08 07:06:54 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/llc.h,v 1.22 2007-03-19 15:14:14 hannes Exp $ (LBL)
  */
 
 /*
@@ -104,6 +104,7 @@
 #define	PID_CISCO_CDP		0x2000	/* Cisco Discovery Protocol */
 #define	PID_CISCO_VTP		0x2003	/* Cisco VLAN Trunk Protocol */
 #define	PID_CISCO_DTP		0x2004	/* Cisco Dynamic Trunk Protocol */
+#define	PID_CISCO_UDLD		0x0111	/* Unidirectional Link Detection */
 
 /*
  * PIDs for use with OUI_RFC2684.

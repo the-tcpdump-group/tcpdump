@@ -208,6 +208,7 @@ print-telnet.c
 print-tftp.c
 print-timed.c
 print-token.c
+print-udld.c
 print-udp.c
 print-vjc.c
 print-vqp.c

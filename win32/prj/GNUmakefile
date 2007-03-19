@@ -130,6 +130,7 @@ OBJS = \
 	../../print-tftp.o \
 	../../print-timed.o \
 	../../print-token.o \
+	../../print-udlp.o \
 	../../print-udp.o \
 	../../print-vjc.o \
 	../../print-vqp.o \
