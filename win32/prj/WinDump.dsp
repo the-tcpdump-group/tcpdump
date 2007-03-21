@@ -565,6 +565,10 @@ SOURCE="..\..\print-vrrp.c"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\print-vtp.c"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\print-wb.c"
 # End Source File
 # Begin Source File

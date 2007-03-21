@@ -213,6 +213,7 @@ print-udp.c
 print-vjc.c
 print-vqp.c
 print-vrrp.c
+print-vtp.c
 print-wb.c
 print-zephyr.c
 route6d.h
