@@ -17,6 +17,7 @@
  * Reference documentation:
  *  http://www.cisco.com/en/US/tech/tk389/tk689/technologies_tech_note09186a0080094c52.shtml 
  *  http://www.cisco.com/warp/public/473/21.html 
+ *  http://www.cisco.com/univercd/cc/td/doc/product/lan/trsrb/frames.htm
  *
  * Original code ode by Carles Kishimoto <carles.kishimoto@gmail.com>
  */
@@ -87,10 +88,42 @@ static struct tok vtp_vlan_status[] = {
     { 0, NULL }
 };
 
+#define VTP_VLAN_SOURCE_ROUTING_RING_NUMBER      0x01
+#define VTP_VLAN_SOURCE_ROUTING_BRIDGE_NUMBER    0x02
+#define VTP_VLAN_STP_TYPE                        0x03
+#define VTP_VLAN_PARENT_VLAN                     0x04
+#define VTP_VLAN_TRANS_BRIDGED_VLAN              0x05
+#define VTP_VLAN_PRUNING                         0x06
+#define VTP_VLAN_BRIDGE_TYPE                     0x07
+#define VTP_VLAN_ARP_HOP_COUNT                   0x08
+#define VTP_VLAN_STE_HOP_COUNT                   0x09
+#define VTP_VLAN_BACKUP_CRF_MODE                 0x0A
+
+static struct tok vtp_vlan_tlv_values[] = {
+    { VTP_VLAN_SOURCE_ROUTING_RING_NUMBER, "Source-Routing Ring Number TLV"},
+    { VTP_VLAN_SOURCE_ROUTING_BRIDGE_NUMBER, "Source-Routing Bridge Number TLV"},
+    { VTP_VLAN_STP_TYPE, "STP type TLV"},
+    { VTP_VLAN_PARENT_VLAN, "Parent VLAN TLV"},
+    { VTP_VLAN_TRANS_BRIDGED_VLAN, "Translationally bridged VLANs TLV"},
+    { VTP_VLAN_PRUNING, "Pruning TLV"},
+    { VTP_VLAN_BRIDGE_TYPE, "Bridge Type TLV"},
+    { VTP_VLAN_ARP_HOP_COUNT, "Max ARP Hop Count TLV"},
+    { VTP_VLAN_STE_HOP_COUNT, "Max STE Hop Count TLV"},
+    { VTP_VLAN_BACKUP_CRF_MODE, "Backup CRF Mode TLV"},
+    { 0,                                  NULL }
+};
+
+static struct tok vtp_stp_type_values[] = {
+    { 1, "SRT"},
+    { 2, "SRB"},
+    { 3, "Auto"},
+    { 0, NULL }
+};
+
 void
 vtp_print (const u_char *pptr, u_int length)
 {
-    int type, len;
+    int type, len, tlv_len, tlv_value;
     const u_char *tptr;
     const struct vtp_vlan_ *vtp_vlan;
 
@@ -115,7 +148,7 @@ vtp_print (const u_char *pptr, u_int length)
     }
 
     /* verbose mode print all fields */
-    printf("\n\tDomain name: %s, Flags [%s] %u", 
+    printf("\n\tDomain name: %s, %s: %u", 
 	   (tptr+4),
 	   tok2str(vtp_header_values,"Unknown",*(tptr+1)),
 	   *(tptr+2));
@@ -220,14 +253,80 @@ vtp_print (const u_char *pptr, u_int length)
 		   EXTRACT_16BITS(&vtp_vlan->mtu),
 		   EXTRACT_32BITS(&vtp_vlan->index),
 		   (tptr + VTP_VLAN_INFO_OFFSET));
-	    tptr += len;
 
-	    /* FIXME: TLV dissector missing */
-	
-	    /* The following URL:
-	       http://www.cisco.com/univercd/cc/td/doc/product/lan/trsrb/frames.htm
-	       talks about type (2 bytes) and length (2 bytes), that is not true...
-	    */
+            /*
+             * Vlan names are aligned to 32-bit boundaries.
+             */
+            len  -= VTP_VLAN_INFO_OFFSET + 4*((vtp_vlan->name_len + 3)/4);
+            tptr += VTP_VLAN_INFO_OFFSET + 4*((vtp_vlan->name_len + 3)/4);
+
+            /* TLV information follows */
+
+            while (len > 0) {
+
+                /* 
+                 * Cisco specs says 2 bytes for type + 2 bytes for length, take only 1
+                 * See: http://www.cisco.com/univercd/cc/td/doc/product/lan/trsrb/frames.htm 
+                 */
+                type = *tptr;
+                tlv_len = *(tptr+1);
+
+                printf("\n\t\t%s (0x%04x) TLV",
+                       tok2str(vtp_vlan_tlv_values, "Unknown", type),
+                       type);
+
+                /*
+                 * infinite loop check
+                 */
+                if (type == 0 || tlv_len == 0) {
+                    return;
+                }
+
+                if (!TTEST2(*tptr, tlv_len*2 +2))
+                    goto trunc;
+
+                tlv_value = EXTRACT_16BITS(tptr+2);
+
+                switch (type) {
+                case VTP_VLAN_STE_HOP_COUNT:
+                    printf(", %u", tlv_value);
+                    break;
+
+                case VTP_VLAN_PRUNING:
+                    printf(", %s (%u)",
+                           tlv_value == 1 ? "Enabled" : "Disabled",
+                           tlv_value);
+                    break;
+
+                case VTP_VLAN_STP_TYPE:
+                    printf(", %s (%u)",
+                           tok2str(vtp_stp_type_values, "Unknown", tlv_value),
+                           tlv_value);
+                    break;
+
+                case VTP_VLAN_BRIDGE_TYPE:
+                    printf(", %s (%u)",
+                           tlv_value == 1 ? "SRB" : "SRT",
+                           tlv_value);
+                    break;
+
+                case VTP_VLAN_BACKUP_CRF_MODE:
+                    printf(", %s (%u)",
+                           tlv_value == 1 ? "Backup" : "Not backup",
+                           tlv_value);
+                    break;
+
+                case VTP_VLAN_SOURCE_ROUTING_RING_NUMBER:
+                case VTP_VLAN_SOURCE_ROUTING_BRIDGE_NUMBER:
+                case VTP_VLAN_PARENT_VLAN:
+                case VTP_VLAN_TRANS_BRIDGED_VLAN:
+                case VTP_VLAN_ARP_HOP_COUNT:
+                default:
+                    break;
+                }
+                len -= 2 + tlv_len*2;
+                tptr += 2 + tlv_len*2;
+            }
 	}
 	break;
 
