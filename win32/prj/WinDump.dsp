@@ -249,6 +249,10 @@ SOURCE="..\..\print-domain.c"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\print-dtp.c"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\print-dvmrp.c"
 # End Source File
 # Begin Source File

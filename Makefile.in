@@ -17,7 +17,7 @@
 #  WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 #  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.307 2007-03-21 07:35:00 hannes Exp $ (LBL)
+# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.308 2007-03-23 08:12:00 hannes Exp $ (LBL)
 
 #
 # Various configurable paths (remember to edit Makefile.in, not Makefile)
@@ -71,7 +71,7 @@ CSRC =	addrtoname.c af.c checksum.c cpack.c gmpls.c oui.c gmt2local.c ipproto.c 
 	print-aodv.c print-arp.c print-ascii.c print-atalk.c print-atm.c \
 	print-beep.c print-bfd.c print-bgp.c print-bootp.c print-cdp.c \
 	print-cfm.c print-chdlc.c print-cip.c print-cnfp.c print-dccp.c print-decnet.c \
-	print-domain.c print-dvmrp.c print-enc.c print-egp.c \
+	print-domain.c print-dtp.c print-dvmrp.c print-enc.c print-egp.c \
 	print-eap.c print-eigrp.c\
 	print-esp.c print-ether.c print-fddi.c print-fr.c \
 	print-gre.c print-hsrp.c print-icmp.c print-igmp.c \

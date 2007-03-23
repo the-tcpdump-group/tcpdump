@@ -24,7 +24,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.73 2007-03-21 07:35:00 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.74 2007-03-23 08:12:00 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -445,6 +445,9 @@ snap_print(const u_char *p, u_int length, u_int caplen,
                 switch (et) {
                 case PID_CISCO_CDP:
                         cdp_print(p, length, caplen);
+                        return (1);
+                case PID_CISCO_DTP:
+                        dtp_print(p, length); 
                         return (1);
                 case PID_CISCO_UDLD:
                         udld_print(p, length);

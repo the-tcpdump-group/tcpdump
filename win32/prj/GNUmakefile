@@ -64,6 +64,7 @@ OBJS = \
 	../../print-decnet.o \
 	../../print-dhcp6.o \
 	../../print-domain.o \
+	../../print-dtp.o \
 	../../print-dvmrp.o \
 	../../print-egp.o \
 	../../print-enc.o \

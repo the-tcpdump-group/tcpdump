@@ -134,6 +134,7 @@ print-dccp.c
 print-decnet.c
 print-dhcp6.c
 print-domain.c
+print-dtp.c
 print-dvmrp.c
 print-eap.c
 print-egp.c

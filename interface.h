@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.273 2007-03-21 07:58:55 hannes Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.274 2007-03-23 08:12:00 hannes Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -283,6 +283,7 @@ extern u_int symantec_if_print(const struct pcap_pkthdr *, const u_char *);
 extern void tcp_print(const u_char *, u_int, const u_char *, int);
 extern void tftp_print(const u_char *, u_int);
 extern void timed_print(const u_char *);
+extern void udld_print(const u_char *, u_int);
 extern void udp_print(const u_char *, u_int, const u_char *, int);
 extern void vtp_print(const u_char *, u_int);
 extern void wb_print(const void *, u_int);
@@ -304,6 +305,7 @@ extern void mpcp_print(const u_char *, u_int);
 extern void cfm_print(const u_char *, u_int);
 extern void pgm_print(const u_char *, u_int, const u_char *);
 extern void cdp_print(const u_char *, u_int, u_int);
+extern void dtp_print(const u_char *, u_int);
 extern void stp_print(const u_char *, u_int);
 extern void radius_print(const u_char *, u_int);
 extern void lwres_print(const u_char *, u_int);
