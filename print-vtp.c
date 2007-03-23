@@ -72,13 +72,6 @@ static struct tok vtp_header_values[] = {
     { 0, NULL }
 };
 
-static struct tok vtp_stp_type_values[] = {
-    { 1, "SRT"},	
-    { 2, "SRB"},
-    { 3, "Auto"},
-    { 0, NULL }
-};
-
 static struct tok vtp_vlan_type_values[] = {
     { 0x01, "Ethernet"},
     { 0x02, "FDDI"},
@@ -97,7 +90,7 @@ static struct tok vtp_vlan_status[] = {
 void
 vtp_print (const u_char *pptr, u_int length)
 {
-    int type, len, tlv_len;
+    int type, len;
     const u_char *tptr;
     const struct vtp_vlan_ *vtp_vlan;
 
