@@ -316,12 +316,18 @@ vtp_print (const u_char *pptr, u_int length)
                            tlv_value);
                     break;
 
+                    /*
+                     * FIXME those are the defined TLVs that lack a decoder
+                     * you are welcome to contribute code ;-)
+                     */
+
                 case VTP_VLAN_SOURCE_ROUTING_RING_NUMBER:
                 case VTP_VLAN_SOURCE_ROUTING_BRIDGE_NUMBER:
                 case VTP_VLAN_PARENT_VLAN:
                 case VTP_VLAN_TRANS_BRIDGED_VLAN:
                 case VTP_VLAN_ARP_HOP_COUNT:
                 default:
+		    print_unknown_data(tptr, "\n\t\t  ", 2 + tlv_len*2);
                     break;
                 }
                 len -= 2 + tlv_len*2;
