@@ -421,6 +421,10 @@ SOURCE="..\..\print-null.c"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\print-olsr.c"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\print-ospf.c"
 # End Source File
 # Begin Source File

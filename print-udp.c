@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.139 2006-03-03 22:31:16 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-udp.c,v 1.140 2007-03-27 10:44:09 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -674,6 +674,8 @@ udp_print(register const u_char *bp, u_int length,
 			lwres_print((const u_char *)(up + 1), length);
                 else if (ISPORT(LDP_PORT))
 			ldp_print((const u_char *)(up + 1), length);
+                else if (ISPORT(OLSR_PORT))
+			olsr_print((const u_char *)(up + 1), length);
                 else if (ISPORT(MPLS_LSP_PING_PORT))
 			lspping_print((const u_char *)(up + 1), length);
 		else if (dport == BFD_CONTROL_PORT ||

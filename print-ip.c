@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.157 2007-01-17 17:55:01 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.158 2007-03-27 10:44:09 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -665,7 +665,7 @@ ip_print(netdissect_options *ndo,
 		}
 	    }
 
-            printf(") ");
+            printf(")\n    ");
 	}
 
 	/*

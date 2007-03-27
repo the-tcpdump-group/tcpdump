@@ -177,6 +177,7 @@ print-netbios.c
 print-nfs.c
 print-ntp.c
 print-null.c
+print-olsr.c
 print-ospf.c
 print-ospf6.c
 print-pflog.c

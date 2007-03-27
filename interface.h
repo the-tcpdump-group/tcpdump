@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.274 2007-03-23 08:12:00 hannes Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.275 2007-03-27 10:44:09 hannes Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -106,6 +106,10 @@ extern char *strsep(char **, const char *);
 #define HTONL(x)	(x) = htonl(x)
 #define HTONS(x)	(x) = htons(x)
 #endif
+#endif
+
+#ifndef MIN
+#define MIN(a,b) ((a)<(b)?(a):(b))
 #endif
 
 extern char *program_name;	/* used to generate self-identifying messages */
@@ -233,6 +237,7 @@ extern void ns_print(const u_char *, u_int, int);
 extern void ntp_print(const u_char *, u_int);
 extern u_int null_if_print(const struct pcap_pkthdr *, const u_char *);
 extern void ospf_print(const u_char *, u_int, const u_char *);
+extern void olsr_print (const u_char *, u_int);
 extern void pimv1_print(const u_char *, u_int);
 extern void cisco_autorp_print(const u_char *, u_int);
 extern void rsvp_print(const u_char *, u_int);
