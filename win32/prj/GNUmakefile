@@ -97,6 +97,7 @@ OBJS = \
 	../../print-nfs.o \
 	../../print-ntp.o \
 	../../print-null.o \
+	../../print-olsr.o \
 	../../print-ospf.o \
 	../../print-ospf6.o \
 	../../print-pflog.o \

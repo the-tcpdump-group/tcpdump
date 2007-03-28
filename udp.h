@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/udp.h,v 1.8.2.1 2006-02-09 23:34:07 hannes Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/udp.h,v 1.8.2.2 2007-03-28 07:45:46 hannes Exp $ (LBL) */
 /*
  * Copyright (c) 1982, 1986, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -57,6 +57,7 @@ struct udphdr {
 #define RIP_PORT 520		/*XXX*/
 #define LDP_PORT 646
 #define AODV_PORT 654		/*XXX*/
+#define OLSR_PORT 698           /* rfc3626 */
 #define KERBEROS_SEC_PORT 750	/*XXX*/
 #define L2TP_PORT 1701		/*XXX*/
 #define SIP_PORT 5060
