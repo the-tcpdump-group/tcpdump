@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.128 2007-01-29 19:19:51 hannes Exp $ (LBL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.129 2007-04-03 20:02:56 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -463,7 +463,8 @@ tcp_print(register const u_char *bp, register u_int length,
                 cp = (const u_char *)tp + sizeof(*tp);
                 printf(", options [");
                 while (hlen > 0) {
-                        putchar(ch);
+                        if (ch != '\0')
+                                putchar(ch);
                         TCHECK(*cp);
                         opt = *cp++;
                         if (ZEROLENOPT(opt))
