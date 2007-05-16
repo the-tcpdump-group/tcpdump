@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.104 2007-05-16 08:04:50 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.105 2007-05-16 14:02:51 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -395,6 +395,9 @@ static struct tok bgp_safi_values[] = {
 
 #define BGP_EXT_COM_L2INFO      0x800a  /* draft-kompella-ppvpn-l2vpn */
 
+#define BGP_EXT_COM_SOURCE_AS   0x0010  /* draft-ietf-l3vpn-2547bis-mcast-bgp-02.txt */
+#define BGP_EXT_COM_VRF_RT_IMP  0x0108  /* draft-ietf-l3vpn-2547bis-mcast-bgp-02.txt */
+
 /* http://www.cisco.com/en/US/tech/tk436/tk428/technologies_tech_note09186a00801eb09a.shtml  */
 #define BGP_EXT_COM_EIGRP_GEN   0x8800
 #define BGP_EXT_COM_EIGRP_METRIC_AS_DELAY  0x8801
@@ -433,6 +436,8 @@ static struct tok bgp_extd_comm_subtype_values[] = {
     { BGP_EXT_COM_EIGRP_METRIC_LOAD_MTU , "eigrp-route-metric (load, MTU)" },
     { BGP_EXT_COM_EIGRP_EXT_REMAS_REMID , "eigrp-external-route (remote-AS, remote-ID)" },
     { BGP_EXT_COM_EIGRP_EXT_REMPROTO_REMMETRIC , "eigrp-external-route (remote-proto, remote-metric)" },
+    { BGP_EXT_COM_SOURCE_AS, "source-AS" },
+    { BGP_EXT_COM_VRF_RT_IMP, "vrf-route-import"},
     { 0, NULL},
 };
 
@@ -1554,6 +1559,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                         break;
                     case BGP_EXT_COM_RT_1:
                     case BGP_EXT_COM_RO_1:
+                    case BGP_EXT_COM_VRF_RT_IMP:
                         printf(": %s:%u",
                                getname(tptr+2),
                                EXTRACT_16BITS(tptr+6));
@@ -1601,6 +1607,9 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
 					  tokbuf, sizeof(tokbuf)),
                                        *(tptr+3),
                                EXTRACT_16BITS(tptr+4));
+                        break;
+                    case BGP_EXT_COM_SOURCE_AS:
+                        printf(": AS %u", EXTRACT_16BITS(tptr+2));
                         break;
                     default:
                         TCHECK2(*tptr,8);
