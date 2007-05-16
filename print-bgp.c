@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.105 2007-05-16 14:02:51 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.106 2007-05-16 14:35:35 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -1640,23 +1640,38 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                 tlen -= 5;
 
                 switch (tunnel_type) {
-                case BGP_PMSI_TUNNEL_PIM_SSM:
+                case BGP_PMSI_TUNNEL_PIM_SM: /* fall through */
+                case BGP_PMSI_TUNNEL_PIM_BIDIR:
                     TCHECK2(tptr[0], 8);
-                    printf("\n\t      P-Root-Node %s, P-Group %s",
+                    printf("\n\t      Sender %s, P-Group %s",
                            ipaddr_string(tptr),
                            ipaddr_string(tptr+4));
                     break;
 
-                    /*
-                     * no Tunnel-ID printing, just hexdumping for now
-                     * you are welcome to contribute code ;-)
-                     */
-                case BGP_PMSI_TUNNEL_RSVP_P2MP:
-                case BGP_PMSI_TUNNEL_LDP_P2MP:
-                case BGP_PMSI_TUNNEL_PIM_SM:
-                case BGP_PMSI_TUNNEL_PIM_BIDIR:
+                case BGP_PMSI_TUNNEL_PIM_SSM:
+                    TCHECK2(tptr[0], 8);
+                    printf("\n\t      Root-Node %s, P-Group %s",
+                           ipaddr_string(tptr),
+                           ipaddr_string(tptr+4));
+                    break;
                 case BGP_PMSI_TUNNEL_INGRESS:
+                    TCHECK2(tptr[0], 4);
+                    printf("\n\t      Tunnel-Endpoint %s",
+                           ipaddr_string(tptr));
+                    break;
+                case BGP_PMSI_TUNNEL_LDP_P2MP: /* fall through */
                 case BGP_PMSI_TUNNEL_LDP_MP2MP:
+                    TCHECK2(tptr[0], 8);
+                    printf("\n\t      Root-Node %s, LSP-ID 0x%08x",
+                           ipaddr_string(tptr),
+                           EXTRACT_32BITS(tptr+4));
+                    break;
+                case BGP_PMSI_TUNNEL_RSVP_P2MP:
+                    TCHECK2(tptr[0], 8);
+                    printf("\n\t      Extended-Tunnel-ID %s, P2MP-ID 0x%08x",
+                           ipaddr_string(tptr),
+                           EXTRACT_32BITS(tptr+4));
+                    break;
                 default:
                     if (vflag <= 1) {
                         print_unknown_data(tptr,"\n\t      ",tlen);
