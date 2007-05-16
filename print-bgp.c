@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.103 2006-10-06 06:25:06 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.104 2007-05-16 08:04:50 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -145,6 +145,7 @@ struct bgp_attr {
 #define BGPTYPE_MP_REACH_NLRI		14	/* RFC2283 */
 #define BGPTYPE_MP_UNREACH_NLRI		15	/* RFC2283 */
 #define BGPTYPE_EXTD_COMMUNITIES        16      /* draft-ietf-idr-bgp-ext-communities */
+#define BGPTYPE_PMSI_TUNNEL             17      /* draft-ietf-l3vpn-2547bis-mcast-bgp-02.txt */
 #define BGPTYPE_ATTR_SET               128      /* draft-marques-ppvpn-ibgp */
 
 #define BGP_MP_NLRI_MINSIZE              3       /* End of RIB Marker detection */
@@ -166,6 +167,7 @@ static struct tok bgp_attr_values[] = {
     { BGPTYPE_MP_REACH_NLRI,    "Multi-Protocol Reach NLRI"},
     { BGPTYPE_MP_UNREACH_NLRI,  "Multi-Protocol Unreach NLRI"},
     { BGPTYPE_EXTD_COMMUNITIES, "Extended Community"},
+    { BGPTYPE_PMSI_TUNNEL,      "PMSI Tunnel"},
     { BGPTYPE_ATTR_SET,         "Attribute Set"},
     { 255,                      "Reserved for development"},
     { 0, NULL}
@@ -301,6 +303,31 @@ static struct tok bgp_origin_values[] = {
     { 0, NULL}
 };
 
+#define BGP_PMSI_TUNNEL_RSVP_P2MP 1
+#define BGP_PMSI_TUNNEL_LDP_P2MP  2
+#define BGP_PMSI_TUNNEL_PIM_SSM   3
+#define BGP_PMSI_TUNNEL_PIM_SM    4
+#define BGP_PMSI_TUNNEL_PIM_BIDIR 5
+#define BGP_PMSI_TUNNEL_INGRESS   6
+#define BGP_PMSI_TUNNEL_LDP_MP2MP 7
+
+static struct tok bgp_pmsi_tunnel_values[] = {
+    { BGP_PMSI_TUNNEL_RSVP_P2MP, "RSVP-TE P2MP LSP"},
+    { BGP_PMSI_TUNNEL_LDP_P2MP, "LDP P2MP LSP"},
+    { BGP_PMSI_TUNNEL_PIM_SSM, "PIM-SSM Tree"},
+    { BGP_PMSI_TUNNEL_PIM_SM, "PIM-SM Tree"},
+    { BGP_PMSI_TUNNEL_PIM_BIDIR, "PIM-Bidir Tree"},
+    { BGP_PMSI_TUNNEL_INGRESS, "Ingress Replication"},
+    { BGP_PMSI_TUNNEL_LDP_MP2MP, "LDP MP2MP LSP"},
+    { 0, NULL}
+};
+
+static struct tok bgp_pmsi_flag_values[] = {
+    { 0x01, "Leaf Information required"},
+    { 0, NULL}
+};
+
+
 /* Subsequent address family identifier, RFC2283 section 7 */
 #define SAFNUM_RES                      0
 #define SAFNUM_UNICAST                  1
@@ -317,6 +344,8 @@ static struct tok bgp_origin_values[] = {
 #define SAFNUM_VPNUNIMULTICAST          130
 /* draft-marques-ppvpn-rt-constrain-01.txt */
 #define SAFNUM_RT_ROUTING_INFO          132
+/* draft-ietf-l3vpn-2547bis-mcast-bgp-02.txt */
+#define SAFNUM_MULTICAST_VPN            139
 
 #define BGP_VPN_RD_LEN                  8
 
@@ -332,7 +361,8 @@ static struct tok bgp_safi_values[] = {
     { SAFNUM_VPNUNICAST,        "labeled VPN Unicast"},
     { SAFNUM_VPNMULTICAST,      "labeled VPN Multicast"},
     { SAFNUM_VPNUNIMULTICAST,   "labeled VPN Unicast+Multicast"},
-    { SAFNUM_RT_ROUTING_INFO,   "Route Target Routing Information"}, /* draft-marques-ppvpn-rt-constrain-01.txt */
+    { SAFNUM_RT_ROUTING_INFO,   "Route Target Routing Information"},
+    { SAFNUM_MULTICAST_VPN,     "Multicast VPN"},
     { 0, NULL }
 };
 
@@ -605,6 +635,59 @@ decode_labeled_vpn_prefix4(const u_char *pptr, char *buf, u_int buflen)
                  ((pptr[3]&1)==0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
 
 	return 12 + (plen + 7) / 8;
+
+trunc:
+	return -2;
+}
+
+#define BGP_MULTICAST_VPN_ROUTE_TYPE_INTRA_AS_I_PMSI   1
+#define BGP_MULTICAST_VPN_ROUTE_TYPE_INTER_AS_I_PMSI   2
+#define BGP_MULTICAST_VPN_ROUTE_TYPE_S_PMSI            3
+#define BGP_MULTICAST_VPN_ROUTE_TYPE_INTRA_AS_SEG_LEAF 4
+#define BGP_MULTICAST_VPN_ROUTE_TYPE_SOURCE_ACTIVE     5
+#define BGP_MULTICAST_VPN_ROUTE_TYPE_SHARED_TREE_JOIN  6
+#define BGP_MULTICAST_VPN_ROUTE_TYPE_SOURCE_TREE_JOIN  7
+
+static struct tok bgp_multicast_vpn_route_type_values[] = {
+    { BGP_MULTICAST_VPN_ROUTE_TYPE_INTRA_AS_I_PMSI, "Intra-AS I-PMSI"},
+    { BGP_MULTICAST_VPN_ROUTE_TYPE_INTER_AS_I_PMSI, "Inter-AS I-PMSI"},
+    { BGP_MULTICAST_VPN_ROUTE_TYPE_S_PMSI, "S-PMSI"},
+    { BGP_MULTICAST_VPN_ROUTE_TYPE_INTRA_AS_SEG_LEAF, "Intra-AS Segment-Leaf"},
+    { BGP_MULTICAST_VPN_ROUTE_TYPE_SOURCE_ACTIVE, "Source-Active"},
+    { BGP_MULTICAST_VPN_ROUTE_TYPE_SHARED_TREE_JOIN, "Shared Tree Join"},
+    { BGP_MULTICAST_VPN_ROUTE_TYPE_SOURCE_TREE_JOIN, "Source Tree Join"},
+};
+
+static int
+decode_multicast_vpn(const u_char *pptr, char *buf, u_int buflen)
+{
+        u_int8_t route_type, route_length;
+
+	TCHECK2(pptr[0], 2);
+        route_type = *pptr++;
+        route_length = *pptr++;
+
+        snprintf(buf, buflen, "Route-Type: %s (%u), length: %u",
+                 tok2str(bgp_multicast_vpn_route_type_values, "Unknown", route_type),
+                 route_type, route_length);
+
+        switch(route_type) {
+
+            /*
+             * no per route-type printing yet.
+             */
+        case BGP_MULTICAST_VPN_ROUTE_TYPE_INTRA_AS_I_PMSI:
+        case BGP_MULTICAST_VPN_ROUTE_TYPE_INTER_AS_I_PMSI:
+        case BGP_MULTICAST_VPN_ROUTE_TYPE_S_PMSI:
+        case BGP_MULTICAST_VPN_ROUTE_TYPE_INTRA_AS_SEG_LEAF:
+        case BGP_MULTICAST_VPN_ROUTE_TYPE_SOURCE_ACTIVE:
+        case BGP_MULTICAST_VPN_ROUTE_TYPE_SHARED_TREE_JOIN:
+        case BGP_MULTICAST_VPN_ROUTE_TYPE_SOURCE_TREE_JOIN:
+        default:
+            break;
+        }
+
+        return route_length + 2;
 
 trunc:
 	return -2;
@@ -997,12 +1080,12 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                 case (AFNUM_INET<<8 | SAFNUM_VPNUNICAST):
                 case (AFNUM_INET<<8 | SAFNUM_VPNMULTICAST):
                 case (AFNUM_INET<<8 | SAFNUM_VPNUNIMULTICAST):
+                case (AFNUM_INET<<8 | SAFNUM_MULTICAST_VPN):
 #ifdef INET6
                 case (AFNUM_INET6<<8 | SAFNUM_UNICAST):
                 case (AFNUM_INET6<<8 | SAFNUM_MULTICAST):
                 case (AFNUM_INET6<<8 | SAFNUM_UNIMULTICAST):
                 case (AFNUM_INET6<<8 | SAFNUM_LABUNICAST):
-                case (AFNUM_INET6<<8 | SAFNUM_RT_ROUTING_INFO):
                 case (AFNUM_INET6<<8 | SAFNUM_VPNUNICAST):
                 case (AFNUM_INET6<<8 | SAFNUM_VPNMULTICAST):
                 case (AFNUM_INET6<<8 | SAFNUM_VPNUNIMULTICAST):
@@ -1043,6 +1126,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                         case (AFNUM_INET<<8 | SAFNUM_UNIMULTICAST):
                         case (AFNUM_INET<<8 | SAFNUM_LABUNICAST):
                         case (AFNUM_INET<<8 | SAFNUM_RT_ROUTING_INFO):
+                        case (AFNUM_INET<<8 | SAFNUM_MULTICAST_VPN):
                             if (tlen < (int)sizeof(struct in_addr)) {
                                 printf("invalid len");
                                 tlen = 0;
@@ -1073,7 +1157,6 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                         case (AFNUM_INET6<<8 | SAFNUM_MULTICAST):
                         case (AFNUM_INET6<<8 | SAFNUM_UNIMULTICAST):
                         case (AFNUM_INET6<<8 | SAFNUM_LABUNICAST):
-                        case (AFNUM_INET6<<8 | SAFNUM_RT_ROUTING_INFO):
                             if (tlen < (int)sizeof(struct in6_addr)) {
                                 printf("invalid len");
                                 tlen = 0;
@@ -1218,6 +1301,15 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                         else
                             printf("\n\t      %s", buf);
                         break;
+                    case (AFNUM_INET<<8 | SAFNUM_MULTICAST_VPN):
+                        advance = decode_multicast_vpn(tptr, buf, sizeof(buf));
+                        if (advance == -1)
+                            printf("\n\t    (illegal prefix length)");
+                        else if (advance == -2)
+                            goto trunc;
+                        else
+                            printf("\n\t      %s", buf);
+                        break;
 #ifdef INET6
                     case (AFNUM_INET6<<8 | SAFNUM_UNICAST):
                     case (AFNUM_INET6<<8 | SAFNUM_MULTICAST):
@@ -1243,15 +1335,6 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                     case (AFNUM_INET6<<8 | SAFNUM_VPNMULTICAST):
                     case (AFNUM_INET6<<8 | SAFNUM_VPNUNIMULTICAST):
                         advance = decode_labeled_vpn_prefix6(tptr, buf, sizeof(buf));
-                        if (advance == -1)
-                            printf("\n\t    (illegal prefix length)");
-                        else if (advance == -2)
-                            goto trunc;
-                        else
-                            printf("\n\t      %s", buf);
-                        break;
-                    case (AFNUM_INET6<<8 | SAFNUM_RT_ROUTING_INFO):
-                        advance = decode_rt_routing_info(tptr, buf, sizeof(buf));
                         if (advance == -1)
                             printf("\n\t    (illegal prefix length)");
                         else if (advance == -2)
@@ -1529,6 +1612,49 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                 }
                 break;
 
+        case BGPTYPE_PMSI_TUNNEL:
+        {
+                u_int8_t tunnel_type, flags;
+            
+                tunnel_type = *(tptr+1);
+                flags = *tptr;
+                tlen = len;
+
+                TCHECK2(tptr[0], 5);
+                printf("\n\t    Tunnel-type %s (%u), Flags [%s], MPLS Label %u",
+                       tok2str(bgp_pmsi_tunnel_values, "Unknown", tunnel_type),
+                       tunnel_type,
+                       bittok2str(bgp_pmsi_flag_values, "none", flags),
+                       EXTRACT_24BITS(tptr+2)>>4);
+
+                tptr +=5;
+                tlen -= 5;
+
+                switch (tunnel_type) {
+                case BGP_PMSI_TUNNEL_PIM_SSM:
+                    TCHECK2(tptr[0], 8);
+                    printf("\n\t      P-Root-Node %s, P-Group %s",
+                           ipaddr_string(tptr),
+                           ipaddr_string(tptr+4));
+                    break;
+
+                    /*
+                     * no Tunnel-ID printing, just hexdumping for now
+                     * you are welcome to contribute code ;-)
+                     */
+                case BGP_PMSI_TUNNEL_RSVP_P2MP:
+                case BGP_PMSI_TUNNEL_LDP_P2MP:
+                case BGP_PMSI_TUNNEL_PIM_SM:
+                case BGP_PMSI_TUNNEL_PIM_BIDIR:
+                case BGP_PMSI_TUNNEL_INGRESS:
+                case BGP_PMSI_TUNNEL_LDP_MP2MP:
+                default:
+                    if (vflag <= 1) {
+                        print_unknown_data(tptr,"\n\t      ",tlen);
+                    }
+                }
+                break;
+        }
         case BGPTYPE_ATTR_SET:
                 TCHECK2(tptr[0], 4);
                 printf("\n\t    Origin AS: %u", EXTRACT_32BITS(tptr));
