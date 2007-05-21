@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.106 2007-05-16 14:35:35 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.107 2007-05-21 15:42:33 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -530,6 +530,93 @@ trunc:
 	return -2;
 }
 
+/*
+ * bgp_vpn_ip_print
+ *
+ * print an ipv4 or ipv6 address into a buffer dependend on address length.
+ */
+static char *
+bgp_vpn_ip_print (const u_char *pptr, u_int addr_length) {
+
+    /* worst case string is s fully formatted v6 address */
+    static char addr[sizeof("1234:5678:89ab:cdef:1234:5678:89ab:cdef")];
+    char *pos = addr;
+
+    switch(addr_length) {
+    case sizeof(struct in_addr):
+        TCHECK2(pptr[0], sizeof(struct in_addr));
+        snprintf(pos, sizeof(addr), "%s", ipaddr_string(pptr));
+        break;
+    case sizeof(struct in6_addr):
+        TCHECK2(pptr[0], sizeof(struct in6_addr));
+        snprintf(pos, sizeof(addr), "%s", ip6addr_string(pptr));
+        break;
+    default:
+        snprintf(pos, sizeof(addr), "bogus address length %u", addr_length);
+        break;
+    }
+    pos += strlen(pos);
+
+trunc:
+    *(pos) = '\0';
+    return (addr);
+}
+
+/*
+ * bgp_vpn_sg_print
+ *
+ * print an multicast s,g entry into a buffer.
+ * the s,g entry is encoded like this.
+ *
+ * +-----------------------------------+
+ * | Multicast Source Length (1 octet) |
+ * +-----------------------------------+
+ * |   Multicast Source (Variable)     |
+ * +-----------------------------------+
+ * |  Multicast Group Length (1 octet) |
+ * +-----------------------------------+
+ * |  Multicast Group   (Variable)     |
+ * +-----------------------------------+
+ *
+ * return the number of bytes read from the wire.
+ */
+static int
+bgp_vpn_sg_print (const u_char *pptr, char *buf, u_int buflen) {
+
+    u_int8_t addr_length;
+    u_int total_length, offset;
+
+    total_length = 0;
+
+    /* Source address length */
+    TCHECK2(pptr[0], 1);
+    addr_length =  *pptr++;
+
+    /* Source address */
+    TCHECK2(pptr[0], addr_length);
+    total_length += addr_length + 1;
+    offset = strlen(buf);
+    snprintf(buf + offset, buflen - offset, ", Source %s",
+             bgp_vpn_ip_print(pptr, addr_length));
+    pptr += addr_length;
+    
+    /* Group address length */
+    TCHECK2(pptr[0], 1);
+    addr_length =  *pptr++;
+
+    /* Group address */
+    TCHECK2(pptr[0], addr_length);
+    total_length += addr_length + 1;
+    offset = strlen(buf);
+    snprintf(buf + offset, buflen - offset, ", Group %s",
+             bgp_vpn_ip_print(pptr, addr_length));
+    pptr += addr_length;
+
+trunc:
+    return (total_length);
+}
+
+
 /* RDs and RTs share the same semantics
  * we use bgp_vpn_rd_print for
  * printing route targets inside a NLRI */
@@ -666,28 +753,77 @@ static struct tok bgp_multicast_vpn_route_type_values[] = {
 static int
 decode_multicast_vpn(const u_char *pptr, char *buf, u_int buflen)
 {
-        u_int8_t route_type, route_length;
+        u_int8_t route_type, route_length, addr_length, sg_length;
+        u_int offset;
 
 	TCHECK2(pptr[0], 2);
         route_type = *pptr++;
         route_length = *pptr++;
 
         snprintf(buf, buflen, "Route-Type: %s (%u), length: %u",
-                 tok2str(bgp_multicast_vpn_route_type_values, "Unknown", route_type),
+                 tok2str(bgp_multicast_vpn_route_type_values,
+                         "Unknown", route_type),
                  route_type, route_length);
 
         switch(route_type) {
+        case BGP_MULTICAST_VPN_ROUTE_TYPE_INTRA_AS_I_PMSI:
+            TCHECK2(pptr[0], BGP_VPN_RD_LEN);
+            offset = strlen(buf);
+            snprintf(buf + offset, buflen - offset, ", RD: %s, Originator %s",
+                     bgp_vpn_rd_print(pptr),
+                     bgp_vpn_ip_print(pptr + BGP_VPN_RD_LEN,
+                                      route_length - BGP_VPN_RD_LEN));
+            break;
+        case BGP_MULTICAST_VPN_ROUTE_TYPE_INTER_AS_I_PMSI:
+            TCHECK2(pptr[0], BGP_VPN_RD_LEN + 4);
+            offset = strlen(buf);
+            snprintf(buf + offset, buflen - offset, ", RD: %s, Source-AS %u",
+                     bgp_vpn_rd_print(pptr),
+                     EXTRACT_32BITS(pptr + BGP_VPN_RD_LEN));
+            break;
+
+        case BGP_MULTICAST_VPN_ROUTE_TYPE_S_PMSI:
+            TCHECK2(pptr[0], BGP_VPN_RD_LEN);
+            offset = strlen(buf);
+            snprintf(buf + offset, buflen - offset, ", RD: %s",
+                     bgp_vpn_rd_print(pptr));
+            pptr += BGP_VPN_RD_LEN;
+
+            sg_length = bgp_vpn_sg_print(pptr, buf, buflen);
+            addr_length =  route_length - sg_length;
+
+            TCHECK2(pptr[0], addr_length);
+            offset = strlen(buf);
+            snprintf(buf + offset, buflen - offset, ", Originator %s",
+                     bgp_vpn_ip_print(pptr, addr_length));
+            break;
+
+        case BGP_MULTICAST_VPN_ROUTE_TYPE_SOURCE_ACTIVE:
+            TCHECK2(pptr[0], BGP_VPN_RD_LEN);
+            offset = strlen(buf);
+            snprintf(buf + offset, buflen - offset, ", RD: %s",
+                     bgp_vpn_rd_print(pptr));
+            pptr += BGP_VPN_RD_LEN;
+
+            bgp_vpn_sg_print(pptr, buf, buflen);
+            break;
+
+        case BGP_MULTICAST_VPN_ROUTE_TYPE_SHARED_TREE_JOIN: /* fall through */
+        case BGP_MULTICAST_VPN_ROUTE_TYPE_SOURCE_TREE_JOIN:
+            TCHECK2(pptr[0], BGP_VPN_RD_LEN);
+            offset = strlen(buf);
+            snprintf(buf + offset, buflen - offset, ", RD: %s, Source-AS %u",
+                     bgp_vpn_rd_print(pptr),
+                     EXTRACT_32BITS(pptr + BGP_VPN_RD_LEN));
+            pptr += BGP_VPN_RD_LEN;
+
+            bgp_vpn_sg_print(pptr, buf, buflen);
+            break;
 
             /*
              * no per route-type printing yet.
              */
-        case BGP_MULTICAST_VPN_ROUTE_TYPE_INTRA_AS_I_PMSI:
-        case BGP_MULTICAST_VPN_ROUTE_TYPE_INTER_AS_I_PMSI:
-        case BGP_MULTICAST_VPN_ROUTE_TYPE_S_PMSI:
         case BGP_MULTICAST_VPN_ROUTE_TYPE_INTRA_AS_SEG_LEAF:
-        case BGP_MULTICAST_VPN_ROUTE_TYPE_SOURCE_ACTIVE:
-        case BGP_MULTICAST_VPN_ROUTE_TYPE_SHARED_TREE_JOIN:
-        case BGP_MULTICAST_VPN_ROUTE_TYPE_SOURCE_TREE_JOIN:
         default:
             break;
         }
