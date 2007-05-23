@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.107 2007-05-21 15:42:33 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.108 2007-05-23 22:24:49 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -145,7 +145,7 @@ struct bgp_attr {
 #define BGPTYPE_MP_REACH_NLRI		14	/* RFC2283 */
 #define BGPTYPE_MP_UNREACH_NLRI		15	/* RFC2283 */
 #define BGPTYPE_EXTD_COMMUNITIES        16      /* draft-ietf-idr-bgp-ext-communities */
-#define BGPTYPE_PMSI_TUNNEL             17      /* draft-ietf-l3vpn-2547bis-mcast-bgp-02.txt */
+#define BGPTYPE_PMSI_TUNNEL             22      /* draft-ietf-l3vpn-2547bis-mcast-bgp-02.txt */
 #define BGPTYPE_ATTR_SET               128      /* draft-marques-ppvpn-ibgp */
 
 #define BGP_MP_NLRI_MINSIZE              3       /* End of RIB Marker detection */
