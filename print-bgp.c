@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.108 2007-05-23 22:24:49 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.109 2007-05-24 23:13:18 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -1442,7 +1442,8 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                         else
                             printf("\n\t      %s", buf);
                         break;
-                    case (AFNUM_INET<<8 | SAFNUM_MULTICAST_VPN):
+                    case (AFNUM_INET<<8 | SAFNUM_MULTICAST_VPN): /* fall through */
+                    case (AFNUM_INET6<<8 | SAFNUM_MULTICAST_VPN):
                         advance = decode_multicast_vpn(tptr, buf, sizeof(buf));
                         if (advance == -1)
                             printf("\n\t    (illegal prefix length)");
@@ -1653,6 +1654,16 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                         else
                             printf("\n\t      %s", buf);
                         break;                                   
+                    case (AFNUM_INET<<8 | SAFNUM_MULTICAST_VPN): /* fall through */
+                    case (AFNUM_INET6<<8 | SAFNUM_MULTICAST_VPN):
+                        advance = decode_multicast_vpn(tptr, buf, sizeof(buf));
+                        if (advance == -1)
+                            printf("\n\t    (illegal prefix length)");
+                        else if (advance == -2)
+                            goto trunc;
+                        else
+                            printf("\n\t      %s", buf);
+                        break;
                     default:
                         TCHECK2(*(tptr-3),tlen);
                         printf("no AFI %u / SAFI %u decoder",af,safi);
