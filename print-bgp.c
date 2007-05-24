@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.109 2007-05-24 23:13:18 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.110 2007-05-24 23:21:28 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -596,9 +596,11 @@ bgp_vpn_sg_print (const u_char *pptr, char *buf, u_int buflen) {
     TCHECK2(pptr[0], addr_length);
     total_length += addr_length + 1;
     offset = strlen(buf);
-    snprintf(buf + offset, buflen - offset, ", Source %s",
-             bgp_vpn_ip_print(pptr, addr_length));
-    pptr += addr_length;
+    if (addr_length) {
+        snprintf(buf + offset, buflen - offset, ", Source %s",
+                 bgp_vpn_ip_print(pptr, addr_length));
+        pptr += addr_length;
+    }
     
     /* Group address length */
     TCHECK2(pptr[0], 1);
@@ -608,9 +610,11 @@ bgp_vpn_sg_print (const u_char *pptr, char *buf, u_int buflen) {
     TCHECK2(pptr[0], addr_length);
     total_length += addr_length + 1;
     offset = strlen(buf);
-    snprintf(buf + offset, buflen - offset, ", Group %s",
-             bgp_vpn_ip_print(pptr, addr_length));
-    pptr += addr_length;
+    if (addr_length) {
+        snprintf(buf + offset, buflen - offset, ", Group %s",
+                 bgp_vpn_ip_print(pptr, addr_length));
+        pptr += addr_length;
+    }
 
 trunc:
     return (total_length);
