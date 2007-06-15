@@ -34,7 +34,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.38 2006-04-07 08:36:03 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.39 2007-06-15 19:43:39 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1013,6 +1013,7 @@ acl_print(u_char *s, int maxsize, u_char *end)
 	int pos, neg, acl;
 	int n, i;
 	char *user;
+	char fmt[1024];
 
 	if ((user = (char *)malloc(maxsize)) == NULL)
 		return;
@@ -1046,7 +1047,8 @@ acl_print(u_char *s, int maxsize, u_char *end)
 		printf("a");
 
 	for (i = 0; i < pos; i++) {
-		if (sscanf((char *) s, "%s %d\n%n", user, &acl, &n) != 2)
+		snprintf(fmt, sizeof(fmt), "%%%ds %%d\n%%n", maxsize - 1);
+		if (sscanf((char *) s, fmt, user, &acl, &n) != 2)
 			goto finish;
 		s += n;
 		printf(" +{");
@@ -1059,7 +1061,8 @@ acl_print(u_char *s, int maxsize, u_char *end)
 	}
 
 	for (i = 0; i < neg; i++) {
-		if (sscanf((char *) s, "%s %d\n%n", user, &acl, &n) != 2)
+		snprintf(fmt, sizeof(fmt), "%%%ds %%d\n%%n", maxsize - 1);
+		if (sscanf((char *) s, fmt, user, &acl, &n) != 2)
 			goto finish;
 		s += n;
 		printf(" -{");
