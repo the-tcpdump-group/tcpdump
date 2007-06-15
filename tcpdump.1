@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.167.2.10 2005-12-05 20:11:19 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.167.2.11 2007-06-15 20:13:49 guy Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -234,7 +234,10 @@ operation, be enabled on that interface.
 .TP
 .B Under BSD (this includes Mac OS X):
 You must have read access to
-.IR /dev/bpf* .
+.I /dev/bpf*
+on systems that don't have a cloning BPF device, or to
+.I /dev/bpf
+on systems that do.
 On BSDs with a devfs (this includes Mac OS X), this might involve more
 than just having somebody with super-user access setting the ownership
 or permissions on the BPF devices - it might involve configuring devfs
