@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.109 2007-06-15 19:04:39 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-nfs.c,v 1.110 2007-06-15 23:17:05 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -287,7 +287,7 @@ nfsreply_print(register const u_char *bp, u_int length,
 	       register const u_char *bp2)
 {
 	register const struct sunrpc_msg *rp;
-	u_int32_t proc, vers, reply;
+	u_int32_t proc, vers, reply_stat;
 	char srcid[20], dstid[20];	/*fits 32bit*/
 	enum sunrpc_reject_stat rstat;
 	u_int32_t rlow;
@@ -307,25 +307,25 @@ nfsreply_print(register const u_char *bp, u_int length,
 		    EXTRACT_32BITS(&rp->rm_xid));
 	}
 	print_nfsaddr(bp2, srcid, dstid);
-	reply = EXTRACT_32BITS(&rp->rm_reply.rp_stat);
-	switch (reply) {
+	reply_stat = EXTRACT_32BITS(&rp->rm_reply.rp_stat);
+	switch (reply_stat) {
 
 	case SUNRPC_MSG_ACCEPTED:
-		(void)printf("reply ok %d", length);
+		(void)printf("reply ok %u", length);
 		if (xid_map_find(rp, bp2, &proc, &vers) >= 0)
 			interp_reply(rp, proc, vers, length);
 		break;
 
 	case SUNRPC_MSG_DENIED:
-		(void)printf("reply ERR %d: ", length);
+		(void)printf("reply ERR %u: ", length);
 		rstat = EXTRACT_32BITS(&rp->rm_reply.rp_reject.rj_stat);
 		switch (rstat) {
 
 		case SUNRPC_RPC_MISMATCH:
 			rlow = EXTRACT_32BITS(&rp->rm_reply.rp_reject.rj_vers.low);
 			rhigh = EXTRACT_32BITS(&rp->rm_reply.rp_reject.rj_vers.high);
-			(void)printf("RPC Version mismatch (%d-%d)",
-			    (int)rlow, (int)rhigh);
+			(void)printf("RPC Version mismatch (%u-%u)",
+			    rlow, rhigh);
 			break;
 
 		case SUNRPC_AUTH_ERROR:
@@ -366,22 +366,22 @@ nfsreply_print(register const u_char *bp, u_int length,
 				break;
 
 			default:
-				(void)printf("Invalid failure code %d",
-				    (int)rwhy);
+				(void)printf("Invalid failure code %u",
+				    (unsigned int)rwhy);
 				break;
 			}
 			break;
 
 		default:
-			(void)printf("Unknown reason for rejecting rpc message %d",
-			    (int)rstat);
+			(void)printf("Unknown reason for rejecting rpc message %u",
+			    (unsigned int)rstat);
 			break;
 		}
 		break;
 
 	default:
-		(void)printf("reply Unknown rpc response code=%u %d",
-		    reply, length);
+		(void)printf("reply Unknown rpc response code=%u %u",
+		    reply_stat, length);
 		break;
 	}
 }
