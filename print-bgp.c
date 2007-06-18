@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.110 2007-05-24 23:21:28 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.111 2007-06-18 13:24:25 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -543,11 +543,11 @@ bgp_vpn_ip_print (const u_char *pptr, u_int addr_length) {
     char *pos = addr;
 
     switch(addr_length) {
-    case sizeof(struct in_addr):
+    case (sizeof(struct in_addr) << 3): /* 32 */
         TCHECK2(pptr[0], sizeof(struct in_addr));
         snprintf(pos, sizeof(addr), "%s", ipaddr_string(pptr));
         break;
-    case sizeof(struct in6_addr):
+    case (sizeof(struct in6_addr) << 3): /* 128 */
         TCHECK2(pptr[0], sizeof(struct in6_addr));
         snprintf(pos, sizeof(addr), "%s", ip6addr_string(pptr));
         break;
@@ -588,32 +588,32 @@ bgp_vpn_sg_print (const u_char *pptr, char *buf, u_int buflen) {
 
     total_length = 0;
 
-    /* Source address length */
+    /* Source address length, encoded in bits */
     TCHECK2(pptr[0], 1);
     addr_length =  *pptr++;
 
     /* Source address */
-    TCHECK2(pptr[0], addr_length);
-    total_length += addr_length + 1;
+    TCHECK2(pptr[0], (addr_length >> 3));
+    total_length += (addr_length >> 3) + 1;
     offset = strlen(buf);
     if (addr_length) {
         snprintf(buf + offset, buflen - offset, ", Source %s",
                  bgp_vpn_ip_print(pptr, addr_length));
-        pptr += addr_length;
+        pptr += (addr_length >> 3);
     }
     
-    /* Group address length */
+    /* Group address length, encoded in bits */
     TCHECK2(pptr[0], 1);
     addr_length =  *pptr++;
 
     /* Group address */
-    TCHECK2(pptr[0], addr_length);
-    total_length += addr_length + 1;
+    TCHECK2(pptr[0], (addr_length >> 3));
+    total_length += (addr_length >> 3) + 1;
     offset = strlen(buf);
     if (addr_length) {
         snprintf(buf + offset, buflen - offset, ", Group %s",
                  bgp_vpn_ip_print(pptr, addr_length));
-        pptr += addr_length;
+        pptr += (addr_length >> 3);
     }
 
 trunc:
@@ -776,7 +776,7 @@ decode_multicast_vpn(const u_char *pptr, char *buf, u_int buflen)
             snprintf(buf + offset, buflen - offset, ", RD: %s, Originator %s",
                      bgp_vpn_rd_print(pptr),
                      bgp_vpn_ip_print(pptr + BGP_VPN_RD_LEN,
-                                      route_length - BGP_VPN_RD_LEN));
+                                      (route_length - BGP_VPN_RD_LEN) << 3));
             break;
         case BGP_MULTICAST_VPN_ROUTE_TYPE_INTER_AS_I_PMSI:
             TCHECK2(pptr[0], BGP_VPN_RD_LEN + 4);
@@ -799,7 +799,7 @@ decode_multicast_vpn(const u_char *pptr, char *buf, u_int buflen)
             TCHECK2(pptr[0], addr_length);
             offset = strlen(buf);
             snprintf(buf + offset, buflen - offset, ", Originator %s",
-                     bgp_vpn_ip_print(pptr, addr_length));
+                     bgp_vpn_ip_print(pptr, addr_length << 3));
             break;
 
         case BGP_MULTICAST_VPN_ROUTE_TYPE_SOURCE_ACTIVE:
