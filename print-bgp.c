@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.111 2007-06-18 13:24:25 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.112 2007-06-20 13:29:50 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -335,6 +335,8 @@ static struct tok bgp_pmsi_flag_values[] = {
 #define SAFNUM_UNIMULTICAST             3
 /* labeled BGP RFC3107 */
 #define SAFNUM_LABUNICAST               4
+/* draft-ietf-l3vpn-2547bis-mcast-bgp-02.txt */
+#define SAFNUM_MULTICAST_VPN            5
 #define SAFNUM_TUNNEL                   64 /* XXX */
 #define SAFNUM_VPLS                     65 /* XXX */
 #define SAFNUM_MDT                      66 /* XXX */
@@ -344,8 +346,6 @@ static struct tok bgp_pmsi_flag_values[] = {
 #define SAFNUM_VPNUNIMULTICAST          130
 /* draft-marques-ppvpn-rt-constrain-01.txt */
 #define SAFNUM_RT_ROUTING_INFO          132
-/* draft-ietf-l3vpn-2547bis-mcast-bgp-02.txt */
-#define SAFNUM_MULTICAST_VPN            139
 
 #define BGP_VPN_RD_LEN                  8
 
@@ -395,8 +395,8 @@ static struct tok bgp_safi_values[] = {
 
 #define BGP_EXT_COM_L2INFO      0x800a  /* draft-kompella-ppvpn-l2vpn */
 
-#define BGP_EXT_COM_SOURCE_AS   0x0010  /* draft-ietf-l3vpn-2547bis-mcast-bgp-02.txt */
-#define BGP_EXT_COM_VRF_RT_IMP  0x0108  /* draft-ietf-l3vpn-2547bis-mcast-bgp-02.txt */
+#define BGP_EXT_COM_SOURCE_AS   0x0009  /* draft-ietf-l3vpn-2547bis-mcast-bgp-02.txt */
+#define BGP_EXT_COM_VRF_RT_IMP  0x010a  /* draft-ietf-l3vpn-2547bis-mcast-bgp-02.txt */
 
 /* http://www.cisco.com/en/US/tech/tk436/tk428/technologies_tech_note09186a00801eb09a.shtml  */
 #define BGP_EXT_COM_EIGRP_GEN   0x8800
