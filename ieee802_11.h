@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ieee802_11.h,v 1.9.4.2 2005-11-13 12:07:44 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ieee802_11.h,v 1.9.4.3 2007-07-22 20:01:16 guy Exp $ (LBL) */
 /*
  * Copyright (c) 2001
  *	Fortress Technologies
@@ -79,14 +79,32 @@
 #define	CTRL_CF_END	0xE
 #define	CTRL_END_ACK	0xF
 
-#define	DATA_DATA		0x0
-#define	DATA_DATA_CF_ACK	0x1
-#define	DATA_DATA_CF_POLL	0x2
-#define	DATA_DATA_CF_ACK_POLL	0x3
-#define	DATA_NODATA		0x4
-#define	DATA_NODATA_CF_ACK	0x5
-#define	DATA_NODATA_CF_POLL	0x6
-#define	DATA_NODATA_CF_ACK_POLL	0x7
+#define	DATA_DATA			0x0
+#define	DATA_DATA_CF_ACK		0x1
+#define	DATA_DATA_CF_POLL		0x2
+#define	DATA_DATA_CF_ACK_POLL		0x3
+#define	DATA_NODATA			0x4
+#define	DATA_NODATA_CF_ACK		0x5
+#define	DATA_NODATA_CF_POLL		0x6
+#define	DATA_NODATA_CF_ACK_POLL		0x7
+
+#define DATA_QOS_DATA			0x8
+#define DATA_QOS_DATA_CF_ACK		0x9
+#define DATA_QOS_DATA_CF_POLL		0xA
+#define DATA_QOS_DATA_CF_ACK_POLL	0xB
+#define DATA_QOS_NODATA			0xC
+#define DATA_QOS_CF_POLL_NODATA		0xE
+#define DATA_QOS_CF_ACK_POLL_NODATA	0xF
+
+/*
+ * The subtype field of a data frame is, in effect, composed of 4 flag
+ * bits - CF-Ack, CF-Poll, Null (means the frame doesn't actually have
+ * any data), and QoS.
+ */
+#define DATA_FRAME_IS_CF_ACK(x)		((x) & 0x01)
+#define DATA_FRAME_IS_CF_POLL(x)	((x) & 0x02)
+#define DATA_FRAME_IS_NULL(x)		((x) & 0x04)
+#define DATA_FRAME_IS_QOS(x)		((x) & 0x08)
 
 /*
  * Bits in the frame control field.
