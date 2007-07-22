@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.44 2007-03-23 08:17:57 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.45 2007-07-22 19:59:06 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -945,6 +945,8 @@ ieee802_11_print(const u_char *p, u_int length, u_int caplen)
 		}
 		break;
 	case T_DATA:
+		if (DATA_FRAME_IS_NULL(FC_SUBTYPE(fc)))
+			return hdrlen;	/* no-data frame */
 		/* There may be a problem w/ AP not having this bit set */
 		if (FC_WEP(fc)) {
 			if (!wep_print(p)) {
