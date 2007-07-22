@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.46 2007-07-22 22:00:40 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.47 2007-07-22 23:13:41 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -906,8 +906,12 @@ ieee_802_11_hdr_print(u_int16_t fc, const u_char *p, const u_int8_t **srcp,
 	}
 }
 
+#ifndef roundup2
+#define	roundup2(x, y)	(((x)+((y)-1))&(~((y)-1))) /* if y is powers of two */
+#endif
+
 static u_int
-ieee802_11_print(const u_char *p, u_int length, u_int caplen)
+ieee802_11_print(const u_char *p, u_int length, u_int caplen, int pad)
 {
 	u_int16_t fc;
 	u_int hdrlen;
@@ -921,6 +925,8 @@ ieee802_11_print(const u_char *p, u_int length, u_int caplen)
 
 	fc = EXTRACT_LE_16BITS(p);
 	hdrlen = extract_header_length(fc);
+	if (pad)
+		hdrlen = roundup2(hdrlen, 4);
 
 	if (caplen < hdrlen) {
 		printf("[|802.11]");
@@ -993,11 +999,11 @@ ieee802_11_print(const u_char *p, u_int length, u_int caplen)
 u_int
 ieee802_11_if_print(const struct pcap_pkthdr *h, const u_char *p)
 {
-	return ieee802_11_print(p, h->len, h->caplen);
+	return ieee802_11_print(p, h->len, h->caplen, 0);
 }
 
 static int
-print_radiotap_field(struct cpack_state *s, u_int32_t bit)
+print_radiotap_field(struct cpack_state *s, u_int32_t bit, int *pad)
 {
 	union {
 		int8_t		i8;
@@ -1011,6 +1017,10 @@ print_radiotap_field(struct cpack_state *s, u_int32_t bit)
 
 	switch (bit) {
 	case IEEE80211_RADIOTAP_FLAGS:
+		rc = cpack_uint8(s, &u.u8);
+		if (u.u8 & IEEE80211_RADIOTAP_F_DATAPAD)
+			*pad = 1;
+		break;
 	case IEEE80211_RADIOTAP_RATE:
 	case IEEE80211_RADIOTAP_DB_ANTSIGNAL:
 	case IEEE80211_RADIOTAP_DB_ANTNOISE:
@@ -1133,6 +1143,7 @@ ieee802_11_radio_print(const u_char *p, u_int length, u_int caplen)
 	int bit0;
 	const u_char *iter;
 	u_int len;
+	int pad;
 
 	if (caplen < sizeof(*hdr)) {
 		printf("[|802.11]");
@@ -1166,6 +1177,8 @@ ieee802_11_radio_print(const u_char *p, u_int length, u_int caplen)
 		return caplen;
 	}
 
+	/* Assume no Atheros padding between 802.11 header and body */
+	pad = 0;
 	for (bit0 = 0, presentp = &hdr->it_present; presentp <= last_presentp;
 	     presentp++, bit0 += 32) {
 		for (present = EXTRACT_LE_32BITS(presentp); present;
@@ -1177,12 +1190,12 @@ ieee802_11_radio_print(const u_char *p, u_int length, u_int caplen)
 			bit = (enum ieee80211_radiotap_type)
 			    (bit0 + BITNO_32(present ^ next_present));
 
-			if (print_radiotap_field(&cpacker, bit) != 0)
+			if (print_radiotap_field(&cpacker, bit, &pad) != 0)
 				goto out;
 		}
 	}
 out:
-	return len + ieee802_11_print(p + len, length - len, caplen - len);
+	return len + ieee802_11_print(p + len, length - len, caplen - len, pad);
 #undef BITNO_32
 #undef BITNO_16
 #undef BITNO_8
@@ -1213,7 +1226,7 @@ ieee802_11_avs_radio_print(const u_char *p, u_int length, u_int caplen)
 	}
 
 	return caphdr_len + ieee802_11_print(p + caphdr_len,
-	    length - caphdr_len, caplen - caphdr_len);
+	    length - caphdr_len, caplen - caphdr_len, 0);
 }
 
 #define PRISM_HDR_LEN		144
@@ -1252,7 +1265,7 @@ prism_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	}
 
 	return PRISM_HDR_LEN + ieee802_11_print(p + PRISM_HDR_LEN,
-	    length - PRISM_HDR_LEN, caplen - PRISM_HDR_LEN);
+	    length - PRISM_HDR_LEN, caplen - PRISM_HDR_LEN, 0);
 }
 
 /*
