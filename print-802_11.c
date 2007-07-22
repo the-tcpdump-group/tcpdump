@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.45 2007-07-22 19:59:06 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.46 2007-07-22 22:00:40 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -687,22 +687,23 @@ static void
 data_header_print(u_int16_t fc, const u_char *p, const u_int8_t **srcp,
     const u_int8_t **dstp)
 {
-	switch (FC_SUBTYPE(fc)) {
-	case DATA_DATA:
-	case DATA_NODATA:
-		break;
-	case DATA_DATA_CF_ACK:
-	case DATA_NODATA_CF_ACK:
-		printf("CF Ack ");
-		break;
-	case DATA_DATA_CF_POLL:
-	case DATA_NODATA_CF_POLL:
-		printf("CF Poll ");
-		break;
-	case DATA_DATA_CF_ACK_POLL:
-	case DATA_NODATA_CF_ACK_POLL:
-		printf("CF Ack/Poll ");
-		break;
+	u_int subtype = FC_SUBTYPE(fc);
+
+	if (DATA_FRAME_IS_CF_ACK(subtype) || DATA_FRAME_IS_CF_POLL(subtype) ||
+	    DATA_FRAME_IS_QOS(subtype)) {
+		printf("CF ");
+		if (DATA_FRAME_IS_CF_ACK(subtype)) {
+			if (DATA_FRAME_IS_CF_POLL(subtype))
+				printf("Ack/Poll");
+			else
+				printf("Ack");
+		} else {
+			if (DATA_FRAME_IS_CF_POLL(subtype))
+				printf("Poll");
+		}
+		if (DATA_FRAME_IS_QOS(subtype))
+			printf("+QoS");
+		printf(" ");
 	}
 
 #define ADDR1  (p + 4)
@@ -825,6 +826,8 @@ ctrl_header_print(u_int16_t fc, const u_char *p, const u_int8_t **srcp,
 static int
 extract_header_length(u_int16_t fc)
 {
+	int len;
+
 	switch (FC_TYPE(fc)) {
 	case T_MGMT:
 		return MGMT_HDRLEN;
@@ -846,7 +849,10 @@ extract_header_length(u_int16_t fc)
 			return 0;
 		}
 	case T_DATA:
-		return (FC_TO_DS(fc) && FC_FROM_DS(fc)) ? 30 : 24;
+		len = (FC_TO_DS(fc) && FC_FROM_DS(fc)) ? 30 : 24;
+		if (DATA_FRAME_IS_QOS(FC_SUBTYPE(fc)))
+			len += 2;
+		return len;
 	default:
 		printf("unknown IEEE802.11 frame type (%d)", FC_TYPE(fc));
 		return 0;
