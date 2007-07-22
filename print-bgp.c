@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.114 2007-07-14 22:24:54 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.115 2007-07-22 02:42:53 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -544,10 +544,12 @@ bgp_vpn_ip_print (const u_char *pptr, u_int addr_length) {
         TCHECK2(pptr[0], sizeof(struct in_addr));
         snprintf(pos, sizeof(addr), "%s", ipaddr_string(pptr));
         break;
+#ifdef INET6
     case (sizeof(struct in6_addr) << 3): /* 128 */
         TCHECK2(pptr[0], sizeof(struct in6_addr));
         snprintf(pos, sizeof(addr), "%s", ip6addr_string(pptr));
         break;
+#endif
     default:
         snprintf(pos, sizeof(addr), "bogus address length %u", addr_length);
         break;
