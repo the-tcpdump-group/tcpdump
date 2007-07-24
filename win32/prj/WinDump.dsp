@@ -381,6 +381,10 @@ SOURCE="..\..\print-lspping.c"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\print-lwapp.c"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\print-lwres.c"
 # End Source File
 # Begin Source File

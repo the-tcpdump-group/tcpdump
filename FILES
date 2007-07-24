@@ -167,6 +167,7 @@ print-ldp.c
 print-llc.c
 print-lmp.c
 print-lspping.c
+print-lwapp.c
 print-lwres.c
 print-mobile.c
 print-mobility.c

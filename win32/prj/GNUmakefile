@@ -92,6 +92,7 @@ OBJS = \
 	../../print-lane.o \
 	../../print-ldp.o \
 	../../print-llc.o \
+	../../print-lwapp.o \
 	../../print-lwres.o \
 	../../print-mobile.o \
 	../../print-mobility.o \
