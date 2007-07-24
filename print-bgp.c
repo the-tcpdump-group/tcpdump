@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.115 2007-07-22 02:42:53 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.116 2007-07-24 13:16:48 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -633,10 +633,12 @@ bgp_vpn_rd_print (const u_char *pptr) {
     /* ok lets load the RD format */
     switch (EXTRACT_16BITS(pptr)) {
 
-        /* AS:IP-address fmt*/
+        /* 2-byte-AS:number fmt*/
     case 0:
-        snprintf(pos, sizeof(rd) - (pos - rd), "%u:%u.%u.%u.%u",
-            EXTRACT_16BITS(pptr+2), *(pptr+4), *(pptr+5), *(pptr+6), *(pptr+7));
+        snprintf(pos, sizeof(rd) - (pos - rd), "%u:%u (= %u.%u.%u.%u)",
+                 EXTRACT_16BITS(pptr+2),
+                 EXTRACT_32BITS(pptr+4),
+                 *(pptr+4), *(pptr+5), *(pptr+6), *(pptr+7));
         break;
         /* IP-address:AS fmt*/
 
@@ -1734,8 +1736,9 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                     switch(extd_comm) {
                     case BGP_EXT_COM_RT_0:
                     case BGP_EXT_COM_RO_0:
-                        printf(": %u:%s",
+                        printf(": %u:%u (= %s)",
                                EXTRACT_16BITS(tptr+2),
+                               EXTRACT_32BITS(tptr+4),
                                getname(tptr+4));
                         break;
                     case BGP_EXT_COM_RT_1:
@@ -2373,3 +2376,10 @@ bgp_print(const u_char *dat, int length)
 trunc:
 	printf(" [|BGP]");
 }
+
+/*
+ * Local Variables:
+ * c-style: whitesmith
+ * c-basic-offset: 4
+ * End:
+ */
