@@ -1,4 +1,19 @@
-$Header: /tcpdump/master/tcpdump/CHANGES,v 1.87.2.13 2007-04-23 21:22:56 ken Exp $
+$Header: /tcpdump/master/tcpdump/CHANGES,v 1.87.2.14 2007-07-24 02:17:13 mcr Exp $
+
+Wed.	July 23, 2007.  mcr@xelerance.com.  Summary for 0.9.7 libpcap release
+
+    	NFS: Print unsigned values as such. 
+	RX: parse safely.
+	BGP: fixes for IPv6-less builds.
+	801.1ag: use standard codepoint.
+	use /dev/bpf on systems with such a device.
+	802.11: print QoS data, avoid dissect of no-data frame, ignore padding.
+	smb: make sure that we haven't gone past the end of the captured data.
+	smb: squelch an uninitialized complaint from coverity.
+	NFS: from NetBSD; don't interpret the reply as a possible NFS reply
+		if it got MSG_DENIED.
+	BGP: don't print TLV values that didn't fit, from www.digit-labs.org. 
+	revised INSTALL.txt about libpcap dependancy.
 
 Wed.	April 25, 2007. ken@xelerance.com.  Summary for 3.9.6 tcpdump release
 	Update man page to reflect changes to libpcap
