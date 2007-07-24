@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.78.2.7 2007-01-29 20:56:00 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.78.2.8 2007-07-24 17:29:43 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -278,6 +278,8 @@ static struct tok tag2str[] = {
 	{ TAG_NS_SEARCH,	"sNSSEARCH" },	/* XXX 's' */
 /* RFC 3011 */
 	{ TAG_IP4_SUBNET_SELECT, "iSUBNET" },
+/* RFC 3442 */
+	{ TAG_CLASSLESS_STATIC_RT, "$Classless-Static-Route" },
 /* http://www.iana.org/assignments/bootp-dhcp-extensions/index.htm */
 	{ TAG_USER_CLASS,	"aCLASS" },
 	{ TAG_SLP_NAMING_AUTH,	"aSLP-NA" },
@@ -360,7 +362,7 @@ static void
 rfc1048_print(register const u_char *bp)
 {
 	register u_int16_t tag;
-	register u_int len, size;
+	register u_int len;
 	register const char *cp;
 	register char c;
 	int first, idx;
@@ -456,12 +458,11 @@ rfc1048_print(register const u_char *bp)
 		}
 
 		/* Print data */
-		size = len;
 		if (c == '?') {
 			/* Base default formats for unknown tags on data size */
-			if (size & 1)
+			if (len & 1)
 				c = 'b';
-			else if (size & 2)
+			else if (len & 2)
 				c = 's';
 			else
 				c = 'l';
@@ -472,20 +473,20 @@ rfc1048_print(register const u_char *bp)
 		case 'a':
 			/* ascii strings */
 			putchar('"');
-			if (fn_printn(bp, size, snapend)) {
+			if (fn_printn(bp, len, snapend)) {
 				putchar('"');
 				goto trunc;
 			}
 			putchar('"');
-			bp += size;
-			size = 0;
+			bp += len;
+			len = 0;
 			break;
 
 		case 'i':
 		case 'l':
 		case 'L':
 			/* ip addresses/32-bit words */
-			while (size >= sizeof(ul)) {
+			while (len >= sizeof(ul)) {
 				if (!first)
 					putchar(',');
 				ul = EXTRACT_32BITS(bp);
@@ -497,14 +498,14 @@ rfc1048_print(register const u_char *bp)
 				else
 					printf("%u", ul);
 				bp += sizeof(ul);
-				size -= sizeof(ul);
+				len -= sizeof(ul);
 				first = 0;
 			}
 			break;
 
 		case 'p':
 			/* IP address pairs */
-			while (size >= 2*sizeof(ul)) {
+			while (len >= 2*sizeof(ul)) {
 				if (!first)
 					putchar(',');
 				memcpy((char *)&ul, (const char *)bp, sizeof(ul));
@@ -513,27 +514,27 @@ rfc1048_print(register const u_char *bp)
 				memcpy((char *)&ul, (const char *)bp, sizeof(ul));
 				printf("%s)", ipaddr_string(&ul));
 				bp += sizeof(ul);
-				size -= 2*sizeof(ul);
+				len -= 2*sizeof(ul);
 				first = 0;
 			}
 			break;
 
 		case 's':
 			/* shorts */
-			while (size >= sizeof(us)) {
+			while (len >= sizeof(us)) {
 				if (!first)
 					putchar(',');
 				us = EXTRACT_16BITS(bp);
 				printf("%u", us);
 				bp += sizeof(us);
-				size -= sizeof(us);
+				len -= sizeof(us);
 				first = 0;
 			}
 			break;
 
 		case 'B':
 			/* boolean */
-			while (size > 0) {
+			while (len > 0) {
 				if (!first)
 					putchar(',');
 				switch (*bp) {
@@ -548,7 +549,7 @@ rfc1048_print(register const u_char *bp)
 					break;
 				}
 				++bp;
-				--size;
+				--len;
 				first = 0;
 			}
 			break;
@@ -557,7 +558,7 @@ rfc1048_print(register const u_char *bp)
 		case 'x':
 		default:
 			/* Bytes */
-			while (size > 0) {
+			while (len > 0) {
 				if (!first)
 					putchar(c == 'x' ? ':' : '.');
 				if (c == 'x')
@@ -565,7 +566,7 @@ rfc1048_print(register const u_char *bp)
 				else
 					printf("%u", *bp);
 				++bp;
-				--size;
+				--len;
 				first = 0;
 			}
 			break;
@@ -575,21 +576,40 @@ rfc1048_print(register const u_char *bp)
 			switch (tag) {
 
 			case TAG_NETBIOS_NODE:
+				/* this option should be at least 1 byte long */
+				if (len < 1)  {
+					printf("ERROR: option %u len %u < 1 bytes",
+					    TAG_NETBIOS_NODE, len);
+					bp += len;
+					len = 0;
+					break;
+				}
 				tag = *bp++;
-				--size;
+				--len;
 				fputs(tok2str(nbo2str, NULL, tag), stdout);
 				break;
 
 			case TAG_OPT_OVERLOAD:
+				/* this option should be at least 1 byte long */
+				if (len < 1)  {
+					printf("ERROR: option %u len %u < 1 bytes",
+					    TAG_OPT_OVERLOAD, len);
+					bp += len;
+					len = 0;
+					break;
+				}
 				tag = *bp++;
-				--size;
+				--len;
 				fputs(tok2str(oo2str, NULL, tag), stdout);
 				break;
 
 			case TAG_CLIENT_FQDN:
-				/* option 81 should be at least 3 bytes long */
+				/* this option should be at least 3 bytes long */
 				if (len < 3)  {
-					printf("ERROR: option 81 len %u < 3 bytes", len);
+					printf("ERROR: option %u len %u < 3 bytes",
+					    TAG_CLIENT_FQDN, len);
+					bp += len;
+					len = 0;
 					break;
 				}
 				if (*bp)
@@ -599,86 +619,152 @@ rfc1048_print(register const u_char *bp)
 					printf("%u/%u ", *bp, *(bp+1));
 				bp += 2;
 				putchar('"');
-				if (fn_printn(bp, size - 3, snapend)) {
+				if (fn_printn(bp, len - 3, snapend)) {
 					putchar('"');
 					goto trunc;
 				}
 				putchar('"');
-				bp += size - 3;
-				size = 0;
+				bp += len - 3;
+				len = 0;
 				break;
 
 			case TAG_CLIENT_ID:
-			    {	int type = *bp++;
-				size--;
+			    {	int type;
+
+				/* this option should be at least 1 byte long */
+				if (len < 1)  {
+					printf("ERROR: option %u len %u < 1 bytes",
+					    TAG_CLIENT_ID, len);
+					bp += len;
+					len = 0;
+					break;
+				}
+				type = *bp++;
+				len--;
 				if (type == 0) {
 					putchar('"');
-					if (fn_printn(bp, size, snapend)) {
+					if (fn_printn(bp, len, snapend)) {
 						putchar('"');
 						goto trunc;
 					}
 					putchar('"');
-					bp += size;
-					size = 0;
+					bp += len;
+					len = 0;
 					break;
 				} else {
 					printf("%s ", tok2str(arp2str, "hardware-type %u,", type));
-				}
-				while (size > 0) {
-					if (!first)
-						putchar(':');
-					printf("%02x", *bp);
-					++bp;
-					--size;
-					first = 0;
+					while (len > 0) {
+						if (!first)
+							putchar(':');
+						printf("%02x", *bp);
+						++bp;
+						--len;
+						first = 0;
+					}
 				}
 				break;
 			    }
 
-                        case TAG_AGENT_CIRCUIT:
-                        {
-                            while (size > 0 ) {
-                            subopt = *bp++;
-                            suboptlen = *bp++;
-                            size -= 2;
-                            printf("\n\t      %s SubOption %u, length %u: ",
-                                   tok2str(agent_suboption_values, "Unknown", subopt),
-                                   subopt,
-                                   suboptlen);
+			case TAG_AGENT_CIRCUIT:
+				while (len >= 2) {
+					subopt = *bp++;
+					suboptlen = *bp++;
+					len -= 2;
+					if (suboptlen > len) {
+						printf("\n\t      %s SubOption %u, length %u: length goes past end of option",
+						   tok2str(agent_suboption_values, "Unknown", subopt),
+						   subopt,
+						   suboptlen);
+						bp += len;
+						len = 0;
+						break;
+					}
+					printf("\n\t      %s SubOption %u, length %u: ",
+					   tok2str(agent_suboption_values, "Unknown", subopt),
+					   subopt,
+					   suboptlen);
+					switch (subopt) {
 
-                            if (subopt == 0 || suboptlen == 0) {
-                                break;
-                            }
+					case AGENT_SUBOPTION_CIRCUIT_ID:
+						fn_printn(bp, suboptlen, NULL);
+						break;
 
-                            switch(subopt) {
-                            case AGENT_SUBOPTION_CIRCUIT_ID:
-                                for (idx = 0; idx < suboptlen; idx++) {
-                                    safeputchar(*(bp+idx));
-                                }
-                                break;
-                            default:
-                                print_unknown_data(bp, "\n\t\t", suboptlen);
-                            }
+					default:
+						print_unknown_data(bp, "\n\t\t", suboptlen);
+					}
 
-                            size -= suboptlen;
-                            bp += suboptlen;
-                            }
-                        }
-                            break;
+					len -= suboptlen;
+					bp += suboptlen;
+			    }
+			    break;
+
+			case TAG_CLASSLESS_STATIC_RT:
+			{	
+				u_int mask_width, significant_octets, i;
+
+				/* this option should be at least 5 bytes long */
+				if (len < 5)  {
+					printf("ERROR: option %u len %u < 5 bytes",
+					    TAG_CLASSLESS_STATIC_RT, len);
+					bp += len;
+					len = 0;
+					break;
+				}
+				while (len > 0) {
+					if (!first)
+						putchar(',');
+					mask_width = *bp++;
+					len--;
+					/* mask_width <= 32 */
+					if (mask_width > 32) {
+						printf("[ERROR: Mask width (%d) > 32]",  mask_width);
+						bp += len;
+						len = 0;
+						break;
+					}
+					significant_octets = (mask_width + 7) / 8;
+					/* significant octets + router(4) */
+					if (len < significant_octets + 4) {
+						printf("[ERROR: Remaining length (%u) < %u bytes]",  len, significant_octets + 4);
+						bp += len;
+						len = 0;
+						break;
+					}
+					putchar('(');
+					if (mask_width == 0)
+						printf("default");
+					else {
+						for (i = 0; i < significant_octets ; i++) {
+							if (i > 0)
+								putchar('.');
+							printf("%d", *bp++);
+						}
+						for (i = significant_octets ; i < 4 ; i++)
+							printf(".0");
+						printf("/%d", mask_width);
+					}
+					memcpy((char *)&ul, (const char *)bp, sizeof(ul));
+					printf(":%s)", ipaddr_string(&ul));
+					bp += sizeof(ul);
+					len -= (significant_octets + 4);
+					first = 0;
+				}
+			}
+			break;
 
 			default:
 				printf("[unknown special tag %u, size %u]",
-				    tag, size);
-				bp += size;
-				size = 0;
+				    tag, len);
+				bp += len;
+				len = 0;
 				break;
 			}
 			break;
 		}
 		/* Data left over? */
-		if (size) {
+		if (len) {
 			printf("\n\t  trailing data length %u", len);
-			bp += size;
+			bp += len;
 		}
 	}
 	return;
