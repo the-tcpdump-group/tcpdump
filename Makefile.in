@@ -17,7 +17,7 @@
 #  WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 #  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.309 2007-03-27 10:44:09 hannes Exp $ (LBL)
+# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.310 2007-07-24 02:21:25 mcr Exp $ (LBL)
 
 #
 # Various configurable paths (remember to edit Makefile.in, not Makefile)
@@ -195,19 +195,10 @@ tags: $(TAGFILES)
 TAGS: $(TAGFILES)
 	etags $(TAGFILES)
 
-tar:
+releasetar:
 	@cwd=`pwd` ; dir=`basename $$cwd` ; name=$(PROG)-`cat VERSION` ; \
-	    list="" ; tar="tar chf" ; \
-	    for i in `cat FILES` ; do list="$$list $$name/$$i" ; done; \
-	    echo \
-	    "rm -f ../$$name; ln -s $$dir ../$$name" ; \
-	     rm -f ../$$name; ln -s $$dir ../$$name ; \
-	    echo \
-	    "(cd .. ; $$tar - [lots of files]) | compress > /tmp/$$name.tar.Z" ; \
-	     (cd .. ; $$tar - $$list) | compress > /tmp/$$name.tar.Z ; \
-	    echo \
-	    "rm -f ../$$name" ; \
-	     rm -f ../$$name
+	    list="" ; make distclean; \
+	    cd ..; tar -c -z -f $name.tar.gz $dir ;
 
 depend: $(GENSRC)
 	${srcdir}/mkdep -c $(CC) $(DEFS) $(INCLS) $(SRC)
