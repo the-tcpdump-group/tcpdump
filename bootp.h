@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/bootp.h,v 1.16 2007-01-29 20:55:01 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/bootp.h,v 1.17 2007-07-24 17:28:56 guy Exp $ (LBL) */
 /*
  * Bootstrap Protocol (BOOTP).  RFC951 and RFC1048.
  *
@@ -161,6 +161,8 @@ struct bootp {
 #define	TAG_NS_SEARCH		((u_int8_t) 117)
 /* RFC 3011 */
 #define	TAG_IP4_SUBNET_SELECT	((u_int8_t) 118)
+/* RFC 3442 */
+#define TAG_CLASSLESS_STATIC_RT	((u_int8_t) 121)
 /* ftp://ftp.isi.edu/.../assignments/bootp-dhcp-extensions */
 #define	TAG_USER_CLASS		((u_int8_t)  77)
 #define	TAG_SLP_NAMING_AUTH	((u_int8_t)  80)
