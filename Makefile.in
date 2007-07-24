@@ -17,7 +17,7 @@
 #  WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 #  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.310 2007-07-24 02:21:25 mcr Exp $ (LBL)
+# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.311 2007-07-24 02:40:59 mcr Exp $ (LBL)
 
 #
 # Various configurable paths (remember to edit Makefile.in, not Makefile)
@@ -197,8 +197,8 @@ TAGS: $(TAGFILES)
 
 releasetar:
 	@cwd=`pwd` ; dir=`basename $$cwd` ; name=$(PROG)-`cat VERSION` ; \
-	    list="" ; make distclean; \
-	    cd ..; tar -c -z -f $name.tar.gz $dir ;
+	   list="" ; make distclean; cd ..; mkdir -p n; cd n; ln -s ../$$dir $$name; \
+	   tar -c -z -f $$name.tar.gz $$name/. ;
 
 depend: $(GENSRC)
 	${srcdir}/mkdep -c $(CC) $(DEFS) $(INCLS) $(SRC)
