@@ -10,6 +10,8 @@
  * LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE.
  *
+ * Support for the Link Management Protocol as per rfc 4204.
+ *
  * Original code by Hannes Gredler (hannes@juniper.net)
  * Support for LMP service discovery extensions (defined by UNI 1.0) added
  * by Manu Pathak (mapathak@cisco.com), May 2005
@@ -17,7 +19,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lmp.c,v 1.10 2006-06-23 02:03:09 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-lmp.c,v 1.11 2007-08-02 17:32:49 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
