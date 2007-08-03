@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.104 2007-07-23 09:01:09 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.105 2007-08-03 11:03:19 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -76,6 +76,7 @@ const struct tok ethertype_values[] = {
     { ETHERTYPE_GRE_ISO,        "GRE-OSI" },
     { ETHERTYPE_CFM_OLD,        "CFM (old)" },
     { ETHERTYPE_CFM,            "CFM" },
+    { ETHERTYPE_LLDP,           "LLDP" },
     { 0, NULL}
 };
 
@@ -312,6 +313,10 @@ ether_encap_print(u_short ether_type, const u_char *p,
 	case ETHERTYPE_CFM:
 	case ETHERTYPE_CFM_OLD:
 	        cfm_print(p, length);
+		return (1);
+
+	case ETHERTYPE_LLDP:
+	        lldp_print(p, length);
 		return (1);
 
         case ETHERTYPE_LOOPBACK:

@@ -91,6 +91,7 @@ OBJS = \
 	../../print-l2tp.o \
 	../../print-lane.o \
 	../../print-ldp.o \
+	../../print-lldp.o \
 	../../print-llc.o \
 	../../print-lwapp.o \
 	../../print-lwres.o \
