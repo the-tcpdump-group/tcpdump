@@ -23,7 +23,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.118 2006-05-12 02:14:55 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.119 2007-08-08 14:06:34 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -79,7 +79,6 @@ extern int ether_ntohost(char *, const struct ether_addr *);
  */
 
 #define HASHNAMESIZE 4096
-#define BUFSIZE 128
 
 struct hnamemem {
 	u_int32_t addr;
