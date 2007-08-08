@@ -497,6 +497,10 @@ SOURCE="..\..\print-sctp.c"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\print-sflow.c"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\print-sip.c"
 # End Source File
 # Begin Source File

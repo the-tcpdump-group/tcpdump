@@ -120,6 +120,7 @@ OBJS = \
 	../../print-rt6.o \
 	../../print-rx.o \
 	../../print-sctp.o \
+	../../print-sflow.o \
 	../../print-sl.o \
 	../../print-sll.o \
 	../../print-slow.o \

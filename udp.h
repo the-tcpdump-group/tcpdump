@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/udp.h,v 1.12 2007-07-24 16:07:30 hannes Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/udp.h,v 1.13 2007-08-08 17:20:58 hannes Exp $ (LBL) */
 /*
  * Copyright (c) 1982, 1986, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -82,6 +82,7 @@ struct udphdr {
 #define MPLS_LSP_PING_PORT      3503 /* draft-ietf-mpls-lsp-ping-02.txt */
 #define BFD_CONTROL_PORT        3784 /* draft-katz-ward-bfd-v4v6-1hop-00.txt */
 #define BFD_ECHO_PORT           3785 /* draft-katz-ward-bfd-v4v6-1hop-00.txt */
+#define SFLOW_PORT              6343 /* http://www.sflow.org/developers/specifications.php */
 #define LWAPP_DATA_PORT         12222 /* draft-ohara-capwap-lwapp-04.txt */
 #define LWAPP_CONTROL_PORT      12223 /* draft-ohara-capwap-lwapp-04.txt */
 
