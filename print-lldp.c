@@ -19,7 +19,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-lldp.c,v 1.2 2007-08-08 14:39:52 hannes Exp $";
+"@(#) $Header: /tcpdump/master/tcpdump/print-lldp.c,v 1.3 2007-08-09 18:43:44 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -116,14 +116,14 @@ static const struct tok lldp_port_subtype_values[] = {
 /*
  * System Capabilities
  */
-#define LLDP_CAP_OTHER               1 <<  0
-#define LLDP_CAP_REPEATER            1 <<  1
-#define LLDP_CAP_BRIDGE              1 <<  2
-#define LLDP_CAP_WLAN_AP             1 <<  3
-#define LLDP_CAP_ROUTER              1 <<  4
-#define LLDP_CAP_PHONE               1 <<  5
-#define LLDP_CAP_DOCSIS              1 <<  6
-#define LLDP_CAP_STATION_ONLY        1 <<  7
+#define LLDP_CAP_OTHER              (1 <<  0)
+#define LLDP_CAP_REPEATER           (1 <<  1)
+#define LLDP_CAP_BRIDGE             (1 <<  2)
+#define LLDP_CAP_WLAN_AP            (1 <<  3)
+#define LLDP_CAP_ROUTER             (1 <<  4)
+#define LLDP_CAP_PHONE              (1 <<  5)
+#define LLDP_CAP_DOCSIS             (1 <<  6)
+#define LLDP_CAP_STATION_ONLY       (1 <<  7)
 
 static const struct tok lldp_cap_values[] = {
     { LLDP_CAP_OTHER, "Other"},
@@ -149,6 +149,8 @@ static const struct tok lldp_intf_numb_subtype_values[] = {
     { 0, NULL}
 };
 
+#define LLDP_INTF_NUM_LEN                  5
+
 
 static char *
 lldp_network_addr_print(const u_char *tptr) {
@@ -157,7 +159,7 @@ lldp_network_addr_print(const u_char *tptr) {
     static char buf[BUFSIZE];
     const char * (*pfunc)(const u_char *);
 
-    af = *(tptr);
+    af = *tptr;
     switch (af) {
     case AFNUM_INET:
         pfunc = getname; 
@@ -187,7 +189,7 @@ lldp_network_addr_print(const u_char *tptr) {
 }
 
 static int
-lldp_mgmt_addr_tlv_print(const u_char *pptr, u_int len)  {
+lldp_mgmt_addr_tlv_print(const u_char *pptr, u_int len) {
 
     u_int8_t mgmt_addr_len, intf_num_subtype, oid_len;
     const u_char *tptr;
@@ -209,7 +211,7 @@ lldp_mgmt_addr_tlv_print(const u_char *pptr, u_int len)  {
     tptr += mgmt_addr_len;
     tlen -= mgmt_addr_len;
 
-    if (tlen < 5) {
+    if (tlen < LLDP_INTF_NUM_LEN) {
         return 0;
     }
 
@@ -218,8 +220,9 @@ lldp_mgmt_addr_tlv_print(const u_char *pptr, u_int len)  {
            tok2str(lldp_intf_numb_subtype_values, "Unknown", intf_num_subtype),
            intf_num_subtype,
            EXTRACT_32BITS(tptr+1));
-    tptr += 5;
-    tlen -= 5;
+
+    tptr += LLDP_INTF_NUM_LEN;
+    tlen -= LLDP_INTF_NUM_LEN;
 
     /*
      * The OID is optional.
@@ -379,7 +382,6 @@ lldp_print(register const u_char *pptr, register u_int len) {
 
         case LLDP_PRIVATE_TLV:
             if (vflag) {
-
                 oui = EXTRACT_24BITS(tptr);
                 printf(": OUI %s (0x%06x)", tok2str(oui_values, "Unknown", oui), oui);
                 hexdump = TRUE;
