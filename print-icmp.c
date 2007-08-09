@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.85 2006-12-12 14:31:51 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.86 2007-08-09 18:53:26 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -415,7 +415,7 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
 		case ICMP_UNREACH_NEEDFRAG:
 		    {
 			register const struct mtu_discovery *mp;
-			mp = (struct mtu_discovery *)&dp->icmp_void;
+			mp = (struct mtu_discovery *)(u_char *)&dp->icmp_void;
 			mtu = EXTRACT_16BITS(&mp->nexthopmtu);
 			if (mtu) {
 				(void)snprintf(buf, sizeof(buf),
