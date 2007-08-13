@@ -19,7 +19,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-lldp.c,v 1.3 2007-08-09 18:43:44 hannes Exp $";
+"@(#) $Header: /tcpdump/master/tcpdump/print-lldp.c,v 1.4 2007-08-13 12:55:17 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -134,6 +134,203 @@ static const struct tok lldp_cap_values[] = {
     { LLDP_CAP_PHONE, "Telephone"},
     { LLDP_CAP_DOCSIS, "Docsis"},
     { LLDP_CAP_STATION_ONLY, "Station Only"},
+    { 0, NULL}
+};
+
+#define		LLDP_8023_SUTBYPE_1		1
+#define		LLDP_8023_SUTBYPE_2		2
+#define		LLDP_8023_SUTBYPE_3		3
+#define		LLDP_8023_SUTBYPE_4		4
+
+static const struct tok lldp_8023_subtype_values[] = {
+    { LLDP_8023_SUTBYPE_1,	"MAC/PHY configuration/status"},
+    { LLDP_8023_SUTBYPE_2,	"Power via MDI"},
+    { LLDP_8023_SUTBYPE_3,  	"Link aggregation"},
+    { LLDP_8023_SUTBYPE_4,	"Max frame size"},
+    { 0, NULL}
+};
+
+/*
+ * From RFC 3636 - dot3MauType
+ */
+#define		LLDP_MAU_TYPE_UNKNOWN		0
+#define		LLDP_MAU_TYPE_AUI		1
+#define		LLDP_MAU_TYPE_10BASE_5		2
+#define		LLDP_MAU_TYPE_FOIRL		3
+#define		LLDP_MAU_TYPE_10BASE_2		4
+#define		LLDP_MAU_TYPE_10BASE_T		5
+#define		LLDP_MAU_TYPE_10BASE_FP		6
+#define		LLDP_MAU_TYPE_10BASE_FB		7
+#define		LLDP_MAU_TYPE_10BASE_FL		8
+#define		LLDP_MAU_TYPE_10BROAD36		9
+#define		LLDP_MAU_TYPE_10BASE_T_HD	10
+#define		LLDP_MAU_TYPE_10BASE_T_FD	11
+#define		LLDP_MAU_TYPE_10BASE_FL_HD	12
+#define		LLDP_MAU_TYPE_10BASE_FL_FD	13
+#define		LLDP_MAU_TYPE_100BASE_T4	14
+#define		LLDP_MAU_TYPE_100BASE_TX_HD	15
+#define		LLDP_MAU_TYPE_100BASE_TX_FD	16
+#define		LLDP_MAU_TYPE_100BASE_FX_HD	17
+#define		LLDP_MAU_TYPE_100BASE_FX_FD	18
+#define		LLDP_MAU_TYPE_100BASE_T2_HD	19
+#define		LLDP_MAU_TYPE_100BASE_T2_FD	20
+#define		LLDP_MAU_TYPE_1000BASE_X_HD	21
+#define		LLDP_MAU_TYPE_1000BASE_X_FD	22
+#define		LLDP_MAU_TYPE_1000BASE_LX_HD	23
+#define		LLDP_MAU_TYPE_1000BASE_LX_FD	24
+#define		LLDP_MAU_TYPE_1000BASE_SX_HD	25
+#define		LLDP_MAU_TYPE_1000BASE_SX_FD	26
+#define		LLDP_MAU_TYPE_1000BASE_CX_HD	27
+#define		LLDP_MAU_TYPE_1000BASE_CX_FD	28
+#define		LLDP_MAU_TYPE_1000BASE_T_HD	29
+#define		LLDP_MAU_TYPE_1000BASE_T_FD	30
+#define		LLDP_MAU_TYPE_10GBASE_X		31
+#define		LLDP_MAU_TYPE_10GBASE_LX4	32
+#define		LLDP_MAU_TYPE_10GBASE_R		33
+#define		LLDP_MAU_TYPE_10GBASE_ER	34
+#define		LLDP_MAU_TYPE_10GBASE_LR	35
+#define		LLDP_MAU_TYPE_10GBASE_SR	36
+#define		LLDP_MAU_TYPE_10GBASE_W		37
+#define		LLDP_MAU_TYPE_10GBASE_EW	38
+#define		LLDP_MAU_TYPE_10GBASE_LW	39
+#define		LLDP_MAU_TYPE_10GBASE_SW	40
+
+static const struct tok lldp_mau_types_values[] = {
+    { LLDP_MAU_TYPE_UNKNOWN,            "Unknown"},
+    { LLDP_MAU_TYPE_AUI,                "AUI"},
+    { LLDP_MAU_TYPE_10BASE_5,           "10BASE_5"},
+    { LLDP_MAU_TYPE_FOIRL,              "FOIRL"},
+    { LLDP_MAU_TYPE_10BASE_2,           "10BASE2"},
+    { LLDP_MAU_TYPE_10BASE_T,           "10BASET duplex mode unknown"},
+    { LLDP_MAU_TYPE_10BASE_FP,          "10BASEFP"},
+    { LLDP_MAU_TYPE_10BASE_FB,          "10BASEFB"},
+    { LLDP_MAU_TYPE_10BASE_FL,          "10BASEFL duplex mode unknown"},
+    { LLDP_MAU_TYPE_10BROAD36,          "10BROAD36"},
+    { LLDP_MAU_TYPE_10BASE_T_HD,        "10BASET hdx"},
+    { LLDP_MAU_TYPE_10BASE_T_FD,        "10BASET fdx"},
+    { LLDP_MAU_TYPE_10BASE_FL_HD,       "10BASEFL hdx"},
+    { LLDP_MAU_TYPE_10BASE_FL_FD,       "10BASEFL fdx"},
+    { LLDP_MAU_TYPE_100BASE_T4,         "100BASET4"},
+    { LLDP_MAU_TYPE_100BASE_TX_HD,      "100BASETX hdx"},
+    { LLDP_MAU_TYPE_100BASE_TX_FD,      "100BASETX fdx"},
+    { LLDP_MAU_TYPE_100BASE_FX_HD,      "100BASEFX hdx"},
+    { LLDP_MAU_TYPE_100BASE_FX_FD,      "100BASEFX fdx"},
+    { LLDP_MAU_TYPE_100BASE_T2_HD,      "100BASET2 hdx"},
+    { LLDP_MAU_TYPE_100BASE_T2_FD,      "100BASET2 fdx"},
+    { LLDP_MAU_TYPE_1000BASE_X_HD,      "1000BASEX hdx"},
+    { LLDP_MAU_TYPE_1000BASE_X_FD,      "1000BASEX fdx"},
+    { LLDP_MAU_TYPE_1000BASE_LX_HD,     "1000BASELX hdx"},
+    { LLDP_MAU_TYPE_1000BASE_LX_FD,     "1000BASELX fdx"},
+    { LLDP_MAU_TYPE_1000BASE_SX_HD,     "1000BASESX hdx"},
+    { LLDP_MAU_TYPE_1000BASE_SX_FD,     "1000BASESX fdx"},
+    { LLDP_MAU_TYPE_1000BASE_CX_HD,     "1000BASECX hdx"},
+    { LLDP_MAU_TYPE_1000BASE_CX_FD,     "1000BASECX fdx"},
+    { LLDP_MAU_TYPE_1000BASE_T_HD,      "1000BASET hdx"},
+    { LLDP_MAU_TYPE_1000BASE_T_FD,      "1000BASET fdx"},
+    { LLDP_MAU_TYPE_10GBASE_X,          "10GBASEX"},
+    { LLDP_MAU_TYPE_10GBASE_LX4,        "10GBASELX4"},
+    { LLDP_MAU_TYPE_10GBASE_R,          "10GBASER"},
+    { LLDP_MAU_TYPE_10GBASE_ER,         "10GBASEER"},
+    { LLDP_MAU_TYPE_10GBASE_LR,         "10GBASELR"},
+    { LLDP_MAU_TYPE_10GBASE_SR,         "10GBASESR"},
+    { LLDP_MAU_TYPE_10GBASE_W,          "10GBASEW"},
+    { LLDP_MAU_TYPE_10GBASE_EW,         "10GBASEEW"},
+    { LLDP_MAU_TYPE_10GBASE_LW,         "10GBASELW"},
+    { LLDP_MAU_TYPE_10GBASE_SW,         "10GBASESW"},
+    { 0, NULL}
+};
+
+#define LLDP_8023_AUTONEGOTIATION_SUPPORT       (1 <<  0)
+#define LLDP_8023_AUTONEGOTIATION_STATUS        (1 <<  1)
+
+static const struct tok lldp_8023_autonegotiation_values[] = {
+    { LLDP_8023_AUTONEGOTIATION_SUPPORT, "supported"},
+    { LLDP_8023_AUTONEGOTIATION_STATUS, "enabled"},
+    { 0, NULL}
+};
+
+/*
+ * From RFC 3636 - ifMauAutoNegCapAdvertisedBits
+ */ 
+#define	 LLDP_MAU_PMD_OTHER			(1 <<  0)
+#define	 LLDP_MAU_PMD_10BASE_T			(1 <<  1)
+#define	 LLDP_MAU_PMD_10BASE_T_FD		(1 <<  2)
+#define	 LLDP_MAU_PMD_100BASE_T4		(1 <<  3)
+#define	 LLDP_MAU_PMD_100BASE_TX		(1 <<  4)
+#define	 LLDP_MAU_PMD_100BASE_TX_FD		(1 <<  5)
+#define	 LLDP_MAU_PMD_100BASE_T2		(1 <<  6)
+#define	 LLDP_MAU_PMD_100BASE_T2_FD		(1 <<  7)
+#define	 LLDP_MAU_PMD_FDXPAUSE			(1 <<  8)
+#define	 LLDP_MAU_PMD_FDXAPAUSE			(1 <<  9)
+#define	 LLDP_MAU_PMD_FDXSPAUSE			(1 <<  10)
+#define	 LLDP_MAU_PMD_FDXBPAUSE			(1 <<  11)
+#define	 LLDP_MAU_PMD_1000BASE_X		(1 <<  12)
+#define	 LLDP_MAU_PMD_1000BASE_X_FD		(1 <<  13)
+#define	 LLDP_MAU_PMD_1000BASE_T		(1 <<  14)
+#define	 LLDP_MAU_PMD_1000BASE_T_FD		(1 <<  15)
+
+static const struct tok lldp_pmd_capability_values[] = {
+    { LLDP_MAU_PMD_10BASE_T,		"10BASE-T hdx"},
+    { LLDP_MAU_PMD_10BASE_T_FD,	        "10BASE-T fdx"},
+    { LLDP_MAU_PMD_100BASE_T4,		"100BASE-T4"},
+    { LLDP_MAU_PMD_100BASE_TX,		"100BASE-TX hdx"},
+    { LLDP_MAU_PMD_100BASE_TX_FD,	"100BASE-TX fdx"},
+    { LLDP_MAU_PMD_100BASE_T2,		"100BASE-T2 hdx"},
+    { LLDP_MAU_PMD_100BASE_T2_FD,	"100BASE-T2 fdx"},
+    { LLDP_MAU_PMD_FDXPAUSE,		"Pause for fdx links"},
+    { LLDP_MAU_PMD_FDXAPAUSE,		"Asym PAUSE for fdx"},
+    { LLDP_MAU_PMD_FDXSPAUSE,		"Sym PAUSE for fdx"},
+    { LLDP_MAU_PMD_FDXBPAUSE,		"Asym and Sym PAUSE for fdx"},
+    { LLDP_MAU_PMD_1000BASE_X,		"1000BASE-{X LX SX CX} hdx"},
+    { LLDP_MAU_PMD_1000BASE_X_FD,	"1000BASE-{X LX SX CX} fdx"},
+    { LLDP_MAU_PMD_1000BASE_T,		"1000BASE-T hdx"},
+    { LLDP_MAU_PMD_1000BASE_T_FD,	"1000BASE-T fdx"},
+    { 0, NULL}
+};
+
+#define	LLDP_MDI_PORT_CLASS			(1 <<  0)
+#define	LLDP_MDI_POWER_SUPPORT			(1 <<  1)
+#define LLDP_MDI_POWER_STATE			(1 <<  2)
+#define LLDP_MDI_PAIR_CONTROL_ABILITY		(1 <<  3)
+
+static const struct tok lldp_mdi_values[] = {
+    { LLDP_MDI_PORT_CLASS, 		"PSE"},
+    { LLDP_MDI_POWER_SUPPORT, 		"supported"},
+    { LLDP_MDI_POWER_STATE, 		"enabled"},
+    { LLDP_MDI_PAIR_CONTROL_ABILITY, 	"can be controlled"},
+    { 0, NULL}
+};
+
+#define LLDP_MDI_PSE_PORT_POWER_PAIRS_SIGNAL	1
+#define LLDP_MDI_PSE_PORT_POWER_PAIRS_SPARE	2
+
+static const struct tok lldp_mdi_power_pairs_values[] = {
+    { LLDP_MDI_PSE_PORT_POWER_PAIRS_SIGNAL,	"signal"},
+    { LLDP_MDI_PSE_PORT_POWER_PAIRS_SPARE,	"spare"},
+    { 0, NULL}
+};
+
+#define LLDP_MDI_POWER_CLASS0		1
+#define LLDP_MDI_POWER_CLASS1		2
+#define LLDP_MDI_POWER_CLASS2		3
+#define LLDP_MDI_POWER_CLASS3		4
+#define LLDP_MDI_POWER_CLASS4		5
+
+static const struct tok lldp_mdi_power_class_values[] = {
+    { LLDP_MDI_POWER_CLASS0,     "class0"},
+    { LLDP_MDI_POWER_CLASS1,     "class1"},
+    { LLDP_MDI_POWER_CLASS2,     "class2"},
+    { LLDP_MDI_POWER_CLASS3,     "class3"},
+    { LLDP_MDI_POWER_CLASS4,     "class4"},
+    { 0, NULL}
+};
+
+#define LLDP_AGGREGATION_CAPABILTIY     (1 <<  0)
+#define LLDP_AGGREGATION_STATUS         (1 <<  1)
+
+static const struct tok lldp_aggregation_values[] = {
+    { LLDP_AGGREGATION_CAPABILTIY,   	"supported"},
+    { LLDP_AGGREGATION_STATUS,    	"enabled"},
     { 0, NULL}
 };
 
@@ -382,9 +579,56 @@ lldp_print(register const u_char *pptr, register u_int len) {
 
         case LLDP_PRIVATE_TLV:
             if (vflag) {
+		int subtype;
                 oui = EXTRACT_24BITS(tptr);
                 printf(": OUI %s (0x%06x)", tok2str(oui_values, "Unknown", oui), oui);
                 hexdump = TRUE;
+                
+		if (oui == OUI_IEEE_PRIVATE) {
+
+                    hexdump = FALSE;
+		    subtype = *(tptr+3);
+
+	  	    printf("\n\t  %s Subtype (%u)",
+                           tok2str(lldp_8023_subtype_values, "unknown", subtype),
+                           subtype);
+
+		    switch (subtype) {
+                    case LLDP_8023_SUTBYPE_1:
+                        printf("\n\t    autonegotiation [%s] (0x%02x)",
+                               bittok2str(lldp_8023_autonegotiation_values,"none",*(tptr+4)),
+                               *(tptr+4));
+                        printf("\n\t    PMD autoneg capability [%s] (0x%04x)",
+                               bittok2str(lldp_pmd_capability_values,"unknown",EXTRACT_16BITS(tptr+5)),
+                               EXTRACT_16BITS(tptr+5));
+                        printf("\n\t    MAU type %s (0x%04x)",
+                               tok2str(lldp_mau_types_values, "unknown", EXTRACT_16BITS(tptr+7)),
+                               EXTRACT_16BITS(tptr+7));
+                        break;
+
+                    case LLDP_8023_SUTBYPE_2:
+                        printf("\n\t    MDI power support [%s], power pair %s, power class %s",
+                               bittok2str(lldp_mdi_values, "none", *(tptr+4)),
+                               tok2str(lldp_mdi_power_pairs_values, "unknown", *(tptr+5)),
+                               tok2str(lldp_mdi_power_class_values, "unknown", *(tptr+6)));
+                        break;
+
+                    case LLDP_8023_SUTBYPE_3:
+                        printf("\n\t    aggregation status [%s], aggregation port ID %u",
+                               bittok2str(lldp_aggregation_values, "none", (*tptr+4)),
+                               EXTRACT_32BITS(tptr+5));
+                        break;
+
+                    case LLDP_8023_SUTBYPE_4:
+                        printf("\n\t    MTU size %u",
+                               EXTRACT_16BITS(tptr+4));
+                        break;
+
+                    default:
+                        hexdump = TRUE;
+                        break;
+                    }
+                }
             }
             break;
 

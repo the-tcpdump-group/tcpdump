@@ -15,7 +15,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/oui.c,v 1.6 2005-04-09 21:49:48 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/oui.c,v 1.7 2007-08-13 12:55:17 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -39,6 +39,7 @@ struct tok oui_values[] = {
     { OUI_APPLETALK, "Appletalk" },
     { OUI_JUNIPER, "Juniper" },
     { OUI_HP, "Hewlett-Packard" },
+    { OUI_IEEE_PRIVATE, "IEEE 802.3 Private"},
     { 0, NULL }
 };
 
