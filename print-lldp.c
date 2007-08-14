@@ -19,7 +19,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-lldp.c,v 1.4 2007-08-13 12:55:17 hannes Exp $";
+"@(#) $Header: /tcpdump/master/tcpdump/print-lldp.c,v 1.5 2007-08-14 17:09:35 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -137,16 +137,16 @@ static const struct tok lldp_cap_values[] = {
     { 0, NULL}
 };
 
-#define		LLDP_8023_SUTBYPE_1		1
-#define		LLDP_8023_SUTBYPE_2		2
-#define		LLDP_8023_SUTBYPE_3		3
-#define		LLDP_8023_SUTBYPE_4		4
+#define	LLDP_PRIVATE_8023_SUTBYPE_MACPHY	1
+#define	LLDP_PRIVATE_8023_SUTBYPE_MDIPOWER	2
+#define	LLDP_PRIVATE_8023_SUTBYPE_LINKAGGR	3
+#define	LLDP_PRIVATE_8023_SUTBYPE_MTU		4
 
 static const struct tok lldp_8023_subtype_values[] = {
-    { LLDP_8023_SUTBYPE_1,	"MAC/PHY configuration/status"},
-    { LLDP_8023_SUTBYPE_2,	"Power via MDI"},
-    { LLDP_8023_SUTBYPE_3,  	"Link aggregation"},
-    { LLDP_8023_SUTBYPE_4,	"Max frame size"},
+    { LLDP_PRIVATE_8023_SUTBYPE_MACPHY,	"MAC/PHY configuration/status"},
+    { LLDP_PRIVATE_8023_SUTBYPE_MDIPOWER, "Power via MDI"},
+    { LLDP_PRIVATE_8023_SUTBYPE_LINKAGGR, "Link aggregation"},
+    { LLDP_PRIVATE_8023_SUTBYPE_MTU, "Max frame size"},
     { 0, NULL}
 };
 
@@ -329,8 +329,8 @@ static const struct tok lldp_mdi_power_class_values[] = {
 #define LLDP_AGGREGATION_STATUS         (1 <<  1)
 
 static const struct tok lldp_aggregation_values[] = {
-    { LLDP_AGGREGATION_CAPABILTIY,   	"supported"},
-    { LLDP_AGGREGATION_STATUS,    	"enabled"},
+    { LLDP_AGGREGATION_CAPABILTIY, "supported"},
+    { LLDP_AGGREGATION_STATUS, "enabled"},
     { 0, NULL}
 };
 
@@ -347,6 +347,58 @@ static const struct tok lldp_intf_numb_subtype_values[] = {
 };
 
 #define LLDP_INTF_NUM_LEN                  5
+
+/*
+ * Print IEEE private extensions.
+ */
+static int
+lldp_private_8023_print(const u_char *tptr)
+{
+    int subtype, hexdump = FALSE;
+
+    subtype = *(tptr+3);
+
+    printf("\n\t  %s Subtype (%u)",
+           tok2str(lldp_8023_subtype_values, "unknown", subtype),
+           subtype);
+
+    switch (subtype) {
+    case LLDP_PRIVATE_8023_SUTBYPE_MACPHY:
+        printf("\n\t    autonegotiation [%s] (0x%02x)",
+               bittok2str(lldp_8023_autonegotiation_values,"none", *(tptr+4)),
+               *(tptr+4));
+        printf("\n\t    PMD autoneg capability [%s] (0x%04x)",
+               bittok2str(lldp_pmd_capability_values,"unknown", EXTRACT_16BITS(tptr+5)),
+               EXTRACT_16BITS(tptr+5));
+        printf("\n\t    MAU type %s (0x%04x)",
+               tok2str(lldp_mau_types_values, "unknown", EXTRACT_16BITS(tptr+7)),
+               EXTRACT_16BITS(tptr+7));
+        break;
+
+    case LLDP_PRIVATE_8023_SUTBYPE_MDIPOWER:
+        printf("\n\t    MDI power support [%s], power pair %s, power class %s",
+               bittok2str(lldp_mdi_values, "none", *(tptr+4)),
+               tok2str(lldp_mdi_power_pairs_values, "unknown", *(tptr+5)),
+               tok2str(lldp_mdi_power_class_values, "unknown", *(tptr+6)));
+        break;
+
+    case LLDP_PRIVATE_8023_SUTBYPE_LINKAGGR:
+        printf("\n\t    aggregation status [%s], aggregation port ID %u",
+               bittok2str(lldp_aggregation_values, "none", (*tptr+4)),
+               EXTRACT_32BITS(tptr+5));
+        break;
+
+    case LLDP_PRIVATE_8023_SUTBYPE_MTU:
+        printf("\n\t    MTU size %u", EXTRACT_16BITS(tptr+4));
+        break;
+
+    default:
+        hexdump = TRUE;
+        break;
+    }
+
+    return hexdump;
+}
 
 
 static char *
@@ -579,55 +631,16 @@ lldp_print(register const u_char *pptr, register u_int len) {
 
         case LLDP_PRIVATE_TLV:
             if (vflag) {
-		int subtype;
                 oui = EXTRACT_24BITS(tptr);
                 printf(": OUI %s (0x%06x)", tok2str(oui_values, "Unknown", oui), oui);
-                hexdump = TRUE;
                 
-		if (oui == OUI_IEEE_PRIVATE) {
-
-                    hexdump = FALSE;
-		    subtype = *(tptr+3);
-
-	  	    printf("\n\t  %s Subtype (%u)",
-                           tok2str(lldp_8023_subtype_values, "unknown", subtype),
-                           subtype);
-
-		    switch (subtype) {
-                    case LLDP_8023_SUTBYPE_1:
-                        printf("\n\t    autonegotiation [%s] (0x%02x)",
-                               bittok2str(lldp_8023_autonegotiation_values,"none",*(tptr+4)),
-                               *(tptr+4));
-                        printf("\n\t    PMD autoneg capability [%s] (0x%04x)",
-                               bittok2str(lldp_pmd_capability_values,"unknown",EXTRACT_16BITS(tptr+5)),
-                               EXTRACT_16BITS(tptr+5));
-                        printf("\n\t    MAU type %s (0x%04x)",
-                               tok2str(lldp_mau_types_values, "unknown", EXTRACT_16BITS(tptr+7)),
-                               EXTRACT_16BITS(tptr+7));
-                        break;
-
-                    case LLDP_8023_SUTBYPE_2:
-                        printf("\n\t    MDI power support [%s], power pair %s, power class %s",
-                               bittok2str(lldp_mdi_values, "none", *(tptr+4)),
-                               tok2str(lldp_mdi_power_pairs_values, "unknown", *(tptr+5)),
-                               tok2str(lldp_mdi_power_class_values, "unknown", *(tptr+6)));
-                        break;
-
-                    case LLDP_8023_SUTBYPE_3:
-                        printf("\n\t    aggregation status [%s], aggregation port ID %u",
-                               bittok2str(lldp_aggregation_values, "none", (*tptr+4)),
-                               EXTRACT_32BITS(tptr+5));
-                        break;
-
-                    case LLDP_8023_SUTBYPE_4:
-                        printf("\n\t    MTU size %u",
-                               EXTRACT_16BITS(tptr+4));
-                        break;
-
-                    default:
-                        hexdump = TRUE;
-                        break;
-                    }
+                switch (oui) {
+                case OUI_IEEE_PRIVATE:
+                    hexdump = lldp_private_8023_print(tptr);
+                    break;
+                default:
+                    hexdump = TRUE;
+                    break;
                 }
             }
             break;
