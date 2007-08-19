@@ -15,11 +15,12 @@
  * support for the IEEE Link Discovery Protocol as per 802.1ab
  *
  * Original code by Hannes Gredler (hannes@juniper.net)
+ * IEEE and TIA extensions by Carles Kishimoto <carles.kishimoto@gmail.com>
  */
 
 #ifndef lint
 static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-lldp.c,v 1.5 2007-08-14 17:09:35 hannes Exp $";
+"@(#) $Header: /tcpdump/master/tcpdump/print-lldp.c,v 1.6 2007-08-19 09:14:49 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -150,6 +151,39 @@ static const struct tok lldp_8023_subtype_values[] = {
     { 0, NULL}
 };
 
+#define LLDP_PRIVATE_TIA_SUBTYPE_CAPABILITIES                   1
+#define LLDP_PRIVATE_TIA_SUBTYPE_NETWORK_POLICY                 2
+#define LLDP_PRIVATE_TIA_SUBTYPE_LOCAL_ID                       3
+#define LLDP_PRIVATE_TIA_SUBTYPE_EXTENDED_POWER_MDI             4
+#define LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_HARDWARE_REV         5
+#define LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_FIRMWARE_REV         6
+#define LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_SOFTWARE_REV         7
+#define LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_SERIAL_NUMBER        8
+#define LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_MANUFACTURER_NAME    9
+#define LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_MODEL_NAME           10
+#define LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_ASSET_ID             11
+
+static const struct tok lldp_tia_subtype_values[] = {
+    { LLDP_PRIVATE_TIA_SUBTYPE_CAPABILITIES, "LLDP-MED Capabilities" },
+    { LLDP_PRIVATE_TIA_SUBTYPE_NETWORK_POLICY, "Network policy" },
+    { LLDP_PRIVATE_TIA_SUBTYPE_LOCAL_ID, "Location identification" },
+    { LLDP_PRIVATE_TIA_SUBTYPE_EXTENDED_POWER_MDI, "Extended power-via-MDI" },
+    { LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_HARDWARE_REV, "Inventory - hardware revision" },
+    { LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_FIRMWARE_REV, "Inventory - firmware revision" },
+    { LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_SOFTWARE_REV, "Inventory - software revision" },
+    { LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_SERIAL_NUMBER, "Inventory - serial number" },
+    { LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_MANUFACTURER_NAME, "Inventory - manufacturer name" },
+    { LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_MODEL_NAME, "Inventory - model name" },
+    { LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_ASSET_ID, "Inventory - asset ID" },
+    { 0, NULL}
+};
+
+#define LLDP_NETWORK_CONNECTIVITY_TLV
+#define LLDP_ENDPOINT_CLASS_1_TLV
+#define LLDP_ENDPOINT_CLASS_2_TLV
+#define LLDP_ENDPOINT_CLASS_3_TLV
+#define LLDP_INVENTORY_TLV
+
 /*
  * From RFC 3636 - dot3MauType
  */
@@ -246,6 +280,118 @@ static const struct tok lldp_mau_types_values[] = {
 static const struct tok lldp_8023_autonegotiation_values[] = {
     { LLDP_8023_AUTONEGOTIATION_SUPPORT, "supported"},
     { LLDP_8023_AUTONEGOTIATION_STATUS, "enabled"},
+    { 0, NULL}
+};
+
+#define LLDP_TIA_CAPABILITY_MED                         (1 <<  0)
+#define LLDP_TIA_CAPABILITY_NETWORK_POLICY              (1 <<  1)
+#define LLDP_TIA_CAPABILITY_LOCATION_IDENTIFICATION     (1 <<  2)
+#define LLDP_TIA_CAPABILITY_EXTENDED_POWER_MDI_PSE      (1 <<  3)
+#define LLDP_TIA_CAPABILITY_EXTENDED_POWER_MDI_PD       (1 <<  4)
+#define LLDP_TIA_CAPABILITY_INVENTORY                   (1 <<  5)
+
+static const struct tok lldp_tia_capabilities_values[] = {
+    { LLDP_TIA_CAPABILITY_MED, "LLDP-MED capabilities"},
+    { LLDP_TIA_CAPABILITY_NETWORK_POLICY, "network policy"},
+    { LLDP_TIA_CAPABILITY_LOCATION_IDENTIFICATION, "location identification"},
+    { LLDP_TIA_CAPABILITY_EXTENDED_POWER_MDI_PSE, "extended power via MDI-PSE"},
+    { LLDP_TIA_CAPABILITY_EXTENDED_POWER_MDI_PD, "extended power via MDI-PD"},
+    { LLDP_TIA_CAPABILITY_INVENTORY, "Inventory"},
+    { 0, NULL}
+};
+
+#define LLDP_TIA_DEVICE_TYPE_ENDPOINT_CLASS_1           1
+#define LLDP_TIA_DEVICE_TYPE_ENDPOINT_CLASS_2           2
+#define LLDP_TIA_DEVICE_TYPE_ENDPOINT_CLASS_3           3
+#define LLDP_TIA_DEVICE_TYPE_NETWORK_CONNECTIVITY       4
+
+static const struct tok lldp_tia_device_type_values[] = {
+    { LLDP_TIA_DEVICE_TYPE_ENDPOINT_CLASS_1, "endpoint class 1"},
+    { LLDP_TIA_DEVICE_TYPE_ENDPOINT_CLASS_2, "endpoint class 2"},
+    { LLDP_TIA_DEVICE_TYPE_ENDPOINT_CLASS_3, "endpoint class 3"},
+    { LLDP_TIA_DEVICE_TYPE_NETWORK_CONNECTIVITY, "network connectivity"},
+    { 0, NULL}
+};
+
+#define LLDP_TIA_APPLICATION_TYPE_VOICE                 1
+#define LLDP_TIA_APPLICATION_TYPE_VOICE_SIGNALING       2
+#define LLDP_TIA_APPLICATION_TYPE_GUEST_VOICE           3
+#define LLDP_TIA_APPLICATION_TYPE_GUEST_VOICE_SIGNALING 4
+#define LLDP_TIA_APPLICATION_TYPE_SOFTPHONE_VOICE       5
+#define LLDP_TIA_APPLICATION_TYPE_VIDEO_CONFERENCING    6
+#define LLDP_TIA_APPLICATION_TYPE_STREAMING_VIDEO       7
+#define LLDP_TIA_APPLICATION_TYPE_VIDEO_SIGNALING       8
+
+static const struct tok lldp_tia_application_type_values[] = {
+    { LLDP_TIA_APPLICATION_TYPE_VOICE, "voice"},
+    { LLDP_TIA_APPLICATION_TYPE_VOICE_SIGNALING, "voice signaling"},
+    { LLDP_TIA_APPLICATION_TYPE_GUEST_VOICE, "guest voice"},
+    { LLDP_TIA_APPLICATION_TYPE_GUEST_VOICE_SIGNALING, "guest voice signaling"},
+    { LLDP_TIA_APPLICATION_TYPE_SOFTPHONE_VOICE, "softphone voice"},
+    { LLDP_TIA_APPLICATION_TYPE_VIDEO_CONFERENCING, "video conferencing"},
+    { LLDP_TIA_APPLICATION_TYPE_STREAMING_VIDEO, "streaming video"},
+    { LLDP_TIA_APPLICATION_TYPE_VIDEO_SIGNALING, "video signaling"},
+    { 0, NULL}
+};
+
+#define LLDP_TIA_NETWORK_POLICY_U_BIT           (1 << 5)
+#define LLDP_TIA_NETWORK_POLICY_T_BIT           (1 << 6)
+#define LLDP_TIA_NETWORK_POLICY_X_BIT           (1 << 7)
+
+static const struct tok lldp_tia_network_policy_bits_values[] = {
+    { LLDP_TIA_NETWORK_POLICY_U_BIT, "Unknown"},
+    { LLDP_TIA_NETWORK_POLICY_T_BIT, "Tagged"},
+    { LLDP_TIA_NETWORK_POLICY_X_BIT, "reserved"},
+    { 0, NULL}
+};
+
+#define LLDP_EXTRACT_NETWORK_POLICY_VLAN(x)           (((x)&0x1ffe)>>1)
+#define LLDP_EXTRACT_NETWORK_POLICY_L2_PRIORITY(x)    (((x)&0x01ff)>>6)
+#define LLDP_EXTRACT_NETWORK_POLICY_DSCP(x)           ((x)&0x003f)
+
+#define LLDP_TIA_LOCATION_DATA_FORMAT_COORDINATE_BASED  1
+#define LLDP_TIA_LOCATION_DATA_FORMAT_CIVIC_ADDRESS     2
+#define LLDP_TIA_LOCATION_DATA_FORMAT_ECS_ELIN          3
+
+static const struct tok lldp_tia_location_data_format_values[] = {
+    { LLDP_TIA_LOCATION_DATA_FORMAT_COORDINATE_BASED, "coordinate-based LCI"},
+    { LLDP_TIA_LOCATION_DATA_FORMAT_CIVIC_ADDRESS, "civic address LCI"},
+    { LLDP_TIA_LOCATION_DATA_FORMAT_ECS_ELIN, "ECS ELIN"},
+    { 0, NULL}
+};
+
+#define LLDP_TIA_POWER_SOURCE_PSE               1
+#define LLDP_TIA_POWER_SOURCE_LOCAL             2
+#define LLDP_TIA_POWER_SOURCE_PSE_AND_LOCAL     3
+
+static const struct tok lldp_tia_power_source_values[] = {
+    { LLDP_TIA_POWER_SOURCE_PSE, "PSE - primary power source"},
+    { LLDP_TIA_POWER_SOURCE_LOCAL, "local - backup power source"},
+    { LLDP_TIA_POWER_SOURCE_PSE_AND_LOCAL, "PSE+local - reserved"},
+    { 0, NULL}
+};
+
+#define LLDP_TIA_POWER_PRIORITY_CRITICAL        1
+#define LLDP_TIA_POWER_PRIORITY_HIGH            2
+#define LLDP_TIA_POWER_PRIORITY_LOW             3
+
+static const struct tok lldp_tia_power_priority_values[] = {
+    { LLDP_TIA_POWER_PRIORITY_CRITICAL, "critical"},
+    { LLDP_TIA_POWER_PRIORITY_HIGH, "high"},
+    { LLDP_TIA_POWER_PRIORITY_LOW, "low"},
+    { 0, NULL}
+};
+
+#define LLDP_TIA_POWER_VAL_MAX               1024
+
+static const struct tok lldp_tia_inventory_values[] = {
+    { LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_HARDWARE_REV, "Hardware revision" },
+    { LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_FIRMWARE_REV, "Firmware revision" },
+    { LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_SOFTWARE_REV, "Software revision" },
+    { LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_SERIAL_NUMBER, "Serial number" },
+    { LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_MANUFACTURER_NAME, "Manufacturer name" },
+    { LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_MODEL_NAME, "Model name" },
+    { LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_ASSET_ID, "Asset ID" },
     { 0, NULL}
 };
 
@@ -365,7 +511,7 @@ lldp_private_8023_print(const u_char *tptr)
     switch (subtype) {
     case LLDP_PRIVATE_8023_SUTBYPE_MACPHY:
         printf("\n\t    autonegotiation [%s] (0x%02x)",
-               bittok2str(lldp_8023_autonegotiation_values,"none", *(tptr+4)),
+               bittok2str(lldp_8023_autonegotiation_values, "none", *(tptr+4)),
                *(tptr+4));
         printf("\n\t    PMD autoneg capability [%s] (0x%04x)",
                bittok2str(lldp_pmd_capability_values,"unknown", EXTRACT_16BITS(tptr+5)),
@@ -400,6 +546,98 @@ lldp_private_8023_print(const u_char *tptr)
     return hexdump;
 }
 
+/*
+ * Print private TIA extensions.
+ */
+static int
+lldp_private_tia_print(const u_char *tptr, u_int tlv_len)
+{
+    int subtype, hexdump = FALSE;
+    u_int8_t location_format;
+    u_int16_t power_val;
+
+    subtype = *(tptr+3);
+
+    printf("\n\t  %s Subtype (%u)",
+           tok2str(lldp_tia_subtype_values, "unknown", subtype),
+           subtype);
+
+    switch (subtype) {
+    case LLDP_PRIVATE_TIA_SUBTYPE_CAPABILITIES:
+        printf("\n\t    Media capabilities [%s] (0x%04x)",
+               bittok2str(lldp_tia_capabilities_values, "none",
+                          EXTRACT_16BITS(tptr+4)), EXTRACT_16BITS(tptr+4));
+        printf("\n\t    Device type [%s] (0x%02x)",
+               tok2str(lldp_tia_device_type_values, "unknown", *(tptr+6)),
+               *(tptr+6));
+        break;
+
+    case LLDP_PRIVATE_TIA_SUBTYPE_NETWORK_POLICY:
+        printf("\n\t    Application type [%s] (0x%02x)",
+               tok2str(lldp_tia_application_type_values, "none", *(tptr+4)),
+               *(tptr+4));
+        printf(", Flags [%s]", bittok2str(
+                   lldp_tia_network_policy_bits_values, "none", *(tptr+5)));
+        printf("\n\t    Vlan id %u",
+                LLDP_EXTRACT_NETWORK_POLICY_VLAN(EXTRACT_16BITS(tptr+5)));
+        printf(", L2 priority %u",
+                LLDP_EXTRACT_NETWORK_POLICY_L2_PRIORITY(EXTRACT_16BITS(tptr+6)));
+        printf(", DSCP value %u",
+                LLDP_EXTRACT_NETWORK_POLICY_DSCP(EXTRACT_16BITS(tptr+6)));
+        break;
+
+    case LLDP_PRIVATE_TIA_SUBTYPE_LOCAL_ID:
+        location_format = *(tptr+4);
+        printf("\n\t    Location data format [%s] (0x%02x)",
+               tok2str(lldp_tia_location_data_format_values, "none", location_format),
+               location_format);
+
+        switch (location_format) {
+            /* FIXME - print location ID based on location data format */
+        case LLDP_TIA_LOCATION_DATA_FORMAT_COORDINATE_BASED:
+        case LLDP_TIA_LOCATION_DATA_FORMAT_CIVIC_ADDRESS:
+        case LLDP_TIA_LOCATION_DATA_FORMAT_ECS_ELIN:
+        default:
+            printf("\n\t    Location ID ");
+            print_unknown_data(tptr+5, "\n\t      ", tlv_len-5);
+        }
+        break;
+
+    case LLDP_PRIVATE_TIA_SUBTYPE_EXTENDED_POWER_MDI:
+        printf("\n\t    Power type [%s]",
+               (*(tptr+4)&0xC0>>6) ? "PD device" : "PSE device");
+        printf(", Power source [%s]",
+               tok2str(lldp_tia_power_source_values, "none", (*(tptr+4)&0x30)>>4));
+        printf("\n\t    Power priority [%s] (0x%02x)",
+               tok2str(lldp_tia_power_priority_values, "none", *(tptr+4)&0x0f),
+               *(tptr+4)&0x0f);
+        power_val = EXTRACT_16BITS(tptr+5);
+        if (power_val < LLDP_TIA_POWER_VAL_MAX) {
+            printf(", Power %.1f Watts", ((float)power_val)/10);
+        } else {
+            printf(", Power %u (Reserved)", power_val);
+        }
+        break;
+
+    case LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_HARDWARE_REV:
+    case LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_FIRMWARE_REV:
+    case LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_SOFTWARE_REV:
+    case LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_SERIAL_NUMBER:
+    case LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_MANUFACTURER_NAME:
+    case LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_MODEL_NAME:
+    case LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_ASSET_ID:
+       printf("\n\t  %s ",
+           tok2str(lldp_tia_inventory_values, "unknown", subtype));
+        safeputs((const char *)tptr+4, tlv_len-4);
+        break;
+
+    default:
+        hexdump = TRUE;
+        break;
+    }
+
+    return hexdump;
+}
 
 static char *
 lldp_network_addr_print(const u_char *tptr) {
@@ -427,7 +665,7 @@ lldp_network_addr_print(const u_char *tptr) {
     }
 
     if (!pfunc) {
-        snprintf(buf, sizeof(buf), "AFI %s (%u) XXX",
+        snprintf(buf, sizeof(buf), "AFI %s (%u), no AF printer !",
                  tok2str(af_values, "Unknown", af), af);
     } else {
         snprintf(buf, sizeof(buf), "AFI %s (%u): %s",
@@ -637,6 +875,9 @@ lldp_print(register const u_char *pptr, register u_int len) {
                 switch (oui) {
                 case OUI_IEEE_PRIVATE:
                     hexdump = lldp_private_8023_print(tptr);
+                    break;
+                case OUI_TIA:
+                    hexdump = lldp_private_tia_print(tptr, tlv_len);
                     break;
                 default:
                     hexdump = TRUE;
