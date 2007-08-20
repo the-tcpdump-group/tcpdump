@@ -20,7 +20,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-lldp.c,v 1.6 2007-08-19 09:14:49 hannes Exp $";
+"@(#) $Header: /tcpdump/master/tcpdump/print-lldp.c,v 1.7 2007-08-20 12:18:30 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -178,11 +178,39 @@ static const struct tok lldp_tia_subtype_values[] = {
     { 0, NULL}
 };
 
-#define LLDP_NETWORK_CONNECTIVITY_TLV
-#define LLDP_ENDPOINT_CLASS_1_TLV
-#define LLDP_ENDPOINT_CLASS_2_TLV
-#define LLDP_ENDPOINT_CLASS_3_TLV
-#define LLDP_INVENTORY_TLV
+#define LLDP_PRIVATE_TIA_LOCATION_ALTITUDE_METERS       1
+#define LLDP_PRIVATE_TIA_LOCATION_ALTITUDE_FLOORS       2
+
+static const struct tok lldp_tia_location_altitude_type_values[] = {
+    { LLDP_PRIVATE_TIA_LOCATION_ALTITUDE_METERS, "meters"},
+    { LLDP_PRIVATE_TIA_LOCATION_ALTITUDE_FLOORS, "floors"},
+    { 0, NULL}
+};
+
+/* ANSI/TIA-1057 - Annex B */
+#define LLDP_PRIVATE_TIA_LOCATION_LCI_CATYPE_A1		1
+#define LLDP_PRIVATE_TIA_LOCATION_LCI_CATYPE_A2		2
+#define LLDP_PRIVATE_TIA_LOCATION_LCI_CATYPE_A3		3
+#define LLDP_PRIVATE_TIA_LOCATION_LCI_CATYPE_A4		4
+#define LLDP_PRIVATE_TIA_LOCATION_LCI_CATYPE_A5		5
+#define LLDP_PRIVATE_TIA_LOCATION_LCI_CATYPE_A6		6
+
+static const struct tok lldp_tia_location_lci_catype_values[] = {
+    { LLDP_PRIVATE_TIA_LOCATION_LCI_CATYPE_A1, "national subdivisions (state,canton,region,province,prefecture)"},
+    { LLDP_PRIVATE_TIA_LOCATION_LCI_CATYPE_A2, "county, parish, gun, district"},
+    { LLDP_PRIVATE_TIA_LOCATION_LCI_CATYPE_A3, "city, township, shi"},
+    { LLDP_PRIVATE_TIA_LOCATION_LCI_CATYPE_A4, "city division, borough, city district, ward chou"},
+    { LLDP_PRIVATE_TIA_LOCATION_LCI_CATYPE_A5, "neighborhood, block"},
+    { LLDP_PRIVATE_TIA_LOCATION_LCI_CATYPE_A6, "street"},
+    { 0, NULL}
+};
+
+static const struct tok lldp_tia_location_lci_what_values[] = {
+    { 0, "location of DHCP server"},
+    { 1, "location of the network element believed to be closest to the client"}, 
+    { 2, "location of the client"},
+    { 0, NULL}
+};
 
 /*
  * From RFC 3636 - dot3MauType
@@ -357,6 +385,17 @@ static const struct tok lldp_tia_location_data_format_values[] = {
     { LLDP_TIA_LOCATION_DATA_FORMAT_COORDINATE_BASED, "coordinate-based LCI"},
     { LLDP_TIA_LOCATION_DATA_FORMAT_CIVIC_ADDRESS, "civic address LCI"},
     { LLDP_TIA_LOCATION_DATA_FORMAT_ECS_ELIN, "ECS ELIN"},
+    { 0, NULL}
+};
+
+#define LLDP_TIA_LOCATION_DATUM_WGS_84          1
+#define LLDP_TIA_LOCATION_DATUM_NAD_83_NAVD_88  2
+#define LLDP_TIA_LOCATION_DATUM_NAD_83_MLLW     3
+
+static const struct tok lldp_tia_location_datum_type_values[] = {
+    { LLDP_TIA_LOCATION_DATUM_WGS_84, "World Geodesic System 1984"},
+    { LLDP_TIA_LOCATION_DATUM_NAD_83_NAVD_88, "North American Datum 1983 (NAVD88)"},
+    { LLDP_TIA_LOCATION_DATUM_NAD_83_MLLW, "North American Datum 1983 (MLLW)"},
     { 0, NULL}
 };
 
@@ -547,6 +586,20 @@ lldp_private_8023_print(const u_char *tptr)
 }
 
 /*
+ * Extract 34bits of latitude/longitude coordinates.
+ */
+static u_int64_t
+lldp_extract_latlon(const u_char *tptr)
+{
+    u_int64_t latlon;
+
+    latlon = *tptr & 0x3;
+    latlon = (latlon << 32) | EXTRACT_32BITS(tptr+1);
+
+    return latlon;
+}
+
+/*
  * Print private TIA extensions.
  */
 static int
@@ -555,6 +608,7 @@ lldp_private_tia_print(const u_char *tptr, u_int tlv_len)
     int subtype, hexdump = FALSE;
     u_int8_t location_format;
     u_int16_t power_val;
+    u_int8_t lci_len, ca_type, ca_len;
 
     subtype = *(tptr+3);
 
@@ -579,24 +633,77 @@ lldp_private_tia_print(const u_char *tptr, u_int tlv_len)
         printf(", Flags [%s]", bittok2str(
                    lldp_tia_network_policy_bits_values, "none", *(tptr+5)));
         printf("\n\t    Vlan id %u",
-                LLDP_EXTRACT_NETWORK_POLICY_VLAN(EXTRACT_16BITS(tptr+5)));
+               LLDP_EXTRACT_NETWORK_POLICY_VLAN(EXTRACT_16BITS(tptr+5)));
         printf(", L2 priority %u",
-                LLDP_EXTRACT_NETWORK_POLICY_L2_PRIORITY(EXTRACT_16BITS(tptr+6)));
+               LLDP_EXTRACT_NETWORK_POLICY_L2_PRIORITY(EXTRACT_16BITS(tptr+6)));
         printf(", DSCP value %u",
-                LLDP_EXTRACT_NETWORK_POLICY_DSCP(EXTRACT_16BITS(tptr+6)));
+               LLDP_EXTRACT_NETWORK_POLICY_DSCP(EXTRACT_16BITS(tptr+6)));
         break;
 
     case LLDP_PRIVATE_TIA_SUBTYPE_LOCAL_ID:
         location_format = *(tptr+4);
-        printf("\n\t    Location data format [%s] (0x%02x)",
-               tok2str(lldp_tia_location_data_format_values, "none", location_format),
+        printf("\n\t    Location data format %s (0x%02x)",
+               tok2str(lldp_tia_location_data_format_values, "unknown", location_format),
                location_format);
 
         switch (location_format) {
-            /* FIXME - print location ID based on location data format */
         case LLDP_TIA_LOCATION_DATA_FORMAT_COORDINATE_BASED:
+            printf("\n\t    Latitude resolution %u, latitude value %" PRIu64,
+                   (*(tptr+5)>>2), lldp_extract_latlon(tptr+5));
+            printf("\n\t    Longitude resolution %u, longitude value %" PRIu64,
+                   (*(tptr+10)>>2), lldp_extract_latlon(tptr+10));
+            printf("\n\t    Altitude type %s (%u)",
+                   tok2str(lldp_tia_location_altitude_type_values, "unknown",(*(tptr+15)>>4)),
+                   (*(tptr+15)>>4));
+            printf("\n\t    Altitude resolution %u, altitude value 0x%x",
+                   (EXTRACT_16BITS(tptr+15)>>6)&0x3f,
+                   ((EXTRACT_32BITS(tptr+16)&0x3fffffff)));
+            printf("\n\t    Datum %s (0x%02x)",
+                   tok2str(lldp_tia_location_datum_type_values, "unknown", *(tptr+20)),
+                   *(tptr+20));
+            break;
+
         case LLDP_TIA_LOCATION_DATA_FORMAT_CIVIC_ADDRESS:
+            lci_len = *(tptr+5);
+            printf("\n\t    LCI length %u, LCI what %s (0x%02x), Country-code ",
+                   lci_len,
+                   tok2str(lldp_tia_location_lci_what_values, "unknown", *(tptr+6)),
+                   *(tptr+6));
+
+            /* Country code */
+            safeputs((const char *)(tptr+7), 2);
+
+            lci_len = lci_len-3;
+            tptr = tptr + 9;
+
+            /* Decode each civic address element */	
+            while (lci_len > 0) {
+		ca_type = *(tptr);
+                ca_len = *(tptr+1);
+
+		tptr += 2;
+                lci_len -= 2; 
+
+                printf("\n\t      CA type \'%s\' (%u), length %u: ",
+                       tok2str(lldp_tia_location_lci_catype_values, "unknown", ca_type),
+                       ca_type, ca_len);
+
+		/* basic sanity check */
+		if ( ca_type == 0 || ca_len == 0) {
+                    return hexdump;
+		}
+
+                safeputs((const char *)tptr, ca_len);
+                tptr += ca_len;
+                lci_len -= ca_len;
+            }
+            break;
+
         case LLDP_TIA_LOCATION_DATA_FORMAT_ECS_ELIN:
+            printf("\n\t    ECS ELIN id ");
+            safeputs((const char *)tptr+5, tlv_len-5);       
+            break;
+
         default:
             printf("\n\t    Location ID ");
             print_unknown_data(tptr+5, "\n\t      ", tlv_len-5);
@@ -626,8 +733,8 @@ lldp_private_tia_print(const u_char *tptr, u_int tlv_len)
     case LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_MANUFACTURER_NAME:
     case LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_MODEL_NAME:
     case LLDP_PRIVATE_TIA_SUBTYPE_INVENTORY_ASSET_ID:
-       printf("\n\t  %s ",
-           tok2str(lldp_tia_inventory_values, "unknown", subtype));
+        printf("\n\t  %s ",
+               tok2str(lldp_tia_inventory_values, "unknown", subtype));
         safeputs((const char *)tptr+4, tlv_len-4);
         break;
 
