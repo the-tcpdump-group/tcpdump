@@ -22,7 +22,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.78.2.8 2007-07-24 17:29:43 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bootp.c,v 1.78.2.9 2007-08-21 22:02:08 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -280,6 +280,7 @@ static struct tok tag2str[] = {
 	{ TAG_IP4_SUBNET_SELECT, "iSUBNET" },
 /* RFC 3442 */
 	{ TAG_CLASSLESS_STATIC_RT, "$Classless-Static-Route" },
+	{ TAG_CLASSLESS_STA_RT_MS, "$Classless-Static-Route-Microsoft" },
 /* http://www.iana.org/assignments/bootp-dhcp-extensions/index.htm */
 	{ TAG_USER_CLASS,	"aCLASS" },
 	{ TAG_SLP_NAMING_AUTH,	"aSLP-NA" },
@@ -699,6 +700,7 @@ rfc1048_print(register const u_char *bp)
 			    break;
 
 			case TAG_CLASSLESS_STATIC_RT:
+			case TAG_CLASSLESS_STA_RT_MS:
 			{	
 				u_int mask_width, significant_octets, i;
 
