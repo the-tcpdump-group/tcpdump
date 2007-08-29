@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.278 2007-08-08 17:20:58 hannes Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.279 2007-08-29 12:31:00 mcr Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -356,6 +356,7 @@ extern void bpf_dump(struct bpf_program *, int);
 
 /* forward compatibility */
 
+#ifndef NETDISSECT_REWORKED
 extern netdissect_options *gndo;
 
 #define eflag gndo->ndo_eflag 
@@ -389,3 +390,4 @@ extern netdissect_options *gndo;
 #define snaplen     gndo->ndo_snaplen
 #define snapend     gndo->ndo_snapend
 
+#endif
