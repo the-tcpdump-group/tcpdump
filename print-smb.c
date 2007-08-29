@@ -12,7 +12,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.45 2007-07-14 22:28:36 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-smb.c,v 1.46 2007-08-29 02:31:44 mcr Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -1459,8 +1459,7 @@ ipx_netbios_print(const u_char *data, u_int length)
 	    break;
 	if (memcmp(&data[i], "\377SMB", 4) == 0) {
 	    smb_fdata(data, "\n>>> IPX transport ", &data[i], 0);
-	    if (data != NULL)
-		print_smb(&data[i], maxbuf);
+	    print_smb(&data[i], maxbuf);
 	    printf("\n");
 	    fflush(stdout);
 	    break;

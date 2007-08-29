@@ -1,3 +1,5 @@
+/*	$NetBSD: print-tcp.c,v 1.9 2007/07/26 18:15:12 plunky Exp $	*/
+
 /*
  * Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997
  *	The Regents of the University of California.  All rights reserved.
@@ -23,7 +25,9 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.129 2007-04-03 20:02:56 guy Exp $ (LBL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.130 2007-08-29 02:31:44 mcr Exp $ (LBL)";
+  #else
+__RCSID("$NetBSD: print-tcp.c,v 1.8 2007/07/24 11:53:48 drochner Exp $");
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -724,9 +728,9 @@ tcp_verify_signature(const struct ip *ip, const struct tcphdr *tp,
         u_int16_t savecsum, tlen;
 #ifdef INET6
         struct ip6_hdr *ip6;
-#endif
         u_int32_t len32;
         u_int8_t nxt;
+#endif
 
         tp1 = *tp;
 

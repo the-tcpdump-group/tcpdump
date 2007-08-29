@@ -1,5 +1,5 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/nfs.h,v 1.7 2002-12-11 07:13:55 guy Exp $ (LBL) */
-/*	$NetBSD: nfs.h,v 1.1 1996/05/23 22:49:53 fvdl Exp $	*/
+/* @(#) $Header: /tcpdump/master/tcpdump/nfs.h,v 1.8 2007-08-29 02:31:44 mcr Exp $ (LBL) */
+/*	NetBSD: nfs.h,v 1.1 1996/05/23 22:49:53 fvdl Exp 	*/
 
 /*
  * Copyright (c) 1989, 1993

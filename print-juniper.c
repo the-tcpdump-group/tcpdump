@@ -1,3 +1,5 @@
+/*     NetBSD: print-juniper.c,v 1.2 2007/07/24 11:53:45 drochner Exp        */
+
 /* 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that: (1) source code
@@ -15,7 +17,9 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.33 2006-06-14 21:40:00 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.34 2007-08-29 02:31:44 mcr Exp $ (LBL)";
+#else
+__RCSID("NetBSD: print-juniper.c,v 1.3 2007/07/25 06:31:32 dogcow Exp ");
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -546,8 +550,8 @@ juniper_es_print(const struct pcap_pkthdr *h, register const u_char *p)
                        tok2str(juniper_ipsec_type_values,"Unknown",ih->type),
                        ih->type,
                        EXTRACT_32BITS(&ih->spi),
-                       ipaddr_string(EXTRACT_32BITS(&ih->src_ip)),
-                       ipaddr_string(EXTRACT_32BITS(&ih->dst_ip)),
+                       ipaddr_string(&ih->src_ip),
+                       ipaddr_string(&ih->dst_ip),
                        l2info.length);
             } else {
                 printf("ES SA, index %u, ttl %u type %s (%u), length %u\n", 
