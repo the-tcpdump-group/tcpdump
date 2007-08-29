@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.54 2007-08-29 02:38:14 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.55 2007-08-29 02:58:43 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -97,7 +97,7 @@ DECLARE_PRINTER(v2_e);
 DECLARE_PRINTER(v2_cp);
 DECLARE_PRINTER(v2_eap);
 
-static const u_char *ikev1_sub0_print(netdissect_options *ndo,u_char, const struct isakmp_gen *,
+static const u_char *ike_sub0_print(netdissect_options *ndo,u_char, const struct isakmp_gen *,
 	const u_char *,	u_int32_t, u_int32_t, u_int32_t, int);
 static const u_char *ikev1_sub_print(netdissect_options *ndo,u_char, const struct isakmp_gen *,
 	const u_char *, u_int32_t, u_int32_t, u_int32_t, int);
@@ -518,7 +518,7 @@ ikev1_attr_print(netdissect_options *ndo, const u_char *p, const u_char *ep)
 }
 
 static const u_char *
-ikev1_sa_print(netdissect_options *ndo, u_char tpay,
+ikev1_sa_print(netdissect_options *ndo, u_char tpay _U_,
 	       const struct isakmp_gen *ext,
 		u_int item_len _U_,
 		const u_char *ep, u_int32_t phase, u_int32_t doi0 _U_,
@@ -580,7 +580,7 @@ trunc:
 }
 
 static const u_char *
-ikev1_p_print(netdissect_options *ndo, u_char tpay,
+ikev1_p_print(netdissect_options *ndo, u_char tpay _U_,
 	      const struct isakmp_gen *ext, u_int item_len _U_,
 	       const u_char *ep, u_int32_t phase, u_int32_t doi0,
 	       u_int32_t proto0 _U_, int depth)
@@ -615,10 +615,6 @@ trunc:
 }
 
 static const char *ikev1_p_map[] = {
-	NULL, "ike",
-};
-
-static const char *ikev2_p_map[] = {
 	NULL, "ike",
 };
 
@@ -747,7 +743,7 @@ const struct attrmap oakley_t_map[] = {
 };
 
 static const u_char *
-ikev1_t_print(netdissect_options *ndo, u_char tpay,
+ikev1_t_print(netdissect_options *ndo, u_char tpay _U_,
 	      const struct isakmp_gen *ext, u_int item_len,
 	      const u_char *ep, u_int32_t phase _U_, u_int32_t doi _U_,
 	      u_int32_t proto, int depth _U_)
@@ -816,7 +812,7 @@ trunc:
 }
 
 static const u_char *
-ikev1_ke_print(netdissect_options *ndo, u_char tpay,
+ikev1_ke_print(netdissect_options *ndo, u_char tpay _U_,
 	       const struct isakmp_gen *ext, u_int item_len _U_,
 	       const u_char *ep _U_, u_int32_t phase _U_, u_int32_t doi _U_,
 	       u_int32_t proto _U_, int depth _U_)
@@ -840,7 +836,7 @@ trunc:
 }
 
 static const u_char *
-ikev1_id_print(netdissect_options *ndo, u_char tpay,
+ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 	       const struct isakmp_gen *ext, u_int item_len _U_,
 	       const u_char *ep _U_, u_int32_t phase, u_int32_t doi _U_,
 	       u_int32_t proto _U_, int depth _U_)
@@ -1019,7 +1015,7 @@ trunc:
 }
 
 static const u_char *
-ikev1_cert_print(netdissect_options *ndo, u_char tpay,
+ikev1_cert_print(netdissect_options *ndo, u_char tpay _U_,
 		 const struct isakmp_gen *ext, u_int item_len _U_,
 		 const u_char *ep _U_, u_int32_t phase _U_,
 		 u_int32_t doi0 _U_,
@@ -1052,7 +1048,7 @@ trunc:
 }
 
 static const u_char *
-ikev1_cr_print(netdissect_options *ndo, u_char tpay,
+ikev1_cr_print(netdissect_options *ndo, u_char tpay _U_,
 	       const struct isakmp_gen *ext, u_int item_len _U_,
 	       const u_char *ep _U_, u_int32_t phase _U_, u_int32_t doi0 _U_,
 	       u_int32_t proto0 _U_, int depth _U_)
@@ -1084,7 +1080,7 @@ trunc:
 }
 
 static const u_char *
-ikev1_hash_print(netdissect_options *ndo, u_char tpay,
+ikev1_hash_print(netdissect_options *ndo, u_char tpay _U_,
 		 const struct isakmp_gen *ext, u_int item_len _U_,
 		 const u_char *ep _U_, u_int32_t phase _U_, u_int32_t doi _U_,
 		 u_int32_t proto _U_, int depth _U_)
@@ -1108,7 +1104,7 @@ trunc:
 }
 
 static const u_char *
-ikev1_sig_print(netdissect_options *ndo, u_char tpay,
+ikev1_sig_print(netdissect_options *ndo, u_char tpay _U_,
 		const struct isakmp_gen *ext, u_int item_len _U_,
 		const u_char *ep _U_, u_int32_t phase _U_, u_int32_t doi _U_,
 		u_int32_t proto _U_, int depth _U_)
@@ -1132,7 +1128,7 @@ trunc:
 }
 
 static const u_char *
-ikev1_nonce_print(netdissect_options *ndo, u_char tpay,
+ikev1_nonce_print(netdissect_options *ndo, u_char tpay _U_,
 		  const struct isakmp_gen *ext,
 		  u_int item_len _U_,
 		  const u_char *ep _U_,
@@ -1162,7 +1158,7 @@ trunc:
 }
 
 static const u_char *
-ikev1_n_print(netdissect_options *ndo, u_char tpay,
+ikev1_n_print(netdissect_options *ndo, u_char tpay _U_,
 	      const struct isakmp_gen *ext, u_int item_len,
 	      const u_char *ep, u_int32_t phase, u_int32_t doi0 _U_,
 	      u_int32_t proto0 _U_, int depth)
@@ -1303,7 +1299,7 @@ trunc:
 }
 
 static const u_char *
-ikev1_d_print(netdissect_options *ndo, u_char tpay,
+ikev1_d_print(netdissect_options *ndo, u_char tpay _U_,
 	      const struct isakmp_gen *ext, u_int item_len _U_,
 	      const u_char *ep _U_, u_int32_t phase _U_, u_int32_t doi0 _U_,
 	      u_int32_t proto0 _U_, int depth _U_)
@@ -1347,7 +1343,7 @@ trunc:
 }
 
 static const u_char *
-ikev1_vid_print(netdissect_options *ndo, u_char tpay,
+ikev1_vid_print(netdissect_options *ndo, u_char tpay _U_,
 		const struct isakmp_gen *ext,
 		u_int item_len _U_, const u_char *ep _U_,
 		u_int32_t phase _U_, u_int32_t doi _U_,
@@ -1384,7 +1380,7 @@ ikev2_pay_print(netdissect_options *ndo, const char *payname, int critical)
 }
 
 static const u_char *
-ikev2_gen_print(netdissect_options *ndo, int tpay,
+ikev2_gen_print(netdissect_options *ndo, u_char tpay,
 		const struct isakmp_gen *ext)
 {
 	struct isakmp_gen e;
@@ -1406,10 +1402,10 @@ trunc:
 }
 
 static const u_char *
-ikev2_t_print(netdissect_options *ndo, u_char tpay, int pcount,
+ikev2_t_print(netdissect_options *ndo, u_char tpay _U_, int pcount,
 	      const struct isakmp_gen *ext, u_int item_len,
 	      const u_char *ep, u_int32_t phase _U_, u_int32_t doi _U_,
-	      u_int32_t proto, int depth _U_)
+	      u_int32_t proto _U_, int depth _U_)
 {
 	const struct ikev2_t *p;
 	struct ikev2_t t;
@@ -1484,7 +1480,7 @@ trunc:
 }
 
 static const u_char *
-ikev2_p_print(netdissect_options *ndo, u_char tpay, int pcount,
+ikev2_p_print(netdissect_options *ndo, u_char tpay _U_, int pcount _U_,
 	      const struct isakmp_gen *ext, u_int item_len _U_,
 	       const u_char *ep, u_int32_t phase, u_int32_t doi0,
 	       u_int32_t proto0 _U_, int depth)
@@ -1526,8 +1522,7 @@ ikev2_sa_print(netdissect_options *ndo, u_char tpay,
 		u_int32_t proto _U_, int depth _U_)
 {
 	struct isakmp_gen e;
-	const struct isakmp_gen *ext;
-	int    osa_len, sa_len, np;
+	int    osa_len, sa_len;
 
 	TCHECK(*ext1);
 	safememcpy(&e, ext1, sizeof(e));
@@ -1556,8 +1551,6 @@ ikev2_ke_print(netdissect_options *ndo, u_char tpay,
 {
 	struct ikev2_ke ke;
 	struct ikev2_ke *k;
-	const u_char *vid;
-	int i, len;
 
 	k = (struct ikev2_ke *)ext;
 	TCHECK(*ext);
@@ -1616,7 +1609,8 @@ ikev2_auth_print(netdissect_options *ndo, u_char tpay,
 		u_int32_t proto _U_, int depth _U_)
 {
 	struct ikev2_auth e;
-	char *v2_auth[]={ "invalid", "rsasig", "shared-secret", "dsssig" };
+	const char *v2_auth[]={ "invalid", "rsasig",
+				"shared-secret", "dsssig" };
 
 	TCHECK(*ext);
 	safememcpy(&e, ext, sizeof(e));
@@ -1671,7 +1665,7 @@ trunc:
 
 /* notify payloads */
 static const u_char *
-ikev2_n_print(netdissect_options *ndo, u_char tpay, 
+ikev2_n_print(netdissect_options *ndo, u_char tpay _U_, 
 		const struct isakmp_gen *ext,
 		u_int item_len _U_, const u_char *ep _U_,
 		u_int32_t phase _U_, u_int32_t doi _U_,
@@ -1681,7 +1675,7 @@ ikev2_n_print(netdissect_options *ndo, u_char tpay,
 	const u_char *cp;
 	u_char *ep2;
 	u_char showspi, showdata, showsomedata;
-	char *notify_name;
+	const char *notify_name;
 	u_int32_t type;
 
 	p = (struct ikev2_n *)ext;
@@ -2230,15 +2224,14 @@ trunc:
 	return NULL;
 }
 
-void
+static void
 ikev2_print(netdissect_options *ndo,
 	    const u_char *bp,  u_int length,
-	    const u_char *bp2, struct isakmp *base)
+	    const u_char *bp2 _U_, struct isakmp *base)
 {
 	const struct isakmp *p;
 	const u_char *ep;
 	u_char np;
-	int i;
 	int phase;
 
 	p = (const struct isakmp *)bp;
@@ -2299,9 +2292,6 @@ isakmp_print(netdissect_options *ndo,
 	const struct isakmp *p;
 	struct isakmp base;
 	const u_char *ep;
-	u_char np;
-	int i;
-	int phase;
 	int major, minor;
 
 	p = (const struct isakmp *)bp;
