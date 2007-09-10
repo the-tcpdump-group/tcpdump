@@ -1,6 +1,19 @@
-$Header: /tcpdump/master/tcpdump/CHANGES,v 1.87.2.14 2007-07-24 02:17:13 mcr Exp $
+$Header: /tcpdump/master/tcpdump/CHANGES,v 1.87.2.15 2007-09-10 23:55:12 ken Exp $
 
-Wed.	July 23, 2007.  mcr@xelerance.com.  Summary for 0.9.7 libpcap release
+Mon.	September 10, 2007.  ken@xelerance.com.  Summary for 0.9.8 tcpdump release
+	Rework ARP printer
+	Rework OSPFv3 printer
+	Add support for Frame-Relay ARP
+	Decode DHCP Option 121 (RFC 3442 Classless Static Route)
+	Decode DHCP Option 249 (MS Classless Static Route) the same as Option 121
+	TLV: Add support for Juniper .pcap extensions
+	Add support for IKEv2 (Only PARENT_SA so far)
+	Print EGP header in new-world-order style
+	Converted print-isakmp.c to NETDISSECT
+	Moved AF specific stuff into af.h
+	Test subsystem now table driven, and saves outputs and diffs to one place
+
+Wed.	July 23, 2007.  mcr@xelerance.com.  Summary for 0.9.7 tcpdump release
 
     	NFS: Print unsigned values as such. 
 	RX: parse safely.
