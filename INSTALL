@@ -1,4 +1,4 @@
-@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.63.2.5 2007-06-15 20:10:17 guy Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.63.2.6 2007-09-12 19:48:50 guy Exp $ (LBL)
 
 If you have not built libpcap, and your system does not have libpcap
 installed, install libpcap first.  Your system might provide a version
@@ -129,7 +129,6 @@ parsenfsfh.c	- Network File System file parser routines
 pcap_dump_ftell.c - pcap_dump_ftell() implementation, in case libpcap
 		doesn't have it
 pcap-missing.h	- declarations of functions possibly missing from libpcap
-pf.h		- OpenBSD PF definitions
 pmap_prot.h	- definitions for ONC RPC portmapper protocol
 ppp.h		- Point to Point Protocol definitions
 print-802_11.c	- IEEE 802.11 printer routines
