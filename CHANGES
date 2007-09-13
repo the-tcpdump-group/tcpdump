@@ -1,4 +1,4 @@
-$Header: /tcpdump/master/tcpdump/CHANGES,v 1.87.2.16 2007-09-12 22:42:07 ken Exp $
+$Header: /tcpdump/master/tcpdump/CHANGES,v 1.87.2.17 2007-09-13 13:39:44 ken Exp $
 
 Mon.	September 10, 2007.  ken@xelerance.com.  Summary for 0.9.8 tcpdump release
 	Rework ARP printer
@@ -7,7 +7,6 @@ Mon.	September 10, 2007.  ken@xelerance.com.  Summary for 0.9.8 tcpdump release
 	Decode DHCP Option 121 (RFC 3442 Classless Static Route)
 	Decode DHCP Option 249 (MS Classless Static Route) the same as Option 121
 	TLV: Add support for Juniper .pcap extensions
-	Add support for IKEv2 (Only PARENT_SA so far)
 	Print EGP header in new-world-order style
 	Converted print-isakmp.c to NETDISSECT
 	Moved AF specific stuff into af.h
