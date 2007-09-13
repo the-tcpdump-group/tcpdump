@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.81.2.4 2006-12-12 14:33:20 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp.c,v 1.81.2.5 2007-09-13 17:34:20 gianluca Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -300,8 +300,10 @@ struct icmp_ext_t {
     u_int8_t icmp_ext_data[1];
 };
 
+/*
 struct icmp_mpls_ext_common_header_t {
 };
+*/
 
 struct icmp_mpls_ext_object_header_t {
     u_int8_t length[2];
