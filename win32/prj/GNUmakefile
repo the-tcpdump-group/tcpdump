@@ -106,7 +106,6 @@ OBJS = \
 	../../print-olsr.o \
 	../../print-ospf.o \
 	../../print-ospf6.o \
-	../../print-pflog.o \
 	../../print-pim.o \
 	../../print-pgm.o \
 	../../print-ppp.o \
