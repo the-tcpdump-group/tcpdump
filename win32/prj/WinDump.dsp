@@ -417,10 +417,6 @@ SOURCE="..\..\print-ospf6.c"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\print-pflog.c"
-# End Source File
-# Begin Source File
-
 SOURCE="..\..\print-pgm.c"
 # End Source File
 # Begin Source File
