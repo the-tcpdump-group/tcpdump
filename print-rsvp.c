@@ -17,7 +17,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.33.2.14 2007-02-26 13:32:36 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.33.2.15 2007-09-13 17:33:54 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -630,6 +630,8 @@ rsvp_obj_print (const u_char *tptr, const char *ident, u_int tlen) {
 	u_int32_t i;
     } bw;
     u_int8_t namelen;
+
+    u_int action, subchannel;
 
     while(tlen>=sizeof(struct rsvp_object_header)) {
         /* did we capture enough for fully decoding the object header ? */
@@ -1577,8 +1579,6 @@ rsvp_obj_print (const u_char *tptr, const char *ident, u_int tlen) {
             case RSVP_CTYPE_1: 
                 if (obj_tlen < 4)
                     return-1;
-
-                u_int action, subchannel;
                 action = (EXTRACT_16BITS(obj_tptr)>>8);
 
                 printf("%s  Action: %s (%u), Label type: %u", ident,
