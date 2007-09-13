@@ -35,7 +35,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-sctp.c,v 1.20 2005-07-07 01:22:20 guy Exp $ (NETLAB/PEL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-sctp.c,v 1.21 2007-09-13 18:03:49 guy Exp $ (NETLAB/PEL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -206,6 +206,7 @@ void sctp_print(const u_char *bp,        /* beginning of sctp packet */
 			if (htons(chunkDescPtr->chunkLength) <
 			    sizeof(struct sctpDataPart)+
 			    sizeof(struct sctpChunkDesc)+1) {
+				/* Less than 1 byte of chunk payload */
 				printf("bogus chunk length %u]",
 				    htons(chunkDescPtr->chunkLength));
 				return;
@@ -213,7 +214,7 @@ void sctp_print(const u_char *bp,        /* beginning of sctp packet */
 			default_print(payloadPtr,
 			      htons(chunkDescPtr->chunkLength) -
 			      (sizeof(struct sctpDataPart)+
-			      sizeof(struct sctpChunkDesc)+1));
+			      sizeof(struct sctpChunkDesc)));
 		} else
 			printf("]");
 	      }
