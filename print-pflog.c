@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-pflog.c,v 1.13.2.3 2007-09-12 19:48:51 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-pflog.c,v 1.13.2.4 2007-09-13 17:18:10 gianluca Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -31,11 +31,16 @@ static const char rcsid[] _U_ =
 #ifndef HAVE_NET_PFVAR_H
 #error "No pf headers available"
 #endif
+
 #include <sys/types.h>
+#ifndef WIN32
 #include <sys/socket.h>
+#endif
 #include <net/if.h>
 #include <net/pfvar.h>
 #include <net/if_pflog.h>
+
+
 
 #include <tcpdump-stdinc.h>
 
