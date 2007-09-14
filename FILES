@@ -231,6 +231,7 @@ tcpdump.1
 tcpdump.c
 tcpdump-stdinc.h
 telnet.h
+tftp.h
 timed.h
 token.h
 udp.h
