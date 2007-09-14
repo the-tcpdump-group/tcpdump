@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.149.2.8 2007-01-29 20:57:47 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip.c,v 1.149.2.9 2007-09-14 01:30:02 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -50,6 +50,7 @@ struct tok ip_option_values[] = {
     { IPOPT_SSRR, "SSRR" },
     { IPOPT_LSRR, "LSRR" },
     { IPOPT_RA, "RA" },
+    { IPOPT_RFC1393, "traceroute" },
     { 0, NULL }
 };
 
