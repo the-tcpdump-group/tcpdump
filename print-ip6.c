@@ -21,7 +21,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.47.2.3 2005-09-20 06:05:38 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ip6.c,v 1.47.2.4 2007-09-14 00:39:22 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -225,7 +225,7 @@ ip6_print(register const u_char *bp, register u_int length)
 			return;
 
 		default:
-			(void)printf("ip-proto-%d %d", ip6->ip6_nxt, len);
+			(void)printf("ip-proto-%d %d", nh, len);
 			return;
 		}
 	}
