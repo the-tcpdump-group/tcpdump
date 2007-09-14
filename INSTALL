@@ -1,4 +1,4 @@
-@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.69 2007-09-12 19:36:18 guy Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.70 2007-09-14 01:02:07 guy Exp $ (LBL)
 
 If you have not built libpcap, and your system does not have libpcap
 installed, install libpcap first.  Your system might provide a version
@@ -243,6 +243,7 @@ tcp.h		- TCP definitions
 tcpdump.1	- manual entry
 tcpdump.c	- main program
 telnet.h	- Telnet definitions
+tftp.h		- TFTP definitions
 timed.h		- BSD time daemon protocol definitions
 token.h		- Token Ring definitions
 udp.h		- UDP definitions
