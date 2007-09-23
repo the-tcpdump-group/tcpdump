@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.19 2006-12-13 08:21:50 hannes Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.20 2007-09-23 23:01:33 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1991, 1993, 1994, 1995, 1996, 1997
  *	The Regents of the University of California.  All rights reserved.
@@ -30,8 +30,12 @@
 
 /* Options field
  *
+ * +-------------------------------------+
+ * | DN | O | DC | EA | N/P | MC | E | T |
+ * +-------------------------------------+
+ *
  * +------------------------------------+
- * | * | O | DC | EA | N/P | MC | E | T |
+ * | DN | O | DC | L | N/P | MC | E | T |
  * +------------------------------------+
  *
  */
@@ -41,6 +45,7 @@
 #define	OSPF_OPTION_MC	0x04	/* MC bit: Multicast capable */
 #define	OSPF_OPTION_NP	0x08	/* N/P bit: NSSA capable */
 #define	OSPF_OPTION_EA	0x10	/* EA bit: External Attribute capable */
+#define	OSPF_OPTION_L	0x10	/* L bit: Packet contains LLS data block */
 #define	OSPF_OPTION_DC	0x20	/* DC bit: Demand circuit capable */
 #define	OSPF_OPTION_O	0x40	/* O bit: Opaque LSA capable */
 #define	OSPF_OPTION_DN	0x80	/* DN bit: Up/Down Bit capable - draft-ietf-ospf-2547-dnbit-04 */
@@ -56,6 +61,7 @@
 #define	OSPF_DB_INIT		0x04	    /*	*/
 #define	OSPF_DB_MORE		0x02
 #define	OSPF_DB_MASTER		0x01
+#define OSPF_DB_RESYNC		0x08		/* RFC4811 */
 
 /* ls_type	*/
 #define	LS_TYPE_ROUTER		1   /* router link */
@@ -133,6 +139,14 @@
 /* multicast vertex type */
 #define	MCLA_VERTEX_ROUTER	1
 #define	MCLA_VERTEX_NETWORK	2
+
+/* Link-Local-Signaling */
+#define OSPF_LLS_EO		1	/* RFC4811, RFC4812 */
+#define OSPF_LLS_MD5	2	/* RFC4813 */
+
+#define OSPF_LLS_EO_LR		0x00000001		/* RFC4811 */
+#define OSPF_LLS_EO_RS		0x00000002		/* RFC4812 */
+
 
 /* link state advertisement header */
 struct lsa_hdr {
@@ -269,7 +283,7 @@ struct ospfhdr {
 
 	/* Database Description packet */
 	struct {
-	    u_int8_t db_zero[2];
+	    u_int16_t db_ifmtu;
 	    u_int8_t db_options;
 	    u_int8_t db_flags;
 	    u_int32_t db_seq;

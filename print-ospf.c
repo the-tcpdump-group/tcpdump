@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.62 2007-07-24 16:01:42 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.63 2007-09-23 23:01:33 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -49,6 +49,18 @@ static struct tok ospf_option_values[] = {
 	{ OSPF_OPTION_MC,	"Multicast" },
 	{ OSPF_OPTION_NP,	"NSSA" },
 	{ OSPF_OPTION_EA,	"Advertise External" },
+	{ OSPF_OPTION_DC,	"Demand Circuit" },
+	{ OSPF_OPTION_O,	"Opaque" },
+	{ OSPF_OPTION_DN,	"Up/Down" },
+	{ 0,			NULL }
+};
+
+static struct tok ospf_option_values2[] = {
+	{ OSPF_OPTION_T,	"TOS" },
+	{ OSPF_OPTION_E,	"External" },
+	{ OSPF_OPTION_MC,	"Multicast" },
+	{ OSPF_OPTION_NP,	"NSSA" },
+	{ OSPF_OPTION_L,	"LLS" },
 	{ OSPF_OPTION_DC,	"Demand Circuit" },
 	{ OSPF_OPTION_O,	"Opaque" },
 	{ OSPF_OPTION_DN,	"Up/Down" },
@@ -98,6 +110,7 @@ static struct tok ospf_dd_flag_values[] = {
 	{ OSPF_DB_INIT,	        "Init" },
 	{ OSPF_DB_MORE,	        "More" },
 	{ OSPF_DB_MASTER,	"Master" },
+    { OSPF_DB_RESYNC,	"OOBResync" },
 	{ 0,			NULL }
 };
 
@@ -172,6 +185,18 @@ static struct tok lsa_opaque_ri_tlv_cap_values[] = {
 	{ 0,		        NULL }
 };
 
+static struct tok ospf_lls_tlv_values[] = {
+	{ OSPF_LLS_EO,	"Extended Options" },
+	{ OSPF_LLS_MD5,	"MD5 Authentication" },
+	{ 0,	NULL }
+};
+
+static struct tok ospf_lls_eo_options[] = {
+	{ OSPF_LLS_EO_LR,	"LSDB resync" },
+	{ OSPF_LLS_EO_RS,	"Restart" },
+	{ 0,	NULL }
+};
+
 static char tstr[] = " [|ospf2]";
 
 #ifdef WIN32
@@ -181,6 +206,7 @@ static char tstr[] = " [|ospf2]";
 static int ospf_print_lshdr(const struct lsa_hdr *);
 static const u_char *ospf_print_lsa(const struct lsa *);
 static int ospf_decode_v2(const struct ospfhdr *, const u_char *);
+static int ospf_decode_lls(const struct ospfhdr *, register u_int);
 
 int
 ospf_print_grace_lsa (u_int8_t *tptr, u_int ls_length) {
@@ -457,7 +483,7 @@ ospf_print_lshdr(register const struct lsa_hdr *lshp)
         TCHECK(lshp->ls_length);
         ls_length = EXTRACT_16BITS(&lshp->ls_length);
         if (ls_length < sizeof(struct lsa_hdr)) {
-                printf("\n\t    Bogus length %u < %lu", ls_length,
+                printf("\n\t    Bogus length %u < header (%lu)", ls_length,
                     (unsigned long)sizeof(struct lsa_hdr));
                 return(-1);
         }
@@ -733,7 +759,6 @@ ospf_print_lsa(register const struct lsa *lsap)
                             ls_length);
                         return(ls_end);
                     }
-                    ls_length-=tlv_length;
                     TCHECK2(*tptr, tlv_length);
                     switch(tlv_type) {
 
@@ -754,6 +779,7 @@ ospf_print_lsa(register const struct lsa *lsap)
 
                     }
                     tptr+=tlv_length;
+                    ls_length-=tlv_length;
                 }
                 break;
 
@@ -794,6 +820,98 @@ trunc:
 }
 
 static int
+ospf_decode_lls(register const struct ospfhdr *op,
+    register u_int length)
+{
+    register const u_char *dptr;
+    register const u_char *dataend;
+    register u_int length2;
+    register u_int16_t lls_type, lls_len;
+    register u_int32_t lls_flags;
+
+    switch (op->ospf_type) {
+
+    case OSPF_TYPE_HELLO:
+        if (!(op->ospf_hello.hello_options & OSPF_OPTION_L))
+            return (0);
+        break;
+
+    case OSPF_TYPE_DD:
+        if (!(op->ospf_db.db_options & OSPF_OPTION_L))
+            return (0);
+        break;
+
+    default:
+        return (0);
+    }
+
+    /* dig deeper if LLS data is available; see RFC4813 */
+    length2 = EXTRACT_16BITS(&op->ospf_len);
+    dptr = (u_char *)op + length2;
+    dataend = (u_char *)op + length;
+
+    if (EXTRACT_16BITS(&op->ospf_authtype) == OSPF_AUTH_MD5) {
+        dptr = dptr + op->ospf_authdata[3];
+        length2 += op->ospf_authdata[3];
+    }
+    if (length2 >= length) {
+        printf("\n\t[LLS truncated]");
+        return (1);
+    }
+    TCHECK2(*dptr, 2);
+    printf("\n\t  LLS: checksum: 0x%04x", (u_int)EXTRACT_16BITS(dptr));
+
+    dptr += 2;
+    TCHECK2(*dptr, 2);
+    length2 = EXTRACT_16BITS(dptr);
+    printf(", length: %u", length2);
+
+    dptr += 2;
+    TCHECK(*dptr);
+    while (dptr < dataend) {
+        TCHECK2(*dptr, 2);
+        lls_type = EXTRACT_16BITS(dptr);
+        printf("\n\t    %s (%u)",
+               tok2str(ospf_lls_tlv_values,"Unknown TLV",lls_type),
+               lls_type);
+        dptr += 2;
+        TCHECK2(*dptr, 2);
+        lls_len = EXTRACT_16BITS(dptr);
+        printf(", length: %u", lls_len);
+        dptr += 2;
+        switch (lls_type) {
+
+        case OSPF_LLS_EO:
+            if (lls_len != 4) {
+                printf(" [should be 4]");
+                lls_len = 4;
+            }
+            TCHECK2(*dptr, 4);
+            lls_flags = EXTRACT_32BITS(dptr);
+            printf("\n\t      Options: 0x%08x [%s]", lls_flags,
+                   bittok2str(ospf_lls_eo_options,"?",lls_flags));
+
+            break;
+
+        case OSPF_LLS_MD5:
+            if (lls_len != 20) {
+                printf(" [should be 20]");
+                lls_len = 20;
+            }
+			TCHECK2(*dptr, 4);
+            printf("\n\t      Sequence number: 0x%08x", EXTRACT_32BITS(dptr));
+            break;
+        }
+
+        dptr += lls_len;
+    }
+
+    return (0);
+trunc:
+    return (1);
+}
+
+static int
 ospf_decode_v2(register const struct ospfhdr *op,
     register const u_char *dataend)
 {
@@ -814,7 +932,7 @@ ospf_decode_v2(register const struct ospfhdr *op,
 
 	case OSPF_TYPE_HELLO:
                 printf("\n\tOptions [%s]",
-                       bittok2str(ospf_option_values,"none",op->ospf_hello.hello_options));
+                       bittok2str(ospf_option_values2,"none",op->ospf_hello.hello_options));
 
                 TCHECK(op->ospf_hello.hello_deadint);
                 printf("\n\t  Hello Timer %us, Dead Timer %us, Mask %s, Priority %u",
@@ -846,14 +964,20 @@ ospf_decode_v2(register const struct ospfhdr *op,
 	case OSPF_TYPE_DD:
 		TCHECK(op->ospf_db.db_options);
                 printf("\n\tOptions [%s]",
-                       bittok2str(ospf_option_values,"none",op->ospf_db.db_options));
+                       bittok2str(ospf_option_values2,"none",op->ospf_db.db_options));
 		TCHECK(op->ospf_db.db_flags);
                 printf(", DD Flags [%s]",
                        bittok2str(ospf_dd_flag_values,"none",op->ospf_db.db_flags));
+                TCHECK(op->ospf_db.db_ifmtu);
+                if (op->ospf_db.db_ifmtu) {
+                        printf(", MTU: %u", ntohs(op->ospf_db.db_ifmtu));
+                }
+                TCHECK(op->ospf_db.db_seq);
+                printf(", Sequence: 0x%08x", ntohl(op->ospf_db.db_seq));
 
                 /* Print all the LS adv's */
                 lshp = op->ospf_db.db_lshdr;
-                while (ospf_print_lshdr(lshp) != -1) {
+                while ((u_char *)lshp < dataend && ospf_print_lshdr(lshp) != -1) {
                     ++lshp;
                 }
 		break;
@@ -951,9 +1075,13 @@ ospf_print(register const u_char *bp, register u_int length,
 	TCHECK(op->ospf_len);
 	if (length != EXTRACT_16BITS(&op->ospf_len)) {
 		printf(" [len %d]", EXTRACT_16BITS(&op->ospf_len));
-		return;
 	}
-	dataend = bp + length;
+
+	if (length > EXTRACT_16BITS(&op->ospf_len)) {
+		dataend = bp + EXTRACT_16BITS(&op->ospf_len);
+	} else {
+		dataend = bp + length;
+	}
 
 	TCHECK(op->ospf_routerid);
         printf("\n\tRouter-ID %s", ipaddr_string(&op->ospf_routerid));
@@ -1000,6 +1128,10 @@ ospf_print(register const u_char *bp, register u_int length,
 		/* ospf version 2 */
 		if (ospf_decode_v2(op, dataend))
 			goto trunc;
+		if (length > EXTRACT_16BITS(&op->ospf_len)) {
+			if (ospf_decode_lls(op, length))
+				goto trunc;
+		}
 		break;
 
 	default:
