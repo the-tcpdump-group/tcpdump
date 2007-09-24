@@ -124,6 +124,7 @@ print-beep.c
 print-bfd.c
 print-bgp.c
 print-bootp.c
+print-bt.c
 print-cdp.c
 print-cfm.c
 print-chdlc.c

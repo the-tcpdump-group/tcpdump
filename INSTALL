@@ -1,4 +1,4 @@
-@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.70 2007-09-14 01:02:07 guy Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.71 2007-09-24 23:46:26 guy Exp $ (LBL)
 
 If you have not built libpcap, and your system does not have libpcap
 installed, install libpcap first.  Your system might provide a version
@@ -140,9 +140,10 @@ print-arp.c	- Address Resolution Protocol printer routines
 print-ascii.c	- ASCII packet dump routines
 print-atalk.c	- AppleTalk printer routines
 print-atm.c	- ATM printer routines
+print-beep.c	- BEEP printer routines
 print-bgp.c	- Border Gateway Protocol printer routines
 print-bootp.c	- BOOTP and IPv4 DHCP printer routines
-print-beep.c	- BEEP printer routines
+print-bt.c	- Bluetooth printer routines
 print-cdp.c	- Cisco Discovery Protocol printer routines
 print-chdlc.c	- Cisco HDLC printer routines
 print-cip.c	- Classical-IP over ATM routines
