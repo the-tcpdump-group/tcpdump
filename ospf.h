@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.21 2007-09-27 10:20:26 hannes Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.22 2007-09-27 10:24:21 hannes Exp $ (LBL) */
 /*
  * Copyright (c) 1991, 1993, 1994, 1995, 1996, 1997
  *	The Regents of the University of California.  All rights reserved.
@@ -29,10 +29,6 @@
 #define	OSPF_TYPE_LS_ACK        5	/* Link State Ack */
 
 /* Options field
- *
- * +-------------------------------------+
- * | DN | O | DC | EA | N/P | MC | E | T |
- * +-------------------------------------+
  *
  * +------------------------------------+
  * | DN | O | DC | L | N/P | MC | E | T |
