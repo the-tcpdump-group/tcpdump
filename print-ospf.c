@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.63 2007-09-23 23:01:33 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.64 2007-09-27 10:20:26 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -44,7 +44,7 @@ static const char rcsid[] _U_ =
 #include "ip.h"
 
 static struct tok ospf_option_values[] = {
-	{ OSPF_OPTION_T,	"TOS" },
+        { OSPF_OPTION_T,	"MultiTopology" }, /* draft-ietf-ospf-mt-09 */
 	{ OSPF_OPTION_E,	"External" },
 	{ OSPF_OPTION_MC,	"Multicast" },
 	{ OSPF_OPTION_NP,	"NSSA" },
@@ -531,6 +531,41 @@ trunc:
 	return (-1);
 }
 
+/* draft-ietf-ospf-mt-09 */
+static struct tok ospf_topology_values[] = {
+    { 0, "default " },
+    { 1, "multicast " },
+    { 2, "management " },
+    { 0, NULL }
+};
+
+/*
+ * Print all the per-topology metrics.
+ */
+static void
+ospf_print_tos_metrics(const struct tos_metric *metrics)
+{
+    int metric_count;
+    int toscount;
+
+    toscount = metrics->tos_count+1;
+    metric_count = 0;
+
+    /*
+     * All but the first metric contain a valid topology id.
+     */
+    while (toscount) { 
+        printf("\n\t\ttopology %s(%u), metric %u",
+               tok2str(ospf_topology_values, "",
+                       metric_count ? metrics->tos_type : 0),
+               metric_count ? metrics->tos_type : 0,
+               EXTRACT_16BITS(&metrics->tos_metric));
+        metric_count++;
+        metrics++;
+        toscount--;
+    }
+}
+
 /*
  * Print a single link state advertisement.  If truncated or if LSA length
  * field is less than the length of the LSA header, return NULl, else
@@ -541,12 +576,11 @@ ospf_print_lsa(register const struct lsa *lsap)
 {
 	register const u_int8_t *ls_end;
 	register const struct rlalink *rlp;
-	register const struct tos_metric *tosp;
 	register const struct in_addr *ap;
 	register const struct aslametric *almp;
 	register const struct mcla *mcp;
 	register const u_int32_t *lp;
-	register int j, k, tlv_type, tlv_length;
+	register int j, tlv_type, tlv_length, topology;
 	register int ls_length;
 	const u_int8_t *tptr;
 
@@ -569,7 +603,7 @@ ospf_print_lsa(register const struct lsa *lsap)
 		rlp = lsap->lsa_un.un_rla.rla_link;
 		while (j--) {
 			TCHECK(*rlp);
-			switch (rlp->link_type) {
+			switch (rlp->metrics.tos_type) {
 
 			case RLA_TYPE_VIRTUAL:
 				printf("\n\t      Virtual Link: Neighbor Router-ID: %s, Interface Address: %s",
@@ -597,20 +631,14 @@ ospf_print_lsa(register const struct lsa *lsap)
 
 			default:
 				printf("\n\t      Unknown Router Link Type (%u)",
-				    rlp->link_type);
+				    rlp->metrics.tos_type);
 				return (ls_end);
 			}
-			printf(", tos 0, metric: %d", EXTRACT_16BITS(&rlp->link_tos0metric));
-			tosp = (struct tos_metric *)
-			    ((sizeof rlp->link_tos0metric) + (u_char *) rlp);
-			for (k = 0; k < (int) rlp->link_toscount; ++k, ++tosp) {
-				TCHECK(*tosp);
-				printf(", tos %d, metric: %d",
-				    tosp->tos_type,
-				    EXTRACT_16BITS(&tosp->tos_metric));
-			}
+
+                        ospf_print_tos_metrics(&rlp->metrics);
+
 			rlp = (struct rlalink *)((u_char *)(rlp + 1) +
-			    ((rlp->link_toscount) * sizeof(*tosp)));
+			    ((rlp->metrics.tos_count) * sizeof(struct tos_metric)));
 		}
 		break;
 
@@ -632,19 +660,16 @@ ospf_print_lsa(register const struct lsa *lsap)
 		    ipaddr_string(&lsap->lsa_un.un_sla.sla_mask));
 		TCHECK(lsap->lsa_un.un_sla.sla_tosmetric);
 		lp = lsap->lsa_un.un_sla.sla_tosmetric;
-                /* suppress tos if its not supported */
-                if(!((lsap->ls_hdr.ls_options)&OSPF_OPTION_T)) {
-                    printf(", metric %u", EXTRACT_32BITS(lp)&SLA_MASK_METRIC);
-                    break;
-                }
 		while ((u_char *)lp < ls_end) {
 			register u_int32_t ul;
 
 			TCHECK(*lp);
 			ul = EXTRACT_32BITS(lp);
-			printf(", tos %d metric %d",
-			    (ul & SLA_MASK_TOS) >> SLA_SHIFT_TOS,
-			    ul & SLA_MASK_METRIC);
+                        topology = (ul & SLA_MASK_TOS) >> SLA_SHIFT_TOS;
+			printf("\n\t\ttopology %s(%u) metric %d",
+                               tok2str(ospf_topology_values, "", topology),
+                               topology,
+                               ul & SLA_MASK_METRIC);
 			++lp;
 		}
 		break;
@@ -652,19 +677,16 @@ ospf_print_lsa(register const struct lsa *lsap)
 	case LS_TYPE_SUM_ABR:
 		TCHECK(lsap->lsa_un.un_sla.sla_tosmetric);
 		lp = lsap->lsa_un.un_sla.sla_tosmetric;
-                /* suppress tos if its not supported */
-                if(!((lsap->ls_hdr.ls_options)&OSPF_OPTION_T)) {
-                    printf(", metric: %u", EXTRACT_32BITS(lp)&SLA_MASK_METRIC);
-                    break;
-                }
 		while ((u_char *)lp < ls_end) {
 			register u_int32_t ul;
 
 			TCHECK(*lp);
 			ul = EXTRACT_32BITS(lp);
-			printf(", tos %d metric %d",
-			    (ul & SLA_MASK_TOS) >> SLA_SHIFT_TOS,
-			    ul & SLA_MASK_METRIC);
+                        topology = (ul & SLA_MASK_TOS) >> SLA_SHIFT_TOS;
+			printf("\n\t\ttopology %s(%u) metric %d",
+                               tok2str(ospf_topology_values, "", topology),
+                               topology,
+                               ul & SLA_MASK_METRIC);
 			++lp;
 		}
 		break;
@@ -682,9 +704,11 @@ ospf_print_lsa(register const struct lsa *lsap)
 
 			TCHECK(almp->asla_tosmetric);
 			ul = EXTRACT_32BITS(&almp->asla_tosmetric);
-			printf(", type %d, tos %d metric:",
-			    (ul & ASLA_FLAG_EXTERNAL) ? 2 : 1,
-			    (ul & ASLA_MASK_TOS) >> ASLA_SHIFT_TOS);
+                        topology = ((ul & ASLA_MASK_TOS) >> ASLA_SHIFT_TOS);
+			printf("\n\t\ttopology %s(%u), type %d, metric",
+                               tok2str(ospf_topology_values, "", topology),
+                               topology,
+                               (ul & ASLA_FLAG_EXTERNAL) ? 2 : 1);
                         if ((ul & ASLA_MASK_METRIC)==0xffffff)
                             printf(" infinite");
                         else
@@ -973,7 +997,7 @@ ospf_decode_v2(register const struct ospfhdr *op,
                         printf(", MTU: %u", ntohs(op->ospf_db.db_ifmtu));
                 }
                 TCHECK(op->ospf_db.db_seq);
-                printf(", Sequence: 0x%08x", ntohl(op->ospf_db.db_seq));
+                printf(", Sequence: 0x%08x", EXTRACT_32BITS(&op->ospf_db.db_seq));
 
                 /* Print all the LS adv's */
                 lshp = op->ospf_db.db_lshdr;

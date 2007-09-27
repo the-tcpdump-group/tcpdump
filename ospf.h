@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.20 2007-09-23 23:01:33 guy Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.21 2007-09-27 10:20:26 hannes Exp $ (LBL) */
 /*
  * Copyright (c) 1991, 1993, 1994, 1995, 1996, 1997
  *	The Regents of the University of California.  All rights reserved.
@@ -147,6 +147,14 @@
 #define OSPF_LLS_EO_LR		0x00000001		/* RFC4811 */
 #define OSPF_LLS_EO_RS		0x00000002		/* RFC4812 */
 
+/*
+ * TOS metric struct (will be 0 or more in router links update)
+ */
+struct tos_metric {
+    u_int8_t tos_type;
+    u_int8_t tos_count;
+    u_int8_t tos_metric[2];
+};
 
 /* link state advertisement header */
 struct lsa_hdr {
@@ -180,9 +188,7 @@ struct lsa {
 	    struct rlalink {
 		struct in_addr link_id;
 		struct in_addr link_data;
-		u_int8_t link_type;
-		u_int8_t link_toscount;
-		u_int16_t link_tos0metric;
+                struct tos_metric metrics;
 	    } rla_link[1];		/* may repeat	*/
 	} un_rla;
 
@@ -241,16 +247,6 @@ struct lsa {
 	} un_unknown[1];
 
     } lsa_un;
-};
-
-
-/*
- * TOS metric struct (will be 0 or more in router links update)
- */
-struct tos_metric {
-    u_int8_t tos_type;
-    u_int8_t tos_zero;
-    u_int16_t tos_metric;
 };
 
 #define	OSPF_AUTH_SIZE	8
