@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.64 2007-09-27 10:20:26 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.65 2007-09-27 10:29:18 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -45,18 +45,6 @@ static const char rcsid[] _U_ =
 
 static struct tok ospf_option_values[] = {
         { OSPF_OPTION_T,	"MultiTopology" }, /* draft-ietf-ospf-mt-09 */
-	{ OSPF_OPTION_E,	"External" },
-	{ OSPF_OPTION_MC,	"Multicast" },
-	{ OSPF_OPTION_NP,	"NSSA" },
-	{ OSPF_OPTION_EA,	"Advertise External" },
-	{ OSPF_OPTION_DC,	"Demand Circuit" },
-	{ OSPF_OPTION_O,	"Opaque" },
-	{ OSPF_OPTION_DN,	"Up/Down" },
-	{ 0,			NULL }
-};
-
-static struct tok ospf_option_values2[] = {
-	{ OSPF_OPTION_T,	"TOS" },
 	{ OSPF_OPTION_E,	"External" },
 	{ OSPF_OPTION_MC,	"Multicast" },
 	{ OSPF_OPTION_NP,	"NSSA" },
@@ -956,7 +944,7 @@ ospf_decode_v2(register const struct ospfhdr *op,
 
 	case OSPF_TYPE_HELLO:
                 printf("\n\tOptions [%s]",
-                       bittok2str(ospf_option_values2,"none",op->ospf_hello.hello_options));
+                       bittok2str(ospf_option_values,"none",op->ospf_hello.hello_options));
 
                 TCHECK(op->ospf_hello.hello_deadint);
                 printf("\n\t  Hello Timer %us, Dead Timer %us, Mask %s, Priority %u",
@@ -988,7 +976,7 @@ ospf_decode_v2(register const struct ospfhdr *op,
 	case OSPF_TYPE_DD:
 		TCHECK(op->ospf_db.db_options);
                 printf("\n\tOptions [%s]",
-                       bittok2str(ospf_option_values2,"none",op->ospf_db.db_options));
+                       bittok2str(ospf_option_values,"none",op->ospf_db.db_options));
 		TCHECK(op->ospf_db.db_flags);
                 printf(", DD Flags [%s]",
                        bittok2str(ospf_dd_flag_values,"none",op->ospf_db.db_flags));
