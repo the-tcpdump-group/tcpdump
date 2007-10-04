@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-eap.c,v 1.4 2007-10-04 08:34:28 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-eap.c,v 1.5 2007-10-04 16:41:33 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -89,6 +89,11 @@ static const struct tok eap_code_values[] = {
 #define		EAP_TYPE_MD5_CHALLENGE	4
 #define		EAP_TYPE_OTP		5
 #define		EAP_TYPE_GTC		6
+#define		EAP_TYPE_TLS		13		/* RFC 2716 */
+#define		EAP_TYPE_SIM		18		/* RFC 4186 */
+#define		EAP_TYPE_TTLS		21		/* draft-funk-eap-ttls-v0-01.txt */
+#define		EAP_TYPE_AKA		23		/* RFC 4187 */
+#define		EAP_TYPE_FAST		43		/* RFC 4851 */
 #define		EAP_TYPE_EXPANDED_TYPES	254
 #define		EAP_TYPE_EXPERIMENTAL	255
 
@@ -100,10 +105,55 @@ static const struct tok eap_type_values[] = {
     { EAP_TYPE_MD5_CHALLENGE,   "MD5-challenge" },
     { EAP_TYPE_OTP,      	"OTP" },
     { EAP_TYPE_GTC,      	"GTC" },
+    { EAP_TYPE_TLS,      	"TLS" },
+    { EAP_TYPE_SIM,      	"SIM" },
+    { EAP_TYPE_TTLS,      	"TTLS" },
+    { EAP_TYPE_AKA,      	"AKA" },
+    { EAP_TYPE_FAST,      	"FAST" },
     { EAP_TYPE_EXPANDED_TYPES,  "Expanded types" },
     { EAP_TYPE_EXPERIMENTAL,    "Experimental" },
     { 0, NULL}
 };  
+
+#define EAP_TLS_EXTRACT_BIT_L(x) 	(((x)&0x80)>>7)
+
+/* RFC 2716 - EAP TLS bits */
+#define EAP_TLS_FLAGS_LEN_INCLUDED		(1 << 7)
+#define EAP_TLS_FLAGS_MORE_FRAGMENTS		(1 << 6)
+#define EAP_TLS_FLAGS_START			(1 << 5)
+
+static const struct tok eap_tls_flags_values[] = {
+	{ EAP_TLS_FLAGS_LEN_INCLUDED, "L bit" },
+	{ EAP_TLS_FLAGS_MORE_FRAGMENTS, "More fragments bit"},
+	{ EAP_TLS_FLAGS_START, "Start bit"},
+	{ 0, NULL}
+};
+
+#define EAP_TTLS_VERSION(x)		((x)&0x07)
+
+/* EAP-AKA and EAP-SIM - RFC 4187 */
+#define EAP_AKA_CHALLENGE		1
+#define EAP_AKA_AUTH_REJECT		2
+#define EAP_AKA_SYNC_FAILURE		4
+#define EAP_AKA_IDENTITY		5
+#define EAP_SIM_START			10
+#define EAP_SIM_CHALLENGE		11
+#define EAP_AKA_NOTIFICATION		12
+#define EAP_AKA_REAUTH			13
+#define EAP_AKA_CLIENT_ERROR		14
+
+static const struct tok eap_aka_subtype_values[] = {
+    { EAP_AKA_CHALLENGE,	"Challenge" },
+    { EAP_AKA_AUTH_REJECT,	"Auth reject" },
+    { EAP_AKA_SYNC_FAILURE,	"Sync failure" },
+    { EAP_AKA_IDENTITY,		"Identity" },
+    { EAP_SIM_START,		"Start" },
+    { EAP_SIM_CHALLENGE,	"Challenge" },
+    { EAP_AKA_NOTIFICATION,	"Notification" },
+    { EAP_AKA_REAUTH,		"Reauth" },
+    { EAP_AKA_CLIENT_ERROR,	"Client error" },
+    { 0, NULL}
+};
 
 /*
  * Print EAP requests / responses
@@ -190,6 +240,42 @@ eap_print(netdissect_options *ndo _U_,
                            *(tptr+count));
                     count++;
                 }
+                break;
+
+            case EAP_TYPE_TTLS:
+                printf(" TTLSv%u", 
+                       EAP_TTLS_VERSION(*(tptr+5))); /* fall through */
+            case EAP_TYPE_TLS:
+                printf(" flags [%s] 0x%02x,", 
+                       bittok2str(eap_tls_flags_values, "none", *(tptr+5)),
+                       *(tptr+5));
+
+                if (EAP_TLS_EXTRACT_BIT_L(*(tptr+5))) {
+		    printf(" len %u", EXTRACT_32BITS(tptr+6));
+                }
+                break;
+
+            case EAP_TYPE_FAST:
+                printf(" FASTv%u",
+                       EAP_TTLS_VERSION(*(tptr+5)));
+                printf(" flags [%s] 0x%02x,",
+                       bittok2str(eap_tls_flags_values, "none", *(tptr+5)),
+                       *(tptr+5));
+
+                if (EAP_TLS_EXTRACT_BIT_L(*(tptr+5))) {
+                    printf(" len %u", EXTRACT_32BITS(tptr+6));
+                }
+
+                /* FIXME - TLV attributes follow */
+                break;
+
+            case EAP_TYPE_AKA:
+            case EAP_TYPE_SIM:
+                printf(" subtype [%s] 0x%02x,",
+                       tok2str(eap_aka_subtype_values, "unknown", *(tptr+5)),
+                       *(tptr+5));
+
+                /* FIXME - TLV attributes follow */
                 break;
 
             case EAP_TYPE_MD5_CHALLENGE:	
