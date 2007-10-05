@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.116 2007-07-24 13:16:48 hannes Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.117 2007-10-05 02:00:11 guy Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -177,6 +177,14 @@ static struct tok bgp_attr_values[] = {
 #define BGP_AS_SEQUENCE        2
 #define BGP_CONFED_AS_SEQUENCE 3 /* draft-ietf-idr-rfc3065bis-01 */
 #define BGP_CONFED_AS_SET      4 /* draft-ietf-idr-rfc3065bis-01  */
+
+static int bgp_as_path_segment_known[] = {
+    BGP_AS_SEQUENCE,
+    BGP_AS_SET,
+    BGP_CONFED_AS_SEQUENCE,
+    BGP_CONFED_AS_SET,
+    0
+};
 
 static struct tok bgp_as_path_segment_open_values[] = {
     { BGP_AS_SEQUENCE,         ""},
@@ -1093,6 +1101,34 @@ trunc:
 	return -2;
 }
 
+/*
+ * Check for 4-byte ASN's, as per RFC 4893.
+ */
+static int
+check_asnbytes(const u_char *tptr, const u_char *mptr, int asnlen)
+{
+	int *kptr;
+
+	while (tptr < mptr) {
+		TCHECK(tptr[0]);
+		kptr = bgp_as_path_segment_known;
+		while (kptr[0] != 0) {
+			if (kptr[0] == tptr[0])
+				break;
+			++kptr;
+		}
+		if (kptr[0] == 0)
+			goto trunc;
+		TCHECK(tptr[1]);
+		tptr += 2 + tptr[1] * asnlen;
+	}
+	if (tptr == mptr)
+		return 1;
+
+trunc:
+	return 0;
+}
+
 static int
 bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
 {
@@ -1108,6 +1144,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
 	const u_char *tptr;
 	char buf[MAXHOSTNAMELEN + 100];
 	char tokbuf[TOKBUFSIZE];
+	int asn4bytes;
 
         tptr = pptr;
         tlen=len;
@@ -1135,21 +1172,36 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
 			break;
                 }
 
+                asn4bytes = 0;
+                if (!check_asnbytes(tptr, pptr+len, 2) &&
+                     check_asnbytes(tptr, pptr+len, 4))
+                        asn4bytes = 1;
 		while (tptr < pptr + len) {
 			TCHECK(tptr[0]);
                         printf("%s", tok2strbuf(bgp_as_path_segment_open_values,
 						"?", tptr[0],
 						tokbuf, sizeof(tokbuf)));
-                        for (i = 0; i < tptr[1] * 2; i += 2) {
-                            TCHECK2(tptr[2 + i], 2);
-                            printf("%u ", EXTRACT_16BITS(&tptr[2 + i]));
+                        TCHECK(tptr[1]);
+                        if (asn4bytes == 0) {
+                                for (i = 0; i < tptr[1] * 2; i += 2) {
+                                        TCHECK2(tptr[2 + i], 2);
+                                        printf("%u ", EXTRACT_16BITS(&tptr[2 + i]));
+                                }
+                        } else {
+                                for (i = 0; i < tptr[1] * 4; i += 4) {
+                                        TCHECK2(tptr[2 + i], 4);
+                                        printf("%u.%u ", EXTRACT_16BITS(&tptr[2 + i]), EXTRACT_16BITS(&tptr[4 + i]));
+                                }
                         }
 			TCHECK(tptr[0]);
                         printf("%s", tok2strbuf(bgp_as_path_segment_close_values,
 						"?", tptr[0],
 						tokbuf, sizeof(tokbuf)));
                         TCHECK(tptr[1]);
-                        tptr += 2 + tptr[1] * 2;
+                        if (asn4bytes == 0)
+                                tptr += 2 + tptr[1] * 2;
+                        else
+                                tptr += 2 + tptr[1] * 4;
 		}
 		break;
 	case BGPTYPE_NEXT_HOP:
