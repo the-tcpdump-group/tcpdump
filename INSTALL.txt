@@ -1,4 +1,4 @@
-@(#) $Header: /tcpdump/master/tcpdump/Attic/INSTALL,v 1.71 2007-09-24 23:46:26 guy Exp $ (LBL)
+@(#) $Header: /tcpdump/master/tcpdump/INSTALL.txt,v 1.1 2007-10-05 01:47:40 guy Exp $ (LBL)
 
 If you have not built libpcap, and your system does not have libpcap
 installed, install libpcap first.  Your system might provide a version
@@ -43,7 +43,7 @@ FILES
 CHANGES		- description of differences between releases
 CREDITS		- people that have helped tcpdump along
 FILES		- list of files exported as part of the distribution
-INSTALL		- this file
+INSTALL.txt	- this file
 LICENSE		- the license under which tcpdump is distributed
 Makefile.in	- compilation rules (input to the configure script)
 README		- description of distribution
