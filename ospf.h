@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.22 2007-09-27 10:24:21 hannes Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.23 2007-10-08 07:53:21 hannes Exp $ (LBL) */
 /*
  * Copyright (c) 1991, 1993, 1994, 1995, 1996, 1997
  *	The Regents of the University of California.  All rights reserved.
@@ -54,10 +54,10 @@
 #define OSPF_AUTH_MD5_LEN	16	/* length of MD5 authentication */
 
 /* db_flags	*/
-#define	OSPF_DB_INIT		0x04	    /*	*/
+#define	OSPF_DB_INIT		0x04
 #define	OSPF_DB_MORE		0x02
-#define	OSPF_DB_MASTER		0x01
-#define OSPF_DB_RESYNC		0x08		/* RFC4811 */
+#define	OSPF_DB_MASTER          0x01
+#define OSPF_DB_RESYNC          0x08  /* RFC4811 */
 
 /* ls_type	*/
 #define	LS_TYPE_ROUTER		1   /* router link */
@@ -137,8 +137,8 @@
 #define	MCLA_VERTEX_NETWORK	2
 
 /* Link-Local-Signaling */
-#define OSPF_LLS_EO		1	/* RFC4811, RFC4812 */
-#define OSPF_LLS_MD5	2	/* RFC4813 */
+#define OSPF_LLS_EO             1  /* RFC4811, RFC4812 */
+#define OSPF_LLS_MD5            2  /* RFC4813 */
 
 #define OSPF_LLS_EO_LR		0x00000001		/* RFC4811 */
 #define OSPF_LLS_EO_RS		0x00000002		/* RFC4812 */
@@ -148,8 +148,17 @@
  */
 struct tos_metric {
     u_int8_t tos_type;
-    u_int8_t tos_count;
+    u_int8_t reserved;
     u_int8_t tos_metric[2];
+};
+struct tos_link {
+    u_int8_t link_type;
+    u_int8_t link_tos_count;
+    u_int8_t tos_metric[2];
+};
+union un_tos {
+    struct tos_link link;
+    struct tos_metric metrics;
 };
 
 /* link state advertisement header */
@@ -184,7 +193,7 @@ struct lsa {
 	    struct rlalink {
 		struct in_addr link_id;
 		struct in_addr link_data;
-                struct tos_metric metrics;
+                union un_tos un_tos;
 	    } rla_link[1];		/* may repeat	*/
 	} un_rla;
 

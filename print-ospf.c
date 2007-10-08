@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.65 2007-09-27 10:29:18 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ospf.c,v 1.66 2007-10-08 07:53:21 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -48,7 +48,7 @@ static struct tok ospf_option_values[] = {
 	{ OSPF_OPTION_E,	"External" },
 	{ OSPF_OPTION_MC,	"Multicast" },
 	{ OSPF_OPTION_NP,	"NSSA" },
-	{ OSPF_OPTION_L,	"LLS" },
+        { OSPF_OPTION_L,        "LLS" },
 	{ OSPF_OPTION_DC,	"Demand Circuit" },
 	{ OSPF_OPTION_O,	"Opaque" },
 	{ OSPF_OPTION_DN,	"Up/Down" },
@@ -531,12 +531,12 @@ static struct tok ospf_topology_values[] = {
  * Print all the per-topology metrics.
  */
 static void
-ospf_print_tos_metrics(const struct tos_metric *metrics)
+ospf_print_tos_metrics(const union un_tos *tos)
 {
     int metric_count;
     int toscount;
 
-    toscount = metrics->tos_count+1;
+    toscount = tos->link.link_tos_count+1;
     metric_count = 0;
 
     /*
@@ -545,11 +545,11 @@ ospf_print_tos_metrics(const struct tos_metric *metrics)
     while (toscount) { 
         printf("\n\t\ttopology %s(%u), metric %u",
                tok2str(ospf_topology_values, "",
-                       metric_count ? metrics->tos_type : 0),
-               metric_count ? metrics->tos_type : 0,
-               EXTRACT_16BITS(&metrics->tos_metric));
+                       metric_count ? tos->metrics.tos_type : 0),
+               metric_count ? tos->metrics.tos_type : 0,
+               EXTRACT_16BITS(&tos->metrics.tos_metric));
         metric_count++;
-        metrics++;
+        tos++;
         toscount--;
     }
 }
@@ -591,7 +591,7 @@ ospf_print_lsa(register const struct lsa *lsap)
 		rlp = lsap->lsa_un.un_rla.rla_link;
 		while (j--) {
 			TCHECK(*rlp);
-			switch (rlp->metrics.tos_type) {
+			switch (rlp->un_tos.link.link_type) {
 
 			case RLA_TYPE_VIRTUAL:
 				printf("\n\t      Virtual Link: Neighbor Router-ID: %s, Interface Address: %s",
@@ -619,14 +619,14 @@ ospf_print_lsa(register const struct lsa *lsap)
 
 			default:
 				printf("\n\t      Unknown Router Link Type (%u)",
-				    rlp->metrics.tos_type);
+				    rlp->un_tos.link.link_type);
 				return (ls_end);
 			}
 
-                        ospf_print_tos_metrics(&rlp->metrics);
+                        ospf_print_tos_metrics(&rlp->un_tos);
 
 			rlp = (struct rlalink *)((u_char *)(rlp + 1) +
-			    ((rlp->metrics.tos_count) * sizeof(struct tos_metric)));
+			    ((rlp->un_tos.link.link_tos_count) * sizeof(union un_tos)));
 		}
 		break;
 
@@ -833,7 +833,7 @@ trunc:
 
 static int
 ospf_decode_lls(register const struct ospfhdr *op,
-    register u_int length)
+		register u_int length)
 {
     register const u_char *dptr;
     register const u_char *dataend;
@@ -989,7 +989,7 @@ ospf_decode_v2(register const struct ospfhdr *op,
 
                 /* Print all the LS adv's */
                 lshp = op->ospf_db.db_lshdr;
-                while ((u_char *)lshp < dataend && ospf_print_lshdr(lshp) != -1) {
+                while (((u_char *)lshp < dataend) && ospf_print_lshdr(lshp) != -1) {
                     ++lshp;
                 }
 		break;
