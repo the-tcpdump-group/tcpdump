@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.271 2007-09-24 23:46:27 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.272 2007-10-13 00:46:16 gianluca Exp $ (LBL)";
 #endif
 
 /*
@@ -66,13 +66,14 @@ extern int SIZE_BUF;
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
-#include <sys/resource.h>
-#include <sys/wait.h>
 #ifndef WIN32
+#include <sys/wait.h>
+#include <sys/resource.h>
 #include <pwd.h>
 #include <grp.h>
 #include <errno.h>
 #endif /* WIN32 */
+
 
 #include "netdissect.h"
 #include "interface.h"
@@ -1006,10 +1007,10 @@ main(int argc, char **argv)
 
 #ifndef WIN32	
 	(void)setsignal(SIGPIPE, cleanup);
-#endif /* WIN32 */
 	(void)setsignal(SIGTERM, cleanup);
 	(void)setsignal(SIGINT, cleanup);
 	(void)setsignal(SIGCHLD, child_cleanup);
+#endif /* WIN32 */
 	/* Cooperate with nohup(1) */
 #ifndef WIN32	
 	if ((oldhandler = setsignal(SIGHUP, cleanup)) != SIG_DFL)
@@ -1188,11 +1189,17 @@ cleanup(int signo _U_)
 #endif
 }
 
+/*
+  On windows, we do not use a fork, so we do not care less about
+  waiting a child processes to die
+ */
+#ifndef WIN32
 static RETSIGTYPE
 child_cleanup(int signo _U_)
 {
   wait(NULL);
 }
+#endif /* WIN32 */
 
 static void
 info(register int verbose)
@@ -1221,6 +1228,7 @@ info(register int verbose)
 	infoprint = 0;
 }
 
+#ifndef WIN32
 static void
 compress_savefile(const char *filename)
 {
@@ -1241,6 +1249,14 @@ compress_savefile(const char *filename)
 			filename,
 			strerror(errno));
 }
+#else  /* WIN32 */
+static void
+compress_savefile(const char *filename)
+{
+	fprintf(stderr,
+		"compress_savefile failed. Functionality not implemented under windows\n");
+}
+#endif /* WIN32 */
 
 static void
 dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
