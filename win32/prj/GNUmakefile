@@ -159,7 +159,8 @@ OBJS = \
 	../../print-eap.o \
 	../../print-lmp.o \
 	../../print-syslog.o \
-	../../print-dccp.o
+	../../print-dccp.o \
+	../../print-bt.o
 
 main: ${OBJS}
 	${CC} ${CFLAGS} ${LDFLAGS} -o windump.exe ${OBJS} ${LIBS}

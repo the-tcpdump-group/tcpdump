@@ -97,11 +97,11 @@ SOURCE=..\..\bpf_dump.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\cpack.c
+SOURCE=..\..\checksum.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\checksum.c
+SOURCE=..\..\cpack.c
 # End Source File
 # Begin Source File
 
@@ -210,6 +210,10 @@ SOURCE="..\..\print-bgp.c"
 # Begin Source File
 
 SOURCE="..\..\print-bootp.c"
+# End Source File
+# Begin Source File
+
+SOURCE="..\..\print-bt.c"
 # End Source File
 # Begin Source File
 
@@ -369,11 +373,11 @@ SOURCE="..\..\print-ldp.c"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\print-lldp.c"
+SOURCE="..\..\print-llc.c"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\print-llc.c"
+SOURCE="..\..\print-lldp.c"
 # End Source File
 # Begin Source File
 
@@ -569,11 +573,11 @@ SOURCE="..\..\print-udp.c"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\print-vqp.c"
+SOURCE="..\..\print-vjc.c"
 # End Source File
 # Begin Source File
 
-SOURCE="..\..\print-vjc.c"
+SOURCE="..\..\print-vqp.c"
 # End Source File
 # Begin Source File
 
