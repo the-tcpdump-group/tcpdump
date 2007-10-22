@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.48 2006-02-09 20:33:49 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-atm.c,v 1.48.2.1 2007-10-22 19:39:12 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -49,8 +49,8 @@ static const char rcsid[] _U_ =
 #define OAM_CELLTYPE_FUNCTYPE_LEN 1
 
 struct tok oam_f_values[] = {
-    { OAMF4SC, "OAM F4 (segment)" },
-    { OAMF4EC, "OAM F4 (end)" },
+    { VCI_OAMF4SC, "OAM F4 (segment)" },
+    { VCI_OAMF4EC, "OAM F4 (end)" },
     { 0, NULL }
 };
 
@@ -295,24 +295,24 @@ atm_print(u_int vpi, u_int vci, u_int traftype, const u_char *p, u_int length,
 	if (vpi == 0) {
 		switch (vci) {
 
-		case PPC:
+		case VCI_PPC:
 			sig_print(p, caplen);
 			return;
 
-		case BCC:
+		case VCI_BCC:
 			printf("broadcast sig: ");
 			return;
 
-		case OAMF4SC: /* fall through */
-		case OAMF4EC:
+		case VCI_OAMF4SC: /* fall through */
+		case VCI_OAMF4EC:
                         oam_print(p, length, ATM_OAM_HEC);
 			return;
 
-		case METAC:
+		case VCI_METAC:
 			printf("meta: ");
 			return;
 
-		case ILMIC:
+		case VCI_ILMIC:
 			printf("ilmi: ");
 			snmp_print(p, length);
 			return;
