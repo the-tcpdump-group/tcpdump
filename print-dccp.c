@@ -9,7 +9,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dccp.c,v 1.7 2006-11-02 09:05:23 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-dccp.c,v 1.7.2.1 2007-11-09 00:45:16 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -277,32 +277,21 @@ void dccp_print(const u_char *bp, const u_char *data2, u_int len)
 	}
 
 	/* checksum calculation */
+	if (vflag && TTEST2(bp[0], len)) {
+		u_int16_t sum = 0, dccp_sum;
+
+		dccp_sum = EXTRACT_16BITS(&dh->dccph_checksum);
+		(void)printf("cksum 0x%04x ", dccp_sum);
+		if (IP_V(ip) == 4)
+			sum = dccp_cksum(ip, dh, len);
 #ifdef INET6
-	if (ip6) {
-		if (ip6->ip6_plen && vflag) {
-			u_int16_t sum, dccp_sum;
-
+		else if (IP_V(ip) == 6)
 			sum = dccp6_cksum(ip6, dh, len);
-			dccp_sum = EXTRACT_16BITS(&dh->dccph_checksum);		
-			printf("cksum 0x%04x", dccp_sum);		
-			if (sum != 0) {
-				(void)printf(" (incorrect -> 0x%04x), ",in_cksum_shouldbe(dccp_sum, sum));
-			} else
-				(void)printf(" (correct), ");
-		}					
-	} else 
-#endif /* INET6 */
-	if (vflag)
-	{
-		u_int16_t sum, dccp_sum;
-
-		sum = dccp_cksum(ip, dh, len);
-		dccp_sum = EXTRACT_16BITS(&dh->dccph_checksum);		
-		printf("cksum 0x%04x", dccp_sum);		
-		if (sum != 0) {
-			(void)printf(" (incorrect (-> 0x%04x), ",in_cksum_shouldbe(dccp_sum, sum));
-		} else
-			(void)printf(" (correct), ");
+#endif
+		if (sum != 0)
+			(void)printf("(incorrect -> 0x%04x), ",in_cksum_shouldbe(dccp_sum, sum));
+		else
+			(void)printf("(correct), ");
 	}
 
 	switch (DCCPH_TYPE(dh)) {
