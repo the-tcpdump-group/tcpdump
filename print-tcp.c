@@ -25,7 +25,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.130 2007-08-29 02:31:44 mcr Exp $ (LBL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.131 2007-11-09 00:34:25 guy Exp $ (LBL)";
   #else
 __RCSID("$NetBSD: print-tcp.c,v 1.8 2007/07/24 11:53:48 drochner Exp $");
 #endif
@@ -430,7 +430,7 @@ tcp_print(register const u_char *bp, register u_int length,
                         (void)printf(", cksum 0x%04x",EXTRACT_16BITS(&tp->th_sum));
                         if (sum != 0) {
                                 tcp_sum = EXTRACT_16BITS(&tp->th_sum);
-                                (void)printf(" (incorrect (-> 0x%04x)",in_cksum_shouldbe(tcp_sum, sum));
+                                (void)printf(" (incorrect -> 0x%04x)",in_cksum_shouldbe(tcp_sum, sum));
                         } else
                                 (void)printf(" (correct)");
 
