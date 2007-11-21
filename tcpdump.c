@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.272 2007-10-13 00:46:16 gianluca Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.273 2007-11-21 20:31:31 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -1208,6 +1208,7 @@ info(register int verbose)
 
 	if (pcap_stats(pd, &stat) < 0) {
 		(void)fprintf(stderr, "pcap_stats: %s\n", pcap_geterr(pd));
+		infoprint = 0;
 		return;
 	}
 
