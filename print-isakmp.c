@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.56 2007-08-29 12:31:00 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.57 2007-11-22 21:53:43 mcr Exp $ (LBL)";
 #endif
 
 #define NETDISSECT_REWORKED
@@ -1495,8 +1495,9 @@ ikev2_p_print(netdissect_options *ndo, u_char tpay _U_, int pcount _U_,
 	safememcpy(&prop, ext, sizeof(prop));
 	ikev2_pay_print(ndo, NPSTR(ISAKMP_NPTYPE_P), prop.h.critical);
 
-	ND_PRINT((ndo," #%u protoid=%s transform=%d",
-		  prop.p_no, PROTOIDSTR(prop.prot_id), prop.num_t));
+	ND_PRINT((ndo," #%u protoid=%s transform=%d len=%u",
+		  prop.p_no,  PROTOIDSTR(prop.prot_id),
+		  prop.num_t, ntohs(prop.h.len)));
 	if (prop.spi_size) {
 		ND_PRINT((ndo," spi="));
 		if (!rawprint(ndo, (caddr_t)(p + 1), prop.spi_size))
@@ -1505,7 +1506,7 @@ ikev2_p_print(netdissect_options *ndo, u_char tpay _U_, int pcount _U_,
 
 	ext = (struct isakmp_gen *)((u_char *)(p + 1) + prop.spi_size);
 	ND_TCHECK(*ext);
-	
+
 	cp = ikev2_sub_print(ndo, ISAKMP_NPTYPE_T, ext, ep, phase, doi0,
 			     prop.prot_id, depth);
 	
@@ -1935,7 +1936,26 @@ ikev2_e_print(netdissect_options *ndo, u_char tpay,
 		u_int32_t phase _U_, u_int32_t doi _U_,
 		u_int32_t proto _U_, int depth _U_)
 {
-	return ikev2_gen_print(ndo, tpay, ext);
+	struct isakmp_gen e;
+
+	ND_TCHECK(*ext);
+	safememcpy(&e, ext, sizeof(e));
+	ikev2_pay_print(ndo, NPSTR(tpay), e.critical);
+
+	ND_PRINT((ndo," len=%d", ntohs(e.len) - 4));
+	if (2 < ndo->ndo_vflag && 4 < ntohs(e.len)) {
+		ND_PRINT((ndo," "));
+		if (!rawprint(ndo, (caddr_t)(ext + 1), ntohs(e.len) - 4))
+			goto trunc;
+	}
+
+	/* always return NULL, because E must be at end, and NP refers
+	 * to what was inside.
+	 */
+	return NULL;
+trunc:
+	ND_PRINT((ndo," [|%s]", NPSTR(tpay)));
+	return NULL;
 }
 
 static const u_char *
@@ -1961,7 +1981,8 @@ ikev2_eap_print(netdissect_options *ndo, u_char tpay,
 static const u_char *
 ike_sub0_print(netdissect_options *ndo,
 		 u_char np, const struct isakmp_gen *ext, const u_char *ep,
-		 u_int32_t phase, u_int32_t doi, u_int32_t proto, int depth)
+
+	       u_int32_t phase, u_int32_t doi, u_int32_t proto, int depth)
 {
 	const u_char *cp;
 	struct isakmp_gen e;
