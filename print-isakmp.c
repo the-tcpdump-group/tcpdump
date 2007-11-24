@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.57 2007-11-22 21:53:43 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.58 2007-11-24 18:13:33 mcr Exp $ (LBL)";
 #endif
 
 #define NETDISSECT_REWORKED
@@ -94,9 +94,19 @@ DECLARE_PRINTER(v2_n);
 DECLARE_PRINTER(v2_d);
 DECLARE_PRINTER(v2_vid);
 DECLARE_PRINTER(v2_TS);
-DECLARE_PRINTER(v2_e);
 DECLARE_PRINTER(v2_cp);
 DECLARE_PRINTER(v2_eap);
+
+static const u_char *ikev2_e_print(netdissect_options *ndo,
+				   struct isakmp *base,
+				   u_char tpay,
+				   const struct isakmp_gen *ext,
+				   u_int item_len,	
+				   const u_char *end_pointer, 
+				   u_int32_t phase,
+				   u_int32_t doi0, 
+				   u_int32_t proto0, int depth);
+
 
 static const u_char *ike_sub0_print(netdissect_options *ndo,u_char, const struct isakmp_gen *,
 	const u_char *,	u_int32_t, u_int32_t, u_int32_t, int);
@@ -104,6 +114,7 @@ static const u_char *ikev1_sub_print(netdissect_options *ndo,u_char, const struc
 	const u_char *, u_int32_t, u_int32_t, u_int32_t, int);
 
 static const u_char *ikev2_sub_print(netdissect_options *ndo,
+				     struct isakmp *base,
 				     u_char np, const struct isakmp_gen *ext,
 				     const u_char *ep, u_int32_t phase,
 				     u_int32_t doi, u_int32_t proto,
@@ -185,7 +196,7 @@ static const u_char *(*npfunc[])(netdissect_options *ndo, u_char tpay,
 	ikev2_vid_print,                /* 43 */
 	ikev2_TS_print,                 /* 44 */
 	ikev2_TS_print,                 /* 45 */
-	ikev2_e_print,                  /* 46 */
+	NULL, /* ikev2_e_print,*/       /* 46 - special */
 	ikev2_cp_print,                 /* 47 */
 	ikev2_eap_print,                /* 48 */
 };
@@ -391,21 +402,28 @@ cookie_sidecheck(int i, const u_char *bp2, int initiator)
 	return 0;
 }
 
-static int
-rawprint(netdissect_options *ndo, caddr_t loc, size_t len)
+static void
+hexprint(netdissect_options *ndo, caddr_t loc, size_t len)
 {
-	static u_char *p;
+	u_char *p;
 	size_t i;
 
-	ND_TCHECK2(*loc, len);
-	
 	p = (u_char *)loc;
 	for (i = 0; i < len; i++)
 		ND_PRINT((ndo,"%02x", p[i] & 0xff));
+}
+
+static int
+rawprint(netdissect_options *ndo, caddr_t loc, size_t len)
+{
+	ND_TCHECK2(*loc, len);
+
+	hexprint(ndo, loc, len);
 	return 1;
 trunc:
 	return 0;
 }
+
 
 /*
  * returns false if we run out of data buffer
@@ -1507,7 +1525,7 @@ ikev2_p_print(netdissect_options *ndo, u_char tpay _U_, int pcount _U_,
 	ext = (struct isakmp_gen *)((u_char *)(p + 1) + prop.spi_size);
 	ND_TCHECK(*ext);
 
-	cp = ikev2_sub_print(ndo, ISAKMP_NPTYPE_T, ext, ep, phase, doi0,
+	cp = ikev2_sub_print(ndo, NULL, ISAKMP_NPTYPE_T, ext, ep, phase, doi0,
 			     prop.prot_id, depth);
 	
 	return cp;
@@ -1534,7 +1552,7 @@ ikev2_sa_print(netdissect_options *ndo, u_char tpay,
 	sa_len = osa_len - 4;
 	ND_PRINT((ndo," len=%d", sa_len));
 
-	ikev2_sub_print(ndo, ISAKMP_NPTYPE_P,
+	ikev2_sub_print(ndo, NULL, ISAKMP_NPTYPE_P,
 			ext1+1, ep,
 			0, 0, 0, depth);
 
@@ -1580,7 +1598,79 @@ ikev2_ID_print(netdissect_options *ndo, u_char tpay,
 		u_int32_t phase _U_, u_int32_t doi _U_,
 		u_int32_t proto _U_, int depth _U_)
 {
-	return ikev2_gen_print(ndo, tpay, ext);
+	struct ikev2_id id;
+	int id_len, idtype_len, i;
+	unsigned int dumpascii, dumphex;
+	unsigned char *typedata;
+
+	ND_TCHECK(*ext);
+	safememcpy(&id, ext, sizeof(id));
+	ikev2_pay_print(ndo, NPSTR(tpay), id.h.critical);
+
+	id_len = ntohs(id.h.len);
+
+	ND_PRINT((ndo," len=%d", id_len - 4));
+	if (2 < ndo->ndo_vflag && 4 < id_len) {
+		ND_PRINT((ndo," "));
+		if (!rawprint(ndo, (caddr_t)(ext + 1), id_len - 4))
+			goto trunc;
+	}
+
+	idtype_len =id_len - sizeof(struct ikev2_id);
+	dumpascii = 0;
+	dumphex   = 0;
+	typedata  = (unsigned char *)(ext)+sizeof(struct ikev2_id);
+
+	switch(id.type) {
+	case ID_IPV4_ADDR:
+		ND_PRINT((ndo, " ipv4:"));
+		dumphex=1;
+		break;
+	case ID_FQDN:
+		ND_PRINT((ndo, " fqdn:"));
+		dumpascii=1;
+		break;
+	case ID_RFC822_ADDR:
+		ND_PRINT((ndo, " rfc822:"));
+		dumpascii=1;
+		break;
+	case ID_IPV6_ADDR:
+		ND_PRINT((ndo, " ipv6:"));
+		dumphex=1;
+		break;
+	case ID_DER_ASN1_DN:
+		ND_PRINT((ndo, " dn:"));
+		dumphex=1;
+		break;
+	case ID_DER_ASN1_GN:
+		ND_PRINT((ndo, " gn:"));
+		dumphex=1;
+		break;
+	case ID_KEY_ID:
+		ND_PRINT((ndo, " keyid:"));
+		dumphex=1;
+		break;
+	}
+
+	if(dumpascii) {
+		ND_TCHECK2(*typedata, idtype_len);
+		for(i=0; i<idtype_len; i++) {
+			if(isprint(typedata[i])) {
+				ND_PRINT((ndo, "%c", typedata[i]));
+			} else {
+				ND_PRINT((ndo, "."));
+			}
+		}
+	}
+	if(dumphex) {
+		if (!rawprint(ndo, typedata, idtype_len))
+			goto trunc;
+	}
+
+	return (u_char *)ext + id_len;
+trunc:
+	ND_PRINT((ndo," [|%s]", NPSTR(tpay)));
+	return NULL;
 }
 
 static const u_char *
@@ -1930,24 +2020,46 @@ ikev2_TS_print(netdissect_options *ndo, u_char tpay,
 }
 
 static const u_char *
-ikev2_e_print(netdissect_options *ndo, u_char tpay, 
+ikev2_e_print(netdissect_options *ndo, struct isakmp *base,
+	      u_char tpay, 
 		const struct isakmp_gen *ext,
 		u_int item_len _U_, const u_char *ep _U_,
-		u_int32_t phase _U_, u_int32_t doi _U_,
-		u_int32_t proto _U_, int depth _U_)
+		u_int32_t phase, u_int32_t doi,
+		u_int32_t proto, int depth)
 {
 	struct isakmp_gen e;
+	u_char *dat;
+	volatile int dlen;
 
 	ND_TCHECK(*ext);
 	safememcpy(&e, ext, sizeof(e));
 	ikev2_pay_print(ndo, NPSTR(tpay), e.critical);
 
-	ND_PRINT((ndo," len=%d", ntohs(e.len) - 4));
-	if (2 < ndo->ndo_vflag && 4 < ntohs(e.len)) {
+	dlen = ntohs(e.len)-4;
+
+	ND_PRINT((ndo," len=%d", dlen));
+	if (2 < ndo->ndo_vflag && 4 < dlen) {
 		ND_PRINT((ndo," "));
-		if (!rawprint(ndo, (caddr_t)(ext + 1), ntohs(e.len) - 4))
+		if (!rawprint(ndo, (caddr_t)(ext + 1), dlen))
 			goto trunc;
 	}
+
+	dat = (u_char *)(ext+1);
+	ND_TCHECK2(*dat, dlen);
+	
+	/* try to decypt it! */
+	if(esp_print_decrypt_buffer_by_ikev2(ndo,
+					     base->flags & ISAKMP_FLAG_I,
+					     base->i_ck, base->r_ck,
+					     dat, dat+dlen)) {
+		
+		ext = (const struct isakmp_gen *)ndo->ndo_packetp;
+
+		/* got it decrypted, print stuff inside. */
+		ikev2_sub_print(ndo, base, e.np, ext, ndo->ndo_snapend,
+				phase, doi, proto, depth+1);
+	}
+	
 
 	/* always return NULL, because E must be at end, and NP refers
 	 * to what was inside.
@@ -2156,7 +2268,8 @@ done:
 }
 
 static const u_char *
-ikev2_sub0_print(netdissect_options *ndo, u_char np, int pcount,
+ikev2_sub0_print(netdissect_options *ndo, struct isakmp *base,
+		 u_char np, int pcount,
 		 const struct isakmp_gen *ext, const u_char *ep,
 		 u_int32_t phase, u_int32_t doi, u_int32_t proto, int depth)
 {
@@ -2184,6 +2297,9 @@ ikev2_sub0_print(netdissect_options *ndo, u_char np, int pcount,
 	} else if(np == ISAKMP_NPTYPE_T) {
 		cp = ikev2_t_print(ndo, np, pcount, ext, item_len,
 				   ep, phase, doi, proto, depth);
+	} else if(np == ISAKMP_NPTYPE_v2E) {
+		cp = ikev2_e_print(ndo, base, np, ext, item_len,
+				   ep, phase, doi, proto, depth);
 	} else if (NPFUNC(np)) {
 		/*
 		 * XXX - what if item_len is too short, or too long,
@@ -2204,6 +2320,7 @@ trunc:
 
 static const u_char *
 ikev2_sub_print(netdissect_options *ndo,
+		struct isakmp *base,
 		u_char np, const struct isakmp_gen *ext, const u_char *ep,
 		u_int32_t phase, u_int32_t doi, u_int32_t proto, int depth)
 {
@@ -2227,7 +2344,7 @@ ikev2_sub_print(netdissect_options *ndo,
 		for (i = 0; i < depth; i++)
 			ND_PRINT((ndo,"    "));
 		ND_PRINT((ndo,"("));
-		cp = ikev2_sub0_print(ndo, np, pcount,
+		cp = ikev2_sub0_print(ndo, base, np, pcount,
 				      ext, ep, phase, doi, proto, depth);
 		ND_PRINT((ndo,")"));
 		depth--;
@@ -2294,7 +2411,7 @@ ikev2_print(netdissect_options *ndo,
 
 		np = base->np;
 		ext = (struct isakmp_gen *)(p + 1);
-		ikev2_sub_print(ndo, np, ext, ep, phase, 0, 0, 0);
+		ikev2_sub_print(ndo, base, np, ext, ep, phase, 0, 0, 0);
 	}
 
 done:
@@ -2315,6 +2432,12 @@ isakmp_print(netdissect_options *ndo,
 	struct isakmp base;
 	const u_char *ep;
 	int major, minor;
+
+	/* initiailize SAs */
+	if (ndo->ndo_sa_list_head == NULL) {
+		if (ndo->ndo_espsecret)
+			esp_print_decodesecret(ndo);
+	}
 
 	p = (const struct isakmp *)bp;
 	ep = ndo->ndo_snapend;
@@ -2338,14 +2461,14 @@ isakmp_print(netdissect_options *ndo,
 
 	if (ndo->ndo_vflag) {
 		ND_PRINT((ndo," msgid "));
-		rawprint(ndo, (caddr_t)&base.msgid, sizeof(base.msgid));
+		hexprint(ndo, (caddr_t)&base.msgid, sizeof(base.msgid));
 	}
 
 	if (1 < ndo->ndo_vflag) {
 		ND_PRINT((ndo," cookie "));
-		rawprint(ndo, (caddr_t)&base.i_ck, sizeof(base.i_ck));
+		hexprint(ndo, (caddr_t)&base.i_ck, sizeof(base.i_ck));
 		ND_PRINT((ndo,"->"));
-		rawprint(ndo, (caddr_t)&base.r_ck, sizeof(base.r_ck));
+		hexprint(ndo, (caddr_t)&base.r_ck, sizeof(base.r_ck));
 	}
 	ND_PRINT((ndo,":"));
 

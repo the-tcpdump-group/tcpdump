@@ -21,7 +21,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.23 2007-01-29 09:59:42 hannes Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.24 2007-11-24 18:13:33 mcr Exp $ (LBL)
  */
 
 #ifndef netdissect_h
@@ -437,5 +437,12 @@ extern u_short in_cksum(const u_short *,
 			register u_int, int);
 
 #endif
+
+extern void esp_print_decodesecret(netdissect_options *ndo);
+extern int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
+					     int initiator,
+					     u_char spii[8], u_char spir[8],
+					     u_char *buf, u_char *end);
+
 
 #endif  /* netdissect_h */
