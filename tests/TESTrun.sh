@@ -13,6 +13,7 @@ do
   if sh ./$i >DIFF/$i.result
   then
       echo $i: passed.
+      rm -f DIFF/$i.result
       passed=$(($passed + 1))
   else
       echo $i: failed.
@@ -34,6 +35,7 @@ do
   if ./TESTonce $name $input $output "$options"
   then
       echo $name: passed.
+      rm -f DIFF/$output.diff
       passed=$(($passed + 1))
       echo $passed >.passed
   else

@@ -9,3 +9,7 @@ isakmp-identification-segfault.pcap
 isakmp-pointer-loop.pcap
 run1.pcap
 run2.pcap
+.failed
+.gdbinit
+.passed
+
