@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.58 2007-11-24 18:13:33 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.59 2007-11-27 03:57:20 mcr Exp $ (LBL)";
 #endif
 
 #define NETDISSECT_REWORKED
@@ -1663,7 +1663,7 @@ ikev2_ID_print(netdissect_options *ndo, u_char tpay,
 		}
 	}
 	if(dumphex) {
-		if (!rawprint(ndo, typedata, idtype_len))
+		if (!rawprint(ndo, (caddr_t)typedata, idtype_len))
 			goto trunc;
 	}
 
@@ -1700,27 +1700,30 @@ ikev2_auth_print(netdissect_options *ndo, u_char tpay,
 		u_int32_t phase _U_, u_int32_t doi _U_,
 		u_int32_t proto _U_, int depth _U_)
 {
-	struct ikev2_auth e;
+	struct ikev2_auth a;
 	const char *v2_auth[]={ "invalid", "rsasig",
 				"shared-secret", "dsssig" };
+	u_char *authdata = (u_char*)ext + sizeof(a);
+	unsigned int len;
 
 	ND_TCHECK(*ext);
-	safememcpy(&e, ext, sizeof(e));
-	ikev2_pay_print(ndo, NPSTR(tpay), e.h.critical);
+	safememcpy(&a, ext, sizeof(a));
+	ikev2_pay_print(ndo, NPSTR(tpay), a.h.critical);
+	len = ntohs(a.h.len);
 
-	ND_PRINT((ndo," len=%d method=%s", ntohs(e.h.len) - 4, 
-		  STR_OR_ID(e.auth_method, v2_auth)));
+	ND_PRINT((ndo," len=%d method=%s", len-4, 
+		  STR_OR_ID(a.auth_method, v2_auth)));
 
-	if (1 < ndo->ndo_vflag && 4 < ntohs(e.h.len)) {
+	if (1 < ndo->ndo_vflag && 4 < len) {
 		ND_PRINT((ndo," authdata=("));
-		if (!rawprint(ndo, (caddr_t)(ext + 1), ntohs(e.h.len) - 4))
+		if (!rawprint(ndo, (caddr_t)authdata, len - sizeof(a)))
 			goto trunc;
 		ND_PRINT((ndo,") "));
-	} else if(ndo->ndo_vflag && 4 < ntohs(e.h.len)) {
-		if(!ike_show_somedata(ndo, (const u_char *)(ext+1), ep)) goto trunc;
+	} else if(ndo->ndo_vflag && 4 < len) {
+		if(!ike_show_somedata(ndo, authdata, ep)) goto trunc;
 	}
 
-	return (u_char *)ext + ntohs(e.h.len);
+	return (u_char *)ext + len;
 trunc:
 	ND_PRINT((ndo," [|%s]", NPSTR(tpay)));
 	return NULL;
