@@ -36,7 +36,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.117 2007-10-05 02:00:11 guy Exp $";
+     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.118 2007-12-07 15:54:52 hannes Exp $";
 #endif
 
 #include <tcpdump-stdinc.h>
@@ -145,6 +145,8 @@ struct bgp_attr {
 #define BGPTYPE_MP_REACH_NLRI		14	/* RFC2283 */
 #define BGPTYPE_MP_UNREACH_NLRI		15	/* RFC2283 */
 #define BGPTYPE_EXTD_COMMUNITIES        16      /* draft-ietf-idr-bgp-ext-communities */
+#define BGPTYPE_AS4_PATH	        17      /* RFC4893 */
+#define BGPTYPE_AGGREGATOR4		18      /* RFC4893 */
 #define BGPTYPE_PMSI_TUNNEL             22      /* draft-ietf-l3vpn-2547bis-mcast-bgp-02.txt */
 #define BGPTYPE_ATTR_SET               128      /* draft-marques-ppvpn-ibgp */
 
@@ -153,11 +155,13 @@ struct bgp_attr {
 static struct tok bgp_attr_values[] = {
     { BGPTYPE_ORIGIN,           "Origin"},
     { BGPTYPE_AS_PATH,          "AS Path"},
+    { BGPTYPE_AS4_PATH,         "AS4 Path"},
     { BGPTYPE_NEXT_HOP,         "Next Hop"},
     { BGPTYPE_MULTI_EXIT_DISC,  "Multi Exit Discriminator"},
     { BGPTYPE_LOCAL_PREF,       "Local Preference"},
     { BGPTYPE_ATOMIC_AGGREGATE, "Atomic Aggregate"},
     { BGPTYPE_AGGREGATOR,       "Aggregator"},
+    { BGPTYPE_AGGREGATOR4,      "Aggregator4"},
     { BGPTYPE_COMMUNITIES,      "Community"},
     { BGPTYPE_ORIGINATOR_ID,    "Originator ID"},
     { BGPTYPE_CLUSTER_LIST,     "Cluster List"},
@@ -178,13 +182,8 @@ static struct tok bgp_attr_values[] = {
 #define BGP_CONFED_AS_SEQUENCE 3 /* draft-ietf-idr-rfc3065bis-01 */
 #define BGP_CONFED_AS_SET      4 /* draft-ietf-idr-rfc3065bis-01  */
 
-static int bgp_as_path_segment_known[] = {
-    BGP_AS_SEQUENCE,
-    BGP_AS_SET,
-    BGP_CONFED_AS_SEQUENCE,
-    BGP_CONFED_AS_SET,
-    0
-};
+#define BGP_AS_SEG_TYPE_MIN    BGP_AS_SET
+#define BGP_AS_SEG_TYPE_MAX    BGP_CONFED_AS_SET
 
 static struct tok bgp_as_path_segment_open_values[] = {
     { BGP_AS_SEQUENCE,         ""},
@@ -1102,31 +1101,60 @@ trunc:
 }
 
 /*
- * Check for 4-byte ASN's, as per RFC 4893.
+ * bgp_attr_get_as_size
+ *
+ * Try to find the size of the ASs encoded in an as-path. It is not obvious, as
+ * both Old speakers that do not support 4 byte AS, and the new speakers that do
+ * support, exchange AS-Path with the same path-attribute type value 0x02.
  */
 static int
-check_asnbytes(const u_char *tptr, const u_char *mptr, int asnlen)
+bgp_attr_get_as_size (u_int8_t bgpa_type, const u_char *pptr, int len)
 {
-	int *kptr;
+    const u_char *tptr = pptr;
 
-	while (tptr < mptr) {
-		TCHECK(tptr[0]);
-		kptr = bgp_as_path_segment_known;
-		while (kptr[0] != 0) {
-			if (kptr[0] == tptr[0])
-				break;
-			++kptr;
-		}
-		if (kptr[0] == 0)
-			goto trunc;
-		TCHECK(tptr[1]);
-		tptr += 2 + tptr[1] * asnlen;
-	}
-	if (tptr == mptr)
-		return 1;
+    /*
+     * If the path attribute is the optional AS4 path type, then we already
+     * know, that ASs must be encoded in 4 byte format.
+     */
+    if (bgpa_type == BGPTYPE_AS4_PATH) {
+        return 4;
+    }
+
+    /*
+     * Let us assume that ASs are of 2 bytes in size, and check if the AS-Path
+     * TLV is good. If not, ask the caller to try with AS encoded as 4 bytes
+     * each.
+     */
+    while (tptr < pptr + len) {
+        TCHECK(tptr[0]);
+
+        /*
+         * If we do not find a valid segment type, our guess might be wrong.
+         */
+        if (tptr[0] < BGP_AS_SEG_TYPE_MIN || tptr[0] > BGP_AS_SEG_TYPE_MAX) {
+            goto trunc;
+        }
+        TCHECK(tptr[1]);
+        tptr += 2 + tptr[1] * 2;
+    }
+
+    /*
+     * If we correctly reached end of the AS path attribute data content,
+     * then most likely ASs were indeed encoded as 2 bytes.
+     */
+    if (tptr == pptr + len) {
+        return 2;
+    }
 
 trunc:
-	return 0;
+
+    /*
+     * We can come here, either we did not have enough data, or if we
+     * try to decode 4 byte ASs in 2 byte format. Either way, return 4,
+     * so that calller can try to decode each AS as of 4 bytes. If indeed
+     * there was not enough data, it will crib and end the parse anyways.
+     */
+   return 4;
 }
 
 static int
@@ -1144,7 +1172,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
 	const u_char *tptr;
 	char buf[MAXHOSTNAMELEN + 100];
 	char tokbuf[TOKBUFSIZE];
-	int asn4bytes;
+        int  as_size;
 
         tptr = pptr;
         tlen=len;
@@ -1162,6 +1190,11 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
 		}
 		break;
 
+
+        /*
+         * Process AS4 byte path and AS2 byte path attributes here.
+         */
+	case BGPTYPE_AS4_PATH:
 	case BGPTYPE_AS_PATH:
 		if (len % 2) {
 			printf("invalid len");
@@ -1172,36 +1205,33 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
 			break;
                 }
 
-                asn4bytes = 0;
-                if (!check_asnbytes(tptr, pptr+len, 2) &&
-                     check_asnbytes(tptr, pptr+len, 4))
-                        asn4bytes = 1;
+                /*
+                 * BGP updates exchanged between New speakers that support 4
+                 * byte AS, ASs are always encoded in 4 bytes. There is no
+                 * definitive way to find this, just by the packet's
+                 * contents. So, check for packet's TLV's sanity assuming
+                 * 2 bytes first, and it does not pass, assume that ASs are
+                 * encoded in 4 bytes format and move on.
+                 */
+                as_size = bgp_attr_get_as_size(attr->bgpa_type, pptr, len);
+
 		while (tptr < pptr + len) {
 			TCHECK(tptr[0]);
                         printf("%s", tok2strbuf(bgp_as_path_segment_open_values,
 						"?", tptr[0],
 						tokbuf, sizeof(tokbuf)));
-                        TCHECK(tptr[1]);
-                        if (asn4bytes == 0) {
-                                for (i = 0; i < tptr[1] * 2; i += 2) {
-                                        TCHECK2(tptr[2 + i], 2);
-                                        printf("%u ", EXTRACT_16BITS(&tptr[2 + i]));
-                                }
-                        } else {
-                                for (i = 0; i < tptr[1] * 4; i += 4) {
-                                        TCHECK2(tptr[2 + i], 4);
-                                        printf("%u.%u ", EXTRACT_16BITS(&tptr[2 + i]), EXTRACT_16BITS(&tptr[4 + i]));
-                                }
+                        for (i = 0; i < tptr[1] * as_size; i += as_size) {
+                            TCHECK2(tptr[2 + i], as_size);
+                            printf("%u ",
+                                   as_size == 2 ?  EXTRACT_16BITS(&tptr[2 + i]) :
+                                                   EXTRACT_32BITS(&tptr[2 + i]));
                         }
 			TCHECK(tptr[0]);
                         printf("%s", tok2strbuf(bgp_as_path_segment_close_values,
 						"?", tptr[0],
 						tokbuf, sizeof(tokbuf)));
                         TCHECK(tptr[1]);
-                        if (asn4bytes == 0)
-                                tptr += 2 + tptr[1] * 2;
-                        else
-                                tptr += 2 + tptr[1] * 4;
+                        tptr += 2 + tptr[1] * as_size;
 		}
 		break;
 	case BGPTYPE_NEXT_HOP:
@@ -1233,6 +1263,15 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
 		TCHECK2(tptr[0], 6);
 		printf(" AS #%u, origin %s", EXTRACT_16BITS(tptr),
 			getname(tptr + 2));
+		break;
+	case BGPTYPE_AGGREGATOR4:
+		if (len != 8) {
+			printf("invalid len");
+			break;
+		}
+		TCHECK2(tptr[0], 8);
+		printf(" AS #%u, origin %s", EXTRACT_32BITS(tptr),
+			getname(tptr + 4));
 		break;
 	case BGPTYPE_COMMUNITIES:
 		if (len % 4) {
