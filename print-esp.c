@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.57 2007-11-24 18:13:33 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-esp.c,v 1.58 2007-12-07 00:03:07 mcr Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -128,6 +128,7 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 		(*ndo->ndo_warning)(ndo, "espkey init failed");
 	EVP_CipherInit(&ctx, NULL, NULL, iv, 0);
 	EVP_Cipher(&ctx, buf, buf, len);
+	EVP_CIPHER_CTX_cleanup(&ctx);
 
 	ndo->ndo_packetp = buf;
 	ndo->ndo_snapend = end;
@@ -662,6 +663,7 @@ esp_print(netdissect_options *ndo,
 		p = ivoff;
 		EVP_CipherInit(&ctx, NULL, NULL, p, 0);
 		EVP_Cipher(&ctx, p + ivlen, p + ivlen, ep - (p + ivlen));
+		EVP_CIPHER_CTX_cleanup(&ctx);
 		advance = ivoff - (u_char *)esp + ivlen;
 	} else
 		advance = sizeof(struct newesp);
