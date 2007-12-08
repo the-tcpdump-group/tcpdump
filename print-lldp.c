@@ -20,7 +20,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-lldp.c,v 1.7 2007-08-20 12:18:30 hannes Exp $";
+"@(#) $Header: /tcpdump/master/tcpdump/print-lldp.c,v 1.8 2007-12-08 09:52:31 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -138,16 +138,16 @@ static const struct tok lldp_cap_values[] = {
     { 0, NULL}
 };
 
-#define	LLDP_PRIVATE_8023_SUTBYPE_MACPHY	1
-#define	LLDP_PRIVATE_8023_SUTBYPE_MDIPOWER	2
-#define	LLDP_PRIVATE_8023_SUTBYPE_LINKAGGR	3
-#define	LLDP_PRIVATE_8023_SUTBYPE_MTU		4
+#define	LLDP_PRIVATE_8023_SUBTYPE_MACPHY	1
+#define	LLDP_PRIVATE_8023_SUBTYPE_MDIPOWER	2
+#define	LLDP_PRIVATE_8023_SUBTYPE_LINKAGGR	3
+#define	LLDP_PRIVATE_8023_SUBTYPE_MTU		4
 
 static const struct tok lldp_8023_subtype_values[] = {
-    { LLDP_PRIVATE_8023_SUTBYPE_MACPHY,	"MAC/PHY configuration/status"},
-    { LLDP_PRIVATE_8023_SUTBYPE_MDIPOWER, "Power via MDI"},
-    { LLDP_PRIVATE_8023_SUTBYPE_LINKAGGR, "Link aggregation"},
-    { LLDP_PRIVATE_8023_SUTBYPE_MTU, "Max frame size"},
+    { LLDP_PRIVATE_8023_SUBTYPE_MACPHY,	"MAC/PHY configuration/status"},
+    { LLDP_PRIVATE_8023_SUBTYPE_MDIPOWER, "Power via MDI"},
+    { LLDP_PRIVATE_8023_SUBTYPE_LINKAGGR, "Link aggregation"},
+    { LLDP_PRIVATE_8023_SUBTYPE_MTU, "Max frame size"},
     { 0, NULL}
 };
 
@@ -437,22 +437,22 @@ static const struct tok lldp_tia_inventory_values[] = {
 /*
  * From RFC 3636 - ifMauAutoNegCapAdvertisedBits
  */ 
-#define	 LLDP_MAU_PMD_OTHER			(1 <<  0)
-#define	 LLDP_MAU_PMD_10BASE_T			(1 <<  1)
-#define	 LLDP_MAU_PMD_10BASE_T_FD		(1 <<  2)
-#define	 LLDP_MAU_PMD_100BASE_T4		(1 <<  3)
-#define	 LLDP_MAU_PMD_100BASE_TX		(1 <<  4)
-#define	 LLDP_MAU_PMD_100BASE_TX_FD		(1 <<  5)
-#define	 LLDP_MAU_PMD_100BASE_T2		(1 <<  6)
-#define	 LLDP_MAU_PMD_100BASE_T2_FD		(1 <<  7)
-#define	 LLDP_MAU_PMD_FDXPAUSE			(1 <<  8)
-#define	 LLDP_MAU_PMD_FDXAPAUSE			(1 <<  9)
-#define	 LLDP_MAU_PMD_FDXSPAUSE			(1 <<  10)
-#define	 LLDP_MAU_PMD_FDXBPAUSE			(1 <<  11)
-#define	 LLDP_MAU_PMD_1000BASE_X		(1 <<  12)
-#define	 LLDP_MAU_PMD_1000BASE_X_FD		(1 <<  13)
-#define	 LLDP_MAU_PMD_1000BASE_T		(1 <<  14)
-#define	 LLDP_MAU_PMD_1000BASE_T_FD		(1 <<  15)
+#define	 LLDP_MAU_PMD_OTHER			(1 <<  15)
+#define	 LLDP_MAU_PMD_10BASE_T			(1 <<  14)
+#define	 LLDP_MAU_PMD_10BASE_T_FD		(1 <<  13)
+#define	 LLDP_MAU_PMD_100BASE_T4		(1 <<  12)
+#define	 LLDP_MAU_PMD_100BASE_TX		(1 <<  11)
+#define	 LLDP_MAU_PMD_100BASE_TX_FD		(1 <<  10)
+#define	 LLDP_MAU_PMD_100BASE_T2		(1 <<  9)
+#define	 LLDP_MAU_PMD_100BASE_T2_FD		(1 <<  8)
+#define	 LLDP_MAU_PMD_FDXPAUSE			(1 <<  7)
+#define	 LLDP_MAU_PMD_FDXAPAUSE			(1 <<  6)
+#define	 LLDP_MAU_PMD_FDXSPAUSE			(1 <<  5)
+#define	 LLDP_MAU_PMD_FDXBPAUSE			(1 <<  4)
+#define	 LLDP_MAU_PMD_1000BASE_X		(1 <<  3)
+#define	 LLDP_MAU_PMD_1000BASE_X_FD		(1 <<  2)
+#define	 LLDP_MAU_PMD_1000BASE_T		(1 <<  1)
+#define	 LLDP_MAU_PMD_1000BASE_T_FD		(1 <<  0)
 
 static const struct tok lldp_pmd_capability_values[] = {
     { LLDP_MAU_PMD_10BASE_T,		"10BASE-T hdx"},
@@ -548,7 +548,7 @@ lldp_private_8023_print(const u_char *tptr)
            subtype);
 
     switch (subtype) {
-    case LLDP_PRIVATE_8023_SUTBYPE_MACPHY:
+    case LLDP_PRIVATE_8023_SUBTYPE_MACPHY:
         printf("\n\t    autonegotiation [%s] (0x%02x)",
                bittok2str(lldp_8023_autonegotiation_values, "none", *(tptr+4)),
                *(tptr+4));
@@ -560,20 +560,20 @@ lldp_private_8023_print(const u_char *tptr)
                EXTRACT_16BITS(tptr+7));
         break;
 
-    case LLDP_PRIVATE_8023_SUTBYPE_MDIPOWER:
+    case LLDP_PRIVATE_8023_SUBTYPE_MDIPOWER:
         printf("\n\t    MDI power support [%s], power pair %s, power class %s",
                bittok2str(lldp_mdi_values, "none", *(tptr+4)),
                tok2str(lldp_mdi_power_pairs_values, "unknown", *(tptr+5)),
                tok2str(lldp_mdi_power_class_values, "unknown", *(tptr+6)));
         break;
 
-    case LLDP_PRIVATE_8023_SUTBYPE_LINKAGGR:
+    case LLDP_PRIVATE_8023_SUBTYPE_LINKAGGR:
         printf("\n\t    aggregation status [%s], aggregation port ID %u",
                bittok2str(lldp_aggregation_values, "none", (*tptr+4)),
                EXTRACT_32BITS(tptr+5));
         break;
 
-    case LLDP_PRIVATE_8023_SUTBYPE_MTU:
+    case LLDP_PRIVATE_8023_SUBTYPE_MTU:
         printf("\n\t    MTU size %u", EXTRACT_16BITS(tptr+4));
         break;
 
