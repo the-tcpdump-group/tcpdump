@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/tcp.h,v 1.13 2007-01-29 09:59:42 hannes Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/tcp.h,v 1.13.2.1 2007-12-09 00:31:35 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1982, 1986, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -103,3 +103,6 @@ struct tcphdr {
 #endif
 #define MSDP_PORT	        639
 #define LDP_PORT                646
+#ifndef SMB_PORT
+#define SMB_PORT                445
+#endif

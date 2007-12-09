@@ -25,7 +25,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.130.2.1 2007-11-09 00:38:52 guy Exp $ (LBL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.130.2.2 2007-12-09 00:31:35 guy Exp $ (LBL)";
   #else
 __RCSID("$NetBSD: print-tcp.c,v 1.8 2007/07/24 11:53:48 drochner Exp $");
 #endif
@@ -650,6 +650,8 @@ tcp_print(register const u_char *bp, register u_int length,
 #ifdef TCPDUMP_DO_SMB
         else if (sport == NETBIOS_SSN_PORT || dport == NETBIOS_SSN_PORT)
                 nbt_tcp_print(bp, length);
+	else if (sport == SMB_PORT || dport == SMB_PORT)
+		smb_tcp_print(bp, length);
 #endif
         else if (sport == BEEP_PORT || dport == BEEP_PORT)
                 beep_print(bp, length);
