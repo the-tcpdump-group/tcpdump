@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.281 2007-12-09 00:30:47 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/interface.h,v 1.282 2007-12-20 08:13:35 guy Exp $ (LBL)
  */
 
 #ifndef tcpdump_interface_h
@@ -219,6 +219,8 @@ extern u_int ieee802_11_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int ieee802_11_radio_if_print(const struct pcap_pkthdr *,
 	const u_char *);
 extern u_int ap1394_if_print(const struct pcap_pkthdr *, const u_char *);
+extern u_int ieee802_11_radio_avs_if_print(const struct pcap_pkthdr *,
+	const u_char *);
 extern void gre_print(const u_char *, u_int);
 extern void icmp_print(const u_char *, u_int, const u_char *, int);
 extern void igmp_print(const u_char *, u_int);
