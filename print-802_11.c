@@ -22,7 +22,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.47 2007-07-22 23:13:41 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-802_11.c,v 1.47.2.1 2007-12-20 08:14:18 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -1209,6 +1209,11 @@ ieee802_11_avs_radio_print(const u_char *p, u_int length, u_int caplen)
 {
 	u_int32_t caphdr_len;
 
+	if (caplen < 8) {
+		printf("[|802.11]");
+		return caplen;
+	}
+
 	caphdr_len = EXTRACT_32BITS(p + 4);
 	if (caphdr_len < 8) {
 		/*
@@ -1270,19 +1275,21 @@ prism_if_print(const struct pcap_pkthdr *h, const u_char *p)
 
 /*
  * For DLT_IEEE802_11_RADIO; like DLT_IEEE802_11, but with an extra
- * header, containing information such as radio information, which we
- * currently ignore.
+ * header, containing information such as radio information.
  */
 u_int
 ieee802_11_radio_if_print(const struct pcap_pkthdr *h, const u_char *p)
 {
-	u_int caplen = h->caplen;
-	u_int length = h->len;
+	return ieee802_11_radio_print(p, h->len, h->caplen);
+}
 
-	if (caplen < 8) {
-		printf("[|802.11]");
-		return caplen;
-	}
-
-	return ieee802_11_radio_print(p, length, caplen);
+/*
+ * For DLT_IEEE802_11_RADIO_AVS; like DLT_IEEE802_11, but with an
+ * extra header, containing information such as radio information,
+ * which we currently ignore.
+ */
+u_int
+ieee802_11_radio_avs_if_print(const struct pcap_pkthdr *h, const u_char *p)
+{
+	return ieee802_11_avs_radio_print(p, h->len, h->caplen);
 }
