@@ -1,4 +1,4 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/oui.h,v 1.7 2007-08-19 09:14:49 hannes Exp $ (LBL) */
+/* @(#) $Header: /tcpdump/master/tcpdump/oui.h,v 1.8 2008-01-09 09:40:47 hannes Exp $ (LBL) */
 /* 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that: (1) source code
@@ -27,7 +27,8 @@ extern struct tok smi_values[];
 #define OUI_APPLETALK   0x080007        /* Appletalk */
 #define OUI_JUNIPER     0x009069        /* Juniper */
 #define OUI_HP          0x080009        /* Hewlett-Packard */
-#define OUI_IEEE_PRIVATE 0x00120f       /* IEEE 802.3 Organisation Specific - Annex G */
+#define OUI_IEEE_8021_PRIVATE 0x0080c2      /* IEEE 802.1 Organisation Specific - Annex F */
+#define OUI_IEEE_8023_PRIVATE 0x00120f      /* IEEE 802.3 Organisation Specific - Annex G */
 #define OUI_TIA         0x0012bb        /* TIA - Telecommunications Industry Association - ANSI/TIA-1057- 2006 */
 
 /*

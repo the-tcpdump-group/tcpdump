@@ -20,7 +20,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-lldp.c,v 1.8 2007-12-08 09:52:31 hannes Exp $";
+"@(#) $Header: /tcpdump/master/tcpdump/print-lldp.c,v 1.9 2008-01-09 09:40:47 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -138,10 +138,32 @@ static const struct tok lldp_cap_values[] = {
     { 0, NULL}
 };
 
-#define	LLDP_PRIVATE_8023_SUBTYPE_MACPHY	1
-#define	LLDP_PRIVATE_8023_SUBTYPE_MDIPOWER	2
-#define	LLDP_PRIVATE_8023_SUBTYPE_LINKAGGR	3
-#define	LLDP_PRIVATE_8023_SUBTYPE_MTU		4
+#define LLDP_PRIVATE_8021_SUBTYPE_PORT_VLAN_ID		1
+#define LLDP_PRIVATE_8021_SUBTYPE_PROTOCOL_VLAN_ID	2
+#define LLDP_PRIVATE_8021_SUBTYPE_VLAN_NAME		3
+#define LLDP_PRIVATE_8021_SUBTYPE_PROTOCOL_IDENTITY	4
+
+static const struct tok lldp_8021_subtype_values[] = {
+    { LLDP_PRIVATE_8021_SUBTYPE_PORT_VLAN_ID, "Port VLAN Id"},
+    { LLDP_PRIVATE_8021_SUBTYPE_PROTOCOL_VLAN_ID, "Port and Protocol VLAN ID"},
+    { LLDP_PRIVATE_8021_SUBTYPE_VLAN_NAME, "VLAN name"},
+    { LLDP_PRIVATE_8021_SUBTYPE_PROTOCOL_IDENTITY, "Protocol Identity"},
+    { 0, NULL}
+};
+
+#define LLDP_8021_PORT_PROTOCOL_VLAN_SUPPORT       (1 <<  1)
+#define LLDP_8021_PORT_PROTOCOL_VLAN_STATUS        (1 <<  2)
+
+static const struct tok lldp_8021_port_protocol_id_values[] = {
+    { LLDP_8021_PORT_PROTOCOL_VLAN_SUPPORT, "supported"},
+    { LLDP_8021_PORT_PROTOCOL_VLAN_STATUS, "enabled"},
+    { 0, NULL}
+};
+
+#define LLDP_PRIVATE_8023_SUBTYPE_MACPHY        1
+#define LLDP_PRIVATE_8023_SUBTYPE_MDIPOWER      2
+#define LLDP_PRIVATE_8023_SUBTYPE_LINKAGGR      3
+#define LLDP_PRIVATE_8023_SUBTYPE_MTU           4
 
 static const struct tok lldp_8023_subtype_values[] = {
     { LLDP_PRIVATE_8023_SUBTYPE_MACPHY,	"MAC/PHY configuration/status"},
@@ -534,7 +556,51 @@ static const struct tok lldp_intf_numb_subtype_values[] = {
 #define LLDP_INTF_NUM_LEN                  5
 
 /*
- * Print IEEE private extensions.
+ * Print IEEE private extensions. (802.1 annex F)
+ */
+static int
+lldp_private_8021_print(const u_char *tptr)
+{
+    int subtype, hexdump = FALSE;
+
+    subtype = *(tptr+3);
+
+    printf("\n\t  %s Subtype (%u)",
+           tok2str(lldp_8021_subtype_values, "unknown", subtype),
+           subtype);
+
+    switch (subtype) {
+    case LLDP_PRIVATE_8021_SUBTYPE_PORT_VLAN_ID:
+        printf("\n\t    port vlan id (PVID): %u",
+               EXTRACT_16BITS(tptr+4));
+        break;
+    case LLDP_PRIVATE_8021_SUBTYPE_PROTOCOL_VLAN_ID:
+        printf("\n\t    port and protocol vlan id (PPVID): %u, flags [%s] (0x%02x)",
+               EXTRACT_16BITS(tptr+5),
+	       bittok2str(lldp_8021_port_protocol_id_values, "none", *(tptr+4)),
+	       *(tptr+4));
+        break;
+    case LLDP_PRIVATE_8021_SUBTYPE_VLAN_NAME:
+        printf("\n\t    vlan id (VID): %u",
+               EXTRACT_16BITS(tptr+4));
+        printf("\n\t    vlan name: ");
+        safeputs((const char *)tptr+7, *(tptr+6));
+        break;
+    case LLDP_PRIVATE_8021_SUBTYPE_PROTOCOL_IDENTITY:
+        printf("\n\t    protocol identity: ");
+        safeputs((const char *)tptr+5, *(tptr+4));
+        break;
+
+    default:
+        hexdump = TRUE;
+        break;
+    }
+
+    return hexdump;
+}
+
+/*
+ * Print IEEE private extensions. (802.3)
  */
 static int
 lldp_private_8023_print(const u_char *tptr)
@@ -980,7 +1046,10 @@ lldp_print(register const u_char *pptr, register u_int len) {
                 printf(": OUI %s (0x%06x)", tok2str(oui_values, "Unknown", oui), oui);
                 
                 switch (oui) {
-                case OUI_IEEE_PRIVATE:
+                case OUI_IEEE_8021_PRIVATE:
+                    hexdump = lldp_private_8021_print(tptr);
+                    break;
+                case OUI_IEEE_8023_PRIVATE:
                     hexdump = lldp_private_8023_print(tptr);
                     break;
                 case OUI_TIA:
