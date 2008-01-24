@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.59 2007-11-27 03:57:20 mcr Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.60 2008-01-24 19:57:46 guy Exp $ (LBL)";
 #endif
 
 #define NETDISSECT_REWORKED
@@ -2050,6 +2050,7 @@ ikev2_e_print(netdissect_options *ndo, struct isakmp *base,
 	dat = (u_char *)(ext+1);
 	ND_TCHECK2(*dat, dlen);
 	
+#ifdef HAVE_LIBCRYPTO
 	/* try to decypt it! */
 	if(esp_print_decrypt_buffer_by_ikev2(ndo,
 					     base->flags & ISAKMP_FLAG_I,
@@ -2062,6 +2063,7 @@ ikev2_e_print(netdissect_options *ndo, struct isakmp *base,
 		ikev2_sub_print(ndo, base, e.np, ext, ndo->ndo_snapend,
 				phase, doi, proto, depth+1);
 	}
+#endif
 	
 
 	/* always return NULL, because E must be at end, and NP refers
@@ -2436,11 +2438,13 @@ isakmp_print(netdissect_options *ndo,
 	const u_char *ep;
 	int major, minor;
 
-	/* initiailize SAs */
+#ifdef HAVE_LIBCRYPTO
+	/* initialize SAs */
 	if (ndo->ndo_sa_list_head == NULL) {
 		if (ndo->ndo_espsecret)
 			esp_print_decodesecret(ndo);
 	}
+#endif
 
 	p = (const struct isakmp *)bp;
 	ep = ndo->ndo_snapend;
