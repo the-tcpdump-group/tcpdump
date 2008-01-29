@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.271.2.4 2007-12-20 08:14:18 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.271.2.5 2008-01-29 10:50:28 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -334,10 +334,10 @@ show_dlts_and_exit(pcap_t *pd)
 			 * OK, does tcpdump handle that type?
 			 */
 			if (lookup_printer(dlts[n_dlts]) == NULL)
-				(void) fprintf(stderr, " (not supported)");
+				(void) fprintf(stderr, " (printing not supported)");
 			putchar('\n');
 		} else {
-			(void) fprintf(stderr, "  DLT %d (not supported)\n",
+			(void) fprintf(stderr, "  DLT %d (printing not supported)\n",
 			    dlts[n_dlts]);
 		}
 	}
