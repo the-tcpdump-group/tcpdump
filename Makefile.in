@@ -17,7 +17,7 @@
 #  WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 #  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.318 2007-11-24 18:13:33 mcr Exp $ (LBL)
+# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.319 2008-02-04 20:33:21 guy Exp $ (LBL)
 
 #
 # Various configurable paths (remember to edit Makefile.in, not Makefile)
@@ -57,6 +57,7 @@ LIBS = @LIBS@
 INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
+RANLIB = @RANLIB@
 
 # Explicitly define compilation rule since SunOS 4's make doesn't like gcc.
 # Also, gcc does not remove the .o before forking 'as', which can be a
@@ -133,7 +134,9 @@ $(PROG): $(OBJ) @V_PCAPDEP@
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJ) $(LIBS)
 
 $(LIBNETDISSECT): $(LIBNETDISSECT_OBJ)
-	$(AR) cr $(LIBNETDISSECT) $(LIBNETDISSECT_OBJ) 
+	@rm -f $@
+	$(AR) cr $@ $(LIBNETDISSECT_OBJ) 
+	$(RANLIB) $@
 
 datalinks.o: $(srcdir)/missing/datalinks.c
 	$(CC) $(CFLAGS) -o $@ -c $(srcdir)/missing/datalinks.c
