@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.196 2007-09-12 19:36:18 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.196.2.1 2008-02-04 20:33:49 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.196 $)
+AC_REVISION($Revision: 1.196.2.1 $)
 AC_PREREQ(2.50)
 AC_INIT(tcpdump.c)
 
@@ -899,6 +899,8 @@ if test "$ac_lbl_inttypes_h_defines_formats" = no; then
 	])
     ])
 fi
+
+AC_PROG_RANLIB
 
 AC_LBL_DEVEL(V_CCOPT)
 
