@@ -30,7 +30,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.60 2008-01-24 19:57:46 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isakmp.c,v 1.61 2008-02-05 19:34:25 guy Exp $ (LBL)";
 #endif
 
 #define NETDISSECT_REWORKED
@@ -2023,12 +2023,30 @@ ikev2_TS_print(netdissect_options *ndo, u_char tpay,
 }
 
 static const u_char *
-ikev2_e_print(netdissect_options *ndo, struct isakmp *base,
+ikev2_e_print(netdissect_options *ndo,
+#ifndef HAVE_LIBCRYPTO
+	      _U_
+#endif
+	      struct isakmp *base,
 	      u_char tpay, 
-		const struct isakmp_gen *ext,
-		u_int item_len _U_, const u_char *ep _U_,
-		u_int32_t phase, u_int32_t doi,
-		u_int32_t proto, int depth)
+	      const struct isakmp_gen *ext,
+	      u_int item_len _U_, const u_char *ep _U_,
+#ifndef HAVE_LIBCRYPTO
+	      _U_
+#endif
+	      u_int32_t phase,
+#ifndef HAVE_LIBCRYPTO
+	      _U_
+#endif
+	      u_int32_t doi,
+#ifndef HAVE_LIBCRYPTO
+	      _U_
+#endif
+	      u_int32_t proto,
+#ifndef HAVE_LIBCRYPTO
+	      _U_
+#endif
+	      int depth)
 {
 	struct isakmp_gen e;
 	u_char *dat;
