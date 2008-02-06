@@ -20,7 +20,7 @@
  */
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.105 2007-08-03 11:03:19 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ether.c,v 1.105.2.1 2008-02-06 10:49:22 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -70,6 +70,7 @@ const struct tok ethertype_values[] = {
     { ETHERTYPE_PPPOED,         "PPPoE D" },
     { ETHERTYPE_PPPOES,         "PPPoE S" },
     { ETHERTYPE_EAPOL,          "EAPOL" },
+    { ETHERTYPE_RRCP,           "RRCP" },
     { ETHERTYPE_JUMBO,          "Jumbo" },
     { ETHERTYPE_LOOPBACK,       "Loopback" },
     { ETHERTYPE_ISO,            "OSI" },
@@ -293,6 +294,10 @@ ether_encap_print(u_short ether_type, const u_char *p,
 
 	case ETHERTYPE_EAPOL:
 	        eap_print(gndo, p, length);
+		return (1);
+
+	case ETHERTYPE_RRCP:
+	        rrcp_print(gndo, p - 14 , length + 14);
 		return (1);
 
 	case ETHERTYPE_PPP:

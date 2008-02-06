@@ -18,7 +18,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/ethertype.h,v 1.29 2007-08-03 11:03:19 hannes Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/ethertype.h,v 1.29.2.1 2008-02-06 10:49:22 guy Exp $ (LBL)
  */
 
 /*
@@ -135,6 +135,9 @@
 #endif
 #ifndef ETHERTYPE_EAPOL
 #define ETHERTYPE_EAPOL  	0x888e
+#endif
+#ifndef ETHERTYPE_RRCP
+#define ETHERTYPE_RRCP  	0x8899
 #endif
 #ifndef	ETHERTYPE_LOOPBACK
 #define	ETHERTYPE_LOOPBACK	0x9000
