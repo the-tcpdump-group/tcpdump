@@ -473,6 +473,10 @@ SOURCE="..\..\print-raw.c"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\print-rrcp.c"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\print-rip.c"
 # End Source File
 # Begin Source File

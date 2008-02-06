@@ -21,7 +21,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.24 2007-11-24 18:13:33 mcr Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.25 2008-02-06 10:47:53 guy Exp $ (LBL)
  */
 
 #ifndef netdissect_h
@@ -250,7 +250,7 @@ extern const char *dnnum_string(netdissect_options *, u_short);
 #include <pcap.h>
 
 
-extern void eap_print(netdissect_options *,const u_char *, u_int);    
+extern void eap_print(netdissect_options *,const u_char *, u_int);
 extern int esp_print(netdissect_options *,
 		     register const u_char *bp, int len, register const u_char *bp2,
 		     int *nhdr, int *padlen);
@@ -263,6 +263,7 @@ extern void ip_print(netdissect_options *,const u_char *, u_int);
 extern void ip_print_inner(netdissect_options *ndo,
 			   const u_char *bp, u_int length, u_int nh,
 			   const u_char *bp2);
+extern void rrcp_print(netdissect_options *,const u_char *, u_int);
 
 /* stuff that has not yet been rototiled */
 #if 0
