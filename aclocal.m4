@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.114 2008-02-26 19:17:56 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.115 2008-02-26 20:47:12 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -1253,4 +1253,31 @@ else
   V_DEFS="$V_DEFS -D_U_=\"\""
 fi
 AC_MSG_RESULT($ac_cv___attribute__)
+])
+
+AC_DEFUN(AC_LBL_SSLEAY,
+    [
+	#
+	# XXX - is there a better way to check if a given library is
+	# in a given directory than checking each of the possible
+	# shared library suffixes?
+	#
+	# Are there any other suffixes we need to look for?  Do we
+	# have to worry about ".so.{version}"?
+	#
+	# Or should we just look for "libcrypto.*"?
+	#
+	if test -d "$1/lib" -a \( -f "$1/lib/libcrypto.a" -o \
+		          	    -f "$1/lib/libcrypto.so" -o \
+		          	    -f "$1/lib/libcrypto.sl" -o \
+			  	    -f "$1/lib/libcrypto.dylib" \); then
+		ac_cv_ssleay_path="$1"
+	fi
+
+	#
+	# Make sure we have the headers as well.
+	#
+	if test -d "$1/include/openssl" -a -f "$1/include/openssl/des.h"; then
+		incdir="-I$1/include"
+	fi
 ])
