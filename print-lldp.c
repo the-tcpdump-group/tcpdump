@@ -20,7 +20,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-lldp.c,v 1.9 2008-01-09 09:40:47 hannes Exp $";
+"@(#) $Header: /tcpdump/master/tcpdump/print-lldp.c,v 1.10 2008-03-20 09:30:56 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -635,7 +635,7 @@ lldp_private_8023_print(const u_char *tptr)
 
     case LLDP_PRIVATE_8023_SUBTYPE_LINKAGGR:
         printf("\n\t    aggregation status [%s], aggregation port ID %u",
-               bittok2str(lldp_aggregation_values, "none", (*tptr+4)),
+               bittok2str(lldp_aggregation_values, "none", *(tptr+4)),
                EXTRACT_32BITS(tptr+5));
         break;
 
