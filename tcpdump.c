@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.277 2008-04-04 19:42:11 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.278 2008-04-04 20:24:49 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -966,15 +966,6 @@ main(int argc, char **argv)
 			error("%s: pcap_set_promisc failed: %s",
 			    device, pcap_strerror(status));
 		if (Iflag) {
-status = pcap_can_set_rfmon(pd);
-if (status < 0) {
-if (status == PCAP_ERROR)
-fprintf(stderr, "pcap_can_set_rfmon failed: %s\n", pcap_geterr(pd));
-else
-fprintf(stderr, "pcap_can_set_rfmon failed: %s\n", pcap_strerror(status));
-}
-else if (!status)
-fprintf(stderr, "This isn't gonna work...\n");
 			status = pcap_set_rfmon(pd, 1);
 			if (status != 0)
 				error("%s: pcap_set_rfmon failed: %s",
