@@ -190,6 +190,9 @@
 /* Define to 1 if you have the `pcap_breakloop' function. */
 #undef HAVE_PCAP_BREAKLOOP
 
+/* Define to 1 if you have the `pcap_create' function. */
+#undef HAVE_PCAP_CREATE
+
 /* Define to 1 if you have the `pcap_dump_flush' function. */
 #undef HAVE_PCAP_DUMP_FLUSH
 

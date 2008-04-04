@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.271.2.5 2008-01-29 10:50:28 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.271.2.6 2008-04-04 19:42:52 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -349,13 +349,19 @@ show_dlts_and_exit(pcap_t *pd)
  * Set up flags that might or might not be supported depending on the
  * version of libpcap we're using.
  */
-#ifdef WIN32
+#if defined(HAVE_PCAP_CREATE) || defined(WIN32)
 #define B_FLAG		"B:"
 #define B_FLAG_USAGE	" [ -B size ]"
-#else /* WIN32 */
+#else /* defined(HAVE_PCAP_CREATE) || defined(WIN32) */
 #define B_FLAG
 #define B_FLAG_USAGE
-#endif /* WIN32 */
+#endif /* defined(HAVE_PCAP_CREATE) || defined(WIN32) */
+
+#ifdef HAVE_PCAP_CREATE
+#define I_FLAG		"I"
+#else /* HAVE_PCAP_CREATE */
+#define I_FLAG
+#endif /* HAVE_PCAP_CREATE */
 
 #ifdef HAVE_PCAP_FINDALLDEVS
 #ifndef HAVE_PCAP_IF_T
@@ -498,7 +504,6 @@ main(int argc, char **argv)
 #endif
 	int status;
 #ifdef WIN32
-	u_int UserBufferSize = 1000000;
 	if(wsockinit() != 0) return 1;
 #endif /* WIN32 */
 
@@ -530,7 +535,7 @@ main(int argc, char **argv)
 
 	opterr = 0;
 	while (
-	    (op = getopt(argc, argv, "aA" B_FLAG "c:C:d" D_FLAG "eE:fF:G:i:KlLm:M:nNOpqr:Rs:StT:u" U_FLAG "vw:W:xXy:Yz:Z:")) != -1)
+	    (op = getopt(argc, argv, "aA" B_FLAG "c:C:d" D_FLAG "eE:fF:G:i:" I_FLAG "KlLm:M:nNOpqr:Rs:StT:u" U_FLAG "vw:W:xXy:Yz:Z:")) != -1)
 		switch (op) {
 
 		case 'a':
@@ -541,13 +546,13 @@ main(int argc, char **argv)
 			++Aflag;
 			break;
 
-#ifdef WIN32
+#if defined(HAVE_PCAP_CREATE) || defined(WIN32)
 		case 'B':
-			UserBufferSize = atoi(optarg)*1024;
-			if (UserBufferSize < 0)
+			Bflag = atoi(optarg)*1024;
+			if (Bflag <= 0)
 				error("invalid packet buffer size %s", optarg);
 			break;
-#endif /* WIN32 */
+#endif /* defined(HAVE_PCAP_CREATE) || defined(WIN32) */
 
 		case 'c':
 			cnt = atoi(optarg);
@@ -653,6 +658,12 @@ main(int argc, char **argv)
 #endif /* HAVE_PCAP_FINDALLDEVS */
 			device = optarg;
 			break;
+
+#ifdef HAVE_PCAP_CREATE
+		case 'I':
+			++Iflag;
+			break;
+#endif /* HAVE_PCAP_CREATE */
 
 		case 'l':
 #ifdef WIN32
@@ -942,12 +953,58 @@ main(int argc, char **argv)
 
 		fflush(stderr);	
 #endif /* WIN32 */
+#ifdef HAVE_PCAP_CREATE
+		pd = pcap_create(device, ebuf);
+		if (pd == NULL)
+			error("%s", ebuf);
+		status = pcap_set_snaplen(pd, snaplen);
+		if (status != 0)
+			error("%s: pcap_set_snaplen failed: %s",
+			    device, pcap_strerror(status));
+		status = pcap_set_promisc(pd, !pflag);
+		if (status != 0)
+			error("%s: pcap_set_promisc failed: %s",
+			    device, pcap_strerror(status));
+		if (Iflag) {
+status = pcap_can_set_rfmon(pd);
+if (status < 0) {
+if (status == PCAP_ERROR)
+fprintf(stderr, "pcap_can_set_rfmon failed: %s\n", pcap_geterr(pd));
+else
+fprintf(stderr, "pcap_can_set_rfmon failed: %s\n", pcap_strerror(status));
+}
+else if (!status)
+fprintf(stderr, "This isn't gonna work...\n");
+			status = pcap_set_rfmon(pd, 1);
+			if (status != 0)
+				error("%s: pcap_set_rfmon failed: %s",
+				    device, pcap_strerror(status));
+		}
+		status = pcap_set_timeout(pd, 1000);
+		if (status != 0)
+			error("%s: pcap_set_timeout failed: %s",
+			    device, pcap_strerror(status));
+		if (Bflag != 0) {
+			status = pcap_set_buffer_size(pd, Bflag);
+			if (status != 0)
+				error("%s: pcap_set_buffer_size failed: %s",
+				    device, pcap_strerror(status));
+		}
+		status = pcap_activate(pd);
+		if (status != 0) {
+			if (status == PCAP_ERROR)
+				error("%s", pcap_geterr(pd));
+			else
+				error("%s: %s", device, pcap_strerror(status));
+		}
+#else
 		*ebuf = '\0';
 		pd = pcap_open_live(device, snaplen, !pflag, 1000, ebuf);
 		if (pd == NULL)
 			error("%s", ebuf);
 		else if (*ebuf)
 			warning("%s", ebuf);
+#endif /* HAVE_PCAP_CREATE */
 		/*
 		 * Let user own process after socket has been opened.
 		 */
@@ -955,12 +1012,12 @@ main(int argc, char **argv)
 		if (setgid(getgid()) != 0 || setuid(getuid()) != 0)
 			fprintf(stderr, "Warning: setgid/setuid failed !\n");
 #endif /* WIN32 */
-#ifdef WIN32
-		if(UserBufferSize != 1000000)
-			if(pcap_setbuff(pd, UserBufferSize)==-1){
+#if !defined(HAVE_PCAP_CREATE) && defined(WIN32)
+		if(Bflag != 0)
+			if(pcap_setbuff(pd, Bflag)==-1){
 				error("%s", pcap_geterr(pd));
 			}
-#endif /* WIN32 */
+#endif /* !defined(HAVE_PCAP_CREATE) && defined(WIN32) */
 		if (Lflag)
 			show_dlts_and_exit(pd);
 		if (gndo->ndo_dlt >= 0) {
@@ -1599,13 +1656,15 @@ usage(void)
 #endif /* WIN32 */
 #endif /* HAVE_PCAP_LIB_VERSION */
 	(void)fprintf(stderr,
-"Usage: %s [-aAd" D_FLAG "efKlLnNOpqRStu" U_FLAG "vxX]" B_FLAG_USAGE " [-c count] [ -C file_size ]\n", program_name);
+"Usage: %s [-aAd" D_FLAG "ef" I_FLAG "KlLnNOpqRStu" U_FLAG "vxX]" B_FLAG_USAGE " [ -c count ]\n", program_name);
 	(void)fprintf(stderr,
-"\t\t[ -E algo:secret ] [ -F file ] [ -G seconds ] [ -i interface ]\n");
+"\t\t[ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]\n");
 	(void)fprintf(stderr,
-"\t\t[ -M secret ] [ -r file ] [ -s snaplen ] [ -T type ] [ -w file ]\n");
+"\t\t[ -i interface ] [ -M secret ] [ -r file ]\n");
 	(void)fprintf(stderr,
-"\t\t[ -W filecount ] [ -y datalinktype ] [ -z command ] [ -Z user ]\n");
+"\t\t[ -s snaplen ] [ -T type ] [ -w file ] [ -W filecount ]\n");
+	(void)fprintf(stderr,
+"\t\t[ -y datalinktype ] [ -z command ] [ -Z user ]\n");
 	(void)fprintf(stderr,
 "\t\t[ expression ]\n");
 	exit(1);
@@ -1648,4 +1707,3 @@ ndo_warning(netdissect_options *ndo _U_, const char *fmt, ...)
 			(void)fputc('\n', stderr);
 	}
 }
-

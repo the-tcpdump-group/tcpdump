@@ -21,7 +21,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.23.2.1 2008-02-06 10:49:22 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.23.2.2 2008-04-04 19:42:52 guy Exp $ (LBL)
  */
 
 #ifndef netdissect_h
@@ -102,6 +102,8 @@ struct netdissect_options {
   int ndo_Aflag;		/* print packet only in ascii observing TAB,
 				 * LF, CR and SPACE as graphical chars
 				 */
+  int ndo_Bflag;		/* buffer size */
+  int ndo_Iflag;		/* rfmon (monitor) mode */
   int ndo_Oflag;                /* run filter code optimizer */
   int ndo_dlt;                  /* if != -1, ask libpcap for the DLT it names*/
   int ndo_pflag;                /* don't go promiscuous */
