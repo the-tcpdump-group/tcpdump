@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.278 2008-04-04 20:24:49 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.279 2008-04-06 20:12:12 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -960,33 +960,33 @@ main(int argc, char **argv)
 		status = pcap_set_snaplen(pd, snaplen);
 		if (status != 0)
 			error("%s: pcap_set_snaplen failed: %s",
-			    device, pcap_strerror(status));
+			    device, pcap_errtostr(status));
 		status = pcap_set_promisc(pd, !pflag);
 		if (status != 0)
 			error("%s: pcap_set_promisc failed: %s",
-			    device, pcap_strerror(status));
+			    device, pcap_errtostr(status));
 		if (Iflag) {
 			status = pcap_set_rfmon(pd, 1);
 			if (status != 0)
 				error("%s: pcap_set_rfmon failed: %s",
-				    device, pcap_strerror(status));
+				    device, pcap_errtostr(status));
 		}
 		status = pcap_set_timeout(pd, 1000);
 		if (status != 0)
 			error("%s: pcap_set_timeout failed: %s",
-			    device, pcap_strerror(status));
+			    device, pcap_errtostr(status));
 		if (Bflag != 0) {
 			status = pcap_set_buffer_size(pd, Bflag);
 			if (status != 0)
 				error("%s: pcap_set_buffer_size failed: %s",
-				    device, pcap_strerror(status));
+				    device, pcap_errtostr(status));
 		}
 		status = pcap_activate(pd);
 		if (status != 0) {
 			if (status == PCAP_ERROR)
-				error("%s", pcap_geterr(pd));
+				error("%s: %s", device, pcap_geterr(pd));
 			else
-				error("%s: %s", device, pcap_strerror(status));
+				error("%s: %s", device, pcap_errtostr(status));
 		}
 #else
 		*ebuf = '\0';
