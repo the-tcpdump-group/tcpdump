@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.188 2008-01-07 00:16:06 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.189 2008-04-06 17:41:44 guy Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -29,7 +29,10 @@ tcpdump \- dump traffic on a network
 .na
 .B tcpdump
 [
-.B \-AdDefKlLnNOpqRStuUvxX
+.B \-AdDefIKlLnNOpqRStuUvxX
+] [
+.B \-B
+.I buffer_size
 ] [
 .B \-c
 .I count
@@ -259,6 +262,9 @@ Reading a saved packet file doesn't require special privileges.
 Print each packet (minus its link level header) in ASCII.  Handy for
 capturing web pages.
 .TP
+.B \-B
+Set the operating system capture buffer size to \fIbuffer_size\fP.
+.TP
 .B \-c
 Exit after receiving \fIcount\fP packets.
 .TP
@@ -398,6 +404,17 @@ flag is supported, an interface number as printed by that flag can be
 used as the
 .I interface
 argument.
+.TP
+.B \-I
+Put the interface in "monitor mode"; this is supported only on IEEE
+802.11 Wi-Fi interfaces, and supported only on some operating systems.
+.IP
+Note that in monitor mode the adapter might disassociate from the
+network with which it's associated, so that you will not be able to use
+any wireless networks with that adapter.  This could prevent accessing
+files on a network server, or resolving host names or network addresses,
+if you are capturing in monitor mode and are not connected to another
+network with another adapter.
 .TP
 .B \-K
 Don't attempt to verify TCP checksums.  This is useful for interfaces
@@ -1664,7 +1681,7 @@ is made to account for the time lag between when the
 Ethernet interface removed the packet from the wire and when the kernel
 serviced the `new packet' interrupt.
 .SH "SEE ALSO"
-stty(1), pcap(3), pcap-filter(4), bpf(4), nit(4P), pfconfig(8)
+stty(1), pcap(3PCAP), pcap-filter(4), bpf(4), nit(4P), pfconfig(8)
 .SH AUTHORS
 The original authors are:
 .LP
