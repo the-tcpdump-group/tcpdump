@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.271.2.8 2008-04-06 20:12:35 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.271.2.9 2008-04-09 20:01:26 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -983,8 +983,14 @@ main(int argc, char **argv)
 		}
 		status = pcap_activate(pd);
 		if (status != 0) {
+			cp = pcap_geterr(pd);
 			if (status == PCAP_ERROR)
-				error("%s: %s", device, pcap_geterr(pd));
+				error("%s", cp);
+			else if ((status == PCAP_ERROR_NO_SUCH_DEVICE ||
+			          status == PCAP_ERROR_PERM_DENIED) &&
+			         *cp != '\0')
+				error("%s: %s\n(%s)", device,
+				    pcap_errtostr(status), cp);
 			else
 				error("%s: %s", device, pcap_errtostr(status));
 		}
