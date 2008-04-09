@@ -30,7 +30,7 @@ static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.271.2.9 2008-04-09 20:01:26 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.271.2.10 2008-04-09 21:45:21 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -960,29 +960,32 @@ main(int argc, char **argv)
 		status = pcap_set_snaplen(pd, snaplen);
 		if (status != 0)
 			error("%s: pcap_set_snaplen failed: %s",
-			    device, pcap_errtostr(status));
+			    device, pcap_statustostr(status));
 		status = pcap_set_promisc(pd, !pflag);
 		if (status != 0)
 			error("%s: pcap_set_promisc failed: %s",
-			    device, pcap_errtostr(status));
+			    device, pcap_statustostr(status));
 		if (Iflag) {
 			status = pcap_set_rfmon(pd, 1);
 			if (status != 0)
 				error("%s: pcap_set_rfmon failed: %s",
-				    device, pcap_errtostr(status));
+				    device, pcap_statustostr(status));
 		}
 		status = pcap_set_timeout(pd, 1000);
 		if (status != 0)
 			error("%s: pcap_set_timeout failed: %s",
-			    device, pcap_errtostr(status));
+			    device, pcap_statustostr(status));
 		if (Bflag != 0) {
 			status = pcap_set_buffer_size(pd, Bflag);
 			if (status != 0)
 				error("%s: pcap_set_buffer_size failed: %s",
-				    device, pcap_errtostr(status));
+				    device, pcap_statustostr(status));
 		}
 		status = pcap_activate(pd);
-		if (status != 0) {
+		if (status < 0) {
+			/*
+			 * pcap_activate() failed.
+			 */
 			cp = pcap_geterr(pd);
 			if (status == PCAP_ERROR)
 				error("%s", cp);
@@ -990,9 +993,25 @@ main(int argc, char **argv)
 			          status == PCAP_ERROR_PERM_DENIED) &&
 			         *cp != '\0')
 				error("%s: %s\n(%s)", device,
-				    pcap_errtostr(status), cp);
+				    pcap_statustostr(status), cp);
 			else
-				error("%s: %s", device, pcap_errtostr(status));
+				error("%s: %s", device,
+				    pcap_statustostr(status));
+		} else if (status > 0) {
+			/*
+			 * pcap_activate() succeeded, but it's warning us
+			 * of a problem it had.
+			 */
+			cp = pcap_geterr(pd);
+			if (status == PCAP_WARNING)
+				warning("%s", cp);
+			else if (status == PCAP_WARNING_PROMISC_NOTSUP &&
+			         *cp != '\0')
+				warning("%s: %s\n(%s)", device,
+				    pcap_statustostr(status), cp);
+			else
+				warning("%s: %s", device,
+				    pcap_statustostr(status));
 		}
 #else
 		*ebuf = '\0';
