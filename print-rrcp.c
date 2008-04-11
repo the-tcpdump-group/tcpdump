@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rrcp.c,v 1.1.2.1 2008-02-06 10:49:22 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rrcp.c,v 1.1.2.2 2008-04-11 17:00:00 gianluca Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -46,29 +46,29 @@ static const char rcsid[] _U_ =
 
 struct rrcp_packet_t
 {
-  uint16_t rrcp_ethertype;		/* 0x8899 */
-  uint8_t  rrcp_proto;			/* must be 0x01         */
-  uint8_t  rrcp_opcode:7;               /* 0x00 = hello, 0x01 = get, 0x02 = set */
-  uint8_t  rrcp_isreply:1;              /* 0 = request to switch, 1 = reply from switch */
-  uint16_t rrcp_authkey;		/* 0x2379 by default */
-  uint16_t rrcp_reg_addr;		/* register address */
-  uint32_t rrcp_reg_data;		/* register data */
-  uint32_t cookie1;
-  uint32_t cookie2;
+  u_int16_t rrcp_ethertype;		/* 0x8899 */
+  u_int8_t  rrcp_proto;			/* must be 0x01         */
+  u_int8_t  rrcp_opcode:7;               /* 0x00 = hello, 0x01 = get, 0x02 = set */
+  u_int8_t  rrcp_isreply:1;              /* 0 = request to switch, 1 = reply from switch */
+  u_int16_t rrcp_authkey;		/* 0x2379 by default */
+  u_int16_t rrcp_reg_addr;		/* register address */
+  u_int32_t rrcp_reg_data;		/* register data */
+  u_int32_t cookie1;
+  u_int32_t cookie2;
 };
 
 struct rrcp_helloreply_packet_t
 {
-  uint16_t rrcp_ethertype;		/* 0x8899 */
-  uint8_t  rrcp_proto;			/* must be 0x01         */
-  uint8_t  rrcp_opcode:7;               /* 0x00 = hello, 0x01 = get, 0x02 = set */
-  uint8_t  rrcp_isreply:1;              /* 0 = request to switch, 1 = reply from switch */
-  uint16_t rrcp_authkey;		/* 0x2379 by default */
-  uint8_t  rrcp_downlink_port;		/*  */
-  uint8_t  rrcp_uplink_port;		/*  */
-  uint8_t  rrcp_uplink_mac[ETH_ALEN];   /*  */
-  uint16_t rrcp_chip_id;		/*  */
-  uint32_t rrcp_vendor_id;		/*  */
+  u_int16_t rrcp_ethertype;		/* 0x8899 */
+  u_int8_t  rrcp_proto;			/* must be 0x01         */
+  u_int8_t  rrcp_opcode:7;               /* 0x00 = hello, 0x01 = get, 0x02 = set */
+  u_int8_t  rrcp_isreply:1;              /* 0 = request to switch, 1 = reply from switch */
+  u_int16_t rrcp_authkey;		/* 0x2379 by default */
+  u_int8_t  rrcp_downlink_port;		/*  */
+  u_int8_t  rrcp_uplink_port;		/*  */
+  u_int8_t  rrcp_uplink_mac[ETH_ALEN];   /*  */
+  u_int16_t rrcp_chip_id;		/*  */
+  u_int32_t rrcp_vendor_id;		/*  */
 };
 
 
