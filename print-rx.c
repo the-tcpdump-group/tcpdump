@@ -34,7 +34,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.41 2008-07-01 07:40:39 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.42 2008-07-01 07:44:50 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -707,7 +707,7 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 			TCHECK2(bp[0], sizeof(u_int64_t)); \
 			i = EXTRACT_64BITS(bp); \
 			bp += sizeof(u_int64_t); \
-			printf(" " PRIu64, i); \
+			printf(" %" PRIu64, i); \
 		}
 
 #define DATEOUT() { time_t t; struct tm *tm; char str[256]; \
