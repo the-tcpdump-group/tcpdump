@@ -21,7 +21,7 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.26 2008-04-04 19:42:11 guy Exp $ (LBL)
+ * @(#) $Header: /tcpdump/master/tcpdump/netdissect.h,v 1.27 2008-08-16 11:36:20 hannes Exp $ (LBL)
  */
 
 #ifndef netdissect_h
@@ -122,7 +122,7 @@ struct netdissect_options {
   struct sa_list *ndo_sa_list_head;  /* used by print-esp.c */
   struct sa_list *ndo_sa_default;
 
-  char *ndo_tcpmd5secret;     	/* TCP-MD5 secret key */
+  char *ndo_sigsecret;     	/* Signature verification secret key */
 
   struct esp_algorithm *ndo_espsecret_xform;   /* cache of decoded  */
   char                 *ndo_espsecret_key;

@@ -25,7 +25,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.133 2007-12-22 03:08:04 guy Exp $ (LBL)";
+"@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.134 2008-08-16 11:36:20 hannes Exp $ (LBL)";
   #else
 __RCSID("$NetBSD: print-tcp.c,v 1.8 2007/07/24 11:53:48 drochner Exp $");
 #endif
@@ -58,10 +58,7 @@ __RCSID("$NetBSD: print-tcp.c,v 1.8 2007/07/24 11:53:48 drochner Exp $");
 
 #ifdef HAVE_LIBCRYPTO
 #include <openssl/md5.h>
-
-#define SIGNATURE_VALID		0
-#define SIGNATURE_INVALID	1
-#define CANT_CHECK_SIGNATURE	2
+#include <signature.h>
 
 static int tcp_verify_signature(const struct ip *ip, const struct tcphdr *tp,
                                 const u_char *data, int length, const u_char *rcvsig);
@@ -752,7 +749,7 @@ tcp_verify_signature(const struct ip *ip, const struct tcphdr *tp,
 
         tp1 = *tp;
 
-        if (tcpmd5secret == NULL)
+        if (sigsecret == NULL)
                 return (CANT_CHECK_SIGNATURE);
 
         MD5_Init(&ctx);
@@ -800,7 +797,7 @@ tcp_verify_signature(const struct ip *ip, const struct tcphdr *tp,
         /*
          * Step 4: Update MD5 hash with shared secret.
          */
-        MD5_Update(&ctx, tcpmd5secret, strlen(tcpmd5secret));
+        MD5_Update(&ctx, sigsecret, strlen(sigsecret));
         MD5_Final(sig, &ctx);
 
         if (memcmp(rcvsig, sig, TCP_SIGLEN) == 0)

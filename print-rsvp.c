@@ -17,7 +17,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.49 2008-03-03 12:57:04 hannes Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.50 2008-08-16 11:36:20 hannes Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -36,6 +36,7 @@ static const char rcsid[] _U_ =
 #include "ethertype.h"
 #include "gmpls.h"
 #include "af.h"
+#include "signature.h"
 
 /*
  * RFC 2205 common header
@@ -627,7 +628,8 @@ rsvp_intserv_print(const u_char *tptr, u_short obj_tlen) {
 }
 
 static int
-rsvp_obj_print (const u_char *tptr, const char *ident, u_int tlen) {
+rsvp_obj_print (const u_char *pptr, u_int plen, const u_char *tptr,
+                const char *ident, u_int tlen) {
 
     const struct rsvp_object_header *rsvp_obj_header;
     const u_char *obj_tptr;
@@ -637,7 +639,7 @@ rsvp_obj_print (const u_char *tptr, const char *ident, u_int tlen) {
     } obj_ptr;
 
     u_short rsvp_obj_len,rsvp_obj_ctype,obj_tlen,intserv_serv_tlen;
-    int hexdump,processed,padbytes,error_code,error_value,i;
+    int hexdump,processed,padbytes,error_code,error_value,i,sigcheck;
     union {
 	float f;
 	u_int32_t i;
@@ -1636,12 +1638,21 @@ rsvp_obj_print (const u_char *tptr, const char *ident, u_int tlen) {
                        bittok2str(rsvp_obj_integrity_flag_values,
                                   "none",
                                   obj_ptr.rsvp_obj_integrity->flags));
-                printf("%s  MD5-sum 0x%08x%08x%08x%08x (unverified)",
+                printf("%s  MD5-sum 0x%08x%08x%08x%08x ",
                        ident,
                        EXTRACT_32BITS(obj_ptr.rsvp_obj_integrity->digest),
                        EXTRACT_32BITS(obj_ptr.rsvp_obj_integrity->digest+4),
                        EXTRACT_32BITS(obj_ptr.rsvp_obj_integrity->digest+8),
                        EXTRACT_32BITS(obj_ptr.rsvp_obj_integrity->digest+12));
+
+#ifdef HAVE_LIBCRYPTO
+                sigcheck = signature_verify(pptr, plen, (unsigned char *)obj_ptr.\
+                                             rsvp_obj_integrity->digest);
+#else
+                sigcheck = CANT_CHECK_SIGNATURE;
+#endif
+                printf(" (%s)", tok2str(signature_check_values, "Unknown", sigcheck));
+
                 obj_tlen+=sizeof(struct rsvp_obj_integrity_t);
                 obj_tptr+=sizeof(struct rsvp_obj_integrity_t);
                 break;
@@ -1767,13 +1778,13 @@ trunc:
 void
 rsvp_print(register const u_char *pptr, register u_int len) {
 
-    const struct rsvp_common_header *rsvp_com_header;
+    struct rsvp_common_header *rsvp_com_header;
     const u_char *tptr,*subtptr;
-    u_short tlen,subtlen;
+    u_short plen, tlen, subtlen;
 
     tptr=pptr;
 
-    rsvp_com_header = (const struct rsvp_common_header *)pptr;
+    rsvp_com_header = (struct rsvp_common_header *)pptr;
     TCHECK(*rsvp_com_header);
 
     /*
@@ -1796,7 +1807,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
 
     /* ok they seem to want to know everything - lets fully decode it */
 
-    tlen=EXTRACT_16BITS(rsvp_com_header->length);
+    plen = tlen = EXTRACT_16BITS(rsvp_com_header->length);
 
     printf("\n\tRSVPv%u %s Message (%u), Flags: [%s], length: %u, ttl: %u, checksum: 0x%04x",
            RSVP_EXTRACT_VERSION(rsvp_com_header->version_flags),
@@ -1806,6 +1817,12 @@ rsvp_print(register const u_char *pptr, register u_int len) {
            tlen,
            rsvp_com_header->ttl,
            EXTRACT_16BITS(rsvp_com_header->checksum));
+
+    /*
+     * Clear checksum prior to signature verification.
+     */
+    rsvp_com_header->checksum[0] = 0;
+    rsvp_com_header->checksum[1] = 0;
 
     if (tlen < sizeof(const struct rsvp_common_header)) {
         printf("ERROR: common header too short %u < %lu", tlen,
@@ -1821,7 +1838,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
     case RSVP_MSGTYPE_AGGREGATE:
         while(tlen > 0) {
             subtptr=tptr;
-            rsvp_com_header = (const struct rsvp_common_header *)subtptr;
+            rsvp_com_header = (struct rsvp_common_header *)subtptr;
             TCHECK(*rsvp_com_header);
 
             /*
@@ -1842,6 +1859,12 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                    subtlen,
                    rsvp_com_header->ttl,
                    EXTRACT_16BITS(rsvp_com_header->checksum));
+
+            /*
+             * Clear checksum prior to signature verification.
+             */
+            rsvp_com_header->checksum[0] = 0;
+            rsvp_com_header->checksum[1] = 0;
             
             if (subtlen < sizeof(const struct rsvp_common_header)) {
                 printf("ERROR: common header too short %u < %lu", subtlen,
@@ -1858,7 +1881,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
             subtptr+=sizeof(const struct rsvp_common_header);
             subtlen-=sizeof(const struct rsvp_common_header);
 
-            if (rsvp_obj_print(subtptr,"\n\t    ", subtlen) == -1)
+            if (rsvp_obj_print(pptr, plen, subtptr,"\n\t    ", subtlen) == -1)
                 return;
 
             tptr+=subtlen+sizeof(const struct rsvp_common_header);
@@ -1878,7 +1901,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
     case RSVP_MSGTYPE_HELLO:
     case RSVP_MSGTYPE_ACK:
     case RSVP_MSGTYPE_SREFRESH:
-        if (rsvp_obj_print(tptr,"\n\t  ", tlen) == -1)
+        if (rsvp_obj_print(pptr, plen, tptr,"\n\t  ", tlen) == -1)
             return;
         break;
 
