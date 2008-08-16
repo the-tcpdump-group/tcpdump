@@ -215,6 +215,7 @@ olsr_print (const u_char *pptr, u_int length)
     } ptr;
 
     u_int msg_type, msg_len, msg_tlen, hello_len, prefix;
+    u_int16_t name_entries, name_entry_type, name_entry_len;
     u_int8_t link_type, neighbor_type;
     const u_char *tptr, *msg_data;
 
@@ -369,13 +370,43 @@ olsr_print (const u_char *pptr, u_int length)
             }
             break;
 
+        case OLSR_NAMESERVICE_MSG:
+            name_entries = EXTRACT_16BITS(msg_data+2);
+            printf("\n\t  Version %u, Entries %u",
+                   EXTRACT_16BITS(msg_data), name_entries);
+            msg_data += 4;
+            msg_tlen -= 4;
+
+            while (name_entries && msg_tlen) {
+
+                name_entry_type = EXTRACT_16BITS(msg_data);
+                name_entry_len = EXTRACT_16BITS(msg_data+2);
+                msg_data += 4;
+                msg_tlen -= 4;
+
+                printf("\n\t    #%u Name Entry, length %u",
+                       name_entry_type,
+                       name_entry_len);
+
+                printf(", originator %s", ipaddr_string(msg_data));
+
+                /* 32-bit alignement */
+                if (name_entry_len%4 != 0)
+                    name_entry_len+=4-(name_entry_len%4);
+
+
+                msg_data += name_entry_len;
+                msg_tlen -= name_entry_len;
+
+                name_entries--;
+            }
+            break;
+
             /*
              * FIXME those are the defined messages that lack a decoder
              * you are welcome to contribute code ;-)
              */
-
         case OLSR_POWERINFO_MSG:
-        case OLSR_NAMESERVICE_MSG:
         default:
 	    print_unknown_data(msg_data, "\n\t    ", msg_tlen);
             break;
