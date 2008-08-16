@@ -26,7 +26,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.164 2008-08-16 12:07:17 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-isoclns.c,v 1.165 2008-08-16 13:38:15 hannes Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -2200,13 +2200,12 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    break;
 
         case ISIS_TLV_MT_IS_REACH:
+            mt_len = isis_print_mtid(tptr, "\n\t      ");
+            if (mt_len == 0) /* did something go wrong ? */
+                goto trunctlv;
+            tptr+=mt_len;
+            tmp-=mt_len;
             while (tmp >= 2+NODE_ID_LEN+3+1) {
-                mt_len = isis_print_mtid(tptr, "\n\t      ");
-                if (mt_len == 0) /* did something go wrong ? */
-                    goto trunctlv;
-                tptr+=mt_len;
-                tmp-=mt_len;
-
                 ext_is_len = isis_print_ext_is_reach(tptr,"\n\t      ",tlv_type);
                 if (ext_is_len == 0) /* did something go wrong ? */
                     goto trunctlv;
