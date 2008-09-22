@@ -17,7 +17,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/signature.c,v 1.1 2008-08-16 11:36:20 hannes Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/signature.c,v 1.2 2008-09-22 20:22:10 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -83,10 +83,10 @@ signature_compute_hmac_md5(const u_int8_t *text, int text_len, unsigned char *ke
      */
 
     /* start out by storing key in pads */
-    bzero(k_ipad, sizeof k_ipad);
-    bzero(k_opad, sizeof k_opad);
-    bcopy(key, k_ipad, key_len);
-    bcopy(key, k_opad, key_len);
+    memset(k_ipad, 0, sizeof k_ipad);
+    memset(k_opad, 0, sizeof k_opad);
+    memcpy(k_ipad, key, key_len);
+    memcpy(k_opad, key, key_len);
 
     /* XOR key with ipad and opad values */
     for (i=0; i<64; i++) {
@@ -127,8 +127,8 @@ signature_verify (const u_char *pptr, u_int plen, u_char *sig_ptr)
     /*
      * Save the signature before clearing it.
      */
-    bcopy(sig_ptr, rcvsig, sizeof(rcvsig));
-    bzero(sig_ptr, sizeof(rcvsig));
+    memcpy(rcvsig, sig_ptr, sizeof(rcvsig));
+    memset(sig_ptr, 0, sizeof(rcvsig));
 
     if (!sigsecret) {
         return (CANT_CHECK_SIGNATURE);
