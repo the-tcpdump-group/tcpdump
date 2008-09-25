@@ -19,7 +19,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-bt.c,v 1.1 2007-09-24 23:46:27 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-bt.c,v 1.1.2.1 2008-09-25 21:50:04 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -35,7 +35,7 @@ static const char rcsid[] _U_ =
 #include "interface.h"
 #include "addrtoname.h"
 
-#ifdef DLT_BLUETOOTH_HCI_H4_WITH_PHDR
+#if defined(DLT_BLUETOOTH_HCI_H4_WITH_PHDR) && defined(HAVE_PCAP_BLUETOOTH_H)
 #include <pcap/bluetooth.h>
 
 #define	BT_HDRLEN sizeof(pcap_bluetooth_h4_header)

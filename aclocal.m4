@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.113.2.2 2008-02-26 20:48:10 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.113.2.3 2008-09-25 21:50:04 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
@@ -259,7 +259,7 @@ AC_DEFUN(AC_LBL_LIBPCAP,
 		    AC_MSG_ERROR(see the INSTALL doc for more info)
 	    fi
 	    dnl
-	    dnl Good old Red Hat Linux puts "pcap.h" in
+	    dnl Some versions of Red Hat Linux put "pcap.h" in
 	    dnl "/usr/include/pcap"; had the LBL folks done so,
 	    dnl that would have been a good idea, but for
 	    dnl the Red Hat folks to do so just breaks source
@@ -272,6 +272,10 @@ AC_DEFUN(AC_LBL_LIBPCAP,
 	    dnl find it in either of those directories, we check to
 	    dnl see if it's in a "pcap" subdirectory of them and,
 	    dnl if so, add that subdirectory to the "-I" list.
+	    dnl
+	    dnl (We now also put pcap.h in /usr/include/pcap, but we
+	    dnl leave behind a /usr/include/pcap.h that includes it,
+	    dnl so you can still just include <pcap.h>.)
 	    dnl
 	    AC_MSG_CHECKING(for extraneous pcap header directories)
 	    if test \( ! -r /usr/local/include/pcap.h \) -a \
