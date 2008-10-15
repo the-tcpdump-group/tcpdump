@@ -1,19 +1,4 @@
-$Header: /tcpdump/master/tcpdump/CHANGES,v 1.87.2.18 2008-10-15 23:24:05 ken Exp $
-
-Mon.	October 27, 2008.  ken@netfunctional.ca.  Summary for 4.0.0 tcpdump release
-	Add support for Bluetooth Sniffing
-	Add support for Realtek Remote Control Protocol (openrrcp.org.ru)
-	Add support for 802.11 AVS
-	Add support for SMB over TCP
-	Add support for 4 byte BGP AS printing
-	Add support for compiling on case-insensitive file systems
-	Add support for ikev2 printing
-	Update support for decoding AFS
-	Update DHCPv6 printer
-	Use newer libpcap API's (allows -B option on all platforms)
-	Add -I to turn on monitor mode
-	Bugfixes in lldp, lspping, dccp, ESP, NFS printers
-	Cleanup unused files and various cruft
+$Header: /tcpdump/master/tcpdump/CHANGES,v 1.87.2.19 2008-10-15 23:26:02 ken Exp $
 
 Mon.	September 10, 2007.  ken@xelerance.com.  Summary for 0.9.8 tcpdump release
 	Rework ARP printer
