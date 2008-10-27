@@ -1,4 +1,4 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.202 2008-09-25 21:45:50 guy Exp $ (LBL)
+dnl @(#) $Header: /tcpdump/master/tcpdump/configure.in,v 1.203 2008-10-27 21:12:49 guy Exp $ (LBL)
 dnl
 dnl Copyright (c) 1994, 1995, 1996, 1997
 dnl	The Regents of the University of California.  All rights reserved.
@@ -6,7 +6,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
-AC_REVISION($Revision: 1.202 $)
+AC_REVISION($Revision: 1.203 $)
 AC_PREREQ(2.50)
 AC_INIT(tcpdump.c)
 
@@ -779,6 +779,12 @@ V_GROUP=0
 if test -f /etc/group -a ! -z "`grep '^wheel:' /etc/group`" ; then
 	V_GROUP=wheel
 fi
+#
+# Assume V7/BSD convention for man pages (file formats in section 5,
+# miscellaneous info in section 7).
+#
+MAN_FILE_FORMATS=5
+MAN_MISC_INFO=7
 case "$host_os" in
 
 aix*)
@@ -786,16 +792,42 @@ aix*)
 	AC_DEFINE(_SUN)
 	;;
 
+hpux*)
+	#
+	# Use System V conventions for man pages.
+	#
+	MAN_FILE_FORMATS=4
+	MAN_MISC_INFO=5
+	;;
+
 irix*)
 	V_GROUP=sys
+
+	#
+	# Use System V conventions for man pages.
+	#
+	MAN_FILE_FORMATS=4
+	MAN_MISC_INFO=5
 	;;
 
 osf*)
 	V_GROUP=system
+
+	#
+	# Use System V conventions for man pages.
+	#
+	MAN_FILE_FORMATS=4
+	MAN_MISC_INFO=5
 	;;
 
 solaris*)
 	V_GROUP=sys
+
+	#
+	# Use System V conventions for man pages.
+	#
+	MAN_FILE_FORMATS=4
+	MAN_MISC_INFO=5
 	;;
 esac
 
@@ -1024,6 +1056,8 @@ AC_SUBST(V_GROUP)
 AC_SUBST(V_INCLS)
 AC_SUBST(V_PCAPDEP)
 AC_SUBST(LOCALSRC)
+AC_SUBST(MAN_FILE_FORMATS)
+AC_SUBST(MAN_MISC_INFO)
 
 AC_PROG_INSTALL
 
@@ -1034,5 +1068,5 @@ AC_OUTPUT_COMMANDS([if test -f .devel; then
 	cat Makefile-devel-adds >> Makefile
 	make depend
 fi])
-AC_OUTPUT(Makefile)
+AC_OUTPUT(Makefile tcpdump.1)
 exit 0

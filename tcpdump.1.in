@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/Attic/tcpdump.1,v 1.192 2008-08-16 11:36:20 hannes Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/tcpdump.1.in,v 1.1 2008-10-27 21:12:49 guy Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -514,6 +514,9 @@ Write the raw packets to \fIfile\fR rather than parsing and printing
 them out.
 They can later be printed with the \-r option.
 Standard output is used if \fIfile\fR is ``-''.
+See
+.BR pcap-savefile (@MAN_FILE_FORMATS@)
+for a description of the file format.
 .TP
 .B \-W
 Used in conjunction with the 
@@ -607,7 +610,7 @@ Otherwise,
 only packets for which \fIexpression\fP is `true' will be dumped.
 .LP
 For the \fIexpression\fP syntax, see
-.BR pcap-filter (4).
+.BR pcap-filter (@MAN_MISC_INFO@).
 .LP
 Expression arguments can be passed to \fItcpdump\fP as either a single
 argument or as multiple arguments, whichever is more convenient.
@@ -1611,7 +1614,8 @@ is made to account for the time lag between when the
 Ethernet interface removed the packet from the wire and when the kernel
 serviced the `new packet' interrupt.
 .SH "SEE ALSO"
-stty(1), pcap(3PCAP), pcap-filter(4), bpf(4), nit(4P)
+stty(1), pcap(3PCAP), bpf(4), nit(4P), pcap-savefile(@MAN_FILE_FORMATS@),
+pcap-filter(@MAN_MISC_INFO@)
 .SH AUTHORS
 The original authors are:
 .LP

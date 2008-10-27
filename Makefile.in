@@ -17,7 +17,7 @@
 #  WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 #  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.323 2008-08-16 11:36:20 hannes Exp $ (LBL)
+# @(#) $Header: /tcpdump/master/tcpdump/Makefile.in,v 1.324 2008-10-27 21:12:48 guy Exp $ (LBL)
 
 #
 # Various configurable paths (remember to edit Makefile.in, not Makefile)
@@ -258,7 +258,7 @@ EXTRA_DIST = \
 	smbutil.c \
 	stime.awk \
 	strcasecmp.c \
-	tcpdump.1 \
+	tcpdump.1.in \
 	vfprintf.c \
 	win32/Include/Arpa/tftp.h \
 	win32/Include/errno.h \
@@ -344,7 +344,7 @@ clean:
 
 distclean:
 	rm -f $(CLEANFILES) Makefile config.cache config.log config.status \
-	    config.h gnuc.h os-proto.h stamp-h stamp-h.in
+	    config.h gnuc.h os-proto.h stamp-h stamp-h.in $(PROG).1
 
 check:
 	(cd tests && ./TESTrun.sh)
