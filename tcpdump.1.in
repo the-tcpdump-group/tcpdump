@@ -1,4 +1,4 @@
-.\" @(#) $Header: /tcpdump/master/tcpdump/tcpdump.1.in,v 1.1 2008-10-27 21:12:49 guy Exp $ (LBL)
+.\" @(#) $Header: /tcpdump/master/tcpdump/tcpdump.1.in,v 1.2 2008-11-09 23:35:03 mcr Exp $ (LBL)
 .\"
 .\"	$NetBSD: tcpdump.8,v 1.9 2003/03/31 00:18:17 perry Exp $
 .\"
@@ -369,8 +369,7 @@ can be used several times to load several MIB modules into \fItcpdump\fP.
 .TP
 .B \-M
 Use \fIsecret\fP as a shared secret for validating the digests found in
-Routing Protocols (RSVP) and TCP segments with the TCP-MD5 option
-(RFC 2385), if present.
+TCP segments with the TCP-MD5 option (RFC 2385), if present.
 .TP
 .B \-n
 Don't convert addresses (i.e., host addresses, port numbers, etc.) to names.
