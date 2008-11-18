@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-enc.c,v 1.5 2008-02-06 10:30:59 guy Exp $ (LBL)";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-enc.c,v 1.6 2008-11-18 07:35:32 guy Exp $ (LBL)";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -77,9 +77,11 @@ enc_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 	case AF_INET:
 		ip_print(gndo, p, length);
 		break;
+#ifdef INET6
 	case AF_INET6:
 		ip6_print(p, length);
 		break;
+#endif /*INET6*/
 	}
 
 out:
