@@ -1,4 +1,8 @@
-$Header: /tcpdump/master/tcpdump/CHANGES,v 1.98.2.2 2008-10-15 23:26:30 ken Exp $
+$Header: /tcpdump/master/tcpdump/CHANGES,v 1.98.2.3 2008-12-02 18:39:51 ken Exp $
+
+Mon.    December 8, 2008.  ken@netfunctional.ca.  Summary for 4.0.1 tcpdump release
+	Fix compiling with/out smi (--with{,out}-smi)
+	Fix compiling without IPv6 support (--disable-ipv6)
 
 Mon.    October 27, 2008.  ken@netfunctional.ca.  Summary for 4.0.0 tcpdump release
         Add support for Bluetooth Sniffing
