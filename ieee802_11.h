@@ -72,12 +72,15 @@
 /* RESERVED 			0xF  */
 
 
-#define	CTRL_PS_POLL	0xA
-#define	CTRL_RTS	0xB
-#define	CTRL_CTS	0xC
-#define	CTRL_ACK	0xD
-#define	CTRL_CF_END	0xE
-#define	CTRL_END_ACK	0xF
+#define CTRL_CONTROL_WRAPPER	0x7
+#define CTRL_BLOCK_ACK_REQ	0x8
+#define CTRL_BLOCK_ACK		0x9
+#define	CTRL_PS_POLL		0xA
+#define	CTRL_RTS		0xB
+#define	CTRL_CTS		0xC
+#define	CTRL_ACK		0xD
+#define	CTRL_CF_END		0xE
+#define	CTRL_END_ACK		0xF
 
 #define	DATA_DATA			0x0
 #define	DATA_DATA_CF_ACK		0x1
@@ -311,6 +314,28 @@ struct ctrl_end_ack_t {
 
 #define	CTRL_END_ACK_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
 				 IEEE802_11_RA_LEN+IEEE802_11_BSSID_LEN)
+
+struct ctrl_block_ack_req_t {
+	u_int16_t	fc;
+	u_int16_t	duration;
+	u_int8_t	ra[6];
+	u_int8_t	ta[6];
+	u_int16_t	bar_control;
+};
+
+#define	CTRL_BLOCK_ACK_REQ_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
+					 IEEE802_11_RA_LEN+IEEE802_11_TA_LEN)
+
+struct ctrl_block_ack_t {
+	u_int16_t	fc;
+	u_int16_t	duration;
+	u_int8_t	ra[6];
+	u_int8_t	ta[6];
+	u_int16_t	ba_control;
+};
+
+#define	CTRL_BLOCK_ACK_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
+				 IEEE802_11_RA_LEN+IEEE802_11_TA_LEN)
 
 #define	IV_IV(iv)	((iv) & 0xFFFFFF)
 #define	IV_PAD(iv)	(((iv) >> 24) & 0x3F)

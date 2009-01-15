@@ -616,6 +616,26 @@ static int
 ctrl_body_print(u_int16_t fc, const u_char *p)
 {
 	switch (FC_SUBTYPE(fc)) {
+	case CTRL_CONTROL_WRAPPER:
+		printf("Control Wrapper");
+		/* XXX - requires special handling */
+		break;
+	case CTRL_BLOCK_ACK_REQ:
+		printf("Block Ack Request");
+		if (!TTEST2(*p, CTRL_BLOCK_ACK_REQ_HDRLEN))
+			return 0;
+		if (!eflag)
+			printf(" RA:%s ",
+			    etheraddr_string(((const struct ctrl_block_ack_req_t *)p)->ra));
+		break;
+	case CTRL_BLOCK_ACK:
+		printf("Block Ack");
+		if (!TTEST2(*p, CTRL_BLOCK_ACK_HDRLEN))
+			return 0;
+		if (!eflag)
+			printf(" RA:%s ",
+			    etheraddr_string(((const struct ctrl_block_ack_t *)p)->ra));
+		break;
 	case CTRL_PS_POLL:
 		printf("Power Save-Poll");
 		if (!TTEST2(*p, CTRL_PS_POLL_HDRLEN))
@@ -911,16 +931,31 @@ ieee_802_11_hdr_print(u_int16_t fc, const u_char *p, const u_int8_t **srcp,
 #endif
 
 static u_int
-ieee802_11_print(const u_char *p, u_int length, u_int caplen, int pad)
+ieee802_11_print(const u_char *p, u_int length, u_int orig_caplen, int pad,
+    int fcslen)
 {
 	u_int16_t fc;
-	u_int hdrlen;
+	u_int caplen, hdrlen;
 	const u_int8_t *src, *dst;
 	u_short extracted_ethertype;
 
-	if (caplen < IEEE802_11_FC_LEN) {
+	caplen = orig_caplen;
+	/* Remove FCS, if present */
+	if (length < fcslen) {
 		printf("[|802.11]");
 		return caplen;
+	}
+	length -= fcslen;
+	if (caplen > length) {
+		/* Amount of FCS in actual packet data, if any */
+		fcslen = caplen - length;
+		caplen -= fcslen;
+		snapend -= fcslen;
+	}
+
+	if (caplen < IEEE802_11_FC_LEN) {
+		printf("[|802.11]");
+		return orig_caplen;
 	}
 
 	fc = EXTRACT_LE_16BITS(p);
@@ -999,11 +1034,11 @@ ieee802_11_print(const u_char *p, u_int length, u_int caplen, int pad)
 u_int
 ieee802_11_if_print(const struct pcap_pkthdr *h, const u_char *p)
 {
-	return ieee802_11_print(p, h->len, h->caplen, 0);
+	return ieee802_11_print(p, h->len, h->caplen, 0, 0);
 }
 
 static int
-print_radiotap_field(struct cpack_state *s, u_int32_t bit, int *pad)
+print_radiotap_field(struct cpack_state *s, u_int32_t bit, u_int8_t *flags)
 {
 	union {
 		int8_t		i8;
@@ -1018,8 +1053,7 @@ print_radiotap_field(struct cpack_state *s, u_int32_t bit, int *pad)
 	switch (bit) {
 	case IEEE80211_RADIOTAP_FLAGS:
 		rc = cpack_uint8(s, &u.u8);
-		if (u.u8 & IEEE80211_RADIOTAP_F_DATAPAD)
-			*pad = 1;
+		*flags = u.u8;
 		break;
 	case IEEE80211_RADIOTAP_RATE:
 	case IEEE80211_RADIOTAP_DB_ANTSIGNAL:
@@ -1143,7 +1177,8 @@ ieee802_11_radio_print(const u_char *p, u_int length, u_int caplen)
 	int bit0;
 	const u_char *iter;
 	u_int len;
-	int pad;
+	u_int8_t flags;
+	int pad, fcslen;
 
 	if (caplen < sizeof(*hdr)) {
 		printf("[|802.11]");
@@ -1177,8 +1212,12 @@ ieee802_11_radio_print(const u_char *p, u_int length, u_int caplen)
 		return caplen;
 	}
 
+	/* Assume no flags */
+	flags = 0;
 	/* Assume no Atheros padding between 802.11 header and body */
 	pad = 0;
+	/* Assume no FCS at end of frame */
+	fcslen = 0;
 	for (bit0 = 0, presentp = &hdr->it_present; presentp <= last_presentp;
 	     presentp++, bit0 += 32) {
 		for (present = EXTRACT_LE_32BITS(presentp); present;
@@ -1190,12 +1229,18 @@ ieee802_11_radio_print(const u_char *p, u_int length, u_int caplen)
 			bit = (enum ieee80211_radiotap_type)
 			    (bit0 + BITNO_32(present ^ next_present));
 
-			if (print_radiotap_field(&cpacker, bit, &pad) != 0)
+			if (print_radiotap_field(&cpacker, bit, &flags) != 0)
 				goto out;
 		}
 	}
+
+	if (flags & IEEE80211_RADIOTAP_F_DATAPAD)
+		pad = 1;	/* Atheros padding */
+	if (flags & IEEE80211_RADIOTAP_F_FCS)
+		fcslen = 4;	/* FCS at end of packet */
 out:
-	return len + ieee802_11_print(p + len, length - len, caplen - len, pad);
+	return len + ieee802_11_print(p + len, length - len, caplen - len, pad,
+	    fcslen);
 #undef BITNO_32
 #undef BITNO_16
 #undef BITNO_8
@@ -1231,7 +1276,7 @@ ieee802_11_avs_radio_print(const u_char *p, u_int length, u_int caplen)
 	}
 
 	return caphdr_len + ieee802_11_print(p + caphdr_len,
-	    length - caphdr_len, caplen - caphdr_len, 0);
+	    length - caphdr_len, caplen - caphdr_len, 0, 0);
 }
 
 #define PRISM_HDR_LEN		144
@@ -1276,7 +1321,7 @@ prism_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	}
 
 	return PRISM_HDR_LEN + ieee802_11_print(p + PRISM_HDR_LEN,
-	    length - PRISM_HDR_LEN, caplen - PRISM_HDR_LEN, 0);
+	    length - PRISM_HDR_LEN, caplen - PRISM_HDR_LEN, 0, 0);
 }
 
 /*
