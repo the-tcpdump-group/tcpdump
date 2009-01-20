@@ -363,6 +363,7 @@ extern void bpf_dump(const struct bpf_program *, int);
 #ifndef NETDISSECT_REWORKED
 extern netdissect_options *gndo;
 
+#define bflag gndo->ndo_bflag 
 #define eflag gndo->ndo_eflag 
 #define fflag gndo->ndo_fflag 
 #define Kflag gndo->ndo_Kflag 

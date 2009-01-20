@@ -545,6 +545,9 @@ main(int argc, char **argv)
 		case 'A':
 			++Aflag;
 			break;
+		case 'b':
+			++bflag;
+			break;
 
 #if defined(HAVE_PCAP_CREATE) || defined(WIN32)
 		case 'B':

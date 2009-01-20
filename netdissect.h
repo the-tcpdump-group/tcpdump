@@ -84,6 +84,7 @@ typedef struct netdissect_options netdissect_options;
 
 struct netdissect_options {
   int ndo_aflag;		/* translate network and broadcast addresses */
+  int ndo_bflag;		/* print 4 byte ASes in ASDOT notation */
   int ndo_eflag;		/* print ethernet header */
   int ndo_fflag;		/* don't translate "foreign" IP address */
   int ndo_Kflag;		/* don't check TCP checksums */
