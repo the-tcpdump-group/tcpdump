@@ -346,7 +346,8 @@ static struct tok bgp_pmsi_flag_values[] = {
 #define SAFNUM_MULTICAST_VPN            5
 #define SAFNUM_TUNNEL                   64 /* XXX */
 #define SAFNUM_VPLS                     65 /* XXX */
-#define SAFNUM_MDT                      66 /* XXX */
+/* draft-nalawade-idr-mdt-safi-03 */
+#define SAFNUM_MDT                      66
 /* Section 4.3.4 of draft-rosen-rfc2547bis-03.txt  */
 #define SAFNUM_VPNUNICAST               128
 #define SAFNUM_VPNMULTICAST             129
@@ -742,6 +743,55 @@ decode_labeled_vpn_prefix4(const u_char *pptr, char *buf, u_int buflen)
 
 trunc:
 	return -2;
+}
+
+/*
+ * +-------------------------------+
+ * |                               |
+ * |  RD:IPv4-address (12 octets)  |
+ * |                               |
+ * +-------------------------------+
+ * |  MDT Group-address (4 octets) |
+ * +-------------------------------+
+ */
+
+#define MDT_VPN_NLRI_LEN 16
+
+static int
+decode_mdt_vpn_nlri(const u_char *pptr, char *buf, u_int buflen)
+{
+
+    const u_char *rd;
+    const u_char *vpn_ip;
+    
+    TCHECK(pptr[0]);
+
+    /* if the NLRI is not predefined length, quit.*/
+    if (*pptr != MDT_VPN_NLRI_LEN * NBBY)
+	return -1;
+    pptr++;
+
+    /* RD */
+    TCHECK2(pptr[0], 8);
+    rd = pptr;
+    pptr+=8;
+
+    /* IPv4 address */
+    TCHECK2(pptr[0], sizeof(struct in_addr));
+    vpn_ip = pptr;
+    pptr+=sizeof(struct in_addr);
+
+    /* MDT Group Address */
+    TCHECK2(pptr[0], sizeof(struct in_addr));
+
+    snprintf(buf, buflen, "RD: %s, VPN IP Address: %s, MC Group Address: %s",
+	     bgp_vpn_rd_print(rd), ipaddr_string(vpn_ip), ipaddr_string(pptr));
+       
+    return MDT_VPN_NLRI_LEN + 1;
+
+ trunc:
+
+return -2;
 }
 
 #define BGP_MULTICAST_VPN_ROUTE_TYPE_INTRA_AS_I_PMSI   1
@@ -1349,6 +1399,7 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                 case (AFNUM_INET<<8 | SAFNUM_VPNMULTICAST):
                 case (AFNUM_INET<<8 | SAFNUM_VPNUNIMULTICAST):
                 case (AFNUM_INET<<8 | SAFNUM_MULTICAST_VPN):
+		case (AFNUM_INET<<8 | SAFNUM_MDT): 
 #ifdef INET6
                 case (AFNUM_INET6<<8 | SAFNUM_UNICAST):
                 case (AFNUM_INET6<<8 | SAFNUM_MULTICAST):
@@ -1395,7 +1446,8 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                         case (AFNUM_INET<<8 | SAFNUM_LABUNICAST):
                         case (AFNUM_INET<<8 | SAFNUM_RT_ROUTING_INFO):
                         case (AFNUM_INET<<8 | SAFNUM_MULTICAST_VPN):
-                            if (tlen < (int)sizeof(struct in_addr)) {
+                        case (AFNUM_INET<<8 | SAFNUM_MDT):  
+			    if (tlen < (int)sizeof(struct in_addr)) {
                                 printf("invalid len");
                                 tlen = 0;
                             } else {
@@ -1579,6 +1631,16 @@ bgp_attr_print(const struct bgp_attr *attr, const u_char *pptr, int len)
                         else
                             printf("\n\t      %s", buf);
                         break;
+
+		    case (AFNUM_INET<<8 | SAFNUM_MDT):
+		      advance = decode_mdt_vpn_nlri(tptr, buf, sizeof(buf));
+		      if (advance == -1)
+                            printf("\n\t    (illegal prefix length)");
+                        else if (advance == -2)
+                            goto trunc;
+                        else
+                            printf("\n\t      %s", buf);
+		       break;
 #ifdef INET6
                     case (AFNUM_INET6<<8 | SAFNUM_UNICAST):
                     case (AFNUM_INET6<<8 | SAFNUM_MULTICAST):
