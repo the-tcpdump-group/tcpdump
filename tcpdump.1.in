@@ -344,6 +344,16 @@ any wireless networks with that adapter.  This could prevent accessing
 files on a network server, or resolving host names or network addresses,
 if you are capturing in monitor mode and are not connected to another
 network with another adapter.
+.IP
+This flag will affect the output of the
+.B \-L
+flag.  If
+.B \-I
+isn't specified, only those link-layer types available when not in
+monitor mode will be shown; if
+.B \-I
+is specified, only those link-layer types available when in monitor mode
+will be shown.
 .TP
 .B \-K
 Don't attempt to verify TCP checksums.  This is useful for interfaces
@@ -360,7 +370,15 @@ E.g.,
 ``tcpdump\ \ \-l \ \ > dat\ \ &\ \ tail\ \ \-f\ \ dat''.
 .TP
 .B \-L
-List the known data link types for the interface and exit.
+List the known data link types for the interface, in the specified mode,
+and exit.  The list of known data link types may be dependent on the
+specified mode; for example, on some platforms, a Wi-Fi interface might
+support one set of data link types when not in monitor mode (for
+example, it might support only fake Ethernet headers, or might support
+802.11 headers but not support 802.11 headers with radio information)
+and another set of data link types when in monitor mode (for example, it
+might support 802.11 headers, or 802.11 headers with radio information,
+only in monitor mode).
 .TP
 .B \-m
 Load SMI MIB module definitions from file \fImodule\fR.
