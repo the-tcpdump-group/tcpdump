@@ -1,12 +1,6 @@
-version.c
 Makefile
-Makefile-devel.in
-config.status
-config.log
-config.cache
-config.h
-.devel
-stamp-h
-stamp-h.in
+*~
+*.o
+config.*
 tcpdump
-autom4te.cache
+version.c
