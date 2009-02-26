@@ -328,7 +328,7 @@ bittok2str_internal(register const struct tok *lp, register const char *fmt,
         register int rotbit; /* this is the bit we rotate through all bitpositions */
         register int tokval;
 
-	while (lp->s != NULL && lp != NULL) {
+	while (lp != NULL && lp->s != NULL) {
             tokval=lp->v;   /* load our first value */
             rotbit=1;
             while (rotbit != 0) {
