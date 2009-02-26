@@ -747,10 +747,17 @@ tcp_verify_signature(const struct ip *ip, const struct tcphdr *tp,
         u_int8_t nxt;
 #endif
 
+	if (data + length > snapend) {
+		printf("snaplen too short, ");
+		return (CANT_CHECK_SIGNATURE);
+	}
+
         tp1 = *tp;
 
-        if (sigsecret == NULL)
+        if (sigsecret == NULL) {
+		printf("shared secret not supplied with -M, ");
                 return (CANT_CHECK_SIGNATURE);
+        }
 
         MD5_Init(&ctx);
         /*
@@ -778,8 +785,14 @@ tcp_verify_signature(const struct ip *ip, const struct tcphdr *tp,
                 nxt = IPPROTO_TCP;
                 MD5_Update(&ctx, (char *)&nxt, sizeof(nxt));
 #endif
-        } else
+        } else {
+#ifdef INET6
+		printf("IP version not 4 or 6, ");
+#else
+		printf("IP version not 4, ");
+#endif
                 return (CANT_CHECK_SIGNATURE);
+        }
 
         /*
          * Step 2: Update MD5 hash with TCP header, excluding options.
