@@ -56,6 +56,7 @@ const struct tok ethertype_values[] = {
     { ETHERTYPE_DN,             "DN" },
     { ETHERTYPE_LAT,            "LAT" },
     { ETHERTYPE_SCA,            "SCA" },
+    { ETHERTYPE_TEB,            "TEB" },
     { ETHERTYPE_LANBRIDGE,      "Lanbridge" },
     { ETHERTYPE_DECDNS,         "DEC DNS" },
     { ETHERTYPE_DECDTS,         "DEC DTS" },
