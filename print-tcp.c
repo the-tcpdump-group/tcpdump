@@ -452,7 +452,7 @@ tcp_print(register const u_char *bp, register u_int length,
 #endif
 
         length -= hlen;
-        if (vflag > 1 || flags & (TH_SYN | TH_FIN | TH_RST)) {
+        if (vflag > 1 || length > 0 || flags & (TH_SYN | TH_FIN | TH_RST)) {
                 (void)printf(", seq %u", seq);
 
                 if (length > 0) {
