@@ -748,10 +748,10 @@ main(int argc, char **argv)
 
 			snaplen = strtol(optarg, &end, 0);
 			if (optarg == end || *end != '\0'
-			    || snaplen < 0 || snaplen > 65535)
+			    || snaplen < 0 || snaplen > MAXIMUM_SNAPLEN)
 				error("invalid snaplen %s", optarg);
 			else if (snaplen == 0)
-				snaplen = 65535;
+				snaplen = MAXIMUM_SNAPLEN;
 			break;
 		}
 

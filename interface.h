@@ -82,16 +82,6 @@ extern char *strsep(char **, const char *);
 #define max(a,b) ((b)>(a)?(b):(a))
 #endif
 
-/*
- * The default snapshot length.  This value allows most printers to print
- * useful information while keeping the amount of unwanted data down.
- */
-#ifndef INET6
-#define DEFAULT_SNAPLEN 68	/* ether + IPv4 + TCP + 14 */
-#else
-#define DEFAULT_SNAPLEN 96	/* ether + IPv6 + TCP + 22 */
-#endif
-
 #ifndef BIG_ENDIAN
 #define BIG_ENDIAN 4321
 #define LITTLE_ENDIAN 1234

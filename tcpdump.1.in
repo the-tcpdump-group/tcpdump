@@ -22,7 +22,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "07 January 2008"
+.TH TCPDUMP 1  "05 March 2009"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -432,10 +432,7 @@ Print absolute, rather than relative, TCP sequence numbers.
 .TP
 .B \-s
 Snarf \fIsnaplen\fP bytes of data from each packet rather than the
-default of 68 (with SunOS's NIT, the minimum is actually 96).
-68 bytes is adequate for IP, ICMP, TCP
-and UDP but may truncate protocol information from name server and NFS
-packets (see below).
+default of 65535 bytes.
 Packets truncated because of a limited snapshot
 are indicated in the output with ``[|\fIproto\fP]'', where \fIproto\fP
 is the name of the protocol level at which the truncation has occurred.
@@ -447,7 +444,9 @@ lost.
 You should limit \fIsnaplen\fP to the smallest number that will
 capture the protocol information you're interested in.
 Setting
-\fIsnaplen\fP to 0 means use the required length to catch whole packets.
+\fIsnaplen\fP to 0 sets it to the default of 65535,
+for backwards compatibility with recent older versions of
+.IR tcpdump .
 .TP
 .B \-T
 Force packets selected by "\fIexpression\fP" to be interpreted the
@@ -1251,14 +1250,6 @@ RA, \fInot\fP set) and `|' (truncated message, TC, set).
 If the
 `question' section doesn't contain exactly one entry, `[\fIn\fPq]'
 is printed.
-.LP
-Note that name server requests and responses tend to be large and the
-default \fIsnaplen\fP of 68 bytes may not capture enough of the packet
-to print.
-Use the \fB\-s\fP flag to increase the snaplen if you
-need to seriously investigate name server traffic.
-`\fB\-s 128\fP'
-has worked well for me.
 
 .HD
 SMB/CIFS decoding

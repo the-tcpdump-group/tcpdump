@@ -171,17 +171,21 @@ struct netdissect_options {
 #define max(a,b) ((b)>(a)?(b):(a))
 #endif
 
-#ifndef INET6
 /*
- * The default snapshot length.  This value allows most printers to print
- * useful information while keeping the amount of unwanted data down.
- * In particular, it allows for an ethernet header, tcp/ip header, and
- * 14 bytes of data (assuming no ip options).
+ * Maximum snapshot length.  This should be enough to capture the full
+ * packet on most network interfaces.
+ *
+ * XXX - could it be larger?  If so, should it?  Some applications might
+ * use the snapshot length in a savefile header to control the size of
+ * the buffer they allocate, so a size of, say, 2^31-1 might not work
+ * well.
  */
-#define DEFAULT_SNAPLEN 68
-#else
-#define DEFAULT_SNAPLEN 96
-#endif
+#define MAXIMUM_SNAPLEN	65535
+
+/*
+ * The default snapshot length is the maximum.
+ */
+#define DEFAULT_SNAPLEN	MAXIMUM_SNAPLEN
 
 #ifndef BIG_ENDIAN
 #define BIG_ENDIAN 4321
