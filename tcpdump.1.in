@@ -356,9 +356,9 @@ is specified, only those link-layer types available when in monitor mode
 will be shown.
 .TP
 .B \-K
-Don't attempt to verify TCP checksums.  This is useful for interfaces
-that perform the TCP checksum calculation in hardware; otherwise,
-all outgoing TCP checksums will be flagged as bad.
+Don't attempt to verify IP, TCP, or UDP checksums.  This is useful for
+interfaces that perform some or all of those checksum calculation in
+hardware; otherwise, all outgoing TCP checksums will be flagged as bad.
 .TP
 .B \-l
 Make stdout line buffered.

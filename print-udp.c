@@ -568,7 +568,7 @@ udp_print(register const u_char *bp, u_int length,
 	}
 	udpipaddr_print(ip, sport, dport);
 
-	if (IP_V(ip) == 4 && (vflag > 1) && !fragmented) {
+	if (IP_V(ip) == 4 && vflag && !Kflag && !fragmented) {
 		int sum = up->uh_sum;
 		if (sum == 0) {
 			(void)printf("[no cksum] ");
@@ -581,7 +581,7 @@ udp_print(register const u_char *bp, u_int length,
 		}
 	}
 #ifdef INET6
-	if (IP_V(ip) == 6 && ip6->ip6_plen && vflag && !fragmented) {
+	if (IP_V(ip) == 6 && ip6->ip6_plen && vflag && !Kflag && !fragmented) {
 		int sum = up->uh_sum;
 		/* for IPv6, UDP checksum is mandatory */
 		if (TTEST2(cp[0], length)) {
