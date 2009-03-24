@@ -1262,6 +1262,16 @@ AC_MSG_RESULT($ac_cv___attribute__)
 AC_DEFUN(AC_LBL_SSLEAY,
     [
 	#
+	# Find the last component of $libdir; it's not necessarily
+	# "lib" - it might be "lib64" on, for example, x86-64
+	# Linux systems.
+	#
+	# We assume the directory in which we're looking for
+	# libcrypto has a subdirectory with that as its name.
+	#
+	tmplib=`echo "$libdir" | sed 's,.*/,,'`
+
+	#
 	# XXX - is there a better way to check if a given library is
 	# in a given directory than checking each of the possible
 	# shared library suffixes?
@@ -1271,10 +1281,10 @@ AC_DEFUN(AC_LBL_SSLEAY,
 	#
 	# Or should we just look for "libcrypto.*"?
 	#
-	if test -d "$1/lib" -a \( -f "$1/lib/libcrypto.a" -o \
-		          	    -f "$1/lib/libcrypto.so" -o \
-		          	    -f "$1/lib/libcrypto.sl" -o \
-			  	    -f "$1/lib/libcrypto.dylib" \); then
+	if test -d "$1/$tmplib" -a \( -f "$1/$tmplib/libcrypto.a" -o \
+		          	    -f "$1/$tmplib/libcrypto.so" -o \
+		          	    -f "$1/$tmplib/libcrypto.sl" -o \
+			  	    -f "$1/$tmplib/libcrypto.dylib" \); then
 		ac_cv_ssleay_path="$1"
 	fi
 
