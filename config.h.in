@@ -208,6 +208,9 @@
 /* Define to 1 if you have the `pcap_lib_version' function. */
 #undef HAVE_PCAP_LIB_VERSION
 
+/* Define to 1 if you have the <pcap/usb.h> header file. */
+#undef HAVE_PCAP_USB_H
+
 /* Define to 1 if you have the `pfopen' function. */
 #undef HAVE_PFOPEN
 

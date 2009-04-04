@@ -322,6 +322,7 @@ extern void bfd_print(const u_char *, u_int, u_int);
 extern void sip_print(const u_char *, u_int);
 extern void syslog_print(const u_char *, u_int);
 extern u_int bt_if_print(const struct pcap_pkthdr *, const u_char *);
+extern u_int usb_linux_print(const struct pcap_pkthdr *, const u_char *);
 
 #ifdef INET6
 extern void ip6_print(const u_char *, u_int);

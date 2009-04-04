@@ -849,6 +849,7 @@ fi
 savedcppflags="$CPPFLAGS"
 CPPFLAGS="$CPPFLAGS $V_INCLS"
 AC_CHECK_HEADERS(pcap/bluetooth.h)
+AC_CHECK_HEADERS(pcap/usb.h)
 CPPFLAGS="$savedcppflags"
 
 AC_CHECK_HEADERS(sys/bitypes.h)

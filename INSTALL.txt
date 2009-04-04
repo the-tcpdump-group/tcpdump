@@ -221,6 +221,7 @@ print-tftp.c	- Trivial File Transfer Protocol printer routines
 print-timed.c	- BSD time daemon protocol printer routines
 print-token.c	- Token Ring printer routines
 print-udp.c	- UDP printer routines
+print-usb.c	- USB printer routines
 print-vjc.c	- PPP Van Jacobson compression (RFC1144) printer routines
 print-vrrp.c	- Virtual Router Redundancy Protocol
 print-wb.c	- White Board printer routines

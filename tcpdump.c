@@ -276,6 +276,12 @@ static struct printer printers[] = {
 #if defined(DLT_BLUETOOTH_HCI_H4_WITH_PHDR) && defined(HAVE_PCAP_BLUETOOTH_H)
 	{ bt_if_print, DLT_BLUETOOTH_HCI_H4_WITH_PHDR},
 #endif
+#if defined(HAVE_PCAP_USB_H) && defined(DLT_USB_LINUX)
+	{ usb_linux_print, DLT_USB_LINUX},
+#endif
+#if defined(HAVE_PCAP_USB_H) && defined(DLT_USB_LINUX_MMAPPED)
+	{ usb_linux_print, DLT_USB_LINUX_MMAPPED},
+#endif
 	{ NULL,			0 },
 };
 
@@ -1131,10 +1137,10 @@ main(int argc, char **argv)
 		if (printinfo.printer == NULL) {
 			gndo->ndo_dltname = pcap_datalink_val_to_name(type);
 			if (gndo->ndo_dltname != NULL)
-				error("unsupported data link type %s",
+				error("packet printing is not supported for link type %s: use -w",
 				      gndo->ndo_dltname);
 			else
-				error("unsupported data link type %d", type);
+				error("packet printing is not supported for link type %d: use -w", type);
 		}
 		callback = print_packet;
 		pcap_userdata = (u_char *)&printinfo;

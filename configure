@@ -11664,6 +11664,146 @@ fi
 
 done
 
+
+for ac_header in pcap/usb.h
+do
+as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
+if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then
+  { echo "$as_me:$LINENO: checking for $ac_header" >&5
+echo $ECHO_N "checking for $ac_header... $ECHO_C" >&6; }
+if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+fi
+ac_res=`eval echo '${'$as_ac_Header'}'`
+	       { echo "$as_me:$LINENO: result: $ac_res" >&5
+echo "${ECHO_T}$ac_res" >&6; }
+else
+  # Is the header compilable?
+{ echo "$as_me:$LINENO: checking $ac_header usability" >&5
+echo $ECHO_N "checking $ac_header usability... $ECHO_C" >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_includes_default
+#include <$ac_header>
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ac_header_compiler=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_header_compiler=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+{ echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
+echo "${ECHO_T}$ac_header_compiler" >&6; }
+
+# Is the header present?
+{ echo "$as_me:$LINENO: checking $ac_header presence" >&5
+echo $ECHO_N "checking $ac_header presence... $ECHO_C" >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <$ac_header>
+_ACEOF
+if { (ac_try="$ac_cpp conftest.$ac_ext"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null && {
+	 test -z "$ac_c_preproc_warn_flag$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       }; then
+  ac_header_preproc=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+  ac_header_preproc=no
+fi
+
+rm -f conftest.err conftest.$ac_ext
+{ echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
+echo "${ECHO_T}$ac_header_preproc" >&6; }
+
+# So?  What about this header?
+case $ac_header_compiler:$ac_header_preproc:$ac_c_preproc_warn_flag in
+  yes:no: )
+    { echo "$as_me:$LINENO: WARNING: $ac_header: accepted by the compiler, rejected by the preprocessor!" >&5
+echo "$as_me: WARNING: $ac_header: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header: proceeding with the compiler's result" >&5
+echo "$as_me: WARNING: $ac_header: proceeding with the compiler's result" >&2;}
+    ac_header_preproc=yes
+    ;;
+  no:yes:* )
+    { echo "$as_me:$LINENO: WARNING: $ac_header: present but cannot be compiled" >&5
+echo "$as_me: WARNING: $ac_header: present but cannot be compiled" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header:     check for missing prerequisite headers?" >&5
+echo "$as_me: WARNING: $ac_header:     check for missing prerequisite headers?" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header: see the Autoconf documentation" >&5
+echo "$as_me: WARNING: $ac_header: see the Autoconf documentation" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header:     section \"Present But Cannot Be Compiled\"" >&5
+echo "$as_me: WARNING: $ac_header:     section \"Present But Cannot Be Compiled\"" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header: proceeding with the preprocessor's result" >&5
+echo "$as_me: WARNING: $ac_header: proceeding with the preprocessor's result" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header: in the future, the compiler will take precedence" >&5
+echo "$as_me: WARNING: $ac_header: in the future, the compiler will take precedence" >&2;}
+
+    ;;
+esac
+{ echo "$as_me:$LINENO: checking for $ac_header" >&5
+echo $ECHO_N "checking for $ac_header... $ECHO_C" >&6; }
+if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  eval "$as_ac_Header=\$ac_header_preproc"
+fi
+ac_res=`eval echo '${'$as_ac_Header'}'`
+	       { echo "$as_me:$LINENO: result: $ac_res" >&5
+echo "${ECHO_T}$ac_res" >&6; }
+
+fi
+if test `eval echo '${'$as_ac_Header'}'` = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define `echo "HAVE_$ac_header" | $as_tr_cpp` 1
+_ACEOF
+
+fi
+
+done
+
 CPPFLAGS="$savedcppflags"
 
 
@@ -13349,6 +13489,16 @@ echo $ECHO_N "checking where SSLeay is located... $ECHO_C" >&6; }
 		for dir in $dirs; do
 
 	#
+	# Find the last component of $libdir; it's not necessarily
+	# "lib" - it might be "lib64" on, for example, x86-64
+	# Linux systems.
+	#
+	# We assume the directory in which we're looking for
+	# libcrypto has a subdirectory with that as its name.
+	#
+	tmplib=`echo "$libdir" | sed 's,.*/,,'`
+
+	#
 	# XXX - is there a better way to check if a given library is
 	# in a given directory than checking each of the possible
 	# shared library suffixes?
@@ -13358,10 +13508,10 @@ echo $ECHO_N "checking where SSLeay is located... $ECHO_C" >&6; }
 	#
 	# Or should we just look for "libcrypto.*"?
 	#
-	if test -d "$dir/lib" -a \( -f "$dir/lib/libcrypto.a" -o \
-		          	    -f "$dir/lib/libcrypto.so" -o \
-		          	    -f "$dir/lib/libcrypto.sl" -o \
-			  	    -f "$dir/lib/libcrypto.dylib" \); then
+	if test -d "$dir/$tmplib" -a \( -f "$dir/$tmplib/libcrypto.a" -o \
+		          	    -f "$dir/$tmplib/libcrypto.so" -o \
+		          	    -f "$dir/$tmplib/libcrypto.sl" -o \
+			  	    -f "$dir/$tmplib/libcrypto.dylib" \); then
 		ac_cv_ssleay_path="$dir"
 	fi
 
@@ -13389,6 +13539,16 @@ echo "${ECHO_T}$ac_cv_ssleay_path" >&6; }
 echo $ECHO_N "checking for SSLeay in $crypto_dir... $ECHO_C" >&6; }
 
 	#
+	# Find the last component of $libdir; it's not necessarily
+	# "lib" - it might be "lib64" on, for example, x86-64
+	# Linux systems.
+	#
+	# We assume the directory in which we're looking for
+	# libcrypto has a subdirectory with that as its name.
+	#
+	tmplib=`echo "$libdir" | sed 's,.*/,,'`
+
+	#
 	# XXX - is there a better way to check if a given library is
 	# in a given directory than checking each of the possible
 	# shared library suffixes?
@@ -13398,10 +13558,10 @@ echo $ECHO_N "checking for SSLeay in $crypto_dir... $ECHO_C" >&6; }
 	#
 	# Or should we just look for "libcrypto.*"?
 	#
-	if test -d "$crypto_dir/lib" -a \( -f "$crypto_dir/lib/libcrypto.a" -o \
-		          	    -f "$crypto_dir/lib/libcrypto.so" -o \
-		          	    -f "$crypto_dir/lib/libcrypto.sl" -o \
-			  	    -f "$crypto_dir/lib/libcrypto.dylib" \); then
+	if test -d "$crypto_dir/$tmplib" -a \( -f "$crypto_dir/$tmplib/libcrypto.a" -o \
+		          	    -f "$crypto_dir/$tmplib/libcrypto.so" -o \
+		          	    -f "$crypto_dir/$tmplib/libcrypto.sl" -o \
+			  	    -f "$crypto_dir/$tmplib/libcrypto.dylib" \); then
 		ac_cv_ssleay_path="$crypto_dir"
 	fi
 
