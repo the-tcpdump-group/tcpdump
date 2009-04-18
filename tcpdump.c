@@ -1082,6 +1082,7 @@ main(int argc, char **argv)
 
 	if (pcap_compile(pd, &fcode, cmdbuf, Oflag, netmask) < 0)
 		error("%s", pcap_geterr(pd));
+	free(cmdbuf);
 	if (dflag) {
 		bpf_dump(&fcode, dflag);
 		pcap_close(pd);
