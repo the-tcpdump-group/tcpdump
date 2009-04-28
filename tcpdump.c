@@ -655,11 +655,17 @@ main(int argc, char **argv)
 				if (pcap_findalldevs(&devpointer, ebuf) < 0)
 					error("%s", ebuf);
 				else {
-					for (i = 0; i < devnum-1; i++){
-						devpointer = devpointer->next;
-						if (devpointer == NULL)
-							error("Invalid adapter index");
-					}
+					/*
+					 * Look for the devnum-th entry
+					 * in the list of devices
+					 * (1-based).
+					 */
+					for (i = 0;
+					    i < devnum-1 && devpointer != NULL;
+					    i++, devpointer = devpointer->next)
+						;
+					if (devpointer == NULL)
+						error("Invalid adapter index");
 				}
 				device = devpointer->name;
 				break;
