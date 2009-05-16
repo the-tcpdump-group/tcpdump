@@ -286,6 +286,7 @@ olsr_print (const u_char *pptr, u_int length)
             msg_tlen -= sizeof(struct olsr_hello);
 
             while (msg_tlen >= sizeof(struct olsr_hello_link)) {
+                int hello_len_valid = 0;
 
                 /*
                  * link-type.
@@ -299,10 +300,18 @@ olsr_print (const u_char *pptr, u_int length)
                 link_type = OLSR_EXTRACT_LINK_TYPE(ptr.hello_link->link_code);
                 neighbor_type = OLSR_EXTRACT_NEIGHBOR_TYPE(ptr.hello_link->link_code);
 
-                printf("\n\t    link-type %s, neighbor-type %s, len %u",
+                if ((hello_len <= msg_tlen)
+                        && (hello_len >= sizeof(struct olsr_hello_link)))
+                    hello_len_valid = 1;
+
+                printf("\n\t    link-type %s, neighbor-type %s, len %u%s",
                        tok2str(olsr_link_type_values, "Unknown", link_type),
                        tok2str(olsr_neighbor_type_values, "Unknown", neighbor_type),
-                       hello_len);
+                       hello_len,
+                       (hello_len_valid == 0) ? " (invalid)" : "");
+
+                if (hello_len_valid == 0)
+                    break;
 
                 msg_data += sizeof(struct olsr_hello_link);
                 msg_tlen -= sizeof(struct olsr_hello_link);
