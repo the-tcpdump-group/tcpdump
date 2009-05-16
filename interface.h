@@ -336,6 +336,7 @@ extern void ripng_print(const u_char *, unsigned int);
 extern int rt6_print(const u_char *, const u_char *);
 extern void ospf6_print(const u_char *, u_int);
 extern void dhcp6_print(const u_char *, u_int);
+extern int mask62plen(const u_char *);
 #endif /*INET6*/
 extern u_short in_cksum(const u_short *, register u_int, int);
 extern u_int16_t in_cksum_shouldbe(u_int16_t, u_int16_t);
