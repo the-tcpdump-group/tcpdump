@@ -520,10 +520,10 @@ olsr_print (const u_char *pptr, u_int length, int is_ipv6)
 
         case OLSR_NAMESERVICE_MSG:
         {
-            u_int16_t name_entries = EXTRACT_16BITS(msg_data+2);
-            u_int16_t addr_size = 4;
+            u_int name_entries = EXTRACT_16BITS(msg_data+2);
+            u_int addr_size = 4;
             int name_entries_valid = 0;
-            u_int16_t i;
+            u_int i;
 
             if (is_ipv6)
                 addr_size = 16;
