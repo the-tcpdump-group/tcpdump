@@ -79,11 +79,21 @@ static int get_direction(int transfer_type, int event_type)
 	return direction;
 }
 
-
+/*
+ * This is the top level routine of the printer.  'p' points
+ * to the ether header of the packet, 'h->ts' is the timestamp,
+ * 'h->len' is the length of the packet off the wire, and 'h->caplen'
+ * is the number of bytes actually captured.
+ */
 u_int usb_linux_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
 	const pcap_usb_header *uh;
 	int direction;
+
+	if (h->caplen < sizeof(pcap_usb_header)) {
+		printf("[|usb]");
+		return(sizeof(pcap_usb_header));
+	}
 
 	uh = (const pcap_usb_header *) p;
 	switch(uh->transfer_type)
