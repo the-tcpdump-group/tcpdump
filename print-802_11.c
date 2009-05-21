@@ -932,7 +932,7 @@ ieee_802_11_hdr_print(u_int16_t fc, const u_char *p, const u_int8_t **srcp,
 
 static u_int
 ieee802_11_print(const u_char *p, u_int length, u_int orig_caplen, int pad,
-    int fcslen)
+    u_int fcslen)
 {
 	u_int16_t fc;
 	u_int caplen, hdrlen;
@@ -1178,7 +1178,8 @@ ieee802_11_radio_print(const u_char *p, u_int length, u_int caplen)
 	const u_char *iter;
 	u_int len;
 	u_int8_t flags;
-	int pad, fcslen;
+	int pad;
+	u_int fcslen;
 
 	if (caplen < sizeof(*hdr)) {
 		printf("[|802.11]");
