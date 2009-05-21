@@ -28,7 +28,7 @@
 
 #include "interface.h"
 #include "addrtoname.h"
-#include "extract.h"		
+#include "extract.h"
 #include "ip.h"
 
 /*
@@ -219,7 +219,7 @@ olsr_print (const u_char *pptr, u_int length)
     u_int8_t link_type, neighbor_type;
     const u_char *tptr, *msg_data;
 
-    tptr = pptr; 
+    tptr = pptr;
 
     if (length < sizeof(struct olsr_common)) {
         goto trunc;
@@ -247,7 +247,7 @@ olsr_print (const u_char *pptr, u_int length)
 
     while (tptr < (pptr+length)) {
 
-        if (!TTEST2(*tptr, sizeof(struct olsr_msg)))	
+        if (!TTEST2(*tptr, sizeof(struct olsr_msg)))
             goto trunc;
 
         ptr.msg = (struct olsr_msg *)tptr;
@@ -276,7 +276,7 @@ olsr_print (const u_char *pptr, u_int length)
         switch (msg_type) {
         case OLSR_HELLO_MSG:
         case OLSR_HELLO_LQ_MSG:
-            if (!TTEST2(*msg_data, sizeof(struct olsr_hello)))	
+            if (!TTEST2(*msg_data, sizeof(struct olsr_hello)))
                 goto trunc;
 
             ptr.hello = (struct olsr_hello *)msg_data;
@@ -291,7 +291,7 @@ olsr_print (const u_char *pptr, u_int length)
                 /*
                  * link-type.
                  */
-                if (!TTEST2(*msg_data, sizeof(struct olsr_hello_link)))	
+                if (!TTEST2(*msg_data, sizeof(struct olsr_hello_link)))
                     goto trunc;
 
                 ptr.hello_link = (struct olsr_hello_link *)msg_data;
@@ -330,7 +330,7 @@ olsr_print (const u_char *pptr, u_int length)
 
         case OLSR_TC_MSG:
         case OLSR_TC_LQ_MSG:
-            if (!TTEST2(*msg_data, sizeof(struct olsr_tc)))	
+            if (!TTEST2(*msg_data, sizeof(struct olsr_tc)))
                 goto trunc;
 
             ptr.tc = (struct olsr_tc *)msg_data;
@@ -347,7 +347,7 @@ olsr_print (const u_char *pptr, u_int length)
             break;
 
         case OLSR_MID_MSG:
-            if (!TTEST2(*msg_data, sizeof(struct in_addr)))	
+            if (!TTEST2(*msg_data, sizeof(struct in_addr)))
                 goto trunc;
 
             while (msg_tlen >= sizeof(struct in_addr)) {
@@ -361,7 +361,7 @@ olsr_print (const u_char *pptr, u_int length)
             prefix = 1;
             printf("\n\t  advertised networks\n\t    ");
             while (msg_tlen >= sizeof(struct olsr_hna)) {
-                if (!TTEST2(*msg_data, sizeof(struct olsr_hna)))	
+                if (!TTEST2(*msg_data, sizeof(struct olsr_hna)))
                     goto trunc;
 
                 ptr.hna = (struct olsr_hna *)msg_data;
@@ -370,7 +370,7 @@ olsr_print (const u_char *pptr, u_int length)
 
                 printf("%s/%u%s",
                        ipaddr_string(ptr.hna->network),
-                       mask2plen(EXTRACT_32BITS(ptr.hna->mask)),                       
+                       mask2plen(EXTRACT_32BITS(ptr.hna->mask)),
                        prefix % 4 == 0 ? "\n\t    " : " ");
 
                 msg_data += sizeof(struct olsr_hna);
@@ -419,7 +419,7 @@ olsr_print (const u_char *pptr, u_int length)
         default:
 	    print_unknown_data(msg_data, "\n\t    ", msg_tlen);
             break;
-        }	
+        }
         tptr += msg_len;
     }
 
