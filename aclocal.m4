@@ -254,43 +254,60 @@ AC_DEFUN(AC_LBL_LIBPCAP,
     done
     if test $libpcap = FAIL ; then
 	    AC_MSG_RESULT(not found)
-	    AC_CHECK_LIB(pcap, main, libpcap="-lpcap")
-	    if test $libpcap = FAIL ; then
-		    AC_MSG_ERROR(see the INSTALL doc for more info)
-	    fi
-	    dnl
-	    dnl Some versions of Red Hat Linux put "pcap.h" in
-	    dnl "/usr/include/pcap"; had the LBL folks done so,
-	    dnl that would have been a good idea, but for
-	    dnl the Red Hat folks to do so just breaks source
-	    dnl compatibility with other systems.
-	    dnl
-	    dnl We work around this by assuming that, as we didn't
-	    dnl find a local libpcap, libpcap is in /usr/lib or
-	    dnl /usr/local/lib and that the corresponding header
-	    dnl file is under one of those directories; if we don't
-	    dnl find it in either of those directories, we check to
-	    dnl see if it's in a "pcap" subdirectory of them and,
-	    dnl if so, add that subdirectory to the "-I" list.
-	    dnl
-	    dnl (We now also put pcap.h in /usr/include/pcap, but we
-	    dnl leave behind a /usr/include/pcap.h that includes it,
-	    dnl so you can still just include <pcap.h>.)
-	    dnl
-	    AC_MSG_CHECKING(for extraneous pcap header directories)
-	    if test \( ! -r /usr/local/include/pcap.h \) -a \
-			\( ! -r /usr/include/pcap.h \); then
-		if test -r /usr/local/include/pcap/pcap.h; then
-		    d="/usr/local/include/pcap"
-		elif test -r /usr/include/pcap/pcap.h; then
-		    d="/usr/include/pcap"
-		fi
-	    fi
-	    if test -z "$d" ; then
-		AC_MSG_RESULT(not found)
+
+	    #
+	    # Look for pcap-config.
+	    #
+	    AC_PATH_PROG(PCAP_CONFIG, pcap-config)
+	    if test -n "$PCAP_CONFIG" ; then
+		#
+		# Found - use it to get the include flags for
+		# libpcap and the flags to link with libpcap.
+		#
+		$2="`\"$PCAP_CONFIG\" --cflags` $$2"
+		libpcap="`\"$PCAP_CONFIG\" --libs`"
 	    else
-		$2="-I$d $$2"
-		AC_MSG_RESULT(found -- -I$d added)
+		#
+		# Not found; look for pcap.
+		#
+		AC_CHECK_LIB(pcap, main, libpcap="-lpcap")
+		if test $libpcap = FAIL ; then
+		    AC_MSG_ERROR(see the INSTALL doc for more info)
+		fi
+		dnl
+		dnl Some versions of Red Hat Linux put "pcap.h" in
+		dnl "/usr/include/pcap"; had the LBL folks done so,
+		dnl that would have been a good idea, but for
+		dnl the Red Hat folks to do so just breaks source
+		dnl compatibility with other systems.
+		dnl
+		dnl We work around this by assuming that, as we didn't
+		dnl find a local libpcap, libpcap is in /usr/lib or
+		dnl /usr/local/lib and that the corresponding header
+		dnl file is under one of those directories; if we don't
+		dnl find it in either of those directories, we check to
+		dnl see if it's in a "pcap" subdirectory of them and,
+		dnl if so, add that subdirectory to the "-I" list.
+		dnl
+		dnl (We now also put pcap.h in /usr/include/pcap, but we
+		dnl leave behind a /usr/include/pcap.h that includes it,
+		dnl so you can still just include <pcap.h>.)
+		dnl
+		AC_MSG_CHECKING(for extraneous pcap header directories)
+		if test \( ! -r /usr/local/include/pcap.h \) -a \
+			\( ! -r /usr/include/pcap.h \); then
+		    if test -r /usr/local/include/pcap/pcap.h; then
+			d="/usr/local/include/pcap"
+		    elif test -r /usr/include/pcap/pcap.h; then
+			d="/usr/include/pcap"
+		    fi
+		fi
+		if test -z "$d" ; then
+		    AC_MSG_RESULT(not found)
+		else
+		    $2="-I$d $$2"
+		    AC_MSG_RESULT(found -- -I$d added)
+		fi
 	    fi
     else
 	    $1=$libpcap
@@ -304,6 +321,16 @@ AC_DEFUN(AC_LBL_LIBPCAP,
                     AC_MSG_ERROR(cannot find pcap.h, see INSTALL)
  	    fi
 	    AC_MSG_RESULT($libpcap)
+	    AC_PATH_PROG(PCAP_CONFIG, pcap-config,, $d)
+	    if test "$PCAP_CONFIG"; then
+		#
+		# The libpcap directory has a pcap-config script.
+		# Use it to get any additioal libraries needed
+		# to link with the libpcap archive library in
+		# that directory
+		#
+		libpcap="$libpcap `\"$PCAP_CONFIG\" --additional-libs --static`"
+	    fi
     fi
     LIBS="$libpcap $LIBS"
     case "$host_os" in
