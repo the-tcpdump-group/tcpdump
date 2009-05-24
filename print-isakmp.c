@@ -1999,7 +1999,7 @@ ikev2_vid_print(netdissect_options *ndo, u_char tpay,
 	ND_TCHECK2(*vid, len);
 	for(i=0; i<len; i++) {
 		if(isprint(vid[i])) ND_PRINT((ndo, "%c", vid[i]));
-		else ND_PRINT((ndo, ".", vid[i]));
+		else ND_PRINT((ndo, "."));
 	}
 	if (2 < ndo->ndo_vflag && 4 < len) {
 		ND_PRINT((ndo," "));
@@ -2407,7 +2407,7 @@ ikev2_print(netdissect_options *ndo,
 
 	ND_PRINT((ndo, " %s", ETYPESTR(base->etype)));
 	if (base->flags) {
-		ND_PRINT((ndo, "[%s%s]",
+		ND_PRINT((ndo, "[%s%s%s]",
 			  base->flags & ISAKMP_FLAG_I ? "I" : "",
 			  base->flags & ISAKMP_FLAG_V ? "V" : "",
 			  base->flags & ISAKMP_FLAG_R ? "R" : ""));

@@ -149,11 +149,14 @@ struct netdissect_options {
   void (*ndo_info)(netdissect_options *, int verbose);
 
   int  (*ndo_printf)(netdissect_options *,
-		     const char *fmt, ...);
+		     const char *fmt, ...)
+		     __attribute__ ((format (printf, 2, 3)));
   void (*ndo_error)(netdissect_options *,
-		    const char *fmt, ...);
+		    const char *fmt, ...)
+		     __attribute__ ((format (printf, 2, 3)));
   void (*ndo_warning)(netdissect_options *,
-		      const char *fmt, ...);
+		      const char *fmt, ...)
+		     __attribute__ ((format (printf, 2, 3)));
 };
 
 #define PT_VAT		1	/* Visual Audio Tool */
