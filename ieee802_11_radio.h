@@ -73,7 +73,7 @@ struct ieee80211_radiotap_header {
 					 * Additional extensions are made
 					 * by setting bit 31.
 					 */
-} __attribute__((__packed__));
+};
 
 /* Name                                 Data type       Units
  * ----                                 ---------       -----
