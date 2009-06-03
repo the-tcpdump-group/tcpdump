@@ -85,7 +85,7 @@ sll_print(register const struct sll_header *sllp, u_int length)
 				/*
 				 * 802.2.
 				 */
-				(void)printf("802.3");
+				(void)printf("802.2");
 				break;
 
 			default:
