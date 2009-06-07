@@ -1,7 +1,11 @@
 Makefile
 *~
 *.o
-config.*
+config.h
+config.log
+config.cache
+config.status
+.devel
 tcpdump
 tcpdump.1
 version.c
