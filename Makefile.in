@@ -341,7 +341,7 @@ lint: $(GENSRC)
 	    grep -v 'possible pointer alignment problem'
 
 clean:
-	rm -f $(CLEANFILES)
+	rm -f $(CLEANFILES) $(PROG)-`cat VERSION`.tar.gz
 
 distclean:
 	rm -f $(CLEANFILES) Makefile config.cache config.log config.status \
