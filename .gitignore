@@ -6,6 +6,8 @@ config.log
 config.cache
 config.status
 .devel
+stamp-h
+stamp-h.in
 tcpdump
 tcpdump.1
 tcpdump-*.tar.gz
