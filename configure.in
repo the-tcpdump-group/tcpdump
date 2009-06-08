@@ -1029,7 +1029,9 @@ if test "$want_libcrypto" != "no"; then
 	fi
 	if test "$ac_cv_ssleay_path" != no; then
 		V_INCLS="$V_INCLS $incdir"
-		LDFLAGS="-L$dir/lib $LDFLAGS"
+		if test "$dir" != "/usr"; then
+			LDFLAGS="-L$dir/lib $LDFLAGS"
+		fi
 		if test -f $ac_cv_ssleay_path/lib/libRSAglue.a; then
 			LIBS="$LIBS -lRSAglue"
 		fi
