@@ -1340,7 +1340,7 @@ compress_savefile(const char *filename)
 #else
 	setpriority(PRIO_PROCESS, 0, 19);
 #endif
-	if (execlp(zflag, zflag, filename, NULL) == -1)
+	if (execlp(zflag, zflag, filename, (char *)NULL) == -1)
 		fprintf(stderr,
 			"compress_savefile:execlp(%s, %s): %s\n",
 			zflag,
