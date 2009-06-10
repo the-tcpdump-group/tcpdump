@@ -330,6 +330,7 @@ struct rsvp_obj_frr_t {
 #define	RSVP_OBJ_XRO_RES       0
 #define	RSVP_OBJ_XRO_IPV4      1
 #define	RSVP_OBJ_XRO_IPV6      2
+#define	RSVP_OBJ_XRO_LABEL     3
 #define	RSVP_OBJ_XRO_ASN       32
 #define	RSVP_OBJ_XRO_MPLS      64
 
@@ -337,6 +338,7 @@ static const struct tok rsvp_obj_xro_values[] = {
     { RSVP_OBJ_XRO_RES,	      "Reserved" },
     { RSVP_OBJ_XRO_IPV4,      "IPv4 prefix" },
     { RSVP_OBJ_XRO_IPV6,      "IPv6 prefix" },
+    { RSVP_OBJ_XRO_LABEL,     "Label" },
     { RSVP_OBJ_XRO_ASN,       "Autonomous system number" },
     { RSVP_OBJ_XRO_MPLS,      "MPLS label switched path termination" },
     { 0, NULL}
@@ -348,6 +350,12 @@ static const struct tok rsvp_obj_rro_flag_values[] = {
     { 0x02,                   "Local protection in use" },
     { 0x04,                   "Bandwidth protection" },
     { 0x08,                   "Node protection" },
+    { 0, NULL}
+};
+
+/* RFC3209 */
+static const struct tok rsvp_obj_rro_label_flag_values[] = {
+    { 0x01,                   "Global" },
     { 0, NULL}
 };
 
@@ -1065,6 +1073,18 @@ rsvp_obj_print (const u_char *pptr, u_int plen, const u_char *tptr,
                                bittok2str(rsvp_obj_rro_flag_values,
                                    "none",
                                    *(obj_tptr+7))); /* rfc3209 says that this field is rsvd. */
+                    break;
+                    case RSVP_OBJ_XRO_LABEL:
+                        printf(", Flags: [%s] (%#x), Class-Type: %s (%u), %u",
+                               bittok2str(rsvp_obj_rro_label_flag_values,
+                                   "none",
+                                   *(obj_tptr+2)),
+                                   *(obj_tptr+2),
+                               tok2str(rsvp_ctype_values,
+                                       "Unknown",
+                                       *(obj_tptr+3) + 256*RSVP_OBJ_RRO),
+                                       *(obj_tptr+3),
+                                       ntohl(*(unsigned int *)(obj_tptr+4)));
                     }
                     obj_tlen-=*(obj_tptr+1);
                     obj_tptr+=*(obj_tptr+1);
