@@ -383,11 +383,11 @@ static const struct tok rsvp_intserv_parameter_id_values[] = {
 };
 
 static struct tok rsvp_session_attribute_flag_values[] = {
-    { 0x01,	              "Local Protection desired" },
-    { 0x02,                   "Label Recording desired" },
-    { 0x04,                   "SE Style desired" },
-    { 0x08,                   "Bandwidth protection desired" }, /* draft-ietf-mpls-rsvp-lsp-fastreroute-02.txt */
-    { 0x10,                   "Node protection desired" },      /* draft-ietf-mpls-rsvp-lsp-fastreroute-02.txt */
+    { 0x01,	              "Local Protection" },
+    { 0x02,                   "Label Recording" },
+    { 0x04,                   "SE Style" },
+    { 0x08,                   "Bandwidth protection" }, /* RFC4090 */
+    { 0x10,                   "Node protection" },      /* RFC4090 */
     { 0, NULL}
 };
 
@@ -1121,14 +1121,14 @@ rsvp_obj_print (const u_char *pptr, u_int plen, const u_char *tptr,
                 printf("%s  Session Name: ", ident);
                 for (i = 0; i < namelen; i++)
                     safeputchar(*(obj_tptr+4+i));
-                printf("%s  Setup Priority: %u, Holding Priority: %u, Flags: [%s]",
+                printf("%s  Setup Priority: %u, Holding Priority: %u, Flags: [%s] (%#x)",
                        ident,
                        (int)*obj_tptr,
                        (int)*(obj_tptr+1),
-                       tok2str(rsvp_session_attribute_flag_values,
+                       bittok2str(rsvp_session_attribute_flag_values,
                                   "none",
-                                  *(obj_tptr+2)));
-
+                                  *(obj_tptr+2)),
+                       *(obj_tptr+2));
                 obj_tlen-=4+*(obj_tptr+3);
                 obj_tptr+=4+*(obj_tptr+3);
                 break;
