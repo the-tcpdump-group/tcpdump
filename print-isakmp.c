@@ -2214,7 +2214,7 @@ safememcpy(void *p, const void *q, size_t l)
 	memcpy(p, q, l);
 }
 
-void
+static void
 ikev1_print(netdissect_options *ndo,
 	    const u_char *bp,  u_int length,
 	    const u_char *bp2, struct isakmp *base)
