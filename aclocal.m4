@@ -322,7 +322,7 @@ AC_DEFUN(AC_LBL_LIBPCAP,
  	    fi
 	    AC_MSG_RESULT($libpcap)
 	    AC_PATH_PROG(PCAP_CONFIG, pcap-config,, $d)
-	    if test "$PCAP_CONFIG"; then
+	    if test -n "$PCAP_CONFIG"; then
 		#
 		# The libpcap directory has a pcap-config script.
 		# Use it to get any additioal libraries needed
@@ -333,24 +333,38 @@ AC_DEFUN(AC_LBL_LIBPCAP,
 	    fi
     fi
     LIBS="$libpcap $LIBS"
-    case "$host_os" in
+    if ! test -n "$PCAP_CONFIG" ; then
+	#
+	# We don't have pcap-config; find out any additional link flags
+	# we need.  (If we have pcap-config, we assume it tells us what
+	# we need.)
+	#
+	case "$host_os" in
 
-    aix*)
+	aix*)
+	    #
+	    # If libpcap is DLPI-based, we have to use /lib/pse.exp if
+	    # present, as we use the STREAMS routines.
+	    #
+	    # (XXX - true only if we're linking with a static libpcap?)
+	    #
 	    pseexe="/lib/pse.exp"
 	    AC_MSG_CHECKING(for $pseexe)
 	    if test -f $pseexe ; then
 		    AC_MSG_RESULT(yes)
 		    LIBS="$LIBS -I:$pseexe"
 	    fi
+
 	    #
-	    # We need "-lodm" and "-lcfg", as libpcap requires them on
-	    # AIX, and we just build a static libpcap.a and thus can't
-	    # arrange that when you link with libpcap you automatically
-	    # link with those libraries.
+	    # If libpcap is BPF-based, we need "-lodm" and "-lcfg", as
+	    # we use them to load the BPF module.
+	    #
+	    # (XXX - true only if we're linking with a static libpcap?)
 	    #
 	    LIBS="$LIBS -lodm -lcfg"
 	    ;;
-    esac
+	esac
+    fi
 
     dnl
     dnl Check for "pcap_list_datalinks()", "pcap_set_datalink()",
