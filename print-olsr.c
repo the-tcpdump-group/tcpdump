@@ -262,6 +262,7 @@ olsr_print (const u_char *pptr, u_int length, int is_ipv6)
 
     u_int msg_type, msg_len, msg_tlen, hello_len;
     u_int16_t name_entry_type, name_entry_len;
+    u_int name_entry_padding;
     u_int8_t link_type, neighbor_type;
     const u_char *tptr, *msg_data;
 
@@ -452,10 +453,10 @@ olsr_print (const u_char *pptr, u_int length, int is_ipv6)
                 addr_size = sizeof(struct in6_addr);
 #endif
 
-            if (!TTEST2(*msg_data, addr_size))
-                goto trunc;
-
             while (msg_tlen >= addr_size) {
+                if (!TTEST2(*msg_data, addr_size))
+                    goto trunc;
+
                 printf("\n\t  interface address %s",
 #if INET6
                         is_ipv6 ? ip6addr_string(msg_data) :
@@ -532,6 +533,11 @@ olsr_print (const u_char *pptr, u_int length, int is_ipv6)
                     && ((name_entries * (4 + addr_size)) <= msg_tlen))
                 name_entries_valid = 1;
 
+            if (msg_tlen < 4)
+                goto trunc;
+            if (!TTEST2(*msg_data, 4))
+                goto trunc;
+
             printf("\n\t  Version %u, Entries %u%s",
                    EXTRACT_16BITS(msg_data),
                    name_entries, (name_entries_valid == 0) ? " (invalid)" : "");
@@ -547,6 +553,8 @@ olsr_print (const u_char *pptr, u_int length, int is_ipv6)
 
                 if (msg_tlen < 4)
                     break;
+                if (!TTEST2(*msg_data, 4))
+                    goto trunc;
 
                 name_entry_type = EXTRACT_16BITS(msg_data);
                 name_entry_len = EXTRACT_16BITS(msg_data+2);
@@ -564,26 +572,30 @@ olsr_print (const u_char *pptr, u_int length, int is_ipv6)
                 if (name_entry_len_valid == 0)
                     break;
 
-                {
-                    char name[name_entry_len + 1];
-                    memcpy (name, msg_data + addr_size, name_entry_len);
-                    name[name_entry_len] = 0;
-#if INET6
-                    if (is_ipv6)
-                        printf(", address %s, name \"%s\"",
-                                ip6addr_string(msg_data), name);
-                    else
-#endif
-                        printf(", address %s, name \"%s\"",
-                                ipaddr_string(msg_data), name);
-                }
-
                 /* 32-bit alignment */
+                name_entry_padding = 0;
                 if (name_entry_len%4 != 0)
-                    name_entry_len+=4-(name_entry_len%4);
+                    name_entry_padding = 4-(name_entry_len%4);
 
-                msg_data += addr_size + name_entry_len;
-                msg_tlen -= addr_size + name_entry_len;
+                if (msg_tlen < addr_size + name_entry_len + name_entry_padding)
+                    goto trunc;
+
+                if (!TTEST2(*msg_data, addr_size + name_entry_len + name_entry_padding))
+                    goto trunc;
+
+#if INET6
+                if (is_ipv6)
+                    printf(", address %s, name \"",
+                            ip6addr_string(msg_data));
+                else
+#endif
+                    printf(", address %s, name \"",
+                            ipaddr_string(msg_data));
+                fn_printn(msg_data + addr_size, name_entry_len, NULL);
+                printf("\"");
+
+                msg_data += addr_size + name_entry_len + name_entry_padding;
+                msg_tlen -= addr_size + name_entry_len + name_entry_padding;
             } /* for (i = 0; i < name_entries; i++) */
             break;
         } /* case OLSR_NAMESERVICE_MSG */
