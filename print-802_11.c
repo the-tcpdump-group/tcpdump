@@ -1165,7 +1165,7 @@ ieee802_11_radio_print(const u_char *p, u_int length, u_int caplen)
 #define	BITNO_8(x) (((x) >> 4) ? 4 + BITNO_4((x) >> 4) : BITNO_4((x)))
 #define	BITNO_4(x) (((x) >> 2) ? 2 + BITNO_2((x) >> 2) : BITNO_2((x)))
 #define	BITNO_2(x) (((x) & 2) ? 1 : 0)
-#define	BIT(n)	(1 << n)
+#define	BIT(n)	(1U << n)
 #define	IS_EXTENDED(__p)	\
 	    (EXTRACT_LE_32BITS(__p) & BIT(IEEE80211_RADIOTAP_EXT)) != 0
 
