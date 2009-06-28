@@ -1079,12 +1079,12 @@ rsvp_obj_print (const u_char *pptr, u_int plen, const u_char *tptr,
                                bittok2str(rsvp_obj_rro_label_flag_values,
                                    "none",
                                    *(obj_tptr+2)),
-                                   *(obj_tptr+2),
+                               *(obj_tptr+2),
                                tok2str(rsvp_ctype_values,
                                        "Unknown",
                                        *(obj_tptr+3) + 256*RSVP_OBJ_RRO),
-                                       *(obj_tptr+3),
-                                       ntohl(*(unsigned int *)(obj_tptr+4)));
+                               *(obj_tptr+3),
+                               EXTRACT_32BITS(obj_tptr+4));
                     }
                     obj_tlen-=*(obj_tptr+1);
                     obj_tptr+=*(obj_tptr+1);
