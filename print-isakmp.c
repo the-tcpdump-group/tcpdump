@@ -1542,21 +1542,21 @@ ikev2_sa_print(netdissect_options *ndo, u_char tpay,
 		u_int32_t proto _U_, int depth _U_)
 {
 	struct isakmp_gen e;
-	int    osa_len, sa_len;
+	int    osa_length, sa_length;
 
 	ND_TCHECK(*ext1);
 	safememcpy(&e, ext1, sizeof(e));
 	ikev2_pay_print(ndo, "sa", e.critical);
 
-	osa_len= ntohs(e.len);
-	sa_len = osa_len - 4;
-	ND_PRINT((ndo," len=%d", sa_len));
+	osa_length= ntohs(e.len);
+	sa_length = osa_length - 4;
+	ND_PRINT((ndo," len=%d", sa_length));
 
 	ikev2_sub_print(ndo, NULL, ISAKMP_NPTYPE_P,
 			ext1+1, ep,
 			0, 0, 0, depth);
 
-	return (u_char *)ext1 + osa_len;
+	return (u_char *)ext1 + osa_length;
 trunc:
 	ND_PRINT((ndo," [|%s]", NPSTR(tpay)));
 	return NULL;
