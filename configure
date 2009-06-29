@@ -12079,6 +12079,10 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 $ac_includes_default
+#ifdef HAVE_SYS_BITYPES_H
+#include <sys/bitypes.h>
+#endif
+
 typedef int8_t ac__type_new_;
 int
 main ()
@@ -12258,6 +12262,10 @@ cat >>confdefs.h <<\_ACEOF
 #define int16_t short
 _ACEOF
 
+	$ac_includes_default
+#ifdef HAVE_SYS_BITYPES_H
+#include <sys/bitypes.h>
+#endif
 fi
 
 { echo "$as_me:$LINENO: checking for u_int16_t" >&5
@@ -12339,6 +12347,10 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 $ac_includes_default
+#ifdef HAVE_SYS_BITYPES_H
+#include <sys/bitypes.h>
+#endif
+
 typedef int32_t ac__type_new_;
 int
 main ()
@@ -12469,6 +12481,10 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 $ac_includes_default
+#ifdef HAVE_SYS_BITYPES_H
+#include <sys/bitypes.h>
+#endif
+
 typedef int64_t ac__type_new_;
 int
 main ()
