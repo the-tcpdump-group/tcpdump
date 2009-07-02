@@ -3049,6 +3049,8 @@ _ACEOF
 
 { echo "$as_me:$LINENO: checking for inline" >&5
 echo $ECHO_N "checking for inline... $ECHO_C" >&6; }
+    save_CFLAGS="$CFLAGS"
+    CFLAGS="$V_CCOPT"
     if test "${ac_cv_lbl_inline+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -3120,6 +3122,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 	fi
 fi
 
+    CFLAGS="$save_CFLAGS"
     if test ! -z "$ac_cv_lbl_inline" ; then
 	{ echo "$as_me:$LINENO: result: $ac_cv_lbl_inline" >&5
 echo "${ECHO_T}$ac_cv_lbl_inline" >&6; }
