@@ -167,8 +167,13 @@ AC_DEFUN(AC_LBL_C_INIT,
 # at least some versions of HP's C compiler can inline that, but can't
 # inline a function that returns a struct pointer.
 #
+# Make sure we use the V_CCOPT flags, because some of those might
+# disable inlining.
+#
 AC_DEFUN(AC_LBL_C_INLINE,
     [AC_MSG_CHECKING(for inline)
+    save_CFLAGS="$CFLAGS"
+    CFLAGS="$V_CCOPT"
     AC_CACHE_VAL(ac_cv_lbl_inline, [
 	ac_cv_lbl_inline=""
 	ac_lbl_cc_inline=no
@@ -196,6 +201,7 @@ AC_DEFUN(AC_LBL_C_INLINE,
 	if test "$ac_lbl_cc_inline" = yes ; then
 	    ac_cv_lbl_inline=$ac_lbl_inline
 	fi])
+    CFLAGS="$save_CFLAGS"
     if test ! -z "$ac_cv_lbl_inline" ; then
 	AC_MSG_RESULT($ac_cv_lbl_inline)
     else
