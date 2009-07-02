@@ -278,7 +278,7 @@ str_isnumber(p)
 {
 	char *q = (char *)p;
 	while (*q) {
-		if (! isdigit(*q))
+		if (! isdigit((unsigned char)*q))
 			return NO;
 		q++;
 	}
