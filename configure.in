@@ -6,6 +6,15 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
 
+#
+# See
+#
+#	http://ftp.gnu.org/gnu/config/README
+#
+# for the URLs to use to fetch new versions of config.guess and
+# config.sub.
+#
+
 AC_REVISION($Revision: 1.204 $)
 AC_PREREQ(2.50)
 AC_INIT(tcpdump.c)
