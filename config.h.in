@@ -2,31 +2,17 @@
 /* "generated automatically" means DO NOT MAKE CHANGES TO config.h.in --
  * make them to acconfig.h and rerun autoheader */
 
-/* Define if you have SSLeay 0.9.0b with the buggy cast128. */
-#undef HAVE_BUGGY_CAST128
-
 /* Define if you enable IPv6 support */
 #undef INET6
 
 /* Define if you enable support for the libsmi. */
 #undef LIBSMI
 
-/* Define if you have the <smi.h> header file.  */
-#undef HAVE_SMI_H
-
 /* define if you have struct __res_state_ext */
 #undef HAVE_RES_STATE_EXT
 
 /* define if your struct __res_state has the nsort member */
 #undef HAVE_NEW_RES_STATE
-
-/*
- * define if struct ether_header.ether_dhost is a struct with ether_addr_octet
- */
-#undef ETHER_HEADER_HAS_EA
-
-/* define if struct ether_arp contains arp_xsha */
-#undef ETHER_ARP_HAS_X
 
 /* define if you have the addrinfo function. */
 #undef HAVE_ADDRINFO
@@ -43,17 +29,8 @@
 /* define if INADDRSZ is defined (XXX not used!) */
 #undef HAVE_INADDRSZ
 
-/* define if this is a development version, to use additional prototypes. */
-#undef HAVE_OS_PROTO_H
-
-/* define if <unistd.h> defines __P() */
-#undef HAVE_PORTABLE_PROTOTYPE
-
 /* define if RES_USE_INET6 is defined */
 #undef HAVE_RES_USE_INET6
-
-/* define if struct sockaddr has the sa_len member */
-#undef HAVE_SOCKADDR_SA_LEN
 
 /* define if you have struct sockaddr_storage */
 #undef HAVE_SOCKADDR_STORAGE
@@ -90,18 +67,6 @@
 
 /* define if you have getrpcbynumber() */
 #undef HAVE_GETRPCBYNUMBER
-
-/* define if unaligned memory accesses fail */
-#undef LBL_ALIGN
-
-/* The successful return value from signal (?)XXX */
-#undef RETSIGVAL
-
-/* Define this on IRIX */
-#undef _BSD_SIGNALS
-
-/* For HP/UX ANSI compiler? */
-#undef _HPUX_SOURCE
 
 /* AIX hack. */
 #undef _SUN
@@ -187,6 +152,9 @@
 /* Define to 1 if you have the <openssl/evp.h> header file. */
 #undef HAVE_OPENSSL_EVP_H
 
+/* if there's an os_proto.h for this platform, to use additional prototypes */
+#undef HAVE_OS_PROTO_H
+
 /* Define to 1 if you have the <pcap/bluetooth.h> header file. */
 #undef HAVE_PCAP_BLUETOOTH_H
 
@@ -231,6 +199,9 @@
 
 /* Define to 1 if you have the `snprintf' function. */
 #undef HAVE_SNPRINTF
+
+/* if struct sockaddr has sa_len */
+#undef HAVE_SOCKADDR_SA_LEN
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
@@ -286,6 +257,9 @@
 /* define if your compiler has __attribute__ */
 #undef HAVE___ATTRIBUTE__
 
+/* if unaligned access fails */
+#undef LBL_ALIGN
+
 /* Define to 1 if netinet/ether.h declares `ether_ntohost' */
 #undef NETINET_ETHER_H_DECLARES_ETHER_NTOHOST
 
@@ -310,6 +284,9 @@
 /* Define as the return type of signal handlers (`int' or `void'). */
 #undef RETSIGTYPE
 
+/* return value of signal handlers */
+#undef RETSIGVAL
+
 /* The size of `char', as computed by sizeof. */
 #undef SIZEOF_CHAR
 
@@ -330,6 +307,12 @@
 
 /* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
 #undef TIME_WITH_SYS_TIME
+
+/* get BSD semantics on Irix */
+#undef _BSD_SIGNALS
+
+/* needed on HP-UX */
+#undef _HPUX_SOURCE
 
 /* Define as token for inline if inlining supported */
 #undef inline

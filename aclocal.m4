@@ -118,7 +118,7 @@ AC_DEFUN(AC_LBL_C_INIT,
 			    fi
 			    CFLAGS="$savedcflags"
 			    V_CCOPT="-Aa $V_CCOPT"
-			    AC_DEFINE(_HPUX_SOURCE)
+			    AC_DEFINE(_HPUX_SOURCE,1,[needed on HP-UX])
 			    ;;
 
 		    *)
@@ -136,6 +136,10 @@ AC_DEFUN(AC_LBL_C_INIT,
 		    ;;
 
 	    osf*)
+	    	    #
+		    # Presumed to be DEC OSF/1, Digital UNIX, or
+		    # Tru64 UNIX.
+		    #
 		    V_CCOPT="$V_CCOPT -std1 -O"
 		    ;;
 
@@ -430,14 +434,14 @@ AC_DEFUN(AC_LBL_TYPE_SIGNAL,
     [AC_BEFORE([$0], [AC_LBL_LIBPCAP])
     AC_TYPE_SIGNAL
     if test "$ac_cv_type_signal" = void ; then
-	    AC_DEFINE(RETSIGVAL,)
+	    AC_DEFINE(RETSIGVAL,[],[return value of signal handlers])
     else
-	    AC_DEFINE(RETSIGVAL,(0))
+	    AC_DEFINE(RETSIGVAL,(0),[return value of signal handlers])
     fi
     case "$host_os" in
 
     irix*)
-	    AC_DEFINE(_BSD_SIGNALS)
+	    AC_DEFINE(_BSD_SIGNALS,1,[get BSD semantics on Irix])
 	    ;;
 
     *)
@@ -568,9 +572,9 @@ AC_DEFUN(AC_LBL_UNION_WAIT,
 	    ac_cv_lbl_union_wait=yes))
     AC_MSG_RESULT($ac_cv_lbl_union_wait)
     if test $ac_cv_lbl_union_wait = yes ; then
-	    AC_DEFINE(DECLWAITSTATUS,union wait)
+	    AC_DEFINE(DECLWAITSTATUS,union wait,[type for wait])
     else
-	    AC_DEFINE(DECLWAITSTATUS,int)
+	    AC_DEFINE(DECLWAITSTATUS,int,[type for wait])
     fi])
 
 dnl
@@ -585,7 +589,7 @@ dnl
 dnl	HAVE_SOCKADDR_SA_LEN (defined)
 dnl
 AC_DEFUN(AC_LBL_SOCKADDR_SA_LEN,
-    [AC_MSG_CHECKING(if sockaddr struct has sa_len member)
+    [AC_MSG_CHECKING(if sockaddr struct has the sa_len member)
     AC_CACHE_VAL(ac_cv_lbl_sockaddr_has_sa_len,
 	AC_TRY_COMPILE([
 #	include <sys/types.h>
@@ -595,7 +599,7 @@ AC_DEFUN(AC_LBL_SOCKADDR_SA_LEN,
 	ac_cv_lbl_sockaddr_has_sa_len=no))
     AC_MSG_RESULT($ac_cv_lbl_sockaddr_has_sa_len)
     if test $ac_cv_lbl_sockaddr_has_sa_len = yes ; then
-	    AC_DEFINE(HAVE_SOCKADDR_SA_LEN)
+	    AC_DEFINE(HAVE_SOCKADDR_SA_LEN,1,[if struct sockaddr has sa_len])
     fi])
 
 dnl
@@ -764,7 +768,7 @@ EOF
 	esac])
     AC_MSG_RESULT($ac_cv_lbl_unaligned_fail)
     if test $ac_cv_lbl_unaligned_fail = yes ; then
-	    AC_DEFINE(LBL_ALIGN)
+	    AC_DEFINE(LBL_ALIGN,1,[if unaligned access fails])
     fi])
 
 dnl
@@ -815,7 +819,8 @@ AC_DEFUN(AC_LBL_DEVEL,
 	    name="lbl/os-$os.h"
 	    if test -f $name ; then
 		    ln -s $name os-proto.h
-		    AC_DEFINE(HAVE_OS_PROTO_H)
+		    AC_DEFINE(HAVE_OS_PROTO_H, 1,
+			[if there's an os_proto.h for this platform, to use additional prototypes])
 	    else
 		    AC_MSG_WARN(can't find $name)
 	    fi

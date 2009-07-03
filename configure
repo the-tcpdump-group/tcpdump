@@ -2959,7 +2959,8 @@ echo "$as_me: error: see the INSTALL doc for more info" >&2;}
 			    fi
 			    CFLAGS="$savedcflags"
 			    V_CCOPT="-Aa $V_CCOPT"
-			    cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define _HPUX_SOURCE 1
 _ACEOF
 
@@ -2982,6 +2983,10 @@ echo "$as_me: error: see the INSTALL doc for more info" >&2;}
 		    ;;
 
 	    osf*)
+	    	    #
+		    # Presumed to be DEC OSF/1, Digital UNIX, or
+		    # Tru64 UNIX.
+		    #
 		    V_CCOPT="$V_CCOPT -std1 -O"
 		    ;;
 
@@ -8350,12 +8355,14 @@ _ACEOF
 
 
     if test "$ac_cv_type_signal" = void ; then
-	    cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define RETSIGVAL
 _ACEOF
 
     else
-	    cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define RETSIGVAL (0)
 _ACEOF
 
@@ -8363,7 +8370,8 @@ _ACEOF
     case "$host_os" in
 
     irix*)
-	    cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define _BSD_SIGNALS 1
 _ACEOF
 
@@ -13349,7 +13357,8 @@ rm -f os-proto.h
 	    name="lbl/os-$os.h"
 	    if test -f $name ; then
 		    ln -s $name os-proto.h
-		    cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define HAVE_OS_PROTO_H 1
 _ACEOF
 
@@ -13359,8 +13368,8 @@ echo "$as_me: WARNING: can't find $name" >&2;}
 	    fi
     fi
 
-{ echo "$as_me:$LINENO: checking if sockaddr struct has sa_len member" >&5
-echo $ECHO_N "checking if sockaddr struct has sa_len member... $ECHO_C" >&6; }
+{ echo "$as_me:$LINENO: checking if sockaddr struct has the sa_len member" >&5
+echo $ECHO_N "checking if sockaddr struct has the sa_len member... $ECHO_C" >&6; }
     if test "${ac_cv_lbl_sockaddr_has_sa_len+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -13412,7 +13421,8 @@ fi
     { echo "$as_me:$LINENO: result: $ac_cv_lbl_sockaddr_has_sa_len" >&5
 echo "${ECHO_T}$ac_cv_lbl_sockaddr_has_sa_len" >&6; }
     if test $ac_cv_lbl_sockaddr_has_sa_len = yes ; then
-	    cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define HAVE_SOCKADDR_SA_LEN 1
 _ACEOF
 
@@ -13508,7 +13518,8 @@ fi
     { echo "$as_me:$LINENO: result: $ac_cv_lbl_unaligned_fail" >&5
 echo "${ECHO_T}$ac_cv_lbl_unaligned_fail" >&6; }
     if test $ac_cv_lbl_unaligned_fail = yes ; then
-	    cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define LBL_ALIGN 1
 _ACEOF
 
