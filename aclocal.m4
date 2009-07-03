@@ -599,7 +599,7 @@ AC_DEFUN(AC_LBL_SOCKADDR_SA_LEN,
 	ac_cv_lbl_sockaddr_has_sa_len=no))
     AC_MSG_RESULT($ac_cv_lbl_sockaddr_has_sa_len)
     if test $ac_cv_lbl_sockaddr_has_sa_len = yes ; then
-	    AC_DEFINE(HAVE_SOCKADDR_SA_LEN,1,[if struct sockaddr has sa_len])
+	    AC_DEFINE(HAVE_SOCKADDR_SA_LEN,1,[if struct sockaddr has the sa_len member])
     fi])
 
 dnl
