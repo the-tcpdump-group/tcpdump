@@ -205,6 +205,7 @@ EXTRA_DIST = \
 	INSTALL.txt \
 	LICENSE \
 	Makefile.in \
+	Makefile-devel-adds \
 	README \
 	Readme.Win32 \
 	VERSION \
