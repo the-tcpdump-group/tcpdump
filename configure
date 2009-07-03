@@ -3043,7 +3043,8 @@ fi
 		    { echo "$as_me:$LINENO: result: $ac_cv_lbl_cc_const_proto" >&5
 echo "${ECHO_T}$ac_cv_lbl_cc_const_proto" >&6; }
 		    if test $ac_cv_lbl_cc_const_proto = no ; then
-			    cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define const
 _ACEOF
 

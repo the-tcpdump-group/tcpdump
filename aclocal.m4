@@ -154,7 +154,8 @@ AC_DEFUN(AC_LBL_C_INIT,
 			    ac_cv_lbl_cc_const_proto=no))
 		    AC_MSG_RESULT($ac_cv_lbl_cc_const_proto)
 		    if test $ac_cv_lbl_cc_const_proto = no ; then
-			    AC_DEFINE(const,)
+			    AC_DEFINE(const,[],
+			        [to handle Ultrix compilers that don't support const in prototypes])
 		    fi
 		    ;;
 	    esac
