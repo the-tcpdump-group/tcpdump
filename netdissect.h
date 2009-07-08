@@ -150,13 +150,22 @@ struct netdissect_options {
 
   int  (*ndo_printf)(netdissect_options *,
 		     const char *fmt, ...)
-		     __attribute__ ((format (printf, 2, 3)));
+#ifdef __ATTRIBUTE___FORMAT_OK_FOR_FUNCTION_POINTERS
+		     __attribute__ ((format (printf, 2, 3)))
+#endif
+		     ;
   void (*ndo_error)(netdissect_options *,
 		    const char *fmt, ...)
-		     __attribute__ ((format (printf, 2, 3)));
+#ifdef __ATTRIBUTE___FORMAT_OK_FOR_FUNCTION_POINTERS
+		     __attribute__ ((format (printf, 2, 3)))
+#endif
+		     ;
   void (*ndo_warning)(netdissect_options *,
 		      const char *fmt, ...)
-		     __attribute__ ((format (printf, 2, 3)));
+#ifdef __ATTRIBUTE___FORMAT_OK_FOR_FUNCTION_POINTERS
+		     __attribute__ ((format (printf, 2, 3)))
+#endif
+		     ;
 };
 
 #define PT_VAT		1	/* Visual Audio Tool */

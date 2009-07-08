@@ -509,65 +509,6 @@ AC_DEFUN(AC_LBL_FIXINCLUDES,
     fi])
 
 dnl
-dnl Check for flex, default to lex
-dnl Require flex 2.4 or higher
-dnl Check for bison, default to yacc
-dnl Default to lex/yacc if both flex and bison are not available
-dnl Define the yy prefix string if using flex and bison
-dnl
-dnl usage:
-dnl
-dnl	AC_LBL_LEX_AND_YACC(lex, yacc, yyprefix)
-dnl
-dnl results:
-dnl
-dnl	$1 (lex set)
-dnl	$2 (yacc appended)
-dnl	$3 (optional flex and bison -P prefix)
-dnl
-AC_DEFUN(AC_LBL_LEX_AND_YACC,
-    [AC_ARG_WITH(flex, [  --without-flex          don't use flex])
-    AC_ARG_WITH(bison, [  --without-bison         don't use bison])
-    if test "$with_flex" = no ; then
-	    $1=lex
-    else
-	    AC_CHECK_PROGS($1, flex, lex)
-    fi
-    if test "$$1" = flex ; then
-	    # The -V flag was added in 2.4
-	    AC_MSG_CHECKING(for flex 2.4 or higher)
-	    AC_CACHE_VAL(ac_cv_lbl_flex_v24,
-		if flex -V >/dev/null 2>&1; then
-			ac_cv_lbl_flex_v24=yes
-		else
-			ac_cv_lbl_flex_v24=no
-		fi)
-	    AC_MSG_RESULT($ac_cv_lbl_flex_v24)
-	    if test $ac_cv_lbl_flex_v24 = no ; then
-		    s="2.4 or higher required"
-		    AC_MSG_WARN(ignoring obsolete flex executable ($s))
-		    $1=lex
-	    fi
-    fi
-    if test "$with_bison" = no ; then
-	    $2=yacc
-    else
-	    AC_CHECK_PROGS($2, bison, yacc)
-    fi
-    if test "$$2" = bison ; then
-	    $2="$$2 -y"
-    fi
-    if test "$$1" != lex -a "$$2" = yacc -o "$$1" = lex -a "$$2" != yacc ; then
-	    AC_MSG_WARN(don't have both flex and bison; reverting to lex/yacc)
-	    $1=lex
-	    $2=yacc
-    fi
-    if test "$$1" = flex -a -n "$3" ; then
-	    $1="$$1 -P$3"
-	    $2="$$2 -p $3"
-    fi])
-
-dnl
 dnl Checks to see if union wait is used with WEXITSTATUS()
 dnl
 dnl usage:
@@ -1025,83 +966,6 @@ AC_DEFUN(AC_CHECK_SA_LEN, [
 ])
 
 dnl
-dnl Checks for portable prototype declaration macro
-AC_DEFUN(AC_CHECK_PORTABLE_PROTO,  [
-	AC_MSG_CHECKING(for __P)
-	AC_CACHE_VAL($1,
-	AC_TRY_COMPILE([
-#		include <unistd.h>],
-		[int f __P(())],
-		$1=yes,
-		$1=no))
-	AC_MSG_RESULT($$1)
-	if test $$1 = yes; then
-		AC_DEFINE(HAVE_PORTABLE_PROTOTYPE)
-	fi
-])
-
-dnl checks for u_intXX_t
-AC_DEFUN(AC_CHECK_BITTYPES, [
-	$1=yes
-dnl check for u_int8_t
-	AC_MSG_CHECKING(for u_int8_t)
-	AC_CACHE_VAL(ac_cv_u_int8_t,
-	AC_TRY_COMPILE([
-#		include <sys/types.h>],
-		[u_int8_t i],
-		ac_cv_u_int8_t=yes,
-		ac_cv_u_int8_t=no))
-	AC_MSG_RESULT($ac_cv_u_int8_t)
-	if test $ac_cv_u_int8_t = yes; then
-		AC_DEFINE(HAVE_U_INT8_T)
-	else
-		$1=no
-	fi
-dnl check for u_int16_t
-	AC_MSG_CHECKING(for u_int16_t)
-	AC_CACHE_VAL(ac_cv_u_int16_t,
-	AC_TRY_COMPILE([
-#		include <sys/types.h>],
-		[u_int16_t i],
-		ac_cv_u_int16_t=yes,
-		ac_cv_u_int16_t=no))
-	AC_MSG_RESULT($ac_cv_u_int16_t)
-	if test $ac_cv_u_int16_t = yes; then
-		AC_DEFINE(HAVE_U_INT16_T)
-	else
-		$1=no
-	fi
-dnl check for u_int32_t
-	AC_MSG_CHECKING(for u_int32_t)
-	AC_CACHE_VAL(ac_cv_u_int32_t,
-	AC_TRY_COMPILE([
-#		include <sys/types.h>],
-		[u_int32_t i],
-		ac_cv_u_int32_t=yes,
-		ac_cv_u_int32_t=no))
-	AC_MSG_RESULT($ac_cv_u_int32_t)
-	if test $ac_cv_u_int32_t = yes; then
-		AC_DEFINE(HAVE_U_INT32_T)
-	else
-		$1=no
-	fi
-dnl check for u_int64_t
-	AC_MSG_CHECKING(for u_int64_t)
-	AC_CACHE_VAL(ac_cv_u_int64_t,
-	AC_TRY_COMPILE([
-#		include <sys/types.h>],
-		[u_int64_t i],
-		ac_cv_u_int64_t=yes,
-		ac_cv_u_int64_t=no))
-	AC_MSG_RESULT($ac_cv_u_int64_t)
-	if test $ac_cv_u_int64_t = yes; then
-		AC_DEFINE(HAVE_U_INT64_T)
-	else
-		$1=no
-	fi
-])
-
-dnl
 dnl Checks for addrinfo structure
 AC_DEFUN(AC_STRUCT_ADDRINFO, [
 	AC_MSG_CHECKING(for addrinfo)
@@ -1328,6 +1192,37 @@ else
   V_DEFS="$V_DEFS -D_U_=\"\""
 fi
 AC_MSG_RESULT($ac_cv___attribute__)
+])
+
+
+dnl
+dnl Test whether __attribute__((format)) can be applied to function
+dnl pointers
+dnl
+
+AC_DEFUN(AC_C___ATTRIBUTE___FORMAT_FUNCTION_POINTER, [
+AC_MSG_CHECKING([whether __attribute__((format)) can be applied to function pointers])
+AC_CACHE_VAL(ac_cv___attribute___format_function_pointer, [
+AC_COMPILE_IFELSE(
+  AC_LANG_SOURCE([[
+#include <stdlib.h>
+
+extern int (*foo)(const char *fmt, ...)
+		  __attribute__ ((format (printf, 1, 2)));
+
+int
+main(int argc, char **argv)
+{
+  (*foo)("%s", "test");
+}
+  ]]),
+ac_cv___attribute___format_function_pointer=yes,
+ac_cv___attribute___format_function_pointer=no)])
+if test "$ac_cv___attribute___format_function_pointer" = "yes"; then
+  AC_DEFINE(__ATTRIBUTE___FORMAT_OK_FOR_FUNCTION_POINTERS, 1,
+    [define if your compiler allows __attribute__((format)) to be applied to function pointers])
+fi
+AC_MSG_RESULT($ac_cv___attribute___format_function_pointer)
 ])
 
 AC_DEFUN(AC_LBL_SSLEAY,

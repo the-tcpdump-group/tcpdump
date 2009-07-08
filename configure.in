@@ -24,6 +24,9 @@ AC_CANONICAL_HOST
 AC_LBL_C_INIT(V_CCOPT, V_INCLS)
 AC_LBL_C_INLINE
 AC_C___ATTRIBUTE__
+if test "$ac_cv___attribute__" = "yes"; then
+	AC_C___ATTRIBUTE___FORMAT_FUNCTION_POINTER
+fi
 AC_CHECK_HEADERS(fcntl.h rpc/rpcent.h netdnet/dnetdb.h)
 AC_CHECK_HEADERS(net/pfvar.h, , , [#include <sys/types.h>
 #include <sys/socket.h>
@@ -450,7 +453,7 @@ main()
 		fi
 	fi
 	])
-	AC_REPLACE_FUNCS(getaddrinfo getnameinfo)
+	AC_REPLACE_FUNCS(getnameinfo)
 fi
 
 AC_CACHE_CHECK([for dnet_htoa declaration in netdnet/dnetdb.h],
@@ -470,13 +473,6 @@ AC_CHECK_SIZEOF(short, 2)
 AC_CHECK_SIZEOF(int, 4)
 AC_CHECK_SIZEOF(long, 4)
 AC_CHECK_SIZEOF(long long, 8)
-
-dnl
-dnl Checks for u_intXX_t
-dnl AC_CHECK_BITTYPES(ac_cv_bittypes)
-dnl if test "$ac_cv_bittypes" = no; then
-dnl 	missing_includes=yes
-dnl fi
 
 dnl
 dnl Checks for addrinfo structure

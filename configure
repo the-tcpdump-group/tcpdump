@@ -3275,6 +3275,72 @@ fi
 { echo "$as_me:$LINENO: result: $ac_cv___attribute__" >&5
 echo "${ECHO_T}$ac_cv___attribute__" >&6; }
 
+if test "$ac_cv___attribute__" = "yes"; then
+
+{ echo "$as_me:$LINENO: checking whether __attribute__((format)) can be applied to function pointers" >&5
+echo $ECHO_N "checking whether __attribute__((format)) can be applied to function pointers... $ECHO_C" >&6; }
+if test "${ac_cv___attribute___format_function_pointer+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#include <stdlib.h>
+
+extern int (*foo)(const char *fmt, ...)
+		  __attribute__ ((format (printf, 1, 2)));
+
+int
+main(int argc, char **argv)
+{
+  (*foo)("%s", "test");
+}
+
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ac_cv___attribute___format_function_pointer=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv___attribute___format_function_pointer=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+
+if test "$ac_cv___attribute___format_function_pointer" = "yes"; then
+
+cat >>confdefs.h <<\_ACEOF
+#define __ATTRIBUTE___FORMAT_OK_FOR_FUNCTION_POINTERS 1
+_ACEOF
+
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv___attribute___format_function_pointer" >&5
+echo "${ECHO_T}$ac_cv___attribute___format_function_pointer" >&6; }
+
+fi
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -5260,8 +5326,7 @@ echo "${ECHO_T}buggy" >&6; }
 fi
 
 
-
-for ac_func in getaddrinfo getnameinfo
+for ac_func in getnameinfo
 do
 as_ac_var=`echo "ac_cv_func_$ac_func" | $as_tr_sh`
 { echo "$as_me:$LINENO: checking for $ac_func" >&5
@@ -7419,7 +7484,6 @@ echo "${ECHO_T}$ac_cv_sizeof_long_long" >&6; }
 cat >>confdefs.h <<_ACEOF
 #define SIZEOF_LONG_LONG $ac_cv_sizeof_long_long
 _ACEOF
-
 
 
 
