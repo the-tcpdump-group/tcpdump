@@ -228,7 +228,6 @@ EXTRA_DIST = \
 	missing/bittypes.h \
 	missing/dlnames.c \
 	missing/datalinks.c \
-	missing/getaddrinfo.c \
 	missing/getnameinfo.c \
 	missing/inet_aton.c \
 	missing/inet_ntop.c \
