@@ -290,6 +290,8 @@ ether_encap_print(u_short ether_type, const u_char *p,
 
 	case ETHERTYPE_PPPOED:
 	case ETHERTYPE_PPPOES:
+	case ETHERTYPE_PPPOED2:
+	case ETHERTYPE_PPPOES2:
 		pppoe_print(p, length);
 		return (1);
 
