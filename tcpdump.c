@@ -1317,12 +1317,12 @@ info(register int verbose)
 		fputs(", ", stderr);
 	else
 		putc('\n', stderr);
-	(void)fprintf(stderr, "%d packets received by filter", stat.ps_recv);
+	(void)fprintf(stderr, "%u packets received by filter", stat.ps_recv);
 	if (!verbose)
 		fputs(", ", stderr);
 	else
 		putc('\n', stderr);
-	(void)fprintf(stderr, "%d packets dropped by kernel\n", stat.ps_drop);
+	(void)fprintf(stderr, "%u packets dropped by kernel\n", stat.ps_drop);
 	infoprint = 0;
 }
 
