@@ -68,11 +68,11 @@ RANLIB = @RANLIB@
 
 CSRC =	addrtoname.c af.c checksum.c cpack.c gmpls.c oui.c gmt2local.c ipproto.c \
         nlpid.c l2vpn.c machdep.c parsenfsfh.c \
-	print-802_11.c print-ap1394.c print-ah.c print-arcnet.c \
-	print-aodv.c print-arp.c print-ascii.c print-atalk.c print-atm.c \
-	print-beep.c print-bfd.c print-bgp.c print-bootp.c print-bt.c \
-	print-cdp.c print-cfm.c print-chdlc.c print-cip.c print-cnfp.c \
-	print-dccp.c print-decnet.c \
+	print-802_15_4.c print-802_11.c print-ap1394.c print-ah.c \
+	print-arcnet.c print-aodv.c print-arp.c print-ascii.c print-atalk.c \
+	print-atm.c print-beep.c print-bfd.c print-bgp.c print-bootp.c \
+	print-bt.c print-cdp.c print-cfm.c print-chdlc.c print-cip.c \
+	print-cnfp.c print-dccp.c print-decnet.c \
 	print-domain.c print-dtp.c print-dvmrp.c print-enc.c print-egp.c \
 	print-eap.c print-eigrp.c\
 	print-esp.c print-ether.c print-fddi.c print-fr.c \

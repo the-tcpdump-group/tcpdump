@@ -282,6 +282,9 @@ static struct printer printers[] = {
 #if defined(HAVE_PCAP_USB_H) && defined(DLT_USB_LINUX_MMAPPED)
 	{ usb_linux_print, DLT_USB_LINUX_MMAPPED},
 #endif
+#ifdef DLT_IEEE802_15_4
+	{ ieee802_15_4_if_print, DLT_IEEE802_15_4 },
+#endif
 	{ NULL,			0 },
 };
 
