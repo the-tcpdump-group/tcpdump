@@ -121,6 +121,7 @@ struct tok tcp_option_values[] = {
         { TCPOPT_CCECHO, "" },
         { TCPOPT_SIGNATURE, "md5" },
         { TCPOPT_AUTH, "enhanced auth" },
+        { TCPOPT_UTO, "uto" },
         { 0, NULL }
 };
 
@@ -608,6 +609,18 @@ tcp_print(register const u_char *bp, register u_int length,
                                  * Nothing interesting.
                                  * fall through
                                  */
+                                break;
+
+                        case TCPOPT_UTO:
+                                datalen = 2;
+                                LENCHECK(datalen);
+                                uint utoval = EXTRACT_16BITS(cp);
+                                (void)printf("0x%x", utoval);
+                                if (utoval & 0x0001)
+                                        utoval = (utoval >> 1) * 60;
+                                else
+                                        utoval >>= 1;
+                                (void)printf(" %u", utoval);
                                 break;
 
                         default:
