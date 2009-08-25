@@ -806,6 +806,13 @@ else
 		AC_MSG_RESULT(no)
 	fi
 fi
+
+AC_CHECK_FUNCS(pcap_setdirection)
+if test $ac_cv_func_pcap_setdirection = "yes" ; then
+dnl Check for capture direction setting support
+	AC_DEFINE(HAVE_PCAP_SETDIRECTION)
+fi
+
 AC_REPLACE_FUNCS(bpf_dump)	dnl moved to libpcap in 0.6
 
 V_GROUP=0

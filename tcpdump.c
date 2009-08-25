@@ -105,6 +105,9 @@ static int Lflag;			/* list available data link types and exit */
 #ifdef HAVE_PCAP_SET_TSTAMP_TYPE
 static int Jflag;			/* list available time stamp types */
 #endif
+#ifdef HAVE_PCAP_SETDIRECTION
+int Pflag = PCAP_D_INOUT;	/* Restrict captured packet by sent/receive direction */
+#endif
 static char *zflag = NULL;		/* compress each savefile using a specified command (like gzip or bzip2) */
 
 static int infodelay;
@@ -520,6 +523,12 @@ show_dlts_and_exit(const char *device, pcap_t *pd)
 #define U_FLAG
 #endif
 
+#ifdef HAVE_PCAP_SETDIRECTION
+#define P_FLAG "P:"
+#else
+#define P_FLAG
+#endif
+
 #ifndef WIN32
 /* Drop root privileges and chroot if necessary */
 static void
@@ -738,7 +747,7 @@ main(int argc, char **argv)
 #endif
 
 	while (
-	    (op = getopt(argc, argv, "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOpqr:Rs:StT:u" U_FLAG "V:vw:W:xXy:Yz:Z:")) != -1)
+	    (op = getopt(argc, argv, "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOp" P_FLAG "qr:Rs:StT:u" U_FLAG "V:vw:W:xXy:Yz:Z:")) != -1)
 		switch (op) {
 
 		case 'a':
@@ -960,7 +969,18 @@ main(int argc, char **argv)
 		case 'p':
 			++pflag;
 			break;
-
+#ifdef HAVE_PCAP_SETDIRECTION
+		case 'P':
+			if (strcasecmp(optarg, "in") == 0)
+				Pflag = PCAP_D_IN;
+			else if (strcasecmp(optarg, "out") == 0)
+				Pflag = PCAP_D_OUT;
+			else if (strcasecmp(optarg, "inout") == 0)
+				Pflag = PCAP_D_INOUT;
+			else
+				error("unknown capture direction `%s'", optarg);
+			break;
+#endif /* HAVE_PCAP_SETDIRECTION */
 		case 'q':
 			++qflag;
 			++suppress_default_print;
@@ -1313,6 +1333,12 @@ main(int argc, char **argv)
 				warning("%s: %s", device,
 				    pcap_statustostr(status));
 		}
+#ifdef HAVE_PCAP_SETDIRECTION
+		status = pcap_setdirection(pd, Pflag);
+		if (status != 0)
+			error("%s: pcap_set_direction failed: %s",
+			    device,  pcap_geterr(pd));
+#endif
 #else
 		*ebuf = '\0';
 		pd = pcap_open_live(device, snaplen, !pflag, 1000, ebuf);
@@ -2098,6 +2124,10 @@ usage(void)
 "\t\t[ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]\n");
 	(void)fprintf(stderr,
 "\t\t[ -i interface ]" j_FLAG_USAGE " [ -M secret ]\n");
+#ifdef HAVE_PCAP_SETDIRECTION
+	(void)fprintf(stderr,
+"\t\t[ -P in|out|inout ]\n");
+#endif
 	(void)fprintf(stderr,
 "\t\t[ -r file ] [ -s snaplen ] [ -T type ] [ -V file ] [ -w file ]\n");
 	(void)fprintf(stderr,

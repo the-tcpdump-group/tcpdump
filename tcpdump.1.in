@@ -70,6 +70,11 @@ tcpdump \- dump traffic on a network
 .br
 .ti +8
 [
+.B \-P
+.I in|out|inout
+]
+.ti +8
+[
 .B \-r
 .I file
 ]
@@ -473,6 +478,11 @@ into promiscuous mode.
 Note that the interface might be in promiscuous
 mode for some other reason; hence, `-p' cannot be used as an abbreviation for
 `ether host {local-hw-addr} or ether broadcast'.
+.TP
+.B \-P
+Choose send/receive direction \fIdirection\fR for which packets should be
+captured. Possible values are `in', `out' and `inout'. Not available
+on all platforms.
 .TP
 .B \-q
 Quick (quiet?) output.
