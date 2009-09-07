@@ -1303,6 +1303,11 @@ info(register int verbose)
 {
 	struct pcap_stat stat;
 
+	/*
+	 * Older versions of libpcap didn't set ps_ifdrop on some
+	 * platforms; initialize it to 0 to handle that.
+	 */
+	stat.ps_ifdrop = 0;
 	if (pcap_stats(pd, &stat) < 0) {
 		(void)fprintf(stderr, "pcap_stats: %s\n", pcap_geterr(pd));
 		infoprint = 0;
@@ -1322,7 +1327,16 @@ info(register int verbose)
 		fputs(", ", stderr);
 	else
 		putc('\n', stderr);
-	(void)fprintf(stderr, "%u packets dropped by kernel\n", stat.ps_drop);
+	(void)fprintf(stderr, "%u packets dropped by kernel", stat.ps_drop);
+	if (stat.ps_ifdrop != 0) {
+		if (!verbose)
+			fputs(", ", stderr);
+		else
+			putc('\n', stderr);
+		(void)fprintf(stderr, "%u packets dropped by interface\n",
+		    stat.ps_ifdrop);
+	} else
+		putc('\n', stderr);
 	infoprint = 0;
 }
 
