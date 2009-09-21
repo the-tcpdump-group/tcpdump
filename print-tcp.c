@@ -198,6 +198,7 @@ tcp_print(register const u_char *bp, register u_int length,
         register char ch;
         u_int16_t sport, dport, win, urp;
         u_int32_t seq, ack, thseq, thack;
+        u_int utoval;
         int threv;
 #ifdef INET6
         register const struct ip6_hdr *ip6;
@@ -614,7 +615,7 @@ tcp_print(register const u_char *bp, register u_int length,
                         case TCPOPT_UTO:
                                 datalen = 2;
                                 LENCHECK(datalen);
-                                uint utoval = EXTRACT_16BITS(cp);
+                                utoval = EXTRACT_16BITS(cp);
                                 (void)printf("0x%x", utoval);
                                 if (utoval & 0x0001)
                                         utoval = (utoval >> 1) * 60;
