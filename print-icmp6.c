@@ -863,7 +863,7 @@ trunc:
     return;
 }
 
-void
+static void
 dnsname_print(const u_char *cp, const u_char *ep)
 {
 	int i;
