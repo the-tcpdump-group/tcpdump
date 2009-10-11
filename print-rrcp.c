@@ -64,6 +64,19 @@ static const char rcsid[] _U_ =
 #define RRCP_CHIP_ID_OFFSET		12	/* 2 bytes */
 #define RRCP_VENDOR_ID_OFFSET		14	/* 4 bytes */
 
+static const struct tok proto_values[] = {
+	{ 1, "RRCP" },
+	{ 2, "RRCP-REP" },
+	{ 0, NULL }
+};
+
+static const struct tok opcode_values[] = {
+	{ 0, "hello" },
+	{ 1, "get" },
+	{ 2, "set" },
+	{ 0, NULL }
+};
+
 /*
  * Print RRCP requests
  */
@@ -84,31 +97,16 @@ rrcp_print(netdissect_options *ndo,
 
 	ND_TCHECK(*(rrcp + RRCP_PROTO_OFFSET));
 	rrcp_proto = *(rrcp + RRCP_PROTO_OFFSET);
-	if (rrcp_proto==1){
-	    strcpy(proto_str,"RRCP");
-	}else if ( rrcp_proto==2 ){
-	    strcpy(proto_str,"RRCP-REP");
-	}else{
-	    sprintf(proto_str,"RRCP-0x%02d",rrcp_proto);
-	}
 	ND_TCHECK(*(rrcp + RRCP_OPCODE_ISREPLY_OFFSET));
 	rrcp_opcode = (*(rrcp + RRCP_OPCODE_ISREPLY_OFFSET)) & RRCP_OPCODE_MASK;
-	if (rrcp_opcode==0){
-	    strcpy(opcode_str,"hello");
-	}else if ( rrcp_opcode==1 ){
-	    strcpy(opcode_str,"get");
-	}else if ( rrcp_opcode==2 ){
-	    strcpy(opcode_str,"set");
-	}else{
-	    sprintf(opcode_str,"unknown opcode (0x%02d)",rrcp_opcode);
-	}
         ND_PRINT((ndo, "%s > %s, %s %s",
 		etheraddr_string(ESRC(ep)),
 		etheraddr_string(EDST(ep)),
-		proto_str,
+		tok2strbuf(proto_values,"RRCP-0x%02d",rrcp_proto,proto_str,sizeof(proto_str)),
 		((*(rrcp + RRCP_OPCODE_ISREPLY_OFFSET)) & RRCP_ISREPLY) ? "reply" : "query"));
 	if (rrcp_proto==1){
-    	    ND_PRINT((ndo, ": %s", opcode_str));
+    	    ND_PRINT((ndo, ": %s",
+		     tok2strbuf(opcode_values,"unknown opcode (0x%02d)",rrcp_opcode,opcode_str,sizeof(opcode_str))));
 	}
 	if (rrcp_opcode==1 || rrcp_opcode==2){
 	    ND_TCHECK2(*(rrcp + RRCP_REG_ADDR_OFFSET), 6);
