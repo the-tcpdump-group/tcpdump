@@ -1,4 +1,4 @@
-im/*
+/*
  * Copyright (c) 1988-2002
  *	The Regents of the University of California.  All rights reserved.
  *
