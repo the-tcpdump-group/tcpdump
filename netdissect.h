@@ -362,7 +362,7 @@ extern void ospf_print(netdissect_options *,const u_char *,
 		       u_int, const u_char *);
 extern void pimv1_print(netdissect_options *,const u_char *, u_int);
 extern void mobile_print(netdissect_options *,const u_char *, u_int);
-extern void pim_print(netdissect_options *,const u_char *, u_int);
+extern void pim_print(netdissect_options *,const u_char *, u_int, u_int);
 extern void pppoe_if_print(u_char *,const struct pcap_pkthdr *, const u_char *);
 extern void pppoe_print(netdissect_options *,const u_char *, u_int);
 extern void ppp_print(netdissect_options *,
@@ -437,6 +437,7 @@ extern void pptp_print(netdissect_options *,const u_char *, u_int);
 #ifdef INET6
 extern void ip6_print(netdissect_options *,const u_char *, u_int);
 extern void ip6_opt_print(netdissect_options *,const u_char *, int);
+extern int nextproto6_cksum(const struct ip6_hdr *, const u_short *, u_int, u_int);
 extern int hbhopt_print(netdissect_options *,const u_char *);
 extern int dstopt_print(netdissect_options *,const u_char *);
 extern int frag6_print(netdissect_options *,const u_char *,

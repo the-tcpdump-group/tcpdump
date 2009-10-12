@@ -1,4 +1,4 @@
-/*
+im/*
  * Copyright (c) 1988-2002
  *	The Regents of the University of California.  All rights reserved.
  *
@@ -241,7 +241,7 @@ extern void lwapp_control_print(const u_char *, u_int, int);
 extern void lwapp_data_print(const u_char *, u_int);
 extern void eigrp_print(const u_char *, u_int);
 extern void mobile_print(const u_char *, u_int);
-extern void pim_print(const u_char *, u_int);
+extern void pim_print(const u_char *, u_int, u_int);
 extern u_int pppoe_print(const u_char *, u_int);
 extern u_int ppp_print(register const u_char *, u_int);
 extern u_int ppp_if_print(const struct pcap_pkthdr *, const u_char *);
@@ -327,6 +327,7 @@ extern u_int usb_linux_print(const struct pcap_pkthdr *, const u_char *);
 #ifdef INET6
 extern void ip6_print(const u_char *, u_int);
 extern void ip6_opt_print(const u_char *, int);
+extern int nextproto6_cksum(const struct ip6_hdr *, const u_short *, u_int, u_int);
 extern int hbhopt_print(const u_char *);
 extern int dstopt_print(const u_char *);
 extern int frag6_print(const u_char *, const u_char *);
