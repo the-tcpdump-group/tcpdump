@@ -144,12 +144,6 @@ struct mgmt_header_t {
 #define	CAPABILITY_CFP_REQ(cap)	((cap) & 0x0008)
 #define	CAPABILITY_PRIVACY(cap)	((cap) & 0x0010)
 
-typedef enum {
-	NOT_PRESENT,
-	PRESENT,
-	TRUNCATED
-} elem_status_t;
-
 struct ssid_t {
 	u_int8_t	element_id;
 	u_int8_t	length;
@@ -237,20 +231,20 @@ struct mgmt_body_t {
 	u_int16_t	reason_code;
 	u_int16_t	auth_alg;
 	u_int16_t	auth_trans_seq_num;
-	elem_status_t	challenge_status;
+	int		challenge_present;
 	struct challenge_t  challenge;
 	u_int16_t	capability_info;
-	elem_status_t	ssid_status;
+	int		ssid_present;
 	struct ssid_t	ssid;
-	elem_status_t	rates_status;
+	int		rates_present;
 	struct rates_t 	rates;
-	elem_status_t	ds_status;
+	int		ds_present;
 	struct ds_t	ds;
-	elem_status_t	cf_status;
+	int		cf_present;
 	struct cf_t	cf;
-	elem_status_t	fh_status;
+	int		fh_present;
 	struct fh_t	fh;
-	elem_status_t	tim_status;
+	int		tim_present;
 	struct tim_t	tim;
 };
 
