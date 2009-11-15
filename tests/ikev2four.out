@@ -19,7 +19,7 @@ IP (tos 0x0, ttl 64, id 19908, offset 0, flags [none], proto UDP (17), length 40
     (n: prot_id=#0 type=16388(nat_detection_source_ip))
     (n: prot_id=#0 type=16389(nat_detection_destination_ip))
 IP (tos 0x0, ttl 64, id 19909, offset 0, flags [none], proto UDP (17), length 88)
-    192.168.1.1.500 > 192.168.1.2.500: isakmp 2.0 msgid 00000000: parent_sa ikev2_init[]:
+    192.168.1.1.500 > 192.168.1.2.500: isakmp 2.0 msgid 00000000: parent_sa ikev2_init[R]:
     (n: prot_id=#0 type=16390(cookie) data=(00000001c2221e50c16e123f2b0c71aefcf0cb3b798782c6))
 IP (tos 0x0, ttl 64, id 19910, offset 0, flags [none], proto UDP (17), length 436)
     192.168.1.2.500 > 192.168.1.1.500: isakmp 2.0 msgid 00000000: parent_sa ikev2_init[I]:
@@ -43,7 +43,7 @@ IP (tos 0x0, ttl 64, id 19910, offset 0, flags [none], proto UDP (17), length 43
     (n: prot_id=#0 type=16388(nat_detection_source_ip))
     (n: prot_id=#0 type=16389(nat_detection_destination_ip))
 IP (tos 0x0, ttl 64, id 19911, offset 0, flags [none], proto UDP (17), length 332)
-    192.168.1.1.500 > 192.168.1.2.500: isakmp 2.0 msgid 00000000: parent_sa ikev2_init[]:
+    192.168.1.1.500 > 192.168.1.2.500: isakmp 2.0 msgid 00000000: parent_sa ikev2_init[R]:
     (sa: len=44
         (p: #1 protoid=isakmp transform=4 len=44
             (t: #1 type=encr id=aes (type=keylen value=0080))
@@ -58,7 +58,7 @@ IP (tos 0x0, ttl 64, id 19912, offset 0, flags [none], proto UDP (17), length 26
     192.168.1.2.500 > 192.168.1.1.500: isakmp 2.0 msgid 00000001: child_sa  ikev2_auth[I]:
     (v2e: len=204)
 IP (tos 0x0, ttl 64, id 19913, offset 0, flags [none], proto UDP (17), length 184)
-    192.168.1.1.500 > 192.168.1.2.500: isakmp 2.0 msgid 00000001: child_sa  ikev2_auth[]:
+    192.168.1.1.500 > 192.168.1.2.500: isakmp 2.0 msgid 00000001: child_sa  ikev2_auth[R]:
     (v2e: len=124)
 IP (tos 0x0, ttl 64, id 19914, offset 0, flags [none], proto UDP (17), length 280)
     192.168.1.2.500 > 192.168.1.1.500: isakmp 2.0 msgid 00000002: child_sa  child_sa[I]:
@@ -67,10 +67,10 @@ IP (tos 0x0, ttl 64, id 19915, offset 0, flags [none], proto UDP (17), length 24
     192.168.1.2.500 > 192.168.1.1.500: isakmp 2.0 msgid 00000003: child_sa  child_sa[I]:
     (v2e: len=188)
 IP (tos 0x0, ttl 64, id 19916, offset 0, flags [none], proto UDP (17), length 104)
-    192.168.1.1.500 > 192.168.1.2.500: isakmp 2.0 msgid 00000002: child_sa  child_sa[]:
+    192.168.1.1.500 > 192.168.1.2.500: isakmp 2.0 msgid 00000002: child_sa  child_sa[R]:
     (v2e: len=44)
 IP (tos 0x0, ttl 64, id 19917, offset 0, flags [none], proto UDP (17), length 104)
-    192.168.1.1.500 > 192.168.1.2.500: isakmp 2.0 msgid 00000003: child_sa  child_sa[]:
+    192.168.1.1.500 > 192.168.1.2.500: isakmp 2.0 msgid 00000003: child_sa  child_sa[R]:
     (v2e: len=44)
 IP (tos 0x0, ttl 64, id 19918, offset 0, flags [none], proto UDP (17), length 312)
     192.168.1.2.500 > 192.168.1.1.500: isakmp 2.0 msgid 00000004: child_sa  child_sa[I]:
@@ -79,10 +79,10 @@ IP (tos 0x0, ttl 64, id 19919, offset 0, flags [none], proto UDP (17), length 28
     192.168.1.2.500 > 192.168.1.1.500: isakmp 2.0 msgid 00000005: child_sa  child_sa[I]:
     (v2e: len=220)
 IP (tos 0x0, ttl 64, id 19920, offset 0, flags [none], proto UDP (17), length 232)
-    192.168.1.1.500 > 192.168.1.2.500: isakmp 2.0 msgid 00000004: child_sa  child_sa[]:
+    192.168.1.1.500 > 192.168.1.2.500: isakmp 2.0 msgid 00000004: child_sa  child_sa[R]:
     (v2e: len=172)
 IP (tos 0x0, ttl 64, id 19921, offset 0, flags [none], proto UDP (17), length 232)
-    192.168.1.1.500 > 192.168.1.2.500: isakmp 2.0 msgid 00000005: child_sa  child_sa[]:
+    192.168.1.1.500 > 192.168.1.2.500: isakmp 2.0 msgid 00000005: child_sa  child_sa[R]:
     (v2e: len=172)
 IP (tos 0x0, ttl 64, id 19922, offset 0, flags [none], proto UDP (17), length 312)
     192.168.1.2.500 > 192.168.1.1.500: isakmp 2.0 msgid 00000006: child_sa  child_sa[I]:
@@ -91,16 +91,16 @@ IP (tos 0x0, ttl 64, id 19923, offset 0, flags [none], proto UDP (17), length 28
     192.168.1.2.500 > 192.168.1.1.500: isakmp 2.0 msgid 00000007: child_sa  child_sa[I]:
     (v2e: len=220)
 IP (tos 0x0, ttl 64, id 19924, offset 0, flags [none], proto UDP (17), length 232)
-    192.168.1.1.500 > 192.168.1.2.500: isakmp 2.0 msgid 00000006: child_sa  child_sa[]:
+    192.168.1.1.500 > 192.168.1.2.500: isakmp 2.0 msgid 00000006: child_sa  child_sa[R]:
     (v2e: len=172)
 IP (tos 0x0, ttl 64, id 19925, offset 0, flags [none], proto UDP (17), length 232)
-    192.168.1.1.500 > 192.168.1.2.500: isakmp 2.0 msgid 00000007: child_sa  child_sa[]:
+    192.168.1.1.500 > 192.168.1.2.500: isakmp 2.0 msgid 00000007: child_sa  child_sa[R]:
     (v2e: len=172)
 IP (tos 0x0, ttl 64, id 19926, offset 0, flags [none], proto UDP (17), length 392)
     192.168.1.2.500 > 192.168.1.1.500: isakmp 2.0 msgid 00000008: child_sa  child_sa[I]:
     (v2e: len=332)
 IP (tos 0x0, ttl 64, id 19927, offset 0, flags [none], proto UDP (17), length 344)
-    192.168.1.1.500 > 192.168.1.2.500: isakmp 2.0 msgid 00000008: child_sa  child_sa[]:
+    192.168.1.1.500 > 192.168.1.2.500: isakmp 2.0 msgid 00000008: child_sa  child_sa[R]:
     (v2e: len=284)
 IP (tos 0x0, ttl 64, id 19928, offset 0, flags [none], proto UDP (17), length 120)
     192.168.1.2.500 > 192.168.1.1.500: isakmp 2.0 msgid 00000000: parent_sa inf2[I]:
