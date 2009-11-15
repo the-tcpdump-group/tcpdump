@@ -195,7 +195,7 @@ ip6_print(register const u_char *bp, register u_int length)
 			udp_print(cp, len, (const u_char *)ip6, fragmented);
 			return;
 		case IPPROTO_ICMPV6:
-			icmp6_print(cp, len, (const u_char *)ip6, fragmented);
+			icmp6_print(gndo, cp, len, (const u_char *)ip6, fragmented);
 			return;
 		case IPPROTO_AH:
 			advance = ah_print(cp);

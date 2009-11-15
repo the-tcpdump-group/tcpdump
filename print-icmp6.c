@@ -233,7 +233,8 @@ static int icmp6_cksum(const struct ip6_hdr *ip6, const struct icmp6_hdr *icp,
 }
 
 void
-icmp6_print(const u_char *bp, u_int length, const u_char *bp2, int fragmented)
+icmp6_print(netdissect_options *ndo,
+            const u_char *bp, u_int length, const u_char *bp2, int fragmented)
 {
 	const struct icmp6_hdr *dp;
 	const struct ip6_hdr *ip;
