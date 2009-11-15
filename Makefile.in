@@ -347,7 +347,7 @@ distclean:
 	rm -f $(CLEANFILES) Makefile config.cache config.log config.status \
 	    config.h gnuc.h os-proto.h stamp-h stamp-h.in $(PROG).1
 
-check:
+check: tcpdump
 	(cd tests && ./TESTrun.sh)
 
 tags: $(TAGFILES)
