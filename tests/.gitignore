@@ -14,6 +14,7 @@ isakmp-delete-segfault.pcap
 isakmp-identification-segfault.pcap
 isakmp-pointer-loop.pcap
 isakmp4500.pcap
+lmp.new
 lmp.pcap
 mpls-ldp-hello.pcap
 ospf-gmpls.pcap
