@@ -62,6 +62,9 @@ static void icmp6_rrenum_print(const u_char *, const u_char *);
 #define abs(a)	((0 < (a)) ? (a) : -(a))
 #endif
 
+/* inline the various RPL definitions */
+#define ND_RPL_MESSAGE 0x9B
+
 static struct tok icmp6_type_values[] = {
     { ICMP6_DST_UNREACH, "destination unreachable"},
     { ICMP6_PACKET_TOO_BIG, "packet too big"},
@@ -91,6 +94,7 @@ static struct tok icmp6_type_values[] = {
     { ICMP6_NI_REPLY, "node information reply"},
     { MLD6_MTRACE, "mtrace message"},
     { MLD6_MTRACE_RESP, "mtrace response"},
+    { ND_RPL_MESSAGE,   "RPL"},
     { 0,	NULL }
 };
 
@@ -231,6 +235,84 @@ static int icmp6_cksum(const struct ip6_hdr *ip6, const struct icmp6_hdr *icp,
 
 	return (sum);
 }
+
+enum ND_RPL_CODE {
+        ND_RPL_DAG_IS=0x01,
+        ND_RPL_DAG_IO=0x02,
+        ND_RPL_DAO   =0x04
+};
+
+enum ND_RPL_DIO_FLAGS {
+        ND_RPL_DIO_GROUNDED = 0x80,
+        ND_RPL_DIO_DATRIG   = 0x40,
+        ND_RPL_DIO_DASUPPORT= 0x20,
+        ND_RPL_DIO_RES4     = 0x10,
+        ND_RPL_DIO_RES3     = 0x08,
+        ND_RPL_DIO_PRF_MASK = 0x07,  /* 3-bit preference */
+};
+
+struct nd_rpl_dio {
+        u_int8_t rpl_flags;
+        u_int8_t rpl_seq;
+        u_int8_t rpl_instanceid;
+        u_int8_t rpl_dagrank;
+        u_int8_t rpl_dagid[16];
+};
+
+void
+rpl_print(netdissect_options *ndo,
+          const struct icmp6_hdr *hdr,
+          const u_char *bp, u_int length)
+{
+        struct nd_rpl_dio *dio = (struct nd_rpl_dio *)bp;
+
+        ND_TCHECK(dio->rpl_dagid);
+
+        switch(hdr->icmp6_code) {
+        case ND_RPL_DAG_IS:
+                ND_PRINT((ndo, ", DAG Information Solicitation"));
+                if(ndo->ndo_vflag) {
+                }
+                break;
+        case ND_RPL_DAG_IO:
+                ND_PRINT((ndo, ", DAG Information Object"));
+                if(ndo->ndo_vflag) {
+                        char dagid[65];
+                        char *d = dagid;
+                        int  i;
+                        for(i=0;i<16;i++) {
+                                if(isprint(dio->rpl_dagid[i])) {
+                                        *d++ = dio->rpl_dagid[i];
+                                } else {
+                                        int cnt=snprintf(d,4,"0x%02x",
+                                                         dio->rpl_dagid[i]);
+                                        d += cnt;
+                                }
+                        }
+                        *d++ = '\0';
+                        ND_PRINT((ndo, " [seq:%u,instance:%u,rank:%u,dagid:%s]",
+                                  dio->rpl_seq,
+                                  dio->rpl_instanceid,
+                                  dio->rpl_dagrank,
+                                  dagid));
+                }
+                break;
+        case ND_RPL_DAO:
+                ND_PRINT((ndo, ", Destination Advertisement Object"));
+                if(ndo->ndo_vflag) {
+                }
+                break;
+        default:
+                ND_PRINT((ndo, ", RPL message, unknown code %u",hdr->icmp6_code));
+                break;
+        }
+	return;
+trunc:
+	ND_PRINT((ndo," [|truncated]"));
+	return;
+        
+}
+
 
 void
 icmp6_print(netdissect_options *ndo,
@@ -506,6 +588,9 @@ icmp6_print(netdissect_options *ndo,
 					length - MPADVLEN);
 		}
 		break;
+        case ND_RPL_MESSAGE:
+                rpl_print(ndo, dp, &dp->icmp6_data8[0], length);
+                break;
 	default:
                 printf(", length %u", length);
                 if (vflag <= 1)
