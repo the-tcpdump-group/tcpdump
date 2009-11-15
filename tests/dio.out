@@ -1,0 +1,12 @@
+IP6 (hlim 255, next-header ICMPv6 (58) payload length: 24) fe80::1000:ff:fe64:6423 > ff02::1: [icmp6 sum ok] ICMP6, unknown icmp6 type (155), length 24, length 24
+	0x0000:  9b02 7769 000a 2a01 7468 6973 6973 6d79
+	0x0010:  6e69 6365 6461 6731
+IP6 (hlim 1, next-header Options (0) payload length: 36) fe80::1000:ff:fe64:6423 > ff02::16: HBH (rtalert: 0x0000) (padn)[icmp6 sum ok] ICMP6, multicast listener report v2, length 28, 1 group record(s) [gaddr ff02::2 to_in, 0 source(s)]
+IP6 (hlim 255, next-header ICMPv6 (58) payload length: 24) fe80::1000:ff:fe64:6423 > ff02::1: [icmp6 sum ok] ICMP6, unknown icmp6 type (155), length 24, length 24
+	0x0000:  9b02 7769 000a 2a01 7468 6973 6973 6d79
+	0x0010:  6e69 6365 6461 6731
+IP6 (hlim 1, next-header Options (0) payload length: 36) fe80::1000:ff:fe64:6423 > ff02::16: HBH (rtalert: 0x0000) (padn)[icmp6 sum ok] ICMP6, multicast listener report v2, length 28, 1 group record(s) [gaddr ff02::2 to_in, 0 source(s)]
+IP6 (hlim 255, next-header ICMPv6 (58) payload length: 24) fe80::1000:ff:fe64:6423 > ff02::1: [icmp6 sum ok] ICMP6, unknown icmp6 type (155), length 24, length 24
+	0x0000:  9b02 7769 000a 2a01 7468 6973 6973 6d79
+	0x0010:  6e69 6365 6461 6731
+IP6 (hlim 1, next-header Options (0) payload length: 36) fe80::1000:ff:fe64:6423 > ff02::16: HBH (rtalert: 0x0000) (padn)[icmp6 sum ok] ICMP6, multicast listener report v2, length 28, 1 group record(s) [gaddr ff02::2 to_in, 0 source(s)]
