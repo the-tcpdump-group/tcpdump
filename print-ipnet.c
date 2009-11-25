@@ -7,13 +7,13 @@
 #include <stdio.h>
 #include <pcap.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
 #include "ipnet.h"
 
 #ifdef DLT_IPNET
 
-int ipnet_encap_print(u_short, const u_char *, u_int, u_int);
+int ipnet_encap_print(netdissect_options *,u_short, const u_char *, u_int, u_int);
 
 const struct tok ipnet_values[] = {
 	{ IPH_AF_INET,		"IPv4" },
@@ -22,53 +22,53 @@ const struct tok ipnet_values[] = {
 };
 
 static inline void
-ipnet_hdr_print(register const u_char *bp, u_int length)
+ipnet_hdr_print(struct netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	const ipnet_hdr_t *hdr;
 	hdr = (const ipnet_hdr_t *)bp;
 
-	(void)printf("%d > %d", hdr->iph_zsrc, hdr->iph_zdst);
+	ND_PRINT((ndo, "%d > %d", hdr->iph_zsrc, hdr->iph_zdst));
 
-	if (!qflag) {
-		(void)printf(", family %s (%d)",
-			     tok2str(ipnet_values, "Unknown",
-				     hdr->iph_family),
-			      hdr->iph_family);
+	if (!ndo->ndo_qflag) {
+		ND_PRINT((ndo,", family %s (%d)",
+                          tok2str(ipnet_values, "Unknown",
+                                  hdr->iph_family),
+                          hdr->iph_family));
         } else {
-		(void)printf(", %s",
-			     tok2str(ipnet_values,
-				     "Unknown Ethertype (0x%04x)",
-				     hdr->iph_family));
+		ND_PRINT((ndo,", %s",
+                          tok2str(ipnet_values,
+                                  "Unknown Ethertype (0x%04x)",
+                                  hdr->iph_family)));
         }
 
-	(void)printf(", length %u: ", length);
+	ND_PRINT((ndo, ", length %u: ", length));
 }
 
 void
-ipnet_print(const u_char *p, u_int length, u_int caplen)
+ipnet_print(struct netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 {
 	ipnet_hdr_t *hdr;
 
 	if (caplen < sizeof(ipnet_hdr_t)) {
-		printf("[|ipnet]");
+		ND_PRINT((ndo, "[|ipnet]"));
 		return;
 	}
 
-	if (eflag)
-		ipnet_hdr_print(p, length);
+	if (ndo->ndo_eflag)
+		ipnet_hdr_print(ndo, p, length);
 
 	length -= sizeof(ipnet_hdr_t);
 	caplen -= sizeof(ipnet_hdr_t);
 	hdr = (ipnet_hdr_t *)p;
 	p += sizeof(ipnet_hdr_t);
 
-	if (ipnet_encap_print(hdr->iph_family, p, length, caplen) == 0) {
-		if (!eflag)
-			ipnet_hdr_print((u_char *)hdr,
+	if (ipnet_encap_print(ndo, hdr->iph_family, p, length, caplen) == 0) {
+		if (!ndo->ndo_eflag)
+			ipnet_hdr_print(ndo, (u_char *)hdr,
 					length + sizeof(ipnet_hdr_t));
 
-		if (!suppress_default_print)
-			default_print(p, caplen);
+		if (!ndo->ndo_suppress_default_print)
+			ndo->ndo_default_print(ndo, p, caplen);
 	} 
 }
 
@@ -79,9 +79,9 @@ ipnet_print(const u_char *p, u_int length, u_int caplen)
  * is the number of bytes actually captured.
  */
 u_int
-ipnet_if_print(const struct pcap_pkthdr *h, const u_char *p)
+ipnet_if_print(struct netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
-	ipnet_print(p, h->len, h->caplen);
+	ipnet_print(ndo, p, h->len, h->caplen);
 
 	return (sizeof(ipnet_hdr_t));
 }
@@ -99,7 +99,7 @@ ipnet_if_print(const struct pcap_pkthdr *h, const u_char *p)
  */
 
 int
-ipnet_encap_print(u_short family, const u_char *p,
+ipnet_encap_print(struct netdissect_options *ndo, u_short family, const u_char *p,
     u_int length, u_int caplen)
 {
  recurse:
@@ -107,7 +107,7 @@ ipnet_encap_print(u_short family, const u_char *p,
 	switch (family) {
 
 	case IPH_AF_INET:
-	        ip_print(gndo, p, length);
+	        ip_print(ndo, p, length);
 		return (1);
 
 #ifdef INET6

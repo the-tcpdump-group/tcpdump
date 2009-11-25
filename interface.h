@@ -322,9 +322,6 @@ extern void bfd_print(const u_char *, u_int, u_int);
 extern void sip_print(const u_char *, u_int);
 extern void syslog_print(const u_char *, u_int);
 extern u_int bt_if_print(const struct pcap_pkthdr *, const u_char *);
-extern void ipnet_print(const u_char *, u_int, u_int);
-extern u_int ipnet_if_print(const struct pcap_pkthdr *, const u_char *);
-extern int ipnet_encap_print(u_short, const u_char *, u_int, u_int);
 
 extern u_int usb_linux_print(const struct pcap_pkthdr *, const u_char *);
 
