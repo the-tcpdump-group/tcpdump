@@ -8,12 +8,11 @@
 #include <pcap.h>
 
 #include "netdissect.h"
+#include "interface.h"
 #include "addrtoname.h"
 #include "ipnet.h"
 
 #ifdef DLT_IPNET
-
-int ipnet_encap_print(netdissect_options *,u_short, const u_char *, u_int, u_int);
 
 const struct tok ipnet_values[] = {
 	{ IPH_AF_INET,		"IPv4" },
@@ -62,14 +61,27 @@ ipnet_print(struct netdissect_options *ndo, const u_char *p, u_int length, u_int
 	hdr = (ipnet_hdr_t *)p;
 	p += sizeof(ipnet_hdr_t);
 
-	if (ipnet_encap_print(ndo, hdr->iph_family, p, length, caplen) == 0) {
+	switch (hdr->iph_family) {
+
+	case IPH_AF_INET:
+	        ip_print(ndo, p, length);
+		break;
+
+#ifdef INET6
+	case IPH_AF_INET6:
+		ip6_print(p, length);
+		break;
+#endif /*INET6*/
+
+	default:
 		if (!ndo->ndo_eflag)
 			ipnet_hdr_print(ndo, (u_char *)hdr,
 					length + sizeof(ipnet_hdr_t));
 
 		if (!ndo->ndo_suppress_default_print)
 			ndo->ndo_default_print(ndo, p, caplen);
-	} 
+		break;
+	}
 }
 
 /*
@@ -85,42 +97,6 @@ ipnet_if_print(struct netdissect_options *ndo, const struct pcap_pkthdr *h, cons
 
 	return (sizeof(ipnet_hdr_t));
 }
-
-/*
- * Prints the packet encapsulated in an Ethernet data segment
- * (or an equivalent encapsulation), given the Ethernet type code.
- *
- * Returns non-zero if it can do so, zero if the ethertype is unknown.
- *
- * The Ethernet type code is passed through a pointer; if it was
- * ETHERTYPE_8021Q, it gets updated to be the Ethernet type of
- * the 802.1Q payload, for the benefit of lower layers that might
- * want to know what it is.
- */
-
-int
-ipnet_encap_print(struct netdissect_options *ndo, u_short family, const u_char *p,
-    u_int length, u_int caplen)
-{
- recurse:
-
-	switch (family) {
-
-	case IPH_AF_INET:
-	        ip_print(ndo, p, length);
-		return (1);
-
-#ifdef INET6
-	case IPH_AF_INET6:
-		ip6_print(p, length);
-		return (1);
-#endif /*INET6*/
-
-	default:
-		return(0);
-	}
-}
-
 
 /*
  * Local Variables:

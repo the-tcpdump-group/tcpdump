@@ -439,7 +439,6 @@ extern void pptp_print(netdissect_options *,const u_char *, u_int);
 
 extern void ipnet_print(netdissect_options *,const u_char *, u_int, u_int);
 extern u_int ipnet_if_print(netdissect_options *,const struct pcap_pkthdr *, const u_char *);
-extern int ipnet_encap_print(netdissect_options *,u_short, const u_char *, u_int, u_int);
 
 #if 0
 #ifdef INET6
