@@ -274,6 +274,8 @@ extern int esp_print(netdissect_options *,
 		     register const u_char *bp, int len, register const u_char *bp2,
 		     int *nhdr, int *padlen);
 extern void arp_print(netdissect_options *,const u_char *, u_int, u_int);
+extern void icmp6_print(netdissect_options *ndo, const u_char *,
+                        u_int, const u_char *, int);
 extern void isakmp_print(netdissect_options *,const u_char *,
 			 u_int, const u_char *);
 extern void isakmp_rfc3948_print(netdissect_options *,const u_char *,
@@ -329,8 +331,6 @@ extern void fddi_if_print(u_char *,const struct pcap_pkthdr *, const u_char *);
 extern void gre_print(netdissect_options *,const u_char *, u_int);
 extern void icmp_print(netdissect_options *,const u_char *, u_int,
 		       const u_char *);
-extern void icmp6_print(netdissect_options *ndo, const u_char *,
-                        u_int, const u_char *, int);
 extern void hsrp_print(netdissect_options *ndo,
 		       register const u_char *bp, register u_int len);
 extern void ieee802_11_if_print(u_char *,const struct pcap_pkthdr *, const u_char *);
