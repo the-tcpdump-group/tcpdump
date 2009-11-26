@@ -43,7 +43,7 @@ ipnet_hdr_print(struct netdissect_options *ndo, const u_char *bp, u_int length)
 	ND_PRINT((ndo, ", length %u: ", length));
 }
 
-void
+static void
 ipnet_print(struct netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 {
 	ipnet_hdr_t *hdr;
@@ -91,9 +91,9 @@ ipnet_print(struct netdissect_options *ndo, const u_char *p, u_int length, u_int
  * is the number of bytes actually captured.
  */
 u_int
-ipnet_if_print(struct netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
+ipnet_if_print(const struct pcap_pkthdr *h, const u_char *p)
 {
-	ipnet_print(ndo, p, h->len, h->caplen);
+	ipnet_print(gndo, p, h->len, h->caplen);
 
 	return (sizeof(ipnet_hdr_t));
 }
