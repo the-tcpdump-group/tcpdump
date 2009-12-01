@@ -105,7 +105,7 @@ int32_t thiszone;		/* seconds offset from gmt to local time */
 static RETSIGTYPE cleanup(int);
 static RETSIGTYPE child_cleanup(int);
 static void usage(void) __attribute__((noreturn));
-static void show_dlts_and_exit(pcap_t *pd) __attribute__((noreturn));
+static void show_dlts_and_exit(const char *device, pcap_t *pd) __attribute__((noreturn));
 
 static void print_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void ndo_default_print(netdissect_options *, const u_char *, u_int);
@@ -303,6 +303,8 @@ lookup_printer(int type)
 
 static pcap_t *pd;
 
+static int supports_monitor_mode;
+
 extern int optind;
 extern int opterr;
 extern char *optarg;
@@ -319,7 +321,7 @@ struct dump_info {
 };
 
 static void
-show_dlts_and_exit(pcap_t *pd)
+show_dlts_and_exit(const char *device, pcap_t *pd)
 {
 	int n_dlts;
 	int *dlts = 0;
@@ -331,7 +333,21 @@ show_dlts_and_exit(pcap_t *pd)
 	else if (n_dlts == 0 || !dlts)
 		error("No data link types.");
 
-	(void) fprintf(stderr, "Data link types (use option -y to set):\n");
+	/*
+	 * If the interface is known to support monitor mode, indicate
+	 * whether these are the data link types available when not in
+	 * monitor mode, if -I wasn't specified, or when in monitor mode,
+	 * when -I was specified (the link-layer types available in
+	 * monitor mode might be different from the ones available when
+	 * not in monitor mode).
+	 */
+	if (supports_monitor_mode)
+		(void) fprintf(stderr, "Data link types for %s %s (use option -y to set):\n",
+		    device,
+		    Iflag ? "when in monitor mode" : "when not in monitor mode");
+	else
+		(void) fprintf(stderr, "Data link types for %s (use option -y to set):\n",
+		    device);
 
 	while (--n_dlts >= 0) {
 		dlt_name = pcap_datalink_val_to_name(dlts[n_dlts]);
@@ -975,6 +991,13 @@ main(int argc, char **argv)
 		pd = pcap_create(device, ebuf);
 		if (pd == NULL)
 			error("%s", ebuf);
+		/*
+		 * Is this an interface that supports monitor mode?
+		 */
+		if (pcap_can_set_rfmon(pd) == 1)
+			supports_monitor_mode = 1;
+		else
+			supports_monitor_mode = 0;
 		status = pcap_set_snaplen(pd, snaplen);
 		if (status != 0)
 			error("%s: pcap_set_snaplen failed: %s",
@@ -1053,7 +1076,7 @@ main(int argc, char **argv)
 			}
 #endif /* !defined(HAVE_PCAP_CREATE) && defined(WIN32) */
 		if (Lflag)
-			show_dlts_and_exit(pd);
+			show_dlts_and_exit(device, pd);
 		if (gndo->ndo_dlt >= 0) {
 #ifdef HAVE_PCAP_SET_DATALINK
 			if (pcap_set_datalink(pd, gndo->ndo_dlt) < 0)
