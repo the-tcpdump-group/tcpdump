@@ -1,5 +1,29 @@
 $Header: /tcpdump/master/tcpdump/CHANGES,v 1.100 2008-12-14 19:58:28 guy Exp $
 
+Mon.	December 21, 2009.  ken@netfunctional.ca.  Summary for 4.0.2 tcpdump release
+	Make the default snapshot (-s) the maximum
+	Print name of device (when -L is used)
+	Support for OpenSolaris (and SXCE build 125 and later)
+	Print new TCP flags
+	Add support for RPL DIO
+	Add support for TCP User Timeout (UTO)
+	Add support for non-standard Ethertypes used by 3com PPPoE gear
+	Add support for 802.11n and 802.11s
+	Add support for Transparent Ethernet Bridge ethertype in GRE
+	Add 4 byte AS support for BGP printer
+	Add support for the MDT SAFI 66 BG printer
+	Add basic IPv6 support to print-olsr
+	Add USB printer
+	Handle frames with an FCS
+	Handle 802.11n Control Wrapper, Block Acq Req and Block Ack frames
+	Fix TCP sequence number printing 
+	Report 802.2 packets as 802.2 instead of 802.3
+	Don't include -L/usr/lib in LDFLAGS
+	On x86_64 Linux, look in lib64 directory too
+	Lots of code clean ups
+	Autoconf clean ups
+	Update testcases to make output changes
+
 Mon.    December 8, 2008.  ken@netfunctional.ca.  Summary for 4.0.1 tcpdump release
 	Fix compiling with/out smi (--with{,out}-smi)
 	Fix compiling without IPv6 support (--disable-ipv6)
