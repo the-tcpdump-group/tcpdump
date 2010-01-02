@@ -1836,6 +1836,7 @@ case $host_os in *\ *) host_os=`echo "$host_os" | sed 's/ /-/g'`;; esac
 
 
 
+
 # Check whether --with-gcc was given.
 if test "${with_gcc+set}" = set; then
   withval=$with_gcc;
@@ -1902,7 +1903,8 @@ fi
 	    CC=cc
 	    export CC
     fi
-    ac_ext=c
+
+ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
@@ -2820,6 +2822,10 @@ ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+
+
 
     if test "$GCC" = yes ; then
 	    if test "$SHLICC2" = yes ; then
@@ -3802,7 +3808,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 else
   ac_cv_header_stdc=no
 fi
-rm -f conftest*
+rm -f -r conftest*
 
 fi
 
@@ -3823,7 +3829,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 else
   ac_cv_header_stdc=no
 fi
-rm -f conftest*
+rm -f -r conftest*
 
 fi
 
@@ -4910,7 +4916,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
   ipv6type=$i;
 				CFLAGS="-DINET6 $CFLAGS"
 fi
-rm -f conftest*
+rm -f -r conftest*
 
 			;;
 		kame)
@@ -4933,7 +4939,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 				ipv6trylibc=yes;
 				CFLAGS="-DINET6 $CFLAGS"
 fi
-rm -f conftest*
+rm -f -r conftest*
 
 			;;
 		linux-glibc)
@@ -4953,7 +4959,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
   ipv6type=$i;
 				CFLAGS="-DINET6 $CFLAGS"
 fi
-rm -f conftest*
+rm -f -r conftest*
 
 			;;
 		linux-libinet6)
@@ -4984,7 +4990,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 				ipv6libdir=/usr/local/v6/lib;
 				CFLAGS="-DINET6 $CFLAGS"
 fi
-rm -f conftest*
+rm -f -r conftest*
 
 			;;
 		v6d)
@@ -5006,7 +5012,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 				ipv6libdir=/usr/local/v6/lib;
 				CFLAGS="-I/usr/local/v6/include $CFLAGS"
 fi
-rm -f conftest*
+rm -f -r conftest*
 
 			;;
 		zeta)
@@ -5028,7 +5034,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 				ipv6libdir=/usr/local/v6/lib;
 				CFLAGS="-DINET6 $CFLAGS"
 fi
-rm -f conftest*
+rm -f -r conftest*
 
 			;;
 		esac
@@ -5449,7 +5455,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 else
   td_cv_decl_netdnet_dnetdb_h_dnet_htoa=no
 fi
-rm -f conftest*
+rm -f -r conftest*
 
 fi
 { echo "$as_me:$LINENO: result: $td_cv_decl_netdnet_dnetdb_h_dnet_htoa" >&5
@@ -7578,7 +7584,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 else
   ac_cv_maxserv=no
 fi
-rm -f conftest*
+rm -f -r conftest*
 
 fi
 
@@ -7618,7 +7624,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 else
   ac_cv_namereqd=no
 fi
-rm -f conftest*
+rm -f -r conftest*
 
 fi
 
