@@ -13643,7 +13643,7 @@ EOF
 				ac_cv_lbl_unaligned_fail=no
 			fi
 		fi
-		rm -f conftest* core core.conftest
+		rm -f -r conftest* core core.conftest
 		;;
 	esac
 fi

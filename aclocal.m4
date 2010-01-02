@@ -604,7 +604,7 @@ AC_DEFUN(AC_LBL_HAVE_RUN_PATH,
 	else
 		ac_cv_lbl_have_run_path=no
 	fi
-	rm -f conftest*])
+	rm -f -r conftest*])
     AC_MSG_RESULT($ac_cv_lbl_have_run_path)
     ])
 
@@ -744,7 +744,7 @@ EOF
 				ac_cv_lbl_unaligned_fail=no
 			fi
 		fi
-		rm -f conftest* core core.conftest
+		rm -f -r conftest* core core.conftest
 		;;
 	esac])
     AC_MSG_RESULT($ac_cv_lbl_unaligned_fail)
