@@ -151,7 +151,7 @@ static struct printer printers[] = {
 	{ cip_if_print,         DLT_CIP },
 #endif
 #ifdef DLT_ATM_CLIP
-	{ cip_if_print,         DLT_ATM_CLIP },
+	{ cip_if_print,		DLT_ATM_CLIP },
 #endif
 	{ sl_if_print,		DLT_SLIP },
 #ifdef DLT_SLIP_BSDOS
@@ -178,7 +178,7 @@ static struct printer printers[] = {
 	{ chdlc_if_print,	DLT_HDLC },
 #endif
 #ifdef DLT_PPP_SERIAL
-	{ ppp_hdlc_if_print,    DLT_PPP_SERIAL },
+	{ ppp_hdlc_if_print,	DLT_PPP_SERIAL },
 #endif
 #ifdef DLT_PPP_ETHER
 	{ pppoe_if_print,	DLT_PPP_ETHER },
@@ -193,7 +193,7 @@ static struct printer printers[] = {
 	{ ltalk_if_print,	DLT_LTALK },
 #endif
 #if defined(DLT_PFLOG) && defined(HAVE_NET_PFVAR_H)
-	{ pflog_if_print, 	DLT_PFLOG },
+	{ pflog_if_print,	DLT_PFLOG },
 #endif
 #ifdef DLT_FR
 	{ fr_if_print,		DLT_FR },
@@ -214,10 +214,10 @@ static struct printer printers[] = {
 	{ ieee802_11_radio_if_print,	DLT_IEEE802_11_RADIO },
 #endif
 #ifdef DLT_ENC
-	{ enc_if_print, 	DLT_ENC },
+	{ enc_if_print,		DLT_ENC },
 #endif
 #ifdef DLT_SYMANTEC_FIREWALL
-	{ symantec_if_print, 	DLT_SYMANTEC_FIREWALL },
+	{ symantec_if_print,	DLT_SYMANTEC_FIREWALL },
 #endif
 #ifdef DLT_APPLE_IP_OVER_IEEE1394
 	{ ap1394_if_print,	DLT_APPLE_IP_OVER_IEEE1394 },
@@ -259,31 +259,37 @@ static struct printer printers[] = {
 	{ juniper_services_print, DLT_JUNIPER_SERVICES },
 #endif
 #ifdef DLT_JUNIPER_ETHER
-	{ juniper_ether_print, DLT_JUNIPER_ETHER },
+	{ juniper_ether_print,	DLT_JUNIPER_ETHER },
 #endif
 #ifdef DLT_JUNIPER_PPP
-	{ juniper_ppp_print, DLT_JUNIPER_PPP },
+	{ juniper_ppp_print,	DLT_JUNIPER_PPP },
 #endif
 #ifdef DLT_JUNIPER_FRELAY
-	{ juniper_frelay_print, DLT_JUNIPER_FRELAY },
+	{ juniper_frelay_print,	DLT_JUNIPER_FRELAY },
 #endif
 #ifdef DLT_JUNIPER_CHDLC
-	{ juniper_chdlc_print, DLT_JUNIPER_CHDLC },
+	{ juniper_chdlc_print,	DLT_JUNIPER_CHDLC },
 #endif
 #ifdef DLT_MFR
-	{ mfr_if_print, DLT_MFR },
+	{ mfr_if_print,		DLT_MFR },
 #endif
 #if defined(DLT_BLUETOOTH_HCI_H4_WITH_PHDR) && defined(HAVE_PCAP_BLUETOOTH_H)
-	{ bt_if_print, DLT_BLUETOOTH_HCI_H4_WITH_PHDR},
+	{ bt_if_print,		DLT_BLUETOOTH_HCI_H4_WITH_PHDR},
 #endif
 #if defined(HAVE_PCAP_USB_H) && defined(DLT_USB_LINUX)
-	{ usb_linux_print, DLT_USB_LINUX},
+	{ usb_linux_print,	DLT_USB_LINUX},
 #endif
 #if defined(HAVE_PCAP_USB_H) && defined(DLT_USB_LINUX_MMAPPED)
-	{ usb_linux_print, DLT_USB_LINUX_MMAPPED},
+	{ usb_linux_print,	DLT_USB_LINUX_MMAPPED},
 #endif
 #ifdef DLT_IPNET
-	{ ipnet_if_print, DLT_IPNET },
+	{ ipnet_if_print,	DLT_IPNET },
+#endif
+#ifdef DLT_IPV4
+	{ raw_if_print,		DLT_IPV4 },
+#endif
+#ifdef DLT_IPV6
+	{ raw_if_print,		DLT_IPV6 },
 #endif
 	{ NULL,			0 },
 };
