@@ -41,3 +41,8 @@ dio01           dio.pcap                dio.out         -t -v
 # IPNET encapsulated site
 e1000g		e1000g.pcap		e1000g.out	-t
 
+# IETF FORCES WG packets and printer
+forces01        forces1.pcap            forces1.out     -t
+forces02        forces2.pcap            forces2.out     -t
+forces02v       forces2.pcap            forces2v.out     -t -v
+
