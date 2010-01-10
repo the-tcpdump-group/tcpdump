@@ -39,7 +39,7 @@
 */
 #define	ForCES_VERS	1
 #define	ForCES_HDRL	24
-#define	ForCES_ALNL	4
+#define	ForCES_ALNL	4U
 #define TLV_HDRL	4
 #define ILV_HDRL	8
 
@@ -104,8 +104,14 @@ int asttlv_print(register const u_char * pptr, register u_int len,
 		 u_int16_t op_msk, int indent);
 int gentltlv_print(register const u_char * pptr, register u_int len,
 		   u_int16_t op_msk, int indent);
+int print_metailv(register const u_char * pptr, register u_int len,
+	      u_int16_t op_msk, int indent);
+int print_metatlv(register const u_char * pptr, register u_int len,
+	      u_int16_t op_msk, int indent);
+int print_reddata(register const u_char * pptr, register u_int len,
+	      u_int16_t op_msk, int indent);
 
-static inline tom_valid(u_int8_t tom)
+static inline int tom_valid(u_int8_t tom)
 {
 	if (tom > 0) {
 		if (tom >= 0x7 && tom <= 0xe)
@@ -121,7 +127,7 @@ static inline tom_valid(u_int8_t tom)
 
 static inline const char *ForCES_node(u_int32_t node)
 {
-	if (node >= 0 && node <= 0x3FFFFFFF)
+	if (node <= 0x3FFFFFFF)
 		return "FE";
 	if (node >= 0x40000000 && node <= 0x7FFFFFFF)
 		return "CE";
@@ -227,6 +233,9 @@ struct tok ForCES_LFBs[] = {
 	{F_LFB_FEPO, "FEProtoObj LFB"},
 	{0, NULL}
 };
+
+int forces_type_print(register const u_char * pptr, const struct forcesh *fhdr,
+		  register u_int mlen, struct tom_h *tops);
 
 enum {
 	F_OP_RSV,
@@ -348,7 +357,7 @@ static inline char *indent_pr(int indent, int nlpref)
 	return r;
 }
 
-static inline op_valid(u_int16_t op, u_int16_t mask)
+static inline int op_valid(u_int16_t op, u_int16_t mask)
 {
 	int opb = 1 << (op - 1);
 
@@ -419,6 +428,8 @@ struct forces_tlv {
 	u_int16_t length;
 };
 
+int otlv_print(struct forces_tlv *otlv, u_int16_t op_msk, int indent);
+
 #define F_ALN_LEN(len) ( ((len)+ForCES_ALNL-1) & ~(ForCES_ALNL-1) )
 #define	GET_TOP_TLV(fhdr) ((struct forces_tlv *)((fhdr) + sizeof (struct forcesh)))
 #define TLV_SET_LEN(len)  (F_ALN_LEN(sizeof(struct forces_tlv)) + (len))
@@ -448,9 +459,9 @@ static struct tok ForCES_TLV_err[] = {
 	{0, NULL}
 };
 
-static inline int tlv_valid(struct forces_tlv *tlv, int rlen)
+static inline int tlv_valid(struct forces_tlv *tlv, u_int rlen)
 {
-	if (rlen < sizeof(struct forces_tlv))
+	if (rlen < (int) sizeof(struct forces_tlv))
 		return INVALID_RLEN;
 	if (ntohs(tlv->length) < sizeof(struct forces_tlv))
 		return INVALID_STLN;
@@ -462,7 +473,7 @@ static inline int tlv_valid(struct forces_tlv *tlv, int rlen)
 	return 0;
 }
 
-static inline int ilv_valid(struct forces_ilv *ilv, int rlen)
+static inline int ilv_valid(struct forces_ilv *ilv, u_int rlen)
 {
 	if (rlen < sizeof(struct forces_ilv))
 		return INVALID_RLEN;
@@ -542,14 +553,12 @@ enum {
 
 static inline int pd_valid(u_int16_t pd)
 {
-	if (pd > 0) {
-		if (pd >= F_TLV_PDAT && pd <= F_TLV_REST)
-			return 1;
-	} else
-		return 0;
+	if (pd >= F_TLV_PDAT && pd <= F_TLV_REST)
+		return 1;
+	return 0;
 }
 
-static inline int chk_op_type(u_int16_t type, u_int16_t msk, u_int16_t omsk)
+static inline void chk_op_type(u_int16_t type, u_int16_t msk, u_int16_t omsk)
 {
 	if (type != F_TLV_PDAT) {
 		if (msk & B_KEYIN) {
@@ -570,12 +579,19 @@ static inline int chk_op_type(u_int16_t type, u_int16_t msk, u_int16_t omsk)
 
 int fdatatlv_print(register const u_char * pptr, register u_int len,
 		   u_int16_t op_msk, int indent);
+int sdatailv_print(register const u_char * pptr, register u_int len,
+	       u_int16_t op_msk, int indent);
 int sdatatlv_print(register const u_char * pptr, register u_int len,
 		   u_int16_t op_msk, int indent);
 int pdatatlv_print(register const u_char * pptr, register u_int len,
 		   u_int16_t op_msk, int indent);
 int pkeyitlv_print(register const u_char * pptr, register u_int len,
 		   u_int16_t op_msk, int indent);
+
+int pdatacnt_print(register const u_char * pptr, register u_int len,
+	       u_int32_t IDcnt, u_int16_t op_msk, int indent);
+int pdata_print(register const u_char * pptr, register u_int len,
+	    u_int16_t op_msk, int indent);
 
 int prestlv_print(register const u_char * pptr, register u_int len,
 		  u_int16_t op_msk, int indent);

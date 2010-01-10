@@ -32,12 +32,11 @@
 
 int
 prestlv_print(register const u_char * pptr, register u_int len,
-	      u_int16_t op_msk, int indent)
+	      u_int16_t op_msk _U_, int indent)
 {
 	struct forces_tlv *tlv = (struct forces_tlv *)pptr;
 	register const u_char *tdp = (u_char *) TLV_DATA(tlv);
 	struct res_val *r = (struct res_val *)tdp;
-	u_int32_t allres = (u_int32_t) * (u_char *) TLV_DATA(tlv);
 	u_int16_t dlen = len - TLV_HDRL;
 
 	if (dlen != RESLEN) {
@@ -60,7 +59,7 @@ prestlv_print(register const u_char * pptr, register u_int len,
 
 int
 fdatatlv_print(register const u_char * pptr, register u_int len,
-	       u_int16_t op_msk, int indent)
+	       u_int16_t op_msk _U_, int indent)
 {
 	struct forces_tlv *tlv = (struct forces_tlv *)pptr;
 	u_int tll = len - TLV_HDRL;
@@ -82,9 +81,9 @@ fdatatlv_print(register const u_char * pptr, register u_int len,
 
 int
 sdatailv_print(register const u_char * pptr, register u_int len,
-	       u_int16_t op_msk, int indent)
+	       u_int16_t op_msk _U_, int indent)
 {
-	int tll = len - ILV_HDRL;
+	u_int tll = len - ILV_HDRL;
 	struct forces_ilv *ilv = (struct forces_ilv *)pptr;
 	int invilv;
 
@@ -159,7 +158,7 @@ int
 pdatacnt_print(register const u_char * pptr, register u_int len,
 	       u_int32_t IDcnt, u_int16_t op_msk, int indent)
 {
-	int i;
+	u_int i;
 	int rc;
 	u_int32_t id;
 	char *ib = indent_pr(indent, 0);
@@ -167,7 +166,7 @@ pdatacnt_print(register const u_char * pptr, register u_int len,
 	for (i = 0; i < IDcnt; i++) {
 		id = EXTRACT_32BITS(pptr);
 		if (vflag >= 3)
-			printf("%s  ID#%02d: %d\n", ib, i + 1, id);
+			printf("%s  ID#%02u: %d\n", ib, i + 1, id);
 		len -= 4;
 		pptr += 4;
 	}
@@ -175,9 +174,8 @@ pdatacnt_print(register const u_char * pptr, register u_int len,
 		struct forces_tlv *pdtlv = (struct forces_tlv *)pptr;
 		u_int16_t type = ntohs(pdtlv->type);
 		u_int16_t tll = ntohs(pdtlv->length) - TLV_HDRL;
-		register const u_char *dp = (u_char *) TLV_DATA(pdtlv);
 		int pad = 0;
-		int aln = F_ALN_LEN(ntohs(pdtlv->length));
+		u_int aln = F_ALN_LEN(ntohs(pdtlv->length));
 
 		int invtlv = tlv_valid(pdtlv, len);
 
@@ -240,7 +238,7 @@ pdata_print(register const u_char * pptr, register u_int len,
 {
 	struct pathdata_h *pdh = (struct pathdata_h *)pptr;
 	char *ib = indent_pr(indent, 0);
-	int minsize = 0;
+	u_int minsize = 0;
 	if (vflag >= 3) {
 		printf("\n%sPathdata: Flags 0x%x ID count %d\n",
 		       ib, ntohs(pdh->pflags), ntohs(pdh->pIDcnt));
@@ -253,7 +251,7 @@ pdata_print(register const u_char * pptr, register u_int len,
 	len -= sizeof(struct pathdata_h);
 	minsize = ntohs(pdh->pIDcnt) * 4;
 	if (len < minsize) {
-		printf("\t\t\ttruncated IDs expectd %dB got %dB\n", minsize,
+		printf("\t\t\ttruncated IDs expected %uB got %uB\n", minsize,
 		       len);
 		hex_print_with_offset("\t\t\tID Data[", pptr, len, 0);
 		printf("]\n");
@@ -271,8 +269,6 @@ genoptlv_print(register const u_char * pptr, register u_int len,
 	int tll = ntohs(pdtlv->length) - TLV_HDRL;
 	int invtlv = tlv_valid(pdtlv, len);
 	char *ib = indent_pr(indent, 0);
-	struct optlv_h *ops;
-	int rc = 0;
 
 	printf("genoptlvprint - %s TLV type 0x%x len %d\n",
 	       tok2str(ForCES_TLV, NULL, type), type, ntohs(pdtlv->length));
@@ -341,7 +337,7 @@ recpdoptlv_print(register const u_char * pptr, register u_int len,
 
 int
 invoptlv_print(register const u_char * pptr, register u_int len,
-	       u_int16_t op_msk, int indent)
+	       u_int16_t op_msk _U_, int indent)
 {
 	char *ib = indent_pr(indent, 1);
 	if (vflag >= 3) {
@@ -352,7 +348,7 @@ invoptlv_print(register const u_char * pptr, register u_int len,
 	return -1;
 }
 
-int otlv_print(struct forces_tlv *otlv, u_int16_t op_msk, int indent)
+int otlv_print(struct forces_tlv *otlv, u_int16_t op_msk _U_, int indent)
 {
 	int rc = 0;
 	register const u_char *dp = (u_char *) TLV_DATA(otlv);
@@ -360,20 +356,19 @@ int otlv_print(struct forces_tlv *otlv, u_int16_t op_msk, int indent)
 	int tll = ntohs(otlv->length) - TLV_HDRL;
 	char *ib = indent_pr(indent, 0);
 	struct optlv_h *ops;
-	struct pathdata_h *pdh;
 
 	ops = get_forces_optlv_h(type);
 	if (vflag >= 3) {
 		printf("%sOper TLV %s(0x%x) length %d\n", ib, ops->s, type,
 		       ntohs(otlv->length));
 	}
-	//empty TLVs like COMMIT and TRCOMMIT are empty, we stop here ..
+	/* empty TLVs like COMMIT and TRCOMMIT are empty, we stop here .. */
 	if (!ops->flags & ZERO_TTLV) {
-		if (tll != 0)	// instead of "if (tll)" - for readability ..
+		if (tll != 0)	/* instead of "if (tll)" - for readability .. */
 			printf("%s: Illegal - MUST be empty\n", ops->s);
 		return rc;
 	}
-	// rest of ops must at least have 12B {pathinfo}
+	/* rest of ops must at least have 12B {pathinfo} */
 	if (tll < OP_MIN_SIZ) {
 		printf("\t\tOper TLV %s(0x%x) length %d\n", ops->s, type,
 		       ntohs(otlv->length));
@@ -391,7 +386,7 @@ int otlv_print(struct forces_tlv *otlv, u_int16_t op_msk, int indent)
 #define ASTMCD	255
 int
 asttlv_print(register const u_char * pptr, register u_int len,
-	     u_int16_t op_msk, int indent)
+	     u_int16_t op_msk _U_, int indent)
 {
 
 	u_int32_t rescode;
@@ -438,14 +433,14 @@ asttlv_print(register const u_char * pptr, register u_int len,
 #define ASRMCD	3
 int
 asrtlv_print(register const u_char * pptr, register u_int len,
-	     u_int16_t op_msk, int indent)
+	     u_int16_t op_msk _U_, int indent)
 {
 
 	u_int32_t rescode;
 	u_int16_t dlen = len - TLV_HDRL;
 	char *ib = indent_pr(indent, 0);
 
-	if (dlen != ASRDLN) {	// id, instance, oper tlv
+	if (dlen != ASRDLN) {	/* id, instance, oper tlv */
 		printf("illegal ASRresult-TLV: %d bytes! \n", dlen);
 		return -1;
 	}
@@ -478,8 +473,8 @@ asrtlv_print(register const u_char * pptr, register u_int len,
 }
 
 int
-gentltlv_print(register const u_char * pptr, register u_int len,
-	       u_int16_t op_msk, int indent)
+gentltlv_print(register const u_char * pptr _U_, register u_int len,
+	       u_int16_t op_msk _U_, int indent _U_)
 {
 	u_int16_t dlen = len - TLV_HDRL;
 	if (dlen < 4) {		/* at least 32 bits must exist */
@@ -492,26 +487,26 @@ gentltlv_print(register const u_char * pptr, register u_int len,
 #define RD_MIN 8
 int
 print_metailv(register const u_char * pptr, register u_int len,
-	      u_int16_t op_msk, int indent)
+	      u_int16_t op_msk _U_, int indent)
 {
 	u_int16_t dlen = len - ILV_HDRL;
 	int tll = dlen;
 	char *ib = indent_pr(indent, 0);
-	//XXX: check header length
+	/* XXX: check header length */
 	struct forces_ilv *ilv = (struct forces_ilv *)pptr;
 	printf("\n%sMetaID 0x%x length %d\n", ib, ntohl(ilv->type),
 	       ntohl(ilv->length));
-	hex_print_with_offset("\n\t\t\t\t[", (char *)ILV_DATA(ilv), tll, 0);
+	hex_print_with_offset("\n\t\t\t\t[", ILV_DATA(ilv), tll, 0);
 	return 0;
 }
 
 int
 print_metatlv(register const u_char * pptr, register u_int len,
-	      u_int16_t op_msk, int indent)
+	      u_int16_t op_msk _U_, int indent)
 {
 	u_int16_t dlen = len - TLV_HDRL;
 	char *ib = indent_pr(indent, 0);
-	int tll = dlen;
+	u_int tll = dlen;
 	struct forces_ilv *ilv = (struct forces_ilv *)pptr;
 	int invilv;
 
@@ -532,10 +527,10 @@ print_metatlv(register const u_char * pptr, register u_int len,
 */
 int
 print_reddata(register const u_char * pptr, register u_int len,
-	      u_int16_t op_msk, int indent)
+	      u_int16_t op_msk _U_, int indent _U_)
 {
 	u_int16_t dlen = len - TLV_HDRL;
-	int tll = dlen;
+	u_int tll = dlen;
 	int invtlv;
 	struct forces_tlv *tlv = (struct forces_tlv *)pptr;
 
@@ -555,17 +550,17 @@ print_reddata(register const u_char * pptr, register u_int len,
 	}
 
 	tll -= TLV_HDRL;
-	hex_print_with_offset("\n\t\t\t[", (char *)TLV_DATA(tlv), tll, 0);
+	hex_print_with_offset("\n\t\t\t[", TLV_DATA(tlv), tll, 0);
 	return 0;
 }
 
 int
 redirect_print(register const u_char * pptr, register u_int len,
-	       u_int16_t op_msk, int indent)
+	       u_int16_t op_msk _U_, int indent)
 {
 	struct forces_tlv *tlv = (struct forces_tlv *)pptr;
 	u_int16_t dlen = len - TLV_HDRL;
-	int tll = dlen;
+	u_int tll = dlen;
 	int invtlv;
 
 	if (dlen <= RD_MIN) {
@@ -612,10 +607,10 @@ lfbselect_print(register const u_char * pptr, register u_int len,
 	struct forces_tlv *otlv;
 	char *ib = indent_pr(indent, 0);
 	u_int16_t dlen = len - TLV_HDRL;
-	int tll = dlen - OP_OFF;
+	u_int tll = dlen - OP_OFF;
 	int invtlv;
 
-	if (dlen <= OP_MIN) {	// id, instance, oper tlv header ..
+	if (dlen <= OP_MIN) {	/* id, instance, oper tlv header .. */
 		printf("\n\t\ttruncated lfb selector: %d bytes missing! ",
 		       OP_MIN - dlen);
 		return -1;
@@ -643,7 +638,7 @@ lfbselect_print(register const u_char * pptr, register u_int len,
 			printf
 			    ("\t\tINValid oper-TLV type 0x%x length %d for this ForCES message\n",
 			     ntohs(otlv->type), ntohs(otlv->length));
-			invoptlv_print((char *)otlv, tll, 0, indent);
+			invoptlv_print((u_char *)otlv, tll, 0, indent);
 		}
 		otlv = GO_NXT_TLV(otlv, tll);
 	}
@@ -659,15 +654,14 @@ lfbselect_print(register const u_char * pptr, register u_int len,
 }
 
 int
-forces_type_print(register const u_char * pptr, const struct forcesh *fhdr,
+forces_type_print(register const u_char * pptr, const struct forcesh *fhdr _U_,
 		  register u_int mlen, struct tom_h *tops)
 {
 	struct forces_tlv *tltlv;
-	int tll;
+	u_int tll;
 	int invtlv;
 	int rc = 0;
 	int ttlv = 0;
-	int len = mlen;
 
 	tll = mlen - sizeof(struct forcesh);
 
@@ -760,7 +754,7 @@ void forces_print(register const u_char * pptr, register u_int len)
 
 	flg_raw = EXTRACT_32BITS(pptr + 20);
 	if (vflag >= 1) {
-		printf("\n\tForCES Version %d len %dB flags 0x%08x ",
+		printf("\n\tForCES Version %d len %uB flags 0x%08x ",
 		       ForCES_V(fhdr), mlen, flg_raw);
 		printf("\n\tSrcID 0x%x(%s) DstID 0x%x(%s) Correlator 0x%"
 		       PRIu64, ForCES_SID(fhdr), ForCES_node(ForCES_SID(fhdr)),
