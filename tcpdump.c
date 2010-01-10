@@ -131,11 +131,20 @@ static void info(int);
 static u_int packets_captured;
 
 typedef u_int (*if_printer)(const struct pcap_pkthdr *, const u_char *);
+typedef u_int (*if_ndo_printer)(struct netdissect_options *ndo,
+                                const struct pcap_pkthdr *, const u_char *);
 
 struct printer {
-	if_printer f;
+        if_printer f;
 	int type;
 };
+
+
+struct ndo_printer {
+        if_ndo_printer f;
+	int type;
+};
+
 
 static struct printer printers[] = {
 	{ arcnet_if_print,	DLT_ARCNET },
@@ -282,6 +291,10 @@ static struct printer printers[] = {
 #if defined(HAVE_PCAP_USB_H) && defined(DLT_USB_LINUX_MMAPPED)
 	{ usb_linux_print, DLT_USB_LINUX_MMAPPED},
 #endif
+	{ NULL,			0 },
+};
+
+static struct ndo_printer ndo_printers[] = {
 #ifdef DLT_IPNET
 	{ ipnet_if_print, DLT_IPNET },
 #endif
@@ -301,6 +314,19 @@ lookup_printer(int type)
 	/* NOTREACHED */
 }
 
+static if_ndo_printer
+lookup_ndo_printer(int type)
+{
+	struct ndo_printer *p;
+
+	for (p = ndo_printers; p->f; ++p)
+		if (type == p->type)
+			return p->f;
+
+	return NULL;
+	/* NOTREACHED */
+}
+
 static pcap_t *pd;
 
 extern int optind;
@@ -308,7 +334,12 @@ extern int opterr;
 extern char *optarg;
 
 struct print_info {
-	if_printer printer;
+        netdissect_options *ndo;
+        union {
+                if_printer     printer;
+                if_ndo_printer ndo_printer;
+        } p;
+        int ndo_type;
 };
 
 struct dump_info {
@@ -342,7 +373,8 @@ show_dlts_and_exit(pcap_t *pd)
 			/*
 			 * OK, does tcpdump handle that type?
 			 */
-			if (lookup_printer(dlts[n_dlts]) == NULL)
+			if (lookup_printer(dlts[n_dlts]) == NULL
+                            && lookup_ndo_printer(dlts[n_dlts]) == NULL)
 				(void) fprintf(stderr, " (printing not supported)");
 			putchar('\n');
 		} else {
@@ -1143,15 +1175,21 @@ main(int argc, char **argv)
 		}
 	} else {
 		type = pcap_datalink(pd);
-		printinfo.printer = lookup_printer(type);
-		if (printinfo.printer == NULL) {
-			gndo->ndo_dltname = pcap_datalink_val_to_name(type);
-			if (gndo->ndo_dltname != NULL)
-				error("packet printing is not supported for link type %s: use -w",
-				      gndo->ndo_dltname);
-			else
-				error("packet printing is not supported for link type %d: use -w", type);
-		}
+                printinfo.ndo_type = 1;
+                printinfo.ndo = gndo;
+		printinfo.p.ndo_printer = lookup_ndo_printer(type);
+                if (printinfo.p.ndo_printer == NULL) {
+                        printinfo.p.printer = lookup_printer(type);
+                        printinfo.ndo_type = 0;
+                        if (printinfo.p.printer == NULL) {
+                                gndo->ndo_dltname = pcap_datalink_val_to_name(type);
+                                if (gndo->ndo_dltname != NULL)
+                                        error("packet printing is not supported for link type %s: use -w",
+                                              gndo->ndo_dltname);
+                                else
+                                        error("packet printing is not supported for link type %d: use -w", type);
+                        }
+                }
 		callback = print_packet;
 		pcap_userdata = (u_char *)&printinfo;
 	}
@@ -1535,7 +1573,12 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	 */
 	snapend = sp + h->caplen;
 
-	hdrlen = (*print_info->printer)(h, sp);
+        if(print_info->ndo_type) {
+                hdrlen = (*print_info->p.ndo_printer)(print_info->ndo, h, sp);
+        } else {
+                hdrlen = (*print_info->p.printer)(h, sp);
+        }
+                
 	if (Xflag) {
 		/*
 		 * Print the raw packet data in hex and ASCII.
