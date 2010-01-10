@@ -291,18 +291,18 @@ static struct printer printers[] = {
 #if defined(HAVE_PCAP_USB_H) && defined(DLT_USB_LINUX_MMAPPED)
 	{ usb_linux_print,	DLT_USB_LINUX_MMAPPED},
 #endif
+#ifdef DLT_IPV4
+	{ raw_if_print,		DLT_IPV4 },
+#endif
+#ifdef DLT_IPV6
+	{ raw_if_print,		DLT_IPV6 },
+#endif
 	{ NULL,			0 },
 };
 
 static struct ndo_printer ndo_printers[] = {
 #ifdef DLT_IPNET
 	{ ipnet_if_print,	DLT_IPNET },
-#endif
-#ifdef DLT_IPV4
-	{ raw_if_print,		DLT_IPV4 },
-#endif
-#ifdef DLT_IPV6
-	{ raw_if_print,		DLT_IPV6 },
 #endif
 	{ NULL,			0 },
 };
