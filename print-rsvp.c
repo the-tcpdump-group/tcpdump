@@ -636,7 +636,15 @@ rsvp_intserv_print(const u_char *tptr, u_short obj_tlen) {
 }
 
 static int
-rsvp_obj_print (const u_char *pptr, u_int plen, const u_char *tptr,
+rsvp_obj_print (const u_char *pptr
+#ifndef HAVE_LIBCRYPTO
+_U_
+#endif
+, u_int plen
+#ifndef HAVE_LIBCRYPTO
+_U_
+#endif
+, const u_char *tptr,
                 const char *ident, u_int tlen) {
 
     const struct rsvp_object_header *rsvp_obj_header;

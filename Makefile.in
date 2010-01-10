@@ -139,6 +139,7 @@ HDR = \
 	ip.h \
 	ip6.h \
 	ipfc.h \
+	ipnet.h \
 	ipproto.h \
 	ipsec_doi.h \
 	ipx.h \

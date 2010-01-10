@@ -259,10 +259,10 @@ struct nd_rpl_dio {
         u_int8_t rpl_dagid[16];
 };
 
-void
+static void
 rpl_print(netdissect_options *ndo,
           const struct icmp6_hdr *hdr,
-          const u_char *bp, u_int length)
+          const u_char *bp, u_int length _U_)
 {
         struct nd_rpl_dio *dio = (struct nd_rpl_dio *)bp;
 
