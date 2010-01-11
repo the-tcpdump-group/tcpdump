@@ -765,12 +765,14 @@ void forces_print(register const u_char * pptr, register u_int len)
 	if (vflag >= 2) {
 		printf
 		    ("\n\tForCES flags:\n\t  %s(0x%x), prio=%d, %s(0x%x),\n\t  %s(0x%x), %s(0x%x)\n",
-		     ForCES_ACKp(fhdr->f_ack), fhdr->f_ack, fhdr->f_pri,
-		     ForCES_EMp(fhdr->f_em), fhdr->f_em, ForCES_ATp(fhdr->f_at),
-		     fhdr->f_at, ForCES_TPp(fhdr->f_tp), fhdr->f_tp);
+		     ForCES_ACKp(ForCES_ACK(fhdr)), ForCES_ACK(fhdr),
+		     ForCES_PRI(fhdr),
+		     ForCES_EMp(ForCES_EM(fhdr)), ForCES_EM(fhdr),
+		     ForCES_ATp(ForCES_AT(fhdr)), ForCES_AT(fhdr),
+		     ForCES_TPp(ForCES_TP(fhdr)), ForCES_TP(fhdr));
 		printf
-		    ("\t  Extra flags: rsv(b5-7) 0x%x rsv(b13-15) 0x%x rsv(b16-31) 0x%x\n",
-		     fhdr->f_rs1, fhdr->f_rs2, ntohs(fhdr->f_rs3));
+		    ("\t  Extra flags: rsv(b5-7) 0x%x rsv(b13-31) 0x%x\n",
+		     ForCES_RS1(fhdr), ForCES_RS2(fhdr));
 	}
 	rc = forces_type_print(pptr, fhdr, mlen, tops);
 	if (rc < 0) {

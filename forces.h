@@ -196,13 +196,8 @@ static inline const char *ForCES_TPp(u_int32_t flg)
  * Structure of forces header, naked of TLVs.
  */
 struct forcesh {
-#if BYTE_ORDER == LITTLE_ENDIAN
-	u_int8_t fm_rsvd:4, fm_version:4;
-#elif BYTE_ORDER == BIG_ENDIAN
-	u_int8_t fm_version:4, fm_rsvd:4;
-#endif
-
-#define ForCES_V(forcesh)	(forcesh)->fm_version
+	u_int8_t fm_vrsvd;	/* version and reserved */
+#define ForCES_V(forcesh)	((forcesh)->fm_vrsvd >> 4)
 	u_int8_t fm_tom;	/* type of message */
 	u_int16_t fm_len;	/* total length * 4 bytes */
 #define ForCES_BLN(forcesh)	ntohs((forcesh)->fm_len) << 2
@@ -211,13 +206,14 @@ struct forcesh {
 	u_int32_t fm_did;	/* Destination ID */
 #define ForCES_DID(forcesh)	ntohl((forcesh)->fm_did)
 	u_int8_t fm_cor[8];	/* correlator */
-#if BYTE_ORDER == LITTLE_ENDIAN
-	u_int16_t f_rs1:3, f_pri:3, f_ack:2, f_rs2:3, f_tp:2, f_at:1, f_em:2;
-#elif BYTE_ORDER == BIG_ENDIAN
-	u_int16_t f_ack:2, f_pri:3, f_rs1:3, f_em:2, f_at:1, f_tp:2, f_rs2:3;
-#endif
-	u_int16_t f_rs3;
-
+	u_int32_t fm_flags;	/* flags */
+#define ForCES_ACK(forcesh)	((ntohl((forcesh)->fm_flags)&0xC0000000) >> 30)
+#define ForCES_PRI(forcesh)	((ntohl((forcesh)->fm_flags)&0x38000000) >> 27)
+#define ForCES_RS1(forcesh)	((ntohl((forcesh)->fm_flags)&0x07000000) >> 24)
+#define ForCES_EM(forcesh)	((ntohl((forcesh)->fm_flags)&0x00C00000) >> 22)
+#define ForCES_AT(forcesh)	((ntohl((forcesh)->fm_flags)&0x00200000) >> 21)
+#define ForCES_TP(forcesh)	((ntohl((forcesh)->fm_flags)&0x00180000) >> 19)
+#define ForCES_RS2(forcesh)	((ntohl((forcesh)->fm_flags)&0x0007FFFF) >> 0)
 };
 
 #define ForCES_HLN_VALID(fhl,tlen) ((tlen) >= (int)sizeof(struct forcesh) && \
