@@ -297,25 +297,25 @@ struct pathdata_h {
 #define B_KEYIN		0x8
 
 static struct optlv_h OPTLV_msg[F_OP_MAX + 1] = {
-	[F_OP_RSV] = {ZERO_TTLV, 0, "Invalid OPTLV", invoptlv_print},
-	[F_OP_SET] = {TTLV_T2, B_FULLD | B_SPARD, " Set", recpdoptlv_print},
-	[F_OP_SETPROP] =
+	/* F_OP_RSV */ {ZERO_TTLV, 0, "Invalid OPTLV", invoptlv_print},
+	/* F_OP_SET */ {TTLV_T2, B_FULLD | B_SPARD, " Set", recpdoptlv_print},
+	/* F_OP_SETPROP */
 	    {TTLV_T2, B_FULLD | B_SPARD, " SetProp", recpdoptlv_print},
-	[F_OP_SETRESP] = {TTLV_T2, B_RESTV, " SetResp", recpdoptlv_print},
-	[F_OP_SETPRESP] = {TTLV_T2, B_RESTV, " SetPropResp", recpdoptlv_print},
-	[F_OP_DEL] = {ZERO_TTLV, 0, " Del", recpdoptlv_print},
-	[F_OP_DELRESP] = {TTLV_T2, B_RESTV, " DelResp", recpdoptlv_print},
-	[F_OP_GET] = {ZERO_TTLV, 0, " Get", recpdoptlv_print},
-	[F_OP_GETPROP] = {ZERO_TTLV, 0, " GetProp", recpdoptlv_print},
-	[F_OP_GETRESP] =
+	/* F_OP_SETRESP */ {TTLV_T2, B_RESTV, " SetResp", recpdoptlv_print},
+	/* F_OP_SETPRESP */ {TTLV_T2, B_RESTV, " SetPropResp", recpdoptlv_print},
+	/* F_OP_DEL */ {ZERO_TTLV, 0, " Del", recpdoptlv_print},
+	/* F_OP_DELRESP */ {TTLV_T2, B_RESTV, " DelResp", recpdoptlv_print},
+	/* F_OP_GET */ {ZERO_TTLV, 0, " Get", recpdoptlv_print},
+	/* F_OP_GETPROP */ {ZERO_TTLV, 0, " GetProp", recpdoptlv_print},
+	/* F_OP_GETRESP */
 	    {TTLV_T2, B_FULLD | B_RESTV, " GetResp", recpdoptlv_print},
-	[F_OP_GETPRESP] =
+	/* F_OP_GETPRESP */
 	    {TTLV_T2, B_FULLD | B_RESTV, " GetPropResp", recpdoptlv_print},
-	[F_OP_REPORT] =
+	/* F_OP_REPORT */
 	    {TTLV_T2, B_FULLD | B_SPARD, " Report", recpdoptlv_print},
-	[F_OP_COMMIT] = {ZERO_TTLV, 0, " Commit", NULL},
-	[F_OP_RCOMMIT] = {TTLV_T1, B_RESTV, " RCommit", genoptlv_print},
-	[F_OP_RTRCOMP] = {ZERO_TTLV, 0, " RTRCOMP", NULL},
+	/* F_OP_COMMIT */ {ZERO_TTLV, 0, " Commit", NULL},
+	/* F_OP_RCOMMIT */ {TTLV_T1, B_RESTV, " RCommit", genoptlv_print},
+	/* F_OP_RTRCOMP */ {ZERO_TTLV, 0, " RTRCOMP", NULL},
 };
 
 static inline struct optlv_h *get_forces_optlv_h(u_int16_t opt)
@@ -361,7 +361,7 @@ static inline int op_valid(u_int16_t op, u_int16_t mask)
 		return 0;
 	if (opb & mask)
 		return 1;
-	// I guess we should allow vendor operations?
+	/* I guess we should allow vendor operations? */
 	if (op >= 0x8000)
 		return 1;
 	return 0;
@@ -408,7 +408,7 @@ static inline int ttlv_valid(u_int16_t ttlv)
 		if (ttlv >= 0x110 && ttlv <= 0x116)
 			return 1;
 		if (ttlv >= 0x8000)
-			return 0;	//XXX:
+			return 0;	/* XXX: */
 	}
 
 	return 0;
@@ -496,23 +496,23 @@ struct forces_lfbsh {
 #define CFG_EVN (B_OP_REPORT)
 
 static struct tom_h ForCES_msg[TOM_MAX_IND + 1] = {
-	[TOM_RSV_I] = {TOM_RSVD, ZERO_TTLV, 0, "Invalid message", NULL},
-	[TOM_ASS_I] = {TOM_ASSNSETUP, ZERO_MORE_TTLV | TWO_TLV, ASSNS_OPS,
+	/* TOM_RSV_I */ {TOM_RSVD, ZERO_TTLV, 0, "Invalid message", NULL},
+	/* TOM_ASS_I */ {TOM_ASSNSETUP, ZERO_MORE_TTLV | TWO_TLV, ASSNS_OPS,
 		       "Association Setup", lfbselect_print},
-	[TOM_AST_I] =
+	/* TOM_AST_I */
 	    {TOM_ASSNTEARD, TTLV_T1, 0, "Association TearDown", asttlv_print},
-	[TOM_CFG_I] = {TOM_CONFIG, TTLV_T2, CFG_OPS, "Config", lfbselect_print},
-	[TOM_QRY_I] = {TOM_QUERY, TTLV_T2, CFG_QY, "Query", lfbselect_print},
-	[TOM_EVN_I] = {TOM_EVENTNOT, TTLV_T1, CFG_EVN, "Event Notification",
+	/* TOM_CFG_I */ {TOM_CONFIG, TTLV_T2, CFG_OPS, "Config", lfbselect_print},
+	/* TOM_QRY_I */ {TOM_QUERY, TTLV_T2, CFG_QY, "Query", lfbselect_print},
+	/* TOM_EVN_I */ {TOM_EVENTNOT, TTLV_T1, CFG_EVN, "Event Notification",
 		       lfbselect_print},
-	[TOM_RED_I] =
+	/* TOM_RED_I */
 	    {TOM_PKTREDIR, TTLV_T2, 0, "Packet Redirect", redirect_print},
-	[TOM_HBT_I] = {TOM_HEARTBT, ZERO_TTLV, 0, "HeartBeat", NULL},
-	[TOM_ASR_I] =
+	/* TOM_HBT_I */ {TOM_HEARTBT, ZERO_TTLV, 0, "HeartBeat", NULL},
+	/* TOM_ASR_I */
 	    {TOM_ASSNSETREP, TTLV_T1, 0, "Association Response", asrtlv_print},
-	[TOM_CNR_I] = {TOM_CONFIGREP, TTLV_T2, CFG_ROPS, "Config Response",
+	/* TOM_CNR_I */ {TOM_CONFIGREP, TTLV_T2, CFG_ROPS, "Config Response",
 		       lfbselect_print},
-	[TOM_QRR_I] =
+	/* TOM_QRR_I */
 	    {TOM_QUERYREP, TTLV_T2, CFG_QYR, "Query Response", lfbselect_print},
 };
 
@@ -600,12 +600,12 @@ struct res_val {
 };
 
 static struct pdata_ops ForCES_pdata[PD_MAX_IND + 1] = {
-	[PD_RSV_I] = {0, 0, 0, "Invalid message", NULL},
-	[PD_SEL_I] = {F_TLV_KEYI, 0, 0, "KEYINFO TLV", pkeyitlv_print},
-	[PD_FDT_I] = {F_TLV_FULD, 0, B_FULLD, "FULLDATA TLV", fdatatlv_print},
-	[PD_SDT_I] = {F_TLV_SPAD, 0, B_SPARD, "SPARSEDATA TLV", sdatatlv_print},
-	[PD_RES_I] = {F_TLV_REST, 0, B_RESTV, "RESULT TLV", prestlv_print},
-	[PD_PDT_I] =
+	/* PD_RSV_I */ {0, 0, 0, "Invalid message", NULL},
+	/* PD_SEL_I */ {F_TLV_KEYI, 0, 0, "KEYINFO TLV", pkeyitlv_print},
+	/* PD_FDT_I */ {F_TLV_FULD, 0, B_FULLD, "FULLDATA TLV", fdatatlv_print},
+	/* PD_SDT_I */ {F_TLV_SPAD, 0, B_SPARD, "SPARSEDATA TLV", sdatatlv_print},
+	/* PD_RES_I */ {F_TLV_REST, 0, B_RESTV, "RESULT TLV", prestlv_print},
+	/* PD_PDT_I */
 	    {F_TLV_PDAT, 0, 0, "Inner PATH-DATA TLV", recpdoptlv_print},
 };
 
@@ -645,7 +645,7 @@ enum {
 	E_NOT_SUPPORTED,
 	E_MEMORY_ERROR,
 	E_INTERNAL_ERROR,
-	// 0x18-0xFE are reserved ..
+	/* 0x18-0xFE are reserved .. */
 	E_UNSPECIFIED_ERROR = 0XFF
 };
 
