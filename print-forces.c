@@ -98,7 +98,8 @@ sdatailv_print(register const u_char * pptr, register u_int len,
 			register const u_char *tdp = (u_char *) ILV_DATA(ilv);
 			char *ib = indent_pr(indent, 1);
 			printf("\n%s SPARSEDATA: type %x length %d\n", &ib[1],
-			       ntohl(ilv->type), ntohl(ilv->length));
+			       (u_int32_t)ntohl(ilv->type),
+			       (u_int32_t)ntohl(ilv->length));
 			printf("%s[", &ib[1]);
 			hex_print_with_offset(ib, tdp, tll, 0);
 			printf("\n%s]\n", &ib[1]);
@@ -494,8 +495,8 @@ print_metailv(register const u_char * pptr, register u_int len,
 	char *ib = indent_pr(indent, 0);
 	/* XXX: check header length */
 	struct forces_ilv *ilv = (struct forces_ilv *)pptr;
-	printf("\n%sMetaID 0x%x length %d\n", ib, ntohl(ilv->type),
-	       ntohl(ilv->length));
+	printf("\n%sMetaID 0x%x length %d\n", ib, (u_int32_t)ntohl(ilv->type),
+	       (u_int32_t)ntohl(ilv->length));
 	hex_print_with_offset("\n\t\t\t\t[", ILV_DATA(ilv), tll, 0);
 	return 0;
 }
@@ -620,7 +621,8 @@ lfbselect_print(register const u_char * pptr, register u_int len,
 	if (vflag >= 3) {
 		printf("\n%s%s(Classid %x) instance %x\n",
 		       ib, tok2str(ForCES_LFBs, NULL, ntohl(lfbs->class)),
-		       ntohl(lfbs->class), ntohl(lfbs->instance));
+		       (u_int32_t)ntohl(lfbs->class),
+		       (u_int32_t)ntohl(lfbs->instance));
 	}
 
 	otlv = (struct forces_tlv *)(lfbs + 1);
@@ -714,8 +716,9 @@ forces_type_print(register const u_char * pptr, const struct forcesh *fhdr _U_,
 			break;
 	}
 	if (tll) {
-		printf("\tMess TopTLV header: min %ld, total %d advertised %d ",
-		       sizeof(struct forces_tlv), tll, ntohs(tltlv->length));
+		printf("\tMess TopTLV header: min %lu, total %d advertised %d ",
+		       (unsigned long)sizeof(struct forces_tlv),
+		       tll, ntohs(tltlv->length));
 		return -1;
 	}
 
@@ -747,8 +750,8 @@ void forces_print(register const u_char * pptr, register u_int len)
 	printf("\n\tForCES %s ", tops->s);
 	if (!ForCES_HLN_VALID(mlen, len)) {
 		printf
-		    ("Illegal ForCES pkt len - min %ld, total recvd %d, advertised %d ",
-		     sizeof(struct forcesh), len, ForCES_BLN(fhdr));
+		    ("Illegal ForCES pkt len - min %lu, total recvd %d, advertised %d ",
+		     (unsigned long)sizeof(struct forcesh), len, ForCES_BLN(fhdr));
 		goto error;
 	}
 
