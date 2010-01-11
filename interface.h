@@ -82,11 +82,6 @@ extern char *strsep(char **, const char *);
 #define max(a,b) ((b)>(a)?(b):(a))
 #endif
 
-#ifndef BIG_ENDIAN
-#define BIG_ENDIAN 4321
-#define LITTLE_ENDIAN 1234
-#endif
-
 #define ESRC(ep) ((ep)->ether_shost)
 #define EDST(ep) ((ep)->ether_dhost)
 
