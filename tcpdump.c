@@ -285,12 +285,14 @@ static struct printer printers[] = {
 #if defined(DLT_BLUETOOTH_HCI_H4_WITH_PHDR) && defined(HAVE_PCAP_BLUETOOTH_H)
 	{ bt_if_print,		DLT_BLUETOOTH_HCI_H4_WITH_PHDR},
 #endif
-#if defined(HAVE_PCAP_USB_H) && defined(DLT_USB_LINUX)
-	{ usb_linux_print,	DLT_USB_LINUX},
-#endif
-#if defined(HAVE_PCAP_USB_H) && defined(DLT_USB_LINUX_MMAPPED)
-	{ usb_linux_print,	DLT_USB_LINUX_MMAPPED},
-#endif
+#ifdef HAVE_PCAP_USB_H
+#ifdef DLT_USB_LINUX
+	{ usb_linux_48_byte_print, DLT_USB_LINUX},
+#endif /* DLT_USB_LINUX */
+#ifdef DLT_USB_LINUX_MMAPPED
+	{ usb_linux_64_byte_print, DLT_USB_LINUX_MMAPPED},
+#endif /* DLT_USB_LINUX_MMAPPED */
+#endif /* HAVE_PCAP_USB_H */
 #ifdef DLT_IPV4
 	{ raw_if_print,		DLT_IPV4 },
 #endif
