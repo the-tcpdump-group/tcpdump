@@ -200,20 +200,20 @@ struct forcesh {
 #define ForCES_V(forcesh)	((forcesh)->fm_vrsvd >> 4)
 	u_int8_t fm_tom;	/* type of message */
 	u_int16_t fm_len;	/* total length * 4 bytes */
-#define ForCES_BLN(forcesh)	((u_int32_t)(ntohs((forcesh)->fm_len) << 2))
+#define ForCES_BLN(forcesh)	((u_int32_t)(EXTRACT_16BITS(&(forcesh)->fm_len) << 2))
 	u_int32_t fm_sid;	/* Source ID */
-#define ForCES_SID(forcesh)	((u_int32_t)ntohl((forcesh)->fm_sid))
+#define ForCES_SID(forcesh)	((u_int32_t)EXTRACT_32BITS(&(forcesh)->fm_sid))
 	u_int32_t fm_did;	/* Destination ID */
-#define ForCES_DID(forcesh)	((u_int32_t)ntohl((forcesh)->fm_did))
+#define ForCES_DID(forcesh)	((u_int32_t)EXTRACT_32BITS(&(forcesh)->fm_did))
 	u_int8_t fm_cor[8];	/* correlator */
 	u_int32_t fm_flags;	/* flags */
-#define ForCES_ACK(forcesh)	((u_int32_t)((ntohl((forcesh)->fm_flags)&0xC0000000) >> 30))
-#define ForCES_PRI(forcesh)	((u_int32_t)((ntohl((forcesh)->fm_flags)&0x38000000) >> 27))
-#define ForCES_RS1(forcesh)	((u_int32_t)((ntohl((forcesh)->fm_flags)&0x07000000) >> 24))
-#define ForCES_EM(forcesh)	((u_int32_t)((ntohl((forcesh)->fm_flags)&0x00C00000) >> 22))
-#define ForCES_AT(forcesh)	((u_int32_t)((ntohl((forcesh)->fm_flags)&0x00200000) >> 21))
-#define ForCES_TP(forcesh)	((u_int32_t)((ntohl((forcesh)->fm_flags)&0x00180000) >> 19))
-#define ForCES_RS2(forcesh)	((u_int32_t)((ntohl((forcesh)->fm_flags)&0x0007FFFF) >> 0))
+#define ForCES_ACK(forcesh)	((u_int32_t)((EXTRACT_32BITS(&(forcesh)->fm_flags)&0xC0000000) >> 30))
+#define ForCES_PRI(forcesh)	((u_int32_t)((EXTRACT_32BITS(&(forcesh)->fm_flags)&0x38000000) >> 27))
+#define ForCES_RS1(forcesh)	((u_int32_t)((EXTRACT_32BITS(&(forcesh)->fm_flags)&0x07000000) >> 24))
+#define ForCES_EM(forcesh)	((u_int32_t)((EXTRACT_32BITS(&(forcesh)->fm_flags)&0x00C00000) >> 22))
+#define ForCES_AT(forcesh)	((u_int32_t)((EXTRACT_32BITS(&(forcesh)->fm_flags)&0x00200000) >> 21))
+#define ForCES_TP(forcesh)	((u_int32_t)((EXTRACT_32BITS(&(forcesh)->fm_flags)&0x00180000) >> 19))
+#define ForCES_RS2(forcesh)	((u_int32_t)((EXTRACT_32BITS(&(forcesh)->fm_flags)&0x0007FFFF) >> 0))
 };
 
 #define ForCES_HLN_VALID(fhl,tlen) ((tlen) >= sizeof(struct forcesh) && \
@@ -430,18 +430,18 @@ int otlv_print(struct forces_tlv *otlv, u_int16_t op_msk, int indent);
 #define	GET_TOP_TLV(fhdr) ((struct forces_tlv *)((fhdr) + sizeof (struct forcesh)))
 #define TLV_SET_LEN(len)  (F_ALN_LEN(sizeof(struct forces_tlv)) + (len))
 #define TLV_ALN_LEN(len)  F_ALN_LEN(TLV_SET_LEN(len))
-#define TLV_RDAT_LEN(tlv) ((int)(ntohs((tlv)->length)) - TLV_SET_LEN(0))
+#define TLV_RDAT_LEN(tlv) ((int)(EXTRACT_16BITS(&(tlv)->length) - TLV_SET_LEN(0))
 #define TLV_DATA(tlvp)   ((void*)(((char*)(tlvp)) + TLV_SET_LEN(0)))
-#define GO_NXT_TLV(tlv,rlen) ((rlen) -= F_ALN_LEN(ntohs((tlv)->length)), \
+#define GO_NXT_TLV(tlv,rlen) ((rlen) -= F_ALN_LEN(EXTRACT_16BITS(&(tlv)->length)), \
 		              (struct forces_tlv*)(((char*)(tlv)) \
-				      + F_ALN_LEN(ntohs((tlv)->length))))
+				      + F_ALN_LEN(EXTRACT_16BITS(&(tlv)->length))))
 #define ILV_SET_LEN(len)  (F_ALN_LEN(sizeof(struct forces_ilv)) + (len))
 #define ILV_ALN_LEN(len)  F_ALN_LEN(ILV_SET_LEN(len))
-#define ILV_RDAT_LEN(ilv) ((int)(ntohl((ilv)->length)) - ILV_SET_LEN(0))
+#define ILV_RDAT_LEN(ilv) ((int)(EXTRACT_32BITS(&(ilv)->length)) - ILV_SET_LEN(0))
 #define ILV_DATA(ilvp)   ((void*)(((char*)(ilvp)) + ILV_SET_LEN(0)))
-#define GO_NXT_ILV(ilv,rlen) ((rlen) -= F_ALN_LEN(ntohl((ilv)->length)), \
+#define GO_NXT_ILV(ilv,rlen) ((rlen) -= F_ALN_LEN(EXTRACT_32BITS(&(ilv)->length)), \
 		              (struct forces_ilv *)(((char*)(ilv)) \
-				      + F_ALN_LEN(ntohl((ilv)->length))))
+				      + F_ALN_LEN(EXTRACT_32BITS(&(ilv)->length))))
 #define INVALID_RLEN -1
 #define INVALID_STLN -2
 #define INVALID_LTLN -3
@@ -459,11 +459,11 @@ static inline int tlv_valid(struct forces_tlv *tlv, u_int rlen)
 {
 	if (rlen < (int) sizeof(struct forces_tlv))
 		return INVALID_RLEN;
-	if (ntohs(tlv->length) < sizeof(struct forces_tlv))
+	if (EXTRACT_16BITS(&tlv->length) < sizeof(struct forces_tlv))
 		return INVALID_STLN;
-	if (ntohs(tlv->length) > rlen)
+	if (EXTRACT_16BITS(&tlv->length) > rlen)
 		return INVALID_LTLN;
-	if (rlen < F_ALN_LEN(ntohs(tlv->length)))
+	if (rlen < F_ALN_LEN(EXTRACT_16BITS(&tlv->length)))
 		return INVALID_ALEN;
 
 	return 0;
@@ -473,11 +473,11 @@ static inline int ilv_valid(struct forces_ilv *ilv, u_int rlen)
 {
 	if (rlen < sizeof(struct forces_ilv))
 		return INVALID_RLEN;
-	if (ntohl(ilv->length) < sizeof(struct forces_ilv))
+	if (EXTRACT_32BITS(&ilv->length) < sizeof(struct forces_ilv))
 		return INVALID_STLN;
-	if (ntohl(ilv->length) > rlen)
+	if (EXTRACT_32BITS(&ilv->length) > rlen)
 		return INVALID_LTLN;
-	if (rlen < F_ALN_LEN(ntohl(ilv->length)))
+	if (rlen < F_ALN_LEN(EXTRACT_32BITS(&ilv->length)))
 		return INVALID_ALEN;
 
 	return 0;
