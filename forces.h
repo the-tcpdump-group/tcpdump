@@ -223,7 +223,7 @@ struct forcesh {
 #define F_LFB_RSVD 0x0
 #define F_LFB_FEO 0x1
 #define F_LFB_FEPO 0x2
-struct tok ForCES_LFBs[] = {
+const struct tok ForCES_LFBs[] = {
 	{F_LFB_RSVD, "Invalid TLV"},
 	{F_LFB_FEO, "FEObj LFB"},
 	{F_LFB_FEPO, "FEProtoObj LFB"},
@@ -231,7 +231,7 @@ struct tok ForCES_LFBs[] = {
 };
 
 int forces_type_print(register const u_char * pptr, const struct forcesh *fhdr,
-		  register u_int mlen, struct tom_h *tops);
+		  register u_int mlen, const struct tom_h *tops);
 
 enum {
 	F_OP_RSV,
@@ -296,7 +296,7 @@ struct pathdata_h {
 #define B_RESTV		0x4
 #define B_KEYIN		0x8
 
-static struct optlv_h OPTLV_msg[F_OP_MAX + 1] = {
+static const struct optlv_h OPTLV_msg[F_OP_MAX + 1] = {
 	/* F_OP_RSV */ {ZERO_TTLV, 0, "Invalid OPTLV", invoptlv_print},
 	/* F_OP_SET */ {TTLV_T2, B_FULLD | B_SPARD, " Set", recpdoptlv_print},
 	/* F_OP_SETPROP */
@@ -318,7 +318,7 @@ static struct optlv_h OPTLV_msg[F_OP_MAX + 1] = {
 	/* F_OP_RTRCOMP */ {ZERO_TTLV, 0, " RTRCOMP", NULL},
 };
 
-static inline struct optlv_h *get_forces_optlv_h(u_int16_t opt)
+static inline const struct optlv_h *get_forces_optlv_h(u_int16_t opt)
 {
 	if (opt > F_OP_MAX || opt <= F_OP_RSV)
 		return &OPTLV_msg[F_OP_RSV];
@@ -381,7 +381,7 @@ static inline int op_valid(u_int16_t op, u_int16_t mask)
 #define F_TLV_REDD	0x0116
 #define F_TLV_VNST	0x8000
 
-static struct tok ForCES_TLV[] = {
+static const struct tok ForCES_TLV[] = {
 	{F_TLV_RSVD, "Invalid TLV"},
 	{F_TLV_REDR, "REDIRECT TLV"},
 	{F_TLV_ASRS, "ASResult TLV"},
@@ -424,7 +424,7 @@ struct forces_tlv {
 	u_int16_t length;
 };
 
-int otlv_print(struct forces_tlv *otlv, u_int16_t op_msk, int indent);
+int otlv_print(const struct forces_tlv *otlv, u_int16_t op_msk, int indent);
 
 #define F_ALN_LEN(len) ( ((len)+ForCES_ALNL-1) & ~(ForCES_ALNL-1) )
 #define	GET_TOP_TLV(fhdr) ((struct forces_tlv *)((fhdr) + sizeof (struct forcesh)))
@@ -447,7 +447,7 @@ int otlv_print(struct forces_tlv *otlv, u_int16_t op_msk, int indent);
 #define INVALID_LTLN -3
 #define INVALID_ALEN -4
 
-static struct tok ForCES_TLV_err[] = {
+static const struct tok ForCES_TLV_err[] = {
 	{INVALID_RLEN, "Invalid total length"},
 	{INVALID_STLN, "xLV too short"},
 	{INVALID_LTLN, "xLV too long"},
@@ -455,7 +455,7 @@ static struct tok ForCES_TLV_err[] = {
 	{0, NULL}
 };
 
-static inline int tlv_valid(struct forces_tlv *tlv, u_int rlen)
+static inline int tlv_valid(const struct forces_tlv *tlv, u_int rlen)
 {
 	if (rlen < (int) sizeof(struct forces_tlv))
 		return INVALID_RLEN;
@@ -469,7 +469,7 @@ static inline int tlv_valid(struct forces_tlv *tlv, u_int rlen)
 	return 0;
 }
 
-static inline int ilv_valid(struct forces_ilv *ilv, u_int rlen)
+static inline int ilv_valid(const struct forces_ilv *ilv, u_int rlen)
 {
 	if (rlen < sizeof(struct forces_ilv))
 		return INVALID_RLEN;
@@ -495,7 +495,7 @@ struct forces_lfbsh {
 #define CFG_QYR (B_OP_GETRESP|B_OP_GETPRESP)
 #define CFG_EVN (B_OP_REPORT)
 
-static struct tom_h ForCES_msg[TOM_MAX_IND + 1] = {
+static const struct tom_h ForCES_msg[TOM_MAX_IND + 1] = {
 	/* TOM_RSV_I */ {TOM_RSVD, ZERO_TTLV, 0, "Invalid message", NULL},
 	/* TOM_ASS_I */ {TOM_ASSNSETUP, ZERO_MORE_TTLV | TWO_TLV, ASSNS_OPS,
 		       "Association Setup", lfbselect_print},
@@ -516,11 +516,11 @@ static struct tom_h ForCES_msg[TOM_MAX_IND + 1] = {
 	    {TOM_QUERYREP, TTLV_T2, CFG_QYR, "Query Response", lfbselect_print},
 };
 
-static inline struct tom_h *get_forces_tom(u_int8_t tom)
+static inline const struct tom_h *get_forces_tom(u_int8_t tom)
 {
 	int i;
 	for (i = TOM_RSV_I; i <= TOM_MAX_IND; i++) {
-		struct tom_h *th = &ForCES_msg[i];
+		const struct tom_h *th = &ForCES_msg[i];
 		if (th->v == tom)
 			return th;
 	}
@@ -599,7 +599,7 @@ struct res_val {
 	u_int16_t resv2;
 };
 
-static struct pdata_ops ForCES_pdata[PD_MAX_IND + 1] = {
+static const struct pdata_ops ForCES_pdata[PD_MAX_IND + 1] = {
 	/* PD_RSV_I */ {0, 0, 0, "Invalid message", NULL},
 	/* PD_SEL_I */ {F_TLV_KEYI, 0, 0, "KEYINFO TLV", pkeyitlv_print},
 	/* PD_FDT_I */ {F_TLV_FULD, 0, B_FULLD, "FULLDATA TLV", fdatatlv_print},
@@ -609,11 +609,11 @@ static struct pdata_ops ForCES_pdata[PD_MAX_IND + 1] = {
 	    {F_TLV_PDAT, 0, 0, "Inner PATH-DATA TLV", recpdoptlv_print},
 };
 
-static inline struct pdata_ops *get_forces_pd(u_int16_t pd)
+static inline const struct pdata_ops *get_forces_pd(u_int16_t pd)
 {
 	int i;
 	for (i = PD_RSV_I + 1; i <= PD_MAX_IND; i++) {
-		struct pdata_ops *pdo = &ForCES_pdata[i];
+		const struct pdata_ops *pdo = &ForCES_pdata[i];
 		if (pdo->v == pd)
 			return pdo;
 	}
@@ -649,7 +649,7 @@ enum {
 	E_UNSPECIFIED_ERROR = 0XFF
 };
 
-struct tok ForCES_errs[] = {
+const struct tok ForCES_errs[] = {
 	{E_SUCCESS, "SUCCESS"},
 	{E_INVALID_HEADER, "INVALID HEADER"},
 	{E_LENGTH_MISMATCH, "LENGTH MISMATCH"},
