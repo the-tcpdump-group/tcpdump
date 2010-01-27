@@ -232,16 +232,16 @@ void sctp_print(const u_char *bp,        /* beginning of sctp packet */
 		u_int chunksize = sizeof(struct sctpDataPart)+
 			          sizeof(struct sctpChunkDesc);
 		payloadPtr = (const u_char *) (dataHdrPtr + 1);
-		if (htons(chunkDescPtr->chunkLength) <
+		if (EXTRACT_16BITS(&chunkDescPtr->chunkLength) <
 			sizeof(struct sctpDataPart)+
 			sizeof(struct sctpChunkDesc)+1) {
 		/* Less than 1 byte of chunk payload */
 			printf("bogus ForCES chunk length %u]",
-			htons(chunkDescPtr->chunkLength));
+			    EXTRACT_16BITS(&chunkDescPtr->chunkLength));
 			return;
 		}
 
-		forces_print(payloadPtr, htons(chunkDescPtr->chunkLength)- chunksize);
+		forces_print(payloadPtr, EXTRACT_16BITS(&chunkDescPtr->chunkLength)- chunksize);
 	   } else if (vflag >= 2) {	/* if verbose output is specified */
 					/* at the command line */
 		const u_char *payloadPtr;
@@ -251,16 +251,16 @@ void sctp_print(const u_char *bp,        /* beginning of sctp packet */
 		if (!suppress_default_print) {
 			payloadPtr = (const u_char *) (++dataHdrPtr);
 			printf(":");
-			if (htons(chunkDescPtr->chunkLength) <
+			if (EXTRACT_16BITS(&chunkDescPtr->chunkLength) <
 			    sizeof(struct sctpDataPart)+
 			    sizeof(struct sctpChunkDesc)+1) {
 				/* Less than 1 byte of chunk payload */
 				printf("bogus chunk length %u]",
-				    htons(chunkDescPtr->chunkLength));
+				    EXTRACT_16BITS(&chunkDescPtr->chunkLength));
 				return;
 			}
 			default_print(payloadPtr,
-			      htons(chunkDescPtr->chunkLength) -
+			      EXTRACT_16BITS(&chunkDescPtr->chunkLength) -
 			      (sizeof(struct sctpDataPart)+
 			      sizeof(struct sctpChunkDesc)));
 		} else
