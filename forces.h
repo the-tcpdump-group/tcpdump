@@ -202,18 +202,18 @@ struct forcesh {
 	u_int16_t fm_len;	/* total length * 4 bytes */
 #define ForCES_BLN(forcesh)	((u_int32_t)(EXTRACT_16BITS(&(forcesh)->fm_len) << 2))
 	u_int32_t fm_sid;	/* Source ID */
-#define ForCES_SID(forcesh)	((u_int32_t)EXTRACT_32BITS(&(forcesh)->fm_sid))
+#define ForCES_SID(forcesh)	EXTRACT_32BITS(&(forcesh)->fm_sid)
 	u_int32_t fm_did;	/* Destination ID */
-#define ForCES_DID(forcesh)	((u_int32_t)EXTRACT_32BITS(&(forcesh)->fm_did))
+#define ForCES_DID(forcesh)	EXTRACT_32BITS(&(forcesh)->fm_did)
 	u_int8_t fm_cor[8];	/* correlator */
 	u_int32_t fm_flags;	/* flags */
-#define ForCES_ACK(forcesh)	((u_int32_t)((EXTRACT_32BITS(&(forcesh)->fm_flags)&0xC0000000) >> 30))
-#define ForCES_PRI(forcesh)	((u_int32_t)((EXTRACT_32BITS(&(forcesh)->fm_flags)&0x38000000) >> 27))
-#define ForCES_RS1(forcesh)	((u_int32_t)((EXTRACT_32BITS(&(forcesh)->fm_flags)&0x07000000) >> 24))
-#define ForCES_EM(forcesh)	((u_int32_t)((EXTRACT_32BITS(&(forcesh)->fm_flags)&0x00C00000) >> 22))
-#define ForCES_AT(forcesh)	((u_int32_t)((EXTRACT_32BITS(&(forcesh)->fm_flags)&0x00200000) >> 21))
-#define ForCES_TP(forcesh)	((u_int32_t)((EXTRACT_32BITS(&(forcesh)->fm_flags)&0x00180000) >> 19))
-#define ForCES_RS2(forcesh)	((u_int32_t)((EXTRACT_32BITS(&(forcesh)->fm_flags)&0x0007FFFF) >> 0))
+#define ForCES_ACK(forcesh)	((EXTRACT_32BITS(&(forcesh)->fm_flags)&0xC0000000) >> 30)
+#define ForCES_PRI(forcesh)	((EXTRACT_32BITS(&(forcesh)->fm_flags)&0x38000000) >> 27)
+#define ForCES_RS1(forcesh)	((EXTRACT_32BITS(&(forcesh)->fm_flags)&0x07000000) >> 24)
+#define ForCES_EM(forcesh)	((EXTRACT_32BITS(&(forcesh)->fm_flags)&0x00C00000) >> 22)
+#define ForCES_AT(forcesh)	((EXTRACT_32BITS(&(forcesh)->fm_flags)&0x00200000) >> 21)
+#define ForCES_TP(forcesh)	((EXTRACT_32BITS(&(forcesh)->fm_flags)&0x00180000) >> 19)
+#define ForCES_RS2(forcesh)	((EXTRACT_32BITS(&(forcesh)->fm_flags)&0x0007FFFF) >> 0)
 };
 
 #define ForCES_HLN_VALID(fhl,tlen) ((tlen) >= sizeof(struct forcesh) && \
