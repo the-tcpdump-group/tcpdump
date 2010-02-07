@@ -135,6 +135,7 @@ static struct tok icmp6_opt_values[] = {
    { ND_OPT_PREFIX_INFORMATION, "prefix info"},
    { ND_OPT_REDIRECTED_HEADER, "redirected header"},
    { ND_OPT_MTU, "mtu"},
+   { ND_OPT_RDNSS, "rdnss"},
    { ND_OPT_ADVINTERVAL, "advertisement interval"},
    { ND_OPT_HOMEAGENT_INFO, "homeagent information"},
    { ND_OPT_ROUTE_INFO, "route info"},
@@ -686,12 +687,14 @@ icmp6_opt_print(const u_char *bp, int resid)
 	const struct nd_opt_prefix_info *opp;
 	const struct icmp6_opts_redirect *opr;
 	const struct nd_opt_mtu *opm;
+	const struct nd_opt_rdnss *oprd;
 	const struct nd_opt_advinterval *opa;
 	const struct nd_opt_homeagent_info *oph;
 	const struct nd_opt_route_info *opri;
 	const u_char *cp, *ep;
 	struct in6_addr in6, *in6p;
 	size_t l;
+	u_int i;
 
 #define ECHECK(var) if ((u_char *)&(var) > ep - sizeof(var)) return
 
@@ -750,6 +753,17 @@ icmp6_opt_print(const u_char *bp, int resid)
                                EXTRACT_32BITS(&opm->nd_opt_mtu_mtu),
                                (op->nd_opt_len != 1) ? "bad option length" : "" );
                         break;
+		case ND_OPT_RDNSS:
+			oprd = (struct nd_opt_rdnss *)op;
+			l = (op->nd_opt_len - 1) / 2;
+			printf(" lifetime %us,", 
+				EXTRACT_32BITS(&oprd->nd_opt_rdnss_lifetime)); 
+			for (i = 0; i < l; i++) {
+				TCHECK(oprd->nd_opt_rdnss_addr[i]);
+				printf(" addr: %s", 
+				    ip6addr_string(&oprd->nd_opt_rdnss_addr[i]));
+			}
+			break;
 		case ND_OPT_ADVINTERVAL:
 			opa = (struct nd_opt_advinterval *)op;
 			TCHECK(opa->nd_opt_adv_interval);
