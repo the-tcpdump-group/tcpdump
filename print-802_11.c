@@ -1523,9 +1523,9 @@ print_radiotap_field(struct cpack_state *s, u_int32_t bit, u_int8_t *flags)
 	default:
 		/* this bit indicates a field whose
 		 * size we do not know, so we cannot
-		 * proceed.
+		 * proceed.  Just print the bit number.
 		 */
-		printf("[0x%08x] ", bit);
+		printf("[bit %u] ", bit);
 		return -1;
 	}
 
