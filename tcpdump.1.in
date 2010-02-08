@@ -29,7 +29,7 @@ tcpdump \- dump traffic on a network
 .na
 .B tcpdump
 [
-.B \-AdDefIKlLnNOpqRStuUvxX
+.B \-AbdDefIKlLnNOpqRStuUvxX
 ] [
 .B \-B
 .I buffer_size
@@ -190,6 +190,10 @@ special privileges.
 .B \-A
 Print each packet (minus its link level header) in ASCII.  Handy for
 capturing web pages.
+.TP
+.B \-b
+Print the AS number in BGP packets in ASDOT notation rather than ASPLAIN
+notation.
 .TP
 .B \-B
 Set the operating system capture buffer size to \fIbuffer_size\fP.
