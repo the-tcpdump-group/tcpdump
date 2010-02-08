@@ -216,8 +216,8 @@ struct forcesh {
 #define ForCES_RS2(forcesh)	((EXTRACT_32BITS(&(forcesh)->fm_flags)&0x0007FFFF) >> 0)
 };
 
-#define ForCES_HLN_VALID(fhl,tlen) ((tlen) >= sizeof(struct forcesh) && \
-				   (fhl) >= sizeof(struct forcesh) && \
+#define ForCES_HLN_VALID(fhl,tlen) ((tlen) >= ForCES_HDRL && \
+				   (fhl) >= ForCES_HDRL && \
 				   (fhl) == (tlen))
 
 #define F_LFB_RSVD 0x0
@@ -428,14 +428,14 @@ int otlv_print(const struct forces_tlv *otlv, u_int16_t op_msk, int indent);
 
 #define F_ALN_LEN(len) ( ((len)+ForCES_ALNL-1) & ~(ForCES_ALNL-1) )
 #define	GET_TOP_TLV(fhdr) ((struct forces_tlv *)((fhdr) + sizeof (struct forcesh)))
-#define TLV_SET_LEN(len)  (F_ALN_LEN(sizeof(struct forces_tlv)) + (len))
+#define TLV_SET_LEN(len)  (F_ALN_LEN(TLV_HDRL) + (len))
 #define TLV_ALN_LEN(len)  F_ALN_LEN(TLV_SET_LEN(len))
 #define TLV_RDAT_LEN(tlv) ((int)(EXTRACT_16BITS(&(tlv)->length) - TLV_SET_LEN(0))
 #define TLV_DATA(tlvp)   ((void*)(((char*)(tlvp)) + TLV_SET_LEN(0)))
 #define GO_NXT_TLV(tlv,rlen) ((rlen) -= F_ALN_LEN(EXTRACT_16BITS(&(tlv)->length)), \
 		              (struct forces_tlv*)(((char*)(tlv)) \
 				      + F_ALN_LEN(EXTRACT_16BITS(&(tlv)->length))))
-#define ILV_SET_LEN(len)  (F_ALN_LEN(sizeof(struct forces_ilv)) + (len))
+#define ILV_SET_LEN(len)  (F_ALN_LEN(ILV_HDRL) + (len))
 #define ILV_ALN_LEN(len)  F_ALN_LEN(ILV_SET_LEN(len))
 #define ILV_RDAT_LEN(ilv) ((int)(EXTRACT_32BITS(&(ilv)->length)) - ILV_SET_LEN(0))
 #define ILV_DATA(ilvp)   ((void*)(((char*)(ilvp)) + ILV_SET_LEN(0)))
@@ -457,9 +457,9 @@ static const struct tok ForCES_TLV_err[] = {
 
 static inline int tlv_valid(const struct forces_tlv *tlv, u_int rlen)
 {
-	if (rlen < (int) sizeof(struct forces_tlv))
+	if (rlen < TLV_HDRL)
 		return INVALID_RLEN;
-	if (EXTRACT_16BITS(&tlv->length) < sizeof(struct forces_tlv))
+	if (EXTRACT_16BITS(&tlv->length) < TLV_HDRL)
 		return INVALID_STLN;
 	if (EXTRACT_16BITS(&tlv->length) > rlen)
 		return INVALID_LTLN;
@@ -471,9 +471,9 @@ static inline int tlv_valid(const struct forces_tlv *tlv, u_int rlen)
 
 static inline int ilv_valid(const struct forces_ilv *ilv, u_int rlen)
 {
-	if (rlen < sizeof(struct forces_ilv))
+	if (rlen < ILV_HDRL)
 		return INVALID_RLEN;
-	if (EXTRACT_32BITS(&ilv->length) < sizeof(struct forces_ilv))
+	if (EXTRACT_32BITS(&ilv->length) < ILV_HDRL)
 		return INVALID_STLN;
 	if (EXTRACT_32BITS(&ilv->length) > rlen)
 		return INVALID_LTLN;

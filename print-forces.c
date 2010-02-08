@@ -213,7 +213,6 @@ pdatacnt_print(register const u_char * pptr, register u_int len,
 
 		TCHECK(*pdtlv);
 		type = EXTRACT_16BITS(&pdtlv->type);
-		tll = EXTRACT_16BITS(&pdtlv->length) - TLV_HDRL;
 		aln = F_ALN_LEN(EXTRACT_16BITS(&pdtlv->length));
 		invtlv = tlv_valid(pdtlv, len);
 		if (invtlv) {
@@ -223,6 +222,7 @@ pdatacnt_print(register const u_char * pptr, register u_int len,
 			     EXTRACT_16BITS(&pdtlv->length));
 			goto pd_err;
 		}
+		tll = EXTRACT_16BITS(&pdtlv->length) - TLV_HDRL;
 		if (aln > EXTRACT_16BITS(&pdtlv->length)) {
 			if (aln > len) {
 				printf
@@ -769,7 +769,7 @@ forces_type_print(register const u_char * pptr, const struct forcesh *fhdr _U_,
 	int rc = 0;
 	int ttlv = 0;
 
-	tll = mlen - sizeof(struct forcesh);
+	tll = mlen - ForCES_HDRL;
 
 	if (tll > TLV_HLN) {
 		if (tops->flags & ZERO_TTLV) {
@@ -821,9 +821,8 @@ forces_type_print(register const u_char * pptr, const struct forcesh *fhdr _U_,
 			break;
 	}
 	if (tll) {
-		printf("\tMess TopTLV header: min %lu, total %d advertised %d ",
-		       (unsigned long)sizeof(struct forces_tlv),
-		       tll, EXTRACT_16BITS(&tltlv->length));
+		printf("\tMess TopTLV header: min %u, total %d advertised %d ",
+		       TLV_HDRL, tll, EXTRACT_16BITS(&tltlv->length));
 		return -1;
 	}
 
@@ -860,8 +859,8 @@ void forces_print(register const u_char * pptr, register u_int len)
 	printf("\n\tForCES %s ", tops->s);
 	if (!ForCES_HLN_VALID(mlen, len)) {
 		printf
-		    ("Illegal ForCES pkt len - min %lu, total recvd %d, advertised %d ",
-		     (unsigned long)sizeof(struct forcesh), len, ForCES_BLN(fhdr));
+		    ("Illegal ForCES pkt len - min %u, total recvd %d, advertised %d ",
+		     ForCES_HDRL, len, ForCES_BLN(fhdr));
 		goto error;
 	}
 
