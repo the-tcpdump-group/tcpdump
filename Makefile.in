@@ -323,7 +323,6 @@ version.c: $(srcdir)/VERSION
 		cat ${srcdir}/VERSION; \
 	fi | sed -e 's/.*/char version[] = "&";/' > $@
 
-
 install: all
 	[ -d $(DESTDIR)$(sbindir) ] || \
 	    (mkdir -p $(DESTDIR)$(sbindir); chmod 755 $(DESTDIR)$(sbindir))
