@@ -37,8 +37,13 @@ prestlv_print(register const u_char * pptr, register u_int len,
 	const struct forces_tlv *tlv = (struct forces_tlv *)pptr;
 	register const u_char *tdp = (u_char *) TLV_DATA(tlv);
 	struct res_val *r = (struct res_val *)tdp;
-	u_int dlen = len - TLV_HDRL;
+	u_int dlen;
 
+	/*
+	 * pdatacnt_print() has ensured that len (the TLV length)
+	 * >= TLV_HDRL.
+	 */
+	dlen = len - TLV_HDRL;
 	if (dlen != RESLEN) {
 		printf("illegal RESULT-TLV: %d bytes!\n", dlen);
 		return -1;
@@ -67,10 +72,15 @@ fdatatlv_print(register const u_char * pptr, register u_int len,
 	       u_int16_t op_msk _U_, int indent)
 {
 	const struct forces_tlv *tlv = (struct forces_tlv *)pptr;
-	u_int tll = len - TLV_HDRL;
+	u_int tll;
 	register const u_char *tdp = (u_char *) TLV_DATA(tlv);
 	u_int16_t type;
 
+	/*
+	 * pdatacnt_print() or pkeyitlv_print() has ensured that len
+	 * (the TLV length) >= TLV_HDRL.
+	 */
+	tll = len - TLV_HDRL;
 	TCHECK(*tlv);
 	type = EXTRACT_16BITS(&tlv->type);
 	if (type != F_TLV_FULD) {
@@ -95,12 +105,17 @@ int
 sdatailv_print(register const u_char * pptr, register u_int len,
 	       u_int16_t op_msk _U_, int indent)
 {
-	u_int tll = len - ILV_HDRL;
+	u_int tll;
 	const struct forces_ilv *ilv = (struct forces_ilv *)pptr;
 	int invilv;
 
+	if (len < ILV_HDRL) {
+		printf("Error: BAD SPARSEDATA-TLV!\n");
+		return -1;
+	}
+	tll = len - ILV_HDRL;
 	indent += 1;
-	while (1) {
+	while (tll != 0) {
 		TCHECK(*ilv);
 		invilv = ilv_valid(ilv, tll);
 		if (invilv) {
@@ -133,10 +148,15 @@ sdatatlv_print(register const u_char * pptr, register u_int len,
 	       u_int16_t op_msk, int indent)
 {
 	const struct forces_tlv *tlv = (struct forces_tlv *)pptr;
-	u_int tll = len - TLV_HDRL;
+	u_int tll;
 	register const u_char *tdp = (u_char *) TLV_DATA(tlv);
 	u_int16_t type;
 
+	/*
+	 * pdatacnt_print() has ensured that len (the TLV length)
+	 * >= TLV_HDRL.
+	 */
+	tll = len - TLV_HDRL;
 	TCHECK(*tlv);
 	type = EXTRACT_16BITS(&tlv->type);
 	if (type != F_TLV_SPAD) {
@@ -177,6 +197,11 @@ pkeyitlv_print(register const u_char * pptr, register u_int len,
 		       EXTRACT_16BITS(&kdtlv->length));
 		return -1;
 	}
+	/*
+	 * At this point, tlv_valid() has ensured that the TLV
+	 * length is large enough but not too large (it doesn't
+	 * go past the end of the containing TLV).
+	 */
 	tll = EXTRACT_16BITS(&kdtlv->length);
 	dp = (u_char *) TLV_DATA(kdtlv);
 	return fdatatlv_print(dp, tll, op_msk, indent);
@@ -197,6 +222,8 @@ pdatacnt_print(register const u_char * pptr, register u_int len,
 
 	for (i = 0; i < IDcnt; i++) {
 		TCHECK2(*pptr, 4);
+		if (len < 4)
+			goto trunc;
 		id = EXTRACT_32BITS(pptr);
 		if (vflag >= 3)
 			printf("%s  ID#%02u: %d\n", ib, i + 1, id);
@@ -213,7 +240,6 @@ pdatacnt_print(register const u_char * pptr, register u_int len,
 
 		TCHECK(*pdtlv);
 		type = EXTRACT_16BITS(&pdtlv->type);
-		aln = F_ALN_LEN(EXTRACT_16BITS(&pdtlv->length));
 		invtlv = tlv_valid(pdtlv, len);
 		if (invtlv) {
 			printf
@@ -222,7 +248,13 @@ pdatacnt_print(register const u_char * pptr, register u_int len,
 			     EXTRACT_16BITS(&pdtlv->length));
 			goto pd_err;
 		}
+		/*
+		 * At this point, tlv_valid() has ensured that the TLV
+		 * length is large enough but not too large (it doesn't
+		 * go past the end of the containing TLV).
+		 */
 		tll = EXTRACT_16BITS(&pdtlv->length) - TLV_HDRL;
+		aln = F_ALN_LEN(EXTRACT_16BITS(&pdtlv->length));
 		if (aln > EXTRACT_16BITS(&pdtlv->length)) {
 			if (aln > len) {
 				printf
@@ -282,6 +314,8 @@ pdata_print(register const u_char * pptr, register u_int len,
 	u_int minsize = 0;
 
 	TCHECK(*pdh);
+	if (len < sizeof(struct pathdata_h))
+		goto trunc;
 	if (vflag >= 3) {
 		printf("\n%sPathdata: Flags 0x%x ID count %d\n",
 		       ib, EXTRACT_16BITS(&pdh->pflags), EXTRACT_16BITS(&pdh->pIDcnt));
@@ -324,6 +358,11 @@ genoptlv_print(register const u_char * pptr, register u_int len,
 	printf("genoptlvprint - %s TLV type 0x%x len %d\n",
 	       tok2str(ForCES_TLV, NULL, type), type, EXTRACT_16BITS(&pdtlv->length));
 	if (!invtlv) {
+		/*
+		 * At this point, tlv_valid() has ensured that the TLV
+		 * length is large enough but not too large (it doesn't
+		 * go past the end of the containing TLV).
+		 */
 		register const u_char *dp = (u_char *) TLV_DATA(pdtlv);
 		if (!ttlv_valid(type)) {
 			printf("%s TLV type 0x%x len %d\n",
@@ -352,19 +391,25 @@ recpdoptlv_print(register const u_char * pptr, register u_int len,
 		 u_int16_t op_msk, int indent)
 {
 	const struct forces_tlv *pdtlv = (struct forces_tlv *)pptr;
-	int tll = len;
+	int tll;
 	int rc = 0;
 	int invtlv;
 	u_int16_t type;
 	register const u_char *dp;
 	char *ib;
 
-	while (1) {
+	while (len != 0) {
 		TCHECK(*pdtlv);
 		invtlv = tlv_valid(pdtlv, len);
 		if (invtlv) {
 			break;
 		}
+
+		/*
+		 * At this point, tlv_valid() has ensured that the TLV
+		 * length is large enough but not too large (it doesn't
+		 * go past the end of the containing TLV).
+		 */
 		ib = indent_pr(indent, 0);
 		type = EXTRACT_16BITS(&pdtlv->type);
 		dp = (u_char *) TLV_DATA(pdtlv);
@@ -384,7 +429,7 @@ recpdoptlv_print(register const u_char * pptr, register u_int len,
 	if (len) {
 		printf
 		    ("\n\t\tMessy PATHDATA TLV header, type (0x%x)\n\t\texcess of %d Bytes ",
-		     EXTRACT_16BITS(&pdtlv->type), tll - EXTRACT_16BITS(&pdtlv->length));
+		     EXTRACT_16BITS(&pdtlv->type), len - EXTRACT_16BITS(&pdtlv->length));
 		return -1;
 	}
 
@@ -418,6 +463,10 @@ int otlv_print(const struct forces_tlv *otlv, u_int16_t op_msk _U_, int indent)
 	char *ib = indent_pr(indent, 0);
 	const struct optlv_h *ops;
 
+	/*
+	 * lfbselect_print() has ensured that EXTRACT_16BITS(&otlv->length)
+	 * >= TLV_HDRL.
+	 */
 	TCHECK(*otlv);
 	type = EXTRACT_16BITS(&otlv->type);
 	tll = EXTRACT_16BITS(&otlv->length) - TLV_HDRL;
@@ -457,9 +506,14 @@ asttlv_print(register const u_char * pptr, register u_int len,
 	     u_int16_t op_msk _U_, int indent)
 {
 	u_int32_t rescode;
-	u_int dlen = len - TLV_HDRL;
+	u_int dlen;
 	char *ib = indent_pr(indent, 0);
 
+	/*
+	 * forces_type_print() has ensured that len (the TLV length)
+	 * >= TLV_HDRL.
+	 */
+	dlen = len - TLV_HDRL;
 	if (dlen != ASTDLN) {
 		printf("illegal ASTresult-TLV: %d bytes!\n", dlen);
 		return -1;
@@ -509,9 +563,14 @@ asrtlv_print(register const u_char * pptr, register u_int len,
 	     u_int16_t op_msk _U_, int indent)
 {
 	u_int32_t rescode;
-	u_int dlen = len - TLV_HDRL;
+	u_int dlen;
 	char *ib = indent_pr(indent, 0);
 
+	/*
+	 * forces_type_print() has ensured that len (the TLV length)
+	 * >= TLV_HDRL.
+	 */
+	dlen = len - TLV_HDRL;
 	if (dlen != ASRDLN) {	/* id, instance, oper tlv */
 		printf("illegal ASRresult-TLV: %d bytes!\n", dlen);
 		return -1;
@@ -549,6 +608,9 @@ trunc:
 	return -1;
 }
 
+/*
+ * XXX - not used.
+ */
 int
 gentltlv_print(register const u_char * pptr _U_, register u_int len,
 	       u_int16_t op_msk _U_, int indent _U_)
@@ -567,12 +629,18 @@ int
 print_metailv(register const u_char * pptr, register u_int len,
 	      u_int16_t op_msk _U_, int indent)
 {
-	u_int dlen = len - ILV_HDRL;
-	int tll = dlen;
+	u_int dlen;
+	int tll;
 	char *ib = indent_pr(indent, 0);
 	/* XXX: check header length */
 	const struct forces_ilv *ilv = (struct forces_ilv *)pptr;
 
+	/*
+	 * print_metatlv() has ensured that len (what remains in the
+	 * ILV) >= ILV_HDRL.
+	 */
+	dlen = len - ILV_HDRL;
+	tll = dlen;
 	TCHECK(*ilv);
 	printf("\n%sMetaID 0x%x length %d\n", ib, EXTRACT_32BITS(&ilv->type),
 	       EXTRACT_32BITS(&ilv->length));
@@ -588,18 +656,30 @@ int
 print_metatlv(register const u_char * pptr, register u_int len,
 	      u_int16_t op_msk _U_, int indent)
 {
-	u_int dlen = len - TLV_HDRL;
+	u_int dlen;
 	char *ib = indent_pr(indent, 0);
-	u_int tll = dlen;
+	u_int tll;
 	const struct forces_ilv *ilv = (struct forces_ilv *)pptr;
 	int invilv;
 
+	/*
+	 * redirect_print() has ensured that len (what remains in the
+	 * TLV) >= TLV_HDRL.
+	 */
+	dlen = len - TLV_HDRL;
+	tll = dlen;
 	printf("\n%s METADATA\n", ib);
-	while (1) {
+	while (tll != 0) {
 		TCHECK(*ilv);
 		invilv = ilv_valid(ilv, tll);
 		if (invilv)
 			break;
+
+		/*
+		 * At this point, ilv_valid() has ensured that the ILV
+		 * length is large enough but not too large (it doesn't
+		 * go past the end of the containing TLV).
+		 */
 		print_metailv((u_char *) ilv, tll, 0, indent + 1);
 
 		ilv = GO_NXT_ILV(ilv, tll);
@@ -618,11 +698,17 @@ int
 print_reddata(register const u_char * pptr, register u_int len,
 	      u_int16_t op_msk _U_, int indent _U_)
 {
-	u_int dlen = len - TLV_HDRL;
-	u_int tll = dlen;
+	u_int dlen;
+	u_int tll;
 	int invtlv;
 	const struct forces_tlv *tlv = (struct forces_tlv *)pptr;
 
+	/*
+	 * redirect_print() has ensured that len (what remains in the
+	 * TLV) >= TLV_HDRL.
+	 */
+	dlen = len - TLV_HDRL;
+	tll = dlen;
 	printf("\n\t\t Redirect DATA\n");
 	if (dlen <= RD_MIN) {
 		printf("\n\t\ttruncated Redirect data: %d bytes missing! ",
@@ -639,6 +725,11 @@ print_reddata(register const u_char * pptr, register u_int len,
 		return -1;
 	}
 
+	/*
+	 * At this point, tlv_valid() has ensured that the TLV
+	 * length is large enough but not too large (it doesn't
+	 * go past the end of the containing TLV).
+	 */
 	tll -= TLV_HDRL;
 	hex_print_with_offset("\n\t\t\t[", TLV_DATA(tlv), tll, 0);
 	return 0;
@@ -653,22 +744,34 @@ redirect_print(register const u_char * pptr, register u_int len,
 	       u_int16_t op_msk _U_, int indent)
 {
 	const struct forces_tlv *tlv = (struct forces_tlv *)pptr;
-	u_int dlen = len - TLV_HDRL;
-	u_int tll = dlen;
+	u_int dlen;
+	u_int tll;
 	int invtlv;
 
+	/*
+	 * forces_type_print() has ensured that len (the TLV length)
+	 * >= TLV_HDRL.
+	 */
+	dlen = len - TLV_HDRL;
 	if (dlen <= RD_MIN) {
 		printf("\n\t\ttruncated Redirect TLV: %d bytes missing! ",
 		       RD_MIN - dlen);
 		return -1;
 	}
 
+	tll = dlen;
 	indent += 1;
-	while (1) {
+	while (tll != 0) {
 		TCHECK(*tlv);
 		invtlv = tlv_valid(tlv, tll);
 		if (invtlv)
 			break;
+
+		/*
+		 * At this point, tlv_valid() has ensured that the TLV
+		 * length is large enough but not too large (it doesn't
+		 * go past the end of the containing TLV).
+		 */
 		if (EXTRACT_16BITS(&tlv->type) == F_TLV_METD) {
 			print_metatlv((u_char *) TLV_DATA(tlv), tll, 0, indent);
 		} else if ((EXTRACT_16BITS(&tlv->type) == F_TLV_REDD)) {
@@ -705,15 +808,26 @@ lfbselect_print(register const u_char * pptr, register u_int len,
 	const struct forces_lfbsh *lfbs;
 	const struct forces_tlv *otlv;
 	char *ib = indent_pr(indent, 0);
-	u_int dlen = len - TLV_HDRL;
-	u_int tll = dlen - OP_OFF;
+	u_int dlen;
+	u_int tll;
 	int invtlv;
 
+	/*
+	 * forces_type_print() has ensured that len (the TLV length)
+	 * >= TLV_HDRL.
+	 */
+	dlen = len - TLV_HDRL;
 	if (dlen <= OP_MIN) {	/* id, instance, oper tlv header .. */
 		printf("\n\t\ttruncated lfb selector: %d bytes missing! ",
 		       OP_MIN - dlen);
 		return -1;
 	}
+
+	/*
+	 * At this point, we know that dlen > OP_MIN; OP_OFF < OP_MIN, so
+	 * we also know that it's > OP_OFF.
+	 */
+	tll = dlen - OP_OFF;
 
 	lfbs = (const struct forces_lfbsh *)pptr;
 	TCHECK(*lfbs);
@@ -727,11 +841,17 @@ lfbselect_print(register const u_char * pptr, register u_int len,
 	otlv = (struct forces_tlv *)(lfbs + 1);
 
 	indent += 1;
-	while (1) {
+	while (tll != 0) {
 		TCHECK(*otlv);
 		invtlv = tlv_valid(otlv, tll);
 		if (invtlv)
 			break;
+
+		/*
+		 * At this point, tlv_valid() has ensured that the TLV
+		 * length is large enough but not too large (it doesn't
+		 * go past the end of the containing TLV).
+		 */
 		if (op_valid(EXTRACT_16BITS(&otlv->type), op_msk)) {
 			otlv_print(otlv, 0, indent);
 		} else {
@@ -769,6 +889,10 @@ forces_type_print(register const u_char * pptr, const struct forcesh *fhdr _U_,
 	int rc = 0;
 	int ttlv = 0;
 
+	/*
+	 * forces_print() has already checked that mlen >= ForCES_HDRL
+	 * by calling ForCES_HLN_VALID().
+	 */
 	tll = mlen - ForCES_HDRL;
 
 	if (tll > TLV_HLN) {
@@ -794,11 +918,17 @@ forces_type_print(register const u_char * pptr, const struct forcesh *fhdr _U_,
 
 	/*XXX: 15 top level tlvs will probably be fine
 	   You are nuts if you send more ;-> */
-	while (1) {
+	while (tll != 0) {
 		TCHECK(*tltlv);
 		invtlv = tlv_valid(tltlv, tll);
 		if (invtlv)
 			break;
+
+		/*
+		 * At this point, tlv_valid() has ensured that the TLV
+		 * length is large enough but not too large (it doesn't
+		 * go past the end of the packet).
+		 */
 		if (!ttlv_valid(EXTRACT_16BITS(&tltlv->type))) {
 			printf("\n\tInvalid ForCES Top TLV type=0x%x",
 			       EXTRACT_16BITS(&tltlv->type));
@@ -808,7 +938,8 @@ forces_type_print(register const u_char * pptr, const struct forcesh *fhdr _U_,
 		if (vflag >= 3)
 			printf("\t%s, length %d (data length %d Bytes)",
 			       tok2str(ForCES_TLV, NULL, EXTRACT_16BITS(&tltlv->type)),
-			       EXTRACT_16BITS(&tltlv->length), EXTRACT_16BITS(&tltlv->length) - 4);
+			       EXTRACT_16BITS(&tltlv->length),
+			       EXTRACT_16BITS(&tltlv->length) - TLV_HDRL);
 
 		rc = tops->print((u_char *) TLV_DATA(tltlv),
 				 EXTRACT_16BITS(&tltlv->length), tops->op_msk, 9);
@@ -820,6 +951,10 @@ forces_type_print(register const u_char * pptr, const struct forcesh *fhdr _U_,
 		if (ttlv <= 0)
 			break;
 	}
+	/*
+	 * XXX - if ttlv != 0, does that mean that the packet was too
+	 * short, and didn't have *enough* TLVs in it?
+	 */
 	if (tll) {
 		printf("\tMess TopTLV header: min %u, total %d advertised %d ",
 		       TLV_HDRL, tll, EXTRACT_16BITS(&tltlv->length));
