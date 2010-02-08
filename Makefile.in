@@ -315,7 +315,7 @@ version.o: version.c
 
 version.c: $(srcdir)/VERSION
 	@rm -f $@
-	if grep CVS ${srcdir}/VERSION >/dev/null; then \
+	if grep GIT ${srcdir}/VERSION >/dev/null; then \
 		read ver <${srcdir}/VERSION; \
 		echo $$ver | tr -d '\012'; \
 		date +_%Y_%m_%d; \
