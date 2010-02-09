@@ -288,9 +288,10 @@ AC_DEFUN(AC_LBL_LIBPCAP,
     libpcap=FAIL
     lastdir=FAIL
     places=`ls $srcdir/.. | sed -e 's,/$,,' -e "s,^,$srcdir/../," | \
-	egrep '/libpcap-[[0-9]]*.[[0-9]]*(.[[0-9]]*)?([[ab]][[0-9]]*)?$'`
+	egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT)?$'`
     for dir in $places $srcdir/../libpcap $srcdir/libpcap ; do
-	    basedir=`echo $dir | sed -e 's/[[ab]][[0-9]]*$//'`
+	    basedir=`echo $dir | sed -e 's/[[ab]][[0-9]]*$//' | \
+	        sed -e 's/-PRE-GIT$//' `
 	    if test $lastdir = $basedir ; then
 		    dnl skip alphas when an actual release is present
 		    continue;
