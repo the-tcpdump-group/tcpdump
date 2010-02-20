@@ -86,12 +86,12 @@ struct hnamemem {
 	struct hnamemem *nxt;
 };
 
-struct hnamemem hnametable[HASHNAMESIZE];
-struct hnamemem tporttable[HASHNAMESIZE];
-struct hnamemem uporttable[HASHNAMESIZE];
-struct hnamemem eprototable[HASHNAMESIZE];
-struct hnamemem dnaddrtable[HASHNAMESIZE];
-struct hnamemem ipxsaptable[HASHNAMESIZE];
+static struct hnamemem hnametable[HASHNAMESIZE];
+static struct hnamemem tporttable[HASHNAMESIZE];
+static struct hnamemem uporttable[HASHNAMESIZE];
+static struct hnamemem eprototable[HASHNAMESIZE];
+static struct hnamemem dnaddrtable[HASHNAMESIZE];
+static struct hnamemem ipxsaptable[HASHNAMESIZE];
 
 #if defined(INET6) && defined(WIN32)
 /*
@@ -140,7 +140,7 @@ struct h6namemem {
 	struct h6namemem *nxt;
 };
 
-struct h6namemem h6nametable[HASHNAMESIZE];
+static struct h6namemem h6nametable[HASHNAMESIZE];
 #endif /* INET6 */
 
 struct enamemem {
@@ -153,9 +153,9 @@ struct enamemem {
 	struct enamemem *e_nxt;
 };
 
-struct enamemem enametable[HASHNAMESIZE];
-struct enamemem nsaptable[HASHNAMESIZE];
-struct enamemem bytestringtable[HASHNAMESIZE];
+static struct enamemem enametable[HASHNAMESIZE];
+static struct enamemem nsaptable[HASHNAMESIZE];
+static struct enamemem bytestringtable[HASHNAMESIZE];
 
 struct protoidmem {
 	u_int32_t p_oui;
@@ -164,7 +164,7 @@ struct protoidmem {
 	struct protoidmem *p_nxt;
 };
 
-struct protoidmem protoidtable[HASHNAMESIZE];
+static struct protoidmem protoidtable[HASHNAMESIZE];
 
 /*
  * A faster replacement for inet_ntoa().
