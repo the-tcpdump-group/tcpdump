@@ -311,7 +311,7 @@ getname6(const u_char *ap)
 }
 #endif /* INET6 */
 
-static char hex[] = "0123456789abcdef";
+static const char hex[] = "0123456789abcdef";
 
 
 /* Find the hash node that corresponds the ether address 'ep' */
@@ -747,7 +747,7 @@ init_eprotoarray(void)
 	}
 }
 
-static struct protoidlist {
+static const struct protoidlist {
 	const u_char protoid[5];
 	const char *name;
 } protoidlist[] = {
@@ -792,7 +792,7 @@ init_protoidarray(void)
 	}
 }
 
-static struct etherlist {
+static const struct etherlist {
 	const u_char addr[6];
 	const char *name;
 } etherlist[] = {
@@ -861,7 +861,7 @@ init_etherarray(void)
 	}
 }
 
-static struct tok ipxsap_db[] = {
+static const struct tok ipxsap_db[] = {
 	{ 0x0000, "Unknown" },
 	{ 0x0001, "User" },
 	{ 0x0002, "User Group" },
