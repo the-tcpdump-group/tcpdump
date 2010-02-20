@@ -768,7 +768,7 @@ init_protoidarray(void)
 {
 	register int i;
 	register struct protoidmem *tp;
-	struct protoidlist *pl;
+	const struct protoidlist *pl;
 	u_char protoid[5];
 
 	protoid[0] = 0;
@@ -817,7 +817,7 @@ static const struct etherlist {
 static void
 init_etherarray(void)
 {
-	register struct etherlist *el;
+	register const struct etherlist *el;
 	register struct enamemem *tp;
 #ifdef USE_ETHER_NTOHOST
 	char name[256];
