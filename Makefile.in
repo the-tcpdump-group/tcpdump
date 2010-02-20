@@ -321,7 +321,7 @@ version.c: $(srcdir)/VERSION
 		date +_%Y_%m_%d; \
 	else \
 		cat ${srcdir}/VERSION; \
-	fi | sed -e 's/.*/char version[] = "&";/' > $@
+	fi | sed -e 's/.*/const char version[] = "&";/' > $@
 
 install: all
 	[ -d $(DESTDIR)$(sbindir) ] || \
