@@ -35,7 +35,7 @@ static const char rcsid[] _U_ =
 #include <openssl/md5.h>
 #endif
 
-struct tok signature_check_values[] = {
+const struct tok signature_check_values[] = {
     { SIGNATURE_VALID, "valid"},
     { SIGNATURE_INVALID, "invalid"},
     { CANT_CHECK_SIGNATURE, "unchecked"},
