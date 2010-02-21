@@ -91,7 +91,6 @@ ap1394_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	u_int caplen = h->caplen;
 	struct firewire_header *fp;
 	u_short ether_type;
-	u_short extracted_ether_type;
 
 	if (caplen < FIREWIRE_HDRLEN) {
 		printf("[|ap1394]");
@@ -107,10 +106,7 @@ ap1394_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	p += FIREWIRE_HDRLEN;
 
 	ether_type = EXTRACT_16BITS(&fp->firewire_type);
-
-	extracted_ether_type = 0;
-	if (ether_encap_print(ether_type, p, length, caplen,
-	    &extracted_ether_type) == 0) {
+	if (ethertype_print(ether_type, p, length, caplen) == 0) {
 		/* ether_type not known, print raw packet */
 		if (!eflag)
 			ap1394_hdr_print((u_char *)fp, length + FIREWIRE_HDRLEN);

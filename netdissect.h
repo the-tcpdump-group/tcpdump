@@ -291,8 +291,8 @@ extern void hex_print_with_offset(netdissect_options *,const char *,
 				  u_int, u_int);
 extern void hex_print(netdissect_options *,const char *, u_int);
 extern void telnet_print(netdissect_options *,const u_char *, u_int);
-extern int ether_encap_print(netdissect_options *,u_short, const u_char *,
-			     u_int, u_int, u_short *);
+extern int ethertype_print(netdissect_options *,u_short, const u_char *,
+			     u_int, u_int);
 extern int llc_print(netdissect_options *,
 		     const u_char *, u_int, u_int, const u_char *,
 		     const u_char *, u_short *);

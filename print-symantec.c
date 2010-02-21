@@ -84,7 +84,6 @@ symantec_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	u_int caplen = h->caplen;
 	struct symantec_header *sp;
 	u_short ether_type;
-	u_short extracted_ether_type;
 
 	if (caplen < sizeof (struct symantec_header)) {
 		printf("[|symantec]");
@@ -108,8 +107,7 @@ symantec_if_print(const struct pcap_pkthdr *h, const u_char *p)
 
 		if (!suppress_default_print)
 			default_print(p, caplen);
-	} else if (ether_encap_print(ether_type, p, length, caplen,
-	    &extracted_ether_type) == 0) {
+	} else if (ethertype_print(ether_type, p, length, caplen) == 0) {
 		/* ether_type not known, print raw packet */
 		if (!eflag)
 			symantec_hdr_print((u_char *)sp, length + sizeof (struct symantec_header));

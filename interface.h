@@ -166,10 +166,10 @@ extern void hex_and_ascii_print(const char *, const u_char *, u_int);
 extern void hex_print_with_offset(const char *, const u_char *, u_int, u_int);
 extern void hex_print(const char *, const u_char *, u_int);
 extern void telnet_print(const u_char *, u_int);
-extern int ether_encap_print(u_short, const u_char *, u_int, u_int, u_short *);
+extern int ethertype_print(u_short, const u_char *, u_int, u_int);
 extern int llc_print(const u_char *, u_int, u_int, const u_char *,
 	const u_char *, u_short *);
-extern int snap_print(const u_char *, u_int, u_int, u_short *, u_int);
+extern int snap_print(const u_char *, u_int, u_int, u_int);
 extern void aarp_print(const u_char *, u_int);
 extern void aodv_print(const u_char *, u_int, int);
 extern void atalk_print(const u_char *, u_int);
@@ -189,7 +189,8 @@ extern u_int enc_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int pflog_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int arcnet_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int arcnet_linux_if_print(const struct pcap_pkthdr *, const u_char *);
-extern void ether_print(const u_char *, u_int, u_int);
+extern void ether_print(const u_char *, u_int, u_int,
+    void (*)(const u_char *), const u_char *);
 extern u_int ether_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int token_print(const u_char *, u_int, u_int);
 extern u_int token_if_print(const struct pcap_pkthdr *, const u_char *);
