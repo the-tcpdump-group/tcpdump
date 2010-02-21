@@ -183,9 +183,12 @@ ntp_print(register const u_char *cp, u_int length)
 	p_ntp_delta(&(bp->org_timestamp), &(bp->xmt_timestamp));
 
 	if ( (sizeof(struct ntpdata) - length) == 16) { 	/* Optional: key-id */
+		TCHECK(bp->key_id);
 		printf("\n\tKey id: %u", bp->key_id);
 	} else if ( (sizeof(struct ntpdata) - length) == 0) { 	/* Optional: key-id + authentication */
+		TCHECK(bp->key_id);
 		printf("\n\tKey id: %u", bp->key_id);
+		TCHECK2(bp->message_digest, sizeof (bp->message_digest));
                 printf("\n\tAuthentication: %08x%08x%08x%08x",
         		       EXTRACT_32BITS(bp->message_digest),
 		               EXTRACT_32BITS(bp->message_digest + 4),
