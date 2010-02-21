@@ -127,7 +127,16 @@ token_print(const u_char *p, u_int length, u_int caplen)
 		if (eflag)
 			token_hdr_print(trp, length, ESRC(&ehdr), EDST(&ehdr));
 
+		if (caplen < TOKEN_HDRLEN + 2) {
+			printf("[|token-ring]");
+			return hdr_len;
+		}
 		route_len = RIF_LENGTH(trp);
+		hdr_len += route_len;
+		if (caplen < hdr_len) {
+			printf("[|token-ring]");
+			return hdr_len;
+		}
 		if (vflag) {
 			printf("%s ", broadcast_indicator[BROADCAST(trp)]);
 			printf("%s", direction[DIRECTION(trp)]);
@@ -148,7 +157,6 @@ token_print(const u_char *p, u_int length, u_int caplen)
 	}
 
 	/* Skip over token ring MAC header and routing information */
-	hdr_len += route_len;
 	length -= hdr_len;
 	p += hdr_len;
 	caplen -= hdr_len;
