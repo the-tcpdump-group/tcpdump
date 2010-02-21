@@ -759,7 +759,7 @@ tcp_verify_signature(const struct ip *ip, const struct tcphdr *tp,
                 ip6 = (struct ip6_hdr *)ip;
                 MD5_Update(&ctx, (char *)&ip6->ip6_src, sizeof(ip6->ip6_src));
                 MD5_Update(&ctx, (char *)&ip6->ip6_dst, sizeof(ip6->ip6_dst));
-                len32 = htonl(ntohs(ip6->ip6_plen));
+                len32 = htonl(EXTRACT_16BITS(&ip6->ip6_plen));
                 MD5_Update(&ctx, (char *)&len32, sizeof(len32));
                 nxt = 0;
                 MD5_Update(&ctx, (char *)&nxt, sizeof(nxt));

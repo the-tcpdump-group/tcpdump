@@ -600,7 +600,7 @@ esp_print(netdissect_options *ndo,
 		/* see if we can find the SA, and if so, decode it */
 		for (sa = ndo->ndo_sa_list_head; sa != NULL; sa = sa->next) {
 			struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *)&sa->daddr;
-			if (sa->spi == ntohl(esp->esp_spi) &&
+			if (sa->spi == EXTRACT_32BITS(&esp->esp_spi) &&
 			    sin6->sin6_family == AF_INET6 &&
 			    memcmp(&sin6->sin6_addr, &ip6->ip6_dst,
 				   sizeof(struct in6_addr)) == 0) {
@@ -618,7 +618,7 @@ esp_print(netdissect_options *ndo,
 		/* see if we can find the SA, and if so, decode it */
 		for (sa = ndo->ndo_sa_list_head; sa != NULL; sa = sa->next) {
 			struct sockaddr_in *sin = (struct sockaddr_in *)&sa->daddr;
-			if (sa->spi == ntohl(esp->esp_spi) &&
+			if (sa->spi == EXTRACT_32BITS(&esp->esp_spi) &&
 			    sin->sin_family == AF_INET &&
 			    sin->sin_addr.s_addr == ip->ip_dst.s_addr) {
 				break;

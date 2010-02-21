@@ -853,7 +853,7 @@ mldv2_report_print(const u_char *bp, u_int len)
     }
 
     TCHECK(icp->icmp6_data16[1]);
-    ngroups = ntohs(icp->icmp6_data16[1]);
+    ngroups = EXTRACT_16BITS(&icp->icmp6_data16[1]);
     printf(", %d group record(s)", ngroups);
     if (vflag > 0) {
 	/* Print the group records */
@@ -912,7 +912,7 @@ mldv2_query_print(const u_char *bp, u_int len)
 	return;
     }
     TCHECK(icp->icmp6_data16[0]);
-    mrc = ntohs(icp->icmp6_data16[0]);
+    mrc = EXTRACT_16BITS(&icp->icmp6_data16[0]);
     if (mrc < 32768) {
 	mrt = mrc;
     } else {
@@ -941,7 +941,7 @@ mldv2_query_print(const u_char *bp, u_int len)
     }
 
     TCHECK2(bp[26], 2);
-    nsrcs = ntohs(*(u_short *)&bp[26]);
+    nsrcs = EXTRACT_16BITS(&bp[26]);
     if (nsrcs > 0) {
 	if (len < 28 + nsrcs * sizeof(struct in6_addr))
 	    printf(" [invalid number of sources]");

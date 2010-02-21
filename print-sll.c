@@ -142,7 +142,7 @@ sll_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	caplen -= SLL_HDR_LEN;
 	p += SLL_HDR_LEN;
 
-	ether_type = ntohs(sllp->sll_protocol);
+	ether_type = EXTRACT_16BITS(&sllp->sll_protocol);
 
 	/*
 	 * Is it (gag) an 802.3 encapsulation, or some non-Ethernet

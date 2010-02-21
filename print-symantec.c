@@ -33,6 +33,7 @@ static const char rcsid[] _U_ =
 #include <pcap.h>
 
 #include "interface.h"
+#include "extract.h"
 #include "addrtoname.h"
 #include "ethertype.h"
 
@@ -52,7 +53,7 @@ symantec_hdr_print(register const u_char *bp, u_int length)
 
 	sp = (const struct symantec_header *)bp;
 
-	etype = ntohs(sp->ether_type);
+	etype = EXTRACT_16BITS(&sp->ether_type);
 	if (!qflag) {
 	        if (etype <= ETHERMTU)
 		          (void)printf("invalid ethertype %u", etype);
@@ -98,7 +99,7 @@ symantec_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	sp = (struct symantec_header *)p;
 	p += sizeof (struct symantec_header);
 
-	ether_type = ntohs(sp->ether_type);
+	ether_type = EXTRACT_16BITS(&sp->ether_type);
 
 	if (ether_type <= ETHERMTU) {
 		/* ether_type not known, print raw packet */

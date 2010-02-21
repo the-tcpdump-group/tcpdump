@@ -33,6 +33,7 @@ static const char rcsid[] _U_ =
 #include <pcap.h>
 
 #include "interface.h"
+#include "extract.h"
 #include "addrtoname.h"
 #include "ethertype.h"
 
@@ -86,24 +87,27 @@ static inline void
 ether_hdr_print(register const u_char *bp, u_int length)
 {
 	register const struct ether_header *ep;
+	u_int16_t ether_type;
+
 	ep = (const struct ether_header *)bp;
 
 	(void)printf("%s > %s",
 		     etheraddr_string(ESRC(ep)),
 		     etheraddr_string(EDST(ep)));
 
+	ether_type = EXTRACT_16BITS(&ep->ether_type);
 	if (!qflag) {
-	        if (ntohs(ep->ether_type) <= ETHERMTU)
+	        if (ether_type <= ETHERMTU)
 		          (void)printf(", 802.3");
                 else 
 		          (void)printf(", ethertype %s (0x%04x)",
-				       tok2str(ethertype_values,"Unknown", ntohs(ep->ether_type)),
-                                       ntohs(ep->ether_type));	      
+				       tok2str(ethertype_values,"Unknown", ether_type),
+                                       ether_type);
         } else {
-                if (ntohs(ep->ether_type) <= ETHERMTU)
+                if (ether_type <= ETHERMTU)
                           (void)printf(", 802.3");
                 else 
-                          (void)printf(", %s", tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", ntohs(ep->ether_type)));  
+                          (void)printf(", %s", tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", ether_type));
         }
 
 	(void)printf(", length %u: ", length);
@@ -129,7 +133,7 @@ ether_print(const u_char *p, u_int length, u_int caplen)
 	ep = (struct ether_header *)p;
 	p += ETHER_HDRLEN;
 
-	ether_type = ntohs(ep->ether_type);
+	ether_type = EXTRACT_16BITS(&ep->ether_type);
 
 	/*
 	 * Is it (gag) an 802.3 encapsulation?
@@ -226,13 +230,16 @@ ether_encap_print(u_short ether_type, const u_char *p,
 		return (1);
 
 	case ETHERTYPE_8021Q:
-	        if (eflag)
-		    printf("vlan %u, p %u%s, ",
-			   ntohs(*(u_int16_t *)p) & 0xfff,
-			   ntohs(*(u_int16_t *)p) >> 13,
-			   (ntohs(*(u_int16_t *)p) & 0x1000) ? ", CFI" : "");
+	        if (eflag) {
+	        	u_int16_t tag = EXTRACT_16BITS(p);
 
-		ether_type = ntohs(*(u_int16_t *)(p + 2));
+			printf("vlan %u, p %u%s, ",
+			    tag & 0xfff,
+			    tag >> 13,
+			    (tag & 0x1000) ? ", CFI" : "");
+		}
+
+		ether_type = EXTRACT_16BITS(p + 2);
 		p += 4;
 		length -= 4;
 		caplen -= 4;
@@ -259,7 +266,7 @@ ether_encap_print(u_short ether_type, const u_char *p,
 		return (1);
 
         case ETHERTYPE_JUMBO:
-                ether_type = ntohs(*(u_int16_t *)(p));
+                ether_type = EXTRACT_16BITS(p);
                 p += 2;
                 length -= 2;      
                 caplen -= 2;
