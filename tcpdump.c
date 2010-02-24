@@ -90,9 +90,9 @@ extern int SIZE_BUF;
 netdissect_options Gndo;
 netdissect_options *gndo = &Gndo;
 
-int dflag;			/* print filter code */
-int Lflag;			/* list available data link types and exit */
-char *zflag = NULL;		/* compress each savefile using a specified command (like gzip or bzip2) */
+static int dflag;			/* print filter code */
+static int Lflag;			/* list available data link types and exit */
+static char *zflag = NULL;		/* compress each savefile using a specified command (like gzip or bzip2) */
 
 static int infodelay;
 static int infoprint;
