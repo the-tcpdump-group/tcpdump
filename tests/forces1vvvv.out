@@ -7,7 +7,7 @@ IP (tos 0x2,ECT(0), ttl 64, id 0, offset 0, flags [DF], proto SCTP (132), length
 	ForCES flags:
 	  AlwaysACK(0x3), prio=7, EMReserved(0x0),
 	  Standalone(0x0), StartofTransaction(0x0)
-	  Extra flags: rsv(b5-7) 0x0 rsv(b13-15) 0x0 rsv(b16-31) 0x0
+	  Extra flags: rsv(b5-7) 0x0 rsv(b13-31) 0x0
 	LFBselect TLV, length 40 (data length 36 Bytes)
          FEObj LFB(Classid 1) instance 1
           Oper TLV  Get(0x7) length 28
@@ -18,7 +18,7 @@ IP (tos 0x2,ECT(0), ttl 64, id 0, offset 0, flags [DF], proto SCTP (132), length
                Pathdata: Flags 0x0 ID count 1
                  ID#01: 2
 
-	  Raw ForCES message 
+	  Raw ForCES message
 	 [
 	 0x0000:  1004 0010 4000 0001 0000 0007 0000 0000
 	 0x0010:  0000 0002 f800 0000 1000 0028 0000 0001
@@ -38,7 +38,7 @@ IP (tos 0x2,ECT(0), ttl 64, id 8, offset 0, flags [DF], proto SCTP (132), length
 	ForCES flags:
 	  NoACK(0x0), prio=7, EMReserved(0x0),
 	  Standalone(0x0), StartofTransaction(0x0)
-	  Extra flags: rsv(b5-7) 0x0 rsv(b13-15) 0x0 rsv(b16-31) 0x0
+	  Extra flags: rsv(b5-7) 0x0 rsv(b13-31) 0x0
 	LFBselect TLV, length 52 (data length 48 Bytes)
          FEObj LFB(Classid 1) instance 1
           Oper TLV  GetResp(0x9) length 40
@@ -53,7 +53,7 @@ IP (tos 0x2,ECT(0), ttl 64, id 8, offset 0, flags [DF], proto SCTP (132), length
                   0x0000:  0000 0002 0000 0001
                   ]
 
-	  Raw ForCES message 
+	  Raw ForCES message
 	 [
 	 0x0000:  1014 0013 0000 0007 4000 0001 0000 0000
 	 0x0010:  0000 0002 3800 0000 1000 0034 0000 0001
