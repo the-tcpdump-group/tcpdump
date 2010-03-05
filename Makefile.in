@@ -349,7 +349,7 @@ distclean:
 	    config.h gnuc.h os-proto.h stamp-h stamp-h.in $(PROG).1
 
 check: tcpdump
-	uudecode -h || (echo "No uudecode program found, not running tests"; echo "apt-get/rpm install sharutils?"; exit 1)
+	uudecode --help || (echo "No uudecode program found, not running tests"; echo "apt-get/rpm install sharutils?"; exit 1)
 	(cd tests && ./TESTrun.sh)
 
 tags: $(TAGFILES)
