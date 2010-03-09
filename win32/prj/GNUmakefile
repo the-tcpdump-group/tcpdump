@@ -161,7 +161,8 @@ OBJS = \
 	../../print-lmp.o \
 	../../print-syslog.o \
 	../../print-dccp.o \
-	../../print-bt.o
+	../../print-bt.o \
+	../../signature.o
 
 main: ${OBJS}
 	${CC} ${CFLAGS} ${LDFLAGS} -o windump.exe ${OBJS} ${LIBS}
