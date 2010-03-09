@@ -28,7 +28,7 @@ static const char rcsid[] _U_ =
 
 /* FIXME complete OUI list using a script */
 
-struct tok oui_values[] = {
+const struct tok oui_values[] = {
     { OUI_ENCAP_ETHER, "Ethernet" },
     { OUI_CISCO, "Cisco" },
     { OUI_NORTEL, "Nortel Networks SONMP" },
@@ -55,7 +55,7 @@ struct tok oui_values[] = {
  *
  * List taken from Ethereal's epan/sminmpec.c.
  */
-struct tok smi_values[] = {
+const struct tok smi_values[] = {
     { SMI_IETF,                 "IETF (reserved)"},
     { SMI_ACC,                  "ACC"},
     { SMI_CISCO,                "Cisco"},

@@ -41,3 +41,6 @@ if (! -f $input) {
 
 print "    ";
 exec("../tcpdump -n -r $input $options | tee NEW/$output | diff -w - $output >DIFF/$output.diff");
+@cores = glob("core*");
+exit 10 if (@cores > 0);
+exit 0;

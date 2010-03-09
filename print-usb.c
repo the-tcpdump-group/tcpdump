@@ -36,7 +36,8 @@
 #include <pcap/usb.h>
 
 /* returns direction: 1=inbound 2=outbound -1=invalid */
-static int get_direction(int transfer_type, int event_type)
+static int
+get_direction(int transfer_type, int event_type)
 {
 	int direction;
 
@@ -79,23 +80,11 @@ static int get_direction(int transfer_type, int event_type)
 	return direction;
 }
 
-/*
- * This is the top level routine of the printer.  'p' points
- * to the ether header of the packet, 'h->ts' is the timestamp,
- * 'h->len' is the length of the packet off the wire, and 'h->caplen'
- * is the number of bytes actually captured.
- */
-u_int usb_linux_print(const struct pcap_pkthdr *h, register const u_char *p)
+static void
+usb_header_print(const pcap_usb_header *uh)
 {
-	const pcap_usb_header *uh;
 	int direction;
 
-	if (h->caplen < sizeof(pcap_usb_header)) {
-		printf("[|usb]");
-		return(sizeof(pcap_usb_header));
-	}
-
-	uh = (const pcap_usb_header *) p;
 	switch(uh->transfer_type)
 	{
 		case URB_ISOCHRONOUS:
@@ -135,9 +124,51 @@ u_int usb_linux_print(const struct pcap_pkthdr *h, register const u_char *p)
 	else if(direction == 2)
 		printf(" to");
 	printf(" %d:%d:%d", uh->bus_id, uh->device_address, uh->endpoint_number & 0x7f);
+}
+
+/*
+ * This is the top level routine of the printer for captures with a
+ * 48-byte header.
+ *
+ * 'p' points to the header of the packet, 'h->ts' is the timestamp,
+ * 'h->len' is the length of the packet off the wire, and 'h->caplen'
+ * is the number of bytes actually captured.
+ */
+u_int
+usb_linux_48_byte_print(const struct pcap_pkthdr *h, register const u_char *p)
+{
+	if (h->caplen < sizeof(pcap_usb_header)) {
+		printf("[|usb]");
+		return(sizeof(pcap_usb_header));
+	}
+
+	usb_header_print((const pcap_usb_header *) p);
 
 	return(sizeof(pcap_usb_header));
 }
 
-#endif
+#ifdef DLT_USB_LINUX_MMAPPED
+/*
+ * This is the top level routine of the printer for captures with a
+ * 64-byte header.
+ *
+ * 'p' points to the header of the packet, 'h->ts' is the timestamp,
+ * 'h->len' is the length of the packet off the wire, and 'h->caplen'
+ * is the number of bytes actually captured.
+ */
+u_int
+usb_linux_64_byte_print(const struct pcap_pkthdr *h, register const u_char *p)
+{
+	if (h->caplen < sizeof(pcap_usb_header_mmapped)) {
+		printf("[|usb]");
+		return(sizeof(pcap_usb_header_mmapped));
+	}
+
+	usb_header_print((const pcap_usb_header *) p);
+
+	return(sizeof(pcap_usb_header_mmapped));
+}
+#endif /* DLT_USB_LINUX_MMAPPED */
+
+#endif /* defined(HAVE_PCAP_USB_H) && defined(DLT_USB_LINUX) */
 

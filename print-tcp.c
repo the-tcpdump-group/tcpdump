@@ -121,6 +121,7 @@ struct tok tcp_option_values[] = {
         { TCPOPT_CCECHO, "" },
         { TCPOPT_SIGNATURE, "md5" },
         { TCPOPT_AUTH, "enhanced auth" },
+        { TCPOPT_UTO, "uto" },
         { 0, NULL }
 };
 
@@ -155,37 +156,6 @@ static int tcp_cksum(register const struct ip *ip,
                         sp[0]+sp[1]+sp[2]+sp[3]+sp[4]+sp[5]);
 }
 
-#ifdef INET6
-static int tcp6_cksum(const struct ip6_hdr *ip6, const struct tcphdr *tp,
-                      u_int len)
-{
-        size_t i;
-        u_int32_t sum = 0;
-        union {
-                struct {
-                        struct in6_addr ph_src;
-                        struct in6_addr ph_dst;
-                        u_int32_t	ph_len;
-                        u_int8_t	ph_zero[3];
-                        u_int8_t	ph_nxt;
-                } ph;
-                u_int16_t pa[20];
-        } phu;
-
-        /* pseudo-header */
-        memset(&phu, 0, sizeof(phu));
-        phu.ph.ph_src = ip6->ip6_src;
-        phu.ph.ph_dst = ip6->ip6_dst;
-        phu.ph.ph_len = htonl(len);
-        phu.ph.ph_nxt = IPPROTO_TCP;
-
-        for (i = 0; i < sizeof(phu.pa) / sizeof(phu.pa[0]); i++)
-                sum += phu.pa[i];
-
-        return in_cksum((u_short *)tp, len, sum);
-}
-#endif
-
 void
 tcp_print(register const u_char *bp, register u_int length,
 	  register const u_char *bp2, int fragmented)
@@ -197,6 +167,7 @@ tcp_print(register const u_char *bp, register u_int length,
         register char ch;
         u_int16_t sport, dport, win, urp;
         u_int32_t seq, ack, thseq, thack;
+        u_int utoval;
         int threv;
 #ifdef INET6
         register const struct ip6_hdr *ip6;
@@ -439,7 +410,7 @@ tcp_print(register const u_char *bp, register u_int length,
         if (IP_V(ip) == 6 && ip6->ip6_plen && vflag && !Kflag && !fragmented) {
                 u_int16_t sum,tcp_sum;
                 if (TTEST2(tp->th_sport, length)) {
-                        sum = tcp6_cksum(ip6, tp, length);
+                        sum = nextproto6_cksum(ip6, (u_short *)tp, length, IPPROTO_TCP);
                         (void)printf(", cksum 0x%04x",EXTRACT_16BITS(&tp->th_sum));
                         if (sum != 0) {
                                 tcp_sum = EXTRACT_16BITS(&tp->th_sum);
@@ -610,6 +581,18 @@ tcp_print(register const u_char *bp, register u_int length,
                                  */
                                 break;
 
+                        case TCPOPT_UTO:
+                                datalen = 2;
+                                LENCHECK(datalen);
+                                utoval = EXTRACT_16BITS(cp);
+                                (void)printf("0x%x", utoval);
+                                if (utoval & 0x0001)
+                                        utoval = (utoval >> 1) * 60;
+                                else
+                                        utoval >>= 1;
+                                (void)printf(" %u", utoval);
+                                break;
+
                         default:
                                 datalen = len - 2;
                                 for (i = 0; i < datalen; ++i) {
@@ -776,7 +759,7 @@ tcp_verify_signature(const struct ip *ip, const struct tcphdr *tp,
                 ip6 = (struct ip6_hdr *)ip;
                 MD5_Update(&ctx, (char *)&ip6->ip6_src, sizeof(ip6->ip6_src));
                 MD5_Update(&ctx, (char *)&ip6->ip6_dst, sizeof(ip6->ip6_dst));
-                len32 = htonl(ntohs(ip6->ip6_plen));
+                len32 = htonl(EXTRACT_16BITS(&ip6->ip6_plen));
                 MD5_Update(&ctx, (char *)&len32, sizeof(len32));
                 nxt = 0;
                 MD5_Update(&ctx, (char *)&nxt, sizeof(nxt));

@@ -508,7 +508,8 @@ again:
 		break;
 
 	case IPPROTO_PIM:
-		pim_print(ipds->cp,  ipds->len);
+		pim_print(ipds->cp,  ipds->len,
+			  in_cksum((const u_short*)ipds->cp, ipds->len, 0));
 		break;
 
 	case IPPROTO_VRRP:

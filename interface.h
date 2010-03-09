@@ -82,11 +82,6 @@ extern char *strsep(char **, const char *);
 #define max(a,b) ((b)>(a)?(b):(a))
 #endif
 
-#ifndef BIG_ENDIAN
-#define BIG_ENDIAN 4321
-#define LITTLE_ENDIAN 1234
-#endif
-
 #define ESRC(ep) ((ep)->ether_shost)
 #define EDST(ep) ((ep)->ether_dhost)
 
@@ -171,10 +166,10 @@ extern void hex_and_ascii_print(const char *, const u_char *, u_int);
 extern void hex_print_with_offset(const char *, const u_char *, u_int, u_int);
 extern void hex_print(const char *, const u_char *, u_int);
 extern void telnet_print(const u_char *, u_int);
-extern int ether_encap_print(u_short, const u_char *, u_int, u_int, u_short *);
+extern int ethertype_print(u_short, const u_char *, u_int, u_int);
 extern int llc_print(const u_char *, u_int, u_int, const u_char *,
 	const u_char *, u_short *);
-extern int snap_print(const u_char *, u_int, u_int, u_short *, u_int);
+extern int snap_print(const u_char *, u_int, u_int, u_int);
 extern void aarp_print(const u_char *, u_int);
 extern void aodv_print(const u_char *, u_int, int);
 extern void atalk_print(const u_char *, u_int);
@@ -194,7 +189,8 @@ extern u_int enc_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int pflog_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int arcnet_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int arcnet_linux_if_print(const struct pcap_pkthdr *, const u_char *);
-extern void ether_print(const u_char *, u_int, u_int);
+extern void ether_print(const u_char *, u_int, u_int,
+    void (*)(const u_char *), const u_char *);
 extern u_int ether_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int token_print(const u_char *, u_int, u_int);
 extern u_int token_if_print(const struct pcap_pkthdr *, const u_char *);
@@ -241,7 +237,7 @@ extern void lwapp_control_print(const u_char *, u_int, int);
 extern void lwapp_data_print(const u_char *, u_int);
 extern void eigrp_print(const u_char *, u_int);
 extern void mobile_print(const u_char *, u_int);
-extern void pim_print(const u_char *, u_int);
+extern void pim_print(const u_char *, u_int, u_int);
 extern u_int pppoe_print(const u_char *, u_int);
 extern u_int ppp_print(register const u_char *, u_int);
 extern u_int ppp_if_print(const struct pcap_pkthdr *, const u_char *);
@@ -315,6 +311,7 @@ extern void lwres_print(const u_char *, u_int);
 extern void pptp_print(const u_char *);
 extern void dccp_print(const u_char *, const u_char *, u_int);
 extern void sctp_print(const u_char *, const u_char *, u_int);
+extern void forces_print(const u_char *, u_int);
 extern void mpls_print(const u_char *, u_int);
 extern void mpls_lsp_ping_print(const u_char *, u_int);
 extern void zephyr_print(const u_char *, int);
@@ -323,16 +320,17 @@ extern void bfd_print(const u_char *, u_int, u_int);
 extern void sip_print(const u_char *, u_int);
 extern void syslog_print(const u_char *, u_int);
 extern u_int bt_if_print(const struct pcap_pkthdr *, const u_char *);
-extern u_int usb_linux_print(const struct pcap_pkthdr *, const u_char *);
+extern u_int usb_linux_48_byte_print(const struct pcap_pkthdr *, const u_char *);
+extern u_int usb_linux_64_byte_print(const struct pcap_pkthdr *, const u_char *);
 
 #ifdef INET6
 extern void ip6_print(const u_char *, u_int);
 extern void ip6_opt_print(const u_char *, int);
+extern int nextproto6_cksum(const struct ip6_hdr *, const u_short *, u_int, u_int);
 extern int hbhopt_print(const u_char *);
 extern int dstopt_print(const u_char *);
 extern int frag6_print(const u_char *, const u_char *);
 extern int mobility_print(const u_char *, const u_char *);
-extern void icmp6_print(const u_char *, u_int, const u_char *, int);
 extern void ripng_print(const u_char *, unsigned int);
 extern int rt6_print(const u_char *, const u_char *);
 extern void ospf6_print(const u_char *, u_int);

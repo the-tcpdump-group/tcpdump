@@ -29,7 +29,7 @@ tcpdump \- dump traffic on a network
 .na
 .B tcpdump
 [
-.B \-AdDefIKlLnNOpqRStuUvxX
+.B \-AbdDefIKlLnNOpqRStuUvxX
 ] [
 .B \-B
 .I buffer_size
@@ -190,6 +190,10 @@ special privileges.
 .B \-A
 Print each packet (minus its link level header) in ASCII.  Handy for
 capturing web pages.
+.TP
+.B \-b
+Print the AS number in BGP packets in ASDOT notation rather than ASPLAIN
+notation.
 .TP
 .B \-B
 Set the operating system capture buffer size to \fIbuffer_size\fP.
@@ -1141,6 +1145,18 @@ This points us to the \fItcpdump\fP filter expression
 .RS
 .B
      tcpdump -i xl0 'tcp[13] & 2 == 2'
+.RE
+.PP
+Some offsets and field values may be expressed as names
+rather than as numeric values. For example tcp[13] may
+be replaced with tcp[tcpflags]. The following TCP flag
+field values are also available: tcp-fin, tcp-syn, tcp-rst,
+tcp-push, tcp-act, tcp-urg.
+.PP
+This can be demonstrated as:
+.RS
+.B 
+     tcpdump -i xl0 'tcp[tcpflags] & tcp-push != 0'
 .RE
 .PP
 Note that you should use single quotes or a backslash

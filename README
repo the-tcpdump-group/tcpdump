@@ -7,10 +7,8 @@ See 		www.tcpdump.org
 Please send inquiries/comments/reports to:
 	tcpdump-workers@lists.tcpdump.org
 
-Anonymous CVS is available via:
-	cvs -d :pserver:cvs.tcpdump.org:/tcpdump/master login
-	(password "anoncvs")
-	cvs -d :pserver:cvs.tcpdump.org:/tcpdump/master checkout tcpdump
+Anonymous Git is available via:
+	git clone git://bpf.tcpdump.org/tcpdump
 
 Version 4.x.y of TCPDUMP can be retrieved with the CVS tag "tcpdump_4_xrely":
 	cvs -d :pserver:cvs.tcpdump.org:/tcpdump/master checkout -r tcpdump_4_xrely tcpdump

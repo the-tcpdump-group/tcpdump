@@ -94,8 +94,8 @@ pflog_print(const struct pfloghdr *hdr)
 {
 	u_int32_t rulenr, subrulenr;
 
-	rulenr = ntohl(hdr->rulenr);
-	subrulenr = ntohl(hdr->subrulenr);
+	rulenr = EXTRACT_32BITS(&hdr->rulenr);
+	subrulenr = EXTRACT_32BITS(&hdr->subrulenr);
 	if (subrulenr == (u_int32_t)-1)
 		printf("rule %u/", rulenr);
 	else

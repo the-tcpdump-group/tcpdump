@@ -22,5 +22,5 @@
 #define SIGNATURE_INVALID	1
 #define CANT_CHECK_SIGNATURE	2
 
-extern struct tok signature_check_values[];
+extern const struct tok signature_check_values[];
 extern int signature_verify (const u_char *, u_int, u_char *);

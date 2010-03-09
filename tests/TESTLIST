@@ -35,3 +35,17 @@ ikev2fourv	ikev2four.pcap		ikev2fourv.out	-t -v -v -v
 ikev2fourv4	ikev2four.pcap		ikev2fourv4.out	-t -v -v -v -v
 ikev2pI2	ikev2pI2.pcap		ikev2pI2.out	-t -E "file ikev2pI2-secrets.txt" -v -v -v -v
 
+# IETF ROLL RPL packets
+dio01           dio.pcap                dio.out         -t -v
+
+# IPNET encapsulated site
+e1000g		e1000g.pcap		e1000g.out	-t
+
+# IETF FORCES WG packets and printer
+forces01        forces1.pcap            forces1.out     -t
+forces02        forces2.pcap            forces2.out     -t
+forces02v       forces2.pcap            forces2v.out    -t -v
+forces02vv      forces2.pcap            forces2vv.out   -t -v -v
+forces01vvv     forces1.pcap            forces1vvv.out  -t -v -v -v 
+forces01vvvv    forces1.pcap            forces1vvvv.out -t -v -v -v -v
+

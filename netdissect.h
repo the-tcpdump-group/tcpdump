@@ -199,11 +199,6 @@ struct netdissect_options {
  */
 #define DEFAULT_SNAPLEN	MAXIMUM_SNAPLEN
 
-#ifndef BIG_ENDIAN
-#define BIG_ENDIAN 4321
-#define LITTLE_ENDIAN 1234
-#endif
-
 #define ESRC(ep) ((ep)->ether_shost)
 #define EDST(ep) ((ep)->ether_dhost)
 
@@ -274,6 +269,8 @@ extern int esp_print(netdissect_options *,
 		     register const u_char *bp, int len, register const u_char *bp2,
 		     int *nhdr, int *padlen);
 extern void arp_print(netdissect_options *,const u_char *, u_int, u_int);
+extern void icmp6_print(netdissect_options *ndo, const u_char *,
+                        u_int, const u_char *, int);
 extern void isakmp_print(netdissect_options *,const u_char *,
 			 u_int, const u_char *);
 extern void isakmp_rfc3948_print(netdissect_options *,const u_char *,
@@ -294,8 +291,8 @@ extern void hex_print_with_offset(netdissect_options *,const char *,
 				  u_int, u_int);
 extern void hex_print(netdissect_options *,const char *, u_int);
 extern void telnet_print(netdissect_options *,const u_char *, u_int);
-extern int ether_encap_print(netdissect_options *,u_short, const u_char *,
-			     u_int, u_int, u_short *);
+extern int ethertype_print(netdissect_options *,u_short, const u_char *,
+			     u_int, u_int);
 extern int llc_print(netdissect_options *,
 		     const u_char *, u_int, u_int, const u_char *,
 		     const u_char *, u_short *);
@@ -362,7 +359,7 @@ extern void ospf_print(netdissect_options *,const u_char *,
 		       u_int, const u_char *);
 extern void pimv1_print(netdissect_options *,const u_char *, u_int);
 extern void mobile_print(netdissect_options *,const u_char *, u_int);
-extern void pim_print(netdissect_options *,const u_char *, u_int);
+extern void pim_print(netdissect_options *,const u_char *, u_int, u_int);
 extern void pppoe_if_print(u_char *,const struct pcap_pkthdr *, const u_char *);
 extern void pppoe_print(netdissect_options *,const u_char *, u_int);
 extern void ppp_print(netdissect_options *,
@@ -433,10 +430,15 @@ extern void stp_print(netdissect_options *,const u_char *p, u_int length);
 extern void radius_print(netdissect_options *,const u_char *, u_int);
 extern void lwres_print(netdissect_options *,const u_char *, u_int);
 extern void pptp_print(netdissect_options *,const u_char *, u_int);
+#endif
 
+extern u_int ipnet_if_print(netdissect_options *,const struct pcap_pkthdr *, const u_char *);
+
+#if 0
 #ifdef INET6
 extern void ip6_print(netdissect_options *,const u_char *, u_int);
 extern void ip6_opt_print(netdissect_options *,const u_char *, int);
+extern int nextproto6_cksum(const struct ip6_hdr *, const u_short *, u_int, u_int);
 extern int hbhopt_print(netdissect_options *,const u_char *);
 extern int dstopt_print(netdissect_options *,const u_char *);
 extern int frag6_print(netdissect_options *,const u_char *,
