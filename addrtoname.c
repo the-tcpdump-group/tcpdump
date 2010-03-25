@@ -514,13 +514,14 @@ linkaddr_string(const u_char *ep, const unsigned int type, const unsigned int le
 	register char *cp;
 	register struct enamemem *tp;
 
-	if (type == LINKADDR_ETHER && len == ETHER_ADDR_LEN) {
-            return etheraddr_string(ep);
-        }
+	if (len == 0)
+		return ("<empty>");
 
-        if (type == LINKADDR_FRELAY) {
-            return q922_string(ep);
-        }
+	if (type == LINKADDR_ETHER && len == ETHER_ADDR_LEN)
+		return (etheraddr_string(ep));
+
+	if (type == LINKADDR_FRELAY)
+		return (q922_string(ep));
 
 	tp = lookup_bytestring(ep, len);
 	if (tp->e_name)
