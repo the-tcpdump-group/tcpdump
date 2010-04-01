@@ -23,6 +23,28 @@ AC_CANONICAL_HOST
 
 AC_LBL_C_INIT_BEFORE_CC(V_CCOPT, V_INCLS)
 AC_PROG_CC
+dnl
+dnl Allow the user to specify flags to indicate the target architecture(s)
+dnl (yes, possibly plural - think, for example, Mac OS X) for which we're
+dnl building.  Those might need to be used not only when compiling, but
+dnl also when linking and when building a shared library.
+dnl
+dnl This is not for general cross-compiling, it's for use on platforms
+dnl where versions of the native OS support more than one instruction
+dnl set and where you want to build for the OS on which you're running
+dnl but not for the default build architecture on the machine on which
+dnl you're running.
+dnl
+AC_ARG_WITH(arch-flags,
+    AC_HELP_STRING([--with-arch-flags=FLAGS],[Use FLAGS to specify the target architecture(s)]),
+    [
+	if test "$withval" = "yes"
+	then
+	    AC_MSG_ERROR(No flags specified for --with-arch-flags)
+	fi
+	ARCHFLAGS="$withval"
+	AC_SUBST(ARCHFLAGS)
+    ])
 AC_LBL_C_INIT(V_CCOPT, V_INCLS)
 AC_LBL_C_INLINE
 AC_C___ATTRIBUTE__
