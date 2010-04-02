@@ -1,3 +1,9 @@
+Thu.	April 1, 2010.  guy@alum.mit.edu.
+  Summary for 4.1.1 tcpdump release
+	Fix build on systems with PF, such as FreeBSD and OpenBSD.
+	Don't blow up if a zero-length link-layer address is passed to
+	  linkaddr_string(). 
+
 Thu.	April 1, 2010.  ken@netfunctional.ca/guy@alum.mit.edu.
   Summary for 4.1.0 tcpdump release
 	Fix printing of MAC addresses for VLAN frames with a length
