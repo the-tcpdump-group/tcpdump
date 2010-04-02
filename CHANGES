@@ -1,4 +1,14 @@
-Mon.	December 21, 2009.  ken@netfunctional.ca.  Summary for 4.1 tcpdump release
+Thu.	April 1, 2010.  ken@netfunctional.ca/guy@alum.mit.edu.
+  Summary for 4.1.0 tcpdump release
+	Fix printing of MAC addresses for VLAN frames with a length
+	  field
+	Add some additional bounds checks and use the EXTRACT_ macros
+	  more
+	Add a -b flag to print the AS number in BGP packets in ASDOT
+	  notation rather than ASPLAIN notation
+	Add ICMPv6 RFC 5006 support
+	Decode the access flags in NFS access requests
+	Handle the new DLT_ for memory-mapped USB captures on Linux
 	Make the default snapshot (-s) the maximum
 	Print name of device (when -L is used)
 	Support for OpenSolaris (and SXCE build 125 and later)
@@ -12,6 +22,7 @@ Mon.	December 21, 2009.  ken@netfunctional.ca.  Summary for 4.1 tcpdump release
 	Add support for the MDT SAFI 66 BG printer
 	Add basic IPv6 support to print-olsr
 	Add USB printer
+	Add printer for ForCES
 	Handle frames with an FCS
 	Handle 802.11n Control Wrapper, Block Acq Req and Block Ack frames
 	Fix TCP sequence number printing 
@@ -21,8 +32,6 @@ Mon.	December 21, 2009.  ken@netfunctional.ca.  Summary for 4.1 tcpdump release
 	Lots of code clean ups
 	Autoconf clean ups
 	Update testcases to make output changes
-
-Mon.    December 8, 2008.  ken@netfunctional.ca.  Summary for 4.0.1 tcpdump release
 	Fix compiling with/out smi (--with{,out}-smi)
 	Fix compiling without IPv6 support (--disable-ipv6)
 
