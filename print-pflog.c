@@ -42,6 +42,7 @@ static const char rcsid[] _U_ =
 #include <stdio.h>
 #include <pcap.h>
 
+#include "extract.h"
 #include "interface.h"
 #include "addrtoname.h"
 
