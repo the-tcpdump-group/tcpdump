@@ -4788,7 +4788,7 @@ fi
 
 { echo "$as_me:$LINENO: checking whether to chroot" >&5
 echo $ECHO_N "checking whether to chroot... $ECHO_C" >&6; }
-if test ! -z "$with_chroot" ; then
+if test ! -z "$with_chroot" && test "$with_chroot" != "no" ; then
         cat >>confdefs.h <<_ACEOF
 #define WITH_CHROOT "$withval"
 _ACEOF
