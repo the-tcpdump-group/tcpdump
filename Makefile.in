@@ -227,7 +227,6 @@ EXTRA_DIST = \
 	makemib \
 	missing/addrinfo.h \
 	missing/addrsize.h \
-	missing/bittypes.h \
 	missing/dlnames.c \
 	missing/datalinks.c \
 	missing/getnameinfo.c \

@@ -66,7 +66,7 @@ darwin*)
 	if test "$enable_universal" != "no"; then
 		case "$host_os" in
 
-		darwin10.3*)
+		darwin10.*)
 			#
 			# Snow Leopard.  Build for x86-64 and x86, with
 			# x86-64 first.  (That's what Apple does.)
