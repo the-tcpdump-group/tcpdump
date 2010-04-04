@@ -26,24 +26,32 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+#ifndef _BITTYPES_H
+#define _BITTYPES_H
+
 #ifndef HAVE_U_INT8_T
 typedef unsigned char u_int8_t;
+typedef signed char int8_t;
 #endif /* HAVE_U_INT8_T */
 
 #ifndef HAVE_U_INT16_T
 typedef unsigned short u_int16_t;
+typedef signed short int16_t;
 #endif /* HAVE_U_INT16_T */
 
 #ifndef HAVE_U_INT32_T
 typedef unsigned int u_int32_t;
+typedef signed int int32_t;
 #endif /* HAVE_U_INT32_T */
 
 #ifndef HAVE_U_INT64_T
 #ifdef _MSC_EXTENSIONS
 typedef unsigned _int64 u_int64_t;
+typedef _int64 int64_t;
 #else /* _MSC_EXTENSIONS */
 typedef unsigned long long u_int64_t;
-#else /* _MSC_EXTENSIONS */
+typedef long long int64_t;
+#endif /* _MSC_EXTENSIONS */
 #endif /* HAVE_U_INT64_T */
 
 #ifndef PRId64
@@ -77,3 +85,5 @@ typedef unsigned long long u_int64_t;
 #define PRIu64	"llu"
 #endif /* _MSC_EXTENSIONS */
 #endif /* PRIu64 */
+
+#endif /* _BITTYPES_H */
