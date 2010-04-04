@@ -27,61 +27,23 @@
  * SUCH DAMAGE.
  */
 #ifndef HAVE_U_INT8_T
-
-#if SIZEOF_CHAR == 1
 typedef unsigned char u_int8_t;
-#elif SIZEOF_INT == 1
-typedef unsigned int u_int8_t;
-#else  /* XXX */
-#error "there's no appropriate type for u_int8_t"
-#endif
-
 #endif /* HAVE_U_INT8_T */
 
 #ifndef HAVE_U_INT16_T
-
-#if SIZEOF_SHORT == 2
 typedef unsigned short u_int16_t;
-#elif SIZEOF_INT == 2
-typedef unsigned int u_int16_t;
-#elif SIZEOF_CHAR == 2
-typedef unsigned char u_int16_t;
-#else  /* XXX */
-#error "there's no appropriate type for u_int16_t"
-#endif
-
 #endif /* HAVE_U_INT16_T */
 
 #ifndef HAVE_U_INT32_T
-
-#if SIZEOF_INT == 4
 typedef unsigned int u_int32_t;
-#elif SIZEOF_LONG == 4
-typedef unsigned long u_int32_t;
-#elif SIZEOF_SHORT == 4
-typedef unsigned short u_int32_t;
-#else  /* XXX */
-#error "there's no appropriate type for u_int32_t"
-#endif
-
 #endif /* HAVE_U_INT32_T */
 
 #ifndef HAVE_U_INT64_T
-
-#if SIZEOF_LONG_LONG == 8
-typedef unsigned long long u_int64_t;
-#elif defined(_MSC_EXTENSIONS)
+#ifdef _MSC_EXTENSIONS
 typedef unsigned _int64 u_int64_t;
-#elif SIZEOF_INT == 8
-typedef unsigned int u_int64_t;
-#elif SIZEOF_LONG == 8
-typedef unsigned long u_int64_t;
-#elif SIZEOF_SHORT == 8
-typedef unsigned short u_int64_t;
-#else  /* XXX */
-#error "there's no appropriate type for u_int64_t"
-#endif
-
+#else /* _MSC_EXTENSIONS */
+typedef unsigned long long u_int64_t;
+#else /* _MSC_EXTENSIONS */
 #endif /* HAVE_U_INT64_T */
 
 #ifndef PRId64
