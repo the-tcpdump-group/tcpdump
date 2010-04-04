@@ -667,7 +667,6 @@ CPPFLAGS
 ac_ct_CC
 EXEEXT
 OBJEXT
-ARCHFLAGS
 CPP
 GREP
 EGREP
@@ -1268,6 +1267,7 @@ if test -n "$ac_init_help"; then
 Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --disable-universal     don't build universal on OS X
   --enable-smb            enable possibly-buggy SMB printer default=yes
   --disable-smb           disable possibly-buggy SMB printer
   --enable-ipv6           enable ipv6 (with ipv4) support
@@ -1277,7 +1277,6 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --without-gcc           don't use gcc
-  --with-arch-flags=FLAGS Use FLAGS to specify the target architecture(s)
   --with-smi              link with libsmi (allows to load MIBs on the fly to decode SNMP packets. default=yes
   --without-smi           don't link with libsmi
   --with-user=USERNAME    drop privileges by default to USERNAME
@@ -2824,21 +2823,6 @@ ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-# Check whether --with-arch-flags was given.
-if test "${with_arch_flags+set}" = set; then
-  withval=$with_arch_flags;
-	if test "$withval" = "yes"
-	then
-	    { { echo "$as_me:$LINENO: error: No flags specified for --with-arch-flags" >&5
-echo "$as_me: error: No flags specified for --with-arch-flags" >&2;}
-   { (exit 1); exit 1; }; }
-	fi
-	ARCHFLAGS="$withval"
-
-
-fi
 
 
 
@@ -4403,6 +4387,27 @@ fi
 
 
 case "$host_os" in
+
+darwin*)
+	# Check whether --enable-universal was given.
+if test "${enable_universal+set}" = set; then
+  enableval=$enable_universal;
+fi
+
+	if test "$enable_universal" != "no"; then
+		case "$host_os" in
+
+		darwin10.3*)
+			#
+			# Snow Leopard.  Build for x86-64 and x86, with
+			# x86-64 first.  (That's what Apple does.)
+			#
+			V_CCOPT="$V_CCOPT -arch x86_64 -arch i386"
+			LDFLAGS="$LDFLAGS -arch x86_64 -arch i386"
+			;;
+		esac
+	fi
+	;;
 
 linux*)
 	{ echo "$as_me:$LINENO: checking Linux kernel version" >&5
@@ -14899,7 +14904,6 @@ CPPFLAGS!$CPPFLAGS$ac_delim
 ac_ct_CC!$ac_ct_CC$ac_delim
 EXEEXT!$EXEEXT$ac_delim
 OBJEXT!$OBJEXT$ac_delim
-ARCHFLAGS!$ARCHFLAGS$ac_delim
 CPP!$CPP$ac_delim
 GREP!$GREP$ac_delim
 EGREP!$EGREP$ac_delim
@@ -14920,7 +14924,7 @@ INSTALL_DATA!$INSTALL_DATA$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 72; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 71; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5
