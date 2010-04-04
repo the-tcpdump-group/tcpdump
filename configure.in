@@ -486,15 +486,6 @@ if test "$td_cv_decl_netdnet_dnetdb_h_dnet_htoa" = yes; then
 fi
 
 dnl
-dnl check sizeof basic types.
-dnl They're very likely to be wrong for cross-compiling.
-AC_CHECK_SIZEOF(char, 1)
-AC_CHECK_SIZEOF(short, 2)
-AC_CHECK_SIZEOF(int, 4)
-AC_CHECK_SIZEOF(long, 4)
-AC_CHECK_SIZEOF(long long, 8)
-
-dnl
 dnl Checks for addrinfo structure
 AC_STRUCT_ADDRINFO(ac_cv_addrinfo)
 if test "$ac_cv_addrinfo" = no; then
