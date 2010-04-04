@@ -227,7 +227,6 @@ EXTRA_DIST = \
 	makemib \
 	missing/addrinfo.h \
 	missing/addrsize.h \
-	missing/bittypes.h \
 	missing/dlnames.c \
 	missing/datalinks.c \
 	missing/getnameinfo.c \
@@ -340,6 +339,7 @@ EXTRA_DIST = \
 	tests/rsvp-infinite-loop.pcap \
 	vfprintf.c \
 	win32/Include/Arpa/tftp.h \
+	win32/Include/bittypes.h \
 	win32/Include/errno.h \
 	win32/Include/getopt.h \
 	win32/Include/inetprivate.h \
