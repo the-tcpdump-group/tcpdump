@@ -46,7 +46,8 @@ INCLS = -I. @V_INCLS@
 DEFS = @DEFS@ @CPPFLAGS@ @V_DEFS@
 
 # Standard CFLAGS
-CFLAGS = $(CCOPT) $(DEFS) $(INCLS)
+CFLAGS = @CFLAGS@
+FULL_CFLAGS = $(CCOPT) $(DEFS) $(INCLS) $(CFLAGS)
 
 # Standard LDFLAGS
 LDFLAGS = @LDFLAGS@
@@ -64,7 +65,7 @@ RANLIB = @RANLIB@
 # problem if you don't own the file but can write to the directory.
 .c.o:
 	@rm -f $@
-	$(CC) $(CFLAGS) -c $(srcdir)/$*.c
+	$(CC) $(FULL_CFLAGS) -c $(srcdir)/$*.c
 
 CSRC =	addrtoname.c af.c checksum.c cpack.c gmpls.c oui.c gmt2local.c ipproto.c \
         nlpid.c l2vpn.c machdep.c parsenfsfh.c \
@@ -356,7 +357,7 @@ all: $(PROG)
 
 $(PROG): $(OBJ) @V_PCAPDEP@
 	@rm -f $@
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJ) $(LIBS)
+	$(CC) $(FULL_CFLAGS) $(LDFLAGS) -o $@ $(OBJ) $(LIBS)
 
 $(LIBNETDISSECT): $(LIBNETDISSECT_OBJ)
 	@rm -f $@
@@ -364,30 +365,30 @@ $(LIBNETDISSECT): $(LIBNETDISSECT_OBJ)
 	$(RANLIB) $@
 
 datalinks.o: $(srcdir)/missing/datalinks.c
-	$(CC) $(CFLAGS) -o $@ -c $(srcdir)/missing/datalinks.c
+	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/datalinks.c
 dlnames.o: $(srcdir)/missing/dlnames.c
-	$(CC) $(CFLAGS) -o $@ -c $(srcdir)/missing/dlnames.c
+	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/dlnames.c
 getnameinfo.o: $(srcdir)/missing/getnameinfo.c
-	$(CC) $(CFLAGS) -o $@ -c $(srcdir)/missing/getnameinfo.c
+	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/getnameinfo.c
 getaddrinfo.o: $(srcdir)/missing/getaddrinfo.c
-	$(CC) $(CFLAGS) -o $@ -c $(srcdir)/missing/getaddrinfo.c
+	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/getaddrinfo.c
 inet_pton.o: $(srcdir)/missing/inet_pton.c
-	$(CC) $(CFLAGS) -o $@ -c $(srcdir)/missing/inet_pton.c
+	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/inet_pton.c
 inet_ntop.o: $(srcdir)/missing/inet_ntop.c
-	$(CC) $(CFLAGS) -o $@ -c $(srcdir)/missing/inet_ntop.c
+	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/inet_ntop.c
 inet_aton.o: $(srcdir)/missing/inet_aton.c
-	$(CC) $(CFLAGS) -o $@ -c $(srcdir)/missing/inet_aton.c
+	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/inet_aton.c
 snprintf.o: $(srcdir)/missing/snprintf.c
-	$(CC) $(CFLAGS) -o $@ -c $(srcdir)/missing/snprintf.c
+	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/snprintf.c
 strlcat.o: $(srcdir)/missing/strlcat.c
-	$(CC) $(CFLAGS) -o $@ -c $(srcdir)/missing/strlcat.c
+	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/strlcat.c
 strlcpy.o: $(srcdir)/missing/strlcpy.c
-	$(CC) $(CFLAGS) -o $@ -c $(srcdir)/missing/strlcpy.c
+	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/strlcpy.c
 strsep.o: $(srcdir)/missing/strsep.c
-	$(CC) $(CFLAGS) -o $@ -c $(srcdir)/missing/strsep.c
+	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/strsep.c
 
 version.o: version.c
-	$(CC) $(CFLAGS) -c version.c
+	$(CC) $(FULL_CFLAGS) -c version.c
 
 version.c: $(srcdir)/VERSION
 	@rm -f $@
