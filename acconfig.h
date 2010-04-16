@@ -68,9 +68,6 @@
 /* define if you have getrpcbynumber() */
 #undef HAVE_GETRPCBYNUMBER
 
-/* AIX hack. */
-#undef _SUN
-
 /* Workaround for missing 64-bit formats */
 #undef PRId64
 #undef PRIo64

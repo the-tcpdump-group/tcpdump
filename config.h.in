@@ -68,9 +68,6 @@
 /* define if you have getrpcbynumber() */
 #undef HAVE_GETRPCBYNUMBER
 
-/* AIX hack. */
-#undef _SUN
-
 /* Workaround for missing 64-bit formats */
 #undef PRId64
 #undef PRIo64
@@ -302,6 +299,9 @@
 
 /* needed on HP-UX */
 #undef _HPUX_SOURCE
+
+/* define on AIX to get certain functions */
+#undef _SUN
 
 /* define if your compiler allows __attribute__((format)) to be applied to
    function pointers */
