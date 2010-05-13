@@ -87,7 +87,8 @@ extract_header_length(u_int16_t fc)
 
 
 u_int
-ieee802_15_4_if_print(const struct pcap_pkthdr *h, const u_char *p)
+ieee802_15_4_if_print(struct netdissect_options *ndo,
+                      const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
 	u_int hdrlen;
@@ -95,7 +96,7 @@ ieee802_15_4_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	u_int8_t seq;
 
 	if (caplen < 3) {
-		printf("[|802.15.4] %x", caplen);
+		ND_PRINT((ndo, "[|802.15.4] %x", caplen));
 		return caplen;
 	}
 
@@ -107,11 +108,11 @@ ieee802_15_4_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	p += 3;
 	caplen -= 3;
 
-	printf("IEEE 802.15.4 %s packet ", ftypes[fc & 0x7]);
+	ND_PRINT((ndo,"IEEE 802.15.4 %s packet ", ftypes[fc & 0x7]));
 	if (vflag)
-		printf("seq %02x ", seq);
+		ND_PRINT((ndo,"seq %02x ", seq));
 	if (hdrlen == -1) {
-		printf("malformed! ");
+		ND_PRINT((ndo,"malformed! "));
 		return caplen;
 	}
 
@@ -124,33 +125,33 @@ ieee802_15_4_if_print(const struct pcap_pkthdr *h, const u_char *p)
 
 		switch ((fc >> 10) & 0x3) {
 		case 0x00:
-			printf("none ");
+			ND_PRINT((ndo,"none "));
 			break;
 		case 0x02:
 			panid = EXTRACT_LE_16BITS(p);
 			p += 2;
-			printf("%04x:%04x ", panid, EXTRACT_LE_16BITS(p));
+			ND_PRINT((ndo,"%04x:%04x ", panid, EXTRACT_LE_16BITS(p)));
 			p += 2;
 			break;
 		case 0x03:
 			panid = EXTRACT_LE_16BITS(p);
 			p += 2;
-			printf("%04x:%s ", panid, le64addr_string(p));
+			ND_PRINT((ndo,"%04x:%s ", panid, le64addr_string(p)));
 			p += 8;
 			break;
 		}
-		printf("< ");
+		ND_PRINT((ndo,"< ");
 
 		switch ((fc >> 14) & 0x3) {
 		case 0x00:
-			printf("none ");
+			ND_PRINT((ndo,"none "));
 			break;
 		case 0x02:
 			if (!(fc & (1 << 6))) {
 				panid = EXTRACT_LE_16BITS(p);
 				p += 2;
 			}
-			printf("%04x:%04x ", panid, EXTRACT_LE_16BITS(p));
+			ND_PRINT((ndo,"%04x:%04x ", panid, EXTRACT_LE_16BITS(p)));
 			p += 2;
 			break;
 		case 0x03:
@@ -158,7 +159,7 @@ ieee802_15_4_if_print(const struct pcap_pkthdr *h, const u_char *p)
 				panid = EXTRACT_LE_16BITS(p);
 				p += 2;
 			}
-			printf("%04x:%s ", panid, le64addr_string(p));
+                        ND_PRINT((ndo,"%04x:%s ", panid, le64addr_string(p))));
 			p += 8;
 			break;
 		}
@@ -167,7 +168,7 @@ ieee802_15_4_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	}
 
 	if (!suppress_default_print)
-		default_print(p, caplen);
+		(ndo->ndo_default_print)(ndo, p, caplen);
 
 	return 0;
 }
