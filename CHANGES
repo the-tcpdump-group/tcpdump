@@ -1,3 +1,7 @@
+  Summary for 4.1.+
+        merged 802.15.4 decoder from Dmitry Eremin-Solenikov <dbaryshkov at gmail dot com>
+
+
 Thu.	April 1, 2010.  guy@alum.mit.edu.
   Summary for 4.1.1 tcpdump release
 	Fix build on systems with PF, such as FreeBSD and OpenBSD.
