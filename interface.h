@@ -273,6 +273,7 @@ extern u_int juniper_ppp_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int juniper_frelay_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int juniper_chdlc_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int sll_if_print(const struct pcap_pkthdr *, const u_char *);
+extern u_int ieee802_15_4_if_print(const struct pcap_pkthdr *, const u_char *);
 extern void snmp_print(const u_char *, u_int);
 extern void sunrpcrequest_print(const u_char *, u_int, const u_char *);
 extern u_int symantec_if_print(const struct pcap_pkthdr *, const u_char *);

@@ -293,6 +293,9 @@ static struct printer printers[] = {
 	{ usb_linux_64_byte_print, DLT_USB_LINUX_MMAPPED},
 #endif /* DLT_USB_LINUX_MMAPPED */
 #endif /* HAVE_PCAP_USB_H */
+#ifdef DLT_IEEE802_15_4
+	{ ieee802_15_4_if_print, DLT_IEEE802_15_4 },
+#endif
 #ifdef DLT_IPV4
 	{ raw_if_print,		DLT_IPV4 },
 #endif
