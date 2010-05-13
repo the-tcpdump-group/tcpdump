@@ -9739,7 +9739,8 @@ MAN_MISC_INFO=7
 case "$host_os" in
 
 aix*)
-		cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define _SUN 1
 _ACEOF
 

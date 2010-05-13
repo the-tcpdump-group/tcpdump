@@ -821,7 +821,7 @@ case "$host_os" in
 
 aix*)
 	dnl Workaround to enable certain features
-	AC_DEFINE(_SUN)
+	AC_DEFINE(_SUN,1,[define on AIX to get certain functions])
 	;;
 
 hpux*)

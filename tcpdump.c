@@ -403,7 +403,7 @@ show_dlts_and_exit(const char *device, pcap_t *pd)
 			if (lookup_printer(dlts[n_dlts]) == NULL
                             && lookup_ndo_printer(dlts[n_dlts]) == NULL)
 				(void) fprintf(stderr, " (printing not supported)");
-			putchar('\n');
+			fprintf(stderr, "\n");
 		} else {
 			(void) fprintf(stderr, "  DLT %d (printing not supported)\n",
 			    dlts[n_dlts]);
