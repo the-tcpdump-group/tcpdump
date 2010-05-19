@@ -52,11 +52,11 @@ extract_header_length(u_int16_t fc)
 	int len = 0;
 
 	switch ((fc >> 10) & 0x3) {
-	case 0x0:
+	case 0x00:
 		if (fc & (1 << 6)) /* intra-PAN with none dest addr */
 			return -1;
 		break;
-	case 0x1:
+	case 0x01:
 		return -1;
 	case 0x02:
 		len += 4;
@@ -67,9 +67,9 @@ extract_header_length(u_int16_t fc)
 	}
 
 	switch ((fc >> 14) & 0x3) {
-	case 0x0:
+	case 0x00:
 		break;
-	case 0x1:
+	case 0x01:
 		return -1;
 	case 0x02:
 		len += 4;
@@ -79,8 +79,11 @@ extract_header_length(u_int16_t fc)
 		break;
 	}
 
-	if (fc & (1 << 6))
+	if (fc & (1 << 6)) {
+		if (len < 2)
+			return -1;
 		len -= 2;
+	}
 
 	return len;
 }
@@ -91,7 +94,7 @@ ieee802_15_4_if_print(struct netdissect_options *ndo,
                       const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
-	u_int hdrlen;
+	int hdrlen;
 	u_int16_t fc;
 	u_int8_t seq;
 
