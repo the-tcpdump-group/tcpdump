@@ -384,6 +384,7 @@ extern netdissect_options *gndo;
 #define Cflag_count gndo->ndo_Cflag_count
 #define Gflag_count gndo->ndo_Gflag_count
 #define Gflag_time gndo->ndo_Gflag_time 
+#define hflag gndo->ndo_hflag
 #define snaplen     gndo->ndo_snaplen
 #define snapend     gndo->ndo_snapend
 

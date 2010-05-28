@@ -1321,7 +1321,8 @@ ieee802_11_print(const u_char *p, u_int length, u_int orig_caplen, int pad,
 	hdrlen = extract_header_length(fc);
 	if (pad)
 		hdrlen = roundup2(hdrlen, 4);
-	if (FC_TYPE(fc) == T_DATA && DATA_FRAME_IS_QOS(FC_SUBTYPE(fc))) {
+	if (hflag && FC_TYPE(fc) == T_DATA &&
+	    DATA_FRAME_IS_QOS(FC_SUBTYPE(fc))) {
 		meshdrlen = extract_mesh_header_length(p+hdrlen);
 		hdrlen += meshdrlen;
 	} else

@@ -29,7 +29,7 @@ tcpdump \- dump traffic on a network
 .na
 .B tcpdump
 [
-.B \-AbdDefIKlLnNOpqRStuUvxX
+.B \-AbdDefhIKlLnNOpqRStuUvxX
 ] [
 .B \-B
 .I buffer_size
@@ -318,6 +318,9 @@ If no time format is specified, each new file will overwrite the previous.
 If used in conjunction with the
 .B \-C
 option, filenames will take the form of `\fIfile\fP<count>'.
+.TP
+.B \-h
+Attempt to detect 802.11s draft mesh headers.
 .TP
 .B \-i
 Listen on \fIinterface\fP.
