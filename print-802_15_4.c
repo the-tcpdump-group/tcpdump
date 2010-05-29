@@ -124,12 +124,15 @@ ieee802_15_4_if_print(struct netdissect_options *ndo,
 		p+= hdrlen;
 		caplen -= hdrlen;
 	} else {
-		u_int16_t panid;
+		u_int16_t panid = 0;
 
 		switch ((fc >> 10) & 0x3) {
 		case 0x00:
 			ND_PRINT((ndo,"none "));
 			break;
+		case 0x01:
+			ND_PRINT((ndo,"reserved destination addressing mode"));
+			return 0;
 		case 0x02:
 			panid = EXTRACT_LE_16BITS(p);
 			p += 2;
@@ -149,6 +152,9 @@ ieee802_15_4_if_print(struct netdissect_options *ndo,
 		case 0x00:
 			ND_PRINT((ndo,"none "));
 			break;
+		case 0x01:
+			ND_PRINT((ndo,"reserved source addressing mode"));
+			return 0;
 		case 0x02:
 			if (!(fc & (1 << 6))) {
 				panid = EXTRACT_LE_16BITS(p);
