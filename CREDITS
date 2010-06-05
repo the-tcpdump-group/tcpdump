@@ -10,6 +10,7 @@ The current maintainers:
 
 Additional people who have contributed patches:
 
+	A Costa				<agcosta at gis dot net>
         Aaron Campbell                  <aaron at arbor dot net>
 	Alfredo Andres			<aandres at s21sec dot com>
 	Albert Chin			<china at thewrittenword dot com>
@@ -37,9 +38,10 @@ Additional people who have contributed patches:
 	Charles M. Hannum		<mycroft at netbsd dot org>
 	Chris Cogdon			<chris at cogdon dot org>
 	Chris G. Demetriou		<cgd at netbsd dot org>
-	Christian Sievers		<c_s at users dot sourceforge dot net>
 	Chris Jepeway			<jepeway at blasted-heath dot com>
 	Chris Larson			<clarson at kergoth dot com>
+	Christian Sievers		<c_s at users dot sourceforge dot net>
+	Christophe Rhodes		<csr21 at cantab dot net>
 	Craig Rodrigues			<rodrigc at mediaone dot net>
 	Crist J. Clark			<cjclark at alum dot mit dot edu>
 	Daniel Hagerty 			<hag at ai dot mit dot edu>
