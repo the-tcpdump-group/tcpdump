@@ -256,7 +256,7 @@ Print the link-level header on each dump line.
 .B \-E
 Use \fIspi@ipaddr algo:secret\fP for decrypting IPsec ESP packets that
 are addressed to \fIaddr\fP and contain Security Parameter Index value
-\fIspi\fP. This combination may be repeated with comma or newline seperation.
+\fIspi\fP. This combination may be repeated with comma or newline separation.
 .IP
 Note that setting the secret for IPv4 ESP packets is supported at this time.
 .IP
@@ -272,7 +272,7 @@ The ability to decrypt packets is only present if \fItcpdump\fP was compiled
 with cryptography enabled.
 .IP
 \fIsecret\fP is the ASCII text for ESP secret key. 
-If preceeded by 0x, then a hex value will be read.
+If preceded by 0x, then a hex value will be read.
 .IP
 The option assumes RFC2406 ESP, not RFC1827 ESP.
 The option is only for debugging purposes, and
@@ -874,8 +874,8 @@ The general format of a tcp protocol line is:
 \fISrc\fP and \fIdst\fP are the source and destination IP
 addresses and ports.
 \fIFlags\fP are some combination of S (SYN),
-F (FIN), P (PUSH), R (RST), W (ECN CWR) or E (ECN-Echo), or a single
-`.' (no flags).
+F (FIN), P (PUSH), R (RST), U (URG), W (ECN CWR), E (ECN-Echo) or
+`.' (ACK), or `none' if no flags are set.
 \fIData-seqno\fP describes the portion of sequence space covered
 by the data in this packet (see example below).
 \fIAck\fP is sequence number of the next data expected the other
@@ -922,8 +922,7 @@ bytes and there was a max-segment-size option requesting an mss of
 Csam replies with a similar packet except it includes a piggy-backed
 ack for rtsg's SYN.
 Rtsg then acks csam's SYN.
-The `.' means no
-flags were set.
+The `.' means the ACK flag was set.
 The packet contained no data so there is no data sequence number.
 Note that the ack sequence
 number is a small integer (1).
