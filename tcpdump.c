@@ -1212,6 +1212,10 @@ main(int argc, char **argv)
 			callback = dump_packet;
 			pcap_userdata = (u_char *)p;
 		}
+#ifdef HAVE_PCAP_DUMP_FLUSH
+		if (Uflag)
+			pcap_dump_flush(p);
+#endif
 	} else {
 		type = pcap_datalink(pd);
                 printinfo.ndo_type = 1;
