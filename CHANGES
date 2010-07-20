@@ -1,3 +1,16 @@
+Tue.    July 20, 2010.  guy@alum.mit.edu.
+  Summary for 4.1.2 tcpdump release
+	If -U is specified, flush the file after creating it, so it's
+	  not zero-length
+	Fix TCP flags output description, and some typoes, in the man
+	  page
+	Add a -h flag, and only attempt to recognize 802.11s mesh
+	  headers if it's set
+	When printing the link-layer type list, send *all* output to
+	  stderr
+	Include the CFLAGS setting when configure was run in the
+	  compiler flags
+
 Thu.	April 1, 2010.  guy@alum.mit.edu.
   Summary for 4.1.1 tcpdump release
 	Fix build on systems with PF, such as FreeBSD and OpenBSD.
