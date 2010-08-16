@@ -543,26 +543,24 @@ ataddr_string(u_short atnet, u_char athost)
 	if (first && (first = 0, !nflag)
 	    && (fp = fopen("/etc/atalk.names", "r"))) {
 		char line[256];
-		int i1, i2, i3;
+		int i1, i2;
 
 		while (fgets(line, sizeof(line), fp)) {
 			if (line[0] == '\n' || line[0] == 0 || line[0] == '#')
 				continue;
-			if (sscanf(line, "%d.%d.%d %256s", &i1, &i2, &i3,
-				     nambuf) == 4)
+			if (sscanf(line, "%d.%d %256s", &i1, &i2, nambuf) == 3)
 				/* got a hostname. */
-				i3 |= ((i1 << 8) | i2) << 8;
-			else if (sscanf(line, "%d.%d %256s", &i1, &i2,
-					nambuf) == 3)
+				i2 |= (i1 << 8);
+			else if (sscanf(line, "%d %256s", &i1, nambuf) == 2)
 				/* got a net name */
-				i3 = (((i1 << 8) | i2) << 8) | 255;
+				i2 = (i1 << 8) | 255;
 			else
 				continue;
 
-			for (tp = &hnametable[i3 & (HASHNAMESIZE-1)];
+			for (tp = &hnametable[i2 & (HASHNAMESIZE-1)];
 			     tp->nxt; tp = tp->nxt)
 				;
-			tp->addr = i3;
+			tp->addr = i2;
 			tp->nxt = newhnamemem();
 			tp->name = strdup(nambuf);
 		}
@@ -588,11 +586,9 @@ ataddr_string(u_short atnet, u_char athost)
 	tp->addr = (atnet << 8) | athost;
 	tp->nxt = newhnamemem();
 	if (athost != 255)
-		(void)snprintf(nambuf, sizeof(nambuf), "%d.%d.%d",
-		    atnet >> 8, atnet & 0xff, athost);
+		(void)snprintf(nambuf, sizeof(nambuf), "%d.%d", atnet, athost);
 	else
-		(void)snprintf(nambuf, sizeof(nambuf), "%d.%d", atnet >> 8,
-		    atnet & 0xff);
+		(void)snprintf(nambuf, sizeof(nambuf), "%d", atnet);
 	tp->name = strdup(nambuf);
 
 	return (tp->name);
