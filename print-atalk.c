@@ -99,14 +99,6 @@ llap_print(register const u_char *bp, u_int length)
 	u_short snet;
 	u_int hdrlen;
 
-	/*
-	 * Our packet is on a 4-byte boundary, as we're either called
-	 * directly from a top-level link-layer printer (ltalk_if_print)
-	 * or from the UDP printer.  The LLAP+DDP header is a multiple
-	 * of 4 bytes in length, so the DDP payload is also on a 4-byte
-	 * boundary, and we don't need to align it before calling
-	 * "ddp_print()".
-	 */
 	lp = (const struct LAP *)bp;
 	bp += sizeof(*lp);
 	length -= sizeof(*lp);
