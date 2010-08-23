@@ -367,7 +367,11 @@ is specified, only those link-layer types available when in monitor mode
 will be shown.
 .TP
 .B \-j
-Set the time stamp type for the capture to \fItstamp_type\fP.
+Set the time stamp type for the capture to \fItstamp_type\fP.  The names
+to use for the time stamp types are given in
+.BR pcap-tstamp-type (@MAN_MISC_INFO@);
+not all the types listed there will necessarily be valid for any given
+interface.
 .TP
 .B \-J
 List the supported time stamp types for the interface and exit.  If the
@@ -1653,7 +1657,7 @@ Ethernet interface removed the packet from the wire and when the kernel
 serviced the `new packet' interrupt.
 .SH "SEE ALSO"
 stty(1), pcap(3PCAP), bpf(4), nit(4P), pcap-savefile(@MAN_FILE_FORMATS@),
-pcap-filter(@MAN_MISC_INFO@)
+pcap-filter(@MAN_MISC_INFO@), pcap-tstamp-type(@MAN_MISC_INFO@)
 .SH AUTHORS
 The original authors are:
 .LP
