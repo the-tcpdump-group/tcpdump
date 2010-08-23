@@ -340,7 +340,6 @@ EXTRA_DIST = \
 	tests/print-xx.out \
 	tests/rsvp-infinite-loop.pcap \
 	vfprintf.c \
-	win32/Include/bittypes.h \
 	win32/Include/errno.h \
 	win32/Include/getopt.h \
 	win32/Include/inetprivate.h \
