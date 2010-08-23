@@ -343,10 +343,7 @@ EXTRA_DIST = \
 	win32/Include/errno.h \
 	win32/Include/getopt.h \
 	win32/Include/inetprivate.h \
-	win32/Include/telnet.h \
 	win32/Include/w32_fzs.h \
-	win32/Include/Netinet/in_systm.h \
-	win32/Include/Netinet/ip.h \
 	win32/Src/getopt.c \
 	win32/prj/GNUmakefile \
 	win32/prj/WinDump.dsp \
