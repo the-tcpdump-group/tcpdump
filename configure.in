@@ -741,8 +741,17 @@ fi
 
 #
 # Do we have the new open API?  Check for pcap_create, and assume that,
-# if we do, we also have pcap_activate() and the other new routines.
+# if we do, we also have pcap_activate() and the other new routines
+# introduced in libpcap 1.0.0.
+#
 AC_CHECK_FUNCS(pcap_create)
+if test $ac_cv_func_pcap_create = "yes" ; then
+	#
+	# OK, do we have pcap_set_tstamp_type?  If so, assume we have
+	# pcap_list_tstamp_types and pcap_free_tstamp_types as well.
+	#
+	AC_CHECK_FUNCS(pcap_set_tstamp_type)
+fi
 
 AC_CHECK_FUNCS(pcap_findalldevs pcap_dump_flush pcap_lib_version)
 if test $ac_cv_func_pcap_findalldevs = "yes" ; then

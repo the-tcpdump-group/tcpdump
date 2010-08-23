@@ -107,6 +107,7 @@ struct netdissect_options {
   int ndo_Iflag;		/* rfmon (monitor) mode */
   int ndo_Oflag;                /* run filter code optimizer */
   int ndo_dlt;                  /* if != -1, ask libpcap for the DLT it names*/
+  int ndo_jflag;                /* packet time stamp source */
   int ndo_pflag;                /* don't go promiscuous */
 
   int ndo_Cflag;                /* rotate dump files after this many bytes */ 

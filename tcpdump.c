@@ -92,6 +92,9 @@ netdissect_options *gndo = &Gndo;
 
 static int dflag;			/* print filter code */
 static int Lflag;			/* list available data link types and exit */
+#ifdef HAVE_PCAP_SET_TSTAMP_TYPE
+static int Jflag;			/* list available time stamp types */
+#endif
 static char *zflag = NULL;		/* compress each savefile using a specified command (like gzip or bzip2) */
 
 static int infodelay;
@@ -362,6 +365,33 @@ struct dump_info {
 	pcap_dumper_t *p;
 };
 
+#ifdef HAVE_PCAP_SET_TSTAMP_TYPE
+static void
+show_tstamp_types_and_exit(const char *device, pcap_t *pd)
+{
+	int n_tstamp_types;
+	int *tstamp_types = 0;
+	const char *tstamp_type_name;
+	int i;
+
+	n_tstamp_types = pcap_list_tstamp_types(pd, &tstamp_types);
+	if (n_tstamp_types < 0)
+		error("%s", pcap_geterr(pd));
+
+	for (i = 0; i < n_tstamp_types; i++) {
+		tstamp_type_name = pcap_tstamp_type_val_to_name(tstamp_types[i]);
+		if (tstamp_type_name != NULL) {
+			(void) fprintf(stderr, "  %s (%s)\n", tstamp_type_name,
+			    pcap_tstamp_type_val_to_description(tstamp_types[i]));
+		} else {
+			(void) fprintf(stderr, "  %d\n", tstamp_types[i]);
+		}
+	}
+	pcap_free_tstamp_types(tstamp_types);
+	exit(0);
+}
+#endif
+
 static void
 show_dlts_and_exit(const char *device, pcap_t *pd)
 {
@@ -409,7 +439,7 @@ show_dlts_and_exit(const char *device, pcap_t *pd)
 			    dlts[n_dlts]);
 		}
 	}
-	free(dlts);
+	pcap_free_datalinks(dlts);
 	exit(0);
 }
 
@@ -430,6 +460,16 @@ show_dlts_and_exit(const char *device, pcap_t *pd)
 #else /* HAVE_PCAP_CREATE */
 #define I_FLAG
 #endif /* HAVE_PCAP_CREATE */
+
+#ifdef HAVE_PCAP_SET_TSTAMP_TYPE
+#define j_FLAG		"j:"
+#define j_FLAG_USAGE	" [ -j tstamptype ]"
+#define J_FLAG		"J"
+#else /* PCAP_ERROR_TSTAMP_TYPE_NOTSUP */
+#define j_FLAG
+#define j_FLAG_USAGE
+#define J_FLAG
+#endif /* PCAP_ERROR_TSTAMP_TYPE_NOTSUP */
 
 #ifdef HAVE_PCAP_FINDALLDEVS
 #ifndef HAVE_PCAP_IF_T
@@ -575,6 +615,7 @@ main(int argc, char **argv)
 	if(wsockinit() != 0) return 1;
 #endif /* WIN32 */
 
+	jflag=-1;	/* not set */
         gndo->ndo_Oflag=1;
 	gndo->ndo_Rflag=1;
 	gndo->ndo_dlt=-1;
@@ -603,7 +644,7 @@ main(int argc, char **argv)
 
 	opterr = 0;
 	while (
-	    (op = getopt(argc, argv, "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hi:" I_FLAG "KlLm:M:nNOpqr:Rs:StT:u" U_FLAG "vw:W:xXy:Yz:Z:")) != -1)
+	    (op = getopt(argc, argv, "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOpqr:Rs:StT:u" U_FLAG "vw:W:xXy:Yz:Z:")) != -1)
 		switch (op) {
 
 		case 'a':
@@ -746,6 +787,18 @@ main(int argc, char **argv)
 			++Iflag;
 			break;
 #endif /* HAVE_PCAP_CREATE */
+
+#ifdef HAVE_PCAP_SET_TSTAMP_TYPE
+		case 'j':
+			jflag = pcap_tstamp_type_name_to_val(optarg);
+			if (jflag < 0)
+				error("invalid time stamp type %s", optarg);
+			break;
+
+		case 'J':
+			Jflag++;
+			break;
+#endif
 
 		case 'l':
 #ifdef WIN32
@@ -1039,6 +1092,10 @@ main(int argc, char **argv)
 		pd = pcap_create(device, ebuf);
 		if (pd == NULL)
 			error("%s", ebuf);
+#ifdef HAVE_PCAP_SET_TSTAMP_TYPE
+		if (Jflag)
+			show_tstamp_types_and_exit(device, pd);
+#endif
 		/*
 		 * Is this an interface that supports monitor mode?
 		 */
@@ -1048,16 +1105,16 @@ main(int argc, char **argv)
 			supports_monitor_mode = 0;
 		status = pcap_set_snaplen(pd, snaplen);
 		if (status != 0)
-			error("%s: pcap_set_snaplen failed: %s",
+			error("%s: Can't set snapshot length: %s",
 			    device, pcap_statustostr(status));
 		status = pcap_set_promisc(pd, !pflag);
 		if (status != 0)
-			error("%s: pcap_set_promisc failed: %s",
+			error("%s: Can't set promiscuous mode: %s",
 			    device, pcap_statustostr(status));
 		if (Iflag) {
 			status = pcap_set_rfmon(pd, 1);
 			if (status != 0)
-				error("%s: pcap_set_rfmon failed: %s",
+				error("%s: Can't set monitor mode: %s",
 				    device, pcap_statustostr(status));
 		}
 		status = pcap_set_timeout(pd, 1000);
@@ -1067,9 +1124,17 @@ main(int argc, char **argv)
 		if (Bflag != 0) {
 			status = pcap_set_buffer_size(pd, Bflag);
 			if (status != 0)
-				error("%s: pcap_set_buffer_size failed: %s",
+				error("%s: Can't set buffer size: %s",
 				    device, pcap_statustostr(status));
 		}
+#ifdef HAVE_PCAP_SET_TSTAMP_TYPE
+                if (jflag != -1) {
+			status = pcap_set_tstamp_type(pd, jflag);
+			if (status < 0)
+				error("%s: Can't set time stamp type: %s",
+			    	    device, pcap_statustostr(status));
+		}
+#endif
 		status = pcap_activate(pd);
 		if (status < 0) {
 			/*
@@ -1791,17 +1856,17 @@ usage(void)
 #endif /* WIN32 */
 #endif /* HAVE_PCAP_LIB_VERSION */
 	(void)fprintf(stderr,
-"Usage: %s [-aAbd" D_FLAG "ef" I_FLAG "KlLnNOpqRStu" U_FLAG "vxX]" B_FLAG_USAGE " [ -c count ]\n", program_name);
+"Usage: %s [-aAbd" D_FLAG "ef" I_FLAG J_FLAG "KlLnNOpqRStu" U_FLAG "vxX]" B_FLAG_USAGE " [ -c count ]\n", program_name);
 	(void)fprintf(stderr,
 "\t\t[ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]\n");
 	(void)fprintf(stderr,
-"\t\t[ -i interface ] [ -M secret ] [ -r file ]\n");
+"\t\t[ -i interface ]" j_FLAG_USAGE " [ -M secret ]\n");
 	(void)fprintf(stderr,
-"\t\t[ -s snaplen ] [ -T type ] [ -w file ] [ -W filecount ]\n");
+"\t\t[ -r file ] [ -s snaplen ] [ -T type ] [ -w file ]\n");
 	(void)fprintf(stderr,
-"\t\t[ -y datalinktype ] [ -z command ] [ -Z user ]\n");
+"\t\t[ -W filecount ] [ -y datalinktype ] [ -z command ]\n");
 	(void)fprintf(stderr,
-"\t\t[ expression ]\n");
+"\t\t[ -Z user ] [ expression ]\n");
 	exit(1);
 }
 
