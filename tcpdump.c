@@ -312,6 +312,9 @@ static struct ndo_printer ndo_printers[] = {
 #ifdef DLT_IEEE802_15_4
 	{ ieee802_15_4_if_print, DLT_IEEE802_15_4 },
 #endif
+#ifdef DLT_IEEE802_15_4_NOFCS
+	{ ieee802_15_4_if_print, DLT_IEEE802_15_4_NOFCS },
+#endif
 	{ NULL,			0 },
 };
 
