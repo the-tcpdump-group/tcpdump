@@ -1866,7 +1866,7 @@ usage(void)
 #endif /* WIN32 */
 #endif /* HAVE_PCAP_LIB_VERSION */
 	(void)fprintf(stderr,
-"Usage: %s [-aAbd" D_FLAG "ef" I_FLAG J_FLAG "KlLnNOpqRStu" U_FLAG "vxX]" B_FLAG_USAGE " [ -c count ]\n", program_name);
+"Usage: %s [-aAbd" D_FLAG "efh" I_FLAG J_FLAG "KlLnNOpqRStu" U_FLAG "vxX]" B_FLAG_USAGE " [ -c count ]\n", program_name);
 	(void)fprintf(stderr,
 "\t\t[ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]\n");
 	(void)fprintf(stderr,

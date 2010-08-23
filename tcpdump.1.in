@@ -29,7 +29,7 @@ tcpdump \- dump traffic on a network
 .na
 .B tcpdump
 [
-.B \-AbdDefhIKlLnNOpqRStuUvxX
+.B \-AbdDefhIJKlLnNOpqRStuUvxX
 ] [
 .B \-B
 .I buffer_size
@@ -54,6 +54,10 @@ tcpdump \- dump traffic on a network
 [
 .B \-i
 .I interface
+]
+[
+.B \-j
+.I tstamp_type
 ]
 [
 .B \-m
@@ -361,6 +365,14 @@ monitor mode will be shown; if
 .B \-I
 is specified, only those link-layer types available when in monitor mode
 will be shown.
+.TP
+.B \-j
+Set the time stamp type for the capture to \fItstamp_type\fP.
+.TP
+.B \-J
+List the supported time stamp types for the interface and exit.  If the
+time stamp type cannot be set for the interface, no time stamp types are
+listed.
 .TP
 .B \-K
 Don't attempt to verify IP, TCP, or UDP checksums.  This is useful for
