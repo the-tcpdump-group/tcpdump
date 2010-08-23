@@ -375,6 +375,13 @@ show_tstamp_types_and_exit(const char *device, pcap_t *pd)
 	if (n_tstamp_types < 0)
 		error("%s", pcap_geterr(pd));
 
+	if (n_tstamp_types == 0) {
+		fprintf(stderr, "Time stamp type cannot be set for %s\n",
+		    device);
+		exit(0);
+	}
+	fprintf(stderr, "Time stamp types for %s (use option -j to set):\n",
+	    device);
 	for (i = 0; i < n_tstamp_types; i++) {
 		tstamp_type_name = pcap_tstamp_type_val_to_name(tstamp_types[i]);
 		if (tstamp_type_name != NULL) {
