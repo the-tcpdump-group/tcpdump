@@ -33,7 +33,6 @@ static const char rcsid[] _U_ =
 #ifdef SEGSIZE
 #undef SEGSIZE
 #endif
-#include <arpa/tftp.h>
 
 #include <stdio.h>
 #include <string.h>
