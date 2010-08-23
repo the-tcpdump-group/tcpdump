@@ -162,6 +162,9 @@
 /* Define to 1 if you have the `pcap_lib_version' function. */
 #undef HAVE_PCAP_LIB_VERSION
 
+/* Define to 1 if you have the `pcap_set_tstamp_type' function. */
+#undef HAVE_PCAP_SET_TSTAMP_TYPE
+
 /* Define to 1 if you have the <pcap/usb.h> header file. */
 #undef HAVE_PCAP_USB_H
 

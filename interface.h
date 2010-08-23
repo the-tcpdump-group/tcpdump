@@ -389,6 +389,7 @@ extern netdissect_options *gndo;
 #define bflag gndo->ndo_bflag 
 #define eflag gndo->ndo_eflag 
 #define fflag gndo->ndo_fflag 
+#define jflag gndo->ndo_jflag
 #define Kflag gndo->ndo_Kflag 
 #define nflag gndo->ndo_nflag 
 #define Nflag gndo->ndo_Nflag 
