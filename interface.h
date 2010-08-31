@@ -28,43 +28,6 @@
 #include "os-proto.h"
 #endif
 
-#ifndef HAVE___ATTRIBUTE__
-#define __attribute__(x)
-#endif
-
-/*
- * Used to declare a structure unaligned, so that the C compiler,
- * if necessary, generates code that doesn't assume alignment.
- * This is required because there is no guarantee that the packet
- * data we get from libpcap/WinPcap is properly aligned.
- *
- * This assumes that, for all compilers that support __attribute__:
- *
- *	1) they support __attribute__((packed));
- *
- *	2) for all instruction set architectures requiring strict
- *	   alignment, declaring a structure with that attribute
- *	   causes the compiler to generate code that handles
- *	   misaligned 2-byte, 4-byte, and 8-byte integral
- *	   quantities.
- *
- * It does not (yet) handle compilers where you can get the compiler
- * to generate code of that sort by some other means.
- *
- * This is required in order to, for example, keep the compiler from
- * generating, for
- *
- *	if (bp->bp_htype == 1 && bp->bp_hlen == 6 && bp->bp_op == BOOTPREQUEST) {
- *
- * in print-bootp.c, code that loads the first 4-byte word of a
- * "struct bootp", masking out the bp_hops field, and comparing the result
- * against 0x01010600.
- *
- * Note: this also requires that padding be put into the structure,
- * at least for compilers where it's implemented as __attribute__((packed)).
- */
-#define UNALIGNED	__attribute__((packed))
-
 /* snprintf et al */
 
 #include <stdarg.h>
@@ -358,7 +321,6 @@ extern u_int usb_linux_64_byte_print(const struct pcap_pkthdr *, const u_char *)
 #ifdef INET6
 extern void ip6_print(const u_char *, u_int);
 extern void ip6_opt_print(const u_char *, int);
-extern int nextproto6_cksum(const struct ip6_hdr *, const u_short *, u_int, u_int);
 extern int hbhopt_print(const u_char *);
 extern int dstopt_print(const u_char *);
 extern int frag6_print(const u_char *, const u_char *);
