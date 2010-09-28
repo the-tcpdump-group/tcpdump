@@ -12,5 +12,5 @@ IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto UDP (17), length 107)
 	Msg: 2013-09-12T19:16:34.457849+04:00 localhost through rsyslog: test message 23
 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto UDP (17), length 106)
     10.0.0.20.52693 > 10.0.0.71.514: SYSLOG, length: 78
-	Facility ftp (11), Severity warning (4)
-	Msg: 013-09-12T19:16:43.513746+04:00 localhost through rsyslog: test message 24
+	Facility user (1), Severity alert (1)
+	Msg: 2013-09-12T19:16:43.513746+04:00 localhost through rsyslog: test message 24

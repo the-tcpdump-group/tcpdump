@@ -116,9 +116,9 @@ syslog_print(register const u_char *pptr, register u_int len)
             if (!TTEST2(*(pptr+msg_off), 1))
                 goto trunc;
 
+        }
         if (*(pptr+msg_off) == '>')
             msg_off++;
-        }
     } else {
         printf("[|syslog]");
         return;
