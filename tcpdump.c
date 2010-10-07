@@ -154,7 +154,6 @@ static struct printer printers[] = {
 #ifdef DLT_ARCNET_LINUX
 	{ arcnet_linux_if_print, DLT_ARCNET_LINUX },
 #endif
-	{ ether_if_print,	DLT_EN10MB },
 	{ token_if_print,	DLT_IEEE802 },
 #ifdef DLT_LANE8023
 	{ lane_if_print,        DLT_LANE8023 },
@@ -306,6 +305,7 @@ static struct printer printers[] = {
 };
 
 static struct ndo_printer ndo_printers[] = {
+	{ ether_if_print,	DLT_EN10MB },
 #ifdef DLT_IPNET
 	{ ipnet_if_print,	DLT_IPNET },
 #endif

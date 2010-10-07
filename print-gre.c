@@ -226,7 +226,7 @@ gre_print_0(const u_char *bp, u_int length)
 		isoclns_print(bp, len, len);
 		break;
 	case ETHERTYPE_TEB:
-		ether_print(bp, len, len, NULL, NULL);
+		ether_print(gndo, bp, len, len, NULL, NULL);
 		break;
 	default:
 		printf("gre-proto-0x%x", prot);

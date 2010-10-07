@@ -573,7 +573,7 @@ ip_print(netdissect_options *ndo,
         else if (!eflag)
 	    printf("IP ");
 
-	if ((u_char *)(ipds->ip + 1) > snapend) {
+	if ((u_char *)(ipds->ip + 1) > ndo->ndo_snapend) {
 		printf("[|ip]");
 		return;
 	}
@@ -611,8 +611,8 @@ ip_print(netdissect_options *ndo,
 	 * Cut off the snapshot length to the end of the IP payload.
 	 */
 	ipend = bp + ipds->len;
-	if (ipend < snapend)
-		snapend = ipend;
+	if (ipend < ndo->ndo_snapend)
+		ndo->ndo_snapend = ipend;
 
 	ipds->len -= hlen;
 
@@ -658,7 +658,7 @@ ip_print(netdissect_options *ndo,
                 printf(")");
             }
 
-	    if (!Kflag && (u_char *)ipds->ip + hlen <= snapend) {
+	    if (!Kflag && (u_char *)ipds->ip + hlen <= ndo->ndo_snapend) {
 	        sum = in_cksum((const u_short *)ipds->ip, hlen, 0);
 		if (sum != 0) {
 		    ip_sum = EXTRACT_16BITS(&ipds->ip->ip_sum);

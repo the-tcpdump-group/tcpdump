@@ -647,7 +647,7 @@ juniper_pppoe_print(const struct pcap_pkthdr *h, register const u_char *p)
 
         p+=l2info.header_len;
         /* this DLT contains nothing but raw ethernet frames */
-        ether_print(p, l2info.length, l2info.caplen, NULL, NULL);
+        ether_print(gndo, p, l2info.length, l2info.caplen, NULL, NULL);
         return l2info.header_len;
 }
 #endif
@@ -664,7 +664,7 @@ juniper_ether_print(const struct pcap_pkthdr *h, register const u_char *p)
 
         p+=l2info.header_len;
         /* this DLT contains nothing but raw Ethernet frames */
-        ether_print(p, l2info.length, l2info.caplen, NULL, NULL);
+        ether_print(gndo, p, l2info.length, l2info.caplen, NULL, NULL);
         return l2info.header_len;
 }
 #endif
@@ -736,7 +736,7 @@ juniper_pppoe_atm_print(const struct pcap_pkthdr *h, register const u_char *p)
         extracted_ethertype = EXTRACT_16BITS(p);
         /* this DLT contains nothing but raw PPPoE frames,
          * prepended with a type field*/
-        if (ethertype_print(extracted_ethertype,
+        if (ethertype_print(gndo, extracted_ethertype,
                               p+ETHERTYPE_LEN,
                               l2info.length-ETHERTYPE_LEN,
                               l2info.caplen-ETHERTYPE_LEN) == 0)
@@ -987,7 +987,7 @@ juniper_atm2_print(const struct pcap_pkthdr *h, register const u_char *p)
 
         if (l2info.direction != JUNIPER_BPF_PKT_IN && /* ether-over-1483 encaps ? */
             (EXTRACT_32BITS(l2info.cookie) & ATM2_GAP_COUNT_MASK)) {
-            ether_print(p, l2info.length, l2info.caplen, NULL, NULL);
+            ether_print(gndo, p, l2info.length, l2info.caplen, NULL, NULL);
             return l2info.header_len;
         }
 

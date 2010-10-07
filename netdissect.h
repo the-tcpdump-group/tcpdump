@@ -283,6 +283,17 @@ extern void ip_print_inner(netdissect_options *ndo,
 			   const u_char *bp2);
 extern void rrcp_print(netdissect_options *,const u_char *, u_int);
 
+extern void ether_print(netdissect_options *,
+                        const u_char *, u_int, u_int,
+                        void (*)(netdissect_options *, const u_char *),
+                        const u_char *);
+
+extern u_int ether_if_print(netdissect_options *, 
+                           const struct pcap_pkthdr *,const u_char *);
+
+extern int ethertype_print(netdissect_options *,u_short, const u_char *,
+			     u_int, u_int);
+
 /* stuff that has not yet been rototiled */
 #if 0
 extern void ascii_print(netdissect_options *,u_int);
@@ -293,8 +304,6 @@ extern void hex_print_with_offset(netdissect_options *,const char *,
 				  u_int, u_int);
 extern void hex_print(netdissect_options *,const char *, u_int);
 extern void telnet_print(netdissect_options *,const u_char *, u_int);
-extern int ethertype_print(netdissect_options *,u_short, const u_char *,
-			     u_int, u_int);
 extern int llc_print(netdissect_options *,
 		     const u_char *, u_int, u_int, const u_char *,
 		     const u_char *, u_short *);
@@ -321,7 +330,6 @@ extern void egp_print(netdissect_options *,const u_char *, u_int,
 		      const u_char *);
 
 extern void arcnet_if_print(u_char*,const struct pcap_pkthdr *,const u_char *);
-extern void ether_if_print(u_char *,const struct pcap_pkthdr *,const u_char *);
 extern void token_if_print(u_char *,const struct pcap_pkthdr *,const u_char *);
 extern void fddi_if_print(u_char *,const struct pcap_pkthdr *, const u_char *);
 
