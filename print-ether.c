@@ -46,6 +46,9 @@ const struct tok ethertype_values[] = {
     { ETHERTYPE_MPLS_MULTI,	"MPLS multicast" },
     { ETHERTYPE_IPV6,		"IPv6" },
     { ETHERTYPE_8021Q,		"802.1Q" },
+    { ETHERTYPE_8021Q9100,	"802.1Q-9100" },
+    { ETHERTYPE_8021QinQ,	"802.1Q-QinQ" },
+    { ETHERTYPE_8021Q9200,	"802.1Q-9200" },
     { ETHERTYPE_VMAN,		"VMAN" },
     { ETHERTYPE_PUP,            "PUP" },
     { ETHERTYPE_ARP,            "ARP"},
@@ -168,7 +171,10 @@ recurse:
 			if (!ndo->ndo_suppress_default_print)
 				ndo->ndo_default_print(ndo, p, caplen);
 		}
-	} else if (ether_type == ETHERTYPE_8021Q) {
+	} else if (ether_type == ETHERTYPE_8021Q  ||
+                ether_type == ETHERTYPE_8021Q9100 ||
+                ether_type == ETHERTYPE_8021Q9200 ||
+                ether_type == ETHERTYPE_8021QinQ) {
 		/*
 		 * Print VLAN information, and then go back and process
 		 * the enclosed type field.

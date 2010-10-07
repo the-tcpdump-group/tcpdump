@@ -49,3 +49,8 @@ forces02vv      forces2.pcap            forces2vv.out   -t -v -v
 forces01vvv     forces1.pcap            forces1vvv.out  -t -v -v -v 
 forces01vvvv    forces1.pcap            forces1vvvv.out -t -v -v -v -v
 
+# 802.1ad, QinQ tests 
+qinq            QinQpacket.pcap         QinQpacket.out  -t -e
+qinqv           QinQpacket.pcap         QinQpacketv.out  -t -e -v
+
+
