@@ -445,9 +445,9 @@ extern void pptp_print(netdissect_options *,const u_char *, u_int);
 extern u_int ipnet_if_print(netdissect_options *,const struct pcap_pkthdr *, const u_char *);
 extern u_int ieee802_15_4_if_print(netdissect_options *,const struct pcap_pkthdr *, const u_char *);
 
-#if 0
 #ifdef INET6
 extern void ip6_print(netdissect_options *,const u_char *, u_int);
+#if 0
 extern void ip6_opt_print(netdissect_options *,const u_char *, int);
 extern int nextproto6_cksum(const struct ip6_hdr *, const u_short *, u_int, u_int);
 extern int hbhopt_print(netdissect_options *,const u_char *);
@@ -464,11 +464,13 @@ extern void dhcp6_print(netdissect_options *,const u_char *,
 
 extern void zephyr_print(netdissect_options * ndo,
 			 const u_char *cp, int length);
+#endif /* 0 */
 
 #endif /*INET6*/
+
+#if 0
 extern u_short in_cksum(const u_short *,
 			register u_int, int);
-
 #endif
 
 extern void esp_print_decodesecret(netdissect_options *ndo);

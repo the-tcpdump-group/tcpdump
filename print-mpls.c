@@ -199,7 +199,7 @@ mpls_print(const u_char *bp, u_int length)
 
 	case PT_IPV6:
 #ifdef INET6
-		ip6_print(p, length - (p - bp));
+		ip6_print(gndo, p, length - (p - bp));
 #else
 		printf("IPv6, length: %u", length);
 #endif

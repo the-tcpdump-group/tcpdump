@@ -768,7 +768,7 @@ pimv2_print(register const u_char *bp, register u_int len, u_int cksum)
 			break;
 #ifdef INET6
 		case 6:	/* IPv6 */
-			ip6_print(bp, len);
+			ip6_print(gndo, bp, len);
 			break;
 #endif
                 default:

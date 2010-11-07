@@ -272,7 +272,7 @@ ethertype_print(netdissect_options *ndo,
 
 #ifdef INET6
 	case ETHERTYPE_IPV6:
-		ip6_print(/*ndo,*/ p, length);
+		ip6_print(ndo, p, length);
 		return (1);
 #endif /*INET6*/
 
