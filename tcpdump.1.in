@@ -634,7 +634,10 @@ savefile name as the only argument, make the flags & arguments arrangements
 and execute the command that you want.
 .TP
 .B \-Z
-Drops privileges (if root) and changes user ID to
+If
+.I tcpdump
+is running as root, after opening the capture device or input savefile,
+but before opening any savefiles for output, change the user ID to
 .I user
 and the group ID to the primary group of
 .IR user .
