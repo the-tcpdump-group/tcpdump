@@ -96,26 +96,26 @@ ether_hdr_print(netdissect_options *ndo,
 
 	ep = (const struct ether_header *)bp;
 
-	(void)printf("%s > %s",
+	(void)ND_PRINT((ndo, "%s > %s",
 		     etheraddr_string(ESRC(ep)),
-		     etheraddr_string(EDST(ep)));
+		     etheraddr_string(EDST(ep))));
 
 	ether_type = EXTRACT_16BITS(&ep->ether_type);
 	if (!ndo->ndo_qflag) {
 	        if (ether_type <= ETHERMTU)
-		          (void)printf(", 802.3");
+		          (void)ND_PRINT((ndo, ", 802.3"));
                 else 
-		          (void)printf(", ethertype %s (0x%04x)",
+		          (void)ND_PRINT((ndo, ", ethertype %s (0x%04x)",
 				       tok2str(ethertype_values,"Unknown", ether_type),
-                                       ether_type);
+                                       ether_type));
         } else {
                 if (ether_type <= ETHERMTU)
-                          (void)printf(", 802.3");
+                          (void)ND_PRINT((ndo, ", 802.3"));
                 else 
-                          (void)printf(", %s", tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", ether_type));
+                          (void)ND_PRINT((ndo, ", %s", tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", ether_type)));
         }
 
-	(void)printf(", length %u: ", length);
+	(void)ND_PRINT((ndo, ", length %u: ", length));
 }
 
 /*
@@ -135,7 +135,7 @@ ether_print(netdissect_options *ndo,
 	u_short extracted_ether_type;
 
 	if (caplen < ETHER_HDRLEN || length < ETHER_HDRLEN) {
-		printf("[|ether]");
+		ND_PRINT((ndo, "[|ether]"));
 		return;
 	}
 
@@ -180,21 +180,21 @@ recurse:
 		 * the enclosed type field.
 		 */
 		if (caplen < 4 || length < 4) {
-			printf("[|vlan]");
+			ND_PRINT((ndo, "[|vlan]"));
 			return;
 		}
 	        if (ndo->ndo_eflag) {
 	        	u_int16_t tag = EXTRACT_16BITS(p);
 
-			printf("vlan %u, p %u%s, ",
+			ND_PRINT((ndo, "vlan %u, p %u%s, ",
 			    tag & 0xfff,
 			    tag >> 13,
-			    (tag & 0x1000) ? ", CFI" : "");
+			    (tag & 0x1000) ? ", CFI" : ""));
 		}
 
 		ether_type = EXTRACT_16BITS(p + 2);
 		if (ndo->ndo_eflag && ether_type > ETHERMTU)
-			printf("ethertype %s, ", tok2str(ethertype_values,"0x%04x", ether_type));
+			ND_PRINT((ndo, "ethertype %s, ", tok2str(ethertype_values,"0x%04x", ether_type)));
 		p += 4;
 		length -= 4;
 		caplen -= 4;
@@ -296,7 +296,7 @@ ethertype_print(netdissect_options *ndo,
 		return (1);
 
 	case ETHERTYPE_IPX:
-		printf("(NOV-ETHII) ");
+		ND_PRINT((ndo, "(NOV-ETHII) "));
 		ipx_print(/*ndo,*/p, length);
 		return (1);
 
