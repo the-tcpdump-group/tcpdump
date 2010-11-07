@@ -1252,6 +1252,30 @@ main(int argc, char **argv)
 		(void)setsignal(SIGHUP, oldhandler);
 #endif /* WIN32 */
 
+#ifndef WIN32
+	/*
+	 * If a user name was specified with "-Z", attempt to switch to
+	 * that user's UID.  This would probably be used with sudo,
+	 * to allow tcpdump to be run in a special restricted
+	 * account (if you just want to allow users to open capture
+	 * devices, and can't just give users that permission,
+	 * you'd make tcpdump set-UID or set-GID).
+	 *
+	 * Tcpdump doesn't necessarily write only to one savefile;
+	 * the general only way to allow a -Z instance to write to
+	 * savefiles as the user under whose UID it's run, rather
+	 * than as the user specified with -Z, would thus be to switch
+	 * to the original user ID before opening a capture file and
+	 * then switch back to the -Z user ID after opening the savefile.
+	 * Switching to the -Z user ID only after opening the first
+	 * savefile doesn't handle the general case.
+	 */
+	if (getuid() == 0 || geteuid() == 0) {
+		if (username || chroot_dir)
+			droproot(username, chroot_dir);
+	}
+#endif /* WIN32 */
+
 	if (pcap_setfilter(pd, &fcode) < 0)
 		error("%s", pcap_geterr(pd));
 	if (WFileName) {
@@ -1305,16 +1329,7 @@ main(int argc, char **argv)
 		callback = print_packet;
 		pcap_userdata = (u_char *)&printinfo;
 	}
-#ifndef WIN32
-	/*
-	 * We cannot do this earlier, because we want to be able to open
-	 * the file (if done) for writing before giving up permissions.
-	 */
-	if (getuid() == 0 || geteuid() == 0) {
-		if (username || chroot_dir)
-			droproot(username, chroot_dir);
-	}
-#endif /* WIN32 */
+
 #ifdef SIGINFO
 	/*
 	 * We can't get statistics when reading from a file rather
