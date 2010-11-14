@@ -418,6 +418,21 @@ AC_DEFUN(AC_LBL_LIBPCAP,
     fi
 
     dnl
+    dnl Check for "pcap_loop()", to make sure we found a working
+    dnl libpcap and have all the right other libraries with which
+    dnl to link.  (Otherwise, the checks below will fail, not
+    dnl because the routines are missing from the library, but
+    dnl because we aren't linking properly with libpcap, and
+    dnl that will cause confusing errors at build time.)
+    dnl
+    AC_CHECK_FUNC(pcap_loop,,
+	[
+	    AC_MSG_ERROR(
+[Report this to tcpdump-workers@tcpdump.org, and include the
+config.log file in your report])
+	])
+
+    dnl
     dnl Check for "pcap_list_datalinks()", "pcap_set_datalink()",
     dnl and "pcap_datalink_name_to_val()", and use substitute versions
     dnl if they're not present.
