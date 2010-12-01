@@ -531,7 +531,7 @@ AC_STRUCT_RES_STATE(ac_cv_res_state)
 
 
 AC_REPLACE_FUNCS(vfprintf strcasecmp strlcat strlcpy strdup strsep)
-AC_CHECK_FUNCS(strftime)
+AC_CHECK_FUNCS(fork vfork strftime)
 AC_CHECK_FUNCS(setlinebuf alarm)
 
 needsnprintf=no
