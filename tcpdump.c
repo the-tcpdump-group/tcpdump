@@ -1250,8 +1250,10 @@ main(int argc, char **argv)
 	(void)setsignal(SIGPIPE, cleanup);
 	(void)setsignal(SIGTERM, cleanup);
 	(void)setsignal(SIGINT, cleanup);
-	(void)setsignal(SIGCHLD, child_cleanup);
 #endif /* WIN32 */
+#if defined(HAVE_FORK) || defined(HAVE_VFORK)
+	(void)setsignal(SIGCHLD, child_cleanup);
+#endif
 	/* Cooperate with nohup(1) */
 #ifndef WIN32	
 	if ((oldhandler = setsignal(SIGHUP, cleanup)) != SIG_DFL)
@@ -1464,13 +1466,13 @@ cleanup(int signo _U_)
   On windows, we do not use a fork, so we do not care less about
   waiting a child processes to die
  */
-#ifndef WIN32
+#if defined(HAVE_FORK) || defined(HAVE_VFORK)
 static RETSIGTYPE
 child_cleanup(int signo _U_)
 {
   wait(NULL);
 }
-#endif /* WIN32 */
+#endif /* HAVE_FORK && HAVE_VFORK */
 
 static void
 info(register int verbose)
@@ -1514,11 +1516,15 @@ info(register int verbose)
 	infoprint = 0;
 }
 
-#ifndef WIN32
+#if defined(HAVE_FORK) || defined(HAVE_VFORK)
 static void
 compress_savefile(const char *filename)
 {
+# ifdef HAVE_FORK
 	if (fork())
+# else
+	if (vfork())
+# endif
 		return;
 	/*
 	 * Set to lowest priority so that this doesn't disturb the capture
@@ -1534,15 +1540,20 @@ compress_savefile(const char *filename)
 			zflag,
 			filename,
 			strerror(errno));
+# ifdef HAVE_FORK
+	exit(1);
+# else
+	_exit(1);
+# endif
 }
-#else  /* WIN32 */
+#else  /* HAVE_FORK && HAVE_VFORK */
 static void
 compress_savefile(const char *filename)
 {
 	fprintf(stderr,
-		"compress_savefile failed. Functionality not implemented under windows\n");
+		"compress_savefile failed. Functionality not implemented under your system\n");
 }
-#endif /* WIN32 */
+#endif /* HAVE_FORK && HAVE_VFORK */
 
 static void
 dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
