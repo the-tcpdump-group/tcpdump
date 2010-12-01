@@ -309,7 +309,7 @@ AC_DEFUN(AC_LBL_LIBPCAP,
 	    #
 	    # Look for pcap-config.
 	    #
-	    AC_PATH_PROG(PCAP_CONFIG, pcap-config)
+	    AC_PATH_TOOL(PCAP_CONFIG, pcap-config)
 	    if test -n "$PCAP_CONFIG" ; then
 		#
 		# Found - use it to get the include flags for
