@@ -238,9 +238,15 @@ static int icmp6_cksum(const struct ip6_hdr *ip6, const struct icmp6_hdr *icp,
 }
 
 enum ND_RPL_CODE {
-        ND_RPL_DAG_IS=0x01,
-        ND_RPL_DAG_IO=0x02,
-        ND_RPL_DAO   =0x04
+        ND_RPL_DIS   =0x01,
+        ND_RPL_DIO   =0x02,
+        ND_RPL_DAO   =0x03,
+        ND_RPL_DAO_ACK=0x04,
+        ND_RPL_SDIS  =0x80,
+        ND_RPL_SDIO  =0x81,
+        ND_RPL_SDAO  =0x82,
+        ND_RPL_SDAO_ACK=0x83,
+        ND_RPL_SCC   =0x8A,
 };
 
 enum ND_RPL_DIO_FLAGS {
@@ -266,17 +272,25 @@ rpl_print(netdissect_options *ndo,
           const u_char *bp, u_int length _U_)
 {
         struct nd_rpl_dio *dio = (struct nd_rpl_dio *)bp;
+        int secured = hdr->icmp6_code & 0x80;
+        int basecode= hdr->icmp6_code & 0x7f;
 
         ND_TCHECK(dio->rpl_dagid);
 
-        switch(hdr->icmp6_code) {
-        case ND_RPL_DAG_IS:
-                ND_PRINT((ndo, ", DAG Information Solicitation"));
+        if(secured) {
+                ND_PRINT((ndo, ", (SEC)"));
+        } else {
+                ND_PRINT((ndo, ", (CLR)"));
+        }
+                
+        switch(basecode) {
+        case ND_RPL_DIS:
+                ND_PRINT((ndo, "DODAG Information Solicitation"));
                 if(ndo->ndo_vflag) {
                 }
                 break;
-        case ND_RPL_DAG_IO:
-                ND_PRINT((ndo, ", DAG Information Object"));
+        case ND_RPL_DIO:
+                ND_PRINT((ndo, "DODAG Information Object"));
                 if(ndo->ndo_vflag) {
                         char dagid[65];
                         char *d = dagid;
@@ -299,12 +313,17 @@ rpl_print(netdissect_options *ndo,
                 }
                 break;
         case ND_RPL_DAO:
-                ND_PRINT((ndo, ", Destination Advertisement Object"));
+                ND_PRINT((ndo, "Destination Advertisement Object"));
+                if(ndo->ndo_vflag) {
+                }
+                break;
+        case ND_RPL_DAO_ACK:
+                ND_PRINT((ndo, "Destination Advertisement Object Ack"));
                 if(ndo->ndo_vflag) {
                 }
                 break;
         default:
-                ND_PRINT((ndo, ", RPL message, unknown code %u",hdr->icmp6_code));
+                ND_PRINT((ndo, "RPL message, unknown code %u",hdr->icmp6_code));
                 break;
         }
 	return;
