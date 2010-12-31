@@ -238,10 +238,10 @@ static int icmp6_cksum(const struct ip6_hdr *ip6, const struct icmp6_hdr *icp,
 }
 
 enum ND_RPL_CODE {
-        ND_RPL_DIS   =0x01,
-        ND_RPL_DIO   =0x02,
-        ND_RPL_DAO   =0x03,
-        ND_RPL_DAO_ACK=0x04,
+        ND_RPL_DIS   =0x00,
+        ND_RPL_DIO   =0x01,
+        ND_RPL_DAO   =0x02,
+        ND_RPL_DAO_ACK=0x03,
         ND_RPL_SDIS  =0x80,
         ND_RPL_SDIO  =0x81,
         ND_RPL_SDAO  =0x82,
