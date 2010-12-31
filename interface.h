@@ -315,7 +315,6 @@ extern u_int usb_linux_48_byte_print(const struct pcap_pkthdr *, const u_char *)
 extern u_int usb_linux_64_byte_print(const struct pcap_pkthdr *, const u_char *);
 
 #ifdef INET6
-extern void ip6_print(const u_char *, u_int);
 extern void ip6_opt_print(const u_char *, int);
 extern int hbhopt_print(const u_char *);
 extern int dstopt_print(const u_char *);

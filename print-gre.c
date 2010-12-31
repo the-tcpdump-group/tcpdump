@@ -210,7 +210,7 @@ gre_print_0(const u_char *bp, u_int length)
 		break;
 #ifdef INET6
 	case ETHERTYPE_IPV6:
-		ip6_print(bp, len);
+		ip6_print(gndo, bp, len);
 		break;
 #endif
 	case ETHERTYPE_MPLS:

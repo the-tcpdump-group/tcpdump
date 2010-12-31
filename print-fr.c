@@ -286,7 +286,7 @@ fr_print(register const u_char *p, u_int length)
 
 #ifdef INET6
 	case NLPID_IP6:
-		ip6_print(p, length);
+		ip6_print(gndo, p, length);
 		break;
 #endif
 	case NLPID_CLNP:

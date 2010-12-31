@@ -486,7 +486,7 @@ juniper_ggsn_print(const struct pcap_pkthdr *h, register const u_char *p)
             break;
 #ifdef INET6
         case JUNIPER_PROTO_IPV6:
-            ip6_print(p, l2info.length);
+            ip6_print(gndo, p, l2info.length);
             break;
 #endif /* INET6 */
         default:
@@ -779,7 +779,7 @@ juniper_mlppp_print(const struct pcap_pkthdr *h, register const u_char *p)
             return l2info.header_len;
 #ifdef INET6
         case JUNIPER_LSQ_L3_PROTO_IPV6:
-            ip6_print(p,l2info.length);
+            ip6_print(gndo, p,l2info.length);
             return l2info.header_len;
 #endif
         case JUNIPER_LSQ_L3_PROTO_MPLS:
@@ -834,7 +834,7 @@ juniper_mfr_print(const struct pcap_pkthdr *h, register const u_char *p)
                 return l2info.header_len;
 #ifdef INET6
             case JUNIPER_LSQ_L3_PROTO_IPV6:
-                ip6_print(p,l2info.length);
+                ip6_print(gndo, p,l2info.length);
                 return l2info.header_len;
 #endif
             case JUNIPER_LSQ_L3_PROTO_MPLS:
@@ -1073,7 +1073,7 @@ ip_heuristic_guess(register const u_char *p, u_int length) {
     case 0x6d:
     case 0x6e:
     case 0x6f:
-        ip6_print(p, length);
+        ip6_print(gndo, p, length);
         break;
 #endif
     default:

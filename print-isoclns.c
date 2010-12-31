@@ -662,7 +662,7 @@ void isoclns_print(const u_int8_t *p, u_int length, u_int caplen)
 
 #ifdef INET6
         case NLPID_IP6:
-                ip6_print(p+1, length-1);
+                ip6_print(gndo, p+1, length-1);
                 break;
 #endif
 

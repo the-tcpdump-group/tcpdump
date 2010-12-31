@@ -1250,12 +1250,38 @@ main(int argc, char **argv)
 	(void)setsignal(SIGPIPE, cleanup);
 	(void)setsignal(SIGTERM, cleanup);
 	(void)setsignal(SIGINT, cleanup);
-	(void)setsignal(SIGCHLD, child_cleanup);
 #endif /* WIN32 */
+#if defined(HAVE_FORK) || defined(HAVE_VFORK)
+	(void)setsignal(SIGCHLD, child_cleanup);
+#endif
 	/* Cooperate with nohup(1) */
 #ifndef WIN32	
 	if ((oldhandler = setsignal(SIGHUP, cleanup)) != SIG_DFL)
 		(void)setsignal(SIGHUP, oldhandler);
+#endif /* WIN32 */
+
+#ifndef WIN32
+	/*
+	 * If a user name was specified with "-Z", attempt to switch to
+	 * that user's UID.  This would probably be used with sudo,
+	 * to allow tcpdump to be run in a special restricted
+	 * account (if you just want to allow users to open capture
+	 * devices, and can't just give users that permission,
+	 * you'd make tcpdump set-UID or set-GID).
+	 *
+	 * Tcpdump doesn't necessarily write only to one savefile;
+	 * the general only way to allow a -Z instance to write to
+	 * savefiles as the user under whose UID it's run, rather
+	 * than as the user specified with -Z, would thus be to switch
+	 * to the original user ID before opening a capture file and
+	 * then switch back to the -Z user ID after opening the savefile.
+	 * Switching to the -Z user ID only after opening the first
+	 * savefile doesn't handle the general case.
+	 */
+	if (getuid() == 0 || geteuid() == 0) {
+		if (username || chroot_dir)
+			droproot(username, chroot_dir);
+	}
 #endif /* WIN32 */
 
 	if (pcap_setfilter(pd, &fcode) < 0)
@@ -1311,16 +1337,7 @@ main(int argc, char **argv)
 		callback = print_packet;
 		pcap_userdata = (u_char *)&printinfo;
 	}
-#ifndef WIN32
-	/*
-	 * We cannot do this earlier, because we want to be able to open
-	 * the file (if done) for writing before giving up permissions.
-	 */
-	if (getuid() == 0 || geteuid() == 0) {
-		if (username || chroot_dir)
-			droproot(username, chroot_dir);
-	}
-#endif /* WIN32 */
+
 #ifdef SIGINFO
 	/*
 	 * We can't get statistics when reading from a file rather
@@ -1449,13 +1466,13 @@ cleanup(int signo _U_)
   On windows, we do not use a fork, so we do not care less about
   waiting a child processes to die
  */
-#ifndef WIN32
+#if defined(HAVE_FORK) || defined(HAVE_VFORK)
 static RETSIGTYPE
 child_cleanup(int signo _U_)
 {
   wait(NULL);
 }
-#endif /* WIN32 */
+#endif /* HAVE_FORK && HAVE_VFORK */
 
 static void
 info(register int verbose)
@@ -1499,11 +1516,15 @@ info(register int verbose)
 	infoprint = 0;
 }
 
-#ifndef WIN32
+#if defined(HAVE_FORK) || defined(HAVE_VFORK)
 static void
 compress_savefile(const char *filename)
 {
+# ifdef HAVE_FORK
 	if (fork())
+# else
+	if (vfork())
+# endif
 		return;
 	/*
 	 * Set to lowest priority so that this doesn't disturb the capture
@@ -1519,15 +1540,20 @@ compress_savefile(const char *filename)
 			zflag,
 			filename,
 			strerror(errno));
+# ifdef HAVE_FORK
+	exit(1);
+# else
+	_exit(1);
+# endif
 }
-#else  /* WIN32 */
+#else  /* HAVE_FORK && HAVE_VFORK */
 static void
 compress_savefile(const char *filename)
 {
 	fprintf(stderr,
-		"compress_savefile failed. Functionality not implemented under windows\n");
+		"compress_savefile failed. Functionality not implemented under your system\n");
 }
-#endif /* WIN32 */
+#endif /* HAVE_FORK && HAVE_VFORK */
 
 static void
 dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)

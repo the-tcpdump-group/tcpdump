@@ -309,7 +309,7 @@ AC_DEFUN(AC_LBL_LIBPCAP,
 	    #
 	    # Look for pcap-config.
 	    #
-	    AC_PATH_PROG(PCAP_CONFIG, pcap-config)
+	    AC_PATH_TOOL(PCAP_CONFIG, pcap-config)
 	    if test -n "$PCAP_CONFIG" ; then
 		#
 		# Found - use it to get the include flags for
@@ -416,6 +416,21 @@ AC_DEFUN(AC_LBL_LIBPCAP,
 	    ;;
 	esac
     fi
+
+    dnl
+    dnl Check for "pcap_loop()", to make sure we found a working
+    dnl libpcap and have all the right other libraries with which
+    dnl to link.  (Otherwise, the checks below will fail, not
+    dnl because the routines are missing from the library, but
+    dnl because we aren't linking properly with libpcap, and
+    dnl that will cause confusing errors at build time.)
+    dnl
+    AC_CHECK_FUNC(pcap_loop,,
+	[
+	    AC_MSG_ERROR(
+[Report this to tcpdump-workers@tcpdump.org, and include the
+config.log file in your report])
+	])
 
     dnl
     dnl Check for "pcap_list_datalinks()", "pcap_set_datalink()",

@@ -480,7 +480,7 @@ again:
 
 	case IPPROTO_IPV4:
 		/* DVMRP multicast tunnel (ip-in-ip encapsulation) */
-		ip_print(gndo, ipds->cp, ipds->len);
+		ip_print(ndo, ipds->cp, ipds->len);
 		if (! vflag) {
 			ND_PRINT((ndo, " (ipip-proto-4)"));
 			return;
@@ -490,7 +490,7 @@ again:
 #ifdef INET6
 	case IPPROTO_IPV6:
 		/* ip6-in-ip encapsulation */
-		ip6_print(ipds->cp, ipds->len);
+		ip6_print(ndo, ipds->cp, ipds->len);
 		break;
 #endif /*INET6*/
 
@@ -722,7 +722,7 @@ ipN_print(register const u_char *bp, register u_int length)
 		return;
 #ifdef INET6
 	case 6:
-		ip6_print (bp, length);
+		ip6_print (gndo, bp, length);
 		return;
 #endif
 	default:
