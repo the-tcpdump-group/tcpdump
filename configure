@@ -7579,8 +7579,9 @@ fi
 		# Found - use it to get the include flags for
 		# libpcap and the flags to link with libpcap.
 		#
-		V_INCLS="`\"$PCAP_CONFIG\" --cflags` $V_INCLS"
-		libpcap="`\"$PCAP_CONFIG\" --libs`"
+		cflags=`"$PCAP_CONFIG" --cflags`
+		V_INCLS="$cflags $V_INCLS"
+		libpcap=`"$PCAP_CONFIG" --libs`
 	    else
 		#
 		# Not found; look for pcap.
@@ -7730,7 +7731,8 @@ fi
 		# to link with the libpcap archive library in
 		# that directory
 		#
-		libpcap="$libpcap `\"$PCAP_CONFIG\" --additional-libs --static`"
+		additional_libs=`"$PCAP_CONFIG" --additional-libs --static`
+		libpcap="$libpcap $additional_libs"
 	    fi
     fi
     LIBS="$libpcap $LIBS"
