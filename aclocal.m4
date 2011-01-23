@@ -315,8 +315,9 @@ AC_DEFUN(AC_LBL_LIBPCAP,
 		# Found - use it to get the include flags for
 		# libpcap and the flags to link with libpcap.
 		#
-		$2="`\"$PCAP_CONFIG\" --cflags` $$2"
-		libpcap="`\"$PCAP_CONFIG\" --libs`"
+		cflags=`"$PCAP_CONFIG" --cflags`
+		$2="$cflags $$2"
+		libpcap=`"$PCAP_CONFIG" --libs`
 	    else
 		#
 		# Not found; look for pcap.
@@ -380,7 +381,8 @@ AC_DEFUN(AC_LBL_LIBPCAP,
 		# to link with the libpcap archive library in
 		# that directory
 		#
-		libpcap="$libpcap `\"$PCAP_CONFIG\" --additional-libs --static`"
+		additional_libs=`"$PCAP_CONFIG" --additional-libs --static`
+		libpcap="$libpcap $additional_libs"
 	    fi
     fi
     LIBS="$libpcap $LIBS"
