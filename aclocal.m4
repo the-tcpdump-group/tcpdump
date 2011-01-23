@@ -315,6 +315,13 @@ AC_DEFUN(AC_LBL_LIBPCAP,
 		# Found - use it to get the include flags for
 		# libpcap and the flags to link with libpcap.
 		#
+		# Please read section 11.6 "Shell Substitutions"
+		# in the autoconf manual before doing anything
+		# to this that involves quoting.  Especially note
+		# the statement "There is just no portable way to use
+		# double-quoted strings inside double-quoted back-quoted
+		# expressions (pfew!)."
+		#
 		cflags=`"$PCAP_CONFIG" --cflags`
 		$2="$cflags $$2"
 		libpcap=`"$PCAP_CONFIG" --libs`
@@ -379,7 +386,14 @@ AC_DEFUN(AC_LBL_LIBPCAP,
 		# The libpcap directory has a pcap-config script.
 		# Use it to get any additioal libraries needed
 		# to link with the libpcap archive library in
-		# that directory
+		# that directory.
+		#
+		# Please read section 11.6 "Shell Substitutions"
+		# in the autoconf manual before doing anything
+		# to this that involves quoting.  Especially note
+		# the statement "There is just no portable way to use
+		# double-quoted strings inside double-quoted back-quoted
+		# expressions (pfew!)."
 		#
 		additional_libs=`"$PCAP_CONFIG" --additional-libs --static`
 		libpcap="$libpcap $additional_libs"
