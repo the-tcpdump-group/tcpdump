@@ -270,7 +270,7 @@ pdatacnt_print(register const u_char * pptr, register u_int len,
 			if (vflag >= 3 && ops->v != F_TLV_PDAT) {
 				if (pad)
 					printf
-					    ("%s %s (Length %d DataLen %d pad %d Bytes)\n",
+					    ("%s  %s (Length %d DataLen %d pad %d Bytes)\n",
 					     ib, ops->s, EXTRACT_16BITS(&pdtlv->length),
 					     tll, pad);
 				else
