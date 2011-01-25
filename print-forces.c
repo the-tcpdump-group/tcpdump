@@ -213,7 +213,7 @@ trunc:
 
 int
 pdatacnt_print(register const u_char * pptr, register u_int len,
-	       u_int32_t IDcnt, u_int16_t op_msk, int indent)
+	       u_int16_t IDcnt, u_int16_t op_msk, int indent)
 {
 	u_int i;
 	int rc;
@@ -314,7 +314,7 @@ pdata_print(register const u_char * pptr, register u_int len,
 	char *ib = indent_pr(indent, 0);
 	u_int minsize = 0;
 	int more_pd = 0;
-	u_int32_t idcnt = 0;
+	u_int16_t idcnt = 0;
 
 	TCHECK(*pdh);
 	if (len < sizeof(struct pathdata_h))
