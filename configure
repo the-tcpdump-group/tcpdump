@@ -7870,9 +7870,9 @@ if test $ac_cv_func_pcap_loop = yes; then
   :
 else
 
-	    { { echo "$as_me:$LINENO: error: Report this to tcpdump-workers@tcpdump.org, and include the
+	    { { echo "$as_me:$LINENO: error: Report this to tcpdump-workers@lists.tcpdump.org, and include the
 config.log file in your report" >&5
-echo "$as_me: error: Report this to tcpdump-workers@tcpdump.org, and include the
+echo "$as_me: error: Report this to tcpdump-workers@lists.tcpdump.org, and include the
 config.log file in your report" >&2;}
    { (exit 1); exit 1; }; }
 
