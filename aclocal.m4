@@ -444,7 +444,7 @@ AC_DEFUN(AC_LBL_LIBPCAP,
     AC_CHECK_FUNC(pcap_loop,,
 	[
 	    AC_MSG_ERROR(
-[Report this to tcpdump-workers@tcpdump.org, and include the
+[Report this to tcpdump-workers@lists.tcpdump.org, and include the
 config.log file in your report])
 	])
 
