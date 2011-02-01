@@ -26,6 +26,10 @@
 # Top level hierarchy
 prefix = @prefix@
 exec_prefix = @exec_prefix@
+# Root of the directory tree for read-only architecture-independent data
+# files.  (We don't use it directly, but, in autoconf 2.60 and later,
+# other things we use are defined in terms of it.)
+datarootdir = @datarootdir@
 # Pathname of directory to install the binary
 sbindir = @sbindir@
 # Pathname of directory to install the man page
