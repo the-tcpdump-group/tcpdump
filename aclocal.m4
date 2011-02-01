@@ -1149,7 +1149,7 @@ dnl
 AC_DEFUN(AC_C___ATTRIBUTE___FORMAT_FUNCTION_POINTER, [
 AC_MSG_CHECKING([whether __attribute__((format)) can be applied to function pointers])
 AC_CACHE_VAL(ac_cv___attribute___format_function_pointer, [
-AC_COMPILE_IFELSE(
+AC_COMPILE_IFELSE([
   AC_LANG_SOURCE([[
 #include <stdlib.h>
 
@@ -1161,7 +1161,7 @@ main(int argc, char **argv)
 {
   (*foo)("%s", "test");
 }
-  ]]),
+  ]])],
 ac_cv___attribute___format_function_pointer=yes,
 ac_cv___attribute___format_function_pointer=no)])
 if test "$ac_cv___attribute___format_function_pointer" = "yes"; then
