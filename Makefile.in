@@ -227,7 +227,6 @@ EXTRA_DIST = \
 	lbl/os-ultrix4.h \
 	makemib \
 	missing/addrinfo.h \
-	missing/addrsize.h \
 	missing/bittypes.h \
 	missing/dlnames.c \
 	missing/datalinks.c \
@@ -235,8 +234,6 @@ EXTRA_DIST = \
 	missing/inet_aton.c \
 	missing/inet_ntop.c \
 	missing/inet_pton.c \
-	missing/resolv6.h \
-	missing/resolv_ext.h \
 	missing/snprintf.c \
 	missing/sockstorage.h \
 	missing/strdup.c \

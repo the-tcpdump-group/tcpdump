@@ -504,32 +504,6 @@ if test "$ac_cv_sa_storage" = no; then
 	missing_includes=yes
 fi
 
-dnl
-dnl Checks for IN[6]ADDRSZ
-AC_CHECK_ADDRSZ(ac_cv_addrsz)
-if test "$ac_cv_addrsz" = no; then
-	missing_includes=yes
-fi
-
-dnl
-dnl Checks for RES_USE_INET6
-AC_CHECK_RES_USE_INET6(ac_cv_res_inet6)
-if test "$ac_cv_res_inet6" = no; then
-	missing_includes=yes
-fi
-
-dnl
-dnl Checks for res_state_ext structure
-AC_STRUCT_RES_STATE_EXT(ac_cv_res_state_ext)
-if test "$ac_cv_res_state_ext" = no; then
-	missing_includes=yes
-fi
-
-dnl
-dnl Checks if res_state structure has nsort member.
-AC_STRUCT_RES_STATE(ac_cv_res_state)
-
-
 AC_REPLACE_FUNCS(vfprintf strcasecmp strlcat strlcpy strdup strsep)
 AC_CHECK_FUNCS(fork vfork strftime)
 AC_CHECK_FUNCS(setlinebuf alarm)
