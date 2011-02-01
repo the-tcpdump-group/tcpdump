@@ -3291,7 +3291,8 @@ if test "${ac_cv___attribute___format_function_pointer+set}" = set; then
 else
 
 cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
+
+  /* confdefs.h.  */
 _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
