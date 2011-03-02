@@ -439,8 +439,8 @@ static struct tok clnp_flag_values[] = {
 #define ISIS_MASK_MTFLAGS(x)               ((x)&0xf000)
 
 static struct tok isis_mt_flag_values[] = {
-    { 0x4000,                  "sub-TLVs present"},
-    { 0x8000,                  "ATT bit set"},
+    { 0x4000,                  "ATT bit set"},
+    { 0x8000,                  "Overload bit set"},
     { 0, NULL}
 };
 
