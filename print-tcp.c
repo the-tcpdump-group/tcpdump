@@ -319,12 +319,20 @@ tcp_print(register const u_char *bp, register u_int length,
                          * fields are big enough to hold an IPv6
                          * address, but we only have IPv4 addresses
                          * and thus must clear out the remaining 124
-                         * bytes.
+                         * bits.
                          *
                          * XXX - should we just clear those bytes after
                          * copying the IPv4 addresses, rather than
                          * zeroing out the entire structure and then
                          * overwriting some of the zeroes?
+                         *
+                         * XXX - this could fail if we see TCP packets
+                         * with an IPv6 address with the lower 124 bits
+                         * all zero and also see TCP packes with an
+                         * IPv4 address with the same 32 bits as the
+                         * upper 32 bits of the IPv6 address in question.
+                         * Can that happen?  Is it likely enough to be
+                         * an issue?
                          */
                         memset(&tha, 0, sizeof(tha));
                         src = &ip->ip_src;
