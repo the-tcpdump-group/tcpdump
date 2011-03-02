@@ -294,7 +294,6 @@ tcp_print(register const u_char *bp, register u_int length,
                  * both directions).
                  */
 #ifdef INET6
-                memset(&tha, 0, sizeof(tha));
                 rev = 0;
                 if (ip6) {
                         src = &ip6->ip6_src;
@@ -315,6 +314,19 @@ tcp_print(register const u_char *bp, register u_int length,
                                 tha.port = sport << 16 | dport;
                         }
                 } else {
+                        /*
+                         * Zero out the tha structure; the src and dst
+                         * fields are big enough to hold an IPv6
+                         * address, but we only have IPv4 addresses
+                         * and thus must clear out the remaining 124
+                         * bytes.
+                         *
+                         * XXX - should we just clear those bytes after
+                         * copying the IPv4 addresses, rather than
+                         * zeroing out the entire structure and then
+                         * overwriting some of the zeroes?
+                         */
+                        memset(&tha, 0, sizeof(tha));
                         src = &ip->ip_src;
                         dst = &ip->ip_dst;
                         if (sport > dport)
