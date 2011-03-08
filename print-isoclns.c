@@ -393,12 +393,14 @@ static struct tok isis_subtlv_link_attribute_values[] = {
 };
 
 #define ISIS_SUBTLV_AUTH_SIMPLE        1
+#define ISIS_SUBTLV_AUTH_GENERIC       3 /* rfc 5310 */
 #define ISIS_SUBTLV_AUTH_MD5          54
 #define ISIS_SUBTLV_AUTH_MD5_LEN      16
 #define ISIS_SUBTLV_AUTH_PRIVATE     255
 
 static struct tok isis_subtlv_auth_values[] = {
     { ISIS_SUBTLV_AUTH_SIMPLE,	"simple text password"},
+    { ISIS_SUBTLV_AUTH_GENERIC, "Generic Crypto key-id"},
     { ISIS_SUBTLV_AUTH_MD5,	"HMAC-MD5 password"},
     { ISIS_SUBTLV_AUTH_PRIVATE,	"Routing Domain private password"},
     { 0, NULL }
@@ -439,8 +441,8 @@ static struct tok clnp_flag_values[] = {
 #define ISIS_MASK_MTFLAGS(x)               ((x)&0xf000)
 
 static struct tok isis_mt_flag_values[] = {
-    { 0x4000,                  "sub-TLVs present"},
-    { 0x8000,                  "ATT bit set"},
+    { 0x4000,                  "ATT bit set"},
+    { 0x8000,                  "Overload bit set"},
     { 0, NULL}
 };
 
@@ -1777,7 +1779,7 @@ static int isis_print (const u_int8_t *p, u_int length)
     u_int8_t pdu_type, max_area, id_length, tlv_type, tlv_len, tmp, alen, lan_alen, prefix_len;
     u_int8_t ext_is_len, ext_ip_len, mt_len;
     const u_int8_t *optr, *pptr, *tptr;
-    u_short packet_len,pdu_len;
+    u_short packet_len,pdu_len, key_id;
     u_int i,vendor_id;
     int sigcheck;
 
@@ -2376,6 +2378,15 @@ static int isis_print (const u_int8_t *p, u_int length)
                 printf(" (%s)", tok2str(signature_check_values, "Unknown", sigcheck));
 
 		break;
+            case ISIS_SUBTLV_AUTH_GENERIC:
+                key_id = EXTRACT_16BITS((tptr+1));
+                printf("%u, password: ", key_id); 
+                for(i=1 + sizeof(u_int16_t);i<tlv_len;i++) {
+                    if (!TTEST2(*(tptr+i), 1))
+                        goto trunctlv;
+                    printf("%02x",*(tptr+i));
+                }
+                break;
 	    case ISIS_SUBTLV_AUTH_PRIVATE:
 	    default:
 		if(!print_unknown_data(tptr+1,"\n\t\t  ",tlv_len-1))
