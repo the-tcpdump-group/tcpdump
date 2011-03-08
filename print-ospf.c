@@ -1028,7 +1028,7 @@ ospf_decode_v2(register const struct ospfhdr *op,
                 lsap = op->ospf_lsu.lsu_lsa;
                 TCHECK(op->ospf_lsu.lsu_count);
                 lsa_count_max = EXTRACT_32BITS(&op->ospf_lsu.lsu_count);
-                printf(", %d LSA%s",lsa_count_max, lsa_count_max > 1 ? "s" : "");
+                printf(", %d LSA%s",lsa_count_max, PLURAL_SUFFIX(lsa_count_max));
                 for (lsa_count=1;lsa_count <= lsa_count_max;lsa_count++) {
                     printf("\n\t  LSA #%u",lsa_count);
                         lsap = (const struct lsa *)ospf_print_lsa(lsap);

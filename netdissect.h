@@ -254,6 +254,9 @@ extern char *copy_argv(netdissect_options *, char **);
 extern void safeputchar(int);
 extern void safeputs(const char *, int);
 
+#define PLURAL_SUFFIX(n) \
+	(((n) != 1) ? "s" : "")
+
 #if 0
 extern const char *isonsap_string(netdissect_options *, const u_char *);
 extern const char *protoid_string(netdissect_options *, const u_char *);
