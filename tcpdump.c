@@ -1487,24 +1487,27 @@ info(register int verbose)
 	if (!verbose)
 		fprintf(stderr, "%s: ", program_name);
 
-	(void)fprintf(stderr, "%u packets captured", packets_captured);
+	(void)fprintf(stderr, "%u packet%s captured", packets_captured,
+	    PLURAL_SUFFIX(packets_captured));
 	if (!verbose)
 		fputs(", ", stderr);
 	else
 		putc('\n', stderr);
-	(void)fprintf(stderr, "%u packets received by filter", stat.ps_recv);
+	(void)fprintf(stderr, "%u packet%s received by filter", stat.ps_recv,
+	    PLURAL_SUFFIX(stat.ps_recv));
 	if (!verbose)
 		fputs(", ", stderr);
 	else
 		putc('\n', stderr);
-	(void)fprintf(stderr, "%u packets dropped by kernel", stat.ps_drop);
+	(void)fprintf(stderr, "%u packet%s dropped by kernel", stat.ps_drop,
+	    PLURAL_SUFFIX(stat.ps_drop));
 	if (stat.ps_ifdrop != 0) {
 		if (!verbose)
 			fputs(", ", stderr);
 		else
 			putc('\n', stderr);
-		(void)fprintf(stderr, "%u packets dropped by interface\n",
-		    stat.ps_ifdrop);
+		(void)fprintf(stderr, "%u packet%s dropped by interface\n",
+		    stat.ps_ifdrop, PLURAL_SUFFIX(stat.ps_ifdrop));
 	} else
 		putc('\n', stderr);
 	infoprint = 0;
