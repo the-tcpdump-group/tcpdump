@@ -110,6 +110,14 @@ linux*)
 	;;
 esac
 
+AC_CHECK_PROG(HAVE_UUDECODE, uudecode, yes, no)
+if test "$HAVE_UUDECODE" = yes
+then
+    CHECK_UUDECODE=true
+else
+    CHECK_UUDECODE="(echo \"No uudecode program found, not running tests\"; echo \"If this is a Linux distribution, try apt-get/rpm install sharutils\"; exit 1)"
+fi
+AC_SUBST(CHECK_UUDECODE)
 
 AC_ARG_WITH(smi,
 [  --with-smi              link with libsmi (allows to load MIBs on the fly to decode SNMP packets. [default=yes]

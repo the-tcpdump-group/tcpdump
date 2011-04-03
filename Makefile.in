@@ -420,7 +420,7 @@ distclean:
 	rm -rf autom4te.cache
 
 check: tcpdump
-	uudecode --help || (echo "No uudecode program found, not running tests"; echo "apt-get/rpm install sharutils?"; exit 1)
+	@@CHECK_UUDECODE@
 	(cd tests && ./TESTrun.sh)
 
 tags: $(TAGFILES)
