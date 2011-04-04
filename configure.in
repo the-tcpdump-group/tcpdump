@@ -1064,8 +1064,10 @@ if test "$want_libcrypto" != "no"; then
 		fi
 		AC_CHECK_LIB(crypto, DES_cbc_encrypt)
 
+		savedppflags="$CPPLAGS"
 		CPPFLAGS="$CPPFLAGS $V_INCLS"
 		AC_CHECK_HEADERS(openssl/evp.h)
+		CPPFLAGS="$savedcppflags"
 	else
 		#
 		# Not found.  Did the user explicitly ask for it?

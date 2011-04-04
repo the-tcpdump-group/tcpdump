@@ -11908,6 +11908,7 @@ _ACEOF
 fi
 
 
+		savedppflags="$CPPLAGS"
 		CPPFLAGS="$CPPFLAGS $V_INCLS"
 
 for ac_header in openssl/evp.h
@@ -12049,6 +12050,7 @@ fi
 
 done
 
+		CPPFLAGS="$savedcppflags"
 	else
 		#
 		# Not found.  Did the user explicitly ask for it?
