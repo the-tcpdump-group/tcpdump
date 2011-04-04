@@ -850,16 +850,6 @@ if test -f /dev/bpf0 ; then
 	V_GROUP=bpf
 fi
 
-#
-# Check for some headers introduced in later versions of libpcap
-# and used by some printers.
-#
-savedcppflags="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $V_INCLS"
-AC_CHECK_HEADERS(pcap/bluetooth.h)
-AC_CHECK_HEADERS(pcap/usb.h)
-CPPFLAGS="$savedcppflags"
-
 AC_CHECK_HEADERS(sys/bitypes.h)
 
 AC_CHECK_TYPE([int8_t], ,
@@ -980,6 +970,19 @@ if test "$ac_lbl_inttypes_h_defines_formats" = no; then
 	])
     ])
 fi
+
+#
+# Check for some headers introduced in later versions of libpcap
+# and used by some printers.
+#
+# Those headers use the {u_}intN_t types, so we must do this after
+# we check for what's needed to get them defined.
+#
+savedcppflags="$CPPFLAGS"
+CPPFLAGS="$CPPFLAGS $V_INCLS"
+AC_CHECK_HEADERS(pcap/bluetooth.h,,,[#include "tcpdump-stdinc.h"])
+AC_CHECK_HEADERS(pcap/usb.h,,,[#include "tcpdump-stdinc.h"])
+CPPFLAGS="$savedcppflags"
 
 AC_PROG_RANLIB
 
