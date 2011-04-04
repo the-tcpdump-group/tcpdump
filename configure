@@ -1846,7 +1846,7 @@ fi
     V_CCOPT="-O"
     V_INCLS=""
     if test "${srcdir}" != "." ; then
-	    V_INCLS="-I\$(srcdir)"
+	    V_INCLS="-I$srcdir"
     fi
     if test "${CFLAGS+set}" = set; then
 	    LBL_CFLAGS="$CFLAGS"
@@ -12066,8 +12066,8 @@ echo "$as_me: error: SSLeay not found" >&2;}
 fi
 
 if test "$missing_includes" = "yes"; then
-	CPPFLAGS="$CPPFLAGS -I\$(srcdir)/missing"
-	V_INCLS="$V_INCLS -I\$(srcdir)/missing"
+	CPPFLAGS="$CPPFLAGS -I$srcdir/missing"
+	V_INCLS="$V_INCLS -I$srcdir/missing"
 fi
 
 

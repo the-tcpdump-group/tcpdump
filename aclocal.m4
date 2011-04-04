@@ -47,7 +47,7 @@ AC_DEFUN(AC_LBL_C_INIT_BEFORE_CC,
     $1="-O"
     $2=""
     if test "${srcdir}" != "." ; then
-	    $2="-I\$(srcdir)"
+	    $2="-I$srcdir"
     fi
     if test "${CFLAGS+set}" = set; then
 	    LBL_CFLAGS="$CFLAGS"

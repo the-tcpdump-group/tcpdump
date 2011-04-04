@@ -1082,8 +1082,8 @@ fi
 dnl
 dnl set additional include path if necessary
 if test "$missing_includes" = "yes"; then
-	CPPFLAGS="$CPPFLAGS -I\$(srcdir)/missing"
-	V_INCLS="$V_INCLS -I\$(srcdir)/missing"
+	CPPFLAGS="$CPPFLAGS -I$srcdir/missing"
+	V_INCLS="$V_INCLS -I$srcdir/missing"
 fi
 
 AC_SUBST(V_CCOPT)
