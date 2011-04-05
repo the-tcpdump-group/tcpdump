@@ -1477,6 +1477,8 @@ print_radiotap_field(struct cpack_state *s, u_int32_t bit, u_int8_t *flags)
 	switch (bit) {
 	case IEEE80211_RADIOTAP_FLAGS:
 		rc = cpack_uint8(s, &u.u8);
+		if (rc != 0)
+			break;
 		*flags = u.u8;
 		break;
 	case IEEE80211_RADIOTAP_RATE:
