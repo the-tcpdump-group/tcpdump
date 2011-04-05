@@ -1677,11 +1677,11 @@ ieee802_11_radio_print(const u_char *p, u_int length, u_int caplen)
 		}
 	}
 
+out:
 	if (flags & IEEE80211_RADIOTAP_F_DATAPAD)
 		pad = 1;	/* Atheros padding */
 	if (flags & IEEE80211_RADIOTAP_F_FCS)
 		fcslen = 4;	/* FCS at end of packet */
-out:
 	return len + ieee802_11_print(p + len, length - len, caplen - len, pad,
 	    fcslen);
 #undef BITNO_32
