@@ -269,6 +269,7 @@ static int
 parse_elements(struct mgmt_body_t *pbody, const u_char *p, int offset,
     u_int length)
 {
+	u_int elementlen;
 	struct ssid_t ssid;
 	struct challenge_t challenge;
 	struct rates_t rates;
@@ -487,12 +488,13 @@ parse_elements(struct mgmt_body_t *pbody, const u_char *p, int offset,
 				return 0;
 			if (length < 2)
 				return 0;
-			if (!TTEST2(*(p + offset + 2), *(p + offset + 1)))
+			elementlen = *(p + offset + 1);
+			if (!TTEST2(*(p + offset + 2), elementlen))
 				return 0;
-			if (length < (u_int)(*(p + offset + 1) + 2))
+			if (length < elementlen + 2)
 				return 0;
-			offset += *(p + offset + 1) + 2;
-			length -= *(p + offset + 1) + 2;
+			offset += elementlen + 2;
+			length -= elementlen + 2;
 			break;
 		}
 	}
