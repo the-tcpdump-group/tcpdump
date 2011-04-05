@@ -274,7 +274,8 @@ sflow_print(const u_char *pptr, u_int len) {
     const u_char *tptr;
     int tlen;
     u_int32_t sflow_sample_type, sflow_sample_len;
-    int nsamples, nrecords, counter_len, counter_type, flow_len, flow_type;
+    u_int32_t nsamples, nrecords;
+    u_int32_t counter_len, counter_type, flow_len, flow_type;
 
     tptr=pptr;
     tlen = len;
@@ -313,16 +314,18 @@ sflow_print(const u_char *pptr, u_int len) {
            len);
 
     /* skip Common header */
-    tptr+=sizeof(const struct sflow_datagram_t);
-    tlen-=sizeof(const struct sflow_datagram_t);
+    tptr += sizeof(const struct sflow_datagram_t);
+    tlen -= sizeof(const struct sflow_datagram_t);
 
     while (nsamples > 0 && tlen > 0) {
         sflow_sample = (const struct sflow_sample_header *)tptr;
+        TCHECK(*sflow_sample);
+
         sflow_sample_type = (EXTRACT_32BITS(sflow_sample->format)&0x0FFF);
         sflow_sample_len = EXTRACT_32BITS(sflow_sample->len);
 
-        tptr+=sizeof(struct sflow_sample_header);
-        tlen-=sizeof(struct sflow_sample_header);
+        tptr += sizeof(struct sflow_sample_header);
+        tlen -= sizeof(struct sflow_sample_header);
   
         printf("\n\t%s (%u), length %u,",
                tok2str(sflow_format_values, "Unknown", sflow_sample_type),
@@ -335,8 +338,7 @@ sflow_print(const u_char *pptr, u_int len) {
         }
 
         /* did we capture enough for fully decoding the sample ? */
-        if (!TTEST2(*tptr, sflow_sample_len)) 
-            goto trunc;
+        TCHECK2(*tptr, sflow_sample_len);
 
 	switch(sflow_sample_type) {
         case SFLOW_FLOW_SAMPLE:				/* XXX */
@@ -346,6 +348,10 @@ sflow_print(const u_char *pptr, u_int len) {
             break;
 
         case SFLOW_EXPANDED_FLOW_SAMPLE:
+            /* does the header run past the end of the sample? */
+            if (sflow_sample_len < sizeof(struct sflow_expanded_flow_sample_t))
+                goto trunc;
+
             sflow_expanded_flow_sample = (const struct sflow_expanded_flow_sample_t *)tptr;
             nrecords = EXTRACT_32BITS(sflow_expanded_flow_sample->records);
 
@@ -358,12 +364,15 @@ sflow_print(const u_char *pptr, u_int len) {
                    EXTRACT_32BITS(sflow_expanded_flow_sample->drops),
                    EXTRACT_32BITS(sflow_expanded_flow_sample->records));
 
-            tptr+= sizeof(struct sflow_expanded_flow_sample_t);
-            tlen-= sizeof(struct sflow_expanded_flow_sample_t);
+            tptr += sizeof(struct sflow_expanded_flow_sample_t);
+            tlen -= sizeof(struct sflow_expanded_flow_sample_t);
+            sflow_sample_len-= sizeof(struct sflow_expanded_flow_sample_t);
 	
             while ( nrecords > 0 && tlen > 0) {
-				
-                /* decode Flow record - 2 bytes */
+                if (sflow_sample_len < 8)
+                    goto trunc;
+
+                /* decode Flow record */
                 flow_type = EXTRACT_32BITS(tptr)&0x0FFF;
                 flow_len = EXTRACT_32BITS(tptr+4);
                 printf("\n\t  %s (%u) length %u",
@@ -373,13 +382,17 @@ sflow_print(const u_char *pptr, u_int len) {
 
                 tptr += 8;
                 tlen -= 8;
+                sflow_sample_len -= 8;
 
-                /* did we capture enough for fully decoding the flow ? */
-                if (!TTEST2(*tptr, flow_len))
+                /* does the flow run past the end of the sample? */
+                if (sflow_sample_len < flow_len)
                     goto trunc;
 
                 switch(flow_type) {
                 case SFLOW_FLOW_RAW_PACKET:
+                    if (flow_len < sizeof (struct sflow_expanded_flow_raw_t))
+                        goto trunc;
+
                     sflow_flow_raw = (const struct sflow_expanded_flow_raw_t *)tptr;
                     printf("\n\t    protocol %s (%u), length %u, stripped bytes %u, header_size %u",
                            tok2str(sflow_flow_raw_protocol_values,"Unknown",EXTRACT_32BITS(sflow_flow_raw->protocol)),
@@ -408,6 +421,7 @@ sflow_print(const u_char *pptr, u_int len) {
                 case SFLOW_FLOW_EXTENDED_MPLS_LVP_FEC:
                 case SFLOW_FLOW_EXTENDED_VLAN_TUNNEL:
                     break;
+
                 default:
                     if (vflag <= 1)
                         print_unknown_data(tptr, "\n\t      ", flow_len);
@@ -416,11 +430,16 @@ sflow_print(const u_char *pptr, u_int len) {
                 }
                 tptr += flow_len;
                 tlen -= flow_len;
+                sflow_sample_len -= flow_len;
                 nrecords--;
             }
             break;
 
         case SFLOW_EXPANDED_COUNTER_SAMPLE:
+            /* does the header run past the end of the sample? */
+            if (sflow_sample_len < sizeof(struct sflow_expanded_counter_sample_t))
+                goto trunc;
+
             sflow_expanded_counter_sample = (const struct sflow_expanded_counter_sample_t *)tptr;
             nrecords = EXTRACT_32BITS(sflow_expanded_counter_sample->records);
 
@@ -430,12 +449,15 @@ sflow_print(const u_char *pptr, u_int len) {
                    EXTRACT_32BITS(sflow_expanded_counter_sample->index),
                    nrecords);
 
-            tptr+= sizeof(struct sflow_expanded_counter_sample_t);
-            tlen-= sizeof(struct sflow_expanded_counter_sample_t);
+            tptr += sizeof(struct sflow_expanded_counter_sample_t);
+            tlen -= sizeof(struct sflow_expanded_counter_sample_t);
+            sflow_sample_len -= sizeof(struct sflow_expanded_counter_sample_t);
 
             while ( nrecords > 0 && tlen > 0) {
+                if (sflow_sample_len < 8)
+                    goto trunc;
 
-                /* decode counter record - 2 bytes */
+                /* decode counter record */
                 counter_type = EXTRACT_32BITS(tptr)&0x0FFF;			
                 counter_len = EXTRACT_32BITS(tptr+4);
                 printf("\n\t    %s (%u) length %u",
@@ -445,13 +467,17 @@ sflow_print(const u_char *pptr, u_int len) {
 
                 tptr += 8;
                 tlen -= 8;
+                sflow_sample_len -= 8;
 
-                /* did we capture enough for fully decoding the counter ? */
-                if (!TTEST2(*tptr, counter_len))
+                /* does the counter run past the end of the sample? */
+                if (sflow_sample_len < counter_len)
                     goto trunc;
 
                 switch(counter_type) {
                 case SFLOW_COUNTER_GENERIC:			
+                    if (counter_len < sizeof (struct sflow_generic_counter_t))
+                        goto trunc;
+
                     sflow_gen_counter = (const struct sflow_generic_counter_t *)tptr;
                     printf("\n\t      ifindex %u, iftype %u, ifspeed %u, ifdirection %u (%s)",
                            EXTRACT_32BITS(sflow_gen_counter->ifindex),
@@ -485,7 +511,11 @@ sflow_print(const u_char *pptr, u_int len) {
                            EXTRACT_32BITS(sflow_gen_counter->ifouterrors),
                            EXTRACT_32BITS(sflow_gen_counter->ifpromiscmode));
                     break;
+
                 case SFLOW_COUNTER_ETHERNET:
+                    if (counter_len < sizeof (struct sflow_ethernet_counter_t))
+                        goto trunc;
+
                     sflow_eth_counter = (const struct sflow_ethernet_counter_t *)tptr;
                     printf("\n\t      align errors %u, fcs errors %u, single collision %u, multiple collision %u, test error %u",
                            EXTRACT_32BITS(sflow_eth_counter->alignerrors),
@@ -504,9 +534,14 @@ sflow_print(const u_char *pptr, u_int len) {
                            EXTRACT_32BITS(sflow_eth_counter->mac_receive_errors),
                            EXTRACT_32BITS(sflow_eth_counter->symbol_errors));
                     break;
+
                 case SFLOW_COUNTER_TOKEN_RING:			/* XXX */
                     break;
+
                 case SFLOW_COUNTER_BASEVG:
+                    if (counter_len < sizeof (struct sflow_100basevg_counter_t))
+                        goto trunc;
+
                     sflow_100basevg_counter = (const struct sflow_100basevg_counter_t *)tptr;
                     printf("\n\t      in high prio frames %u, in high prio octets %" PRIu64,
                            EXTRACT_32BITS(sflow_100basevg_counter->in_highpriority_frames),
@@ -531,7 +566,11 @@ sflow_print(const u_char *pptr, u_int len) {
                            EXTRACT_64BITS(sflow_100basevg_counter->hc_in_normpriority_octets),
                            EXTRACT_64BITS(sflow_100basevg_counter->hc_out_highpriority_octets));
                     break;
+
                 case SFLOW_COUNTER_VLAN:
+                    if (counter_len < sizeof (struct sflow_vlan_counter_t))
+                        goto trunc;
+
                     sflow_vlan_counter = (const struct sflow_vlan_counter_t *)tptr;
                     printf("\n\t      vlan_id %u, octets %" PRIu64
                            ", unicast_pkt %u, multicast_pkt %u, broadcast_pkt %u, discards %u",
@@ -542,8 +581,10 @@ sflow_print(const u_char *pptr, u_int len) {
                            EXTRACT_32BITS(sflow_vlan_counter->broadcast_pkt),
                            EXTRACT_32BITS(sflow_vlan_counter->discards));
                     break;
+
                 case SFLOW_COUNTER_PROCESSOR:			/* XXX */
                     break;
+
                 default:
                     if (vflag <= 1)
                         print_unknown_data(tptr, "\n\t\t", counter_len);
@@ -551,9 +592,11 @@ sflow_print(const u_char *pptr, u_int len) {
                 }
                 tptr += counter_len;
                 tlen -= counter_len;
+                sflow_sample_len -= counter_len;
                 nrecords--;
             }
             break;
+
         default:
             if (vflag <= 1)
                 print_unknown_data(tptr, "\n\t    ", sflow_sample_len);
