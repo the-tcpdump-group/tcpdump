@@ -170,6 +170,13 @@ struct sflow_expanded_flow_raw_t {
     u_int8_t    header_size[4];
 };
 
+struct sflow_ethernet_frame_t {
+    u_int8_t length[4];
+    u_int8_t src_mac[8];
+    u_int8_t dst_mac[8];
+    u_int8_t type[4];
+};
+
 struct sflow_extended_switch_data_t {
     u_int8_t src_vlan[4];
     u_int8_t src_pri[4];
@@ -468,6 +475,7 @@ sflow_print_counter_records(const u_char *pointer, u_int len, u_int records) {
     u_int tlen;
     u_int counter_type;
     u_int counter_len;
+    u_int enterprise;
     const struct sflow_counter_record_t *sflow_counter_record;
 
     nrecords = records;
@@ -480,10 +488,13 @@ sflow_print_counter_records(const u_char *pointer, u_int len, u_int records) {
 	    return 1;
 	sflow_counter_record = (const struct sflow_counter_record_t *)tptr;
 
-	counter_type = EXTRACT_32BITS(sflow_counter_record->format);
+	enterprise = EXTRACT_32BITS(sflow_counter_record->format);
+	counter_type = enterprise & 0x0FFF;
+	enterprise = enterprise >> 20;
 	counter_len  = EXTRACT_32BITS(sflow_counter_record->length);
-	printf("\n\t    %s (%u) length %u",
-	       tok2str(sflow_counter_type_values,"Unknown",counter_type),
+	printf("\n\t    enterprise %u, %s (%u) length %u",
+	       enterprise,
+	       (enterprise == 0) ? tok2str(sflow_counter_type_values,"Unknown",counter_type) : "Unknown",
 	       counter_type,
 	       counter_len);
 
@@ -492,36 +503,37 @@ sflow_print_counter_records(const u_char *pointer, u_int len, u_int records) {
 
 	if (tlen < counter_len)
 	    return 1;
-
-	switch (counter_type) {
-	case SFLOW_COUNTER_GENERIC:
-	    if (print_sflow_counter_generic(tptr,tlen))
-		return 1;
-	    break;
-	case SFLOW_COUNTER_ETHERNET:
-	    if (print_sflow_counter_ethernet(tptr,tlen))
-		return 1;
-	    break;
-	case SFLOW_COUNTER_TOKEN_RING:
-	    if (print_sflow_counter_token_ring(tptr,tlen))
-		return 1;
-	    break;
-	case SFLOW_COUNTER_BASEVG:
-	    if (print_sflow_counter_basevg(tptr,tlen))
-		return 1;
-	    break;
-	case SFLOW_COUNTER_VLAN:
-	    if (print_sflow_counter_vlan(tptr,tlen))
-		return 1;
-	    break;
-	case SFLOW_COUNTER_PROCESSOR:
-	    if (print_sflow_counter_processor(tptr,tlen))
-		return 1;
-	    break;
-	default:
-	    if (vflag <= 1)
-		print_unknown_data(tptr, "\n\t\t", counter_len);
-	    break;
+	if (enterprise == 0) {
+	    switch (counter_type) {
+	    case SFLOW_COUNTER_GENERIC:
+		if (print_sflow_counter_generic(tptr,tlen))
+		    return 1;
+		break;
+	    case SFLOW_COUNTER_ETHERNET:
+		if (print_sflow_counter_ethernet(tptr,tlen))
+		    return 1;
+		break;
+	    case SFLOW_COUNTER_TOKEN_RING:
+		if (print_sflow_counter_token_ring(tptr,tlen))
+		    return 1;
+		break;
+	    case SFLOW_COUNTER_BASEVG:
+		if (print_sflow_counter_basevg(tptr,tlen))
+		    return 1;
+		break;
+	    case SFLOW_COUNTER_VLAN:
+		if (print_sflow_counter_vlan(tptr,tlen))
+		    return 1;
+		break;
+	    case SFLOW_COUNTER_PROCESSOR:
+		if (print_sflow_counter_processor(tptr,tlen))
+		    return 1;
+		break;
+	    default:
+		if (vflag <= 1)
+		    print_unknown_data(tptr, "\n\t\t", counter_len);
+		break;
+	    }
 	}
 	tptr += counter_len;
 	tlen -= counter_len;
@@ -613,6 +625,22 @@ print_sflow_raw_packet(const u_char *pointer, u_int len) {
     return 0;
 }
 
+static int
+print_sflow_ethernet_frame(const u_char *pointer, u_int len) {
+
+    const struct sflow_ethernet_frame_t *sflow_ethernet_frame;
+
+    if (len < sizeof(struct sflow_ethernet_frame_t))
+	return 1;
+
+    sflow_ethernet_frame = (const struct sflow_ethernet_frame_t *)pointer;
+
+    printf("\n\t      frame len %u, type %u",
+	   EXTRACT_32BITS(sflow_ethernet_frame->length),
+	   EXTRACT_32BITS(sflow_ethernet_frame->type));
+
+    return 0;
+}
 
 static int
 print_sflow_extended_switch_data(const u_char *pointer, u_int len) {
@@ -639,6 +667,7 @@ sflow_print_flow_records(const u_char *pointer, u_int len, u_int records) {
     const u_char *tptr;
     u_int tlen;
     u_int flow_type;
+    u_int enterprise;
     u_int flow_len;
     const struct sflow_flow_record_t *sflow_flow_record;
 
@@ -653,10 +682,16 @@ sflow_print_flow_records(const u_char *pointer, u_int len, u_int records) {
 
 	sflow_flow_record = (const struct sflow_flow_record_t *)tptr;
 
-	flow_type = EXTRACT_32BITS(sflow_flow_record->format) & 0x0FFF;
+	/* so, the funky encoding means we cannot blythly mask-off
+	   bits, we must also check the enterprise. */
+	
+	enterprise = EXTRACT_32BITS(sflow_flow_record->format);
+	flow_type = enterprise & 0x0FFF;
+	enterprise = enterprise >> 12;
 	flow_len  = EXTRACT_32BITS(sflow_flow_record->length);
-	printf("\n\t    %s (%u) length %u",
-	       tok2str(sflow_flow_type_values,"Unknown",flow_type),
+	printf("\n\t    enterprise %u %s (%u) length %u",
+	       enterprise,
+	       (enterprise == 0) ? tok2str(sflow_flow_type_values,"Unknown",flow_type) : "Unknown",
 	       flow_type,
 	       flow_len);
 
@@ -666,35 +701,40 @@ sflow_print_flow_records(const u_char *pointer, u_int len, u_int records) {
 	if (tlen < flow_len)
 	    return 1;
 
-	switch (flow_type) {
-	case SFLOW_FLOW_RAW_PACKET:
-	    if (print_sflow_raw_packet(tptr,tlen))
-		return 1;
-	    break;
-	case SFLOW_FLOW_EXTENDED_SWITCH_DATA:
-	    if (print_sflow_extended_switch_data(tptr,tlen))
-		return 1;
-	    break;
-	    /* FIXME these need a decoder */
-	case SFLOW_FLOW_ETHERNET_FRAME:
-	case SFLOW_FLOW_IPV4_DATA:
-	case SFLOW_FLOW_IPV6_DATA:
-	case SFLOW_FLOW_EXTENDED_ROUTER_DATA:
-	case SFLOW_FLOW_EXTENDED_GATEWAY_DATA:
-	case SFLOW_FLOW_EXTENDED_USER_DATA:
-	case SFLOW_FLOW_EXTENDED_URL_DATA:
-	case SFLOW_FLOW_EXTENDED_MPLS_DATA:
-	case SFLOW_FLOW_EXTENDED_NAT_DATA:
-	case SFLOW_FLOW_EXTENDED_MPLS_TUNNEL:
-	case SFLOW_FLOW_EXTENDED_MPLS_VC:
-	case SFLOW_FLOW_EXTENDED_MPLS_FEC:
-	case SFLOW_FLOW_EXTENDED_MPLS_LVP_FEC:
-	case SFLOW_FLOW_EXTENDED_VLAN_TUNNEL:
-	    break;
-	default:
-	    if (vflag <= 1)
-		print_unknown_data(tptr, "\n\t\t", flow_len);
-	    break;
+	if (enterprise == 0) {
+	    switch (flow_type) {
+	    case SFLOW_FLOW_RAW_PACKET:
+		if (print_sflow_raw_packet(tptr,tlen))
+		    return 1;
+		break;
+	    case SFLOW_FLOW_EXTENDED_SWITCH_DATA:
+		if (print_sflow_extended_switch_data(tptr,tlen))
+		    return 1;
+		break;
+	    case SFLOW_FLOW_ETHERNET_FRAME:
+		if (print_sflow_ethernet_frame(tptr,tlen))
+		    return 1;
+		break;
+		/* FIXME these need a decoder */
+	    case SFLOW_FLOW_IPV4_DATA:
+	    case SFLOW_FLOW_IPV6_DATA:
+	    case SFLOW_FLOW_EXTENDED_ROUTER_DATA:
+	    case SFLOW_FLOW_EXTENDED_GATEWAY_DATA:
+	    case SFLOW_FLOW_EXTENDED_USER_DATA:
+	    case SFLOW_FLOW_EXTENDED_URL_DATA:
+	    case SFLOW_FLOW_EXTENDED_MPLS_DATA:
+	    case SFLOW_FLOW_EXTENDED_NAT_DATA:
+	    case SFLOW_FLOW_EXTENDED_MPLS_TUNNEL:
+	    case SFLOW_FLOW_EXTENDED_MPLS_VC:
+	    case SFLOW_FLOW_EXTENDED_MPLS_FEC:
+	    case SFLOW_FLOW_EXTENDED_MPLS_LVP_FEC:
+	    case SFLOW_FLOW_EXTENDED_VLAN_TUNNEL:
+		break;
+	    default:
+		if (vflag <= 1)
+		    print_unknown_data(tptr, "\n\t\t", flow_len);
+		break;
+	    }
 	}
 	tptr += flow_len;
 	tlen -= flow_len;
@@ -724,10 +764,15 @@ sflow_print_flow_sample(const u_char *pointer, u_int len) {
     type = typesource >> 24;
     index = typesource & 0x0FFF;
 
-    printf(" seqnum %u, type %u, idx %u, records %u",
+    printf(" seqnum %u, type %u, idx %u, rate %u, pool %u, drops %u, input %u output %u records %u",
 	   EXTRACT_32BITS(sflow_flow_sample->seqnum),
 	   type,
 	   index,
+	   EXTRACT_32BITS(sflow_flow_sample->rate),
+	   EXTRACT_32BITS(sflow_flow_sample->pool),
+	   EXTRACT_32BITS(sflow_flow_sample->drops),
+	   EXTRACT_32BITS(sflow_flow_sample->in_interface),
+	   EXTRACT_32BITS(sflow_flow_sample->out_interface),
 	   nrecords);
 
     return sflow_print_flow_records(pointer + sizeof(struct sflow_flow_sample_t),
