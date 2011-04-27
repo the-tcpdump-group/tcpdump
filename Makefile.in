@@ -279,6 +279,7 @@ EXTRA_DIST = \
 	tests/eapon1.out \
 	tests/eapon1.puu \
 	tests/eapon2.puu \
+	tests/empty.uu \
 	tests/esp-secrets.txt \
 	tests/esp0.out \
 	tests/esp1.gdbinit \
@@ -420,7 +421,7 @@ distclean:
 	rm -rf autom4te.cache
 
 check: tcpdump
-	uudecode --help || (echo "No uudecode program found, not running tests"; echo "apt-get/rpm install sharutils?"; exit 1)
+	uudecode <tests/empty.uu || (echo "No uudecode program found, not running tests"; echo "apt-get/rpm install sharutils?"; exit 1)
 	(cd tests && ./TESTrun.sh)
 
 tags: $(TAGFILES)
