@@ -46,6 +46,15 @@ static const char rcsid[] _U_ =
 #include "ieee802_11.h"
 #include "ieee802_11_radio.h"
 
+/* Radiotap state */
+/*  This is used to save state when parsing/processing parameters */
+struct radiotap_state
+{
+	u_int32_t	present;
+
+	u_int8_t	rate;
+};
+
 #define PRINT_SSID(p) \
 	if (p.ssid_present) { \
 		printf(" ("); \
@@ -74,26 +83,403 @@ static const char rcsid[] _U_ =
 	printf("%s", \
 	    CAPABILITY_PRIVACY(p.capability_info) ? ", PRIVACY" : "" );
 
-static const int ieee80211_htrates[16] = {
-	13,		/* IFM_IEEE80211_MCS0 */
-	26,		/* IFM_IEEE80211_MCS1 */
-	39,		/* IFM_IEEE80211_MCS2 */
-	52,		/* IFM_IEEE80211_MCS3 */
-	78,		/* IFM_IEEE80211_MCS4 */
-	104,		/* IFM_IEEE80211_MCS5 */
-	117,		/* IFM_IEEE80211_MCS6 */
-	130,		/* IFM_IEEE80211_MCS7 */
-	26,		/* IFM_IEEE80211_MCS8 */
-	52,		/* IFM_IEEE80211_MCS9 */
-	78,		/* IFM_IEEE80211_MCS10 */
-	104,		/* IFM_IEEE80211_MCS11 */
-	156,		/* IFM_IEEE80211_MCS12 */
-	208,		/* IFM_IEEE80211_MCS13 */
-	234,		/* IFM_IEEE80211_MCS14 */
-	260,		/* IFM_IEEE80211_MCS15 */
+#define MAX_MCS_INDEX	76
+
+/*
+ * Indices are:
+ *
+ *	the MCS index (0-76);
+ *
+ *	0 for 20 MHz, 1 for 40 MHz;
+ *
+ *	0 for a long guard interval, 1 for a short guard interval.
+ */
+static const float ieee80211_float_htrates[MAX_MCS_INDEX+1][2][2] = {
+	/* MCS  0  */
+	{	/* 20 Mhz */ {    6.5,		/* SGI */    7.2, },
+		/* 40 Mhz */ {   13.5,		/* SGI */   15.0, },
+	},
+
+	/* MCS  1  */
+	{	/* 20 Mhz */ {   13.0,		/* SGI */   14.4, },
+		/* 40 Mhz */ {   27.0,		/* SGI */   30.0, },
+	},
+
+	/* MCS  2  */
+	{	/* 20 Mhz */ {   19.5,		/* SGI */   21.7, },
+		/* 40 Mhz */ {   40.5,		/* SGI */   45.0, },
+	},
+
+	/* MCS  3  */
+	{	/* 20 Mhz */ {   26.0,		/* SGI */   28.9, },
+		/* 40 Mhz */ {   54.0,		/* SGI */   60.0, },
+	},
+
+	/* MCS  4  */
+	{	/* 20 Mhz */ {   39.0,		/* SGI */   43.3, },
+		/* 40 Mhz */ {   81.0,		/* SGI */   90.0, },
+	},
+
+	/* MCS  5  */
+	{	/* 20 Mhz */ {   52.0,		/* SGI */   57.8, },
+		/* 40 Mhz */ {  108.0,		/* SGI */  120.0, },
+	},
+
+	/* MCS  6  */
+	{	/* 20 Mhz */ {   58.5,		/* SGI */   65.0, },
+		/* 40 Mhz */ {  121.5,		/* SGI */  135.0, },
+	},
+
+	/* MCS  7  */
+	{	/* 20 Mhz */ {   65.0,		/* SGI */   72.2, },
+		/* 40 Mhz */ {   135.0,		/* SGI */  150.0, },
+	},
+
+	/* MCS  8  */
+	{	/* 20 Mhz */ {   13.0,		/* SGI */   14.4, },
+		/* 40 Mhz */ {   27.0,		/* SGI */   30.0, },
+	},
+
+	/* MCS  9  */
+	{	/* 20 Mhz */ {   26.0,		/* SGI */   28.9, },
+		/* 40 Mhz */ {   54.0,		/* SGI */   60.0, },
+	},
+
+	/* MCS 10  */
+	{	/* 20 Mhz */ {   39.0,		/* SGI */   43.3, },
+		/* 40 Mhz */ {   81.0,		/* SGI */   90.0, },
+	},
+
+	/* MCS 11  */
+	{	/* 20 Mhz */ {   52.0,		/* SGI */   57.8, },
+		/* 40 Mhz */ {  108.0,		/* SGI */  120.0, },
+	},
+
+	/* MCS 12  */
+	{	/* 20 Mhz */ {   78.0,		/* SGI */   86.7, },
+		/* 40 Mhz */ {  162.0,		/* SGI */  180.0, },
+	},
+
+	/* MCS 13  */
+	{	/* 20 Mhz */ {  104.0,		/* SGI */  115.6, },
+		/* 40 Mhz */ {  216.0,		/* SGI */  240.0, },
+	},
+
+	/* MCS 14  */
+	{	/* 20 Mhz */ {  117.0,		/* SGI */  130.0, },
+		/* 40 Mhz */ {  243.0,		/* SGI */  270.0, },
+	},
+
+	/* MCS 15  */
+	{	/* 20 Mhz */ {  130.0,		/* SGI */  144.4, },
+		/* 40 Mhz */ {  270.0,		/* SGI */  300.0, },
+	},
+
+	/* MCS 16  */
+	{	/* 20 Mhz */ {   19.5,		/* SGI */   21.7, },
+		/* 40 Mhz */ {   40.5,		/* SGI */   45.0, },
+	},
+
+	/* MCS 17  */
+	{	/* 20 Mhz */ {   39.0,		/* SGI */   43.3, },
+		/* 40 Mhz */ {   81.0,		/* SGI */   90.0, },
+	},
+
+	/* MCS 18  */
+	{	/* 20 Mhz */ {   58.5,		/* SGI */   65.0, },
+		/* 40 Mhz */ {  121.5,		/* SGI */  135.0, },
+	},
+
+	/* MCS 19  */
+	{	/* 20 Mhz */ {   78.0,		/* SGI */   86.7, },
+		/* 40 Mhz */ {  162.0,		/* SGI */  180.0, },
+	},
+
+	/* MCS 20  */
+	{	/* 20 Mhz */ {  117.0,		/* SGI */  130.0, },
+		/* 40 Mhz */ {  243.0,		/* SGI */  270.0, },
+	},
+
+	/* MCS 21  */
+	{	/* 20 Mhz */ {  156.0,		/* SGI */  173.3, },
+		/* 40 Mhz */ {  324.0,		/* SGI */  360.0, },
+	},
+
+	/* MCS 22  */
+	{	/* 20 Mhz */ {  175.5,		/* SGI */  195.0, },
+		/* 40 Mhz */ {  364.5,		/* SGI */  405.0, },
+	},
+
+	/* MCS 23  */
+	{	/* 20 Mhz */ {  195.0,		/* SGI */  216.7, },
+		/* 40 Mhz */ {  405.0,		/* SGI */  450.0, },
+	},
+
+	/* MCS 24  */
+	{	/* 20 Mhz */ {   26.0,		/* SGI */   28.9, },
+		/* 40 Mhz */ {   54.0,		/* SGI */   60.0, },
+	},
+
+	/* MCS 25  */
+	{	/* 20 Mhz */ {   52.0,		/* SGI */   57.8, },
+		/* 40 Mhz */ {  108.0,		/* SGI */  120.0, },
+	},
+
+	/* MCS 26  */
+	{	/* 20 Mhz */ {   78.0,		/* SGI */   86.7, },
+		/* 40 Mhz */ {  162.0,		/* SGI */  180.0, },
+	},
+
+	/* MCS 27  */
+	{	/* 20 Mhz */ {  104.0,		/* SGI */  115.6, },
+		/* 40 Mhz */ {  216.0,		/* SGI */  240.0, },
+	},
+
+	/* MCS 28  */
+	{	/* 20 Mhz */ {  156.0,		/* SGI */  173.3, },
+		/* 40 Mhz */ {  324.0,		/* SGI */  360.0, },
+	},
+
+	/* MCS 29  */
+	{	/* 20 Mhz */ {  208.0,		/* SGI */  231.1, },
+		/* 40 Mhz */ {  432.0,		/* SGI */  480.0, },
+	},
+
+	/* MCS 30  */
+	{	/* 20 Mhz */ {  234.0,		/* SGI */  260.0, },
+		/* 40 Mhz */ {  486.0,		/* SGI */  540.0, },
+	},
+
+	/* MCS 31  */
+	{	/* 20 Mhz */ {  260.0,		/* SGI */  288.9, },
+		/* 40 Mhz */ {  540.0,		/* SGI */  600.0, },
+	},
+
+	/* MCS 32  */
+	{	/* 20 Mhz */ {    0.0,		/* SGI */    0.0, }, /* not valid */
+		/* 40 Mhz */ {    6.0,		/* SGI */    6.7, },
+	},
+
+	/* MCS 33  */
+	{	/* 20 Mhz */ {   39.0,		/* SGI */   43.3, },
+		/* 40 Mhz */ {   81.0,		/* SGI */   90.0, },
+	},
+
+	/* MCS 34  */
+	{	/* 20 Mhz */ {   52.0,		/* SGI */   57.8, },
+		/* 40 Mhz */ {  108.0,		/* SGI */  120.0, },
+	},
+
+	/* MCS 35  */
+	{	/* 20 Mhz */ {   65.0,		/* SGI */   72.2, },
+		/* 40 Mhz */ {  135.0,		/* SGI */  150.0, },
+	},
+
+	/* MCS 36  */
+	{	/* 20 Mhz */ {   58.5,		/* SGI */   65.0, },
+		/* 40 Mhz */ {  121.5,		/* SGI */  135.0, },
+	},
+
+	/* MCS 37  */
+	{	/* 20 Mhz */ {   78.0,		/* SGI */   86.7, },
+		/* 40 Mhz */ {  162.0,		/* SGI */  180.0, },
+	},
+
+	/* MCS 38  */
+	{	/* 20 Mhz */ {   97.5,		/* SGI */  108.3, },
+		/* 40 Mhz */ {  202.5,		/* SGI */  225.0, },
+	},
+
+	/* MCS 39  */
+	{	/* 20 Mhz */ {   52.0,		/* SGI */   57.8, },
+		/* 40 Mhz */ {  108.0,		/* SGI */  120.0, },
+	},
+
+	/* MCS 40  */
+	{	/* 20 Mhz */ {   65.0,		/* SGI */   72.2, },
+		/* 40 Mhz */ {  135.0,		/* SGI */  150.0, },
+	},
+
+	/* MCS 41  */
+	{	/* 20 Mhz */ {   65.0,		/* SGI */   72.2, },
+		/* 40 Mhz */ {  135.0,		/* SGI */  150.0, },
+	},
+
+	/* MCS 42  */
+	{	/* 20 Mhz */ {   78.0,		/* SGI */   86.7, },
+		/* 40 Mhz */ {  162.0,		/* SGI */  180.0, },
+	},
+
+	/* MCS 43  */
+	{	/* 20 Mhz */ {   91.0,		/* SGI */  101.1, },
+		/* 40 Mhz */ {  189.0,		/* SGI */  210.0, },
+	},
+
+	/* MCS 44  */
+	{	/* 20 Mhz */ {   91.0,		/* SGI */  101.1, },
+		/* 40 Mhz */ {  189.0,		/* SGI */  210.0, },
+	},
+
+	/* MCS 45  */
+	{	/* 20 Mhz */ {  104.0,		/* SGI */  115.6, },
+		/* 40 Mhz */ {  216.0,		/* SGI */  240.0, },
+	},
+
+	/* MCS 46  */
+	{	/* 20 Mhz */ {   78.0,		/* SGI */   86.7, },
+		/* 40 Mhz */ {  162.0,		/* SGI */  180.0, },
+	},
+
+	/* MCS 47  */
+	{	/* 20 Mhz */ {   97.5,		/* SGI */  108.3, },
+		/* 40 Mhz */ {  202.5,		/* SGI */  225.0, },
+	},
+
+	/* MCS 48  */
+	{	/* 20 Mhz */ {   97.5,		/* SGI */  108.3, },
+		/* 40 Mhz */ {  202.5,		/* SGI */  225.0, },
+	},
+
+	/* MCS 49  */
+	{	/* 20 Mhz */ {  117.0,		/* SGI */  130.0, },
+		/* 40 Mhz */ {  243.0,		/* SGI */  270.0, },
+	},
+
+	/* MCS 50  */
+	{	/* 20 Mhz */ {  136.5,		/* SGI */  151.7, },
+		/* 40 Mhz */ {  283.5,		/* SGI */  315.0, },
+	},
+
+	/* MCS 51  */
+	{	/* 20 Mhz */ {  136.5,		/* SGI */  151.7, },
+		/* 40 Mhz */ {  283.5,		/* SGI */  315.0, },
+	},
+
+	/* MCS 52  */
+	{	/* 20 Mhz */ {  156.0,		/* SGI */  173.3, },
+		/* 40 Mhz */ {  324.0,		/* SGI */  360.0, },
+	},
+
+	/* MCS 53  */
+	{	/* 20 Mhz */ {   65.0,		/* SGI */   72.2, },
+		/* 40 Mhz */ {  135.0,		/* SGI */  150.0, },
+	},
+
+	/* MCS 54  */
+	{	/* 20 Mhz */ {   78.0,		/* SGI */   86.7, },
+		/* 40 Mhz */ {  162.0,		/* SGI */  180.0, },
+	},
+
+	/* MCS 55  */
+	{	/* 20 Mhz */ {   91.0,		/* SGI */  101.1, },
+		/* 40 Mhz */ {  189.0,		/* SGI */  210.0, },
+	},
+
+	/* MCS 56  */
+	{	/* 20 Mhz */ {   78.0,		/* SGI */   86.7, },
+		/* 40 Mhz */ {  162.0,		/* SGI */  180.0, },
+	},
+
+	/* MCS 57  */
+	{	/* 20 Mhz */ {   91.0,		/* SGI */  101.1, },
+		/* 40 Mhz */ {  189.0,		/* SGI */  210.0, },
+	},
+
+	/* MCS 58  */
+	{	/* 20 Mhz */ {  104.0,		/* SGI */  115.6, },
+		/* 40 Mhz */ {  216.0,		/* SGI */  240.0, },
+	},
+
+	/* MCS 59  */
+	{	/* 20 Mhz */ {  117.0,		/* SGI */  130.0, },
+		/* 40 Mhz */ {  243.0,		/* SGI */  270.0, },
+	},
+
+	/* MCS 60  */
+	{	/* 20 Mhz */ {  104.0,		/* SGI */  115.6, },
+		/* 40 Mhz */ {  216.0,		/* SGI */  240.0, },
+	},
+
+	/* MCS 61  */
+	{	/* 20 Mhz */ {  117.0,		/* SGI */  130.0, },
+		/* 40 Mhz */ {  243.0,		/* SGI */  270.0, },
+	},
+
+	/* MCS 62  */
+	{	/* 20 Mhz */ {  130.0,		/* SGI */  144.4, },
+		/* 40 Mhz */ {  270.0,		/* SGI */  300.0, },
+	},
+
+	/* MCS 63  */
+	{	/* 20 Mhz */ {  130.0,		/* SGI */  144.4, },
+		/* 40 Mhz */ {  270.0,		/* SGI */  300.0, },
+	},
+
+	/* MCS 64  */
+	{	/* 20 Mhz */ {  143.0,		/* SGI */  158.9, },
+		/* 40 Mhz */ {  297.0,		/* SGI */  330.0, },
+	},
+
+	/* MCS 65  */
+	{	/* 20 Mhz */ {   97.5,		/* SGI */  108.3, },
+		/* 40 Mhz */ {  202.5,		/* SGI */  225.0, },
+	},
+
+	/* MCS 66  */
+	{	/* 20 Mhz */ {  117.0,		/* SGI */  130.0, },
+		/* 40 Mhz */ {  243.0,		/* SGI */  270.0, },
+	},
+
+	/* MCS 67  */
+	{	/* 20 Mhz */ {  136.5,		/* SGI */  151.7, },
+		/* 40 Mhz */ {  283.5,		/* SGI */  315.0, },
+	},
+
+	/* MCS 68  */
+	{	/* 20 Mhz */ {  117.0,		/* SGI */  130.0, },
+		/* 40 Mhz */ {  243.0,		/* SGI */  270.0, },
+	},
+
+	/* MCS 69  */
+	{	/* 20 Mhz */ {  136.5,		/* SGI */  151.7, },
+		/* 40 Mhz */ {  283.5,		/* SGI */  315.0, },
+	},
+
+	/* MCS 70  */
+	{	/* 20 Mhz */ {  156.0,		/* SGI */  173.3, },
+		/* 40 Mhz */ {  324.0,		/* SGI */  360.0, },
+	},
+
+	/* MCS 71  */
+	{	/* 20 Mhz */ {  175.5,		/* SGI */  195.0, },
+		/* 40 Mhz */ {  364.5,		/* SGI */  405.0, },
+	},
+
+	/* MCS 72  */
+	{	/* 20 Mhz */ {  156.0,		/* SGI */  173.3, },
+		/* 40 Mhz */ {  324.0,		/* SGI */  360.0, },
+	},
+
+	/* MCS 73  */
+	{	/* 20 Mhz */ {  175.5,		/* SGI */  195.0, },
+		/* 40 Mhz */ {  364.5,		/* SGI */  405.0, },
+	},
+
+	/* MCS 74  */
+	{	/* 20 Mhz */ {  195.0,		/* SGI */  216.7, },
+		/* 40 Mhz */ {  405.0,		/* SGI */  450.0, },
+	},
+
+	/* MCS 75  */
+	{	/* 20 Mhz */ {  195.0,		/* SGI */  216.7, },
+		/* 40 Mhz */ {  405.0,		/* SGI */  450.0, },
+	},
+
+	/* MCS 76  */
+	{	/* 20 Mhz */ {  214.5,		/* SGI */  238.3, },
+		/* 40 Mhz */ {  445.5,		/* SGI */  495.0, },
+	},
 };
-#define PRINT_HT_RATE(_sep, _r, _suf) \
-	printf("%s%.1f%s", _sep, (.5 * ieee80211_htrates[(_r) & 0xf]), _suf)
 
 static const char *auth_alg_text[]={"Open System","Shared Key","EAP"};
 #define NUM_AUTH_ALGS	(sizeof auth_alg_text / sizeof auth_alg_text[0])
@@ -1464,7 +1850,8 @@ print_chaninfo(int freq, int flags)
 }
 
 static int
-print_radiotap_field(struct cpack_state *s, u_int32_t bit, u_int8_t *flags)
+print_radiotap_field(struct cpack_state *s, u_int32_t bit, u_int8_t *flags,
+						struct radiotap_state *state, u_int32_t presentflags)
 {
 	union {
 		int8_t		i8;
@@ -1484,6 +1871,13 @@ print_radiotap_field(struct cpack_state *s, u_int32_t bit, u_int8_t *flags)
 		*flags = u.u8;
 		break;
 	case IEEE80211_RADIOTAP_RATE:
+		rc = cpack_uint8(s, &u.u8);
+		if (rc != 0)
+			break;
+
+		/* Save state rate */
+		state->rate = u.u8;
+		break;
 	case IEEE80211_RADIOTAP_DB_ANTSIGNAL:
 	case IEEE80211_RADIOTAP_DB_ANTNOISE:
 	case IEEE80211_RADIOTAP_ANTENNA:
@@ -1502,6 +1896,7 @@ print_radiotap_field(struct cpack_state *s, u_int32_t bit, u_int8_t *flags)
 	case IEEE80211_RADIOTAP_FHSS:
 	case IEEE80211_RADIOTAP_LOCK_QUALITY:
 	case IEEE80211_RADIOTAP_TX_ATTENUATION:
+	case IEEE80211_RADIOTAP_RX_FLAGS:
 		rc = cpack_uint16(s, &u.u16);
 		break;
 	case IEEE80211_RADIOTAP_DB_TX_ATTENUATION:
@@ -1525,6 +1920,45 @@ print_radiotap_field(struct cpack_state *s, u_int32_t bit, u_int8_t *flags)
 			break;
 		rc = cpack_uint8(s, &u4.u8);
 		break;
+	case IEEE80211_RADIOTAP_MCS:
+		rc = cpack_uint8(s, &u.u8);
+		if (rc != 0)
+			break;
+		rc = cpack_uint8(s, &u2.u8);
+		if (rc != 0)
+			break;
+		rc = cpack_uint8(s, &u3.u8);
+		break;
+	case IEEE80211_RADIOTAP_VENDOR_NAMESPACE: {
+		u_int8_t vns[3];
+		u_int16_t length;
+		u_int8_t subspace;
+
+		if ((cpack_align_and_reserve(s, 2)) == NULL) {
+			rc = -1;
+			break;
+		}
+
+		rc = cpack_uint8(s, &vns[0]);
+		if (rc != 0)
+			break;
+		rc = cpack_uint8(s, &vns[1]);
+		if (rc != 0)
+			break;
+		rc = cpack_uint8(s, &vns[2]);
+		if (rc != 0)
+			break;
+		rc = cpack_uint8(s, &subspace);
+		if (rc != 0)
+			break;
+		rc = cpack_uint16(s, &length);
+		if (rc != 0)
+			break;
+
+		/* Skip up to length */
+		s->c_next += length;
+		break;
+	}
 	default:
 		/* this bit indicates a field whose
 		 * size we do not know, so we cannot
@@ -1539,16 +1973,35 @@ print_radiotap_field(struct cpack_state *s, u_int32_t bit, u_int8_t *flags)
 		return rc;
 	}
 
+	/* Preserve the state present flags */
+	state->present = presentflags;
+
 	switch (bit) {
 	case IEEE80211_RADIOTAP_CHANNEL:
+		/*
+		 * If CHANNEL and XCHANNEL are both present, skip
+		 * CHANNEL.
+		 */
+		if (presentflags & (1 << IEEE80211_RADIOTAP_XCHANNEL))
+			break;
 		print_chaninfo(u.u16, u2.u16);
 		break;
 	case IEEE80211_RADIOTAP_FHSS:
 		printf("fhset %d fhpat %d ", u.u16 & 0xff, (u.u16 >> 8) & 0xff);
 		break;
 	case IEEE80211_RADIOTAP_RATE:
+		/*
+		 * If the 0x80 bit is set, this is a FreeBSD-style
+		 * MCS index.  Print the MCS index, not the rate;
+		 * to correctly determine the rate with an MCS index you
+		 * need the channel width, i.e. 20MHz/40MHz, and you also
+		 * need whether or not the short GI is set or not.
+		 *
+		 * If you want us to print the rate, use
+		 * IEEE80211_RADIOTAP_MCS, not IEEE80211_RADIOTAP_RATE.
+		 */
 		if (u.u8 & 0x80)
-			PRINT_HT_RATE("", u.u8, " Mb/s ");
+			printf("MCS %u ", u.u8 & 0x7f);
 		else
 			PRINT_RATE("", u.u8, " Mb/s ");
 		break;
@@ -1594,9 +2047,89 @@ print_radiotap_field(struct cpack_state *s, u_int32_t bit, u_int8_t *flags)
 	case IEEE80211_RADIOTAP_TSFT:
 		printf("%" PRIu64 "us tsft ", u.u64);
 		break;
+	case IEEE80211_RADIOTAP_RX_FLAGS:
+		/* Do nothing for now */
+		break;
 	case IEEE80211_RADIOTAP_XCHANNEL:
 		print_chaninfo(u2.u16, u.u32);
 		break;
+	case IEEE80211_RADIOTAP_MCS: {
+		static const char *bandwidth[4] = {
+			"20 MHz",
+			"40 MHz",
+			"20 MHz (L)",
+			"20 MHz (U)"
+		};
+		float htrate;
+
+		if (u.u8 & IEEE80211_RADIOTAP_MCS_MCS_INDEX_KNOWN) {
+			/*
+			 * We know the MCS index.
+			 */
+			if (u3.u8 <= MAX_MCS_INDEX) {
+				/*
+				 * And it's in-range.
+				 */
+				if (u.u8 & (IEEE80211_RADIOTAP_MCS_BANDWIDTH_KNOWN|IEEE80211_RADIOTAP_MCS_GUARD_INTERVAL_KNOWN)) {
+					/*
+					 * And we know both the bandwidth and
+					 * the guard interval, so we can look
+					 * up the rate.
+					 */
+					htrate = 
+						ieee80211_float_htrates \
+							[u3.u8] \
+							[((u2.u8 & IEEE80211_RADIOTAP_MCS_BANDWIDTH_MASK) == IEEE80211_RADIOTAP_MCS_BANDWIDTH_40 ? 1 : 0)] \
+							[((u2.u8 & IEEE80211_RADIOTAP_MCS_SHORT_GI) ? 1 : 0)];
+				} else {
+					/*
+					 * We don't know both the bandwidth
+					 * and the guard interval, so we can
+					 * only report the MCS index.
+					 */
+					htrate = 0.0;
+				}
+			} else {
+				/*
+				 * The MCS value is out of range.
+				 */
+				htrate = 0.0;
+			}
+			if (htrate != 0.0) {
+				/*
+				 * We have the rate.
+				 * Print it.
+				 */
+				printf("%.1f Mb/s MCS %u ", htrate, u3.u8);
+			} else {
+				/*
+				 * We at least have the MCS index.
+				 * Print it.
+				 */
+				printf("MCS %u ", u3.u8);
+			}
+		}
+		if (u.u8 & IEEE80211_RADIOTAP_MCS_BANDWIDTH_KNOWN) {
+			printf("%s ",
+				bandwidth[u2.u8 & IEEE80211_RADIOTAP_MCS_BANDWIDTH_MASK]);
+		}
+		if (u.u8 & IEEE80211_RADIOTAP_MCS_GUARD_INTERVAL_KNOWN) {
+			printf("%s GI ",
+				(u2.u8 & IEEE80211_RADIOTAP_MCS_SHORT_GI) ?
+				"short" : "lon");
+		}
+		if (u.u8 & IEEE80211_RADIOTAP_MCS_HT_FORMAT_KNOWN) {
+			printf("%s ",
+				(u2.u8 & IEEE80211_RADIOTAP_MCS_HT_GREENFIELD) ?
+				"greenfield" : "mixed");
+		}
+		if (u.u8 & IEEE80211_RADIOTAP_MCS_FEC_TYPE_KNOWN) {
+			printf("%s FEC ",
+				(u2.u8 & IEEE80211_RADIOTAP_MCS_FEC_LDPC) ?
+				"LDPC" : "BCC");
+		}
+		break;
+		}
 	}
 	return 0;
 }
@@ -1616,6 +2149,7 @@ ieee802_11_radio_print(const u_char *p, u_int length, u_int caplen)
 	struct cpack_state cpacker;
 	struct ieee80211_radiotap_header *hdr;
 	u_int32_t present, next_present;
+	u_int32_t presentflags = 0;
 	u_int32_t *presentp, *last_presentp;
 	enum ieee80211_radiotap_type bit;
 	int bit0;
@@ -1624,6 +2158,7 @@ ieee802_11_radio_print(const u_char *p, u_int length, u_int caplen)
 	u_int8_t flags;
 	int pad;
 	u_int fcslen;
+	struct radiotap_state state;
 
 	if (caplen < sizeof(*hdr)) {
 		printf("[|802.11]");
@@ -1665,6 +2200,11 @@ ieee802_11_radio_print(const u_char *p, u_int length, u_int caplen)
 	fcslen = 0;
 	for (bit0 = 0, presentp = &hdr->it_present; presentp <= last_presentp;
 	     presentp++, bit0 += 32) {
+		presentflags = EXTRACT_LE_32BITS(presentp);
+
+		/* Clear state. */
+		memset(&state, 0, sizeof(state));
+
 		for (present = EXTRACT_LE_32BITS(presentp); present;
 		     present = next_present) {
 			/* clear the least significant bit that is set */
@@ -1674,7 +2214,7 @@ ieee802_11_radio_print(const u_char *p, u_int length, u_int caplen)
 			bit = (enum ieee80211_radiotap_type)
 			    (bit0 + BITNO_32(present ^ next_present));
 
-			if (print_radiotap_field(&cpacker, bit, &flags) != 0)
+			if (print_radiotap_field(&cpacker, bit, &flags, &state, presentflags) != 0)
 				goto out;
 		}
 	}
