@@ -53,4 +53,6 @@ forces01vvvv    forces1.pcap            forces1vvvv.out -t -v -v -v -v
 qinq            QinQpacket.pcap         QinQpacket.out  -t -e
 qinqv           QinQpacket.pcap         QinQpacketv.out  -t -e -v
 
+# now SFLOW tests
+sflow1          sflow_multiple_counter_30_pdus.pcap     sflow_multiple_counter_30_pdus.out      -t -v
 
