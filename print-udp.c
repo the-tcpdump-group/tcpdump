@@ -651,9 +651,10 @@ udp_print(register const u_char *bp, u_int length,
 #ifdef INET6
 		else if (ISPORT(RIPNG_PORT))
 			ripng_print((const u_char *)(up + 1), length);
-		else if (ISPORT(DHCP6_SERV_PORT) || ISPORT(DHCP6_CLI_PORT)) {
+		else if (ISPORT(DHCP6_SERV_PORT) || ISPORT(DHCP6_CLI_PORT))
 			dhcp6_print((const u_char *)(up + 1), length);
-		}
+		else if (ISPORT(BABEL_PORT))
+			babel_print((const u_char *)(up + 1), length);
 #endif /*INET6*/
 		/*
 		 * Kludge in test for whiteboard packets.
