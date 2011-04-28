@@ -1991,19 +1991,46 @@ print_radiotap_field(struct cpack_state *s, u_int32_t bit, u_int8_t *flags,
 		break;
 	case IEEE80211_RADIOTAP_RATE:
 		/*
-		 * If the 0x80 bit is set, this is a FreeBSD-style
-		 * MCS index.  Print the MCS index, not the rate;
-		 * to correctly determine the rate with an MCS index you
-		 * need the channel width, i.e. 20MHz/40MHz, and you also
-		 * need whether or not the short GI is set or not.
+		 * XXX On FreeBSD rate & 0x80 means we have an MCS. On
+		 * Linux and AirPcap it does not.  (What about
+		 * Mac OS X, NetBSD, OpenBSD, and DragonFly BSD?)
 		 *
-		 * If you want us to print the rate, use
-		 * IEEE80211_RADIOTAP_MCS, not IEEE80211_RADIOTAP_RATE.
+		 * This is an issue either for proprietary extensions
+		 * to 11a or 11g, which do exist, or for 11n
+		 * implementations that stuff a rate value into
+		 * this field, which also appear to exist.
+		 *
+		 * We currently handle that by assuming that
+		 * if the 0x80 bit is set *and* the remaining
+		 * bits have a value between 0 and 15 it's
+		 * an MCS value, otherwise it's a rate.  If
+		 * there are cases where systems that use
+		 * "0x80 + MCS index" for MCS indices > 15,
+		 * or stuff a rate value here between 64 and
+		 * 71.5 Mb/s in here, we'll need a preference
+		 * setting.  Such rates do exist, e.g. 11n
+		 * MCS 7 at 20 MHz with a long guard interval.
 		 */
-		if (u.u8 & 0x80)
+		if (u.u8 >= 0x80 && u.u8 <= 0x8f) {
+			/*
+			 * XXX - we don't know the channel width
+			 * or guard interval length, so we can't
+			 * convert this to a data rate.
+			 *
+			 * If you want us to show a data rate,
+			 * use the MCS field, not the Rate field;
+			 * the MCS field includes not only the
+			 * MCS index, it also includes bandwidth
+			 * and guard interval information.
+			 *
+			 * XXX - can we get the channel width
+			 * from XChannel and the guard interval
+			 * information from Flags, at least on
+			 * FreeBSD?
+			 */
 			printf("MCS %u ", u.u8 & 0x7f);
-		else
-			PRINT_RATE("", u.u8, " Mb/s ");
+		} else
+			printf("%2.1f Mb/s ", .5*u.u8);
 		break;
 	case IEEE80211_RADIOTAP_DBM_ANTSIGNAL:
 		printf("%ddB signal ", u.i8);
