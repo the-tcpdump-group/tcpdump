@@ -32,14 +32,6 @@ if(@ARGV == 1) {
 print "Running $name. \n" if $debug;
 print "   Input: $input, OUTPUT: $output, OPTIONS: $options\n" if $debug;
 
-if (! -f $input) {
-  ($puu = $input) =~ s/\.pcap/\.puu/;
-  if( -f $puu) {
-    print "Uudecoding $puu to make $input\n";
-    system("uudecode $puu");
-  }
-}
-
 print "    ";
 exec("../tcpdump 2>/dev/null -n -r $input $options | tee NEW/$output | diff -w - $output >DIFF/$output.diff");
 @cores = glob("core*");
