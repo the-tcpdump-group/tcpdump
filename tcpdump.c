@@ -133,10 +133,6 @@ RETSIGTYPE requestinfo(int);
 static void info(int);
 static u_int packets_captured;
 
-typedef u_int (*if_printer)(const struct pcap_pkthdr *, const u_char *);
-typedef u_int (*if_ndo_printer)(struct netdissect_options *ndo,
-                                const struct pcap_pkthdr *, const u_char *);
-
 struct printer {
         if_printer f;
 	int type;
@@ -315,10 +311,13 @@ static struct ndo_printer ndo_printers[] = {
 #ifdef DLT_IEEE802_15_4_NOFCS
 	{ ieee802_15_4_if_print, DLT_IEEE802_15_4_NOFCS },
 #endif
+#ifdef DLT_PPI
+	{ ppi_if_print,		DLT_PPI },
+#endif
 	{ NULL,			0 },
 };
 
-static if_printer
+if_printer
 lookup_printer(int type)
 {
 	struct printer *p;
@@ -331,7 +330,7 @@ lookup_printer(int type)
 	/* NOTREACHED */
 }
 
-static if_ndo_printer
+if_ndo_printer
 lookup_ndo_printer(int type)
 {
 	struct ndo_printer *p;
