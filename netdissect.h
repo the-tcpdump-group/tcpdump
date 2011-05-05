@@ -268,6 +268,12 @@ extern const char *dnnum_string(netdissect_options *, u_short);
 
 #include <pcap.h>
 
+typedef u_int (*if_ndo_printer)(struct netdissect_options *ndo,
+				const struct pcap_pkthdr *, const u_char *);
+typedef u_int (*if_printer)(const struct pcap_pkthdr *, const u_char *);
+
+extern if_ndo_printer lookup_ndo_printer(int);
+extern if_printer lookup_printer(int);
 
 extern void eap_print(netdissect_options *,const u_char *, u_int);
 extern int esp_print(netdissect_options *,

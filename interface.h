@@ -97,14 +97,6 @@ extern char *program_name;	/* used to generate self-identifying messages */
 
 extern int32_t thiszone;	/* seconds offset from gmt to local time */
 
-typedef u_int (*if_ndo_printer)(struct netdissect_options *ndo,
-				const struct pcap_pkthdr *, const u_char *);
-typedef u_int (*if_printer)(const struct pcap_pkthdr *, const u_char *);
-
-extern if_ndo_printer lookup_ndo_printer(int);
-extern if_printer lookup_printer(int);
-
-
 /*
  * True if  "l" bytes of "var" were captured.
  *
