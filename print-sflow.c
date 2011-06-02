@@ -313,10 +313,10 @@ print_sflow_counter_generic(const u_char *pointer, u_int len) {
 
 
     sflow_gen_counter = (const struct sflow_generic_counter_t *)pointer;
-    printf("\n\t      ifindex %u, iftype %u, ifspeed %u, ifdirection %u (%s)",
+    printf("\n\t      ifindex %u, iftype %u, ifspeed %" PRIu64 ", ifdirection %u (%s)",
 	   EXTRACT_32BITS(sflow_gen_counter->ifindex),
 	   EXTRACT_32BITS(sflow_gen_counter->iftype),
-	   EXTRACT_32BITS(sflow_gen_counter->ifspeed),
+	   EXTRACT_64BITS(sflow_gen_counter->ifspeed),
 	   EXTRACT_32BITS(sflow_gen_counter->ifdirection),
 	   tok2str(sflow_iface_direction_values, "Unknown",
 		   EXTRACT_32BITS(sflow_gen_counter->ifdirection)));
