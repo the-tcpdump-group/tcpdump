@@ -480,8 +480,12 @@ extern void zephyr_print(netdissect_options * ndo,
 #endif /*INET6*/
 
 #if 0
-extern u_short in_cksum(const u_short *,
-			register u_int, int);
+struct cksum_vec {
+	const u_int8_t	*ptr;
+	int		len;
+};
+extern u_int16_t in_cksum(const struct cksum_vec *, int);
+extern u_int16_t in_cksum_shouldbe(u_int16_t, u_int16_t);
 #endif
 
 extern void esp_print_decodesecret(netdissect_options *ndo);

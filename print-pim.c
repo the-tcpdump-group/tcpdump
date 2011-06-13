@@ -29,7 +29,15 @@ static const char rcsid[] _U_ =
 #endif
 
 #include <tcpdump-stdinc.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "interface.h"
+#include "addrtoname.h"
+#include "extract.h"
+
+#include "ip.h"
 
 #define PIMV2_TYPE_HELLO         0
 #define PIMV2_TYPE_REGISTER      1
@@ -107,16 +115,6 @@ struct pim {
 	u_char  pim_rsv;	/* Reserved */
 	u_short	pim_cksum;	/* IP style check sum */
 };
-
-
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "interface.h"
-#include "addrtoname.h"
-#include "extract.h"
-
-#include "ip.h"
 
 static void pimv2_print(register const u_char *bp, register u_int len, u_int cksum);
 

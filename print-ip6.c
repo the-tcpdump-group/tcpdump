@@ -51,22 +51,28 @@ int
 nextproto6_cksum(const struct ip6_hdr *ip6, const u_short *data,
 		 u_int len, u_int next_proto)
 {
-        size_t i;
-        u_int32_t sum = 0;
-	union ip6_pseudo_hdr phu;
+        struct {
+                struct in6_addr ph_src;
+                struct in6_addr ph_dst;
+                u_int32_t       ph_len;
+                u_int8_t        ph_zero[3];
+                u_int8_t        ph_nxt;
+        } ph;
+        struct cksum_vec vec[2];
 
         /* pseudo-header */
-        memset(&phu, 0, sizeof(phu));
-        phu.ph.ph_src = ip6->ip6_src;
-        phu.ph.ph_dst = ip6->ip6_dst;
-        phu.ph.ph_len = htonl(len);
-        phu.ph.ph_nxt = next_proto;
+        memset(&ph, 0, sizeof(ph));
+        ph.ph_src = ip6->ip6_src;
+        ph.ph_dst = ip6->ip6_dst;
+        ph.ph_len = htonl(len);
+        ph.ph_nxt = next_proto;
 
-        for (i = 0; i < sizeof(phu.pa) / sizeof(phu.pa[0]); i++) {
-                sum += phu.pa[i];
-	}
+        vec[0].ptr = (const u_int8_t *)(void *)&ph;
+        vec[0].len = sizeof(ph);
+        vec[1].ptr = (const u_int8_t *)(void *)data;
+        vec[1].len = len;
 
-        return in_cksum(data, len, sum);
+        return in_cksum(vec, 2);
 }
 
 /*

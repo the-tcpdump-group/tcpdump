@@ -74,60 +74,57 @@ static int dccp_cksum(const struct ip *ip,
 	const struct dccp_hdr *dh, u_int len)
 {
 	int cov = dccp_csum_coverage(dh, len);
-	union phu {
-		struct phdr {
-			u_int32_t src;
-			u_int32_t dst;
-			u_char mbz;
-			u_char proto;
-			u_int16_t len;
-		} ph;
-		u_int16_t pa[6];
-	} phu;
-	const u_int16_t *sp;
+	struct phdr {
+		u_int32_t src;
+		u_int32_t dst;
+		u_char mbz;
+		u_char proto;
+		u_int16_t len;
+	} ph;
+	struct cksum_vec vec[2];
 
 	/* pseudo-header.. */
-	phu.ph.mbz = 0;
-	phu.ph.len = htons(len);
-	phu.ph.proto = IPPROTO_DCCP;
-	memcpy(&phu.ph.src, &ip->ip_src.s_addr, sizeof(u_int32_t));
+	ph.mbz = 0;
+	ph.len = htons(len);
+	ph.proto = IPPROTO_DCCP;
+	memcpy(&ph.src, &ip->ip_src.s_addr, sizeof(u_int32_t));
 	if (IP_HL(ip) == 5)
-		memcpy(&phu.ph.dst, &ip->ip_dst.s_addr, sizeof(u_int32_t));
+		memcpy(&ph.dst, &ip->ip_dst.s_addr, sizeof(u_int32_t));
 	else
-		phu.ph.dst = ip_finddst(ip);
+		ph.dst = ip_finddst(ip);
 
-	sp = &phu.pa[0];
-	return in_cksum((u_short *)dh, cov, sp[0]+sp[1]+sp[2]+sp[3]+sp[4]+sp[5]);
+	vec[0].ptr = (const u_int8_t *)(void *)&ph;
+	vec[0].len = sizeof(ph);
+	vec[1].ptr = (const u_int8_t *)(void *)dh;
+	vec[1].len = cov;
+	return in_cksum(vec, 2);
 }
 
 #ifdef INET6
 static int dccp6_cksum(const struct ip6_hdr *ip6, const struct dccp_hdr *dh, u_int len)
 {
-	size_t i;
-	u_int32_t sum = 0;
 	int cov = dccp_csum_coverage(dh, len);
-	union {
-		struct {
-			struct in6_addr ph_src;
-			struct in6_addr ph_dst;
-			u_int32_t   ph_len;
-			u_int8_t    ph_zero[3];
-			u_int8_t    ph_nxt;
-		} ph;
-		u_int16_t pa[20];
-	} phu;
+	struct {
+		struct in6_addr ph_src;
+		struct in6_addr ph_dst;
+		u_int32_t   ph_len;
+		u_int8_t    ph_zero[3];
+		u_int8_t    ph_nxt;
+	} ph;
+	struct cksum_vec vec[2];
 
 	/* pseudo-header */
-	memset(&phu, 0, sizeof(phu));
-	phu.ph.ph_src = ip6->ip6_src;
-	phu.ph.ph_dst = ip6->ip6_dst;
-	phu.ph.ph_len = htonl(len);
-	phu.ph.ph_nxt = IPPROTO_DCCP;
+	memset(&ph, 0, sizeof(ph));
+	ph.ph_src = ip6->ip6_src;
+	ph.ph_dst = ip6->ip6_dst;
+	ph.ph_len = htonl(len);
+	ph.ph_nxt = IPPROTO_DCCP;
 
-	for (i = 0; i < sizeof(phu.pa) / sizeof(phu.pa[0]); i++)
-		sum += phu.pa[i];
-
-	return in_cksum((u_short *)dh, cov, sum);
+	vec[0].ptr = (const u_int8_t *)(void *)&ph;
+	vec[0].len = sizeof(ph);
+	vec[1].ptr = (const u_int8_t *)(void *)dh;
+	vec[1].len = cov;
+	return in_cksum(vec, 2);
 }
 #endif
 

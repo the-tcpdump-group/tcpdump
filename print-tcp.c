@@ -129,31 +129,30 @@ static int tcp_cksum(register const struct ip *ip,
 		     register const struct tcphdr *tp,
 		     register u_int len)
 {
-        union phu {
-                struct phdr {
-                        u_int32_t src;
-                        u_int32_t dst;
-                        u_char mbz;
-                        u_char proto;
-                        u_int16_t len;
-                } ph;
-                u_int16_t pa[6];
-        } phu;
-        const u_int16_t *sp;
+        struct phdr {
+                u_int32_t src;
+                u_int32_t dst;
+                u_char mbz;
+                u_char proto;
+                u_int16_t len;
+        } ph;
+        struct cksum_vec vec[2];
 
         /* pseudo-header.. */
-        phu.ph.len = htons((u_int16_t)len);
-        phu.ph.mbz = 0;
-        phu.ph.proto = IPPROTO_TCP;
-        memcpy(&phu.ph.src, &ip->ip_src.s_addr, sizeof(u_int32_t));
+        ph.len = htons((u_int16_t)len);
+        ph.mbz = 0;
+        ph.proto = IPPROTO_TCP;
+        memcpy(&ph.src, &ip->ip_src.s_addr, sizeof(u_int32_t));
         if (IP_HL(ip) == 5)
-                memcpy(&phu.ph.dst, &ip->ip_dst.s_addr, sizeof(u_int32_t));
+                memcpy(&ph.dst, &ip->ip_dst.s_addr, sizeof(u_int32_t));
         else
-                phu.ph.dst = ip_finddst(ip);
+                ph.dst = ip_finddst(ip);
 
-        sp = &phu.pa[0];
-        return in_cksum((u_short *)tp, len,
-                        sp[0]+sp[1]+sp[2]+sp[3]+sp[4]+sp[5]);
+        vec[0].ptr = (const u_int8_t *)(void *)&ph;
+        vec[0].len = sizeof(ph);
+        vec[1].ptr = (const u_int8_t *)tp;
+        vec[1].len = len;
+        return in_cksum(vec, 2);
 }
 
 void

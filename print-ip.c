@@ -268,92 +268,6 @@ trunc:
 	printf("[|ip]");
 }
 
-/*
- * compute an IP header checksum.
- * don't modifiy the packet.
- */
-u_short
-in_cksum(const u_short *addr, register u_int len, int csum)
-{
-	int nleft = len;
-	const u_short *w = addr;
-	u_short answer;
-	int sum = csum;
-
-	/*
-	 *  Our algorithm is simple, using a 32 bit accumulator (sum),
-	 *  we add sequential 16 bit words to it, and at the end, fold
-	 *  back all the carry bits from the top 16 bits into the lower
-	 *  16 bits.
-	 */
-	while (nleft > 1)  {
-		sum += *w++;
-		nleft -= 2;
-	}
-	if (nleft == 1)
-		sum += htons(*(u_char *)w<<8);
-
-	/*
-	 * add back carry outs from top 16 bits to low 16 bits
-	 */
-	sum = (sum >> 16) + (sum & 0xffff);	/* add hi 16 to low 16 */
-	sum += (sum >> 16);			/* add carry */
-	answer = ~sum;				/* truncate to 16 bits */
-	return (answer);
-}
-
-/*
- * Given the host-byte-order value of the checksum field in a packet
- * header, and the network-byte-order computed checksum of the data
- * that the checksum covers (including the checksum itself), compute
- * what the checksum field *should* have been.
- */
-u_int16_t
-in_cksum_shouldbe(u_int16_t sum, u_int16_t computed_sum)
-{
-	u_int32_t shouldbe;
-
-	/*
-	 * The value that should have gone into the checksum field
-	 * is the negative of the value gotten by summing up everything
-	 * *but* the checksum field.
-	 *
-	 * We can compute that by subtracting the value of the checksum
-	 * field from the sum of all the data in the packet, and then
-	 * computing the negative of that value.
-	 *
-	 * "sum" is the value of the checksum field, and "computed_sum"
-	 * is the negative of the sum of all the data in the packets,
-	 * so that's -(-computed_sum - sum), or (sum + computed_sum).
-	 *
-	 * All the arithmetic in question is one's complement, so the
-	 * addition must include an end-around carry; we do this by
-	 * doing the arithmetic in 32 bits (with no sign-extension),
-	 * and then adding the upper 16 bits of the sum, which contain
-	 * the carry, to the lower 16 bits of the sum, and then do it
-	 * again in case *that* sum produced a carry.
-	 *
-	 * As RFC 1071 notes, the checksum can be computed without
-	 * byte-swapping the 16-bit words; summing 16-bit words
-	 * on a big-endian machine gives a big-endian checksum, which
-	 * can be directly stuffed into the big-endian checksum fields
-	 * in protocol headers, and summing words on a little-endian
-	 * machine gives a little-endian checksum, which must be
-	 * byte-swapped before being stuffed into a big-endian checksum
-	 * field.
-	 *
-	 * "computed_sum" is a network-byte-order value, so we must put
-	 * it in host byte order before subtracting it from the
-	 * host-byte-order value from the header; the adjusted checksum
-	 * will be in host byte order, which is what we'll return.
-	 */
-	shouldbe = sum;
-	shouldbe += ntohs(computed_sum);
-	shouldbe = (shouldbe & 0xFFFF) + (shouldbe >> 16);
-	shouldbe = (shouldbe & 0xFFFF) + (shouldbe >> 16);
-	return shouldbe;
-}
-
 #define IP_RES 0x8000
 
 static struct tok ip_frag_values[] = {
@@ -376,6 +290,7 @@ ip_print_demux(netdissect_options *ndo,
 	       struct ip_print_demux_state *ipds)
 {
 	struct protoent *proto;
+	struct cksum_vec vec[1];
 
 again:
 	switch (ipds->nh) {
@@ -508,8 +423,9 @@ again:
 		break;
 
 	case IPPROTO_PIM:
-		pim_print(ipds->cp,  ipds->len,
-			  in_cksum((const u_short*)ipds->cp, ipds->len, 0));
+		vec[0].ptr = ipds->cp;
+		vec[0].len = ipds->len;
+		pim_print(ipds->cp, ipds->len, in_cksum(vec, 1));
 		break;
 
 	case IPPROTO_VRRP:
@@ -561,6 +477,7 @@ ip_print(netdissect_options *ndo,
 	struct ip_print_demux_state *ipds=&ipd;
 	const u_char *ipend;
 	u_int hlen;
+	struct cksum_vec vec[1];
 	u_int16_t sum, ip_sum;
 	struct protoent *proto;
 
@@ -659,7 +576,9 @@ ip_print(netdissect_options *ndo,
             }
 
 	    if (!Kflag && (u_char *)ipds->ip + hlen <= ndo->ndo_snapend) {
-	        sum = in_cksum((const u_short *)ipds->ip, hlen, 0);
+	        vec[0].ptr = (const u_int8_t *)(void *)ipds->ip;
+	        vec[0].len = hlen;
+	        sum = in_cksum(vec, 1);
 		if (sum != 0) {
 		    ip_sum = EXTRACT_16BITS(&ipds->ip->ip_sum);
 		    (void)printf(", bad cksum %x (->%x)!", ip_sum,

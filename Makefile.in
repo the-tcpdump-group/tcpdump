@@ -69,7 +69,7 @@ RANLIB = @RANLIB@
 	$(CC) $(FULL_CFLAGS) -c $(srcdir)/$*.c
 
 CSRC =	addrtoname.c af.c checksum.c cpack.c gmpls.c oui.c gmt2local.c ipproto.c \
-        nlpid.c l2vpn.c machdep.c parsenfsfh.c \
+        nlpid.c l2vpn.c machdep.c parsenfsfh.c in_cksum.c \
 	print-802_11.c print-802_15_4.c print-ap1394.c print-ah.c \
 	print-arcnet.c print-aodv.c print-arp.c print-ascii.c print-atalk.c \
 	print-atm.c print-babel.c print-beep.c print-bfd.c print-bgp.c \

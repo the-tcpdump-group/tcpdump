@@ -328,7 +328,12 @@ extern void dhcp6_print(const u_char *, u_int);
 extern void babel_print(const u_char *, u_int);
 extern int mask62plen(const u_char *);
 #endif /*INET6*/
-extern u_short in_cksum(const u_short *, register u_int, int);
+
+struct cksum_vec {
+	const u_int8_t	*ptr;
+	int		len;
+};
+extern u_int16_t in_cksum(const struct cksum_vec *, int);
 extern u_int16_t in_cksum_shouldbe(u_int16_t, u_int16_t);
 
 #ifndef HAVE_BPF_DUMP
