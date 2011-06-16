@@ -397,6 +397,7 @@ extern void raw_if_print(u_char *,
 			 const struct pcap_pkthdr *, const u_char *);
 
 extern void rip_print(netdissect_options *,const u_char *, u_int);
+extern void rpki_rtr_print(netdissect_options *,const u_char *, u_int);
 
 extern void sctp_print(netdissect_options *ndo,
 		       const u_char *bp, const u_char *bp2,       

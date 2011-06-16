@@ -485,6 +485,10 @@ SOURCE="..\..\print-ripng.c"
 # End Source File
 # Begin Source File
 
+SOURCE="..\..\print-rpki-rtr.c"
+# End Source File
+# Begin Source File
+
 SOURCE="..\..\print-rsvp.c"
 # End Source File
 # Begin Source File

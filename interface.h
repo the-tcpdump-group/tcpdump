@@ -223,6 +223,7 @@ extern void cisco_autorp_print(const u_char *, u_int);
 extern void rsvp_print(const u_char *, u_int);
 extern void ldp_print(const u_char *, u_int);
 extern void lldp_print(const u_char *, u_int);
+extern void rpki_rtr_print(const u_char *, u_int);
 extern void lmp_print(const u_char *, u_int);
 extern void lspping_print(const u_char *, u_int);
 extern void lwapp_control_print(const u_char *, u_int, int);
