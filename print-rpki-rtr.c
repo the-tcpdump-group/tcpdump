@@ -176,7 +176,7 @@ indent_string (u_int indent)
 /*
  * Print a single PDU.
  */
-static int
+static void
 rpki_rtr_pdu_print (const u_char *tptr, u_int indent)
 {
     const rpki_rtr_pdu *pdu_header;
@@ -184,7 +184,7 @@ rpki_rtr_pdu_print (const u_char *tptr, u_int indent)
 
     pdu_header = (rpki_rtr_pdu *)tptr;
     pdu_type = pdu_header->pdu_type;
-    pdu_len = pdu_len = EXTRACT_32BITS(pdu_header->length);
+    pdu_len = EXTRACT_32BITS(pdu_header->length);
     hexdump = FALSE;
 
     printf("%sRPKI-RTRv%u, %s PDU (%u), length: %u",
