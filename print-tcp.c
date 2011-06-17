@@ -412,34 +412,40 @@ tcp_print(register const u_char *bp, register u_int length,
                 return;
         }
 
-        if (IP_V(ip) == 4 && vflag && !Kflag && !fragmented) {
+        if (vflag && !Kflag && !fragmented) {
+                /* Check the checksum, if possible. */
                 u_int16_t sum, tcp_sum;
-                if (TTEST2(tp->th_sport, length)) {
-                        sum = tcp_cksum(ip, tp, length);
 
-                        (void)printf(", cksum 0x%04x",EXTRACT_16BITS(&tp->th_sum));
-                        if (sum != 0) {
+                if (IP_V(ip) == 4) {
+                        if (TTEST2(tp->th_sport, length)) {
+                                sum = tcp_cksum(ip, tp, length);
                                 tcp_sum = EXTRACT_16BITS(&tp->th_sum);
-                                (void)printf(" (incorrect -> 0x%04x)",in_cksum_shouldbe(tcp_sum, sum));
-                        } else
-                                (void)printf(" (correct)");
+
+                                (void)printf(", cksum 0x%04x", tcp_sum);
+                                if (sum != 0)
+                                        (void)printf(" (incorrect -> 0x%04x)",
+                                            in_cksum_shouldbe(tcp_sum, sum));
+                                else
+                                        (void)printf(" (correct)");
+                        }
                 }
-        }
 #ifdef INET6
-        if (IP_V(ip) == 6 && ip6->ip6_plen && vflag && !Kflag && !fragmented) {
-                u_int16_t sum,tcp_sum;
-                if (TTEST2(tp->th_sport, length)) {
-                        sum = nextproto6_cksum(ip6, (u_short *)tp, length, IPPROTO_TCP);
-                        (void)printf(", cksum 0x%04x",EXTRACT_16BITS(&tp->th_sum));
-                        if (sum != 0) {
+                else if (IP_V(ip) == 6 && ip6->ip6_plen) {
+                        if (TTEST2(tp->th_sport, length)) {
+                                sum = nextproto6_cksum(ip6, (u_short *)tp, length, IPPROTO_TCP);
                                 tcp_sum = EXTRACT_16BITS(&tp->th_sum);
-                                (void)printf(" (incorrect -> 0x%04x)",in_cksum_shouldbe(tcp_sum, sum));
-                        } else
-                                (void)printf(" (correct)");
 
+                                (void)printf(", cksum 0x%04x", tcp_sum);
+                                if (sum != 0)
+                                        (void)printf(" (incorrect -> 0x%04x)",
+                                            in_cksum_shouldbe(tcp_sum, sum));
+                                else
+                                        (void)printf(" (correct)");
+
+                        }
                 }
-        }
 #endif
+        }
 
         length -= hlen;
         if (vflag > 1 || length > 0 || flags & (TH_SYN | TH_FIN | TH_RST)) {
