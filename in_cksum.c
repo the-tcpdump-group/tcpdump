@@ -2,8 +2,6 @@
  * 4.4-Lite-2 Internet checksum routine, modified to take a vector of
  * pointers/lengths giving the pieces to be checksummed.  Also using
  * Tahoe/CGI version of ADDCARRY(x) macro instead of from portable version.
- *
- * $Id: in_cksum.c 36796 2011-04-22 04:04:20Z guy $
  */
 
 /*
