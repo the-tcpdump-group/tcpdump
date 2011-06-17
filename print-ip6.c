@@ -48,7 +48,7 @@ static const char rcsid[] _U_ =
  * Compute a V6-style checksum by building a pseudoheader.
  */
 int
-nextproto6_cksum(const struct ip6_hdr *ip6, const u_short *data,
+nextproto6_cksum(const struct ip6_hdr *ip6, const u_int8_t *data,
 		 u_int len, u_int next_proto)
 {
         struct {
@@ -69,7 +69,7 @@ nextproto6_cksum(const struct ip6_hdr *ip6, const u_short *data,
 
         vec[0].ptr = (const u_int8_t *)(void *)&ph;
         vec[0].len = sizeof(ph);
-        vec[1].ptr = (const u_int8_t *)(void *)data;
+        vec[1].ptr = data;
         vec[1].len = len;
 
         return in_cksum(vec, 2);
@@ -225,7 +225,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		    }
 
 		case IPPROTO_PIM:
-			pim_print(cp, len, nextproto6_cksum(ip6, (u_short *)cp, len,
+			pim_print(cp, len, nextproto6_cksum(ip6, cp, len,
 							    IPPROTO_PIM));
 			return;
 

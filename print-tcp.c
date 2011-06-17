@@ -432,7 +432,7 @@ tcp_print(register const u_char *bp, register u_int length,
 #ifdef INET6
                 else if (IP_V(ip) == 6 && ip6->ip6_plen) {
                         if (TTEST2(tp->th_sport, length)) {
-                                sum = nextproto6_cksum(ip6, (u_short *)tp, length, IPPROTO_TCP);
+                                sum = nextproto6_cksum(ip6, (const u_int8_t *)tp, length, IPPROTO_TCP);
                                 tcp_sum = EXTRACT_16BITS(&tp->th_sum);
 
                                 (void)printf(", cksum 0x%04x", tcp_sum);

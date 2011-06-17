@@ -197,44 +197,8 @@ print_lladdr(const u_int8_t *p, size_t l)
 static int icmp6_cksum(const struct ip6_hdr *ip6, const struct icmp6_hdr *icp,
 	u_int len)
 {
-	size_t i;
-	register const u_int16_t *sp;
-	u_int32_t sum;
-	union {
-		struct {
-			struct in6_addr ph_src;
-			struct in6_addr ph_dst;
-			u_int32_t	ph_len;
-			u_int8_t	ph_zero[3];
-			u_int8_t	ph_nxt;
-		} ph;
-		u_int16_t pa[20];
-	} phu;
-
-	/* pseudo-header */
-	memset(&phu, 0, sizeof(phu));
-	phu.ph.ph_src = ip6->ip6_src;
-	phu.ph.ph_dst = ip6->ip6_dst;
-	phu.ph.ph_len = htonl(len);
-	phu.ph.ph_nxt = IPPROTO_ICMPV6;
-
-	sum = 0;
-	for (i = 0; i < sizeof(phu.pa) / sizeof(phu.pa[0]); i++)
-		sum += phu.pa[i];
-
-	sp = (const u_int16_t *)icp;
-
-	for (i = 0; i < (len & ~1); i += 2)
-		sum += *sp++;
-
-	if (len & 1)
-		sum += htons((*(const u_int8_t *)sp) << 8);
-
-	while (sum > 0xffff)
-		sum = (sum & 0xffff) + (sum >> 16);
-	sum = ~sum & 0xffff;
-
-	return (sum);
+	return (nextproto6_cksum(ip6, (const u_int8_t *)(void *)icp, len,
+	    IPPROTO_ICMPV6));
 }
 
 enum ND_RPL_CODE {

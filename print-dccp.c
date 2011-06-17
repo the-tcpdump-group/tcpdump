@@ -103,28 +103,8 @@ static int dccp_cksum(const struct ip *ip,
 #ifdef INET6
 static int dccp6_cksum(const struct ip6_hdr *ip6, const struct dccp_hdr *dh, u_int len)
 {
-	int cov = dccp_csum_coverage(dh, len);
-	struct {
-		struct in6_addr ph_src;
-		struct in6_addr ph_dst;
-		u_int32_t   ph_len;
-		u_int8_t    ph_zero[3];
-		u_int8_t    ph_nxt;
-	} ph;
-	struct cksum_vec vec[2];
-
-	/* pseudo-header */
-	memset(&ph, 0, sizeof(ph));
-	ph.ph_src = ip6->ip6_src;
-	ph.ph_dst = ip6->ip6_dst;
-	ph.ph_len = htonl(len);
-	ph.ph_nxt = IPPROTO_DCCP;
-
-	vec[0].ptr = (const u_int8_t *)(void *)&ph;
-	vec[0].len = sizeof(ph);
-	vec[1].ptr = (const u_int8_t *)(void *)dh;
-	vec[1].len = cov;
-	return in_cksum(vec, 2);
+	return nextproto6_cksum(ip6, (const u_int8_t *)(void *)dh,
+	    dccp_csum_coverage(dh, len), IPPROTO_DCCP);
 }
 #endif
 
