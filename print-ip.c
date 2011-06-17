@@ -87,7 +87,7 @@ ip_printroute(register const u_char *cp, u_int length)
  * This is used for UDP and TCP pseudo-header in the checksum
  * calculation.
  */
-u_int32_t
+static u_int32_t
 ip_finddst(const struct ip *ip)
 {
 	int length;
@@ -127,6 +127,39 @@ ip_finddst(const struct ip *ip)
 trunc:
 	memcpy(&retval, &ip->ip_dst.s_addr, sizeof(u_int32_t));
 	return retval;
+}
+
+/*
+ * Compute a V4-style checksum by building a pseudoheader.
+ */
+int
+nextproto4_cksum(const struct ip *ip, const u_int8_t *data,
+		 u_int len, u_int next_proto)
+{
+	struct phdr {
+		u_int32_t src;
+		u_int32_t dst;
+		u_char mbz;
+		u_char proto;
+		u_int16_t len;
+	} ph;
+	struct cksum_vec vec[2];
+
+	/* pseudo-header.. */
+	ph.len = htons((u_int16_t)len);
+	ph.mbz = 0;
+	ph.proto = next_proto;
+	memcpy(&ph.src, &ip->ip_src.s_addr, sizeof(u_int32_t));
+	if (IP_HL(ip) == 5)
+		memcpy(&ph.dst, &ip->ip_dst.s_addr, sizeof(u_int32_t));
+	else
+		ph.dst = ip_finddst(ip);
+
+	vec[0].ptr = (const u_int8_t *)(void *)&ph;
+	vec[0].len = sizeof(ph);
+	vec[1].ptr = data;
+	vec[1].len = len;
+	return (in_cksum(vec, 2));
 }
 
 static void

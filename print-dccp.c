@@ -60,7 +60,7 @@ static const char *dccp_feature_nums[] = {
 	"check data checksum",
 };
 
-static inline int dccp_csum_coverage(const struct dccp_hdr* dh, u_int len)
+static inline u_int dccp_csum_coverage(const struct dccp_hdr* dh, u_int len)
 {
 	u_int cov;
 	
@@ -73,31 +73,8 @@ static inline int dccp_csum_coverage(const struct dccp_hdr* dh, u_int len)
 static int dccp_cksum(const struct ip *ip,
 	const struct dccp_hdr *dh, u_int len)
 {
-	int cov = dccp_csum_coverage(dh, len);
-	struct phdr {
-		u_int32_t src;
-		u_int32_t dst;
-		u_char mbz;
-		u_char proto;
-		u_int16_t len;
-	} ph;
-	struct cksum_vec vec[2];
-
-	/* pseudo-header.. */
-	ph.mbz = 0;
-	ph.len = htons(len);
-	ph.proto = IPPROTO_DCCP;
-	memcpy(&ph.src, &ip->ip_src.s_addr, sizeof(u_int32_t));
-	if (IP_HL(ip) == 5)
-		memcpy(&ph.dst, &ip->ip_dst.s_addr, sizeof(u_int32_t));
-	else
-		ph.dst = ip_finddst(ip);
-
-	vec[0].ptr = (const u_int8_t *)(void *)&ph;
-	vec[0].len = sizeof(ph);
-	vec[1].ptr = (const u_int8_t *)(void *)dh;
-	vec[1].len = cov;
-	return in_cksum(vec, 2);
+	return nextproto4_cksum(ip, (const u_int8_t *)(void *)dh,
+	    dccp_csum_coverage(dh, len), IPPROTO_DCCP);
 }
 
 #ifdef INET6

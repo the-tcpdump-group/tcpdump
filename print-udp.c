@@ -286,30 +286,8 @@ static int udp_cksum(register const struct ip *ip,
 		     register const struct udphdr *up,
 		     register u_int len)
 {
-	struct phdr {
-		u_int32_t src;
-		u_int32_t dst;
-		u_char mbz;
-		u_char proto;
-		u_int16_t len;
-	} ph;
-	struct cksum_vec vec[2];
-
-	/* pseudo-header.. */
-	ph.len = htons((u_int16_t)len);
-	ph.mbz = 0;
-	ph.proto = IPPROTO_UDP;
-	memcpy(&ph.src, &ip->ip_src.s_addr, sizeof(u_int32_t));
-	if (IP_HL(ip) == 5)
-		memcpy(&ph.dst, &ip->ip_dst.s_addr, sizeof(u_int32_t));
-	else
-		ph.dst = ip_finddst(ip);
-
-	vec[0].ptr = (const u_int8_t *)(void *)&ph;
-	vec[0].len = sizeof(ph);
-	vec[1].ptr = (const u_int8_t *)(void *)up;
-	vec[1].len = len;
-	return (in_cksum(vec, 2));
+	return (nextproto4_cksum(ip, (const u_int8_t *)(void *)up, len,
+	    IPPROTO_UDP));
 }
 
 #ifdef INET6
