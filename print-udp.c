@@ -549,31 +549,46 @@ udp_print(register const u_char *bp, u_int length,
 	}
 	udpipaddr_print(ip, sport, dport);
 
-	if (IP_V(ip) == 4 && (vflag > 1) && !Kflag && !fragmented) {
-		int sum = up->uh_sum;
-		if (sum == 0) {
-			(void)printf("[no cksum] ");
-		} else if (TTEST2(cp[0], length)) {
-			sum = udp_cksum(ip, up, length + sizeof(struct udphdr));
-			if (sum != 0)
-				(void)printf("[bad udp cksum %x!] ", sum);
-			else
-				(void)printf("[udp sum ok] ");
+	if (vflag && !Kflag && !fragmented) {
+                /* Check the checksum, if possible. */
+                u_int16_t sum, udp_sum;
+
+		/*
+		 * XXX - do this even if vflag == 1?
+		 * TCP does, and we do so for UDP-over-IPv6.
+		 */
+	        if (IP_V(ip) == 4 && (vflag > 1)) {
+			udp_sum = EXTRACT_16BITS(&up->uh_sum);
+			if (udp_sum == 0) {
+				(void)printf("[no cksum] ");
+			} else if (TTEST2(cp[0], length)) {
+				sum = udp_cksum(ip, up, length + sizeof(struct udphdr));
+
+	                        if (sum != 0) {
+        	                        (void)printf("[bad udp cksum 0x%04x -> 0x%04x!] ",
+					    udp_sum,
+					    in_cksum_shouldbe(udp_sum, sum));
+				} else
+					(void)printf("[udp sum ok] ");
+			}
 		}
-	}
 #ifdef INET6
-	if (IP_V(ip) == 6 && ip6->ip6_plen && vflag && !Kflag && !fragmented) {
-		int sum = up->uh_sum;
-		/* for IPv6, UDP checksum is mandatory */
-		if (TTEST2(cp[0], length)) {
-			sum = udp6_cksum(ip6, up, length + sizeof(struct udphdr));
-			if (sum != 0)
-				(void)printf("[bad udp cksum %x!] ", sum);
-			else
-				(void)printf("[udp sum ok] ");
+		else if (IP_V(ip) == 6 && ip6->ip6_plen) {
+			/* for IPv6, UDP checksum is mandatory */
+			if (TTEST2(cp[0], length)) {
+				sum = udp6_cksum(ip6, up, length + sizeof(struct udphdr));
+				udp_sum = EXTRACT_16BITS(&up->uh_sum);
+
+	                        if (sum != 0) {
+        	                        (void)printf("[bad udp cksum 0x%04x -> 0x%04x!] ",
+					    udp_sum,
+					    in_cksum_shouldbe(udp_sum, sum));
+				} else
+					(void)printf("[udp sum ok] ");
+			}
 		}
-	}
 #endif
+	}
 
 	if (!qflag) {
 #define ISPORT(p) (dport == (p) || sport == (p))
