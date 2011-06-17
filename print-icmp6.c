@@ -319,12 +319,15 @@ icmp6_print(netdissect_options *ndo,
 	TCHECK(dp->icmp6_cksum);
 
 	if (vflag && !fragmented) {
-		int sum = dp->icmp6_cksum;
+		u_int16_t sum, udp_sum;
 
 		if (TTEST2(bp[0], length)) {
+			udp_sum = EXTRACT_16BITS(&dp->icmp6_cksum);
 			sum = icmp6_cksum(ip, dp, length);
 			if (sum != 0)
-				(void)printf("[bad icmp6 cksum %x!] ", sum);
+				(void)printf("[bad icmp6 cksum 0x%04x -> 0x%04x!] ",
+				    udp_sum,
+				    in_cksum_shouldbe(udp_sum, sum));
 			else
 				(void)printf("[icmp6 sum ok] ");
 		}
