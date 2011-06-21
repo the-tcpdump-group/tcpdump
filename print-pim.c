@@ -397,8 +397,12 @@ cisco_autorp_print(register const u_char *bp, register u_int len)
 			TCHECK2(bp[0], 6);
 			(void)printf("%c%s%s/%d", s, bp[0] & 1 ? "!" : "",
 			    ipaddr_string(&bp[2]), bp[1]);
-			if (bp[0] & 0xfe)
-				(void)printf("[rsvd=0x%02x]", bp[0] & 0xfe);
+			if (bp[0] & 0x02) {
+			    (void)printf(" bidir");
+			}
+			if (bp[0] & 0xfc) {
+			    (void)printf("[rsvd=0x%02x]", bp[0] & 0xfc);
+			}
 			s = ',';
 			bp += 6; len -= 6;
 		}
