@@ -651,9 +651,8 @@ main(int argc, char **argv)
 	smiInit("tcpdump");
 #endif
 
-	opterr = 0;
 	while (
-	    (op = getopt(argc, argv, "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOpqr:Rs:StT:u" U_FLAG "vw:W:xXy:Yz:Z:")) != -1)
+	    (op = getopt(argc, argv, "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOpqr:Rs:StT:u" U_FLAG "vw:W:xXy:Yz:Z:")) != -1)
 		switch (op) {
 
 		case 'a':
@@ -747,7 +746,11 @@ main(int argc, char **argv)
 			break;
 
 		case 'h':
-			++hflag;
+			usage();
+			break;
+
+		case 'H':
+			++Hflag;
 			break;
 
 		case 'i':
@@ -1894,7 +1897,7 @@ usage(void)
 #endif /* WIN32 */
 #endif /* HAVE_PCAP_LIB_VERSION */
 	(void)fprintf(stderr,
-"Usage: %s [-aAbd" D_FLAG "efh" I_FLAG J_FLAG "KlLnNOpqRStu" U_FLAG "vxX]" B_FLAG_USAGE " [ -c count ]\n", program_name);
+"Usage: %s [-aAbd" D_FLAG "efhH" I_FLAG J_FLAG "KlLnNOpqRStu" U_FLAG "vxX]" B_FLAG_USAGE " [ -c count ]\n", program_name);
 	(void)fprintf(stderr,
 "\t\t[ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]\n");
 	(void)fprintf(stderr,

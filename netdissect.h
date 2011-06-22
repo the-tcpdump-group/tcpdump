@@ -117,7 +117,7 @@ struct netdissect_options {
   time_t ndo_Gflag_time;    /* The last time_t the dump file was rotated. */
   int ndo_Wflag;          /* recycle output files after this number of files */
   int ndo_WflagChars;
-  int ndo_hflag;		/* dissect 802.11s draft mesh standard */
+  int ndo_Hflag;		/* dissect 802.11s draft mesh standard */
   int ndo_suppress_default_print; /* don't use default_print() for unknown packet types */
   const char *ndo_dltname;
 

@@ -29,7 +29,7 @@ tcpdump \- dump traffic on a network
 .na
 .B tcpdump
 [
-.B \-AbdDefhIJKlLnNOpqRStuUvxX
+.B \-AbdDefhHIJKlLnNOpqRStuUvxX
 ] [
 .B \-B
 .I buffer_size
@@ -324,6 +324,10 @@ If used in conjunction with the
 option, filenames will take the form of `\fIfile\fP<count>'.
 .TP
 .B \-h
+Print the tcpdump and libpcap version strings, print a usage message,
+and exit.
+.TP
+.B \-H
 Attempt to detect 802.11s draft mesh headers.
 .TP
 .B \-i
