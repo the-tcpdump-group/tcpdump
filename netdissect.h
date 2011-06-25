@@ -159,7 +159,7 @@ struct netdissect_options {
   void (*ndo_error)(netdissect_options *,
 		    const char *fmt, ...)
 #ifdef __ATTRIBUTE___FORMAT_OK_FOR_FUNCTION_POINTERS
-		     __attribute__ ((format (printf, 2, 3)))
+		     __attribute__ ((noreturn, format (printf, 2, 3)))
 #endif
 		     ;
   void (*ndo_warning)(netdissect_options *,

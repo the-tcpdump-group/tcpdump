@@ -115,7 +115,8 @@ static void ndo_default_print(netdissect_options *, const u_char *, u_int);
 static void dump_packet_and_trunc(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void dump_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void droproot(const char *, const char *);
-static void ndo_error(netdissect_options *ndo, const char *fmt, ...);
+static void ndo_error(netdissect_options *ndo, const char *fmt, ...)
+     __attribute__ ((noreturn, format (printf, 2, 3)));
 static void ndo_warning(netdissect_options *ndo, const char *fmt, ...);
 
 #ifdef SIGINFO
