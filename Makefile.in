@@ -261,12 +261,18 @@ EXTRA_DIST = \
 	stime.awk \
 	strcasecmp.c \
 	tcpdump.1.in \
-	tests/02-sunrise-sunset-esp.puu \
-	tests/08-sunrise-sunset-aes.puu \
-	tests/08-sunrise-sunset-esp2.puu \
+	tests/02-sunrise-sunset-esp.pcap \
+	tests/08-sunrise-sunset-aes.pcap \
+	tests/08-sunrise-sunset-esp2.pcap \
+	tests/QinQpacket.out \
+	tests/QinQpacket.pcap \
+	tests/QinQpacketv.out \
 	tests/TESTLIST \
 	tests/TESTonce \
 	tests/TESTrun.sh \
+	tests/babel.pcap \
+	tests/babel1.out \
+	tests/babel1v.out \
 	tests/bgp-infinite-loop.pcap \
 	tests/bgp_vpn_attrset.out \
 	tests/bgp_vpn_attrset.pcap \
@@ -278,8 +284,7 @@ EXTRA_DIST = \
 	tests/e1000g.pcap \
 	tests/eapon1.gdbinit \
 	tests/eapon1.out \
-	tests/eapon1.puu \
-	tests/eapon2.puu \
+	tests/eapon1.pcap \
 	tests/empty.uu \
 	tests/esp-secrets.txt \
 	tests/esp0.out \
@@ -292,52 +297,54 @@ EXTRA_DIST = \
 	tests/esp5.gdbinit \
 	tests/esp5.out \
 	tests/espudp1.out \
-	tests/espudp1.puu \
+	tests/espudp1.pcap \
 	tests/forces1.out \
 	tests/forces1.pcap \
 	tests/forces1vvv.out \
 	tests/forces1vvvv.out \
 	tests/forces2.out \
-	tests/forces2.pcap \
 	tests/forces2v.out \
 	tests/forces2vv.out \
-	tests/ikev2.puu \
+	tests/forces3vvv.out \
 	tests/ikev2four.out \
-	tests/ikev2four.puu \
+	tests/ikev2four.pcap \
 	tests/ikev2fourv.out \
 	tests/ikev2fourv4.out \
 	tests/ikev2pI2-secrets.txt \
 	tests/ikev2pI2.out \
-	tests/ikev2pI2.puu \
-	tests/isakmp-delete-segfault.puu \
-	tests/isakmp-identification-segfault.puu \
-	tests/isakmp-pointer-loop.puu \
+	tests/ikev2pI2.pcap \
+	tests/isakmp-delete-segfault.pcap \
+	tests/isakmp-identification-segfault.pcap \
+	tests/isakmp-pointer-loop.pcap \
 	tests/isakmp1.out \
 	tests/isakmp2.out \
 	tests/isakmp3.out \
 	tests/isakmp4.out \
-	tests/isakmp4500.puu \
+	tests/isakmp4500.pcap \
 	tests/isis-infinite-loop.pcap \
 	tests/ldp-infinite-loop.pcap \
+	tests/lmp.new \
 	tests/lmp.out \
-	tests/lmp.puu \
+	tests/lmp.pcap \
 	tests/lmp.sh \
 	tests/lspping-fec-ldp.pcap \
 	tests/lspping-fec-rsvp.pcap \
 	tests/mpls-ldp-hello.out \
-	tests/mpls-ldp-hello.puu \
+	tests/mpls-ldp-hello.pcap \
 	tests/mpls-traceroute.pcap \
 	tests/ospf-gmpls.out \
-	tests/ospf-gmpls.puu \
+	tests/ospf-gmpls.pcap \
 	tests/print-A.out \
 	tests/print-AA.out \
 	tests/print-capX.out \
 	tests/print-capXX.out \
-	tests/print-flags.puu \
+	tests/print-flags.pcap \
 	tests/print-flags.sh \
 	tests/print-x.out \
 	tests/print-xx.out \
 	tests/rsvp-infinite-loop.pcap \
+	tests/sflow_multiple_counter_30_pdus.out \
+	tests/sflow_multiple_counter_30_pdus.pcap \
 	vfprintf.c \
 	win32/Include/bittypes.h \
 	win32/Include/errno.h \
