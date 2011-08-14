@@ -168,6 +168,7 @@ HDR = \
 	oui.h \
 	pcap-missing.h \
 	pmap_prot.h \
+	ppi.h \
 	ppp.h \
 	route6d.h \
 	rpc_auth.h \
