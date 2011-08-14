@@ -21,9 +21,10 @@ static inline void
 ppi_header_print(struct netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	const ppi_header_t *hdr;
-	hdr = (const ppi_header_t *)bp;
 	u_int32_t dlt;
 	u_int16_t len;
+
+	hdr = (const ppi_header_t *)bp;
 
 	len = EXTRACT_16BITS(&hdr->ppi_len);
 	dlt = EXTRACT_32BITS(&hdr->ppi_dlt);
