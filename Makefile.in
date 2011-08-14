@@ -72,7 +72,7 @@ CSRC =	addrtoname.c af.c checksum.c cpack.c gmpls.c oui.c gmt2local.c ipproto.c 
         nlpid.c l2vpn.c machdep.c parsenfsfh.c in_cksum.c \
 	print-802_11.c print-802_15_4.c print-ap1394.c print-ah.c \
 	print-arcnet.c print-aodv.c print-arp.c print-ascii.c print-atalk.c \
-	print-atm.c print-babel.c print-beep.c print-bfd.c print-bgp.c \
+	print-atm.c print-beep.c print-bfd.c print-bgp.c \
 	print-bootp.c print-bt.c print-cdp.c print-cfm.c print-chdlc.c \
 	print-cip.c print-cnfp.c print-dccp.c print-decnet.c \
 	print-domain.c print-dtp.c print-dvmrp.c print-enc.c print-egp.c \
@@ -245,6 +245,7 @@ EXTRA_DIST = \
 	mkdep \
 	packetdat.awk \
 	pcap_dump_ftell.c \
+	print-babel.c \
 	print-dhcp6.c \
 	print-frag6.c \
 	print-icmp6.c \
