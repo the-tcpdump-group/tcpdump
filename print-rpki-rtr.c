@@ -85,7 +85,6 @@ typedef struct rpki_rtr_pdu_ipv6_prefix_ {
 typedef struct rpki_rtr_pdu_error_report_ {
     rpki_rtr_pdu pdu_header;
     u_char encapsulated_pdu_length[4]; /* Encapsulated PDU length */
-    u_char variable[0];
 } rpki_rtr_pdu_error_report;
 
 /*
