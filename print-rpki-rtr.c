@@ -48,10 +48,9 @@ typedef struct rpki_rtr_pdu_ {
     union {
 	u_char cache_nonce[2];	/* Cache Nonce */
 	u_char error_code[2];	/* Error code */
-    };
+    } u;
     u_char length[4];
-    u_char msg[0];		/* message body */
-} __attribute__((packed)) rpki_rtr_pdu;
+} rpki_rtr_pdu;
 #define RPKI_RTR_PDU_OVERHEAD (offsetof(rpki_rtr_pdu, rpki_rtr_pdu_msg))
 
 /*
@@ -65,7 +64,7 @@ typedef struct rpki_rtr_pdu_ipv4_prefix_ {
     u_char zero;
     u_char prefix[4];
     u_char as[4];
-} __attribute__((packed)) rpki_rtr_pdu_ipv4_prefix;
+} rpki_rtr_pdu_ipv4_prefix;
 
 /*
  * IPv6 Prefix PDU.
@@ -78,7 +77,7 @@ typedef struct rpki_rtr_pdu_ipv6_prefix_ {
     u_char zero;
     u_char prefix[16];
     u_char as[4];
-} __attribute__((packed)) rpki_rtr_pdu_ipv6_prefix;
+} rpki_rtr_pdu_ipv6_prefix;
 
 /*
  * Error report PDU.
@@ -86,8 +85,7 @@ typedef struct rpki_rtr_pdu_ipv6_prefix_ {
 typedef struct rpki_rtr_pdu_error_report_ {
     rpki_rtr_pdu pdu_header;
     u_char encapsulated_pdu_length[4]; /* Encapsulated PDU length */
-    u_char variable[0];
-} __attribute__((packed)) rpki_rtr_pdu_error_report;
+} rpki_rtr_pdu_error_report;
 
 /*
  * PDU type codes
@@ -181,6 +179,7 @@ rpki_rtr_pdu_print (const u_char *tptr, u_int indent)
 {
     const rpki_rtr_pdu *pdu_header;
     u_int pdu_type, pdu_len, hexdump;
+    const u_char *msg;
 
     pdu_header = (rpki_rtr_pdu *)tptr;
     pdu_type = pdu_header->pdu_type;
@@ -201,10 +200,11 @@ rpki_rtr_pdu_print (const u_char *tptr, u_int indent)
     case RPKI_RTR_SERIAL_NOTIFY_PDU:
     case RPKI_RTR_SERIAL_QUERY_PDU:
     case RPKI_RTR_END_OF_DATA_PDU:
+        msg = (const u_char *)(pdu_header + 1);
 	printf("%sCache-Nonce: 0x%04x, Serial: %u",
 	       indent_string(indent+2),
-	       EXTRACT_16BITS(pdu_header->cache_nonce),
-	       EXTRACT_32BITS(pdu_header->msg));
+	       EXTRACT_16BITS(pdu_header->u.cache_nonce),
+	       EXTRACT_32BITS(msg));
 	break;
 
 	/*
@@ -221,7 +221,7 @@ rpki_rtr_pdu_print (const u_char *tptr, u_int indent)
     case RPKI_RTR_CACHE_RESPONSE_PDU:
 	printf("%sCache-Nonce: 0x%04x",
 	       indent_string(indent+2),
-	       EXTRACT_16BITS(pdu_header->cache_nonce));
+	       EXTRACT_16BITS(pdu_header->u.cache_nonce));
 	break;
 
     case RPKI_RTR_IPV4_PREFIX_PDU:
@@ -262,7 +262,7 @@ rpki_rtr_pdu_print (const u_char *tptr, u_int indent)
 	    encapsulated_pdu_length = EXTRACT_32BITS(pdu->encapsulated_pdu_length);
 	    tlen = pdu_len;
 
-	    error_code = EXTRACT_16BITS(pdu->pdu_header.error_code);
+	    error_code = EXTRACT_16BITS(pdu->pdu_header.u.error_code);
 	    printf("%sError code: %s (%u), Encapsulated PDU length: %u",
 		   indent_string(indent+2),
 		   tok2str(rpki_rtr_error_codes, "Unknown", error_code),
