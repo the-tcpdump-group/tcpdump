@@ -261,9 +261,6 @@ EXTRA_DIST = \
 	stime.awk \
 	strcasecmp.c \
 	tcpdump.1.in \
-	tests/02-sunrise-sunset-esp.puu \
-	tests/08-sunrise-sunset-aes.puu \
-	tests/08-sunrise-sunset-esp2.puu \
 	tests/TESTLIST \
 	tests/TESTonce \
 	tests/TESTrun.sh \
@@ -297,8 +294,6 @@ EXTRA_DIST = \
 	tests/forces1.pcap \
 	tests/forces1vvv.out \
 	tests/forces1vvvv.out \
-	tests/forces2.out \
-	tests/forces2.pcap \
 	tests/forces2v.out \
 	tests/forces2vv.out \
 	tests/ikev2.puu \
