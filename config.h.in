@@ -162,6 +162,9 @@
 /* Define to 1 if you have the <rpc/rpcent.h> header file. */
 #undef HAVE_RPC_RPCENT_H
 
+/* Define to 1 if you have the <rpc/rpc.h> header file. */
+#undef HAVE_RPC_RPC_H
+
 /* Define to 1 if you have the `setlinebuf' function. */
 #undef HAVE_SETLINEBUF
 
