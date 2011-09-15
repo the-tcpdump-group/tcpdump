@@ -253,6 +253,63 @@ ether_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 }
 
 /*
+ * This is the top level routine of the printer.  'p' points
+ * to the ether header of the packet, 'h->ts' is the timestamp,
+ * 'h->len' is the length of the packet off the wire, and 'h->caplen'
+ * is the number of bytes actually captured.
+ *
+ * This is for DLT_ETHERNET_HILSCHER, which has a 4-byte pseudo-header
+ * before the Ethernet header.
+ */
+u_int
+ether_hilscher_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
+                        const u_char *p)
+{
+	/*
+	 * Fail if we don't have enough data for the Hilscher pseudo-header.
+	 */
+	if (h->len < 4 || h->caplen < 4) {
+		printf("[|hilscher]");
+		return (h->caplen);
+	}
+
+	/* Skip the pseudo-header. */
+	ether_print(ndo, p + 4, h->len - 4, h->caplen - 4, NULL, NULL);
+
+	return (4 + ETHER_HDRLEN);
+}
+
+/*
+ * This is the top level routine of the printer.  'p' points
+ * to the ether header of the packet, 'h->ts' is the timestamp,
+ * 'h->len' is the length of the packet off the wire, and 'h->caplen'
+ * is the number of bytes actually captured.
+ *
+ * This is for DLT_ETHERNET_HILSCHER_TRANSPARENT, which has a 4-byte
+ * pseudo-header, a 7-byte Ethernet preamble, and a 1-byte Ethernet SOF
+ * before the Ethernet header.
+ */
+u_int
+ether_hilscher_transparent_if_print(netdissect_options *ndo,
+                                    const struct pcap_pkthdr *h,
+                                    const u_char *p)
+{
+	/*
+	 * Fail if we don't have enough data for the Hilscher pseudo-header,
+	 * preamble, and SOF.
+	 */
+	if (h->len < 12 || h->caplen < 12) {
+		printf("[|hilscher-transparent]");
+		return (h->caplen);
+	}
+
+	/* Skip the pseudo-header, preamble, and SOF. */
+	ether_print(ndo, p + 12, h->len - 12, h->caplen - 12, NULL, NULL);
+
+	return (12 + ETHER_HDRLEN);
+}
+
+/*
  * Prints the packet payload, given an Ethernet type code for the payload's
  * protocol.
  *
