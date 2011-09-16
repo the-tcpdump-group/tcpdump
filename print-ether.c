@@ -258,18 +258,18 @@ ether_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  *
- * This is for DLT_ETHERNET_HILSCHER, which has a 4-byte pseudo-header
+ * This is for DLT_NETANALYZER, which has a 4-byte pseudo-header
  * before the Ethernet header.
  */
 u_int
-ether_hilscher_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
-                        const u_char *p)
+netanalyzer_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
+                     const u_char *p)
 {
 	/*
 	 * Fail if we don't have enough data for the Hilscher pseudo-header.
 	 */
 	if (h->len < 4 || h->caplen < 4) {
-		printf("[|hilscher]");
+		printf("[|netanalyzer]");
 		return (h->caplen);
 	}
 
@@ -285,21 +285,21 @@ ether_hilscher_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
  * 'h->len' is the length of the packet off the wire, and 'h->caplen'
  * is the number of bytes actually captured.
  *
- * This is for DLT_ETHERNET_HILSCHER_TRANSPARENT, which has a 4-byte
+ * This is for DLT_NETANALYZER_TRANSPARENT, which has a 4-byte
  * pseudo-header, a 7-byte Ethernet preamble, and a 1-byte Ethernet SOF
  * before the Ethernet header.
  */
 u_int
-ether_hilscher_transparent_if_print(netdissect_options *ndo,
-                                    const struct pcap_pkthdr *h,
-                                    const u_char *p)
+netanalyzer_transparent_if_print(netdissect_options *ndo,
+                                 const struct pcap_pkthdr *h,
+                                 const u_char *p)
 {
 	/*
 	 * Fail if we don't have enough data for the Hilscher pseudo-header,
 	 * preamble, and SOF.
 	 */
 	if (h->len < 12 || h->caplen < 12) {
-		printf("[|hilscher-transparent]");
+		printf("[|netanalyzer-transparent]");
 		return (h->caplen);
 	}
 
