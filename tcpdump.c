@@ -315,11 +315,11 @@ static struct ndo_printer ndo_printers[] = {
 #ifdef DLT_PPI
 	{ ppi_if_print,		DLT_PPI },
 #endif
-#ifdef DLT_ETHERNET_HILSCHER
-	{ ether_hilscher_if_print, DLT_ETHERNET_HILSCHER },
+#ifdef DLT_NETANALYZER
+	{ netanalyzer_if_print, DLT_NETANALYZER },
 #endif
-#ifdef DLT_ETHERNET_HILSCHER_TRANSPARENT
-	{ ether_hilscher_transparent_if_print, DLT_ETHERNET_HILSCHER_TRANSPARENT },
+#ifdef DLT_NETANALYZER_TRANSPARENT
+	{ netanalyzer_transparent_if_print, DLT_NETANALYZER_TRANSPARENT },
 #endif
 	{ NULL,			0 },
 };

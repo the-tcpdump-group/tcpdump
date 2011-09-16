@@ -299,11 +299,11 @@ extern void ether_print(netdissect_options *,
 
 extern u_int ether_if_print(netdissect_options *, 
                             const struct pcap_pkthdr *,const u_char *);
-extern u_int ether_hilscher_if_print(netdissect_options *, 
-                                     const struct pcap_pkthdr *,const u_char *);
-extern u_int ether_hilscher_transparent_if_print(netdissect_options *, 
-                                                 const struct pcap_pkthdr *,
-                                                 const u_char *);
+extern u_int netanalyzer_if_print(netdissect_options *, 
+                                  const struct pcap_pkthdr *,const u_char *);
+extern u_int netanalyzer_transparent_if_print(netdissect_options *, 
+                                              const struct pcap_pkthdr *,
+                                              const u_char *);
 
 extern int ethertype_print(netdissect_options *,u_short, const u_char *,
 			     u_int, u_int);
