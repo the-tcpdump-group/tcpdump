@@ -1179,15 +1179,15 @@ esis_print(const u_int8_t *pptr, u_int length)
 	}
 
         /* now walk the options */
-        while (li >= 2) {
+        while (li != 0) {
             u_int op, opli;
             const u_int8_t *tptr;
             
-            TCHECK2(*pptr, 2);
             if (li < 2) {
                 printf(", bad opts/li");
                 return;
             }
+            TCHECK2(*pptr, 2);
             op = *pptr++;
             opli = *pptr++;
             li -= 2;
@@ -1206,8 +1206,11 @@ esis_print(const u_int8_t *pptr, u_int length)
             switch (op) {
 
             case ESIS_OPTION_ES_CONF_TIME:
-                TCHECK2(*pptr, 2);
-                printf("%us", EXTRACT_16BITS(tptr));
+                if (opli == 2) {
+                    TCHECK2(*pptr, 2);
+                    printf("%us", EXTRACT_16BITS(tptr));
+                } else
+                    printf("(bad length)");
                 break;
 
             case ESIS_OPTION_PROTOCOLS:
