@@ -197,7 +197,7 @@ static int ospf_decode_v2(const struct ospfhdr *, const u_char *);
 static int ospf_decode_lls(const struct ospfhdr *, register u_int);
 
 int
-ospf_print_grace_lsa (u_int8_t *tptr, u_int ls_length) {
+ospf_print_grace_lsa (const u_int8_t *tptr, u_int ls_length) {
 
     u_int tlv_type, tlv_length;
 
@@ -279,7 +279,7 @@ trunc:
 }
 
 int
-ospf_print_te_lsa (u_int8_t *tptr, u_int ls_length) {
+ospf_print_te_lsa (const u_int8_t *tptr, u_int ls_length) {
 
     u_int tlv_type, tlv_length, subtlv_type, subtlv_length;
     u_int priority_level, te_class, count_srlg;
