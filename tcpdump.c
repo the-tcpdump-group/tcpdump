@@ -933,6 +933,8 @@ main(int argc, char **argv)
 				packettype = PT_TFTP;
 			else if (strcasecmp(optarg, "aodv") == 0)
 				packettype = PT_AODV;
+			else if (strcasecmp(optarg, "carp") == 0)
+				packettype = PT_CARP;
 			else
 				error("unknown packet type `%s'", optarg);
 			break;
