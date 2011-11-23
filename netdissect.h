@@ -450,6 +450,8 @@ extern void l2tp_print(netdissect_options *,const u_char *, u_int);
 extern void lcp_print(netdissect_options *,const u_char *, u_int);
 extern void vrrp_print(netdissect_options *,const u_char *bp,
 		       u_int len, int ttl);
+extern void carp_print(netdissect_options *,const u_char *bp,
+		       u_int len, int ttl);
 extern void cdp_print(netdissect_options *,const u_char *,
 		      u_int, u_int, const u_char *, const u_char *);
 extern void stp_print(netdissect_options *,const u_char *p, u_int length);

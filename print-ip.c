@@ -462,7 +462,19 @@ again:
 		break;
 
 	case IPPROTO_VRRP:
-		vrrp_print(ipds->cp, ipds->len, ipds->ip->ip_ttl);
+		if (packettype == PT_CARP) {
+			if (vflag)
+				(void)printf("carp %s > %s: ",
+					     ipaddr_string(&ipds->ip->ip_src),
+					     ipaddr_string(&ipds->ip->ip_dst));
+			carp_print(ipds->cp, ipds->len, ipds->ip->ip_ttl);
+		} else {
+			if (vflag)
+				(void)printf("vrrp %s > %s: ",
+					     ipaddr_string(&ipds->ip->ip_src),
+					     ipaddr_string(&ipds->ip->ip_dst));
+			vrrp_print(ipds->cp, ipds->len, ipds->ip->ip_ttl);
+		}
 		break;
 
 	case IPPROTO_PGM:

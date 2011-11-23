@@ -70,6 +70,7 @@ extern char *strsep(char **, const char *);
 #define PT_CNFP		7	/* Cisco NetFlow protocol */
 #define PT_TFTP		8	/* trivial file transfer protocol */
 #define PT_AODV		9	/* Ad-hoc On-demand Distance Vector Protocol */
+#define PT_CARP         10      /* Common Address Redundancy Protocol */
 
 #ifndef min
 #define min(a,b) ((a)>(b)?(b):(a))
@@ -290,6 +291,7 @@ extern const char *nt_errstr(u_int32_t);
 extern void print_data(const unsigned char *, int);
 extern void l2tp_print(const u_char *, u_int);
 extern void vrrp_print(const u_char *, u_int, int);
+extern void carp_print(const u_char *, u_int, int);
 extern void slow_print(const u_char *, u_int);
 extern void sflow_print(const u_char *, u_int);
 extern void mpcp_print(const u_char *, u_int);
