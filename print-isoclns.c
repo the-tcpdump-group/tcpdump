@@ -618,10 +618,6 @@ struct isis_tlv_lsp {
 
 void isoclns_print(const u_int8_t *p, u_int length, u_int caplen)
 {
-	const struct isis_common_header *header;
-
-	header = (const struct isis_common_header *)p;
-
         if (caplen <= 1) { /* enough bytes on the wire ? */
             printf("|OSI");
             return;
