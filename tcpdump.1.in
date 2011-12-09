@@ -1291,7 +1291,6 @@ RA, \fInot\fP set) and `|' (truncated message, TC, set).
 If the
 `question' section doesn't contain exactly one entry, `[\fIn\fPq]'
 is printed.
-
 .HD
 SMB/CIFS decoding
 .LP
@@ -1299,19 +1298,18 @@ SMB/CIFS decoding
 on UDP/137, UDP/138 and TCP/139.
 Some primitive decoding of IPX and
 NetBEUI SMB data is also done.
-
+.LP
 By default a fairly minimal decode is done, with a much more detailed
 decode done if -v is used.
 Be warned that with -v a single SMB packet
 may take up a page or more, so only use -v if you really want all the
 gory details.
-
-For information on SMB packet formats and what all te fields mean see
+.LP
+For information on SMB packet formats and what all the fields mean see
 www.cifs.org or the pub/samba/specs/ directory on your favorite
 samba.org mirror site.
 The SMB patches were written by Andrew Tridgell
 (tridge@samba.org).
-
 .HD
 NFS Requests and Replies
 .LP
