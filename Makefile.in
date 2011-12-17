@@ -335,6 +335,8 @@ EXTRA_DIST = \
 	tests/mpls-traceroute.pcap \
 	tests/ospf-gmpls.out \
 	tests/ospf-gmpls.pcap \
+	tests/pppoe.out \
+	tests/pppoe.pcap \
 	tests/print-A.out \
 	tests/print-AA.out \
 	tests/print-capX.out \
