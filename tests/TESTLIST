@@ -60,3 +60,6 @@ sflow1          sflow_multiple_counter_30_pdus.pcap     sflow_multiple_counter_3
 # Babel tests
 babel1          babel.pcap             babel1.out      -t 
 babel1v         babel.pcap             babel1v.out     -t -v
+
+# PPPoE tests
+pppoe           pppoe.pcap             pppoe.out       -t
