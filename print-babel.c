@@ -37,6 +37,7 @@
 
 #include "addrtoname.h"
 #include "interface.h"
+#include "extract.h"
 
 static void babel_print_v2(const u_char *cp, u_int length);
 
@@ -68,23 +69,6 @@ babel_print(const u_char *cp, u_int length) {
     printf(" [|babel]");
     return;
 }
-
-#if defined __GNUC__
-struct __us { unsigned short x __attribute__((packed)); };
-#define DO_NTOHS(_d, _s) \
-    do { _d = ntohs(((const struct __us*)(_s))->x); } while(0)
-#define DO_HTONS(_d, _s) \
-    do { ((struct __us*)(_d))->x = htons(_s); } while(0)
-#else
-#define DO_NTOHS(_d, _s) \
-    do { short _dd; \
-         memcpy(&(_dd), (_s), 2); \
-         _d = ntohs(_dd); } while(0)
-#define DO_HTONS(_d, _s) \
-    do { unsigned short _dd; \
-         _dd = htons(_s); \
-         memcpy((_d), &(_dd), 2); } while(0)
-#endif
 
 #define MESSAGE_PAD1 0
 #define MESSAGE_PADN 1
@@ -194,29 +178,37 @@ network_address(int ae, const unsigned char *a, unsigned int len,
     return network_prefix(ae, -1, 0, a, NULL, len, a_r);
 }
 
+#define ICHECK(i, l) \
+	if ((i) + (l) > bodylen || (i) + (l) > length) goto corrupt;
+
 static void
 babel_print_v2(const u_char *cp, u_int length) {
-    int i;
+    u_int i;
     u_short bodylen;
     u_char v4_prefix[16] =
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0xFF, 0, 0, 0, 0 };
     u_char v6_prefix[16] = {0};
 
-    DO_NTOHS(bodylen, cp + 2);
-    printf(" (%d)", bodylen);
+    TCHECK2(*cp, 4);
+    if (length < 4)
+        goto corrupt;
+    bodylen = EXTRACT_16BITS(cp + 2);
+    printf(" (%u)", bodylen);
 
+    /* Process the TLVs in the body */
     i = 0;
     while(i < bodylen) {
         const u_char *message;
         u_char type, len;
 
-        TCHECK2(*cp, 4 + i);
-
         message = cp + 4 + i;
+        TCHECK2(*message, 2);
+        ICHECK(i, 2);
         type = message[0];
         len = message[1];
 
-        TCHECK2(*cp, 4 + i + 2 + len);
+        TCHECK2(*message, 2 + len);
+        ICHECK(i, 2 + len);
 
         switch(type) {
         case MESSAGE_PAD1: {
@@ -242,8 +234,8 @@ babel_print_v2(const u_char *cp, u_int length) {
             else {
                 printf("\n\tAcknowledgment Request ");
                 if(len < 6) goto corrupt;
-                DO_NTOHS(nonce, message + 4);
-                DO_NTOHS(interval, message + 6);
+                nonce = EXTRACT_16BITS(message + 4);
+                interval = EXTRACT_16BITS(message + 6);
                 printf("%04x %d", nonce, interval);
             }
         }
@@ -256,7 +248,7 @@ babel_print_v2(const u_char *cp, u_int length) {
             else {
                 printf("\n\tAcknowledgment ");
                 if(len < 2) goto corrupt;
-                DO_NTOHS(nonce, message + 2);
+                nonce = EXTRACT_16BITS(message + 2);
                 printf("%04x", nonce);
             }
         }
@@ -269,8 +261,8 @@ babel_print_v2(const u_char *cp, u_int length) {
             else {
                 printf("\n\tHello ");
                 if(len < 6) goto corrupt;
-                DO_NTOHS(seqno, message + 4);
-                DO_NTOHS(interval, message + 6);
+                seqno = EXTRACT_16BITS(message + 4);
+                interval = EXTRACT_16BITS(message + 6);
                 printf("seqno %u interval %u", seqno, interval);
             }
         }
@@ -285,8 +277,8 @@ babel_print_v2(const u_char *cp, u_int length) {
                 int rc;
                 printf("\n\tIHU ");
                 if(len < 6) goto corrupt;
-                DO_NTOHS(txcost, message + 4);
-                DO_NTOHS(interval, message + 6);
+                txcost = EXTRACT_16BITS(message + 4);
+                interval = EXTRACT_16BITS(message + 6);
                 rc = network_address(message[2], message + 8, len - 6, address);
                 if(rc < 0) { printf("[|babel]"); break; }
                 printf("%s txcost %u interval %d",
@@ -344,9 +336,9 @@ babel_print_v2(const u_char *cp, u_int length) {
                                     message[2] == 1 ? v4_prefix : v6_prefix,
                                     len - 10, prefix);
                 if(rc < 0) goto corrupt;
-                DO_NTOHS(interval, message + 6);
-                DO_NTOHS(seqno, message + 8);
-                DO_NTOHS(metric, message + 10);
+                interval = EXTRACT_16BITS(message + 6);
+                seqno = EXTRACT_16BITS(message + 8);
+                metric = EXTRACT_16BITS(message + 10);
                 printf("%s%s%s %s metric %u seqno %u interval %u",
                        (message[3] & 0x80) ? "/prefix": "",
                        (message[3] & 0x40) ? "/id" : "",
@@ -391,7 +383,7 @@ babel_print_v2(const u_char *cp, u_int length) {
                 u_char prefix[16], plen;
                 printf("\n\tMH-Request ");
                 if(len < 14) goto corrupt;
-                DO_NTOHS(seqno, message + 4);
+                seqno = EXTRACT_16BITS(message + 4);
                 rc = network_prefix(message[2], message[3], 0,
                                     message + 16, NULL, len - 14, prefix);
                 if(rc < 0) goto corrupt;
