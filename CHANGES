@@ -19,6 +19,7 @@ Friday  December 9, 2011.  guy@alum.mit.edu.
 	Get rid of some GCCisms that caused builds to fai with compilers
 	 that don't support them.
 	Fix typo in man page.
+	Added length checks to Babel printer.
 
 Sunday  July 24, 2011.  mcr@sandelman.ca.
   Summary for 4.2.+
