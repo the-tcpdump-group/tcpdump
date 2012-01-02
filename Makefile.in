@@ -347,7 +347,6 @@ EXTRA_DIST = \
 	tests/sflow_multiple_counter_30_pdus.out \
 	tests/sflow_multiple_counter_30_pdus.pcap \
 	vfprintf.c \
-	win32/Include/bittypes.h \
 	win32/Include/errno.h \
 	win32/Include/getopt.h \
 	win32/Include/w32_fzs.h \
