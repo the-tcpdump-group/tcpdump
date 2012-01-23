@@ -661,7 +661,7 @@ ip_print(netdissect_options *ndo,
 	    if (ipds->off & 0x1fff) {
 	        (void)printf("%s > %s:", ipaddr_string(&ipds->ip->ip_src),
 			     ipaddr_string(&ipds->ip->ip_dst));
-		if ((proto = getprotobynumber(ipds->ip->ip_p)) != NULL)
+		if (!ndo->ndo_nflag && (proto = getprotobynumber(ipds->ip->ip_p)) != NULL)
 		    (void)printf(" %s", proto->p_name);
 		else
 		    (void)printf(" ip-proto-%d", ipds->ip->ip_p);

@@ -11,7 +11,7 @@ esp2 08-sunrise-sunset-esp2.pcap esp2.out -t -E "0x12345678@192.1.2.45 3des-cbc-
 esp3 02-sunrise-sunset-esp.pcap esp1.out -t -E "3des-cbc-hmac96:0x4043434545464649494a4a4c4c4f4f515152525454575758"
 esp4 08-sunrise-sunset-esp2.pcap esp2.out -t -E "file esp-secrets.txt"
 esp5 08-sunrise-sunset-aes.pcap esp5.out -t -E "file esp-secrets.txt"
-espudp1 espudp1.pcap espudp1.out -t -E "file esp-secrets.txt"
+espudp1 espudp1.pcap                    espudp1.out -nnn -t -E "file esp-secrets.txt"
 
 # ISAKMP tests
 isakmp1 isakmp-delete-segfault.pcap isakmp1.out -t 
