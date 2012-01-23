@@ -1,3 +1,26 @@
+Friday  December 9, 2011.  guy@alum.mit.edu.
+  Summary for 4.2.1 tcpdump release
+	Only build the Babel printer if IPv6 is enabled.
+	Support Babel on port 6696 as well as 6697.
+	Include ppi.h in release tarball.
+	Include all the test files in the release tarball, and don't
+	 "include" test files that no longer exist.
+	Don't assume we have <rpc/rpc.h> - check for it.
+	Support "-T carp" as a way of dissecting IP protocol 112 as CARP
+	 rather than VRRP.
+	Support Hilscher NetAnalyzer link-layer header format.
+	Constify some pointers and fix compiler warnings.
+	Get rid of never-true test.
+	Fix an unintended fall-through in a case statement in the ARP
+	 printer.
+	Fix several cases where sizeof(sizeof(XXX)) was used when just
+	 sizeof(XXX) was intended.
+	Make stricter sanity checks in the ES-IS printer.
+	Get rid of some GCCisms that caused builds to fai with compilers
+	 that don't support them.
+	Fix typo in man page.
+	Added length checks to Babel printer.
+
 Sunday  July 24, 2011.  mcr@sandelman.ca.
   Summary for 4.2.+
 	merged 802.15.4 decoder from Dmitry Eremin-Solenikov <dbaryshkov
