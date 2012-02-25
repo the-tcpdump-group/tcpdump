@@ -63,3 +63,6 @@ babel1v         babel.pcap             babel1v.out     -t -v
 
 # PPPoE tests
 pppoe           pppoe.pcap             pppoe.out       -t
+
+# IGMP tests
+igmpv3-queries  igmpv3-queries.pcap     igmpv3-queries.out      -t
