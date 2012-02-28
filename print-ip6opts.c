@@ -141,6 +141,8 @@ ip6_opt_print(const u_char *bp, int len)
     int i;
     int optlen = 0;
 
+    if (len == 0)
+        return;
     for (i = 0; i < len; i += optlen) {
 	if (bp[i] == IP6OPT_PAD1)
 	    optlen = 1;
@@ -275,6 +277,7 @@ ip6_opt_print(const u_char *bp, int len)
 	    break;
 	}
     }
+    printf(" ");
 
 #if 0
 end:
