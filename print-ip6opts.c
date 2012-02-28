@@ -271,7 +271,7 @@ ip6_opt_print(const u_char *bp, int len)
 		printf("(type %d: trunc)", bp[i]);
 		goto trunc;
 	    }
-	    printf("(opt_type 0x%02x: len=%d) ", bp[i], bp[i + 1]);
+	    printf("(opt_type 0x%02x: len=%d)", bp[i], bp[i + 1]);
 	    break;
 	}
     }
