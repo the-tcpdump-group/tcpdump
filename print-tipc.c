@@ -70,6 +70,7 @@ static const char rcsid[] _U_ =
 
 struct tipc_pkthdr {
 	u_int32_t w0;
+	u_int32_t w1;
 };
 
 #define TIPC_VER(w0)		(((w0) >> 29) & 0x07)
@@ -102,6 +103,12 @@ static const struct tok tipcmtype_values[] = {
     { TIPC_DIRECT_MSG, "MCAST_MSG" },
     { TIPC_NAMED_MSG,  "NAMED_MSG" },
     { TIPC_MCAST_MSG,  "DIRECT_MSG" },
+    { 0, NULL }
+};
+
+static const struct tok tipc_linkconf_mtype_values[] = {
+    { 0,   "Link request" },
+    { 1,   "Link response" },
     { 0, NULL }
 };
 
@@ -188,15 +195,17 @@ print_payload(netdissect_options *ndo, struct payload_tipc_pkthdr *ap)
 	dest_port = EXTRACT_32BITS(&ap->dest_port);
 	prev_node = EXTRACT_32BITS(&ap->prev_node);
 
-	ND_PRINT((ndo, "<%u.%u.%u> : %u > <%u.%u.%u> : %u, Previous Node <%u.%u.%u>, Broadcast Ack %u, Link Ack %u, Link Sequence %u, headerlength %u bytes, MessageSize %u bytes, %s messageType %s\n\n",
+	ND_PRINT((ndo, " messageType %s: <%u.%u.%u> : %u > <%u.%u.%u> : %u",
+	    tok2str(tipcmtype_values, "Unknown", mtype),
 	    TIPC_ZONE(orig_node), TIPC_CLUSTER(orig_node), TIPC_NODE(orig_node),
 	    orig_port,
 	    TIPC_ZONE(dest_node), TIPC_CLUSTER(dest_node), TIPC_NODE(dest_node),
-	    dest_port,
-	    TIPC_ZONE(prev_node), TIPC_CLUSTER(prev_node), TIPC_NODE(prev_node),
-	    broadcast_ack, link_ack, link_seq, hsize*4, msize,
-	    tok2str(tipcuser_values, "unknown", user),
-	    tok2str(tipcmtype_values, "Unknown", mtype)));
+	    dest_port));
+	if (ndo->ndo_vflag) {
+		ND_PRINT((ndo, "\n\tPrevious Node <%u.%u.%u>, Broadcast Ack %u, Link Ack %u, Link Sequence %u",
+		    TIPC_ZONE(prev_node), TIPC_CLUSTER(prev_node), TIPC_NODE(prev_node),
+		    broadcast_ack, link_ack, link_seq));
+	}
 	return;
 
 trunc:
@@ -207,7 +216,6 @@ static void
 print_internal(netdissect_options *ndo, struct internal_tipc_pkthdr *ap)
 {
 	u_int32_t w0, w1, w2, w4, w5, w9;
-	u_int user;
 	u_int hsize;
 	u_int msize;
 	u_int mtype;
@@ -227,7 +235,6 @@ print_internal(netdissect_options *ndo, struct internal_tipc_pkthdr *ap)
 
 	ND_TCHECK(*ap);
 	w0 = EXTRACT_32BITS(&ap->w0);
-	user = TIPC_USER(w0);
 	hsize = TIPC_HSIZE(w0);
 	msize = TIPC_MSIZE(w0);
 	w1 = EXTRACT_32BITS(&ap->w1);
@@ -250,15 +257,17 @@ print_internal(netdissect_options *ndo, struct internal_tipc_pkthdr *ap)
 	msg_cnt = TIPC_MSG_CNT(w9);
 	link_tol = TIPC_LINK_TOL(w9);
 
-	ND_PRINT((ndo, "<%u.%u.%u> > <%u.%u.%u>, Previous Node <%u.%u.%u>, Session No. %u, Broadcast Ack %u, Sequence Gap %u,  Broadcast Gap After %u, Broadcast Gap To %u, Last Sent Packet No. %u, Next sent Packet No. %u, Transport Sequence %u, msg_count %u, Link Tolerance %u,   headerlength %u bytes, MessageSize %u bytes, %s messageType %s\n\n",
+	ND_PRINT((ndo, " messageType %s: <%u.%u.%u> > <%u.%u.%u>",
+	    tok2str(tipcmtype_values, "Unknown", mtype),
 	    TIPC_ZONE(orig_node), TIPC_CLUSTER(orig_node), TIPC_NODE(orig_node),
-	    TIPC_ZONE(dest_node), TIPC_CLUSTER(dest_node), TIPC_NODE(dest_node),
-	    TIPC_ZONE(prev_node), TIPC_CLUSTER(prev_node), TIPC_NODE(prev_node),
-	    sess_no, broadcast_ack, seq_gap, bc_gap_after, bc_gap_to,
-	    last_sent_frag, next_sent_frag, trans_seq, msg_cnt, link_tol,
-	    hsize*4, msize,
-	    tok2str(tipcuser_values, "unknown", user),
-	    tok2str(tipcmtype_values, "Unknown", mtype)));
+	    TIPC_ZONE(dest_node), TIPC_CLUSTER(dest_node), TIPC_NODE(dest_node)));
+	if (ndo->ndo_vflag) {
+		ND_PRINT((ndo, "\n\tPrevious Node <%u.%u.%u>, Session No. %u, Broadcast Ack %u, Sequence Gap %u,  Broadcast Gap After %u, Broadcast Gap To %u, Last Sent Packet No. %u, Next sent Packet No. %u, Transport Sequence %u, msg_count %u, Link Tolerance %u",
+		    TIPC_ZONE(prev_node), TIPC_CLUSTER(prev_node), TIPC_NODE(prev_node),
+		    sess_no, broadcast_ack, seq_gap, bc_gap_after, bc_gap_to,
+		    last_sent_frag, next_sent_frag, trans_seq, msg_cnt,
+		    link_tol));
+	}
 	return;
 
 trunc:
@@ -270,8 +279,6 @@ print_link_conf(netdissect_options *ndo, struct link_conf_tipc_pkthdr *ap)
 {
 	u_int32_t w0, w1, w5;
 	u_int user;
-	u_int hsize;
-	u_int msize;
 	u_int mtype;
 	u_int node_sig;
 	u_int prev_node;
@@ -282,8 +289,6 @@ print_link_conf(netdissect_options *ndo, struct link_conf_tipc_pkthdr *ap)
 	ND_TCHECK(*ap);
 	w0 = EXTRACT_32BITS(&ap->w0);
 	user = TIPC_USER(w0);
-	hsize = TIPC_HSIZE(w0);
-	msize = TIPC_MSIZE(w0);
 	w1 = EXTRACT_32BITS(&ap->w1);
 	mtype = TIPC_MTYPE(w1);
 	node_sig = TIPC_NODE_SIG(w1);
@@ -294,14 +299,14 @@ print_link_conf(netdissect_options *ndo, struct link_conf_tipc_pkthdr *ap)
 	w5 = EXTRACT_32BITS(&ap->w5);
 	media_id = TIPC_MEDIA_ID(w5);
 
-	ND_PRINT((ndo, "<%u.%u.%u> > <%u.%u.%u>  NodeSignature %u, network_id %u, %s, headerlength %u bytes, MessageSize %u bytes, messageType %s, media_id %u\n\n",
+	ND_PRINT((ndo, " messageType %s: <%u.%u.%u> > <%u.%u.%u>",
+	    tok2str(tipc_linkconf_mtype_values, "Unknown", mtype),
 	    TIPC_ZONE(prev_node), TIPC_CLUSTER(prev_node), TIPC_NODE(prev_node),
-	    TIPC_ZONE(dest_domain), TIPC_CLUSTER(dest_domain), TIPC_NODE(dest_domain),
-	    node_sig, ntwrk_id,
-	    tok2str(tipcuser_values, "unknown", user),
-	    hsize*4, msize,
-	    tok2str(tipcmtype_values, "Unknown", mtype),
-	    media_id));
+	    TIPC_ZONE(dest_domain), TIPC_CLUSTER(dest_domain), TIPC_NODE(dest_domain)));
+	if (ndo->ndo_vflag) {
+		ND_PRINT((ndo, "\n\tNodeSignature %u, network_id %u, media_id %u",
+		    node_sig, ntwrk_id, media_id));
+	}
 	return;
 
 trunc:
@@ -313,16 +318,23 @@ tipc_print(netdissect_options *ndo, const u_char *bp, u_int length _U_,
     u_int caplen _U_)
 {
 	struct tipc_pkthdr *ap;
-	u_int32_t w0;
-	u_int usr;
+	u_int32_t w0, w1;
+	u_int user;
+	u_int hsize;
+	u_int msize;
 
 	ap = (struct tipc_pkthdr *)bp;
-	ND_TCHECK(ap->w0);
+	ND_TCHECK(ap->w1);
 	w0 = EXTRACT_32BITS(&ap->w0);
-	ND_PRINT((ndo, "TIPC Protocol Packet version %u.0\n", TIPC_VER(w0)));
+	user = TIPC_USER(w0);
+	hsize = TIPC_HSIZE(w0);
+	msize = TIPC_MSIZE(w0);
+	w1 = EXTRACT_32BITS(&ap->w1);
+	ND_PRINT((ndo, "TIPC v%u.0, headerlength %u bytes, MessageSize %u bytes, %s",
+	    TIPC_VER(w0), hsize*4, msize,
+	    tok2str(tipcuser_values, "unknown", user)));
 
-	usr = TIPC_USER(w0);
-	switch (usr)
+	switch (user)
 	{
 		case TIPC_USER_LOW_IMPORTANCE:
 		case TIPC_USER_MEDIUM_IMPORTANCE:
