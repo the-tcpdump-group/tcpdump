@@ -4190,7 +4190,7 @@ fi
 done
 
 if test "$ac_cv_header_net_pfvar_h" = yes; then
-	LOCALSRC="print-pflog.c $LOCALSRC"
+	LOCALSRC="print-pflog.c print-pfsync.c pf_print_state.c $LOCALSRC"
 fi
 
 for ac_header in netinet/if_ether.h

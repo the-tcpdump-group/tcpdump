@@ -245,6 +245,7 @@ EXTRA_DIST = \
 	mkdep \
 	packetdat.awk \
 	pcap_dump_ftell.c \
+	pf_print_state.c \
 	print-babel.c \
 	print-dhcp6.c \
 	print-frag6.c \
@@ -255,6 +256,7 @@ EXTRA_DIST = \
 	print-netbios.c \
 	print-ospf6.c \
 	print-pflog.c \
+	print-pfsync.c \
 	print-ripng.c \
 	print-rt6.c \
 	print-smb.c \
