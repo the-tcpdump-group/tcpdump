@@ -477,14 +477,6 @@ again:
 		}
 		break;
 
-#ifdef HAVE_NET_PFVAR_H
-	case IPPROTO_PFSYNC:
-		pfsync_ip_print(ipds->cp,
-		    (int)(snapend - (u_char *)ipds->ip) - IP_HL(ipds->ip) * 4,
-				(const u_char *)ipds->ip);
-		break;
-#endif
-
 	case IPPROTO_PGM:
 		pgm_print(ipds->cp, ipds->len, (const u_char *)ipds->ip);
 		break;

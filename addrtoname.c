@@ -156,7 +156,6 @@ struct enamemem {
 static struct enamemem enametable[HASHNAMESIZE];
 static struct enamemem nsaptable[HASHNAMESIZE];
 static struct enamemem bytestringtable[HASHNAMESIZE];
-static const char *ipprototable[256];
 
 struct protoidmem {
 	u_int32_t p_oui;
@@ -718,12 +717,6 @@ ipxsap_string(u_short port)
 	return (tp->name);
 }
 
-const char *
-ipproto_string(u_int proto)
-{
-	return ipprototable[proto & 0xff];
-}
-
 static void
 init_servarray(void)
 {
@@ -753,25 +746,6 @@ init_servarray(void)
 		table->nxt = newhnamemem();
 	}
 	endservent();
-}
-
-static void
-init_ipprotoarray(void)
-{
-	int i;
-	char buf[sizeof("000")];
-	struct protoent	*pr;
-
-	if (!nflag) {
-		while ((pr = getprotoent()) != NULL)
-			ipprototable[pr->p_proto & 0xff] = strdup(pr->p_name);
-		endprotoent();
-	}
-	for (i = 0; i < 256; i++)
-		if (ipprototable[i] == NULL) {
-			(void)snprintf(buf, sizeof(buf), "%d", i);
-			ipprototable[i] = strdup(buf);
-		}
 }
 
 /* in libpcap.a (nametoaddr.c) */
@@ -1163,7 +1137,6 @@ init_addrtoname(u_int32_t localnet, u_int32_t mask)
 		f_localnet = localnet;
 		f_netmask = mask;
 	}
-	init_ipprotoarray();
 	if (nflag)
 		/*
 		 * Simplest way to suppress names.
