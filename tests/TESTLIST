@@ -1,5 +1,6 @@
-# BGP test
+# BGP tests
 bgp_vpn_attrset bgp_vpn_attrset.pcap bgp_vpn_attrset.out -t -v 
+mpbgp-linklocal-nexthop mpbgp-linklocal-nexthop.pcap mpbgp-linklocal-nexthop.out -t -v
 
 # EAP tests
 eapon1 eapon1.pcap eapon1.out -t 
