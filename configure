@@ -9344,7 +9344,7 @@ fi
 done
 
 if test $ac_cv_func_pcap_findalldevs = "yes" ; then
-    savedppflags="$CPPFLAGS"
+    savedcppflags="$CPPFLAGS"
     CPPFLAGS="$CPPFLAGS $V_INCLS"
     { echo "$as_me:$LINENO: checking for pcap_if_t" >&5
 echo $ECHO_N "checking for pcap_if_t... $ECHO_C" >&6; }
@@ -11762,7 +11762,7 @@ _ACEOF
 fi
 
 
-		savedppflags="$CPPFLAGS"
+		savedcppflags="$CPPFLAGS"
 		CPPFLAGS="$CPPFLAGS $V_INCLS"
 
 for ac_header in openssl/evp.h
