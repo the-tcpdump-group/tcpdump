@@ -93,6 +93,7 @@ struct bgp_opt {
 	/* variable length */
 };
 #define BGP_OPT_SIZE		2	/* some compilers may pad to 4 bytes */
+#define BGP_CAP_HEADER_SIZE	2	/* some compilers may pad to 4 bytes */
 
 #define BGP_UPDATE_MINSIZE      23
 
@@ -2160,14 +2161,97 @@ trunc:
 }
 
 static void
+bgp_capabilities_print(const u_char *opt, int caps_len)
+{
+	char tokbuf[TOKBUFSIZE];
+	char tokbuf2[TOKBUFSIZE];
+	int cap_type, cap_len, tcap_len, cap_offset;
+        int i = 0;
+
+        while (i < caps_len) {
+                TCHECK2(opt[i], BGP_CAP_HEADER_SIZE);
+                cap_type=opt[i];
+                cap_len=opt[i+1];
+                tcap_len=cap_len;
+                printf("\n\t      %s (%u), length: %u",
+                       tok2strbuf(bgp_capcode_values, "Unknown",
+                                  cap_type, tokbuf, sizeof(tokbuf)),
+                       cap_type,
+                       cap_len);
+                TCHECK2(opt[i+2], cap_len);
+                switch (cap_type) {
+                case BGP_CAPCODE_MP:
+                    printf("\n\t\tAFI %s (%u), SAFI %s (%u)",
+                           tok2strbuf(af_values, "Unknown",
+                                      EXTRACT_16BITS(opt+i+2),
+                                      tokbuf, sizeof(tokbuf)),
+                           EXTRACT_16BITS(opt+i+2),
+                           tok2strbuf(bgp_safi_values, "Unknown",
+                                      opt[i+5],
+                                      tokbuf, sizeof(tokbuf)),
+                           opt[i+5]);
+                    break;
+                case BGP_CAPCODE_RESTART:
+                    printf("\n\t\tRestart Flags: [%s], Restart Time %us",
+                           ((opt[i+2])&0x80) ? "R" : "none",
+                           EXTRACT_16BITS(opt+i+2)&0xfff);
+                    tcap_len-=2;
+                    cap_offset=4;
+                    while(tcap_len>=4) {
+                        printf("\n\t\t  AFI %s (%u), SAFI %s (%u), Forwarding state preserved: %s",
+                               tok2strbuf(af_values,"Unknown",
+                                          EXTRACT_16BITS(opt+i+cap_offset),
+                                          tokbuf, sizeof(tokbuf)),
+                               EXTRACT_16BITS(opt+i+cap_offset),
+                               tok2strbuf(bgp_safi_values,"Unknown",
+                                          opt[i+cap_offset+2],
+                                          tokbuf2, sizeof(tokbuf2)),
+                               opt[i+cap_offset+2],
+                               ((opt[i+cap_offset+3])&0x80) ? "yes" : "no" );
+                        tcap_len-=4;
+                        cap_offset+=4;
+                    }
+                    break;
+                case BGP_CAPCODE_RR:
+                case BGP_CAPCODE_RR_CISCO:
+                    break;
+                case BGP_CAPCODE_AS_NEW:
+
+                    /*
+                     * Extract the 4 byte AS number encoded.
+                     */
+                    if (cap_len == 4) {
+                        printf("\n\t\t 4 Byte AS %s",
+                            as_printf(astostr, sizeof(astostr),
+                            EXTRACT_32BITS(opt + i + 2)));
+                    }
+                    break;
+                default:
+                    printf("\n\t\tno decoder for Capability %u",
+                           cap_type);
+                    if (vflag <= 1)
+                        print_unknown_data(&opt[i+2],"\n\t\t",cap_len);
+                    break;
+                }
+                if (vflag > 1 && cap_len > 0) {
+                    print_unknown_data(&opt[i+2],"\n\t\t",cap_len);
+                }
+                i += BGP_CAP_HEADER_SIZE + cap_len;
+        }
+        return;
+
+trunc:
+	printf("[|BGP]");
+}
+
+static void
 bgp_open_print(const u_char *dat, int length)
 {
 	struct bgp_open bgpo;
 	struct bgp_opt bgpopt;
 	const u_char *opt;
-	int i,cap_type,cap_len,tcap_len,cap_offset;
+	int i;
 	char tokbuf[TOKBUFSIZE];
-	char tokbuf2[TOKBUFSIZE];
 
 	TCHECK2(dat[0], BGP_OPEN_SIZE);
 	memcpy(&bgpo, dat, BGP_OPEN_SIZE);
@@ -2192,96 +2276,31 @@ bgp_open_print(const u_char *dat, int length)
 		TCHECK2(opt[i], BGP_OPT_SIZE);
 		memcpy(&bgpopt, &opt[i], BGP_OPT_SIZE);
 		if (i + 2 + bgpopt.bgpopt_len > bgpo.bgpo_optlen) {
-                        printf("\n\t     Option %d, length: %u", bgpopt.bgpopt_type, bgpopt.bgpopt_len);
+			printf("\n\t     Option %d, length: %u", bgpopt.bgpopt_type, bgpopt.bgpopt_len);
 			break;
 		}
 
 		printf("\n\t    Option %s (%u), length: %u",
-                       tok2strbuf(bgp_opt_values,"Unknown",
+		       tok2strbuf(bgp_opt_values,"Unknown",
 				  bgpopt.bgpopt_type,
 				  tokbuf, sizeof(tokbuf)),
-                       bgpopt.bgpopt_type,
-                       bgpopt.bgpopt_len);
+		       bgpopt.bgpopt_type,
+		       bgpopt.bgpopt_len);
 
-                /* now lets decode the options we know*/
-                switch(bgpopt.bgpopt_type) {
-                case BGP_OPT_CAP:
-                    cap_type=opt[i+BGP_OPT_SIZE];
-                    cap_len=opt[i+BGP_OPT_SIZE+1];
-                    tcap_len=cap_len;
-                    printf("\n\t      %s (%u), length: %u",
-                           tok2strbuf(bgp_capcode_values, "Unknown",
-				      cap_type, tokbuf, sizeof(tokbuf)),
-                           cap_type,
-                           cap_len);
-                    switch(cap_type) {
-                    case BGP_CAPCODE_MP:
-                        printf("\n\t\tAFI %s (%u), SAFI %s (%u)",
-                               tok2strbuf(af_values, "Unknown",
-					  EXTRACT_16BITS(opt+i+BGP_OPT_SIZE+2),
-					  tokbuf, sizeof(tokbuf)),
-                               EXTRACT_16BITS(opt+i+BGP_OPT_SIZE+2),
-                               tok2strbuf(bgp_safi_values, "Unknown",
-					  opt[i+BGP_OPT_SIZE+5],
-					  tokbuf, sizeof(tokbuf)),
-                               opt[i+BGP_OPT_SIZE+5]);
-                        break;
-                    case BGP_CAPCODE_RESTART:
-                        printf("\n\t\tRestart Flags: [%s], Restart Time %us",
-                               ((opt[i+BGP_OPT_SIZE+2])&0x80) ? "R" : "none",
-                               EXTRACT_16BITS(opt+i+BGP_OPT_SIZE+2)&0xfff);
-                        tcap_len-=2;
-                        cap_offset=4;
-                        while(tcap_len>=4) {
-                            printf("\n\t\t  AFI %s (%u), SAFI %s (%u), Forwarding state preserved: %s",
-                                   tok2strbuf(af_values,"Unknown",
-					      EXTRACT_16BITS(opt+i+BGP_OPT_SIZE+cap_offset),
-					      tokbuf, sizeof(tokbuf)),
-                                   EXTRACT_16BITS(opt+i+BGP_OPT_SIZE+cap_offset),
-                                   tok2strbuf(bgp_safi_values,"Unknown",
-					      opt[i+BGP_OPT_SIZE+cap_offset+2],
-					      tokbuf2, sizeof(tokbuf2)),
-                                   opt[i+BGP_OPT_SIZE+cap_offset+2],
-                                   ((opt[i+BGP_OPT_SIZE+cap_offset+3])&0x80) ? "yes" : "no" );
-                            tcap_len-=4;
-                            cap_offset+=4;
-                        }
-                        break;
-                    case BGP_CAPCODE_RR:
-                    case BGP_CAPCODE_RR_CISCO:
-                        break;
-                    case BGP_CAPCODE_AS_NEW:
+		/* now let's decode the options we know*/
+		switch(bgpopt.bgpopt_type) {
 
-                        /*
-                         * Extract the 4 byte AS number encoded.
-                         */
-                        TCHECK2(opt[i + BGP_OPT_SIZE + 2], cap_len);
-                        if (cap_len == 4) {
-			    printf("\n\t\t 4 Byte AS %s",
-				as_printf(astostr, sizeof(astostr),
-				EXTRACT_32BITS(opt + i + BGP_OPT_SIZE + 2)));
-                        }
-                        break;
-                    default:
-                        TCHECK2(opt[i+BGP_OPT_SIZE+2],cap_len);
-                        printf("\n\t\tno decoder for Capability %u",
-                               cap_type);
-                        if (vflag <= 1)
-                            print_unknown_data(&opt[i+BGP_OPT_SIZE+2],"\n\t\t",cap_len);
-                        break;
-                    }
-                    if (vflag > 1) {
-                        TCHECK2(opt[i+BGP_OPT_SIZE+2],cap_len);
-                        print_unknown_data(&opt[i+BGP_OPT_SIZE+2],"\n\t\t",cap_len);
-                    }
-                    break;
-                case BGP_OPT_AUTH:
-                default:
-                       printf("\n\t      no decoder for option %u",
-                           bgpopt.bgpopt_type);
-                       break;
-                }
+		case BGP_OPT_CAP:
+			bgp_capabilities_print(&opt[i+BGP_OPT_SIZE],
+			    bgpopt.bgpopt_len);
+			break;
 
+		case BGP_OPT_AUTH:
+		default:
+		       printf("\n\t      no decoder for option %u",
+			   bgpopt.bgpopt_type);
+		       break;
+		}
 		i += BGP_OPT_SIZE + bgpopt.bgpopt_len;
 	}
 	return;
