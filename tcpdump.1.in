@@ -557,6 +557,13 @@ Write the raw packets to \fIfile\fR rather than parsing and printing
 them out.
 They can later be printed with the \-r option.
 Standard output is used if \fIfile\fR is ``-''.
+.IP
+This output will be buffered if written to a file or pipe, so a program
+reading from the file or pipe may not see packets for an arbitrary
+amount of time after they are received.  Use the
+.B \-U
+flag to cause packets to be written as soon as they are received.
+.IP
 See
 .BR pcap-savefile (@MAN_FILE_FORMATS@)
 for a description of the file format.
