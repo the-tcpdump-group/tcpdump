@@ -113,24 +113,24 @@ sdatailv_print(register const u_char * pptr, register u_int len,
 		printf("Error: BAD SPARSEDATA-TLV!\n");
 		return -1;
 	}
-	rlen = len - ILV_HDRL;
+	rlen = len;
 	indent += 1;
 	while (rlen != 0) {
+		char *ib = indent_pr(indent, 1);
+		register const u_char *tdp = (u_char *) ILV_DATA(ilv);
 		TCHECK(*ilv);
 		invilv = ilv_valid(ilv, rlen);
 		if (invilv) {
-			printf("Error: BAD ILV!\n");
-			return -1;
-		}
-		if (vflag >= 3) {
-			register const u_char *tdp = (u_char *) ILV_DATA(ilv);
-			char *ib = indent_pr(indent, 1);
-			printf("\n%s SPARSEDATA: type %x length %d\n", &ib[1],
-			       EXTRACT_32BITS(&ilv->type),
-			       EXTRACT_32BITS(&ilv->length));
 			printf("%s[", &ib[1]);
 			hex_print_with_offset(ib, tdp, rlen, 0);
 			printf("\n%s]\n", &ib[1]);
+			return -1;
+		}
+		if (vflag >= 3) {
+			int ilvl = EXTRACT_32BITS(&ilv->length);
+			printf("\n%s ILV: type %x length %d\n", &ib[1],
+			       EXTRACT_32BITS(&ilv->type), ilvl);
+			hex_print_with_offset("\t\t[", tdp, ilvl-ILV_HDRL, 0);
 		}
 
 		ilv = GO_NXT_ILV(ilv, rlen);
@@ -1016,7 +1016,7 @@ void forces_print(register const u_char * pptr, register u_int len)
 	if (vflag >= 1) {
 		printf("\n\tForCES Version %d len %uB flags 0x%08x ",
 		       ForCES_V(fhdr), mlen, flg_raw);
-		printf("\n\tSrcID 0x%x(%s) DstID 0x%x(%s) Correlator 0x%" PRIu64,
+		printf("\n\tSrcID 0x%x(%s) DstID 0x%x(%s) Correlator 0x%lx",
 		       ForCES_SID(fhdr), ForCES_node(ForCES_SID(fhdr)),
 		       ForCES_DID(fhdr), ForCES_node(ForCES_DID(fhdr)),
 		       EXTRACT_64BITS(fhdr->fm_cor));
