@@ -36,7 +36,7 @@ do
   then
       echo $name: passed.
       rm -f DIFF/$output.diff
-      passed=`expr passed + 1`
+      passed=`expr $passed + 1`
       echo $passed >.passed
   else
       echo $name: failed.
