@@ -63,3 +63,6 @@ babel1v         babel.pcap             babel1v.out     -t -v
 
 # PPPoE tests
 pppoe           pppoe.pcap             pppoe.out       -t
+
+# ICMPv6
+icmpv6          icmpv6.pcap             icmpv6.out      -t -vv -c1
