@@ -307,6 +307,8 @@ EXTRA_DIST = \
 	tests/forces2v.out \
 	tests/forces2vv.out \
 	tests/forces3vvv.out \
+	tests/icmpv6.out  \
+	tests/icmpv6.pcap \
 	tests/ikev2four.out \
 	tests/ikev2four.pcap \
 	tests/ikev2fourv.out \
