@@ -482,7 +482,7 @@ again:
 		break;
 
 	default:
-		if ((proto = getprotobynumber(ipds->nh)) != NULL)
+		if (ndo->ndo_nflag==0 && (proto = getprotobynumber(ipds->nh)) != NULL)
 			ND_PRINT((ndo, " %s", proto->p_name));
 		else
 			ND_PRINT((ndo, " ip-proto-%d", ipds->nh));
