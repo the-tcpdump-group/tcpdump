@@ -2,7 +2,7 @@
  * Copyright (c) 1988-1997
  *	The Regents of the University of California.  All rights reserved.
  *
- * Copyright (c) 1998-2004  Michael Richardson <mcr@tcpdump.org>
+ * Copyright (c) 1998-2012  Michael Richardson <mcr@tcpdump.org>
  *      The TCPDUMP project
  *
  * Redistribution and use in source and binary forms, with or without
@@ -110,7 +110,7 @@ struct netdissect_options {
   int ndo_jflag;                /* packet time stamp source */
   int ndo_pflag;                /* don't go promiscuous */
 
-  int ndo_Cflag;                /* rotate dump files after this many bytes */ 
+  int ndo_Cflag;                /* rotate dump files after this many bytes */
   int ndo_Cflag_count;      /* Keep track of which file number we're writing */
   int ndo_Gflag;            /* rotate dump files after this many seconds */
   int ndo_Gflag_count;      /* number of files created with Gflag rotation */
@@ -234,7 +234,7 @@ struct netdissect_options {
 #define ND_PRINT(STUFF) (*ndo->ndo_printf)STUFF
 #define ND_DEFAULTPRINT(ap, length) (*ndo->ndo_default_print)(ndo, ap, length)
 
-#if 0	
+#if 0
 extern void ts_print(netdissect_options *ipdo,
 		     const struct timeval *);
 extern void relts_print(int);
@@ -298,11 +298,11 @@ extern void ether_print(netdissect_options *,
                         void (*)(netdissect_options *, const u_char *),
                         const u_char *);
 
-extern u_int ether_if_print(netdissect_options *, 
+extern u_int ether_if_print(netdissect_options *,
                             const struct pcap_pkthdr *,const u_char *);
-extern u_int netanalyzer_if_print(netdissect_options *, 
+extern u_int netanalyzer_if_print(netdissect_options *,
                                   const struct pcap_pkthdr *,const u_char *);
-extern u_int netanalyzer_transparent_if_print(netdissect_options *, 
+extern u_int netanalyzer_transparent_if_print(netdissect_options *,
                                               const struct pcap_pkthdr *,
                                               const u_char *);
 
@@ -407,7 +407,7 @@ extern void rip_print(netdissect_options *,const u_char *, u_int);
 extern void rpki_rtr_print(netdissect_options *,const u_char *, u_int);
 
 extern void sctp_print(netdissect_options *ndo,
-		       const u_char *bp, const u_char *bp2,       
+		       const u_char *bp, const u_char *bp2,
 		       u_int sctpPacketLength);
 
 extern void sl_if_print(u_char *,const struct pcap_pkthdr *, const u_char *);
