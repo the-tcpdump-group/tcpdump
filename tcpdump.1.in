@@ -200,7 +200,8 @@ Print the AS number in BGP packets in ASDOT notation rather than ASPLAIN
 notation.
 .TP
 .B \-B
-Set the operating system capture buffer size to \fIbuffer_size\fP.
+Set the operating system capture buffer size to \fIbuffer_size\fP, in
+units of KiB (1024 bytes).
 .TP
 .B \-c
 Exit after receiving \fIcount\fP packets.
