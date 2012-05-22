@@ -429,6 +429,7 @@ static struct tok isis_subtlv_idrp_values[] = {
 #define ISIS_SUBTLV_SPB_BVID          6
 
 #define ISIS_SUBTLV_SPB_INSTANCE      1
+#define ISIS_SUBTLV_SPBM_SI           3
 
 #define ISIS_SPB_MCID_LEN                         51
 #define ISIS_SUBTLV_SPB_MCID_MIN_LEN              102
@@ -446,6 +447,7 @@ static struct tok isis_mt_port_cap_subtlv_values[] = {
 
 static struct tok isis_mt_capability_subtlv_values[] = {
     { ISIS_SUBTLV_SPB_INSTANCE,      "SPB Instance" },
+    { ISIS_SUBTLV_SPBM_SI,      "SPBM Service Identifier and Unicast Address" },
     { 0, NULL }
 };
 
@@ -1356,7 +1358,7 @@ isis_print_mt_port_cap_subtlv (const u_int8_t *tptr, int len)
           printf( "\n\t         MCID: ");
           isis_print_mcid (&(subtlv_spb_mcid->mcid));
 
-          printf( "\t         AUX-MCID: ");
+          printf( "\n\t         AUX-MCID: ");
           isis_print_mcid (&(subtlv_spb_mcid->aux_mcid));
 
           tptr = tptr + sizeof(struct isis_subtlv_spb_mcid);
@@ -1432,10 +1434,7 @@ isis_print_mt_port_cap_subtlv (const u_int8_t *tptr, int len)
 static int
 isis_print_mt_capability_subtlv (const u_int8_t *tptr, int len)
 {
-  int stlv_type;
-  int stlv_len;
-  const struct isis_subtlv_spb_mcid *subtlv_spb_mcid;
-  int i;
+  int stlv_type, stlv_len, tmp;
 
   while (len > 0) 
   {   
@@ -1443,7 +1442,7 @@ isis_print_mt_capability_subtlv (const u_int8_t *tptr, int len)
     stlv_len  = *(tptr++);
 
     /* first lets see if we know the subTLVs name*/
-    printf("\n\t       %s subTLV #%u, length: %u",
+    printf("\n\t      %s subTLV #%u, length: %u",
                tok2str(isis_mt_capability_subtlv_values, "unknown", stlv_type),
                stlv_type,
                stlv_len);
@@ -1457,7 +1456,7 @@ isis_print_mt_capability_subtlv (const u_int8_t *tptr, int len)
           if (!TTEST2(*(tptr), ISIS_SUBTLV_SPB_INSTANCE_MIN_LEN)) 
             goto trunctlv;
 
-          printf("\n\t         CIST Root-ID: %08x", EXTRACT_32BITS(tptr));
+          printf("\n\t        CIST Root-ID: %08x", EXTRACT_32BITS(tptr));
           tptr = tptr+4;
           printf(" %08x", EXTRACT_32BITS(tptr));
           tptr = tptr+4;
@@ -1465,7 +1464,7 @@ isis_print_mt_capability_subtlv (const u_int8_t *tptr, int len)
           tptr = tptr+4;
           printf(", Prio: %d", EXTRACT_16BITS(tptr));
           tptr = tptr + 2; 
-          printf("\n\t         RES: %d", 
+          printf("\n\t        RES: %d", 
                     EXTRACT_16BITS(tptr) >> 5);
           printf(", V: %d", 
                     (EXTRACT_16BITS(tptr) >> 4) & 0x0001);
@@ -1474,13 +1473,14 @@ isis_print_mt_capability_subtlv (const u_int8_t *tptr, int len)
           tptr = tptr+4;
           printf(", No of Trees: %x", *(tptr));
 
+          tmp = *(tptr++);
+
           len = len - ISIS_SUBTLV_SPB_INSTANCE_MIN_LEN;
 
-          while (len > 0)
+          while (tmp)
           {
             if (!TTEST2(*(tptr), ISIS_SUBTLV_SPB_INSTANCE_VLAN_TUPLE_LEN))
               goto trunctlv;
-
 
             printf ("\n\t         U:%d, M:%d, A:%d, RES:%d",
                       *(tptr) >> 7, (*(tptr) >> 6) & 0x01,
@@ -1497,10 +1497,43 @@ isis_print_mt_capability_subtlv (const u_int8_t *tptr, int len)
                       EXTRACT_24BITS(tptr) & 0x000fff);
 
             tptr = tptr + 3;
-            len = len - ISIS_SUBTLV_SPB_INSTANCE_VLAN_TUPLE_LEN;             
+            len = len - ISIS_SUBTLV_SPB_INSTANCE_VLAN_TUPLE_LEN;
+            tmp--;             
           }
 
           break;
+
+      case ISIS_SUBTLV_SPBM_SI:
+
+          if (!TTEST2(*(tptr), 6)) 
+            goto trunctlv;
+
+          printf("\n\t        BMAC: %08x", EXTRACT_32BITS(tptr));
+          tptr = tptr+4;
+          printf("%04x", EXTRACT_16BITS(tptr));
+          tptr = tptr+2;
+
+          printf (", RES: %d, VID: %d", EXTRACT_16BITS(tptr) >> 12,
+                    (EXTRACT_16BITS(tptr)) & 0x0fff);
+
+          tptr = tptr+2;
+          len = len - 8;
+          stlv_len = stlv_len - 8;
+
+          while (stlv_len)
+          {
+            printf("\n\t        T: %d, R: %d, RES: %d, ISID: %d",
+                    (EXTRACT_32BITS(tptr) >> 31),
+                    (EXTRACT_32BITS(tptr) >> 30) & 0x01,
+                    (EXTRACT_32BITS(tptr) >> 24) & 0x03f,
+                    (EXTRACT_32BITS(tptr)) & 0x0ffffff);
+
+            tptr = tptr + 4;
+            len = len - 4;
+            stlv_len = stlv_len - 4;
+          }
+
+        break;
 
       default:
         break;
@@ -2741,7 +2774,7 @@ static int isis_print (const u_int8_t *p, u_int length)
       if (!TTEST2(*(tptr), 2))
         goto trunctlv;
 
-      printf("\n\t       O: %d, RES: %d, MTID(s): %d",
+      printf("\n\t      O: %d, RES: %d, MTID(s): %d",
                 (EXTRACT_16BITS(tptr) >> 15) & 0x01,
                 (EXTRACT_16BITS(tptr) >> 12) & 0x07,
                 EXTRACT_16BITS(tptr) & 0x0fff);
