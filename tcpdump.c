@@ -74,6 +74,10 @@ extern int SIZE_BUF;
 #include <errno.h>
 #endif /* WIN32 */
 
+/* capabilities convinience library */
+#ifdef HAVE_CAP_NG_H
+#include <cap-ng.h>
+#endif /* HAVE_CAP_NG_H */
 
 #include "netdissect.h"
 #include "interface.h"
@@ -532,6 +536,19 @@ droproot(const char *username, const char *chroot_dir)
 				exit(1);
 			}
 		}
+#ifdef HAVE_CAP_NG_H
+		int ret = capng_change_id(pw->pw_uid, pw->pw_gid, CAPNG_NO_FLAG);
+		if (ret < 0) {
+			printf("error : ret %d\n", ret);
+		}
+		/* We don't need CAP_SETUID and CAP_SETGID */
+		capng_update(CAPNG_DROP, CAPNG_EFFECTIVE, CAP_SETUID);
+		capng_update(CAPNG_DROP, CAPNG_EFFECTIVE, CAP_SETUID);
+		capng_update(CAPNG_DROP, CAPNG_PERMITTED, CAP_SETUID);
+		capng_update(CAPNG_DROP, CAPNG_PERMITTED, CAP_SETUID);
+		capng_apply(CAPNG_SELECT_BOTH);
+
+#else
 		if (initgroups(pw->pw_name, pw->pw_gid) != 0 ||
 		    setgid(pw->pw_gid) != 0 || setuid(pw->pw_uid) != 0) {
 			fprintf(stderr, "tcpdump: Couldn't change to '%.32s' uid=%lu gid=%lu: %s\n",
@@ -541,6 +558,7 @@ droproot(const char *username, const char *chroot_dir)
 			    pcap_strerror(errno));
 			exit(1);
 		}
+#endif /* HAVE_CAP_NG_H */
 	}
 	else {
 		fprintf(stderr, "tcpdump: Couldn't find user '%.32s'\n",
@@ -1295,9 +1313,31 @@ main(int argc, char **argv)
 	 * Switching to the -Z user ID only after opening the first
 	 * savefile doesn't handle the general case.
 	 */
+
+#ifdef HAVE_CAP_NG_H
+	/* We are running as root and we will be writing to savefile */
+	if ((getuid() == 0 || geteuid() == 0) && WFileName) {
+		if (username) {
+			/* Drop all capabilities from effective set */
+			capng_clear(CAPNG_EFFECTIVE);
+			/* Add capabilities we will need*/
+			capng_update(CAPNG_ADD, CAPNG_PERMITTED, CAP_SETUID);
+			capng_update(CAPNG_ADD, CAPNG_PERMITTED, CAP_SETGID);
+			capng_update(CAPNG_ADD, CAPNG_PERMITTED, CAP_DAC_OVERRIDE);
+
+			capng_update(CAPNG_ADD, CAPNG_EFFECTIVE, CAP_SETUID);
+			capng_update(CAPNG_ADD, CAPNG_EFFECTIVE, CAP_SETGID);
+			capng_update(CAPNG_ADD, CAPNG_EFFECTIVE, CAP_DAC_OVERRIDE);
+
+			capng_apply(CAPNG_SELECT_BOTH);
+		}
+	}
+#endif /* HAVE_CAP_NG_H */
+
 	if (getuid() == 0 || geteuid() == 0) {
 		if (username || chroot_dir)
 			droproot(username, chroot_dir);
+
 	}
 #endif /* WIN32 */
 
@@ -1318,6 +1358,10 @@ main(int argc, char **argv)
 		  MakeFilename(dumpinfo.CurrentFileName, WFileName, 0, 0);
 
 		p = pcap_dump_open(pd, dumpinfo.CurrentFileName);
+#ifdef HAVE_CAP_NG_H
+        /* Give up capabilities, clear Effective set */
+        capng_clear(CAPNG_EFFECTIVE);
+#endif
 		if (p == NULL)
 			error("%s", pcap_geterr(pd));
 		if (Cflag != 0 || Gflag != 0) {
@@ -1649,7 +1693,15 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			else
 				MakeFilename(dump_info->CurrentFileName, dump_info->WFileName, 0, 0);
 
+#ifdef HAVE_CAP_NG_H
+			capng_update(CAPNG_ADD, CAPNG_EFFECTIVE, CAP_DAC_OVERRIDE);
+			capng_apply(CAPNG_EFFECTIVE);
+#endif /* HAVE_CAP_NG_H */
 			dump_info->p = pcap_dump_open(dump_info->pd, dump_info->CurrentFileName);
+#ifdef HAVE_CAP_NG_H
+			capng_update(CAPNG_DROP, CAPNG_EFFECTIVE, CAP_DAC_OVERRIDE);
+			capng_apply(CAPNG_EFFECTIVE);
+#endif /* HAVE_CAP_NG_H */
 			if (dump_info->p == NULL)
 				error("%s", pcap_geterr(pd));
 		}
