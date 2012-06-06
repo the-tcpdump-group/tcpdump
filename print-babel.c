@@ -81,6 +81,8 @@ babel_print(const u_char *cp, u_int length) {
 #define MESSAGE_UPDATE 8
 #define MESSAGE_REQUEST 9
 #define MESSAGE_MH_REQUEST 10
+#define MESSAGE_PCTS 11
+#define MESSAGE_HD 12
 
 static const char *
 format_id(const u_char *id)
@@ -391,6 +393,30 @@ babel_print_v2(const u_char *cp, u_int length) {
                 printf("(%u hops) for %s seqno %u id %s",
                        message[6], format_prefix(prefix, plen),
                        seqno, format_id(message + 8));
+            }
+        }
+            break;
+        case MESSAGE_PCTS :
+            if(!vflag)
+                printf(" pcts");
+            else {
+                printf("\n\tPC/TS ");
+                if(len != 6) goto corrupt;
+                printf("packet counter %u timestamp %u", EXTRACT_16BITS(message + 2),
+                       EXTRACT_32BITS (message + 4));
+            }
+            break;
+        case MESSAGE_HD : {
+            if(!vflag)
+                printf(" hd");
+            else {
+                unsigned i;
+                printf("\n\tHash Digest ");
+                if(len < 18) goto corrupt;
+                printf("key ID %u digest-%u '", EXTRACT_16BITS(message + 2), len - 2);
+                for (i = 0; i < len - 2; i++)
+                    printf ("%02X", message[4 + i]);
+                printf("'");
             }
         }
             break;
