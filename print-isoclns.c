@@ -1302,7 +1302,7 @@ trunc:
 }   
 
 
-static int
+static void
 isis_print_mcid (const struct isis_spb_mcid *mcid)
 {
   int i;
@@ -1313,7 +1313,7 @@ isis_print_mcid (const struct isis_spb_mcid *mcid)
   { 
     printf("%c", mcid->name[i]);
     if(mcid->name[i] == '\0')
-    break;
+        break;
   }
 
   printf("\n\t              Lvl: %d", 
@@ -1418,7 +1418,7 @@ isis_print_mt_port_cap_subtlv (const u_int8_t *tptr, int len)
 
           break;
       
-      defualt:
+      default:
           break;
     }
   }
