@@ -326,7 +326,6 @@ EXTRA_DIST = \
 	tests/isakmp4500.pcap \
 	tests/isis-infinite-loop.pcap \
 	tests/ldp-infinite-loop.pcap \
-	tests/lmp.new \
 	tests/lmp.out \
 	tests/lmp.pcap \
 	tests/lmp.sh \
