@@ -1016,7 +1016,7 @@ void forces_print(register const u_char * pptr, register u_int len)
 	if (vflag >= 1) {
 		printf("\n\tForCES Version %d len %uB flags 0x%08x ",
 		       ForCES_V(fhdr), mlen, flg_raw);
-		printf("\n\tSrcID 0x%x(%s) DstID 0x%x(%s) Correlator 0x%lx",
+		printf("\n\tSrcID 0x%x(%s) DstID 0x%x(%s) Correlator 0x%" PRIx64,
 		       ForCES_SID(fhdr), ForCES_node(ForCES_SID(fhdr)),
 		       ForCES_DID(fhdr), ForCES_node(ForCES_DID(fhdr)),
 		       EXTRACT_64BITS(fhdr->fm_cor));
