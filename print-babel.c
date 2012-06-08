@@ -201,7 +201,7 @@ babel_print_v2(const u_char *cp, u_int length) {
     i = 0;
     while(i < bodylen) {
         const u_char *message;
-        u_char type, len;
+        u_int type, len;
 
         message = cp + 4 + i;
         TCHECK2(*message, 2);
@@ -410,12 +410,12 @@ babel_print_v2(const u_char *cp, u_int length) {
             if(!vflag)
                 printf(" hd");
             else {
-                unsigned i;
+                unsigned j;
                 printf("\n\tHash Digest ");
                 if(len < 18) goto corrupt;
                 printf("key ID %u digest-%u '", EXTRACT_16BITS(message + 2), len - 2);
-                for (i = 0; i < len - 2; i++)
-                    printf ("%02X", message[4 + i]);
+                for (j = 0; j < len - 2; j++)
+                    printf ("%02X", message[4 + j]);
                 printf("'");
             }
         }
