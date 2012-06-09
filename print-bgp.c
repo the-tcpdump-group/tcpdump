@@ -2406,7 +2406,7 @@ bgp_update_print(const u_char *dat, int length)
 				break;
 			} else if (wpfx == -2)
 				goto trunc;
-			} else if (wpfx == -3)
+			else if (wpfx == -3)
 				goto trunc; /* bytes left, but not enough */
 			else {
 				printf("\n\t    %s", buf);
