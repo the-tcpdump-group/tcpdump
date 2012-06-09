@@ -216,7 +216,6 @@ pdatacnt_print(register const u_char * pptr, register u_int len,
 	       u_int16_t IDcnt, u_int16_t op_msk, int indent)
 {
 	u_int i;
-	int rc;
 	u_int32_t id;
 	char *ib = indent_pr(indent, 0);
 
@@ -282,9 +281,10 @@ pdatacnt_print(register const u_char * pptr, register u_int len,
 
 			chk_op_type(type, op_msk, ops->op_msk);
 
-			rc = ops->print((const u_char *)pdtlv,
+			if (ops->print((const u_char *)pdtlv,
 					tll + pad + TLV_HDRL, op_msk,
-					indent + 2);
+					indent + 2) == -1)
+				return -1;
 			len -= (TLV_HDRL + pad + tll);
 		} else {
 			printf("Invalid path data content type 0x%x len %d\n",
@@ -404,7 +404,6 @@ recpdoptlv_print(register const u_char * pptr, register u_int len,
 {
 	const struct forces_tlv *pdtlv = (struct forces_tlv *)pptr;
 	int tll;
-	int rc = 0;
 	int invtlv;
 	u_int16_t type;
 	register const u_char *dp;
@@ -434,7 +433,8 @@ recpdoptlv_print(register const u_char * pptr, register u_int len,
 			     EXTRACT_16BITS(&pdtlv->length),
 			     EXTRACT_16BITS(&pdtlv->length) - TLV_HDRL);
 
-		rc = pdata_print(dp, tll, op_msk, indent + 1);
+		if (pdata_print(dp, tll, op_msk, indent + 1) == -1)
+			return -1;
 		pdtlv = GO_NXT_TLV(pdtlv, len);
 	}
 
