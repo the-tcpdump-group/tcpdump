@@ -2359,6 +2359,10 @@ bgp_update_print(const u_char *dat, int length)
 	int len;
 	int i;
 	char tokbuf[TOKBUFSIZE];
+#ifndef INET6
+	char buf[MAXHOSTNAMELEN + 100];
+	int wpfx;
+#endif
 
 	TCHECK2(dat[0], BGP_SIZE);
 	if (length < BGP_SIZE)
@@ -2388,9 +2392,6 @@ bgp_update_print(const u_char *dat, int length)
 		p += withdrawn_routes_len;
 		length -= withdrawn_routes_len;
 #else
-		char buf[MAXHOSTNAMELEN + 100];
-		int wpfx;
-
 		if (withdrawn_routes_len < 2)
 			goto trunc;
 		length -= 2;
