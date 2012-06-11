@@ -102,7 +102,7 @@ rip_entry_print_v1(register const struct rip_netinfo *ni)
 
 	/* RFC 1058 */
 	family = EXTRACT_16BITS(&ni->rip_family);
-	if (family != BSD_AFNUM_INET) {
+	if (family != BSD_AFNUM_INET && family != 0) {
 		printf("\n\t AFI %s, ", tok2str(bsd_af_values, "Unknown (%u)", family));
                 print_unknown_data((u_int8_t *)&ni->rip_family,"\n\t  ",RIP_ROUTELEN);
 		return;
@@ -112,6 +112,12 @@ rip_entry_print_v1(register const struct rip_netinfo *ni)
 	    EXTRACT_32BITS(&ni->rip_router)) {
 		/* MBZ fields not zero */
                 print_unknown_data((u_int8_t *)&ni->rip_family,"\n\t  ",RIP_ROUTELEN);
+		return;
+	}
+	if (family == 0) {
+		printf("\n\t  AFI 0, %s, metric: %u",
+			ipaddr_string(&ni->rip_dest),
+			EXTRACT_32BITS(&ni->rip_metric));
 		return;
 	} /* BSD_AFNUM_INET */
 	printf("\n\t  %s, metric: %u",
@@ -141,13 +147,13 @@ rip_entry_print_v2(register const struct rip_netinfo *ni)
 			       EXTRACT_16BITS(&ni->rip_tag));
                         print_unknown_data((u_int8_t *)&ni->rip_dest,"\n\t  ",RIP_AUTHLEN);
 		}
-	} else if (family != BSD_AFNUM_INET) {
+	} else if (family != BSD_AFNUM_INET && family != 0) {
 		printf("\n\t  AFI %s", tok2str(bsd_af_values, "Unknown (%u)", family));
                 print_unknown_data((u_int8_t *)&ni->rip_tag,"\n\t  ",RIP_ROUTELEN-2);
 		return;
-	} else { /* BSD_AFNUM_INET */
+	} else { /* BSD_AFNUM_INET or AFI 0 */
 		printf("\n\t  AFI %s, %15s/%-2d, tag 0x%04x, metric: %u, next-hop: ",
-                       tok2str(bsd_af_values, "Unknown (%u)", family),
+                       tok2str(bsd_af_values, "%u", family),
                        ipaddr_string(&ni->rip_dest),
 		       mask2plen(EXTRACT_32BITS(&ni->rip_dest_mask)),
                        EXTRACT_16BITS(&ni->rip_tag),
@@ -213,6 +219,7 @@ rip_print(const u_char *dat, u_int length)
                     return;
 
 		switch (rp->rip_cmd) {
+		case RIPCMD_REQUEST:
 		case RIPCMD_RESPONSE:
 			j = length / sizeof(*ni);
                         printf(", routes: %u",j);
@@ -231,7 +238,6 @@ rip_print(const u_char *dat, u_int length)
 				printf("[|rip]");
 			break;
 
-		case RIPCMD_REQUEST:
 		case RIPCMD_TRACEOFF:
 		case RIPCMD_POLL:
 		case RIPCMD_POLLENTRY:
