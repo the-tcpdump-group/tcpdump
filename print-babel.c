@@ -401,7 +401,7 @@ babel_print_v2(const u_char *cp, u_int length) {
                 printf(" pcts");
             else {
                 printf("\n\tPC/TS ");
-                if(len != 6) goto corrupt;
+                if(len < 6) goto corrupt;
                 printf("packet counter %u timestamp %u", EXTRACT_16BITS(message + 2),
                        EXTRACT_32BITS (message + 4));
             }
