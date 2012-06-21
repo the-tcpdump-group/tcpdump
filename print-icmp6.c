@@ -175,7 +175,7 @@ get_lifetime(u_int32_t v)
 	if (v == (u_int32_t)~0UL)
 		return "infinity";
 	else {
-		snprintf(buf, sizeof(buf), "%u", v);
+		snprintf(buf, sizeof(buf), "%us", v);
 		return buf;
 	}
 }
@@ -720,13 +720,13 @@ icmp6_opt_print(const u_char *bp, int resid)
 		case ND_OPT_PREFIX_INFORMATION:
 			opp = (struct nd_opt_prefix_info *)op;
 			TCHECK(opp->nd_opt_pi_prefix);
-                        printf("%s/%u%s, Flags [%s], valid time %ss",
+                        printf("%s/%u%s, Flags [%s], valid time %s",
                                ip6addr_string(&opp->nd_opt_pi_prefix),
                                opp->nd_opt_pi_prefix_len,
                                (op->nd_opt_len != 4) ? "badlen" : "",
                                bittok2str(icmp6_opt_pi_flag_values, "none", opp->nd_opt_pi_flags_reserved),
                                get_lifetime(EXTRACT_32BITS(&opp->nd_opt_pi_valid_time)));
-                        printf(", pref. time %ss", get_lifetime(EXTRACT_32BITS(&opp->nd_opt_pi_preferred_time)));
+                        printf(", pref. time %s", get_lifetime(EXTRACT_32BITS(&opp->nd_opt_pi_preferred_time)));
 			break;
 		case ND_OPT_REDIRECTED_HEADER:
 			opr = (struct icmp6_opts_redirect *)op;
