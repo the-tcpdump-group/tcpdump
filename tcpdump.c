@@ -465,7 +465,9 @@ show_dlts_and_exit(const char *device, pcap_t *pd)
 			    dlts[n_dlts]);
 		}
 	}
+#ifdef HAVE_PCAP_FREE_DATALINKS
 	pcap_free_datalinks(dlts);
+#endif
 	exit(0);
 }
 
@@ -959,6 +961,8 @@ main(int argc, char **argv)
 				packettype = PT_AODV;
 			else if (strcasecmp(optarg, "carp") == 0)
 				packettype = PT_CARP;
+			else if (strcasecmp(optarg, "radius") == 0)
+				packettype = PT_RADIUS;
 			else
 				error("unknown packet type `%s'", optarg);
 			break;

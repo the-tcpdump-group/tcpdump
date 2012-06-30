@@ -469,6 +469,11 @@ udp_print(register const u_char *bp, u_int length,
 			    0);
 #endif
 			break;
+
+		case PT_RADIUS:
+			udpipaddr_print(ip, sport, dport);
+			radius_print(cp, length);
+			break;
 		}
 		return;
 	}
