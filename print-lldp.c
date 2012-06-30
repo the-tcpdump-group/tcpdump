@@ -1184,9 +1184,7 @@ lldp_print(register const u_char *pptr, register u_int len) {
     tptr = pptr;
     tlen = len;
 
-    if (vflag) {
-        printf("LLDP, length %u", len);
-    }
+    printf("LLDP, length %u", len);
 
     while (tlen >= sizeof(tlv)) {
 
