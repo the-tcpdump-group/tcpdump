@@ -1,3 +1,9 @@
+Saturday June 30, 2012 guy@alum.mit.edu.
+  Summary for 4.3.1 tcpdump release
+	Print "LLDP, length N" for LLDP packets even when not in verbose
+	    mode, so something is printed even if only the timestamp is
+	    present
+
 Friday  April 3, 2011.  mcr@sandelman.ca.
   Summary for 4.3.0 tcpdump release
         fixes for forces: SPARSE data (per RFC 5810)
