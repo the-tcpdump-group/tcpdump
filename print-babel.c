@@ -410,13 +410,15 @@ babel_print_v2(const u_char *cp, u_int length) {
             if(!vflag)
                 printf(" hd");
             else {
-                unsigned j;
+                unsigned j, dlen;
                 printf("\n\tHash Digest ");
-                if(len < 18) goto corrupt;
-                printf("key ID %u digest-%u '", EXTRACT_16BITS(message + 2), len - 2);
-                for (j = 0; j < len - 2; j++)
-                    printf ("%02X", message[4 + j]);
-                printf("'");
+                if(len < 19) goto corrupt;
+                dlen = message[4];
+                printf("key-id %u dlen %u ", EXTRACT_16BITS(message + 2), dlen);
+                if(dlen < 16 || dlen > len - 3) goto corrupt;
+                printf("digest ");
+                for (j = 0; j < dlen; j++)
+                    printf ("%02X", message[5 + j]);
             }
         }
             break;
