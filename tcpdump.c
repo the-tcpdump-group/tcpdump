@@ -630,6 +630,27 @@ static int tcpdump_printf(netdissect_options *ndo _U_,
   return ret;
 }
 
+struct print_info get_print_info(int type) {
+	struct print_info printinfo;
+
+	printinfo.ndo_type = 1;
+	printinfo.ndo = gndo;
+	printinfo.p.ndo_printer = lookup_ndo_printer(type);
+	if (printinfo.p.ndo_printer == NULL) {
+		printinfo.p.printer = lookup_printer(type);
+		printinfo.ndo_type = 0;
+		if (printinfo.p.printer == NULL) {
+			gndo->ndo_dltname = pcap_datalink_val_to_name(type);
+			if (gndo->ndo_dltname != NULL)
+				error("packet printing is not supported for link type %s: use -w",
+				      gndo->ndo_dltname);
+			else
+				error("packet printing is not supported for link type %d: use -w", type);
+		}
+	}
+	return (printinfo);
+}
+
 int
 main(int argc, char **argv)
 {
@@ -1414,21 +1435,7 @@ main(int argc, char **argv)
 #endif
 	} else {
 		type = pcap_datalink(pd);
-                printinfo.ndo_type = 1;
-                printinfo.ndo = gndo;
-		printinfo.p.ndo_printer = lookup_ndo_printer(type);
-                if (printinfo.p.ndo_printer == NULL) {
-                        printinfo.p.printer = lookup_printer(type);
-                        printinfo.ndo_type = 0;
-                        if (printinfo.p.printer == NULL) {
-                                gndo->ndo_dltname = pcap_datalink_val_to_name(type);
-                                if (gndo->ndo_dltname != NULL)
-                                        error("packet printing is not supported for link type %s: use -w",
-                                              gndo->ndo_dltname);
-                                else
-                                        error("packet printing is not supported for link type %d: use -w", type);
-                        }
-                }
+		printinfo = get_print_info(type);
 		callback = print_packet;
 		pcap_userdata = (u_char *)&printinfo;
 	}
@@ -1523,6 +1530,7 @@ main(int argc, char **argv)
 				new_dlt = pcap_datalink(pd);
 				if (WFileName && new_dlt != dlt)
 					error("%s: new dlt does not match original", RFileName);
+				printinfo = get_print_info(new_dlt);
 				dlt_name = pcap_datalink_val_to_name(new_dlt);
 				if (dlt_name == NULL) {
 					fprintf(stderr, "reading from file %s, link-type %u\n",
