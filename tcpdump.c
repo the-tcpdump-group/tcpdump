@@ -639,6 +639,7 @@ main(int argc, char **argv)
 	pcap_handler callback;
 	int type;
 	int dlt;
+	int new_dlt;
 	const char *dlt_name;
 	struct bpf_program fcode;
 #ifndef WIN32
@@ -1519,16 +1520,18 @@ main(int argc, char **argv)
 				pd = pcap_open_offline(RFileName, ebuf);
 				if (pd == NULL)
 					error("%s", ebuf);
-				dlt = pcap_datalink(pd);
-				dlt_name = pcap_datalink_val_to_name(dlt);
+				new_dlt = pcap_datalink(pd);
+				if (WFileName && new_dlt != dlt)
+					error("%s: new dlt does not match original", RFileName);
+				dlt_name = pcap_datalink_val_to_name(new_dlt);
 				if (dlt_name == NULL) {
 					fprintf(stderr, "reading from file %s, link-type %u\n",
-					RFileName, dlt);
+					RFileName, new_dlt);
 				} else {
 					fprintf(stderr,
 					"reading from file %s, link-type %s (%s)\n",
 					RFileName, dlt_name,
-					pcap_datalink_val_to_description(dlt));
+					pcap_datalink_val_to_description(new_dlt));
 				}
 				if (pcap_compile(pd, &fcode, cmdbuf, Oflag, netmask) < 0)
 					error("%s", pcap_geterr(pd));
