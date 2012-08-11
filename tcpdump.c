@@ -635,9 +635,11 @@ main(int argc, char **argv)
 {
 	register int cnt, op, i;
 	bpf_u_int32 localnet, netmask;
-	register char *cp, *infile, *cmdbuf, *device, *RFileName, *WFileName;
+	register char *cp, *infile, *cmdbuf, *device, *RFileName, *VFileName, *WFileName;
 	pcap_handler callback;
 	int type;
+	int dlt;
+	const char *dlt_name;
 	struct bpf_program fcode;
 #ifndef WIN32
 	RETSIGTYPE (*oldhandler)(int);
@@ -646,13 +648,16 @@ main(int argc, char **argv)
 	struct dump_info dumpinfo;
 	u_char *pcap_userdata;
 	char ebuf[PCAP_ERRBUF_SIZE];
+	char VFileLine[NAME_MAX + 1];
 	char *username = NULL;
 	char *chroot_dir = NULL;
+	char *ret = NULL;
 #ifdef HAVE_PCAP_FINDALLDEVS
 	pcap_if_t *devpointer;
 	int devnum;
 #endif
 	int status;
+	FILE *VFile;
 #ifdef WIN32
 	if(wsockinit() != 0) return 1;
 #endif /* WIN32 */
@@ -671,6 +676,7 @@ main(int argc, char **argv)
 	device = NULL;
 	infile = NULL;
 	RFileName = NULL;
+	VFileName = NULL;
 	WFileName = NULL;
 	if ((cp = strrchr(argv[0], '/')) != NULL)
 		program_name = cp + 1;
@@ -685,7 +691,7 @@ main(int argc, char **argv)
 #endif
 
 	while (
-	    (op = getopt(argc, argv, "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOpqr:Rs:StT:u" U_FLAG "vw:W:xXy:Yz:Z:")) != -1)
+	    (op = getopt(argc, argv, "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOpqr:Rs:StT:u" U_FLAG "V:vw:W:xXy:Yz:Z:")) != -1)
 		switch (op) {
 
 		case 'a':
@@ -981,6 +987,10 @@ main(int argc, char **argv)
 			++vflag;
 			break;
 
+		case 'V':
+			VFileName = optarg;
+			break;
+
 		case 'w':
 			WFileName = optarg;
 			break;
@@ -1066,6 +1076,12 @@ main(int argc, char **argv)
 		break;
 	}
 
+	if (fflag != 0 && (VFileName != NULL || RFileName != NULL))
+		error("-f can not be used with -V or -r");
+
+	if (VFileName != NULL && RFileName != NULL)
+		error("-V and -r are mutually exclusive.");
+
 #ifdef WITH_CHROOT
 	/* if run as root, prepare for chrooting */
 	if (getuid() == 0 || geteuid() == 0) {
@@ -1084,10 +1100,7 @@ main(int argc, char **argv)
 	}
 #endif
 
-	if (RFileName != NULL) {
-		int dlt;
-		const char *dlt_name;
-
+	if (RFileName != NULL || VFileName != NULL) {
 #ifndef WIN32
 		/*
 		 * We don't need network access, so relinquish any set-UID
@@ -1101,6 +1114,24 @@ main(int argc, char **argv)
 		if (setgid(getgid()) != 0 || setuid(getuid()) != 0 )
 			fprintf(stderr, "Warning: setgid/setuid failed !\n");
 #endif /* WIN32 */
+		if (VFileName != NULL) {
+			if (VFileName[0] == '-' && VFileName[1] == '\0')
+				VFile = fopen("/dev/stdin", "r");
+			else
+				VFile = fopen(VFileName, "r");
+
+			if (VFile == NULL)
+				error("Unable to open file: %s\n", strerror(errno));
+
+			ret = fgets(VFileLine, NAME_MAX, VFile);
+			if (!ret)
+				error("Nothing in %s\n", VFile);
+
+			if (VFileLine[strlen(VFileLine) - 1] == '\n')
+				VFileLine[strlen(VFileLine) - 1] = '\0';
+			RFileName = VFileLine;
+		}
+
 		pd = pcap_open_offline(RFileName, ebuf);
 		if (pd == NULL)
 			error("%s", ebuf);
@@ -1117,8 +1148,6 @@ main(int argc, char **argv)
 		}
 		localnet = 0;
 		netmask = 0;
-		if (fflag != 0)
-			error("-f and -r options are incompatible");
 	} else {
 		if (device == NULL) {
 			device = pcap_lookupdev(ebuf);
@@ -1276,10 +1305,10 @@ main(int argc, char **argv)
 
 	if (pcap_compile(pd, &fcode, cmdbuf, Oflag, netmask) < 0)
 		error("%s", pcap_geterr(pd));
-	free(cmdbuf);
 	if (dflag) {
 		bpf_dump(&fcode, dflag);
 		pcap_close(pd);
+		free(cmdbuf);
 		exit(0);
 	}
 	init_addrtoname(localnet, netmask);
@@ -1430,9 +1459,6 @@ main(int argc, char **argv)
 
 #ifndef WIN32
 	if (RFileName == NULL) {
-		int dlt;
-		const char *dlt_name;
-
 		if (!vflag && !WFileName) {
 			(void)fprintf(stderr,
 			    "%s: verbose output suppressed, use -v or -vv for full protocol decode\n",
@@ -1452,37 +1478,68 @@ main(int argc, char **argv)
 		(void)fflush(stderr);
 	}
 #endif /* WIN32 */
-	status = pcap_loop(pd, cnt, callback, pcap_userdata);
-	if (WFileName == NULL) {
-		/*
-		 * We're printing packets.  Flush the printed output,
-		 * so it doesn't get intermingled with error output.
-		 */
-		if (status == -2) {
+	do {
+		status = pcap_loop(pd, cnt, callback, pcap_userdata);
+		if (WFileName == NULL) {
 			/*
-			 * We got interrupted, so perhaps we didn't
-			 * manage to finish a line we were printing.
-			 * Print an extra newline, just in case.
+			 * We're printing packets.  Flush the printed output,
+			 * so it doesn't get intermingled with error output.
 			 */
-			putchar('\n');
+			if (status == -2) {
+				/*
+				 * We got interrupted, so perhaps we didn't
+				 * manage to finish a line we were printing.
+				 * Print an extra newline, just in case.
+				 */
+				putchar('\n');
+			}
+			(void)fflush(stdout);
 		}
-		(void)fflush(stdout);
+		if (status == -1) {
+			/*
+			 * Error.  Report it.
+			 */
+			(void)fprintf(stderr, "%s: pcap_loop: %s\n",
+			    program_name, pcap_geterr(pd));
+		}
+		if (RFileName == NULL) {
+			/*
+			 * We're doing a live capture.  Report the capture
+			 * statistics.
+			 */
+			info(1);
+		}
+		pcap_close(pd);
+		if (VFileName != NULL) {
+			ret = fgets(VFileLine, NAME_MAX, VFile);
+			if (ret) {
+				if (VFileLine[strlen(VFileLine) - 1] == '\n')
+					VFileLine[strlen(VFileLine) - 1] = '\0';
+				RFileName = VFileLine;
+				pd = pcap_open_offline(RFileName, ebuf);
+				if (pd == NULL)
+					error("%s", ebuf);
+				dlt = pcap_datalink(pd);
+				dlt_name = pcap_datalink_val_to_name(dlt);
+				if (dlt_name == NULL) {
+					fprintf(stderr, "reading from file %s, link-type %u\n",
+					RFileName, dlt);
+				} else {
+					fprintf(stderr,
+					"reading from file %s, link-type %s (%s)\n",
+					RFileName, dlt_name,
+					pcap_datalink_val_to_description(dlt));
+				}
+				if (pcap_compile(pd, &fcode, cmdbuf, Oflag, netmask) < 0)
+					error("%s", pcap_geterr(pd));
+				if (pcap_setfilter(pd, &fcode) < 0)
+					error("%s", pcap_geterr(pd));
+			}
+		}
 	}
-	if (status == -1) {
-		/*
-		 * Error.  Report it.
-		 */
-		(void)fprintf(stderr, "%s: pcap_loop: %s\n",
-		    program_name, pcap_geterr(pd));
-	}
-	if (RFileName == NULL) {
-		/*
-		 * We're doing a live capture.  Report the capture
-		 * statistics.
-		 */
-		info(1);
-	}
-	pcap_close(pd);
+	while (ret != NULL);
+
+	free(cmdbuf);
 	exit(status == -1 ? 1 : 0);
 }
 
@@ -1974,7 +2031,7 @@ usage(void)
 	(void)fprintf(stderr,
 "\t\t[ -i interface ]" j_FLAG_USAGE " [ -M secret ]\n");
 	(void)fprintf(stderr,
-"\t\t[ -r file ] [ -s snaplen ] [ -T type ] [ -w file ]\n");
+"\t\t[ -r file ] [ -s snaplen ] [ -T type ] [ -V file ] [ -w file ]\n");
 	(void)fprintf(stderr,
 "\t\t[ -W filecount ] [ -y datalinktype ] [ -z command ]\n");
 	(void)fprintf(stderr,
