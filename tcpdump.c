@@ -589,6 +589,8 @@ static void
 MakeFilename(char *buffer, char *orig_name, int cnt, int max_chars)
 {
         char *filename = malloc(NAME_MAX + 1);
+	if (filename == NULL)   /* didn't get memory requested  */
+	 error("malloc of filename:");
 
         /* Process with strftime if Gflag is set. */
         if (Gflag != 0) {
