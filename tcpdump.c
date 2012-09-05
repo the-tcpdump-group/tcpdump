@@ -590,7 +590,7 @@ MakeFilename(char *buffer, char *orig_name, int cnt, int max_chars)
 {
         char *filename = malloc(NAME_MAX + 1);
         if (filename == NULL)
-            error("Makefilename: malloc);
+            error("Makefilename: malloc");
 
         /* Process with strftime if Gflag is set. */
         if (Gflag != 0) {
