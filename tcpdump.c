@@ -651,6 +651,19 @@ struct print_info get_print_info(int type) {
 	return (printinfo);
 }
 
+char *get_next_file(FILE *VFile, char *ptr) {
+	char *ret;
+
+	ret = fgets(ptr, NAME_MAX, VFile);
+	if (!ret)
+		return NULL;
+
+	if (ptr[strlen(ptr) - 1] == '\n')
+		ptr[strlen(ptr) - 1] = '\0';
+
+	return ret;
+}
+
 int
 main(int argc, char **argv)
 {
@@ -1138,19 +1151,16 @@ main(int argc, char **argv)
 #endif /* WIN32 */
 		if (VFileName != NULL) {
 			if (VFileName[0] == '-' && VFileName[1] == '\0')
-				VFile = fopen("/dev/stdin", "r");
+				VFile = stdin;
 			else
 				VFile = fopen(VFileName, "r");
 
 			if (VFile == NULL)
 				error("Unable to open file: %s\n", strerror(errno));
 
-			ret = fgets(VFileLine, NAME_MAX, VFile);
+			ret = get_next_file(VFile, VFileLine);
 			if (!ret)
-				error("Nothing in %s\n", VFile);
-
-			if (VFileLine[strlen(VFileLine) - 1] == '\n')
-				VFileLine[strlen(VFileLine) - 1] = '\0';
+				error("Nothing in %s\n", VFileName);
 			RFileName = VFileLine;
 		}
 
@@ -1519,10 +1529,8 @@ main(int argc, char **argv)
 		}
 		pcap_close(pd);
 		if (VFileName != NULL) {
-			ret = fgets(VFileLine, NAME_MAX, VFile);
+			ret = get_next_file(VFile, VFileLine);
 			if (ret) {
-				if (VFileLine[strlen(VFileLine) - 1] == '\n')
-					VFileLine[strlen(VFileLine) - 1] = '\0';
 				RFileName = VFileLine;
 				pd = pcap_open_offline(RFileName, ebuf);
 				if (pd == NULL)
