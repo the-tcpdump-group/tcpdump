@@ -81,8 +81,8 @@ babel_print(const u_char *cp, u_int length) {
 #define MESSAGE_UPDATE 8
 #define MESSAGE_REQUEST 9
 #define MESSAGE_MH_REQUEST 10
-#define MESSAGE_PCTS 11
-#define MESSAGE_HD 12
+#define MESSAGE_TSPC 11
+#define MESSAGE_HMAC 12
 
 static const char *
 format_id(const u_char *id)
@@ -396,29 +396,26 @@ babel_print_v2(const u_char *cp, u_int length) {
             }
         }
             break;
-        case MESSAGE_PCTS :
+        case MESSAGE_TSPC :
             if(!vflag)
-                printf(" pcts");
+                printf(" tspc");
             else {
-                printf("\n\tPC/TS ");
+                printf("\n\tTS/PC ");
                 if(len < 6) goto corrupt;
-                printf("packet counter %u timestamp %u", EXTRACT_16BITS(message + 2),
-                       EXTRACT_32BITS (message + 4));
+                printf("timestamp %u packetcounter %u", EXTRACT_32BITS (message + 4),
+                       EXTRACT_16BITS(message + 2));
             }
             break;
-        case MESSAGE_HD : {
+        case MESSAGE_HMAC : {
             if(!vflag)
-                printf(" hd");
+                printf(" hmac");
             else {
-                unsigned j, dlen;
-                printf("\n\tHash Digest ");
-                if(len < 19) goto corrupt;
-                dlen = message[4];
-                printf("key-id %u dlen %u ", EXTRACT_16BITS(message + 2), dlen);
-                if(dlen < 16 || dlen > len - 3) goto corrupt;
-                printf("digest ");
-                for (j = 0; j < dlen; j++)
-                    printf ("%02X", message[5 + j]);
+                unsigned j;
+                printf("\n\tHMAC ");
+                if(len < 18) goto corrupt;
+                printf("key-id %u digest-%u ", EXTRACT_16BITS(message + 2), len - 2);
+                for (j = 0; j < len - 2; j++)
+                    printf ("%02X", message[4 + j]);
             }
         }
             break;
