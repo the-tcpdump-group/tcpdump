@@ -628,6 +628,7 @@ main(int argc, char **argv)
 	char ebuf[PCAP_ERRBUF_SIZE];
 	char *username = NULL;
 	char *chroot_dir = NULL;
+	char *end;
 #ifdef HAVE_PCAP_FINDALLDEVS
 	pcap_if_t *devpointer;
 	int devnum;
@@ -781,7 +782,8 @@ main(int argc, char **argv)
 			 * It can be useful on Windows, where more than
 			 * one interface can have the same name.
 			 */
-			if ((devnum = atoi(optarg)) != 0) {
+			devnum = strtol(optarg, &end, 10);
+			if (optarg != end && *end == '\0') {
 				if (devnum < 0)
 					error("Invalid adapter index");
 
@@ -900,9 +902,7 @@ main(int argc, char **argv)
 			Rflag = 0;
 			break;
 
-		case 's': {
-			char *end;
-
+		case 's':
 			snaplen = strtol(optarg, &end, 0);
 			if (optarg == end || *end != '\0'
 			    || snaplen < 0 || snaplen > MAXIMUM_SNAPLEN)
@@ -910,7 +910,6 @@ main(int argc, char **argv)
 			else if (snaplen == 0)
 				snaplen = MAXIMUM_SNAPLEN;
 			break;
-		}
 
 		case 'S':
 			++Sflag;
