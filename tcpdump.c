@@ -83,8 +83,8 @@ extern int SIZE_BUF;
 #include "gmt2local.h"
 #include "pcap-missing.h"
 
-#ifndef NAME_MAX
-#define NAME_MAX 255
+#ifndef PATH_MAX
+#define PATH_MAX 1024
 #endif
 
 #ifdef SIGINFO
@@ -568,7 +568,7 @@ getWflagChars(int x)
 static void
 MakeFilename(char *buffer, char *orig_name, int cnt, int max_chars)
 {
-        char *filename = malloc(NAME_MAX + 1);
+        char *filename = malloc(PATH_MAX + 1);
 
         /* Process with strftime if Gflag is set. */
         if (Gflag != 0) {
@@ -582,17 +582,17 @@ MakeFilename(char *buffer, char *orig_name, int cnt, int max_chars)
           /* There's no good way to detect an error in strftime since a return
            * value of 0 isn't necessarily failure.
            */
-          strftime(filename, NAME_MAX, orig_name, local_tm);
+          strftime(filename, PATH_MAX, orig_name, local_tm);
         } else {
-          strncpy(filename, orig_name, NAME_MAX);
+          strncpy(filename, orig_name, PATH_MAX);
         }
 
 	if (cnt == 0 && max_chars == 0)
-		strncpy(buffer, filename, NAME_MAX + 1);
+		strncpy(buffer, filename, PATH_MAX + 1);
 	else
-		if (snprintf(buffer, NAME_MAX + 1, "%s%0*d", filename, max_chars, cnt) > NAME_MAX)
+		if (snprintf(buffer, PATH_MAX + 1, "%s%0*d", filename, max_chars, cnt) > PATH_MAX)
                   /* Report an error if the filename is too large */
-                  error("too many output files or filename is too long (> %d)", NAME_MAX);
+                  error("too many output files or filename is too long (> %d)", PATH_MAX);
         free(filename);
 }
 
@@ -1305,8 +1305,8 @@ main(int argc, char **argv)
 		error("%s", pcap_geterr(pd));
 	if (WFileName) {
 		pcap_dumper_t *p;
-		/* Do not exceed the default NAME_MAX for files. */
-		dumpinfo.CurrentFileName = (char *)malloc(NAME_MAX + 1);
+		/* Do not exceed the default PATH_MAX for files. */
+		dumpinfo.CurrentFileName = (char *)malloc(PATH_MAX + 1);
 
 		if (dumpinfo.CurrentFileName == NULL)
 			error("malloc of dumpinfo.CurrentFileName");
@@ -1635,7 +1635,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			if (dump_info->CurrentFileName != NULL)
 				free(dump_info->CurrentFileName);
 			/* Allocate space for max filename + \0. */
-			dump_info->CurrentFileName = (char *)malloc(NAME_MAX + 1);
+			dump_info->CurrentFileName = (char *)malloc(PATH_MAX + 1);
 			if (dump_info->CurrentFileName == NULL)
 				error("dump_packet_and_trunc: malloc");
 			/*
@@ -1679,7 +1679,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 		}
 		if (dump_info->CurrentFileName != NULL)
 			free(dump_info->CurrentFileName);
-		dump_info->CurrentFileName = (char *)malloc(NAME_MAX + 1);
+		dump_info->CurrentFileName = (char *)malloc(PATH_MAX + 1);
 		if (dump_info->CurrentFileName == NULL)
 			error("dump_packet_and_trunc: malloc");
 		MakeFilename(dump_info->CurrentFileName, dump_info->WFileName, Cflag_count, WflagChars);
