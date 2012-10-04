@@ -52,11 +52,13 @@ struct stp_bpdu_ {
 #define STP_PROTO_REGULAR 0x00
 #define STP_PROTO_RAPID   0x02
 #define STP_PROTO_MSTP    0x03
+#define STP_PROTO_SPB     0x04
 
 struct tok stp_proto_values[] = {
     { STP_PROTO_REGULAR, "802.1d" },
     { STP_PROTO_RAPID, "802.1w" },
     { STP_PROTO_MSTP, "802.1s" },
+    { STP_PROTO_SPB, "802.1aq" },
     { 0, NULL}
 };
 
@@ -163,6 +165,7 @@ stp_print_config_bpdu(const struct stp_bpdu_ *stp_bpdu, u_int length)
  * 8 -  bytes CIST Bridge Identifier
  * 1 -  byte  CIST Remaining Hops
  * 16 - bytes MSTI information [Max 64 MSTI, each 16 bytes]
+ * 
  *
  * MSTI Payload
  *
@@ -192,11 +195,22 @@ stp_print_config_bpdu(const struct stp_bpdu_ *stp_bpdu, u_int length)
 #define MST_BPDU_MSTI_PORT_PRIO_OFFSET	    14
 #define MST_BPDU_MSTI_REMAIN_HOPS_OFFSET    15
 
+#define SPB_BPDU_MIN_LEN                  87
+#define SPB_BPDU_CONFIG_NAME_OFFSET       3
+#define SPB_BPDU_CONFIG_REV_OFFSET        SPB_BPDU_CONFIG_NAME_OFFSET + 32
+#define SPB_BPDU_CONFIG_DIGEST_OFFSET     SPB_BPDU_CONFIG_REV_OFFSET + 2
+#define SPB_BPDU_AGREEMENT_OFFSET         SPB_BPDU_CONFIG_DIGEST_OFFSET + 16
+#define SPB_BPDU_AGREEMENT_CON_OFFSET     SPB_BPDU_AGREEMENT_OFFSET + 1
+#define SPB_BPDU_AGREEMENT_EDGE_OFFSET    SPB_BPDU_AGREEMENT_CON_OFFSET + 1
+#define SPB_BPDU_AGREEMENT_DIGEST_OFFSET  SPB_BPDU_AGREEMENT_EDGE_OFFSET + 10 
+
+
 static void
 stp_print_mstp_bpdu(const struct stp_bpdu_ *stp_bpdu, u_int length)
 {
     const u_char    *ptr;
     u_int16_t	    v3len;
+    u_int16_t	    v4len;
     u_int16_t	    len;
     u_int16_t	    msti;
     u_int16_t	    offset;
@@ -230,14 +244,14 @@ stp_print_mstp_bpdu(const struct stp_bpdu_ *stp_bpdu, u_int length)
            EXTRACT_32BITS(&stp_bpdu->root_path_cost),
            EXTRACT_32BITS(ptr + MST_BPDU_CIST_INT_PATH_COST_OFFSET));
 
-    printf(", port-role %s",
+    printf("\n\t\tport-role %s",
            tok2str(rstp_obj_port_role_values, "Unknown",
                    RSTP_EXTRACT_PORT_ROLE(stp_bpdu->flags)));
 
     printf("\n\tCIST regional-root-id %s",
            stp_print_bridge_id((const u_char *)&stp_bpdu->bridge_id));
 
-    printf("\n\tMSTP Configuration Name %s, revision %u, digest %08x%08x%08x%08x",
+    printf("\n\tMSTP Configuration Name %s, revision %u, \n\t\tdigest %08x%08x%08x%08x",
            ptr + MST_BPDU_CONFIG_NAME_OFFSET,
 	   EXTRACT_16BITS(ptr + MST_BPDU_CONFIG_NAME_OFFSET + 32),
 	   EXTRACT_32BITS(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET),
@@ -275,16 +289,42 @@ stp_print_mstp_bpdu(const struct stp_bpdu_ *stp_bpdu, u_int length)
             offset += MST_BPDU_MSTI_LENGTH;
         }
     }
+
+    if (length != offset)
+    {
+      printf("\n\tv4len: %d AUXMCID Name %s, Rev: %u, \n\t\tdigest %08x%08x%08x%08x",
+              EXTRACT_16BITS (ptr + offset),
+              ptr + offset + SPB_BPDU_CONFIG_NAME_OFFSET,
+              EXTRACT_16BITS(ptr + offset + SPB_BPDU_CONFIG_REV_OFFSET),
+              EXTRACT_32BITS(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET),
+              EXTRACT_32BITS(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET + 4),
+              EXTRACT_32BITS(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET + 8),
+              EXTRACT_32BITS(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET + 12));
+     
+      printf("\n\tFormat ID: %d, Cap: %d, Convention ID: %d, Cap: %d, EdgeCount:%d\n"
+              "\tDigest: %08x%08x%08x%08x%08x\n",
+              ptr[offset + SPB_BPDU_AGREEMENT_OFFSET]>>4,
+              ptr[offset + SPB_BPDU_AGREEMENT_OFFSET]&0x00ff,
+              ptr[offset + SPB_BPDU_AGREEMENT_CON_OFFSET]>>4,
+              ptr[offset + SPB_BPDU_AGREEMENT_CON_OFFSET]&0x00ff,
+              EXTRACT_16BITS(ptr + offset + SPB_BPDU_AGREEMENT_EDGE_OFFSET),
+              EXTRACT_32BITS(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET),
+              EXTRACT_32BITS(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET)+4,
+              EXTRACT_32BITS(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET)+8,
+              EXTRACT_32BITS(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET)+12,
+              EXTRACT_32BITS(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET)+16);
+      }
 }
 
 /*
- * Print 802.1d / 802.1w / 802.1q (mstp) packets.
+ * Print 802.1d / 802.1w / 802.1q (mstp) / 802.1aq (spb) packets.
  */
 void
 stp_print(const u_char *p, u_int length)
 {
     const struct stp_bpdu_ *stp_bpdu;
     u_int16_t              mstp_len;
+    u_int16_t              spb_len;
     
     stp_bpdu = (struct stp_bpdu_*)p;
 
@@ -304,6 +344,7 @@ stp_print(const u_char *p, u_int length)
     case STP_PROTO_REGULAR:
     case STP_PROTO_RAPID:
     case STP_PROTO_MSTP:
+    case STP_PROTO_SPB:
         break;
     default:
         return;
@@ -326,7 +367,8 @@ stp_print(const u_char *p, u_int length)
                 goto trunc;
             }
             stp_print_config_bpdu(stp_bpdu, length);
-        } else if (stp_bpdu->protocol_version == STP_PROTO_MSTP) {
+        } else if (stp_bpdu->protocol_version == STP_PROTO_MSTP ||
+                   stp_bpdu->protocol_version == STP_PROTO_SPB) {
             if (length < STP_BPDU_MSTP_MIN_LEN) {
                 goto trunc;
             }
@@ -340,6 +382,17 @@ stp_print(const u_char *p, u_int length)
             if (length < (sizeof(struct stp_bpdu_) + mstp_len)) {
                 goto trunc;
             }
+
+            if (stp_bpdu->protocol_version == STP_PROTO_SPB)
+            {
+              spb_len = EXTRACT_16BITS (p + MST_BPDU_VER3_LEN_OFFSET + mstp_len);
+              spb_len += 2;
+              if (length < (sizeof(struct stp_bpdu_) + mstp_len + spb_len) ||
+                  spb_len < SPB_BPDU_MIN_LEN) {
+                goto trunc;
+              }
+            }
+
             stp_print_mstp_bpdu(stp_bpdu, length);
         }
         break;
