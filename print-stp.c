@@ -210,7 +210,6 @@ stp_print_mstp_bpdu(const struct stp_bpdu_ *stp_bpdu, u_int length)
 {
     const u_char    *ptr;
     u_int16_t	    v3len;
-    u_int16_t	    v4len;
     u_int16_t	    len;
     u_int16_t	    msti;
     u_int16_t	    offset;
@@ -290,7 +289,7 @@ stp_print_mstp_bpdu(const struct stp_bpdu_ *stp_bpdu, u_int length)
         }
     }
 
-    if (length != offset)
+    if ((length-offset) == SPB_BPDU_MIN_LEN)
     {
       printf("\n\tv4len: %d AUXMCID Name %s, Rev: %u, \n\t\tdigest %08x%08x%08x%08x",
               EXTRACT_16BITS (ptr + offset),
