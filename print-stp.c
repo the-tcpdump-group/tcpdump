@@ -181,7 +181,13 @@ stp_print_config_bpdu(const struct stp_bpdu_ *stp_bpdu, u_int length)
  *            (6) Restricted Role Flag
  *            (7 - 8) Unused sent zero
  * 1 -  byte Unused
- * 20 - bytes Agreement Digest
+ * 1 -  byte (1 - 4) Agreement Digest Format Identifier
+ *           (5 - 8) Agreement Digest Format Capabilities
+ * 1 -  byte (1 - 4) Agreement Digest Convention Identifier
+ *           (5 - 8) Agreement Digest Convention Capabilities
+ * 2 -  bytes Agreement Digest Edge Count
+ * 8 -  byte Reserved Set
+ * 20 - bytes Computed Topology Digest
  *
  *
  * MSTI Payload
