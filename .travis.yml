@@ -2,12 +2,8 @@ language: c
 
 before_script:
   - sudo apt-get install libpcap-dev libssl-dev libssl0.9.8 libssl1.0.0
-  # - find /lib /usr/lib -name 'libcrypto.*'
-  # - sudo ln -s i386-linux-gnu/libcrypto.so.0.9.8 /usr/lib/libcrypto.so
 
 script:
-  - curl -sk http://patch-tracker.debian.org/patch/series/dl/tcpdump/4.3.0-1/40_openssl.diff | patch -p1  # Patch OpenSSL detection to be multiarch-aware
-  - autoconf
-  - ./configure  # --with-crypto=/usr --with-libdir=/usr/lib/i386-linux-gnu
+  - ./configure
   - make
   - make check
