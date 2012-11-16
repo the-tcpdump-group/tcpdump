@@ -262,7 +262,9 @@ that lacks the
 function.
 .TP
 .B \-e
-Print the link-level header on each dump line.
+Print the link-level header on each dump line.  This can be used, for
+example, to print MAC layer addresses for protocols such as Ethernet and
+IEEE 802.11.
 .TP
 .B \-E
 Use \fIspi@ipaddr algo:secret\fP for decrypting IPsec ESP packets that
@@ -726,8 +728,10 @@ For the \fIexpression\fP syntax, see
 .LP
 Expression arguments can be passed to \fItcpdump\fP as either a single
 argument or as multiple arguments, whichever is more convenient.
-Generally, if the expression contains Shell metacharacters, it is
-easier to pass it as a single, quoted argument.
+Generally, if the expression contains Shell metacharacters, such as
+backslashes used to escape protocol names, it is easier to pass it as
+a single, quoted argument rather than to escape the Shell
+metacharacters.
 Multiple arguments are concatenated with spaces before being parsed.
 .SH EXAMPLES
 .LP
