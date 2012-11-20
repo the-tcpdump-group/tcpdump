@@ -36,6 +36,7 @@
  *  RFC4075,
  *  RFC4242,
  *  RFC4280,
+ *  RFC6334,
  */
 
 #ifndef lint
@@ -170,6 +171,7 @@ struct dhcp6_relay {
 #define DH6OPT_CLT_TIME 46
 #define DH6OPT_LQ_RELAY_DATA 47
 #define DH6OPT_LQ_CLIENT_LINK 48
+#define DH6OPT_AFTR_NAME 64
 
 struct dhcp6opt {
 	u_int16_t dh6opt_type;
@@ -278,6 +280,8 @@ dhcp6opt_name(int type)
 		return "LQ-relay-data";
 	case DH6OPT_LQ_CLIENT_LINK:
 		return "LQ-client-link";
+	case DH6OPT_AFTR_NAME:
+		return "AFTR-Name";
 	default:
 		snprintf(genstr, sizeof(genstr), "opt_%d", type);
 		return(genstr);
@@ -711,6 +715,30 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 			for (i = 16; i < optlen && i < 26; i++)
 				printf("%02x", tp[i]);
 			printf("...)");
+			break;
+		case DH6OPT_AFTR_NAME:
+			if (optlen < 3) {
+				printf(" ?)");
+				break;
+			}
+			tp = (u_char *)(dh6o + 1);
+			int remain_len = optlen;
+			printf(" ");
+			/* Encoding is described in section 3.1 of RFC 1035 */
+			int label_len; /* Label length */
+			while (remain_len && *tp) {
+				label_len =  *tp++;
+				if (label_len < remain_len - 1) {
+					printf("%.*s", label_len, tp);
+					tp += label_len;
+					remain_len -= (label_len + 1);
+					if(*tp) printf(".");
+				} else {
+					printf(" ?");
+					break;
+				}
+			}
+			printf(")");
 			break;
 		default:
 			printf(")");
