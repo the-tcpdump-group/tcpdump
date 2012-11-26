@@ -74,3 +74,6 @@ spb	            spb.pcap	            spb.out -t
 # RIP tests
 ripv1v2         ripv1v2.pcap            ripv1v2.out     -t -v
 ripv2_auth      ripv2_auth.pcap         ripv2_auth.out  -t -v
+
+# DHCPv6 tests
+dhcpv6-aftr-name	dhcpv6-AFTR-Name-RFC6334.pcap	dhcpv6-AFTR-Name-RFC6334.out	-t -v
