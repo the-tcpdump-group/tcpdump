@@ -342,6 +342,7 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 		if (ep < cp + sizeof(*dh6o))
 			goto trunc;
 		dh6o = (struct dhcp6opt *)cp;
+		TCHECK(*dh6o);
 		optlen = EXTRACT_16BITS(&dh6o->dh6opt_len);
 		if (ep < cp + sizeof(*dh6o) + optlen)
 			goto trunc;
