@@ -415,7 +415,7 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 			    EXTRACT_32BITS(&tp[20]));
 			if (optlen > 24) {
 				/* there are sub-options */
-				dhcp6opt_print(tp + 24, tp + 24 + optlen);
+				dhcp6opt_print(tp + 24, tp + optlen);
 			}
 			printf(")");
 			break;
@@ -615,7 +615,7 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 			    EXTRACT_32BITS(&tp[8]));
 			if (optlen > 12) {
 				/* there are sub-options */
-				dhcp6opt_print(tp + 12, tp + 12 + optlen);
+				dhcp6opt_print(tp + 12, tp + optlen);
 			}
 			printf(")");
 			break;
@@ -628,7 +628,7 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 			printf(" IAID:%u", EXTRACT_32BITS(tp));
 			if (optlen > 4) {
 				/* there are sub-options */
-				dhcp6opt_print(tp + 4, tp + 4 + optlen);
+				dhcp6opt_print(tp + 4, tp + optlen);
 			}
 			printf(")");
 			break;
@@ -644,7 +644,7 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 			    EXTRACT_32BITS(&tp[4]));
 			if (optlen > 25) {
 				/* there are sub-options */
-				dhcp6opt_print(tp + 25, tp + 25 + optlen);
+				dhcp6opt_print(tp + 25, tp + optlen);
 			}
 			printf(")");
 			break;
