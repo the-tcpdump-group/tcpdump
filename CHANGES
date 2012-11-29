@@ -11,7 +11,7 @@ Wednesday  November 28, 2012 guy@alum.mit.edu.
 	    backslashes in filter expressions on the command line
 	Fix some "the the" in the man page
 	Use the right maximum path length
-	Don't treate 192_1_2, when passed to -i, as an interface number
+	Don't treat 192_1_2, when passed to -i, as an interface number
 
 Friday  April 3, 2011.  mcr@sandelman.ca.
   Summary for 4.3.0 tcpdump release
