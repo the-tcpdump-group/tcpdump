@@ -1,9 +1,17 @@
-Saturday June 30, 2012 guy@alum.mit.edu.
+Wednesday  November 28, 2012 guy@alum.mit.edu.
   Summary for 4.3.1 tcpdump release
 	Print "LLDP, length N" for LLDP packets even when not in verbose
 	    mode, so something is printed even if only the timestamp is
 	    present
-	Documented "-T carp".
+	Document "-T carp"
+	Print NTP poll interval correctly (it's an exponent, so print
+	    both its raw value and 2^value)
+	Document that "-e" is used to get MAC addresses
+	More clearly document that you need to escape or quote
+	    backslashes in filter expressions on the command line
+	Fix some "the the" in the man page
+	Use the right maximum path length
+	Don't treate 192_1_2, when passed to -i, as an interface number
 
 Friday  April 3, 2011.  mcr@sandelman.ca.
   Summary for 4.3.0 tcpdump release
