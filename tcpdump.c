@@ -719,7 +719,9 @@ main(int argc, char **argv)
 	infile = NULL;
 	RFileName = NULL;
 	VFileName = NULL;
+	VFile = NULL;
 	WFileName = NULL;
+	dlt = -1;
 	if ((cp = strrchr(argv[0], '/')) != NULL)
 		program_name = cp + 1;
 	else
@@ -1141,6 +1143,15 @@ main(int argc, char **argv)
 #endif
 
 	if (RFileName != NULL || VFileName != NULL) {
+		/*
+		 * If RFileName is non-null, it's the pathname of a
+		 * savefile to read.  If VFileName is non-null, it's
+		 * the pathname of a file containing a list of pathnames
+		 * (one per line) of savefiles to read.
+		 *
+		 * In either case, we're reading a savefile, not doing
+		 * a live capture.
+		 */
 #ifndef WIN32
 		/*
 		 * We don't need network access, so relinquish any set-UID
@@ -1186,12 +1197,19 @@ main(int argc, char **argv)
 		localnet = 0;
 		netmask = 0;
 	} else {
+		/*
+		 * We're doing a live capture.
+		 */
 		if (device == NULL) {
 			device = pcap_lookupdev(ebuf);
 			if (device == NULL)
 				error("%s", ebuf);
 		}
 #ifdef WIN32
+		/*
+		 * Print a message to the standard error on Windows.
+		 * XXX - why do it here, with a different message?
+		 */
 		if(strlen(device) == 1)	//we assume that an ASCII string is always longer than 1 char
 		{						//a Unicode string has a \0 as second byte (so strlen() is 1)
 			fprintf(stderr, "%s: listening on %ws\n", program_name, device);
@@ -1482,6 +1500,11 @@ main(int argc, char **argv)
 
 #ifndef WIN32
 	if (RFileName == NULL) {
+		/*
+		 * Live capture (if -V was specified, we set RFileName
+		 * to a file from the -V file).  Print a message to
+		 * the standard error on UN*X.
+		 */
 		if (!vflag && !WFileName) {
 			(void)fprintf(stderr,
 			    "%s: verbose output suppressed, use -v or -vv for full protocol decode\n",
