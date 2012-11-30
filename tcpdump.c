@@ -632,7 +632,9 @@ static int tcpdump_printf(netdissect_options *ndo _U_,
   return ret;
 }
 
-struct print_info get_print_info(int type) {
+static struct print_info
+get_print_info(int type)
+{
 	struct print_info printinfo;
 
 	printinfo.ndo_type = 1;
@@ -653,10 +655,12 @@ struct print_info get_print_info(int type) {
 	return (printinfo);
 }
 
-char *get_next_file(FILE *VFile, char *ptr) {
+static char *
+get_next_file(FILE *VFile, char *ptr)
+{
 	char *ret;
 
-	ret = fgets(ptr, NAME_MAX, VFile);
+	ret = fgets(ptr, PATH_MAX, VFile);
 	if (!ret)
 		return NULL;
 
@@ -685,7 +689,7 @@ main(int argc, char **argv)
 	struct dump_info dumpinfo;
 	u_char *pcap_userdata;
 	char ebuf[PCAP_ERRBUF_SIZE];
-	char VFileLine[NAME_MAX + 1];
+	char VFileLine[PATH_MAX + 1];
 	char *username = NULL;
 	char *chroot_dir = NULL;
 	char *ret = NULL;
