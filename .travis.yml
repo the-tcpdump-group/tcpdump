@@ -1,6 +1,7 @@
 language: c
 
 before_script:
+  - ( cd ../ && git clone https://github.com/mcr/libpcap.git && cd libpcap && ./configure && make )
   - sudo apt-get install libpcap-dev libssl-dev libssl0.9.8 libssl1.0.0
 
 script:
