@@ -1,8 +1,12 @@
 language: c
 
+env:
+  - BUILD_LIBPCAP=true
+  - BUILD_LIBPCAP=false
+
 before_script:
-  - ( cd ../ && git clone https://github.com/mcr/libpcap.git && cd libpcap && ./configure && make )
-  - sudo apt-get install libpcap-dev libssl-dev libssl0.9.8 libssl1.0.0
+  - sudo apt-get install libssl-dev libssl0.9.8 libssl1.0.0
+  - if [ $BUILD_LIBPCAP == "true" ]; then ( cd ../ && git clone https://github.com/mcr/libpcap.git && cd libpcap && ./configure && make ); else sudo apt-get install libpcap-dev; fi
 
 script:
   - ./configure
