@@ -74,6 +74,10 @@ tcpdump \- dump traffic on a network
 .I file
 ]
 [
+.B \-V
+.I file
+]
+[
 .B \-s
 .I snaplen
 ]
@@ -127,8 +131,10 @@ flag, which causes it to save the packet data to a file for later
 analysis, and/or with the
 .B \-r
 flag, which causes it to read from a saved packet file rather than to
-read packets from a network interface.  In all cases, only packets that
-match
+read packets from a network interface.  It can also be run with the
+.B \-V
+flag, which causes it to read a list of saved packet files. In all cases,
+only packets that match
 .I expression
 will be processed by
 .IR tcpdump .
@@ -593,6 +599,10 @@ are printed in full.
 With
 .B \-X
 Telnet options are printed in hex as well.
+.TP
+.B \-V
+Read a list of filenames from \fIfile\fR. Standard input is used
+if \fIfile\fR is ``-''.
 .TP
 .B \-w
 Write the raw packets to \fIfile\fR rather than parsing and printing
