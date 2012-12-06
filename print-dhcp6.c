@@ -29,14 +29,14 @@
 /*
  * RFC3315: DHCPv6
  * supported DHCPv6 options: 
- *  RFC3319,
- *  RFC3633,
- *  RFC3646,
- *  RFC3898,
- *  RFC4075,
- *  RFC4242,
- *  RFC4280,
- *  RFC6334,
+ *  RFC3319: Session Initiation Protocol (SIP) Servers options,
+ *  RFC3633: IPv6 Prefix options,
+ *  RFC3646: DNS Configuration options,
+ *  RFC3898: Network Information Service (NIS) Configuration options,
+ *  RFC4075: Simple Network Time Protocol (SNTP) Configuration option,
+ *  RFC4242: Information Refresh Time option,
+ *  RFC4280: Broadcast and Multicast Control Servers options,
+ *  RFC6334: Dual-Stack Lite option,
  */
 
 #ifndef lint
