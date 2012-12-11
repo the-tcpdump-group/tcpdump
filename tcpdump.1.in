@@ -1732,7 +1732,7 @@ The current version is available via http:
 The original distribution is available via anonymous ftp:
 .LP
 .RS
-.I ftp://ftp.ee.lbl.gov/tcpdump.tar.Z
+.I ftp://ftp.ee.lbl.gov/old/tcpdump.tar.Z
 .RE
 .LP
 IPv6/IPsec support is added by WIDE/KAME project.
