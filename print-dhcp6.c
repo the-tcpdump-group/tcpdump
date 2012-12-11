@@ -29,14 +29,14 @@
 /*
  * RFC3315: DHCPv6
  * supported DHCPv6 options: 
- *  RFC3319,
- *  RFC3633,
- *  RFC3646,
- *  RFC3898,
- *  RFC4075,
- *  RFC4242,
- *  RFC4280,
- *  RFC6334,
+ *  RFC3319: Session Initiation Protocol (SIP) Servers options,
+ *  RFC3633: IPv6 Prefix options,
+ *  RFC3646: DNS Configuration options,
+ *  RFC3898: Network Information Service (NIS) Configuration options,
+ *  RFC4075: Simple Network Time Protocol (SNTP) Configuration option,
+ *  RFC4242: Information Refresh Time option,
+ *  RFC4280: Broadcast and Multicast Control Servers options,
+ *  RFC6334: Dual-Stack Lite option,
  */
 
 #ifndef lint
@@ -342,6 +342,7 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 		if (ep < cp + sizeof(*dh6o))
 			goto trunc;
 		dh6o = (struct dhcp6opt *)cp;
+		TCHECK(*dh6o);
 		optlen = EXTRACT_16BITS(&dh6o->dh6opt_len);
 		if (ep < cp + sizeof(*dh6o) + optlen)
 			goto trunc;
@@ -414,7 +415,7 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 			    EXTRACT_32BITS(&tp[20]));
 			if (optlen > 24) {
 				/* there are sub-options */
-				dhcp6opt_print(tp + 24, tp + 24 + optlen);
+				dhcp6opt_print(tp + 24, tp + optlen);
 			}
 			printf(")");
 			break;
@@ -614,7 +615,7 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 			    EXTRACT_32BITS(&tp[8]));
 			if (optlen > 12) {
 				/* there are sub-options */
-				dhcp6opt_print(tp + 12, tp + 12 + optlen);
+				dhcp6opt_print(tp + 12, tp + optlen);
 			}
 			printf(")");
 			break;
@@ -627,7 +628,7 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 			printf(" IAID:%u", EXTRACT_32BITS(tp));
 			if (optlen > 4) {
 				/* there are sub-options */
-				dhcp6opt_print(tp + 4, tp + 4 + optlen);
+				dhcp6opt_print(tp + 4, tp + optlen);
 			}
 			printf(")");
 			break;
@@ -643,7 +644,7 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 			    EXTRACT_32BITS(&tp[4]));
 			if (optlen > 25) {
 				/* there are sub-options */
-				dhcp6opt_print(tp + 25, tp + 25 + optlen);
+				dhcp6opt_print(tp + 25, tp + optlen);
 			}
 			printf(")");
 			break;
