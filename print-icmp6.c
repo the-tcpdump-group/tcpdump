@@ -440,7 +440,7 @@ icmp6_print(netdissect_options *ndo,
 		if (length == MLD_MINLEN) {
 			mld6_print((const u_char *)dp);
 		} else if (length >= MLDV2_MINLEN) {
-			printf("v2 ");
+			printf(" v2");
 			mldv2_query_print((const u_char *)dp, length);
 		} else {
 			printf(" unknown-version (len %u) ", length);
