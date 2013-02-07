@@ -409,10 +409,12 @@ stp_print(const u_char *p, u_int length)
             if (length < STP_BPDU_MSTP_MIN_LEN) {
                 goto trunc;
             }
+
             if (stp_bpdu->v1_length != 0) {
                 /* FIX ME: Emit a message here ? */
                 goto trunc;
             }
+
             /* Validate v3 length */
             mstp_len = EXTRACT_16BITS(p + MST_BPDU_VER3_LEN_OFFSET);
             mstp_len += 2;  /* length encoding itself is 2 bytes */
@@ -422,6 +424,7 @@ stp_print(const u_char *p, u_int length)
 
             if (stp_bpdu->protocol_version == STP_PROTO_SPB)
             {
+              /* Validate v4 length */
               spb_len = EXTRACT_16BITS (p + MST_BPDU_VER3_LEN_OFFSET + mstp_len);
               spb_len += 2;
               if (length < (sizeof(struct stp_bpdu_) + mstp_len + spb_len) ||

@@ -1328,8 +1328,7 @@ isis_print_mcid (const struct isis_spb_mcid *mcid)
 static int
 isis_print_mt_port_cap_subtlv (const u_int8_t *tptr, int len)
 {
-  int stlv_type;
-  int stlv_len;
+  int stlv_type, stlv_len;
   const struct isis_subtlv_spb_mcid *subtlv_spb_mcid;
   int i;
 
@@ -1344,79 +1343,87 @@ isis_print_mt_port_cap_subtlv (const u_int8_t *tptr, int len)
                stlv_type,
                stlv_len);
 
+    /*len -= TLV_TYPE_LEN_OFFSET;*/
     len = len -2;
 
     switch (stlv_type)
     {
       case ISIS_SUBTLV_SPB_MCID:
+      {
+        if (!TTEST2(*(tptr), ISIS_SUBTLV_SPB_MCID_MIN_LEN))
+          goto trunctlv;
 
-          if (!TTEST2(*(tptr), ISIS_SUBTLV_SPB_MCID_MIN_LEN))
-            goto trunctlv;
+        subtlv_spb_mcid = (struct isis_subtlv_spb_mcid *)tptr;
 
-          subtlv_spb_mcid = (struct isis_subtlv_spb_mcid *)tptr;
+        printf( "\n\t         MCID: ");
+        isis_print_mcid (&(subtlv_spb_mcid->mcid));
 
-          printf( "\n\t         MCID: ");
-          isis_print_mcid (&(subtlv_spb_mcid->mcid));
+          /*tptr += SPB_MCID_MIN_LEN;
+            len -= SPB_MCID_MIN_LEN; */
 
-          printf( "\n\t         AUX-MCID: ");
-          isis_print_mcid (&(subtlv_spb_mcid->aux_mcid));
+        printf( "\n\t         AUX-MCID: ");
+        isis_print_mcid (&(subtlv_spb_mcid->aux_mcid));
 
-          tptr = tptr + sizeof(struct isis_subtlv_spb_mcid);
-          len = len - sizeof(struct isis_subtlv_spb_mcid);
+          /*tptr += SPB_MCID_MIN_LEN;
+            len -= SPB_MCID_MIN_LEN; */
+        tptr = tptr + sizeof(struct isis_subtlv_spb_mcid);
+        len = len - sizeof(struct isis_subtlv_spb_mcid);
 
-          break;
+        break;
+      }
 
       case ISIS_SUBTLV_SPB_DIGEST:
+      {
+        if (!TTEST2(*(tptr), ISIS_SUBTLV_SPB_DIGEST_MIN_LEN))
+          goto trunctlv;
 
-          if (!TTEST2(*(tptr), ISIS_SUBTLV_SPB_DIGEST_MIN_LEN))
-            goto trunctlv;
-
-          printf ("\n\t         RES: %d V: %d A: %d D: %d",
+        printf ("\n\t        RES: %d V: %d A: %d D: %d",
                         (*(tptr) >> 5), (((*tptr)>> 4) & 0x01),
                         ((*(tptr) >> 2) & 0x03), ((*tptr) & 0x03));
 
-          tptr++;
+        tptr++;
 
-          printf( "\n\t         Digest: ");
+        printf( "\n\t         Digest: ");
           
-          for(i=1;i<=8; i++)
-          {
+        for(i=1;i<=8; i++)
+        {
             printf("%08x ", EXTRACT_32BITS(tptr));
             if (i%4 == 0 && i != 8)
               printf("\n\t                 ");
             tptr = tptr + 4;
-          }
+        }
 
-          len = len - ISIS_SUBTLV_SPB_DIGEST_MIN_LEN;
+        len = len - ISIS_SUBTLV_SPB_DIGEST_MIN_LEN;
 
-          break;
+        break;
+      }
 
       case ISIS_SUBTLV_SPB_BVID:
+      {
+        if (!TTEST2(*(tptr), stlv_len))
+          goto trunctlv;
 
-          if (!TTEST2(*(tptr), stlv_len))
+        while (len)
+        {
+          if (!TTEST2(*(tptr), ISIS_SUBTLV_SPB_BVID_MIN_LEN))
             goto trunctlv;
 
-          while (len)
-          {
-            if (!TTEST2(*(tptr), ISIS_SUBTLV_SPB_BVID_MIN_LEN))
-              goto trunctlv;
-
-            printf("\n\t           ECT: %08x", 
+          printf("\n\t           ECT: %08x", 
                       EXTRACT_32BITS(tptr));
 
-            tptr = tptr+4;
+          tptr = tptr+4;
 
-            printf(" B-Vlan: %d, U:%01x, M:%01x RES: %01x",
+          printf(" BVID: %d, U:%01x M:%01x ",
                      (EXTRACT_16BITS (tptr) >> 4) ,
                      (EXTRACT_16BITS (tptr) >> 3) & 0x01,
-                     (EXTRACT_16BITS (tptr) >> 2) & 0x01,
-                     (EXTRACT_16BITS (tptr) & 0x03));
+                     (EXTRACT_16BITS (tptr) >> 2) & 0x01);
 
-            tptr = tptr + 2;
-            len = len - ISIS_SUBTLV_SPB_BVID_MIN_LEN;
-          }
+          tptr = tptr + 2;
+          len = len - ISIS_SUBTLV_SPB_BVID_MIN_LEN;
+        }
 
-          break;
+        break;
+      }
       
       default:
           break;
@@ -1429,7 +1436,6 @@ isis_print_mt_port_cap_subtlv (const u_int8_t *tptr, int len)
     printf("\n\t\t packet exceeded snapshot");
     return(1); 
 }
-
 
 static int
 isis_print_mt_capability_subtlv (const u_int8_t *tptr, int len)
@@ -2754,7 +2760,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	    break;
 
     case ISIS_TLV_MT_PORT_CAP:
-
+    {
       if (!TTEST2(*(tptr), 2))
         goto trunctlv;
 
@@ -2767,7 +2773,9 @@ static int isis_print (const u_int8_t *p, u_int length)
 
       if (tmp)
         isis_print_mt_port_cap_subtlv (tptr, tmp);
+
       break;
+    }
 
     case ISIS_TLV_MT_CAPABILITY:
 
