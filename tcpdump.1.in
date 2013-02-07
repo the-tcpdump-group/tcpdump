@@ -74,6 +74,10 @@ tcpdump \- dump traffic on a network
 .I file
 ]
 [
+.B \-V
+.I file
+]
+[
 .B \-s
 .I snaplen
 ]
@@ -127,8 +131,10 @@ flag, which causes it to save the packet data to a file for later
 analysis, and/or with the
 .B \-r
 flag, which causes it to read from a saved packet file rather than to
-read packets from a network interface.  In all cases, only packets that
-match
+read packets from a network interface.  It can also be run with the
+.B \-V
+flag, which causes it to read a list of saved packet files. In all cases,
+only packets that match
 .I expression
 will be processed by
 .IR tcpdump .
@@ -256,7 +262,9 @@ that lacks the
 function.
 .TP
 .B \-e
-Print the link-level header on each dump line.
+Print the link-level header on each dump line.  This can be used, for
+example, to print MAC layer addresses for protocols such as Ethernet and
+IEEE 802.11.
 .TP
 .B \-E
 Use \fIspi@ipaddr algo:secret\fP for decrypting IPsec ESP packets that
@@ -592,6 +600,10 @@ With
 .B \-X
 Telnet options are printed in hex as well.
 .TP
+.B \-V
+Read a list of filenames from \fIfile\fR. Standard input is used
+if \fIfile\fR is ``-''.
+.TP
 .B \-w
 Write the raw packets to \fIfile\fR rather than parsing and printing
 them out.
@@ -716,8 +728,10 @@ For the \fIexpression\fP syntax, see
 .LP
 Expression arguments can be passed to \fItcpdump\fP as either a single
 argument or as multiple arguments, whichever is more convenient.
-Generally, if the expression contains Shell metacharacters, it is
-easier to pass it as a single, quoted argument.
+Generally, if the expression contains Shell metacharacters, such as
+backslashes used to escape protocol names, it is easier to pass it as
+a single, quoted argument rather than to escape the Shell
+metacharacters.
 Multiple arguments are concatenated with spaces before being parsed.
 .SH EXAMPLES
 .LP
@@ -1491,11 +1505,11 @@ not be useful to people who are not familiar with the workings of
 AFS and RX.
 .LP
 If the -v (verbose) flag is given twice, acknowledgement packets and
-additional header information is printed, such as the the RX call ID,
+additional header information is printed, such as the RX call ID,
 call number, sequence number, serial number, and the RX packet flags.
 .LP
 If the -v flag is given twice, additional information is printed,
-such as the the RX call ID, serial number, and the RX packet flags.
+such as the RX call ID, serial number, and the RX packet flags.
 The MTU negotiation information is also printed from RX ack packets.
 .LP
 If the -v flag is given three times, the security index and service id
@@ -1743,7 +1757,7 @@ The current version is available via http:
 The original distribution is available via anonymous ftp:
 .LP
 .RS
-.I ftp://ftp.ee.lbl.gov/tcpdump.tar.Z
+.I ftp://ftp.ee.lbl.gov/old/tcpdump.tar.Z
 .RE
 .LP
 IPv6/IPsec support is added by WIDE/KAME project.
