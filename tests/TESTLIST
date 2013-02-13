@@ -71,6 +71,9 @@ icmpv6          icmpv6.pcap             icmpv6.out      -t -vv
 # SPB tests
 spb	            spb.pcap	            spb.out -t
 
+# SPB BPDUv4 tests
+spb_bpduv4      spb_bpduv4.pcap       spb_bpduv4.out -t
+
 # RIP tests
 ripv1v2         ripv1v2.pcap            ripv1v2.out     -t -v
 ripv2_auth      ripv2_auth.pcap         ripv2_auth.out  -t -v
