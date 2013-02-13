@@ -1011,6 +1011,8 @@ main(int argc, char **argv)
 				packettype = PT_CARP;
 			else if (strcasecmp(optarg, "radius") == 0)
 				packettype = PT_RADIUS;
+			else if (strcasecmp(optarg, "zmtp1") == 0)
+				packettype = PT_ZMTP1;
 			else
 				error("unknown packet type `%s'", optarg);
 			break;
