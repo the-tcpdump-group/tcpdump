@@ -1,5 +1,6 @@
-Thursday  November 29, 2012 guy@alum.mit.edu.
+Thursday  February 19, 2013 guy@alum.mit.edu.
   Summary for 4.4.0 tcpdump release
+	RPKI-RTR (RFC6810) is now official (TCP Port 323)
 	Fix detection of OpenSSL libcrypto.
 	Add DNSSL (RFC6106) support.
 	Add "radius" as an option for -T.
