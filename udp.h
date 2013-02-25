@@ -85,6 +85,7 @@ struct udphdr {
 #define SFLOW_PORT              6343 /* http://www.sflow.org/developers/specifications.php */
 #define LWAPP_DATA_PORT         12222 /* draft-ohara-capwap-lwapp-04.txt */
 #define LWAPP_CONTROL_PORT      12223 /* draft-ohara-capwap-lwapp-04.txt */
+#define VXLAN_PORT              8472  /* draft-mahalingam-dutt-dcops-vxlan-03 */
 
 #ifdef INET6
 #define RIPNG_PORT 521		/*XXX*/
