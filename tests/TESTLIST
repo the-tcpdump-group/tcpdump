@@ -104,3 +104,7 @@ epgm_zmtp1v	epgm_zmtp1.pcap		epgm_zmtp1v.out	-t -v -T pgm_zmtp1
 # MS NLB tests
 msnlb		msnlb.pcap		msnlb.out	-t
 msnlb2		msnlb2.pcap		msnlb2.out	-t
+
+# MPTCP tests
+mptcp		mptcp.pcap		mptcp.out		-t
+mptcp-fclose	mptcp-fclose.pcap	mptcp-fclose.out	-t

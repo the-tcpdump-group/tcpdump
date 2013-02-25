@@ -122,6 +122,7 @@ struct tok tcp_option_values[] = {
         { TCPOPT_SIGNATURE, "md5" },
         { TCPOPT_AUTH, "enhanced auth" },
         { TCPOPT_UTO, "uto" },
+        { TCPOPT_MPTCP, "MPTCP" },
         { 0, NULL }
 };
 
@@ -594,6 +595,12 @@ tcp_print(register const u_char *bp, register u_int length,
                                 else
                                         utoval >>= 1;
                                 (void)printf(" %u", utoval);
+                                break;
+
+                        case TCPOPT_MPTCP:
+                                datalen = len - 2;
+                                if (!mptcp_print(cp-2, len))
+                                        goto bad;
                                 break;
 
                         default:
