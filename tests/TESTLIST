@@ -90,3 +90,7 @@ dhcpv6-ia-ta	dhcpv6-ia-ta.pcap	dhcpv6-ia-ta.out	-t -v
 
 # ZeroMQ tests
 zmtp1v		zmtp1.pcap		zmtp1.out	-t -v -T zmtp1
+
+# MS NLB tests
+msnlb		msnlb.pcap		msnlb.out	-t
+msnlb2		msnlb2.pcap		msnlb2.out	-t
