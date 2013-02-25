@@ -318,6 +318,7 @@ extern void hsrp_print(const u_char *, u_int);
 extern void bfd_print(const u_char *, u_int, u_int);
 extern void sip_print(const u_char *, u_int);
 extern void syslog_print(const u_char *, u_int);
+extern int mptcp_print(const u_char *, u_int);
 extern u_int bt_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int usb_linux_48_byte_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int usb_linux_64_byte_print(const struct pcap_pkthdr *, const u_char *);
