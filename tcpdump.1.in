@@ -527,8 +527,9 @@ Currently known types are
 \fBtftp\fR (Trivial File Transfer Protocol),
 \fBvat\fR (Visual Audio Tool),
 \fBwb\fR (distributed White Board),
+\fBzmtp1\fR (ZeroMQ Message Transport Protocol 1.0)
 and
-\fBzmtp1\fR (ZeroMQ Message Transport Protocol 1.0).
+\fBvxlan\fR (Virtual eXtensible Local Area Network).
 .TP
 .B \-t
 \fIDon't\fP print a timestamp on each dump line.
