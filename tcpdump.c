@@ -1013,6 +1013,8 @@ main(int argc, char **argv)
 				packettype = PT_RADIUS;
 			else if (strcasecmp(optarg, "zmtp1") == 0)
 				packettype = PT_ZMTP1;
+			else if (strcasecmp(optarg, "vxlan") == 0)
+				packettype = PT_VXLAN;
 			else
 				error("unknown packet type `%s'", optarg);
 			break;

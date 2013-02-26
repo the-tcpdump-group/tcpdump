@@ -182,6 +182,7 @@ struct netdissect_options {
 #define PT_CARP		10	/* Common Address Redundancy Protocol */
 #define PT_RADIUS	11	/* RADIUS authentication Protocol */
 #define PT_ZMTP1	12	/* ZeroMQ Message Transport Protocol 1.0 */
+#define PT_VXLAN	13	/* Virtual eXtensible Local Area Network */
 
 #ifndef min
 #define min(a,b) ((a)>(b)?(b):(a))

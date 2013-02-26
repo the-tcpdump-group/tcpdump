@@ -93,7 +93,7 @@ CSRC =	addrtoname.c af.c checksum.c cpack.c gmpls.c oui.c gmt2local.c ipproto.c 
 	print-symantec.c print-syslog.c print-tcp.c print-telnet.c print-tftp.c \
 	print-timed.c print-tipc.c print-token.c print-udld.c print-udp.c \
 	print-usb.c print-vjc.c print-vqp.c print-vrrp.c print-vtp.c \
-	print-wb.c print-zephyr.c print-zeromq.c signature.c setsignal.c tcpdump.c util.c
+	print-wb.c print-zephyr.c print-zeromq.c print-vxlan.c print-otv.c signature.c setsignal.c tcpdump.c util.c
 
 LIBNETDISSECT_SRC=print-isakmp.c
 LIBNETDISSECT_OBJ=$(LIBNETDISSECT_SRC:.c=.o)
