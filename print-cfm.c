@@ -282,7 +282,7 @@ cfm_egress_id_string(register const u_char *tptr) {
     static char egress_id_buffer[80];
     
     snprintf(egress_id_buffer, sizeof(egress_id_buffer),
-             "MAC %0x4x-%s",
+             "MAC 0x%4x-%s",
              EXTRACT_16BITS(tptr),
              etheraddr_string(tptr+2));
 

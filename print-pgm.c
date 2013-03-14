@@ -471,7 +471,7 @@ pgm_print(register const u_char *bp, register u_int length,
 	    break;
 
 	default:
-	    (void)printf("UNKNOWN type %0x02x", pgm->pgm_type);
+	    (void)printf("UNKNOWN type 0x%02x", pgm->pgm_type);
 	    break;
 
 	}
