@@ -481,6 +481,7 @@ udp_print(register const u_char *bp, u_int length,
 			break;
 
 		case PT_PGM:
+		case PT_PGM_ZMTP1:
 			udpipaddr_print(ip, sport, dport);
 			pgm_print(cp, length, bp2);
 			break;

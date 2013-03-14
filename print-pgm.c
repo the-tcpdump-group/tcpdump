@@ -834,6 +834,9 @@ pgm_print(register const u_char *bp, register u_int length,
 	}
 
 	(void)printf(" [%u]", length);
+	if (packettype == PT_PGM_ZMTP1 &&
+	    (pgm->pgm_type == PGM_ODATA || pgm->pgm_type == PGM_RDATA))
+		zmtp1_print_datagram(bp, EXTRACT_16BITS(&pgm->pgm_length));
 
 	return;
 
