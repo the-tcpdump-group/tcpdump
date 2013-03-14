@@ -94,6 +94,8 @@ dhcpv6-ia-ta	dhcpv6-ia-ta.pcap	dhcpv6-ia-ta.out	-t -v
 zmtp1v		zmtp1.pcap		zmtp1.out	-t -v -T zmtp1
 # native PGM
 pgmv		pgm_zmtp1.pcap		pgmv.out	-t -v
+# UDP-encapsulated PGM
+epgmv		epgm_zmtp1.pcap		epgmv.out	-t -v -T pgm
 
 # MS NLB tests
 msnlb		msnlb.pcap		msnlb.out	-t
