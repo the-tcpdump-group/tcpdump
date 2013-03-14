@@ -237,13 +237,10 @@ pgm_print(register const u_char *bp, register u_int length,
 
 	TCHECK(*pgm);
 
-        (void)printf("PGM, length %u", pgm->pgm_length);
+        (void)printf("PGM, length %u", EXTRACT_16BITS(&pgm->pgm_length));
 
         if (!vflag)
             return;
-
-        if (length > pgm->pgm_length)
-            length = pgm->pgm_length;
 
 	(void)printf(" 0x%02x%02x%02x%02x%02x%02x ",
 		     pgm->pgm_gsid[0],
@@ -836,7 +833,7 @@ pgm_print(register const u_char *bp, register u_int length,
 	     }
 	}
 
-	(void)printf(" [%u]", EXTRACT_16BITS(&pgm->pgm_length));
+	(void)printf(" [%u]", length);
 
 	return;
 
