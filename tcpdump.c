@@ -1015,6 +1015,8 @@ main(int argc, char **argv)
 				packettype = PT_ZMTP1;
 			else if (strcasecmp(optarg, "vxlan") == 0)
 				packettype = PT_VXLAN;
+			else if (strcasecmp(optarg, "pgm") == 0)
+				packettype = PT_PGM;
 			else
 				error("unknown packet type `%s'", optarg);
 			break;

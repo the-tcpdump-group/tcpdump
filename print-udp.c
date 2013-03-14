@@ -479,6 +479,11 @@ udp_print(register const u_char *bp, u_int length,
 			udpipaddr_print(ip, sport, dport);
 			vxlan_print((const u_char *)(up + 1), length);
 			break;
+
+		case PT_PGM:
+			udpipaddr_print(ip, sport, dport);
+			pgm_print(cp, length, bp2);
+			break;
 		}
 		return;
 	}
