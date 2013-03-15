@@ -49,7 +49,7 @@ struct msnlb_heartbeat_pkt {
 };
 
 void
-msnlb_print(netdissect_options *ndo, const u_char *bp, u_int length)
+msnlb_print(netdissect_options *ndo, const u_char *bp)
 {
 	const struct msnlb_heartbeat_pkt *hb;
 
