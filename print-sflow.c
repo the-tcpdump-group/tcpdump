@@ -840,7 +840,7 @@ sflow_print(const u_char *pptr, u_int len) {
                EXTRACT_32BITS(sflow_datagram->version),
                EXTRACT_32BITS(sflow_datagram->ip_version) == 1 ? "IPv4" : "IPv6",
 	       ipaddr_string(sflow_datagram->agent),
-               EXTRACT_32BITS(sflow_datagram->samples),
+               EXTRACT_32BITS(sflow_datagram->agent_id),
                len);
         return;
     }
