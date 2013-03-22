@@ -57,6 +57,7 @@ qinqv           QinQpacket.pcap         QinQpacketv.out  -t -e -v
 
 # now SFLOW tests
 sflow1          sflow_multiple_counter_30_pdus.pcap     sflow_multiple_counter_30_pdus.out      -t -v
+sflow2          sflow_multiple_counter_30_pdus.pcap     sflow_multiple_counter_30_pdus-nv.out      -t
 
 # Babel tests
 babel1          babel.pcap             babel1.out      -t 
