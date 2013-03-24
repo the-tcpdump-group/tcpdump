@@ -1,5 +1,6 @@
-# BGP test
+# BGP tests
 bgp_vpn_attrset bgp_vpn_attrset.pcap bgp_vpn_attrset.out -t -v 
+mpbgp-linklocal-nexthop mpbgp-linklocal-nexthop.pcap mpbgp-linklocal-nexthop.out -t -v
 
 # EAP tests
 eapon1 eapon1.pcap eapon1.out -t 
@@ -65,6 +66,9 @@ babel_auth      babel_auth.pcap        babel_auth.out  -t -v
 # PPPoE tests
 pppoe           pppoe.pcap             pppoe.out       -t
 
+# IGMP tests
+igmpv3-queries  igmpv3-queries.pcap     igmpv3-queries.out      -t
+
 # ICMPv6
 icmpv6          icmpv6.pcap             icmpv6.out      -t -vv
 
@@ -86,3 +90,7 @@ dhcpv6-ia-ta	dhcpv6-ia-ta.pcap	dhcpv6-ia-ta.out	-t -v
 
 # ZeroMQ tests
 zmtp1v		zmtp1.pcap		zmtp1.out	-t -v -T zmtp1
+
+# MS NLB tests
+msnlb		msnlb.pcap		msnlb.out	-t
+msnlb2		msnlb2.pcap		msnlb2.out	-t

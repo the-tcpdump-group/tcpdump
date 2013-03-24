@@ -182,6 +182,7 @@ struct netdissect_options {
 #define PT_CARP		10	/* Common Address Redundancy Protocol */
 #define PT_RADIUS	11	/* RADIUS authentication Protocol */
 #define PT_ZMTP1	12	/* ZeroMQ Message Transport Protocol 1.0 */
+#define PT_VXLAN	13	/* Virtual eXtensible Local Area Network */
 
 #ifndef min
 #define min(a,b) ((a)>(b)?(b):(a))
@@ -286,6 +287,7 @@ extern int esp_print(netdissect_options *,
 		     int *nhdr, int *padlen);
 extern void arp_print(netdissect_options *,const u_char *, u_int, u_int);
 extern void tipc_print(netdissect_options *, const u_char *, u_int, u_int);
+extern void msnlb_print(netdissect_options *, const u_char *, u_int);
 extern void icmp6_print(netdissect_options *ndo, const u_char *,
                         u_int, const u_char *, int);
 extern void isakmp_print(netdissect_options *,const u_char *,

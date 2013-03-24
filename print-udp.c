@@ -474,6 +474,11 @@ udp_print(register const u_char *bp, u_int length,
 			udpipaddr_print(ip, sport, dport);
 			radius_print(cp, length);
 			break;
+
+		case PT_VXLAN:
+			udpipaddr_print(ip, sport, dport);
+			vxlan_print((const u_char *)(up + 1), length);
+			break;
 		}
 		return;
 	}
@@ -663,6 +668,8 @@ udp_print(register const u_char *bp, u_int length,
 			sip_print((const u_char *)(up + 1), length);
                 else if (ISPORT(SYSLOG_PORT))
 			syslog_print((const u_char *)(up + 1), length);
+                else if (ISPORT(OTV_PORT))
+			otv_print((const u_char *)(up + 1), length);
 		else
 			(void)printf("UDP, length %u",
 			    (u_int32_t)(ulen - sizeof(*up)));
