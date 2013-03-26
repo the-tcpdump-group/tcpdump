@@ -1,4 +1,4 @@
-Thursday  February 19, 2013 guy@alum.mit.edu.
+Tuesday  March 26, 2013 guy@alum.mit.edu.
   Summary for 4.4.0 tcpdump release
 	RPKI-RTR (RFC6810) is now official (TCP Port 323)
 	Fix detection of OpenSSL libcrypto.
@@ -16,6 +16,11 @@ Thursday  February 19, 2013 guy@alum.mit.edu.
 	On Linux systems with cap-ng.h, drop root privileges
 	    using Linux Capabilities.
 	Add support for reading multiple files.
+	Add MS NLB heartbeat printer.
+	Add support for VXLAN (draft-mahalingam-dutt-dcops-vxlan-03),
+	    and add "vxlan" as an option for -T.
+	Add support for OTV (draft-hasmit-otv-04).
+	Separate multiple nexthops in BGP.
 
 Wednesday  November 28, 2012 guy@alum.mit.edu.
   Summary for 4.3.1 tcpdump release
