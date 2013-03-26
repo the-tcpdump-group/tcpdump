@@ -240,7 +240,7 @@ stp_print_mstp_bpdu(const struct stp_bpdu_ *stp_bpdu, u_int length)
     u_int16_t	    v3len;
     u_int16_t	    len;
     u_int16_t	    msti;
-    u_int16_t	    offset;
+    u_int	    offset;
 
     ptr = (const u_char *)stp_bpdu;
     printf(", CIST Flags [%s], length %u",
@@ -320,37 +320,41 @@ stp_print_mstp_bpdu(const struct stp_bpdu_ *stp_bpdu, u_int length)
             offset += MST_BPDU_MSTI_LENGTH;
         }
     }
+}
 
-    if ((length-offset) >= SPB_BPDU_MIN_LEN)
-    {
-      printf("\n\tv4len %d AUXMCID Name %s, Rev %u, \n\t\tdigest %08x%08x%08x%08x",
-              EXTRACT_16BITS (ptr + offset),
-              ptr + offset + SPB_BPDU_CONFIG_NAME_OFFSET,
-              EXTRACT_16BITS(ptr + offset + SPB_BPDU_CONFIG_REV_OFFSET),
-              EXTRACT_32BITS(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET),
-              EXTRACT_32BITS(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET + 4),
-              EXTRACT_32BITS(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET + 8),
-              EXTRACT_32BITS(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET + 12));
+static void
+stp_print_spb_bpdu(const struct stp_bpdu_ *stp_bpdu, u_int offset)
+{
+    const u_char *ptr;
+
+    ptr = (const u_char *)stp_bpdu;
+    printf("\n\tv4len %d AUXMCID Name %s, Rev %u, \n\t\tdigest %08x%08x%08x%08x",
+            EXTRACT_16BITS (ptr + offset),
+            ptr + offset + SPB_BPDU_CONFIG_NAME_OFFSET,
+            EXTRACT_16BITS(ptr + offset + SPB_BPDU_CONFIG_REV_OFFSET),
+            EXTRACT_32BITS(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET),
+            EXTRACT_32BITS(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET + 4),
+            EXTRACT_32BITS(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET + 8),
+            EXTRACT_32BITS(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET + 12));
      
-      printf("\n\tAgreement num %d, Discarded Agreement num %d, Agreement valid-"
-              "flag %d, \n\tRestricted role-flag: %d, Format id %d cap %d, "
-              "Convention id %d cap %d, \n\tEdge count %d, "
-              "Agreement digest %08x%08x%08x%08x%08x\n",
-              ptr[offset + SPB_BPDU_AGREEMENT_OFFSET]>>6, 
-              ptr[offset + SPB_BPDU_AGREEMENT_OFFSET]>>4 & 0x3,
-              ptr[offset + SPB_BPDU_AGREEMENT_OFFSET]>>3 & 0x1,
-              ptr[offset + SPB_BPDU_AGREEMENT_OFFSET]>>2 & 0x1,
-              ptr[offset + SPB_BPDU_AGREEMENT_FORMAT_OFFSET]>>4,
-              ptr[offset + SPB_BPDU_AGREEMENT_FORMAT_OFFSET]&0x00ff,
-              ptr[offset + SPB_BPDU_AGREEMENT_CON_OFFSET]>>4,
-              ptr[offset + SPB_BPDU_AGREEMENT_CON_OFFSET]&0x00ff,
-              EXTRACT_16BITS(ptr + offset + SPB_BPDU_AGREEMENT_EDGE_OFFSET),
-              EXTRACT_32BITS(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET),
-              EXTRACT_32BITS(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET)+4,
-              EXTRACT_32BITS(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET)+8,
-              EXTRACT_32BITS(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET)+12,
-              EXTRACT_32BITS(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET)+16);
-      }
+    printf("\n\tAgreement num %d, Discarded Agreement num %d, Agreement valid-"
+            "flag %d, \n\tRestricted role-flag: %d, Format id %d cap %d, "
+            "Convention id %d cap %d, \n\tEdge count %d, "
+            "Agreement digest %08x%08x%08x%08x%08x\n",
+            ptr[offset + SPB_BPDU_AGREEMENT_OFFSET]>>6, 
+            ptr[offset + SPB_BPDU_AGREEMENT_OFFSET]>>4 & 0x3,
+            ptr[offset + SPB_BPDU_AGREEMENT_OFFSET]>>3 & 0x1,
+            ptr[offset + SPB_BPDU_AGREEMENT_OFFSET]>>2 & 0x1,
+            ptr[offset + SPB_BPDU_AGREEMENT_FORMAT_OFFSET]>>4,
+            ptr[offset + SPB_BPDU_AGREEMENT_FORMAT_OFFSET]&0x00ff,
+            ptr[offset + SPB_BPDU_AGREEMENT_CON_OFFSET]>>4,
+            ptr[offset + SPB_BPDU_AGREEMENT_CON_OFFSET]&0x00ff,
+            EXTRACT_16BITS(ptr + offset + SPB_BPDU_AGREEMENT_EDGE_OFFSET),
+            EXTRACT_32BITS(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET),
+            EXTRACT_32BITS(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET)+4,
+            EXTRACT_32BITS(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET)+8,
+            EXTRACT_32BITS(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET)+12,
+            EXTRACT_32BITS(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET)+16);
 }
 
 /*
@@ -360,8 +364,8 @@ void
 stp_print(const u_char *p, u_int length)
 {
     const struct stp_bpdu_ *stp_bpdu;
-    u_int16_t              mstp_len;
-    u_int16_t              spb_len;
+    u_int                  mstp_len;
+    u_int                  spb_len;
     
     stp_bpdu = (struct stp_bpdu_*)p;
 
@@ -421,6 +425,7 @@ stp_print(const u_char *p, u_int length)
             if (length < (sizeof(struct stp_bpdu_) + mstp_len)) {
                 goto trunc;
             }
+            stp_print_mstp_bpdu(stp_bpdu, length);
 
             if (stp_bpdu->protocol_version == STP_PROTO_SPB)
             {
@@ -431,9 +436,8 @@ stp_print(const u_char *p, u_int length)
                   spb_len < SPB_BPDU_MIN_LEN) {
                 goto trunc;
               }
+              stp_print_spb_bpdu(stp_bpdu, (sizeof(struct stp_bpdu_) + mstp_len));
             }
-
-            stp_print_mstp_bpdu(stp_bpdu, length);
         }
         break;
 
