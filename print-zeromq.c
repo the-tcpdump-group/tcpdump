@@ -87,7 +87,7 @@ zmtp1_print_frame(const u_char *cp, const u_char *ep) {
 		body_len_declared = cp[0];
 		if (body_len_declared == 0)
 			return cp + header_len; /* skip to next frame */
-		printf(" frame flags+body  (8-bit) length %"PRIu8"", cp[0]);
+		printf(" frame flags+body  (8-bit) length %u", cp[0]);
 		TCHECK2(*cp, header_len + 1); /* length, flags */
 		flags = cp[1];
 	} else {
@@ -97,15 +97,15 @@ zmtp1_print_frame(const u_char *cp, const u_char *ep) {
 		body_len_declared = EXTRACT_64BITS(cp + 1);
 		if (body_len_declared == 0)
 			return cp + header_len; /* skip to next frame */
-		printf(" %"PRIu64"", body_len_declared);
+		printf(" %" PRIu64, body_len_declared);
 		TCHECK2(*cp, header_len + 1); /* 0xFF, length, flags */
 		flags = cp[9];
 	}
 
 	body_len_captured = ep - cp - header_len;
 	if (body_len_declared > body_len_captured)
-		printf(" (%"PRIu64" captured)", body_len_captured);
-	printf(", flags 0x%02"PRIx8"", flags);
+		printf(" (%" PRIu64 " captured)", body_len_captured);
+	printf(", flags 0x%02x", flags);
 
 	if (vflag) {
 		u_int64_t body_len_printed = MIN(body_len_captured, body_len_declared);
@@ -123,7 +123,7 @@ zmtp1_print_frame(const u_char *cp, const u_char *ep) {
 		if (vflag == 1)
 			body_len_printed = MIN(VBYTES + 1, body_len_printed);
 		if (body_len_printed > 1) {
-			printf(", first %"PRIu64" byte(s) of body:", body_len_printed - 1);
+			printf(", first %" PRIu64 " byte(s) of body:", body_len_printed - 1);
 			hex_and_ascii_print("\n\t ", cp + header_len + 1, body_len_printed - 1);
 			printf("\n");
 		}
