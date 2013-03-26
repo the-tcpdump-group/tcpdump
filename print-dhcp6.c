@@ -335,6 +335,8 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 	size_t optlen;
 	u_int8_t auth_proto;
 	u_int authinfolen, authrealmlen;
+	int remain_len;  /* Length of remaining options */
+	int label_len;   /* Label length */
 
 	if (cp == ep)
 		return;
@@ -723,10 +725,9 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 				break;
 			}
 			tp = (u_char *)(dh6o + 1);
-			int remain_len = optlen;
+			remain_len = optlen;
 			printf(" ");
 			/* Encoding is described in section 3.1 of RFC 1035 */
-			int label_len; /* Label length */
 			while (remain_len && *tp) {
 				label_len =  *tp++;
 				if (label_len < remain_len - 1) {
