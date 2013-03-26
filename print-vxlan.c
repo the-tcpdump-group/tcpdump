@@ -41,7 +41,7 @@
  */
 
 void
-vxlan_print(const u_char *bp, u_int len, u_int port)
+vxlan_print(const u_char *bp, u_int len)
 {
     u_int8_t flags;
     u_int32_t vni;
