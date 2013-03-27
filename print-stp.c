@@ -247,8 +247,7 @@ stp_print_mstp_bpdu(const struct stp_bpdu_ *stp_bpdu, u_int length)
            bittok2str(stp_bpdu_flag_values, "none", stp_bpdu->flags), length);
 
     /*
-     * in non-verbose mode just print the flags. We dont read that much
-     * of the packet (DEFAULT_SNAPLEN) to print out cist bridge-id
+     * in non-verbose mode just print the flags.
      */
     if (!vflag) {
         return;
@@ -326,6 +325,13 @@ static void
 stp_print_spb_bpdu(const struct stp_bpdu_ *stp_bpdu, u_int offset)
 {
     const u_char *ptr;
+
+    /*
+     * in non-verbose mode don't print anything.
+     */
+    if (!vflag) {
+        return;
+    }
 
     ptr = (const u_char *)stp_bpdu;
     printf("\n\tv4len %d AUXMCID Name %s, Rev %u, \n\t\tdigest %08x%08x%08x%08x",
