@@ -287,7 +287,7 @@ extern int esp_print(netdissect_options *,
 		     int *nhdr, int *padlen);
 extern void arp_print(netdissect_options *,const u_char *, u_int, u_int);
 extern void tipc_print(netdissect_options *, const u_char *, u_int, u_int);
-extern void msnlb_print(netdissect_options *, const u_char *, u_int);
+extern void msnlb_print(netdissect_options *, const u_char *);
 extern void icmp6_print(netdissect_options *ndo, const u_char *,
                         u_int, const u_char *, int);
 extern void isakmp_print(netdissect_options *,const u_char *,
