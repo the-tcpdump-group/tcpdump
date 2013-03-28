@@ -1545,6 +1545,14 @@ main(int argc, char **argv)
 			}
 			(void)fflush(stdout);
 		}
+                if (status == -2) {
+			/*
+			 * We got interrupted. If we are reading multiple
+			 * files (via -V) set these so that we stop.
+			 */
+			VFileName = NULL;
+			ret = NULL;
+		}
 		if (status == -1) {
 			/*
 			 * Error.  Report it.
