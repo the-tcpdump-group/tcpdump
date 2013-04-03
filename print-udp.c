@@ -608,7 +608,7 @@ udp_print(register const u_char *bp, u_int length,
 		else if (ISPORT(NETBIOS_DGRAM_PORT))
 			nbt_udp138_print((const u_char *)(up + 1), length);
 #endif
-		else if (dport == 3456)
+		else if (dport == VAT_PORT)
 			vat_print((const void *)(up + 1), up);
 		else if (ISPORT(ZEPHYR_SRV_PORT) || ISPORT(ZEPHYR_CLT_PORT))
 			zephyr_print((const void *)(up + 1), length);
@@ -631,7 +631,7 @@ udp_print(register const u_char *bp, u_int length,
 		/*
 		 * Kludge in test for whiteboard packets.
 		 */
-		else if (dport == 4567)
+		else if (dport == WB_PORT)
 			wb_print((const void *)(up + 1), length);
 		else if (ISPORT(CISCO_AUTORP_PORT))
 			cisco_autorp_print((const void *)(up + 1), length);
