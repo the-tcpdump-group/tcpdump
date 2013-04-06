@@ -1,4 +1,4 @@
-Tuesday  March 26, 2013 guy@alum.mit.edu.
+Saturday April 6, 2013 guy@alum.mit.edu.
   Summary for 4.4.0 tcpdump release
 	RPKI-RTR (RFC6810) is now official (TCP Port 323)
 	Fix detection of OpenSSL libcrypto.
@@ -21,6 +21,8 @@ Tuesday  March 26, 2013 guy@alum.mit.edu.
 	    and add "vxlan" as an option for -T.
 	Add support for OTV (draft-hasmit-otv-04).
 	Separate multiple nexthops in BGP.
+	Fixed IPv6 check on Solaris and other OSes requiring extra
+	    networking libraries
 
 Wednesday  November 28, 2012 guy@alum.mit.edu.
   Summary for 4.3.1 tcpdump release
