@@ -193,6 +193,13 @@ else
        AC_MSG_RESULT(no)
 fi
 
+#
+# We must check this before checking whether to enable IPv6, because,
+# on some platforms (such as SunOS 5.x), the test program requires
+# the extra networking libraries.
+#
+AC_LBL_LIBRARY_NET
+
 AC_MSG_CHECKING([whether to enable ipv6])
 AC_ARG_ENABLE(ipv6,
 [  --enable-ipv6           enable ipv6 (with ipv4) support
