@@ -1214,8 +1214,8 @@ main(int argc, char **argv)
 		 * Print a message to the standard error on Windows.
 		 * XXX - why do it here, with a different message?
 		 */
-		if(strlen(device) == 1)	//we assume that an ASCII string is always longer than 1 char
-		{						//a Unicode string has a \0 as second byte (so strlen() is 1)
+		if(strlen(device) == 1)	/* we assume that an ASCII string is always longer than 1 char */
+		{						/* a Unicode string has a \0 as second byte (so strlen() is 1) */
 			fprintf(stderr, "%s: listening on %ws\n", program_name, device);
 		}
 		else
