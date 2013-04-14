@@ -237,13 +237,10 @@ pgm_print(register const u_char *bp, register u_int length,
 
 	TCHECK(*pgm);
 
-        (void)printf("PGM, length %u", pgm->pgm_length);
+        (void)printf("PGM, length %u", EXTRACT_16BITS(&pgm->pgm_length));
 
         if (!vflag)
             return;
-
-        if (length > pgm->pgm_length)
-            length = pgm->pgm_length;
 
 	(void)printf(" 0x%02x%02x%02x%02x%02x%02x ",
 		     pgm->pgm_gsid[0],
@@ -471,7 +468,7 @@ pgm_print(register const u_char *bp, register u_int length,
 	    break;
 
 	default:
-	    (void)printf("UNKNOWN type %0x02x", pgm->pgm_type);
+	    (void)printf("UNKNOWN type 0x%02x", pgm->pgm_type);
 	    break;
 
 	}
@@ -836,7 +833,10 @@ pgm_print(register const u_char *bp, register u_int length,
 	     }
 	}
 
-	(void)printf(" [%u]", EXTRACT_16BITS(&pgm->pgm_length));
+	(void)printf(" [%u]", length);
+	if (packettype == PT_PGM_ZMTP1 &&
+	    (pgm->pgm_type == PGM_ODATA || pgm->pgm_type == PGM_RDATA))
+		zmtp1_print_datagram(bp, EXTRACT_16BITS(&pgm->pgm_length));
 
 	return;
 

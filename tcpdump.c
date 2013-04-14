@@ -1015,6 +1015,10 @@ main(int argc, char **argv)
 				packettype = PT_ZMTP1;
 			else if (strcasecmp(optarg, "vxlan") == 0)
 				packettype = PT_VXLAN;
+			else if (strcasecmp(optarg, "pgm") == 0)
+				packettype = PT_PGM;
+			else if (strcasecmp(optarg, "pgm_zmtp1") == 0)
+				packettype = PT_PGM_ZMTP1;
 			else
 				error("unknown packet type `%s'", optarg);
 			break;
@@ -1214,8 +1218,8 @@ main(int argc, char **argv)
 		 * Print a message to the standard error on Windows.
 		 * XXX - why do it here, with a different message?
 		 */
-		if(strlen(device) == 1)	//we assume that an ASCII string is always longer than 1 char
-		{						//a Unicode string has a \0 as second byte (so strlen() is 1)
+		if(strlen(device) == 1)	/* we assume that an ASCII string is always longer than 1 char */
+		{						/* a Unicode string has a \0 as second byte (so strlen() is 1) */
 			fprintf(stderr, "%s: listening on %ws\n", program_name, device);
 		}
 		else

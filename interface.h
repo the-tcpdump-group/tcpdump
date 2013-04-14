@@ -74,6 +74,8 @@ extern char *strsep(char **, const char *);
 #define PT_RADIUS	11	/* RADIUS authentication Protocol */
 #define PT_ZMTP1	12	/* ZeroMQ Message Transport Protocol 1.0 */
 #define PT_VXLAN	13	/* Virtual eXtensible Local Area Network */
+#define PT_PGM		14	/* [UDP-encapsulated] Pragmatic General Multicast */
+#define PT_PGM_ZMTP1	15	/* ZMTP/1.0 inside PGM (native or UDP-encapsulated) */
 
 #ifndef min
 #define min(a,b) ((a)>(b)?(b):(a))
@@ -314,10 +316,12 @@ extern void mpls_print(const u_char *, u_int);
 extern void mpls_lsp_ping_print(const u_char *, u_int);
 extern void zephyr_print(const u_char *, int);
 extern void zmtp1_print(const u_char *, u_int);
+extern void zmtp1_print_datagram(const u_char *, u_int);
 extern void hsrp_print(const u_char *, u_int);
 extern void bfd_print(const u_char *, u_int, u_int);
 extern void sip_print(const u_char *, u_int);
 extern void syslog_print(const u_char *, u_int);
+extern int mptcp_print(const u_char *, u_int);
 extern u_int bt_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int usb_linux_48_byte_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int usb_linux_64_byte_print(const struct pcap_pkthdr *, const u_char *);

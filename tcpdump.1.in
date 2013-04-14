@@ -519,6 +519,8 @@ Currently known types are
 \fBaodv\fR (Ad-hoc On-demand Distance Vector protocol),
 \fBcarp\fR (Common Address Redundancy Protocol),
 \fBcnfp\fR (Cisco NetFlow protocol),
+\fBpgm\fR (Pragmatic General Multicast),
+\fBpgm_zmtp1\fR (ZMTP/1.0 inside PGM/EPGM),
 \fBradius\fR (RADIUS),
 \fBrpc\fR (Remote Procedure Call),
 \fBrtp\fR (Real-Time Applications protocol),
@@ -530,6 +532,16 @@ Currently known types are
 \fBzmtp1\fR (ZeroMQ Message Transport Protocol 1.0)
 and
 \fBvxlan\fR (Virtual eXtensible Local Area Network).
+.IP
+Note that the \fBpgm\fR type above affects UDP interpretation only, the native
+PGM is always recognised as IP protocol 113 regardless. UDP-encapsulated PGM is
+often called "EPGM" or "PGM/UDP".
+.IP
+Note that the \fBpgm_zmtp1\fR type above affects interpretation of both native
+PGM and UDP at once. During the native PGM decoding the application data of an
+ODATA/RDATA packet would be decoded as a ZeroMQ datagram with ZMTP/1.0 frames.
+During the UDP decoding in addition to that any UDP packet would be treated as
+an encapsulated PGM packet.
 .TP
 .B \-t
 \fIDon't\fP print a timestamp on each dump line.

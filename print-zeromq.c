@@ -146,3 +146,69 @@ zmtp1_print(const u_char *cp, u_int len) {
 		cp = zmtp1_print_frame(cp, ep);
 }
 
+/* The functions below decode a ZeroMQ datagram, supposedly stored in the "Data"
+ * field of an ODATA/RDATA [E]PGM packet. An excerpt from zmq_pgm(7) man page
+ * follows.
+ *
+ * In order for late joining consumers to be able to identify message
+ * boundaries, each PGM datagram payload starts with a 16-bit unsigned integer
+ * in network byte order specifying either the offset of the first message frame
+ * in the datagram or containing the value 0xFFFF if the datagram contains
+ * solely an intermediate part of a larger message.
+ *
+ * Note that offset specifies where the first message begins rather than the
+ * first message part. Thus, if there are trailing message parts at the
+ * beginning of the packet the offset ignores them and points to first initial
+ * message part in the packet.
+ */
+
+static const u_char *
+zmtp1_print_intermediate_part(const u_char *cp, const u_int len) {
+	u_int frame_offset;
+	u_int64_t remaining_len;
+
+	TCHECK2(*cp, 2);
+	frame_offset = EXTRACT_16BITS(cp);
+	printf("\n\t frame offset 0x%04"PRIx16"", frame_offset);
+	cp += 2;
+	remaining_len = snapend - cp; /* without the frame length */
+
+	if (frame_offset == 0xFFFF)
+		frame_offset = len - 2; /* always within the declared length */
+	else if (2 + frame_offset > len) {
+		printf(" (exceeds datagram declared length)");
+		goto trunc;
+	}
+
+	/* offset within declared length of the datagram */
+	if (frame_offset) {
+		printf("\n\t frame intermediate part, %u bytes", frame_offset);
+		if (frame_offset > remaining_len)
+			printf(" (%"PRIu64" captured)", remaining_len);
+		if (vflag) {
+			u_int64_t len_printed = MIN(frame_offset, remaining_len);
+
+			if (vflag == 1)
+				len_printed = MIN(VBYTES, len_printed);
+			if (len_printed > 1) {
+				printf(", first %"PRIu64" byte(s):", len_printed);
+				hex_and_ascii_print("\n\t ", cp, len_printed);
+				printf("\n");
+			}
+		}
+	}
+	return cp + frame_offset;
+
+trunc:
+	printf(" [|zmtp1]");
+	return cp + len;
+}
+
+void
+zmtp1_print_datagram(const u_char *cp, const u_int len) {
+	const u_char *ep = MIN(snapend, cp + len);
+
+	cp = zmtp1_print_intermediate_part(cp, len);
+	while (cp < ep)
+		cp = zmtp1_print_frame(cp, ep);
+}

@@ -89,9 +89,22 @@ dhcpv6-ia-na	dhcpv6-ia-na.pcap	dhcpv6-ia-na.out	-t -v
 dhcpv6-ia-pd	dhcpv6-ia-pd.pcap	dhcpv6-ia-pd.out	-t -v
 dhcpv6-ia-ta	dhcpv6-ia-ta.pcap	dhcpv6-ia-ta.out	-t -v
 
-# ZeroMQ tests
+# ZeroMQ/PGM tests
+# ZMTP/1.0 over TCP
 zmtp1v		zmtp1.pcap		zmtp1.out	-t -v -T zmtp1
+# native PGM
+pgmv		pgm_zmtp1.pcap		pgmv.out	-t -v
+# UDP-encapsulated PGM
+epgmv		epgm_zmtp1.pcap		epgmv.out	-t -v -T pgm
+# ZMTP/1.0 inside native PGM
+pgm_zmtp1v	pgm_zmtp1.pcap		pgm_zmtp1v.out	-t -v -T pgm_zmtp1
+# ZMTP/1.0 inside UDP-encapsulated PGM
+epgm_zmtp1v	epgm_zmtp1.pcap		epgm_zmtp1v.out	-t -v -T pgm_zmtp1
 
 # MS NLB tests
 msnlb		msnlb.pcap		msnlb.out	-t
 msnlb2		msnlb2.pcap		msnlb2.out	-t
+
+# MPTCP tests
+mptcp		mptcp.pcap		mptcp.out		-t
+mptcp-fclose	mptcp-fclose.pcap	mptcp-fclose.out	-t

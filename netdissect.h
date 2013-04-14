@@ -183,6 +183,8 @@ struct netdissect_options {
 #define PT_RADIUS	11	/* RADIUS authentication Protocol */
 #define PT_ZMTP1	12	/* ZeroMQ Message Transport Protocol 1.0 */
 #define PT_VXLAN	13	/* Virtual eXtensible Local Area Network */
+#define PT_PGM		14	/* [UDP-encapsulated] Pragmatic General Multicast */
+#define PT_PGM_ZMTP1	15	/* ZMTP/1.0 inside PGM (native or UDP-encapsulated) */
 
 #ifndef min
 #define min(a,b) ((a)>(b)?(b):(a))
