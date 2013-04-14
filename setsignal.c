@@ -78,6 +78,8 @@ RETSIGTYPE
 
 	memset(&new, 0, sizeof(new));
 	new.sa_handler = func;
+	if (sig == SIGCHLD)
+		new.sa_flags = SA_RESTART;
 	if (sigaction(sig, &new, &old) < 0)
 		return (SIG_ERR);
 	return (old.sa_handler);
