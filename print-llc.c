@@ -107,6 +107,7 @@ static const struct tok cisco_values[] = {
 	{ PID_CISCO_DTP, "DTP" },
 	{ PID_CISCO_UDLD, "UDLD" },
 	{ PID_CISCO_PVST, "PVST" },
+	{ PID_CISCO_VLANBRIDGE, "VLAN Bridge" },
 	{ 0,             NULL }
 };
 
@@ -453,6 +454,7 @@ snap_print(const u_char *p, u_int length, u_int caplen, u_int bridge_pad)
                         vtp_print(p, length);
                         return (1);
                 case PID_CISCO_PVST:
+                case PID_CISCO_VLANBRIDGE:
                         stp_print(p, length);
                         return (1);
                 default:

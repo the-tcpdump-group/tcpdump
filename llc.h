@@ -106,6 +106,7 @@
 #define	PID_CISCO_DTP		0x2004	/* Cisco Dynamic Trunk Protocol */
 #define	PID_CISCO_UDLD		0x0111	/* Unidirectional Link Detection */
 #define	PID_CISCO_PVST		0x010b	/* Per VLAN Spanning Tree+ and RPVST+ */
+#define	PID_CISCO_VLANBRIDGE	0x010c	/* "VLAN Bridge", according to Wireshark */
 
 /*
  * PIDs for use with OUI_RFC2684.
