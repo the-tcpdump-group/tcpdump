@@ -48,7 +48,7 @@
 #include "ipproto.h"
 #include "mptcp.h"
 
-static int dummy_print(const u_char *opt, u_int opt_len)
+static int dummy_print(const u_char *opt _U_, u_int opt_len _U_)
 {
         return 1;
 }
@@ -170,16 +170,18 @@ static int mp_prio_print(const u_char *opt, u_int opt_len)
         return 1;
 }
 
-static int mp_fail_print(const u_char *opt, u_int opt_len)
+static int mp_fail_print(const u_char *opt, u_int opt_len _U_)
 {
         opt += 4;
         printf(" seq %" PRIu64, EXTRACT_64BITS(opt));
+        return 1;
 }
 
-static int mp_fast_close_print(const u_char *opt, u_int opt_len)
+static int mp_fast_close_print(const u_char *opt, u_int opt_len _U_)
 {
         opt += 4;
         printf(" key 0x%" PRIx64, *((uint64_t *)opt));
+        return 1;
 }
 
 static struct {
