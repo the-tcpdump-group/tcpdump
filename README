@@ -15,7 +15,7 @@ Version 4.x.y of TCPDUMP can be retrieved with the CVS tag "tcpdump_4_xrely":
 
 Please submit patches by forking the branch on GitHub at
 
-	http://github.com/mcr/tcpdump/tree/master
+	http://github.com/the-tcpdump-group/tcpdump/tree/master
 
 and issuing a pull request.
 
@@ -74,12 +74,12 @@ to the address "tcpdump-workers@lists.tcpdump.org".  Bugs, support
 requests, and feature requests may also be submitted on the GitHub issue
 tracker for tcpdump at
 
-	https://github.com/mcr/tcpdump/issues
+	https://github.com/the-tcpdump-group/tcpdump/issues
 
 Source code contributions, etc. should be sent to the email address
 above or submitted by forking the branch on GitHub at
 
-	http://github.com/mcr/tcpdump/tree/master
+	http://github.com/the-tcpdump-group/tcpdump/tree/master
 
 and issuing a pull request.
 
