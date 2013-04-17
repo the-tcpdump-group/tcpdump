@@ -122,7 +122,7 @@ struct tok tcp_option_values[] = {
         { TCPOPT_SIGNATURE, "md5" },
         { TCPOPT_AUTH, "enhanced auth" },
         { TCPOPT_UTO, "uto" },
-        { TCPOPT_MPTCP, "MPTCP" },
+        { TCPOPT_MPTCP, "mptcp" },
         { 0, NULL }
 };
 
@@ -599,7 +599,8 @@ tcp_print(register const u_char *bp, register u_int length,
 
                         case TCPOPT_MPTCP:
                                 datalen = len - 2;
-                                if (!mptcp_print(cp-2, len))
+                                LENCHECK(datalen);
+                                if (!mptcp_print(cp-2, len, flags))
                                         goto bad;
                                 break;
 
