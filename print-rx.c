@@ -653,7 +653,7 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 			*opcode = rxent->opcode;
 			return(1);
 		}
-		if (++i > RX_CACHE_SIZE)
+		if (++i >= RX_CACHE_SIZE)
 			i = 0;
 	} while (i != rx_cache_hint);
 
