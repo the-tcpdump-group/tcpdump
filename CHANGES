@@ -39,7 +39,7 @@ Wednesday  November 28, 2012 guy@alum.mit.edu.
 	Use the right maximum path length
 	Don't treat 192_1_2, when passed to -i, as an interface number
 
-Friday  April 3, 2011.  mcr@sandelman.ca.
+Friday  April 3, 2012.  mcr@sandelman.ca.
   Summary for 4.3.0 tcpdump release
         fixes for forces: SPARSE data (per RFC 5810)
         some more test cases added
