@@ -36,6 +36,7 @@
  *  RFC4075: Simple Network Time Protocol (SNTP) Configuration option,
  *  RFC4242: Information Refresh Time option,
  *  RFC4280: Broadcast and Multicast Control Servers options,
+ *  RFC5908: Network Time Protocol (NTP) Server Option for DHCPv6
  *  RFC6334: Dual-Stack Lite option,
  */
 
@@ -154,7 +155,7 @@ struct dhcp6_relay {
 #define DH6OPT_NISP_SERVERS 28
 #define DH6OPT_NIS_NAME 29
 #define DH6OPT_NISP_NAME 30
-#define DH6OPT_NTP_SERVERS 31
+#define DH6OPT_SNTP_SERVERS 31
 #define DH6OPT_LIFETIME 32
 #define DH6OPT_BCMCS_SERVER_D 33
 #define DH6OPT_BCMCS_SERVER_A 34
@@ -171,6 +172,10 @@ struct dhcp6_relay {
 #define DH6OPT_CLT_TIME 46
 #define DH6OPT_LQ_RELAY_DATA 47
 #define DH6OPT_LQ_CLIENT_LINK 48
+#define DH6OPT_NTP_SERVER 56
+#  define DH6OPT_NTP_SUBOPTION_SRV_ADDR 1
+#  define DH6OPT_NTP_SUBOPTION_MC_ADDR 2
+#  define DH6OPT_NTP_SUBOPTION_SRV_FQDN 3
 #define DH6OPT_AFTR_NAME 64
 
 struct dhcp6opt {
@@ -238,8 +243,8 @@ dhcp6opt_name(int type)
 		return "IA_PD";
 	case DH6OPT_IA_PD_PREFIX:
 		return "IA_PD-prefix";
-	case DH6OPT_NTP_SERVERS:
-		return "NTP-server";
+	case DH6OPT_SNTP_SERVERS:
+		return "SNTP-servers";
 	case DH6OPT_LIFETIME:
 		return "lifetime";
 	case DH6OPT_NIS_SERVERS:
@@ -280,6 +285,8 @@ dhcp6opt_name(int type)
 		return "LQ-relay-data";
 	case DH6OPT_LQ_CLIENT_LINK:
 		return "LQ-client-link";
+	case DH6OPT_NTP_SERVER:
+		return "NTP-server";
 	case DH6OPT_AFTR_NAME:
 		return "AFTR-Name";
 	default:
@@ -337,6 +344,8 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 	u_int authinfolen, authrealmlen;
 	int remain_len;  /* Length of remaining options */
 	int label_len;   /* Label length */
+	u_int16_t subopt_code;
+	u_int16_t subopt_len;
 
 	if (cp == ep)
 		return;
@@ -581,7 +590,7 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 			break;
 		case DH6OPT_SIP_SERVER_A:
 		case DH6OPT_DNS:
-		case DH6OPT_NTP_SERVERS:
+		case DH6OPT_SNTP_SERVERS:
 		case DH6OPT_NIS_SERVERS:
 		case DH6OPT_NISP_SERVERS:
 		case DH6OPT_BCMCS_SERVER_A:
@@ -718,6 +727,40 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 			for (i = 16; i < optlen && i < 26; i++)
 				printf("%02x", tp[i]);
 			printf("...)");
+			break;
+		case DH6OPT_NTP_SERVER:
+			if (optlen < 4) {
+				printf(" ?)");
+				break;
+			}
+			tp = (u_char *)(dh6o + 1);
+			while (tp < ep - 4) {
+				subopt_code = EXTRACT_16BITS(tp);
+				tp += 2;
+				subopt_len = EXTRACT_16BITS(tp);
+				tp += 2;
+				printf(" subopt:%d", subopt_code);
+				switch (subopt_code) {
+				case DH6OPT_NTP_SUBOPTION_SRV_ADDR:
+				case DH6OPT_NTP_SUBOPTION_MC_ADDR:
+					if (subopt_len != 16) {
+						printf(" ?");
+						break;
+					}
+					printf(" %s", ip6addr_string(&tp[0]));
+					tp += subopt_len;
+					break;
+				case DH6OPT_NTP_SUBOPTION_SRV_FQDN:
+					putchar(' ');
+					ns_nprint(tp, ep);
+					tp += subopt_len;
+					break;
+				default:
+					printf(" ?");
+					break;
+				}
+			}
+			printf(")");
 			break;
 		case DH6OPT_AFTR_NAME:
 			if (optlen < 3) {
