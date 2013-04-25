@@ -88,6 +88,7 @@ dhcpv6-aftr-name	dhcpv6-AFTR-Name-RFC6334.pcap	dhcpv6-AFTR-Name-RFC6334.out	-t -
 dhcpv6-ia-na	dhcpv6-ia-na.pcap	dhcpv6-ia-na.out	-t -v
 dhcpv6-ia-pd	dhcpv6-ia-pd.pcap	dhcpv6-ia-pd.out	-t -v
 dhcpv6-ia-ta	dhcpv6-ia-ta.pcap	dhcpv6-ia-ta.out	-t -v
+dhcpv6-ntp-server	dhcpv6-ntp-server.pcap	dhcpv6-ntp-server.out	-t -v
 
 # ZeroMQ/PGM tests
 # ZMTP/1.0 over TCP
