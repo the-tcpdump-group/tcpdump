@@ -16,3 +16,4 @@ tcpdump.1
 tcpdump-*.tar.gz
 version.c
 failure-outputs.txt
+autom4te.cache/
