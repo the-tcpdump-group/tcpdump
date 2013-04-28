@@ -51,4 +51,6 @@ u_int8_t *cpack_align_and_reserve(struct cpack_state *cs, size_t wordsize);
 #define cpack_int32(__s, __p)	cpack_uint32((__s), (u_int32_t*)(__p))
 #define cpack_int64(__s, __p)	cpack_uint64((__s), (u_int64_t*)(__p))
 
+extern int cpack_advance(struct cpack_state *, const size_t);
+
 #endif /* _CPACK_H */
