@@ -68,6 +68,17 @@ cpack_align_and_reserve(struct cpack_state *cs, size_t wordsize)
 	return next;
 }
 
+/* Advance by N bytes without returning them. */
+int
+cpack_advance(struct cpack_state *cs, const size_t toskip)
+{
+	/* No space left? */
+	if (cs->c_next - cs->c_buf + toskip > cs->c_len)
+		return -1;
+	cs->c_next += toskip;
+	return 0;
+}
+
 int
 cpack_init(struct cpack_state *cs, u_int8_t *buf, size_t buflen)
 {
