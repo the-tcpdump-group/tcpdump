@@ -1,0 +1,26 @@
+43019938624962560us tsft 0.0 Mb/s 0 MHz Turbo 108dB signal 9dB noise antenna 160 [bit 31] 0us Probe Request (omus) [1.0 2.0 5.5 11.0 6.0 9.0 12.0 18.0 Mbit][|802.11]
+43030942331174912us tsft 0.0 Mb/s 0 MHz Turbo 108dB signal 9dB noise antenna 160 [bit 31] 0us Acknowledgment RA:90:a4:de:c0:46:0a 
+43023739671019520us tsft 0.0 Mb/s 0dB noise 0dBm tx power [bit 15] 314us Probe Response (omus) [1.0* 2.0* 5.5* 11.0* 6.0 9.0 12.0 18.0 Mbit] CH: 1
+43316037965316096us tsft 0.0 Mb/s 0 MHz Turbo 108dB signal 9dB noise antenna 160 [bit 31] 0us Probe Request (omus) [1.0 2.0 5.5 11.0 6.0 9.0 12.0 18.0 Mbit][|802.11]
+43326418901270528us tsft 0.0 Mb/s 0 MHz Turbo 108dB signal 9dB noise antenna 160 [bit 31] 0us Acknowledgment RA:90:a4:de:c0:46:0a 
+43319220536082432us tsft 0.0 Mb/s 0dB noise 0dBm tx power [bit 15] 314us Probe Response (omus) [1.0* 2.0* 5.5* 11.0* 6.0 9.0 12.0 18.0 Mbit] CH: 1
+44170981270355968us tsft 0.0 Mb/s 0 MHz Turbo 108dB signal 9dB noise antenna 160 [bit 31] 0us Probe Request (omus) [1.0 2.0 5.5 11.0 6.0 9.0 12.0 18.0 Mbit][|802.11]
+44187555549151232us tsft 0.0 Mb/s 0 MHz Turbo 108dB signal 9dB noise antenna 160 [bit 31] 0us Acknowledgment RA:90:a4:de:c0:46:0a 
+44180361478930432us tsft 0.0 Mb/s 0dB noise 0dBm tx power [bit 15] 314us Probe Response (omus) [1.0* 2.0* 5.5* 11.0* 6.0 9.0 12.0 18.0 Mbit] CH: 1
+44458778438926336us tsft 0.0 Mb/s 0 MHz Turbo 108dB signal 9dB noise antenna 160 [bit 31] 0us Probe Request (omus) [1.0 2.0 5.5 11.0 6.0 9.0 12.0 18.0 Mbit]
+44469099245338624us tsft 0.0 Mb/s 0 MHz Turbo 108dB signal 9dB noise antenna 160 [bit 31] 0us Acknowledgment RA:90:a4:de:c0:46:0a 
+44461896585183232us tsft 0.0 Mb/s 0dB noise 0dBm tx power [bit 15] 314us Probe Response (omus) [1.0* 2.0* 5.5* 11.0* 6.0 9.0 12.0 18.0 Mbit] CH: 1
+44746549837692928us tsft 0.0 Mb/s 0 MHz Turbo 108dB signal 9dB noise antenna 160 [bit 31] 0us Probe Request (omus) [1.0 2.0 5.5 11.0 6.0 9.0 12.0 18.0 Mbit][|802.11]
+44757549248937984us tsft 0.0 Mb/s 0 MHz Turbo 108dB signal 9dB noise antenna 160 [bit 31] 0us Acknowledgment RA:90:a4:de:c0:46:0a 
+44750350883749888us tsft 0.0 Mb/s 0dB noise 0dBm tx power [bit 15] 314us Probe Response (omus) [1.0* 2.0* 5.5* 11.0* 6.0 9.0 12.0 18.0 Mbit] CH: 1
+45034325531426816us tsft 0.0 Mb/s 0 MHz Turbo 108dB signal 9dB noise antenna 160 [bit 31] 0us Probe Request (omus) [1.0 2.0 5.5 11.0 6.0 9.0 12.0 18.0 Mbit][|802.11]
+45051105968652288us tsft 0.0 Mb/s 0 MHz Turbo 108dB signal 9dB noise antenna 160 [bit 31] 0us Acknowledgment RA:90:a4:de:c0:46:0a 
+45043907603464192us tsft 0.0 Mb/s 0dB noise 0dBm tx power [bit 15] 314us Probe Response (omus) [1.0* 2.0* 5.5* 11.0* 6.0 9.0 12.0 18.0 Mbit] CH: 1
+57288455637434368us tsft 0.0 Mb/s 0 MHz Turbo 108dB signal 9dB noise antenna 160 [bit 31] 314us Authentication (Open System)-1: Successful[|802.11]
+57295787146608640us tsft 0.0 Mb/s 0 MHz Turbo 108dB signal 9dB noise antenna 160 [bit 31] 0us Acknowledgment RA:90:a4:de:c0:46:0a 
+57292437072117760us tsft 0.0 Mb/s 0dB noise 0dBm tx power [bit 15] 314us Authentication (Open System)-2: 
+57303449368264704us tsft 0.0 Mb/s 0 MHz Turbo 108dB signal 9dB noise antenna 160 [bit 31] 314us Assoc Request (omus) [1.0 2.0 5.5 11.0 6.0 9.0 12.0 18.0 Mbit][|802.11]
+57322600627437568us tsft 0.0 Mb/s 0 MHz Turbo 108dB signal 9dB noise antenna 160 [bit 31] 0us Acknowledgment RA:90:a4:de:c0:46:0a 
+57316016442572800us tsft 0.0 Mb/s 0dB noise 0dBm tx power [bit 15] 314us Assoc Response AID(1) :: Successful
+57361147958919168us tsft 0 MHz Turbo 108dB signal 9dB noise antenna 128 20 MHz [bit 31] 48us 
+57787887319515136us tsft 0 MHz Turbo 108dB signal 9dB noise antenna 128 20 MHz [bit 31] Pwr Mgmt 44us 
