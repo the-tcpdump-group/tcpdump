@@ -336,7 +336,7 @@ static void
 dhcp6opt_print(const u_char *cp, const u_char *ep)
 {
 	struct dhcp6opt *dh6o;
-	u_char *tp;
+	const u_char *tp;
 	size_t i;
 	u_int16_t opttype;
 	size_t optlen;
@@ -604,6 +604,14 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 			for (i = 0; i < optlen; i += 16)
 				printf(" %s", ip6addr_string(&tp[i]));
 			printf(")");
+			break;
+		case DH6OPT_SIP_SERVER_D:
+			tp = (u_char *)(dh6o + 1);
+			while (tp < ep) {
+				putchar(' ');
+				if((tp = ns_nprint(tp, ep)) == NULL)
+					goto trunc;
+			}
 			break;
 		case DH6OPT_STATUS_CODE:
 			if (optlen < 2) {
