@@ -155,6 +155,7 @@ HDR = \
 	machdep.h \
 	mib.h \
 	mpls.h \
+	mptcp.h \
 	nameser.h \
 	netbios.h \
 	netdissect.h \
