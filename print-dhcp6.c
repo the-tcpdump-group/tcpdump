@@ -147,8 +147,8 @@ struct dhcp6_relay {
 #define DH6OPT_RECONF_ACCEPT 20
 #define DH6OPT_SIP_SERVER_D 21
 #define DH6OPT_SIP_SERVER_A 22
-#define DH6OPT_DNS 23
-#define DH6OPT_DNSNAME 24
+#define DH6OPT_DNS_SERVERS 23
+#define DH6OPT_DOMAIN_LIST 24
 #define DH6OPT_IA_PD 25
 #define DH6OPT_IA_PD_PREFIX 26
 #define DH6OPT_NIS_SERVERS 27
@@ -235,9 +235,9 @@ dhcp6opt_name(int type)
 		return "SIP-servers-domain";
 	case DH6OPT_SIP_SERVER_A:
 		return "SIP-servers-address";
-	case DH6OPT_DNS:
+	case DH6OPT_DNS_SERVERS:
 		return "DNS-server";
-	case DH6OPT_DNSNAME:
+	case DH6OPT_DOMAIN_LIST:
 		return "DNS-search-list";
 	case DH6OPT_IA_PD:
 		return "IA_PD";
@@ -335,7 +335,7 @@ dhcp6stcode(int code)
 static void
 dhcp6opt_print(const u_char *cp, const u_char *ep)
 {
-	struct dhcp6opt *dh6o;
+	const struct dhcp6opt *dh6o;
 	const u_char *tp;
 	size_t i;
 	u_int16_t opttype;
@@ -589,7 +589,7 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 			printf(")");
 			break;
 		case DH6OPT_SIP_SERVER_A:
-		case DH6OPT_DNS:
+		case DH6OPT_DNS_SERVERS:
 		case DH6OPT_SNTP_SERVERS:
 		case DH6OPT_NIS_SERVERS:
 		case DH6OPT_NISP_SERVERS:
@@ -606,6 +606,7 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 			printf(")");
 			break;
 		case DH6OPT_SIP_SERVER_D:
+		case DH6OPT_DOMAIN_LIST:
 			tp = (u_char *)(dh6o + 1);
 			while (tp < ep) {
 				putchar(' ');
