@@ -217,8 +217,8 @@ static int add_addr_print(const u_char *opt, u_int opt_len, u_char flags _U_)
 
 static int remove_addr_print(const u_char *opt, u_int opt_len, u_char flags _U_)
 {
-        struct mp_remove_addr *rem_addr = (struct mp_remove_addr *) opt;
-        u_int8_t *addr_id = &rem_addr->addrs_id;
+        struct mp_remove_addr *remove_addr = (struct mp_remove_addr *) opt;
+        u_int8_t *addr_id = &remove_addr->addrs_id;
 
         if (opt_len < 4)
                 return 0;
