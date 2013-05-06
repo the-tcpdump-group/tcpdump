@@ -103,7 +103,7 @@ static int mp_join_print(const u_char *opt, u_int opt_len, u_char flags)
                         EXTRACT_32BITS(&mpj->u.synack.nonce));
                 break;
         case 24: {/* ACK */
-                int i;
+                size_t i;
                 printf(" hmac 0x");
                 for (i = 0; i < sizeof(mpj->u.ack.mac); ++i)
                         printf("%02x", mpj->u.ack.mac[i]);
@@ -219,7 +219,7 @@ static int mp_prio_print(const u_char *opt, u_int opt_len, u_char flags _U_)
         return 1;
 }
 
-static int mp_fail_print(const u_char *opt, u_int opt_len, u_char flags)
+static int mp_fail_print(const u_char *opt, u_int opt_len, u_char flags _U_)
 {
         if (opt_len != 12)
                 return 0;
@@ -228,7 +228,7 @@ static int mp_fail_print(const u_char *opt, u_int opt_len, u_char flags)
         return 1;
 }
 
-static int mp_fast_close_print(const u_char *opt, u_int opt_len, u_char flags)
+static int mp_fast_close_print(const u_char *opt, u_int opt_len, u_char flags _U_)
 {
         if (opt_len != 12)
                 return 0;
