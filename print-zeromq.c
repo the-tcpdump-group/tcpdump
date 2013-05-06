@@ -169,7 +169,7 @@ zmtp1_print_intermediate_part(const u_char *cp, const u_int len) {
 
 	TCHECK2(*cp, 2);
 	frame_offset = EXTRACT_16BITS(cp);
-	printf("\n\t frame offset 0x%04u", frame_offset);
+	printf("\n\t frame offset 0x%04x", frame_offset);
 	cp += 2;
 	remaining_len = snapend - cp; /* without the frame length */
 
