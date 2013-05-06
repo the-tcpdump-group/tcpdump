@@ -62,16 +62,16 @@ static int mp_capable_print(const u_char *opt, u_int opt_len, u_char flags)
             !(opt_len == 20 && (flags & (TH_SYN | TH_ACK)) == TH_ACK))
                 return 0;
 
-        if (mpc->ver != 0) {
-                printf(" Unknown Version (%d)", mpc->ver);
+        if (MP_CAPABLE_OPT_VERSION(mpc->sub_ver) != 0) {
+                printf(" Unknown Version (%d)", MP_CAPABLE_OPT_VERSION(mpc->sub_ver));
                 return 1;
         }
 
-        if (mpc->c)
+        if (mpc->flags & MP_CAPABLE_C)
                 printf(" csum");
-        printf(" {0x%" PRIx64, EXTRACT_64BITS(&mpc->sender_key));
+        printf(" {0x%" PRIx64, EXTRACT_64BITS(mpc->sender_key));
         if (opt_len == 20) /* ACK */
-                printf(",0x%" PRIx64, EXTRACT_64BITS(&mpc->receiver_key));
+                printf(",0x%" PRIx64, EXTRACT_64BITS(mpc->receiver_key));
         printf("}");
         return 1;
 }
@@ -86,21 +86,21 @@ static int mp_join_print(const u_char *opt, u_int opt_len, u_char flags)
                 return 0;
 
         if (opt_len != 24) {
-                if (mpj->b)
+                if (mpj->sub_b & MP_JOIN_B)
                         printf(" backup");
                 printf(" id %u", mpj->addr_id);
         }
 
         switch (opt_len) {
         case 12: /* SYN */
-                printf(" token 0x%" PRIx32 " nonce 0x%" PRIx32,
-                        EXTRACT_32BITS(&mpj->u.syn.token),
-                        EXTRACT_32BITS(&mpj->u.syn.nonce));
+                printf(" token 0x%x" " nonce 0x%x",
+                        EXTRACT_32BITS(mpj->u.syn.token),
+                        EXTRACT_32BITS(mpj->u.syn.nonce));
                 break;
         case 16: /* SYN/ACK */
-                printf(" hmac 0x%" PRIx64 " nonce 0x%" PRIx32,
-                        EXTRACT_64BITS(&mpj->u.synack.mac),
-                        EXTRACT_32BITS(&mpj->u.synack.nonce));
+                printf(" hmac 0x%" PRIx64 " nonce 0x%x",
+                        EXTRACT_64BITS(mpj->u.synack.mac),
+                        EXTRACT_32BITS(mpj->u.synack.nonce));
                 break;
         case 24: {/* ACK */
                 size_t i;
@@ -116,7 +116,30 @@ static int mp_join_print(const u_char *opt, u_int opt_len, u_char flags)
 
 static u_int mp_dss_len(struct mp_dss *m, int csum)
 {
-        return 4 + m->A * (4 + m->a * 4) + m->M * (10 + m->m * 4 + csum * 2);
+        u_int len;
+
+        len = 4;
+        if (m->flags & MP_DSS_A) {
+                /* Ack present - 4 or 8 octets */
+                len += (m->flags & MP_DSS_a) ? 8 : 4;
+        }
+        if (m->flags & MP_DSS_M) {
+                /*
+                 * Data Sequence Number (DSN), Subflow Sequence Number (SSN),
+                 * Data-Level Length present, and Checksum possibly present.
+                 * All but the Checksum are 10 bytes if the m flag is
+                 * clear (4-byte DSN) and 14 bytes if the m flag is set
+                 * (8-byte DSN).
+                 */
+                len += (m->flags & MP_DSS_m) ? 14 : 10;
+
+                /*
+                 * The Checksum is present only if negotiated.
+                 */
+                if (csum)
+                        len += 2;
+	}
+	return len;
 }
 
 static int mp_dss_print(const u_char *opt, u_int opt_len, u_char flags)
@@ -127,33 +150,37 @@ static int mp_dss_print(const u_char *opt, u_int opt_len, u_char flags)
              opt_len != mp_dss_len(mdss, 0)) || flags & TH_SYN)
                 return 0;
 
-        if (mdss->F)
+        if (mdss->flags & MP_DSS_F)
                 printf(" fin");
 
         opt += 4;
-        if (mdss->A) {
+        if (mdss->flags & MP_DSS_A) {
                 printf(" ack ");
-                if (mdss->a)
+                if (mdss->flags & MP_DSS_a) {
                         printf("%" PRIu64, EXTRACT_64BITS(opt));
-                else
-                        printf("%" PRIu32, EXTRACT_32BITS(opt));
-                opt += mdss->a ? 8 : 4;
+                        opt += 8;
+                } else {
+                        printf("%u", EXTRACT_32BITS(opt));
+                        opt += 4;
+                }
         }
 
-        if (mdss->M) {
+        if (mdss->flags & MP_DSS_M) {
                 printf(" seq ");
-                if (mdss->m)
+                if (mdss->flags & MP_DSS_m) {
                         printf("%" PRIu64, EXTRACT_64BITS(opt));
-                else
-                        printf("%" PRIu32, EXTRACT_32BITS(opt));
-                opt += mdss->m ? 8 : 4;
-                printf(" subseq %" PRIu32, EXTRACT_32BITS(opt));
+                        opt += 8;
+                } else {
+                        printf("%u", EXTRACT_32BITS(opt));
+                        opt += 4;
+                }
+                printf(" subseq %u", EXTRACT_32BITS(opt));
                 opt += 4;
-                printf(" len %" PRIu16, EXTRACT_16BITS(opt));
+                printf(" len %u", EXTRACT_16BITS(opt));
                 opt += 2;
 
                 if (opt_len == mp_dss_len(mdss, 1))
-                        printf(" csum 0x%" PRIx16, EXTRACT_16BITS(opt));
+                        printf(" csum 0x%x", EXTRACT_16BITS(opt));
         }
         return 1;
 }
@@ -161,29 +188,30 @@ static int mp_dss_print(const u_char *opt, u_int opt_len, u_char flags)
 static int add_addr_print(const u_char *opt, u_int opt_len, u_char flags _U_)
 {
         struct mp_add_addr *add_addr = (struct mp_add_addr *) opt;
+        u_int ipver = MP_ADD_ADDR_IPVER(add_addr->sub_ipver);
 
-        if (!((opt_len == 8 || opt_len == 10) && add_addr->ipver == 4) &&
-            !((opt_len == 20 || opt_len == 22) && add_addr->ipver == 6))
+        if (!((opt_len == 8 || opt_len == 10) && ipver == 4) &&
+            !((opt_len == 20 || opt_len == 22) && ipver == 6))
                 return 0;
 
         printf(" id %u", add_addr->addr_id);
-        switch (add_addr->ipver) {
+        switch (ipver) {
         case 4:
-                printf(" %s", ipaddr_string(&add_addr->u.v4.addr));
+                printf(" %s", ipaddr_string(add_addr->u.v4.addr));
+                if (opt_len == 10)
+                        printf(":%u", EXTRACT_16BITS(add_addr->u.v4.port));
                 break;
         case 6:
 #ifdef INET6
-                printf(" %s", ip6addr_string(&add_addr->u.v6.addr));
+                printf(" %s", ip6addr_string(add_addr->u.v6.addr));
 #endif
+                if (opt_len == 22)
+                        printf(":%u", EXTRACT_16BITS(add_addr->u.v6.port));
                 break;
         default:
                 return 0;
         }
 
-        if (opt_len == 10 || opt_len == 22)
-                printf(":%" PRIu16, ntohs(add_addr->ipver == 4 ?
-                                         add_addr->u.v4.port :
-                                         add_addr->u.v6.port));
         return 1;
 }
 
@@ -209,7 +237,7 @@ static int mp_prio_print(const u_char *opt, u_int opt_len, u_char flags _U_)
         if (opt_len != 3 && opt_len != 4)
                 return 0;
 
-        if (mpp->b)
+        if (mpp->sub_b & MP_PRIO_B)
                 printf(" backup");
         else
                 printf(" non-backup");
@@ -261,7 +289,7 @@ int mptcp_print(const u_char *cp, u_int len, u_char flags)
                 return 0;
 
         opt = (struct mptcp_option *) cp;
-        subtype = min(opt->sub, MPTCP_SUB_FCLOSE + 1);
+        subtype = min(MPTCP_OPT_SUBTYPE(opt->sub_etc), MPTCP_SUB_FCLOSE + 1);
 
         printf(" %s", mptcp_options[subtype].name);
         return mptcp_options[subtype].print(cp, len, flags);

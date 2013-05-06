@@ -45,120 +45,82 @@
 struct mptcp_option {
         u_int8_t        kind;
         u_int8_t        len;
-#if !LBL_ALIGN
-        u_int8_t        ver:4,
-                        sub:4;
-#else
-        u_int8_t        sub:4,
-                        ver:4;
-#endif
+        u_int8_t        sub_etc;        /* subtype upper 4 bits, other stuff lower 4 bits */
 };
+
+#define MPTCP_OPT_SUBTYPE(sub_etc)      (((sub_etc) >> 4) & 0xF)
 
 struct mp_capable {
         u_int8_t        kind;
         u_int8_t        len;
-#if !LBL_ALIGN
-        u_int8_t        ver:4,
-                        sub:4;
-        u_int8_t        s:1,
-                        rsv:6,
-                        c:1;
-#else
-        u_int8_t        sub:4,
-                        ver:4;
-        u_int8_t        c:1,
-                        rsv:6,
-                        s:1;
-#endif
-        u_int64_t        sender_key;
-        u_int64_t        receiver_key;
-} __attribute__((__packed__));
+        u_int8_t        sub_ver;
+        u_int8_t        flags;
+        u_int8_t        sender_key[8];
+        u_int8_t        receiver_key[8];
+};
+
+#define MP_CAPABLE_OPT_VERSION(sub_ver) (((sub_ver) >> 0) & 0xF)
+#define MP_CAPABLE_C                    0x80
+#define MP_CAPABLE_S                    0x01
 
 struct mp_join {
         u_int8_t        kind;
         u_int8_t        len;
-#if !LBL_ALIGN
-        u_int8_t        b:1,
-                        rsv:3,
-                        sub:4;
-#else
-        u_int8_t        sub:4,
-                        rsv:3,
-                        b:1;
-#endif
+        u_int8_t        sub_b;
         u_int8_t        addr_id;
         union {
                 struct {
-                        u_int32_t        token;
-                        u_int32_t        nonce;
+                        u_int8_t         token[4];
+                        u_int8_t         nonce[4];
                 } syn;
                 struct {
-                        u_int64_t        mac;
-                        u_int32_t        nonce;
+                        u_int8_t         mac[8];
+                        u_int8_t         nonce[4];
                 } synack;
                 struct {
                         u_int8_t        mac[20];
                 } ack;
         } u;
-} __attribute__((__packed__));
+};
+
+#define MP_JOIN_B                       0x01
 
 struct mp_dss {
         u_int8_t        kind;
         u_int8_t        len;
-#if !LBL_ALIGN
-        u_int16_t        rsv1:4,
-                        sub:4,
-                        A:1,
-                        a:1,
-                        M:1,
-                        m:1,
-                        F:1,
-                        rsv2:3;
-#else
-        u_int16_t        sub:4,
-                        rsv1:4,
-                        rsv2:3,
-                        F:1,
-                        m:1,
-                        M:1,
-                        a:1,
-                        A:1;
-#endif
+        u_int8_t        sub;
+        u_int8_t        flags;
 };
+
+#define MP_DSS_F                        0x10
+#define MP_DSS_m                        0x08
+#define MP_DSS_M                        0x04
+#define MP_DSS_a                        0x02
+#define MP_DSS_A                        0x01
 
 struct mp_add_addr {
         u_int8_t        kind;
         u_int8_t        len;
-#if !LBL_ALIGN
-        u_int8_t        ipver:4,
-                        sub:4;
-#else
-        u_int8_t        sub:4,
-                        ipver:4;
-#endif
+        u_int8_t        sub_ipver;
         u_int8_t        addr_id;
         union {
                 struct {
-                        struct in_addr   addr;
-                        u_int16_t        port;
+                        u_int8_t         addr[4];
+                        u_int8_t         port[2];
                 } v4;
                 struct {
-                        struct in6_addr  addr;
-                        u_int16_t        port;
+                        u_int8_t         addr[16];
+                        u_int8_t         port[2];
                 } v6;
         } u;
-} __attribute__((__packed__));
+};
+
+#define MP_ADD_ADDR_IPVER(sub_ipver)    (((sub_ipver) >> 0) & 0xF)
 
 struct mp_remove_addr {
         u_int8_t        kind;
         u_int8_t        len;
-#if !LBL_ALIGN
-        u_int8_t        rsv:4,
-                        sub:4;
-#else
-        u_int8_t        sub:4,
-                        rsv:4;
-#endif
+        u_int8_t        sub;
         /* list of addr_id */
         u_int8_t        addrs_id;
 };
@@ -166,45 +128,24 @@ struct mp_remove_addr {
 struct mp_fail {
         u_int8_t        kind;
         u_int8_t        len;
-#if !LBL_ALIGN
-        u_int16_t       rsv1:4,
-                        sub:4,
-                        rsv2:8;
-#else
-        u_int16_t       sub:4,
-                        rsv1:4,
-                        rsv2:8;
-#endif
-        u_int64_t        data_seq;
-} __attribute__((__packed__));
+        u_int8_t        sub;
+        u_int8_t        resv;
+        u_int8_t        data_seq[8];
+};
 
-struct mp_fclose {
+struct mp_close {
         u_int8_t        kind;
         u_int8_t        len;
-#if !LBL_ALIGN
-        u_int16_t       rsv1:4,
-                        sub:4,
-                        rsv2:8;
-#else
-        u_int16_t       sub:4,
-                        rsv1:4,
-                        rsv2:8;
-#endif
-        u_int64_t        key;
-} __attribute__((__packed__));
+        u_int8_t        sub;
+        u_int8_t        rsv;
+        u_int8_t        key[8];
+};
 
 struct mp_prio {
         u_int8_t        kind;
         u_int8_t        len;
-#if !LBL_ALIGN
-        u_int8_t        b:1,
-                        rsv:3,
-                        sub:4;
-#else
-        u_int8_t        sub:4,
-                        rsv:3,
-                        b:1;
-#endif
+        u_int8_t        sub_b;
         u_int8_t        addr_id;
-} __attribute__((__packed__));
+};
 
+#define MP_PRIO_B                       0x01
