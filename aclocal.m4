@@ -202,6 +202,60 @@ AC_DEFUN(AC_LBL_C_INIT,
     fi
 ])
 
+dnl
+dnl Check whether, if you pass an unknown warning option to the
+dnl compiler, it fails or just prints a warning message and succeeds.
+dnl Set ac_lbl_unknown_warning_option_error to the appropriate flag
+dnl to force an error if it would otherwise just print a warning message
+dnl and succeed.
+dnl
+AC_DEFUN(AC_LBL_CHECK_UNKNOWN_WARNING_OPTION_ERROR,
+    [
+	AC_MSG_CHECKING([whether the compiler fails when given an unknown warning option])
+	save_CFLAGS="$CFLAGS"
+	CFLAGS="$CFLAGS -Wxyzzy-this-will-never-succeed-xyzzy"
+	AC_TRY_COMPILE(
+	    [],
+	    [return 0],
+	    [
+		AC_MSG_RESULT([no])
+		#
+		# We're assuming this is clang, where
+		# -Werror=unknown-warning-option is the appropriate
+		# option to force the compiler to fail.
+		# 
+		ac_lbl_unknown_warning_option_error="-Werror=unknown-warning-option"
+	    ],
+	    [
+		AC_MSG_RESULT([yes])
+	    ])
+	CFLAGS="$save_CFLAGS"
+    ])
+
+dnl
+dnl Check whether the compiler option specified as the second argument
+dnl is supported by the compiler and, if so, add it to the macro
+dnl specified as the first argument
+dnl
+AC_DEFUN(AC_LBL_CHECK_COMPILER_OPT,
+    [
+	AC_MSG_CHECKING([whether the compiler supports the $2 option])
+	save_CFLAGS="$CFLAGS"
+	CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error $2"
+	AC_TRY_COMPILE(
+	    [],
+	    [return 0],
+	    [
+		AC_MSG_RESULT([yes])
+		CFLAGS="$save_CFLAGS"
+		$1="$$1 $2"
+	    ],
+	    [
+		AC_MSG_RESULT([no])
+		CFLAGS="$save_CFLAGS"
+	    ])
+    ])
+
 #
 # Try compiling a sample of the type of code that appears in
 # gencode.c with "inline", "__inline__", and "__inline".
@@ -792,11 +846,11 @@ EOF
     fi])
 
 dnl
-dnl If using gcc and the file .devel exists:
-dnl	Compile with -g (if supported) and -Wall
-dnl	If using gcc 2 or later, do extra prototype checking and some other
-dnl	checks
+dnl If the file .devel exists:
+dnl	Add some warning flags if the compiler supports them
 dnl	If an os prototype include exists, symlink os-proto.h to it
+dnl	If we're using gcc:
+dnl	    Compile with -g (if supported)
 dnl
 dnl usage:
 dnl
@@ -814,14 +868,17 @@ AC_DEFUN(AC_LBL_DEVEL,
 	    $1="$$1 ${LBL_CFLAGS}"
     fi
     if test -f .devel ; then
+	    AC_LBL_CHECK_UNKNOWN_WARNING_OPTION_ERROR()
+	    AC_LBL_CHECK_COMPILER_OPT($1, -Wall)
+	    AC_LBL_CHECK_COMPILER_OPT($1, -Wmissing-prototypes)
+	    AC_LBL_CHECK_COMPILER_OPT($1, -Wstrict-prototypes)
+	    AC_LBL_CHECK_COMPILER_OPT($1, -Wwrite-strings)
+	    AC_LBL_CHECK_COMPILER_OPT($1, -Wpointer-arith)
+	    AC_LBL_CHECK_COMPILER_OPT($1, -W)
 	    if test "$GCC" = yes ; then
 		    if test "${LBL_CFLAGS+set}" != set; then
 			    if test "$ac_cv_prog_cc_g" = yes ; then
 				    $1="-g $$1"
-			    fi
-			    $1="$$1 -Wall"
-			    if test $ac_cv_lbl_gcc_vers -gt 1 ; then
-				    $1="$$1 -Wmissing-prototypes -Wstrict-prototypes -Wwrite-strings -Wpointer-arith -W"
 			    fi
 		    fi
 	    else
