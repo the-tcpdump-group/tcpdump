@@ -171,6 +171,15 @@ AC_DEFUN(AC_LBL_C_INIT,
 
 	    case "$host_os" in
 
+	    hpux*)
+		    #
+		    # Note that this is HP C, because we have to
+		    # treat it specially below.
+		    #
+		    ac_lbl_cc_is_hp_c=yes
+		    ;;
+
+
 	    irix*)
 		    $1="$$1 -xansi -signed -O"
 		    ;;
@@ -868,13 +877,24 @@ AC_DEFUN(AC_LBL_DEVEL,
 	    $1="$$1 ${LBL_CFLAGS}"
     fi
     if test -f .devel ; then
-	    AC_LBL_CHECK_UNKNOWN_WARNING_OPTION_ERROR()
-	    AC_LBL_CHECK_COMPILER_OPT($1, -Wall)
-	    AC_LBL_CHECK_COMPILER_OPT($1, -Wmissing-prototypes)
-	    AC_LBL_CHECK_COMPILER_OPT($1, -Wstrict-prototypes)
-	    AC_LBL_CHECK_COMPILER_OPT($1, -Wwrite-strings)
-	    AC_LBL_CHECK_COMPILER_OPT($1, -Wpointer-arith)
-	    AC_LBL_CHECK_COMPILER_OPT($1, -W)
+	    #
+	    # At least one version of HP's C compiler will not
+	    # exit with a non-zero exit status when given an
+	    # unknown -W flag, even if you use +We and the
+	    # number of the warning it gives for that issue.
+	    #
+	    # We therefore skip all the warning option stuff
+	    # on HP-UX.
+	    #
+	    if test "$ac_lbl_cc_is_hp_c" != yes; then
+		    AC_LBL_CHECK_UNKNOWN_WARNING_OPTION_ERROR()
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wall)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wmissing-prototypes)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wstrict-prototypes)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wwrite-strings)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wpointer-arith)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -W)
+	    fi
 	    if test "$GCC" = yes ; then
 		    if test "${LBL_CFLAGS+set}" != set; then
 			    if test "$ac_cv_prog_cc_g" = yes ; then

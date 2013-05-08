@@ -3046,6 +3046,15 @@ echo "$as_me: error: see the INSTALL doc for more info" >&2;}
 
 	    case "$host_os" in
 
+	    hpux*)
+		    #
+		    # Note that this is HP C, because we have to
+		    # treat it specially below.
+		    #
+		    ac_lbl_cc_is_hp_c=yes
+		    ;;
+
+
 	    irix*)
 		    V_CCOPT="$V_CCOPT -xansi -signed -O"
 		    ;;
@@ -11289,6 +11298,16 @@ rm -f os-proto.h
 	    V_CCOPT="$V_CCOPT ${LBL_CFLAGS}"
     fi
     if test -f .devel ; then
+	    #
+	    # At least one version of HP's C compiler will not
+	    # exit with a non-zero exit status when given an
+	    # unknown -W flag, even if you use +We and the
+	    # number of the warning it gives for that issue.
+	    #
+	    # We therefore skip all the warning option stuff
+	    # on HP-UX.
+	    #
+	    if test "$ac_lbl_cc_is_hp_c" != yes; then
 
 	{ echo "$as_me:$LINENO: checking whether the compiler fails when given an unknown warning option" >&5
 echo $ECHO_N "checking whether the compiler fails when given an unknown warning option... $ECHO_C" >&6; }
@@ -11685,6 +11704,7 @@ fi
 
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
+	    fi
 	    if test "$GCC" = yes ; then
 		    if test "${LBL_CFLAGS+set}" != set; then
 			    if test "$ac_cv_prog_cc_g" = yes ; then
