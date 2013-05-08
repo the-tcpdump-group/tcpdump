@@ -179,7 +179,6 @@ AC_DEFUN(AC_LBL_C_INIT,
 		    ac_lbl_cc_is_hp_c=yes
 		    ;;
 
-
 	    irix*)
 		    $1="$$1 -xansi -signed -O"
 		    ;;

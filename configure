@@ -3054,7 +3054,6 @@ echo "$as_me: error: see the INSTALL doc for more info" >&2;}
 		    ac_lbl_cc_is_hp_c=yes
 		    ;;
 
-
 	    irix*)
 		    V_CCOPT="$V_CCOPT -xansi -signed -O"
 		    ;;
