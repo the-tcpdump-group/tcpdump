@@ -41,6 +41,7 @@ VPATH = @srcdir@
 #
 
 CC = @CC@
+MKDEP = @MKDEP@
 PROG = tcpdump
 CCOPT = @V_CCOPT@
 INCLS = -I. @V_INCLS@
@@ -60,6 +61,8 @@ INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 RANLIB = @RANLIB@
+
+DEPENDENCY_CFLAG = @DEPENDENCY_CFLAG@
 
 # Explicitly define compilation rule since SunOS 4's make doesn't like gcc.
 # Also, gcc does not remove the .o before forking 'as', which can be a
@@ -369,4 +372,4 @@ testlist:
 	echo $(TEST_DIST)
 
 depend: $(GENSRC)
-	${srcdir}/mkdep -c $(CC) $(DEFS) $(INCLS) $(SRC)
+	$(MKDEP) -c $(CC) -m $(DEPENDENCY_CFLAG) $(DEFS) $(INCLS) $(SRC)

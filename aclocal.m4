@@ -264,6 +264,119 @@ AC_DEFUN(AC_LBL_CHECK_COMPILER_OPT,
 	    ])
     ])
 
+dnl
+dnl Check whether the compiler supports an option to generate
+dnl Makefile-style dependency lines
+dnl
+dnl GCC uses -M for this.  Non-GCC compilers that support this
+dnl use a variety of flags, including but not limited to -M.
+dnl
+dnl We test whether the flag in question is supported, as older
+dnl versions of compilers might not support it.
+dnl
+dnl We don't try all the possible flags, just in case some flag means
+dnl "generate dependencies" on one compiler but means something else
+dnl on another compiler.
+dnl
+dnl Most compilers that support this send the output to the standard
+dnl output by default.  IBM's XLC, however, supports -M but sends
+dnl the output to {sourcefile-basename}.u, and AIX has no /dev/stdout
+dnl to work around that, so we don't bother with XLC.
+dnl
+AC_DEFUN(AC_LBL_CHECK_DEPENDENCY_GENERATION_OPT,
+    [
+	AC_MSG_CHECKING([whether the compiler supports generating dependencies])
+	if test "$GCC" = yes ; then
+		#
+		# GCC, or a compiler deemed to be GCC by AC_PROG_CC (even
+		# though it's not); we assume that, in this case, the flag
+		# would be -M.
+		#
+		ac_lbl_dependency_flag="-M"
+	else
+		#
+		# Not GCC or a compiler deemed to be GCC; what platform is
+		# this?  (We're assuming that if the compiler isn't GCC
+		# it's the compiler from the vendor of the OS; that won't
+		# necessarily be true for x86 platforms, where it might be
+		# the Intel C compiler.)
+		#
+		case "$host_os" in
+
+		irix*|osf*|darwin*)
+			#
+			# MIPS C for IRIX, DEC C, and clang all use -M.
+			#
+			ac_lbl_dependency_flag="-M"
+			;;
+
+		solaris*)
+			#
+			# Sun C uses -xM.
+			#
+			ac_lbl_dependency_flag="-xM"
+			;;
+
+		hpux*)
+			#
+			# HP's older C compilers don't support this.
+			# HP's newer C compilers support this with
+			# either +M or +Make; the older compilers
+			# interpret +M as something completely
+			# different, so we use +Make so we don't
+			# think it works with the older compilers.
+			#
+			ac_lbl_dependency_flag="+Make"
+			;;
+
+		*)
+			#
+			# Not one of the above; assume no support for
+			# generating dependencies.
+			#
+			ac_lbl_dependency_flag=""
+			;;
+		esac
+	fi
+
+	#
+	# Is ac_lbl_dependency_flag defined and, if so, does the compiler
+	# complain about it?
+	#
+	# Note: clang doesn't seem to exit with an error status when handed
+	# an unknown non-warning error, even if you pass it
+	# -Werror=unknown-warning-option.  However, it always supports
+	# -M, so the fact that this test always succeeds with clang
+	# isn't an issue.
+	#
+	if test ! -z "$ac_lbl_dependency_flag"; then
+		AC_LANG_CONFTEST(
+		    [AC_LANG_SOURCE([[int main(void) { return 0; }]])])
+		echo "$CC" $ac_lbl_dependency_flag conftest.c >&5
+		if "$CC" $ac_lbl_dependency_flag conftest.c >/dev/null 2>&1; then
+			AC_MSG_RESULT([yes, with $ac_lbl_dependency_flag])
+			DEPENDENCY_CFLAG="$ac_lbl_dependency_flag"
+			MKDEP='${srcdir}/mkdep'
+		else
+			AC_MSG_RESULT([no])
+			#
+			# We can't run mkdep, so have "make depend" do
+			# nothing.
+			#
+			MKDEP=:
+		fi
+		rm -rf conftest*
+	else
+		AC_MSG_RESULT([no])
+		#
+		# We can't run mkdep, so have "make depend" do
+		# nothing.
+		#
+		MKDEP=:
+	fi
+	AC_SUBST(DEPENDENCY_CFLAG MKDEP)
+    ])
+
 #
 # Try compiling a sample of the type of code that appears in
 # gencode.c with "inline", "__inline__", and "__inline".
@@ -894,6 +1007,7 @@ AC_DEFUN(AC_LBL_DEVEL,
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wpointer-arith)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -W)
 	    fi
+	    AC_LBL_CHECK_DEPENDENCY_GENERATION_OPT()
 	    if test "$GCC" = yes ; then
 		    if test "${LBL_CFLAGS+set}" != set; then
 			    if test "$ac_cv_prog_cc_g" = yes ; then
