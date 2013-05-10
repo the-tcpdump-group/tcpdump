@@ -212,23 +212,22 @@ babel_print_v2(const u_char *cp, u_int length) {
         u_int type, len;
 
         message = cp + 4 + i;
+
+        TCHECK2(*message, 1);
+        if((type = message[0]) == MESSAGE_PAD1) {
+            printf(vflag ? "\n\tPad 1" : " pad1");
+            i += 1;
+            continue;
+        }
+
         TCHECK2(*message, 2);
         ICHECK(i, 2);
-        type = message[0];
         len = message[1];
 
         TCHECK2(*message, 2 + len);
         ICHECK(i, 2 + len);
 
         switch(type) {
-        case MESSAGE_PAD1: {
-            if(!vflag)
-                printf(" pad1");
-            else
-                printf("\n\tPad 1");
-        }
-            break;
-
         case MESSAGE_PADN: {
             if(!vflag)
                 printf(" padN");
