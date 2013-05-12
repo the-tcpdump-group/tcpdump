@@ -173,13 +173,24 @@ AC_DEFUN(AC_LBL_C_INIT,
 
 	    hpux*)
 		    #
-		    # Note that this is HP C, because we have to
-		    # treat it specially below.
+		    # HP C, which is what we presume we're using, doesn't
+		    # exit with a non-zero exit status if we hand it an
+		    # invalid -W flag, can't be forced to do so even with
+		    # +We, and doesn't handle GCC-style -W flags, so we
+		    # don't want to try using GCC-style -W flags.
 		    #
-		    ac_lbl_cc_is_hp_c=yes
+		    ac_lbl_cc_dont_try_gcc_dashW=yes
 		    ;;
 
 	    irix*)
+		    #
+		    # MIPS C, which is what we presume we're using, doesn't
+		    # necessarily exit with a non-zero exit status if we
+		    # hand it an invalid -W flag, can't be forced to do
+		    # so, and doesn't handle GCC-style -W flags, so we
+		    # don't want to try using GCC-style -W flags.
+		    #
+		    ac_lbl_cc_dont_try_gcc_dashW=yes
 		    $1="$$1 -xansi -signed -O"
 		    ;;
 
@@ -188,6 +199,13 @@ AC_DEFUN(AC_LBL_C_INIT,
 		    # Presumed to be DEC OSF/1, Digital UNIX, or
 		    # Tru64 UNIX.
 		    #
+		    # The DEC C compiler, which is what we presume we're
+		    # using, doesn't exit with a non-zero exit status if we
+		    # hand it an invalid -W flag, can't be forced to do
+		    # so, and doesn't handle GCC-style -W flags, so we
+		    # don't want to try using GCC-style -W flags.
+		    #
+		    ac_lbl_cc_dont_try_gcc_dashW=yes
 		    $1="$$1 -O"
 		    ;;
 
@@ -998,7 +1016,7 @@ AC_DEFUN(AC_LBL_DEVEL,
 	    # We therefore skip all the warning option stuff
 	    # on HP-UX.
 	    #
-	    if test "$ac_lbl_cc_is_hp_c" != yes; then
+	    if test "$ac_lbl_cc_dont_try_gcc_dashW" != yes; then
 		    AC_LBL_CHECK_UNKNOWN_WARNING_OPTION_ERROR()
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wall)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wmissing-prototypes)

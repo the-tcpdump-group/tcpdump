@@ -3049,13 +3049,24 @@ echo "$as_me: error: see the INSTALL doc for more info" >&2;}
 
 	    hpux*)
 		    #
-		    # Note that this is HP C, because we have to
-		    # treat it specially below.
+		    # HP C, which is what we presume we're using, doesn't
+		    # exit with a non-zero exit status if we hand it an
+		    # invalid -W flag, can't be forced to do so even with
+		    # +We, and doesn't handle GCC-style -W flags, so we
+		    # don't want to try using GCC-style -W flags.
 		    #
-		    ac_lbl_cc_is_hp_c=yes
+		    ac_lbl_cc_dont_try_gcc_dashW=yes
 		    ;;
 
 	    irix*)
+		    #
+		    # MIPS C, which is what we presume we're using, doesn't
+		    # necessarily exit with a non-zero exit status if we
+		    # hand it an invalid -W flag, can't be forced to do
+		    # so, and doesn't handle GCC-style -W flags, so we
+		    # don't want to try using GCC-style -W flags.
+		    #
+		    ac_lbl_cc_dont_try_gcc_dashW=yes
 		    V_CCOPT="$V_CCOPT -xansi -signed -O"
 		    ;;
 
@@ -3064,6 +3075,13 @@ echo "$as_me: error: see the INSTALL doc for more info" >&2;}
 		    # Presumed to be DEC OSF/1, Digital UNIX, or
 		    # Tru64 UNIX.
 		    #
+		    # The DEC C compiler, which is what we presume we're
+		    # using, doesn't exit with a non-zero exit status if we
+		    # hand it an invalid -W flag, can't be forced to do
+		    # so, and doesn't handle GCC-style -W flags, so we
+		    # don't want to try using GCC-style -W flags.
+		    #
+		    ac_lbl_cc_dont_try_gcc_dashW=yes
 		    V_CCOPT="$V_CCOPT -O"
 		    ;;
 
@@ -11307,7 +11325,7 @@ rm -f os-proto.h
 	    # We therefore skip all the warning option stuff
 	    # on HP-UX.
 	    #
-	    if test "$ac_lbl_cc_is_hp_c" != yes; then
+	    if test "$ac_lbl_cc_dont_try_gcc_dashW" != yes; then
 
 	{ echo "$as_me:$LINENO: checking whether the compiler fails when given an unknown warning option" >&5
 echo $ECHO_N "checking whether the compiler fails when given an unknown warning option... $ECHO_C" >&6; }
