@@ -672,7 +672,8 @@ EGREP
 LIBOBJS
 PCAP_CONFIG
 RANLIB
-DEPENDENCY_CFLAG MKDEP
+DEPENDENCY_CFLAG
+MKDEP
 V_CCOPT
 V_DEFS
 V_GROUP
@@ -11664,6 +11665,7 @@ echo "${ECHO_T}no" >&6; }
 		#
 		MKDEP=:
 	fi
+
 
 
 	    if test "$GCC" = yes ; then
