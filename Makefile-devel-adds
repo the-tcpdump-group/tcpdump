@@ -7,7 +7,7 @@ ${srcdir}/configure: configure.in aclocal.m4
 
 # autoheader might not change config.h.in, so touch a stamp file.
 ${srcdir}/config.h.in: ${srcdir}/stamp-h.in
-${srcdir}/stamp-h.in: configure.in
+${srcdir}/stamp-h.in: configure.in aclocal.m4
 	cd ${srcdir} && autoheader
 	echo timestamp > ${srcdir}/stamp-h.in
 
