@@ -113,59 +113,6 @@ AC_DEFUN(AC_LBL_C_INIT,
 		    fi
 	    fi
     else
-	    AC_MSG_CHECKING(that $CC handles ansi prototypes)
-	    AC_CACHE_VAL(ac_cv_lbl_cc_ansi_prototypes,
-		AC_TRY_COMPILE(
-		    [#include <sys/types.h>],
-		    [int frob(int, char *)],
-		    ac_cv_lbl_cc_ansi_prototypes=yes,
-		    ac_cv_lbl_cc_ansi_prototypes=no))
-	    AC_MSG_RESULT($ac_cv_lbl_cc_ansi_prototypes)
-	    if test $ac_cv_lbl_cc_ansi_prototypes = no ; then
-		    case "$host_os" in
-
-		    hpux*)
-			    AC_MSG_CHECKING(for HP-UX ansi compiler ($CC -Aa -D_HPUX_SOURCE))
-			    savedcflags="$CFLAGS"
-			    CFLAGS="-Aa -D_HPUX_SOURCE $CFLAGS"
-			    AC_CACHE_VAL(ac_cv_lbl_cc_hpux_cc_aa,
-				AC_TRY_COMPILE(
-				    [#include <sys/types.h>],
-				    [int frob(int, char *)],
-				    ac_cv_lbl_cc_hpux_cc_aa=yes,
-				    ac_cv_lbl_cc_hpux_cc_aa=no))
-			    AC_MSG_RESULT($ac_cv_lbl_cc_hpux_cc_aa)
-			    if test $ac_cv_lbl_cc_hpux_cc_aa = no ; then
-				    AC_MSG_ERROR(see the INSTALL doc for more info)
-			    fi
-			    CFLAGS="$savedcflags"
-			    $1="-Aa $$1"
-			    AC_DEFINE(_HPUX_SOURCE,1,[needed on HP-UX])
-			    ;;
-
-		    osf*)
-			    AC_MSG_CHECKING(for ansi mode in DEC compiler ($CC -std1))
-			    savedcflags="$CFLAGS"
-			    CFLAGS="-std1"
-			    AC_CACHE_VAL(ac_cv_lbl_cc_osf1_cc_std1,
-				AC_TRY_COMPILE(
-				    [#include <sys/types.h>],
-				    [int frob(int, char *)],
-				    ac_cv_lbl_cc_osf1_cc_std1=yes,
-				    ac_cv_lbl_cc_osf1_cc_std1=no))
-			    AC_MSG_RESULT($ac_cv_lbl_cc_osf1_cc_std1)
-			    if test $ac_cv_lbl_cc_osf1_cc_std1 = no ; then
-				    AC_MSG_ERROR(see the INSTALL doc for more info)
-			    fi
-			    CFLAGS="$savedcflags"
-			    $1="-std1 $$1"
-			    ;;
-
-		    *)
-			    AC_MSG_ERROR(see the INSTALL doc for more info)
-			    ;;
-		    esac
-	    fi
 	    $2="$$2 -I/usr/local/include"
 	    LDFLAGS="$LDFLAGS -L/usr/local/lib"
 

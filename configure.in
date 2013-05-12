@@ -16,7 +16,7 @@ dnl
 #
 
 AC_REVISION($Revision: 1.204 $)
-AC_PREREQ(2.50)
+AC_PREREQ(2.61)
 AC_INIT(tcpdump.c)
 
 AC_CANONICAL_HOST

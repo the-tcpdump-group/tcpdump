@@ -279,9 +279,6 @@
 /* get BSD semantics on Irix */
 #undef _BSD_SIGNALS
 
-/* needed on HP-UX */
-#undef _HPUX_SOURCE
-
 /* define on AIX to get certain functions */
 #undef _SUN
 
