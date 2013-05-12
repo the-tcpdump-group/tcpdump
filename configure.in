@@ -15,7 +15,6 @@ dnl
 # config.sub.
 #
 
-AC_REVISION($Revision: 1.204 $)
 AC_PREREQ(2.61)
 AC_INIT(tcpdump.c)
 
