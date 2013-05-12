@@ -960,13 +960,7 @@ AC_DEFUN(AC_LBL_DEVEL,
     fi
     if test -f .devel ; then
 	    #
-	    # At least one version of HP's C compiler will not
-	    # exit with a non-zero exit status when given an
-	    # unknown -W flag, even if you use +We and the
-	    # number of the warning it gives for that issue.
-	    #
-	    # We therefore skip all the warning option stuff
-	    # on HP-UX.
+	    # Skip all the warning option stuff on some compilers.
 	    #
 	    if test "$ac_lbl_cc_dont_try_gcc_dashW" != yes; then
 		    AC_LBL_CHECK_UNKNOWN_WARNING_OPTION_ERROR()
