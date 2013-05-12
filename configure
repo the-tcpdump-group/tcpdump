@@ -4573,7 +4573,8 @@ eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
   (exit $ac_status); }; }; then
    { echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6; }
-  cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define LIBSMI 1
 _ACEOF
 
@@ -4619,7 +4620,8 @@ yes)	{ echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6; }
 	{ echo "$as_me:$LINENO: WARNING: The SMB printer may have exploitable buffer overflows!!!" >&5
 echo "$as_me: WARNING: The SMB printer may have exploitable buffer overflows!!!" >&2;}
-	cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define TCPDUMP_DO_SMB 1
 _ACEOF
 
@@ -4639,7 +4641,8 @@ fi
 { echo "$as_me:$LINENO: checking whether to drop root privileges by default" >&5
 echo $ECHO_N "checking whether to drop root privileges by default... $ECHO_C" >&6; }
 if test ! -z "$with_user" ; then
-        cat >>confdefs.h <<_ACEOF
+
+cat >>confdefs.h <<_ACEOF
 #define WITH_USER "$withval"
 _ACEOF
 
@@ -4659,7 +4662,8 @@ fi
 { echo "$as_me:$LINENO: checking whether to chroot" >&5
 echo $ECHO_N "checking whether to chroot... $ECHO_C" >&6; }
 if test ! -z "$with_chroot" && test "$with_chroot" != "no" ; then
-        cat >>confdefs.h <<_ACEOF
+
+cat >>confdefs.h <<_ACEOF
 #define WITH_CHROOT "$withval"
 _ACEOF
 
@@ -5076,7 +5080,8 @@ if test "${enable_ipv6+set}" = set; then
 yes)   { echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6; }
        LOCALSRC="print-ip6.c print-ip6opts.c print-mobility.c print-ripng.c print-icmp6.c print-frag6.c print-rt6.c print-ospf6.c print-dhcp6.c print-babel.c $LOCALSRC"
-       cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define INET6 1
 _ACEOF
 
@@ -5136,7 +5141,8 @@ eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
    { echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6; }
   LOCALSRC="print-ip6.c print-ip6opts.c print-mobility.c print-ripng.c print-icmp6.c print-frag6.c print-rt6.c print-ospf6.c print-dhcp6.c print-babel.c $LOCALSRC"
-  cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define INET6 1
 _ACEOF
 
@@ -5729,7 +5735,8 @@ fi
 { echo "$as_me:$LINENO: result: $td_cv_decl_netdnet_dnetdb_h_dnet_htoa" >&5
 echo "${ECHO_T}$td_cv_decl_netdnet_dnetdb_h_dnet_htoa" >&6; }
 if test "$td_cv_decl_netdnet_dnetdb_h_dnet_htoa" = yes; then
-	cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define HAVE_NETDNET_DNETDB_H_DNET_HTOA 1
 _ACEOF
 
@@ -5788,12 +5795,14 @@ fi
 	{ echo "$as_me:$LINENO: result: $ac_cv_addrinfo" >&5
 echo "${ECHO_T}$ac_cv_addrinfo" >&6; }
 	if test $ac_cv_addrinfo = yes; then
-		cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define HAVE_ADDRINFO 1
 _ACEOF
 
 	else
-		cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define NEED_ADDRINFO_H 1
 _ACEOF
 
@@ -5937,7 +5946,8 @@ fi
 	{ echo "$as_me:$LINENO: result: $ac_cv_sa_storage" >&5
 echo "${ECHO_T}$ac_cv_sa_storage" >&6; }
 	if test $ac_cv_sa_storage = yes; then
-		cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define HAVE_SOCKADDR_STORAGE 1
 _ACEOF
 
@@ -6708,7 +6718,8 @@ echo "${ECHO_T}$ac_cv_search_dnet_htoa" >&6; }
 ac_res=$ac_cv_search_dnet_htoa
 if test "$ac_res" != no; then
   test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
-  cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define HAVE_DNET_HTOA 1
 _ACEOF
 
@@ -6860,7 +6871,8 @@ echo "${ECHO_T}$ac_cv_search_getrpcbynumber" >&6; }
 ac_res=$ac_cv_search_getrpcbynumber
 if test "$ac_res" != no; then
   test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
-  cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define HAVE_GETRPCBYNUMBER 1
 _ACEOF
 
@@ -7500,7 +7512,8 @@ fi
 { echo "$as_me:$LINENO: result: $ac_cv_func_pcap_list_datalinks" >&5
 echo "${ECHO_T}$ac_cv_func_pcap_list_datalinks" >&6; }
 if test $ac_cv_func_pcap_list_datalinks = yes; then
-  cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define HAVE_PCAP_LIST_DATALINKS 1
 _ACEOF
 
@@ -7597,7 +7610,8 @@ fi
 { echo "$as_me:$LINENO: result: $ac_cv_func_pcap_set_datalink" >&5
 echo "${ECHO_T}$ac_cv_func_pcap_set_datalink" >&6; }
 if test $ac_cv_func_pcap_set_datalink = yes; then
-  cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define HAVE_PCAP_SET_DATALINK 1
 _ACEOF
 
@@ -7686,7 +7700,8 @@ fi
 echo "${ECHO_T}$ac_cv_func_pcap_datalink_name_to_val" >&6; }
 if test $ac_cv_func_pcap_datalink_name_to_val = yes; then
 
-	    cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define HAVE_PCAP_DATALINK_NAME_TO_VAL 1
 _ACEOF
 
@@ -7772,7 +7787,8 @@ fi
 { echo "$as_me:$LINENO: result: $ac_cv_func_pcap_datalink_val_to_description" >&5
 echo "${ECHO_T}$ac_cv_func_pcap_datalink_val_to_description" >&6; }
 if test $ac_cv_func_pcap_datalink_val_to_description = yes; then
-  cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION 1
 _ACEOF
 
@@ -7977,7 +7993,8 @@ fi
 { echo "$as_me:$LINENO: result: $ac_cv_func_pcap_dump_ftell" >&5
 echo "${ECHO_T}$ac_cv_func_pcap_dump_ftell" >&6; }
 if test $ac_cv_func_pcap_dump_ftell = yes; then
-  cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define HAVE_PCAP_DUMP_FTELL 1
 _ACEOF
 
@@ -8351,7 +8368,8 @@ fi
 { echo "$as_me:$LINENO: result: $ac_cv_buggy_ether_ntohost" >&5
 echo "${ECHO_T}$ac_cv_buggy_ether_ntohost" >&6; }
     if test "$ac_cv_buggy_ether_ntohost" = "no"; then
-	cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define USE_ETHER_NTOHOST 1
 _ACEOF
 
@@ -9307,7 +9325,8 @@ rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
     if test "$ac_lbl_cv_pcap_version_defined" = yes ; then
     	{ echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6; }
-	cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define HAVE_PCAP_VERSION 1
 _ACEOF
 
@@ -9368,7 +9387,8 @@ rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
 if test "$ac_lbl_cv_pcap_debug_defined" = yes ; then
 	{ echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6; }
-	cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define HAVE_PCAP_DEBUG 1
 _ACEOF
 
@@ -9430,7 +9450,8 @@ rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
 	if test "$ac_lbl_cv_yydebug_defined" = yes ; then
 		{ echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6; }
-		cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define HAVE_YYDEBUG 1
 _ACEOF
 
@@ -10561,19 +10582,23 @@ eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
 
-	cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define PRId64 "ld"
 _ACEOF
 
-	cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define PRIo64 "lo"
 _ACEOF
 
-	cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define PRIx64 "lx"
 _ACEOF
 
-	cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define PRIu64 "lu"
 _ACEOF
 
@@ -10651,19 +10676,23 @@ eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
 
-	cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define PRId64 "lld"
 _ACEOF
 
-	cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define PRIo64 "llo"
 _ACEOF
 
-	cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define PRIx64 "llx"
 _ACEOF
 
-	cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define PRIu64 "llu"
 _ACEOF
 
@@ -10741,19 +10770,23 @@ eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
 
-	cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define PRId64 "Ld"
 _ACEOF
 
-	cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define PRIo64 "Lo"
 _ACEOF
 
-	cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define PRIx64 "Lx"
 _ACEOF
 
-	cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define PRIu64 "Lu"
 _ACEOF
 
@@ -10831,19 +10864,23 @@ eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
 
-	cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define PRId64 "qd"
 _ACEOF
 
-	cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define PRIo64 "qo"
 _ACEOF
 
-	cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define PRIx64 "qx"
 _ACEOF
 
-	cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define PRIu64 "qu"
 _ACEOF
 
@@ -11878,7 +11915,8 @@ fi
 	{ echo "$as_me:$LINENO: result: $ac_cv_var_h_errno" >&5
 echo "${ECHO_T}$ac_cv_var_h_errno" >&6; }
 	if test "$ac_cv_var_h_errno" = "yes"; then
-		cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define HAVE_H_ERRNO 1
 _ACEOF
 

@@ -112,7 +112,6 @@ SRC =	$(CSRC) $(GENSRC) $(LOCALSRC) $(LIBNETDISSECT_SRC)
 # hack the extra indirection
 OBJ =	$(CSRC:.c=.o) $(GENSRC:.c=.o) $(LOCALSRC:.c=.o) $(LIBOBJS) $(LIBNETDISSECT_OBJ)
 HDR = \
-	acconfig.h \
 	addrtoname.h \
 	af.h \
 	ah.h \

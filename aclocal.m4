@@ -601,17 +601,21 @@ reproduce this problem ourselves.])
     dnl if they're not present.
     dnl
     AC_CHECK_FUNC(pcap_list_datalinks,
-	AC_DEFINE(HAVE_PCAP_LIST_DATALINKS),
+	AC_DEFINE(HAVE_PCAP_LIST_DATALINKS, 1,
+	    [define if libpcap has pcap_list_datalinks()]),
 	[
 	    AC_LIBOBJ(datalinks)
 	])
     AC_CHECK_FUNC(pcap_set_datalink,
-	AC_DEFINE(HAVE_PCAP_SET_DATALINK))
+	AC_DEFINE(HAVE_PCAP_SET_DATALINK, 1,
+	    [define if libpcap has pcap_set_datalink()]))
     AC_CHECK_FUNC(pcap_datalink_name_to_val,
 	[
-	    AC_DEFINE(HAVE_PCAP_DATALINK_NAME_TO_VAL)
+	    AC_DEFINE(HAVE_PCAP_DATALINK_NAME_TO_VAL, 1,
+		[define if libpcap has pcap_datalink_name_to_val()])
 	    AC_CHECK_FUNC(pcap_datalink_val_to_description,
-		AC_DEFINE(HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION),
+		AC_DEFINE(HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION, 1,
+		    [define if libpcap has pcap_datalink_val_to_description()]),
 		[
 		    AC_LIBOBJ(dlnames)
 		])
@@ -631,7 +635,8 @@ reproduce this problem ourselves.])
     dnl Check for "pcap_dump_ftell()" and use a substitute version
     dnl if it's not present.
     AC_CHECK_FUNC(pcap_dump_ftell,
-	AC_DEFINE(HAVE_PCAP_DUMP_FTELL),
+	AC_DEFINE(HAVE_PCAP_DUMP_FTELL, 1,
+	    [define if libpcap has pcap_dump_ftell()]),
 	[
 	    AC_LIBOBJ(pcap_dump_ftell)
 	])
@@ -819,10 +824,10 @@ AC_DEFUN(AC_LBL_CHECK_64BIT_FORMAT,
 	  ]])
       ],
       [
-	AC_DEFINE(PRId64, "$1d")
-	AC_DEFINE(PRIo64, "$1o")
-	AC_DEFINE(PRIx64, "$1x")
-	AC_DEFINE(PRIu64, "$1u")
+	AC_DEFINE(PRId64, "$1d", [define if the platform doesn't define PRId64])
+	AC_DEFINE(PRIo64, "$1o", [define if the platform doesn't define PRIo64])
+	AC_DEFINE(PRIx64, "$1x", [define if the platform doesn't define PRIu64])
+	AC_DEFINE(PRIu64, "$1u", [define if the platform doesn't define PRIx64])
 	AC_MSG_RESULT(yes)
       ],
       [
@@ -1192,9 +1197,11 @@ AC_DEFUN(AC_STRUCT_ADDRINFO, [
 		$1=no))
 	AC_MSG_RESULT($$1)
 	if test $$1 = yes; then
-		AC_DEFINE(HAVE_ADDRINFO)
+		AC_DEFINE(HAVE_ADDRINFO, 1,
+		    [define if you have the addrinfo function])
 	else
-		AC_DEFINE(NEED_ADDRINFO_H)
+		AC_DEFINE(NEED_ADDRINFO_H, 1,
+		    [define if you need to include missing/addrinfo.h])
 	fi
 ])
 
@@ -1245,7 +1252,8 @@ AC_DEFUN(AC_STRUCT_SA_STORAGE, [
 		$1=no))
 	AC_MSG_RESULT($$1)
 	if test $$1 = yes; then
-		AC_DEFINE(HAVE_SOCKADDR_STORAGE)
+		AC_DEFINE(HAVE_SOCKADDR_STORAGE, 1,
+		    [define if you have struct sockaddr_storage])
 	fi
 ])
 
@@ -1262,7 +1270,8 @@ AC_DEFUN(AC_VAR_H_ERRNO, [
 		ac_cv_var_h_errno=no))
 	AC_MSG_RESULT($ac_cv_var_h_errno)
 	if test "$ac_cv_var_h_errno" = "yes"; then
-		AC_DEFINE(HAVE_H_ERRNO)
+		AC_DEFINE(HAVE_H_ERRNO, 1,
+		    [define if you have the h_errno variable])
 	fi
 ])
 
