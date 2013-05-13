@@ -113,65 +113,31 @@ AC_DEFUN(AC_LBL_C_INIT,
 		    fi
 	    fi
     else
-	    AC_MSG_CHECKING(that $CC handles ansi prototypes)
-	    AC_CACHE_VAL(ac_cv_lbl_cc_ansi_prototypes,
-		AC_TRY_COMPILE(
-		    [#include <sys/types.h>],
-		    [int frob(int, char *)],
-		    ac_cv_lbl_cc_ansi_prototypes=yes,
-		    ac_cv_lbl_cc_ansi_prototypes=no))
-	    AC_MSG_RESULT($ac_cv_lbl_cc_ansi_prototypes)
-	    if test $ac_cv_lbl_cc_ansi_prototypes = no ; then
-		    case "$host_os" in
-
-		    hpux*)
-			    AC_MSG_CHECKING(for HP-UX ansi compiler ($CC -Aa -D_HPUX_SOURCE))
-			    savedcflags="$CFLAGS"
-			    CFLAGS="-Aa -D_HPUX_SOURCE $CFLAGS"
-			    AC_CACHE_VAL(ac_cv_lbl_cc_hpux_cc_aa,
-				AC_TRY_COMPILE(
-				    [#include <sys/types.h>],
-				    [int frob(int, char *)],
-				    ac_cv_lbl_cc_hpux_cc_aa=yes,
-				    ac_cv_lbl_cc_hpux_cc_aa=no))
-			    AC_MSG_RESULT($ac_cv_lbl_cc_hpux_cc_aa)
-			    if test $ac_cv_lbl_cc_hpux_cc_aa = no ; then
-				    AC_MSG_ERROR(see the INSTALL doc for more info)
-			    fi
-			    CFLAGS="$savedcflags"
-			    $1="-Aa $$1"
-			    AC_DEFINE(_HPUX_SOURCE,1,[needed on HP-UX])
-			    ;;
-
-		    osf*)
-			    AC_MSG_CHECKING(for ansi mode in DEC compiler ($CC -std1))
-			    savedcflags="$CFLAGS"
-			    CFLAGS="-std1"
-			    AC_CACHE_VAL(ac_cv_lbl_cc_osf1_cc_std1,
-				AC_TRY_COMPILE(
-				    [#include <sys/types.h>],
-				    [int frob(int, char *)],
-				    ac_cv_lbl_cc_osf1_cc_std1=yes,
-				    ac_cv_lbl_cc_osf1_cc_std1=no))
-			    AC_MSG_RESULT($ac_cv_lbl_cc_osf1_cc_std1)
-			    if test $ac_cv_lbl_cc_osf1_cc_std1 = no ; then
-				    AC_MSG_ERROR(see the INSTALL doc for more info)
-			    fi
-			    CFLAGS="$savedcflags"
-			    $1="-std1 $$1"
-			    ;;
-
-		    *)
-			    AC_MSG_ERROR(see the INSTALL doc for more info)
-			    ;;
-		    esac
-	    fi
 	    $2="$$2 -I/usr/local/include"
 	    LDFLAGS="$LDFLAGS -L/usr/local/lib"
 
 	    case "$host_os" in
 
+	    hpux*)
+		    #
+		    # HP C, which is what we presume we're using, doesn't
+		    # exit with a non-zero exit status if we hand it an
+		    # invalid -W flag, can't be forced to do so even with
+		    # +We, and doesn't handle GCC-style -W flags, so we
+		    # don't want to try using GCC-style -W flags.
+		    #
+		    ac_lbl_cc_dont_try_gcc_dashW=yes
+		    ;;
+
 	    irix*)
+		    #
+		    # MIPS C, which is what we presume we're using, doesn't
+		    # necessarily exit with a non-zero exit status if we
+		    # hand it an invalid -W flag, can't be forced to do
+		    # so, and doesn't handle GCC-style -W flags, so we
+		    # don't want to try using GCC-style -W flags.
+		    #
+		    ac_lbl_cc_dont_try_gcc_dashW=yes
 		    $1="$$1 -xansi -signed -O"
 		    ;;
 
@@ -180,6 +146,13 @@ AC_DEFUN(AC_LBL_C_INIT,
 		    # Presumed to be DEC OSF/1, Digital UNIX, or
 		    # Tru64 UNIX.
 		    #
+		    # The DEC C compiler, which is what we presume we're
+		    # using, doesn't exit with a non-zero exit status if we
+		    # hand it an invalid -W flag, can't be forced to do
+		    # so, and doesn't handle GCC-style -W flags, so we
+		    # don't want to try using GCC-style -W flags.
+		    #
+		    ac_lbl_cc_dont_try_gcc_dashW=yes
 		    $1="$$1 -O"
 		    ;;
 
@@ -201,6 +174,174 @@ AC_DEFUN(AC_LBL_C_INIT,
 	    esac
     fi
 ])
+
+dnl
+dnl Check whether, if you pass an unknown warning option to the
+dnl compiler, it fails or just prints a warning message and succeeds.
+dnl Set ac_lbl_unknown_warning_option_error to the appropriate flag
+dnl to force an error if it would otherwise just print a warning message
+dnl and succeed.
+dnl
+AC_DEFUN(AC_LBL_CHECK_UNKNOWN_WARNING_OPTION_ERROR,
+    [
+	AC_MSG_CHECKING([whether the compiler fails when given an unknown warning option])
+	save_CFLAGS="$CFLAGS"
+	CFLAGS="$CFLAGS -Wxyzzy-this-will-never-succeed-xyzzy"
+	AC_TRY_COMPILE(
+	    [],
+	    [return 0],
+	    [
+		AC_MSG_RESULT([no])
+		#
+		# We're assuming this is clang, where
+		# -Werror=unknown-warning-option is the appropriate
+		# option to force the compiler to fail.
+		# 
+		ac_lbl_unknown_warning_option_error="-Werror=unknown-warning-option"
+	    ],
+	    [
+		AC_MSG_RESULT([yes])
+	    ])
+	CFLAGS="$save_CFLAGS"
+    ])
+
+dnl
+dnl Check whether the compiler option specified as the second argument
+dnl is supported by the compiler and, if so, add it to the macro
+dnl specified as the first argument
+dnl
+AC_DEFUN(AC_LBL_CHECK_COMPILER_OPT,
+    [
+	AC_MSG_CHECKING([whether the compiler supports the $2 option])
+	save_CFLAGS="$CFLAGS"
+	CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error $2"
+	AC_TRY_COMPILE(
+	    [],
+	    [return 0],
+	    [
+		AC_MSG_RESULT([yes])
+		CFLAGS="$save_CFLAGS"
+		$1="$$1 $2"
+	    ],
+	    [
+		AC_MSG_RESULT([no])
+		CFLAGS="$save_CFLAGS"
+	    ])
+    ])
+
+dnl
+dnl Check whether the compiler supports an option to generate
+dnl Makefile-style dependency lines
+dnl
+dnl GCC uses -M for this.  Non-GCC compilers that support this
+dnl use a variety of flags, including but not limited to -M.
+dnl
+dnl We test whether the flag in question is supported, as older
+dnl versions of compilers might not support it.
+dnl
+dnl We don't try all the possible flags, just in case some flag means
+dnl "generate dependencies" on one compiler but means something else
+dnl on another compiler.
+dnl
+dnl Most compilers that support this send the output to the standard
+dnl output by default.  IBM's XLC, however, supports -M but sends
+dnl the output to {sourcefile-basename}.u, and AIX has no /dev/stdout
+dnl to work around that, so we don't bother with XLC.
+dnl
+AC_DEFUN(AC_LBL_CHECK_DEPENDENCY_GENERATION_OPT,
+    [
+	AC_MSG_CHECKING([whether the compiler supports generating dependencies])
+	if test "$GCC" = yes ; then
+		#
+		# GCC, or a compiler deemed to be GCC by AC_PROG_CC (even
+		# though it's not); we assume that, in this case, the flag
+		# would be -M.
+		#
+		ac_lbl_dependency_flag="-M"
+	else
+		#
+		# Not GCC or a compiler deemed to be GCC; what platform is
+		# this?  (We're assuming that if the compiler isn't GCC
+		# it's the compiler from the vendor of the OS; that won't
+		# necessarily be true for x86 platforms, where it might be
+		# the Intel C compiler.)
+		#
+		case "$host_os" in
+
+		irix*|osf*|darwin*)
+			#
+			# MIPS C for IRIX, DEC C, and clang all use -M.
+			#
+			ac_lbl_dependency_flag="-M"
+			;;
+
+		solaris*)
+			#
+			# Sun C uses -xM.
+			#
+			ac_lbl_dependency_flag="-xM"
+			;;
+
+		hpux*)
+			#
+			# HP's older C compilers don't support this.
+			# HP's newer C compilers support this with
+			# either +M or +Make; the older compilers
+			# interpret +M as something completely
+			# different, so we use +Make so we don't
+			# think it works with the older compilers.
+			#
+			ac_lbl_dependency_flag="+Make"
+			;;
+
+		*)
+			#
+			# Not one of the above; assume no support for
+			# generating dependencies.
+			#
+			ac_lbl_dependency_flag=""
+			;;
+		esac
+	fi
+
+	#
+	# Is ac_lbl_dependency_flag defined and, if so, does the compiler
+	# complain about it?
+	#
+	# Note: clang doesn't seem to exit with an error status when handed
+	# an unknown non-warning error, even if you pass it
+	# -Werror=unknown-warning-option.  However, it always supports
+	# -M, so the fact that this test always succeeds with clang
+	# isn't an issue.
+	#
+	if test ! -z "$ac_lbl_dependency_flag"; then
+		AC_LANG_CONFTEST(
+		    [AC_LANG_SOURCE([[int main(void) { return 0; }]])])
+		echo "$CC" $ac_lbl_dependency_flag conftest.c >&5
+		if "$CC" $ac_lbl_dependency_flag conftest.c >/dev/null 2>&1; then
+			AC_MSG_RESULT([yes, with $ac_lbl_dependency_flag])
+			DEPENDENCY_CFLAG="$ac_lbl_dependency_flag"
+			MKDEP='${srcdir}/mkdep'
+		else
+			AC_MSG_RESULT([no])
+			#
+			# We can't run mkdep, so have "make depend" do
+			# nothing.
+			#
+			MKDEP=:
+		fi
+		rm -rf conftest*
+	else
+		AC_MSG_RESULT([no])
+		#
+		# We can't run mkdep, so have "make depend" do
+		# nothing.
+		#
+		MKDEP=:
+	fi
+	AC_SUBST(DEPENDENCY_CFLAG)
+	AC_SUBST(MKDEP)
+    ])
 
 #
 # Try compiling a sample of the type of code that appears in
@@ -461,17 +602,21 @@ reproduce this problem ourselves.])
     dnl if they're not present.
     dnl
     AC_CHECK_FUNC(pcap_list_datalinks,
-	AC_DEFINE(HAVE_PCAP_LIST_DATALINKS),
+	AC_DEFINE(HAVE_PCAP_LIST_DATALINKS, 1,
+	    [define if libpcap has pcap_list_datalinks()]),
 	[
 	    AC_LIBOBJ(datalinks)
 	])
     AC_CHECK_FUNC(pcap_set_datalink,
-	AC_DEFINE(HAVE_PCAP_SET_DATALINK))
+	AC_DEFINE(HAVE_PCAP_SET_DATALINK, 1,
+	    [define if libpcap has pcap_set_datalink()]))
     AC_CHECK_FUNC(pcap_datalink_name_to_val,
 	[
-	    AC_DEFINE(HAVE_PCAP_DATALINK_NAME_TO_VAL)
+	    AC_DEFINE(HAVE_PCAP_DATALINK_NAME_TO_VAL, 1,
+		[define if libpcap has pcap_datalink_name_to_val()])
 	    AC_CHECK_FUNC(pcap_datalink_val_to_description,
-		AC_DEFINE(HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION),
+		AC_DEFINE(HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION, 1,
+		    [define if libpcap has pcap_datalink_val_to_description()]),
 		[
 		    AC_LIBOBJ(dlnames)
 		])
@@ -491,7 +636,8 @@ reproduce this problem ourselves.])
     dnl Check for "pcap_dump_ftell()" and use a substitute version
     dnl if it's not present.
     AC_CHECK_FUNC(pcap_dump_ftell,
-	AC_DEFINE(HAVE_PCAP_DUMP_FTELL),
+	AC_DEFINE(HAVE_PCAP_DUMP_FTELL, 1,
+	    [define if libpcap has pcap_dump_ftell()]),
 	[
 	    AC_LIBOBJ(pcap_dump_ftell)
 	])
@@ -679,10 +825,10 @@ AC_DEFUN(AC_LBL_CHECK_64BIT_FORMAT,
 	  ]])
       ],
       [
-	AC_DEFINE(PRId64, "$1d")
-	AC_DEFINE(PRIo64, "$1o")
-	AC_DEFINE(PRIx64, "$1x")
-	AC_DEFINE(PRIu64, "$1u")
+	AC_DEFINE(PRId64, "$1d", [define if the platform doesn't define PRId64])
+	AC_DEFINE(PRIo64, "$1o", [define if the platform doesn't define PRIo64])
+	AC_DEFINE(PRIx64, "$1x", [define if the platform doesn't define PRIu64])
+	AC_DEFINE(PRIu64, "$1u", [define if the platform doesn't define PRIx64])
 	AC_MSG_RESULT(yes)
       ],
       [
@@ -792,11 +938,11 @@ EOF
     fi])
 
 dnl
-dnl If using gcc and the file .devel exists:
-dnl	Compile with -g (if supported) and -Wall
-dnl	If using gcc 2 or later, do extra prototype checking and some other
-dnl	checks
+dnl If the file .devel exists:
+dnl	Add some warning flags if the compiler supports them
 dnl	If an os prototype include exists, symlink os-proto.h to it
+dnl	If we're using gcc:
+dnl	    Compile with -g (if supported)
 dnl
 dnl usage:
 dnl
@@ -814,14 +960,23 @@ AC_DEFUN(AC_LBL_DEVEL,
 	    $1="$$1 ${LBL_CFLAGS}"
     fi
     if test -f .devel ; then
+	    #
+	    # Skip all the warning option stuff on some compilers.
+	    #
+	    if test "$ac_lbl_cc_dont_try_gcc_dashW" != yes; then
+		    AC_LBL_CHECK_UNKNOWN_WARNING_OPTION_ERROR()
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wall)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wmissing-prototypes)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wstrict-prototypes)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wwrite-strings)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wpointer-arith)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -W)
+	    fi
+	    AC_LBL_CHECK_DEPENDENCY_GENERATION_OPT()
 	    if test "$GCC" = yes ; then
 		    if test "${LBL_CFLAGS+set}" != set; then
 			    if test "$ac_cv_prog_cc_g" = yes ; then
 				    $1="-g $$1"
-			    fi
-			    $1="$$1 -Wall"
-			    if test $ac_cv_lbl_gcc_vers -gt 1 ; then
-				    $1="$$1 -Wmissing-prototypes -Wstrict-prototypes -Wwrite-strings -Wpointer-arith -W"
 			    fi
 		    fi
 	    else
@@ -1037,9 +1192,11 @@ AC_DEFUN(AC_STRUCT_ADDRINFO, [
 		$1=no))
 	AC_MSG_RESULT($$1)
 	if test $$1 = yes; then
-		AC_DEFINE(HAVE_ADDRINFO)
+		AC_DEFINE(HAVE_ADDRINFO, 1,
+		    [define if you have the addrinfo function])
 	else
-		AC_DEFINE(NEED_ADDRINFO_H)
+		AC_DEFINE(NEED_ADDRINFO_H, 1,
+		    [define if you need to include missing/addrinfo.h])
 	fi
 ])
 
@@ -1090,7 +1247,8 @@ AC_DEFUN(AC_STRUCT_SA_STORAGE, [
 		$1=no))
 	AC_MSG_RESULT($$1)
 	if test $$1 = yes; then
-		AC_DEFINE(HAVE_SOCKADDR_STORAGE)
+		AC_DEFINE(HAVE_SOCKADDR_STORAGE, 1,
+		    [define if you have struct sockaddr_storage])
 	fi
 ])
 
@@ -1107,7 +1265,8 @@ AC_DEFUN(AC_VAR_H_ERRNO, [
 		ac_cv_var_h_errno=no))
 	AC_MSG_RESULT($ac_cv_var_h_errno)
 	if test "$ac_cv_var_h_errno" = "yes"; then
-		AC_DEFINE(HAVE_H_ERRNO)
+		AC_DEFINE(HAVE_H_ERRNO, 1,
+		    [define if you have the h_errno variable])
 	fi
 ])
 
