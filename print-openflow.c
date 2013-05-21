@@ -40,6 +40,7 @@
 #include "extract.h"
 
 #define OF_HEADER_LEN 8
+#define OF_VER_1_0    0x01
 
 static void
 of_header_print(const uint8_t version, const uint8_t type,
@@ -85,6 +86,8 @@ of_header_body_print(const u_char *cp, const u_char *ep) {
 	/* Decode known protocol versions further without printing the header (the
 	 * type decoding is version-specific. */
 	switch (version) {
+	case OF_VER_1_0:
+		return of10_header_body_print(cp, ep, type, length, xid);
 	default:
 		of_header_print(version, type, length, xid);
 		TCHECK2(*cp, length - OF_HEADER_LEN);
