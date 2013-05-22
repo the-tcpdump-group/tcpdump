@@ -749,6 +749,8 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 				tp += 2;
 				subopt_len = EXTRACT_16BITS(tp);
 				tp += 2;
+				if (tp + subopt_len > cp + sizeof(*dh6o) + optlen)
+					goto trunc; 
 				printf(" subopt:%d", subopt_code);
 				switch (subopt_code) {
 				case DH6OPT_NTP_SUBOPTION_SRV_ADDR:
@@ -761,7 +763,7 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 					break;
 				case DH6OPT_NTP_SUBOPTION_SRV_FQDN:
 					putchar(' ');
-					if (ns_nprint(tp, cp + sizeof(*dh6o) + optlen) == NULL)
+					if (ns_nprint(tp, cp + sizeof(*dh6o) + subopt_len) == NULL)
 						goto trunc;
 					break;
 				default:
