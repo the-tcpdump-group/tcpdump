@@ -763,7 +763,7 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 					break;
 				case DH6OPT_NTP_SUBOPTION_SRV_FQDN:
 					putchar(' ');
-					if (ns_nprint(tp, cp + sizeof(*dh6o) + subopt_len) == NULL)
+					if (ns_nprint(tp, tp + subopt_len) == NULL)
 						goto trunc;
 					break;
 				default:
