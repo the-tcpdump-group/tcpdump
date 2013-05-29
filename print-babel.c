@@ -70,6 +70,7 @@ babel_print(const u_char *cp, u_int length) {
     return;
 }
 
+/* TLVs */
 #define MESSAGE_PAD1 0
 #define MESSAGE_PADN 1
 #define MESSAGE_ACK_REQ 2
@@ -83,6 +84,18 @@ babel_print(const u_char *cp, u_int length) {
 #define MESSAGE_MH_REQUEST 10
 #define MESSAGE_TSPC 11
 #define MESSAGE_HMAC 12
+
+/* sub-TLVs */
+#define MESSAGE_SUB_PAD1 0
+#define MESSAGE_SUB_PADN 1
+#define MESSAGE_SUB_CHANINFO 2
+
+/* ChanInfo sub-TLV channel codes */
+static const struct tok chaninfo_str[] = {
+    { 0,   "reserved" },
+    { 255, "all"      },
+    { 0, NULL }
+};
 
 static const char *
 format_id(const u_char *id)
@@ -126,6 +139,8 @@ format_address(const u_char *prefix)
 #endif
 }
 
+/* Return number of octets consumed from the input buffer (not the prefix length
+ * in bytes), or -1 for encoding error. */
 static int
 network_prefix(int ae, int plen, unsigned int omitted,
                const unsigned char *p, const unsigned char *dp,
@@ -133,6 +148,7 @@ network_prefix(int ae, int plen, unsigned int omitted,
 {
     unsigned pb;
     unsigned char prefix[16];
+    int consumed = 0;
 
     if(plen >= 0)
         pb = (plen + 7) / 8;
@@ -156,7 +172,10 @@ network_prefix(int ae, int plen, unsigned int omitted,
             if (dp == NULL) return -1;
             memcpy(prefix, dp, 12 + omitted);
         }
-        if(pb > omitted) memcpy(prefix + 12 + omitted, p, pb - omitted);
+        if(pb > omitted) {
+            memcpy(prefix + 12 + omitted, p, pb - omitted);
+            consumed = pb - omitted;
+        }
         break;
     case 2:
         if(omitted > 16 || (pb > omitted && len < pb - omitted))
@@ -165,20 +184,26 @@ network_prefix(int ae, int plen, unsigned int omitted,
             if (dp == NULL) return -1;
             memcpy(prefix, dp, omitted);
         }
-        if(pb > omitted) memcpy(prefix + omitted, p, pb - omitted);
+        if(pb > omitted) {
+            memcpy(prefix + omitted, p, pb - omitted);
+            consumed = pb - omitted;
+        }
         break;
     case 3:
         if(pb > 8 && len < pb - 8) return -1;
         prefix[0] = 0xfe;
         prefix[1] = 0x80;
-        if(pb > 8) memcpy(prefix + 8, p, pb - 8);
+        if(pb > 8) {
+            memcpy(prefix + 8, p, pb - 8);
+            consumed = pb - 8;
+        }
         break;
     default:
         return -1;
     }
 
     memcpy(p_r, prefix, 16);
-    return 1;
+    return consumed;
 }
 
 static int
@@ -186,6 +211,71 @@ network_address(int ae, const unsigned char *a, unsigned int len,
                 unsigned char *a_r)
 {
     return network_prefix(ae, -1, 0, a, NULL, len, a_r);
+}
+
+/*
+ * Sub-TLVs consume the "extra data" of Babel TLVs (see Section 4.3 of RFC6126),
+ * their encoding is similar to the encoding of TLVs, but the type namespace is
+ * different:
+ *
+ * o Type 0 stands for Pad1 sub-TLV with the same encoding as the Pad1 TLV.
+ * o Type 1 stands for PadN sub-TLV with the same encoding as the PadN TLV.
+ * o Type 2 stands for ChanInfo sub-TLV, which propagates diversity routing
+ *   data. Its body is a variable-length sequence of 8-bit unsigned integers,
+ *   each representing per-hop number of interferring radio channel for the
+ *   prefix. Channel 0 is invalid and must not be used in the sub-TLV, channel
+ *   255 interferes with any other channel.
+ *
+ * Sub-TLV types 0 and 1 are valid for any TLV type, whether sub-TLV type 2 is
+ * only valid for TLV type 8 (Update). Note that within an Update TLV a missing
+ * ChanInfo sub-TLV is not the same as a ChanInfo sub-TLV with an empty body.
+ * The former would mean a lack of any claims about the interference, and the
+ * latter would state that interference is definitely absent. */
+static void
+subtlvs_print(const u_char *cp, const u_char *ep, const uint8_t tlv_type) {
+    uint8_t subtype, sublen;
+    const char *sep;
+
+    while (cp < ep) {
+        subtype = *cp++;
+        if(subtype == MESSAGE_SUB_PAD1) {
+            printf(" sub-pad1");
+            continue;
+        }
+        if(cp == ep)
+            goto corrupt;
+        sublen = *cp++;
+        if(cp + sublen > ep)
+            goto corrupt;
+
+        switch(subtype) {
+        case MESSAGE_SUB_PADN:
+            printf(" sub-padn");
+            cp += sublen;
+            break;
+        case MESSAGE_SUB_CHANINFO:
+            printf(" sub-chaninfo");
+            if (sublen == 0) {
+                printf(" empty");
+                break;
+            }
+            sep = " ";
+            while(sublen--) {
+                printf("%s%s", sep, tok2str(chaninfo_str, "%u", *cp++));
+                sep = "-";
+            }
+            if(tlv_type != MESSAGE_UPDATE)
+                printf(" (bogus)");
+            break;
+        default:
+            printf(" sub-unknown-0x%02x", subtype);
+            cp += sublen;
+        } /* switch */
+    } /* while */
+    return;
+
+ corrupt:
+    printf(" (corrupt)");
 }
 
 #define ICHECK(i, l) \
@@ -212,23 +302,22 @@ babel_print_v2(const u_char *cp, u_int length) {
         u_int type, len;
 
         message = cp + 4 + i;
+
+        TCHECK2(*message, 1);
+        if((type = message[0]) == MESSAGE_PAD1) {
+            printf(vflag ? "\n\tPad 1" : " pad1");
+            i += 1;
+            continue;
+        }
+
         TCHECK2(*message, 2);
         ICHECK(i, 2);
-        type = message[0];
         len = message[1];
 
         TCHECK2(*message, 2 + len);
         ICHECK(i, 2 + len);
 
         switch(type) {
-        case MESSAGE_PAD1: {
-            if(!vflag)
-                printf(" pad1");
-            else
-                printf("\n\tPad 1");
-        }
-            break;
-
         case MESSAGE_PADN: {
             if(!vflag)
                 printf(" padN");
@@ -361,6 +450,9 @@ babel_print_v2(const u_char *cp, u_int length) {
                     else
                         memcpy(v6_prefix, prefix, 16);
                 }
+                /* extra data? */
+                if(rc < len - 10)
+                    subtlvs_print(message + 12 + rc, message + 2 + len, type);
             }
         }
             break;

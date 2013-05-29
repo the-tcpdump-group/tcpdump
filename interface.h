@@ -223,6 +223,9 @@ extern void ns_print(const u_char *, u_int, int);
 extern const u_char * ns_nprint (register const u_char *, register const u_char *);
 extern void ntp_print(const u_char *, u_int);
 extern u_int null_if_print(const struct pcap_pkthdr *, const u_char *);
+extern void openflow_print(const u_char *, u_int);
+extern const u_char *of10_header_body_print(const u_char *, const u_char *,
+  const uint8_t, const uint16_t, const uint32_t);
 extern void ospf_print(const u_char *, u_int, const u_char *);
 extern void olsr_print (const u_char *, u_int, int);
 extern void pimv1_print(const u_char *, u_int);
