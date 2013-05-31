@@ -312,6 +312,9 @@ static struct printer printers[] = {
 };
 
 static struct ndo_printer ndo_printers[] = {
+#ifdef DLT_NFLOG
+	{ nflog_if_print,	DLT_NFLOG},
+#endif
 	{ ether_if_print,	DLT_EN10MB },
 #ifdef DLT_IPNET
 	{ ipnet_if_print,	DLT_IPNET },
