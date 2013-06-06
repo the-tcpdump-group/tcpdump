@@ -116,7 +116,7 @@ mptcp		mptcp.pcap		mptcp.out		-t
 mptcp-fclose	mptcp-fclose.pcap	mptcp-fclose.out	-t
 
 # IEEE 802.11 tests
-80211_exthdr	ieee802.11_exthdr.pcap	ieee802.11_exthdr.out	-t -v
+802.11_exthdr	ieee802.11_exthdr.pcap	ieee802.11_exthdr.out	-t -v
 802.11_rx-stbc	ieee802.11_rx-stbc.pcap	ieee802.11_rx-stbc.out	-t
 
 # OpenFlow tests
