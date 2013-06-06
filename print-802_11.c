@@ -2184,6 +2184,11 @@ print_radiotap_field(struct cpack_state *s, u_int32_t bit, u_int8_t *flags,
 				(u2.u8 & IEEE80211_RADIOTAP_MCS_FEC_LDPC) ?
 				"LDPC" : "BCC");
 		}
+		if (u.u8 & IEEE80211_RADIOTAP_MCS_STBC_KNOWN) {
+			printf("RX-STBC%u ",
+				(u2.u8 & IEEE80211_RADIOTAP_MCS_STBC_MASK) >> IEEE80211_RADIOTAP_MCS_STBC_SHIFT);
+		}
+
 		break;
 		}
 	}
