@@ -13,26 +13,24 @@
 #ifdef DLT_NFLOG
 
 static void
-nflog_print(struct netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
+nflog_print(struct netdissect_options *ndo, const u_char *p, u_int length, u_int caplen _U_)
 {
-    ip_print(ndo, p, length);
-    return;
+	ip_print(ndo, p, length);
+	return;
 }
 
 u_int
 nflog_if_print(struct netdissect_options *ndo,
-               const struct pcap_pkthdr *h, const u_char *p)
+	       const struct pcap_pkthdr *h, const u_char *p)
 {
-    int j = 0;
+	if (h->len < 104 || h->caplen < 104) {
+		ND_PRINT((ndo, "[!nflog]"));
+		return h->caplen;
+	}
 
-    /* Discard NFLOG header */
-    for (j = 0; j < 104; j++) {
-        *p++;
-    }
+	nflog_print(ndo, p + 104, h->len - 104, h->caplen - 104);
 
-	nflog_print(ndo, p, h->len - 104, h->caplen - 104);
-
-	return 0;
+	return 104;
 }
 
 #endif /* DLT_NFLOG */
