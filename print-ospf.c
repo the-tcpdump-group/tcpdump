@@ -187,10 +187,6 @@ static struct tok ospf_lls_eo_options[] = {
 
 static char tstr[] = " [|ospf2]";
 
-#ifdef WIN32
-#define inline __inline
-#endif /* WIN32 */
-
 static int ospf_print_lshdr(const struct lsa_hdr *);
 static const u_char *ospf_print_lsa(const struct lsa *);
 static int ospf_decode_v2(const struct ospfhdr *, const u_char *);

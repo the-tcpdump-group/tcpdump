@@ -117,10 +117,6 @@ static struct tok ospf6_lsa_prefix_option_values[] = {
 
 static char tstr[] = " [|ospf3]";
 
-#ifdef WIN32
-#define inline __inline
-#endif /* WIN32 */
-
 /* Forwards */
 static void ospf6_print_ls_type(u_int, const rtrid_t *);
 static int ospf6_print_lshdr(const struct lsa6_hdr *);
