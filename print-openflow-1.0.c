@@ -1428,7 +1428,7 @@ of10_queue_stats_reply_print(const u_char *cp, const u_char *ep, u_int len) {
 		printf(", tx_errors %" PRIu64, EXTRACT_64BITS(cp));
 		cp += 8;
 
-		len -= sizeof(struct ofp_port_stats);
+		len -= sizeof(struct ofp_queue_stats);
 	} /* while */
 	return cp;
 
