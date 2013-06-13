@@ -1279,12 +1279,12 @@ of10_table_stats_reply_print(const u_char *cp, const u_char *ep, u_int len) {
 		cp += OFP_MAX_TABLE_NAME_LEN;
 		/* wildcards */
 		TCHECK2(*cp, 4);
-		printf("\n\t wildcards 0x%08x", EXTRACT_32BITS(cp));
+		printf("\n\t  wildcards 0x%08x", EXTRACT_32BITS(cp));
 		of10_bitmap_print(ofpfw_bm, EXTRACT_32BITS(cp), OFPFW_U);
 		cp += 4;
 		/* max_entries */
 		TCHECK2(*cp, 4);
-		printf("\n\t max_entries %u", EXTRACT_32BITS(cp));
+		printf("\n\t  max_entries %u", EXTRACT_32BITS(cp));
 		cp += 4;
 		/* active_count */
 		TCHECK2(*cp, 4);
