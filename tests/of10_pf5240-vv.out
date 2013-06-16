@@ -1,7 +1,7 @@
 IP (tos 0xa0, ttl 64, id 10670, offset 0, flags [DF], proto TCP (6), length 60)
     172.16.1.101.62224 > 172.16.1.51.6633: Flags [S], cksum 0x6dd0 (correct), seq 2446711727, win 2048, options [mss 1460,nop,wscale 0,nop,nop,TS val 0 ecr 0], length 0
 IP (tos 0xa0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
-    172.16.1.51.6633 > 172.16.1.101.62224: Flags [R.], cksum 0xda97 (correct), seq 0, ack 2446711728, win 0, length 0
+    172.16.1.51.6633 > 172.16.1.101.62224: Flags [R.], cksum 0xda97 (correct), seq 0, ack 1, win 0, length 0
 IP (tos 0xa0, ttl 64, id 10673, offset 0, flags [DF], proto TCP (6), length 60)
     172.16.1.101.62221 > 172.16.1.51.6633: Flags [S], cksum 0xa14c (correct), seq 2619186670, win 2048, options [mss 1460,nop,wscale 0,nop,nop,TS val 0 ecr 0], length 0
 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
@@ -425,4 +425,4 @@ IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 52)
 IP (tos 0xa0, ttl 64, id 10710, offset 0, flags [DF], proto TCP (6), length 60)
     172.16.1.101.62216 > 172.16.1.51.6633: Flags [S], cksum 0xf0a4 (correct), seq 2928426028, win 2048, options [mss 1460,nop,wscale 0,nop,nop,TS val 0 ecr 0], length 0
 IP (tos 0xa0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
-    172.16.1.51.6633 > 172.16.1.101.62216: Flags [R.], cksum 0x5d6c (correct), seq 0, ack 2928426029, win 0, length 0
+    172.16.1.51.6633 > 172.16.1.101.62216: Flags [R.], cksum 0x5d6c (correct), seq 0, ack 1, win 0, length 0
