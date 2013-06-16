@@ -123,6 +123,7 @@ static const struct tok tcp_option_values[] = {
         { TCPOPT_AUTH, "enhanced auth" },
         { TCPOPT_UTO, "uto" },
         { TCPOPT_MPTCP, "mptcp" },
+        { TCPOPT_EXPERIMENT2, "exp" },
         { 0, NULL }
 };
 
@@ -146,6 +147,7 @@ tcp_print(register const u_char *bp, register u_int length,
         u_int16_t sport, dport, win, urp;
         u_int32_t seq, ack, thseq, thack;
         u_int utoval;
+        u_int16_t magic;
         int threv;
 #ifdef INET6
         register const struct ip6_hdr *ip6;
@@ -602,6 +604,40 @@ tcp_print(register const u_char *bp, register u_int length,
                                 LENCHECK(datalen);
                                 if (!mptcp_print(cp-2, len, flags))
                                         goto bad;
+                                break;
+
+                        case TCPOPT_EXPERIMENT2:
+                                datalen = len - 2;
+                                LENCHECK(datalen);
+                                if (datalen < 2)
+                                        goto bad;
+                                magic = EXTRACT_16BITS(cp);
+                                (void)printf("-");
+
+                                switch(magic) {
+
+                                case 0xf989:
+                                        /* TCP Fast Open: draft-ietf-tcpm-fastopen-04 */
+                                        if (datalen == 2) {
+                                                /* Fast Open Cookie Request */
+                                                (void)printf("tfo cookiereq");
+                                        } else {
+                                                /* Fast Open Cookie */
+                                                if (datalen % 2 != 0 || datalen < 6 || datalen > 18) {
+                                                        (void)printf("tfo malformed");
+                                                } else {
+                                                        (void)printf("tfo cookie ");
+                                                        for (i = 2; i < datalen; ++i)
+                                                                (void)printf("%02x", cp[i]);
+                                                }
+                                        }
+                                        break;
+
+                                default:
+                                        /* Unknown magic number */
+                                        (void)printf("%04x", magic);
+                                        break;
+                                }
                                 break;
 
                         default:
