@@ -417,7 +417,7 @@ icmp6_print(netdissect_options *ndo,
 		TCHECK(oip->ip6_dst);
 		switch (dp->icmp6_code) {
 		case ICMP6_PARAMPROB_HEADER:
-			printf(", errorneous - octet %u", EXTRACT_32BITS(&dp->icmp6_pptr));
+			printf(", erroneous - octet %u", EXTRACT_32BITS(&dp->icmp6_pptr));
 			break;
 		case ICMP6_PARAMPROB_NEXTHEADER:
 			printf(", next header - octet %u", EXTRACT_32BITS(&dp->icmp6_pptr));
