@@ -2851,11 +2851,24 @@ echo "${ECHO_T}$ac_cv_lbl_gcc_vers" >&6; }
 			    V_CCOPT="-O2"
 		    fi
 	    fi
+
+	    #
+	    # -Werror forces warnings to be errors.
+	    #
+	    ac_lbl_cc_force_warning_errors=-Werror
     else
 	    V_INCLS="$V_INCLS -I/usr/local/include"
 	    LDFLAGS="$LDFLAGS -L/usr/local/lib"
 
 	    case "$host_os" in
+
+	    darwin*)
+		    #
+		    # This is assumed either to be GCC or clang, both
+		    # of which use -Werror to force warnings to be errors.
+		    #
+		    ac_lbl_cc_force_warning_errors=-Werror
+		    ;;
 
 	    hpux*)
 		    #
@@ -2893,6 +2906,14 @@ echo "${ECHO_T}$ac_cv_lbl_gcc_vers" >&6; }
 		    #
 		    ac_lbl_cc_dont_try_gcc_dashW=yes
 		    V_CCOPT="$V_CCOPT -O"
+		    ;;
+
+	    solaris*)
+		    #
+		    # Assumed to be Sun C, which requires -errwarn to force
+		    # warnings to be treated as errors.
+		    #
+		    ac_lbl_cc_force_warning_errors=-errwarn
 		    ;;
 
 	    ultrix*)
@@ -3113,14 +3134,219 @@ cat >>confdefs.h <<\_ACEOF
 #define HAVE___ATTRIBUTE__ 1
 _ACEOF
 
-  V_DEFS="$V_DEFS -D_U_=\"__attribute__((unused))\""
 else
+  #
+  # We can't use __attribute__, so we can't use __attribute__((unused)),
+  # so we define _U_ to an empty string.
+  #
   V_DEFS="$V_DEFS -D_U_=\"\""
 fi
 { echo "$as_me:$LINENO: result: $ac_cv___attribute__" >&5
 echo "${ECHO_T}$ac_cv___attribute__" >&6; }
 
 if test "$ac_cv___attribute__" = "yes"; then
+
+{ echo "$as_me:$LINENO: checking whether __attribute__((unused)) can be used without warnings" >&5
+echo $ECHO_N "checking whether __attribute__((unused)) can be used without warnings... $ECHO_C" >&6; }
+if test "${ac_cv___attribute___unused+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+save_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS $ac_lbl_cc_force_warning_errors"
+cat >conftest.$ac_ext <<_ACEOF
+
+  /* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#include <stdlib.h>
+#include <stdio.h>
+
+int
+main(int argc  __attribute((unused)), char **argv __attribute((unused)))
+{
+  printf("Hello, world!\n");
+  return 0;
+}
+
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ac_cv___attribute___unused=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv___attribute___unused=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+
+CFLAGS="$save_CFLAGS"
+if test "$ac_cv___attribute___unused" = "yes"; then
+  V_DEFS="$V_DEFS -D_U_=\"__attribute__((unused))\""
+else
+  V_DEFS="$V_DEFS -D_U_=\"\""
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv___attribute___unused" >&5
+echo "${ECHO_T}$ac_cv___attribute___unused" >&6; }
+
+
+{ echo "$as_me:$LINENO: checking whether __attribute__((noreturn)) can be applied to function pointers without warnings" >&5
+echo $ECHO_N "checking whether __attribute__((noreturn)) can be applied to function pointers without warnings... $ECHO_C" >&6; }
+if test "${ac_cv___attribute___noreturn_function_pointer+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+save_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS $ac_lbl_cc_force_warning_errors"
+cat >conftest.$ac_ext <<_ACEOF
+
+  /* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#include <stdlib.h>
+
+extern int (*foo)(int i)
+		  __attribute__ ((noreturn));
+
+int
+main(int argc, char **argv)
+{
+  (*foo)(1);
+}
+
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ac_cv___attribute___noreturn_function_pointer=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv___attribute___noreturn_function_pointer=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+
+CFLAGS="$save_CFLAGS"
+if test "$ac_cv___attribute___noreturn_function_pointer" = "yes"; then
+
+cat >>confdefs.h <<\_ACEOF
+#define __ATTRIBUTE___NORETURN_OK_FOR_FUNCTION_POINTERS 1
+_ACEOF
+
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv___attribute___noreturn_function_pointer" >&5
+echo "${ECHO_T}$ac_cv___attribute___noreturn_function_pointer" >&6; }
+
+
+{ echo "$as_me:$LINENO: checking whether __attribute__((format)) can be used without warnings" >&5
+echo $ECHO_N "checking whether __attribute__((format)) can be used without warnings... $ECHO_C" >&6; }
+if test "${ac_cv___attribute___format+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+save_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS $ac_lbl_cc_force_warning_errors"
+cat >conftest.$ac_ext <<_ACEOF
+
+  /* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#include <stdlib.h>
+
+extern int foo(const char *fmt, ...)
+		  __attribute__ ((format (printf, 1, 2)));
+
+int
+main(int argc, char **argv)
+{
+  foo("%s", "test");
+}
+
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ac_cv___attribute___format=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv___attribute___format=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+
+CFLAGS="$save_CFLAGS"
+if test "$ac_cv___attribute___format" = "yes"; then
+
+cat >>confdefs.h <<\_ACEOF
+#define __ATTRIBUTE___FORMAT_OK 1
+_ACEOF
+
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv___attribute___format" >&5
+echo "${ECHO_T}$ac_cv___attribute___format" >&6; }
+
+	if test "$ac_cv___attribute___format" = "yes"; then
 
 { echo "$as_me:$LINENO: checking whether __attribute__((format)) can be applied to function pointers" >&5
 echo $ECHO_N "checking whether __attribute__((format)) can be applied to function pointers... $ECHO_C" >&6; }
@@ -3186,6 +3412,7 @@ fi
 { echo "$as_me:$LINENO: result: $ac_cv___attribute___format_function_pointer" >&5
 echo "${ECHO_T}$ac_cv___attribute___format_function_pointer" >&6; }
 
+	fi
 fi
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'

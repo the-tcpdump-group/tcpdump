@@ -38,13 +38,19 @@
 
 #if !defined(HAVE_SNPRINTF)
 int snprintf(char *, size_t, const char *, ...)
-     __attribute__((format(printf, 3, 4)));
-#endif
+#ifdef __ATTRIBUTE___FORMAT_OK
+     __attribute__((format(printf, 3, 4)))
+#endif /* __ATTRIBUTE___FORMAT_OK */
+     ;
+#endif /* !defined(HAVE_SNPRINTF) */
 
 #if !defined(HAVE_VSNPRINTF)
 int vsnprintf(char *, size_t, const char *, va_list)
-     __attribute__((format(printf, 3, 0)));
-#endif
+#ifdef __ATTRIBUTE___FORMAT_OK
+     __attribute__((format(printf, 3, 0)))
+#endif /* __ATTRIBUTE___FORMAT_OK */
+     ;
+#endif /* !defined(HAVE_VSNPRINTF) */
 
 #ifndef HAVE_STRLCAT
 extern size_t strlcat(char *, const char *, size_t);
@@ -136,8 +142,16 @@ extern const char *tok2strary_internal(const char **, int, const char *, int);
 extern const char *dnaddr_string(u_short);
 
 extern void error(const char *, ...)
-    __attribute__((noreturn, format (printf, 1, 2)));
-extern void warning(const char *, ...) __attribute__ ((format (printf, 1, 2)));
+     __attribute__((noreturn))
+#ifdef __ATTRIBUTE___FORMAT_OK
+     __attribute__((format (printf, 1, 2)))
+#endif /* __ATTRIBUTE___FORMAT_OK */
+     ;
+extern void warning(const char *, ...)
+#ifdef __ATTRIBUTE___FORMAT_OK
+     __attribute__((format (printf, 1, 2)))
+#endif /* __ATTRIBUTE___FORMAT_OK */
+     ;
 
 extern char *read_infile(char *);
 extern char *copy_argv(char **);

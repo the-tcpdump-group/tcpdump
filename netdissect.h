@@ -42,13 +42,19 @@
 
 #if !defined(HAVE_SNPRINTF)
 int snprintf (char *str, size_t sz, const char *format, ...)
-     __attribute__ ((format (printf, 3, 4)));
-#endif
+#ifdef __ATTRIBUTE___FORMAT_OK
+     __attribute__((format (printf, 3, 4)))
+#endif /* __ATTRIBUTE___FORMAT_OK */
+     ;
+#endif /* !defined(HAVE_SNPRINTF) */
 
 #if !defined(HAVE_VSNPRINTF)
 int vsnprintf (char *str, size_t sz, const char *format, va_list ap)
-     __attribute__((format (printf, 3, 0)));
-#endif
+#ifdef __ATTRIBUTE___FORMAT_OK
+     __attribute__((format (printf, 3, 0)))
+#endif /* __ATTRIBUTE___FORMAT_OK */
+     ;
+#endif /* !defined(HAVE_SNPRINTF) */
 
 #ifndef HAVE_STRLCAT
 extern size_t strlcat (char *, const char *, size_t);
@@ -158,9 +164,12 @@ struct netdissect_options {
 		     ;
   void (*ndo_error)(netdissect_options *,
 		    const char *fmt, ...)
+#ifdef __ATTRIBUTE___NORETURN_OK_FOR_FUNCTION_POINTERS
+		     __attribute__ ((noreturn))
+#endif /* __ATTRIBUTE___NORETURN_OK_FOR_FUNCTION_POINTERS */
 #ifdef __ATTRIBUTE___FORMAT_OK_FOR_FUNCTION_POINTERS
-		     __attribute__ ((noreturn, format (printf, 2, 3)))
-#endif
+		     __attribute__ ((format (printf, 2, 3)))
+#endif /* __ATTRIBUTE___FORMAT_OK_FOR_FUNCTION_POINTERS */
 		     ;
   void (*ndo_warning)(netdissect_options *,
 		      const char *fmt, ...)

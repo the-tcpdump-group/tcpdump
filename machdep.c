@@ -46,7 +46,10 @@ static const char rcsid[] _U_ =
 
 #if !defined(HAVE_SNPRINTF)
 int snprintf(char *, size_t, const char *, ...)
-     __attribute__((format(printf, 3, 4)));
+#ifdef __ATTRIBUTE___FORMAT_OK
+     __attribute__((format(printf, 3, 4)))
+#endif /* __ATTRIBUTE___FORMAT_OK */
+     ;
 #endif /* !defined(HAVE_SNPRINTF) */
 #endif /* __osf__ */
 
