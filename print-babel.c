@@ -451,7 +451,7 @@ babel_print_v2(const u_char *cp, u_int length) {
                         memcpy(v6_prefix, prefix, 16);
                 }
                 /* extra data? */
-                if(rc < len - 10)
+                if((u_int)rc < len - 10)
                     subtlvs_print(message + 12 + rc, message + 2 + len, type);
             }
         }
