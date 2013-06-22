@@ -38,6 +38,13 @@ static const char rcsid[] _U_ =
 #include "config.h"
 #endif
 
+/* The functions from print-esp.c used in this file are only defined when both
+ * OpenSSL and evp.h are detected. Employ the same preprocessor device here.
+ */
+#ifndef HAVE_OPENSSL_EVP_H
+#undef HAVE_LIBCRYPTO
+#endif
+
 #include <tcpdump-stdinc.h>
 
 #include <string.h>

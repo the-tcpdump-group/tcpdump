@@ -2,7 +2,6 @@ language: c
 
 env:
   - BUILD_LIBPCAP=true
-  - BUILD_LIBPCAP=false
 
 before_script:
   - sudo apt-get install libssl-dev libssl0.9.8 libssl1.0.0

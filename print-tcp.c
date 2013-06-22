@@ -671,6 +671,8 @@ tcp_print(register const u_char *bp, register u_int length,
 #endif
         else if (sport == BEEP_PORT || dport == BEEP_PORT)
                 beep_print(bp, length);
+        else if (sport == OPENFLOW_PORT || dport == OPENFLOW_PORT)
+                openflow_print(bp, length);
         else if (length > 2 &&
                  (sport == NAMESERVER_PORT || dport == NAMESERVER_PORT ||
                   sport == MULTICASTDNS_PORT || dport == MULTICASTDNS_PORT)) {

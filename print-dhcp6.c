@@ -608,11 +608,12 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 		case DH6OPT_SIP_SERVER_D:
 		case DH6OPT_DOMAIN_LIST:
 			tp = (u_char *)(dh6o + 1);
-			while (tp < ep) {
+			while (tp < cp + sizeof(*dh6o) + optlen) {
 				putchar(' ');
-				if((tp = ns_nprint(tp, ep)) == NULL)
+				if ((tp = ns_nprint(tp, cp + sizeof(*dh6o) + optlen)) == NULL)
 					goto trunc;
 			}
+			printf(")");
 			break;
 		case DH6OPT_STATUS_CODE:
 			if (optlen < 2) {
@@ -743,11 +744,13 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 				break;
 			}
 			tp = (u_char *)(dh6o + 1);
-			while (tp < ep - 4) {
+			while (tp < cp + sizeof(*dh6o) + optlen - 4) {
 				subopt_code = EXTRACT_16BITS(tp);
 				tp += 2;
 				subopt_len = EXTRACT_16BITS(tp);
 				tp += 2;
+				if (tp + subopt_len > cp + sizeof(*dh6o) + optlen)
+					goto trunc;
 				printf(" subopt:%d", subopt_code);
 				switch (subopt_code) {
 				case DH6OPT_NTP_SUBOPTION_SRV_ADDR:
@@ -757,17 +760,17 @@ dhcp6opt_print(const u_char *cp, const u_char *ep)
 						break;
 					}
 					printf(" %s", ip6addr_string(&tp[0]));
-					tp += subopt_len;
 					break;
 				case DH6OPT_NTP_SUBOPTION_SRV_FQDN:
 					putchar(' ');
-					ns_nprint(tp, ep);
-					tp += subopt_len;
+					if (ns_nprint(tp, tp + subopt_len) == NULL)
+						goto trunc;
 					break;
 				default:
 					printf(" ?");
 					break;
 				}
+				tp += subopt_len;
 			}
 			printf(")");
 			break;

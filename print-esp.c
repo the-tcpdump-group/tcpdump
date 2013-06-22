@@ -36,9 +36,15 @@ static const char rcsid[] _U_ =
 
 #include <stdlib.h>
 
+/* Any code in this file that depends on HAVE_LIBCRYPTO depends on
+ * HAVE_OPENSSL_EVP_H too. Undefining the former when the latter isn't defined
+ * is the simplest way of handling the dependency.
+ */
 #ifdef HAVE_LIBCRYPTO
 #ifdef HAVE_OPENSSL_EVP_H
 #include <openssl/evp.h>
+#else
+#undef HAVE_LIBCRYPTO
 #endif
 #endif
 

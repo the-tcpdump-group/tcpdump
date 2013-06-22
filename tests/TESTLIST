@@ -63,6 +63,7 @@ sflow2          sflow_multiple_counter_30_pdus.pcap     sflow_multiple_counter_3
 babel1          babel.pcap             babel1.out      -t 
 babel1v         babel.pcap             babel1v.out     -t -v
 babel_auth      babel_auth.pcap        babel_auth.out  -t -v
+babel_pad1      babel_pad1.pcap        babel_pad1.out  -t
 
 # PPPoE tests
 pppoe           pppoe.pcap             pppoe.out       -t
@@ -115,4 +116,8 @@ mptcp		mptcp.pcap		mptcp.out		-t
 mptcp-fclose	mptcp-fclose.pcap	mptcp-fclose.out	-t
 
 # IEEE 802.11 tests
-80211_exthdr	ieee802.11_exthdr.pcap	ieee802.11_exthdr.out	-t -v
+802.11_exthdr	ieee802.11_exthdr.pcap	ieee802.11_exthdr.out	-t -v
+802.11_rx-stbc	ieee802.11_rx-stbc.pcap	ieee802.11_rx-stbc.out	-t
+
+# OpenFlow tests
+of10_p3295-vv	of10_p3295.pcap		of10_p3295-vv.out	-t -vv
