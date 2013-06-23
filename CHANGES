@@ -1,3 +1,14 @@
+Saturday June 22, 2013 guy@alum.mit.edu.
+  Summary for 4.4.1 tcpdump release
+	Point users to the the-tcpdump-group repository on GitHub rather
+	    than the mcr repository
+	Add MSDP printer.
+	Fixed IPv6 check on Solaris and other OSes requiring extra
+	    networking libraries.
+	Add support for VXLAN (draft-mahalingam-dutt-dcops-vxlan-03),
+	    and add "vxlan" as an option for -T.
+	Add support for OTV (draft-hasmit-otv-04).
+
 Saturday April 6, 2013 guy@alum.mit.edu.
   Summary for 4.4.0 tcpdump release
 	RPKI-RTR (RFC6810) is now official (TCP Port 323)
@@ -17,12 +28,7 @@ Saturday April 6, 2013 guy@alum.mit.edu.
 	    using Linux Capabilities.
 	Add support for reading multiple files.
 	Add MS NLB heartbeat printer.
-	Add support for VXLAN (draft-mahalingam-dutt-dcops-vxlan-03),
-	    and add "vxlan" as an option for -T.
-	Add support for OTV (draft-hasmit-otv-04).
 	Separate multiple nexthops in BGP.
-	Fixed IPv6 check on Solaris and other OSes requiring extra
-	    networking libraries
 
 Wednesday  November 28, 2012 guy@alum.mit.edu.
   Summary for 4.3.1 tcpdump release
