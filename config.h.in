@@ -283,6 +283,21 @@
 /* define on AIX to get certain functions */
 #undef _SUN
 
+/* Define for Solaris 2.5.1 so the uint32_t typedef from <sys/synch.h>,
+   <pthread.h>, or <semaphore.h> is not used. If the typedef was allowed, the
+   #define below would cause a syntax error. */
+#undef _UINT32_T
+
+/* Define for Solaris 2.5.1 so the uint64_t typedef from <sys/synch.h>,
+   <pthread.h>, or <semaphore.h> is not used. If the typedef was allowed, the
+   #define below would cause a syntax error. */
+#undef _UINT64_T
+
+/* Define for Solaris 2.5.1 so the uint8_t typedef from <sys/synch.h>,
+   <pthread.h>, or <semaphore.h> is not used. If the typedef was allowed, the
+   #define below would cause a syntax error. */
+#undef _UINT8_T
+
 /* define if your compiler allows __attribute__((format)) without a warning */
 #undef __ATTRIBUTE___FORMAT_OK
 
@@ -300,16 +315,20 @@
 /* Define as token for inline if inlining supported */
 #undef inline
 
-/* Define to `short' if int16_t not defined. */
+/* Define to the type of a signed integer type of width exactly 16 bits if
+   such a type exists and the standard includes do not define it. */
 #undef int16_t
 
-/* Define to `int' if int32_t not defined. */
+/* Define to the type of a signed integer type of width exactly 32 bits if
+   such a type exists and the standard includes do not define it. */
 #undef int32_t
 
-/* Define to `long long' if int64_t not defined. */
+/* Define to the type of a signed integer type of width exactly 64 bits if
+   such a type exists and the standard includes do not define it. */
 #undef int64_t
 
-/* Define to `signed char' if int8_t not defined. */
+/* Define to the type of a signed integer type of width exactly 8 bits if such
+   a type exists and the standard includes do not define it. */
 #undef int8_t
 
 /* Define to `unsigned short' if u_int16_t not defined. */
@@ -323,3 +342,19 @@
 
 /* Define to `unsigned char' if u_int8_t not defined. */
 #undef u_int8_t
+
+/* Define to the type of an unsigned integer type of width exactly 16 bits if
+   such a type exists and the standard includes do not define it. */
+#undef uint16_t
+
+/* Define to the type of an unsigned integer type of width exactly 32 bits if
+   such a type exists and the standard includes do not define it. */
+#undef uint32_t
+
+/* Define to the type of an unsigned integer type of width exactly 64 bits if
+   such a type exists and the standard includes do not define it. */
+#undef uint64_t
+
+/* Define to the type of an unsigned integer type of width exactly 8 bits if
+   such a type exists and the standard includes do not define it. */
+#undef uint8_t

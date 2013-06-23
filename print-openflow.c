@@ -38,8 +38,8 @@
 
 #include "interface.h"
 #include "extract.h"
+#include "openflow.h"
 
-#define OF_HEADER_LEN 8
 #define OF_VER_1_0    0x01
 
 static void

@@ -46,6 +46,7 @@
 #include "addrtoname.h"
 #include "ethertype.h"
 #include "ipproto.h"
+#include "openflow.h"
 #include "openflow-1.0.h"
 
 static const struct tok ofpt_str[] = {
@@ -438,7 +439,7 @@ of10_phy_ports_print(const u_char *cp, const u_char *ep, u_int len) {
 	const u_int len0 = len;
 
 	while (len) {
-		if (len < sizeof(struct ofp_phy_port))
+		if (len < OF_PHY_PORT_LEN)
 			goto corrupt;
 		/* port_no */
 		TCHECK2(*cp, 2);
@@ -491,7 +492,7 @@ of10_phy_ports_print(const u_char *cp, const u_char *ep, u_int len) {
 		of10_bitmap_print(ofppf_bm, EXTRACT_32BITS(cp), OFPPF_U);
 		cp += 4;
 next_port:
-		len -= sizeof(struct ofp_phy_port);
+		len -= OF_PHY_PORT_LEN;
 	} /* while */
 	return cp;
 
@@ -514,7 +515,7 @@ of10_queue_props_print(const u_char *cp, const u_char *ep, u_int len) {
 	while (len) {
 		u_char plen_bogus = 0, skip = 0;
 
-		if (len < sizeof(struct ofp_queue_prop_header))
+		if (len < OF_QUEUE_PROP_HEADER_LEN)
 			goto corrupt;
 		/* property */
 		TCHECK2(*cp, 2);
@@ -526,7 +527,7 @@ of10_queue_props_print(const u_char *cp, const u_char *ep, u_int len) {
 		plen = EXTRACT_16BITS(cp);
 		cp += 2;
 		printf(", len %u", plen);
-		if (plen < sizeof(struct ofp_queue_prop_header) || plen > len)
+		if (plen < OF_QUEUE_PROP_HEADER_LEN || plen > len)
 			goto corrupt;
 		/* pad */
 		TCHECK2(*cp, 4);
@@ -534,10 +535,10 @@ of10_queue_props_print(const u_char *cp, const u_char *ep, u_int len) {
 		/* property-specific constraints and decoding */
 		switch (property) {
 		case OFPQT_NONE:
-			plen_bogus = plen != sizeof(struct ofp_queue_prop_header);
+			plen_bogus = plen != OF_QUEUE_PROP_HEADER_LEN;
 			break;
 		case OFPQT_MIN_RATE:
-			plen_bogus = plen != sizeof(struct ofp_queue_prop_min_rate);
+			plen_bogus = plen != OF_QUEUE_PROP_MIN_RATE_LEN;
 			break;
 		default:
 			skip = 1;
@@ -586,7 +587,7 @@ of10_queues_print(const u_char *cp, const u_char *ep, u_int len) {
 	uint16_t desclen;
 
 	while (len) {
-		if (len < sizeof(struct ofp_packet_queue))
+		if (len < OF_PACKET_QUEUE_LEN)
 			goto corrupt;
 		/* queue_id */
 		TCHECK2(*cp, 4);
@@ -597,18 +598,18 @@ of10_queues_print(const u_char *cp, const u_char *ep, u_int len) {
 		desclen = EXTRACT_16BITS(cp);
 		cp += 2;
 		printf(", len %u", desclen);
-		if (desclen < sizeof(struct ofp_packet_queue) || desclen > len)
+		if (desclen < OF_PACKET_QUEUE_LEN || desclen > len)
 			goto corrupt;
 		/* pad */
 		TCHECK2(*cp, 2);
 		cp += 2;
 		/* properties */
 		if (vflag < 2) {
-			TCHECK2(*cp, desclen - sizeof(struct ofp_packet_queue));
-			cp += desclen - sizeof(struct ofp_packet_queue);
+			TCHECK2(*cp, desclen - OF_PACKET_QUEUE_LEN);
+			cp += desclen - OF_PACKET_QUEUE_LEN;
 			goto next_queue;
 		}
-		if (ep == (cp = of10_queue_props_print(cp, ep, desclen - sizeof(struct ofp_packet_queue))))
+		if (ep == (cp = of10_queue_props_print(cp, ep, desclen - OF_PACKET_QUEUE_LEN)))
 			return ep; /* end of snapshot */
 next_queue:
 		len -= desclen;
@@ -737,7 +738,7 @@ of10_actions_print(const char *pfx, const u_char *cp, const u_char *ep,
 	while (len) {
 		u_char alen_bogus = 0, skip = 0;
 
-		if (len < sizeof(struct ofp_action_header))
+		if (len < OF_ACTION_HEADER_LEN)
 			goto corrupt;
 		/* type */
 		TCHECK2(*cp, 2);
@@ -750,7 +751,7 @@ of10_actions_print(const char *pfx, const u_char *cp, const u_char *ep,
 		cp += 2;
 		printf(", len %u", alen);
 		/* On action size underrun/overrun skip the rest of the action list. */
-		if (alen < sizeof(struct ofp_action_header) || alen > len)
+		if (alen < OF_ACTION_HEADER_LEN || alen > len)
 			goto corrupt;
 		/* On action size inappropriate for the given type or invalid type just skip
 		 * the current action, as the basic length constraint has been met. */
@@ -920,7 +921,7 @@ of10_features_reply_print(const u_char *cp, const u_char *ep, const u_int len) {
 	of10_bitmap_print(ofpat_bm, EXTRACT_32BITS(cp), OFPAT_U);
 	cp += 4;
 	/* ports */
-	return of10_phy_ports_print(cp, ep, len - sizeof(struct ofp_switch_features));
+	return of10_phy_ports_print(cp, ep, len - OF_SWITCH_FEATURES_LEN);
 
 trunc:
 	printf(" [|openflow]");
@@ -976,7 +977,7 @@ of10_flow_mod_print(const u_char *cp, const u_char *ep, const u_int len) {
 	of10_bitmap_print(ofpff_bm, EXTRACT_16BITS(cp), OFPFF_U);
 	cp += 2;
 	/* actions */
-	return of10_actions_print("\n\t ", cp, ep, len - sizeof(struct ofp_flow_mod));
+	return of10_actions_print("\n\t ", cp, ep, len - OF_FLOW_MOD_LEN);
 
 trunc:
 	printf(" [|openflow]");
@@ -1037,7 +1038,7 @@ of10_stats_request_print(const u_char *cp, const u_char *ep, u_int len) {
 		printf(" (bogus)");
 	cp += 2;
 	/* type-specific body of one of fixed lengths */
-	len -= sizeof(struct ofp_stats_request);
+	len -= OF_STATS_REQUEST_LEN;
 	switch(type) {
 	case OFPST_DESC:
 	case OFPST_TABLE:
@@ -1046,7 +1047,7 @@ of10_stats_request_print(const u_char *cp, const u_char *ep, u_int len) {
 		return cp;
 	case OFPST_FLOW:
 	case OFPST_AGGREGATE:
-		if (len != sizeof(struct ofp_flow_stats_request))
+		if (len != OF_FLOW_STATS_REQUEST_LEN)
 			goto corrupt;
 		/* match */
 		if (ep == (cp = of10_match_print("\n\t ", cp, ep)))
@@ -1063,7 +1064,7 @@ of10_stats_request_print(const u_char *cp, const u_char *ep, u_int len) {
 		printf(", out_port %s", tok2str(ofpp_str, "%u", EXTRACT_16BITS(cp)));
 		return cp + 2;
 	case OFPST_PORT:
-		if (len != sizeof(struct ofp_port_stats_request))
+		if (len != OF_PORT_STATS_REQUEST_LEN)
 			goto corrupt;
 		/* port_no */
 		TCHECK2(*cp, 2);
@@ -1073,7 +1074,7 @@ of10_stats_request_print(const u_char *cp, const u_char *ep, u_int len) {
 		TCHECK2(*cp, 6);
 		return cp + 6;
 	case OFPST_QUEUE:
-		if (len != sizeof(struct ofp_queue_stats_request))
+		if (len != OF_QUEUE_STATS_REQUEST_LEN)
 			goto corrupt;
 		/* port_no */
 		TCHECK2(*cp, 2);
@@ -1103,7 +1104,7 @@ trunc:
 /* ibid */
 static const u_char *
 of10_desc_stats_reply_print(const u_char *cp, const u_char *ep, const u_int len) {
-	if (len != sizeof(struct ofp_desc_stats))
+	if (len != OF_DESC_STATS_LEN)
 		goto corrupt;
 	/* mfr_desc */
 	TCHECK2(*cp, DESC_STR_LEN);
@@ -1153,13 +1154,13 @@ of10_flow_stats_reply_print(const u_char *cp, const u_char *ep, u_int len) {
 	uint16_t entry_len;
 
 	while (len) {
-		if (len < sizeof(struct ofp_flow_stats))
+		if (len < OF_FLOW_STATS_LEN)
 			goto corrupt;
 		/* length */
 		TCHECK2(*cp, 2);
 		entry_len = EXTRACT_16BITS(cp);
 		printf("\n\t length %u", entry_len);
-		if (entry_len < sizeof(struct ofp_flow_stats) || entry_len > len)
+		if (entry_len < OF_FLOW_STATS_LEN || entry_len > len)
 			goto corrupt;
 		cp += 2;
 		/* table_id */
@@ -1208,7 +1209,7 @@ of10_flow_stats_reply_print(const u_char *cp, const u_char *ep, u_int len) {
 		printf(", byte_count %" PRIu64, EXTRACT_64BITS(cp));
 		cp += 8;
 		/* actions */
-		if (ep == (cp = of10_actions_print("\n\t  ", cp, ep, entry_len - sizeof(struct ofp_flow_stats))))
+		if (ep == (cp = of10_actions_print("\n\t  ", cp, ep, entry_len - OF_FLOW_STATS_LEN)))
 			return ep; /* end of snapshot */
 
 		len -= entry_len;
@@ -1228,7 +1229,7 @@ trunc:
 static const u_char *
 of10_aggregate_stats_reply_print(const u_char *cp, const u_char *ep,
                                  const u_int len) {
-	if (len != sizeof(struct ofp_aggregate_stats_reply))
+	if (len != OF_AGGREGATE_STATS_REPLY_LEN)
 		goto corrupt;
 	/* packet_count */
 	TCHECK2(*cp, 8);
@@ -1262,7 +1263,7 @@ of10_table_stats_reply_print(const u_char *cp, const u_char *ep, u_int len) {
 	const u_int len0 = len;
 
 	while (len) {
-		if (len < sizeof(struct ofp_table_stats))
+		if (len < OF_TABLE_STATS_LEN)
 			goto corrupt;
 		/* table_id */
 		TCHECK2(*cp, 1);
@@ -1299,7 +1300,7 @@ of10_table_stats_reply_print(const u_char *cp, const u_char *ep, u_int len) {
 		printf(", matched_count %" PRIu64, EXTRACT_64BITS(cp));
 		cp += 8;
 
-		len -= sizeof(struct ofp_table_stats);
+		len -= OF_TABLE_STATS_LEN;
 	} /* while */
 	return cp;
 
@@ -1319,15 +1320,15 @@ of10_port_stats_reply_print(const u_char *cp, const u_char *ep, u_int len) {
 	const u_int len0 = len;
 
 	while (len) {
-		if (len < sizeof(struct ofp_port_stats))
+		if (len < OF_PORT_STATS_LEN)
 			goto corrupt;
 		/* port_no */
 		TCHECK2(*cp, 2);
 		printf("\n\t  port_no %s", tok2str(ofpp_str, "%u", EXTRACT_16BITS(cp)));
 		cp += 2;
 		if (vflag < 2) {
-			TCHECK2(*cp, sizeof(struct ofp_port_stats) - 2);
-			cp += sizeof(struct ofp_port_stats) - 2;
+			TCHECK2(*cp, OF_PORT_STATS_LEN - 2);
+			cp += OF_PORT_STATS_LEN - 2;
 			goto next_port;
 		}
 		/* pad */
@@ -1382,7 +1383,7 @@ of10_port_stats_reply_print(const u_char *cp, const u_char *ep, u_int len) {
 		printf(", collisions %" PRIu64, EXTRACT_64BITS(cp));
 		cp += 8;
 next_port:
-		len -= sizeof(struct ofp_port_stats);
+		len -= OF_PORT_STATS_LEN;
 	} /* while */
 	return cp;
 
@@ -1402,7 +1403,7 @@ of10_queue_stats_reply_print(const u_char *cp, const u_char *ep, u_int len) {
 	const u_int len0 = len;
 
 	while (len) {
-		if (len < sizeof(struct ofp_queue_stats))
+		if (len < OF_QUEUE_STATS_LEN)
 			goto corrupt;
 		/* port_no */
 		TCHECK2(*cp, 2);
@@ -1428,7 +1429,7 @@ of10_queue_stats_reply_print(const u_char *cp, const u_char *ep, u_int len) {
 		printf(", tx_errors %" PRIu64, EXTRACT_64BITS(cp));
 		cp += 8;
 
-		len -= sizeof(struct ofp_queue_stats);
+		len -= OF_QUEUE_STATS_LEN;
 	} /* while */
 	return cp;
 
@@ -1469,7 +1470,7 @@ of10_stats_reply_print(const u_char *cp, const u_char *ep, const u_int len) {
 			type == OFPST_VENDOR    ? of10_vendor_data_print           :
 			NULL;
 		if (decoder != NULL)
-			return decoder(cp, ep, len - sizeof(struct ofp_stats_reply));
+			return decoder(cp, ep, len - OF_STATS_REPLY_LEN);
 	}
 	TCHECK2(*cp0, len);
 	return cp0 + len;
@@ -1498,13 +1499,13 @@ of10_packet_out_print(const u_char *cp, const u_char *ep, const u_int len) {
 	TCHECK2(*cp, 2);
 	actions_len = EXTRACT_16BITS(cp);
 	cp += 2;
-	if (actions_len > len - sizeof(struct ofp_packet_out))
+	if (actions_len > len - OF_PACKET_OUT_LEN)
 		goto corrupt;
 	/* actions */
 	if (ep == (cp = of10_actions_print("\n\t ", cp, ep, actions_len)))
 		return ep; /* end of snapshot */
 	/* data */
-	return of10_data_print(cp, ep, len - sizeof(struct ofp_packet_out) - actions_len);
+	return of10_data_print(cp, ep, len - OF_PACKET_OUT_LEN - actions_len);
 
 corrupt: /* skip the rest of the message body */
 	printf(" (corrupt)");
@@ -1538,8 +1539,8 @@ of10_packet_in_print(const u_char *cp, const u_char *ep, const u_int len) {
 	TCHECK2(*cp, 1);
 	cp += 1;
 	/* data */
-	/* 2 mock octets count in sizeof() but not in len */
-	return of10_data_print(cp, ep, len - (sizeof(struct ofp_packet_in) - 2));
+	/* 2 mock octets count in OF_PACKET_IN_LEN but not in len */
+	return of10_data_print(cp, ep, len - (OF_PACKET_IN_LEN - 2));
 
 trunc:
 	printf(" [|openflow]");
@@ -1622,7 +1623,7 @@ of10_error_print(const u_char *cp, const u_char *ep, const u_int len) {
 	printf(", code %s", tok2str(code_str, "invalid (0x%04x)", EXTRACT_16BITS(cp)));
 	cp += 2;
 	/* data */
-	return of10_data_print(cp, ep, len - sizeof(struct ofp_error_msg));
+	return of10_data_print(cp, ep, len - OF_ERROR_MSG_LEN);
 
 trunc:
 	printf(" [|openflow]");
@@ -1650,14 +1651,14 @@ of10_header_body_print(const u_char *cp, const u_char *ep, const uint8_t type,
 	case OFPT_GET_CONFIG_REQUEST: /* [OF10] Section 5.3.2 */
 	case OFPT_BARRIER_REQUEST: /* [OF10] Section 5.3.7 */
 	case OFPT_BARRIER_REPLY: /* ibid */
-		if (len != sizeof(struct ofp_header))
+		if (len != OF_HEADER_LEN)
 			goto corrupt;
 		break;
 
 	/* OpenFlow header and fixed-size message body. */
 	case OFPT_SET_CONFIG: /* [OF10] Section 5.3.2 */
 	case OFPT_GET_CONFIG_REPLY: /* ibid */
-		if (len != sizeof(struct ofp_switch_config))
+		if (len != OF_SWITCH_CONFIG_LEN)
 			goto corrupt;
 		if (vflag < 1)
 			goto next_message;
@@ -1670,13 +1671,13 @@ of10_header_body_print(const u_char *cp, const u_char *ep, const uint8_t type,
 		printf(", miss_send_len %u", EXTRACT_16BITS(cp));
 		return cp + 2;
 	case OFPT_PORT_MOD:
-		if (len != sizeof(struct ofp_port_mod))
+		if (len != OF_PORT_MOD_LEN)
 			goto corrupt;
 		if (vflag < 1)
 			goto next_message;
 		return of10_port_mod_print(cp, ep);
 	case OFPT_QUEUE_GET_CONFIG_REQUEST: /* [OF10] Section 5.3.4 */
-		if (len != sizeof(struct ofp_queue_get_config_request))
+		if (len != OF_QUEUE_GET_CONFIG_REQUEST_LEN)
 			goto corrupt;
 		if (vflag < 1)
 			goto next_message;
@@ -1688,13 +1689,13 @@ of10_header_body_print(const u_char *cp, const u_char *ep, const uint8_t type,
 		TCHECK2(*cp, 2);
 		return cp + 2;
 	case OFPT_FLOW_REMOVED:
-		if (len != sizeof(struct ofp_flow_removed))
+		if (len != OF_FLOW_REMOVED_LEN)
 			goto corrupt;
 		if (vflag < 1)
 			goto next_message;
 		return of10_flow_removed_print(cp, ep);
 	case OFPT_PORT_STATUS: /* [OF10] Section 5.4.3 */
-		if (len != sizeof(struct ofp_port_status))
+		if (len != OF_PORT_STATUS_LEN)
 			goto corrupt;
 		if (vflag < 1)
 			goto next_message;
@@ -1706,11 +1707,11 @@ of10_header_body_print(const u_char *cp, const u_char *ep, const uint8_t type,
 		TCHECK2(*cp, 7);
 		cp += 7;
 		/* desc */
-		return of10_phy_ports_print(cp, ep, sizeof(struct ofp_phy_port));
+		return of10_phy_ports_print(cp, ep, OF_PHY_PORT_LEN);
 
 	/* OpenFlow header, fixed-size message body and n * fixed-size data units. */
 	case OFPT_FEATURES_REPLY:
-		if (len < sizeof(struct ofp_switch_features))
+		if (len < OF_SWITCH_FEATURES_LEN)
 			goto corrupt;
 		if (vflag < 1)
 			goto next_message;
@@ -1722,25 +1723,25 @@ of10_header_body_print(const u_char *cp, const u_char *ep, const uint8_t type,
 	case OFPT_ECHO_REPLY: /* [OF10] Section 5.5.3 */
 		if (vflag < 1)
 			goto next_message;
-		return of10_data_print(cp, ep, len - sizeof(struct ofp_header));
+		return of10_data_print(cp, ep, len - OF_HEADER_LEN);
 
 	/* OpenFlow header, fixed-size message body and variable-size data. */
 	case OFPT_ERROR:
-		if (len < sizeof(struct ofp_error_msg))
+		if (len < OF_ERROR_MSG_LEN)
 			goto corrupt;
 		if (vflag < 1)
 			goto next_message;
 		return of10_error_print(cp, ep, len);
 	case OFPT_VENDOR:
 	  /* [OF10] Section 5.5.4 */
-		if (len < sizeof(struct ofp_vendor_header))
+		if (len < OF_VENDOR_HEADER_LEN)
 			goto corrupt;
 		if (vflag < 1)
 			goto next_message;
-		return of10_vendor_data_print(cp, ep, len - sizeof(struct ofp_header));
+		return of10_vendor_data_print(cp, ep, len - OF_HEADER_LEN);
 	case OFPT_PACKET_IN:
-		/* 2 mock octets count in sizeof() but not in len */
-		if (len < sizeof(struct ofp_packet_in) - 2)
+		/* 2 mock octets count in OF_PACKET_IN_LEN but not in len */
+		if (len < OF_PACKET_IN_LEN - 2)
 			goto corrupt;
 		if (vflag < 1)
 			goto next_message;
@@ -1750,7 +1751,7 @@ of10_header_body_print(const u_char *cp, const u_char *ep, const uint8_t type,
 	/* b. OpenFlow header and one of the fixed-size message bodies. */
 	/* c. OpenFlow header, fixed-size message body and variable-size data. */
 	case OFPT_STATS_REQUEST:
-		if (len < sizeof(struct ofp_stats_request))
+		if (len < OF_STATS_REQUEST_LEN)
 			goto corrupt;
 		if (vflag < 1)
 			goto next_message;
@@ -1761,7 +1762,7 @@ of10_header_body_print(const u_char *cp, const u_char *ep, const uint8_t type,
 	/* c. OpenFlow header and n * variable-size data units. */
 	/* d. OpenFlow header, fixed-size message body and variable-size data. */
 	case OFPT_STATS_REPLY:
-		if (len < sizeof(struct ofp_stats_reply))
+		if (len < OF_STATS_REPLY_LEN)
 			goto corrupt;
 		if (vflag < 1)
 			goto next_message;
@@ -1769,7 +1770,7 @@ of10_header_body_print(const u_char *cp, const u_char *ep, const uint8_t type,
 
 	/* OpenFlow header and n * variable-size data units and variable-size data. */
 	case OFPT_PACKET_OUT:
-		if (len < sizeof(struct ofp_packet_out))
+		if (len < OF_PACKET_OUT_LEN)
 			goto corrupt;
 		if (vflag < 1)
 			goto next_message;
@@ -1777,7 +1778,7 @@ of10_header_body_print(const u_char *cp, const u_char *ep, const uint8_t type,
 
 	/* OpenFlow header, fixed-size message body and n * variable-size data units. */
 	case OFPT_FLOW_MOD:
-		if (len < sizeof(struct ofp_flow_mod))
+		if (len < OF_FLOW_MOD_LEN)
 			goto corrupt;
 		if (vflag < 1)
 			goto next_message;
@@ -1785,7 +1786,7 @@ of10_header_body_print(const u_char *cp, const u_char *ep, const uint8_t type,
 
 	/* OpenFlow header, fixed-size message body and n * variable-size data units. */
 	case OFPT_QUEUE_GET_CONFIG_REPLY: /* [OF10] Section 5.3.4 */
-		if (len < sizeof(struct ofp_queue_get_config_reply))
+		if (len < OF_QUEUE_GET_CONFIG_REPLY_LEN)
 			goto corrupt;
 		if (vflag < 1)
 			goto next_message;
@@ -1797,15 +1798,15 @@ of10_header_body_print(const u_char *cp, const u_char *ep, const uint8_t type,
 		TCHECK2(*cp, 6);
 		cp += 6;
 		/* queues */
-		return of10_queues_print(cp, ep, len - sizeof(struct ofp_queue_get_config_reply));
+		return of10_queues_print(cp, ep, len - OF_QUEUE_GET_CONFIG_REPLY_LEN);
 	} /* switch (type) */
 	goto next_message;
 
 corrupt: /* skip the message body */
 	printf(" (corrupt)");
 next_message:
-	TCHECK2(*cp0, len0 - sizeof(struct ofp_header));
-	return cp0 + len0 - sizeof(struct ofp_header);
+	TCHECK2(*cp0, len0 - OF_HEADER_LEN);
+	return cp0 + len0 - OF_HEADER_LEN;
 trunc:
 	printf(" [|openflow]");
 	return ep;
