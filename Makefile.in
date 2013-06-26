@@ -168,7 +168,6 @@ HDR = \
 	ntp.h \
 	oakley.h \
 	openflow.h \
-	openflow-1.0.h \
 	ospf.h \
 	ospf6.h \
 	oui.h \
