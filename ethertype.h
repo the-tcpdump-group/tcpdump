@@ -187,7 +187,7 @@
 #define	ETHERTYPE_CALM_FAST     0x1111  /* ISO CALM FAST */
 #endif
 #ifndef	ETHERTYPE_GEONET_OLD
-#define	ETHERTYPE_GEONET_OLD    0x0707  /* ETSI GeoNetworking (before an 2013) */
+#define	ETHERTYPE_GEONET_OLD    0x0707  /* ETSI GeoNetworking (before Jan 2013) */
 #endif
 #ifndef	ETHERTYPE_GEONET
 #define	ETHERTYPE_GEONET        0x8947  /* ETSI GeoNetworking (Official IEEE registration from Jan 2013) */

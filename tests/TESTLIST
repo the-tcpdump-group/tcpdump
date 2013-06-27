@@ -121,3 +121,6 @@ mptcp-fclose	mptcp-fclose.pcap	mptcp-fclose.out	-t
 
 # OpenFlow tests
 of10_p3295-vv	of10_p3295.pcap		of10_p3295-vv.out	-t -vv
+
+# GeoNetworking and CALM FAST tests
+geonet-calm-fast	geonet_and_calm_fast.pcap	geonet_and_calm_fast.out	-t -vv -n

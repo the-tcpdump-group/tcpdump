@@ -1,20 +1,18 @@
 /*
- * Copyright (c) 2013
- *	lykkja@hotmail.com  All rights reserved.
+ * Copyright (c) 2013 The TCPDUMP project
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that: (1) source code distributions
- * retain the above copyright notice and this paragraph in its entirety, (2)
- * distributions including binary code include the above copyright notice and
- * this paragraph in its entirety in the documentation or other materials
- * provided with the distribution, and (3) all advertising materials mentioning
- * features or use of this software display the following acknowledgement:
- * ``This product includes software developed by Paolo Abeni.'' 
- * The name of author may not be used to endorse or promote products derived 
- * from this software without specific prior written permission.
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ * modification, are permitted provided that: (1) source code
+ * distributions retain the above copyright notice and this paragraph
+ * in its entirety, and (2) distributions including binary code include
+ * the above copyright notice and this paragraph in its entirety in
+ * the documentation or other materials provided with the distribution.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND
+ * WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT
+ * LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE.
+ *
+ * Original code by Ola Martin Lykkja (ola.lykkja@q-free.com)
  */
 
 #ifdef HAVE_CONFIG_H
@@ -31,31 +29,28 @@
 #include "extract.h"
 #include "addrtoname.h"
 
-
-static const char *
-hex48_to_string(const u_char *bp)
-{
-        int i;
-        static char sz[6*3+2];
-        memset(sz, 0, sizeof(sz));
-        for (i=0; i<6; i++) {
-                if (i) strcat(sz,":");
-                sprintf(sz+strlen(sz), "%02x", bp[i]);
-        }
-        return sz;
-}
+/*
+   ISO 29281:2009
+   Intelligent Transport Systems . Communications access for land mobiles (CALM)
+   CALM non-IP networking
+*/
 
 /*
- * This is the top level routine of the printer.  'p' points
+ * This is the top level routine of the printer.  'bp' points
  * to the calm header of the packet.
  */
 void
 calm_fast_print(netdissect_options *ndo, const u_char *eth, const u_char *bp, u_int length)
 {
-	printf("CALM FAST src:%s; ", hex48_to_string(eth+6));
+	printf("CALM FAST src:%s; ", etheraddr_string(eth+6));
 
-	length -= 0;
-	bp += 0;
+	int srcNwref = bp[0];
+	int dstNwref = bp[1];
+	length -= 2;
+	bp += 2;
+
+	printf("SrcNwref:%d; ", srcNwref);
+	printf("DstNwref:%d; ", dstNwref);
 
 	if (ndo->ndo_vflag)
 		default_print(bp, length);

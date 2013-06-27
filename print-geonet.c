@@ -1,20 +1,18 @@
 /*
- * Copyright (c) 2013
- *	lykkja@hotmail.com  All rights reserved.
+ * Copyright (c) 2013 The TCPDUMP project
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that: (1) source code distributions
- * retain the above copyright notice and this paragraph in its entirety, (2)
- * distributions including binary code include the above copyright notice and
- * this paragraph in its entirety in the documentation or other materials
- * provided with the distribution, and (3) all advertising materials mentioning
- * features or use of this software display the following acknowledgement:
- * ``This product includes software developed by Paolo Abeni.'' 
- * The name of author may not be used to endorse or promote products derived 
- * from this software without specific prior written permission.
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ * modification, are permitted provided that: (1) source code
+ * distributions retain the above copyright notice and this paragraph
+ * in its entirety, and (2) distributions including binary code include
+ * the above copyright notice and this paragraph in its entirety in
+ * the documentation or other materials provided with the distribution.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND
+ * WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT
+ * LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE.
+ *
+ * Original code by Ola Martin Lykkja (ola.lykkja@q-free.com)
  */
 
 #ifdef HAVE_CONFIG_H
@@ -43,44 +41,37 @@
    Sub-part 1: Media-Independent Functionality
 */
 
-static const char *
-hex48_to_string(const u_char *bp)
-{
-	int i;
-	static char sz[6*3+2];
-	memset(sz, 0, sizeof(sz));
-	for (i=0; i<6; i++) {
-		if (i) strcat(sz,":");
-		sprintf(sz+strlen(sz), "%02x", bp[i]);
-	}
-	return sz;
-}
+static const struct tok msg_type_values[] = {
+	{   0, "CAM" },
+	{   1, "DENM" },
+	{ 101, "TPEGM" },
+	{ 102, "TSPDM" },
+	{ 103, "VPM" },
+	{ 104, "SRM" },
+	{ 105, "SLAM" },
+	{ 106, "ecoCAM" },
+	{ 107, "ITM" },
+	{ 150, "SA" },
+	{   0, NULL }
+};
 
 static void
 print_btp_body(const u_char *bp, u_int length)
 {
+	if (length <= 2) {
+		return;
+	}
+
 	// Assuming ItsDpuHeader
 	int version = bp[0];
 	int msg_type = bp[1];
-	const char *msg_type_str = "Unknown";
+	const char *msg_type_str = tok2str(msg_type_values, "unknown (%u)", msg_type);
 
-	switch (msg_type) {
-		case   0: msg_type_str = "CAM"; break;
-		case   1: msg_type_str = "DENM"; break;
-		case 101: msg_type_str = "TPEGM"; break;
-		case 102: msg_type_str = "TSPDM"; break;
-		case 103: msg_type_str = "VPM"; break;
-		case 104: msg_type_str = "SRM"; break;
-		case 105: msg_type_str = "SLAM"; break;
-		case 106: msg_type_str = "ecoCAM"; break;
-		case 107: msg_type_str = "ITM"; break;
-		case 150: msg_type_str = "SA"; break;
-	}
 	printf("; ItsPduHeader v:%d t:%d-%s", version, msg_type, msg_type_str);
 }
 
 static void
-print_btp(const u_char *bp, u_int length)
+print_btp(const u_char *bp)
 {
 	u_int16_t dest = EXTRACT_16BITS(bp+0);
 	u_int16_t src = EXTRACT_16BITS(bp+2);
@@ -88,7 +79,7 @@ print_btp(const u_char *bp, u_int length)
 }
 
 static void
-print_long_pos_vector(const char *type, const u_char *bp, u_int length)
+print_long_pos_vector(const u_char *bp)
 {
 	int i;
 	u_int32_t lat, lon;
@@ -114,7 +105,7 @@ print_long_pos_vector(const char *type, const u_char *bp, u_int length)
 void
 geonet_print(netdissect_options *ndo, const u_char *eth, const u_char *bp, u_int length)
 {
-	printf("GeoNet src:%s; ", hex48_to_string(eth+6));
+	printf("GeoNet src:%s; ", etheraddr_string(eth+6));
 
 	if (length >= 36) {
 		// Process Common Header
@@ -168,7 +159,7 @@ geonet_print(netdissect_options *ndo, const u_char *eth, const u_char *bp, u_int
 		printf("HT:%d-%d-%s ", hdr_type, hdr_subtype, hdr_type_txt);
 		printf("HopLim:%d ", hop_limit);
 		printf("Payload:%d ", payload_length);
-        	print_long_pos_vector("Sender", bp + 8, 36-8);
+        	print_long_pos_vector(bp + 8);
 
 		// Skip Common Header
 		length -= 36;
@@ -229,7 +220,7 @@ geonet_print(netdissect_options *ndo, const u_char *eth, const u_char *bp, u_int
 					break;
 				case 1:
 				case 2: /* BTP A/B */
-					print_btp(bp, length);
+					print_btp(bp);
 					length -= 4;
 					bp += 4;
 					print_btp_body(bp, length);
