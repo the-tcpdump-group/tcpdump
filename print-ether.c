@@ -85,6 +85,9 @@ const struct tok ethertype_values[] = {
     { ETHERTYPE_CFM,            "CFM" },
     { ETHERTYPE_LLDP,           "LLDP" },
     { ETHERTYPE_TIPC,           "TIPC"},    	
+    { ETHERTYPE_GEONET_OLD,     "GeoNet (old)"},
+    { ETHERTYPE_GEONET,         "GeoNet"},
+    { ETHERTYPE_CALM_FAST,      "CALM FAST"},
     { 0, NULL}
 };
 
@@ -416,6 +419,15 @@ ethertype_print(netdissect_options *ndo,
 	case ETHERTYPE_MS_NLB_HB:
 		msnlb_print(ndo, p);
 		return (1);
+
+        case ETHERTYPE_GEONET_OLD:
+        case ETHERTYPE_GEONET:
+                geonet_print(ndo, p-14, p, length);
+                return (1);
+
+        case ETHERTYPE_CALM_FAST:
+                calm_fast_print(ndo, p-14, p, length);
+                return (1);
 
 	case ETHERTYPE_LAT:
 	case ETHERTYPE_SCA:
