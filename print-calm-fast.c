@@ -42,13 +42,12 @@
 void
 calm_fast_print(netdissect_options *ndo, const u_char *eth, const u_char *bp, u_int length)
 {
-	printf("CALM FAST src:%s; ", etheraddr_string(eth+6));
-
 	int srcNwref = bp[0];
 	int dstNwref = bp[1];
 	length -= 2;
 	bp += 2;
 
+	printf("CALM FAST src:%s; ", etheraddr_string(eth+6));
 	printf("SrcNwref:%d; ", srcNwref);
 	printf("DstNwref:%d; ", dstNwref);
 

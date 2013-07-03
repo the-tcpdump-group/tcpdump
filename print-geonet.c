@@ -58,14 +58,18 @@ static const struct tok msg_type_values[] = {
 static void
 print_btp_body(const u_char *bp, u_int length)
 {
+	int version;
+	int msg_type;
+	const char *msg_type_str;
+
 	if (length <= 2) {
 		return;
 	}
 
 	// Assuming ItsDpuHeader
-	int version = bp[0];
-	int msg_type = bp[1];
-	const char *msg_type_str = tok2str(msg_type_values, "unknown (%u)", msg_type);
+	version = bp[0];
+	msg_type = bp[1];
+	msg_type_str = tok2str(msg_type_values, "unknown (%u)", msg_type);
 
 	printf("; ItsPduHeader v:%d t:%d-%s", version, msg_type, msg_type_str);
 }
