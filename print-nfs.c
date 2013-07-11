@@ -50,7 +50,7 @@ static const char rcsid[] _U_ =
 
 static void nfs_printfh(const u_int32_t *, const u_int);
 static int xid_map_enter(const struct sunrpc_msg *, const u_char *);
-static int32_t xid_map_find(const struct sunrpc_msg *, const u_char *,
+static int xid_map_find(const struct sunrpc_msg *, const u_char *,
 			    u_int32_t *, u_int32_t *);
 static void interp_reply(const struct sunrpc_msg *, u_int32_t, u_int32_t, int);
 static const u_int32_t *parse_post_op_attr(const u_int32_t *, int);
