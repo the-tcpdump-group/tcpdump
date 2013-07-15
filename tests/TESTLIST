@@ -134,3 +134,7 @@ of10_pf5240-vv	of10_pf5240.pcap	of10_pf5240-vv.out	-t -vv
 
 # GeoNetworking and CALM FAST tests
 geonet-calm-fast	geonet_and_calm_fast.pcap	geonet_and_calm_fast.out	-t -vv -n
+
+# M3UA tests
+m3ua	isup.pcap	isup.out	-t
+m3ua-vv	isup.pcap	isupvv.out	-t -vv

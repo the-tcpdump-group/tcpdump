@@ -327,6 +327,7 @@ extern void pptp_print(const u_char *);
 extern void dccp_print(const u_char *, const u_char *, u_int);
 extern void sctp_print(const u_char *, const u_char *, u_int);
 extern void forces_print(const u_char *, u_int);
+extern void print_m3ua(const u_char *, u_int);
 extern void mpls_print(const u_char *, u_int);
 extern void mpls_lsp_ping_print(const u_char *, u_int);
 extern void zephyr_print(const u_char *, int);
