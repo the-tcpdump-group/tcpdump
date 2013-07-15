@@ -638,6 +638,7 @@ gentltlv_print(register const u_char * pptr _U_, register u_int len,
 }
 
 #define RD_MIN 8
+
 int
 print_metailv(register const u_char * pptr, register u_int len,
 	      u_int16_t op_msk _U_, int indent)
@@ -705,51 +706,26 @@ trunc:
 	return -1;
 }
 
-/*
-*/
+
 int
 print_reddata(register const u_char * pptr, register u_int len,
 	      u_int16_t op_msk _U_, int indent _U_)
 {
 	u_int dlen;
+	char *ib = indent_pr(indent, 0);
 	u_int rlen;
-	int invtlv;
-	const struct forces_tlv *tlv = (struct forces_tlv *)pptr;
+	const struct forces_ilv *ilv = (struct forces_ilv *)pptr;
+	int invilv;
 
-	/*
-	 * redirect_print() has ensured that len (what remains in the
-	 * TLV) >= TLV_HDRL.
-	 */
 	dlen = len - TLV_HDRL;
-	printf("\n\t\t Redirect DATA\n");
-	if (dlen <= RD_MIN) {
-		printf("\n\t\ttruncated Redirect data: %d bytes missing! ",
-		       RD_MIN - dlen);
-		return -1;
-	}
-
 	rlen = dlen;
-	TCHECK(*tlv);
-	invtlv = tlv_valid(tlv, rlen);
+	printf("\n%s Redirect Data length %d \n", ib, rlen);
 
-	if (invtlv) {
-		printf("Redir data type 0x%x len %d\n", EXTRACT_16BITS(&tlv->type),
-		       EXTRACT_16BITS(&tlv->length));
-		return -1;
-	}
+	printf("\t\t[");
+	hex_print_with_offset("\n\t\t", pptr, rlen, 0);
+	printf("\n\t\t]");
 
-	/*
-	 * At this point, tlv_valid() has ensured that the TLV
-	 * length is large enough but not too large (it doesn't
-	 * go past the end of the containing TLV).
-	 */
-	rlen -= TLV_HDRL;
-	hex_print_with_offset("\n\t\t\t[", TLV_DATA(tlv), rlen, 0);
 	return 0;
-
-trunc:
-	fputs("[|forces]", stdout);
-	return -1;
 }
 
 int
@@ -788,12 +764,15 @@ redirect_print(register const u_char * pptr, register u_int len,
 		 * go past the end of the containing TLV).
 		 */
 		if (EXTRACT_16BITS(&tlv->type) == F_TLV_METD) {
-			print_metatlv((u_char *) TLV_DATA(tlv), EXTRACT_16BITS(&tlv->length), 0, indent);
+			print_metatlv((u_char *) TLV_DATA(tlv),
+				      EXTRACT_16BITS(&tlv->length), 0, indent);
 		} else if ((EXTRACT_16BITS(&tlv->type) == F_TLV_REDD)) {
-			print_reddata((u_char *) TLV_DATA(tlv), rlen, 0, indent);
+			print_reddata((u_char *) TLV_DATA(tlv),
+				      EXTRACT_16BITS(&tlv->length), 0, indent);
 		} else {
 			printf("Unknown REDIRECT TLV 0x%x len %d\n",
-			       EXTRACT_16BITS(&tlv->type), EXTRACT_16BITS(&tlv->length));
+			       EXTRACT_16BITS(&tlv->type),
+			       EXTRACT_16BITS(&tlv->length));
 		}
 
 		tlv = GO_NXT_TLV(tlv, rlen);
@@ -802,7 +781,8 @@ redirect_print(register const u_char * pptr, register u_int len,
 	if (rlen) {
 		printf
 		    ("\n\t\tMessy Redirect TLV header, type (0x%x)\n\t\texcess of %d Bytes ",
-		     EXTRACT_16BITS(&tlv->type), rlen - EXTRACT_16BITS(&tlv->length));
+		     EXTRACT_16BITS(&tlv->type),
+		     rlen - EXTRACT_16BITS(&tlv->length));
 		return -1;
 	}
 
