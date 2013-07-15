@@ -657,8 +657,10 @@ print_metailv(register const u_char * pptr, register u_int len,
 	TCHECK(*ilv);
 	printf("%sMetaID 0x%x length %d\n", ib, EXTRACT_32BITS(&ilv->type),
 	       EXTRACT_32BITS(&ilv->length));
-	hex_print_with_offset("\t\t[", ILV_DATA(ilv), rlen, 0);
-	printf(" ]\n");
+	if (vflag >= 3) {
+		hex_print_with_offset("\t\t[", ILV_DATA(ilv), rlen, 0);
+		printf(" ]\n");
+	}
 	return 0;
 
 trunc:
@@ -721,9 +723,11 @@ print_reddata(register const u_char * pptr, register u_int len,
 	rlen = dlen;
 	printf("\n%s Redirect Data length %d \n", ib, rlen);
 
-	printf("\t\t[");
-	hex_print_with_offset("\n\t\t", pptr, rlen, 0);
-	printf("\n\t\t]");
+	if (vflag >= 3) {
+		printf("\t\t[");
+		hex_print_with_offset("\n\t\t", pptr, rlen, 0);
+		printf("\n\t\t]");
+	}
 
 	return 0;
 }
