@@ -116,6 +116,7 @@ sdatailv_print(register const u_char * pptr, register u_int len,
 	rlen = len;
 	indent += 1;
 	while (rlen != 0) {
+		//printf("Jamal - outstanding length <%d>\n", rlen);
 		char *ib = indent_pr(indent, 1);
 		register const u_char *tdp = (u_char *) ILV_DATA(ilv);
 		TCHECK(*ilv);
@@ -641,8 +642,8 @@ int
 print_metailv(register const u_char * pptr, register u_int len,
 	      u_int16_t op_msk _U_, int indent)
 {
-	u_int dlen;
 	u_int rlen;
+	u_int plen;
 	char *ib = indent_pr(indent, 0);
 	/* XXX: check header length */
 	const struct forces_ilv *ilv = (struct forces_ilv *)pptr;
@@ -651,12 +652,12 @@ print_metailv(register const u_char * pptr, register u_int len,
 	 * print_metatlv() has ensured that len (what remains in the
 	 * ILV) >= ILV_HDRL.
 	 */
-	dlen = len - ILV_HDRL;
-	rlen = dlen;
+	rlen = EXTRACT_32BITS(&ilv->length) - ILV_HDRL;
 	TCHECK(*ilv);
-	printf("\n%sMetaID 0x%x length %d\n", ib, EXTRACT_32BITS(&ilv->type),
+	printf("%sMetaID 0x%x length %d\n", ib, EXTRACT_32BITS(&ilv->type),
 	       EXTRACT_32BITS(&ilv->length));
-	hex_print_with_offset("\n\t\t\t\t[", ILV_DATA(ilv), rlen, 0);
+	hex_print_with_offset("\t\t[", ILV_DATA(ilv), rlen, 0);
+	printf(" ]\n");
 	return 0;
 
 trunc:
@@ -680,12 +681,13 @@ print_metatlv(register const u_char * pptr, register u_int len,
 	 */
 	dlen = len - TLV_HDRL;
 	rlen = dlen;
-	printf("\n%s METADATA\n", ib);
+	printf("\n%s METADATA length %d \n", ib, rlen);
 	while (rlen != 0) {
 		TCHECK(*ilv);
 		invilv = ilv_valid(ilv, rlen);
-		if (invilv)
+		if (invilv) {
 			break;
+		}
 
 		/*
 		 * At this point, ilv_valid() has ensured that the ILV
@@ -693,7 +695,6 @@ print_metatlv(register const u_char * pptr, register u_int len,
 		 * go past the end of the containing TLV).
 		 */
 		print_metailv((u_char *) ilv, rlen, 0, indent + 1);
-
 		ilv = GO_NXT_ILV(ilv, rlen);
 	}
 
@@ -776,8 +777,10 @@ redirect_print(register const u_char * pptr, register u_int len,
 	while (rlen != 0) {
 		TCHECK(*tlv);
 		invtlv = tlv_valid(tlv, rlen);
-		if (invtlv)
+		if (invtlv) {
+			printf("Bad Redirect data\n");
 			break;
+		}
 
 		/*
 		 * At this point, tlv_valid() has ensured that the TLV
@@ -785,7 +788,7 @@ redirect_print(register const u_char * pptr, register u_int len,
 		 * go past the end of the containing TLV).
 		 */
 		if (EXTRACT_16BITS(&tlv->type) == F_TLV_METD) {
-			print_metatlv((u_char *) TLV_DATA(tlv), rlen, 0, indent);
+			print_metatlv((u_char *) TLV_DATA(tlv), EXTRACT_16BITS(&tlv->length), 0, indent);
 		} else if ((EXTRACT_16BITS(&tlv->type) == F_TLV_REDD)) {
 			print_reddata((u_char *) TLV_DATA(tlv), rlen, 0, indent);
 		} else {
