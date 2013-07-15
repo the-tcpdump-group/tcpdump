@@ -212,6 +212,8 @@ trunc:
 	return -1;
 }
 
+#define PTH_DESC_SIZE 12
+
 int
 pdatacnt_print(register const u_char * pptr, register u_int len,
 	       u_int16_t IDcnt, u_int16_t op_msk, int indent)
@@ -226,10 +228,58 @@ pdatacnt_print(register const u_char * pptr, register u_int len,
 			goto trunc;
 		id = EXTRACT_32BITS(pptr);
 		if (vflag >= 3)
-			printf("%s  ID#%02u: %d\n", ib, i + 1, id);
+			printf("%sID#%02u: %d\n", ib, i + 1, id);
 		len -= 4;
 		pptr += 4;
 	}
+
+	if ((op_msk & B_TRNG) || (op_msk & B_KEYIN)) {
+		if (len < PTH_DESC_SIZE) {
+			printf("pathlength %d with key/range too short %d\n",
+			       len, PTH_DESC_SIZE);
+			return -1;
+		}
+
+		if (op_msk & B_TRNG) {
+			u_int32_t starti, endi;
+			pptr += sizeof(struct forces_tlv);
+			len -= sizeof(struct forces_tlv);
+
+			starti = EXTRACT_32BITS(pptr);
+			pptr += 4;
+			len -= 4;
+
+			endi = EXTRACT_32BITS(pptr);
+			pptr += 4;
+			len -= 4;
+
+			if (vflag >= 3)
+				printf("%sTable range: [%d,%d]\n", ib, starti, endi);
+		}
+
+		if (op_msk & B_KEYIN) {
+			struct forces_tlv *keytlv;
+			u_int16_t tll;
+			u_int32_t keyid = EXTRACT_32BITS(pptr);
+			/* skip keyid */
+			pptr += 4;
+			len -= 4;
+			keytlv = (struct forces_tlv *)pptr;
+			/* skip header */
+			pptr += sizeof(struct forces_tlv);
+			len -= sizeof(struct forces_tlv);
+			/* skip key content */
+			tll = EXTRACT_16BITS(&keytlv->length) - TLV_HDRL;
+			pptr += tll;
+			len -= tll;
+			if (len < 0) {
+				printf("Key content too short\n");
+				return -1;
+			}
+		}
+
+	}
+
 	if (len) {
 		const struct forces_tlv *pdtlv = (struct forces_tlv *)pptr;
 		u_int16_t type;
@@ -328,6 +378,12 @@ pdata_print(register const u_char * pptr, register u_int len,
 	if (EXTRACT_16BITS(&pdh->pflags) & F_SELKEY) {
 		op_msk |= B_KEYIN;
 	}
+
+	/* Table GET Range operation */
+	if (EXTRACT_16BITS(&pdh->pflags) & F_SELTABRANGE) {
+		op_msk |= B_TRNG;
+	}
+
 	pptr += sizeof(struct pathdata_h);
 	len -= sizeof(struct pathdata_h);
 	idcnt = EXTRACT_16BITS(&pdh->pIDcnt);
@@ -339,6 +395,12 @@ pdata_print(register const u_char * pptr, register u_int len,
 		printf("]\n");
 		return -1;
 	}
+
+	if ((op_msk & B_TRNG) && (op_msk & B_KEYIN)) {
+		printf("\t\t\tIllegal to have both Table ranges and keys\n");
+		return -1;
+	}
+
 	more_pd = pdatacnt_print(pptr, len, idcnt, op_msk, indent);
 	if (more_pd > 0) {
 		int consumed = len - more_pd;

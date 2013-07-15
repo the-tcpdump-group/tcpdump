@@ -295,6 +295,7 @@ struct pathdata_h {
 #define	B_SPARD 	0x2
 #define B_RESTV		0x4
 #define B_KEYIN		0x8
+#define B_TRNG		0x20
 
 static const struct optlv_h OPTLV_msg[F_OP_MAX + 1] = {
 	/* F_OP_RSV */ {ZERO_TTLV, 0, "Invalid OPTLV", invoptlv_print},
@@ -379,6 +380,9 @@ static inline int op_valid(u_int16_t op, u_int16_t mask)
 #define F_TLV_REST	0x0114
 #define F_TLV_METD	0x0115
 #define F_TLV_REDD	0x0116
+#define F_TLV_TRNG	0x0117
+
+
 #define F_TLV_VNST	0x8000
 
 static const struct tok ForCES_TLV[] = {
@@ -592,6 +596,7 @@ int pdata_print(register const u_char * pptr, register u_int len,
 int prestlv_print(register const u_char * pptr, register u_int len,
 		  u_int16_t op_msk, int indent);
 #define F_SELKEY 1
+#define F_SELTABRANGE 2
 
 struct res_val {
 	u_int8_t result;
