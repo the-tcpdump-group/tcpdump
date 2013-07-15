@@ -295,6 +295,7 @@ struct pathdata_h {
 #define	B_SPARD 	0x2
 #define B_RESTV		0x4
 #define B_KEYIN		0x8
+#define B_APPND		0x10
 #define B_TRNG		0x20
 
 static const struct optlv_h OPTLV_msg[F_OP_MAX + 1] = {
@@ -597,6 +598,7 @@ int prestlv_print(register const u_char * pptr, register u_int len,
 		  u_int16_t op_msk, int indent);
 #define F_SELKEY 1
 #define F_SELTABRANGE 2
+#define F_TABAPPEND 4
 
 struct res_val {
 	u_int8_t result;

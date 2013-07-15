@@ -222,6 +222,9 @@ pdatacnt_print(register const u_char * pptr, register u_int len,
 	u_int32_t id;
 	char *ib = indent_pr(indent, 0);
 
+	if ((op_msk & B_APPND) && vflag >= 3) {
+		printf("%sTABLE APPEND\n", ib);
+	}
 	for (i = 0; i < IDcnt; i++) {
 		TCHECK2(*pptr, 4);
 		if (len < 4)
@@ -382,6 +385,10 @@ pdata_print(register const u_char * pptr, register u_int len,
 	/* Table GET Range operation */
 	if (EXTRACT_16BITS(&pdh->pflags) & F_SELTABRANGE) {
 		op_msk |= B_TRNG;
+	}
+	/* Table SET append operation */
+	if (EXTRACT_16BITS(&pdh->pflags) & F_TABAPPEND) {
+		op_msk |= B_APPND;
 	}
 
 	pptr += sizeof(struct pathdata_h);
