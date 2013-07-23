@@ -134,7 +134,6 @@ HDR = \
 	ethertype.h \
 	extract.h \
 	fddi.h \
-	forces.h \
 	gmpls.h \
 	gmt2local.h \
 	icmp6.h \
