@@ -540,7 +540,7 @@ ataddr_string(u_short atnet, u_char athost)
 {
 	register struct hnamemem *tp, *tp2;
 	register int i = (atnet << 8) | athost;
-	char nambuf[256];
+	char nambuf[256+1];
 	static int first = 1;
 	FILE *fp;
 
