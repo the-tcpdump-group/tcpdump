@@ -33,7 +33,7 @@ if test "$ac_cv___attribute__" = "yes"; then
 		AC_C___ATTRIBUTE___FORMAT_FUNCTION_POINTER
 	fi
 fi
-AC_CHECK_HEADERS(fcntl.h rpc/rpc.h rpc/rpcent.h netdnet/dnetdb.h)
+AC_CHECK_HEADERS(fcntl.h rpc/rpc.h rpc/rpcent.h netdnet/dnetdb.h linux/netfilter/nfnetlink_log.h)
 AC_CHECK_HEADERS(net/pfvar.h, , , [#include <sys/types.h>
 #include <sys/socket.h>
 #include <net/if.h>])
