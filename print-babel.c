@@ -88,10 +88,10 @@ babel_print(const u_char *cp, u_int length) {
 /* sub-TLVs */
 #define MESSAGE_SUB_PAD1 0
 #define MESSAGE_SUB_PADN 1
-#define MESSAGE_SUB_CHANINFO 2
+#define MESSAGE_SUB_DIVERSITY 2
 
-/* ChanInfo sub-TLV channel codes */
-static const struct tok chaninfo_str[] = {
+/* Diversity sub-TLV channel codes */
+static const struct tok diversity_str[] = {
     { 0,   "reserved" },
     { 255, "all"      },
     { 0, NULL }
@@ -220,7 +220,7 @@ network_address(int ae, const unsigned char *a, unsigned int len,
  *
  * o Type 0 stands for Pad1 sub-TLV with the same encoding as the Pad1 TLV.
  * o Type 1 stands for PadN sub-TLV with the same encoding as the PadN TLV.
- * o Type 2 stands for ChanInfo sub-TLV, which propagates diversity routing
+ * o Type 2 stands for Diversity sub-TLV, which propagates diversity routing
  *   data. Its body is a variable-length sequence of 8-bit unsigned integers,
  *   each representing per-hop number of interferring radio channel for the
  *   prefix. Channel 0 is invalid and must not be used in the sub-TLV, channel
@@ -228,7 +228,7 @@ network_address(int ae, const unsigned char *a, unsigned int len,
  *
  * Sub-TLV types 0 and 1 are valid for any TLV type, whether sub-TLV type 2 is
  * only valid for TLV type 8 (Update). Note that within an Update TLV a missing
- * ChanInfo sub-TLV is not the same as a ChanInfo sub-TLV with an empty body.
+ * Diversity sub-TLV is not the same as a Diversity sub-TLV with an empty body.
  * The former would mean a lack of any claims about the interference, and the
  * latter would state that interference is definitely absent. */
 static void
@@ -253,15 +253,15 @@ subtlvs_print(const u_char *cp, const u_char *ep, const uint8_t tlv_type) {
             printf(" sub-padn");
             cp += sublen;
             break;
-        case MESSAGE_SUB_CHANINFO:
-            printf(" sub-chaninfo");
+        case MESSAGE_SUB_DIVERSITY:
+            printf(" sub-diversity");
             if (sublen == 0) {
                 printf(" empty");
                 break;
             }
             sep = " ";
             while(sublen--) {
-                printf("%s%s", sep, tok2str(chaninfo_str, "%u", *cp++));
+                printf("%s%s", sep, tok2str(diversity_str, "%u", *cp++));
                 sep = "-";
             }
             if(tlv_type != MESSAGE_UPDATE)
