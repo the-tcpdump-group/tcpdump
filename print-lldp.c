@@ -608,7 +608,7 @@ static const struct tok lldp_evb_mode_values[]={
 #define LLDP_PRIVATE_8021_SUBTYPE_EVB_LENGTH                      9
 #define LLDP_PRIVATE_8021_SUBTYPE_CDCP_MIN_LENGTH                 8
 
-void print_ets_priority_assignment_table(const u_char *ptr)
+static void print_ets_priority_assignment_table(const u_char *ptr)
 {
     printf("\n\t    Priority Assignment Table");
     printf("\n\t     Priority : 0   1   2   3   4   5   6   7");
@@ -617,7 +617,7 @@ void print_ets_priority_assignment_table(const u_char *ptr)
             ptr[2]&0x0f,ptr[3]>>4,ptr[3]&0x0f);
 }
 
-void print_tc_bandwidth_table(const u_char *ptr)
+static void print_tc_bandwidth_table(const u_char *ptr)
 {
     printf("\n\t    TC Bandwidth Table");
     printf("\n\t     TC%%   : 0   1   2   3   4   5   6   7");
@@ -625,7 +625,7 @@ void print_tc_bandwidth_table(const u_char *ptr)
              ptr[0],ptr[1],ptr[2],ptr[3],ptr[4],ptr[5],ptr[6],ptr[7]);
 }
 
-void print_tsa_assignment_table(const u_char *ptr)
+static void print_tsa_assignment_table(const u_char *ptr)
 {
     printf("\n\t    TSA Assignment Table");
     printf("\n\t     Traffic Class: 0   1   2   3   4   5   6   7");
