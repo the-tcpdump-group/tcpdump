@@ -82,6 +82,14 @@ spb	            spb.pcap	            spb.out -t
 # SPB BPDUv4 tests
 spb_bpduv4      spb_bpduv4.pcap       spb_bpduv4.out -t
 
+# DCB Tests
+dcb_ets         dcb_ets.pcap          dcb_ets.out   -t -vv
+dcb_pfc         dcb_pfc.pcap          dcb_pfc.out   -t -vv
+dcb_qcn         dcb_qcn.pcap          dcb_qcn.out   -t -vv
+
+# EVB tests
+evb             evb.pcap              evb.out       -t -vv
+
 # RIP tests
 ripv1v2         ripv1v2.pcap            ripv1v2.out     -t -v
 ripv2_auth      ripv2_auth.pcap         ripv2_auth.out  -t -v

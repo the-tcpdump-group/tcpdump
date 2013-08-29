@@ -143,12 +143,26 @@ static const struct tok lldp_cap_values[] = {
 #define LLDP_PRIVATE_8021_SUBTYPE_PROTOCOL_VLAN_ID	2
 #define LLDP_PRIVATE_8021_SUBTYPE_VLAN_NAME		3
 #define LLDP_PRIVATE_8021_SUBTYPE_PROTOCOL_IDENTITY	4
+#define LLDP_PRIVATE_8021_SUBTYPE_CONGESTION_NOTIFICATION 8
+#define LLDP_PRIVATE_8021_SUBTYPE_ETS_CONFIGURATION       9
+#define LLDP_PRIVATE_8021_SUBTYPE_ETS_RECOMMENDATION     10
+#define LLDP_PRIVATE_8021_SUBTYPE_PFC_CONFIGURATION      11
+#define LLDP_PRIVATE_8021_SUBTYPE_APPLICATION_PRIORITY   12
+#define LLDP_PRIVATE_8021_SUBTYPE_EVB                    13
+#define LLDP_PRIVATE_8021_SUBTYPE_CDCP 			 14
 
 static const struct tok lldp_8021_subtype_values[] = {
     { LLDP_PRIVATE_8021_SUBTYPE_PORT_VLAN_ID, "Port VLAN Id"},
     { LLDP_PRIVATE_8021_SUBTYPE_PROTOCOL_VLAN_ID, "Port and Protocol VLAN ID"},
     { LLDP_PRIVATE_8021_SUBTYPE_VLAN_NAME, "VLAN name"},
     { LLDP_PRIVATE_8021_SUBTYPE_PROTOCOL_IDENTITY, "Protocol Identity"},
+    { LLDP_PRIVATE_8021_SUBTYPE_CONGESTION_NOTIFICATION, "Congestion Notification"},
+    { LLDP_PRIVATE_8021_SUBTYPE_ETS_CONFIGURATION, "ETS Configuration"},
+    { LLDP_PRIVATE_8021_SUBTYPE_ETS_RECOMMENDATION, "ETS Recommendation"},
+    { LLDP_PRIVATE_8021_SUBTYPE_PFC_CONFIGURATION, "Priority Flow Control Configuration"},
+    { LLDP_PRIVATE_8021_SUBTYPE_APPLICATION_PRIORITY, "Application Priority"},
+    { LLDP_PRIVATE_8021_SUBTYPE_EVB, "EVB"},
+    { LLDP_PRIVATE_8021_SUBTYPE_CDCP,"CDCP"},
     { 0, NULL}
 };
 
@@ -573,6 +587,52 @@ static const struct tok lldp_intf_numb_subtype_values[] = {
 
 #define LLDP_INTF_NUM_LEN                  5
 
+#define LLDP_EVB_MODE_NOT_SUPPORTED	0
+#define LLDP_EVB_MODE_EVB_BRIDGE	1
+#define LLDP_EVB_MODE_EVB_STATION	2
+#define LLDP_EVB_MODE_RESERVED		3
+
+static const struct tok lldp_evb_mode_values[]={
+    { LLDP_EVB_MODE_NOT_SUPPORTED, "Not Supported"},
+    { LLDP_EVB_MODE_EVB_BRIDGE, "EVB Bridge"},
+    { LLDP_EVB_MODE_EVB_STATION, "EVB Staion"},
+    { LLDP_EVB_MODE_RESERVED, "Reserved for future Standardization"},
+};
+
+#define NO_OF_BITS 8
+#define LLDP_PRIVATE_8021_SUBTYPE_CONGESTION_NOTIFICATION_LENGTH  6
+#define LLDP_PRIVATE_8021_SUBTYPE_ETS_CONFIGURATION_LENGTH       25
+#define LLDP_PRIVATE_8021_SUBTYPE_ETS_RECOMMENDATION_LENGTH      25
+#define LLDP_PRIVATE_8021_SUBTYPE_PFC_CONFIGURATION_LENGTH        6
+#define LLDP_PRIVATE_8021_SUBTYPE_APPLICATION_PRIORITY_MIN_LENGTH 5
+#define LLDP_PRIVATE_8021_SUBTYPE_EVB_LENGTH                      9
+#define LLDP_PRIVATE_8021_SUBTYPE_CDCP_MIN_LENGTH                 8
+
+void print_ets_priority_assignment_table(const u_char *ptr)
+{
+    printf("\n\t    Priority Assignment Table");
+    printf("\n\t     Priority : 0   1   2   3   4   5   6   7");
+    printf("\n\t     Value    : %-3d %-3d %-3d %-3d %-3d %-3d %-3d %-3d",
+            ptr[0]>>4,ptr[0]&0x0f,ptr[1]>>4,ptr[1]&0x0f,ptr[2]>>4,
+            ptr[2]&0x0f,ptr[3]>>4,ptr[3]&0x0f);
+}
+
+void print_tc_bandwidth_table(const u_char *ptr)
+{
+    printf("\n\t    TC Bandwidth Table");
+    printf("\n\t     TC%%   : 0   1   2   3   4   5   6   7");
+    printf("\n\t     Value : %-3d %-3d %-3d %-3d %-3d %-3d %-3d %-3d",
+             ptr[0],ptr[1],ptr[2],ptr[3],ptr[4],ptr[5],ptr[6],ptr[7]);
+}
+
+void print_tsa_assignment_table(const u_char *ptr)
+{
+    printf("\n\t    TSA Assignment Table");
+    printf("\n\t     Traffic Class: 0   1   2   3   4   5   6   7");
+    printf("\n\t     Value        : %-3d %-3d %-3d %-3d %-3d %-3d %-3d %-3d", 
+             ptr[0],ptr[1],ptr[2],ptr[3],ptr[4],ptr[5],ptr[6],ptr[7]);
+}
+
 /*
  * Print IEEE 802.1 private extensions. (802.1AB annex E)
  */
@@ -581,6 +641,8 @@ lldp_private_8021_print(const u_char *tptr, u_int tlv_len)
 {
     int subtype, hexdump = FALSE;
     u_int sublen;
+    u_int tval;
+    u_int8_t i;
 
     if (tlv_len < 4) {
         return hexdump;
@@ -634,6 +696,136 @@ lldp_private_8021_print(const u_char *tptr, u_int tlv_len)
         }
         printf("\n\t    protocol identity: ");
         safeputs((const char *)tptr+5, sublen);
+        break;
+    case LLDP_PRIVATE_8021_SUBTYPE_CONGESTION_NOTIFICATION:
+        if(tlv_len<LLDP_PRIVATE_8021_SUBTYPE_CONGESTION_NOTIFICATION_LENGTH){
+        	return hexdump;
+        }
+        tval=*(tptr+4);
+        printf("\n\t    Pre-Priority CNPV Indicator");
+        printf("\n\t     Priority : 0  1  2  3  4  5  6  7");        
+        printf("\n\t     Value    : ");
+        for(i=0;i<NO_OF_BITS;i++)
+            printf("%-2d ",(tval>>i)&0x01);
+        tval=*(tptr+5);
+        printf("\n\t    Pre-Priority Ready Indicator");
+        printf("\n\t     Priority : 0  1  2  3  4  5  6  7");
+        printf("\n\t     Value    : ");
+        for(i=0;i<NO_OF_BITS;i++)
+            printf("%-2d ",(tval>>i)&0x01);
+        break;
+
+    case LLDP_PRIVATE_8021_SUBTYPE_ETS_CONFIGURATION: 
+        if(tlv_len<LLDP_PRIVATE_8021_SUBTYPE_ETS_CONFIGURATION_LENGTH) {
+            return hexdump;
+        }
+        tval=*(tptr+4);
+        printf("\n\t    Willing:%d, CBS:%d, RES:%d, Max TCs:%d",
+        	tval>>7, (tval>>6) & 0x02, (tval>>3) & 0x07, tval & 0x07);
+		
+        /*Print Priority Assignment Table*/
+        print_ets_priority_assignment_table(tptr+5);
+	
+        /*Print TC Bandwidth Table*/
+        print_tc_bandwidth_table(tptr+9);
+		
+        /* Print TSA Assignment Table */
+        print_tsa_assignment_table(tptr+17);
+		
+        break;
+
+    case LLDP_PRIVATE_8021_SUBTYPE_ETS_RECOMMENDATION:
+        if(tlv_len<LLDP_PRIVATE_8021_SUBTYPE_ETS_RECOMMENDATION_LENGTH) {
+        	return hexdump;
+        }       
+        printf("\n\t    RES: %d",*(tptr+4));
+        /*Print Priority Assignment Table */ 
+        print_ets_priority_assignment_table(tptr+5);
+        /*Print TC Bandwidth Table */
+        print_tc_bandwidth_table(tptr+9);
+        /* Print TSA Assignment Table */
+        print_tsa_assignment_table(tptr+17);
+        break;
+
+    case LLDP_PRIVATE_8021_SUBTYPE_PFC_CONFIGURATION:
+        if(tlv_len<LLDP_PRIVATE_8021_SUBTYPE_PFC_CONFIGURATION_LENGTH) {
+            return hexdump;
+        }
+        tval=*(tptr+4);
+        printf("\n\t    Willing: %d, MBC: %d, RES: %d, PFC cap:%d ",
+        	tval>>7, (tval>>6)&0x01, (tval>>4)&0x03, (tval & 0x0f));
+        printf("\n\t    PFC Enable");
+        tval=*(tptr+5);
+        printf("\n\t     Priority : 0  1  2  3  4  5  6  7");
+        printf("\n\t     Value    : ");
+        for(i=0;i<NO_OF_BITS;i++)
+            printf("%-2d ",(tval>>i)&0x01);
+        break;
+
+    case LLDP_PRIVATE_8021_SUBTYPE_APPLICATION_PRIORITY:
+        if(tlv_len<LLDP_PRIVATE_8021_SUBTYPE_APPLICATION_PRIORITY_MIN_LENGTH) {
+            return hexdump;
+        }
+        printf("\n\t    RES: %d",*(tptr+4));
+        if(tlv_len<=LLDP_PRIVATE_8021_SUBTYPE_APPLICATION_PRIORITY_MIN_LENGTH){
+        	return hexdump;
+        }
+        /*  Length of Application Priority Table */
+        sublen=tlv_len-5; 
+        if(sublen%3!=0){
+        	return hexdump;
+        }
+        i=0;
+        printf("\n\t    Application Priority Table");
+        while(i<sublen) {
+        	tval=*(tptr+i+5);
+        	printf("\n\t      Priority: %d, RES: %d, Sel: %d",
+        		 tval>>5, (tval>>3)&0x03, (tval & 0x07));
+        	printf("Protocol ID: %d",EXTRACT_16BITS(tptr+i+5));
+        	i=i+3;
+        }
+        break;
+    case LLDP_PRIVATE_8021_SUBTYPE_EVB:
+        if(tlv_len<LLDP_PRIVATE_8021_SUBTYPE_EVB_LENGTH){
+        	return hexdump;
+        }
+        printf("\n\t    EVB Bridge Status");
+        tval=*(tptr+4);
+        printf("\n\t      RES: %d, BGID: %d, RRCAP: %d, RRCTR: %d",
+        	tval>>3, (tval>>2)&0x01, (tval>>1)&0x01,tval&0x01);
+        printf("\n\t    EVB Station Status");
+        tval=*(tptr+5);
+        printf("\n\t      RES: %d, SGID: %d, RRREQ: %d,RRSTAT: %d",
+        	tval>>4, (tval>>3)&0x01, (tval>>2)&0x01, tval&0x03);
+        tval=*(tptr+6);
+        printf("\n\t    R: %d, RTE: %d, ",tval>>5, tval&0x1f);
+        tval=*(tptr+7);
+        printf("EVB Mode: %s [%d]",
+        	tok2str(lldp_evb_mode_values,"unknown",tval>>6),tval>>6);
+        printf("\n\t    ROL: %d, RWD: %d, ", (tval>>5)&0x01,tval&0x1f);
+        tval=*(tptr+8);
+        printf("RES: %d, ROL: %d, RKA: %d", tval>>6,(tval>>5)&0x01, tval&0x1f);
+        break;
+
+    case LLDP_PRIVATE_8021_SUBTYPE_CDCP:
+        if(tlv_len<LLDP_PRIVATE_8021_SUBTYPE_CDCP_MIN_LENGTH){
+        	return hexdump;
+        }
+        tval=*(tptr+4);
+        printf("\n\t    Role: %d, RES: %d, Scomp: %d ",
+        	tval>>7, (tval>>4)&0x07,(tval>>3)&0x01);
+        printf("ChnCap: %d",EXTRACT_16BITS(tptr+6)&0x0fff);
+        sublen=tlv_len-8;
+        if(sublen%3!=0) {
+        	return hexdump;
+        }	
+        i=0;
+        while(i<sublen) {
+        	tval=EXTRACT_24BITS(tptr+i+8);
+        	printf("\n\t    SCID: %d, SVID: %d",
+        		tval>>12, tval&0x000fff);
+        	i=i+3;
+        }
         break;
 
     default:
