@@ -343,15 +343,8 @@ void sctp_print(const u_char *bp,        /* beginning of sctp packet */
 	    break;
 	  }
 	case SCTP_HEARTBEAT_REQUEST :
-	  {
-	    const struct sctpHBsender *hb;
-
-	    hb=(const struct sctpHBsender*)chunkDescPtr;
-
-	    printf("[HB REQ] ");
-
-	    break;
-	  }
+	  printf("[HB REQ] ");
+	  break;
 	case SCTP_HEARTBEAT_ACK :
 	  printf("[HB ACK] ");
 	  break;
