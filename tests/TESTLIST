@@ -20,9 +20,9 @@ isakmp2 isakmp-pointer-loop.pcap    isakmp2.out -t
 isakmp3 isakmp-identification-segfault.pcap isakmp3.out -t -v
 isakmp4 isakmp4500.pcap             isakmp4.out -t -E "file esp-secrets.txt"
 
-# LMP tests (what is it?)
-# fails right now.
-#lmp     lmp.pcap                    lmp.out -t -v -v
+# Link Management Protocol tests
+lmp		lmp.pcap		lmp.out -t -T lmp
+lmp-v		lmp.pcap		lmp-v.out -t -T lmp -v
 
 # MPLS tests
 mpls-ldp-hello	mpls-ldp-hello.pcap	mpls-ldp-hello.out -t -v

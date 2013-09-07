@@ -485,6 +485,10 @@ udp_print(register const u_char *bp, u_int length,
 			udpipaddr_print(ip, sport, dport);
 			pgm_print(cp, length, bp2);
 			break;
+		case PT_LMP:
+			udpipaddr_print(ip, sport, dport);
+			lmp_print(cp, length);
+			break;
 		}
 		return;
 	}
