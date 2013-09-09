@@ -8,6 +8,13 @@
  *
  * [OF10] http://www.openflow.org/documents/openflow-spec-v1.0.0.pdf
  *
+ * Decoding of Ethernet frames nested in OFPT_PACKET_IN and OFPT_PACKET_OUT
+ * messages is done only when the verbosity level set by command-line argument
+ * is "-vvv" or higher. In that case the verbosity level is temporarily
+ * decremented by 3 during the nested frame decoding. For example, running
+ * tcpdump with "-vvvv" will do full decoding of OpenFlow and "-v" decoding of
+ * the nested frames.
+ *
  *
  * Copyright (c) 2013 The TCPDUMP project
  * All rights reserved.
@@ -636,6 +643,26 @@ corrupt: /* skip the undersized data */
 	printf(" (corrupt)");
 	TCHECK2(*cp, len);
 	return cp + len;
+trunc:
+	printf(" [|openflow]");
+	return ep;
+}
+
+static const u_char *
+of10_packet_data_print(const u_char *cp, const u_char *ep, const u_int len) {
+	if (len == 0)
+		return cp;
+	/* data */
+	printf("\n\t data (%u octets)", len);
+	if (vflag < 3)
+		return cp + len;
+	TCHECK2(*cp, len);
+	vflag -= 3;
+	printf(", frame decoding below\n");
+	ether_print(gndo, cp, len, snapend - cp, NULL, NULL);
+	vflag += 3;
+	return cp + len;
+
 trunc:
 	printf(" [|openflow]");
 	return ep;
@@ -1714,7 +1741,7 @@ of10_packet_out_print(const u_char *cp, const u_char *ep, const u_int len) {
 	if (ep == (cp = of10_actions_print("\n\t ", cp, ep, actions_len)))
 		return ep; /* end of snapshot */
 	/* data */
-	return of10_data_print(cp, ep, len - OF_PACKET_OUT_LEN - actions_len);
+	return of10_packet_data_print(cp, ep, len - OF_PACKET_OUT_LEN - actions_len);
 
 corrupt: /* skip the rest of the message body */
 	printf(" (corrupt)");
@@ -1749,7 +1776,7 @@ of10_packet_in_print(const u_char *cp, const u_char *ep, const u_int len) {
 	cp += 1;
 	/* data */
 	/* 2 mock octets count in OF_PACKET_IN_LEN but not in len */
-	return of10_data_print(cp, ep, len - (OF_PACKET_IN_LEN - 2));
+	return of10_packet_data_print(cp, ep, len - (OF_PACKET_IN_LEN - 2));
 
 trunc:
 	printf(" [|openflow]");

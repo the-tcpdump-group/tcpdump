@@ -884,15 +884,14 @@ IP (tos 0x0, ttl 64, id 53604, offset 0, flags [DF], proto TCP (6), length 189)
     10.0.0.81.56068 > 10.0.0.20.6633: Flags [P.], cksum 0x03e7 (correct), seq 10213:10350, ack 4641, win 1035, options [nop,nop,TS val 3 ecr 47837000], length 137: OpenFlow
 	version 1.0, type PACKET_IN, length 137, xid 0x00000000
 	 buffer_id NONE, total_len 119, in_port 1, reason ACTION
-	 data (119 octets)
-	  0x0000:  0180 c200 0000 089e 0162 d5f4 0069 4242  .........b...iBB
-	  0x0010:  0300 0003 027e 8000 089e 0162 d5f4 0000  .....~.....b....
-	  0x0020:  0000 8000 089e 0162 d5f4 8034 0000 1400  .......b...4....
-	  0x0030:  0200 0f00 0000 4000 7069 6361 3800 0000  ......@.pica8...
-	  0x0040:  0000 0000 0000 0000 0000 0000 0000 0000  ................
-	  0x0050:  0000 0000 0000 0000 0000 ac36 177f 5028  ...........6..P(
-	  0x0060:  3cd4 b838 21d8 ab26 de62 0000 0000 8000  <..8!..&.b......
-	  0x0070:  089e 0162 d5f4 14                        ...b...
+	 data (119 octets), frame decoding below
+STP 802.1s, Rapid STP, CIST Flags [Proposal, Learn, Forward, Agreement], length 102
+	port-role Designated, CIST root-id 8000.08:9e:01:62:d5:f4, CIST ext-pathcost 0 
+	CIST regional-root-id 8000.08:9e:01:62:d5:f4, CIST port-id 8034, 
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	v3len 64, MCID Name pica8, rev 0, 
+		digest ac36177f50283cd4b83821d8ab26de62, CIST int-root-pathcost 0, 
+	CIST bridge-id 8000.08:9e:01:62:d5:f4, CIST remaining-hops 20
 IP (tos 0x0, ttl 64, id 53605, offset 0, flags [DF], proto TCP (6), length 168)
     10.0.0.81.56068 > 10.0.0.20.6633: Flags [P.], cksum 0x4a03 (correct), seq 10350:10466, ack 4641, win 1035, options [nop,nop,TS val 3 ecr 47837000], length 116: OpenFlow
 	version 1.0, type STATS_REPLY, length 116, xid 0x0000003f
@@ -1235,11 +1234,8 @@ IP (tos 0x0, ttl 64, id 53123, offset 0, flags [DF], proto TCP (6), length 144)
 	version 1.0, type PACKET_OUT, length 84, xid 0x00000044
 	 buffer_id 0xffffffff, in_port CONTROLLER
 	 action type OUTPUT, len 8, port 1
-	 data (60 octets)
-	  0x0000:  6162 6364 6566 6768 0000 0000 0000 0000  abcdefgh........
-	  0x0010:  0000 0000 0000 0000 0000 0000 0000 0000  ................
-	  0x0020:  0000 0000 0000 0000 0000 0000 0000 0000  ................
-	  0x0030:  0000 0000 0000 0000 0000 0000            ............
+	 data (60 octets), frame decoding below
+67:68:00:00:00:00 > 61:62:63:64:65:66 Null Information, send seq 0, rcv seq 0, Flags [Command], length 46
 	version 1.0, type BARRIER_REQUEST, length 8, xid 0x00000045
 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
     10.0.0.81.56068 > 10.0.0.20.6633: Flags [P.], cksum 0xb6f1 (correct), seq 14734:14742, ack 4821, win 1035, options [nop,nop,TS val 3 ecr 47837403], length 8: OpenFlow
@@ -1317,15 +1313,14 @@ IP (tos 0x0, ttl 64, id 53775, offset 0, flags [DF], proto TCP (6), length 189)
     10.0.0.81.56068 > 10.0.0.20.6633: Flags [P.], cksum 0xf083 (correct), seq 14766:14903, ack 4857, win 1035, options [nop,nop,TS val 6 ecr 47837447], length 137: OpenFlow
 	version 1.0, type PACKET_IN, length 137, xid 0x00000000
 	 buffer_id NONE, total_len 119, in_port 1, reason NO_MATCH
-	 data (119 octets)
-	  0x0000:  0180 c200 0000 089e 0162 d5f4 0069 4242  .........b...iBB
-	  0x0010:  0300 0003 027e 8000 089e 0162 d5f4 0000  .....~.....b....
-	  0x0020:  0000 8000 089e 0162 d5f4 8034 0000 1400  .......b...4....
-	  0x0030:  0200 0f00 0000 4000 7069 6361 3800 0000  ......@.pica8...
-	  0x0040:  0000 0000 0000 0000 0000 0000 0000 0000  ................
-	  0x0050:  0000 0000 0000 0000 0000 ac36 177f 5028  ...........6..P(
-	  0x0060:  3cd4 b838 21d8 ab26 de62 0000 0000 8000  <..8!..&.b......
-	  0x0070:  089e 0162 d5f4 14                        ...b...
+	 data (119 octets), frame decoding below
+STP 802.1s, Rapid STP, CIST Flags [Proposal, Learn, Forward, Agreement], length 102
+	port-role Designated, CIST root-id 8000.08:9e:01:62:d5:f4, CIST ext-pathcost 0 
+	CIST regional-root-id 8000.08:9e:01:62:d5:f4, CIST port-id 8034, 
+	message-age 0.00s, max-age 20.00s, hello-time 2.00s, forwarding-delay 15.00s
+	v3len 64, MCID Name pica8, rev 0, 
+		digest ac36177f50283cd4b83821d8ab26de62, CIST int-root-pathcost 0, 
+	CIST bridge-id 8000.08:9e:01:62:d5:f4, CIST remaining-hops 20
 IP (tos 0x0, ttl 64, id 53128, offset 0, flags [DF], proto TCP (6), length 52)
     10.0.0.20.6633 > 10.0.0.81.56068: Flags [.], cksum 0x148b (incorrect -> 0xb3e0), seq 4857, ack 14903, win 331, options [nop,nop,TS val 47839052 ecr 6], length 0
 IP (tos 0x0, ttl 64, id 53129, offset 0, flags [DF], proto TCP (6), length 52)
