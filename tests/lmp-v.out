@@ -12,7 +12,7 @@ IP (tos 0x0, ttl 1, id 44530, offset 0, flags [none], proto UDP (17), length 84)
 	    Verify Interval: 20
 	    Data links: 30
 	    Encoding type: Lambda (photonic)
-	    Verify Tranport Mechanism: 32768 (0x8000) 
+	    Verify Transport Mechanism: 32768 (0x8000)
 	    Transmission Rate: 0.001 Mbps
 	    Wavelength: 8
 IP (tos 0x0, ttl 1, id 44531, offset 0, flags [none], proto UDP (17), length 56)
@@ -77,7 +77,7 @@ IP (tos 0x0, ttl 1, id 44536, offset 0, flags [none], proto UDP (17), length 124
 	    Error Code: Unacceptable non-negotiable LINK-SUMMARY parameters, Renegotiate LINK-SUMMARY parameters, Invalid DATA-LINK Object, Unknown TE-LINK Object c-type, Unknown DATA-LINK Object c-type
 	  Data Link Object (12), Class-Type: IPv4 (1) Flags: [non-negotiable], length: 36
 	    Flags: [none]
-	    Local Interface ID: 192.168.1.1 (0xc0a80101) 			
+	    Local Interface ID: 192.168.1.1 (0xc0a80101)
 	    Remote Interface ID: 192.168.1.2 (0xc0a80102)
 	    Subobject, Type: Interface Switching Type (1), Length: 12
 	      Switching Type: Lambda-Switch Capable (150)
@@ -88,7 +88,7 @@ IP (tos 0x0, ttl 1, id 44536, offset 0, flags [none], proto UDP (17), length 124
 	      Wavelength: 6
 	  Data Link Object (12), Class-Type: IPv4 (1) Flags: [non-negotiable], length: 36
 	    Flags: [none]
-	    Local Interface ID: 10.1.1.1 (0x0a010101) 			
+	    Local Interface ID: 10.1.1.1 (0x0a010101)
 	    Remote Interface ID: 10.1.1.2 (0x0a010102)
 	    Subobject, Type: Interface Switching Type (1), Length: 12
 	      Switching Type: Lambda-Switch Capable (150)
@@ -105,7 +105,7 @@ IP (tos 0x0, ttl 1, id 44537, offset 0, flags [none], proto UDP (17), length 68)
 	  Message ID Object (5), Class-Type: 2 (2) Flags: [non-negotiable], length: 8
 	    Message ID Ack: 1 (0x00000001)
 	  Verify Begin ACK Object (9), Class-Type: 1 (1) Flags: [negotiable], length: 8
-	    Verify Dead Interval: 50 				
+	    Verify Dead Interval: 50
 	    Verify Transport Response: 100
 	  Verify ID Object (10), Class-Type: 1 (1) Flags: [non-negotiable], length: 8
 	    Verify ID: 5

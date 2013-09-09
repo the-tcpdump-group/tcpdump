@@ -552,8 +552,8 @@ lmp_print(register const u_char *pptr, register u_int len) {
             
 	    switch(lmp_obj_ctype) {
 	    case LMP_CTYPE_IPV4:
-		printf("\n\t    Local Link-ID: %s (0x%08x) \
-			\n\t    Remote Link-ID: %s (0x%08x)",
+		printf("\n\t    Local Link-ID: %s (0x%08x)"
+		       "\n\t    Remote Link-ID: %s (0x%08x)",
                        ipaddr_string(obj_tptr+4),
                        EXTRACT_32BITS(obj_tptr+4),
                        ipaddr_string(obj_tptr+8),
@@ -578,8 +578,8 @@ lmp_print(register const u_char *pptr, register u_int len) {
 	    switch(lmp_obj_ctype) {
 	    case LMP_CTYPE_IPV4:
 	    case LMP_CTYPE_UNMD:
-                printf("\n\t    Local Interface ID: %s (0x%08x) \
-			\n\t    Remote Interface ID: %s (0x%08x)",
+                printf("\n\t    Local Interface ID: %s (0x%08x)"
+                       "\n\t    Remote Interface ID: %s (0x%08x)",
                        ipaddr_string(obj_tptr+4),
                        EXTRACT_32BITS(obj_tptr+4),
                        ipaddr_string(obj_tptr+8),
@@ -650,10 +650,10 @@ lmp_print(register const u_char *pptr, register u_int len) {
 			EXTRACT_32BITS(obj_tptr+4));
                 printf("\n\t    Encoding type: %s",
 			tok2str(gmpls_encoding_values, "Unknown", *(obj_tptr+8)));
-                printf("\n\t    Verify Tranport Mechanism: %u (0x%x) %s",
+                printf("\n\t    Verify Transport Mechanism: %u (0x%x)%s",
 			EXTRACT_16BITS(obj_tptr+10),
 			EXTRACT_16BITS(obj_tptr+10),
-			EXTRACT_16BITS(obj_tptr+10)&8000 ? "(Payload test messages capable)" : "");
+			EXTRACT_16BITS(obj_tptr+10)&8000 ? " (Payload test messages capable)" : "");
                 bw.i = EXTRACT_32BITS(obj_tptr+12);
 		printf("\n\t    Transmission Rate: %.3f Mbps",bw.f*8/1000000);
 		printf("\n\t    Wavelength: %u",
@@ -668,8 +668,8 @@ lmp_print(register const u_char *pptr, register u_int len) {
         case LMP_OBJ_VERIFY_BEGIN_ACK:
 	    switch(lmp_obj_ctype) {
             case LMP_CTYPE_1:
-                printf("\n\t    Verify Dead Interval: %u 	\
-			\n\t    Verify Transport Response: %u",
+                printf("\n\t    Verify Dead Interval: %u"
+                       "\n\t    Verify Transport Response: %u",
                        EXTRACT_16BITS(obj_tptr),
                        EXTRACT_16BITS(obj_tptr+2));
                 break;
