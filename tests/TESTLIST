@@ -134,3 +134,6 @@ of10_pf5240-vv	of10_pf5240.pcap	of10_pf5240-vv.out	-t -vv
 
 # GeoNetworking and CALM FAST tests
 geonet-calm-fast	geonet_and_calm_fast.pcap	geonet_and_calm_fast.out	-t -vv -n
+
+# NFLOG test case
+nflog-e		nflog.pcap		nflog-e.out		-t -e

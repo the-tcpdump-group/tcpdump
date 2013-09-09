@@ -37,11 +37,12 @@
 #include "netdissect.h"
 #include "interface.h"
 
-#ifdef HAVE_LINUX_NETFILTER_NFNETLINK_LOG_H
-#include <linux/netfilter/nfnetlink_log.h>
 #include "nflog.h"
 
 #ifdef DLT_NFLOG
+
+#define NFULA_PAYLOAD 9
+#define NFULA_MAX 17
 
 const struct tok nflog_values[] = {
 	{ AF_INET,		"IPv4" },
@@ -150,5 +151,4 @@ nflog_if_print(struct netdissect_options *ndo,
 	return (sizeof(nflog_hdr_t));
 }
 
-#endif /* HAVE_LINUX_NETFILTER_NFNETLINK_LOG_H */
 #endif /* DLT_NFLOG */

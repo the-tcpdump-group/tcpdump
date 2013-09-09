@@ -332,9 +332,7 @@ static struct ndo_printer ndo_printers[] = {
 	{ netanalyzer_transparent_if_print, DLT_NETANALYZER_TRANSPARENT },
 #endif
 #ifdef DLT_NFLOG
-#ifdef HAVE_LINUX_NETFILTER_NFNETLINK_LOG_H
 	{ nflog_if_print,	DLT_NFLOG},
-#endif
 #endif
 	{ NULL,			0 },
 };
