@@ -137,3 +137,6 @@ geonet-calm-fast	geonet_and_calm_fast.pcap	geonet_and_calm_fast.out	-t -vv -n
 
 # NFLOG test case
 nflog-e		nflog.pcap		nflog-e.out		-t -e
+
+# syslog test case
+syslog-v	syslog_udp.pcap		syslog-v.out		-t -v
