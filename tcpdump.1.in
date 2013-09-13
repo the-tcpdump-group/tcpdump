@@ -347,8 +347,8 @@ Attempt to detect 802.11s draft mesh headers.
 .B \-i
 Listen on \fIinterface\fP.
 If unspecified, \fItcpdump\fP searches the system interface list for the
-lowest numbered, configured up interface (excluding loopback).
-Ties are broken by choosing the earliest match.
+lowest numbered, configured up interface (excluding loopback), which may turn
+out to be, for example, ``eth0''.
 .IP
 On Linux systems with 2.2 or later kernels, an
 .I interface
@@ -751,8 +751,8 @@ only packets for which \fIexpression\fP is `true' will be dumped.
 For the \fIexpression\fP syntax, see
 .BR pcap-filter (@MAN_MISC_INFO@).
 .LP
-Expression arguments can be passed to \fItcpdump\fP as either a single
-argument or as multiple arguments, whichever is more convenient.
+The \fIexpression\fP argument can be passed to \fItcpdump\fP as either a single
+Shell argument, or as multiple Shell arguments, whichever is more convenient.
 Generally, if the expression contains Shell metacharacters, such as
 backslashes used to escape protocol names, it is easier to pass it as
 a single, quoted argument rather than to escape the Shell
