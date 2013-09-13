@@ -42,7 +42,7 @@ build libpcap, also originally from LBL and now being maintained by
 tcpdump.org; see http://www.tcpdump.org/ .
 
 Once libpcap is built (either install it or make sure it's in
-`../libpcap`), you can build tcpdump using the procedure in the `INSTALL`
+`../libpcap`), you can build tcpdump using the procedure in the `INSTALL.txt`
 file.
 
 The program is loosely based on SMI's "etherfind" although none of the
