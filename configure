@@ -4054,7 +4054,8 @@ done
 
 
 
-for ac_header in fcntl.h rpc/rpc.h rpc/rpcent.h netdnet/dnetdb.h
+
+for ac_header in fcntl.h rpc/rpc.h rpc/rpcent.h netdnet/dnetdb.h linux/netfilter/nfnetlink_log.h
 do
 as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
 if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then
@@ -9338,7 +9339,8 @@ fi
 
 
 
-for ac_func in pcap_findalldevs pcap_dump_flush pcap_lib_version
+
+for ac_func in pcap_findalldevs pcap_dump_flush pcap_lib_version pcap_setdirection
 do
 as_ac_var=`echo "ac_cv_func_$ac_func" | $as_tr_sh`
 { echo "$as_me:$LINENO: checking for $ac_func" >&5

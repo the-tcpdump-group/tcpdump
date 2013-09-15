@@ -93,9 +93,17 @@ nflog_print(struct netdissect_options *ndo, const u_char *p, u_int length, u_int
 	hdr = (const nflog_hdr_t *)p;
 	p += sizeof(nflog_hdr_t);
 
+    if (!(hdr->nflog_version) == 0) {
+	    ND_PRINT((ndo, ", NFLOG version mismatch: %u", hdr->nflog_version));
+        return;
+    }
+
 	do {
 		tlv = (const nflog_tlv_t *) p;
 		size = tlv->tlv_length;
+
+		if (size % 4 != 0)
+			size += 4 - size % 4;
 
 		/* wrong size of the packet */
 		if (size > length )
@@ -104,9 +112,6 @@ nflog_print(struct netdissect_options *ndo, const u_char *p, u_int length, u_int
 		/* wrong tlv type */
 		if (tlv->tlv_type > NFULA_MAX)
 			return;
-
-		if (size % 4 != 0)
-			size += 4 - size % 4;
 
 		p += size;
 		length = length - size;
