@@ -73,7 +73,7 @@ static void frf15_print(const u_char *, u_int);
 #define FR_SDLC_BIT	0x00000002
 
 
-struct tok fr_header_flag_values[] = {
+static const struct tok fr_header_flag_values[] = {
     { FR_CR_BIT, "C!" },
     { FR_DE_BIT, "DE" },
     { FR_BECN_BIT, "BECN" },
@@ -90,7 +90,7 @@ struct tok fr_header_flag_values[] = {
 #define MFR_CTRL_FRAME  (MFR_B_BIT | MFR_E_BIT | MFR_C_BIT)
 #define MFR_FRAG_FRAME  (MFR_B_BIT | MFR_E_BIT )
 
-struct tok frf_flag_values[] = {
+static const struct tok frf_flag_values[] = {
     { MFR_B_BIT, "Begin" },
     { MFR_E_BIT, "End" },
     { MFR_C_BIT, "Control" },
@@ -360,7 +360,7 @@ mfr_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 #define MFR_CTRL_MSG_REMOVE_LINK     6
 #define MFR_CTRL_MSG_REMOVE_LINK_ACK 7
 
-struct tok mfr_ctrl_msg_values[] = {
+static const struct tok mfr_ctrl_msg_values[] = {
     { MFR_CTRL_MSG_ADD_LINK, "Add Link" },
     { MFR_CTRL_MSG_ADD_LINK_ACK, "Add Link ACK" },
     { MFR_CTRL_MSG_ADD_LINK_REJ, "Add Link Reject" },
@@ -378,7 +378,7 @@ struct tok mfr_ctrl_msg_values[] = {
 #define MFR_CTRL_IE_VENDOR_EXT 6
 #define MFR_CTRL_IE_CAUSE      7
 
-struct tok mfr_ctrl_ie_values[] = {
+static const struct tok mfr_ctrl_ie_values[] = {
     { MFR_CTRL_IE_BUNDLE_ID, "Bundle ID"},
     { MFR_CTRL_IE_LINK_ID, "Link ID"},
     { MFR_CTRL_IE_MAGIC_NUM, "Magic Number"},
@@ -626,7 +626,7 @@ frf15_print (const u_char *p, u_int length) {
 #define MSG_TYPE_STATUS           0x7D
 #define MSG_TYPE_STATUS_ENQ       0x75
 
-struct tok fr_q933_msg_values[] = {
+static const struct tok fr_q933_msg_values[] = {
     { MSG_TYPE_ESC_TO_NATIONAL, "ESC to National" },
     { MSG_TYPE_ALERT, "Alert" },
     { MSG_TYPE_CALL_PROCEEDING, "Call proceeding" },
@@ -655,7 +655,7 @@ struct tok fr_q933_msg_values[] = {
 #define FR_LMI_CCITT_LINK_VERIFY_IE	0x53
 #define FR_LMI_CCITT_PVC_STATUS_IE	0x57
 
-struct tok fr_q933_ie_values_codeset5[] = {
+static const struct tok fr_q933_ie_values_codeset5[] = {
     { FR_LMI_ANSI_REPORT_TYPE_IE, "ANSI Report Type" },
     { FR_LMI_ANSI_LINK_VERIFY_IE_91, "ANSI Link Verify" },
     { FR_LMI_ANSI_LINK_VERIFY_IE, "ANSI Link Verify" },
@@ -670,7 +670,7 @@ struct tok fr_q933_ie_values_codeset5[] = {
 #define FR_LMI_REPORT_TYPE_IE_LINK_VERIFY 1
 #define FR_LMI_REPORT_TYPE_IE_ASYNC_PVC   2
 
-struct tok fr_lmi_report_type_ie_values[] = {
+static const struct tok fr_lmi_report_type_ie_values[] = {
     { FR_LMI_REPORT_TYPE_IE_FULL_STATUS, "Full Status" },
     { FR_LMI_REPORT_TYPE_IE_LINK_VERIFY, "Link verify" },
     { FR_LMI_REPORT_TYPE_IE_ASYNC_PVC, "Async PVC Status" },
@@ -678,7 +678,7 @@ struct tok fr_lmi_report_type_ie_values[] = {
 };
 
 /* array of 16 codepages - currently we only support codepage 1,5 */
-static struct tok *fr_q933_ie_codesets[] = {
+static const struct tok *fr_q933_ie_codesets[] = {
     NULL,
     fr_q933_ie_values_codeset5,
     NULL,

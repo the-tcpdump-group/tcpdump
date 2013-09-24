@@ -99,7 +99,7 @@ struct  arp_pkthdr {
 #define TPA(ap) (ar_tpa(ap))
 
 
-struct tok arpop_values[] = {
+static const struct tok arpop_values[] = {
     { ARPOP_REQUEST, "Request" },
     { ARPOP_REPLY, "Reply" },
     { ARPOP_REVREQUEST, "Reverse Request" },
@@ -110,7 +110,7 @@ struct tok arpop_values[] = {
     { 0, NULL }
 };
 
-struct tok arphrd_values[] = {
+static const struct tok arphrd_values[] = {
     { ARPHRD_ETHER, "Ethernet" },
     { ARPHRD_IEEE802, "TokenRing" },
     { ARPHRD_ARCNET, "ArcNet" },

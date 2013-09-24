@@ -187,7 +187,7 @@ trunc:
  *     B - on/off (8 bits)
  *     $ - special (explicit code to handle)
  */
-static struct tok tag2str[] = {
+static const struct tok tag2str[] = {
 /* RFC1048 tags */
 	{ TAG_PAD,		" PAD" },
 	{ TAG_SUBNET_MASK,	"iSubnet-Mask" },	/* subnet mask (RFC950) */
@@ -308,12 +308,12 @@ static struct tok tag2str[] = {
 	{ 0,			NULL }
 };
 /* 2-byte extended tags */
-static struct tok xtag2str[] = {
+static const struct tok xtag2str[] = {
 	{ 0,			NULL }
 };
 
 /* DHCP "options overload" types */
-static struct tok oo2str[] = {
+static const struct tok oo2str[] = {
 	{ 1,			"file" },
 	{ 2,			"sname" },
 	{ 3,			"file+sname" },
@@ -321,7 +321,7 @@ static struct tok oo2str[] = {
 };
 
 /* NETBIOS over TCP/IP node type options */
-static struct tok nbo2str[] = {
+static const struct tok nbo2str[] = {
 	{ 0x1,			"b-node" },
 	{ 0x2,			"p-node" },
 	{ 0x4,			"m-node" },
@@ -330,7 +330,7 @@ static struct tok nbo2str[] = {
 };
 
 /* ARP Hardware types, for Client-ID option */
-static struct tok arp2str[] = {
+static const struct tok arp2str[] = {
 	{ 0x1,			"ether" },
 	{ 0x6,			"ieee802" },
 	{ 0x7,			"arcnet" },
@@ -340,7 +340,7 @@ static struct tok arp2str[] = {
 	{ 0,			NULL }
 };
 
-static struct tok dhcp_msg_values[] = {
+static const struct tok dhcp_msg_values[] = {
         { DHCPDISCOVER, "Discover" },
         { DHCPOFFER, "Offer" },
         { DHCPREQUEST, "Request" },
@@ -355,7 +355,7 @@ static struct tok dhcp_msg_values[] = {
 #define AGENT_SUBOPTION_CIRCUIT_ID 	1	/* RFC 3046 */
 #define AGENT_SUBOPTION_REMOTE_ID  	2	/* RFC 3046 */
 #define AGENT_SUBOPTION_SUBSCRIBER_ID 	6	/* RFC 3993 */
-static struct tok agent_suboption_values[] = {
+static const struct tok agent_suboption_values[] = {
         { AGENT_SUBOPTION_CIRCUIT_ID, "Circuit-ID" },
         { AGENT_SUBOPTION_REMOTE_ID, "Remote-ID" },
         { AGENT_SUBOPTION_SUBSCRIBER_ID, "Subscriber-ID" },

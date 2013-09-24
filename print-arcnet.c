@@ -41,7 +41,7 @@ static const char rcsid[] _U_ =
 static int arcnet_encap_print(u_char arctype, const u_char *p,
     u_int length, u_int caplen);
 
-struct tok arctypemap[] = {
+static const struct tok arctypemap[] = {
 	{ ARCTYPE_IP_OLD,	"oldip" },
 	{ ARCTYPE_ARP_OLD,	"oldarp" },
 	{ ARCTYPE_IP,		"ip" },

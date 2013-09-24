@@ -44,7 +44,7 @@ static const char rcsid[] _U_ =
 #include "ethertype.h"
 #include "oui.h"
 
-static struct tok llc_values[] = {
+static const struct tok llc_values[] = {
         { LLCSAP_NULL,     "Null" },
         { LLCSAP_GLOBAL,   "Global" },
         { LLCSAP_8021B_I,  "802.1B I" },
@@ -63,7 +63,7 @@ static struct tok llc_values[] = {
         { 0,               NULL },
 };
 
-static struct tok llc_cmd_values[] = {
+static const struct tok llc_cmd_values[] = {
 	{ LLC_UI,	"ui" },
 	{ LLC_TEST,	"test" },
 	{ LLC_XID,	"xid" },

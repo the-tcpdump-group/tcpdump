@@ -37,7 +37,7 @@
 #define DTP_DTP_TYPE_TLV		0x0003
 #define DTP_NEIGHBOR_TLV		0x0004
 
-static struct tok dtp_tlv_values[] = {
+static const struct tok dtp_tlv_values[] = {
     { DTP_DOMAIN_TLV, "Domain TLV"},
     { DTP_STATUS_TLV, "Status TLV"},
     { DTP_DTP_TYPE_TLV, "DTP type TLV"},

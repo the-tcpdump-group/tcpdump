@@ -43,7 +43,7 @@ static const char rcsid[] _U_ =
 #include "extract.h"			/* must come after interface.h */
 #include "appletalk.h"
 
-static struct tok type2str[] = {
+static const struct tok type2str[] = {
 	{ ddpRTMP,		"rtmp" },
 	{ ddpRTMPrequest,	"rtmpReq" },
 	{ ddpECHO,		"echo" },
@@ -602,7 +602,7 @@ ataddr_string(u_short atnet, u_char athost)
 	return (tp->name);
 }
 
-static struct tok skt2str[] = {
+static const struct tok skt2str[] = {
 	{ rtmpSkt,	"rtmp" },	/* routing table maintenance */
 	{ nbpSkt,	"nis" },	/* name info socket */
 	{ echoSkt,	"echo" },	/* AppleTalk echo protocol */

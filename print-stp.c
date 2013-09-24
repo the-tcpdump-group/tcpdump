@@ -54,7 +54,7 @@ struct stp_bpdu_ {
 #define STP_PROTO_MSTP    0x03
 #define STP_PROTO_SPB     0x04
 
-struct tok stp_proto_values[] = {
+static const struct tok stp_proto_values[] = {
     { STP_PROTO_REGULAR, "802.1d" },
     { STP_PROTO_RAPID, "802.1w" },
     { STP_PROTO_MSTP, "802.1s" },
@@ -66,7 +66,7 @@ struct tok stp_proto_values[] = {
 #define STP_BPDU_TYPE_RSTP        0x02
 #define STP_BPDU_TYPE_TOPO_CHANGE 0x80
 
-struct tok stp_bpdu_flag_values[] = {
+static const struct tok stp_bpdu_flag_values[] = {
     { 0x01, "Topology change" },
     { 0x02, "Proposal" },
     { 0x10, "Learn" },
@@ -76,14 +76,14 @@ struct tok stp_bpdu_flag_values[] = {
     { 0, NULL}
 };
 
-struct tok stp_bpdu_type_values[] = {
+static const struct tok stp_bpdu_type_values[] = {
     { STP_BPDU_TYPE_CONFIG, "Config" },
     { STP_BPDU_TYPE_RSTP, "Rapid STP" },
     { STP_BPDU_TYPE_TOPO_CHANGE, "Topology Change" },
     { 0, NULL}
 };
 
-struct tok rstp_obj_port_role_values[] = {
+static const struct tok rstp_obj_port_role_values[] = {
     { 0x00, "Unknown" },
     { 0x01, "Alternate" },
     { 0x02, "Root" },

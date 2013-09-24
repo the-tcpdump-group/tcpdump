@@ -53,7 +53,7 @@ static const char *op_code_str[] = {
 };
 
 /* HSRP states and associated names. */
-static struct tok states[] = {
+static const struct tok states[] = {
 	{  0, "initial" },
 	{  1, "learn" },
 	{  2, "listen" },

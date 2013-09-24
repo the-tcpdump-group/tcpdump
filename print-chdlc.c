@@ -42,7 +42,7 @@ static const char rcsid[] _U_ =
 
 static void chdlc_slarp_print(const u_char *, u_int);
 
-const struct tok chdlc_cast_values[] = { 
+static const struct tok chdlc_cast_values[] = { 
     { CHDLC_UNICAST, "unicast" },
     { CHDLC_BCAST, "bcast" },
     { 0, NULL}

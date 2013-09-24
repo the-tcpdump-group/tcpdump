@@ -94,7 +94,7 @@ struct tcp_seq_hash {
 
 static struct tcp_seq_hash tcp_seq_hash[TSEQ_HASHSIZE];
 
-struct tok tcp_flag_values[] = {
+static const struct tok tcp_flag_values[] = {
         { TH_FIN, "F" },
         { TH_SYN, "S" },
         { TH_RST, "R" },
@@ -106,7 +106,7 @@ struct tok tcp_flag_values[] = {
         { 0, NULL }
 };
 
-struct tok tcp_option_values[] = {
+static const struct tok tcp_option_values[] = {
         { TCPOPT_EOL, "eol" },
         { TCPOPT_NOP, "nop" },
         { TCPOPT_MAXSEG, "mss" },

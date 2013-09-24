@@ -14,7 +14,7 @@
 
 #ifdef DLT_IPNET
 
-const struct tok ipnet_values[] = {
+static const struct tok ipnet_values[] = {
 	{ IPH_AF_INET,		"IPv4" },
 	{ IPH_AF_INET6,		"IPv6" },
 	{ 0,			NULL }

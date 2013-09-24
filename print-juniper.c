@@ -65,7 +65,7 @@ __RCSID("NetBSD: print-juniper.c,v 1.3 2007/07/25 06:31:32 dogcow Exp ");
 #define JUNIPER_IPSEC_O_AH_AUTHENTICATION_TYPE 4
 #define JUNIPER_IPSEC_O_ESP_ENCRYPTION_TYPE 5
 
-static struct tok juniper_ipsec_type_values[] = {
+static const struct tok juniper_ipsec_type_values[] = {
     { JUNIPER_IPSEC_O_ESP_ENCRYPT_ESP_AUTHEN_TYPE, "ESP ENCR-AUTH" },
     { JUNIPER_IPSEC_O_ESP_ENCRYPT_AH_AUTHEN_TYPE, "ESP ENCR-AH AUTH" },
     { JUNIPER_IPSEC_O_ESP_AUTHENTICATION_TYPE, "ESP AUTH" },
@@ -74,7 +74,7 @@ static struct tok juniper_ipsec_type_values[] = {
     { 0, NULL}
 };
 
-static struct tok juniper_direction_values[] = {
+static const struct tok juniper_direction_values[] = {
     { JUNIPER_BPF_IN,  "In"},
     { JUNIPER_BPF_OUT, "Out"},
     { 0, NULL}
@@ -95,7 +95,7 @@ enum {
 /* 1 byte type and 1-byte length */
 #define JUNIPER_EXT_TLV_OVERHEAD 2
 
-struct tok jnx_ext_tlv_values[] = {
+static const struct tok jnx_ext_tlv_values[] = {
     { JUNIPER_EXT_TLV_IFD_IDX, "Device Interface Index" },
     { JUNIPER_EXT_TLV_IFD_NAME,"Device Interface Name" },
     { JUNIPER_EXT_TLV_IFD_MEDIATYPE, "Device Media Type" },
@@ -107,7 +107,7 @@ struct tok jnx_ext_tlv_values[] = {
     { 0, NULL }
 };
 
-struct tok jnx_flag_values[] = {
+static const struct tok jnx_flag_values[] = {
     { JUNIPER_BPF_EXT, "Ext" },
     { JUNIPER_BPF_FILTER, "Filter" },
     { JUNIPER_BPF_IIF, "IIF" },
@@ -177,7 +177,7 @@ struct tok jnx_flag_values[] = {
 #define JUNIPER_IFML_DFC                59
 #define JUNIPER_IFML_PICPEER            60
 
-struct tok juniper_ifmt_values[] = {
+static const struct tok juniper_ifmt_values[] = {
     { JUNIPER_IFML_ETHER, "Ethernet" },
     { JUNIPER_IFML_FDDI, "FDDI" },
     { JUNIPER_IFML_TOKENRING, "Token-Ring" },
@@ -300,7 +300,7 @@ struct tok juniper_ifmt_values[] = {
 #define JUNIPER_IFLE_DFC                    66
 #define JUNIPER_IFLE_PICPEER                67
 
-struct tok juniper_ifle_values[] = {
+static const struct tok juniper_ifle_values[] = {
     { JUNIPER_IFLE_AGGREGATOR, "Aggregator" },
     { JUNIPER_IFLE_ATM_CCC, "CCC over ATM" },
     { JUNIPER_IFLE_ATM_CELLRELAY_CCC, "ATM CCC Cell Relay" },
@@ -439,7 +439,7 @@ struct juniper_l2info_t {
 
 #define MFR_BE_MASK 0xc0
 
-static struct tok juniper_protocol_values[] = {
+static const struct tok juniper_protocol_values[] = {
     { JUNIPER_PROTO_NULL, "Null" },
     { JUNIPER_PROTO_IPV4, "IPv4" },
     { JUNIPER_PROTO_IPV6, "IPv6" },

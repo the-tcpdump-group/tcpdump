@@ -43,7 +43,7 @@ static const char rcsid[] _U_ =
 
 #include "ip.h"
 
-static struct tok ospf_option_values[] = {
+static const struct tok ospf_option_values[] = {
         { OSPF_OPTION_T,	"MultiTopology" }, /* draft-ietf-ospf-mt-09 */
 	{ OSPF_OPTION_E,	"External" },
 	{ OSPF_OPTION_MC,	"Multicast" },
@@ -55,14 +55,14 @@ static struct tok ospf_option_values[] = {
 	{ 0,			NULL }
 };
 
-static struct tok ospf_authtype_values[] = {
+static const struct tok ospf_authtype_values[] = {
 	{ OSPF_AUTH_NONE,	"none" },
 	{ OSPF_AUTH_SIMPLE,	"simple" },
 	{ OSPF_AUTH_MD5,	"MD5" },
 	{ 0,			NULL }
 };
 
-static struct tok ospf_rla_flag_values[] = {
+static const struct tok ospf_rla_flag_values[] = {
 	{ RLA_FLAG_B,		"ABR" },
 	{ RLA_FLAG_E,		"ASBR" },
 	{ RLA_FLAG_W1,		"Virtual" },
@@ -70,7 +70,7 @@ static struct tok ospf_rla_flag_values[] = {
 	{ 0,			NULL }
 };
 
-static struct tok type2str[] = {
+static const struct tok type2str[] = {
 	{ OSPF_TYPE_UMD,	"UMD" },
 	{ OSPF_TYPE_HELLO,	"Hello" },
 	{ OSPF_TYPE_DD,		"Database Description" },
@@ -80,7 +80,7 @@ static struct tok type2str[] = {
 	{ 0,			NULL }
 };
 
-static struct tok lsa_values[] = {
+static const struct tok lsa_values[] = {
 	{ LS_TYPE_ROUTER,       "Router" },
 	{ LS_TYPE_NETWORK,      "Network" },
 	{ LS_TYPE_SUM_IP,       "Summary" },
@@ -94,7 +94,7 @@ static struct tok lsa_values[] = {
 	{ 0,			NULL }
 };
 
-static struct tok ospf_dd_flag_values[] = {
+static const struct tok ospf_dd_flag_values[] = {
 	{ OSPF_DB_INIT,	        "Init" },
 	{ OSPF_DB_MORE,	        "More" },
 	{ OSPF_DB_MASTER,	"Master" },
@@ -102,20 +102,20 @@ static struct tok ospf_dd_flag_values[] = {
 	{ 0,			NULL }
 };
 
-static struct tok lsa_opaque_values[] = {
+static const struct tok lsa_opaque_values[] = {
 	{ LS_OPAQUE_TYPE_TE,    "Traffic Engineering" },
 	{ LS_OPAQUE_TYPE_GRACE, "Graceful restart" },
 	{ LS_OPAQUE_TYPE_RI,    "Router Information" },
 	{ 0,			NULL }
 };
 
-static struct tok lsa_opaque_te_tlv_values[] = {
+static const struct tok lsa_opaque_te_tlv_values[] = {
 	{ LS_OPAQUE_TE_TLV_ROUTER, "Router Address" },
 	{ LS_OPAQUE_TE_TLV_LINK,   "Link" },
 	{ 0,			NULL }
 };
 
-static struct tok lsa_opaque_te_link_tlv_subtlv_values[] = {
+static const struct tok lsa_opaque_te_link_tlv_subtlv_values[] = {
 	{ LS_OPAQUE_TE_LINK_SUBTLV_LINK_TYPE,            "Link Type" },
 	{ LS_OPAQUE_TE_LINK_SUBTLV_LINK_ID,              "Link ID" },
 	{ LS_OPAQUE_TE_LINK_SUBTLV_LOCAL_IP,             "Local Interface IP address" },
@@ -133,14 +133,14 @@ static struct tok lsa_opaque_te_link_tlv_subtlv_values[] = {
 	{ 0,			NULL }
 };
 
-static struct tok lsa_opaque_grace_tlv_values[] = {
+static const struct tok lsa_opaque_grace_tlv_values[] = {
 	{ LS_OPAQUE_GRACE_TLV_PERIOD,             "Grace Period" },
 	{ LS_OPAQUE_GRACE_TLV_REASON,             "Graceful restart Reason" },
 	{ LS_OPAQUE_GRACE_TLV_INT_ADDRESS,        "IPv4 interface address" },
 	{ 0,		        NULL }
 };
 
-static struct tok lsa_opaque_grace_tlv_reason_values[] = {
+static const struct tok lsa_opaque_grace_tlv_reason_values[] = {
 	{ LS_OPAQUE_GRACE_TLV_REASON_UNKNOWN,     "Unknown" },
 	{ LS_OPAQUE_GRACE_TLV_REASON_SW_RESTART,  "Software Restart" },
 	{ LS_OPAQUE_GRACE_TLV_REASON_SW_UPGRADE,  "Software Reload/Upgrade" },
@@ -148,18 +148,18 @@ static struct tok lsa_opaque_grace_tlv_reason_values[] = {
 	{ 0,		        NULL }
 };
 
-static struct tok lsa_opaque_te_tlv_link_type_sub_tlv_values[] = {
+static const struct tok lsa_opaque_te_tlv_link_type_sub_tlv_values[] = {
 	{ LS_OPAQUE_TE_LINK_SUBTLV_LINK_TYPE_PTP, "Point-to-point" },
 	{ LS_OPAQUE_TE_LINK_SUBTLV_LINK_TYPE_MA,  "Multi-Access" },
 	{ 0,			NULL }
 };
 
-static struct tok lsa_opaque_ri_tlv_values[] = {
+static const struct tok lsa_opaque_ri_tlv_values[] = {
 	{ LS_OPAQUE_RI_TLV_CAP, "Router Capabilities" },
 	{ 0,		        NULL }
 };
 
-static struct tok lsa_opaque_ri_tlv_cap_values[] = {
+static const struct tok lsa_opaque_ri_tlv_cap_values[] = {
 	{ 1, "Reserved" },
 	{ 2, "Reserved" },
 	{ 4, "Reserved" },
@@ -173,13 +173,13 @@ static struct tok lsa_opaque_ri_tlv_cap_values[] = {
 	{ 0,		        NULL }
 };
 
-static struct tok ospf_lls_tlv_values[] = {
+static const struct tok ospf_lls_tlv_values[] = {
 	{ OSPF_LLS_EO,	"Extended Options" },
 	{ OSPF_LLS_MD5,	"MD5 Authentication" },
 	{ 0,	NULL }
 };
 
-static struct tok ospf_lls_eo_options[] = {
+static const struct tok ospf_lls_eo_options[] = {
 	{ OSPF_LLS_EO_LR,	"LSDB resync" },
 	{ OSPF_LLS_EO_RS,	"Restart" },
 	{ 0,	NULL }
@@ -516,7 +516,7 @@ trunc:
 }
 
 /* draft-ietf-ospf-mt-09 */
-static struct tok ospf_topology_values[] = {
+static const struct tok ospf_topology_values[] = {
     { 0, "default " },
     { 1, "multicast " },
     { 2, "management " },

@@ -52,7 +52,7 @@ static void p_sfix(const struct s_fixedpt *);
 static void p_ntp_time(const struct l_fixedpt *);
 static void p_ntp_delta(const struct l_fixedpt *, const struct l_fixedpt *);
 
-static struct tok ntp_mode_values[] = {
+static const struct tok ntp_mode_values[] = {
     { MODE_UNSPEC,    "unspecified" },
     { MODE_SYM_ACT,   "symmetric active" },
     { MODE_SYM_PAS,   "symmetric passive" },
@@ -64,7 +64,7 @@ static struct tok ntp_mode_values[] = {
     { 0, NULL }
 };
 
-static struct tok ntp_leapind_values[] = {
+static const struct tok ntp_leapind_values[] = {
     { NO_WARNING,     "" },
     { PLUS_SEC,       "+1s" },
     { MINUS_SEC,      "-1s" },
@@ -72,7 +72,7 @@ static struct tok ntp_leapind_values[] = {
     { 0, NULL }
 };
 
-static struct tok ntp_stratum_values[] = {
+static const struct tok ntp_stratum_values[] = {
 	{ UNSPECIFIED,	"unspecified" },
 	{ PRIM_REF, 	"primary reference" },
 	{ 0, NULL }

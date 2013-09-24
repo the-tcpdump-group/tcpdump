@@ -51,7 +51,7 @@ enum {
 	PPPOE_PADT = 0xa7
 };
 
-static struct tok pppoecode2str[] = {
+static const struct tok pppoecode2str[] = {
 	{ PPPOE_PADI, "PADI" },
 	{ PPPOE_PADO, "PADO" },
 	{ PPPOE_PADR, "PADR" },
@@ -76,7 +76,7 @@ enum {
 	PPPOE_GENERIC_ERROR = 0x0203
 };
 
-static struct tok pppoetag2str[] = {
+static const struct tok pppoetag2str[] = {
 	{ PPPOE_EOL, "EOL" },
 	{ PPPOE_SERVICE_NAME, "Service-Name" },
 	{ PPPOE_AC_NAME, "AC-Name" },

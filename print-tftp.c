@@ -45,7 +45,7 @@ static const char rcsid[] _U_ =
 #include "tftp.h"
 
 /* op code to string mapping */
-static struct tok op2str[] = {
+static const struct tok op2str[] = {
 	{ RRQ,		"RRQ" },	/* read request */
 	{ WRQ,		"WRQ" },	/* write request */
 	{ DATA,		"DATA" },	/* data packet */
@@ -56,7 +56,7 @@ static struct tok op2str[] = {
 };
 
 /* error code to string mapping */
-static struct tok err2str[] = {
+static const struct tok err2str[] = {
 	{ EUNDEF,	"EUNDEF" },	/* not defined */
 	{ ENOTFOUND,	"ENOTFOUND" },	/* file not found */
 	{ EACCESS,	"EACCESS" },	/* access violation */

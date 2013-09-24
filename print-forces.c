@@ -199,7 +199,7 @@ struct forcesh {
 #define F_LFB_RSVD 0x0
 #define F_LFB_FEO 0x1
 #define F_LFB_FEPO 0x2
-const struct tok ForCES_LFBs[] = {
+static const struct tok ForCES_LFBs[] = {
 	{F_LFB_RSVD, "Invalid TLV"},
 	{F_LFB_FEO, "FEObj LFB"},
 	{F_LFB_FEPO, "FEProtoObj LFB"},
@@ -627,7 +627,7 @@ enum {
 	E_UNSPECIFIED_ERROR = 0XFF
 };
 
-const struct tok ForCES_errs[] = {
+static const struct tok ForCES_errs[] = {
 	{E_SUCCESS, "SUCCESS"},
 	{E_INVALID_HEADER, "INVALID HEADER"},
 	{E_LENGTH_MISMATCH, "LENGTH MISMATCH"},

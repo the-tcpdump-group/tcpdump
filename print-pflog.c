@@ -46,7 +46,7 @@ static const char rcsid[] _U_ =
 #include "interface.h"
 #include "addrtoname.h"
 
-static struct tok pf_reasons[] = {
+static const struct tok pf_reasons[] = {
 	{ 0,	"0(match)" },
 	{ 1,	"1(bad-offset)" },
 	{ 2,	"2(fragment)" },
@@ -65,7 +65,7 @@ static struct tok pf_reasons[] = {
 	{ 0,	NULL }
 };
 
-static struct tok pf_actions[] = {
+static const struct tok pf_actions[] = {
 	{ PF_PASS,		"pass" },
 	{ PF_DROP,		"block" },
 	{ PF_SCRUB,		"scrub" },
@@ -79,7 +79,7 @@ static struct tok pf_actions[] = {
 	{ 0,			NULL }
 };
 
-static struct tok pf_directions[] = {
+static const struct tok pf_directions[] = {
 	{ PF_INOUT,	"in/out" },
 	{ PF_IN,	"in" },
 	{ PF_OUT,	"out" },

@@ -55,7 +55,7 @@ static char tstr[] = " [|l2tp]";
 #define	L2TP_MSGTYPE_WEN	15 /* WAN-Error-Notify */
 #define	L2TP_MSGTYPE_SLI	16 /* Set-Link-Info */
 
-static struct tok l2tp_msgtype2str[] = {
+static const struct tok l2tp_msgtype2str[] = {
 	{ L2TP_MSGTYPE_SCCRQ, 	"SCCRQ" },
 	{ L2TP_MSGTYPE_SCCRP,	"SCCRP" },
 	{ L2TP_MSGTYPE_SCCCN,	"SCCCN" },
@@ -115,7 +115,7 @@ static struct tok l2tp_msgtype2str[] = {
 #define L2TP_AVP_SEQ_REQUIRED 		39 /* Sequencing Required */
 #define L2TP_AVP_PPP_DISCON_CC		46 /* PPP Disconnect Cause Code */
 
-static struct tok l2tp_avp2str[] = {
+static const struct tok l2tp_avp2str[] = {
 	{ L2TP_AVP_MSGTYPE,		"MSGTYPE" },
 	{ L2TP_AVP_RESULT_CODE,		"RESULT_CODE" },
 	{ L2TP_AVP_PROTO_VER,		"PROTO_VER" },
@@ -160,7 +160,7 @@ static struct tok l2tp_avp2str[] = {
 	{ 0,				NULL }
 };
 
-static struct tok l2tp_authentype2str[] = {
+static const struct tok l2tp_authentype2str[] = {
 	{ L2TP_AUTHEN_TYPE_RESERVED,	"Reserved" },
 	{ L2TP_AUTHEN_TYPE_TEXTUAL,	"Textual" },
 	{ L2TP_AUTHEN_TYPE_CHAP,	"CHAP" },
@@ -174,7 +174,7 @@ static struct tok l2tp_authentype2str[] = {
 #define L2TP_PPP_DISCON_CC_DIRECTION_AT_PEER	1
 #define L2TP_PPP_DISCON_CC_DIRECTION_AT_LOCAL	2
 
-static struct tok l2tp_cc_direction2str[] = {
+static const struct tok l2tp_cc_direction2str[] = {
 	{ L2TP_PPP_DISCON_CC_DIRECTION_GLOBAL,	"global error" },
 	{ L2TP_PPP_DISCON_CC_DIRECTION_AT_PEER,	"at peer" },
 	{ L2TP_PPP_DISCON_CC_DIRECTION_AT_LOCAL,"at local" },

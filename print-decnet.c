@@ -819,7 +819,7 @@ trunc:
 	return (0);
 }
 
-static struct tok reason2str[] = {
+static const struct tok reason2str[] = {
 	{ UC_OBJREJECT,		"object rejected connect" },
 	{ UC_RESOURCES,		"insufficient resources" },
 	{ UC_NOSUCHNODE,	"unrecognized node name" },

@@ -57,7 +57,7 @@ struct vtp_vlan_ {
     u_int32_t index;
 };
 
-static struct tok vtp_message_type_values[] = {
+static const struct tok vtp_message_type_values[] = {
     { VTP_SUMMARY_ADV, "Summary advertisement"},
     { VTP_SUBSET_ADV, "Subset advertisement"},
     { VTP_ADV_REQUEST, "Advertisement request"},
@@ -65,7 +65,7 @@ static struct tok vtp_message_type_values[] = {
     { 0, NULL }
 };
 
-static struct tok vtp_header_values[] = {
+static const struct tok vtp_header_values[] = {
     { 0x01, "Followers"}, /* On Summary advertisement, 3rd byte is Followers */
     { 0x02, "Seq number"}, /* On Subset  advertisement, 3rd byte is Sequence number */
     { 0x03, "Rsvd"}, /* On Adver. requests 3rd byte is Rsvd */
@@ -73,7 +73,7 @@ static struct tok vtp_header_values[] = {
     { 0, NULL }
 };
 
-static struct tok vtp_vlan_type_values[] = {
+static const struct tok vtp_vlan_type_values[] = {
     { 0x01, "Ethernet"},
     { 0x02, "FDDI"},
     { 0x03, "TrCRF"},
@@ -82,7 +82,7 @@ static struct tok vtp_vlan_type_values[] = {
     { 0, NULL }
 };
 
-static struct tok vtp_vlan_status[] = {
+static const struct tok vtp_vlan_status[] = {
     { 0x00, "Operational"},
     { 0x01, "Suspended"},
     { 0, NULL }
@@ -99,7 +99,7 @@ static struct tok vtp_vlan_status[] = {
 #define VTP_VLAN_STE_HOP_COUNT                   0x09
 #define VTP_VLAN_BACKUP_CRF_MODE                 0x0A
 
-static struct tok vtp_vlan_tlv_values[] = {
+static const struct tok vtp_vlan_tlv_values[] = {
     { VTP_VLAN_SOURCE_ROUTING_RING_NUMBER, "Source-Routing Ring Number TLV"},
     { VTP_VLAN_SOURCE_ROUTING_BRIDGE_NUMBER, "Source-Routing Bridge Number TLV"},
     { VTP_VLAN_STP_TYPE, "STP type TLV"},
@@ -113,7 +113,7 @@ static struct tok vtp_vlan_tlv_values[] = {
     { 0,                                  NULL }
 };
 
-static struct tok vtp_stp_type_values[] = {
+static const struct tok vtp_stp_type_values[] = {
     { 1, "SRT"},
     { 2, "SRB"},
     { 3, "Auto"},

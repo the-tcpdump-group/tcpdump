@@ -44,7 +44,7 @@
 #define NFULA_PAYLOAD 9
 #define NFULA_MAX 17
 
-const struct tok nflog_values[] = {
+static const struct tok nflog_values[] = {
 	{ AF_INET,		"IPv4" },
 	{ AF_INET6,		"IPv6" },
 	{ 0,				NULL }

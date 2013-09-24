@@ -78,7 +78,7 @@ struct olsr_common {
 #define OLSR_HELLO_LQ_MSG    201 /* LQ extensions olsr.org */
 #define OLSR_TC_LQ_MSG       202 /* LQ extensions olsr.org */
 
-static struct tok olsr_msg_values[] = {
+static const struct tok olsr_msg_values[] = {
     { OLSR_HELLO_MSG, "Hello" },
     { OLSR_TC_MSG, "TC" },
     { OLSR_MID_MSG, "MID" },
@@ -141,7 +141,7 @@ struct olsr_hna6 {
 #define OLSR_EXTRACT_LINK_TYPE(link_code) (link_code & 0x3)
 #define OLSR_EXTRACT_NEIGHBOR_TYPE(link_code) (link_code >> 2)
 
-static struct tok olsr_link_type_values[] = {
+static const struct tok olsr_link_type_values[] = {
     { 0, "Unspecified" },
     { 1, "Asymmetric" },
     { 2, "Symmetric" },
@@ -149,7 +149,7 @@ static struct tok olsr_link_type_values[] = {
     { 0, NULL}
 };
 
-static struct tok olsr_neighbor_type_values[] = {
+static const struct tok olsr_neighbor_type_values[] = {
     { 0, "Not-Neighbor" },
     { 1, "Symmetric" },
     { 2, "Symmetric-MPR" },

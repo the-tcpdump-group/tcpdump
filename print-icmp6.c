@@ -65,7 +65,7 @@ static void icmp6_rrenum_print(const u_char *, const u_char *);
 /* inline the various RPL definitions */
 #define ND_RPL_MESSAGE 0x9B
 
-static struct tok icmp6_type_values[] = {
+static const struct tok icmp6_type_values[] = {
     { ICMP6_DST_UNREACH, "destination unreachable"},
     { ICMP6_PACKET_TOO_BIG, "packet too big"},
     { ICMP6_TIME_EXCEEDED, "time exceeded in-transit"},
@@ -98,7 +98,7 @@ static struct tok icmp6_type_values[] = {
     { 0,	NULL }
 };
 
-static struct tok icmp6_dst_unreach_code_values[] = {
+static const struct tok icmp6_dst_unreach_code_values[] = {
     { ICMP6_DST_UNREACH_NOROUTE, "unreachable route" },
     { ICMP6_DST_UNREACH_ADMIN, " unreachable prohibited"},
     { ICMP6_DST_UNREACH_BEYONDSCOPE, "beyond scope"},
@@ -107,21 +107,21 @@ static struct tok icmp6_dst_unreach_code_values[] = {
     { 0,	NULL }
 };
 
-static struct tok icmp6_opt_pi_flag_values[] = {
+static const struct tok icmp6_opt_pi_flag_values[] = {
     { ND_OPT_PI_FLAG_ONLINK, "onlink" },
     { ND_OPT_PI_FLAG_AUTO, "auto" },
     { ND_OPT_PI_FLAG_ROUTER, "router" },
     { 0,	NULL }
 };
 
-static struct tok icmp6_opt_ra_flag_values[] = {
+static const struct tok icmp6_opt_ra_flag_values[] = {
     { ND_RA_FLAG_MANAGED, "managed" },
     { ND_RA_FLAG_OTHER, "other stateful"},
     { ND_RA_FLAG_HOME_AGENT, "home agent"},
     { 0,	NULL }
 };
 
-static struct tok icmp6_nd_na_flag_values[] = {
+static const struct tok icmp6_nd_na_flag_values[] = {
     { ND_NA_FLAG_ROUTER, "router" },
     { ND_NA_FLAG_SOLICITED, "solicited" },
     { ND_NA_FLAG_OVERRIDE, "override" },
@@ -129,7 +129,7 @@ static struct tok icmp6_nd_na_flag_values[] = {
 };
 
 
-static struct tok icmp6_opt_values[] = {
+static const struct tok icmp6_opt_values[] = {
    { ND_OPT_SOURCE_LINKADDR, "source link-address"},
    { ND_OPT_TARGET_LINKADDR, "destination link-address"},
    { ND_OPT_PREFIX_INFORMATION, "prefix info"},
@@ -144,7 +144,7 @@ static struct tok icmp6_opt_values[] = {
 };
 
 /* mldv2 report types */
-static struct tok mldv2report2str[] = {
+static const struct tok mldv2report2str[] = {
 	{ 1,	"is_in" },
 	{ 2,	"is_ex" },
 	{ 3,	"to_in" },
