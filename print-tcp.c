@@ -611,6 +611,7 @@ tcp_print(register const u_char *bp, register u_int length,
                                 LENCHECK(datalen);
                                 if (datalen < 2)
                                         goto bad;
+                                /* RFC6994 */
                                 magic = EXTRACT_16BITS(cp);
                                 (void)printf("-");
 
