@@ -148,7 +148,7 @@ tcp_print(register const u_char *bp, register u_int length,
         u_int32_t seq, ack, thseq, thack;
         u_int utoval;
         u_int16_t magic;
-        int threv;
+        register int rev;
 #ifdef INET6
         register const struct ip6_hdr *ip6;
 #endif
@@ -265,7 +265,6 @@ tcp_print(register const u_char *bp, register u_int length,
         if (!Sflag && (flags & TH_ACK)) {
                 register struct tcp_seq_hash *th;
                 const void *src, *dst;
-                register int rev;
                 struct tha tha;
                 /*
                  * Find (or record) the initial sequence numbers for
@@ -354,7 +353,6 @@ tcp_print(register const u_char *bp, register u_int length,
                 }
 #endif
 
-                threv = rev;
                 for (th = &tcp_seq_hash[tha.port % TSEQ_HASHSIZE];
                      th->nxt; th = th->nxt)
                         if (memcmp((char *)&tha, (char *)&th->addr,
@@ -385,7 +383,7 @@ tcp_print(register const u_char *bp, register u_int length,
                 thack = th->ack;
         } else {
                 /*fool gcc*/
-                thseq = thack = threv = 0;
+                thseq = thack = rev = 0;
         }
         if (hlen > length) {
                 (void)printf(" [bad hdr length %u - too long, > %u]",
@@ -506,7 +504,7 @@ tcp_print(register const u_char *bp, register u_int length,
                                                 s = EXTRACT_32BITS(cp + i);
                                                 LENCHECK(i + 8);
                                                 e = EXTRACT_32BITS(cp + i + 4);
-                                                if (threv) {
+                                                if (rev) {
                                                         s -= thseq;
                                                         e -= thseq;
                                                 } else {
