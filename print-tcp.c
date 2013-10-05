@@ -70,13 +70,8 @@ static void print_tcp_rst_data(register const u_char *sp, u_int length);
 
 
 struct tha {
-#ifndef INET6
         struct in_addr src;
         struct in_addr dst;
-#else
-        struct in6_addr src;
-        struct in6_addr dst;
-#endif /*INET6*/
         u_int port;
 };
 
@@ -87,12 +82,30 @@ struct tcp_seq_hash {
         tcp_seq ack;
 };
 
+#ifdef INET6
+struct tha6 {
+        struct in6_addr src;
+        struct in6_addr dst;
+        u_int port;
+};
+
+struct tcp_seq_hash6 {
+        struct tcp_seq_hash6 *nxt;
+        struct tha6 addr;
+        tcp_seq seq;
+        tcp_seq ack;
+};
+#endif
+
 #define TSEQ_HASHSIZE 919
 
 /* These tcp optinos do not have the size octet */
 #define ZEROLENOPT(o) ((o) == TCPOPT_EOL || (o) == TCPOPT_NOP)
 
-static struct tcp_seq_hash tcp_seq_hash[TSEQ_HASHSIZE];
+static struct tcp_seq_hash tcp_seq_hash4[TSEQ_HASHSIZE];
+#ifdef INET6
+static struct tcp_seq_hash6 tcp_seq_hash6[TSEQ_HASHSIZE];
+#endif
 
 static const struct tok tcp_flag_values[] = {
         { TH_FIN, "F" },
@@ -263,18 +276,21 @@ tcp_print(register const u_char *bp, register u_int length,
         printf("Flags [%s]", bittok2str_nosep(tcp_flag_values, "none", flags));
 
         if (!Sflag && (flags & TH_ACK)) {
-                register struct tcp_seq_hash *th;
-                const void *src, *dst;
-                struct tha tha;
                 /*
                  * Find (or record) the initial sequence numbers for
                  * this conversation.  (we pick an arbitrary
                  * collating order so there's only one entry for
                  * both directions).
                  */
-#ifdef INET6
                 rev = 0;
+#ifdef INET6
                 if (ip6) {
+                        register struct tcp_seq_hash6 *th;
+                        struct tcp_seq_hash6 *tcp_seq_hash;
+                        const struct in6_addr *src, *dst;
+                        struct tha6 tha;
+
+                        tcp_seq_hash = tcp_seq_hash6;
                         src = &ip6->ip6_src;
                         dst = &ip6->ip6_dst;
                         if (sport > dport)
@@ -292,28 +308,45 @@ tcp_print(register const u_char *bp, register u_int length,
                                 memcpy(&tha.src, src, sizeof ip6->ip6_src);
                                 tha.port = sport << 16 | dport;
                         }
+
+                        for (th = &tcp_seq_hash[tha.port % TSEQ_HASHSIZE];
+                             th->nxt; th = th->nxt)
+                                if (memcmp((char *)&tha, (char *)&th->addr,
+                                           sizeof(th->addr)) == 0)
+                                        break;
+
+                        if (!th->nxt || (flags & TH_SYN)) {
+                                /* didn't find it or new conversation */
+                                if (th->nxt == NULL) {
+                                        th->nxt = (struct tcp_seq_hash6 *)
+                                                calloc(1, sizeof(*th));
+                                        if (th->nxt == NULL)
+                                                error("tcp_print: calloc");
+                                }
+                                th->addr = tha;
+                                if (rev)
+                                        th->ack = seq, th->seq = ack - 1;
+                                else
+                                        th->seq = seq, th->ack = ack - 1;
+                        } else {
+                                if (rev)
+                                        seq -= th->ack, ack -= th->seq;
+                                else
+                                        seq -= th->seq, ack -= th->ack;
+                        }
+
+                        thseq = th->seq;
+                        thack = th->ack;
                 } else {
-                        /*
-                         * Zero out the tha structure; the src and dst
-                         * fields are big enough to hold an IPv6
-                         * address, but we only have IPv4 addresses
-                         * and thus must clear out the remaining 124
-                         * bits.
-                         *
-                         * XXX - should we just clear those bytes after
-                         * copying the IPv4 addresses, rather than
-                         * zeroing out the entire structure and then
-                         * overwriting some of the zeroes?
-                         *
-                         * XXX - this could fail if we see TCP packets
-                         * with an IPv6 address with the lower 124 bits
-                         * all zero and also see TCP packes with an
-                         * IPv4 address with the same 32 bits as the
-                         * upper 32 bits of the IPv6 address in question.
-                         * Can that happen?  Is it likely enough to be
-                         * an issue?
-                         */
-                        memset(&tha, 0, sizeof(tha));
+#else  /*INET6*/
+                {
+#endif /*INET6*/
+                        register struct tcp_seq_hash *th;
+                        struct tcp_seq_hash *tcp_seq_hash;
+                        const struct in_addr *src, *dst;
+                        struct tha tha;
+
+                        tcp_seq_hash = tcp_seq_hash4;
                         src = &ip->ip_src;
                         dst = &ip->ip_dst;
                         if (sport > dport)
@@ -331,56 +364,36 @@ tcp_print(register const u_char *bp, register u_int length,
                                 memcpy(&tha.src, src, sizeof ip->ip_src);
                                 tha.port = sport << 16 | dport;
                         }
-                }
-#else
-                rev = 0;
-                src = &ip->ip_src;
-                dst = &ip->ip_dst;
-                if (sport > dport)
-                        rev = 1;
-                else if (sport == dport) {
-                        if (memcmp(src, dst, sizeof ip->ip_dst) > 0)
-                                rev = 1;
-                }
-                if (rev) {
-                        memcpy(&tha.src, dst, sizeof ip->ip_dst);
-                        memcpy(&tha.dst, src, sizeof ip->ip_src);
-                        tha.port = dport << 16 | sport;
-                } else {
-                        memcpy(&tha.dst, dst, sizeof ip->ip_dst);
-                        memcpy(&tha.src, src, sizeof ip->ip_src);
-                        tha.port = sport << 16 | dport;
-                }
-#endif
 
-                for (th = &tcp_seq_hash[tha.port % TSEQ_HASHSIZE];
-                     th->nxt; th = th->nxt)
-                        if (memcmp((char *)&tha, (char *)&th->addr,
-                                   sizeof(th->addr)) == 0)
-                                break;
+                        for (th = &tcp_seq_hash[tha.port % TSEQ_HASHSIZE];
+                             th->nxt; th = th->nxt)
+                                if (memcmp((char *)&tha, (char *)&th->addr,
+                                           sizeof(th->addr)) == 0)
+                                        break;
 
-                if (!th->nxt || (flags & TH_SYN)) {
-                        /* didn't find it or new conversation */
-                        if (th->nxt == NULL) {
-                                th->nxt = (struct tcp_seq_hash *)
-                                        calloc(1, sizeof(*th));
-                                if (th->nxt == NULL)
-                                        error("tcp_print: calloc");
+                        if (!th->nxt || (flags & TH_SYN)) {
+                                /* didn't find it or new conversation */
+                                if (th->nxt == NULL) {
+                                        th->nxt = (struct tcp_seq_hash *)
+                                                calloc(1, sizeof(*th));
+                                        if (th->nxt == NULL)
+                                                error("tcp_print: calloc");
+                                }
+                                th->addr = tha;
+                                if (rev)
+                                        th->ack = seq, th->seq = ack - 1;
+                                else
+                                        th->seq = seq, th->ack = ack - 1;
+                        } else {
+                                if (rev)
+                                        seq -= th->ack, ack -= th->seq;
+                                else
+                                        seq -= th->seq, ack -= th->ack;
                         }
-                        th->addr = tha;
-                        if (rev)
-                                th->ack = seq, th->seq = ack - 1;
-                        else
-                                th->seq = seq, th->ack = ack - 1;
-                } else {
-                        if (rev)
-                                seq -= th->ack, ack -= th->seq;
-                        else
-                                seq -= th->seq, ack -= th->ack;
-                }
 
-                thseq = th->seq;
-                thack = th->ack;
+                        thseq = th->seq;
+                        thack = th->ack;
+                }
         } else {
                 /*fool gcc*/
                 thseq = thack = rev = 0;
