@@ -117,6 +117,7 @@ AC_DEFUN(AC_LBL_C_INIT,
 	    # -Werror forces warnings to be errors.
 	    #
 	    ac_lbl_cc_force_warning_errors=-Werror
+	    AC_LBL_CHECK_COMPILER_OPT($1, -ffloat-store)
     else
 	    $2="$$2 -I/usr/local/include"
 	    LDFLAGS="$LDFLAGS -L/usr/local/lib"
