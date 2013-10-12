@@ -853,7 +853,7 @@ static void
 nfs_printfh(register const u_int32_t *dp, const u_int len)
 {
 	my_fsid fsid;
-	ino_t ino;
+	u_int32_t ino;
 	const char *sfsname = NULL;
 	char *spacep;
 

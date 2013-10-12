@@ -69,8 +69,6 @@
 #define read _read
 #define close _close
 #define O_RDONLY _O_RDONLY
-
-typedef short ino_t;
 #endif /* __MINGW32__ */
 
 #ifdef __MINGW32__
