@@ -171,7 +171,11 @@ typedef char* caddr_t;
  * Note: this also requires that padding be put into the structure,
  * at least for compilers where it's implemented as __attribute__((packed)).
  */
+#if defined(_MSC_VER) && defined(UNALIGNED)
+/* MSVC may have its own macro defined with the same name and purpose. */
+#else
 #define UNALIGNED	__attribute__((packed))
+#endif
 
 #if defined(WIN32) || defined(MSDOS)
   #define FOPEN_READ_TXT   "rt"
