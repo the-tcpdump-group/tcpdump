@@ -106,7 +106,7 @@ static int Lflag;			/* list available data link types and exit */
 static int Jflag;			/* list available time stamp types */
 #endif
 #ifdef HAVE_PCAP_SETDIRECTION
-int Pflag = PCAP_D_INOUT;	/* Restrict captured packet by sent/receive direction */
+int Pflag = -1;	/* Restrict captured packet by sent/receive direction */
 #endif
 static char *zflag = NULL;		/* compress each savefile using a specified command (like gzip or bzip2) */
 
@@ -1334,10 +1334,12 @@ main(int argc, char **argv)
 				    pcap_statustostr(status));
 		}
 #ifdef HAVE_PCAP_SETDIRECTION
-		status = pcap_setdirection(pd, Pflag);
-		if (status != 0)
-			error("%s: pcap_set_direction failed: %s",
-			    device,  pcap_geterr(pd));
+		if (Pflag != -1) {
+			status = pcap_setdirection(pd, Pflag);
+			if (status != 0)
+				error("%s: pcap_setdirection() failed: %s",
+				      device,  pcap_geterr(pd));
+		}
 #endif
 #else
 		*ebuf = '\0';
