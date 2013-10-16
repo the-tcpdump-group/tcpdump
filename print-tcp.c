@@ -774,6 +774,7 @@ print_tcp_rst_data(register const u_char *sp, u_int length)
 }
 
 #ifdef HAVE_LIBCRYPTO
+USES_APPLE_DEPRECATED_API
 static int
 tcp_verify_signature(const struct ip *ip, const struct tcphdr *tp,
                      const u_char *data, int length, const u_char *rcvsig)
@@ -860,6 +861,7 @@ tcp_verify_signature(const struct ip *ip, const struct tcphdr *tp,
         else
                 return (SIGNATURE_INVALID);
 }
+USES_APPLE_RST
 #endif /* HAVE_LIBCRYPTO */
 
 /*
