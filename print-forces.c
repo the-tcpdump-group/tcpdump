@@ -744,7 +744,9 @@ sdatailv_print(register const u_char * pptr, register u_int len,
 	rlen = len;
 	indent += 1;
 	while (rlen != 0) {
-		//printf("Jamal - outstanding length <%d>\n", rlen);
+#if 0
+		printf("Jamal - outstanding length <%d>\n", rlen);
+#endif
 		char *ib = indent_pr(indent, 1);
 		register const u_char *tdp = (u_char *) ILV_DATA(ilv);
 		TCHECK(*ilv);
