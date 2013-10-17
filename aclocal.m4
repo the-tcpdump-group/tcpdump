@@ -78,6 +78,9 @@ dnl     use -O (AC_PROG_CC will use -g -O2 on gcc, so we don't need to
 dnl     do that ourselves for gcc)
 dnl     explicitly specify /usr/local/include
 dnl
+dnl NOTE WELL: with newer versions of autoconf, "gcc" means any compiler
+dnl that defines __GNUC__, which means clang, for example, counts as "gcc".
+dnl
 dnl usage:
 dnl
 dnl	AC_LBL_C_INIT(copt, incls)
