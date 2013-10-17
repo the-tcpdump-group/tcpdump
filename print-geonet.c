@@ -66,7 +66,7 @@ print_btp_body(const u_char *bp, u_int length)
 		return;
 	}
 
-	// Assuming ItsDpuHeader
+	/* Assuming ItsDpuHeader */
 	version = bp[0];
 	msg_type = bp[1];
 	msg_type_str = tok2str(msg_type_values, "unknown (%u)", msg_type);
@@ -112,7 +112,7 @@ geonet_print(netdissect_options *ndo, const u_char *eth, const u_char *bp, u_int
 	printf("GeoNet src:%s; ", etheraddr_string(eth+6));
 
 	if (length >= 36) {
-		// Process Common Header
+		/* Process Common Header */
 		int version = bp[0] >> 4;
 		int next_hdr = bp[0] & 0x0f;
 		int hdr_type = bp[1] >> 4;
@@ -165,11 +165,11 @@ geonet_print(netdissect_options *ndo, const u_char *eth, const u_char *bp, u_int
 		printf("Payload:%d ", payload_length);
         	print_long_pos_vector(bp + 8);
 
-		// Skip Common Header
+		/* Skip Common Header */
 		length -= 36;
 		bp += 36;
 
-		// Process Extended Headers
+		/* Process Extended Headers */
 		switch (hdr_type) {
 			case 0: /* Any */
 				hdr_size = 0;
@@ -215,7 +215,7 @@ geonet_print(netdissect_options *ndo, const u_char *eth, const u_char *bp, u_int
 				break;
 		}
 
-		// Skip Extended headers
+		/* Skip Extended headers */
 		if (hdr_size >= 0) {
 			length -= hdr_size;
 			bp += hdr_size;
@@ -237,7 +237,7 @@ geonet_print(netdissect_options *ndo, const u_char *eth, const u_char *bp, u_int
 		printf("Malformed (small) ");
 	}
 
-	// Print user data part
+	/* Print user data part */
 	if (ndo->ndo_vflag)
 		default_print(bp, length);
 }
