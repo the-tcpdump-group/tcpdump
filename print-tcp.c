@@ -187,42 +187,6 @@ tcp_print(register const u_char *bp, register u_int length,
 
         hlen = TH_OFF(tp) * 4;
 
-        /*
-	 * If data present, header length valid, and NFS port used,
-	 * assume NFS.
-	 * Pass offset of data plus 4 bytes for RPC TCP msg length
-	 * to NFS print routines.
-	 */
-	if (!qflag && hlen >= sizeof(*tp) && hlen <= length &&
-	    (length - hlen) >= 4) {
-		u_char *fraglenp;
-		u_int32_t fraglen;
-		register struct sunrpc_msg *rp;
-		enum sunrpc_msg_type direction;
-
-		fraglenp = (u_char *)tp + hlen;
-		if (TTEST2(*fraglenp, 4)) {
-			fraglen = EXTRACT_32BITS(fraglenp) & 0x7FFFFFFF;
-			if (fraglen > (length - hlen) - 4)
-				fraglen = (length - hlen) - 4;
-			rp = (struct sunrpc_msg *)(fraglenp + 4);
-			if (TTEST(rp->rm_direction)) {
-				direction = (enum sunrpc_msg_type)EXTRACT_32BITS(&rp->rm_direction);
-				if (dport == NFS_PORT &&
-				    direction == SUNRPC_CALL) {
-					nfsreq_print((u_char *)rp, fraglen,
-					    (u_char *)ip);
-					return;
-				}
-				if (sport == NFS_PORT &&
-				    direction == SUNRPC_REPLY) {
-					nfsreply_print((u_char *)rp, fraglen,
-					    (u_char *)ip);
-					return;
-				}
-			}
-                }
-        }
 #ifdef INET6
         if (ip6) {
                 if (ip6->ip6_nxt == IPPROTO_TCP) {
@@ -738,6 +702,36 @@ tcp_print(register const u_char *bp, register u_int length,
         }
         else if (length > 0 && (sport == LDP_PORT || dport == LDP_PORT)) {
                 ldp_print(bp, length);
+        }
+        else if ((sport == NFS_PORT || dport == NFS_PORT) &&
+                 length >= 4 && TTEST2(*bp, 4)) {
+                /*
+                 * If data present, header length valid, and NFS port used,
+                 * assume NFS.
+                 * Pass offset of data plus 4 bytes for RPC TCP msg length
+                 * to NFS print routines.
+                 */
+                u_int32_t fraglen;
+                register struct sunrpc_msg *rp;
+                enum sunrpc_msg_type direction;
+
+                fraglen = EXTRACT_32BITS(bp) & 0x7FFFFFFF;
+                if (fraglen > (length) - 4)
+                        fraglen = (length) - 4;
+                rp = (struct sunrpc_msg *)(bp + 4);
+                if (TTEST(rp->rm_direction)) {
+                        direction = (enum sunrpc_msg_type)EXTRACT_32BITS(&rp->rm_direction);
+                        if (dport == NFS_PORT && direction == SUNRPC_CALL) {
+                                (void)printf(" | ");
+                                nfsreq_print_noaddr((u_char *)rp, fraglen, (u_char *)ip);
+                                return;
+                        }
+                        if (sport == NFS_PORT && direction == SUNRPC_REPLY) {
+                                (void)printf(" | ");
+                                nfsreply_print_noaddr((u_char *)rp, fraglen, (u_char *)ip);
+                                return;
+                        }
+                }
         }
 
         return;
