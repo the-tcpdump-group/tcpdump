@@ -44,10 +44,9 @@ AC_DEFUN(AC_LBL_C_INIT_BEFORE_CC,
     AC_BEFORE([$0], [AC_LBL_FIXINCLUDES])
     AC_BEFORE([$0], [AC_LBL_DEVEL])
     AC_ARG_WITH(gcc, [  --without-gcc           don't use gcc])
-    $1="-O"
-    $2=""
+    $1=""
     if test "${srcdir}" != "." ; then
-	    $2="-I$srcdir"
+	    $1="-I$srcdir"
     fi
     if test "${CFLAGS+set}" = set; then
 	    LBL_CFLAGS="$CFLAGS"
@@ -73,9 +72,11 @@ AC_DEFUN(AC_LBL_C_INIT_BEFORE_CC,
 dnl
 dnl Determine which compiler we're using (cc or gcc)
 dnl If using gcc, determine the version number
-dnl If using cc, require that it support ansi prototypes
-dnl If using gcc, use -O2 (otherwise use -O)
-dnl If using cc, explicitly specify /usr/local/include
+dnl If using cc:
+dnl     require that it support ansi prototypes
+dnl     use -O (AC_PROG_CC will use -g -O2 on gcc, so we don't need to
+dnl     do that ourselves for gcc)
+dnl     explicitly specify /usr/local/include
 dnl
 dnl usage:
 dnl
@@ -98,7 +99,6 @@ AC_DEFUN(AC_LBL_C_INIT,
     if test "$GCC" = yes ; then
 	    if test "$SHLICC2" = yes ; then
 		    ac_cv_lbl_gcc_vers=2
-		    $1="-O2"
 	    else
 		    AC_MSG_CHECKING(gcc version)
 		    AC_CACHE_VAL(ac_cv_lbl_gcc_vers,
@@ -108,15 +108,19 @@ AC_DEFUN(AC_LBL_C_INIT,
 				-e 's/ .*//' -e 's/^[[[^0-9]]]*//' \
 				-e 's/\..*//'`)
 		    AC_MSG_RESULT($ac_cv_lbl_gcc_vers)
-		    if test $ac_cv_lbl_gcc_vers -gt 1 ; then
-			    $1="-O2"
-		    fi
 	    fi
 
 	    #
 	    # -Werror forces warnings to be errors.
 	    #
 	    ac_lbl_cc_force_warning_errors=-Werror
+
+            #
+            # Use -ffloat-store so that, on 32-bit x86, we don't
+	    # do 80-bit arithmetic with the FPU; that way we should
+	    # get the same results for floating-point calculations
+	    # on x86-32 and x86-64.
+	    #
 	    AC_LBL_CHECK_COMPILER_OPT($1, -ffloat-store)
     else
 	    $2="$$2 -I/usr/local/include"
@@ -152,7 +156,7 @@ AC_DEFUN(AC_LBL_C_INIT,
 		    # don't want to try using GCC-style -W flags.
 		    #
 		    ac_lbl_cc_dont_try_gcc_dashW=yes
-		    $1="$$1 -xansi -signed -O"
+		    $1="$$1 -xansi -signed"
 		    ;;
 
 	    osf*)
@@ -167,7 +171,6 @@ AC_DEFUN(AC_LBL_C_INIT,
 		    # don't want to try using GCC-style -W flags.
 		    #
 		    ac_lbl_cc_dont_try_gcc_dashW=yes
-		    $1="$$1 -O"
 		    ;;
 
 	    solaris*)
@@ -194,6 +197,7 @@ AC_DEFUN(AC_LBL_C_INIT,
 		    fi
 		    ;;
 	    esac
+	    $1="$$1 -O"
     fi
 ])
 
@@ -933,8 +937,6 @@ dnl
 dnl If the file .devel exists:
 dnl	Add some warning flags if the compiler supports them
 dnl	If an os prototype include exists, symlink os-proto.h to it
-dnl	If we're using gcc:
-dnl	    Compile with -g (if supported)
 dnl
 dnl usage:
 dnl
@@ -964,13 +966,7 @@ AC_DEFUN(AC_LBL_DEVEL,
 		    AC_LBL_CHECK_COMPILER_OPT($1, -W)
 	    fi
 	    AC_LBL_CHECK_DEPENDENCY_GENERATION_OPT()
-	    if test "$GCC" = yes ; then
-		    if test "${LBL_CFLAGS+set}" != set; then
-			    if test "$ac_cv_prog_cc_g" = yes ; then
-				    $1="-g $$1"
-			    fi
-		    fi
-	    else
+	    if test "$GCC" != yes ; then
 		    case "$host_os" in
 
 		    irix6*)
