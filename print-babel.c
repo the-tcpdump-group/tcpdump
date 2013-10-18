@@ -139,6 +139,23 @@ format_address(const u_char *prefix)
 #endif
 }
 
+static const char *
+format_interval(const u_int16_t i)
+{
+    static char buf[sizeof("0000.0s")];
+
+    if (i == 0)
+        return "0.0s (bogus)";
+    snprintf(buf, sizeof(buf), "%u.%us", i / 10, i % 10);
+    return buf;
+}
+
+static const char *
+format_interval_update(const u_int16_t i)
+{
+    return i == 0xFFFF ? "infinity" : format_interval(i);
+}
+
 /* Return number of octets consumed from the input buffer (not the prefix length
  * in bytes), or -1 for encoding error. */
 static int
@@ -335,7 +352,7 @@ babel_print_v2(const u_char *cp, u_int length) {
                 if(len < 6) goto corrupt;
                 nonce = EXTRACT_16BITS(message + 4);
                 interval = EXTRACT_16BITS(message + 6);
-                printf("%04x %d", nonce, interval);
+                printf("%04x %s", nonce, format_interval(interval));
             }
         }
             break;
@@ -362,7 +379,7 @@ babel_print_v2(const u_char *cp, u_int length) {
                 if(len < 6) goto corrupt;
                 seqno = EXTRACT_16BITS(message + 4);
                 interval = EXTRACT_16BITS(message + 6);
-                printf("seqno %u interval %u", seqno, interval);
+                printf("seqno %u interval %s", seqno, format_interval(interval));
             }
         }
             break;
@@ -380,8 +397,8 @@ babel_print_v2(const u_char *cp, u_int length) {
                 interval = EXTRACT_16BITS(message + 6);
                 rc = network_address(message[2], message + 8, len - 6, address);
                 if(rc < 0) { printf("[|babel]"); break; }
-                printf("%s txcost %u interval %d",
-                       format_address(address), txcost, interval);
+                printf("%s txcost %u interval %s",
+                       format_address(address), txcost, format_interval(interval));
             }
         }
             break;
@@ -438,12 +455,12 @@ babel_print_v2(const u_char *cp, u_int length) {
                 interval = EXTRACT_16BITS(message + 6);
                 seqno = EXTRACT_16BITS(message + 8);
                 metric = EXTRACT_16BITS(message + 10);
-                printf("%s%s%s %s metric %u seqno %u interval %u",
+                printf("%s%s%s %s metric %u seqno %u interval %s",
                        (message[3] & 0x80) ? "/prefix": "",
                        (message[3] & 0x40) ? "/id" : "",
                        (message[3] & 0x3f) ? "/unknown" : "",
                        format_prefix(prefix, plen),
-                       metric, seqno, interval);
+                       metric, seqno, format_interval_update(interval));
                 if(message[3] & 0x80) {
                     if(message[2] == 1)
                         memcpy(v4_prefix, prefix, 16);

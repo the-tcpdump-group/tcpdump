@@ -48,6 +48,7 @@ const struct tok signature_check_values[] = {
  * Compute a HMAC MD5 sum.
  * Taken from rfc2104, Appendix.
  */
+USES_APPLE_DEPRECATED_API
 static void
 signature_compute_hmac_md5(const u_int8_t *text, int text_len, unsigned char *key,
                            unsigned int key_len, u_int8_t *digest)
@@ -110,6 +111,7 @@ signature_compute_hmac_md5(const u_int8_t *text, int text_len, unsigned char *ke
     MD5_Update(&context, digest, 16);     /* then results of 1st hash */
     MD5_Final(digest, &context);          /* finish up 2nd pass */
 }
+USES_APPLE_RST
 #endif
 
 #ifdef HAVE_LIBCRYPTO
