@@ -38,7 +38,7 @@ dnl AC_LBL_C_INIT.  Now, we run AC_LBL_C_INIT_BEFORE_CC, AC_PROG_CC,
 dnl and AC_LBL_C_INIT at the top level.
 dnl
 AC_DEFUN(AC_LBL_C_INIT_BEFORE_CC,
-    [AC_PREREQ(2.50)
+[
     AC_BEFORE([$0], [AC_LBL_C_INIT])
     AC_BEFORE([$0], [AC_PROG_CC])
     AC_BEFORE([$0], [AC_LBL_FIXINCLUDES])
@@ -95,7 +95,7 @@ dnl	ac_cv_lbl_gcc_vers
 dnl	LBL_CFLAGS
 dnl
 AC_DEFUN(AC_LBL_C_INIT,
-    [AC_PREREQ(2.50)
+[
     AC_BEFORE([$0], [AC_LBL_FIXINCLUDES])
     AC_BEFORE([$0], [AC_LBL_DEVEL])
     AC_BEFORE([$0], [AC_LBL_SHLIBS_INIT])
