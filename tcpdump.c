@@ -747,7 +747,7 @@ main(int argc, char **argv)
 #endif
 
 	while (
-	    (op = getopt(argc, argv, "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOp" P_FLAG "qr:Rs:StT:u" U_FLAG "V:vw:W:xXy:Yz:Z:")) != -1)
+	    (op = getopt(argc, argv, "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOp" P_FLAG "qr:Rs:StT:u" U_FLAG "vV:w:W:xXy:Yz:Z:")) != -1)
 		switch (op) {
 
 		case 'a':
