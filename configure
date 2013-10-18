@@ -3406,6 +3406,21 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 		    # don't want to try using GCC-style -W flags.
 		    #
 		    ac_lbl_cc_dont_try_gcc_dashW=yes
+		    #
+		    # It also, apparently, defaults to "char" being
+		    # unsigned, unlike most other C implementations;
+		    # I suppose we could say "signed char" whenever
+		    # we want to guarantee a signed "char", but let's
+		    # just force signed chars.
+		    #
+		    # -xansi is normally the default, but the
+		    # configure script was setting it; perhaps -cckr
+		    # was the default in the Old Days.  (Then again,
+		    # that would probably be for backwards compatibility
+		    # in the days when ANSI C was Shiny and New, i.e.
+		    # 1989 and the early '90's, so maybe we can just
+		    # drop support for those compilers.)
+		    #
 		    V_CCOPT="$V_CCOPT -xansi -signed"
 		    ;;
 
