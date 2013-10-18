@@ -100,26 +100,13 @@ AC_DEFUN(AC_LBL_C_INIT,
     AC_BEFORE([$0], [AC_LBL_DEVEL])
     AC_BEFORE([$0], [AC_LBL_SHLIBS_INIT])
     if test "$GCC" = yes ; then
-	    if test "$SHLICC2" = yes ; then
-		    ac_cv_lbl_gcc_vers=2
-	    else
-		    AC_MSG_CHECKING(gcc version)
-		    AC_CACHE_VAL(ac_cv_lbl_gcc_vers,
-			ac_cv_lbl_gcc_vers=`$CC -v 2>&1 | \
-			    sed -e '/^gcc version /!d' \
-				-e 's/^gcc version //' \
-				-e 's/ .*//' -e 's/^[[[^0-9]]]*//' \
-				-e 's/\..*//'`)
-		    AC_MSG_RESULT($ac_cv_lbl_gcc_vers)
-	    fi
-
 	    #
 	    # -Werror forces warnings to be errors.
 	    #
 	    ac_lbl_cc_force_warning_errors=-Werror
 
-            #
-            # Use -ffloat-store so that, on 32-bit x86, we don't
+	    #
+	    # Use -ffloat-store so that, on 32-bit x86, we don't
 	    # do 80-bit arithmetic with the FPU; that way we should
 	    # get the same results for floating-point calculations
 	    # on x86-32 and x86-64.
