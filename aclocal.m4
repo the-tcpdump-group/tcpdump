@@ -91,7 +91,6 @@ dnl	$1 (copt set)
 dnl	$2 (incls set)
 dnl	CC
 dnl	LDFLAGS
-dnl	ac_cv_lbl_gcc_vers
 dnl	LBL_CFLAGS
 dnl
 AC_DEFUN(AC_LBL_C_INIT,
