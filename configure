@@ -7764,7 +7764,18 @@ $as_echo "no" >&6; }
 		    case "$host_os" in
 
 		    irix6*)
-			    V_CCOPT="$V_CCOPT -n32"
+			    # Presumed to be MIPS C.
+			    V_CCOPT="$V_CCOPT -n32 -g3"
+			    ;;
+
+		    irix*)
+			    # Presumed to be MIPS C.
+			    V_CCOPT="$V_CCOPT -g3"
+			    ;;
+
+		    osf*)
+			    # Presumed to be the DEC C compiler.
+			    V_CCOPT="$V_CCOPT -g3"
 			    ;;
 
 		    *)

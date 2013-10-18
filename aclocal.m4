@@ -940,6 +940,7 @@ dnl
 dnl If the file .devel exists:
 dnl	Add some warning flags if the compiler supports them
 dnl	If an os prototype include exists, symlink os-proto.h to it
+dnl     Add -g flags, as appropriate, for various non-gcc-style compilers
 dnl
 dnl usage:
 dnl
@@ -973,7 +974,18 @@ AC_DEFUN(AC_LBL_DEVEL,
 		    case "$host_os" in
 
 		    irix6*)
-			    V_CCOPT="$V_CCOPT -n32"
+			    # Presumed to be MIPS C.
+			    V_CCOPT="$V_CCOPT -n32 -g3"
+			    ;;
+
+		    irix*)
+			    # Presumed to be MIPS C.
+			    V_CCOPT="$V_CCOPT -g3"
+			    ;;
+
+		    osf*)
+			    # Presumed to be the DEC C compiler.
+			    V_CCOPT="$V_CCOPT -g3"
 			    ;;
 
 		    *)
