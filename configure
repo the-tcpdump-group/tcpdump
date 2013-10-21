@@ -3421,7 +3421,13 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 		    # 1989 and the early '90's, so maybe we can just
 		    # drop support for those compilers.)
 		    #
-		    V_CCOPT="$V_CCOPT -xansi -signed"
+		    # -g is equivalent to -g2, which turns off
+		    # optimization; we choose -g3, which generates
+		    # debugging information but doesn't turn off
+		    # optimization (even if the optimization would
+		    # cause inaccuracies in debugging).
+		    #
+		    V_CCOPT="$V_CCOPT -xansi -signed -g3"
 		    ;;
 
 	    osf*)
@@ -3436,6 +3442,14 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 		    # don't want to try using GCC-style -W flags.
 		    #
 		    ac_lbl_cc_dont_try_gcc_dashW=yes
+		    #
+		    # -g is equivalent to -g2, which turns off
+		    # optimization; we choose -g3, which generates
+		    # debugging information but doesn't turn off
+		    # optimization (even if the optimization would
+		    # cause inaccuracies in debugging).
+		    #
+		    V_CCOPT="$V_CCOPT -g3"
 		    ;;
 
 	    solaris*)
@@ -7756,28 +7770,14 @@ $as_echo "no" >&6; }
 
 
 
-	    if test "$GCC" != yes ; then
-		    case "$host_os" in
-
-		    irix6*)
-			    # Presumed to be MIPS C.
-			    V_CCOPT="$V_CCOPT -n32 -g3"
-			    ;;
-
-		    irix*)
-			    # Presumed to be MIPS C.
-			    V_CCOPT="$V_CCOPT -g3"
-			    ;;
-
-		    osf*)
-			    # Presumed to be the DEC C compiler.
-			    V_CCOPT="$V_CCOPT -g3"
-			    ;;
-
-		    *)
-			    ;;
-		    esac
-	    fi
+	    #
+	    # We used to set -n32 for IRIX 6 when not using GCC (presumed
+	    # to mean that we're using MIPS C or MIPSpro C); it specified
+	    # the "new" faster 32-bit ABI, introduced in IRIX 6.2.  I'm
+	    # not sure why that would be something to do *only* with a
+	    # .devel file; why should the ABI for which we produce code
+	    # depend on .devel?
+	    #
 	    os=`echo $host_os | sed -e 's/\([0-9][0-9]*\)[^0-9].*$/\1/'`
 	    name="lbl/os-$os.h"
 	    if test -f $name ; then

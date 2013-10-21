@@ -76,6 +76,7 @@ dnl If using cc:
 dnl     require that it support ansi prototypes
 dnl     use -O (AC_PROG_CC will use -g -O2 on gcc, so we don't need to
 dnl     do that ourselves for gcc)
+dnl     add -g flags, as appropriate
 dnl     explicitly specify /usr/local/include
 dnl
 dnl NOTE WELL: with newer versions of autoconf, "gcc" means any compiler
@@ -160,7 +161,13 @@ AC_DEFUN(AC_LBL_C_INIT,
 		    # 1989 and the early '90's, so maybe we can just
 		    # drop support for those compilers.)
 		    #
-		    $1="$$1 -xansi -signed"
+		    # -g is equivalent to -g2, which turns off
+		    # optimization; we choose -g3, which generates
+		    # debugging information but doesn't turn off
+		    # optimization (even if the optimization would
+		    # cause inaccuracies in debugging).
+		    #
+		    $1="$$1 -xansi -signed -g3"
 		    ;;
 
 	    osf*)
@@ -175,6 +182,14 @@ AC_DEFUN(AC_LBL_C_INIT,
 		    # don't want to try using GCC-style -W flags.
 		    #
 		    ac_lbl_cc_dont_try_gcc_dashW=yes
+		    #
+		    # -g is equivalent to -g2, which turns off
+		    # optimization; we choose -g3, which generates
+		    # debugging information but doesn't turn off
+		    # optimization (even if the optimization would
+		    # cause inaccuracies in debugging).
+		    #
+		    $1="$$1 -g3"
 		    ;;
 
 	    solaris*)
@@ -941,7 +956,6 @@ dnl
 dnl If the file .devel exists:
 dnl	Add some warning flags if the compiler supports them
 dnl	If an os prototype include exists, symlink os-proto.h to it
-dnl     Add -g flags, as appropriate, for various non-gcc-style compilers
 dnl
 dnl usage:
 dnl
@@ -971,28 +985,14 @@ AC_DEFUN(AC_LBL_DEVEL,
 		    AC_LBL_CHECK_COMPILER_OPT($1, -W)
 	    fi
 	    AC_LBL_CHECK_DEPENDENCY_GENERATION_OPT()
-	    if test "$GCC" != yes ; then
-		    case "$host_os" in
-
-		    irix6*)
-			    # Presumed to be MIPS C.
-			    V_CCOPT="$V_CCOPT -n32 -g3"
-			    ;;
-
-		    irix*)
-			    # Presumed to be MIPS C.
-			    V_CCOPT="$V_CCOPT -g3"
-			    ;;
-
-		    osf*)
-			    # Presumed to be the DEC C compiler.
-			    V_CCOPT="$V_CCOPT -g3"
-			    ;;
-
-		    *)
-			    ;;
-		    esac
-	    fi
+	    #
+	    # We used to set -n32 for IRIX 6 when not using GCC (presumed
+	    # to mean that we're using MIPS C or MIPSpro C); it specified
+	    # the "new" faster 32-bit ABI, introduced in IRIX 6.2.  I'm
+	    # not sure why that would be something to do *only* with a
+	    # .devel file; why should the ABI for which we produce code
+	    # depend on .devel?
+	    #
 	    os=`echo $host_os | sed -e 's/\([[0-9]][[0-9]]*\)[[^0-9]].*$/\1/'`
 	    name="lbl/os-$os.h"
 	    if test -f $name ; then
