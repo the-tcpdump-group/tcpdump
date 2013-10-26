@@ -488,7 +488,7 @@ tcp_print(register const u_char *bp, register u_int length,
 #define LENCHECK(l) { if ((l) > hlen) goto bad; TCHECK2(*cp, l); }
 
 
-                        printf("%s", tok2str(tcp_option_values, "Unknown Option %u", opt));
+                        printf("%s", tok2str(tcp_option_values, "unknown-%u", opt));
 
                         switch (opt) {
 
@@ -654,6 +654,8 @@ tcp_print(register const u_char *bp, register u_int length,
 
                         default:
                                 datalen = len - 2;
+                                if (datalen)
+                                        printf(" 0x");
                                 for (i = 0; i < datalen; ++i) {
                                         LENCHECK(i);
                                         (void)printf("%02x", cp[i]);
