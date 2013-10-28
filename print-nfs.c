@@ -287,12 +287,7 @@ nfsreply_print(register const u_char *bp, u_int length,
 	       register const u_char *bp2)
 {
 	register const struct sunrpc_msg *rp;
-	u_int32_t proc, vers, reply_stat;
 	char srcid[20], dstid[20];	/*fits 32bit*/
-	enum sunrpc_reject_stat rstat;
-	u_int32_t rlow;
-	u_int32_t rhigh;
-	enum sunrpc_auth_stat rwhy;
 
 	nfserr = 0;		/* assume no error */
 	rp = (const struct sunrpc_msg *)bp;
@@ -308,6 +303,29 @@ nfsreply_print(register const u_char *bp, u_int length,
 		    EXTRACT_32BITS(&rp->rm_xid));
 	}
 	print_nfsaddr(bp2, srcid, dstid);
+
+	nfsreply_print_noaddr(bp, length, bp2);
+	return;
+
+trunc:
+	if (!nfserr)
+		fputs(" [|nfs]", stdout);
+}
+
+void
+nfsreply_print_noaddr(register const u_char *bp, u_int length,
+	       register const u_char *bp2)
+{
+	register const struct sunrpc_msg *rp;
+	u_int32_t proc, vers, reply_stat;
+	enum sunrpc_reject_stat rstat;
+	u_int32_t rlow;
+	u_int32_t rhigh;
+	enum sunrpc_auth_stat rwhy;
+
+	nfserr = 0;		/* assume no error */
+	rp = (const struct sunrpc_msg *)bp;
+
 	TCHECK(rp->rm_reply.rp_stat);
 	reply_stat = EXTRACT_32BITS(&rp->rm_reply.rp_stat);
 	switch (reply_stat) {
@@ -504,12 +522,6 @@ nfsreq_print(register const u_char *bp, u_int length,
     register const u_char *bp2)
 {
 	register const struct sunrpc_msg *rp;
-	register const u_int32_t *dp;
-	nfs_type type;
-	int v3;
-	u_int32_t proc;
-	u_int32_t access_flags;
-	struct nfsv3_sattr sa3;
 	char srcid[20], dstid[20];	/*fits 32bit*/
 
 	nfserr = 0;		/* assume no error */
@@ -527,6 +539,29 @@ nfsreq_print(register const u_char *bp, u_int length,
 	}
 	print_nfsaddr(bp2, srcid, dstid);
 	(void)printf("%d", length);
+
+	nfsreq_print_noaddr(bp, length, bp2);
+	return;
+
+trunc:
+	if (!nfserr)
+		fputs(" [|nfs]", stdout);
+}
+
+void
+nfsreq_print_noaddr(register const u_char *bp, u_int length,
+    register const u_char *bp2)
+{
+	register const struct sunrpc_msg *rp;
+	register const u_int32_t *dp;
+	nfs_type type;
+	int v3;
+	u_int32_t proc;
+	u_int32_t access_flags;
+	struct nfsv3_sattr sa3;
+
+	nfserr = 0;		/* assume no error */
+	rp = (const struct sunrpc_msg *)bp;
 
 	if (!xid_map_enter(rp, bp2))	/* record proc number for later on */
 		goto trunc;
