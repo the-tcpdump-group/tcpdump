@@ -15,10 +15,6 @@ Anonymous Git is available via:
 
 	git clone git://bpf.tcpdump.org/tcpdump
 
-Version 4.x.y of TCPDUMP can be retrieved with the CVS tag `tcpdump_4_xrely`:
-
-	cvs -d :pserver:cvs.tcpdump.org:/tcpdump/master checkout -r tcpdump_4_xrely tcpdump
-
 Please submit patches by forking the branch on GitHub at:
 
 *	http://github.com/the-tcpdump-group/tcpdump/tree/master
@@ -27,7 +23,7 @@ and issuing a pull request.
 
 formerly from 	Lawrence Berkeley National Laboratory  
 		Network Research Group <tcpdump@ee.lbl.gov>  
-		ftp://ftp.ee.lbl.gov/tcpdump.tar.Z (3.4)  
+		ftp://ftp.ee.lbl.gov/old/tcpdump.tar.Z (3.4)
 
 This directory contains source code for tcpdump, a tool for network
 monitoring and data acquisition.  This software was originally
@@ -69,7 +65,7 @@ from the Internet Traffic Archive:
 
 Another tool that tcpdump users might find useful is tcpslice:
 
-* ftp://ftp.ee.lbl.gov/tcpslice.tar.Z
+* https://github.com/the-tcpdump-group/tcpslice
 
 It is a program that can be used to extract portions of tcpdump binary
 trace files. See the above distribution for further details and
