@@ -482,7 +482,7 @@ extern void pptp_print(netdissect_options *,const u_char *, u_int);
 
 extern u_int ipnet_if_print(netdissect_options *,const struct pcap_pkthdr *, const u_char *);
 extern u_int ppi_if_print(netdissect_options *,const struct pcap_pkthdr *, const u_char *);
-extern u_int nflog_if_print(netdissect_options *,const struct pcap_pkthdr *, const u_char *);
+extern u_int nflog_if_print(struct netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p);
 extern u_int ieee802_15_4_if_print(netdissect_options *,const struct pcap_pkthdr *, const u_char *);
 
 #ifdef INET6

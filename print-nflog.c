@@ -42,7 +42,6 @@
 #ifdef DLT_NFLOG
 
 #define NFULA_PAYLOAD 9
-#define NFULA_MAX 17
 
 static const struct tok nflog_values[] = {
 	{ AF_INET,		"IPv4" },
@@ -73,16 +72,20 @@ nflog_hdr_print(struct netdissect_options *ndo, const u_char *bp, u_int length)
 	ND_PRINT((ndo, ", length %u: ", length));
 }
 
-static void
-nflog_print(struct netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
+u_int
+nflog_if_print(struct netdissect_options *ndo,
+			   const struct pcap_pkthdr *h, const u_char *p)
 {
 	const nflog_hdr_t *hdr;
 	const nflog_tlv_t *tlv;
 	u_int16_t size;
+	u_int16_t h_size = sizeof(nflog_hdr_t);
+	u_int caplen = h->caplen;
+	u_int length = h->len;
 
-	if (caplen < (int) sizeof(nflog_hdr_t)) {
+	if (caplen < (int) sizeof(nflog_hdr_t) || length < (int) sizeof(nflog_hdr_t)) {
 		ND_PRINT((ndo, "[|nflog]"));
-		return;
+		return h_size;
 	}
 
 	if (ndo->ndo_eflag)
@@ -93,20 +96,24 @@ nflog_print(struct netdissect_options *ndo, const u_char *p, u_int length, u_int
 	hdr = (const nflog_hdr_t *)p;
 	p += sizeof(nflog_hdr_t);
 
+
+	if (!(hdr->nflog_version) == 0) {
+		ND_PRINT((ndo, ", NFLOG version mismatch: %u", hdr->nflog_version));
+		return h_size;
+	}
+
 	do {
 		tlv = (const nflog_tlv_t *) p;
 		size = tlv->tlv_length;
 
-		/* wrong size of the packet */
-		if (size > length )
-			return;
-
-		/* wrong tlv type */
-		if (tlv->tlv_type > NFULA_MAX)
-			return;
-
 		if (size % 4 != 0)
 			size += 4 - size % 4;
+
+		h_size = h_size + size;
+
+		/* wrong size of the packet */
+		if (size > length || size == 0)
+			return h_size;
 
 		p += size;
 		length = length - size;
@@ -118,6 +125,7 @@ nflog_print(struct netdissect_options *ndo, const u_char *p, u_int length, u_int
 	p = p - size + 4;
 	length += size - 4;
 	caplen += size - 4;
+	h_size -= length;
 
 	switch (hdr->nflog_family) {
 
@@ -140,15 +148,8 @@ nflog_print(struct netdissect_options *ndo, const u_char *p, u_int length, u_int
 			ndo->ndo_default_print(ndo, p, caplen);
 		break;
 	}
-}
 
-u_int
-nflog_if_print(struct netdissect_options *ndo,
-			   const struct pcap_pkthdr *h, const u_char *p)
-{
-
-	nflog_print(ndo, p, h->len, h->caplen);
-	return (sizeof(nflog_hdr_t));
+	return h_size;
 }
 
 #endif /* DLT_NFLOG */
