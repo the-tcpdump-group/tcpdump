@@ -65,7 +65,7 @@ static const char rcsid[] _U_ =
 #define	GRE_RECRS	0x0700		/* recursion count */
 #define	GRE_AP		0x0080		/* acknowledgment# present */
 
-struct tok gre_flag_values[] = {
+static const struct tok gre_flag_values[] = {
     { GRE_CP, "checksum present"},
     { GRE_RP, "routing present"}, 
     { GRE_KP, "key present"}, 

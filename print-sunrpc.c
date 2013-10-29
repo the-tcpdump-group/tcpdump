@@ -68,7 +68,7 @@ static const char rcsid[] _U_ =
 #include "rpc_msg.h"
 #include "pmap_prot.h"
 
-static struct tok proc2str[] = {
+static const struct tok proc2str[] = {
 	{ SUNRPC_PMAPPROC_NULL,		"null" },
 	{ SUNRPC_PMAPPROC_SET,		"set" },
 	{ SUNRPC_PMAPPROC_UNSET,	"unset" },

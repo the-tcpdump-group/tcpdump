@@ -63,7 +63,7 @@ static const char rcsid[] _U_ =
 #define CHAN_MP 6705
 #define CHAN_LP 6706
 
-struct tok ForCES_channels[] = {
+static const struct tok ForCES_channels[] = {
 	{ CHAN_HP, "ForCES HP" },
 	{ CHAN_MP, "ForCES MP" },
 	{ CHAN_LP, "ForCES LP" },

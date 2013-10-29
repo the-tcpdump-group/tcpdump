@@ -242,7 +242,7 @@ ns_cprint(register const u_char *cp)
 }
 
 /* http://www.iana.org/assignments/dns-parameters */
-struct tok ns_type2str[] = {
+const struct tok ns_type2str[] = {
 	{ T_A,		"A" },			/* RFC 1035 */
 	{ T_NS,		"NS" },			/* RFC 1035 */
 	{ T_MD,		"MD" },			/* RFC 1035 */
@@ -307,7 +307,7 @@ struct tok ns_type2str[] = {
 	{ 0,		NULL }
 };
 
-struct tok ns_class2str[] = {
+const struct tok ns_class2str[] = {
 	{ C_IN,		"IN" },		/* Not used */
 	{ C_CHAOS,	"CHAOS" },
 	{ C_HS,		"HS" },

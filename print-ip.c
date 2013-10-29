@@ -41,7 +41,7 @@ static const char rcsid[] _U_ =
 #include "ip.h"
 #include "ipproto.h"
 
-struct tok ip_option_values[] = {
+static const struct tok ip_option_values[] = {
     { IPOPT_EOL, "EOL" },
     { IPOPT_NOP, "NOP" },
     { IPOPT_TS, "timestamp" },
@@ -303,7 +303,7 @@ trunc:
 
 #define IP_RES 0x8000
 
-static struct tok ip_frag_values[] = {
+static const struct tok ip_frag_values[] = {
         { IP_MF,        "+" },
         { IP_DF,        "DF" },
 	{ IP_RES,       "rsvd" }, /* The RFC3514 evil ;-) bit */

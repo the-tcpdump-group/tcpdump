@@ -67,5 +67,3 @@
 #define PPP_MPCP		0xc03d	/* Multi-Link */
 #define PPP_SPAP_OLD    0xc123
 #define PPP_EAP         0xc227
-
-extern struct tok ppptype2str[];

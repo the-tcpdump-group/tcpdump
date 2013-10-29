@@ -71,7 +71,7 @@ struct krb {
 
 static char tstr[] = " [|kerberos]";
 
-static struct tok type2str[] = {
+static const struct tok type2str[] = {
 	{ AUTH_MSG_KDC_REQUEST,		"KDC_REQUEST" },
 	{ AUTH_MSG_KDC_REPLY,		"KDC_REPLY" },
 	{ AUTH_MSG_APPL_REQUEST,	"APPL_REQUEST" },
@@ -84,7 +84,7 @@ static struct tok type2str[] = {
 	{ 0,				NULL }
 };
 
-static struct tok kerr2str[] = {
+static const struct tok kerr2str[] = {
 	{ KERB_ERR_OK,			"OK" },
 	{ KERB_ERR_NAME_EXP,		"NAME_EXP" },
 	{ KERB_ERR_SERVICE_EXP,		"SERVICE_EXP" },

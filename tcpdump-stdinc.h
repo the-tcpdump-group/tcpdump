@@ -69,8 +69,6 @@
 #define read _read
 #define close _close
 #define O_RDONLY _O_RDONLY
-
-typedef short ino_t;
 #endif /* __MINGW32__ */
 
 #ifdef __MINGW32__
@@ -173,7 +171,11 @@ typedef char* caddr_t;
  * Note: this also requires that padding be put into the structure,
  * at least for compilers where it's implemented as __attribute__((packed)).
  */
+#if defined(_MSC_VER) && defined(UNALIGNED)
+/* MSVC may have its own macro defined with the same name and purpose. */
+#else
 #define UNALIGNED	__attribute__((packed))
+#endif
 
 #if defined(WIN32) || defined(MSDOS)
   #define FOPEN_READ_TXT   "rt"
@@ -229,5 +231,51 @@ typedef char* caddr_t;
 #ifndef FALSE
 #define FALSE 0
 #endif
+
+/*
+ * The Apple deprecation workaround macros below were adopted from the
+ * FreeRADIUS server code under permission of Alan DeKok and Arran Cudbard-Bell.
+ */
+
+#define XSTRINGIFY(x) #x
+
+/*
+ *	Macros for controlling warnings in GCC >= 4.2 and clang >= 2.8
+ */
+#define DIAG_JOINSTR(x,y) XSTRINGIFY(x ## y)
+#define DIAG_DO_PRAGMA(x) _Pragma (#x)
+
+#if defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 402
+#  define DIAG_PRAGMA(x) DIAG_DO_PRAGMA(GCC diagnostic x)
+#  if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406
+#    define DIAG_OFF(x) DIAG_PRAGMA(push) DIAG_PRAGMA(ignored DIAG_JOINSTR(-W,x))
+#    define DIAG_ON(x) DIAG_PRAGMA(pop)
+#  else
+#    define DIAG_OFF(x) DIAG_PRAGMA(ignored DIAG_JOINSTR(-W,x))
+#    define DIAG_ON(x)  DIAG_PRAGMA(warning DIAG_JOINSTR(-W,x))
+#  endif
+#elif defined(__clang__) && ((__clang_major__ * 100) + __clang_minor__ >= 208)
+#  define DIAG_PRAGMA(x) DIAG_DO_PRAGMA(clang diagnostic x)
+#  define DIAG_OFF(x) DIAG_PRAGMA(push) DIAG_PRAGMA(ignored DIAG_JOINSTR(-W,x))
+#  define DIAG_ON(x) DIAG_PRAGMA(pop)
+#else
+#  define DIAG_OFF(x)
+#  define DIAG_ON(x)
+#endif
+
+/*
+ *	For dealing with APIs which are only deprecated in OSX (like the OpenSSL API)
+ */
+#ifdef __APPLE__
+#  define USES_APPLE_DEPRECATED_API DIAG_OFF(deprecated-declarations)
+#  define USES_APPLE_RST DIAG_ON(deprecated-declarations)
+#else
+#  define USES_APPLE_DEPRECATED_API
+#  define USES_APPLE_RST
+#endif
+
+/*
+ * end of Apple deprecation workaround macros
+ */
 
 #endif /* tcpdump_stdinc_h */

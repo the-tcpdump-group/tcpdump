@@ -194,7 +194,7 @@ struct icmp {
 #endif
 
 /* Most of the icmp types */
-static struct tok icmp2str[] = {
+static const struct tok icmp2str[] = {
 	{ ICMP_ECHOREPLY,		"echo reply" },
 	{ ICMP_SOURCEQUENCH,		"source quench" },
 	{ ICMP_ECHO,			"echo request" },
@@ -208,7 +208,7 @@ static struct tok icmp2str[] = {
 };
 
 /* Formats for most of the ICMP_UNREACH codes */
-static struct tok unreach2str[] = {
+static const struct tok unreach2str[] = {
 	{ ICMP_UNREACH_NET,		"net %s unreachable" },
 	{ ICMP_UNREACH_HOST,		"host %s unreachable" },
 	{ ICMP_UNREACH_SRCFAIL,
@@ -235,7 +235,7 @@ static struct tok unreach2str[] = {
 };
 
 /* Formats for the ICMP_REDIRECT codes */
-static struct tok type2str[] = {
+static const struct tok type2str[] = {
 	{ ICMP_REDIRECT_NET,		"redirect %s to net %s" },
 	{ ICMP_REDIRECT_HOST,		"redirect %s to host %s" },
 	{ ICMP_REDIRECT_TOSNET,		"redirect-tos %s to net %s" },

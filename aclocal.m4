@@ -38,16 +38,15 @@ dnl AC_LBL_C_INIT.  Now, we run AC_LBL_C_INIT_BEFORE_CC, AC_PROG_CC,
 dnl and AC_LBL_C_INIT at the top level.
 dnl
 AC_DEFUN(AC_LBL_C_INIT_BEFORE_CC,
-    [AC_PREREQ(2.50)
+[
     AC_BEFORE([$0], [AC_LBL_C_INIT])
     AC_BEFORE([$0], [AC_PROG_CC])
     AC_BEFORE([$0], [AC_LBL_FIXINCLUDES])
     AC_BEFORE([$0], [AC_LBL_DEVEL])
     AC_ARG_WITH(gcc, [  --without-gcc           don't use gcc])
-    $1="-O"
-    $2=""
+    $1=""
     if test "${srcdir}" != "." ; then
-	    $2="-I$srcdir"
+	    $1="-I$srcdir"
     fi
     if test "${CFLAGS+set}" = set; then
 	    LBL_CFLAGS="$CFLAGS"
@@ -73,9 +72,15 @@ AC_DEFUN(AC_LBL_C_INIT_BEFORE_CC,
 dnl
 dnl Determine which compiler we're using (cc or gcc)
 dnl If using gcc, determine the version number
-dnl If using cc, require that it support ansi prototypes
-dnl If using gcc, use -O2 (otherwise use -O)
-dnl If using cc, explicitly specify /usr/local/include
+dnl If using cc:
+dnl     require that it support ansi prototypes
+dnl     use -O (AC_PROG_CC will use -g -O2 on gcc, so we don't need to
+dnl     do that ourselves for gcc)
+dnl     add -g flags, as appropriate
+dnl     explicitly specify /usr/local/include
+dnl
+dnl NOTE WELL: with newer versions of autoconf, "gcc" means any compiler
+dnl that defines __GNUC__, which means clang, for example, counts as "gcc".
 dnl
 dnl usage:
 dnl
@@ -87,36 +92,26 @@ dnl	$1 (copt set)
 dnl	$2 (incls set)
 dnl	CC
 dnl	LDFLAGS
-dnl	ac_cv_lbl_gcc_vers
 dnl	LBL_CFLAGS
 dnl
 AC_DEFUN(AC_LBL_C_INIT,
-    [AC_PREREQ(2.50)
+[
     AC_BEFORE([$0], [AC_LBL_FIXINCLUDES])
     AC_BEFORE([$0], [AC_LBL_DEVEL])
     AC_BEFORE([$0], [AC_LBL_SHLIBS_INIT])
     if test "$GCC" = yes ; then
-	    if test "$SHLICC2" = yes ; then
-		    ac_cv_lbl_gcc_vers=2
-		    $1="-O2"
-	    else
-		    AC_MSG_CHECKING(gcc version)
-		    AC_CACHE_VAL(ac_cv_lbl_gcc_vers,
-			ac_cv_lbl_gcc_vers=`$CC -v 2>&1 | \
-			    sed -e '/^gcc version /!d' \
-				-e 's/^gcc version //' \
-				-e 's/ .*//' -e 's/^[[[^0-9]]]*//' \
-				-e 's/\..*//'`)
-		    AC_MSG_RESULT($ac_cv_lbl_gcc_vers)
-		    if test $ac_cv_lbl_gcc_vers -gt 1 ; then
-			    $1="-O2"
-		    fi
-	    fi
-
 	    #
 	    # -Werror forces warnings to be errors.
 	    #
 	    ac_lbl_cc_force_warning_errors=-Werror
+
+	    #
+	    # Use -ffloat-store so that, on 32-bit x86, we don't
+	    # do 80-bit arithmetic with the FPU; that way we should
+	    # get the same results for floating-point calculations
+	    # on x86-32 and x86-64.
+	    #
+	    AC_LBL_CHECK_COMPILER_OPT($1, -ffloat-store)
     else
 	    $2="$$2 -I/usr/local/include"
 	    LDFLAGS="$LDFLAGS -L/usr/local/lib"
@@ -151,7 +146,28 @@ AC_DEFUN(AC_LBL_C_INIT,
 		    # don't want to try using GCC-style -W flags.
 		    #
 		    ac_lbl_cc_dont_try_gcc_dashW=yes
-		    $1="$$1 -xansi -signed -O"
+		    #
+		    # It also, apparently, defaults to "char" being
+		    # unsigned, unlike most other C implementations;
+		    # I suppose we could say "signed char" whenever
+		    # we want to guarantee a signed "char", but let's
+		    # just force signed chars.
+		    #
+		    # -xansi is normally the default, but the
+		    # configure script was setting it; perhaps -cckr
+		    # was the default in the Old Days.  (Then again,
+		    # that would probably be for backwards compatibility
+		    # in the days when ANSI C was Shiny and New, i.e.
+		    # 1989 and the early '90's, so maybe we can just
+		    # drop support for those compilers.)
+		    #
+		    # -g is equivalent to -g2, which turns off
+		    # optimization; we choose -g3, which generates
+		    # debugging information but doesn't turn off
+		    # optimization (even if the optimization would
+		    # cause inaccuracies in debugging).
+		    #
+		    $1="$$1 -xansi -signed -g3"
 		    ;;
 
 	    osf*)
@@ -166,7 +182,14 @@ AC_DEFUN(AC_LBL_C_INIT,
 		    # don't want to try using GCC-style -W flags.
 		    #
 		    ac_lbl_cc_dont_try_gcc_dashW=yes
-		    $1="$$1 -O"
+		    #
+		    # -g is equivalent to -g2, which turns off
+		    # optimization; we choose -g3, which generates
+		    # debugging information but doesn't turn off
+		    # optimization (even if the optimization would
+		    # cause inaccuracies in debugging).
+		    #
+		    $1="$$1 -g3"
 		    ;;
 
 	    solaris*)
@@ -193,38 +216,9 @@ AC_DEFUN(AC_LBL_C_INIT,
 		    fi
 		    ;;
 	    esac
+	    $1="$$1 -O"
     fi
 ])
-
-dnl
-dnl Check whether, if you pass an unknown warning option to the
-dnl compiler, it fails or just prints a warning message and succeeds.
-dnl Set ac_lbl_unknown_warning_option_error to the appropriate flag
-dnl to force an error if it would otherwise just print a warning message
-dnl and succeed.
-dnl
-AC_DEFUN(AC_LBL_CHECK_UNKNOWN_WARNING_OPTION_ERROR,
-    [
-	AC_MSG_CHECKING([whether the compiler fails when given an unknown warning option])
-	save_CFLAGS="$CFLAGS"
-	CFLAGS="$CFLAGS -Wxyzzy-this-will-never-succeed-xyzzy"
-	AC_TRY_COMPILE(
-	    [],
-	    [return 0],
-	    [
-		AC_MSG_RESULT([no])
-		#
-		# We're assuming this is clang, where
-		# -Werror=unknown-warning-option is the appropriate
-		# option to force the compiler to fail.
-		# 
-		ac_lbl_unknown_warning_option_error="-Werror=unknown-warning-option"
-	    ],
-	    [
-		AC_MSG_RESULT([yes])
-	    ])
-	CFLAGS="$save_CFLAGS"
-    ])
 
 dnl
 dnl Check whether the compiler option specified as the second argument
@@ -235,7 +229,7 @@ AC_DEFUN(AC_LBL_CHECK_COMPILER_OPT,
     [
 	AC_MSG_CHECKING([whether the compiler supports the $2 option])
 	save_CFLAGS="$CFLAGS"
-	CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error $2"
+	CFLAGS="$CFLAGS $ac_lbl_cc_force_warning_errors $2"
 	AC_TRY_COMPILE(
 	    [],
 	    [return 0],
@@ -962,8 +956,6 @@ dnl
 dnl If the file .devel exists:
 dnl	Add some warning flags if the compiler supports them
 dnl	If an os prototype include exists, symlink os-proto.h to it
-dnl	If we're using gcc:
-dnl	    Compile with -g (if supported)
 dnl
 dnl usage:
 dnl
@@ -985,7 +977,6 @@ AC_DEFUN(AC_LBL_DEVEL,
 	    # Skip all the warning option stuff on some compilers.
 	    #
 	    if test "$ac_lbl_cc_dont_try_gcc_dashW" != yes; then
-		    AC_LBL_CHECK_UNKNOWN_WARNING_OPTION_ERROR()
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wall)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wmissing-prototypes)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wstrict-prototypes)
@@ -994,23 +985,14 @@ AC_DEFUN(AC_LBL_DEVEL,
 		    AC_LBL_CHECK_COMPILER_OPT($1, -W)
 	    fi
 	    AC_LBL_CHECK_DEPENDENCY_GENERATION_OPT()
-	    if test "$GCC" = yes ; then
-		    if test "${LBL_CFLAGS+set}" != set; then
-			    if test "$ac_cv_prog_cc_g" = yes ; then
-				    $1="-g $$1"
-			    fi
-		    fi
-	    else
-		    case "$host_os" in
-
-		    irix6*)
-			    V_CCOPT="$V_CCOPT -n32"
-			    ;;
-
-		    *)
-			    ;;
-		    esac
-	    fi
+	    #
+	    # We used to set -n32 for IRIX 6 when not using GCC (presumed
+	    # to mean that we're using MIPS C or MIPSpro C); it specified
+	    # the "new" faster 32-bit ABI, introduced in IRIX 6.2.  I'm
+	    # not sure why that would be something to do *only* with a
+	    # .devel file; why should the ABI for which we produce code
+	    # depend on .devel?
+	    #
 	    os=`echo $host_os | sed -e 's/\([[0-9]][[0-9]]*\)[[^0-9]].*$/\1/'`
 	    name="lbl/os-$os.h"
 	    if test -f $name ; then

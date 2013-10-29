@@ -48,13 +48,13 @@ static const char rcsid[] _U_ =
 #define OAM_FUNCTION_SPECIFIC_LEN 45 /* this excludes crc10 and cell-type/function-type */
 #define OAM_CELLTYPE_FUNCTYPE_LEN 1
 
-struct tok oam_f_values[] = {
+static const struct tok oam_f_values[] = {
     { VCI_OAMF4SC, "OAM F4 (segment)" },
     { VCI_OAMF4EC, "OAM F4 (end)" },
     { 0, NULL }
 };
 
-struct tok atm_pty_values[] = {
+static const struct tok atm_pty_values[] = {
     { 0x0, "user data, uncongested, SDU 0" },
     { 0x1, "user data, uncongested, SDU 1" },
     { 0x2, "user data, congested, SDU 0" },
@@ -70,7 +70,7 @@ struct tok atm_pty_values[] = {
 #define OAM_CELLTYPE_AD 0x8
 #define OAM_CELLTYPE_SM 0xf
 
-struct tok oam_celltype_values[] = {
+static const struct tok oam_celltype_values[] = {
     { OAM_CELLTYPE_FM, "Fault Management" },
     { OAM_CELLTYPE_PM, "Performance Management" },
     { OAM_CELLTYPE_AD, "activate/deactivate" },
@@ -83,7 +83,7 @@ struct tok oam_celltype_values[] = {
 #define OAM_FM_FUNCTYPE_CONTCHECK 0x4
 #define OAM_FM_FUNCTYPE_LOOPBACK  0x8
 
-struct tok oam_fm_functype_values[] = {
+static const struct tok oam_fm_functype_values[] = {
     { OAM_FM_FUNCTYPE_AIS, "AIS" },
     { OAM_FM_FUNCTYPE_RDI, "RDI" },
     { OAM_FM_FUNCTYPE_CONTCHECK, "Continuity Check" },
@@ -91,14 +91,14 @@ struct tok oam_fm_functype_values[] = {
     { 0, NULL }
 };
 
-struct tok oam_pm_functype_values[] = {
+static const struct tok oam_pm_functype_values[] = {
     { 0x0, "Forward Monitoring" },
     { 0x1, "Backward Reporting" },
     { 0x2, "Monitoring and Reporting" },
     { 0, NULL }
 };
 
-struct tok oam_ad_functype_values[] = {
+static const struct tok oam_ad_functype_values[] = {
     { 0x0, "Performance Monitoring" },
     { 0x1, "Continuity Check" },
     { 0, NULL }
@@ -106,7 +106,7 @@ struct tok oam_ad_functype_values[] = {
 
 #define OAM_FM_LOOPBACK_INDICATOR_MASK 0x1
 
-struct tok oam_fm_loopback_indicator_values[] = {
+static const struct tok oam_fm_loopback_indicator_values[] = {
     { 0x0, "Reply" },
     { 0x1, "Request" },
     { 0, NULL }
@@ -229,7 +229,7 @@ atm_if_print(const struct pcap_pkthdr *h, const u_char *p)
 /*
  * ATM signalling.
  */
-static struct tok msgtype2str[] = {
+static const struct tok msgtype2str[] = {
 	{ CALL_PROCEED,		"Call_proceeding" },
 	{ CONNECT,		"Connect" },
 	{ CONNECT_ACK,		"Connect_ack" },

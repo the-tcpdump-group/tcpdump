@@ -41,7 +41,7 @@
 #define UDLD_DEVICE_NAME_TLV		0x0006
 #define UDLD_SEQ_NUMBER_TLV		0x0007
 
-static struct tok udld_tlv_values[] = {
+static const struct tok udld_tlv_values[] = {
     { UDLD_DEVICE_ID_TLV, "Device-ID TLV"},
     { UDLD_PORT_ID_TLV, "Port-ID TLV"},
     { UDLD_ECHO_TLV, "Echo TLV"},
@@ -52,7 +52,7 @@ static struct tok udld_tlv_values[] = {
     { 0, NULL}
 };
 
-static struct tok udld_code_values[] = {
+static const struct tok udld_code_values[] = {
     { 0x00, "Reserved"},
     { 0x01, "Probe message"},
     { 0x02, "Echo message"},
@@ -60,7 +60,7 @@ static struct tok udld_code_values[] = {
     { 0, NULL}
 };
 
-static struct tok udld_flags_values[] = {
+static const struct tok udld_flags_values[] = {
     { 0x00, "RT"},
     { 0x01, "RSY"},
     { 0, NULL}

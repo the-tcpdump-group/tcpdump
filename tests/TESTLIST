@@ -1,3 +1,21 @@
+# Various flags applied to a TCP session.
+#
+# We cannot rely on, for example, "print-x.out" and
+# "print-X.out" being different files - we might be running
+# this on a case-insensitive file system, e.g. a Windows
+# file system or a case-insensitive HFS+ file system on
+# Mac OS X.
+#
+# Therefore, for "X" and "XX", we have "print-capX.out"
+# and "print-capXX.out".
+#
+print-x		print-flags.pcap	print-x.out	-t -x
+print-xx	print-flags.pcap	print-xx.out	-t -xx
+print-X		print-flags.pcap	print-capX.out	-t -X
+print-XX	print-flags.pcap	print-capXX.out	-t -XX
+print-A		print-flags.pcap	print-A.out	-t -A
+print-AA	print-flags.pcap	print-AA.out	-t -AA
+
 # BGP tests
 bgp_vpn_attrset bgp_vpn_attrset.pcap bgp_vpn_attrset.out -t -v 
 mpbgp-linklocal-nexthop mpbgp-linklocal-nexthop.pcap mpbgp-linklocal-nexthop.out -t -v
@@ -122,6 +140,8 @@ msnlb2		msnlb2.pcap		msnlb2.out	-t
 # MPTCP tests
 mptcp		mptcp.pcap		mptcp.out		-t
 mptcp-fclose	mptcp-fclose.pcap	mptcp-fclose.out	-t
+# TFO tests
+tfo		tfo-5c1fa7f9ae91.pcap	tfo.out		-t
 
 # IEEE 802.11 tests
 802.11_exthdr	ieee802.11_exthdr.pcap	ieee802.11_exthdr.out	-t -v

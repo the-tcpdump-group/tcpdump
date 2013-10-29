@@ -70,7 +70,7 @@ enum z_packet_type {
     Z_PACKET_STAT
 };
 
-static struct tok z_types[] = {
+static const struct tok z_types[] = {
     { Z_PACKET_UNSAFE,		"unsafe" },
     { Z_PACKET_UNACKED,		"unacked" },
     { Z_PACKET_ACKED,		"acked" },

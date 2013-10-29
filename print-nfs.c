@@ -100,7 +100,7 @@ u_int32_t nfsv3_procid[NFS_NPROCS] = {
  * the first NFS server was the SunOS 2.0 one, and until 5.0 SunOS
  * was primarily BSD-derived.
  */
-static struct tok status2str[] = {
+static const struct tok status2str[] = {
 	{ 1,     "Operation not permitted" },	/* EPERM */
 	{ 2,     "No such file or directory" },	/* ENOENT */
 	{ 5,     "Input/output error" },	/* EIO */
@@ -138,14 +138,14 @@ static struct tok status2str[] = {
 	{ 0,     NULL }
 };
 
-static struct tok nfsv3_writemodes[] = {
+static const struct tok nfsv3_writemodes[] = {
 	{ 0,		"unstable" },
 	{ 1,		"datasync" },
 	{ 2,		"filesync" },
 	{ 0,		NULL }
 };
 
-static struct tok type2str[] = {
+static const struct tok type2str[] = {
 	{ NFNON,	"NON" },
 	{ NFREG,	"REG" },
 	{ NFDIR,	"DIR" },
@@ -853,7 +853,7 @@ static void
 nfs_printfh(register const u_int32_t *dp, const u_int len)
 {
 	my_fsid fsid;
-	ino_t ino;
+	u_int32_t ino;
 	const char *sfsname = NULL;
 	char *spacep;
 

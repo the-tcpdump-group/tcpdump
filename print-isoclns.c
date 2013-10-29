@@ -76,7 +76,7 @@ static const char rcsid[] _U_ =
 #define ISIS_PDU_L1_PSNP        26
 #define ISIS_PDU_L2_PSNP        27
 
-static struct tok isis_pdu_values[] = {
+static const struct tok isis_pdu_values[] = {
     { ISIS_PDU_L1_LAN_IIH,       "L1 Lan IIH"},
     { ISIS_PDU_L2_LAN_IIH,       "L2 Lan IIH"},
     { ISIS_PDU_PTP_IIH,          "p2p IIH"},
@@ -146,7 +146,7 @@ static struct tok isis_pdu_values[] = {
 #define ISIS_TLV_VENDOR_PRIVATE      250 /* draft-ietf-isis-experimental-tlv-01 */
 #define ISIS_TLV_VENDOR_PRIVATE_MINLEN 3
 
-static struct tok isis_tlv_values[] = {
+static const struct tok isis_tlv_values[] = {
     { ISIS_TLV_AREA_ADDR,	   "Area address(es)"},
     { ISIS_TLV_IS_REACH,           "IS Reachability"},
     { ISIS_TLV_ESNEIGH,            "ES Neighbor(s)"},
@@ -198,7 +198,7 @@ static struct tok isis_tlv_values[] = {
 #define ESIS_OPTION_ADDRESS_MASK     225 /* iso9542 */
 #define ESIS_OPTION_SNPA_MASK        226 /* iso9542 */
 
-static struct tok esis_option_values[] = {
+static const struct tok esis_option_values[] = {
     { ESIS_OPTION_PROTOCOLS,       "Protocols supported"},
     { ESIS_OPTION_QOS_MAINTENANCE, "QoS Maintenance" },
     { ESIS_OPTION_SECURITY,        "Security" },
@@ -217,7 +217,7 @@ static struct tok esis_option_values[] = {
 #define CLNP_OPTION_PADDING          204 /* iso8473 */
 #define CLNP_OPTION_PRIORITY         205 /* iso8473 */
 
-static struct tok clnp_option_values[] = {
+static const struct tok clnp_option_values[] = {
     { CLNP_OPTION_DISCARD_REASON,  "Discard Reason"},
     { CLNP_OPTION_PRIORITY,        "Priority"},
     { CLNP_OPTION_QOS_MAINTENANCE, "QoS Maintenance"},
@@ -228,7 +228,7 @@ static struct tok clnp_option_values[] = {
     { 0, NULL }
 };
 
-static struct tok clnp_option_rfd_class_values[] = {
+static const struct tok clnp_option_rfd_class_values[] = {
     { 0x0, "General"},
     { 0x8, "Address"},
     { 0x9, "Source Routeing"},
@@ -238,7 +238,7 @@ static struct tok clnp_option_rfd_class_values[] = {
     { 0, NULL }
 };
 
-static struct tok clnp_option_rfd_general_values[] = {
+static const struct tok clnp_option_rfd_general_values[] = {
     { 0x0, "Reason not specified"},
     { 0x1, "Protocol procedure error"},
     { 0x2, "Incorrect checksum"},
@@ -250,13 +250,13 @@ static struct tok clnp_option_rfd_general_values[] = {
     { 0, NULL }
 };
 
-static struct tok clnp_option_rfd_address_values[] = {
+static const struct tok clnp_option_rfd_address_values[] = {
     { 0x0, "Destination address unreachable"},
     { 0x1, "Destination address unknown"},
     { 0, NULL }
 };
 
-static struct tok clnp_option_rfd_source_routeing_values[] = {
+static const struct tok clnp_option_rfd_source_routeing_values[] = {
     { 0x0, "Unspecified source routeing error"},
     { 0x1, "Syntax error in source routeing field"},
     { 0x2, "Unknown address in source routeing field"},
@@ -264,13 +264,13 @@ static struct tok clnp_option_rfd_source_routeing_values[] = {
     { 0, NULL }
 };
 
-static struct tok clnp_option_rfd_lifetime_values[] = {
+static const struct tok clnp_option_rfd_lifetime_values[] = {
     { 0x0, "Lifetime expired while data unit in transit"},
     { 0x1, "Lifetime expired during reassembly"},
     { 0, NULL }
 };
 
-static struct tok clnp_option_rfd_pdu_discard_values[] = {
+static const struct tok clnp_option_rfd_pdu_discard_values[] = {
     { 0x0, "Unsupported option not specified"},
     { 0x1, "Unsupported protocol version"},
     { 0x2, "Unsupported security option"},
@@ -279,13 +279,13 @@ static struct tok clnp_option_rfd_pdu_discard_values[] = {
     { 0, NULL }
 };
 
-static struct tok clnp_option_rfd_reassembly_values[] = {
+static const struct tok clnp_option_rfd_reassembly_values[] = {
     { 0x0, "Reassembly interference"},
     { 0, NULL }
 };
 
 /* array of 16 error-classes */
-static struct tok *clnp_option_rfd_error_class[] = {
+static const struct tok *clnp_option_rfd_error_class[] = {
     clnp_option_rfd_general_values,
     NULL,
     NULL,
@@ -310,26 +310,26 @@ static struct tok *clnp_option_rfd_error_class[] = {
 #define CLNP_OPTION_SCOPE_DA_SPEC   0x80
 #define CLNP_OPTION_SCOPE_GLOBAL    0xc0
 
-static struct tok clnp_option_scope_values[] = {
+static const struct tok clnp_option_scope_values[] = {
     { CLNP_OPTION_SCOPE_SA_SPEC, "Source Address Specific"},
     { CLNP_OPTION_SCOPE_DA_SPEC, "Destination Address Specific"},
     { CLNP_OPTION_SCOPE_GLOBAL, "Globally unique"},
     { 0, NULL }
 };
 
-static struct tok clnp_option_sr_rr_values[] = {
+static const struct tok clnp_option_sr_rr_values[] = {
     { 0x0, "partial"},
     { 0x1, "complete"},
     { 0, NULL }
 };
 
-static struct tok clnp_option_sr_rr_string_values[] = {
+static const struct tok clnp_option_sr_rr_string_values[] = {
     { CLNP_OPTION_SOURCE_ROUTING, "source routing"},
     { CLNP_OPTION_ROUTE_RECORDING, "recording of route in progress"},
     { 0, NULL }
 };
 
-static struct tok clnp_option_qos_global_values[] = {
+static const struct tok clnp_option_qos_global_values[] = {
     { 0x20, "reserved"},
     { 0x10, "sequencing vs. delay"},
     { 0x08, "congested"},
@@ -356,7 +356,7 @@ static struct tok clnp_option_qos_global_values[] = {
 
 #define ISIS_SUBTLV_SPB_METRIC                        29 /* rfc6329 */
 
-static struct tok isis_ext_is_reach_subtlv_values[] = {
+static const struct tok isis_ext_is_reach_subtlv_values[] = {
     { ISIS_SUBTLV_EXT_IS_REACH_ADMIN_GROUP,            "Administrative groups" },
     { ISIS_SUBTLV_EXT_IS_REACH_LINK_LOCAL_REMOTE_ID,   "Link Local/Remote Identifier" },
     { ISIS_SUBTLV_EXT_IS_REACH_LINK_REMOTE_ID,         "Link Remote Identifier" },
@@ -385,14 +385,14 @@ static struct tok isis_ext_is_reach_subtlv_values[] = {
 #define ISIS_SUBTLV_EXTD_IP_REACH_ADMIN_TAG64          2 /* draft-ietf-isis-admin-tags-01 */
 #define ISIS_SUBTLV_EXTD_IP_REACH_MGMT_PREFIX_COLOR  117 /* draft-ietf-isis-wg-multi-topology-05 */
 
-static struct tok isis_ext_ip_reach_subtlv_values[] = {
+static const struct tok isis_ext_ip_reach_subtlv_values[] = {
     { ISIS_SUBTLV_EXTD_IP_REACH_ADMIN_TAG32,           "32-Bit Administrative tag" },
     { ISIS_SUBTLV_EXTD_IP_REACH_ADMIN_TAG64,           "64-Bit Administrative tag" },
     { ISIS_SUBTLV_EXTD_IP_REACH_MGMT_PREFIX_COLOR,     "Management Prefix Color" },
     { 0, NULL }
 };
 
-static struct tok isis_subtlv_link_attribute_values[] = {
+static const struct tok isis_subtlv_link_attribute_values[] = {
     { 0x01, "Local Protection Available" },
     { 0x02, "Link excluded from local protection path" },
     { 0x04, "Local maintenance required"},
@@ -405,7 +405,7 @@ static struct tok isis_subtlv_link_attribute_values[] = {
 #define ISIS_SUBTLV_AUTH_MD5_LEN      16
 #define ISIS_SUBTLV_AUTH_PRIVATE     255
 
-static struct tok isis_subtlv_auth_values[] = {
+static const struct tok isis_subtlv_auth_values[] = {
     { ISIS_SUBTLV_AUTH_SIMPLE,	"simple text password"},
     { ISIS_SUBTLV_AUTH_GENERIC, "Generic Crypto key-id"},
     { ISIS_SUBTLV_AUTH_MD5,	"HMAC-MD5 password"},
@@ -417,7 +417,7 @@ static struct tok isis_subtlv_auth_values[] = {
 #define ISIS_SUBTLV_IDRP_LOCAL         1
 #define ISIS_SUBTLV_IDRP_ASN           2
 
-static struct tok isis_subtlv_idrp_values[] = {
+static const struct tok isis_subtlv_idrp_values[] = {
     { ISIS_SUBTLV_IDRP_RES,         "Reserved"},
     { ISIS_SUBTLV_IDRP_LOCAL,       "Routing-Domain Specific"},
     { ISIS_SUBTLV_IDRP_ASN,         "AS Number Tag"},
@@ -438,14 +438,14 @@ static struct tok isis_subtlv_idrp_values[] = {
 #define ISIS_SUBTLV_SPB_INSTANCE_MIN_LEN          19
 #define ISIS_SUBTLV_SPB_INSTANCE_VLAN_TUPLE_LEN   8
 
-static struct tok isis_mt_port_cap_subtlv_values[] = {
+static const struct tok isis_mt_port_cap_subtlv_values[] = {
     { ISIS_SUBTLV_SPB_MCID,           "SPB MCID" },
     { ISIS_SUBTLV_SPB_DIGEST,         "SPB Digest" },
     { ISIS_SUBTLV_SPB_BVID,           "SPB BVID" },
     { 0, NULL }
 };
 
-static struct tok isis_mt_capability_subtlv_values[] = {
+static const struct tok isis_mt_capability_subtlv_values[] = {
     { ISIS_SUBTLV_SPB_INSTANCE,      "SPB Instance" },
     { ISIS_SUBTLV_SPBM_SI,      "SPBM Service Identifier and Unicast Address" },
     { 0, NULL }
@@ -475,7 +475,7 @@ struct isis_subtlv_spb_instance {
 #define CLNP_MORE_SEGMENTS 0x40
 #define CLNP_REQUEST_ER    0x20
 
-static struct tok clnp_flag_values[] = {
+static const struct tok clnp_flag_values[] = {
     { CLNP_SEGMENT_PART, "Segmentation permitted"},
     { CLNP_MORE_SEGMENTS, "more Segments"},
     { CLNP_REQUEST_ER, "request Error Report"},
@@ -494,7 +494,7 @@ static struct tok clnp_flag_values[] = {
 #define ISIS_MASK_MTID(x)                  ((x)&0x0fff)
 #define ISIS_MASK_MTFLAGS(x)               ((x)&0xf000)
 
-static struct tok isis_mt_flag_values[] = {
+static const struct tok isis_mt_flag_values[] = {
     { 0x4000,                  "ATT bit set"},
     { 0x8000,                  "Overload bit set"},
     { 0, NULL}
@@ -513,7 +513,7 @@ static struct tok isis_mt_flag_values[] = {
 
 #define ISIS_MASK_TLV_SHARED_RISK_GROUP(x) ((x)&0x1)
 
-static struct tok isis_mt_values[] = {
+static const struct tok isis_mt_values[] = {
     { 0,    "IPv4 unicast"},
     { 1,    "In-Band Management"},
     { 2,    "IPv6 unicast"},
@@ -522,7 +522,7 @@ static struct tok isis_mt_values[] = {
     { 0, NULL }
 };
 
-static struct tok isis_iih_circuit_type_values[] = {
+static const struct tok isis_iih_circuit_type_values[] = {
     { 1,    "Level 1 only"},
     { 2,    "Level 2 only"},
     { 3,    "Level 1, Level 2"},
@@ -534,7 +534,7 @@ static struct tok isis_iih_circuit_type_values[] = {
 #define ISIS_LSP_TYPE_UNUSED2   2
 #define ISIS_LSP_TYPE_LEVEL_2   3
 
-static struct tok isis_lsp_istype_values[] = {
+static const struct tok isis_lsp_istype_values[] = {
     { ISIS_LSP_TYPE_UNUSED0,	"Unused 0x0 (invalid)"},
     { ISIS_LSP_TYPE_LEVEL_1,	"L1 IS"},
     { ISIS_LSP_TYPE_UNUSED2,	"Unused 0x2 (invalid)"},
@@ -551,7 +551,7 @@ static struct tok isis_lsp_istype_values[] = {
 #define ISIS_PTP_ADJ_INIT 1
 #define ISIS_PTP_ADJ_DOWN 2
 
-static struct tok isis_ptp_adjancey_values[] = {
+static const struct tok isis_ptp_adjancey_values[] = {
     { ISIS_PTP_ADJ_UP,    "Up" },
     { ISIS_PTP_ADJ_INIT,  "Initializing" },
     { ISIS_PTP_ADJ_DOWN,  "Down" },
@@ -594,13 +594,13 @@ struct isis_tlv_ip_reach {
     u_int8_t mask[4];
 };
 
-static struct tok isis_is_reach_virtual_values[] = {
+static const struct tok isis_is_reach_virtual_values[] = {
     { 0,    "IsNotVirtual"},
     { 1,    "IsVirtual"},
     { 0, NULL }
 };
 
-static struct tok isis_restart_flag_values[] = {
+static const struct tok isis_restart_flag_values[] = {
     { 0x1,  "Restart Request"},
     { 0x2,  "Restart Acknowledgement"},
     { 0x4,  "Suppress adjacency advertisement"},
@@ -740,7 +740,7 @@ void isoclns_print(const u_int8_t *p, u_int length, u_int caplen)
 #define	CLNP_PDU_ERQ	30
 #define	CLNP_PDU_ERP	31
 
-static struct tok clnp_pdu_values[] = {
+static const struct tok clnp_pdu_values[] = {
     { CLNP_PDU_ER,  "Error Report"},
     { CLNP_PDU_MD,  "MD"},
     { CLNP_PDU_DT,  "Data"},
@@ -1007,7 +1007,7 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
 #define	ESIS_PDU_ESH	        2
 #define	ESIS_PDU_ISH	        4
 
-static struct tok esis_pdu_values[] = {
+static const struct tok esis_pdu_values[] = {
     { ESIS_PDU_REDIRECT, "redirect"},
     { ESIS_PDU_ESH,      "ESH"},
     { ESIS_PDU_ISH,      "ISH"},

@@ -217,7 +217,7 @@ EXTRA_DIST = \
 	LICENSE \
 	Makefile.in \
 	Makefile-devel-adds \
-	README \
+	README.md \
 	Readme.Win32 \
 	VERSION \
 	aclocal.m4 \

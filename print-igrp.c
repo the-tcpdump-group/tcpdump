@@ -70,7 +70,7 @@ igrp_entry_print(register struct igrprte *igr, register int is_interior,
 	    mtu, igr->igr_hct);
 }
 
-static struct tok op2str[] = {
+static const struct tok op2str[] = {
 	{ IGRP_UPDATE,		"update" },
 	{ IGRP_REQUEST,		"request" },
 	{ 0,			NULL }

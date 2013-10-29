@@ -84,7 +84,7 @@ static const char rcsid[] _U_ =
 #define RADCMD_STATUS_CLI  13 /* Status-Client       */
 #define RADCMD_RESERVED   255 /* Reserved            */
 
-static struct tok radius_command_values[] = {
+static const struct tok radius_command_values[] = {
     { RADCMD_ACCESS_REQ, "Access Request" },
     { RADCMD_ACCESS_ACC, "Access Accept" },
     { RADCMD_ACCESS_REJ, "Access Reject" },
