@@ -86,7 +86,7 @@ nflog_if_print(struct netdissect_options *ndo,
 	}
 
 	if (!(hdr->nflog_version) == 0) {
-		ND_PRINT((ndo, ", NFLOG version mismatch: %u", hdr->nflog_version));
+		ND_PRINT((ndo, "version %u (unknown)", hdr->nflog_version));
 		return h_size;
 	}
 
