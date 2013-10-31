@@ -50,11 +50,8 @@ static const struct tok nflog_values[] = {
 };
 
 static inline void
-nflog_hdr_print(struct netdissect_options *ndo, const u_char *bp, u_int length)
+nflog_hdr_print(struct netdissect_options *ndo, const nflog_hdr_t *hdr, u_int length)
 {
-	const nflog_hdr_t *hdr;
-	hdr = (const nflog_hdr_t *)bp;
-
 	ND_PRINT((ndo, "version %d, resource ID %d", hdr->nflog_version, ntohs(hdr->nflog_rid)));
 
 	if (!ndo->ndo_qflag) {
@@ -76,7 +73,7 @@ u_int
 nflog_if_print(struct netdissect_options *ndo,
 			   const struct pcap_pkthdr *h, const u_char *p)
 {
-	const nflog_hdr_t *hdr;
+	const nflog_hdr_t *hdr = (const nflog_hdr_t *)p;
 	const nflog_tlv_t *tlv;
 	u_int16_t size;
 	u_int16_t h_size = sizeof(nflog_hdr_t);
@@ -88,18 +85,17 @@ nflog_if_print(struct netdissect_options *ndo,
 		return h_size;
 	}
 
-	if (ndo->ndo_eflag)
-		nflog_hdr_print(ndo, p, length);
-
-	length -= sizeof(nflog_hdr_t);
-	caplen -= sizeof(nflog_hdr_t);
-	hdr = (const nflog_hdr_t *)p;
-	p += sizeof(nflog_hdr_t);
-
 	if (!(hdr->nflog_version) == 0) {
 		ND_PRINT((ndo, ", NFLOG version mismatch: %u", hdr->nflog_version));
 		return h_size;
 	}
+
+	if (ndo->ndo_eflag)
+		nflog_hdr_print(ndo, hdr, length);
+
+	length -= sizeof(nflog_hdr_t);
+	caplen -= sizeof(nflog_hdr_t);
+	p += sizeof(nflog_hdr_t);
 
 	do {
 		tlv = (const nflog_tlv_t *) p;
@@ -140,7 +136,7 @@ nflog_if_print(struct netdissect_options *ndo,
 
 	default:
 		if (!ndo->ndo_eflag)
-			nflog_hdr_print(ndo, (u_char *)hdr,
+			nflog_hdr_print(ndo, hdr,
 				length + sizeof(nflog_hdr_t));
 
 		if (!ndo->ndo_suppress_default_print)
