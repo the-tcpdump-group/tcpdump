@@ -1,5 +1,16 @@
-Saturday June 22, 2013 guy@alum.mit.edu.
-  Summary for 4.4.1 tcpdump release
+Thursday Nov. 7, 2013  mcr@sandelman.ca and guy@alum.mit.edu.
+  Summary for 4.5.0 tcpdump release
+        some NFSv4 fixes for printing  
+        fix printing of unknown TCP options, and tcp fast-open
+        fixes for syslog parser
+        some gcc-version-specific flag tuning
+        adopt MacOS deprecation workarounds for openssl
+        improvements to babel printing
+        add OpenFlow 1.0 (no SSL) and test cases
+        GeoNet printer.
+        added STBC Rx support
+        improvements to DHCPv6 decoder
+        clarify which autoconf is needed
 	Point users to the the-tcpdump-group repository on GitHub rather
 	    than the mcr repository
 	Add MSDP printer.
@@ -8,6 +19,8 @@ Saturday June 22, 2013 guy@alum.mit.edu.
 	Add support for VXLAN (draft-mahalingam-dutt-dcops-vxlan-03),
 	    and add "vxlan" as an option for -T.
 	Add support for OTV (draft-hasmit-otv-04).
+        fixes for DLT_IEEE802_11_RADIO datalink types
+        added MPTCP decoder
 
 Saturday April 6, 2013 guy@alum.mit.edu.
   Summary for 4.4.0 tcpdump release
