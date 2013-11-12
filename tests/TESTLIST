@@ -160,3 +160,6 @@ nflog-e		nflog.pcap		nflog-e.out		-t -e
 
 # syslog test case
 syslog-v	syslog_udp.pcap		syslog-v.out		-t -v
+
+#IPv6 tests
+ipv6-bad-version.pcap	ipv6-bad-version.pcap 	ipv6-bad-version.out	-t
