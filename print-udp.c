@@ -629,6 +629,8 @@ udp_print(register const u_char *bp, u_int length,
 			ripng_print((const u_char *)(up + 1), length);
 		else if (ISPORT(DHCP6_SERV_PORT) || ISPORT(DHCP6_CLI_PORT))
 			dhcp6_print((const u_char *)(up + 1), length);
+		else if (ISPORT(AHCP_PORT))
+			ahcp_print((const u_char *)(up + 1), length);
 		else if (ISPORT(BABEL_PORT) || ISPORT(BABEL_PORT_OLD))
 			babel_print((const u_char *)(up + 1), length);
 #endif /*INET6*/
