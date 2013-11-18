@@ -921,15 +921,9 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 		safememcpy(&id, ext, sizeof(id));
 		ND_PRINT((ndo," idtype=%s", STR_OR_ID(id.type, ipsecidtypestr)));
 		if (id.proto_id) {
-#ifndef WIN32
-			setprotoent(1);
-#endif /* WIN32 */
 			pe = getprotobynumber(id.proto_id);
 			if (pe)
 				ND_PRINT((ndo," protoid=%s", pe->p_name));
-#ifndef WIN32
-			endprotoent();
-#endif /* WIN32 */
 		} else {
 			/* it DOES NOT mean IPPROTO_IP! */
 			ND_PRINT((ndo," protoid=%s", "0"));
