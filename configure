@@ -4341,10 +4341,12 @@ fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_linux_vers" >&5
 $as_echo "$ac_cv_linux_vers" >&6; }
  	if test $ac_cv_linux_vers = unknown ; then
- 		as_fn_error $? "cannot determine linux version when cross-compiling" "$LINENO" 5
+ 		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: cannot determine linux version when cross-compiling" >&5
+$as_echo "$as_me: WARNING: cannot determine linux version when cross-compiling" >&2;}
  	fi
 	if test $ac_cv_linux_vers -lt 2 ; then
-		as_fn_error $? "version 2 or higher required; see the INSTALL doc for more info" "$LINENO" 5
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: version 2 or higher required; see the INSTALL doc for more info" >&5
+$as_echo "$as_me: WARNING: version 2 or higher required; see the INSTALL doc for more info" >&2;}
 	fi
 	;;
 

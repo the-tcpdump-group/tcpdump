@@ -103,10 +103,10 @@ linux*)
  	fi
 	AC_MSG_RESULT($ac_cv_linux_vers)
  	if test $ac_cv_linux_vers = unknown ; then
- 		AC_MSG_ERROR(cannot determine linux version when cross-compiling)
+ 		AC_MSG_WARN(cannot determine linux version when cross-compiling)
  	fi
 	if test $ac_cv_linux_vers -lt 2 ; then
-		AC_MSG_ERROR(version 2 or higher required; see the INSTALL doc for more info)
+		AC_MSG_WARN(version 2 or higher required; see the INSTALL doc for more info)
 	fi
 	;;
 
