@@ -488,7 +488,6 @@ babel_print_v2(const u_char *cp, u_int length) {
                 rc = network_prefix(message[2], message[3], 0,
                                     message + 4, NULL, len - 2, prefix);
                 if(rc < 0) goto corrupt;
-                plen = message[3] + (message[2] == 1 ? 96 : 0);
                 printf("for %s",
                        message[2] == 0 ? "any" : format_prefix(prefix, plen));
             }
