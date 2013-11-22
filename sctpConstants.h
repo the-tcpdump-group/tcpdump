@@ -565,7 +565,34 @@
 #define SCTP_NONE_LFT_RWND 19
 #define SCTP_NONE_LFT_CWND 20
 
+/* data chunk's payload protocol identifiers */
 
+#define SCTP_PPID_IUA 1
+#define SCTP_PPID_M2UA 2
+#define SCTP_PPID_M3UA 3
+#define SCTP_PPID_SUA 4
+#define SCTP_PPID_M2PA 5
+#define SCTP_PPID_V5UA 6
+#define SCTP_PPID_H248 7
+#define SCTP_PPID_BICC 8
+#define SCTP_PPID_TALI 9
+#define SCTP_PPID_DUA 10
+#define SCTP_PPID_ASAP 11
+#define SCTP_PPID_ENRP 12
+#define SCTP_PPID_H323 13
+#define SCTP_PPID_QIPC 14
+#define SCTP_PPID_SIMCO 15
+#define SCTP_PPID_DDPSC 16
+#define SCTP_PPID_DDPSSC 17
+#define SCTP_PPID_S1AP 18
+#define SCTP_PPID_RUA 19
+#define SCTP_PPID_HNBAP 20
+#define SCTP_PPID_FORCES_HP 21
+#define SCTP_PPID_FORCES_MP 22
+#define SCTP_PPID_FORCES_LP 23
+#define SCTP_PPID_SBC_AP 24
+#define SCTP_PPID_NBAP 25
+/* 26 */
+#define SCTP_PPID_X2AP 27
 
-#endif
-
+#endif /* __sctpConstants_h__ */

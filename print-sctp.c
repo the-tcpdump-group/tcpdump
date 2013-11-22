@@ -70,6 +70,38 @@ static const struct tok ForCES_channels[] = {
 	{ 0, NULL }
 };
 
+static struct tok PayloadProto_idents[] = {
+	{ SCTP_PPID_IUA,    "ISDN Q.921" },
+	{ SCTP_PPID_M2UA,   "M2UA"   },
+	{ SCTP_PPID_M3UA,   "M3UA"   },
+	{ SCTP_PPID_SUA,    "SUA"    },
+	{ SCTP_PPID_M2PA,   "M2PA"   },
+	{ SCTP_PPID_V5UA,   "V5.2"   },
+	{ SCTP_PPID_H248,   "H.248"  },
+	{ SCTP_PPID_BICC,   "BICC"   },
+	{ SCTP_PPID_TALI,   "TALI"   },
+	{ SCTP_PPID_DUA,    "DUA"    },
+	{ SCTP_PPID_ASAP,   "ASAP"   },
+	{ SCTP_PPID_ENRP,   "ENRP"   },
+	{ SCTP_PPID_H323,   "H.323"  },
+	{ SCTP_PPID_QIPC,   "Q.IPC"  },
+	{ SCTP_PPID_SIMCO,  "SIMCO"  },
+	{ SCTP_PPID_DDPSC,  "DDPSC"  },
+	{ SCTP_PPID_DDPSSC, "DDPSSC" },
+	{ SCTP_PPID_S1AP,   "S1AP"   },
+	{ SCTP_PPID_RUA,    "RUA"    },
+	{ SCTP_PPID_HNBAP,  "HNBAP"  },
+	{ SCTP_PPID_FORCES_HP, "ForCES HP" },
+	{ SCTP_PPID_FORCES_MP, "ForCES MP" },
+	{ SCTP_PPID_FORCES_LP, "ForCES LP" },
+	{ SCTP_PPID_SBC_AP, "SBc-AP" },
+	{ SCTP_PPID_NBAP,   "NBAP"   },
+	/* 26 */
+	{ SCTP_PPID_X2AP,   "X2AP"   },
+	{ 0, NULL }
+};
+
+
 static inline int isForCES_port(u_short Port)
 {
 	if (Port == CHAN_HP)
@@ -222,50 +254,49 @@ void sctp_print(const u_char *bp,        /* beginning of sctp packet */
 
 	    dataHdrPtr=(const struct sctpDataPart*)(chunkDescPtr+1);
 
+	    u_int32_t ppid = EXTRACT_32BITS(&dataHdrPtr->payloadtype);
+
 	    printf("[TSN: %u] ", EXTRACT_32BITS(&dataHdrPtr->TSN));
 	    printf("[SID: %u] ", EXTRACT_16BITS(&dataHdrPtr->streamId));
 	    printf("[SSEQ %u] ", EXTRACT_16BITS(&dataHdrPtr->sequence));
-	    printf("[PPID 0x%x] ", EXTRACT_32BITS(&dataHdrPtr->payloadtype));
+	    printf("[PPID %s] ",
+		    tok2str(PayloadProto_idents, "0x%x", ppid));
 	    fflush(stdout);
+
+
+	    if (!isforces) {
+		isforces = (ppid == SCTP_PPID_FORCES_HP) ||
+		    (ppid == SCTP_PPID_FORCES_MP) ||
+		    (ppid == SCTP_PPID_FORCES_LP);
+	    }
+
+	    const u_char *payloadPtr = (const u_char *) (dataHdrPtr + 1);
+	    if (EXTRACT_16BITS(&chunkDescPtr->chunkLength) <
+		    sizeof(struct sctpDataPart) + sizeof(struct sctpChunkDesc) + 1) {
+		printf("bogus chunk length %u]", EXTRACT_16BITS(&chunkDescPtr->chunkLength));
+		return;
+	    }
+
+	    u_int payload_size = EXTRACT_16BITS(&chunkDescPtr->chunkLength) -
+		(sizeof(struct sctpDataPart) + sizeof(struct sctpChunkDesc));
 	    if (isforces) {
-		const u_char *payloadPtr;
-		u_int chunksize = sizeof(struct sctpDataPart)+
-			          sizeof(struct sctpChunkDesc);
-		payloadPtr = (const u_char *) (dataHdrPtr + 1);
-		if (EXTRACT_16BITS(&chunkDescPtr->chunkLength) <
-			sizeof(struct sctpDataPart)+
-			sizeof(struct sctpChunkDesc)+1) {
-		/* Less than 1 byte of chunk payload */
-			printf("bogus ForCES chunk length %u]",
-			    EXTRACT_16BITS(&chunkDescPtr->chunkLength));
-			return;
-		}
-
-		forces_print(payloadPtr, EXTRACT_16BITS(&chunkDescPtr->chunkLength)- chunksize);
-	   } else if (vflag >= 2) {	/* if verbose output is specified */
+		forces_print(payloadPtr, payload_size);
+	    } else if (vflag >= 2) {	/* if verbose output is specified */
 					/* at the command line */
-		const u_char *payloadPtr;
-
-		printf("[Payload");
-
-		if (!suppress_default_print) {
-			payloadPtr = (const u_char *) (++dataHdrPtr);
-			printf(":");
-			if (EXTRACT_16BITS(&chunkDescPtr->chunkLength) <
-			    sizeof(struct sctpDataPart)+
-			    sizeof(struct sctpChunkDesc)+1) {
-				/* Less than 1 byte of chunk payload */
-				printf("bogus chunk length %u]",
-				    EXTRACT_16BITS(&chunkDescPtr->chunkLength));
-				return;
+		switch (ppid) {
+		case SCTP_PPID_M3UA :
+			print_m3ua(payloadPtr, payload_size);
+			break;
+		default:
+			printf("[Payload");
+			if (!suppress_default_print) {
+				printf(":");
+				default_print(payloadPtr, payload_size);
 			}
-			default_print(payloadPtr,
-			      EXTRACT_16BITS(&chunkDescPtr->chunkLength) -
-			      (sizeof(struct sctpDataPart)+
-			      sizeof(struct sctpChunkDesc)));
-		} else
 			printf("]");
-	      }
+			break;
+		}
+	    }
 	    break;
 	  }
 	case SCTP_INITIATION :
