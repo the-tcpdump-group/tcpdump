@@ -40,7 +40,7 @@ struct m3ua_param_header {
 #define M3UA_SSNM_DUPU 5
 #define M3UA_SSNM_DRST 6
 
-/* ASP State Maintence messages */
+/* ASP State Maintenance messages */
 #define M3UA_ASP_UP 1
 #define M3UA_ASP_DN 2
 #define M3UA_ASP_BEAT 3
@@ -48,7 +48,7 @@ struct m3ua_param_header {
 #define M3UA_ASP_DN_ACK 5
 #define M3UA_ASP_BEAT_ACK 6
 
-/* ASP Traffic Maintence messages */
+/* ASP Traffic Maintenance messages */
 #define M3UA_ASP_AC 1
 #define M3UA_ASP_IA 2
 #define M3UA_ASP_AC_ACK 3
