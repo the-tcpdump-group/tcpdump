@@ -70,7 +70,7 @@ static const struct tok ForCES_channels[] = {
 	{ 0, NULL }
 };
 
-static struct tok PayloadProto_idents[] = {
+static const struct tok PayloadProto_idents[] = {
 	{ SCTP_PPID_IUA,    "ISDN Q.921" },
 	{ SCTP_PPID_M2UA,   "M2UA"   },
 	{ SCTP_PPID_M3UA,   "M3UA"   },
