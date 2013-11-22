@@ -148,6 +148,7 @@ LIBNETDISSECT_SRC=\
 	print-lspping.c \
 	print-lwapp.c \
 	print-lwres.c \
+	print-m3ua.c \
 	print-mobile.c \
 	print-mpcp.c \
 	print-mpls.c \
@@ -359,7 +360,7 @@ $(PROG): $(OBJ) @V_PCAPDEP@
 
 $(LIBNETDISSECT): $(LIBNETDISSECT_OBJ)
 	@rm -f $@
-	$(AR) cr $@ $(LIBNETDISSECT_OBJ) 
+	$(AR) cr $@ $(LIBNETDISSECT_OBJ)
 	$(RANLIB) $@
 
 datalinks.o: $(srcdir)/missing/datalinks.c

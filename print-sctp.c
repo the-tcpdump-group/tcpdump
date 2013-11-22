@@ -417,6 +417,68 @@ static const struct tok ForCES_channels[] = {
 	{ 0, NULL }
 };
 
+/* data chunk's payload protocol identifiers */
+
+#define SCTP_PPID_IUA 1
+#define SCTP_PPID_M2UA 2
+#define SCTP_PPID_M3UA 3
+#define SCTP_PPID_SUA 4
+#define SCTP_PPID_M2PA 5
+#define SCTP_PPID_V5UA 6
+#define SCTP_PPID_H248 7
+#define SCTP_PPID_BICC 8
+#define SCTP_PPID_TALI 9
+#define SCTP_PPID_DUA 10
+#define SCTP_PPID_ASAP 11
+#define SCTP_PPID_ENRP 12
+#define SCTP_PPID_H323 13
+#define SCTP_PPID_QIPC 14
+#define SCTP_PPID_SIMCO 15
+#define SCTP_PPID_DDPSC 16
+#define SCTP_PPID_DDPSSC 17
+#define SCTP_PPID_S1AP 18
+#define SCTP_PPID_RUA 19
+#define SCTP_PPID_HNBAP 20
+#define SCTP_PPID_FORCES_HP 21
+#define SCTP_PPID_FORCES_MP 22
+#define SCTP_PPID_FORCES_LP 23
+#define SCTP_PPID_SBC_AP 24
+#define SCTP_PPID_NBAP 25
+/* 26 */
+#define SCTP_PPID_X2AP 27
+
+static const struct tok PayloadProto_idents[] = {
+	{ SCTP_PPID_IUA,    "ISDN Q.921" },
+	{ SCTP_PPID_M2UA,   "M2UA"   },
+	{ SCTP_PPID_M3UA,   "M3UA"   },
+	{ SCTP_PPID_SUA,    "SUA"    },
+	{ SCTP_PPID_M2PA,   "M2PA"   },
+	{ SCTP_PPID_V5UA,   "V5.2"   },
+	{ SCTP_PPID_H248,   "H.248"  },
+	{ SCTP_PPID_BICC,   "BICC"   },
+	{ SCTP_PPID_TALI,   "TALI"   },
+	{ SCTP_PPID_DUA,    "DUA"    },
+	{ SCTP_PPID_ASAP,   "ASAP"   },
+	{ SCTP_PPID_ENRP,   "ENRP"   },
+	{ SCTP_PPID_H323,   "H.323"  },
+	{ SCTP_PPID_QIPC,   "Q.IPC"  },
+	{ SCTP_PPID_SIMCO,  "SIMCO"  },
+	{ SCTP_PPID_DDPSC,  "DDPSC"  },
+	{ SCTP_PPID_DDPSSC, "DDPSSC" },
+	{ SCTP_PPID_S1AP,   "S1AP"   },
+	{ SCTP_PPID_RUA,    "RUA"    },
+	{ SCTP_PPID_HNBAP,  "HNBAP"  },
+	{ SCTP_PPID_FORCES_HP, "ForCES HP" },
+	{ SCTP_PPID_FORCES_MP, "ForCES MP" },
+	{ SCTP_PPID_FORCES_LP, "ForCES LP" },
+	{ SCTP_PPID_SBC_AP, "SBc-AP" },
+	{ SCTP_PPID_NBAP,   "NBAP"   },
+	/* 26 */
+	{ SCTP_PPID_X2AP,   "X2AP"   },
+	{ 0, NULL }
+};
+
+
 static inline int isForCES_port(u_short Port)
 {
 	if (Port == CHAN_HP)
@@ -569,49 +631,47 @@ void sctp_print(netdissect_options *ndo,
 
 	    dataHdrPtr=(const struct sctpDataPart*)(chunkDescPtr+1);
 
+	    u_int32_t ppid = EXTRACT_32BITS(&dataHdrPtr->payloadtype);
 	    ND_PRINT((ndo, "[TSN: %u] ", EXTRACT_32BITS(&dataHdrPtr->TSN)));
 	    ND_PRINT((ndo, "[SID: %u] ", EXTRACT_16BITS(&dataHdrPtr->streamId)));
 	    ND_PRINT((ndo, "[SSEQ %u] ", EXTRACT_16BITS(&dataHdrPtr->sequence)));
-	    ND_PRINT((ndo, "[PPID 0x%x] ", EXTRACT_32BITS(&dataHdrPtr->payloadtype)));
+	    ND_PRINT((ndo, "[PPID %s] ",
+		    tok2str(PayloadProto_idents, "0x%x", ppid)));
+
+	    if (!isforces) {
+		isforces = (ppid == SCTP_PPID_FORCES_HP) ||
+		    (ppid == SCTP_PPID_FORCES_MP) ||
+		    (ppid == SCTP_PPID_FORCES_LP);
+	    }
+
+	    const u_char *payloadPtr = (const u_char *) (dataHdrPtr + 1);
+	    if (EXTRACT_16BITS(&chunkDescPtr->chunkLength) <
+		    sizeof(struct sctpDataPart) + sizeof(struct sctpChunkDesc) + 1) {
+		ND_PRINT((ndo, "bogus chunk length %u]", EXTRACT_16BITS(&chunkDescPtr->chunkLength)));
+		return;
+	    }
+
+	    u_int payload_size = EXTRACT_16BITS(&chunkDescPtr->chunkLength) -
+		(sizeof(struct sctpDataPart) + sizeof(struct sctpChunkDesc));
+
 	    if (isforces) {
-		const u_char *payloadPtr;
-		u_int chunksize = sizeof(struct sctpDataPart)+
-			          sizeof(struct sctpChunkDesc);
-		payloadPtr = (const u_char *) (dataHdrPtr + 1);
-		if (EXTRACT_16BITS(&chunkDescPtr->chunkLength) <
-			sizeof(struct sctpDataPart)+
-			sizeof(struct sctpChunkDesc)+1) {
-		/* Less than 1 byte of chunk payload */
-			ND_PRINT((ndo, "bogus ForCES chunk length %u]",
-			    EXTRACT_16BITS(&chunkDescPtr->chunkLength)));
-			return;
-		}
-
-		forces_print(ndo, payloadPtr, EXTRACT_16BITS(&chunkDescPtr->chunkLength)- chunksize);
-	   } else if (ndo->ndo_vflag >= 2) {	/* if verbose output is specified */
+		forces_print(ndo, payloadPtr, payload_size);
+	    } else if (ndo->ndo_vflag >= 2) {	/* if verbose output is specified */
 					/* at the command line */
-		const u_char *payloadPtr;
-
-		ND_PRINT((ndo, "[Payload"));
-
-		if (!ndo->ndo_suppress_default_print) {
-			payloadPtr = (const u_char *) (++dataHdrPtr);
-			ND_PRINT((ndo, ":"));
-			if (EXTRACT_16BITS(&chunkDescPtr->chunkLength) <
-			    sizeof(struct sctpDataPart)+
-			    sizeof(struct sctpChunkDesc)+1) {
-				/* Less than 1 byte of chunk payload */
-				ND_PRINT((ndo, "bogus chunk length %u]",
-				    EXTRACT_16BITS(&chunkDescPtr->chunkLength)));
-				return;
+		switch (ppid) {
+		case SCTP_PPID_M3UA :
+			print_m3ua(payloadPtr, payload_size);
+			break;
+		default:
+			ND_PRINT((ndo, "[Payload"));
+			if (!ndo->ndo_suppress_default_print) {
+				ND_PRINT((ndo, ":"));
+				ND_DEFAULTPRINT(payloadPtr, payload_size);
 			}
-			ND_DEFAULTPRINT(payloadPtr,
-			      EXTRACT_16BITS(&chunkDescPtr->chunkLength) -
-			      (sizeof(struct sctpDataPart)+
-			      sizeof(struct sctpChunkDesc)));
-		} else
 			ND_PRINT((ndo, "]"));
-	      }
+			break;
+		}
+	    }
 	    break;
 	  }
 	case SCTP_INITIATION :

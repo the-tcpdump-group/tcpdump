@@ -151,6 +151,7 @@ extern u_int16_t create_osi_cksum(const u_int8_t *, int, int);
 extern char *q922_string(const u_char *);
 extern char *smb_errstr(int, int);
 extern const char *nt_errstr(u_int32_t);
+extern void print_m3ua(const u_char *, u_int);
 
 #ifdef INET6
 extern int mask62plen(const u_char *);
