@@ -237,17 +237,20 @@ trunc:
 /* Data decoders signal truncated data with -1. */
 static int
 (* const data_decoders[AHCP1_OPT_MAX + 1])(const u_char *, const u_char *) = {
-	[AHCP1_OPT_ORIGIN_TIME]            = ahcp_time_print,
-	[AHCP1_OPT_EXPIRES]                = ahcp_seconds_print,
-	[AHCP1_OPT_MY_IPV6_ADDRESS]        = ahcp_ipv6_addresses_print,
-	[AHCP1_OPT_MY_IPV4_ADDRESS]        = ahcp_ipv4_addresses_print,
-	[AHCP1_OPT_IPV6_PREFIX]            = ahcp_ipv6_prefixes_print,
-	[AHCP1_OPT_IPV6_ADDRESS]           = ahcp_ipv6_addresses_print,
-	[AHCP1_OPT_IPV4_ADDRESS]           = ahcp_ipv4_addresses_print,
-	[AHCP1_OPT_IPV6_PREFIX_DELEGATION] = ahcp_ipv6_prefixes_print,
-	[AHCP1_OPT_IPV4_PREFIX_DELEGATION] = ahcp_ipv4_prefixes_print,
-	[AHCP1_OPT_NAME_SERVER]            = ahcp_ipv6_addresses_print,
-	[AHCP1_OPT_NTP_SERVER]             = ahcp_ipv6_addresses_print,
+	/* [AHCP1_OPT_PAD]                    = */  NULL,
+	/* [AHCP1_OPT_MANDATORY]              = */  NULL,
+	/* [AHCP1_OPT_ORIGIN_TIME]            = */  ahcp_time_print,
+	/* [AHCP1_OPT_EXPIRES]                = */  ahcp_seconds_print,
+	/* [AHCP1_OPT_MY_IPV6_ADDRESS]        = */  ahcp_ipv6_addresses_print,
+	/* [AHCP1_OPT_MY_IPV4_ADDRESS]        = */  ahcp_ipv4_addresses_print,
+	/* [AHCP1_OPT_IPV6_PREFIX]            = */  ahcp_ipv6_prefixes_print,
+	/* [AHCP1_OPT_IPV4_PREFIX]            = */  NULL,
+	/* [AHCP1_OPT_IPV6_ADDRESS]           = */  ahcp_ipv6_addresses_print,
+	/* [AHCP1_OPT_IPV4_ADDRESS]           = */  ahcp_ipv4_addresses_print,
+	/* [AHCP1_OPT_IPV6_PREFIX_DELEGATION] = */  ahcp_ipv6_prefixes_print,
+	/* [AHCP1_OPT_IPV4_PREFIX_DELEGATION] = */  ahcp_ipv4_prefixes_print,
+	/* [AHCP1_OPT_NAME_SERVER]            = */  ahcp_ipv6_addresses_print,
+	/* [AHCP1_OPT_NTP_SERVER]             = */  ahcp_ipv6_addresses_print,
 };
 
 static void
