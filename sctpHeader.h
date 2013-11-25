@@ -55,10 +55,6 @@ extern "C" {
 
 /* the sctp common header */
 
-#ifdef TRU64
- #define _64BITS 1
-#endif
-
 struct sctpHeader{
   u_int16_t source;
   u_int16_t destination;
