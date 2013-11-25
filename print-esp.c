@@ -225,7 +225,6 @@ static int
 espprint_decode_encalgo(netdissect_options *ndo,
 			char *decode, struct sa_list *sa)
 {
-	int len;
 	size_t i;
 	const EVP_CIPHER *evp;
 	int authlen = 0;
@@ -238,7 +237,6 @@ espprint_decode_encalgo(netdissect_options *ndo,
 	}
 	*colon = '\0';
 	
-	len = colon - decode;
 	if (strlen(decode) > strlen("-hmac96") &&
 	    !strcmp(decode + strlen(decode) - strlen("-hmac96"),
 		    "-hmac96")) {
@@ -550,7 +548,6 @@ esp_print(netdissect_options *ndo,
 #ifdef HAVE_LIBCRYPTO
 	struct ip *ip;
 	struct sa_list *sa = NULL;
-	int espsecret_keylen;
 #ifdef INET6
 	struct ip6_hdr *ip6 = NULL;
 #endif
@@ -561,7 +558,6 @@ esp_print(netdissect_options *ndo,
 	u_char *ivoff;
 	u_char *p;
 	EVP_CIPHER_CTX ctx;
-	int blocksz;
 #endif
 
 	esp = (struct newesp *)bp;
@@ -665,15 +661,12 @@ esp_print(netdissect_options *ndo,
 	ivoff = (u_char *)(esp + 1) + 0;
 	ivlen = sa->ivlen;
 	secret = sa->secret;
-	espsecret_keylen = sa->secretlen;
 	ep = ep - sa->authlen;
 
 	if (sa->evp) {
 		memset(&ctx, 0, sizeof(ctx));
 		if (EVP_CipherInit(&ctx, sa->evp, secret, NULL, 0) < 0)
 			(*ndo->ndo_warning)(ndo, "espkey init failed");
-
-		blocksz = EVP_CIPHER_CTX_block_size(&ctx);
 
 		p = ivoff;
 		EVP_CipherInit(&ctx, NULL, NULL, p, 0);

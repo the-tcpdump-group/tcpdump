@@ -669,9 +669,7 @@ static void
 icmp6_opt_print(const u_char *bp, int resid)
 {
 	const struct nd_opt_hdr *op;
-	const struct nd_opt_hdr *opl;	/* why there's no struct? */
 	const struct nd_opt_prefix_info *opp;
-	const struct icmp6_opts_redirect *opr;
 	const struct nd_opt_mtu *opm;
 	const struct nd_opt_rdnss *oprd;
 	const struct nd_opt_dnssl *opds;
@@ -708,12 +706,10 @@ icmp6_opt_print(const u_char *bp, int resid)
 
 		switch (op->nd_opt_type) {
 		case ND_OPT_SOURCE_LINKADDR:
-			opl = (struct nd_opt_hdr *)op;
 			l = (op->nd_opt_len << 3) - 2;
 			print_lladdr(cp + 2, l);
 			break;
 		case ND_OPT_TARGET_LINKADDR:
-			opl = (struct nd_opt_hdr *)op;
 			l = (op->nd_opt_len << 3) - 2;
 			print_lladdr(cp + 2, l);
 			break;
@@ -729,7 +725,6 @@ icmp6_opt_print(const u_char *bp, int resid)
                         printf(", pref. time %s", get_lifetime(EXTRACT_32BITS(&opp->nd_opt_pi_preferred_time)));
 			break;
 		case ND_OPT_REDIRECTED_HEADER:
-			opr = (struct icmp6_opts_redirect *)op;
                         print_unknown_data(bp,"\n\t    ",op->nd_opt_len<<3);
 			/* xxx */
 			break;
