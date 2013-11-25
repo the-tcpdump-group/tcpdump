@@ -23,7 +23,7 @@
 
 #ifndef lint
 static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-redis.c,v 1.9 2003-11-16 09:36:40 guy Exp $";
+    "@(#) $Header: /tcpdump/master/tcpdump/print-redis.c,v 1.9 2013-12-08 09:36:40 guy Exp $";
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -67,40 +67,82 @@ $7
 myvalue
 */
 
+	int print_prefix = 0;
     int length_cur = length, i, argc = 0, len_arg, data_len;
+    u_char *bp_ptr = (u_char *)bp, *str_args, *data_ptr, op;
+	char sep;
+	static char tstr[] = " [|redis]";
 
-    u_char *bp_ptr = bp, *str_args, *data_ptr;
-
-    putchar('\n');
     while(1) {
 
-	/* *<num_args>\r\n */
-	if (*bp_ptr != '*') { break; }
+		op = *bp_ptr;
 
-	INC(bp_ptr, 1, length_cur);
-	argc = atoi(bp_ptr);
+		TCHECK(*bp_ptr);
 
-	MOVE_FORWARD(bp_ptr, length_cur);
+		if (op == '+' || op == '-' || op == ':' || op == '$') {
+			/* This is a reply from the redis-server */
+			int len;
+			u_char * orig_bp_ptr = bp_ptr;
+			MOVE_FORWARD(bp_ptr, length_cur);
+			len = (bp_ptr - orig_bp_ptr);
+			TCHECK2(*orig_bp_ptr, len);
+			printf(" redisReply: %.*s", len, orig_bp_ptr);
+			break;
+		} else if (*bp_ptr != '*') { break; }
 
-	INC(bp_ptr, 2, length_cur);
+		/* Redis command processing -> client to redis-server */
+		if (print_prefix == 0) {
+			print_prefix = 1;
+			printf(" redisCommand: ");
+		}
 
-	for(i = 0; i < argc; i++) {
+		TCHECK(*bp_ptr);
+		INC(bp_ptr, 1, length_cur);
+		argc = atoi(bp_ptr);
 
-	    if(*bp_ptr != '$') { length_cur = 0; break; }
-	    INC(bp_ptr, 1, length_cur);
-	    data_len = atoi(bp_ptr);
-	    MOVE_FORWARD(bp_ptr, length_cur);
-	    INC(bp_ptr, 2, length_cur);
-	    data_ptr = bp_ptr;
-	    INC(bp_ptr, data_len, length_cur);
+		TCHECK(*bp_ptr);
+		MOVE_FORWARD(bp_ptr, length_cur);
 
-	    printf("%.*s,", data_len, data_ptr);
-	    INC(bp_ptr, 2, length_cur);
-	}
+		TCHECK2(*bp_ptr, 2);
+		INC(bp_ptr, 2, length_cur);
 
-	if(length_cur <= 0) break;
+		for(i = 0; i < argc; i++) {
+
+			TCHECK(*bp_ptr);
+			if(*bp_ptr != '$') { length_cur = 0; break; }
+
+			TCHECK(*bp_ptr);
+			INC(bp_ptr, 1, length_cur);
+			data_len = atoi(bp_ptr);
+
+			MOVE_FORWARD(bp_ptr, length_cur);
+
+			TCHECK2(*bp_ptr,2);
+			INC(bp_ptr, 2, length_cur);
+			data_ptr = bp_ptr;
+
+			TCHECK2(*bp_ptr, data_len);
+			INC(bp_ptr, data_len, length_cur);
+
+			sep = ' ';
+			if(i == 0 && argc != 1) { sep = ':'; }
+			else if(i == (argc - 1)) { sep = ' '; }
+			else { sep = ','; }
+			printf("%.*s%c", data_len, data_ptr, sep);
+
+			TCHECK2(*bp_ptr, 2);
+			INC(bp_ptr, 2, length_cur);
+		}
+
+		if(length_cur <= 0) break;
+
+		putchar('|');
     }
 
-    puts("");
+	return;
+
+trunc:
+	fputs(tstr, stdout);
+
     return;
 }
