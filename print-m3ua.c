@@ -97,7 +97,7 @@ static const struct tok ParamName[] = {
   { M3UA_PARAM_CONCERNED_DST, "Concerned Destination" },
   { M3UA_PARAM_ROUTING_KEY, "Routing Key" },
   { M3UA_PARAM_REG_RESULT, "Registration Result" },
-  { M3UA_PARAM_DEREG_RESUL, "Deregistration Result" },
+  { M3UA_PARAM_DEREG_RESULT, "Deregistration Result" },
   { M3UA_PARAM_LOCAL_ROUTING_KEY_ID, "Local Routing Key Identifier" },
   { M3UA_PARAM_DST_POINT_CODE, "Destination Point Code" },
   { M3UA_PARAM_SI, "Service Indicators" },
