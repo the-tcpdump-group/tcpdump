@@ -121,7 +121,7 @@ static void pimv2_print(register const u_char *bp, register u_int len, u_int cks
 static void
 pimv1_join_prune_print(register const u_char *bp, register u_int len)
 {
-	int maddrlen, addrlen, ngroups, njoin, nprune;
+	int ngroups, njoin, nprune;
 	int njp;
 
 	/* If it's a single group and a single source, use 1-line output. */
@@ -162,8 +162,6 @@ pimv1_join_prune_print(register const u_char *bp, register u_int len)
 	len -= 8;
 
 	TCHECK2(bp[0], 4);
-	maddrlen = bp[1];
-	addrlen = bp[2];
 	ngroups = bp[3];
 	bp += 4;
 	len -= 4;
