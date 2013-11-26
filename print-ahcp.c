@@ -150,7 +150,13 @@ ahcp_ipv6_addresses_print(const u_char *cp, const u_char *ep) {
 		if (cp + 16 > ep)
 			goto corrupt;
 		TCHECK2(*cp, 16);
-		printf("%s%s", sep, ip6addr_string(cp));
+		printf("%s%s", sep,
+#ifdef INET6
+		       ip6addr_string(cp)
+#else
+		       "(compiled w/o IPv6)"
+#endif /* INET6 */
+		       );
 		cp += 16;
 		sep = ", ";
 	}
@@ -196,7 +202,13 @@ ahcp_ipv6_prefixes_print(const u_char *cp, const u_char *ep) {
 		if (cp + 17 > ep)
 			goto corrupt;
 		TCHECK2(*cp, 17);
-		printf("%s%s/%u", sep, ip6addr_string(cp), *(cp + 16));
+		printf("%s%s/%u", sep,
+#ifdef INET6
+		       ip6addr_string(cp),
+#else
+		       "(compiled w/o IPv6)",
+#endif /* INET6 */
+		       *(cp + 16));
 		cp += 17;
 		sep = ", ";
 	}
