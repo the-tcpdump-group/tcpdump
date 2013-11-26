@@ -673,7 +673,11 @@ tcp_print(register const u_char *bp, register u_int length,
         if (sport == TELNET_PORT || dport == TELNET_PORT) {
                 if (!qflag && vflag)
                         telnet_print(bp, length);
-        } else if (sport == BGP_PORT || dport == BGP_PORT)
+        }
+        else if (sport == REDIS_PORT || dport == REDIS_PORT) {
+                redis_print(bp, length);
+        }
+        else if (sport == BGP_PORT || dport == BGP_PORT)
                 bgp_print(bp, length);
         else if (sport == PPTP_PORT || dport == PPTP_PORT)
                 pptp_print(bp);

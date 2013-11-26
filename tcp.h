@@ -98,6 +98,9 @@ struct tcphdr {
 #define BGP_PORT                179
 #endif
 #define NETBIOS_SSN_PORT        139
+#ifndef REDIS_PORT
+#define REDIS_PORT 		6379
+#endif
 #ifndef OPENFLOW_PORT
 #define OPENFLOW_PORT           6633
 #endif

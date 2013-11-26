@@ -31,6 +31,8 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
+ * redis.h - github.com/adarqui
+ *
  *	@(#)redis.h	8.1 (Berkeley) 6/2/93
  */
 
@@ -39,5 +41,8 @@
 
 #define	TSPVERSION	1
 #define ANYADDR 	NULL
+
+
+void redis_print(register const u_char *, int);
 
 #endif /* !_REDIS_H_ */
