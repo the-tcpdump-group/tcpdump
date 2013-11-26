@@ -51,6 +51,7 @@
 #include "interface.h"
 #include "extract.h"
 #include "addrtoname.h"
+#include "ether.h"
 #include "ethertype.h"
 #include "ipproto.h"
 #include "openflow.h"
@@ -573,7 +574,6 @@ static const struct tok empty_str[] = {
 #define OFP_MAX_PORT_NAME_LEN      16
 #define DESC_STR_LEN              256
 #define SERIAL_NUM_LEN             32
-#define OFP_ETH_ALEN                6
 #define OFP_VLAN_NONE          0xffff
 
 static const char *
@@ -682,9 +682,9 @@ of10_phy_ports_print(const u_char *cp, const u_char *ep, u_int len) {
 		printf("\n\t  port_no %s", tok2str(ofpp_str, "%u", EXTRACT_16BITS(cp)));
 		cp += 2;
 		/* hw_addr */
-		TCHECK2(*cp, OFP_ETH_ALEN);
+		TCHECK2(*cp, ETHER_ADDR_LEN);
 		printf(", hw_addr %s", etheraddr_string(cp));
-		cp += OFP_ETH_ALEN;
+		cp += ETHER_ADDR_LEN;
 		/* name */
 		TCHECK2(*cp, OFP_MAX_PORT_NAME_LEN);
 		printf(", name '");
@@ -882,15 +882,15 @@ of10_match_print(const char *pfx, const u_char *cp, const u_char *ep) {
 		printf("%smatch in_port %s", pfx, tok2str(ofpp_str, "%u", EXTRACT_16BITS(cp)));
 	cp += 2;
 	/* dl_src */
-	TCHECK2(*cp, OFP_ETH_ALEN);
+	TCHECK2(*cp, ETHER_ADDR_LEN);
 	if (! (wildcards & OFPFW_DL_SRC))
 		printf("%smatch dl_src %s", pfx, etheraddr_string(cp));
-	cp += OFP_ETH_ALEN;
+	cp += ETHER_ADDR_LEN;
 	/* dl_dst */
-	TCHECK2(*cp, OFP_ETH_ALEN);
+	TCHECK2(*cp, ETHER_ADDR_LEN);
 	if (! (wildcards & OFPFW_DL_DST))
 		printf("%smatch dl_dst %s", pfx, etheraddr_string(cp));
-	cp += OFP_ETH_ALEN;
+	cp += ETHER_ADDR_LEN;
 	/* dl_vlan */
 	TCHECK2(*cp, 2);
 	if (! (wildcards & OFPFW_DL_VLAN))
@@ -1058,9 +1058,9 @@ of10_actions_print(const char *pfx, const u_char *cp, const u_char *ep,
 		case OFPAT_SET_DL_SRC:
 		case OFPAT_SET_DL_DST:
 			/* dl_addr */
-			TCHECK2(*cp, OFP_ETH_ALEN);
+			TCHECK2(*cp, ETHER_ADDR_LEN);
 			printf(", dl_addr %s", etheraddr_string(cp));
-			cp += OFP_ETH_ALEN;
+			cp += ETHER_ADDR_LEN;
 			/* pad */
 			TCHECK2(*cp, 6);
 			cp += 6;
@@ -1228,9 +1228,9 @@ of10_port_mod_print(const u_char *cp, const u_char *ep) {
 	printf("\n\t port_no %s", tok2str(ofpp_str, "%u", EXTRACT_16BITS(cp)));
 	cp += 2;
 	/* hw_addr */
-	TCHECK2(*cp, OFP_ETH_ALEN);
+	TCHECK2(*cp, ETHER_ADDR_LEN);
 	printf(", hw_addr %s", etheraddr_string(cp));
-	cp += OFP_ETH_ALEN;
+	cp += ETHER_ADDR_LEN;
 	/* config */
 	TCHECK2(*cp, 4);
 	printf("\n\t config 0x%08x", EXTRACT_32BITS(cp));

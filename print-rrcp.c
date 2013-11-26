@@ -40,10 +40,6 @@ static const char rcsid[] _U_ =
 #include "extract.h"
 #include "ether.h"
 
-#ifndef ETH_ALEN 
-#define ETH_ALEN 6
-#endif
-
 #define RRCP_OPCODE_MASK	0x7F	/* 0x00 = hello, 0x01 = get, 0x02 = set */
 #define RRCP_ISREPLY		0x80	/* 0 = request to switch, 0x80 = reply from switch */
 
