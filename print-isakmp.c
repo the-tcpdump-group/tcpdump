@@ -552,7 +552,6 @@ ikev1_sa_print(netdissect_options *ndo, u_char tpay _U_,
 {
 	const struct ikev1_pl_sa *p;
 	struct ikev1_pl_sa sa;
-	const u_int32_t *q;
 	u_int32_t doi, sit, ident;
 	const u_char *cp, *np;
 	int t;
@@ -571,7 +570,6 @@ ikev1_sa_print(netdissect_options *ndo, u_char tpay _U_,
 	}
 
 	ND_PRINT((ndo," doi=ipsec"));
-	q = (u_int32_t *)&sa.sit;
 	ND_PRINT((ndo," situation="));
 	t = 0;
 	if (sit & 0x01) {
@@ -1775,7 +1773,6 @@ ikev2_n_print(netdissect_options *ndo, u_char tpay _U_,
 {
 	struct ikev2_n *p, n;
 	const u_char *cp;
-	u_char *ep2;
 	u_char showspi, showdata, showsomedata;
 	const char *notify_name;
 	u_int32_t type;
@@ -1952,7 +1949,6 @@ ikev2_n_print(netdissect_options *ndo, u_char tpay _U_,
 	}
 
 	cp = (u_char *)(p + 1) + n.spi_size;
-	ep2 = (u_char *)p + item_len;
 
 	if(3 < ndo->ndo_vflag) {
 		showdata = 1;
@@ -2235,7 +2231,7 @@ ikev1_print(netdissect_options *ndo,
 	p = (const struct isakmp *)bp;
 	ep = ndo->ndo_snapend;
 	
-	phase = (*(u_int32_t *)base->msgid == 0) ? 1 : 2;
+	phase = (EXTRACT_32BITS(base->msgid) == 0) ? 1 : 2;
 	if (phase == 1)
 		ND_PRINT((ndo," phase %d", phase));
 	else
@@ -2267,7 +2263,6 @@ ikev1_print(netdissect_options *ndo,
 	
 	if (ndo->ndo_vflag) {
 		const struct isakmp_gen *ext;
-		int nparen;
 		
 		ND_PRINT((ndo,":"));
 		
@@ -2281,7 +2276,6 @@ ikev1_print(netdissect_options *ndo,
 			goto done;
 		}
 		
-		nparen = 0;
 		CHECKLEN(p + 1, base->np);
 		np = base->np;
 		ext = (struct isakmp_gen *)(p + 1);
@@ -2406,7 +2400,7 @@ ikev2_print(netdissect_options *ndo,
 	p = (const struct isakmp *)bp;
 	ep = ndo->ndo_snapend;
 
-	phase = (*(u_int32_t *)base->msgid == 0) ? 1 : 2;
+	phase = (EXTRACT_32BITS(base->msgid) == 0) ? 1 : 2;
 	if (phase == 1)
 		ND_PRINT((ndo, " parent_sa"));
 	else
@@ -2422,7 +2416,6 @@ ikev2_print(netdissect_options *ndo,
 
 	if (ndo->ndo_vflag) {
 		const struct isakmp_gen *ext;
-		int nparen;
 
 		ND_PRINT((ndo, ":"));
 
@@ -2436,7 +2429,6 @@ ikev2_print(netdissect_options *ndo,
 			goto done;
 		}
 
-		nparen = 0;
 		CHECKLEN(p + 1, base->np)
 
 		np = base->np;
@@ -2520,8 +2512,6 @@ isakmp_rfc3948_print(netdissect_options *ndo,
 		     const u_char *bp, u_int length,
 		     const u_char *bp2)
 {
-	const u_char *ep;
-	ep = ndo->ndo_snapend;
 
 	if(length == 1 && bp[0]==0xff) {
 		ND_PRINT((ndo, "isakmp-nat-keep-alive"));
