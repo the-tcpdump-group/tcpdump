@@ -129,8 +129,16 @@ static void dump_packet_and_trunc(u_char *, const struct pcap_pkthdr *, const u_
 static void dump_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void droproot(const char *, const char *);
 static void ndo_error(netdissect_options *ndo, const char *fmt, ...)
-     __attribute__ ((noreturn, format (printf, 2, 3)));
-static void ndo_warning(netdissect_options *ndo, const char *fmt, ...);
+     __attribute__((noreturn))
+#ifdef __ATTRIBUTE___FORMAT_OK
+     __attribute__((format (printf, 2, 3)))
+#endif /* __ATTRIBUTE___FORMAT_OK */
+    ;
+static void ndo_warning(netdissect_options *ndo, const char *fmt, ...)
+#ifdef __ATTRIBUTE___FORMAT_OK
+     __attribute__((format (printf, 2, 3)))
+#endif /* __ATTRIBUTE___FORMAT_OK */
+    ;
 
 #ifdef SIGNAL_REQ_INFO
 RETSIGTYPE requestinfo(int);
