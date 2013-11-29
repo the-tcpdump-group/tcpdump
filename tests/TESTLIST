@@ -77,7 +77,8 @@ qinqv           QinQpacket.pcap         QinQpacketv.out  -t -e -v
 sflow1          sflow_multiple_counter_30_pdus.pcap     sflow_multiple_counter_30_pdus.out      -t -v
 sflow2          sflow_multiple_counter_30_pdus.pcap     sflow_multiple_counter_30_pdus-nv.out      -t
 
-# Babel tests
+# AHCP and Babel tests
+ahcp-vv         ahcp.pcap              ahcp-vv.out     -t -vv
 babel1          babel.pcap             babel1.out      -t 
 babel1v         babel.pcap             babel1v.out     -t -v
 babel_auth      babel_auth.pcap        babel_auth.out  -t -v
@@ -93,6 +94,7 @@ igmpv3-queries  igmpv3-queries.pcap     igmpv3-queries.out      -t
 
 # ICMPv6
 icmpv6          icmpv6.pcap             icmpv6.out      -t -vv
+icmpv6_opt24-v	icmpv6_opt24.pcap	icmpv6_opt24-v.out	-t -v
 
 # SPB tests
 spb	            spb.pcap	            spb.out -t
@@ -151,6 +153,7 @@ tfo		tfo-5c1fa7f9ae91.pcap	tfo.out		-t
 of10_p3295-vv	of10_p3295.pcap		of10_p3295-vv.out	-t -vv
 of10_s4810-vvvv	of10_s4810.pcap		of10_s4810-vvvv.out	-t -vvvv
 of10_pf5240-vv	of10_pf5240.pcap	of10_pf5240-vv.out	-t -vv
+of10_7050q-v	of10_7050q.pcap		of10_7050q-v.out	-t -v
 
 # GeoNetworking and CALM FAST tests
 geonet-calm-fast	geonet_and_calm_fast.pcap	geonet_and_calm_fast.out	-t -vv -n

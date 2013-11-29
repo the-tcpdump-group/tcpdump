@@ -275,7 +275,7 @@ struct nd_opt_hdr {		/* Neighbor discovery option header */
 #define ND_OPT_MTU			5
 #define ND_OPT_ADVINTERVAL		7
 #define ND_OPT_HOMEAGENT_INFO		8
-#define ND_OPT_ROUTE_INFO		9	/* draft-ietf-ipngwg-router-preference, not officially assigned yet */
+#define ND_OPT_ROUTE_INFO		24	/* RFC4191 */
 #define ND_OPT_RDNSS			25
 #define ND_OPT_DNSSL			31
 
