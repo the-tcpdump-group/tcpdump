@@ -39,13 +39,6 @@ static const char rcsid[] _U_ =
 #include "interface.h"
 #include "extract.h"
 
-/*
-typedef struct LIST {
-    void *data;
-    struct LIST *next;
-} list_t;
-*/
-
 #define MOVE_FORWARD(x, len) while(*x != '\r' && *(x+1) != '\n' && len >= 0) x++, len--
 #define INC(x, y, len) if((len - y) < 0) { break; } else { x+=y; len-=y; }
 
