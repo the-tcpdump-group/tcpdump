@@ -1042,6 +1042,8 @@ main(int argc, char **argv)
 				packettype = PT_PGM;
 			else if (strcasecmp(optarg, "pgm_zmtp1") == 0)
 				packettype = PT_PGM_ZMTP1;
+			else if (strcasecmp(optarg, "redis") == 0)
+				packettype = PT_REDIS;
 			else if (strcasecmp(optarg, "lmp") == 0)
 				packettype = PT_LMP;
 			else

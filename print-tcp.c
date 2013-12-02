@@ -666,6 +666,9 @@ tcp_print(register const u_char *bp, register u_int length,
                 case PT_ZMTP1:
                         zmtp1_print(bp, length);
                         break;
+                case PT_REDIS:
+                        redis_print(bp, length);
+                        break;
                 }
                 return;
         }
