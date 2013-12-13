@@ -22,7 +22,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "12 July 2012"
+.TH TCPDUMP 1  "13 December 2013"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -1427,8 +1427,12 @@ wrl.nfs > sushi.201b:
 .fi
 .RE
 In the first line, host \fIsushi\fP sends a transaction with id \fI6709\fP
-to \fIwrl\fP (note that the number following the src host is a
-transaction id, \fInot\fP the source port).
+to \fIwrl\fP.
+(Note that for UDP NFS packets the standard UDP header isn't printed and the
+number following the src host is a transaction id, \fInot\fP the source port.
+The example above represents UDP NFS traffic.
+For TCP NFS packets port numbers are printed as part of the standard TCP header
+and the transaction id is printed separately as "xid" field of the packet.)
 The request was 112 bytes,
 excluding the UDP and IP headers.
 The operation was a \fIreadlink\fP
