@@ -345,6 +345,7 @@ extern u_int usb_linux_48_byte_print(const struct pcap_pkthdr *, const u_char *)
 extern u_int usb_linux_64_byte_print(const struct pcap_pkthdr *, const u_char *);
 extern void vxlan_print(const u_char *, u_int);
 extern void otv_print(const u_char *, u_int);
+extern void ahcp_print(const u_char *, u_int);
 
 
 #ifdef INET6
@@ -357,7 +358,6 @@ extern void ripng_print(const u_char *, unsigned int);
 extern int rt6_print(const u_char *, const u_char *);
 extern void ospf6_print(const u_char *, u_int);
 extern void dhcp6_print(const u_char *, u_int);
-extern void ahcp_print(const u_char *, u_int);
 extern void babel_print(const u_char *, u_int);
 extern int mask62plen(const u_char *);
 #endif /*INET6*/
