@@ -106,7 +106,7 @@ static int Lflag;			/* list available data link types and exit */
 static int Jflag;			/* list available time stamp types */
 #endif
 #ifdef HAVE_PCAP_SETDIRECTION
-int Pflag = -1;	/* Restrict captured packet by sent/receive direction */
+int Qflag = -1;				/* restrict captured packet by send/receive direction */
 #endif
 static char *zflag = NULL;		/* compress each savefile using a specified command (like gzip or bzip2) */
 
@@ -532,9 +532,9 @@ show_dlts_and_exit(const char *device, pcap_t *pd)
 #endif
 
 #ifdef HAVE_PCAP_SETDIRECTION
-#define P_FLAG "P:"
+#define Q_FLAG "Q:"
 #else
-#define P_FLAG
+#define Q_FLAG
 #endif
 
 #ifndef WIN32
@@ -755,7 +755,7 @@ main(int argc, char **argv)
 #endif
 
 	while (
-	    (op = getopt(argc, argv, "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOp" P_FLAG "qr:Rs:StT:u" U_FLAG "vV:w:W:xXy:Yz:Z:")) != -1)
+	    (op = getopt(argc, argv, "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOpq" Q_FLAG "r:Rs:StT:u" U_FLAG "vV:w:W:xXy:Yz:Z:")) != -1)
 		switch (op) {
 
 		case 'a':
@@ -977,22 +977,24 @@ main(int argc, char **argv)
 		case 'p':
 			++pflag;
 			break;
-#ifdef HAVE_PCAP_SETDIRECTION
-		case 'P':
-			if (strcasecmp(optarg, "in") == 0)
-				Pflag = PCAP_D_IN;
-			else if (strcasecmp(optarg, "out") == 0)
-				Pflag = PCAP_D_OUT;
-			else if (strcasecmp(optarg, "inout") == 0)
-				Pflag = PCAP_D_INOUT;
-			else
-				error("unknown capture direction `%s'", optarg);
-			break;
-#endif /* HAVE_PCAP_SETDIRECTION */
+
 		case 'q':
 			++qflag;
 			++suppress_default_print;
 			break;
+
+#ifdef HAVE_PCAP_SETDIRECTION
+		case 'Q':
+			if (strcasecmp(optarg, "in") == 0)
+				Qflag = PCAP_D_IN;
+			else if (strcasecmp(optarg, "out") == 0)
+				Qflag = PCAP_D_OUT;
+			else if (strcasecmp(optarg, "inout") == 0)
+				Qflag = PCAP_D_INOUT;
+			else
+				error("unknown capture direction `%s'", optarg);
+			break;
+#endif /* HAVE_PCAP_SETDIRECTION */
 
 		case 'r':
 			RFileName = optarg;
@@ -1342,13 +1344,13 @@ main(int argc, char **argv)
 				    pcap_statustostr(status));
 		}
 #ifdef HAVE_PCAP_SETDIRECTION
-		if (Pflag != -1) {
-			status = pcap_setdirection(pd, Pflag);
+		if (Qflag != -1) {
+			status = pcap_setdirection(pd, Qflag);
 			if (status != 0)
 				error("%s: pcap_setdirection() failed: %s",
 				      device,  pcap_geterr(pd));
 		}
-#endif
+#endif /* HAVE_PCAP_SETDIRECTION */
 #else
 		*ebuf = '\0';
 		pd = pcap_open_live(device, snaplen, !pflag, 1000, ebuf);
@@ -2136,7 +2138,7 @@ usage(void)
 "\t\t[ -i interface ]" j_FLAG_USAGE " [ -M secret ]\n");
 #ifdef HAVE_PCAP_SETDIRECTION
 	(void)fprintf(stderr,
-"\t\t[ -P in|out|inout ]\n");
+"\t\t[ -Q in|out|inout ]\n");
 #endif
 	(void)fprintf(stderr,
 "\t\t[ -r file ] [ -s snaplen ] [ -T type ] [ -V file ] [ -w file ]\n");
