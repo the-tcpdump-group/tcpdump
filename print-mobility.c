@@ -123,7 +123,7 @@ mobility_opt_print(const u_char *bp, int len)
 				goto trunc;
 			}
 			/* units of 4 secs */
-			printf("(refresh: %d)",
+			printf("(refresh: %u)",
 				EXTRACT_16BITS(&bp[i+2]) << 2);
 			break;
 		case IP6MOPT_ALTCOA:
@@ -151,10 +151,10 @@ mobility_opt_print(const u_char *bp, int len)
 			break;
 		default:
 			if (len - i < IP6MOPT_MINLEN) {
-				printf("(sopt_type %d: trunc)", bp[i]);
+				printf("(sopt_type %u: trunc)", bp[i]);
 				goto trunc;
 			}
-			printf("(type-0x%02x: len=%d)", bp[i], bp[i + 1]);
+			printf("(type-0x%02x: len=%u)", bp[i], bp[i + 1]);
 			break;
 		}
 	}
@@ -247,7 +247,7 @@ mobility_print(const u_char *bp, const u_char *bp2 _U_)
 	case IP6M_BINDING_UPDATE:
 		printf("mobility: BU");
 		TCHECK(mh->ip6m_data16[0]);
-		printf(" seq#=%d", EXTRACT_16BITS(&mh->ip6m_data16[0]));
+		printf(" seq#=%u", EXTRACT_16BITS(&mh->ip6m_data16[0]));
 		hlen = IP6M_MINLEN;
 		TCHECK2(*mh, hlen + 1);
 		if (bp[hlen] & 0xf0)
@@ -266,29 +266,29 @@ mobility_print(const u_char *bp, const u_char *bp2 _U_)
 		hlen += 1;
 		TCHECK2(*mh, hlen + 2);
 		/* units of 4 secs */
-		printf(" lifetime=%d", EXTRACT_16BITS(&bp[hlen]) << 2);
+		printf(" lifetime=%u", EXTRACT_16BITS(&bp[hlen]) << 2);
 		hlen += 2;
 		break;
 	case IP6M_BINDING_ACK:
 		printf("mobility: BA");
 		TCHECK(mh->ip6m_data8[0]);
-		printf(" status=%d", mh->ip6m_data8[0]);
+		printf(" status=%u", mh->ip6m_data8[0]);
 		if (mh->ip6m_data8[1] & 0x80)
 			printf(" K");
 		/* Reserved (7bits) */
 		hlen = IP6M_MINLEN;
 		TCHECK2(*mh, hlen + 2);
-		printf(" seq#=%d", EXTRACT_16BITS(&bp[hlen]));
+		printf(" seq#=%u", EXTRACT_16BITS(&bp[hlen]));
 		hlen += 2;
 		TCHECK2(*mh, hlen + 2);
 		/* units of 4 secs */
-		printf(" lifetime=%d", EXTRACT_16BITS(&bp[hlen]) << 2);
+		printf(" lifetime=%u", EXTRACT_16BITS(&bp[hlen]) << 2);
 		hlen += 2;
 		break;
 	case IP6M_BINDING_ERROR:
 		printf("mobility: BE");
 		TCHECK(mh->ip6m_data8[0]);
-		printf(" status=%d", mh->ip6m_data8[0]);
+		printf(" status=%u", mh->ip6m_data8[0]);
 		/* Reserved */
 		hlen = IP6M_MINLEN;
 		TCHECK2(*mh, hlen + 16);
@@ -296,7 +296,7 @@ mobility_print(const u_char *bp, const u_char *bp2 _U_)
 		hlen += 16;
 		break;
 	default:
-		printf("mobility: type-#%d len=%d", type, mh->ip6m_len);
+		printf("mobility: type-#%u len=%u", type, mh->ip6m_len);
 		return(mhlen);
 		break;
 	}
