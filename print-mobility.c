@@ -89,10 +89,9 @@ struct ip6_mobility {
 #define IP6MOPT_AUTH_MINLEN    12
 
 static void
-mobility_opt_print(const u_char *bp, int len)
+mobility_opt_print(const u_char *bp, const unsigned len)
 {
-	int i;
-	int optlen;
+	unsigned i, optlen;
 
 	for (i = 0; i < len; i += optlen) {
 		if (bp[i] == IP6MOPT_PAD1)
@@ -172,7 +171,8 @@ mobility_print(const u_char *bp, const u_char *bp2 _U_)
 {
 	const struct ip6_mobility *mh;
 	const u_char *ep;
-	int mhlen, hlen, type;
+	unsigned mhlen, hlen;
+	u_int8_t type;
 
 	mh = (struct ip6_mobility *)bp;
 
@@ -195,7 +195,7 @@ mobility_print(const u_char *bp, const u_char *bp2 _U_)
 		mhlen = ep - bp;
 		goto trunc;
 	}
-	mhlen = (int)((mh->ip6m_len + 1) << 3);
+	mhlen = (mh->ip6m_len + 1) << 3;
 
 	/* XXX ip6m_cksum */
 
