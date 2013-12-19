@@ -167,7 +167,7 @@ struct ndo_printer {
 };
 
 
-static struct printer printers[] = {
+static const struct printer printers[] = {
 	{ arcnet_if_print,	DLT_ARCNET },
 #ifdef DLT_ARCNET_LINUX
 	{ arcnet_linux_if_print, DLT_ARCNET_LINUX },
@@ -322,7 +322,7 @@ static struct printer printers[] = {
 	{ NULL,			0 },
 };
 
-static struct ndo_printer ndo_printers[] = {
+static const struct ndo_printer ndo_printers[] = {
 	{ ether_if_print,	DLT_EN10MB },
 #ifdef DLT_IPNET
 	{ ipnet_if_print,	DLT_IPNET },
@@ -351,7 +351,7 @@ static struct ndo_printer ndo_printers[] = {
 if_printer
 lookup_printer(int type)
 {
-	struct printer *p;
+	const struct printer *p;
 
 	for (p = printers; p->f; ++p)
 		if (type == p->type)
@@ -364,7 +364,7 @@ lookup_printer(int type)
 if_ndo_printer
 lookup_ndo_printer(int type)
 {
-	struct ndo_printer *p;
+	const struct ndo_printer *p;
 
 	for (p = ndo_printers; p->f; ++p)
 		if (type == p->type)

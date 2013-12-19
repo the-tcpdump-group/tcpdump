@@ -691,7 +691,7 @@ static const char *ipcomp_p_map[] = {
 	NULL, "oui", "deflate", "lzs",
 };
 
-const struct attrmap ipsec_t_map[] = {
+static const struct attrmap ipsec_t_map[] = {
 	{ NULL,	0, { NULL } },
 	{ "lifetype", 3, { NULL, "sec", "kb", }, },
 	{ "life", 0, { NULL } },
@@ -718,7 +718,7 @@ const struct attrmap ipsec_t_map[] = {
 	{ "privalg", 0, { NULL } },
 };
 
-const struct attrmap encr_t_map[] = {
+static const struct attrmap encr_t_map[] = {
 	{ NULL,	0, { NULL } }, 	{ NULL,	0, { NULL } },  /* 0, 1 */
 	{ NULL,	0, { NULL } },	{ NULL,	0, { NULL } },  /* 2, 3 */
 	{ NULL,	0, { NULL } },	{ NULL,	0, { NULL } },  /* 4, 5 */
@@ -729,7 +729,7 @@ const struct attrmap encr_t_map[] = {
 	{ "keylen", 14, { NULL }},
 };
 
-const struct attrmap oakley_t_map[] = {
+static const struct attrmap oakley_t_map[] = {
 	{ NULL,	0, { NULL } },
 	{ "enc", 8,	{ NULL, "1des", "idea", "blowfish", "rc5",
 		 	  "3des", "cast", "aes", }, },

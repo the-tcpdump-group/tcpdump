@@ -252,7 +252,7 @@ cdp_print_addr(const u_char * p, int l)
 	int pt, pl, al, num;
 	const u_char *endp = p + l;
 #ifdef INET6
-	static u_char prot_ipv6[] = {
+	static const u_char prot_ipv6[] = {
 		0xaa, 0xaa, 0x03, 0x00, 0x00, 0x00, 0x86, 0xdd
 	};
 #endif

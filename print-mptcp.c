@@ -265,7 +265,7 @@ static int mp_fast_close_print(const u_char *opt, u_int opt_len, u_char flags _U
         return 1;
 }
 
-static struct {
+static const struct {
         const char *name;
         int (*print)(const u_char *, u_int, u_char);
 } mptcp_options[] = {

@@ -288,7 +288,7 @@ wb_prep(const struct pkt_prep *prep, u_int len)
 }
 
 
-const char *dopstr[] = {
+static const char *dopstr[] = {
 	"dop-0!",
 	"dop-1!",
 	"RECT",

@@ -83,7 +83,7 @@ static const char rcsid[] _U_ =
  * Universal ASN.1 types
  * (we only care about the tag values for those allowed in the Internet SMI)
  */
-const char *Universal[] = {
+static const char *Universal[] = {
 	"U-0",
 	"Boolean",
 	"Integer",
@@ -106,7 +106,7 @@ const char *Universal[] = {
 /*
  * Application-wide ASN.1 types from the Internet SMI and their tags
  */
-const char *Application[] = {
+static const char *Application[] = {
 	"IpAddress",
 #define IPADDR 0
 	"Counter",
@@ -125,7 +125,7 @@ const char *Application[] = {
 /*
  * Context-specific ASN.1 types for the SNMP PDUs and their tags
  */
-const char *Context[] = {
+static const char *Context[] = {
 	"GetRequest",
 #define GETREQ 0
 	"GetNextRequest",
@@ -155,7 +155,7 @@ const char *Context[] = {
 /*
  * Context-specific ASN.1 types for the SNMP Exceptions and their tags
  */
-const char *Exceptions[] = {
+static const char *Exceptions[] = {
 	"noSuchObject",
 #define NOSUCHOBJECT 0
 	"noSuchInstance",
@@ -168,14 +168,14 @@ const char *Exceptions[] = {
  * Private ASN.1 types
  * The Internet SMI does not specify any
  */
-const char *Private[] = {
+static const char *Private[] = {
 	"P-0"
 };
 
 /*
  * error-status values for any SNMP PDU
  */
-const char *ErrorStatus[] = {
+static const char *ErrorStatus[] = {
 	"noError",
 	"tooBig",
 	"noSuchName",
@@ -204,7 +204,7 @@ const char *ErrorStatus[] = {
 /*
  * generic-trap values in the SNMP Trap-PDU
  */
-const char *GenericTrap[] = {
+static const char *GenericTrap[] = {
 	"coldStart",
 	"warmStart",
 	"linkDown",
@@ -225,7 +225,7 @@ const char *GenericTrap[] = {
  * type definitions.
  */
 #define defineCLASS(x) { "x", x, sizeof(x)/sizeof(x[0]) } /* not ANSI-C */
-struct {
+static const struct {
 	const char	*name;
 	const char	**Id;
 	    int	numIDs;
@@ -245,7 +245,7 @@ struct {
 /*
  * defined forms for ASN.1 types
  */
-const char *Form[] = {
+static const char *Form[] = {
 	"Primitive",
 #define PRIMITIVE	0
 	"Constructed",
@@ -278,7 +278,7 @@ struct obj {
  * Currently, this includes the prefixes for the Internet MIB, the
  * private enterprises tree, and the experimental tree.
  */
-struct obj_abrev {
+static const struct obj_abrev {
 	const char *prefix;		/* prefix for this abrev */
 	struct obj *node;		/* pointer into object table */
 	const char *oid;		/* ASN.1 encoded OID */
@@ -360,7 +360,7 @@ struct be {
 /*
  * SNMP versions recognized by this module
  */
-const char *SnmpVersion[] = {
+static const char *SnmpVersion[] = {
 	"SNMPv1",
 #define SNMP_VERSION_1	0
 	"SNMPv2c",
@@ -684,7 +684,7 @@ asn1_print(struct be *elem)
 		int o = 0, first = -1, i = asnlen;
 
 		if (!sflag && !nflag && asnlen > 2) {
-			struct obj_abrev *a = &obj_abrev_list[0];
+			const struct obj_abrev *a = &obj_abrev_list[0];
 			size_t a_len = strlen(a->oid);
 			for (; a->node; a++) {
 				TCHECK2(*p, a_len);
@@ -879,7 +879,7 @@ struct smi2be {
     int be;
 };
 
-static struct smi2be smi2betab[] = {
+static const struct smi2be smi2betab[] = {
     { SMI_BASETYPE_INTEGER32,		BE_INT },
     { SMI_BASETYPE_OCTETSTRING,		BE_STR },
     { SMI_BASETYPE_OCTETSTRING,		BE_INETADDR },

@@ -704,7 +704,7 @@ typedef int (*codeset_pr_func_t)(const struct ie_tlv_header_t  *ie_p,
     const u_char *p);
 
 /* array of 16 codepages - currently we only support codepage 1,5 */
-static codeset_pr_func_t fr_q933_print_ie_codeset[] = {
+static const codeset_pr_func_t fr_q933_print_ie_codeset[] = {
     NULL,
     fr_q933_print_ie_codeset5,
     NULL,

@@ -68,7 +68,7 @@ static const struct tok rx_types[] = {
 	{ 0,				NULL },
 };
 
-static struct double_tok {
+static const struct double_tok {
 	int flag;		/* Rx flag */
 	int packetType;		/* Packet type */
 	const char *s;		/* Flag string */

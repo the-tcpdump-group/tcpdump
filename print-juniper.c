@@ -371,7 +371,7 @@ struct juniper_cookie_table_t {
     const char *s;		/* pic name */
 };
 
-static struct juniper_cookie_table_t juniper_cookie_table[] = {
+static const struct juniper_cookie_table_t juniper_cookie_table[] = {
 #ifdef DLT_JUNIPER_ATM1
     { DLT_JUNIPER_ATM1,  4, "ATM1"},
 #endif
@@ -1133,7 +1133,7 @@ juniper_read_tlv_value(const u_char *p, u_int tlv_type, u_int tlv_len) {
 static int
 juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct juniper_l2info_t *l2info) {
 
-    struct juniper_cookie_table_t *lp = juniper_cookie_table;
+    const struct juniper_cookie_table_t *lp = juniper_cookie_table;
     u_int idx, jnx_ext_len, jnx_header_len = 0;
     u_int8_t tlv_type,tlv_len;
     u_int32_t control_word;

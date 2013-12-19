@@ -94,7 +94,7 @@ struct egp_packet {
 #define  egp_sourcenet  egp_pands.egpu_sourcenet
 };
 
-const char *egp_acquire_codes[] = {
+static const char *egp_acquire_codes[] = {
 	"request",
 	"confirm",
 	"refuse",
@@ -102,7 +102,7 @@ const char *egp_acquire_codes[] = {
 	"cease_ack"
 };
 
-const char *egp_acquire_status[] = {
+static const char *egp_acquire_status[] = {
 	"unspecified",
 	"active_mode",
 	"passive_mode",
@@ -113,18 +113,18 @@ const char *egp_acquire_status[] = {
 	"protocol_violation"
 };
 
-const char *egp_reach_codes[] = {
+static const char *egp_reach_codes[] = {
 	"hello",
 	"i-h-u"
 };
 
-const char *egp_status_updown[] = {
+static const char *egp_status_updown[] = {
 	"indeterminate",
 	"up",
 	"down"
 };
 
-const char *egp_reasons[] = {
+static const char *egp_reasons[] = {
 	"unspecified",
 	"bad_EGP_header_format",
 	"bad_EGP_data_field_format",

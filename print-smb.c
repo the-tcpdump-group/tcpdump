@@ -65,8 +65,8 @@ struct smbfnsint
 
 #define FLG_CHAIN	(1 << 0)
 
-static struct smbfns *
-smbfind(int id, struct smbfns *list)
+static const struct smbfns *
+smbfind(int id, const struct smbfns *list)
 {
     int sindex;
 
@@ -77,8 +77,8 @@ smbfind(int id, struct smbfns *list)
     return(&list[0]);
 }
 
-static struct smbfnsint *
-smbfindint(int id, struct smbfnsint *list)
+static const struct smbfnsint *
+smbfindint(int id, const struct smbfnsint *list)
 {
     int sindex;
 
@@ -144,7 +144,7 @@ trunc:
     return;
 }
 
-struct smbfnsint trans2_fns[] = {
+static const struct smbfnsint trans2_fns[] = {
     { 0, "TRANSACT2_OPEN", 0,
 	{ "Flags2=[w]\nMode=[w]\nSearchAttrib=[A]\nAttrib=[A]\nTime=[T2]\nOFun=[w]\nSize=[D]\nRes=([w, w, w, w, w])\nPath=[S]",
 	  NULL,
@@ -173,7 +173,7 @@ static void
 print_trans2(const u_char *words, const u_char *dat, const u_char *buf, const u_char *maxbuf)
 {
     u_int bcc;
-    static struct smbfnsint *fn = &trans2_fns[0];
+    static const struct smbfnsint *fn = &trans2_fns[0];
     const u_char *data, *param;
     const u_char *w = words + 1;
     const char *f1 = NULL, *f2 = NULL;
@@ -520,7 +520,7 @@ trunc:
 }
 
 
-static struct smbfns smb_fns[] = {
+static const struct smbfns smb_fns[] = {
     { -1, "SMBunknown", 0, DEFDESCRIPT },
 
     { SMBtcon, "SMBtcon", 0,
@@ -799,7 +799,7 @@ print_smb(const u_char *buf, const u_char *maxbuf)
     int command;
     u_int32_t nterror;
     const u_char *words, *maxwords, *data;
-    struct smbfns *fn;
+    const struct smbfns *fn;
     const char *fmt_smbheader =
         "[P4]SMB Command   =  [B]\nError class   =  [BP1]\nError code    =  [d]\nFlags1        =  [B]\nFlags2        =  [B][P13]\nTree ID       =  [d]\nProc ID       =  [d]\nUID           =  [d]\nMID           =  [d]\nWord Count    =  [b]\n";
     int smboffset;

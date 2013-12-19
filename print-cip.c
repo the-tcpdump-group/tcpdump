@@ -43,7 +43,7 @@ static const char rcsid[] _U_ =
 
 #define RFC1483LLC_LEN	8
 
-static unsigned char rfcllc[] = {
+static const unsigned char rfcllc[] = {
 	0xaa,	/* DSAP: non-ISO */
 	0xaa,	/* SSAP: non-ISO */
 	0x03,	/* Ctrl: Unnumbered Information Command PDU */
