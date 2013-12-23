@@ -34,6 +34,10 @@
 #define OSPF6_OPTION_N	0x08	/* N bit: For type-7 LSA */
 #define OSPF6_OPTION_R	0x10	/* R bit: Router bit */
 #define OSPF6_OPTION_DC	0x20	/* DC bit: Demand circuits */
+/* The field is actually 24-bit (RFC5340 Section A.2). */
+#define OSPF6_OPTION_AF	0x0100	/* AF bit: Multiple address families */
+#define OSPF6_OPTION_L	0x0200	/* L bit: Link-local signaling (LLS) */
+#define OSPF6_OPTION_AT	0x0400	/* AT bit: Authentication trailer */
 
 
 /* db_flags	*/

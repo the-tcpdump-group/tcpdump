@@ -45,10 +45,13 @@ static const char rcsid[] _U_ =
 static const struct tok ospf6_option_values[] = {
 	{ OSPF6_OPTION_V6,	"V6" },
 	{ OSPF6_OPTION_E,	"External" },
-	{ OSPF6_OPTION_MC,	"Multicast" },
+	{ OSPF6_OPTION_MC,	"Deprecated" },
 	{ OSPF6_OPTION_N,	"NSSA" },
 	{ OSPF6_OPTION_R,	"Router" },
 	{ OSPF6_OPTION_DC,	"Demand Circuit" },
+	{ OSPF6_OPTION_AF,	"AFs Support" },
+	{ OSPF6_OPTION_L,	"LLS" },
+	{ OSPF6_OPTION_AT,	"Authentication Trailer" },
 	{ 0,			NULL }
 };
 
@@ -63,7 +66,7 @@ static const struct tok ospf6_rla_flag_values[] = {
 
 static const struct tok ospf6_asla_flag_values[] = {
 	{ ASLA_FLAG_EXTERNAL,	"External Type 2" },
-	{ ASLA_FLAG_FWDADDR,	"Fforwarding" },
+	{ ASLA_FLAG_FWDADDR,	"Forwarding" },
 	{ ASLA_FLAG_ROUTETAG,	"Tag" },
 	{ 0,			NULL }
 };
