@@ -48,6 +48,8 @@ static const char rcsid[] _U_ =
 #include "rpc_auth.h"
 #include "rpc_msg.h"
 
+static const char tstr[] = " [|nfs]";
+
 static void nfs_printfh(const u_int32_t *, const u_int);
 static int xid_map_enter(const struct sunrpc_msg *, const u_char *);
 static int xid_map_find(const struct sunrpc_msg *, const u_char *,
@@ -309,7 +311,7 @@ nfsreply_print(register const u_char *bp, u_int length,
 
 trunc:
 	if (!nfserr)
-		fputs(" [|nfs]", stdout);
+		printf("%s", tstr);
 }
 
 void
@@ -411,7 +413,7 @@ nfsreply_print_noaddr(register const u_char *bp, u_int length,
 
 trunc:
 	if (!nfserr)
-		fputs(" [|nfs]", stdout);
+		printf("%s", tstr);
 }
 
 /*
@@ -545,7 +547,7 @@ nfsreq_print(register const u_char *bp, u_int length,
 
 trunc:
 	if (!nfserr)
-		fputs(" [|nfs]", stdout);
+		printf("%s", tstr);
 }
 
 void
@@ -872,7 +874,7 @@ nfsreq_print_noaddr(register const u_char *bp, u_int length,
 
 trunc:
 	if (!nfserr)
-		fputs(" [|nfs]", stdout);
+		printf("%s", tstr);
 }
 
 /*
@@ -1882,5 +1884,5 @@ interp_reply(const struct sunrpc_msg *rp, u_int32_t proc, u_int32_t vers, int le
 	}
 trunc:
 	if (!nfserr)
-		fputs(" [|nfs]", stdout);
+		printf("%s", tstr);
 }

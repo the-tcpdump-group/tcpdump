@@ -39,6 +39,8 @@ static const char rcsid[] _U_ =
 #include "ethertype.h"
 #include "extract.h"			/* must come after interface.h */
 
+static const char tstr[] = "[|ARP]";
+
 /*
  * Address Resolution Protocol.
  *
@@ -211,7 +213,7 @@ atmarp_print(netdissect_options *ndo,
 	op = ATMOP(ap);
 
 	if (!ND_TTEST2(*aar_tpa(ap), ATMTPROTO_LEN(ap))) {
-		ND_PRINT((ndo, "[|ARP]"));
+		ND_PRINT((ndo, "%s", tstr));
 		ND_DEFAULTPRINT((const u_char *)ap, length);
 		return;
 	}
@@ -289,7 +291,7 @@ atmarp_print(netdissect_options *ndo,
         return;
 
 trunc:
-	ND_PRINT((ndo, "[|ARP]"));
+	ND_PRINT((ndo, "%s", tstr));
 }
 
 void
@@ -325,7 +327,7 @@ arp_print(netdissect_options *ndo,
 	}
 
 	if (!ND_TTEST2(*ar_tpa(ap), PROTO_LEN(ap))) {
-		ND_PRINT((ndo, "[|ARP]"));
+		ND_PRINT((ndo, "%s", tstr));
 		ND_DEFAULTPRINT((const u_char *)ap, length);
 		return;
 	}
@@ -406,7 +408,7 @@ arp_print(netdissect_options *ndo,
 
 	return;
 trunc:
-	ND_PRINT((ndo, "[|ARP]"));
+	ND_PRINT((ndo, "%s", tstr));
 }
 
 /*

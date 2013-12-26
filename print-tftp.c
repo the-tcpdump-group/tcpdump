@@ -44,6 +44,8 @@ static const char rcsid[] _U_ =
 #include "extract.h"
 #include "tftp.h"
 
+static const char tstr[] = " [|tftp]";
+
 /* op code to string mapping */
 static const struct tok op2str[] = {
 	{ RRQ,		"RRQ" },	/* read request */
@@ -78,7 +80,6 @@ tftp_print(register const u_char *bp, u_int length)
 	register const char *cp;
 	register const u_char *p;
 	register int opcode, i;
-	static char tstr[] = " [|tftp]";
 
 	tp = (const struct tftphdr *)bp;
 

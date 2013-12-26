@@ -35,6 +35,8 @@
 #if defined(HAVE_PCAP_USB_H) && defined(DLT_USB_LINUX)
 #include <pcap/usb.h>
 
+static const char tstr[] = "[|usb]";
+
 /* returns direction: 1=inbound 2=outbound -1=invalid */
 static int
 get_direction(int transfer_type, int event_type)
@@ -138,7 +140,7 @@ u_int
 usb_linux_48_byte_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
 	if (h->caplen < sizeof(pcap_usb_header)) {
-		printf("[|usb]");
+		printf("%s", tstr);
 		return(sizeof(pcap_usb_header));
 	}
 
@@ -160,7 +162,7 @@ u_int
 usb_linux_64_byte_print(const struct pcap_pkthdr *h, register const u_char *p)
 {
 	if (h->caplen < sizeof(pcap_usb_header_mmapped)) {
-		printf("[|usb]");
+		printf("%s", tstr);
 		return(sizeof(pcap_usb_header_mmapped));
 	}
 

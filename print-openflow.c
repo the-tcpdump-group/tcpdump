@@ -40,6 +40,9 @@
 #include "extract.h"
 #include "openflow.h"
 
+static const char tstr[] = " [|openflow]";
+static const char cstr[] = " (corrupt)";
+
 #define OF_VER_1_0    0x01
 
 static void
@@ -95,11 +98,11 @@ of_header_body_print(const u_char *cp, const u_char *ep) {
 	}
 
 corrupt: /* fail current packet */
-	printf(" (corrupt)");
+	printf("%s", cstr);
 	TCHECK2(*cp, ep - cp);
 	return ep;
 trunc:
-	printf(" [|openflow]");
+	printf("%s", tstr);
 	return ep;
 }
 

@@ -43,6 +43,8 @@ static const char rcsid[] _U_ =
 #include "extract.h"			/* must come after interface.h */
 #include "appletalk.h"
 
+static const char tstr[] = "[|atalk]";
+
 static const struct tok type2str[] = {
 	{ ddpRTMP,		"rtmp" },
 	{ ddpRTMPrequest,	"rtmpReq" },
@@ -62,8 +64,6 @@ struct aarp {
 	u_int8_t	hdaddr[6];
 	u_int8_t	pdaddr[4];
 };
-
-static char tstr[] = "[|atalk]";
 
 static void atp_print(const struct atATP *, u_int);
 static void atp_bitmap_print(u_char);

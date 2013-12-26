@@ -46,6 +46,8 @@ static const char rcsid[] _U_ =
 #include "interface.h"
 #include "addrtoname.h"
 
+static const char tstr[] = "[|pflog]";
+
 static const struct tok pf_reasons[] = {
 	{ 0,	"0(match)" },
 	{ 1,	"1(bad-offset)" },
@@ -120,7 +122,7 @@ pflog_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 
 	/* check length */
 	if (caplen < sizeof(u_int8_t)) {
-		printf("[|pflog]");
+		printf("%s", pflog);
 		return (caplen);
 	}
 
@@ -133,7 +135,7 @@ pflog_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 	hdrlen = BPF_WORDALIGN(hdr->length);
 
 	if (caplen < hdrlen) {
-		printf("[|pflog]");
+		printf("%s", pflog);
 		return (hdrlen);	/* XXX: true? */
 	}
 
@@ -176,7 +178,7 @@ pflog_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 	
 	return (hdrlen);
 trunc:
-	printf("[|pflog]");
+	printf("%s", pflog);
 	return (hdrlen);
 }
 

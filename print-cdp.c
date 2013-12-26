@@ -43,6 +43,8 @@ static const char rcsid[] _U_ =
 #include "extract.h"			/* must come after interface.h */
 #include "nlpid.h"
 
+static const char tstr[] = "[|cdp]";
+
 #define CDP_HEADER_LEN  4
 
 static const struct tok cdp_tlv_values[] = {
@@ -92,7 +94,7 @@ cdp_print(const u_char *pptr, u_int length, u_int caplen)
         const u_char *tptr;
 
 	if (caplen < CDP_HEADER_LEN) {
-		(void)printf("[|cdp]");
+		printf("%s", tstr);
 		return;
 	}
 
@@ -232,7 +234,7 @@ cdp_print(const u_char *pptr, u_int length, u_int caplen)
 
 	return;
 trunc:
-	printf("[|cdp]");
+	printf("%s", tstr);
 }
 
 /*

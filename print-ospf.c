@@ -43,6 +43,8 @@ static const char rcsid[] _U_ =
 
 #include "ip.h"
 
+static const char tstr[] = " [|ospf2]";
+
 static const struct tok ospf_option_values[] = {
         { OSPF_OPTION_T,	"MultiTopology" }, /* draft-ietf-ospf-mt-09 */
 	{ OSPF_OPTION_E,	"External" },
@@ -184,8 +186,6 @@ static const struct tok ospf_lls_eo_options[] = {
 	{ OSPF_LLS_EO_RS,	"Restart" },
 	{ 0,	NULL }
 };
-
-static char tstr[] = " [|ospf2]";
 
 static int ospf_print_lshdr(const struct lsa_hdr *);
 static const u_char *ospf_print_lsa(const struct lsa *);

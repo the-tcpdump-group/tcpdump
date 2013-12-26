@@ -62,6 +62,8 @@ static const char rcsid[] _U_ =
 #include "extract.h"
 #include "oui.h"
 
+static const char tstr[] = " [|radius]";
+
 #define TAM_SIZE(x) (sizeof(x)/sizeof(x[0]) )
 
 #define PRINT_HEX(bytes_len, ptr_data)                               \
@@ -456,7 +458,7 @@ print_attr_string(register u_char *data, u_int length, u_short attr_code )
       case TUNNEL_PASS:
            if (length < 3)
            {
-              printf(" [|radius]");
+              printf("%s", tstr);
               return;
            }
            if (*data && (*data <=0x1F) )
@@ -477,7 +479,7 @@ print_attr_string(register u_char *data, u_int length, u_short attr_code )
            {
               if (length < 1)
               {
-                 printf(" [|radius]");
+                 printf("%s", tstr);
                  return;
               }
               printf("Tag %u",*data);
@@ -493,7 +495,7 @@ print_attr_string(register u_char *data, u_int length, u_short attr_code )
    return;
 
    trunc:
-      printf(" [|radius]");
+      printf("%s", tstr);
 }
 
 /*
@@ -554,7 +556,7 @@ print_vendor_attr(register u_char *data, u_int length, u_short attr_code _U_)
     return;
 
    trunc:
-     printf(" [|radius]");
+     printf("%s", tstr);
 }
 
 
@@ -671,7 +673,7 @@ print_attr_num(register u_char *data, u_int length, u_short attr_code )
    return;
 
    trunc:
-     printf(" [|radius]");
+     printf("%s", tstr);
 }
 
 
@@ -714,7 +716,7 @@ print_attr_address(register u_char *data, u_int length, u_short attr_code )
    return;
 
    trunc:
-     printf(" [|radius]");
+     printf("%s", tstr);
 }
 
 
@@ -747,7 +749,7 @@ static void print_attr_time(register u_char *data, u_int length, u_short attr_co
    return;
 
    trunc:
-     printf(" [|radius]");
+     printf("%s", tstr);
 }
 
 
@@ -824,7 +826,7 @@ static void print_attr_strange(register u_char *data, u_int length, u_short attr
    return;
 
    trunc:
-     printf(" [|radius]");
+     printf("%s", tstr);
 }
 
 
@@ -886,7 +888,7 @@ radius_attrs_print(register const u_char *attr, u_int length)
    return;
 
 trunc:
-   printf(" [|radius]");
+   printf("%s", tstr);
 }
 
 
@@ -902,7 +904,7 @@ radius_print(const u_char *dat, u_int length)
 
    if (len < MIN_RADIUS_LEN)
    {
-	  printf(" [|radius]");
+	  printf("%s", tstr);
 	  return;
    }
 
@@ -933,5 +935,5 @@ radius_print(const u_char *dat, u_int length)
    return;
 
 trunc:
-   printf(" [|radius]");
+   printf("%s", tstr);
 }

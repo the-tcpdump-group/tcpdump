@@ -57,6 +57,8 @@ static const char rcsid[] _U_ =
 #include "ip.h"
 #include "ethertype.h"
 
+static const char tstr[] = "[|gre]";
+
 #define	GRE_CP		0x8000		/* checksum present */
 #define	GRE_RP		0x4000		/* routing present */
 #define	GRE_KP		0x2000		/* key present */
@@ -94,7 +96,7 @@ gre_print(const u_char *bp, u_int length)
 	u_int len = length, vers;
 
 	if (len < 2) {
-		printf("[|gre]");
+		printf("%s", tstr);
 		return;
 	}
 	vers = EXTRACT_16BITS(bp) & GRE_VERS_MASK;
@@ -234,7 +236,7 @@ gre_print_0(const u_char *bp, u_int length)
 	return;
 
 trunc:
-	printf("[|gre]");
+	printf("%s", tstr);
 }
 
 void
@@ -314,7 +316,7 @@ gre_print_1(const u_char *bp, u_int length)
 	return;
 
 trunc:
-	printf("[|gre]");
+	printf("%s", tstr);
 }
 
 void

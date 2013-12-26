@@ -32,6 +32,8 @@ static const char rcsid[] _U_ =
 #endif
 #include "ipproto.h"
 
+static const char tstr[] = "[|dccp]";
+
 static const char *dccp_reset_codes[] = {
 	"unspecified",
 	"closed",
@@ -340,7 +342,7 @@ void dccp_print(const u_char *bp, const u_char *data2, u_int len)
 	}
 	return;
 trunc:
-	printf("[|dccp]");
+	printf("%s", tstr);
 trunc2:
 	return;
 }
@@ -459,6 +461,6 @@ static int dccp_print_option(const u_char *option)
 
 	return optlen;
 trunc:
-	printf("[|dccp]");
+	printf("%s", tstr);
 	return 0;
 }

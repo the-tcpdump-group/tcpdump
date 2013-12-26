@@ -39,6 +39,8 @@
 #include "interface.h"
 #include "extract.h"
 
+static const char tstr[] = "[|babel]";
+
 static void babel_print_v2(const u_char *cp, u_int length);
 
 void
@@ -66,7 +68,7 @@ babel_print(const u_char *cp, u_int length) {
     return;
 
  trunc:
-    printf(" [|babel]");
+    printf(" %s", tstr);
     return;
 }
 
@@ -396,7 +398,7 @@ babel_print_v2(const u_char *cp, u_int length) {
                 txcost = EXTRACT_16BITS(message + 4);
                 interval = EXTRACT_16BITS(message + 6);
                 rc = network_address(message[2], message + 8, len - 6, address);
-                if(rc < 0) { printf("[|babel]"); break; }
+                if(rc < 0) { printf("%s", tstr); break; }
                 printf("%s txcost %u interval %s",
                        format_address(address), txcost, format_interval(interval));
             }
@@ -547,7 +549,7 @@ babel_print_v2(const u_char *cp, u_int length) {
     return;
 
  trunc:
-    printf(" [|babel]");
+    printf(" %s", tstr);
     return;
 
  corrupt:

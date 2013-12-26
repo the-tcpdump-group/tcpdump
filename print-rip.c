@@ -39,6 +39,8 @@ static const char rcsid[] _U_ =
 
 #include "af.h"
 
+static const char tstr[] = "[|rip]";
+
 struct rip {
 	u_int8_t rip_cmd;		/* request/response */
 	u_int8_t rip_vers;		/* protocol version # */
@@ -182,14 +184,14 @@ rip_print(const u_char *dat, u_int length)
 	register u_int i, j;
 
 	if (snapend < dat) {
-		printf(" [|rip]");
+		printf(" %s", tstr);
 		return;
 	}
 	i = snapend - dat;
 	if (i > length)
 		i = length;
 	if (i < sizeof(*rp)) {
-		printf(" [|rip]");
+		printf(" %s", tstr);
 		return;
 	}
 	i -= sizeof(*rp);
@@ -244,7 +246,7 @@ rip_print(const u_char *dat, u_int length)
                                     break;
 			}
 			if (i)
-				printf("[|rip]");
+				printf("%s", tstr);
 			break;
 
 		case RIPCMD_TRACEOFF:

@@ -38,6 +38,8 @@ static const char rcsid[] _U_ =
 #include "addrtoname.h"
 #include "extract.h"
 
+static const char tstr[] = " [|kerberos]";
+
 static const u_char *c_print(register const u_char *, register const u_char *);
 static const u_char *krb4_print_hdr(const u_char *);
 static void krb4_print(const u_char *);
@@ -68,8 +70,6 @@ struct krb {
 	u_int8_t pvno;		/* Protocol Version */
 	u_int8_t type;		/* Type+B */
 };
-
-static char tstr[] = " [|kerberos]";
 
 static const struct tok type2str[] = {
 	{ AUTH_MSG_KDC_REQUEST,		"KDC_REQUEST" },

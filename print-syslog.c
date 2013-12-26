@@ -31,6 +31,8 @@ static const char rcsid[] _U_ =
 #include "interface.h"
 #include "extract.h"
 
+static const char tstr[] = "[|syslog]";
+
 /*
  * tokenlists and #defines taken from Ethereal - Network traffic analyzer
  * by Gerald Combs <gerald@ethereal.com>
@@ -105,12 +107,12 @@ syslog_print(register const u_char *pptr, register u_int len)
             TCHECK2(*(pptr+msg_off), 1);
         }
         if (*(pptr+msg_off) != '>') {
-            printf("[|syslog]");
+            printf("%s", tstr);
             return;
         }
         msg_off++;
     } else {
-        printf("[|syslog]");
+        printf("%s", tstr);
         return;
     }
 
@@ -145,5 +147,5 @@ syslog_print(register const u_char *pptr, register u_int len)
     return;
 
 trunc:
-        printf("[|syslog]");
+        printf("%s", tstr);
 }

@@ -40,11 +40,11 @@ static const char rcsid[] _U_ =
 #include "ether.h"
 #include "bootp.h"
 
+static const char tstr[] = " [|bootp]";
+
 static void rfc1048_print(const u_char *);
 static void cmu_print(const u_char *);
 static char *client_fqdn_flags(u_int flags);
-
-static char tstr[] = " [|bootp]";
 
 static const struct tok bootp_flag_values[] = {
     { 0x8000,                   "Broadcast" },

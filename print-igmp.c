@@ -41,6 +41,8 @@ static const char rcsid[] _U_ =
 #define IN_CLASSD(i) (((int32_t)(i) & 0xf0000000) == 0xe0000000)
 #endif
 
+static const char tstr[] = "[|igmp]";
+
 /* (following from ipmulti/mrouted/prune.h) */
 
 /*
@@ -124,7 +126,7 @@ print_mtrace(register const u_char *bp, register u_int len)
         printf(" with-ttl %d", TR_GETTTL(EXTRACT_32BITS(&tr->tr_rttlqid)));
     return;
 trunc:
-    (void)printf("[|igmp]");
+    printf("%s", tstr);
     return;
 }
 
@@ -146,7 +148,7 @@ print_mresp(register const u_char *bp, register u_int len)
         printf(" with-ttl %d", TR_GETTTL(EXTRACT_32BITS(&tr->tr_rttlqid)));
     return;
 trunc:
-    (void)printf("[|igmp]");
+    printf("%s", tstr);
     return;
 }
 
@@ -200,7 +202,7 @@ print_igmpv3_report(register const u_char *bp, register u_int len)
     }
     return;
 trunc:
-    (void)printf("[|igmp]");
+    (void)printf("%s", tstr);
     return;
 }
 
@@ -256,7 +258,7 @@ print_igmpv3_query(register const u_char *bp, register u_int len)
     (void)printf("]");
     return;
 trunc:
-    (void)printf("[|igmp]");
+    (void)printf("%s", tstr);
     return;
 }
 
@@ -340,5 +342,5 @@ igmp_print(register const u_char *bp, register u_int len)
     }
     return;
 trunc:
-    fputs("[|igmp]", stdout);
+    (void)printf("%s", tstr);
 }

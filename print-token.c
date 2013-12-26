@@ -46,6 +46,8 @@ static const char rcsid[] _U_ =
 #include "ether.h"
 #include "token.h"
 
+static const char tstr[] = "[|token-ring]";
+
 /* Extract src, dst addresses */
 static inline void
 extract_token_addrs(const struct token_header *trp, char *fsrc, char *fdst)
@@ -110,7 +112,7 @@ token_print(const u_char *p, u_int length, u_int caplen)
 	trp = (const struct token_header *)p;
 
 	if (caplen < TOKEN_HDRLEN) {
-		printf("[|token-ring]");
+		printf("%s", tstr);
 		return hdr_len;
 	}
 
@@ -128,13 +130,13 @@ token_print(const u_char *p, u_int length, u_int caplen)
 			token_hdr_print(trp, length, ESRC(&ehdr), EDST(&ehdr));
 
 		if (caplen < TOKEN_HDRLEN + 2) {
-			printf("[|token-ring]");
+			printf("%s", tstr);
 			return hdr_len;
 		}
 		route_len = RIF_LENGTH(trp);
 		hdr_len += route_len;
 		if (caplen < hdr_len) {
-			printf("[|token-ring]");
+			printf("%s", tstr);
 			return hdr_len;
 		}
 		if (vflag) {

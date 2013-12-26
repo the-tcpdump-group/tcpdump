@@ -38,7 +38,7 @@ static const char rcsid[] _U_ =
 #include "interface.h"
 #include "extract.h"
 
-static char tstr[] = " [|pptp]";
+static const char tstr[] = " [|pptp]";
 
 #define PPTP_MSG_TYPE_CTRL	1	/* Control Message */
 #define PPTP_MSG_TYPE_MGMT	2	/* Management Message (currently not used */

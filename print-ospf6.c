@@ -42,6 +42,8 @@ static const char rcsid[] _U_ =
 #include "ospf.h"
 #include "ospf6.h"
 
+static const char tstr[] = " [|ospf3]";
+
 static const struct tok ospf6_option_values[] = {
 	{ OSPF6_OPTION_V6,	"V6" },
 	{ OSPF6_OPTION_E,	"External" },
@@ -117,8 +119,6 @@ static const struct tok ospf6_lsa_prefix_option_values[] = {
         { LSA_PREFIX_OPT_DN, "Down" },
 	{ 0, NULL }
 };
-
-static char tstr[] = " [|ospf3]";
 
 /* Forwards */
 static void ospf6_print_ls_type(u_int, const rtrid_t *);

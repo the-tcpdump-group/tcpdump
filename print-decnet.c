@@ -46,6 +46,8 @@ struct rtentry;
 #include "interface.h"
 #include "addrtoname.h"
 
+static const char tstr[] = "[|decnet]";
+
 /* Forwards */
 static int print_decnet_ctlmsg(const union routehdr *, u_int, u_int);
 static void print_t_info(int);
@@ -74,18 +76,18 @@ decnet_print(register const u_char *ap, register u_int length,
 	const u_char *nspp;
 
 	if (length < sizeof(struct shorthdr)) {
-		(void)printf("[|decnet]");
+		(void)printf("%s", tstr);
 		return;
 	}
 
 	TCHECK2(*ap, sizeof(short));
 	pktlen = EXTRACT_LE_16BITS(ap);
 	if (pktlen < sizeof(struct shorthdr)) {
-		(void)printf("[|decnet]");
+		(void)printf("%s", tstr);
 		return;
 	}
 	if (pktlen > length) {
-		(void)printf("[|decnet]");
+		(void)printf("%s", tstr);
 		return;
 	}
 	length = pktlen;
@@ -100,7 +102,7 @@ decnet_print(register const u_char *ap, register u_int length,
 	    if (vflag)
 		(void) printf("[pad:%d] ", padlen);
 	    if (length < padlen + 2) {
-		(void)printf("[|decnet]");
+		(void)printf("%s", tstr);
 		return;
 	    }
 	    TCHECK2(ap[sizeof(short)], padlen);
@@ -127,7 +129,7 @@ decnet_print(register const u_char *ap, register u_int length,
 	switch (mflags & RMF_MASK) {
 	case RMF_LONG:
 	    if (length < sizeof(struct longhdr)) {
-		(void)printf("[|decnet]");
+		(void)printf("%s", tstr);
 		return;
 	    }
 	    TCHECK(rhp->rh_long);
@@ -170,7 +172,7 @@ decnet_print(register const u_char *ap, register u_int length,
 	return;
 
 trunc:
-	(void)printf("[|decnet]");
+	(void)printf("%s", tstr);
 	return;
 }
 

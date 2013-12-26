@@ -56,6 +56,9 @@
 #include "ipproto.h"
 #include "openflow.h"
 
+static const char tstr[] = " [|openflow]";
+static const char cstr[] = " (corrupt)";
+
 #define OFPT_HELLO                    0x00
 #define OFPT_ERROR                    0x01
 #define OFPT_ECHO_REQUEST             0x02
@@ -623,7 +626,7 @@ of10_data_print(const u_char *cp, const u_char *ep, const u_int len) {
 	return cp + len;
 
 trunc:
-	printf(" [|openflow]");
+	printf("%s", tstr);
 	return ep;
 }
 
@@ -640,11 +643,11 @@ of10_vendor_data_print(const u_char *cp, const u_char *ep, const u_int len) {
 	return of10_data_print(cp, ep, len - 4);
 
 corrupt: /* skip the undersized data */
-	printf(" (corrupt)");
+	printf("%s", cstr);
 	TCHECK2(*cp, len);
 	return cp + len;
 trunc:
-	printf(" [|openflow]");
+	printf("%s", tstr);
 	return ep;
 }
 
@@ -664,7 +667,7 @@ of10_packet_data_print(const u_char *cp, const u_char *ep, const u_int len) {
 	return cp + len;
 
 trunc:
-	printf(" [|openflow]");
+	printf("%s", tstr);
 	return ep;
 }
 
@@ -733,11 +736,11 @@ next_port:
 	return cp;
 
 corrupt: /* skip the undersized trailing data */
-	printf(" (corrupt)");
+	printf("%s", cstr);
 	TCHECK2(*cp0, len0);
 	return cp0 + len0;
 trunc:
-	printf(" [|openflow]");
+	printf("%s", tstr);
 	return ep;
 }
 
@@ -807,11 +810,11 @@ next_property:
 	return cp;
 
 corrupt: /* skip the rest of queue properties */
-	printf(" (corrupt)");
+	printf("%s", cstr);
 	TCHECK2(*cp0, len0);
 	return cp0 + len0;
 trunc:
-	printf(" [|openflow]");
+	printf("%s", tstr);
 	return ep;
 }
 
@@ -853,11 +856,11 @@ next_queue:
 	return cp;
 
 corrupt: /* skip the rest of queues */
-	printf(" (corrupt)");
+	printf("%s", cstr);
 	TCHECK2(*cp0, len0);
 	return cp0 + len0;
 trunc:
-	printf(" [|openflow]");
+	printf("%s", tstr);
 	return ep;
 }
 
@@ -959,7 +962,7 @@ of10_match_print(const char *pfx, const u_char *cp, const u_char *ep) {
 	return cp + 2;
 
 trunc:
-	printf(" [|openflow]");
+	printf("%s", tstr);
 	return ep;
 }
 
@@ -1120,11 +1123,11 @@ next_action:
 	return cp;
 
 corrupt: /* skip the rest of actions */
-	printf(" (corrupt)");
+	printf("%s", cstr);
 	TCHECK2(*cp0, len0);
 	return cp0 + len0;
 trunc:
-	printf(" [|openflow]");
+	printf("%s", tstr);
 	return ep;
 }
 
@@ -1160,7 +1163,7 @@ of10_features_reply_print(const u_char *cp, const u_char *ep, const u_int len) {
 	return of10_phy_ports_print(cp, ep, len - OF_SWITCH_FEATURES_LEN);
 
 trunc:
-	printf(" [|openflow]");
+	printf("%s", tstr);
 	return ep;
 }
 
@@ -1216,7 +1219,7 @@ of10_flow_mod_print(const u_char *cp, const u_char *ep, const u_int len) {
 	return of10_actions_print("\n\t ", cp, ep, len - OF_FLOW_MOD_LEN);
 
 trunc:
-	printf(" [|openflow]");
+	printf("%s", tstr);
 	return ep;
 }
 
@@ -1251,7 +1254,7 @@ of10_port_mod_print(const u_char *cp, const u_char *ep) {
 	return cp + 4;
 
 trunc:
-	printf(" [|openflow]");
+	printf("%s", tstr);
 	return ep;
 }
 
@@ -1329,11 +1332,11 @@ of10_stats_request_print(const u_char *cp, const u_char *ep, u_int len) {
 	return cp;
 
 corrupt: /* skip the message body */
-	printf(" (corrupt)");
+	printf("%s", cstr);
 	TCHECK2(*cp0, len0);
 	return cp0 + len0;
 trunc:
-	printf(" [|openflow]");
+	printf("%s", tstr);
 	return ep;
 }
 
@@ -1374,11 +1377,11 @@ of10_desc_stats_reply_print(const u_char *cp, const u_char *ep, const u_int len)
 	return cp + DESC_STR_LEN;
 
 corrupt: /* skip the message body */
-	printf(" (corrupt)");
+	printf("%s", cstr);
 	TCHECK2(*cp, len);
 	return cp + len;
 trunc:
-	printf(" [|openflow]");
+	printf("%s", tstr);
 	return ep;
 }
 
@@ -1453,11 +1456,11 @@ of10_flow_stats_reply_print(const u_char *cp, const u_char *ep, u_int len) {
 	return cp;
 
 corrupt: /* skip the rest of flow statistics entries */
-	printf(" (corrupt)");
+	printf("%s", cstr);
 	TCHECK2(*cp0, len0);
 	return cp0 + len0;
 trunc:
-	printf(" [|openflow]");
+	printf("%s", tstr);
 	return ep;
 }
 
@@ -1484,11 +1487,11 @@ of10_aggregate_stats_reply_print(const u_char *cp, const u_char *ep,
 	return cp + 4;
 
 corrupt: /* skip the message body */
-	printf(" (corrupt)");
+	printf("%s", cstr);
 	TCHECK2(*cp, len);
 	return cp + len;
 trunc:
-	printf(" [|openflow]");
+	printf("%s", tstr);
 	return ep;
 }
 
@@ -1541,11 +1544,11 @@ of10_table_stats_reply_print(const u_char *cp, const u_char *ep, u_int len) {
 	return cp;
 
 corrupt: /* skip the undersized trailing data */
-	printf(" (corrupt)");
+	printf("%s", cstr);
 	TCHECK2(*cp0, len0);
 	return cp0 + len0;
 trunc:
-	printf(" [|openflow]");
+	printf("%s", tstr);
 	return ep;
 }
 
@@ -1624,11 +1627,11 @@ next_port:
 	return cp;
 
 corrupt: /* skip the undersized trailing data */
-	printf(" (corrupt)");
+	printf("%s", cstr);
 	TCHECK2(*cp0, len0);
 	return cp0 + len0;
 trunc:
-	printf(" [|openflow]");
+	printf("%s", tstr);
 	return ep;
 }
 
@@ -1670,11 +1673,11 @@ of10_queue_stats_reply_print(const u_char *cp, const u_char *ep, u_int len) {
 	return cp;
 
 corrupt: /* skip the undersized trailing data */
-	printf(" (corrupt)");
+	printf("%s", cstr);
 	TCHECK2(*cp0, len0);
 	return cp0 + len0;
 trunc:
-	printf(" [|openflow]");
+	printf("%s", tstr);
 	return ep;
 }
 
@@ -1712,7 +1715,7 @@ of10_stats_reply_print(const u_char *cp, const u_char *ep, const u_int len) {
 	return cp0 + len;
 
 trunc:
-	printf(" [|openflow]");
+	printf("%s", tstr);
 	return ep;
 }
 
@@ -1744,11 +1747,11 @@ of10_packet_out_print(const u_char *cp, const u_char *ep, const u_int len) {
 	return of10_packet_data_print(cp, ep, len - OF_PACKET_OUT_LEN - actions_len);
 
 corrupt: /* skip the rest of the message body */
-	printf(" (corrupt)");
+	printf("%s", cstr);
 	TCHECK2(*cp0, len0);
 	return cp0 + len0;
 trunc:
-	printf(" [|openflow]");
+	printf("%s", tstr);
 	return ep;
 }
 
@@ -1779,7 +1782,7 @@ of10_packet_in_print(const u_char *cp, const u_char *ep, const u_int len) {
 	return of10_packet_data_print(cp, ep, len - (OF_PACKET_IN_LEN - 2));
 
 trunc:
-	printf(" [|openflow]");
+	printf("%s", tstr);
 	return ep;
 }
 
@@ -1831,7 +1834,7 @@ of10_flow_removed_print(const u_char *cp, const u_char *ep) {
 	return cp + 8;
 
 trunc:
-	printf(" [|openflow]");
+	printf("%s", tstr);
 	return ep;
 }
 
@@ -1862,7 +1865,7 @@ of10_error_print(const u_char *cp, const u_char *ep, const u_int len) {
 	return of10_data_print(cp, ep, len - OF_ERROR_MSG_LEN);
 
 trunc:
-	printf(" [|openflow]");
+	printf("%s", tstr);
 	return ep;
 }
 
@@ -2039,11 +2042,11 @@ of10_header_body_print(const u_char *cp, const u_char *ep, const uint8_t type,
 	goto next_message;
 
 corrupt: /* skip the message body */
-	printf(" (corrupt)");
+	printf("%s", cstr);
 next_message:
 	TCHECK2(*cp0, len0 - OF_HEADER_LEN);
 	return cp0 + len0 - OF_HEADER_LEN;
 trunc:
-	printf(" [|openflow]");
+	printf("%s", tstr);
 	return ep;
 }

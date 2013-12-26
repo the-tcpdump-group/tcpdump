@@ -39,8 +39,8 @@
 #include "extract.h"
 #include "addrtoname.h"
 
-static const char *corrupt_str = "(corrupt)";
-static const char *trunc_str = "[|ahcp]";
+static const char tstr[] = " [|ahcp]";
+static const char cstr[] = "(corrupt)";
 
 #define AHCP_MAGIC_NUMBER 43
 #define AHCP_VERSION_1 1
@@ -117,11 +117,11 @@ ahcp_time_print(const u_char *cp, const u_char *ep) {
 	return 0;
 
 corrupt:
-	printf(": %s", corrupt_str);
+	printf(": %s", cstr);
 	TCHECK2(*cp, ep - cp);
 	return 0;
 trunc:
-	printf(" %s", trunc_str);
+	printf("%s", tstr);
 	return -1;
 }
 
@@ -134,11 +134,11 @@ ahcp_seconds_print(const u_char *cp, const u_char *ep) {
 	return 0;
 
 corrupt:
-	printf(": %s", corrupt_str);
+	printf(": %s", cstr);
 	TCHECK2(*cp, ep - cp);
 	return 0;
 trunc:
-	printf(" %s", trunc_str);
+	printf("%s", tstr);
 	return -1;
 }
 
@@ -163,11 +163,11 @@ ahcp_ipv6_addresses_print(const u_char *cp, const u_char *ep) {
 	return 0;
 
 corrupt:
-	printf(": %s", corrupt_str);
+	printf(": %s", cstr);
 	TCHECK2(*cp, ep - cp);
 	return 0;
 trunc:
-	printf(" %s", trunc_str);
+	printf("%s", tstr);
 	return -1;
 }
 
@@ -186,11 +186,11 @@ ahcp_ipv4_addresses_print(const u_char *cp, const u_char *ep) {
 	return 0;
 
 corrupt:
-	printf(": %s", corrupt_str);
+	printf(": %s", cstr);
 	TCHECK2(*cp, ep - cp);
 	return 0;
 trunc:
-	printf(" %s", trunc_str);
+	printf("%s", tstr);
 	return -1;
 }
 
@@ -215,11 +215,11 @@ ahcp_ipv6_prefixes_print(const u_char *cp, const u_char *ep) {
 	return 0;
 
 corrupt:
-	printf(": %s", corrupt_str);
+	printf(": %s", cstr);
 	TCHECK2(*cp, ep - cp);
 	return 0;
 trunc:
-	printf(" %s", trunc_str);
+	printf("%s", tstr);
 	return -1;
 }
 
@@ -238,11 +238,11 @@ ahcp_ipv4_prefixes_print(const u_char *cp, const u_char *ep) {
 	return 0;
 
 corrupt:
-	printf(": %s", corrupt_str);
+	printf(": %s", cstr);
 	TCHECK2(*cp, ep - cp);
 	return 0;
 trunc:
-	printf(" %s", trunc_str);
+	printf("%s", tstr);
 	return -1;
 }
 
@@ -298,11 +298,11 @@ ahcp1_options_print(const u_char *cp, const u_char *ep) {
 	return;
 
 corrupt:
-	printf(" %s", corrupt_str);
+	printf(" %s", cstr);
 	TCHECK2(*cp, ep - cp);
 	return;
 trunc:
-	printf(" %s", trunc_str);
+	printf("%s", tstr);
 }
 
 static void
@@ -342,11 +342,11 @@ ahcp1_body_print(const u_char *cp, const u_char *ep) {
 	return;
 
 corrupt:
-	printf(" %s", corrupt_str);
+	printf(" %s", cstr);
 	TCHECK2(*cp, ep - cp);
 	return;
 trunc:
-	printf(" %s", trunc_str);
+	printf("%s", tstr);
 }
 
 void
@@ -407,10 +407,10 @@ ahcp_print(const u_char *cp, const u_int len) {
 	return;
 
 corrupt:
-	printf(" %s", corrupt_str);
+	printf(" %s", cstr);
 	TCHECK2(*cp, ep - cp);
 	return;
 trunc:
-	printf(" %s", trunc_str);
+	printf("%s", tstr);
 }
 

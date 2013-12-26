@@ -24,6 +24,8 @@ static const char rcsid[] _U_ =
 #include "extract.h"
 #include "smb.h"
 
+static const char tstr[] = "[|SMB]";
+
 static int request = 0;
 static int unicodestr = 0;
 
@@ -140,7 +142,7 @@ trans2_qfsinfo(const u_char *param, const u_char *data, int pcnt, int dcnt)
     }
     return;
 trunc:
-    printf("[|SMB]");
+    printf("%s", tstr);
     return;
 }
 
@@ -234,7 +236,7 @@ print_trans2(const u_char *words, const u_char *dat, const u_char *buf, const u_
     }
     return;
 trunc:
-    printf("[|SMB]");
+    printf("%s", tstr);
     return;
 }
 
@@ -316,7 +318,7 @@ print_browse(const u_char *param, int paramlen, const u_char *data, int datalen)
     }
     return;
 trunc:
-    printf("[|SMB]");
+    printf("%s", tstr);
     return;
 }
 
@@ -389,7 +391,7 @@ print_trans(const u_char *words, const u_char *data1, const u_char *buf, const u
     }
     return;
 trunc:
-    printf("[|SMB]");
+    printf("%s", tstr);
     return;
 }
 
@@ -431,7 +433,7 @@ print_negprot(const u_char *words, const u_char *data, const u_char *buf _U_, co
     }
     return;
 trunc:
-    printf("[|SMB]");
+    printf("%s", tstr);
     return;
 }
 
@@ -475,7 +477,7 @@ print_sesssetup(const u_char *words, const u_char *data, const u_char *buf _U_, 
     }
     return;
 trunc:
-    printf("[|SMB]");
+    printf("%s", tstr);
     return;
 }
 
@@ -515,7 +517,7 @@ print_lockingandx(const u_char *words, const u_char *data, const u_char *buf _U_
     }
     return;
 trunc:
-    printf("[|SMB]");
+    printf("%s", tstr);
     return;
 }
 
@@ -914,7 +916,7 @@ print_smb(const u_char *buf, const u_char *maxbuf)
     printf("\n");
     return;
 trunc:
-    printf("[|SMB]");
+    printf("%s", tstr);
     return;
 }
 
@@ -1078,7 +1080,7 @@ nbt_tcp_print(const u_char *data, int length)
     }
     return;
 trunc:
-    printf("[|SMB]");
+    printf("%s", tstr);
     return;
 }
 
@@ -1240,7 +1242,7 @@ out:
     fflush(stdout);
     return;
 trunc:
-    printf("[|SMB]");
+    printf("%s", tstr);
     return;
 }
 
@@ -1282,7 +1284,7 @@ smb_tcp_print (const u_char * data, int length)
 	printf("SMB-over-TCP packet:(raw data or continuation?)\n");
     return;
 trunc:
-    printf("[|SMB]");
+    printf("%s", tstr);
     return;
 }
 
@@ -1471,7 +1473,7 @@ out:
     printf("\n");
     return;
 trunc:
-    printf("[|SMB]");
+    printf("%s", tstr);
     return;
 }
 

@@ -42,6 +42,8 @@ static const char rcsid[] _U_ =
 #include "slip.h"
 #include "slcompress.h"
 
+static const char tstr[] = "[|slip]";
+
 static u_int lastlen[2][256];
 static u_int lastconn = 255;
 
@@ -56,7 +58,7 @@ sl_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	register const struct ip *ip;
 
 	if (caplen < SLIP_HDRLEN) {
-		printf("[|slip]");
+		printf("%s", tstr);
 		return (caplen);
 	}
 
@@ -91,7 +93,7 @@ sl_bsdos_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	register const struct ip *ip;
 
 	if (caplen < SLIP_HDRLEN) {
-		printf("[|slip]");
+		printf("%s", tstr);
 		return (caplen);
 	}
 

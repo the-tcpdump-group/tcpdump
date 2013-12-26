@@ -39,6 +39,8 @@ static const char rcsid[] _U_ =
 #include "ethertype.h"
 #include "extract.h"			/* must come after interface.h */
 
+static const char tstr[] = "[|TIPC]";
+
 /*
  * Transparent Inter-Process Communication (TIPC) protocol.
  *
@@ -223,7 +225,7 @@ print_payload(netdissect_options *ndo, const struct payload_tipc_pkthdr *ap)
 	return;
 
 trunc:
-	ND_PRINT((ndo, "[|TIPC]"));
+	ND_PRINT((ndo, "%s", tstr));
 }
 	 
 static void
@@ -291,7 +293,7 @@ print_internal(netdissect_options *ndo, const struct internal_tipc_pkthdr *ap)
 	return;
 
 trunc:
-	ND_PRINT((ndo, "[|TIPC]"));
+	ND_PRINT((ndo, "%s", tstr));
 }
 
 static void
@@ -338,7 +340,7 @@ print_link_conf(netdissect_options *ndo, const struct link_conf_tipc_pkthdr *ap)
 	return;
 
 trunc:
-	ND_PRINT((ndo, "[|TIPC]"));
+	ND_PRINT((ndo, "%s", tstr));
 }
 
 void
@@ -381,7 +383,7 @@ tipc_print(netdissect_options *ndo, const u_char *bp, u_int length _U_,
 	return;
 
 trunc:
-	ND_PRINT((ndo, "[|TIPC]"));
+	ND_PRINT((ndo, "%s", tstr));
 }
 
 /*

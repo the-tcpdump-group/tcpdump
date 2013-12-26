@@ -26,6 +26,7 @@
 #include "interface.h"
 #include "extract.h"
 
+static const char tstr[] = "[|forces]";
 
 /*
  * Per draft-ietf-forces-protocol-22
@@ -691,7 +692,7 @@ prestlv_print(register const u_char * pptr, register u_int len,
 	return 0;
 
 trunc:
-	fputs("[|forces]", stdout);
+	printf("%s", tstr);
 	return -1;
 }
 
@@ -725,7 +726,7 @@ fdatatlv_print(register const u_char * pptr, register u_int len,
 	return 0;
 
 trunc:
-	fputs("[|forces]", stdout);
+	printf("%s", tstr);
 	return -1;
 }
 
@@ -770,7 +771,7 @@ sdatailv_print(register const u_char * pptr, register u_int len,
 	return 0;
 
 trunc:
-	fputs("[|forces]", stdout);
+	printf("%s", tstr);
 	return -1;
 }
 
@@ -798,7 +799,7 @@ sdatatlv_print(register const u_char * pptr, register u_int len,
 	return sdatailv_print(tdp, rlen, op_msk, indent);
 
 trunc:
-	fputs("[|forces]", stdout);
+	printf("%s", tstr);
 	return -1;
 }
 
@@ -838,7 +839,7 @@ pkeyitlv_print(register const u_char * pptr, register u_int len,
 	return fdatatlv_print(dp, tll, op_msk, indent);
 
 trunc:
-	fputs("[|forces]", stdout);
+	printf("%s", tstr);
 	return -1;
 }
 
@@ -999,7 +1000,7 @@ pd_err:
 	return len;
 
 trunc:
-	fputs("[|forces]", stdout);
+	printf("%s", tstr);
 	return -1;
 }
 
@@ -1062,7 +1063,7 @@ pdata_print(register const u_char * pptr, register u_int len,
 		return 0;
 
 trunc:
-	fputs("[|forces]", stdout);
+	printf("%s", tstr);
 	return -1;
 }
 
@@ -1107,7 +1108,7 @@ genoptlv_print(register const u_char * pptr, register u_int len,
 	}
 
 trunc:
-	fputs("[|forces]", stdout);
+	printf("%s", tstr);
 	return -1;
 }
 
@@ -1161,7 +1162,7 @@ recpdoptlv_print(register const u_char * pptr, register u_int len,
 	return 0;
 
 trunc:
-	fputs("[|forces]", stdout);
+	printf("%s", tstr);
 	return -1;
 }
 
@@ -1221,7 +1222,7 @@ otlv_print(const struct forces_tlv *otlv, u_int16_t op_msk _U_, int indent)
 	return rc;
 
 trunc:
-	fputs("[|forces]", stdout);
+	printf("%s", tstr);
 	return -1;
 }
 
@@ -1278,7 +1279,7 @@ asttlv_print(register const u_char * pptr, register u_int len,
 	return 0;
 
 trunc:
-	fputs("[|forces]", stdout);
+	printf("%s", tstr);
 	return -1;
 }
 
@@ -1330,7 +1331,7 @@ asrtlv_print(register const u_char * pptr, register u_int len,
 	return 0;
 
 trunc:
-	fputs("[|forces]", stdout);
+	printf("%s", tstr);
 	return -1;
 }
 
@@ -1379,7 +1380,7 @@ print_metailv(register const u_char * pptr, register u_int len,
 	return 0;
 
 trunc:
-	fputs("[|forces]", stdout);
+	printf("%s", tstr);
 	return -1;
 }
 
@@ -1419,7 +1420,7 @@ print_metatlv(register const u_char * pptr, register u_int len,
 	return 0;
 
 trunc:
-	fputs("[|forces]", stdout);
+	printf("%s", tstr);
 	return -1;
 }
 
@@ -1506,7 +1507,7 @@ redirect_print(register const u_char * pptr, register u_int len,
 	return 0;
 
 trunc:
-	fputs("[|forces]", stdout);
+	printf("%s", tstr);
 	return -1;
 }
 
@@ -1587,7 +1588,7 @@ lfbselect_print(register const u_char * pptr, register u_int len,
 	return 0;
 
 trunc:
-	fputs("[|forces]", stdout);
+	printf("%s", tstr);
 	return -1;
 }
 
@@ -1676,7 +1677,7 @@ forces_type_print(register const u_char * pptr, const struct forcesh *fhdr _U_,
 	return 0;
 
 trunc:
-	fputs("[|forces]", stdout);
+	printf("%s", tstr);
 	return -1;
 }
 
@@ -1752,5 +1753,5 @@ error:
 	return;
 
 trunc:
-	fputs("[|forces]", stdout);
+	printf("%s", tstr);
 }

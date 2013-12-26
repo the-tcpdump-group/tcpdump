@@ -39,6 +39,8 @@
 #include "interface.h"
 #include "extract.h"
 
+static const char tstr[] = " [|zmtp1]";
+
 /* Maximum number of ZMTP/1.0 frame body bytes (without the flags) to dump in
  * hex and ASCII under a single "-v" flag.
  */
@@ -133,7 +135,7 @@ zmtp1_print_frame(const u_char *cp, const u_char *ep) {
 	return cp + header_len + body_len_declared;
 
 trunc:
-	printf(" [|zmtp1]");
+	printf("%s", tstr);
 	return ep;
 }
 
@@ -200,7 +202,7 @@ zmtp1_print_intermediate_part(const u_char *cp, const u_int len) {
 	return cp + frame_offset;
 
 trunc:
-	printf(" [|zmtp1]");
+	printf("%s", tstr);
 	return cp + len;
 }
 

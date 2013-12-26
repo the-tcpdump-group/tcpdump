@@ -41,6 +41,8 @@ static const char rcsid[] _U_ =
 #include "ip.h"
 #include "ipproto.h"
 
+static const char tstr[] = "[|ip]";
+
 static const struct tok ip_option_values[] = {
     { IPOPT_EOL, "EOL" },
     { IPOPT_NOP, "NOP" },
@@ -298,7 +300,7 @@ ip_optprint(register const u_char *cp, u_int length)
 	return;
 
 trunc:
-	printf("[|ip]");
+	printf("%s", tstr);
 }
 
 #define IP_RES 0x8000
@@ -536,7 +538,7 @@ ip_print(netdissect_options *ndo,
 	    printf("IP ");
 
 	if ((u_char *)(ipds->ip + 1) > ndo->ndo_snapend) {
-		printf("[|ip]");
+		printf("%s", tstr);
 		return;
 	}
 	if (length < sizeof (struct ip)) {

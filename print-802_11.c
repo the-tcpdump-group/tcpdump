@@ -46,6 +46,8 @@ static const char rcsid[] _U_ =
 #include "ieee802_11.h"
 #include "ieee802_11_radio.h"
 
+static const char tstr[] = "[|802.11]";
+
 /* Radiotap state */
 /*  This is used to save state when parsing/processing parameters */
 struct radiotap_state
@@ -1718,7 +1720,7 @@ ieee802_11_print(const u_char *p, u_int length, u_int orig_caplen, int pad,
 	caplen = orig_caplen;
 	/* Remove FCS, if present */
 	if (length < fcslen) {
-		printf("[|802.11]");
+		printf("%s", tstr);
 		return caplen;
 	}
 	length -= fcslen;
@@ -1730,7 +1732,7 @@ ieee802_11_print(const u_char *p, u_int length, u_int orig_caplen, int pad,
 	}
 
 	if (caplen < IEEE802_11_FC_LEN) {
-		printf("[|802.11]");
+		printf("%s", tstr);
 		return orig_caplen;
 	}
 
@@ -1747,7 +1749,7 @@ ieee802_11_print(const u_char *p, u_int length, u_int orig_caplen, int pad,
 
 
 	if (caplen < hdrlen) {
-		printf("[|802.11]");
+		printf("%s", tstr);
 		return hdrlen;
 	}
 
@@ -1764,13 +1766,13 @@ ieee802_11_print(const u_char *p, u_int length, u_int orig_caplen, int pad,
 	case T_MGMT:
 		if (!mgmt_body_print(fc,
 		    (const struct mgmt_header_t *)(p - hdrlen), p, length)) {
-			printf("[|802.11]");
+			printf("%s", tstr);
 			return hdrlen;
 		}
 		break;
 	case T_CTRL:
 		if (!ctrl_body_print(fc, p - hdrlen)) {
-			printf("[|802.11]");
+			printf("%s", tstr);
 			return hdrlen;
 		}
 		break;
@@ -1780,7 +1782,7 @@ ieee802_11_print(const u_char *p, u_int length, u_int orig_caplen, int pad,
 		/* There may be a problem w/ AP not having this bit set */
 		if (FC_WEP(fc)) {
 			if (!wep_print(p)) {
-				printf("[|802.11]");
+				printf("%s", tstr);
 				return hdrlen;
 			}
 		} else if (llc_print(p, length, caplen, dst, src,
@@ -1998,7 +2000,7 @@ print_radiotap_field(struct cpack_state *s, u_int32_t bit, u_int8_t *flags,
 	}
 
 	if (rc != 0) {
-		printf("[|802.11]");
+		printf("%s", tstr);
 		return rc;
 	}
 
@@ -2221,7 +2223,7 @@ ieee802_11_radio_print(const u_char *p, u_int length, u_int caplen)
 	struct radiotap_state state;
 
 	if (caplen < sizeof(*hdr)) {
-		printf("[|802.11]");
+		printf("%s", tstr);
 		return caplen;
 	}
 
@@ -2230,7 +2232,7 @@ ieee802_11_radio_print(const u_char *p, u_int length, u_int caplen)
 	len = EXTRACT_LE_16BITS(&hdr->it_len);
 
 	if (caplen < len) {
-		printf("[|802.11]");
+		printf("%s", tstr);
 		return caplen;
 	}
 	cpack_init(&cpacker, (u_int8_t *)hdr, len); /* align against header start */
@@ -2243,7 +2245,7 @@ ieee802_11_radio_print(const u_char *p, u_int length, u_int caplen)
 
 	/* are there more bitmap extensions than bytes in header? */
 	if (IS_EXTENDED(last_presentp)) {
-		printf("[|802.11]");
+		printf("%s", tstr);
 		return caplen;
 	}
 
@@ -2295,7 +2297,7 @@ ieee802_11_avs_radio_print(const u_char *p, u_int length, u_int caplen)
 	u_int32_t caphdr_len;
 
 	if (caplen < 8) {
-		printf("[|802.11]");
+		printf("%s", tstr);
 		return caplen;
 	}
 
@@ -2306,12 +2308,12 @@ ieee802_11_avs_radio_print(const u_char *p, u_int length, u_int caplen)
 		 * to be large enough to include even the version
 		 * cookie or capture header length!
 		 */
-		printf("[|802.11]");
+		printf("%s", tstr);
 		return caplen;
 	}
 
 	if (caplen < caphdr_len) {
-		printf("[|802.11]");
+		printf("%s", tstr);
 		return caplen;
 	}
 
@@ -2346,7 +2348,7 @@ prism_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	u_int32_t msgcode;
 
 	if (caplen < 4) {
-		printf("[|802.11]");
+		printf("%s", tstr);
 		return caplen;
 	}
 
@@ -2356,7 +2358,7 @@ prism_if_print(const struct pcap_pkthdr *h, const u_char *p)
 		return ieee802_11_avs_radio_print(p, length, caplen);
 
 	if (caplen < PRISM_HDR_LEN) {
-		printf("[|802.11]");
+		printf("%s", tstr);
 		return caplen;
 	}
 

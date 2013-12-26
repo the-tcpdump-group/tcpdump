@@ -43,6 +43,8 @@ static const char rcsid[] _U_ =
 
 #include "ether.h"
 
+static const char tstr[] = "[|atm]";
+
 #define OAM_CRC10_MASK 0x3ff
 #define OAM_PAYLOAD_LEN 48
 #define OAM_FUNCTION_SPECIFIC_LEN 45 /* this excludes crc10 and cell-type/function-type */
@@ -172,7 +174,7 @@ atm_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	u_int hdrlen = 0;
 
 	if (caplen < 8) {
-		printf("[|atm]");
+		printf("%s", tstr);
 		return (caplen);
 	}
 
@@ -254,7 +256,7 @@ sig_print(const u_char *p, int caplen)
 	bpf_u_int32 call_ref;
 
 	if (caplen < PROTO_POS) {
-		printf("[|atm]");
+		printf("%s", tstr);
 		return;
 	}
 	if (p[PROTO_POS] == Q2931) {
@@ -264,7 +266,7 @@ sig_print(const u_char *p, int caplen)
 		 */
 		printf("Q.2931");
 		if (caplen < MSG_TYPE_POS) {
-			printf(" [|atm]");
+			printf(" %s", tstr);
 			return;
 		}
 		printf(":%s ",

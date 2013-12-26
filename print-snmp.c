@@ -79,6 +79,8 @@ static const char rcsid[] _U_ =
 
 #undef OPAQUE  /* defined in <wingdi.h> */
 
+static const char tstr[] = "[|snmp]";
+
 /*
  * Universal ASN.1 types
  * (we only care about the tag values for those allowed in the Internet SMI)
@@ -653,7 +655,7 @@ asn1_parse(register const u_char *p, u_int len, struct be *elem)
 	return elem->asnlen + hdr;
 
 trunc:
-	fputs("[|snmp]", stdout);
+	printf("%s", tstr);
 	return -1;
 }
 
@@ -834,7 +836,7 @@ asn1_print(struct be *elem)
 	return 0;
 
 trunc:
-	fputs("[|snmp]", stdout);
+	printf("%s", tstr);
 	return -1;
 }
 
@@ -930,7 +932,7 @@ smi_decode_oid(struct be *elem, unsigned int *oid,
 	return 0;
 
 trunc:
-	fputs("[|snmp]", stdout);
+	printf("%s", tstr);
 	return -1;
 }
 

@@ -38,7 +38,7 @@ static const char rcsid[] _U_ =
 #include "interface.h"
 #include "extract.h"
 
-static char tstr[] = " [|l2tp]";
+static const char tstr[] = " [|l2tp]";
 
 #define	L2TP_MSGTYPE_SCCRQ	1  /* Start-Control-Connection-Request */
 #define	L2TP_MSGTYPE_SCCRP	2  /* Start-Control-Connection-Reply */

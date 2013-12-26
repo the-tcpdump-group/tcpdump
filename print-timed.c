@@ -37,6 +37,8 @@ static const char rcsid[] _U_ =
 #include "interface.h"
 #include "extract.h"
 
+static const char tstr[] = "[|timed]";
+
 static const char *tsptype[TSPTYPENUMBER] =
   { "ANY", "ADJTIME", "ACK", "MASTERREQ", "MASTERACK", "SETTIME", "MASTERUP",
   "SLAVEUP", "ELECTION", "ACCEPT", "REFUSE", "CONFLICT", "RESOLVE", "QUIT",
@@ -52,7 +54,7 @@ timed_print(register const u_char *bp)
 	const u_char *end;
 
 	if (endof(tsp->tsp_type) > snapend) {
-		fputs("[|timed]", stdout);
+		printf("%s", tstr);
 		return;
 	}
 	if (tsp->tsp_type < TSPTYPENUMBER)
@@ -61,20 +63,20 @@ timed_print(register const u_char *bp)
 		printf("(tsp_type %#x)", tsp->tsp_type);
 
 	if (endof(tsp->tsp_vers) > snapend) {
-		fputs(" [|timed]", stdout);
+		printf(" %s", tstr);
 		return;
 	}
 	printf(" vers %d", tsp->tsp_vers);
 
 	if (endof(tsp->tsp_seq) > snapend) {
-		fputs(" [|timed]", stdout);
+		printf(" %s", tstr);
 		return;
 	}
 	printf(" seq %d", tsp->tsp_seq);
 
 	if (tsp->tsp_type == TSP_LOOP) {
 		if (endof(tsp->tsp_hopcnt) > snapend) {
-			fputs(" [|timed]", stdout);
+			printf(" %s", tstr);
 			return;
 		}
 		printf(" hopcnt %d", tsp->tsp_hopcnt);
@@ -83,7 +85,7 @@ timed_print(register const u_char *bp)
 	  tsp->tsp_type == TSP_SETDATE ||
 	  tsp->tsp_type == TSP_SETDATEREQ) {
 		if (endof(tsp->tsp_time) > snapend) {
-			fputs(" [|timed]", stdout);
+			printf(" %s", tstr);
 			return;
 		}
 		sec = EXTRACT_32BITS(&tsp->tsp_time.tv_sec);
@@ -103,7 +105,7 @@ timed_print(register const u_char *bp)
 
 	end = memchr(tsp->tsp_name, '\0', snapend - (u_char *)tsp->tsp_name);
 	if (end == NULL)
-		fputs(" [|timed]", stdout);
+		printf(" %s", tstr);
 	else {
 		fputs(" name ", stdout);
 		fwrite(tsp->tsp_name, end - (u_char *)tsp->tsp_name, 1, stdout);
