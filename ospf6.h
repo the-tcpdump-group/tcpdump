@@ -44,6 +44,7 @@
 #define	OSPF6_DB_INIT		0x04	    /*	*/
 #define	OSPF6_DB_MORE		0x02
 #define	OSPF6_DB_MASTER		0x01
+#define	OSPF6_DB_M6		0x10  /* IPv6 MTU */
 
 /* ls_type	*/
 #define	LS_TYPE_ROUTER		1   /* router link */
@@ -57,6 +58,9 @@
 #define	LS_TYPE_INTRA_AP	9   /* Intra-Area-Prefix */
 #define LS_TYPE_INTRA_ATE       10  /* Intra-Area-TE */
 #define LS_TYPE_GRACE           11  /* Grace LSA */
+#define LS_TYPE_RI		12  /* Router information */
+#define LS_TYPE_INTER_ASTE	13  /* Inter-AS-TE */
+#define LS_TYPE_L1VPN		14  /* L1VPN */
 #define LS_TYPE_MASK		0x1fff
 
 #define LS_SCOPE_LINKLOCAL	0x0000

@@ -88,12 +88,15 @@ static const struct tok ospf6_lsa_values[] = {
 	{ LS_TYPE_INTER_AP,     "Inter-Area Prefix" },
 	{ LS_TYPE_INTER_AR,     "Inter-Area Router" },
 	{ LS_TYPE_ASE,          "External" },
-	{ LS_TYPE_GROUP,        "Multicast Group" },
+	{ LS_TYPE_GROUP,        "Deprecated" },
 	{ LS_TYPE_NSSA,         "NSSA" },
 	{ LS_TYPE_LINK,         "Link" },
 	{ LS_TYPE_INTRA_AP,     "Intra-Area Prefix" },
         { LS_TYPE_INTRA_ATE,    "Intra-Area TE" },
         { LS_TYPE_GRACE,        "Grace" },
+	{ LS_TYPE_RI,           "Router Information" },
+	{ LS_TYPE_INTER_ASTE,   "Inter-AS-TE" },
+	{ LS_TYPE_L1VPN,        "Layer 1 VPN" },
 	{ 0,			NULL }
 };
 
@@ -108,23 +111,18 @@ static const struct tok ospf6_dd_flag_values[] = {
 	{ OSPF6_DB_INIT,	"Init" },
 	{ OSPF6_DB_MORE,	"More" },
 	{ OSPF6_DB_MASTER,	"Master" },
+	{ OSPF6_DB_M6,		"IPv6 MTU" },
 	{ 0,			NULL }
 };
 
 static const struct tok ospf6_lsa_prefix_option_values[] = {
         { LSA_PREFIX_OPT_NU, "No Unicast" },
         { LSA_PREFIX_OPT_LA, "Local address" },
-        { LSA_PREFIX_OPT_MC, "Multicast" },
+        { LSA_PREFIX_OPT_MC, "Deprecated" },
         { LSA_PREFIX_OPT_P, "Propagate" },
         { LSA_PREFIX_OPT_DN, "Down" },
 	{ 0, NULL }
 };
-
-/* Forwards */
-static void ospf6_print_ls_type(u_int, const rtrid_t *);
-static int ospf6_print_lshdr(const struct lsa6_hdr *);
-static int ospf6_print_lsa(const struct lsa6 *);
-static int ospf6_decode_v3(const struct ospf6hdr *, const u_char *);
 
 
 static void
@@ -502,7 +500,7 @@ ospf6_decode_v3(register const struct ospf6hdr *op,
 		if (op->ospf6_hello.hello_bdr != 0)
 			printf(", Backup Designated Router %s",
 			    ipaddr_string(&op->ospf6_hello.hello_bdr));
-		if (vflag) {
+		if (vflag > 1) {
 			printf("\n\t  Neighbor List:");
 			ap = op->ospf6_hello.hello_neighbor;
 			while ((u_char *)ap < dataend) {
@@ -526,16 +524,17 @@ ospf6_decode_v3(register const struct ospf6hdr *op,
 		printf(", MTU %u, DD-Sequence 0x%08x",
                        EXTRACT_16BITS(&op->ospf6_db.db_mtu),
                        EXTRACT_32BITS(&op->ospf6_db.db_seq));
-
-                /* Print all the LS adv's */
-                lshp = op->ospf6_db.db_lshdr;
-                while (!ospf6_print_lshdr(lshp)) {
-                    ++lshp;
-                }
+		if (vflag > 1) {
+			/* Print all the LS adv's */
+			lshp = op->ospf6_db.db_lshdr;
+			while (!ospf6_print_lshdr(lshp)) {
+				++lshp;
+			}
+		}
 		break;
 
 	case OSPF_TYPE_LS_REQ:
-		if (vflag) {
+		if (vflag > 1) {
 			lsrp = op->ospf6_lsr;
 			while ((u_char *)lsrp < dataend) {
 				TCHECK(*lsrp);
@@ -549,7 +548,7 @@ ospf6_decode_v3(register const struct ospf6hdr *op,
 		break;
 
 	case OSPF_TYPE_LS_UPDATE:
-		if (vflag) {
+		if (vflag > 1) {
 			lsap = op->ospf6_lsu.lsu_lsa;
 			TCHECK(op->ospf6_lsu.lsu_count);
 			i = EXTRACT_32BITS(&op->ospf6_lsu.lsu_count);
@@ -564,7 +563,7 @@ ospf6_decode_v3(register const struct ospf6hdr *op,
 
 
 	case OSPF_TYPE_LS_ACK:
-		if (vflag) {
+		if (vflag > 1) {
 			lshp = op->ospf6_lsa.lsa_lshdr;
 
 			while (!ospf6_print_lshdr(lshp)) {
@@ -593,7 +592,7 @@ ospf6_print(register const u_char *bp, register u_int length)
 	/* If the type is valid translate it, or just print the type */
 	/* value.  If it's not valid, say so and return */
 	TCHECK(op->ospf6_type);
-	cp = tok2str(ospf6_type_values, "unknown LS-type", op->ospf6_type);
+	cp = tok2str(ospf6_type_values, "unknown packet type (%u)", op->ospf6_type);
 	printf("OSPFv%u, %s, length %d", op->ospf6_version, cp, length);
 	if (*cp == 'u') {
 		return;
@@ -610,7 +609,6 @@ ospf6_print(register const u_char *bp, register u_int length)
 	}
 	dataend = bp + length;
 
-	/* Print the routerid if it is not the same as the source */
 	TCHECK(op->ospf6_routerid);
 	printf("\n\tRouter-ID %s", ipaddr_string(&op->ospf6_routerid));
 
@@ -630,10 +628,6 @@ ospf6_print(register const u_char *bp, register u_int length)
 		/* ospf version 3 */
 		if (ospf6_decode_v3(op, dataend))
 			goto trunc;
-		break;
-
-	default:
-		printf(" ospf [version %d]", op->ospf6_version);
 		break;
 	}			/* end switch on version */
 
