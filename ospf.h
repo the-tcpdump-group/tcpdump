@@ -137,6 +137,8 @@
 #define	MCLA_VERTEX_NETWORK	2
 
 /* Link-Local-Signaling */
+#define OSPF_LLS_HDRLEN         4U /* RFC5613 Section 2.2 */
+
 #define OSPF_LLS_EO             1  /* RFC4811, RFC4812 */
 #define OSPF_LLS_MD5            2  /* RFC4813 */
 

@@ -98,6 +98,10 @@
 #define ASLA_FLAG_ROUTETAG	0x01000000
 #define	ASLA_MASK_METRIC	0x00ffffff
 
+/* RFC6506 Section 4.1 */
+#define OSPF6_AT_HDRLEN             16U
+#define OSPF6_AUTH_TYPE_HMAC        0x0001
+
 typedef u_int32_t rtrid_t;
 
 /* link state advertisement header */
@@ -200,9 +204,6 @@ struct lsa6 {
 	} un_intra_ap;
     } lsa_un;
 };
-
-
-#define	OSPF_AUTH_SIZE	8
 
 /*
  * the main header

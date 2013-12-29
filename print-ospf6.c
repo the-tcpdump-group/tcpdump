@@ -124,6 +124,10 @@ static const struct tok ospf6_lsa_prefix_option_values[] = {
 	{ 0, NULL }
 };
 
+static const struct tok ospf6_auth_type_str[] = {
+	{ OSPF6_AUTH_TYPE_HMAC,        "HMAC" },
+	{ 0, NULL }
+};
 
 static void
 ospf6_print_ls_type(register u_int ls_type, register const rtrid_t *ls_stateid)
@@ -137,9 +141,10 @@ ospf6_print_ls_type(register u_int ls_type, register const rtrid_t *ls_stateid)
 }
 
 static int
-ospf6_print_lshdr(register const struct lsa6_hdr *lshp)
+ospf6_print_lshdr(register const struct lsa6_hdr *lshp, const u_char *dataend)
 {
-
+	if ((u_char *)(lshp + 1) > dataend)
+		goto trunc;
 	TCHECK(lshp->ls_type);
 	TCHECK(lshp->ls_seq);
 
@@ -197,7 +202,7 @@ trunc:
  * Print a single link state advertisement.  If truncated return 1, else 0.
  */
 static int
-ospf6_print_lsa(register const struct lsa6 *lsap)
+ospf6_print_lsa(register const struct lsa6 *lsap, const u_char *dataend)
 {
 	register const struct rlalink6 *rlp;
 #if 0
@@ -219,7 +224,7 @@ ospf6_print_lsa(register const struct lsa6 *lsap)
 	u_int32_t flags32;
 	const u_int8_t *tptr;
 
-	if (ospf6_print_lshdr(&lsap->ls_hdr))
+	if (ospf6_print_lshdr(&lsap->ls_hdr, dataend))
 		return (1);
 	TCHECK(lsap->ls_hdr.ls_length);
         length = EXTRACT_16BITS(&lsap->ls_hdr.ls_length);
@@ -230,7 +235,7 @@ ospf6_print_lsa(register const struct lsa6 *lsap)
 	 * If it does, find the length of what follows the
 	 * header.
 	 */
-        if (length < sizeof(struct lsa6_hdr))
+        if (length < sizeof(struct lsa6_hdr) || (u_char *)lsap + length > dataend)
         	return (1);
         lsa_length = length - sizeof(struct lsa6_hdr);
         tptr = (u_int8_t *)lsap+sizeof(struct lsa6_hdr);
@@ -527,8 +532,9 @@ ospf6_decode_v3(register const struct ospf6hdr *op,
 		if (vflag > 1) {
 			/* Print all the LS adv's */
 			lshp = op->ospf6_db.db_lshdr;
-			while (!ospf6_print_lshdr(lshp)) {
-				++lshp;
+			while ((u_char *)lshp < dataend) {
+				if (ospf6_print_lshdr(lshp++, dataend))
+					goto trunc;
 			}
 		}
 		break;
@@ -552,8 +558,8 @@ ospf6_decode_v3(register const struct ospf6hdr *op,
 			lsap = op->ospf6_lsu.lsu_lsa;
 			TCHECK(op->ospf6_lsu.lsu_count);
 			i = EXTRACT_32BITS(&op->ospf6_lsu.lsu_count);
-			while (i--) {
-				if (ospf6_print_lsa(lsap))
+			while ((u_char *)lsap < dataend && i--) {
+				if (ospf6_print_lsa(lsap, dataend))
 					goto trunc;
 				lsap = (struct lsa6 *)((u_char *)lsap +
 				    EXTRACT_16BITS(&lsap->ls_hdr.ls_length));
@@ -565,9 +571,9 @@ ospf6_decode_v3(register const struct ospf6hdr *op,
 	case OSPF_TYPE_LS_ACK:
 		if (vflag > 1) {
 			lshp = op->ospf6_lsa.lsa_lshdr;
-
-			while (!ospf6_print_lshdr(lshp)) {
-				++lshp;
+			while ((u_char *)lshp < dataend) {
+				if (ospf6_print_lshdr(lshp++, dataend))
+					goto trunc;
 			}
 		}
 		break;
@@ -580,12 +586,111 @@ trunc:
 	return (1);
 }
 
+/* RFC5613 Section 2.2 (w/o the TLVs) */
+static int
+ospf6_print_lls(const u_char *cp, const u_int len)
+{
+	uint16_t llsdatalen;
+
+	if (len == 0)
+		return 0;
+	if (len < OSPF_LLS_HDRLEN)
+		goto trunc;
+	/* Checksum */
+	TCHECK2(*cp, 2);
+	printf("\n\tLLS Checksum 0x%04x", EXTRACT_16BITS(cp));
+	cp += 2;
+	/* LLS Data Length */
+	TCHECK2(*cp, 2);
+	llsdatalen = EXTRACT_16BITS(cp);
+	printf(", Data Length %u", llsdatalen);
+	if (llsdatalen < OSPF_LLS_HDRLEN || llsdatalen > len)
+		goto trunc;
+	cp += 2;
+	/* LLS TLVs */
+	TCHECK2(*cp, llsdatalen - OSPF_LLS_HDRLEN);
+	/* FIXME: code in print-ospf.c can be reused to decode the TLVs */
+
+	return llsdatalen;
+trunc:
+	return -1;
+}
+
+/* RFC6506 Section 4.1 */
+static int
+ospf6_decode_at(const u_char *cp, const u_int len)
+{
+	uint16_t authdatalen;
+
+	if (len == 0)
+		return 0;
+	if (len < OSPF6_AT_HDRLEN)
+		goto trunc;
+	/* Authentication Type */
+	TCHECK2(*cp, 2);
+	printf("\n\tAuthentication Type %s", tok2str(ospf6_auth_type_str, "unknown (0x%04x)", EXTRACT_16BITS(cp)));
+	cp += 2;
+	/* Auth Data Len */
+	TCHECK2(*cp, 2);
+	authdatalen = EXTRACT_16BITS(cp);
+	printf(", Length %u", authdatalen);
+	if (authdatalen < OSPF6_AT_HDRLEN || authdatalen > len)
+		goto trunc;
+	cp += 2;
+	/* Reserved */
+	TCHECK2(*cp, 2);
+	cp += 2;
+	/* Security Association ID */
+	TCHECK2(*cp, 2);
+	printf(", SAID %u", EXTRACT_16BITS(cp));
+	cp += 2;
+	/* Cryptographic Sequence Number (High-Order 32 Bits) */
+	TCHECK2(*cp, 4);
+	printf(", CSN 0x%08x", EXTRACT_32BITS(cp));
+	cp += 4;
+	/* Cryptographic Sequence Number (Low-Order 32 Bits) */
+	TCHECK2(*cp, 4);
+	printf(":%08x", EXTRACT_32BITS(cp));
+	cp += 4;
+	/* Authentication Data */
+	TCHECK2(*cp, authdatalen - OSPF6_AT_HDRLEN);
+	if (vflag > 1)
+		print_unknown_data(cp, "\n\tAuthentication Data ", authdatalen - OSPF6_AT_HDRLEN);
+	return 0;
+
+trunc:
+	return 1;
+}
+
+/* The trailing data may include LLS and/or AT data (in this specific order).
+ * LLS data may be present only in Hello and DBDesc packets with the L-bit set.
+ * AT data may be present in Hello and DBDesc packets with the AT-bit set or in
+ * any other packet type, thus decode the AT data regardless of the AT-bit.
+ */
+static int
+ospf6_decode_v3_trailer(const struct ospf6hdr *op, const u_char *cp, const unsigned len)
+{
+	int llslen = 0;
+	u_char lls_hello = op->ospf6_type == OSPF_TYPE_HELLO &&
+	                   op->ospf6_hello.hello_options & OSPF6_OPTION_L;
+	u_char lls_dd    = op->ospf6_type == OSPF_TYPE_DD &&
+	                   op->ospf6_db.db_options & OSPF6_OPTION_L;
+
+	if ((lls_hello || lls_dd) && (llslen = ospf6_print_lls(cp, len)) < 0)
+		goto trunc;
+	return ospf6_decode_at(cp + llslen, len - llslen);
+
+trunc:
+	return 1;
+}
+
 void
 ospf6_print(register const u_char *bp, register u_int length)
 {
 	register const struct ospf6hdr *op;
 	register const u_char *dataend;
 	register const char *cp;
+	uint16_t datalen;
 
 	op = (struct ospf6hdr *)bp;
 
@@ -602,12 +707,14 @@ ospf6_print(register const u_char *bp, register u_int length)
                 return;
         }
 
+	/* OSPFv3 data always comes first and optional trailing data may follow. */
 	TCHECK(op->ospf6_len);
-	if (length != EXTRACT_16BITS(&op->ospf6_len)) {
-		printf(" [len %d]", EXTRACT_16BITS(&op->ospf6_len));
+	datalen = EXTRACT_16BITS(&op->ospf6_len);
+	if (datalen > length) {
+		printf(" [len %d]", datalen);
 		return;
 	}
-	dataend = bp + length;
+	dataend = bp + datalen;
 
 	TCHECK(op->ospf6_routerid);
 	printf("\n\tRouter-ID %s", ipaddr_string(&op->ospf6_routerid));
@@ -626,7 +733,8 @@ ospf6_print(register const u_char *bp, register u_int length)
 
 	case 3:
 		/* ospf version 3 */
-		if (ospf6_decode_v3(op, dataend))
+		if (ospf6_decode_v3(op, dataend) ||
+		    ospf6_decode_v3_trailer(op, dataend, length - datalen))
 			goto trunc;
 		break;
 	}			/* end switch on version */
