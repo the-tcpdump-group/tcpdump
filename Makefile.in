@@ -130,7 +130,6 @@ HDR = \
 	extract.h \
 	gmpls.h \
 	gmt2local.h \
-	igrp.h \
 	interface.h \
 	interface.h \
 	ip.h \
