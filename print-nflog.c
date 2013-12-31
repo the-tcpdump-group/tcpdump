@@ -37,7 +37,21 @@
 #include "netdissect.h"
 #include "interface.h"
 
-#include "nflog.h"
+/*
+ * Structure of an NFLOG header and TLV parts, as described at
+ * http://www.tcpdump.org/linktypes/LINKTYPE_NFLOG.html
+ */
+typedef struct nflog_hdr {
+	u_int8_t	nflog_family;		/* adress family */
+	u_int8_t	nflog_version;		/* version */
+	u_int16_t	nflog_rid;			/* resource ID */
+} nflog_hdr_t;
+
+typedef struct nflog_tlv {
+	u_int16_t	tlv_length;		/* tlv length */
+	u_int16_t	tlv_type;		/* tlv type */
+	void*		tlv_value;		/* tlv value */
+} nflog_tlv_t;
 
 #ifdef DLT_NFLOG
 
