@@ -117,7 +117,6 @@ HDR = \
 	af.h \
 	ah.h \
 	appletalk.h \
-	arcnet.h \
 	atm.h \
 	atmuni31.h \
 	bootp.h \
