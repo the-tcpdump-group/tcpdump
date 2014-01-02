@@ -531,7 +531,7 @@ sflow_print_counter_records(const u_char *pointer, u_int len, u_int records) {
 		break;
 	    default:
 		if (vflag <= 1)
-		    print_unknown_data(tptr, "\n\t\t", counter_len);
+		    print_unknown_data(gndo,tptr, "\n\t\t", counter_len);
 		break;
 	    }
 	}
@@ -732,7 +732,7 @@ sflow_print_flow_records(const u_char *pointer, u_int len, u_int records) {
 		break;
 	    default:
 		if (vflag <= 1)
-		    print_unknown_data(tptr, "\n\t\t", flow_len);
+		    print_unknown_data(gndo,tptr, "\n\t\t", flow_len);
 		break;
 	    }
 	}
@@ -913,7 +913,7 @@ sflow_print(const u_char *pptr, u_int len) {
 
         default:
             if (vflag <= 1)
-                print_unknown_data(tptr, "\n\t    ", sflow_sample_len);
+                print_unknown_data(gndo,tptr, "\n\t    ", sflow_sample_len);
             break;
         }
         tptr += sflow_sample_len;

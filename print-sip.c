@@ -55,7 +55,7 @@ sip_print(register const u_char *pptr, register u_int len)
 
     /* do we want to see an additionally hexdump ? */
     if (vflag> 1)
-        print_unknown_data(pptr,"\n\t",len);
+        print_unknown_data(gndo,pptr,"\n\t",len);
 
     return;
 

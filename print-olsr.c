@@ -606,7 +606,7 @@ olsr_print (const u_char *pptr, u_int length, int is_ipv6)
              */
         case OLSR_POWERINFO_MSG:
         default:
-            print_unknown_data(msg_data, "\n\t    ", msg_tlen);
+            print_unknown_data(gndo,msg_data, "\n\t    ", msg_tlen);
             break;
         } /* switch (msg_type) */
         tptr += msg_len;

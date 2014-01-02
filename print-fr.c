@@ -484,13 +484,13 @@ mfr_print(register const u_char *p, u_int length)
 
             default:
                 if (vflag <= 1)
-                    print_unknown_data(tptr,"\n\t  ",ie_len);
+                    print_unknown_data(gndo,tptr,"\n\t  ",ie_len);
                 break;
             }
 
             /* do we want to see a hexdump of the IE ? */
             if (vflag > 1 )
-                print_unknown_data(tptr,"\n\t  ",ie_len);
+                print_unknown_data(gndo,tptr,"\n\t  ",ie_len);
 
             tlen-=ie_len;
             tptr+=ie_len;
@@ -528,7 +528,7 @@ mfr_print(register const u_char *p, u_int length)
     printf("FRF.16 Frag, seq %u, Flags [%s]",
            sequence_num,
            bittok2str(frf_flag_values,"none",(p[0] & MFR_BEC_MASK)));
-    print_unknown_data(p,"\n\t",length);
+    print_unknown_data(gndo,p,"\n\t",length);
 
     return hdr_len;
 
@@ -807,12 +807,12 @@ q933_print(const u_char *p, u_int length)
 		}
 
                 if (vflag >= 1 && !ie_is_known) {
-                    print_unknown_data(ptemp+2,"\n\t",ie_p->ie_len);
+                    print_unknown_data(gndo,ptemp+2,"\n\t",ie_p->ie_len);
 		}
 
                 /* do we want to see a hexdump of the IE ? */
                 if (vflag> 1 && ie_is_known) {
-                    print_unknown_data(ptemp+2,"\n\t  ",ie_p->ie_len);
+                    print_unknown_data(gndo,ptemp+2,"\n\t  ",ie_p->ie_len);
 		}
 
 		length = length - ie_p->ie_len - 2;
@@ -881,3 +881,9 @@ fr_q933_print_ie_codeset5(const struct ie_tlv_header_t  *ie_p, const u_char *p)
 
         return 0;
 }
+/*
+ * Local Variables:
+ * c-style: whitesmith
+ * c-basic-offset: 8
+ * End:
+ */

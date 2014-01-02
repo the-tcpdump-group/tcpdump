@@ -1052,7 +1052,7 @@ lldp_private_tia_print(const u_char *tptr, u_int tlv_len)
 
         default:
             printf("\n\t    Location ID ");
-            print_unknown_data(tptr+5, "\n\t      ", tlv_len-5);
+            print_unknown_data(gndo,tptr+5, "\n\t      ", tlv_len-5);
         }
         break;
 
@@ -1247,7 +1247,7 @@ lldp_private_dcbx_print(const u_char *pptr, u_int len)
 
         /* do we also want to see a hex dump ? */
         if (vflag > 1 || (vflag && hexdump)) {
-	    print_unknown_data(tptr,"\n\t    ", tlv_len);
+	    print_unknown_data(gndo,tptr,"\n\t    ", tlv_len);
         }
 
         tlen -= tlv_len;
@@ -1586,7 +1586,7 @@ lldp_print(register const u_char *pptr, register u_int len) {
 
         /* do we also want to see a hex dump ? */
         if (vflag > 1 || (vflag && hexdump)) {
-            print_unknown_data(tptr,"\n\t  ", tlv_len);
+            print_unknown_data(gndo,tptr,"\n\t  ", tlv_len);
         }
 
         tlen -= tlv_len;

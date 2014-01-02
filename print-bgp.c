@@ -1518,7 +1518,7 @@ bgp_attr_print(u_int atype, const u_char *pptr, u_int len)
                     TCHECK2(tptr[0], tlen);
                     printf("\n\t    no AFI %u / SAFI %u decoder",af,safi);
                     if (vflag <= 1)
-                        print_unknown_data(tptr,"\n\t    ",tlen);
+                        print_unknown_data(gndo,tptr,"\n\t    ",tlen);
                     goto done;
                     break;
                 }
@@ -1651,7 +1651,7 @@ bgp_attr_print(u_int atype, const u_char *pptr, u_int len)
                             TCHECK2(tptr[0], tlen);
                             printf("no AFI %u/SAFI %u decoder",af,safi);
                             if (vflag <= 1)
-                                print_unknown_data(tptr,"\n\t    ",tlen);
+                                print_unknown_data(gndo,tptr,"\n\t    ",tlen);
                             tptr += tlen;
                             tlen = 0;
                             goto done;
@@ -1818,7 +1818,7 @@ bgp_attr_print(u_int atype, const u_char *pptr, u_int len)
                         TCHECK2(*tptr,tlen);
                         printf("\n\t    no AFI %u / SAFI %u decoder",af,safi);
                         if (vflag <= 1)
-                            print_unknown_data(tptr,"\n\t    ",tlen);
+                            print_unknown_data(gndo,tptr,"\n\t    ",tlen);
                         advance = 0;
                         tptr = pptr + len;
                         break;
@@ -1980,7 +1980,7 @@ bgp_attr_print(u_int atype, const u_char *pptr, u_int len)
                         TCHECK2(*(tptr-3),tlen);
                         printf("no AFI %u / SAFI %u decoder",af,safi);
                         if (vflag <= 1)
-                            print_unknown_data(tptr-3,"\n\t    ",tlen);
+                            print_unknown_data(gndo,tptr-3,"\n\t    ",tlen);
                         advance = 0;
                         tptr = pptr + len;
                         break;
@@ -2070,7 +2070,7 @@ bgp_attr_print(u_int atype, const u_char *pptr, u_int len)
                         break;
                     default:
                         TCHECK2(*tptr,8);
-                        print_unknown_data(tptr,"\n\t      ",8);
+                        print_unknown_data(gndo,tptr,"\n\t      ",8);
                         break;
                     }
                     tlen -=8;
@@ -2131,7 +2131,7 @@ bgp_attr_print(u_int atype, const u_char *pptr, u_int len)
                     break;
                 default:
                     if (vflag <= 1) {
-                        print_unknown_data(tptr,"\n\t      ",tlen);
+                        print_unknown_data(gndo,tptr,"\n\t      ",tlen);
                     }
                 }
                 break;
@@ -2193,12 +2193,12 @@ bgp_attr_print(u_int atype, const u_char *pptr, u_int len)
 	    TCHECK2(*pptr,len);
             printf("\n\t    no Attribute %u decoder",atype); /* we have no decoder for the attribute */
             if (vflag <= 1)
-                print_unknown_data(pptr,"\n\t    ",len);
+                print_unknown_data(gndo,pptr,"\n\t    ",len);
             break;
 	}
         if (vflag > 1 && len) { /* omit zero length attributes*/
             TCHECK2(*pptr,len);
-            print_unknown_data(pptr,"\n\t    ",len);
+            print_unknown_data(gndo,pptr,"\n\t    ",len);
         }
         return 1;
 
@@ -2276,11 +2276,11 @@ bgp_capabilities_print(const u_char *opt, int caps_len)
                     printf("\n\t\tno decoder for Capability %u",
                            cap_type);
                     if (vflag <= 1)
-                        print_unknown_data(&opt[i+2],"\n\t\t",cap_len);
+                        print_unknown_data(gndo,&opt[i+2],"\n\t\t",cap_len);
                     break;
                 }
                 if (vflag > 1 && cap_len > 0) {
-                    print_unknown_data(&opt[i+2],"\n\t\t",cap_len);
+                    print_unknown_data(gndo,&opt[i+2],"\n\t\t",cap_len);
                 }
                 i += BGP_CAP_HEADER_SIZE + cap_len;
         }
@@ -2628,7 +2628,7 @@ bgp_route_refresh_print(const u_char *pptr, int len) {
 
         if (vflag > 1) {
             TCHECK2(*pptr, len);
-            print_unknown_data(pptr,"\n\t  ", len);
+            print_unknown_data(gndo,pptr,"\n\t  ", len);
         }
 
         return;
@@ -2669,7 +2669,7 @@ bgp_header_print(const u_char *dat, int length)
                 /* we have no decoder for the BGP message */
                 TCHECK2(*dat, length);
                 printf("\n\t  no Message %u decoder",bgp.bgp_type);
-                print_unknown_data(dat,"\n\t  ",length);
+                print_unknown_data(gndo,dat,"\n\t  ",length);
                 break;
 	}
 	return 1;

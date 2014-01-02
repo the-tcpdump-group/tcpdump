@@ -866,12 +866,12 @@ lmp_print(register const u_char *pptr, register u_int len) {
 
         default:
             if (vflag <= 1)
-                print_unknown_data(obj_tptr,"\n\t    ",obj_tlen);
+                print_unknown_data(gndo,obj_tptr,"\n\t    ",obj_tlen);
             break;
         }
         /* do we want to see an additionally hexdump ? */
         if (vflag > 1 || hexdump==TRUE)
-            print_unknown_data(tptr+sizeof(struct lmp_object_header),"\n\t    ",
+            print_unknown_data(gndo,tptr+sizeof(struct lmp_object_header),"\n\t    ",
                                lmp_obj_len-sizeof(struct lmp_object_header));
 
         tptr+=lmp_obj_len;
@@ -881,3 +881,9 @@ lmp_print(register const u_char *pptr, register u_int len) {
 trunc:
     printf("\n\t\t packet exceeded snapshot");
 }
+/*
+ * Local Variables:
+ * c-style: whitesmith
+ * c-basic-offset: 8
+ * End:
+ */

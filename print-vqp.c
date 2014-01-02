@@ -196,7 +196,7 @@ vqp_print(register const u_char *pptr, register u_int len)
               break;
         default:
             if (vflag <= 1)
-                print_unknown_data(tptr, "\n\t    ", vqp_obj_len);
+                print_unknown_data(gndo,tptr, "\n\t    ", vqp_obj_len);
             break;
         }
 	tptr += vqp_obj_len;

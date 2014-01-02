@@ -192,14 +192,14 @@ chdlc_slarp_print(const u_char *cp, u_int length)
 	default:
 		printf("0x%02x unknown", EXTRACT_32BITS(&slarp->code));
                 if (vflag <= 1)
-                    print_unknown_data(cp+4,"\n\t",length-4);
+                    print_unknown_data(gndo,cp+4,"\n\t",length-4);
 		break;
 	}
 
 	if (SLARP_MAX_LEN < length && vflag)
 		printf(", (trailing junk: %d bytes)", length - SLARP_MAX_LEN);
         if (vflag > 1)
-            print_unknown_data(cp+4,"\n\t",length-4);
+            print_unknown_data(gndo,cp+4,"\n\t",length-4);
 	return;
 
 trunc:

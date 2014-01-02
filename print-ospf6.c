@@ -460,7 +460,7 @@ ospf6_print_lsa(register const struct lsa6 *lsap, const u_char *dataend)
                 break;
 
 	default:
-                if(!print_unknown_data(tptr,
+                if(!print_unknown_data(gndo,tptr,
                                        "\n\t      ",
                                        lsa_length)) {
                     return (1);
@@ -655,7 +655,7 @@ ospf6_decode_at(const u_char *cp, const u_int len)
 	/* Authentication Data */
 	TCHECK2(*cp, authdatalen - OSPF6_AT_HDRLEN);
 	if (vflag > 1)
-		print_unknown_data(cp, "\n\tAuthentication Data ", authdatalen - OSPF6_AT_HDRLEN);
+		print_unknown_data(gndo,cp, "\n\tAuthentication Data ", authdatalen - OSPF6_AT_HDRLEN);
 	return 0;
 
 trunc:

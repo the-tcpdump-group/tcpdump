@@ -328,15 +328,17 @@ extern u_int netanalyzer_transparent_if_print(netdissect_options *,
 extern int ethertype_print(netdissect_options *,u_short, const u_char *,
 			     u_int, u_int);
 
+extern int print_unknown_data(netdissect_options *,const u_char *, const char *,int);
+extern void hex_print_with_offset(netdissect_options *, const char *ident, const u_char *cp,
+				  u_int, u_int);
+extern void hex_print(netdissect_options *,const char *ident, const u_char *cp,u_int);
+
 /* stuff that has not yet been rototiled */
 #if 0
 extern void ascii_print(netdissect_options *,u_int);
 extern void hex_and_ascii_print_with_offset(netdissect_options *,const char *,
 				    u_int, u_int);
 extern void hex_and_ascii_print(netdissect_options *,const char *, u_int);
-extern void hex_print_with_offset(netdissect_options *,const char *,
-				  u_int, u_int);
-extern void hex_print(netdissect_options *,const char *, u_int);
 extern void telnet_print(netdissect_options *,const u_char *, u_int);
 extern int llc_print(netdissect_options *,
 		     const u_char *, u_int, u_int, const u_char *,

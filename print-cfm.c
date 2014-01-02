@@ -387,7 +387,7 @@ cfm_print(register const u_char *pptr, register u_int length) {
                 /* FIXME add printers for those MD formats - hexdump for now */
             case CFM_CCM_MA_FORMAT_8021:
             default:
-                print_unknown_data(msg_ptr.cfm_ccm->md_name, "\n\t    ",
+                print_unknown_data(gndo,msg_ptr.cfm_ccm->md_name, "\n\t    ",
                                    msg_ptr.cfm_ccm->md_namelength);
             }
         }
@@ -418,7 +418,7 @@ cfm_print(register const u_char *pptr, register u_int length) {
         case CFM_CCM_MA_FORMAT_INT:
         case CFM_CCM_MA_FORMAT_VPN:
         default:
-            print_unknown_data(ma_name, "\n\t    ", *ma_namelength);
+            print_unknown_data(gndo,ma_name, "\n\t    ", *ma_namelength);
         }
         break;
 
@@ -467,7 +467,7 @@ cfm_print(register const u_char *pptr, register u_int length) {
     case CFM_OPCODE_LBM:
     default:
         if (tlen > cfm_common_header->first_tlv_offset) {
-            print_unknown_data(tptr, "\n\t  ",
+            print_unknown_data(gndo,tptr, "\n\t  ",
                                tlen -  cfm_common_header->first_tlv_offset);
         }
         break;
@@ -507,7 +507,7 @@ cfm_print(register const u_char *pptr, register u_int length) {
         if ((cfm_tlv_type != CFM_TLV_END) &&
             ((cfm_tlv_len + sizeof(struct cfm_tlv_header_t) > tlen) ||
              (!cfm_tlv_len))) {
-            print_unknown_data(tptr,"\n\t  ",tlen);
+            print_unknown_data(gndo,tptr,"\n\t  ",tlen);
             return;
         }
 
@@ -634,7 +634,7 @@ cfm_print(register const u_char *pptr, register u_int length) {
         }
         /* do we want to see an additional hexdump ? */
         if (hexdump || vflag > 1)
-            print_unknown_data(tlv_ptr, "\n\t  ", cfm_tlv_len);
+            print_unknown_data(gndo,tlv_ptr, "\n\t  ", cfm_tlv_len);
 
         tptr+=cfm_tlv_len;
         tlen-=cfm_tlv_len;

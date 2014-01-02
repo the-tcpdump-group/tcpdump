@@ -310,7 +310,7 @@ rpki_rtr_pdu_print (const u_char *tptr, u_int indent)
 
     /* do we also want to see a hex dump ? */
     if (vflag > 1 || (vflag && hexdump)) {
-	print_unknown_data(tptr,"\n\t  ", pdu_len);
+	print_unknown_data(gndo,tptr,"\n\t  ", pdu_len);
     }
 }
 

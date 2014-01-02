@@ -47,7 +47,7 @@ static const char rcsid[] _U_ =
 #include <tcpdump-stdinc.h>
 #include <stdio.h>
 
-#include "interface.h"
+#include "netdissect.h"
 
 #define ASCII_LINELENGTH 300
 #define HEXDUMP_BYTES_PER_LINE 16
@@ -131,8 +131,9 @@ hex_and_ascii_print(register const char *ident, register const u_char *cp,
  * telnet_print() wants this.  It is essentially default_print_unaligned()
  */
 void
-hex_print_with_offset(register const char *ident, register const u_char *cp, register u_int length,
-		      register u_int oset)
+hex_print_with_offset(netdissect_options *ndo,
+                      const char *ident, const u_char *cp, u_int length,
+		      u_int oset)
 {
 	register u_int i, s;
 	register int nshorts;
@@ -141,16 +142,16 @@ hex_print_with_offset(register const char *ident, register const u_char *cp, reg
 	i = 0;
 	while (--nshorts >= 0) {
 		if ((i++ % 8) == 0) {
-			(void)printf("%s0x%04x: ", ident, oset);
-			oset += HEXDUMP_BYTES_PER_LINE;
+                  (void)ND_PRINT((ndo,"%s0x%04x: ", ident, oset));
+                  oset += HEXDUMP_BYTES_PER_LINE;
 		}
 		s = *cp++;
-		(void)printf(" %02x%02x", s, *cp++);
+		(void)ND_PRINT((ndo," %02x%02x", s, *cp++));
 	}
 	if (length & 1) {
 		if ((i % 8) == 0)
-			(void)printf("%s0x%04x: ", ident, oset);
-		(void)printf(" %02x", *cp);
+                  (void)ND_PRINT((ndo,"%s0x%04x: ", ident, oset));
+		(void)ND_PRINT((ndo," %02x", *cp));
 	}
 }
 
@@ -158,9 +159,9 @@ hex_print_with_offset(register const char *ident, register const u_char *cp, reg
  * just for completeness
  */
 void
-hex_print(register const char *ident, register const u_char *cp, register u_int length)
+hex_print(netdissect_options *ndo,const char *ident, const u_char *cp, u_int length)
 {
-	hex_print_with_offset(ident, cp, length, 0);
+  hex_print_with_offset(ndo, ident, cp, length, 0);
 }
 
 #ifdef MAIN

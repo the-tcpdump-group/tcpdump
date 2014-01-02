@@ -256,7 +256,7 @@ ospf_print_grace_lsa (const u_int8_t *tptr, u_int ls_length) {
 
         default:
             if (vflag <= 1) {
-                if(!print_unknown_data(tptr,"\n\t      ",tlv_length))
+                if(!print_unknown_data(gndo,tptr,"\n\t      ",tlv_length))
                     return -1;
             }
             break;
@@ -416,7 +416,7 @@ ospf_print_te_lsa (const u_int8_t *tptr, u_int ls_length) {
 
                 default:
                     if (vflag <= 1) {
-                        if(!print_unknown_data(tptr,"\n\t\t",subtlv_length))
+                        if(!print_unknown_data(gndo,tptr,"\n\t\t",subtlv_length))
                             return -1;
                     }
                     break;
@@ -442,7 +442,7 @@ ospf_print_te_lsa (const u_int8_t *tptr, u_int ls_length) {
 
         default:
             if (vflag <= 1) {
-                if(!print_unknown_data(tptr,"\n\t      ",tlv_length))
+                if(!print_unknown_data(gndo,tptr,"\n\t      ",tlv_length))
                     return -1;
             }
             break;
@@ -780,7 +780,7 @@ ospf_print_lsa(register const struct lsa *lsap)
                         break;
                     default:
                         if (vflag <= 1) {
-                            if(!print_unknown_data(tptr,"\n\t      ",tlv_length))
+                            if(!print_unknown_data(gndo,tptr,"\n\t      ",tlv_length))
                                 return(ls_end);
                         }
                         break;
@@ -807,7 +807,7 @@ ospf_print_lsa(register const struct lsa *lsap)
 
             default:
                 if (vflag <= 1) {
-                    if(!print_unknown_data((u_int8_t *)lsap->lsa_un.un_unknown,
+                    if(!print_unknown_data(gndo,(u_int8_t *)lsap->lsa_un.un_unknown,
                                            "\n\t    ", ls_length))
                         return(ls_end);
                 }
@@ -817,7 +817,7 @@ ospf_print_lsa(register const struct lsa *lsap)
 
         /* do we want to see an additionally hexdump ? */
         if (vflag> 1)
-            if(!print_unknown_data((u_int8_t *)lsap->lsa_un.un_unknown,
+            if(!print_unknown_data(gndo,(u_int8_t *)lsap->lsa_un.un_unknown,
                                    "\n\t    ", ls_length)) {
                 return(ls_end);
             }

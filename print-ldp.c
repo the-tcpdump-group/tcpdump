@@ -455,7 +455,7 @@ ldp_tlv_print(register const u_char *tptr) {
                     break;
 
                 default:
-                    print_unknown_data(tptr+2,"\n\t\t  ",vc_info_tlv_len-2);
+                    print_unknown_data(gndo,tptr+2,"\n\t\t  ",vc_info_tlv_len-2);
                     break;
                 }
 
@@ -529,7 +529,7 @@ ldp_tlv_print(register const u_char *tptr) {
 
     default:
         if (vflag <= 1)
-            print_unknown_data(tptr,"\n\t      ",tlv_tlen);
+            print_unknown_data(gndo,tptr,"\n\t      ",tlv_tlen);
         break;
     }
     return(tlv_len+4); /* Type & Length fields not included */
@@ -657,12 +657,12 @@ ldp_msg_print(register const u_char *pptr) {
 
         default:
             if (vflag <= 1)
-                print_unknown_data(msg_tptr,"\n\t  ",msg_tlen);
+                print_unknown_data(gndo,msg_tptr,"\n\t  ",msg_tlen);
             break;
         }
         /* do we want to see an additionally hexdump ? */
         if (vflag > 1 || hexdump==TRUE)
-            print_unknown_data(tptr+sizeof(struct ldp_msg_header),"\n\t  ",
+            print_unknown_data(gndo,tptr+sizeof(struct ldp_msg_header),"\n\t  ",
                                msg_len);
 
         tptr += msg_len+4;
@@ -674,3 +674,9 @@ trunc:
     return 0;
 }
 
+/*
+ * Local Variables:
+ * c-style: whitesmith
+ * c-basic-offset: 8
+ * End:
+ */

@@ -244,7 +244,7 @@ telnet_print(const u_char *sp, u_int length)
 		if (Xflag && 2 < vflag) {
 			if (first)
 				printf("\nTelnet:");
-			hex_print_with_offset("\n", sp, l, sp - osp);
+			hex_print_with_offset(gndo,"\n", sp, l, sp - osp);
 			if (l > 8)
 				printf("\n\t\t\t\t");
 			else

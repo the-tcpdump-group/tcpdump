@@ -768,7 +768,7 @@ lspping_print(register const u_char *pptr, register u_int len) {
                 }
                 /* do we want to see an additionally subtlv hexdump ? */
                 if (vflag > 1 || subtlv_hexdump==TRUE)
-                    print_unknown_data(tlv_tptr+sizeof(struct lspping_tlv_header), \
+                    print_unknown_data(gndo,tlv_tptr+sizeof(struct lspping_tlv_header), \
                                        "\n\t      ",
                                        lspping_subtlv_len);
 
@@ -873,12 +873,12 @@ lspping_print(register const u_char *pptr, register u_int len) {
 
         default:
             if (vflag <= 1)
-                print_unknown_data(tlv_tptr,"\n\t    ",tlv_tlen);
+                print_unknown_data(gndo,tlv_tptr,"\n\t    ",tlv_tlen);
             break;
         }
         /* do we want to see an additionally tlv hexdump ? */
         if (vflag > 1 || tlv_hexdump==TRUE)
-            print_unknown_data(tptr+sizeof(struct lspping_tlv_header),"\n\t    ",
+            print_unknown_data(gndo,tptr+sizeof(struct lspping_tlv_header),"\n\t    ",
                                lspping_tlv_len);
 
 
@@ -894,3 +894,9 @@ lspping_print(register const u_char *pptr, register u_int len) {
 trunc:
     printf("\n\t\t packet exceeded snapshot");
 }
+/*
+ * Local Variables:
+ * c-style: whitesmith
+ * c-basic-offset: 8
+ * End:
+ */

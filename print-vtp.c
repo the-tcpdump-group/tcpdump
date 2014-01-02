@@ -327,7 +327,7 @@ vtp_print (const u_char *pptr, u_int length)
                 case VTP_VLAN_TRANS_BRIDGED_VLAN:
                 case VTP_VLAN_ARP_HOP_COUNT:
                 default:
-		    print_unknown_data(tptr, "\n\t\t  ", 2 + tlv_len*2);
+		    print_unknown_data(gndo,tptr, "\n\t\t  ", 2 + tlv_len*2);
                     break;
                 }
                 len -= 2 + tlv_len*2;

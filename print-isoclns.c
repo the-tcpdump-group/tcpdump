@@ -686,7 +686,7 @@ void isoclns_print(const u_int8_t *p, u_int length, u_int caplen)
 
 	case NLPID_CLNP:
 		if (!clnp_print(p, length))
-                        print_unknown_data(p,"\n\t",caplen);
+                        print_unknown_data(gndo,p,"\n\t",caplen);
 		break;
 
 	case NLPID_ESIS:
@@ -695,7 +695,7 @@ void isoclns_print(const u_int8_t *p, u_int length, u_int caplen)
 
 	case NLPID_ISIS:
 		if (!isis_print(p, length))
-                        print_unknown_data(p,"\n\t",caplen);
+                        print_unknown_data(gndo,p,"\n\t",caplen);
 		break;
 
 	case NLPID_NULLNS:
@@ -729,7 +729,7 @@ void isoclns_print(const u_int8_t *p, u_int length, u_int caplen)
 		             eflag ? "" : ", ",
                              length);
 		if (caplen > 1)
-                        print_unknown_data(p,"\n\t",caplen);
+                        print_unknown_data(gndo,p,"\n\t",caplen);
 		break;
 	}
 }
@@ -962,11 +962,11 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
                  */
 
             default:
-                print_unknown_data(tptr,"\n\t  ",opli);
+                print_unknown_data(gndo,tptr,"\n\t  ",opli);
                 break;
             }
             if (vflag > 1)
-                print_unknown_data(pptr,"\n\t  ",opli);
+                print_unknown_data(gndo,pptr,"\n\t  ",opli);
             pptr += opli;
         }
 
@@ -990,7 +990,7 @@ static int clnp_print (const u_int8_t *pptr, u_int length)
             /* dump the PDU specific data */
             if (length-(pptr-optr) > 0) {
                 printf("\n\t  undecoded non-header data, length %u",length-clnp_header->length_indicator);
-                print_unknown_data(pptr,"\n\t  ",length-(pptr-optr));
+                print_unknown_data(gndo,pptr,"\n\t  ",length-(pptr-optr));
             }
         }
 
@@ -1096,7 +1096,7 @@ esis_print(const u_int8_t *pptr, u_int length)
         printf(", holding time: %us, length indicator: %u",EXTRACT_16BITS(esis_header->holdtime),li);
 
         if (vflag > 1)
-            print_unknown_data(optr,"\n\t",sizeof(struct esis_header_t));
+            print_unknown_data(gndo,optr,"\n\t",sizeof(struct esis_header_t));
 
 	pptr += sizeof(struct esis_header_t);
 	li -= sizeof(struct esis_header_t);
@@ -1223,7 +1223,7 @@ esis_print(const u_int8_t *pptr, u_int length)
 	default:
             if (vflag <= 1) {
 		    if (pptr < snapend)
-                            print_unknown_data(pptr,"\n\t  ",snapend-pptr);
+                            print_unknown_data(gndo,pptr,"\n\t  ",snapend-pptr);
             }
             return;
 	}
@@ -1290,11 +1290,11 @@ esis_print(const u_int8_t *pptr, u_int length)
             case ESIS_OPTION_SNPA_MASK:
 
             default:
-                print_unknown_data(tptr,"\n\t  ",opli);
+                print_unknown_data(gndo,tptr,"\n\t  ",opli);
                 break;
             }
             if (vflag > 1)
-                print_unknown_data(pptr,"\n\t  ",opli);
+                print_unknown_data(gndo,pptr,"\n\t  ",opli);
             pptr += opli;
         }
 trunc:
@@ -1701,7 +1701,7 @@ isis_print_ip_reach_subtlv (const u_int8_t *tptr,int subt,int subl,const char *i
 	}
 	break;
     default:
-	if(!print_unknown_data(tptr,"\n\t\t    ",
+	if(!print_unknown_data(gndo,tptr,"\n\t\t    ",
 			       subl))
 	  return(0);
 	break;
@@ -1856,7 +1856,7 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,u_int subt,u_int subl,const cha
                 /* there is some optional stuff left to decode but this is as of yet
                    not specified so just lets hexdump what is left */
                 if(subl>0){
-                  if(!print_unknown_data(tptr,"\n\t\t    ",
+                  if(!print_unknown_data(gndo,tptr,"\n\t\t    ",
                                          subl))
                     return(0);
                 }
@@ -1864,7 +1864,7 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,u_int subt,u_int subl,const cha
             }
             break;
         default:
-            if(!print_unknown_data(tptr,"\n\t\t    ",
+            if(!print_unknown_data(gndo,tptr,"\n\t\t    ",
 				   subl))
                 return(0);
             break;
@@ -2230,7 +2230,7 @@ static int isis_print (const u_int8_t *p, u_int length)
            isis_header->max_area);
 
     if (vflag > 1) {
-        if(!print_unknown_data(optr,"\n\t",8)) /* provide the _o_riginal pointer */
+        if(!print_unknown_data(gndo,optr,"\n\t",8)) /* provide the _o_riginal pointer */
             return(0);                         /* for optionally debugging the common header */
     }
 
@@ -2264,7 +2264,7 @@ static int isis_print (const u_int8_t *p, u_int length)
                pdu_len);
 
         if (vflag > 1) {
-            if(!print_unknown_data(pptr,"\n\t  ",ISIS_IIH_LAN_HEADER_SIZE))
+            if(!print_unknown_data(gndo,pptr,"\n\t  ",ISIS_IIH_LAN_HEADER_SIZE))
                 return(0);
         }
 
@@ -2298,7 +2298,7 @@ static int isis_print (const u_int8_t *p, u_int length)
                pdu_len);
 
         if (vflag > 1) {
-            if(!print_unknown_data(pptr,"\n\t  ",ISIS_IIH_PTP_HEADER_SIZE))
+            if(!print_unknown_data(gndo,pptr,"\n\t  ",ISIS_IIH_PTP_HEADER_SIZE))
                 return(0);
         }
 
@@ -2355,7 +2355,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	printf("%s ]", tok2str(isis_lsp_istype_values,"Unknown(0x%x)",ISIS_MASK_LSP_ISTYPE_BITS(header_lsp->typeblock)));
 
         if (vflag > 1) {
-            if(!print_unknown_data(pptr,"\n\t  ",ISIS_LSP_HEADER_SIZE))
+            if(!print_unknown_data(gndo,pptr,"\n\t  ",ISIS_LSP_HEADER_SIZE))
                 return(0);
         }
 
@@ -2387,7 +2387,7 @@ static int isis_print (const u_int8_t *p, u_int length)
                isis_print_id(header_csnp->end_lsp_id, LSP_ID_LEN));
 
         if (vflag > 1) {
-            if(!print_unknown_data(pptr,"\n\t  ",ISIS_CSNP_HEADER_SIZE))
+            if(!print_unknown_data(gndo,pptr,"\n\t  ",ISIS_CSNP_HEADER_SIZE))
                 return(0);
         }
 
@@ -2415,7 +2415,7 @@ static int isis_print (const u_int8_t *p, u_int length)
                pdu_len);
 
         if (vflag > 1) {
-            if(!print_unknown_data(pptr,"\n\t  ",ISIS_PSNP_HEADER_SIZE))
+            if(!print_unknown_data(gndo,pptr,"\n\t  ",ISIS_PSNP_HEADER_SIZE))
                 return(0);
         }
 
@@ -2424,7 +2424,7 @@ static int isis_print (const u_int8_t *p, u_int length)
 	break;
 
     default:
-	if(!print_unknown_data(pptr,"\n\t  ",length))
+	if(!print_unknown_data(gndo,pptr,"\n\t  ",length))
 	    return(0);
 	return (0);
     }
@@ -2702,7 +2702,7 @@ static int isis_print (const u_int8_t *p, u_int length)
                 break;
 	    case ISIS_SUBTLV_AUTH_PRIVATE:
 	    default:
-		if(!print_unknown_data(tptr+1,"\n\t\t  ",tlv_len-1))
+		if(!print_unknown_data(gndo,tptr+1,"\n\t\t  ",tlv_len-1))
 		    return(0);
 		break;
 	    }
@@ -2966,7 +2966,7 @@ static int isis_print (const u_int8_t *p, u_int length)
             case ISIS_SUBTLV_IDRP_LOCAL:
             case ISIS_SUBTLV_IDRP_RES:
             default:
-                if(!print_unknown_data(tptr,"\n\t      ",tlv_len-1))
+                if(!print_unknown_data(gndo,tptr,"\n\t      ",tlv_len-1))
                     return(0);
                 break;
             }
@@ -3041,7 +3041,7 @@ static int isis_print (const u_int8_t *p, u_int length)
             tptr+=3;
             tmp-=3;
             if (tmp > 0) /* hexdump the rest */
-                if(!print_unknown_data(tptr,"\n\t\t",tmp))
+                if(!print_unknown_data(gndo,tptr,"\n\t\t",tmp))
                     return(0);
             break;
             /*
@@ -3057,14 +3057,14 @@ static int isis_print (const u_int8_t *p, u_int length)
 
 	default:
             if (vflag <= 1) {
-                if(!print_unknown_data(pptr,"\n\t\t",tlv_len))
+                if(!print_unknown_data(gndo,pptr,"\n\t\t",tlv_len))
                     return(0);
             }
 	    break;
 	}
         /* do we want to see an additionally hexdump ? */
         if (vflag> 1) {
-	    if(!print_unknown_data(pptr,"\n\t      ",tlv_len))
+	    if(!print_unknown_data(gndo,pptr,"\n\t      ",tlv_len))
 	        return(0);
         }
 

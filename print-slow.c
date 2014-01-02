@@ -307,7 +307,7 @@ slow_print(register const u_char *pptr, register u_int len) {
 
     /* unrecognized subtype */
     if (print_version == -1) {
-        print_unknown_data(pptr, "\n\t", len);
+        print_unknown_data(gndo,pptr, "\n\t", len);
         return;
     }
 
@@ -368,7 +368,7 @@ void slow_marker_lacp_print(register const u_char *tptr, register u_int tlen) {
             tlv_header->type != LACP_TLV_TERMINATOR &&
             tlv_header->type != MARKER_TLV_TERMINATOR) {
             printf("\n\t-----trailing data-----");
-            print_unknown_data(tptr+sizeof(struct tlv_header_t),"\n\t  ",tlen);
+            print_unknown_data(gndo,tptr+sizeof(struct tlv_header_t),"\n\t  ",tlen);
             return;
         }
 
@@ -436,12 +436,12 @@ void slow_marker_lacp_print(register const u_char *tptr, register u_int tlen) {
 
         default:
             if (vflag <= 1)
-                print_unknown_data(tlv_tptr,"\n\t  ",tlv_tlen);
+                print_unknown_data(gndo,tlv_tptr,"\n\t  ",tlv_tlen);
             break;
         }
         /* do we want to see an additional hexdump ? */
         if (vflag > 1) {
-            print_unknown_data(tptr+sizeof(struct tlv_header_t),"\n\t  ",
+            print_unknown_data(gndo,tptr+sizeof(struct tlv_header_t),"\n\t  ",
                                tlv_len-sizeof(struct tlv_header_t));
         }
 
@@ -556,7 +556,7 @@ void slow_oam_print(register const u_char *tptr, register u_int tlen) {
 
             /* do we also want to see a hex dump ? */
             if (vflag > 1 || hexdump==TRUE) {
-                print_unknown_data(tptr,"\n\t  ",
+                print_unknown_data(gndo,tptr,"\n\t  ",
                                    ptr.slow_oam_tlv_header->length);
             }
 
@@ -624,7 +624,7 @@ void slow_oam_print(register const u_char *tptr, register u_int tlen) {
 
             /* do we also want to see a hex dump ? */
             if (vflag > 1 || hexdump==TRUE) {
-                print_unknown_data(tptr,"\n\t  ",
+                print_unknown_data(gndo,tptr,"\n\t  ",
                                    ptr.slow_oam_tlv_header->length);
             }
 
@@ -653,7 +653,7 @@ void slow_oam_print(register const u_char *tptr, register u_int tlen) {
     case SLOW_OAM_CODE_PRIVATE:
     default:
         if (vflag <= 1) {
-            print_unknown_data(tptr,"\n\t  ", tlen);
+            print_unknown_data(gndo,tptr,"\n\t  ", tlen);
         }
         break;
     }

@@ -691,7 +691,7 @@ rfc1048_print(register const u_char *bp)
                                                 break;
 
 					default:
-						print_unknown_data(bp, "\n\t\t", suboptlen);
+						print_unknown_data(gndo,bp, "\n\t\t", suboptlen);
 					}
 
 					len -= suboptlen;

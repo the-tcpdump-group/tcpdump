@@ -880,7 +880,7 @@ radius_attrs_print(register const u_char *attr, u_int length)
      }
      /* do we also want to see a hex dump ? */
      if (vflag> 1)
-         print_unknown_data((u_char *)rad_attr+2,"\n\t    ",(rad_attr->len)-2);
+         print_unknown_data(gndo,(u_char *)rad_attr+2,"\n\t    ",(rad_attr->len)-2);
 
      length-=(rad_attr->len);
      rad_attr = (struct radius_attr *)( ((char *)(rad_attr))+rad_attr->len);

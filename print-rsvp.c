@@ -630,7 +630,7 @@ rsvp_intserv_print(const u_char *tptr, u_short obj_tlen) {
 
     default:
         if (vflag <= 1)
-            print_unknown_data(tptr+4,"\n\t\t",parameter_length);
+            print_unknown_data(gndo,tptr+4,"\n\t\t",parameter_length);
     }
     return (parameter_length+4); /* header length 4 bytes */
 }
@@ -1612,7 +1612,7 @@ _U_
                         return-1;
                     if (*(obj_tptr+1) < 2)
                         return -1;
-                    print_unknown_data(obj_tptr+2,"\n\t\t",*(obj_tptr+1)-2);
+                    print_unknown_data(gndo,obj_tptr+2,"\n\t\t",*(obj_tptr+1)-2);
                     obj_tlen-=*(obj_tptr+1);
                     obj_tptr+=*(obj_tptr+1);
                 }
@@ -1785,12 +1785,12 @@ _U_
         case RSVP_OBJ_PROTECTION:
         default:
             if (vflag <= 1)
-                print_unknown_data(obj_tptr,"\n\t    ",obj_tlen); /* FIXME indentation */
+                print_unknown_data(gndo,obj_tptr,"\n\t    ",obj_tlen); /* FIXME indentation */
             break;
         }
         /* do we also want to see a hex dump ? */
         if (vflag > 1 || hexdump==TRUE)
-            print_unknown_data(tptr+sizeof(struct rsvp_object_header),"\n\t    ", /* FIXME indentation */
+            print_unknown_data(gndo,tptr+sizeof(struct rsvp_object_header),"\n\t    ", /* FIXME indentation */
                                rsvp_obj_len-sizeof(struct rsvp_object_header));
 
         tptr+=rsvp_obj_len;
@@ -1934,7 +1934,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
         break;
 
     default:
-        print_unknown_data(tptr,"\n\t    ",tlen);
+        print_unknown_data(gndo,tptr,"\n\t    ",tlen);
         break;
     }
 

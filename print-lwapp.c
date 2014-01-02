@@ -343,7 +343,7 @@ lwapp_data_print(const u_char *pptr, u_int len) {
     tlen-=sizeof(const struct lwapp_transport_header);
 
     /* FIX - An IEEE 802.11 frame follows - hexdump for now */
-    print_unknown_data(tptr, "\n\t", tlen);
+    print_unknown_data(gndo,tptr, "\n\t", tlen);
 
     return;
 

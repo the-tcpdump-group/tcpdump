@@ -271,8 +271,8 @@ bfd_print(register const u_char *pptr, register u_int len, register u_int port)
                    tok2str(bfd_port_values, "unknown (%u)", port),
                    len);
             if (vflag >= 1) {
-                if(!print_unknown_data(pptr,"\n\t",len))
-                    return;
+                    if(!print_unknown_data(gndo, pptr,"\n\t",len))
+                            return;
             }
             break;
         }
@@ -281,3 +281,9 @@ bfd_print(register const u_char *pptr, register u_int len, register u_int port)
 trunc:
         printf("[|BFD]");
 }
+/*
+ * Local Variables:
+ * c-style: whitesmith
+ * c-basic-offset: 8
+ * End:
+ */

@@ -720,7 +720,7 @@ fdatatlv_print(register const u_char * pptr, register u_int len,
 	if (vflag >= 3) {
 		char *ib = indent_pr(indent + 2, 1);
 		printf("%s[", &ib[1]);
-		hex_print_with_offset(ib, tdp, rlen, 0);
+		hex_print_with_offset(gndo,ib, tdp, rlen, 0);
 		printf("\n%s]\n", &ib[1]);
 	}
 	return 0;
@@ -754,7 +754,7 @@ sdatailv_print(register const u_char * pptr, register u_int len,
 		invilv = ilv_valid(ilv, rlen);
 		if (invilv) {
 			printf("%s[", &ib[1]);
-			hex_print_with_offset(ib, tdp, rlen, 0);
+			hex_print_with_offset(gndo,ib, tdp, rlen, 0);
 			printf("\n%s]\n", &ib[1]);
 			return -1;
 		}
@@ -762,7 +762,7 @@ sdatailv_print(register const u_char * pptr, register u_int len,
 			int ilvl = EXTRACT_32BITS(&ilv->length);
 			printf("\n%s ILV: type %x length %d\n", &ib[1],
 			       EXTRACT_32BITS(&ilv->type), ilvl);
-			hex_print_with_offset("\t\t[", tdp, ilvl-ILV_HDRL, 0);
+			hex_print_with_offset(gndo,"\t\t[", tdp, ilvl-ILV_HDRL, 0);
 		}
 
 		ilv = GO_NXT_ILV(ilv, rlen);
@@ -989,7 +989,7 @@ pdatacnt_print(register const u_char * pptr, register u_int len,
 			       type, EXTRACT_16BITS(&pdtlv->length));
 pd_err:
 			if (EXTRACT_16BITS(&pdtlv->length)) {
-				hex_print_with_offset("Bad Data val\n\t  [",
+                                hex_print_with_offset(gndo,"Bad Data val\n\t  [",
 						      pptr, len, 0);
 				printf("]\n");
 
@@ -1042,7 +1042,7 @@ pdata_print(register const u_char * pptr, register u_int len,
 	if (len < minsize) {
 		printf("\t\t\ttruncated IDs expected %uB got %uB\n", minsize,
 		       len);
-		hex_print_with_offset("\t\t\tID Data[", pptr, len, 0);
+		hex_print_with_offset(gndo,"\t\t\tID Data[", pptr, len, 0);
 		printf("]\n");
 		return -1;
 	}
@@ -1174,7 +1174,7 @@ invoptlv_print(register const u_char * pptr, register u_int len,
 
 	if (vflag >= 3) {
 		printf("%sData[", &ib[1]);
-		hex_print_with_offset(ib, pptr, len, 0);
+		hex_print_with_offset(gndo,ib, pptr, len, 0);
 		printf("%s]\n", ib);
 	}
 	return -1;
@@ -1374,7 +1374,7 @@ print_metailv(register const u_char * pptr, register u_int len,
 	printf("%sMetaID 0x%x length %d\n", ib, EXTRACT_32BITS(&ilv->type),
 	       EXTRACT_32BITS(&ilv->length));
 	if (vflag >= 3) {
-		hex_print_with_offset("\t\t[", ILV_DATA(ilv), rlen, 0);
+		hex_print_with_offset(gndo,"\t\t[", ILV_DATA(ilv), rlen, 0);
 		printf(" ]\n");
 	}
 	return 0;
@@ -1439,7 +1439,7 @@ print_reddata(register const u_char * pptr, register u_int len,
 
 	if (vflag >= 3) {
 		printf("\t\t[");
-		hex_print_with_offset("\n\t\t", pptr, rlen, 0);
+		hex_print_with_offset(gndo,"\n\t\t", pptr, rlen, 0);
 		printf("\n\t\t]");
 	}
 
@@ -1739,14 +1739,14 @@ forces_print(register const u_char * pptr, register u_int len)
 	rc = forces_type_print(pptr, fhdr, mlen, tops);
 	if (rc < 0) {
 error:
-		hex_print_with_offset("\n\t[", pptr, len, 0);
+		hex_print_with_offset(gndo,"\n\t[", pptr, len, 0);
 		printf("\n\t]");
 		return;
 	}
 
 	if (vflag >= 4) {
 		printf("\n\t  Raw ForCES message\n\t [");
-		hex_print_with_offset("\n\t ", pptr, len, 0);
+		hex_print_with_offset(gndo,"\n\t ", pptr, len, 0);
 		printf("\n\t ]");
 	}
 	printf("\n");
@@ -1755,3 +1755,9 @@ error:
 trunc:
 	printf("%s", tstr);
 }
+/*
+ * Local Variables:
+ * c-style: whitesmith
+ * c-basic-offset: 8
+ * End:
+ */

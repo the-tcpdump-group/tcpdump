@@ -459,7 +459,7 @@ handle_ctrl_proto(u_int proto, const u_char *pptr, int length)
         printf("\n\tencoded length %u (=Option(s) length %u)",len,len-4);
 
         if (vflag>1)
-            print_unknown_data(pptr-2,"\n\t",6);
+            print_unknown_data(gndo,pptr-2,"\n\t",6);
 
 
 	switch (code) {
@@ -533,7 +533,7 @@ handle_ctrl_proto(u_int proto, const u_char *pptr, int length)
 		/* XXX: need to decode Rejected-Information? - hexdump for now */
                 if (len > 6) {
                         printf("\n\t  Rejected Packet");
-                        print_unknown_data(tptr+2,"\n\t    ",len-2);
+                        print_unknown_data(gndo,tptr+2,"\n\t    ",len-2);
                 }
 		break;
 	case CPCODES_ECHO_REQ:
@@ -547,7 +547,7 @@ handle_ctrl_proto(u_int proto, const u_char *pptr, int length)
                 if (len > 8) {
                         printf("\n\t  -----trailing data-----");
                         TCHECK2(tptr[4], len-8);
-                        print_unknown_data(tptr+4,"\n\t  ",len-8);
+                        print_unknown_data(gndo,tptr+4,"\n\t  ",len-8);
                 }
 		break;
 	case CPCODES_ID:
@@ -575,7 +575,7 @@ handle_ctrl_proto(u_int proto, const u_char *pptr, int length)
              * original pointer passed to the begin
              * the PPP packet */
                 if (vflag <= 1)
-                    print_unknown_data(pptr-2,"\n\t  ",length+2);
+                    print_unknown_data(gndo,pptr-2,"\n\t  ",length+2);
 		break;
 	}
 	return;
@@ -657,7 +657,7 @@ print_lcp_config_options(const u_char *p, int length)
 		    case PPP_SPAP_OLD:
                         break;
 		    default:
-                        print_unknown_data(p,"\n\t",len);
+                        print_unknown_data(gndo,p,"\n\t",len);
 		    }
 		}
 		break;
@@ -758,12 +758,12 @@ print_lcp_config_options(const u_char *p, int length)
 #endif
         default:
                 if(vflag<2)
-                        print_unknown_data(&p[2],"\n\t    ",len-2);
+                        print_unknown_data(gndo,&p[2],"\n\t    ",len-2);
                 break;
 	}
 
         if (vflag>1)
-                print_unknown_data(&p[2],"\n\t    ",len-2); /* exclude TLV header */
+                print_unknown_data(gndo,&p[2],"\n\t    ",len-2); /* exclude TLV header */
 
 	return len;
 
@@ -1085,11 +1085,11 @@ print_ipcp_config_options(const u_char *p, int length)
 		break;
 	default:
                 if(vflag<2)
-                        print_unknown_data(&p[2],"\n\t    ",len-2);
+                        print_unknown_data(gndo,&p[2],"\n\t    ",len-2);
 		break;
 	}
         if (vflag>1)
-                print_unknown_data(&p[2],"\n\t    ",len-2); /* exclude TLV header */
+                print_unknown_data(gndo,&p[2],"\n\t    ",len-2); /* exclude TLV header */
 	return len;
 
 invlen:
@@ -1140,11 +1140,11 @@ print_ip6cp_config_options(const u_char *p, int length)
 		break;
 	default:
                 if(vflag<2)
-                        print_unknown_data(&p[2],"\n\t    ",len-2);
+                        print_unknown_data(gndo,&p[2],"\n\t    ",len-2);
 		break;
 	}
         if (vflag>1)
-                print_unknown_data(&p[2],"\n\t    ",len-2); /* exclude TLV header */
+                print_unknown_data(gndo,&p[2],"\n\t    ",len-2); /* exclude TLV header */
 
 	return len;
 
@@ -1203,11 +1203,11 @@ print_ccp_config_options(const u_char *p, int length)
 	case CCPOPT_RESV:
 	default:
                 if(vflag<2)
-                        print_unknown_data(&p[2],"\n\t    ",len-2);
+                        print_unknown_data(gndo,&p[2],"\n\t    ",len-2);
 		break;
 	}
         if (vflag>1)
-                print_unknown_data(&p[2],"\n\t    ",len-2); /* exclude TLV header */
+                print_unknown_data(gndo,&p[2],"\n\t    ",len-2); /* exclude TLV header */
 
 	return len;
 
@@ -1249,11 +1249,11 @@ print_bacp_config_options(const u_char *p, int length)
                 break;
 	default:
                 if(vflag<2)
-                        print_unknown_data(&p[2],"\n\t    ",len-2);
+                        print_unknown_data(gndo,&p[2],"\n\t    ",len-2);
 		break;
 	}
         if (vflag>1)
-                print_unknown_data(&p[2],"\n\t    ",len-2); /* exclude TLV header */
+                print_unknown_data(gndo,&p[2],"\n\t    ",len-2); /* exclude TLV header */
 
 	return len;
 
@@ -1387,7 +1387,7 @@ handle_ppp(u_int proto, const u_char *p, int length)
 		break;
 	default:
 		printf("%s ", tok2str(ppptype2str, "unknown PPP protocol (0x%04x)", proto));
-		print_unknown_data(p,"\n\t",length);
+		print_unknown_data(gndo,p,"\n\t",length);
 		break;
 	}
 }

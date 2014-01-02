@@ -220,7 +220,7 @@ cdp_print(const u_char *pptr, u_int length, u_int caplen)
 	                }
 			break;
                     default:
-                        print_unknown_data(tptr,"\n\t  ",len);
+                        print_unknown_data(gndo,tptr,"\n\t  ",len);
 			break;
                     }
                 }

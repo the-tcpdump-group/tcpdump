@@ -263,7 +263,7 @@ mpcp_print(register const u_char *pptr, register u_int length) {
 
     default:
         /* unknown opcode - hexdump for now */
-        print_unknown_data(pptr, "\n\t", length);
+        print_unknown_data(gndo,pptr, "\n\t", length);
         break;
     }
 
@@ -272,3 +272,9 @@ mpcp_print(register const u_char *pptr, register u_int length) {
 trunc:
     printf("\n\t[|MPCP]");
 }
+/*
+ * Local Variables:
+ * c-style: whitesmith
+ * c-basic-offset: 8
+ * End:
+ */

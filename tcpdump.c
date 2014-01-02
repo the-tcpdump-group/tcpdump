@@ -1941,6 +1941,7 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
 	struct print_info *print_info;
 	u_int hdrlen;
+        netdissect_options *ndo;
 
 	++packets_captured;
 
@@ -1948,25 +1949,26 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	ts_print(&h->ts);
 
 	print_info = (struct print_info *)user;
+        ndo = print_info->ndo;
 
 	/*
 	 * Some printers want to check that they're not walking off the
 	 * end of the packet.
 	 * Rather than pass it all the way down, we set this global.
 	 */
-	snapend = sp + h->caplen;
+	ndo->ndo_snapend = sp + h->caplen;
 
         if(print_info->ndo_type) {
                 hdrlen = (*print_info->p.ndo_printer)(print_info->ndo, h, sp);
         } else {
                 hdrlen = (*print_info->p.printer)(h, sp);
         }
-                
-	if (Xflag) {
+
+	if (ndo->ndo_Xflag) {
 		/*
 		 * Print the raw packet data in hex and ASCII.
 		 */
-		if (Xflag > 1) {
+		if (ndo->ndo_Xflag > 1) {
 			/*
 			 * Include the link-layer header.
 			 */
@@ -1981,15 +1983,15 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 				hex_and_ascii_print("\n\t", sp + hdrlen,
 				    h->caplen - hdrlen);
 		}
-	} else if (xflag) {
+	} else if (ndo->ndo_xflag) {
 		/*
 		 * Print the raw packet data in hex.
 		 */
-		if (xflag > 1) {
+		if (ndo->ndo_xflag > 1) {
 			/*
 			 * Include the link-layer header.
 			 */
-			hex_print("\n\t", sp, h->caplen);
+                        hex_print(ndo, "\n\t", sp, h->caplen);
 		} else {
 			/*
 			 * Don't include the link-layer header - and if
@@ -1997,14 +1999,14 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 			 * print nothing.
 			 */
 			if (h->caplen > hdrlen)
-				hex_print("\n\t", sp + hdrlen,
-				    h->caplen - hdrlen);
+				hex_print(ndo, "\n\t", sp + hdrlen,
+                                          h->caplen - hdrlen);
 		}
-	} else if (Aflag) {
+	} else if (ndo->ndo_Aflag) {
 		/*
 		 * Print the raw packet data in ASCII.
 		 */
-		if (Aflag > 1) {
+		if (ndo->ndo_Aflag > 1) {
 			/*
 			 * Include the link-layer header.
 			 */
@@ -2186,3 +2188,9 @@ ndo_warning(netdissect_options *ndo _U_, const char *fmt, ...)
 			(void)fputc('\n', stderr);
 	}
 }
+/*
+ * Local Variables:
+ * c-style: whitesmith
+ * c-basic-offset: 8
+ * End:
+ */

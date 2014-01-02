@@ -103,8 +103,8 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
             ND_PRINT((ndo, "IP6 "));
 
 	if (IP6_VERSION(ip6) != 6) {
-		printf("version error: %u != 6", IP6_VERSION(ip6));
-		return;
+          ND_PRINT((ndo,"version error: %u != 6", IP6_VERSION(ip6)));
+          return;
 	}
 
 	payload_len = EXTRACT_16BITS(&ip6->ip6_plen);

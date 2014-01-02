@@ -669,7 +669,7 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
                         printf(", ttl %u", MPLS_TTL(raw_label));
                         break;
                     default:
-                        print_unknown_data(obj_tptr, "\n\t    ", obj_tlen);
+                        print_unknown_data(gndo,obj_tptr, "\n\t    ", obj_tlen);
                     }
                     break;
 
@@ -679,7 +679,7 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
                 */
                 case 2:
                 default:
-                    print_unknown_data(obj_tptr, "\n\t    ", obj_tlen);
+                    print_unknown_data(gndo,obj_tptr, "\n\t    ", obj_tlen);
                     break;
                 }
                 if (hlen < obj_tlen)
@@ -693,3 +693,9 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
 trunc:
 	fputs("[|icmp]", stdout);
 }
+/*
+ * Local Variables:
+ * c-style: whitesmith
+ * c-basic-offset: 8
+ * End:
+ */

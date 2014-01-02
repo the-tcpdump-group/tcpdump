@@ -730,12 +730,12 @@ pimv2_print(register const u_char *bp, register u_int len, u_int cksum)
 				break;
 			default:
                                 if (vflag <= 1)
-                                    print_unknown_data(bp,"\n\t    ",olen);
+                                    print_unknown_data(gndo,bp,"\n\t    ",olen);
                                 break;
 			}
                         /* do we want to see an additionally hexdump ? */
                         if (vflag> 1)
-                            print_unknown_data(bp,"\n\t    ",olen);
+                            print_unknown_data(gndo,bp,"\n\t    ",olen);
 			bp += olen;
 		}
 		break;
