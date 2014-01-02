@@ -3,6 +3,7 @@
 Makefile
 *~
 *.o
+libnetdissect.a
 config.h
 config.log
 config.cache
