@@ -50,7 +50,160 @@ static const char rcsid[] _U_ =
 #include "addrtoname.h"
 #include "extract.h"			/* must come after interface.h */
 
-#include "aodv.h"
+
+struct aodv_rreq {
+	u_int8_t	rreq_type;	/* AODV message type (1) */
+	u_int8_t	rreq_flags;	/* various flags */
+	u_int8_t	rreq_zero0;	/* reserved, set to zero */
+	u_int8_t	rreq_hops;	/* number of hops from originator */
+	u_int32_t	rreq_id;	/* request ID */
+	u_int32_t	rreq_da;	/* destination IPv4 address */
+	u_int32_t	rreq_ds;	/* destination sequence number */
+	u_int32_t	rreq_oa;	/* originator IPv4 address */
+	u_int32_t	rreq_os;	/* originator sequence number */
+};
+#ifdef INET6
+struct aodv_rreq6 {
+	u_int8_t	rreq_type;	/* AODV message type (1) */
+	u_int8_t	rreq_flags;	/* various flags */
+	u_int8_t	rreq_zero0;	/* reserved, set to zero */
+	u_int8_t	rreq_hops;	/* number of hops from originator */
+	u_int32_t	rreq_id;	/* request ID */
+	struct in6_addr	rreq_da;	/* destination IPv6 address */
+	u_int32_t	rreq_ds;	/* destination sequence number */
+	struct in6_addr	rreq_oa;	/* originator IPv6 address */
+	u_int32_t	rreq_os;	/* originator sequence number */
+};
+struct aodv_rreq6_draft_01 {
+	u_int8_t	rreq_type;	/* AODV message type (16) */
+	u_int8_t	rreq_flags;	/* various flags */
+	u_int8_t	rreq_zero0;	/* reserved, set to zero */
+	u_int8_t	rreq_hops;	/* number of hops from originator */
+	u_int32_t	rreq_id;	/* request ID */
+	u_int32_t	rreq_ds;	/* destination sequence number */
+	u_int32_t	rreq_os;	/* originator sequence number */
+	struct in6_addr	rreq_da;	/* destination IPv6 address */
+	struct in6_addr	rreq_oa;	/* originator IPv6 address */
+};
+#endif
+
+#define	RREQ_JOIN	0x80		/* join (reserved for multicast */
+#define	RREQ_REPAIR	0x40		/* repair (reserved for multicast */
+#define	RREQ_GRAT	0x20		/* gratuitous RREP */
+#define	RREQ_DEST	0x10		/* destination only */
+#define	RREQ_UNKNOWN	0x08		/* unknown destination sequence num */
+#define	RREQ_FLAGS_MASK	0xF8		/* mask for rreq_flags */
+
+struct aodv_rrep {
+	u_int8_t	rrep_type;	/* AODV message type (2) */
+	u_int8_t	rrep_flags;	/* various flags */
+	u_int8_t	rrep_ps;	/* prefix size */
+	u_int8_t	rrep_hops;	/* number of hops from o to d */
+	u_int32_t	rrep_da;	/* destination IPv4 address */
+	u_int32_t	rrep_ds;	/* destination sequence number */
+	u_int32_t	rrep_oa;	/* originator IPv4 address */
+	u_int32_t	rrep_life;	/* lifetime of this route */
+};
+#ifdef INET6
+struct aodv_rrep6 {
+	u_int8_t	rrep_type;	/* AODV message type (2) */
+	u_int8_t	rrep_flags;	/* various flags */
+	u_int8_t	rrep_ps;	/* prefix size */
+	u_int8_t	rrep_hops;	/* number of hops from o to d */
+	struct in6_addr	rrep_da;	/* destination IPv6 address */
+	u_int32_t	rrep_ds;	/* destination sequence number */
+	struct in6_addr	rrep_oa;	/* originator IPv6 address */
+	u_int32_t	rrep_life;	/* lifetime of this route */
+};
+struct aodv_rrep6_draft_01 {
+	u_int8_t	rrep_type;	/* AODV message type (17) */
+	u_int8_t	rrep_flags;	/* various flags */
+	u_int8_t	rrep_ps;	/* prefix size */
+	u_int8_t	rrep_hops;	/* number of hops from o to d */
+	u_int32_t	rrep_ds;	/* destination sequence number */
+	struct in6_addr	rrep_da;	/* destination IPv6 address */
+	struct in6_addr	rrep_oa;	/* originator IPv6 address */
+	u_int32_t	rrep_life;	/* lifetime of this route */
+};
+#endif
+
+#define	RREP_REPAIR		0x80	/* repair (reserved for multicast */
+#define	RREP_ACK		0x40	/* acknowledgement required */
+#define	RREP_FLAGS_MASK		0xC0	/* mask for rrep_flags */
+#define	RREP_PREFIX_MASK	0x1F	/* mask for prefix size */
+
+struct rerr_unreach {
+	u_int32_t	u_da;	/* IPv4 address */
+	u_int32_t	u_ds;	/* sequence number */
+};
+#ifdef INET6
+struct rerr_unreach6 {
+	struct in6_addr	u_da;	/* IPv6 address */
+	u_int32_t	u_ds;	/* sequence number */
+};
+struct rerr_unreach6_draft_01 {
+	struct in6_addr	u_da;	/* IPv6 address */
+	u_int32_t	u_ds;	/* sequence number */
+};
+#endif
+
+struct aodv_rerr {
+	u_int8_t	rerr_type;	/* AODV message type (3 or 18) */
+	u_int8_t	rerr_flags;	/* various flags */
+	u_int8_t	rerr_zero0;	/* reserved, set to zero */
+	u_int8_t	rerr_dc;	/* destination count */
+	union {
+		struct	rerr_unreach dest[1];
+#ifdef INET6
+		struct	rerr_unreach6 dest6[1];
+		struct	rerr_unreach6_draft_01 dest6_draft_01[1];
+#endif
+	} r;
+};
+
+#define RERR_NODELETE		0x80	/* don't delete the link */
+#define RERR_FLAGS_MASK		0x80	/* mask for rerr_flags */
+
+struct aodv_rrep_ack {
+	u_int8_t	ra_type;
+	u_int8_t	ra_zero0;
+};
+
+union aodv {
+	struct aodv_rreq rreq;
+	struct aodv_rrep rrep;
+	struct aodv_rerr rerr;
+	struct aodv_rrep_ack rrep_ack;
+#ifdef INET6
+	struct aodv_rreq6 rreq6;
+	struct aodv_rreq6_draft_01 rreq6_draft_01;
+	struct aodv_rrep6 rrep6;
+	struct aodv_rrep6_draft_01 rrep6_draft_01;
+#endif
+};
+
+#define	AODV_RREQ		1	/* route request */
+#define	AODV_RREP		2	/* route response */
+#define	AODV_RERR		3	/* error report */
+#define	AODV_RREP_ACK		4	/* route response acknowledgement */
+
+#define AODV_V6_DRAFT_01_RREQ		16	/* IPv6 route request */
+#define AODV_V6_DRAFT_01_RREP		17	/* IPv6 route response */
+#define AODV_V6_DRAFT_01_RERR		18	/* IPv6 error report */
+#define AODV_V6_DRAFT_01_RREP_ACK	19	/* IPV6 route response acknowledgment */
+
+struct aodv_ext {
+	u_int8_t	type;		/* extension type */
+	u_int8_t	length;		/* extension length */
+};
+
+struct aodv_hello {
+	struct	aodv_ext	eh;		/* extension header */
+	u_int32_t		interval;	/* expect my next hello in
+						 * (n) ms */
+};
+
+#define	AODV_EXT_HELLO	1
 
 static void
 aodv_extension(const struct aodv_ext *ep, u_int length)

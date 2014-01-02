@@ -39,8 +39,20 @@ static const char rcsid[] _U_ =
 
 #include "ip.h"
 #include "tcp.h"
-#include "slip.h"
 #include "slcompress.h"
+
+/*
+ * definitions of the pseudo- link-level header attached to slip
+ * packets grabbed by the packet filter (bpf) traffic monitor.
+ */
+#define SLIP_HDRLEN 16
+
+#define SLX_DIR 0
+#define SLX_CHDR 1
+#define CHDR_LEN 15
+
+#define SLIPDIR_IN 0
+#define SLIPDIR_OUT 1
 
 static const char tstr[] = "[|slip]";
 

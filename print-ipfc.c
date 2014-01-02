@@ -39,11 +39,17 @@ static const char rcsid[] _U_ =
 #include "ethertype.h"
 
 #include "ether.h"
-#include "ipfc.h"
 
 /*
  * RFC 2625 IP-over-Fibre Channel.
  */
+
+struct ipfc_header {
+	u_char  ipfc_dhost[8];
+	u_char  ipfc_shost[8];
+};
+
+#define IPFC_HDRLEN 16
 
 /* Extract src, dst addresses */
 static inline void

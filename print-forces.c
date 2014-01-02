@@ -121,53 +121,35 @@ static inline const char *ForCES_node(u_int32_t node)
 
 }
 
-static inline const char *ForCES_ACKp(u_int32_t flg)
-{
-	if (flg == 0x0)
-		return "NoACK";
-	if (flg == 0x1)
-		return "SuccessACK";
-	if (flg == 0x2)
-		return "FailureACK";
-	if (flg == 0x3)
-		return "AlwaysACK";
-	return "ACKUnknown";
-}
+static const struct tok ForCES_ACKs[] = {
+	{0x0, "NoACK"},
+	{0x1, "SuccessACK"},
+	{0x2, "FailureACK"},
+	{0x3, "AlwaysACK"},
+	{0, NULL}
+};
 
-static inline const char *ForCES_EMp(u_int32_t flg)
-{
-	if (flg == 0x0)
-		return "EMReserved";
-	if (flg == 0x1)
-		return "execute-all-or-none";
-	if (flg == 0x2)
-		return "execute-until-failure";
-	if (flg == 0x3)
-		return "continue-execute-on-failure";
-	return "EMUnknown";
-}
+static const struct tok ForCES_EMs[] = {
+	{0x0, "EMReserved"},
+	{0x1, "execute-all-or-none"},
+	{0x2, "execute-until-failure"},
+	{0x3, "continue-execute-on-failure"},
+	{0, NULL}
+};
 
-static inline const char *ForCES_ATp(u_int32_t flg)
-{
-	if (flg == 0x0)
-		return "Standalone";
-	if (flg == 0x1)
-		return "2PCtransaction";
-	return "ATUnknown";
-}
+static const struct tok ForCES_ATs[] = {
+	{0x0, "Standalone"},
+	{0x1, "2PCtransaction"},
+	{0, NULL}
+};
 
-static inline const char *ForCES_TPp(u_int32_t flg)
-{
-	if (flg == 0x0)
-		return "StartofTransaction";
-	if (flg == 0x1)
-		return "MiddleofTransaction";
-	if (flg == 0x2)
-		return "EndofTransaction";
-	if (flg == 0x3)
-		return "abort";
-	return "TPUnknown";
-}
+static const struct tok ForCES_TPs[] = {
+	{0x0, "StartofTransaction"},
+	{0x1, "MiddleofTransaction"},
+	{0x2, "EndofTransaction"},
+	{0x3, "abort"},
+	{0, NULL}
+};
 
 /*
  * Structure of forces header, naked of TLVs.
@@ -1727,11 +1709,15 @@ forces_print(register const u_char * pptr, register u_int len)
 	if (vflag >= 2) {
 		printf
 		    ("\n\tForCES flags:\n\t  %s(0x%x), prio=%d, %s(0x%x),\n\t  %s(0x%x), %s(0x%x)\n",
-		     ForCES_ACKp(ForCES_ACK(fhdr)), ForCES_ACK(fhdr),
+		     tok2str(ForCES_ACKs, "ACKUnknown", ForCES_ACK(fhdr)),
+		     ForCES_ACK(fhdr),
 		     ForCES_PRI(fhdr),
-		     ForCES_EMp(ForCES_EM(fhdr)), ForCES_EM(fhdr),
-		     ForCES_ATp(ForCES_AT(fhdr)), ForCES_AT(fhdr),
-		     ForCES_TPp(ForCES_TP(fhdr)), ForCES_TP(fhdr));
+		     tok2str(ForCES_EMs, "EMUnknown", ForCES_EM(fhdr)),
+		     ForCES_EM(fhdr),
+		     tok2str(ForCES_ATs, "ATUnknown", ForCES_AT(fhdr)),
+		     ForCES_AT(fhdr),
+		     tok2str(ForCES_TPs, "TPUnknown", ForCES_TP(fhdr)),
+		     ForCES_TP(fhdr));
 		printf
 		    ("\t  Extra flags: rsv(b5-7) 0x%x rsv(b13-31) 0x%x\n",
 		     ForCES_RS1(fhdr), ForCES_RS2(fhdr));

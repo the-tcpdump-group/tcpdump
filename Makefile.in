@@ -119,83 +119,48 @@ HDR = \
 	addrtoname.h \
 	af.h \
 	ah.h \
-	aodv.h \
 	appletalk.h \
-	arcnet.h \
 	atm.h \
 	atmuni31.h \
 	bootp.h \
 	bgp.h \
 	chdlc.h \
 	cpack.h \
-	dccp.h \
 	decnet.h \
 	decode_prefix.h \
-	enc.h \
-	esp.h \
 	ether.h \
 	ethertype.h \
 	extract.h \
-	fddi.h \
 	gmpls.h \
 	gmt2local.h \
-	icmp6.h \
-	ieee802_11.h \
-	ieee802_11_radio.h \
-	igrp.h \
 	interface.h \
 	interface.h \
 	ip.h \
 	ip6.h \
-	ipfc.h \
-	ipnet.h \
 	ipproto.h \
-	ipsec_doi.h \
-	ipx.h \
-	isakmp.h \
-	l2tp.h \
 	l2vpn.h \
-	lane.h \
 	llc.h \
 	machdep.h \
 	mib.h \
 	mpls.h \
-	mptcp.h \
 	nameser.h \
-	netbios.h \
 	netdissect.h \
-	nflog.h \
 	nfs.h \
 	nfsfh.h \
 	nlpid.h \
-	ntp.h \
-	oakley.h \
 	openflow.h \
 	ospf.h \
-	ospf6.h \
 	oui.h \
 	pcap-missing.h \
-	pmap_prot.h \
-	ppi.h \
 	ppp.h \
-	route6d.h \
 	rpc_auth.h \
 	rpc_msg.h \
-	rx.h \
-	sctpConstants.h \
-	sctpHeader.h \
 	setsignal.h \
 	signature.h \
 	slcompress.h \
-	slip.h \
-	sll.h \
 	smb.h \
 	tcp.h \
 	tcpdump-stdinc.h \
-	telnet.h \
-	tftp.h \
-	timed.h \
-	token.h \
 	udp.h
 
 TAGHDR = \
