@@ -20,10 +20,6 @@
  *
  * From: NetBSD: print-arcnet.c,v 1.2 2000/04/24 13:02:28 itojun Exp
  */
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-arcnet.c,v 1.20 2005-04-06 21:32:38 mcr Exp $ (LBL)";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

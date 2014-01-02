@@ -19,11 +19,6 @@
  * DCBX extensions by Kaladhar Musunuru <kaladharm@sourceforge.net>
  */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-lldp.c,v 1.10 2008-03-20 09:30:56 hannes Exp $";
-#endif
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

@@ -1,4 +1,3 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/nfs.h,v 1.9 2007-11-18 03:24:38 guy Exp $ (LBL) */
 /*	NetBSD: nfs.h,v 1.1 1996/05/23 22:49:53 fvdl Exp 	*/
 
 /*

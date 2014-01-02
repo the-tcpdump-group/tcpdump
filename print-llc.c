@@ -22,11 +22,6 @@
  *	with an awful lot of hacking by Jeffrey Mogul, DECWRL
  */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-llc.c,v 1.75 2007-04-13 09:43:11 hannes Exp $";
-#endif
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

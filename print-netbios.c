@@ -22,11 +22,6 @@
  * Contributed by Brad Parker (brad@fcr.com).
  */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-netbios.c,v 1.20 2003-11-16 09:36:29 guy Exp $";
-#endif
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

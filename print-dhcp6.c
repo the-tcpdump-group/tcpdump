@@ -40,11 +40,6 @@
  *  RFC6334: Dual-Stack Lite option,
  */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dhcp6.c,v 1.37 2008-02-06 10:26:09 guy Exp $";
-#endif
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

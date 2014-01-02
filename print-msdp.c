@@ -15,10 +15,6 @@
  * LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE.
  */
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-msdp.c,v 1.7 2005-04-06 21:32:41 mcr Exp $";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

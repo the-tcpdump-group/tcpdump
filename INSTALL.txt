@@ -1,5 +1,3 @@
-@(#) $Header: /tcpdump/master/tcpdump/INSTALL.txt,v 1.2 2008-02-06 10:47:53 guy Exp $ (LBL)
-
 If you have not built libpcap, and your system does not have libpcap
 installed, install libpcap first.  Your system might provide a version
 of libpcap that can be installed; if so, to compile tcpdump you might

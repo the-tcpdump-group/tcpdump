@@ -1,4 +1,3 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/rpc_auth.h,v 1.2 2005-04-27 21:43:48 guy Exp $ (LBL) */
 /*
  * Sun RPC is a product of Sun Microsystems, Inc. and is provided for
  * unrestricted use provided that this legend is included on all tape

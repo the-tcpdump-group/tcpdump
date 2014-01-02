@@ -41,11 +41,6 @@
 #include <config.h>
 #endif
 
-#ifndef lint
-static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/missing/getnameinfo.c,v 1.11 2003-11-16 09:36:49 guy Exp $";
-#endif
-
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <net/if.h>

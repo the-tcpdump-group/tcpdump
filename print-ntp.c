@@ -23,11 +23,6 @@
  *	loosely based on print-bootp.c
  */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ntp.c,v 1.43 2007-11-30 13:45:10 hannes Exp $ (LBL)";
-#endif
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

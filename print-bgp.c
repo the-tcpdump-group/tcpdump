@@ -34,11 +34,6 @@
 #include "config.h"
 #endif
 
-#ifndef lint
-static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-bgp.c,v 1.118 2007-12-07 15:54:52 hannes Exp $";
-#endif
-
 #include <tcpdump-stdinc.h>
 
 #include <stdio.h>

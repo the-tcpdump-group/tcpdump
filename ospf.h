@@ -1,4 +1,3 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ospf.h,v 1.23 2007-10-08 07:53:21 hannes Exp $ (LBL) */
 /*
  * Copyright (c) 1991, 1993, 1994, 1995, 1996, 1997
  *	The Regents of the University of California.  All rights reserved.

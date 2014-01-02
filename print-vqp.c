@@ -17,11 +17,6 @@
  * Original code by Carles Kishimoto <Carles.Kishimoto@bsc.es>
  */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-vqp.c,v 1.3 2006-08-19 06:51:13 guy Exp $";
-#endif
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

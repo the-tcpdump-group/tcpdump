@@ -7,11 +7,6 @@
  * BSD-style license that accompanies tcpdump or the GNU GPL version 2
  */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-dccp.c,v 1.8 2007-11-09 00:44:09 guy Exp $ (LBL)";
-#endif
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

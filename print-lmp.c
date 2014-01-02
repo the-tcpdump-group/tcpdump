@@ -17,11 +17,6 @@
  * by Manu Pathak (mapathak@cisco.com), May 2005
  */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-lmp.c,v 1.11 2007-08-02 17:32:49 hannes Exp $";
-#endif
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

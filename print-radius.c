@@ -42,11 +42,6 @@
  * TODO: Among other things to print ok MacIntosh and Vendor values
  */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "$Id: print-radius.c,v 1.28 2005-09-26 01:01:55 guy Exp $";
-#endif
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

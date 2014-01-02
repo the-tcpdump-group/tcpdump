@@ -32,11 +32,6 @@
  * Ken Hornstein <kenh@cmf.nrl.navy.mil>
  */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rx.c,v 1.42 2008-07-01 07:44:50 guy Exp $";
-#endif
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

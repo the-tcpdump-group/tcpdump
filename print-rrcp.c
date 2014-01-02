@@ -21,11 +21,6 @@
  * and Realtek Echo Protocol (RRCP-REP) packets.
  */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rrcp.c,v 1.2 2008-04-11 17:21:34 gianluca Exp $";
-#endif
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
