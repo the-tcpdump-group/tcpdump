@@ -48,6 +48,7 @@ static const char rcsid[] _U_ =
 #include <stdio.h>
 
 #include "netdissect.h"
+#include "interface.h"
 
 #define ASCII_LINELENGTH 300
 #define HEXDUMP_BYTES_PER_LINE 16

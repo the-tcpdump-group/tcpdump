@@ -36,6 +36,7 @@ static const char rcsid[] _U_ =
 #include <string.h>
 
 #include "netdissect.h"
+#include "interface.h"
 #include "addrtoname.h"
 #include "extract.h"
 
