@@ -188,12 +188,12 @@ ts_print(register const struct timeval *tvp)
 		if (b_sec == 0) {
                         /* init timestamp for first packet */
                         b_usec = tvp->tv_usec;
-                        b_sec = tvp->tv_sec;                        
+                        b_sec = tvp->tv_sec;
                 }
 
                 d_usec = tvp->tv_usec - b_usec;
                 d_sec = tvp->tv_sec - b_sec;
-                
+
                 while (d_usec < 0) {
                     d_usec += 1000000;
                     d_sec--;

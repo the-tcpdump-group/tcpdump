@@ -147,7 +147,7 @@ mpls_print(const u_char *bp, u_int length)
 		case 0x4f:
 			pt = PT_IPV4;
 			break;
-				
+
 		case 0x60:
 		case 0x61:
 		case 0x62:

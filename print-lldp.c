@@ -40,8 +40,8 @@ static const char rcsid[] _U_ =
 #include "af.h"
 #include "oui.h"
 
-#define	LLDP_EXTRACT_TYPE(x) (((x)&0xfe00)>>9) 
-#define	LLDP_EXTRACT_LEN(x) ((x)&0x01ff) 
+#define	LLDP_EXTRACT_TYPE(x) (((x)&0xfe00)>>9)
+#define	LLDP_EXTRACT_LEN(x) ((x)&0x01ff)
 
 /*
  * TLV type codes
@@ -244,7 +244,7 @@ static const struct tok lldp_tia_location_lci_catype_values[] = {
 
 static const struct tok lldp_tia_location_lci_what_values[] = {
     { 0, "location of DHCP server"},
-    { 1, "location of the network element believed to be closest to the client"}, 
+    { 1, "location of the network element believed to be closest to the client"},
     { 2, "location of the client"},
     { 0, NULL}
 };
@@ -473,7 +473,7 @@ static const struct tok lldp_tia_inventory_values[] = {
 
 /*
  * From RFC 3636 - ifMauAutoNegCapAdvertisedBits
- */ 
+ */
 #define	 LLDP_MAU_PMD_OTHER			(1 <<  15)
 #define	 LLDP_MAU_PMD_10BASE_T			(1 <<  14)
 #define	 LLDP_MAU_PMD_10BASE_T_FD		(1 <<  13)
@@ -629,7 +629,7 @@ static void print_tsa_assignment_table(const u_char *ptr)
 {
     printf("\n\t    TSA Assignment Table");
     printf("\n\t     Traffic Class: 0   1   2   3   4   5   6   7");
-    printf("\n\t     Value        : %-3d %-3d %-3d %-3d %-3d %-3d %-3d %-3d", 
+    printf("\n\t     Value        : %-3d %-3d %-3d %-3d %-3d %-3d %-3d %-3d",
              ptr[0],ptr[1],ptr[2],ptr[3],ptr[4],ptr[5],ptr[6],ptr[7]);
 }
 
@@ -703,7 +703,7 @@ lldp_private_8021_print(const u_char *tptr, u_int tlv_len)
         }
         tval=*(tptr+4);
         printf("\n\t    Pre-Priority CNPV Indicator");
-        printf("\n\t     Priority : 0  1  2  3  4  5  6  7");        
+        printf("\n\t     Priority : 0  1  2  3  4  5  6  7");
         printf("\n\t     Value    : ");
         for(i=0;i<NO_OF_BITS;i++)
             printf("%-2d ",(tval>>i)&0x01);
@@ -715,31 +715,31 @@ lldp_private_8021_print(const u_char *tptr, u_int tlv_len)
             printf("%-2d ",(tval>>i)&0x01);
         break;
 
-    case LLDP_PRIVATE_8021_SUBTYPE_ETS_CONFIGURATION: 
+    case LLDP_PRIVATE_8021_SUBTYPE_ETS_CONFIGURATION:
         if(tlv_len<LLDP_PRIVATE_8021_SUBTYPE_ETS_CONFIGURATION_LENGTH) {
             return hexdump;
         }
         tval=*(tptr+4);
         printf("\n\t    Willing:%d, CBS:%d, RES:%d, Max TCs:%d",
         	tval>>7, (tval>>6) & 0x02, (tval>>3) & 0x07, tval & 0x07);
-		
+
         /*Print Priority Assignment Table*/
         print_ets_priority_assignment_table(tptr+5);
-	
+
         /*Print TC Bandwidth Table*/
         print_tc_bandwidth_table(tptr+9);
-		
+
         /* Print TSA Assignment Table */
         print_tsa_assignment_table(tptr+17);
-		
+
         break;
 
     case LLDP_PRIVATE_8021_SUBTYPE_ETS_RECOMMENDATION:
         if(tlv_len<LLDP_PRIVATE_8021_SUBTYPE_ETS_RECOMMENDATION_LENGTH) {
         	return hexdump;
-        }       
+        }
         printf("\n\t    RES: %d",*(tptr+4));
-        /*Print Priority Assignment Table */ 
+        /*Print Priority Assignment Table */
         print_ets_priority_assignment_table(tptr+5);
         /*Print TC Bandwidth Table */
         print_tc_bandwidth_table(tptr+9);
@@ -771,7 +771,7 @@ lldp_private_8021_print(const u_char *tptr, u_int tlv_len)
         	return hexdump;
         }
         /*  Length of Application Priority Table */
-        sublen=tlv_len-5; 
+        sublen=tlv_len-5;
         if(sublen%3!=0){
         	return hexdump;
         }
@@ -818,7 +818,7 @@ lldp_private_8021_print(const u_char *tptr, u_int tlv_len)
         sublen=tlv_len-8;
         if(sublen%3!=0) {
         	return hexdump;
-        }	
+        }
         i=0;
         while(i<sublen) {
         	tval=EXTRACT_24BITS(tptr+i+8);
@@ -1016,7 +1016,7 @@ lldp_private_tia_print(const u_char *tptr, u_int tlv_len)
             lci_len = lci_len-3;
             tptr = tptr + 9;
 
-            /* Decode each civic address element */	
+            /* Decode each civic address element */
             while (lci_len > 0) {
                 if (lci_len < 2) {
                     return hexdump;
@@ -1025,7 +1025,7 @@ lldp_private_tia_print(const u_char *tptr, u_int tlv_len)
                 ca_len = *(tptr+1);
 
 		tptr += 2;
-                lci_len -= 2; 
+                lci_len -= 2;
 
                 printf("\n\t      CA type \'%s\' (%u), length %u: ",
                        tok2str(lldp_tia_location_lci_catype_values, "unknown", ca_type),
@@ -1047,7 +1047,7 @@ lldp_private_tia_print(const u_char *tptr, u_int tlv_len)
 
         case LLDP_TIA_LOCATION_DATA_FORMAT_ECS_ELIN:
             printf("\n\t    ECS ELIN id ");
-            safeputs((const char *)tptr+5, tlv_len-5);       
+            safeputs((const char *)tptr+5, tlv_len-5);
             break;
 
         default:
@@ -1273,7 +1273,7 @@ lldp_network_addr_print(const u_char *tptr, u_int len) {
     case AFNUM_INET:
         if (len < 4)
           return NULL;
-        pfunc = getname; 
+        pfunc = getname;
         break;
 #ifdef INET6
     case AFNUM_INET6:
@@ -1310,7 +1310,7 @@ lldp_mgmt_addr_tlv_print(const u_char *pptr, u_int len) {
     const u_char *tptr;
     u_int tlen;
     char *mgmt_addr;
-    
+
     tlen = len;
     tptr = pptr;
 
@@ -1362,7 +1362,7 @@ lldp_mgmt_addr_tlv_print(const u_char *pptr, u_int len) {
     }
 
     return 1;
-} 
+}
 
 void
 lldp_print(register const u_char *pptr, register u_int len) {
@@ -1372,7 +1372,7 @@ lldp_print(register const u_char *pptr, register u_int len) {
     u_int oui, tlen, hexdump, tlv_type, tlv_len;
     const u_char *tptr;
     char *network_addr;
-    
+
     tptr = pptr;
     tlen = len;
 
@@ -1558,7 +1558,7 @@ lldp_print(register const u_char *pptr, register u_int len) {
                 }
                 oui = EXTRACT_24BITS(tptr);
                 printf(": OUI %s (0x%06x)", tok2str(oui_values, "Unknown", oui), oui);
-                
+
                 switch (oui) {
                 case OUI_IEEE_8021_PRIVATE:
                     hexdump = lldp_private_8021_print(tptr, tlv_len);

@@ -57,15 +57,15 @@ symantec_hdr_print(register const u_char *bp, u_int length)
 	if (!qflag) {
 	        if (etype <= ETHERMTU)
 		          (void)printf("invalid ethertype %u", etype);
-                else 
+                else
 		          (void)printf("ethertype %s (0x%04x)",
 				       tok2str(ethertype_values,"Unknown", etype),
                                        etype);
         } else {
                 if (etype <= ETHERMTU)
                           (void)printf("invalid ethertype %u", etype);
-                else 
-                          (void)printf("%s", tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", etype));  
+                else
+                          (void)printf("%s", tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", etype));
         }
 
 	(void)printf(", length %u: ", length);
@@ -114,7 +114,7 @@ symantec_if_print(const struct pcap_pkthdr *h, const u_char *p)
 
 		if (!suppress_default_print)
 			default_print(p, caplen);
-	} 
+	}
 
 	return (sizeof (struct symantec_header));
 }

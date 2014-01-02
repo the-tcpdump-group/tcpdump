@@ -237,7 +237,7 @@ egp_print(register const u_int8_t *bp, register u_int length)
         } else
             printf("EGPv%u, length %u",
                    egp->egp_version,
-                   length);            
+                   length);
 
 	if (egp->egp_version != EGP_VERSION) {
 		printf("[version %d]", egp->egp_version);

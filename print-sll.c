@@ -67,7 +67,7 @@ sll_print(register const struct sll_header *sllp, u_int length)
 
 	if (!qflag) {
 		ether_type = EXTRACT_16BITS(&sllp->sll_protocol);
-	
+
 		if (ether_type <= ETHERMTU) {
 			/*
 			 * Not an Ethernet type; what type is it?

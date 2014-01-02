@@ -115,14 +115,14 @@ struct eigrp_tlv_general_parm_t {
     u_int8_t k5;
     u_int8_t res;
     u_int8_t holdtime[2];
-};          
+};
 
 struct eigrp_tlv_sw_version_t {
     u_int8_t ios_major;
     u_int8_t ios_minor;
     u_int8_t eigrp_major;
     u_int8_t eigrp_minor;
-}; 
+};
 
 struct eigrp_tlv_ip_int_t {
     u_int8_t nexthop[4];
@@ -135,7 +135,7 @@ struct eigrp_tlv_ip_int_t {
     u_int8_t reserved[2];
     u_int8_t plen;
     u_int8_t destination; /* variable length [1-4] bytes encoding */
-}; 
+};
 
 struct eigrp_tlv_ip_ext_t {
     u_int8_t nexthop[4];
@@ -155,7 +155,7 @@ struct eigrp_tlv_ip_ext_t {
     u_int8_t reserved2[2];
     u_int8_t plen;
     u_int8_t destination; /* variable length [1-4] bytes encoding */
-}; 
+};
 
 struct eigrp_tlv_at_cable_setup_t {
     u_int8_t cable_start[2];
@@ -174,7 +174,7 @@ struct eigrp_tlv_at_int_t {
     u_int8_t reserved[2];
     u_int8_t cable_start[2];
     u_int8_t cable_end[2];
-}; 
+};
 
 struct eigrp_tlv_at_ext_t {
     u_int8_t nexthop[4];

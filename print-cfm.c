@@ -280,7 +280,7 @@ cfm_mgmt_addr_print(register const u_char *tptr) {
 const char *
 cfm_egress_id_string(register const u_char *tptr) {
     static char egress_id_buffer[80];
-    
+
     snprintf(egress_id_buffer, sizeof(egress_id_buffer),
              "MAC 0x%4x-%s",
              EXTRACT_16BITS(tptr),
@@ -404,7 +404,7 @@ cfm_print(register const u_char *pptr, register u_int length) {
                tok2str(cfm_ma_nameformat_values, "Unknown",
                        *ma_nameformat),
                *ma_nameformat,
-               *ma_namelength);        
+               *ma_namelength);
 
         printf("\n\t  MA Name: ");
         switch (*ma_nameformat) {
@@ -482,7 +482,7 @@ cfm_print(register const u_char *pptr, register u_int length) {
 
     tptr += cfm_common_header->first_tlv_offset;
     tlen -= cfm_common_header->first_tlv_offset;
-    
+
     while (tlen > 0) {
         cfm_tlv_header = (const struct cfm_tlv_header_t *)tptr;
 
@@ -492,7 +492,7 @@ cfm_print(register const u_char *pptr, register u_int length) {
 
         if (cfm_tlv_type != CFM_TLV_END) {
             /* did we capture enough for fully decoding the object header ? */
-            TCHECK2(*tptr, sizeof(struct cfm_tlv_header_t));            
+            TCHECK2(*tptr, sizeof(struct cfm_tlv_header_t));
             cfm_tlv_len=EXTRACT_16BITS(&cfm_tlv_header->length);
         } else {
             cfm_tlv_len = 0;

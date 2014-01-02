@@ -12,7 +12,7 @@
  * LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE.
  *
- * UNIDIRECTIONAL LINK DETECTION (UDLD) as per 
+ * UNIDIRECTIONAL LINK DETECTION (UDLD) as per
  * http://www.ietf.org/internet-drafts/draft-foschiano-udld-02.txt
  *
  * Original code by Carles Kishimoto <carles.kishimoto@gmail.com>
@@ -29,7 +29,7 @@
 
 #include "interface.h"
 #include "addrtoname.h"
-#include "extract.h"		
+#include "extract.h"
 #include "nlpid.h"
 
 #define UDLD_HEADER_LEN			4
@@ -68,19 +68,19 @@ static const struct tok udld_flags_values[] = {
 
 /*
  *
- * 0                   1                   2                   3 
- * 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
- * | Ver | Opcode  |     Flags     |           Checksum            | 
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
- * |               List of TLVs (variable length list)             | 
- * |                              ...                              | 
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
+ * 0                   1                   2                   3
+ * 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * | Ver | Opcode  |     Flags     |           Checksum            |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |               List of TLVs (variable length list)             |
+ * |                              ...                              |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
  */
 
-#define	UDLD_EXTRACT_VERSION(x) (((x)&0xe0)>>5) 
-#define	UDLD_EXTRACT_OPCODE(x) ((x)&0x1f) 
+#define	UDLD_EXTRACT_VERSION(x) (((x)&0xe0)>>5)
+#define	UDLD_EXTRACT_OPCODE(x) ((x)&0x1f)
 
 void
 udld_print (const u_char *pptr, u_int length)
@@ -91,14 +91,14 @@ udld_print (const u_char *pptr, u_int length)
     if (length < UDLD_HEADER_LEN)
         goto trunc;
 
-    tptr = pptr; 
+    tptr = pptr;
 
-    if (!TTEST2(*tptr, UDLD_HEADER_LEN))	
+    if (!TTEST2(*tptr, UDLD_HEADER_LEN))
 	goto trunc;
 
     code = UDLD_EXTRACT_OPCODE(*tptr);
 
-    printf("UDLDv%u, Code %s (%x), Flags [%s] (0x%02x), length %u", 
+    printf("UDLDv%u, Code %s (%x), Flags [%s] (0x%02x), length %u",
            UDLD_EXTRACT_VERSION(*tptr),
            tok2str(udld_code_values, "Reserved", code),
            code,
@@ -119,11 +119,11 @@ udld_print (const u_char *pptr, u_int length)
 
     while (tptr < (pptr+length)) {
 
-        if (!TTEST2(*tptr, 4)) 
+        if (!TTEST2(*tptr, 4))
             goto trunc;
 
 	type = EXTRACT_16BITS(tptr);
-        len  = EXTRACT_16BITS(tptr+2); 
+        len  = EXTRACT_16BITS(tptr+2);
         len -= 4;
         tptr += 4;
 
@@ -140,11 +140,11 @@ udld_print (const u_char *pptr, u_int length)
         case UDLD_DEVICE_ID_TLV:
         case UDLD_PORT_ID_TLV:
         case UDLD_ECHO_TLV:
-        case UDLD_DEVICE_NAME_TLV: 
+        case UDLD_DEVICE_NAME_TLV:
             printf(", %s", tptr);
             break;
 
-        case UDLD_MESSAGE_INTERVAL_TLV: 
+        case UDLD_MESSAGE_INTERVAL_TLV:
         case UDLD_TIMEOUT_INTERVAL_TLV:
             printf(", %us", (*tptr));
             break;
@@ -155,7 +155,7 @@ udld_print (const u_char *pptr, u_int length)
 
         default:
             break;
-        }	
+        }
         tptr += len;
     }
 

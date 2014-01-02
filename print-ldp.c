@@ -91,8 +91,8 @@ struct ldp_msg_header {
     u_int8_t id[4];
 };
 
-#define	LDP_MASK_MSG_TYPE(x)  ((x)&0x7fff) 
-#define	LDP_MASK_U_BIT(x)     ((x)&0x8000) 
+#define	LDP_MASK_MSG_TYPE(x)  ((x)&0x7fff)
+#define	LDP_MASK_U_BIT(x)     ((x)&0x8000)
 
 #define	LDP_MSG_NOTIF                0x0001
 #define	LDP_MSG_HELLO                0x0100
@@ -126,8 +126,8 @@ static const struct tok ldp_msg_values[] = {
     { 0, NULL}
 };
 
-#define	LDP_MASK_TLV_TYPE(x)  ((x)&0x3fff) 
-#define	LDP_MASK_F_BIT(x) ((x)&0x4000) 
+#define	LDP_MASK_TLV_TYPE(x)  ((x)&0x3fff)
+#define	LDP_MASK_F_BIT(x) ((x)&0x4000)
 
 #define	LDP_TLV_FEC                  0x0100
 #define	LDP_TLV_ADDRESS_LIST         0x0101
@@ -220,8 +220,8 @@ static const struct tok ldp_fec_martini_ifparm_vccv_cv_values[] = {
 
 int ldp_msg_print(register const u_char *);
 int ldp_tlv_print(register const u_char *);
-   
-/* 
+
+/*
  * ldp tlv header
  *
  *  0                   1                   2                   3
@@ -256,7 +256,7 @@ ldp_tlv_print(register const u_char *tptr) {
     char buf[100];
     int i;
 
-    ldp_tlv_header = (const struct ldp_tlv_header *)tptr;    
+    ldp_tlv_header = (const struct ldp_tlv_header *)tptr;
     tlv_len=EXTRACT_16BITS(ldp_tlv_header->length);
     tlv_tlen=tlv_len;
     tlv_type=LDP_MASK_TLV_TYPE(EXTRACT_16BITS(ldp_tlv_header->type));
@@ -311,7 +311,7 @@ ldp_tlv_print(register const u_char *tptr) {
 		TCHECK2(*tptr, sizeof(struct in_addr));
 		printf(" %s",ipaddr_string(tptr));
 		tlv_tlen-=sizeof(struct in_addr);
-		tptr+=sizeof(struct in_addr);                
+		tptr+=sizeof(struct in_addr);
 	    }
             break;
 #ifdef INET6
@@ -320,7 +320,7 @@ ldp_tlv_print(register const u_char *tptr) {
 		TCHECK2(*tptr, sizeof(struct in6_addr));
 		printf(" %s",ip6addr_string(tptr));
 		tlv_tlen-=sizeof(struct in6_addr);
-		tptr+=sizeof(struct in6_addr);                
+		tptr+=sizeof(struct in6_addr);
 	    }
             break;
 #endif
@@ -533,7 +533,7 @@ ldp_tlv_print(register const u_char *tptr) {
         break;
     }
     return(tlv_len+4); /* Type & Length fields not included */
- 
+
 trunc:
     printf("\n\t\t packet exceeded snapshot");
     return 0;
@@ -589,7 +589,7 @@ ldp_msg_print(register const u_char *pptr) {
            EXTRACT_16BITS(&ldp_com_header->label_space),
            pdu_len);
 
-    /* bail out if non-verbose */ 
+    /* bail out if non-verbose */
     if (vflag < 1)
         return 0;
 
@@ -628,7 +628,7 @@ ldp_msg_print(register const u_char *pptr) {
         hexdump=FALSE;
 
         switch(msg_type) {
- 
+
         case LDP_MSG_NOTIF:
         case LDP_MSG_HELLO:
         case LDP_MSG_INIT:

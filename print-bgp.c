@@ -111,7 +111,7 @@ struct bgp_route_refresh {
     u_int8_t  afi[2]; /* the compiler messes this structure up               */
     u_int8_t  res;    /* when doing misaligned sequences of int8 and int16   */
     u_int8_t  safi;   /* afi should be int16 - so we have to access it using */
-};                    /* EXTRACT_16BITS(&bgp_route_refresh->afi) (sigh)      */ 
+};                    /* EXTRACT_16BITS(&bgp_route_refresh->afi) (sigh)      */
 #define BGP_ROUTE_REFRESH_SIZE          23
 
 #define bgp_attr_lenlen(flags, p) \
@@ -387,7 +387,7 @@ static const struct tok bgp_safi_values[] = {
 #define BGP_EXT_COM_OSPF_RTYPE2 0x8000  /* duplicate - keep for backwards compatability */
 
 #define BGP_EXT_COM_OSPF_RID    0x0107  /* OSPF Router ID,Format RouterID(4B):Unused(2B) */
-#define BGP_EXT_COM_OSPF_RID2   0x8001  /* duplicate - keep for backwards compatability */ 
+#define BGP_EXT_COM_OSPF_RID2   0x8001  /* duplicate - keep for backwards compatability */
 
 #define BGP_EXT_COM_L2INFO      0x800a  /* draft-kompella-ppvpn-l2vpn */
 
@@ -427,7 +427,7 @@ static const struct tok bgp_extd_comm_subtype_values[] = {
     { BGP_EXT_COM_OSPF_RTYPE2, "ospf-route-type"},
     { BGP_EXT_COM_OSPF_RID,    "ospf-router-id"},
     { BGP_EXT_COM_OSPF_RID2,   "ospf-router-id"},
-    { BGP_EXT_COM_L2INFO,      "layer2-info"}, 
+    { BGP_EXT_COM_L2INFO,      "layer2-info"},
     { BGP_EXT_COM_EIGRP_GEN , "eigrp-general-route (flag, tag)" },
     { BGP_EXT_COM_EIGRP_METRIC_AS_DELAY , "eigrp-route-metric (AS, delay)" },
     { BGP_EXT_COM_EIGRP_METRIC_REL_NH_BW , "eigrp-route-metric (reliability, nexthop, bandwidth)" },
@@ -451,12 +451,12 @@ static const struct tok bgp_extd_comm_subtype_values[] = {
 #define BGP_OSPF_RTYPE_METRIC_TYPE 0x1 /* LSB of RTYPE Options Field */
 
 static const struct tok bgp_extd_comm_ospf_rtype_values[] = {
-  { BGP_OSPF_RTYPE_RTR, "Router" },  
-  { BGP_OSPF_RTYPE_NET, "Network" },  
-  { BGP_OSPF_RTYPE_SUM, "Summary" },  
-  { BGP_OSPF_RTYPE_EXT, "External" },  
+  { BGP_OSPF_RTYPE_RTR, "Router" },
+  { BGP_OSPF_RTYPE_NET, "Network" },
+  { BGP_OSPF_RTYPE_SUM, "Summary" },
+  { BGP_OSPF_RTYPE_EXT, "External" },
   { BGP_OSPF_RTYPE_NSSA,"NSSA External" },
-  { BGP_OSPF_RTYPE_SHAM,"MPLS-VPN Sham" },  
+  { BGP_OSPF_RTYPE_SHAM,"MPLS-VPN Sham" },
   { 0, NULL },
 };
 
@@ -643,7 +643,7 @@ bgp_vpn_sg_print (const u_char *pptr, char *buf, u_int buflen) {
                  bgp_vpn_ip_print(pptr, addr_length));
         pptr += (addr_length >> 3);
     }
-    
+
     /* Group address length, encoded in bits */
     TCHECK2(pptr[0], 1);
     addr_length =  *pptr++;
@@ -799,7 +799,7 @@ decode_mdt_vpn_nlri(const u_char *pptr, char *buf, u_int buflen)
 
     const u_char *rd;
     const u_char *vpn_ip;
-    
+
     TCHECK(pptr[0]);
 
     /* if the NLRI is not predefined length, quit.*/
@@ -822,7 +822,7 @@ decode_mdt_vpn_nlri(const u_char *pptr, char *buf, u_int buflen)
 
     snprintf(buf, buflen, "RD: %s, VPN IP Address: %s, MC Group Address: %s",
 	     bgp_vpn_rd_print(rd), ipaddr_string(vpn_ip), ipaddr_string(pptr));
-       
+
     return MDT_VPN_NLRI_LEN + 1;
 
  trunc:
@@ -967,12 +967,12 @@ decode_labeled_vpn_l2(const u_char *pptr, char *buf, u_int buflen)
          *   -> Assume a 12 Byte-length NLRI is auto-discovery-only
          *      and > 17 as old format. Complain for the middle case
          */
-        if (plen==12) { 
+        if (plen==12) {
 	    /* assume AD-only with RD, BGPNH */
 	    TCHECK2(pptr[0],12);
 	    buf[0]='\0';
 	    strlen=snprintf(buf, buflen, "RD: %s, BGPNH: %s",
-			    bgp_vpn_rd_print(pptr), 
+			    bgp_vpn_rd_print(pptr),
 			    /* need something like getname() here */
 			    getname(pptr+8)
 			    );
@@ -980,7 +980,7 @@ decode_labeled_vpn_l2(const u_char *pptr, char *buf, u_int buflen)
 	    pptr+=12;
 	    tlen-=12;
 	    return plen;
-        } else if (plen>17) { 
+        } else if (plen>17) {
 	    /* assume old format */
 	    /* RD, ID, LBLKOFF, LBLBASE */
 
@@ -1035,7 +1035,7 @@ decode_labeled_vpn_l2(const u_char *pptr, char *buf, u_int buflen)
 		tlen-=(tlv_len<<3); /* the tlv-length is expressed in bits so lets shift it right */
 	    }
 	    return plen+2;
-	    
+
         } else {
 	    /* complain bitterly ? */
 	    /* fall through */
@@ -1293,7 +1293,7 @@ bgp_attr_print(u_int atype, const u_char *pptr, u_int len)
 	u_int16_t af;
 	u_int8_t safi, snpa, nhlen;
         union { /* copy buffer for bandwidth values */
-            float f; 
+            float f;
             u_int32_t i;
         } bw;
 	int advance;
@@ -1353,7 +1353,7 @@ bgp_attr_print(u_int atype, const u_char *pptr, u_int len)
                             TCHECK2(tptr[2 + i], as_size);
 			    printf("%s ",
 				as_printf(astostr, sizeof(astostr),
-				as_size == 2 ? 
+				as_size == 2 ?
 				EXTRACT_16BITS(&tptr[2 + i]) :
 				EXTRACT_32BITS(&tptr[2 + i])));
                         }
@@ -1473,7 +1473,7 @@ bgp_attr_print(u_int atype, const u_char *pptr, u_int len)
 		TCHECK2(tptr[0], 3);
 		af = EXTRACT_16BITS(tptr);
 		safi = tptr[2];
-	
+
                 printf("\n\t    AFI: %s (%u), %sSAFI: %s (%u)",
                        tok2strbuf(af_values, "Unknown AFI", af,
 				  tokbuf, sizeof(tokbuf)),
@@ -1493,7 +1493,7 @@ bgp_attr_print(u_int atype, const u_char *pptr, u_int len)
                 case (AFNUM_INET<<8 | SAFNUM_VPNMULTICAST):
                 case (AFNUM_INET<<8 | SAFNUM_VPNUNIMULTICAST):
                 case (AFNUM_INET<<8 | SAFNUM_MULTICAST_VPN):
-		case (AFNUM_INET<<8 | SAFNUM_MDT): 
+		case (AFNUM_INET<<8 | SAFNUM_MDT):
 #ifdef INET6
                 case (AFNUM_INET6<<8 | SAFNUM_UNICAST):
                 case (AFNUM_INET6<<8 | SAFNUM_MULTICAST):
@@ -1544,7 +1544,7 @@ bgp_attr_print(u_int atype, const u_char *pptr, u_int len)
                         case (AFNUM_INET<<8 | SAFNUM_LABUNICAST):
                         case (AFNUM_INET<<8 | SAFNUM_RT_ROUTING_INFO):
                         case (AFNUM_INET<<8 | SAFNUM_MULTICAST_VPN):
-                        case (AFNUM_INET<<8 | SAFNUM_MDT):  
+                        case (AFNUM_INET<<8 | SAFNUM_MDT):
 			    if (tlen < (int)sizeof(struct in_addr)) {
                                 printf("invalid len");
                                 tlen = 0;
@@ -1790,7 +1790,7 @@ bgp_attr_print(u_int atype, const u_char *pptr, u_int len)
                         else if (advance == -2)
                             goto trunc;
                         else
-                            printf("\n\t      %s", buf);         
+                            printf("\n\t      %s", buf);
                         break;
                     case (AFNUM_NSAP<<8 | SAFNUM_UNICAST):
                     case (AFNUM_NSAP<<8 | SAFNUM_MULTICAST):
@@ -1813,7 +1813,7 @@ bgp_attr_print(u_int atype, const u_char *pptr, u_int len)
                             goto trunc;
                         else
                             printf("\n\t      %s", buf);
-                        break;                                   
+                        break;
                     default:
                         TCHECK2(*tptr,tlen);
                         printf("\n\t    no AFI %u / SAFI %u decoder",af,safi);
@@ -1848,7 +1848,7 @@ bgp_attr_print(u_int atype, const u_char *pptr, u_int len)
                     printf("\n\t      End-of-Rib Marker (empty NLRI)");
 
 		tptr += 3;
-                
+
 		while (len - (tptr - pptr) > 0) {
                     switch (af<<8 | safi) {
                     case (AFNUM_INET<<8 | SAFNUM_UNICAST):
@@ -1933,7 +1933,7 @@ bgp_attr_print(u_int atype, const u_char *pptr, u_int len)
                         else if (advance == -2)
                             goto trunc;
                         else
-                            printf("\n\t      %s", buf);         
+                            printf("\n\t      %s", buf);
                         break;
                     case (AFNUM_NSAP<<8 | SAFNUM_UNICAST):
                     case (AFNUM_NSAP<<8 | SAFNUM_MULTICAST):
@@ -1956,7 +1956,7 @@ bgp_attr_print(u_int atype, const u_char *pptr, u_int len)
                             goto trunc;
                         else
                             printf("\n\t      %s", buf);
-                        break;                                   
+                        break;
 		    case (AFNUM_INET<<8 | SAFNUM_MDT):
 		      advance = decode_mdt_vpn_nlri(tptr, buf, sizeof(buf));
 		      if (advance == -1)
@@ -1980,7 +1980,7 @@ bgp_attr_print(u_int atype, const u_char *pptr, u_int len)
                         TCHECK2(*(tptr-3),tlen);
                         printf("no AFI %u / SAFI %u decoder",af,safi);
                         if (vflag <= 1)
-                            print_unknown_data(tptr-3,"\n\t    ",tlen);                                        
+                            print_unknown_data(tptr-3,"\n\t    ",tlen);
                         advance = 0;
                         tptr = pptr + len;
                         break;
@@ -2046,7 +2046,7 @@ bgp_attr_print(u_int atype, const u_char *pptr, u_int len)
                         printf("%s", getname(tptr+2));
                         break;
                     case BGP_EXT_COM_OSPF_RTYPE:
-                    case BGP_EXT_COM_OSPF_RTYPE2: 
+                    case BGP_EXT_COM_OSPF_RTYPE2:
                         printf(": area:%s, router-type:%s, metric-type:%s%s",
                                getname(tptr+2),
                                tok2strbuf(bgp_extd_comm_ospf_rtype_values,
@@ -2081,7 +2081,7 @@ bgp_attr_print(u_int atype, const u_char *pptr, u_int len)
         case BGPTYPE_PMSI_TUNNEL:
         {
                 u_int8_t tunnel_type, flags;
-            
+
                 tunnel_type = *(tptr+1);
                 flags = *tptr;
                 tlen = len;
@@ -2147,7 +2147,7 @@ bgp_attr_print(u_int atype, const u_char *pptr, u_int len)
 
                 while (len) {
                     u_int aflags, atype, alenlen, alen;
-                    
+
                     TCHECK2(tptr[0], 2);
                     if (len < 2)
                         goto trunc;
@@ -2162,14 +2162,14 @@ bgp_attr_print(u_int atype, const u_char *pptr, u_int len)
                     alen = bgp_attr_len(aflags, tptr);
                     tptr += alenlen;
                     len -= alenlen;
-                    
+
                     printf("\n\t      %s (%u), length: %u",
                            tok2strbuf(bgp_attr_values,
                                       "Unknown Attribute", atype,
                                       tokbuf, sizeof(tokbuf)),
                            atype,
                            alen);
-                    
+
                     if (aflags) {
                         printf(", Flags [%s%s%s%s",
                                aflags & 0x80 ? "O" : "",
@@ -2187,7 +2187,7 @@ bgp_attr_print(u_int atype, const u_char *pptr, u_int len)
                     len -= alen;
 		}
                 break;
-           
+
 
 	default:
 	    TCHECK2(*pptr,len);
@@ -2310,7 +2310,7 @@ bgp_open_print(const u_char *dat, int length)
 	printf("\n\t  Optional parameters, length: %u", bgpo.bgpo_optlen);
 
         /* some little sanity checking */
-        if (length < bgpo.bgpo_optlen+BGP_OPEN_SIZE) 
+        if (length < bgpo.bgpo_optlen+BGP_OPEN_SIZE)
             return;
 
 	/* ugly! */
@@ -2489,7 +2489,7 @@ bgp_update_print(const u_char *dat, int length)
 			len -= alen;
 			length -= alen;
 		}
-	} 
+	}
 
 	if (length) {
 		/*
@@ -2619,7 +2619,7 @@ bgp_route_refresh_print(const u_char *pptr, int len) {
 			  /* this stinks but the compiler pads the structure
 			   * weird */
 			  EXTRACT_16BITS(&bgp_route_refresh_header->afi),
-			  tokbuf, sizeof(tokbuf)), 
+			  tokbuf, sizeof(tokbuf)),
                EXTRACT_16BITS(&bgp_route_refresh_header->afi),
                tok2strbuf(bgp_safi_values,"Unknown",
 			  bgp_route_refresh_header->safi,
@@ -2630,7 +2630,7 @@ bgp_route_refresh_print(const u_char *pptr, int len) {
             TCHECK2(*pptr, len);
             print_unknown_data(pptr,"\n\t  ", len);
         }
-        
+
         return;
 trunc:
 	printf("[|BGP]");

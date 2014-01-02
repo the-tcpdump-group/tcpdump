@@ -192,7 +192,7 @@ atmarp_addr_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "<No address>"));
 	else {
 		ND_PRINT((ndo, "%s", linkaddr_string(ha, LINKADDR_ATM, ha_len)));
-		if (srca_len != 0) 
+		if (srca_len != 0)
 			ND_PRINT((ndo, ",%s",
 				  linkaddr_string(srca, LINKADDR_ATM, srca_len)));
 	}
@@ -240,7 +240,7 @@ atmarp_print(netdissect_options *ndo,
 
         /* print operation */
         printf("%s%s ",
-               ndo->ndo_vflag ? ", " : "", 
+               ndo->ndo_vflag ? ", " : "",
                tok2str(arpop_values, "Unknown (%u)", op));
 
 	switch (op) {
@@ -308,7 +308,7 @@ arp_print(netdissect_options *ndo,
 	pro = PRO(ap);
 	op = OP(ap);
 
-        
+
         /* if its ATM then call the ATM ARP printer
            for Frame-relay ARP most of the fields
            are similar to Ethernet so overload the Ethernet Printer
@@ -355,7 +355,7 @@ arp_print(netdissect_options *ndo,
 
         /* print operation */
         printf("%s%s ",
-               ndo->ndo_vflag ? ", " : "", 
+               ndo->ndo_vflag ? ", " : "",
                tok2str(arpop_values, "Unknown (%u)", op));
 
 	switch (op) {

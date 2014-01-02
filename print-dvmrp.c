@@ -165,7 +165,7 @@ trunc:
 	return;
 }
 
-static int 
+static int
 print_report(register const u_char *bp, register const u_char *ep,
     register u_int len)
 {

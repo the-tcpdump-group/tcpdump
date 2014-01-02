@@ -247,7 +247,7 @@ rpl_print(netdissect_options *ndo,
         } else {
                 ND_PRINT((ndo, ", (CLR)"));
         }
-                
+
         switch(basecode) {
         case ND_RPL_DIS:
                 ND_PRINT((ndo, "DODAG Information Solicitation"));
@@ -295,7 +295,7 @@ rpl_print(netdissect_options *ndo,
 trunc:
 	ND_PRINT((ndo," [|truncated]"));
 	return;
-        
+
 }
 
 
@@ -345,7 +345,7 @@ icmp6_print(netdissect_options *ndo,
                       dp->icmp6_type == ICMP6_HADISCOV_REPLY ||
                       dp->icmp6_type == ICMP6_MOBILEPREFIX_ADVERT ))
             printf(", length %u", length);
-                      
+
 	switch (dp->icmp6_type) {
 	case ICMP6_DST_UNREACH:
 		TCHECK(oip->ip6_dst);
@@ -585,7 +585,7 @@ icmp6_print(netdissect_options *ndo,
                 return;
         }
         if (!vflag)
-            printf(", length %u", length); 
+            printf(", length %u", length);
 	return;
 trunc:
 	fputs("[|icmp6]", stdout);
@@ -738,11 +738,11 @@ icmp6_opt_print(const u_char *bp, int resid)
 		case ND_OPT_RDNSS:
 			oprd = (struct nd_opt_rdnss *)op;
 			l = (op->nd_opt_len - 1) / 2;
-			printf(" lifetime %us,", 
-				EXTRACT_32BITS(&oprd->nd_opt_rdnss_lifetime)); 
+			printf(" lifetime %us,",
+				EXTRACT_32BITS(&oprd->nd_opt_rdnss_lifetime));
 			for (i = 0; i < l; i++) {
 				TCHECK(oprd->nd_opt_rdnss_addr[i]);
-				printf(" addr: %s", 
+				printf(" addr: %s",
 				    ip6addr_string(&oprd->nd_opt_rdnss_addr[i]));
 			}
 			break;

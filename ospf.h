@@ -35,7 +35,7 @@
  * +------------------------------------+
  *
  */
-                
+
 #define OSPF_OPTION_T	0x01	/* T bit: TOS support	*/
 #define OSPF_OPTION_E	0x02	/* E bit: External routes advertised	*/
 #define	OSPF_OPTION_MC	0x04	/* MC bit: Multicast capable */

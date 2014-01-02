@@ -842,7 +842,7 @@ radius_attrs_print(register const u_char *attr, u_int length)
      if (length < 2)
         goto trunc;
      TCHECK(*rad_attr);
-     
+
      if (rad_attr->type > 0 && rad_attr->type < TAM_SIZE(attr_type))
 	attr_string = attr_type[rad_attr->type].name;
      else

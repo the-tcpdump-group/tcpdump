@@ -63,7 +63,7 @@ static const struct tok mpcp_opcode_values[] = {
 };
 
 #define MPCP_GRANT_NUMBER_LEN 1
-#define	MPCP_GRANT_NUMBER_MASK 0x7 
+#define	MPCP_GRANT_NUMBER_MASK 0x7
 static const struct tok mpcp_grant_flag_values[] = {
     { 0x08, "Discovery" },
     { 0x10, "Force Grant #1" },
@@ -183,7 +183,7 @@ mpcp_print(register const u_char *pptr, register u_int length) {
         for (grant = 1; grant <= grant_numbers; grant++) {
             if (!TTEST2(*tptr, sizeof(const struct mpcp_grant_t)))
                 goto trunc;
-            mpcp.grant = (const struct mpcp_grant_t *)tptr;        
+            mpcp.grant = (const struct mpcp_grant_t *)tptr;
             printf("\n\tGrant #%u, Start-Time %u ticks, duration %u ticks",
                    grant,
                    EXTRACT_32BITS(mpcp.grant->starttime),
@@ -214,7 +214,7 @@ mpcp_print(register const u_char *pptr, register u_int length) {
             tptr++;
 
             report=1;
-            while (report_bitmap != 0) { 
+            while (report_bitmap != 0) {
                 if (report_bitmap & 1) {
                     if (!TTEST2(*tptr, MPCP_TIMESTAMP_DURATION_LEN))
                         goto trunc;
@@ -232,7 +232,7 @@ mpcp_print(register const u_char *pptr, register u_int length) {
     case MPCP_OPCODE_REG_REQ:
         if (!TTEST2(*tptr, sizeof(const struct mpcp_reg_req_t)))
             goto trunc;
-        mpcp.reg_req = (const struct mpcp_reg_req_t *)tptr;        
+        mpcp.reg_req = (const struct mpcp_reg_req_t *)tptr;
         printf("\n\tFlags [ %s ], Pending-Grants %u",
                bittok2str(mpcp_reg_req_flag_values, "Reserved", mpcp.reg_req->flags),
                mpcp.reg_req->pending_grants);
@@ -241,7 +241,7 @@ mpcp_print(register const u_char *pptr, register u_int length) {
     case MPCP_OPCODE_REG:
         if (!TTEST2(*tptr, sizeof(const struct mpcp_reg_t)))
             goto trunc;
-        mpcp.reg = (const struct mpcp_reg_t *)tptr;        
+        mpcp.reg = (const struct mpcp_reg_t *)tptr;
         printf("\n\tAssigned-Port %u, Flags [ %s ]" \
                "\n\tSync-Time %u ticks, Echoed-Pending-Grants %u",
                EXTRACT_16BITS(mpcp.reg->assigned_port),
@@ -253,7 +253,7 @@ mpcp_print(register const u_char *pptr, register u_int length) {
     case MPCP_OPCODE_REG_ACK:
         if (!TTEST2(*tptr, sizeof(const struct mpcp_reg_ack_t)))
             goto trunc;
-        mpcp.reg_ack = (const struct mpcp_reg_ack_t *)tptr;        
+        mpcp.reg_ack = (const struct mpcp_reg_ack_t *)tptr;
         printf("\n\tEchoed-Assigned-Port %u, Flags [ %s ]" \
                "\n\tEchoed-Sync-Time %u ticks",
                EXTRACT_16BITS(mpcp.reg_ack->echoed_assigned_port),

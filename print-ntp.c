@@ -101,10 +101,10 @@ ntp_print(register const u_char *cp, u_int length)
                     length);
             return;
         }
-        
+
         printf (", length %u\n\t%s",
                 length,
-                tok2str(ntp_mode_values, "Unknown mode", mode));        
+                tok2str(ntp_mode_values, "Unknown mode", mode));
 
 	leapind = bp->status & LEAPMASK;
         printf (", Leap indicator: %s (%u)",
@@ -112,7 +112,7 @@ ntp_print(register const u_char *cp, u_int length)
                 leapind);
 
 	TCHECK(bp->stratum);
-	printf(", Stratum %u (%s)", 	
+	printf(", Stratum %u (%s)",
 		bp->stratum,
 		tok2str(ntp_stratum_values, (bp->stratum >=2 && bp->stratum<=15) ? "secondary reference" : "reserved", bp->stratum));
 

@@ -17,8 +17,8 @@
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * Original code by Greg Stark <gsstark@mit.edu> 
+ *
+ * Original code by Greg Stark <gsstark@mit.edu>
  */
 
 #ifndef lint
@@ -189,7 +189,7 @@ pppoe_print(register const u_char *bp, u_int length)
 					}
 					printf("]");
 				}
-				
+
 
 			} else
 				printf(" [%s]", tok2str(pppoetag2str,

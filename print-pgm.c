@@ -142,7 +142,7 @@ typedef enum _pgm_type {
 
 #define PGM_OPT_PGMCC_DATA	0x12
 #define PGM_OPT_PGMCC_FEEDBACK	0x13
-     
+
 #define PGM_OPT_MASK		0x7f
 
 #define PGM_OPT_END		0x80    /* end of options marker */
@@ -472,7 +472,7 @@ pgm_print(register const u_char *bp, register u_int length,
 	    break;
 
 	}
-	if (pgm->pgm_options & PGM_OPT_BIT_PRESENT) {      
+	if (pgm->pgm_options & PGM_OPT_BIT_PRESENT) {
 
 	    /*
 	     * make sure there's enough for the first option header
@@ -480,7 +480,7 @@ pgm_print(register const u_char *bp, register u_int length,
 	    if (!TTEST2(*bp, PGM_MIN_OPT_LEN)) {
 		(void)printf("[|OPT]");
 		return;
-	    } 
+	    }
 
 	    /*
 	     * That option header MUST be an OPT_LENGTH option
@@ -524,7 +524,7 @@ pgm_print(register const u_char *bp, register u_int length,
 		if (!TTEST2(*bp, opt_len - 2)) {
 		    (void)printf(" [|OPT]");
 		    return;
-		} 
+		}
 
 		switch (opt_type & PGM_OPT_MASK) {
 		case PGM_OPT_LENGTH:

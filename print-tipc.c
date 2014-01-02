@@ -227,7 +227,7 @@ print_payload(netdissect_options *ndo, const struct payload_tipc_pkthdr *ap)
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
 }
-	 
+
 static void
 print_internal(netdissect_options *ndo, const struct internal_tipc_pkthdr *ap)
 {
@@ -365,7 +365,7 @@ tipc_print(netdissect_options *ndo, const u_char *bp, u_int length _U_,
 		case TIPC_USER_NAME_DISTRIBUTOR:
 		case TIPC_USER_CONN_MANAGER:
 			print_payload(ndo, (struct payload_tipc_pkthdr *)bp);
-			break;			 
+			break;
 
 		case TIPC_USER_LINK_CONFIG:
 			print_link_conf(ndo, (struct link_conf_tipc_pkthdr *)bp);

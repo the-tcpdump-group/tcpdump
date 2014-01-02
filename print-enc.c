@@ -73,7 +73,7 @@ enc_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 	length -= ENC_HDRLEN;
 	caplen -= ENC_HDRLEN;
 	p += ENC_HDRLEN;
-	
+
 	switch (hdr->af) {
 	case AF_INET:
 		ip_print(gndo, p, length);

@@ -900,7 +900,7 @@ print_smb(const u_char *buf, const u_char *maxbuf)
 	if (command == 0xFF)
 	    break;
 	TCHECK2(words[3], 2);
-	newsmboffset = EXTRACT_LE_16BITS(words + 3); 
+	newsmboffset = EXTRACT_LE_16BITS(words + 3);
 
 	fn = smbfind(command, smb_fns);
 

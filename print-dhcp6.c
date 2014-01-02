@@ -28,7 +28,7 @@
  */
 /*
  * RFC3315: DHCPv6
- * supported DHCPv6 options: 
+ * supported DHCPv6 options:
  *  RFC3319: Session Initiation Protocol (SIP) Servers options,
  *  RFC3633: IPv6 Prefix options,
  *  RFC3646: DNS Configuration options,

@@ -9,8 +9,8 @@
  * this paragraph in its entirety in the documentation or other materials
  * provided with the distribution, and (3) all advertising materials mentioning
  * features or use of this software display the following acknowledgement:
- * ``This product includes software developed by Paolo Abeni.'' 
- * The name of author may not be used to endorse or promote products derived 
+ * ``This product includes software developed by Paolo Abeni.''
+ * The name of author may not be used to endorse or promote products derived
  * from this software without specific prior written permission.
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF

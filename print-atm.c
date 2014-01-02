@@ -261,7 +261,7 @@ sig_print(const u_char *p, int caplen)
 	}
 	if (p[PROTO_POS] == Q2931) {
 		/*
-		 * protocol:Q.2931 for User to Network Interface 
+		 * protocol:Q.2931 for User to Network Interface
 		 * (UNI 3.1) signalling
 		 */
 		printf("Q.2931");
@@ -353,7 +353,7 @@ struct oam_fm_ais_rdi_t {
     u_int8_t unused[28];
 };
 
-int 
+int
 oam_print (const u_char *p, u_int length, u_int hec) {
 
     u_int32_t cell_header;
@@ -444,7 +444,7 @@ oam_print (const u_char *p, u_int length, u_int hec) {
     cksum = EXTRACT_16BITS(p + OAM_CELLTYPE_FUNCTYPE_LEN + OAM_FUNCTION_SPECIFIC_LEN)
         & OAM_CRC10_MASK;
     cksum_shouldbe = verify_crc10_cksum(0, p, OAM_PAYLOAD_LEN);
-    
+
     printf("\n\tcksum 0x%03x (%scorrect)",
            cksum,
            cksum_shouldbe == 0 ? "" : "in");

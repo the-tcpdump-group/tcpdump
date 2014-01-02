@@ -1,6 +1,6 @@
 /*     NetBSD: print-juniper.c,v 1.2 2007/07/24 11:53:45 drochner Exp        */
 
-/* 
+/*
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that: (1) source code
  * distributions retain the above copyright notice and this paragraph
@@ -87,8 +87,8 @@ enum {
     JUNIPER_EXT_TLV_IFD_MEDIATYPE = 3,
     JUNIPER_EXT_TLV_IFL_IDX = 4,
     JUNIPER_EXT_TLV_IFL_UNIT = 5,
-    JUNIPER_EXT_TLV_IFL_ENCAPS = 6, 
-    JUNIPER_EXT_TLV_TTP_IFD_MEDIATYPE = 7,  
+    JUNIPER_EXT_TLV_IFL_ENCAPS = 6,
+    JUNIPER_EXT_TLV_TTP_IFD_MEDIATYPE = 7,
     JUNIPER_EXT_TLV_TTP_IFL_ENCAPS = 8
 };
 
@@ -544,9 +544,9 @@ juniper_es_print(const struct pcap_pkthdr *h, register const u_char *p)
 
         if (eflag) {
             if (!es_type_bundle) {
-                printf("ES SA, index %u, ttl %u type %s (%u), spi %u, Tunnel %s > %s, length %u\n", 
+                printf("ES SA, index %u, ttl %u type %s (%u), spi %u, Tunnel %s > %s, length %u\n",
                        EXTRACT_16BITS(&ih->sa_index),
-                       ih->ttl, 
+                       ih->ttl,
                        tok2str(juniper_ipsec_type_values,"Unknown",ih->type),
                        ih->type,
                        EXTRACT_32BITS(&ih->spi),
@@ -554,9 +554,9 @@ juniper_es_print(const struct pcap_pkthdr *h, register const u_char *p)
                        ipaddr_string(&ih->dst_ip),
                        l2info.length);
             } else {
-                printf("ES SA, index %u, ttl %u type %s (%u), length %u\n", 
+                printf("ES SA, index %u, ttl %u type %s (%u), length %u\n",
                        EXTRACT_16BITS(&ih->sa_index),
-                       ih->ttl, 
+                       ih->ttl,
                        tok2str(juniper_ipsec_type_values,"Unknown",ih->type),
                        ih->type,
                        l2info.length);
@@ -742,7 +742,7 @@ juniper_pppoe_atm_print(const struct pcap_pkthdr *h, register const u_char *p)
                               l2info.caplen-ETHERTYPE_LEN) == 0)
             /* ether_type not known, probably it wasn't one */
             printf("unknown ethertype 0x%04x", extracted_ethertype);
-        
+
         return l2info.header_len;
 }
 #endif
@@ -817,7 +817,7 @@ juniper_mfr_print(const struct pcap_pkthdr *h, register const u_char *p)
         l2info.pictype = DLT_JUNIPER_MFR;
         if(juniper_parse_header(p, h, &l2info) == 0)
             return l2info.header_len;
-        
+
         p+=l2info.header_len;
 
         /* child-link ? */
@@ -859,7 +859,7 @@ juniper_mfr_print(const struct pcap_pkthdr *h, register const u_char *p)
         case (LLC_UI<<8 | NLPID_IP):
         case (LLC_UI<<8 | NLPID_IP6):
             /* pass IP{4,6} to the OSI layer for proper link-layer printing */
-            isoclns_print(p-1, l2info.length+1, l2info.caplen+1); 
+            isoclns_print(p-1, l2info.length+1, l2info.caplen+1);
             break;
         default:
             printf("unknown protocol 0x%04x, length %u",l2info.proto, l2info.length);
@@ -1151,11 +1151,11 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
     TCHECK2(p[0],4);
     l2info->flags = p[3];
     l2info->direction = p[3]&JUNIPER_BPF_PKT_IN;
-    
+
     if (EXTRACT_24BITS(p) != JUNIPER_MGC_NUMBER) { /* magic number found ? */
         printf("no magic-number found!");
         return 0;
-    } 
+    }
 
     if (eflag) /* print direction */
         printf("%3s ",tok2str(juniper_direction_values,"---",l2info->direction));
@@ -1177,32 +1177,32 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
         jnx_ext_len = EXTRACT_16BITS(tptr);
         jnx_header_len += 2;
         tptr +=2;
-        
+
         /* nail up the total length -
          * just in case something goes wrong
          * with TLV parsing */
         jnx_header_len += jnx_ext_len;
-        
+
         if (vflag>1)
             printf(", PCAP Extension(s) total length %u",
                    jnx_ext_len);
-        
+
         TCHECK2(tptr[0], jnx_ext_len);
         while (jnx_ext_len > JUNIPER_EXT_TLV_OVERHEAD) {
             tlv_type = *(tptr++);
             tlv_len = *(tptr++);
             tlv_value = 0;
-            
+
             /* sanity check */
             if (tlv_type == 0 || tlv_len == 0)
                 break;
-            
+
             if (vflag>1)
                 printf("\n\t  %s Extension TLV #%u, length %u, value ",
                        tok2str(jnx_ext_tlv_values,"Unknown",tlv_type),
                        tlv_type,
                        tlv_len);
-            
+
             tlv_value = juniper_read_tlv_value(tptr, tlv_type, tlv_len);
             switch (tlv_type) {
             case JUNIPER_EXT_TLV_IFD_NAME:
@@ -1236,16 +1236,16 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
                 }
                 break;
             }
-            
+
             tptr+=tlv_len;
             jnx_ext_len -= tlv_len+JUNIPER_EXT_TLV_OVERHEAD;
         }
-        
+
         if (vflag>1)
             printf("\n\t-----original packet-----\n\t");
-    } 
-    
-    if ((l2info->flags & JUNIPER_BPF_NO_L2 ) == JUNIPER_BPF_NO_L2 ) {            
+    }
+
+    if ((l2info->flags & JUNIPER_BPF_NO_L2 ) == JUNIPER_BPF_NO_L2 ) {
         if (eflag)
             printf("no-L2-hdr, ");
 
@@ -1259,7 +1259,7 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
 
         l2info->header_len=jnx_header_len+4;
         return 0; /* stop parsing the output further */
-        
+
     }
     l2info->header_len = jnx_header_len;
     p+=l2info->header_len;
@@ -1281,7 +1281,7 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
                 l2info->cookie_type = AS_COOKIE_ID;
                 l2info->cookie_len = 8;
                 break;
-            
+
             default:
                 l2info->bundle = l2info->cookie[0];
                 break;
@@ -1316,9 +1316,9 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
             }
 
             if (eflag) printf(": "); /* print demarc b/w L2/L3*/
-            
 
-            l2info->proto = EXTRACT_16BITS(p+l2info->cookie_len); 
+
+            l2info->proto = EXTRACT_16BITS(p+l2info->cookie_len);
             break;
         }
         ++lp;
@@ -1335,7 +1335,7 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
             break;
         case AS_COOKIE_ID:
             l2info->bundle = (EXTRACT_16BITS(&l2info->cookie[6])>>3)&0xfff;
-            l2info->proto = (l2info->cookie[5])&JUNIPER_LSQ_L3_PROTO_MASK;            
+            l2info->proto = (l2info->cookie[5])&JUNIPER_LSQ_L3_PROTO_MASK;
             break;
         default:
             l2info->bundle = l2info->cookie[0];
@@ -1348,7 +1348,7 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
         switch (l2info->cookie_type) {
         case LS_COOKIE_ID:
             l2info->bundle = l2info->cookie[1];
-            l2info->proto = EXTRACT_16BITS(p);        
+            l2info->proto = EXTRACT_16BITS(p);
             l2info->header_len += 2;
             l2info->length -= 2;
             l2info->caplen -= 2;
@@ -1371,7 +1371,7 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
         switch (l2info->cookie_type) {
         case LS_COOKIE_ID:
             l2info->bundle = l2info->cookie[1];
-            l2info->proto = EXTRACT_16BITS(p);        
+            l2info->proto = EXTRACT_16BITS(p);
             l2info->header_len += 2;
             l2info->length -= 2;
             l2info->caplen -= 2;
@@ -1402,7 +1402,7 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
             default:
                 break;
             }
-            
+
             if (eflag)
                 printf("control-word 0x%08x ", control_word);
         }
@@ -1437,7 +1437,7 @@ juniper_parse_header (const u_char *p, const struct pcap_pkthdr *h, struct junip
         printf("Unknown Juniper DLT_ type %u: ", l2info->pictype);
         break;
     }
-    
+
     if (eflag > 1)
         printf("hlen %u, proto 0x%04x, ",l2info->header_len,l2info->proto);
 

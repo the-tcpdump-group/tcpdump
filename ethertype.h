@@ -172,7 +172,7 @@
 #define	ETHERTYPE_LOOPBACK	0x9000
 #endif
 #ifndef	ETHERTYPE_VMAN
-#define	ETHERTYPE_VMAN	        0x9100 /* Extreme VMAN Protocol */ 
+#define	ETHERTYPE_VMAN	        0x9100 /* Extreme VMAN Protocol */
 #endif
 #ifndef	ETHERTYPE_CFM_OLD
 #define	ETHERTYPE_CFM_OLD       0xabcd /* 802.1ag depreciated */

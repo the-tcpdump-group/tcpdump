@@ -15,8 +15,8 @@
  * VLAN TRUNKING PROTOCOL (VTP)
  *
  * Reference documentation:
- *  http://www.cisco.com/en/US/tech/tk389/tk689/technologies_tech_note09186a0080094c52.shtml 
- *  http://www.cisco.com/warp/public/473/21.html 
+ *  http://www.cisco.com/en/US/tech/tk389/tk689/technologies_tech_note09186a0080094c52.shtml
+ *  http://www.cisco.com/warp/public/473/21.html
  *  http://www.cisco.com/univercd/cc/td/doc/product/lan/trsrb/frames.htm
  *
  * Original code ode by Carles Kishimoto <carles.kishimoto@gmail.com>
@@ -33,7 +33,7 @@
 
 #include "interface.h"
 #include "addrtoname.h"
-#include "extract.h"		
+#include "extract.h"
 #include "nlpid.h"
 
 #define VTP_HEADER_LEN			36
@@ -130,14 +130,14 @@ vtp_print (const u_char *pptr, u_int length)
     if (length < VTP_HEADER_LEN)
         goto trunc;
 
-    tptr = pptr; 
+    tptr = pptr;
 
-    if (!TTEST2(*tptr, VTP_HEADER_LEN))	
+    if (!TTEST2(*tptr, VTP_HEADER_LEN))
 	goto trunc;
 
     type = *(tptr+1);
     printf("VTPv%u, Message %s (0x%02x), length %u",
-	   *tptr,  
+	   *tptr,
 	   tok2str(vtp_message_type_values,"Unknown message type", type),
 	   *(tptr+1),
 	   length);
@@ -148,7 +148,7 @@ vtp_print (const u_char *pptr, u_int length)
     }
 
     /* verbose mode print all fields */
-    printf("\n\tDomain name: %s, %s: %u", 
+    printf("\n\tDomain name: %s, %s: %u",
 	   (tptr+4),
 	   tok2str(vtp_header_values,"Unknown",*(tptr+1)),
 	   *(tptr+2));
@@ -176,13 +176,13 @@ vtp_print (const u_char *pptr, u_int length)
 	 *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 	 *  |                        MD5 digest (16 bytes)                  |
 	 *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-	 *  
+	 *
 	 */
 
 	printf("\n\t  Config Rev %x, Updater %s",
 	       EXTRACT_32BITS(tptr),
 	       ipaddr_string(tptr+4));
-	tptr += 8;	
+	tptr += 8;
 	printf(", Timestamp 0x%08x 0x%08x 0x%08x",
 	       EXTRACT_32BITS(tptr),
 	       EXTRACT_32BITS(tptr + 4),
@@ -215,12 +215,12 @@ vtp_print (const u_char *pptr, u_int length)
 	 *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 	 *  |                         VLAN info field N                     |
 	 *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-	 *      
+	 *
 	 */
 
 	printf(", Config Rev %x", EXTRACT_32BITS(tptr));
 
-	/*  
+	/*
 	 *  VLAN INFORMATION
 	 *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 	 *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -264,9 +264,9 @@ vtp_print (const u_char *pptr, u_int length)
 
             while (len > 0) {
 
-                /* 
+                /*
                  * Cisco specs says 2 bytes for type + 2 bytes for length, take only 1
-                 * See: http://www.cisco.com/univercd/cc/td/doc/product/lan/trsrb/frames.htm 
+                 * See: http://www.cisco.com/univercd/cc/td/doc/product/lan/trsrb/frames.htm
                  */
                 type = *tptr;
                 tlv_len = *(tptr+1);

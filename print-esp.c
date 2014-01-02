@@ -106,7 +106,7 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 
 	/* initiator arg is any non-zero value */
 	if(initiator) initiator=1;
-				       
+
 	/* see if we can find the SA, and if so, decode it */
 	for (sa = ndo->ndo_sa_list_head; sa != NULL; sa = sa->next) {
 		if (sa->spi == 0
@@ -141,7 +141,7 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 	ndo->ndo_snapend = end;
 
 	return 1;
-	
+
 }
 USES_APPLE_RST
 
@@ -200,12 +200,12 @@ int espprint_decode_hex(netdissect_options *ndo,
 	int i;
 
 	len = strlen(hex) / 2;
-		
+
 	if (len > binbuf_len) {
 		(*ndo->ndo_warning)(ndo, "secret is too big: %d\n", len);
 		return 0;
 	}
-		
+
 	i = 0;
 	while (hex[0] != '\0' && hex[1]!='\0') {
 		binbuf[i] = hex2byte(ndo, hex);
@@ -229,14 +229,14 @@ espprint_decode_encalgo(netdissect_options *ndo,
 	const EVP_CIPHER *evp;
 	int authlen = 0;
 	char *colon, *p;
-	
+
 	colon = strchr(decode, ':');
 	if (colon == NULL) {
 		(*ndo->ndo_warning)(ndo, "failed to decode espsecret: %s\n", decode);
 		return 0;
 	}
 	*colon = '\0';
-	
+
 	if (strlen(decode) > strlen("-hmac96") &&
 	    !strcmp(decode + strlen(decode) - strlen("-hmac96"),
 		    "-hmac96")) {
@@ -258,11 +258,11 @@ espprint_decode_encalgo(netdissect_options *ndo,
 		sa->ivlen = 0;
 		return 0;
 	}
-	
+
 	sa->evp = evp;
 	sa->authlen = authlen;
 	sa->ivlen = EVP_CIPHER_iv_length(evp);
-	
+
 	colon++;
 	if (colon[0] == '0' && colon[1] == 'x') {
 		/* decode some hex! */
@@ -272,7 +272,7 @@ espprint_decode_encalgo(netdissect_options *ndo,
 		if(sa->secretlen == 0) return 0;
 	} else {
 		i = strlen(colon);
-		
+
 		if (i < sizeof(sa->secret)) {
 			memcpy(sa->secret, colon, i);
 			sa->secretlen = i;
@@ -302,7 +302,7 @@ espprint_decode_authalgo(netdissect_options *ndo,
 		return 0;
 	}
 	*colon = '\0';
-	
+
 	if(strcasecmp(colon,"sha1") == 0 ||
 	   strcasecmp(colon,"md5") == 0) {
 		sa->authlen = 12;
@@ -321,21 +321,21 @@ static void esp_print_decode_ikeline(netdissect_options *ndo, char *line,
 	int   ilen, rlen;
 	char *authkey;
 	char *enckey;
-	
+
 	init = strsep(&line, " \t");
 	icookie = strsep(&line, " \t");
 	rcookie = strsep(&line, " \t");
 	authkey = strsep(&line, " \t");
 	enckey  = strsep(&line, " \t");
-	
+
 	/* if any fields are missing */
 	if(!init || !icookie || !rcookie || !authkey || !enckey) {
 		(*ndo->ndo_warning)(ndo, "print_esp: failed to find all fields for ikev2 at %s:%u",
 				    file, lineno);
-		
+
 		return;
 	}
-	
+
 	ilen = strlen(icookie);
 	rlen = strlen(rcookie);
 
@@ -349,7 +349,7 @@ static void esp_print_decode_ikeline(netdissect_options *ndo, char *line,
 
 		(*ndo->ndo_warning)(ndo, "init=%s icookie=%s(%u) rcookie=%s(%u)",
 				    init, icookie, ilen, rcookie, rlen);
-		
+
 		return;
 	}
 
@@ -364,7 +364,7 @@ static void esp_print_decode_ikeline(netdissect_options *ndo, char *line,
 	if(!espprint_decode_encalgo(ndo, enckey, &sa1)) return;
 
 	if(!espprint_decode_authalgo(ndo, authkey, &sa1)) return;
-	
+
 	esp_print_addsa(ndo, &sa1, FALSE);
 }
 
@@ -430,27 +430,27 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 	if (spikey && strcasecmp(spikey, "ikev2") == 0) {
 		esp_print_decode_ikeline(ndo, line, file, lineno);
 		return;
-	} 
+	}
 
 	if (spikey) {
-		
+
 		char *spistr, *foo;
 		u_int32_t spino;
 		struct sockaddr_in *sin;
 #ifdef INET6
 		struct sockaddr_in6 *sin6;
 #endif
-		
+
 		spistr = strsep(&spikey, "@");
-		
+
 		spino = strtoul(spistr, &foo, 0);
 		if (spistr == foo || !spikey) {
 			(*ndo->ndo_warning)(ndo, "print_esp: failed to decode spi# %s\n", foo);
 			return;
 		}
-		
+
 		sa1.spi = spino;
-		
+
 		sin = (struct sockaddr_in *)&sa1.daddr;
 #ifdef INET6
 		sin6 = (struct sockaddr_in6 *)&sa1.daddr;
@@ -476,7 +476,7 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 		/* skip any blank spaces */
 		while (isspace((unsigned char)*decode))
 			decode++;
-		
+
 		if(!espprint_decode_encalgo(ndo, decode, &sa1)) {
 			return;
 		}
@@ -645,7 +645,7 @@ esp_print(netdissect_options *ndo,
 	 */
 	if (sa == NULL)
 		sa = ndo->ndo_sa_default;
-	
+
 	/* if not found fail */
 	if (sa == NULL)
 		goto fail;

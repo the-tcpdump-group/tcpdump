@@ -28,7 +28,7 @@
 
 #include "interface.h"
 #include "addrtoname.h"
-#include "extract.h"		
+#include "extract.h"
 #include "nlpid.h"
 
 #define DTP_HEADER_LEN			1
@@ -54,12 +54,12 @@ dtp_print (const u_char *pptr, u_int length)
     if (length < DTP_HEADER_LEN)
         goto trunc;
 
-    tptr = pptr; 
+    tptr = pptr;
 
-    if (!TTEST2(*tptr, DTP_HEADER_LEN))	
+    if (!TTEST2(*tptr, DTP_HEADER_LEN))
 	goto trunc;
 
-    printf("DTPv%u, length %u", 
+    printf("DTPv%u, length %u",
            (*tptr),
            length);
 
@@ -74,11 +74,11 @@ dtp_print (const u_char *pptr, u_int length)
 
     while (tptr < (pptr+length)) {
 
-        if (!TTEST2(*tptr, 4)) 
+        if (!TTEST2(*tptr, 4))
             goto trunc;
 
 	type = EXTRACT_16BITS(tptr);
-        len  = EXTRACT_16BITS(tptr+2); 
+        len  = EXTRACT_16BITS(tptr+2);
 
         /* infinite loop check */
         if (type == 0 || len == 0) {
@@ -94,7 +94,7 @@ dtp_print (const u_char *pptr, u_int length)
 		printf(", %s", tptr+4);
 		break;
 
-	case DTP_STATUS_TLV:            
+	case DTP_STATUS_TLV:
 	case DTP_DTP_TYPE_TLV:
                 printf(", 0x%x", *(tptr+4));
                 break;
@@ -105,7 +105,7 @@ dtp_print (const u_char *pptr, u_int length)
 
         default:
             break;
-        }	
+        }
         tptr += len;
     }
 

@@ -2261,7 +2261,7 @@ vol_reply_print(register const u_char *bp, int length, int32_t opcode)
 						printf(" <none!>");
 				}
 				break;
-				
+
 
 			default:
 				;

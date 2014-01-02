@@ -701,7 +701,7 @@ rfc1048_print(register const u_char *bp)
 
 			case TAG_CLASSLESS_STATIC_RT:
 			case TAG_CLASSLESS_STA_RT_MS:
-			{	
+			{
 				u_int mask_width, significant_octets, i;
 
 				/* this option should be at least 5 bytes long */

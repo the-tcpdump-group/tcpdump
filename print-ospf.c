@@ -208,7 +208,7 @@ ospf_print_grace_lsa (const u_int8_t *tptr, u_int ls_length) {
         tlv_length = EXTRACT_16BITS(tptr+2);
         tptr+=4;
         ls_length-=4;
-                    
+
         printf("\n\t    %s TLV (%u), length %u, value: ",
                tok2str(lsa_opaque_grace_tlv_values,"unknown",tlv_type),
                tlv_type,
@@ -280,7 +280,7 @@ ospf_print_te_lsa (const u_int8_t *tptr, u_int ls_length) {
     u_int tlv_type, tlv_length, subtlv_type, subtlv_length;
     u_int priority_level, te_class, count_srlg;
     union { /* int to float conversion buffer for several subTLVs */
-        float f; 
+        float f;
         u_int32_t i;
     } bw;
 
@@ -294,7 +294,7 @@ ospf_print_te_lsa (const u_int8_t *tptr, u_int ls_length) {
         tlv_length = EXTRACT_16BITS(tptr+2);
         tptr+=4;
         ls_length-=4;
-                    
+
         printf("\n\t    %s TLV (%u), length: %u",
                tok2str(lsa_opaque_te_tlv_values,"unknown",tlv_type),
                tlv_type,
@@ -324,12 +324,12 @@ ospf_print_te_lsa (const u_int8_t *tptr, u_int ls_length) {
                 subtlv_length = EXTRACT_16BITS(tptr+2);
                 tptr+=4;
                 tlv_length-=4;
-                            
+
                 printf("\n\t      %s subTLV (%u), length: %u",
                        tok2str(lsa_opaque_te_link_tlv_subtlv_values,"unknown",subtlv_type),
                        subtlv_type,
                        subtlv_length);
-                            
+
                 TCHECK2(*tptr, subtlv_length);
                 switch(subtlv_type) {
                 case LS_OPAQUE_TE_LINK_SUBTLV_ADMIN_GROUP:
@@ -424,13 +424,13 @@ ospf_print_te_lsa (const u_int8_t *tptr, u_int ls_length) {
                 /* in OSPF everything has to be 32-bit aligned, including subTLVs */
                 if (subtlv_length%4 != 0)
                     subtlv_length+=4-(subtlv_length%4);
-                            
+
                 tlv_length-=subtlv_length;
                 tptr+=subtlv_length;
-                            
+
             }
             break;
-                        
+
         case LS_OPAQUE_TE_TLV_ROUTER:
             if (tlv_length < 4) {
                 printf("\n\t    TLV length %u < 4", tlv_length);
@@ -439,7 +439,7 @@ ospf_print_te_lsa (const u_int8_t *tptr, u_int ls_length) {
             TCHECK2(*tptr, 4);
             printf(", %s", ipaddr_string(tptr));
             break;
-                        
+
         default:
             if (vflag <= 1) {
                 if(!print_unknown_data(tptr,"\n\t      ",tlv_length))
@@ -494,7 +494,7 @@ ospf_print_lshdr(register const struct lsa_hdr *lshp)
 			   *(&lshp->un_lsa_id.opaque_field.opaque_type)),
 		   *(&lshp->un_lsa_id.opaque_field.opaque_type),
 		   EXTRACT_24BITS(&lshp->un_lsa_id.opaque_field.opaque_id)
-                   
+
                    );
             break;
 
@@ -538,7 +538,7 @@ ospf_print_tos_metrics(const union un_tos *tos)
     /*
      * All but the first metric contain a valid topology id.
      */
-    while (toscount) { 
+    while (toscount) {
         printf("\n\t\ttopology %s(%u), metric %u",
                tok2str(ospf_topology_values, "",
                        metric_count ? tos->metrics.tos_type : 0),
@@ -592,7 +592,7 @@ ospf_print_lsa(register const struct lsa *lsap)
 			case RLA_TYPE_VIRTUAL:
 				printf("\n\t      Virtual Link: Neighbor Router-ID: %s, Interface Address: %s",
 				    ipaddr_string(&rlp->link_id),
-				    ipaddr_string(&rlp->link_data)); 
+				    ipaddr_string(&rlp->link_data));
                                 break;
 
 			case RLA_TYPE_ROUTER:
@@ -739,7 +739,7 @@ ospf_print_lsa(register const struct lsa *lsap)
 		break;
 
 	case LS_TYPE_OPAQUE_LL: /* fall through */
-	case LS_TYPE_OPAQUE_AL: 
+	case LS_TYPE_OPAQUE_AL:
 	case LS_TYPE_OPAQUE_DW:
 
 	    switch (*(&lsap->ls_hdr.un_lsa_id.opaque_field.opaque_type)) {
@@ -756,7 +756,7 @@ ospf_print_lsa(register const struct lsa *lsap)
                     tlv_length = EXTRACT_16BITS(tptr+2);
                     tptr+=4;
                     ls_length-=4;
-                    
+
                     printf("\n\t    %s TLV (%u), length: %u, value: ",
                            tok2str(lsa_opaque_ri_tlv_values,"unknown",tlv_type),
                            tlv_type,
@@ -810,7 +810,7 @@ ospf_print_lsa(register const struct lsa *lsap)
                     if(!print_unknown_data((u_int8_t *)lsap->lsa_un.un_unknown,
                                            "\n\t    ", ls_length))
                         return(ls_end);
-                } 
+                }
                 break;
             }
         }
@@ -821,7 +821,7 @@ ospf_print_lsa(register const struct lsa *lsap)
                                    "\n\t    ", ls_length)) {
                 return(ls_end);
             }
-        
+
 	return (ls_end);
 trunc:
 	return (NULL);
@@ -1015,7 +1015,7 @@ ospf_decode_v2(register const struct ospfhdr *op,
                                ipaddr_string(&lsrp->un_ls_stateid.ls_stateid));
                         break;
                     }
-                    
+
                     ++lsrp;
                 }
 		break;

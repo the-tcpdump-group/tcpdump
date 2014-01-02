@@ -59,10 +59,10 @@ struct rsvp_common_header {
     u_int8_t length[2];
 };
 
-/* 
+/*
  * RFC2205 object header
  *
- * 
+ *
  *               0             1              2             3
  *        +-------------+-------------+-------------+-------------+
  *        |       Length (bytes)      |  Class-Num  |   C-Type    |
@@ -80,7 +80,7 @@ struct rsvp_object_header {
 };
 
 #define RSVP_VERSION            1
-#define	RSVP_EXTRACT_VERSION(x) (((x)&0xf0)>>4) 
+#define	RSVP_EXTRACT_VERSION(x) (((x)&0xf0)>>4)
 #define	RSVP_EXTRACT_FLAGS(x)   ((x)&0x0f)
 
 #define	RSVP_MSGTYPE_PATH       1
@@ -121,7 +121,7 @@ static const struct tok rsvp_header_flag_values[] = {
 #define	RSVP_OBJ_RSVP_HOP           3   /* rfc2205, rfc3473 */
 #define	RSVP_OBJ_INTEGRITY          4   /* rfc2747 */
 #define	RSVP_OBJ_TIME_VALUES        5   /* rfc2205 */
-#define	RSVP_OBJ_ERROR_SPEC         6 
+#define	RSVP_OBJ_ERROR_SPEC         6
 #define	RSVP_OBJ_SCOPE              7
 #define	RSVP_OBJ_STYLE              8   /* rfc2205 */
 #define	RSVP_OBJ_FLOWSPEC           9   /* rfc2215 */
@@ -442,7 +442,7 @@ static const struct tok rsvp_obj_error_code_diffserv_te_values[] = {
     { 4,                      "CT/setup priority do not form a configured TE-Class" },
     { 5,                      "CT/holding priority do not form a configured TE-Class" },
     { 6,                      "CT/setup priority and CT/holding priority do not form a configured TE-Class" },
-    { 7,                      "Inconsistency between signaled PSC and signaled CT" }, 
+    { 7,                      "Inconsistency between signaled PSC and signaled CT" },
     { 8,                      "Inconsistency between signaled PHBs and signaled CT" },
    { 0, NULL}
 };
@@ -488,7 +488,7 @@ static const struct tok rsvp_obj_generalized_uni_values[] = {
 
 static int rsvp_intserv_print(const u_char *, u_short);
 
-/* 
+/*
  * this is a dissector for all the intserv defined
  * specs as defined per rfc2215
  * it is called from various rsvp objects;
@@ -574,7 +574,7 @@ rsvp_intserv_print(const u_char *tptr, u_short obj_tlen) {
             printf("\n\t\tComposed MTU: %u bytes", EXTRACT_32BITS(tptr+4));
         break;
     case 127:
-       /* 
+       /*
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         * |   127 (e)     |    0 (f)      |             5 (g)             |
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -603,7 +603,7 @@ rsvp_intserv_print(const u_char *tptr, u_short obj_tlen) {
         break;
 
     case 130:
-       /* 
+       /*
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         * |     130 (h)   |    0 (i)      |            2 (j)              |
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -701,7 +701,7 @@ _U_
                        ((rsvp_obj_header->class_num)<<8)+rsvp_obj_ctype),
                rsvp_obj_ctype,
                rsvp_obj_len);
-    
+
         if(tlen < rsvp_obj_len) {
             printf("%sERROR: object goes past end of objects TLV", ident);
             return -1;
@@ -730,7 +730,7 @@ _U_
                        *(obj_tptr+5),
                        EXTRACT_16BITS(obj_tptr+6));
                 obj_tlen-=8;
-                obj_tptr+=8;                
+                obj_tptr+=8;
                 break;
 #ifdef INET6
             case RSVP_CTYPE_IPV6:
@@ -745,7 +745,7 @@ _U_
                        *(obj_tptr+sizeof(struct in6_addr)+1),
                        EXTRACT_16BITS(obj_tptr+sizeof(struct in6_addr)+2));
                 obj_tlen-=20;
-                obj_tptr+=20;                
+                obj_tptr+=20;
                 break;
 
             case RSVP_CTYPE_TUNNEL_IPV6:
@@ -757,7 +757,7 @@ _U_
                        EXTRACT_16BITS(obj_tptr+18),
                        ip6addr_string(obj_tptr+20));
                 obj_tlen-=36;
-                obj_tptr+=36;                
+                obj_tptr+=36;
                 break;
 
             case RSVP_CTYPE_14: /* IPv6 p2mp LSP Tunnel */
@@ -769,7 +769,7 @@ _U_
                        EXTRACT_16BITS(obj_tptr+6),
                        ip6addr_string(obj_tptr+8));
                 obj_tlen-=26;
-                obj_tptr+=26;                
+                obj_tptr+=26;
                 break;
 #endif
             case RSVP_CTYPE_13: /* IPv4 p2mp LSP Tunnel */
@@ -781,7 +781,7 @@ _U_
                        EXTRACT_16BITS(obj_tptr+6),
                        ipaddr_string(obj_tptr+8));
                 obj_tlen-=12;
-                obj_tptr+=12;                
+                obj_tptr+=12;
                 break;
             case RSVP_CTYPE_TUNNEL_IPV4:
             case RSVP_CTYPE_UNI_IPV4:
@@ -793,7 +793,7 @@ _U_
                        EXTRACT_16BITS(obj_tptr+6),
                        ipaddr_string(obj_tptr+8));
                 obj_tlen-=12;
-                obj_tptr+=12;                
+                obj_tptr+=12;
                 break;
             default:
                 hexdump=TRUE;
@@ -809,7 +809,7 @@ _U_
                        ident,
                        ipaddr_string(obj_tptr));
                 obj_tlen-=sizeof(struct in_addr);
-                obj_tptr+=sizeof(struct in_addr);                
+                obj_tptr+=sizeof(struct in_addr);
                 break;
 #ifdef INET6
             case RSVP_CTYPE_IPV6:
@@ -819,7 +819,7 @@ _U_
                        ident,
                        ip6addr_string(obj_tptr));
                 obj_tlen-=sizeof(struct in6_addr);
-                obj_tptr+=sizeof(struct in6_addr);                
+                obj_tptr+=sizeof(struct in6_addr);
                 break;
 #endif
             default:
@@ -836,7 +836,7 @@ _U_
                        ident,
                        ipaddr_string(obj_tptr));
                 obj_tlen-=sizeof(struct in_addr);
-                obj_tptr+=sizeof(struct in_addr);                
+                obj_tptr+=sizeof(struct in_addr);
                 break;
 #ifdef INET6
             case RSVP_CTYPE_IPV6:
@@ -846,7 +846,7 @@ _U_
                        ident,
                        ip6addr_string(obj_tptr));
                 obj_tlen-=sizeof(struct in6_addr);
-                obj_tptr+=sizeof(struct in6_addr);                
+                obj_tptr+=sizeof(struct in6_addr);
                 break;
 #endif
             default:
@@ -1065,7 +1065,7 @@ _U_
                            tok2str(rsvp_obj_xro_values,
                                    "Unknown %u",
                                    RSVP_OBJ_XRO_MASK_SUBOBJ(*obj_tptr)),
-                           *(obj_tptr+1));                
+                           *(obj_tptr+1));
 
                     if (*(obj_tptr+1) == 0) { /* prevent infinite loops */
                         printf("%s  ERROR: zero length ERO subtype",ident);
@@ -1169,7 +1169,7 @@ _U_
             switch(rsvp_obj_ctype) {
 		int subobj_type,af,subobj_len,total_subobj_len;
 
-            case RSVP_CTYPE_1: 
+            case RSVP_CTYPE_1:
 
                 if (obj_tlen < 4)
                     return-1;
@@ -1338,7 +1338,7 @@ _U_
                            *(obj_tptr),
                            (*(obj_tptr+1)&0x80) ? "" : "not",
                            intserv_serv_tlen);
-                    
+
                     obj_tptr+=4; /* get to the start of the parameter list */
                     obj_tlen-=4;
 
@@ -1458,7 +1458,7 @@ _U_
                        (int)obj_ptr.rsvp_obj_frr->setup_prio,
                        (int)obj_ptr.rsvp_obj_frr->hold_prio,
                        (int)obj_ptr.rsvp_obj_frr->hop_limit,
-                        bw.f*8/1000000);              
+                        bw.f*8/1000000);
                 printf("%s  Include-any: 0x%08x, Exclude-any: 0x%08x, Include-all: 0x%08x",
                        ident,
                        EXTRACT_32BITS(obj_ptr.rsvp_obj_frr->include_any),
@@ -1476,7 +1476,7 @@ _U_
                        (int)obj_ptr.rsvp_obj_frr->setup_prio,
                        (int)obj_ptr.rsvp_obj_frr->hold_prio,
                        (int)obj_ptr.rsvp_obj_frr->hop_limit,
-                        bw.f*8/1000000);              
+                        bw.f*8/1000000);
                 printf("%s  Include Colors: 0x%08x, Exclude Colors: 0x%08x",
                        ident,
                        EXTRACT_32BITS(obj_ptr.rsvp_obj_frr->include_any),
@@ -1497,7 +1497,7 @@ _U_
                     printf("%s  PLR-ID: %s, Avoid-Node-ID: %s",
                            ident,
                            ipaddr_string(obj_tptr),
-                           ipaddr_string(obj_tptr+4));              
+                           ipaddr_string(obj_tptr+4));
                     obj_tlen-=8;
                     obj_tptr+=8;
                 }
@@ -1513,7 +1513,7 @@ _U_
             case RSVP_CTYPE_1:
                 printf("%s  CT: %u",
                        ident,
-                       EXTRACT_32BITS(obj_tptr)&0x7);              
+                       EXTRACT_32BITS(obj_tptr)&0x7);
                 obj_tlen-=4;
                 obj_tptr+=4;
                 break;
@@ -1687,11 +1687,11 @@ _U_
             default:
                 hexdump=TRUE;
             }
-            break;           
+            break;
 
         case RSVP_OBJ_ADMIN_STATUS:
             switch(rsvp_obj_ctype) {
-            case RSVP_CTYPE_1: 
+            case RSVP_CTYPE_1:
                 if (obj_tlen < 4)
                     return-1;
                 printf("%s  Flags [%s]", ident,
@@ -1707,7 +1707,7 @@ _U_
 
         case RSVP_OBJ_LABEL_SET:
             switch(rsvp_obj_ctype) {
-            case RSVP_CTYPE_1: 
+            case RSVP_CTYPE_1:
                 if (obj_tlen < 4)
                     return-1;
                 action = (EXTRACT_16BITS(obj_tptr)>>8);
@@ -1750,7 +1750,7 @@ _U_
 
         case RSVP_OBJ_S2L:
             switch (rsvp_obj_ctype) {
-            case RSVP_CTYPE_IPV4: 
+            case RSVP_CTYPE_IPV4:
                 if (obj_tlen < 4)
                     return-1;
                 printf("%s  Sub-LSP destination address: %s",
@@ -1760,7 +1760,7 @@ _U_
                 obj_tptr+=4;
                 break;
 #ifdef INET6
-            case RSVP_CTYPE_IPV6: 
+            case RSVP_CTYPE_IPV6:
                 if (obj_tlen < 16)
                     return-1;
                 printf("%s  Sub-LSP destination address: %s",
@@ -1878,7 +1878,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
                 return;
             }
             subtlen=EXTRACT_16BITS(rsvp_com_header->length);
-            
+
             printf("\n\t  RSVPv%u %s Message (%u), Flags: [%s], length: %u, ttl: %u, checksum: 0x%04x",
                    RSVP_EXTRACT_VERSION(rsvp_com_header->version_flags),
                    tok2str(rsvp_msg_type_values, "unknown, type: %u",rsvp_com_header->msg_type),
@@ -1893,7 +1893,7 @@ rsvp_print(register const u_char *pptr, register u_int len) {
              */
             rsvp_com_header->checksum[0] = 0;
             rsvp_com_header->checksum[1] = 0;
-            
+
             if (subtlen < sizeof(const struct rsvp_common_header)) {
                 printf("ERROR: common header too short %u < %lu", subtlen,
                        (unsigned long)sizeof(const struct rsvp_common_header));
@@ -1933,8 +1933,8 @@ rsvp_print(register const u_char *pptr, register u_int len) {
             return;
         break;
 
-    default: 
-        print_unknown_data(tptr,"\n\t    ",tlen);  
+    default:
+        print_unknown_data(tptr,"\n\t    ",tlen);
         break;
     }
 

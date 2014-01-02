@@ -68,9 +68,9 @@ struct lspping_common_header {
     u_int8_t version[2];
     u_int8_t reserved[2];
     u_int8_t msg_type;
-    u_int8_t reply_mode;   
-    u_int8_t return_code;   
-    u_int8_t return_subcode;   
+    u_int8_t reply_mode;
+    u_int8_t return_code;
+    u_int8_t return_subcode;
     u_int8_t sender_handle[4];
     u_int8_t seq_number[4];
     u_int8_t ts_sent_sec[4];
@@ -112,7 +112,7 @@ static const struct tok lspping_return_code_values[] = {
 };
 
 
-/* 
+/*
  * LSPPING TLV header
  *  0                   1                   2                   3
  *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -475,7 +475,7 @@ lspping_print(register const u_char *pptr, register u_int len) {
     int tlen,lspping_tlv_len,lspping_tlv_type,tlv_tlen;
     int tlv_hexdump,subtlv_hexdump;
     int lspping_subtlv_len,lspping_subtlv_type;
-    struct timeval timestamp; 
+    struct timeval timestamp;
 
     union {
         const struct lspping_tlv_downstream_map_ipv4_t *lspping_tlv_downstream_map_ipv4;
@@ -544,26 +544,26 @@ lspping_print(register const u_char *pptr, register u_int len) {
         lspping_com_header->return_code == 12 )
         printf("\n\t  Return Code: %s %u (%u)\n\t  Return Subcode: (%u)",
                tok2str(lspping_return_code_values, "unknown",lspping_com_header->return_code),
-               lspping_com_header->return_subcode,    
+               lspping_com_header->return_subcode,
                lspping_com_header->return_code,
                lspping_com_header->return_subcode);
     else
         printf("\n\t  Return Code: %s (%u)\n\t  Return Subcode: (%u)",
-               tok2str(lspping_return_code_values, "unknown",lspping_com_header->return_code),   
+               tok2str(lspping_return_code_values, "unknown",lspping_com_header->return_code),
                lspping_com_header->return_code,
                lspping_com_header->return_subcode);
- 
+
     printf("\n\t  Sender Handle: 0x%08x, Sequence: %u",
            EXTRACT_32BITS(lspping_com_header->sender_handle),
            EXTRACT_32BITS(lspping_com_header->seq_number));
 
     timestamp.tv_sec=EXTRACT_32BITS(lspping_com_header->ts_sent_sec);
-    timestamp.tv_usec=EXTRACT_32BITS(lspping_com_header->ts_sent_usec);     
+    timestamp.tv_usec=EXTRACT_32BITS(lspping_com_header->ts_sent_usec);
     printf("\n\t  Sender Timestamp: ");
     ts_print(&timestamp);
 
     timestamp.tv_sec=EXTRACT_32BITS(lspping_com_header->ts_rcvd_sec);
-    timestamp.tv_usec=EXTRACT_32BITS(lspping_com_header->ts_rcvd_usec); 
+    timestamp.tv_usec=EXTRACT_32BITS(lspping_com_header->ts_rcvd_usec);
     printf("Receiver Timestamp: ");
     if ((timestamp.tv_sec != 0) && (timestamp.tv_usec != 0))
         ts_print(&timestamp);
@@ -620,7 +620,7 @@ lspping_print(register const u_char *pptr, register u_int len) {
                 lspping_subtlv_type=EXTRACT_16BITS(lspping_subtlv_header->type);
                 lspping_subtlv_len=EXTRACT_16BITS(lspping_subtlv_header->length);
                 subtlv_tptr=tlv_tptr+sizeof(struct lspping_tlv_header);
-                
+
                 if (lspping_subtlv_len == 0)
                     break;
 
@@ -729,7 +729,7 @@ lspping_print(register const u_char *pptr, register u_int len) {
                                    "unknown",
                                    EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->encapsulation)),
                            EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->encapsulation));
-                    
+
                     break;
 
                     /* the old L2VPN VCID subTLV does not have support for the sender field */
@@ -744,7 +744,7 @@ lspping_print(register const u_char *pptr, register u_int len) {
                                    "unknown",
                                    EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid_old->encapsulation)),
                            EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid_old->encapsulation));
-                    
+
                     break;
 
                 case LSPPING_TLV_TARGETFEC_SUBTLV_L2VPN_VCID:
@@ -759,7 +759,7 @@ lspping_print(register const u_char *pptr, register u_int len) {
                                    "unknown",
                                    EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid->encapsulation)),
                            EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_vcid->encapsulation));
-                    
+
                     break;
 
                 default:
@@ -829,7 +829,7 @@ lspping_print(register const u_char *pptr, register u_int len) {
 
             tlv_ptr.lspping_tlv_downstream_map_info= \
                 (const struct lspping_tlv_downstream_map_info_t *)tlv_tptr;
-            
+
             /* FIXME add hash-key type, depth limit, multipath processing */
 
 
@@ -870,7 +870,7 @@ lspping_print(register const u_char *pptr, register u_int len) {
         case LSPPING_TLV_PAD:
         case LSPPING_TLV_ERROR_CODE:
         case LSPPING_TLV_VENDOR_PRIVATE:
-    
+
         default:
             if (vflag <= 1)
                 print_unknown_data(tlv_tptr,"\n\t    ",tlv_tlen);

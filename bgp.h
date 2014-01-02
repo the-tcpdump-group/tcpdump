@@ -1,5 +1,5 @@
 /* @(#) $Header: /tcpdump/master/tcpdump/bgp.h,v 1.3 2004-06-16 08:45:15 hannes Exp $ (LBL) */
-/* 
+/*
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that: (1) source code
  * distributions retain the above copyright notice and this paragraph

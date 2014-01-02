@@ -1056,7 +1056,7 @@ pdata_print(register const u_char * pptr, register u_int len,
 	if (more_pd > 0) {
 		int consumed = len - more_pd;
 		pptr += consumed;
-		len = more_pd; 
+		len = more_pd;
 		/* XXX: Argh, recurse some more */
 		return recpdoptlv_print(pptr, len, op_msk, indent+1);
 	} else

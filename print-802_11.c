@@ -2134,7 +2134,7 @@ print_radiotap_field(struct cpack_state *s, u_int32_t bit, u_int8_t *flags,
 					 * the guard interval, so we can look
 					 * up the rate.
 					 */
-					htrate = 
+					htrate =
 						ieee80211_float_htrates \
 							[u3.u8] \
 							[((u2.u8 & IEEE80211_RADIOTAP_MCS_BANDWIDTH_MASK) == IEEE80211_RADIOTAP_MCS_BANDWIDTH_40 ? 1 : 0)] \

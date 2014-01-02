@@ -12,7 +12,7 @@
  * LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE.
  *
- * support for the Cisco prop. VQP Protocol 
+ * support for the Cisco prop. VQP Protocol
  *
  * Original code by Carles Kishimoto <Carles.Kishimoto@bsc.es>
  */
@@ -106,7 +106,7 @@ static const struct tok vqp_obj_values[] = {
 };
 
 void
-vqp_print(register const u_char *pptr, register u_int len) 
+vqp_print(register const u_char *pptr, register u_int len)
 {
     const struct vqp_common_header_t *vqp_common_header;
     const struct vqp_obj_tlv_t *vqp_obj_tlv;
@@ -141,7 +141,7 @@ vqp_print(register const u_char *pptr, register u_int len)
                len);
         return;
     }
-    
+
     /* ok they seem to want to know everything - lets fully decode it */
     nitems = vqp_common_header->nitems;
     printf("\n\tVQPv%u, %s Message, error-code %s (%u), seq 0x%08x, items %u, length %u",
@@ -175,7 +175,7 @@ vqp_print(register const u_char *pptr, register u_int len)
         }
 
         /* did we capture enough for fully decoding the object ? */
-        if (!TTEST2(*tptr, vqp_obj_len)) 
+        if (!TTEST2(*tptr, vqp_obj_len))
             goto trunc;
 
         switch(vqp_obj_type) {

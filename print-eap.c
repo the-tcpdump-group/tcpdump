@@ -113,7 +113,7 @@ static const struct tok eap_type_values[] = {
     { EAP_TYPE_EXPANDED_TYPES,  "Expanded types" },
     { EAP_TYPE_EXPERIMENTAL,    "Experimental" },
     { 0, NULL}
-};  
+};
 
 #define EAP_TLS_EXTRACT_BIT_L(x) 	(((x)&0x80)>>7)
 
@@ -167,7 +167,7 @@ eap_print(netdissect_options *ndo _U_,
     const u_char *tptr;
     u_int tlen, type, subtype;
     int count=0, len;
-    
+
     tptr = cp;
     tlen = length;
     eap = (const struct eap_frame_t *)cp;
@@ -182,8 +182,8 @@ eap_print(netdissect_options *ndo _U_,
                EXTRACT_16BITS(eap->length));
 	return;
     }
-  
-    printf("%s (%u) v%u, len %u", 
+
+    printf("%s (%u) v%u, len %u",
            tok2str(eap_frame_type_values, "unknown", eap->type),
            eap->type,
            eap->version,
@@ -202,7 +202,7 @@ eap_print(netdissect_options *ndo _U_,
                *(tptr+1),
                len);
 
-        if (!TTEST2(*tptr, len)) 
+        if (!TTEST2(*tptr, len))
             goto trunc;
 
         if (type <= 2) { /* For EAP_REQUEST and EAP_RESPONSE only */
@@ -211,7 +211,7 @@ eap_print(netdissect_options *ndo _U_,
                    tok2str(eap_type_values, "unknown", *(tptr+4)),
                    *(tptr+4));
 
-            switch (subtype) {	
+            switch (subtype) {
             case EAP_TYPE_IDENTITY:
                 if (len - 5 > 0) {
                     printf(", Identity: ");
@@ -234,8 +234,8 @@ eap_print(netdissect_options *ndo _U_,
                  * the desired authentication
                  * type one octet per type
                  */
-                while (count < len) {	
-                    printf(" %s (%u),", 
+                while (count < len) {
+                    printf(" %s (%u),",
                            tok2str(eap_type_values, "unknown", *(tptr+count)),
                            *(tptr+count));
                     count++;
@@ -243,10 +243,10 @@ eap_print(netdissect_options *ndo _U_,
                 break;
 
             case EAP_TYPE_TTLS:
-                printf(" TTLSv%u", 
+                printf(" TTLSv%u",
                        EAP_TTLS_VERSION(*(tptr+5))); /* fall through */
             case EAP_TYPE_TLS:
-                printf(" flags [%s] 0x%02x,", 
+                printf(" flags [%s] 0x%02x,",
                        bittok2str(eap_tls_flags_values, "none", *(tptr+5)),
                        *(tptr+5));
 
@@ -278,7 +278,7 @@ eap_print(netdissect_options *ndo _U_,
                 /* FIXME - TLV attributes follow */
                 break;
 
-            case EAP_TYPE_MD5_CHALLENGE:	
+            case EAP_TYPE_MD5_CHALLENGE:
             case EAP_TYPE_OTP:
             case EAP_TYPE_GTC:
             case EAP_TYPE_EXPANDED_TYPES:
@@ -287,7 +287,7 @@ eap_print(netdissect_options *ndo _U_,
                 break;
             }
         }
-        break;	
+        break;
 
     case EAP_FRAME_TYPE_LOGOFF:
     case EAP_FRAME_TYPE_ENCAP_ASF_ALERT:

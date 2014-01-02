@@ -37,7 +37,7 @@
  *    |R|R|R|R|I|R|R|R|            Reserved                           |
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *    |                VXLAN Network Identifier (VNI) |   Reserved    |
- *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
+ *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 
 void
@@ -45,7 +45,7 @@ vxlan_print(const u_char *bp, u_int len)
 {
     u_int8_t flags;
     u_int32_t vni;
-    
+
     if (len < 8) {
         printf("[|VXLAN]");
         return;

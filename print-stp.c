@@ -28,7 +28,7 @@ static const char rcsid[] _U_ =
 #include "addrtoname.h"
 #include "extract.h"
 
-#define	RSTP_EXTRACT_PORT_ROLE(x) (((x)&0x0C)>>2) 
+#define	RSTP_EXTRACT_PORT_ROLE(x) (((x)&0x0C)>>2)
 /* STP timers are expressed in multiples of 1/256th second */
 #define STP_TIME_BASE 256
 #define STP_BPDU_MSTP_MIN_LEN 102
@@ -144,7 +144,7 @@ stp_print_config_bpdu(const struct stp_bpdu_ *stp_bpdu, u_int length)
  * MSTP BPDU
  *
  * 2 -  bytes Protocol Id
- * 1 -  byte  Protocol Ver. 
+ * 1 -  byte  Protocol Ver.
  * 1 -  byte  BPDU tye
  * 1 -  byte  Flags
  * 8 -  bytes CIST Root Identifier
@@ -171,11 +171,11 @@ stp_print_config_bpdu(const struct stp_bpdu_ *stp_bpdu, u_int length)
  * Ref. IEEE 802.1aq. Section 14
  *
  * 2 -  bytes Version 4 length
- * 1 -  byte  Aux Config Identifier  
+ * 1 -  byte  Aux Config Identifier
  * 32 - bytes Aux Config Name
  * 2 -  bytes Aux Revision level
  * 16 - bytes Aux Config Digest [MD5]
- * 1 -  byte  (1 - 2) Agreement Number 
+ * 1 -  byte  (1 - 2) Agreement Number
  *            (3 - 4) Discarded Agreement Number
  *            (5) Agreement Valid Flag
  *            (6) Restricted Role Flag
@@ -283,8 +283,8 @@ stp_print_mstp_bpdu(const struct stp_bpdu_ *stp_bpdu, u_int length)
 	          EXTRACT_32BITS(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 8),
 	          EXTRACT_32BITS(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 12));
 
-    printf ("CIST int-root-pathcost %u, ", 
-            EXTRACT_32BITS(ptr + MST_BPDU_CIST_INT_PATH_COST_OFFSET));  
+    printf ("CIST int-root-pathcost %u, ",
+            EXTRACT_32BITS(ptr + MST_BPDU_CIST_INT_PATH_COST_OFFSET));
 
     printf("\n\tCIST bridge-id %s, ",
            stp_print_bridge_id(ptr + MST_BPDU_CIST_BRIDGE_ID_OFFSET));
@@ -301,7 +301,7 @@ stp_print_mstp_bpdu(const struct stp_bpdu_ *stp_bpdu, u_int length)
                                   MST_BPDU_MSTI_ROOT_PRIO_OFFSET);
             msti = msti & 0x0FFF;
 
-            printf("\n\tMSTI %d, Flags [%s], port-role %s", 
+            printf("\n\tMSTI %d, Flags [%s], port-role %s",
                    msti, bittok2str(stp_bpdu_flag_values, "none", ptr[offset]),
                    tok2str(rstp_obj_port_role_values, "Unknown",
                            RSTP_EXTRACT_PORT_ROLE(ptr[offset])));
@@ -342,12 +342,12 @@ stp_print_spb_bpdu(const struct stp_bpdu_ *stp_bpdu, u_int offset)
             EXTRACT_32BITS(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET + 4),
             EXTRACT_32BITS(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET + 8),
             EXTRACT_32BITS(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET + 12));
-     
+
     printf("\n\tAgreement num %d, Discarded Agreement num %d, Agreement valid-"
             "flag %d, \n\tRestricted role-flag: %d, Format id %d cap %d, "
             "Convention id %d cap %d, \n\tEdge count %d, "
             "Agreement digest %08x%08x%08x%08x%08x\n",
-            ptr[offset + SPB_BPDU_AGREEMENT_OFFSET]>>6, 
+            ptr[offset + SPB_BPDU_AGREEMENT_OFFSET]>>6,
             ptr[offset + SPB_BPDU_AGREEMENT_OFFSET]>>4 & 0x3,
             ptr[offset + SPB_BPDU_AGREEMENT_OFFSET]>>3 & 0x1,
             ptr[offset + SPB_BPDU_AGREEMENT_OFFSET]>>2 & 0x1,
@@ -372,13 +372,13 @@ stp_print(const u_char *p, u_int length)
     const struct stp_bpdu_ *stp_bpdu;
     u_int                  mstp_len;
     u_int                  spb_len;
-    
+
     stp_bpdu = (struct stp_bpdu_*)p;
 
     /* Minimum STP Frame size. */
     if (length < 4)
         goto trunc;
-        
+
     if (EXTRACT_16BITS(&stp_bpdu->protocol_id)) {
         printf("unknown STP version, length %u", length);
         return;

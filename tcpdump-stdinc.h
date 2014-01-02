@@ -189,7 +189,7 @@ typedef char* caddr_t;
   #define FOPEN_WRITE_BIN  FOPEN_WRITE_TXT
 #endif
 
-#if defined(__GNUC__) && defined(__i386__) && !defined(__APPLE__) && !defined(__ntohl) 
+#if defined(__GNUC__) && defined(__i386__) && !defined(__APPLE__) && !defined(__ntohl)
   #undef ntohl
   #undef ntohs
   #undef htonl

@@ -659,7 +659,7 @@ tcp_print(register const u_char *bp, register u_int length,
         if ((flags & TH_RST) && vflag) {
                 print_tcp_rst_data(bp, length);
                 return;
-        } 
+        }
 
         if (packettype) {
                 switch (packettype) {

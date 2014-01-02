@@ -75,7 +75,7 @@ static const struct tok llc_cmd_values[] = {
 	{ 0,		NULL }
 };
 
-static const struct tok llc_flag_values[] = { 
+static const struct tok llc_flag_values[] = {
         { 0, "Command" },
         { LLC_GSAP, "Response" },
         { LLC_U_POLL, "Poll" },
@@ -86,14 +86,14 @@ static const struct tok llc_flag_values[] = {
 };
 
 
-static const struct tok llc_ig_flag_values[] = { 
+static const struct tok llc_ig_flag_values[] = {
         { 0, "Individual" },
         { LLC_IG, "Group" },
 	{ 0, NULL }
 };
 
 
-static const struct tok llc_supervisory_values[] = { 
+static const struct tok llc_supervisory_values[] = {
         { 0, "Receiver Ready" },
         { 1, "Receiver not Ready" },
         { 2, "Reject" },
@@ -101,7 +101,7 @@ static const struct tok llc_supervisory_values[] = {
 };
 
 
-static const struct tok cisco_values[] = { 
+static const struct tok cisco_values[] = {
 	{ PID_CISCO_CDP, "CDP" },
 	{ PID_CISCO_VTP, "VTP" },
 	{ PID_CISCO_DTP, "DTP" },
@@ -111,7 +111,7 @@ static const struct tok cisco_values[] = {
 	{ 0,             NULL }
 };
 
-static const struct tok bridged_values[] = { 
+static const struct tok bridged_values[] = {
 	{ PID_RFC2684_ETH_FCS,     "Ethernet + FCS" },
 	{ PID_RFC2684_ETH_NOFCS,   "Ethernet w/o FCS" },
 	{ PID_RFC2684_802_4_FCS,   "802.4 + FCS" },
@@ -126,7 +126,7 @@ static const struct tok bridged_values[] = {
 	{ 0,                       NULL },
 };
 
-static const struct tok null_values[] = { 
+static const struct tok null_values[] = {
 	{ 0,             NULL }
 };
 
@@ -445,7 +445,7 @@ snap_print(const u_char *p, u_int length, u_int caplen, u_int bridge_pad)
                         cdp_print(p, length, caplen);
                         return (1);
                 case PID_CISCO_DTP:
-                        dtp_print(p, length); 
+                        dtp_print(p, length);
                         return (1);
                 case PID_CISCO_UDLD:
                         udld_print(p, length);

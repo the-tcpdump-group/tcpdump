@@ -285,7 +285,7 @@ rpki_rtr_pdu_print (const u_char *tptr, u_int indent)
 
 	    /*
 	     * Extract, trail-zero and print the Error message.
-	     */ 
+	     */
 	    text_length = 0;
 	    if (tlen > 4) {
 		text_length = EXTRACT_32BITS(tptr);
@@ -304,7 +304,7 @@ rpki_rtr_pdu_print (const u_char *tptr, u_int indent)
 
 	/*
 	 * Unknown data, please hexdump.
-	 */ 
+	 */
 	hexdump = TRUE;
     }
 

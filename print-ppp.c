@@ -439,7 +439,7 @@ handle_ctrl_proto(u_int proto, const u_char *pptr, int length)
 	TCHECK2(*tptr, 2);
 
 	code = *tptr++;
-	
+
         printf("%s (0x%02x), id %u, length %u",
                tok2str(cpcodes, "Unknown Opcode",code),
                code,
@@ -508,7 +508,7 @@ handle_ctrl_proto(u_int proto, const u_char *pptr, int length)
 
 			if (pfunc == NULL) /* catch the above null pointer if unknown CP */
 				break;
- 
+
 			if ((j = (*pfunc)(tptr, len)) == 0)
 				break;
 			x -= j;
@@ -761,7 +761,7 @@ print_lcp_config_options(const u_char *p, int length)
                         print_unknown_data(&p[2],"\n\t    ",len-2);
                 break;
 	}
-         
+
         if (vflag>1)
                 print_unknown_data(&p[2],"\n\t    ",len-2); /* exclude TLV header */
 
@@ -1041,14 +1041,14 @@ print_ipcp_config_options(const u_char *p, int length)
                         if (len > IPCPOPT_IPCOMP_MINLEN) {
                                 ipcomp_subopttotallen = len - IPCPOPT_IPCOMP_MINLEN;
                                 p += IPCPOPT_IPCOMP_MINLEN;
-                                
+
                                 printf("\n\t      Suboptions, length %u", ipcomp_subopttotallen);
 
                                 while (ipcomp_subopttotallen >= 2) {
                                         TCHECK2(*p, 2);
                                         ipcomp_subopt = *p;
                                         ipcomp_suboptlen = *(p+1);
-                                        
+
                                         /* sanity check */
                                         if (ipcomp_subopt == 0 ||
                                             ipcomp_suboptlen == 0 )
@@ -1296,7 +1296,7 @@ ppp_hdlc(const u_char *p, int length)
 
         /* now lets guess about the payload codepoint format */
         proto = *b; /* start with a one-octet codepoint guess */
-        
+
         switch (proto) {
         case PPP_IP:
 		ip_print(gndo, b+1, t - b - 1);

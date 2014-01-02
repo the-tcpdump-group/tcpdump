@@ -53,7 +53,7 @@ static const char rcsid[] _U_ =
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 
-/* 
+/*
  *  Control packet, BFDv1, draft-ietf-bfd-base-02.txt
  *
  *     0                   1                   2                   3
@@ -194,7 +194,7 @@ bfd_print(register const u_char *pptr, register u_int len, register u_int port)
                        len);
                 return;
             }
-            
+
             printf("BFDv%u, length: %u\n\t%s, Flags: [%s], Diagnostic: %s (0x%02x)",
                    version,
                    len,
@@ -202,7 +202,7 @@ bfd_print(register const u_char *pptr, register u_int len, register u_int port)
                    bittok2str(bfd_v0_flag_values, "none", bfd_header->flags),
                    tok2str(bfd_diag_values,"unknown",BFD_EXTRACT_DIAG(bfd_header->version_diag)),
                    BFD_EXTRACT_DIAG(bfd_header->version_diag));
-            
+
             printf("\n\tDetection Timer Multiplier: %u (%u ms Detection time), BFD Length: %u",
                    bfd_header->detect_time_multiplier,
                    bfd_header->detect_time_multiplier * EXTRACT_32BITS(bfd_header->desired_min_tx_interval)/1000,
@@ -228,7 +228,7 @@ bfd_print(register const u_char *pptr, register u_int len, register u_int port)
                        len);
                 return;
             }
-            
+
             printf("BFDv%u, length: %u\n\t%s, State %s, Flags: [%s], Diagnostic: %s (0x%02x)",
                    version,
                    len,
@@ -237,7 +237,7 @@ bfd_print(register const u_char *pptr, register u_int len, register u_int port)
                    bittok2str(bfd_v1_flag_values, "none", bfd_header->flags & 0x3f),
                    tok2str(bfd_diag_values,"unknown",BFD_EXTRACT_DIAG(bfd_header->version_diag)),
                    BFD_EXTRACT_DIAG(bfd_header->version_diag));
-            
+
             printf("\n\tDetection Timer Multiplier: %u (%u ms Detection time), BFD Length: %u",
                    bfd_header->detect_time_multiplier,
                    bfd_header->detect_time_multiplier * EXTRACT_32BITS(bfd_header->desired_min_tx_interval)/1000,

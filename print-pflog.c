@@ -144,7 +144,7 @@ pflog_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 	TCHECK(*hdr);
 	if (eflag)
 		pflog_print(hdr);
-	
+
 	/* skip to the real packet */
 	af = hdr->af;
 	length -= hdrlen;
@@ -175,7 +175,7 @@ pflog_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 		if (!suppress_default_print)
 			default_print(p, caplen);
 	}
-	
+
 	return (hdrlen);
 trunc:
 	printf("%s", pflog);

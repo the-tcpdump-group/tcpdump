@@ -38,9 +38,9 @@ static const char rcsid[] _U_ =
 #include "extract.h"
 #include "addrtoname.h"
 
-/* 
+/*
  * sFlow datagram
- * 
+ *
  * 0                   1                   2                   3
  * 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -58,7 +58,7 @@ static const char rcsid[] _U_ =
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * |                    num samples in datagram                    |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * 
+ *
  */
 
 struct sflow_datagram_t {
@@ -162,7 +162,7 @@ static const struct tok sflow_flow_raw_protocol_values[] = {
     { SFLOW_HEADER_PROTOCOL_IPV6, "IPv6"},
     { 0, NULL}
 };
-	
+
 struct sflow_expanded_flow_raw_t {
     u_int8_t    protocol[4];
     u_int8_t    length[4];
@@ -237,28 +237,28 @@ static const struct tok sflow_iface_direction_values[] = {
     { SFLOW_IFACE_DIRECTION_IN, "in"},
     { SFLOW_IFACE_DIRECTION_OUT, "out"},
     { 0, NULL}
-};  
+};
 
 struct sflow_generic_counter_t {
     u_int8_t    ifindex[4];
     u_int8_t    iftype[4];
     u_int8_t    ifspeed[8];
-    u_int8_t    ifdirection[4];	
+    u_int8_t    ifdirection[4];
     u_int8_t    ifstatus[4];
-    u_int8_t    ifinoctets[8];	
-    u_int8_t    ifinunicastpkts[4];	
-    u_int8_t    ifinmulticastpkts[4];	
-    u_int8_t    ifinbroadcastpkts[4];	
-    u_int8_t    ifindiscards[4];	
-    u_int8_t    ifinerrors[4];	
-    u_int8_t    ifinunkownprotos[4];	
+    u_int8_t    ifinoctets[8];
+    u_int8_t    ifinunicastpkts[4];
+    u_int8_t    ifinmulticastpkts[4];
+    u_int8_t    ifinbroadcastpkts[4];
+    u_int8_t    ifindiscards[4];
+    u_int8_t    ifinerrors[4];
+    u_int8_t    ifinunkownprotos[4];
     u_int8_t    ifoutoctets[8];
-    u_int8_t    ifoutunicastpkts[4];     
-    u_int8_t    ifoutmulticastpkts[4];   
-    u_int8_t    ifoutbroadcastpkts[4];         
-    u_int8_t    ifoutdiscards[4];             
-    u_int8_t    ifouterrors[4];        
-    u_int8_t    ifpromiscmode[4];        
+    u_int8_t    ifoutunicastpkts[4];
+    u_int8_t    ifoutmulticastpkts[4];
+    u_int8_t    ifoutbroadcastpkts[4];
+    u_int8_t    ifoutdiscards[4];
+    u_int8_t    ifouterrors[4];
+    u_int8_t    ifpromiscmode[4];
 };
 
 struct sflow_ethernet_counter_t {
@@ -282,8 +282,8 @@ struct sflow_100basevg_counter_t {
     u_int8_t    in_highpriority_octets[8];
     u_int8_t    in_normpriority_frames[4];
     u_int8_t    in_normpriority_octets[8];
-    u_int8_t    in_ipmerrors[4]; 
-    u_int8_t    in_oversized[4]; 
+    u_int8_t    in_ipmerrors[4];
+    u_int8_t    in_oversized[4];
     u_int8_t    in_data_errors[4];
     u_int8_t    in_null_addressed_frames[4];
     u_int8_t    out_highpriority_frames[4];
@@ -341,7 +341,7 @@ print_sflow_counter_generic(const u_char *pointer, u_int len) {
 	   EXTRACT_32BITS(sflow_gen_counter->ifoutmulticastpkts),
 	   EXTRACT_32BITS(sflow_gen_counter->ifoutbroadcastpkts),
 	   EXTRACT_32BITS(sflow_gen_counter->ifoutdiscards));
-    printf("\n\t      Out errors %u, promisc mode %u", 
+    printf("\n\t      Out errors %u, promisc mode %u",
 	   EXTRACT_32BITS(sflow_gen_counter->ifouterrors),
 	   EXTRACT_32BITS(sflow_gen_counter->ifpromiscmode));
 
@@ -363,12 +363,12 @@ print_sflow_counter_ethernet(const u_char *pointer, u_int len){
 	   EXTRACT_32BITS(sflow_eth_counter->single_collision_frames),
 	   EXTRACT_32BITS(sflow_eth_counter->multiple_collision_frames),
 	   EXTRACT_32BITS(sflow_eth_counter->test_errors));
-    printf("\n\t      deferred %u, late collision %u, excessive collision %u, mac trans error %u", 
+    printf("\n\t      deferred %u, late collision %u, excessive collision %u, mac trans error %u",
 	   EXTRACT_32BITS(sflow_eth_counter->deferred_transmissions),
 	   EXTRACT_32BITS(sflow_eth_counter->late_collisions),
 	   EXTRACT_32BITS(sflow_eth_counter->excessive_collisions),
 	   EXTRACT_32BITS(sflow_eth_counter->mac_transmit_errors));
-    printf("\n\t      carrier error %u, frames too long %u, mac receive errors %u, symbol errors %u",	
+    printf("\n\t      carrier error %u, frames too long %u, mac receive errors %u, symbol errors %u",
 	   EXTRACT_32BITS(sflow_eth_counter->carrier_sense_errors),
 	   EXTRACT_32BITS(sflow_eth_counter->frame_too_longs),
 	   EXTRACT_32BITS(sflow_eth_counter->mac_receive_errors),
@@ -422,7 +422,7 @@ static int
 print_sflow_counter_vlan(const u_char *pointer, u_int len) {
 
     const struct sflow_vlan_counter_t *sflow_vlan_counter;
-    
+
     if (len < sizeof(struct sflow_vlan_counter_t))
 	return 1;
 
@@ -538,7 +538,7 @@ sflow_print_counter_records(const u_char *pointer, u_int len, u_int records) {
 	tptr += counter_len;
 	tlen -= counter_len;
 	nrecords--;
-	
+
     }
 
     return 0;
@@ -564,7 +564,7 @@ sflow_print_counter_sample(const u_char *pointer, u_int len) {
     nrecords   = EXTRACT_32BITS(sflow_counter_sample->records);
     type = typesource >> 24;
     index = typesource & 0x0FFF;
-    
+
     printf(" seqnum %u, type %u, idx %u, records %u",
 	   EXTRACT_32BITS(sflow_counter_sample->seqnum),
 	   type,
@@ -596,7 +596,7 @@ sflow_print_expanded_counter_sample(const u_char *pointer, u_int len) {
 	   EXTRACT_32BITS(sflow_expanded_counter_sample->type),
 	   EXTRACT_32BITS(sflow_expanded_counter_sample->index),
 	   nrecords);
-    
+
     return sflow_print_counter_records(pointer + sizeof(struct sflow_expanded_counter_sample_t),
 				       len - sizeof(struct sflow_expanded_counter_sample_t),
 				       nrecords);
@@ -684,7 +684,7 @@ sflow_print_flow_records(const u_char *pointer, u_int len, u_int records) {
 
 	/* so, the funky encoding means we cannot blythly mask-off
 	   bits, we must also check the enterprise. */
-	
+
 	enterprise = EXTRACT_32BITS(sflow_flow_record->format);
 	flow_type = enterprise & 0x0FFF;
 	enterprise = enterprise >> 12;
@@ -802,7 +802,7 @@ sflow_print_expanded_flow_sample(const u_char *pointer, u_int len) {
 	   EXTRACT_32BITS(sflow_expanded_flow_sample->pool),
 	   EXTRACT_32BITS(sflow_expanded_flow_sample->drops),
 	   EXTRACT_32BITS(sflow_expanded_flow_sample->records));
-    
+
     return sflow_print_flow_records(pointer + sizeof(struct sflow_expanded_flow_sample_t),
 				    len - sizeof(struct sflow_expanded_flow_sample_t),
 				    nrecords);
@@ -873,7 +873,7 @@ sflow_print(const u_char *pptr, u_int len) {
 
         tptr += sizeof(struct sflow_sample_header);
         tlen -= sizeof(struct sflow_sample_header);
-  
+
         printf("\n\t%s (%u), length %u,",
                tok2str(sflow_format_values, "Unknown", sflow_sample_type),
                sflow_sample_type,

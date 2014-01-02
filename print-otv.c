@@ -46,7 +46,7 @@ otv_print(const u_char *bp, u_int len)
     u_int8_t flags;
     u_int32_t overlay_id;
     u_int32_t instance_id;
-    
+
     if (len < 8) {
         printf("[|OTV]");
         return;

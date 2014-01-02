@@ -39,7 +39,7 @@ static const char rcsid[] _U_ =
 #include "ethertype.h"
 #include "ether.h"
 
-const struct tok ethertype_values[] = { 
+const struct tok ethertype_values[] = {
     { ETHERTYPE_IP,		"IPv4" },
     { ETHERTYPE_MPLS,		"MPLS unicast" },
     { ETHERTYPE_MPLS_MULTI,	"MPLS multicast" },
@@ -84,7 +84,7 @@ const struct tok ethertype_values[] = {
     { ETHERTYPE_CFM_OLD,        "CFM (old)" },
     { ETHERTYPE_CFM,            "CFM" },
     { ETHERTYPE_LLDP,           "LLDP" },
-    { ETHERTYPE_TIPC,           "TIPC"},    	
+    { ETHERTYPE_TIPC,           "TIPC"},
     { ETHERTYPE_GEONET_OLD,     "GeoNet (old)"},
     { ETHERTYPE_GEONET,         "GeoNet"},
     { ETHERTYPE_CALM_FAST,      "CALM FAST"},
@@ -108,14 +108,14 @@ ether_hdr_print(netdissect_options *ndo,
 	if (!ndo->ndo_qflag) {
 	        if (ether_type <= ETHERMTU)
 		          (void)ND_PRINT((ndo, ", 802.3"));
-                else 
+                else
 		          (void)ND_PRINT((ndo, ", ethertype %s (0x%04x)",
 				       tok2str(ethertype_values,"Unknown", ether_type),
                                        ether_type));
         } else {
                 if (ether_type <= ETHERMTU)
                           (void)ND_PRINT((ndo, ", 802.3"));
-                else 
+                else
                           (void)ND_PRINT((ndo, ", %s", tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", ether_type)));
         }
 

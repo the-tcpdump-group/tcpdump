@@ -266,7 +266,7 @@ ospf6_print_lsa(register const struct lsa6 *lsap, const u_char *dataend)
                                        "\n\t      Neighbor Interface-ID %s, Interface %s",
                                        ipaddr_string(&rlp->link_nrtid),
                                        ipaddr_string(&rlp->link_nifid),
-                                       ipaddr_string(&rlp->link_ifid)); 
+                                       ipaddr_string(&rlp->link_ifid));
                                 break;
 
 			case RLA_TYPE_ROUTER:
@@ -274,7 +274,7 @@ ospf6_print_lsa(register const struct lsa6 *lsap, const u_char *dataend)
                                        "\n\t      Neighbor Interface-ID %s, Interface %s",
                                        ipaddr_string(&rlp->link_nrtid),
                                        ipaddr_string(&rlp->link_nifid),
-                                       ipaddr_string(&rlp->link_ifid)); 
+                                       ipaddr_string(&rlp->link_ifid));
 				break;
 
 			case RLA_TYPE_TRANSIT:

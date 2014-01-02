@@ -69,9 +69,9 @@ static const char tstr[] = "[|gre]";
 
 static const struct tok gre_flag_values[] = {
     { GRE_CP, "checksum present"},
-    { GRE_RP, "routing present"}, 
-    { GRE_KP, "key present"}, 
-    { GRE_SP, "sequence# present"}, 
+    { GRE_RP, "routing present"},
+    { GRE_KP, "key present"},
+    { GRE_SP, "sequence# present"},
     { GRE_sP, "source routing present"},
     { GRE_RECRS, "recursion count"},
     { GRE_AP, "ack present"},

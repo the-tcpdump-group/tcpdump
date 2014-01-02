@@ -36,7 +36,7 @@ static const char rcsid[] _U_ =
 #include "extract.h"
 #include "addrtoname.h"
 
-/* 
+/*
  * LWAPP transport (common) header
  *      0                   1                   2                   3
  *     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -76,9 +76,9 @@ struct lwapp_control_header {
 };
 
 #define LWAPP_VERSION 0
-#define	LWAPP_EXTRACT_VERSION(x) (((x)&0xC0)>>6) 
-#define	LWAPP_EXTRACT_RID(x) (((x)&0x38)>>3) 
-#define LWAPP_EXTRACT_CONTROL_BIT(x) (((x)&0x04)>>2) 
+#define	LWAPP_EXTRACT_VERSION(x) (((x)&0xC0)>>6)
+#define	LWAPP_EXTRACT_RID(x) (((x)&0x38)>>3)
+#define LWAPP_EXTRACT_CONTROL_BIT(x) (((x)&0x04)>>2)
 
 static const struct tok lwapp_header_bits_values[] = {
     { 0x01, "Last Fragment Bit"},
@@ -154,9 +154,9 @@ static const struct tok lwapp_msg_type_values[] = {
     { 0, NULL}
 };
 
-/* 
+/*
  * LWAPP message elements
- * 
+ *
  * 0                   1                   2                   3
  * 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -236,7 +236,7 @@ lwapp_control_print(const u_char *pptr, u_int len, int has_ap_ident) {
         lwapp_control_header = (const struct lwapp_control_header *)tptr;
 	msg_tlen = EXTRACT_16BITS(lwapp_control_header->len);
 
-	/* print message header */ 
+	/* print message header */
         printf("\n\t  Msg type: %s (%u), Seqnum: %u, Msg len: %d, Session: 0x%08x",
                tok2str(lwapp_msg_type_values,"Unknown",lwapp_control_header->msg_type),
                lwapp_control_header->msg_type,

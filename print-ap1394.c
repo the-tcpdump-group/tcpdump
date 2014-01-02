@@ -113,7 +113,7 @@ ap1394_if_print(const struct pcap_pkthdr *h, const u_char *p)
 
 		if (!suppress_default_print)
 			default_print(p, caplen);
-	} 
+	}
 
 	return FIREWIRE_HDRLEN;
 }
