@@ -689,42 +689,33 @@ struct nd_rpl_option {
     u_int8_t rpl_dio_data[0];
 };
 
-static const char *rpl_mop_name[]={
-        "nonstoring",
-        "storing",
-        "nonstoring-multicast",
-        "storing-multicast",
-        "mop-reserved-4",
-        "mop-reserved-5",
-        "mop-reserved-6",
-        "mop-reserved-7"
+enum RPL_DIO_MOP {
+    RPL_DIO_NONSTORING= 0x0,
+    RPL_DIO_STORING   = 0x1,
+    RPL_DIO_NONSTORING_MULTICAST = 0x2,
+    RPL_DIO_STORING_MULTICAST    = 0x3,
 };
 
-static const char *rpl_subopt_name(int opt, char *buf, int len) {
-        switch(opt) {
-        case RPL_OPT_PAD0:
-                return "pad0";
-        case RPL_OPT_PADN:
-                return "padN";
-        case RPL_DIO_METRICS:
-                return "metrics";
-        case RPL_DIO_ROUTINGINFO:
-                return "routinginfo";
-        case RPL_DIO_CONFIG:
-                return "routinginfo";
-        case RPL_DAO_RPLTARGET:
-                return "rpltarget";
-        case RPL_DAO_TRANSITINFO:
-                return "transitinfo";
-        case RPL_DIO_DESTPREFIX:
-                return "destprefix";
-        case RPL_DAO_RPLTARGET_DESC:
-                return "rpltargetdesc";
-        default:
-                snprintf(buf, len, "unknown:%u", opt);
-                return buf;
-        }
-}
+const struct tok rpl_mop_values[] = {
+        { RPL_DIO_NONSTORING,         "nonstoring"},
+        { RPL_DIO_STORING,            "storing"},
+        { RPL_DIO_NONSTORING_MULTICAST, "nonstoring-multicast"},
+        { RPL_DIO_STORING_MULTICAST,  "storing-multicast"},
+        { 0, NULL},
+};
+
+const struct tok rpl_subopt_values[] = {
+        { RPL_OPT_PAD0, "pad0"},
+        { RPL_OPT_PADN, "padN"},
+        { RPL_DIO_METRICS, "metrics"},
+        { RPL_DIO_ROUTINGINFO, "routinginfo"},
+        { RPL_DIO_CONFIG,    "config"},
+        { RPL_DAO_RPLTARGET, "rpltarget"},
+        { RPL_DAO_TRANSITINFO, "transitinfo"},
+        { RPL_DIO_DESTPREFIX, "destprefix"},
+        { RPL_DAO_RPLTARGET_DESC, "rpltargetdesc"},
+        { 0, NULL},
+};
 
 static void
 rpl_dio_print(netdissect_options *ndo,
@@ -753,13 +744,12 @@ rpl_dio_print(netdissect_options *ndo,
                   dio->rpl_instanceid,
                   dio->rpl_dagrank,
                   RPL_DIO_GROUNDED(dio->rpl_mopprf) ? "grounded,":"",
-                  rpl_mop_name[RPL_DIO_MOP(dio->rpl_mopprf)],
+                  tok2str(rpl_mop_values, "mop%u", RPL_DIO_MOP(dio->rpl_mopprf)),
                   RPL_DIO_PRF(dio->rpl_mopprf)));
 
         if(ndo->ndo_vflag > 1) {
                 struct nd_rpl_option *opt = (struct nd_rpl_option *)&dio[1];
                 length -= sizeof(struct nd_rpl_dio);
-                char optname_buf[64];
                 ND_TCHECK(opt->rpl_dio_len);
                 while((opt->rpl_dio_type == RPL_OPT_PAD0 &&
                        (u_char *)opt < ndo->ndo_snapend) ||
@@ -770,7 +760,7 @@ rpl_dio_print(netdissect_options *ndo,
                                 ND_PRINT((ndo, " opt:pad0"));
                         } else {
                                 ND_PRINT((ndo, " opt:%s len:%u ",
-                                          rpl_subopt_name(opt->rpl_dio_type, optname_buf, sizeof(optname_buf)),
+                                          tok2str(rpl_subopt_values, "%subopt:%u", opt->rpl_dio_type),
                                           optlen));
                                 if(ndo->ndo_vflag > 2) {
                                         unsigned int paylen = opt->rpl_dio_len;
