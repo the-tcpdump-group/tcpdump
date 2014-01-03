@@ -117,7 +117,7 @@ pflog_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 
 	/* check length */
 	if (caplen < sizeof(u_int8_t)) {
-		printf("%s", pflog);
+		printf("%s", tstr);
 		return (caplen);
 	}
 
@@ -130,7 +130,7 @@ pflog_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 	hdrlen = BPF_WORDALIGN(hdr->length);
 
 	if (caplen < hdrlen) {
-		printf("%s", pflog);
+		printf("%s", tstr);
 		return (hdrlen);	/* XXX: true? */
 	}
 
@@ -173,7 +173,7 @@ pflog_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 
 	return (hdrlen);
 trunc:
-	printf("%s", pflog);
+	printf("%s", tstr);
 	return (hdrlen);
 }
 
