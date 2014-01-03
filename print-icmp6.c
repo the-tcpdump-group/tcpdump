@@ -655,24 +655,88 @@ enum ND_RPL_DIO_FLAGS {
         ND_RPL_DIO_PRF_MASK = 0x07,  /* 3-bit preference */
 };
 
-struct nd_rpl_dio {
-        u_int8_t rpl_flags;
-        u_int8_t rpl_seq;
-        u_int8_t rpl_instanceid;
-        u_int8_t rpl_dagrank;
-        u_int8_t rpl_dagid[16];
+enum ND_RPL_SUBOPT {
+        RPL_OPT_PAD0        = 0,
+        RPL_OPT_PADN        = 1,
+        RPL_DIO_METRICS     = 2,
+        RPL_DIO_ROUTINGINFO = 3,
+        RPL_DIO_CONFIG      = 4,
+        RPL_DAO_RPLTARGET   = 5,
+        RPL_DAO_TRANSITINFO = 6,
+        RPL_DIO_DESTPREFIX  = 8,
+        RPL_DAO_RPLTARGET_DESC=9,
 };
+
+#define RPL_DIO_GROUND_FLAG 0x80
+#define RPL_DIO_MOP_SHIFT   3
+#define RPL_DIO_MOP_MASK    (7 << RPL_DIO_MOP_SHIFT)
+#define RPL_DIO_PRF_SHIFT   0
+#define RPL_DIO_PRF_MASK    (7 << RPL_DIO_MOP_SHIFT)
+#define RPL_DIO_GROUNDED(X) ((X)&RPL_DIO_GROUND_FLAG)
+#define RPL_DIO_MOP(X)      (((X)&RPL_DIO_MOP_MASK) >> RPL_DIO_MOP_SHIFT)
+#define RPL_DIO_PRF(X)      (((X)&RPL_DIO_PRF_MASK) >> RPL_DIO_PRF_SHIFT)
+
+
+struct nd_rpl_dio {
+        u_int8_t  rpl_instanceid;
+        u_int8_t  rpl_version;
+        u_int16_t rpl_dagrank;
+        u_int8_t  rpl_mopprf;     /* bit 7=G, 5-3=MOP, 2-0=PRF */
+        u_int8_t  rpl_dtsn;
+        u_int8_t  rpl_flags;      /* Dest. Advertisement Trigger Seq Number */
+        u_int8_t  rpl_resv1;
+        u_int8_t  rpl_dagid[16];
+};
+struct nd_rpl_option {
+    u_int8_t rpl_dio_type;
+    u_int8_t rpl_dio_len;        /* suboption length, not including type/len */
+    u_int8_t rpl_dio_data[0];
+};
+
+static char *rpl_mop_name[]={
+        "nonstoring",
+        "storing",
+        "nonstoring-multicast",
+        "storing-multicast",
+        "mop-reserved-4",
+        "mop-reserved-5",
+        "mop-reserved-6",
+        "mop-reserved-7"
+};
+
+static char *rpl_subopt_name(int opt, char *buf, int len) {
+        switch(opt) {
+        case RPL_OPT_PAD0:
+                return "pad0";
+        case RPL_OPT_PADN:
+                return "padN";
+        case RPL_DIO_METRICS:
+                return "metrics";
+        case RPL_DIO_ROUTINGINFO:
+                return "routinginfo";
+        case RPL_DIO_CONFIG:
+                return "routinginfo";
+        case RPL_DAO_RPLTARGET:
+                return "rpltarget";
+        case RPL_DAO_TRANSITINFO:
+                return "transitinfo";
+        case RPL_DIO_DESTPREFIX:
+                return "destprefix";
+        case RPL_DAO_RPLTARGET_DESC:
+                return "rpltargetdesc";
+        default:
+                snprintf(buf, len, "unknown:%u", opt);
+                return buf;
+        }
+}
 
 static void
 rpl_print(netdissect_options *ndo,
           const struct icmp6_hdr *hdr,
           const u_char *bp, u_int length _U_)
 {
-        struct nd_rpl_dio *dio = (struct nd_rpl_dio *)bp;
         int secured = hdr->icmp6_code & 0x80;
         int basecode= hdr->icmp6_code & 0x7f;
-
-        ND_TCHECK(dio->rpl_dagid);
 
         if(secured) {
                 ND_PRINT((ndo, ", (SEC)"));
@@ -689,9 +753,12 @@ rpl_print(netdissect_options *ndo,
         case ND_RPL_DIO:
                 ND_PRINT((ndo, "DODAG Information Object"));
                 if(ndo->ndo_vflag) {
+                        struct nd_rpl_dio *dio = (struct nd_rpl_dio *)bp;
                         char dagid[65];
                         char *d = dagid;
                         int  i;
+                        ND_TCHECK(dio->rpl_dagid);
+
                         for(i=0;i<16;i++) {
                                 if(isprint(dio->rpl_dagid[i])) {
                                         *d++ = dio->rpl_dagid[i];
@@ -702,11 +769,30 @@ rpl_print(netdissect_options *ndo,
                                 }
                         }
                         *d++ = '\0';
-                        ND_PRINT((ndo, " [seq:%u,instance:%u,rank:%u,dagid:%s]",
-                                  dio->rpl_seq,
+                        ND_PRINT((ndo, " [dagid:%s,seq:%u,instance:%u,rank:%u,%smop:%s,prf:%u]",
+                                  dagid,
+                                  dio->rpl_dtsn,
                                   dio->rpl_instanceid,
                                   dio->rpl_dagrank,
-                                  dagid));
+                                  RPL_DIO_GROUNDED(dio->rpl_mopprf) ? "grounded,":"",
+                                  rpl_mop_name[RPL_DIO_MOP(dio->rpl_mopprf)],
+                                  RPL_DIO_PRF(dio->rpl_mopprf)));
+
+                        if(ndo->ndo_vflag > 1) {
+                                struct nd_rpl_option *opt = (struct nd_rpl_option *)&dio[1];
+                                char optname_buf[64];
+                                ND_TCHECK(opt->rpl_dio_len);
+                                while(opt->rpl_dio_type == RPL_OPT_PAD0 || ND_TTEST2(opt,(opt->rpl_dio_len+2))) {
+                                        unsigned int len = opt->rpl_dio_len+2;
+                                        if(opt->rpl_dio_type == RPL_OPT_PAD0) {
+                                                len = 1;
+                                        }
+                                        ND_PRINT((ndo, " opt:%s len:%u ",
+                                                  rpl_subopt_name(opt->rpl_dio_type, optname_buf, sizeof(optname_buf)),
+                                                  len));
+                                        opt = (struct nd_rpl_option *)((char *)opt) + len;
+                                }
+                        }
                 }
                 break;
         case ND_RPL_DAO:
