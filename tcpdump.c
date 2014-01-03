@@ -29,8 +29,6 @@
 static const char copyright[] _U_ =
     "@(#) Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000\n\
 The Regents of the University of California.  All rights reserved.\n";
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/tcpdump.c,v 1.283 2008-09-25 21:45:50 guy Exp $ (LBL)";
 #endif
 
 /*
@@ -2048,11 +2046,11 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	 * version number of the Packet.dll code, to supply the
 	 * "Wpcap_version" information on Windows.
 	 */
-	char WDversion[]="current-cvs.tcpdump.org";
+	char WDversion[]="current-git.tcpdump.org";
 #if !defined(HAVE_GENERATED_VERSION)
-	char version[]="current-cvs.tcpdump.org";
+	char version[]="current-git.tcpdump.org";
 #endif
-	char pcap_version[]="current-cvs.tcpdump.org";
+	char pcap_version[]="current-git.tcpdump.org";
 	char Wpcap_version[]="3.1";
 #endif
 

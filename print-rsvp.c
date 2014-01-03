@@ -15,11 +15,6 @@
  * Original code by Hannes Gredler (hannes@juniper.net)
  */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-rsvp.c,v 1.50 2008-08-16 11:36:20 hannes Exp $";
-#endif
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

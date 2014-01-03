@@ -1,4 +1,3 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/ip.h,v 1.12 2007-09-14 01:29:28 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1982, 1986, 1993
  *	The Regents of the University of California.  All rights reserved.

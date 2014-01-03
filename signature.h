@@ -15,8 +15,6 @@
  * Original code by Hannes Gredler (hannes@juniper.net)
  */
 
-/* @(#) $Header: /tcpdump/master/tcpdump/signature.h,v 1.1 2008-08-16 11:36:20 hannes Exp $ (LBL) */
-
 /* signature checking result codes */
 #define SIGNATURE_VALID		0
 #define SIGNATURE_INVALID	1

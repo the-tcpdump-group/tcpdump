@@ -40,14 +40,11 @@
 #include "config.h"
 #endif
 
-#ifndef lint
-static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-ascii.c,v 1.17 2005-07-06 20:53:32 guy Exp $";
-#endif
 #include <tcpdump-stdinc.h>
 #include <stdio.h>
 
 #include "netdissect.h"
+#include "interface.h"
 
 #define ASCII_LINELENGTH 300
 #define HEXDUMP_BYTES_PER_LINE 16

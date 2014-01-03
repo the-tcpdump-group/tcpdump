@@ -19,11 +19,6 @@
  * Expansion and refactoring by Rick Jones <rick.jones2@hp.com>
  */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-sflow.c,v 1.1 2007-08-08 17:20:58 hannes Exp $";
-#endif
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

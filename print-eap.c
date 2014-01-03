@@ -21,11 +21,6 @@
  *
  */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-eap.c,v 1.5 2007-10-04 16:41:33 hannes Exp $";
-#endif
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

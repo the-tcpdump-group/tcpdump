@@ -16,8 +16,6 @@
  */
 
 #ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-juniper.c,v 1.34 2007-08-29 02:31:44 mcr Exp $ (LBL)";
 #else
 __RCSID("NetBSD: print-juniper.c,v 1.3 2007/07/25 06:31:32 dogcow Exp ");
 #endif

@@ -22,11 +22,6 @@
  * Contributed by Brad Parker (brad@fcr.com).
  */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-ipx.c,v 1.42 2005-05-06 08:26:44 guy Exp $";
-#endif
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

@@ -33,11 +33,6 @@
  * SUCH DAMAGE.
  */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-sctp.c,v 1.21 2007-09-13 18:03:49 guy Exp $ (NETLAB/PEL)";
-#endif
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

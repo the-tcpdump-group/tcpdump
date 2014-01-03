@@ -19,11 +19,6 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-icmp6.c,v 1.86 2008-02-05 19:36:13 guy Exp $";
-#endif
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -36,6 +31,7 @@ static const char rcsid[] _U_ =
 #include <string.h>
 
 #include "netdissect.h"
+#include "interface.h"
 #include "addrtoname.h"
 #include "extract.h"
 

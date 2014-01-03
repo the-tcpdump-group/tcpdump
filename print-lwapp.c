@@ -17,11 +17,6 @@
  * Original code by Carles Kishimoto <carles.kishimoto@gmail.com>
  */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-lwapp.c,v 1.1 2007-07-24 16:07:30 hannes Exp $";
-#endif
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

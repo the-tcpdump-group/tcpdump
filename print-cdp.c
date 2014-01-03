@@ -24,11 +24,6 @@
  *    http://www.cisco.com/univercd/cc/td/doc/product/lan/trsrb/frames.htm
  */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-cdp.c,v 1.25 2004-10-07 14:53:11 hannes Exp $";
-#endif
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

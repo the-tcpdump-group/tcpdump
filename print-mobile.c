@@ -40,11 +40,6 @@
 #include "config.h"
 #endif
 
-#ifndef lint
-static const char rcsid[] _U_ =
-     "@(#) $Header: /tcpdump/master/tcpdump/print-mobile.c,v 1.15 2004-03-24 01:58:14 guy Exp $";
-#endif
-
 #include <tcpdump-stdinc.h>
 
 #include <stdio.h>

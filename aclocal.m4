@@ -1,5 +1,3 @@
-dnl @(#) $Header: /tcpdump/master/tcpdump/aclocal.m4,v 1.116 2008-09-25 21:45:50 guy Exp $ (LBL)
-dnl
 dnl Copyright (c) 1995, 1996, 1997, 1998
 dnl	The Regents of the University of California.  All rights reserved.
 dnl

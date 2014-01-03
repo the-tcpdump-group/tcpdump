@@ -18,11 +18,6 @@
  * Initial contribution from Jeff Honig (jch@MITCHELL.CIT.CORNELL.EDU).
  */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-egp.c,v 1.38 2006-02-11 22:13:24 hannes Exp $ (LBL)";
-#endif
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

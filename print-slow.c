@@ -18,11 +18,6 @@
  * Original code by Hannes Gredler (hannes@juniper.net)
  */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-slow.c,v 1.8 2006-10-12 05:44:33 hannes Exp $";
-#endif
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

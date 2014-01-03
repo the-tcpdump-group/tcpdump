@@ -21,10 +21,6 @@
  *  Internet, ethernet, port, and protocol string to address
  *  and address to string conversion routines
  */
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/addrtoname.c,v 1.119 2007-08-08 14:06:34 hannes Exp $ (LBL)";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

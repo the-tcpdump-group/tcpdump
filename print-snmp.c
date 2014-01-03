@@ -56,11 +56,6 @@
  #	@(#)snmp.awk.x	1.1 (LANL) 1/15/90
  */
 
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/print-snmp.c,v 1.64 2005-05-06 07:56:53 guy Exp $ (LBL)";
-#endif
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

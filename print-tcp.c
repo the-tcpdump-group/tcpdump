@@ -24,8 +24,6 @@
  */
 
 #ifndef lint
-static const char rcsid[] _U_ =
-"@(#) $Header: /tcpdump/master/tcpdump/print-tcp.c,v 1.135 2008-11-09 23:35:03 mcr Exp $ (LBL)";
 #else
 __RCSID("$NetBSD: print-tcp.c,v 1.8 2007/07/24 11:53:48 drochner Exp $");
 #endif

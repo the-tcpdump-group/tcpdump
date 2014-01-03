@@ -1,4 +1,3 @@
-/* @(#) $Header: /tcpdump/master/tcpdump/udp.h,v 1.13 2007-08-08 17:20:58 hannes Exp $ (LBL) */
 /*
  * Copyright (c) 1982, 1986, 1993
  *	The Regents of the University of California.  All rights reserved.
