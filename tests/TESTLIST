@@ -57,6 +57,7 @@ ikev2pI2	ikev2pI2.pcap		ikev2pI2.out	-t -E "file ikev2pI2-secrets.txt" -v -v -v 
 # IETF ROLL RPL packets
 dio01           dio.pcap                dio.out         -t -v
 dio02           19-pickdag.pcap         19-pickdag.out  -t -v -v
+dio03           19-pickdag.pcap         19-pickdagvvv.out  -t -v -v -v
 
 # IPNET encapsulated site
 e1000g		e1000g.pcap		e1000g.out	-t
