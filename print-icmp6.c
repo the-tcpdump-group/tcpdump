@@ -689,7 +689,7 @@ struct nd_rpl_option {
     u_int8_t rpl_dio_data[0];
 };
 
-static char *rpl_mop_name[]={
+static const char *rpl_mop_name[]={
         "nonstoring",
         "storing",
         "nonstoring-multicast",
@@ -700,7 +700,7 @@ static char *rpl_mop_name[]={
         "mop-reserved-7"
 };
 
-static char *rpl_subopt_name(int opt, char *buf, int len) {
+static const char *rpl_subopt_name(int opt, char *buf, int len) {
         switch(opt) {
         case RPL_OPT_PAD0:
                 return "pad0";
@@ -728,7 +728,7 @@ static char *rpl_subopt_name(int opt, char *buf, int len) {
 
 static void
 rpl_dio_print(netdissect_options *ndo,
-              const struct icmp6_hdr *hdr,
+              const struct icmp6_hdr *hdr _U_,
               const u_char *bp, u_int length)
 {
         struct nd_rpl_dio *dio = (struct nd_rpl_dio *)bp;
@@ -764,25 +764,25 @@ rpl_dio_print(netdissect_options *ndo,
                 while((opt->rpl_dio_type == RPL_OPT_PAD0 &&
                        (u_char *)opt < ndo->ndo_snapend) ||
                       ND_TTEST2(*opt,(opt->rpl_dio_len+2))) {
-                        unsigned int len = opt->rpl_dio_len+2;
+                        unsigned int optlen = opt->rpl_dio_len+2;
                         if(opt->rpl_dio_type == RPL_OPT_PAD0) {
-                                len = 1;
+                                optlen = 1;
                                 ND_PRINT((ndo, " opt:pad0"));
                         } else {
                                 ND_PRINT((ndo, " opt:%s len:%u ",
                                           rpl_subopt_name(opt->rpl_dio_type, optname_buf, sizeof(optname_buf)),
-                                          len));
+                                          optlen));
                                 if(ndo->ndo_vflag > 2) {
-                                        int len = opt->rpl_dio_len;
-                                        if(len > length) len = length;
+                                        unsigned int paylen = opt->rpl_dio_len;
+                                        if(paylen > length) paylen = length;
                                         hex_print(ndo,
                                                   " ",
-                                                  (char *)&opt[1],  /* content of DIO option */
-                                                  len);
+                                                  (u_char *)&opt[1],  /* content of DIO option */
+                                                  paylen);
                                 }
                         }
-                        opt = (struct nd_rpl_option *)(((char *)opt) + len);
-                        length -= len;
+                        opt = (struct nd_rpl_option *)(((char *)opt) + optlen);
+                        length -= optlen;
                 }
         }
 	return;
@@ -832,9 +832,12 @@ rpl_print(netdissect_options *ndo,
                 break;
         }
 	return;
+
+#if 0
 trunc:
 	ND_PRINT((ndo," [|truncated]"));
 	return;
+#endif
 
 }
 
