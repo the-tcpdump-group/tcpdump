@@ -490,8 +490,7 @@ static void icmp6_rrenum_print(netdissect_options *ndo, const u_char *, const u_
 #define abs(a)	((0 < (a)) ? (a) : -(a))
 #endif
 
-/* inline the various RPL definitions */
-#define ND_RPL_MESSAGE 0x9B
+#include "rpl.h"
 
 static const struct tok icmp6_type_values[] = {
     { ICMP6_DST_UNREACH, "destination unreachable"},
@@ -630,72 +629,6 @@ static int icmp6_cksum(const struct ip6_hdr *ip6, const struct icmp6_hdr *icp,
 	    IPPROTO_ICMPV6));
 }
 
-enum ND_RPL_CODE {
-        ND_RPL_DIS   =0x00,
-        ND_RPL_DIO   =0x01,
-        ND_RPL_DAO   =0x02,
-        ND_RPL_DAO_ACK=0x03,
-        ND_RPL_SDIS  =0x80,
-        ND_RPL_SDIO  =0x81,
-        ND_RPL_SDAO  =0x82,
-        ND_RPL_SDAO_ACK=0x83,
-        ND_RPL_SCC   =0x8A,
-};
-
-enum ND_RPL_DIO_FLAGS {
-        ND_RPL_DIO_GROUNDED = 0x80,
-        ND_RPL_DIO_DATRIG   = 0x40,
-        ND_RPL_DIO_DASUPPORT= 0x20,
-        ND_RPL_DIO_RES4     = 0x10,
-        ND_RPL_DIO_RES3     = 0x08,
-        ND_RPL_DIO_PRF_MASK = 0x07,  /* 3-bit preference */
-};
-
-enum ND_RPL_SUBOPT {
-        RPL_OPT_PAD0        = 0,
-        RPL_OPT_PADN        = 1,
-        RPL_DIO_METRICS     = 2,
-        RPL_DIO_ROUTINGINFO = 3,
-        RPL_DIO_CONFIG      = 4,
-        RPL_DAO_RPLTARGET   = 5,
-        RPL_DAO_TRANSITINFO = 6,
-        RPL_DIO_DESTPREFIX  = 8,
-        RPL_DAO_RPLTARGET_DESC=9,
-};
-
-#define RPL_DIO_GROUND_FLAG 0x80
-#define RPL_DIO_MOP_SHIFT   3
-#define RPL_DIO_MOP_MASK    (7 << RPL_DIO_MOP_SHIFT)
-#define RPL_DIO_PRF_SHIFT   0
-#define RPL_DIO_PRF_MASK    (7 << RPL_DIO_PRF_SHIFT)
-#define RPL_DIO_GROUNDED(X) ((X)&RPL_DIO_GROUND_FLAG)
-#define RPL_DIO_MOP(X)      (((X)&RPL_DIO_MOP_MASK) >> RPL_DIO_MOP_SHIFT)
-#define RPL_DIO_PRF(X)      (((X)&RPL_DIO_PRF_MASK) >> RPL_DIO_PRF_SHIFT)
-
-
-struct nd_rpl_dio {
-        u_int8_t  rpl_instanceid;
-        u_int8_t  rpl_version;
-        u_int16_t rpl_dagrank;
-        u_int8_t  rpl_mopprf;     /* bit 7=G, 5-3=MOP, 2-0=PRF */
-        u_int8_t  rpl_dtsn;
-        u_int8_t  rpl_flags;      /* Dest. Advertisement Trigger Seq Number */
-        u_int8_t  rpl_resv1;
-        u_int8_t  rpl_dagid[16];
-};
-struct nd_rpl_option {
-    u_int8_t rpl_dio_type;
-    u_int8_t rpl_dio_len;        /* suboption length, not including type/len */
-    u_int8_t rpl_dio_data[0];
-};
-
-enum RPL_DIO_MOP {
-    RPL_DIO_NONSTORING= 0x0,
-    RPL_DIO_STORING   = 0x1,
-    RPL_DIO_NONSTORING_MULTICAST = 0x2,
-    RPL_DIO_STORING_MULTICAST    = 0x3,
-};
-
 const struct tok rpl_mop_values[] = {
         { RPL_DIO_NONSTORING,         "nonstoring"},
         { RPL_DIO_STORING,            "storing"},
@@ -718,28 +651,73 @@ const struct tok rpl_subopt_values[] = {
 };
 
 static void
+rpl_format_dagid(char dagid_str[65], u_char *dagid)
+{
+        char *d = dagid_str;
+        int  i;
+
+        for(i=0;i<16;i++) {
+                if(isprint(dagid[i])) {
+                        *d++ = dagid[i];
+                } else {
+                        int cnt=snprintf(d,4,"0x%02x", dagid[i]);
+                        d += cnt;
+                }
+        }
+        *d++ = '\0';
+}
+
+static void
+rpl_dio_printopt(netdissect_options *ndo,
+                 struct rpl_dio_genoption *opt,
+                 u_int length)
+{
+        length -= sizeof(struct rpl_dio_genoption);
+        ND_TCHECK(opt->rpl_dio_len);
+
+        while((opt->rpl_dio_type == RPL_OPT_PAD0 &&
+               (u_char *)opt < ndo->ndo_snapend) ||
+              ND_TTEST2(*opt,(opt->rpl_dio_len+2))) {
+
+                unsigned int optlen = opt->rpl_dio_len+2;
+                if(opt->rpl_dio_type == RPL_OPT_PAD0) {
+                        optlen = 1;
+                        ND_PRINT((ndo, " opt:pad0"));
+                } else {
+                        ND_PRINT((ndo, " opt:%s len:%u ",
+                                  tok2str(rpl_subopt_values, "%subopt:%u", opt->rpl_dio_type),
+                                  optlen));
+                        if(ndo->ndo_vflag > 2) {
+                                unsigned int paylen = opt->rpl_dio_len;
+                                if(paylen > length) paylen = length;
+                                hex_print(ndo,
+                                          " ",
+                                          opt->rpl_dio_data,  /* content of DIO option */
+                                          paylen);
+                        }
+                }
+                opt = (struct rpl_dio_genoption *)(((char *)opt) + optlen);
+                length -= optlen;
+        }
+        return;
+trunc:
+	ND_PRINT((ndo," [|truncated]"));
+	return;
+}
+
+static void
 rpl_dio_print(netdissect_options *ndo,
               const struct icmp6_hdr *hdr _U_,
               const u_char *bp, u_int length)
 {
         struct nd_rpl_dio *dio = (struct nd_rpl_dio *)bp;
-        char dagid[65];
-        char *d = dagid;
-        int  i;
-        ND_TCHECK(dio->rpl_dagid);
+        char dagid_str[65];
 
-        for(i=0;i<16;i++) {
-                if(isprint(dio->rpl_dagid[i])) {
-                        *d++ = dio->rpl_dagid[i];
-                } else {
-                        int cnt=snprintf(d,4,"0x%02x",
-                                         dio->rpl_dagid[i]);
-                        d += cnt;
-                }
-        }
-        *d++ = '\0';
+        ND_TCHECK(*dio);
+        rpl_format_dagid(dagid_str, dio->rpl_dagid);
+
         ND_PRINT((ndo, " [dagid:%s,seq:%u,instance:%u,rank:%u,%smop:%s,prf:%u]",
-                  dagid,
+                  dagid_str,
                   dio->rpl_dtsn,
                   dio->rpl_instanceid,
                   dio->rpl_dagrank,
@@ -748,34 +726,67 @@ rpl_dio_print(netdissect_options *ndo,
                   RPL_DIO_PRF(dio->rpl_mopprf)));
 
         if(ndo->ndo_vflag > 1) {
-                struct nd_rpl_option *opt = (struct nd_rpl_option *)&dio[1];
-                length -= sizeof(struct nd_rpl_dio);
-                ND_TCHECK(opt->rpl_dio_len);
-                while((opt->rpl_dio_type == RPL_OPT_PAD0 &&
-                       (u_char *)opt < ndo->ndo_snapend) ||
-                      ND_TTEST2(*opt,(opt->rpl_dio_len+2))) {
-                        unsigned int optlen = opt->rpl_dio_len+2;
-                        if(opt->rpl_dio_type == RPL_OPT_PAD0) {
-                                optlen = 1;
-                                ND_PRINT((ndo, " opt:pad0"));
-                        } else {
-                                ND_PRINT((ndo, " opt:%s len:%u ",
-                                          tok2str(rpl_subopt_values, "%subopt:%u", opt->rpl_dio_type),
-                                          optlen));
-                                if(ndo->ndo_vflag > 2) {
-                                        unsigned int paylen = opt->rpl_dio_len;
-                                        if(paylen > length) paylen = length;
-                                        hex_print(ndo,
-                                                  " ",
-                                                  (u_char *)&opt[1],  /* content of DIO option */
-                                                  paylen);
-                                }
-                        }
-                        opt = (struct nd_rpl_option *)(((char *)opt) + optlen);
-                        length -= optlen;
-                }
+                struct rpl_dio_genoption *opt = (struct rpl_dio_genoption *)&dio[1];
+                rpl_dio_printopt(ndo, opt, length);
         }
 	return;
+trunc:
+	ND_PRINT((ndo," [|truncated]"));
+	return;
+}
+
+static void
+rpl_dao_print(netdissect_options *ndo,
+              const struct icmp6_hdr *hdr _U_,
+              const u_char *bp, u_int length)
+{
+        struct nd_rpl_dao *dao = (struct nd_rpl_dao *)bp;
+        char dagid_str[65];
+
+        ND_TCHECK(*dao);
+
+        strcpy(dagid_str,"<elided>");
+        if(RPL_DAO_D(dao->rpl_flags)) {
+                ND_TTEST2(dao->rpl_dagid, 16);
+                rpl_format_dagid(dagid_str, dao->rpl_dagid);
+        }
+
+        ND_PRINT((ndo, " [dagid:%s,seq:%u,instance:%u]",
+                  dagid_str,
+                  dao->rpl_daoseq,
+                  dao->rpl_instanceid));
+
+        /* need to print the DAO TARGET options */
+	return;
+
+trunc:
+	ND_PRINT((ndo," [|truncated]"));
+	return;
+}
+
+static void
+rpl_daoack_print(netdissect_options *ndo,
+              const struct icmp6_hdr *hdr _U_,
+              const u_char *bp, u_int length)
+{
+        struct nd_rpl_daoack *daoack = (struct nd_rpl_daoack *)bp;
+        char dagid_str[65];
+
+        ND_TCHECK(*daoack);
+
+        strcpy(dagid_str,"<elided>");
+        if(RPL_DAOACK_D(daoack->rpl_flags)) {
+                ND_TTEST2(daoack->rpl_dagid, 16);
+                rpl_format_dagid(dagid_str, daoack->rpl_dagid);
+        }
+
+        ND_PRINT((ndo, " [dagid:%s,seq:%u,instance:%u,status:%u]",
+                  dagid_str,
+                  daoack->rpl_daoseq,
+                  daoack->rpl_instanceid,
+                  daoack->rpl_status));
+	return;
+
 trunc:
 	ND_PRINT((ndo," [|truncated]"));
 	return;
@@ -790,18 +801,23 @@ rpl_print(netdissect_options *ndo,
         int basecode= hdr->icmp6_code & 0x7f;
 
         if(secured) {
-                ND_PRINT((ndo, ", (SEC)"));
+                ND_PRINT((ndo, ", (SEC) [worktodo]"));
+                /* XXX
+                 * the next header pointer needs to move forward to
+                 * skip the secure part.
+                 */
+                return;
         } else {
                 ND_PRINT((ndo, ", (CLR)"));
         }
 
         switch(basecode) {
-        case ND_RPL_DIS:
+        case ND_RPL_DAG_IS:
                 ND_PRINT((ndo, "DODAG Information Solicitation"));
                 if(ndo->ndo_vflag) {
                 }
                 break;
-        case ND_RPL_DIO:
+        case ND_RPL_DAG_IO:
                 ND_PRINT((ndo, "DODAG Information Object"));
                 if(ndo->ndo_vflag) {
                         rpl_dio_print(ndo, hdr, bp, length);
@@ -810,11 +826,13 @@ rpl_print(netdissect_options *ndo,
         case ND_RPL_DAO:
                 ND_PRINT((ndo, "Destination Advertisement Object"));
                 if(ndo->ndo_vflag) {
+                        rpl_dao_print(ndo, hdr, bp, length);
                 }
                 break;
         case ND_RPL_DAO_ACK:
                 ND_PRINT((ndo, "Destination Advertisement Object Ack"));
                 if(ndo->ndo_vflag) {
+                        rpl_daoack_print(ndo, hdr, bp, length);
                 }
                 break;
         default:
