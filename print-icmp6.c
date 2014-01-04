@@ -741,6 +741,7 @@ rpl_dao_print(netdissect_options *ndo,
               const u_char *bp, u_int length)
 {
         struct nd_rpl_dao *dao = (struct nd_rpl_dao *)bp;
+        u_char *dao_end = (u_char *)&dao[1];
         char dagid_str[65];
 
         ND_TCHECK(*dao);
@@ -749,6 +750,7 @@ rpl_dao_print(netdissect_options *ndo,
         if(RPL_DAO_D(dao->rpl_flags)) {
                 ND_TTEST2(dao->rpl_dagid, 16);
                 rpl_format_dagid(dagid_str, dao->rpl_dagid);
+                dao_end += DAGID_LEN;
         }
 
         ND_PRINT((ndo, " [dagid:%s,seq:%u,instance:%u]",
@@ -756,7 +758,10 @@ rpl_dao_print(netdissect_options *ndo,
                   dao->rpl_daoseq,
                   dao->rpl_instanceid));
 
-        /* need to print the DAO TARGET options */
+        if(ndo->ndo_vflag > 1) {
+                struct rpl_dio_genoption *opt = (struct rpl_dio_genoption *)dao_end;
+                rpl_dio_printopt(ndo, opt, length);
+        }
 	return;
 
 trunc:
@@ -770,6 +775,7 @@ rpl_daoack_print(netdissect_options *ndo,
               const u_char *bp, u_int length)
 {
         struct nd_rpl_daoack *daoack = (struct nd_rpl_daoack *)bp;
+        u_char *daoack_end = (u_char *)&daoack[1];
         char dagid_str[65];
 
         ND_TCHECK(*daoack);
@@ -778,6 +784,7 @@ rpl_daoack_print(netdissect_options *ndo,
         if(RPL_DAOACK_D(daoack->rpl_flags)) {
                 ND_TTEST2(daoack->rpl_dagid, 16);
                 rpl_format_dagid(dagid_str, daoack->rpl_dagid);
+                daoack_end += DAGID_LEN;
         }
 
         ND_PRINT((ndo, " [dagid:%s,seq:%u,instance:%u,status:%u]",
@@ -785,6 +792,12 @@ rpl_daoack_print(netdissect_options *ndo,
                   daoack->rpl_daoseq,
                   daoack->rpl_instanceid,
                   daoack->rpl_status));
+
+        /* no officially defined options for DAOACK, but print anyway, we find*/
+        if(ndo->ndo_vflag > 1) {
+                struct rpl_dio_genoption *opt = (struct rpl_dio_genoption *)daoack_end;
+                rpl_dio_printopt(ndo, opt, length);
+        }
 	return;
 
 trunc:
