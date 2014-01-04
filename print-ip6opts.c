@@ -42,29 +42,6 @@
 #include "addrtoname.h"
 #include "extract.h"
 
-/* items outside of rfc2292bis */
-#ifndef IP6OPT_MINLEN
-#define IP6OPT_MINLEN	2
-#endif
-#ifndef IP6OPT_RTALERT_LEN
-#define IP6OPT_RTALERT_LEN	4
-#endif
-#ifndef IP6OPT_JUMBO_LEN
-#define IP6OPT_JUMBO_LEN	6
-#endif
-#define IP6OPT_HOMEADDR_MINLEN 18
-#define IP6OPT_BU_MINLEN       10
-#define IP6OPT_BA_MINLEN       13
-#define IP6OPT_BR_MINLEN        2
-#define IP6SOPT_UI            0x2
-#define IP6SOPT_UI_MINLEN       4
-#define IP6SOPT_ALTCOA        0x3
-#define IP6SOPT_ALTCOA_MINLEN  18
-#define IP6SOPT_AUTH          0x4
-#define IP6SOPT_AUTH_MINLEN     6
-
-static void ip6_sopt_print(const u_char *, int);
-
 static void
 ip6_sopt_print(const u_char *bp, int len)
 {
@@ -93,27 +70,6 @@ ip6_sopt_print(const u_char *bp, int len)
 		goto trunc;
 	    }
             printf(", padn");
-	    break;
-        case IP6SOPT_UI:
-             if (len - i < IP6SOPT_UI_MINLEN) {
-		printf(", ui: trunc");
-		goto trunc;
-	    }
-            printf(", ui: 0x%04x ", EXTRACT_16BITS(&bp[i + 2]));
-	    break;
-        case IP6SOPT_ALTCOA:
-             if (len - i < IP6SOPT_ALTCOA_MINLEN) {
-		printf(", altcoa: trunc");
-		goto trunc;
-	    }
-            printf(", alt-CoA: %s", ip6addr_string(&bp[i+2]));
-	    break;
-        case IP6SOPT_AUTH:
-             if (len - i < IP6SOPT_AUTH_MINLEN) {
-		printf(", auth: trunc");
-		goto trunc;
-	    }
-            printf(", auth spi: 0x%08x", EXTRACT_32BITS(&bp[i + 2]));
 	    break;
 	default:
 	    if (len - i < IP6OPT_MINLEN) {
@@ -199,70 +155,6 @@ ip6_opt_print(const u_char *bp, int len)
 	    }
             printf(")");
 	    break;
-        case IP6OPT_BINDING_UPDATE:
-	    if (len - i < IP6OPT_BU_MINLEN) {
-		printf("(bu: trunc)");
-		goto trunc;
-	    }
-	    if (bp[i + 1] < IP6OPT_BU_MINLEN - 2) {
-		printf("(bu: invalid len %d)", bp[i + 1]);
-		goto trunc;
-	    }
-	    printf("(bu: ");
-	    if (bp[i + 2] & 0x80)
-		    printf("A");
-	    if (bp[i + 2] & 0x40)
-		    printf("H");
-	    if (bp[i + 2] & 0x20)
-		    printf("S");
-	    if (bp[i + 2] & 0x10)
-		    printf("D");
-	    if ((bp[i + 2] & 0x0f) || bp[i + 3] || bp[i + 4])
-		    printf("res");
-	    printf(", sequence: %u", bp[i + 5]);
-	    printf(", lifetime: %u", EXTRACT_32BITS(&bp[i + 6]));
-
-	    if (bp[i + 1] > IP6OPT_BU_MINLEN - 2) {
-		ip6_sopt_print(&bp[i + IP6OPT_BU_MINLEN],
-		    (optlen - IP6OPT_BU_MINLEN));
-	    }
-	    printf(")");
-	    break;
-	case IP6OPT_BINDING_ACK:
-	    if (len - i < IP6OPT_BA_MINLEN) {
-		printf("(ba: trunc)");
-		goto trunc;
-	    }
-	    if (bp[i + 1] < IP6OPT_BA_MINLEN - 2) {
-		printf("(ba: invalid len %d)", bp[i + 1]);
-		goto trunc;
-	    }
-	    printf("(ba: ");
-	    printf("status: %u", bp[i + 2]);
-	    if (bp[i + 3])
-		    printf("res");
-	    printf(", sequence: %u", bp[i + 4]);
-	    printf(", lifetime: %u", EXTRACT_32BITS(&bp[i + 5]));
-	    printf(", refresh: %u", EXTRACT_32BITS(&bp[i + 9]));
-
-	    if (bp[i + 1] > IP6OPT_BA_MINLEN - 2) {
-		ip6_sopt_print(&bp[i + IP6OPT_BA_MINLEN],
-		    (optlen - IP6OPT_BA_MINLEN));
-	    }
-            printf(")");
-	    break;
-        case IP6OPT_BINDING_REQ:
-	    if (len - i < IP6OPT_BR_MINLEN) {
-		printf("(br: trunc)");
-		goto trunc;
-	    }
-            printf("(br");
-            if (bp[i + 1] > IP6OPT_BR_MINLEN - 2) {
-		ip6_sopt_print(&bp[i + IP6OPT_BR_MINLEN],
-		    (optlen - IP6OPT_BR_MINLEN));
-	    }
-            printf(")");
-	    break;
 	default:
 	    if (len - i < IP6OPT_MINLEN) {
 		printf("(type %d: trunc)", bp[i]);
@@ -273,10 +165,6 @@ ip6_opt_print(const u_char *bp, int len)
 	}
     }
     printf(" ");
-
-#if 0
-end:
-#endif
     return;
 
 trunc:

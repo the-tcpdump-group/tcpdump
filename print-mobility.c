@@ -60,6 +60,8 @@ struct ip6_mobility {
 
 #define IP6M_MINLEN	8
 
+/* http://www.iana.org/assignments/mobility-parameters/mobility-parameters.xhtml */
+
 /* message type */
 #define IP6M_BINDING_REQUEST	0	/* Binding Refresh Request */
 #define IP6M_HOME_TEST_INIT	1	/* Home Test Init */
@@ -69,6 +71,11 @@ struct ip6_mobility {
 #define IP6M_BINDING_UPDATE	5	/* Binding Update */
 #define IP6M_BINDING_ACK	6	/* Binding Acknowledgement */
 #define IP6M_BINDING_ERROR	7	/* Binding Error */
+
+/* XXX: unused */
+#define IP6MOPT_BU_MINLEN	10
+#define IP6MOPT_BA_MINLEN	13
+#define IP6MOPT_BR_MINLEN	2
 
 /* Mobility Header Options */
 #define IP6MOPT_MINLEN		2
