@@ -672,8 +672,8 @@ rpl_dio_printopt(netdissect_options *ndo,
                  struct rpl_dio_genoption *opt,
                  u_int length)
 {
-        length -= sizeof(struct rpl_dio_genoption);
         if(length == 0) return;
+        length -= sizeof(struct rpl_dio_genoption);
 
         ND_TCHECK(opt->rpl_dio_len);
 
@@ -709,7 +709,6 @@ trunc:
 
 static void
 rpl_dio_print(netdissect_options *ndo,
-              const struct icmp6_hdr *hdr _U_,
               const u_char *bp, u_int length)
 {
         struct nd_rpl_dio *dio = (struct nd_rpl_dio *)bp;
@@ -739,7 +738,6 @@ trunc:
 
 static void
 rpl_dao_print(netdissect_options *ndo,
-              const struct icmp6_hdr *hdr _U_,
               const u_char *bp, u_int length)
 {
         struct nd_rpl_dao *dao = (struct nd_rpl_dao *)bp;
@@ -773,8 +771,7 @@ trunc:
 
 static void
 rpl_daoack_print(netdissect_options *ndo,
-              const struct icmp6_hdr *hdr _U_,
-              const u_char *bp, u_int length)
+                 const u_char *bp, u_int length)
 {
         struct nd_rpl_daoack *daoack = (struct nd_rpl_daoack *)bp;
         u_char *daoack_end = (u_char *)&daoack[1];
@@ -783,10 +780,12 @@ rpl_daoack_print(netdissect_options *ndo,
         ND_TCHECK(*daoack);
 
         strcpy(dagid_str,"<elided>");
+        length -= sizeof(struct nd_rpl_daoack);
         if(RPL_DAOACK_D(daoack->rpl_flags)) {
                 ND_TTEST2(daoack->rpl_dagid, 16);
                 rpl_format_dagid(dagid_str, daoack->rpl_dagid);
                 daoack_end += DAGID_LEN;
+                length     -= DAGID_LEN;
         }
 
         ND_PRINT((ndo, " [dagid:%s,seq:%u,instance:%u,status:%u]",
@@ -795,7 +794,7 @@ rpl_daoack_print(netdissect_options *ndo,
                   daoack->rpl_instanceid,
                   daoack->rpl_status));
 
-        /* no officially defined options for DAOACK, but print anyway, we find*/
+        /* no officially defined options for DAOACK, but print any we find */
         if(ndo->ndo_vflag > 1) {
                 struct rpl_dio_genoption *opt = (struct rpl_dio_genoption *)daoack_end;
                 rpl_dio_printopt(ndo, opt, length);
@@ -803,7 +802,7 @@ rpl_daoack_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT((ndo," [|truncated]"));
+	ND_PRINT((ndo," [|dao-truncated]"));
 	return;
 }
 
@@ -835,19 +834,19 @@ rpl_print(netdissect_options *ndo,
         case ND_RPL_DAG_IO:
                 ND_PRINT((ndo, "DODAG Information Object"));
                 if(ndo->ndo_vflag) {
-                        rpl_dio_print(ndo, hdr, bp, length);
+                        rpl_dio_print(ndo, bp, length);
                 }
                 break;
         case ND_RPL_DAO:
                 ND_PRINT((ndo, "Destination Advertisement Object"));
                 if(ndo->ndo_vflag) {
-                        rpl_dao_print(ndo, hdr, bp, length);
+                        rpl_dao_print(ndo, bp, length);
                 }
                 break;
         case ND_RPL_DAO_ACK:
                 ND_PRINT((ndo, "Destination Advertisement Object Ack"));
                 if(ndo->ndo_vflag) {
-                        rpl_daoack_print(ndo, hdr, bp, length);
+                        rpl_daoack_print(ndo, bp, length);
                 }
                 break;
         default:
@@ -1142,7 +1141,8 @@ icmp6_print(netdissect_options *ndo,
 		}
 		break;
         case ND_RPL_MESSAGE:
-                rpl_print(ndo, dp, &dp->icmp6_data8[0], length);
+                /* plus 4, because struct icmp6_hdr contains 4 bytes of icmp payload */
+                rpl_print(ndo, dp, &dp->icmp6_data8[0], length-sizeof(struct icmp6_hdr)+4);
                 break;
 	default:
                 ND_PRINT((ndo,", length %u", length));
