@@ -1847,7 +1847,15 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			dump_info->CurrentFileName = (char *)malloc(PATH_MAX + 1);
 			if (dump_info->CurrentFileName == NULL)
 				error("dump_packet_and_trunc: malloc");
-			/*
+            /* 
+			* Zolf 
+			* Gflag was set otherwise we where not here.
+			* reset the count so multiple files would start with 1,2,3 in the filename 
+			* the counting is handled with the -C flow after this 
+			*/
+			 Cflag_count = 0;
+
+				/*
 			 * This is always the first file in the Cflag
 			 * rotation: e.g. 0
 			 * We also don't need numbering if Cflag is not set.
