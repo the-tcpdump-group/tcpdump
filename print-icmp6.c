@@ -747,10 +747,12 @@ rpl_dao_print(netdissect_options *ndo,
         ND_TCHECK(*dao);
 
         strcpy(dagid_str,"<elided>");
+        length -= sizeof(struct nd_rpl_dao);
         if(RPL_DAO_D(dao->rpl_flags)) {
                 ND_TTEST2(dao->rpl_dagid, 16);
                 rpl_format_dagid(dagid_str, dao->rpl_dagid);
                 dao_end += DAGID_LEN;
+                length  -= DAGID_LEN;
         }
 
         ND_PRINT((ndo, " [dagid:%s,seq:%u,instance:%u]",
