@@ -673,6 +673,8 @@ rpl_dio_printopt(netdissect_options *ndo,
                  u_int length)
 {
         length -= sizeof(struct rpl_dio_genoption);
+        if(length == 0) return;
+
         ND_TCHECK(opt->rpl_dio_len);
 
         while((opt->rpl_dio_type == RPL_OPT_PAD0 &&
