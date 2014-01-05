@@ -759,10 +759,13 @@ rpl_dao_print(netdissect_options *ndo,
                 length -= DAGID_LEN;
         }
 
-        ND_PRINT((ndo, " [dagid:%s,seq:%u,instance:%u]",
+        ND_PRINT((ndo, " [dagid:%s,seq:%u,instance:%u%s%s,%02x]",
                   dagid_str,
                   dao->rpl_daoseq,
-                  dao->rpl_instanceid));
+                  dao->rpl_instanceid,
+                  RPL_DAO_K(dao->rpl_flags) ? ",acK":"",
+                  RPL_DAO_D(dao->rpl_flags) ? ",Dagid":"",
+                  dao->rpl_flags));
 
         if(ndo->ndo_vflag > 1) {
                 const struct rpl_dio_genoption *opt = (struct rpl_dio_genoption *)bp;

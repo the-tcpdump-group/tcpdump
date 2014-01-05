@@ -58,7 +58,6 @@ ikev2fourv4	ikev2four.pcap		ikev2fourv4.out	-t -v -v -v -v
 # ikev2pI2 test in crypto.sh
 
 # IETF ROLL RPL packets
-dio01           rpl-dio.pcap                rpl-dio.out         -t -v
 dio02           rpl-19-pickdag.pcap         rpl-19-pickdag.out  -t -v -v
 dio03           rpl-19-pickdag.pcap         rpl-19-pickdagvvv.out  -t -v -v -v
 dao01           rpl-14-dao.pcap             rpl-14-daovvv.out    -t -v -v -v
