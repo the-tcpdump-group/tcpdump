@@ -55,11 +55,11 @@ ikev2fourv4	ikev2four.pcap		ikev2fourv4.out	-t -v -v -v -v
 ikev2pI2	ikev2pI2.pcap		ikev2pI2.out	-t -E "file ikev2pI2-secrets.txt" -v -v -v -v
 
 # IETF ROLL RPL packets
-dio01           dio.pcap                dio.out         -t -v
-dio02           19-pickdag.pcap         19-pickdag.out  -t -v -v
-dio03           19-pickdag.pcap         19-pickdagvvv.out  -t -v -v -v
-dao01           14-dao.pcap             14-daovvv.out    -t -v -v -v
-daoack01        26-senddaoack.pcap      26-senddaovv.out -t -v -v -v
+dio01           rpl-dio.pcap                rpl-dio.out         -t -v
+dio02           rpl-19-pickdag.pcap         rpl-19-pickdag.out  -t -v -v
+dio03           rpl-19-pickdag.pcap         rpl-19-pickdagvvv.out  -t -v -v -v
+dao01           rpl-14-dao.pcap             rpl-14-daovvv.out    -t -v -v -v
+daoack01        rpl-26-senddaoack.pcap      rpl-26-senddaovv.out -t -v -v -v
 
 # IPNET encapsulated site
 e1000g		e1000g.pcap		e1000g.out	-t
