@@ -153,6 +153,7 @@ HDR = \
 	ppp.h \
 	rpc_auth.h \
 	rpc_msg.h \
+	rpl.h \
 	setsignal.h \
 	signature.h \
 	slcompress.h \
