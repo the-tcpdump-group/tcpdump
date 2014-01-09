@@ -67,23 +67,6 @@ struct sockaddr_storage {
 #endif
 #endif /* HAVE_SOCKADDR_STORAGE */
 
-#ifdef HAVE_LIBCRYPTO
-struct sa_list {
-	struct sa_list	*next;
-	struct sockaddr_storage daddr;
-	u_int32_t	spi;          /* if == 0, then IKEv2 */
-	int             initiator;
-	u_char          spii[8];      /* for IKEv2 */
-	u_char          spir[8];
-	const EVP_CIPHER *evp;
-	int		ivlen;
-	int		authlen;
-	u_char          authsecret[256];
-	int             authsecret_len;
-	u_char		secret[256];  /* is that big enough for all secrets? */
-	int		secretlen;
-};
-
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
  * All rights reserved.
@@ -126,6 +109,23 @@ struct newesp {
 	/*8bit*/			/* next header */
 	/*8bit*/			/* next header */
 	/*variable size, 32bit bound*/	/* Authentication data */
+};
+
+#ifdef HAVE_LIBCRYPTO
+struct sa_list {
+	struct sa_list	*next;
+	struct sockaddr_storage daddr;
+	u_int32_t	spi;          /* if == 0, then IKEv2 */
+	int             initiator;
+	u_char          spii[8];      /* for IKEv2 */
+	u_char          spir[8];
+	const EVP_CIPHER *evp;
+	int		ivlen;
+	int		authlen;
+	u_char          authsecret[256];
+	int             authsecret_len;
+	u_char		secret[256];  /* is that big enough for all secrets? */
+	int		secretlen;
 };
 
 /*
