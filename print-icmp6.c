@@ -481,7 +481,7 @@ static void icmp6_opt_print(netdissect_options *ndo, const u_char *, int);
 static void mld6_print(netdissect_options *ndo, const u_char *);
 static void mldv2_report_print(netdissect_options *ndo, const u_char *, u_int);
 static void mldv2_query_print(netdissect_options *ndo, const u_char *, u_int);
-static struct udphdr *get_upperlayer(netdissect_options *ndo, u_char *, u_int *);
+static const struct udphdr *get_upperlayer(netdissect_options *ndo, const u_char *, u_int *);
 static void dnsname_print(netdissect_options *ndo, const u_char *, const u_char *);
 static void icmp6_nodeinfo_print(netdissect_options *ndo, u_int, const u_char *, const u_char *);
 static void icmp6_rrenum_print(netdissect_options *ndo, const u_char *, const u_char *);
@@ -651,7 +651,7 @@ const struct tok rpl_subopt_values[] = {
 };
 
 static void
-rpl_format_dagid(char dagid_str[65], u_char *dagid)
+rpl_format_dagid(char dagid_str[65], const u_char *dagid)
 {
         char *d = dagid_str;
         int  i;
@@ -669,11 +669,11 @@ rpl_format_dagid(char dagid_str[65], u_char *dagid)
 
 static void
 rpl_dio_printopt(netdissect_options *ndo,
-                 struct rpl_dio_genoption *opt,
+                 const struct rpl_dio_genoption *opt,
                  u_int length)
 {
-        if(length == 0) return;
-        length -= sizeof(struct rpl_dio_genoption);
+        if(length < RPL_DIO_GENOPTION_LEN) return;
+        length -= RPL_DIO_GENOPTION_LEN;
 
         ND_TCHECK(opt->rpl_dio_len);
 
@@ -694,7 +694,7 @@ rpl_dio_printopt(netdissect_options *ndo,
                                 if(paylen > length) paylen = length;
                                 hex_print(ndo,
                                           " ",
-                                          opt->rpl_dio_data,  /* content of DIO option */
+                                          ((u_int8_t *)opt) + RPL_DIO_GENOPTION_LEN,  /* content of DIO option */
                                           paylen);
                         }
                 }
@@ -711,7 +711,7 @@ static void
 rpl_dio_print(netdissect_options *ndo,
               const u_char *bp, u_int length)
 {
-        struct nd_rpl_dio *dio = (struct nd_rpl_dio *)bp;
+        const struct nd_rpl_dio *dio = (struct nd_rpl_dio *)bp;
         char dagid_str[65];
 
         ND_TCHECK(*dio);
@@ -740,19 +740,23 @@ static void
 rpl_dao_print(netdissect_options *ndo,
               const u_char *bp, u_int length)
 {
-        struct nd_rpl_dao *dao = (struct nd_rpl_dao *)bp;
-        u_char *dao_end = (u_char *)&dao[1];
+        const struct nd_rpl_dao *dao = (struct nd_rpl_dao *)bp;
         char dagid_str[65];
 
         ND_TCHECK(*dao);
+        if (length < ND_RPL_DAO_MIN_LEN)
+        	goto tooshort;
 
         strcpy(dagid_str,"<elided>");
-        length -= sizeof(struct nd_rpl_dao);
+        bp += ND_RPL_DAO_MIN_LEN;
+        length -= ND_RPL_DAO_MIN_LEN;
         if(RPL_DAO_D(dao->rpl_flags)) {
-                ND_TTEST2(dao->rpl_dagid, 16);
+                ND_TCHECK2(dao->rpl_dagid, DAGID_LEN);
+                if (length < DAGID_LEN)
+                	goto tooshort;
                 rpl_format_dagid(dagid_str, dao->rpl_dagid);
-                dao_end += DAGID_LEN;
-                length  -= DAGID_LEN;
+                bp += DAGID_LEN;
+                length -= DAGID_LEN;
         }
 
         ND_PRINT((ndo, " [dagid:%s,seq:%u,instance:%u]",
@@ -761,7 +765,7 @@ rpl_dao_print(netdissect_options *ndo,
                   dao->rpl_instanceid));
 
         if(ndo->ndo_vflag > 1) {
-                struct rpl_dio_genoption *opt = (struct rpl_dio_genoption *)dao_end;
+                const struct rpl_dio_genoption *opt = (struct rpl_dio_genoption *)bp;
                 rpl_dio_printopt(ndo, opt, length);
         }
 	return;
@@ -769,25 +773,33 @@ rpl_dao_print(netdissect_options *ndo,
 trunc:
 	ND_PRINT((ndo," [|truncated]"));
 	return;
+
+tooshort:
+	ND_PRINT((ndo," [|length too short]"));
+	return;
 }
 
 static void
 rpl_daoack_print(netdissect_options *ndo,
                  const u_char *bp, u_int length)
 {
-        struct nd_rpl_daoack *daoack = (struct nd_rpl_daoack *)bp;
-        u_char *daoack_end = (u_char *)&daoack[1];
+        const struct nd_rpl_daoack *daoack = (struct nd_rpl_daoack *)bp;
         char dagid_str[65];
 
-        ND_TCHECK(*daoack);
+        ND_TCHECK2(*daoack, ND_RPL_DAOACK_MIN_LEN);
+        if (length < ND_RPL_DAOACK_MIN_LEN)
+        	goto tooshort;
 
         strcpy(dagid_str,"<elided>");
-        length -= sizeof(struct nd_rpl_daoack);
+        bp += ND_RPL_DAOACK_MIN_LEN;
+        length -= ND_RPL_DAOACK_MIN_LEN;
         if(RPL_DAOACK_D(daoack->rpl_flags)) {
-                ND_TTEST2(daoack->rpl_dagid, 16);
+                ND_TCHECK2(daoack->rpl_dagid, 16);
+                if (length < DAGID_LEN)
+                	goto tooshort;
                 rpl_format_dagid(dagid_str, daoack->rpl_dagid);
-                daoack_end += DAGID_LEN;
-                length     -= DAGID_LEN;
+                bp += DAGID_LEN;
+                length -= DAGID_LEN;
         }
 
         ND_PRINT((ndo, " [dagid:%s,seq:%u,instance:%u,status:%u]",
@@ -798,13 +810,17 @@ rpl_daoack_print(netdissect_options *ndo,
 
         /* no officially defined options for DAOACK, but print any we find */
         if(ndo->ndo_vflag > 1) {
-                struct rpl_dio_genoption *opt = (struct rpl_dio_genoption *)daoack_end;
+                const struct rpl_dio_genoption *opt = (struct rpl_dio_genoption *)bp;
                 rpl_dio_printopt(ndo, opt, length);
         }
 	return;
 
 trunc:
 	ND_PRINT((ndo," [|dao-truncated]"));
+	return;
+
+tooshort:
+	ND_PRINT((ndo," [|dao-length too short]"));
 	return;
 }
 
@@ -1159,15 +1175,15 @@ trunc:
 	ND_PRINT((ndo, "[|icmp6]"));
 }
 
-static struct udphdr *
-get_upperlayer(netdissect_options *ndo, u_char *bp, u_int *prot)
+static const struct udphdr *
+get_upperlayer(netdissect_options *ndo, const u_char *bp, u_int *prot)
 {
 	const u_char *ep;
-	struct ip6_hdr *ip6 = (struct ip6_hdr *)bp;
-	struct udphdr *uh;
-	struct ip6_hbh *hbh;
-	struct ip6_frag *fragh;
-	struct ah *ah;
+	const struct ip6_hdr *ip6 = (struct ip6_hdr *)bp;
+	const struct udphdr *uh;
+	const struct ip6_hbh *hbh;
+	const struct ip6_frag *fragh;
+	const struct ah *ah;
 	u_int nh;
 	int hlen;
 
@@ -1388,7 +1404,7 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 static void
 mld6_print(netdissect_options *ndo, const u_char *bp)
 {
-	struct mld6_hdr *mp = (struct mld6_hdr *)bp;
+	const struct mld6_hdr *mp = (struct mld6_hdr *)bp;
 	const u_char *ep;
 
 	/* 'ep' points to the end of available data. */
@@ -1564,8 +1580,8 @@ dnsname_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 static void
 icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, const u_char *ep)
 {
-	struct icmp6_nodeinfo *ni6;
-	struct icmp6_hdr *dp;
+	const struct icmp6_nodeinfo *ni6;
+	const struct icmp6_hdr *dp;
 	const u_char *cp;
 	size_t siz, i;
 	int needcomma;
@@ -1813,7 +1829,7 @@ trunc:
 static void
 icmp6_rrenum_print(netdissect_options *ndo, const u_char *bp, const u_char *ep)
 {
-	struct icmp6_router_renum *rr6;
+	const struct icmp6_router_renum *rr6;
 	const char *cp;
 	struct rr_pco_match *match;
 	struct rr_pco_use *use;

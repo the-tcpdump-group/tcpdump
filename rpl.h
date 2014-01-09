@@ -45,15 +45,19 @@ struct nd_rpl_security {
     u_int16_t rpl_sec_kim_lvl_flags;  /* bit 15/14, KIM */
                                       /* bit 10-8, LVL, bit 7-0 flags */
     u_int32_t rpl_sec_counter;
+#if 0
     u_int8_t  rpl_sec_ki[0];          /* depends upon kim */
-} PACKED;
+#endif
+};
 
 /* section 6.2.1, DODAG Information Solication (DIS_IS) */
 struct nd_rpl_dis_is {
     u_int8_t rpl_dis_flags;
     u_int8_t rpl_dis_reserved;
+#if 0
     u_int8_t rpl_dis_options[0];
-} PACKED;
+#endif
+};
 
 /* section 6.3.1, DODAG Information Object (DIO) */
 struct nd_rpl_dio {
@@ -65,7 +69,7 @@ struct nd_rpl_dio {
     u_int8_t  rpl_flags;    /* no flags defined yet */
     u_int8_t  rpl_resv1;
     u_int8_t  rpl_dagid[DAGID_LEN];
-} PACKED;
+};
 #define RPL_DIO_GROUND_FLAG 0x80
 #define RPL_DIO_MOP_SHIFT   3
 #define RPL_DIO_MOP_MASK    (7 << RPL_DIO_MOP_SHIFT)
@@ -97,8 +101,8 @@ enum RPL_SUBOPT {
 struct rpl_dio_genoption {
     u_int8_t rpl_dio_type;
     u_int8_t rpl_dio_len;        /* suboption length, not including type/len */
-    u_int8_t rpl_dio_data[0];
-} PACKED;
+};
+#define RPL_DIO_GENOPTION_LEN	2
 
 #define RPL_DIO_LIFETIME_INFINITE   0xffffffff
 #define RPL_DIO_LIFETIME_DISCONNECT 0
@@ -109,8 +113,10 @@ struct rpl_dio_destprefix {
     u_int8_t rpl_dio_prefixlen;        /* in bits */
     u_int8_t rpl_dio_prf;              /* flags, including Route Preference */
     u_int32_t rpl_dio_prefixlifetime;  /* in seconds */
-    u_int8_t rpl_dio_prefix[0];        /* variables number of bytes */
-} PACKED;
+#if 0
+    u_int8_t rpl_dio_prefix[0];        /* variable number of bytes */
+#endif
+};
 
 /* section 6.4.1, DODAG Information Object (DIO) */
 struct nd_rpl_dao {
@@ -118,8 +124,9 @@ struct nd_rpl_dao {
     u_int8_t  rpl_flags;      /* bit 7=K, 6=D */
     u_int8_t  rpl_resv;
     u_int8_t  rpl_daoseq;
-    u_int8_t  rpl_dagid[0];   /* [DAGID_LEN] present when D set. */
-} PACKED;
+    u_int8_t  rpl_dagid[DAGID_LEN];   /* present when D set. */
+};
+#define ND_RPL_DAO_MIN_LEN	4	/* length without DAGID */
 
 /* indicates if this DAO is to be acK'ed */
 #define RPL_DAO_K_SHIFT   7
@@ -136,8 +143,10 @@ struct rpl_dao_target {
     u_int8_t rpl_dao_len;
     u_int8_t rpl_dao_flags;            /* unused */
     u_int8_t rpl_dao_prefixlen;        /* in bits */
-    u_int8_t rpl_dao_prefix[0];        /* variables number of bytes */
-} PACKED;
+#if 0
+    u_int8_t rpl_dao_prefix[0];        /* variable number of bytes */
+#endif
+};
 
 /* section 6.5.1, Destination Advertisement Object Acknowledgement (DAO-ACK) */
 struct nd_rpl_daoack {
@@ -145,8 +154,9 @@ struct nd_rpl_daoack {
     u_int8_t  rpl_flags;      /* bit 7=D */
     u_int8_t  rpl_daoseq;
     u_int8_t  rpl_status;
-    u_int8_t  rpl_dagid[0];   /* [DAGID_LEN] present when D set. */
-} PACKED;
+    u_int8_t  rpl_dagid[DAGID_LEN];   /* present when D set. */
+};
+#define ND_RPL_DAOACK_MIN_LEN	4	/* length without DAGID */
 /* indicates if the DAGID is present */
 #define RPL_DAOACK_D_SHIFT   7
 #define RPL_DAOACK_D_MASK    (1 << RPL_DAOACK_D_SHIFT)
