@@ -401,6 +401,7 @@ ethertype_print(netdissect_options *ndo,
 		return (1);
 
         case ETHERTYPE_LOOPBACK:
+		loopback_print(ndo, p, length);
                 return (1);
 
 	case ETHERTYPE_MPLS:
