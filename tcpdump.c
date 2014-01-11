@@ -797,10 +797,20 @@ main(int argc, char **argv)
 			if (pcap_findalldevs(&devpointer, ebuf) < 0)
 				error("%s", ebuf);
 			else {
-				for (i = 0; devpointer != 0; i++) {
+				for (i = 0; devpointer != NULL; i++) {
 					printf("%d.%s", i+1, devpointer->name);
 					if (devpointer->description != NULL)
 						printf(" (%s)", devpointer->description);
+					if (devpointer->flags != 0) {
+    					printf(" [");
+					    if (devpointer->flags & PCAP_IF_UP)
+					        printf("Up-");
+					    if (devpointer->flags & PCAP_IF_RUNNING)
+					        printf("Running-");
+					    if (devpointer->flags & PCAP_IF_LOOPBACK)
+					        printf("Loopback-");
+    					printf("\b]");
+    				}
 					printf("\n");
 					devpointer = devpointer->next;
 				}
