@@ -346,6 +346,17 @@ static const struct ndo_printer ndo_printers[] = {
 	{ NULL,			0 },
 };
 
+static const struct tok status_flags[] = {
+#ifdef PCAP_IF_UP
+	{ PCAP_IF_UP,       "Up"       },
+#endif
+#ifdef PCAP_IF_RUNNING
+	{ PCAP_IF_RUNNING,  "Running"  },
+#endif
+	{ PCAP_IF_LOOPBACK, "Loopback" },
+	{ 0, NULL }
+};
+
 if_printer
 lookup_printer(int type)
 {
@@ -801,14 +812,8 @@ main(int argc, char **argv)
 					printf("%d.%s", i+1, devpointer->name);
 					if (devpointer->description != NULL)
 						printf(" (%s)", devpointer->description);
-					if (devpointer->flags != 0) {
-					    struct tok status_flags[] = {
-					        { PCAP_IF_UP, "Up" },
-					        { PCAP_IF_RUNNING, "Running" },
-					        { PCAP_IF_LOOPBACK, "Loopback" }
-					    };
-    					printf(" [%s]", bittok2str(status_flags, "none", devpointer->flags));
-    				}
+					if (devpointer->flags != 0)
+						printf(" [%s]", bittok2str(status_flags, "none", devpointer->flags));
 					printf("\n");
 					devpointer = devpointer->next;
 				}
