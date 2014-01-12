@@ -802,14 +802,12 @@ main(int argc, char **argv)
 					if (devpointer->description != NULL)
 						printf(" (%s)", devpointer->description);
 					if (devpointer->flags != 0) {
-    					printf(" [");
-					    if (devpointer->flags & PCAP_IF_UP)
-					        printf("Up-");
-					    if (devpointer->flags & PCAP_IF_RUNNING)
-					        printf("Running-");
-					    if (devpointer->flags & PCAP_IF_LOOPBACK)
-					        printf("Loopback-");
-    					printf("\b]");
+					    struct tok status_flags[] = {
+					        { PCAP_IF_UP, "Up" },
+					        { PCAP_IF_RUNNING, "Running" },
+					        { PCAP_IF_LOOPBACK, "Loopback" }
+					    };
+    					printf(" [%s]", bittok2str(status_flags, "none", devpointer->flags));
     				}
 					printf("\n");
 					devpointer = devpointer->next;
