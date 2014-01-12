@@ -797,10 +797,18 @@ main(int argc, char **argv)
 			if (pcap_findalldevs(&devpointer, ebuf) < 0)
 				error("%s", ebuf);
 			else {
-				for (i = 0; devpointer != 0; i++) {
+				for (i = 0; devpointer != NULL; i++) {
 					printf("%d.%s", i+1, devpointer->name);
 					if (devpointer->description != NULL)
 						printf(" (%s)", devpointer->description);
+					if (devpointer->flags != 0) {
+					    struct tok status_flags[] = {
+					        { PCAP_IF_UP, "Up" },
+					        { PCAP_IF_RUNNING, "Running" },
+					        { PCAP_IF_LOOPBACK, "Loopback" }
+					    };
+    					printf(" [%s]", bittok2str(status_flags, "none", devpointer->flags));
+    				}
 					printf("\n");
 					devpointer = devpointer->next;
 				}
