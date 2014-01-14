@@ -98,6 +98,7 @@ extern int SIZE_BUF;
 netdissect_options Gndo;
 netdissect_options *gndo = &Gndo;
 
+static int Dflag;			/* list available devices and exit */
 static int dflag;			/* print filter code */
 static int Lflag;			/* list available data link types and exit */
 #ifdef HAVE_PCAP_SET_TSTAMP_TYPE
@@ -494,6 +495,31 @@ show_dlts_and_exit(const char *device, pcap_t *pd)
 	exit(0);
 }
 
+#ifdef HAVE_PCAP_FINDALLDEVS
+static void
+show_devices_and_exit (void)
+{
+	pcap_if_t *devpointer;
+	char ebuf[PCAP_ERRBUF_SIZE];
+	int i;
+
+	if (pcap_findalldevs(&devpointer, ebuf) < 0)
+		error("%s", ebuf);
+	else {
+		for (i = 0; devpointer != NULL; i++) {
+			printf("%d.%s", i+1, devpointer->name);
+			if (devpointer->description != NULL)
+				printf(" (%s)", devpointer->description);
+			if (devpointer->flags != 0)
+				printf(" [%s]", bittok2str(status_flags, "none", devpointer->flags));
+			printf("\n");
+			devpointer = devpointer->next;
+		}
+	}
+	exit(0);
+}
+#endif /* HAVE_PCAP_FINDALLDEVS */
+
 /*
  * Set up flags that might or might not be supported depending on the
  * version of libpcap we're using.
@@ -803,23 +829,9 @@ main(int argc, char **argv)
 			++dflag;
 			break;
 
-#ifdef HAVE_PCAP_FINDALLDEVS
 		case 'D':
-			if (pcap_findalldevs(&devpointer, ebuf) < 0)
-				error("%s", ebuf);
-			else {
-				for (i = 0; devpointer != NULL; i++) {
-					printf("%d.%s", i+1, devpointer->name);
-					if (devpointer->description != NULL)
-						printf(" (%s)", devpointer->description);
-					if (devpointer->flags != 0)
-						printf(" [%s]", bittok2str(status_flags, "none", devpointer->flags));
-					printf("\n");
-					devpointer = devpointer->next;
-				}
-			}
-			return 0;
-#endif /* HAVE_PCAP_FINDALLDEVS */
+			Dflag++;
+			break;
 
 		case 'L':
 			Lflag++;
@@ -1131,28 +1143,22 @@ main(int argc, char **argv)
 			break;
 #endif
 		case 'z':
-			if (optarg) {
-				zflag = strdup(optarg);
-			} else {
-				usage();
-				/* NOTREACHED */
-			}
+			zflag = strdup(optarg);
 			break;
 
 		case 'Z':
-			if (optarg) {
-				username = strdup(optarg);
-			}
-			else {
-				usage();
-				/* NOTREACHED */
-			}
+			username = strdup(optarg);
 			break;
 
 		default:
 			usage();
 			/* NOTREACHED */
 		}
+
+#ifdef HAVE_PCAP_FINDALLDEVS
+	if (Dflag)
+		show_devices_and_exit();
+#endif
 
 	switch (tflag) {
 
