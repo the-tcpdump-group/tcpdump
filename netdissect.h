@@ -293,7 +293,7 @@ extern if_printer lookup_printer(int);
 
 extern void eap_print(netdissect_options *,const u_char *, u_int);
 extern int esp_print(netdissect_options *,
-		     register const u_char *bp, int len, register const u_char *bp2,
+		     const u_char *bp, const int length, const u_char *bp2,
 		     int *nhdr, int *padlen);
 extern void arp_print(netdissect_options *,const u_char *, u_int, u_int);
 extern void tipc_print(netdissect_options *, const u_char *, u_int, u_int);

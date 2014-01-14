@@ -235,7 +235,7 @@ extern void ns_print(const u_char *, u_int, int);
 extern const u_char * ns_nprint (register const u_char *, register const u_char *);
 extern void ntp_print(const u_char *, u_int);
 extern u_int null_if_print(const struct pcap_pkthdr *, const u_char *);
-extern void openflow_print(const u_char *, u_int);
+extern void openflow_print(const u_char *, const u_int);
 extern void ospf_print(const u_char *, u_int, const u_char *);
 extern void olsr_print (const u_char *, u_int, int);
 extern void pimv1_print(const u_char *, u_int);
@@ -340,7 +340,7 @@ extern u_int usb_linux_48_byte_print(const struct pcap_pkthdr *, const u_char *)
 extern u_int usb_linux_64_byte_print(const struct pcap_pkthdr *, const u_char *);
 extern void vxlan_print(const u_char *, u_int);
 extern void otv_print(const u_char *, u_int);
-extern void ahcp_print(const u_char *, u_int);
+extern void ahcp_print(const u_char *, const u_int);
 
 
 #ifdef INET6
