@@ -309,7 +309,7 @@ extern void ip_print_inner(netdissect_options *ndo,
 			   const u_char *bp, u_int length, u_int nh,
 			   const u_char *bp2);
 extern void rrcp_print(netdissect_options *,const u_char *, u_int);
-extern void loopback_print(netdissect_options *, const u_char *, u_int);
+extern void loopback_print(netdissect_options *, const u_char *, const u_int);
 
 extern void ether_print(netdissect_options *,
                         const u_char *, u_int, u_int,
