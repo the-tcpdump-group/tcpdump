@@ -1,3 +1,12 @@
+Wednesday Jan. 15, 2014 guy@alum.mit.edu
+  Summary for 4.5.2 tcpdump release
+	Man page fix
+	Fix crashes on SPARC
+
+Monday Nov. 11, 2013 mcr@sandelman.ca
+  Summary for 4.5.1 tcpdump release
+	CREDITS file fixes
+
 Thursday Nov. 7, 2013  mcr@sandelman.ca and guy@alum.mit.edu.
   Summary for 4.5.0 tcpdump release
         some NFSv4 fixes for printing  
