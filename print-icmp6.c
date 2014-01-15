@@ -721,7 +721,7 @@ rpl_dio_print(netdissect_options *ndo,
                   dagid_str,
                   dio->rpl_dtsn,
                   dio->rpl_instanceid,
-                  dio->rpl_dagrank,
+                  EXTRACT_16BITS(&dio->rpl_dagrank),
                   RPL_DIO_GROUNDED(dio->rpl_mopprf) ? "grounded,":"",
                   tok2str(rpl_mop_values, "mop%u", RPL_DIO_MOP(dio->rpl_mopprf)),
                   RPL_DIO_PRF(dio->rpl_mopprf)));
