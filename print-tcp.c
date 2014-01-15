@@ -307,12 +307,18 @@ tcp_print(register const u_char *bp, register u_int length,
 #endif /*INET6*/
                         register struct tcp_seq_hash *th;
                         struct tcp_seq_hash *tcp_seq_hash;
-                        const struct in_addr *src, *dst;
+                        const void *src, *dst;
                         struct tha tha;
 
                         tcp_seq_hash = tcp_seq_hash4;
-                        src = &ip->ip_src;
-                        dst = &ip->ip_dst;
+			/*
+			 * We use "void *" to keep the compiler from
+			 * assuming the structures are aligned and
+			 * generating non-unaligned-safe code for
+			 * the copies.
+			 */
+                        src = (const void *)&ip->ip_src;
+                        dst = (const void *)&ip->ip_dst;
                         if (sport > dport)
                                 rev = 1;
                         else if (sport == dport) {
