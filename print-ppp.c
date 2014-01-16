@@ -1265,6 +1265,9 @@ ppp_hdlc(const u_char *p, int length)
 	int i, proto;
 	const void *se;
 
+        if (length <= 0)
+                return;
+
 	b = (u_int8_t *)malloc(length);
 	if (b == NULL)
 		return;
