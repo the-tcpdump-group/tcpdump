@@ -307,31 +307,25 @@ tcp_print(register const u_char *bp, register u_int length,
 #endif /*INET6*/
                         register struct tcp_seq_hash *th;
                         struct tcp_seq_hash *tcp_seq_hash;
-                        const void *src, *dst;
+                        const struct in_addr *src, *dst;
                         struct tha tha;
 
                         tcp_seq_hash = tcp_seq_hash4;
-			/*
-			 * We use "void *" to keep the compiler from
-			 * assuming the structures are aligned and
-			 * generating non-unaligned-safe code for
-			 * the copies.
-			 */
-                        src = (const void *)&ip->ip_src;
-                        dst = (const void *)&ip->ip_dst;
+                        src = &ip->ip_src;
+                        dst = &ip->ip_dst;
                         if (sport > dport)
                                 rev = 1;
                         else if (sport == dport) {
-                                if (memcmp(src, dst, sizeof ip->ip_dst) > 0)
+                                if (unaligned_memcmp(src, dst, sizeof ip->ip_dst) > 0)
                                         rev = 1;
                         }
                         if (rev) {
-                                memcpy(&tha.src, dst, sizeof ip->ip_dst);
-                                memcpy(&tha.dst, src, sizeof ip->ip_src);
+                                unaligned_memcpy(&tha.src, dst, sizeof ip->ip_dst);
+                                unaligned_memcpy(&tha.dst, src, sizeof ip->ip_src);
                                 tha.port = dport << 16 | sport;
                         } else {
-                                memcpy(&tha.dst, dst, sizeof ip->ip_dst);
-                                memcpy(&tha.src, src, sizeof ip->ip_src);
+                                unaligned_memcpy(&tha.dst, dst, sizeof ip->ip_dst);
+                                unaligned_memcpy(&tha.src, src, sizeof ip->ip_src);
                                 tha.port = sport << 16 | dport;
                         }
 

@@ -617,3 +617,11 @@ unaligned_memcpy(void *p, const void *q, size_t l)
 {
 	memcpy(p, q, l);
 }
+
+/* As with memcpy(), so with memcmp(). */
+int
+unaligned_memcmp(void *p, const void *q, size_t l)
+{
+	return (memcmp(p, q, l));
+}
+
