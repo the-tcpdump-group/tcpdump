@@ -324,7 +324,6 @@ struct ikev1_pl_d {
 	/* SPI(es) */
 };
 
-
 struct ikev1_ph1tab {
 	struct ikev1_ph1 *head;
 	struct ikev1_ph1 *tail;
