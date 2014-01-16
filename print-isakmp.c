@@ -652,10 +652,17 @@ ikev1_print(netdissect_options *ndo,
 
 #define MAXINITIATORS	20
 int ninitiator = 0;
+union inaddr_u {
+	struct in_addr in4;
+#ifdef INET6
+	struct in6_addr in6;
+#endif
+};
 struct {
 	cookie_t initiator;
-	struct sockaddr_storage iaddr;
-	struct sockaddr_storage raddr;
+	u_int version;
+	union inaddr_u iaddr;
+	union inaddr_u raddr;
 } cookiecache[MAXINITIATORS];
 
 /* protocol id */
@@ -781,10 +788,8 @@ cookie_record(cookie_t *in, const u_char *bp2)
 {
 	int i;
 	struct ip *ip;
-	struct sockaddr_in *sin;
 #ifdef INET6
 	struct ip6_hdr *ip6;
-	struct sockaddr_in6 *sin6;
 #endif
 
 	i = cookie_find(in);
@@ -796,44 +801,16 @@ cookie_record(cookie_t *in, const u_char *bp2)
 	ip = (struct ip *)bp2;
 	switch (IP_V(ip)) {
 	case 4:
-		memset(&cookiecache[ninitiator].iaddr, 0,
-			sizeof(cookiecache[ninitiator].iaddr));
-		memset(&cookiecache[ninitiator].raddr, 0,
-			sizeof(cookiecache[ninitiator].raddr));
-
-		sin = (struct sockaddr_in *)&cookiecache[ninitiator].iaddr;
-#ifdef HAVE_SOCKADDR_SA_LEN
-		sin->sin_len = sizeof(struct sockaddr_in);
-#endif
-		sin->sin_family = AF_INET;
-		unaligned_memcpy(&sin->sin_addr, &ip->ip_src, sizeof(ip->ip_src));
-		sin = (struct sockaddr_in *)&cookiecache[ninitiator].raddr;
-#ifdef HAVE_SOCKADDR_SA_LEN
-		sin->sin_len = sizeof(struct sockaddr_in);
-#endif
-		sin->sin_family = AF_INET;
-		unaligned_memcpy(&sin->sin_addr, &ip->ip_dst, sizeof(ip->ip_dst));
+		cookiecache[ninitiator].version = 4;
+		unaligned_memcpy(&cookiecache[ninitiator].iaddr.in4, &ip->ip_src, sizeof(struct in_addr));
+		unaligned_memcpy(&cookiecache[ninitiator].raddr.in4, &ip->ip_dst, sizeof(struct in_addr));
 		break;
 #ifdef INET6
 	case 6:
-		memset(&cookiecache[ninitiator].iaddr, 0,
-			sizeof(cookiecache[ninitiator].iaddr));
-		memset(&cookiecache[ninitiator].raddr, 0,
-			sizeof(cookiecache[ninitiator].raddr));
-
 		ip6 = (struct ip6_hdr *)bp2;
-		sin6 = (struct sockaddr_in6 *)&cookiecache[ninitiator].iaddr;
-#ifdef HAVE_SOCKADDR_SA_LEN
-		sin6->sin6_len = sizeof(struct sockaddr_in6);
-#endif
-		sin6->sin6_family = AF_INET6;
-		unaligned_memcpy(&sin6->sin6_addr, &ip6->ip6_src, sizeof(ip6->ip6_src));
-		sin6 = (struct sockaddr_in6 *)&cookiecache[ninitiator].raddr;
-#ifdef HAVE_SOCKADDR_SA_LEN
-		sin6->sin6_len = sizeof(struct sockaddr_in6);
-#endif
-		sin6->sin6_family = AF_INET6;
-		unaligned_memcpy(&sin6->sin6_addr, &ip6->ip6_dst, sizeof(ip6->ip6_dst));
+		cookiecache[ninitiator].version = 6;
+		unaligned_memcpy(&cookiecache[ninitiator].iaddr.in6, &ip6->ip6_src, sizeof(struct in6_addr));
+		unaligned_memcpy(&cookiecache[ninitiator].raddr.in6, &ip6->ip6_dst, sizeof(struct in6_addr));
 		break;
 #endif
 	default:
@@ -848,78 +825,42 @@ cookie_record(cookie_t *in, const u_char *bp2)
 static int
 cookie_sidecheck(int i, const u_char *bp2, int initiator)
 {
-	struct sockaddr_storage ss;
-	struct sockaddr *sa;
 	struct ip *ip;
-	struct sockaddr_in *sin;
 #ifdef INET6
 	struct ip6_hdr *ip6;
-	struct sockaddr_in6 *sin6;
 #endif
-	int salen;
 
-	memset(&ss, 0, sizeof(ss));
 	ip = (struct ip *)bp2;
 	switch (IP_V(ip)) {
 	case 4:
-		sin = (struct sockaddr_in *)&ss;
-#ifdef HAVE_SOCKADDR_SA_LEN
-		sin->sin_len = sizeof(struct sockaddr_in);
-#endif
-		sin->sin_family = AF_INET;
-		unaligned_memcpy(&sin->sin_addr, &ip->ip_src, sizeof(ip->ip_src));
+		if (cookiecache[i].version != 4)
+			return 0;
+		if (initiator) {
+			if (unaligned_memcmp(&ip->ip_src, &cookiecache[i].iaddr.in4, sizeof(struct in_addr)) == 0)
+				return 1;
+		} else {
+			if (unaligned_memcmp(&ip->ip_src, &cookiecache[i].raddr.in4, sizeof(struct in_addr)) == 0)
+				return 1;
+		}
 		break;
 #ifdef INET6
 	case 6:
+		if (cookiecache[i].version != 6)
+			return 0;
 		ip6 = (struct ip6_hdr *)bp2;
-		sin6 = (struct sockaddr_in6 *)&ss;
-#ifdef HAVE_SOCKADDR_SA_LEN
-		sin6->sin6_len = sizeof(struct sockaddr_in6);
-#endif
-		sin6->sin6_family = AF_INET6;
-		unaligned_memcpy(&sin6->sin6_addr, &ip6->ip6_src, sizeof(ip6->ip6_src));
+		if (initiator) {
+			if (unaligned_memcmp(&ip6->ip6_src, &cookiecache[i].iaddr.in6, sizeof(struct in6_addr)) == 0)
+				return 1;
+		} else {
+			if (unaligned_memcmp(&ip6->ip6_src, &cookiecache[i].raddr.in6, sizeof(struct in6_addr)) == 0)
+				return 1;
+		}
 		break;
-#endif
+#endif /* INET6 */
 	default:
-		return 0;
+		break;
 	}
 
-	sa = (struct sockaddr *)&ss;
-	if (initiator) {
-		if (sa->sa_family != ((struct sockaddr *)&cookiecache[i].iaddr)->sa_family)
-			return 0;
-#ifdef HAVE_SOCKADDR_SA_LEN
-		salen = sa->sa_len;
-#else
-#ifdef INET6
-		if (sa->sa_family == AF_INET6)
-			salen = sizeof(struct sockaddr_in6);
-		else
-			salen = sizeof(struct sockaddr);
-#else
-		salen = sizeof(struct sockaddr);
-#endif
-#endif
-		if (memcmp(&ss, &cookiecache[i].iaddr, salen) == 0)
-			return 1;
-	} else {
-		if (sa->sa_family != ((struct sockaddr *)&cookiecache[i].raddr)->sa_family)
-			return 0;
-#ifdef HAVE_SOCKADDR_SA_LEN
-		salen = sa->sa_len;
-#else
-#ifdef INET6
-		if (sa->sa_family == AF_INET6)
-			salen = sizeof(struct sockaddr_in6);
-		else
-			salen = sizeof(struct sockaddr);
-#else
-		salen = sizeof(struct sockaddr);
-#endif
-#endif
-		if (memcmp(&ss, &cookiecache[i].raddr, salen) == 0)
-			return 1;
-	}
 	return 0;
 }
 
