@@ -606,3 +606,14 @@ safeputchar(int c)
 	else
 		printf("\\0x%02x", ch);
 }
+
+/*
+ * some compiler tries to optimize memcpy(), using the alignment constraint
+ * on the argument pointer type.  by using this function, we try to avoid the
+ * optimization.
+ */
+void
+unaligned_memcpy(void *p, const void *q, size_t l)
+{
+	memcpy(p, q, l);
+}

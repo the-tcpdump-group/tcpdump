@@ -272,6 +272,8 @@ extern char *copy_argv(netdissect_options *, char **);
 extern void safeputchar(int);
 extern void safeputs(const char *, int);
 
+extern void unaligned_memcpy(void *, const void *, size_t);
+
 #define PLURAL_SUFFIX(n) \
 	(((n) != 1) ? "s" : "")
 

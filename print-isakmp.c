@@ -129,7 +129,6 @@ static const u_char *ikev2_sub_print(netdissect_options *ndo,
 
 
 static char *numstr(int);
-static void safememcpy(void *, const void *, size_t);
 
 static void
 ikev1_print(netdissect_options *ndo,
@@ -292,13 +291,13 @@ cookie_record(cookie_t *in, const u_char *bp2)
 		sin->sin_len = sizeof(struct sockaddr_in);
 #endif
 		sin->sin_family = AF_INET;
-		memcpy(&sin->sin_addr, &ip->ip_src, sizeof(ip->ip_src));
+		unaligned_memcpy(&sin->sin_addr, &ip->ip_src, sizeof(ip->ip_src));
 		sin = (struct sockaddr_in *)&cookiecache[ninitiator].raddr;
 #ifdef HAVE_SOCKADDR_SA_LEN
 		sin->sin_len = sizeof(struct sockaddr_in);
 #endif
 		sin->sin_family = AF_INET;
-		memcpy(&sin->sin_addr, &ip->ip_dst, sizeof(ip->ip_dst));
+		unaligned_memcpy(&sin->sin_addr, &ip->ip_dst, sizeof(ip->ip_dst));
 		break;
 #ifdef INET6
 	case 6:
@@ -313,19 +312,19 @@ cookie_record(cookie_t *in, const u_char *bp2)
 		sin6->sin6_len = sizeof(struct sockaddr_in6);
 #endif
 		sin6->sin6_family = AF_INET6;
-		memcpy(&sin6->sin6_addr, &ip6->ip6_src, sizeof(ip6->ip6_src));
+		unaligned_memcpy(&sin6->sin6_addr, &ip6->ip6_src, sizeof(ip6->ip6_src));
 		sin6 = (struct sockaddr_in6 *)&cookiecache[ninitiator].raddr;
 #ifdef HAVE_SOCKADDR_SA_LEN
 		sin6->sin6_len = sizeof(struct sockaddr_in6);
 #endif
 		sin6->sin6_family = AF_INET6;
-		memcpy(&sin6->sin6_addr, &ip6->ip6_dst, sizeof(ip6->ip6_dst));
+		unaligned_memcpy(&sin6->sin6_addr, &ip6->ip6_dst, sizeof(ip6->ip6_dst));
 		break;
 #endif
 	default:
 		return;
 	}
-	memcpy(&cookiecache[ninitiator].initiator, in, sizeof(*in));
+	unaligned_memcpy(&cookiecache[ninitiator].initiator, in, sizeof(*in));
 	ninitiator = (ninitiator + 1) % MAXINITIATORS;
 }
 
@@ -353,7 +352,7 @@ cookie_sidecheck(int i, const u_char *bp2, int initiator)
 		sin->sin_len = sizeof(struct sockaddr_in);
 #endif
 		sin->sin_family = AF_INET;
-		memcpy(&sin->sin_addr, &ip->ip_src, sizeof(ip->ip_src));
+		unaligned_memcpy(&sin->sin_addr, &ip->ip_src, sizeof(ip->ip_src));
 		break;
 #ifdef INET6
 	case 6:
@@ -363,7 +362,7 @@ cookie_sidecheck(int i, const u_char *bp2, int initiator)
 		sin6->sin6_len = sizeof(struct sockaddr_in6);
 #endif
 		sin6->sin6_family = AF_INET6;
-		memcpy(&sin6->sin6_addr, &ip6->ip6_src, sizeof(ip6->ip6_src));
+		unaligned_memcpy(&sin6->sin6_addr, &ip6->ip6_src, sizeof(ip6->ip6_src));
 		break;
 #endif
 	default:
@@ -557,7 +556,7 @@ ikev1_sa_print(netdissect_options *ndo, u_char tpay _U_,
 
 	p = (struct ikev1_pl_sa *)ext;
 	ND_TCHECK(*p);
-	safememcpy(&sa, ext, sizeof(sa));
+	unaligned_memcpy(&sa, ext, sizeof(sa));
 	doi = ntohl(sa.doi);
 	sit = ntohl(sa.sit);
 	if (doi != 1) {
@@ -584,7 +583,7 @@ ikev1_sa_print(netdissect_options *ndo, u_char tpay _U_,
 	np = (u_char *)ext + sizeof(sa);
 	if (sit != 0x01) {
 		ND_TCHECK2(*(ext + 1), sizeof(ident));
-		safememcpy(&ident, ext + 1, sizeof(ident));
+		unaligned_memcpy(&ident, ext + 1, sizeof(ident));
 		ND_PRINT((ndo," ident=%u", (u_int32_t)ntohl(ident)));
 		np += sizeof(ident);
 	}
@@ -615,7 +614,7 @@ ikev1_p_print(netdissect_options *ndo, u_char tpay _U_,
 
 	p = (struct ikev1_pl_p *)ext;
 	ND_TCHECK(*p);
-	safememcpy(&prop, ext, sizeof(prop));
+	unaligned_memcpy(&prop, ext, sizeof(prop));
 	ND_PRINT((ndo," #%d protoid=%s transform=%d",
 		  prop.p_no, PROTOIDSTR(prop.prot_id), prop.num_t));
 	if (prop.spi_size) {
@@ -782,7 +781,7 @@ ikev1_t_print(netdissect_options *ndo, u_char tpay _U_,
 
 	p = (struct ikev1_pl_t *)ext;
 	ND_TCHECK(*p);
-	safememcpy(&t, ext, sizeof(t));
+	unaligned_memcpy(&t, ext, sizeof(t));
 
 	switch (proto) {
 	case 1:
@@ -844,7 +843,7 @@ ikev1_ke_print(netdissect_options *ndo, u_char tpay _U_,
 	ND_PRINT((ndo,"%s:", NPSTR(ISAKMP_NPTYPE_KE)));
 
 	ND_TCHECK(*ext);
-	safememcpy(&e, ext, sizeof(e));
+	unaligned_memcpy(&e, ext, sizeof(e));
 	ND_PRINT((ndo," key len=%d", ntohs(e.len) - 4));
 	if (2 < ndo->ndo_vflag && 4 < ntohs(e.len)) {
 		ND_PRINT((ndo," "));
@@ -881,7 +880,7 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 
 	p = (struct ikev1_pl_id *)ext;
 	ND_TCHECK(*p);
-	safememcpy(&id, ext, sizeof(id));
+	unaligned_memcpy(&id, ext, sizeof(id));
 	if (sizeof(*p) < item_len) {
 		data = (u_char *)(p + 1);
 		len = item_len - sizeof(*p);
@@ -914,7 +913,7 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 
 		p = (struct ipsecdoi_id *)ext;
 		ND_TCHECK(*p);
-		safememcpy(&id, ext, sizeof(id));
+		unaligned_memcpy(&id, ext, sizeof(id));
 		ND_PRINT((ndo," idtype=%s", STR_OR_ID(id.type, ipsecidtypestr)));
 		if (id.proto_id) {
 #ifndef WIN32
@@ -1055,7 +1054,7 @@ ikev1_cert_print(netdissect_options *ndo, u_char tpay _U_,
 
 	p = (struct ikev1_pl_cert *)ext;
 	ND_TCHECK(*p);
-	safememcpy(&cert, ext, sizeof(cert));
+	unaligned_memcpy(&cert, ext, sizeof(cert));
 	ND_PRINT((ndo," len=%d", item_len - 4));
 	ND_PRINT((ndo," type=%s", STR_OR_ID((cert.encode), certstr)));
 	if (2 < ndo->ndo_vflag && 4 < item_len) {
@@ -1087,7 +1086,7 @@ ikev1_cr_print(netdissect_options *ndo, u_char tpay _U_,
 
 	p = (struct ikev1_pl_cert *)ext;
 	ND_TCHECK(*p);
-	safememcpy(&cert, ext, sizeof(cert));
+	unaligned_memcpy(&cert, ext, sizeof(cert));
 	ND_PRINT((ndo," len=%d", item_len - 4));
 	ND_PRINT((ndo," type=%s", STR_OR_ID((cert.encode), certstr)));
 	if (2 < ndo->ndo_vflag && 4 < item_len) {
@@ -1112,7 +1111,7 @@ ikev1_hash_print(netdissect_options *ndo, u_char tpay _U_,
 	ND_PRINT((ndo,"%s:", NPSTR(ISAKMP_NPTYPE_HASH)));
 
 	ND_TCHECK(*ext);
-	safememcpy(&e, ext, sizeof(e));
+	unaligned_memcpy(&e, ext, sizeof(e));
 	ND_PRINT((ndo," len=%d", ntohs(e.len) - 4));
 	if (2 < ndo->ndo_vflag && 4 < ntohs(e.len)) {
 		ND_PRINT((ndo," "));
@@ -1136,7 +1135,7 @@ ikev1_sig_print(netdissect_options *ndo, u_char tpay _U_,
 	ND_PRINT((ndo,"%s:", NPSTR(ISAKMP_NPTYPE_SIG)));
 
 	ND_TCHECK(*ext);
-	safememcpy(&e, ext, sizeof(e));
+	unaligned_memcpy(&e, ext, sizeof(e));
 	ND_PRINT((ndo," len=%d", ntohs(e.len) - 4));
 	if (2 < ndo->ndo_vflag && 4 < ntohs(e.len)) {
 		ND_PRINT((ndo," "));
@@ -1162,7 +1161,7 @@ ikev1_nonce_print(netdissect_options *ndo, u_char tpay _U_,
 	ND_PRINT((ndo,"%s:", NPSTR(ISAKMP_NPTYPE_NONCE)));
 
 	ND_TCHECK(*ext);
-	safememcpy(&e, ext, sizeof(e));
+	unaligned_memcpy(&e, ext, sizeof(e));
 	ND_PRINT((ndo," n len=%d", ntohs(e.len) - 4));
 	if (2 < ndo->ndo_vflag && 4 < ntohs(e.len)) {
 		ND_PRINT((ndo," "));
@@ -1240,7 +1239,7 @@ ikev1_n_print(netdissect_options *ndo, u_char tpay _U_,
 
 	p = (struct ikev1_pl_n *)ext;
 	ND_TCHECK(*p);
-	safememcpy(&n, ext, sizeof(n));
+	unaligned_memcpy(&n, ext, sizeof(n));
 	doi = ntohl(n.doi);
 	proto = n.prot_id;
 	if (doi != 1) {
@@ -1337,7 +1336,7 @@ ikev1_d_print(netdissect_options *ndo, u_char tpay _U_,
 
 	p = (struct ikev1_pl_d *)ext;
 	ND_TCHECK(*p);
-	safememcpy(&d, ext, sizeof(d));
+	unaligned_memcpy(&d, ext, sizeof(d));
 	doi = ntohl(d.doi);
 	proto = d.prot_id;
 	if (doi != 1) {
@@ -1376,7 +1375,7 @@ ikev1_vid_print(netdissect_options *ndo, u_char tpay _U_,
 	ND_PRINT((ndo,"%s:", NPSTR(ISAKMP_NPTYPE_VID)));
 
 	ND_TCHECK(*ext);
-	safememcpy(&e, ext, sizeof(e));
+	unaligned_memcpy(&e, ext, sizeof(e));
 	ND_PRINT((ndo," len=%d", ntohs(e.len) - 4));
 	if (2 < ndo->ndo_vflag && 4 < ntohs(e.len)) {
 		ND_PRINT((ndo," "));
@@ -1408,7 +1407,7 @@ ikev2_gen_print(netdissect_options *ndo, u_char tpay,
 	struct isakmp_gen e;
 
 	ND_TCHECK(*ext);
-	safememcpy(&e, ext, sizeof(e));
+	unaligned_memcpy(&e, ext, sizeof(e));
 	ikev2_pay_print(ndo, NPSTR(tpay), e.critical);
 
 	ND_PRINT((ndo," len=%d", ntohs(e.len) - 4));
@@ -1440,7 +1439,7 @@ ikev2_t_print(netdissect_options *ndo, u_char tpay _U_, int pcount,
 
 	p = (struct ikev2_t *)ext;
 	ND_TCHECK(*p);
-	safememcpy(&t, ext, sizeof(t));
+	unaligned_memcpy(&t, ext, sizeof(t));
 	ikev2_pay_print(ndo, NPSTR(ISAKMP_NPTYPE_T), t.h.critical);
 
 	t_id = ntohs(t.t_id);
@@ -1513,7 +1512,7 @@ ikev2_p_print(netdissect_options *ndo, u_char tpay _U_, int pcount _U_,
 
 	p = (struct ikev2_p *)ext;
 	ND_TCHECK(*p);
-	safememcpy(&prop, ext, sizeof(prop));
+	unaligned_memcpy(&prop, ext, sizeof(prop));
 	ikev2_pay_print(ndo, NPSTR(ISAKMP_NPTYPE_P), prop.h.critical);
 
 	ND_PRINT((ndo," #%u protoid=%s transform=%d len=%u",
@@ -1548,7 +1547,7 @@ ikev2_sa_print(netdissect_options *ndo, u_char tpay,
 	int    osa_length, sa_length;
 
 	ND_TCHECK(*ext1);
-	safememcpy(&e, ext1, sizeof(e));
+	unaligned_memcpy(&e, ext1, sizeof(e));
 	ikev2_pay_print(ndo, "sa", e.critical);
 
 	osa_length= ntohs(e.len);
@@ -1577,7 +1576,7 @@ ikev2_ke_print(netdissect_options *ndo, u_char tpay,
 
 	k = (struct ikev2_ke *)ext;
 	ND_TCHECK(*ext);
-	safememcpy(&ke, ext, sizeof(ke));
+	unaligned_memcpy(&ke, ext, sizeof(ke));
 	ikev2_pay_print(ndo, NPSTR(tpay), ke.h.critical);
 
 	ND_PRINT((ndo," len=%u group=%s", ntohs(ke.h.len) - 8,
@@ -1607,7 +1606,7 @@ ikev2_ID_print(netdissect_options *ndo, u_char tpay,
 	unsigned char *typedata;
 
 	ND_TCHECK(*ext);
-	safememcpy(&id, ext, sizeof(id));
+	unaligned_memcpy(&id, ext, sizeof(id));
 	ikev2_pay_print(ndo, NPSTR(tpay), id.h.critical);
 
 	id_len = ntohs(id.h.len);
@@ -1710,7 +1709,7 @@ ikev2_auth_print(netdissect_options *ndo, u_char tpay,
 	unsigned int len;
 
 	ND_TCHECK(*ext);
-	safememcpy(&a, ext, sizeof(a));
+	unaligned_memcpy(&a, ext, sizeof(a));
 	ikev2_pay_print(ndo, NPSTR(tpay), a.h.critical);
 	len = ntohs(a.h.len);
 
@@ -1742,7 +1741,7 @@ ikev2_nonce_print(netdissect_options *ndo, u_char tpay,
 	struct isakmp_gen e;
 
 	ND_TCHECK(*ext);
-	safememcpy(&e, ext, sizeof(e));
+	unaligned_memcpy(&e, ext, sizeof(e));
 	ikev2_pay_print(ndo, "nonce", e.critical);
 
 	ND_PRINT((ndo," len=%d", ntohs(e.len) - 4));
@@ -1778,7 +1777,7 @@ ikev2_n_print(netdissect_options *ndo, u_char tpay _U_,
 
 	p = (struct ikev2_n *)ext;
 	ND_TCHECK(*p);
-	safememcpy(&n, ext, sizeof(n));
+	unaligned_memcpy(&n, ext, sizeof(n));
 	ikev2_pay_print(ndo, NPSTR(ISAKMP_NPTYPE_N), n.h.critical);
 
 	showspi = 1;
@@ -1993,10 +1992,10 @@ ikev2_vid_print(netdissect_options *ndo, u_char tpay,
 	int i, len;
 
 	ND_TCHECK(*ext);
-	safememcpy(&e, ext, sizeof(e));
+	unaligned_memcpy(&e, ext, sizeof(e));
 	ikev2_pay_print(ndo, NPSTR(tpay), e.critical);
 	ND_PRINT((ndo," len=%d vid=", ntohs(e.len) - 4));
-	
+
 	vid = (const u_char *)(ext+1);
 	len = ntohs(e.len) - 4;
 	ND_TCHECK2(*vid, len);
@@ -2056,7 +2055,7 @@ ikev2_e_print(netdissect_options *ndo,
 	volatile int dlen;
 
 	ND_TCHECK(*ext);
-	safememcpy(&e, ext, sizeof(e));
+	unaligned_memcpy(&e, ext, sizeof(e));
 	ikev2_pay_print(ndo, NPSTR(tpay), e.critical);
 
 	dlen = ntohs(e.len)-4;
@@ -2128,7 +2127,7 @@ ike_sub0_print(netdissect_options *ndo,
 
 	cp = (u_char *)ext;
 	ND_TCHECK(*ext);
-	safememcpy(&e, ext, sizeof(e));
+	unaligned_memcpy(&e, ext, sizeof(e));
 
 	/*
 	 * Since we can't have a payload length of less than 4 bytes,
@@ -2170,8 +2169,8 @@ ikev1_sub_print(netdissect_options *ndo,
 
 	while (np) {
 		ND_TCHECK(*ext);
-		
-		safememcpy(&e, ext, sizeof(e));
+
+		unaligned_memcpy(&e, ext, sizeof(e));
 
 		ND_TCHECK2(*ext, ntohs(e.len));
 
@@ -2204,17 +2203,6 @@ numstr(int x)
 	static char buf[20];
 	snprintf(buf, sizeof(buf), "#%d", x);
 	return buf;
-}
-
-/*
- * some compiler tries to optimize memcpy(), using the alignment constraint
- * on the argument pointer type.  by using this function, we try to avoid the
- * optimization.
- */
-static void
-safememcpy(void *p, const void *q, size_t l)
-{
-	memcpy(p, q, l);
 }
 
 static void
@@ -2305,7 +2293,7 @@ ikev2_sub0_print(netdissect_options *ndo, struct isakmp *base,
 
 	cp = (u_char *)ext;
 	ND_TCHECK(*ext);
-	safememcpy(&e, ext, sizeof(e));
+	unaligned_memcpy(&e, ext, sizeof(e));
 
 	/*
 	 * Since we can't have a payload length of less than 4 bytes,
@@ -2360,8 +2348,8 @@ ikev2_sub_print(netdissect_options *ndo,
 	while (np) {
 		pcount++;
 		ND_TCHECK(*ext);
-		
-		safememcpy(&e, ext, sizeof(e));
+
+		unaligned_memcpy(&e, ext, sizeof(e));
 
 		ND_TCHECK2(*ext, ntohs(e.len));
 
@@ -2475,7 +2463,7 @@ isakmp_print(netdissect_options *ndo,
 		return;
 	}
 
-	safememcpy(&base, p, sizeof(base));
+	unaligned_memcpy(&base, p, sizeof(base));
 
 	ND_PRINT((ndo,"isakmp"));
 	major = (base.vers & ISAKMP_VERS_MAJOR)
