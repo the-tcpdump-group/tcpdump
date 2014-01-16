@@ -1049,7 +1049,7 @@ ikev1_attr_print(netdissect_options *ndo, const u_char *p, const u_char *ep)
 		rawprint(ndo, (caddr_t)&p[2], 2);
 	} else {
 		ND_PRINT((ndo,"len=%d value=", EXTRACT_16BITS(&p[2])));
-		rawprint(ndo, (caddr_t)&p[2], EXTRACT_16BITS(&p[2]));
+		rawprint(ndo, (caddr_t)&p[4], EXTRACT_16BITS(&p[2]));
 	}
 	ND_PRINT((ndo,")"));
 	return p + totlen;
