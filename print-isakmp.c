@@ -1431,15 +1431,18 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 			break;
 		case IPSECDOI_ID_IPV6_ADDR_SUBNET:
 		    {
-			const u_int32_t *mask;
+			const u_char *mask;
 			if (len < 20)
 				ND_PRINT((ndo," len=%d [bad: < 20]", len));
 			else {
-				mask = (u_int32_t *)(data + sizeof(struct in6_addr));
+				mask = (u_char *)(data + sizeof(struct in6_addr));
 				/*XXX*/
-				ND_PRINT((ndo," len=%d %s/0x%08x%08x%08x%08x", len,
+				ND_PRINT((ndo," len=%d %s/0x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x", len,
 					  ip6addr_string(data),
-					  mask[0], mask[1], mask[2], mask[3]));
+					  mask[0], mask[1], mask[2], mask[3],
+					  mask[4], mask[5], mask[6], mask[7],
+					  mask[8], mask[9], mask[10], mask[11],
+					  mask[12], mask[13], mask[14], mask[15]));
 			}
 			len = 0;
 			break;
@@ -1751,7 +1754,7 @@ ikev1_n_print(netdissect_options *ndo, u_char tpay _U_,
 		    }
 		case IPSECDOI_NTYPE_REPLAY_STATUS:
 			ND_PRINT((ndo,"replay detection %sabled",
-				  (*(u_int32_t *)cp) ? "en" : "dis"));
+				  EXTRACT_32BITS(cp) ? "en" : "dis"));
 			break;
 		case ISAKMP_NTYPE_NO_PROPOSAL_CHOSEN:
 			if (ikev1_sub_print(ndo, ISAKMP_NPTYPE_SA,
