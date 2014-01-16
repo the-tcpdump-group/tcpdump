@@ -1288,32 +1288,39 @@ ppp_hdlc(const u_char *p, int length)
 
 	se = snapend;
 	snapend = t;
+	length = t - b;
 
         /* now lets guess about the payload codepoint format */
+        if (length < 1)
+                goto trunc;
         proto = *b; /* start with a one-octet codepoint guess */
 
         switch (proto) {
         case PPP_IP:
-		ip_print(gndo, b+1, t - b - 1);
+		ip_print(gndo, b+1, length - 1);
 		goto cleanup;
 #ifdef INET6
         case PPP_IPV6:
-		ip6_print(gndo, b+1, t - b - 1);
+		ip6_print(gndo, b+1, length - 1);
 		goto cleanup;
 #endif
         default: /* no luck - try next guess */
 		break;
         }
 
+        if (length < 2)
+                goto trunc;
         proto = EXTRACT_16BITS(b); /* next guess - load two octets */
 
         switch (proto) {
         case (PPP_ADDRESS << 8 | PPP_CONTROL): /* looks like a PPP frame */
+            if (length < 4)
+                goto trunc;
             proto = EXTRACT_16BITS(b+2); /* load the PPP proto-id */
-            handle_ppp(proto, b+4, t - b - 4);
+            handle_ppp(proto, b+4, length - 4);
             break;
         default: /* last guess - proto must be a PPP proto-id */
-            handle_ppp(proto, b+2, t - b - 2);
+            handle_ppp(proto, b+2, length - 2);
             break;
         }
 
@@ -1321,6 +1328,12 @@ cleanup:
         snapend = se;
 	free(b);
         return;
+
+trunc:
+        snapend = se;
+	free(b);
+	printf("[|ppp]");
+	return;
 }
 
 
