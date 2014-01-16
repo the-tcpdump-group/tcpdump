@@ -159,6 +159,7 @@ extern void safeputchar(int);
 extern void safeputs(const char *, int);
 
 extern void unaligned_memcpy(void *, const void *, size_t);
+extern int unaligned_memcmp(void *, const void *, size_t);
 
 extern const char *isonsap_string(const u_char *, register u_int);
 extern const char *protoid_string(const u_char *);
