@@ -1342,7 +1342,6 @@ print_metailv(register const u_char * pptr, register u_int len,
 	      u_int16_t op_msk _U_, int indent)
 {
 	u_int rlen;
-	u_int plen;
 	char *ib = indent_pr(indent, 0);
 	/* XXX: check header length */
 	const struct forces_ilv *ilv = (struct forces_ilv *)pptr;
