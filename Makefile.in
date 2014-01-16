@@ -39,6 +39,7 @@ VPATH = @srcdir@
 #
 
 CC = @CC@
+AR = @AR@
 MKDEP = @MKDEP@
 PROG = tcpdump
 CCOPT = @V_CCOPT@
