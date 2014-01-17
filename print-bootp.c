@@ -92,9 +92,9 @@ bootp_print(register const u_char *cp, u_int length)
 	/* Only print interesting fields */
 	if (bp->bp_hops)
 		printf(", hops %d", bp->bp_hops);
-	if (bp->bp_xid)
+	if (EXTRACT_32BITS(&bp->bp_xid))
 		printf(", xid 0x%x", EXTRACT_32BITS(&bp->bp_xid));
-	if (bp->bp_secs)
+	if (EXTRACT_16BITS(&bp->bp_secs))
 		printf(", secs %d", EXTRACT_16BITS(&bp->bp_secs));
 
 	printf(", Flags [%s]",
@@ -104,22 +104,22 @@ bootp_print(register const u_char *cp, u_int length)
 
 	/* Client's ip address */
 	TCHECK(bp->bp_ciaddr);
-	if (bp->bp_ciaddr.s_addr)
+	if (EXTRACT_32BITS(&bp->bp_ciaddr.s_addr))
 		printf("\n\t  Client-IP %s", ipaddr_string(&bp->bp_ciaddr));
 
 	/* 'your' ip address (bootp client) */
 	TCHECK(bp->bp_yiaddr);
-	if (bp->bp_yiaddr.s_addr)
+	if (EXTRACT_32BITS(&bp->bp_yiaddr.s_addr))
 		printf("\n\t  Your-IP %s", ipaddr_string(&bp->bp_yiaddr));
 
 	/* Server's ip address */
 	TCHECK(bp->bp_siaddr);
-	if (bp->bp_siaddr.s_addr)
+	if (EXTRACT_32BITS(&bp->bp_siaddr.s_addr))
 		printf("\n\t  Server-IP %s", ipaddr_string(&bp->bp_siaddr));
 
 	/* Gateway's ip address */
 	TCHECK(bp->bp_giaddr);
-	if (bp->bp_giaddr.s_addr)
+	if (EXTRACT_32BITS(&bp->bp_giaddr.s_addr))
 		printf("\n\t  Gateway-IP %s", ipaddr_string(&bp->bp_giaddr));
 
 	/* Client's Ethernet address */
