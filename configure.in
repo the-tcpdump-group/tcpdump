@@ -528,13 +528,6 @@ if test "$ac_cv_namereqd" = no; then
 	missing_includes=yes
 fi
 
-dnl
-dnl Checks for sockaddr_storage structure
-AC_STRUCT_SA_STORAGE(ac_cv_sa_storage)
-if test "$ac_cv_sa_storage" = no; then
-	missing_includes=yes
-fi
-
 AC_REPLACE_FUNCS(vfprintf strcasecmp strlcat strlcpy strdup strsep)
 AC_CHECK_FUNCS(fork vfork strftime)
 AC_CHECK_FUNCS(setlinebuf alarm)

@@ -148,9 +148,6 @@
 /* if struct sockaddr has the sa_len member */
 #undef HAVE_SOCKADDR_SA_LEN
 
-/* define if you have struct sockaddr_storage */
-#undef HAVE_SOCKADDR_STORAGE
-
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
 
