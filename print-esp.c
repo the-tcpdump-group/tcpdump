@@ -54,19 +54,6 @@
 #include "addrtoname.h"
 #include "extract.h"
 
-#ifndef HAVE_SOCKADDR_STORAGE
-#ifdef INET6
-struct sockaddr_storage {
-	union {
-		struct sockaddr_in sin;
-		struct sockaddr_in6 sin6;
-	} un;
-};
-#else
-#define sockaddr_storage sockaddr
-#endif
-#endif /* HAVE_SOCKADDR_STORAGE */
-
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
  * All rights reserved.
@@ -112,9 +99,16 @@ struct newesp {
 };
 
 #ifdef HAVE_LIBCRYPTO
+union inaddr_u {
+	struct in_addr in4;
+#ifdef INET6
+	struct in6_addr in6;
+#endif
+};
 struct sa_list {
 	struct sa_list	*next;
-	struct sockaddr_storage daddr;
+	u_int		daddr_version;
+	union inaddr_u	daddr;
 	u_int32_t	spi;          /* if == 0, then IKEv2 */
 	int             initiator;
 	u_char          spii[8];      /* for IKEv2 */
@@ -429,6 +423,7 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 	if (line == NULL) {
 		decode = spikey;
 		spikey = NULL;
+		/* sa1.daddr.version = 0; */
 		/* memset(&sa1.daddr, 0, sizeof(sa1.daddr)); */
 		/* sa1.spi = 0; */
 		sa_def    = 1;
@@ -474,10 +469,6 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 
 		char *spistr, *foo;
 		u_int32_t spino;
-		struct sockaddr_in *sin;
-#ifdef INET6
-		struct sockaddr_in6 *sin6;
-#endif
 
 		spistr = strsep(&spikey, "@");
 
@@ -489,21 +480,13 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 
 		sa1.spi = spino;
 
-		sin = (struct sockaddr_in *)&sa1.daddr;
 #ifdef INET6
-		sin6 = (struct sockaddr_in6 *)&sa1.daddr;
-		if (inet_pton(AF_INET6, spikey, &sin6->sin6_addr) == 1) {
-#ifdef HAVE_SOCKADDR_SA_LEN
-			sin6->sin6_len = sizeof(struct sockaddr_in6);
-#endif
-			sin6->sin6_family = AF_INET6;
+		if (inet_pton(AF_INET6, spikey, &sa1.daddr.in6) == 1) {
+			sa1.daddr_version = 6;
 		} else
 #endif
-			if (inet_pton(AF_INET, spikey, &sin->sin_addr) == 1) {
-#ifdef HAVE_SOCKADDR_SA_LEN
-				sin->sin_len = sizeof(struct sockaddr_in);
-#endif
-				sin->sin_family = AF_INET;
+			if (inet_pton(AF_INET, spikey, &sa1.daddr.in4) == 1) {
+				sa1.daddr_version = 4;
 			} else {
 				(*ndo->ndo_warning)(ndo, "print_esp: can not decode IP# %s\n", spikey);
 				return;
@@ -648,10 +631,9 @@ esp_print(netdissect_options *ndo,
 
 		/* see if we can find the SA, and if so, decode it */
 		for (sa = ndo->ndo_sa_list_head; sa != NULL; sa = sa->next) {
-			struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *)&sa->daddr;
 			if (sa->spi == EXTRACT_32BITS(&esp->esp_spi) &&
-			    sin6->sin6_family == AF_INET6 &&
-			    unaligned_memcmp(&sin6->sin6_addr, &ip6->ip6_dst,
+			    sa->daddr_version == 6 &&
+			    unaligned_memcmp(&sa->daddr.in6, &ip6->ip6_dst,
 				   sizeof(struct in6_addr)) == 0) {
 				break;
 			}
@@ -666,10 +648,9 @@ esp_print(netdissect_options *ndo,
 
 		/* see if we can find the SA, and if so, decode it */
 		for (sa = ndo->ndo_sa_list_head; sa != NULL; sa = sa->next) {
-			struct sockaddr_in *sin = (struct sockaddr_in *)&sa->daddr;
 			if (sa->spi == EXTRACT_32BITS(&esp->esp_spi) &&
-			    sin->sin_family == AF_INET &&
-			    unaligned_memcmp(&sin->sin_addr, &ip->ip_dst,
+			    sa->daddr_version == 4 &&
+			    unaligned_memcmp(&sa->daddr.in4, &ip->ip_dst,
 				   sizeof(struct in_addr)) == 0) {
 				break;
 			}
