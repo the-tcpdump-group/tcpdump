@@ -55,10 +55,6 @@
 #include "ip6.h"
 #endif
 
-#ifndef HAVE_SOCKADDR_STORAGE
-#define sockaddr_storage sockaddr
-#endif
-
 /* refer to RFC 2408 */
 
 typedef u_char cookie_t[8];
