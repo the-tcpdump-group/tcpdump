@@ -633,7 +633,7 @@ esp_print(netdissect_options *ndo,
 		for (sa = ndo->ndo_sa_list_head; sa != NULL; sa = sa->next) {
 			if (sa->spi == EXTRACT_32BITS(&esp->esp_spi) &&
 			    sa->daddr_version == 6 &&
-			    unaligned_memcmp(&sa->daddr.in6, &ip6->ip6_dst,
+			    UNALIGNED_MEMCMP(&sa->daddr.in6, &ip6->ip6_dst,
 				   sizeof(struct in6_addr)) == 0) {
 				break;
 			}
@@ -650,7 +650,7 @@ esp_print(netdissect_options *ndo,
 		for (sa = ndo->ndo_sa_list_head; sa != NULL; sa = sa->next) {
 			if (sa->spi == EXTRACT_32BITS(&esp->esp_spi) &&
 			    sa->daddr_version == 4 &&
-			    unaligned_memcmp(&sa->daddr.in4, &ip->ip_dst,
+			    UNALIGNED_MEMCMP(&sa->daddr.in4, &ip->ip_dst,
 				   sizeof(struct in_addr)) == 0) {
 				break;
 			}
