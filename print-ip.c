@@ -120,12 +120,12 @@ ip_finddst(const struct ip *ip)
 		case IPOPT_LSRR:
 			if (len < 7)
 				break;
-			memcpy(&retval, cp + len - 4, 4);
+			unaligned_memcpy(&retval, cp + len - 4, 4);
 			return retval;
 		}
 	}
 trunc:
-	memcpy(&retval, &ip->ip_dst.s_addr, sizeof(u_int32_t));
+	unaligned_memcpy(&retval, &ip->ip_dst.s_addr, sizeof(u_int32_t));
 	return retval;
 }
 
@@ -149,9 +149,9 @@ nextproto4_cksum(const struct ip *ip, const u_int8_t *data,
 	ph.len = htons((u_int16_t)len);
 	ph.mbz = 0;
 	ph.proto = next_proto;
-	memcpy(&ph.src, &ip->ip_src.s_addr, sizeof(u_int32_t));
+	unaligned_memcpy(&ph.src, &ip->ip_src.s_addr, sizeof(u_int32_t));
 	if (IP_HL(ip) == 5)
-		memcpy(&ph.dst, &ip->ip_dst.s_addr, sizeof(u_int32_t));
+		unaligned_memcpy(&ph.dst, &ip->ip_dst.s_addr, sizeof(u_int32_t));
 	else
 		ph.dst = ip_finddst(ip);
 
