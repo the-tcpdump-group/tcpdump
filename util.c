@@ -607,8 +607,9 @@ safeputchar(int c)
 		printf("\\0x%02x", ch);
 }
 
+#ifdef LBL_ALIGN
 /*
- * some compiler tries to optimize memcpy(), using the alignment constraint
+ * Some compilers try to optimize memcpy(), using the alignment constraint
  * on the argument pointer type.  by using this function, we try to avoid the
  * optimization.
  */
@@ -624,4 +625,4 @@ unaligned_memcmp(const void *p, const void *q, size_t l)
 {
 	return (memcmp(p, q, l));
 }
-
+#endif

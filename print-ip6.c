@@ -62,8 +62,8 @@ nextproto6_cksum(const struct ip6_hdr *ip6, const u_int8_t *data,
 
         /* pseudo-header */
         memset(&ph, 0, sizeof(ph));
-        unaligned_memcpy(&ph.ph_src, &ip6->ip6_src, sizeof (struct in6_addr));
-        unaligned_memcpy(&ph.ph_dst, &ip6->ip6_dst, sizeof (struct in6_addr));
+        UNALIGNED_MEMCPY(&ph.ph_src, &ip6->ip6_src, sizeof (struct in6_addr));
+        UNALIGNED_MEMCPY(&ph.ph_dst, &ip6->ip6_dst, sizeof (struct in6_addr));
         ph.ph_len = htonl(len);
         ph.ph_nxt = next_proto;
 

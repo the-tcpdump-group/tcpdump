@@ -613,7 +613,7 @@ esp_print(netdissect_options *ndo,
 			struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *)&sa->daddr;
 			if (sa->spi == EXTRACT_32BITS(&esp->esp_spi) &&
 			    sin6->sin6_family == AF_INET6 &&
-			    unaligned_memcmp(&sin6->sin6_addr, &ip6->ip6_dst,
+			    UNALIGNED_MEMCMP(&sin6->sin6_addr, &ip6->ip6_dst,
 				   sizeof(struct in6_addr)) == 0) {
 				break;
 			}
@@ -631,7 +631,7 @@ esp_print(netdissect_options *ndo,
 			struct sockaddr_in *sin = (struct sockaddr_in *)&sa->daddr;
 			if (sa->spi == EXTRACT_32BITS(&esp->esp_spi) &&
 			    sin->sin_family == AF_INET &&
-			    unaligned_memcmp(&sin->sin_addr, &ip->ip_dst,
+			    UNALIGNED_MEMCMP(&sin->sin_addr, &ip->ip_dst,
 				   sizeof(struct in_addr)) == 0) {
 				break;
 			}
