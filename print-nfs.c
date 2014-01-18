@@ -1035,18 +1035,18 @@ xid_map_find(const struct sunrpc_msg *rp, const u_char *bp, u_int32_t *proc,
 			goto nextitem;
 		switch (xmep->ipver) {
 		case 4:
-			if (memcmp(&ip->ip_src, &xmep->server,
+			if (UNALIGNED_MEMCMP(&ip->ip_src, &xmep->server,
 				   sizeof(ip->ip_src)) != 0 ||
-			    memcmp(&ip->ip_dst, &xmep->client,
+			    UNALIGNED_MEMCMP(&ip->ip_dst, &xmep->client,
 				   sizeof(ip->ip_dst)) != 0) {
 				cmp = 0;
 			}
 			break;
 #ifdef INET6
 		case 6:
-			if (memcmp(&ip6->ip6_src, &xmep->server,
+			if (UNALIGNED_MEMCMP(&ip6->ip6_src, &xmep->server,
 				   sizeof(ip6->ip6_src)) != 0 ||
-			    memcmp(&ip6->ip6_dst, &xmep->client,
+			    UNALIGNED_MEMCMP(&ip6->ip6_dst, &xmep->client,
 				   sizeof(ip6->ip6_dst)) != 0) {
 				cmp = 0;
 			}
