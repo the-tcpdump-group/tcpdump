@@ -672,14 +672,13 @@ ip_print(netdissect_options *ndo,
 void
 ipN_print(register const u_char *bp, register u_int length)
 {
-	struct ip *ip, hdr;
+	struct ip hdr;
 
-	ip = (struct ip *)bp;
 	if (length < 4) {
 		(void)printf("truncated-ip %d", length);
 		return;
 	}
-	memcpy (&hdr, (char *)ip, 4);
+	memcpy (&hdr, bp, 4);
 	switch (IP_V(&hdr)) {
 	case 4:
 		ip_print (gndo, bp, length);
