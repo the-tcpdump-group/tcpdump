@@ -997,14 +997,14 @@ xid_map_enter(const struct sunrpc_msg *rp, const u_char *bp)
 	xmep->xid = rp->rm_xid;
 	if (ip) {
 		xmep->ipver = 4;
-		memcpy(&xmep->client, &ip->ip_src, sizeof(ip->ip_src));
-		memcpy(&xmep->server, &ip->ip_dst, sizeof(ip->ip_dst));
+		UNALIGNED_MEMCPY(&xmep->client, &ip->ip_src, sizeof(ip->ip_src));
+		UNALIGNED_MEMCPY(&xmep->server, &ip->ip_dst, sizeof(ip->ip_dst));
 	}
 #ifdef INET6
 	else if (ip6) {
 		xmep->ipver = 6;
-		memcpy(&xmep->client, &ip6->ip6_src, sizeof(ip6->ip6_src));
-		memcpy(&xmep->server, &ip6->ip6_dst, sizeof(ip6->ip6_dst));
+		UNALIGNED_MEMCPY(&xmep->client, &ip6->ip6_src, sizeof(ip6->ip6_src));
+		UNALIGNED_MEMCPY(&xmep->server, &ip6->ip6_dst, sizeof(ip6->ip6_dst));
 	}
 #endif
 	xmep->proc = EXTRACT_32BITS(&rp->rm_call.cb_proc);
