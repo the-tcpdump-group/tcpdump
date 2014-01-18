@@ -260,16 +260,16 @@ tcp_print(register const u_char *bp, register u_int length,
                         if (sport > dport)
                                 rev = 1;
                         else if (sport == dport) {
-                                if (memcmp(src, dst, sizeof ip6->ip6_dst) > 0)
+                                if (UNALIGNED_MEMCMP(src, dst, sizeof ip6->ip6_dst) > 0)
                                         rev = 1;
                         }
                         if (rev) {
-                                memcpy(&tha.src, dst, sizeof ip6->ip6_dst);
-                                memcpy(&tha.dst, src, sizeof ip6->ip6_src);
+                                UNALIGNED_MEMCPY(&tha.src, dst, sizeof ip6->ip6_dst);
+                                UNALIGNED_MEMCPY(&tha.dst, src, sizeof ip6->ip6_src);
                                 tha.port = dport << 16 | sport;
                         } else {
-                                memcpy(&tha.dst, dst, sizeof ip6->ip6_dst);
-                                memcpy(&tha.src, src, sizeof ip6->ip6_src);
+                                UNALIGNED_MEMCPY(&tha.dst, dst, sizeof ip6->ip6_dst);
+                                UNALIGNED_MEMCPY(&tha.src, src, sizeof ip6->ip6_src);
                                 tha.port = sport << 16 | dport;
                         }
 
