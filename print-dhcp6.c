@@ -54,7 +54,7 @@
 #include "extract.h"
 
 /* lease duration */
-#define DHCP6_DURATITION_INFINITE 0xffffffff
+#define DHCP6_DURATION_INFINITE 0xffffffff
 
 /* Error Values */
 #define DH6ERR_FAILURE		16
