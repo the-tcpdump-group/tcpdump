@@ -40,7 +40,7 @@ isakmp4 isakmp4500.pcap             isakmp4.out -t -E "file esp-secrets.txt"
 
 # Link Management Protocol tests
 lmp		lmp.pcap		lmp.out -t -T lmp
-lmp-v		lmp.pcap		lmp-v.out -t -T lmp -v
+# lmp-v is now conditionally handled by lmp-v.sh
 
 # MPLS tests
 mpls-ldp-hello	mpls-ldp-hello.pcap	mpls-ldp-hello.out -t -v
