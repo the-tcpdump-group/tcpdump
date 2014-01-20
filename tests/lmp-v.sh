@@ -6,10 +6,9 @@
 # GCC build and must reproduce correctly on any other GCC build regardless of
 # the architecture.
 
-if ! grep -qe '^CC = gcc$' ../Makefile
+if grep -qe '^CC = gcc$' ../Makefile
 then
+  ./TESTonce lmp-v lmp.pcap lmp-v.out '-t -T lmp -v'
+else
 	printf '%-30s: TEST SKIPPED (compiler is not GCC)\n' 'lmp-v'
-	exit 0
 fi
-
-./TESTonce lmp-v lmp.pcap lmp-v.out '-t -T lmp -v'
