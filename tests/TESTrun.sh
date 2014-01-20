@@ -24,7 +24,7 @@ runComplexTests()
 
 runSimpleTests()
 {
-  local only=$1
+  only=$1
   echo $passed >.passed
   echo $failed >.failed
   cat TESTLIST | while read name input output options
@@ -43,7 +43,7 @@ runSimpleTests()
       failed=`expr $failed + 1`
       echo $failed >.failed
     fi
-    [ "$only" != "" -a "$name" == "$only" ] && break
+    [ "$only" != "" -a "$name" = "$only" ] && break
   done
   # I hate shells with their stupid, useless subshells.
   passed=`cat .passed`
