@@ -4,7 +4,6 @@ mkdir -p NEW
 mkdir -p DIFF
 passed=0
 failed=0
-INDENT='    '
 cat /dev/null > failure-outputs.txt
 
 runComplexTests()
@@ -12,7 +11,6 @@ runComplexTests()
   for i in *.sh
   do
     case $i in TEST*.sh) continue;; esac
-    echo -n "$INDENT"
     if sh ./$i
     then
       passed=`expr $passed + 1`
@@ -34,7 +32,6 @@ runSimpleTests()
       '') continue;;
     esac
     [ "$only" != "" -a "$name" != "$only" ] && continue
-    echo -n "$INDENT"
     if ./TESTonce $name $input $output "$options"
     then
       passed=`expr $passed + 1`

@@ -15,11 +15,11 @@ $options=$ARGV[3];
 $r = system "../tcpdump 2>/dev/null -n -r $input $options | tee NEW/$output | diff -uw $output - >DIFF/$output.diff";
 
 if($r == 0) {
-  printf "%-30s: passed\n", $name;
+  printf "    %-30s: passed\n", $name;
   unlink "DIFF/$output.diff";
   exit 0;
 }
-printf "%-30s: TEST FAILED", $name;
+printf "    %-30s: TEST FAILED", $name;
 open FOUT, '>>failure-outputs.txt';
 printf FOUT "Failed test: $name\n\n";
 close FOUT;
