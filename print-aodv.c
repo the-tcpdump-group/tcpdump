@@ -194,8 +194,9 @@ struct aodv_ext {
 
 struct aodv_hello {
 	struct	aodv_ext	eh;		/* extension header */
-	u_int32_t		interval;	/* expect my next hello in
-						 * (n) ms */
+	u_int8_t		interval[4];	/* expect my next hello in
+						 * (n) ms
+						 * NOTE: this is not aligned */
 };
 
 #define	AODV_EXT_HELLO	1
