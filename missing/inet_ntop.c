@@ -190,7 +190,6 @@ inet_ntop_v6 (const u_char *src, char *dst, size_t size)
     return (NULL);
   }
   return strcpy (dst, tmp);
-  return (NULL);
 }
 #endif   /* INET6 */
 
