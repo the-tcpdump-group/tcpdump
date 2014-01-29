@@ -10,7 +10,7 @@ env:
 
 before_script:
   - sudo apt-get install libssl-dev libssl0.9.8 libssl1.0.0
-  - if [ $BUILD_LIBPCAP == "true" ]; then ( cd ../ && git clone git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure && make ); else sudo apt-get install libpcap-dev; fi
+  - if [ "$BUILD_LIBPCAP" = "true" ]; then ( cd ../ && git clone git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure && make ); else sudo apt-get install libpcap-dev; fi
 
 script:
   - if [ "$BUILD_IPV6" = "true" ]; then ./configure; else ./configure --disable-ipv6; fi
