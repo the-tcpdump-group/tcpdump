@@ -12,7 +12,7 @@ $input=$ARGV[1];
 $output=$ARGV[2];
 $options=$ARGV[3];
 
-$r = system "../tcpdump 2>/dev/null -n -r $input $options | tee NEW/$output | diff -uw $output - >DIFF/$output.diff";
+$r = system "../tcpdump 2>/dev/null -n -r $input $options | tee NEW/$output | diff -w $output - >DIFF/$output.diff";
 
 if($r == 0) {
   printf "    %-30s: passed\n", $name;
