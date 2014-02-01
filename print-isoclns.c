@@ -1810,7 +1810,8 @@ isis_print_is_reach_subtlv (const u_int8_t *tptr,u_int subt,u_int subl,const cha
               printf (", LM: %u", EXTRACT_24BITS(tptr));
               tptr=tptr+3;
               printf (", P: %u", *(tptr));
-              printf (", P-ID: %u", EXTRACT_16BITS(++tptr));
+              tptr++;
+              printf (", P-ID: %u", EXTRACT_16BITS(tptr));
             }
             break;
         case ISIS_SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR:
