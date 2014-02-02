@@ -334,7 +334,7 @@ write_bits(unsigned int val, const char *fmt)
     }
 }
 
-/* convert a UCS2 string into iso-8859-1 string */
+/* convert a UCS-2 string into an ASCII string */
 #define MAX_UNISTR_SIZE	1000
 static const char *
 unistr(const u_char *s, u_int32_t *len, int use_unicode)
@@ -389,7 +389,7 @@ unistr(const u_char *s, u_int32_t *len, int use_unicode)
     	    TCHECK(s[0]);
 	    if (l >= MAX_UNISTR_SIZE)
 		break;
-	    if (isprint(s[0]))
+	    if (ND_ISPRINT(s[0]))
 		buf[l] = s[0];
 	    else {
 		if (s[0] == 0)
@@ -405,7 +405,7 @@ unistr(const u_char *s, u_int32_t *len, int use_unicode)
 	    TCHECK2(s[0], 2);
 	    if (l >= MAX_UNISTR_SIZE)
 		break;
-	    if (s[1] == 0 && isprint(s[0])) {
+	    if (s[1] == 0 && ND_ISPRINT(s[0])) {
 		/* It's a printable ASCII character */
 		buf[l] = s[0];
 	    } else {

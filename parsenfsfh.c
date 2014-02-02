@@ -457,7 +457,7 @@ const unsigned char *fhp;
 	int seen_null = 0;
 
 	for (i = 1; i < 14; i++) {
-	    if (isprint(fhp[i])) {
+	    if (ND_ISPRINT(fhp[i])) {
 		if (seen_null)
 		   return(0);
 		else

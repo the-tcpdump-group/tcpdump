@@ -65,7 +65,7 @@ ascii_print(register const u_char *cp, register u_int length)
 	while (length > 0) {
 		s = *cp++;
 		length--;
-		if (!isgraph(s) &&
+		if (!ND_ISGRAPH(s) &&
 		    (s != '\t' && s != ' ' && s != '\n' && s != '\r'))
 			putchar('.');
 		else
@@ -92,8 +92,8 @@ hex_and_ascii_print_with_offset(register const char *ident,
 		(void)snprintf(hsp, sizeof(hexstuff) - (hsp - hexstuff),
 		    " %02x%02x", s1, s2);
 		hsp += HEXDUMP_HEXSTUFF_PER_SHORT;
-		*(asp++) = (isgraph(s1) ? s1 : '.');
-		*(asp++) = (isgraph(s2) ? s2 : '.');
+		*(asp++) = (ND_ISGRAPH(s1) ? s1 : '.');
+		*(asp++) = (ND_ISGRAPH(s2) ? s2 : '.');
 		i++;
 		if (i >= HEXDUMP_SHORTS_PER_LINE) {
 			*hsp = *asp = '\0';
@@ -109,7 +109,7 @@ hex_and_ascii_print_with_offset(register const char *ident,
 		(void)snprintf(hsp, sizeof(hexstuff) - (hsp - hexstuff),
 		    " %02x", s1);
 		hsp += 3;
-		*(asp++) = (isgraph(s1) ? s1 : '.');
+		*(asp++) = (ND_ISGRAPH(s1) ? s1 : '.');
 		++i;
 	}
 	if (i > 0) {

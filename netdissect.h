@@ -269,6 +269,17 @@ extern char *read_infile(netdissect_options *, char *);
 extern char *copy_argv(netdissect_options *, char **);
 #endif
 
+/*
+ * Locale-independent macros for testing character properties and
+ * stripping the 8th bit from characters.  Assumed to be handed
+ * a value between 0 and 255, i.e. don't hand them a char, as
+ * those might be in the range -128 to 127.
+ */
+#define ND_ISASCII(c)	(!((c) & 0x80))	/* value is an ASCII code point */
+#define ND_ISPRINT(c)	((c) >= 0x20 && (c) <= 0x7E)
+#define ND_ISGRAPH(c)	((c) > 0x20 && (c) <= 0x7E)
+#define ND_TOASCII(c)	((c) & 0x7F)
+
 extern void safeputchar(int);
 extern void safeputs(const char *, int);
 
