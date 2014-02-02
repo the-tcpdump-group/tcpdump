@@ -660,8 +660,8 @@ rpl_format_dagid(char dagid_str[65], const u_char *dagid)
                 if(isprint(dagid[i])) {
                         *d++ = dagid[i];
                 } else {
-                        int cnt=snprintf(d,4,"0x%02x", dagid[i]);
-                        d += cnt;
+                        snprintf(d,4,"0x%02x", dagid[i]);
+                        d += 4;
                 }
         }
         *d++ = '\0';
