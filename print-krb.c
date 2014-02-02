@@ -107,12 +107,12 @@ c_print(register const u_char *s, register const u_char *ep)
 			flag = 0;
 			break;
 		}
-		if (!isascii(c)) {
-			c = toascii(c);
+		if (!ND_ISASCII(c)) {
+			c = ND_TOASCII(c);
 			putchar('M');
 			putchar('-');
 		}
-		if (!isprint(c)) {
+		if (!ND_ISPRINT(c)) {
 			c ^= 0x40;	/* DEL to ?, others to alpha */
 			putchar('^');
 		}

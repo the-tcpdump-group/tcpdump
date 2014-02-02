@@ -57,9 +57,6 @@
 #endif
 
 #if !defined(__MINGW32__) && !defined(__WATCOMC__)
-#undef toascii
-#define isascii __isascii
-#define toascii __toascii
 #define stat _stat
 #define open _open
 #define fstat _fstat
@@ -88,10 +85,6 @@ extern int inet_aton (const char *cp, struct in_addr *addr);
 
 #ifndef INET6_ADDRSTRLEN
 #define INET6_ADDRSTRLEN 46
-#endif
-
-#ifndef toascii
-#define toascii(c) ((c) & 0x7f)
 #endif
 
 #ifndef caddr_t

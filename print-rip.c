@@ -135,7 +135,7 @@ rip_entry_print_v2(register const struct rip_netinfo *ni, const unsigned remaini
 			u_int i = 0;
 			printf("\n\t  Simple Text Authentication data: ");
 			for (; i < RIP_AUTHLEN; p++, i++)
-				putchar (isprint(*p) ? *p : '.');
+				putchar (ND_ISPRINT(*p) ? *p : '.');
 		} else if (auth_type == 3) {
 			printf("\n\t  Auth header:");
 			printf(" Packet Len %u,", EXTRACT_16BITS((u_int8_t *)ni + 4));

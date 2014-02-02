@@ -779,7 +779,7 @@ asn1_print(struct be *elem)
 		const u_char *p = elem->data.str;
 		TCHECK2(*p, asnlen);
 		for (i = asnlen; printable && i-- > 0; p++)
-			printable = isprint(*p) || isspace(*p);
+			printable = ND_ISPRINT(*p);
 		p = elem->data.str;
 		if (printable) {
 			putchar('"');

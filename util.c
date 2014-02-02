@@ -59,12 +59,12 @@ fn_print(register const u_char *s, register const u_char *ep)
 			ret = 0;
 			break;
 		}
-		if (!isascii(c)) {
-			c = toascii(c);
+		if (!ND_ISASCII(c)) {
+			c = ND_TOASCII(c);
 			putchar('M');
 			putchar('-');
 		}
-		if (!isprint(c)) {
+		if (!ND_ISPRINT(c)) {
 			c ^= 0x40;	/* DEL to ?, others to alpha */
 			putchar('^');
 		}
@@ -87,12 +87,12 @@ fn_printn(register const u_char *s, register u_int n,
 	while (n > 0 && (ep == NULL || s < ep)) {
 		n--;
 		c = *s++;
-		if (!isascii(c)) {
-			c = toascii(c);
+		if (!ND_ISASCII(c)) {
+			c = ND_TOASCII(c);
 			putchar('M');
 			putchar('-');
 		}
-		if (!isprint(c)) {
+		if (!ND_ISPRINT(c)) {
 			c ^= 0x40;	/* DEL to ?, others to alpha */
 			putchar('^');
 		}
@@ -121,12 +121,12 @@ fn_printzp(register const u_char *s, register u_int n,
 			ret = 0;
 			break;
 		}
-		if (!isascii(c)) {
-			c = toascii(c);
+		if (!ND_ISASCII(c)) {
+			c = ND_TOASCII(c);
 			putchar('M');
 			putchar('-');
 		}
-		if (!isprint(c)) {
+		if (!ND_ISPRINT(c)) {
 			c ^= 0x40;	/* DEL to ?, others to alpha */
 			putchar('^');
 		}
@@ -596,7 +596,7 @@ safeputchar(int c)
 	unsigned char ch;
 
 	ch = (unsigned char)(c & 0xff);
-	if (ch < 0x80 && isprint(ch))
+	if (ch < 0x80 && ND_ISPRINT(ch))
 		printf("%c", ch);
 	else
 		printf("\\0x%02x", ch);
