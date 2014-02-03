@@ -62,11 +62,25 @@ ascii_print(register const u_char *cp, register u_int length)
 	while (length > 0) {
 		s = *cp++;
 		length--;
-		if (!ND_ISGRAPH(s) &&
-		    (s != '\t' && s != ' ' && s != '\n' && s != '\r'))
-			putchar('.');
-		else
-			putchar(s);
+		if (s == '\r') {
+			/*
+			 * Don't print CRs at the end of the line; they
+			 * don't belong at the ends of lines on UN*X,
+			 * and the standard I/O library will give us one
+			 * on Windows so we don't need to print one
+			 * ourselves.
+			 *
+			 * In the middle of a line, just print a '.'.
+			 */
+			if (length > 1 && *cp != '\n')
+				putchar('.');
+		} else {
+			if (!ND_ISGRAPH(s) &&
+			    (s != '\t' && s != ' ' && s != '\n'))
+				putchar('.');
+			else
+				putchar(s);
+		}
 	}
 }
 
