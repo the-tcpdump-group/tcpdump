@@ -37,25 +37,8 @@
 #include "netdissect.h"
 #include "interface.h"
 
-/*
- * Structure of an NFLOG header and TLV parts, as described at
- * http://www.tcpdump.org/linktypes/LINKTYPE_NFLOG.html
- */
-typedef struct nflog_hdr {
-	u_int8_t	nflog_family;		/* adress family */
-	u_int8_t	nflog_version;		/* version */
-	u_int16_t	nflog_rid;			/* resource ID */
-} nflog_hdr_t;
-
-typedef struct nflog_tlv {
-	u_int16_t	tlv_length;		/* tlv length */
-	u_int16_t	tlv_type;		/* tlv type */
-	void*		tlv_value;		/* tlv value */
-} nflog_tlv_t;
-
-#ifdef DLT_NFLOG
-
-#define NFULA_PAYLOAD 9
+#if defined(DLT_NFLOG) && defined(HAVE_PCAP_NFLOG_H)
+#include <pcap/nflog.h>
 
 static const struct tok nflog_values[] = {
 	{ AF_INET,		"IPv4" },
@@ -139,7 +122,7 @@ nflog_if_print(struct netdissect_options *ndo,
 	switch (hdr->nflog_family) {
 
 	case AF_INET:
-			ip_print(ndo, p, length);
+		ip_print(ndo, p, length);
 		break;
 
 #ifdef INET6
@@ -161,4 +144,4 @@ nflog_if_print(struct netdissect_options *ndo,
 	return h_size;
 }
 
-#endif /* DLT_NFLOG */
+#endif /* defined(DLT_NFLOG) && defined(HAVE_PCAP_NFLOG_H) */
