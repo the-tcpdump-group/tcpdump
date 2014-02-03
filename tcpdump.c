@@ -525,8 +525,10 @@ show_dlts_and_exit(const char *device, pcap_t *pd)
 
 #ifdef HAVE_PCAP_SETDIRECTION
 #define P_FLAG "P:"
+#define Q_FLAG "Q:"
 #else
 #define P_FLAG
+#define Q_FLAG
 #endif
 
 #ifndef WIN32
@@ -747,7 +749,7 @@ main(int argc, char **argv)
 #endif
 
 	while (
-	    (op = getopt(argc, argv, "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOp" P_FLAG "qr:Rs:StT:u" U_FLAG "vV:w:W:xXy:Yz:Z:")) != -1)
+	    (op = getopt(argc, argv, "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOp" P_FLAG "q" Q_FLAG "r:Rs:StT:u" U_FLAG "vV:w:W:xXy:Yz:Z:")) != -1)
 		switch (op) {
 
 		case 'a':
@@ -971,6 +973,10 @@ main(int argc, char **argv)
 			break;
 #ifdef HAVE_PCAP_SETDIRECTION
 		case 'P':
+			warning("don't use -P, use -Q; -P will be used for pcap-ng output in the future");
+			/* FALLTHROUGH */
+
+		case 'Q':
 			if (strcasecmp(optarg, "in") == 0)
 				Pflag = PCAP_D_IN;
 			else if (strcasecmp(optarg, "out") == 0)
@@ -2128,7 +2134,7 @@ usage(void)
 "\t\t[ -i interface ]" j_FLAG_USAGE " [ -M secret ]\n");
 #ifdef HAVE_PCAP_SETDIRECTION
 	(void)fprintf(stderr,
-"\t\t[ -P in|out|inout ]\n");
+"\t\t[ -Q in|out|inout ]\n");
 #endif
 	(void)fprintf(stderr,
 "\t\t[ -r file ] [ -s snaplen ] [ -T type ] [ -V file ] [ -w file ]\n");
