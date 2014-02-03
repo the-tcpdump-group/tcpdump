@@ -37,11 +37,8 @@
 #include "netdissect.h"
 #include "interface.h"
 
-#include "nflog.h"
-
-#ifdef DLT_NFLOG
-
-#define NFULA_PAYLOAD 9
+#if defined(DLT_NFLOG) && defined(HAVE_PCAP_NFLOG_H)
+#include <pcap/nflog.h>
 
 static const struct tok nflog_values[] = {
 	{ AF_INET,		"IPv4" },
@@ -125,7 +122,7 @@ nflog_if_print(struct netdissect_options *ndo,
 	switch (hdr->nflog_family) {
 
 	case AF_INET:
-			ip_print(ndo, p, length);
+		ip_print(ndo, p, length);
 		break;
 
 #ifdef INET6
@@ -147,4 +144,4 @@ nflog_if_print(struct netdissect_options *ndo,
 	return h_size;
 }
 
-#endif /* DLT_NFLOG */
+#endif /* defined(DLT_NFLOG) && defined(HAVE_PCAP_NFLOG_H) */

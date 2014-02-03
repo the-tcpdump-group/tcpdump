@@ -106,6 +106,9 @@
 /* define if libpcap has pcap_list_datalinks() */
 #undef HAVE_PCAP_LIST_DATALINKS
 
+/* Define to 1 if you have the <pcap/nflog.h> header file. */
+#undef HAVE_PCAP_NFLOG_H
+
 /* Define to 1 if you have the `pcap_setdirection' function. */
 #undef HAVE_PCAP_SETDIRECTION
 

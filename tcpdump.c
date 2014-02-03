@@ -334,7 +334,7 @@ static struct ndo_printer ndo_printers[] = {
 #ifdef DLT_NETANALYZER_TRANSPARENT
 	{ netanalyzer_transparent_if_print, DLT_NETANALYZER_TRANSPARENT },
 #endif
-#ifdef DLT_NFLOG
+#if defined(DLT_NFLOG) && defined(HAVE_PCAP_NFLOG_H)
 	{ nflog_if_print,	DLT_NFLOG},
 #endif
 	{ NULL,			0 },
