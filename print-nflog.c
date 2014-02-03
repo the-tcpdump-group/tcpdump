@@ -90,34 +90,55 @@ nflog_if_print(struct netdissect_options *ndo,
 	if (ndo->ndo_eflag)
 		nflog_hdr_print(ndo, hdr, length);
 
+	p += sizeof(nflog_hdr_t);
 	length -= sizeof(nflog_hdr_t);
 	caplen -= sizeof(nflog_hdr_t);
-	p += sizeof(nflog_hdr_t);
 
-	do {
+	while (length > 0) {
+		/* We have some data.  Do we have enough for the TLV header? */
+		if (caplen < sizeof(nflog_tlv_t) || length < sizeof(nflog_tlv_t)) {
+			/* No. */
+			ND_PRINT((ndo, "[|nflog]"));
+			return h_size;
+		}
+
 		tlv = (const nflog_tlv_t *) p;
 		size = tlv->tlv_length;
-
 		if (size % 4 != 0)
 			size += 4 - size % 4;
 
-		h_size = h_size + size;
-
-		/* wrong size of the packet */
-		if (size > length || size == 0)
+		/* Is the TLV's length less than the minimum? */
+		if (size < sizeof(nflog_tlv_t)) {
+			/* Yes. Give up now. */
+			ND_PRINT((ndo, "[|nflog]"));
 			return h_size;
+		}
+
+		/* Do we have enough data for the full TLV? */
+		if (caplen < size || length < size) {
+			/* No. */
+			ND_PRINT((ndo, "[|nflog]"));
+			return h_size;
+		}
+
+		if (tlv->tlv_type == NFULA_PAYLOAD) {
+			/*
+			 * This TLV's data is the packet payload.
+			 * Skip past the TLV header, and break out
+			 * of the loop so we print the packet data.
+			 */
+			p += sizeof(nflog_tlv_t);
+			h_size += sizeof(nflog_tlv_t);
+			length -= sizeof(nflog_tlv_t);
+			caplen -= sizeof(nflog_tlv_t);
+			break;
+		}
 
 		p += size;
-		length = length - size;
-		caplen = caplen - size;
-
-	} while (tlv->tlv_type != NFULA_PAYLOAD);
-
-	/* dont skip payload just tlv length and type */
-	p = p - size + 4;
-	length += size - 4;
-	caplen += size - 4;
-	h_size -= length;
+		h_size += size;
+		length -= size;
+		caplen -= size;
+	}
 
 	switch (hdr->nflog_family) {
 
