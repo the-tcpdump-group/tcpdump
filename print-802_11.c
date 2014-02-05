@@ -1781,7 +1781,6 @@ static int
 handle_deauth(const struct mgmt_header_t *pmh, const u_char *p, u_int length)
 {
 	struct mgmt_body_t  pbody;
-	int offset = 0;
 	const char *reason = NULL;
 
 	memset(&pbody, 0, sizeof(pbody));
@@ -1791,8 +1790,6 @@ handle_deauth(const struct mgmt_header_t *pmh, const u_char *p, u_int length)
 	if (length < IEEE802_11_REASON_LEN)
 		return 0;
 	pbody.reason_code = EXTRACT_LE_16BITS(p);
-	offset += IEEE802_11_REASON_LEN;
-	length -= IEEE802_11_REASON_LEN;
 
 	reason = (pbody.reason_code < NUM_REASONS)
 			? reason_text[pbody.reason_code]
