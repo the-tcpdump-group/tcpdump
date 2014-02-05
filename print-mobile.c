@@ -65,7 +65,6 @@ struct mobile_ip {
 void
 mobile_print(const u_char *bp, u_int length)
 {
-	const u_char *cp = bp +8 ;
 	const struct mobile_ip *mob;
 	struct cksum_vec vec[1];
 	u_short proto,crc;
@@ -83,7 +82,6 @@ mobile_print(const u_char *bp, u_int length)
 	crc =  EXTRACT_16BITS(&mob->hcheck);
 	if (proto & OSRC_PRES) {
 		osp=1;
-		cp +=4 ;
 	}
 
 	if (osp)  {
