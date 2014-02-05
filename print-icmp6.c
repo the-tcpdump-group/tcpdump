@@ -1614,7 +1614,6 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 			if (i)
 				ND_PRINT((ndo," [%s]", (i & 0x01) ? "C" : ""));
 			break;
-			break;
 		case NI_QTYPE_FQDN:
 			ND_PRINT((ndo,"DNS name"));
 			break;
