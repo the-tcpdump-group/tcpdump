@@ -1338,8 +1338,7 @@ gentltlv_print(register const u_char * pptr _U_, register u_int len,
 #define RD_MIN 8
 
 static int
-print_metailv(register const u_char * pptr, register u_int len,
-	      u_int16_t op_msk _U_, int indent)
+print_metailv(register const u_char * pptr, u_int16_t op_msk _U_, int indent)
 {
 	u_int rlen;
 	char *ib = indent_pr(indent, 0);
@@ -1394,7 +1393,7 @@ print_metatlv(register const u_char * pptr, register u_int len,
 		 * length is large enough but not too large (it doesn't
 		 * go past the end of the containing TLV).
 		 */
-		print_metailv((u_char *) ilv, rlen, 0, indent + 1);
+		print_metailv((u_char *) ilv, 0, indent + 1);
 		ilv = GO_NXT_ILV(ilv, rlen);
 	}
 
