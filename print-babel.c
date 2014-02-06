@@ -88,6 +88,9 @@ babel_print(netdissect_options *ndo,
 #define MESSAGE_MH_REQUEST 10
 #define MESSAGE_TSPC 11
 #define MESSAGE_HMAC 12
+#define MESSAGE_UPDATE_SRC_SPECIFIC 13
+#define MESSAGE_REQUEST_SRC_SPECIFIC 14
+#define MESSAGE_MH_REQUEST_SRC_SPECIFIC 15
 
 /* sub-TLVs */
 #define MESSAGE_SUB_PAD1 0
@@ -304,7 +307,8 @@ subtlvs_print(netdissect_options *ndo,
                 ND_PRINT((ndo, "%s%s", sep, tok2str(diversity_str, "%u", *cp++)));
                 sep = "-";
             }
-            if(tlv_type != MESSAGE_UPDATE)
+            if(tlv_type != MESSAGE_UPDATE &&
+               tlv_type != MESSAGE_UPDATE_SRC_SPECIFIC)
                 ND_PRINT((ndo, " (bogus)"));
             break;
         case MESSAGE_SUB_TIMESTAMP:
@@ -585,6 +589,120 @@ babel_print_v2(netdissect_options *ndo,
             }
         }
             break;
+
+        case MESSAGE_UPDATE_SRC_SPECIFIC : {
+            if(!ndo->ndo_vflag) {
+                ND_PRINT((ndo, " ss-update"));
+            } else {
+                u_char prefix[16], src_prefix[16];
+                u_short interval, seqno, metric;
+                u_char ae, plen, src_plen, omitted;
+                int rc;
+                int parsed_len = 10;
+                ND_PRINT((ndo, "\n\tSS-Update"));
+                if(len < 10) goto corrupt;
+                ae = message[2];
+                src_plen = message[3];
+                plen = message[4];
+                omitted = message[5];
+                interval = EXTRACT_16BITS(message + 6);
+                seqno = EXTRACT_16BITS(message + 8);
+                metric = EXTRACT_16BITS(message + 10);
+                rc = network_prefix(ae, plen, omitted, message + 2 + parsed_len,
+                                    ae == 1 ? v4_prefix : v6_prefix,
+                                    len - parsed_len, prefix);
+                if(rc < 0) goto corrupt;
+                if(ae == 1)
+                    plen += 96;
+                parsed_len += rc;
+                rc = network_prefix(ae, src_plen, 0, message + 2 + parsed_len,
+                                    NULL, len - parsed_len, src_prefix);
+                if(rc < 0) goto corrupt;
+                if(ae == 1)
+                    src_plen += 96;
+                parsed_len += rc;
+
+                ND_PRINT((ndo, " %s from", format_prefix(ndo, prefix, plen)));
+                ND_PRINT((ndo, " %s metric %u seqno %u interval %s",
+                          format_prefix(ndo, src_prefix, src_plen),
+                          metric, seqno, format_interval_update(interval)));
+                /* extra data? */
+                if((u_int)parsed_len < len)
+                    subtlvs_print(ndo, message + 2 + parsed_len,
+                                  message + 2 + len, type);
+            }
+        }
+            break;
+
+        case MESSAGE_REQUEST_SRC_SPECIFIC : {
+            if(!ndo->ndo_vflag)
+                ND_PRINT((ndo, " ss-request"));
+            else {
+                int rc, parsed_len = 3;
+                u_char ae, plen, src_plen, prefix[16], src_prefix[16];
+                ND_PRINT((ndo, "\n\tSS-Request "));
+                if(len < 3) goto corrupt;
+                ae = message[2];
+                plen = message[3];
+                src_plen = message[4];
+                rc = network_prefix(ae, plen, 0, message + 2 + parsed_len,
+                                    NULL, len - parsed_len, prefix);
+                if(rc < 0) goto corrupt;
+                if(ae == 1)
+                    plen += 96;
+                parsed_len += rc;
+                rc = network_prefix(ae, src_plen, 0, message + 2 + parsed_len,
+                                    NULL, len - parsed_len, src_prefix);
+                if(rc < 0) goto corrupt;
+                if(ae == 1)
+                    src_plen += 96;
+                parsed_len += rc;
+                if(ae == 0) {
+                    ND_PRINT((ndo, "for any"));
+                } else {
+                    ND_PRINT((ndo, "for (%s, ", format_prefix(ndo, prefix, plen)));
+                    ND_PRINT((ndo, "%s)", format_prefix(ndo, src_prefix, src_plen)));
+                }
+            }
+        }
+            break;
+
+        case MESSAGE_MH_REQUEST_SRC_SPECIFIC : {
+            if(!ndo->ndo_vflag)
+                ND_PRINT((ndo, " ss-mh-request"));
+            else {
+                int rc, parsed_len = 14;
+                u_short seqno;
+                u_char ae, plen, src_plen, prefix[16], src_prefix[16], hopc;
+                const u_char *router_id = NULL;
+                ND_PRINT((ndo, "\n\tSS-MH-Request "));
+                if(len < 14) goto corrupt;
+                ae = message[2];
+                plen = message[3];
+                seqno = EXTRACT_16BITS(message + 4);
+                hopc = message[6];
+                src_plen = message[7];
+                router_id = message + 8;
+                rc = network_prefix(ae, plen, 0, message + 2 + parsed_len,
+                                    NULL, len - parsed_len, prefix);
+                if(rc < 0) goto corrupt;
+                if(ae == 1)
+                    plen += 96;
+                parsed_len += rc;
+                rc = network_prefix(ae, src_plen, 0, message + 2 + parsed_len,
+                                    NULL, len - parsed_len, src_prefix);
+                if(rc < 0) goto corrupt;
+                if(ae == 1)
+                    src_plen += 96;
+                ND_PRINT((ndo, "(%u hops) for (%s, ",
+                          message[6], format_prefix(ndo, prefix, plen)));
+                ND_PRINT((ndo, "%s) seqno %u id %s",
+                          format_prefix(ndo, src_prefix, src_plen),
+                          seqno, format_id(message + 8)));
+            }
+        }
+            break;
+
         default:
             if (!ndo->ndo_vflag)
                 ND_PRINT((ndo, " unknown"));
