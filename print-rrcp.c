@@ -125,8 +125,6 @@ rrcp_print(netdissect_options *ndo,
 		    EXTRACT_32BITS(rrcp + RRCP_COOKIE2_OFFSET),
 		    EXTRACT_32BITS(rrcp + RRCP_COOKIE1_OFFSET)));
 	}
-        if (!ndo->ndo_vflag)
-            return;
 	return;
 
 trunc:
