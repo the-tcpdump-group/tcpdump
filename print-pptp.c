@@ -560,8 +560,8 @@ pptp_result_code_print(const u_int8_t *result_code, int ctrl_msg_type)
 			default:
 				printf(":?");
 				break;
-			break;
 			}
+			break;
 		default:
 			/* assertion error */
 			break;
