@@ -557,6 +557,7 @@ pptp_result_code_print(const u_int8_t *result_code, int ctrl_msg_type)
 				break;
 			case 4:
 				printf(":Request");
+				break;
 			default:
 				printf(":?");
 				break;
