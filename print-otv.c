@@ -26,8 +26,6 @@
 #include "extract.h"
 #include "addrtoname.h"
 
-#include "udp.h"
-
 /*
  * OTV header, draft-hasmit-otv-04
  *

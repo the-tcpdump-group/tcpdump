@@ -25,8 +25,6 @@
 #include "interface.h"
 #include "extract.h"
 
-#include "udp.h"
-
 void
 sip_print(register const u_char *pptr, register u_int len)
 {

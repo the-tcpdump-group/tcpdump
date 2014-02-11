@@ -26,8 +26,6 @@
 #include "extract.h"
 #include "addrtoname.h"
 
-#include "udp.h"
-
 /*
  * VXLAN header, draft-mahalingam-dutt-dcops-vxlan-03
  *
