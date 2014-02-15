@@ -184,8 +184,8 @@ static inline u_int dccp_csum_coverage(const struct dccp_hdr* dh, u_int len)
 static int dccp_cksum(const struct ip *ip,
 	const struct dccp_hdr *dh, u_int len)
 {
-	return nextproto4_cksum(ip, (const u_int8_t *)(void *)dh,
-	    dccp_csum_coverage(dh, len), IPPROTO_DCCP);
+	return nextproto4_cksum(ip, (const u_int8_t *)(void *)dh, len,
+				dccp_csum_coverage(dh, len), IPPROTO_DCCP);
 }
 
 #ifdef INET6

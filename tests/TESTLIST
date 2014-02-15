@@ -173,3 +173,7 @@ ipv6-bad-version.pcap	ipv6-bad-version.pcap 	ipv6-bad-version.out	-t
 
 # Loopback/CTP test case
 loopback	loopback.pcap		loopback.out		-t
+
+# DCCP partial checksums tests
+dccp_partial_csum_v4_simple	dccp_partial_csum_v4_simple.pcap	dccp_partial_csum_v4_simple.out -t -v
+dccp_partial_csum_v4_longer	dccp_partial_csum_v4_longer.pcap	dccp_partial_csum_v4_longer.out -t -v
