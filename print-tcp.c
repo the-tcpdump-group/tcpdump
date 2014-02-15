@@ -144,8 +144,8 @@ static int tcp_cksum(register const struct ip *ip,
 		     register const struct tcphdr *tp,
 		     register u_int len)
 {
-	return (nextproto4_cksum(ip, (const u_int8_t *)tp, len,
-	    IPPROTO_TCP));
+	return nextproto4_cksum(ip, (const u_int8_t *)tp, len, len,
+				IPPROTO_TCP);
 }
 
 void
