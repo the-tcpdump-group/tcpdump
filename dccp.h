@@ -77,31 +77,22 @@ struct dccp_hdr_ack_bits {
 /**
  * struct dccp_hdr_response - Conection initiation response header
  *
- * @dccph_resp_ack_nr_high - 48 bit ack number high order bits, contains GSR
- * @dccph_resp_ack_nr_low - 48 bit ack number low order bits, contains GSR
+ * @dccph_resp_ack - 48 bit ack number, contains GSR
  * @dccph_resp_service - Echoes the Service Code on a received DCCP-Request
  */
 struct dccp_hdr_response {
-	struct dccp_hdr_ack_bits	dccph_resp_ack;
+	u_int8_t			dccph_resp_ack[8];	/* always 8 bytes */
 	u_int32_t			dccph_resp_service;
 } UNALIGNED;
-
-#if 0
-static inline struct dccp_hdr_data *dccp_hdr_data(struct dccp_hdr *hdrg)
-{
-	const int ext = DCCPH_X(hdrg) ? sizeof(struct dccp_hdr_ext) : 0;
-
-	return (struct dccp_hdr_data *)(((u_char *)hdrg) + sizeof(hdrg) + ext);
-}
-#endif
 
 /**
  * struct dccp_hdr_reset - Unconditionally shut down a connection
  *
+ * @dccph_resp_ack - 48 bit ack number
  * @dccph_reset_service - Echoes the Service Code on a received DCCP-Request
  */
 struct dccp_hdr_reset {
-	struct dccp_hdr_ack_bits	dccph_reset_ack;
+	u_int8_t			dccph_reset_ack[8];	/* always 8 bytes */
 	u_int8_t			dccph_reset_code,
 					dccph_reset_data[3];
 } UNALIGNED;
