@@ -294,8 +294,8 @@ static int udp_cksum(register const struct ip *ip,
 static int udp6_cksum(const struct ip6_hdr *ip6, const struct udphdr *up,
 	u_int len)
 {
-	return (nextproto6_cksum(ip6, (const u_int8_t *)(void *)up, len,
-	    IPPROTO_UDP));
+	return nextproto6_cksum(ip6, (const u_int8_t *)(void *)up, len, len,
+	    IPPROTO_UDP);
 }
 #endif
 

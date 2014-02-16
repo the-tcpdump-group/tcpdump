@@ -198,8 +198,8 @@ print_lladdr(const u_int8_t *p, size_t l)
 static int icmp6_cksum(const struct ip6_hdr *ip6, const struct icmp6_hdr *icp,
 	u_int len)
 {
-	return (nextproto6_cksum(ip6, (const u_int8_t *)(void *)icp, len,
-	    IPPROTO_ICMPV6));
+	return nextproto6_cksum(ip6, (const u_int8_t *)(void *)icp, len, len,
+				IPPROTO_ICMPV6);
 }
 
 enum ND_RPL_CODE {
