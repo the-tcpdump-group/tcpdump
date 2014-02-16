@@ -92,16 +92,16 @@ static const char *dccp_reset_code(u_int8_t code)
 	return dccp_reset_codes[code];
 }
 
-static u_int64_t dccp_seqno(const struct dccp_hdr *dh)
+static u_int64_t dccp_seqno(const u_char *bp)
 {
-	u_int32_t seq_high = DCCPH_SEQ(dh);
-	u_int64_t seqno = EXTRACT_24BITS(&seq_high) & 0xFFFFFF;
+	const struct dccp_hdr *dh = (const struct dccp_hdr *)bp;
+	u_int64_t seqno;
 
 	if (DCCPH_X(dh) != 0) {
-		const struct dccp_hdr_ext *dhx = (void *)(dh + 1);
-		u_int32_t seq_low = dhx->dccph_seq_low;
-		seqno &= 0x00FFFF;  /* clear reserved field */
-		seqno = (seqno << 32) + EXTRACT_32BITS(&seq_low);
+		const struct dccp_hdr_ext *dhx = (const struct dccp_hdr_ext *)bp;
+		seqno = EXTRACT_48BITS(dhx->dccph_seq);
+	} else {
+		seqno = EXTRACT_24BITS(dh->dccph_seq);
 	}
 
 	return seqno;
@@ -109,7 +109,7 @@ static u_int64_t dccp_seqno(const struct dccp_hdr *dh)
 
 static inline unsigned int dccp_basic_hdr_len(const struct dccp_hdr *dh)
 {
-	return sizeof(*dh) + (DCCPH_X(dh) ? sizeof(struct dccp_hdr_ext) : 0);
+	return DCCPH_X(dh) ? sizeof(struct dccp_hdr_ext) : sizeof(struct dccp_hdr);
 }
 
 static void dccp_print_ack_no(const u_char *bp)
@@ -291,7 +291,7 @@ void dccp_print(const u_char *bp, const u_char *data2, u_int len)
 	if (vflag < 2)
 		return;
 
-	(void)printf("seq %" PRIu64, dccp_seqno(dh));
+	(void)printf("seq %" PRIu64, dccp_seqno(bp));
 
 	/* process options */
 	if (hlen > dccp_basic_hdr_len(dh) + extlen){

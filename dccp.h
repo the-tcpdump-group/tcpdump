@@ -12,7 +12,8 @@
 #define __DCCP_HDR__
 
 /**
- * struct dccp_hdr - generic part of DCCP packet header
+ * struct dccp_hdr - generic part of DCCP packet header, with a 24-bit
+ * sequence number
  *
  * @dccph_sport - Relevant port on the endpoint that sent this packet
  * @dccph_dport - Relevant port on the other endpoint
@@ -22,7 +23,7 @@
  * @dccph_checksum - Internet checksum, depends on dccph_cscov
  * @dccph_x - 0 = 24 bit sequence number, 1 = 48
  * @dccph_type - packet type, see DCCP_PKT_ prefixed macros
- * @dccph_seq - sequence number high or low order 24 bits, depends on dccph_x
+ * @dccph_seq - 24-bit sequence number
  */
 struct dccp_hdr {
 	u_int16_t	dccph_sport,
@@ -30,27 +31,40 @@ struct dccp_hdr {
 	u_int8_t	dccph_doff;
 	u_int8_t	dccph_ccval_cscov;
 	u_int16_t	dccph_checksum;
-	union {
 	u_int8_t	dccph_xtr;
-	u_int32_t	dccph_seq;
-	}		dccph_xtrs;
+	u_int8_t	dccph_seq[3];
+} UNALIGNED;
+
+/**
+ * struct dccp_hdr_ext - generic part of DCCP packet header, with a 48-bit
+ * sequence number
+ *
+ * @dccph_sport - Relevant port on the endpoint that sent this packet
+ * @dccph_dport - Relevant port on the other endpoint
+ * @dccph_doff - Data Offset from the start of the DCCP header, in 32-bit words
+ * @dccph_ccval - Used by the HC-Sender CCID
+ * @dccph_cscov - Parts of the packet that are covered by the Checksum field
+ * @dccph_checksum - Internet checksum, depends on dccph_cscov
+ * @dccph_x - 0 = 24 bit sequence number, 1 = 48
+ * @dccph_type - packet type, see DCCP_PKT_ prefixed macros
+ * @dccph_seq - 48-bit sequence number
+ */
+struct dccp_hdr_ext {
+	u_int16_t	dccph_sport,
+			dccph_dport;
+	u_int8_t	dccph_doff;
+	u_int8_t	dccph_ccval_cscov;
+	u_int16_t	dccph_checksum;
+	u_int8_t	dccph_xtr;
+	u_int8_t	reserved;
+	u_int8_t	dccph_seq[6];
 } UNALIGNED;
 
 #define DCCPH_CCVAL(dh)	(((dh)->dccph_ccval_cscov >> 4) & 0xF)
 #define DCCPH_CSCOV(dh)	(((dh)->dccph_ccval_cscov) & 0xF)
 
-#define DCCPH_X(dh)	((dh)->dccph_xtrs.dccph_xtr & 1)
-#define DCCPH_TYPE(dh)	(((dh)->dccph_xtrs.dccph_xtr >> 1) & 0xF)
-#define DCCPH_SEQ(dh)   (((dh)->dccph_xtrs.dccph_seq) >> 8)
-
-/**
- * struct dccp_hdr_ext - the low bits of a 48 bit seq packet
- *
- * @dccph_seq_low - low 24 bits of a 48 bit seq packet
- */
-struct dccp_hdr_ext {
-	u_int32_t	dccph_seq_low;
-} UNALIGNED;
+#define DCCPH_X(dh)	((dh)->dccph_xtr & 1)
+#define DCCPH_TYPE(dh)	(((dh)->dccph_xtr >> 1) & 0xF)
 
 /**
  * struct dccp_hdr_request - Conection initiation request header
@@ -60,19 +74,6 @@ struct dccp_hdr_ext {
 struct dccp_hdr_request {
 	u_int32_t	dccph_req_service;
 } UNALIGNED;
-
-/**
- * struct dccp_hdr_ack_bits - acknowledgment bits common to most packets
- *
- * @dccph_resp_ack_nr_high - 48 bit ack number high order bits, contains GSR
- * @dccph_resp_ack_nr_low - 48 bit ack number low order bits, contains GSR
- */
-struct dccp_hdr_ack_bits {
-	u_int32_t	dccph_ra;
-	u_int32_t	dccph_ack_nr_low;
-} UNALIGNED;
-
-#define DCCPH_ACK(dh_ack)   ((dh_ack)->dccph_ra >> 8)
 
 /**
  * struct dccp_hdr_response - Conection initiation response header
