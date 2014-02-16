@@ -167,6 +167,30 @@ EXTRACT_64BITS(const void *p)
 		     (u_int32_t)*((const u_int8_t *)(p) + 1) << 8 | \
 		     (u_int32_t)*((const u_int8_t *)(p) + 2)))
 
+#define EXTRACT_40BITS(p) \
+	((u_int64_t)((u_int64_t)*((const u_int8_t *)(p) + 0) << 32 | \
+		     (u_int64_t)*((const u_int8_t *)(p) + 1) << 24 | \
+		     (u_int64_t)*((const u_int8_t *)(p) + 2) << 16 | \
+		     (u_int64_t)*((const u_int8_t *)(p) + 3) << 8 | \
+		     (u_int64_t)*((const u_int8_t *)(p) + 4)))
+
+#define EXTRACT_48BITS(p) \
+	((u_int64_t)((u_int64_t)*((const u_int8_t *)(p) + 0) << 40 | \
+		     (u_int64_t)*((const u_int8_t *)(p) + 1) << 32 | \
+		     (u_int64_t)*((const u_int8_t *)(p) + 2) << 24 | \
+		     (u_int64_t)*((const u_int8_t *)(p) + 3) << 16 | \
+		     (u_int64_t)*((const u_int8_t *)(p) + 4) << 8 | \
+		     (u_int64_t)*((const u_int8_t *)(p) + 5)))
+
+#define EXTRACT_56BITS(p) \
+	((u_int64_t)((u_int64_t)*((const u_int8_t *)(p) + 0) << 48 | \
+		     (u_int64_t)*((const u_int8_t *)(p) + 1) << 40 | \
+		     (u_int64_t)*((const u_int8_t *)(p) + 2) << 32 | \
+		     (u_int64_t)*((const u_int8_t *)(p) + 3) << 24 | \
+		     (u_int64_t)*((const u_int8_t *)(p) + 4) << 16 | \
+		     (u_int64_t)*((const u_int8_t *)(p) + 5) << 8 | \
+		     (u_int64_t)*((const u_int8_t *)(p) + 6)))
+
 /*
  * Macros to extract possibly-unaligned little-endian integral values.
  * XXX - do loads on little-endian machines that support unaligned loads?
