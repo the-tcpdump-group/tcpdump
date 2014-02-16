@@ -192,8 +192,8 @@ static int dccp_cksum(const struct ip *ip,
 #ifdef INET6
 static int dccp6_cksum(const struct ip6_hdr *ip6, const struct dccp_hdr *dh, u_int len)
 {
-	return nextproto6_cksum(ip6, (const u_int8_t *)(void *)dh,
-	    dccp_csum_coverage(dh, len), IPPROTO_DCCP);
+	return nextproto6_cksum(ip6, (const u_int8_t *)(void *)dh, len,
+				dccp_csum_coverage(dh, len), IPPROTO_DCCP);
 }
 #endif
 
