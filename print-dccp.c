@@ -226,23 +226,15 @@ static inline unsigned int dccp_basic_hdr_len(const struct dccp_hdr *dh)
 static void dccp_print_ack_no(const u_char *bp)
 {
 	const struct dccp_hdr *dh = (const struct dccp_hdr *)bp;
-	const struct dccp_hdr_ack_bits *dh_ack =
-		(struct dccp_hdr_ack_bits *)(bp + dccp_basic_hdr_len(dh));
-	u_int32_t ack_high;
+	const u_char *ackp = bp + dccp_basic_hdr_len(dh);
 	u_int64_t ackno;
 
-	TCHECK2(*dh_ack,4);
-	ack_high = DCCPH_ACK(dh_ack);
-	ackno = EXTRACT_24BITS(&ack_high) & 0xFFFFFF;
-
 	if (DCCPH_X(dh) != 0) {
-		u_int32_t ack_low;
-
-		TCHECK2(*dh_ack,8);
-		ack_low = dh_ack->dccph_ack_nr_low;
-
-		ackno &= 0x00FFFF;  /* clear reserved field */
-		ackno = (ackno << 32) + EXTRACT_32BITS(&ack_low);
+		TCHECK2(*ackp, 8);
+		ackno = EXTRACT_48BITS(ackp + 2);
+	} else {
+		TCHECK2(*ackp, 4);
+		ackno = EXTRACT_24BITS(ackp + 1);
 	}
 
 	(void)printf("(ack=%" PRIu64 ") ", ackno);
