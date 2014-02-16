@@ -44,7 +44,7 @@
  */
 int
 nextproto6_cksum(const struct ip6_hdr *ip6, const u_int8_t *data,
-		 u_int len, u_int next_proto)
+		 u_int len, u_int covlen, u_int next_proto)
 {
         struct {
                 struct in6_addr ph_src;
@@ -65,7 +65,7 @@ nextproto6_cksum(const struct ip6_hdr *ip6, const u_int8_t *data,
         vec[0].ptr = (const u_int8_t *)(void *)&ph;
         vec[0].len = sizeof(ph);
         vec[1].ptr = data;
-        vec[1].len = len;
+        vec[1].len = covlen;
 
         return in_cksum(vec, 2);
 }
@@ -225,7 +225,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		    }
 
 		case IPPROTO_PIM:
-			pim_print(cp, len, nextproto6_cksum(ip6, cp, len,
+			pim_print(cp, len, nextproto6_cksum(ip6, cp, len, len,
 							    IPPROTO_PIM));
 			return;
 

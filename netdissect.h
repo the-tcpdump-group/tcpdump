@@ -527,7 +527,6 @@ extern u_int ieee802_15_4_if_print(netdissect_options *,const struct pcap_pkthdr
 extern void ip6_print(netdissect_options *,const u_char *, u_int);
 #if 0
 extern void ip6_opt_print(netdissect_options *,const u_char *, int);
-extern int nextproto6_cksum(const struct ip6_hdr *, const u_int8_t *, u_int, u_int);
 extern int hbhopt_print(netdissect_options *,const u_char *);
 extern int dstopt_print(netdissect_options *,const u_char *);
 extern int frag6_print(netdissect_options *,const u_char *,
