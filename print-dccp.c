@@ -48,7 +48,7 @@ struct dccp_hdr {
 	u_int8_t	dccph_xtr;
 	u_int32_t	dccph_seq;
 	}		dccph_xtrs;
-};
+} UNALIGNED;
 
 #define DCCPH_CCVAL(dh)	(((dh)->dccph_ccval_cscov >> 4) & 0xF)
 #define DCCPH_CSCOV(dh)	(((dh)->dccph_ccval_cscov) & 0xF)
@@ -64,7 +64,7 @@ struct dccp_hdr {
  */
 struct dccp_hdr_ext {
 	u_int32_t	dccph_seq_low;
-};
+} UNALIGNED;
 
 /**
  * struct dccp_hdr_request - Conection initiation request header
@@ -73,7 +73,7 @@ struct dccp_hdr_ext {
  */
 struct dccp_hdr_request {
 	u_int32_t	dccph_req_service;
-};
+} UNALIGNED;
 
 /**
  * struct dccp_hdr_ack_bits - acknowledgment bits common to most packets
@@ -84,7 +84,7 @@ struct dccp_hdr_request {
 struct dccp_hdr_ack_bits {
 	u_int32_t	dccph_ra;
 	u_int32_t	dccph_ack_nr_low;
-};
+} UNALIGNED;
 
 #define DCCPH_ACK(dh_ack)   ((dh_ack)->dccph_ra >> 8)
 
@@ -98,7 +98,7 @@ struct dccp_hdr_ack_bits {
 struct dccp_hdr_response {
 	struct dccp_hdr_ack_bits	dccph_resp_ack;
 	u_int32_t			dccph_resp_service;
-};
+} UNALIGNED;
 
 /**
  * struct dccp_hdr_reset - Unconditionally shut down a connection
@@ -109,7 +109,7 @@ struct dccp_hdr_reset {
 	struct dccp_hdr_ack_bits	dccph_reset_ack;
 	u_int8_t			dccph_reset_code,
 					dccph_reset_data[3];
-};
+} UNALIGNED;
 
 enum dccp_pkt_type {
 	DCCP_PKT_REQUEST = 0,
