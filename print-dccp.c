@@ -243,7 +243,7 @@ trunc:
 	return;
 }
 
-static int dccp_print_option(const u_char *option);
+static int dccp_print_option(const u_char *option, u_int hlen);
 
 /**
  * dccp_print - show dccp packet
@@ -261,7 +261,7 @@ void dccp_print(const u_char *bp, const u_char *data2, u_int len)
 	const u_char *cp;
 	u_short sport, dport;
 	u_int hlen;
-	u_int extlen = 0;
+	u_int fixed_hdrlen;
 
 	dh = (const struct dccp_hdr *)bp;
 
@@ -272,17 +272,27 @@ void dccp_print(const u_char *bp, const u_char *data2, u_int len)
 	else
 		ip6 = NULL;
 #endif /*INET6*/
+
+	/* make sure we have enough data to look at the X bit */
 	cp = (const u_char *)(dh + 1);
 	if (cp > snapend) {
 		printf("[Invalid packet|dccp]");
 		return;
 	}
-
 	if (len < sizeof(struct dccp_hdr)) {
-		printf("truncated-dccp - %ld bytes missing!",
-			     (long)len - sizeof(struct dccp_hdr));
+		printf("truncated-dccp - %u bytes missing!",
+			     len - (u_int)sizeof(struct dccp_hdr));
 		return;
 	}
+
+	/* get the length of the generic header */
+	fixed_hdrlen = dccp_basic_hdr_len(dh);
+	if (len < fixed_hdrlen) {
+		printf("truncated-dccp - %u bytes missing!",
+			     len - fixed_hdrlen);
+		return;
+	}
+	TCHECK2(*dh, fixed_hdrlen);
 
 	sport = EXTRACT_16BITS(&dh->dccph_sport);
 	dport = EXTRACT_16BITS(&dh->dccph_dport);
@@ -337,59 +347,104 @@ void dccp_print(const u_char *bp, const u_char *data2, u_int len)
 	switch (DCCPH_TYPE(dh)) {
 	case DCCP_PKT_REQUEST: {
 		struct dccp_hdr_request *dhr =
-			(struct dccp_hdr_request *)(bp + dccp_basic_hdr_len(dh));
+			(struct dccp_hdr_request *)(bp + fixed_hdrlen);
+		fixed_hdrlen += 4;
+		if (len < fixed_hdrlen) {
+			printf("truncated-dccp request - %u bytes missing!",
+				     len - fixed_hdrlen);
+			return;
+		}
 		TCHECK(*dhr);
 		(void)printf("request (service=%d) ",
 			     EXTRACT_32BITS(&dhr->dccph_req_service));
-		extlen += 4;
 		break;
 	}
 	case DCCP_PKT_RESPONSE: {
 		struct dccp_hdr_response *dhr =
-			(struct dccp_hdr_response *)(bp + dccp_basic_hdr_len(dh));
+			(struct dccp_hdr_response *)(bp + fixed_hdrlen);
+		fixed_hdrlen += 12;
+		if (len < fixed_hdrlen) {
+			printf("truncated-dccp response - %u bytes missing!",
+				     len - fixed_hdrlen);
+			return;
+		}
 		TCHECK(*dhr);
 		(void)printf("response (service=%d) ",
 			     EXTRACT_32BITS(&dhr->dccph_resp_service));
-		extlen += 12;
 		break;
 	}
 	case DCCP_PKT_DATA:
 		(void)printf("data ");
 		break;
 	case DCCP_PKT_ACK: {
+		fixed_hdrlen += 8;
+		if (len < fixed_hdrlen) {
+			printf("truncated-dccp ack - %u bytes missing!",
+				     len - fixed_hdrlen);
+			return;
+		}
 		(void)printf("ack ");
-		extlen += 8;
 		break;
 	}
 	case DCCP_PKT_DATAACK: {
+		fixed_hdrlen += 8;
+		if (len < fixed_hdrlen) {
+			printf("truncated-dccp dataack - %u bytes missing!",
+				     len - fixed_hdrlen);
+			return;
+		}
 		(void)printf("dataack ");
-		extlen += 8;
 		break;
 	}
 	case DCCP_PKT_CLOSEREQ:
+		fixed_hdrlen += 8;
+		if (len < fixed_hdrlen) {
+			printf("truncated-dccp closereq - %u bytes missing!",
+				     len - fixed_hdrlen);
+			return;
+		}
 		(void)printf("closereq ");
-		extlen += 8;
 		break;
 	case DCCP_PKT_CLOSE:
+		fixed_hdrlen += 8;
+		if (len < fixed_hdrlen) {
+			printf("truncated-dccp close - %u bytes missing!",
+				     len - fixed_hdrlen);
+			return;
+		}
 		(void)printf("close ");
-		extlen += 8;
 		break;
 	case DCCP_PKT_RESET: {
 		struct dccp_hdr_reset *dhr =
-			(struct dccp_hdr_reset *)(bp + dccp_basic_hdr_len(dh));
+			(struct dccp_hdr_reset *)(bp + fixed_hdrlen);
+		fixed_hdrlen += 12;
+		if (len < fixed_hdrlen) {
+			printf("truncated-dccp reset - %u bytes missing!",
+				     len - fixed_hdrlen);
+			return;
+		}
 		TCHECK(*dhr);
 		(void)printf("reset (code=%s) ",
 			     dccp_reset_code(dhr->dccph_reset_code));
-		extlen += 12;
 		break;
 	}
 	case DCCP_PKT_SYNC:
+		fixed_hdrlen += 8;
+		if (len < fixed_hdrlen) {
+			printf("truncated-dccp sync - %u bytes missing!",
+				     len - fixed_hdrlen);
+			return;
+		}
 		(void)printf("sync ");
-		extlen += 8;
 		break;
 	case DCCP_PKT_SYNCACK:
+		fixed_hdrlen += 8;
+		if (len < fixed_hdrlen) {
+			printf("truncated-dccp syncack - %u bytes missing!",
+				     len - fixed_hdrlen);
+			return;
+		}
 		(void)printf("syncack ");
-		extlen += 8;
 		break;
 	default:
 		(void)printf("invalid ");
@@ -406,18 +461,19 @@ void dccp_print(const u_char *bp, const u_char *data2, u_int len)
 	(void)printf("seq %" PRIu64, dccp_seqno(bp));
 
 	/* process options */
-	if (hlen > dccp_basic_hdr_len(dh) + extlen){
+	if (hlen > fixed_hdrlen){
 		const u_char *cp;
 		u_int optlen;
-		cp = bp + dccp_basic_hdr_len(dh) + extlen;
+		cp = bp + fixed_hdrlen;
 		printf(" <");
 
-		hlen -= dccp_basic_hdr_len(dh) + extlen;
+		hlen -= fixed_hdrlen;
 		while(1){
-			TCHECK(*cp);
-			optlen = dccp_print_option(cp);
-			if (!optlen) goto trunc2;
-			if (hlen <= optlen) break;
+			optlen = dccp_print_option(cp, hlen);
+			if (!optlen)
+				break;
+			if (hlen <= optlen)
+				break;
 			hlen -= optlen;
 			cp += optlen;
 			printf(", ");
@@ -427,11 +483,30 @@ void dccp_print(const u_char *bp, const u_char *data2, u_int len)
 	return;
 trunc:
 	printf("%s", tstr);
-trunc2:
 	return;
 }
 
-static int dccp_print_option(const u_char *option)
+static const struct tok dccp_option_values[] = {
+	{ 0, "nop" },
+	{ 1, "mandatory" },
+	{ 2, "slowreceiver" },
+	{ 32, "change_l" },
+	{ 33, "confirm_l" },
+	{ 34, "change_r" },
+	{ 35, "confirm_r" },
+	{ 36, "initcookie" },
+	{ 37, "ndp_count" },
+	{ 38, "ack_vector0" },
+	{ 39, "ack_vector1" },
+	{ 40, "data_dropped" },
+	{ 41, "timestamp" },
+	{ 42, "timestamp_echo" },
+	{ 43, "elapsed_time" },
+	{ 44, "data_checksum" },
+        { 0, NULL }
+};
+
+static int dccp_print_option(const u_char *option, u_int hlen)
 {
 	u_int8_t optlen, i;
 
@@ -441,106 +516,116 @@ static int dccp_print_option(const u_char *option)
 		TCHECK(*(option+1));
 		optlen = *(option +1);
 		if (optlen < 2) {
-			printf("Option %d optlen too short",*option);
-			return 1;
+			if (*option >= 128)
+				printf("CCID option %u optlen too short", *option);
+			else
+				printf("%s optlen too short",
+				    tok2str(dccp_option_values, "Option %u", *option));
+			return 0;
 		}
-	} else optlen = 1;
+	} else
+		optlen = 1;
 
-	TCHECK2(*option,optlen);
-
-	switch (*option){
-	case 0:
-		printf("nop");
-		break;
-	case 1:
-		printf("mandatory");
-		break;
-	case 2:
-		printf("slowreceiver");
-		break;
-	case 32:
-		printf("change_l");
-		if (*(option +2) < 10){
-			printf(" %s", dccp_feature_nums[*(option +2)]);
-			for (i = 0; i < optlen -3; i ++) printf(" %d", *(option +3 + i));
-		}
-		break;
-	case 33:
-		printf("confirm_l");
-		if (*(option +2) < 10){
-			printf(" %s", dccp_feature_nums[*(option +2)]);
-			for (i = 0; i < optlen -3; i ++) printf(" %d", *(option +3 + i));
-		}
-		break;
-	case 34:
-	        printf("change_r");
-		if (*(option +2) < 10){
-			printf(" %s", dccp_feature_nums[*(option +2)]);
-			for (i = 0; i < optlen -3; i ++) printf(" %d", *(option +3 + i));
-		}
-		break;
-	case 35:
-		printf("confirm_r");
-		if (*(option +2) < 10){
-			printf(" %s", dccp_feature_nums[*(option +2)]);
-			for (i = 0; i < optlen -3; i ++) printf(" %d", *(option +3 + i));
-		}
-		break;
-	case 36:
-		printf("initcookie 0x");
-		for (i = 0; i < optlen -2; i ++) printf("%02x", *(option +2 + i));
-		break;
-	case 37:
-		printf("ndp_count");
-		for (i = 0; i < optlen -2; i ++) printf(" %d", *(option +2 + i));
-		break;
-	case 38:
-		printf("ack_vector0 0x");
-		for (i = 0; i < optlen -2; i ++) printf("%02x", *(option +2 + i));
-		break;
-	case 39:
-		printf("ack_vector1 0x");
-		for (i = 0; i < optlen -2; i ++) printf("%02x", *(option +2 + i));
-		break;
-	case 40:
-		printf("data_dropped 0x");
-		for (i = 0; i < optlen -2; i ++) printf("%02x", *(option +2 + i));
-		break;
-	case 41:
-		printf("timestamp %u", EXTRACT_32BITS(option + 2));
-		break;
-	case 42:
-		printf("timestamp_echo %u", EXTRACT_32BITS(option + 2));
-		break;
-	case 43:
-		printf("elapsed_time ");
-		if (optlen == 6)
-			printf("%u", EXTRACT_32BITS(option + 2));
+	if (hlen < optlen) {
+		if (*option >= 128)
+			printf("CCID option %u optlen goes past header length",
+			    *option);
 		else
-			printf("%u", EXTRACT_16BITS(option + 2));
-		break;
-	case 44:
-		printf("data_checksum ");
-		for (i = 0; i < optlen -2; i ++) printf("%02x", *(option +2 + i));
-		break;
-	default :
-		if (*option >= 128) {
-			printf("CCID option %d",*option);
-			switch (optlen) {
-				case 4:
-					printf(" %u", EXTRACT_16BITS(option + 2));
-					break;
-				case 6:
-					printf(" %u", EXTRACT_32BITS(option + 2));
-					break;
-				default:
-					break;
+			printf("%s optlen goes past header length",
+			    tok2str(dccp_option_values, "Option %u", *option));
+		return 0;
+	}
+	TCHECK2(*option, optlen);
+
+	if (*option >= 128) {
+		printf("CCID option %d", *option);
+		switch (optlen) {
+			case 4:
+				printf(" %u", EXTRACT_16BITS(option + 2));
+				break;
+			case 6:
+				printf(" %u", EXTRACT_32BITS(option + 2));
+				break;
+			default:
+				break;
+		}
+	} else {
+		printf("%s", tok2str(dccp_option_values, "Option %u", *option));
+		switch (*option) {
+		case 32:
+		case 33:
+		case 34:
+		case 35:
+			if (optlen < 3) {
+				printf(" optlen too short");
+				return optlen;
+			}
+			if (*(option + 2) < 10){
+				printf(" %s", dccp_feature_nums[*(option + 2)]);
+				for (i = 0; i < optlen - 3; i++)
+					printf(" %d", *(option + 3 + i));
+			}
+			break;
+		case 36:
+			if (optlen > 2) {
+				printf(" 0x");
+				for (i = 0; i < optlen - 2; i++)
+					printf("%02x", *(option + 2 + i));
+			}
+			break;
+		case 37:
+			for (i = 0; i < optlen - 2; i++)
+				printf(" %d", *(option + 2 + i));
+			break;
+		case 38:
+			if (optlen > 2) {
+				printf(" 0x");
+				for (i = 0; i < optlen - 2; i++)
+					printf("%02x", *(option + 2 + i));
+			}
+			break;
+		case 39:
+			if (optlen > 2) {
+				printf(" 0x");
+				for (i = 0; i < optlen - 2; i++)
+					printf("%02x", *(option + 2 + i));
+			}
+			break;
+		case 40:
+			if (optlen > 2) {
+				printf(" 0x");
+				for (i = 0; i < optlen - 2; i++)
+					printf("%02x", *(option + 2 + i));
+			}
+			break;
+		case 41:
+			if (optlen == 4)
+				printf(" %u", EXTRACT_32BITS(option + 2));
+			else
+				printf(" optlen != 4");
+			break;
+		case 42:
+			if (optlen == 4)
+				printf(" %u", EXTRACT_32BITS(option + 2));
+			else
+				printf(" optlen != 4");
+			break;
+		case 43:
+			if (optlen == 6)
+				printf(" %u", EXTRACT_32BITS(option + 2));
+			else if (optlen == 4)
+				printf(" %u", EXTRACT_16BITS(option + 2));
+			else
+				printf(" optlen != 4 or 6");
+			break;
+		case 44:
+			if (optlen > 2) {
+				printf(" ");
+				for (i = 0; i < optlen - 2; i++)
+					printf("%02x", *(option + 2 + i));
 			}
 			break;
 		}
-
-		printf("unknown_opt %d", *option);
-		break;
 	}
 
 	return optlen;
