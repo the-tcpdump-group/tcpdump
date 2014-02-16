@@ -123,13 +123,14 @@ vrrp_print(register const u_char *bp, register u_int len,
 	printf(", vrid %u, prio %u", bp[1], bp[2]);
 	TCHECK(bp[5]);
 
-  if (version == 2) {
-	  auth_type = bp[4];
-	  printf(", authtype %s", tok2str(auth2str, NULL, auth_type));
-	  printf(", intvl %us, length %u", bp[5], len);
-  } else { // version == 3
-    printf(", intvl %ucs, length %u", ((bp[4] & 0x0f) << 8 | bp[5]), len);
-  }
+	if (version == 2) {
+		auth_type = bp[4];
+		printf(", authtype %s", tok2str(auth2str, NULL, auth_type));
+		printf(", intvl %us, length %u", bp[5], len);
+	} else { // version == 3
+		u_int16_t intvl = (bp[4] & 0x0f) << 8 | bp[5];
+		printf(", intvl %ucs, length %u", intvl, len);
+	}
 
 	if (vflag) {
 		int naddrs = bp[3];
@@ -146,11 +147,13 @@ vrrp_print(register const u_char *bp, register u_int len,
 					EXTRACT_16BITS(&bp[6]));
 		}
 
-    if (version == 3 && TTEST2(bp[0], len)) {
-      if (nextproto4_cksum((struct ip *)ip, bp, len, len, IPPROTO_VRRP))
+		if (version == 3 && TTEST2(bp[0], len)) {
+			u_int16_t cksum = nextproto4_cksum((struct ip *)bp2, bp,
+				len, len, IPPROTO_VRRP);
+			if (cksum)
 				printf(", (bad vrrp cksum %x)",
 					EXTRACT_16BITS(&bp[6]));
-    }
+		}
 
 		printf(", addrs");
 		if (naddrs > 1)
