@@ -309,7 +309,7 @@ extern char *smb_errstr(int, int);
 extern const char *nt_errstr(u_int32_t);
 extern void print_data(const unsigned char *, int);
 extern void l2tp_print(const u_char *, u_int);
-extern void vrrp_print(const u_char *, u_int, int);
+extern void vrrp_print(const u_char *, u_int, const u_char *, int);
 extern void carp_print(const u_char *, u_int, int);
 extern void slow_print(const u_char *, u_int);
 extern void sflow_print(const u_char *, u_int);
