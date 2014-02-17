@@ -36,8 +36,11 @@
 #include "extract.h"
 #include "addrtoname.h"
 
+#include "ip.h"
+#include "ipproto.h"
 /*
- * RFC 2338:
+ * RFC 2338 (VRRP v2):
+ *
  *     0                   1                   2                   3
  *     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -56,6 +59,27 @@
  *    |                     Authentication Data (1)                   |
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *    |                     Authentication Data (2)                   |
+ *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *
+ *
+ * RFC 5798 (VRRP v3):
+ *
+ *    0                   1                   2                   3
+ *    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *    |                    IPv4 Fields or IPv6 Fields                 |
+ *   ...                                                             ...
+ *    |                                                               |
+ *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *    |Version| Type  | Virtual Rtr ID|   Priority    |Count IPvX Addr|
+ *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *    |(rsvd) |     Max Adver Int     |          Checksum             |
+ *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *    |                                                               |
+ *    +                                                               +
+ *    |                       IPvX Address(es)                        |
+ *    +                                                               +
+ *    |                                                               |
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 
@@ -80,7 +104,8 @@ static const struct tok auth2str[] = {
 };
 
 void
-vrrp_print(register const u_char *bp, register u_int len, int ttl)
+vrrp_print(register const u_char *bp, register u_int len,
+    register const u_char *bp2, int ttl)
 {
 	int version, type, auth_type;
 	const char *type_s;
@@ -92,20 +117,27 @@ vrrp_print(register const u_char *bp, register u_int len, int ttl)
 	printf("VRRPv%u, %s", version, type_s);
 	if (ttl != 255)
 		printf(", (ttl %u)", ttl);
-	if (version != 2 || type != VRRP_TYPE_ADVERTISEMENT)
+	if (version < 2 || version > 3 || type != VRRP_TYPE_ADVERTISEMENT)
 		return;
 	TCHECK(bp[2]);
 	printf(", vrid %u, prio %u", bp[1], bp[2]);
 	TCHECK(bp[5]);
-	auth_type = bp[4];
-	printf(", authtype %s", tok2str(auth2str, NULL, auth_type));
-	printf(", intvl %us, length %u", bp[5],len);
+
+	if (version == 2) {
+		auth_type = bp[4];
+		printf(", authtype %s", tok2str(auth2str, NULL, auth_type));
+		printf(", intvl %us, length %u", bp[5], len);
+	} else { /* version == 3 */
+		u_int16_t intvl = (bp[4] & 0x0f) << 8 | bp[5];
+		printf(", intvl %ucs, length %u", intvl, len);
+	}
+
 	if (vflag) {
 		int naddrs = bp[3];
 		int i;
 		char c;
 
-		if (TTEST2(bp[0], len)) {
+		if (version == 2 && TTEST2(bp[0], len)) {
 			struct cksum_vec vec[1];
 
 			vec[0].ptr = bp;
@@ -114,6 +146,15 @@ vrrp_print(register const u_char *bp, register u_int len, int ttl)
 				printf(", (bad vrrp cksum %x)",
 					EXTRACT_16BITS(&bp[6]));
 		}
+
+		if (version == 3 && TTEST2(bp[0], len)) {
+			u_int16_t cksum = nextproto4_cksum((struct ip *)bp2, bp,
+				len, len, IPPROTO_VRRP);
+			if (cksum)
+				printf(", (bad vrrp cksum %x)",
+					EXTRACT_16BITS(&bp[6]));
+		}
+
 		printf(", addrs");
 		if (naddrs > 1)
 			printf("(%d)", naddrs);
