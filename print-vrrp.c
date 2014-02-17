@@ -127,7 +127,7 @@ vrrp_print(register const u_char *bp, register u_int len,
 		auth_type = bp[4];
 		printf(", authtype %s", tok2str(auth2str, NULL, auth_type));
 		printf(", intvl %us, length %u", bp[5], len);
-	} else { // version == 3
+	} else { /* version == 3 */
 		u_int16_t intvl = (bp[4] & 0x0f) << 8 | bp[5];
 		printf(", intvl %ucs, length %u", intvl, len);
 	}
