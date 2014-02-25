@@ -464,7 +464,7 @@ again:
 				(void)printf("carp %s > %s: ",
 					     ipaddr_string(&ipds->ip->ip_src),
 					     ipaddr_string(&ipds->ip->ip_dst));
-			carp_print(ipds->cp, ipds->len, ipds->ip->ip_ttl);
+			carp_print(ndo, ipds->cp, ipds->len, ipds->ip->ip_ttl);
 		} else {
 			if (vflag)
 				(void)printf("vrrp %s > %s: ",
