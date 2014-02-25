@@ -24,7 +24,6 @@
 
 #include "interface.h"
 #include "extract.h"
-#include "addrtoname.h"
 
 /*
  * OTV header, draft-hasmit-otv-04

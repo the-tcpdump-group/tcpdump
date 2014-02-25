@@ -39,7 +39,6 @@ struct ipcomp {
 #endif
 
 #include "interface.h"
-#include "addrtoname.h"
 #include "extract.h"
 
 int

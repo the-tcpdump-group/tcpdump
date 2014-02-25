@@ -56,7 +56,6 @@
 #include <string.h>
 
 #include "interface.h"
-#include "addrtoname.h"
 
 #define TELCMDS
 #define TELOPTS

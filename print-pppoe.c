@@ -31,7 +31,6 @@
 #include <string.h>
 
 #include "interface.h"
-#include "addrtoname.h"
 #include "ppp.h"
 #include "ethertype.h"
 #include "ether.h"

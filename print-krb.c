@@ -30,7 +30,6 @@
 #include <stdio.h>
 
 #include "interface.h"
-#include "addrtoname.h"
 #include "extract.h"
 
 static const char tstr[] = " [|kerberos]";

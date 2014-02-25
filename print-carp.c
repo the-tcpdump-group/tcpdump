@@ -45,7 +45,6 @@
 
 #include "interface.h"
 #include "extract.h"
-#include "addrtoname.h"
 
 void
 carp_print(register const u_char *bp, register u_int len, int ttl)

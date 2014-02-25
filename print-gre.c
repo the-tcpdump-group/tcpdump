@@ -46,7 +46,6 @@
 #include <string.h>
 
 #include "interface.h"
-#include "addrtoname.h"
 #include "extract.h"
 
 #include "ip.h"

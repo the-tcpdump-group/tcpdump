@@ -32,7 +32,6 @@
 #include "ip6.h"
 
 #include "interface.h"
-#include "addrtoname.h"
 #include "extract.h"
 
 int

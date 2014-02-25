@@ -29,7 +29,6 @@
 #include <stdio.h>
 
 #include "interface.h"
-#include "addrtoname.h"
 
 #include "slcompress.h"
 #include "ppp.h"

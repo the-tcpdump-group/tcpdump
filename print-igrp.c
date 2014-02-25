@@ -30,7 +30,6 @@
 #include <stdio.h>
 
 #include "interface.h"
-#include "addrtoname.h"
 #include "ip.h"
 #include "extract.h"			/* must come after interface.h */
 

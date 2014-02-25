@@ -36,7 +36,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "addrtoname.h"
 #include "interface.h"
 #include "extract.h"			/* must come after interface.h */
 #include "mpls.h"

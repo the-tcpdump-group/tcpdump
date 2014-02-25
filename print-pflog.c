@@ -39,7 +39,6 @@
 
 #include "extract.h"
 #include "interface.h"
-#include "addrtoname.h"
 
 static const char tstr[] = "[|pflog]";
 

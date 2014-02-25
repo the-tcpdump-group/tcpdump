@@ -30,7 +30,6 @@
 
 #include "interface.h"
 #include "extract.h"
-#include "addrtoname.h"
 #include "ethertype.h"
 
 #include "ether.h"

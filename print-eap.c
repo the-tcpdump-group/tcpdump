@@ -32,7 +32,6 @@
 
 #include "netdissect.h"
 #include "interface.h"
-#include "addrtoname.h"
 #include "extract.h"
 #include "ether.h"
 

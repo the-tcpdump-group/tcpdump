@@ -29,7 +29,6 @@
 
 #include "interface.h"
 #include "extract.h"
-#include "addrtoname.h"
 #include "ether.h"
 
 #define MPCP_TIMESTAMP_LEN        4

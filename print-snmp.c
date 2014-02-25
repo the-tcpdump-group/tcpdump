@@ -70,7 +70,6 @@
 #endif
 
 #include "interface.h"
-#include "addrtoname.h"
 
 #undef OPAQUE  /* defined in <wingdi.h> */
 

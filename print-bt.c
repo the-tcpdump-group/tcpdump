@@ -29,7 +29,6 @@
 
 #include "interface.h"
 #include "extract.h"
-#include "addrtoname.h"
 
 #if defined(DLT_BLUETOOTH_HCI_H4_WITH_PHDR) && defined(HAVE_PCAP_BLUETOOTH_H)
 #include <pcap/bluetooth.h>

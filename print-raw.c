@@ -29,7 +29,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "addrtoname.h"
 #include "interface.h"
 
 /*

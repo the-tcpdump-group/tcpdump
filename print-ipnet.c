@@ -9,7 +9,6 @@
 
 #include "netdissect.h"
 #include "interface.h"
-#include "addrtoname.h"
 
 typedef struct ipnet_hdr {
 	uint8_t		iph_version;
