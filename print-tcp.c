@@ -237,7 +237,7 @@ tcp_print(register const u_char *bp, register u_int length,
         flags = tp->th_flags;
         printf("Flags [%s]", bittok2str_nosep(tcp_flag_values, "none", flags));
 
-        if (!Sflag && (flags & TH_ACK)) {
+        if (!Sflag && (flags & (TH_ACK | TH_SYN))) {
                 /*
                  * Find (or record) the initial sequence numbers for
                  * this conversation.  (we pick an arbitrary
@@ -333,7 +333,7 @@ tcp_print(register const u_char *bp, register u_int length,
                                            sizeof(th->addr)) == 0)
                                         break;
 
-                        if (!th->nxt || (flags & TH_SYN)) {
+                        if (!th->nxt || ((flags & TH_SYN) && !(flags & TH_ACK))) {
                                 /* didn't find it or new conversation */
                                 if (th->nxt == NULL) {
                                         th->nxt = (struct tcp_seq_hash *)
@@ -343,9 +343,14 @@ tcp_print(register const u_char *bp, register u_int length,
                                 }
                                 th->addr = tha;
                                 if (rev)
-                                        th->ack = seq, th->seq = ack - 1;
+                                        th->ack = seq, th->seq = ack;
                                 else
-                                        th->seq = seq, th->ack = ack - 1;
+                                        th->seq = seq, th->ack = ack;
+                        } else if (flags & TH_SYN) {
+                                if (rev)
+                                        th->ack = seq;
+                                else
+                                        th->seq = seq;
                         } else {
                                 if (rev)
                                         seq -= th->ack, ack -= th->seq;
