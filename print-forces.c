@@ -401,10 +401,10 @@ struct forces_tlv {
 #define GO_NXT_ILV(ilv,rlen) ((rlen) -= F_ALN_LEN(EXTRACT_32BITS(&(ilv)->length)), \
 		              (struct forces_ilv *)(((char*)(ilv)) \
 				      + F_ALN_LEN(EXTRACT_32BITS(&(ilv)->length))))
-#define INVALID_RLEN -1
-#define INVALID_STLN -2
-#define INVALID_LTLN -3
-#define INVALID_ALEN -4
+#define INVALID_RLEN 1
+#define INVALID_STLN 2
+#define INVALID_LTLN 3
+#define INVALID_ALEN 4
 
 static const struct tok ForCES_TLV_err[] = {
 	{INVALID_RLEN, "Invalid total length"},
@@ -414,7 +414,7 @@ static const struct tok ForCES_TLV_err[] = {
 	{0, NULL}
 };
 
-static inline int tlv_valid(const struct forces_tlv *tlv, u_int rlen)
+static inline u_int tlv_valid(const struct forces_tlv *tlv, u_int rlen)
 {
 	if (rlen < TLV_HDRL)
 		return INVALID_RLEN;
@@ -796,7 +796,7 @@ pkeyitlv_print(register const u_char * pptr, register u_int len,
 	u_int32_t id;
 	char *ib = indent_pr(indent, 0);
 	u_int16_t type, tll;
-	int invtlv;
+	u_int invtlv;
 
 	TCHECK(*tdp);
 	id = EXTRACT_32BITS(tdp);
@@ -915,7 +915,7 @@ pdatacnt_print(register const u_char * pptr, register u_int len,
 		u_int16_t tll;
 		int pad = 0;
 		u_int aln;
-		int invtlv;
+		u_int invtlv;
 
 		TCHECK(*pdtlv);
 		type = EXTRACT_16BITS(&pdtlv->type);
@@ -1056,7 +1056,7 @@ genoptlv_print(register const u_char * pptr, register u_int len,
 	const struct forces_tlv *pdtlv = (struct forces_tlv *)pptr;
 	u_int16_t type;
 	int tll;
-	int invtlv;
+	u_int invtlv;
 	char *ib = indent_pr(indent, 0);
 
 	TCHECK(*pdtlv);
@@ -1100,7 +1100,7 @@ recpdoptlv_print(register const u_char * pptr, register u_int len,
 {
 	const struct forces_tlv *pdtlv = (struct forces_tlv *)pptr;
 	int tll;
-	int invtlv;
+	u_int invtlv;
 	u_int16_t type;
 	register const u_char *dp;
 	char *ib;
@@ -1433,7 +1433,7 @@ redirect_print(register const u_char * pptr, register u_int len,
 	const struct forces_tlv *tlv = (struct forces_tlv *)pptr;
 	u_int dlen;
 	u_int rlen;
-	int invtlv;
+	u_int invtlv;
 
 	/*
 	 * forces_type_print() has ensured that len (the TLV length)
@@ -1503,7 +1503,7 @@ lfbselect_print(register const u_char * pptr, register u_int len,
 	char *ib = indent_pr(indent, 0);
 	u_int dlen;
 	u_int rlen;
-	int invtlv;
+	u_int invtlv;
 
 	/*
 	 * forces_type_print() has ensured that len (the TLV length)
@@ -1578,7 +1578,7 @@ forces_type_print(register const u_char * pptr, const struct forcesh *fhdr _U_,
 {
 	const struct forces_tlv *tltlv;
 	u_int rlen;
-	int invtlv;
+	u_int invtlv;
 	int rc = 0;
 	int ttlv = 0;
 

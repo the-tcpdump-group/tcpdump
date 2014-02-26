@@ -446,7 +446,7 @@ static const struct tok afs_fs_errors[] = {
 	{ 110, 		"volume busy" },
 	{ 111, 		"volume moved" },
 	{ 112, 		"AFS IO error" },
-	{ -100,		"restarting fileserver" },
+	{ 0xffffff9c,	"restarting fileserver" }, /* -100, sic! */
 	{ 0,		NULL }
 };
 
