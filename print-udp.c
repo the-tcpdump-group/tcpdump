@@ -488,6 +488,7 @@ udp_print(register const u_char *bp, u_int length,
 		return;
 	}
 
+	udpipaddr_print(ip, sport, dport);
 	if (!qflag) {
 		register struct sunrpc_msg *rp;
 		enum sunrpc_msg_type direction;
@@ -496,12 +497,14 @@ udp_print(register const u_char *bp, u_int length,
 		if (TTEST(rp->rm_direction)) {
 			direction = (enum sunrpc_msg_type)EXTRACT_32BITS(&rp->rm_direction);
 			if (dport == NFS_PORT && direction == SUNRPC_CALL) {
-				nfsreq_print((u_char *)rp, length,
+				(void)printf("NFS request xid %u ", EXTRACT_32BITS(&rp->rm_xid));
+				nfsreq_print_noaddr((u_char *)rp, length,
 				    (u_char *)ip);
 				return;
 			}
 			if (sport == NFS_PORT && direction == SUNRPC_REPLY) {
-				nfsreply_print((u_char *)rp, length,
+				(void)printf("NFS reply xid %u ", EXTRACT_32BITS(&rp->rm_xid));
+				nfsreply_print_noaddr((u_char *)rp, length,
 				    (u_char *)ip);
 				return;
 			}
@@ -521,7 +524,6 @@ udp_print(register const u_char *bp, u_int length,
 			return;
 		}
 	}
-	udpipaddr_print(ip, sport, dport);
 
 	if (vflag && !Kflag && !fragmented) {
                 /* Check the checksum, if possible. */

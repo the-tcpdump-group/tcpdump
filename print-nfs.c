@@ -535,7 +535,6 @@ nfsreq_print(register const u_char *bp, u_int length,
 		snprintf(dstid, sizeof(dstid), "%u", NFS_PORT);
 	}
 	print_nfsaddr(bp2, srcid, dstid);
-	(void)printf("%d", length);
 
 	nfsreq_print_noaddr(bp, length, bp2);
 	return;
@@ -557,6 +556,7 @@ nfsreq_print_noaddr(register const u_char *bp, u_int length,
 	u_int32_t access_flags;
 	struct nfsv3_sattr sa3;
 
+	(void)printf("%d", length);
 	nfserr = 0;		/* assume no error */
 	rp = (const struct sunrpc_msg *)bp;
 

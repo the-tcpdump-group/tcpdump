@@ -20,7 +20,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "13 December 2013"
+.TH TCPDUMP 1  "26 February 2014"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -1410,43 +1410,45 @@ Sun NFS (Network File System) requests and replies are printed as:
 .RS
 .nf
 .sp .5
-\fIsrc.xid > dst.nfs: len op args\fP
-\fIsrc.nfs > dst.xid: reply stat len op results\fP
+\fIsrc.sport > dst.nfs: NFS request xid xid len op args\fP
+\fIsrc.nfs > dst.dport: NFS reply xid xid reply stat len op results\fP
 .sp .5
 \f(CW
-sushi.6709 > wrl.nfs: 112 readlink fh 21,24/10.73165
-wrl.nfs > sushi.6709: reply ok 40 readlink "../var"
-sushi.201b > wrl.nfs:
+sushi.1023 > wrl.nfs: NFS request xid 26377
+	112 readlink fh 21,24/10.73165
+wrl.nfs > sushi.1023: NFS reply xid 26377
+	reply ok 40 readlink "../var"
+sushi.1022 > wrl.nfs: NFS request xid 8219
 	144 lookup fh 9,74/4096.6878 "xcolors"
-wrl.nfs > sushi.201b:
+wrl.nfs > sushi.1022: NFS reply xid 8219
 	reply ok 128 lookup fh 9,74/4134.3150
 \fR
 .sp .5
 .fi
 .RE
-In the first line, host \fIsushi\fP sends a transaction with id \fI6709\fP
+In the first line, host \fIsushi\fP sends a transaction with id \fI26377\fP
 to \fIwrl\fP.
-(Note that for UDP NFS packets the standard UDP header isn't printed and the
-number following the src host is a transaction id, \fInot\fP the source port.
-The example above represents UDP NFS traffic.
-For TCP NFS packets port numbers are printed as part of the standard TCP header
-and the transaction id is printed separately as "xid" field of the packet.)
 The request was 112 bytes,
 excluding the UDP and IP headers.
 The operation was a \fIreadlink\fP
 (read symbolic link) on file handle (\fIfh\fP) 21,24/10.731657119.
 (If one is lucky, as in this case, the file handle can be interpreted
 as a major,minor device number pair, followed by the inode number and
-generation number.)
-\fIWrl\fP replies `ok' with the contents of the link.
+generation number.) In the second line, \fIwrl\fP replies `ok' with
+the same transaction id and the contents of the link.
 .LP
-In the third line, \fIsushi\fP asks \fIwrl\fP to lookup the name
-`\fIxcolors\fP' in directory file 9,74/4096.6878.
+In the third line, \fIsushi\fP asks (using a new transaction id) \fIwrl\fP
+to lookup the name `\fIxcolors\fP' in directory file 9,74/4096.6878. In
+the fourth line, \fIwrl\fP sends a reply with the respective transaction id.
+.LP
 Note that the data printed
 depends on the operation type.
 The format is intended to be self
 explanatory if read in conjunction with
 an NFS protocol spec.
+Also note that older versions of tcpdump printed NFS packets in a
+slightly different format: the transaction id (xid) would be printed
+instead of the non-NFS port number of the packet.
 .LP
 If the \-v (verbose) flag is given, additional information is printed.
 For example:
@@ -1454,9 +1456,9 @@ For example:
 .nf
 .sp .5
 \f(CW
-sushi.1372a > wrl.nfs:
+sushi.1023 > wrl.nfs: NFS request xid 79658
 	148 read fh 21,11/12.195 8192 bytes @ 24576
-wrl.nfs > sushi.1372a:
+wrl.nfs > sushi.1023: NFS reply xid 79658
 	reply ok 1472 read REG 100664 ids 417/0 sz 29388
 \fP
 .sp .5
