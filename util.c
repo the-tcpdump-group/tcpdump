@@ -277,7 +277,7 @@ print_unknown_data(netdissect_options *ndo, const u_char *cp,const char *ident,i
  */
 const char *
 tok2strbuf(register const struct tok *lp, register const char *fmt,
-	   register int v, char *buf, size_t bufsize)
+	   register u_int v, char *buf, size_t bufsize)
 {
 	if (lp != NULL) {
 		while (lp->s != NULL) {
