@@ -65,7 +65,6 @@ config.sub	- autoconf support
 configure	- configure script (run this first)
 configure.in	- configure script source
 decnet.h	- DECnet definitions
-decode_prefix.h	- Declarations of "decode_prefix{4,6}()"
 ether.h		- Ethernet definitions
 ethertype.h	- Ethernet type value definitions
 extract.h	- alignment definitions

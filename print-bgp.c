@@ -40,7 +40,6 @@
 #include <string.h>
 
 #include "interface.h"
-#include "decode_prefix.h"
 #include "addrtoname.h"
 #include "extract.h"
 #include "bgp.h"

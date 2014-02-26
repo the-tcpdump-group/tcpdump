@@ -233,7 +233,6 @@ HDR = \
 	chdlc.h \
 	cpack.h \
 	decnet.h \
-	decode_prefix.h \
 	ether.h \
 	ethertype.h \
 	extract.h \

@@ -362,6 +362,10 @@ struct cksum_vec {
 };
 extern u_int16_t in_cksum(const struct cksum_vec *, int);
 extern u_int16_t in_cksum_shouldbe(u_int16_t, u_int16_t);
+extern int decode_prefix4(const u_char *, u_int, char *, u_int);
+#ifdef INET6
+extern int decode_prefix6(const u_char *, u_int, char *, u_int);
+#endif
 
 #ifndef HAVE_BPF_DUMP
 struct bpf_program;

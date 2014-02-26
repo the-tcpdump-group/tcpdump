@@ -25,7 +25,6 @@
 #include <string.h>
 
 #include "interface.h"
-#include "decode_prefix.h"
 #include "extract.h"
 #include "addrtoname.h"
 
