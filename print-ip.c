@@ -327,7 +327,7 @@ again:
 
 	case IPPROTO_AH:
 		ipds->nh = *ipds->cp;
-		ipds->advance = ah_print(ipds->cp);
+		ipds->advance = ah_print(gndo, ipds->cp);
 		if (ipds->advance <= 0)
 			break;
 		ipds->cp += ipds->advance;

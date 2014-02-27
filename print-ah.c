@@ -27,15 +27,13 @@
 
 #include <tcpdump-stdinc.h>
 
-#include <stdio.h>
-
 #include "ah.h"
 
-#include "interface.h"
+#include "netdissect.h"
 #include "extract.h"
 
 int
-ah_print(register const u_char *bp)
+ah_print(netdissect_options *ndo, register const u_char *bp)
 {
 	register const struct ah *ah;
 	register const u_char *ep;
@@ -43,23 +41,23 @@ ah_print(register const u_char *bp)
 	u_int32_t spi;
 
 	ah = (const struct ah *)bp;
-	ep = snapend;		/* 'ep' points to the end of available data. */
+	ep = ndo->ndo_snapend;		/* 'ep' points to the end of available data. */
 
-	TCHECK(*ah);
+	ND_TCHECK(*ah);
 
 	sumlen = ah->ah_len << 2;
 	spi = EXTRACT_32BITS(&ah->ah_spi);
 
-	printf("AH(spi=0x%08x", spi);
-	if (vflag)
-		printf(",sumlen=%d", sumlen);
-	printf(",seq=0x%x", EXTRACT_32BITS(ah + 1));
+	ND_PRINT((ndo, "AH(spi=0x%08x", spi));
+	if (ndo->ndo_vflag)
+		ND_PRINT((ndo, ",sumlen=%d", sumlen));
+	ND_PRINT((ndo, ",seq=0x%x", EXTRACT_32BITS(ah + 1)));
 	if (bp + sizeof(struct ah) + sumlen > ep)
-		fputs("[truncated]", stdout);
-	fputs("): ", stdout);
+		ND_PRINT((ndo, "[truncated]"));
+	ND_PRINT((ndo, "): "));
 
 	return sizeof(struct ah) + sumlen;
  trunc:
-	fputs("[|AH]", stdout);
+	ND_PRINT((ndo, "[|AH]"));
 	return -1;
 }

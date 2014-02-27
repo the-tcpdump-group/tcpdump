@@ -683,7 +683,7 @@ tcp_print(register const u_char *bp, register u_int length,
 		smb_tcp_print(bp, length);
 #endif
         else if (sport == BEEP_PORT || dport == BEEP_PORT)
-                beep_print(bp, length);
+                beep_print(gndo, bp, length);
         else if (sport == OPENFLOW_PORT || dport == OPENFLOW_PORT)
                 openflow_print(bp, length);
         else if (length > 2 &&

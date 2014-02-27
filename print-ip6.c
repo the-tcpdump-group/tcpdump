@@ -205,7 +205,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			icmp6_print(ndo, cp, len, (const u_char *)ip6, fragmented);
 			return;
 		case IPPROTO_AH:
-			advance = ah_print(cp);
+			advance = ah_print(gndo, cp);
 			nh = *cp;
 			break;
 		case IPPROTO_ESP:

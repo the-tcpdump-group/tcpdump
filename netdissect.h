@@ -368,6 +368,9 @@ extern int print_unknown_data(netdissect_options *,const u_char *, const char *,
 extern void hex_print_with_offset(netdissect_options *, const char *ident, const u_char *cp,
 				  u_int, u_int);
 extern void hex_print(netdissect_options *,const char *ident, const u_char *cp,u_int);
+extern int ah_print(netdissect_options *, register const u_char *);
+extern void beep_print(netdissect_options *, const u_char *, u_int);
+extern void dtp_print(netdissect_options *, const u_char *, u_int);
 
 /* stuff that has not yet been rototiled */
 extern const u_char * ns_nprint (register const u_char *, register const u_char *);
@@ -487,8 +490,6 @@ extern void timed_print(netdissect_options *,const u_char *, u_int);
 extern void udp_print(netdissect_options *,const u_char *, u_int,
 		      const u_char *, int);
 extern void wb_print(netdissect_options *,const void *, u_int);
-extern int ah_print(netdissect_options *,register const u_char *,
-		    register const u_char *);
 extern void esp_print_decodesecret(netdissect_options *ndo);
 extern int ipcomp_print(netdissect_options *,register const u_char *,
 			register const u_char *, int *);

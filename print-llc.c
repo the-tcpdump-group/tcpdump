@@ -440,7 +440,7 @@ snap_print(const u_char *p, u_int length, u_int caplen, u_int bridge_pad)
                         cdp_print(p, length, caplen);
                         return (1);
                 case PID_CISCO_DTP:
-                        dtp_print(p, length);
+                        dtp_print(gndo, p, length);
                         return (1);
                 case PID_CISCO_UDLD:
                         udld_print(p, length);
