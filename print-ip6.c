@@ -219,7 +219,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		case IPPROTO_IPCOMP:
 		    {
 			int enh;
-			advance = ipcomp_print(cp, &enh);
+			advance = ipcomp_print(ndo, cp, &enh);
 			nh = enh & 0xff;
 			break;
 		    }

@@ -175,12 +175,6 @@ static const struct printer printers[] = {
 #ifdef DLT_LANE8023
 	{ lane_if_print,        DLT_LANE8023 },
 #endif
-#ifdef DLT_CIP
-	{ cip_if_print,         DLT_CIP },
-#endif
-#ifdef DLT_ATM_CLIP
-	{ cip_if_print,		DLT_ATM_CLIP },
-#endif
 	{ sl_if_print,		DLT_SLIP },
 #ifdef DLT_SLIP_BSDOS
 	{ sl_bsdos_if_print,	DLT_SLIP_BSDOS },
@@ -231,9 +225,6 @@ static const struct printer printers[] = {
 #endif
 #ifdef DLT_SUNATM
 	{ sunatm_if_print,	DLT_SUNATM },
-#endif
-#ifdef DLT_IP_OVER_FC
-	{ ipfc_if_print,	DLT_IP_OVER_FC },
 #endif
 #ifdef DLT_PRISM_HEADER
 	{ prism_if_print,	DLT_PRISM_HEADER },
@@ -343,6 +334,15 @@ static const struct ndo_printer ndo_printers[] = {
 #endif
 #if defined(DLT_NFLOG) && defined(HAVE_PCAP_NFLOG_H)
 	{ nflog_if_print,	DLT_NFLOG},
+#endif
+#ifdef DLT_CIP
+	{ cip_if_print,         DLT_CIP },
+#endif
+#ifdef DLT_ATM_CLIP
+	{ cip_if_print,		DLT_ATM_CLIP },
+#endif
+#ifdef DLT_IP_OVER_FC
+	{ ipfc_if_print,	DLT_IP_OVER_FC },
 #endif
 	{ NULL,			0 },
 };

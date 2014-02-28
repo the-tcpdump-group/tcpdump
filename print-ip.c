@@ -351,7 +351,7 @@ again:
 	case IPPROTO_IPCOMP:
 	{
 		int enh;
-		ipds->advance = ipcomp_print(ipds->cp, &enh);
+		ipds->advance = ipcomp_print(ndo, ipds->cp, &enh);
 		if (ipds->advance <= 0)
 			break;
 		ipds->cp += ipds->advance;

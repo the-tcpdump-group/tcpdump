@@ -371,6 +371,9 @@ extern void hex_print(netdissect_options *,const char *ident, const u_char *cp,u
 extern int ah_print(netdissect_options *, register const u_char *);
 extern void beep_print(netdissect_options *, const u_char *, u_int);
 extern void dtp_print(netdissect_options *, const u_char *, u_int);
+extern u_int cip_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern int ipcomp_print(netdissect_options *, register const u_char *, int *);
+extern u_int ipfc_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
 
 /* stuff that has not yet been rototiled */
 extern const u_char * ns_nprint (register const u_char *, register const u_char *);
@@ -474,7 +477,6 @@ extern void sctp_print(netdissect_options *ndo,
 extern void sl_if_print(u_char *,const struct pcap_pkthdr *, const u_char *);
 
 extern void lane_if_print(u_char *,const struct pcap_pkthdr *,const u_char *);
-extern void cip_if_print(u_char *,const struct pcap_pkthdr *,const u_char *);
 extern void sl_bsdos_if_print(u_char *,
 			      const struct pcap_pkthdr *, const u_char *);
 extern void sll_if_print(u_char *,
@@ -491,8 +493,6 @@ extern void udp_print(netdissect_options *,const u_char *, u_int,
 		      const u_char *, int);
 extern void wb_print(netdissect_options *,const void *, u_int);
 extern void esp_print_decodesecret(netdissect_options *ndo);
-extern int ipcomp_print(netdissect_options *,register const u_char *,
-			register const u_char *, int *);
 extern void rx_print(netdissect_options *,register const u_char *,
 		     int, int, int, u_char *);
 extern void netbeui_print(netdissect_options *,u_short,
