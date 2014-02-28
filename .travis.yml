@@ -5,8 +5,11 @@ compiler:
   - clang
 
 env:
-  - BUILD_LIBPCAP=true BUILD_IPV6=true
-  - BUILD_LIBPCAP=true BUILD_IPV6=false
+  global:
+    - BUILD_LIBPCAP=true
+  matrix:
+    - BUILD_IPV6=true
+    - BUILD_IPV6=false
 
 before_script:
   - sudo apt-get install libssl-dev libssl0.9.8 libssl1.0.0
