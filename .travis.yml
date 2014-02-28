@@ -18,5 +18,5 @@ before_script:
 script:
   - touch .devel configure
   - if [ "$BUILD_IPV6" = "true" ]; then ./configure; else ./configure --disable-ipv6; fi
-  - make
+  - make -s
   - if [ "$BUILD_IPV6" = "true" ]; then make check; else true; fi
