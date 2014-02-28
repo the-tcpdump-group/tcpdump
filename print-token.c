@@ -30,7 +30,6 @@
 
 #include <tcpdump-stdinc.h>
 
-#include <pcap.h>
 #include <stdio.h>
 #include <string.h>
 

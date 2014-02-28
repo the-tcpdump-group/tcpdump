@@ -26,7 +26,6 @@ __RCSID("NetBSD: print-juniper.c,v 1.3 2007/07/25 06:31:32 dogcow Exp ");
 
 #include <tcpdump-stdinc.h>
 
-#include <pcap.h>
 #include <stdio.h>
 
 #include "interface.h"

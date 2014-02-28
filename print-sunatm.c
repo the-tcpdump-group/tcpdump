@@ -40,7 +40,6 @@ struct mbuf;
 struct rtentry;
 
 #include <stdio.h>
-#include <pcap.h>
 
 #include "interface.h"
 #include "extract.h"

@@ -8,7 +8,6 @@
 #include <tcpdump-stdinc.h>
 
 #include <stdio.h>
-#include <pcap.h>
 
 #include "netdissect.h"
 #include "interface.h"

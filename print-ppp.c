@@ -40,7 +40,6 @@
 #include <net/if_ppp.h>
 #endif
 
-#include <pcap.h>
 #include <stdio.h>
 #include <stdlib.h>
 

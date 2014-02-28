@@ -27,8 +27,6 @@
 
 #include <tcpdump-stdinc.h>
 
-#include <pcap.h>
-
 #include "interface.h"
 #include "extract.h"
 

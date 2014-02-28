@@ -27,7 +27,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <pcap.h>
 
 #include "addrtoname.h"
 #include "interface.h"
