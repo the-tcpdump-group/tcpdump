@@ -101,6 +101,7 @@ static const struct tok ppptype2str[] = {
 	{ PPP_BACP,	  "BACP" },
 	{ PPP_BAP,	  "BAP" },
 	{ PPP_MPCP,	  "MLPPP-CP" },
+	{ PPP_CCP,	  "CCP" },
 	{ 0,		  NULL }
 };
 
@@ -751,6 +752,10 @@ print_lcp_config_options(const u_char *p, int length)
 		break;
 #endif
         default:
+        	/*
+        	 * Unknown option; dump it as raw bytes now if we're
+        	 * not going to do so below.
+        	 */
                 if(vflag<2)
                         print_unknown_data(gndo,&p[2],"\n\t    ",len-2);
                 break;
@@ -1078,6 +1083,10 @@ print_ipcp_config_options(const u_char *p, int length)
 		printf("%s", ipaddr_string(p + 2));
 		break;
 	default:
+        	/*
+        	 * Unknown option; dump it as raw bytes now if we're
+        	 * not going to do so below.
+        	 */
                 if(vflag<2)
                         print_unknown_data(gndo,&p[2],"\n\t    ",len-2);
 		break;
@@ -1133,6 +1142,10 @@ print_ip6cp_config_options(const u_char *p, int length)
 		       EXTRACT_16BITS(p + 8));
 		break;
 	default:
+        	/*
+        	 * Unknown option; dump it as raw bytes now if we're
+        	 * not going to do so below.
+        	 */
                 if(vflag<2)
                         print_unknown_data(gndo,&p[2],"\n\t    ",len-2);
 		break;
@@ -1173,13 +1186,50 @@ print_ccp_config_options(const u_char *p, int length)
         	return 0;
         }
 
-        printf("\n\t  %s Option (0x%02x), length %u:",
+        printf("\n\t  %s Option (0x%02x), length %u",
                tok2str(ccpconfopts_values, "Unknown", opt),
                opt,
                len);
 
+	TCHECK2(*p, len);
 	switch (opt) {
-                /* fall through --> default: nothing supported yet */
+	case CCPOPT_BSDCOMP:
+		if (len < 3) {
+			printf(" (bogus, should be >= 3)");
+			return 0;
+		}
+		printf(":");
+		if(vflag>2)
+			printf("\n\t    Version: %u, Dictionary Bits: %u",
+				p[2] >> 5, p[2] & 0x1f);
+		break;
+	case CCPOPT_MVRCA:
+		if (len < 4) {
+			printf(" (bogus, should be >= 4)");
+			return 0;
+		}
+		printf(":");
+		if(vflag>2)
+			printf("\n\t    Features: %u, PxP: %s, History: %u, #CTX-ID: %u",
+				(p[2] & 0xc0) >> 5,
+				(p[2] & 0x200) ? "Enabled" : "Disabled",
+				p[2] & 0x1f, p[3]);
+		break;
+	case CCPOPT_DEFLATE:
+		if (len < 4) {
+			printf(" (bogus, should be >= 4)");
+			return 0;
+		}
+		printf(":");
+		if(vflag>2)
+			printf("\n\t    Window: %uK, Method: %s (0x%x), MBZ: %u, CHK: %u",
+				(p[2] & 0xf0) >> 4,
+				((p[2] & 0x0f) == 8) ? "zlib" : "unkown",
+				p[2] & 0x0f, (p[3] & 0xfc) >> 2, p[3] & 0x03);
+		break;
+
+/* XXX: to be supported */
+#if 0
 	case CCPOPT_OUI:
 	case CCPOPT_PRED1:
 	case CCPOPT_PRED2:
@@ -1189,13 +1239,17 @@ print_ccp_config_options(const u_char *p, int length)
 	case CCPOPT_MPPC:
 	case CCPOPT_GFZA:
 	case CCPOPT_V42BIS:
-	case CCPOPT_BSDCOMP:
 	case CCPOPT_LZSDCP:
-	case CCPOPT_MVRCA:
 	case CCPOPT_DEC:
-	case CCPOPT_DEFLATE:
 	case CCPOPT_RESV:
+		break;
+#endif
 	default:
+        	/*
+        	 * Unknown option; dump it as raw bytes now if we're
+        	 * not going to do so below.
+        	 */
+		printf(":");
                 if(vflag<2)
                         print_unknown_data(gndo,&p[2],"\n\t    ",len-2);
 		break;
@@ -1242,6 +1296,10 @@ print_bacp_config_options(const u_char *p, int length)
 		printf(", Magic-Num 0x%08x", EXTRACT_32BITS(p + 2));
                 break;
 	default:
+        	/*
+        	 * Unknown option; dump it as raw bytes now if we're
+        	 * not going to do so below.
+        	 */
                 if(vflag<2)
                         print_unknown_data(gndo,&p[2],"\n\t    ",len-2);
 		break;
