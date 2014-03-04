@@ -330,7 +330,6 @@ EXTRA_DIST = \
 	print-ip6.c \
 	print-ip6opts.c \
 	print-mobility.c \
-	print-netbios.c \
 	print-ospf6.c \
 	print-pflog.c \
 	print-ripng.c \

@@ -156,7 +156,6 @@ print-mobile.c	- IPv4 mobility printer routines
 print-mobility.c - IPv6 mobility printer routines
 print-mpls.c	- Multi-Protocol Label Switching printer routines
 print-msdp.c	- Multicast Source Discovery Protocol printer routines
-print-netbios.c	- NetBIOS frame protocol printer routines
 print-nfs.c	- Network File System printer routines
 print-ntp.c	- Network Time Protocol printer routines
 print-null.c	- BSD loopback device printer routines
