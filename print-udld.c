@@ -24,12 +24,8 @@
 
 #include <tcpdump-stdinc.h>
 
-#include <stdio.h>
-#include <string.h>
-
-#include "interface.h"
+#include "netdissect.h"
 #include "extract.h"
-#include "nlpid.h"
 
 #define UDLD_HEADER_LEN			4
 #define UDLD_DEVICE_ID_TLV		0x0001
@@ -82,7 +78,7 @@ static const struct tok udld_flags_values[] = {
 #define	UDLD_EXTRACT_OPCODE(x) ((x)&0x1f)
 
 void
-udld_print (const u_char *pptr, u_int length)
+udld_print (netdissect_options *ndo, const u_char *pptr, u_int length)
 {
     int code, type, len;
     const u_char *tptr;
@@ -92,33 +88,33 @@ udld_print (const u_char *pptr, u_int length)
 
     tptr = pptr;
 
-    if (!TTEST2(*tptr, UDLD_HEADER_LEN))
+    if (!ND_TTEST2(*tptr, UDLD_HEADER_LEN))
 	goto trunc;
 
     code = UDLD_EXTRACT_OPCODE(*tptr);
 
-    printf("UDLDv%u, Code %s (%x), Flags [%s] (0x%02x), length %u",
+    ND_PRINT((ndo, "UDLDv%u, Code %s (%x), Flags [%s] (0x%02x), length %u",
            UDLD_EXTRACT_VERSION(*tptr),
            tok2str(udld_code_values, "Reserved", code),
            code,
            bittok2str(udld_flags_values, "none", *(tptr+1)),
            *(tptr+1),
-           length);
+           length));
 
     /*
      * In non-verbose mode, just print version and opcode type
      */
-    if (vflag < 1) {
+    if (ndo->ndo_vflag < 1) {
 	return;
     }
 
-    printf("\n\tChecksum 0x%04x (unverified)", EXTRACT_16BITS(tptr+2));
+    ND_PRINT((ndo, "\n\tChecksum 0x%04x (unverified)", EXTRACT_16BITS(tptr+2)));
 
     tptr += UDLD_HEADER_LEN;
 
     while (tptr < (pptr+length)) {
 
-        if (!TTEST2(*tptr, 4))
+        if (!ND_TTEST2(*tptr, 4))
             goto trunc;
 
 	type = EXTRACT_16BITS(tptr);
@@ -131,25 +127,25 @@ udld_print (const u_char *pptr, u_int length)
             return;
         }
 
-        printf("\n\t%s (0x%04x) TLV, length %u",
+        ND_PRINT((ndo, "\n\t%s (0x%04x) TLV, length %u",
                tok2str(udld_tlv_values, "Unknown", type),
-               type, len);
+               type, len));
 
         switch (type) {
         case UDLD_DEVICE_ID_TLV:
         case UDLD_PORT_ID_TLV:
         case UDLD_ECHO_TLV:
         case UDLD_DEVICE_NAME_TLV:
-            printf(", %s", tptr);
+            ND_PRINT((ndo, ", %s", tptr));
             break;
 
         case UDLD_MESSAGE_INTERVAL_TLV:
         case UDLD_TIMEOUT_INTERVAL_TLV:
-            printf(", %us", (*tptr));
+            ND_PRINT((ndo, ", %us", (*tptr)));
             break;
 
         case UDLD_SEQ_NUMBER_TLV:
-            printf(", %u", EXTRACT_32BITS(tptr));
+            ND_PRINT((ndo, ", %u", EXTRACT_32BITS(tptr)));
             break;
 
         default:
@@ -161,7 +157,7 @@ udld_print (const u_char *pptr, u_int length)
     return;
 
  trunc:
-    printf("[|udld]");
+    ND_PRINT((ndo, "[|udld]"));
 }
 
 /*

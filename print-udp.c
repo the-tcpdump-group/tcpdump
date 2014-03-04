@@ -644,7 +644,7 @@ udp_print(register const u_char *bp, u_int length,
 			 ISPORT(RADIUS_NEW_ACCOUNTING_PORT) )
 			radius_print((const u_char *)(up+1), length);
 		else if (dport == HSRP_PORT)
-			hsrp_print((const u_char *)(up + 1), length);
+			hsrp_print(gndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(LWRES_PORT))
 			lwres_print((const u_char *)(up + 1), length);
 		else if (ISPORT(LDP_PORT))

@@ -400,7 +400,7 @@ again:
 		 * match was the current protocol number
 		 * assignments say.
 		 */
-		igrp_print(ipds->cp, ipds->len, (const u_char *)ipds->ip);
+		igrp_print(ndo, ipds->cp, ipds->len);
 		break;
 
 	case IPPROTO_EIGRP:

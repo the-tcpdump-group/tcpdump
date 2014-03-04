@@ -443,7 +443,7 @@ snap_print(const u_char *p, u_int length, u_int caplen, u_int bridge_pad)
                         dtp_print(gndo, p, length);
                         return (1);
                 case PID_CISCO_UDLD:
-                        udld_print(p, length);
+                        udld_print(gndo, p, length);
                         return (1);
                 case PID_CISCO_VTP:
                         vtp_print(p, length);

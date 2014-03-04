@@ -35,8 +35,6 @@
 
 #include <tcpdump-stdinc.h>
 
-#include <stdio.h>
-
 #include "interface.h"
 #include "addrtoname.h"
 
@@ -93,43 +91,43 @@ struct hsrp {
 };
 
 void
-hsrp_print(register const u_int8_t *bp, register u_int len)
+hsrp_print(netdissect_options *ndo, register const u_int8_t *bp, register u_int len)
 {
 	struct hsrp *hp = (struct hsrp *) bp;
 
-	TCHECK(hp->hsrp_version);
-	printf("HSRPv%d", hp->hsrp_version);
+	ND_TCHECK(hp->hsrp_version);
+	ND_PRINT((ndo, "HSRPv%d", hp->hsrp_version));
 	if (hp->hsrp_version != 0)
 		return;
-	TCHECK(hp->hsrp_op_code);
-	printf("-");
-	printf("%s ", tok2strary(op_code_str, "unknown (%d)", hp->hsrp_op_code));
-	printf("%d: ", len);
-	TCHECK(hp->hsrp_state);
-	printf("state=%s ", tok2str(states, "Unknown (%d)", hp->hsrp_state));
-	TCHECK(hp->hsrp_group);
-	printf("group=%d ", hp->hsrp_group);
-	TCHECK(hp->hsrp_reserved);
+	ND_TCHECK(hp->hsrp_op_code);
+	ND_PRINT((ndo, "-"));
+	ND_PRINT((ndo, "%s ", tok2strary(op_code_str, "unknown (%d)", hp->hsrp_op_code)));
+	ND_PRINT((ndo, "%d: ", len));
+	ND_TCHECK(hp->hsrp_state);
+	ND_PRINT((ndo, "state=%s ", tok2str(states, "Unknown (%d)", hp->hsrp_state)));
+	ND_TCHECK(hp->hsrp_group);
+	ND_PRINT((ndo, "group=%d ", hp->hsrp_group));
+	ND_TCHECK(hp->hsrp_reserved);
 	if (hp->hsrp_reserved != 0) {
-		printf("[reserved=%d!] ", hp->hsrp_reserved);
+		ND_PRINT((ndo, "[reserved=%d!] ", hp->hsrp_reserved));
 	}
-	TCHECK(hp->hsrp_virtaddr);
-	printf("addr=%s", ipaddr_string(&hp->hsrp_virtaddr));
+	ND_TCHECK(hp->hsrp_virtaddr);
+	ND_PRINT((ndo, "addr=%s", ipaddr_string(&hp->hsrp_virtaddr)));
 	if (vflag) {
-		printf(" hellotime=");
+		ND_PRINT((ndo, " hellotime="));
 		relts_print(hp->hsrp_hellotime);
-		printf(" holdtime=");
+		ND_PRINT((ndo, " holdtime="));
 		relts_print(hp->hsrp_holdtime);
-		printf(" priority=%d", hp->hsrp_priority);
-		printf(" auth=\"");
+		ND_PRINT((ndo, " priority=%d", hp->hsrp_priority));
+		ND_PRINT((ndo, " auth=\""));
 		if (fn_printn(hp->hsrp_authdata, sizeof(hp->hsrp_authdata),
 		    snapend)) {
-			printf("\"");
+			ND_PRINT((ndo, "\""));
 			goto trunc;
 		}
-		printf("\"");
+		ND_PRINT((ndo, "\""));
 	}
 	return;
 trunc:
-	printf("[|hsrp]");
+	ND_PRINT((ndo, "[|hsrp]"));
 }
