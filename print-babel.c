@@ -144,11 +144,11 @@ format_address(const u_char *prefix)
 static const char *
 format_interval(const u_int16_t i)
 {
-    static char buf[sizeof("0000.0s")];
+    static char buf[sizeof("000.00s")];
 
     if (i == 0)
         return "0.0s (bogus)";
-    snprintf(buf, sizeof(buf), "%u.%us", i / 10, i % 10);
+    snprintf(buf, sizeof(buf), "%u.%02us", i / 100, i % 100);
     return buf;
 }
 
