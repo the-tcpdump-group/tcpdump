@@ -729,7 +729,7 @@ int
 main(int argc, char **argv)
 {
 	register int cnt, op, i;
-	bpf_u_int32 localnet, netmask;
+	bpf_u_int32 localnet =0 , netmask = 0;
 	register char *cp, *infile, *cmdbuf, *device, *RFileName, *VFileName, *WFileName;
 	pcap_handler callback;
 	int type;
@@ -1254,8 +1254,6 @@ main(int argc, char **argv)
 			    RFileName, dlt_name,
 			    pcap_datalink_val_to_description(dlt));
 		}
-		localnet = 0;
-		netmask = 0;
 	} else {
 		/*
 		 * We're doing a live capture.
@@ -1415,11 +1413,12 @@ main(int argc, char **argv)
 			warning("snaplen raised from %d to %d", snaplen, i);
 			snaplen = i;
 		}
-		if (pcap_lookupnet(device, &localnet, &netmask, ebuf) < 0) {
-			localnet = 0;
-			netmask = 0;
-			warning("%s", ebuf);
-		}
+                if(fflag != 0) {
+                        if (pcap_lookupnet(device, &localnet, &netmask, ebuf) < 0) {
+                                warning("foreign (-f) flag used but: %s", ebuf);
+                        }
+                }
+
 	}
 	if (infile)
 		cmdbuf = read_infile(infile);
