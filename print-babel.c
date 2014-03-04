@@ -93,6 +93,7 @@ babel_print(netdissect_options *ndo,
 #define MESSAGE_SUB_PAD1 0
 #define MESSAGE_SUB_PADN 1
 #define MESSAGE_SUB_DIVERSITY 2
+#define MESSAGE_SUB_TIMESTAMP 3
 
 /* Diversity sub-TLV channel codes */
 static const struct tok diversity_str[] = {
@@ -158,6 +159,17 @@ static const char *
 format_interval_update(const uint16_t i)
 {
     return i == 0xFFFF ? "infinity" : format_interval(i);
+}
+
+static const char *
+format_timestamp(const uint32_t i)
+{
+    /* Rotating buffer. */
+    static char buf[2][sizeof("0000.000000s")];
+    static int x = 0;
+    x = (x + 1) % 2;
+    snprintf(buf[x], sizeof(buf[x]), "%u.%06us", i / 1000000, i % 1000000);
+    return buf[x];
 }
 
 /* Return number of octets consumed from the input buffer (not the prefix length
@@ -246,17 +258,25 @@ network_address(int ae, const unsigned char *a, unsigned int len,
  *   each representing per-hop number of interferring radio channel for the
  *   prefix. Channel 0 is invalid and must not be used in the sub-TLV, channel
  *   255 interferes with any other channel.
+ * o Type 3 stands for Timestamp sub-TLV, used to compute RTT between
+ *   neighbours. In the case of a Hello TLV, the body stores a 32-bits
+ *   timestamp, while in the case of a IHU TLV, two 32-bits timestamps are
+ *   stored.
  *
  * Sub-TLV types 0 and 1 are valid for any TLV type, whether sub-TLV type 2 is
  * only valid for TLV type 8 (Update). Note that within an Update TLV a missing
  * Diversity sub-TLV is not the same as a Diversity sub-TLV with an empty body.
  * The former would mean a lack of any claims about the interference, and the
- * latter would state that interference is definitely absent. */
+ * latter would state that interference is definitely absent.
+ * A type 3 sub-TLV is valid both for Hello and IHU TLVs, though the exact
+ * semantic of the sub-TLV is different in each case.
+ */
 static void
 subtlvs_print(netdissect_options *ndo,
               const u_char *cp, const u_char *ep, const uint8_t tlv_type) {
     uint8_t subtype, sublen;
     const char *sep;
+    uint32_t t1, t2;
 
     while (cp < ep) {
         subtype = *cp++;
@@ -288,6 +308,24 @@ subtlvs_print(netdissect_options *ndo,
             }
             if(tlv_type != MESSAGE_UPDATE)
                 ND_PRINT((ndo, " (bogus)"));
+            break;
+        case MESSAGE_SUB_TIMESTAMP:
+            ND_PRINT((ndo, " sub-timestamp"));
+            if(tlv_type == MESSAGE_HELLO) {
+                if(sublen != 4)
+                    goto corrupt;
+                t1 = EXTRACT_32BITS(cp);
+                ND_PRINT((ndo, " %s", format_timestamp(t1)));
+            } else if(tlv_type == MESSAGE_IHU) {
+                if(sublen != 8)
+                    goto corrupt;
+                t1 = EXTRACT_32BITS(cp);
+                t2 = EXTRACT_32BITS(cp + 4);
+                ND_PRINT((ndo, " %s|%s",
+                          format_timestamp(t1), format_timestamp(t2)));
+            } else
+                ND_PRINT((ndo, " (bogus)"));
+            cp += sublen;
             break;
         default:
             ND_PRINT((ndo, " sub-unknown-0x%02x", subtype));
@@ -386,6 +424,9 @@ babel_print_v2(netdissect_options *ndo,
                 seqno = EXTRACT_16BITS(message + 4);
                 interval = EXTRACT_16BITS(message + 6);
                 ND_PRINT((ndo, "seqno %u interval %s", seqno, format_interval(interval)));
+                /* Extra data. */
+                if(len > 6)
+                    subtlvs_print(ndo, message + 8, message + 2 + len, type);
             }
         }
             break;
@@ -405,6 +446,10 @@ babel_print_v2(netdissect_options *ndo,
                 if(rc < 0) { ND_PRINT((ndo, "%s", tstr)); break; }
                 ND_PRINT((ndo, "%s txcost %u interval %s",
                        format_address(ndo, address), txcost, format_interval(interval)));
+                /* Extra data. */
+                if((u_int)rc < len - 6)
+                    subtlvs_print(ndo, message + 8 + rc, message + 2 + len,
+                                  type);
             }
         }
             break;
