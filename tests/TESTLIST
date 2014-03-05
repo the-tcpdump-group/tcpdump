@@ -174,3 +174,7 @@ dccp_partial_csum_v4_simple	dccp_partial_csum_v4_simple.pcap	dccp_partial_csum_v
 dccp_partial_csum_v4_longer	dccp_partial_csum_v4_longer.pcap	dccp_partial_csum_v4_longer.out -t -vv
 dccp_partial_csum_v6_simple	dccp_partial_csum_v6_simple.pcap	dccp_partial_csum_v6_simple.out -t -vv
 dccp_partial_csum_v6_longer	dccp_partial_csum_v6_longer.pcap	dccp_partial_csum_v6_longer.out -t -vv
+
+# VRRP tests
+vrrp		vrrp.pcap		vrrp.out		-t
+vrrp-v		vrrp.pcap		vrrp-v.out		-t -v
