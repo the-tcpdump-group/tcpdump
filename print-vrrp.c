@@ -107,7 +107,7 @@ void
 vrrp_print(register const u_char *bp, register u_int len,
     register const u_char *bp2, int ttl)
 {
-	int version, type, auth_type;
+	int version, type, auth_type = VRRP_AUTH_NONE; /* keep compiler happy */
 	const char *type_s;
 
 	TCHECK(bp[0]);
@@ -167,7 +167,7 @@ vrrp_print(register const u_char *bp, register u_int len,
 			c = ',';
 			bp += 4;
 		}
-		if (auth_type == VRRP_AUTH_SIMPLE) { /* simple text password */
+		if (version == 2 && auth_type == VRRP_AUTH_SIMPLE) { /* simple text password */
 			TCHECK(bp[7]);
 			printf(" auth \"");
 			if (fn_printn(bp, 8, snapend)) {
