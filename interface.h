@@ -320,7 +320,7 @@ extern void mpls_print(const u_char *, u_int);
 extern void mpls_lsp_ping_print(const u_char *, u_int);
 extern void zephyr_print(const u_char *, int);
 extern void zmtp1_print(const u_char *, u_int);
-extern void zmtp1_print_datagram(const u_char *, u_int);
+extern void zmtp1_print_datagram(const u_char *, const u_int);
 extern void bfd_print(const u_char *, u_int, u_int);
 extern void sip_print(const u_char *, u_int);
 extern void syslog_print(const u_char *, u_int);
