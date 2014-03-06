@@ -377,6 +377,9 @@ extern u_int ipfc_if_print(netdissect_options *, const struct pcap_pkthdr *, con
 extern void udld_print(netdissect_options *, const u_char *, u_int);
 extern void hsrp_print(netdissect_options *, const u_char *, u_int);
 extern void igrp_print(netdissect_options *, const u_char *, u_int);
+extern void msdp_print(netdissect_options *, const u_char *, u_int);
+extern u_int null_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern void mobile_print(netdissect_options *, const u_char *, u_int);
 
 /* stuff that has not yet been rototiled */
 extern const u_char * ns_nprint (register const u_char *, register const u_char *);

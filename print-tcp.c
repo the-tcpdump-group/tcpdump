@@ -695,7 +695,7 @@ tcp_print(register const u_char *bp, register u_int length,
                  */
                 ns_print(bp + 2, length - 2, 0);
         } else if (sport == MSDP_PORT || dport == MSDP_PORT) {
-                msdp_print(bp, length);
+                msdp_print(gndo, bp, length);
         } else if (sport == RPKI_RTR_PORT || dport == RPKI_RTR_PORT) {
                 rpki_rtr_print(bp, length);
         }

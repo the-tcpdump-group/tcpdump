@@ -42,8 +42,6 @@
 
 #include <tcpdump-stdinc.h>
 
-#include <stdio.h>
-
 #include "interface.h"
 #include "addrtoname.h"
 #include "extract.h"		/* must come after interface.h */
@@ -63,7 +61,7 @@ struct mobile_ip {
  * Deencapsulate and print a mobile-tunneled IP datagram
  */
 void
-mobile_print(const u_char *bp, u_int length)
+mobile_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	const struct mobile_ip *mob;
 	struct cksum_vec vec[1];
@@ -72,11 +70,11 @@ mobile_print(const u_char *bp, u_int length)
 
 	mob = (const struct mobile_ip *)bp;
 
-	if (length < MOBILE_SIZE || !TTEST(*mob)) {
-		fputs("[|mobile]", stdout);
+	if (length < MOBILE_SIZE || !ND_TTEST(*mob)) {
+		ND_PRINT((ndo, "[|mobile]"));
 		return;
 	}
-	fputs("mobile: ", stdout);
+	ND_PRINT((ndo, "mobile: "));
 
 	proto = EXTRACT_16BITS(&mob->proto);
 	crc =  EXTRACT_16BITS(&mob->hcheck);
@@ -85,21 +83,19 @@ mobile_print(const u_char *bp, u_int length)
 	}
 
 	if (osp)  {
-		fputs("[S] ",stdout);
-		if (vflag)
-			(void)printf("%s ",ipaddr_string(&mob->osrc));
+		ND_PRINT((ndo, "[S] "));
+		if (ndo->ndo_vflag)
+			ND_PRINT((ndo, "%s ", ipaddr_string(&mob->osrc)));
 	} else {
-		fputs("[] ",stdout);
+		ND_PRINT((ndo, "[] "));
 	}
-	if (vflag) {
-		(void)printf("> %s ",ipaddr_string(&mob->odst));
-		(void)printf("(oproto=%d)",proto>>8);
+	if (ndo->ndo_vflag) {
+		ND_PRINT((ndo, "> %s ", ipaddr_string(&mob->odst)));
+		ND_PRINT((ndo, "(oproto=%d)", proto>>8));
 	}
 	vec[0].ptr = (const u_int8_t *)(void *)mob;
 	vec[0].len = osp ? 12 : 8;
 	if (in_cksum(vec, 1)!=0) {
-		(void)printf(" (bad checksum %d)",crc);
+		ND_PRINT((ndo, " (bad checksum %d)", crc));
 	}
-
-	return;
 }

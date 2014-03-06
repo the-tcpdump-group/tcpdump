@@ -25,15 +25,9 @@
 
 #include <tcpdump-stdinc.h>
 
-#include <stdio.h>
 #include <string.h>
 
 #include "interface.h"
-
-#include "ip.h"
-#ifdef INET6
-#include "ip6.h"
-#endif
 #include "af.h"
 
 /*
@@ -57,17 +51,17 @@
 ((((y)&0xff)<<24) | (((y)&0xff00)<<8) | (((y)&0xff0000)>>8) | (((y)>>24)&0xff))
 
 static inline void
-null_hdr_print(u_int family, u_int length)
+null_hdr_print(netdissect_options *ndo, u_int family, u_int length)
 {
-	if (!qflag) {
-		(void)printf("AF %s (%u)",
-			tok2str(bsd_af_values,"Unknown",family),family);
+	if (!ndo->ndo_qflag) {
+		ND_PRINT((ndo, "AF %s (%u)",
+			tok2str(bsd_af_values,"Unknown",family),family));
 	} else {
-		(void)printf("%s",
-			tok2str(bsd_af_values,"Unknown AF %u",family));
+		ND_PRINT((ndo, "%s",
+			tok2str(bsd_af_values,"Unknown AF %u",family)));
 	}
 
-	(void)printf(", length %u: ", length);
+	ND_PRINT((ndo, ", length %u: ", length));
 }
 
 /*
@@ -77,14 +71,14 @@ null_hdr_print(u_int family, u_int length)
  * is the number of bytes actually captured.
  */
 u_int
-null_if_print(const struct pcap_pkthdr *h, const u_char *p)
+null_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int length = h->len;
 	u_int caplen = h->caplen;
 	u_int family;
 
 	if (caplen < NULL_HDRLEN) {
-		printf("[|null]");
+		ND_PRINT((ndo, "[|null]"));
 		return (NULL_HDRLEN);
 	}
 
@@ -101,8 +95,8 @@ null_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	if ((family & 0xFFFF0000) != 0)
 		family = SWAPLONG(family);
 
-	if (eflag)
-		null_hdr_print(family, length);
+	if (ndo->ndo_eflag)
+		null_hdr_print(ndo, family, length);
 
 	length -= NULL_HDRLEN;
 	caplen -= NULL_HDRLEN;
@@ -111,14 +105,14 @@ null_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	switch (family) {
 
 	case BSD_AFNUM_INET:
-		ip_print(gndo, p, length);
+		ip_print(ndo, p, length);
 		break;
 
 #ifdef INET6
 	case BSD_AFNUM_INET6_BSD:
 	case BSD_AFNUM_INET6_FREEBSD:
 	case BSD_AFNUM_INET6_DARWIN:
-		ip6_print(gndo, p, length);
+		ip6_print(ndo, p, length);
 		break;
 #endif
 
@@ -136,10 +130,10 @@ null_if_print(const struct pcap_pkthdr *h, const u_char *p)
 
 	default:
 		/* unknown AF_ value */
-		if (!eflag)
-			null_hdr_print(family, length + NULL_HDRLEN);
-		if (!suppress_default_print)
-			default_print(p, caplen);
+		if (!ndo->ndo_eflag)
+			null_hdr_print(ndo, family, length + NULL_HDRLEN);
+		if (!ndo->ndo_suppress_default_print)
+			ndo->ndo_default_print(ndo, p, caplen);
 	}
 
 	return (NULL_HDRLEN);

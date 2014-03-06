@@ -187,10 +187,6 @@ static const struct printer printers[] = {
 	{ ppp_bsdos_if_print,	DLT_PPP_BSDOS },
 #endif
 	{ fddi_if_print,	DLT_FDDI },
-	{ null_if_print,	DLT_NULL },
-#ifdef DLT_LOOP
-	{ null_if_print,	DLT_LOOP },
-#endif
 	{ raw_if_print,		DLT_RAW },
 	{ atm_if_print,		DLT_ATM_RFC1483 },
 #ifdef DLT_C_HDLC
@@ -343,6 +339,10 @@ static const struct ndo_printer ndo_printers[] = {
 #endif
 #ifdef DLT_IP_OVER_FC
 	{ ipfc_if_print,	DLT_IP_OVER_FC },
+#endif
+	{ null_if_print,	DLT_NULL },
+#ifdef DLT_LOOP
+	{ null_if_print,	DLT_LOOP },
 #endif
 	{ NULL,			0 },
 };

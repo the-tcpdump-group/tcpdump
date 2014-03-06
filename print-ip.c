@@ -449,7 +449,7 @@ again:
 		break;
 
 	case IPPROTO_MOBILE:
-		mobile_print(ipds->cp, ipds->len);
+		mobile_print(ndo, ipds->cp, ipds->len);
 		break;
 
 	case IPPROTO_PIM:
