@@ -484,7 +484,6 @@ telnet_parse(const u_char *sp, u_int length, int print)
 		if (print)
 			(void)printf(" SE");
 		sp += 2;
-		length -= 2;
 		break;
 	default:
 		if (print)
