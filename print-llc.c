@@ -282,11 +282,9 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 		if (is_u) {
 			p += 3;
 			length -= 3;
-			caplen -= 3;
 		} else {
 			p += 4;
 			length -= 4;
-			caplen -= 4;
 		}
 		netbeui_print(control, p, length);
 		return (1);
@@ -340,15 +338,10 @@ llc_print(const u_char *p, u_int length, u_int caplen,
                        length);
 
 		p += 3;
-		length -= 3;
-		caplen -= 3;
 
 		if ((control & ~LLC_U_POLL) == LLC_XID) {
 			if (*p == LLC_XID_FI) {
 				printf(": %02x %02x", p[1], p[2]);
-				p += 3;
-				length -= 3;
-				caplen -= 3;
 			}
 		}
 	} else {
@@ -365,9 +358,6 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 				tok2str(llc_flag_values,"?",(ssap_field & LLC_GSAP) | (control & LLC_IS_POLL)),
                                 length);
 		}
-		p += 4;
-		length -= 4;
-		caplen -= 4;
 	}
 	return(1);
 }
