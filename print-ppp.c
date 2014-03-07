@@ -1671,7 +1671,6 @@ ppp_hdlc_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 		if (eflag)
 			printf("%02x %02x %d ", p[0], p[1], length);
 		p += 2;
-		length -= 2;
 		hdrlen += 2;
 
 		/*
