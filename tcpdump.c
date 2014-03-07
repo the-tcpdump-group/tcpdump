@@ -172,9 +172,6 @@ static const struct printer printers[] = {
 	{ arcnet_linux_if_print, DLT_ARCNET_LINUX },
 #endif
 	{ token_if_print,	DLT_IEEE802 },
-#ifdef DLT_LANE8023
-	{ lane_if_print,        DLT_LANE8023 },
-#endif
 	{ sl_if_print,		DLT_SLIP },
 #ifdef DLT_SLIP_BSDOS
 	{ sl_bsdos_if_print,	DLT_SLIP_BSDOS },
@@ -234,9 +231,6 @@ static const struct printer printers[] = {
 #ifdef DLT_SYMANTEC_FIREWALL
 	{ symantec_if_print,	DLT_SYMANTEC_FIREWALL },
 #endif
-#ifdef DLT_APPLE_IP_OVER_IEEE1394
-	{ ap1394_if_print,	DLT_APPLE_IP_OVER_IEEE1394 },
-#endif
 #ifdef DLT_IEEE802_11_RADIO_AVS
 	{ ieee802_11_radio_avs_if_print,	DLT_IEEE802_11_RADIO_AVS },
 #endif
@@ -287,9 +281,6 @@ static const struct printer printers[] = {
 #endif
 #ifdef DLT_MFR
 	{ mfr_if_print,		DLT_MFR },
-#endif
-#if defined(DLT_BLUETOOTH_HCI_H4_WITH_PHDR) && defined(HAVE_PCAP_BLUETOOTH_H)
-	{ bt_if_print,		DLT_BLUETOOTH_HCI_H4_WITH_PHDR},
 #endif
 #ifdef HAVE_PCAP_USB_H
 #ifdef DLT_USB_LINUX
@@ -343,6 +334,15 @@ static const struct ndo_printer ndo_printers[] = {
 	{ null_if_print,	DLT_NULL },
 #ifdef DLT_LOOP
 	{ null_if_print,	DLT_LOOP },
+#endif
+#ifdef DLT_APPLE_IP_OVER_IEEE1394
+	{ ap1394_if_print,	DLT_APPLE_IP_OVER_IEEE1394 },
+#endif
+#if defined(DLT_BLUETOOTH_HCI_H4_WITH_PHDR) && defined(HAVE_PCAP_BLUETOOTH_H)
+	{ bt_if_print,		DLT_BLUETOOTH_HCI_H4_WITH_PHDR},
+#endif
+#ifdef DLT_LANE8023
+	{ lane_if_print,        DLT_LANE8023 },
 #endif
 	{ NULL,			0 },
 };

@@ -380,6 +380,10 @@ extern void igrp_print(netdissect_options *, const u_char *, u_int);
 extern void msdp_print(netdissect_options *, const u_char *, u_int);
 extern u_int null_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
 extern void mobile_print(netdissect_options *, const u_char *, u_int);
+extern u_int ap1394_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int bt_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern void lane_print(netdissect_options *, const u_char *, u_int, u_int);
+extern u_int lane_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
 
 /* stuff that has not yet been rototiled */
 extern const u_char * ns_nprint (register const u_char *, register const u_char *);
@@ -533,12 +537,11 @@ extern u_int ieee802_15_4_if_print(netdissect_options *,const struct pcap_pkthdr
 
 #ifdef INET6
 extern void ip6_print(netdissect_options *,const u_char *, u_int);
+extern int frag6_print(netdissect_options *, const u_char *, const u_char *);
 #if 0
 extern void ip6_opt_print(netdissect_options *,const u_char *, int);
 extern int hbhopt_print(netdissect_options *,const u_char *);
 extern int dstopt_print(netdissect_options *,const u_char *);
-extern int frag6_print(netdissect_options *,const u_char *,
-		       const u_char *);
 extern void icmp6_print(netdissect_options *,const u_char *,
 			const u_char *);
 extern void ripng_print(netdissect_options *,const u_char *, int);

@@ -163,7 +163,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			nh = *cp;
 			break;
 		case IPPROTO_FRAGMENT:
-			advance = frag6_print(cp, (const u_char *)ip6);
+			advance = frag6_print(ndo, cp, (const u_char *)ip6);
 			if (ndo->ndo_snapend <= cp + advance)
 				return;
 			nh = *cp;

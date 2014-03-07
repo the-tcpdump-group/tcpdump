@@ -26,15 +26,9 @@
 
 #include <tcpdump-stdinc.h>
 
-#include <stdio.h>
-
-#include "interface.h"
+#include "netdissect.h"
 #include "extract.h"
 #include "ether.h"
-
-#ifndef ETHER_ADDR_LEN
-#define ETHER_ADDR_LEN 6
-#endif
 
 struct lecdatahdr_8023 {
   u_int16_t le_header;
@@ -85,12 +79,12 @@ lane_hdr_print(netdissect_options *ndo, const u_char *bp)
  * This assumes 802.3, not 802.5, LAN emulation.
  */
 void
-lane_print(const u_char *p, u_int length, u_int caplen)
+lane_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 {
 	struct lane_controlhdr *lec;
 
 	if (caplen < sizeof(struct lane_controlhdr)) {
-		printf("[|lane]");
+		ND_PRINT((ndo, "[|lane]"));
 		return;
 	}
 
@@ -99,9 +93,9 @@ lane_print(const u_char *p, u_int length, u_int caplen)
 		/*
 		 * LE Control.
 		 */
-		printf("lec: proto %x vers %x %s",
+		ND_PRINT((ndo, "lec: proto %x vers %x %s",
 		    lec->lec_proto, lec->lec_vers,
-		    tok2str(lecop2str, "opcode-#%u", EXTRACT_16BITS(&lec->lec_opcode)));
+		    tok2str(lecop2str, "opcode-#%u", EXTRACT_16BITS(&lec->lec_opcode))));
 		return;
 	}
 
@@ -116,13 +110,13 @@ lane_print(const u_char *p, u_int length, u_int caplen)
 	 * Now print the encapsulated frame, under the assumption
 	 * that it's an Ethernet frame.
 	 */
-	ether_print(gndo, p, length, caplen, lane_hdr_print, p - 2);
+	ether_print(ndo, p, length, caplen, lane_hdr_print, p - 2);
 }
 
 u_int
-lane_if_print(const struct pcap_pkthdr *h, const u_char *p)
+lane_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
-	lane_print(p, h->len, h->caplen);
+	lane_print(ndo, p, h->len, h->caplen);
 
 	return (sizeof(struct lecdatahdr_8023));
 }

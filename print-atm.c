@@ -329,7 +329,7 @@ atm_print(u_int vpi, u_int vci, u_int traftype, const u_char *p, u_int length,
 		break;
 
 	case ATM_LANE:
-		lane_print(p, length, caplen);
+		lane_print(gndo, p, length, caplen);
 		break;
 	}
 }
