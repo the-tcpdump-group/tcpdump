@@ -472,7 +472,7 @@ udp_print(register const u_char *bp, u_int length,
 
 		case PT_VXLAN:
 			udpipaddr_print(ip, sport, dport);
-			vxlan_print((const u_char *)(up + 1), length);
+			vxlan_print(gndo, (const u_char *)(up + 1), length);
 			break;
 
 		case PT_PGM:
@@ -627,7 +627,7 @@ udp_print(register const u_char *bp, u_int length,
 		else if (ISPORT(DHCP6_SERV_PORT) || ISPORT(DHCP6_CLI_PORT))
 			dhcp6_print((const u_char *)(up + 1), length);
 		else if (ISPORT(AHCP_PORT))
-			ahcp_print((const u_char *)(up + 1), length);
+			ahcp_print(gndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(BABEL_PORT) || ISPORT(BABEL_PORT_OLD))
 			babel_print((const u_char *)(up + 1), length);
 #endif /*INET6*/
@@ -678,9 +678,9 @@ udp_print(register const u_char *bp, u_int length,
                 else if (ISPORT(SYSLOG_PORT))
 			syslog_print((const u_char *)(up + 1), length);
                 else if (ISPORT(OTV_PORT))
-			otv_print((const u_char *)(up + 1), length);
+			otv_print(gndo, (const u_char *)(up + 1), length);
                 else if (ISPORT(VXLAN_PORT))
-			vxlan_print((const u_char *)(up + 1), length);
+			vxlan_print(gndo, (const u_char *)(up + 1), length);
 		else
 			(void)printf("UDP, length %u",
 			    (u_int32_t)(ulen - sizeof(*up)));

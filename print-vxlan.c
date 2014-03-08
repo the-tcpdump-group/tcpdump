@@ -19,10 +19,7 @@
 
 #include <tcpdump-stdinc.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "interface.h"
+#include "netdissect.h"
 #include "extract.h"
 
 /*
@@ -38,13 +35,13 @@
  */
 
 void
-vxlan_print(const u_char *bp, u_int len)
+vxlan_print(netdissect_options *ndo, const u_char *bp, u_int len)
 {
     u_int8_t flags;
     u_int32_t vni;
 
     if (len < 8) {
-        printf("[|VXLAN]");
+        ND_PRINT((ndo, "[|VXLAN]"));
         return;
     }
 
@@ -54,18 +51,9 @@ vxlan_print(const u_char *bp, u_int len)
     vni = EXTRACT_24BITS(bp);
     bp += 4;
 
-    printf("VXLAN, ");
+    ND_PRINT((ndo, "VXLAN, "));
+    ND_PRINT((ndo, "flags [%s] (0x%02x), ", flags & 0x08 ? "I" : ".", flags));
+    ND_PRINT((ndo, "vni %u\n", vni));
 
-    fputs("flags [", stdout);
-    if (flags & 0x08)
-        fputs("I", stdout);
-    else
-        fputs(".", stdout);
-    fputs("] ", stdout);
-
-    printf("(0x%02x), ", flags);
-    printf("vni %u\n", vni);
-
-    ether_print(gndo, bp, len - 8, len - 8, NULL, NULL);
-    return;
+    ether_print(ndo, bp, len - 8, len - 8, NULL, NULL);
 }

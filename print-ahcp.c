@@ -35,7 +35,7 @@
 
 #include <tcpdump-stdinc.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
 
@@ -99,156 +99,156 @@ static const struct tok ahcp1_opt_str[] = {
 };
 
 static int
-ahcp_time_print(const u_char *cp, const u_char *ep) {
+ahcp_time_print(netdissect_options *ndo, const u_char *cp, const u_char *ep) {
 	time_t t;
 	struct tm *tm;
 	char buf[BUFSIZE];
 
 	if (cp + 4 != ep)
 		goto corrupt;
-	TCHECK2(*cp, 4);
+	ND_TCHECK2(*cp, 4);
 	t = EXTRACT_32BITS(cp);
 	if (NULL == (tm = gmtime(&t)))
-		printf(": gmtime() error");
+		ND_PRINT((ndo, ": gmtime() error"));
 	else if (0 == strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", tm))
-		printf(": strftime() error");
+		ND_PRINT((ndo, ": strftime() error"));
 	else
-		printf(": %s UTC", buf);
+		ND_PRINT((ndo, ": %s UTC", buf));
 	return 0;
 
 corrupt:
-	printf(": %s", cstr);
-	TCHECK2(*cp, ep - cp);
+	ND_PRINT((ndo, ": %s", cstr));
+	ND_TCHECK2(*cp, ep - cp);
 	return 0;
 trunc:
-	printf("%s", tstr);
+	ND_PRINT((ndo, "%s", tstr));
 	return -1;
 }
 
 static int
-ahcp_seconds_print(const u_char *cp, const u_char *ep) {
+ahcp_seconds_print(netdissect_options *ndo, const u_char *cp, const u_char *ep) {
 	if (cp + 4 != ep)
 		goto corrupt;
-	TCHECK2(*cp, 4);
-	printf(": %us", EXTRACT_32BITS(cp));
+	ND_TCHECK2(*cp, 4);
+	ND_PRINT((ndo, ": %us", EXTRACT_32BITS(cp)));
 	return 0;
 
 corrupt:
-	printf(": %s", cstr);
-	TCHECK2(*cp, ep - cp);
+	ND_PRINT((ndo, ": %s", cstr));
+	ND_TCHECK2(*cp, ep - cp);
 	return 0;
 trunc:
-	printf("%s", tstr);
+	ND_PRINT((ndo, "%s", tstr));
 	return -1;
 }
 
 static int
-ahcp_ipv6_addresses_print(const u_char *cp, const u_char *ep) {
+ahcp_ipv6_addresses_print(netdissect_options *ndo, const u_char *cp, const u_char *ep) {
 	const char *sep = ": ";
 
 	while (cp < ep) {
 		if (cp + 16 > ep)
 			goto corrupt;
-		TCHECK2(*cp, 16);
-		printf("%s%s", sep,
+		ND_TCHECK2(*cp, 16);
+		ND_PRINT((ndo, "%s%s", sep,
 #ifdef INET6
 		       ip6addr_string(cp)
 #else
 		       "(compiled w/o IPv6)"
 #endif /* INET6 */
-		       );
+		       ));
 		cp += 16;
 		sep = ", ";
 	}
 	return 0;
 
 corrupt:
-	printf(": %s", cstr);
-	TCHECK2(*cp, ep - cp);
+	ND_PRINT((ndo, ": %s", cstr));
+	ND_TCHECK2(*cp, ep - cp);
 	return 0;
 trunc:
-	printf("%s", tstr);
+	ND_PRINT((ndo, "%s", tstr));
 	return -1;
 }
 
 static int
-ahcp_ipv4_addresses_print(const u_char *cp, const u_char *ep) {
+ahcp_ipv4_addresses_print(netdissect_options *ndo, const u_char *cp, const u_char *ep) {
 	const char *sep = ": ";
 
 	while (cp < ep) {
 		if (cp + 4 > ep)
 			goto corrupt;
-		TCHECK2(*cp, 4);
-		printf("%s%s", sep, ipaddr_string(cp));
+		ND_TCHECK2(*cp, 4);
+		ND_PRINT((ndo, "%s%s", sep, ipaddr_string(cp)));
 		cp += 4;
 		sep = ", ";
 	}
 	return 0;
 
 corrupt:
-	printf(": %s", cstr);
-	TCHECK2(*cp, ep - cp);
+	ND_PRINT((ndo, ": %s", cstr));
+	ND_TCHECK2(*cp, ep - cp);
 	return 0;
 trunc:
-	printf("%s", tstr);
+	ND_PRINT((ndo, "%s", tstr));
 	return -1;
 }
 
 static int
-ahcp_ipv6_prefixes_print(const u_char *cp, const u_char *ep) {
+ahcp_ipv6_prefixes_print(netdissect_options *ndo, const u_char *cp, const u_char *ep) {
 	const char *sep = ": ";
 
 	while (cp < ep) {
 		if (cp + 17 > ep)
 			goto corrupt;
-		TCHECK2(*cp, 17);
-		printf("%s%s/%u", sep,
+		ND_TCHECK2(*cp, 17);
+		ND_PRINT((ndo, "%s%s/%u", sep,
 #ifdef INET6
 		       ip6addr_string(cp),
 #else
 		       "(compiled w/o IPv6)",
 #endif /* INET6 */
-		       *(cp + 16));
+		       *(cp + 16)));
 		cp += 17;
 		sep = ", ";
 	}
 	return 0;
 
 corrupt:
-	printf(": %s", cstr);
-	TCHECK2(*cp, ep - cp);
+	ND_PRINT((ndo, ": %s", cstr));
+	ND_TCHECK2(*cp, ep - cp);
 	return 0;
 trunc:
-	printf("%s", tstr);
+	ND_PRINT((ndo, "%s", tstr));
 	return -1;
 }
 
 static int
-ahcp_ipv4_prefixes_print(const u_char *cp, const u_char *ep) {
+ahcp_ipv4_prefixes_print(netdissect_options *ndo, const u_char *cp, const u_char *ep) {
 	const char *sep = ": ";
 
 	while (cp < ep) {
 		if (cp + 5 > ep)
 			goto corrupt;
-		TCHECK2(*cp, 5);
-		printf("%s%s/%u", sep, ipaddr_string(cp), *(cp + 4));
+		ND_TCHECK2(*cp, 5);
+		ND_PRINT((ndo, "%s%s/%u", sep, ipaddr_string(cp), *(cp + 4)));
 		cp += 5;
 		sep = ", ";
 	}
 	return 0;
 
 corrupt:
-	printf(": %s", cstr);
-	TCHECK2(*cp, ep - cp);
+	ND_PRINT((ndo, ": %s", cstr));
+	ND_TCHECK2(*cp, ep - cp);
 	return 0;
 trunc:
-	printf("%s", tstr);
+	ND_PRINT((ndo, "%s", tstr));
 	return -1;
 }
 
 /* Data decoders signal truncated data with -1. */
 static int
-(* const data_decoders[AHCP1_OPT_MAX + 1])(const u_char *, const u_char *) = {
+(* const data_decoders[AHCP1_OPT_MAX + 1])(netdissect_options *, const u_char *, const u_char *) = {
 	/* [AHCP1_OPT_PAD]                    = */  NULL,
 	/* [AHCP1_OPT_MANDATORY]              = */  NULL,
 	/* [AHCP1_OPT_ORIGIN_TIME]            = */  ahcp_time_print,
@@ -266,151 +266,151 @@ static int
 };
 
 static void
-ahcp1_options_print(const u_char *cp, const u_char *ep) {
+ahcp1_options_print(netdissect_options *ndo, const u_char *cp, const u_char *ep) {
 	uint8_t option_no, option_len;
 
 	while (cp < ep) {
 		/* Option no */
-		TCHECK2(*cp, 1);
+		ND_TCHECK2(*cp, 1);
 		option_no = *cp;
 		cp += 1;
-		printf("\n\t %s", tok2str(ahcp1_opt_str, "Unknown-%u", option_no));
+		ND_PRINT((ndo, "\n\t %s", tok2str(ahcp1_opt_str, "Unknown-%u", option_no)));
 		if (option_no == AHCP1_OPT_PAD || option_no == AHCP1_OPT_MANDATORY)
 			continue;
 		/* Length */
 		if (cp + 1 > ep)
 			goto corrupt;
-		TCHECK2(*cp, 1);
+		ND_TCHECK2(*cp, 1);
 		option_len = *cp;
 		cp += 1;
 		if (cp + option_len > ep)
 			goto corrupt;
 		/* Value */
 		if (option_no <= AHCP1_OPT_MAX && data_decoders[option_no] != NULL) {
-			if (data_decoders[option_no](cp, cp + option_len) < 0)
+			if (data_decoders[option_no](ndo, cp, cp + option_len) < 0)
 				break; /* truncated and already marked up */
 		} else {
-			printf(" (Length %u)", option_len);
-			TCHECK2(*cp, option_len);
+			ND_PRINT((ndo, " (Length %u)", option_len));
+			ND_TCHECK2(*cp, option_len);
 		}
 		cp += option_len;
 	}
 	return;
 
 corrupt:
-	printf(" %s", cstr);
-	TCHECK2(*cp, ep - cp);
+	ND_PRINT((ndo, " %s", cstr));
+	ND_TCHECK2(*cp, ep - cp);
 	return;
 trunc:
-	printf("%s", tstr);
+	ND_PRINT((ndo, "%s", tstr));
 }
 
 static void
-ahcp1_body_print(const u_char *cp, const u_char *ep) {
+ahcp1_body_print(netdissect_options *ndo, const u_char *cp, const u_char *ep) {
 	uint8_t type, mbz;
 	uint16_t body_len;
 
 	if (cp + AHCP1_BODY_MIN_LEN > ep)
 		goto corrupt;
 	/* Type */
-	TCHECK2(*cp, 1);
+	ND_TCHECK2(*cp, 1);
 	type = *cp;
 	cp += 1;
 	/* MBZ */
-	TCHECK2(*cp, 1);
+	ND_TCHECK2(*cp, 1);
 	mbz = *cp;
 	cp += 1;
 	/* Length */
-	TCHECK2(*cp, 2);
+	ND_TCHECK2(*cp, 2);
 	body_len = EXTRACT_16BITS(cp);
 	cp += 2;
 
-	if (vflag) {
-		printf("\n\t%s", tok2str(ahcp1_msg_str, "Unknown-%u", type));
+	if (ndo->ndo_vflag) {
+		ND_PRINT((ndo, "\n\t%s", tok2str(ahcp1_msg_str, "Unknown-%u", type)));
 		if (mbz != 0)
-			printf(", MBZ %u", mbz);
-		printf(", Length %u", body_len);
+			ND_PRINT((ndo, ", MBZ %u", mbz));
+		ND_PRINT((ndo, ", Length %u", body_len));
 	}
 	if (cp + body_len > ep)
 		goto corrupt;
 
 	/* Options */
-	if (vflag >= 2)
-		ahcp1_options_print(cp, cp + body_len); /* not ep (ignore extra data) */
+	if (ndo->ndo_vflag >= 2)
+		ahcp1_options_print(ndo, cp, cp + body_len); /* not ep (ignore extra data) */
 	else
-		TCHECK2(*cp, body_len);
+		ND_TCHECK2(*cp, body_len);
 	return;
 
 corrupt:
-	printf(" %s", cstr);
-	TCHECK2(*cp, ep - cp);
+	ND_PRINT((ndo, " %s", cstr));
+	ND_TCHECK2(*cp, ep - cp);
 	return;
 trunc:
-	printf("%s", tstr);
+	ND_PRINT((ndo, "%s", tstr));
 }
 
 void
-ahcp_print(const u_char *cp, const u_int len) {
+ahcp_print(netdissect_options *ndo, const u_char *cp, const u_int len) {
 	const u_char *ep = cp + len;
 	uint8_t version;
 
-	printf("AHCP");
+	ND_PRINT((ndo, "AHCP"));
 	if (len < 2)
 		goto corrupt;
 	/* Magic */
-	TCHECK2(*cp, 1);
+	ND_TCHECK2(*cp, 1);
 	if (*cp != AHCP_MAGIC_NUMBER)
 		goto corrupt;
 	cp += 1;
 	/* Version */
-	TCHECK2(*cp, 1);
+	ND_TCHECK2(*cp, 1);
 	version = *cp;
 	cp += 1;
 	switch (version) {
 		case AHCP_VERSION_1: {
-			printf(" Version 1");
+			ND_PRINT((ndo, " Version 1"));
 			if (len < AHCP1_HEADER_FIX_LEN)
 				goto corrupt;
-			if (!vflag) {
-				TCHECK2(*cp, AHCP1_HEADER_FIX_LEN - 2);
+			if (!ndo->ndo_vflag) {
+				ND_TCHECK2(*cp, AHCP1_HEADER_FIX_LEN - 2);
 				cp += AHCP1_HEADER_FIX_LEN - 2;
 			} else {
 				/* Hopcount */
-				TCHECK2(*cp, 1);
-				printf("\n\tHopcount %u", *cp);
+				ND_TCHECK2(*cp, 1);
+				ND_PRINT((ndo, "\n\tHopcount %u", *cp));
 				cp += 1;
 				/* Original Hopcount */
-				TCHECK2(*cp, 1);
-				printf(", Original Hopcount %u", *cp);
+				ND_TCHECK2(*cp, 1);
+				ND_PRINT((ndo, ", Original Hopcount %u", *cp));
 				cp += 1;
 				/* Nonce */
-				TCHECK2(*cp, 4);
-				printf(", Nonce 0x%08x", EXTRACT_32BITS(cp));
+				ND_TCHECK2(*cp, 4);
+				ND_PRINT((ndo, ", Nonce 0x%08x", EXTRACT_32BITS(cp)));
 				cp += 4;
 				/* Source Id */
-				TCHECK2(*cp, 8);
-				printf(", Source Id %s", linkaddr_string(cp, 0, 8));
+				ND_TCHECK2(*cp, 8);
+				ND_PRINT((ndo, ", Source Id %s", linkaddr_string(cp, 0, 8)));
 				cp += 8;
 				/* Destination Id */
-				TCHECK2(*cp, 8);
-				printf(", Destination Id %s", linkaddr_string(cp, 0, 8));
+				ND_TCHECK2(*cp, 8);
+				ND_PRINT((ndo, ", Destination Id %s", linkaddr_string(cp, 0, 8)));
 				cp += 8;
 			}
 			/* Body */
-			ahcp1_body_print(cp, ep);
+			ahcp1_body_print(ndo, cp, ep);
 			break;
 		}
 		default:
-			printf(" Version %u (unknown)", version);
+			ND_PRINT((ndo, " Version %u (unknown)", version));
 			break;
 	}
 	return;
 
 corrupt:
-	printf(" %s", cstr);
-	TCHECK2(*cp, ep - cp);
+	ND_PRINT((ndo, " %s", cstr));
+	ND_TCHECK2(*cp, ep - cp);
 	return;
 trunc:
-	printf("%s", tstr);
+	ND_PRINT((ndo, "%s", tstr));
 }
 

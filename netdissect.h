@@ -384,6 +384,9 @@ extern u_int ap1394_if_print(netdissect_options *, const struct pcap_pkthdr *, c
 extern u_int bt_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
 extern void lane_print(netdissect_options *, const u_char *, u_int, u_int);
 extern u_int lane_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern void otv_print(netdissect_options *, const u_char *, u_int);
+extern void ahcp_print(netdissect_options *, const u_char *, const u_int);
+extern void vxlan_print(netdissect_options *, const u_char *, u_int);
 
 /* stuff that has not yet been rototiled */
 extern const u_char * ns_nprint (register const u_char *, register const u_char *);
