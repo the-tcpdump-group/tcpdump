@@ -660,7 +660,7 @@ udp_print(register const u_char *bp, u_int length,
 			lspping_print((const u_char *)(up + 1), length);
 		else if (dport == BFD_CONTROL_PORT ||
 			 dport == BFD_ECHO_PORT )
-			bfd_print((const u_char *)(up+1), length, dport);
+			bfd_print(gndo, (const u_char *)(up+1), length, dport);
                 else if (ISPORT(LMP_PORT))
 			lmp_print((const u_char *)(up + 1), length);
 		else if (ISPORT(VQP_PORT))

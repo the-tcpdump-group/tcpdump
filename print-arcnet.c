@@ -27,8 +27,6 @@
 
 #include <tcpdump-stdinc.h>
 
-#include <stdio.h>
-
 #include "interface.h"
 #include "extract.h"
 
@@ -101,7 +99,7 @@ struct	arc_linux_header {
 #define	ARC_LINUX_HDRLEN	5
 #define	ARC_LINUX_HDRNEWLEN	8
 
-static int arcnet_encap_print(u_char arctype, const u_char *p,
+static int arcnet_encap_print(netdissect_options *, u_char arctype, const u_char *p,
     u_int length, u_int caplen);
 
 static const struct tok arctypemap[] = {
@@ -119,7 +117,8 @@ static const struct tok arctypemap[] = {
 };
 
 static inline void
-arcnet_print(const u_char *bp, u_int length, int phds, int flag, u_int seqid)
+arcnet_print(netdissect_options *ndo, const u_char *bp, u_int length, int phds,
+             int flag, u_int seqid)
 {
 	const struct arc_header *ap;
 	const char *arctypename;
@@ -128,40 +127,40 @@ arcnet_print(const u_char *bp, u_int length, int phds, int flag, u_int seqid)
 	ap = (const struct arc_header *)bp;
 
 
-	if (qflag) {
-		(void)printf("%02x %02x %d: ",
+	if (ndo->ndo_qflag) {
+		ND_PRINT((ndo, "%02x %02x %d: ",
 			     ap->arc_shost,
 			     ap->arc_dhost,
-			     length);
+			     length));
 		return;
 	}
 
 	arctypename = tok2str(arctypemap, "%02x", ap->arc_type);
 
 	if (!phds) {
-		(void)printf("%02x %02x %s %d: ",
+		ND_PRINT((ndo, "%02x %02x %s %d: ",
 			     ap->arc_shost, ap->arc_dhost, arctypename,
-			     length);
+			     length));
 			     return;
 	}
 
 	if (flag == 0) {
-		(void)printf("%02x %02x %s seqid %04x %d: ",
+		ND_PRINT((ndo, "%02x %02x %s seqid %04x %d: ",
 			ap->arc_shost, ap->arc_dhost, arctypename, seqid,
-			length);
+			length));
 			return;
 	}
 
 	if (flag & 1)
-		(void)printf("%02x %02x %s seqid %04x "
+		ND_PRINT((ndo, "%02x %02x %s seqid %04x "
 			"(first of %d fragments) %d: ",
 			ap->arc_shost, ap->arc_dhost, arctypename, seqid,
-			(flag + 3) / 2, length);
+			(flag + 3) / 2, length));
 	else
-		(void)printf("%02x %02x %s seqid %04x "
+		ND_PRINT((ndo, "%02x %02x %s seqid %04x "
 			"(fragment %d) %d: ",
 			ap->arc_shost, ap->arc_dhost, arctypename, seqid,
-			flag/2 + 1, length);
+			flag/2 + 1, length));
 }
 
 /*
@@ -171,7 +170,7 @@ arcnet_print(const u_char *bp, u_int length, int phds, int flag, u_int seqid)
  * is the number of bytes actually captured.
  */
 u_int
-arcnet_if_print(const struct pcap_pkthdr *h, const u_char *p)
+arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;
@@ -182,7 +181,7 @@ arcnet_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	u_char arc_type;
 
 	if (caplen < ARC_HDRLEN) {
-		printf("[|arcnet]");
+		ND_PRINT((ndo, "[|arcnet]"));
 		return (caplen);
 	}
 
@@ -203,15 +202,15 @@ arcnet_if_print(const struct pcap_pkthdr *h, const u_char *p)
 
 	if (phds) {
 		if (caplen < ARC_HDRNEWLEN) {
-			arcnet_print(p, length, 0, 0, 0);
-			printf("[|phds]");
+			arcnet_print(ndo, p, length, 0, 0, 0);
+			ND_PRINT((ndo, "[|phds]"));
 			return (caplen);
 		}
 
 		if (ap->arc_flag == 0xff) {
 			if (caplen < ARC_HDRNEWLEN_EXC) {
-				arcnet_print(p, length, 0, 0, 0);
-				printf("[|phds extended]");
+				arcnet_print(ndo, p, length, 0, 0, 0);
+				ND_PRINT((ndo, "[|phds extended]"));
 				return (caplen);
 			}
 			flag = ap->arc_flag2;
@@ -225,8 +224,8 @@ arcnet_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	}
 
 
-	if (eflag)
-		arcnet_print(p, length, phds, flag, seqid);
+	if (ndo->ndo_eflag)
+		arcnet_print(ndo, p, length, phds, flag, seqid);
 
 	/*
 	 * Go past the ARCNET header.
@@ -242,8 +241,8 @@ arcnet_if_print(const struct pcap_pkthdr *h, const u_char *p)
 		return (archdrlen);
 	}
 
-	if (!arcnet_encap_print(arc_type, p, length, caplen))
-		default_print(p, caplen);
+	if (!arcnet_encap_print(ndo, arc_type, p, length, caplen))
+		ndo->ndo_default_print(ndo, p, caplen);
 
 	return (archdrlen);
 }
@@ -259,7 +258,7 @@ arcnet_if_print(const struct pcap_pkthdr *h, const u_char *p)
  * extra "offset" field between the src/dest and packet type.
  */
 u_int
-arcnet_linux_if_print(const struct pcap_pkthdr *h, const u_char *p)
+arcnet_linux_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;
@@ -269,7 +268,7 @@ arcnet_linux_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	u_char arc_type;
 
 	if (caplen < ARC_LINUX_HDRLEN) {
-		printf("[|arcnet]");
+		ND_PRINT((ndo, "[|arcnet]"));
 		return (caplen);
 	}
 
@@ -280,7 +279,7 @@ arcnet_linux_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	default:
 		archdrlen = ARC_LINUX_HDRNEWLEN;
 		if (caplen < ARC_LINUX_HDRNEWLEN) {
-			printf("[|arcnet]");
+			ND_PRINT((ndo, "[|arcnet]"));
 			return (caplen);
 		}
 		break;
@@ -291,8 +290,8 @@ arcnet_linux_if_print(const struct pcap_pkthdr *h, const u_char *p)
 		break;
 	}
 
-	if (eflag)
-		arcnet_print(p, length, 0, 0, 0);
+	if (ndo->ndo_eflag)
+		arcnet_print(ndo, p, length, 0, 0, 0);
 
 	/*
 	 * Go past the ARCNET header.
@@ -301,8 +300,8 @@ arcnet_linux_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	caplen -= archdrlen;
 	p += archdrlen;
 
-	if (!arcnet_encap_print(arc_type, p, length, caplen))
-		default_print(p, caplen);
+	if (!arcnet_encap_print(ndo, arc_type, p, length, caplen))
+		ndo->ndo_default_print(ndo, p, caplen);
 
 	return (archdrlen);
 }
@@ -316,30 +315,30 @@ arcnet_linux_if_print(const struct pcap_pkthdr *h, const u_char *p)
 
 
 static int
-arcnet_encap_print(u_char arctype, const u_char *p,
+arcnet_encap_print(netdissect_options *ndo, u_char arctype, const u_char *p,
     u_int length, u_int caplen)
 {
 	switch (arctype) {
 
 	case ARCTYPE_IP_OLD:
 	case ARCTYPE_IP:
-	        ip_print(gndo, p, length);
+	        ip_print(ndo, p, length);
 		return (1);
 
 #ifdef INET6
 	case ARCTYPE_INET6:
-		ip6_print(gndo, p, length);
+		ip6_print(ndo, p, length);
 		return (1);
 #endif /*INET6*/
 
 	case ARCTYPE_ARP_OLD:
 	case ARCTYPE_ARP:
 	case ARCTYPE_REVARP:
-		arp_print(gndo, p, length, caplen);
+		arp_print(ndo, p, length, caplen);
 		return (1);
 
 	case ARCTYPE_ATALK:	/* XXX was this ever used? */
-		if (vflag)
+		if (ndo->ndo_vflag)
 			fputs("et1 ", stdout);
 		atalk_print(p, length);
 		return (1);

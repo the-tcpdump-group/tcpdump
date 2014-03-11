@@ -42,13 +42,10 @@
 
 #include <tcpdump-stdinc.h>
 
-#include <stdio.h>
 #include <string.h>
 
 #include "interface.h"
 #include "extract.h"
-
-#include "ip.h"
 #include "ethertype.h"
 
 static const char tstr[] = "[|gre]";
@@ -78,49 +75,47 @@ static const struct tok gre_flag_values[] = {
 #define	GRESRE_IP	0x0800		/* IP */
 #define	GRESRE_ASN	0xfffe		/* ASN */
 
-void gre_print_0(const u_char *, u_int);
-void gre_print_1(const u_char *, u_int);
-void gre_sre_print(u_int16_t, u_int8_t, u_int8_t, const u_char *, u_int);
-void gre_sre_ip_print(u_int8_t, u_int8_t, const u_char *, u_int);
-void gre_sre_asn_print(u_int8_t, u_int8_t, const u_char *, u_int);
+static void gre_print_0(netdissect_options *, const u_char *, u_int);
+static void gre_print_1(netdissect_options *, const u_char *, u_int);
+static void gre_sre_print(netdissect_options *, u_int16_t, u_int8_t, u_int8_t, const u_char *, u_int);
+static void gre_sre_ip_print(netdissect_options *, u_int8_t, u_int8_t, const u_char *, u_int);
+static void gre_sre_asn_print(netdissect_options *, u_int8_t, u_int8_t, const u_char *, u_int);
 
 void
-gre_print(const u_char *bp, u_int length)
+gre_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	u_int len = length, vers;
 
 	if (len < 2) {
-		printf("%s", tstr);
+		ND_PRINT((ndo, "%s", tstr));
 		return;
 	}
 	vers = EXTRACT_16BITS(bp) & GRE_VERS_MASK;
-        printf("GREv%u",vers);
+        ND_PRINT((ndo, "GREv%u",vers));
 
         switch(vers) {
         case 0:
-            gre_print_0(bp, len);
+            gre_print_0(ndo, bp, len);
             break;
         case 1:
-            gre_print_1(bp, len);
+            gre_print_1(ndo, bp, len);
             break;
 	default:
-            printf(" ERROR: unknown-version");
+            ND_PRINT((ndo, " ERROR: unknown-version"));
             break;
         }
-	return;
-
 }
 
-void
-gre_print_0(const u_char *bp, u_int length)
+static void
+gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	u_int len = length;
 	u_int16_t flags, prot;
 
 	flags = EXTRACT_16BITS(bp);
-        if (vflag)
-            printf(", Flags [%s]",
-                   bittok2str(gre_flag_values,"none",flags));
+        if (ndo->ndo_vflag)
+            ND_PRINT((ndo, ", Flags [%s]",
+                   bittok2str(gre_flag_values,"none",flags)));
 
 	len -= 2;
 	bp += 2;
@@ -134,14 +129,14 @@ gre_print_0(const u_char *bp, u_int length)
 	if ((flags & GRE_CP) | (flags & GRE_RP)) {
 		if (len < 2)
 			goto trunc;
-		if (vflag)
-			printf(", sum 0x%x", EXTRACT_16BITS(bp));
+		if (ndo->ndo_vflag)
+			ND_PRINT((ndo, ", sum 0x%x", EXTRACT_16BITS(bp)));
 		bp += 2;
 		len -= 2;
 
 		if (len < 2)
 			goto trunc;
-		printf(", off 0x%x", EXTRACT_16BITS(bp));
+		ND_PRINT((ndo, ", off 0x%x", EXTRACT_16BITS(bp)));
 		bp += 2;
 		len -= 2;
 	}
@@ -149,7 +144,7 @@ gre_print_0(const u_char *bp, u_int length)
 	if (flags & GRE_KP) {
 		if (len < 4)
 			goto trunc;
-		printf(", key=0x%x", EXTRACT_32BITS(bp));
+		ND_PRINT((ndo, ", key=0x%x", EXTRACT_32BITS(bp)));
 		bp += 4;
 		len -= 4;
 	}
@@ -157,7 +152,7 @@ gre_print_0(const u_char *bp, u_int length)
 	if (flags & GRE_SP) {
 		if (len < 4)
 			goto trunc;
-		printf(", seq %u", EXTRACT_32BITS(bp));
+		ND_PRINT((ndo, ", seq %u", EXTRACT_32BITS(bp)));
 		bp += 4;
 		len -= 4;
 	}
@@ -179,7 +174,7 @@ gre_print_0(const u_char *bp, u_int length)
 			if (af == 0 && srelen == 0)
 				break;
 
-			gre_sre_print(af, sreoff, srelen, bp, len);
+			gre_sre_print(ndo, af, sreoff, srelen, bp, len);
 
 			if (len < srelen)
 				goto trunc;
@@ -188,25 +183,25 @@ gre_print_0(const u_char *bp, u_int length)
 		}
 	}
 
-        if (eflag)
-            printf(", proto %s (0x%04x)",
+        if (ndo->ndo_eflag)
+            ND_PRINT((ndo, ", proto %s (0x%04x)",
                    tok2str(ethertype_values,"unknown",prot),
-                   prot);
+                   prot));
 
-        printf(", length %u",length);
+        ND_PRINT((ndo, ", length %u",length));
 
-        if (vflag < 1)
-            printf(": "); /* put in a colon as protocol demarc */
+        if (ndo->ndo_vflag < 1)
+            ND_PRINT((ndo, ": ")); /* put in a colon as protocol demarc */
         else
-            printf("\n\t"); /* if verbose go multiline */
+            ND_PRINT((ndo, "\n\t")); /* if verbose go multiline */
 
 	switch (prot) {
 	case ETHERTYPE_IP:
-	        ip_print(gndo, bp, len);
+	        ip_print(ndo, bp, len);
 		break;
 #ifdef INET6
 	case ETHERTYPE_IPV6:
-		ip6_print(gndo, bp, len);
+		ip6_print(ndo, bp, len);
 		break;
 #endif
 	case ETHERTYPE_MPLS:
@@ -222,19 +217,19 @@ gre_print_0(const u_char *bp, u_int length)
 		isoclns_print(bp, len, len);
 		break;
 	case ETHERTYPE_TEB:
-		ether_print(gndo, bp, len, len, NULL, NULL);
+		ether_print(ndo, bp, len, len, NULL, NULL);
 		break;
 	default:
-		printf("gre-proto-0x%x", prot);
+		ND_PRINT((ndo, "gre-proto-0x%x", prot));
 	}
 	return;
 
 trunc:
-	printf("%s", tstr);
+	ND_PRINT((ndo, "%s", tstr));
 }
 
-void
-gre_print_1(const u_char *bp, u_int length)
+static void
+gre_print_1(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	u_int len = length;
 	u_int16_t flags, prot;
@@ -243,9 +238,9 @@ gre_print_1(const u_char *bp, u_int length)
 	len -= 2;
 	bp += 2;
 
-	if (vflag)
-            printf(", Flags [%s]",
-                   bittok2str(gre_flag_values,"none",flags));
+	if (ndo->ndo_vflag)
+            ND_PRINT((ndo, ", Flags [%s]",
+                   bittok2str(gre_flag_values,"none",flags)));
 
 	if (len < 2)
 		goto trunc;
@@ -260,7 +255,7 @@ gre_print_1(const u_char *bp, u_int length)
 		if (len < 4)
 			goto trunc;
 		k = EXTRACT_32BITS(bp);
-		printf(", call %d", k & 0xffff);
+		ND_PRINT((ndo, ", call %d", k & 0xffff));
 		len -= 4;
 		bp += 4;
 	}
@@ -268,7 +263,7 @@ gre_print_1(const u_char *bp, u_int length)
 	if (flags & GRE_SP) {
 		if (len < 4)
 			goto trunc;
-		printf(", seq %u", EXTRACT_32BITS(bp));
+		ND_PRINT((ndo, ", seq %u", EXTRACT_32BITS(bp)));
 		bp += 4;
 		len -= 4;
 	}
@@ -276,78 +271,80 @@ gre_print_1(const u_char *bp, u_int length)
 	if (flags & GRE_AP) {
 		if (len < 4)
 			goto trunc;
-		printf(", ack %u", EXTRACT_32BITS(bp));
+		ND_PRINT((ndo, ", ack %u", EXTRACT_32BITS(bp)));
 		bp += 4;
 		len -= 4;
 	}
 
 	if ((flags & GRE_SP) == 0)
-		printf(", no-payload");
+		ND_PRINT((ndo, ", no-payload"));
 
-        if (eflag)
-            printf(", proto %s (0x%04x)",
+        if (ndo->ndo_eflag)
+            ND_PRINT((ndo, ", proto %s (0x%04x)",
                    tok2str(ethertype_values,"unknown",prot),
-                   prot);
+                   prot));
 
-        printf(", length %u",length);
+        ND_PRINT((ndo, ", length %u",length));
 
         if ((flags & GRE_SP) == 0)
             return;
 
-        if (vflag < 1)
-            printf(": "); /* put in a colon as protocol demarc */
+        if (ndo->ndo_vflag < 1)
+            ND_PRINT((ndo, ": ")); /* put in a colon as protocol demarc */
         else
-            printf("\n\t"); /* if verbose go multiline */
+            ND_PRINT((ndo, "\n\t")); /* if verbose go multiline */
 
 	switch (prot) {
 	case ETHERTYPE_PPP:
                 ppp_print(bp, len);
 		break;
 	default:
-		printf("gre-proto-0x%x", prot);
+		ND_PRINT((ndo, "gre-proto-0x%x", prot));
 		break;
 	}
 	return;
 
 trunc:
-	printf("%s", tstr);
+	ND_PRINT((ndo, "%s", tstr));
 }
 
-void
-gre_sre_print(u_int16_t af, u_int8_t sreoff, u_int8_t srelen,
-    const u_char *bp, u_int len)
+static void
+gre_sre_print(netdissect_options *ndo, u_int16_t af, u_int8_t sreoff,
+    u_int8_t srelen, const u_char *bp, u_int len)
 {
 	switch (af) {
 	case GRESRE_IP:
-		printf(", (rtaf=ip");
-		gre_sre_ip_print(sreoff, srelen, bp, len);
-		printf(") ");
+		ND_PRINT((ndo, ", (rtaf=ip"));
+		gre_sre_ip_print(ndo, sreoff, srelen, bp, len);
+		ND_PRINT((ndo, ") "));
 		break;
 	case GRESRE_ASN:
-		printf(", (rtaf=asn");
-		gre_sre_asn_print(sreoff, srelen, bp, len);
-		printf(") ");
+		ND_PRINT((ndo, ", (rtaf=asn"));
+		gre_sre_asn_print(ndo, sreoff, srelen, bp, len);
+		ND_PRINT((ndo, ") "));
 		break;
 	default:
-		printf(", (rtaf=0x%x) ", af);
+		ND_PRINT((ndo, ", (rtaf=0x%x) ", af));
 	}
 }
-void
-gre_sre_ip_print(u_int8_t sreoff, u_int8_t srelen, const u_char *bp, u_int len)
+
+static void
+gre_sre_ip_print(netdissect_options *ndo, u_int8_t sreoff, u_int8_t srelen,
+                 const u_char *bp, u_int len)
 {
 	struct in_addr a;
 	const u_char *up = bp;
 
 	if (sreoff & 3) {
-		printf(", badoffset=%u", sreoff);
+		ND_PRINT((ndo, ", badoffset=%u", sreoff));
 		return;
 	}
 	if (srelen & 3) {
-		printf(", badlength=%u", srelen);
+		ND_PRINT((ndo, ", badlength=%u", srelen));
 		return;
 	}
 	if (sreoff >= srelen) {
-		printf(", badoff/len=%u/%u", sreoff, srelen);
+		ND_PRINT((ndo, ", badoff/len=%u/%u", sreoff, srelen));
 		return;
 	}
 
@@ -356,9 +353,9 @@ gre_sre_ip_print(u_int8_t sreoff, u_int8_t srelen, const u_char *bp, u_int len)
 			return;
 
 		memcpy(&a, bp, sizeof(a));
-		printf(" %s%s",
+		ND_PRINT((ndo, " %s%s",
 		    ((bp - up) == sreoff) ? "*" : "",
-		    inet_ntoa(a));
+		    inet_ntoa(a)));
 
 		bp += 4;
 		len -= 4;
@@ -366,21 +363,22 @@ gre_sre_ip_print(u_int8_t sreoff, u_int8_t srelen, const u_char *bp, u_int len)
 	}
 }
 
-void
-gre_sre_asn_print(u_int8_t sreoff, u_int8_t srelen, const u_char *bp, u_int len)
+static void
+gre_sre_asn_print(netdissect_options *ndo, u_int8_t sreoff, u_int8_t srelen,
+                  const u_char *bp, u_int len)
 {
 	const u_char *up = bp;
 
 	if (sreoff & 1) {
-		printf(", badoffset=%u", sreoff);
+		ND_PRINT((ndo, ", badoffset=%u", sreoff));
 		return;
 	}
 	if (srelen & 1) {
-		printf(", badlength=%u", srelen);
+		ND_PRINT((ndo, ", badlength=%u", srelen));
 		return;
 	}
 	if (sreoff >= srelen) {
-		printf(", badoff/len=%u/%u", sreoff, srelen);
+		ND_PRINT((ndo, ", badoff/len=%u/%u", sreoff, srelen));
 		return;
 	}
 
@@ -388,9 +386,9 @@ gre_sre_asn_print(u_int8_t sreoff, u_int8_t srelen, const u_char *bp, u_int len)
 		if (len < 2 || srelen == 0)
 			return;
 
-		printf(" %s%x",
+		ND_PRINT((ndo, " %s%x",
 		    ((bp - up) == sreoff) ? "*" : "",
-		    EXTRACT_16BITS(bp));
+		    EXTRACT_16BITS(bp)));
 
 		bp += 2;
 		len -= 2;

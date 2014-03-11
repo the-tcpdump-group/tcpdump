@@ -445,7 +445,7 @@ again:
 
 	case IPPROTO_GRE:
 		/* do it */
-		gre_print(ipds->cp, ipds->len);
+		gre_print(ndo, ipds->cp, ipds->len);
 		break;
 
 	case IPPROTO_MOBILE:

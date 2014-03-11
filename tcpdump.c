@@ -167,10 +167,6 @@ struct ndo_printer {
 
 
 static const struct printer printers[] = {
-	{ arcnet_if_print,	DLT_ARCNET },
-#ifdef DLT_ARCNET_LINUX
-	{ arcnet_linux_if_print, DLT_ARCNET_LINUX },
-#endif
 	{ token_if_print,	DLT_IEEE802 },
 	{ sl_if_print,		DLT_SLIP },
 #ifdef DLT_SLIP_BSDOS
@@ -343,6 +339,10 @@ static const struct ndo_printer ndo_printers[] = {
 #endif
 #ifdef DLT_LANE8023
 	{ lane_if_print,        DLT_LANE8023 },
+#endif
+	{ arcnet_if_print,	DLT_ARCNET },
+#ifdef DLT_ARCNET_LINUX
+	{ arcnet_linux_if_print, DLT_ARCNET_LINUX },
 #endif
 	{ NULL,			0 },
 };

@@ -387,6 +387,10 @@ extern u_int lane_if_print(netdissect_options *, const struct pcap_pkthdr *, con
 extern void otv_print(netdissect_options *, const u_char *, u_int);
 extern void ahcp_print(netdissect_options *, const u_char *, const u_int);
 extern void vxlan_print(netdissect_options *, const u_char *, u_int);
+extern u_int arcnet_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int arcnet_linux_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern void bfd_print(netdissect_options *, const u_char *, u_int, u_int);
+extern void gre_print(netdissect_options *, const u_char *, u_int);
 
 /* stuff that has not yet been rototiled */
 extern const u_char * ns_nprint (register const u_char *, register const u_char *);
@@ -422,11 +426,9 @@ extern void dvmrp_print(netdissect_options *,const u_char *, u_int);
 extern void egp_print(netdissect_options *,const u_char *, u_int,
 		      const u_char *);
 
-extern void arcnet_if_print(u_char*,const struct pcap_pkthdr *,const u_char *);
 extern void token_if_print(u_char *,const struct pcap_pkthdr *,const u_char *);
 extern void fddi_if_print(u_char *,const struct pcap_pkthdr *, const u_char *);
 
-extern void gre_print(netdissect_options *,const u_char *, u_int);
 extern void icmp_print(netdissect_options *,const u_char *, u_int,
 		       const u_char *);
 extern void hsrp_print(netdissect_options *ndo,
