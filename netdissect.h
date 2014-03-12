@@ -391,6 +391,7 @@ extern u_int arcnet_if_print(netdissect_options *, const struct pcap_pkthdr *, c
 extern u_int arcnet_linux_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
 extern void bfd_print(netdissect_options *, const u_char *, u_int, u_int);
 extern void gre_print(netdissect_options *, const u_char *, u_int);
+extern int vjc_print(netdissect_options *, register const char *, u_short);
 
 /* stuff that has not yet been rototiled */
 extern const u_char * ns_nprint (register const u_char *, register const u_char *);
@@ -475,9 +476,6 @@ extern void ppp_hdlc_if_print(u_char *,
 			      const struct pcap_pkthdr *, const u_char *);
 extern void ppp_bsdos_if_print(u_char *,
 			       const struct pcap_pkthdr *, const u_char *);
-
-extern int vjc_print(netdissect_options *,register const char *,
-		     register u_int, u_short);
 
 extern void raw_if_print(u_char *,
 			 const struct pcap_pkthdr *, const u_char *);

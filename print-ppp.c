@@ -1767,7 +1767,7 @@ ppp_bsdos_if_print(const struct pcap_pkthdr *h _U_, register const u_char *p _U_
 
 		switch (ptype) {
 		case PPP_VJC:
-			ptype = vjc_print(q, ptype);
+			ptype = vjc_print(gndo, q, ptype);
 			hdrlength = PPP_BSDI_HDRLEN;
 			p += hdrlength;
 			switch (ptype) {
@@ -1786,7 +1786,7 @@ ppp_bsdos_if_print(const struct pcap_pkthdr *h _U_, register const u_char *p _U_
 			}
 			goto printx;
 		case PPP_VJNC:
-			ptype = vjc_print(q, ptype);
+			ptype = vjc_print(gndo, q, ptype);
 			hdrlength = PPP_BSDI_HDRLEN;
 			p += hdrlength;
 			switch (ptype) {

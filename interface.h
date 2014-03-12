@@ -249,7 +249,6 @@ extern u_int ppp_bsdos_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int pppoe_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int prism_if_print(const struct pcap_pkthdr *, const u_char *);
 extern void q933_print(const u_char *, u_int);
-extern int vjc_print(register const char *, u_short);
 extern void vqp_print(register const u_char *, register u_int);
 extern u_int raw_if_print(const struct pcap_pkthdr *, const u_char *);
 extern void rip_print(const u_char *, u_int);
