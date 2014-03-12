@@ -7,8 +7,6 @@
 
 #include <tcpdump-stdinc.h>
 
-#include <stdio.h>
-
 #include "netdissect.h"
 #include "interface.h"
 #include "extract.h"

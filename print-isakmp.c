@@ -44,8 +44,6 @@
 
 #include <string.h>
 
-#include <stdio.h>
-
 #include "interface.h"
 #include "addrtoname.h"
 #include "extract.h"                    /* must come after interface.h */

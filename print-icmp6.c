@@ -1337,7 +1337,7 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 			domp = cp + 8; /* domain names, variable-sized, RFC1035-encoded */
 			while (domp < cp + (op->nd_opt_len << 3) && *domp != '\0')
 			{
-				printf (" ");
+				ND_PRINT((ndo, " "));
 				if ((domp = ns_nprint (domp, bp)) == NULL)
 					goto trunc;
 			}

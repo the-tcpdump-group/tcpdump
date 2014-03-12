@@ -40,9 +40,6 @@
 
 #include <tcpdump-stdinc.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "interface.h" /* for checksum structure and functions */
 #include "netdissect.h"
 #include "extract.h"

@@ -25,7 +25,6 @@
 
 #include <tcpdump-stdinc.h>
 
-#include <stdio.h>
 #include <string.h>
 
 #include "netdissect.h"
@@ -234,9 +233,9 @@ atmarp_print(netdissect_options *ndo,
 	}
 
         /* print operation */
-        printf("%s%s ",
+        ND_PRINT((ndo, "%s%s ",
                ndo->ndo_vflag ? ", " : "",
-               tok2str(arpop_values, "Unknown (%u)", op));
+               tok2str(arpop_values, "Unknown (%u)", op)));
 
 	switch (op) {
 
@@ -349,9 +348,9 @@ arp_print(netdissect_options *ndo,
 	}
 
         /* print operation */
-        printf("%s%s ",
+        ND_PRINT((ndo, "%s%s ",
                ndo->ndo_vflag ? ", " : "",
-               tok2str(arpop_values, "Unknown (%u)", op));
+               tok2str(arpop_values, "Unknown (%u)", op)));
 
 	switch (op) {
 

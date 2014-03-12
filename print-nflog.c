@@ -31,10 +31,7 @@
 
 #include <tcpdump-stdinc.h>
 
-#include <stdio.h>
-
 #include "netdissect.h"
-#include "interface.h"
 
 #if defined(DLT_NFLOG) && defined(HAVE_PCAP_NFLOG_H)
 #include <pcap/nflog.h>
