@@ -180,14 +180,7 @@ static const struct printer printers[] = {
 	{ ppp_bsdos_if_print,	DLT_PPP_BSDOS },
 #endif
 	{ fddi_if_print,	DLT_FDDI },
-	{ raw_if_print,		DLT_RAW },
 	{ atm_if_print,		DLT_ATM_RFC1483 },
-#ifdef DLT_C_HDLC
-	{ chdlc_if_print,	DLT_C_HDLC },
-#endif
-#ifdef DLT_HDLC
-	{ chdlc_if_print,	DLT_HDLC },
-#endif
 #ifdef DLT_PPP_SERIAL
 	{ ppp_hdlc_if_print,	DLT_PPP_SERIAL },
 #endif
@@ -223,9 +216,6 @@ static const struct printer printers[] = {
 #endif
 #ifdef DLT_ENC
 	{ enc_if_print,		DLT_ENC },
-#endif
-#ifdef DLT_SYMANTEC_FIREWALL
-	{ symantec_if_print,	DLT_SYMANTEC_FIREWALL },
 #endif
 #ifdef DLT_IEEE802_11_RADIO_AVS
 	{ ieee802_11_radio_avs_if_print,	DLT_IEEE802_11_RADIO_AVS },
@@ -278,20 +268,6 @@ static const struct printer printers[] = {
 #ifdef DLT_MFR
 	{ mfr_if_print,		DLT_MFR },
 #endif
-#ifdef HAVE_PCAP_USB_H
-#ifdef DLT_USB_LINUX
-	{ usb_linux_48_byte_print, DLT_USB_LINUX},
-#endif /* DLT_USB_LINUX */
-#ifdef DLT_USB_LINUX_MMAPPED
-	{ usb_linux_64_byte_print, DLT_USB_LINUX_MMAPPED},
-#endif /* DLT_USB_LINUX_MMAPPED */
-#endif /* HAVE_PCAP_USB_H */
-#ifdef DLT_IPV4
-	{ raw_if_print,		DLT_IPV4 },
-#endif
-#ifdef DLT_IPV6
-	{ raw_if_print,		DLT_IPV6 },
-#endif
 	{ NULL,			0 },
 };
 
@@ -343,6 +319,30 @@ static const struct ndo_printer ndo_printers[] = {
 	{ arcnet_if_print,	DLT_ARCNET },
 #ifdef DLT_ARCNET_LINUX
 	{ arcnet_linux_if_print, DLT_ARCNET_LINUX },
+#endif
+	{ raw_if_print,		DLT_RAW },
+#ifdef DLT_IPV4
+	{ raw_if_print,		DLT_IPV4 },
+#endif
+#ifdef DLT_IPV6
+	{ raw_if_print,		DLT_IPV6 },
+#endif
+#ifdef HAVE_PCAP_USB_H
+#ifdef DLT_USB_LINUX
+	{ usb_linux_48_byte_print, DLT_USB_LINUX},
+#endif /* DLT_USB_LINUX */
+#ifdef DLT_USB_LINUX_MMAPPED
+	{ usb_linux_64_byte_print, DLT_USB_LINUX_MMAPPED},
+#endif /* DLT_USB_LINUX_MMAPPED */
+#endif /* HAVE_PCAP_USB_H */
+#ifdef DLT_SYMANTEC_FIREWALL
+	{ symantec_if_print,	DLT_SYMANTEC_FIREWALL },
+#endif
+#ifdef DLT_C_HDLC
+	{ chdlc_if_print,	DLT_C_HDLC },
+#endif
+#ifdef DLT_HDLC
+	{ chdlc_if_print,	DLT_HDLC },
 #endif
 	{ NULL,			0 },
 };

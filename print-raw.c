@@ -25,22 +25,19 @@
 
 #include <tcpdump-stdinc.h>
 
-#include <stdio.h>
-#include <string.h>
-
-#include "interface.h"
+#include "netdissect.h"
 
 /*
  * The DLT_RAW packet has no header. It contains a raw IP packet.
  */
 
 u_int
-raw_if_print(const struct pcap_pkthdr *h, const u_char *p)
+raw_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
 {
-	if (eflag)
-		printf("ip: ");
+	if (ndo->ndo_eflag)
+		ND_PRINT((ndo, "ip: "));
 
-	ipN_print(p, h->len);
+	ipN_print(ndo, p, h->len);
 
 	return (0);
 }

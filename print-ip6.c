@@ -184,7 +184,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			nh = *cp;
 			return;
 		case IPPROTO_ROUTING:
-			advance = rt6_print(cp, (const u_char *)ip6);
+			advance = rt6_print(ndo, cp, (const u_char *)ip6);
 			nh = *cp;
 			break;
 		case IPPROTO_SCTP:

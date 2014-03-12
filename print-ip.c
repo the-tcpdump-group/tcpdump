@@ -668,7 +668,7 @@ ip_print(netdissect_options *ndo,
 }
 
 void
-ipN_print(register const u_char *bp, register u_int length)
+ipN_print(netdissect_options *ndo, register const u_char *bp, register u_int length)
 {
 	struct ip hdr;
 
@@ -679,11 +679,11 @@ ipN_print(register const u_char *bp, register u_int length)
 	memcpy (&hdr, bp, 4);
 	switch (IP_V(&hdr)) {
 	case 4:
-		ip_print (gndo, bp, length);
+		ip_print (ndo, bp, length);
 		return;
 #ifdef INET6
 	case 6:
-		ip6_print (gndo, bp, length);
+		ip6_print (ndo, bp, length);
 		return;
 #endif
 	default:

@@ -213,7 +213,6 @@ extern u_int ieee802_11_radio_avs_if_print(const struct pcap_pkthdr *,
 	const u_char *);
 extern void icmp_print(const u_char *, u_int, const u_char *, int);
 extern void igmp_print(const u_char *, u_int);
-extern void ipN_print(const u_char *, u_int);
 extern void ipx_print(const u_char *, u_int);
 extern void isoclns_print(const u_char *, u_int, u_int);
 extern void krb_print(const u_char *);
@@ -250,12 +249,9 @@ extern u_int pppoe_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int prism_if_print(const struct pcap_pkthdr *, const u_char *);
 extern void q933_print(const u_char *, u_int);
 extern void vqp_print(register const u_char *, register u_int);
-extern u_int raw_if_print(const struct pcap_pkthdr *, const u_char *);
 extern void rip_print(const u_char *, u_int);
 extern u_int sl_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int sl_bsdos_if_print(const struct pcap_pkthdr *, const u_char *);
-extern u_int chdlc_if_print(const struct pcap_pkthdr *, const u_char *);
-extern u_int chdlc_print(register const u_char *, u_int);
 extern u_int juniper_atm1_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int juniper_atm2_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int juniper_mfr_print(const struct pcap_pkthdr *, register const u_char *);
@@ -274,7 +270,6 @@ extern u_int juniper_chdlc_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int sll_if_print(const struct pcap_pkthdr *, const u_char *);
 extern void snmp_print(const u_char *, u_int);
 extern void sunrpcrequest_print(const u_char *, u_int, const u_char *);
-extern u_int symantec_if_print(const struct pcap_pkthdr *, const u_char *);
 extern void tcp_print(const u_char *, u_int, const u_char *, int);
 extern void tftp_print(const u_char *, u_int);
 extern void timed_print(const u_char *);
@@ -314,8 +309,6 @@ extern void zmtp1_print_datagram(const u_char *, const u_int);
 extern void sip_print(const u_char *, u_int);
 extern void syslog_print(const u_char *, u_int);
 extern int mptcp_print(const u_char *, u_int, u_char);
-extern u_int usb_linux_48_byte_print(const struct pcap_pkthdr *, const u_char *);
-extern u_int usb_linux_64_byte_print(const struct pcap_pkthdr *, const u_char *);
 
 
 #ifdef INET6
@@ -324,7 +317,6 @@ extern int hbhopt_print(const u_char *);
 extern int dstopt_print(const u_char *);
 extern int mobility_print(const u_char *, const u_char *);
 extern void ripng_print(const u_char *, unsigned int);
-extern int rt6_print(const u_char *, const u_char *);
 extern void ospf6_print(const u_char *, u_int);
 extern void dhcp6_print(const u_char *, u_int);
 extern void babel_print(const u_char *, u_int);

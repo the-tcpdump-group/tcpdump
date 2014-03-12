@@ -25,16 +25,13 @@
 
 #include <tcpdump-stdinc.h>
 
-#include <stdio.h>
-
 #include "interface.h"
 #include "addrtoname.h"
 #include "ethertype.h"
 #include "extract.h"
-#include "ppp.h"
 #include "chdlc.h"
 
-static void chdlc_slarp_print(const u_char *, u_int);
+static void chdlc_slarp_print(netdissect_options *, const u_char *, u_int);
 
 static const struct tok chdlc_cast_values[] = {
     { CHDLC_UNICAST, "unicast" },
@@ -45,29 +42,29 @@ static const struct tok chdlc_cast_values[] = {
 
 /* Standard CHDLC printer */
 u_int
-chdlc_if_print(const struct pcap_pkthdr *h, register const u_char *p)
+chdlc_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, register const u_char *p)
 {
 	register u_int length = h->len;
 	register u_int caplen = h->caplen;
 
 	if (caplen < CHDLC_HDRLEN) {
-		printf("[|chdlc]");
+		ND_PRINT((ndo, "[|chdlc]"));
 		return (caplen);
 	}
-        return (chdlc_print(p,length));
+        return (chdlc_print(ndo, p,length));
 }
 
 u_int
-chdlc_print(register const u_char *p, u_int length) {
+chdlc_print(netdissect_options *ndo, register const u_char *p, u_int length) {
 	u_int proto;
 
 	proto = EXTRACT_16BITS(&p[2]);
-	if (eflag) {
-                printf("%s, ethertype %s (0x%04x), length %u: ",
+	if (ndo->ndo_eflag) {
+                ND_PRINT((ndo, "%s, ethertype %s (0x%04x), length %u: ",
                        tok2str(chdlc_cast_values, "0x%02x", p[0]),
                        tok2str(ethertype_values, "Unknown", proto),
                        proto,
-                       length);
+                       length));
 	}
 
 	length -= CHDLC_HDRLEN;
@@ -75,15 +72,15 @@ chdlc_print(register const u_char *p, u_int length) {
 
 	switch (proto) {
 	case ETHERTYPE_IP:
-		ip_print(gndo, p, length);
+		ip_print(ndo, p, length);
 		break;
 #ifdef INET6
 	case ETHERTYPE_IPV6:
-		ip6_print(gndo, p, length);
+		ip6_print(ndo, p, length);
 		break;
 #endif
 	case CHDLC_TYPE_SLARP:
-		chdlc_slarp_print(p, length);
+		chdlc_slarp_print(ndo, p, length);
 		break;
 #if 0
 	case CHDLC_TYPE_CDP:
@@ -104,8 +101,8 @@ chdlc_print(register const u_char *p, u_int length) {
                     isoclns_print(p, length, length);
                 break;
 	default:
-                if (!eflag)
-                        printf("unknown CHDLC protocol (0x%04x)", proto);
+                if (!ndo->ndo_eflag)
+                        ND_PRINT((ndo, "unknown CHDLC protocol (0x%04x)", proto));
                 break;
 	}
 
@@ -137,20 +134,20 @@ struct cisco_slarp {
 #define SLARP_MAX_LEN	18
 
 static void
-chdlc_slarp_print(const u_char *cp, u_int length)
+chdlc_slarp_print(netdissect_options *ndo, const u_char *cp, u_int length)
 {
 	const struct cisco_slarp *slarp;
         u_int sec,min,hrs,days;
 
-        printf("SLARP (length: %u), ",length);
+	ND_PRINT((ndo, "SLARP (length: %u), ",length));
 	if (length < SLARP_MIN_LEN)
 		goto trunc;
 
 	slarp = (const struct cisco_slarp *)cp;
-	TCHECK2(*slarp, SLARP_MIN_LEN);
+	ND_TCHECK2(*slarp, SLARP_MIN_LEN);
 	switch (EXTRACT_32BITS(&slarp->code)) {
 	case SLARP_REQUEST:
-		printf("request");
+		ND_PRINT((ndo, "request"));
 		/*
 		 * At least according to William "Chops" Westfield's
 		 * message in
@@ -162,42 +159,42 @@ chdlc_slarp_print(const u_char *cp, u_int length)
 		 */
 		break;
 	case SLARP_REPLY:
-		printf("reply %s/%s",
+		ND_PRINT((ndo, "reply %s/%s",
 			ipaddr_string(&slarp->un.addr.addr),
-			ipaddr_string(&slarp->un.addr.mask));
+			ipaddr_string(&slarp->un.addr.mask)));
 		break;
 	case SLARP_KEEPALIVE:
-		printf("keepalive: mineseen=0x%08x, yourseen=0x%08x, reliability=0x%04x",
+		ND_PRINT((ndo, "keepalive: mineseen=0x%08x, yourseen=0x%08x, reliability=0x%04x",
                        EXTRACT_32BITS(&slarp->un.keep.myseq),
                        EXTRACT_32BITS(&slarp->un.keep.yourseq),
-                       EXTRACT_16BITS(&slarp->un.keep.rel));
+                       EXTRACT_16BITS(&slarp->un.keep.rel)));
 
                 if (length >= SLARP_MAX_LEN) { /* uptime-stamp is optional */
                         cp += SLARP_MIN_LEN;
-                        if (!TTEST2(*cp, 4))
+                        if (!ND_TTEST2(*cp, 4))
                                 goto trunc;
                         sec = EXTRACT_32BITS(cp) / 1000;
                         min = sec / 60; sec -= min * 60;
                         hrs = min / 60; min -= hrs * 60;
                         days = hrs / 24; hrs -= days * 24;
-                        printf(", link uptime=%ud%uh%um%us",days,hrs,min,sec);
+                        ND_PRINT((ndo, ", link uptime=%ud%uh%um%us",days,hrs,min,sec));
                 }
 		break;
 	default:
-		printf("0x%02x unknown", EXTRACT_32BITS(&slarp->code));
-                if (vflag <= 1)
-                    print_unknown_data(gndo,cp+4,"\n\t",length-4);
+		ND_PRINT((ndo, "0x%02x unknown", EXTRACT_32BITS(&slarp->code)));
+                if (ndo->ndo_vflag <= 1)
+                    print_unknown_data(ndo,cp+4,"\n\t",length-4);
 		break;
 	}
 
-	if (SLARP_MAX_LEN < length && vflag)
-		printf(", (trailing junk: %d bytes)", length - SLARP_MAX_LEN);
-        if (vflag > 1)
-            print_unknown_data(gndo,cp+4,"\n\t",length-4);
+	if (SLARP_MAX_LEN < length && ndo->ndo_vflag)
+		ND_PRINT((ndo, ", (trailing junk: %d bytes)", length - SLARP_MAX_LEN));
+        if (ndo->ndo_vflag > 1)
+            print_unknown_data(ndo,cp+4,"\n\t",length-4);
 	return;
 
 trunc:
-	printf("[|slarp]");
+	ND_PRINT((ndo, "[|slarp]"));
 }
 
 

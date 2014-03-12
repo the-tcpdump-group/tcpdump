@@ -712,7 +712,7 @@ juniper_chdlc_print(const struct pcap_pkthdr *h, register const u_char *p)
 
         p+=l2info.header_len;
         /* this DLT contains nothing but raw c-hdlc frames */
-        chdlc_print(p, l2info.length);
+        chdlc_print(gndo, p, l2info.length);
         return l2info.header_len;
 }
 #endif

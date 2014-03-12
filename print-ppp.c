@@ -1665,7 +1665,7 @@ ppp_hdlc_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 
 	case CHDLC_UNICAST:
 	case CHDLC_BCAST:
-		return (chdlc_if_print(h, p));
+		return (chdlc_if_print(gndo, h, p));
 
 	default:
 		if (eflag)

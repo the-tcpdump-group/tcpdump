@@ -27,16 +27,14 @@
 
 #include <tcpdump-stdinc.h>
 
-#include <stdio.h>
-
 #include "ip6.h"
 
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
 
 int
-rt6_print(register const u_char *bp, const u_char *bp2 _U_)
+rt6_print(netdissect_options *ndo, register const u_char *bp, const u_char *bp2 _U_)
 {
 	register const struct ip6_rthdr *dp;
 	register const struct ip6_rthdr0 *dp0;
@@ -48,13 +46,13 @@ rt6_print(register const u_char *bp, const u_char *bp2 _U_)
 	len = dp->ip6r_len;
 
 	/* 'ep' points to the end of available data. */
-	ep = snapend;
+	ep = ndo->ndo_snapend;
 
-	TCHECK(dp->ip6r_segleft);
+	ND_TCHECK(dp->ip6r_segleft);
 
-	printf("srcrt (len=%d", dp->ip6r_len);	/*)*/
-	printf(", type=%d", dp->ip6r_type);
-	printf(", segleft=%d", dp->ip6r_segleft);
+	ND_PRINT((ndo, "srcrt (len=%d", dp->ip6r_len));	/*)*/
+	ND_PRINT((ndo, ", type=%d", dp->ip6r_type));
+	ND_PRINT((ndo, ", segleft=%d", dp->ip6r_segleft));
 
 	switch (dp->ip6r_type) {
 #ifndef IPV6_RTHDR_TYPE_0
@@ -67,10 +65,10 @@ rt6_print(register const u_char *bp, const u_char *bp2 _U_)
 	case IPV6_RTHDR_TYPE_2:			/* Mobile IPv6 ID-20 */
 		dp0 = (struct ip6_rthdr0 *)dp;
 
-		TCHECK(dp0->ip6r0_reserved);
-		if (dp0->ip6r0_reserved || vflag) {
-			printf(", rsv=0x%0x",
-			    EXTRACT_32BITS(&dp0->ip6r0_reserved));
+		ND_TCHECK(dp0->ip6r0_reserved);
+		if (dp0->ip6r0_reserved || ndo->ndo_vflag) {
+			ND_PRINT((ndo, ", rsv=0x%0x",
+			    EXTRACT_32BITS(&dp0->ip6r0_reserved)));
 		}
 
 		if (len % 2 == 1)
@@ -81,11 +79,11 @@ rt6_print(register const u_char *bp, const u_char *bp2 _U_)
 			if ((u_char *)(addr + 1) > ep)
 				goto trunc;
 
-			printf(", [%d]%s", i, ip6addr_string(addr));
+			ND_PRINT((ndo, ", [%d]%s", i, ip6addr_string(addr)));
 			addr++;
 		}
 		/*(*/
-		printf(") ");
+		ND_PRINT((ndo, ") "));
 		return((dp0->ip6r0_len + 1) << 3);
 		break;
 	default:
@@ -94,7 +92,7 @@ rt6_print(register const u_char *bp, const u_char *bp2 _U_)
 	}
 
  trunc:
-	fputs("[|srcrt]", stdout);
+	ND_PRINT((ndo, "[|srcrt]"));
 	return -1;
 }
 #endif /* INET6 */

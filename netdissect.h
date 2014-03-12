@@ -392,6 +392,13 @@ extern u_int arcnet_linux_if_print(netdissect_options *, const struct pcap_pkthd
 extern void bfd_print(netdissect_options *, const u_char *, u_int, u_int);
 extern void gre_print(netdissect_options *, const u_char *, u_int);
 extern int vjc_print(netdissect_options *, register const char *, u_short);
+extern void ipN_print(netdissect_options *, const u_char *, u_int);
+extern u_int raw_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int usb_linux_48_byte_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int usb_linux_64_byte_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int symantec_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int chdlc_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int chdlc_print(netdissect_options *, register const u_char *, u_int);
 
 /* stuff that has not yet been rototiled */
 extern const u_char * ns_nprint (register const u_char *, register const u_char *);
@@ -412,10 +419,6 @@ extern void bootp_print(netdissect_options *,const u_char *,
 			u_int, u_short, u_short);
 extern void bgp_print(netdissect_options *,const u_char *, int);
 extern void bxxp_print(netdissect_options *,const u_char *, u_int);
-extern void chdlc_if_print(u_char *user, const struct pcap_pkthdr *h,
-			   register const u_char *p);
-extern void chdlc_print(netdissect_options *ndo,
-			register const u_char *p, u_int length, u_int caplen);
 extern void cisco_autorp_print(netdissect_options *,
 			       const u_char *, u_int);
 extern void cnfp_print(netdissect_options *,const u_char *cp,
@@ -439,7 +442,6 @@ extern void igmp_print(netdissect_options *,
 		       register const u_char *, u_int);
 extern void igrp_print(netdissect_options *,const u_char *, u_int,
 		       const u_char *);
-extern void ipN_print(netdissect_options *,const u_char *, u_int);
 extern void ipx_print(netdissect_options *,const u_char *, u_int);
 extern void isoclns_print(netdissect_options *,const u_char *,
 			  u_int, u_int, const u_char *,	const u_char *);
@@ -476,9 +478,6 @@ extern void ppp_hdlc_if_print(u_char *,
 			      const struct pcap_pkthdr *, const u_char *);
 extern void ppp_bsdos_if_print(u_char *,
 			       const struct pcap_pkthdr *, const u_char *);
-
-extern void raw_if_print(u_char *,
-			 const struct pcap_pkthdr *, const u_char *);
 
 extern void rip_print(netdissect_options *,const u_char *, u_int);
 extern void rpki_rtr_print(netdissect_options *,const u_char *, u_int);
@@ -541,6 +540,7 @@ extern u_int ieee802_15_4_if_print(netdissect_options *,const struct pcap_pkthdr
 #ifdef INET6
 extern void ip6_print(netdissect_options *,const u_char *, u_int);
 extern int frag6_print(netdissect_options *, const u_char *, const u_char *);
+extern int rt6_print(netdissect_options *, const u_char *, const u_char *);
 #if 0
 extern void ip6_opt_print(netdissect_options *,const u_char *, int);
 extern int hbhopt_print(netdissect_options *,const u_char *);
@@ -548,7 +548,6 @@ extern int dstopt_print(netdissect_options *,const u_char *);
 extern void icmp6_print(netdissect_options *,const u_char *,
 			const u_char *);
 extern void ripng_print(netdissect_options *,const u_char *, int);
-extern int rt6_print(netdissect_options *,const u_char *, const u_char *);
 extern void ospf6_print(netdissect_options *,const u_char *, u_int);
 extern void dhcp6_print(netdissect_options *,const u_char *,
 			u_int, u_int16_t, u_int16_t);
