@@ -184,9 +184,6 @@ static const struct printer printers[] = {
 #ifdef DLT_PPP_SERIAL
 	{ ppp_hdlc_if_print,	DLT_PPP_SERIAL },
 #endif
-#ifdef DLT_PPP_ETHER
-	{ pppoe_if_print,	DLT_PPP_ETHER },
-#endif
 #ifdef DLT_LINUX_SLL
 	{ sll_if_print,		DLT_LINUX_SLL },
 #endif
@@ -195,9 +192,6 @@ static const struct printer printers[] = {
 #endif
 #ifdef DLT_LTALK
 	{ ltalk_if_print,	DLT_LTALK },
-#endif
-#if defined(DLT_PFLOG) && defined(HAVE_NET_PFVAR_H)
-	{ pflog_if_print,	DLT_PFLOG },
 #endif
 #ifdef DLT_FR
 	{ fr_if_print,		DLT_FR },
@@ -343,6 +337,12 @@ static const struct ndo_printer ndo_printers[] = {
 #endif
 #ifdef DLT_HDLC
 	{ chdlc_if_print,	DLT_HDLC },
+#endif
+#ifdef DLT_PPP_ETHER
+	{ pppoe_if_print,	DLT_PPP_ETHER },
+#endif
+#if defined(DLT_PFLOG) && defined(HAVE_NET_PFVAR_H)
+	{ pflog_if_print,	DLT_PFLOG },
 #endif
 	{ NULL,			0 },
 };

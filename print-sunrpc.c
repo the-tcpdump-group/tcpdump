@@ -50,7 +50,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
 
@@ -165,8 +165,8 @@ static const struct tok proc2str[] = {
 static char *progstr(u_int32_t);
 
 void
-sunrpcrequest_print(register const u_char *bp, register u_int length,
-		    register const u_char *bp2)
+sunrpcrequest_print(netdissect_options *ndo, register const u_char *bp,
+                    register u_int length, register const u_char *bp2)
 {
 	register const struct sunrpc_msg *rp;
 	register const struct ip *ip;
@@ -178,7 +178,7 @@ sunrpcrequest_print(register const u_char *bp, register u_int length,
 
 	rp = (struct sunrpc_msg *)bp;
 
-	if (!nflag) {
+	if (!ndo->ndo_nflag) {
 		snprintf(srcid, sizeof(srcid), "0x%x",
 		    EXTRACT_32BITS(&rp->rm_xid));
 		strlcpy(dstid, "sunrpc", sizeof(dstid));
@@ -191,28 +191,28 @@ sunrpcrequest_print(register const u_char *bp, register u_int length,
 	switch (IP_V((struct ip *)bp2)) {
 	case 4:
 		ip = (struct ip *)bp2;
-		printf("%s.%s > %s.%s: %d",
+		ND_PRINT((ndo, "%s.%s > %s.%s: %d",
 		    ipaddr_string(&ip->ip_src), srcid,
-		    ipaddr_string(&ip->ip_dst), dstid, length);
+		    ipaddr_string(&ip->ip_dst), dstid, length));
 		break;
 #ifdef INET6
 	case 6:
 		ip6 = (struct ip6_hdr *)bp2;
-		printf("%s.%s > %s.%s: %d",
+		ND_PRINT((ndo, "%s.%s > %s.%s: %d",
 		    ip6addr_string(&ip6->ip6_src), srcid,
-		    ip6addr_string(&ip6->ip6_dst), dstid, length);
+		    ip6addr_string(&ip6->ip6_dst), dstid, length));
 		break;
 #endif
 	default:
-		printf("%s.%s > %s.%s: %d", "?", srcid, "?", dstid, length);
+		ND_PRINT((ndo, "%s.%s > %s.%s: %d", "?", srcid, "?", dstid, length));
 		break;
 	}
 
-	printf(" %s", tok2str(proc2str, " proc #%u",
-	    EXTRACT_32BITS(&rp->rm_call.cb_proc)));
+	ND_PRINT((ndo, " %s", tok2str(proc2str, " proc #%u",
+	    EXTRACT_32BITS(&rp->rm_call.cb_proc))));
 	x = EXTRACT_32BITS(&rp->rm_call.cb_rpcvers);
 	if (x != 2)
-		printf(" [rpcver %u]", x);
+		ND_PRINT((ndo, " [rpcver %u]", x));
 
 	switch (EXTRACT_32BITS(&rp->rm_call.cb_proc)) {
 
@@ -221,11 +221,11 @@ sunrpcrequest_print(register const u_char *bp, register u_int length,
 	case SUNRPC_PMAPPROC_GETPORT:
 	case SUNRPC_PMAPPROC_CALLIT:
 		x = EXTRACT_32BITS(&rp->rm_call.cb_prog);
-		if (!nflag)
-			printf(" %s", progstr(x));
+		if (!ndo->ndo_nflag)
+			ND_PRINT((ndo, " %s", progstr(x)));
 		else
-			printf(" %u", x);
-		printf(".%u", EXTRACT_32BITS(&rp->rm_call.cb_vers));
+			ND_PRINT((ndo, " %u", x));
+		ND_PRINT((ndo, ".%u", EXTRACT_32BITS(&rp->rm_call.cb_vers)));
 		break;
 	}
 }

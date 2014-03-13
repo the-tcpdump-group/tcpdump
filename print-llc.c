@@ -211,7 +211,7 @@ llc_print(const u_char *p, u_int length, u_int caplen,
             if (eflag)
 		printf("IPX 802.3: ");
 
-            ipx_print(p, length);
+            ipx_print(gndo, p, length);
             return (1);
 	}
 
@@ -258,7 +258,7 @@ llc_print(const u_char *p, u_int length, u_int caplen,
                 if (eflag)
                         printf("IPX 802.2: ");
 
-		ipx_print(p+3, length-3);
+		ipx_print(gndo, p+3, length-3);
 		return (1);
 	}
 

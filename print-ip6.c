@@ -153,11 +153,11 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 		switch (nh) {
 		case IPPROTO_HOPOPTS:
-			advance = hbhopt_print(cp);
+			advance = hbhopt_print(ndo, cp);
 			nh = *cp;
 			break;
 		case IPPROTO_DSTOPTS:
-			advance = dstopt_print(cp);
+			advance = dstopt_print(ndo, cp);
 			nh = *cp;
 			break;
 		case IPPROTO_FRAGMENT:

@@ -780,7 +780,7 @@ juniper_mlppp_print(const struct pcap_pkthdr *h, register const u_char *p)
             return l2info.header_len;
 #endif
         case JUNIPER_LSQ_L3_PROTO_MPLS:
-            mpls_print(p,l2info.length);
+            mpls_print(gndo, p, l2info.length);
             return l2info.header_len;
         case JUNIPER_LSQ_L3_PROTO_ISO:
             isoclns_print(p,l2info.length,l2info.caplen);
@@ -835,7 +835,7 @@ juniper_mfr_print(const struct pcap_pkthdr *h, register const u_char *p)
                 return l2info.header_len;
 #endif
             case JUNIPER_LSQ_L3_PROTO_MPLS:
-                mpls_print(p,l2info.length);
+                mpls_print(gndo, p, l2info.length);
                 return l2info.header_len;
             case JUNIPER_LSQ_L3_PROTO_ISO:
                 isoclns_print(p,l2info.length,l2info.caplen);

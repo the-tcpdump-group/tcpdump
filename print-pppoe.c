@@ -27,13 +27,7 @@
 
 #include <tcpdump-stdinc.h>
 
-#include <stdio.h>
-#include <string.h>
-
 #include "interface.h"
-#include "ppp.h"
-#include "ethertype.h"
-#include "ether.h"
 #include "extract.h"			/* must come after interface.h */
 
 /* Codes */
@@ -89,13 +83,13 @@ static const struct tok pppoetag2str[] = {
 #define MAXTAGPRINT 80
 
 u_int
-pppoe_if_print(const struct pcap_pkthdr *h, register const u_char *p)
+pppoe_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, register const u_char *p)
 {
-	return (pppoe_print(p, h->len));
+	return (pppoe_print(ndo, p, h->len));
 }
 
 u_int
-pppoe_print(register const u_char *bp, u_int length)
+pppoe_print(netdissect_options *ndo, register const u_char *bp, u_int length)
 {
 	u_int16_t pppoe_ver, pppoe_type, pppoe_code, pppoe_sessionid;
 	u_int pppoe_length;
@@ -107,7 +101,7 @@ pppoe_print(register const u_char *bp, u_int length)
 	}
 	length -= PPPOE_HDRLEN;
 	pppoe_packet = bp;
-	TCHECK2(*pppoe_packet, PPPOE_HDRLEN);
+	ND_TCHECK2(*pppoe_packet, PPPOE_HDRLEN);
 	pppoe_ver  = (pppoe_packet[0] & 0xF0) >> 4;
 	pppoe_type  = (pppoe_packet[0] & 0x0F);
 	pppoe_code = pppoe_packet[1];
@@ -116,22 +110,22 @@ pppoe_print(register const u_char *bp, u_int length)
 	pppoe_payload = pppoe_packet + PPPOE_HDRLEN;
 
 	if (pppoe_ver != 1) {
-		printf(" [ver %d]",pppoe_ver);
+		ND_PRINT((ndo, " [ver %d]",pppoe_ver));
 	}
 	if (pppoe_type != 1) {
-		printf(" [type %d]",pppoe_type);
+		ND_PRINT((ndo, " [type %d]",pppoe_type));
 	}
 
-	printf("PPPoE %s", tok2str(pppoecode2str, "PAD-%x", pppoe_code));
+	ND_PRINT((ndo, "PPPoE %s", tok2str(pppoecode2str, "PAD-%x", pppoe_code)));
 	if (pppoe_code == PPPOE_PADI && pppoe_length > 1484 - PPPOE_HDRLEN) {
-		printf(" [len %u!]",pppoe_length);
+		ND_PRINT((ndo, " [len %u!]",pppoe_length));
 	}
 	if (pppoe_length > length) {
-		printf(" [len %u > %u!]", pppoe_length, length);
+		ND_PRINT((ndo, " [len %u > %u!]", pppoe_length, length));
 		pppoe_length = length;
 	}
 	if (pppoe_sessionid) {
-		printf(" [ses 0x%x]", pppoe_sessionid);
+		ND_PRINT((ndo, " [ses 0x%x]", pppoe_sessionid));
 	}
 
 	if (pppoe_code) {
@@ -145,7 +139,7 @@ pppoe_print(register const u_char *bp, u_int length)
 		 * tag_type is previous tag or 0xffff for first iteration
 		 */
 		while (tag_type && p < pppoe_payload + pppoe_length) {
-			TCHECK2(*p, 4);
+			ND_TCHECK2(*p, 4);
 			tag_type = EXTRACT_16BITS(p);
 			tag_len = EXTRACT_16BITS(p + 2);
 			p += 4;
@@ -158,7 +152,7 @@ pppoe_print(register const u_char *bp, u_int length)
 				unsigned tag_str_len = 0;
 
 				/* TODO print UTF-8 decoded text */
-				TCHECK2(*p, tag_len);
+				ND_TCHECK2(*p, tag_len);
 				for (v = p; v < p + tag_len && tag_str_len < MAXTAGPRINT-1; v++)
 					if (*v >= 32 && *v < 127) {
 						tag_str[tag_str_len++] = *v;
@@ -170,24 +164,24 @@ pppoe_print(register const u_char *bp, u_int length)
 				tag_str[tag_str_len] = 0;
 
 				if (isascii > isgarbage) {
-					printf(" [%s \"%*.*s\"]",
+					ND_PRINT((ndo, " [%s \"%*.*s\"]",
 					       tok2str(pppoetag2str, "TAG-0x%x", tag_type),
 					       (int)tag_str_len,
 					       (int)tag_str_len,
-					       tag_str);
+					       tag_str));
 				} else {
 					/* Print hex, not fast to abuse printf but this doesn't get used much */
-					printf(" [%s 0x", tok2str(pppoetag2str, "TAG-0x%x", tag_type));
+					ND_PRINT((ndo, " [%s 0x", tok2str(pppoetag2str, "TAG-0x%x", tag_type)));
 					for (v=p; v<p+tag_len; v++) {
-						printf("%02X", *v);
+						ND_PRINT((ndo, "%02X", *v));
 					}
-					printf("]");
+					ND_PRINT((ndo, "]"));
 				}
 
 
 			} else
-				printf(" [%s]", tok2str(pppoetag2str,
-				    "TAG-0x%x", tag_type));
+				ND_PRINT((ndo, " [%s]", tok2str(pppoetag2str,
+				    "TAG-0x%x", tag_type)));
 
 			p += tag_len;
 			/* p points to next tag */
@@ -195,11 +189,11 @@ pppoe_print(register const u_char *bp, u_int length)
 		return (0);
 	} else {
 		/* PPPoE data */
-		printf(" ");
+		ND_PRINT((ndo, " "));
 		return (PPPOE_HDRLEN + ppp_print(pppoe_payload, pppoe_length));
 	}
 
 trunc:
-	printf("[|pppoe]");
+	ND_PRINT((ndo, "[|pppoe]"));
 	return (PPPOE_HDRLEN);
 }

@@ -89,7 +89,7 @@ chdlc_print(netdissect_options *ndo, register const u_char *p, u_int length) {
 #endif
         case ETHERTYPE_MPLS:
         case ETHERTYPE_MPLS_MULTI:
-                mpls_print(p, length);
+                mpls_print(ndo, p, length);
 		break;
         case ETHERTYPE_ISO:
                 /* is the fudge byte set ? lets verify by spotting ISO headers */

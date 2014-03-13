@@ -26,9 +26,8 @@
 #ifdef INET6
 
 #include <tcpdump-stdinc.h>
-#include <stdio.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
 
@@ -86,8 +85,6 @@ struct	rip6 {
 
 #define	HOPCNT_INFINITY6	16
 
-#define	RIP6_PORT		521
-
 #if !defined(IN6_IS_ADDR_UNSPECIFIED) && !defined(_MSC_VER) /* MSVC inline */
 static int IN6_IS_ADDR_UNSPECIFIED(const struct in6_addr *addr)
 {
@@ -97,19 +94,19 @@ static int IN6_IS_ADDR_UNSPECIFIED(const struct in6_addr *addr)
 #endif
 
 static int
-rip6_entry_print(register const struct netinfo6 *ni, int metric)
+rip6_entry_print(netdissect_options *ndo, register const struct netinfo6 *ni, int metric)
 {
 	int l;
-	l = printf("%s/%d", ip6addr_string(&ni->rip6_dest), ni->rip6_plen);
+	l = ND_PRINT((ndo, "%s/%d", ip6addr_string(&ni->rip6_dest), ni->rip6_plen));
 	if (ni->rip6_tag)
-		l += printf(" [%d]", EXTRACT_16BITS(&ni->rip6_tag));
+		l += ND_PRINT((ndo, " [%d]", EXTRACT_16BITS(&ni->rip6_tag)));
 	if (metric)
-		l += printf(" (%d)", ni->rip6_metric);
+		l += ND_PRINT((ndo, " (%d)", ni->rip6_metric));
 	return l;
 }
 
 void
-ripng_print(const u_char *dat, unsigned int length)
+ripng_print(netdissect_options *ndo, const u_char *dat, unsigned int length)
 {
 	register const struct rip6 *rp = (struct rip6 *)dat;
 	register const struct netinfo6 *ni;
@@ -118,9 +115,9 @@ ripng_print(const u_char *dat, unsigned int length)
 	int j;
 	int trunc;
 
-	if (snapend < dat)
+	if (ndo->ndo_snapend < dat)
 		return;
-	amt = snapend - dat;
+	amt = ndo->ndo_snapend - dat;
 	i = min(length, amt);
 	if (i < (sizeof(struct rip6) - sizeof(struct netinfo6)))
 		return;
@@ -133,46 +130,46 @@ ripng_print(const u_char *dat, unsigned int length)
 		if (j == 1
 		    &&  rp->rip6_nets->rip6_metric == HOPCNT_INFINITY6
 		    &&  IN6_IS_ADDR_UNSPECIFIED(&rp->rip6_nets->rip6_dest)) {
-			printf(" ripng-req dump");
+			ND_PRINT((ndo, " ripng-req dump"));
 			break;
 		}
 		if (j * sizeof(*ni) != length - 4)
-			printf(" ripng-req %d[%u]:", j, length);
+			ND_PRINT((ndo, " ripng-req %d[%u]:", j, length));
 		else
-			printf(" ripng-req %d:", j);
+			ND_PRINT((ndo, " ripng-req %d:", j));
 		trunc = ((i / sizeof(*ni)) * sizeof(*ni) != i);
 		for (ni = rp->rip6_nets; i >= sizeof(*ni);
 		    i -= sizeof(*ni), ++ni) {
-			if (vflag > 1)
-				printf("\n\t");
+			if (ndo->ndo_vflag > 1)
+				ND_PRINT((ndo, "\n\t"));
 			else
-				printf(" ");
-			rip6_entry_print(ni, 0);
+				ND_PRINT((ndo, " "));
+			rip6_entry_print(ndo, ni, 0);
 		}
 		break;
 	case RIP6_RESPONSE:
 		j = length / sizeof(*ni);
 		if (j * sizeof(*ni) != length - 4)
-			printf(" ripng-resp %d[%u]:", j, length);
+			ND_PRINT((ndo, " ripng-resp %d[%u]:", j, length));
 		else
-			printf(" ripng-resp %d:", j);
+			ND_PRINT((ndo, " ripng-resp %d:", j));
 		trunc = ((i / sizeof(*ni)) * sizeof(*ni) != i);
 		for (ni = rp->rip6_nets; i >= sizeof(*ni);
 		    i -= sizeof(*ni), ++ni) {
-			if (vflag > 1)
-				printf("\n\t");
+			if (ndo->ndo_vflag > 1)
+				ND_PRINT((ndo, "\n\t"));
 			else
-				printf(" ");
-			rip6_entry_print(ni, ni->rip6_metric);
+				ND_PRINT((ndo, " "));
+			rip6_entry_print(ndo, ni, ni->rip6_metric);
 		}
 		if (trunc)
-			printf("[|ripng]");
+			ND_PRINT((ndo, "[|ripng]"));
 		break;
 	default:
-		printf(" ripng-%d ?? %u", rp->rip6_cmd, length);
+		ND_PRINT((ndo, " ripng-%d ?? %u", rp->rip6_cmd, length));
 		break;
 	}
 	if (rp->rip6_vers != RIP6_VERSION)
-		printf(" [vers %d]", rp->rip6_vers);
+		ND_PRINT((ndo, " [vers %d]", rp->rip6_vers));
 }
 #endif /* INET6 */

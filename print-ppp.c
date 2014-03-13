@@ -1471,14 +1471,14 @@ handle_ppp(u_int proto, const u_char *p, int length)
 #endif
 	case ETHERTYPE_IPX:	/*XXX*/
 	case PPP_IPX:
-		ipx_print(p, length);
+		ipx_print(gndo, p, length);
 		break;
 	case PPP_OSI:
 	        isoclns_print(p, length, length);
 	        break;
 	case PPP_MPLS_UCAST:
 	case PPP_MPLS_MCAST:
-		mpls_print(p, length);
+		mpls_print(gndo, p, length);
 		break;
 	case PPP_COMP:
 		printf("compressed PPP data");
@@ -1781,7 +1781,7 @@ ppp_bsdos_if_print(const struct pcap_pkthdr *h _U_, register const u_char *p _U_
 #endif
 			case PPP_MPLS_UCAST:
 			case PPP_MPLS_MCAST:
-				mpls_print(p, length);
+				mpls_print(gndo, p, length);
 				break;
 			}
 			goto printx;
@@ -1800,7 +1800,7 @@ ppp_bsdos_if_print(const struct pcap_pkthdr *h _U_, register const u_char *p _U_
 #endif
 			case PPP_MPLS_UCAST:
 			case PPP_MPLS_MCAST:
-				mpls_print(p, length);
+				mpls_print(gndo, p, length);
 				break;
 			}
 			goto printx;

@@ -402,6 +402,14 @@ extern u_int usb_linux_64_byte_print(netdissect_options *, const struct pcap_pkt
 extern u_int symantec_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
 extern u_int chdlc_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
 extern u_int chdlc_print(netdissect_options *, register const u_char *, u_int);
+extern void zmtp1_print(netdissect_options *, const u_char *, u_int);
+extern void zmtp1_print_datagram(netdissect_options *, const u_char *, const u_int);
+extern void ipx_print(netdissect_options *, const u_char *, u_int);
+extern void mpls_print(netdissect_options *, const u_char *, u_int);
+extern u_int pppoe_print(netdissect_options *, const u_char *, u_int);
+extern u_int pppoe_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern void sunrpcrequest_print(netdissect_options *, const u_char *, u_int, const u_char *);
+extern u_int pflog_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
 
 /* stuff that has not yet been rototiled */
 extern const u_char * ns_nprint (register const u_char *, register const u_char *);
@@ -442,7 +450,6 @@ extern void igmp_print(netdissect_options *,
 		       register const u_char *, u_int);
 extern void igrp_print(netdissect_options *,const u_char *, u_int,
 		       const u_char *);
-extern void ipx_print(netdissect_options *,const u_char *, u_int);
 extern void isoclns_print(netdissect_options *,const u_char *,
 			  u_int, u_int, const u_char *,	const u_char *);
 extern void krb_print(netdissect_options *,const u_char *, u_int);
@@ -452,8 +459,6 @@ extern const char *linkaddr_string(netdissect_options *ndo,
 extern void ltalk_if_print(netdissect_options *ndo,
 			   u_char *user, const struct pcap_pkthdr *h,
 			   const u_char *p);
-extern void mpls_print(netdissect_options *ndo,
-		       const u_char *bp, u_int length);
 extern void msdp_print(netdissect_options *ndo,
 		       const unsigned char *sp, u_int length);
 extern void nfsreply_print(netdissect_options *,const u_char *,
@@ -468,8 +473,6 @@ extern void ospf_print(netdissect_options *,const u_char *,
 extern void pimv1_print(netdissect_options *,const u_char *, u_int);
 extern void mobile_print(netdissect_options *,const u_char *, u_int);
 extern void pim_print(netdissect_options *,const u_char *, u_int, u_int);
-extern void pppoe_if_print(u_char *,const struct pcap_pkthdr *, const u_char *);
-extern void pppoe_print(netdissect_options *,const u_char *, u_int);
 extern void ppp_print(netdissect_options *,
 		      register const u_char *, u_int);
 
@@ -495,8 +498,6 @@ extern void sll_if_print(u_char *,
 			 const struct pcap_pkthdr *, const u_char *);
 
 extern void snmp_print(netdissect_options *,const u_char *, u_int);
-extern void sunrpcrequest_print(netdissect_options *,const u_char *,
-				u_int, const u_char *);
 extern void tcp_print(netdissect_options *,const u_char *, u_int,
 		      const u_char *, int);
 extern void tftp_print(netdissect_options *,const u_char *, u_int);
@@ -541,13 +542,12 @@ extern u_int ieee802_15_4_if_print(netdissect_options *,const struct pcap_pkthdr
 extern void ip6_print(netdissect_options *,const u_char *, u_int);
 extern int frag6_print(netdissect_options *, const u_char *, const u_char *);
 extern int rt6_print(netdissect_options *, const u_char *, const u_char *);
+extern int hbhopt_print(netdissect_options *, const u_char *);
+extern int dstopt_print(netdissect_options *, const u_char *);
+extern void ripng_print(netdissect_options *, const u_char *, unsigned int);
 #if 0
-extern void ip6_opt_print(netdissect_options *,const u_char *, int);
-extern int hbhopt_print(netdissect_options *,const u_char *);
-extern int dstopt_print(netdissect_options *,const u_char *);
 extern void icmp6_print(netdissect_options *,const u_char *,
 			const u_char *);
-extern void ripng_print(netdissect_options *,const u_char *, int);
 extern void ospf6_print(netdissect_options *,const u_char *, u_int);
 extern void dhcp6_print(netdissect_options *,const u_char *,
 			u_int, u_int16_t, u_int16_t);

@@ -125,7 +125,7 @@ null_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 		break;
 
 	case BSD_AFNUM_IPX:
-		ipx_print(p, length);
+		ipx_print(ndo, p, length);
 		break;
 
 	default:

@@ -663,7 +663,7 @@ tcp_print(register const u_char *bp, register u_int length,
         if (packettype) {
                 switch (packettype) {
                 case PT_ZMTP1:
-                        zmtp1_print(bp, length);
+                        zmtp1_print(gndo, bp, length);
                         break;
                 }
                 return;

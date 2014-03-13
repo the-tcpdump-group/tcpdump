@@ -205,10 +205,10 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 		break;
 #endif
 	case ETHERTYPE_MPLS:
-		mpls_print(bp, len);
+		mpls_print(ndo, bp, len);
 		break;
 	case ETHERTYPE_IPX:
-		ipx_print(bp, len);
+		ipx_print(ndo, bp, len);
 		break;
 	case ETHERTYPE_ATALK:
 		atalk_print(bp, len);

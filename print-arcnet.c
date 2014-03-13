@@ -344,7 +344,7 @@ arcnet_encap_print(netdissect_options *ndo, u_char arctype, const u_char *p,
 		return (1);
 
 	case ARCTYPE_IPX:
-		ipx_print(p, length);
+		ipx_print(ndo, p, length);
 		return (1);
 
 	default:

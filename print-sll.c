@@ -241,7 +241,7 @@ recurse:
 			/*
 			 * Ethernet_802.3 IPX frame.
 			 */
-			ipx_print(p, length);
+			ipx_print(gndo, p, length);
 			break;
 
 		case LINUX_SLL_P_802_2:

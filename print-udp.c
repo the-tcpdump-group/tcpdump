@@ -422,7 +422,7 @@ udp_print(register const u_char *bp, u_int length,
 			rp = (struct sunrpc_msg *)(up + 1);
 			direction = (enum sunrpc_msg_type)EXTRACT_32BITS(&rp->rm_direction);
 			if (direction == SUNRPC_CALL)
-				sunrpcrequest_print((u_char *)rp, length,
+				sunrpcrequest_print(gndo, (u_char *)rp, length,
 				    (u_char *)ip);
 			else
 				nfsreply_print((u_char *)rp, length,
@@ -623,7 +623,7 @@ udp_print(register const u_char *bp, u_int length,
 				 (u_char *) ip);
 #ifdef INET6
 		else if (ISPORT(RIPNG_PORT))
-			ripng_print((const u_char *)(up + 1), length);
+			ripng_print(gndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(DHCP6_SERV_PORT) || ISPORT(DHCP6_CLI_PORT))
 			dhcp6_print((const u_char *)(up + 1), length);
 		else if (ISPORT(AHCP_PORT))

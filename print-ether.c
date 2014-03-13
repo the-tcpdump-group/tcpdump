@@ -353,7 +353,7 @@ ethertype_print(netdissect_options *ndo,
 
 	case ETHERTYPE_IPX:
 		ND_PRINT((ndo, "(NOV-ETHII) "));
-		ipx_print(/*ndo,*/p, length);
+		ipx_print(ndo, p, length);
 		return (1);
 
         case ETHERTYPE_ISO:
@@ -364,7 +364,7 @@ ethertype_print(netdissect_options *ndo,
 	case ETHERTYPE_PPPOES:
 	case ETHERTYPE_PPPOED2:
 	case ETHERTYPE_PPPOES2:
-		pppoe_print(/*ndo,*/p, length);
+		pppoe_print(ndo, p, length);
 		return (1);
 
 	case ETHERTYPE_EAPOL:
@@ -405,7 +405,7 @@ ethertype_print(netdissect_options *ndo,
 
 	case ETHERTYPE_MPLS:
 	case ETHERTYPE_MPLS_MULTI:
-		mpls_print(/*ndo,*/p, length);
+		mpls_print(ndo, p, length);
 		return (1);
 
 	case ETHERTYPE_TIPC:
