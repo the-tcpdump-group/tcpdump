@@ -622,7 +622,7 @@ of10_data_print(const u_char *cp, const u_char *ep, const u_int len) {
 	printf("\n\t data (%u octets)", len);
 	TCHECK2(*cp, len);
 	if (vflag >= 2)
-		hex_and_ascii_print("\n\t  ", cp, len);
+		hex_and_ascii_print(gndo, "\n\t  ", cp, len);
 	return cp + len;
 
 trunc:

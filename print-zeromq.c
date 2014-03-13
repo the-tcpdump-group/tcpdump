@@ -126,7 +126,7 @@ zmtp1_print_frame(const u_char *cp, const u_char *ep) {
 			body_len_printed = MIN(VBYTES + 1, body_len_printed);
 		if (body_len_printed > 1) {
 			printf(", first %" PRIu64 " byte(s) of body:", body_len_printed - 1);
-			hex_and_ascii_print("\n\t ", cp + header_len + 1, body_len_printed - 1);
+			hex_and_ascii_print(gndo, "\n\t ", cp + header_len + 1, body_len_printed - 1);
 			printf("\n");
 		}
 	}
@@ -194,7 +194,7 @@ zmtp1_print_intermediate_part(const u_char *cp, const u_int len) {
 				len_printed = MIN(VBYTES, len_printed);
 			if (len_printed > 1) {
 				printf(", first %"PRIu64" byte(s):", len_printed);
-				hex_and_ascii_print("\n\t ", cp, len_printed);
+				hex_and_ascii_print(gndo, "\n\t ", cp, len_printed);
 				printf("\n");
 			}
 		}

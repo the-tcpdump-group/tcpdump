@@ -368,6 +368,9 @@ extern int print_unknown_data(netdissect_options *,const u_char *, const char *,
 extern void hex_print_with_offset(netdissect_options *, const char *ident, const u_char *cp,
 				  u_int, u_int);
 extern void hex_print(netdissect_options *,const char *ident, const u_char *cp,u_int);
+extern void hex_and_ascii_print_with_offset(netdissect_options *, const char *, const u_char *, u_int, u_int);
+extern void hex_and_ascii_print(netdissect_options *, const char *, const u_char *, u_int);
+
 extern int ah_print(netdissect_options *, register const u_char *);
 extern void beep_print(netdissect_options *, const u_char *, u_int);
 extern void dtp_print(netdissect_options *, const u_char *, u_int);
@@ -405,9 +408,6 @@ extern const u_char * ns_nprint (register const u_char *, register const u_char 
 
 #if 0
 extern void ascii_print(netdissect_options *,u_int);
-extern void hex_and_ascii_print_with_offset(netdissect_options *,const char *,
-				    u_int, u_int);
-extern void hex_and_ascii_print(netdissect_options *,const char *, u_int);
 extern void telnet_print(netdissect_options *,const u_char *, u_int);
 extern int llc_print(netdissect_options *,
 		     const u_char *, u_int, u_int, const u_char *,

@@ -174,9 +174,6 @@ extern u_int16_t create_osi_cksum(const u_int8_t *, int, int);
 #include <pcap.h>
 
 extern void ascii_print(const u_char *, u_int);
-extern void hex_and_ascii_print_with_offset(const char *, const u_char *,
-	u_int, u_int);
-extern void hex_and_ascii_print(const char *, const u_char *, u_int);
 extern void telnet_print(const u_char *, u_int);
 extern int llc_print(const u_char *, u_int, u_int, const u_char *,
 	const u_char *, u_short *);

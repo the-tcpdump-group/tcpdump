@@ -1995,7 +1995,7 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 			/*
 			 * Include the link-layer header.
 			 */
-			hex_and_ascii_print("\n\t", sp, h->caplen);
+			hex_and_ascii_print(ndo, "\n\t", sp, h->caplen);
 		} else {
 			/*
 			 * Don't include the link-layer header - and if
@@ -2003,7 +2003,7 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 			 * print nothing.
 			 */
 			if (h->caplen > hdrlen)
-				hex_and_ascii_print("\n\t", sp + hdrlen,
+				hex_and_ascii_print(ndo, "\n\t", sp + hdrlen,
 				    h->caplen - hdrlen);
 		}
 	} else if (ndo->ndo_xflag) {
@@ -2083,9 +2083,9 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
  * By default, print the specified data out in hex and ASCII.
  */
 static void
-ndo_default_print(netdissect_options *ndo _U_, const u_char *bp, u_int length)
+ndo_default_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
-	hex_and_ascii_print("\n\t", bp, length); /* pass on lf and identation string */
+	hex_and_ascii_print(ndo, "\n\t", bp, length); /* pass on lf and identation string */
 }
 
 void

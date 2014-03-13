@@ -85,7 +85,7 @@ ascii_print(register const u_char *cp, register u_int length)
 }
 
 void
-hex_and_ascii_print_with_offset(register const char *ident,
+hex_and_ascii_print_with_offset(netdissect_options *ndo, register const char *ident,
     register const u_char *cp, register u_int length, register u_int oset)
 {
 	register u_int i;
@@ -108,9 +108,9 @@ hex_and_ascii_print_with_offset(register const char *ident,
 		i++;
 		if (i >= HEXDUMP_SHORTS_PER_LINE) {
 			*hsp = *asp = '\0';
-			(void)printf("%s0x%04x: %-*s  %s",
+			ND_PRINT((ndo, "%s0x%04x: %-*s  %s",
 			    ident, oset, HEXDUMP_HEXSTUFF_PER_LINE,
-			    hexstuff, asciistuff);
+			    hexstuff, asciistuff));
 			i = 0; hsp = hexstuff; asp = asciistuff;
 			oset += HEXDUMP_BYTES_PER_LINE;
 		}
@@ -125,17 +125,17 @@ hex_and_ascii_print_with_offset(register const char *ident,
 	}
 	if (i > 0) {
 		*hsp = *asp = '\0';
-		(void)printf("%s0x%04x: %-*s  %s",
+		ND_PRINT((ndo, "%s0x%04x: %-*s  %s",
 		     ident, oset, HEXDUMP_HEXSTUFF_PER_LINE,
-		     hexstuff, asciistuff);
+		     hexstuff, asciistuff));
 	}
 }
 
 void
-hex_and_ascii_print(register const char *ident, register const u_char *cp,
-    register u_int length)
+hex_and_ascii_print(netdissect_options *ndo, register const char *ident,
+    register const u_char *cp, register u_int length)
 {
-	hex_and_ascii_print_with_offset(ident, cp, length, 0);
+	hex_and_ascii_print_with_offset(ndo, ident, cp, length, 0);
 }
 
 /*
