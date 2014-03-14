@@ -6,8 +6,6 @@
  * or later
  */
 
-#define SMBMIN(a,b) ((a)<(b)?(a):(b))
-
 /* the complete */
 #define SMBmkdir      0x00   /* create directory */
 #define SMBrmdir      0x01   /* delete directory */

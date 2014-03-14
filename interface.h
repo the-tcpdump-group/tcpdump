@@ -82,13 +82,6 @@ extern char *strsep(char **, const char *);
 #define PT_PGM_ZMTP1	15	/* ZMTP/1.0 inside PGM (native or UDP-encapsulated) */
 #define PT_LMP		16	/* Link Management Protocol */
 
-#ifndef min
-#define min(a,b) ((a)>(b)?(b):(a))
-#endif
-#ifndef max
-#define max(a,b) ((b)>(a)?(b):(a))
-#endif
-
 #define ESRC(ep) ((ep)->ether_shost)
 #define EDST(ep) ((ep)->ether_dhost)
 
@@ -98,10 +91,6 @@ extern char *strsep(char **, const char *);
 #define HTONL(x)	(x) = htonl(x)
 #define HTONS(x)	(x) = htons(x)
 #endif
-#endif
-
-#ifndef MIN
-#define MIN(a,b) ((a)<(b)?(a):(b))
 #endif
 
 extern char *program_name;	/* used to generate self-identifying messages */

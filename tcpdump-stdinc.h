@@ -268,4 +268,11 @@ typedef char* caddr_t;
  * end of Apple deprecation workaround macros
  */
 
+#ifndef min
+#define min(a,b) ((a)>(b)?(b):(a))
+#endif
+#ifndef max
+#define max(a,b) ((b)>(a)?(b):(a))
+#endif
+
 #endif /* tcpdump_stdinc_h */

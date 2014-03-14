@@ -186,7 +186,7 @@ zmtp1_print_intermediate_part(netdissect_options *ndo, const u_char *cp, const u
 		if (frame_offset > remaining_len)
 			ND_PRINT((ndo, " (%"PRIu64" captured)", remaining_len));
 		if (ndo->ndo_vflag) {
-			u_int64_t len_printed = MIN(frame_offset, remaining_len);
+			u_int64_t len_printed = min(frame_offset, remaining_len);
 
 			if (ndo->ndo_vflag == 1)
 				len_printed = MIN(VBYTES, len_printed);
@@ -206,7 +206,7 @@ trunc:
 
 void
 zmtp1_print_datagram(netdissect_options *ndo, const u_char *cp, const u_int len) {
-	const u_char *ep = MIN(ndo->ndo_snapend, cp + len);
+	const u_char *ep = min(ndo->ndo_snapend, cp + len);
 
 	cp = zmtp1_print_intermediate_part(ndo, cp, len);
 	while (cp < ep)

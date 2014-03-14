@@ -360,7 +360,7 @@ print_trans(const u_char *words, const u_char *data1, const u_char *buf, const u
 	f4 = "|Data ";
     }
 
-    smb_fdata(words + 1, f1, SMBMIN(words + 1 + 2 * words[0], maxbuf),
+    smb_fdata(words + 1, f1, min(words + 1 + 2 * words[0], maxbuf),
         unicodestr);
 
     TCHECK2(*data1, 2);
@@ -380,9 +380,9 @@ print_trans(const u_char *words, const u_char *data1, const u_char *buf, const u
 	}
 
 	if (paramlen)
-	    smb_fdata(param, f3, SMBMIN(param + paramlen, maxbuf), unicodestr);
+	    smb_fdata(param, f3, min(param + paramlen, maxbuf), unicodestr);
 	if (datalen)
-	    smb_fdata(data, f4, SMBMIN(data + datalen, maxbuf), unicodestr);
+	    smb_fdata(data, f4, min(data + datalen, maxbuf), unicodestr);
     }
     return;
 trunc:
@@ -411,20 +411,20 @@ print_negprot(const u_char *words, const u_char *data, const u_char *buf _U_, co
     }
 
     if (f1)
-	smb_fdata(words + 1, f1, SMBMIN(words + 1 + wct * 2, maxbuf),
+	smb_fdata(words + 1, f1, min(words + 1 + wct * 2, maxbuf),
 	    unicodestr);
     else
-	print_data(words + 1, SMBMIN(wct * 2, PTR_DIFF(maxbuf, words + 1)));
+	print_data(words + 1, min(wct * 2, PTR_DIFF(maxbuf, words + 1)));
 
     TCHECK2(*data, 2);
     bcc = EXTRACT_LE_16BITS(data);
     printf("smb_bcc=%u\n", bcc);
     if (bcc > 0) {
 	if (f2)
-	    smb_fdata(data + 2, f2, SMBMIN(data + 2 + EXTRACT_LE_16BITS(data),
+	    smb_fdata(data + 2, f2, min(data + 2 + EXTRACT_LE_16BITS(data),
 		maxbuf), unicodestr);
 	else
-	    print_data(data + 2, SMBMIN(EXTRACT_LE_16BITS(data), PTR_DIFF(maxbuf, data + 2)));
+	    print_data(data + 2, min(EXTRACT_LE_16BITS(data), PTR_DIFF(maxbuf, data + 2)));
     }
     return;
 trunc:
@@ -455,20 +455,20 @@ print_sesssetup(const u_char *words, const u_char *data, const u_char *buf _U_, 
     }
 
     if (f1)
-	smb_fdata(words + 1, f1, SMBMIN(words + 1 + wct * 2, maxbuf),
+	smb_fdata(words + 1, f1, min(words + 1 + wct * 2, maxbuf),
 	    unicodestr);
     else
-	print_data(words + 1, SMBMIN(wct * 2, PTR_DIFF(maxbuf, words + 1)));
+	print_data(words + 1, min(wct * 2, PTR_DIFF(maxbuf, words + 1)));
 
     TCHECK2(*data, 2);
     bcc = EXTRACT_LE_16BITS(data);
     printf("smb_bcc=%u\n", bcc);
     if (bcc > 0) {
 	if (f2)
-	    smb_fdata(data + 2, f2, SMBMIN(data + 2 + EXTRACT_LE_16BITS(data),
+	    smb_fdata(data + 2, f2, min(data + 2 + EXTRACT_LE_16BITS(data),
 		maxbuf), unicodestr);
 	else
-	    print_data(data + 2, SMBMIN(EXTRACT_LE_16BITS(data), PTR_DIFF(maxbuf, data + 2)));
+	    print_data(data + 2, min(EXTRACT_LE_16BITS(data), PTR_DIFF(maxbuf, data + 2)));
     }
     return;
 trunc:
@@ -496,7 +496,7 @@ print_lockingandx(const u_char *words, const u_char *data, const u_char *buf _U_
 	f1 = "Com2=[w]\nOff2=[d]\n";
     }
 
-    maxwords = SMBMIN(words + 1 + wct * 2, maxbuf);
+    maxwords = min(words + 1 + wct * 2, maxbuf);
     if (wct)
 	smb_fdata(words + 1, f1, maxwords, unicodestr);
 
@@ -505,10 +505,10 @@ print_lockingandx(const u_char *words, const u_char *data, const u_char *buf _U_
     printf("smb_bcc=%u\n", bcc);
     if (bcc > 0) {
 	if (f2)
-	    smb_fdata(data + 2, f2, SMBMIN(data + 2 + EXTRACT_LE_16BITS(data),
+	    smb_fdata(data + 2, f2, min(data + 2 + EXTRACT_LE_16BITS(data),
 		maxbuf), unicodestr);
 	else
-	    print_data(data + 2, SMBMIN(EXTRACT_LE_16BITS(data), PTR_DIFF(maxbuf, data + 2)));
+	    print_data(data + 2, min(EXTRACT_LE_16BITS(data), PTR_DIFF(maxbuf, data + 2)));
     }
     return;
 trunc:
@@ -844,7 +844,7 @@ print_smb(const u_char *buf, const u_char *maxbuf)
 	TCHECK(words[0]);
 	wct = words[0];
 	data = words + 1 + wct * 2;
-	maxwords = SMBMIN(data, maxbuf);
+	maxwords = min(data, maxbuf);
 
 	if (request) {
 	    f1 = fn->descript.req_f1;
@@ -881,7 +881,7 @@ print_smb(const u_char *buf, const u_char *maxbuf)
 	    } else {
 		if (bcc > 0) {
 		    printf("smb_buf[]=\n");
-		    print_data(data + 2, SMBMIN(bcc, PTR_DIFF(maxbuf, data + 2)));
+		    print_data(data + 2, min(bcc, PTR_DIFF(maxbuf, data + 2)));
 		}
 	    }
 	}

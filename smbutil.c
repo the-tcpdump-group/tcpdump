@@ -298,7 +298,7 @@ print_data(const unsigned char *buf, int len)
 	while (n--)
 	    printf("   ");
 
-	n = SMBMIN(8, i % 16);
+	n = min(8, i % 16);
 	print_asc(&buf[i - (i % 16)], n);
 	printf(" ");
 	n = (i % 16) - n;
