@@ -383,7 +383,7 @@ ethertype_print(netdissect_options *ndo,
 		return (1);
 
 	case ETHERTYPE_MPCP:
-	        mpcp_print(/*ndo,*/p, length);
+	        mpcp_print(ndo, p, length);
 		return (1);
 
 	case ETHERTYPE_SLOW:

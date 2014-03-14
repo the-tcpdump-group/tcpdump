@@ -167,7 +167,6 @@ struct ndo_printer {
 
 
 static const struct printer printers[] = {
-	{ token_if_print,	DLT_IEEE802 },
 	{ sl_if_print,		DLT_SLIP },
 #ifdef DLT_SLIP_BSDOS
 	{ sl_bsdos_if_print,	DLT_SLIP_BSDOS },
@@ -179,7 +178,6 @@ static const struct printer printers[] = {
 #ifdef DLT_PPP_BSDOS
 	{ ppp_bsdos_if_print,	DLT_PPP_BSDOS },
 #endif
-	{ fddi_if_print,	DLT_FDDI },
 	{ atm_if_print,		DLT_ATM_RFC1483 },
 #ifdef DLT_PPP_SERIAL
 	{ ppp_hdlc_if_print,	DLT_PPP_SERIAL },
@@ -344,6 +342,8 @@ static const struct ndo_printer ndo_printers[] = {
 #if defined(DLT_PFLOG) && defined(HAVE_NET_PFVAR_H)
 	{ pflog_if_print,	DLT_PFLOG },
 #endif
+	{ token_if_print,	DLT_IEEE802 },
+	{ fddi_if_print,	DLT_FDDI },
 	{ NULL,			0 },
 };
 

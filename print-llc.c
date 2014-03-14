@@ -488,7 +488,7 @@ snap_print(const u_char *p, u_int length, u_int caplen, u_int bridge_pad)
 			 * What remains is an 802.5 Token Ring
 			 * packet.
 			 */
-			token_print(p, length, caplen);
+			token_print(gndo, p, length, caplen);
 			return (1);
 
 		case PID_RFC2684_FDDI_FCS:
@@ -508,7 +508,7 @@ snap_print(const u_char *p, u_int length, u_int caplen, u_int bridge_pad)
 			/*
 			 * What remains is an FDDI packet.
 			 */
-			fddi_print(p, length, caplen);
+			fddi_print(gndo, p, length, caplen);
 			return (1);
 
 		case PID_RFC2684_BPDU:

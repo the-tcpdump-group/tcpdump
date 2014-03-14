@@ -608,7 +608,7 @@ udp_print(register const u_char *bp, u_int length,
 		else if (dport == VAT_PORT)
 			vat_print((const void *)(up + 1), up);
 		else if (ISPORT(ZEPHYR_SRV_PORT) || ISPORT(ZEPHYR_CLT_PORT))
-			zephyr_print((const void *)(up + 1), length);
+			zephyr_print(gndo, (const void *)(up + 1), length);
 		/*
 		 * Since there are 10 possible ports to check, I think
 		 * a <> test would be more efficient
@@ -660,7 +660,7 @@ udp_print(register const u_char *bp, u_int length,
                 else if (ISPORT(LMP_PORT))
 			lmp_print((const u_char *)(up + 1), length);
 		else if (ISPORT(VQP_PORT))
-			vqp_print((const u_char *)(up + 1), length);
+			vqp_print(gndo, (const u_char *)(up + 1), length);
                 else if (ISPORT(SFLOW_PORT))
                         sflow_print((const u_char *)(up + 1), length);
 	        else if (dport == LWAPP_CONTROL_PORT)

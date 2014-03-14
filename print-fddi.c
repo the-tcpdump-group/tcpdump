@@ -25,13 +25,10 @@
 
 #include <tcpdump-stdinc.h>
 
-#include <stdio.h>
 #include <string.h>
 
 #include "interface.h"
 #include "addrtoname.h"
-#include "ethertype.h"
-
 #include "ether.h"
 
 /*
@@ -160,67 +157,67 @@ static const u_char fddi_bit_swap[] = {
  * Print FDDI frame-control bits
  */
 static inline void
-print_fddi_fc(u_char fc)
+print_fddi_fc(netdissect_options *ndo, u_char fc)
 {
 	switch (fc) {
 
 	case FDDIFC_VOID:                         /* Void frame */
-		printf("void ");
+		ND_PRINT((ndo, "void "));
 		break;
 
 	case FDDIFC_NRT:                          /* Nonrestricted token */
-		printf("nrt ");
+		ND_PRINT((ndo, "nrt "));
 		break;
 
 	case FDDIFC_RT:                           /* Restricted token */
-		printf("rt ");
+		ND_PRINT((ndo, "rt "));
 		break;
 
 	case FDDIFC_SMT_INFO:                     /* SMT Info */
-		printf("info ");
+		ND_PRINT((ndo, "info "));
 		break;
 
 	case FDDIFC_SMT_NSA:                      /* SMT Next station adrs */
-		printf("nsa ");
+		ND_PRINT((ndo, "nsa "));
 		break;
 
 	case FDDIFC_MAC_BEACON:                   /* MAC Beacon frame */
-		printf("beacon ");
+		ND_PRINT((ndo, "beacon "));
 		break;
 
 	case FDDIFC_MAC_CLAIM:                    /* MAC Claim frame */
-		printf("claim ");
+		ND_PRINT((ndo, "claim "));
 		break;
 
 	default:
 		switch (fc & FDDIFC_CLFF) {
 
 		case FDDIFC_MAC:
-			printf("mac%1x ", fc & FDDIFC_ZZZZ);
+			ND_PRINT((ndo, "mac%1x ", fc & FDDIFC_ZZZZ));
 			break;
 
 		case FDDIFC_SMT:
-			printf("smt%1x ", fc & FDDIFC_ZZZZ);
+			ND_PRINT((ndo, "smt%1x ", fc & FDDIFC_ZZZZ));
 			break;
 
 		case FDDIFC_LLC_ASYNC:
-			printf("async%1x ", fc & FDDIFC_ZZZZ);
+			ND_PRINT((ndo, "async%1x ", fc & FDDIFC_ZZZZ));
 			break;
 
 		case FDDIFC_LLC_SYNC:
-			printf("sync%1x ", fc & FDDIFC_ZZZZ);
+			ND_PRINT((ndo, "sync%1x ", fc & FDDIFC_ZZZZ));
 			break;
 
 		case FDDIFC_IMP_ASYNC:
-			printf("imp_async%1x ", fc & FDDIFC_ZZZZ);
+			ND_PRINT((ndo, "imp_async%1x ", fc & FDDIFC_ZZZZ));
 			break;
 
 		case FDDIFC_IMP_SYNC:
-			printf("imp_sync%1x ", fc & FDDIFC_ZZZZ);
+			ND_PRINT((ndo, "imp_sync%1x ", fc & FDDIFC_ZZZZ));
 			break;
 
 		default:
-			printf("%02x ", fc);
+			ND_PRINT((ndo, "%02x ", fc));
 			break;
 		}
 	}
@@ -252,42 +249,43 @@ extract_fddi_addrs(const struct fddi_header *fddip, char *fsrc, char *fdst)
  * Print the FDDI MAC header
  */
 static inline void
-fddi_hdr_print(register const struct fddi_header *fddip, register u_int length,
-	   register const u_char *fsrc, register const u_char *fdst)
+fddi_hdr_print(netdissect_options *ndo,
+               register const struct fddi_header *fddip, register u_int length,
+               register const u_char *fsrc, register const u_char *fdst)
 {
 	const char *srcname, *dstname;
 
 	srcname = etheraddr_string(fsrc);
 	dstname = etheraddr_string(fdst);
 
-	if (vflag)
-		(void) printf("%02x %s %s %d: ",
+	if (ndo->ndo_vflag)
+		ND_PRINT((ndo, "%02x %s %s %d: ",
 		       fddip->fddi_fc,
 		       srcname, dstname,
-		       length);
-	else if (qflag)
-		printf("%s %s %d: ", srcname, dstname, length);
+		       length));
+	else if (ndo->ndo_qflag)
+		ND_PRINT((ndo, "%s %s %d: ", srcname, dstname, length));
 	else {
-		(void) print_fddi_fc(fddip->fddi_fc);
-		(void) printf("%s %s %d: ", srcname, dstname, length);
+		print_fddi_fc(ndo, fddip->fddi_fc);
+		ND_PRINT((ndo, "%s %s %d: ", srcname, dstname, length));
 	}
 }
 
 static inline void
-fddi_smt_print(const u_char *p _U_, u_int length _U_)
+fddi_smt_print(netdissect_options *ndo, const u_char *p _U_, u_int length _U_)
 {
-	printf("<SMT printer not yet implemented>");
+	ND_PRINT((ndo, "<SMT printer not yet implemented>"));
 }
 
 void
-fddi_print(const u_char *p, u_int length, u_int caplen)
+fddi_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 {
 	const struct fddi_header *fddip = (const struct fddi_header *)p;
 	struct ether_header ehdr;
 	u_short extracted_ethertype;
 
 	if (caplen < FDDI_HDRLEN) {
-		printf("[|fddi]");
+		ND_PRINT((ndo, "[|fddi]"));
 		return;
 	}
 
@@ -296,8 +294,8 @@ fddi_print(const u_char *p, u_int length, u_int caplen)
 	 */
 	extract_fddi_addrs(fddip, (char *)ESRC(&ehdr), (char *)EDST(&ehdr));
 
-	if (eflag)
-		fddi_hdr_print(fddip, length, ESRC(&ehdr), EDST(&ehdr));
+	if (ndo->ndo_eflag)
+		fddi_hdr_print(ndo, fddip, length, ESRC(&ehdr), EDST(&ehdr));
 
 	/* Skip over FDDI MAC header */
 	length -= FDDI_HDRLEN;
@@ -313,25 +311,25 @@ fddi_print(const u_char *p, u_int length, u_int caplen)
 			 * Some kinds of LLC packet we cannot
 			 * handle intelligently
 			 */
-			if (!eflag)
-				fddi_hdr_print(fddip, length + FDDI_HDRLEN,
+			if (!ndo->ndo_eflag)
+				fddi_hdr_print(ndo, fddip, length + FDDI_HDRLEN,
 				    ESRC(&ehdr), EDST(&ehdr));
 			if (extracted_ethertype) {
-				printf("(LLC %s) ",
-			etherproto_string(htons(extracted_ethertype)));
+				ND_PRINT((ndo, "(LLC %s) ",
+			etherproto_string(htons(extracted_ethertype))));
 			}
-			if (!suppress_default_print)
-				default_print(p, caplen);
+			if (!ndo->ndo_suppress_default_print)
+				ndo->ndo_default_print(ndo, p, caplen);
 		}
 	} else if ((fddip->fddi_fc & FDDIFC_CLFF) == FDDIFC_SMT)
-		fddi_smt_print(p, caplen);
+		fddi_smt_print(ndo, p, caplen);
 	else {
 		/* Some kinds of FDDI packet we cannot handle intelligently */
-		if (!eflag)
-			fddi_hdr_print(fddip, length + FDDI_HDRLEN, ESRC(&ehdr),
+		if (!ndo->ndo_eflag)
+			fddi_hdr_print(ndo, fddip, length + FDDI_HDRLEN, ESRC(&ehdr),
 			    EDST(&ehdr));
-		if (!suppress_default_print)
-			default_print(p, caplen);
+		if (!ndo->ndo_suppress_default_print)
+			ndo->ndo_default_print(ndo, p, caplen);
 	}
 }
 
@@ -342,9 +340,9 @@ fddi_print(const u_char *p, u_int length, u_int caplen)
  * is the number of bytes actually captured.
  */
 u_int
-fddi_if_print(const struct pcap_pkthdr *h, register const u_char *p)
+fddi_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, register const u_char *p)
 {
-	fddi_print(p, h->len, h->caplen);
+	fddi_print(ndo, p, h->len, h->caplen);
 
 	return (FDDI_HDRLEN);
 }

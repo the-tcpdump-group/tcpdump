@@ -410,6 +410,13 @@ extern u_int pppoe_print(netdissect_options *, const u_char *, u_int);
 extern u_int pppoe_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
 extern void sunrpcrequest_print(netdissect_options *, const u_char *, u_int, const u_char *);
 extern u_int pflog_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int token_print(netdissect_options *, const u_char *, u_int, u_int);
+extern u_int token_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern void vqp_print(netdissect_options *, register const u_char *, register u_int);
+extern void zephyr_print(netdissect_options *, const u_char *, int);
+extern void fddi_print(netdissect_options *, const u_char *, u_int, u_int);
+extern u_int fddi_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern void mpcp_print(netdissect_options *, const u_char *, u_int);
 
 /* stuff that has not yet been rototiled */
 extern const u_char * ns_nprint (register const u_char *, register const u_char *);
@@ -437,9 +444,6 @@ extern void default_print(netdissect_options *,const u_char *, u_int);
 extern void dvmrp_print(netdissect_options *,const u_char *, u_int);
 extern void egp_print(netdissect_options *,const u_char *, u_int,
 		      const u_char *);
-
-extern void token_if_print(u_char *,const struct pcap_pkthdr *,const u_char *);
-extern void fddi_if_print(u_char *,const struct pcap_pkthdr *, const u_char *);
 
 extern void icmp_print(netdissect_options *,const u_char *, u_int,
 		       const u_char *);
@@ -552,8 +556,6 @@ extern void ospf6_print(netdissect_options *,const u_char *, u_int);
 extern void dhcp6_print(netdissect_options *,const u_char *,
 			u_int, u_int16_t, u_int16_t);
 
-extern void zephyr_print(netdissect_options * ndo,
-			 const u_char *cp, int length);
 #endif /* 0 */
 
 #endif /*INET6*/
