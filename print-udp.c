@@ -25,10 +25,6 @@
 
 #include <tcpdump-stdinc.h>
 
-#ifdef SEGSIZE
-#undef SEGSIZE
-#endif
-
 #include <stdio.h>
 #include <string.h>
 

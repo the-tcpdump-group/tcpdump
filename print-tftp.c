@@ -27,10 +27,6 @@
 
 #include <tcpdump-stdinc.h>
 
-#ifdef SEGSIZE
-#undef SEGSIZE					/* SINIX sucks */
-#endif
-
 #include <stdio.h>
 #include <string.h>
 
@@ -40,7 +36,6 @@
 /*
  * Trivial File Transfer Protocol (IEN-133)
  */
-#define	SEGSIZE		512		/* data segment size */
 
 /*
  * Packet types.
