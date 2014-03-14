@@ -182,9 +182,6 @@ static const struct printer printers[] = {
 #ifdef DLT_PPP_SERIAL
 	{ ppp_hdlc_if_print,	DLT_PPP_SERIAL },
 #endif
-#ifdef DLT_LINUX_SLL
-	{ sll_if_print,		DLT_LINUX_SLL },
-#endif
 #ifdef DLT_IEEE802_11
 	{ ieee802_11_if_print,	DLT_IEEE802_11},
 #endif
@@ -344,6 +341,9 @@ static const struct ndo_printer ndo_printers[] = {
 #endif
 	{ token_if_print,	DLT_IEEE802 },
 	{ fddi_if_print,	DLT_FDDI },
+#ifdef DLT_LINUX_SLL
+	{ sll_if_print,		DLT_LINUX_SLL },
+#endif
 	{ NULL,			0 },
 };
 

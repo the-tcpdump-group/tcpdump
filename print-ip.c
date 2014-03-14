@@ -365,7 +365,7 @@ again:
 		break;
 
 	case IPPROTO_DCCP:
-		dccp_print(ipds->cp, (const u_char *)ipds->ip, ipds->len);
+		dccp_print(ndo, ipds->cp, (const u_char *)ipds->ip, ipds->len);
 		break;
 
 	case IPPROTO_TCP:

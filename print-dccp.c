@@ -224,26 +224,26 @@ static inline unsigned int dccp_basic_hdr_len(const struct dccp_hdr *dh)
 	return DCCPH_X(dh) ? sizeof(struct dccp_hdr_ext) : sizeof(struct dccp_hdr);
 }
 
-static void dccp_print_ack_no(const u_char *bp)
+static void dccp_print_ack_no(netdissect_options *ndo, const u_char *bp)
 {
 	const struct dccp_hdr *dh = (const struct dccp_hdr *)bp;
 	const u_char *ackp = bp + dccp_basic_hdr_len(dh);
 	u_int64_t ackno;
 
 	if (DCCPH_X(dh) != 0) {
-		TCHECK2(*ackp, 8);
+		ND_TCHECK2(*ackp, 8);
 		ackno = EXTRACT_48BITS(ackp + 2);
 	} else {
-		TCHECK2(*ackp, 4);
+		ND_TCHECK2(*ackp, 4);
 		ackno = EXTRACT_24BITS(ackp + 1);
 	}
 
-	(void)printf("(ack=%" PRIu64 ") ", ackno);
+	ND_PRINT((ndo, "(ack=%" PRIu64 ") ", ackno));
 trunc:
 	return;
 }
 
-static int dccp_print_option(const u_char *option, u_int hlen);
+static int dccp_print_option(netdissect_options *, const u_char *, u_int);
 
 /**
  * dccp_print - show dccp packet
@@ -251,7 +251,8 @@ static int dccp_print_option(const u_char *option, u_int hlen);
  * @data2 - beginning of enclosing
  * @len - lenght of ip packet
  */
-void dccp_print(const u_char *bp, const u_char *data2, u_int len)
+void dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
+                u_int len)
 {
 	const struct dccp_hdr *dh;
 	const struct ip *ip;
@@ -275,24 +276,24 @@ void dccp_print(const u_char *bp, const u_char *data2, u_int len)
 
 	/* make sure we have enough data to look at the X bit */
 	cp = (const u_char *)(dh + 1);
-	if (cp > snapend) {
-		printf("[Invalid packet|dccp]");
+	if (cp > ndo->ndo_snapend) {
+		ND_PRINT((ndo, "[Invalid packet|dccp]"));
 		return;
 	}
 	if (len < sizeof(struct dccp_hdr)) {
-		printf("truncated-dccp - %u bytes missing!",
-			     len - (u_int)sizeof(struct dccp_hdr));
+		ND_PRINT((ndo, "truncated-dccp - %u bytes missing!",
+			     len - (u_int)sizeof(struct dccp_hdr)));
 		return;
 	}
 
 	/* get the length of the generic header */
 	fixed_hdrlen = dccp_basic_hdr_len(dh);
 	if (len < fixed_hdrlen) {
-		printf("truncated-dccp - %u bytes missing!",
-			     len - fixed_hdrlen);
+		ND_PRINT((ndo, "truncated-dccp - %u bytes missing!",
+			     len - fixed_hdrlen));
 		return;
 	}
-	TCHECK2(*dh, fixed_hdrlen);
+	ND_TCHECK2(*dh, fixed_hdrlen);
 
 	sport = EXTRACT_16BITS(&dh->dccph_sport);
 	dport = EXTRACT_16BITS(&dh->dccph_dport);
@@ -300,38 +301,38 @@ void dccp_print(const u_char *bp, const u_char *data2, u_int len)
 
 #ifdef INET6
 	if (ip6) {
-		(void)printf("%s.%d > %s.%d: ",
+		ND_PRINT((ndo, "%s.%d > %s.%d: ",
 			     ip6addr_string(&ip6->ip6_src), sport,
-			     ip6addr_string(&ip6->ip6_dst), dport);
+			     ip6addr_string(&ip6->ip6_dst), dport));
 	} else
 #endif /*INET6*/
 	{
-		(void)printf("%s.%d > %s.%d: ",
+		ND_PRINT((ndo, "%s.%d > %s.%d: ",
 			     ipaddr_string(&ip->ip_src), sport,
-			     ipaddr_string(&ip->ip_dst), dport);
+			     ipaddr_string(&ip->ip_dst), dport));
 	}
 	fflush(stdout);
 
-	if (qflag) {
-		(void)printf(" %d", len - hlen);
+	if (ndo->ndo_qflag) {
+		ND_PRINT((ndo, " %d", len - hlen));
 		if (hlen > len) {
-			(void)printf("dccp [bad hdr length %u - too long, > %u]",
-			    hlen, len);
+			ND_PRINT((ndo, "dccp [bad hdr length %u - too long, > %u]",
+			    hlen, len));
 		}
 		return;
 	}
 
 	/* other variables in generic header */
-	if (vflag) {
-		(void)printf("CCVal %d, CsCov %d, ", DCCPH_CCVAL(dh), DCCPH_CSCOV(dh));
+	if (ndo->ndo_vflag) {
+		ND_PRINT((ndo, "CCVal %d, CsCov %d, ", DCCPH_CCVAL(dh), DCCPH_CSCOV(dh)));
 	}
 
 	/* checksum calculation */
-	if (vflag && TTEST2(bp[0], len)) {
+	if (ndo->ndo_vflag && ND_TTEST2(bp[0], len)) {
 		u_int16_t sum = 0, dccp_sum;
 
 		dccp_sum = EXTRACT_16BITS(&dh->dccph_checksum);
-		(void)printf("cksum 0x%04x ", dccp_sum);
+		ND_PRINT((ndo, "cksum 0x%04x ", dccp_sum));
 		if (IP_V(ip) == 4)
 			sum = dccp_cksum(ip, dh, len);
 #ifdef INET6
@@ -339,9 +340,9 @@ void dccp_print(const u_char *bp, const u_char *data2, u_int len)
 			sum = dccp6_cksum(ip6, dh, len);
 #endif
 		if (sum != 0)
-			(void)printf("(incorrect -> 0x%04x), ",in_cksum_shouldbe(dccp_sum, sum));
+			ND_PRINT((ndo, "(incorrect -> 0x%04x), ",in_cksum_shouldbe(dccp_sum, sum)));
 		else
-			(void)printf("(correct), ");
+			ND_PRINT((ndo, "(correct), "));
 	}
 
 	switch (DCCPH_TYPE(dh)) {
@@ -350,13 +351,13 @@ void dccp_print(const u_char *bp, const u_char *data2, u_int len)
 			(struct dccp_hdr_request *)(bp + fixed_hdrlen);
 		fixed_hdrlen += 4;
 		if (len < fixed_hdrlen) {
-			printf("truncated-dccp request - %u bytes missing!",
-				     len - fixed_hdrlen);
+			ND_PRINT((ndo, "truncated-dccp request - %u bytes missing!",
+				     len - fixed_hdrlen));
 			return;
 		}
-		TCHECK(*dhr);
-		(void)printf("request (service=%d) ",
-			     EXTRACT_32BITS(&dhr->dccph_req_service));
+		ND_TCHECK(*dhr);
+		ND_PRINT((ndo, "request (service=%d) ",
+			     EXTRACT_32BITS(&dhr->dccph_req_service)));
 		break;
 	}
 	case DCCP_PKT_RESPONSE: {
@@ -364,125 +365,125 @@ void dccp_print(const u_char *bp, const u_char *data2, u_int len)
 			(struct dccp_hdr_response *)(bp + fixed_hdrlen);
 		fixed_hdrlen += 12;
 		if (len < fixed_hdrlen) {
-			printf("truncated-dccp response - %u bytes missing!",
-				     len - fixed_hdrlen);
+			ND_PRINT((ndo, "truncated-dccp response - %u bytes missing!",
+				     len - fixed_hdrlen));
 			return;
 		}
-		TCHECK(*dhr);
-		(void)printf("response (service=%d) ",
-			     EXTRACT_32BITS(&dhr->dccph_resp_service));
+		ND_TCHECK(*dhr);
+		ND_PRINT((ndo, "response (service=%d) ",
+			     EXTRACT_32BITS(&dhr->dccph_resp_service)));
 		break;
 	}
 	case DCCP_PKT_DATA:
-		(void)printf("data ");
+		ND_PRINT((ndo, "data "));
 		break;
 	case DCCP_PKT_ACK: {
 		fixed_hdrlen += 8;
 		if (len < fixed_hdrlen) {
-			printf("truncated-dccp ack - %u bytes missing!",
-				     len - fixed_hdrlen);
+			ND_PRINT((ndo, "truncated-dccp ack - %u bytes missing!",
+				     len - fixed_hdrlen));
 			return;
 		}
-		(void)printf("ack ");
+		ND_PRINT((ndo, "ack "));
 		break;
 	}
 	case DCCP_PKT_DATAACK: {
 		fixed_hdrlen += 8;
 		if (len < fixed_hdrlen) {
-			printf("truncated-dccp dataack - %u bytes missing!",
-				     len - fixed_hdrlen);
+			ND_PRINT((ndo, "truncated-dccp dataack - %u bytes missing!",
+				     len - fixed_hdrlen));
 			return;
 		}
-		(void)printf("dataack ");
+		ND_PRINT((ndo, "dataack "));
 		break;
 	}
 	case DCCP_PKT_CLOSEREQ:
 		fixed_hdrlen += 8;
 		if (len < fixed_hdrlen) {
-			printf("truncated-dccp closereq - %u bytes missing!",
-				     len - fixed_hdrlen);
+			ND_PRINT((ndo, "truncated-dccp closereq - %u bytes missing!",
+				     len - fixed_hdrlen));
 			return;
 		}
-		(void)printf("closereq ");
+		ND_PRINT((ndo, "closereq "));
 		break;
 	case DCCP_PKT_CLOSE:
 		fixed_hdrlen += 8;
 		if (len < fixed_hdrlen) {
-			printf("truncated-dccp close - %u bytes missing!",
-				     len - fixed_hdrlen);
+			ND_PRINT((ndo, "truncated-dccp close - %u bytes missing!",
+				     len - fixed_hdrlen));
 			return;
 		}
-		(void)printf("close ");
+		ND_PRINT((ndo, "close "));
 		break;
 	case DCCP_PKT_RESET: {
 		struct dccp_hdr_reset *dhr =
 			(struct dccp_hdr_reset *)(bp + fixed_hdrlen);
 		fixed_hdrlen += 12;
 		if (len < fixed_hdrlen) {
-			printf("truncated-dccp reset - %u bytes missing!",
-				     len - fixed_hdrlen);
+			ND_PRINT((ndo, "truncated-dccp reset - %u bytes missing!",
+				     len - fixed_hdrlen));
 			return;
 		}
-		TCHECK(*dhr);
-		(void)printf("reset (code=%s) ",
-			     dccp_reset_code(dhr->dccph_reset_code));
+		ND_TCHECK(*dhr);
+		ND_PRINT((ndo, "reset (code=%s) ",
+			     dccp_reset_code(dhr->dccph_reset_code)));
 		break;
 	}
 	case DCCP_PKT_SYNC:
 		fixed_hdrlen += 8;
 		if (len < fixed_hdrlen) {
-			printf("truncated-dccp sync - %u bytes missing!",
-				     len - fixed_hdrlen);
+			ND_PRINT((ndo, "truncated-dccp sync - %u bytes missing!",
+				     len - fixed_hdrlen));
 			return;
 		}
-		(void)printf("sync ");
+		ND_PRINT((ndo, "sync "));
 		break;
 	case DCCP_PKT_SYNCACK:
 		fixed_hdrlen += 8;
 		if (len < fixed_hdrlen) {
-			printf("truncated-dccp syncack - %u bytes missing!",
-				     len - fixed_hdrlen);
+			ND_PRINT((ndo, "truncated-dccp syncack - %u bytes missing!",
+				     len - fixed_hdrlen));
 			return;
 		}
-		(void)printf("syncack ");
+		ND_PRINT((ndo, "syncack "));
 		break;
 	default:
-		(void)printf("invalid ");
+		ND_PRINT((ndo, "invalid "));
 		break;
 	}
 
 	if ((DCCPH_TYPE(dh) != DCCP_PKT_DATA) &&
 			(DCCPH_TYPE(dh) != DCCP_PKT_REQUEST))
-		dccp_print_ack_no(bp);
+		dccp_print_ack_no(ndo, bp);
 
-	if (vflag < 2)
+	if (ndo->ndo_vflag < 2)
 		return;
 
-	(void)printf("seq %" PRIu64, dccp_seqno(bp));
+	ND_PRINT((ndo, "seq %" PRIu64, dccp_seqno(bp)));
 
 	/* process options */
 	if (hlen > fixed_hdrlen){
 		const u_char *cp;
 		u_int optlen;
 		cp = bp + fixed_hdrlen;
-		printf(" <");
+		ND_PRINT((ndo, " <"));
 
 		hlen -= fixed_hdrlen;
 		while(1){
-			optlen = dccp_print_option(cp, hlen);
+			optlen = dccp_print_option(ndo, cp, hlen);
 			if (!optlen)
 				break;
 			if (hlen <= optlen)
 				break;
 			hlen -= optlen;
 			cp += optlen;
-			printf(", ");
+			ND_PRINT((ndo, ", "));
 		}
-		printf(">");
+		ND_PRINT((ndo, ">"));
 	}
 	return;
 trunc:
-	printf("%s", tstr);
+	ND_PRINT((ndo, "%s", tstr));
 	return;
 }
 
@@ -506,21 +507,21 @@ static const struct tok dccp_option_values[] = {
         { 0, NULL }
 };
 
-static int dccp_print_option(const u_char *option, u_int hlen)
+static int dccp_print_option(netdissect_options *ndo, const u_char *option, u_int hlen)
 {
 	u_int8_t optlen, i;
 
-	TCHECK(*option);
+	ND_TCHECK(*option);
 
 	if (*option >= 32) {
-		TCHECK(*(option+1));
+		ND_TCHECK(*(option+1));
 		optlen = *(option +1);
 		if (optlen < 2) {
 			if (*option >= 128)
-				printf("CCID option %u optlen too short", *option);
+				ND_PRINT((ndo, "CCID option %u optlen too short", *option));
 			else
-				printf("%s optlen too short",
-				    tok2str(dccp_option_values, "Option %u", *option));
+				ND_PRINT((ndo, "%s optlen too short",
+				    tok2str(dccp_option_values, "Option %u", *option)));
 			return 0;
 		}
 	} else
@@ -528,101 +529,101 @@ static int dccp_print_option(const u_char *option, u_int hlen)
 
 	if (hlen < optlen) {
 		if (*option >= 128)
-			printf("CCID option %u optlen goes past header length",
-			    *option);
+			ND_PRINT((ndo, "CCID option %u optlen goes past header length",
+			    *option));
 		else
-			printf("%s optlen goes past header length",
-			    tok2str(dccp_option_values, "Option %u", *option));
+			ND_PRINT((ndo, "%s optlen goes past header length",
+			    tok2str(dccp_option_values, "Option %u", *option)));
 		return 0;
 	}
-	TCHECK2(*option, optlen);
+	ND_TCHECK2(*option, optlen);
 
 	if (*option >= 128) {
-		printf("CCID option %d", *option);
+		ND_PRINT((ndo, "CCID option %d", *option));
 		switch (optlen) {
 			case 4:
-				printf(" %u", EXTRACT_16BITS(option + 2));
+				ND_PRINT((ndo, " %u", EXTRACT_16BITS(option + 2)));
 				break;
 			case 6:
-				printf(" %u", EXTRACT_32BITS(option + 2));
+				ND_PRINT((ndo, " %u", EXTRACT_32BITS(option + 2)));
 				break;
 			default:
 				break;
 		}
 	} else {
-		printf("%s", tok2str(dccp_option_values, "Option %u", *option));
+		ND_PRINT((ndo, "%s", tok2str(dccp_option_values, "Option %u", *option)));
 		switch (*option) {
 		case 32:
 		case 33:
 		case 34:
 		case 35:
 			if (optlen < 3) {
-				printf(" optlen too short");
+				ND_PRINT((ndo, " optlen too short"));
 				return optlen;
 			}
 			if (*(option + 2) < 10){
-				printf(" %s", dccp_feature_nums[*(option + 2)]);
+				ND_PRINT((ndo, " %s", dccp_feature_nums[*(option + 2)]));
 				for (i = 0; i < optlen - 3; i++)
-					printf(" %d", *(option + 3 + i));
+					ND_PRINT((ndo, " %d", *(option + 3 + i)));
 			}
 			break;
 		case 36:
 			if (optlen > 2) {
-				printf(" 0x");
+				ND_PRINT((ndo, " 0x"));
 				for (i = 0; i < optlen - 2; i++)
-					printf("%02x", *(option + 2 + i));
+					ND_PRINT((ndo, "%02x", *(option + 2 + i)));
 			}
 			break;
 		case 37:
 			for (i = 0; i < optlen - 2; i++)
-				printf(" %d", *(option + 2 + i));
+				ND_PRINT((ndo, " %d", *(option + 2 + i)));
 			break;
 		case 38:
 			if (optlen > 2) {
-				printf(" 0x");
+				ND_PRINT((ndo, " 0x"));
 				for (i = 0; i < optlen - 2; i++)
-					printf("%02x", *(option + 2 + i));
+					ND_PRINT((ndo, "%02x", *(option + 2 + i)));
 			}
 			break;
 		case 39:
 			if (optlen > 2) {
-				printf(" 0x");
+				ND_PRINT((ndo, " 0x"));
 				for (i = 0; i < optlen - 2; i++)
-					printf("%02x", *(option + 2 + i));
+					ND_PRINT((ndo, "%02x", *(option + 2 + i)));
 			}
 			break;
 		case 40:
 			if (optlen > 2) {
-				printf(" 0x");
+				ND_PRINT((ndo, " 0x"));
 				for (i = 0; i < optlen - 2; i++)
-					printf("%02x", *(option + 2 + i));
+					ND_PRINT((ndo, "%02x", *(option + 2 + i)));
 			}
 			break;
 		case 41:
 			if (optlen == 4)
-				printf(" %u", EXTRACT_32BITS(option + 2));
+				ND_PRINT((ndo, " %u", EXTRACT_32BITS(option + 2)));
 			else
-				printf(" optlen != 4");
+				ND_PRINT((ndo, " optlen != 4"));
 			break;
 		case 42:
 			if (optlen == 4)
-				printf(" %u", EXTRACT_32BITS(option + 2));
+				ND_PRINT((ndo, " %u", EXTRACT_32BITS(option + 2)));
 			else
-				printf(" optlen != 4");
+				ND_PRINT((ndo, " optlen != 4"));
 			break;
 		case 43:
 			if (optlen == 6)
-				printf(" %u", EXTRACT_32BITS(option + 2));
+				ND_PRINT((ndo, " %u", EXTRACT_32BITS(option + 2)));
 			else if (optlen == 4)
-				printf(" %u", EXTRACT_16BITS(option + 2));
+				ND_PRINT((ndo, " %u", EXTRACT_16BITS(option + 2)));
 			else
-				printf(" optlen != 4 or 6");
+				ND_PRINT((ndo, " optlen != 4 or 6"));
 			break;
 		case 44:
 			if (optlen > 2) {
-				printf(" ");
+				ND_PRINT((ndo, " "));
 				for (i = 0; i < optlen - 2; i++)
-					printf("%02x", *(option + 2 + i));
+					ND_PRINT((ndo, "%02x", *(option + 2 + i)));
 			}
 			break;
 		}
@@ -630,6 +631,6 @@ static int dccp_print_option(const u_char *option, u_int hlen)
 
 	return optlen;
 trunc:
-	printf("%s", tstr);
+	ND_PRINT((ndo, "%s", tstr));
 	return 0;
 }

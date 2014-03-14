@@ -417,6 +417,9 @@ extern void zephyr_print(netdissect_options *, const u_char *, int);
 extern void fddi_print(netdissect_options *, const u_char *, u_int, u_int);
 extern u_int fddi_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
 extern void mpcp_print(netdissect_options *, const u_char *, u_int);
+extern void rpki_rtr_print(netdissect_options *, const u_char *, u_int);
+extern u_int sll_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern void dccp_print(netdissect_options *, const u_char *, const u_char *, u_int);
 
 /* stuff that has not yet been rototiled */
 extern const u_char * ns_nprint (register const u_char *, register const u_char *);
@@ -487,7 +490,6 @@ extern void ppp_bsdos_if_print(u_char *,
 			       const struct pcap_pkthdr *, const u_char *);
 
 extern void rip_print(netdissect_options *,const u_char *, u_int);
-extern void rpki_rtr_print(netdissect_options *,const u_char *, u_int);
 
 extern void sctp_print(netdissect_options *ndo,
 		       const u_char *bp, const u_char *bp2,
