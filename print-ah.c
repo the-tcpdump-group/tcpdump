@@ -21,6 +21,7 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -29,7 +30,7 @@
 
 #include "ah.h"
 
-#include "netdissect.h"
+#include "interface.h"
 #include "extract.h"
 
 int

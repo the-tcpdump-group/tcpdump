@@ -9,6 +9,7 @@
  *
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -17,7 +18,7 @@
 
 #include <string.h>
 
-#include "netdissect.h"
+#include "interface.h"
 
 /* Check for a string but not go beyond length
  * Return TRUE on match, FALSE otherwise

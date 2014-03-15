@@ -17,13 +17,14 @@
  * Original code by Hannes Gredler (hannes@juniper.net)
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include <tcpdump-stdinc.h>
 
-#include "netdissect.h"
+#include "interface.h"
 #include "extract.h"
 
 #define MPCP_TIMESTAMP_LEN        4

@@ -18,13 +18,14 @@
  * Original code by Carles Kishimoto <carles.kishimoto@gmail.com>
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include <tcpdump-stdinc.h>
 
-#include "netdissect.h"
+#include "interface.h"
 #include "extract.h"
 
 #define UDLD_HEADER_LEN			4

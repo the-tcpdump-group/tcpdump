@@ -29,6 +29,7 @@
 
 /* Cisco Hot Standby Router Protocol (HSRP). */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -113,7 +114,7 @@ hsrp_print(netdissect_options *ndo, register const u_int8_t *bp, register u_int 
 	}
 	ND_TCHECK(hp->hsrp_virtaddr);
 	ND_PRINT((ndo, "addr=%s", ipaddr_string(&hp->hsrp_virtaddr)));
-	if (vflag) {
+	if (ndo->ndo_vflag) {
 		ND_PRINT((ndo, " hellotime="));
 		relts_print(hp->hsrp_hellotime);
 		ND_PRINT((ndo, " holdtime="));
@@ -121,7 +122,7 @@ hsrp_print(netdissect_options *ndo, register const u_int8_t *bp, register u_int 
 		ND_PRINT((ndo, " priority=%d", hp->hsrp_priority));
 		ND_PRINT((ndo, " auth=\""));
 		if (fn_printn(hp->hsrp_authdata, sizeof(hp->hsrp_authdata),
-		    snapend)) {
+		    ndo->ndo_snapend)) {
 			ND_PRINT((ndo, "\""));
 			goto trunc;
 		}

@@ -15,13 +15,14 @@
  * Original code by Ola Martin Lykkja (ola.lykkja@q-free.com)
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include <tcpdump-stdinc.h>
 
-#include "netdissect.h"
+#include "interface.h"
 #include "addrtoname.h"
 
 /*

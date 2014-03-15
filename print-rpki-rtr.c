@@ -17,6 +17,7 @@
  * Original code by Hannes Gredler (hannes@juniper.net)
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -25,7 +26,7 @@
 
 #include <string.h>
 
-#include "netdissect.h"
+#include "interface.h"
 #include "extract.h"
 #include "addrtoname.h"
 

@@ -20,6 +20,7 @@
  * PURPOSE.
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -30,7 +31,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "netdissect.h"
+#include "interface.h"
 
 struct z_packet {
     char *version;

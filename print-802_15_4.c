@@ -20,14 +20,12 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include <tcpdump-stdinc.h>
-
-#include <stdio.h>
-#include <string.h>
 
 #include "interface.h"
 #include "addrtoname.h"
@@ -111,7 +109,7 @@ ieee802_15_4_if_print(struct netdissect_options *ndo,
 	caplen -= 3;
 
 	ND_PRINT((ndo,"IEEE 802.15.4 %s packet ", ftypes[fc & 0x7]));
-	if (vflag)
+	if (ndo->ndo_vflag)
 		ND_PRINT((ndo,"seq %02x ", seq));
 	if (hdrlen == -1) {
 		ND_PRINT((ndo,"malformed! "));
@@ -119,7 +117,7 @@ ieee802_15_4_if_print(struct netdissect_options *ndo,
 	}
 
 
-	if (!vflag) {
+	if (!ndo->ndo_vflag) {
 		p+= hdrlen;
 		caplen -= hdrlen;
 	} else {
@@ -175,7 +173,7 @@ ieee802_15_4_if_print(struct netdissect_options *ndo,
 		caplen -= hdrlen;
 	}
 
-	if (!suppress_default_print)
+	if (!ndo->ndo_suppress_default_print)
 		(ndo->ndo_default_print)(ndo, p, caplen);
 
 	return 0;

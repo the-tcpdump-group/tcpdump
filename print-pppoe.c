@@ -21,6 +21,7 @@
  * Original code by Greg Stark <gsstark@mit.edu>
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

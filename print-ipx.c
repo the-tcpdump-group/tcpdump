@@ -22,6 +22,7 @@
  * Contributed by Brad Parker (brad@fcr.com).
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

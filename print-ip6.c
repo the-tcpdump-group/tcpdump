@@ -19,6 +19,7 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -29,7 +30,6 @@
 
 #include <string.h>
 
-#include "netdissect.h"
 #include "interface.h"
 #include "addrtoname.h"
 #include "extract.h"
@@ -86,7 +86,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	ip6 = (const struct ip6_hdr *)bp;
 
-	TCHECK(*ip6);
+	ND_TCHECK(*ip6);
 	if (length < sizeof (struct ip6_hdr)) {
 		(void)ND_PRINT((ndo, "truncated-ip6 %u", length));
 		return;
@@ -203,7 +203,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			icmp6_print(ndo, cp, len, (const u_char *)ip6, fragmented);
 			return;
 		case IPPROTO_AH:
-			advance = ah_print(gndo, cp);
+			advance = ah_print(ndo, cp);
 			nh = *cp;
 			break;
 		case IPPROTO_ESP:

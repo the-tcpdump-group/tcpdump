@@ -25,13 +25,14 @@
  * DAMAGE.
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include <tcpdump-stdinc.h>
 
-#include "netdissect.h"
+#include "interface.h"
 
 #if defined(DLT_NFLOG) && defined(HAVE_PCAP_NFLOG_H)
 #include <pcap/nflog.h>

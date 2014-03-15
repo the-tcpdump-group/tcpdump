@@ -21,13 +21,14 @@
  * Initial contribution from Francis Dupont (francis.dupont@inria.fr)
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include <tcpdump-stdinc.h>
 
-#include "netdissect.h"
+#include "interface.h"
 #include "extract.h"			/* must come after interface.h */
 
 /* Cisco IGRP definitions */
