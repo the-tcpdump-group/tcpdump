@@ -26,8 +26,6 @@
 
 #include <tcpdump-stdinc.h>
 
-#include <stdio.h>
-
 #include "interface.h"
 #include "extract.h"
 #include "addrtoname.h"
@@ -268,7 +266,7 @@ netanalyzer_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	 * Fail if we don't have enough data for the Hilscher pseudo-header.
 	 */
 	if (h->len < 4 || h->caplen < 4) {
-		printf("[|netanalyzer]");
+		ND_PRINT((ndo, "[|netanalyzer]"));
 		return (h->caplen);
 	}
 
@@ -298,7 +296,7 @@ netanalyzer_transparent_if_print(netdissect_options *ndo,
 	 * preamble, and SOF.
 	 */
 	if (h->len < 12 || h->caplen < 12) {
-		printf("[|netanalyzer-transparent]");
+		ND_PRINT((ndo, "[|netanalyzer-transparent]"));
 		return (h->caplen);
 	}
 
@@ -377,7 +375,7 @@ ethertype_print(netdissect_options *ndo,
 
 	case ETHERTYPE_PPP:
 		if (length) {
-			printf(": ");
+			ND_PRINT((ndo, ": "));
 			ppp_print(/*ndo,*/p, length);
 		}
 		return (1);
