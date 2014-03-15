@@ -197,7 +197,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			tcp_print(cp, len, (const u_char *)ip6, fragmented);
 			return;
 		case IPPROTO_UDP:
-			udp_print(cp, len, (const u_char *)ip6, fragmented);
+			udp_print(ndo, cp, len, (const u_char *)ip6, fragmented);
 			return;
 		case IPPROTO_ICMPV6:
 			icmp6_print(ndo, cp, len, (const u_char *)ip6, fragmented);

@@ -376,13 +376,13 @@ again:
 
 	case IPPROTO_UDP:
 		/* pass on the MF bit plus the offset to detect fragments */
-		udp_print(ipds->cp, ipds->len, (const u_char *)ipds->ip,
+		udp_print(ndo, ipds->cp, ipds->len, (const u_char *)ipds->ip,
 			  ipds->off & (IP_MF|IP_OFFMASK));
 		break;
 
 	case IPPROTO_ICMP:
 		/* pass on the MF bit plus the offset to detect fragments */
-		icmp_print(ipds->cp, ipds->len, (const u_char *)ipds->ip,
+		icmp_print(ndo, ipds->cp, ipds->len, (const u_char *)ipds->ip,
 			   ipds->off & (IP_MF|IP_OFFMASK));
 		break;
 
@@ -404,7 +404,7 @@ again:
 		break;
 
 	case IPPROTO_EIGRP:
-		eigrp_print(ipds->cp, ipds->len);
+		eigrp_print(ndo, ipds->cp, ipds->len);
 		break;
 
 	case IPPROTO_ND:

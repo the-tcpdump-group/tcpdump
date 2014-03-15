@@ -19,6 +19,7 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -326,7 +327,8 @@ icmp_tstamp_print(u_int tstamp) {
 }
 
 void
-icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
+icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *bp2,
+           int fragmented)
 {
 	char *cp;
 	const struct icmp *dp;
@@ -348,12 +350,12 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
 	ip = (struct ip *)bp2;
 	str = buf;
 
-	TCHECK(dp->icmp_code);
+	ND_TCHECK(dp->icmp_code);
 	switch (dp->icmp_type) {
 
 	case ICMP_ECHO:
 	case ICMP_ECHOREPLY:
-		TCHECK(dp->icmp_seq);
+		ND_TCHECK(dp->icmp_seq);
 		(void)snprintf(buf, sizeof(buf), "echo %s, id %u, seq %u",
                                dp->icmp_type == ICMP_ECHO ?
                                "request" : "reply",
@@ -362,11 +364,11 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
 		break;
 
 	case ICMP_UNREACH:
-		TCHECK(dp->icmp_ip.ip_dst);
+		ND_TCHECK(dp->icmp_ip.ip_dst);
 		switch (dp->icmp_code) {
 
 		case ICMP_UNREACH_PROTOCOL:
-			TCHECK(dp->icmp_ip.ip_p);
+			ND_TCHECK(dp->icmp_ip.ip_p);
 			(void)snprintf(buf, sizeof(buf),
 			    "%s protocol %d unreachable",
 			    ipaddr_string(&dp->icmp_ip.ip_dst),
@@ -374,11 +376,11 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
 			break;
 
 		case ICMP_UNREACH_PORT:
-			TCHECK(dp->icmp_ip.ip_p);
+			ND_TCHECK(dp->icmp_ip.ip_p);
 			oip = &dp->icmp_ip;
 			hlen = IP_HL(oip) * 4;
 			ouh = (struct udphdr *)(((u_char *)oip) + hlen);
-			TCHECK(ouh->uh_dport);
+			ND_TCHECK(ouh->uh_dport);
 			dport = EXTRACT_16BITS(&ouh->uh_dport);
 			switch (oip->ip_p) {
 
@@ -432,7 +434,7 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
 		break;
 
 	case ICMP_REDIRECT:
-		TCHECK(dp->icmp_ip.ip_dst);
+		ND_TCHECK(dp->icmp_ip.ip_dst);
 		fmt = tok2str(type2str, "redirect-#%d %%s to net %%s",
 		    dp->icmp_code);
 		(void)snprintf(buf, sizeof(buf), fmt,
@@ -450,7 +452,7 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
 		cp = buf + strlen(buf);
 
 		ihp = (struct ih_rdiscovery *)&dp->icmp_void;
-		TCHECK(*ihp);
+		ND_TCHECK(*ihp);
 		(void)strncpy(cp, " lifetime ", sizeof(buf) - (cp - buf));
 		cp = buf + strlen(buf);
 		lifetime = EXTRACT_16BITS(&ihp->ird_lifetime);
@@ -481,7 +483,7 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
 		}
 		idp = (struct id_rdiscovery *)&dp->icmp_data;
 		while (num-- > 0) {
-			TCHECK(*idp);
+			ND_TCHECK(*idp);
 			(void)snprintf(cp, sizeof(buf) - (cp - buf), " {%s %u}",
 			    ipaddr_string(&idp->ird_addr),
 			    EXTRACT_32BITS(&idp->ird_pref));
@@ -492,7 +494,7 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
 		break;
 
 	case ICMP_TIMXCEED:
-		TCHECK(dp->icmp_ip.ip_dst);
+		ND_TCHECK(dp->icmp_ip.ip_dst);
 		switch (dp->icmp_code) {
 
 		case ICMP_TIMXCEED_INTRANS:
@@ -515,20 +517,20 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
 			(void)snprintf(buf, sizeof(buf),
 			    "parameter problem - code %d", dp->icmp_code);
 		else {
-			TCHECK(dp->icmp_pptr);
+			ND_TCHECK(dp->icmp_pptr);
 			(void)snprintf(buf, sizeof(buf),
 			    "parameter problem - octet %d", dp->icmp_pptr);
 		}
 		break;
 
 	case ICMP_MASKREPLY:
-		TCHECK(dp->icmp_mask);
+		ND_TCHECK(dp->icmp_mask);
 		(void)snprintf(buf, sizeof(buf), "address mask is 0x%08x",
 		    EXTRACT_32BITS(&dp->icmp_mask));
 		break;
 
 	case ICMP_TSTAMP:
-		TCHECK(dp->icmp_seq);
+		ND_TCHECK(dp->icmp_seq);
 		(void)snprintf(buf, sizeof(buf),
 		    "time stamp query id %u seq %u",
 		    EXTRACT_16BITS(&dp->icmp_id),
@@ -536,7 +538,7 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
 		break;
 
 	case ICMP_TSTAMPREPLY:
-		TCHECK(dp->icmp_ttime);
+		ND_TCHECK(dp->icmp_ttime);
 		(void)snprintf(buf, sizeof(buf),
 		    "time stamp reply id %u seq %u: org %s",
                                EXTRACT_16BITS(&dp->icmp_id),
@@ -553,19 +555,19 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
 		str = tok2str(icmp2str, "type-#%d", dp->icmp_type);
 		break;
 	}
-	(void)printf("ICMP %s, length %u", str, plen);
-	if (vflag && !fragmented) { /* don't attempt checksumming if this is a frag */
+	ND_PRINT((ndo, "ICMP %s, length %u", str, plen));
+	if (ndo->ndo_vflag && !fragmented) { /* don't attempt checksumming if this is a frag */
 		u_int16_t sum, icmp_sum;
 		struct cksum_vec vec[1];
-		if (TTEST2(*bp, plen)) {
+		if (ND_TTEST2(*bp, plen)) {
 			vec[0].ptr = (const u_int8_t *)(void *)dp;
 			vec[0].len = plen;
 			sum = in_cksum(vec, 1);
 			if (sum != 0) {
 				icmp_sum = EXTRACT_16BITS(&dp->icmp_cksum);
-				(void)printf(" (wrong icmp cksum %x (->%x)!)",
+				ND_PRINT((ndo, " (wrong icmp cksum %x (->%x)!)",
 					     icmp_sum,
-					     in_cksum_shouldbe(icmp_sum, sum));
+					     in_cksum_shouldbe(icmp_sum, sum)));
 			}
 		}
 	}
@@ -574,22 +576,22 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
          * print the remnants of the IP packet.
          * save the snaplength as this may get overidden in the IP printer.
          */
-	if (vflag >= 1 && !ICMP_INFOTYPE(dp->icmp_type)) {
+	if (ndo->ndo_vflag >= 1 && !ICMP_INFOTYPE(dp->icmp_type)) {
 		bp += 8;
-		(void)printf("\n\t");
+		ND_PRINT((ndo, "\n\t"));
 		ip = (struct ip *)bp;
-		snaplen = snapend - bp;
-                snapend_save = snapend;
-		ip_print(gndo, bp, EXTRACT_16BITS(&ip->ip_len));
-                snapend = snapend_save;
+		ndo->ndo_snaplen = ndo->ndo_snapend - bp;
+                snapend_save = ndo->ndo_snapend;
+		ip_print(ndo, bp, EXTRACT_16BITS(&ip->ip_len));
+                ndo->ndo_snapend = snapend_save;
 	}
 
         /*
          * Attempt to decode the MPLS extensions only for some ICMP types.
          */
-        if (vflag >= 1 && plen > ICMP_EXTD_MINLEN && ICMP_MPLS_EXT_TYPE(dp->icmp_type)) {
+        if (ndo->ndo_vflag >= 1 && plen > ICMP_EXTD_MINLEN && ICMP_MPLS_EXT_TYPE(dp->icmp_type)) {
 
-            TCHECK(*ext_dp);
+            ND_TCHECK(*ext_dp);
 
             /*
              * Check first if the mpls extension header shows a non-zero length.
@@ -605,25 +607,25 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
                 }
             }
 
-            printf("\n\tMPLS extension v%u",
-                   ICMP_MPLS_EXT_EXTRACT_VERSION(*(ext_dp->icmp_ext_version_res)));
+            ND_PRINT((ndo, "\n\tMPLS extension v%u",
+                   ICMP_MPLS_EXT_EXTRACT_VERSION(*(ext_dp->icmp_ext_version_res))));
 
             /*
              * Sanity checking of the header.
              */
             if (ICMP_MPLS_EXT_EXTRACT_VERSION(*(ext_dp->icmp_ext_version_res)) !=
                 ICMP_MPLS_EXT_VERSION) {
-                printf(" packet not supported");
+                ND_PRINT((ndo, " packet not supported"));
                 return;
             }
 
             hlen = plen - ICMP_EXTD_MINLEN;
             vec[0].ptr = (const u_int8_t *)(void *)&ext_dp->icmp_ext_version_res;
             vec[0].len = hlen;
-            printf(", checksum 0x%04x (%scorrect), length %u",
+            ND_PRINT((ndo, ", checksum 0x%04x (%scorrect), length %u",
                    EXTRACT_16BITS(ext_dp->icmp_ext_checksum),
                    in_cksum(vec, 1) ? "in" : "",
-                   hlen);
+                   hlen));
 
             hlen -= 4; /* subtract common header size */
             obj_tptr = (u_int8_t *)ext_dp->icmp_ext_data;
@@ -631,17 +633,17 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
             while (hlen > sizeof(struct icmp_mpls_ext_object_header_t)) {
 
                 icmp_mpls_ext_object_header = (struct icmp_mpls_ext_object_header_t *)obj_tptr;
-                TCHECK(*icmp_mpls_ext_object_header);
+                ND_TCHECK(*icmp_mpls_ext_object_header);
                 obj_tlen = EXTRACT_16BITS(icmp_mpls_ext_object_header->length);
                 obj_class_num = icmp_mpls_ext_object_header->class_num;
                 obj_ctype = icmp_mpls_ext_object_header->ctype;
                 obj_tptr += sizeof(struct icmp_mpls_ext_object_header_t);
 
-                printf("\n\t  %s Object (%u), Class-Type: %u, length %u",
+                ND_PRINT((ndo, "\n\t  %s Object (%u), Class-Type: %u, length %u",
                        tok2str(icmp_mpls_ext_obj_values,"unknown",obj_class_num),
                        obj_class_num,
                        obj_ctype,
-                       obj_tlen);
+                       obj_tlen));
 
                 hlen-=sizeof(struct icmp_mpls_ext_object_header_t); /* length field includes tlv header */
 
@@ -656,15 +658,15 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
                 case 1:
                     switch(obj_ctype) {
                     case 1:
-                        TCHECK2(*obj_tptr, 4);
+                        ND_TCHECK2(*obj_tptr, 4);
                         raw_label = EXTRACT_32BITS(obj_tptr);
-                        printf("\n\t    label %u, exp %u", MPLS_LABEL(raw_label), MPLS_EXP(raw_label));
+                        ND_PRINT((ndo, "\n\t    label %u, exp %u", MPLS_LABEL(raw_label), MPLS_EXP(raw_label)));
                         if (MPLS_STACK(raw_label))
-                            printf(", [S]");
-                        printf(", ttl %u", MPLS_TTL(raw_label));
+                            ND_PRINT((ndo, ", [S]"));
+                        ND_PRINT((ndo, ", ttl %u", MPLS_TTL(raw_label)));
                         break;
                     default:
-                        print_unknown_data(gndo,obj_tptr, "\n\t    ", obj_tlen);
+                        print_unknown_data(ndo, obj_tptr, "\n\t    ", obj_tlen);
                     }
                     break;
 
@@ -674,7 +676,7 @@ icmp_print(const u_char *bp, u_int plen, const u_char *bp2, int fragmented)
                 */
                 case 2:
                 default:
-                    print_unknown_data(gndo,obj_tptr, "\n\t    ", obj_tlen);
+                    print_unknown_data(ndo, obj_tptr, "\n\t    ", obj_tlen);
                     break;
                 }
                 if (hlen < obj_tlen)

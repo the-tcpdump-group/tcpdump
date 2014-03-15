@@ -138,7 +138,7 @@ ipx_decode(netdissect_options *ndo, const struct ipxHdr *ipx, const u_char *data
 #endif
 	break;
       case IPX_SKT_EIGRP:
-	eigrp_print(datap, length);
+	eigrp_print(ndo, datap, length);
 	break;
       default:
 	ND_PRINT((ndo, "ipx-#%x %d", dstSkt, length));

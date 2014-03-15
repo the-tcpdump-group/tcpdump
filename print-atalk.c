@@ -235,7 +235,7 @@ ddp_print(register const u_char *bp, register u_int length, register int t,
 		break;
 
 	case ddpEIGRP:
-		eigrp_print(bp, length);
+		eigrp_print(gndo, bp, length);
 		break;
 
 	default:

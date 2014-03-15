@@ -234,7 +234,7 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 
 	if (ssap == LLCSAP_8021D && dsap == LLCSAP_8021D &&
 	    control == LLC_UI) {
-		stp_print(p+3, length-3);
+		stp_print(ndo, p+3, length-3);
 		return (1);
 	}
 
@@ -438,7 +438,7 @@ snap_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
                         return (1);
                 case PID_CISCO_PVST:
                 case PID_CISCO_VLANBRIDGE:
-                        stp_print(p, length);
+                        stp_print(ndo, p, length);
                         return (1);
                 default:
                         break;
@@ -510,7 +510,7 @@ snap_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 			return (1);
 
 		case PID_RFC2684_BPDU:
-			stp_print(p, length);
+			stp_print(ndo, p, length);
 			return (1);
 		}
 	}
