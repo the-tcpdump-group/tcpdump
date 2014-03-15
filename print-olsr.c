@@ -277,7 +277,7 @@ olsr_print (const u_char *pptr, u_int length, int is_ipv6)
     }
 
     ptr.common = (struct olsr_common *)tptr;
-    length = MIN(length, EXTRACT_16BITS(ptr.common->packet_len));
+    length = min(length, EXTRACT_16BITS(ptr.common->packet_len));
 
     printf("OLSRv%i, seq 0x%04x, length %u",
             (is_ipv6 == 0) ? 4 : 6,
