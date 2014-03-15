@@ -247,7 +247,7 @@ recurse:
 			 * 802.2.
 			 * Try to print the LLC-layer header & higher layers.
 			 */
-			if (llc_print(p, length, caplen, NULL, NULL,
+			if (llc_print(ndo, p, length, caplen, NULL, NULL,
 			    &extracted_ethertype) == 0)
 				goto unknown;	/* unknown LLC type */
 			break;

@@ -76,7 +76,7 @@ cip_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 		/*
 		 * LLC header is present.  Try to print it & higher layers.
 		 */
-		if (llc_print(p, length, caplen, NULL, NULL,
+		if (llc_print(ndo, p, length, caplen, NULL, NULL,
 		    &extracted_ethertype) == 0) {
 			/* ether_type not known, print raw packet */
 			if (!ndo->ndo_eflag)

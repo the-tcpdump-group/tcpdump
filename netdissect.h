@@ -420,6 +420,8 @@ extern void mpcp_print(netdissect_options *, const u_char *, u_int);
 extern void rpki_rtr_print(netdissect_options *, const u_char *, u_int);
 extern u_int sll_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
 extern void dccp_print(netdissect_options *, const u_char *, const u_char *, u_int);
+extern int llc_print(netdissect_options *, const u_char *, u_int, u_int, const u_char *, const u_char *, u_short *);
+extern int snap_print(netdissect_options *, const u_char *, u_int, u_int, u_int);
 
 /* stuff that has not yet been rototiled */
 extern const u_char * ns_nprint (register const u_char *, register const u_char *);
@@ -427,9 +429,6 @@ extern const u_char * ns_nprint (register const u_char *, register const u_char 
 #if 0
 extern void ascii_print(netdissect_options *,u_int);
 extern void telnet_print(netdissect_options *,const u_char *, u_int);
-extern int llc_print(netdissect_options *,
-		     const u_char *, u_int, u_int, const u_char *,
-		     const u_char *, u_short *);
 extern void aarp_print(netdissect_options *,const u_char *, u_int);
 extern void atalk_print(netdissect_options *,const u_char *, u_int);
 extern void atm_if_print(u_char *,const struct pcap_pkthdr *, const u_char *);

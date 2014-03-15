@@ -156,7 +156,7 @@ recurse:
 	 */
 	if (ether_type <= ETHERMTU) {
 		/* Try to print the LLC-layer header & higher layers */
-		if (llc_print(p, length, caplen, ESRC(ep), EDST(ep),
+		if (llc_print(ndo, p, length, caplen, ESRC(ep), EDST(ep),
 		    &extracted_ether_type) == 0) {
 			/* ether_type not known, print raw packet */
 			if (!ndo->ndo_eflag) {
@@ -207,7 +207,7 @@ recurse:
 		 * there's an LLC header and payload.
 		 */
 		/* Try to print the LLC-layer header & higher layers */
-		if (llc_print(p, length, caplen, ESRC(ep), EDST(ep),
+		if (llc_print(ndo, p, length, caplen, ESRC(ep), EDST(ep),
 		    &extracted_ether_type) == 0) {
 			/* ether_type not known, print raw packet */
 			if (!ndo->ndo_eflag) {

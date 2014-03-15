@@ -102,7 +102,7 @@ ipfc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 	caplen -= IPFC_HDRLEN;
 
 	/* Try to print the LLC-layer header & higher layers */
-	if (llc_print(p, length, caplen, ESRC(&ehdr), EDST(&ehdr),
+	if (llc_print(ndo, p, length, caplen, ESRC(&ehdr), EDST(&ehdr),
 	    &extracted_ethertype) == 0) {
 		/*
 		 * Some kinds of LLC packet we cannot

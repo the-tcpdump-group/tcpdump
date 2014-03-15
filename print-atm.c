@@ -136,7 +136,7 @@ atm_llc_print(const u_char *p, int length, int caplen)
 {
 	u_short extracted_ethertype;
 
-	if (!llc_print(p, length, caplen, NULL, NULL,
+	if (!llc_print(gndo, p, length, caplen, NULL, NULL,
 	    &extracted_ethertype)) {
 		/* ether_type not known, print raw packet */
 		if (extracted_ethertype) {

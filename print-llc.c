@@ -22,14 +22,12 @@
  *	with an awful lot of hacking by Jeffrey Mogul, DECWRL
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include <tcpdump-stdinc.h>
-
-#include <stdio.h>
-#include <string.h>
 
 #include "interface.h"
 #include "addrtoname.h"
@@ -143,7 +141,7 @@ static const struct oui_tok oui_to_tok[] = {
  * Returns non-zero IFF it succeeds in printing the header
  */
 int
-llc_print(const u_char *p, u_int length, u_int caplen,
+llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 	  const u_char *esrc, const u_char *edst, u_short *extracted_ethertype)
 {
 	u_int8_t dsap_field, dsap, ssap_field, ssap;
@@ -154,7 +152,7 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 	*extracted_ethertype = 0;
 
 	if (caplen < 3) {
-		(void)printf("[|llc]");
+		ND_PRINT((ndo, "[|llc]"));
 		default_print((u_char *)p, caplen);
 		return(0);
 	}
@@ -180,7 +178,7 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 		 * 2 bytes...
 		 */
 		if (caplen < 4) {
-			(void)printf("[|llc]");
+			ND_PRINT((ndo, "[|llc]"));
 			default_print((u_char *)p, caplen);
 			return(0);
 		}
@@ -208,29 +206,29 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 		 * least one capture file.)
 		 */
 
-            if (eflag)
-		printf("IPX 802.3: ");
+            if (ndo->ndo_eflag)
+		ND_PRINT((ndo, "IPX 802.3: "));
 
-            ipx_print(gndo, p, length);
+            ipx_print(ndo, p, length);
             return (1);
 	}
 
 	dsap = dsap_field & ~LLC_IG;
 	ssap = ssap_field & ~LLC_GSAP;
 
-	if (eflag) {
-                printf("LLC, dsap %s (0x%02x) %s, ssap %s (0x%02x) %s",
+	if (ndo->ndo_eflag) {
+                ND_PRINT((ndo, "LLC, dsap %s (0x%02x) %s, ssap %s (0x%02x) %s",
                        tok2str(llc_values, "Unknown", dsap),
                        dsap,
                        tok2str(llc_ig_flag_values, "Unknown", dsap_field & LLC_IG),
                        tok2str(llc_values, "Unknown", ssap),
                        ssap,
-                       tok2str(llc_flag_values, "Unknown", ssap_field & LLC_GSAP));
+                       tok2str(llc_flag_values, "Unknown", ssap_field & LLC_GSAP)));
 
 		if (is_u) {
-			printf(", ctrl 0x%02x: ", control);
+			ND_PRINT((ndo, ", ctrl 0x%02x: ", control));
 		} else {
-			printf(", ctrl 0x%04x: ", control);
+			ND_PRINT((ndo, ", ctrl 0x%04x: ", control));
 		}
 	}
 
@@ -242,7 +240,7 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 
 	if (ssap == LLCSAP_IP && dsap == LLCSAP_IP &&
 	    control == LLC_UI) {
-		ip_print(gndo, p+4, length-4);
+		ip_print(ndo, p+4, length-4);
 		return (1);
 	}
 
@@ -255,10 +253,10 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 		 *
 		 * Skip DSAP, LSAP, and control field.
 		 */
-                if (eflag)
-                        printf("IPX 802.2: ");
+                if (ndo->ndo_eflag)
+                        ND_PRINT((ndo, "IPX 802.2: "));
 
-		ipx_print(gndo, p+3, length-3);
+		ipx_print(ndo, p+3, length-3);
 		return (1);
 	}
 
@@ -303,77 +301,77 @@ llc_print(const u_char *p, u_int length, u_int caplen,
 		 * Does anybody ever bridge one form of LAN traffic
 		 * over a networking type that uses 802.2 LLC?
 		 */
-		ret = snap_print(p+3, length-3, caplen-3, 2);
+		ret = snap_print(ndo, p+3, length-3, caplen-3, 2);
 		if (ret)
 			return (ret);
 	}
 
-	if (!eflag) {
+	if (!ndo->ndo_eflag) {
 		if (ssap == dsap) {
 			if (esrc == NULL || edst == NULL)
-				(void)printf("%s ", tok2str(llc_values, "Unknown DSAP 0x%02x", dsap));
+				ND_PRINT((ndo, "%s ", tok2str(llc_values, "Unknown DSAP 0x%02x", dsap)));
 			else
-				(void)printf("%s > %s %s ",
+				ND_PRINT((ndo, "%s > %s %s ",
 						etheraddr_string(esrc),
 						etheraddr_string(edst),
-						tok2str(llc_values, "Unknown DSAP 0x%02x", dsap));
+						tok2str(llc_values, "Unknown DSAP 0x%02x", dsap)));
 		} else {
 			if (esrc == NULL || edst == NULL)
-				(void)printf("%s > %s ",
+				ND_PRINT((ndo, "%s > %s ",
                                         tok2str(llc_values, "Unknown SSAP 0x%02x", ssap),
-					tok2str(llc_values, "Unknown DSAP 0x%02x", dsap));
+					tok2str(llc_values, "Unknown DSAP 0x%02x", dsap)));
 			else
-				(void)printf("%s %s > %s %s ",
+				ND_PRINT((ndo, "%s %s > %s %s ",
 					etheraddr_string(esrc),
                                         tok2str(llc_values, "Unknown SSAP 0x%02x", ssap),
 					etheraddr_string(edst),
-					tok2str(llc_values, "Unknown DSAP 0x%02x", dsap));
+					tok2str(llc_values, "Unknown DSAP 0x%02x", dsap)));
 		}
 	}
 
 	if (is_u) {
-		printf("Unnumbered, %s, Flags [%s], length %u",
+		ND_PRINT((ndo, "Unnumbered, %s, Flags [%s], length %u",
                        tok2str(llc_cmd_values, "%02x", LLC_U_CMD(control)),
                        tok2str(llc_flag_values,"?",(ssap_field & LLC_GSAP) | (control & LLC_U_POLL)),
-                       length);
+                       length));
 
 		p += 3;
 
 		if ((control & ~LLC_U_POLL) == LLC_XID) {
 			if (*p == LLC_XID_FI) {
-				printf(": %02x %02x", p[1], p[2]);
+				ND_PRINT((ndo, ": %02x %02x", p[1], p[2]));
 			}
 		}
 	} else {
 		if ((control & LLC_S_FMT) == LLC_S_FMT) {
-			(void)printf("Supervisory, %s, rcv seq %u, Flags [%s], length %u",
+			ND_PRINT((ndo, "Supervisory, %s, rcv seq %u, Flags [%s], length %u",
 				tok2str(llc_supervisory_values,"?",LLC_S_CMD(control)),
 				LLC_IS_NR(control),
 				tok2str(llc_flag_values,"?",(ssap_field & LLC_GSAP) | (control & LLC_IS_POLL)),
-                                length);
+                                length));
 		} else {
-			(void)printf("Information, send seq %u, rcv seq %u, Flags [%s], length %u",
+			ND_PRINT((ndo, "Information, send seq %u, rcv seq %u, Flags [%s], length %u",
 				LLC_I_NS(control),
 				LLC_IS_NR(control),
 				tok2str(llc_flag_values,"?",(ssap_field & LLC_GSAP) | (control & LLC_IS_POLL)),
-                                length);
+                                length));
 		}
 	}
 	return(1);
 }
 
 int
-snap_print(const u_char *p, u_int length, u_int caplen, u_int bridge_pad)
+snap_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen, u_int bridge_pad)
 {
 	u_int32_t orgcode;
 	register u_short et;
 	register int ret;
 
-	TCHECK2(*p, 5);
+	ND_TCHECK2(*p, 5);
 	orgcode = EXTRACT_24BITS(p);
 	et = EXTRACT_16BITS(p + 3);
 
-	if (eflag) {
+	if (ndo->ndo_eflag) {
 		const struct tok *tok = null_values;
 		const struct oui_tok *otp;
 
@@ -383,12 +381,12 @@ snap_print(const u_char *p, u_int length, u_int caplen, u_int bridge_pad)
 				break;
 			}
 		}
-		(void)printf("oui %s (0x%06x), %s %s (0x%04x): ",
+		ND_PRINT((ndo, "oui %s (0x%06x), %s %s (0x%04x): ",
 		     tok2str(oui_values, "Unknown", orgcode),
 		     orgcode,
 		     (orgcode == 0x000000 ? "ethertype" : "pid"),
 		     tok2str(tok, "Unknown", et),
-		     et);
+		     et));
 	}
 	p += 5;
 	length -= 5;
@@ -403,7 +401,7 @@ snap_print(const u_char *p, u_int length, u_int caplen, u_int bridge_pad)
 		 * Cisco hardware; the protocol ID is
 		 * an Ethernet protocol type.
 		 */
-		ret = ethertype_print(gndo, et, p, length, caplen);
+		ret = ethertype_print(ndo, et, p, length, caplen);
 		if (ret)
 			return (ret);
 		break;
@@ -418,7 +416,7 @@ snap_print(const u_char *p, u_int length, u_int caplen, u_int bridge_pad)
 			 * but used 0x000000 and an Ethernet
 			 * packet type for AARP packets.
 			 */
-			ret = ethertype_print(gndo, et, p, length, caplen);
+			ret = ethertype_print(ndo, et, p, length, caplen);
 			if (ret)
 				return (ret);
 		}
@@ -430,10 +428,10 @@ snap_print(const u_char *p, u_int length, u_int caplen, u_int bridge_pad)
                         cdp_print(p, length, caplen);
                         return (1);
                 case PID_CISCO_DTP:
-                        dtp_print(gndo, p, length);
+                        dtp_print(ndo, p, length);
                         return (1);
                 case PID_CISCO_UDLD:
-                        udld_print(gndo, p, length);
+                        udld_print(ndo, p, length);
                         return (1);
                 case PID_CISCO_VTP:
                         vtp_print(p, length);
@@ -458,7 +456,7 @@ snap_print(const u_char *p, u_int length, u_int caplen, u_int bridge_pad)
 			/*
 			 * Skip the padding.
 			 */
-			TCHECK2(*p, bridge_pad);
+			ND_TCHECK2(*p, bridge_pad);
 			caplen -= bridge_pad;
 			length -= bridge_pad;
 			p += bridge_pad;
@@ -466,7 +464,7 @@ snap_print(const u_char *p, u_int length, u_int caplen, u_int bridge_pad)
 			/*
 			 * What remains is an Ethernet packet.
 			 */
-			ether_print(gndo, p, length, caplen, NULL, NULL);
+			ether_print(ndo, p, length, caplen, NULL, NULL);
 			return (1);
 
 		case PID_RFC2684_802_5_FCS:
@@ -479,7 +477,7 @@ snap_print(const u_char *p, u_int length, u_int caplen, u_int bridge_pad)
 			 * Skip the padding, but not the Access
 			 * Control field.
 			 */
-			TCHECK2(*p, bridge_pad);
+			ND_TCHECK2(*p, bridge_pad);
 			caplen -= bridge_pad;
 			length -= bridge_pad;
 			p += bridge_pad;
@@ -488,7 +486,7 @@ snap_print(const u_char *p, u_int length, u_int caplen, u_int bridge_pad)
 			 * What remains is an 802.5 Token Ring
 			 * packet.
 			 */
-			token_print(gndo, p, length, caplen);
+			token_print(ndo, p, length, caplen);
 			return (1);
 
 		case PID_RFC2684_FDDI_FCS:
@@ -500,7 +498,7 @@ snap_print(const u_char *p, u_int length, u_int caplen, u_int bridge_pad)
 			/*
 			 * Skip the padding.
 			 */
-			TCHECK2(*p, bridge_pad + 1);
+			ND_TCHECK2(*p, bridge_pad + 1);
 			caplen -= bridge_pad + 1;
 			length -= bridge_pad + 1;
 			p += bridge_pad + 1;
@@ -508,7 +506,7 @@ snap_print(const u_char *p, u_int length, u_int caplen, u_int bridge_pad)
 			/*
 			 * What remains is an FDDI packet.
 			 */
-			fddi_print(gndo, p, length, caplen);
+			fddi_print(ndo, p, length, caplen);
 			return (1);
 
 		case PID_RFC2684_BPDU:
@@ -519,7 +517,7 @@ snap_print(const u_char *p, u_int length, u_int caplen, u_int bridge_pad)
 	return (0);
 
 trunc:
-	(void)printf("[|snap]");
+	ND_PRINT((ndo, "[|snap]"));
 	return (1);
 }
 

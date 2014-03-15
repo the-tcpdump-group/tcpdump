@@ -929,7 +929,7 @@ juniper_atm1_print(const struct pcap_pkthdr *h, register const u_char *p)
         if (EXTRACT_24BITS(p) == 0xfefe03 || /* NLPID encaps ? */
             EXTRACT_24BITS(p) == 0xaaaa03) { /* SNAP encaps ? */
 
-            if (llc_print(p, l2info.length, l2info.caplen, NULL, NULL,
+            if (llc_print(gndo, p, l2info.length, l2info.caplen, NULL, NULL,
                           &extracted_ethertype) != 0)
                 return l2info.header_len;
         }
@@ -977,7 +977,7 @@ juniper_atm2_print(const struct pcap_pkthdr *h, register const u_char *p)
         if (EXTRACT_24BITS(p) == 0xfefe03 || /* NLPID encaps ? */
             EXTRACT_24BITS(p) == 0xaaaa03) { /* SNAP encaps ? */
 
-            if (llc_print(p, l2info.length, l2info.caplen, NULL, NULL,
+            if (llc_print(gndo, p, l2info.length, l2info.caplen, NULL, NULL,
                           &extracted_ethertype) != 0)
                 return l2info.header_len;
         }

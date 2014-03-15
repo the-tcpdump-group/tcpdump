@@ -290,7 +290,7 @@ fr_print(register const u_char *p, u_int length)
 		break;
 
 	case NLPID_SNAP:
-		if (snap_print(p, length, length, 0) == 0) {
+		if (snap_print(gndo, p, length, length, 0) == 0) {
 			/* ether_type not known, print raw packet */
                         if (!eflag)
                             fr_hdr_print(length + hdr_len, hdr_len,

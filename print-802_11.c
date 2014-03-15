@@ -2392,7 +2392,7 @@ ieee802_11_print(const u_char *p, u_int length, u_int orig_caplen, int pad,
 				printf("%s", tstr);
 				return hdrlen;
 			}
-		} else if (llc_print(p, length, caplen, dst, src,
+		} else if (llc_print(gndo, p, length, caplen, dst, src,
 		    &extracted_ethertype) == 0) {
 			/*
 			 * Some kinds of LLC packet we cannot

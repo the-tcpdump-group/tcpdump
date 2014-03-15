@@ -164,9 +164,6 @@ extern u_int16_t create_osi_cksum(const u_int8_t *, int, int);
 
 extern void ascii_print(const u_char *, u_int);
 extern void telnet_print(const u_char *, u_int);
-extern int llc_print(const u_char *, u_int, u_int, const u_char *,
-	const u_char *, u_short *);
-extern int snap_print(const u_char *, u_int, u_int, u_int);
 extern void aarp_print(const u_char *, u_int);
 extern void aodv_print(const u_char *, u_int, int);
 extern void atalk_print(const u_char *, u_int);
