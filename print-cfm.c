@@ -149,8 +149,9 @@ struct cfm_ltr_t {
 };
 
 static const struct tok cfm_ltr_flag_values[] = {
-    { 0x80, "Forwarded"},
-    { 0x40, "Terminal MEP"},
+    { 0x80, "UseFDB Only"},
+    { 0x40, "FwdYes"},
+    { 0x20, "Terminal MEP"},
     { 0, NULL}
 };
 
