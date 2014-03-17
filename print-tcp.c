@@ -671,7 +671,7 @@ tcp_print(register const u_char *bp, register u_int length,
 
         if (sport == TELNET_PORT || dport == TELNET_PORT) {
                 if (!qflag && vflag)
-                        telnet_print(bp, length);
+                        telnet_print(gndo, bp, length);
         } else if (sport == BGP_PORT || dport == BGP_PORT)
                 bgp_print(bp, length);
         else if (sport == PPTP_PORT || dport == PPTP_PORT)
@@ -685,7 +685,7 @@ tcp_print(register const u_char *bp, register u_int length,
         else if (sport == BEEP_PORT || dport == BEEP_PORT)
                 beep_print(gndo, bp, length);
         else if (sport == OPENFLOW_PORT || dport == OPENFLOW_PORT)
-                openflow_print(bp, length);
+                openflow_print(gndo, bp, length);
         else if (length > 2 &&
                  (sport == NAMESERVER_PORT || dport == NAMESERVER_PORT ||
                   sport == MULTICASTDNS_PORT || dport == MULTICASTDNS_PORT)) {

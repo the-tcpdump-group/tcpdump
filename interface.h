@@ -163,7 +163,6 @@ extern u_int16_t create_osi_cksum(const u_int8_t *, int, int);
 #include <pcap.h>
 
 extern void ascii_print(const u_char *, u_int);
-extern void telnet_print(const u_char *, u_int);
 extern void aarp_print(const u_char *, u_int);
 extern void aodv_print(const u_char *, u_int, int);
 extern void atalk_print(const u_char *, u_int);
@@ -201,7 +200,6 @@ extern void nfsreq_print_noaddr(const u_char *, u_int, const u_char *);
 extern void ns_print(const u_char *, u_int, int);
 extern const u_char * ns_nprint (register const u_char *, register const u_char *);
 extern void ntp_print(const u_char *, u_int);
-extern void openflow_print(const u_char *, const u_int);
 extern void ospf_print(const u_char *, u_int, const u_char *);
 extern void olsr_print (const u_char *, u_int, int);
 extern void pimv1_print(const u_char *, u_int);
@@ -255,7 +253,6 @@ extern char *smb_errstr(int, int);
 extern const char *nt_errstr(u_int32_t);
 extern void print_data(const unsigned char *, int);
 extern void vrrp_print(const u_char *, u_int, const u_char *, int);
-extern void slow_print(const u_char *, u_int);
 extern void sflow_print(const u_char *, u_int);
 extern void cfm_print(const u_char *, u_int);
 extern void pgm_print(const u_char *, u_int, const u_char *);

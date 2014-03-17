@@ -427,13 +427,15 @@ extern void stp_print(netdissect_options *, const u_char *, u_int);
 extern void l2tp_print(netdissect_options *, const u_char *, u_int);
 extern void udp_print(netdissect_options *, const u_char *, u_int, const u_char *, int);
 extern void icmp_print(netdissect_options *, const u_char *, u_int, const u_char *, int);
+extern void openflow_print(netdissect_options *, const u_char *, const u_int);
+extern void telnet_print(netdissect_options *, const u_char *, u_int);
+extern void slow_print(netdissect_options *, const u_char *, u_int);
 
 /* stuff that has not yet been rototiled */
 extern const u_char * ns_nprint (register const u_char *, register const u_char *);
 
 #if 0
 extern void ascii_print(netdissect_options *,u_int);
-extern void telnet_print(netdissect_options *,const u_char *, u_int);
 extern void aarp_print(netdissect_options *,const u_char *, u_int);
 extern void atalk_print(netdissect_options *,const u_char *, u_int);
 extern void atm_if_print(u_char *,const struct pcap_pkthdr *, const u_char *);

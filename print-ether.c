@@ -385,7 +385,7 @@ ethertype_print(netdissect_options *ndo,
 		return (1);
 
 	case ETHERTYPE_SLOW:
-	        slow_print(/*ndo,*/p, length);
+	        slow_print(ndo, p, length);
 		return (1);
 
 	case ETHERTYPE_CFM:

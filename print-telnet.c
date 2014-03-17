@@ -45,6 +45,7 @@
  *      are preserved in all copies.
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -52,8 +53,6 @@
 #include <tcpdump-stdinc.h>
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include "interface.h"
 
@@ -385,7 +384,7 @@ numstr(int x)
 
 /* sp points to IAC byte */
 static int
-telnet_parse(const u_char *sp, u_int length, int print)
+telnet_parse(netdissect_options *ndo, const u_char *sp, u_int length, int print)
 {
 	int i, x;
 	u_int c;
@@ -394,7 +393,7 @@ telnet_parse(const u_char *sp, u_int length, int print)
 	do { \
 		if (length < 1) \
 			goto pktend; \
-		TCHECK(*sp); \
+		ND_TCHECK(*sp); \
 		c = *sp++; \
 		length--; \
 	} while (0)
@@ -407,7 +406,7 @@ telnet_parse(const u_char *sp, u_int length, int print)
 	FETCH(c, sp, length);
 	if (c == IAC) {		/* <IAC><IAC>! */
 		if (print)
-			printf("IAC IAC");
+			ND_PRINT((ndo, "IAC IAC"));
 		goto done;
 	}
 
@@ -425,10 +424,10 @@ telnet_parse(const u_char *sp, u_int length, int print)
 		FETCH(x, sp, length);
 		if (x >= 0 && x < NTELOPTS) {
 			if (print)
-				(void)printf("%s %s", telcmds[i], telopts[x]);
+				ND_PRINT((ndo, "%s %s", telcmds[i], telopts[x]));
 		} else {
 			if (print)
-				(void)printf("%s %#x", telcmds[i], x);
+				ND_PRINT((ndo, "%s %#x", telcmds[i], x));
 		}
 		if (c != SB)
 			break;
@@ -448,46 +447,46 @@ telnet_parse(const u_char *sp, u_int length, int print)
 				break;
 			FETCH(c, sp, length);
 			if (print)
-				(void)printf(" %s", STR_OR_ID(c, authcmd));
+				ND_PRINT((ndo, " %s", STR_OR_ID(c, authcmd)));
 			if (p <= sp)
 				break;
 			FETCH(c, sp, length);
 			if (print)
-				(void)printf(" %s", STR_OR_ID(c, authtype));
+				ND_PRINT((ndo, " %s", STR_OR_ID(c, authtype)));
 			break;
 		case TELOPT_ENCRYPT:
 			if (p <= sp)
 				break;
 			FETCH(c, sp, length);
 			if (print)
-				(void)printf(" %s", STR_OR_ID(c, enccmd));
+				ND_PRINT((ndo, " %s", STR_OR_ID(c, enccmd)));
 			if (p <= sp)
 				break;
 			FETCH(c, sp, length);
 			if (print)
-				(void)printf(" %s", STR_OR_ID(c, enctype));
+				ND_PRINT((ndo, " %s", STR_OR_ID(c, enctype)));
 			break;
 		default:
 			if (p <= sp)
 				break;
 			FETCH(c, sp, length);
 			if (print)
-				(void)printf(" %s", STR_OR_ID(c, cmds));
+				ND_PRINT((ndo, " %s", STR_OR_ID(c, cmds)));
 			break;
 		}
 		while (p > sp) {
 			FETCH(x, sp, length);
 			if (print)
-				(void)printf(" %#x", x);
+				ND_PRINT((ndo, " %#x", x));
 		}
 		/* terminating IAC SE */
 		if (print)
-			(void)printf(" SE");
+			ND_PRINT((ndo, " SE"));
 		sp += 2;
 		break;
 	default:
 		if (print)
-			(void)printf("%s", telcmds[i]);
+			ND_PRINT((ndo, "%s", telcmds[i]));
 		goto done;
 	}
 
@@ -495,14 +494,14 @@ done:
 	return sp - osp;
 
 trunc:
-	(void)printf("[|telnet]");
+	ND_PRINT((ndo, "[|telnet]"));
 pktend:
 	return -1;
 #undef FETCH
 }
 
 void
-telnet_print(const u_char *sp, u_int length)
+telnet_print(netdissect_options *ndo, const u_char *sp, u_int length)
 {
 	int first = 1;
 	const u_char *osp;
@@ -511,34 +510,34 @@ telnet_print(const u_char *sp, u_int length)
 	osp = sp;
 
 	while (length > 0 && *sp == IAC) {
-		l = telnet_parse(sp, length, 0);
+		l = telnet_parse(ndo, sp, length, 0);
 		if (l < 0)
 			break;
 
 		/*
 		 * now print it
 		 */
-		if (Xflag && 2 < vflag) {
+		if (ndo->ndo_Xflag && 2 < ndo->ndo_vflag) {
 			if (first)
-				printf("\nTelnet:");
-			hex_print_with_offset(gndo,"\n", sp, l, sp - osp);
+				ND_PRINT((ndo, "\nTelnet:"));
+			hex_print_with_offset(ndo, "\n", sp, l, sp - osp);
 			if (l > 8)
-				printf("\n\t\t\t\t");
+				ND_PRINT((ndo, "\n\t\t\t\t"));
 			else
-				printf("%*s\t", (8 - l) * 3, "");
+				ND_PRINT((ndo, "%*s\t", (8 - l) * 3, ""));
 		} else
-			printf("%s", (first) ? " [telnet " : ", ");
+			ND_PRINT((ndo, "%s", (first) ? " [telnet " : ", "));
 
-		(void)telnet_parse(sp, length, 1);
+		(void)telnet_parse(ndo, sp, length, 1);
 		first = 0;
 
 		sp += l;
 		length -= l;
 	}
 	if (!first) {
-		if (Xflag && 2 < vflag)
-			printf("\n");
+		if (ndo->ndo_Xflag && 2 < ndo->ndo_vflag)
+			ND_PRINT((ndo, "\n"));
 		else
-			printf("]");
+			ND_PRINT((ndo, "]"));
 	}
 }
