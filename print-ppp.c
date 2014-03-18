@@ -972,6 +972,13 @@ handle_pap(netdissect_options *ndo,
 		break;
 	case PAP_AACK:
 	case PAP_ANAK:
+		/* Although some implementations ignore truncation at
+		 * this point and at least one generates a truncated
+		 * packet, RFC 1334 section 2.2.2 clearly states that
+		 * both AACK and ANAK are at least 5 bytes long.
+		 */
+		if (len < 5)
+			goto trunc;
 		if (length - (p - p0) < 1)
 			return;
 		ND_TCHECK(*p);
