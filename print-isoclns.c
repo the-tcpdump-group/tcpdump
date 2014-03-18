@@ -700,7 +700,7 @@ void isoclns_print(const u_int8_t *p, u_int length, u_int caplen)
 		break;
 
         case NLPID_Q933:
-                q933_print(p+1, length-1);
+                q933_print(gndo, p+1, length-1);
                 break;
 
         case NLPID_IP:

@@ -695,7 +695,7 @@ juniper_frelay_print(const struct pcap_pkthdr *h, register const u_char *p)
 
         p+=l2info.header_len;
         /* this DLT contains nothing but raw frame-relay frames */
-        fr_print(p, l2info.length);
+        fr_print(gndo, p, l2info.length);
         return l2info.header_len;
 }
 #endif
@@ -819,7 +819,7 @@ juniper_mfr_print(const struct pcap_pkthdr *h, register const u_char *p)
 
         /* child-link ? */
         if (l2info.cookie_len == 0) {
-            mfr_print(p,l2info.length);
+            mfr_print(gndo, p, l2info.length);
             return l2info.header_len;
         }
 

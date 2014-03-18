@@ -430,6 +430,13 @@ extern void icmp_print(netdissect_options *, const u_char *, u_int, const u_char
 extern void openflow_print(netdissect_options *, const u_char *, const u_int);
 extern void telnet_print(netdissect_options *, const u_char *, u_int);
 extern void slow_print(netdissect_options *, const u_char *, u_int);
+extern void radius_print(netdissect_options *, const u_char *, u_int);
+extern void lmp_print(netdissect_options *, const u_char *, u_int);
+extern u_int fr_print(netdissect_options *, register const u_char *, u_int);
+extern u_int mfr_print(netdissect_options *, register const u_char *, u_int);
+extern u_int fr_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int mfr_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern void q933_print(netdissect_options *, const u_char *, u_int);
 
 /* stuff that has not yet been rototiled */
 extern const u_char * ns_nprint (register const u_char *, register const u_char *);
@@ -534,7 +541,6 @@ extern void carp_print(netdissect_options *,const u_char *bp,
 		       u_int len, int ttl);
 extern void cdp_print(netdissect_options *,const u_char *,
 		      u_int, u_int, const u_char *, const u_char *);
-extern void radius_print(netdissect_options *,const u_char *, u_int);
 extern void lwres_print(netdissect_options *,const u_char *, u_int);
 extern void pptp_print(netdissect_options *,const u_char *, u_int);
 #endif

@@ -188,12 +188,6 @@ static const struct printer printers[] = {
 #ifdef DLT_LTALK
 	{ ltalk_if_print,	DLT_LTALK },
 #endif
-#ifdef DLT_FR
-	{ fr_if_print,		DLT_FR },
-#endif
-#ifdef DLT_FRELAY
-	{ fr_if_print,		DLT_FRELAY },
-#endif
 #ifdef DLT_SUNATM
 	{ sunatm_if_print,	DLT_SUNATM },
 #endif
@@ -253,9 +247,6 @@ static const struct printer printers[] = {
 #endif
 #ifdef DLT_JUNIPER_CHDLC
 	{ juniper_chdlc_print,	DLT_JUNIPER_CHDLC },
-#endif
-#ifdef DLT_MFR
-	{ mfr_if_print,		DLT_MFR },
 #endif
 	{ NULL,			0 },
 };
@@ -343,6 +334,15 @@ static const struct ndo_printer ndo_printers[] = {
 	{ fddi_if_print,	DLT_FDDI },
 #ifdef DLT_LINUX_SLL
 	{ sll_if_print,		DLT_LINUX_SLL },
+#endif
+#ifdef DLT_FR
+	{ fr_if_print,		DLT_FR },
+#endif
+#ifdef DLT_FRELAY
+	{ fr_if_print,		DLT_FRELAY },
+#endif
+#ifdef DLT_MFR
+	{ mfr_if_print,		DLT_MFR },
 #endif
 	{ NULL,			0 },
 };

@@ -462,7 +462,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 
 		case PT_RADIUS:
 			udpipaddr_print(ndo, ip, sport, dport);
-			radius_print(cp, length);
+			radius_print(ndo, cp, length);
 			break;
 
 		case PT_VXLAN:
@@ -477,7 +477,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 			break;
 		case PT_LMP:
 			udpipaddr_print(ndo, ip, sport, dport);
-			lmp_print(cp, length);
+			lmp_print(ndo, cp, length);
 			break;
 		}
 		return;
@@ -637,7 +637,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 			 ISPORT(RADIUS_NEW_PORT) ||
 			 ISPORT(RADIUS_ACCOUNTING_PORT) ||
 			 ISPORT(RADIUS_NEW_ACCOUNTING_PORT) )
-			radius_print((const u_char *)(up+1), length);
+			radius_print(ndo, (const u_char *)(up+1), length);
 		else if (dport == HSRP_PORT)
 			hsrp_print(ndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(LWRES_PORT))
@@ -657,7 +657,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 			 dport == BFD_ECHO_PORT )
 			bfd_print(ndo, (const u_char *)(up+1), length, dport);
                 else if (ISPORT(LMP_PORT))
-			lmp_print((const u_char *)(up + 1), length);
+			lmp_print(ndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(VQP_PORT))
 			vqp_print(ndo, (const u_char *)(up + 1), length);
                 else if (ISPORT(SFLOW_PORT))
