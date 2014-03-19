@@ -135,11 +135,14 @@ fn_printzp(netdissect_options *ndo,
  * Format the timestamp
  */
 static char *
-ts_format(register int sec, register int usec)
+ts_format(netdissect_options *ndo, int sec, int usec)
 {
-        static char buf[sizeof("00:00:00.000000")];
-        (void)snprintf(buf, sizeof(buf), "%02d:%02d:%02d.%06u",
-               sec / 3600, (sec % 3600) / 60, sec % 60, usec);
+	static char buf[sizeof("00:00:00.000000000")];
+	const char *format = ndo->ndo_tstamp_precision == PCAP_TSTAMP_PRECISION_NANO ?
+                "%02d:%02d:%02d.%09u" : "%02d:%02d:%02d.%06u";
+
+	snprintf(buf, sizeof(buf), format,
+                 sec / 3600, (sec % 3600) / 60, sec % 60, usec);
 
         return buf;
 }
@@ -163,7 +166,7 @@ ts_print(netdissect_options *ndo,
 
 	case 0: /* Default */
 		s = (tvp->tv_sec + thiszone) % 86400;
-		ND_PRINT((ndo, "%s ", ts_format(s, tvp->tv_usec)));
+		ND_PRINT((ndo, "%s ", ts_format(ndo, s, tvp->tv_usec)));
 		break;
 
 	case 1: /* No time stamp */
@@ -191,7 +194,7 @@ ts_print(netdissect_options *ndo,
                     d_sec--;
                 }
 
-                ND_PRINT((ndo, "%s ", ts_format(d_sec, d_usec)));
+                ND_PRINT((ndo, "%s ", ts_format(ndo, d_sec, d_usec)));
 
                 if (ndo->ndo_tflag == 3) { /* set timestamp for last packet */
                     b_sec = tvp->tv_sec;
@@ -208,7 +211,7 @@ ts_print(netdissect_options *ndo,
 		else
 			ND_PRINT((ndo, "%04d-%02d-%02d %s ",
                                tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday,
-                               ts_format(s, tvp->tv_usec)));
+                               ts_format(ndo, s, tvp->tv_usec)));
 		break;
 	}
 }

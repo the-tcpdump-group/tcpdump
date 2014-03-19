@@ -432,6 +432,15 @@ List the supported time stamp types for the interface and exit.  If the
 time stamp type cannot be set for the interface, no time stamp types are
 listed.
 .TP
+.BI \-\-time\-stamp\-precision= tstamp_precision
+.PD
+Set the time stamp precision for the capture to
+\fItstamp_precision\fP. Currently supported are microseconds and
+nanoseconds. Note that availability of high precision time stamps (nanoseconds)
+and their actual accuracy is platform and HW dependent. Also note that when
+writing captures to the savefile, distinct magic number is used to distinguish
+savefiles which contains time stamps in nanoseconds.
+.TP
 .B \-K
 .PD 0
 .TP

@@ -650,6 +650,7 @@ show_devices_and_exit (void)
  */
 #define OPTION_NUMBER	128
 #define OPTION_VERSION	129
+#define OPTION_TSTAMP_PRECISION 130
 
 static struct option longopts[] = {
 #if defined(HAVE_PCAP_CREATE) || defined(WIN32)
@@ -665,6 +666,7 @@ static struct option longopts[] = {
 	{ "time-stamp-type", required_argument, NULL, 'j' },
 	{ "list-time-stamp-types", no_argument, NULL, 'J' },
 #endif
+	{ "time-stamp-precision", required_argument, NULL, OPTION_TSTAMP_PRECISION},
 	{ "dont-verify-checksums", no_argument, NULL, 'K' },
 	{ "list-data-link-types", no_argument, NULL, 'L' },
 	{ "no-optimize", no_argument, NULL, 'O' },
@@ -838,6 +840,18 @@ get_next_file(FILE *VFile, char *ptr)
 		ptr[strlen(ptr) - 1] = '\0';
 
 	return ret;
+}
+
+static int
+tstamp_precision_from_string(const char *precision)
+{
+	if (strncmp(precision, "nano", strlen("nano")) == 0)
+		return PCAP_TSTAMP_PRECISION_NANO;
+
+	if (strncmp(precision, "micro", strlen("micro")) == 0)
+		return PCAP_TSTAMP_PRECISION_MICRO;
+
+	return -EINVAL;
 }
 
 int
@@ -1275,6 +1289,12 @@ main(int argc, char **argv)
 			exit(0);
 			break;
 
+		case OPTION_TSTAMP_PRECISION:
+			gndo->ndo_tstamp_precision = tstamp_precision_from_string(optarg);
+			if (gndo->ndo_tstamp_precision < 0)
+				error("unsupported time stamp precision");
+			break;
+
 		default:
 			print_usage();
 			exit(1);
@@ -1366,7 +1386,11 @@ main(int argc, char **argv)
 			RFileName = VFileLine;
 		}
 
-		pd = pcap_open_offline(RFileName, ebuf);
+		if (gndo->ndo_tstamp_precision == PCAP_TSTAMP_PRECISION_NANO)
+			pd = pcap_open_offline_with_tstamp_precision(RFileName, PCAP_TSTAMP_PRECISION_NANO, ebuf);
+		else
+			pd = pcap_open_offline_with_tstamp_precision(RFileName, PCAP_TSTAMP_PRECISION_MICRO, ebuf);
+
 		if (pd == NULL)
 			error("%s", ebuf);
 		dlt = pcap_datalink(pd);
@@ -1413,6 +1437,13 @@ main(int argc, char **argv)
 		if (Jflag)
 			show_tstamp_types_and_exit(device, pd);
 #endif
+		if (gndo->ndo_tstamp_precision == PCAP_TSTAMP_PRECISION_NANO) {
+			status = pcap_set_tstamp_precision(pd, PCAP_TSTAMP_PRECISION_NANO);
+			if (status != 0)
+				error("%s: Can't set nanosecond time stamp precision: %s",
+					device, pcap_statustostr(status));
+                }
+
 		/*
 		 * Is this an interface that supports monitor mode?
 		 */
