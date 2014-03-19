@@ -473,7 +473,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 		case PT_PGM:
 		case PT_PGM_ZMTP1:
 			udpipaddr_print(ndo, ip, sport, dport);
-			pgm_print(cp, length, bp2);
+			pgm_print(ndo, cp, length, bp2);
 			break;
 		case PT_LMP:
 			udpipaddr_print(ndo, ip, sport, dport);
@@ -574,7 +574,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 		else if (ISPORT(IPPORT_BOOTPC) || ISPORT(IPPORT_BOOTPS))
 			bootp_print((const u_char *)(up + 1), length);
 		else if (ISPORT(RIP_PORT))
-			rip_print((const u_char *)(up + 1), length);
+			rip_print(ndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(AODV_PORT))
 			aodv_print((const u_char *)(up + 1), length,
 #ifdef INET6
@@ -643,7 +643,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 		else if (ISPORT(LWRES_PORT))
 			lwres_print((const u_char *)(up + 1), length);
 		else if (ISPORT(LDP_PORT))
-			ldp_print((const u_char *)(up + 1), length);
+			ldp_print(ndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(OLSR_PORT))
 			olsr_print((const u_char *)(up + 1), length,
 #if INET6
@@ -663,11 +663,11 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
                 else if (ISPORT(SFLOW_PORT))
                         sflow_print((const u_char *)(up + 1), length);
 	        else if (dport == LWAPP_CONTROL_PORT)
-			lwapp_control_print((const u_char *)(up + 1), length, 1);
+			lwapp_control_print(ndo, (const u_char *)(up + 1), length, 1);
                 else if (sport == LWAPP_CONTROL_PORT)
-                        lwapp_control_print((const u_char *)(up + 1), length, 0);
+                        lwapp_control_print(ndo, (const u_char *)(up + 1), length, 0);
                 else if (ISPORT(LWAPP_DATA_PORT))
-                        lwapp_data_print((const u_char *)(up + 1), length);
+                        lwapp_data_print(ndo, (const u_char *)(up + 1), length);
                 else if (ISPORT(SIP_PORT))
 			sip_print((const u_char *)(up + 1), length);
                 else if (ISPORT(SYSLOG_PORT))

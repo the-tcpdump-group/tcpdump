@@ -420,7 +420,7 @@ again:
 		break;
 
 	case IPPROTO_IGMP:
-		igmp_print(ipds->cp, ipds->len);
+		igmp_print(ndo, ipds->cp, ipds->len);
 		break;
 
 	case IPPROTO_IPV4:
@@ -476,7 +476,7 @@ again:
 		break;
 
 	case IPPROTO_PGM:
-		pgm_print(ipds->cp, ipds->len, (const u_char *)ipds->ip);
+		pgm_print(ndo, ipds->cp, ipds->len, (const u_char *)ipds->ip);
 		break;
 
 	default:

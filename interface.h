@@ -184,7 +184,6 @@ extern u_int ieee802_11_radio_if_print(const struct pcap_pkthdr *,
 	const u_char *);
 extern u_int ieee802_11_radio_avs_if_print(const struct pcap_pkthdr *,
 	const u_char *);
-extern void igmp_print(const u_char *, u_int);
 extern void isoclns_print(const u_char *, u_int, u_int);
 extern void krb_print(const u_char *);
 extern u_int llap_print(const u_char *, u_int);
@@ -201,18 +200,14 @@ extern void olsr_print (const u_char *, u_int, int);
 extern void pimv1_print(const u_char *, u_int);
 extern void cisco_autorp_print(const u_char *, u_int);
 extern void rsvp_print(const u_char *, u_int);
-extern void ldp_print(const u_char *, u_int);
 extern void lldp_print(const u_char *, u_int);
 extern void lspping_print(const u_char *, u_int);
-extern void lwapp_control_print(const u_char *, u_int, int);
-extern void lwapp_data_print(const u_char *, u_int);
 extern void pim_print(const u_char *, u_int, u_int);
 extern u_int ppp_print(register const u_char *, u_int);
 extern u_int ppp_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int ppp_hdlc_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int ppp_bsdos_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int prism_if_print(const struct pcap_pkthdr *, const u_char *);
-extern void rip_print(const u_char *, u_int);
 extern u_int sl_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int sl_bsdos_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int juniper_atm1_print(const struct pcap_pkthdr *, const u_char *);
@@ -249,10 +244,8 @@ extern void print_data(const unsigned char *, int);
 extern void vrrp_print(const u_char *, u_int, const u_char *, int);
 extern void sflow_print(const u_char *, u_int);
 extern void cfm_print(const u_char *, u_int);
-extern void pgm_print(const u_char *, u_int, const u_char *);
 extern void cdp_print(const u_char *, u_int, u_int);
 extern void lwres_print(const u_char *, u_int);
-extern void pptp_print(const u_char *);
 extern void sctp_print(const u_char *, const u_char *, u_int);
 extern void forces_print(const u_char *, u_int);
 extern void mpls_lsp_ping_print(const u_char *, u_int);
@@ -262,7 +255,6 @@ extern int mptcp_print(const u_char *, u_int, u_char);
 
 
 #ifdef INET6
-extern int mobility_print(const u_char *, const u_char *);
 extern void ospf6_print(const u_char *, u_int);
 extern void dhcp6_print(const u_char *, u_int);
 extern void babel_print(const u_char *, u_int);

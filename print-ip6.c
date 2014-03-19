@@ -180,7 +180,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			 * which payload can be piggybacked atop a
 			 * mobility header.
 			 */
-			advance = mobility_print(cp, (const u_char *)ip6);
+			advance = mobility_print(ndo, cp, (const u_char *)ip6);
 			nh = *cp;
 			return;
 		case IPPROTO_ROUTING:
@@ -240,7 +240,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			return;
 
                 case IPPROTO_PGM:
-                        pgm_print(cp, len, (const u_char *)ip6);
+                        pgm_print(ndo, cp, len, (const u_char *)ip6);
                         return;
 
 		case IPPROTO_GRE:
