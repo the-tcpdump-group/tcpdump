@@ -29,6 +29,7 @@
 #include "ip6.h"
 #endif
 #include "ipproto.h"
+#include "af.h"
 
 /*
  * PGM header (RFC 3208)
@@ -141,11 +142,6 @@ typedef enum _pgm_type {
 
 #define PGM_MIN_OPT_LEN		4
 
-#ifndef AFI_IP
-#define AFI_IP		1
-#define AFI_IP6	        2
-#endif
-
 void
 pgm_print(netdissect_options *ndo,
           register const u_char *bp, register u_int length,
@@ -250,12 +246,12 @@ pgm_print(netdissect_options *ndo,
 	    ND_TCHECK(*spm);
 
 	    switch (EXTRACT_16BITS(&spm->pgms_nla_afi)) {
-	    case AFI_IP:
+	    case AFNUM_INET:
 		addr_size = sizeof(struct in_addr);
 		nla_af = AF_INET;
 		break;
 #ifdef INET6
-	    case AFI_IP6:
+	    case AFNUM_INET6:
 		addr_size = sizeof(struct in6_addr);
 		nla_af = AF_INET6;
 		break;
@@ -297,12 +293,12 @@ pgm_print(netdissect_options *ndo,
 	    ND_TCHECK(*polr);
 
 	    switch (EXTRACT_16BITS(&polr->pgmp_nla_afi)) {
-	    case AFI_IP:
+	    case AFNUM_INET:
 		addr_size = sizeof(struct in_addr);
 		nla_af = AF_INET;
 		break;
 #ifdef INET6
-	    case AFI_IP6:
+	    case AFNUM_INET6:
 		addr_size = sizeof(struct in6_addr);
 		nla_af = AF_INET6;
 		break;
@@ -379,12 +375,12 @@ pgm_print(netdissect_options *ndo,
 	     * and stopping if we don't have enough.
 	     */
 	    switch (EXTRACT_16BITS(&nak->pgmn_source_afi)) {
-	    case AFI_IP:
+	    case AFNUM_INET:
 		addr_size = sizeof(struct in_addr);
 		source_af = AF_INET;
 		break;
 #ifdef INET6
-	    case AFI_IP6:
+	    case AFNUM_INET6:
 		addr_size = sizeof(struct in6_addr);
 		source_af = AF_INET6;
 		break;
@@ -403,12 +399,12 @@ pgm_print(netdissect_options *ndo,
 	     * and stopping if we don't have enough.
 	     */
 	    switch (EXTRACT_16BITS(bp)) {
-	    case AFI_IP:
+	    case AFNUM_INET:
 		addr_size = sizeof(struct in_addr);
 		group_af = AF_INET;
 		break;
 #ifdef INET6
-	    case AFI_IP6:
+	    case AFNUM_INET6:
 		addr_size = sizeof(struct in6_addr);
 		group_af = AF_INET6;
 		break;
@@ -606,12 +602,12 @@ pgm_print(netdissect_options *ndo,
 		case PGM_OPT_REDIRECT:
 		    bp += 2;
 		    switch (EXTRACT_16BITS(bp)) {
-		    case AFI_IP:
+		    case AFNUM_INET:
 			addr_size = sizeof(struct in_addr);
 			nla_af = AF_INET;
 			break;
 #ifdef INET6
-		    case AFI_IP6:
+		    case AFNUM_INET6:
 			addr_size = sizeof(struct in6_addr);
 			nla_af = AF_INET6;
 			break;
@@ -737,12 +733,12 @@ pgm_print(netdissect_options *ndo,
 		    offset = EXTRACT_32BITS(bp);
 		    bp += sizeof(u_int32_t);
 		    switch (EXTRACT_16BITS(bp)) {
-		    case AFI_IP:
+		    case AFNUM_INET:
 			addr_size = sizeof(struct in_addr);
 			nla_af = AF_INET;
 			break;
 #ifdef INET6
-		    case AFI_IP6:
+		    case AFNUM_INET6:
 			addr_size = sizeof(struct in6_addr);
 			nla_af = AF_INET6;
 			break;
@@ -770,12 +766,12 @@ pgm_print(netdissect_options *ndo,
 		    offset = EXTRACT_32BITS(bp);
 		    bp += sizeof(u_int32_t);
 		    switch (EXTRACT_16BITS(bp)) {
-		    case AFI_IP:
+		    case AFNUM_INET:
 			addr_size = sizeof(struct in_addr);
 			nla_af = AF_INET;
 			break;
 #ifdef INET6
-		    case AFI_IP6:
+		    case AFNUM_INET6:
 			addr_size = sizeof(struct in6_addr);
 			nla_af = AF_INET6;
 			break;
