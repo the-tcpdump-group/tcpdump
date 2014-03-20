@@ -166,10 +166,6 @@ extern void ascii_print(const u_char *, u_int);
 extern void aarp_print(const u_char *, u_int);
 extern void aodv_print(const u_char *, u_int, int);
 extern void atalk_print(const u_char *, u_int);
-extern void atm_print(u_int, u_int, u_int, const u_char *, u_int, u_int);
-extern u_int atm_if_print(const struct pcap_pkthdr *, const u_char *);
-extern u_int sunatm_if_print(const struct pcap_pkthdr *, const u_char *);
-extern int oam_print(const u_char *, u_int, u_int);
 extern void bootp_print(const u_char *, u_int);
 extern void bgp_print(const u_char *, int);
 extern void cnfp_print(const u_char *, const u_char *);
@@ -194,7 +190,6 @@ extern void nfsreq_print(const u_char *, u_int, const u_char *);
 extern void nfsreq_print_noaddr(const u_char *, u_int, const u_char *);
 extern void ns_print(const u_char *, u_int, int);
 extern const u_char * ns_nprint (register const u_char *, register const u_char *);
-extern void ntp_print(const u_char *, u_int);
 extern void ospf_print(const u_char *, u_int, const u_char *);
 extern void olsr_print (const u_char *, u_int, int);
 extern void pimv1_print(const u_char *, u_int);
@@ -229,8 +224,6 @@ extern void snmp_print(const u_char *, u_int);
 extern void tcp_print(const u_char *, u_int, const u_char *, int);
 extern void tftp_print(const u_char *, u_int);
 extern void timed_print(const u_char *);
-extern void vtp_print(const u_char *, u_int);
-extern void wb_print(const void *, u_int);
 extern void rx_print(register const u_char *, int, int, int, u_char *);
 extern void netbeui_print(u_short, const u_char *, int);
 extern void ipx_netbios_print(const u_char *, u_int);
@@ -251,7 +244,6 @@ extern void forces_print(const u_char *, u_int);
 extern void mpls_lsp_ping_print(const u_char *, u_int);
 extern void sip_print(const u_char *, u_int);
 extern void syslog_print(const u_char *, u_int);
-extern int mptcp_print(const u_char *, u_int, u_char);
 
 
 #ifdef INET6

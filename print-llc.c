@@ -434,7 +434,7 @@ snap_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
                         udld_print(ndo, p, length);
                         return (1);
                 case PID_CISCO_VTP:
-                        vtp_print(p, length);
+                        vtp_print(ndo, p, length);
                         return (1);
                 case PID_CISCO_PVST:
                 case PID_CISCO_VLANBRIDGE:

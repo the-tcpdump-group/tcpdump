@@ -410,7 +410,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 
 		case PT_WB:
 			udpipaddr_print(ndo, ip, sport, dport);
-			wb_print((void *)(up + 1), length);
+			wb_print(ndo, (void *)(up + 1), length);
 			break;
 
 		case PT_RPC:
@@ -593,7 +593,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 		else if (ISPORT(SNMP_PORT) || ISPORT(SNMPTRAP_PORT))
 			snmp_print((const u_char *)(up + 1), length);
 		else if (ISPORT(NTP_PORT))
-			ntp_print((const u_char *)(up + 1), length);
+			ntp_print(ndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(KERBEROS_PORT) || ISPORT(KERBEROS_SEC_PORT))
 			krb_print((const void *)(up + 1));
 		else if (ISPORT(L2TP_PORT))
@@ -630,7 +630,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 		 * Kludge in test for whiteboard packets.
 		 */
 		else if (dport == WB_PORT)
-			wb_print((const void *)(up + 1), length);
+			wb_print(ndo, (const void *)(up + 1), length);
 		else if (ISPORT(CISCO_AUTORP_PORT))
 			cisco_autorp_print((const void *)(up + 1), length);
 		else if (ISPORT(RADIUS_PORT) ||

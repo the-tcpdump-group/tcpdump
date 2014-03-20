@@ -178,7 +178,6 @@ static const struct printer printers[] = {
 #ifdef DLT_PPP_BSDOS
 	{ ppp_bsdos_if_print,	DLT_PPP_BSDOS },
 #endif
-	{ atm_if_print,		DLT_ATM_RFC1483 },
 #ifdef DLT_PPP_SERIAL
 	{ ppp_hdlc_if_print,	DLT_PPP_SERIAL },
 #endif
@@ -187,9 +186,6 @@ static const struct printer printers[] = {
 #endif
 #ifdef DLT_LTALK
 	{ ltalk_if_print,	DLT_LTALK },
-#endif
-#ifdef DLT_SUNATM
-	{ sunatm_if_print,	DLT_SUNATM },
 #endif
 #ifdef DLT_PRISM_HEADER
 	{ prism_if_print,	DLT_PRISM_HEADER },
@@ -343,6 +339,10 @@ static const struct ndo_printer ndo_printers[] = {
 #endif
 #ifdef DLT_MFR
 	{ mfr_if_print,		DLT_MFR },
+#endif
+	{ atm_if_print,		DLT_ATM_RFC1483 },
+#ifdef DLT_SUNATM
+	{ sunatm_if_print,	DLT_SUNATM },
 #endif
 	{ NULL,			0 },
 };

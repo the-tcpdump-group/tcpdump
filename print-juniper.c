@@ -922,7 +922,7 @@ juniper_atm1_print(const struct pcap_pkthdr *h, register const u_char *p)
         p+=l2info.header_len;
 
         if (l2info.cookie[0] == 0x80) { /* OAM cell ? */
-            oam_print(p,l2info.length,ATM_OAM_NOHEC);
+            oam_print(gndo, p, l2info.length, ATM_OAM_NOHEC);
             return l2info.header_len;
         }
 
@@ -970,7 +970,7 @@ juniper_atm2_print(const struct pcap_pkthdr *h, register const u_char *p)
         p+=l2info.header_len;
 
         if (l2info.cookie[7] & ATM2_PKT_TYPE_MASK) { /* OAM cell ? */
-            oam_print(p,l2info.length,ATM_OAM_NOHEC);
+            oam_print(gndo, p, l2info.length, ATM_OAM_NOHEC);
             return l2info.header_len;
         }
 

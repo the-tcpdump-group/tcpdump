@@ -576,7 +576,7 @@ tcp_print(register const u_char *bp, register u_int length,
                         case TCPOPT_MPTCP:
                                 datalen = len - 2;
                                 LENCHECK(datalen);
-                                if (!mptcp_print(cp-2, len, flags))
+                                if (!mptcp_print(gndo, cp-2, len, flags))
                                         goto bad;
                                 break;
 

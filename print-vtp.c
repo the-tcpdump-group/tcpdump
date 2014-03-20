@@ -22,19 +22,16 @@
  * Original code ode by Carles Kishimoto <carles.kishimoto@gmail.com>
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include <tcpdump-stdinc.h>
 
-#include <stdio.h>
-#include <string.h>
-
 #include "interface.h"
 #include "addrtoname.h"
 #include "extract.h"
-#include "nlpid.h"
 
 #define VTP_HEADER_LEN			36
 #define	VTP_DOMAIN_NAME_LEN		32
@@ -121,7 +118,8 @@ static const struct tok vtp_stp_type_values[] = {
 };
 
 void
-vtp_print (const u_char *pptr, u_int length)
+vtp_print (netdissect_options *ndo,
+           const u_char *pptr, u_int length)
 {
     int type, len, tlv_len, tlv_value;
     const u_char *tptr;
@@ -132,26 +130,26 @@ vtp_print (const u_char *pptr, u_int length)
 
     tptr = pptr;
 
-    if (!TTEST2(*tptr, VTP_HEADER_LEN))
+    if (!ND_TTEST2(*tptr, VTP_HEADER_LEN))
 	goto trunc;
 
     type = *(tptr+1);
-    printf("VTPv%u, Message %s (0x%02x), length %u",
+    ND_PRINT((ndo, "VTPv%u, Message %s (0x%02x), length %u",
 	   *tptr,
 	   tok2str(vtp_message_type_values,"Unknown message type", type),
 	   *(tptr+1),
-	   length);
+	   length));
 
     /* In non-verbose mode, just print version and message type */
-    if (vflag < 1) {
+    if (ndo->ndo_vflag < 1) {
         return;
     }
 
     /* verbose mode print all fields */
-    printf("\n\tDomain name: %s, %s: %u",
+    ND_PRINT((ndo, "\n\tDomain name: %s, %s: %u",
 	   (tptr+4),
 	   tok2str(vtp_header_values,"Unknown",*(tptr+1)),
-	   *(tptr+2));
+	   *(tptr+2)));
 
     tptr += VTP_HEADER_LEN;
 
@@ -179,20 +177,20 @@ vtp_print (const u_char *pptr, u_int length)
 	 *
 	 */
 
-	printf("\n\t  Config Rev %x, Updater %s",
+	ND_PRINT((ndo, "\n\t  Config Rev %x, Updater %s",
 	       EXTRACT_32BITS(tptr),
-	       ipaddr_string(tptr+4));
+	       ipaddr_string(tptr+4)));
 	tptr += 8;
-	printf(", Timestamp 0x%08x 0x%08x 0x%08x",
+	ND_PRINT((ndo, ", Timestamp 0x%08x 0x%08x 0x%08x",
 	       EXTRACT_32BITS(tptr),
 	       EXTRACT_32BITS(tptr + 4),
-	       EXTRACT_32BITS(tptr + 8));
+	       EXTRACT_32BITS(tptr + 8)));
 	tptr += VTP_UPDATE_TIMESTAMP_LEN;
-	printf(", MD5 digest: %08x%08x%08x%08x",
+	ND_PRINT((ndo, ", MD5 digest: %08x%08x%08x%08x",
 	       EXTRACT_32BITS(tptr),
 	       EXTRACT_32BITS(tptr + 4),
 	       EXTRACT_32BITS(tptr + 8),
-	       EXTRACT_32BITS(tptr + 12));
+	       EXTRACT_32BITS(tptr + 12)));
 	tptr += VTP_MD5_DIGEST_LEN;
 	break;
 
@@ -218,7 +216,7 @@ vtp_print (const u_char *pptr, u_int length)
 	 *
 	 */
 
-	printf(", Config Rev %x", EXTRACT_32BITS(tptr));
+	ND_PRINT((ndo, ", Config Rev %x", EXTRACT_32BITS(tptr)));
 
 	/*
 	 *  VLAN INFORMATION
@@ -242,17 +240,17 @@ vtp_print (const u_char *pptr, u_int length)
 	    if (len == 0)
 		break;
 
-	    if (!TTEST2(*tptr, len))
+	    if (!ND_TTEST2(*tptr, len))
 		goto trunc;
 
 	    vtp_vlan = (struct vtp_vlan_*)tptr;
-	    printf("\n\tVLAN info status %s, type %s, VLAN-id %u, MTU %u, SAID 0x%08x, Name %s",
+	    ND_PRINT((ndo, "\n\tVLAN info status %s, type %s, VLAN-id %u, MTU %u, SAID 0x%08x, Name %s",
 		   tok2str(vtp_vlan_status,"Unknown",vtp_vlan->status),
 		   tok2str(vtp_vlan_type_values,"Unknown",vtp_vlan->type),
 		   EXTRACT_16BITS(&vtp_vlan->vlanid),
 		   EXTRACT_16BITS(&vtp_vlan->mtu),
 		   EXTRACT_32BITS(&vtp_vlan->index),
-		   (tptr + VTP_VLAN_INFO_OFFSET));
+		   (tptr + VTP_VLAN_INFO_OFFSET)));
 
             /*
              * Vlan names are aligned to 32-bit boundaries.
@@ -271,9 +269,9 @@ vtp_print (const u_char *pptr, u_int length)
                 type = *tptr;
                 tlv_len = *(tptr+1);
 
-                printf("\n\t\t%s (0x%04x) TLV",
+                ND_PRINT((ndo, "\n\t\t%s (0x%04x) TLV",
                        tok2str(vtp_vlan_tlv_values, "Unknown", type),
-                       type);
+                       type));
 
                 /*
                  * infinite loop check
@@ -282,38 +280,38 @@ vtp_print (const u_char *pptr, u_int length)
                     return;
                 }
 
-                if (!TTEST2(*tptr, tlv_len*2 +2))
+                if (!ND_TTEST2(*tptr, tlv_len*2 +2))
                     goto trunc;
 
                 tlv_value = EXTRACT_16BITS(tptr+2);
 
                 switch (type) {
                 case VTP_VLAN_STE_HOP_COUNT:
-                    printf(", %u", tlv_value);
+                    ND_PRINT((ndo, ", %u", tlv_value));
                     break;
 
                 case VTP_VLAN_PRUNING:
-                    printf(", %s (%u)",
+                    ND_PRINT((ndo, ", %s (%u)",
                            tlv_value == 1 ? "Enabled" : "Disabled",
-                           tlv_value);
+                           tlv_value));
                     break;
 
                 case VTP_VLAN_STP_TYPE:
-                    printf(", %s (%u)",
+                    ND_PRINT((ndo, ", %s (%u)",
                            tok2str(vtp_stp_type_values, "Unknown", tlv_value),
-                           tlv_value);
+                           tlv_value));
                     break;
 
                 case VTP_VLAN_BRIDGE_TYPE:
-                    printf(", %s (%u)",
+                    ND_PRINT((ndo, ", %s (%u)",
                            tlv_value == 1 ? "SRB" : "SRT",
-                           tlv_value);
+                           tlv_value));
                     break;
 
                 case VTP_VLAN_BACKUP_CRF_MODE:
-                    printf(", %s (%u)",
+                    ND_PRINT((ndo, ", %s (%u)",
                            tlv_value == 1 ? "Backup" : "Not backup",
-                           tlv_value);
+                           tlv_value));
                     break;
 
                     /*
@@ -327,7 +325,7 @@ vtp_print (const u_char *pptr, u_int length)
                 case VTP_VLAN_TRANS_BRIDGED_VLAN:
                 case VTP_VLAN_ARP_HOP_COUNT:
                 default:
-		    print_unknown_data(gndo,tptr, "\n\t\t  ", 2 + tlv_len*2);
+		    print_unknown_data(ndo, tptr, "\n\t\t  ", 2 + tlv_len*2);
                     break;
                 }
                 len -= 2 + tlv_len*2;
@@ -352,7 +350,7 @@ vtp_print (const u_char *pptr, u_int length)
 	 *
 	 */
 
-	printf("\n\tStart value: %u", EXTRACT_32BITS(tptr));
+	ND_PRINT((ndo, "\n\tStart value: %u", EXTRACT_32BITS(tptr)));
 	break;
 
     case VTP_JOIN_MESSAGE:
@@ -367,7 +365,7 @@ vtp_print (const u_char *pptr, u_int length)
     return;
 
  trunc:
-    printf("[|vtp]");
+    ND_PRINT((ndo, "[|vtp]"));
 }
 
 /*

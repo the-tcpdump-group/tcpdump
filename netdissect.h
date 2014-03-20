@@ -444,6 +444,14 @@ extern void lwapp_data_print(netdissect_options *, const u_char *, u_int);
 extern void pgm_print(netdissect_options *, const u_char *, u_int, const u_char *);
 extern void pptp_print(netdissect_options *, const u_char *);
 extern void ldp_print(netdissect_options *, const u_char *, u_int);
+extern void wb_print(netdissect_options *, const void *, u_int);
+extern int oam_print(netdissect_options *, const u_char *, u_int, u_int);
+extern void atm_print(netdissect_options *, u_int, u_int, u_int, const u_char *, u_int, u_int);
+extern u_int sunatm_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int atm_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern void vtp_print(netdissect_options *, const u_char *, u_int);
+extern int mptcp_print(netdissect_options *, const u_char *, u_int, u_char);
+extern void ntp_print(netdissect_options *, const u_char *, u_int);
 
 /* stuff that has not yet been rototiled */
 extern const u_char * ns_nprint (register const u_char *, register const u_char *);
@@ -489,7 +497,6 @@ extern void nfsreply_print(netdissect_options *,const u_char *,
 extern void nfsreq_print(netdissect_options *,const u_char *,
 			 u_int, const u_char *);
 extern void ns_print(netdissect_options *,const u_char *, u_int);
-extern void ntp_print(netdissect_options *,const u_char *, u_int);
 extern void null_if_print(u_char *,const struct pcap_pkthdr *, const u_char *);
 extern void ospf_print(netdissect_options *,const u_char *,
 		       u_int, const u_char *);
@@ -522,7 +529,6 @@ extern void tcp_print(netdissect_options *,const u_char *, u_int,
 		      const u_char *, int);
 extern void tftp_print(netdissect_options *,const u_char *, u_int);
 extern void timed_print(netdissect_options *,const u_char *, u_int);
-extern void wb_print(netdissect_options *,const void *, u_int);
 extern void esp_print_decodesecret(netdissect_options *ndo);
 extern void rx_print(netdissect_options *,register const u_char *,
 		     int, int, int, u_char *);
