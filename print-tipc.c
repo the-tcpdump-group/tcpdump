@@ -309,7 +309,6 @@ print_link_conf(netdissect_options *ndo, const struct link_conf_tipc_pkthdr *ap)
 	msize = TIPC_MSIZE(w0);
 	w1 = EXTRACT_32BITS(&ap->w1);
 	mtype = TIPC_MTYPE(w1);
-	prev_node = EXTRACT_32BITS(&ap->prev_node);
 	dest_domain = EXTRACT_32BITS(&ap->dest_domain);
 	prev_node = EXTRACT_32BITS(&ap->prev_node);
 
