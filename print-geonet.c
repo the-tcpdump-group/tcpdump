@@ -15,14 +15,12 @@
  * Original code by Ola Martin Lykkja (ola.lykkja@q-free.com)
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include <tcpdump-stdinc.h>
-
-#include <stdio.h>
-#include <string.h>
 
 #include "interface.h"
 #include "extract.h"
@@ -40,6 +38,8 @@
    Sub-part 1: Media-Independent Functionality
 */
 
+#define GEONET_ADDR_LEN 8
+
 static const struct tok msg_type_values[] = {
 	{   0, "CAM" },
 	{   1, "DENM" },
@@ -55,7 +55,8 @@ static const struct tok msg_type_values[] = {
 };
 
 static void
-print_btp_body(const u_char *bp, u_int length)
+print_btp_body(netdissect_options *ndo,
+               const u_char *bp, u_int length)
 {
 	int version;
 	int msg_type;
@@ -70,34 +71,30 @@ print_btp_body(const u_char *bp, u_int length)
 	msg_type = bp[1];
 	msg_type_str = tok2str(msg_type_values, "unknown (%u)", msg_type);
 
-	printf("; ItsPduHeader v:%d t:%d-%s", version, msg_type, msg_type_str);
+	ND_PRINT((ndo, "; ItsPduHeader v:%d t:%d-%s", version, msg_type, msg_type_str));
 }
 
 static void
-print_btp(const u_char *bp)
+print_btp(netdissect_options *ndo,
+          const u_char *bp)
 {
 	u_int16_t dest = EXTRACT_16BITS(bp+0);
 	u_int16_t src = EXTRACT_16BITS(bp+2);
-	printf("; BTP Dst:%u Src:%u", dest, src);
+	ND_PRINT((ndo, "; BTP Dst:%u Src:%u", dest, src));
 }
 
 static void
-print_long_pos_vector(const u_char *bp)
+print_long_pos_vector(netdissect_options *ndo,
+                      const u_char *bp)
 {
-	int i;
 	u_int32_t lat, lon;
 
-	printf("GN_ADDR:");
-	for (i=0; i<8; i++) {
-		if (i) printf(":");
-		printf("%02x", bp[i]);
-	}
-	printf(" ");
+	ND_PRINT((ndo, "GN_ADDR:%s ", linkaddr_string (bp, 0, GEONET_ADDR_LEN)));
 
 	lat = EXTRACT_32BITS(bp+12);
-	printf("lat:%d ", lat);
+	ND_PRINT((ndo, "lat:%d ", lat));
 	lon = EXTRACT_32BITS(bp+16);
-	printf("lon:%d", lon);
+	ND_PRINT((ndo, "lon:%d", lon));
 }
 
 
@@ -108,7 +105,7 @@ print_long_pos_vector(const u_char *bp)
 void
 geonet_print(netdissect_options *ndo, const u_char *eth, const u_char *bp, u_int length)
 {
-	printf("GeoNet src:%s; ", etheraddr_string(eth+6));
+	ND_PRINT((ndo, "GeoNet src:%s; ", etheraddr_string(eth+6)));
 
 	if (length >= 36) {
 		/* Process Common Header */
@@ -157,12 +154,12 @@ geonet_print(netdissect_options *ndo, const u_char *eth, const u_char *bp, u_int
 				break;
 		}
 
-		printf("v:%d ", version);
-		printf("NH:%d-%s ", next_hdr, next_hdr_txt);
-		printf("HT:%d-%d-%s ", hdr_type, hdr_subtype, hdr_type_txt);
-		printf("HopLim:%d ", hop_limit);
-		printf("Payload:%d ", payload_length);
-        	print_long_pos_vector(bp + 8);
+		ND_PRINT((ndo, "v:%d ", version));
+		ND_PRINT((ndo, "NH:%d-%s ", next_hdr, next_hdr_txt));
+		ND_PRINT((ndo, "HT:%d-%d-%s ", hdr_type, hdr_subtype, hdr_type_txt));
+		ND_PRINT((ndo, "HopLim:%d ", hop_limit));
+		ND_PRINT((ndo, "Payload:%d ", payload_length));
+		print_long_pos_vector(ndo, bp + 8);
 
 		/* Skip Common Header */
 		length -= 36;
@@ -223,22 +220,22 @@ geonet_print(netdissect_options *ndo, const u_char *eth, const u_char *bp, u_int
 					break;
 				case 1:
 				case 2: /* BTP A/B */
-					print_btp(bp);
+					print_btp(ndo, bp);
 					length -= 4;
 					bp += 4;
-					print_btp_body(bp, length);
+					print_btp_body(ndo, bp, length);
 					break;
 				case 3: /* IPv6 */
 					break;
 			}
 		}
 	} else {
-		printf("Malformed (small) ");
+		ND_PRINT((ndo, "Malformed (small) "));
 	}
 
 	/* Print user data part */
 	if (ndo->ndo_vflag)
-		default_print(bp, length);
+		ndo->ndo_default_print(ndo, bp, length);
 }
 
 

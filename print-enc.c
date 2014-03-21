@@ -21,6 +21,7 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -79,12 +80,13 @@ struct enchdr {
 
 #define ENC_PRINT_TYPE(wh, xf, nam) \
 	if ((wh) & (xf)) { \
-		printf("%s%s", nam, (wh) == (xf) ? "): " : ","); \
+		ND_PRINT((ndo, "%s%s", nam, (wh) == (xf) ? "): " : ",")); \
 		(wh) &= ~(xf); \
 	}
 
 u_int
-enc_if_print(const struct pcap_pkthdr *h, register const u_char *p)
+enc_if_print(netdissect_options *ndo,
+             const struct pcap_pkthdr *h, register const u_char *p)
 {
 	register u_int length = h->len;
 	register u_int caplen = h->caplen;
@@ -92,20 +94,20 @@ enc_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 	const struct enchdr *hdr;
 
 	if (caplen < ENC_HDRLEN) {
-		printf("[|enc]");
+		ND_PRINT((ndo, "[|enc]"));
 		goto out;
 	}
 
 	hdr = (struct enchdr *)p;
 	flags = hdr->flags;
 	if (flags == 0)
-		printf("(unprotected): ");
+		ND_PRINT((ndo, "(unprotected): "));
 	else
-		printf("(");
+		ND_PRINT((ndo, "("));
 	ENC_PRINT_TYPE(flags, M_AUTH, "authentic");
 	ENC_PRINT_TYPE(flags, M_CONF, "confidential");
 	/* ENC_PRINT_TYPE(flags, M_TUNNEL, "tunnel"); */
-	printf("SPI 0x%08x: ", EXTRACT_32BITS(&hdr->spi));
+	ND_PRINT((ndo, "SPI 0x%08x: ", EXTRACT_32BITS(&hdr->spi)));
 
 	length -= ENC_HDRLEN;
 	caplen -= ENC_HDRLEN;
@@ -113,11 +115,11 @@ enc_if_print(const struct pcap_pkthdr *h, register const u_char *p)
 
 	switch (hdr->af) {
 	case AF_INET:
-		ip_print(gndo, p, length);
+		ip_print(ndo, p, length);
 		break;
 #ifdef INET6
 	case AF_INET6:
-		ip6_print(gndo, p, length);
+		ip6_print(ndo, p, length);
 		break;
 #endif /*INET6*/
 	}

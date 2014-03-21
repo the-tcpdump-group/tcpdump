@@ -442,12 +442,12 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 
 		case PT_CNFP:
 			udpipaddr_print(ndo, ip, sport, dport);
-			cnfp_print(cp, (const u_char *)ip);
+			cnfp_print(ndo, cp, (const u_char *)ip);
 			break;
 
 		case PT_TFTP:
 			udpipaddr_print(ndo, ip, sport, dport);
-			tftp_print(cp, length);
+			tftp_print(ndo, cp, length);
 			break;
 
 		case PT_AODV:
@@ -570,7 +570,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 		else if (ISPORT(TIMED_PORT))
 			timed_print((const u_char *)(up + 1));
 		else if (ISPORT(TFTP_PORT))
-			tftp_print((const u_char *)(up + 1), length);
+			tftp_print(ndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(IPPORT_BOOTPC) || ISPORT(IPPORT_BOOTPS))
 			bootp_print((const u_char *)(up + 1), length);
 		else if (ISPORT(RIP_PORT))

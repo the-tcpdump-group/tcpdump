@@ -21,13 +21,13 @@
  * Format and print trivial file transfer protocol packets.
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include <tcpdump-stdinc.h>
 
-#include <stdio.h>
 #include <string.h>
 
 #include "interface.h"
@@ -104,7 +104,8 @@ static const struct tok err2str[] = {
  * Print trivial file transfer program requests
  */
 void
-tftp_print(register const u_char *bp, u_int length)
+tftp_print(netdissect_options *ndo,
+           register const u_char *bp, u_int length)
 {
 	register const struct tftphdr *tp;
 	register const char *cp;
@@ -114,13 +115,13 @@ tftp_print(register const u_char *bp, u_int length)
 	tp = (const struct tftphdr *)bp;
 
 	/* Print length */
-	printf(" %d", length);
+	ND_PRINT((ndo, " %d", length));
 
 	/* Print tftp request type */
-	TCHECK(tp->th_opcode);
+	ND_TCHECK(tp->th_opcode);
 	opcode = EXTRACT_16BITS(&tp->th_opcode);
 	cp = tok2str(op2str, "tftp-#%d", opcode);
-	printf(" %s", cp);
+	ND_PRINT((ndo, " %s", cp));
 	/* Bail if bogus opcode */
 	if (*cp == 't')
 		return;
@@ -131,13 +132,13 @@ tftp_print(register const u_char *bp, u_int length)
 	case WRQ:
 	case OACK:
 		p = (u_char *)tp->th_stuff;
-		putchar(' ');
+		ND_PRINT((ndo, " "));
 		/* Print filename or first option */
 		if (opcode != OACK)
-			putchar('"');
-		i = fn_print(p, snapend);
+			ND_PRINT((ndo, "\""));
+		i = fn_print(p, ndo->ndo_snapend);
 		if (opcode != OACK)
-			putchar('"');
+			ND_PRINT((ndo, "\""));
 
 		/* Print the mode (RRQ and WRQ only) and any options */
 		while ((p = (const u_char *)strchr((const char *)p, '\0')) != NULL) {
@@ -145,8 +146,8 @@ tftp_print(register const u_char *bp, u_int length)
 				break;
 			p++;
 			if (*p != '\0') {
-				putchar(' ');
-				fn_print(p, snapend);
+				ND_PRINT((ndo, " "));
+				fn_print(p, ndo->ndo_snapend);
 			}
 		}
 
@@ -156,29 +157,29 @@ tftp_print(register const u_char *bp, u_int length)
 
 	case ACK:
 	case DATA:
-		TCHECK(tp->th_block);
-		printf(" block %d", EXTRACT_16BITS(&tp->th_block));
+		ND_TCHECK(tp->th_block);
+		ND_PRINT((ndo, " block %d", EXTRACT_16BITS(&tp->th_block)));
 		break;
 
 	case TFTP_ERROR:
 		/* Print error code string */
-		TCHECK(tp->th_code);
-		printf(" %s \"", tok2str(err2str, "tftp-err-#%d \"",
-				       EXTRACT_16BITS(&tp->th_code)));
+		ND_TCHECK(tp->th_code);
+		ND_PRINT((ndo, " %s \"", tok2str(err2str, "tftp-err-#%d \"",
+				       EXTRACT_16BITS(&tp->th_code))));
 		/* Print error message string */
-		i = fn_print((const u_char *)tp->th_data, snapend);
-		putchar('"');
+		i = fn_print((const u_char *)tp->th_data, ndo->ndo_snapend);
+		ND_PRINT((ndo, "\""));
 		if (i)
 			goto trunc;
 		break;
 
 	default:
 		/* We shouldn't get here */
-		printf("(unknown #%d)", opcode);
+		ND_PRINT((ndo, "(unknown #%d)", opcode));
 		break;
 	}
 	return;
 trunc:
-	fputs(tstr, stdout);
+	ND_PRINT((ndo, tstr));
 	return;
 }

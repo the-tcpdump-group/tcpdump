@@ -412,7 +412,7 @@ again:
 		break;
 
 	case IPPROTO_EGP:
-		egp_print(ipds->cp, ipds->len);
+		egp_print(ndo, ipds->cp, ipds->len);
 		break;
 
 	case IPPROTO_OSPF:

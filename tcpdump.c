@@ -167,10 +167,6 @@ struct ndo_printer {
 
 
 static const struct printer printers[] = {
-	{ sl_if_print,		DLT_SLIP },
-#ifdef DLT_SLIP_BSDOS
-	{ sl_bsdos_if_print,	DLT_SLIP_BSDOS },
-#endif
 	{ ppp_if_print,		DLT_PPP },
 #ifdef DLT_PPP_WITHDIRECTION
 	{ ppp_if_print,		DLT_PPP_WITHDIRECTION },
@@ -192,9 +188,6 @@ static const struct printer printers[] = {
 #endif
 #ifdef DLT_IEEE802_11_RADIO
 	{ ieee802_11_radio_if_print,	DLT_IEEE802_11_RADIO },
-#endif
-#ifdef DLT_ENC
-	{ enc_if_print,		DLT_ENC },
 #endif
 #ifdef DLT_IEEE802_11_RADIO_AVS
 	{ ieee802_11_radio_avs_if_print,	DLT_IEEE802_11_RADIO_AVS },
@@ -343,6 +336,13 @@ static const struct ndo_printer ndo_printers[] = {
 	{ atm_if_print,		DLT_ATM_RFC1483 },
 #ifdef DLT_SUNATM
 	{ sunatm_if_print,	DLT_SUNATM },
+#endif
+#ifdef DLT_ENC
+	{ enc_if_print,		DLT_ENC },
+#endif
+	{ sl_if_print,		DLT_SLIP },
+#ifdef DLT_SLIP_BSDOS
+	{ sl_bsdos_if_print,	DLT_SLIP_BSDOS },
 #endif
 	{ NULL,			0 },
 };

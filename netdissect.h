@@ -452,6 +452,13 @@ extern u_int atm_if_print(netdissect_options *, const struct pcap_pkthdr *, cons
 extern void vtp_print(netdissect_options *, const u_char *, u_int);
 extern int mptcp_print(netdissect_options *, const u_char *, u_int, u_char);
 extern void ntp_print(netdissect_options *, const u_char *, u_int);
+extern void cnfp_print(netdissect_options *, const u_char *, const u_char *);
+extern void dvmrp_print(netdissect_options *, const u_char *, u_int);
+extern void egp_print(netdissect_options *, const u_char *, u_int);
+extern u_int enc_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int sl_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int sl_bsdos_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern void tftp_print(netdissect_options *, const u_char *, u_int);
 
 /* stuff that has not yet been rototiled */
 extern const u_char * ns_nprint (register const u_char *, register const u_char *);
@@ -467,14 +474,9 @@ extern void bgp_print(netdissect_options *,const u_char *, int);
 extern void bxxp_print(netdissect_options *,const u_char *, u_int);
 extern void cisco_autorp_print(netdissect_options *,
 			       const u_char *, u_int);
-extern void cnfp_print(netdissect_options *,const u_char *cp,
-		       u_int len, const u_char *bp);
 extern void decnet_print(netdissect_options *,const u_char *,
 			 u_int, u_int);
 extern void default_print(netdissect_options *,const u_char *, u_int);
-extern void dvmrp_print(netdissect_options *,const u_char *, u_int);
-extern void egp_print(netdissect_options *,const u_char *, u_int,
-		      const u_char *);
 
 extern void hsrp_print(netdissect_options *ndo,
 		       register const u_char *bp, register u_int len);
@@ -516,18 +518,13 @@ extern void sctp_print(netdissect_options *ndo,
 		       const u_char *bp, const u_char *bp2,
 		       u_int sctpPacketLength);
 
-extern void sl_if_print(u_char *,const struct pcap_pkthdr *, const u_char *);
-
 extern void lane_if_print(u_char *,const struct pcap_pkthdr *,const u_char *);
-extern void sl_bsdos_if_print(u_char *,
-			      const struct pcap_pkthdr *, const u_char *);
 extern void sll_if_print(u_char *,
 			 const struct pcap_pkthdr *, const u_char *);
 
 extern void snmp_print(netdissect_options *,const u_char *, u_int);
 extern void tcp_print(netdissect_options *,const u_char *, u_int,
 		      const u_char *, int);
-extern void tftp_print(netdissect_options *,const u_char *, u_int);
 extern void timed_print(netdissect_options *,const u_char *, u_int);
 extern void esp_print_decodesecret(netdissect_options *ndo);
 extern void rx_print(netdissect_options *,register const u_char *,

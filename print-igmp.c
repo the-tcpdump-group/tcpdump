@@ -310,7 +310,7 @@ igmp_print(netdissect_options *ndo,
         if (len < 8)
             ND_PRINT((ndo, " [len %d]", len));
         else
-            dvmrp_print(bp, len);
+            dvmrp_print(ndo, bp, len);
         break;
     case 0x14:
         ND_PRINT((ndo, "igmp pimv1"));
