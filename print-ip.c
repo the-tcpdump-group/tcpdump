@@ -470,7 +470,7 @@ again:
 				(void)printf("vrrp %s > %s: ",
 					     ipaddr_string(&ipds->ip->ip_src),
 					     ipaddr_string(&ipds->ip->ip_dst));
-			vrrp_print(ipds->cp, ipds->len,
+			vrrp_print(ndo, ipds->cp, ipds->len,
 				(const u_char *)ipds->ip, ipds->ip->ip_ttl);
 		}
 		break;

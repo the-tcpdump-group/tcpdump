@@ -227,7 +227,6 @@ extern void smb_tcp_print(const u_char *, int);
 extern char *smb_errstr(int, int);
 extern const char *nt_errstr(u_int32_t);
 extern void print_data(const unsigned char *, int);
-extern void vrrp_print(const u_char *, u_int, const u_char *, int);
 extern void sflow_print(const u_char *, u_int);
 extern void cfm_print(const u_char *, u_int);
 extern void cdp_print(const u_char *, u_int, u_int);

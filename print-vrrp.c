@@ -23,14 +23,12 @@
  * FOR A PARTICULAR PURPOSE.
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include <tcpdump-stdinc.h>
-
-#include <stdio.h>
-#include <stdlib.h>
 
 #include "interface.h"
 #include "extract.h"
@@ -104,80 +102,81 @@ static const struct tok auth2str[] = {
 };
 
 void
-vrrp_print(register const u_char *bp, register u_int len,
-    register const u_char *bp2, int ttl)
+vrrp_print(netdissect_options *ndo,
+           register const u_char *bp, register u_int len,
+           register const u_char *bp2, int ttl)
 {
 	int version, type, auth_type = VRRP_AUTH_NONE; /* keep compiler happy */
 	const char *type_s;
 
-	TCHECK(bp[0]);
+	ND_TCHECK(bp[0]);
 	version = (bp[0] & 0xf0) >> 4;
 	type = bp[0] & 0x0f;
 	type_s = tok2str(type2str, "unknown type (%u)", type);
-	printf("VRRPv%u, %s", version, type_s);
+	ND_PRINT((ndo, "VRRPv%u, %s", version, type_s));
 	if (ttl != 255)
-		printf(", (ttl %u)", ttl);
+		ND_PRINT((ndo, ", (ttl %u)", ttl));
 	if (version < 2 || version > 3 || type != VRRP_TYPE_ADVERTISEMENT)
 		return;
-	TCHECK(bp[2]);
-	printf(", vrid %u, prio %u", bp[1], bp[2]);
-	TCHECK(bp[5]);
+	ND_TCHECK(bp[2]);
+	ND_PRINT((ndo, ", vrid %u, prio %u", bp[1], bp[2]));
+	ND_TCHECK(bp[5]);
 
 	if (version == 2) {
 		auth_type = bp[4];
-		printf(", authtype %s", tok2str(auth2str, NULL, auth_type));
-		printf(", intvl %us, length %u", bp[5], len);
+		ND_PRINT((ndo, ", authtype %s", tok2str(auth2str, NULL, auth_type)));
+		ND_PRINT((ndo, ", intvl %us, length %u", bp[5], len));
 	} else { /* version == 3 */
 		u_int16_t intvl = (bp[4] & 0x0f) << 8 | bp[5];
-		printf(", intvl %ucs, length %u", intvl, len);
+		ND_PRINT((ndo, ", intvl %ucs, length %u", intvl, len));
 	}
 
-	if (vflag) {
+	if (ndo->ndo_vflag) {
 		int naddrs = bp[3];
 		int i;
 		char c;
 
-		if (version == 2 && TTEST2(bp[0], len)) {
+		if (version == 2 && ND_TTEST2(bp[0], len)) {
 			struct cksum_vec vec[1];
 
 			vec[0].ptr = bp;
 			vec[0].len = len;
 			if (in_cksum(vec, 1))
-				printf(", (bad vrrp cksum %x)",
-					EXTRACT_16BITS(&bp[6]));
+				ND_PRINT((ndo, ", (bad vrrp cksum %x)",
+					EXTRACT_16BITS(&bp[6])));
 		}
 
-		if (version == 3 && TTEST2(bp[0], len)) {
+		if (version == 3 && ND_TTEST2(bp[0], len)) {
 			u_int16_t cksum = nextproto4_cksum((struct ip *)bp2, bp,
 				len, len, IPPROTO_VRRP);
 			if (cksum)
-				printf(", (bad vrrp cksum %x)",
-					EXTRACT_16BITS(&bp[6]));
+				ND_PRINT((ndo, ", (bad vrrp cksum %x)",
+					EXTRACT_16BITS(&bp[6])));
 		}
 
-		printf(", addrs");
+		ND_PRINT((ndo, ", addrs"));
 		if (naddrs > 1)
-			printf("(%d)", naddrs);
-		printf(":");
+			ND_PRINT((ndo, "(%d)", naddrs));
+		ND_PRINT((ndo, ":"));
 		c = ' ';
 		bp += 8;
 		for (i = 0; i < naddrs; i++) {
-			TCHECK(bp[3]);
-			printf("%c%s", c, ipaddr_string(bp));
+			ND_TCHECK(bp[3]);
+			ND_PRINT((ndo, "%c%s", c, ipaddr_string(bp)));
 			c = ',';
 			bp += 4;
 		}
 		if (version == 2 && auth_type == VRRP_AUTH_SIMPLE) { /* simple text password */
-			TCHECK(bp[7]);
-			printf(" auth \"");
-			if (fn_printn(bp, 8, snapend)) {
-				printf("\"");
+			ND_TCHECK(bp[7]);
+			ND_PRINT((ndo, " auth \""));
+			if (fn_printn(bp, 8, ndo->ndo_snapend)) {
+				ND_PRINT((ndo, "\""));
 				goto trunc;
 			}
-			printf("\"");
+			ND_PRINT((ndo, "\""));
 		}
 	}
 	return;
 trunc:
-	printf("[|vrrp]");
+	ND_PRINT((ndo, "[|vrrp]"));
 }
