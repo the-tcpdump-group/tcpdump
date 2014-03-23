@@ -599,9 +599,9 @@ esp_print(netdissect_options *ndo,
 		fputs("[|ESP]", stdout);
 		goto fail;
 	}
-	(*ndo->ndo_printf)(ndo, "ESP(spi=0x%08x", EXTRACT_32BITS(&esp->esp_spi));
-	(*ndo->ndo_printf)(ndo, ",seq=0x%x)", EXTRACT_32BITS(&esp->esp_seq));
-        (*ndo->ndo_printf)(ndo, ", length %u", length);
+	ND_PRINT((ndo, "ESP(spi=0x%08x", EXTRACT_32BITS(&esp->esp_spi)));
+	ND_PRINT((ndo, ",seq=0x%x)", EXTRACT_32BITS(&esp->esp_seq)));
+	ND_PRINT((ndo, ", length %u", length));
 
 #ifndef HAVE_LIBCRYPTO
 	goto fail;
@@ -705,7 +705,7 @@ esp_print(netdissect_options *ndo,
 	if (nhdr)
 		*nhdr = *(ep - 1);
 
-	(ndo->ndo_printf)(ndo, ": ");
+	ND_PRINT((ndo, ": "));
 	return advance;
 #endif
 
