@@ -1338,7 +1338,7 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 			while (domp < cp + (op->nd_opt_len << 3) && *domp != '\0')
 			{
 				ND_PRINT((ndo, " "));
-				if ((domp = ns_nprint (domp, bp)) == NULL)
+				if ((domp = ns_nprint (ndo, domp, bp)) == NULL)
 					goto trunc;
 			}
 			break;

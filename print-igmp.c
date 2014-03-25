@@ -314,7 +314,7 @@ igmp_print(netdissect_options *ndo,
         break;
     case 0x14:
         ND_PRINT((ndo, "igmp pimv1"));
-        pimv1_print(bp, len);
+        pimv1_print(ndo, bp, len);
         break;
     case 0x1e:
         print_mresp(ndo, bp, len);

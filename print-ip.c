@@ -455,7 +455,7 @@ again:
 	case IPPROTO_PIM:
 		vec[0].ptr = ipds->cp;
 		vec[0].len = ipds->len;
-		pim_print(ipds->cp, ipds->len, in_cksum(vec, 1));
+		pim_print(ndo, ipds->cp, ipds->len, in_cksum(vec, 1));
 		break;
 
 	case IPPROTO_VRRP:

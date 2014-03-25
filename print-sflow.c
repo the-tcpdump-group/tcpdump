@@ -19,15 +19,12 @@
  * Expansion and refactoring by Rick Jones <rick.jones2@hp.com>
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include <tcpdump-stdinc.h>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include "interface.h"
 #include "extract.h"
@@ -299,7 +296,8 @@ struct sflow_vlan_counter_t {
 };
 
 static int
-print_sflow_counter_generic(const u_char *pointer, u_int len) {
+print_sflow_counter_generic(netdissect_options *ndo,
+                            const u_char *pointer, u_int len) {
 
     const struct sflow_generic_counter_t *sflow_gen_counter;
 
@@ -308,43 +306,44 @@ print_sflow_counter_generic(const u_char *pointer, u_int len) {
 
 
     sflow_gen_counter = (const struct sflow_generic_counter_t *)pointer;
-    printf("\n\t      ifindex %u, iftype %u, ifspeed %" PRIu64 ", ifdirection %u (%s)",
+    ND_PRINT((ndo, "\n\t      ifindex %u, iftype %u, ifspeed %" PRIu64 ", ifdirection %u (%s)",
 	   EXTRACT_32BITS(sflow_gen_counter->ifindex),
 	   EXTRACT_32BITS(sflow_gen_counter->iftype),
 	   EXTRACT_64BITS(sflow_gen_counter->ifspeed),
 	   EXTRACT_32BITS(sflow_gen_counter->ifdirection),
 	   tok2str(sflow_iface_direction_values, "Unknown",
-		   EXTRACT_32BITS(sflow_gen_counter->ifdirection)));
-    printf("\n\t      ifstatus %u, adminstatus: %s, operstatus: %s",
+	   EXTRACT_32BITS(sflow_gen_counter->ifdirection))));
+    ND_PRINT((ndo, "\n\t      ifstatus %u, adminstatus: %s, operstatus: %s",
 	   EXTRACT_32BITS(sflow_gen_counter->ifstatus),
 	   EXTRACT_32BITS(sflow_gen_counter->ifstatus)&1 ? "up" : "down",
-	   (EXTRACT_32BITS(sflow_gen_counter->ifstatus)>>1)&1 ? "up" : "down");
-    printf("\n\t      In octets %" PRIu64
+	   (EXTRACT_32BITS(sflow_gen_counter->ifstatus)>>1)&1 ? "up" : "down"));
+    ND_PRINT((ndo, "\n\t      In octets %" PRIu64
 	   ", unicast pkts %u, multicast pkts %u, broadcast pkts %u, discards %u",
 	   EXTRACT_64BITS(sflow_gen_counter->ifinoctets),
 	   EXTRACT_32BITS(sflow_gen_counter->ifinunicastpkts),
 	   EXTRACT_32BITS(sflow_gen_counter->ifinmulticastpkts),
 	   EXTRACT_32BITS(sflow_gen_counter->ifinbroadcastpkts),
-	   EXTRACT_32BITS(sflow_gen_counter->ifindiscards));
-    printf("\n\t      In errors %u, unknown protos %u",
+	   EXTRACT_32BITS(sflow_gen_counter->ifindiscards)));
+    ND_PRINT((ndo, "\n\t      In errors %u, unknown protos %u",
 	   EXTRACT_32BITS(sflow_gen_counter->ifinerrors),
-	   EXTRACT_32BITS(sflow_gen_counter->ifinunkownprotos));
-    printf("\n\t      Out octets %" PRIu64
+	   EXTRACT_32BITS(sflow_gen_counter->ifinunkownprotos)));
+    ND_PRINT((ndo, "\n\t      Out octets %" PRIu64
 	   ", unicast pkts %u, multicast pkts %u, broadcast pkts %u, discards %u",
 	   EXTRACT_64BITS(sflow_gen_counter->ifoutoctets),
 	   EXTRACT_32BITS(sflow_gen_counter->ifoutunicastpkts),
 	   EXTRACT_32BITS(sflow_gen_counter->ifoutmulticastpkts),
 	   EXTRACT_32BITS(sflow_gen_counter->ifoutbroadcastpkts),
-	   EXTRACT_32BITS(sflow_gen_counter->ifoutdiscards));
-    printf("\n\t      Out errors %u, promisc mode %u",
+	   EXTRACT_32BITS(sflow_gen_counter->ifoutdiscards)));
+    ND_PRINT((ndo, "\n\t      Out errors %u, promisc mode %u",
 	   EXTRACT_32BITS(sflow_gen_counter->ifouterrors),
-	   EXTRACT_32BITS(sflow_gen_counter->ifpromiscmode));
+	   EXTRACT_32BITS(sflow_gen_counter->ifpromiscmode)));
 
     return 0;
 }
 
 static int
-print_sflow_counter_ethernet(const u_char *pointer, u_int len){
+print_sflow_counter_ethernet(netdissect_options *ndo,
+                             const u_char *pointer, u_int len){
 
     const struct sflow_ethernet_counter_t *sflow_eth_counter;
 
@@ -352,34 +351,36 @@ print_sflow_counter_ethernet(const u_char *pointer, u_int len){
 	return 1;
 
     sflow_eth_counter = (const struct sflow_ethernet_counter_t *)pointer;
-    printf("\n\t      align errors %u, fcs errors %u, single collision %u, multiple collision %u, test error %u",
+    ND_PRINT((ndo, "\n\t      align errors %u, fcs errors %u, single collision %u, multiple collision %u, test error %u",
 	   EXTRACT_32BITS(sflow_eth_counter->alignerrors),
 	   EXTRACT_32BITS(sflow_eth_counter->fcserrors),
 	   EXTRACT_32BITS(sflow_eth_counter->single_collision_frames),
 	   EXTRACT_32BITS(sflow_eth_counter->multiple_collision_frames),
-	   EXTRACT_32BITS(sflow_eth_counter->test_errors));
-    printf("\n\t      deferred %u, late collision %u, excessive collision %u, mac trans error %u",
+	   EXTRACT_32BITS(sflow_eth_counter->test_errors)));
+    ND_PRINT((ndo, "\n\t      deferred %u, late collision %u, excessive collision %u, mac trans error %u",
 	   EXTRACT_32BITS(sflow_eth_counter->deferred_transmissions),
 	   EXTRACT_32BITS(sflow_eth_counter->late_collisions),
 	   EXTRACT_32BITS(sflow_eth_counter->excessive_collisions),
-	   EXTRACT_32BITS(sflow_eth_counter->mac_transmit_errors));
-    printf("\n\t      carrier error %u, frames too long %u, mac receive errors %u, symbol errors %u",
+	   EXTRACT_32BITS(sflow_eth_counter->mac_transmit_errors)));
+    ND_PRINT((ndo, "\n\t      carrier error %u, frames too long %u, mac receive errors %u, symbol errors %u",
 	   EXTRACT_32BITS(sflow_eth_counter->carrier_sense_errors),
 	   EXTRACT_32BITS(sflow_eth_counter->frame_too_longs),
 	   EXTRACT_32BITS(sflow_eth_counter->mac_receive_errors),
-	   EXTRACT_32BITS(sflow_eth_counter->symbol_errors));
+	   EXTRACT_32BITS(sflow_eth_counter->symbol_errors)));
 
     return 0;
 }
 
 static int
-print_sflow_counter_token_ring(const u_char *pointer _U_, u_int len _U_) {
+print_sflow_counter_token_ring(netdissect_options *ndo _U_,
+                               const u_char *pointer _U_, u_int len _U_) {
 
     return 0;
 }
 
 static int
-print_sflow_counter_basevg(const u_char *pointer, u_int len) {
+print_sflow_counter_basevg(netdissect_options *ndo,
+                           const u_char *pointer, u_int len) {
 
     const struct sflow_100basevg_counter_t *sflow_100basevg_counter;
 
@@ -387,34 +388,35 @@ print_sflow_counter_basevg(const u_char *pointer, u_int len) {
 	return 1;
 
     sflow_100basevg_counter = (const struct sflow_100basevg_counter_t *)pointer;
-    printf("\n\t      in high prio frames %u, in high prio octets %" PRIu64,
+    ND_PRINT((ndo, "\n\t      in high prio frames %u, in high prio octets %" PRIu64,
 	   EXTRACT_32BITS(sflow_100basevg_counter->in_highpriority_frames),
-	   EXTRACT_64BITS(sflow_100basevg_counter->in_highpriority_octets));
-    printf("\n\t      in norm prio frames %u, in norm prio octets %" PRIu64,
+	   EXTRACT_64BITS(sflow_100basevg_counter->in_highpriority_octets)));
+    ND_PRINT((ndo, "\n\t      in norm prio frames %u, in norm prio octets %" PRIu64,
 	   EXTRACT_32BITS(sflow_100basevg_counter->in_normpriority_frames),
-	   EXTRACT_64BITS(sflow_100basevg_counter->in_normpriority_octets));
-    printf("\n\t      in ipm errors %u, oversized %u, in data errors %u, null addressed frames %u",
+	   EXTRACT_64BITS(sflow_100basevg_counter->in_normpriority_octets)));
+    ND_PRINT((ndo, "\n\t      in ipm errors %u, oversized %u, in data errors %u, null addressed frames %u",
 	   EXTRACT_32BITS(sflow_100basevg_counter->in_ipmerrors),
 	   EXTRACT_32BITS(sflow_100basevg_counter->in_oversized),
 	   EXTRACT_32BITS(sflow_100basevg_counter->in_data_errors),
-	   EXTRACT_32BITS(sflow_100basevg_counter->in_null_addressed_frames));
-    printf("\n\t      out high prio frames %u, out high prio octets %" PRIu64
+	   EXTRACT_32BITS(sflow_100basevg_counter->in_null_addressed_frames)));
+    ND_PRINT((ndo, "\n\t      out high prio frames %u, out high prio octets %" PRIu64
 	   ", trans into frames %u",
 	   EXTRACT_32BITS(sflow_100basevg_counter->out_highpriority_frames),
 	   EXTRACT_64BITS(sflow_100basevg_counter->out_highpriority_octets),
-	   EXTRACT_32BITS(sflow_100basevg_counter->transitioninto_frames));
-    printf("\n\t      in hc high prio octets %" PRIu64
+	   EXTRACT_32BITS(sflow_100basevg_counter->transitioninto_frames)));
+    ND_PRINT((ndo, "\n\t      in hc high prio octets %" PRIu64
 	   ", in hc norm prio octets %" PRIu64
 	   ", out hc high prio octets %" PRIu64,
 	   EXTRACT_64BITS(sflow_100basevg_counter->hc_in_highpriority_octets),
 	   EXTRACT_64BITS(sflow_100basevg_counter->hc_in_normpriority_octets),
-	   EXTRACT_64BITS(sflow_100basevg_counter->hc_out_highpriority_octets));
+	   EXTRACT_64BITS(sflow_100basevg_counter->hc_out_highpriority_octets)));
 
     return 0;
 }
 
 static int
-print_sflow_counter_vlan(const u_char *pointer, u_int len) {
+print_sflow_counter_vlan(netdissect_options *ndo,
+                         const u_char *pointer, u_int len) {
 
     const struct sflow_vlan_counter_t *sflow_vlan_counter;
 
@@ -422,14 +424,14 @@ print_sflow_counter_vlan(const u_char *pointer, u_int len) {
 	return 1;
 
     sflow_vlan_counter = (const struct sflow_vlan_counter_t *)pointer;
-    printf("\n\t      vlan_id %u, octets %" PRIu64
+    ND_PRINT((ndo, "\n\t      vlan_id %u, octets %" PRIu64
 	   ", unicast_pkt %u, multicast_pkt %u, broadcast_pkt %u, discards %u",
 	   EXTRACT_32BITS(sflow_vlan_counter->vlan_id),
 	   EXTRACT_64BITS(sflow_vlan_counter->octets),
 	   EXTRACT_32BITS(sflow_vlan_counter->unicast_pkt),
 	   EXTRACT_32BITS(sflow_vlan_counter->multicast_pkt),
 	   EXTRACT_32BITS(sflow_vlan_counter->broadcast_pkt),
-	   EXTRACT_32BITS(sflow_vlan_counter->discards));
+	   EXTRACT_32BITS(sflow_vlan_counter->discards)));
 
     return 0;
 }
@@ -443,7 +445,8 @@ struct sflow_processor_counter_t {
 };
 
 static int
-print_sflow_counter_processor(const u_char *pointer, u_int len) {
+print_sflow_counter_processor(netdissect_options *ndo,
+                              const u_char *pointer, u_int len) {
 
     const struct sflow_processor_counter_t *sflow_processor_counter;
 
@@ -451,19 +454,20 @@ print_sflow_counter_processor(const u_char *pointer, u_int len) {
 	return 1;
 
     sflow_processor_counter = (const struct sflow_processor_counter_t *)pointer;
-    printf("\n\t      5sec %u, 1min %u, 5min %u, total_mem %" PRIu64
+    ND_PRINT((ndo, "\n\t      5sec %u, 1min %u, 5min %u, total_mem %" PRIu64
 	   ", total_mem %" PRIu64,
 	   EXTRACT_32BITS(sflow_processor_counter->five_sec_util),
 	   EXTRACT_32BITS(sflow_processor_counter->one_min_util),
 	   EXTRACT_32BITS(sflow_processor_counter->five_min_util),
 	   EXTRACT_64BITS(sflow_processor_counter->total_memory),
-	   EXTRACT_64BITS(sflow_processor_counter->free_memory));
+	   EXTRACT_64BITS(sflow_processor_counter->free_memory)));
 
     return 0;
 }
 
 static int
-sflow_print_counter_records(const u_char *pointer, u_int len, u_int records) {
+sflow_print_counter_records(netdissect_options *ndo,
+                            const u_char *pointer, u_int len, u_int records) {
 
     u_int nrecords;
     const u_char *tptr;
@@ -487,11 +491,11 @@ sflow_print_counter_records(const u_char *pointer, u_int len, u_int records) {
 	counter_type = enterprise & 0x0FFF;
 	enterprise = enterprise >> 20;
 	counter_len  = EXTRACT_32BITS(sflow_counter_record->length);
-	printf("\n\t    enterprise %u, %s (%u) length %u",
+	ND_PRINT((ndo, "\n\t    enterprise %u, %s (%u) length %u",
 	       enterprise,
 	       (enterprise == 0) ? tok2str(sflow_counter_type_values,"Unknown",counter_type) : "Unknown",
 	       counter_type,
-	       counter_len);
+	       counter_len));
 
 	tptr += sizeof(struct sflow_counter_record_t);
 	tlen -= sizeof(struct sflow_counter_record_t);
@@ -501,32 +505,32 @@ sflow_print_counter_records(const u_char *pointer, u_int len, u_int records) {
 	if (enterprise == 0) {
 	    switch (counter_type) {
 	    case SFLOW_COUNTER_GENERIC:
-		if (print_sflow_counter_generic(tptr,tlen))
+		if (print_sflow_counter_generic(ndo, tptr, tlen))
 		    return 1;
 		break;
 	    case SFLOW_COUNTER_ETHERNET:
-		if (print_sflow_counter_ethernet(tptr,tlen))
+		if (print_sflow_counter_ethernet(ndo, tptr, tlen))
 		    return 1;
 		break;
 	    case SFLOW_COUNTER_TOKEN_RING:
-		if (print_sflow_counter_token_ring(tptr,tlen))
+		if (print_sflow_counter_token_ring(ndo, tptr,tlen))
 		    return 1;
 		break;
 	    case SFLOW_COUNTER_BASEVG:
-		if (print_sflow_counter_basevg(tptr,tlen))
+		if (print_sflow_counter_basevg(ndo, tptr, tlen))
 		    return 1;
 		break;
 	    case SFLOW_COUNTER_VLAN:
-		if (print_sflow_counter_vlan(tptr,tlen))
+		if (print_sflow_counter_vlan(ndo, tptr, tlen))
 		    return 1;
 		break;
 	    case SFLOW_COUNTER_PROCESSOR:
-		if (print_sflow_counter_processor(tptr,tlen))
+		if (print_sflow_counter_processor(ndo, tptr, tlen))
 		    return 1;
 		break;
 	    default:
-		if (vflag <= 1)
-		    print_unknown_data(gndo,tptr, "\n\t\t", counter_len);
+		if (ndo->ndo_vflag <= 1)
+		    print_unknown_data(ndo, tptr, "\n\t\t", counter_len);
 		break;
 	    }
 	}
@@ -541,7 +545,8 @@ sflow_print_counter_records(const u_char *pointer, u_int len, u_int records) {
 
 
 static int
-sflow_print_counter_sample(const u_char *pointer, u_int len) {
+sflow_print_counter_sample(netdissect_options *ndo,
+                           const u_char *pointer, u_int len) {
 
     const struct sflow_counter_sample_t *sflow_counter_sample;
     u_int           nrecords;
@@ -560,20 +565,21 @@ sflow_print_counter_sample(const u_char *pointer, u_int len) {
     type = typesource >> 24;
     index = typesource & 0x0FFF;
 
-    printf(" seqnum %u, type %u, idx %u, records %u",
+    ND_PRINT((ndo, " seqnum %u, type %u, idx %u, records %u",
 	   EXTRACT_32BITS(sflow_counter_sample->seqnum),
 	   type,
 	   index,
-	   nrecords);
+	   nrecords));
 
-    return sflow_print_counter_records(pointer + sizeof(struct sflow_counter_sample_t),
+    return sflow_print_counter_records(ndo, pointer + sizeof(struct sflow_counter_sample_t),
 				       len - sizeof(struct sflow_counter_sample_t),
 				       nrecords);
 
 }
 
 static int
-sflow_print_expanded_counter_sample(const u_char *pointer, u_int len) {
+sflow_print_expanded_counter_sample(netdissect_options *ndo,
+                                    const u_char *pointer, u_int len) {
 
     const struct sflow_expanded_counter_sample_t *sflow_expanded_counter_sample;
     u_int           nrecords;
@@ -586,20 +592,21 @@ sflow_print_expanded_counter_sample(const u_char *pointer, u_int len) {
 
     nrecords = EXTRACT_32BITS(sflow_expanded_counter_sample->records);
 
-    printf(" seqnum %u, type %u, idx %u, records %u",
+    ND_PRINT((ndo, " seqnum %u, type %u, idx %u, records %u",
 	   EXTRACT_32BITS(sflow_expanded_counter_sample->seqnum),
 	   EXTRACT_32BITS(sflow_expanded_counter_sample->type),
 	   EXTRACT_32BITS(sflow_expanded_counter_sample->index),
-	   nrecords);
+	   nrecords));
 
-    return sflow_print_counter_records(pointer + sizeof(struct sflow_expanded_counter_sample_t),
+    return sflow_print_counter_records(ndo, pointer + sizeof(struct sflow_expanded_counter_sample_t),
 				       len - sizeof(struct sflow_expanded_counter_sample_t),
 				       nrecords);
 
 }
 
 static int
-print_sflow_raw_packet(const u_char *pointer, u_int len) {
+print_sflow_raw_packet(netdissect_options *ndo,
+                       const u_char *pointer, u_int len) {
 
     const struct sflow_expanded_flow_raw_t *sflow_flow_raw;
 
@@ -607,12 +614,12 @@ print_sflow_raw_packet(const u_char *pointer, u_int len) {
 	return 1;
 
     sflow_flow_raw = (const struct sflow_expanded_flow_raw_t *)pointer;
-    printf("\n\t      protocol %s (%u), length %u, stripped bytes %u, header_size %u",
+    ND_PRINT((ndo, "\n\t      protocol %s (%u), length %u, stripped bytes %u, header_size %u",
 	   tok2str(sflow_flow_raw_protocol_values,"Unknown",EXTRACT_32BITS(sflow_flow_raw->protocol)),
 	   EXTRACT_32BITS(sflow_flow_raw->protocol),
 	   EXTRACT_32BITS(sflow_flow_raw->length),
 	   EXTRACT_32BITS(sflow_flow_raw->stripped_bytes),
-	   EXTRACT_32BITS(sflow_flow_raw->header_size));
+	   EXTRACT_32BITS(sflow_flow_raw->header_size)));
 
     /* QUESTION - should we attempt to print the raw header itself?
        assuming of course there is wnough data present to do so... */
@@ -621,7 +628,8 @@ print_sflow_raw_packet(const u_char *pointer, u_int len) {
 }
 
 static int
-print_sflow_ethernet_frame(const u_char *pointer, u_int len) {
+print_sflow_ethernet_frame(netdissect_options *ndo,
+                           const u_char *pointer, u_int len) {
 
     const struct sflow_ethernet_frame_t *sflow_ethernet_frame;
 
@@ -630,15 +638,16 @@ print_sflow_ethernet_frame(const u_char *pointer, u_int len) {
 
     sflow_ethernet_frame = (const struct sflow_ethernet_frame_t *)pointer;
 
-    printf("\n\t      frame len %u, type %u",
+    ND_PRINT((ndo, "\n\t      frame len %u, type %u",
 	   EXTRACT_32BITS(sflow_ethernet_frame->length),
-	   EXTRACT_32BITS(sflow_ethernet_frame->type));
+	   EXTRACT_32BITS(sflow_ethernet_frame->type)));
 
     return 0;
 }
 
 static int
-print_sflow_extended_switch_data(const u_char *pointer, u_int len) {
+print_sflow_extended_switch_data(netdissect_options *ndo,
+                                 const u_char *pointer, u_int len) {
 
     const struct sflow_extended_switch_data_t *sflow_extended_sw_data;
 
@@ -646,17 +655,18 @@ print_sflow_extended_switch_data(const u_char *pointer, u_int len) {
 	return 1;
 
     sflow_extended_sw_data = (const struct sflow_extended_switch_data_t *)pointer;
-    printf("\n\t      src vlan %u, src pri %u, dst vlan %u, dst pri %u",
+    ND_PRINT((ndo, "\n\t      src vlan %u, src pri %u, dst vlan %u, dst pri %u",
 	   EXTRACT_32BITS(sflow_extended_sw_data->src_vlan),
 	   EXTRACT_32BITS(sflow_extended_sw_data->src_pri),
 	   EXTRACT_32BITS(sflow_extended_sw_data->dst_vlan),
-	   EXTRACT_32BITS(sflow_extended_sw_data->dst_pri));
+	   EXTRACT_32BITS(sflow_extended_sw_data->dst_pri)));
 
     return 0;
 }
 
 static int
-sflow_print_flow_records(const u_char *pointer, u_int len, u_int records) {
+sflow_print_flow_records(netdissect_options *ndo,
+                         const u_char *pointer, u_int len, u_int records) {
 
     u_int nrecords;
     const u_char *tptr;
@@ -684,11 +694,11 @@ sflow_print_flow_records(const u_char *pointer, u_int len, u_int records) {
 	flow_type = enterprise & 0x0FFF;
 	enterprise = enterprise >> 12;
 	flow_len  = EXTRACT_32BITS(sflow_flow_record->length);
-	printf("\n\t    enterprise %u %s (%u) length %u",
+	ND_PRINT((ndo, "\n\t    enterprise %u %s (%u) length %u",
 	       enterprise,
 	       (enterprise == 0) ? tok2str(sflow_flow_type_values,"Unknown",flow_type) : "Unknown",
 	       flow_type,
-	       flow_len);
+	       flow_len));
 
 	tptr += sizeof(struct sflow_flow_record_t);
 	tlen -= sizeof(struct sflow_flow_record_t);
@@ -699,15 +709,15 @@ sflow_print_flow_records(const u_char *pointer, u_int len, u_int records) {
 	if (enterprise == 0) {
 	    switch (flow_type) {
 	    case SFLOW_FLOW_RAW_PACKET:
-		if (print_sflow_raw_packet(tptr,tlen))
+		if (print_sflow_raw_packet(ndo, tptr, tlen))
 		    return 1;
 		break;
 	    case SFLOW_FLOW_EXTENDED_SWITCH_DATA:
-		if (print_sflow_extended_switch_data(tptr,tlen))
+		if (print_sflow_extended_switch_data(ndo, tptr, tlen))
 		    return 1;
 		break;
 	    case SFLOW_FLOW_ETHERNET_FRAME:
-		if (print_sflow_ethernet_frame(tptr,tlen))
+		if (print_sflow_ethernet_frame(ndo, tptr, tlen))
 		    return 1;
 		break;
 		/* FIXME these need a decoder */
@@ -726,8 +736,8 @@ sflow_print_flow_records(const u_char *pointer, u_int len, u_int records) {
 	    case SFLOW_FLOW_EXTENDED_VLAN_TUNNEL:
 		break;
 	    default:
-		if (vflag <= 1)
-		    print_unknown_data(gndo,tptr, "\n\t\t", flow_len);
+		if (ndo->ndo_vflag <= 1)
+		    print_unknown_data(ndo, tptr, "\n\t\t", flow_len);
 		break;
 	    }
 	}
@@ -741,7 +751,8 @@ sflow_print_flow_records(const u_char *pointer, u_int len, u_int records) {
 }
 
 static int
-sflow_print_flow_sample(const u_char *pointer, u_int len) {
+sflow_print_flow_sample(netdissect_options *ndo,
+                        const u_char *pointer, u_int len) {
 
     const struct sflow_flow_sample_t *sflow_flow_sample;
     u_int          nrecords;
@@ -759,7 +770,7 @@ sflow_print_flow_sample(const u_char *pointer, u_int len) {
     type = typesource >> 24;
     index = typesource & 0x0FFF;
 
-    printf(" seqnum %u, type %u, idx %u, rate %u, pool %u, drops %u, input %u output %u records %u",
+    ND_PRINT((ndo, " seqnum %u, type %u, idx %u, rate %u, pool %u, drops %u, input %u output %u records %u",
 	   EXTRACT_32BITS(sflow_flow_sample->seqnum),
 	   type,
 	   index,
@@ -768,16 +779,17 @@ sflow_print_flow_sample(const u_char *pointer, u_int len) {
 	   EXTRACT_32BITS(sflow_flow_sample->drops),
 	   EXTRACT_32BITS(sflow_flow_sample->in_interface),
 	   EXTRACT_32BITS(sflow_flow_sample->out_interface),
-	   nrecords);
+	   nrecords));
 
-    return sflow_print_flow_records(pointer + sizeof(struct sflow_flow_sample_t),
+    return sflow_print_flow_records(ndo, pointer + sizeof(struct sflow_flow_sample_t),
 				    len - sizeof(struct sflow_flow_sample_t),
 				    nrecords);
 
 }
 
 static int
-sflow_print_expanded_flow_sample(const u_char *pointer, u_int len) {
+sflow_print_expanded_flow_sample(netdissect_options *ndo,
+                                 const u_char *pointer, u_int len) {
 
     const struct sflow_expanded_flow_sample_t *sflow_expanded_flow_sample;
     u_int nrecords;
@@ -789,23 +801,24 @@ sflow_print_expanded_flow_sample(const u_char *pointer, u_int len) {
 
     nrecords = EXTRACT_32BITS(sflow_expanded_flow_sample->records);
 
-    printf(" seqnum %u, type %u, idx %u, rate %u, pool %u, drops %u, records %u",
+    ND_PRINT((ndo, " seqnum %u, type %u, idx %u, rate %u, pool %u, drops %u, records %u",
 	   EXTRACT_32BITS(sflow_expanded_flow_sample->seqnum),
 	   EXTRACT_32BITS(sflow_expanded_flow_sample->type),
 	   EXTRACT_32BITS(sflow_expanded_flow_sample->index),
 	   EXTRACT_32BITS(sflow_expanded_flow_sample->rate),
 	   EXTRACT_32BITS(sflow_expanded_flow_sample->pool),
 	   EXTRACT_32BITS(sflow_expanded_flow_sample->drops),
-	   EXTRACT_32BITS(sflow_expanded_flow_sample->records));
+	   EXTRACT_32BITS(sflow_expanded_flow_sample->records)));
 
-    return sflow_print_flow_records(pointer + sizeof(struct sflow_expanded_flow_sample_t),
+    return sflow_print_flow_records(ndo, pointer + sizeof(struct sflow_expanded_flow_sample_t),
 				    len - sizeof(struct sflow_expanded_flow_sample_t),
 				    nrecords);
 
 }
 
 void
-sflow_print(const u_char *pptr, u_int len) {
+sflow_print(netdissect_options *ndo,
+            const u_char *pptr, u_int len) {
 
     const struct sflow_datagram_t *sflow_datagram;
     const struct sflow_sample_header *sflow_sample;
@@ -819,30 +832,30 @@ sflow_print(const u_char *pptr, u_int len) {
     tptr = pptr;
     tlen = len;
     sflow_datagram = (const struct sflow_datagram_t *)pptr;
-    TCHECK(*sflow_datagram);
+    ND_TCHECK(*sflow_datagram);
 
     /*
      * Sanity checking of the header.
      */
     if (EXTRACT_32BITS(sflow_datagram->version) != 5) {
-        printf("sFlow version %u packet not supported",
-               EXTRACT_32BITS(sflow_datagram->version));
+        ND_PRINT((ndo, "sFlow version %u packet not supported",
+               EXTRACT_32BITS(sflow_datagram->version)));
         return;
     }
 
-    if (vflag < 1) {
-        printf("sFlowv%u, %s agent %s, agent-id %u, length %u",
+    if (ndo->ndo_vflag < 1) {
+        ND_PRINT((ndo, "sFlowv%u, %s agent %s, agent-id %u, length %u",
                EXTRACT_32BITS(sflow_datagram->version),
                EXTRACT_32BITS(sflow_datagram->ip_version) == 1 ? "IPv4" : "IPv6",
-	       ipaddr_string(sflow_datagram->agent),
+               ipaddr_string(sflow_datagram->agent),
                EXTRACT_32BITS(sflow_datagram->agent_id),
-               len);
+               len));
         return;
     }
 
     /* ok they seem to want to know everything - lets fully decode it */
     nsamples=EXTRACT_32BITS(sflow_datagram->samples);
-    printf("sFlowv%u, %s agent %s, agent-id %u, seqnum %u, uptime %u, samples %u, length %u",
+    ND_PRINT((ndo, "sFlowv%u, %s agent %s, agent-id %u, seqnum %u, uptime %u, samples %u, length %u",
            EXTRACT_32BITS(sflow_datagram->version),
            EXTRACT_32BITS(sflow_datagram->ip_version) == 1 ? "IPv4" : "IPv6",
            ipaddr_string(sflow_datagram->agent),
@@ -850,7 +863,7 @@ sflow_print(const u_char *pptr, u_int len) {
            EXTRACT_32BITS(sflow_datagram->seqnum),
            EXTRACT_32BITS(sflow_datagram->uptime),
            nsamples,
-           len);
+           len));
 
     /* skip Common header */
     tptr += sizeof(const struct sflow_datagram_t);
@@ -858,7 +871,7 @@ sflow_print(const u_char *pptr, u_int len) {
 
     while (nsamples > 0 && tlen > 0) {
         sflow_sample = (const struct sflow_sample_header *)tptr;
-        TCHECK(*sflow_sample);
+        ND_TCHECK(*sflow_sample);
 
         sflow_sample_type = (EXTRACT_32BITS(sflow_sample->format)&0x0FFF);
         sflow_sample_len = EXTRACT_32BITS(sflow_sample->len);
@@ -869,10 +882,10 @@ sflow_print(const u_char *pptr, u_int len) {
         tptr += sizeof(struct sflow_sample_header);
         tlen -= sizeof(struct sflow_sample_header);
 
-        printf("\n\t%s (%u), length %u,",
+        ND_PRINT((ndo, "\n\t%s (%u), length %u,",
                tok2str(sflow_format_values, "Unknown", sflow_sample_type),
                sflow_sample_type,
-               sflow_sample_len);
+               sflow_sample_len));
 
         /* basic sanity check */
         if (sflow_sample_type == 0 || sflow_sample_len ==0) {
@@ -883,32 +896,32 @@ sflow_print(const u_char *pptr, u_int len) {
 	    goto trunc;
 
         /* did we capture enough for fully decoding the sample ? */
-        TCHECK2(*tptr, sflow_sample_len);
+        ND_TCHECK2(*tptr, sflow_sample_len);
 
 	switch(sflow_sample_type) {
         case SFLOW_FLOW_SAMPLE:
-	    if (sflow_print_flow_sample(tptr,tlen))
+	    if (sflow_print_flow_sample(ndo, tptr, tlen))
 		goto trunc;
             break;
 
         case SFLOW_COUNTER_SAMPLE:
-	    if (sflow_print_counter_sample(tptr,tlen))
+	    if (sflow_print_counter_sample(ndo, tptr,tlen))
 		goto trunc;
             break;
 
         case SFLOW_EXPANDED_FLOW_SAMPLE:
-	    if (sflow_print_expanded_flow_sample(tptr,tlen))
+	    if (sflow_print_expanded_flow_sample(ndo, tptr, tlen))
 		goto trunc;
 	    break;
 
         case SFLOW_EXPANDED_COUNTER_SAMPLE:
-	    if (sflow_print_expanded_counter_sample(tptr,tlen))
+	    if (sflow_print_expanded_counter_sample(ndo, tptr,tlen))
 		goto trunc;
 	    break;
 
         default:
-            if (vflag <= 1)
-                print_unknown_data(gndo,tptr, "\n\t    ", sflow_sample_len);
+            if (ndo->ndo_vflag <= 1)
+                print_unknown_data(ndo, tptr, "\n\t    ", sflow_sample_len);
             break;
         }
         tptr += sflow_sample_len;
@@ -918,7 +931,7 @@ sflow_print(const u_char *pptr, u_int len) {
     return;
 
  trunc:
-    printf("[|SFLOW]");
+    ND_PRINT((ndo, "[|SFLOW]"));
 }
 
 /*

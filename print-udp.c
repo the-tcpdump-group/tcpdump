@@ -564,15 +564,15 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 	if (!ndo->ndo_qflag) {
 #define ISPORT(p) (dport == (p) || sport == (p))
 		if (ISPORT(NAMESERVER_PORT))
-			ns_print((const u_char *)(up + 1), length, 0);
+			ns_print(ndo, (const u_char *)(up + 1), length, 0);
 		else if (ISPORT(MULTICASTDNS_PORT))
-			ns_print((const u_char *)(up + 1), length, 1);
+			ns_print(ndo, (const u_char *)(up + 1), length, 1);
 		else if (ISPORT(TIMED_PORT))
 			timed_print((const u_char *)(up + 1));
 		else if (ISPORT(TFTP_PORT))
 			tftp_print(ndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(IPPORT_BOOTPC) || ISPORT(IPPORT_BOOTPS))
-			bootp_print((const u_char *)(up + 1), length);
+			bootp_print(ndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(RIP_PORT))
 			rip_print(ndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(AODV_PORT))
@@ -620,7 +620,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 		else if (ISPORT(RIPNG_PORT))
 			ripng_print(ndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(DHCP6_SERV_PORT) || ISPORT(DHCP6_CLI_PORT))
-			dhcp6_print((const u_char *)(up + 1), length);
+			dhcp6_print(ndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(AHCP_PORT))
 			ahcp_print(ndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(BABEL_PORT) || ISPORT(BABEL_PORT_OLD))
@@ -632,7 +632,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 		else if (dport == WB_PORT)
 			wb_print(ndo, (const void *)(up + 1), length);
 		else if (ISPORT(CISCO_AUTORP_PORT))
-			cisco_autorp_print((const void *)(up + 1), length);
+			cisco_autorp_print(ndo, (const void *)(up + 1), length);
 		else if (ISPORT(RADIUS_PORT) ||
 			 ISPORT(RADIUS_NEW_PORT) ||
 			 ISPORT(RADIUS_ACCOUNTING_PORT) ||
@@ -661,7 +661,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 		else if (ISPORT(VQP_PORT))
 			vqp_print(ndo, (const u_char *)(up + 1), length);
                 else if (ISPORT(SFLOW_PORT))
-                        sflow_print((const u_char *)(up + 1), length);
+                        sflow_print(ndo, (const u_char *)(up + 1), length);
 	        else if (dport == LWAPP_CONTROL_PORT)
 			lwapp_control_print(ndo, (const u_char *)(up + 1), length, 1);
                 else if (sport == LWAPP_CONTROL_PORT)

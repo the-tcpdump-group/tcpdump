@@ -460,20 +460,22 @@ extern u_int sl_if_print(netdissect_options *, const struct pcap_pkthdr *, const
 extern u_int sl_bsdos_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
 extern void tftp_print(netdissect_options *, const u_char *, u_int);
 extern void vrrp_print(netdissect_options *, const u_char *, u_int, const u_char *, int);
+extern void pimv1_print(netdissect_options *, const u_char *, u_int);
+extern void cisco_autorp_print(netdissect_options *, const u_char *, u_int);
+extern void pim_print(netdissect_options *, const u_char *, u_int, u_int);
+extern const u_char * ns_nprint (netdissect_options *, register const u_char *, register const u_char *);
+extern void ns_print(netdissect_options *, const u_char *, u_int, int);
+extern void bootp_print(netdissect_options *, const u_char *, u_int);
+extern void sflow_print(netdissect_options *, const u_char *, u_int);
 
 /* stuff that has not yet been rototiled */
-extern const u_char * ns_nprint (register const u_char *, register const u_char *);
 
 #if 0
 extern void ascii_print(netdissect_options *,u_int);
 extern void aarp_print(netdissect_options *,const u_char *, u_int);
 extern void atalk_print(netdissect_options *,const u_char *, u_int);
-extern void bootp_print(netdissect_options *,const u_char *,
-			u_int, u_short, u_short);
 extern void bgp_print(netdissect_options *,const u_char *, int);
 extern void bxxp_print(netdissect_options *,const u_char *, u_int);
-extern void cisco_autorp_print(netdissect_options *,
-			       const u_char *, u_int);
 extern void decnet_print(netdissect_options *,const u_char *,
 			 u_int, u_int);
 extern void default_print(netdissect_options *,const u_char *, u_int);
@@ -492,11 +494,8 @@ extern void nfsreply_print(netdissect_options *,const u_char *,
 			   u_int, const u_char *);
 extern void nfsreq_print(netdissect_options *,const u_char *,
 			 u_int, const u_char *);
-extern void ns_print(netdissect_options *,const u_char *, u_int);
 extern void ospf_print(netdissect_options *,const u_char *,
 		       u_int, const u_char *);
-extern void pimv1_print(netdissect_options *,const u_char *, u_int);
-extern void pim_print(netdissect_options *,const u_char *, u_int, u_int);
 extern void ppp_print(netdissect_options *,
 		      register const u_char *, u_int);
 
@@ -547,10 +546,9 @@ extern int hbhopt_print(netdissect_options *, const u_char *);
 extern int dstopt_print(netdissect_options *, const u_char *);
 extern void ripng_print(netdissect_options *, const u_char *, unsigned int);
 extern int mobility_print(netdissect_options *, const u_char *, const u_char *);
+extern void dhcp6_print(netdissect_options *, const u_char *, u_int);
 #if 0
 extern void ospf6_print(netdissect_options *,const u_char *, u_int);
-extern void dhcp6_print(netdissect_options *,const u_char *,
-			u_int, u_int16_t, u_int16_t);
 
 #endif /* 0 */
 
