@@ -369,8 +369,6 @@ dlnames.o: $(srcdir)/missing/dlnames.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/dlnames.c
 getnameinfo.o: $(srcdir)/missing/getnameinfo.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/getnameinfo.c
-getaddrinfo.o: $(srcdir)/missing/getaddrinfo.c
-	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/getaddrinfo.c
 inet_pton.o: $(srcdir)/missing/inet_pton.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/inet_pton.c
 inet_ntop.o: $(srcdir)/missing/inet_ntop.c
@@ -379,6 +377,8 @@ inet_aton.o: $(srcdir)/missing/inet_aton.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/inet_aton.c
 snprintf.o: $(srcdir)/missing/snprintf.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/snprintf.c
+strdup.o: $(srcdir)/missing/strdup.c
+	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/strdup.c
 strlcat.o: $(srcdir)/missing/strlcat.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/strlcat.c
 strlcpy.o: $(srcdir)/missing/strlcpy.c
