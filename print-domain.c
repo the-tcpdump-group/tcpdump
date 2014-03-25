@@ -36,7 +36,7 @@
 
 static const char *ns_ops[] = {
 	"", " inv_q", " stat", " op3", " notify", " update", " op6", " op7",
-	" op8", " updataA", " updateD", " updateDA",
+	" op8", " updateA", " updateD", " updateDA",
 	" updateM", " updateMA", " zoneInit", " zoneRef",
 };
 
