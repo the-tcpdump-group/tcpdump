@@ -262,8 +262,6 @@ extern int fn_print(const u_char *, const u_char *);
 extern int fn_printn(const u_char *, u_int, const u_char *);
 extern const char *tok2str(const struct tok *, const char *, int);
 
-extern void wrapup(int);
-
 #if 0
 extern char *read_infile(netdissect_options *, char *);
 extern char *copy_argv(netdissect_options *, char **);
