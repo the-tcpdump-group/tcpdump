@@ -27,7 +27,6 @@
 #include "extract.h"
 #include "addrtoname.h"
 
-#include "bgp.h"
 #include "l2vpn.h"
 #include "oui.h"
 
@@ -696,7 +695,7 @@ lspping_print(register const u_char *pptr, register u_int len) {
                     subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv4 = \
                         (const struct lspping_tlv_targetfec_subtlv_l3vpn_ipv4_t *)subtlv_tptr;
                     printf("\n\t      RD: %s, %s/%u",
-                           bgp_vpn_rd_print(subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv4->rd),
+                           bgp_vpn_rd_print(gndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv4->rd),
                            ipaddr_string(subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv4->prefix),
                            subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv4->prefix_len);
                     break;
@@ -706,7 +705,7 @@ lspping_print(register const u_char *pptr, register u_int len) {
                     subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv6 = \
                         (const struct lspping_tlv_targetfec_subtlv_l3vpn_ipv6_t *)subtlv_tptr;
                     printf("\n\t      RD: %s, %s/%u",
-                           bgp_vpn_rd_print(subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv6->rd),
+                           bgp_vpn_rd_print(gndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv6->rd),
                            ip6addr_string(subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv6->prefix),
                            subtlv_ptr.lspping_tlv_targetfec_subtlv_l3vpn_ipv6->prefix_len);
                     break;
@@ -717,7 +716,7 @@ lspping_print(register const u_char *pptr, register u_int len) {
                         (const struct lspping_tlv_targetfec_subtlv_l2vpn_endpt_t *)subtlv_tptr;
                     printf("\n\t      RD: %s, Sender CE-ID: %u, Receiver CE-ID: %u" \
                            "\n\t      Encapsulation Type: %s (%u)",
-                           bgp_vpn_rd_print(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->rd),
+                           bgp_vpn_rd_print(gndo, subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->rd),
                            EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->sender_ce_id),
                            EXTRACT_16BITS(subtlv_ptr.lspping_tlv_targetfec_subtlv_l2vpn_endpt->receiver_ce_id),
                            tok2str(l2vpn_encaps_values,

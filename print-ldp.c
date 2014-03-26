@@ -349,7 +349,7 @@ ldp_tlv_print(netdissect_options *ndo,
 	    tptr+=LDP_TLV_ADDRESS_LIST_AFNUM_LEN;
 	    tlv_tlen-=LDP_TLV_ADDRESS_LIST_AFNUM_LEN;
 	    if (af == AFNUM_INET) {
-		i=decode_prefix4(tptr,tlv_tlen,buf,sizeof(buf));
+		i=decode_prefix4(ndo, tptr, tlv_tlen, buf, sizeof(buf));
 		if (i == -2)
 		    goto trunc;
 		if (i == -3)
@@ -361,7 +361,7 @@ ldp_tlv_print(netdissect_options *ndo,
 	    }
 #ifdef INET6
 	    else if (af == AFNUM_INET6) {
-		i=decode_prefix6(tptr,tlv_tlen,buf,sizeof(buf));
+		i=decode_prefix6(ndo, tptr, tlv_tlen, buf, sizeof(buf));
 		if (i == -2)
 		    goto trunc;
 		if (i == -3)

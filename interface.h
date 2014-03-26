@@ -165,7 +165,6 @@ extern u_int16_t create_osi_cksum(const u_int8_t *, int, int);
 extern void ascii_print(const u_char *, u_int);
 extern void aarp_print(const u_char *, u_int);
 extern void atalk_print(const u_char *, u_int);
-extern void bgp_print(const u_char *, int);
 extern void decnet_print(const u_char *, u_int, u_int);
 extern void default_print(const u_char *, u_int);
 extern char *q922_string(const u_char *);
@@ -241,10 +240,6 @@ struct cksum_vec {
 };
 extern u_int16_t in_cksum(const struct cksum_vec *, int);
 extern u_int16_t in_cksum_shouldbe(u_int16_t, u_int16_t);
-extern int decode_prefix4(const u_char *, u_int, char *, u_int);
-#ifdef INET6
-extern int decode_prefix6(const u_char *, u_int, char *, u_int);
-#endif
 
 #ifndef HAVE_BPF_DUMP
 struct bpf_program;

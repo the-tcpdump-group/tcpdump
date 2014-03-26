@@ -673,7 +673,7 @@ tcp_print(register const u_char *bp, register u_int length,
                 if (!qflag && vflag)
                         telnet_print(gndo, bp, length);
         } else if (sport == BGP_PORT || dport == BGP_PORT)
-                bgp_print(bp, length);
+                bgp_print(gndo, bp, length);
         else if (sport == PPTP_PORT || dport == PPTP_PORT)
                 pptp_print(gndo, bp);
 #ifdef TCPDUMP_DO_SMB

@@ -229,7 +229,6 @@ HDR = \
 	atm.h \
 	atmuni31.h \
 	bootp.h \
-	bgp.h \
 	chdlc.h \
 	cpack.h \
 	decnet.h \

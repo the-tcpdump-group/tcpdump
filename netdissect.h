@@ -469,6 +469,8 @@ extern void bootp_print(netdissect_options *, const u_char *, u_int);
 extern void sflow_print(netdissect_options *, const u_char *, u_int);
 extern void aodv_print(netdissect_options *, const u_char *, u_int, int);
 extern void sctp_print(netdissect_options *, const u_char *, const u_char *, u_int);
+extern char *bgp_vpn_rd_print (netdissect_options *, const u_char *);
+extern void bgp_print(netdissect_options *, const u_char *, int);
 
 /* stuff that has not yet been rototiled */
 
@@ -476,7 +478,6 @@ extern void sctp_print(netdissect_options *, const u_char *, const u_char *, u_i
 extern void ascii_print(netdissect_options *,u_int);
 extern void aarp_print(netdissect_options *,const u_char *, u_int);
 extern void atalk_print(netdissect_options *,const u_char *, u_int);
-extern void bgp_print(netdissect_options *,const u_char *, int);
 extern void bxxp_print(netdissect_options *,const u_char *, u_int);
 extern void decnet_print(netdissect_options *,const u_char *,
 			 u_int, u_int);
@@ -561,6 +562,10 @@ extern u_int16_t in_cksum(const struct cksum_vec *, int);
 extern u_int16_t in_cksum_shouldbe(u_int16_t, u_int16_t);
 #endif
 extern int nextproto4_cksum(netdissect_options *ndo, const struct ip *, const u_int8_t *, u_int, u_int, u_int);
+extern int decode_prefix4(netdissect_options *ndo, const u_char *, u_int, char *, u_int);
+#ifdef INET6
+extern int decode_prefix6(netdissect_options *ndo, const u_char *, u_int, char *, u_int);
+#endif
 
 extern void esp_print_decodesecret(netdissect_options *ndo);
 extern int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
