@@ -33,6 +33,9 @@
  *	@(#)ip.h	8.2 (Berkeley) 6/1/94
  */
 
+#ifndef TCPDUMP_IP_H
+#define TCPDUMP_IP_H
+
 /*
  * Definitions for internet protocol version 4.
  * Per RFC 791, September 1981.
@@ -158,6 +161,4 @@ struct	ip_timestamp {
 #define	IPTTLDEC	1		/* subtracted when forwarding */
 
 #define	IP_MSS		576		/* default maximum segment size */
-
-/* in print-ip.c */
-extern int nextproto4_cksum(const struct ip *, const u_int8_t *, u_int, u_int, u_int);
+#endif /* TCPDUMP_IP_H */

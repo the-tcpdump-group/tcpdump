@@ -147,7 +147,7 @@ vrrp_print(netdissect_options *ndo,
 		}
 
 		if (version == 3 && ND_TTEST2(bp[0], len)) {
-			u_int16_t cksum = nextproto4_cksum((struct ip *)bp2, bp,
+			u_int16_t cksum = nextproto4_cksum(ndo, (struct ip *)bp2, bp,
 				len, len, IPPROTO_VRRP);
 			if (cksum)
 				ND_PRINT((ndo, ", (bad vrrp cksum %x)",

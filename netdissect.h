@@ -38,6 +38,8 @@
 
 #include <stdarg.h>
 
+#include "ip.h" /* struct ip for nextproto4_cksum() */
+
 #if !defined(HAVE_SNPRINTF)
 int snprintf (char *str, size_t sz, const char *format, ...)
 #ifdef __ATTRIBUTE___FORMAT_OK
@@ -467,6 +469,8 @@ extern const u_char * ns_nprint (netdissect_options *, register const u_char *, 
 extern void ns_print(netdissect_options *, const u_char *, u_int, int);
 extern void bootp_print(netdissect_options *, const u_char *, u_int);
 extern void sflow_print(netdissect_options *, const u_char *, u_int);
+extern void aodv_print(netdissect_options *, const u_char *, u_int, int);
+extern void sctp_print(netdissect_options *, const u_char *, const u_char *, u_int);
 
 /* stuff that has not yet been rototiled */
 
@@ -504,10 +508,6 @@ extern void ppp_hdlc_if_print(u_char *,
 			      const struct pcap_pkthdr *, const u_char *);
 extern void ppp_bsdos_if_print(u_char *,
 			       const struct pcap_pkthdr *, const u_char *);
-
-extern void sctp_print(netdissect_options *ndo,
-		       const u_char *bp, const u_char *bp2,
-		       u_int sctpPacketLength);
 
 extern void snmp_print(netdissect_options *,const u_char *, u_int);
 extern void tcp_print(netdissect_options *,const u_char *, u_int,
@@ -562,6 +562,7 @@ struct cksum_vec {
 extern u_int16_t in_cksum(const struct cksum_vec *, int);
 extern u_int16_t in_cksum_shouldbe(u_int16_t, u_int16_t);
 #endif
+extern int nextproto4_cksum(netdissect_options *ndo, const struct ip *, const u_int8_t *, u_int, u_int, u_int);
 
 extern void esp_print_decodesecret(netdissect_options *ndo);
 extern int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,

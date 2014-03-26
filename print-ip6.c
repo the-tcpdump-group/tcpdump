@@ -188,7 +188,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			nh = *cp;
 			break;
 		case IPPROTO_SCTP:
-			sctp_print(cp, (const u_char *)ip6, len);
+			sctp_print(ndo, cp, (const u_char *)ip6, len);
 			return;
 		case IPPROTO_DCCP:
 			dccp_print(ndo, cp, (const u_char *)ip6, len);

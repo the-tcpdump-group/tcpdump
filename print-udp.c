@@ -272,11 +272,11 @@ rtcp_print(netdissect_options *ndo, const u_char *hdr, const u_char *ep)
 	return (hdr + len);
 }
 
-static int udp_cksum(register const struct ip *ip,
+static int udp_cksum(netdissect_options *ndo, register const struct ip *ip,
 		     register const struct udphdr *up,
 		     register u_int len)
 {
-	return nextproto4_cksum(ip, (const u_int8_t *)(void *)up, len, len,
+	return nextproto4_cksum(ndo, ip, (const u_int8_t *)(void *)up, len, len,
 				IPPROTO_UDP);
 }
 
@@ -452,7 +452,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 
 		case PT_AODV:
 			udpipaddr_print(ndo, ip, sport, dport);
-			aodv_print((const u_char *)(up + 1), length,
+			aodv_print(ndo, (const u_char *)(up + 1), length,
 #ifdef INET6
 			    ip6 != NULL);
 #else
@@ -533,7 +533,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 			if (udp_sum == 0) {
 				ND_PRINT((ndo, "[no cksum] "));
 			} else if (ND_TTEST2(cp[0], length)) {
-				sum = udp_cksum(ip, up, length + sizeof(struct udphdr));
+				sum = udp_cksum(ndo, ip, up, length + sizeof(struct udphdr));
 
 	                        if (sum != 0) {
 					ND_PRINT((ndo, "[bad udp cksum 0x%04x -> 0x%04x!] ",
@@ -576,7 +576,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 		else if (ISPORT(RIP_PORT))
 			rip_print(ndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(AODV_PORT))
-			aodv_print((const u_char *)(up + 1), length,
+			aodv_print(ndo, (const u_char *)(up + 1), length,
 #ifdef INET6
 			    ip6 != NULL);
 #else

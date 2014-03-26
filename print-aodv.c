@@ -30,16 +30,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include <tcpdump-stdinc.h>
 
+/* for offsetof */
 #include <stddef.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <string.h>
 
 #include "interface.h"
 #include "addrtoname.h"
@@ -202,50 +201,52 @@ struct aodv_hello {
 #define	AODV_EXT_HELLO	1
 
 static void
-aodv_extension(const struct aodv_ext *ep, u_int length)
+aodv_extension(netdissect_options *ndo,
+               const struct aodv_ext *ep, u_int length)
 {
 	u_int i;
 	const struct aodv_hello *ah;
 
 	switch (ep->type) {
 	case AODV_EXT_HELLO:
-		if (snapend < (u_char *) ep) {
-			printf(" [|hello]");
+		if (ndo->ndo_snapend < (u_char *) ep) {
+			ND_PRINT((ndo, " [|hello]"));
 			return;
 		}
-		i = min(length, (u_int)(snapend - (u_char *)ep));
+		i = min(length, (u_int)(ndo->ndo_snapend - (u_char *)ep));
 		if (i < sizeof(struct aodv_hello)) {
-			printf(" [|hello]");
+			ND_PRINT((ndo, " [|hello]"));
 			return;
 		}
 		i -= sizeof(struct aodv_hello);
 		ah = (void *)ep;
-		printf("\n\text HELLO %ld ms",
-		    (unsigned long)EXTRACT_32BITS(&ah->interval));
+		ND_PRINT((ndo, "\n\text HELLO %ld ms",
+		    (unsigned long)EXTRACT_32BITS(&ah->interval)));
 		break;
 
 	default:
-		printf("\n\text %u %u", ep->type, ep->length);
+		ND_PRINT((ndo, "\n\text %u %u", ep->type, ep->length));
 		break;
 	}
 }
 
 static void
-aodv_rreq(const union aodv *ap, const u_char *dat, u_int length)
+aodv_rreq(netdissect_options *ndo,
+          const union aodv *ap, const u_char *dat, u_int length)
 {
 	u_int i;
 
-	if (snapend < dat) {
-		printf(" [|aodv]");
+	if (ndo->ndo_snapend < dat) {
+		ND_PRINT((ndo, " [|aodv]"));
 		return;
 	}
-	i = min(length, (u_int)(snapend - dat));
+	i = min(length, (u_int)(ndo->ndo_snapend - dat));
 	if (i < sizeof(ap->rreq)) {
-		printf(" [|rreq]");
+		ND_PRINT((ndo, " [|rreq]"));
 		return;
 	}
 	i -= sizeof(ap->rreq);
-	printf(" rreq %u %s%s%s%s%shops %u id 0x%08lx\n"
+	ND_PRINT((ndo, " rreq %u %s%s%s%s%shops %u id 0x%08lx\n"
 	    "\tdst %s seq %lu src %s seq %lu", length,
 	    ap->rreq.rreq_type & RREQ_JOIN ? "[J]" : "",
 	    ap->rreq.rreq_type & RREQ_REPAIR ? "[R]" : "",
@@ -257,27 +258,28 @@ aodv_rreq(const union aodv *ap, const u_char *dat, u_int length)
 	    ipaddr_string(&ap->rreq.rreq_da),
 	    (unsigned long)EXTRACT_32BITS(&ap->rreq.rreq_ds),
 	    ipaddr_string(&ap->rreq.rreq_oa),
-	    (unsigned long)EXTRACT_32BITS(&ap->rreq.rreq_os));
+	    (unsigned long)EXTRACT_32BITS(&ap->rreq.rreq_os)));
 	if (i >= sizeof(struct aodv_ext))
-		aodv_extension((void *)(&ap->rreq + 1), i);
+		aodv_extension(ndo, (void *)(&ap->rreq + 1), i);
 }
 
 static void
-aodv_rrep(const union aodv *ap, const u_char *dat, u_int length)
+aodv_rrep(netdissect_options *ndo,
+          const union aodv *ap, const u_char *dat, u_int length)
 {
 	u_int i;
 
-	if (snapend < dat) {
-		printf(" [|aodv]");
+	if (ndo->ndo_snapend < dat) {
+		ND_PRINT((ndo, " [|aodv]"));
 		return;
 	}
-	i = min(length, (u_int)(snapend - dat));
+	i = min(length, (u_int)(ndo->ndo_snapend - dat));
 	if (i < sizeof(ap->rrep)) {
-		printf(" [|rrep]");
+		ND_PRINT((ndo, " [|rrep]"));
 		return;
 	}
 	i -= sizeof(ap->rrep);
-	printf(" rrep %u %s%sprefix %u hops %u\n"
+	ND_PRINT((ndo, " rrep %u %s%sprefix %u hops %u\n"
 	    "\tdst %s dseq %lu src %s %lu ms", length,
 	    ap->rrep.rrep_type & RREP_REPAIR ? "[R]" : "",
 	    ap->rrep.rrep_type & RREP_ACK ? "[A] " : " ",
@@ -286,64 +288,67 @@ aodv_rrep(const union aodv *ap, const u_char *dat, u_int length)
 	    ipaddr_string(&ap->rrep.rrep_da),
 	    (unsigned long)EXTRACT_32BITS(&ap->rrep.rrep_ds),
 	    ipaddr_string(&ap->rrep.rrep_oa),
-	    (unsigned long)EXTRACT_32BITS(&ap->rrep.rrep_life));
+	    (unsigned long)EXTRACT_32BITS(&ap->rrep.rrep_life)));
 	if (i >= sizeof(struct aodv_ext))
-		aodv_extension((void *)(&ap->rrep + 1), i);
+		aodv_extension(ndo, (void *)(&ap->rrep + 1), i);
 }
 
 static void
-aodv_rerr(const union aodv *ap, const u_char *dat, u_int length)
+aodv_rerr(netdissect_options *ndo,
+          const union aodv *ap, const u_char *dat, u_int length)
 {
 	u_int i;
 	const struct rerr_unreach *dp = NULL;
 	int n, trunc;
 
-	if (snapend < dat) {
-		printf(" [|aodv]");
+	if (ndo->ndo_snapend < dat) {
+		ND_PRINT((ndo, " [|aodv]"));
 		return;
 	}
-	i = min(length, (u_int)(snapend - dat));
+	i = min(length, (u_int)(ndo->ndo_snapend - dat));
 	if (i < offsetof(struct aodv_rerr, r)) {
-		printf(" [|rerr]");
+		ND_PRINT((ndo, " [|rerr]"));
 		return;
 	}
 	i -= offsetof(struct aodv_rerr, r);
 	dp = &ap->rerr.r.dest[0];
 	n = ap->rerr.rerr_dc * sizeof(ap->rerr.r.dest[0]);
-	printf(" rerr %s [items %u] [%u]:",
+	ND_PRINT((ndo, " rerr %s [items %u] [%u]:",
 	    ap->rerr.rerr_flags & RERR_NODELETE ? "[D]" : "",
-	    ap->rerr.rerr_dc, length);
+	    ap->rerr.rerr_dc, length));
 	trunc = n - (i/sizeof(ap->rerr.r.dest[0]));
 	for (; i >= sizeof(ap->rerr.r.dest[0]);
 	    ++dp, i -= sizeof(ap->rerr.r.dest[0])) {
-		printf(" {%s}(%ld)", ipaddr_string(&dp->u_da),
-		    (unsigned long)EXTRACT_32BITS(&dp->u_ds));
+		ND_PRINT((ndo, " {%s}(%ld)", ipaddr_string(&dp->u_da),
+		    (unsigned long)EXTRACT_32BITS(&dp->u_ds)));
 	}
 	if (trunc)
-		printf("[|rerr]");
+		ND_PRINT((ndo, "[|rerr]"));
 }
 
 static void
 #ifdef INET6
-aodv_v6_rreq(const union aodv *ap, const u_char *dat, u_int length)
+aodv_v6_rreq(netdissect_options *ndo,
+             const union aodv *ap, const u_char *dat, u_int length)
 #else
-aodv_v6_rreq(const union aodv *ap _U_, const u_char *dat _U_, u_int length)
+aodv_v6_rreq(netdissect_options *ndo,
+             const union aodv *ap _U_, const u_char *dat _U_, u_int length)
 #endif
 {
 #ifdef INET6
 	u_int i;
 
-	if (snapend < dat) {
-		printf(" [|aodv]");
+	if (ndo->ndo_snapend < dat) {
+		ND_PRINT((ndo, " [|aodv]"));
 		return;
 	}
-	i = min(length, (u_int)(snapend - dat));
+	i = min(length, (u_int)(ndo->ndo_snapend - dat));
 	if (i < sizeof(ap->rreq6)) {
-		printf(" [|rreq6]");
+		ND_PRINT((ndo, " [|rreq6]"));
 		return;
 	}
 	i -= sizeof(ap->rreq6);
-	printf(" v6 rreq %u %s%s%s%s%shops %u id 0x%08lx\n"
+	ND_PRINT((ndo, " v6 rreq %u %s%s%s%s%shops %u id 0x%08lx\n"
 	    "\tdst %s seq %lu src %s seq %lu", length,
 	    ap->rreq6.rreq_type & RREQ_JOIN ? "[J]" : "",
 	    ap->rreq6.rreq_type & RREQ_REPAIR ? "[R]" : "",
@@ -355,35 +360,37 @@ aodv_v6_rreq(const union aodv *ap _U_, const u_char *dat _U_, u_int length)
 	    ip6addr_string(&ap->rreq6.rreq_da),
 	    (unsigned long)EXTRACT_32BITS(&ap->rreq6.rreq_ds),
 	    ip6addr_string(&ap->rreq6.rreq_oa),
-	    (unsigned long)EXTRACT_32BITS(&ap->rreq6.rreq_os));
+	    (unsigned long)EXTRACT_32BITS(&ap->rreq6.rreq_os)));
 	if (i >= sizeof(struct aodv_ext))
-		aodv_extension((void *)(&ap->rreq6 + 1), i);
+		aodv_extension(ndo, (void *)(&ap->rreq6 + 1), i);
 #else
-	printf(" v6 rreq %u", length);
+	ND_PRINT((ndo, " v6 rreq %u", length));
 #endif
 }
 
 static void
 #ifdef INET6
-aodv_v6_rrep(const union aodv *ap, const u_char *dat, u_int length)
+aodv_v6_rrep(netdissect_options *ndo,
+             const union aodv *ap, const u_char *dat, u_int length)
 #else
-aodv_v6_rrep(const union aodv *ap _U_, const u_char *dat _U_, u_int length)
+aodv_v6_rrep(netdissect_options *ndo,
+             const union aodv *ap _U_, const u_char *dat _U_, u_int length)
 #endif
 {
 #ifdef INET6
 	u_int i;
 
-	if (snapend < dat) {
-		printf(" [|aodv]");
+	if (ndo->ndo_snapend < dat) {
+		ND_PRINT((ndo, " [|aodv]"));
 		return;
 	}
-	i = min(length, (u_int)(snapend - dat));
+	i = min(length, (u_int)(ndo->ndo_snapend - dat));
 	if (i < sizeof(ap->rrep6)) {
-		printf(" [|rrep6]");
+		ND_PRINT((ndo, " [|rrep6]"));
 		return;
 	}
 	i -= sizeof(ap->rrep6);
-	printf(" rrep %u %s%sprefix %u hops %u\n"
+	ND_PRINT((ndo, " rrep %u %s%sprefix %u hops %u\n"
 	   "\tdst %s dseq %lu src %s %lu ms", length,
 	    ap->rrep6.rrep_type & RREP_REPAIR ? "[R]" : "",
 	    ap->rrep6.rrep_type & RREP_ACK ? "[A] " : " ",
@@ -392,19 +399,21 @@ aodv_v6_rrep(const union aodv *ap _U_, const u_char *dat _U_, u_int length)
 	    ip6addr_string(&ap->rrep6.rrep_da),
 	    (unsigned long)EXTRACT_32BITS(&ap->rrep6.rrep_ds),
 	    ip6addr_string(&ap->rrep6.rrep_oa),
-	    (unsigned long)EXTRACT_32BITS(&ap->rrep6.rrep_life));
+	    (unsigned long)EXTRACT_32BITS(&ap->rrep6.rrep_life)));
 	if (i >= sizeof(struct aodv_ext))
-		aodv_extension((void *)(&ap->rrep6 + 1), i);
+		aodv_extension(ndo, (void *)(&ap->rrep6 + 1), i);
 #else
-	printf(" rrep %u", length);
+	ND_PRINT((ndo, " rrep %u", length));
 #endif
 }
 
 static void
 #ifdef INET6
-aodv_v6_rerr(const union aodv *ap, u_int length)
+aodv_v6_rerr(netdissect_options *ndo,
+             const union aodv *ap, u_int length)
 #else
-aodv_v6_rerr(const union aodv *ap _U_, u_int length)
+aodv_v6_rerr(netdissect_options *ndo,
+             const union aodv *ap _U_, u_int length)
 #endif
 {
 #ifdef INET6
@@ -415,43 +424,45 @@ aodv_v6_rerr(const union aodv *ap _U_, u_int length)
 	j = sizeof(ap->rerr.r.dest6[0]);
 	dp6 = &ap->rerr.r.dest6[0];
 	n = ap->rerr.rerr_dc * j;
-	printf(" rerr %s [items %u] [%u]:",
+	ND_PRINT((ndo, " rerr %s [items %u] [%u]:",
 	    ap->rerr.rerr_flags & RERR_NODELETE ? "[D]" : "",
-	    ap->rerr.rerr_dc, length);
+	    ap->rerr.rerr_dc, length));
 	trunc = n - (i/j);
 	for (; i -= j >= 0; ++dp6) {
-		printf(" {%s}(%ld)", ip6addr_string(&dp6->u_da),
-		    (unsigned long)EXTRACT_32BITS(&dp6->u_ds));
+		ND_PRINT((ndo, " {%s}(%ld)", ip6addr_string(&dp6->u_da),
+		    (unsigned long)EXTRACT_32BITS(&dp6->u_ds)));
 	}
 	if (trunc)
-		printf("[|rerr]");
+		ND_PRINT((ndo, "[|rerr]"));
 #else
-	printf(" rerr %u", length);
+	ND_PRINT((ndo, " rerr %u", length));
 #endif
 }
 
 static void
 #ifdef INET6
-aodv_v6_draft_01_rreq(const union aodv *ap, const u_char *dat, u_int length)
+aodv_v6_draft_01_rreq(netdissect_options *ndo,
+                      const union aodv *ap, const u_char *dat, u_int length)
 #else
-aodv_v6_draft_01_rreq(const union aodv *ap _U_, const u_char *dat _U_,
+aodv_v6_draft_01_rreq(netdissect_options *ndo,
+                      const union aodv *ap _U_, const u_char *dat _U_,
     u_int length)
 #endif
 {
 #ifdef INET6
 	u_int i;
 
-	if (snapend < dat) {
-		printf(" [|aodv]");
+	if (ndo->ndo_snapend < dat) {
+		ND_PRINT((ndo, " [|aodv]"));
 		return;
 	}
-	i = min(length, (u_int)(snapend - dat));
+	i = min(length, (u_int)(ndo->ndo_snapend - dat));
 	if (i < sizeof(ap->rreq6_draft_01)) {
-		printf(" [|rreq6]");
+		ND_PRINT((ndo, " [|rreq6]"));
 		return;
 	}
 	i -= sizeof(ap->rreq6_draft_01);
-	printf(" rreq %u %s%s%s%s%shops %u id 0x%08lx\n"
+	ND_PRINT((ndo, " rreq %u %s%s%s%s%shops %u id 0x%08lx\n"
 	    "\tdst %s seq %lu src %s seq %lu", length,
 	    ap->rreq6_draft_01.rreq_type & RREQ_JOIN ? "[J]" : "",
 	    ap->rreq6_draft_01.rreq_type & RREQ_REPAIR ? "[R]" : "",
@@ -463,36 +474,38 @@ aodv_v6_draft_01_rreq(const union aodv *ap _U_, const u_char *dat _U_,
 	    ip6addr_string(&ap->rreq6_draft_01.rreq_da),
 	    (unsigned long)EXTRACT_32BITS(&ap->rreq6_draft_01.rreq_ds),
 	    ip6addr_string(&ap->rreq6_draft_01.rreq_oa),
-	    (unsigned long)EXTRACT_32BITS(&ap->rreq6_draft_01.rreq_os));
+	    (unsigned long)EXTRACT_32BITS(&ap->rreq6_draft_01.rreq_os)));
 	if (i >= sizeof(struct aodv_ext))
-		aodv_extension((void *)(&ap->rreq6_draft_01 + 1), i);
+		aodv_extension(ndo, (void *)(&ap->rreq6_draft_01 + 1), i);
 #else
-	printf(" rreq %u", length);
+	ND_PRINT((ndo, " rreq %u", length));
 #endif
 }
 
 static void
 #ifdef INET6
-aodv_v6_draft_01_rrep(const union aodv *ap, const u_char *dat, u_int length)
+aodv_v6_draft_01_rrep(netdissect_options *ndo,
+                      const union aodv *ap, const u_char *dat, u_int length)
 #else
-aodv_v6_draft_01_rrep(const union aodv *ap _U_, const u_char *dat _U_,
+aodv_v6_draft_01_rrep(netdissect_options *ndo,
+                      const union aodv *ap _U_, const u_char *dat _U_,
     u_int length)
 #endif
 {
 #ifdef INET6
 	u_int i;
 
-	if (snapend < dat) {
-		printf(" [|aodv]");
+	if (ndo->ndo_snapend < dat) {
+		ND_PRINT((ndo, " [|aodv]"));
 		return;
 	}
-	i = min(length, (u_int)(snapend - dat));
+	i = min(length, (u_int)(ndo->ndo_snapend - dat));
 	if (i < sizeof(ap->rrep6_draft_01)) {
-		printf(" [|rrep6]");
+		ND_PRINT((ndo, " [|rrep6]"));
 		return;
 	}
 	i -= sizeof(ap->rrep6_draft_01);
-	printf(" rrep %u %s%sprefix %u hops %u\n"
+	ND_PRINT((ndo, " rrep %u %s%sprefix %u hops %u\n"
 	   "\tdst %s dseq %lu src %s %lu ms", length,
 	    ap->rrep6_draft_01.rrep_type & RREP_REPAIR ? "[R]" : "",
 	    ap->rrep6_draft_01.rrep_type & RREP_ACK ? "[A] " : " ",
@@ -501,19 +514,21 @@ aodv_v6_draft_01_rrep(const union aodv *ap _U_, const u_char *dat _U_,
 	    ip6addr_string(&ap->rrep6_draft_01.rrep_da),
 	    (unsigned long)EXTRACT_32BITS(&ap->rrep6_draft_01.rrep_ds),
 	    ip6addr_string(&ap->rrep6_draft_01.rrep_oa),
-	    (unsigned long)EXTRACT_32BITS(&ap->rrep6_draft_01.rrep_life));
+	    (unsigned long)EXTRACT_32BITS(&ap->rrep6_draft_01.rrep_life)));
 	if (i >= sizeof(struct aodv_ext))
-		aodv_extension((void *)(&ap->rrep6_draft_01 + 1), i);
+		aodv_extension(ndo, (void *)(&ap->rrep6_draft_01 + 1), i);
 #else
-	printf(" rrep %u", length);
+	ND_PRINT((ndo, " rrep %u", length));
 #endif
 }
 
 static void
 #ifdef INET6
-aodv_v6_draft_01_rerr(const union aodv *ap, u_int length)
+aodv_v6_draft_01_rerr(netdissect_options *ndo,
+                      const union aodv *ap, u_int length)
 #else
-aodv_v6_draft_01_rerr(const union aodv *ap _U_, u_int length)
+aodv_v6_draft_01_rerr(netdissect_options *ndo,
+                      const union aodv *ap _U_, u_int length)
 #endif
 {
 #ifdef INET6
@@ -524,81 +539,82 @@ aodv_v6_draft_01_rerr(const union aodv *ap _U_, u_int length)
 	j = sizeof(ap->rerr.r.dest6_draft_01[0]);
 	dp6 = &ap->rerr.r.dest6_draft_01[0];
 	n = ap->rerr.rerr_dc * j;
-	printf(" rerr %s [items %u] [%u]:",
+	ND_PRINT((ndo, " rerr %s [items %u] [%u]:",
 	    ap->rerr.rerr_flags & RERR_NODELETE ? "[D]" : "",
-	    ap->rerr.rerr_dc, length);
+	    ap->rerr.rerr_dc, length));
 	trunc = n - (i/j);
 	for (; i -= j >= 0; ++dp6) {
-		printf(" {%s}(%ld)", ip6addr_string(&dp6->u_da),
-		    (unsigned long)EXTRACT_32BITS(&dp6->u_ds));
+		ND_PRINT((ndo, " {%s}(%ld)", ip6addr_string(&dp6->u_da),
+		    (unsigned long)EXTRACT_32BITS(&dp6->u_ds)));
 	}
 	if (trunc)
-		printf("[|rerr]");
+		ND_PRINT((ndo, "[|rerr]"));
 #else
-	printf(" rerr %u", length);
+	ND_PRINT((ndo, " rerr %u", length));
 #endif
 }
 
 void
-aodv_print(const u_char *dat, u_int length, int is_ip6)
+aodv_print(netdissect_options *ndo,
+           const u_char *dat, u_int length, int is_ip6)
 {
 	const union aodv *ap;
 
 	ap = (union aodv *)dat;
-	if (snapend < dat) {
-		printf(" [|aodv]");
+	if (ndo->ndo_snapend < dat) {
+		ND_PRINT((ndo, " [|aodv]"));
 		return;
 	}
-	if (min(length, (u_int)(snapend - dat)) < sizeof(ap->rrep_ack)) {
-		printf(" [|aodv]");
+	if (min(length, (u_int)(ndo->ndo_snapend - dat)) < sizeof(ap->rrep_ack)) {
+		ND_PRINT((ndo, " [|aodv]"));
 		return;
 	}
-	printf(" aodv");
+	ND_PRINT((ndo, " aodv"));
 
 	switch (ap->rerr.rerr_type) {
 
 	case AODV_RREQ:
 		if (is_ip6)
-			aodv_v6_rreq(ap, dat, length);
+			aodv_v6_rreq(ndo, ap, dat, length);
 		else
-			aodv_rreq(ap, dat, length);
+			aodv_rreq(ndo, ap, dat, length);
 		break;
 
 	case AODV_RREP:
 		if (is_ip6)
-			aodv_v6_rrep(ap, dat, length);
+			aodv_v6_rrep(ndo, ap, dat, length);
 		else
-			aodv_rrep(ap, dat, length);
+			aodv_rrep(ndo, ap, dat, length);
 		break;
 
 	case AODV_RERR:
 		if (is_ip6)
-			aodv_v6_rerr(ap, length);
+			aodv_v6_rerr(ndo, ap, length);
 		else
-			aodv_rerr(ap, dat, length);
+			aodv_rerr(ndo, ap, dat, length);
 		break;
 
 	case AODV_RREP_ACK:
-		printf(" rrep-ack %u", length);
+		ND_PRINT((ndo, " rrep-ack %u", length));
 		break;
 
 	case AODV_V6_DRAFT_01_RREQ:
-		aodv_v6_draft_01_rreq(ap, dat, length);
+		aodv_v6_draft_01_rreq(ndo, ap, dat, length);
 		break;
 
 	case AODV_V6_DRAFT_01_RREP:
-		aodv_v6_draft_01_rrep(ap, dat, length);
+		aodv_v6_draft_01_rrep(ndo, ap, dat, length);
 		break;
 
 	case AODV_V6_DRAFT_01_RERR:
-		aodv_v6_draft_01_rerr(ap, length);
+		aodv_v6_draft_01_rerr(ndo, ap, length);
 		break;
 
 	case AODV_V6_DRAFT_01_RREP_ACK:
-		printf(" rrep-ack %u", length);
+		ND_PRINT((ndo, " rrep-ack %u", length));
 		break;
 
 	default:
-		printf(" %u %u", ap->rreq.rreq_type, length);
+		ND_PRINT((ndo, " %u %u", ap->rreq.rreq_type, length));
 	}
 }

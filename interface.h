@@ -164,7 +164,6 @@ extern u_int16_t create_osi_cksum(const u_int8_t *, int, int);
 
 extern void ascii_print(const u_char *, u_int);
 extern void aarp_print(const u_char *, u_int);
-extern void aodv_print(const u_char *, u_int, int);
 extern void atalk_print(const u_char *, u_int);
 extern void bgp_print(const u_char *, int);
 extern void decnet_print(const u_char *, u_int, u_int);
@@ -224,7 +223,6 @@ extern void print_data(const unsigned char *, int);
 extern void cfm_print(const u_char *, u_int);
 extern void cdp_print(const u_char *, u_int, u_int);
 extern void lwres_print(const u_char *, u_int);
-extern void sctp_print(const u_char *, const u_char *, u_int);
 extern void forces_print(const u_char *, u_int);
 extern void mpls_lsp_ping_print(const u_char *, u_int);
 extern void sip_print(const u_char *, u_int);

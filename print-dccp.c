@@ -183,10 +183,10 @@ static inline u_int dccp_csum_coverage(const struct dccp_hdr* dh, u_int len)
 	return (cov > len)? len : cov;
 }
 
-static int dccp_cksum(const struct ip *ip,
+static int dccp_cksum(netdissect_options *ndo, const struct ip *ip,
 	const struct dccp_hdr *dh, u_int len)
 {
-	return nextproto4_cksum(ip, (const u_int8_t *)(void *)dh, len,
+	return nextproto4_cksum(ndo, ip, (const u_int8_t *)(void *)dh, len,
 				dccp_csum_coverage(dh, len), IPPROTO_DCCP);
 }
 
@@ -334,7 +334,7 @@ void dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 		dccp_sum = EXTRACT_16BITS(&dh->dccph_checksum);
 		ND_PRINT((ndo, "cksum 0x%04x ", dccp_sum));
 		if (IP_V(ip) == 4)
-			sum = dccp_cksum(ip, dh, len);
+			sum = dccp_cksum(ndo, ip, dh, len);
 #ifdef INET6
 		else if (IP_V(ip) == 6)
 			sum = dccp6_cksum(ip6, dh, len);
