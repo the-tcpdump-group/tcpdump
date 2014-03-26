@@ -312,7 +312,6 @@ void dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 			     ipaddr_string(&ip->ip_src), sport,
 			     ipaddr_string(&ip->ip_dst), dport));
 	}
-	fflush(stdout);
 
 	if (ndo->ndo_qflag) {
 		ND_PRINT((ndo, " %d", len - hlen));

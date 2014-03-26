@@ -909,11 +909,11 @@ icmp6_print(netdissect_options *ndo,
 			udp_sum = EXTRACT_16BITS(&dp->icmp6_cksum);
 			sum = icmp6_cksum(ip, dp, length);
 			if (sum != 0)
-				(void)ND_PRINT((ndo,"[bad icmp6 cksum 0x%04x -> 0x%04x!] ",
+				ND_PRINT((ndo,"[bad icmp6 cksum 0x%04x -> 0x%04x!] ",
                                                 udp_sum,
                                                 in_cksum_shouldbe(udp_sum, sum)));
 			else
-                          (void)ND_PRINT((ndo,"[icmp6 sum ok] "));
+				ND_PRINT((ndo,"[icmp6 sum ok] "));
 		}
 	}
 
@@ -1456,13 +1456,13 @@ mldv2_report_print(netdissect_options *ndo, const u_char *bp, u_int len)
                     ND_PRINT((ndo,", %d source(s)", nsrcs));
             else {
 		/* Print the sources */
-                    (void)ND_PRINT((ndo," {"));
+                    ND_PRINT((ndo," {"));
                 for (j = 0; j < nsrcs; j++) {
                     ND_TCHECK2(bp[group + 20 + j * sizeof(struct in6_addr)],
                             sizeof(struct in6_addr));
 		    ND_PRINT((ndo," %s", ip6addr_string(&bp[group + 20 + j * sizeof(struct in6_addr)])));
 		}
-                (void)ND_PRINT((ndo," }"));
+                ND_PRINT((ndo," }"));
             }
 	    /* Next group record */
             group += 20 + nsrcs * sizeof(struct in6_addr);
@@ -1471,7 +1471,7 @@ mldv2_report_print(netdissect_options *ndo, const u_char *bp, u_int len)
     }
     return;
 trunc:
-    (void)ND_PRINT((ndo,"[|icmp6]"));
+    ND_PRINT((ndo,"[|icmp6]"));
     return;
 }
 
@@ -1497,7 +1497,7 @@ mldv2_query_print(netdissect_options *ndo, const u_char *bp, u_int len)
         mrt = ((mrc & 0x0fff) | 0x1000) << (((mrc & 0x7000) >> 12) + 3);
     }
     if (ndo->ndo_vflag) {
-            (void)ND_PRINT((ndo," [max resp delay=%d]", mrt));
+            ND_PRINT((ndo," [max resp delay=%d]", mrt));
     }
     ND_TCHECK2(bp[8], sizeof(struct in6_addr));
     ND_PRINT((ndo," [gaddr %s", ip6addr_string(&bp[8])));
@@ -1537,7 +1537,7 @@ mldv2_query_print(netdissect_options *ndo, const u_char *bp, u_int len)
     ND_PRINT((ndo,"]"));
     return;
 trunc:
-    (void)ND_PRINT((ndo,"[|icmp6]"));
+    ND_PRINT((ndo,"[|icmp6]"));
     return;
 }
 

@@ -93,26 +93,26 @@ ether_hdr_print(netdissect_options *ndo,
 
 	ep = (const struct ether_header *)bp;
 
-	(void)ND_PRINT((ndo, "%s > %s",
+	ND_PRINT((ndo, "%s > %s",
 		     etheraddr_string(ESRC(ep)),
 		     etheraddr_string(EDST(ep))));
 
 	ether_type = EXTRACT_16BITS(&ep->ether_type);
 	if (!ndo->ndo_qflag) {
 	        if (ether_type <= ETHERMTU)
-		          (void)ND_PRINT((ndo, ", 802.3"));
+		          ND_PRINT((ndo, ", 802.3"));
                 else
-		          (void)ND_PRINT((ndo, ", ethertype %s (0x%04x)",
+		          ND_PRINT((ndo, ", ethertype %s (0x%04x)",
 				       tok2str(ethertype_values,"Unknown", ether_type),
                                        ether_type));
         } else {
                 if (ether_type <= ETHERMTU)
-                          (void)ND_PRINT((ndo, ", 802.3"));
+                          ND_PRINT((ndo, ", 802.3"));
                 else
-                          (void)ND_PRINT((ndo, ", %s", tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", ether_type)));
+                          ND_PRINT((ndo, ", %s", tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", ether_type)));
         }
 
-	(void)ND_PRINT((ndo, ", length %u: ", length));
+	ND_PRINT((ndo, ", length %u: ", length));
 }
 
 /*
@@ -341,7 +341,7 @@ ethertype_print(netdissect_options *ndo,
 
 	case ETHERTYPE_ATALK:
 		if (ndo->ndo_vflag)
-			fputs("et1 ", stdout);
+			ND_PRINT((ndo, "et1 "));
 		atalk_print(/*ndo,*/p, length);
 		return (1);
 

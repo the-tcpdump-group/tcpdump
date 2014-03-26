@@ -21,14 +21,14 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include <string.h>
-
 #include <tcpdump-stdinc.h>
 
+#include <string.h>
 #include <stdlib.h>
 
 /* Any code in this file that depends on HAVE_LIBCRYPTO depends on
@@ -43,14 +43,12 @@
 #endif
 #endif
 
-#include <stdio.h>
-
 #include "ip.h"
 #ifdef INET6
 #include "ip6.h"
 #endif
 
-#include "netdissect.h"
+#include "interface.h"
 #include "extract.h"
 
 /*

@@ -688,7 +688,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 
 	return;
 trunc:
-	fputs("[|icmp]", stdout);
+	ND_PRINT((ndo, "[|icmp]"));
 }
 /*
  * Local Variables:

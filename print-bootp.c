@@ -132,21 +132,21 @@ bootp_print(netdissect_options *ndo,
 	if (*bp->bp_sname) {
 		ND_PRINT((ndo, "\n\t  sname \""));
 		if (fn_print(bp->bp_sname, ndo->ndo_snapend)) {
-			putchar('"');
-			fputs(tstr + 1, stdout);
+			ND_PRINT((ndo, "\""));
+			ND_PRINT((ndo, tstr + 1));
 			return;
 		}
-		putchar('"');
+		ND_PRINT((ndo, "\""));
 	}
 	ND_TCHECK2(bp->bp_file[0], 1);		/* check first char only */
 	if (*bp->bp_file) {
 		ND_PRINT((ndo, "\n\t  file \""));
 		if (fn_print(bp->bp_file, ndo->ndo_snapend)) {
-			putchar('"');
-			fputs(tstr + 1, stdout);
+			ND_PRINT((ndo, "\""));
+			ND_PRINT((ndo, tstr + 1));
 			return;
 		}
-		putchar('"');
+		ND_PRINT((ndo, "\""));
 	}
 
 	/* Decode the vendor buffer */
@@ -167,7 +167,7 @@ bootp_print(netdissect_options *ndo,
 
 	return;
 trunc:
-	fputs(tstr, stdout);
+	ND_PRINT((ndo, tstr));
 }
 
 /*
@@ -452,7 +452,7 @@ rfc1048_print(netdissect_options *ndo,
 				bp += 2;
 				cp = tok2str(xtag2str, "?xT%u", us);
 				if (!first)
-					putchar('+');
+					ND_PRINT((ndo, "+"));
 				ND_PRINT((ndo, "%s", cp + 1));
 				first = 0;
 			}
@@ -474,12 +474,12 @@ rfc1048_print(netdissect_options *ndo,
 
 		case 'a':
 			/* ascii strings */
-			putchar('"');
+			ND_PRINT((ndo, "\""));
 			if (fn_printn(bp, len, ndo->ndo_snapend)) {
-				putchar('"');
+				ND_PRINT((ndo, "\""));
 				goto trunc;
 			}
-			putchar('"');
+			ND_PRINT((ndo, "\""));
 			bp += len;
 			len = 0;
 			break;
@@ -490,7 +490,7 @@ rfc1048_print(netdissect_options *ndo,
 			/* ip addresses/32-bit words */
 			while (len >= sizeof(ul)) {
 				if (!first)
-					putchar(',');
+					ND_PRINT((ndo, ","));
 				ul = EXTRACT_32BITS(bp);
 				if (c == 'i') {
 					ul = htonl(ul);
@@ -509,7 +509,7 @@ rfc1048_print(netdissect_options *ndo,
 			/* IP address pairs */
 			while (len >= 2*sizeof(ul)) {
 				if (!first)
-					putchar(',');
+					ND_PRINT((ndo, ","));
 				memcpy((char *)&ul, (const char *)bp, sizeof(ul));
 				ND_PRINT((ndo, "(%s:", ipaddr_string(&ul)));
 				bp += sizeof(ul);
@@ -525,7 +525,7 @@ rfc1048_print(netdissect_options *ndo,
 			/* shorts */
 			while (len >= sizeof(us)) {
 				if (!first)
-					putchar(',');
+					ND_PRINT((ndo, ","));
 				us = EXTRACT_16BITS(bp);
 				ND_PRINT((ndo, "%u", us));
 				bp += sizeof(us);
@@ -538,13 +538,13 @@ rfc1048_print(netdissect_options *ndo,
 			/* boolean */
 			while (len > 0) {
 				if (!first)
-					putchar(',');
+					ND_PRINT((ndo, ","));
 				switch (*bp) {
 				case 0:
-					putchar('N');
+					ND_PRINT((ndo, "N"));
 					break;
 				case 1:
-					putchar('Y');
+					ND_PRINT((ndo, "Y"));
 					break;
 				default:
 					ND_PRINT((ndo, "%u?", *bp));
@@ -562,7 +562,7 @@ rfc1048_print(netdissect_options *ndo,
 			/* Bytes */
 			while (len > 0) {
 				if (!first)
-					putchar(c == 'x' ? ':' : '.');
+					ND_PRINT((ndo, c == 'x' ? ":" : "."));
 				if (c == 'x')
 					ND_PRINT((ndo, "%02x", *bp));
 				else
@@ -586,7 +586,7 @@ rfc1048_print(netdissect_options *ndo,
 				}
 				tag = *bp++;
 				--len;
-				fputs(tok2str(nbo2str, NULL, tag), stdout);
+				ND_PRINT((ndo, tok2str(nbo2str, NULL, tag)));
 				break;
 
 			case TAG_OPT_OVERLOAD:
@@ -598,7 +598,7 @@ rfc1048_print(netdissect_options *ndo,
 				}
 				tag = *bp++;
 				--len;
-				fputs(tok2str(oo2str, NULL, tag), stdout);
+				ND_PRINT((ndo, tok2str(oo2str, NULL, tag)));
 				break;
 
 			case TAG_CLIENT_FQDN:
@@ -616,12 +616,12 @@ rfc1048_print(netdissect_options *ndo,
 				if (*bp || *(bp+1))
 					ND_PRINT((ndo, "%u/%u ", *bp, *(bp+1)));
 				bp += 2;
-				putchar('"');
+				ND_PRINT((ndo, "\""));
 				if (fn_printn(bp, len - 3, ndo->ndo_snapend)) {
-					putchar('"');
+					ND_PRINT((ndo, "\""));
 					goto trunc;
 				}
-				putchar('"');
+				ND_PRINT((ndo, "\""));
 				bp += len - 3;
 				len = 0;
 				break;
@@ -638,12 +638,12 @@ rfc1048_print(netdissect_options *ndo,
 				type = *bp++;
 				len--;
 				if (type == 0) {
-					putchar('"');
+					ND_PRINT((ndo, "\""));
 					if (fn_printn(bp, len, ndo->ndo_snapend)) {
-						putchar('"');
+						ND_PRINT((ndo, "\""));
 						goto trunc;
 					}
-					putchar('"');
+					ND_PRINT((ndo, "\""));
 					bp += len;
 					len = 0;
 					break;
@@ -651,7 +651,7 @@ rfc1048_print(netdissect_options *ndo,
 					ND_PRINT((ndo, "%s ", tok2str(arp2str, "hardware-type %u,", type)));
 					while (len > 0) {
 						if (!first)
-							putchar(':');
+							ND_PRINT((ndo, ":"));
 						ND_PRINT((ndo, "%02x", *bp));
 						++bp;
 						--len;
@@ -711,7 +711,7 @@ rfc1048_print(netdissect_options *ndo,
 				}
 				while (len > 0) {
 					if (!first)
-						putchar(',');
+						ND_PRINT((ndo, ","));
 					mask_width = *bp++;
 					len--;
 					/* mask_width <= 32 */
@@ -729,13 +729,13 @@ rfc1048_print(netdissect_options *ndo,
 						len = 0;
 						break;
 					}
-					putchar('(');
+					ND_PRINT((ndo, "("));
 					if (mask_width == 0)
 						ND_PRINT((ndo, "default"));
 					else {
 						for (i = 0; i < significant_octets ; i++) {
 							if (i > 0)
-								putchar('.');
+								ND_PRINT((ndo, "."));
 							ND_PRINT((ndo, "%d", *bp++));
 						}
 						for (i = significant_octets ; i < 4 ; i++)
@@ -799,7 +799,7 @@ cmu_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	fputs(tstr, stdout);
+	ND_PRINT((ndo, tstr));
 #undef PRINTCMUADDR
 }
 

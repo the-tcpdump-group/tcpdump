@@ -153,16 +153,16 @@ hex_print_with_offset(netdissect_options *ndo,
 	i = 0;
 	while (--nshorts >= 0) {
 		if ((i++ % 8) == 0) {
-                  (void)ND_PRINT((ndo,"%s0x%04x: ", ident, oset));
-                  oset += HEXDUMP_BYTES_PER_LINE;
+			ND_PRINT((ndo,"%s0x%04x: ", ident, oset));
+			oset += HEXDUMP_BYTES_PER_LINE;
 		}
 		s = *cp++;
-		(void)ND_PRINT((ndo," %02x%02x", s, *cp++));
+		ND_PRINT((ndo," %02x%02x", s, *cp++));
 	}
 	if (length & 1) {
 		if ((i % 8) == 0)
-                  (void)ND_PRINT((ndo,"%s0x%04x: ", ident, oset));
-		(void)ND_PRINT((ndo," %02x", *cp));
+			ND_PRINT((ndo,"%s0x%04x: ", ident, oset));
+		ND_PRINT((ndo," %02x", *cp));
 	}
 }
 

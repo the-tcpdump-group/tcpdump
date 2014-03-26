@@ -186,7 +186,7 @@ hbhopt_print(netdissect_options *ndo, register const u_char *bp)
     return(hbhlen);
 
   trunc:
-    fputs("[|HBH]", stdout);
+    ND_PRINT((ndo, "[|HBH]"));
     return(-1);
 }
 
@@ -208,7 +208,7 @@ dstopt_print(netdissect_options *ndo, register const u_char *bp)
     return(dstoptlen);
 
   trunc:
-    fputs("[|DSTOPT]", stdout);
+    ND_PRINT((ndo, "[|DSTOPT]"));
     return(-1);
 }
 #endif /* INET6 */

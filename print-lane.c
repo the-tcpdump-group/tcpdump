@@ -68,7 +68,7 @@ static const struct tok lecop2str[] = {
 static void
 lane_hdr_print(netdissect_options *ndo, const u_char *bp)
 {
-	(void)ND_PRINT((ndo, "lecid:%x ", EXTRACT_16BITS(bp)));
+	ND_PRINT((ndo, "lecid:%x ", EXTRACT_16BITS(bp)));
 }
 
 /*

@@ -88,7 +88,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	ND_TCHECK(*ip6);
 	if (length < sizeof (struct ip6_hdr)) {
-		(void)ND_PRINT((ndo, "truncated-ip6 %u", length));
+		ND_PRINT((ndo, "truncated-ip6 %u", length));
 		return;
 	}
 
@@ -103,7 +103,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	payload_len = EXTRACT_16BITS(&ip6->ip6_plen);
 	len = payload_len + sizeof(struct ip6_hdr);
 	if (length < len)
-		(void)ND_PRINT((ndo, "truncated-ip6 - %u bytes missing!",
+		ND_PRINT((ndo, "truncated-ip6 - %u bytes missing!",
 			len - length));
 
         if (ndo->ndo_vflag) {
@@ -112,18 +112,18 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 #if 0
             /* rfc1883 */
             if (flow & 0x0f000000)
-		(void)ND_PRINT((ndo, "pri 0x%02x, ", (flow & 0x0f000000) >> 24));
+		ND_PRINT((ndo, "pri 0x%02x, ", (flow & 0x0f000000) >> 24));
             if (flow & 0x00ffffff)
-		(void)ND_PRINT((ndo, "flowlabel 0x%06x, ", flow & 0x00ffffff));
+		ND_PRINT((ndo, "flowlabel 0x%06x, ", flow & 0x00ffffff));
 #else
             /* RFC 2460 */
             if (flow & 0x0ff00000)
-		(void)ND_PRINT((ndo, "class 0x%02x, ", (flow & 0x0ff00000) >> 20));
+		ND_PRINT((ndo, "class 0x%02x, ", (flow & 0x0ff00000) >> 20));
             if (flow & 0x000fffff)
-		(void)ND_PRINT((ndo, "flowlabel 0x%05x, ", flow & 0x000fffff));
+		ND_PRINT((ndo, "flowlabel 0x%05x, ", flow & 0x000fffff));
 #endif
 
-            (void)ND_PRINT((ndo, "hlim %u, next-header %s (%u) payload length: %u) ",
+            ND_PRINT((ndo, "hlim %u, next-header %s (%u) payload length: %u) ",
                          ip6->ip6_hlim,
                          tok2str(ipproto_values,"unknown",ip6->ip6_nxt),
                          ip6->ip6_nxt,
@@ -147,7 +147,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		if (cp == (const u_char *)(ip6 + 1) &&
 		    nh != IPPROTO_TCP && nh != IPPROTO_UDP &&
 		    nh != IPPROTO_DCCP && nh != IPPROTO_SCTP) {
-			(void)ND_PRINT((ndo, "%s > %s: ", ip6addr_string(&ip6->ip6_src),
+			ND_PRINT((ndo, "%s > %s: ", ip6addr_string(&ip6->ip6_src),
 				     ip6addr_string(&ip6->ip6_dst)));
 		}
 
@@ -252,18 +252,18 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			return;
 
 		case IPPROTO_NONE:
-			(void)ND_PRINT((ndo, "no next header"));
+			ND_PRINT((ndo, "no next header"));
 			return;
 
 		default:
-			(void)ND_PRINT((ndo, "ip-proto-%d %d", nh, len));
+			ND_PRINT((ndo, "ip-proto-%d %d", nh, len));
 			return;
 		}
 	}
 
 	return;
 trunc:
-	(void)ND_PRINT((ndo, "[|ip6]"));
+	ND_PRINT((ndo, "[|ip6]"));
 }
 
 #endif /* INET6 */

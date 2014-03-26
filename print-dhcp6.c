@@ -606,7 +606,7 @@ dhcp6opt_print(netdissect_options *ndo,
 		case DH6OPT_DOMAIN_LIST:
 			tp = (u_char *)(dh6o + 1);
 			while (tp < cp + sizeof(*dh6o) + optlen) {
-				putchar(' ');
+				ND_PRINT((ndo, " "));
 				if ((tp = ns_nprint(ndo, tp, cp + sizeof(*dh6o) + optlen)) == NULL)
 					goto trunc;
 			}
@@ -759,7 +759,7 @@ dhcp6opt_print(netdissect_options *ndo,
 					ND_PRINT((ndo, " %s", ip6addr_string(&tp[0])));
 					break;
 				case DH6OPT_NTP_SUBOPTION_SRV_FQDN:
-					putchar(' ');
+					ND_PRINT((ndo, " "));
 					if (ns_nprint(ndo, tp, tp + subopt_len) == NULL)
 						goto trunc;
 					break;
