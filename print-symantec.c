@@ -99,14 +99,14 @@ symantec_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_
 			symantec_hdr_print(ndo, (u_char *)sp, length + sizeof (struct symantec_header));
 
 		if (!ndo->ndo_suppress_default_print)
-			ndo->ndo_default_print(ndo, p, caplen);
+			ND_DEFAULTPRINT(p, caplen);
 	} else if (ethertype_print(ndo, ether_type, p, length, caplen) == 0) {
 		/* ether_type not known, print raw packet */
 		if (!ndo->ndo_eflag)
 			symantec_hdr_print(ndo, (u_char *)sp, length + sizeof (struct symantec_header));
 
 		if (!ndo->ndo_suppress_default_print)
-			ndo->ndo_default_print(ndo, p, caplen);
+			ND_DEFAULTPRINT(p, caplen);
 	}
 
 	return (sizeof (struct symantec_header));

@@ -175,7 +175,7 @@ mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	 */
 	if (pt == PT_UNKNOWN) {
 		if (!ndo->ndo_suppress_default_print)
-			ndo->ndo_default_print(ndo, p, length - (p - bp));
+			ND_DEFAULTPRINT(p, length - (p - bp));
 		return;
 	}
 	ND_PRINT((ndo, ndo->ndo_vflag ? "\n\t" : " "));

@@ -88,7 +88,7 @@ ipnet_print(struct netdissect_options *ndo, const u_char *p, u_int length, u_int
 					length + sizeof(ipnet_hdr_t));
 
 		if (!ndo->ndo_suppress_default_print)
-			ndo->ndo_default_print(ndo, p, caplen);
+			ND_DEFAULTPRINT(p, caplen);
 		break;
 	}
 }

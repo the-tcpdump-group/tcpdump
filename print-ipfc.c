@@ -116,7 +116,7 @@ ipfc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 		etherproto_string(htons(extracted_ethertype))));
 		}
 		if (!ndo->ndo_suppress_default_print)
-			ndo->ndo_default_print(ndo, p, caplen);
+			ND_DEFAULTPRINT(p, caplen);
 	}
 }
 

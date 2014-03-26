@@ -155,7 +155,7 @@ nflog_if_print(struct netdissect_options *ndo,
 				length + sizeof(nflog_hdr_t));
 
 		if (!ndo->ndo_suppress_default_print)
-			ndo->ndo_default_print(ndo, p, caplen);
+			ND_DEFAULTPRINT(p, caplen);
 		break;
 	}
 

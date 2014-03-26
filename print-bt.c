@@ -55,7 +55,7 @@ bt_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *
 		ND_PRINT((ndo, "hci length %d, direction %s, ", length, (EXTRACT_32BITS(&hdr->direction)&0x1)?"in":"out"));
 
 	if (!ndo->ndo_suppress_default_print)
-		ndo->ndo_default_print(ndo, p, caplen);
+		ND_DEFAULTPRINT(p, caplen);
 
 	return (BT_HDRLEN);
 }

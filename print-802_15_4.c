@@ -174,7 +174,7 @@ ieee802_15_4_if_print(struct netdissect_options *ndo,
 	}
 
 	if (!ndo->ndo_suppress_default_print)
-		(ndo->ndo_default_print)(ndo, p, caplen);
+		ND_DEFAULTPRINT(p, caplen);
 
 	return 0;
 }

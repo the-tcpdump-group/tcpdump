@@ -243,7 +243,7 @@ arcnet_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 	}
 
 	if (!arcnet_encap_print(ndo, arc_type, p, length, caplen))
-		ndo->ndo_default_print(ndo, p, caplen);
+		ND_DEFAULTPRINT(p, caplen);
 
 	return (archdrlen);
 }
@@ -302,7 +302,7 @@ arcnet_linux_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, cons
 	p += archdrlen;
 
 	if (!arcnet_encap_print(ndo, arc_type, p, length, caplen))
-		ndo->ndo_default_print(ndo, p, caplen);
+		ND_DEFAULTPRINT(p, caplen);
 
 	return (archdrlen);
 }

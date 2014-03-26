@@ -80,7 +80,7 @@ ppi_print(struct netdissect_options *ndo,
 					length + sizeof(ppi_header_t));
 
 		if (!ndo->ndo_suppress_default_print)
-			ndo->ndo_default_print(ndo, p, caplen);
+			ND_DEFAULTPRINT(p, caplen);
 	}
 }
 

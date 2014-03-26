@@ -134,7 +134,7 @@ null_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 		if (!ndo->ndo_eflag)
 			null_hdr_print(ndo, family, length + NULL_HDRLEN);
 		if (!ndo->ndo_suppress_default_print)
-			ndo->ndo_default_print(ndo, p, caplen);
+			ND_DEFAULTPRINT(p, caplen);
 	}
 
 	return (NULL_HDRLEN);

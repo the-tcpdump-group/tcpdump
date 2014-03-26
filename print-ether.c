@@ -166,7 +166,7 @@ recurse:
 			}
 
 			if (!ndo->ndo_suppress_default_print)
-				ndo->ndo_default_print(ndo, p, caplen);
+				ND_DEFAULTPRINT(p, caplen);
 		}
 	} else if (ether_type == ETHERTYPE_8021Q  ||
                 ether_type == ETHERTYPE_8021Q9100 ||
@@ -217,7 +217,7 @@ recurse:
 			}
 
 			if (!ndo->ndo_suppress_default_print)
-				ndo->ndo_default_print(ndo, p, caplen);
+				ND_DEFAULTPRINT(p, caplen);
 		}
 	} else {
 		if (ethertype_print(ndo, ether_type, p, length, caplen) == 0) {
@@ -229,7 +229,7 @@ recurse:
 			}
 
 			if (!ndo->ndo_suppress_default_print)
-				ndo->ndo_default_print(ndo, p, caplen);
+				ND_DEFAULTPRINT(p, caplen);
 		}
 	}
 }

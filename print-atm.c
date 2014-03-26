@@ -140,7 +140,7 @@ atm_llc_print(netdissect_options *ndo,
 		etherproto_string(htons(extracted_ethertype))));
 		}
 		if (!ndo->ndo_suppress_default_print)
-			ndo->ndo_default_print(ndo, p, caplen);
+			ND_DEFAULTPRINT(p, caplen);
 	}
 }
 

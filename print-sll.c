@@ -265,7 +265,7 @@ recurse:
 			       etherproto_string(htons(extracted_ethertype))));
 			}
 			if (!ndo->ndo_suppress_default_print)
-				ndo->ndo_default_print(ndo, p, caplen);
+				ND_DEFAULTPRINT(p, caplen);
 			break;
 		}
 	} else if (ether_type == ETHERTYPE_8021Q) {
@@ -303,7 +303,7 @@ recurse:
 			if (!ndo->ndo_eflag)
 				sll_print(ndo, sllp, length + SLL_HDR_LEN);
 			if (!ndo->ndo_suppress_default_print)
-				ndo->ndo_default_print(ndo, p, caplen);
+				ND_DEFAULTPRINT(p, caplen);
 		}
 	}
 

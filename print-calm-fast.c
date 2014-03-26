@@ -48,7 +48,7 @@ calm_fast_print(netdissect_options *ndo, const u_char *eth, const u_char *bp, u_
 	ND_PRINT((ndo, "DstNwref:%d; ", dstNwref));
 
 	if (ndo->ndo_vflag)
-		ndo->ndo_default_print(ndo, bp, length);
+		ND_DEFAULTPRINT(bp, length);
 }
 
 

@@ -320,7 +320,7 @@ fddi_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 			etherproto_string(htons(extracted_ethertype))));
 			}
 			if (!ndo->ndo_suppress_default_print)
-				ndo->ndo_default_print(ndo, p, caplen);
+				ND_DEFAULTPRINT(p, caplen);
 		}
 	} else if ((fddip->fddi_fc & FDDIFC_CLFF) == FDDIFC_SMT)
 		fddi_smt_print(ndo, p, caplen);
@@ -330,7 +330,7 @@ fddi_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 			fddi_hdr_print(ndo, fddip, length + FDDI_HDRLEN, ESRC(&ehdr),
 			    EDST(&ehdr));
 		if (!ndo->ndo_suppress_default_print)
-			ndo->ndo_default_print(ndo, p, caplen);
+			ND_DEFAULTPRINT(p, caplen);
 	}
 }
 

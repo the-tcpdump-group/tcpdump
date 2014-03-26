@@ -300,7 +300,7 @@ fr_print(netdissect_options *ndo,
                             fr_hdr_print(ndo, length + hdr_len, hdr_len,
                                          dlci, flags, nlpid);
 			if (!ndo->ndo_suppress_default_print)
-                            ndo->ndo_default_print(ndo, p - hdr_len, length + hdr_len);
+				ND_DEFAULTPRINT(p - hdr_len, length + hdr_len);
 		}
 		break;
 
@@ -321,7 +321,7 @@ fr_print(netdissect_options *ndo,
                     fr_hdr_print(ndo, length + hdr_len, addr_len,
 				     dlci, flags, nlpid);
 		if (!ndo->ndo_xflag)
-			ndo->ndo_default_print(ndo, p, length);
+			ND_DEFAULTPRINT(p, length);
 	}
 
 	return hdr_len;

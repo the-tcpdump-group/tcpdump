@@ -106,7 +106,7 @@ ap1394_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 			ap1394_hdr_print(ndo, (u_char *)fp, length + FIREWIRE_HDRLEN);
 
 		if (!ndo->ndo_suppress_default_print)
-			ndo->ndo_default_print(ndo, p, caplen);
+			ND_DEFAULTPRINT(p, caplen);
 	}
 
 	return FIREWIRE_HDRLEN;
