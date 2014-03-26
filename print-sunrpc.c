@@ -232,8 +232,7 @@ sunrpcrequest_print(netdissect_options *ndo, register const u_char *bp,
 }
 
 static char *
-progstr(prog)
-	u_int32_t prog;
+progstr(u_int32_t prog)
 {
 #if defined(HAVE_GETRPCBYNUMBER) && defined(HAVE_RPC_RPC_H)
 	register struct rpcent *rp;
