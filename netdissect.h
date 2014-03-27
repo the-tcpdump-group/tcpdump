@@ -546,11 +546,7 @@ extern int dstopt_print(netdissect_options *, const u_char *);
 extern void ripng_print(netdissect_options *, const u_char *, unsigned int);
 extern int mobility_print(netdissect_options *, const u_char *, const u_char *);
 extern void dhcp6_print(netdissect_options *, const u_char *, u_int);
-#if 0
-extern void ospf6_print(netdissect_options *,const u_char *, u_int);
-
-#endif /* 0 */
-
+extern void ospf6_print(netdissect_options *, const u_char *, u_int);
 #endif /*INET6*/
 
 #if 0

@@ -229,7 +229,6 @@ extern void syslog_print(const u_char *, u_int);
 
 
 #ifdef INET6
-extern void ospf6_print(const u_char *, u_int);
 extern void babel_print(const u_char *, u_int);
 extern int mask62plen(const u_char *);
 #endif /*INET6*/

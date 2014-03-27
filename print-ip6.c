@@ -228,7 +228,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			return;
 
 		case IPPROTO_OSPF:
-			ospf6_print(cp, len);
+			ospf6_print(ndo, cp, len);
 			return;
 
 		case IPPROTO_IPV6:
