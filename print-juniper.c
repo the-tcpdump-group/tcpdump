@@ -529,6 +529,7 @@ juniper_es_print(const struct pcap_pkthdr *h, register const u_char *p)
         case JUNIPER_IPSEC_O_ESP_ENCRYPTION_TYPE:
             rewrite_len = 16;
             es_type_bundle = 0;
+            break;
         default:
             printf("ES Invalid type %u, length %u",
                    ih->type,
