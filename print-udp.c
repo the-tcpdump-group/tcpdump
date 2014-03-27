@@ -645,14 +645,14 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 		else if (ISPORT(LDP_PORT))
 			ldp_print(ndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(OLSR_PORT))
-			olsr_print((const u_char *)(up + 1), length,
+			olsr_print(ndo, (const u_char *)(up + 1), length,
 #if INET6
 					(IP_V(ip) == 6) ? 1 : 0);
 #else
 					0);
 #endif
 		else if (ISPORT(MPLS_LSP_PING_PORT))
-			lspping_print((const u_char *)(up + 1), length);
+			lspping_print(ndo, (const u_char *)(up + 1), length);
 		else if (dport == BFD_CONTROL_PORT ||
 			 dport == BFD_ECHO_PORT )
 			bfd_print(ndo, (const u_char *)(up+1), length, dport);

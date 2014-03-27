@@ -567,7 +567,7 @@ void sctp_print(netdissect_options *ndo,
 			return;
 		}
 
-		forces_print(payloadPtr, EXTRACT_16BITS(&chunkDescPtr->chunkLength)- chunksize);
+		forces_print(ndo, payloadPtr, EXTRACT_16BITS(&chunkDescPtr->chunkLength)- chunksize);
 	   } else if (ndo->ndo_vflag >= 2) {	/* if verbose output is specified */
 					/* at the command line */
 		const u_char *payloadPtr;

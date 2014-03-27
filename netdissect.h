@@ -471,6 +471,9 @@ extern void aodv_print(netdissect_options *, const u_char *, u_int, int);
 extern void sctp_print(netdissect_options *, const u_char *, const u_char *, u_int);
 extern char *bgp_vpn_rd_print (netdissect_options *, const u_char *);
 extern void bgp_print(netdissect_options *, const u_char *, int);
+extern void olsr_print(netdissect_options *, const u_char *, u_int, int);
+extern void forces_print(netdissect_options *, const u_char *, u_int);
+extern void lspping_print(netdissect_options *, const u_char *, u_int);
 
 /* stuff that has not yet been rototiled */
 
