@@ -586,7 +586,7 @@ rfc1048_print(netdissect_options *ndo,
 				}
 				tag = *bp++;
 				--len;
-				ND_PRINT((ndo, tok2str(nbo2str, NULL, tag)));
+				ND_PRINT((ndo, "%s", tok2str(nbo2str, NULL, tag)));
 				break;
 
 			case TAG_OPT_OVERLOAD:
@@ -598,7 +598,7 @@ rfc1048_print(netdissect_options *ndo,
 				}
 				tag = *bp++;
 				--len;
-				ND_PRINT((ndo, tok2str(oo2str, NULL, tag)));
+				ND_PRINT((ndo, "%s", tok2str(oo2str, NULL, tag)));
 				break;
 
 			case TAG_CLIENT_FQDN:
