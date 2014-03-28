@@ -1474,8 +1474,8 @@ handle_ppp(u_int proto, const u_char *p, int length)
 		ipx_print(gndo, p, length);
 		break;
 	case PPP_OSI:
-	        isoclns_print(p, length, length);
-	        break;
+		isoclns_print(gndo, p, length, length);
+		break;
 	case PPP_MPLS_UCAST:
 	case PPP_MPLS_MCAST:
 		mpls_print(gndo, p, length);

@@ -474,6 +474,7 @@ extern void bgp_print(netdissect_options *, const u_char *, int);
 extern void olsr_print(netdissect_options *, const u_char *, u_int, int);
 extern void forces_print(netdissect_options *, const u_char *, u_int);
 extern void lspping_print(netdissect_options *, const u_char *, u_int);
+extern void isoclns_print(netdissect_options *, const u_char *, u_int, u_int);
 
 /* stuff that has not yet been rototiled */
 
@@ -487,8 +488,6 @@ extern void decnet_print(netdissect_options *,const u_char *,
 extern void default_print(netdissect_options *,const u_char *, u_int);
 
 extern void ieee802_11_if_print(u_char *,const struct pcap_pkthdr *, const u_char *);
-extern void isoclns_print(netdissect_options *,const u_char *,
-			  u_int, u_int, const u_char *,	const u_char *);
 extern void krb_print(netdissect_options *,const u_char *, u_int);
 extern void llap_print(netdissect_options *,const u_char *, u_int);
 extern const char *linkaddr_string(netdissect_options *ndo,

@@ -215,7 +215,7 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 		atalk_print(bp, len);
 		break;
 	case ETHERTYPE_GRE_ISO:
-		isoclns_print(bp, len, len);
+		isoclns_print(ndo, bp, len, len);
 		break;
 	case ETHERTYPE_TEB:
 		ether_print(ndo, bp, len, len, NULL, NULL);

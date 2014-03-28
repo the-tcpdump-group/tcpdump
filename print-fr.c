@@ -290,7 +290,7 @@ fr_print(netdissect_options *ndo,
 	case NLPID_CLNP:
 	case NLPID_ESIS:
 	case NLPID_ISIS:
-                isoclns_print(p-1, length+1, length+1); /* OSI printers need the NLPID field */
+		isoclns_print(ndo, p - 1, length + 1, length + 1); /* OSI printers need the NLPID field */
 		break;
 
 	case NLPID_SNAP:

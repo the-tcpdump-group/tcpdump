@@ -354,9 +354,9 @@ ethertype_print(netdissect_options *ndo,
 		ipx_print(ndo, p, length);
 		return (1);
 
-        case ETHERTYPE_ISO:
-                isoclns_print(/*ndo,*/p+1, length-1, length-1);
-                return(1);
+	case ETHERTYPE_ISO:
+		isoclns_print(ndo, p + 1, length - 1, length - 1);
+		return(1);
 
 	case ETHERTYPE_PPPOED:
 	case ETHERTYPE_PPPOES:

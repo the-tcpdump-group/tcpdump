@@ -784,7 +784,7 @@ juniper_mlppp_print(const struct pcap_pkthdr *h, register const u_char *p)
             mpls_print(gndo, p, l2info.length);
             return l2info.header_len;
         case JUNIPER_LSQ_L3_PROTO_ISO:
-            isoclns_print(p,l2info.length,l2info.caplen);
+            isoclns_print(gndo, p, l2info.length, l2info.caplen);
             return l2info.header_len;
         default:
             break;
@@ -839,7 +839,7 @@ juniper_mfr_print(const struct pcap_pkthdr *h, register const u_char *p)
                 mpls_print(gndo, p, l2info.length);
                 return l2info.header_len;
             case JUNIPER_LSQ_L3_PROTO_ISO:
-                isoclns_print(p,l2info.length,l2info.caplen);
+                isoclns_print(gndo, p, l2info.length, l2info.caplen);
                 return l2info.header_len;
             default:
                 break;
@@ -851,13 +851,13 @@ juniper_mfr_print(const struct pcap_pkthdr *h, register const u_char *p)
         if (eflag && EXTRACT_32BITS(l2info.cookie) != 1) printf("Bundle-ID %u, ",l2info.bundle);
         switch (l2info.proto) {
         case (LLCSAP_ISONS<<8 | LLCSAP_ISONS):
-            isoclns_print(p+1, l2info.length-1, l2info.caplen-1);
+            isoclns_print(gndo, p + 1, l2info.length - 1, l2info.caplen - 1);
             break;
         case (LLC_UI<<8 | NLPID_Q933):
         case (LLC_UI<<8 | NLPID_IP):
         case (LLC_UI<<8 | NLPID_IP6):
             /* pass IP{4,6} to the OSI layer for proper link-layer printing */
-            isoclns_print(p-1, l2info.length+1, l2info.caplen+1);
+            isoclns_print(gndo, p - 1, l2info.length + 1, l2info.caplen + 1);
             break;
         default:
             printf("unknown protocol 0x%04x, length %u",l2info.proto, l2info.length);
@@ -884,13 +884,13 @@ juniper_mlfr_print(const struct pcap_pkthdr *h, register const u_char *p)
         switch (l2info.proto) {
         case (LLC_UI):
         case (LLC_UI<<8):
-            isoclns_print(p, l2info.length, l2info.caplen);
+            isoclns_print(gndo, p, l2info.length, l2info.caplen);
             break;
         case (LLC_UI<<8 | NLPID_Q933):
         case (LLC_UI<<8 | NLPID_IP):
         case (LLC_UI<<8 | NLPID_IP6):
             /* pass IP{4,6} to the OSI layer for proper link-layer printing */
-            isoclns_print(p-1, l2info.length+1, l2info.caplen+1);
+            isoclns_print(gndo, p - 1, l2info.length + 1, l2info.caplen + 1);
             break;
         default:
             printf("unknown protocol 0x%04x, length %u",l2info.proto, l2info.length);
@@ -936,7 +936,7 @@ juniper_atm1_print(const struct pcap_pkthdr *h, register const u_char *p)
         }
 
         if (p[0] == 0x03) { /* Cisco style NLPID encaps ? */
-            isoclns_print(p + 1, l2info.length - 1, l2info.caplen - 1);
+            isoclns_print(gndo, p + 1, l2info.length - 1, l2info.caplen - 1);
             /* FIXME check if frame was recognized */
             return l2info.header_len;
         }
@@ -990,7 +990,7 @@ juniper_atm2_print(const struct pcap_pkthdr *h, register const u_char *p)
         }
 
         if (p[0] == 0x03) { /* Cisco style NLPID encaps ? */
-            isoclns_print(p + 1, l2info.length - 1, l2info.caplen - 1);
+            isoclns_print(gndo, p + 1, l2info.length - 1, l2info.caplen - 1);
             /* FIXME check if frame was recognized */
             return l2info.header_len;
         }

@@ -173,7 +173,6 @@ extern u_int ieee802_11_radio_if_print(const struct pcap_pkthdr *,
 	const u_char *);
 extern u_int ieee802_11_radio_avs_if_print(const struct pcap_pkthdr *,
 	const u_char *);
-extern void isoclns_print(const u_char *, u_int, u_int);
 extern void krb_print(const u_char *);
 extern u_int llap_print(const u_char *, u_int);
 extern u_int ltalk_if_print(const struct pcap_pkthdr *, const u_char *);
