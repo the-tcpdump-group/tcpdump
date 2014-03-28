@@ -486,7 +486,6 @@ extern void aarp_print(netdissect_options *, const u_char *, u_int);
 
 #if 0
 extern void ascii_print(netdissect_options *,u_int);
-extern void bxxp_print(netdissect_options *,const u_char *, u_int);
 extern void decnet_print(netdissect_options *,const u_char *,
 			 u_int, u_int);
 extern void default_print(netdissect_options *,const u_char *, u_int);
@@ -513,7 +512,6 @@ extern void snmp_print(netdissect_options *,const u_char *, u_int);
 extern void tcp_print(netdissect_options *,const u_char *, u_int,
 		      const u_char *, int);
 extern void timed_print(netdissect_options *,const u_char *, u_int);
-extern void esp_print_decodesecret(netdissect_options *ndo);
 extern void rx_print(netdissect_options *,register const u_char *,
 		     int, int, int, u_char *);
 extern void netbeui_print(netdissect_options *,u_short,
@@ -527,7 +525,6 @@ extern void nbt_udp138_print(netdissect_options *,
 extern char *smb_errstr(netdissect_options *,int, int);
 extern const char *nt_errstr(netdissect_options *, u_int32_t);
 extern void print_data(netdissect_options *,const unsigned char *, int);
-extern void lcp_print(netdissect_options *,const u_char *, u_int);
 extern void lwres_print(netdissect_options *,const u_char *, u_int);
 #endif
 

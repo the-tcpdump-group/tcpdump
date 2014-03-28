@@ -213,7 +213,6 @@ extern const char *nt_errstr(u_int32_t);
 extern void print_data(const unsigned char *, int);
 extern void cfm_print(const u_char *, u_int);
 extern void lwres_print(const u_char *, u_int);
-extern void mpls_lsp_ping_print(const u_char *, u_int);
 extern void sip_print(const u_char *, u_int);
 extern void syslog_print(const u_char *, u_int);
 
