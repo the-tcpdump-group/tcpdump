@@ -475,26 +475,25 @@ extern void olsr_print(netdissect_options *, const u_char *, u_int, int);
 extern void forces_print(netdissect_options *, const u_char *, u_int);
 extern void lspping_print(netdissect_options *, const u_char *, u_int);
 extern void isoclns_print(netdissect_options *, const u_char *, u_int, u_int);
+extern void krb_print(netdissect_options *, const u_char *);
+extern void cdp_print(netdissect_options *, const u_char *, u_int, u_int);
+extern void atalk_print(netdissect_options *, const u_char *, u_int);
+extern u_int ltalk_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int llap_print(netdissect_options *, const u_char *, u_int);
+extern void aarp_print(netdissect_options *, const u_char *, u_int);
 
 /* stuff that has not yet been rototiled */
 
 #if 0
 extern void ascii_print(netdissect_options *,u_int);
-extern void aarp_print(netdissect_options *,const u_char *, u_int);
-extern void atalk_print(netdissect_options *,const u_char *, u_int);
 extern void bxxp_print(netdissect_options *,const u_char *, u_int);
 extern void decnet_print(netdissect_options *,const u_char *,
 			 u_int, u_int);
 extern void default_print(netdissect_options *,const u_char *, u_int);
 
 extern void ieee802_11_if_print(u_char *,const struct pcap_pkthdr *, const u_char *);
-extern void krb_print(netdissect_options *,const u_char *, u_int);
-extern void llap_print(netdissect_options *,const u_char *, u_int);
 extern const char *linkaddr_string(netdissect_options *ndo,
 				   const u_char *ep, const unsigned int len);
-extern void ltalk_if_print(netdissect_options *ndo,
-			   u_char *user, const struct pcap_pkthdr *h,
-			   const u_char *p);
 extern void nfsreply_print(netdissect_options *,const u_char *,
 			   u_int, const u_char *);
 extern void nfsreq_print(netdissect_options *,const u_char *,
@@ -529,8 +528,6 @@ extern char *smb_errstr(netdissect_options *,int, int);
 extern const char *nt_errstr(netdissect_options *, u_int32_t);
 extern void print_data(netdissect_options *,const unsigned char *, int);
 extern void lcp_print(netdissect_options *,const u_char *, u_int);
-extern void cdp_print(netdissect_options *,const u_char *,
-		      u_int, u_int, const u_char *, const u_char *);
 extern void lwres_print(netdissect_options *,const u_char *, u_int);
 #endif
 

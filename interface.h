@@ -163,8 +163,6 @@ extern u_int16_t create_osi_cksum(const u_int8_t *, int, int);
 #include <pcap.h>
 
 extern void ascii_print(const u_char *, u_int);
-extern void aarp_print(const u_char *, u_int);
-extern void atalk_print(const u_char *, u_int);
 extern void decnet_print(const u_char *, u_int, u_int);
 extern void default_print(const u_char *, u_int);
 extern char *q922_string(const u_char *);
@@ -173,9 +171,6 @@ extern u_int ieee802_11_radio_if_print(const struct pcap_pkthdr *,
 	const u_char *);
 extern u_int ieee802_11_radio_avs_if_print(const struct pcap_pkthdr *,
 	const u_char *);
-extern void krb_print(const u_char *);
-extern u_int llap_print(const u_char *, u_int);
-extern u_int ltalk_if_print(const struct pcap_pkthdr *, const u_char *);
 extern void nfsreply_print(const u_char *, u_int, const u_char *);
 extern void nfsreply_print_noaddr(const u_char *, u_int, const u_char *);
 extern void nfsreq_print(const u_char *, u_int, const u_char *);
@@ -217,7 +212,6 @@ extern char *smb_errstr(int, int);
 extern const char *nt_errstr(u_int32_t);
 extern void print_data(const unsigned char *, int);
 extern void cfm_print(const u_char *, u_int);
-extern void cdp_print(const u_char *, u_int, u_int);
 extern void lwres_print(const u_char *, u_int);
 extern void mpls_lsp_ping_print(const u_char *, u_int);
 extern void sip_print(const u_char *, u_int);

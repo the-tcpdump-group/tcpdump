@@ -122,7 +122,7 @@ null_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 		break;
 
 	case BSD_AFNUM_APPLETALK:
-		atalk_print(p, length);
+		atalk_print(ndo, p, length);
 		break;
 
 	case BSD_AFNUM_IPX:

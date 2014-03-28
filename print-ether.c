@@ -342,11 +342,11 @@ ethertype_print(netdissect_options *ndo,
 	case ETHERTYPE_ATALK:
 		if (ndo->ndo_vflag)
 			ND_PRINT((ndo, "et1 "));
-		atalk_print(/*ndo,*/p, length);
+		atalk_print(ndo, p, length);
 		return (1);
 
 	case ETHERTYPE_AARP:
-		aarp_print(/*ndo,*/p, length);
+		aarp_print(ndo, p, length);
 		return (1);
 
 	case ETHERTYPE_IPX:

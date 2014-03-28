@@ -180,9 +180,6 @@ static const struct printer printers[] = {
 #ifdef DLT_IEEE802_11
 	{ ieee802_11_if_print,	DLT_IEEE802_11},
 #endif
-#ifdef DLT_LTALK
-	{ ltalk_if_print,	DLT_LTALK },
-#endif
 #ifdef DLT_PRISM_HEADER
 	{ prism_if_print,	DLT_PRISM_HEADER },
 #endif
@@ -343,6 +340,9 @@ static const struct ndo_printer ndo_printers[] = {
 	{ sl_if_print,		DLT_SLIP },
 #ifdef DLT_SLIP_BSDOS
 	{ sl_bsdos_if_print,	DLT_SLIP_BSDOS },
+#endif
+#ifdef DLT_LTALK
+	{ ltalk_if_print,	DLT_LTALK },
 #endif
 	{ NULL,			0 },
 };

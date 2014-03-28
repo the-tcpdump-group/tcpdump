@@ -341,7 +341,7 @@ arcnet_encap_print(netdissect_options *ndo, u_char arctype, const u_char *p,
 	case ARCTYPE_ATALK:	/* XXX was this ever used? */
 		if (ndo->ndo_vflag)
 			ND_PRINT((ndo, "et1 "));
-		atalk_print(p, length);
+		atalk_print(ndo, p, length);
 		return (1);
 
 	case ARCTYPE_IPX:

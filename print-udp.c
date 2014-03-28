@@ -515,7 +515,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 		    (atalk_port(sport) || atalk_port(dport))) {
 			if (ndo->ndo_vflag)
 				ND_PRINT((ndo, "kip "));
-			llap_print(cp, length);
+			llap_print(ndo, cp, length);
 			return;
 		}
 	}
@@ -595,7 +595,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 		else if (ISPORT(NTP_PORT))
 			ntp_print(ndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(KERBEROS_PORT) || ISPORT(KERBEROS_SEC_PORT))
-			krb_print((const void *)(up + 1));
+			krb_print(ndo, (const void *)(up + 1));
 		else if (ISPORT(L2TP_PORT))
 			l2tp_print(ndo, (const u_char *)(up + 1), length);
 #ifdef TCPDUMP_DO_SMB
