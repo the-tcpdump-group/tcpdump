@@ -481,6 +481,21 @@ extern void atalk_print(netdissect_options *, const u_char *, u_int);
 extern u_int ltalk_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
 extern u_int llap_print(netdissect_options *, const u_char *, u_int);
 extern void aarp_print(netdissect_options *, const u_char *, u_int);
+extern u_int juniper_atm1_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int juniper_atm2_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int juniper_mfr_print(netdissect_options *, const struct pcap_pkthdr *, register const u_char *);
+extern u_int juniper_mlfr_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int juniper_mlppp_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int juniper_pppoe_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int juniper_pppoe_atm_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int juniper_ggsn_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int juniper_es_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int juniper_monitor_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int juniper_services_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int juniper_ether_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int juniper_ppp_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int juniper_frelay_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int juniper_chdlc_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
 
 /* stuff that has not yet been rototiled */
 
