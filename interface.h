@@ -183,7 +183,6 @@ extern u_int ppp_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int ppp_hdlc_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int ppp_bsdos_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int prism_if_print(const struct pcap_pkthdr *, const u_char *);
-extern void snmp_print(const u_char *, u_int);
 extern void tcp_print(const u_char *, u_int, const u_char *, int);
 extern void timed_print(const u_char *);
 extern void rx_print(register const u_char *, int, int, int, u_char *);

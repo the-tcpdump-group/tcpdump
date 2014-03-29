@@ -312,7 +312,7 @@ atm_print(netdissect_options *ndo,
 
 		case VCI_ILMIC:
 			ND_PRINT((ndo, "ilmi: "));
-			snmp_print(p, length);
+			snmp_print(ndo, p, length);
 			return;
 		}
 	}

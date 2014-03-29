@@ -437,7 +437,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 
 		case PT_SNMP:
 			udpipaddr_print(ndo, ip, sport, dport);
-			snmp_print((const u_char *)(up + 1), length);
+			snmp_print(ndo, (const u_char *)(up + 1), length);
 			break;
 
 		case PT_CNFP:
@@ -591,7 +591,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 			isakmp_print(ndo, (const u_char *)(up + 1), length, bp2);
 #endif
 		else if (ISPORT(SNMP_PORT) || ISPORT(SNMPTRAP_PORT))
-			snmp_print((const u_char *)(up + 1), length);
+			snmp_print(ndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(NTP_PORT))
 			ntp_print(ndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(KERBEROS_PORT) || ISPORT(KERBEROS_SEC_PORT))
