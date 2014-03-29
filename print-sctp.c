@@ -469,7 +469,6 @@ void sctp_print(netdissect_options *ndo,
       ipaddr_string(&ip->ip_dst),
       destPort));
   }
-  fflush(stdout);
 
   if (isForCES_port(sourcePort)) {
          ND_PRINT((ndo, "[%s]", tok2str(ForCES_channels, NULL, sourcePort)));
@@ -552,7 +551,6 @@ void sctp_print(netdissect_options *ndo,
 	    ND_PRINT((ndo, "[SID: %u] ", EXTRACT_16BITS(&dataHdrPtr->streamId)));
 	    ND_PRINT((ndo, "[SSEQ %u] ", EXTRACT_16BITS(&dataHdrPtr->sequence)));
 	    ND_PRINT((ndo, "[PPID 0x%x] ", EXTRACT_32BITS(&dataHdrPtr->payloadtype)));
-	    fflush(stdout);
 	    if (isforces) {
 		const u_char *payloadPtr;
 		u_int chunksize = sizeof(struct sctpDataPart)+

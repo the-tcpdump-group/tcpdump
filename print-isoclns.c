@@ -988,7 +988,7 @@ clnp_print(netdissect_options *ndo,
         return (1);
 
  trunc:
-    fputs("[|clnp]", stdout);
+    ND_PRINT((ndo, "[|clnp]"));
     return (1);
 
 }
@@ -3069,7 +3069,7 @@ isis_print(netdissect_options *ndo,
     return (1);
 
  trunc:
-    fputs("[|isis]", stdout);
+    ND_PRINT((ndo, "[|isis]"));
     return (1);
 
  trunctlv:
