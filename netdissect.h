@@ -497,6 +497,7 @@ extern u_int juniper_ppp_print(netdissect_options *, const struct pcap_pkthdr *,
 extern u_int juniper_frelay_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
 extern u_int juniper_chdlc_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
 extern void snmp_print(netdissect_options *, const u_char *, u_int);
+extern void rx_print(netdissect_options *, register const u_char *, int, int, int, u_char *);
 
 /* stuff that has not yet been rototiled */
 
@@ -527,8 +528,6 @@ extern void ppp_bsdos_if_print(u_char *,
 extern void tcp_print(netdissect_options *,const u_char *, u_int,
 		      const u_char *, int);
 extern void timed_print(netdissect_options *,const u_char *, u_int);
-extern void rx_print(netdissect_options *,register const u_char *,
-		     int, int, int, u_char *);
 extern void netbeui_print(netdissect_options *,u_short,
 			  const u_char *, int);
 extern void ipx_netbios_print(netdissect_options *,const u_char *, u_int);

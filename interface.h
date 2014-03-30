@@ -185,7 +185,6 @@ extern u_int ppp_bsdos_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int prism_if_print(const struct pcap_pkthdr *, const u_char *);
 extern void tcp_print(const u_char *, u_int, const u_char *, int);
 extern void timed_print(const u_char *);
-extern void rx_print(register const u_char *, int, int, int, u_char *);
 extern void netbeui_print(u_short, const u_char *, int);
 extern void ipx_netbios_print(const u_char *, u_int);
 extern void nbt_tcp_print(const u_char *, int);

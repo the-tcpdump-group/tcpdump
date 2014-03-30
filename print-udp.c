@@ -614,7 +614,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 		 */
 		else if ((sport >= RX_PORT_LOW && sport <= RX_PORT_HIGH) ||
 			 (dport >= RX_PORT_LOW && dport <= RX_PORT_HIGH))
-			rx_print((const void *)(up + 1), length, sport, dport,
+			rx_print(ndo, (const void *)(up + 1), length, sport, dport,
 				 (u_char *) ip);
 #ifdef INET6
 		else if (ISPORT(RIPNG_PORT))
