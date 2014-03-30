@@ -891,8 +891,9 @@ static const struct smi2be smi2betab[] = {
 };
 
 static int
-smi_decode_oid(struct be *elem, unsigned int *oid,
-	       unsigned int oidsize, unsigned int *oidlen)
+smi_decode_oid(netdissect_options *ndo,
+               struct be *elem, unsigned int *oid,
+               unsigned int oidsize, unsigned int *oidlen)
 {
 	u_char *p = (u_char *)elem->data.raw;
 	u_int32_t asnlen = elem->asnlen;
@@ -1019,13 +1020,15 @@ static int smi_check_range(SmiType *smiType, struct be *elem)
 	return ok;
 }
 
-static SmiNode *smi_print_variable(struct be *elem, int *status)
+static SmiNode *
+smi_print_variable(netdissect_options *ndo,
+                   struct be *elem, int *status)
 {
 	unsigned int oid[128], oidlen;
 	SmiNode *smiNode = NULL;
 	unsigned int i;
 
-	*status = smi_decode_oid(elem, oid, sizeof(oid)/sizeof(unsigned int),
+	*status = smi_decode_oid(ndo, elem, oid, sizeof(oid) / sizeof(unsigned int),
 	    &oidlen);
 	if (*status < 0)
 		return NULL;
@@ -1048,7 +1051,8 @@ static SmiNode *smi_print_variable(struct be *elem, int *status)
 }
 
 static int
-smi_print_value(SmiNode *smiNode, u_char pduid, struct be *elem)
+smi_print_value(netdissect_options *ndo,
+                SmiNode *smiNode, u_char pduid, struct be *elem)
 {
 	unsigned int i, oid[128], oidlen;
 	SmiType *smiType;
@@ -1109,7 +1113,7 @@ smi_print_value(SmiNode *smiNode, u_char pduid, struct be *elem)
 	        if (smiType->basetype == SMI_BASETYPE_BITS) {
 		        /* print bit labels */
 		} else {
-		        smi_decode_oid(elem, oid,
+		        smi_decode_oid(ndo, elem, oid,
 				       sizeof(oid)/sizeof(unsigned int),
 				       &oidlen);
 			smiNode = smiGetNodeByOID(oidlen, oid);
@@ -1243,7 +1247,7 @@ varbind_print(netdissect_options *ndo,
 			return;
 		}
 #ifdef LIBSMI
-		smiNode = smi_print_variable(&elem, &status);
+		smiNode = smi_print_variable(ndo, &elem, &status);
 #else
 		status = asn1_print(ndo, &elem);
 #endif
@@ -1269,7 +1273,7 @@ varbind_print(netdissect_options *ndo,
 		} else {
 		        if (elem.type != BE_NULL) {
 #ifdef LIBSMI
-				status = smi_print_value(smiNode, pduid, &elem);
+				status = smi_print_value(ndo, smiNode, pduid, &elem);
 #else
 				status = asn1_print(ndo, &elem);
 #endif
