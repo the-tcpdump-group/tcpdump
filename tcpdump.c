@@ -344,6 +344,9 @@ static const struct ndo_printer ndo_printers[] = {
 #ifdef DLT_JUNIPER_CHDLC
 	{ juniper_chdlc_print,	DLT_JUNIPER_CHDLC },
 #endif
+#ifdef DLT_PKTAP
+	{ pktap_if_print,	DLT_PKTAP },
+#endif
 	{ NULL,			0 },
 };
 

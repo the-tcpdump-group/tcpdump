@@ -165,6 +165,7 @@ LIBNETDISSECT_SRC=\
 	print-otv.c \
 	print-pgm.c \
 	print-pim.c \
+	print-pktap.c \
 	print-ppi.c \
 	print-ppp.c \
 	print-pppoe.c \
