@@ -133,7 +133,7 @@ bootp_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "\n\t  sname \""));
 		if (fn_print(bp->bp_sname, ndo->ndo_snapend)) {
 			ND_PRINT((ndo, "\""));
-			ND_PRINT((ndo, tstr + 1));
+			ND_PRINT((ndo, "%s", tstr + 1));
 			return;
 		}
 		ND_PRINT((ndo, "\""));
@@ -143,7 +143,7 @@ bootp_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "\n\t  file \""));
 		if (fn_print(bp->bp_file, ndo->ndo_snapend)) {
 			ND_PRINT((ndo, "\""));
-			ND_PRINT((ndo, tstr + 1));
+			ND_PRINT((ndo, "%s", tstr + 1));
 			return;
 		}
 		ND_PRINT((ndo, "\""));
