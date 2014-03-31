@@ -180,6 +180,6 @@ tftp_print(netdissect_options *ndo,
 	}
 	return;
 trunc:
-	ND_PRINT((ndo, tstr));
+	ND_PRINT((ndo, "%s", tstr));
 	return;
 }

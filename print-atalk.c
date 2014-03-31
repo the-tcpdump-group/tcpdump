@@ -254,7 +254,7 @@ atp_print(netdissect_options *ndo,
 
 	if ((const u_char *)(ap + 1) > ndo->ndo_snapend) {
 		/* Just bail if we don't have the whole chunk. */
-		ND_PRINT((ndo, tstr));
+		ND_PRINT((ndo, "%s", tstr));
 		return;
 	}
 	if (length < sizeof(*ap)) {
@@ -398,7 +398,7 @@ nbp_print(netdissect_options *ndo,
 	/* ep points to end of available data */
 	ep = ndo->ndo_snapend;
 	if ((const u_char *)tp > ep) {
-		ND_PRINT((ndo, tstr));
+		ND_PRINT((ndo, "%s", tstr));
 		return;
 	}
 	switch (i = np->control & 0xf0) {
@@ -407,7 +407,7 @@ nbp_print(netdissect_options *ndo,
 	case nbpLkUp:
 		ND_PRINT((ndo, i == nbpLkUp? " nbp-lkup %d:":" nbp-brRq %d:", np->id));
 		if ((const u_char *)(tp + 1) > ep) {
-			ND_PRINT((ndo, tstr));
+			ND_PRINT((ndo, "%s", tstr));
 			return;
 		}
 		(void)nbp_name_print(ndo, tp, ep);
@@ -449,7 +449,7 @@ print_cstring(netdissect_options *ndo,
 	register u_int length;
 
 	if (cp >= (const char *)ep) {
-		ND_PRINT((ndo, tstr));
+		ND_PRINT((ndo, "%s", tstr));
 		return (0);
 	}
 	length = *cp++;
@@ -461,7 +461,7 @@ print_cstring(netdissect_options *ndo,
 	}
 	while ((int)--length >= 0) {
 		if (cp >= (const char *)ep) {
-			ND_PRINT((ndo, tstr));
+			ND_PRINT((ndo, "%s", tstr));
 			return (0);
 		}
 		ND_PRINT((ndo, "%c", *cp++));
@@ -477,7 +477,7 @@ nbp_tuple_print(netdissect_options *ndo,
 	register const struct atNBPtuple *tpn;
 
 	if ((const u_char *)(tp + 1) > ep) {
-		ND_PRINT((ndo, tstr));
+		ND_PRINT((ndo, "%s", tstr));
 		return 0;
 	}
 	tpn = nbp_name_print(ndo, tp, ep);

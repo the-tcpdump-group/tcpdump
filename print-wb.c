@@ -332,7 +332,7 @@ wb_dops(netdissect_options *ndo,
 		}
 		dh = DOP_NEXT(dh);
 		if ((u_char *)dh > ndo->ndo_snapend) {
-			ND_PRINT((ndo, tstr));
+			ND_PRINT((ndo, "%s", tstr));
 			break;
 		}
 	}
@@ -398,7 +398,7 @@ wb_print(netdissect_options *ndo,
 
 	ph = (const struct pkt_hdr *)hdr;
 	if (len < sizeof(*ph) || (u_char *)(ph + 1) > ndo->ndo_snapend) {
-		ND_PRINT((ndo, tstr));
+		ND_PRINT((ndo, "%s", tstr));
 		return;
 	}
 	len -= sizeof(*ph);

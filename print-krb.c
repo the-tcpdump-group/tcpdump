@@ -137,7 +137,7 @@ krb4_print_hdr(netdissect_options *ndo,
 	return (cp);
 
 trunc:
-	ND_PRINT((ndo, tstr));
+	ND_PRINT((ndo, "%s", tstr));
 	return (NULL);
 
 #undef PRINT
@@ -159,7 +159,7 @@ krb4_print(netdissect_options *ndo,
 	kp = (struct krb *)cp;
 
 	if ((&kp->type) >= ndo->ndo_snapend) {
-		ND_PRINT((ndo, tstr));
+		ND_PRINT((ndo, "%s", tstr));
 		return;
 	}
 
@@ -218,7 +218,7 @@ krb4_print(netdissect_options *ndo,
 
 	return;
 trunc:
-	ND_PRINT((ndo, tstr));
+	ND_PRINT((ndo, "%s", tstr));
 }
 
 void
@@ -230,7 +230,7 @@ krb_print(netdissect_options *ndo,
 	kp = (struct krb *)dat;
 
 	if (dat >= ndo->ndo_snapend) {
-		ND_PRINT((ndo, tstr));
+		ND_PRINT((ndo, "%s", tstr));
 		return;
 	}
 
