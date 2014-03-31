@@ -383,6 +383,30 @@ lookup_ndo_printer(int type)
 		if (type == p->type)
 			return p->f;
 
+#if defined(DLT_USER2) && defined(DLT_PKTAP)
+	/*
+	 * Apple incorrectly chose to use DLT_USER2 for their PKTAP
+	 * header.
+	 *
+	 * We map DLT_PKTAP, whether it's DLT_USER2 as it is on Darwin-
+	 * based OSes or the same value as LINKTYPE_PKTAP as it is on
+	 * other OSes, to LINKTYPE_PKTAP, so files written with
+	 * this version of libpcap for a DLT_PKTAP capture have a link-
+	 * layer header type of LINKTYPE_PKTAP.
+	 *
+	 * However, files written on OS X Mavericks for a DLT_PKTAP
+	 * capture have a link-layer header type of LINKTYPE_USER2.
+	 * If we don't have a printer for DLT_USER2, and type is
+	 * DLT_USER2, we look up the printer for DLT_PKTAP and use
+	 * that.
+	 */
+	if (type == DLT_USER2) {
+		for (p = ndo_printers; p->f; ++p)
+			if (DLT_PKTAP == p->type)
+				return p->f;
+	}
+#endif
+
 	return NULL;
 	/* NOTREACHED */
 }
