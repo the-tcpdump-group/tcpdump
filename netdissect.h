@@ -507,7 +507,6 @@ extern void decnet_print(netdissect_options *,const u_char *,
 			 u_int, u_int);
 extern void default_print(netdissect_options *,const u_char *, u_int);
 
-extern void ieee802_11_if_print(u_char *,const struct pcap_pkthdr *, const u_char *);
 extern const char *linkaddr_string(netdissect_options *ndo,
 				   const u_char *ep, const unsigned int len);
 extern void nfsreply_print(netdissect_options *,const u_char *,
@@ -547,6 +546,10 @@ extern u_int ppi_if_print(netdissect_options *,const struct pcap_pkthdr *, const
 extern u_int nflog_if_print(netdissect_options *,const struct pcap_pkthdr *, const u_char *);
 extern u_int ieee802_15_4_if_print(netdissect_options *,const struct pcap_pkthdr *, const u_char *);
 extern u_int pktap_if_print(netdissect_options *,const struct pcap_pkthdr *, const u_char *);
+extern u_int ieee802_11_radio_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int ieee802_11_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int ieee802_11_radio_avs_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int prism_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
 
 #ifdef INET6
 extern void ip6_print(netdissect_options *,const u_char *, u_int);

@@ -177,18 +177,6 @@ static const struct printer printers[] = {
 #ifdef DLT_PPP_SERIAL
 	{ ppp_hdlc_if_print,	DLT_PPP_SERIAL },
 #endif
-#ifdef DLT_IEEE802_11
-	{ ieee802_11_if_print,	DLT_IEEE802_11},
-#endif
-#ifdef DLT_PRISM_HEADER
-	{ prism_if_print,	DLT_PRISM_HEADER },
-#endif
-#ifdef DLT_IEEE802_11_RADIO
-	{ ieee802_11_radio_if_print,	DLT_IEEE802_11_RADIO },
-#endif
-#ifdef DLT_IEEE802_11_RADIO_AVS
-	{ ieee802_11_radio_avs_if_print,	DLT_IEEE802_11_RADIO_AVS },
-#endif
 	{ NULL,			0 },
 };
 
@@ -346,6 +334,18 @@ static const struct ndo_printer ndo_printers[] = {
 #endif
 #ifdef DLT_PKTAP
 	{ pktap_if_print,	DLT_PKTAP },
+#endif
+#ifdef DLT_IEEE802_11_RADIO
+	{ ieee802_11_radio_if_print,	DLT_IEEE802_11_RADIO },
+#endif
+#ifdef DLT_IEEE802_11
+	{ ieee802_11_if_print,	DLT_IEEE802_11},
+#endif
+#ifdef DLT_IEEE802_11_RADIO_AVS
+	{ ieee802_11_radio_avs_if_print,	DLT_IEEE802_11_RADIO_AVS },
+#endif
+#ifdef DLT_PRISM_HEADER
+	{ prism_if_print,	DLT_PRISM_HEADER },
 #endif
 	{ NULL,			0 },
 };

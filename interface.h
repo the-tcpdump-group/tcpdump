@@ -166,11 +166,6 @@ extern void ascii_print(const u_char *, u_int);
 extern void decnet_print(const u_char *, u_int, u_int);
 extern void default_print(const u_char *, u_int);
 extern char *q922_string(const u_char *);
-extern u_int ieee802_11_if_print(const struct pcap_pkthdr *, const u_char *);
-extern u_int ieee802_11_radio_if_print(const struct pcap_pkthdr *,
-	const u_char *);
-extern u_int ieee802_11_radio_avs_if_print(const struct pcap_pkthdr *,
-	const u_char *);
 extern void nfsreply_print(const u_char *, u_int, const u_char *);
 extern void nfsreply_print_noaddr(const u_char *, u_int, const u_char *);
 extern void nfsreq_print(const u_char *, u_int, const u_char *);
@@ -182,7 +177,6 @@ extern u_int ppp_print(register const u_char *, u_int);
 extern u_int ppp_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int ppp_hdlc_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int ppp_bsdos_if_print(const struct pcap_pkthdr *, const u_char *);
-extern u_int prism_if_print(const struct pcap_pkthdr *, const u_char *);
 extern void tcp_print(const u_char *, u_int, const u_char *, int);
 extern void timed_print(const u_char *);
 extern void netbeui_print(u_short, const u_char *, int);
