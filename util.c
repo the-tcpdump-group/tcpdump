@@ -578,27 +578,23 @@ read_infile(char *fname)
 }
 
 void
-safeputs(const char *s, int maxlen)
+safeputs(netdissect_options *ndo,
+         const u_char *s, const u_int maxlen)
 {
-	int idx = 0;
+	u_int idx = 0;
 
 	while (*s && idx < maxlen) {
-		safeputchar(*s);
-                idx++;
+		safeputchar(ndo, *s);
+		idx++;
 		s++;
 	}
 }
 
 void
-safeputchar(int c)
+safeputchar(netdissect_options *ndo,
+            const u_char c)
 {
-	unsigned char ch;
-
-	ch = (unsigned char)(c & 0xff);
-	if (ch < 0x80 && ND_ISPRINT(ch))
-		printf("%c", ch);
-	else
-		printf("\\0x%02x", ch);
+	ND_PRINT((ndo, (c < 0x80 && ND_ISPRINT(c)) ? "%c" : "\\0x%02x", c));
 }
 
 #ifdef LBL_ALIGN

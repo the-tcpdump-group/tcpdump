@@ -179,7 +179,7 @@ vqp_print(netdissect_options *ndo, register const u_char *pptr, register u_int l
 	case VQP_OBJ_VLAN_NAME:
 	case VQP_OBJ_VTP_DOMAIN:
 	case VQP_OBJ_ETHERNET_PKT:
-            safeputs((const char *)tptr, vqp_obj_len);
+            safeputs(ndo, tptr, vqp_obj_len);
             break;
             /* those objects have similar semantics - fall through */
 	case VQP_OBJ_MAC_ADDRESS:

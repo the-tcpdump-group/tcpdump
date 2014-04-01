@@ -200,7 +200,7 @@ lwres_printname(size_t l, const char *p0)
 
 	printf(" ");
 	for (i = 0; i < l; i++)
-		safeputchar(*p++);
+		safeputchar(gndo, *p++);
 	p++;	/* skip terminating \0 */
 
 	return p - p0;

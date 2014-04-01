@@ -245,7 +245,7 @@ print_asc(const unsigned char *buf, int len)
 {
     int i;
     for (i = 0; i < len; i++)
-	safeputchar(buf[i]);
+	safeputchar(gndo, buf[i]);
 }
 
 static const char *
