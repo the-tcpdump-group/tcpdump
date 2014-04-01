@@ -390,7 +390,7 @@ ethertype_print(netdissect_options *ndo,
 
 	case ETHERTYPE_CFM:
 	case ETHERTYPE_CFM_OLD:
-	        cfm_print(/*ndo,*/p, length);
+		cfm_print(ndo, p, length);
 		return (1);
 
 	case ETHERTYPE_LLDP:
