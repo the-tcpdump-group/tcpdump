@@ -42,6 +42,7 @@ mpls-ldp-hello	mpls-ldp-hello.pcap	mpls-ldp-hello.out -t -v
 
 # OSPF tests
 ospf-gmpls	ospf-gmpls.pcap		ospf-gmpls.out	-t -v
+ospf3_auth-vv	ospf3_auth.pcap		ospf3_auth-vv.out -t -v -v
 
 # IKEv2 tests
 ikev2four	ikev2four.pcap		ikev2four.out	-t -v
