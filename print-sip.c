@@ -39,7 +39,7 @@ sip_print(register const u_char *pptr, register u_int len)
     for (idx = 0; idx < len; idx++) {
         TCHECK2(*(pptr+idx), 2);
         if (EXTRACT_16BITS(pptr+idx) != 0x0d0a) { /* linefeed ? */
-            safeputchar(*(pptr+idx));
+            safeputchar(gndo, *(pptr + idx));
         } else {
             printf("\n\t");
             idx+=1;

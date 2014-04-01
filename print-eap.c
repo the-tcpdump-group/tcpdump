@@ -209,14 +209,14 @@ eap_print(netdissect_options *ndo _U_,
             case EAP_TYPE_IDENTITY:
                 if (len - 5 > 0) {
                     printf(", Identity: ");
-                    safeputs((const char *)tptr+5, len-5);
+                    safeputs(gndo, tptr + 5, len - 5);
                 }
                 break;
 
             case EAP_TYPE_NOTIFICATION:
                 if (len - 5 > 0) {
                     printf(", Notification: ");
-                    safeputs((const char *)tptr+5, len-5);
+                    safeputs(gndo, tptr + 5, len - 5);
                 }
                 break;
 

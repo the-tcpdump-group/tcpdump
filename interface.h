@@ -144,9 +144,6 @@ extern void warning(const char *, ...)
 extern char *read_infile(char *);
 extern char *copy_argv(char **);
 
-extern void safeputchar(int);
-extern void safeputs(const char *, int);
-
 extern const char *isonsap_string(const u_char *, register u_int);
 extern const char *protoid_string(const u_char *);
 extern const char *ipxsap_string(u_short);

@@ -1110,7 +1110,7 @@ ospf_print(register const u_char *bp, register u_int length,
 
 		case OSPF_AUTH_SIMPLE:
                         printf("\n\tSimple text password: ");
-                        safeputs((const char *)op->ospf_authdata, OSPF_AUTH_SIMPLE_LEN);
+                        safeputs(gndo, op->ospf_authdata, OSPF_AUTH_SIMPLE_LEN);
 			break;
 
 		case OSPF_AUTH_MD5:

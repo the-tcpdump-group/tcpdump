@@ -278,8 +278,8 @@ extern char *copy_argv(netdissect_options *, char **);
 #define ND_ISGRAPH(c)	((c) > 0x20 && (c) <= 0x7E)
 #define ND_TOASCII(c)	((c) & 0x7F)
 
-extern void safeputchar(int);
-extern void safeputs(const char *, int);
+extern void safeputchar(netdissect_options *, const u_char);
+extern void safeputs(netdissect_options *, const u_char *, const u_int);
 
 #ifdef LBL_ALIGN
 /*

@@ -1143,7 +1143,7 @@ _U_
                     return-1;
                 printf("%s  Session Name: ", ident);
                 for (i = 0; i < namelen; i++)
-                    safeputchar(*(obj_tptr+4+i));
+                    safeputchar(gndo, *(obj_tptr + 4 + i));
                 printf("%s  Setup Priority: %u, Holding Priority: %u, Flags: [%s] (%#x)",
                        ident,
                        (int)*obj_tptr,

@@ -133,7 +133,7 @@ syslog_print(register const u_char *pptr, register u_int len)
     /* print the syslog text in verbose mode */
     for (; msg_off < len; msg_off++) {
         TCHECK2(*(pptr+msg_off), 1);
-        safeputchar(*(pptr+msg_off));
+        safeputchar(gndo, *(pptr + msg_off));
     }
 
     if (vflag > 1)

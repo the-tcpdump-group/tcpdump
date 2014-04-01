@@ -880,7 +880,7 @@ handle_chap(const u_char *p, int length)
 		printf(", Name ");
 		for (i = 0; i < name_size; i++) {
 			TCHECK(*p);
-			safeputchar(*p++);
+			safeputchar(gndo, *p++);
 		}
 		break;
 	case CHAP_SUCC:
@@ -889,7 +889,7 @@ handle_chap(const u_char *p, int length)
 		printf(", Msg ");
 		for (i = 0; i< msg_size; i++) {
 			TCHECK(*p);
-			safeputchar(*p++);
+			safeputchar(gndo, *p++);
 		}
 		break;
 	}
@@ -955,7 +955,7 @@ handle_pap(const u_char *p, int length)
 		printf(", Peer ");
 		for (i = 0; i < peerid_len; i++) {
 			TCHECK(*p);
-			safeputchar(*p++);
+			safeputchar(gndo, *p++);
 		}
 
 		if (length - (p - p0) < 1)
@@ -968,7 +968,7 @@ handle_pap(const u_char *p, int length)
 		printf(", Name ");
 		for (i = 0; i < passwd_len; i++) {
 			TCHECK(*p);
-			safeputchar(*p++);
+			safeputchar(gndo, *p++);
 		}
 		break;
 	case PAP_AACK:
@@ -983,7 +983,7 @@ handle_pap(const u_char *p, int length)
 		printf(", Msg ");
 		for (i = 0; i< msg_len; i++) {
 			TCHECK(*p);
-			safeputchar(*p++);
+			safeputchar(gndo, *p++);
 		}
 		break;
 	}

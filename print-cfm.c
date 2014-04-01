@@ -372,7 +372,7 @@ cfm_print(register const u_char *pptr, register u_int length) {
             switch (msg_ptr.cfm_ccm->md_nameformat) {
             case CFM_CCM_MD_FORMAT_DNS:
             case CFM_CCM_MD_FORMAT_CHAR:
-                safeputs((const char *)msg_ptr.cfm_ccm->md_name, msg_ptr.cfm_ccm->md_namelength);
+                safeputs(gndo, msg_ptr.cfm_ccm->md_name, msg_ptr.cfm_ccm->md_namelength);
                 break;
 
             case CFM_CCM_MD_FORMAT_MAC:
@@ -405,7 +405,7 @@ cfm_print(register const u_char *pptr, register u_int length) {
         printf("\n\t  MA Name: ");
         switch (*ma_nameformat) {
         case CFM_CCM_MA_FORMAT_CHAR:
-            safeputs((const char *)ma_name, *ma_namelength);
+            safeputs(gndo, ma_name, *ma_namelength);
             break;
 
             /* FIXME add printers for those MA formats - hexdump for now */
@@ -582,7 +582,7 @@ cfm_print(register const u_char *pptr, register u_int length) {
                 case CFM_CHASSIS_ID_LOCAL:
                 case CFM_CHASSIS_ID_CHASSIS_COMPONENT:
                 case CFM_CHASSIS_ID_PORT_COMPONENT:
-                    safeputs((const char *)tptr+1, chassis_id_length);
+                    safeputs(gndo, tptr + 1, chassis_id_length);
                     break;
 
                 default:

@@ -777,7 +777,7 @@ print_tcp_rst_data(register const u_char *sp, u_int length)
         putchar(' ');
         while (length-- && sp <= snapend) {
                 c = *sp++;
-                safeputchar(c);
+                safeputchar(gndo, c);
         }
         putchar(']');
 }

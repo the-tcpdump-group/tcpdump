@@ -886,7 +886,7 @@ pdata(u_char *dp, u_int maxlen)
 
 	while (x-- > 0) {
 	    c = *dp++;
-	    safeputchar(c);
+	    safeputchar(gndo, c);
 	}
 }
 #endif
