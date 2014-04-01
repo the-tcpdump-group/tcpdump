@@ -498,6 +498,10 @@ extern u_int juniper_frelay_print(netdissect_options *, const struct pcap_pkthdr
 extern u_int juniper_chdlc_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
 extern void snmp_print(netdissect_options *, const u_char *, u_int);
 extern void rx_print(netdissect_options *, register const u_char *, int, int, int, u_char *);
+extern void nfsreply_print(netdissect_options *, const u_char *, u_int, const u_char *);
+extern void nfsreply_print_noaddr(netdissect_options *, const u_char *, u_int, const u_char *);
+extern void nfsreq_print(netdissect_options *, const u_char *, u_int, const u_char *);
+extern void nfsreq_print_noaddr(netdissect_options *, const u_char *, u_int, const u_char *);
 
 /* stuff that has not yet been rototiled */
 

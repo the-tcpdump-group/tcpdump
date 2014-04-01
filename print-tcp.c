@@ -723,12 +723,12 @@ tcp_print(register const u_char *bp, register u_int length,
                         direction = (enum sunrpc_msg_type)EXTRACT_32BITS(&rp->rm_direction);
                         if (dport == NFS_PORT && direction == SUNRPC_CALL) {
                                 (void)printf(": NFS request xid %u ", EXTRACT_32BITS(&rp->rm_xid));
-                                nfsreq_print_noaddr((u_char *)rp, fraglen, (u_char *)ip);
+                                nfsreq_print_noaddr(gndo, (u_char *)rp, fraglen, (u_char *)ip);
                                 return;
                         }
                         if (sport == NFS_PORT && direction == SUNRPC_REPLY) {
                                 (void)printf(": NFS reply xid %u ", EXTRACT_32BITS(&rp->rm_xid));
-                                nfsreply_print_noaddr((u_char *)rp, fraglen, (u_char *)ip);
+                                nfsreply_print_noaddr(gndo, (u_char *)rp, fraglen, (u_char *)ip);
                                 return;
                         }
                 }
