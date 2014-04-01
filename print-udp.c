@@ -641,7 +641,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 		else if (dport == HSRP_PORT)
 			hsrp_print(ndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(LWRES_PORT))
-			lwres_print((const u_char *)(up + 1), length);
+			lwres_print(ndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(LDP_PORT))
 			ldp_print(ndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(OLSR_PORT))
@@ -669,9 +669,9 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
                 else if (ISPORT(LWAPP_DATA_PORT))
                         lwapp_data_print(ndo, (const u_char *)(up + 1), length);
                 else if (ISPORT(SIP_PORT))
-			sip_print((const u_char *)(up + 1), length);
+			sip_print(ndo, (const u_char *)(up + 1), length);
                 else if (ISPORT(SYSLOG_PORT))
-			syslog_print((const u_char *)(up + 1), length);
+			syslog_print(ndo, (const u_char *)(up + 1), length);
                 else if (ISPORT(OTV_PORT))
 			otv_print(ndo, (const u_char *)(up + 1), length);
                 else if (ISPORT(VXLAN_PORT))

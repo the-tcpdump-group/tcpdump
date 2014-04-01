@@ -502,6 +502,10 @@ extern void nfsreply_print(netdissect_options *, const u_char *, u_int, const u_
 extern void nfsreply_print_noaddr(netdissect_options *, const u_char *, u_int, const u_char *);
 extern void nfsreq_print(netdissect_options *, const u_char *, u_int, const u_char *);
 extern void nfsreq_print_noaddr(netdissect_options *, const u_char *, u_int, const u_char *);
+extern void sip_print(netdissect_options *, const u_char *, u_int);
+extern void syslog_print(netdissect_options *, const u_char *, u_int);
+extern void lwres_print(netdissect_options *, const u_char *, u_int);
+extern void cfm_print(netdissect_options *, const u_char *, u_int);
 
 /* stuff that has not yet been rototiled */
 
@@ -542,7 +546,6 @@ extern void nbt_udp138_print(netdissect_options *,
 extern char *smb_errstr(netdissect_options *,int, int);
 extern const char *nt_errstr(netdissect_options *, u_int32_t);
 extern void print_data(netdissect_options *,const unsigned char *, int);
-extern void lwres_print(netdissect_options *,const u_char *, u_int);
 #endif
 
 extern u_int ipnet_if_print(netdissect_options *,const struct pcap_pkthdr *, const u_char *);

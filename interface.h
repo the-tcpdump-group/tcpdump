@@ -181,10 +181,6 @@ extern void smb_tcp_print(const u_char *, int);
 extern char *smb_errstr(int, int);
 extern const char *nt_errstr(u_int32_t);
 extern void print_data(const unsigned char *, int);
-extern void cfm_print(const u_char *, u_int);
-extern void lwres_print(const u_char *, u_int);
-extern void sip_print(const u_char *, u_int);
-extern void syslog_print(const u_char *, u_int);
 
 
 #ifdef INET6
