@@ -583,7 +583,7 @@ void sctp_print(netdissect_options *ndo,
 				    EXTRACT_16BITS(&chunkDescPtr->chunkLength)));
 				return;
 			}
-			default_print(payloadPtr,
+			ND_DEFAULTPRINT(payloadPtr,
 			      EXTRACT_16BITS(&chunkDescPtr->chunkLength) -
 			      (sizeof(struct sctpDataPart)+
 			      sizeof(struct sctpChunkDesc)));
