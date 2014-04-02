@@ -232,7 +232,6 @@ HDR = \
 	bootp.h \
 	chdlc.h \
 	cpack.h \
-	decnet.h \
 	ether.h \
 	ethertype.h \
 	extract.h \
