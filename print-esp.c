@@ -594,7 +594,7 @@ esp_print(netdissect_options *ndo,
 	ep = ndo->ndo_snapend;
 
 	if ((u_char *)(esp + 1) >= ep) {
-		fputs("[|ESP]", stdout);
+		ND_PRINT((ndo, "[|ESP]"));
 		goto fail;
 	}
 	ND_PRINT((ndo, "ESP(spi=0x%08x", EXTRACT_32BITS(&esp->esp_spi)));
