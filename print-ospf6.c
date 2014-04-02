@@ -697,13 +697,13 @@ ospf6_print_lsa(netdissect_options *ndo,
 		break;
 
         case LS_TYPE_GRACE | LS_SCOPE_LINKLOCAL:
-                if (ospf_print_grace_lsa(tptr, lsa_length) == -1) {
+                if (ospf_print_grace_lsa(ndo, tptr, lsa_length) == -1) {
                     return 1;
                 }
                 break;
 
         case LS_TYPE_INTRA_ATE | LS_SCOPE_LINKLOCAL:
-                if (ospf_print_te_lsa(tptr, lsa_length) == -1) {
+                if (ospf_print_te_lsa(ndo, tptr, lsa_length) == -1) {
                     return 1;
                 }
                 break;

@@ -336,7 +336,7 @@ ethertype_print(netdissect_options *ndo,
 		return (1);
 
 	case ETHERTYPE_DN:
-		decnet_print(/*ndo,*/p, length, caplen);
+		decnet_print(ndo, p, length, caplen);
 		return (1);
 
 	case ETHERTYPE_ATALK:

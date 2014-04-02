@@ -374,7 +374,7 @@ again:
 
 	case IPPROTO_TCP:
 		/* pass on the MF bit plus the offset to detect fragments */
-		tcp_print(ipds->cp, ipds->len, (const u_char *)ipds->ip,
+		tcp_print(ndo, ipds->cp, ipds->len, (const u_char *)ipds->ip,
 			  ipds->off & (IP_MF|IP_OFFMASK));
 		break;
 
@@ -420,7 +420,7 @@ again:
 		break;
 
 	case IPPROTO_OSPF:
-		ospf_print(ipds->cp, ipds->len, (const u_char *)ipds->ip);
+		ospf_print(ndo, ipds->cp, ipds->len, (const u_char *)ipds->ip);
 		break;
 
 	case IPPROTO_IGMP:
