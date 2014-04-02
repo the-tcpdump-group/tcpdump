@@ -506,6 +506,13 @@ extern void sip_print(netdissect_options *, const u_char *, u_int);
 extern void syslog_print(netdissect_options *, const u_char *, u_int);
 extern void lwres_print(netdissect_options *, const u_char *, u_int);
 extern void cfm_print(netdissect_options *, const u_char *, u_int);
+extern void nbt_tcp_print(netdissect_options *, const u_char *, int);
+extern void nbt_udp137_print(netdissect_options *, const u_char *, int);
+extern void nbt_udp138_print(netdissect_options *, const u_char *, int);
+extern void smb_tcp_print(netdissect_options *, const u_char *, int);
+extern void netbeui_print(netdissect_options *, u_short, const u_char *, int);
+extern void ipx_netbios_print(netdissect_options *, const u_char *, u_int);
+extern void print_data(netdissect_options *, const unsigned char *, int);
 
 /* stuff that has not yet been rototiled */
 
@@ -535,17 +542,8 @@ extern void ppp_bsdos_if_print(u_char *,
 extern void tcp_print(netdissect_options *,const u_char *, u_int,
 		      const u_char *, int);
 extern void timed_print(netdissect_options *,const u_char *, u_int);
-extern void netbeui_print(netdissect_options *,u_short,
-			  const u_char *, int);
-extern void ipx_netbios_print(netdissect_options *,const u_char *, u_int);
-extern void nbt_tcp_print(netdissect_options *,const u_char *, int);
-extern void nbt_udp137_print(netdissect_options *,
-			     const u_char *data, int);
-extern void nbt_udp138_print(netdissect_options *,
-			     const u_char *data, int);
 extern char *smb_errstr(netdissect_options *,int, int);
 extern const char *nt_errstr(netdissect_options *, u_int32_t);
-extern void print_data(netdissect_options *,const unsigned char *, int);
 #endif
 
 extern u_int ipnet_if_print(netdissect_options *,const struct pcap_pkthdr *, const u_char *);

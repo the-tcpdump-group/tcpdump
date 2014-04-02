@@ -284,7 +284,7 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 			p += 4;
 			length -= 4;
 		}
-		netbeui_print(control, p, length);
+		netbeui_print(ndo, control, p, length);
 		return (1);
 	}
 #endif

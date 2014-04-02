@@ -678,9 +678,9 @@ tcp_print(register const u_char *bp, register u_int length,
                 pptp_print(gndo, bp);
 #ifdef TCPDUMP_DO_SMB
         else if (sport == NETBIOS_SSN_PORT || dport == NETBIOS_SSN_PORT)
-                nbt_tcp_print(bp, length);
+                nbt_tcp_print(gndo, bp, length);
 	else if (sport == SMB_PORT || dport == SMB_PORT)
-		smb_tcp_print(bp, length);
+		smb_tcp_print(gndo, bp, length);
 #endif
         else if (sport == BEEP_PORT || dport == BEEP_PORT)
                 beep_print(gndo, bp, length);

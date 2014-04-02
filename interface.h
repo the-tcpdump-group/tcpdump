@@ -172,16 +172,8 @@ extern u_int ppp_hdlc_if_print(const struct pcap_pkthdr *, const u_char *);
 extern u_int ppp_bsdos_if_print(const struct pcap_pkthdr *, const u_char *);
 extern void tcp_print(const u_char *, u_int, const u_char *, int);
 extern void timed_print(const u_char *);
-extern void netbeui_print(u_short, const u_char *, int);
-extern void ipx_netbios_print(const u_char *, u_int);
-extern void nbt_tcp_print(const u_char *, int);
-extern void nbt_udp137_print(const u_char *, int);
-extern void nbt_udp138_print(const u_char *, int);
-extern void smb_tcp_print(const u_char *, int);
 extern char *smb_errstr(int, int);
 extern const char *nt_errstr(u_int32_t);
-extern void print_data(const unsigned char *, int);
-
 
 #ifdef INET6
 extern void babel_print(const u_char *, u_int);
