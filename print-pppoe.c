@@ -97,7 +97,7 @@ pppoe_print(netdissect_options *ndo, register const u_char *bp, u_int length)
 	const u_char *pppoe_packet, *pppoe_payload;
 
 	if (length < PPPOE_HDRLEN) {
-		(void)printf("truncated-pppoe %u", length);
+		ND_PRINT((ndo, "truncated-pppoe %u", length));
 		return (length);
 	}
 	length -= PPPOE_HDRLEN;

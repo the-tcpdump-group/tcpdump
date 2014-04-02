@@ -215,21 +215,21 @@ ntp_print(netdissect_options *ndo,
 	ND_PRINT((ndo, "NTPv%d", version));
 
 	mode = bp->status & MODEMASK;
-        if (!ndo->ndo_vflag) {
-            printf (", %s, length %u",
-                    tok2str(ntp_mode_values, "Unknown mode", mode),
-                    length);
-            return;
-        }
+	if (!ndo->ndo_vflag) {
+		ND_PRINT((ndo, ", %s, length %u",
+		          tok2str(ntp_mode_values, "Unknown mode", mode),
+		          length));
+		return;
+	}
 
-        printf (", length %u\n\t%s",
-                length,
-                tok2str(ntp_mode_values, "Unknown mode", mode));
+	ND_PRINT((ndo, ", length %u\n\t%s",
+	          length,
+	          tok2str(ntp_mode_values, "Unknown mode", mode)));
 
 	leapind = bp->status & LEAPMASK;
-        printf (", Leap indicator: %s (%u)",
-                tok2str(ntp_leapind_values, "Unknown", leapind),
-                leapind);
+	ND_PRINT((ndo, ", Leap indicator: %s (%u)",
+	          tok2str(ntp_leapind_values, "Unknown", leapind),
+	          leapind));
 
 	ND_TCHECK(bp->stratum);
 	ND_PRINT((ndo, ", Stratum %u (%s)",
@@ -367,7 +367,7 @@ p_ntp_time(netdissect_options *ndo,
 
 	    tm = localtime(&seconds);
 	    strftime(time_buf, sizeof (time_buf), "%Y/%m/%d %H:%M:%S", tm);
-	    printf (" (%s)", time_buf);
+	    ND_PRINT((ndo, " (%s)", time_buf));
 	}
 #endif
 }

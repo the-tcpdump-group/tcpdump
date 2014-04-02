@@ -84,7 +84,7 @@ sl_if_print(netdissect_options *ndo,
 		break;
 #endif
 	default:
-		printf ("ip v%d", IP_V(ip));
+		ND_PRINT((ndo, "ip v%d", IP_V(ip)));
 	}
 
 	return (SLIP_HDRLEN);

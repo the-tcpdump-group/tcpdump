@@ -503,12 +503,8 @@ olsr_print(netdissect_options *ndo,
                     ptr.hna = (struct olsr_hna4 *)msg_data;
 
                     /* print 4 prefixes per line */
-                    if (col == 0)
-                        printf ("\n\t    ");
-                    else
-                        printf (", ");
-
-                    ND_PRINT((ndo, "%s/%u",
+                    ND_PRINT((ndo, "%s%s/%u",
+                            col == 0 ? "\n\t    " : ", ",
                             ipaddr_string(ptr.hna->network),
                             mask2plen(EXTRACT_32BITS(ptr.hna->mask))));
 
