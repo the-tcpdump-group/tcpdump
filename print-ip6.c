@@ -248,7 +248,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			return;
 
 		case IPPROTO_RSVP:
-			rsvp_print(cp, len);
+			rsvp_print(ndo, cp, len);
 			return;
 
 		case IPPROTO_NONE:

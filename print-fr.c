@@ -313,7 +313,7 @@ fr_print(netdissect_options *ndo,
                 break;
 
         case NLPID_PPP:
-                ppp_print(p, length);
+                ppp_print(ndo, p, length);
                 break;
 
 	default:

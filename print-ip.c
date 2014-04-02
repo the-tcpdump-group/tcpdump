@@ -444,7 +444,7 @@ again:
 #endif /*INET6*/
 
 	case IPPROTO_RSVP:
-		rsvp_print(ipds->cp, ipds->len);
+		rsvp_print(ndo, ipds->cp, ipds->len);
 		break;
 
 	case IPPROTO_GRE:

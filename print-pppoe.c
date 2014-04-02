@@ -191,7 +191,7 @@ pppoe_print(netdissect_options *ndo, register const u_char *bp, u_int length)
 	} else {
 		/* PPPoE data */
 		ND_PRINT((ndo, " "));
-		return (PPPOE_HDRLEN + ppp_print(pppoe_payload, pppoe_length));
+		return (PPPOE_HDRLEN + ppp_print(ndo, pppoe_payload, pppoe_length));
 	}
 
 trunc:

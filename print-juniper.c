@@ -443,7 +443,7 @@ static const struct tok juniper_protocol_values[] = {
 };
 
 static int ip_heuristic_guess(netdissect_options *, register const u_char *, u_int);
-static int juniper_ppp_heuristic_guess(register const u_char *, u_int);
+static int juniper_ppp_heuristic_guess(netdissect_options *, register const u_char *, u_int);
 static int juniper_parse_header(netdissect_options *, const u_char *, const struct pcap_pkthdr *, struct juniper_l2info_t *);
 
 #ifdef DLT_JUNIPER_GGSN
@@ -684,7 +684,7 @@ juniper_ppp_print(netdissect_options *ndo,
 
         p+=l2info.header_len;
         /* this DLT contains nothing but raw ppp frames */
-        ppp_print(p, l2info.length);
+        ppp_print(ndo, p, l2info.length);
         return l2info.header_len;
 }
 #endif
@@ -780,7 +780,7 @@ juniper_mlppp_print(netdissect_options *ndo,
              * -> this must be incoming IS-IS over PPP
              */
             if (l2info.cookie[4] == (JUNIPER_LSQ_COOKIE_RE|JUNIPER_LSQ_COOKIE_DIR))
-                ppp_print(p, l2info.length);
+                ppp_print(ndo, p, l2info.length);
             else
                 ip_print(ndo, p, l2info.length);
             return l2info.header_len;
@@ -802,11 +802,11 @@ juniper_mlppp_print(netdissect_options *ndo,
         /* zero length cookie ? */
         switch (EXTRACT_16BITS(&l2info.cookie)) {
         case PPP_OSI:
-            ppp_print(p-2,l2info.length+2);
+            ppp_print(ndo, p - 2, l2info.length + 2);
             break;
         case (PPP_ADDRESS << 8 | PPP_CONTROL): /* fall through */
         default:
-            ppp_print(p,l2info.length);
+            ppp_print(ndo, p, l2info.length);
             break;
         }
 
@@ -1010,7 +1010,7 @@ juniper_atm2_print(netdissect_options *ndo,
             return l2info.header_len;
         }
 
-        if(juniper_ppp_heuristic_guess(p, l2info.length) != 0) /* PPPoA vcmux encaps ? */
+        if(juniper_ppp_heuristic_guess(ndo, p, l2info.length) != 0) /* PPPoA vcmux encaps ? */
             return l2info.header_len;
 
         if (ip_heuristic_guess(ndo, p, l2info.length) != 0) /* last try - vcmux encaps ? */
@@ -1024,7 +1024,8 @@ juniper_atm2_print(netdissect_options *ndo,
 /* try to guess, based on all PPP protos that are supported in
  * a juniper router if the payload data is encapsulated using PPP */
 static int
-juniper_ppp_heuristic_guess(register const u_char *p, u_int length) {
+juniper_ppp_heuristic_guess(netdissect_options *ndo,
+                            register const u_char *p, u_int length) {
 
     switch(EXTRACT_16BITS(p)) {
     case PPP_IP :
@@ -1042,7 +1043,7 @@ juniper_ppp_heuristic_guess(register const u_char *p, u_int length) {
     case PPP_IPV6 :
     case PPP_IPV6CP :
 #endif
-        ppp_print(p, length);
+        ppp_print(ndo, p, length);
         break;
 
     default:

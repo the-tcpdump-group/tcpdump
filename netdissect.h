@@ -518,6 +518,12 @@ extern void tcp_print(netdissect_options *, const u_char *, u_int, const u_char 
 extern void ospf_print(netdissect_options *, const u_char *, u_int, const u_char *);
 extern int ospf_print_te_lsa(netdissect_options *, const u_int8_t *, u_int);
 extern int ospf_print_grace_lsa(netdissect_options *, const u_int8_t *, u_int);
+extern u_int ppp_print(netdissect_options *, register const u_char *, u_int);
+extern u_int ppp_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int ppp_hdlc_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern u_int ppp_bsdos_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
+extern void lldp_print(netdissect_options *, const u_char *, u_int);
+extern void rsvp_print(netdissect_options *, const u_char *, u_int);
 
 /* stuff that has not yet been rototiled */
 
@@ -531,14 +537,6 @@ extern void nfsreply_print(netdissect_options *,const u_char *,
 			   u_int, const u_char *);
 extern void nfsreq_print(netdissect_options *,const u_char *,
 			 u_int, const u_char *);
-extern void ppp_print(netdissect_options *,
-		      register const u_char *, u_int);
-
-extern void ppp_if_print(u_char *,const struct pcap_pkthdr *, const u_char *);
-extern void ppp_hdlc_if_print(u_char *,
-			      const struct pcap_pkthdr *, const u_char *);
-extern void ppp_bsdos_if_print(u_char *,
-			       const struct pcap_pkthdr *, const u_char *);
 
 extern void timed_print(netdissect_options *,const u_char *, u_int);
 extern char *smb_errstr(netdissect_options *,int, int);

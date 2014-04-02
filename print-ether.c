@@ -376,7 +376,7 @@ ethertype_print(netdissect_options *ndo,
 	case ETHERTYPE_PPP:
 		if (length) {
 			ND_PRINT((ndo, ": "));
-			ppp_print(/*ndo,*/p, length);
+			ppp_print(ndo, p, length);
 		}
 		return (1);
 
@@ -394,7 +394,7 @@ ethertype_print(netdissect_options *ndo,
 		return (1);
 
 	case ETHERTYPE_LLDP:
-	        lldp_print(/*ndo,*/p, length);
+		lldp_print(ndo, p, length);
 		return (1);
 
         case ETHERTYPE_LOOPBACK:

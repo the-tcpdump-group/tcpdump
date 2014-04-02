@@ -167,16 +167,6 @@ struct ndo_printer {
 
 
 static const struct printer printers[] = {
-	{ ppp_if_print,		DLT_PPP },
-#ifdef DLT_PPP_WITHDIRECTION
-	{ ppp_if_print,		DLT_PPP_WITHDIRECTION },
-#endif
-#ifdef DLT_PPP_BSDOS
-	{ ppp_bsdos_if_print,	DLT_PPP_BSDOS },
-#endif
-#ifdef DLT_PPP_SERIAL
-	{ ppp_hdlc_if_print,	DLT_PPP_SERIAL },
-#endif
 	{ NULL,			0 },
 };
 
@@ -346,6 +336,16 @@ static const struct ndo_printer ndo_printers[] = {
 #endif
 #ifdef DLT_PRISM_HEADER
 	{ prism_if_print,	DLT_PRISM_HEADER },
+#endif
+	{ ppp_if_print,		DLT_PPP },
+#ifdef DLT_PPP_WITHDIRECTION
+	{ ppp_if_print,		DLT_PPP_WITHDIRECTION },
+#endif
+#ifdef DLT_PPP_BSDOS
+	{ ppp_bsdos_if_print,	DLT_PPP_BSDOS },
+#endif
+#ifdef DLT_PPP_SERIAL
+	{ ppp_hdlc_if_print,	DLT_PPP_SERIAL },
 #endif
 	{ NULL,			0 },
 };

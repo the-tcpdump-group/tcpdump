@@ -709,9 +709,9 @@ void isoclns_print(netdissect_options *ndo,
 		break;
 #endif
 
-        case NLPID_PPP:
-                ppp_print(p+1, length-1);
-                break;
+	case NLPID_PPP:
+		ppp_print(ndo, p + 1, length - 1);
+		break;
 
 	default:
 		if (!ndo->ndo_eflag)

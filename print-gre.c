@@ -297,7 +297,7 @@ gre_print_1(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	switch (prot) {
 	case ETHERTYPE_PPP:
-                ppp_print(bp, len);
+		ppp_print(ndo, bp, len);
 		break;
 	default:
 		ND_PRINT((ndo, "gre-proto-0x%x", prot));

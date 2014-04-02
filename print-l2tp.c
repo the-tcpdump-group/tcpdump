@@ -737,7 +737,7 @@ l2tp_print(netdissect_options *ndo, const u_char *dat, u_int length)
 		}
 	} else {
 		ND_PRINT((ndo, " {"));
-		ppp_print(ptr, length - cnt);
+		ppp_print(ndo, ptr, length - cnt);
 		ND_PRINT((ndo, "}"));
 	}
 
