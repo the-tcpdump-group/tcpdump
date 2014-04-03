@@ -310,8 +310,6 @@ extern int unaligned_memcmp(const void *, const void *, size_t);
 	(((n) != 1) ? "s" : "")
 
 #if 0
-extern const char *isonsap_string(netdissect_options *, const u_char *);
-extern const char *protoid_string(netdissect_options *, const u_char *);
 extern const char *dnname_string(netdissect_options *, u_short);
 extern const char *dnnum_string(netdissect_options *, u_short);
 #endif
@@ -530,14 +528,6 @@ extern void rsvp_print(netdissect_options *, const u_char *, u_int);
 #if 0
 extern void ascii_print(netdissect_options *,u_int);
 extern void default_print(netdissect_options *,const u_char *, u_int);
-
-extern const char *linkaddr_string(netdissect_options *ndo,
-				   const u_char *ep, const unsigned int len);
-extern void nfsreply_print(netdissect_options *,const u_char *,
-			   u_int, const u_char *);
-extern void nfsreq_print(netdissect_options *,const u_char *,
-			 u_int, const u_char *);
-
 extern void timed_print(netdissect_options *,const u_char *, u_int);
 extern char *smb_errstr(netdissect_options *,int, int);
 extern const char *nt_errstr(netdissect_options *, u_int32_t);
