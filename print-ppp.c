@@ -548,7 +548,8 @@ handle_ctrl_proto(netdissect_options *ndo,
 		/* RFC 1661 says this is intended to be human readable */
 		if (len > 8) {
 			ND_PRINT((ndo, "\n\t  Message\n\t    "));
-			fn_printn(tptr + 4, len - 4, ndo->ndo_snapend);
+			if (fn_printn(tptr + 4, len - 4, ndo->ndo_snapend))
+				goto trunc;
 		}
 		break;
 	case CPCODES_TIME_REM:
