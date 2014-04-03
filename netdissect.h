@@ -363,6 +363,7 @@ extern int ethertype_print(netdissect_options *,u_short, const u_char *,
 			     u_int, u_int);
 
 extern int print_unknown_data(netdissect_options *,const u_char *, const char *,int);
+extern void ascii_print(netdissect_options *, const u_char *, u_int);
 extern void hex_print_with_offset(netdissect_options *, const char *ident, const u_char *cp,
 				  u_int, u_int);
 extern void hex_print(netdissect_options *,const char *ident, const u_char *cp,u_int);

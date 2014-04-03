@@ -156,7 +156,6 @@ extern u_int16_t create_osi_cksum(const u_int8_t *, int, int);
 
 #include <pcap.h>
 
-extern void ascii_print(const u_char *, u_int);
 extern void default_print(const u_char *, u_int);
 extern char *q922_string(const u_char *);
 extern char *smb_errstr(int, int);

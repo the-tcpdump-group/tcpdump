@@ -27,6 +27,9 @@
 
 /* OpenFlow: protocol between controller and datapath. */
 
+/* for netdissect_options */
+#include "netdissect.h"
+
 #define OF_HEADER_LEN 8
 
 /*

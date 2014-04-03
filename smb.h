@@ -6,6 +6,9 @@
  * or later
  */
 
+/* for netdissect_options */
+#include "netdissect.h"
+
 /* the complete */
 #define SMBmkdir      0x00   /* create directory */
 #define SMBrmdir      0x01   /* delete directory */

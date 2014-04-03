@@ -36,6 +36,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -43,7 +44,6 @@
 #include <tcpdump-stdinc.h>
 #include <stdio.h>
 
-#include "netdissect.h"
 #include "interface.h"
 
 #define ASCII_LINELENGTH 300
@@ -54,11 +54,12 @@
 		(HEXDUMP_HEXSTUFF_PER_SHORT * HEXDUMP_SHORTS_PER_LINE)
 
 void
-ascii_print(register const u_char *cp, register u_int length)
+ascii_print(netdissect_options *ndo,
+            register const u_char *cp, register u_int length)
 {
-	register int s;
+	register u_char s;
 
-	putchar('\n');
+	ND_PRINT((ndo, "\n"));
 	while (length > 0) {
 		s = *cp++;
 		length--;
@@ -73,13 +74,13 @@ ascii_print(register const u_char *cp, register u_int length)
 			 * In the middle of a line, just print a '.'.
 			 */
 			if (length > 1 && *cp != '\n')
-				putchar('.');
+				ND_PRINT((ndo, "."));
 		} else {
 			if (!ND_ISGRAPH(s) &&
 			    (s != '\t' && s != ' ' && s != '\n'))
-				putchar('.');
+				ND_PRINT((ndo, "."));
 			else
-				putchar(s);
+				ND_PRINT((ndo, "%c", s));
 		}
 	}
 }
