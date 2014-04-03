@@ -469,7 +469,7 @@ mfr_print(netdissect_options *ndo,
 
             case MFR_CTRL_IE_TIMESTAMP:
                 if (ie_len == sizeof(struct timeval)) {
-                    ts_print((const struct timeval *)tptr);
+                    ts_print(ndo, (const struct timeval *)tptr);
                     break;
                 }
                 /* fall through and hexdump if no unix timestamp */

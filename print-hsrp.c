@@ -116,9 +116,9 @@ hsrp_print(netdissect_options *ndo, register const u_int8_t *bp, register u_int 
 	ND_PRINT((ndo, "addr=%s", ipaddr_string(&hp->hsrp_virtaddr)));
 	if (ndo->ndo_vflag) {
 		ND_PRINT((ndo, " hellotime="));
-		relts_print(hp->hsrp_hellotime);
+		relts_print(ndo, hp->hsrp_hellotime);
 		ND_PRINT((ndo, " holdtime="));
-		relts_print(hp->hsrp_holdtime);
+		relts_print(ndo, hp->hsrp_holdtime);
 		ND_PRINT((ndo, " priority=%d", hp->hsrp_priority));
 		ND_PRINT((ndo, " auth=\""));
 		if (fn_printn(hp->hsrp_authdata, sizeof(hp->hsrp_authdata),

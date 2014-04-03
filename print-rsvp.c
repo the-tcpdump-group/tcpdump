@@ -1666,7 +1666,7 @@ _U_
                        EXTRACT_32BITS(obj_ptr.rsvp_obj_integrity->digest + 12)));
 
 #ifdef HAVE_LIBCRYPTO
-                sigcheck = signature_verify(pptr, plen, (unsigned char *)obj_ptr.\
+                sigcheck = signature_verify(ndo, pptr, plen, (unsigned char *)obj_ptr.\
                                              rsvp_obj_integrity->digest);
 #else
                 sigcheck = CANT_CHECK_SIGNATURE;

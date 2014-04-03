@@ -115,7 +115,8 @@ USES_APPLE_RST
  * Currently only MD5 is supported.
  */
 int
-signature_verify (const u_char *pptr, u_int plen, u_char *sig_ptr)
+signature_verify(netdissect_options *ndo,
+                 const u_char *pptr, u_int plen, u_char *sig_ptr)
 {
     u_int8_t rcvsig[16];
     u_int8_t sig[16];
@@ -140,7 +141,7 @@ signature_verify (const u_char *pptr, u_int plen, u_char *sig_ptr)
     } else {
 
         for (i = 0; i < sizeof(sig); ++i) {
-            (void)printf("%02x", sig[i]);
+            ND_PRINT((ndo, "%02x", sig[i]));
         }
 
         return (SIGNATURE_INVALID);

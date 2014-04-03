@@ -337,7 +337,7 @@ print_prune(netdissect_options *ndo,
 	ND_PRINT((ndo, " src %s grp %s", ipaddr_string(bp), ipaddr_string(bp + 4)));
 	bp += 8;
 	ND_PRINT((ndo, " timer "));
-	relts_print(EXTRACT_32BITS(bp));
+	relts_print(ndo, EXTRACT_32BITS(bp));
 	return (0);
 trunc:
 	return (-1);

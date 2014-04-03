@@ -226,7 +226,7 @@ print_igmpv3_query(netdissect_options *ndo,
         if (mrt < 600) {
             ND_PRINT((ndo, "%.1fs", mrt * 0.1));
         } else {
-            relts_print(mrt / 10);
+            relts_print(ndo, mrt / 10);
         }
 	ND_PRINT((ndo, "]"));
     }

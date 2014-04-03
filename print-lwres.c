@@ -543,7 +543,7 @@ lwres_print(netdissect_options *ndo,
 				    EXTRACT_16BITS(&grbn->rdclass))));
 			}
 			ND_PRINT((ndo, " TTL "));
-			relts_print(EXTRACT_32BITS(&grbn->ttl));
+			relts_print(ndo, EXTRACT_32BITS(&grbn->ttl));
 			ND_PRINT((ndo, " %u/%u", EXTRACT_16BITS(&grbn->nrdatas),
 			    EXTRACT_16BITS(&grbn->nsigs)));
 

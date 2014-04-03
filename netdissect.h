@@ -252,11 +252,8 @@ struct netdissect_options {
 #define ND_PRINT(STUFF) (*ndo->ndo_printf)STUFF
 #define ND_DEFAULTPRINT(ap, length) (*ndo->ndo_default_print)(ndo, ap, length)
 
-#if 0
-extern void ts_print(netdissect_options *ipdo,
-		     const struct timeval *);
-extern void relts_print(int);
-#endif
+extern void ts_print(netdissect_options *, const struct timeval *);
+extern void relts_print(netdissect_options *, int);
 
 extern int fn_print(const u_char *, const u_char *);
 extern int fn_printn(const u_char *, u_int, const u_char *);

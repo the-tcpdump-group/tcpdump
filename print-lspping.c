@@ -552,13 +552,13 @@ lspping_print(netdissect_options *ndo,
     timestamp.tv_sec=EXTRACT_32BITS(lspping_com_header->ts_sent_sec);
     timestamp.tv_usec=EXTRACT_32BITS(lspping_com_header->ts_sent_usec);
     ND_PRINT((ndo, "\n\t  Sender Timestamp: "));
-    ts_print(&timestamp);
+    ts_print(ndo, &timestamp);
 
     timestamp.tv_sec=EXTRACT_32BITS(lspping_com_header->ts_rcvd_sec);
     timestamp.tv_usec=EXTRACT_32BITS(lspping_com_header->ts_rcvd_usec);
     ND_PRINT((ndo, "Receiver Timestamp: "));
     if ((timestamp.tv_sec != 0) && (timestamp.tv_usec != 0))
-        ts_print(&timestamp);
+        ts_print(ndo, &timestamp);
     else
         ND_PRINT((ndo, "no timestamp"));
 

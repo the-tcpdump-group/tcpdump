@@ -2675,7 +2675,7 @@ isis_print(netdissect_options *ndo,
                     ND_PRINT((ndo, ", (malformed subTLV) "));
 
 #ifdef HAVE_LIBCRYPTO
-                sigcheck = signature_verify(optr, length,
+                sigcheck = signature_verify(ndo, optr, length,
                                             (unsigned char *)tptr + 1);
 #else
                 sigcheck = CANT_CHECK_SIGNATURE;

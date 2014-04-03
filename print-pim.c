@@ -127,7 +127,7 @@ pimv1_join_prune_print(netdissect_options *ndo,
 		hold = EXTRACT_16BITS(&bp[6]);
 		if (hold != 180) {
 			ND_PRINT((ndo, "Hold "));
-			relts_print(hold);
+			relts_print(ndo, hold);
 		}
 		ND_PRINT((ndo, "%s (%s/%d, %s", njoin ? "Join" : "Prune",
 		ipaddr_string(&bp[26]), bp[25] & 0x3f,
@@ -149,7 +149,7 @@ pimv1_join_prune_print(netdissect_options *ndo,
 	if (ndo->ndo_vflag > 1)
 		ND_PRINT((ndo, "\n"));
 	ND_PRINT((ndo, " Hold time: "));
-	relts_print(EXTRACT_16BITS(&bp[6]));
+	relts_print(ndo, EXTRACT_16BITS(&bp[6]));
 	if (ndo->ndo_vflag < 2)
 		return;
 	bp += 8;
@@ -234,7 +234,7 @@ pimv1_print(netdissect_options *ndo,
 		if (ndo->ndo_vflag) {
 			ND_TCHECK2(bp[10],2);
 			ND_PRINT((ndo, " (Hold-time "));
-			relts_print(EXTRACT_16BITS(&bp[10]));
+			relts_print(ndo, EXTRACT_16BITS(&bp[10]));
 			ND_PRINT((ndo, ")"));
 		}
 		break;
@@ -264,7 +264,7 @@ pimv1_print(netdissect_options *ndo,
 			if (EXTRACT_32BITS(&bp[12]) != 0xffffffff)
 				ND_PRINT((ndo, "/%s", ipaddr_string(&bp[12])));
 			ND_PRINT((ndo, " RP %s hold ", ipaddr_string(&bp[16])));
-			relts_print(EXTRACT_16BITS(&bp[22]));
+			relts_print(ndo, EXTRACT_16BITS(&bp[22]));
 		}
 		break;
 	case 5:
@@ -342,7 +342,7 @@ cisco_autorp_print(netdissect_options *ndo,
 	ND_PRINT((ndo, " Hold "));
 	hold = EXTRACT_16BITS(&bp[2]);
 	if (hold)
-		relts_print(EXTRACT_16BITS(&bp[2]));
+		relts_print(ndo, EXTRACT_16BITS(&bp[2]));
 	else
 		ND_PRINT((ndo, "FOREVER"));
 
@@ -657,7 +657,7 @@ pimv2_print(netdissect_options *ndo,
 
 			switch (otype) {
 			case PIMV2_HELLO_OPTION_HOLDTIME:
-				relts_print(EXTRACT_16BITS(bp));
+				relts_print(ndo, EXTRACT_16BITS(bp));
 				break;
 
 			case PIMV2_HELLO_OPTION_LANPRUNEDELAY:
@@ -698,7 +698,7 @@ pimv2_print(netdissect_options *ndo,
 				ND_PRINT((ndo, "v%d", *bp));
 				if (*(bp+1) != 0) {
 					ND_PRINT((ndo, ", interval "));
-					relts_print(*(bp+1));
+					relts_print(ndo, *(bp+1));
 				}
 				if (EXTRACT_16BITS(bp+2) != 0) {
 					ND_PRINT((ndo, " ?0x%04x?", EXTRACT_16BITS(bp+2)));
@@ -863,7 +863,7 @@ pimv2_print(netdissect_options *ndo,
 			if (holdtime == 0xffff)
 				ND_PRINT((ndo, "infinite"));
 			else
-				relts_print(holdtime);
+				relts_print(ndo, holdtime);
 		}
 		bp += 4; len -= 4;
 		for (i = 0; i < ngroup; i++) {
@@ -967,7 +967,7 @@ pimv2_print(netdissect_options *ndo,
 					goto bs_done;
 				}
 				ND_PRINT((ndo, ",holdtime="));
-				relts_print(EXTRACT_16BITS(bp));
+				relts_print(ndo, EXTRACT_16BITS(bp));
 				if (bp + 2 >= ep) {
 					ND_PRINT((ndo, "...)"));
 					goto bs_done;
@@ -1019,7 +1019,7 @@ pimv2_print(netdissect_options *ndo,
 		ND_PRINT((ndo, " prio=%d", bp[1]));
 		if (bp + 3 >= ep) break;
 		ND_PRINT((ndo, " holdtime="));
-		relts_print(EXTRACT_16BITS(&bp[2]));
+		relts_print(ndo, EXTRACT_16BITS(&bp[2]));
 		bp += 4;
 
 		/* Encoded-Unicast-RP-Address */
@@ -1065,7 +1065,7 @@ pimv2_print(netdissect_options *ndo,
 		bp += advance;
 		ND_TCHECK2(bp[0], 2);
 		ND_PRINT((ndo, " TUNR "));
-		relts_print(EXTRACT_16BITS(bp));
+		relts_print(ndo, EXTRACT_16BITS(bp));
 		break;
 
 

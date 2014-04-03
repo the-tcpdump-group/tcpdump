@@ -395,7 +395,7 @@ ns_rprint(netdissect_options *ndo,
 	} else if (ndo->ndo_vflag > 2) {
 		/* print ttl */
 		ND_PRINT((ndo, " ["));
-		relts_print(EXTRACT_32BITS(cp));
+		relts_print(ndo, EXTRACT_32BITS(cp));
 		ND_PRINT((ndo, "]"));
 		cp += 4;
 	} else {

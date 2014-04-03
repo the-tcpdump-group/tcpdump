@@ -1996,10 +1996,10 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	++packets_captured;
 
 	++infodelay;
-	ts_print(&h->ts);
 
 	print_info = (struct print_info *)user;
         ndo = print_info->ndo;
+	ts_print(ndo, &h->ts);
 
 	/*
 	 * Some printers want to check that they're not walking off the

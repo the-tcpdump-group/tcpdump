@@ -117,9 +117,6 @@ extern int32_t thiszone;	/* seconds offset from gmt to local time */
 /* Bail if "var" was not captured */
 #define TCHECK(var) TCHECK2(var, sizeof(var))
 
-extern void ts_print(const struct timeval *);
-extern void relts_print(int);
-
 extern int fn_print(const u_char *, const u_char *);
 extern int fn_printn(const u_char *, u_int, const u_char *);
 extern int fn_printzp(const u_char *, u_int, const u_char *);

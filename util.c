@@ -38,8 +38,6 @@
 
 #include "interface.h"
 
-char * ts_format(register int, register int);
-
 /*
  * Print out a null-terminated filename (or other ascii string).
  * If ep is NULL, assume no truncation check is needed.
@@ -137,7 +135,7 @@ fn_printzp(register const u_char *s, register u_int n,
 /*
  * Format the timestamp
  */
-char *
+static char *
 ts_format(register int sec, register int usec)
 {
         static char buf[sizeof("00:00:00.000000")];
@@ -151,7 +149,8 @@ ts_format(register int sec, register int usec)
  * Print the timestamp
  */
 void
-ts_print(register const struct timeval *tvp)
+ts_print(netdissect_options *ndo,
+         register const struct timeval *tvp)
 {
 	register int s;
 	struct tm *tm;
@@ -161,20 +160,20 @@ ts_print(register const struct timeval *tvp)
 	int d_usec;
 	int d_sec;
 
-	switch (tflag) {
+	switch (ndo->ndo_tflag) {
 
 	case 0: /* Default */
 		s = (tvp->tv_sec + thiszone) % 86400;
-                (void)printf("%s ", ts_format(s, tvp->tv_usec));
+		ND_PRINT((ndo, "%s ", ts_format(s, tvp->tv_usec)));
 		break;
 
 	case 1: /* No time stamp */
 		break;
 
 	case 2: /* Unix timeval style */
-		(void)printf("%u.%06u ",
+		ND_PRINT((ndo, "%u.%06u ",
 			     (unsigned)tvp->tv_sec,
-			     (unsigned)tvp->tv_usec);
+			     (unsigned)tvp->tv_usec));
 		break;
 
 	case 3: /* Microseconds since previous packet */
@@ -193,9 +192,9 @@ ts_print(register const struct timeval *tvp)
                     d_sec--;
                 }
 
-                (void)printf("%s ", ts_format(d_sec, d_usec));
+                ND_PRINT((ndo, "%s ", ts_format(d_sec, d_usec)));
 
-                if (tflag == 3) { /* set timestamp for last packet */
+                if (ndo->ndo_tflag == 3) { /* set timestamp for last packet */
                     b_sec = tvp->tv_sec;
                     b_usec = tvp->tv_usec;
                 }
@@ -206,11 +205,11 @@ ts_print(register const struct timeval *tvp)
 		Time = (tvp->tv_sec + thiszone) - s;
 		tm = gmtime (&Time);
 		if (!tm)
-			printf("Date fail  ");
+			ND_PRINT((ndo, "Date fail  "));
 		else
-			printf("%04d-%02d-%02d %s ",
+			ND_PRINT((ndo, "%04d-%02d-%02d %s ",
                                tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday,
-                               ts_format(s, tvp->tv_usec));
+                               ts_format(s, tvp->tv_usec)));
 		break;
 	}
 }
@@ -221,7 +220,8 @@ ts_print(register const struct timeval *tvp)
  * is represented as 1y1w1d1h1m1s.
  */
 void
-relts_print(int secs)
+relts_print(netdissect_options *ndo,
+            int secs)
 {
 	static const char *lengths[] = {"y", "w", "d", "h", "m", "s"};
 	static const int seconds[] = {31536000, 604800, 86400, 3600, 60, 1};
@@ -229,16 +229,16 @@ relts_print(int secs)
 	const int *s = seconds;
 
 	if (secs == 0) {
-		(void)printf("0s");
+		ND_PRINT((ndo, "0s"));
 		return;
 	}
 	if (secs < 0) {
-		(void)printf("-");
+		ND_PRINT((ndo, "-"));
 		secs = -secs;
 	}
 	while (secs > 0) {
 		if (secs >= *s) {
-			(void)printf("%d%s", secs / *s, *l);
+			ND_PRINT((ndo, "%d%s", secs / *s, *l));
 			secs -= (secs / *s) * *s;
 		}
 		s++;
@@ -260,8 +260,8 @@ print_unknown_data(netdissect_options *ndo, const u_char *cp,const char *ident,i
 		    ident));
 		return(0);
 	}
-	if (snapend - cp < len)
-		len = snapend - cp;
+	if (ndo->ndo_snapend - cp < len)
+		len = ndo->ndo_snapend - cp;
 	if (len < 0) {
           ND_PRINT((ndo,"%sDissector error: print_unknown_data called with pointer past end of packet",
 		    ident));
