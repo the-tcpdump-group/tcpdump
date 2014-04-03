@@ -137,6 +137,7 @@ pktap_if_print(struct netdissect_options *ndo,
 
 	case PKT_REC_NONE:
 		ND_PRINT((ndo, "no data"));
+		break;
 
 	case PKT_REC_PACKET:
 		if ((printer = lookup_printer(dlt)) != NULL) {
