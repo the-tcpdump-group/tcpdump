@@ -522,13 +522,13 @@ extern u_int ppp_hdlc_if_print(netdissect_options *, const struct pcap_pkthdr *,
 extern u_int ppp_bsdos_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
 extern void lldp_print(netdissect_options *, const u_char *, u_int);
 extern void rsvp_print(netdissect_options *, const u_char *, u_int);
+extern void timed_print(netdissect_options *, const u_char *);
 
 /* stuff that has not yet been rototiled */
 
 #if 0
 extern void ascii_print(netdissect_options *,u_int);
 extern void default_print(netdissect_options *,const u_char *, u_int);
-extern void timed_print(netdissect_options *,const u_char *, u_int);
 extern char *smb_errstr(netdissect_options *,int, int);
 extern const char *nt_errstr(netdissect_options *, u_int32_t);
 #endif

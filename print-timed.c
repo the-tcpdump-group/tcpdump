@@ -19,14 +19,12 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include <tcpdump-stdinc.h>
-
-#include <stdio.h>
-#include <string.h>
 
 #include "interface.h"
 #include "extract.h"
@@ -94,68 +92,56 @@ static const char *tsptype[TSPTYPENUMBER] =
   "TEST", "SETDATE", "SETDATEREQ", "LOOP" };
 
 void
-timed_print(register const u_char *bp)
+timed_print(netdissect_options *ndo,
+            register const u_char *bp)
 {
-#define endof(x) ((u_char *)&(x) + sizeof (x))
 	struct tsp *tsp = (struct tsp *)bp;
 	long sec, usec;
-	const u_char *end;
 
-	if (endof(tsp->tsp_type) > snapend) {
-		printf("%s", tstr);
-		return;
-	}
+	ND_TCHECK(tsp->tsp_type);
 	if (tsp->tsp_type < TSPTYPENUMBER)
-		printf("TSP_%s", tsptype[tsp->tsp_type]);
+		ND_PRINT((ndo, "TSP_%s", tsptype[tsp->tsp_type]));
 	else
-		printf("(tsp_type %#x)", tsp->tsp_type);
+		ND_PRINT((ndo, "(tsp_type %#x)", tsp->tsp_type));
 
-	if (endof(tsp->tsp_vers) > snapend) {
-		printf(" %s", tstr);
-		return;
-	}
-	printf(" vers %d", tsp->tsp_vers);
+	ND_TCHECK(tsp->tsp_vers);
+	ND_PRINT((ndo, " vers %u", tsp->tsp_vers));
 
-	if (endof(tsp->tsp_seq) > snapend) {
-		printf(" %s", tstr);
-		return;
-	}
-	printf(" seq %d", tsp->tsp_seq);
+	ND_TCHECK(tsp->tsp_seq);
+	ND_PRINT((ndo, " seq %u", tsp->tsp_seq));
 
-	if (tsp->tsp_type == TSP_LOOP) {
-		if (endof(tsp->tsp_hopcnt) > snapend) {
-			printf(" %s", tstr);
-			return;
-		}
-		printf(" hopcnt %d", tsp->tsp_hopcnt);
-	} else if (tsp->tsp_type == TSP_SETTIME ||
-	  tsp->tsp_type == TSP_ADJTIME ||
-	  tsp->tsp_type == TSP_SETDATE ||
-	  tsp->tsp_type == TSP_SETDATEREQ) {
-		if (endof(tsp->tsp_time) > snapend) {
-			printf(" %s", tstr);
-			return;
-		}
+	switch (tsp->tsp_type) {
+	case TSP_LOOP:
+		ND_TCHECK(tsp->tsp_hopcnt);
+		ND_PRINT((ndo, " hopcnt %u", tsp->tsp_hopcnt));
+		break;
+	case TSP_SETTIME:
+	case TSP_ADJTIME:
+	case TSP_SETDATE:
+	case TSP_SETDATEREQ:
+		ND_TCHECK(tsp->tsp_time);
 		sec = EXTRACT_32BITS(&tsp->tsp_time.tv_sec);
 		usec = EXTRACT_32BITS(&tsp->tsp_time.tv_usec);
+		/* XXX The comparison below is always false? */
 		if (usec < 0)
 			/* corrupt, skip the rest of the packet */
 			return;
-		fputs(" time ", stdout);
+		ND_PRINT((ndo, " time "));
 		if (sec < 0 && usec != 0) {
 			sec++;
 			if (sec == 0)
-				fputc('-', stdout);
+				ND_PRINT((ndo, "-"));
 			usec = 1000000 - usec;
 		}
-		printf("%ld.%06ld", sec, usec);
+		ND_PRINT((ndo, "%ld.%06ld", sec, usec));
+		break;
 	}
+	ND_TCHECK(tsp->tsp_name);
+	ND_PRINT((ndo, " name "));
+	if (fn_print((u_char *)tsp->tsp_name, (u_char *)tsp->tsp_name + sizeof(tsp->tsp_name)))
+		goto trunc;
+	return;
 
-	end = memchr(tsp->tsp_name, '\0', snapend - (u_char *)tsp->tsp_name);
-	if (end == NULL)
-		printf(" %s", tstr);
-	else {
-		fputs(" name ", stdout);
-		fwrite(tsp->tsp_name, end - (u_char *)tsp->tsp_name, 1, stdout);
-	}
+trunc:
+	ND_PRINT((ndo, " %s", tstr));
 }
