@@ -167,7 +167,6 @@ extern char *smb_errstr(int, int);
 extern const char *nt_errstr(u_int32_t);
 
 #ifdef INET6
-extern void babel_print(const u_char *, u_int);
 extern int mask62plen(const u_char *);
 #endif /*INET6*/
 

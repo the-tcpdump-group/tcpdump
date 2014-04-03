@@ -624,7 +624,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 		else if (ISPORT(AHCP_PORT))
 			ahcp_print(ndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(BABEL_PORT) || ISPORT(BABEL_PORT_OLD))
-			babel_print((const u_char *)(up + 1), length);
+			babel_print(ndo, (const u_char *)(up + 1), length);
 #endif /*INET6*/
 		/*
 		 * Kludge in test for whiteboard packets.
