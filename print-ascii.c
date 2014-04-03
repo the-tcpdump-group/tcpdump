@@ -55,7 +55,7 @@
 
 void
 ascii_print(netdissect_options *ndo,
-            register const u_char *cp, register u_int length)
+            const u_char *cp, u_int length)
 {
 	register u_char s;
 
