@@ -457,12 +457,15 @@ olsr_print(netdissect_options *ndo,
             while (msg_tlen >= addr_size) {
                 if (!ND_TTEST2(*msg_data, addr_size))
                     goto trunc;
-
-                ND_PRINT((ndo, "\n\t  interface address %s",
 #if INET6
+                ND_PRINT((ndo, "\n\t  interface address %s",
                         is_ipv6 ? ip6addr_string(msg_data) :
-#endif
                         ipaddr_string(msg_data)));
+#else
+                ND_PRINT((ndo, "\n\t  interface address %s",
+                        ipaddr_string(msg_data)));
+#endif
+
                 msg_data += addr_size;
                 msg_tlen -= addr_size;
             }
