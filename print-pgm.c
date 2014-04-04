@@ -181,15 +181,15 @@ pgm_print(netdissect_options *ndo,
 #ifdef INET6
 		if (ip6) {
 			ND_PRINT((ndo, "%s > %s: [|pgm]",
-				ip6addr_string(&ip6->ip6_src),
-				ip6addr_string(&ip6->ip6_dst)));
+				ip6addr_string(ndo, &ip6->ip6_src),
+				ip6addr_string(ndo, &ip6->ip6_dst)));
 			return;
 		} else
 #endif /* INET6 */
 		{
 			ND_PRINT((ndo, "%s > %s: [|pgm]",
-				ipaddr_string(&ip->ip_src),
-				ipaddr_string(&ip->ip_dst)));
+				ipaddr_string(ndo, &ip->ip_src),
+				ipaddr_string(ndo, &ip->ip_dst)));
 			return;
 		}
 	}
@@ -201,9 +201,9 @@ pgm_print(netdissect_options *ndo,
 	if (ip6) {
 		if (ip6->ip6_nxt == IPPROTO_PGM) {
 			ND_PRINT((ndo, "%s.%s > %s.%s: ",
-				ip6addr_string(&ip6->ip6_src),
+				ip6addr_string(ndo, &ip6->ip6_src),
 				tcpport_string(sport),
-				ip6addr_string(&ip6->ip6_dst),
+				ip6addr_string(ndo, &ip6->ip6_dst),
 				tcpport_string(dport)));
 		} else {
 			ND_PRINT((ndo, "%s > %s: ",
@@ -214,9 +214,9 @@ pgm_print(netdissect_options *ndo,
 	{
 		if (ip->ip_p == IPPROTO_PGM) {
 			ND_PRINT((ndo, "%s.%s > %s.%s: ",
-				ipaddr_string(&ip->ip_src),
+				ipaddr_string(ndo, &ip->ip_src),
 				tcpport_string(sport),
-				ipaddr_string(&ip->ip_dst),
+				ipaddr_string(ndo, &ip->ip_dst),
 				tcpport_string(dport)));
 		} else {
 			ND_PRINT((ndo, "%s > %s: ",

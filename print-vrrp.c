@@ -162,7 +162,7 @@ vrrp_print(netdissect_options *ndo,
 		bp += 8;
 		for (i = 0; i < naddrs; i++) {
 			ND_TCHECK(bp[3]);
-			ND_PRINT((ndo, "%c%s", c, ipaddr_string(bp)));
+			ND_PRINT((ndo, "%c%s", c, ipaddr_string(ndo, bp)));
 			c = ',';
 			bp += 4;
 		}

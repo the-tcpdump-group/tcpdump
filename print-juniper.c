@@ -548,8 +548,8 @@ juniper_es_print(netdissect_options *ndo,
                        tok2str(juniper_ipsec_type_values,"Unknown",ih->type),
                        ih->type,
                        EXTRACT_32BITS(&ih->spi),
-                       ipaddr_string(&ih->src_ip),
-                       ipaddr_string(&ih->dst_ip),
+                       ipaddr_string(ndo, &ih->src_ip),
+                       ipaddr_string(ndo, &ih->dst_ip),
                        l2info.length));
             } else {
                 ND_PRINT((ndo, "ES SA, index %u, ttl %u type %s (%u), length %u\n",

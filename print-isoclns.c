@@ -1147,7 +1147,7 @@ esis_print(netdissect_options *ndo,
                 li -= netal;
 
 		if (netal == 0)
-			ND_PRINT((ndo, "\n\t  %s", etheraddr_string(snpa)));
+			ND_PRINT((ndo, "\n\t  %s", etheraddr_string(ndo, snpa)));
 		else
 			ND_PRINT((ndo, "\n\t  %s", isonsap_string(neta, netal)));
 		break;
@@ -1615,12 +1615,12 @@ isis_print_tlv_ip_reach(netdissect_options *ndo,
 		if (prefix_len == -1)
 			ND_PRINT((ndo, "%sIPv4 prefix: %s mask %s",
                                ident,
-			       ipaddr_string((tlv_ip_reach->prefix)),
-			       ipaddr_string((tlv_ip_reach->mask))));
+			       ipaddr_string(ndo, (tlv_ip_reach->prefix)),
+			       ipaddr_string(ndo, (tlv_ip_reach->mask))));
 		else
 			ND_PRINT((ndo, "%sIPv4 prefix: %15s/%u",
                                ident,
-			       ipaddr_string((tlv_ip_reach->prefix)),
+			       ipaddr_string(ndo, (tlv_ip_reach->prefix)),
 			       prefix_len));
 
 		ND_PRINT((ndo, ", Distribution: %s, Metric: %u, %s",
@@ -1739,7 +1739,7 @@ isis_print_is_reach_subtlv(netdissect_options *ndo,
         case ISIS_SUBTLV_EXT_IS_REACH_IPV4_INTF_ADDR:
         case ISIS_SUBTLV_EXT_IS_REACH_IPV4_NEIGHBOR_ADDR:
             if (subl >= sizeof(struct in_addr))
-              ND_PRINT((ndo, ", %s", ipaddr_string(tptr)));
+              ND_PRINT((ndo, ", %s", ipaddr_string(ndo, tptr)));
             break;
         case ISIS_SUBTLV_EXT_IS_REACH_MAX_LINK_BW :
 	case ISIS_SUBTLV_EXT_IS_REACH_RESERVABLE_BW:
@@ -2004,13 +2004,13 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
     if (afi == AF_INET)
         ND_PRINT((ndo, "%sIPv4 prefix: %15s/%u",
                ident,
-               ipaddr_string(prefix),
+               ipaddr_string(ndo, prefix),
                bit_length));
 #ifdef INET6
     if (afi == AF_INET6)
         ND_PRINT((ndo, "%sIPv6 prefix: %s/%u",
                ident,
-               ip6addr_string(prefix),
+               ip6addr_string(ndo, prefix),
                bit_length));
 #endif
 
@@ -2641,7 +2641,7 @@ isis_print(netdissect_options *ndo,
 		    goto trunctlv;
 
                 ND_PRINT((ndo, "\n\t      IPv6 interface address: %s",
-		       ip6addr_string(tptr)));
+		       ip6addr_string(ndo, tptr)));
 
 		tptr += sizeof(struct in6_addr);
 		tmp -= sizeof(struct in6_addr);
@@ -2790,14 +2790,14 @@ isis_print(netdissect_options *ndo,
 	case ISIS_TLV_TE_ROUTER_ID:
 	    if (!ND_TTEST2(*pptr, sizeof(struct in_addr)))
 		goto trunctlv;
-	    ND_PRINT((ndo, "\n\t      Traffic Engineering Router ID: %s", ipaddr_string(pptr)));
+	    ND_PRINT((ndo, "\n\t      Traffic Engineering Router ID: %s", ipaddr_string(ndo, pptr)));
 	    break;
 
 	case ISIS_TLV_IPADDR:
 	    while (tmp>=sizeof(struct in_addr)) {
 		if (!ND_TTEST2(*tptr, sizeof(struct in_addr)))
 		    goto trunctlv;
-		ND_PRINT((ndo, "\n\t      IPv4 interface address: %s", ipaddr_string(tptr)));
+		ND_PRINT((ndo, "\n\t      IPv4 interface address: %s", ipaddr_string(ndo, tptr)));
 		tptr += sizeof(struct in_addr);
 		tmp -= sizeof(struct in_addr);
 	    }
@@ -2833,7 +2833,7 @@ isis_print(netdissect_options *ndo,
 	        break;
 	    if (!ND_TTEST2(*tptr, sizeof(struct in_addr)))
                 goto trunctlv;
-	    ND_PRINT((ndo, "\n\t      IPv4 interface address: %s", ipaddr_string(tptr)));
+	    ND_PRINT((ndo, "\n\t      IPv4 interface address: %s", ipaddr_string(ndo, tptr)));
 	    tptr+=sizeof(struct in_addr);
 	    tmp-=sizeof(struct in_addr);
 
@@ -2841,7 +2841,7 @@ isis_print(netdissect_options *ndo,
 	        break;
 	    if (!ND_TTEST2(*tptr, sizeof(struct in_addr)))
                 goto trunctlv;
-	    ND_PRINT((ndo, "\n\t      IPv4 neighbor address: %s", ipaddr_string(tptr)));
+	    ND_PRINT((ndo, "\n\t      IPv4 neighbor address: %s", ipaddr_string(ndo, tptr)));
 	    tptr+=sizeof(struct in_addr);
 	    tmp-=sizeof(struct in_addr);
 

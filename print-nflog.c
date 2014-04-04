@@ -44,7 +44,7 @@ static const struct tok nflog_values[] = {
 };
 
 static inline void
-nflog_hdr_print(struct netdissect_options *ndo, const nflog_hdr_t *hdr, u_int length)
+nflog_hdr_print(netdissect_options *ndo, const nflog_hdr_t *hdr, u_int length)
 {
 	ND_PRINT((ndo, "version %d, resource ID %d", hdr->nflog_version, ntohs(hdr->nflog_rid)));
 
@@ -64,7 +64,7 @@ nflog_hdr_print(struct netdissect_options *ndo, const nflog_hdr_t *hdr, u_int le
 }
 
 u_int
-nflog_if_print(struct netdissect_options *ndo,
+nflog_if_print(netdissect_options *ndo,
 			   const struct pcap_pkthdr *h, const u_char *p)
 {
 	const nflog_hdr_t *hdr = (const nflog_hdr_t *)p;

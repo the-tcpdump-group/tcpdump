@@ -94,8 +94,8 @@ ether_hdr_print(netdissect_options *ndo,
 	ep = (const struct ether_header *)bp;
 
 	ND_PRINT((ndo, "%s > %s",
-		     etheraddr_string(ESRC(ep)),
-		     etheraddr_string(EDST(ep))));
+		     etheraddr_string(ndo, ESRC(ep)),
+		     etheraddr_string(ndo, EDST(ep))));
 
 	ether_type = EXTRACT_16BITS(&ep->ether_type);
 	if (!ndo->ndo_qflag) {

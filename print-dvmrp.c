@@ -239,7 +239,7 @@ print_probe(netdissect_options *ndo,
 
 	while ((len > 0) && (bp < ep)) {
 		ND_TCHECK2(bp[0], 4);
-		ND_PRINT((ndo, "\n\tneighbor %s", ipaddr_string(bp)));
+		ND_PRINT((ndo, "\n\tneighbor %s", ipaddr_string(ndo, bp)));
 		bp += 4; len -= 4;
 	}
 	return (0);
@@ -267,9 +267,9 @@ print_neighbors(netdissect_options *ndo,
 		len -= 7;
 		while (--ncount >= 0) {
 			ND_TCHECK2(bp[0], 4);
-			ND_PRINT((ndo, " [%s ->", ipaddr_string(laddr)));
+			ND_PRINT((ndo, " [%s ->", ipaddr_string(ndo, laddr)));
 			ND_PRINT((ndo, " %s, (%d/%d)]",
-				   ipaddr_string(bp), metric, thresh));
+				   ipaddr_string(ndo, bp), metric, thresh));
 			bp += 4;
 			len -= 4;
 		}
@@ -302,8 +302,8 @@ print_neighbors2(netdissect_options *ndo,
 		ncount = *bp++;
 		len -= 8;
 		while (--ncount >= 0 && (len >= 4) && (bp + 4) <= ep) {
-			ND_PRINT((ndo, " [%s -> ", ipaddr_string(laddr)));
-			ND_PRINT((ndo, "%s (%d/%d", ipaddr_string(bp),
+			ND_PRINT((ndo, " [%s -> ", ipaddr_string(ndo, laddr)));
+			ND_PRINT((ndo, "%s (%d/%d", ipaddr_string(ndo, bp),
 				     metric, thresh));
 			if (flags & DVMRP_NF_TUNNEL)
 				ND_PRINT((ndo, "/tunnel"));
@@ -334,7 +334,7 @@ print_prune(netdissect_options *ndo,
             register const u_char *bp)
 {
 	ND_TCHECK2(bp[0], 12);
-	ND_PRINT((ndo, " src %s grp %s", ipaddr_string(bp), ipaddr_string(bp + 4)));
+	ND_PRINT((ndo, " src %s grp %s", ipaddr_string(ndo, bp), ipaddr_string(ndo, bp + 4)));
 	bp += 8;
 	ND_PRINT((ndo, " timer "));
 	relts_print(ndo, EXTRACT_32BITS(bp));
@@ -348,7 +348,7 @@ print_graft(netdissect_options *ndo,
             register const u_char *bp)
 {
 	ND_TCHECK2(bp[0], 8);
-	ND_PRINT((ndo, " src %s grp %s", ipaddr_string(bp), ipaddr_string(bp + 4)));
+	ND_PRINT((ndo, " src %s grp %s", ipaddr_string(ndo, bp), ipaddr_string(ndo, bp + 4)));
 	return (0);
 trunc:
 	return (-1);
@@ -359,7 +359,7 @@ print_graft_ack(netdissect_options *ndo,
                 register const u_char *bp)
 {
 	ND_TCHECK2(bp[0], 8);
-	ND_PRINT((ndo, " src %s grp %s", ipaddr_string(bp), ipaddr_string(bp + 4)));
+	ND_PRINT((ndo, " src %s grp %s", ipaddr_string(ndo, bp), ipaddr_string(ndo, bp + 4)));
 	return (0);
 trunc:
 	return (-1);

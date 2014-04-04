@@ -123,17 +123,17 @@ pimv1_join_prune_print(netdissect_options *ndo,
 	    ((njoin = EXTRACT_16BITS(&bp[20])) + EXTRACT_16BITS(&bp[22])) == 1) {
 		int hold;
 
-		ND_PRINT((ndo, " RPF %s ", ipaddr_string(bp)));
+		ND_PRINT((ndo, " RPF %s ", ipaddr_string(ndo, bp)));
 		hold = EXTRACT_16BITS(&bp[6]);
 		if (hold != 180) {
 			ND_PRINT((ndo, "Hold "));
 			relts_print(ndo, hold);
 		}
 		ND_PRINT((ndo, "%s (%s/%d, %s", njoin ? "Join" : "Prune",
-		ipaddr_string(&bp[26]), bp[25] & 0x3f,
-		ipaddr_string(&bp[12])));
+		ipaddr_string(ndo, &bp[26]), bp[25] & 0x3f,
+		ipaddr_string(ndo, &bp[12])));
 		if (EXTRACT_32BITS(&bp[16]) != 0xffffffff)
-			ND_PRINT((ndo, "/%s", ipaddr_string(&bp[16])));
+			ND_PRINT((ndo, "/%s", ipaddr_string(ndo, &bp[16])));
 		ND_PRINT((ndo, ") %s%s %s",
 		    (bp[24] & 0x01) ? "Sparse" : "Dense",
 		    (bp[25] & 0x80) ? " WC" : "",
@@ -144,7 +144,7 @@ pimv1_join_prune_print(netdissect_options *ndo,
 	ND_TCHECK2(bp[0], sizeof(struct in_addr));
 	if (ndo->ndo_vflag > 1)
 		ND_PRINT((ndo, "\n"));
-	ND_PRINT((ndo, " Upstream Nbr: %s", ipaddr_string(bp)));
+	ND_PRINT((ndo, " Upstream Nbr: %s", ipaddr_string(ndo, bp)));
 	ND_TCHECK2(bp[6], 2);
 	if (ndo->ndo_vflag > 1)
 		ND_PRINT((ndo, "\n"));
@@ -165,10 +165,10 @@ pimv1_join_prune_print(netdissect_options *ndo,
 		 * mask length "maddrlen"?
 		 */
 		ND_TCHECK2(bp[0], sizeof(struct in_addr));
-		ND_PRINT((ndo, "\n\tGroup: %s", ipaddr_string(bp)));
+		ND_PRINT((ndo, "\n\tGroup: %s", ipaddr_string(ndo, bp)));
 		ND_TCHECK2(bp[4], sizeof(struct in_addr));
 		if (EXTRACT_32BITS(&bp[4]) != 0xffffffff)
-			ND_PRINT((ndo, "/%s", ipaddr_string(&bp[4])));
+			ND_PRINT((ndo, "/%s", ipaddr_string(ndo, &bp[4])));
 		ND_TCHECK2(bp[8], 4);
 		njoin = EXTRACT_16BITS(&bp[8]);
 		nprune = EXTRACT_16BITS(&bp[10]);
@@ -187,7 +187,7 @@ pimv1_join_prune_print(netdissect_options *ndo,
 			    (bp[0] & 0x01) ? "Sparse " : "Dense ",
 			    (bp[1] & 0x80) ? "WC " : "",
 			    (bp[1] & 0x40) ? "RP " : "SPT ",
-			ipaddr_string(&bp[2]), bp[1] & 0x3f));
+			ipaddr_string(ndo, &bp[2]), bp[1] & 0x3f));
 			bp += 6;
 			len -= 6;
 		}
@@ -242,14 +242,14 @@ pimv1_print(netdissect_options *ndo,
 	case 1:
 		ND_PRINT((ndo, " Register"));
 		ND_TCHECK2(bp[8], 20);			/* ip header */
-		ND_PRINT((ndo, " for %s > %s", ipaddr_string(&bp[20]),
-		    ipaddr_string(&bp[24])));
+		ND_PRINT((ndo, " for %s > %s", ipaddr_string(ndo, &bp[20]),
+		    ipaddr_string(ndo, &bp[24])));
 		break;
 	case 2:
 		ND_PRINT((ndo, " Register-Stop"));
 		ND_TCHECK2(bp[12], sizeof(struct in_addr));
-		ND_PRINT((ndo, " for %s > %s", ipaddr_string(&bp[8]),
-		    ipaddr_string(&bp[12])));
+		ND_PRINT((ndo, " for %s > %s", ipaddr_string(ndo, &bp[8]),
+		    ipaddr_string(ndo, &bp[12])));
 		break;
 	case 3:
 		ND_PRINT((ndo, " Join/Prune"));
@@ -260,20 +260,20 @@ pimv1_print(netdissect_options *ndo,
 		ND_PRINT((ndo, " RP-reachable"));
 		if (ndo->ndo_vflag) {
 			ND_TCHECK2(bp[22], 2);
-			ND_PRINT((ndo, " group %s", ipaddr_string(&bp[8])));
+			ND_PRINT((ndo, " group %s", ipaddr_string(ndo, &bp[8])));
 			if (EXTRACT_32BITS(&bp[12]) != 0xffffffff)
-				ND_PRINT((ndo, "/%s", ipaddr_string(&bp[12])));
-			ND_PRINT((ndo, " RP %s hold ", ipaddr_string(&bp[16])));
+				ND_PRINT((ndo, "/%s", ipaddr_string(ndo, &bp[12])));
+			ND_PRINT((ndo, " RP %s hold ", ipaddr_string(ndo, &bp[16])));
 			relts_print(ndo, EXTRACT_16BITS(&bp[22]));
 		}
 		break;
 	case 5:
 		ND_PRINT((ndo, " Assert"));
 		ND_TCHECK2(bp[16], sizeof(struct in_addr));
-		ND_PRINT((ndo, " for %s > %s", ipaddr_string(&bp[16]),
-		    ipaddr_string(&bp[8])));
+		ND_PRINT((ndo, " for %s > %s", ipaddr_string(ndo, &bp[16]),
+		    ipaddr_string(ndo, &bp[8])));
 		if (EXTRACT_32BITS(&bp[12]) != 0xffffffff)
-			ND_PRINT((ndo, "/%s", ipaddr_string(&bp[12])));
+			ND_PRINT((ndo, "/%s", ipaddr_string(ndo, &bp[12])));
 		ND_TCHECK2(bp[24], 4);
 		ND_PRINT((ndo, " %s pref %d metric %d",
 		    (bp[20] & 0x80) ? "RP-tree" : "SPT",
@@ -368,7 +368,7 @@ cisco_autorp_print(netdissect_options *ndo,
 		char s;
 
 		ND_TCHECK2(bp[0], 4);
-		ND_PRINT((ndo, " RP %s", ipaddr_string(bp)));
+		ND_PRINT((ndo, " RP %s", ipaddr_string(ndo, bp)));
 		ND_TCHECK(bp[4]);
 		switch (bp[4] & 0x3) {
 		case 0: ND_PRINT((ndo, " PIMv?"));
@@ -389,7 +389,7 @@ cisco_autorp_print(netdissect_options *ndo,
 		for (; nentries; nentries--) {
 			ND_TCHECK2(bp[0], 6);
 			ND_PRINT((ndo, "%c%s%s/%d", s, bp[0] & 1 ? "!" : "",
-			          ipaddr_string(&bp[2]), bp[1]));
+			          ipaddr_string(ndo, &bp[2]), bp[1]));
 			if (bp[0] & 0x02) {
 				ND_PRINT((ndo, " bidir"));
 			}
@@ -564,12 +564,12 @@ pimv2_addr_print(netdissect_options *ndo,
 		ND_TCHECK2(bp[0], len);
 		if (af == AF_INET) {
 			if (!silent)
-				ND_PRINT((ndo, "%s", ipaddr_string(bp)));
+				ND_PRINT((ndo, "%s", ipaddr_string(ndo, bp)));
 		}
 #ifdef INET6
 		else if (af == AF_INET6) {
 			if (!silent)
-				ND_PRINT((ndo, "%s", ip6addr_string(bp)));
+				ND_PRINT((ndo, "%s", ip6addr_string(ndo, bp)));
 		}
 #endif
 		return hdrlen + len;
@@ -578,7 +578,7 @@ pimv2_addr_print(netdissect_options *ndo,
 		ND_TCHECK2(bp[0], len + 2);
 		if (af == AF_INET) {
 			if (!silent) {
-				ND_PRINT((ndo, "%s", ipaddr_string(bp + 2)));
+				ND_PRINT((ndo, "%s", ipaddr_string(ndo, bp + 2)));
 				if (bp[1] != 32)
 					ND_PRINT((ndo, "/%u", bp[1]));
 			}
@@ -586,7 +586,7 @@ pimv2_addr_print(netdissect_options *ndo,
 #ifdef INET6
 		else if (af == AF_INET6) {
 			if (!silent) {
-				ND_PRINT((ndo, "%s", ip6addr_string(bp + 2)));
+				ND_PRINT((ndo, "%s", ip6addr_string(ndo, bp + 2)));
 				if (bp[1] != 128)
 					ND_PRINT((ndo, "/%u", bp[1]));
 			}
@@ -756,8 +756,8 @@ pimv2_print(netdissect_options *ndo,
 		switch (IP_V(ip)) {
                 case 0: /* Null header */
 			ND_PRINT((ndo, "IP-Null-header %s > %s",
-			          ipaddr_string(&ip->ip_src),
-			          ipaddr_string(&ip->ip_dst)));
+			          ipaddr_string(ndo, &ip->ip_src),
+			          ipaddr_string(ndo, &ip->ip_dst)));
 			break;
 
 		case 4:	/* IPv4 */

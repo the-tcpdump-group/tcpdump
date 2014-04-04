@@ -266,17 +266,17 @@ ntp_print(netdissect_options *ndo,
 		break;
 
 	case INFO_QUERY:
-		ND_PRINT((ndo, "%s INFO_QUERY", ipaddr_string(&(bp->refid))));
+		ND_PRINT((ndo, "%s INFO_QUERY", ipaddr_string(ndo, &(bp->refid))));
 		/* this doesn't have more content */
 		return;
 
 	case INFO_REPLY:
-		ND_PRINT((ndo, "%s INFO_REPLY", ipaddr_string(&(bp->refid))));
+		ND_PRINT((ndo, "%s INFO_REPLY", ipaddr_string(ndo, &(bp->refid))));
 		/* this is too complex to be worth printing */
 		return;
 
 	default:
-		ND_PRINT((ndo, "%s", ipaddr_string(&(bp->refid))));
+		ND_PRINT((ndo, "%s", ipaddr_string(ndo, &(bp->refid))));
 		break;
 	}
 

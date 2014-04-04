@@ -1262,11 +1262,11 @@ lldp_private_dcbx_print(netdissect_options *ndo,
 }
 
 static char *
-lldp_network_addr_print(const u_char *tptr, u_int len) {
+lldp_network_addr_print(netdissect_options *ndo, const u_char *tptr, u_int len) {
 
     u_int8_t af;
     static char buf[BUFSIZE];
-    const char * (*pfunc)(const u_char *);
+    const char * (*pfunc)(netdissect_options *, const u_char *);
 
     if (len < 1)
       return NULL;
@@ -1300,7 +1300,7 @@ lldp_network_addr_print(const u_char *tptr, u_int len) {
                  tok2str(af_values, "Unknown", af), af);
     } else {
         snprintf(buf, sizeof(buf), "AFI %s (%u): %s",
-                 tok2str(af_values, "Unknown", af), af, (*pfunc)(tptr+1));
+                 tok2str(af_values, "Unknown", af), af, (*pfunc)(ndo, tptr+1));
     }
 
     return buf;
@@ -1328,7 +1328,7 @@ lldp_mgmt_addr_tlv_print(netdissect_options *ndo,
         return 0;
     }
 
-    mgmt_addr = lldp_network_addr_print(tptr, mgmt_addr_len);
+    mgmt_addr = lldp_network_addr_print(ndo, tptr, mgmt_addr_len);
     if (mgmt_addr == NULL) {
         return 0;
     }
@@ -1429,7 +1429,7 @@ lldp_print(netdissect_options *ndo,
                     if (tlv_len < 1+6) {
                         goto trunc;
                     }
-                    ND_PRINT((ndo, "%s", etheraddr_string(tptr + 1)));
+                    ND_PRINT((ndo, "%s", etheraddr_string(ndo, tptr + 1)));
                     break;
 
                 case LLDP_CHASSIS_INTF_NAME_SUBTYPE: /* fall through */
@@ -1441,7 +1441,7 @@ lldp_print(netdissect_options *ndo,
                     break;
 
                 case LLDP_CHASSIS_NETWORK_ADDR_SUBTYPE:
-                    network_addr = lldp_network_addr_print(tptr+1, tlv_len-1);
+                    network_addr = lldp_network_addr_print(ndo, tptr+1, tlv_len-1);
                     if (network_addr == NULL) {
                         goto trunc;
                     }
@@ -1470,7 +1470,7 @@ lldp_print(netdissect_options *ndo,
                     if (tlv_len < 1+6) {
                         goto trunc;
                     }
-                    ND_PRINT((ndo, "%s", etheraddr_string(tptr + 1)));
+                    ND_PRINT((ndo, "%s", etheraddr_string(ndo, tptr + 1)));
                     break;
 
                 case LLDP_PORT_INTF_NAME_SUBTYPE: /* fall through */
@@ -1482,7 +1482,7 @@ lldp_print(netdissect_options *ndo,
                     break;
 
                 case LLDP_PORT_NETWORK_ADDR_SUBTYPE:
-                    network_addr = lldp_network_addr_print(tptr+1, tlv_len-1);
+                    network_addr = lldp_network_addr_print(ndo, tptr+1, tlv_len-1);
                     if (network_addr == NULL) {
                         goto trunc;
                     }

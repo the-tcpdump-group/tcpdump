@@ -68,8 +68,8 @@ ipfc_hdr_print(netdissect_options *ndo,
 {
 	const char *srcname, *dstname;
 
-	srcname = etheraddr_string(ipfcsrc);
-	dstname = etheraddr_string(ipfcdst);
+	srcname = etheraddr_string(ndo, ipfcsrc);
+	dstname = etheraddr_string(ndo, ipfcdst);
 
 	/*
 	 * XXX - show the upper 16 bits?  Do so only if "vflag" is set?

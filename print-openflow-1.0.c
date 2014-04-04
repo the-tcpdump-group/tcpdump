@@ -692,7 +692,7 @@ of10_phy_ports_print(netdissect_options *ndo,
 		cp += 2;
 		/* hw_addr */
 		ND_TCHECK2(*cp, ETHER_ADDR_LEN);
-		ND_PRINT((ndo, ", hw_addr %s", etheraddr_string(cp)));
+		ND_PRINT((ndo, ", hw_addr %s", etheraddr_string(ndo, cp)));
 		cp += ETHER_ADDR_LEN;
 		/* name */
 		ND_TCHECK2(*cp, OFP_MAX_PORT_NAME_LEN);
@@ -896,12 +896,12 @@ of10_match_print(netdissect_options *ndo,
 	/* dl_src */
 	ND_TCHECK2(*cp, ETHER_ADDR_LEN);
 	if (! (wildcards & OFPFW_DL_SRC))
-		ND_PRINT((ndo, "%smatch dl_src %s", pfx, etheraddr_string(cp)));
+		ND_PRINT((ndo, "%smatch dl_src %s", pfx, etheraddr_string(ndo, cp)));
 	cp += ETHER_ADDR_LEN;
 	/* dl_dst */
 	ND_TCHECK2(*cp, ETHER_ADDR_LEN);
 	if (! (wildcards & OFPFW_DL_DST))
-		ND_PRINT((ndo, "%smatch dl_dst %s", pfx, etheraddr_string(cp)));
+		ND_PRINT((ndo, "%smatch dl_dst %s", pfx, etheraddr_string(ndo, cp)));
 	cp += ETHER_ADDR_LEN;
 	/* dl_vlan */
 	ND_TCHECK2(*cp, 2);
@@ -943,13 +943,13 @@ of10_match_print(netdissect_options *ndo,
 	ND_TCHECK2(*cp, 4);
 	nw_bits = (wildcards & OFPFW_NW_SRC_MASK) >> OFPFW_NW_SRC_SHIFT;
 	if (nw_bits < 32)
-		ND_PRINT((ndo, "%smatch nw_src %s/%u", pfx, ipaddr_string(cp), 32 - nw_bits));
+		ND_PRINT((ndo, "%smatch nw_src %s/%u", pfx, ipaddr_string(ndo, cp), 32 - nw_bits));
 	cp += 4;
 	/* nw_dst */
 	ND_TCHECK2(*cp, 4);
 	nw_bits = (wildcards & OFPFW_NW_DST_MASK) >> OFPFW_NW_DST_SHIFT;
 	if (nw_bits < 32)
-		ND_PRINT((ndo, "%smatch nw_dst %s/%u", pfx, ipaddr_string(cp), 32 - nw_bits));
+		ND_PRINT((ndo, "%smatch nw_dst %s/%u", pfx, ipaddr_string(ndo, cp), 32 - nw_bits));
 	cp += 4;
 	/* tp_src */
 	ND_TCHECK2(*cp, 2);
@@ -1072,7 +1072,7 @@ of10_actions_print(netdissect_options *ndo,
 		case OFPAT_SET_DL_DST:
 			/* dl_addr */
 			ND_TCHECK2(*cp, ETHER_ADDR_LEN);
-			ND_PRINT((ndo, ", dl_addr %s", etheraddr_string(cp)));
+			ND_PRINT((ndo, ", dl_addr %s", etheraddr_string(ndo, cp)));
 			cp += ETHER_ADDR_LEN;
 			/* pad */
 			ND_TCHECK2(*cp, 6);
@@ -1082,7 +1082,7 @@ of10_actions_print(netdissect_options *ndo,
 		case OFPAT_SET_NW_DST:
 			/* nw_addr */
 			ND_TCHECK2(*cp, 4);
-			ND_PRINT((ndo, ", nw_addr %s", ipaddr_string(cp)));
+			ND_PRINT((ndo, ", nw_addr %s", ipaddr_string(ndo, cp)));
 			cp += 4;
 			break;
 		case OFPAT_SET_NW_TOS:
@@ -1245,7 +1245,7 @@ of10_port_mod_print(netdissect_options *ndo,
 	cp += 2;
 	/* hw_addr */
 	ND_TCHECK2(*cp, ETHER_ADDR_LEN);
-	ND_PRINT((ndo, ", hw_addr %s", etheraddr_string(cp)));
+	ND_PRINT((ndo, ", hw_addr %s", etheraddr_string(ndo, cp)));
 	cp += ETHER_ADDR_LEN;
 	/* config */
 	ND_TCHECK2(*cp, 4);

@@ -884,7 +884,7 @@ trunc:
 /*
  * returns false if we run out of data buffer
  */
-static int ike_show_somedata(struct netdissect_options *ndo,
+static int ike_show_somedata(netdissect_options *ndo,
 			     const u_char *cp, const u_char *ep)
 {
 	/* there is too much data, just show some of it */
@@ -1388,7 +1388,7 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 			if (len < 4)
 				ND_PRINT((ndo," len=%d [bad: < 4]", len));
 			else
-				ND_PRINT((ndo," len=%d %s", len, ipaddr_string(data)));
+				ND_PRINT((ndo," len=%d %s", len, ipaddr_string(ndo, data)));
 			len = 0;
 			break;
 		case IPSECDOI_ID_FQDN:
@@ -1409,7 +1409,7 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 			else {
 				mask = data + sizeof(struct in_addr);
 				ND_PRINT((ndo," len=%d %s/%u.%u.%u.%u", len,
-					  ipaddr_string(data),
+					  ipaddr_string(ndo, data),
 					  mask[0], mask[1], mask[2], mask[3]));
 			}
 			len = 0;
@@ -1420,7 +1420,7 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 			if (len < 16)
 				ND_PRINT((ndo," len=%d [bad: < 16]", len));
 			else
-				ND_PRINT((ndo," len=%d %s", len, ip6addr_string(data)));
+				ND_PRINT((ndo," len=%d %s", len, ip6addr_string(ndo, data)));
 			len = 0;
 			break;
 		case IPSECDOI_ID_IPV6_ADDR_SUBNET:
@@ -1432,7 +1432,7 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 				mask = (u_char *)(data + sizeof(struct in6_addr));
 				/*XXX*/
 				ND_PRINT((ndo," len=%d %s/0x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x", len,
-					  ip6addr_string(data),
+					  ip6addr_string(ndo, data),
 					  mask[0], mask[1], mask[2], mask[3],
 					  mask[4], mask[5], mask[6], mask[7],
 					  mask[8], mask[9], mask[10], mask[11],
@@ -1447,8 +1447,8 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 				ND_PRINT((ndo," len=%d [bad: < 8]", len));
 			else {
 				ND_PRINT((ndo," len=%d %s-%s", len,
-					  ipaddr_string(data),
-					  ipaddr_string(data + sizeof(struct in_addr))));
+					  ipaddr_string(ndo, data),
+					  ipaddr_string(ndo, data + sizeof(struct in_addr))));
 			}
 			len = 0;
 			break;
@@ -1458,8 +1458,8 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 				ND_PRINT((ndo," len=%d [bad: < 32]", len));
 			else {
 				ND_PRINT((ndo," len=%d %s-%s", len,
-					  ip6addr_string(data),
-					  ip6addr_string(data + sizeof(struct in6_addr))));
+					  ip6addr_string(ndo, data),
+					  ip6addr_string(ndo, data + sizeof(struct in6_addr))));
 			}
 			len = 0;
 			break;

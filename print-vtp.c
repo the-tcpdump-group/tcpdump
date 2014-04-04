@@ -179,7 +179,7 @@ vtp_print (netdissect_options *ndo,
 
 	ND_PRINT((ndo, "\n\t  Config Rev %x, Updater %s",
 	       EXTRACT_32BITS(tptr),
-	       ipaddr_string(tptr+4)));
+	       ipaddr_string(ndo, tptr+4)));
 	tptr += 8;
 	ND_PRINT((ndo, ", Timestamp 0x%08x 0x%08x 0x%08x",
 	       EXTRACT_32BITS(tptr),

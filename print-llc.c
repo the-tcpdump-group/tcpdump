@@ -312,8 +312,8 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 				ND_PRINT((ndo, "%s ", tok2str(llc_values, "Unknown DSAP 0x%02x", dsap)));
 			else
 				ND_PRINT((ndo, "%s > %s %s ",
-						etheraddr_string(esrc),
-						etheraddr_string(edst),
+						etheraddr_string(ndo, esrc),
+						etheraddr_string(ndo, edst),
 						tok2str(llc_values, "Unknown DSAP 0x%02x", dsap)));
 		} else {
 			if (esrc == NULL || edst == NULL)
@@ -322,9 +322,9 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 					tok2str(llc_values, "Unknown DSAP 0x%02x", dsap)));
 			else
 				ND_PRINT((ndo, "%s %s > %s %s ",
-					etheraddr_string(esrc),
+					etheraddr_string(ndo, esrc),
                                         tok2str(llc_values, "Unknown SSAP 0x%02x", ssap),
-					etheraddr_string(edst),
+					etheraddr_string(ndo, edst),
 					tok2str(llc_values, "Unknown DSAP 0x%02x", dsap)));
 		}
 	}

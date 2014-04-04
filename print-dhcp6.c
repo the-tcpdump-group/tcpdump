@@ -417,7 +417,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (u_char *)(dh6o + 1);
-			ND_PRINT((ndo, " %s", ip6addr_string(&tp[0])));
+			ND_PRINT((ndo, " %s", ip6addr_string(ndo, &tp[0])));
 			ND_PRINT((ndo, " pltime:%u vltime:%u",
 			    EXTRACT_32BITS(&tp[16]),
 			    EXTRACT_32BITS(&tp[20])));
@@ -599,7 +599,7 @@ dhcp6opt_print(netdissect_options *ndo,
 			}
 			tp = (u_char *)(dh6o + 1);
 			for (i = 0; i < optlen; i += 16)
-				ND_PRINT((ndo, " %s", ip6addr_string(&tp[i])));
+				ND_PRINT((ndo, " %s", ip6addr_string(ndo, &tp[i])));
 			ND_PRINT((ndo, ")"));
 			break;
 		case DH6OPT_SIP_SERVER_D:
@@ -656,7 +656,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (u_char *)(dh6o + 1);
-			ND_PRINT((ndo, " %s/%d", ip6addr_string(&tp[9]), tp[8]));
+			ND_PRINT((ndo, " %s/%d", ip6addr_string(ndo, &tp[9]), tp[8]));
 			ND_PRINT((ndo, " pltime:%u vltime:%u",
 			    EXTRACT_32BITS(&tp[0]),
 			    EXTRACT_32BITS(&tp[4])));
@@ -706,7 +706,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				ND_PRINT((ndo, " type_%d", (int)*tp));
 				break;
 			}
-			ND_PRINT((ndo, " %s", ip6addr_string(&tp[1])));
+			ND_PRINT((ndo, " %s", ip6addr_string(ndo, &tp[1])));
 			if (optlen > 17) {
 				/* there are query-options */
 				dhcp6opt_print(ndo, tp + 17, tp + optlen);
@@ -727,7 +727,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (u_char *)(dh6o + 1);
-			ND_PRINT((ndo, " %s ", ip6addr_string(&tp[0])));
+			ND_PRINT((ndo, " %s ", ip6addr_string(ndo, &tp[0])));
 			/*
 			 * Print hex dump first 10 characters.
 			 */
@@ -756,7 +756,7 @@ dhcp6opt_print(netdissect_options *ndo,
 						ND_PRINT((ndo, " ?"));
 						break;
 					}
-					ND_PRINT((ndo, " %s", ip6addr_string(&tp[0])));
+					ND_PRINT((ndo, " %s", ip6addr_string(ndo, &tp[0])));
 					break;
 				case DH6OPT_NTP_SUBOPTION_SRV_FQDN:
 					ND_PRINT((ndo, " "));
@@ -907,10 +907,10 @@ dhcp6_print(netdissect_options *ndo,
 		ND_TCHECK(dh6relay->dh6relay_peeraddr);
 
 		memcpy(&addr6, dh6relay->dh6relay_linkaddr, sizeof (addr6));
-		ND_PRINT((ndo, "linkaddr=%s", ip6addr_string(&addr6)));
+		ND_PRINT((ndo, "linkaddr=%s", ip6addr_string(ndo, &addr6)));
 
 		memcpy(&addr6, dh6relay->dh6relay_peeraddr, sizeof (addr6));
-		ND_PRINT((ndo, " peeraddr=%s", ip6addr_string(&addr6)));
+		ND_PRINT((ndo, " peeraddr=%s", ip6addr_string(ndo, &addr6)));
 
 		dhcp6opt_print(ndo, (u_char *)(dh6relay + 1), ep);
 	}

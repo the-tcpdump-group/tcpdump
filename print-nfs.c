@@ -170,15 +170,15 @@ print_nfsaddr(netdissect_options *ndo,
 	switch (IP_V((struct ip *)bp)) {
 	case 4:
 		ip = (struct ip *)bp;
-		strlcpy(srcaddr, ipaddr_string(&ip->ip_src), sizeof(srcaddr));
-		strlcpy(dstaddr, ipaddr_string(&ip->ip_dst), sizeof(dstaddr));
+		strlcpy(srcaddr, ipaddr_string(ndo, &ip->ip_src), sizeof(srcaddr));
+		strlcpy(dstaddr, ipaddr_string(ndo, &ip->ip_dst), sizeof(dstaddr));
 		break;
 #ifdef INET6
 	case 6:
 		ip6 = (struct ip6_hdr *)bp;
-		strlcpy(srcaddr, ip6addr_string(&ip6->ip6_src),
+		strlcpy(srcaddr, ip6addr_string(ndo, &ip6->ip6_src),
 		    sizeof(srcaddr));
-		strlcpy(dstaddr, ip6addr_string(&ip6->ip6_dst),
+		strlcpy(dstaddr, ip6addr_string(ndo, &ip6->ip6_dst),
 		    sizeof(dstaddr));
 		break;
 #endif

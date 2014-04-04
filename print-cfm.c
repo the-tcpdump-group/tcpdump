@@ -247,12 +247,12 @@ cfm_mgmt_addr_print(netdissect_options *ndo,
      */
     switch(mgmt_addr_type) {
     case AFNUM_INET:
-        ND_PRINT((ndo, ", %s", ipaddr_string(tptr + 1)));
+        ND_PRINT((ndo, ", %s", ipaddr_string(ndo, tptr + 1)));
         break;
 
 #ifdef INET6
     case AFNUM_INET6:
-        ND_PRINT((ndo, ", %s", ip6addr_string(tptr + 1)));
+        ND_PRINT((ndo, ", %s", ip6addr_string(ndo, tptr + 1)));
         break;
 #endif
 
@@ -268,13 +268,13 @@ cfm_mgmt_addr_print(netdissect_options *ndo,
  * The egress-ID string is a 16-Bit string plus a MAC address.
  */
 static const char *
-cfm_egress_id_string(register const u_char *tptr) {
+cfm_egress_id_string(netdissect_options *ndo, register const u_char *tptr) {
     static char egress_id_buffer[80];
 
     snprintf(egress_id_buffer, sizeof(egress_id_buffer),
              "MAC 0x%4x-%s",
              EXTRACT_16BITS(tptr),
-             etheraddr_string(tptr+2));
+             etheraddr_string(ndo, tptr+2));
 
     return egress_id_buffer;
 }
@@ -371,7 +371,7 @@ cfm_print(netdissect_options *ndo,
                 break;
 
             case CFM_CCM_MD_FORMAT_MAC:
-                ND_PRINT((ndo, "\n\t  MAC %s", etheraddr_string(
+                ND_PRINT((ndo, "\n\t  MAC %s", etheraddr_string(ndo, 
                            msg_ptr.cfm_ccm->md_name)));
                 break;
 
@@ -421,12 +421,12 @@ cfm_print(netdissect_options *ndo,
 
         ND_PRINT((ndo, "\n\t  Transaction-ID 0x%08x, Egress-ID %s, ttl %u",
                EXTRACT_32BITS(msg_ptr.cfm_ltm->transaction_id),
-               cfm_egress_id_string(msg_ptr.cfm_ltm->egress_id),
+               cfm_egress_id_string(ndo, msg_ptr.cfm_ltm->egress_id),
                msg_ptr.cfm_ltm->ttl));
 
         ND_PRINT((ndo, "\n\t  Original-MAC %s, Target-MAC %s",
-               etheraddr_string(msg_ptr.cfm_ltm->original_mac),
-               etheraddr_string(msg_ptr.cfm_ltm->target_mac)));
+               etheraddr_string(ndo, msg_ptr.cfm_ltm->original_mac),
+               etheraddr_string(ndo, msg_ptr.cfm_ltm->target_mac)));
         break;
 
     case CFM_OPCODE_LTR:
@@ -437,10 +437,10 @@ cfm_print(netdissect_options *ndo,
 
         ND_PRINT((ndo, "\n\t  Transaction-ID 0x%08x, Last-Egress-ID %s",
                EXTRACT_32BITS(msg_ptr.cfm_ltr->transaction_id),
-               cfm_egress_id_string(msg_ptr.cfm_ltr->last_egress_id)));
+               cfm_egress_id_string(ndo, msg_ptr.cfm_ltr->last_egress_id)));
 
         ND_PRINT((ndo, "\n\t  Next-Egress-ID %s, ttl %u",
-               cfm_egress_id_string(msg_ptr.cfm_ltr->next_egress_id),
+               cfm_egress_id_string(ndo, msg_ptr.cfm_ltr->next_egress_id),
                msg_ptr.cfm_ltr->ttl));
 
         ND_PRINT((ndo, "\n\t  Replay-Action %s (%u)",
@@ -565,7 +565,7 @@ cfm_print(netdissect_options *ndo,
 
                 switch (chassis_id_type) {
                 case CFM_CHASSIS_ID_MAC_ADDRESS:
-                    ND_PRINT((ndo, "\n\t  MAC %s", etheraddr_string(tptr + 1)));
+                    ND_PRINT((ndo, "\n\t  MAC %s", etheraddr_string(ndo, tptr + 1)));
                     break;
 
                 case CFM_CHASSIS_ID_NETWORK_ADDRESS:

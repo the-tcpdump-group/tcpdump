@@ -172,7 +172,7 @@ vqp_print(netdissect_options *ndo, register const u_char *pptr, register u_int l
 
         switch(vqp_obj_type) {
 	case VQP_OBJ_IP_ADDRESS:
-            ND_PRINT((ndo, "%s (0x%08x)", ipaddr_string(tptr), EXTRACT_32BITS(tptr)));
+            ND_PRINT((ndo, "%s (0x%08x)", ipaddr_string(ndo, tptr), EXTRACT_32BITS(tptr)));
             break;
             /* those objects have similar semantics - fall through */
         case VQP_OBJ_PORT_NAME:
@@ -184,7 +184,7 @@ vqp_print(netdissect_options *ndo, register const u_char *pptr, register u_int l
             /* those objects have similar semantics - fall through */
 	case VQP_OBJ_MAC_ADDRESS:
 	case VQP_OBJ_MAC_NULL:
-	      ND_PRINT((ndo, "%s", etheraddr_string(tptr)));
+	      ND_PRINT((ndo, "%s", etheraddr_string(ndo, tptr)));
               break;
         default:
             if (ndo->ndo_vflag <= 1)

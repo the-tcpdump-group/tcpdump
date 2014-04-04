@@ -591,7 +591,7 @@ decnet_print(netdissect_options *ndo,
 	}
 
 	ND_PRINT((ndo, "%s > %s %d ",
-			dnaddr_string(src), dnaddr_string(dst), pktlen));
+			dnaddr_string(ndo, src), dnaddr_string(ndo, dst), pktlen));
 	if (ndo->ndo_vflag) {
 	    if (mflags & RMF_RQR)
 		ND_PRINT((ndo, "RQR "));
@@ -640,7 +640,7 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 	    print_t_info(ndo, info);
 	    ND_PRINT((ndo,
 		"src %sblksize %d vers %d eco %d ueco %d hello %d",
-			dnaddr_string(src), blksize, vers, eco, ueco,
+			dnaddr_string(ndo, src), blksize, vers, eco, ueco,
 			hello));
 	    ret = 1;
 	    break;
@@ -651,7 +651,7 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 	    ND_TCHECK(cmp->cm_ver);
 	    src = EXTRACT_LE_16BITS(cmp->cm_ver.ve_src);
 	    other = EXTRACT_LE_8BITS(cmp->cm_ver.ve_fcnval);
-	    ND_PRINT((ndo, "src %s fcnval %o", dnaddr_string(src), other));
+	    ND_PRINT((ndo, "src %s fcnval %o", dnaddr_string(ndo, src), other));
 	    ret = 1;
 	    break;
 	case RMF_TEST:
@@ -661,7 +661,7 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 	    ND_TCHECK(cmp->cm_test);
 	    src = EXTRACT_LE_16BITS(cmp->cm_test.te_src);
 	    other = EXTRACT_LE_8BITS(cmp->cm_test.te_data);
-	    ND_PRINT((ndo, "src %s data %o", dnaddr_string(src), other));
+	    ND_PRINT((ndo, "src %s data %o", dnaddr_string(ndo, src), other));
 	    ret = 1;
 	    break;
 	case RMF_L1ROUT:
@@ -670,7 +670,7 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 		goto trunc;
 	    ND_TCHECK(cmp->cm_l1rou);
 	    src = EXTRACT_LE_16BITS(cmp->cm_l1rou.r1_src);
-	    ND_PRINT((ndo, "src %s ", dnaddr_string(src)));
+	    ND_PRINT((ndo, "src %s ", dnaddr_string(ndo, src)));
 	    ret = print_l1_routes(ndo, &(rhpx[sizeof(struct l1rout)]),
 				length - sizeof(struct l1rout));
 	    break;
@@ -680,7 +680,7 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 		goto trunc;
 	    ND_TCHECK(cmp->cm_l2rout);
 	    src = EXTRACT_LE_16BITS(cmp->cm_l2rout.r2_src);
-	    ND_PRINT((ndo, "src %s ", dnaddr_string(src)));
+	    ND_PRINT((ndo, "src %s ", dnaddr_string(ndo, src)));
 	    ret = print_l2_routes(ndo, &(rhpx[sizeof(struct l2rout)]),
 				length - sizeof(struct l2rout));
 	    break;
@@ -702,7 +702,7 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 	    print_i_info(ndo, info);
 	    ND_PRINT((ndo,
 	    "vers %d eco %d ueco %d src %s blksize %d pri %d hello %d",
-			vers, eco, ueco, dnaddr_string(src),
+			vers, eco, ueco, dnaddr_string(ndo, src),
 			blksize, priority, hello));
 	    ret = print_elist(&(rhpx[sizeof(struct rhellomsg)]),
 				length - sizeof(struct rhellomsg));
@@ -729,8 +729,8 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 	    print_i_info(ndo, info);
 	    ND_PRINT((ndo,
 	"vers %d eco %d ueco %d src %s blksize %d rtr %s hello %d data %o",
-			vers, eco, ueco, dnaddr_string(src),
-			blksize, dnaddr_string(dst), hello, other));
+			vers, eco, ueco, dnaddr_string(ndo, src),
+			blksize, dnaddr_string(ndo, dst), hello, other));
 	    ret = 1;
 	    break;
 

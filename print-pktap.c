@@ -66,7 +66,7 @@ typedef struct pktap_header {
 #define PKT_REC_PACKET	1	/* a packet follows the header */
 
 static inline void
-pktap_header_print(struct netdissect_options *ndo, const u_char *bp, u_int length)
+pktap_header_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	const pktap_header_t *hdr;
 	uint32_t dlt, hdrlen;
@@ -92,7 +92,7 @@ pktap_header_print(struct netdissect_options *ndo, const u_char *bp, u_int lengt
  * is the number of bytes actually captured.
  */
 u_int
-pktap_if_print(struct netdissect_options *ndo,
+pktap_if_print(netdissect_options *ndo,
                const struct pcap_pkthdr *h, const u_char *p)
 {
 	uint32_t dlt, hdrlen, rectype;

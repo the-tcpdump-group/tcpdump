@@ -303,14 +303,14 @@ void dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 #ifdef INET6
 	if (ip6) {
 		ND_PRINT((ndo, "%s.%d > %s.%d: ",
-			     ip6addr_string(&ip6->ip6_src), sport,
-			     ip6addr_string(&ip6->ip6_dst), dport));
+			     ip6addr_string(ndo, &ip6->ip6_src), sport,
+			     ip6addr_string(ndo, &ip6->ip6_dst), dport));
 	} else
 #endif /*INET6*/
 	{
 		ND_PRINT((ndo, "%s.%d > %s.%d: ",
-			     ipaddr_string(&ip->ip_src), sport,
-			     ipaddr_string(&ip->ip_dst), dport));
+			     ipaddr_string(ndo, &ip->ip_src), sport,
+			     ipaddr_string(ndo, &ip->ip_dst), dport));
 	}
 
 	if (ndo->ndo_qflag) {

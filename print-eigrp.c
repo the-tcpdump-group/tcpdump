@@ -328,12 +328,12 @@ eigrp_print(netdissect_options *ndo, register const u_char *pptr, register u_int
             memcpy(prefix,&tlv_ptr.eigrp_tlv_ip_int->destination,byte_length);
 
             ND_PRINT((ndo, "\n\t    IPv4 prefix: %15s/%u, nexthop: ",
-                   ipaddr_string(prefix),
+                   ipaddr_string(ndo, prefix),
                    bit_length));
             if (EXTRACT_32BITS(&tlv_ptr.eigrp_tlv_ip_int->nexthop) == 0)
                 ND_PRINT((ndo, "self"));
             else
-                ND_PRINT((ndo, "%s",ipaddr_string(&tlv_ptr.eigrp_tlv_ip_int->nexthop)));
+                ND_PRINT((ndo, "%s",ipaddr_string(ndo, &tlv_ptr.eigrp_tlv_ip_int->nexthop)));
 
             ND_PRINT((ndo, "\n\t      delay %u ms, bandwidth %u Kbps, mtu %u, hop %u, reliability %u, load %u",
                    (EXTRACT_32BITS(&tlv_ptr.eigrp_tlv_ip_int->delay)/100),
@@ -357,15 +357,15 @@ eigrp_print(netdissect_options *ndo, register const u_char *pptr, register u_int
             memcpy(prefix,&tlv_ptr.eigrp_tlv_ip_ext->destination,byte_length);
 
             ND_PRINT((ndo, "\n\t    IPv4 prefix: %15s/%u, nexthop: ",
-                   ipaddr_string(prefix),
+                   ipaddr_string(ndo, prefix),
                    bit_length));
             if (EXTRACT_32BITS(&tlv_ptr.eigrp_tlv_ip_ext->nexthop) == 0)
                 ND_PRINT((ndo, "self"));
             else
-                ND_PRINT((ndo, "%s",ipaddr_string(&tlv_ptr.eigrp_tlv_ip_ext->nexthop)));
+                ND_PRINT((ndo, "%s",ipaddr_string(ndo, &tlv_ptr.eigrp_tlv_ip_ext->nexthop)));
 
             ND_PRINT((ndo, "\n\t      origin-router %s, origin-as %u, origin-proto %s, flags [0x%02x], tag 0x%08x, metric %u",
-                   ipaddr_string(tlv_ptr.eigrp_tlv_ip_ext->origin_router),
+                   ipaddr_string(ndo, tlv_ptr.eigrp_tlv_ip_ext->origin_router),
                    EXTRACT_32BITS(tlv_ptr.eigrp_tlv_ip_ext->origin_as),
                    tok2str(eigrp_ext_proto_id_values,"unknown",tlv_ptr.eigrp_tlv_ip_ext->proto_id),
                    tlv_ptr.eigrp_tlv_ip_ext->flags,

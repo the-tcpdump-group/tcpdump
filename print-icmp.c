@@ -371,7 +371,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			ND_TCHECK(dp->icmp_ip.ip_p);
 			(void)snprintf(buf, sizeof(buf),
 			    "%s protocol %d unreachable",
-			    ipaddr_string(&dp->icmp_ip.ip_dst),
+			    ipaddr_string(ndo, &dp->icmp_ip.ip_dst),
 			    dp->icmp_ip.ip_p);
 			break;
 
@@ -387,21 +387,21 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			case IPPROTO_TCP:
 				(void)snprintf(buf, sizeof(buf),
 					"%s tcp port %s unreachable",
-					ipaddr_string(&oip->ip_dst),
+					ipaddr_string(ndo, &oip->ip_dst),
 					tcpport_string(dport));
 				break;
 
 			case IPPROTO_UDP:
 				(void)snprintf(buf, sizeof(buf),
 					"%s udp port %s unreachable",
-					ipaddr_string(&oip->ip_dst),
+					ipaddr_string(ndo, &oip->ip_dst),
 					udpport_string(dport));
 				break;
 
 			default:
 				(void)snprintf(buf, sizeof(buf),
 					"%s protocol %d port %d unreachable",
-					ipaddr_string(&oip->ip_dst),
+					ipaddr_string(ndo, &oip->ip_dst),
 					oip->ip_p, dport);
 				break;
 			}
@@ -415,11 +415,11 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			if (mtu) {
 				(void)snprintf(buf, sizeof(buf),
 				    "%s unreachable - need to frag (mtu %d)",
-				    ipaddr_string(&dp->icmp_ip.ip_dst), mtu);
+				    ipaddr_string(ndo, &dp->icmp_ip.ip_dst), mtu);
 			} else {
 				(void)snprintf(buf, sizeof(buf),
 				    "%s unreachable - need to frag",
-				    ipaddr_string(&dp->icmp_ip.ip_dst));
+				    ipaddr_string(ndo, &dp->icmp_ip.ip_dst));
 			}
 		    }
 			break;
@@ -428,7 +428,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			fmt = tok2str(unreach2str, "#%d %%s unreachable",
 			    dp->icmp_code);
 			(void)snprintf(buf, sizeof(buf), fmt,
-			    ipaddr_string(&dp->icmp_ip.ip_dst));
+			    ipaddr_string(ndo, &dp->icmp_ip.ip_dst));
 			break;
 		}
 		break;
@@ -438,8 +438,8 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		fmt = tok2str(type2str, "redirect-#%d %%s to net %%s",
 		    dp->icmp_code);
 		(void)snprintf(buf, sizeof(buf), fmt,
-		    ipaddr_string(&dp->icmp_ip.ip_dst),
-		    ipaddr_string(&dp->icmp_gwaddr));
+		    ipaddr_string(ndo, &dp->icmp_ip.ip_dst),
+		    ipaddr_string(ndo, &dp->icmp_gwaddr));
 		break;
 
 	case ICMP_ROUTERADVERT:
@@ -485,7 +485,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		while (num-- > 0) {
 			ND_TCHECK(*idp);
 			(void)snprintf(cp, sizeof(buf) - (cp - buf), " {%s %u}",
-			    ipaddr_string(&idp->ird_addr),
+			    ipaddr_string(ndo, &idp->ird_addr),
 			    EXTRACT_32BITS(&idp->ird_pref));
 			cp = buf + strlen(buf);
 			++idp;

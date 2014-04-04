@@ -29,8 +29,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "addrtoname.h"
 #include "interface.h"
+#include "addrtoname.h"
 #include "ethertype.h"
 #include "nlpid.h"
 #include "extract.h"

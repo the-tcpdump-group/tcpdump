@@ -715,7 +715,7 @@ _U_
                     return -1;
                 ND_PRINT((ndo, "%s  IPv4 DestAddress: %s, Protocol ID: 0x%02x",
                        ident,
-                       ipaddr_string(obj_tptr),
+                       ipaddr_string(ndo, obj_tptr),
                        *(obj_tptr + sizeof(struct in_addr))));
                 ND_PRINT((ndo, "%s  Flags: [0x%02x], DestPort %u",
                        ident,
@@ -730,7 +730,7 @@ _U_
                     return -1;
                 ND_PRINT((ndo, "%s  IPv6 DestAddress: %s, Protocol ID: 0x%02x",
                        ident,
-                       ip6addr_string(obj_tptr),
+                       ip6addr_string(ndo, obj_tptr),
                        *(obj_tptr + sizeof(struct in6_addr))));
                 ND_PRINT((ndo, "%s  Flags: [0x%02x], DestPort %u",
                        ident,
@@ -745,9 +745,9 @@ _U_
                     return -1;
                 ND_PRINT((ndo, "%s  IPv6 Tunnel EndPoint: %s, Tunnel ID: 0x%04x, Extended Tunnel ID: %s",
                        ident,
-                       ip6addr_string(obj_tptr),
+                       ip6addr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr+18),
-                       ip6addr_string(obj_tptr + 20)));
+                       ip6addr_string(ndo, obj_tptr + 20)));
                 obj_tlen-=36;
                 obj_tptr+=36;
                 break;
@@ -759,7 +759,7 @@ _U_
                        ident,
                        EXTRACT_32BITS(obj_tptr),
                        EXTRACT_16BITS(obj_tptr+6),
-                       ip6addr_string(obj_tptr + 8)));
+                       ip6addr_string(ndo, obj_tptr + 8)));
                 obj_tlen-=26;
                 obj_tptr+=26;
                 break;
@@ -769,9 +769,9 @@ _U_
                     return -1;
                 ND_PRINT((ndo, "%s  IPv4 P2MP LSP ID: %s, Tunnel ID: 0x%04x, Extended Tunnel ID: %s",
                        ident,
-                       ipaddr_string(obj_tptr),
+                       ipaddr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr+6),
-                       ipaddr_string(obj_tptr + 8)));
+                       ipaddr_string(ndo, obj_tptr + 8)));
                 obj_tlen-=12;
                 obj_tptr+=12;
                 break;
@@ -781,9 +781,9 @@ _U_
                     return -1;
                 ND_PRINT((ndo, "%s  IPv4 Tunnel EndPoint: %s, Tunnel ID: 0x%04x, Extended Tunnel ID: %s",
                        ident,
-                       ipaddr_string(obj_tptr),
+                       ipaddr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr+6),
-                       ipaddr_string(obj_tptr + 8)));
+                       ipaddr_string(ndo, obj_tptr + 8)));
                 obj_tlen-=12;
                 obj_tptr+=12;
                 break;
@@ -799,7 +799,7 @@ _U_
                     return -1;
                 ND_PRINT((ndo, "%s  IPv4 Receiver Address: %s",
                        ident,
-                       ipaddr_string(obj_tptr)));
+                       ipaddr_string(ndo, obj_tptr)));
                 obj_tlen-=sizeof(struct in_addr);
                 obj_tptr+=sizeof(struct in_addr);
                 break;
@@ -809,7 +809,7 @@ _U_
                     return -1;
                 ND_PRINT((ndo, "%s  IPv6 Receiver Address: %s",
                        ident,
-                       ip6addr_string(obj_tptr)));
+                       ip6addr_string(ndo, obj_tptr)));
                 obj_tlen-=sizeof(struct in6_addr);
                 obj_tptr+=sizeof(struct in6_addr);
                 break;
@@ -826,7 +826,7 @@ _U_
                     return -1;
                 ND_PRINT((ndo, "%s  IPv4 Notify Node Address: %s",
                        ident,
-                       ipaddr_string(obj_tptr)));
+                       ipaddr_string(ndo, obj_tptr)));
                 obj_tlen-=sizeof(struct in_addr);
                 obj_tptr+=sizeof(struct in_addr);
                 break;
@@ -836,7 +836,7 @@ _U_
                     return-1;
                 ND_PRINT((ndo, "%s  IPv6 Notify Node Address: %s",
                        ident,
-                       ip6addr_string(obj_tptr)));
+                       ip6addr_string(ndo, obj_tptr)));
                 obj_tlen-=sizeof(struct in6_addr);
                 obj_tptr+=sizeof(struct in6_addr);
                 break;
@@ -910,7 +910,7 @@ _U_
                     return-1;
                 ND_PRINT((ndo, "%s  Source Address: %s, Source Port: %u",
                        ident,
-                       ipaddr_string(obj_tptr),
+                       ipaddr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr + 6)));
                 obj_tlen-=8;
                 obj_tptr+=8;
@@ -921,7 +921,7 @@ _U_
                     return-1;
                 ND_PRINT((ndo, "%s  Source Address: %s, Source Port: %u",
                        ident,
-                       ip6addr_string(obj_tptr),
+                       ip6addr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr + 18)));
                 obj_tlen-=20;
                 obj_tptr+=20;
@@ -932,10 +932,10 @@ _U_
                 ND_PRINT((ndo, "%s  IPv6 Tunnel Sender Address: %s, LSP ID: 0x%04x"
                        "%s  Sub-Group Originator ID: %s, Sub-Group ID: 0x%04x",
                        ident,
-                       ip6addr_string(obj_tptr),
+                       ip6addr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr+18),
                        ident,
-                       ip6addr_string(obj_tptr+20),
+                       ip6addr_string(ndo, obj_tptr+20),
                        EXTRACT_16BITS(obj_tptr + 38)));
                 obj_tlen-=40;
                 obj_tptr+=40;
@@ -946,7 +946,7 @@ _U_
                     return-1;
                 ND_PRINT((ndo, "%s  IPv4 Tunnel Sender Address: %s, LSP-ID: 0x%04x",
                        ident,
-                       ipaddr_string(obj_tptr),
+                       ipaddr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr + 6)));
                 obj_tlen-=8;
                 obj_tptr+=8;
@@ -957,10 +957,10 @@ _U_
                 ND_PRINT((ndo, "%s  IPv4 Tunnel Sender Address: %s, LSP ID: 0x%04x"
                        "%s  Sub-Group Originator ID: %s, Sub-Group ID: 0x%04x",
                        ident,
-                       ipaddr_string(obj_tptr),
+                       ipaddr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr+6),
                        ident,
-                       ipaddr_string(obj_tptr+8),
+                       ipaddr_string(ndo, obj_tptr+8),
                        EXTRACT_16BITS(obj_tptr + 12)));
                 obj_tlen-=16;
                 obj_tptr+=16;
@@ -1068,7 +1068,7 @@ _U_
                     case RSVP_OBJ_XRO_IPV4:
                         ND_PRINT((ndo, ", %s, %s/%u, Flags: [%s]",
                                RSVP_OBJ_XRO_MASK_LOOSE(*obj_tptr) ? "Loose" : "Strict",
-                               ipaddr_string(obj_tptr+2),
+                               ipaddr_string(ndo, obj_tptr+2),
                                *(obj_tptr+6),
                                bittok2str(rsvp_obj_rro_flag_values,
                                    "none",
@@ -1189,14 +1189,14 @@ _U_
                             if (subobj_len < 8)
                                 return -1;
                             ND_PRINT((ndo, "%s    UNI IPv4 TNA address: %s",
-                                   ident, ipaddr_string(obj_tptr + 4)));
+                                   ident, ipaddr_string(ndo, obj_tptr + 4)));
                             break;
 #ifdef INET6
                         case AFNUM_INET6:
                             if (subobj_len < 20)
                                 return -1;
                             ND_PRINT((ndo, "%s    UNI IPv6 TNA address: %s",
-                                   ident, ip6addr_string(obj_tptr + 4)));
+                                   ident, ip6addr_string(ndo, obj_tptr + 4)));
                             break;
 #endif
                         case AFNUM_NSAP:
@@ -1265,7 +1265,7 @@ _U_
                     return-1;
                 ND_PRINT((ndo, "%s  Previous/Next Interface: %s, Logical Interface Handle: 0x%08x",
                        ident,
-                       ipaddr_string(obj_tptr),
+                       ipaddr_string(ndo, obj_tptr),
                        EXTRACT_32BITS(obj_tptr + 4)));
                 obj_tlen-=8;
                 obj_tptr+=8;
@@ -1279,7 +1279,7 @@ _U_
                     return-1;
                 ND_PRINT((ndo, "%s  Previous/Next Interface: %s, Logical Interface Handle: 0x%08x",
                        ident,
-                       ip6addr_string(obj_tptr),
+                       ip6addr_string(ndo, obj_tptr),
                        EXTRACT_32BITS(obj_tptr + 16)));
                 obj_tlen-=20;
                 obj_tptr+=20;
@@ -1356,7 +1356,7 @@ _U_
                     return-1;
                 ND_PRINT((ndo, "%s  Source Address: %s, Source Port: %u",
                        ident,
-                       ipaddr_string(obj_tptr),
+                       ipaddr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr + 6)));
                 obj_tlen-=8;
                 obj_tptr+=8;
@@ -1367,7 +1367,7 @@ _U_
                     return-1;
                 ND_PRINT((ndo, "%s  Source Address: %s, Source Port: %u",
                        ident,
-                       ip6addr_string(obj_tptr),
+                       ip6addr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr + 18)));
                 obj_tlen-=20;
                 obj_tptr+=20;
@@ -1377,7 +1377,7 @@ _U_
                     return-1;
                 ND_PRINT((ndo, "%s  Source Address: %s, Flow Label: %u",
                        ident,
-                       ip6addr_string(obj_tptr),
+                       ip6addr_string(ndo, obj_tptr),
                        EXTRACT_24BITS(obj_tptr + 17)));
                 obj_tlen-=20;
                 obj_tptr+=20;
@@ -1387,7 +1387,7 @@ _U_
                     return-1;
                 ND_PRINT((ndo, "%s  Source Address: %s, LSP-ID: 0x%04x",
                        ident,
-                       ipaddr_string(obj_tptr),
+                       ipaddr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr + 18)));
                 obj_tlen-=20;
                 obj_tptr+=20;
@@ -1398,10 +1398,10 @@ _U_
                 ND_PRINT((ndo, "%s  IPv6 Tunnel Sender Address: %s, LSP ID: 0x%04x"
                        "%s  Sub-Group Originator ID: %s, Sub-Group ID: 0x%04x",
                        ident,
-                       ip6addr_string(obj_tptr),
+                       ip6addr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr+18),
                        ident,
-                       ip6addr_string(obj_tptr+20),
+                       ip6addr_string(ndo, obj_tptr+20),
                        EXTRACT_16BITS(obj_tptr + 38)));
                 obj_tlen-=40;
                 obj_tptr+=40;
@@ -1412,7 +1412,7 @@ _U_
                     return-1;
                 ND_PRINT((ndo, "%s  Source Address: %s, LSP-ID: 0x%04x",
                        ident,
-                       ipaddr_string(obj_tptr),
+                       ipaddr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr + 6)));
                 obj_tlen-=8;
                 obj_tptr+=8;
@@ -1423,10 +1423,10 @@ _U_
                 ND_PRINT((ndo, "%s  IPv4 Tunnel Sender Address: %s, LSP ID: 0x%04x"
                        "%s  Sub-Group Originator ID: %s, Sub-Group ID: 0x%04x",
                        ident,
-                       ipaddr_string(obj_tptr),
+                       ipaddr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr+6),
                        ident,
-                       ipaddr_string(obj_tptr+8),
+                       ipaddr_string(ndo, obj_tptr+8),
                        EXTRACT_16BITS(obj_tptr + 12)));
                 obj_tlen-=16;
                 obj_tptr+=16;
@@ -1488,8 +1488,8 @@ _U_
                 while(obj_tlen >= 8) {
                     ND_PRINT((ndo, "%s  PLR-ID: %s, Avoid-Node-ID: %s",
                            ident,
-                           ipaddr_string(obj_tptr),
-                           ipaddr_string(obj_tptr + 4)));
+                           ipaddr_string(ndo, obj_tptr),
+                           ipaddr_string(ndo, obj_tptr + 4)));
                     obj_tlen-=8;
                     obj_tptr+=8;
                 }
@@ -1524,7 +1524,7 @@ _U_
                 error_value=EXTRACT_16BITS(obj_tptr+6);
                 ND_PRINT((ndo, "%s  Error Node Address: %s, Flags: [0x%02x]%s  Error Code: %s (%u)",
                        ident,
-                       ipaddr_string(obj_tptr),
+                       ipaddr_string(ndo, obj_tptr),
                        *(obj_tptr+4),
                        ident,
                        tok2str(rsvp_obj_error_code_values,"unknown",error_code),
@@ -1557,7 +1557,7 @@ _U_
                 error_value=EXTRACT_16BITS(obj_tptr+18);
                 ND_PRINT((ndo, "%s  Error Node Address: %s, Flags: [0x%02x]%s  Error Code: %s (%u)",
                        ident,
-                       ip6addr_string(obj_tptr),
+                       ip6addr_string(ndo, obj_tptr),
                        *(obj_tptr+16),
                        ident,
                        tok2str(rsvp_obj_error_code_values,"unknown",error_code),
@@ -1746,7 +1746,7 @@ _U_
                 if (obj_tlen < 4)
                     return-1;
                 ND_PRINT((ndo, "%s  Sub-LSP destination address: %s",
-                       ident, ipaddr_string(obj_tptr)));
+                       ident, ipaddr_string(ndo, obj_tptr)));
 
                 obj_tlen-=4;
                 obj_tptr+=4;
@@ -1756,7 +1756,7 @@ _U_
                 if (obj_tlen < 16)
                     return-1;
                 ND_PRINT((ndo, "%s  Sub-LSP destination address: %s",
-                       ident, ip6addr_string(obj_tptr)));
+                       ident, ip6addr_string(ndo, obj_tptr)));
 
                 obj_tlen-=16;
                 obj_tptr+=16;

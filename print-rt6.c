@@ -80,7 +80,7 @@ rt6_print(netdissect_options *ndo, register const u_char *bp, const u_char *bp2 
 			if ((u_char *)(addr + 1) > ep)
 				goto trunc;
 
-			ND_PRINT((ndo, ", [%d]%s", i, ip6addr_string(addr)));
+			ND_PRINT((ndo, ", [%d]%s", i, ip6addr_string(ndo, addr)));
 			addr++;
 		}
 		/*(*/

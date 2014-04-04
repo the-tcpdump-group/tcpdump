@@ -276,12 +276,12 @@ ldp_tlv_print(netdissect_options *ndo,
 
     case LDP_TLV_IPV4_TRANSPORT_ADDR:
         TLV_TCHECK(4);
-        ND_PRINT((ndo, "\n\t      IPv4 Transport Address: %s", ipaddr_string(tptr)));
+        ND_PRINT((ndo, "\n\t      IPv4 Transport Address: %s", ipaddr_string(ndo, tptr)));
         break;
 #ifdef INET6
     case LDP_TLV_IPV6_TRANSPORT_ADDR:
         TLV_TCHECK(16);
-        ND_PRINT((ndo, "\n\t      IPv6 Transport Address: %s", ip6addr_string(tptr)));
+        ND_PRINT((ndo, "\n\t      IPv6 Transport Address: %s", ip6addr_string(ndo, tptr)));
         break;
 #endif
     case LDP_TLV_CONFIG_SEQ_NUMBER:
@@ -300,7 +300,7 @@ ldp_tlv_print(netdissect_options *ndo,
         case AFNUM_INET:
 	    while(tlv_tlen >= sizeof(struct in_addr)) {
 		ND_TCHECK2(*tptr, sizeof(struct in_addr));
-		ND_PRINT((ndo, " %s", ipaddr_string(tptr)));
+		ND_PRINT((ndo, " %s", ipaddr_string(ndo, tptr)));
 		tlv_tlen-=sizeof(struct in_addr);
 		tptr+=sizeof(struct in_addr);
 	    }
@@ -309,7 +309,7 @@ ldp_tlv_print(netdissect_options *ndo,
         case AFNUM_INET6:
 	    while(tlv_tlen >= sizeof(struct in6_addr)) {
 		ND_TCHECK2(*tptr, sizeof(struct in6_addr));
-		ND_PRINT((ndo, " %s", ip6addr_string(tptr)));
+		ND_PRINT((ndo, " %s", ip6addr_string(ndo, tptr)));
 		tlv_tlen-=sizeof(struct in6_addr);
 		tptr+=sizeof(struct in6_addr);
 	    }
@@ -577,7 +577,7 @@ ldp_msg_print(netdissect_options *ndo,
     pdu_len = EXTRACT_16BITS(&ldp_com_header->pdu_length);
     ND_PRINT((ndo, "%sLDP, Label-Space-ID: %s:%u, pdu-length: %u",
            (ndo->ndo_vflag < 1) ? "" : "\n\t",
-           ipaddr_string(&ldp_com_header->lsr_id),
+           ipaddr_string(ndo, &ldp_com_header->lsr_id),
            EXTRACT_16BITS(&ldp_com_header->label_space),
            pdu_len));
 

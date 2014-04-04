@@ -304,13 +304,13 @@ udpipaddr_print(netdissect_options *ndo, const struct ip *ip, int sport, int dpo
 		if (ip6->ip6_nxt == IPPROTO_UDP) {
 			if (sport == -1) {
 				ND_PRINT((ndo, "%s > %s: ",
-					ip6addr_string(&ip6->ip6_src),
-					ip6addr_string(&ip6->ip6_dst)));
+					ip6addr_string(ndo, &ip6->ip6_src),
+					ip6addr_string(ndo, &ip6->ip6_dst)));
 			} else {
 				ND_PRINT((ndo, "%s.%s > %s.%s: ",
-					ip6addr_string(&ip6->ip6_src),
+					ip6addr_string(ndo, &ip6->ip6_src),
 					udpport_string(sport),
-					ip6addr_string(&ip6->ip6_dst),
+					ip6addr_string(ndo, &ip6->ip6_dst),
 					udpport_string(dport)));
 			}
 		} else {
@@ -326,13 +326,13 @@ udpipaddr_print(netdissect_options *ndo, const struct ip *ip, int sport, int dpo
 		if (ip->ip_p == IPPROTO_UDP) {
 			if (sport == -1) {
 				ND_PRINT((ndo, "%s > %s: ",
-					ipaddr_string(&ip->ip_src),
-					ipaddr_string(&ip->ip_dst)));
+					ipaddr_string(ndo, &ip->ip_src),
+					ipaddr_string(ndo, &ip->ip_dst)));
 			} else {
 				ND_PRINT((ndo, "%s.%s > %s.%s: ",
-					ipaddr_string(&ip->ip_src),
+					ipaddr_string(ndo, &ip->ip_src),
 					udpport_string(sport),
-					ipaddr_string(&ip->ip_dst),
+					ipaddr_string(ndo, &ip->ip_dst),
 					udpport_string(dport)));
 			}
 		} else {

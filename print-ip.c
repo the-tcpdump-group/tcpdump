@@ -28,8 +28,8 @@
 
 #include <string.h>
 
-#include "addrtoname.h"
 #include "interface.h"
+#include "addrtoname.h"
 #include "extract.h"			/* must come after interface.h */
 
 #include "ip.h"
@@ -71,7 +71,7 @@ ip_printroute(netdissect_options *ndo,
 		ND_PRINT((ndo, " [bad ptr %u]", cp[2]));
 
 	for (len = 3; len < length; len += 4) {
-		ND_PRINT((ndo, " %s", ipaddr_string(&cp[len])));
+		ND_PRINT((ndo, " %s", ipaddr_string(ndo, &cp[len])));
 		if (ptr > len)
 			ND_PRINT((ndo, ","));
 	}
@@ -211,7 +211,7 @@ ip_printts(netdissect_options *ndo,
 		if (ptr == len)
 			type = " ^ ";
 		ND_PRINT((ndo, "%s%d@%s", type, EXTRACT_32BITS(&cp[len+hoplen-4]),
-		       hoplen!=8 ? "" : ipaddr_string(&cp[len])));
+		       hoplen!=8 ? "" : ipaddr_string(ndo, &cp[len])));
 		type = " ";
 	}
 
@@ -466,14 +466,14 @@ again:
 		if (ndo->ndo_packettype == PT_CARP) {
 			if (ndo->ndo_vflag)
 				ND_PRINT((ndo, "carp %s > %s: ",
-					     ipaddr_string(&ipds->ip->ip_src),
-					     ipaddr_string(&ipds->ip->ip_dst)));
+					     ipaddr_string(ndo, &ipds->ip->ip_src),
+					     ipaddr_string(ndo, &ipds->ip->ip_dst)));
 			carp_print(ndo, ipds->cp, ipds->len, ipds->ip->ip_ttl);
 		} else {
 			if (ndo->ndo_vflag)
 				ND_PRINT((ndo, "vrrp %s > %s: ",
-					     ipaddr_string(&ipds->ip->ip_src),
-					     ipaddr_string(&ipds->ip->ip_dst)));
+					     ipaddr_string(ndo, &ipds->ip->ip_src),
+					     ipaddr_string(ndo, &ipds->ip->ip_dst)));
 			vrrp_print(ndo, ipds->cp, ipds->len,
 				(const u_char *)ipds->ip, ipds->ip->ip_ttl);
 		}
@@ -647,8 +647,8 @@ ip_print(netdissect_options *ndo,
 		if (ipds->nh != IPPROTO_TCP && ipds->nh != IPPROTO_UDP &&
 		    ipds->nh != IPPROTO_SCTP && ipds->nh != IPPROTO_DCCP) {
 			ND_PRINT((ndo, "%s > %s: ",
-				     ipaddr_string(&ipds->ip->ip_src),
-				     ipaddr_string(&ipds->ip->ip_dst)));
+				     ipaddr_string(ndo, &ipds->ip->ip_src),
+				     ipaddr_string(ndo, &ipds->ip->ip_dst)));
 		}
 		ip_print_demux(ndo, ipds);
 	} else {
@@ -661,8 +661,8 @@ ip_print(netdissect_options *ndo,
 	     * and the protocol.
 	     */
 		if (ipds->off & 0x1fff) {
-			ND_PRINT((ndo, "%s > %s:", ipaddr_string(&ipds->ip->ip_src),
-			          ipaddr_string(&ipds->ip->ip_dst)));
+			ND_PRINT((ndo, "%s > %s:", ipaddr_string(ndo, &ipds->ip->ip_src),
+			          ipaddr_string(ndo, &ipds->ip->ip_dst)));
 			if (!ndo->ndo_nflag && (proto = getprotobynumber(ipds->ip->ip_p)) != NULL)
 				ND_PRINT((ndo, " %s", proto->p_name));
 			else

@@ -124,8 +124,6 @@ extern int mask2plen(u_int32_t);
 extern const char *tok2strary_internal(const char **, int, const char *, int);
 #define	tok2strary(a,f,i) tok2strary_internal(a, sizeof(a)/sizeof(a[0]),f,i)
 
-extern const char *dnaddr_string(u_short);
-
 extern void error(const char *, ...)
      __attribute__((noreturn))
 #ifdef __ATTRIBUTE___FORMAT_OK
