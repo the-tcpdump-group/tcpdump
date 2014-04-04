@@ -22,6 +22,7 @@
  *  and address to string conversion routines
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -247,7 +248,7 @@ getname(netdissect_options *ndo, const u_char *ap)
 			char *dotp;
 
 			p->name = strdup(hp->h_name);
-			if (Nflag) {
+			if (ndo->ndo_Nflag) {
 				/* Remove domain qualifications */
 				dotp = strchr(p->name, '.');
 				if (dotp)
@@ -298,7 +299,7 @@ getname6(netdissect_options *ndo, const u_char *ap)
 			char *dotp;
 
 			p->name = strdup(hp->h_name);
-			if (Nflag) {
+			if (ndo->ndo_Nflag) {
 				/* Remove domain qualifications */
 				dotp = strchr(p->name, '.');
 				if (dotp)
@@ -1131,14 +1132,14 @@ init_ipxsaparray(void)
 
 /*
  * Initialize the address to name translation machinery.  We map all
- * non-local IP addresses to numeric addresses if fflag is true (i.e.,
- * to prevent blocking on the nameserver).  localnet is the IP address
+ * non-local IP addresses to numeric addresses if ndo->ndo_fflag is true
+ * (i.e., to prevent blocking on the nameserver).  localnet is the IP address
  * of the local network.  mask is its subnet mask.
  */
 void
 init_addrtoname(netdissect_options *ndo, u_int32_t localnet, u_int32_t mask)
 {
-	if (fflag) {
+	if (ndo->ndo_fflag) {
 		f_localnet = localnet;
 		f_netmask = mask;
 	}
