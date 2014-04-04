@@ -12,7 +12,7 @@ env:
     - BUILD_IPV6=false
 
 before_script:
-  - sudo apt-get install libssl-dev libssl0.9.8 libssl1.0.0
+  - sudo apt-get install libssl-dev libssl0.9.8 libssl1.0.0 libdnet-dev libsmi2-dev
   - if [ "$BUILD_LIBPCAP" = "true" ]; then ( cd ../ && git clone git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure && make ); else sudo apt-get install libpcap-dev; fi
 
 script:
