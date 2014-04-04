@@ -15,6 +15,7 @@
  * Original code by Hannes Gredler (hannes@juniper.net)
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -128,12 +129,12 @@ signature_verify(netdissect_options *ndo,
     memcpy(rcvsig, sig_ptr, sizeof(rcvsig));
     memset(sig_ptr, 0, sizeof(rcvsig));
 
-    if (!sigsecret) {
+    if (!ndo->ndo_sigsecret) {
         return (CANT_CHECK_SIGNATURE);
     }
 
-    signature_compute_hmac_md5(pptr, plen, (unsigned char *)sigsecret,
-                               strlen(sigsecret), sig);
+    signature_compute_hmac_md5(pptr, plen, (unsigned char *)ndo->ndo_sigsecret,
+                               strlen(ndo->ndo_sigsecret), sig);
 
     if (memcmp(rcvsig, sig, sizeof(sig)) == 0) {
         return (SIGNATURE_VALID);
