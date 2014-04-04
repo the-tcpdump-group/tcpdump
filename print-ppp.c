@@ -1242,8 +1242,8 @@ print_ccp_config_options(netdissect_options *ndo,
 		}
 		ND_TCHECK2(*(p + 2), 1);
 		ND_PRINT((ndo, ": Features: %u, PxP: %s, History: %u, #CTX-ID: %u",
-				(p[2] & 0xc0) >> 5,
-				(p[2] & 0x200) ? "Enabled" : "Disabled",
+				(p[2] & 0xc0) >> 6,
+				(p[2] & 0x20) ? "Enabled" : "Disabled",
 				p[2] & 0x1f, p[3]));
 		break;
 	case CCPOPT_DEFLATE:
