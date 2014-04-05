@@ -347,7 +347,7 @@ bittok2str_internal(register const struct tok *lp, register const char *fmt,
         }
 
         if (buflen != 0) { /* did we find anything */
-            /* yep, set the the trailing zero 2 bytes before to eliminate the last comma & whitespace */
+            /* yep, set the trailing zero 2 bytes before to eliminate the last comma & whitespace */
             buf[buflen-2] = '\0';
             return (buf);
         }

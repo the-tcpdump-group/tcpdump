@@ -1,5 +1,5 @@
 /*
- * This module implements decoding of the the Loopback Protocol, originally
+ * This module implements decoding of the Loopback Protocol, originally
  * defined as the Configuration Testing Protocol. It is based on the following
  * specification:
  * http://www.mit.edu/people/jhawk/ctp.pdf

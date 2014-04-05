@@ -2776,7 +2776,7 @@ rx_ack_print(netdissect_options *ndo,
 				}
 
 				/*
-				 * Otherwise, if the there is a skip in
+				 * Otherwise, if there is a skip in
 				 * the range (such as an nacked packet in
 				 * the middle of some acked packets),
 				 * then print the current packet number
