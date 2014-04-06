@@ -282,7 +282,7 @@ cdp_print_addr(netdissect_options *ndo,
 			ND_TCHECK2(*p, 4);
 			if (p + 4 > endp)
 				goto trunc;
-			ND_PRINT((ndo, "IPv4 (%u) %s", num, ipaddr_string(p)));
+			ND_PRINT((ndo, "IPv4 (%u) %s", num, ipaddr_string(ndo, p)));
 			p += 4;
 		}
 #ifdef INET6
@@ -299,7 +299,7 @@ cdp_print_addr(netdissect_options *ndo,
 			if (p + al > endp)
 				goto trunc;
 
-			ND_PRINT((ndo, "IPv6 (%u) %s", num, ip6addr_string(p)));
+			ND_PRINT((ndo, "IPv6 (%u) %s", num, ip6addr_string(ndo, p)));
 			p += al;
 		}
 #endif

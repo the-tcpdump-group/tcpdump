@@ -699,11 +699,11 @@ print_attr_address(netdissect_options *ndo,
               if (EXTRACT_32BITS(data) == 0xFFFFFFFE )
                  ND_PRINT((ndo, "NAS Select"));
               else
-                 ND_PRINT((ndo, "%s",ipaddr_string(data)));
+                 ND_PRINT((ndo, "%s",ipaddr_string(ndo, data)));
       break;
 
       default:
-          ND_PRINT((ndo, "%s", ipaddr_string(data)));
+          ND_PRINT((ndo, "%s", ipaddr_string(ndo, data)));
       break;
    }
 

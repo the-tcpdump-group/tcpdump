@@ -110,8 +110,8 @@ token_hdr_print(netdissect_options *ndo,
 {
 	const char *srcname, *dstname;
 
-	srcname = etheraddr_string(fsrc);
-	dstname = etheraddr_string(fdst);
+	srcname = etheraddr_string(ndo, fsrc);
+	dstname = etheraddr_string(ndo, fdst);
 
 	if (ndo->ndo_vflag)
 		ND_PRINT((ndo, "%02x %02x %s %s %d: ",

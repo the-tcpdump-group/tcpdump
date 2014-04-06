@@ -456,17 +456,17 @@ void sctp_print(netdissect_options *ndo,
 #ifdef INET6
   if (ip6) {
     ND_PRINT((ndo, "%s.%d > %s.%d: sctp",
-      ip6addr_string(&ip6->ip6_src),
+      ip6addr_string(ndo, &ip6->ip6_src),
       sourcePort,
-      ip6addr_string(&ip6->ip6_dst),
+      ip6addr_string(ndo, &ip6->ip6_dst),
       destPort));
   } else
 #endif /*INET6*/
   {
     ND_PRINT((ndo, "%s.%d > %s.%d: sctp",
-      ipaddr_string(&ip->ip_src),
+      ipaddr_string(ndo, &ip->ip_src),
       sourcePort,
-      ipaddr_string(&ip->ip_dst),
+      ipaddr_string(ndo, &ip->ip_dst),
       destPort));
   }
 

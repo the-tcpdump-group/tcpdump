@@ -152,7 +152,7 @@ ahcp_ipv6_addresses_print(netdissect_options *ndo, const u_char *cp, const u_cha
 			goto corrupt;
 		ND_TCHECK2(*cp, 16);
 #ifdef INET6
-		ND_PRINT((ndo, "%s%s", sep, ip6addr_string(cp)));
+		ND_PRINT((ndo, "%s%s", sep, ip6addr_string(ndo, cp)));
 #else
 		ND_PRINT((ndo, "%s(compiled w/o IPv6)", sep));
 #endif /* INET6 */
@@ -178,7 +178,7 @@ ahcp_ipv4_addresses_print(netdissect_options *ndo, const u_char *cp, const u_cha
 		if (cp + 4 > ep)
 			goto corrupt;
 		ND_TCHECK2(*cp, 4);
-		ND_PRINT((ndo, "%s%s", sep, ipaddr_string(cp)));
+		ND_PRINT((ndo, "%s%s", sep, ipaddr_string(ndo, cp)));
 		cp += 4;
 		sep = ", ";
 	}
@@ -202,7 +202,7 @@ ahcp_ipv6_prefixes_print(netdissect_options *ndo, const u_char *cp, const u_char
 			goto corrupt;
 		ND_TCHECK2(*cp, 17);
 #ifdef INET6
-		ND_PRINT((ndo, "%s%s/%u", sep, ip6addr_string(cp), *(cp + 16)));
+		ND_PRINT((ndo, "%s%s/%u", sep, ip6addr_string(ndo, cp), *(cp + 16)));
 #else
 		ND_PRINT((ndo, "%s(compiled w/o IPv6)/%u", sep, *(cp + 16)));
 #endif /* INET6 */
@@ -228,7 +228,7 @@ ahcp_ipv4_prefixes_print(netdissect_options *ndo, const u_char *cp, const u_char
 		if (cp + 5 > ep)
 			goto corrupt;
 		ND_TCHECK2(*cp, 5);
-		ND_PRINT((ndo, "%s%s/%u", sep, ipaddr_string(cp), *(cp + 4)));
+		ND_PRINT((ndo, "%s%s/%u", sep, ipaddr_string(ndo, cp), *(cp + 4)));
 		cp += 5;
 		sep = ", ";
 	}
@@ -386,11 +386,11 @@ ahcp_print(netdissect_options *ndo, const u_char *cp, const u_int len) {
 				cp += 4;
 				/* Source Id */
 				ND_TCHECK2(*cp, 8);
-				ND_PRINT((ndo, ", Source Id %s", linkaddr_string(cp, 0, 8)));
+				ND_PRINT((ndo, ", Source Id %s", linkaddr_string(ndo, cp, 0, 8)));
 				cp += 8;
 				/* Destination Id */
 				ND_TCHECK2(*cp, 8);
-				ND_PRINT((ndo, ", Destination Id %s", linkaddr_string(cp, 0, 8)));
+				ND_PRINT((ndo, ", Destination Id %s", linkaddr_string(ndo, cp, 0, 8)));
 				cp += 8;
 			}
 			/* Body */

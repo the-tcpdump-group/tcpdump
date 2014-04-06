@@ -179,8 +179,8 @@ tcp_print(netdissect_options *ndo,
         ch = '\0';
         if (!ND_TTEST(tp->th_dport)) {
                 ND_PRINT((ndo, "%s > %s: [|tcp]",
-                             ipaddr_string(&ip->ip_src),
-                             ipaddr_string(&ip->ip_dst)));
+                             ipaddr_string(ndo, &ip->ip_src),
+                             ipaddr_string(ndo, &ip->ip_dst)));
                 return;
         }
 
@@ -193,9 +193,9 @@ tcp_print(netdissect_options *ndo,
         if (ip6) {
                 if (ip6->ip6_nxt == IPPROTO_TCP) {
                         ND_PRINT((ndo, "%s.%s > %s.%s: ",
-                                     ip6addr_string(&ip6->ip6_src),
+                                     ip6addr_string(ndo, &ip6->ip6_src),
                                      tcpport_string(sport),
-                                     ip6addr_string(&ip6->ip6_dst),
+                                     ip6addr_string(ndo, &ip6->ip6_dst),
                                      tcpport_string(dport)));
                 } else {
                         ND_PRINT((ndo, "%s > %s: ",
@@ -206,9 +206,9 @@ tcp_print(netdissect_options *ndo,
         {
                 if (ip->ip_p == IPPROTO_TCP) {
                         ND_PRINT((ndo, "%s.%s > %s.%s: ",
-                                     ipaddr_string(&ip->ip_src),
+                                     ipaddr_string(ndo, &ip->ip_src),
                                      tcpport_string(sport),
-                                     ipaddr_string(&ip->ip_dst),
+                                     ipaddr_string(ndo, &ip->ip_dst),
                                      tcpport_string(dport)));
                 } else {
                         ND_PRINT((ndo, "%s > %s: ",

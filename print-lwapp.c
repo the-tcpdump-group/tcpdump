@@ -213,7 +213,7 @@ lwapp_control_print(netdissect_options *ndo,
 	   tlen));
 
     if (has_ap_ident) {
-        ND_PRINT((ndo, "\n\tAP identity: %s", etheraddr_string(tptr)));
+        ND_PRINT((ndo, "\n\tAP identity: %s", etheraddr_string(ndo, tptr)));
         tptr+=sizeof(const struct lwapp_transport_header)+6;
     } else {
         tptr+=sizeof(const struct lwapp_transport_header);

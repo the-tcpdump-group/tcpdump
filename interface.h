@@ -124,8 +124,6 @@ extern int mask2plen(u_int32_t);
 extern const char *tok2strary_internal(const char **, int, const char *, int);
 #define	tok2strary(a,f,i) tok2strary_internal(a, sizeof(a)/sizeof(a[0]),f,i)
 
-extern const char *dnaddr_string(u_short);
-
 extern void error(const char *, ...)
      __attribute__((noreturn))
 #ifdef __ATTRIBUTE___FORMAT_OK
@@ -153,7 +151,6 @@ extern u_int16_t create_osi_cksum(const u_int8_t *, int, int);
 
 #include <pcap.h>
 
-extern void default_print(const u_char *, u_int);
 extern char *q922_string(const u_char *);
 extern char *smb_errstr(int, int);
 extern const char *nt_errstr(u_int32_t);
@@ -218,5 +215,7 @@ extern netdissect_options *gndo;
 #define Hflag gndo->ndo_Hflag
 #define snaplen     gndo->ndo_snaplen
 #define snapend     gndo->ndo_snapend
+
+extern void default_print(const u_char *, u_int);
 
 #endif

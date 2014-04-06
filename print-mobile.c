@@ -86,12 +86,12 @@ mobile_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	if (osp)  {
 		ND_PRINT((ndo, "[S] "));
 		if (ndo->ndo_vflag)
-			ND_PRINT((ndo, "%s ", ipaddr_string(&mob->osrc)));
+			ND_PRINT((ndo, "%s ", ipaddr_string(ndo, &mob->osrc)));
 	} else {
 		ND_PRINT((ndo, "[] "));
 	}
 	if (ndo->ndo_vflag) {
-		ND_PRINT((ndo, "> %s ", ipaddr_string(&mob->odst)));
+		ND_PRINT((ndo, "> %s ", ipaddr_string(ndo, &mob->odst)));
 		ND_PRINT((ndo, "(oproto=%d)", proto>>8));
 	}
 	vec[0].ptr = (const u_int8_t *)(void *)mob;

@@ -143,7 +143,7 @@ sll_print(netdissect_options *ndo, register const struct sll_header *sllp, u_int
 	 * XXX - print others as strings of hex?
 	 */
 	if (EXTRACT_16BITS(&sllp->sll_halen) == 6)
-		ND_PRINT((ndo, "%s ", etheraddr_string(sllp->sll_addr)));
+		ND_PRINT((ndo, "%s ", etheraddr_string(ndo, sllp->sll_addr)));
 
 	if (!ndo->ndo_qflag) {
 		ether_type = EXTRACT_16BITS(&sllp->sll_protocol);

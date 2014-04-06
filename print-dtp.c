@@ -97,7 +97,7 @@ dtp_print (netdissect_options *ndo, const u_char *pptr, u_int length)
                 break;
 
 	case DTP_NEIGHBOR_TLV:
-                ND_PRINT((ndo, ", %s", etheraddr_string(tptr+4)));
+                ND_PRINT((ndo, ", %s", etheraddr_string(ndo, tptr+4)));
                 break;
 
         default:

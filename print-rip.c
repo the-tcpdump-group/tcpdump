@@ -114,12 +114,12 @@ rip_entry_print_v1(netdissect_options *ndo,
 	}
 	if (family == 0) {
 		ND_PRINT((ndo, "\n\t  AFI 0, %s, metric: %u",
-			ipaddr_string(&ni->rip_dest),
+			ipaddr_string(ndo, &ni->rip_dest),
 			EXTRACT_32BITS(&ni->rip_metric)));
 		return;
 	} /* BSD_AFNUM_INET */
 	ND_PRINT((ndo, "\n\t  %s, metric: %u",
-               ipaddr_string(&ni->rip_dest),
+               ipaddr_string(ndo, &ni->rip_dest),
 	       EXTRACT_32BITS(&ni->rip_metric)));
 }
 
@@ -161,12 +161,12 @@ rip_entry_print_v2(netdissect_options *ndo,
 	} else { /* BSD_AFNUM_INET or AFI 0 */
 		ND_PRINT((ndo, "\n\t  AFI %s, %15s/%-2d, tag 0x%04x, metric: %u, next-hop: ",
                        tok2str(bsd_af_values, "%u", family),
-                       ipaddr_string(&ni->rip_dest),
+                       ipaddr_string(ndo, &ni->rip_dest),
 		       mask2plen(EXTRACT_32BITS(&ni->rip_dest_mask)),
                        EXTRACT_16BITS(&ni->rip_tag),
                        EXTRACT_32BITS(&ni->rip_metric)));
 		if (EXTRACT_32BITS(&ni->rip_router))
-			ND_PRINT((ndo, "%s", ipaddr_string(&ni->rip_router)));
+			ND_PRINT((ndo, "%s", ipaddr_string(ndo, &ni->rip_router)));
 		else
 			ND_PRINT((ndo, "self"));
 	}

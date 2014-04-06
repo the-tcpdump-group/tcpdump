@@ -30,7 +30,7 @@ static const struct tok ipnet_values[] = {
 };
 
 static inline void
-ipnet_hdr_print(struct netdissect_options *ndo, const u_char *bp, u_int length)
+ipnet_hdr_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	const ipnet_hdr_t *hdr;
 	hdr = (const ipnet_hdr_t *)bp;
@@ -53,7 +53,7 @@ ipnet_hdr_print(struct netdissect_options *ndo, const u_char *bp, u_int length)
 }
 
 static void
-ipnet_print(struct netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
+ipnet_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 {
 	ipnet_hdr_t *hdr;
 
@@ -100,7 +100,7 @@ ipnet_print(struct netdissect_options *ndo, const u_char *p, u_int length, u_int
  * is the number of bytes actually captured.
  */
 u_int
-ipnet_if_print(struct netdissect_options *ndo,
+ipnet_if_print(netdissect_options *ndo,
                const struct pcap_pkthdr *h, const u_char *p)
 {
 	ipnet_print(ndo, p, h->len, h->caplen);

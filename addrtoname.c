@@ -22,6 +22,7 @@
  *  and address to string conversion routines
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -218,7 +219,7 @@ static u_int32_t f_localnet;
  * also needs to check whether they're present in the packet buffer.
  */
 const char *
-getname(const u_char *ap)
+getname(netdissect_options *ndo, const u_char *ap)
 {
 	register struct hostent *hp;
 	u_int32_t addr;
@@ -240,14 +241,14 @@ getname(const u_char *ap)
 	 *	    given, f_netmask and f_localnet are 0 and the test
 	 *	    evaluates to true)
 	 */
-	if (!nflag &&
+	if (!ndo->ndo_nflag &&
 	    (addr & f_netmask) == f_localnet) {
 		hp = gethostbyaddr((char *)&addr, 4, AF_INET);
 		if (hp) {
 			char *dotp;
 
 			p->name = strdup(hp->h_name);
-			if (Nflag) {
+			if (ndo->ndo_Nflag) {
 				/* Remove domain qualifications */
 				dotp = strchr(p->name, '.');
 				if (dotp)
@@ -266,7 +267,7 @@ getname(const u_char *ap)
  * is assumed to be in network byte order.
  */
 const char *
-getname6(const u_char *ap)
+getname6(netdissect_options *ndo, const u_char *ap)
 {
 	register struct hostent *hp;
 	union {
@@ -292,13 +293,13 @@ getname6(const u_char *ap)
 	/*
 	 * Do not print names if -n was given.
 	 */
-	if (!nflag) {
+	if (!ndo->ndo_nflag) {
 		hp = gethostbyaddr((char *)&addr, sizeof(addr), AF_INET6);
 		if (hp) {
 			char *dotp;
 
 			p->name = strdup(hp->h_name);
-			if (Nflag) {
+			if (ndo->ndo_Nflag) {
 				/* Remove domain qualifications */
 				dotp = strchr(p->name, '.');
 				if (dotp)
@@ -466,7 +467,7 @@ lookup_protoid(const u_char *pi)
 }
 
 const char *
-etheraddr_string(register const u_char *ep)
+etheraddr_string(netdissect_options *ndo, register const u_char *ep)
 {
 	register int i;
 	register char *cp;
@@ -478,7 +479,7 @@ etheraddr_string(register const u_char *ep)
 	if (tp->e_name)
 		return (tp->e_name);
 #ifdef USE_ETHER_NTOHOST
-	if (!nflag) {
+	if (!ndo->ndo_nflag) {
 		char buf2[BUFSIZE];
 
 		/*
@@ -503,7 +504,7 @@ etheraddr_string(register const u_char *ep)
 		*cp++ = hex[*ep++ & 0xf];
 	}
 
-	if (!nflag) {
+	if (!ndo->ndo_nflag) {
 		snprintf(cp, BUFSIZE - (2 + 5*3), " (oui %s)",
 		    tok2str(oui_values, "Unknown", oui));
 	} else
@@ -541,7 +542,7 @@ le64addr_string(const u_char *ep)
 }
 
 const char *
-linkaddr_string(const u_char *ep, const unsigned int type, const unsigned int len)
+linkaddr_string(netdissect_options *ndo, const u_char *ep, const unsigned int type, const unsigned int len)
 {
 	register u_int i;
 	register char *cp;
@@ -551,7 +552,7 @@ linkaddr_string(const u_char *ep, const unsigned int type, const unsigned int le
 		return ("<empty>");
 
 	if (type == LINKADDR_ETHER && len == ETHER_ADDR_LEN)
-		return (etheraddr_string(ep));
+		return (etheraddr_string(ndo, ep));
 
 	if (type == LINKADDR_FRELAY)
 		return (q922_string(ep));
@@ -723,7 +724,7 @@ ipxsap_string(u_short port)
 }
 
 static void
-init_servarray(void)
+init_servarray(netdissect_options *ndo)
 {
 	struct servent *sv;
 	register struct hnamemem *table;
@@ -742,7 +743,7 @@ init_servarray(void)
 
 		while (table->name)
 			table = table->nxt;
-		if (nflag) {
+		if (ndo->ndo_nflag) {
 			(void)snprintf(buf, sizeof(buf), "%d", port);
 			table->name = strdup(buf);
 		} else
@@ -1131,32 +1132,32 @@ init_ipxsaparray(void)
 
 /*
  * Initialize the address to name translation machinery.  We map all
- * non-local IP addresses to numeric addresses if fflag is true (i.e.,
- * to prevent blocking on the nameserver).  localnet is the IP address
+ * non-local IP addresses to numeric addresses if ndo->ndo_fflag is true
+ * (i.e., to prevent blocking on the nameserver).  localnet is the IP address
  * of the local network.  mask is its subnet mask.
  */
 void
-init_addrtoname(u_int32_t localnet, u_int32_t mask)
+init_addrtoname(netdissect_options *ndo, u_int32_t localnet, u_int32_t mask)
 {
-	if (fflag) {
+	if (ndo->ndo_fflag) {
 		f_localnet = localnet;
 		f_netmask = mask;
 	}
-	if (nflag)
+	if (ndo->ndo_nflag)
 		/*
 		 * Simplest way to suppress names.
 		 */
 		return;
 
 	init_etherarray();
-	init_servarray();
+	init_servarray(ndo);
 	init_eprotoarray();
 	init_protoidarray();
 	init_ipxsaparray();
 }
 
 const char *
-dnaddr_string(u_short dnaddr)
+dnaddr_string(netdissect_options *ndo, u_short dnaddr)
 {
 	register struct hnamemem *tp;
 
@@ -1167,7 +1168,7 @@ dnaddr_string(u_short dnaddr)
 
 	tp->addr = dnaddr;
 	tp->nxt = newhnamemem();
-	if (nflag)
+	if (ndo->ndo_nflag)
 		tp->name = dnnum_string(dnaddr);
 	else
 		tp->name = dnname_string(dnaddr);

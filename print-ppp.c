@@ -731,7 +731,7 @@ print_lcp_config_options(netdissect_options *ndo,
 				return 0;
 			}
 			ND_TCHECK2(*(p + 3), 4);
-			ND_PRINT((ndo, ": IPv4 %s", ipaddr_string(p + 3)));
+			ND_PRINT((ndo, ": IPv4 %s", ipaddr_string(ndo, p + 3)));
 			break;
 		case MEDCLASS_MAC:
 			if (len != 9) {
@@ -1037,8 +1037,8 @@ print_ipcp_config_options(netdissect_options *ndo,
 		}
 		ND_TCHECK2(*(p + 6), 4);
 		ND_PRINT((ndo, ": src %s, dst %s",
-		       ipaddr_string(p + 2),
-		       ipaddr_string(p + 6)));
+		       ipaddr_string(ndo, p + 2),
+		       ipaddr_string(ndo, p + 6)));
 		break;
 	case IPCPOPT_IPCOMP:
 		if (len < 4) {
@@ -1118,7 +1118,7 @@ print_ipcp_config_options(netdissect_options *ndo,
 			return 0;
 		}
 		ND_TCHECK2(*(p + 2), 4);
-		ND_PRINT((ndo, ": %s", ipaddr_string(p + 2)));
+		ND_PRINT((ndo, ": %s", ipaddr_string(ndo, p + 2)));
 		break;
 	default:
 		/*

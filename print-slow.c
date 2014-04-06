@@ -382,7 +382,7 @@ slow_marker_lacp_print(netdissect_options *ndo,
 
             ND_PRINT((ndo, "\n\t  System %s, System Priority %u, Key %u" \
                    ", Port %u, Port Priority %u\n\t  State Flags [%s]",
-                   etheraddr_string(tlv_ptr.lacp_tlv_actor_partner_info->sys),
+                   etheraddr_string(ndo, tlv_ptr.lacp_tlv_actor_partner_info->sys),
                    EXTRACT_16BITS(tlv_ptr.lacp_tlv_actor_partner_info->sys_pri),
                    EXTRACT_16BITS(tlv_ptr.lacp_tlv_actor_partner_info->key),
                    EXTRACT_16BITS(tlv_ptr.lacp_tlv_actor_partner_info->port),
@@ -405,7 +405,7 @@ slow_marker_lacp_print(netdissect_options *ndo,
             tlv_ptr.marker_tlv_marker_info = (const struct marker_tlv_marker_info_t *)tlv_tptr;
 
             ND_PRINT((ndo, "\n\t  Request System %s, Request Port %u, Request Transaction ID 0x%08x",
-                   etheraddr_string(tlv_ptr.marker_tlv_marker_info->req_sys),
+                   etheraddr_string(ndo, tlv_ptr.marker_tlv_marker_info->req_sys),
                    EXTRACT_16BITS(tlv_ptr.marker_tlv_marker_info->req_port),
                    EXTRACT_32BITS(tlv_ptr.marker_tlv_marker_info->req_trans_id)));
 

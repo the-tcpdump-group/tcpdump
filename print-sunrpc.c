@@ -193,15 +193,15 @@ sunrpcrequest_print(netdissect_options *ndo, register const u_char *bp,
 	case 4:
 		ip = (struct ip *)bp2;
 		ND_PRINT((ndo, "%s.%s > %s.%s: %d",
-		    ipaddr_string(&ip->ip_src), srcid,
-		    ipaddr_string(&ip->ip_dst), dstid, length));
+		    ipaddr_string(ndo, &ip->ip_src), srcid,
+		    ipaddr_string(ndo, &ip->ip_dst), dstid, length));
 		break;
 #ifdef INET6
 	case 6:
 		ip6 = (struct ip6_hdr *)bp2;
 		ND_PRINT((ndo, "%s.%s > %s.%s: %d",
-		    ip6addr_string(&ip6->ip6_src), srcid,
-		    ip6addr_string(&ip6->ip6_dst), dstid, length));
+		    ip6addr_string(ndo, &ip6->ip6_src), srcid,
+		    ip6addr_string(ndo, &ip6->ip6_dst), dstid, length));
 		break;
 #endif
 	default:

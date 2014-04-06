@@ -71,7 +71,7 @@ bootp_print(netdissect_options *ndo,
 
 	if (bp->bp_htype == 1 && bp->bp_hlen == 6 && bp->bp_op == BOOTPREQUEST) {
 		ND_TCHECK2(bp->bp_chaddr[0], 6);
-		ND_PRINT((ndo, " from %s", etheraddr_string(bp->bp_chaddr)));
+		ND_PRINT((ndo, " from %s", etheraddr_string(ndo, bp->bp_chaddr)));
 	}
 
 	ND_PRINT((ndo, ", length %u", length));
@@ -105,27 +105,27 @@ bootp_print(netdissect_options *ndo,
 	/* Client's ip address */
 	ND_TCHECK(bp->bp_ciaddr);
 	if (EXTRACT_32BITS(&bp->bp_ciaddr.s_addr))
-		ND_PRINT((ndo, "\n\t  Client-IP %s", ipaddr_string(&bp->bp_ciaddr)));
+		ND_PRINT((ndo, "\n\t  Client-IP %s", ipaddr_string(ndo, &bp->bp_ciaddr)));
 
 	/* 'your' ip address (bootp client) */
 	ND_TCHECK(bp->bp_yiaddr);
 	if (EXTRACT_32BITS(&bp->bp_yiaddr.s_addr))
-		ND_PRINT((ndo, "\n\t  Your-IP %s", ipaddr_string(&bp->bp_yiaddr)));
+		ND_PRINT((ndo, "\n\t  Your-IP %s", ipaddr_string(ndo, &bp->bp_yiaddr)));
 
 	/* Server's ip address */
 	ND_TCHECK(bp->bp_siaddr);
 	if (EXTRACT_32BITS(&bp->bp_siaddr.s_addr))
-		ND_PRINT((ndo, "\n\t  Server-IP %s", ipaddr_string(&bp->bp_siaddr)));
+		ND_PRINT((ndo, "\n\t  Server-IP %s", ipaddr_string(ndo, &bp->bp_siaddr)));
 
 	/* Gateway's ip address */
 	ND_TCHECK(bp->bp_giaddr);
 	if (EXTRACT_32BITS(&bp->bp_giaddr.s_addr))
-		ND_PRINT((ndo, "\n\t  Gateway-IP %s", ipaddr_string(&bp->bp_giaddr)));
+		ND_PRINT((ndo, "\n\t  Gateway-IP %s", ipaddr_string(ndo, &bp->bp_giaddr)));
 
 	/* Client's Ethernet address */
 	if (bp->bp_htype == 1 && bp->bp_hlen == 6) {
 		ND_TCHECK2(bp->bp_chaddr[0], 6);
-		ND_PRINT((ndo, "\n\t  Client-Ethernet-Address %s", etheraddr_string(bp->bp_chaddr)));
+		ND_PRINT((ndo, "\n\t  Client-Ethernet-Address %s", etheraddr_string(ndo, bp->bp_chaddr)));
 	}
 
 	ND_TCHECK2(bp->bp_sname[0], 1);		/* check first char only */
@@ -494,7 +494,7 @@ rfc1048_print(netdissect_options *ndo,
 				ul = EXTRACT_32BITS(bp);
 				if (c == 'i') {
 					ul = htonl(ul);
-					ND_PRINT((ndo, "%s", ipaddr_string(&ul)));
+					ND_PRINT((ndo, "%s", ipaddr_string(ndo, &ul)));
 				} else if (c == 'L')
 					ND_PRINT((ndo, "%d", ul));
 				else
@@ -511,10 +511,10 @@ rfc1048_print(netdissect_options *ndo,
 				if (!first)
 					ND_PRINT((ndo, ","));
 				memcpy((char *)&ul, (const char *)bp, sizeof(ul));
-				ND_PRINT((ndo, "(%s:", ipaddr_string(&ul)));
+				ND_PRINT((ndo, "(%s:", ipaddr_string(ndo, &ul)));
 				bp += sizeof(ul);
 				memcpy((char *)&ul, (const char *)bp, sizeof(ul));
-				ND_PRINT((ndo, "%s)", ipaddr_string(&ul)));
+				ND_PRINT((ndo, "%s)", ipaddr_string(ndo, &ul)));
 				bp += sizeof(ul);
 				len -= 2*sizeof(ul);
 				first = 0;
@@ -743,7 +743,7 @@ rfc1048_print(netdissect_options *ndo,
 						ND_PRINT((ndo, "/%d", mask_width));
 					}
 					memcpy((char *)&ul, (const char *)bp, sizeof(ul));
-					ND_PRINT((ndo, ":%s)", ipaddr_string(&ul)));
+					ND_PRINT((ndo, ":%s)", ipaddr_string(ndo, &ul)));
 					bp += sizeof(ul);
 					len -= (significant_octets + 4);
 					first = 0;
@@ -779,7 +779,7 @@ cmu_print(netdissect_options *ndo,
 
 #define PRINTCMUADDR(m, s) { ND_TCHECK(cmu->m); \
     if (cmu->m.s_addr != 0) \
-	ND_PRINT((ndo, " %s:%s", s, ipaddr_string(&cmu->m.s_addr))); }
+	ND_PRINT((ndo, " %s:%s", s, ipaddr_string(ndo, &cmu->m.s_addr))); }
 
 	ND_PRINT((ndo, " vend-cmu"));
 	cmu = (const struct cmu_vend *)bp;

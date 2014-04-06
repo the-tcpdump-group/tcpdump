@@ -89,7 +89,7 @@ print_long_pos_vector(netdissect_options *ndo,
 {
 	u_int32_t lat, lon;
 
-	ND_PRINT((ndo, "GN_ADDR:%s ", linkaddr_string (bp, 0, GEONET_ADDR_LEN)));
+	ND_PRINT((ndo, "GN_ADDR:%s ", linkaddr_string (ndo, bp, 0, GEONET_ADDR_LEN)));
 
 	lat = EXTRACT_32BITS(bp+12);
 	ND_PRINT((ndo, "lat:%d ", lat));
@@ -105,7 +105,7 @@ print_long_pos_vector(netdissect_options *ndo,
 void
 geonet_print(netdissect_options *ndo, const u_char *eth, const u_char *bp, u_int length)
 {
-	ND_PRINT((ndo, "GeoNet src:%s; ", etheraddr_string(eth+6)));
+	ND_PRINT((ndo, "GeoNet src:%s; ", etheraddr_string(ndo, eth+6)));
 
 	if (length >= 36) {
 		/* Process Common Header */

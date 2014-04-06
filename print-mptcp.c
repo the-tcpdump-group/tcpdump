@@ -320,13 +320,13 @@ add_addr_print(netdissect_options *ndo,
         ND_PRINT((ndo, " id %u", add_addr->addr_id));
         switch (ipver) {
         case 4:
-                ND_PRINT((ndo, " %s", ipaddr_string(add_addr->u.v4.addr)));
+                ND_PRINT((ndo, " %s", ipaddr_string(ndo, add_addr->u.v4.addr)));
                 if (opt_len == 10)
                         ND_PRINT((ndo, ":%u", EXTRACT_16BITS(add_addr->u.v4.port)));
                 break;
         case 6:
 #ifdef INET6
-                ND_PRINT((ndo, " %s", ip6addr_string(add_addr->u.v6.addr)));
+                ND_PRINT((ndo, " %s", ip6addr_string(ndo, add_addr->u.v6.addr)));
 #endif
                 if (opt_len == 22)
                         ND_PRINT((ndo, ":%u", EXTRACT_16BITS(add_addr->u.v6.port)));

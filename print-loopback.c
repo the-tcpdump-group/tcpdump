@@ -85,7 +85,7 @@ loopback_message_print(netdissect_options *ndo, const u_char *cp, const u_int le
 				goto corrupt;
 			/* forwarding address */
 			ND_TCHECK2(*cp, ETHER_ADDR_LEN);
-			ND_PRINT((ndo, ", forwarding address %s", etheraddr_string(cp)));
+			ND_PRINT((ndo, ", forwarding address %s", etheraddr_string(ndo, cp)));
 			cp += ETHER_ADDR_LEN;
 			/* data */
 			ND_PRINT((ndo, ", data (%u octets)", len - 8));

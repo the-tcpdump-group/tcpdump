@@ -36,8 +36,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "addrtoname.h"
 #include "interface.h"
+#include "addrtoname.h"
 #include "extract.h"
 
 static const char tstr[] = "[|babel]";
@@ -115,14 +115,14 @@ static const unsigned char v4prefix[16] =
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0xFF, 0, 0, 0, 0 };
 
 static const char *
-format_prefix(const u_char *prefix, unsigned char plen)
+format_prefix(netdissect_options *ndo, const u_char *prefix, unsigned char plen)
 {
     static char buf[50];
     if(plen >= 96 && memcmp(prefix, v4prefix, 12) == 0)
-        snprintf(buf, 50, "%s/%u", ipaddr_string(prefix + 12), plen - 96);
+        snprintf(buf, 50, "%s/%u", ipaddr_string(ndo, prefix + 12), plen - 96);
     else
 #ifdef INET6
-        snprintf(buf, 50, "%s/%u", ip6addr_string(prefix), plen);
+        snprintf(buf, 50, "%s/%u", ip6addr_string(ndo, prefix), plen);
 #else
         snprintf(buf, 50, "IPv6 addresses not supported");
 #endif
@@ -131,13 +131,13 @@ format_prefix(const u_char *prefix, unsigned char plen)
 }
 
 static const char *
-format_address(const u_char *prefix)
+format_address(netdissect_options *ndo, const u_char *prefix)
 {
     if(memcmp(prefix, v4prefix, 12) == 0)
-        return ipaddr_string(prefix + 12);
+        return ipaddr_string(ndo, prefix + 12);
     else
 #ifdef INET6
-        return ip6addr_string(prefix);
+        return ip6addr_string(ndo, prefix);
 #else
         return "IPv6 addresses not supported";
 #endif
@@ -404,7 +404,7 @@ babel_print_v2(netdissect_options *ndo,
                 rc = network_address(message[2], message + 8, len - 6, address);
                 if(rc < 0) { ND_PRINT((ndo, "%s", tstr)); break; }
                 ND_PRINT((ndo, "%s txcost %u interval %s",
-                       format_address(address), txcost, format_interval(interval)));
+                       format_address(ndo, address), txcost, format_interval(interval)));
             }
         }
             break;
@@ -430,7 +430,7 @@ babel_print_v2(netdissect_options *ndo,
                 if(len < 2) goto corrupt;
                 rc = network_address(message[2], message + 4, len - 2, nh);
                 if(rc < 0) goto corrupt;
-                ND_PRINT((ndo, " %s", format_address(nh)));
+                ND_PRINT((ndo, " %s", format_address(ndo, nh)));
             }
         }
             break;
@@ -465,7 +465,7 @@ babel_print_v2(netdissect_options *ndo,
                        (message[3] & 0x80) ? "/prefix": "",
                        (message[3] & 0x40) ? "/id" : "",
                        (message[3] & 0x3f) ? "/unknown" : "",
-                       format_prefix(prefix, plen),
+                       format_prefix(ndo, prefix, plen),
                        metric, seqno, format_interval_update(interval)));
                 if(message[3] & 0x80) {
                     if(message[2] == 1)
@@ -493,7 +493,7 @@ babel_print_v2(netdissect_options *ndo,
                                     message + 4, NULL, len - 2, prefix);
                 if(rc < 0) goto corrupt;
                 ND_PRINT((ndo, "for %s",
-                       message[2] == 0 ? "any" : format_prefix(prefix, plen)));
+                       message[2] == 0 ? "any" : format_prefix(ndo, prefix, plen)));
             }
         }
             break;
@@ -513,7 +513,7 @@ babel_print_v2(netdissect_options *ndo,
                 if(rc < 0) goto corrupt;
                 plen = message[3] + (message[2] == 1 ? 96 : 0);
                 ND_PRINT((ndo, "(%u hops) for %s seqno %u id %s",
-                       message[6], format_prefix(prefix, plen),
+                       message[6], format_prefix(ndo, prefix, plen),
                        seqno, format_id(message + 8)));
             }
         }

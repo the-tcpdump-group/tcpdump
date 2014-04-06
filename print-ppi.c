@@ -23,7 +23,7 @@ typedef struct ppi_header {
 #ifdef DLT_PPI
 
 static inline void
-ppi_header_print(struct netdissect_options *ndo, const u_char *bp, u_int length)
+ppi_header_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	const ppi_header_t *hdr;
 	u_int32_t dlt;
@@ -46,7 +46,7 @@ ppi_header_print(struct netdissect_options *ndo, const u_char *bp, u_int length)
 }
 
 static void
-ppi_print(struct netdissect_options *ndo,
+ppi_print(netdissect_options *ndo,
                const struct pcap_pkthdr *h, const u_char *p)
 {
 	if_ndo_printer ndo_printer;
@@ -91,7 +91,7 @@ ppi_print(struct netdissect_options *ndo,
  * is the number of bytes actually captured.
  */
 u_int
-ppi_if_print(struct netdissect_options *ndo,
+ppi_if_print(netdissect_options *ndo,
                const struct pcap_pkthdr *h, const u_char *p)
 {
 	ppi_print(ndo, h, p);

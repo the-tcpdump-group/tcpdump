@@ -89,8 +89,8 @@ rrcp_print(netdissect_options *ndo,
 	ND_TCHECK(*(rrcp + RRCP_OPCODE_ISREPLY_OFFSET));
 	rrcp_opcode = (*(rrcp + RRCP_OPCODE_ISREPLY_OFFSET)) & RRCP_OPCODE_MASK;
         ND_PRINT((ndo, "%s > %s, %s %s",
-		etheraddr_string(ESRC(ep)),
-		etheraddr_string(EDST(ep)),
+		etheraddr_string(ndo, ESRC(ep)),
+		etheraddr_string(ndo, EDST(ep)),
 		tok2strbuf(proto_values,"RRCP-0x%02x",rrcp_proto,proto_str,sizeof(proto_str)),
 		((*(rrcp + RRCP_OPCODE_ISREPLY_OFFSET)) & RRCP_ISREPLY) ? "reply" : "query"));
 	if (rrcp_proto==1){
@@ -114,7 +114,7 @@ rrcp_print(netdissect_options *ndo,
 	    ND_PRINT((ndo, " downlink_port=%d, uplink_port=%d, uplink_mac=%s, vendor_id=%08x ,chip_id=%04x ",
 		     *(rrcp + RRCP_DOWNLINK_PORT_OFFSET),
 		     *(rrcp + RRCP_UPLINK_PORT_OFFSET),
-		     etheraddr_string(rrcp + RRCP_UPLINK_MAC_OFFSET),
+		     etheraddr_string(ndo, rrcp + RRCP_UPLINK_MAC_OFFSET),
 		     EXTRACT_32BITS(rrcp + RRCP_VENDOR_ID_OFFSET),
 		     EXTRACT_16BITS(rrcp + RRCP_CHIP_ID_OFFSET)));
 	}else if (rrcp_opcode==1 || rrcp_opcode==2 || rrcp_proto==2){
