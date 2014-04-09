@@ -272,36 +272,24 @@ static void
 pptp_bearer_cap_print(netdissect_options *ndo,
                       const u_int32_t *bearer_cap)
 {
-	ND_PRINT((ndo, " BEARER_CAP("));
-	if (EXTRACT_32BITS(bearer_cap) & PPTP_BEARER_CAP_DIGITAL_MASK) {
-                ND_PRINT((ndo, "D"));
-        }
-        if (EXTRACT_32BITS(bearer_cap) & PPTP_BEARER_CAP_ANALOG_MASK) {
-                ND_PRINT((ndo, "A"));
-        }
-	ND_PRINT((ndo, ")"));
+	ND_PRINT((ndo, " BEARER_CAP(%s%s)",
+	          EXTRACT_32BITS(bearer_cap) & PPTP_BEARER_CAP_DIGITAL_MASK ? "D" : "",
+	          EXTRACT_32BITS(bearer_cap) & PPTP_BEARER_CAP_ANALOG_MASK ? "A" : ""));
 }
+
+static const struct tok pptp_btype_str[] = {
+	{ 1, "A"   }, /* Analog */
+	{ 2, "D"   }, /* Digital */
+	{ 3, "Any" },
+	{ 0, NULL }
+};
 
 static void
 pptp_bearer_type_print(netdissect_options *ndo,
                        const u_int32_t *bearer_type)
 {
-	ND_PRINT((ndo, " BEARER_TYPE("));
-	switch (EXTRACT_32BITS(bearer_type)) {
-	case 1:
-		ND_PRINT((ndo, "A"));	/* Analog */
-		break;
-	case 2:
-		ND_PRINT((ndo, "D"));	/* Digital */
-		break;
-	case 3:
-		ND_PRINT((ndo, "Any"));
-		break;
-	default:
-		ND_PRINT((ndo, "?"));
-		break;
-        }
-	ND_PRINT((ndo, ")"));
+	ND_PRINT((ndo, " BEARER_TYPE(%s)",
+	          tok2str(pptp_btype_str, "?", EXTRACT_32BITS(bearer_type))));
 }
 
 static void
@@ -332,38 +320,24 @@ pptp_conn_speed_print(netdissect_options *ndo,
 	ND_PRINT((ndo, " CONN_SPEED(%u)", EXTRACT_32BITS(conn_speed)));
 }
 
+static const struct tok pptp_errcode_str[] = {
+	{ 0, "None"          },
+	{ 1, "Not-Connected" },
+	{ 2, "Bad-Format"    },
+	{ 3, "Bad-Value"     },
+	{ 4, "No-Resource"   },
+	{ 5, "Bad-Call-ID"   },
+	{ 6, "PAC-Error"     },
+	{ 0, NULL }
+};
+
 static void
 pptp_err_code_print(netdissect_options *ndo,
                     const u_int8_t *err_code)
 {
 	ND_PRINT((ndo, " ERR_CODE(%u", *err_code));
 	if (ndo->ndo_vflag) {
-		switch (*err_code) {
-		case 0:
-			ND_PRINT((ndo, ":None"));
-			break;
-		case 1:
-			ND_PRINT((ndo, ":Not-Connected"));
-			break;
-		case 2:
-			ND_PRINT((ndo, ":Bad-Format"));
-			break;
-		case 3:
-			ND_PRINT((ndo, ":Bad-Valude"));
-			break;
-		case 4:
-			ND_PRINT((ndo, ":No-Resource"));
-			break;
-		case 5:
-			ND_PRINT((ndo, ":Bad-Call-ID"));
-			break;
-		case 6:
-			ND_PRINT((ndo, ":PAC-Error"));
-			break;
-		default:
-			ND_PRINT((ndo, ":?"));
-			break;
-		}
+		ND_PRINT((ndo, ":%s", tok2str(pptp_errcode_str, "?", *err_code)));
 	}
 	ND_PRINT((ndo, ")"));
 }
@@ -389,26 +363,19 @@ pptp_framing_cap_print(netdissect_options *ndo,
 	ND_PRINT((ndo, ")"));
 }
 
+static const struct tok pptp_ftype_str[] = {
+	{ 1, "A" }, /* Async */
+	{ 2, "S" }, /* Sync */
+	{ 3, "E" }, /* Either */
+	{ 0, NULL }
+};
+
 static void
 pptp_framing_type_print(netdissect_options *ndo,
                         const u_int32_t *framing_type)
 {
-	ND_PRINT((ndo, " FRAME_TYPE("));
-	switch (EXTRACT_32BITS(framing_type)) {
-	case 1:
-		ND_PRINT((ndo, "A"));		/* Async */
-		break;
-	case 2:
-		ND_PRINT((ndo, "S"));		/* Sync */
-		break;
-	case 3:
-		ND_PRINT((ndo, "E"));		/* Either */
-		break;
-	default:
-		ND_PRINT((ndo, "?"));
-		break;
-	}
-	ND_PRINT((ndo, ")"));
+	ND_PRINT((ndo, " FRAME_TYPE(%s)",
+	          tok2str(pptp_ftype_str, "?", EXTRACT_32BITS(framing_type))));
 }
 
 static void
@@ -469,116 +436,63 @@ pptp_recv_winsiz_print(netdissect_options *ndo,
 	ND_PRINT((ndo, " RECV_WIN(%u)", EXTRACT_16BITS(recv_winsiz)));
 }
 
+static const struct tok pptp_scrrp_str[] = {
+	{ 1, "Successful channel establishment"                           },
+	{ 2, "General error"                                              },
+	{ 3, "Command channel already exists"                             },
+	{ 4, "Requester is not authorized to establish a command channel" },
+	{ 5, "The protocol version of the requester is not supported"     },
+	{ 0, NULL }
+};
+
+static const struct tok pptp_echorp_str[] = {
+	{ 1, "OK" },
+	{ 2, "General Error" },
+	{ 0, NULL }
+};
+
+static const struct tok pptp_ocrp_str[] = {
+	{ 1, "Connected"     },
+	{ 2, "General Error" },
+	{ 3, "No Carrier"    },
+	{ 4, "Busy"          },
+	{ 5, "No Dial Tone"  },
+	{ 6, "Time-out"      },
+	{ 7, "Do Not Accept" },
+	{ 0, NULL }
+};
+
+static const struct tok pptp_icrp_str[] = {
+	{ 1, "Connect"       },
+	{ 2, "General Error" },
+	{ 3, "Do Not Accept" },
+	{ 0, NULL }
+};
+
+static const struct tok pptp_cdn_str[] = {
+	{ 1, "Lost Carrier"   },
+	{ 2, "General Error"  },
+	{ 3, "Admin Shutdown" },
+	{ 4, "Request"        },
+	{ 0, NULL }
+};
+
 static void
 pptp_result_code_print(netdissect_options *ndo,
                        const u_int8_t *result_code, int ctrl_msg_type)
 {
 	ND_PRINT((ndo, " RESULT_CODE(%u", *result_code));
 	if (ndo->ndo_vflag) {
-		switch (ctrl_msg_type) {
-		case PPTP_CTRL_MSG_TYPE_SCCRP:
-			switch (*result_code) {
-			case 1:
-				ND_PRINT((ndo, ":Successful channel establishment"));
-				break;
-			case 2:
-				ND_PRINT((ndo, ":General error"));
-				break;
-			case 3:
-				ND_PRINT((ndo, ":Command channel already exists"));
-				break;
-			case 4:
-				ND_PRINT((ndo, ":Requester is not authorized to establish a command channel"));
-				break;
-			case 5:
-				ND_PRINT((ndo, ":The protocol version of the requester is not supported"));
-				break;
-			default:
-				ND_PRINT((ndo, ":?"));
-				break;
-			}
-			break;
-		case PPTP_CTRL_MSG_TYPE_StopCCRP:
-		case PPTP_CTRL_MSG_TYPE_ECHORP:
-			switch (*result_code) {
-			case 1:
-				ND_PRINT((ndo, ":OK"));
-				break;
-			case 2:
-				ND_PRINT((ndo, ":General Error"));
-				break;
-			default:
-				ND_PRINT((ndo, ":?"));
-				break;
-			}
-			break;
-		case PPTP_CTRL_MSG_TYPE_OCRP:
-			switch (*result_code) {
-			case 1:
-				ND_PRINT((ndo, ":Connected"));
-				break;
-			case 2:
-				ND_PRINT((ndo, ":General Error"));
-				break;
-			case 3:
-				ND_PRINT((ndo, ":No Carrier"));
-				break;
-			case 4:
-				ND_PRINT((ndo, ":Busy"));
-				break;
-			case 5:
-				ND_PRINT((ndo, ":No Dial Tone"));
-				break;
-			case 6:
-				ND_PRINT((ndo, ":Time-out"));
-				break;
-			case 7:
-				ND_PRINT((ndo, ":Do Not Accept"));
-				break;
-			default:
-				ND_PRINT((ndo, ":?"));
-				break;
-			}
-			break;
-		case PPTP_CTRL_MSG_TYPE_ICRP:
-			switch (*result_code) {
-			case 1:
-				ND_PRINT((ndo, ":Connect"));
-				break;
-			case 2:
-				ND_PRINT((ndo, ":General Error"));
-				break;
-			case 3:
-				ND_PRINT((ndo, ":Do Not Accept"));
-				break;
-			default:
-				ND_PRINT((ndo, ":?"));
-				break;
-			}
-			break;
-		case PPTP_CTRL_MSG_TYPE_CDN:
-			switch (*result_code) {
-			case 1:
-				ND_PRINT((ndo, ":Lost Carrier"));
-				break;
-			case 2:
-				ND_PRINT((ndo, ":General Error"));
-				break;
-			case 3:
-				ND_PRINT((ndo, ":Admin Shutdown"));
-				break;
-			case 4:
-				ND_PRINT((ndo, ":Request"));
-				break;
-			default:
-				ND_PRINT((ndo, ":?"));
-				break;
-			}
-			break;
-		default:
-			/* assertion error */
-			break;
-		}
+		const struct tok *dict =
+			ctrl_msg_type == PPTP_CTRL_MSG_TYPE_SCCRP    ? pptp_scrrp_str :
+			ctrl_msg_type == PPTP_CTRL_MSG_TYPE_StopCCRP ? pptp_echorp_str :
+			ctrl_msg_type == PPTP_CTRL_MSG_TYPE_ECHORP   ? pptp_echorp_str :
+			ctrl_msg_type == PPTP_CTRL_MSG_TYPE_OCRP     ? pptp_ocrp_str :
+			ctrl_msg_type == PPTP_CTRL_MSG_TYPE_ICRP     ? pptp_icrp_str :
+			ctrl_msg_type == PPTP_CTRL_MSG_TYPE_CDN      ? pptp_cdn_str :
+			NULL; /* assertion error */
+		if (dict != NULL)
+			ND_PRINT((ndo, ":%s", tok2str(dict, "?", *result_code)));
 	}
 	ND_PRINT((ndo, ")"));
 }
