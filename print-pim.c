@@ -32,6 +32,27 @@
 
 #include "ip.h"
 
+#define PIMV1_TYPE_QUERY           0
+#define PIMV1_TYPE_REGISTER        1
+#define PIMV1_TYPE_REGISTER_STOP   2
+#define PIMV1_TYPE_JOIN_PRUNE      3
+#define PIMV1_TYPE_RP_REACHABILITY 4
+#define PIMV1_TYPE_ASSERT          5
+#define PIMV1_TYPE_GRAFT           6
+#define PIMV1_TYPE_GRAFT_ACK       7
+
+static const struct tok pimv1_type_str[] = {
+	{ PIMV1_TYPE_QUERY,           "Query"         },
+	{ PIMV1_TYPE_REGISTER,        "Register"      },
+	{ PIMV1_TYPE_REGISTER_STOP,   "Register-Stop" },
+	{ PIMV1_TYPE_JOIN_PRUNE,      "Join/Prune"    },
+	{ PIMV1_TYPE_RP_REACHABILITY, "RP-reachable"  },
+	{ PIMV1_TYPE_ASSERT,          "Assert"        },
+	{ PIMV1_TYPE_GRAFT,           "Graft"         },
+	{ PIMV1_TYPE_GRAFT_ACK,       "Graft-ACK"     },
+	{ 0, NULL }
+};
+
 #define PIMV2_TYPE_HELLO         0
 #define PIMV2_TYPE_REGISTER      1
 #define PIMV2_TYPE_REGISTER_STOP 2
@@ -42,6 +63,8 @@
 #define PIMV2_TYPE_GRAFT_ACK     7
 #define PIMV2_TYPE_CANDIDATE_RP  8
 #define PIMV2_TYPE_PRUNE_REFRESH 9
+#define PIMV2_TYPE_DF_ELECTION   10
+#define PIMV2_TYPE_ECMP_REDIRECT 11
 
 static const struct tok pimv2_type_values[] = {
     { PIMV2_TYPE_HELLO,         "Hello" },
@@ -54,6 +77,8 @@ static const struct tok pimv2_type_values[] = {
     { PIMV2_TYPE_GRAFT_ACK,     "Graft Acknowledgement" },
     { PIMV2_TYPE_CANDIDATE_RP,  "Candidate RP Advertisement" },
     { PIMV2_TYPE_PRUNE_REFRESH, "Prune Refresh" },
+    { PIMV2_TYPE_DF_ELECTION,   "DF Election" },
+    { PIMV2_TYPE_ECMP_REDIRECT, "ECMP Redirect" },
     { 0, NULL}
 };
 
@@ -212,9 +237,9 @@ pimv1_print(netdissect_options *ndo,
 	ND_TCHECK(bp[1]);
 	type = bp[1];
 
+	ND_PRINT((ndo, " %s", tok2str(pimv1_type_str, "[type %u]", type)));
 	switch (type) {
-	case 0:
-		ND_PRINT((ndo, " Query"));
+	case PIMV1_TYPE_QUERY:
 		if (ND_TTEST(bp[8])) {
 			switch (bp[8] >> 4) {
 			case 0:
@@ -239,25 +264,17 @@ pimv1_print(netdissect_options *ndo,
 		}
 		break;
 
-	case 1:
-		ND_PRINT((ndo, " Register"));
+	case PIMV1_TYPE_REGISTER:
 		ND_TCHECK2(bp[8], 20);			/* ip header */
 		ND_PRINT((ndo, " for %s > %s", ipaddr_string(ndo, &bp[20]),
 		    ipaddr_string(ndo, &bp[24])));
 		break;
-	case 2:
-		ND_PRINT((ndo, " Register-Stop"));
+	case PIMV1_TYPE_REGISTER_STOP:
 		ND_TCHECK2(bp[12], sizeof(struct in_addr));
 		ND_PRINT((ndo, " for %s > %s", ipaddr_string(ndo, &bp[8]),
 		    ipaddr_string(ndo, &bp[12])));
 		break;
-	case 3:
-		ND_PRINT((ndo, " Join/Prune"));
-		if (ndo->ndo_vflag)
-			pimv1_join_prune_print(ndo, &bp[8], len - 8);
-		break;
-	case 4:
-		ND_PRINT((ndo, " RP-reachable"));
+	case PIMV1_TYPE_RP_REACHABILITY:
 		if (ndo->ndo_vflag) {
 			ND_TCHECK2(bp[22], 2);
 			ND_PRINT((ndo, " group %s", ipaddr_string(ndo, &bp[8])));
@@ -267,8 +284,7 @@ pimv1_print(netdissect_options *ndo,
 			relts_print(ndo, EXTRACT_16BITS(&bp[22]));
 		}
 		break;
-	case 5:
-		ND_PRINT((ndo, " Assert"));
+	case PIMV1_TYPE_ASSERT:
 		ND_TCHECK2(bp[16], sizeof(struct in_addr));
 		ND_PRINT((ndo, " for %s > %s", ipaddr_string(ndo, &bp[16]),
 		    ipaddr_string(ndo, &bp[8])));
@@ -280,21 +296,11 @@ pimv1_print(netdissect_options *ndo,
 		EXTRACT_32BITS(&bp[20]) & 0x7fffffff,
 		EXTRACT_32BITS(&bp[24])));
 		break;
-	case 6:
-		ND_PRINT((ndo, " Graft"));
+	case PIMV1_TYPE_JOIN_PRUNE:
+	case PIMV1_TYPE_GRAFT:
+	case PIMV1_TYPE_GRAFT_ACK:
 		if (ndo->ndo_vflag)
 			pimv1_join_prune_print(ndo, &bp[8], len - 8);
-		break;
-	case 7:
-		ND_PRINT((ndo, " Graft-ACK"));
-		if (ndo->ndo_vflag)
-			pimv1_join_prune_print(ndo, &bp[8], len - 8);
-		break;
-	case 8:
-		ND_PRINT((ndo, " Mode"));
-		break;
-	default:
-		ND_PRINT((ndo, " [type %d]", type));
 		break;
 	}
 	if ((bp[4] >> 4) != 1)
