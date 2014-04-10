@@ -185,9 +185,6 @@ dhcp6opt_name(int type)
 {
 	static char genstr[sizeof("opt_65535") + 1]; /* XXX thread unsafe */
 
-	if (type > 65535)
-		return "INVALID-option";
-
 	switch(type) {
 	case DH6OPT_CLIENTID:
 		return "client-ID";
@@ -883,10 +880,8 @@ dhcp6_print(netdissect_options *ndo,
 	if (!ndo->ndo_vflag) {
 		if (name)
 			ND_PRINT((ndo, " %s", name));
-		else if (dh6->dh6_msgtype != DH6_RELAY_FORW &&
-		    dh6->dh6_msgtype != DH6_RELAY_REPLY) {
+		else
 			ND_PRINT((ndo, " msgtype-%u", dh6->dh6_msgtype));
-		}
 		return;
 	}
 
