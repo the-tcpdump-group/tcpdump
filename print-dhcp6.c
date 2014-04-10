@@ -81,6 +81,25 @@
 #define DH6_LEASEQUERY	14
 #define DH6_LQ_REPLY	15
 
+static const struct tok dh6_msgtype_str[] = {
+	{ DH6_SOLICIT,     "solicit"          },
+	{ DH6_ADVERTISE,   "advertise"        },
+	{ DH6_REQUEST,     "request"          },
+	{ DH6_CONFIRM,     "confirm"          },
+	{ DH6_RENEW,       "renew"            },
+	{ DH6_REBIND,      "rebind"           },
+	{ DH6_REPLY,       "reply"            },
+	{ DH6_RELEASE,     "release"          },
+	{ DH6_DECLINE,     "decline"          },
+	{ DH6_RECONFIGURE, "reconfigure"      },
+	{ DH6_INFORM_REQ,  "inf-req"          },
+	{ DH6_RELAY_FORW,  "relay-fwd"        },
+	{ DH6_RELAY_REPLY, "relay-reply"      },
+	{ DH6_LEASEQUERY,  "leasequery"       },
+	{ DH6_LQ_REPLY,    "leasequery-reply" },
+	{ 0, NULL }
+};
+
 /* DHCP6 base packet format */
 struct dhcp6 {
 	union {
@@ -174,6 +193,73 @@ struct dhcp6_relay {
 #  define DH6OPT_NTP_SUBOPTION_SRV_FQDN 3
 #define DH6OPT_AFTR_NAME 64
 
+static const struct tok dh6opt_str[] = {
+	{ DH6OPT_CLIENTID,           "client-ID"            },
+	{ DH6OPT_SERVERID,           "server-ID"            },
+	{ DH6OPT_IA_NA,              "IA_NA"                },
+	{ DH6OPT_IA_TA,              "IA_TA"                },
+	{ DH6OPT_IA_ADDR,            "IA_ADDR"              },
+	{ DH6OPT_ORO,                "option-request"       },
+	{ DH6OPT_PREFERENCE,         "preference"           },
+	{ DH6OPT_ELAPSED_TIME,       "elapsed-time"         },
+	{ DH6OPT_RELAY_MSG,          "relay-message"        },
+	{ DH6OPT_AUTH,               "authentication"       },
+	{ DH6OPT_UNICAST,            "server-unicast"       },
+	{ DH6OPT_STATUS_CODE,        "status-code"          },
+	{ DH6OPT_RAPID_COMMIT,       "rapid-commit"         },
+	{ DH6OPT_USER_CLASS,         "user-class"           },
+	{ DH6OPT_VENDOR_CLASS,       "vendor-class"         },
+	{ DH6OPT_VENDOR_OPTS,        "vendor-specific-info" },
+	{ DH6OPT_INTERFACE_ID,       "interface-ID"         },
+	{ DH6OPT_RECONF_MSG,         "reconfigure-message"  },
+	{ DH6OPT_RECONF_ACCEPT,      "reconfigure-accept"   },
+	{ DH6OPT_SIP_SERVER_D,       "SIP-servers-domain"   },
+	{ DH6OPT_SIP_SERVER_A,       "SIP-servers-address"  },
+	{ DH6OPT_DNS_SERVERS,        "DNS-server"           },
+	{ DH6OPT_DOMAIN_LIST,        "DNS-search-list"      },
+	{ DH6OPT_IA_PD,              "IA_PD"                },
+	{ DH6OPT_IA_PD_PREFIX,       "IA_PD-prefix"         },
+	{ DH6OPT_SNTP_SERVERS,       "SNTP-servers"         },
+	{ DH6OPT_LIFETIME,           "lifetime"             },
+	{ DH6OPT_NIS_SERVERS,        "NIS-server"           },
+	{ DH6OPT_NISP_SERVERS,       "NIS+-server"          },
+	{ DH6OPT_NIS_NAME,           "NIS-domain-name"      },
+	{ DH6OPT_NISP_NAME,          "NIS+-domain-name"     },
+	{ DH6OPT_BCMCS_SERVER_D,     "BCMCS-domain-name"    },
+	{ DH6OPT_BCMCS_SERVER_A,     "BCMCS-server"         },
+	{ DH6OPT_GEOCONF_CIVIC,      "Geoconf-Civic"        },
+	{ DH6OPT_REMOTE_ID,          "Remote-ID"            },
+	{ DH6OPT_SUBSCRIBER_ID,      "Subscriber-ID"        },
+	{ DH6OPT_CLIENT_FQDN,        "Client-FQDN"          },
+	{ DH6OPT_PANA_AGENT,         "PANA-agent"           },
+	{ DH6OPT_NEW_POSIX_TIMEZONE, "POSIX-timezone"       },
+	{ DH6OPT_NEW_TZDB_TIMEZONE,  "POSIX-tz-database"    },
+	{ DH6OPT_ERO,                "Echo-request-option"  },
+	{ DH6OPT_LQ_QUERY,           "Lease-query"          },
+	{ DH6OPT_CLIENT_DATA,        "LQ-client-data"       },
+	{ DH6OPT_CLT_TIME,           "Clt-time"             },
+	{ DH6OPT_LQ_RELAY_DATA,      "LQ-relay-data"        },
+	{ DH6OPT_LQ_CLIENT_LINK,     "LQ-client-link"       },
+	{ DH6OPT_NTP_SERVER,         "NTP-server"           },
+	{ DH6OPT_AFTR_NAME,          "AFTR-Name"            },
+	{ 0, NULL }
+};
+
+static const struct tok dh6opt_stcode_str[] = {
+	{ DH6OPT_STCODE_SUCCESS,          "success"            },
+	{ DH6OPT_STCODE_UNSPECFAIL,       "unspec failure"     },
+	{ DH6OPT_STCODE_NOADDRAVAIL,      "no addresses"       },
+	{ DH6OPT_STCODE_NOBINDING,        "no binding"         },
+	{ DH6OPT_STCODE_NOTONLINK,        "not on-link"        },
+	{ DH6OPT_STCODE_USEMULTICAST,     "use multicast"      },
+	{ DH6OPT_STCODE_NOPREFIXAVAIL,    "no prefixes"        },
+	{ DH6OPT_STCODE_UNKNOWNQUERYTYPE, "unknown query type" },
+	{ DH6OPT_STCODE_MALFORMEDQUERY,   "malformed query"    },
+	{ DH6OPT_STCODE_NOTCONFIGURED,    "not configured"     },
+	{ DH6OPT_STCODE_NOTALLOWED,       "not allowed"        },
+	{ 0, NULL }
+};
+
 struct dhcp6opt {
 	u_int16_t dh6opt_type;
 	u_int16_t dh6opt_len;
@@ -181,148 +267,9 @@ struct dhcp6opt {
 };
 
 static const char *
-dhcp6opt_name(int type)
+dhcp6stcode(const uint16_t code)
 {
-	static char genstr[sizeof("opt_65535") + 1]; /* XXX thread unsafe */
-
-	switch(type) {
-	case DH6OPT_CLIENTID:
-		return "client-ID";
-	case DH6OPT_SERVERID:
-		return "server-ID";
-	case DH6OPT_IA_NA:
-		return "IA_NA";
-	case DH6OPT_IA_TA:
-		return "IA_TA";
-	case DH6OPT_IA_ADDR:
-		return "IA_ADDR";
-	case DH6OPT_ORO:
-		return "option-request";
-	case DH6OPT_PREFERENCE:
-		return "preference";
-	case DH6OPT_ELAPSED_TIME:
-		return "elapsed-time";
-	case DH6OPT_RELAY_MSG:
-		return "relay-message";
-	case DH6OPT_AUTH:
-		return "authentication";
-	case DH6OPT_UNICAST:
-		return "server-unicast";
-	case DH6OPT_STATUS_CODE:
-		return "status-code";
-	case DH6OPT_RAPID_COMMIT:
-		return "rapid-commit";
-	case DH6OPT_USER_CLASS:
-		return "user-class";
-	case DH6OPT_VENDOR_CLASS:
-		return "vendor-class";
-	case DH6OPT_VENDOR_OPTS:
-		return "vendor-specific-info";
-	case DH6OPT_INTERFACE_ID:
-		return "interface-ID";
-	case DH6OPT_RECONF_MSG:
-		return "reconfigure-message";
-	case DH6OPT_RECONF_ACCEPT:
-		return "reconfigure-accept";
-	case DH6OPT_SIP_SERVER_D:
-		return "SIP-servers-domain";
-	case DH6OPT_SIP_SERVER_A:
-		return "SIP-servers-address";
-	case DH6OPT_DNS_SERVERS:
-		return "DNS-server";
-	case DH6OPT_DOMAIN_LIST:
-		return "DNS-search-list";
-	case DH6OPT_IA_PD:
-		return "IA_PD";
-	case DH6OPT_IA_PD_PREFIX:
-		return "IA_PD-prefix";
-	case DH6OPT_SNTP_SERVERS:
-		return "SNTP-servers";
-	case DH6OPT_LIFETIME:
-		return "lifetime";
-	case DH6OPT_NIS_SERVERS:
-		return "NIS-server";
-	case DH6OPT_NISP_SERVERS:
-		return "NIS+-server";
-	case DH6OPT_NIS_NAME:
-		return "NIS-domain-name";
-	case DH6OPT_NISP_NAME:
-		return "NIS+-domain-name";
-	case DH6OPT_BCMCS_SERVER_D:
-		return "BCMCS-domain-name";
-	case DH6OPT_BCMCS_SERVER_A:
-		return "BCMCS-server";
-	case DH6OPT_GEOCONF_CIVIC:
-		return "Geoconf-Civic";
-	case DH6OPT_REMOTE_ID:
-		return "Remote-ID";
-	case DH6OPT_SUBSCRIBER_ID:
-		return "Subscriber-ID";
-	case DH6OPT_CLIENT_FQDN:
-		return "Client-FQDN";
-	case DH6OPT_PANA_AGENT:
-		return "PANA-agent";
-	case DH6OPT_NEW_POSIX_TIMEZONE:
-		return "POSIX-timezone";
-	case DH6OPT_NEW_TZDB_TIMEZONE:
-		return "POSIX-tz-database";
-	case DH6OPT_ERO:
-		return "Echo-request-option";
-	case DH6OPT_LQ_QUERY:
-		return "Lease-query";
-	case DH6OPT_CLIENT_DATA:
-		return "LQ-client-data";
-	case DH6OPT_CLT_TIME:
-		return "Clt-time";
-	case DH6OPT_LQ_RELAY_DATA:
-		return "LQ-relay-data";
-	case DH6OPT_LQ_CLIENT_LINK:
-		return "LQ-client-link";
-	case DH6OPT_NTP_SERVER:
-		return "NTP-server";
-	case DH6OPT_AFTR_NAME:
-		return "AFTR-Name";
-	default:
-		snprintf(genstr, sizeof(genstr), "opt_%d", type);
-		return(genstr);
-	}
-}
-
-static const char *
-dhcp6stcode(int code)
-{
-	static char genstr[sizeof("code255") + 1]; /* XXX thread unsafe */
-
-	if (code > 255)
-		return "INVALID code";
-
-	switch(code) {
-	case DH6OPT_STCODE_SUCCESS:
-		return "success";
-	case DH6OPT_STCODE_UNSPECFAIL:
-		return "unspec failure";
-	case DH6OPT_STCODE_NOADDRAVAIL:
-		return "no addresses";
-	case DH6OPT_STCODE_NOBINDING:
-		return "no binding";
-	case DH6OPT_STCODE_NOTONLINK:
-		return "not on-link";
-	case DH6OPT_STCODE_USEMULTICAST:
-		return "use multicast";
-	case DH6OPT_STCODE_NOPREFIXAVAIL:
-		return "no prefixes";
-	case DH6OPT_STCODE_UNKNOWNQUERYTYPE:
-		return "unknown query type";
-	case DH6OPT_STCODE_MALFORMEDQUERY:
-		return "malformed query";
-	case DH6OPT_STCODE_NOTCONFIGURED:
-		return "not configured";
-	case DH6OPT_STCODE_NOTALLOWED:
-		return "not allowed";
-	default:
-		snprintf(genstr, sizeof(genstr), "code%d", code);
-		return(genstr);
-	}
+	return code > 255 ? "INVALID code" : tok2str(dh6opt_stcode_str, "code%u", code);
 }
 
 static void
@@ -352,7 +299,7 @@ dhcp6opt_print(netdissect_options *ndo,
 		if (ep < cp + sizeof(*dh6o) + optlen)
 			goto trunc;
 		opttype = EXTRACT_16BITS(&dh6o->dh6opt_type);
-		ND_PRINT((ndo, " (%s", dhcp6opt_name(opttype)));
+		ND_PRINT((ndo, " (%s", tok2str(dh6opt_str, "opt_%u", opttype)));
 		switch (opttype) {
 		case DH6OPT_CLIENTID:
 		case DH6OPT_SERVERID:
@@ -433,7 +380,7 @@ dhcp6opt_print(netdissect_options *ndo,
 			tp = (u_char *)(dh6o + 1);
 			for (i = 0; i < optlen; i += 2) {
 				ND_PRINT((ndo, " %s",
-				    dhcp6opt_name(EXTRACT_16BITS(&tp[i]))));
+				    tok2str(dh6opt_str, "opt_%u", EXTRACT_16BITS(&tp[i]))));
 			}
 			ND_PRINT((ndo, ")"));
 			break;
@@ -826,71 +773,16 @@ dhcp6_print(netdissect_options *ndo,
 	dh6 = (struct dhcp6 *)cp;
 	dh6relay = (struct dhcp6_relay *)cp;
 	ND_TCHECK(dh6->dh6_xid);
-	switch (dh6->dh6_msgtype) {
-	case DH6_SOLICIT:
-		name = "solicit";
-		break;
-	case DH6_ADVERTISE:
-		name = "advertise";
-		break;
-	case DH6_REQUEST:
-		name = "request";
-		break;
-	case DH6_CONFIRM:
-		name = "confirm";
-		break;
-	case DH6_RENEW:
-		name = "renew";
-		break;
-	case DH6_REBIND:
-		name = "rebind";
-		break;
-	case DH6_REPLY:
-		name = "reply";
-		break;
-	case DH6_RELEASE:
-		name = "release";
-		break;
-	case DH6_DECLINE:
-		name = "decline";
-		break;
-	case DH6_RECONFIGURE:
-		name = "reconfigure";
-		break;
-	case DH6_INFORM_REQ:
-		name= "inf-req";
-		break;
-	case DH6_RELAY_FORW:
-		name= "relay-fwd";
-		break;
-	case DH6_RELAY_REPLY:
-		name= "relay-reply";
-		break;
-	case DH6_LEASEQUERY:
-		name= "leasequery";
-		break;
-	case DH6_LQ_REPLY:
-		name= "leasequery-reply";
-		break;
-	default:
-		name = NULL;
-		break;
-	}
+	name = tok2str(dh6_msgtype_str, "msgtype-%u", dh6->dh6_msgtype);
 
 	if (!ndo->ndo_vflag) {
-		if (name)
-			ND_PRINT((ndo, " %s", name));
-		else
-			ND_PRINT((ndo, " msgtype-%u", dh6->dh6_msgtype));
+		ND_PRINT((ndo, " %s", name));
 		return;
 	}
 
 	/* XXX relay agent messages have to be handled differently */
 
-	if (name)
-		ND_PRINT((ndo, " %s (", name));	/*)*/
-	else
-		ND_PRINT((ndo, " msgtype-%u (", dh6->dh6_msgtype));	/*)*/
+	ND_PRINT((ndo, " %s (", name));	/*)*/
 	if (dh6->dh6_msgtype != DH6_RELAY_FORW &&
 	    dh6->dh6_msgtype != DH6_RELAY_REPLY) {
 		ND_PRINT((ndo, "xid=%x", EXTRACT_32BITS(&dh6->dh6_xid) & DH6_XIDMASK));
