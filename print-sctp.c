@@ -115,6 +115,28 @@
 #define SCTP_RELIABLE_CNTL      0xc1
 #define SCTP_RELIABLE_CNTL_ACK  0xc2
 
+static const struct tok sctp_chunkid_str[] = {
+	{ SCTP_DATA,              "DATA"              },
+	{ SCTP_INITIATION,        "INIT"              },
+	{ SCTP_INITIATION_ACK,    "INIT ACK"          },
+	{ SCTP_SELECTIVE_ACK,     "SACK"              },
+	{ SCTP_HEARTBEAT_REQUEST, "HB REQ"            },
+	{ SCTP_HEARTBEAT_ACK,     "HB ACK"            },
+	{ SCTP_ABORT_ASSOCIATION, "ABORT"             },
+	{ SCTP_SHUTDOWN,          "SHUTDOWN"          },
+	{ SCTP_SHUTDOWN_ACK,      "SHUTDOWN ACK"      },
+	{ SCTP_OPERATION_ERR,     "OP ERR"            },
+	{ SCTP_COOKIE_ECHO,       "COOKIE ECHO"       },
+	{ SCTP_COOKIE_ACK,        "COOKIE ACK"        },
+	{ SCTP_ECN_ECHO,          "ECN ECHO"          },
+	{ SCTP_ECN_CWR,           "ECN CWR"           },
+	{ SCTP_SHUTDOWN_COMPLETE, "SHUTDOWN COMPLETE" },
+	{ SCTP_FORWARD_CUM_TSN,   "FOR CUM TSN"       },
+	{ SCTP_RELIABLE_CNTL,     "REL CTRL"          },
+	{ SCTP_RELIABLE_CNTL_ACK, "REL CTRL ACK"      },
+	{ 0, NULL }
+};
+
 /* Data Chuck Specific Flags */
 #define SCTP_DATA_FRAG_MASK	0x03
 #define SCTP_DATA_MIDDLE_FRAG	0x00
@@ -515,13 +537,13 @@ void sctp_print(netdissect_options *ndo,
       nextChunk = (const void *) (chunkEnd + align);
 
       ND_PRINT((ndo, "%s%d) ", sep, chunkCount+1));
+      ND_PRINT((ndo, "[%s] ", tok2str(sctp_chunkid_str, "Unknown chunk type: 0x%x",
+                                      chunkDescPtr->chunkID)));
       switch (chunkDescPtr->chunkID)
 	{
 	case SCTP_DATA :
 	  {
 	    const struct sctpDataPart *dataHdrPtr;
-
-	    ND_PRINT((ndo, "[DATA] "));
 
 	    if ((chunkDescPtr->chunkFlg & SCTP_DATA_UNORDERED)
 		== SCTP_DATA_UNORDERED)
@@ -596,7 +618,6 @@ void sctp_print(netdissect_options *ndo,
 	  {
 	    const struct sctpInitiation *init;
 
-	    ND_PRINT((ndo, "[INIT] "));
 	    init=(const struct sctpInitiation*)(chunkDescPtr+1);
 	    ND_PRINT((ndo, "[init tag: %u] ", EXTRACT_32BITS(&init->initTag)));
 	    ND_PRINT((ndo, "[rwnd: %u] ", EXTRACT_32BITS(&init->rcvWindowCredit)));
@@ -615,7 +636,6 @@ void sctp_print(netdissect_options *ndo,
 	  {
 	    const struct sctpInitiation *init;
 
-	    ND_PRINT((ndo, "[INIT ACK] "));
 	    init=(const struct sctpInitiation*)(chunkDescPtr+1);
 	    ND_PRINT((ndo, "[init tag: %u] ", EXTRACT_32BITS(&init->initTag)));
 	    ND_PRINT((ndo, "[rwnd: %u] ", EXTRACT_32BITS(&init->rcvWindowCredit)));
@@ -637,7 +657,6 @@ void sctp_print(netdissect_options *ndo,
 	    int fragNo, tsnNo;
 	    const u_char *dupTSN;
 
-	    ND_PRINT((ndo, "[SACK] "));
 	    sack=(const struct sctpSelectiveAck*)(chunkDescPtr+1);
 	    ND_PRINT((ndo, "[cum ack %u] ", EXTRACT_32BITS(&sack->highestConseqTSN)));
 	    ND_PRINT((ndo, "[a_rwnd %u] ", EXTRACT_32BITS(&sack->updatedRwnd)));
@@ -666,51 +685,6 @@ void sctp_print(netdissect_options *ndo,
 
 	    break;
 	  }
-	case SCTP_HEARTBEAT_REQUEST :
-	  ND_PRINT((ndo, "[HB REQ] "));
-	  break;
-	case SCTP_HEARTBEAT_ACK :
-	  ND_PRINT((ndo, "[HB ACK] "));
-	  break;
-	case SCTP_ABORT_ASSOCIATION :
-	  ND_PRINT((ndo, "[ABORT] "));
-	  break;
-	case SCTP_SHUTDOWN :
-	  ND_PRINT((ndo, "[SHUTDOWN] "));
-	  break;
-	case SCTP_SHUTDOWN_ACK :
-	  ND_PRINT((ndo, "[SHUTDOWN ACK] "));
-	  break;
-	case SCTP_OPERATION_ERR :
-	  ND_PRINT((ndo, "[OP ERR] "));
-	  break;
-	case SCTP_COOKIE_ECHO :
-	  ND_PRINT((ndo, "[COOKIE ECHO] "));
-	  break;
-	case SCTP_COOKIE_ACK :
-	  ND_PRINT((ndo, "[COOKIE ACK] "));
-	  break;
-	case SCTP_ECN_ECHO :
-	  ND_PRINT((ndo, "[ECN ECHO] "));
-	  break;
-	case SCTP_ECN_CWR :
-	  ND_PRINT((ndo, "[ECN CWR] "));
-	  break;
-	case SCTP_SHUTDOWN_COMPLETE :
-	  ND_PRINT((ndo, "[SHUTDOWN COMPLETE] "));
-	  break;
-	case SCTP_FORWARD_CUM_TSN :
-	  ND_PRINT((ndo, "[FOR CUM TSN] "));
-	  break;
-	case SCTP_RELIABLE_CNTL :
-	  ND_PRINT((ndo, "[REL CTRL] "));
-	  break;
-	case SCTP_RELIABLE_CNTL_ACK :
-	  ND_PRINT((ndo, "[REL CTRL ACK] "));
-	  break;
-	default :
-	  ND_PRINT((ndo, "[Unknown chunk type: 0x%x]", chunkDescPtr->chunkID));
-	  return;
 	}
 
 	if (ndo->ndo_vflag < 2)
