@@ -88,6 +88,21 @@
 /* RESERVED 			0xE  */
 /* RESERVED 			0xF  */
 
+static const struct tok st_str[] = {
+	{ ST_ASSOC_REQUEST,    "Assoc Request"    },
+	{ ST_ASSOC_RESPONSE,   "Assoc Response"   },
+	{ ST_REASSOC_REQUEST,  "ReAssoc Request"  },
+	{ ST_REASSOC_RESPONSE, "ReAssoc Response" },
+	{ ST_PROBE_REQUEST,    "Probe Request"    },
+	{ ST_PROBE_RESPONSE,   "Probe Response"   },
+	{ ST_BEACON,           "Beacon"           },
+	{ ST_ATIM,             "ATIM"             },
+	{ ST_DISASSOC,         "Disassociation"   },
+	{ ST_AUTH,             "Authentication"   },
+	{ ST_DEAUTH,           "DeAuthentication" },
+	{ ST_ACTION,           "Action"           },
+	{ 0, NULL }
+};
 
 #define CTRL_CONTROL_WRAPPER	0x7
 #define	CTRL_BAR	0x8
@@ -98,6 +113,19 @@
 #define	CTRL_ACK	0xD
 #define	CTRL_CF_END	0xE
 #define	CTRL_END_ACK	0xF
+
+static const struct tok ctrl_str[] = {
+	{ CTRL_CONTROL_WRAPPER, "Control Wrapper" },
+	{ CTRL_BAR,             "BAR"             },
+	{ CTRL_BA,              "BA"              },
+	{ CTRL_PS_POLL,         "Power Save-Poll" },
+	{ CTRL_RTS,             "Request-To-Send" },
+	{ CTRL_CTS,             "Clear-To-Send"   },
+	{ CTRL_ACK,             "Acknowledgment"  },
+	{ CTRL_CF_END,          "CF-End"          },
+	{ CTRL_END_ACK,         "CF-End+CF-Ack"   },
+	{ 0, NULL }
+};
 
 #define	DATA_DATA			0x0
 #define	DATA_DATA_CF_ACK		0x1
@@ -1916,36 +1944,27 @@ mgmt_body_print(netdissect_options *ndo,
                 u_int16_t fc, const struct mgmt_header_t *pmh,
                 const u_char *p, u_int length)
 {
+	ND_PRINT((ndo, "%s", tok2str(st_str, "Unhandled Management subtype(%x)", FC_SUBTYPE(fc))));
 	switch (FC_SUBTYPE(fc)) {
 	case ST_ASSOC_REQUEST:
-		ND_PRINT((ndo, "Assoc Request"));
 		return handle_assoc_request(ndo, p, length);
 	case ST_ASSOC_RESPONSE:
-		ND_PRINT((ndo, "Assoc Response"));
 		return handle_assoc_response(ndo, p, length);
 	case ST_REASSOC_REQUEST:
-		ND_PRINT((ndo, "ReAssoc Request"));
 		return handle_reassoc_request(ndo, p, length);
 	case ST_REASSOC_RESPONSE:
-		ND_PRINT((ndo, "ReAssoc Response"));
 		return handle_reassoc_response(ndo, p, length);
 	case ST_PROBE_REQUEST:
-		ND_PRINT((ndo, "Probe Request"));
 		return handle_probe_request(ndo, p, length);
 	case ST_PROBE_RESPONSE:
-		ND_PRINT((ndo, "Probe Response"));
 		return handle_probe_response(ndo, p, length);
 	case ST_BEACON:
-		ND_PRINT((ndo, "Beacon"));
 		return handle_beacon(ndo, p, length);
 	case ST_ATIM:
-		ND_PRINT((ndo, "ATIM"));
 		return handle_atim();
 	case ST_DISASSOC:
-		ND_PRINT((ndo, "Disassociation"));
 		return handle_disassoc(ndo, p, length);
 	case ST_AUTH:
-		ND_PRINT((ndo, "Authentication"));
 		if (!ND_TTEST2(*p, 3))
 			return 0;
 		if ((p[0] == 0 ) && (p[1] == 0) && (p[2] == 0)) {
@@ -1954,16 +1973,10 @@ mgmt_body_print(netdissect_options *ndo,
 		}
 		return handle_auth(ndo, p, length);
 	case ST_DEAUTH:
-		ND_PRINT((ndo, "DeAuthentication"));
 		return handle_deauth(ndo, pmh, p, length);
-		break;
 	case ST_ACTION:
-		ND_PRINT((ndo, "Action"));
 		return handle_action(ndo, pmh, p, length);
-		break;
 	default:
-		ND_PRINT((ndo, "Unhandled Management subtype(%x)",
-		    FC_SUBTYPE(fc)));
 		return 1;
 	}
 }
@@ -1977,13 +1990,12 @@ static int
 ctrl_body_print(netdissect_options *ndo,
                 u_int16_t fc, const u_char *p)
 {
+	ND_PRINT((ndo, "%s", tok2str(ctrl_str, "Unknown Ctrl Subtype", FC_SUBTYPE(fc))));
 	switch (FC_SUBTYPE(fc)) {
 	case CTRL_CONTROL_WRAPPER:
-		ND_PRINT((ndo, "Control Wrapper"));
 		/* XXX - requires special handling */
 		break;
 	case CTRL_BAR:
-		ND_PRINT((ndo, "BAR"));
 		if (!ND_TTEST2(*p, CTRL_BAR_HDRLEN))
 			return 0;
 		if (!ndo->ndo_eflag)
@@ -1994,7 +2006,6 @@ ctrl_body_print(netdissect_options *ndo,
 			    EXTRACT_LE_16BITS(&(((const struct ctrl_bar_t *)p)->seq))));
 		break;
 	case CTRL_BA:
-		ND_PRINT((ndo, "BA"));
 		if (!ND_TTEST2(*p, CTRL_BA_HDRLEN))
 			return 0;
 		if (!ndo->ndo_eflag)
@@ -2002,14 +2013,12 @@ ctrl_body_print(netdissect_options *ndo,
 			    etheraddr_string(ndo, ((const struct ctrl_ba_t *)p)->ra)));
 		break;
 	case CTRL_PS_POLL:
-		ND_PRINT((ndo, "Power Save-Poll"));
 		if (!ND_TTEST2(*p, CTRL_PS_POLL_HDRLEN))
 			return 0;
 		ND_PRINT((ndo, " AID(%x)",
 		    EXTRACT_LE_16BITS(&(((const struct ctrl_ps_poll_t *)p)->aid))));
 		break;
 	case CTRL_RTS:
-		ND_PRINT((ndo, "Request-To-Send"));
 		if (!ND_TTEST2(*p, CTRL_RTS_HDRLEN))
 			return 0;
 		if (!ndo->ndo_eflag)
@@ -2017,7 +2026,6 @@ ctrl_body_print(netdissect_options *ndo,
 			    etheraddr_string(ndo, ((const struct ctrl_rts_t *)p)->ta)));
 		break;
 	case CTRL_CTS:
-		ND_PRINT((ndo, "Clear-To-Send"));
 		if (!ND_TTEST2(*p, CTRL_CTS_HDRLEN))
 			return 0;
 		if (!ndo->ndo_eflag)
@@ -2025,7 +2033,6 @@ ctrl_body_print(netdissect_options *ndo,
 			    etheraddr_string(ndo, ((const struct ctrl_cts_t *)p)->ra)));
 		break;
 	case CTRL_ACK:
-		ND_PRINT((ndo, "Acknowledgment"));
 		if (!ND_TTEST2(*p, CTRL_ACK_HDRLEN))
 			return 0;
 		if (!ndo->ndo_eflag)
@@ -2033,7 +2040,6 @@ ctrl_body_print(netdissect_options *ndo,
 			    etheraddr_string(ndo, ((const struct ctrl_ack_t *)p)->ra)));
 		break;
 	case CTRL_CF_END:
-		ND_PRINT((ndo, "CF-End"));
 		if (!ND_TTEST2(*p, CTRL_END_HDRLEN))
 			return 0;
 		if (!ndo->ndo_eflag)
@@ -2041,15 +2047,12 @@ ctrl_body_print(netdissect_options *ndo,
 			    etheraddr_string(ndo, ((const struct ctrl_end_t *)p)->ra)));
 		break;
 	case CTRL_END_ACK:
-		ND_PRINT((ndo, "CF-End+CF-Ack"));
 		if (!ND_TTEST2(*p, CTRL_END_ACK_HDRLEN))
 			return 0;
 		if (!ndo->ndo_eflag)
 			ND_PRINT((ndo, " RA:%s ",
 			    etheraddr_string(ndo, ((const struct ctrl_end_ack_t *)p)->ra)));
 		break;
-	default:
-		ND_PRINT((ndo, "Unknown Ctrl Subtype"));
 	}
 	return 1;
 }
