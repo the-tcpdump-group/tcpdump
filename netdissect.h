@@ -496,7 +496,6 @@ extern void snmp_print(netdissect_options *, const u_char *, u_int);
 extern void rx_print(netdissect_options *, register const u_char *, int, int, int, u_char *);
 extern void nfsreply_print(netdissect_options *, const u_char *, u_int, const u_char *);
 extern void nfsreply_print_noaddr(netdissect_options *, const u_char *, u_int, const u_char *);
-extern void nfsreq_print(netdissect_options *, const u_char *, u_int, const u_char *);
 extern void nfsreq_print_noaddr(netdissect_options *, const u_char *, u_int, const u_char *);
 extern void sip_print(netdissect_options *, const u_char *, u_int);
 extern void syslog_print(netdissect_options *, const u_char *, u_int);
