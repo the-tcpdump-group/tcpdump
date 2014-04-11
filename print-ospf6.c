@@ -748,11 +748,11 @@ ospf6_decode_v3(netdissect_options *ndo,
 		          op->ospf6_hello.hello_priority));
 
 		ND_TCHECK(op->ospf6_hello.hello_dr);
-		if (op->ospf6_hello.hello_dr != 0)
+		if (EXTRACT_32BITS(&op->ospf6_hello.hello_dr) != 0)
 			ND_PRINT((ndo, "\n\t  Designated Router %s",
 			    ipaddr_string(ndo, &op->ospf6_hello.hello_dr)));
 		ND_TCHECK(op->ospf6_hello.hello_bdr);
-		if (op->ospf6_hello.hello_bdr != 0)
+		if (EXTRACT_32BITS(&op->ospf6_hello.hello_bdr) != 0)
 			ND_PRINT((ndo, ", Backup Designated Router %s",
 			    ipaddr_string(ndo, &op->ospf6_hello.hello_bdr)));
 		if (ndo->ndo_vflag > 1) {
@@ -925,9 +925,9 @@ ospf6_decode_v3_trailer(netdissect_options *ndo,
 {
 	int llslen = 0;
 	u_char lls_hello = op->ospf6_type == OSPF_TYPE_HELLO &&
-	                   op->ospf6_hello.hello_options & OSPF6_OPTION_L;
+	                   EXTRACT_32BITS(&op->ospf6_hello.hello_options) & OSPF6_OPTION_L;
 	u_char lls_dd    = op->ospf6_type == OSPF_TYPE_DD &&
-	                   op->ospf6_db.db_options & OSPF6_OPTION_L;
+	                   EXTRACT_32BITS(&op->ospf6_db.db_options) & OSPF6_OPTION_L;
 
 	if ((lls_hello || lls_dd) && (llslen = ospf6_print_lls(ndo, cp, len)) < 0)
 		goto trunc;
@@ -974,7 +974,7 @@ ospf6_print(netdissect_options *ndo,
 	ND_PRINT((ndo, "\n\tRouter-ID %s", ipaddr_string(ndo, &op->ospf6_routerid)));
 
 	ND_TCHECK(op->ospf6_areaid);
-	if (op->ospf6_areaid != 0)
+	if (EXTRACT_32BITS(&op->ospf6_areaid) != 0)
 		ND_PRINT((ndo, ", Area %s", ipaddr_string(ndo, &op->ospf6_areaid)));
 	else
 		ND_PRINT((ndo, ", Backbone Area"));
