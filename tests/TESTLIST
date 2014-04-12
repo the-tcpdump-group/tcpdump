@@ -179,3 +179,10 @@ dccp_partial_csum_v6_longer	dccp_partial_csum_v6_longer.pcap	dccp_partial_csum_v
 # VRRP tests
 vrrp		vrrp.pcap		vrrp.out		-t
 vrrp-v		vrrp.pcap		vrrp-v.out		-t -v
+
+# PIMv2 tests
+pimv2_dm-v		PIM-DM_pruning.pcap		pimv2_dm-v.out		-t -v
+pimv2_register-v	PIM_register_register-stop.pcap	pimv2_register-v.out	-t -v
+pimv2_sm-v		PIM-SM_join_prune.pcap		pimv2_sm-v.out		-t -v
+pimv2_bootstrap-v	PIMv2_bootstrap.pcap		pimv2_bootstrap-v.out	-t -v
+pimv2_hellos-v		PIMv2_hellos.pcap		pimv2_hellos-v.out	-t -v
