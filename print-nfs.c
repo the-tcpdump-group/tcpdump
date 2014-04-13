@@ -84,6 +84,33 @@ u_int32_t nfsv3_procid[NFS_NPROCS] = {
 	NFSPROC_NOOP
 };
 
+static const struct tok nfsproc_str[] = {
+	{ NFSPROC_NOOP,        "nop"         },
+	{ NFSPROC_NULL,        "null"        },
+	{ NFSPROC_GETATTR,     "getattr"     },
+	{ NFSPROC_SETATTR,     "setattr"     },
+	{ NFSPROC_LOOKUP,      "lookup"      },
+	{ NFSPROC_ACCESS,      "access"      },
+	{ NFSPROC_READLINK,    "readlink"    },
+	{ NFSPROC_READ,        "read"        },
+	{ NFSPROC_WRITE,       "write"       },
+	{ NFSPROC_CREATE,      "create"      },
+	{ NFSPROC_MKDIR,       "mkdir"       },
+	{ NFSPROC_SYMLINK,     "symlink"     },
+	{ NFSPROC_MKNOD,       "mknod"       },
+	{ NFSPROC_REMOVE,      "remove"      },
+	{ NFSPROC_RMDIR,       "rmdir"       },
+	{ NFSPROC_RENAME,      "rename"      },
+	{ NFSPROC_LINK,        "link"        },
+	{ NFSPROC_READDIR,     "readdir"     },
+	{ NFSPROC_READDIRPLUS, "readdirplus" },
+	{ NFSPROC_FSSTAT,      "fsstat"      },
+	{ NFSPROC_FSINFO,      "fsinfo"      },
+	{ NFSPROC_PATHCONF,    "pathconf"    },
+	{ NFSPROC_COMMIT,      "commit"      },
+	{ 0, NULL }
+};
+
 /*
  * NFS V2 and V3 status values.
  *
@@ -149,6 +176,27 @@ static const struct tok type2str[] = {
 	{ NFLNK,	"LNK" },
 	{ NFFIFO,	"FIFO" },
 	{ 0,		NULL }
+};
+
+static const struct tok sunrpc_auth_str[] = {
+	{ SUNRPC_AUTH_OK,           "OK"                                                     },
+	{ SUNRPC_AUTH_BADCRED,      "Bogus Credentials (seal broken)"                        },
+	{ SUNRPC_AUTH_REJECTEDCRED, "Rejected Credentials (client should begin new session)" },
+	{ SUNRPC_AUTH_BADVERF,      "Bogus Verifier (seal broken)"                           },
+	{ SUNRPC_AUTH_REJECTEDVERF, "Verifier expired or was replayed"                       },
+	{ SUNRPC_AUTH_TOOWEAK,      "Credentials are too weak"                               },
+	{ SUNRPC_AUTH_INVALIDRESP,  "Bogus response verifier"                                },
+	{ SUNRPC_AUTH_FAILED,       "Unknown failure"                                        },
+	{ 0, NULL }
+};
+
+static const struct tok sunrpc_str[] = {
+	{ SUNRPC_PROG_UNAVAIL,  "PROG_UNAVAIL"  },
+	{ SUNRPC_PROG_MISMATCH, "PROG_MISMATCH" },
+	{ SUNRPC_PROC_UNAVAIL,  "PROC_UNAVAIL"  },
+	{ SUNRPC_GARBAGE_ARGS,  "GARBAGE_ARGS"  },
+	{ SUNRPC_SYSTEM_ERR,    "SYSTEM_ERR"    },
+	{ 0, NULL }
 };
 
 static void
@@ -352,45 +400,7 @@ nfsreply_print_noaddr(netdissect_options *ndo,
 		case SUNRPC_AUTH_ERROR:
 			ND_TCHECK(rp->rm_reply.rp_reject.rj_why);
 			rwhy = EXTRACT_32BITS(&rp->rm_reply.rp_reject.rj_why);
-			ND_PRINT((ndo, "Auth "));
-			switch (rwhy) {
-
-			case SUNRPC_AUTH_OK:
-				ND_PRINT((ndo, "OK"));
-				break;
-
-			case SUNRPC_AUTH_BADCRED:
-				ND_PRINT((ndo, "Bogus Credentials (seal broken)"));
-				break;
-
-			case SUNRPC_AUTH_REJECTEDCRED:
-				ND_PRINT((ndo, "Rejected Credentials (client should begin new session)"));
-				break;
-
-			case SUNRPC_AUTH_BADVERF:
-				ND_PRINT((ndo, "Bogus Verifier (seal broken)"));
-				break;
-
-			case SUNRPC_AUTH_REJECTEDVERF:
-				ND_PRINT((ndo, "Verifier expired or was replayed"));
-				break;
-
-			case SUNRPC_AUTH_TOOWEAK:
-				ND_PRINT((ndo, "Credentials are too weak"));
-				break;
-
-			case SUNRPC_AUTH_INVALIDRESP:
-				ND_PRINT((ndo, "Bogus response verifier"));
-				break;
-
-			case SUNRPC_AUTH_FAILED:
-				ND_PRINT((ndo, "Unknown failure"));
-				break;
-
-			default:
-				ND_PRINT((ndo, "Invalid failure code %u", (unsigned int)rwhy));
-				break;
-			}
+			ND_PRINT((ndo, "Auth %s", tok2str(sunrpc_auth_str, "Invalid failure code %u", rwhy)));
 			break;
 
 		default:
@@ -543,37 +553,31 @@ nfsreq_print_noaddr(netdissect_options *ndo,
 	if (!v3 && proc < NFS_NPROCS)
 		proc =  nfsv3_procid[proc];
 
+	ND_PRINT((ndo, " %s", tok2str(nfsproc_str, "proc-%u", proc)));
 	switch (proc) {
-	case NFSPROC_NOOP:
-		ND_PRINT((ndo, " nop"));
-		return;
-	case NFSPROC_NULL:
-		ND_PRINT((ndo, " null"));
-		return;
 
 	case NFSPROC_GETATTR:
-		ND_PRINT((ndo, " getattr"));
-		if ((dp = parsereq(ndo, rp, length)) != NULL &&
-		    parsefh(ndo, dp, v3) != NULL)
-			return;
-		break;
-
 	case NFSPROC_SETATTR:
-		ND_PRINT((ndo, " setattr"));
+	case NFSPROC_READLINK:
+	case NFSPROC_FSSTAT:
+	case NFSPROC_FSINFO:
+	case NFSPROC_PATHCONF:
 		if ((dp = parsereq(ndo, rp, length)) != NULL &&
 		    parsefh(ndo, dp, v3) != NULL)
 			return;
 		break;
 
 	case NFSPROC_LOOKUP:
-		ND_PRINT((ndo, " lookup"));
+	case NFSPROC_CREATE:
+	case NFSPROC_MKDIR:
+	case NFSPROC_REMOVE:
+	case NFSPROC_RMDIR:
 		if ((dp = parsereq(ndo, rp, length)) != NULL &&
 		    parsefhn(ndo, dp, v3) != NULL)
 			return;
 		break;
 
 	case NFSPROC_ACCESS:
-		ND_PRINT((ndo, " access"));
 		if ((dp = parsereq(ndo, rp, length)) != NULL &&
 		    (dp = parsefh(ndo, dp, v3)) != NULL) {
 			ND_TCHECK(dp[0]);
@@ -612,15 +616,7 @@ nfsreq_print_noaddr(netdissect_options *ndo,
 		}
 		break;
 
-	case NFSPROC_READLINK:
-		ND_PRINT((ndo, " readlink"));
-		if ((dp = parsereq(ndo, rp, length)) != NULL &&
-		    parsefh(ndo, dp, v3) != NULL)
-			return;
-		break;
-
 	case NFSPROC_READ:
-		ND_PRINT((ndo, " read"));
 		if ((dp = parsereq(ndo, rp, length)) != NULL &&
 		    (dp = parsefh(ndo, dp, v3)) != NULL) {
 			if (v3) {
@@ -639,7 +635,6 @@ nfsreq_print_noaddr(netdissect_options *ndo,
 		break;
 
 	case NFSPROC_WRITE:
-		ND_PRINT((ndo, " write"));
 		if ((dp = parsereq(ndo, rp, length)) != NULL &&
 		    (dp = parsefh(ndo, dp, v3)) != NULL) {
 			if (v3) {
@@ -667,21 +662,7 @@ nfsreq_print_noaddr(netdissect_options *ndo,
 		}
 		break;
 
-	case NFSPROC_CREATE:
-		ND_PRINT((ndo, " create"));
-		if ((dp = parsereq(ndo, rp, length)) != NULL &&
-		    parsefhn(ndo, dp, v3) != NULL)
-			return;
-		break;
-
-	case NFSPROC_MKDIR:
-		ND_PRINT((ndo, " mkdir"));
-		if ((dp = parsereq(ndo, rp, length)) != 0 && parsefhn(ndo, dp, v3) != 0)
-			return;
-		break;
-
 	case NFSPROC_SYMLINK:
-		ND_PRINT((ndo, " symlink"));
 		if ((dp = parsereq(ndo, rp, length)) != 0 &&
 		    (dp = parsefhn(ndo, dp, v3)) != 0) {
 			ND_PRINT((ndo, " ->"));
@@ -696,7 +677,6 @@ nfsreq_print_noaddr(netdissect_options *ndo,
 		break;
 
 	case NFSPROC_MKNOD:
-		ND_PRINT((ndo, " mknod"));
 		if ((dp = parsereq(ndo, rp, length)) != 0 &&
 		    (dp = parsefhn(ndo, dp, v3)) != 0) {
 			ND_TCHECK(*dp);
@@ -718,22 +698,7 @@ nfsreq_print_noaddr(netdissect_options *ndo,
 		}
 		break;
 
-	case NFSPROC_REMOVE:
-		ND_PRINT((ndo, " remove"));
-		if ((dp = parsereq(ndo, rp, length)) != NULL &&
-		    parsefhn(ndo, dp, v3) != NULL)
-			return;
-		break;
-
-	case NFSPROC_RMDIR:
-		ND_PRINT((ndo, " rmdir"));
-		if ((dp = parsereq(ndo, rp, length)) != NULL &&
-		    parsefhn(ndo, dp, v3) != NULL)
-			return;
-		break;
-
 	case NFSPROC_RENAME:
-		ND_PRINT((ndo, " rename"));
 		if ((dp = parsereq(ndo, rp, length)) != NULL &&
 		    (dp = parsefhn(ndo, dp, v3)) != NULL) {
 			ND_PRINT((ndo, " ->"));
@@ -743,7 +708,6 @@ nfsreq_print_noaddr(netdissect_options *ndo,
 		break;
 
 	case NFSPROC_LINK:
-		ND_PRINT((ndo, " link"));
 		if ((dp = parsereq(ndo, rp, length)) != NULL &&
 		    (dp = parsefh(ndo, dp, v3)) != NULL) {
 			ND_PRINT((ndo, " ->"));
@@ -753,7 +717,6 @@ nfsreq_print_noaddr(netdissect_options *ndo,
 		break;
 
 	case NFSPROC_READDIR:
-		ND_PRINT((ndo, " readdir"));
 		if ((dp = parsereq(ndo, rp, length)) != NULL &&
 		    (dp = parsefh(ndo, dp, v3)) != NULL) {
 			if (v3) {
@@ -782,7 +745,6 @@ nfsreq_print_noaddr(netdissect_options *ndo,
 		break;
 
 	case NFSPROC_READDIRPLUS:
-		ND_PRINT((ndo, " readdirplus"));
 		if ((dp = parsereq(ndo, rp, length)) != NULL &&
 		    (dp = parsefh(ndo, dp, v3)) != NULL) {
 			ND_TCHECK(dp[4]);
@@ -802,29 +764,7 @@ nfsreq_print_noaddr(netdissect_options *ndo,
 		}
 		break;
 
-	case NFSPROC_FSSTAT:
-		ND_PRINT((ndo, " fsstat"));
-		if ((dp = parsereq(ndo, rp, length)) != NULL &&
-		    parsefh(ndo, dp, v3) != NULL)
-			return;
-		break;
-
-	case NFSPROC_FSINFO:
-		ND_PRINT((ndo, " fsinfo"));
-		if ((dp = parsereq(ndo, rp, length)) != NULL &&
-		    parsefh(ndo, dp, v3) != NULL)
-			return;
-		break;
-
-	case NFSPROC_PATHCONF:
-		ND_PRINT((ndo, " pathconf"));
-		if ((dp = parsereq(ndo, rp, length)) != NULL &&
-		    parsefh(ndo, dp, v3) != NULL)
-			return;
-		break;
-
 	case NFSPROC_COMMIT:
-		ND_PRINT((ndo, " commit"));
 		if ((dp = parsereq(ndo, rp, length)) != NULL &&
 		    (dp = parsefh(ndo, dp, v3)) != NULL) {
 			ND_TCHECK(dp[2]);
@@ -836,7 +776,6 @@ nfsreq_print_noaddr(netdissect_options *ndo,
 		break;
 
 	default:
-		ND_PRINT((ndo, " proc-%u", EXTRACT_32BITS(&rp->rm_call.cb_proc)));
 		return;
 	}
 
@@ -1093,38 +1032,8 @@ parserep(netdissect_options *ndo,
 	 * now we can check the ar_stat field
 	 */
 	astat = (enum sunrpc_accept_stat) EXTRACT_32BITS(dp);
-	switch (astat) {
-
-	case SUNRPC_SUCCESS:
-		break;
-
-	case SUNRPC_PROG_UNAVAIL:
-		ND_PRINT((ndo, " PROG_UNAVAIL"));
-		nfserr = 1;		/* suppress trunc string */
-		return (NULL);
-
-	case SUNRPC_PROG_MISMATCH:
-		ND_PRINT((ndo, " PROG_MISMATCH"));
-		nfserr = 1;		/* suppress trunc string */
-		return (NULL);
-
-	case SUNRPC_PROC_UNAVAIL:
-		ND_PRINT((ndo, " PROC_UNAVAIL"));
-		nfserr = 1;		/* suppress trunc string */
-		return (NULL);
-
-	case SUNRPC_GARBAGE_ARGS:
-		ND_PRINT((ndo, " GARBAGE_ARGS"));
-		nfserr = 1;		/* suppress trunc string */
-		return (NULL);
-
-	case SUNRPC_SYSTEM_ERR:
-		ND_PRINT((ndo, " SYSTEM_ERR"));
-		nfserr = 1;		/* suppress trunc string */
-		return (NULL);
-
-	default:
-		ND_PRINT((ndo, " ar_stat %d", astat));
+	if (astat != SUNRPC_SUCCESS) {
+		ND_PRINT((ndo, " %s", tok2str(sunrpc_str, "ar_stat %d", astat)));
 		nfserr = 1;		/* suppress trunc string */
 		return (NULL);
 	}
@@ -1568,25 +1477,16 @@ interp_reply(netdissect_options *ndo,
 	if (!v3 && proc < NFS_NPROCS)
 		proc = nfsv3_procid[proc];
 
+	ND_PRINT((ndo, " %s", tok2str(nfsproc_str, "proc-%u", proc)));
 	switch (proc) {
 
-	case NFSPROC_NOOP:
-		ND_PRINT((ndo, " nop"));
-		return;
-
-	case NFSPROC_NULL:
-		ND_PRINT((ndo, " null"));
-		return;
-
 	case NFSPROC_GETATTR:
-		ND_PRINT((ndo, " getattr"));
 		dp = parserep(ndo, rp, length);
 		if (dp != NULL && parseattrstat(ndo, dp, !ndo->ndo_qflag, v3) != 0)
 			return;
 		break;
 
 	case NFSPROC_SETATTR:
-		ND_PRINT((ndo, " setattr"));
 		if (!(dp = parserep(ndo, rp, length)))
 			return;
 		if (v3) {
@@ -1599,7 +1499,6 @@ interp_reply(netdissect_options *ndo,
 		break;
 
 	case NFSPROC_LOOKUP:
-		ND_PRINT((ndo, " lookup"));
 		if (!(dp = parserep(ndo, rp, length)))
 			break;
 		if (v3) {
@@ -1628,7 +1527,6 @@ interp_reply(netdissect_options *ndo,
 		break;
 
 	case NFSPROC_ACCESS:
-		ND_PRINT((ndo, " access"));
 		if (!(dp = parserep(ndo, rp, length)))
 			break;
 		if (!(dp = parsestatus(ndo, dp, &er)))
@@ -1642,14 +1540,12 @@ interp_reply(netdissect_options *ndo,
 		return;
 
 	case NFSPROC_READLINK:
-		ND_PRINT((ndo, " readlink"));
 		dp = parserep(ndo, rp, length);
 		if (dp != NULL && parselinkres(ndo, dp, v3) != 0)
 			return;
 		break;
 
 	case NFSPROC_READ:
-		ND_PRINT((ndo, " read"));
 		if (!(dp = parserep(ndo, rp, length)))
 			break;
 		if (v3) {
@@ -1673,7 +1569,6 @@ interp_reply(netdissect_options *ndo,
 		break;
 
 	case NFSPROC_WRITE:
-		ND_PRINT((ndo, " write"));
 		if (!(dp = parserep(ndo, rp, length)))
 			break;
 		if (v3) {
@@ -1701,20 +1596,7 @@ interp_reply(netdissect_options *ndo,
 		break;
 
 	case NFSPROC_CREATE:
-		ND_PRINT((ndo, " create"));
-		if (!(dp = parserep(ndo, rp, length)))
-			break;
-		if (v3) {
-			if (parsecreateopres(ndo, dp, ndo->ndo_vflag) != 0)
-				return;
-		} else {
-			if (parsediropres(ndo, dp) != 0)
-				return;
-		}
-		break;
-
 	case NFSPROC_MKDIR:
-		ND_PRINT((ndo, " mkdir"));
 		if (!(dp = parserep(ndo, rp, length)))
 			break;
 		if (v3) {
@@ -1727,7 +1609,6 @@ interp_reply(netdissect_options *ndo,
 		break;
 
 	case NFSPROC_SYMLINK:
-		ND_PRINT((ndo, " symlink"));
 		if (!(dp = parserep(ndo, rp, length)))
 			break;
 		if (v3) {
@@ -1740,7 +1621,6 @@ interp_reply(netdissect_options *ndo,
 		break;
 
 	case NFSPROC_MKNOD:
-		ND_PRINT((ndo, " mknod"));
 		if (!(dp = parserep(ndo, rp, length)))
 			break;
 		if (parsecreateopres(ndo, dp, ndo->ndo_vflag) != 0)
@@ -1748,20 +1628,7 @@ interp_reply(netdissect_options *ndo,
 		break;
 
 	case NFSPROC_REMOVE:
-		ND_PRINT((ndo, " remove"));
-		if (!(dp = parserep(ndo, rp, length)))
-			break;
-		if (v3) {
-			if (parsewccres(ndo, dp, ndo->ndo_vflag))
-				return;
-		} else {
-			if (parsestatus(ndo, dp, &er) != 0)
-				return;
-		}
-		break;
-
 	case NFSPROC_RMDIR:
-		ND_PRINT((ndo, " rmdir"));
 		if (!(dp = parserep(ndo, rp, length)))
 			break;
 		if (v3) {
@@ -1774,7 +1641,6 @@ interp_reply(netdissect_options *ndo,
 		break;
 
 	case NFSPROC_RENAME:
-		ND_PRINT((ndo, " rename"));
 		if (!(dp = parserep(ndo, rp, length)))
 			break;
 		if (v3) {
@@ -1796,7 +1662,6 @@ interp_reply(netdissect_options *ndo,
 		break;
 
 	case NFSPROC_LINK:
-		ND_PRINT((ndo, " link"));
 		if (!(dp = parserep(ndo, rp, length)))
 			break;
 		if (v3) {
@@ -1818,7 +1683,6 @@ interp_reply(netdissect_options *ndo,
 		break;
 
 	case NFSPROC_READDIR:
-		ND_PRINT((ndo, " readdir"));
 		if (!(dp = parserep(ndo, rp, length)))
 			break;
 		if (v3) {
@@ -1831,7 +1695,6 @@ interp_reply(netdissect_options *ndo,
 		break;
 
 	case NFSPROC_READDIRPLUS:
-		ND_PRINT((ndo, " readdirplus"));
 		if (!(dp = parserep(ndo, rp, length)))
 			break;
 		if (parsev3rddirres(ndo, dp, ndo->ndo_vflag))
@@ -1839,35 +1702,30 @@ interp_reply(netdissect_options *ndo,
 		break;
 
 	case NFSPROC_FSSTAT:
-		ND_PRINT((ndo, " fsstat"));
 		dp = parserep(ndo, rp, length);
 		if (dp != NULL && parsestatfs(ndo, dp, v3) != 0)
 			return;
 		break;
 
 	case NFSPROC_FSINFO:
-		ND_PRINT((ndo, " fsinfo"));
 		dp = parserep(ndo, rp, length);
 		if (dp != NULL && parsefsinfo(ndo, dp) != 0)
 			return;
 		break;
 
 	case NFSPROC_PATHCONF:
-		ND_PRINT((ndo, " pathconf"));
 		dp = parserep(ndo, rp, length);
 		if (dp != NULL && parsepathconf(ndo, dp) != 0)
 			return;
 		break;
 
 	case NFSPROC_COMMIT:
-		ND_PRINT((ndo, " commit"));
 		dp = parserep(ndo, rp, length);
 		if (dp != NULL && parsewccres(ndo, dp, ndo->ndo_vflag) != 0)
 			return;
 		break;
 
 	default:
-		ND_PRINT((ndo, " proc-%u", proc));
 		return;
 	}
 trunc:
