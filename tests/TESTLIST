@@ -33,6 +33,7 @@ isakmp1 isakmp-delete-segfault.pcap isakmp1.out -t
 isakmp2 isakmp-pointer-loop.pcap    isakmp2.out -t
 isakmp3 isakmp-identification-segfault.pcap isakmp3.out -t -v
 isakmp4 isakmp4500.pcap             isakmp4.out -t -E "file esp-secrets.txt"
+isakmp5-v	ISAKMP_sa_setup.pcap		isakmp5-v.out	-t -v
 
 # Link Management Protocol tests
 lmp		lmp.pcap		lmp.out -t -T lmp
@@ -92,7 +93,11 @@ pppoes          pppoes.pcap            pppoes.out      -t
 pppoes_id       pppoes.pcap            pppoes_id.out   -t pppoes 0x3b
 
 # IGMP tests
+igmpv1		IGMP_V1.pcap		igmpv1.out		-t
+igmpv2		IGMP_V2.pcap		igmpv2.out		-t
 igmpv3-queries  igmpv3-queries.pcap     igmpv3-queries.out      -t
+mtrace		mtrace.pcap		mtrace.out		-t
+dvmrp		mrinfo_query.pcap	dvmrp.out		-t
 
 # ICMPv6
 icmpv6          icmpv6.pcap             icmpv6.out      -t -vv
@@ -111,6 +116,12 @@ dcb_qcn         dcb_qcn.pcap          dcb_qcn.out   -t -vv
 
 # EVB tests
 evb             evb.pcap              evb.out       -t -vv
+
+# STP tests
+mstp-v		MSTP_Intra-Region_BPDUs.pcap	mstp-v.out	-t -v
+stp-v		802.1D_spanning_tree.pcap	stp-v.out	-t -v
+rstp-v		802.1w_rapid_STP.pcap		rstp-v.out	-t -v
+rpvst-v		rpvstp-trunk-native-vid5.pcap	rpvst-v.out	-t -v
 
 # RIP tests
 ripv1v2         ripv1v2.pcap            ripv1v2.out     -t -v
@@ -198,3 +209,18 @@ rsvp_infloop-v	rsvp-infinite-loop.pcap		rsvp_infloop-v.out	-t -v
 # HDLC tests
 hdlc1	chdlc-slarp.pcap	hdlc1.out	-t
 hdlc2	chdlc-slarp-short.pcap	hdlc2.out	-t
+hdlc3	HDLC.pcap		hdlc3.out	-t
+hdlc4	hdlc_slarp.pcap		hdlc4.out	-t
+
+# DECnet test case
+decnet		DECnet_Phone.pcap	decnet.out	-t
+
+# RADIUS tests
+radius-v	RADIUS.pcap	radius-v.out	-t -v
+
+# link-level protocols
+dtp-v		DTP.pcap		dtp-v.out		-t -v
+lacp-ev		LACP.pcap		lacp-ev.out		-t -e -v
+lldp_cdp-ev	LLDP_and_CDP.pcap	lldp_cdp-ev.out		-t -e -v
+cdp-v		3560_CDP.pcap		cdp-v.out		-t -v
+udld-v		UDLD.pcap		udld-v.out		-t -v
