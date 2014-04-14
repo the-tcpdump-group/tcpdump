@@ -261,7 +261,7 @@ ntp_print(netdissect_options *ndo,
 		break;
 
 	case PRIM_REF:
-		if (fn_printn((u_char *)&(bp->refid), 4, ndo->ndo_snapend))
+		if (fn_printn(ndo, (u_char *)&(bp->refid), 4, ndo->ndo_snapend))
 			goto trunc;
 		break;
 

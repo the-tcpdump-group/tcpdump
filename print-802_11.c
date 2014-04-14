@@ -697,7 +697,7 @@ struct radiotap_state
 #define PRINT_SSID(p) \
 	if (p.ssid_present) { \
 		ND_PRINT((ndo, " (")); \
-		fn_print(p.ssid.ssid, NULL); \
+		fn_print(ndo, p.ssid.ssid, NULL); \
 		ND_PRINT((ndo, ")")); \
 	}
 

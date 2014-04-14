@@ -131,7 +131,7 @@ bootp_print(netdissect_options *ndo,
 	ND_TCHECK2(bp->bp_sname[0], 1);		/* check first char only */
 	if (*bp->bp_sname) {
 		ND_PRINT((ndo, "\n\t  sname \""));
-		if (fn_print(bp->bp_sname, ndo->ndo_snapend)) {
+		if (fn_print(ndo, bp->bp_sname, ndo->ndo_snapend)) {
 			ND_PRINT((ndo, "\""));
 			ND_PRINT((ndo, "%s", tstr + 1));
 			return;
@@ -141,7 +141,7 @@ bootp_print(netdissect_options *ndo,
 	ND_TCHECK2(bp->bp_file[0], 1);		/* check first char only */
 	if (*bp->bp_file) {
 		ND_PRINT((ndo, "\n\t  file \""));
-		if (fn_print(bp->bp_file, ndo->ndo_snapend)) {
+		if (fn_print(ndo, bp->bp_file, ndo->ndo_snapend)) {
 			ND_PRINT((ndo, "\""));
 			ND_PRINT((ndo, "%s", tstr + 1));
 			return;
@@ -475,7 +475,7 @@ rfc1048_print(netdissect_options *ndo,
 		case 'a':
 			/* ascii strings */
 			ND_PRINT((ndo, "\""));
-			if (fn_printn(bp, len, ndo->ndo_snapend)) {
+			if (fn_printn(ndo, bp, len, ndo->ndo_snapend)) {
 				ND_PRINT((ndo, "\""));
 				goto trunc;
 			}
@@ -617,7 +617,7 @@ rfc1048_print(netdissect_options *ndo,
 					ND_PRINT((ndo, "%u/%u ", *bp, *(bp+1)));
 				bp += 2;
 				ND_PRINT((ndo, "\""));
-				if (fn_printn(bp, len - 3, ndo->ndo_snapend)) {
+				if (fn_printn(ndo, bp, len - 3, ndo->ndo_snapend)) {
 					ND_PRINT((ndo, "\""));
 					goto trunc;
 				}
@@ -639,7 +639,7 @@ rfc1048_print(netdissect_options *ndo,
 				len--;
 				if (type == 0) {
 					ND_PRINT((ndo, "\""));
-					if (fn_printn(bp, len, ndo->ndo_snapend)) {
+					if (fn_printn(ndo, bp, len, ndo->ndo_snapend)) {
 						ND_PRINT((ndo, "\""));
 						goto trunc;
 					}
@@ -684,7 +684,7 @@ rfc1048_print(netdissect_options *ndo,
 					case AGENT_SUBOPTION_CIRCUIT_ID: /* fall through */
 					case AGENT_SUBOPTION_REMOTE_ID:
 					case AGENT_SUBOPTION_SUBSCRIBER_ID:
-						fn_printn(bp, suboptlen, NULL);
+						fn_printn(ndo, bp, suboptlen, NULL);
 						break;
 
 					default:

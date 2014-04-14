@@ -45,7 +45,8 @@
  * Return true if truncated.
  */
 int
-fn_print(register const u_char *s, register const u_char *ep)
+fn_print(netdissect_options *ndo,
+         register const u_char *s, register const u_char *ep)
 {
 	register int ret;
 	register u_char c;
@@ -59,14 +60,13 @@ fn_print(register const u_char *s, register const u_char *ep)
 		}
 		if (!ND_ISASCII(c)) {
 			c = ND_TOASCII(c);
-			putchar('M');
-			putchar('-');
+			ND_PRINT((ndo, "M-"));
 		}
 		if (!ND_ISPRINT(c)) {
 			c ^= 0x40;	/* DEL to ?, others to alpha */
-			putchar('^');
+			ND_PRINT((ndo, "^"));
 		}
-		putchar(c);
+		ND_PRINT((ndo, "%c", c));
 	}
 	return(ret);
 }
@@ -77,8 +77,8 @@ fn_print(register const u_char *s, register const u_char *ep)
  * Return true if truncated.
  */
 int
-fn_printn(register const u_char *s, register u_int n,
-	  register const u_char *ep)
+fn_printn(netdissect_options *ndo,
+          register const u_char *s, register u_int n, register const u_char *ep)
 {
 	register u_char c;
 
@@ -87,14 +87,13 @@ fn_printn(register const u_char *s, register u_int n,
 		c = *s++;
 		if (!ND_ISASCII(c)) {
 			c = ND_TOASCII(c);
-			putchar('M');
-			putchar('-');
+			ND_PRINT((ndo, "M-"));
 		}
 		if (!ND_ISPRINT(c)) {
 			c ^= 0x40;	/* DEL to ?, others to alpha */
-			putchar('^');
+			ND_PRINT((ndo, "^"));
 		}
-		putchar(c);
+		ND_PRINT((ndo, "%c", c));
 	}
 	return (n == 0) ? 0 : 1;
 }
@@ -105,8 +104,9 @@ fn_printn(register const u_char *s, register u_int n,
  * Return true if truncated.
  */
 int
-fn_printzp(register const u_char *s, register u_int n,
-	  register const u_char *ep)
+fn_printzp(netdissect_options *ndo,
+           register const u_char *s, register u_int n,
+           register const u_char *ep)
 {
 	register int ret;
 	register u_char c;
@@ -121,14 +121,13 @@ fn_printzp(register const u_char *s, register u_int n,
 		}
 		if (!ND_ISASCII(c)) {
 			c = ND_TOASCII(c);
-			putchar('M');
-			putchar('-');
+			ND_PRINT((ndo, "M-"));
 		}
 		if (!ND_ISPRINT(c)) {
 			c ^= 0x40;	/* DEL to ?, others to alpha */
-			putchar('^');
+			ND_PRINT((ndo, "^"));
 		}
-		putchar(c);
+		ND_PRINT((ndo, "%c", c));
 	}
 	return (n == 0) ? 0 : ret;
 }

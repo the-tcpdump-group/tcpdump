@@ -130,7 +130,7 @@ cdp_print(netdissect_options *ndo,
                         if (!ndo->ndo_vflag)
                             ND_PRINT((ndo, ", Device-ID "));
                         ND_PRINT((ndo, "'"));
-                        fn_printn(tptr, len, NULL);
+                        fn_printn(ndo, tptr, len, NULL);
                         ND_PRINT((ndo, "'"));
 			break;
                     case 0x02: /* Address */
@@ -139,7 +139,7 @@ cdp_print(netdissect_options *ndo,
 			break;
                     case 0x03: /* Port-ID */
                         ND_PRINT((ndo, "'"));
-                        fn_printn(tptr, len, NULL);
+                        fn_printn(ndo, tptr, len, NULL);
                         ND_PRINT((ndo, "'"));
 			break;
                     case 0x04: /* Capabilities */
@@ -158,7 +158,7 @@ cdp_print(netdissect_options *ndo,
 			break;
                     case 0x06: /* Platform */
                         ND_PRINT((ndo, "'"));
-                        fn_printn(tptr, len, NULL);
+                        fn_printn(ndo, tptr, len, NULL);
                         ND_PRINT((ndo, "'"));
 			break;
                     case 0x07: /* Prefixes */
@@ -169,7 +169,7 @@ cdp_print(netdissect_options *ndo,
 			break;
                     case 0x09: /* VTP Mgmt Domain  - not documented */
                         ND_PRINT((ndo, "'"));
-                        fn_printn(tptr, len, NULL);
+                        fn_printn(ndo, tptr, len, NULL);
                         ND_PRINT((ndo, "'"));
 			break;
                     case 0x0a: /* Native VLAN ID - not documented */
@@ -199,7 +199,7 @@ cdp_print(netdissect_options *ndo,
 			break;
                     case 0x14: /* System Name - not documented */
                         ND_PRINT((ndo, "'"));
-                        fn_printn(tptr, len, NULL);
+                        fn_printn(ndo, tptr, len, NULL);
                         ND_PRINT((ndo, "'"));
 			break;
                     case 0x16: /* System Object ID - not documented */
@@ -210,7 +210,7 @@ cdp_print(netdissect_options *ndo,
 			ND_PRINT((ndo, "0x%02x", *(tptr)));
 			if (len > 1) {
 				ND_PRINT((ndo, "/"));
-	                        fn_printn(tptr + 1, len - 1, NULL);
+	                        fn_printn(ndo, tptr + 1, len - 1, NULL);
 	                }
 			break;
                     default:

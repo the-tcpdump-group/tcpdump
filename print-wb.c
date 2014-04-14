@@ -204,7 +204,7 @@ wb_id(netdissect_options *ndo,
 	cp = (char *)(io + nid);
 	if ((u_char *)cp + len <= ndo->ndo_snapend) {
 		ND_PRINT((ndo, "\""));
-		(void)fn_print((u_char *)cp, (u_char *)cp + len);
+		fn_print(ndo, (u_char *)cp, (u_char *)cp + len);
 		ND_PRINT((ndo, "\""));
 	}
 

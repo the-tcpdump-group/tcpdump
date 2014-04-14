@@ -782,7 +782,7 @@ asn1_print(netdissect_options *ndo,
 		p = elem->data.str;
 		if (printable) {
 			ND_PRINT((ndo, "\""));
-			if (fn_printn(p, asnlen, ndo->ndo_snapend)) {
+			if (fn_printn(ndo, p, asnlen, ndo->ndo_snapend)) {
 				ND_PRINT((ndo, "\""));
 				goto trunc;
 			}

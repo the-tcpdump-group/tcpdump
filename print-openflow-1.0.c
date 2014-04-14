@@ -697,7 +697,7 @@ of10_phy_ports_print(netdissect_options *ndo,
 		/* name */
 		ND_TCHECK2(*cp, OFP_MAX_PORT_NAME_LEN);
 		ND_PRINT((ndo, ", name '"));
-		fn_print(cp, cp + OFP_MAX_PORT_NAME_LEN);
+		fn_print(ndo, cp, cp + OFP_MAX_PORT_NAME_LEN);
 		ND_PRINT((ndo, "'"));
 		cp += OFP_MAX_PORT_NAME_LEN;
 
@@ -1363,31 +1363,31 @@ of10_desc_stats_reply_print(netdissect_options *ndo,
 	/* mfr_desc */
 	ND_TCHECK2(*cp, DESC_STR_LEN);
 	ND_PRINT((ndo, "\n\t  mfr_desc '"));
-	fn_print(cp, cp + DESC_STR_LEN);
+	fn_print(ndo, cp, cp + DESC_STR_LEN);
 	ND_PRINT((ndo, "'"));
 	cp += DESC_STR_LEN;
 	/* hw_desc */
 	ND_TCHECK2(*cp, DESC_STR_LEN);
 	ND_PRINT((ndo, "\n\t  hw_desc '"));
-	fn_print(cp, cp + DESC_STR_LEN);
+	fn_print(ndo, cp, cp + DESC_STR_LEN);
 	ND_PRINT((ndo, "'"));
 	cp += DESC_STR_LEN;
 	/* sw_desc */
 	ND_TCHECK2(*cp, DESC_STR_LEN);
 	ND_PRINT((ndo, "\n\t  sw_desc '"));
-	fn_print(cp, cp + DESC_STR_LEN);
+	fn_print(ndo, cp, cp + DESC_STR_LEN);
 	ND_PRINT((ndo, "'"));
 	cp += DESC_STR_LEN;
 	/* serial_num */
 	ND_TCHECK2(*cp, SERIAL_NUM_LEN);
 	ND_PRINT((ndo, "\n\t  serial_num '"));
-	fn_print(cp, cp + SERIAL_NUM_LEN);
+	fn_print(ndo, cp, cp + SERIAL_NUM_LEN);
 	ND_PRINT((ndo, "'"));
 	cp += SERIAL_NUM_LEN;
 	/* dp_desc */
 	ND_TCHECK2(*cp, DESC_STR_LEN);
 	ND_PRINT((ndo, "\n\t  dp_desc '"));
-	fn_print(cp, cp + DESC_STR_LEN);
+	fn_print(ndo, cp, cp + DESC_STR_LEN);
 	ND_PRINT((ndo, "'"));
 	return cp + DESC_STR_LEN;
 
@@ -1532,7 +1532,7 @@ of10_table_stats_reply_print(netdissect_options *ndo,
 		/* name */
 		ND_TCHECK2(*cp, OFP_MAX_TABLE_NAME_LEN);
 		ND_PRINT((ndo, ", name '"));
-		fn_print(cp, cp + OFP_MAX_TABLE_NAME_LEN);
+		fn_print(ndo, cp, cp + OFP_MAX_TABLE_NAME_LEN);
 		ND_PRINT((ndo, "'"));
 		cp += OFP_MAX_TABLE_NAME_LEN;
 		/* wildcards */

@@ -255,8 +255,9 @@ struct netdissect_options {
 extern void ts_print(netdissect_options *, const struct timeval *);
 extern void relts_print(netdissect_options *, int);
 
-extern int fn_print(const u_char *, const u_char *);
-extern int fn_printn(const u_char *, u_int, const u_char *);
+extern int fn_print(netdissect_options *, const u_char *, const u_char *);
+extern int fn_printn(netdissect_options *, const u_char *, u_int, const u_char *);
+extern int fn_printzp(netdissect_options *, const u_char *, u_int, const u_char *);
 extern const char *tok2str(const struct tok *, const char *, int);
 
 #if 0

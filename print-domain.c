@@ -205,7 +205,7 @@ ns_nprint(netdissect_options *ndo,
 					return(NULL);
 				}
 			} else {
-				if (fn_printn(cp, l, ndo->ndo_snapend))
+				if (fn_printn(ndo, cp, l, ndo->ndo_snapend))
 					return(NULL);
 			}
 
@@ -236,7 +236,7 @@ ns_cprint(netdissect_options *ndo,
 	if (!ND_TTEST2(*cp, 1))
 		return (NULL);
 	i = *cp++;
-	if (fn_printn(cp, i, ndo->ndo_snapend))
+	if (fn_printn(ndo, cp, i, ndo->ndo_snapend))
 		return (NULL);
 	return (cp + i);
 }
@@ -535,7 +535,7 @@ ns_rprint(netdissect_options *ndo,
 	case T_UNSPECA:		/* One long string */
 		if (!ND_TTEST2(*cp, len))
 			return(NULL);
-		if (fn_printn(cp, len, ndo->ndo_snapend))
+		if (fn_printn(ndo, cp, len, ndo->ndo_snapend))
 			return(NULL);
 		break;
 

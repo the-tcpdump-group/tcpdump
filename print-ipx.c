@@ -178,7 +178,7 @@ ipx_sap_print(netdissect_options *ndo, const u_short *ipx, u_int length)
 	for (i = 0; i < 8 && length > 0; i++) {
 	    ND_TCHECK(ipx[0]);
 	    ND_PRINT((ndo, " %s '", ipxsap_string(htons(EXTRACT_16BITS(&ipx[0])))));
-	    if (fn_printzp((u_char *)&ipx[1], 48, ndo->ndo_snapend)) {
+	    if (fn_printzp(ndo, (u_char *)&ipx[1], 48, ndo->ndo_snapend)) {
 		ND_PRINT((ndo, "'"));
 		goto trunc;
 	    }

@@ -500,7 +500,7 @@ parsefn(netdissect_options *ndo,
 	/* Update 32-bit pointer (NFS filenames padded to 32-bit boundaries) */
 	dp += ((len + 3) & ~3) / sizeof(*dp);
 	ND_PRINT((ndo, "\""));
-	if (fn_printn(cp, len, ndo->ndo_snapend)) {
+	if (fn_printn(ndo, cp, len, ndo->ndo_snapend)) {
 		ND_PRINT((ndo, "\""));
 		goto trunc;
 	}

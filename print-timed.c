@@ -138,7 +138,7 @@ timed_print(netdissect_options *ndo,
 	}
 	ND_TCHECK(tsp->tsp_name);
 	ND_PRINT((ndo, " name "));
-	if (fn_print((u_char *)tsp->tsp_name, (u_char *)tsp->tsp_name + sizeof(tsp->tsp_name)))
+	if (fn_print(ndo, (u_char *)tsp->tsp_name, (u_char *)tsp->tsp_name + sizeof(tsp->tsp_name)))
 		goto trunc;
 	return;
 

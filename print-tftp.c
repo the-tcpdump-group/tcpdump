@@ -136,7 +136,7 @@ tftp_print(netdissect_options *ndo,
 		/* Print filename or first option */
 		if (opcode != OACK)
 			ND_PRINT((ndo, "\""));
-		i = fn_print(p, ndo->ndo_snapend);
+		i = fn_print(ndo, p, ndo->ndo_snapend);
 		if (opcode != OACK)
 			ND_PRINT((ndo, "\""));
 
@@ -147,7 +147,7 @@ tftp_print(netdissect_options *ndo,
 			p++;
 			if (*p != '\0') {
 				ND_PRINT((ndo, " "));
-				fn_print(p, ndo->ndo_snapend);
+				fn_print(ndo, p, ndo->ndo_snapend);
 			}
 		}
 
@@ -167,7 +167,7 @@ tftp_print(netdissect_options *ndo,
 		ND_PRINT((ndo, " %s \"", tok2str(err2str, "tftp-err-#%d \"",
 				       EXTRACT_16BITS(&tp->th_code))));
 		/* Print error message string */
-		i = fn_print((const u_char *)tp->th_data, ndo->ndo_snapend);
+		i = fn_print(ndo, (const u_char *)tp->th_data, ndo->ndo_snapend);
 		ND_PRINT((ndo, "\""));
 		if (i)
 			goto trunc;

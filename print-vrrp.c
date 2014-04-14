@@ -169,7 +169,7 @@ vrrp_print(netdissect_options *ndo,
 		if (version == 2 && auth_type == VRRP_AUTH_SIMPLE) { /* simple text password */
 			ND_TCHECK(bp[7]);
 			ND_PRINT((ndo, " auth \""));
-			if (fn_printn(bp, 8, ndo->ndo_snapend)) {
+			if (fn_printn(ndo, bp, 8, ndo->ndo_snapend)) {
 				ND_PRINT((ndo, "\""));
 				goto trunc;
 			}

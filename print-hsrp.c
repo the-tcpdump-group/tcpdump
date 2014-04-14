@@ -121,7 +121,7 @@ hsrp_print(netdissect_options *ndo, register const u_int8_t *bp, register u_int 
 		relts_print(ndo, hp->hsrp_holdtime);
 		ND_PRINT((ndo, " priority=%d", hp->hsrp_priority));
 		ND_PRINT((ndo, " auth=\""));
-		if (fn_printn(hp->hsrp_authdata, sizeof(hp->hsrp_authdata),
+		if (fn_printn(ndo, hp->hsrp_authdata, sizeof(hp->hsrp_authdata),
 		    ndo->ndo_snapend)) {
 			ND_PRINT((ndo, "\""));
 			goto trunc;

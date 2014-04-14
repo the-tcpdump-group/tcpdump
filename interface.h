@@ -117,9 +117,6 @@ extern int32_t thiszone;	/* seconds offset from gmt to local time */
 /* Bail if "var" was not captured */
 #define TCHECK(var) TCHECK2(var, sizeof(var))
 
-extern int fn_print(const u_char *, const u_char *);
-extern int fn_printn(const u_char *, u_int, const u_char *);
-extern int fn_printzp(const u_char *, u_int, const u_char *);
 extern int mask2plen(u_int32_t);
 extern const char *tok2strary_internal(const char **, int, const char *, int);
 #define	tok2strary(a,f,i) tok2strary_internal(a, sizeof(a)/sizeof(a[0]),f,i)
