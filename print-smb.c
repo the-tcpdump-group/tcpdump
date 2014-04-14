@@ -1079,6 +1079,16 @@ trunc:
     ND_PRINT((ndo, "%s", tstr));
 }
 
+static const struct tok opcode_str[] = {
+	{ 0,  "QUERY"                   },
+	{ 5,  "REGISTRATION"            },
+	{ 6,  "RELEASE"                 },
+	{ 7,  "WACK"                    },
+	{ 8,  "REFRESH(8)"              },
+	{ 9,  "REFRESH"                 },
+	{ 15, "MULTIHOMED REGISTRATION" },
+	{ 0, NULL }
+};
 
 /*
  * print a NBT packet received across udp on port 137
@@ -1090,7 +1100,6 @@ nbt_udp137_print(netdissect_options *ndo,
     const u_char *maxbuf = data + length;
     int name_trn_id, response, opcode, nm_flags, rcode;
     int qdcount, ancount, nscount, arcount;
-    const char *opcodestr;
     const u_char *p;
     int total, i;
 
@@ -1112,35 +1121,12 @@ nbt_udp137_print(netdissect_options *ndo,
     if (ndo->ndo_vflag > 1)
 	ND_PRINT((ndo, "\n>>> "));
 
-    ND_PRINT((ndo, "NBT UDP PACKET(137): "));
-
-    switch (opcode) {
-    case 0: opcodestr = "QUERY"; break;
-    case 5: opcodestr = "REGISTRATION"; break;
-    case 6: opcodestr = "RELEASE"; break;
-    case 7: opcodestr = "WACK"; break;
-    case 8: opcodestr = "REFRESH(8)"; break;
-    case 9: opcodestr = "REFRESH"; break;
-    case 15: opcodestr = "MULTIHOMED REGISTRATION"; break;
-    default: opcodestr = "OPUNKNOWN"; break;
-    }
-    ND_PRINT((ndo, "%s", opcodestr));
+    ND_PRINT((ndo, "NBT UDP PACKET(137): %s", tok2str(opcode_str, "OPUNKNOWN", opcode)));
     if (response) {
-	if (rcode)
-	    ND_PRINT((ndo, "; NEGATIVE"));
-	else
-	    ND_PRINT((ndo, "; POSITIVE"));
+        ND_PRINT((ndo, "; %s", rcode ? "NEGATIVE" : "POSITIVE"));
     }
-
-    if (response)
-	ND_PRINT((ndo, "; RESPONSE"));
-    else
-	ND_PRINT((ndo, "; REQUEST"));
-
-    if (nm_flags & 1)
-	ND_PRINT((ndo, "; BROADCAST"));
-    else
-	ND_PRINT((ndo, "; UNICAST"));
+    ND_PRINT((ndo, "; %s; %s", response ? "RESPONSE" : "REQUEST",
+              (nm_flags & 1) ? "BROADCAST" : "UNICAST"));
 
     if (ndo->ndo_vflag < 2)
 	return;
