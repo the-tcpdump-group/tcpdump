@@ -19,6 +19,7 @@ print-AA	print-flags.pcap	print-AA.out	-t -AA
 # BGP tests
 bgp_vpn_attrset bgp_vpn_attrset.pcap bgp_vpn_attrset.out -t -v
 mpbgp-linklocal-nexthop mpbgp-linklocal-nexthop.pcap mpbgp-linklocal-nexthop.out -t -v
+bgp_infloop-v		bgp-infinite-loop.pcap		bgp_infloop-v.out	-t -v
 
 # EAP tests
 eapon1 eapon1.pcap eapon1.out -t
@@ -39,6 +40,7 @@ lmp		lmp.pcap		lmp.out -t -T lmp
 
 # MPLS tests
 mpls-ldp-hello	mpls-ldp-hello.pcap	mpls-ldp-hello.out -t -v
+ldp_infloop	ldp-infinite-loop.pcap	ldp_infloop.out -t
 
 # OSPF tests
 ospf-gmpls	ospf-gmpls.pcap		ospf-gmpls.out	-t -v
@@ -186,3 +188,13 @@ pimv2_register-v	PIM_register_register-stop.pcap	pimv2_register-v.out	-t -v
 pimv2_sm-v		PIM-SM_join_prune.pcap		pimv2_sm-v.out		-t -v
 pimv2_bootstrap-v	PIMv2_bootstrap.pcap		pimv2_bootstrap-v.out	-t -v
 pimv2_hellos-v		PIMv2_hellos.pcap		pimv2_hellos-v.out	-t -v
+
+# IS-IS tests
+isis_infloop-v	isis-infinite-loop.pcap		isis_infloop-v.out	-t -v
+
+# RSVP tests
+rsvp_infloop-v	rsvp-infinite-loop.pcap		rsvp_infloop-v.out	-t -v
+
+# HDLC tests
+hdlc1	chdlc-slarp.pcap	hdlc1.out	-t
+hdlc2	chdlc-slarp-short.pcap	hdlc2.out	-t
