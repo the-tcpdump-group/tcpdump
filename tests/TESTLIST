@@ -44,8 +44,12 @@ mpls-ldp-hello	mpls-ldp-hello.pcap	mpls-ldp-hello.out -t -v
 ldp_infloop	ldp-infinite-loop.pcap	ldp_infloop.out -t
 
 # OSPF tests
-ospf-gmpls	ospf-gmpls.pcap		ospf-gmpls.out	-t -v
-ospf3_auth-vv	ospf3_auth.pcap		ospf3_auth-vv.out -t -v -v
+ospf-gmpls	ospf-gmpls.pcap				ospf-gmpls.out		-t -v
+ospf3_ah-vv	OSPFv3_with_AH.pcap			ospf3_ah-vv.out		-t -v -v
+ospf3_auth-vv	ospf3_auth.pcap				ospf3_auth-vv.out 	-t -v -v
+ospf3_bc-vv	OSPFv3_broadcast_adjacency.pcap		ospf3_bc-vv.out		-t -v -v
+ospf3_mp-vv	OSPFv3_multipoint_adjacencies.pcap	ospf3_mp-vv.out		-t -v -v
+ospf3_nbma-vv	OSPFv3_NBMA_adjacencies.pcap		ospf3_nbma-vv.out	-t -v -v
 
 # IKEv2 tests
 ikev2four	ikev2four.pcap		ikev2four.out	-t -v
