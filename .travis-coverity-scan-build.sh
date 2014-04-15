@@ -17,6 +17,16 @@ TOOL_BASE=/tmp/coverity-scan-analysis
 UPLOAD_URL="http://scan5.coverity.com/cgi-bin/travis_upload.py"
 SCAN_URL="https://scan.coverity.com"
 
+# Verify Coverity Scan run condition
+COVERITY_SCAN_RUN_CONDITION=${coverity_scan_run_condition:-true}
+echo -ne "\033[33;1mTesting '${COVERITY_SCAN_RUN_CONDITION}' condition... "
+if eval [ $COVERITY_SCAN_RUN_CONDITION ]; then
+  echo -e "True.\033[0m"
+else
+  echo -e "False. Exit.\033[0m"
+  exit 1
+fi
+
 # Do not run on pull requests
 if [ "${TRAVIS_PULL_REQUEST}" = "true" ]; then
   echo -e "\033[33;1mINFO: Skipping Coverity Analysis: branch is a pull request.\033[0m"
@@ -79,6 +89,13 @@ echo -e "\033[33;1mTarring Coverity Scan Analysis results...\033[0m"
 RESULTS_ARCHIVE=analysis-results.tgz
 tar czf $RESULTS_ARCHIVE $RESULTS_DIR
 SHA=`git rev-parse --short HEAD`
+VERSION_SHA=$(cat VERSION)#$SHA
+
+# Verify Coverity Scan script test mode
+if [ "$coverity_scan_script_test_mode" = true ]; then
+  echo -e "\033[33;1mCoverity Scan configured in script test mode. Exit.\033[0m"
+  exit 1
+fi
 
 echo -e "\033[33;1mUploading Coverity Scan Analysis results...\033[0m"
 curl \
@@ -88,5 +105,5 @@ curl \
   --form email=$COVERITY_SCAN_NOTIFICATION_EMAIL \
   --form file=@$RESULTS_ARCHIVE \
   --form version=$SHA \
-  --form description="Travis CI build" \
+  --form description="$VERSION_SHA" \
   $UPLOAD_URL
