@@ -143,7 +143,7 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 			p += 8;
 			break;
 		}
-		ND_PRINT((ndo,"< ");
+		ND_PRINT((ndo,"< "));
 
 		switch ((fc >> 14) & 0x3) {
 		case 0x00:
@@ -165,7 +165,7 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 				panid = EXTRACT_LE_16BITS(p);
 				p += 2;
 			}
-                        ND_PRINT((ndo,"%04x:%s ", panid, le64addr_string(p))));
+                        ND_PRINT((ndo,"%04x:%s ", panid, le64addr_string(p)));
 			p += 8;
 			break;
 		}

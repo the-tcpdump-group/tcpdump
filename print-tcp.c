@@ -810,8 +810,8 @@ tcp_verify_signature(netdissect_options *ndo,
         tp1 = *tp;
 
         if (ndo->ndo_sigsecret == NULL) {
-		ND_PRINT((ndo, "shared secret not supplied with -M, ");
-                return (CANT_CHECK_SIGNATURE));
+		ND_PRINT((ndo, "shared secret not supplied with -M, "));
+                return (CANT_CHECK_SIGNATURE);
         }
 
         MD5_Init(&ctx);
