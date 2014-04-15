@@ -1113,7 +1113,7 @@ parsefattr(netdissect_options *ndo,
 			       EXTRACT_32BITS(&fap->fa3_ctime.nfsv3_nsec)));
 		} else {
 			ND_TCHECK(fap->fa2_ctime);
-			ND_PRINT((ndo, " nlink %d rdev %x fsid %x nodeid %x a/m/ctime",
+			ND_PRINT((ndo, " nlink %d rdev 0x%x fsid 0x%x nodeid 0x%x a/m/ctime",
 			       EXTRACT_32BITS(&fap->fa_nlink),
 			       EXTRACT_32BITS(&fap->fa2_rdev),
 			       EXTRACT_32BITS(&fap->fa2_fsid),
@@ -1253,7 +1253,7 @@ parserddires(netdissect_options *ndo,
 		return (1);
 
 	ND_TCHECK(dp[2]);
-	ND_PRINT((ndo, " offset %x size %d ",
+	ND_PRINT((ndo, " offset 0x%x size %d ",
 	       EXTRACT_32BITS(&dp[0]), EXTRACT_32BITS(&dp[1])));
 	if (dp[2] != 0)
 		ND_PRINT((ndo, " eof"));
