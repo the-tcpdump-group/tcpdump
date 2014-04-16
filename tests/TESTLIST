@@ -228,3 +228,9 @@ lacp-ev		LACP.pcap		lacp-ev.out		-t -e -v
 lldp_cdp-ev	LLDP_and_CDP.pcap	lldp_cdp-ev.out		-t -e -v
 cdp-v		3560_CDP.pcap		cdp-v.out		-t -v
 udld-v		UDLD.pcap		udld-v.out		-t -v
+
+# EIGRP tests
+eigrp1-v	EIGRP_adjacency.pcap	eigrp1-v.out	-t -v
+eigrp2-v	EIGRP_goodbye.pcap	eigrp2-v.out	-t -v
+eigrp3-v	EIGRP_subnet_down.pcap	eigrp3-v.out	-t -v
+eigrp4-v	EIGRP_subnet_up.pcap	eigrp4-v.out	-t -v
