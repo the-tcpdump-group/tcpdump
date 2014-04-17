@@ -183,6 +183,7 @@ syslog-v	syslog_udp.pcap		syslog-v.out		-t -v
 
 #IPv6 tests
 ipv6-bad-version.pcap	ipv6-bad-version.pcap 	ipv6-bad-version.out	-t
+ipv6-routing-header	ipv6-routing-header.pcap	ipv6-routing-header.out -t -v
 
 # Loopback/CTP test case
 loopback	loopback.pcap		loopback.out		-t

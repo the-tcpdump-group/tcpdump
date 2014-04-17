@@ -28,6 +28,8 @@
 
 #include <tcpdump-stdinc.h>
 
+#include <string.h>
+
 #include "ip6.h"
 
 #include "interface.h"
@@ -42,6 +44,7 @@ rt6_print(netdissect_options *ndo, register const u_char *bp, const u_char *bp2 
 	register const u_char *ep;
 	int i, len;
 	register const struct in6_addr *addr;
+	const struct in6_addr *last_addr = NULL;
 
 	dp = (struct ip6_rthdr *)bp;
 	len = dp->ip6r_len;
@@ -81,7 +84,16 @@ rt6_print(netdissect_options *ndo, register const u_char *bp, const u_char *bp2 
 				goto trunc;
 
 			ND_PRINT((ndo, ", [%d]%s", i, ip6addr_string(ndo, addr)));
+			last_addr = addr;
 			addr++;
+		}
+		/*
+		 * the destination address used in the pseudo-header is that of the final
+		 * destination : the last address of the routing header
+		 */
+		if (last_addr != NULL) {
+			struct ip6_hdr *ip6 = (struct ip6_hdr *)bp2;
+			UNALIGNED_MEMCPY(&ip6->ip6_dst, last_addr, sizeof (struct in6_addr));
 		}
 		/*(*/
 		ND_PRINT((ndo, ") "));
