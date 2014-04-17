@@ -197,6 +197,12 @@ dccp_partial_csum_v6_longer	dccp_partial_csum_v6_longer.pcap	dccp_partial_csum_v
 vrrp		vrrp.pcap		vrrp.out		-t
 vrrp-v		vrrp.pcap		vrrp-v.out		-t -v
 
+# HSRP tests
+hsrp_1		HSRP_coup.pcap		hsrp_1.out	-t
+hsrp_1-v	HSRP_coup.pcap		hsrp_1-v.out	-t -v
+hsrp_2-v	HSRP_election.pcap	hsrp_2-v.out	-t -v
+hsrp_3-v	HSRP_failover.pcap	hsrp_3-v.out	-t -v
+
 # PIMv2 tests
 pimv2_dm-v		PIM-DM_pruning.pcap		pimv2_dm-v.out		-t -v
 pimv2_register-v	PIM_register_register-stop.pcap	pimv2_register-v.out	-t -v
@@ -234,3 +240,10 @@ eigrp1-v	EIGRP_adjacency.pcap	eigrp1-v.out	-t -v
 eigrp2-v	EIGRP_goodbye.pcap	eigrp2-v.out	-t -v
 eigrp3-v	EIGRP_subnet_down.pcap	eigrp3-v.out	-t -v
 eigrp4-v	EIGRP_subnet_up.pcap	eigrp4-v.out	-t -v
+
+# IS-IS tests
+isis_1		ISIS_external_lsp.pcap		isis_1.out	-t
+isis_1-v	ISIS_external_lsp.pcap		isis_1-v.out	-t -v
+isis_2-v	ISIS_level1_adjacency.pcap	isis_2-v.out	-t -v
+isis_3-v	ISIS_level2_adjacency.pcap	isis_3-v.out	-t -v
+isis_4-v	ISIS_p2p_adjacency.pcap		isis_4-v.out	-t -v
