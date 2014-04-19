@@ -1315,16 +1315,21 @@ parse_elements(netdissect_options *ndo,
 	pbody->tim_present = 0;
 
 	while (length != 0) {
-		if (!ND_TTEST2(*(p + offset), 1))
+		/* Make sure we at least have the element ID and length. */
+		if (!ND_TTEST2(*(p + offset), 2))
 			return 0;
-		if (length < 1)
+		if (length < 2)
 			return 0;
+		elementlen = *(p + offset + 1);
+
+		/* Make sure we have the entire element. */
+		if (!ND_TTEST2(*(p + offset + 2), elementlen))
+			return 0;
+		if (length < elementlen + 2)
+			return 0;
+
 		switch (*(p + offset)) {
 		case E_SSID:
-			if (!ND_TTEST2(*(p + offset), 2))
-				return 0;
-			if (length < 2)
-				return 0;
 			memcpy(&ssid, p + offset, 2);
 			offset += 2;
 			length -= 2;
@@ -1353,10 +1358,6 @@ parse_elements(netdissect_options *ndo,
 			}
 			break;
 		case E_CHALLENGE:
-			if (!ND_TTEST2(*(p + offset), 2))
-				return 0;
-			if (length < 2)
-				return 0;
 			memcpy(&challenge, p + offset, 2);
 			offset += 2;
 			length -= 2;
@@ -1387,10 +1388,6 @@ parse_elements(netdissect_options *ndo,
 			}
 			break;
 		case E_RATES:
-			if (!ND_TTEST2(*(p + offset), 2))
-				return 0;
-			if (length < 2)
-				return 0;
 			memcpy(&rates, p + offset, 2);
 			offset += 2;
 			length -= 2;
@@ -1427,13 +1424,17 @@ parse_elements(netdissect_options *ndo,
 			}
 			break;
 		case E_DS:
-			if (!ND_TTEST2(*(p + offset), 3))
-				return 0;
-			if (length < 3)
-				return 0;
-			memcpy(&ds, p + offset, 3);
-			offset += 3;
-			length -= 3;
+			memcpy(&ds, p + offset, 2);
+			offset += 2;
+			length -= 2;
+			if (ds.length != 1) {
+				offset += ds.length;
+				length -= ds.length;
+				break;
+			}
+			ds.channel = *(p + offset);
+			offset += 1;
+			length -= 1;
 			/*
 			 * Present and not truncated.
 			 *
@@ -1447,13 +1448,17 @@ parse_elements(netdissect_options *ndo,
 			}
 			break;
 		case E_CF:
-			if (!ND_TTEST2(*(p + offset), 8))
-				return 0;
-			if (length < 8)
-				return 0;
-			memcpy(&cf, p + offset, 8);
-			offset += 8;
-			length -= 8;
+			memcpy(&cf, p + offset, 2);
+			offset += 2;
+			length -= 2;
+			if (cf.length != 6) {
+				offset += cf.length;
+				length -= cf.length;
+				break;
+			}
+			memcpy(&cf.count, p + offset, 6);
+			offset += 6;
+			length -= 6;
 			/*
 			 * Present and not truncated.
 			 *
@@ -1467,29 +1472,20 @@ parse_elements(netdissect_options *ndo,
 			}
 			break;
 		case E_TIM:
-			if (!ND_TTEST2(*(p + offset), 2))
-				return 0;
-			if (length < 2)
-				return 0;
 			memcpy(&tim, p + offset, 2);
 			offset += 2;
 			length -= 2;
-			if (!ND_TTEST2(*(p + offset), 3))
-				return 0;
-			if (length < 3)
+			if (tim.length <= 3) {
+				offset += tim.length;
+				length -= tim.length;
+				break;
+			}
+			if (tim.length - 3 > (int)sizeof tim.bitmap)
 				return 0;
 			memcpy(&tim.count, p + offset, 3);
 			offset += 3;
 			length -= 3;
 
-			if (tim.length <= 3)
-				break;
-			if (tim.length - 3 > (int)sizeof tim.bitmap)
-				return 0;
-			if (!ND_TTEST2(*(p + offset), tim.length - 3))
-				return 0;
-			if (length < (u_int)(tim.length - 3))
-				return 0;
 			memcpy(tim.bitmap, p + (tim.length - 3),
 			    (tim.length - 3));
 			offset += tim.length - 3;
@@ -1511,17 +1507,8 @@ parse_elements(netdissect_options *ndo,
 			ND_PRINT((ndo, "(1) unhandled element_id (%d)  ",
 			    *(p + offset)));
 #endif
-			if (!ND_TTEST2(*(p + offset), 2))
-				return 0;
-			if (length < 2)
-				return 0;
-			elementlen = *(p + offset + 1);
-			if (!ND_TTEST2(*(p + offset + 2), elementlen))
-				return 0;
-			if (length < elementlen + 2)
-				return 0;
-			offset += elementlen + 2;
-			length -= elementlen + 2;
+			offset += 2 + elementlen;
+			length -= 2 + elementlen;
 			break;
 		}
 	}
