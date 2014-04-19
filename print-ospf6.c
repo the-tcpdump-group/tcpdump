@@ -130,11 +130,14 @@ struct lsa6_hdr {
     u_int16_t ls_length;
 };
 
+/* Length of an IPv6 address, in bytes. */
+#define IPV6_ADDR_LEN_BYTES (128/8)
+
 struct lsa6_prefix {
     u_int8_t lsa_p_len;
     u_int8_t lsa_p_opt;
     u_int16_t lsa_p_metric;
-    u_int8_t lsa_p_prefix[4];
+    u_int8_t lsa_p_prefix[IPV6_ADDR_LEN_BYTES]; /* maximum length */
 };
 
 /* link state advertisement */
@@ -416,10 +419,10 @@ ospf6_print_lsaprefix(netdissect_options *ndo,
 	u_int wordlen;
 	struct in6_addr prefix;
 
-	if (lsa_length < sizeof (*lsapp) - 4)
+	if (lsa_length < sizeof (*lsapp) - IPV6_ADDR_LEN_BYTES)
 		goto trunc;
-	lsa_length -= sizeof (*lsapp) - 4;
-	ND_TCHECK2(*lsapp, sizeof (*lsapp) - 4);
+	lsa_length -= sizeof (*lsapp) - IPV6_ADDR_LEN_BYTES;
+	ND_TCHECK2(*lsapp, sizeof (*lsapp) - IPV6_ADDR_LEN_BYTES);
 	wordlen = (lsapp->lsa_p_len + 31) / 32;
 	if (wordlen * 4 > sizeof(struct in6_addr)) {
 		ND_PRINT((ndo, " bogus prefixlen /%d", lsapp->lsa_p_len));
@@ -439,7 +442,7 @@ ospf6_print_lsaprefix(netdissect_options *ndo,
                               "none", lsapp->lsa_p_opt)));
         }
         ND_PRINT((ndo, ", metric %u", EXTRACT_16BITS(&lsapp->lsa_p_metric)));
-	return sizeof(*lsapp) - 4 + wordlen * 4;
+	return sizeof(*lsapp) - IPV6_ADDR_LEN_BYTES + wordlen * 4;
 
 trunc:
 	return -1;
