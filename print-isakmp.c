@@ -1306,7 +1306,7 @@ trunc:
 
 static const u_char *
 ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
-	       const struct isakmp_gen *ext, u_int item_len _U_,
+	       const struct isakmp_gen *ext, u_int item_len,
 	       const u_char *ep _U_, u_int32_t phase, u_int32_t doi _U_,
 	       u_int32_t proto _U_, int depth _U_)
 {
