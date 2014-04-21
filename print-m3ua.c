@@ -32,7 +32,12 @@
 #include "interface.h"
 #include "extract.h"
 
+static const char tstr[] = " [|m3ua]";
+static const char cstr[] = " (corrupt)";
+
 /* RFC 4666 */
+
+#define M3UA_REL_1_0 1
 
 struct m3ua_common_header {
   u_int8_t  v;
@@ -211,36 +216,101 @@ tag_value_print(netdissect_options *ndo,
   case M3UA_PARAM_NETWORK_APPEARANCE:
   case M3UA_PARAM_ROUTING_CTX:
   case M3UA_PARAM_CORR_ID:
+    /* buf and size don't include the header */
+    if (size < 4)
+      goto corrupt;
+    ND_TCHECK2(*buf, size);
     ND_PRINT((ndo, "0x%08x", EXTRACT_32BITS(buf)));
     break;
   /* ... */
   default:
-    ND_PRINT((ndo, "(length %u)", size));
+    ND_PRINT((ndo, "(length %u)", size + sizeof(struct m3ua_param_header)));
+    ND_TCHECK2(*buf, size);
   }
+  return;
+
+corrupt:
+  ND_PRINT((ndo, "%s", cstr));
+  ND_TCHECK2(*buf, size);
+  return;
+trunc:
+  ND_PRINT((ndo, "%s", tstr));
 }
 
+/*
+ *     0                   1                   2                   3
+ *     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *    |          Parameter Tag        |       Parameter Length        |
+ *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *    \                                                               \
+ *    /                       Parameter Value                         /
+ *    \                                                               \
+ *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ */
 static void
 m3ua_tags_print(netdissect_options *ndo,
                 const u_char *buf, const u_int size)
 {
   const u_char *p = buf;
   int align;
+  uint16_t hdr_tag;
+  uint16_t hdr_len;
+
   while (p < buf + size) {
-    const struct m3ua_param_header *hdr = (const struct m3ua_param_header *) p;
-    ND_PRINT((ndo, "\n\t\t\t%s: ", tok2str(ParamName, "Unknown Parameter (0x%04x)", EXTRACT_16BITS(&hdr->tag))));
-    tag_value_print(ndo, p + sizeof(struct m3ua_param_header), EXTRACT_16BITS(&hdr->tag), EXTRACT_16BITS(&hdr->len));
-    p += EXTRACT_16BITS(&hdr->len);
-    align = (p - buf) % 4;
-    p += (align) ? 4 - align : 0;
+    if (p + sizeof(struct m3ua_param_header) > buf + size)
+      goto corrupt;
+    ND_TCHECK2(*p, sizeof(struct m3ua_param_header));
+    /* Parameter Tag */
+    hdr_tag = EXTRACT_16BITS(p);
+    ND_PRINT((ndo, "\n\t\t\t%s: ", tok2str(ParamName, "Unknown Parameter (0x%04x)", hdr_tag)));
+    /* Parameter Length */
+    hdr_len = EXTRACT_16BITS(p + 2);
+    if (hdr_len < sizeof(struct m3ua_param_header))
+      goto corrupt;
+    /* Parameter Value */
+    align = (p + hdr_len - buf) % 4;
+    align = align ? 4 - align : 0;
+    ND_TCHECK2(*p, hdr_len + align);
+    tag_value_print(ndo, p, hdr_tag, hdr_len - sizeof(struct m3ua_param_header));
+    p += hdr_len + align;
   }
+  return;
+
+corrupt:
+  ND_PRINT((ndo, "%s", cstr));
+  ND_TCHECK2(*buf, size);
+  return;
+trunc:
+  ND_PRINT((ndo, "%s", tstr));
 }
 
+/*
+ *     0                   1                   2                   3
+ *     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *    |    Version    |   Reserved    | Message Class | Message Type  |
+ *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *    |                        Message Length                         |
+ *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *    \                                                               \
+ *    /                                                               /
+ */
 void
 m3ua_print(netdissect_options *ndo,
            const u_char *buf, const u_int size)
 {
   const struct m3ua_common_header *hdr = (const struct m3ua_common_header *) buf;
-  const struct tok *dict =
+  const struct tok *dict;
+
+  /* size includes the header */
+  if (size < sizeof(struct m3ua_common_header))
+    goto corrupt;
+  ND_TCHECK(*hdr);
+  if (hdr->v != M3UA_REL_1_0)
+    return;
+
+  dict =
     hdr->msg_class == M3UA_MSGC_MGMT     ? MgmtMessages :
     hdr->msg_class == M3UA_MSGC_TRANSFER ? TransferMessages :
     hdr->msg_class == M3UA_MSGC_SSNM     ? SS7Messages :
@@ -257,5 +327,13 @@ m3ua_print(netdissect_options *ndo,
     ND_PRINT((ndo, "\n\t\t\t@@@@@@ Corrupted length %u of message @@@@@@", EXTRACT_32BITS(&hdr->len)));
   else
     m3ua_tags_print(ndo, buf + sizeof(struct m3ua_common_header), EXTRACT_32BITS(&hdr->len) - sizeof(struct m3ua_common_header));
+  return;
+
+corrupt:
+  ND_PRINT((ndo, "%s", cstr));
+  ND_TCHECK2(*buf, size);
+  return;
+trunc:
+  ND_PRINT((ndo, "%s", tstr));
 }
 
