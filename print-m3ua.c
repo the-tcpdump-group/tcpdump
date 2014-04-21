@@ -224,7 +224,7 @@ tag_value_print(netdissect_options *ndo,
     break;
   /* ... */
   default:
-    ND_PRINT((ndo, "(length %u)", size + sizeof(struct m3ua_param_header)));
+    ND_PRINT((ndo, "(length %u)", size + (u_int)sizeof(struct m3ua_param_header)));
     ND_TCHECK2(*buf, size);
   }
   return;
