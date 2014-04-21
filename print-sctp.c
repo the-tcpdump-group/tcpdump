@@ -606,6 +606,9 @@ void sctp_print(netdissect_options *ndo,
 	case SCTP_DATA :
 	  {
 	    const struct sctpDataPart *dataHdrPtr;
+	    u_int32_t ppid;
+	    const u_char *payloadPtr;
+	    u_int payload_size;
 
 	    if ((chunkDescPtr->chunkFlg & SCTP_DATA_UNORDERED)
 		== SCTP_DATA_UNORDERED)
@@ -631,7 +634,7 @@ void sctp_print(netdissect_options *ndo,
 
 	    dataHdrPtr=(const struct sctpDataPart*)(chunkDescPtr+1);
 
-	    u_int32_t ppid = EXTRACT_32BITS(&dataHdrPtr->payloadtype);
+	    ppid = EXTRACT_32BITS(&dataHdrPtr->payloadtype);
 	    ND_PRINT((ndo, "[TSN: %u] ", EXTRACT_32BITS(&dataHdrPtr->TSN)));
 	    ND_PRINT((ndo, "[SID: %u] ", EXTRACT_16BITS(&dataHdrPtr->streamId)));
 	    ND_PRINT((ndo, "[SSEQ %u] ", EXTRACT_16BITS(&dataHdrPtr->sequence)));
@@ -644,14 +647,14 @@ void sctp_print(netdissect_options *ndo,
 		    (ppid == SCTP_PPID_FORCES_LP);
 	    }
 
-	    const u_char *payloadPtr = (const u_char *) (dataHdrPtr + 1);
+	    payloadPtr = (const u_char *) (dataHdrPtr + 1);
 	    if (EXTRACT_16BITS(&chunkDescPtr->chunkLength) <
 		    sizeof(struct sctpDataPart) + sizeof(struct sctpChunkDesc) + 1) {
 		ND_PRINT((ndo, "bogus chunk length %u]", EXTRACT_16BITS(&chunkDescPtr->chunkLength)));
 		return;
 	    }
 
-	    u_int payload_size = EXTRACT_16BITS(&chunkDescPtr->chunkLength) -
+	    payload_size = EXTRACT_16BITS(&chunkDescPtr->chunkLength) -
 		(sizeof(struct sctpDataPart) + sizeof(struct sctpChunkDesc));
 
 	    if (isforces) {
@@ -660,7 +663,7 @@ void sctp_print(netdissect_options *ndo,
 					/* at the command line */
 		switch (ppid) {
 		case SCTP_PPID_M3UA :
-			print_m3ua(payloadPtr, payload_size);
+			m3ua_print(ndo, payloadPtr, payload_size);
 			break;
 		default:
 			ND_PRINT((ndo, "[Payload"));

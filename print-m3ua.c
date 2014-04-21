@@ -22,16 +22,53 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include <tcpdump-stdinc.h>
-#include "m3ua.h"
 
 #include "interface.h"
-#include "addrtoname.h"
 #include "extract.h"
+
+/* RFC 4666 */
+
+struct m3ua_common_header {
+  u_int8_t  v;
+  u_int8_t  reserved;
+  u_int8_t  msg_class;
+  u_int8_t  msg_type;
+  u_int32_t len;
+};
+
+struct m3ua_param_header {
+  u_int16_t tag;
+  u_int16_t len;
+};
+
+/* message classes */
+#define M3UA_MSGC_MGMT 0
+#define M3UA_MSGC_TRANSFER 1
+#define M3UA_MSGC_SSNM 2
+#define M3UA_MSGC_ASPSM 3
+#define M3UA_MSGC_ASPTM 4
+/* reserved values */
+#define M3UA_MSGC_RKM 9
+
+static const struct tok MessageClasses[] = {
+	{ M3UA_MSGC_MGMT,     "Management"            },
+	{ M3UA_MSGC_TRANSFER, "Transfer"              },
+	{ M3UA_MSGC_SSNM,     "SS7"                   },
+	{ M3UA_MSGC_ASPSM,    "ASP"                   },
+	{ M3UA_MSGC_ASPTM,    "ASP"                   },
+	{ M3UA_MSGC_RKM,      "Routing Key Managment" },
+	{ 0, NULL }
+};
+
+/* management messages */
+#define M3UA_MGMT_ERROR 0
+#define M3UA_MGMT_NOTIFY 1
 
 static const struct tok MgmtMessages[] = {
   { M3UA_MGMT_ERROR, "Error" },
@@ -39,10 +76,21 @@ static const struct tok MgmtMessages[] = {
   { 0, NULL }
 };
 
+/* transfer messages */
+#define M3UA_TRANSFER_DATA 1
+
 static const struct tok TransferMessages[] = {
   { M3UA_TRANSFER_DATA, "Data" },
   { 0, NULL }
 };
+
+/* SS7 Signaling Network Management messages */
+#define M3UA_SSNM_DUNA 1
+#define M3UA_SSNM_DAVA 2
+#define M3UA_SSNM_DAUD 3
+#define M3UA_SSNM_SCON 4
+#define M3UA_SSNM_DUPU 5
+#define M3UA_SSNM_DRST 6
 
 static const struct tok SS7Messages[] = {
   { M3UA_SSNM_DUNA, "Destination Unavailable" },
@@ -54,6 +102,14 @@ static const struct tok SS7Messages[] = {
   { 0, NULL }
 };
 
+/* ASP State Maintenance messages */
+#define M3UA_ASP_UP 1
+#define M3UA_ASP_DN 2
+#define M3UA_ASP_BEAT 3
+#define M3UA_ASP_UP_ACK 4
+#define M3UA_ASP_DN_ACK 5
+#define M3UA_ASP_BEAT_ACK 6
+
 static const struct tok ASPStateMessages[] = {
   { M3UA_ASP_UP, "Up" },
   { M3UA_ASP_DN, "Down" },
@@ -64,6 +120,12 @@ static const struct tok ASPStateMessages[] = {
   { 0, NULL }
 };
 
+/* ASP Traffic Maintenance messages */
+#define M3UA_ASP_AC 1
+#define M3UA_ASP_IA 2
+#define M3UA_ASP_AC_ACK 3
+#define M3UA_ASP_IA_ACK 4
+
 static const struct tok ASPTrafficMessages[] = {
   { M3UA_ASP_AC, "Active" },
   { M3UA_ASP_IA, "Inactive" },
@@ -72,6 +134,12 @@ static const struct tok ASPTrafficMessages[] = {
   { 0, NULL }
 };
 
+/* Routing Key Management messages */
+#define M3UA_RKM_REQ 1
+#define M3UA_RKM_RSP 2
+#define M3UA_RKM_DEREQ 3
+#define M3UA_RKM_DERSP 4
+
 static const struct tok RoutingKeyMgmtMessages[] = {
   { M3UA_RKM_REQ, "Registration Request" },
   { M3UA_RKM_RSP, "Registration Response" },
@@ -79,6 +147,33 @@ static const struct tok RoutingKeyMgmtMessages[] = {
   { M3UA_RKM_DERSP, "Deregistration Response" },
   { 0, NULL }
 };
+
+/* M3UA Parameters */
+#define M3UA_PARAM_INFO 0x0004
+#define M3UA_PARAM_ROUTING_CTX 0x0006
+#define M3UA_PARAM_DIAGNOSTIC 0x0007
+#define M3UA_PARAM_HB_DATA 0x0009
+#define M3UA_PARAM_TRAFFIC_MODE_TYPE 0x000b
+#define M3UA_PARAM_ERROR_CODE 0x000c
+#define M3UA_PARAM_STATUS 0x000d
+#define M3UA_PARAM_ASP_ID 0x0011
+#define M3UA_PARAM_AFFECTED_POINT_CODE 0x0012
+#define M3UA_PARAM_CORR_ID 0x0013
+
+#define M3UA_PARAM_NETWORK_APPEARANCE 0x0200
+#define M3UA_PARAM_USER 0x0204
+#define M3UA_PARAM_CONGESTION_INDICATION 0x0205
+#define M3UA_PARAM_CONCERNED_DST 0x0206
+#define M3UA_PARAM_ROUTING_KEY 0x0207
+#define M3UA_PARAM_REG_RESULT 0x0208
+#define M3UA_PARAM_DEREG_RESULT 0x0209
+#define M3UA_PARAM_LOCAL_ROUTING_KEY_ID 0x020a
+#define M3UA_PARAM_DST_POINT_CODE 0x020b
+#define M3UA_PARAM_SI 0x020c
+#define M3UA_PARAM_ORIGIN_POINT_CODE_LIST 0x020e
+#define M3UA_PARAM_PROTO_DATA 0x0210
+#define M3UA_PARAM_REG_STATUS 0x0212
+#define M3UA_PARAM_DEREG_STATUS 0x0213
 
 static const struct tok ParamName[] = {
   { M3UA_PARAM_INFO, "INFO String" },
@@ -108,68 +203,59 @@ static const struct tok ParamName[] = {
   { 0, NULL }
 };
 
-static void print_tag_value(const u_char *buf, u_int16_t tag, u_int16_t size)
+static void
+tag_value_print(netdissect_options *ndo,
+                const u_char *buf, const u_int16_t tag, const u_int16_t size)
 {
   switch (tag) {
   case M3UA_PARAM_NETWORK_APPEARANCE:
   case M3UA_PARAM_ROUTING_CTX:
   case M3UA_PARAM_CORR_ID:
-    printf("0x%08x", EXTRACT_32BITS(buf));
+    ND_PRINT((ndo, "0x%08x", EXTRACT_32BITS(buf)));
     break;
   /* ... */
   default:
-    printf("(length %u)", size);
+    ND_PRINT((ndo, "(length %u)", size));
   }
 }
 
-static void print_m3ua_tags(const u_char *buf, u_int size)
+static void
+m3ua_tags_print(netdissect_options *ndo,
+                const u_char *buf, const u_int size)
 {
   const u_char *p = buf;
+  int align;
   while (p < buf + size) {
     const struct m3ua_param_header *hdr = (const struct m3ua_param_header *) p;
-    printf("\n\t\t\t%s: ", tok2str(ParamName, "Unknown Parameter (0x%04x)", EXTRACT_16BITS(&hdr->tag)));
-    print_tag_value(p + sizeof(struct m3ua_param_header), EXTRACT_16BITS(&hdr->tag), EXTRACT_16BITS(&hdr->len));
+    ND_PRINT((ndo, "\n\t\t\t%s: ", tok2str(ParamName, "Unknown Parameter (0x%04x)", EXTRACT_16BITS(&hdr->tag))));
+    tag_value_print(ndo, p + sizeof(struct m3ua_param_header), EXTRACT_16BITS(&hdr->tag), EXTRACT_16BITS(&hdr->len));
     p += EXTRACT_16BITS(&hdr->len);
-    int align = (int) (p - buf) % 4;
+    align = (p - buf) % 4;
     p += (align) ? 4 - align : 0;
   }
 }
 
-void print_m3ua(const u_char *buf, u_int size)
+void
+m3ua_print(netdissect_options *ndo,
+           const u_char *buf, const u_int size)
 {
   const struct m3ua_common_header *hdr = (const struct m3ua_common_header *) buf;
+  const struct tok *dict =
+    hdr->msg_class == M3UA_MSGC_MGMT     ? MgmtMessages :
+    hdr->msg_class == M3UA_MSGC_TRANSFER ? TransferMessages :
+    hdr->msg_class == M3UA_MSGC_SSNM     ? SS7Messages :
+    hdr->msg_class == M3UA_MSGC_ASPSM    ? ASPStateMessages :
+    hdr->msg_class == M3UA_MSGC_ASPTM    ? ASPTrafficMessages :
+    hdr->msg_class == M3UA_MSGC_RKM      ? RoutingKeyMgmtMessages :
+    NULL;
 
-  printf("\n\t\t");
-  switch (hdr->msg_class) {
-  case M3UA_MSGC_MGMT:
-    printf("Management %s Message", tok2str(MgmtMessages, "Unknown (0x%02x)", hdr->msg_type));
-    break;
-  case M3UA_MSGC_TRANSFER:
-    printf("Transfer %s Message", tok2str(TransferMessages, "Unknown (0x%02x)", hdr->msg_type));
-    break;
-  case M3UA_MSGC_SSNM:
-    printf("SS7 %s Message", tok2str(SS7Messages, "Unknown (0x%02x)", hdr->msg_type));
-    break;
-  case M3UA_MSGC_ASPSM:
-    printf("ASP %s Message", tok2str(ASPStateMessages, "Unknown (0x%02x)", hdr->msg_type));
-    break;
-  case M3UA_MSGC_ASPTM:
-    printf("ASP %s Message", tok2str(ASPTrafficMessages, "Unknown (0x%02x)", hdr->msg_type));
-    break;
-  case M3UA_MSGC_RKM:
-    printf("Routing Key Managment %s Message",
-        tok2str(RoutingKeyMgmtMessages, "Unknown (0x%02x)", hdr->msg_type));
-    break;
-  default:
-    printf("Unknown message class %i", hdr->msg_class);
-    break;
-  };
-
-  fflush(stdout);
+  ND_PRINT((ndo, "\n\t\t%s", tok2str(MessageClasses, "Unknown message class %i", hdr->msg_class)));
+  if (dict != NULL)
+    ND_PRINT((ndo, " %s Message", tok2str(dict, "Unknown (0x%02x)", hdr->msg_type)));
 
   if (size != EXTRACT_32BITS(&hdr->len))
-    printf("\n\t\t\t@@@@@@ Corrupted length %u of message @@@@@@", EXTRACT_32BITS(&hdr->len));
+    ND_PRINT((ndo, "\n\t\t\t@@@@@@ Corrupted length %u of message @@@@@@", EXTRACT_32BITS(&hdr->len)));
   else
-    print_m3ua_tags(buf + sizeof(struct m3ua_common_header), EXTRACT_32BITS(&hdr->len) - sizeof(struct m3ua_common_header));
+    m3ua_tags_print(ndo, buf + sizeof(struct m3ua_common_header), EXTRACT_32BITS(&hdr->len) - sizeof(struct m3ua_common_header));
 }
 
