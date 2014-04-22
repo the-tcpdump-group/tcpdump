@@ -52,10 +52,6 @@
 #include <sys/types.h>
 #include <net/netdb.h>  /* in wpcap's Win32/include */
 
-#ifndef NBBY
-#define NBBY	8
-#endif
-
 #if !defined(__MINGW32__) && !defined(__WATCOMC__)
 #define stat _stat
 #define open _open
@@ -128,6 +124,10 @@ typedef char* caddr_t;
 
 #ifndef HAVE___ATTRIBUTE__
 #define __attribute__(x)
+#endif
+
+#ifndef NBBY
+#define NBBY	8
 #endif
 
 /*
