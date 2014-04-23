@@ -334,6 +334,18 @@
    a type exists and the standard includes do not define it. */
 #undef int8_t
 
+/* Define to `uint16_t' if u_int16_t not defined. */
+#undef u_int16_t
+
+/* Define to `uint32_t' if u_int32_t not defined. */
+#undef u_int32_t
+
+/* Define to `uint64_t' if u_int64_t not defined. */
+#undef u_int64_t
+
+/* Define to `uint8_t' if u_int8_t not defined. */
+#undef u_int8_t
+
 /* Define to the type of an unsigned integer type of width exactly 16 bits if
    such a type exists and the standard includes do not define it. */
 #undef uint16_t

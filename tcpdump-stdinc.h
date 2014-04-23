@@ -31,8 +31,8 @@
 
 /*
  * Include the appropriate OS header files on Windows and various flavors
- * of UNIX, and also define some additional items and include various
- * non-OS header files on Windows, and; this isolates most of the platform
+ * of UNIX, include various non-OS header files on Windows, and define
+ * various items as needed, to isolate most of tcpdump's platform
  * differences to this one file.
  */
 

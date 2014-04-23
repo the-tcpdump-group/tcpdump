@@ -869,6 +869,7 @@ fi
 #
 # Make sure we have definitions for all the C99 specified-width types
 # (regardless of whether the environment is a C99 environment or not).
+#
 AC_TYPE_INT8_T
 AC_TYPE_INT16_T
 AC_TYPE_INT32_T
@@ -879,18 +880,33 @@ AC_TYPE_UINT32_T
 AC_TYPE_UINT64_T
 
 #
-# The minimum version of autoconf that we support is 2.61, and it
-# supports the AC_TYPE_UINTn_T macros.  Use them; we've stopped
-# using the old BSD-style u_intXX_t types.
+# Define the old BSD specified-width types in terms of the C99 types;
+# we may need them with libpcap include files.
 #
-AC_TYPE_UINT8_T
-AC_TYPE_INT8_T
-AC_TYPE_UINT16_T
-AC_TYPE_INT16_T
-AC_TYPE_UINT32_T
-AC_TYPE_INT32_T
-AC_TYPE_UINT64_T
-AC_TYPE_INT64_T
+AC_CHECK_TYPE([u_int8_t], ,
+	[AC_DEFINE([u_int8_t], [uint8_t],
+	[Define to `uint8_t' if u_int8_t not defined.])],
+	[AC_INCLUDES_DEFAULT
+#include <sys/types.h>
+])
+AC_CHECK_TYPE([u_int16_t], ,
+	[AC_DEFINE([u_int16_t], [uint16_t],
+	[Define to `uint16_t' if u_int16_t not defined.])],
+	[AC_INCLUDES_DEFAULT
+#include <sys/types.h>
+])
+AC_CHECK_TYPE([u_int32_t], ,
+	[AC_DEFINE([u_int32_t], [uint32_t],
+	[Define to `uint32_t' if u_int32_t not defined.])],
+	[AC_INCLUDES_DEFAULT
+#include <sys/types.h>
+])
+AC_CHECK_TYPE([u_int64_t], ,
+	[AC_DEFINE([u_int64_t], [uint64_t],
+	[Define to `uint64_t' if u_int64_t not defined.])],
+	[AC_INCLUDES_DEFAULT
+#include <sys/types.h>
+])
 
 #
 # Check for <inttypes.h>

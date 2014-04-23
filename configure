@@ -6797,6 +6797,7 @@ fi
 #
 # Make sure we have definitions for all the C99 specified-width types
 # (regardless of whether the environment is a C99 environment or not).
+#
 ac_fn_c_find_intX_t "$LINENO" "8" "ac_cv_c_int8_t"
 case $ac_cv_c_int8_t in #(
   no|yes) ;; #(
@@ -6897,107 +6898,56 @@ _ACEOF
 
 
 #
-# The minimum version of autoconf that we support is 2.61, and it
-# supports the AC_TYPE_UINTn_T macros.  Use them; we've stopped
-# using the old BSD-style u_intXX_t types.
+# Define the old BSD specified-width types in terms of the C99 types;
+# we may need them with libpcap include files.
 #
-ac_fn_c_find_uintX_t "$LINENO" "8" "ac_cv_c_uint8_t"
-case $ac_cv_c_uint8_t in #(
-  no|yes) ;; #(
-  *)
+ac_fn_c_check_type "$LINENO" "u_int8_t" "ac_cv_type_u_int8_t" "$ac_includes_default
+#include <sys/types.h>
 
-$as_echo "#define _UINT8_T 1" >>confdefs.h
+"
+if test "x$ac_cv_type_u_int8_t" = xyes; then :
 
+else
 
-cat >>confdefs.h <<_ACEOF
-#define uint8_t $ac_cv_c_uint8_t
-_ACEOF
-;;
-  esac
+$as_echo "#define u_int8_t uint8_t" >>confdefs.h
 
-ac_fn_c_find_intX_t "$LINENO" "8" "ac_cv_c_int8_t"
-case $ac_cv_c_int8_t in #(
-  no|yes) ;; #(
-  *)
+fi
 
-cat >>confdefs.h <<_ACEOF
-#define int8_t $ac_cv_c_int8_t
-_ACEOF
-;;
-esac
+ac_fn_c_check_type "$LINENO" "u_int16_t" "ac_cv_type_u_int16_t" "$ac_includes_default
+#include <sys/types.h>
 
-ac_fn_c_find_uintX_t "$LINENO" "16" "ac_cv_c_uint16_t"
-case $ac_cv_c_uint16_t in #(
-  no|yes) ;; #(
-  *)
+"
+if test "x$ac_cv_type_u_int16_t" = xyes; then :
 
+else
 
-cat >>confdefs.h <<_ACEOF
-#define uint16_t $ac_cv_c_uint16_t
-_ACEOF
-;;
-  esac
+$as_echo "#define u_int16_t uint16_t" >>confdefs.h
 
-ac_fn_c_find_intX_t "$LINENO" "16" "ac_cv_c_int16_t"
-case $ac_cv_c_int16_t in #(
-  no|yes) ;; #(
-  *)
+fi
 
-cat >>confdefs.h <<_ACEOF
-#define int16_t $ac_cv_c_int16_t
-_ACEOF
-;;
-esac
+ac_fn_c_check_type "$LINENO" "u_int32_t" "ac_cv_type_u_int32_t" "$ac_includes_default
+#include <sys/types.h>
 
-ac_fn_c_find_uintX_t "$LINENO" "32" "ac_cv_c_uint32_t"
-case $ac_cv_c_uint32_t in #(
-  no|yes) ;; #(
-  *)
+"
+if test "x$ac_cv_type_u_int32_t" = xyes; then :
 
-$as_echo "#define _UINT32_T 1" >>confdefs.h
+else
 
+$as_echo "#define u_int32_t uint32_t" >>confdefs.h
 
-cat >>confdefs.h <<_ACEOF
-#define uint32_t $ac_cv_c_uint32_t
-_ACEOF
-;;
-  esac
+fi
 
-ac_fn_c_find_intX_t "$LINENO" "32" "ac_cv_c_int32_t"
-case $ac_cv_c_int32_t in #(
-  no|yes) ;; #(
-  *)
+ac_fn_c_check_type "$LINENO" "u_int64_t" "ac_cv_type_u_int64_t" "$ac_includes_default
+#include <sys/types.h>
 
-cat >>confdefs.h <<_ACEOF
-#define int32_t $ac_cv_c_int32_t
-_ACEOF
-;;
-esac
+"
+if test "x$ac_cv_type_u_int64_t" = xyes; then :
 
-ac_fn_c_find_uintX_t "$LINENO" "64" "ac_cv_c_uint64_t"
-case $ac_cv_c_uint64_t in #(
-  no|yes) ;; #(
-  *)
+else
 
-$as_echo "#define _UINT64_T 1" >>confdefs.h
+$as_echo "#define u_int64_t uint64_t" >>confdefs.h
 
-
-cat >>confdefs.h <<_ACEOF
-#define uint64_t $ac_cv_c_uint64_t
-_ACEOF
-;;
-  esac
-
-ac_fn_c_find_intX_t "$LINENO" "64" "ac_cv_c_int64_t"
-case $ac_cv_c_int64_t in #(
-  no|yes) ;; #(
-  *)
-
-cat >>confdefs.h <<_ACEOF
-#define int64_t $ac_cv_c_int64_t
-_ACEOF
-;;
-esac
+fi
 
 
 #
