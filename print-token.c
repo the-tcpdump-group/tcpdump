@@ -82,12 +82,12 @@
 #define SEGMENT_COUNT(trp)	((int)((RIF_LENGTH(trp) - 2) / 2))
 
 struct token_header {
-	u_int8_t  token_ac;
-	u_int8_t  token_fc;
-	u_int8_t  token_dhost[TOKEN_RING_MAC_LEN];
-	u_int8_t  token_shost[TOKEN_RING_MAC_LEN];
-	u_int16_t token_rcf;
-	u_int16_t token_rseg[ROUTING_SEGMENT_MAX];
+	uint8_t  token_ac;
+	uint8_t  token_fc;
+	uint8_t  token_dhost[TOKEN_RING_MAC_LEN];
+	uint8_t  token_shost[TOKEN_RING_MAC_LEN];
+	uint16_t token_rcf;
+	uint16_t token_rseg[ROUTING_SEGMENT_MAX];
 };
 
 static const char tstr[] = "[|token-ring]";

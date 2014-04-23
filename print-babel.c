@@ -144,7 +144,7 @@ format_address(netdissect_options *ndo, const u_char *prefix)
 }
 
 static const char *
-format_interval(const u_int16_t i)
+format_interval(const uint16_t i)
 {
     static char buf[sizeof("000.00s")];
 
@@ -155,7 +155,7 @@ format_interval(const u_int16_t i)
 }
 
 static const char *
-format_interval_update(const u_int16_t i)
+format_interval_update(const uint16_t i)
 {
     return i == 0xFFFF ? "infinity" : format_interval(i);
 }

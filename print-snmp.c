@@ -323,15 +323,15 @@ static const struct obj_abrev {
  * temporary internal representation while decoding an ASN.1 data stream.
  */
 struct be {
-	u_int32_t asnlen;
+	uint32_t asnlen;
 	union {
 		caddr_t raw;
 		int32_t integer;
-		u_int32_t uns;
+		uint32_t uns;
 		const u_char *str;
 	        struct {
-		        u_int32_t high;
-		        u_int32_t low;
+		        uint32_t high;
+		        uint32_t low;
 		} uns64;
 	} data;
 	u_short id;
@@ -472,7 +472,7 @@ asn1_parse(netdissect_options *ndo,
 	elem->asnlen = *p;
 	p++; len--; hdr++;
 	if (elem->asnlen & ASN_BIT8) {
-		u_int32_t noct = elem->asnlen % ASN_BIT8;
+		uint32_t noct = elem->asnlen % ASN_BIT8;
 		elem->asnlen = 0;
 		if (len < noct) {
 			ND_PRINT((ndo, "[asnlen? %d<%d]", len, noct));
@@ -551,7 +551,7 @@ asn1_parse(netdissect_options *ndo,
 			case COUNTER:
 			case GAUGE:
 			case TIMETICKS: {
-				register u_int32_t data;
+				register uint32_t data;
 				ND_TCHECK2(*p, elem->asnlen);
 				elem->type = BE_UNS;
 				data = 0;
@@ -562,7 +562,7 @@ asn1_parse(netdissect_options *ndo,
 			}
 
 			case COUNTER64: {
-				register u_int32_t high, low;
+				register uint32_t high, low;
 				ND_TCHECK2(*p, elem->asnlen);
 			        elem->type = BE_UNS64;
 				high = 0, low = 0;
@@ -662,8 +662,8 @@ asn1_print(netdissect_options *ndo,
            struct be *elem)
 {
 	u_char *p = (u_char *)elem->data.raw;
-	u_int32_t asnlen = elem->asnlen;
-	u_int32_t i;
+	uint32_t asnlen = elem->asnlen;
+	uint32_t i;
 
 	switch (elem->type) {
 
@@ -896,7 +896,7 @@ smi_decode_oid(netdissect_options *ndo,
                unsigned int oidsize, unsigned int *oidlen)
 {
 	u_char *p = (u_char *)elem->data.raw;
-	u_int32_t asnlen = elem->asnlen;
+	uint32_t asnlen = elem->asnlen;
 	int o = 0, first = -1, i = asnlen;
 
 	for (*oidlen = 0; ndo->ndo_sflag && i-- > 0; p++) {

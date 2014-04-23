@@ -87,11 +87,11 @@ static const struct tok pf_directions[] = {
 static void
 pflog_print(netdissect_options *ndo, const struct pfloghdr *hdr)
 {
-	u_int32_t rulenr, subrulenr;
+	uint32_t rulenr, subrulenr;
 
 	rulenr = EXTRACT_32BITS(&hdr->rulenr);
 	subrulenr = EXTRACT_32BITS(&hdr->subrulenr);
-	if (subrulenr == (u_int32_t)-1)
+	if (subrulenr == (uint32_t)-1)
 		ND_PRINT((ndo, "rule %u/", rulenr));
 	else
 		ND_PRINT((ndo, "rule %u.%s.%u/", rulenr, hdr->ruleset, subrulenr));
@@ -111,10 +111,10 @@ pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	u_int hdrlen;
 	u_int caplen = h->caplen;
 	const struct pfloghdr *hdr;
-	u_int8_t af;
+	uint8_t af;
 
 	/* check length */
-	if (caplen < sizeof(u_int8_t)) {
+	if (caplen < sizeof(uint8_t)) {
 		ND_PRINT((ndo, "%s", tstr));
 		return (caplen);
 	}

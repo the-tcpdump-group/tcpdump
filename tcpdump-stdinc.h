@@ -104,13 +104,8 @@ typedef char* caddr_t;
 #include <netdb.h>
 #if HAVE_INTTYPES_H
 #include <inttypes.h>
-#else
-#if HAVE_STDINT_H
+#elif HAVE_STDINT_H
 #include <stdint.h>
-#endif
-#endif
-#ifdef HAVE_SYS_BITYPES_H
-#include <sys/bitypes.h>
 #endif
 #include <sys/param.h>
 #include <sys/types.h>			/* concession to AIX */

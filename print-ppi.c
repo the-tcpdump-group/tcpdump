@@ -26,8 +26,8 @@ static inline void
 ppi_header_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	const ppi_header_t *hdr;
-	u_int32_t dlt;
-	u_int16_t len;
+	uint32_t dlt;
+	uint16_t len;
 
 	hdr = (const ppi_header_t *)bp;
 
@@ -54,7 +54,7 @@ ppi_print(netdissect_options *ndo,
 	ppi_header_t *hdr;
 	u_int caplen = h->caplen;
 	u_int length = h->len;
-	u_int32_t dlt;
+	uint32_t dlt;
 
 	if (caplen < sizeof(ppi_header_t)) {
 		ND_PRINT((ndo, "[|ppi]"));

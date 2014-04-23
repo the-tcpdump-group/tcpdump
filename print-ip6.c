@@ -41,15 +41,15 @@
  * Compute a V6-style checksum by building a pseudoheader.
  */
 int
-nextproto6_cksum(const struct ip6_hdr *ip6, const u_int8_t *data,
+nextproto6_cksum(const struct ip6_hdr *ip6, const uint8_t *data,
 		 u_int len, u_int covlen, u_int next_proto)
 {
         struct {
                 struct in6_addr ph_src;
                 struct in6_addr ph_dst;
-                u_int32_t       ph_len;
-                u_int8_t        ph_zero[3];
-                u_int8_t        ph_nxt;
+                uint32_t       ph_len;
+                uint8_t        ph_zero[3];
+                uint8_t        ph_nxt;
         } ph;
         struct cksum_vec vec[2];
 
@@ -60,7 +60,7 @@ nextproto6_cksum(const struct ip6_hdr *ip6, const u_int8_t *data,
         ph.ph_len = htonl(len);
         ph.ph_nxt = next_proto;
 
-        vec[0].ptr = (const u_int8_t *)(void *)&ph;
+        vec[0].ptr = (const uint8_t *)(void *)&ph;
         vec[0].len = sizeof(ph);
         vec[1].ptr = data;
         vec[1].len = covlen;

@@ -34,14 +34,14 @@
  */
 
 struct tsp_timeval {
-	u_int32_t	tv_sec;
-	u_int32_t	tv_usec;
+	uint32_t	tv_sec;
+	uint32_t	tv_usec;
 };
 
 struct tsp {
-	u_int8_t	tsp_type;
-	u_int8_t	tsp_vers;
-	u_int16_t	tsp_seq;
+	uint8_t	tsp_type;
+	uint8_t	tsp_vers;
+	uint16_t	tsp_seq;
 	union {
 		struct tsp_timeval tspu_time;
 		int8_t tspu_hopcnt;

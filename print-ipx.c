@@ -46,21 +46,21 @@
 
 /* IPX transport header */
 struct ipxHdr {
-    u_int16_t	cksum;		/* Checksum */
-    u_int16_t	length;		/* Length, in bytes, including header */
-    u_int8_t	tCtl;		/* Transport Control (i.e. hop count) */
-    u_int8_t	pType;		/* Packet Type (i.e. level 2 protocol) */
-    u_int16_t	dstNet[2];	/* destination net */
-    u_int8_t	dstNode[6];	/* destination node */
-    u_int16_t	dstSkt;		/* destination socket */
-    u_int16_t	srcNet[2];	/* source net */
-    u_int8_t	srcNode[6];	/* source node */
-    u_int16_t	srcSkt;		/* source socket */
+    uint16_t	cksum;		/* Checksum */
+    uint16_t	length;		/* Length, in bytes, including header */
+    uint8_t	tCtl;		/* Transport Control (i.e. hop count) */
+    uint8_t	pType;		/* Packet Type (i.e. level 2 protocol) */
+    uint16_t	dstNet[2];	/* destination net */
+    uint8_t	dstNode[6];	/* destination node */
+    uint16_t	dstSkt;		/* destination socket */
+    uint16_t	srcNet[2];	/* source net */
+    uint8_t	srcNode[6];	/* source node */
+    uint16_t	srcSkt;		/* source socket */
 };
 
 #define ipxSize	30
 
-static const char *ipxaddr_string(u_int32_t, const u_char *);
+static const char *ipxaddr_string(uint32_t, const u_char *);
 static void ipx_decode(netdissect_options *, const struct ipxHdr *, const u_char *, u_int);
 static void ipx_sap_print(netdissect_options *, const u_short *, u_int);
 static void ipx_rip_print(netdissect_options *, const u_short *, u_int);
@@ -96,7 +96,7 @@ trunc:
 }
 
 static const char *
-ipxaddr_string(u_int32_t net, const u_char *node)
+ipxaddr_string(uint32_t net, const u_char *node)
 {
     static char line[256];
 

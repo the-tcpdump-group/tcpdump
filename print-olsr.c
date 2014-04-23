@@ -62,8 +62,8 @@
  */
 
 struct olsr_common {
-    u_int8_t packet_len[2];
-    u_int8_t packet_seq[2];
+    uint8_t packet_len[2];
+    uint8_t packet_seq[2];
 };
 
 #define OLSR_HELLO_MSG         1 /* rfc3626 */
@@ -88,50 +88,50 @@ static const struct tok olsr_msg_values[] = {
 };
 
 struct olsr_msg4 {
-    u_int8_t msg_type;
-    u_int8_t vtime;
-    u_int8_t msg_len[2];
-    u_int8_t originator[4];
-    u_int8_t ttl;
-    u_int8_t hopcount;
-    u_int8_t msg_seq[2];
+    uint8_t msg_type;
+    uint8_t vtime;
+    uint8_t msg_len[2];
+    uint8_t originator[4];
+    uint8_t ttl;
+    uint8_t hopcount;
+    uint8_t msg_seq[2];
 };
 
 struct olsr_msg6 {
-    u_int8_t msg_type;
-    u_int8_t vtime;
-    u_int8_t msg_len[2];
-    u_int8_t originator[16];
-    u_int8_t ttl;
-    u_int8_t hopcount;
-    u_int8_t msg_seq[2];
+    uint8_t msg_type;
+    uint8_t vtime;
+    uint8_t msg_len[2];
+    uint8_t originator[16];
+    uint8_t ttl;
+    uint8_t hopcount;
+    uint8_t msg_seq[2];
 };
 
 struct olsr_hello {
-    u_int8_t res[2];
-    u_int8_t htime;
-    u_int8_t will;
+    uint8_t res[2];
+    uint8_t htime;
+    uint8_t will;
 };
 
 struct olsr_hello_link {
-    u_int8_t link_code;
-    u_int8_t res;
-    u_int8_t len[2];
+    uint8_t link_code;
+    uint8_t res;
+    uint8_t len[2];
 };
 
 struct olsr_tc {
-    u_int8_t ans_seq[2];
-    u_int8_t res[2];
+    uint8_t ans_seq[2];
+    uint8_t res[2];
 };
 
 struct olsr_hna4 {
-    u_int8_t network[4];
-    u_int8_t mask[4];
+    uint8_t network[4];
+    uint8_t mask[4];
 };
 
 struct olsr_hna6 {
-    u_int8_t network[16];
-    u_int8_t mask[16];
+    uint8_t network[16];
+    uint8_t mask[16];
 };
 
 
@@ -154,17 +154,17 @@ static const struct tok olsr_neighbor_type_values[] = {
 };
 
 struct olsr_lq_neighbor4 {
-    u_int8_t neighbor[4];
-    u_int8_t link_quality;
-    u_int8_t neighbor_link_quality;
-    u_int8_t res[2];
+    uint8_t neighbor[4];
+    uint8_t link_quality;
+    uint8_t neighbor_link_quality;
+    uint8_t res[2];
 };
 
 struct olsr_lq_neighbor6 {
-    u_int8_t neighbor[16];
-    u_int8_t link_quality;
-    u_int8_t neighbor_link_quality;
-    u_int8_t res[2];
+    uint8_t neighbor[16];
+    uint8_t link_quality;
+    uint8_t neighbor_link_quality;
+    uint8_t res[2];
 };
 
 /*
@@ -262,9 +262,9 @@ olsr_print(netdissect_options *ndo,
     } ptr;
 
     u_int msg_type, msg_len, msg_tlen, hello_len;
-    u_int16_t name_entry_type, name_entry_len;
+    uint16_t name_entry_type, name_entry_len;
     u_int name_entry_padding;
-    u_int8_t link_type, neighbor_type;
+    uint8_t link_type, neighbor_type;
     const u_char *tptr, *msg_data;
 
     tptr = pptr;

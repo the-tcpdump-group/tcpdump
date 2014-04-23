@@ -44,9 +44,9 @@
 #include "extract.h"                    /* must come after interface.h */
 
 /* BIND9 lib/lwres/include/lwres */
-typedef u_int32_t lwres_uint32_t;
-typedef u_int16_t lwres_uint16_t;
-typedef u_int8_t lwres_uint8_t;
+typedef uint32_t lwres_uint32_t;
+typedef uint16_t lwres_uint16_t;
+typedef uint8_t lwres_uint8_t;
 
 struct lwres_lwpacket {
 	lwres_uint32_t		length;
@@ -210,7 +210,7 @@ static int
 lwres_printnamelen(netdissect_options *ndo,
                    const char *p)
 {
-	u_int16_t l;
+	uint16_t l;
 	int advance;
 
 	if (p + 2 > (const char *)ndo->ndo_snapend)
@@ -230,7 +230,7 @@ lwres_printbinlen(netdissect_options *ndo,
                   const char *p0)
 {
 	const char *p;
-	u_int16_t l;
+	uint16_t l;
 	int i;
 
 	p = p0;
@@ -252,7 +252,7 @@ static int
 lwres_printaddr(netdissect_options *ndo,
                 lwres_addr_t *ap)
 {
-	u_int16_t l;
+	uint16_t l;
 	const char *p;
 	int i;
 
@@ -294,7 +294,7 @@ lwres_print(netdissect_options *ndo,
             register const u_char *bp, u_int length)
 {
 	const struct lwres_lwpacket *np;
-	u_int32_t v;
+	uint32_t v;
 	const char *s;
 	int response;
 	int advance;
@@ -346,7 +346,7 @@ lwres_print(netdissect_options *ndo,
 		lwres_gabnrequest_t *gabn;
 		lwres_gnbarequest_t *gnba;
 		lwres_grbnrequest_t *grbn;
-		u_int32_t l;
+		uint32_t l;
 
 		gabn = NULL;
 		gnba = NULL;
@@ -445,8 +445,8 @@ lwres_print(netdissect_options *ndo,
 		lwres_gabnresponse_t *gabn;
 		lwres_gnbaresponse_t *gnba;
 		lwres_grbnresponse_t *grbn;
-		u_int32_t l, na;
-		u_int32_t i;
+		uint32_t l, na;
+		uint32_t i;
 
 		gabn = NULL;
 		gnba = NULL;

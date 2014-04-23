@@ -35,62 +35,62 @@
  * PGM header (RFC 3208)
  */
 struct pgm_header {
-    u_int16_t	pgm_sport;
-    u_int16_t	pgm_dport;
-    u_int8_t	pgm_type;
-    u_int8_t	pgm_options;
-    u_int16_t	pgm_sum;
-    u_int8_t	pgm_gsid[6];
-    u_int16_t	pgm_length;
+    uint16_t	pgm_sport;
+    uint16_t	pgm_dport;
+    uint8_t	pgm_type;
+    uint8_t	pgm_options;
+    uint16_t	pgm_sum;
+    uint8_t	pgm_gsid[6];
+    uint16_t	pgm_length;
 };
 
 struct pgm_spm {
-    u_int32_t	pgms_seq;
-    u_int32_t	pgms_trailseq;
-    u_int32_t	pgms_leadseq;
-    u_int16_t	pgms_nla_afi;
-    u_int16_t	pgms_reserved;
-    /* ... u_int8_t	pgms_nla[0]; */
+    uint32_t	pgms_seq;
+    uint32_t	pgms_trailseq;
+    uint32_t	pgms_leadseq;
+    uint16_t	pgms_nla_afi;
+    uint16_t	pgms_reserved;
+    /* ... uint8_t	pgms_nla[0]; */
     /* ... options */
 };
 
 struct pgm_nak {
-    u_int32_t	pgmn_seq;
-    u_int16_t	pgmn_source_afi;
-    u_int16_t	pgmn_reserved;
-    /* ... u_int8_t	pgmn_source[0]; */
-    /* ... u_int16_t	pgmn_group_afi */
-    /* ... u_int16_t	pgmn_reserved2; */
-    /* ... u_int8_t	pgmn_group[0]; */
+    uint32_t	pgmn_seq;
+    uint16_t	pgmn_source_afi;
+    uint16_t	pgmn_reserved;
+    /* ... uint8_t	pgmn_source[0]; */
+    /* ... uint16_t	pgmn_group_afi */
+    /* ... uint16_t	pgmn_reserved2; */
+    /* ... uint8_t	pgmn_group[0]; */
     /* ... options */
 };
 
 struct pgm_ack {
-    u_int32_t	pgma_rx_max_seq;
-    u_int32_t	pgma_bitmap;
+    uint32_t	pgma_rx_max_seq;
+    uint32_t	pgma_bitmap;
     /* ... options */
 };
 
 struct pgm_poll {
-    u_int32_t	pgmp_seq;
-    u_int16_t	pgmp_round;
-    u_int16_t	pgmp_reserved;
+    uint32_t	pgmp_seq;
+    uint16_t	pgmp_round;
+    uint16_t	pgmp_reserved;
     /* ... options */
 };
 
 struct pgm_polr {
-    u_int32_t	pgmp_seq;
-    u_int16_t	pgmp_round;
-    u_int16_t	pgmp_subtype;
-    u_int16_t	pgmp_nla_afi;
-    u_int16_t	pgmp_reserved;
-    /* ... u_int8_t	pgmp_nla[0]; */
+    uint32_t	pgmp_seq;
+    uint16_t	pgmp_round;
+    uint16_t	pgmp_subtype;
+    uint16_t	pgmp_nla_afi;
+    uint16_t	pgmp_reserved;
+    /* ... uint8_t	pgmp_nla[0]; */
     /* ... options */
 };
 
 struct pgm_data {
-    u_int32_t	pgmd_seq;
-    u_int32_t	pgmd_trailseq;
+    uint32_t	pgmd_seq;
+    uint32_t	pgmd_trailseq;
     /* ... options */
 };
 
@@ -150,7 +150,7 @@ pgm_print(netdissect_options *ndo,
 	register const struct pgm_header *pgm;
 	register const struct ip *ip;
 	register char ch;
-	u_int16_t sport, dport;
+	uint16_t sport, dport;
 	int addr_size;
 	const void *nla;
 	int nla_af;
@@ -160,8 +160,8 @@ pgm_print(netdissect_options *ndo,
 #else
 	char nla_buf[INET_ADDRSTRLEN];
 #endif
-	u_int8_t opt_type, opt_len;
-	u_int32_t seq, opts_len, len, offset;
+	uint8_t opt_type, opt_len;
+	uint32_t seq, opts_len, len, offset;
 
 	pgm = (struct pgm_header *)bp;
 	ip = (struct ip *)bp2;
@@ -287,7 +287,7 @@ pgm_print(netdissect_options *ndo,
 	}
 	case PGM_POLR: {
 	    struct pgm_polr *polr;
-	    u_int32_t ivl, rnd, mask;
+	    uint32_t ivl, rnd, mask;
 
 	    polr = (struct pgm_polr *)(pgm + 1);
 	    ND_TCHECK(*polr);
@@ -314,17 +314,17 @@ pgm_print(netdissect_options *ndo,
 
 	    inet_ntop(nla_af, nla, nla_buf, sizeof(nla_buf));
 
-	    ND_TCHECK2(*bp, sizeof(u_int32_t));
+	    ND_TCHECK2(*bp, sizeof(uint32_t));
 	    ivl = EXTRACT_32BITS(bp);
-	    bp += sizeof(u_int32_t);
+	    bp += sizeof(uint32_t);
 
-	    ND_TCHECK2(*bp, sizeof(u_int32_t));
+	    ND_TCHECK2(*bp, sizeof(uint32_t));
 	    rnd = EXTRACT_32BITS(bp);
-	    bp += sizeof(u_int32_t);
+	    bp += sizeof(uint32_t);
 
-	    ND_TCHECK2(*bp, sizeof(u_int32_t));
+	    ND_TCHECK2(*bp, sizeof(uint32_t));
 	    mask = EXTRACT_32BITS(bp);
-	    bp += sizeof(u_int32_t);
+	    bp += sizeof(uint32_t);
 
 	    ND_PRINT((ndo, "POLR seq %u round %u nla %s ivl %u rnd 0x%08x "
 			 "mask 0x%08x", EXTRACT_32BITS(&polr->pgmp_seq),
@@ -413,7 +413,7 @@ pgm_print(netdissect_options *ndo,
 		goto trunc;
 		break;
 	    }
-	    bp += (2 * sizeof(u_int16_t));
+	    bp += (2 * sizeof(uint16_t));
 	    ND_TCHECK2(*bp, addr_size);
 	    group = bp;
 	    bp += addr_size;
@@ -490,7 +490,7 @@ pgm_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "[Bad total option length %u < 4]", opts_len));
 		return;
 	    }
-	    bp += sizeof(u_int16_t);
+	    bp += sizeof(uint16_t);
 	    ND_PRINT((ndo, " OPTS LEN %d", opts_len));
 	    opts_len -= 4;
 
@@ -522,7 +522,7 @@ pgm_print(netdissect_options *ndo,
 			return;
 		    }
 		    ND_PRINT((ndo, " OPTS LEN (extra?) %d", EXTRACT_16BITS(bp)));
-		    bp += sizeof(u_int16_t);
+		    bp += sizeof(uint16_t);
 		    opts_len -= 4;
 		    break;
 
@@ -533,29 +533,29 @@ pgm_print(netdissect_options *ndo,
 		    }
 		    bp += 2;
 		    seq = EXTRACT_32BITS(bp);
-		    bp += sizeof(u_int32_t);
+		    bp += sizeof(uint32_t);
 		    offset = EXTRACT_32BITS(bp);
-		    bp += sizeof(u_int32_t);
+		    bp += sizeof(uint32_t);
 		    len = EXTRACT_32BITS(bp);
-		    bp += sizeof(u_int32_t);
+		    bp += sizeof(uint32_t);
 		    ND_PRINT((ndo, " FRAG seq %u off %u len %u", seq, offset, len));
 		    opts_len -= 16;
 		    break;
 
 		case PGM_OPT_NAK_LIST:
 		    bp += 2;
-		    opt_len -= sizeof(u_int32_t);	/* option header */
+		    opt_len -= sizeof(uint32_t);	/* option header */
 		    ND_PRINT((ndo, " NAK LIST"));
 		    while (opt_len) {
-			if (opt_len < sizeof(u_int32_t)) {
+			if (opt_len < sizeof(uint32_t)) {
 			    ND_PRINT((ndo, "[Option length not a multiple of 4]"));
 			    return;
 			}
-			ND_TCHECK2(*bp, sizeof(u_int32_t));
+			ND_TCHECK2(*bp, sizeof(uint32_t));
 			ND_PRINT((ndo, " %u", EXTRACT_32BITS(bp)));
-			bp += sizeof(u_int32_t);
-			opt_len -= sizeof(u_int32_t);
-			opts_len -= sizeof(u_int32_t);
+			bp += sizeof(uint32_t);
+			opt_len -= sizeof(uint32_t);
+			opts_len -= sizeof(uint32_t);
 		    }
 		    break;
 
@@ -566,7 +566,7 @@ pgm_print(netdissect_options *ndo,
 		    }
 		    bp += 2;
 		    seq = EXTRACT_32BITS(bp);
-		    bp += sizeof(u_int32_t);
+		    bp += sizeof(uint32_t);
 		    ND_PRINT((ndo, " JOIN %u", seq));
 		    opts_len -= 8;
 		    break;
@@ -578,9 +578,9 @@ pgm_print(netdissect_options *ndo,
 		    }
 		    bp += 2;
 		    offset = EXTRACT_32BITS(bp);
-		    bp += sizeof(u_int32_t);
+		    bp += sizeof(uint32_t);
 		    seq = EXTRACT_32BITS(bp);
-		    bp += sizeof(u_int32_t);
+		    bp += sizeof(uint32_t);
 		    ND_PRINT((ndo, " BACKOFF ivl %u ivlseq %u", offset, seq));
 		    opts_len -= 12;
 		    break;
@@ -592,9 +592,9 @@ pgm_print(netdissect_options *ndo,
 		    }
 		    bp += 2;
 		    offset = EXTRACT_32BITS(bp);
-		    bp += sizeof(u_int32_t);
+		    bp += sizeof(uint32_t);
 		    seq = EXTRACT_32BITS(bp);
-		    bp += sizeof(u_int32_t);
+		    bp += sizeof(uint32_t);
 		    ND_PRINT((ndo, " BACKOFF max %u min %u", offset, seq));
 		    opts_len -= 12;
 		    break;
@@ -616,7 +616,7 @@ pgm_print(netdissect_options *ndo,
 			goto trunc;
 			break;
 		    }
-		    bp += (2 * sizeof(u_int16_t));
+		    bp += (2 * sizeof(uint16_t));
 		    if (opt_len != 4 + addr_size) {
 			ND_PRINT((ndo, "[Bad OPT_REDIRECT option, length %u != 4 + address size]", opt_len));
 			return;
@@ -637,7 +637,7 @@ pgm_print(netdissect_options *ndo,
 		    }
 		    bp += 2;
 		    len = EXTRACT_32BITS(bp);
-		    bp += sizeof(u_int32_t);
+		    bp += sizeof(uint32_t);
 		    ND_PRINT((ndo, " PARITY MAXTGS %u", len));
 		    opts_len -= 8;
 		    break;
@@ -649,7 +649,7 @@ pgm_print(netdissect_options *ndo,
 		    }
 		    bp += 2;
 		    seq = EXTRACT_32BITS(bp);
-		    bp += sizeof(u_int32_t);
+		    bp += sizeof(uint32_t);
 		    ND_PRINT((ndo, " PARITY GROUP %u", seq));
 		    opts_len -= 8;
 		    break;
@@ -661,7 +661,7 @@ pgm_print(netdissect_options *ndo,
 		    }
 		    bp += 2;
 		    len = EXTRACT_32BITS(bp);
-		    bp += sizeof(u_int32_t);
+		    bp += sizeof(uint32_t);
 		    ND_PRINT((ndo, " PARITY ATGS %u", len));
 		    opts_len -= 8;
 		    break;
@@ -731,7 +731,7 @@ pgm_print(netdissect_options *ndo,
 		case PGM_OPT_PGMCC_DATA:
 		    bp += 2;
 		    offset = EXTRACT_32BITS(bp);
-		    bp += sizeof(u_int32_t);
+		    bp += sizeof(uint32_t);
 		    switch (EXTRACT_16BITS(bp)) {
 		    case AFNUM_INET:
 			addr_size = sizeof(struct in_addr);
@@ -747,7 +747,7 @@ pgm_print(netdissect_options *ndo,
 			goto trunc;
 			break;
 		    }
-		    bp += (2 * sizeof(u_int16_t));
+		    bp += (2 * sizeof(uint16_t));
 		    if (opt_len != 12 + addr_size) {
 			ND_PRINT((ndo, "[Bad OPT_PGMCC_DATA option, length %u != 12 + address size]", opt_len));
 			return;
@@ -764,7 +764,7 @@ pgm_print(netdissect_options *ndo,
 		case PGM_OPT_PGMCC_FEEDBACK:
 		    bp += 2;
 		    offset = EXTRACT_32BITS(bp);
-		    bp += sizeof(u_int32_t);
+		    bp += sizeof(uint32_t);
 		    switch (EXTRACT_16BITS(bp)) {
 		    case AFNUM_INET:
 			addr_size = sizeof(struct in_addr);
@@ -780,7 +780,7 @@ pgm_print(netdissect_options *ndo,
 			goto trunc;
 			break;
 		    }
-		    bp += (2 * sizeof(u_int16_t));
+		    bp += (2 * sizeof(uint16_t));
 		    if (opt_len != 12 + addr_size) {
 			ND_PRINT((ndo, "[Bad OPT_PGMCC_FEEDBACK option, length %u != 12 + address size]", opt_len));
 			return;

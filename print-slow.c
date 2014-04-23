@@ -32,8 +32,8 @@
 #include "oui.h"
 
 struct slow_common_header_t {
-    u_int8_t proto_subtype;
-    u_int8_t version;
+    uint8_t proto_subtype;
+    uint8_t version;
 };
 
 #define	SLOW_PROTO_LACP                     1
@@ -79,15 +79,15 @@ static const struct tok slow_oam_code_values[] = {
 };
 
 struct slow_oam_info_t {
-    u_int8_t info_type;
-    u_int8_t info_length;
-    u_int8_t oam_version;
-    u_int8_t revision[2];
-    u_int8_t state;
-    u_int8_t oam_config;
-    u_int8_t oam_pdu_config[2];
-    u_int8_t oui[3];
-    u_int8_t vendor_private[4];
+    uint8_t info_type;
+    uint8_t info_length;
+    uint8_t oam_version;
+    uint8_t revision[2];
+    uint8_t state;
+    uint8_t oam_config;
+    uint8_t oam_pdu_config[2];
+    uint8_t oui[3];
+    uint8_t vendor_private[4];
 };
 
 #define SLOW_OAM_INFO_TYPE_END_OF_TLV 0x00
@@ -149,29 +149,29 @@ static const struct tok slow_oam_link_event_values[] = {
 };
 
 struct slow_oam_link_event_t {
-    u_int8_t event_type;
-    u_int8_t event_length;
-    u_int8_t time_stamp[2];
-    u_int8_t window[8];
-    u_int8_t threshold[8];
-    u_int8_t errors[8];
-    u_int8_t errors_running_total[8];
-    u_int8_t event_running_total[4];
+    uint8_t event_type;
+    uint8_t event_length;
+    uint8_t time_stamp[2];
+    uint8_t window[8];
+    uint8_t threshold[8];
+    uint8_t errors[8];
+    uint8_t errors_running_total[8];
+    uint8_t event_running_total[4];
 };
 
 struct slow_oam_variablerequest_t {
-    u_int8_t branch;
-    u_int8_t leaf[2];
+    uint8_t branch;
+    uint8_t leaf[2];
 };
 
 struct slow_oam_variableresponse_t {
-    u_int8_t branch;
-    u_int8_t leaf[2];
-    u_int8_t length;
+    uint8_t branch;
+    uint8_t leaf[2];
+    uint8_t length;
 };
 
 struct slow_oam_loopbackctrl_t {
-    u_int8_t command;
+    uint8_t command;
 };
 
 static const struct tok slow_oam_loopbackctrl_cmd_values[] = {
@@ -181,8 +181,8 @@ static const struct tok slow_oam_loopbackctrl_cmd_values[] = {
 };
 
 struct tlv_header_t {
-    u_int8_t type;
-    u_int8_t length;
+    uint8_t type;
+    uint8_t length;
 };
 
 #define LACP_TLV_TERMINATOR     0x00
@@ -205,13 +205,13 @@ static const struct tok slow_tlv_values[] = {
 };
 
 struct lacp_tlv_actor_partner_info_t {
-    u_int8_t sys_pri[2];
-    u_int8_t sys[ETHER_ADDR_LEN];
-    u_int8_t key[2];
-    u_int8_t port_pri[2];
-    u_int8_t port[2];
-    u_int8_t state;
-    u_int8_t pad[3];
+    uint8_t sys_pri[2];
+    uint8_t sys[ETHER_ADDR_LEN];
+    uint8_t key[2];
+    uint8_t port_pri[2];
+    uint8_t port[2];
+    uint8_t state;
+    uint8_t pad[3];
 };
 
 static const struct tok lacp_tlv_actor_partner_info_state_values[] = {
@@ -227,19 +227,19 @@ static const struct tok lacp_tlv_actor_partner_info_state_values[] = {
 };
 
 struct lacp_tlv_collector_info_t {
-    u_int8_t max_delay[2];
-    u_int8_t pad[12];
+    uint8_t max_delay[2];
+    uint8_t pad[12];
 };
 
 struct marker_tlv_marker_info_t {
-    u_int8_t req_port[2];
-    u_int8_t req_sys[ETHER_ADDR_LEN];
-    u_int8_t req_trans_id[4];
-    u_int8_t pad[2];
+    uint8_t req_port[2];
+    uint8_t req_sys[ETHER_ADDR_LEN];
+    uint8_t req_trans_id[4];
+    uint8_t pad[2];
 };
 
 struct lacp_marker_tlv_terminator_t {
-    u_int8_t pad[50];
+    uint8_t pad[50];
 };
 
 static void slow_marker_lacp_print(netdissect_options *, register const u_char *, register u_int);
@@ -455,13 +455,13 @@ slow_oam_print(netdissect_options *ndo,
     u_int hexdump;
 
     struct slow_oam_common_header_t {
-        u_int8_t flags[2];
-        u_int8_t code;
+        uint8_t flags[2];
+        uint8_t code;
     };
 
     struct slow_oam_tlv_header_t {
-        u_int8_t type;
-        u_int8_t length;
+        uint8_t type;
+        uint8_t length;
     };
 
     union {

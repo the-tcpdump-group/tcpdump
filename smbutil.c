@@ -21,16 +21,16 @@
 #include "extract.h"
 #include "smb.h"
 
-static u_int32_t stringlen;
+static uint32_t stringlen;
 extern const u_char *startbuf;
 
 /*
  * interpret a 32 bit dos packed date/time to some parameters
  */
 static void
-interpret_dos_date(u_int32_t date, struct tm *tp)
+interpret_dos_date(uint32_t date, struct tm *tp)
 {
-    u_int32_t p0, p1, p2, p3;
+    uint32_t p0, p1, p2, p3;
 
     p0 = date & 0xFF;
     p1 = ((date & 0xFF00) >> 8) & 0xFF;
@@ -50,7 +50,7 @@ interpret_dos_date(u_int32_t date, struct tm *tp)
  * create a unix date from a dos date
  */
 static time_t
-int_unix_date(u_int32_t dos_date)
+int_unix_date(uint32_t dos_date)
 {
     struct tm t;
 
@@ -72,7 +72,7 @@ int_unix_date(u_int32_t dos_date)
 static time_t
 make_unix_date(const u_char *date_ptr)
 {
-    u_int32_t dos_date = 0;
+    uint32_t dos_date = 0;
 
     dos_date = EXTRACT_LE_32BITS(date_ptr);
 
@@ -86,7 +86,7 @@ make_unix_date(const u_char *date_ptr)
 static time_t
 make_unix_date2(const u_char *date_ptr)
 {
-    u_int32_t x, x2;
+    uint32_t x, x2;
 
     x = EXTRACT_LE_32BITS(date_ptr);
     x2 = ((x & 0xFFFF) << 16) | ((x & 0xFFFF0000) >> 16);
@@ -181,7 +181,7 @@ name_ptr(netdissect_options *ndo,
 
     /* XXX - this should use the same code that the DNS dissector does */
     if ((c & 0xC0) == 0xC0) {
-	u_int16_t l;
+	uint16_t l;
 
 	ND_TCHECK2(*p, 2);
 	if ((p + 1) >= maxbuf)
@@ -341,11 +341,11 @@ write_bits(netdissect_options *ndo,
 #define MAX_UNISTR_SIZE	1000
 static const char *
 unistr(netdissect_options *ndo,
-       const u_char *s, u_int32_t *len, int use_unicode)
+       const u_char *s, uint32_t *len, int use_unicode)
 {
     static char buf[MAX_UNISTR_SIZE+1];
     size_t l = 0;
-    u_int32_t strsize;
+    uint32_t strsize;
     const u_char *sp;
 
     if (use_unicode) {
@@ -525,7 +525,7 @@ smb_fdata1(netdissect_options *ndo,
 	  }
 	case 'L':
 	  {
-	    u_int64_t x;
+	    uint64_t x;
 	    ND_TCHECK2(buf[0], 8);
 	    x = reverse ? EXTRACT_64BITS(buf) :
 			  EXTRACT_LE_64BITS(buf);
@@ -537,14 +537,14 @@ smb_fdata1(netdissect_options *ndo,
 	case 'M':
 	  {
 	    /* Weird mixed-endian length values in 64-bit locks */
-	    u_int32_t x1, x2;
-	    u_int64_t x;
+	    uint32_t x1, x2;
+	    uint64_t x;
 	    ND_TCHECK2(buf[0], 8);
 	    x1 = reverse ? EXTRACT_32BITS(buf) :
 			   EXTRACT_LE_32BITS(buf);
 	    x2 = reverse ? EXTRACT_32BITS(buf + 4) :
 			   EXTRACT_LE_32BITS(buf + 4);
-	    x = (((u_int64_t)x1) << 32) | x2;
+	    x = (((uint64_t)x1) << 32) | x2;
 	    ND_PRINT((ndo, "%" PRIu64 " (0x%" PRIx64 ")", x, x));
 	    buf += 8;
 	    fmt++;
@@ -618,7 +618,7 @@ smb_fdata1(netdissect_options *ndo,
 	  {
 	    /*XXX unistr() */
 	    const char *s;
-	    u_int32_t len;
+	    uint32_t len;
 
 	    len = 0;
 	    s = unistr(ndo, buf, &len, (*fmt == 'R') ? 0 : unicodestr);
@@ -633,7 +633,7 @@ smb_fdata1(netdissect_options *ndo,
 	case 'Y':	/* like 'Z', but always ASCII */
 	  {
 	    const char *s;
-	    u_int32_t len;
+	    uint32_t len;
 
 	    ND_TCHECK(*buf);
 	    if (*buf != 4 && *buf != 2) {
@@ -730,7 +730,7 @@ smb_fdata1(netdissect_options *ndo,
 	    time_t t;
 	    struct tm *lt;
 	    const char *tstring;
-	    u_int32_t x;
+	    uint32_t x;
 
 	    switch (atoi(fmt + 1)) {
 	    case 1:
@@ -1013,7 +1013,7 @@ smb_errstr(int class, int num)
 }
 
 typedef struct {
-    u_int32_t code;
+    uint32_t code;
     const char *name;
 } nt_err_code_struct;
 
@@ -1877,7 +1877,7 @@ static const nt_err_code_struct nt_errors[] = {
  * return an NT error string from a SMB buffer
  */
 const char *
-nt_errstr(u_int32_t err)
+nt_errstr(uint32_t err)
 {
     static char ret[128];
     int i;

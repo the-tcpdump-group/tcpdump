@@ -59,8 +59,8 @@ void
 mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	const u_char *p;
-	u_int32_t label_entry;
-	u_int16_t label_stack_depth = 0;
+	uint32_t label_entry;
+	uint16_t label_stack_depth = 0;
 	enum mpls_packet_type pt = PT_UNKNOWN;
 
 	p = bp;

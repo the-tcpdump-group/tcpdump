@@ -75,8 +75,8 @@ rrcp_print(netdissect_options *ndo,
 	  u_int length _U_)
 {
 	const u_char *rrcp;
-	u_int8_t rrcp_proto;
-	u_int8_t rrcp_opcode;
+	uint8_t rrcp_proto;
+	uint8_t rrcp_opcode;
 	register const struct ether_header *ep;
 	char proto_str[16];
 	char opcode_str[32];

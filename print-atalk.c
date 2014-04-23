@@ -50,13 +50,13 @@ static const struct tok type2str[] = {
 };
 
 struct aarp {
-	u_int16_t	htype, ptype;
-	u_int8_t	halen, palen;
-	u_int16_t	op;
-	u_int8_t	hsaddr[6];
-	u_int8_t	psaddr[4];
-	u_int8_t	hdaddr[6];
-	u_int8_t	pdaddr[4];
+	uint16_t	htype, ptype;
+	uint8_t	halen, palen;
+	uint16_t	op;
+	uint8_t	hsaddr[6];
+	uint8_t	psaddr[4];
+	uint8_t	hdaddr[6];
+	uint8_t	pdaddr[4];
 };
 
 static void atp_print(netdissect_options *, const struct atATP *, u_int);
@@ -250,7 +250,7 @@ atp_print(netdissect_options *ndo,
           register const struct atATP *ap, u_int length)
 {
 	char c;
-	u_int32_t data;
+	uint32_t data;
 
 	if ((const u_char *)(ap + 1) > ndo->ndo_snapend) {
 		/* Just bail if we don't have the whole chunk. */

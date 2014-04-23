@@ -581,7 +581,7 @@ ns_print(netdissect_options *ndo,
 	register const HEADER *np;
 	register int qdcount, ancount, nscount, arcount;
 	register const u_char *cp;
-	u_int16_t b2;
+	uint16_t b2;
 
 	np = (const HEADER *)bp;
 	ND_TCHECK(*np);

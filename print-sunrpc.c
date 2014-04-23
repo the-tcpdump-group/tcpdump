@@ -133,23 +133,23 @@
  * The service supports remote procedure calls on udp/ip or tcp/ip socket 111.
  */
 
-#define SUNRPC_PMAPPORT		((u_int16_t)111)
-#define SUNRPC_PMAPPROG		((u_int32_t)100000)
-#define SUNRPC_PMAPVERS		((u_int32_t)2)
-#define SUNRPC_PMAPVERS_PROTO	((u_int32_t)2)
-#define SUNRPC_PMAPVERS_ORIG	((u_int32_t)1)
-#define SUNRPC_PMAPPROC_NULL	((u_int32_t)0)
-#define SUNRPC_PMAPPROC_SET	((u_int32_t)1)
-#define SUNRPC_PMAPPROC_UNSET	((u_int32_t)2)
-#define SUNRPC_PMAPPROC_GETPORT	((u_int32_t)3)
-#define SUNRPC_PMAPPROC_DUMP	((u_int32_t)4)
-#define SUNRPC_PMAPPROC_CALLIT	((u_int32_t)5)
+#define SUNRPC_PMAPPORT		((uint16_t)111)
+#define SUNRPC_PMAPPROG		((uint32_t)100000)
+#define SUNRPC_PMAPVERS		((uint32_t)2)
+#define SUNRPC_PMAPVERS_PROTO	((uint32_t)2)
+#define SUNRPC_PMAPVERS_ORIG	((uint32_t)1)
+#define SUNRPC_PMAPPROC_NULL	((uint32_t)0)
+#define SUNRPC_PMAPPROC_SET	((uint32_t)1)
+#define SUNRPC_PMAPPROC_UNSET	((uint32_t)2)
+#define SUNRPC_PMAPPROC_GETPORT	((uint32_t)3)
+#define SUNRPC_PMAPPROC_DUMP	((uint32_t)4)
+#define SUNRPC_PMAPPROC_CALLIT	((uint32_t)5)
 
 struct sunrpc_pmap {
-	u_int32_t pm_prog;
-	u_int32_t pm_vers;
-	u_int32_t pm_prot;
-	u_int32_t pm_port;
+	uint32_t pm_prog;
+	uint32_t pm_vers;
+	uint32_t pm_prot;
+	uint32_t pm_port;
 };
 
 static const struct tok proc2str[] = {
@@ -163,7 +163,7 @@ static const struct tok proc2str[] = {
 };
 
 /* Forwards */
-static char *progstr(u_int32_t);
+static char *progstr(uint32_t);
 
 void
 sunrpcrequest_print(netdissect_options *ndo, register const u_char *bp,
@@ -174,7 +174,7 @@ sunrpcrequest_print(netdissect_options *ndo, register const u_char *bp,
 #ifdef INET6
 	register const struct ip6_hdr *ip6;
 #endif
-	u_int32_t x;
+	uint32_t x;
 	char srcid[20], dstid[20];	/*fits 32bit*/
 
 	rp = (struct sunrpc_msg *)bp;
@@ -232,13 +232,13 @@ sunrpcrequest_print(netdissect_options *ndo, register const u_char *bp,
 }
 
 static char *
-progstr(u_int32_t prog)
+progstr(uint32_t prog)
 {
 #if defined(HAVE_GETRPCBYNUMBER) && defined(HAVE_RPC_RPC_H)
 	register struct rpcent *rp;
 #endif
 	static char buf[32];
-	static u_int32_t lastprog = 0;
+	static uint32_t lastprog = 0;
 
 	if (lastprog != 0 && prog == lastprog)
 		return (buf);

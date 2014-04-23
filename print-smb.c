@@ -793,10 +793,10 @@ static void
 print_smb(netdissect_options *ndo,
           const u_char *buf, const u_char *maxbuf)
 {
-    u_int16_t flags2;
+    uint16_t flags2;
     int nterrcodes;
     int command;
-    u_int32_t nterror;
+    uint32_t nterror;
     const u_char *words, *maxwords, *data;
     const struct smbfns *fn;
     const char *fmt_smbheader =

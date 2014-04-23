@@ -85,8 +85,8 @@
  */
 
 struct newesp {
-	u_int32_t	esp_spi;	/* ESP */
-	u_int32_t	esp_seq;	/* Sequence number */
+	uint32_t	esp_spi;	/* ESP */
+	uint32_t	esp_seq;	/* Sequence number */
 	/*variable size*/		/* (IV and) Payload data */
 	/*variable size*/		/* padding */
 	/*8bit*/			/* pad size */
@@ -106,7 +106,7 @@ struct sa_list {
 	struct sa_list	*next;
 	u_int		daddr_version;
 	union inaddr_u	daddr;
-	u_int32_t	spi;          /* if == 0, then IKEv2 */
+	uint32_t	spi;          /* if == 0, then IKEv2 */
 	int             initiator;
 	u_char          spii[8];      /* for IKEv2 */
 	u_char          spir[8];
@@ -465,7 +465,7 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 	if (spikey) {
 
 		char *spistr, *foo;
-		u_int32_t spino;
+		uint32_t spino;
 
 		spistr = strsep(&spikey, "@");
 

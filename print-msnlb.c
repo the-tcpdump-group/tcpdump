@@ -38,11 +38,11 @@
 #include "extract.h"
 
 struct msnlb_heartbeat_pkt {
-	u_int32_t unknown1;
-	u_int32_t unknown2;
-	u_int32_t host_prio;	/* little-endian */
-	u_int32_t virtual_ip;
-	u_int32_t host_ip;
+	uint32_t unknown1;
+	uint32_t unknown2;
+	uint32_t host_prio;	/* little-endian */
+	uint32_t virtual_ip;
+	uint32_t host_ip;
 	/* the protocol is undocumented so we ignore the rest */
 };
 

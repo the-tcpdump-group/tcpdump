@@ -44,10 +44,10 @@
  */
 
 struct ldp_common_header {
-    u_int8_t version[2];
-    u_int8_t pdu_length[2];
-    u_int8_t lsr_id[4];
-    u_int8_t label_space[2];
+    uint8_t version[2];
+    uint8_t pdu_length[2];
+    uint8_t lsr_id[4];
+    uint8_t label_space[2];
 };
 
 #define LDP_VERSION 1
@@ -77,9 +77,9 @@ struct ldp_common_header {
  */
 
 struct ldp_msg_header {
-    u_int8_t type[2];
-    u_int8_t length[2];
-    u_int8_t id[4];
+    uint8_t type[2];
+    uint8_t length[2];
+    uint8_t id[4];
 };
 
 #define	LDP_MASK_MSG_TYPE(x)  ((x)&0x7fff)
@@ -236,8 +236,8 @@ ldp_tlv_print(netdissect_options *ndo,
               register const u_char *tptr) {
 
     struct ldp_tlv_header {
-        u_int8_t type[2];
-        u_int8_t length[2];
+        uint8_t type[2];
+        uint8_t length[2];
     };
 
     const struct ldp_tlv_header *ldp_tlv_header;

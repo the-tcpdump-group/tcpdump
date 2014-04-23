@@ -68,7 +68,7 @@ carp_print(netdissect_options *ndo, register const u_char *bp, register u_int le
 	    bp[1], bp[5], bp[2], bp[3]));
 	if (ndo->ndo_vflag) {
 		struct cksum_vec vec[1];
-		vec[0].ptr = (const u_int8_t *)bp;
+		vec[0].ptr = (const uint8_t *)bp;
 		vec[0].len = len;
 		if (ND_TTEST2(bp[0], len) && in_cksum(vec, 1))
 			ND_PRINT((ndo, " (bad carp cksum %x!)",

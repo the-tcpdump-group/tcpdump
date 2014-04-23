@@ -154,36 +154,36 @@ static const struct tok sctp_chunkid_str[] = {
 /* the sctp common header */
 
 struct sctpHeader{
-  u_int16_t source;
-  u_int16_t destination;
-  u_int32_t verificationTag;
-  u_int32_t adler32;
+  uint16_t source;
+  uint16_t destination;
+  uint32_t verificationTag;
+  uint32_t adler32;
 };
 
 /* various descriptor parsers */
 
 struct sctpChunkDesc{
-  u_int8_t chunkID;
-  u_int8_t chunkFlg;
-  u_int16_t chunkLength;
+  uint8_t chunkID;
+  uint8_t chunkFlg;
+  uint16_t chunkLength;
 };
 
 struct sctpParamDesc{
-  u_int16_t paramType;
-  u_int16_t paramLength;
+  uint16_t paramType;
+  uint16_t paramLength;
 };
 
 
 struct sctpRelChunkDesc{
   struct sctpChunkDesc chk;
-  u_int32_t serialNumber;
+  uint32_t serialNumber;
 };
 
 struct sctpVendorSpecificParam {
   struct sctpParamDesc p;  /* type must be 0xfffe */
-  u_int32_t vendorId;	   /* vendor ID from RFC 1700 */
-  u_int16_t vendorSpecificType;
-  u_int16_t vendorSpecificLen;
+  uint32_t vendorId;	   /* vendor ID from RFC 1700 */
+  uint16_t vendorSpecificType;
+  uint16_t vendorSpecificLen;
 };
 
 
@@ -195,53 +195,53 @@ struct sctpVendorSpecificParam {
 
 /* this is used for init ack, too */
 struct sctpInitiation{
-  u_int32_t initTag;		/* tag of mine */
-  u_int32_t rcvWindowCredit;	/* rwnd */
-  u_int16_t NumPreopenStreams;	/* OS */
-  u_int16_t MaxInboundStreams;     /* MIS */
-  u_int32_t initialTSN;
+  uint32_t initTag;		/* tag of mine */
+  uint32_t rcvWindowCredit;	/* rwnd */
+  uint16_t NumPreopenStreams;	/* OS */
+  uint16_t MaxInboundStreams;     /* MIS */
+  uint32_t initialTSN;
   /* optional param's follow in sctpParamDesc form */
 };
 
 struct sctpV4IpAddress{
   struct sctpParamDesc p;	/* type is set to SCTP_IPV4_PARAM_TYPE, len=10 */
-  u_int32_t  ipAddress;
+  uint32_t  ipAddress;
 };
 
 
 struct sctpV6IpAddress{
   struct sctpParamDesc p;	/* type is set to SCTP_IPV6_PARAM_TYPE, len=22 */
-  u_int8_t  ipAddress[16];
+  uint8_t  ipAddress[16];
 };
 
 struct sctpDNSName{
   struct sctpParamDesc param;
-  u_int8_t name[1];
+  uint8_t name[1];
 };
 
 
 struct sctpCookiePreserve{
   struct sctpParamDesc p;	/* type is set to SCTP_COOKIE_PRESERVE, len=8 */
-  u_int32_t extraTime;
+  uint32_t extraTime;
 };
 
 
 struct sctpTimeStamp{
-  u_int32_t ts_sec;
-  u_int32_t ts_usec;
+  uint32_t ts_sec;
+  uint32_t ts_usec;
 };
 
 /* wire structure of my cookie */
 struct cookieMessage{
-  u_int32_t TieTag_curTag;		/* copied from assoc if present */
-  u_int32_t TieTag_hisTag; 		/* copied from assoc if present */
+  uint32_t TieTag_curTag;		/* copied from assoc if present */
+  uint32_t TieTag_hisTag; 		/* copied from assoc if present */
   int32_t cookieLife;			/* life I will award this cookie */
   struct sctpTimeStamp timeEnteringState; /* the time I built cookie */
   struct sctpInitiation initAckISent;	/* the INIT-ACK that I sent to my peer */
-  u_int32_t addressWhereISent[4];	/* I make this 4 ints so I get 128bits for future */
+  uint32_t addressWhereISent[4];	/* I make this 4 ints so I get 128bits for future */
   int32_t addrtype;			/* address type */
-  u_int16_t locScope;			/* V6 local scope flag */
-  u_int16_t siteScope;			/* V6 site scope flag */
+  uint16_t locScope;			/* V6 local scope flag */
+  uint16_t siteScope;			/* V6 site scope flag */
   /* at the end is tacked on the INIT chunk sent in
    * its entirety and of course our
    * signature.
@@ -273,15 +273,15 @@ struct sctpSendableInit{
  */
 
 struct sctpSelectiveAck{
-  u_int32_t highestConseqTSN;
-  u_int32_t updatedRwnd;
-  u_int16_t numberOfdesc;
-  u_int16_t numDupTsns;
+  uint32_t highestConseqTSN;
+  uint32_t updatedRwnd;
+  uint16_t numberOfdesc;
+  uint16_t numDupTsns;
 };
 
 struct sctpSelectiveFrag{
-  u_int16_t fragmentStart;
-  u_int16_t fragmentEnd;
+  uint16_t fragmentStart;
+  uint16_t fragmentEnd;
 };
 
 
@@ -295,8 +295,8 @@ struct sctpUnifiedSack{
  */
 
 struct sctpHBrequest {
-  u_int32_t time_value_1;
-  u_int32_t time_value_2;
+  uint32_t time_value_1;
+  uint32_t time_value_2;
 };
 
 /* here is what I read and respond with to. */
@@ -312,7 +312,7 @@ struct sctpHBsender{
   struct sctpParamDesc hb;
   struct sctpHBrequest rtt;
   int8_t addrFmt[SCTP_ADDRMAX];
-  u_int16_t userreq;
+  uint16_t userreq;
 };
 
 
@@ -333,15 +333,15 @@ struct sctpUnifiedAbortLight{
 struct sctpUnifiedAbortHeavy{
   struct sctpHeader mh;
   struct sctpChunkDesc uh;
-  u_int16_t causeCode;
-  u_int16_t causeLen;
+  uint16_t causeCode;
+  uint16_t causeLen;
 };
 
 /* For the graceful shutdown we must carry
  * the tag (in common header)  and the highest consequitive acking value
  */
 struct sctpShutdown {
-  u_int32_t TSN_Seen;
+  uint32_t TSN_Seen;
 };
 
 struct sctpUnifiedShutdown{
@@ -354,8 +354,8 @@ struct sctpUnifiedShutdown{
  * that is defined as a operation error.
  */
 struct sctpOpErrorCause{
-  u_int16_t cause;
-  u_int16_t causeLen;
+  uint16_t cause;
+  uint16_t causeLen;
 };
 
 struct sctpUnifiedOpError{
@@ -367,15 +367,15 @@ struct sctpUnifiedStreamError{
   struct sctpHeader mh;
   struct sctpChunkDesc uh;
   struct sctpOpErrorCause c;
-  u_int16_t strmNum;
-  u_int16_t reserved;
+  uint16_t strmNum;
+  uint16_t reserved;
 };
 
 struct staleCookieMsg{
   struct sctpHeader mh;
   struct sctpChunkDesc uh;
   struct sctpOpErrorCause c;
-  u_int32_t moretime;
+  uint32_t moretime;
 };
 
 /* the following is used in all sends
@@ -388,10 +388,10 @@ struct sctpUnifiedSingleMsg{
 };
 
 struct sctpDataPart{
-  u_int32_t TSN;
-  u_int16_t streamId;
-  u_int16_t sequence;
-  u_int32_t payloadtype;
+  uint32_t TSN;
+  uint16_t streamId;
+  uint16_t sequence;
+  uint32_t payloadtype;
 };
 
 struct sctpUnifiedDatagram{
@@ -401,13 +401,13 @@ struct sctpUnifiedDatagram{
 
 struct sctpECN_echo{
   struct sctpChunkDesc uh;
-  u_int32_t Lowest_TSN;
+  uint32_t Lowest_TSN;
 };
 
 
 struct sctpCWR{
   struct sctpChunkDesc uh;
-  u_int32_t TSN_reduced_at;
+  uint32_t TSN_reduced_at;
 };
 
 static const struct tok ForCES_channels[] = {
@@ -578,9 +578,9 @@ void sctp_print(netdissect_options *ndo,
 
        chunkDescPtr = (const struct sctpChunkDesc *) nextChunk, chunkCount++)
     {
-      u_int16_t chunkLength;
+      uint16_t chunkLength;
       const u_char *chunkEnd;
-      u_int16_t align;
+      uint16_t align;
 
       ND_TCHECK(*chunkDescPtr);
       chunkLength = EXTRACT_16BITS(&chunkDescPtr->chunkLength);
@@ -589,7 +589,7 @@ void sctp_print(netdissect_options *ndo,
         break;
       }
 
-      ND_TCHECK2(*((u_int8_t *)chunkDescPtr), chunkLength);
+      ND_TCHECK2(*((uint8_t *)chunkDescPtr), chunkLength);
       chunkEnd = ((const u_char*)chunkDescPtr + chunkLength);
 
       align=chunkLength % 4;
@@ -606,7 +606,7 @@ void sctp_print(netdissect_options *ndo,
 	case SCTP_DATA :
 	  {
 	    const struct sctpDataPart *dataHdrPtr;
-	    u_int32_t ppid;
+	    uint32_t ppid;
 	    const u_char *payloadPtr;
 	    u_int payload_size;
 

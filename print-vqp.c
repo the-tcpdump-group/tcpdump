@@ -44,16 +44,16 @@
  */
 
 struct vqp_common_header_t {
-    u_int8_t version;
-    u_int8_t msg_type;
-    u_int8_t error_code;
-    u_int8_t nitems;
-    u_int8_t sequence[4];
+    uint8_t version;
+    uint8_t msg_type;
+    uint8_t error_code;
+    uint8_t nitems;
+    uint8_t sequence[4];
 };
 
 struct vqp_obj_tlv_t {
-    u_int8_t obj_type[4];
-    u_int8_t obj_length[2];
+    uint8_t obj_type[4];
+    uint8_t obj_length[2];
 };
 
 #define VQP_OBJ_REQ_JOIN_PORT  0x01
@@ -104,10 +104,10 @@ vqp_print(netdissect_options *ndo, register const u_char *pptr, register u_int l
     const struct vqp_obj_tlv_t *vqp_obj_tlv;
 
     const u_char *tptr;
-    u_int16_t vqp_obj_len;
-    u_int32_t vqp_obj_type;
+    uint16_t vqp_obj_len;
+    uint32_t vqp_obj_type;
     int tlen;
-    u_int8_t nitems;
+    uint8_t nitems;
 
     tptr=pptr;
     tlen = len;

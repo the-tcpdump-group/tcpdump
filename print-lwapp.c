@@ -41,10 +41,10 @@
  */
 
 struct lwapp_transport_header {
-    u_int8_t  version;
-    u_int8_t  frag_id;
-    u_int8_t  length[2];
-    u_int16_t status;
+    uint8_t  version;
+    uint8_t  frag_id;
+    uint8_t  length[2];
+    uint16_t status;
 };
 
 /*
@@ -61,10 +61,10 @@ struct lwapp_transport_header {
  */
 
 struct lwapp_control_header {
-    u_int8_t  msg_type;
-    u_int8_t  seq_num;
-    u_int8_t  len[2];
-    u_int8_t  session_id[4];
+    uint8_t  msg_type;
+    uint8_t  seq_num;
+    uint8_t  len[2];
+    uint8_t  session_id[4];
 };
 
 #define LWAPP_VERSION 0
@@ -156,8 +156,8 @@ static const struct tok lwapp_msg_type_values[] = {
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 struct lwapp_message_header {
-    u_int8_t type;
-    u_int8_t length[2];
+    uint8_t type;
+    uint8_t length[2];
 };
 
 void

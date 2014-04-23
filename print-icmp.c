@@ -47,17 +47,17 @@
  * Structure of an icmp header.
  */
 struct icmp {
-	u_int8_t  icmp_type;		/* type of message, see below */
-	u_int8_t  icmp_code;		/* type sub code */
-	u_int16_t icmp_cksum;		/* ones complement cksum of struct */
+	uint8_t  icmp_type;		/* type of message, see below */
+	uint8_t  icmp_code;		/* type sub code */
+	uint16_t icmp_cksum;		/* ones complement cksum of struct */
 	union {
-		u_int8_t ih_pptr;			/* ICMP_PARAMPROB */
+		uint8_t ih_pptr;			/* ICMP_PARAMPROB */
 		struct in_addr ih_gwaddr;	/* ICMP_REDIRECT */
 		struct ih_idseq {
-			u_int16_t icd_id;
-			u_int16_t icd_seq;
+			uint16_t icd_id;
+			uint16_t icd_seq;
 		} ih_idseq;
-		u_int32_t ih_void;
+		uint32_t ih_void;
 	} icmp_hun;
 #define	icmp_pptr	icmp_hun.ih_pptr
 #define	icmp_gwaddr	icmp_hun.ih_gwaddr
@@ -66,16 +66,16 @@ struct icmp {
 #define	icmp_void	icmp_hun.ih_void
 	union {
 		struct id_ts {
-			u_int32_t its_otime;
-			u_int32_t its_rtime;
-			u_int32_t its_ttime;
+			uint32_t its_otime;
+			uint32_t its_rtime;
+			uint32_t its_ttime;
 		} id_ts;
 		struct id_ip  {
 			struct ip idi_ip;
 			/* options and then 64 bits of data */
 		} id_ip;
-		u_int32_t id_mask;
-		u_int8_t id_data[1];
+		uint32_t id_mask;
+		uint8_t id_data[1];
 	} icmp_dun;
 #define	icmp_otime	icmp_dun.id_ts.its_otime
 #define	icmp_rtime	icmp_dun.id_ts.its_rtime
@@ -98,7 +98,7 @@ struct icmp {
  */
 #define	ICMP_MINLEN	8				/* abs minimum */
 #define ICMP_EXTD_MINLEN (156 - sizeof (struct ip))     /* draft-bonica-internet-icmp-08 */
-#define	ICMP_TSLEN	(8 + 3 * sizeof (u_int32_t))	/* timestamp */
+#define	ICMP_TSLEN	(8 + 3 * sizeof (uint32_t))	/* timestamp */
 #define	ICMP_MASKLEN	12				/* address mask */
 #define	ICMP_ADVLENMIN	(8 + sizeof (struct ip) + 8)	/* min */
 #define	ICMP_ADVLEN(p)	(8 + (IP_HL(&(p)->icmp_ip) << 2) + 8)
@@ -241,20 +241,20 @@ static const struct tok type2str[] = {
 
 /* rfc1191 */
 struct mtu_discovery {
-	u_int16_t unused;
-	u_int16_t nexthopmtu;
+	uint16_t unused;
+	uint16_t nexthopmtu;
 };
 
 /* rfc1256 */
 struct ih_rdiscovery {
-	u_int8_t ird_addrnum;
-	u_int8_t ird_addrsiz;
-	u_int16_t ird_lifetime;
+	uint8_t ird_addrnum;
+	uint8_t ird_addrsiz;
+	uint16_t ird_lifetime;
 };
 
 struct id_rdiscovery {
-	u_int32_t ird_addr;
-	u_int32_t ird_pref;
+	uint32_t ird_addr;
+	uint32_t ird_pref;
 };
 
 /*
@@ -284,22 +284,22 @@ struct id_rdiscovery {
  */
 
 struct icmp_ext_t {
-    u_int8_t icmp_type;
-    u_int8_t icmp_code;
-    u_int8_t icmp_checksum[2];
-    u_int8_t icmp_reserved;
-    u_int8_t icmp_length;
-    u_int8_t icmp_reserved2[2];
-    u_int8_t icmp_ext_legacy_header[128]; /* extension header starts 128 bytes after ICMP header */
-    u_int8_t icmp_ext_version_res[2];
-    u_int8_t icmp_ext_checksum[2];
-    u_int8_t icmp_ext_data[1];
+    uint8_t icmp_type;
+    uint8_t icmp_code;
+    uint8_t icmp_checksum[2];
+    uint8_t icmp_reserved;
+    uint8_t icmp_length;
+    uint8_t icmp_reserved2[2];
+    uint8_t icmp_ext_legacy_header[128]; /* extension header starts 128 bytes after ICMP header */
+    uint8_t icmp_ext_version_res[2];
+    uint8_t icmp_ext_checksum[2];
+    uint8_t icmp_ext_data[1];
 };
 
 struct icmp_mpls_ext_object_header_t {
-    u_int8_t length[2];
-    u_int8_t class_num;
-    u_int8_t ctype;
+    uint8_t length[2];
+    uint8_t class_num;
+    uint8_t ctype;
 };
 
 static const struct tok icmp_mpls_ext_obj_values[] = {
@@ -337,8 +337,8 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 	const char *str, *fmt;
 	const struct ip *oip;
 	const struct udphdr *ouh;
-        const u_int8_t *obj_tptr;
-        u_int32_t raw_label;
+        const uint8_t *obj_tptr;
+        uint32_t raw_label;
         const u_char *snapend_save;
 	const struct icmp_mpls_ext_object_header_t *icmp_mpls_ext_object_header;
 	u_int hlen, dport, mtu, obj_tlen, obj_class_num, obj_ctype;
@@ -557,10 +557,10 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 	}
 	ND_PRINT((ndo, "ICMP %s, length %u", str, plen));
 	if (ndo->ndo_vflag && !fragmented) { /* don't attempt checksumming if this is a frag */
-		u_int16_t sum, icmp_sum;
+		uint16_t sum, icmp_sum;
 		struct cksum_vec vec[1];
 		if (ND_TTEST2(*bp, plen)) {
-			vec[0].ptr = (const u_int8_t *)(void *)dp;
+			vec[0].ptr = (const uint8_t *)(void *)dp;
 			vec[0].len = plen;
 			sum = in_cksum(vec, 1);
 			if (sum != 0) {
@@ -600,7 +600,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
              * however not all implementations set the length field proper.
              */
             if (!ext_dp->icmp_length) {
-                vec[0].ptr = (const u_int8_t *)(void *)&ext_dp->icmp_ext_version_res;
+                vec[0].ptr = (const uint8_t *)(void *)&ext_dp->icmp_ext_version_res;
                 vec[0].len = plen - ICMP_EXTD_MINLEN;
                 if (in_cksum(vec, 1)) {
                     return;
@@ -620,7 +620,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
             }
 
             hlen = plen - ICMP_EXTD_MINLEN;
-            vec[0].ptr = (const u_int8_t *)(void *)&ext_dp->icmp_ext_version_res;
+            vec[0].ptr = (const uint8_t *)(void *)&ext_dp->icmp_ext_version_res;
             vec[0].len = hlen;
             ND_PRINT((ndo, ", checksum 0x%04x (%scorrect), length %u",
                    EXTRACT_16BITS(ext_dp->icmp_ext_checksum),
@@ -628,7 +628,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                    hlen));
 
             hlen -= 4; /* subtract common header size */
-            obj_tptr = (u_int8_t *)ext_dp->icmp_ext_data;
+            obj_tptr = (uint8_t *)ext_dp->icmp_ext_data;
 
             while (hlen > sizeof(struct icmp_mpls_ext_object_header_t)) {
 

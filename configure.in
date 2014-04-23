@@ -879,41 +879,18 @@ AC_TYPE_UINT32_T
 AC_TYPE_UINT64_T
 
 #
-# For now, we're using the old BSD-style u_intXX_t types, so check for
-# them.
+# The minimum version of autoconf that we support is 2.61, and it
+# supports the AC_TYPE_UINTn_T macros.  Use them; we've stopped
+# using the old BSD-style u_intXX_t types.
 #
-# We should probably migrate to the standard C uintXX_t types.
-#
-AC_CHECK_HEADERS(sys/bitypes.h)
-
-AC_CHECK_TYPE([u_int8_t], ,
-	[AC_DEFINE([u_int8_t], [unsigned char],
-	[Define to `unsigned char' if u_int8_t not defined.])],
-	[AC_INCLUDES_DEFAULT
-#ifdef HAVE_SYS_BITYPES_H
-#include <sys/bitypes.h>
-#endif])
-AC_CHECK_TYPE([u_int16_t], ,
-	[AC_DEFINE([u_int16_t], [unsigned short],
-	[Define to `unsigned short' if u_int16_t not defined.])],
-	[AC_INCLUDES_DEFAULT
-#ifdef HAVE_SYS_BITYPES_H
-#include <sys/bitypes.h>
-#endif])
-AC_CHECK_TYPE([u_int32_t], ,
-	[AC_DEFINE([u_int32_t], [unsigned int],
-	[Define to `unsigned int' if u_int32_t not defined.])],
-	[AC_INCLUDES_DEFAULT
-#ifdef HAVE_SYS_BITYPES_H
-#include <sys/bitypes.h>
-#endif])
-AC_CHECK_TYPE([u_int64_t], ,
-	[AC_DEFINE([u_int64_t], [unsigned long long],
-	[Define to `unsigned long long' if u_int64_t not defined.])],
-	[AC_INCLUDES_DEFAULT
-#ifdef HAVE_SYS_BITYPES_H
-#include <sys/bitypes.h>
-#endif])
+AC_TYPE_UINT8_T
+AC_TYPE_INT8_T
+AC_TYPE_UINT16_T
+AC_TYPE_INT16_T
+AC_TYPE_UINT32_T
+AC_TYPE_INT32_T
+AC_TYPE_UINT64_T
+AC_TYPE_INT64_T
 
 #
 # Check for <inttypes.h>
@@ -932,16 +909,13 @@ AC_CHECK_HEADERS(inttypes.h,
 	    #include <inttypes.h>
 	    #include <stdio.h>
 	    #include <sys/types.h>
-	    #ifdef HAVE_SYS_BITYPES_H
-	    #include <sys/bitypes.h>
-	    #endif
 
 	    main()
 	    {
-	      printf("%" PRId64 "\n", (u_int64_t)1);
-	      printf("%" PRIo64 "\n", (u_int64_t)1);
-	      printf("%" PRIx64 "\n", (u_int64_t)1);
-	      printf("%" PRIu64 "\n", (u_int64_t)1);
+	      printf("%" PRId64 "\n", (uint64_t)1);
+	      printf("%" PRIo64 "\n", (uint64_t)1);
+	      printf("%" PRIx64 "\n", (uint64_t)1);
+	      printf("%" PRIu64 "\n", (uint64_t)1);
 	    }
 	  ]])
       ],

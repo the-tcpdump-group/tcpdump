@@ -40,22 +40,22 @@
  * as given to interface code.
  */
 struct	arc_header {
-	u_int8_t  arc_shost;
-	u_int8_t  arc_dhost;
-	u_int8_t  arc_type;
+	uint8_t  arc_shost;
+	uint8_t  arc_dhost;
+	uint8_t  arc_type;
 	/*
 	 * only present for newstyle encoding with LL fragmentation.
 	 * Don't use sizeof(anything), use ARC_HDR{,NEW}LEN instead.
 	 */
-	u_int8_t  arc_flag;
-	u_int16_t arc_seqid;
+	uint8_t  arc_flag;
+	uint16_t arc_seqid;
 
 	/*
 	 * only present in exception packets (arc_flag == 0xff)
 	 */
-	u_int8_t  arc_type2;	/* same as arc_type */
-	u_int8_t  arc_flag2;	/* real flag value */
-	u_int16_t arc_seqid2;	/* real seqid value */
+	uint8_t  arc_type2;	/* same as arc_type */
+	uint8_t  arc_flag2;	/* real flag value */
+	uint16_t arc_seqid2;	/* real seqid value */
 };
 
 #define	ARC_HDRLEN		3
@@ -84,17 +84,17 @@ struct	arc_header {
  * never presents packets that look like exception frames.
  */
 struct	arc_linux_header {
-	u_int8_t  arc_shost;
-	u_int8_t  arc_dhost;
-	u_int16_t arc_offset;
-	u_int8_t  arc_type;
+	uint8_t  arc_shost;
+	uint8_t  arc_dhost;
+	uint16_t arc_offset;
+	uint8_t  arc_type;
 	/*
 	 * only present for newstyle encoding with LL fragmentation.
 	 * Don't use sizeof(anything), use ARC_LINUX_HDR{,NEW}LEN
 	 * instead.
 	 */
-	u_int8_t  arc_flag;
-	u_int16_t arc_seqid;
+	uint8_t  arc_flag;
+	uint16_t arc_seqid;
 };
 
 #define	ARC_LINUX_HDRLEN	5

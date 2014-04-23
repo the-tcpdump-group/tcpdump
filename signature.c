@@ -46,8 +46,8 @@ const struct tok signature_check_values[] = {
  */
 USES_APPLE_DEPRECATED_API
 static void
-signature_compute_hmac_md5(const u_int8_t *text, int text_len, unsigned char *key,
-                           unsigned int key_len, u_int8_t *digest)
+signature_compute_hmac_md5(const uint8_t *text, int text_len, unsigned char *key,
+                           unsigned int key_len, uint8_t *digest)
 {
     MD5_CTX context;
     unsigned char k_ipad[65];    /* inner padding - key XORd with ipad */
@@ -119,8 +119,8 @@ int
 signature_verify(netdissect_options *ndo,
                  const u_char *pptr, u_int plen, u_char *sig_ptr)
 {
-    u_int8_t rcvsig[16];
-    u_int8_t sig[16];
+    uint8_t rcvsig[16];
+    uint8_t sig[16];
     unsigned int i;
 
     /*

@@ -56,9 +56,9 @@ static const char tstr[] = "[|wb]";
  * The transport level header.
  */
 struct pkt_hdr {
-	u_int32_t ph_src;		/* site id of source */
-	u_int32_t ph_ts;		/* time stamp (for skew computation) */
-	u_int16_t ph_version;	/* version number */
+	uint32_t ph_src;		/* site id of source */
+	uint32_t ph_ts;		/* time stamp (for skew computation) */
+	uint16_t ph_version;	/* version number */
 	u_char ph_type;		/* message type */
 	u_char ph_flags;	/* message flags */
 };
@@ -81,13 +81,13 @@ struct pkt_hdr {
 #define PF_VIS		0x02	/* only visible ops wanted */
 
 struct PageID {
-	u_int32_t p_sid;		/* session id of initiator */
-	u_int32_t p_uid;		/* page number */
+	uint32_t p_sid;		/* session id of initiator */
+	uint32_t p_uid;		/* page number */
 };
 
 struct dophdr {
-	u_int32_t  dh_ts;		/* sender's timestamp */
-	u_int16_t	dh_len;		/* body length */
+	uint32_t  dh_ts;		/* sender's timestamp */
+	uint16_t	dh_len;		/* body length */
 	u_char	dh_flags;
 	u_char	dh_type;	/* body type */
 	/* body follows */
@@ -116,8 +116,8 @@ struct dophdr {
  */
 struct pkt_dop {
 	struct PageID pd_page;	/* page that operations apply to */
-	u_int32_t	pd_sseq;	/* start sequence number */
-	u_int32_t	pd_eseq;	/* end sequence number */
+	uint32_t	pd_sseq;	/* start sequence number */
+	uint32_t	pd_eseq;	/* end sequence number */
 	/* drawing ops follow */
 };
 
@@ -125,31 +125,31 @@ struct pkt_dop {
  * A repair request.
  */
 struct pkt_rreq {
-        u_int32_t pr_id;           /* source id of drawops to be repaired */
+        uint32_t pr_id;           /* source id of drawops to be repaired */
         struct PageID pr_page;           /* page of drawops */
-        u_int32_t pr_sseq;         /* start seqno */
-        u_int32_t pr_eseq;         /* end seqno */
+        uint32_t pr_sseq;         /* start seqno */
+        uint32_t pr_eseq;         /* end seqno */
 };
 
 /*
  * A repair reply.
  */
 struct pkt_rrep {
-	u_int32_t pr_id;	/* original site id of ops  */
+	uint32_t pr_id;	/* original site id of ops  */
 	struct pkt_dop pr_dop;
 	/* drawing ops follow */
 };
 
 struct id_off {
-        u_int32_t id;
-        u_int32_t off;
+        uint32_t id;
+        uint32_t off;
 };
 
 struct pgstate {
-	u_int32_t slot;
+	uint32_t slot;
 	struct PageID page;
-	u_int16_t nid;
-	u_int16_t rsvd;
+	uint16_t nid;
+	uint16_t rsvd;
         /* seqptr's */
 };
 
@@ -157,7 +157,7 @@ struct pgstate {
  * An announcement packet.
  */
 struct pkt_id {
-	u_int32_t pi_mslot;
+	uint32_t pi_mslot;
         struct PageID    pi_mpage;        /* current page */
 	struct pgstate pi_ps;
         /* seqptr's */
@@ -166,12 +166,12 @@ struct pkt_id {
 
 struct pkt_preq {
         struct PageID  pp_page;
-        u_int32_t  pp_low;
-        u_int32_t  pp_high;
+        uint32_t  pp_low;
+        uint32_t  pp_high;
 };
 
 struct pkt_prep {
-        u_int32_t  pp_n;           /* size of pageid array */
+        uint32_t  pp_n;           /* size of pageid array */
         /* pgstate's follow */
 };
 
@@ -309,7 +309,7 @@ static const char *dopstr[] = {
 
 static int
 wb_dops(netdissect_options *ndo,
-        const struct dophdr *dh, u_int32_t ss, u_int32_t es)
+        const struct dophdr *dh, uint32_t ss, uint32_t es)
 {
 	ND_PRINT((ndo, " <"));
 	for ( ; ss <= es; ++ss) {
@@ -320,7 +320,7 @@ wb_dops(netdissect_options *ndo,
 		else {
 			ND_PRINT((ndo, " %s", dopstr[t]));
 			if (t == DT_SKIP || t == DT_HOLE) {
-				u_int32_t ts = EXTRACT_32BITS(&dh->dh_ts);
+				uint32_t ts = EXTRACT_32BITS(&dh->dh_ts);
 				ND_PRINT((ndo, "%d", ts - ss + 1));
 				if (ss > ts || ts > es) {
 					ND_PRINT((ndo, "[|]"));

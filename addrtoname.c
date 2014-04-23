@@ -78,7 +78,7 @@ extern int ether_ntohost(char *, const struct ether_addr *);
 #define HASHNAMESIZE 4096
 
 struct hnamemem {
-	u_int32_t addr;
+	uint32_t addr;
 	const char *name;
 	struct hnamemem *nxt;
 };
@@ -155,7 +155,7 @@ static struct enamemem nsaptable[HASHNAMESIZE];
 static struct enamemem bytestringtable[HASHNAMESIZE];
 
 struct protoidmem {
-	u_int32_t p_oui;
+	uint32_t p_oui;
 	u_short p_proto;
 	const char *p_name;
 	struct protoidmem *p_nxt;
@@ -167,7 +167,7 @@ static struct protoidmem protoidtable[HASHNAMESIZE];
  * A faster replacement for inet_ntoa().
  */
 const char *
-intoa(u_int32_t addr)
+intoa(uint32_t addr)
 {
 	register char *cp;
 	register u_int byte;
@@ -196,8 +196,8 @@ intoa(u_int32_t addr)
 	return cp + 1;
 }
 
-static u_int32_t f_netmask;
-static u_int32_t f_localnet;
+static uint32_t f_netmask;
+static uint32_t f_localnet;
 
 /*
  * Return a name for the IP address pointed to by ap.  This address
@@ -222,7 +222,7 @@ const char *
 getname(netdissect_options *ndo, const u_char *ap)
 {
 	register struct hostent *hp;
-	u_int32_t addr;
+	uint32_t addr;
 	static struct hnamemem *p;		/* static for longjmp() */
 
 	memcpy(&addr, ap, sizeof(addr));
@@ -274,7 +274,7 @@ getname6(netdissect_options *ndo, const u_char *ap)
 		struct in6_addr addr;
 		struct for_hash_addr {
 			char fill[14];
-			u_int16_t d;
+			uint16_t d;
 		} addra;
 	} addr;
 	static struct h6namemem *p;		/* static for longjmp() */
@@ -580,7 +580,7 @@ etherproto_string(u_short port)
 {
 	register char *cp;
 	register struct hnamemem *tp;
-	register u_int32_t i = port;
+	register uint32_t i = port;
 	char buf[sizeof("0000")];
 
 	for (tp = &eprototable[i & (HASHNAMESIZE-1)]; tp->nxt; tp = tp->nxt)
@@ -663,7 +663,7 @@ const char *
 tcpport_string(u_short port)
 {
 	register struct hnamemem *tp;
-	register u_int32_t i = port;
+	register uint32_t i = port;
 	char buf[sizeof("00000")];
 
 	for (tp = &tporttable[i & (HASHNAMESIZE-1)]; tp->nxt; tp = tp->nxt)
@@ -682,7 +682,7 @@ const char *
 udpport_string(register u_short port)
 {
 	register struct hnamemem *tp;
-	register u_int32_t i = port;
+	register uint32_t i = port;
 	char buf[sizeof("00000")];
 
 	for (tp = &uporttable[i & (HASHNAMESIZE-1)]; tp->nxt; tp = tp->nxt)
@@ -702,7 +702,7 @@ ipxsap_string(u_short port)
 {
 	register char *cp;
 	register struct hnamemem *tp;
-	register u_int32_t i = port;
+	register uint32_t i = port;
 	char buf[sizeof("0000")];
 
 	for (tp = &ipxsaptable[i & (HASHNAMESIZE-1)]; tp->nxt; tp = tp->nxt)
@@ -1137,7 +1137,7 @@ init_ipxsaparray(void)
  * of the local network.  mask is its subnet mask.
  */
 void
-init_addrtoname(netdissect_options *ndo, u_int32_t localnet, u_int32_t mask)
+init_addrtoname(netdissect_options *ndo, uint32_t localnet, uint32_t mask)
 {
 	if (ndo->ndo_fflag) {
 		f_localnet = localnet;

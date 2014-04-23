@@ -84,147 +84,147 @@ static const char *pptp_message_type_string[] = {
 
 /* common for all PPTP control messages */
 struct pptp_hdr {
-	u_int16_t length;
-	u_int16_t msg_type;
-	u_int32_t magic_cookie;
-	u_int16_t ctrl_msg_type;
-	u_int16_t reserved0;
+	uint16_t length;
+	uint16_t msg_type;
+	uint32_t magic_cookie;
+	uint16_t ctrl_msg_type;
+	uint16_t reserved0;
 };
 
 struct pptp_msg_sccrq {
-	u_int16_t proto_ver;
-	u_int16_t reserved1;
-	u_int32_t framing_cap;
-	u_int32_t bearer_cap;
-	u_int16_t max_channel;
-	u_int16_t firm_rev;
+	uint16_t proto_ver;
+	uint16_t reserved1;
+	uint32_t framing_cap;
+	uint32_t bearer_cap;
+	uint16_t max_channel;
+	uint16_t firm_rev;
 	u_char hostname[64];
 	u_char vendor[64];
 };
 
 struct pptp_msg_sccrp {
-	u_int16_t proto_ver;
-	u_int8_t result_code;
-	u_int8_t err_code;
-	u_int32_t framing_cap;
-	u_int32_t bearer_cap;
-	u_int16_t max_channel;
-	u_int16_t firm_rev;
+	uint16_t proto_ver;
+	uint8_t result_code;
+	uint8_t err_code;
+	uint32_t framing_cap;
+	uint32_t bearer_cap;
+	uint16_t max_channel;
+	uint16_t firm_rev;
 	u_char hostname[64];
 	u_char vendor[64];
 };
 
 struct pptp_msg_stopccrq {
-	u_int8_t reason;
-	u_int8_t reserved1;
-	u_int16_t reserved2;
+	uint8_t reason;
+	uint8_t reserved1;
+	uint16_t reserved2;
 };
 
 struct pptp_msg_stopccrp {
-	u_int8_t result_code;
-	u_int8_t err_code;
-	u_int16_t reserved1;
+	uint8_t result_code;
+	uint8_t err_code;
+	uint16_t reserved1;
 };
 
 struct pptp_msg_echorq {
-	u_int32_t id;
+	uint32_t id;
 };
 
 struct pptp_msg_echorp {
-	u_int32_t id;
-	u_int8_t result_code;
-	u_int8_t err_code;
-	u_int16_t reserved1;
+	uint32_t id;
+	uint8_t result_code;
+	uint8_t err_code;
+	uint16_t reserved1;
 };
 
 struct pptp_msg_ocrq {
-	u_int16_t call_id;
-	u_int16_t call_ser;
-	u_int32_t min_bps;
-	u_int32_t max_bps;
-	u_int32_t bearer_type;
-	u_int32_t framing_type;
-	u_int16_t recv_winsiz;
-	u_int16_t pkt_proc_delay;
-	u_int16_t phone_no_len;
-	u_int16_t reserved1;
+	uint16_t call_id;
+	uint16_t call_ser;
+	uint32_t min_bps;
+	uint32_t max_bps;
+	uint32_t bearer_type;
+	uint32_t framing_type;
+	uint16_t recv_winsiz;
+	uint16_t pkt_proc_delay;
+	uint16_t phone_no_len;
+	uint16_t reserved1;
 	u_char phone_no[64];
 	u_char subaddr[64];
 };
 
 struct pptp_msg_ocrp {
-	u_int16_t call_id;
-	u_int16_t peer_call_id;
-	u_int8_t result_code;
-	u_int8_t err_code;
-	u_int16_t cause_code;
-	u_int32_t conn_speed;
-	u_int16_t recv_winsiz;
-	u_int16_t pkt_proc_delay;
-	u_int32_t phy_chan_id;
+	uint16_t call_id;
+	uint16_t peer_call_id;
+	uint8_t result_code;
+	uint8_t err_code;
+	uint16_t cause_code;
+	uint32_t conn_speed;
+	uint16_t recv_winsiz;
+	uint16_t pkt_proc_delay;
+	uint32_t phy_chan_id;
 };
 
 struct pptp_msg_icrq {
-	u_int16_t call_id;
-	u_int16_t call_ser;
-	u_int32_t bearer_type;
-	u_int32_t phy_chan_id;
-	u_int16_t dialed_no_len;
-	u_int16_t dialing_no_len;
+	uint16_t call_id;
+	uint16_t call_ser;
+	uint32_t bearer_type;
+	uint32_t phy_chan_id;
+	uint16_t dialed_no_len;
+	uint16_t dialing_no_len;
 	u_char dialed_no[64];		/* DNIS */
 	u_char dialing_no[64];		/* CLID */
 	u_char subaddr[64];
 };
 
 struct pptp_msg_icrp {
-	u_int16_t call_id;
-	u_int16_t peer_call_id;
-	u_int8_t result_code;
-	u_int8_t err_code;
-	u_int16_t recv_winsiz;
-	u_int16_t pkt_proc_delay;
-	u_int16_t reserved1;
+	uint16_t call_id;
+	uint16_t peer_call_id;
+	uint8_t result_code;
+	uint8_t err_code;
+	uint16_t recv_winsiz;
+	uint16_t pkt_proc_delay;
+	uint16_t reserved1;
 };
 
 struct pptp_msg_iccn {
-	u_int16_t peer_call_id;
-	u_int16_t reserved1;
-	u_int32_t conn_speed;
-	u_int16_t recv_winsiz;
-	u_int16_t pkt_proc_delay;
-	u_int32_t framing_type;
+	uint16_t peer_call_id;
+	uint16_t reserved1;
+	uint32_t conn_speed;
+	uint16_t recv_winsiz;
+	uint16_t pkt_proc_delay;
+	uint32_t framing_type;
 };
 
 struct pptp_msg_ccrq {
-	u_int16_t call_id;
-	u_int16_t reserved1;
+	uint16_t call_id;
+	uint16_t reserved1;
 };
 
 struct pptp_msg_cdn {
-	u_int16_t call_id;
-	u_int8_t result_code;
-	u_int8_t err_code;
-	u_int16_t cause_code;
-	u_int16_t reserved1;
+	uint16_t call_id;
+	uint8_t result_code;
+	uint8_t err_code;
+	uint16_t cause_code;
+	uint16_t reserved1;
 	u_char call_stats[128];
 };
 
 struct pptp_msg_wen {
-	u_int16_t peer_call_id;
-	u_int16_t reserved1;
-	u_int32_t crc_err;
-	u_int32_t framing_err;
-	u_int32_t hardware_overrun;
-	u_int32_t buffer_overrun;
-	u_int32_t timeout_err;
-	u_int32_t align_err;
+	uint16_t peer_call_id;
+	uint16_t reserved1;
+	uint32_t crc_err;
+	uint32_t framing_err;
+	uint32_t hardware_overrun;
+	uint32_t buffer_overrun;
+	uint32_t timeout_err;
+	uint32_t align_err;
 };
 
 struct pptp_msg_sli {
-	u_int16_t peer_call_id;
-	u_int16_t reserved1;
-	u_int32_t send_accm;
-	u_int32_t recv_accm;
+	uint16_t peer_call_id;
+	uint16_t reserved1;
+	uint32_t send_accm;
+	uint32_t recv_accm;
 };
 
 /* attributes that appear more than once in above messages:
@@ -232,27 +232,27 @@ struct pptp_msg_sli {
    Number of
    occurence    attributes
   --------------------------------------
-      2         u_int32_t bearer_cap;
-      2         u_int32_t bearer_type;
-      6         u_int16_t call_id;
-      2         u_int16_t call_ser;
-      2         u_int16_t cause_code;
-      2         u_int32_t conn_speed;
-      6         u_int8_t err_code;
-      2         u_int16_t firm_rev;
-      2         u_int32_t framing_cap;
-      2         u_int32_t framing_type;
+      2         uint32_t bearer_cap;
+      2         uint32_t bearer_type;
+      6         uint16_t call_id;
+      2         uint16_t call_ser;
+      2         uint16_t cause_code;
+      2         uint32_t conn_speed;
+      6         uint8_t err_code;
+      2         uint16_t firm_rev;
+      2         uint32_t framing_cap;
+      2         uint32_t framing_type;
       2         u_char hostname[64];
-      2         u_int32_t id;
-      2         u_int16_t max_channel;
-      5         u_int16_t peer_call_id;
-      2         u_int32_t phy_chan_id;
-      4         u_int16_t pkt_proc_delay;
-      2         u_int16_t proto_ver;
-      4         u_int16_t recv_winsiz;
-      2         u_int8_t reserved1;
-      9         u_int16_t reserved1;
-      6         u_int8_t result_code;
+      2         uint32_t id;
+      2         uint16_t max_channel;
+      5         uint16_t peer_call_id;
+      2         uint32_t phy_chan_id;
+      4         uint16_t pkt_proc_delay;
+      2         uint16_t proto_ver;
+      4         uint16_t recv_winsiz;
+      2         uint8_t reserved1;
+      9         uint16_t reserved1;
+      6         uint8_t result_code;
       2         u_char subaddr[64];
       2         u_char vendor[64];
 
@@ -270,7 +270,7 @@ struct pptp_msg_sli {
 
 static void
 pptp_bearer_cap_print(netdissect_options *ndo,
-                      const u_int32_t *bearer_cap)
+                      const uint32_t *bearer_cap)
 {
 	ND_PRINT((ndo, " BEARER_CAP(%s%s)",
 	          EXTRACT_32BITS(bearer_cap) & PPTP_BEARER_CAP_DIGITAL_MASK ? "D" : "",
@@ -286,7 +286,7 @@ static const struct tok pptp_btype_str[] = {
 
 static void
 pptp_bearer_type_print(netdissect_options *ndo,
-                       const u_int32_t *bearer_type)
+                       const uint32_t *bearer_type)
 {
 	ND_PRINT((ndo, " BEARER_TYPE(%s)",
 	          tok2str(pptp_btype_str, "?", EXTRACT_32BITS(bearer_type))));
@@ -294,28 +294,28 @@ pptp_bearer_type_print(netdissect_options *ndo,
 
 static void
 pptp_call_id_print(netdissect_options *ndo,
-                   const u_int16_t *call_id)
+                   const uint16_t *call_id)
 {
 	ND_PRINT((ndo, " CALL_ID(%u)", EXTRACT_16BITS(call_id)));
 }
 
 static void
 pptp_call_ser_print(netdissect_options *ndo,
-                    const u_int16_t *call_ser)
+                    const uint16_t *call_ser)
 {
 	ND_PRINT((ndo, " CALL_SER_NUM(%u)", EXTRACT_16BITS(call_ser)));
 }
 
 static void
 pptp_cause_code_print(netdissect_options *ndo,
-                      const u_int16_t *cause_code)
+                      const uint16_t *cause_code)
 {
 	ND_PRINT((ndo, " CAUSE_CODE(%u)", EXTRACT_16BITS(cause_code)));
 }
 
 static void
 pptp_conn_speed_print(netdissect_options *ndo,
-                      const u_int32_t *conn_speed)
+                      const uint32_t *conn_speed)
 {
 	ND_PRINT((ndo, " CONN_SPEED(%u)", EXTRACT_32BITS(conn_speed)));
 }
@@ -333,7 +333,7 @@ static const struct tok pptp_errcode_str[] = {
 
 static void
 pptp_err_code_print(netdissect_options *ndo,
-                    const u_int8_t *err_code)
+                    const uint8_t *err_code)
 {
 	ND_PRINT((ndo, " ERR_CODE(%u", *err_code));
 	if (ndo->ndo_vflag) {
@@ -344,14 +344,14 @@ pptp_err_code_print(netdissect_options *ndo,
 
 static void
 pptp_firm_rev_print(netdissect_options *ndo,
-                    const u_int16_t *firm_rev)
+                    const uint16_t *firm_rev)
 {
 	ND_PRINT((ndo, " FIRM_REV(%u)", EXTRACT_16BITS(firm_rev)));
 }
 
 static void
 pptp_framing_cap_print(netdissect_options *ndo,
-                       const u_int32_t *framing_cap)
+                       const uint32_t *framing_cap)
 {
 	ND_PRINT((ndo, " FRAME_CAP("));
 	if (EXTRACT_32BITS(framing_cap) & PPTP_FRAMING_CAP_ASYNC_MASK) {
@@ -372,7 +372,7 @@ static const struct tok pptp_ftype_str[] = {
 
 static void
 pptp_framing_type_print(netdissect_options *ndo,
-                        const u_int32_t *framing_type)
+                        const uint32_t *framing_type)
 {
 	ND_PRINT((ndo, " FRAME_TYPE(%s)",
 	          tok2str(pptp_ftype_str, "?", EXTRACT_32BITS(framing_type))));
@@ -387,42 +387,42 @@ pptp_hostname_print(netdissect_options *ndo,
 
 static void
 pptp_id_print(netdissect_options *ndo,
-              const u_int32_t *id)
+              const uint32_t *id)
 {
 	ND_PRINT((ndo, " ID(%u)", EXTRACT_32BITS(id)));
 }
 
 static void
 pptp_max_channel_print(netdissect_options *ndo,
-                       const u_int16_t *max_channel)
+                       const uint16_t *max_channel)
 {
 	ND_PRINT((ndo, " MAX_CHAN(%u)", EXTRACT_16BITS(max_channel)));
 }
 
 static void
 pptp_peer_call_id_print(netdissect_options *ndo,
-                        const u_int16_t *peer_call_id)
+                        const uint16_t *peer_call_id)
 {
 	ND_PRINT((ndo, " PEER_CALL_ID(%u)", EXTRACT_16BITS(peer_call_id)));
 }
 
 static void
 pptp_phy_chan_id_print(netdissect_options *ndo,
-                       const u_int32_t *phy_chan_id)
+                       const uint32_t *phy_chan_id)
 {
 	ND_PRINT((ndo, " PHY_CHAN_ID(%u)", EXTRACT_32BITS(phy_chan_id)));
 }
 
 static void
 pptp_pkt_proc_delay_print(netdissect_options *ndo,
-                          const u_int16_t *pkt_proc_delay)
+                          const uint16_t *pkt_proc_delay)
 {
 	ND_PRINT((ndo, " PROC_DELAY(%u)", EXTRACT_16BITS(pkt_proc_delay)));
 }
 
 static void
 pptp_proto_ver_print(netdissect_options *ndo,
-                     const u_int16_t *proto_ver)
+                     const uint16_t *proto_ver)
 {
 	ND_PRINT((ndo, " PROTO_VER(%u.%u)",	/* Version.Revision */
 	       EXTRACT_16BITS(proto_ver) >> 8,
@@ -431,7 +431,7 @@ pptp_proto_ver_print(netdissect_options *ndo,
 
 static void
 pptp_recv_winsiz_print(netdissect_options *ndo,
-                       const u_int16_t *recv_winsiz)
+                       const uint16_t *recv_winsiz)
 {
 	ND_PRINT((ndo, " RECV_WIN(%u)", EXTRACT_16BITS(recv_winsiz)));
 }
@@ -479,7 +479,7 @@ static const struct tok pptp_cdn_str[] = {
 
 static void
 pptp_result_code_print(netdissect_options *ndo,
-                       const u_int8_t *result_code, int ctrl_msg_type)
+                       const uint8_t *result_code, int ctrl_msg_type)
 {
 	ND_PRINT((ndo, " RESULT_CODE(%u", *result_code));
 	if (ndo->ndo_vflag) {
@@ -901,8 +901,8 @@ pptp_print(netdissect_options *ndo,
            const u_char *dat)
 {
 	const struct pptp_hdr *hdr;
-	u_int32_t mc;
-	u_int16_t ctrl_msg_type;
+	uint32_t mc;
+	uint16_t ctrl_msg_type;
 
 	ND_PRINT((ndo, ": pptp"));
 

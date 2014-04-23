@@ -42,14 +42,14 @@
 
 /* Mobility header */
 struct ip6_mobility {
-	u_int8_t ip6m_pproto;	/* following payload protocol (for PG) */
-	u_int8_t ip6m_len;	/* length in units of 8 octets */
-	u_int8_t ip6m_type;	/* message type */
-	u_int8_t reserved;	/* reserved */
-	u_int16_t ip6m_cksum;	/* sum of IPv6 pseudo-header and MH */
+	uint8_t ip6m_pproto;	/* following payload protocol (for PG) */
+	uint8_t ip6m_len;	/* length in units of 8 octets */
+	uint8_t ip6m_type;	/* message type */
+	uint8_t reserved;	/* reserved */
+	uint16_t ip6m_cksum;	/* sum of IPv6 pseudo-header and MH */
 	union {
-		u_int16_t	ip6m_un_data16[1]; /* type-specific field */
-		u_int8_t	ip6m_un_data8[2];  /* type-specific fiedl */
+		uint16_t	ip6m_un_data16[1]; /* type-specific field */
+		uint8_t	ip6m_un_data8[2];  /* type-specific fiedl */
 	} ip6m_dataun;
 };
 
@@ -174,7 +174,7 @@ mobility_print(netdissect_options *ndo,
 	const struct ip6_mobility *mh;
 	const u_char *ep;
 	unsigned mhlen, hlen;
-	u_int8_t type;
+	uint8_t type;
 
 	mh = (struct ip6_mobility *)bp;
 

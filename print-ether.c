@@ -89,7 +89,7 @@ ether_hdr_print(netdissect_options *ndo,
                 const u_char *bp, u_int length)
 {
 	register const struct ether_header *ep;
-	u_int16_t ether_type;
+	uint16_t ether_type;
 
 	ep = (const struct ether_header *)bp;
 
@@ -181,7 +181,7 @@ recurse:
 			return;
 		}
 	        if (ndo->ndo_eflag) {
-	        	u_int16_t tag = EXTRACT_16BITS(p);
+	        	uint16_t tag = EXTRACT_16BITS(p);
 
 			ND_PRINT((ndo, "vlan %u, p %u%s, ",
 			    tag & 0xfff,

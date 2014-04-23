@@ -45,17 +45,17 @@
 
 static const char tstr[] = " [|nfs]";
 
-static void nfs_printfh(netdissect_options *, const u_int32_t *, const u_int);
+static void nfs_printfh(netdissect_options *, const uint32_t *, const u_int);
 static int xid_map_enter(netdissect_options *, const struct sunrpc_msg *, const u_char *);
 static int xid_map_find(const struct sunrpc_msg *, const u_char *,
-			    u_int32_t *, u_int32_t *);
-static void interp_reply(netdissect_options *, const struct sunrpc_msg *, u_int32_t, u_int32_t, int);
-static const u_int32_t *parse_post_op_attr(netdissect_options *, const u_int32_t *, int);
+			    uint32_t *, uint32_t *);
+static void interp_reply(netdissect_options *, const struct sunrpc_msg *, uint32_t, uint32_t, int);
+static const uint32_t *parse_post_op_attr(netdissect_options *, const uint32_t *, int);
 
 /*
  * Mapping of old NFS Version 2 RPC numbers to generic numbers.
  */
-u_int32_t nfsv3_procid[NFS_NPROCS] = {
+uint32_t nfsv3_procid[NFS_NPROCS] = {
 	NFSPROC_NULL,
 	NFSPROC_GETATTR,
 	NFSPROC_SETATTR,
@@ -239,9 +239,9 @@ print_nfsaddr(netdissect_options *ndo,
 	ND_PRINT((ndo, "%s.%s > %s.%s: ", srcaddr, s, dstaddr, d));
 }
 
-static const u_int32_t *
+static const uint32_t *
 parse_sattr3(netdissect_options *ndo,
-             const u_int32_t *dp, struct nfsv3_sattr *sa3)
+             const uint32_t *dp, struct nfsv3_sattr *sa3)
 {
 	ND_TCHECK(dp[0]);
 	sa3->sa_modeset = EXTRACT_32BITS(dp);
@@ -365,10 +365,10 @@ nfsreply_print_noaddr(netdissect_options *ndo,
                       register const u_char *bp2)
 {
 	register const struct sunrpc_msg *rp;
-	u_int32_t proc, vers, reply_stat;
+	uint32_t proc, vers, reply_stat;
 	enum sunrpc_reject_stat rstat;
-	u_int32_t rlow;
-	u_int32_t rhigh;
+	uint32_t rlow;
+	uint32_t rhigh;
 	enum sunrpc_auth_stat rwhy;
 
 	nfserr = 0;		/* assume no error */
@@ -424,17 +424,17 @@ trunc:
  * Return a pointer to the first file handle in the packet.
  * If the packet was truncated, return 0.
  */
-static const u_int32_t *
+static const uint32_t *
 parsereq(netdissect_options *ndo,
          register const struct sunrpc_msg *rp, register u_int length)
 {
-	register const u_int32_t *dp;
+	register const uint32_t *dp;
 	register u_int len;
 
 	/*
 	 * find the start of the req data (if we captured it)
 	 */
-	dp = (u_int32_t *)&rp->rm_call.cb_cred;
+	dp = (uint32_t *)&rp->rm_call.cb_cred;
 	ND_TCHECK(dp[1]);
 	len = EXTRACT_32BITS(&dp[1]);
 	if (len < length) {
@@ -455,9 +455,9 @@ trunc:
  * Print out an NFS file handle and return a pointer to following word.
  * If packet was truncated, return 0.
  */
-static const u_int32_t *
+static const uint32_t *
 parsefh(netdissect_options *ndo,
-        register const u_int32_t *dp, int v3)
+        register const uint32_t *dp, int v3)
 {
 	u_int len;
 
@@ -480,11 +480,11 @@ trunc:
  * Print out a file name and return pointer to 32-bit word past it.
  * If packet was truncated, return 0.
  */
-static const u_int32_t *
+static const uint32_t *
 parsefn(netdissect_options *ndo,
-        register const u_int32_t *dp)
+        register const uint32_t *dp)
 {
-	register u_int32_t len;
+	register uint32_t len;
 	register const u_char *cp;
 
 	/* Bail if we don't have the string length */
@@ -516,9 +516,9 @@ trunc:
  * Return pointer to 32-bit word past file name.
  * If packet was truncated (or there was some other error), return 0.
  */
-static const u_int32_t *
+static const uint32_t *
 parsefhn(netdissect_options *ndo,
-         register const u_int32_t *dp, int v3)
+         register const uint32_t *dp, int v3)
 {
 	dp = parsefh(ndo, dp, v3);
 	if (dp == NULL)
@@ -533,11 +533,11 @@ nfsreq_print_noaddr(netdissect_options *ndo,
                     register const u_char *bp2)
 {
 	register const struct sunrpc_msg *rp;
-	register const u_int32_t *dp;
+	register const uint32_t *dp;
 	nfs_type type;
 	int v3;
-	u_int32_t proc;
-	u_int32_t access_flags;
+	uint32_t proc;
+	uint32_t access_flags;
 	struct nfsv3_sattr sa3;
 
 	ND_PRINT((ndo, "%d", length));
@@ -795,10 +795,10 @@ trunc:
  */
 static void
 nfs_printfh(netdissect_options *ndo,
-            register const u_int32_t *dp, const u_int len)
+            register const uint32_t *dp, const u_int len)
 {
 	my_fsid fsid;
-	u_int32_t ino;
+	uint32_t ino;
 	const char *sfsname = NULL;
 	char *spacep;
 
@@ -849,7 +849,7 @@ nfs_printfh(netdissect_options *ndo,
  */
 
 struct xid_map_entry {
-	u_int32_t	xid;		/* transaction ID (net order) */
+	uint32_t	xid;		/* transaction ID (net order) */
 	int ipver;			/* IP version (4 or 6) */
 #ifdef INET6
 	struct in6_addr	client;		/* client IP address (net order) */
@@ -858,8 +858,8 @@ struct xid_map_entry {
 	struct in_addr	client;		/* client IP address (net order) */
 	struct in_addr	server;		/* server IP address (net order) */
 #endif
-	u_int32_t	proc;		/* call proc number (host order) */
-	u_int32_t	vers;		/* program version (host order) */
+	uint32_t	proc;		/* call proc number (host order) */
+	uint32_t	vers;		/* program version (host order) */
 };
 
 /*
@@ -928,12 +928,12 @@ xid_map_enter(netdissect_options *ndo,
  * version in vers return, or returns -1 on failure
  */
 static int
-xid_map_find(const struct sunrpc_msg *rp, const u_char *bp, u_int32_t *proc,
-	     u_int32_t *vers)
+xid_map_find(const struct sunrpc_msg *rp, const u_char *bp, uint32_t *proc,
+	     uint32_t *vers)
 {
 	int i;
 	struct xid_map_entry *xmep;
-	u_int32_t xid = rp->rm_xid;
+	uint32_t xid = rp->rm_xid;
 	struct ip *ip = (struct ip *)bp;
 #ifdef INET6
 	struct ip6_hdr *ip6 = (struct ip6_hdr *)bp;
@@ -994,11 +994,11 @@ xid_map_find(const struct sunrpc_msg *rp, const u_char *bp, u_int32_t *proc,
  * Return a pointer to the beginning of the actual results.
  * If the packet was truncated, return 0.
  */
-static const u_int32_t *
+static const uint32_t *
 parserep(netdissect_options *ndo,
          register const struct sunrpc_msg *rp, register u_int length)
 {
-	register const u_int32_t *dp;
+	register const uint32_t *dp;
 	u_int len;
 	enum sunrpc_accept_stat astat;
 
@@ -1006,7 +1006,7 @@ parserep(netdissect_options *ndo,
 	 * Portability note:
 	 * Here we find the address of the ar_verf credentials.
 	 * Originally, this calculation was
-	 *	dp = (u_int32_t *)&rp->rm_reply.rp_acpt.ar_verf
+	 *	dp = (uint32_t *)&rp->rm_reply.rp_acpt.ar_verf
 	 * On the wire, the rp_acpt field starts immediately after
 	 * the (32 bit) rp_stat field.  However, rp_acpt (which is a
 	 * "struct accepted_reply") contains a "struct opaque_auth",
@@ -1017,7 +1017,7 @@ parserep(netdissect_options *ndo,
 	 * representation.  Instead, we skip past the rp_stat field,
 	 * which is an "enum" and so occupies one 32-bit word.
 	 */
-	dp = ((const u_int32_t *)&rp->rm_reply) + 1;
+	dp = ((const uint32_t *)&rp->rm_reply) + 1;
 	ND_TCHECK(dp[1]);
 	len = EXTRACT_32BITS(&dp[1]);
 	if (len >= length)
@@ -1025,7 +1025,7 @@ parserep(netdissect_options *ndo,
 	/*
 	 * skip past the ar_verf credentials.
 	 */
-	dp += (len + (2*sizeof(u_int32_t) + 3)) / sizeof(u_int32_t);
+	dp += (len + (2*sizeof(uint32_t) + 3)) / sizeof(uint32_t);
 	ND_TCHECK2(dp[0], 0);
 
 	/*
@@ -1039,14 +1039,14 @@ parserep(netdissect_options *ndo,
 	}
 	/* successful return */
 	ND_TCHECK2(*dp, sizeof(astat));
-	return ((u_int32_t *) (sizeof(astat) + ((char *)dp)));
+	return ((uint32_t *) (sizeof(astat) + ((char *)dp)));
 trunc:
 	return (0);
 }
 
-static const u_int32_t *
+static const uint32_t *
 parsestatus(netdissect_options *ndo,
-            const u_int32_t *dp, int *er)
+            const uint32_t *dp, int *er)
 {
 	int errnum;
 
@@ -1066,9 +1066,9 @@ trunc:
 	return NULL;
 }
 
-static const u_int32_t *
+static const uint32_t *
 parsefattr(netdissect_options *ndo,
-           const u_int32_t *dp, int verbose, int v3)
+           const uint32_t *dp, int verbose, int v3)
 {
 	const struct nfs_fattr *fap;
 
@@ -1084,7 +1084,7 @@ parsefattr(netdissect_options *ndo,
 		if (v3) {
 			ND_TCHECK(fap->fa3_size);
 			ND_PRINT((ndo, " sz %" PRIu64,
-				EXTRACT_64BITS((u_int32_t *)&fap->fa3_size)));
+				EXTRACT_64BITS((uint32_t *)&fap->fa3_size)));
 		} else {
 			ND_TCHECK(fap->fa2_size);
 			ND_PRINT((ndo, " sz %d", EXTRACT_32BITS(&fap->fa2_size)));
@@ -1099,9 +1099,9 @@ parsefattr(netdissect_options *ndo,
 			       EXTRACT_32BITS(&fap->fa3_rdev.specdata1),
 			       EXTRACT_32BITS(&fap->fa3_rdev.specdata2)));
 			ND_PRINT((ndo, " fsid %" PRIx64,
-				EXTRACT_64BITS((u_int32_t *)&fap->fa3_fsid)));
+				EXTRACT_64BITS((uint32_t *)&fap->fa3_fsid)));
 			ND_PRINT((ndo, " fileid %" PRIx64,
-				EXTRACT_64BITS((u_int32_t *)&fap->fa3_fileid)));
+				EXTRACT_64BITS((uint32_t *)&fap->fa3_fileid)));
 			ND_PRINT((ndo, " a/m/ctime %u.%06u",
 			       EXTRACT_32BITS(&fap->fa3_atime.nfsv3_sec),
 			       EXTRACT_32BITS(&fap->fa3_atime.nfsv3_nsec)));
@@ -1129,7 +1129,7 @@ parsefattr(netdissect_options *ndo,
 			       EXTRACT_32BITS(&fap->fa2_ctime.nfsv2_usec)));
 		}
 	}
-	return ((const u_int32_t *)((unsigned char *)dp +
+	return ((const uint32_t *)((unsigned char *)dp +
 		(v3 ? NFSX_V3FATTR : NFSX_V2FATTR)));
 trunc:
 	return (NULL);
@@ -1137,7 +1137,7 @@ trunc:
 
 static int
 parseattrstat(netdissect_options *ndo,
-              const u_int32_t *dp, int verbose, int v3)
+              const uint32_t *dp, int verbose, int v3)
 {
 	int er;
 
@@ -1152,7 +1152,7 @@ parseattrstat(netdissect_options *ndo,
 
 static int
 parsediropres(netdissect_options *ndo,
-              const u_int32_t *dp)
+              const uint32_t *dp)
 {
 	int er;
 
@@ -1170,7 +1170,7 @@ parsediropres(netdissect_options *ndo,
 
 static int
 parselinkres(netdissect_options *ndo,
-             const u_int32_t *dp, int v3)
+             const uint32_t *dp, int v3)
 {
 	int er;
 
@@ -1187,7 +1187,7 @@ parselinkres(netdissect_options *ndo,
 
 static int
 parsestatfs(netdissect_options *ndo,
-            const u_int32_t *dp, int v3)
+            const uint32_t *dp, int v3)
 {
 	const struct nfs_statfs *sfsp;
 	int er;
@@ -1214,14 +1214,14 @@ parsestatfs(netdissect_options *ndo,
 
 	if (v3) {
 		ND_PRINT((ndo, " tbytes %" PRIu64 " fbytes %" PRIu64 " abytes %" PRIu64,
-			EXTRACT_64BITS((u_int32_t *)&sfsp->sf_tbytes),
-			EXTRACT_64BITS((u_int32_t *)&sfsp->sf_fbytes),
-			EXTRACT_64BITS((u_int32_t *)&sfsp->sf_abytes)));
+			EXTRACT_64BITS((uint32_t *)&sfsp->sf_tbytes),
+			EXTRACT_64BITS((uint32_t *)&sfsp->sf_fbytes),
+			EXTRACT_64BITS((uint32_t *)&sfsp->sf_abytes)));
 		if (ndo->ndo_vflag) {
 			ND_PRINT((ndo, " tfiles %" PRIu64 " ffiles %" PRIu64 " afiles %" PRIu64 " invar %u",
-			       EXTRACT_64BITS((u_int32_t *)&sfsp->sf_tfiles),
-			       EXTRACT_64BITS((u_int32_t *)&sfsp->sf_ffiles),
-			       EXTRACT_64BITS((u_int32_t *)&sfsp->sf_afiles),
+			       EXTRACT_64BITS((uint32_t *)&sfsp->sf_tfiles),
+			       EXTRACT_64BITS((uint32_t *)&sfsp->sf_ffiles),
+			       EXTRACT_64BITS((uint32_t *)&sfsp->sf_afiles),
 			       EXTRACT_32BITS(&sfsp->sf_invarsec)));
 		}
 	} else {
@@ -1240,7 +1240,7 @@ trunc:
 
 static int
 parserddires(netdissect_options *ndo,
-             const u_int32_t *dp)
+             const uint32_t *dp)
 {
 	int er;
 
@@ -1263,9 +1263,9 @@ trunc:
 	return (0);
 }
 
-static const u_int32_t *
+static const uint32_t *
 parse_wcc_attr(netdissect_options *ndo,
-               const u_int32_t *dp)
+               const uint32_t *dp)
 {
 	ND_PRINT((ndo, " sz %" PRIu64, EXTRACT_64BITS(&dp[0])));
 	ND_PRINT((ndo, " mtime %u.%06u ctime %u.%06u",
@@ -1277,9 +1277,9 @@ parse_wcc_attr(netdissect_options *ndo,
 /*
  * Pre operation attributes. Print only if vflag > 1.
  */
-static const u_int32_t *
+static const uint32_t *
 parse_pre_op_attr(netdissect_options *ndo,
-                  const u_int32_t *dp, int verbose)
+                  const uint32_t *dp, int verbose)
 {
 	ND_TCHECK(dp[0]);
 	if (!EXTRACT_32BITS(&dp[0]))
@@ -1299,9 +1299,9 @@ trunc:
 /*
  * Post operation attributes are printed if vflag >= 1
  */
-static const u_int32_t *
+static const uint32_t *
 parse_post_op_attr(netdissect_options *ndo,
-                   const u_int32_t *dp, int verbose)
+                   const uint32_t *dp, int verbose)
 {
 	ND_TCHECK(dp[0]);
 	if (!EXTRACT_32BITS(&dp[0]))
@@ -1310,14 +1310,14 @@ parse_post_op_attr(netdissect_options *ndo,
 	if (verbose) {
 		return parsefattr(ndo, dp, verbose, 1);
 	} else
-		return (dp + (NFSX_V3FATTR / sizeof (u_int32_t)));
+		return (dp + (NFSX_V3FATTR / sizeof (uint32_t)));
 trunc:
 	return (NULL);
 }
 
-static const u_int32_t *
+static const uint32_t *
 parse_wcc_data(netdissect_options *ndo,
-               const u_int32_t *dp, int verbose)
+               const uint32_t *dp, int verbose)
 {
 	if (verbose > 1)
 		ND_PRINT((ndo, " PRE:"));
@@ -1329,9 +1329,9 @@ parse_wcc_data(netdissect_options *ndo,
 	return parse_post_op_attr(ndo, dp, verbose);
 }
 
-static const u_int32_t *
+static const uint32_t *
 parsecreateopres(netdissect_options *ndo,
-                 const u_int32_t *dp, int verbose)
+                 const uint32_t *dp, int verbose)
 {
 	int er;
 
@@ -1362,7 +1362,7 @@ trunc:
 
 static int
 parsewccres(netdissect_options *ndo,
-            const u_int32_t *dp, int verbose)
+            const uint32_t *dp, int verbose)
 {
 	int er;
 
@@ -1371,9 +1371,9 @@ parsewccres(netdissect_options *ndo,
 	return parse_wcc_data(ndo, dp, verbose) != 0;
 }
 
-static const u_int32_t *
+static const uint32_t *
 parsev3rddirres(netdissect_options *ndo,
-                const u_int32_t *dp, int verbose)
+                const uint32_t *dp, int verbose)
 {
 	int er;
 
@@ -1397,7 +1397,7 @@ trunc:
 
 static int
 parsefsinfo(netdissect_options *ndo,
-            const u_int32_t *dp)
+            const uint32_t *dp)
 {
 	struct nfsv3_fsinfo *sfp;
 	int er;
@@ -1423,7 +1423,7 @@ parsefsinfo(netdissect_options *ndo,
 		ND_PRINT((ndo, " rtmult %u wtmult %u maxfsz %" PRIu64,
 		       EXTRACT_32BITS(&sfp->fs_rtmult),
 		       EXTRACT_32BITS(&sfp->fs_wtmult),
-		       EXTRACT_64BITS((u_int32_t *)&sfp->fs_maxfilesize)));
+		       EXTRACT_64BITS((uint32_t *)&sfp->fs_maxfilesize)));
 		ND_PRINT((ndo, " delta %u.%06u ",
 		       EXTRACT_32BITS(&sfp->fs_timedelta.nfsv3_sec),
 		       EXTRACT_32BITS(&sfp->fs_timedelta.nfsv3_nsec)));
@@ -1435,7 +1435,7 @@ trunc:
 
 static int
 parsepathconf(netdissect_options *ndo,
-              const u_int32_t *dp)
+              const uint32_t *dp)
 {
 	int er;
 	struct nfsv3_pathconf *spp;
@@ -1466,9 +1466,9 @@ trunc:
 
 static void
 interp_reply(netdissect_options *ndo,
-             const struct sunrpc_msg *rp, u_int32_t proc, u_int32_t vers, int length)
+             const struct sunrpc_msg *rp, uint32_t proc, uint32_t vers, int length)
 {
-	register const u_int32_t *dp;
+	register const uint32_t *dp;
 	register int v3;
 	int er;
 

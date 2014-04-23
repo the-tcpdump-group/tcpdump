@@ -60,8 +60,8 @@ static void krb4_print(netdissect_options *, const u_char *);
 #define KERB_ERR_NULL_KEY			10
 
 struct krb {
-	u_int8_t pvno;		/* Protocol Version */
-	u_int8_t type;		/* Type+B */
+	uint8_t pvno;		/* Protocol Version */
+	uint8_t type;		/* Type+B */
 };
 
 static const struct tok type2str[] = {

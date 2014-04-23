@@ -181,7 +181,7 @@ static const struct tok ospf_lls_eo_options[] = {
 
 int
 ospf_print_grace_lsa(netdissect_options *ndo,
-                     const u_int8_t *tptr, u_int ls_length) {
+                     const uint8_t *tptr, u_int ls_length) {
 
     u_int tlv_type, tlv_length;
 
@@ -264,13 +264,13 @@ trunc:
 
 int
 ospf_print_te_lsa(netdissect_options *ndo,
-                  const u_int8_t *tptr, u_int ls_length) {
+                  const uint8_t *tptr, u_int ls_length) {
 
     u_int tlv_type, tlv_length, subtlv_type, subtlv_length;
     u_int priority_level, te_class, count_srlg;
     union { /* int to float conversion buffer for several subTLVs */
         float f;
-        u_int32_t i;
+        uint32_t i;
     } bw;
 
     while (ls_length != 0) {
@@ -545,25 +545,25 @@ ospf_print_tos_metrics(netdissect_options *ndo,
  * field is less than the length of the LSA header, return NULl, else
  * return pointer to data past end of LSA.
  */
-static const u_int8_t *
+static const uint8_t *
 ospf_print_lsa(netdissect_options *ndo,
                register const struct lsa *lsap)
 {
-	register const u_int8_t *ls_end;
+	register const uint8_t *ls_end;
 	register const struct rlalink *rlp;
 	register const struct in_addr *ap;
 	register const struct aslametric *almp;
 	register const struct mcla *mcp;
-	register const u_int32_t *lp;
+	register const uint32_t *lp;
 	register int j, tlv_type, tlv_length, topology;
 	register int ls_length;
-	const u_int8_t *tptr;
+	const uint8_t *tptr;
 
-	tptr = (u_int8_t *)lsap->lsa_un.un_unknown; /* squelch compiler warnings */
+	tptr = (uint8_t *)lsap->lsa_un.un_unknown; /* squelch compiler warnings */
         ls_length = ospf_print_lshdr(ndo, &lsap->ls_hdr);
         if (ls_length == -1)
                 return(NULL);
-	ls_end = (u_int8_t *)lsap + ls_length;
+	ls_end = (uint8_t *)lsap + ls_length;
 	ls_length -= sizeof(struct lsa_hdr);
 
 	switch (lsap->ls_hdr.ls_type) {
@@ -637,7 +637,7 @@ ospf_print_lsa(netdissect_options *ndo,
 		ND_TCHECK(lsap->lsa_un.un_sla.sla_tosmetric);
 		lp = lsap->lsa_un.un_sla.sla_tosmetric;
 		while ((u_char *)lp < ls_end) {
-			register u_int32_t ul;
+			register uint32_t ul;
 
 			ND_TCHECK(*lp);
 			ul = EXTRACT_32BITS(lp);
@@ -654,7 +654,7 @@ ospf_print_lsa(netdissect_options *ndo,
 		ND_TCHECK(lsap->lsa_un.un_sla.sla_tosmetric);
 		lp = lsap->lsa_un.un_sla.sla_tosmetric;
 		while ((u_char *)lp < ls_end) {
-			register u_int32_t ul;
+			register uint32_t ul;
 
 			ND_TCHECK(*lp);
 			ul = EXTRACT_32BITS(lp);
@@ -676,7 +676,7 @@ ospf_print_lsa(netdissect_options *ndo,
 		ND_TCHECK(lsap->lsa_un.un_sla.sla_tosmetric);
 		almp = lsap->lsa_un.un_asla.asla_metric;
 		while ((u_char *)almp < ls_end) {
-			register u_int32_t ul;
+			register uint32_t ul;
 
 			ND_TCHECK(almp->asla_tosmetric);
 			ul = EXTRACT_32BITS(&almp->asla_tosmetric);
@@ -734,7 +734,7 @@ ospf_print_lsa(netdissect_options *ndo,
 
 	    switch (*(&lsap->ls_hdr.un_lsa_id.opaque_field.opaque_type)) {
             case LS_OPAQUE_TYPE_RI:
-		tptr = (u_int8_t *)(&lsap->lsa_un.un_ri_tlv.type);
+		tptr = (uint8_t *)(&lsap->lsa_un.un_ri_tlv.type);
 
 		while (ls_length != 0) {
                     ND_TCHECK2(*tptr, 4);
@@ -782,14 +782,14 @@ ospf_print_lsa(netdissect_options *ndo,
                 break;
 
             case LS_OPAQUE_TYPE_GRACE:
-                if (ospf_print_grace_lsa(ndo, (u_int8_t *)(&lsap->lsa_un.un_grace_tlv.type),
+                if (ospf_print_grace_lsa(ndo, (uint8_t *)(&lsap->lsa_un.un_grace_tlv.type),
                                          ls_length) == -1) {
                     return(ls_end);
                 }
                 break;
 
 	    case LS_OPAQUE_TYPE_TE:
-                if (ospf_print_te_lsa(ndo, (u_int8_t *)(&lsap->lsa_un.un_te_lsa_tlv.type),
+                if (ospf_print_te_lsa(ndo, (uint8_t *)(&lsap->lsa_un.un_te_lsa_tlv.type),
                                       ls_length) == -1) {
                     return(ls_end);
                 }
@@ -797,7 +797,7 @@ ospf_print_lsa(netdissect_options *ndo,
 
             default:
                 if (ndo->ndo_vflag <= 1) {
-                    if (!print_unknown_data(ndo, (u_int8_t *)lsap->lsa_un.un_unknown,
+                    if (!print_unknown_data(ndo, (uint8_t *)lsap->lsa_un.un_unknown,
                                            "\n\t    ", ls_length))
                         return(ls_end);
                 }
@@ -807,7 +807,7 @@ ospf_print_lsa(netdissect_options *ndo,
 
         /* do we want to see an additionally hexdump ? */
         if (ndo->ndo_vflag> 1)
-            if (!print_unknown_data(ndo, (u_int8_t *)lsap->lsa_un.un_unknown,
+            if (!print_unknown_data(ndo, (uint8_t *)lsap->lsa_un.un_unknown,
                                    "\n\t    ", ls_length)) {
                 return(ls_end);
             }
@@ -824,8 +824,8 @@ ospf_decode_lls(netdissect_options *ndo,
     register const u_char *dptr;
     register const u_char *dataend;
     register u_int length2;
-    register u_int16_t lls_type, lls_len;
-    register u_int32_t lls_flags;
+    register uint16_t lls_type, lls_len;
+    register uint32_t lls_flags;
 
     switch (op->ospf_type) {
 
@@ -917,7 +917,7 @@ ospf_decode_v2(netdissect_options *ndo,
 	register const struct lsr *lsrp;
 	register const struct lsa_hdr *lshp;
 	register const struct lsa *lsap;
-	register u_int32_t lsa_count,lsa_count_max;
+	register uint32_t lsa_count,lsa_count_max;
 
 	switch (op->ospf_type) {
 

@@ -39,7 +39,7 @@ ah_print(netdissect_options *ndo, register const u_char *bp)
 	register const struct ah *ah;
 	register const u_char *ep;
 	int sumlen;
-	u_int32_t spi;
+	uint32_t spi;
 
 	ah = (const struct ah *)bp;
 	ep = ndo->ndo_snapend;		/* 'ep' points to the end of available data. */

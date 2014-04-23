@@ -40,16 +40,16 @@ static const char cstr[] = " (corrupt)";
 #define M3UA_REL_1_0 1
 
 struct m3ua_common_header {
-  u_int8_t  v;
-  u_int8_t  reserved;
-  u_int8_t  msg_class;
-  u_int8_t  msg_type;
-  u_int32_t len;
+  uint8_t  v;
+  uint8_t  reserved;
+  uint8_t  msg_class;
+  uint8_t  msg_type;
+  uint32_t len;
 };
 
 struct m3ua_param_header {
-  u_int16_t tag;
-  u_int16_t len;
+  uint16_t tag;
+  uint16_t len;
 };
 
 /* message classes */
@@ -210,7 +210,7 @@ static const struct tok ParamName[] = {
 
 static void
 tag_value_print(netdissect_options *ndo,
-                const u_char *buf, const u_int16_t tag, const u_int16_t size)
+                const u_char *buf, const uint16_t tag, const uint16_t size)
 {
   switch (tag) {
   case M3UA_PARAM_NETWORK_APPEARANCE:

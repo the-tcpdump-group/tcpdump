@@ -45,13 +45,13 @@
 #define VTP_JOIN_MESSAGE		0x04
 
 struct vtp_vlan_ {
-    u_int8_t  len;
-    u_int8_t  status;
-    u_int8_t  type;
-    u_int8_t  name_len;
-    u_int16_t vlanid;
-    u_int16_t mtu;
-    u_int32_t index;
+    uint8_t  len;
+    uint8_t  status;
+    uint8_t  type;
+    uint8_t  name_len;
+    uint16_t vlanid;
+    uint16_t mtu;
+    uint32_t index;
 };
 
 static const struct tok vtp_message_type_values[] = {

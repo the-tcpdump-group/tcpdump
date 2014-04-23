@@ -42,11 +42,11 @@
  */
 
 struct lmp_common_header {
-    u_int8_t version_res[2];
-    u_int8_t flags;
-    u_int8_t msg_type;
-    u_int8_t length[2];
-    u_int8_t reserved[2];
+    uint8_t version_res[2];
+    uint8_t flags;
+    uint8_t msg_type;
+    uint8_t length[2];
+    uint8_t reserved[2];
 };
 
 #define LMP_VERSION            1
@@ -212,9 +212,9 @@ static const struct tok lmp_msg_type_values[] = {
  */
 
 struct lmp_object_header {
-    u_int8_t ctype;
-    u_int8_t class_num;
-    u_int8_t length[2];
+    uint8_t ctype;
+    uint8_t class_num;
+    uint8_t length[2];
 };
 
 #define	LMP_OBJ_CC_ID                 1
@@ -366,7 +366,7 @@ lmp_print(netdissect_options *ndo,
 
     union { /* int to float conversion buffer */
         float f;
-        u_int32_t i;
+        uint32_t i;
     } bw;
 
     tptr=pptr;

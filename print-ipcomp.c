@@ -27,9 +27,9 @@
 #include <tcpdump-stdinc.h>
 
 struct ipcomp {
-	u_int8_t comp_nxt;	/* Next Header */
-	u_int8_t comp_flags;	/* Length of data, in 32bit */
-	u_int16_t comp_cpi;	/* Compression parameter index */
+	uint8_t comp_nxt;	/* Next Header */
+	uint8_t comp_flags;	/* Length of data, in 32bit */
+	uint16_t comp_cpi;	/* Compression parameter index */
 };
 
 #if defined(HAVE_LIBZ) && defined(HAVE_ZLIB_H)
@@ -44,7 +44,7 @@ ipcomp_print(netdissect_options *ndo, register const u_char *bp, int *nhdr _U_)
 {
 	register const struct ipcomp *ipcomp;
 	register const u_char *ep;
-	u_int16_t cpi;
+	uint16_t cpi;
 #if defined(HAVE_LIBZ) && defined(HAVE_ZLIB_H)
 	int advance;
 #endif

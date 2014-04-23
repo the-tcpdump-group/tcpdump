@@ -52,7 +52,7 @@ static inline void
 ap1394_hdr_print(netdissect_options *ndo, register const u_char *bp, u_int length)
 {
 	register const struct firewire_header *fp;
-	u_int16_t firewire_type;
+	uint16_t firewire_type;
 
 	fp = (const struct firewire_header *)bp;
 

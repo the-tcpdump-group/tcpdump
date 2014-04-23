@@ -78,8 +78,8 @@ static void
 print_btp(netdissect_options *ndo,
           const u_char *bp)
 {
-	u_int16_t dest = EXTRACT_16BITS(bp+0);
-	u_int16_t src = EXTRACT_16BITS(bp+2);
+	uint16_t dest = EXTRACT_16BITS(bp+0);
+	uint16_t src = EXTRACT_16BITS(bp+2);
 	ND_PRINT((ndo, "; BTP Dst:%u Src:%u", dest, src));
 }
 
@@ -87,7 +87,7 @@ static void
 print_long_pos_vector(netdissect_options *ndo,
                       const u_char *bp)
 {
-	u_int32_t lat, lon;
+	uint32_t lat, lon;
 
 	ND_PRINT((ndo, "GN_ADDR:%s ", linkaddr_string (ndo, bp, 0, GEONET_ADDR_LEN)));
 
@@ -113,7 +113,7 @@ geonet_print(netdissect_options *ndo, const u_char *eth, const u_char *bp, u_int
 		int next_hdr = bp[0] & 0x0f;
 		int hdr_type = bp[1] >> 4;
 		int hdr_subtype = bp[1] & 0x0f;
-		u_int16_t payload_length = EXTRACT_16BITS(bp+4);
+		uint16_t payload_length = EXTRACT_16BITS(bp+4);
 		int hop_limit = bp[7];
 		const char *next_hdr_txt = "Unknown";
 		const char *hdr_type_txt = "Unknown";

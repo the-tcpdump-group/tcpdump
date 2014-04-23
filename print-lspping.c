@@ -56,18 +56,18 @@
  */
 
 struct lspping_common_header {
-    u_int8_t version[2];
-    u_int8_t reserved[2];
-    u_int8_t msg_type;
-    u_int8_t reply_mode;
-    u_int8_t return_code;
-    u_int8_t return_subcode;
-    u_int8_t sender_handle[4];
-    u_int8_t seq_number[4];
-    u_int8_t ts_sent_sec[4];
-    u_int8_t ts_sent_usec[4];
-    u_int8_t ts_rcvd_sec[4];
-    u_int8_t ts_rcvd_usec[4];
+    uint8_t version[2];
+    uint8_t reserved[2];
+    uint8_t msg_type;
+    uint8_t reply_mode;
+    uint8_t return_code;
+    uint8_t return_subcode;
+    uint8_t sender_handle[4];
+    uint8_t seq_number[4];
+    uint8_t ts_sent_sec[4];
+    uint8_t ts_sent_usec[4];
+    uint8_t ts_rcvd_sec[4];
+    uint8_t ts_rcvd_usec[4];
 };
 
 #define LSPPING_VERSION            1
@@ -119,8 +119,8 @@ static const struct tok lspping_return_code_values[] = {
  */
 
 struct lspping_tlv_header {
-    u_int8_t type[2];
-    u_int8_t length[2];
+    uint8_t type[2];
+    uint8_t length[2];
 };
 
 #define	LSPPING_TLV_TARGET_FEC_STACK      1
@@ -186,8 +186,8 @@ static const struct tok lspping_tlvtargetfec_subtlv_values[] = {
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 struct lspping_tlv_targetfec_subtlv_ldp_ipv4_t {
-    u_int8_t prefix [4];
-    u_int8_t prefix_len;
+    uint8_t prefix [4];
+    uint8_t prefix_len;
 };
 
 /*
@@ -203,8 +203,8 @@ struct lspping_tlv_targetfec_subtlv_ldp_ipv4_t {
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 struct lspping_tlv_targetfec_subtlv_ldp_ipv6_t {
-    u_int8_t prefix [16];
-    u_int8_t prefix_len;
+    uint8_t prefix [16];
+    uint8_t prefix_len;
 };
 
 /*
@@ -218,9 +218,9 @@ struct lspping_tlv_targetfec_subtlv_ldp_ipv6_t {
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 struct lspping_tlv_targetfec_subtlv_bgp_ipv4_t {
-    u_int8_t sender_id [4];
-    u_int8_t prefix [4];
-    u_int8_t prefix_len;
+    uint8_t sender_id [4];
+    uint8_t prefix [4];
+    uint8_t prefix_len;
 };
 
 /*
@@ -240,9 +240,9 @@ struct lspping_tlv_targetfec_subtlv_bgp_ipv4_t {
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 struct lspping_tlv_targetfec_subtlv_bgp_ipv6_t {
-    u_int8_t sender_id [16];
-    u_int8_t prefix [16];
-    u_int8_t prefix_len;
+    uint8_t sender_id [16];
+    uint8_t prefix [16];
+    uint8_t prefix_len;
 };
 
 /*
@@ -261,13 +261,13 @@ struct lspping_tlv_targetfec_subtlv_bgp_ipv6_t {
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 struct lspping_tlv_targetfec_subtlv_rsvp_ipv4_t {
-    u_int8_t tunnel_endpoint [4];
-    u_int8_t res[2];
-    u_int8_t tunnel_id[2];
-    u_int8_t extended_tunnel_id[4];
-    u_int8_t tunnel_sender [4];
-    u_int8_t res2[2];
-    u_int8_t lsp_id [2];
+    uint8_t tunnel_endpoint [4];
+    uint8_t res[2];
+    uint8_t tunnel_id[2];
+    uint8_t extended_tunnel_id[4];
+    uint8_t tunnel_sender [4];
+    uint8_t res2[2];
+    uint8_t lsp_id [2];
 };
 
 /*
@@ -295,13 +295,13 @@ struct lspping_tlv_targetfec_subtlv_rsvp_ipv4_t {
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 struct lspping_tlv_targetfec_subtlv_rsvp_ipv6_t {
-    u_int8_t tunnel_endpoint [16];
-    u_int8_t res[2];
-    u_int8_t tunnel_id[2];
-    u_int8_t extended_tunnel_id[16];
-    u_int8_t tunnel_sender [16];
-    u_int8_t res2[2];
-    u_int8_t lsp_id [2];
+    uint8_t tunnel_endpoint [16];
+    uint8_t res[2];
+    uint8_t tunnel_id[2];
+    uint8_t extended_tunnel_id[16];
+    uint8_t tunnel_sender [16];
+    uint8_t res2[2];
+    uint8_t lsp_id [2];
 };
 
 /*
@@ -317,9 +317,9 @@ struct lspping_tlv_targetfec_subtlv_rsvp_ipv6_t {
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 struct lspping_tlv_targetfec_subtlv_l3vpn_ipv4_t {
-    u_int8_t rd [8];
-    u_int8_t prefix [4];
-    u_int8_t prefix_len;
+    uint8_t rd [8];
+    uint8_t prefix [4];
+    uint8_t prefix_len;
 };
 
 /*
@@ -338,9 +338,9 @@ struct lspping_tlv_targetfec_subtlv_l3vpn_ipv4_t {
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 struct lspping_tlv_targetfec_subtlv_l3vpn_ipv6_t {
-    u_int8_t rd [8];
-    u_int8_t prefix [16];
-    u_int8_t prefix_len;
+    uint8_t rd [8];
+    uint8_t prefix [16];
+    uint8_t prefix_len;
 };
 
 /*
@@ -357,10 +357,10 @@ struct lspping_tlv_targetfec_subtlv_l3vpn_ipv6_t {
  *  0                   1                   2                   3
  */
 struct lspping_tlv_targetfec_subtlv_l2vpn_endpt_t {
-    u_int8_t rd [8];
-    u_int8_t sender_ce_id [2];
-    u_int8_t receiver_ce_id [2];
-    u_int8_t encapsulation[2];
+    uint8_t rd [8];
+    uint8_t sender_ce_id [2];
+    uint8_t receiver_ce_id [2];
+    uint8_t encapsulation[2];
 };
 
 /*
@@ -374,9 +374,9 @@ struct lspping_tlv_targetfec_subtlv_l2vpn_endpt_t {
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 struct lspping_tlv_targetfec_subtlv_l2vpn_vcid_old_t {
-    u_int8_t remote_pe_address [4];
-    u_int8_t vc_id [4];
-    u_int8_t encapsulation[2];
+    uint8_t remote_pe_address [4];
+    uint8_t vc_id [4];
+    uint8_t encapsulation[2];
 };
 
 /*
@@ -392,10 +392,10 @@ struct lspping_tlv_targetfec_subtlv_l2vpn_vcid_old_t {
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 struct lspping_tlv_targetfec_subtlv_l2vpn_vcid_t {
-    u_int8_t sender_pe_address [4];
-    u_int8_t remote_pe_address [4];
-    u_int8_t vc_id [4];
-    u_int8_t encapsulation[2];
+    uint8_t sender_pe_address [4];
+    uint8_t remote_pe_address [4];
+    uint8_t vc_id [4];
+    uint8_t encapsulation[2];
 };
 
 /*
@@ -424,25 +424,25 @@ struct lspping_tlv_targetfec_subtlv_l2vpn_vcid_t {
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 struct lspping_tlv_downstream_map_ipv4_t {
-    u_int8_t mtu [2];
-    u_int8_t address_type;
-    u_int8_t res;
-    u_int8_t downstream_ip[4];
-    u_int8_t downstream_interface[4];
+    uint8_t mtu [2];
+    uint8_t address_type;
+    uint8_t res;
+    uint8_t downstream_ip[4];
+    uint8_t downstream_interface[4];
 };
 
 struct lspping_tlv_downstream_map_ipv6_t {
-    u_int8_t mtu [2];
-    u_int8_t address_type;
-    u_int8_t res;
-    u_int8_t downstream_ip[16];
-    u_int8_t downstream_interface[16];
+    uint8_t mtu [2];
+    uint8_t address_type;
+    uint8_t res;
+    uint8_t downstream_ip[16];
+    uint8_t downstream_interface[16];
 };
 
 struct lspping_tlv_downstream_map_info_t {
-    u_int8_t hash_key_type;
-    u_int8_t depth_limit;
-    u_int8_t multipath_length [2];
+    uint8_t hash_key_type;
+    uint8_t depth_limit;
+    uint8_t multipath_length [2];
 };
 
 #define LSPPING_AFI_IPV4 1
@@ -844,7 +844,7 @@ lspping_print(netdissect_options *ndo,
 
         case  LSPPING_TLV_VENDOR_ENTERPRISE:
         {
-            u_int32_t vendor_id;
+            uint32_t vendor_id;
 
             if (!ND_TTEST2(*tptr, LSPPING_TLV_VENDOR_ENTERPRISE_LEN))
                 goto trunc;

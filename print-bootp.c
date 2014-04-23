@@ -152,13 +152,13 @@ bootp_print(netdissect_options *ndo,
 	/* Decode the vendor buffer */
 	ND_TCHECK(bp->bp_vend[0]);
 	if (memcmp((const char *)bp->bp_vend, vm_rfc1048,
-		 sizeof(u_int32_t)) == 0)
+		 sizeof(uint32_t)) == 0)
 		rfc1048_print(ndo, bp->bp_vend);
 	else if (memcmp((const char *)bp->bp_vend, vm_cmu,
-		      sizeof(u_int32_t)) == 0)
+		      sizeof(uint32_t)) == 0)
 		cmu_print(ndo, bp->bp_vend);
 	else {
-		u_int32_t ul;
+		uint32_t ul;
 
 		ul = EXTRACT_32BITS(&bp->bp_vend);
 		if (ul != 0)
@@ -363,14 +363,14 @@ static void
 rfc1048_print(netdissect_options *ndo,
               register const u_char *bp)
 {
-	register u_int16_t tag;
+	register uint16_t tag;
 	register u_int len;
 	register const char *cp;
 	register char c;
 	int first, idx;
-	u_int32_t ul;
-	u_int16_t us;
-	u_int8_t uc, subopt, suboptlen;
+	uint32_t ul;
+	uint16_t us;
+	uint8_t uc, subopt, suboptlen;
 
 	ND_PRINT((ndo, "\n\t  Vendor-rfc1048 Extensions"));
 

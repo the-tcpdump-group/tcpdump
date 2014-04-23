@@ -92,7 +92,7 @@ pppoe_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, register co
 u_int
 pppoe_print(netdissect_options *ndo, register const u_char *bp, u_int length)
 {
-	u_int16_t pppoe_ver, pppoe_type, pppoe_code, pppoe_sessionid;
+	uint16_t pppoe_ver, pppoe_type, pppoe_code, pppoe_sessionid;
 	u_int pppoe_length;
 	const u_char *pppoe_packet, *pppoe_payload;
 

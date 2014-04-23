@@ -103,8 +103,8 @@ static const struct tok dh6_msgtype_str[] = {
 /* DHCP6 base packet format */
 struct dhcp6 {
 	union {
-		u_int8_t m;
-		u_int32_t x;
+		uint8_t m;
+		uint32_t x;
 	} dh6_msgtypexid;
 	/* options follow */
 };
@@ -114,10 +114,10 @@ struct dhcp6 {
 
 /* DHCPv6 relay messages */
 struct dhcp6_relay {
-	u_int8_t dh6relay_msgtype;
-	u_int8_t dh6relay_hcnt;
-	u_int8_t dh6relay_linkaddr[16];	/* XXX: badly aligned */
-	u_int8_t dh6relay_peeraddr[16];
+	uint8_t dh6relay_msgtype;
+	uint8_t dh6relay_hcnt;
+	uint8_t dh6relay_linkaddr[16];	/* XXX: badly aligned */
+	uint8_t dh6relay_peeraddr[16];
 	/* options follow */
 };
 
@@ -261,8 +261,8 @@ static const struct tok dh6opt_stcode_str[] = {
 };
 
 struct dhcp6opt {
-	u_int16_t dh6opt_type;
-	u_int16_t dh6opt_len;
+	uint16_t dh6opt_type;
+	uint16_t dh6opt_len;
 	/* type-dependent data follows */
 };
 
@@ -279,14 +279,14 @@ dhcp6opt_print(netdissect_options *ndo,
 	const struct dhcp6opt *dh6o;
 	const u_char *tp;
 	size_t i;
-	u_int16_t opttype;
+	uint16_t opttype;
 	size_t optlen;
-	u_int8_t auth_proto;
+	uint8_t auth_proto;
 	u_int authinfolen, authrealmlen;
 	int remain_len;  /* Length of remaining options */
 	int label_len;   /* Label length */
-	u_int16_t subopt_code;
-	u_int16_t subopt_len;
+	uint16_t subopt_code;
+	uint16_t subopt_len;
 
 	if (cp == ep)
 		return;

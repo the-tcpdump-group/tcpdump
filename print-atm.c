@@ -162,7 +162,7 @@ atm_if_print(netdissect_options *ndo,
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;
-	u_int32_t llchdr;
+	uint32_t llchdr;
 	u_int hdrlen = 0;
 
 	if (caplen < 8) {
@@ -334,26 +334,26 @@ atm_print(netdissect_options *ndo,
 }
 
 struct oam_fm_loopback_t {
-    u_int8_t loopback_indicator;
-    u_int8_t correlation_tag[4];
-    u_int8_t loopback_id[12];
-    u_int8_t source_id[12];
-    u_int8_t unused[16];
+    uint8_t loopback_indicator;
+    uint8_t correlation_tag[4];
+    uint8_t loopback_id[12];
+    uint8_t source_id[12];
+    uint8_t unused[16];
 };
 
 struct oam_fm_ais_rdi_t {
-    u_int8_t failure_type;
-    u_int8_t failure_location[16];
-    u_int8_t unused[28];
+    uint8_t failure_type;
+    uint8_t failure_location[16];
+    uint8_t unused[28];
 };
 
 int
 oam_print (netdissect_options *ndo,
            const u_char *p, u_int length, u_int hec) {
 
-    u_int32_t cell_header;
-    u_int16_t vpi, vci, cksum, cksum_shouldbe, idx;
-    u_int8_t  cell_type, func_type, payload, clp;
+    uint32_t cell_header;
+    uint16_t vpi, vci, cksum, cksum_shouldbe, idx;
+    uint8_t  cell_type, func_type, payload, clp;
 
     union {
         const struct oam_fm_loopback_t *oam_fm_loopback;

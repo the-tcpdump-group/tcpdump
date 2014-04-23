@@ -79,20 +79,20 @@ static const struct tok states[] = {
 
 /* HSRP protocol header. */
 struct hsrp {
-	u_int8_t	hsrp_version;
-	u_int8_t	hsrp_op_code;
-	u_int8_t	hsrp_state;
-	u_int8_t	hsrp_hellotime;
-	u_int8_t	hsrp_holdtime;
-	u_int8_t	hsrp_priority;
-	u_int8_t	hsrp_group;
-	u_int8_t	hsrp_reserved;
-	u_int8_t	hsrp_authdata[HSRP_AUTH_SIZE];
+	uint8_t	hsrp_version;
+	uint8_t	hsrp_op_code;
+	uint8_t	hsrp_state;
+	uint8_t	hsrp_hellotime;
+	uint8_t	hsrp_holdtime;
+	uint8_t	hsrp_priority;
+	uint8_t	hsrp_group;
+	uint8_t	hsrp_reserved;
+	uint8_t	hsrp_authdata[HSRP_AUTH_SIZE];
 	struct in_addr	hsrp_virtaddr;
 };
 
 void
-hsrp_print(netdissect_options *ndo, register const u_int8_t *bp, register u_int len)
+hsrp_print(netdissect_options *ndo, register const uint8_t *bp, register u_int len)
 {
 	struct hsrp *hp = (struct hsrp *) bp;
 

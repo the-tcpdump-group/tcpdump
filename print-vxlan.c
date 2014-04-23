@@ -38,8 +38,8 @@
 void
 vxlan_print(netdissect_options *ndo, const u_char *bp, u_int len)
 {
-    u_int8_t flags;
-    u_int32_t vni;
+    uint8_t flags;
+    uint32_t vni;
 
     if (len < 8) {
         ND_PRINT((ndo, "[|VXLAN]"));

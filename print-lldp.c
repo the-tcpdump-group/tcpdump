@@ -643,7 +643,7 @@ lldp_private_8021_print(netdissect_options *ndo,
     int subtype, hexdump = FALSE;
     u_int sublen;
     u_int tval;
-    u_int8_t i;
+    uint8_t i;
 
     if (tlv_len < 4) {
         return hexdump;
@@ -904,10 +904,10 @@ lldp_private_8023_print(netdissect_options *ndo,
 /*
  * Extract 34bits of latitude/longitude coordinates.
  */
-static u_int64_t
+static uint64_t
 lldp_extract_latlon(const u_char *tptr)
 {
-    u_int64_t latlon;
+    uint64_t latlon;
 
     latlon = *tptr & 0x3;
     latlon = (latlon << 32) | EXTRACT_32BITS(tptr+1);
@@ -923,10 +923,10 @@ lldp_private_tia_print(netdissect_options *ndo,
                        const u_char *tptr, u_int tlv_len)
 {
     int subtype, hexdump = FALSE;
-    u_int8_t location_format;
-    u_int16_t power_val;
+    uint8_t location_format;
+    uint16_t power_val;
     u_int lci_len;
-    u_int8_t ca_type, ca_len;
+    uint8_t ca_type, ca_len;
 
     if (tlv_len < 4) {
         return hexdump;
@@ -1105,9 +1105,9 @@ lldp_private_dcbx_print(netdissect_options *ndo,
                         const u_char *pptr, u_int len)
 {
     int subtype, hexdump = FALSE;
-    u_int8_t tval;
-    u_int16_t tlv;
-    u_int32_t i, pgval, uval;
+    uint8_t tval;
+    uint16_t tlv;
+    uint32_t i, pgval, uval;
     u_int tlen, tlv_type, tlv_len;
     const u_char *tptr, *mptr;
 
@@ -1264,7 +1264,7 @@ lldp_private_dcbx_print(netdissect_options *ndo,
 static char *
 lldp_network_addr_print(netdissect_options *ndo, const u_char *tptr, u_int len) {
 
-    u_int8_t af;
+    uint8_t af;
     static char buf[BUFSIZE];
     const char * (*pfunc)(netdissect_options *, const u_char *);
 
@@ -1310,7 +1310,7 @@ static int
 lldp_mgmt_addr_tlv_print(netdissect_options *ndo,
                          const u_char *pptr, u_int len) {
 
-    u_int8_t mgmt_addr_len, intf_num_subtype, oid_len;
+    uint8_t mgmt_addr_len, intf_num_subtype, oid_len;
     const u_char *tptr;
     u_int tlen;
     char *mgmt_addr;
@@ -1372,8 +1372,8 @@ void
 lldp_print(netdissect_options *ndo,
            register const u_char *pptr, register u_int len) {
 
-    u_int8_t subtype;
-    u_int16_t tlv, cap, ena_cap;
+    uint8_t subtype;
+    uint16_t tlv, cap, ena_cap;
     u_int oui, tlen, hexdump, tlv_type, tlv_len;
     const u_char *tptr;
     char *network_addr;

@@ -170,12 +170,12 @@ static const struct tok ctrl_str[] = {
 #define	FC_ORDER(fc)		((fc) & 0x8000)
 
 struct mgmt_header_t {
-	u_int16_t	fc;
-	u_int16_t 	duration;
-	u_int8_t	da[6];
-	u_int8_t	sa[6];
-	u_int8_t	bssid[6];
-	u_int16_t	seq_ctrl;
+	uint16_t	fc;
+	uint16_t 	duration;
+	uint8_t	da[6];
+	uint8_t	sa[6];
+	uint8_t	bssid[6];
+	uint16_t	seq_ctrl;
 };
 
 #define	MGMT_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
@@ -189,54 +189,54 @@ struct mgmt_header_t {
 #define	CAPABILITY_PRIVACY(cap)	((cap) & 0x0010)
 
 struct ssid_t {
-	u_int8_t	element_id;
-	u_int8_t	length;
+	uint8_t	element_id;
+	uint8_t	length;
 	u_char		ssid[33];  /* 32 + 1 for null */
 };
 
 struct rates_t {
-	u_int8_t	element_id;
-	u_int8_t	length;
-	u_int8_t	rate[16];
+	uint8_t	element_id;
+	uint8_t	length;
+	uint8_t	rate[16];
 };
 
 struct challenge_t {
-	u_int8_t	element_id;
-	u_int8_t	length;
-	u_int8_t	text[254]; /* 1-253 + 1 for null */
+	uint8_t	element_id;
+	uint8_t	length;
+	uint8_t	text[254]; /* 1-253 + 1 for null */
 };
 
 struct fh_t {
-	u_int8_t	element_id;
-	u_int8_t	length;
-	u_int16_t	dwell_time;
-	u_int8_t	hop_set;
-	u_int8_t 	hop_pattern;
-	u_int8_t	hop_index;
+	uint8_t	element_id;
+	uint8_t	length;
+	uint16_t	dwell_time;
+	uint8_t	hop_set;
+	uint8_t 	hop_pattern;
+	uint8_t	hop_index;
 };
 
 struct ds_t {
-	u_int8_t	element_id;
-	u_int8_t	length;
-	u_int8_t	channel;
+	uint8_t	element_id;
+	uint8_t	length;
+	uint8_t	channel;
 };
 
 struct cf_t {
-	u_int8_t	element_id;
-	u_int8_t	length;
-	u_int8_t	count;
-	u_int8_t	period;
-	u_int16_t	max_duration;
-	u_int16_t	dur_remaing;
+	uint8_t	element_id;
+	uint8_t	length;
+	uint8_t	count;
+	uint8_t	period;
+	uint16_t	max_duration;
+	uint16_t	dur_remaing;
 };
 
 struct tim_t {
-	u_int8_t	element_id;
-	u_int8_t	length;
-	u_int8_t	count;
-	u_int8_t	period;
-	u_int8_t	bitmap_control;
-	u_int8_t	bitmap[251];
+	uint8_t	element_id;
+	uint8_t	length;
+	uint8_t	count;
+	uint8_t	period;
+	uint8_t	bitmap_control;
+	uint8_t	bitmap[251];
 };
 
 #define	E_SSID 		0
@@ -266,18 +266,18 @@ struct tim_t {
 
 
 struct mgmt_body_t {
-	u_int8_t   	timestamp[IEEE802_11_TSTAMP_LEN];
-	u_int16_t  	beacon_interval;
-	u_int16_t 	listen_interval;
-	u_int16_t 	status_code;
-	u_int16_t 	aid;
+	uint8_t   	timestamp[IEEE802_11_TSTAMP_LEN];
+	uint16_t  	beacon_interval;
+	uint16_t 	listen_interval;
+	uint16_t 	status_code;
+	uint16_t 	aid;
 	u_char		ap[IEEE802_11_AP_LEN];
-	u_int16_t	reason_code;
-	u_int16_t	auth_alg;
-	u_int16_t	auth_trans_seq_num;
+	uint16_t	reason_code;
+	uint16_t	auth_alg;
+	uint16_t	auth_trans_seq_num;
 	int		challenge_present;
 	struct challenge_t  challenge;
-	u_int16_t	capability_info;
+	uint16_t	capability_info;
 	int		ssid_present;
 	struct ssid_t	ssid;
 	int		rates_present;
@@ -293,84 +293,84 @@ struct mgmt_body_t {
 };
 
 struct ctrl_rts_t {
-	u_int16_t	fc;
-	u_int16_t	duration;
-	u_int8_t	ra[6];
-	u_int8_t	ta[6];
-	u_int8_t	fcs[4];
+	uint16_t	fc;
+	uint16_t	duration;
+	uint8_t	ra[6];
+	uint8_t	ta[6];
+	uint8_t	fcs[4];
 };
 
 #define	CTRL_RTS_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
 			 IEEE802_11_RA_LEN+IEEE802_11_TA_LEN)
 
 struct ctrl_cts_t {
-	u_int16_t	fc;
-	u_int16_t	duration;
-	u_int8_t	ra[6];
-	u_int8_t	fcs[4];
+	uint16_t	fc;
+	uint16_t	duration;
+	uint8_t	ra[6];
+	uint8_t	fcs[4];
 };
 
 #define	CTRL_CTS_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+IEEE802_11_RA_LEN)
 
 struct ctrl_ack_t {
-	u_int16_t	fc;
-	u_int16_t	duration;
-	u_int8_t	ra[6];
-	u_int8_t	fcs[4];
+	uint16_t	fc;
+	uint16_t	duration;
+	uint8_t	ra[6];
+	uint8_t	fcs[4];
 };
 
 #define	CTRL_ACK_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+IEEE802_11_RA_LEN)
 
 struct ctrl_ps_poll_t {
-	u_int16_t	fc;
-	u_int16_t	aid;
-	u_int8_t	bssid[6];
-	u_int8_t	ta[6];
-	u_int8_t	fcs[4];
+	uint16_t	fc;
+	uint16_t	aid;
+	uint8_t	bssid[6];
+	uint8_t	ta[6];
+	uint8_t	fcs[4];
 };
 
 #define	CTRL_PS_POLL_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_AID_LEN+\
 				 IEEE802_11_BSSID_LEN+IEEE802_11_TA_LEN)
 
 struct ctrl_end_t {
-	u_int16_t	fc;
-	u_int16_t	duration;
-	u_int8_t	ra[6];
-	u_int8_t	bssid[6];
-	u_int8_t	fcs[4];
+	uint16_t	fc;
+	uint16_t	duration;
+	uint8_t	ra[6];
+	uint8_t	bssid[6];
+	uint8_t	fcs[4];
 };
 
 #define	CTRL_END_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
 			 IEEE802_11_RA_LEN+IEEE802_11_BSSID_LEN)
 
 struct ctrl_end_ack_t {
-	u_int16_t	fc;
-	u_int16_t	duration;
-	u_int8_t	ra[6];
-	u_int8_t	bssid[6];
-	u_int8_t	fcs[4];
+	uint16_t	fc;
+	uint16_t	duration;
+	uint8_t	ra[6];
+	uint8_t	bssid[6];
+	uint8_t	fcs[4];
 };
 
 #define	CTRL_END_ACK_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
 				 IEEE802_11_RA_LEN+IEEE802_11_BSSID_LEN)
 
 struct ctrl_ba_t {
-	u_int16_t	fc;
-	u_int16_t	duration;
-	u_int8_t	ra[6];
-	u_int8_t	fcs[4];
+	uint16_t	fc;
+	uint16_t	duration;
+	uint8_t	ra[6];
+	uint8_t	fcs[4];
 };
 
 #define	CTRL_BA_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+IEEE802_11_RA_LEN)
 
 struct ctrl_bar_t {
-	u_int16_t	fc;
-	u_int16_t	dur;
-	u_int8_t	ra[6];
-	u_int8_t	ta[6];
-	u_int16_t	ctl;
-	u_int16_t	seq;
-	u_int8_t	fcs[4];
+	uint16_t	fc;
+	uint16_t	dur;
+	uint8_t	ra[6];
+	uint8_t	ta[6];
+	uint16_t	ctl;
+	uint16_t	seq;
+	uint8_t	fcs[4];
 };
 
 #define	CTRL_BAR_HDRLEN		(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
@@ -378,12 +378,12 @@ struct ctrl_bar_t {
 				 IEEE802_11_CTL_LEN+IEEE802_11_SEQ_LEN)
 
 struct meshcntl_t {
-	u_int8_t	flags;
-	u_int8_t	ttl;
-	u_int8_t	seq[4];
-	u_int8_t	addr4[6];
-	u_int8_t	addr5[6];
-	u_int8_t	addr6[6];
+	uint8_t	flags;
+	uint8_t	ttl;
+	uint8_t	seq[4];
+	uint8_t	addr4[6];
+	uint8_t	addr5[6];
+	uint8_t	addr6[6];
 };
 
 #define	IV_IV(iv)	((iv) & 0xFFFFFF)
@@ -443,18 +443,18 @@ struct meshcntl_t {
  * Note well: all radiotap fields are little-endian.
  */
 struct ieee80211_radiotap_header {
-	u_int8_t	it_version;	/* Version 0. Only increases
+	uint8_t	it_version;	/* Version 0. Only increases
 					 * for drastic changes,
 					 * introduction of compatible
 					 * new fields does not count.
 					 */
-	u_int8_t	it_pad;
-	u_int16_t       it_len;         /* length of the whole
+	uint8_t	it_pad;
+	uint16_t       it_len;         /* length of the whole
 					 * header in bytes, including
 					 * it_version, it_pad,
 					 * it_len, and data fields.
 					 */
-	u_int32_t       it_present;     /* A bitmap telling which
+	uint32_t       it_present;     /* A bitmap telling which
 					 * fields are present. Set bit 31
 					 * (0x80000000) to extend the
 					 * bitmap by another 32 bits.
@@ -466,25 +466,25 @@ struct ieee80211_radiotap_header {
 /* Name                                 Data type       Units
  * ----                                 ---------       -----
  *
- * IEEE80211_RADIOTAP_TSFT              u_int64_t       microseconds
+ * IEEE80211_RADIOTAP_TSFT              uint64_t       microseconds
  *
  *      Value in microseconds of the MAC's 64-bit 802.11 Time
  *      Synchronization Function timer when the first bit of the
  *      MPDU arrived at the MAC. For received frames, only.
  *
- * IEEE80211_RADIOTAP_CHANNEL           2 x u_int16_t   MHz, bitmap
+ * IEEE80211_RADIOTAP_CHANNEL           2 x uint16_t   MHz, bitmap
  *
  *      Tx/Rx frequency in MHz, followed by flags (see below).
  *	Note that IEEE80211_RADIOTAP_XCHANNEL must be used to
  *	represent an HT channel as there is not enough room in
  *	the flags word.
  *
- * IEEE80211_RADIOTAP_FHSS              u_int16_t       see below
+ * IEEE80211_RADIOTAP_FHSS              uint16_t       see below
  *
  *      For frequency-hopping radios, the hop set (first byte)
  *      and pattern (second byte).
  *
- * IEEE80211_RADIOTAP_RATE              u_int8_t        500kb/s or index
+ * IEEE80211_RADIOTAP_RATE              uint8_t        500kb/s or index
  *
  *      Tx/Rx data rate.  If bit 0x80 is set then it represents an
  *	an MCS index and not an IEEE rate.
@@ -501,30 +501,30 @@ struct ieee80211_radiotap_header {
  *      RF noise power at the antenna, decibel difference from one
  *      milliwatt.
  *
- * IEEE80211_RADIOTAP_DB_ANTSIGNAL      u_int8_t        decibel (dB)
+ * IEEE80211_RADIOTAP_DB_ANTSIGNAL      uint8_t        decibel (dB)
  *
  *      RF signal power at the antenna, decibel difference from an
  *      arbitrary, fixed reference.
  *
- * IEEE80211_RADIOTAP_DB_ANTNOISE       u_int8_t        decibel (dB)
+ * IEEE80211_RADIOTAP_DB_ANTNOISE       uint8_t        decibel (dB)
  *
  *      RF noise power at the antenna, decibel difference from an
  *      arbitrary, fixed reference point.
  *
- * IEEE80211_RADIOTAP_LOCK_QUALITY      u_int16_t       unitless
+ * IEEE80211_RADIOTAP_LOCK_QUALITY      uint16_t       unitless
  *
  *      Quality of Barker code lock. Unitless. Monotonically
  *      nondecreasing with "better" lock strength. Called "Signal
  *      Quality" in datasheets.  (Is there a standard way to measure
  *      this?)
  *
- * IEEE80211_RADIOTAP_TX_ATTENUATION    u_int16_t       unitless
+ * IEEE80211_RADIOTAP_TX_ATTENUATION    uint16_t       unitless
  *
  *      Transmit power expressed as unitless distance from max
  *      power set at factory calibration.  0 is max power.
  *      Monotonically nondecreasing with lower power levels.
  *
- * IEEE80211_RADIOTAP_DB_TX_ATTENUATION u_int16_t       decibels (dB)
+ * IEEE80211_RADIOTAP_DB_TX_ATTENUATION uint16_t       decibels (dB)
  *
  *      Transmit power expressed as decibel distance from max power
  *      set at factory calibration.  0 is max power.  Monotonically
@@ -537,24 +537,24 @@ struct ieee80211_radiotap_header {
  *      reference). This is the absolute power level measured at
  *      the antenna port.
  *
- * IEEE80211_RADIOTAP_FLAGS             u_int8_t        bitmap
+ * IEEE80211_RADIOTAP_FLAGS             uint8_t        bitmap
  *
  *      Properties of transmitted and received frames. See flags
  *      defined below.
  *
- * IEEE80211_RADIOTAP_ANTENNA           u_int8_t        antenna index
+ * IEEE80211_RADIOTAP_ANTENNA           uint8_t        antenna index
  *
  *      Unitless indication of the Rx/Tx antenna for this packet.
  *      The first antenna is antenna 0.
  *
- * IEEE80211_RADIOTAP_RX_FLAGS          u_int16_t       bitmap
+ * IEEE80211_RADIOTAP_RX_FLAGS          uint16_t       bitmap
  *
  *     Properties of received frames. See flags defined below.
  *
- * IEEE80211_RADIOTAP_XCHANNEL          u_int32_t	bitmap
- *					u_int16_t	MHz
- *					u_int8_t	channel number
- *					u_int8_t	.5 dBm
+ * IEEE80211_RADIOTAP_XCHANNEL          uint32_t	bitmap
+ *					uint16_t	MHz
+ *					uint8_t	channel number
+ *					uint8_t	.5 dBm
  *
  *	Extended channel specification: flags (see below) followed by
  *	frequency in MHz, the corresponding IEEE channel number, and
@@ -562,18 +562,18 @@ struct ieee80211_radiotap_header {
  *	units.  This property supersedes IEEE80211_RADIOTAP_CHANNEL
  *	and only one of the two should be present.
  *
- * IEEE80211_RADIOTAP_MCS		u_int8_t	known
- *					u_int8_t	flags
- *					u_int8_t	mcs
+ * IEEE80211_RADIOTAP_MCS		uint8_t	known
+ *					uint8_t	flags
+ *					uint8_t	mcs
  *
  *	Bitset indicating which fields have known values, followed
  *	by bitset of flag values, followed by the MCS rate index as
  *	in IEEE 802.11n.
  *
  * IEEE80211_RADIOTAP_VENDOR_NAMESPACE
- *					u_int8_t  OUI[3]
- *                                   u_int8_t  subspace
- *                                   u_int16_t length
+ *					uint8_t  OUI[3]
+ *                                   uint8_t  subspace
+ *                                   uint16_t length
  *
  *     The Vendor Namespace Field contains three sub-fields. The first
  *     sub-field is 3 bytes long. It contains the vendor's IEEE 802
@@ -689,9 +689,9 @@ static const char tstr[] = "[|802.11]";
 /*  This is used to save state when parsing/processing parameters */
 struct radiotap_state
 {
-	u_int32_t	present;
+	uint32_t	present;
 
-	u_int8_t	rate;
+	uint8_t	rate;
 };
 
 #define PRINT_SSID(p) \
@@ -1279,7 +1279,7 @@ static int
 wep_print(netdissect_options *ndo,
           const u_char *p)
 {
-	u_int32_t iv;
+	uint32_t iv;
 
 	if (!ND_TTEST2(*p, IEEE802_11_IV_LEN + IEEE802_11_KID_LEN))
 		return 0;
@@ -1614,7 +1614,7 @@ handle_assoc_response(netdissect_options *ndo,
 
 	ret = parse_elements(ndo, &pbody, p, offset, length);
 
-	ND_PRINT((ndo, " AID(%x) :%s: %s", ((u_int16_t)(pbody.aid << 2 )) >> 2 ,
+	ND_PRINT((ndo, " AID(%x) :%s: %s", ((uint16_t)(pbody.aid << 2 )) >> 2 ,
 	    CAPABILITY_PRIVACY(pbody.capability_info) ? " PRIVACY " : "",
 	    (pbody.status_code < NUM_STATUSES
 		? status_text[pbody.status_code]
@@ -1928,7 +1928,7 @@ handle_action(netdissect_options *ndo,
 
 static int
 mgmt_body_print(netdissect_options *ndo,
-                u_int16_t fc, const struct mgmt_header_t *pmh,
+                uint16_t fc, const struct mgmt_header_t *pmh,
                 const u_char *p, u_int length)
 {
 	ND_PRINT((ndo, "%s", tok2str(st_str, "Unhandled Management subtype(%x)", FC_SUBTYPE(fc))));
@@ -1975,7 +1975,7 @@ mgmt_body_print(netdissect_options *ndo,
 
 static int
 ctrl_body_print(netdissect_options *ndo,
-                u_int16_t fc, const u_char *p)
+                uint16_t fc, const u_char *p)
 {
 	ND_PRINT((ndo, "%s", tok2str(ctrl_str, "Unknown Ctrl Subtype", FC_SUBTYPE(fc))));
 	switch (FC_SUBTYPE(fc)) {
@@ -2060,8 +2060,8 @@ ctrl_body_print(netdissect_options *ndo,
 
 static void
 data_header_print(netdissect_options *ndo,
-                  u_int16_t fc, const u_char *p, const u_int8_t **srcp,
-                  const u_int8_t **dstp)
+                  uint16_t fc, const u_char *p, const uint8_t **srcp,
+                  const uint8_t **dstp)
 {
 	u_int subtype = FC_SUBTYPE(fc);
 
@@ -2137,7 +2137,7 @@ data_header_print(netdissect_options *ndo,
 
 static void
 mgmt_header_print(netdissect_options *ndo,
-                  const u_char *p, const u_int8_t **srcp, const u_int8_t **dstp)
+                  const u_char *p, const uint8_t **srcp, const uint8_t **dstp)
 {
 	const struct mgmt_header_t *hp = (const struct mgmt_header_t *) p;
 
@@ -2155,8 +2155,8 @@ mgmt_header_print(netdissect_options *ndo,
 
 static void
 ctrl_header_print(netdissect_options *ndo,
-                  u_int16_t fc, const u_char *p, const u_int8_t **srcp,
-                  const u_int8_t **dstp)
+                  uint16_t fc, const u_char *p, const uint8_t **srcp,
+                  const uint8_t **dstp)
 {
 	if (srcp != NULL)
 		*srcp = NULL;
@@ -2213,7 +2213,7 @@ ctrl_header_print(netdissect_options *ndo,
 
 static int
 extract_header_length(netdissect_options *ndo,
-                      u_int16_t fc)
+                      uint16_t fc)
 {
 	int len;
 
@@ -2263,9 +2263,9 @@ extract_mesh_header_length(const u_char *p)
  */
 static void
 ieee_802_11_hdr_print(netdissect_options *ndo,
-                      u_int16_t fc, const u_char *p, u_int hdrlen,
-                      u_int meshdrlen, const u_int8_t **srcp,
-                      const u_int8_t **dstp)
+                      uint16_t fc, const u_char *p, u_int hdrlen,
+                      u_int meshdrlen, const uint8_t **srcp,
+                      const uint8_t **dstp)
 {
 	if (ndo->ndo_vflag) {
 		if (FC_MORE_DATA(fc))
@@ -2329,9 +2329,9 @@ ieee802_11_print(netdissect_options *ndo,
                  const u_char *p, u_int length, u_int orig_caplen, int pad,
                  u_int fcslen)
 {
-	u_int16_t fc;
+	uint16_t fc;
 	u_int caplen, hdrlen, meshdrlen;
-	const u_int8_t *src, *dst;
+	const uint8_t *src, *dst;
 	u_short extracted_ethertype;
 
 	caplen = orig_caplen;
@@ -2501,16 +2501,16 @@ print_chaninfo(netdissect_options *ndo,
 
 static int
 print_radiotap_field(netdissect_options *ndo,
-                     struct cpack_state *s, u_int32_t bit, u_int8_t *flags,
-                     struct radiotap_state *state, u_int32_t presentflags)
+                     struct cpack_state *s, uint32_t bit, uint8_t *flags,
+                     struct radiotap_state *state, uint32_t presentflags)
 {
 	union {
 		int8_t		i8;
-		u_int8_t	u8;
+		uint8_t	u8;
 		int16_t		i16;
-		u_int16_t	u16;
-		u_int32_t	u32;
-		u_int64_t	u64;
+		uint16_t	u16;
+		uint32_t	u32;
+		uint64_t	u64;
 	} u, u2, u3, u4;
 	int rc;
 
@@ -2581,9 +2581,9 @@ print_radiotap_field(netdissect_options *ndo,
 		rc = cpack_uint8(s, &u3.u8);
 		break;
 	case IEEE80211_RADIOTAP_VENDOR_NAMESPACE: {
-		u_int8_t vns[3];
-		u_int16_t length;
-		u_int8_t subspace;
+		uint8_t vns[3];
+		uint16_t length;
+		uint8_t subspace;
 
 		if ((cpack_align_and_reserve(s, 2)) == NULL) {
 			rc = -1;
@@ -2832,13 +2832,13 @@ ieee802_11_radio_print(netdissect_options *ndo,
 
 	struct cpack_state cpacker;
 	struct ieee80211_radiotap_header *hdr;
-	u_int32_t present, next_present;
-	u_int32_t presentflags = 0;
-	u_int32_t *presentp, *last_presentp;
+	uint32_t present, next_present;
+	uint32_t presentflags = 0;
+	uint32_t *presentp, *last_presentp;
 	enum ieee80211_radiotap_type bit;
 	int bit0;
 	u_int len;
-	u_int8_t flags;
+	uint8_t flags;
 	int pad;
 	u_int fcslen;
 	struct radiotap_state state;
@@ -2856,7 +2856,7 @@ ieee802_11_radio_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "%s", tstr));
 		return caplen;
 	}
-	cpack_init(&cpacker, (u_int8_t *)hdr, len); /* align against header start */
+	cpack_init(&cpacker, (uint8_t *)hdr, len); /* align against header start */
 	cpack_advance(&cpacker, sizeof(*hdr)); /* includes the 1st bitmap */
 	for (last_presentp = &hdr->it_present;
 	     IS_EXTENDED(last_presentp) &&
@@ -2916,7 +2916,7 @@ static u_int
 ieee802_11_avs_radio_print(netdissect_options *ndo,
                            const u_char *p, u_int length, u_int caplen)
 {
-	u_int32_t caphdr_len;
+	uint32_t caphdr_len;
 
 	if (caplen < 8) {
 		ND_PRINT((ndo, "%s", tstr));
@@ -2968,7 +2968,7 @@ prism_if_print(netdissect_options *ndo,
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;
-	u_int32_t msgcode;
+	uint32_t msgcode;
 
 	if (caplen < 4) {
 		ND_PRINT((ndo, "%s", tstr));

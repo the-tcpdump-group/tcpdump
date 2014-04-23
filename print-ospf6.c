@@ -117,27 +117,27 @@
 #define OSPF6_AT_HDRLEN             16U
 #define OSPF6_AUTH_TYPE_HMAC        0x0001
 
-typedef u_int32_t rtrid_t;
+typedef uint32_t rtrid_t;
 
 /* link state advertisement header */
 struct lsa6_hdr {
-    u_int16_t ls_age;
-    u_int16_t ls_type;
+    uint16_t ls_age;
+    uint16_t ls_type;
     rtrid_t ls_stateid;
     rtrid_t ls_router;
-    u_int32_t ls_seq;
-    u_int16_t ls_chksum;
-    u_int16_t ls_length;
+    uint32_t ls_seq;
+    uint16_t ls_chksum;
+    uint16_t ls_length;
 };
 
 /* Length of an IPv6 address, in bytes. */
 #define IPV6_ADDR_LEN_BYTES (128/8)
 
 struct lsa6_prefix {
-    u_int8_t lsa_p_len;
-    u_int8_t lsa_p_opt;
-    u_int16_t lsa_p_metric;
-    u_int8_t lsa_p_prefix[IPV6_ADDR_LEN_BYTES]; /* maximum length */
+    uint8_t lsa_p_len;
+    uint8_t lsa_p_opt;
+    uint16_t lsa_p_metric;
+    uint8_t lsa_p_prefix[IPV6_ADDR_LEN_BYTES]; /* maximum length */
 };
 
 /* link state advertisement */
@@ -149,36 +149,36 @@ struct lsa6 {
 	/* Router links advertisements */
 	struct {
 	    union {
-		u_int8_t flg;
-		u_int32_t opt;
+		uint8_t flg;
+		uint32_t opt;
 	    } rla_flgandopt;
 #define rla_flags	rla_flgandopt.flg
 #define rla_options	rla_flgandopt.opt
 	    struct rlalink6 {
-		u_int8_t link_type;
-		u_int8_t link_zero[1];
-		u_int16_t link_metric;
-		u_int32_t link_ifid;
-		u_int32_t link_nifid;
+		uint8_t link_type;
+		uint8_t link_zero[1];
+		uint16_t link_metric;
+		uint32_t link_ifid;
+		uint32_t link_nifid;
 		rtrid_t link_nrtid;
 	    } rla_link[1];		/* may repeat	*/
 	} un_rla;
 
 	/* Network links advertisements */
 	struct {
-	    u_int32_t nla_options;
+	    uint32_t nla_options;
 	    rtrid_t nla_router[1];	/* may repeat	*/
 	} un_nla;
 
 	/* Inter Area Prefix LSA */
 	struct {
-	    u_int32_t inter_ap_metric;
+	    uint32_t inter_ap_metric;
 	    struct lsa6_prefix inter_ap_prefix[1];
 	} un_inter_ap;
 
 	/* AS external links advertisements */
 	struct {
-	    u_int32_t asla_metric;
+	    uint32_t asla_metric;
 	    struct lsa6_prefix asla_prefix[1];
 	    /* some optional fields follow */
 	} un_asla;
@@ -187,12 +187,12 @@ struct lsa6 {
 	/* Summary links advertisements */
 	struct {
 	    struct in_addr sla_mask;
-	    u_int32_t sla_tosmetric[1];	/* may repeat	*/
+	    uint32_t sla_tosmetric[1];	/* may repeat	*/
 	} un_sla;
 
 	/* Multicast group membership */
 	struct mcla {
-	    u_int32_t mcla_vtype;
+	    uint32_t mcla_vtype;
 	    struct in_addr mcla_vid;
 	} un_mcla[1];
 #endif
@@ -202,20 +202,20 @@ struct lsa6 {
 	/* Link LSA */
 	struct llsa {
 	    union {
-		u_int8_t pri;
-		u_int32_t opt;
+		uint8_t pri;
+		uint32_t opt;
 	    } llsa_priandopt;
 #define llsa_priority	llsa_priandopt.pri
 #define llsa_options	llsa_priandopt.opt
 	    struct in6_addr llsa_lladdr;
-	    u_int32_t llsa_nprefix;
+	    uint32_t llsa_nprefix;
 	    struct lsa6_prefix llsa_prefix[1];
 	} un_llsa;
 
 	/* Intra-Area-Prefix */
 	struct {
-	    u_int16_t intra_ap_nprefix;
-	    u_int16_t intra_ap_lstype;
+	    uint16_t intra_ap_nprefix;
+	    uint16_t intra_ap_lstype;
 	    rtrid_t intra_ap_lsid;
 	    rtrid_t intra_ap_rtid;
 	    struct lsa6_prefix intra_ap_prefix[1];
@@ -227,27 +227,27 @@ struct lsa6 {
  * the main header
  */
 struct ospf6hdr {
-    u_int8_t ospf6_version;
-    u_int8_t ospf6_type;
-    u_int16_t ospf6_len;
+    uint8_t ospf6_version;
+    uint8_t ospf6_type;
+    uint16_t ospf6_len;
     rtrid_t ospf6_routerid;
     rtrid_t ospf6_areaid;
-    u_int16_t ospf6_chksum;
-    u_int8_t ospf6_instanceid;
-    u_int8_t ospf6_rsvd;
+    uint16_t ospf6_chksum;
+    uint8_t ospf6_instanceid;
+    uint8_t ospf6_rsvd;
     union {
 
 	/* Hello packet */
 	struct {
-	    u_int32_t hello_ifid;
+	    uint32_t hello_ifid;
 	    union {
-		u_int8_t pri;
-		u_int32_t opt;
+		uint8_t pri;
+		uint32_t opt;
 	    } hello_priandopt;
 #define hello_priority	hello_priandopt.pri
 #define hello_options	hello_priandopt.opt
-	    u_int16_t hello_helloint;
-	    u_int16_t hello_deadint;
+	    uint16_t hello_helloint;
+	    uint16_t hello_deadint;
 	    rtrid_t hello_dr;
 	    rtrid_t hello_bdr;
 	    rtrid_t hello_neighbor[1]; /* may repeat	*/
@@ -255,25 +255,25 @@ struct ospf6hdr {
 
 	/* Database Description packet */
 	struct {
-	    u_int32_t db_options;
-	    u_int16_t db_mtu;
-	    u_int8_t db_mbz;
-	    u_int8_t db_flags;
-	    u_int32_t db_seq;
+	    uint32_t db_options;
+	    uint16_t db_mtu;
+	    uint8_t db_mbz;
+	    uint8_t db_flags;
+	    uint32_t db_seq;
 	    struct lsa6_hdr db_lshdr[1]; /* may repeat	*/
 	} un_db;
 
 	/* Link State Request */
 	struct lsr6 {
-	    u_int16_t ls_mbz;
-	    u_int16_t ls_type;
+	    uint16_t ls_mbz;
+	    uint16_t ls_type;
 	    rtrid_t ls_stateid;
 	    rtrid_t ls_router;
 	} un_lsr[1];		/* may repeat	*/
 
 	/* Link State Update */
 	struct {
-	    u_int32_t lsu_count;
+	    uint32_t lsu_count;
 	    struct lsa6 lsu_lsa[1]; /* may repeat	*/
 	} un_lsu;
 
@@ -413,7 +413,7 @@ trunc:
 
 static int
 ospf6_print_lsaprefix(netdissect_options *ndo,
-                      const u_int8_t *tptr, u_int lsa_length)
+                      const uint8_t *tptr, u_int lsa_length)
 {
 	const struct lsa6_prefix *lsapp = (struct lsa6_prefix *)tptr;
 	u_int wordlen;
@@ -468,13 +468,13 @@ ospf6_print_lsa(netdissect_options *ndo,
 	register const struct llsa *llsap;
 	register const struct lsa6_prefix *lsapp;
 #if 0
-	register const u_int32_t *lp;
+	register const uint32_t *lp;
 #endif
 	register u_int prefixes;
 	register int bytelen;
 	register u_int length, lsa_length;
-	u_int32_t flags32;
-	const u_int8_t *tptr;
+	uint32_t flags32;
+	const uint8_t *tptr;
 
 	if (ospf6_print_lshdr(ndo, &lsap->ls_hdr, dataend))
 		return (1);
@@ -490,7 +490,7 @@ ospf6_print_lsa(netdissect_options *ndo,
         if (length < sizeof(struct lsa6_hdr) || (u_char *)lsap + length > dataend)
         	return (1);
         lsa_length = length - sizeof(struct lsa6_hdr);
-        tptr = (u_int8_t *)lsap+sizeof(struct lsa6_hdr);
+        tptr = (uint8_t *)lsap+sizeof(struct lsa6_hdr);
 
 	switch (EXTRACT_16BITS(&lsap->ls_hdr.ls_type)) {
 	case LS_TYPE_ROUTER | LS_SCOPE_AREA:
@@ -576,7 +576,7 @@ ospf6_print_lsa(netdissect_options *ndo,
 		ND_PRINT((ndo, ", metric %u",
 			EXTRACT_32BITS(&lsap->lsa_un.un_inter_ap.inter_ap_metric) & SLA_MASK_METRIC));
 
-		tptr = (u_int8_t *)lsap->lsa_un.un_inter_ap.inter_ap_prefix;
+		tptr = (uint8_t *)lsap->lsa_un.un_inter_ap.inter_ap_prefix;
 		while (lsa_length != 0) {
 			bytelen = ospf6_print_lsaprefix(ndo, tptr, lsa_length);
 			if (bytelen < 0)
@@ -598,7 +598,7 @@ ospf6_print_lsa(netdissect_options *ndo,
 		       EXTRACT_32BITS(&lsap->lsa_un.un_asla.asla_metric) &
 		       ASLA_MASK_METRIC));
 
-		tptr = (u_int8_t *)lsap->lsa_un.un_asla.asla_prefix;
+		tptr = (uint8_t *)lsap->lsa_un.un_asla.asla_prefix;
 		lsapp = (struct lsa6_prefix *)tptr;
 		bytelen = ospf6_print_lsaprefix(ndo, tptr, lsa_length);
 		if (bytelen < 0)
@@ -620,23 +620,23 @@ ospf6_print_lsa(netdissect_options *ndo,
 		}
 
 		if ((flags32 & ASLA_FLAG_ROUTETAG) != 0) {
-			if (lsa_length < sizeof (u_int32_t))
+			if (lsa_length < sizeof (uint32_t))
 				return (1);
-			lsa_length -= sizeof (u_int32_t);
-			ND_TCHECK(*(u_int32_t *)tptr);
+			lsa_length -= sizeof (uint32_t);
+			ND_TCHECK(*(uint32_t *)tptr);
 			ND_PRINT((ndo, " tag %s",
-			       ipaddr_string(ndo, (u_int32_t *)tptr)));
-			tptr += sizeof(u_int32_t);
+			       ipaddr_string(ndo, (uint32_t *)tptr)));
+			tptr += sizeof(uint32_t);
 		}
 
 		if (lsapp->lsa_p_metric) {
-			if (lsa_length < sizeof (u_int32_t))
+			if (lsa_length < sizeof (uint32_t))
 				return (1);
-			lsa_length -= sizeof (u_int32_t);
-			ND_TCHECK(*(u_int32_t *)tptr);
+			lsa_length -= sizeof (uint32_t);
+			ND_TCHECK(*(uint32_t *)tptr);
 			ND_PRINT((ndo, " RefLSID: %s",
-			       ipaddr_string(ndo, (u_int32_t *)tptr)));
-			tptr += sizeof(u_int32_t);
+			       ipaddr_string(ndo, (uint32_t *)tptr)));
+			tptr += sizeof(uint32_t);
 		}
 		break;
 
@@ -660,7 +660,7 @@ ospf6_print_lsa(netdissect_options *ndo,
                        ip6addr_string(ndo, &llsap->llsa_lladdr),
                        prefixes));
 
-		tptr = (u_int8_t *)llsap->llsa_prefix;
+		tptr = (uint8_t *)llsap->llsa_prefix;
 		while (prefixes > 0) {
 			bytelen = ospf6_print_lsaprefix(ndo, tptr, lsa_length);
 			if (bytelen < 0)
@@ -688,7 +688,7 @@ ospf6_print_lsa(netdissect_options *ndo,
                 prefixes = EXTRACT_16BITS(&lsap->lsa_un.un_intra_ap.intra_ap_nprefix);
 		ND_PRINT((ndo, "\n\t      Prefixes %d:", prefixes));
 
-		tptr = (u_int8_t *)lsap->lsa_un.un_intra_ap.intra_ap_prefix;
+		tptr = (uint8_t *)lsap->lsa_un.un_intra_ap.intra_ap_prefix;
 		while (prefixes > 0) {
 			bytelen = ospf6_print_lsaprefix(ndo, tptr, lsa_length);
 			if (bytelen < 0)

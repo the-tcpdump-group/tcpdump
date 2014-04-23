@@ -50,27 +50,27 @@
 #include "ipproto.h"
 
 struct nfhdr {
-	u_int32_t	ver_cnt;	/* version [15], and # of records */
-	u_int32_t	msys_uptime;
-	u_int32_t	utc_sec;
-	u_int32_t	utc_nsec;
-	u_int32_t	sequence;	/* v5 flow sequence number */
-	u_int32_t	reserved;	/* v5 only */
+	uint32_t	ver_cnt;	/* version [15], and # of records */
+	uint32_t	msys_uptime;
+	uint32_t	utc_sec;
+	uint32_t	utc_nsec;
+	uint32_t	sequence;	/* v5 flow sequence number */
+	uint32_t	reserved;	/* v5 only */
 };
 
 struct nfrec {
 	struct in_addr	src_ina;
 	struct in_addr	dst_ina;
 	struct in_addr	nhop_ina;
-	u_int32_t	ifaces;		/* src,dst ifaces */
-	u_int32_t	packets;
-	u_int32_t	octets;
-	u_int32_t	start_time;	/* sys_uptime value */
-	u_int32_t	last_time;	/* sys_uptime value */
-	u_int32_t	ports;		/* src,dst ports */
-	u_int32_t	proto_tos;	/* proto, tos, pad, flags(v5) */
-	u_int32_t	asses;		/* v1: flags; v5: src,dst AS */
-	u_int32_t	masks;		/* src,dst addr prefix; v6: encaps */
+	uint32_t	ifaces;		/* src,dst ifaces */
+	uint32_t	packets;
+	uint32_t	octets;
+	uint32_t	start_time;	/* sys_uptime value */
+	uint32_t	last_time;	/* sys_uptime value */
+	uint32_t	ports;		/* src,dst ports */
+	uint32_t	proto_tos;	/* proto, tos, pad, flags(v5) */
+	uint32_t	asses;		/* v1: flags; v5: src,dst AS */
+	uint32_t	masks;		/* src,dst addr prefix; v6: encaps */
 	struct in_addr	peer_nexthop;	/* v6: IP address of the nexthop within the peer (FIB)*/
 };
 

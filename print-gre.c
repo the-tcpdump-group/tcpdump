@@ -78,9 +78,9 @@ static const struct tok gre_flag_values[] = {
 
 static void gre_print_0(netdissect_options *, const u_char *, u_int);
 static void gre_print_1(netdissect_options *, const u_char *, u_int);
-static void gre_sre_print(netdissect_options *, u_int16_t, u_int8_t, u_int8_t, const u_char *, u_int);
-static void gre_sre_ip_print(netdissect_options *, u_int8_t, u_int8_t, const u_char *, u_int);
-static void gre_sre_asn_print(netdissect_options *, u_int8_t, u_int8_t, const u_char *, u_int);
+static void gre_sre_print(netdissect_options *, uint16_t, uint8_t, uint8_t, const u_char *, u_int);
+static void gre_sre_ip_print(netdissect_options *, uint8_t, uint8_t, const u_char *, u_int);
+static void gre_sre_asn_print(netdissect_options *, uint8_t, uint8_t, const u_char *, u_int);
 
 void
 gre_print(netdissect_options *ndo, const u_char *bp, u_int length)
@@ -111,7 +111,7 @@ static void
 gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	u_int len = length;
-	u_int16_t flags, prot;
+	uint16_t flags, prot;
 
 	flags = EXTRACT_16BITS(bp);
         if (ndo->ndo_vflag)
@@ -160,9 +160,9 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	if (flags & GRE_RP) {
 		for (;;) {
-			u_int16_t af;
-			u_int8_t sreoff;
-			u_int8_t srelen;
+			uint16_t af;
+			uint8_t sreoff;
+			uint8_t srelen;
 
 			if (len < 4)
 				goto trunc;
@@ -233,7 +233,7 @@ static void
 gre_print_1(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	u_int len = length;
-	u_int16_t flags, prot;
+	uint16_t flags, prot;
 
 	flags = EXTRACT_16BITS(bp);
 	len -= 2;
@@ -251,7 +251,7 @@ gre_print_1(netdissect_options *ndo, const u_char *bp, u_int length)
 
 
 	if (flags & GRE_KP) {
-		u_int32_t k;
+		uint32_t k;
 
 		if (len < 4)
 			goto trunc;
@@ -310,8 +310,8 @@ trunc:
 }
 
 static void
-gre_sre_print(netdissect_options *ndo, u_int16_t af, u_int8_t sreoff,
-    u_int8_t srelen, const u_char *bp, u_int len)
+gre_sre_print(netdissect_options *ndo, uint16_t af, uint8_t sreoff,
+    uint8_t srelen, const u_char *bp, u_int len)
 {
 	switch (af) {
 	case GRESRE_IP:
@@ -330,7 +330,7 @@ gre_sre_print(netdissect_options *ndo, u_int16_t af, u_int8_t sreoff,
 }
 
 static void
-gre_sre_ip_print(netdissect_options *ndo, u_int8_t sreoff, u_int8_t srelen,
+gre_sre_ip_print(netdissect_options *ndo, uint8_t sreoff, uint8_t srelen,
                  const u_char *bp, u_int len)
 {
 	struct in_addr a;
@@ -365,7 +365,7 @@ gre_sre_ip_print(netdissect_options *ndo, u_int8_t sreoff, u_int8_t srelen,
 }
 
 static void
-gre_sre_asn_print(netdissect_options *ndo, u_int8_t sreoff, u_int8_t srelen,
+gre_sre_asn_print(netdissect_options *ndo, uint8_t sreoff, uint8_t srelen,
                   const u_char *bp, u_int len)
 {
 	const u_char *up = bp;

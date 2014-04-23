@@ -819,15 +819,12 @@ AC_DEFUN(AC_LBL_CHECK_64BIT_FORMAT,
 #	    ifdef HAVE_INTTYPES_H
 	    #include <inttypes.h>
 #	    endif
-#	    ifdef HAVE_SYS_BITYPES_H
-            #include <sys/bitypes.h>
-#	    endif
 	    #include <stdio.h>
 	    #include <sys/types.h>
 
 	    main()
 	    {
-	      u_int64_t t = 1;
+	      uint64_t t = 1;
 	      char strbuf[16+1];
 	      sprintf(strbuf, "%016$1x", t << 32);
 	      if (strcmp(strbuf, "0000000100000000") == 0)

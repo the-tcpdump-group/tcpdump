@@ -77,8 +77,8 @@ static const char tstr[] = " [|zmtp1]";
 
 static const u_char *
 zmtp1_print_frame(netdissect_options *ndo, const u_char *cp, const u_char *ep) {
-	u_int64_t body_len_declared, body_len_captured, header_len;
-	u_int8_t flags;
+	uint64_t body_len_declared, body_len_captured, header_len;
+	uint8_t flags;
 
 	ND_PRINT((ndo, "\n\t"));
 	ND_TCHECK2(*cp, 1); /* length/0xFF */
@@ -109,7 +109,7 @@ zmtp1_print_frame(netdissect_options *ndo, const u_char *cp, const u_char *ep) {
 	ND_PRINT((ndo, ", flags 0x%02x", flags));
 
 	if (ndo->ndo_vflag) {
-		u_int64_t body_len_printed = min(body_len_captured, body_len_declared);
+		uint64_t body_len_printed = min(body_len_captured, body_len_declared);
 
 		ND_PRINT((ndo, " (%s|%s|%s|%s|%s|%s|%s|%s)",
 			flags & 0x80 ? "MBZ" : "-",
@@ -166,7 +166,7 @@ zmtp1_print(netdissect_options *ndo, const u_char *cp, u_int len) {
 static const u_char *
 zmtp1_print_intermediate_part(netdissect_options *ndo, const u_char *cp, const u_int len) {
 	u_int frame_offset;
-	u_int64_t remaining_len;
+	uint64_t remaining_len;
 
 	ND_TCHECK2(*cp, 2);
 	frame_offset = EXTRACT_16BITS(cp);
@@ -187,7 +187,7 @@ zmtp1_print_intermediate_part(netdissect_options *ndo, const u_char *cp, const u
 		if (frame_offset > remaining_len)
 			ND_PRINT((ndo, " (%"PRIu64" captured)", remaining_len));
 		if (ndo->ndo_vflag) {
-			u_int64_t len_printed = min(frame_offset, remaining_len);
+			uint64_t len_printed = min(frame_offset, remaining_len);
 
 			if (ndo->ndo_vflag == 1)
 				len_printed = min(VBYTES, len_printed);

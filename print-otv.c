@@ -38,9 +38,9 @@
 void
 otv_print(netdissect_options *ndo, const u_char *bp, u_int len)
 {
-    u_int8_t flags;
-    u_int32_t overlay_id;
-    u_int32_t instance_id;
+    uint8_t flags;
+    uint32_t overlay_id;
+    uint32_t instance_id;
 
     if (len < 8) {
         ND_PRINT((ndo, "[|OTV]"));

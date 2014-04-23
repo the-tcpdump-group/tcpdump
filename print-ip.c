@@ -84,14 +84,14 @@ ip_printroute(netdissect_options *ndo,
  * This is used for UDP and TCP pseudo-header in the checksum
  * calculation.
  */
-static u_int32_t
+static uint32_t
 ip_finddst(netdissect_options *ndo,
            const struct ip *ip)
 {
 	int length;
 	int len;
 	const u_char *cp;
-	u_int32_t retval;
+	uint32_t retval;
 
 	cp = (const u_char *)(ip + 1);
 	length = (IP_HL(ip) << 2) - sizeof(struct ip);
@@ -123,7 +123,7 @@ ip_finddst(netdissect_options *ndo,
 		}
 	}
 trunc:
-	UNALIGNED_MEMCPY(&retval, &ip->ip_dst.s_addr, sizeof(u_int32_t));
+	UNALIGNED_MEMCPY(&retval, &ip->ip_dst.s_addr, sizeof(uint32_t));
 	return retval;
 }
 
@@ -132,29 +132,29 @@ trunc:
  */
 int
 nextproto4_cksum(netdissect_options *ndo,
-                 const struct ip *ip, const u_int8_t *data,
+                 const struct ip *ip, const uint8_t *data,
                  u_int len, u_int covlen, u_int next_proto)
 {
 	struct phdr {
-		u_int32_t src;
-		u_int32_t dst;
+		uint32_t src;
+		uint32_t dst;
 		u_char mbz;
 		u_char proto;
-		u_int16_t len;
+		uint16_t len;
 	} ph;
 	struct cksum_vec vec[2];
 
 	/* pseudo-header.. */
-	ph.len = htons((u_int16_t)len);
+	ph.len = htons((uint16_t)len);
 	ph.mbz = 0;
 	ph.proto = next_proto;
-	UNALIGNED_MEMCPY(&ph.src, &ip->ip_src.s_addr, sizeof(u_int32_t));
+	UNALIGNED_MEMCPY(&ph.src, &ip->ip_src.s_addr, sizeof(uint32_t));
 	if (IP_HL(ip) == 5)
-		UNALIGNED_MEMCPY(&ph.dst, &ip->ip_dst.s_addr, sizeof(u_int32_t));
+		UNALIGNED_MEMCPY(&ph.dst, &ip->ip_dst.s_addr, sizeof(uint32_t));
 	else
 		ph.dst = ip_finddst(ndo, ip);
 
-	vec[0].ptr = (const u_int8_t *)(void *)&ph;
+	vec[0].ptr = (const uint8_t *)(void *)&ph;
 	vec[0].len = sizeof(ph);
 	vec[1].ptr = data;
 	vec[1].len = covlen;
@@ -525,7 +525,7 @@ ip_print(netdissect_options *ndo,
 	const u_char *ipend;
 	u_int hlen;
 	struct cksum_vec vec[1];
-	u_int16_t sum, ip_sum;
+	uint16_t sum, ip_sum;
 	struct protoent *proto;
 
 	ipds->ip = (const struct ip *)bp;
@@ -623,7 +623,7 @@ ip_print(netdissect_options *ndo,
             }
 
 	    if (!ndo->ndo_Kflag && (u_char *)ipds->ip + hlen <= ndo->ndo_snapend) {
-	        vec[0].ptr = (const u_int8_t *)(void *)ipds->ip;
+	        vec[0].ptr = (const uint8_t *)(void *)ipds->ip;
 	        vec[0].len = hlen;
 	        sum = in_cksum(vec, 1);
 		if (sum != 0) {

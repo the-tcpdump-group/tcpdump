@@ -66,13 +66,13 @@
  *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
 struct l_fixedpt {
-	u_int32_t int_part;
-	u_int32_t fraction;
+	uint32_t int_part;
+	uint32_t fraction;
 };
 
 struct s_fixedpt {
-	u_int16_t int_part;
-	u_int16_t fraction;
+	uint16_t int_part;
+	uint16_t fraction;
 };
 
 /* rfc2030
@@ -120,13 +120,13 @@ struct ntpdata {
 	int precision:8;
 	struct s_fixedpt root_delay;
 	struct s_fixedpt root_dispersion;
-	u_int32_t refid;
+	uint32_t refid;
 	struct l_fixedpt ref_timestamp;
 	struct l_fixedpt org_timestamp;
 	struct l_fixedpt rec_timestamp;
 	struct l_fixedpt xmt_timestamp;
-        u_int32_t key_id;
-        u_int8_t  message_digest[16];
+        uint32_t key_id;
+        uint8_t  message_digest[16];
 };
 /*
  *	Leap Second Codes (high order two bits)
@@ -343,8 +343,8 @@ p_ntp_time(netdissect_options *ndo,
            register const struct l_fixedpt *lfp)
 {
 	register int32_t i;
-	register u_int32_t uf;
-	register u_int32_t f;
+	register uint32_t uf;
+	register uint32_t f;
 	register float ff;
 
 	i = EXTRACT_32BITS(&lfp->int_part);
@@ -379,9 +379,9 @@ p_ntp_delta(netdissect_options *ndo,
             register const struct l_fixedpt *lfp)
 {
 	register int32_t i;
-	register u_int32_t u, uf;
-	register u_int32_t ou, ouf;
-	register u_int32_t f;
+	register uint32_t u, uf;
+	register uint32_t ou, ouf;
+	register uint32_t f;
 	register float ff;
 	int signbit;
 

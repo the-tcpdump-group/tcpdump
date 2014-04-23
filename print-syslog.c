@@ -79,9 +79,9 @@ void
 syslog_print(netdissect_options *ndo,
              register const u_char *pptr, register u_int len)
 {
-    u_int16_t msg_off = 0;
-    u_int16_t pri = 0;
-    u_int16_t facility,severity;
+    uint16_t msg_off = 0;
+    uint16_t pri = 0;
+    uint16_t facility,severity;
 
     /* extract decimal figures that are
      * encapsulated within < > tags

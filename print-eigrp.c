@@ -33,13 +33,13 @@
  */
 
 struct eigrp_common_header {
-    u_int8_t version;
-    u_int8_t opcode;
-    u_int8_t checksum[2];
-    u_int8_t flags[4];
-    u_int8_t seq[4];
-    u_int8_t ack[4];
-    u_int8_t asn[4];
+    uint8_t version;
+    uint8_t opcode;
+    uint8_t checksum[2];
+    uint8_t flags[4];
+    uint8_t seq[4];
+    uint8_t ack[4];
+    uint8_t asn[4];
 };
 
 #define	EIGRP_VERSION                        2
@@ -68,8 +68,8 @@ static const struct tok eigrp_common_header_flag_values[] = {
 };
 
 struct eigrp_tlv_header {
-    u_int8_t type[2];
-    u_int8_t length[2];
+    uint8_t type[2];
+    uint8_t length[2];
 };
 
 #define EIGRP_TLV_GENERAL_PARM   0x0001
@@ -102,91 +102,91 @@ static const struct tok eigrp_tlv_values[] = {
 };
 
 struct eigrp_tlv_general_parm_t {
-    u_int8_t k1;
-    u_int8_t k2;
-    u_int8_t k3;
-    u_int8_t k4;
-    u_int8_t k5;
-    u_int8_t res;
-    u_int8_t holdtime[2];
+    uint8_t k1;
+    uint8_t k2;
+    uint8_t k3;
+    uint8_t k4;
+    uint8_t k5;
+    uint8_t res;
+    uint8_t holdtime[2];
 };
 
 struct eigrp_tlv_sw_version_t {
-    u_int8_t ios_major;
-    u_int8_t ios_minor;
-    u_int8_t eigrp_major;
-    u_int8_t eigrp_minor;
+    uint8_t ios_major;
+    uint8_t ios_minor;
+    uint8_t eigrp_major;
+    uint8_t eigrp_minor;
 };
 
 struct eigrp_tlv_ip_int_t {
-    u_int8_t nexthop[4];
-    u_int8_t delay[4];
-    u_int8_t bandwidth[4];
-    u_int8_t mtu[3];
-    u_int8_t hopcount;
-    u_int8_t reliability;
-    u_int8_t load;
-    u_int8_t reserved[2];
-    u_int8_t plen;
-    u_int8_t destination; /* variable length [1-4] bytes encoding */
+    uint8_t nexthop[4];
+    uint8_t delay[4];
+    uint8_t bandwidth[4];
+    uint8_t mtu[3];
+    uint8_t hopcount;
+    uint8_t reliability;
+    uint8_t load;
+    uint8_t reserved[2];
+    uint8_t plen;
+    uint8_t destination; /* variable length [1-4] bytes encoding */
 };
 
 struct eigrp_tlv_ip_ext_t {
-    u_int8_t nexthop[4];
-    u_int8_t origin_router[4];
-    u_int8_t origin_as[4];
-    u_int8_t tag[4];
-    u_int8_t metric[4];
-    u_int8_t reserved[2];
-    u_int8_t proto_id;
-    u_int8_t flags;
-    u_int8_t delay[4];
-    u_int8_t bandwidth[4];
-    u_int8_t mtu[3];
-    u_int8_t hopcount;
-    u_int8_t reliability;
-    u_int8_t load;
-    u_int8_t reserved2[2];
-    u_int8_t plen;
-    u_int8_t destination; /* variable length [1-4] bytes encoding */
+    uint8_t nexthop[4];
+    uint8_t origin_router[4];
+    uint8_t origin_as[4];
+    uint8_t tag[4];
+    uint8_t metric[4];
+    uint8_t reserved[2];
+    uint8_t proto_id;
+    uint8_t flags;
+    uint8_t delay[4];
+    uint8_t bandwidth[4];
+    uint8_t mtu[3];
+    uint8_t hopcount;
+    uint8_t reliability;
+    uint8_t load;
+    uint8_t reserved2[2];
+    uint8_t plen;
+    uint8_t destination; /* variable length [1-4] bytes encoding */
 };
 
 struct eigrp_tlv_at_cable_setup_t {
-    u_int8_t cable_start[2];
-    u_int8_t cable_end[2];
-    u_int8_t router_id[4];
+    uint8_t cable_start[2];
+    uint8_t cable_end[2];
+    uint8_t router_id[4];
 };
 
 struct eigrp_tlv_at_int_t {
-    u_int8_t nexthop[4];
-    u_int8_t delay[4];
-    u_int8_t bandwidth[4];
-    u_int8_t mtu[3];
-    u_int8_t hopcount;
-    u_int8_t reliability;
-    u_int8_t load;
-    u_int8_t reserved[2];
-    u_int8_t cable_start[2];
-    u_int8_t cable_end[2];
+    uint8_t nexthop[4];
+    uint8_t delay[4];
+    uint8_t bandwidth[4];
+    uint8_t mtu[3];
+    uint8_t hopcount;
+    uint8_t reliability;
+    uint8_t load;
+    uint8_t reserved[2];
+    uint8_t cable_start[2];
+    uint8_t cable_end[2];
 };
 
 struct eigrp_tlv_at_ext_t {
-    u_int8_t nexthop[4];
-    u_int8_t origin_router[4];
-    u_int8_t origin_as[4];
-    u_int8_t tag[4];
-    u_int8_t proto_id;
-    u_int8_t flags;
-    u_int8_t metric[2];
-    u_int8_t delay[4];
-    u_int8_t bandwidth[4];
-    u_int8_t mtu[3];
-    u_int8_t hopcount;
-    u_int8_t reliability;
-    u_int8_t load;
-    u_int8_t reserved2[2];
-    u_int8_t cable_start[2];
-    u_int8_t cable_end[2];
+    uint8_t nexthop[4];
+    uint8_t origin_router[4];
+    uint8_t origin_as[4];
+    uint8_t tag[4];
+    uint8_t proto_id;
+    uint8_t flags;
+    uint8_t metric[2];
+    uint8_t delay[4];
+    uint8_t bandwidth[4];
+    uint8_t mtu[3];
+    uint8_t hopcount;
+    uint8_t reliability;
+    uint8_t load;
+    uint8_t reserved2[2];
+    uint8_t cable_start[2];
+    uint8_t cable_end[2];
 };
 
 static const struct tok eigrp_ext_proto_id_values[] = {
@@ -211,7 +211,7 @@ eigrp_print(netdissect_options *ndo, register const u_char *pptr, register u_int
     const struct eigrp_tlv_header *eigrp_tlv_header;
     const u_char *tptr,*tlv_tptr;
     u_int tlen,eigrp_tlv_len,eigrp_tlv_type,tlv_tlen, byte_length, bit_length;
-    u_int8_t prefix[4];
+    uint8_t prefix[4];
 
     union {
         const struct eigrp_tlv_general_parm_t *eigrp_tlv_general_parm;

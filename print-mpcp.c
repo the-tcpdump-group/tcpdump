@@ -31,8 +31,8 @@
 #define MPCP_TIMESTAMP_DURATION_LEN 2
 
 struct mpcp_common_header_t {
-    u_int8_t opcode[2];
-    u_int8_t timestamp[MPCP_TIMESTAMP_LEN];
+    uint8_t opcode[2];
+    uint8_t timestamp[MPCP_TIMESTAMP_LEN];
 };
 
 #define	MPCP_OPCODE_PAUSE   0x0001
@@ -64,13 +64,13 @@ static const struct tok mpcp_grant_flag_values[] = {
 };
 
 struct mpcp_grant_t {
-    u_int8_t starttime[MPCP_TIMESTAMP_LEN];
-    u_int8_t duration[MPCP_TIMESTAMP_DURATION_LEN];
+    uint8_t starttime[MPCP_TIMESTAMP_LEN];
+    uint8_t duration[MPCP_TIMESTAMP_DURATION_LEN];
 };
 
 struct mpcp_reg_req_t {
-    u_int8_t flags;
-    u_int8_t pending_grants;
+    uint8_t flags;
+    uint8_t pending_grants;
 };
 
 
@@ -81,10 +81,10 @@ static const struct tok mpcp_reg_req_flag_values[] = {
 };
 
 struct mpcp_reg_t {
-    u_int8_t assigned_port[2];
-    u_int8_t flags;
-    u_int8_t sync_time[MPCP_TIMESTAMP_DURATION_LEN];
-    u_int8_t echoed_pending_grants;
+    uint8_t assigned_port[2];
+    uint8_t flags;
+    uint8_t sync_time[MPCP_TIMESTAMP_DURATION_LEN];
+    uint8_t echoed_pending_grants;
 };
 
 static const struct tok mpcp_reg_flag_values[] = {
@@ -110,9 +110,9 @@ static const struct tok mpcp_report_bitmap_values[] = {
 };
 
 struct mpcp_reg_ack_t {
-    u_int8_t flags;
-    u_int8_t echoed_assigned_port[2];
-    u_int8_t echoed_sync_time[MPCP_TIMESTAMP_DURATION_LEN];
+    uint8_t flags;
+    uint8_t echoed_assigned_port[2];
+    uint8_t echoed_sync_time[MPCP_TIMESTAMP_DURATION_LEN];
 };
 
 static const struct tok mpcp_reg_ack_flag_values[] = {
@@ -134,9 +134,9 @@ mpcp_print(netdissect_options *ndo, register const u_char *pptr, register u_int 
 
 
     const u_char *tptr;
-    u_int16_t opcode;
-    u_int8_t grant_numbers, grant;
-    u_int8_t queue_sets, queue_set, report_bitmap, report;
+    uint16_t opcode;
+    uint8_t grant_numbers, grant;
+    uint8_t queue_sets, queue_set, report_bitmap, report;
 
     tptr=pptr;
     mpcp.common_header = (const struct mpcp_common_header_t *)pptr;

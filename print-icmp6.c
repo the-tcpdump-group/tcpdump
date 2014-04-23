@@ -74,13 +74,13 @@
  */
 
 struct icmp6_hdr {
-	u_int8_t	icmp6_type;	/* type field */
-	u_int8_t	icmp6_code;	/* code field */
-	u_int16_t	icmp6_cksum;	/* checksum field */
+	uint8_t	icmp6_type;	/* type field */
+	uint8_t	icmp6_code;	/* code field */
+	uint16_t	icmp6_cksum;	/* checksum field */
 	union {
-		u_int32_t	icmp6_un_data32[1]; /* type-specific field */
-		u_int16_t	icmp6_un_data16[2]; /* type-specific field */
-		u_int8_t	icmp6_un_data8[4];  /* type-specific field */
+		uint32_t	icmp6_un_data32[1]; /* type-specific field */
+		uint16_t	icmp6_un_data16[2]; /* type-specific field */
+		uint8_t	icmp6_un_data8[4];  /* type-specific field */
 	} icmp6_dataun;
 };
 
@@ -201,8 +201,8 @@ struct nd_router_solicit {	/* router solicitation */
 
 struct nd_router_advert {	/* router advertisement */
 	struct icmp6_hdr	nd_ra_hdr;
-	u_int32_t		nd_ra_reachable;	/* reachable time */
-	u_int32_t		nd_ra_retransmit;	/* retransmit timer */
+	uint32_t		nd_ra_reachable;	/* reachable time */
+	uint32_t		nd_ra_retransmit;	/* retransmit timer */
 	/* could be followed by options */
 };
 
@@ -267,8 +267,8 @@ struct nd_redirect {		/* redirect */
 #define nd_rd_reserved		nd_rd_hdr.icmp6_data32[0]
 
 struct nd_opt_hdr {		/* Neighbor discovery option header */
-	u_int8_t	nd_opt_type;
-	u_int8_t	nd_opt_len;
+	uint8_t	nd_opt_type;
+	uint8_t	nd_opt_len;
 	/* followed by option specific data*/
 };
 
@@ -284,13 +284,13 @@ struct nd_opt_hdr {		/* Neighbor discovery option header */
 #define ND_OPT_DNSSL			31
 
 struct nd_opt_prefix_info {	/* prefix information */
-	u_int8_t	nd_opt_pi_type;
-	u_int8_t	nd_opt_pi_len;
-	u_int8_t	nd_opt_pi_prefix_len;
-	u_int8_t	nd_opt_pi_flags_reserved;
-	u_int8_t	nd_opt_pi_valid_time[4];
-	u_int8_t	nd_opt_pi_preferred_time[4];
-	u_int8_t	nd_opt_pi_reserved2[4];
+	uint8_t	nd_opt_pi_type;
+	uint8_t	nd_opt_pi_len;
+	uint8_t	nd_opt_pi_prefix_len;
+	uint8_t	nd_opt_pi_flags_reserved;
+	uint8_t	nd_opt_pi_valid_time[4];
+	uint8_t	nd_opt_pi_preferred_time[4];
+	uint8_t	nd_opt_pi_reserved2[4];
 	struct in6_addr	nd_opt_pi_prefix;
 };
 
@@ -299,57 +299,57 @@ struct nd_opt_prefix_info {	/* prefix information */
 #define ND_OPT_PI_FLAG_ROUTER		0x20	/*2292bis*/
 
 struct nd_opt_rd_hdr {         /* redirected header */
-	u_int8_t	nd_opt_rh_type;
-	u_int8_t	nd_opt_rh_len;
-	u_int16_t	nd_opt_rh_reserved1;
-	u_int32_t	nd_opt_rh_reserved2;
+	uint8_t	nd_opt_rh_type;
+	uint8_t	nd_opt_rh_len;
+	uint16_t	nd_opt_rh_reserved1;
+	uint32_t	nd_opt_rh_reserved2;
 	/* followed by IP header and data */
 };
 
 struct nd_opt_mtu {		/* MTU option */
-	u_int8_t	nd_opt_mtu_type;
-	u_int8_t	nd_opt_mtu_len;
-	u_int16_t	nd_opt_mtu_reserved;
-	u_int32_t	nd_opt_mtu_mtu;
+	uint8_t	nd_opt_mtu_type;
+	uint8_t	nd_opt_mtu_len;
+	uint16_t	nd_opt_mtu_reserved;
+	uint32_t	nd_opt_mtu_mtu;
 };
 
 struct nd_opt_rdnss {		/* RDNSS RFC 6106 5.1 */
-	u_int8_t	nd_opt_rdnss_type;
-	u_int8_t	nd_opt_rdnss_len;
-	u_int16_t	nd_opt_rdnss_reserved;
-	u_int32_t	nd_opt_rdnss_lifetime;
+	uint8_t	nd_opt_rdnss_type;
+	uint8_t	nd_opt_rdnss_len;
+	uint16_t	nd_opt_rdnss_reserved;
+	uint32_t	nd_opt_rdnss_lifetime;
 	struct in6_addr nd_opt_rdnss_addr[1];	/* variable-length */
 };
 
 struct nd_opt_dnssl {		/* DNSSL RFC 6106 5.2 */
-	u_int8_t  nd_opt_dnssl_type;
-	u_int8_t  nd_opt_dnssl_len;
-	u_int16_t nd_opt_dnssl_reserved;
-	u_int32_t nd_opt_dnssl_lifetime;
+	uint8_t  nd_opt_dnssl_type;
+	uint8_t  nd_opt_dnssl_len;
+	uint16_t nd_opt_dnssl_reserved;
+	uint32_t nd_opt_dnssl_lifetime;
 	/* followed by list of DNS search domains, variable-length */
 };
 
 struct nd_opt_advinterval {	/* Advertisement interval option */
-	u_int8_t	nd_opt_adv_type;
-	u_int8_t	nd_opt_adv_len;
-	u_int16_t	nd_opt_adv_reserved;
-	u_int32_t	nd_opt_adv_interval;
+	uint8_t	nd_opt_adv_type;
+	uint8_t	nd_opt_adv_len;
+	uint16_t	nd_opt_adv_reserved;
+	uint32_t	nd_opt_adv_interval;
 };
 
 struct nd_opt_homeagent_info {	/* Home Agent info */
-	u_int8_t	nd_opt_hai_type;
-	u_int8_t	nd_opt_hai_len;
-	u_int16_t	nd_opt_hai_reserved;
+	uint8_t	nd_opt_hai_type;
+	uint8_t	nd_opt_hai_len;
+	uint16_t	nd_opt_hai_reserved;
 	int16_t		nd_opt_hai_preference;
-	u_int16_t	nd_opt_hai_lifetime;
+	uint16_t	nd_opt_hai_lifetime;
 };
 
 struct nd_opt_route_info {	/* route info */
-	u_int8_t	nd_opt_rti_type;
-	u_int8_t	nd_opt_rti_len;
-	u_int8_t	nd_opt_rti_prefixlen;
-	u_int8_t	nd_opt_rti_flags;
-	u_int32_t	nd_opt_rti_lifetime;
+	uint8_t	nd_opt_rti_type;
+	uint8_t	nd_opt_rti_len;
+	uint8_t	nd_opt_rti_prefixlen;
+	uint8_t	nd_opt_rti_flags;
+	uint32_t	nd_opt_rti_lifetime;
 	/* prefix follows */
 };
 
@@ -359,11 +359,11 @@ struct nd_opt_route_info {	/* route info */
 
 struct icmp6_namelookup {
 	struct icmp6_hdr 	icmp6_nl_hdr;
-	u_int8_t	icmp6_nl_nonce[8];
+	uint8_t	icmp6_nl_nonce[8];
 	int32_t		icmp6_nl_ttl;
 #if 0
-	u_int8_t	icmp6_nl_len;
-	u_int8_t	icmp6_nl_name[3];
+	uint8_t	icmp6_nl_len;
+	uint8_t	icmp6_nl_name[3];
 #endif
 	/* could be followed by options */
 };
@@ -373,7 +373,7 @@ struct icmp6_namelookup {
  */
 struct icmp6_nodeinfo {
 	struct icmp6_hdr icmp6_ni_hdr;
-	u_int8_t icmp6_ni_nonce[8];
+	uint8_t icmp6_ni_nonce[8];
 	/* could be followed by reply data */
 };
 
@@ -391,22 +391,22 @@ struct icmp6_nodeinfo {
 #define NI_QTYPE_IPV4ADDR	4 /* IPv4 Addresses */
 
 /* network endian */
-#define NI_SUPTYPE_FLAG_COMPRESS	((u_int16_t)htons(0x1))
-#define NI_FQDN_FLAG_VALIDTTL		((u_int16_t)htons(0x1))
+#define NI_SUPTYPE_FLAG_COMPRESS	((uint16_t)htons(0x1))
+#define NI_FQDN_FLAG_VALIDTTL		((uint16_t)htons(0x1))
 
 /* network endian */
-#define NI_NODEADDR_FLAG_TRUNCATE	((u_int16_t)htons(0x1))
-#define NI_NODEADDR_FLAG_ALL		((u_int16_t)htons(0x2))
-#define NI_NODEADDR_FLAG_COMPAT		((u_int16_t)htons(0x4))
-#define NI_NODEADDR_FLAG_LINKLOCAL	((u_int16_t)htons(0x8))
-#define NI_NODEADDR_FLAG_SITELOCAL	((u_int16_t)htons(0x10))
-#define NI_NODEADDR_FLAG_GLOBAL		((u_int16_t)htons(0x20))
-#define NI_NODEADDR_FLAG_ANYCAST	((u_int16_t)htons(0x40)) /* just experimental. not in spec */
+#define NI_NODEADDR_FLAG_TRUNCATE	((uint16_t)htons(0x1))
+#define NI_NODEADDR_FLAG_ALL		((uint16_t)htons(0x2))
+#define NI_NODEADDR_FLAG_COMPAT		((uint16_t)htons(0x4))
+#define NI_NODEADDR_FLAG_LINKLOCAL	((uint16_t)htons(0x8))
+#define NI_NODEADDR_FLAG_SITELOCAL	((uint16_t)htons(0x10))
+#define NI_NODEADDR_FLAG_GLOBAL		((uint16_t)htons(0x20))
+#define NI_NODEADDR_FLAG_ANYCAST	((uint16_t)htons(0x40)) /* just experimental. not in spec */
 
 struct ni_reply_fqdn {
-	u_int32_t ni_fqdn_ttl;	/* TTL */
-	u_int8_t ni_fqdn_namelen; /* length in octets of the FQDN */
-	u_int8_t ni_fqdn_name[3]; /* XXX: alignment */
+	uint32_t ni_fqdn_ttl;	/* TTL */
+	uint8_t ni_fqdn_namelen; /* length in octets of the FQDN */
+	uint8_t ni_fqdn_name[3]; /* XXX: alignment */
 };
 
 /*
@@ -414,10 +414,10 @@ struct ni_reply_fqdn {
  */
 struct icmp6_router_renum {	/* router renumbering header */
 	struct icmp6_hdr	rr_hdr;
-	u_int8_t	rr_segnum;
-	u_int8_t	rr_flags;
-	u_int16_t	rr_maxdelay;
-	u_int32_t	rr_reserved;
+	uint8_t	rr_segnum;
+	uint8_t	rr_flags;
+	uint16_t	rr_maxdelay;
+	uint32_t	rr_reserved;
 };
 #define ICMP6_RR_FLAGS_TEST		0x80
 #define ICMP6_RR_FLAGS_REQRESULT	0x40
@@ -431,13 +431,13 @@ struct icmp6_router_renum {	/* router renumbering header */
 #define rr_seqnum 	rr_hdr.icmp6_data32[0]
 
 struct rr_pco_match {		/* match prefix part */
-	u_int8_t	rpm_code;
-	u_int8_t	rpm_len;
-	u_int8_t	rpm_ordinal;
-	u_int8_t	rpm_matchlen;
-	u_int8_t	rpm_minlen;
-	u_int8_t	rpm_maxlen;
-	u_int16_t	rpm_reserved;
+	uint8_t	rpm_code;
+	uint8_t	rpm_len;
+	uint8_t	rpm_ordinal;
+	uint8_t	rpm_matchlen;
+	uint8_t	rpm_minlen;
+	uint8_t	rpm_maxlen;
+	uint16_t	rpm_reserved;
 	struct	in6_addr	rpm_prefix;
 };
 
@@ -447,35 +447,35 @@ struct rr_pco_match {		/* match prefix part */
 #define RPM_PCO_MAX		4
 
 struct rr_pco_use {		/* use prefix part */
-	u_int8_t	rpu_uselen;
-	u_int8_t	rpu_keeplen;
-	u_int8_t	rpu_ramask;
-	u_int8_t	rpu_raflags;
-	u_int32_t	rpu_vltime;
-	u_int32_t	rpu_pltime;
-	u_int32_t	rpu_flags;
+	uint8_t	rpu_uselen;
+	uint8_t	rpu_keeplen;
+	uint8_t	rpu_ramask;
+	uint8_t	rpu_raflags;
+	uint32_t	rpu_vltime;
+	uint32_t	rpu_pltime;
+	uint32_t	rpu_flags;
 	struct	in6_addr rpu_prefix;
 };
 #define ICMP6_RR_PCOUSE_RAFLAGS_ONLINK	0x80
 #define ICMP6_RR_PCOUSE_RAFLAGS_AUTO	0x40
 
 /* network endian */
-#define ICMP6_RR_PCOUSE_FLAGS_DECRVLTIME     ((u_int32_t)htonl(0x80000000))
-#define ICMP6_RR_PCOUSE_FLAGS_DECRPLTIME     ((u_int32_t)htonl(0x40000000))
+#define ICMP6_RR_PCOUSE_FLAGS_DECRVLTIME     ((uint32_t)htonl(0x80000000))
+#define ICMP6_RR_PCOUSE_FLAGS_DECRPLTIME     ((uint32_t)htonl(0x40000000))
 
 struct rr_result {		/* router renumbering result message */
-	u_int16_t	rrr_flags;
-	u_int8_t	rrr_ordinal;
-	u_int8_t	rrr_matchedlen;
-	u_int32_t	rrr_ifid;
+	uint16_t	rrr_flags;
+	uint8_t	rrr_ordinal;
+	uint8_t	rrr_matchedlen;
+	uint32_t	rrr_ifid;
 	struct	in6_addr rrr_prefix;
 };
 /* network endian */
-#define ICMP6_RR_RESULT_FLAGS_OOB		((u_int16_t)htons(0x0002))
-#define ICMP6_RR_RESULT_FLAGS_FORBIDDEN		((u_int16_t)htons(0x0001))
+#define ICMP6_RR_RESULT_FLAGS_OOB		((uint16_t)htons(0x0002))
+#define ICMP6_RR_RESULT_FLAGS_FORBIDDEN		((uint16_t)htons(0x0001))
 
 static const char *get_rtpref(u_int);
-static const char *get_lifetime(u_int32_t);
+static const char *get_lifetime(uint32_t);
 static void print_lladdr(netdissect_options *ndo, const u_char *, size_t);
 static void icmp6_opt_print(netdissect_options *ndo, const u_char *, int);
 static void mld6_print(netdissect_options *ndo, const u_char *);
@@ -595,11 +595,11 @@ get_rtpref(u_int v)
 }
 
 static const char *
-get_lifetime(u_int32_t v)
+get_lifetime(uint32_t v)
 {
 	static char buf[20];
 
-	if (v == (u_int32_t)~0UL)
+	if (v == (uint32_t)~0UL)
 		return "infinity";
 	else {
 		snprintf(buf, sizeof(buf), "%us", v);
@@ -608,9 +608,9 @@ get_lifetime(u_int32_t v)
 }
 
 static void
-print_lladdr(netdissect_options *ndo, const u_int8_t *p, size_t l)
+print_lladdr(netdissect_options *ndo, const uint8_t *p, size_t l)
 {
-	const u_int8_t *ep, *q;
+	const uint8_t *ep, *q;
 
 	q = p;
 	ep = p + l;
@@ -625,7 +625,7 @@ print_lladdr(netdissect_options *ndo, const u_int8_t *p, size_t l)
 static int icmp6_cksum(const struct ip6_hdr *ip6, const struct icmp6_hdr *icp,
 	u_int len)
 {
-	return nextproto6_cksum(ip6, (const u_int8_t *)(void *)icp, len, len,
+	return nextproto6_cksum(ip6, (const uint8_t *)(void *)icp, len, len,
 				IPPROTO_ICMPV6);
 }
 
@@ -694,7 +694,7 @@ rpl_dio_printopt(netdissect_options *ndo,
                                 if(paylen > length) paylen = length;
                                 hex_print(ndo,
                                           " ",
-                                          ((u_int8_t *)opt) + RPL_DIO_GENOPTION_LEN,  /* content of DIO option */
+                                          ((uint8_t *)opt) + RPL_DIO_GENOPTION_LEN,  /* content of DIO option */
                                           paylen);
                         }
                 }
@@ -903,7 +903,7 @@ icmp6_print(netdissect_options *ndo,
 	ND_TCHECK(dp->icmp6_cksum);
 
 	if (ndo->ndo_vflag && !fragmented) {
-		u_int16_t sum, udp_sum;
+		uint16_t sum, udp_sum;
 
 		if (ND_TTEST2(bp[0], length)) {
 			udp_sum = EXTRACT_16BITS(&dp->icmp6_cksum);
@@ -1781,7 +1781,7 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 			} else
 				dnsname_print(ndo, cp, ep);
 			if ((EXTRACT_16BITS(&ni6->ni_flags) & 0x01) != 0)
-				ND_PRINT((ndo," [TTL=%u]", *(u_int32_t *)(ni6 + 1)));
+				ND_PRINT((ndo," [TTL=%u]", *(uint32_t *)(ni6 + 1)));
 			break;
 		case NI_QTYPE_NODEADDR:
 			if (needcomma)

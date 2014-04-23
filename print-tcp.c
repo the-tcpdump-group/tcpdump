@@ -145,7 +145,7 @@ tcp_cksum(netdissect_options *ndo,
           register const struct tcphdr *tp,
           register u_int len)
 {
-	return nextproto4_cksum(ndo, ip, (const u_int8_t *)tp, len, len,
+	return nextproto4_cksum(ndo, ip, (const uint8_t *)tp, len, len,
 				IPPROTO_TCP);
 }
 
@@ -159,10 +159,10 @@ tcp_print(netdissect_options *ndo,
         register u_char flags;
         register u_int hlen;
         register char ch;
-        u_int16_t sport, dport, win, urp;
-        u_int32_t seq, ack, thseq, thack;
+        uint16_t sport, dport, win, urp;
+        uint32_t seq, ack, thseq, thack;
         u_int utoval;
-        u_int16_t magic;
+        uint16_t magic;
         register int rev;
 #ifdef INET6
         register const struct ip6_hdr *ip6;
@@ -372,7 +372,7 @@ tcp_print(netdissect_options *ndo,
 
         if (ndo->ndo_vflag && !ndo->ndo_Kflag && !fragmented) {
                 /* Check the checksum, if possible. */
-                u_int16_t sum, tcp_sum;
+                uint16_t sum, tcp_sum;
 
                 if (IP_V(ip) == 4) {
                         if (ND_TTEST2(tp->th_sport, length)) {
@@ -390,7 +390,7 @@ tcp_print(netdissect_options *ndo,
 #ifdef INET6
                 else if (IP_V(ip) == 6 && ip6->ip6_plen) {
                         if (ND_TTEST2(tp->th_sport, length)) {
-                                sum = nextproto6_cksum(ip6, (const u_int8_t *)tp,
+                                sum = nextproto6_cksum(ip6, (const uint8_t *)tp,
 							length, length, IPPROTO_TCP);
                                 tcp_sum = EXTRACT_16BITS(&tp->th_sum);
 
@@ -476,7 +476,7 @@ tcp_print(netdissect_options *ndo,
                                 if (datalen % 8 != 0) {
                                         ND_PRINT((ndo, "malformed sack"));
                                 } else {
-                                        u_int32_t s, e;
+                                        uint32_t s, e;
 
                                         ND_PRINT((ndo, " %d ", datalen / 8));
                                         for (i = 0; i < datalen; i += 8) {
@@ -715,7 +715,7 @@ tcp_print(netdissect_options *ndo,
                  * Pass offset of data plus 4 bytes for RPC TCP msg length
                  * to NFS print routines.
                  */
-                u_int32_t fraglen;
+                uint32_t fraglen;
                 register struct sunrpc_msg *rp;
                 enum sunrpc_msg_type direction;
 
@@ -795,11 +795,11 @@ tcp_verify_signature(netdissect_options *ndo,
         u_char sig[TCP_SIGLEN];
         char zero_proto = 0;
         MD5_CTX ctx;
-        u_int16_t savecsum, tlen;
+        uint16_t savecsum, tlen;
 #ifdef INET6
         struct ip6_hdr *ip6;
-        u_int32_t len32;
-        u_int8_t nxt;
+        uint32_t len32;
+        uint8_t nxt;
 #endif
 
 	if (data + length > ndo->ndo_snapend) {

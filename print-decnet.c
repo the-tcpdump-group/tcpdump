@@ -44,7 +44,7 @@ struct rtentry;
 static const char tstr[] = "[|decnet]";
 
 #ifndef WIN32
-typedef u_int8_t byte[1];		/* single byte field */
+typedef uint8_t byte[1];		/* single byte field */
 #else
 /*
  * the keyword 'byte' generates conflicts in Windows
@@ -52,17 +52,17 @@ typedef u_int8_t byte[1];		/* single byte field */
 typedef unsigned char Byte[1];		/* single byte field */
 #define byte Byte
 #endif /* WIN32 */
-typedef u_int8_t word[2];		/* 2 byte field */
-typedef u_int8_t longword[4];		/* 4 bytes field */
+typedef uint8_t word[2];		/* 2 byte field */
+typedef uint8_t longword[4];		/* 4 bytes field */
 
 /*
  * Definitions for DECNET Phase IV protocol headers
  */
 union etheraddress {
-	u_int8_t   dne_addr[6];		/* full ethernet address */
+	uint8_t   dne_addr[6];		/* full ethernet address */
 	struct {
-		u_int8_t dne_hiord[4];	/* DECnet HIORD prefix */
-		u_int8_t dne_nodeaddr[2]; /* DECnet node address */
+		uint8_t dne_hiord[4];	/* DECnet HIORD prefix */
+		uint8_t dne_nodeaddr[2]; /* DECnet node address */
 	} dne_remote;
 };
 
@@ -76,8 +76,8 @@ typedef union etheraddress etheraddr;	/* Ethernet address */
 
 #define DN_MAXADDL	20		/* max size of DECnet address */
 struct dn_naddr {
-	u_int16_t	a_len;		/* length of address */
-	u_int8_t a_addr[DN_MAXADDL]; /* address as bytes */
+	uint16_t	a_len;		/* length of address */
+	uint8_t a_addr[DN_MAXADDL]; /* address as bytes */
 };
 
 /*

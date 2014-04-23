@@ -44,7 +44,7 @@ static const char *ftypes[] = {
 };
 
 static int
-extract_header_length(u_int16_t fc)
+extract_header_length(uint16_t fc)
 {
 	int len = 0;
 
@@ -92,8 +92,8 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 {
 	u_int caplen = h->caplen;
 	int hdrlen;
-	u_int16_t fc;
-	u_int8_t seq;
+	uint16_t fc;
+	uint8_t seq;
 
 	if (caplen < 3) {
 		ND_PRINT((ndo, "[|802.15.4] %x", caplen));
@@ -121,7 +121,7 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 		p+= hdrlen;
 		caplen -= hdrlen;
 	} else {
-		u_int16_t panid = 0;
+		uint16_t panid = 0;
 
 		switch ((fc >> 10) & 0x3) {
 		case 0x00:

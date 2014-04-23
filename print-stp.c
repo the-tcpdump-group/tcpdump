@@ -27,19 +27,19 @@
 #define STP_BPDU_MSTP_MIN_LEN 102
 
 struct stp_bpdu_ {
-    u_int8_t protocol_id[2];
-    u_int8_t protocol_version;
-    u_int8_t bpdu_type;
-    u_int8_t flags;
-    u_int8_t root_id[8];
-    u_int8_t root_path_cost[4];
-    u_int8_t bridge_id[8];
-    u_int8_t port_id[2];
-    u_int8_t message_age[2];
-    u_int8_t max_age[2];
-    u_int8_t hello_time[2];
-    u_int8_t forward_delay[2];
-    u_int8_t v1_length;
+    uint8_t protocol_id[2];
+    uint8_t protocol_version;
+    uint8_t bpdu_type;
+    uint8_t flags;
+    uint8_t root_id[8];
+    uint8_t root_path_cost[4];
+    uint8_t bridge_id[8];
+    uint8_t port_id[2];
+    uint8_t message_age[2];
+    uint8_t max_age[2];
+    uint8_t hello_time[2];
+    uint8_t forward_delay[2];
+    uint8_t v1_length;
 };
 
 #define STP_PROTO_REGULAR 0x00
@@ -232,9 +232,9 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
                     u_int length)
 {
     const u_char *ptr;
-    u_int16_t	    v3len;
-    u_int16_t	    len;
-    u_int16_t	    msti;
+    uint16_t	    v3len;
+    uint16_t	    len;
+    uint16_t	    msti;
     u_int	    offset;
 
     ptr = (const u_char *)stp_bpdu;

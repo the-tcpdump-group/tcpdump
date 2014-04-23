@@ -43,12 +43,12 @@
  */
 
 struct rsvp_common_header {
-    u_int8_t version_flags;
-    u_int8_t msg_type;
-    u_int8_t checksum[2];
-    u_int8_t ttl;
-    u_int8_t reserved;
-    u_int8_t length[2];
+    uint8_t version_flags;
+    uint8_t msg_type;
+    uint8_t checksum[2];
+    uint8_t ttl;
+    uint8_t reserved;
+    uint8_t length[2];
 };
 
 /*
@@ -66,9 +66,9 @@ struct rsvp_common_header {
  */
 
 struct rsvp_object_header {
-    u_int8_t length[2];
-    u_int8_t class_num;
-    u_int8_t ctype;
+    uint8_t length[2];
+    uint8_t class_num;
+    uint8_t ctype;
 };
 
 #define RSVP_VERSION            1
@@ -292,11 +292,11 @@ static const struct tok rsvp_ctype_values[] = {
 };
 
 struct rsvp_obj_integrity_t {
-    u_int8_t flags;
-    u_int8_t res;
-    u_int8_t key_id[6];
-    u_int8_t sequence[8];
-    u_int8_t digest[16];
+    uint8_t flags;
+    uint8_t res;
+    uint8_t key_id[6];
+    uint8_t sequence[8];
+    uint8_t digest[16];
 };
 
 static const struct tok rsvp_obj_integrity_flag_values[] = {
@@ -305,14 +305,14 @@ static const struct tok rsvp_obj_integrity_flag_values[] = {
 };
 
 struct rsvp_obj_frr_t {
-    u_int8_t setup_prio;
-    u_int8_t hold_prio;
-    u_int8_t hop_limit;
-    u_int8_t flags;
-    u_int8_t bandwidth[4];
-    u_int8_t include_any[4];
-    u_int8_t exclude_any[4];
-    u_int8_t include_all[4];
+    uint8_t setup_prio;
+    uint8_t hold_prio;
+    uint8_t hop_limit;
+    uint8_t flags;
+    uint8_t bandwidth[4];
+    uint8_t include_any[4];
+    uint8_t exclude_any[4];
+    uint8_t include_all[4];
 };
 
 
@@ -491,7 +491,7 @@ rsvp_intserv_print(netdissect_options *ndo,
     int parameter_id,parameter_length;
     union {
 	float f;
-	u_int32_t i;
+	uint32_t i;
     } bw;
 
     if (obj_tlen < 4)
@@ -650,9 +650,9 @@ _U_
     int hexdump,processed,padbytes,error_code,error_value,i,sigcheck;
     union {
 	float f;
-	u_int32_t i;
+	uint32_t i;
     } bw;
-    u_int8_t namelen;
+    uint8_t namelen;
 
     u_int action, subchannel;
 

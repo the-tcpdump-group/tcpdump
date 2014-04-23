@@ -66,15 +66,15 @@
  */
 
 struct bfd_header_t {
-    u_int8_t version_diag;
-    u_int8_t flags;
-    u_int8_t detect_time_multiplier;
-    u_int8_t length;
-    u_int8_t my_discriminator[4];
-    u_int8_t your_discriminator[4];
-    u_int8_t desired_min_tx_interval[4];
-    u_int8_t required_min_rx_interval[4];
-    u_int8_t required_min_echo_interval[4];
+    uint8_t version_diag;
+    uint8_t flags;
+    uint8_t detect_time_multiplier;
+    uint8_t length;
+    uint8_t my_discriminator[4];
+    uint8_t your_discriminator[4];
+    uint8_t desired_min_tx_interval[4];
+    uint8_t required_min_rx_interval[4];
+    uint8_t required_min_echo_interval[4];
 };
 
 /*
@@ -88,9 +88,9 @@ struct bfd_header_t {
  */
 
 struct bfd_auth_header_t {
-    u_int8_t auth_type;
-    u_int8_t auth_len;
-    u_int8_t auth_data;
+    uint8_t auth_type;
+    uint8_t auth_len;
+    uint8_t auth_data;
 };
 
 static const struct tok bfd_v1_authentication_values[] = {
@@ -164,7 +164,7 @@ bfd_print(netdissect_options *ndo, register const u_char *pptr,
 {
         const struct bfd_header_t *bfd_header;
         const struct bfd_auth_header_t *bfd_auth_header;
-        u_int8_t version = 0;
+        uint8_t version = 0;
 
         bfd_header = (const struct bfd_header_t *)pptr;
         if (port == BFD_CONTROL_PORT) {

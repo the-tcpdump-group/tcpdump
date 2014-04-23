@@ -78,11 +78,11 @@
 #define SLL_ADDRLEN	8		/* length of address field */
 
 struct sll_header {
-	u_int16_t	sll_pkttype;	/* packet type */
-	u_int16_t	sll_hatype;	/* link-layer address type */
-	u_int16_t	sll_halen;	/* link-layer address length */
-	u_int8_t	sll_addr[SLL_ADDRLEN];	/* link-layer address */
-	u_int16_t	sll_protocol;	/* protocol */
+	uint16_t	sll_pkttype;	/* packet type */
+	uint16_t	sll_hatype;	/* link-layer address type */
+	uint16_t	sll_halen;	/* link-layer address length */
+	uint8_t	sll_addr[SLL_ADDRLEN];	/* link-layer address */
+	uint16_t	sll_protocol;	/* protocol */
 };
 
 /*
@@ -278,7 +278,7 @@ recurse:
 			return (SLL_HDR_LEN);
 		}
 	        if (ndo->ndo_eflag) {
-	        	u_int16_t tag = EXTRACT_16BITS(p);
+	        	uint16_t tag = EXTRACT_16BITS(p);
 
 			ND_PRINT((ndo, "vlan %u, p %u%s, ",
 			    tag & 0xfff,

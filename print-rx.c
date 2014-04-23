@@ -73,12 +73,12 @@
 #define	PRSFS_ADMINISTER	64 /* Change ACL's */
 
 struct rx_header {
-	u_int32_t epoch;
-	u_int32_t cid;
-	u_int32_t callNumber;
-	u_int32_t seq;
-	u_int32_t serial;
-	u_int8_t type;
+	uint32_t epoch;
+	uint32_t cid;
+	uint32_t callNumber;
+	uint32_t seq;
+	uint32_t serial;
+	uint8_t type;
 #define RX_PACKET_TYPE_DATA		1
 #define RX_PACKET_TYPE_ACK		2
 #define RX_PACKET_TYPE_BUSY		3
@@ -89,7 +89,7 @@ struct rx_header {
 #define RX_PACKET_TYPE_DEBUG		8
 #define RX_PACKET_TYPE_PARAMS		9
 #define RX_PACKET_TYPE_VERSION		13
-	u_int8_t flags;
+	uint8_t flags;
 #define RX_CLIENT_INITIATED	1
 #define RX_REQUEST_ACK		2
 #define RX_LAST_PACKET		4
@@ -97,10 +97,10 @@ struct rx_header {
 #define RX_FREE_PACKET		16
 #define RX_SLOW_START_OK	32
 #define RX_JUMBO_PACKET		32
-	u_int8_t userStatus;
-	u_int8_t securityIndex;
-	u_int16_t spare;		/* How clever: even though the AFS */
-	u_int16_t serviceId;		/* header files indicate that the */
+	uint8_t userStatus;
+	uint8_t securityIndex;
+	uint16_t spare;		/* How clever: even though the AFS */
+	uint16_t serviceId;		/* header files indicate that the */
 };					/* serviceId is first, it's really */
 					/* encoded _after_ the spare field */
 					/* I wasted a day figuring that out! */
@@ -110,15 +110,15 @@ struct rx_header {
 #define RX_MAXACKS 255
 
 struct rx_ackPacket {
-	u_int16_t bufferSpace;		/* Number of packet buffers available */
-	u_int16_t maxSkew;		/* Max diff between ack'd packet and */
+	uint16_t bufferSpace;		/* Number of packet buffers available */
+	uint16_t maxSkew;		/* Max diff between ack'd packet and */
 					/* highest packet received */
-	u_int32_t firstPacket;		/* The first packet in ack list */
-	u_int32_t previousPacket;	/* Previous packet recv'd (obsolete) */
-	u_int32_t serial;		/* # of packet that prompted the ack */
-	u_int8_t reason;		/* Reason for acknowledgement */
-	u_int8_t nAcks;			/* Number of acknowledgements */
-	u_int8_t acks[RX_MAXACKS];	/* Up to RX_MAXACKS acknowledgements */
+	uint32_t firstPacket;		/* The first packet in ack list */
+	uint32_t previousPacket;	/* Previous packet recv'd (obsolete) */
+	uint32_t serial;		/* # of packet that prompted the ack */
+	uint8_t reason;		/* Reason for acknowledgement */
+	uint8_t nAcks;			/* Number of acknowledgements */
+	uint8_t acks[RX_MAXACKS];	/* Up to RX_MAXACKS acknowledgements */
 };
 
 /*
@@ -474,12 +474,12 @@ static const struct tok rx_ack_reasons[] = {
  */
 
 struct rx_cache_entry {
-	u_int32_t	callnum;	/* Call number (net order) */
+	uint32_t	callnum;	/* Call number (net order) */
 	struct in_addr	client;		/* client IP address (net order) */
 	struct in_addr	server;		/* server IP address (net order) */
 	int		dport;		/* server port (host order) */
 	u_short		serviceId;	/* Service identifier (net order) */
-	u_int32_t	opcode;		/* RX opcode (host order) */
+	uint32_t	opcode;		/* RX opcode (host order) */
 };
 
 #define RX_CACHE_SIZE	64
@@ -512,7 +512,7 @@ static void ubik_reply_print(netdissect_options *, const u_char *, int, int32_t)
 
 static void rx_ack_print(netdissect_options *, const u_char *, int);
 
-static int is_ubik(u_int32_t);
+static int is_ubik(uint32_t);
 
 /*
  * Handle the rx-level packet.  See if we know what port it's going to so
@@ -709,8 +709,8 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 {
 	int i;
 	struct rx_cache_entry *rxent;
-	u_int32_t clip = ip->ip_dst.s_addr;
-	u_int32_t sip = ip->ip_src.s_addr;
+	uint32_t clip = ip->ip_dst.s_addr;
+	uint32_t sip = ip->ip_src.s_addr;
 
 	/* Start the search where we last left off */
 
@@ -779,10 +779,10 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 			ND_PRINT((ndo, " %lu", i)); \
 		}
 
-#define UINT64OUT() { u_int64_t i; \
-			ND_TCHECK2(bp[0], sizeof(u_int64_t)); \
+#define UINT64OUT() { uint64_t i; \
+			ND_TCHECK2(bp[0], sizeof(uint64_t)); \
 			i = EXTRACT_64BITS(bp); \
-			bp += sizeof(u_int64_t); \
+			bp += sizeof(uint64_t); \
 			ND_PRINT((ndo, " %" PRIu64, i)); \
 		}
 
@@ -822,20 +822,20 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 			ND_PRINT((ndo, " %d.%d", epoch, counter)); \
 		}
 
-#define AFSUUIDOUT() {u_int32_t temp; int i; \
-			ND_TCHECK2(bp[0], 11*sizeof(u_int32_t)); \
+#define AFSUUIDOUT() {uint32_t temp; int i; \
+			ND_TCHECK2(bp[0], 11*sizeof(uint32_t)); \
 			temp = EXTRACT_32BITS(bp); \
-			bp += sizeof(u_int32_t); \
+			bp += sizeof(uint32_t); \
 			ND_PRINT((ndo, " %08x", temp)); \
 			temp = EXTRACT_32BITS(bp); \
-			bp += sizeof(u_int32_t); \
+			bp += sizeof(uint32_t); \
 			ND_PRINT((ndo, "%04x", temp)); \
 			temp = EXTRACT_32BITS(bp); \
-			bp += sizeof(u_int32_t); \
+			bp += sizeof(uint32_t); \
 			ND_PRINT((ndo, "%04x", temp)); \
 			for (i = 0; i < 8; i++) { \
 				temp = EXTRACT_32BITS(bp); \
-				bp += sizeof(u_int32_t); \
+				bp += sizeof(uint32_t); \
 				ND_PRINT((ndo, "%02x", (unsigned char) temp)); \
 			} \
 		}
@@ -2505,7 +2505,7 @@ trunc:
  */
 
 static int
-is_ubik(u_int32_t opcode)
+is_ubik(uint32_t opcode)
 {
 	if ((opcode >= VOTE_LOW && opcode <= VOTE_HIGH) ||
 	    (opcode >= DISK_LOW && opcode <= DISK_HIGH))
@@ -2698,7 +2698,7 @@ rx_ack_print(netdissect_options *ndo,
 {
 	struct rx_ackPacket *rxa;
 	int i, start, last;
-	u_int32_t firstPacket;
+	uint32_t firstPacket;
 
 	if (length < (int)sizeof(struct rx_header))
 		return;

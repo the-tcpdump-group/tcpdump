@@ -73,9 +73,9 @@
 #define M_AUTH		0x0800  /* packet was authenticated (AH) */
 
 struct enchdr {
-	u_int32_t af;
-	u_int32_t spi;
-	u_int32_t flags;
+	uint32_t af;
+	uint32_t spi;
+	uint32_t flags;
 };
 
 #define ENC_PRINT_TYPE(wh, xf, nam) \

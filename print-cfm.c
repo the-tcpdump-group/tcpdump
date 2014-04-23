@@ -34,10 +34,10 @@
 #include "af.h"
 
 struct cfm_common_header_t {
-    u_int8_t mdlevel_version;
-    u_int8_t opcode;
-    u_int8_t flags;
-    u_int8_t first_tlv_offset;
+    uint8_t mdlevel_version;
+    uint8_t opcode;
+    uint8_t flags;
+    uint8_t first_tlv_offset;
 };
 
 #define	CFM_VERSION 0
@@ -63,13 +63,13 @@ static const struct tok cfm_opcode_values[] = {
  * Message Formats.
  */
 struct cfm_ccm_t {
-    u_int8_t sequence[4];
-    u_int8_t ma_epi[2];
-    u_int8_t md_nameformat;
-    u_int8_t md_namelength;
-    u_int8_t md_name[46]; /* md name and short ma name */
-    u_int8_t reserved_itu[16];
-    u_int8_t reserved[6];
+    uint8_t sequence[4];
+    uint8_t ma_epi[2];
+    uint8_t md_nameformat;
+    uint8_t md_namelength;
+    uint8_t md_name[46]; /* md name and short ma name */
+    uint8_t reserved_itu[16];
+    uint8_t reserved[6];
 };
 
 /*
@@ -114,17 +114,17 @@ static const struct tok cfm_ma_nameformat_values[] = {
 };
 
 struct cfm_lbm_t {
-    u_int8_t transaction_id[4];
-    u_int8_t reserved[4];
+    uint8_t transaction_id[4];
+    uint8_t reserved[4];
 };
 
 struct cfm_ltm_t {
-    u_int8_t transaction_id[4];
-    u_int8_t egress_id[8];
-    u_int8_t ttl;
-    u_int8_t original_mac[ETHER_ADDR_LEN];
-    u_int8_t target_mac[ETHER_ADDR_LEN];
-    u_int8_t reserved[3];
+    uint8_t transaction_id[4];
+    uint8_t egress_id[8];
+    uint8_t ttl;
+    uint8_t original_mac[ETHER_ADDR_LEN];
+    uint8_t target_mac[ETHER_ADDR_LEN];
+    uint8_t reserved[3];
 };
 
 static const struct tok cfm_ltm_flag_values[] = {
@@ -133,12 +133,12 @@ static const struct tok cfm_ltm_flag_values[] = {
 };
 
 struct cfm_ltr_t {
-    u_int8_t transaction_id[4];
-    u_int8_t last_egress_id[8];
-    u_int8_t next_egress_id[8];
-    u_int8_t ttl;
-    u_int8_t replay_action;
-    u_int8_t reserved[6];
+    uint8_t transaction_id[4];
+    uint8_t last_egress_id[8];
+    uint8_t next_egress_id[8];
+    uint8_t ttl;
+    uint8_t replay_action;
+    uint8_t reserved[6];
 };
 
 static const struct tok cfm_ltr_flag_values[] = {
@@ -182,8 +182,8 @@ static const struct tok cfm_tlv_values[] = {
  */
 
 struct cfm_tlv_header_t {
-    u_int8_t type;
-    u_int8_t length[2];
+    uint8_t type;
+    uint8_t length[2];
 };
 
 /* FIXME define TLV formats */
@@ -285,7 +285,7 @@ cfm_print(netdissect_options *ndo,
 
     const struct cfm_common_header_t *cfm_common_header;
     const struct cfm_tlv_header_t *cfm_tlv_header;
-    const u_int8_t *tptr, *tlv_ptr, *ma_name, *ma_nameformat, *ma_namelength;
+    const uint8_t *tptr, *tlv_ptr, *ma_name, *ma_nameformat, *ma_namelength;
     u_int hexdump, tlen, cfm_tlv_len, cfm_tlv_type, ccm_interval;
 
 

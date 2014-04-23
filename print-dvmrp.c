@@ -62,7 +62,7 @@ static int print_prune(netdissect_options *, const u_char *);
 static int print_graft(netdissect_options *, const u_char *);
 static int print_graft_ack(netdissect_options *, const u_char *);
 
-static u_int32_t target_level;
+static uint32_t target_level;
 
 void
 dvmrp_print(netdissect_options *ndo,
@@ -163,7 +163,7 @@ print_report(netdissect_options *ndo,
              register const u_char *bp, register const u_char *ep,
              register u_int len)
 {
-	register u_int32_t mask, origin;
+	register uint32_t mask, origin;
 	register int metric, done;
 	register u_int i, width;
 
@@ -173,7 +173,7 @@ print_report(netdissect_options *ndo,
 			return (0);
 		}
 		ND_TCHECK2(bp[0], 3);
-		mask = (u_int32_t)0xff << 24 | bp[0] << 16 | bp[1] << 8 | bp[2];
+		mask = (uint32_t)0xff << 24 | bp[0] << 16 | bp[1] << 8 | bp[2];
 		width = 1;
 		if (bp[0])
 			width = 2;
@@ -221,7 +221,7 @@ print_probe(netdissect_options *ndo,
             register const u_char *bp, register const u_char *ep,
             register u_int len)
 {
-	register u_int32_t genid;
+	register uint32_t genid;
 
 	ND_TCHECK2(bp[0], 4);
 	if ((len < 4) || ((bp + 4) > ep)) {

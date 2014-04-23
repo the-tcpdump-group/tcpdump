@@ -124,7 +124,7 @@ static const struct tok null_values[] = {
 };
 
 struct oui_tok {
-	u_int32_t	oui;
+	uint32_t	oui;
 	const struct tok *tok;
 };
 
@@ -144,8 +144,8 @@ int
 llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 	  const u_char *esrc, const u_char *edst, u_short *extracted_ethertype)
 {
-	u_int8_t dsap_field, dsap, ssap_field, ssap;
-	u_int16_t control;
+	uint8_t dsap_field, dsap, ssap_field, ssap;
+	uint16_t control;
 	int is_u;
 	register int ret;
 
@@ -363,7 +363,7 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 int
 snap_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen, u_int bridge_pad)
 {
-	u_int32_t orgcode;
+	uint32_t orgcode;
 	register u_short et;
 	register int ret;
 

@@ -55,20 +55,20 @@
 #define MPTCP_SUB_FCLOSE        0x7
 
 struct mptcp_option {
-        u_int8_t        kind;
-        u_int8_t        len;
-        u_int8_t        sub_etc;        /* subtype upper 4 bits, other stuff lower 4 bits */
+        uint8_t        kind;
+        uint8_t        len;
+        uint8_t        sub_etc;        /* subtype upper 4 bits, other stuff lower 4 bits */
 };
 
 #define MPTCP_OPT_SUBTYPE(sub_etc)      (((sub_etc) >> 4) & 0xF)
 
 struct mp_capable {
-        u_int8_t        kind;
-        u_int8_t        len;
-        u_int8_t        sub_ver;
-        u_int8_t        flags;
-        u_int8_t        sender_key[8];
-        u_int8_t        receiver_key[8];
+        uint8_t        kind;
+        uint8_t        len;
+        uint8_t        sub_ver;
+        uint8_t        flags;
+        uint8_t        sender_key[8];
+        uint8_t        receiver_key[8];
 };
 
 #define MP_CAPABLE_OPT_VERSION(sub_ver) (((sub_ver) >> 0) & 0xF)
@@ -76,21 +76,21 @@ struct mp_capable {
 #define MP_CAPABLE_S                    0x01
 
 struct mp_join {
-        u_int8_t        kind;
-        u_int8_t        len;
-        u_int8_t        sub_b;
-        u_int8_t        addr_id;
+        uint8_t        kind;
+        uint8_t        len;
+        uint8_t        sub_b;
+        uint8_t        addr_id;
         union {
                 struct {
-                        u_int8_t         token[4];
-                        u_int8_t         nonce[4];
+                        uint8_t         token[4];
+                        uint8_t         nonce[4];
                 } syn;
                 struct {
-                        u_int8_t         mac[8];
-                        u_int8_t         nonce[4];
+                        uint8_t         mac[8];
+                        uint8_t         nonce[4];
                 } synack;
                 struct {
-                        u_int8_t        mac[20];
+                        uint8_t        mac[20];
                 } ack;
         } u;
 };
@@ -98,10 +98,10 @@ struct mp_join {
 #define MP_JOIN_B                       0x01
 
 struct mp_dss {
-        u_int8_t        kind;
-        u_int8_t        len;
-        u_int8_t        sub;
-        u_int8_t        flags;
+        uint8_t        kind;
+        uint8_t        len;
+        uint8_t        sub;
+        uint8_t        flags;
 };
 
 #define MP_DSS_F                        0x10
@@ -111,18 +111,18 @@ struct mp_dss {
 #define MP_DSS_A                        0x01
 
 struct mp_add_addr {
-        u_int8_t        kind;
-        u_int8_t        len;
-        u_int8_t        sub_ipver;
-        u_int8_t        addr_id;
+        uint8_t        kind;
+        uint8_t        len;
+        uint8_t        sub_ipver;
+        uint8_t        addr_id;
         union {
                 struct {
-                        u_int8_t         addr[4];
-                        u_int8_t         port[2];
+                        uint8_t         addr[4];
+                        uint8_t         port[2];
                 } v4;
                 struct {
-                        u_int8_t         addr[16];
-                        u_int8_t         port[2];
+                        uint8_t         addr[16];
+                        uint8_t         port[2];
                 } v6;
         } u;
 };
@@ -130,34 +130,34 @@ struct mp_add_addr {
 #define MP_ADD_ADDR_IPVER(sub_ipver)    (((sub_ipver) >> 0) & 0xF)
 
 struct mp_remove_addr {
-        u_int8_t        kind;
-        u_int8_t        len;
-        u_int8_t        sub;
+        uint8_t        kind;
+        uint8_t        len;
+        uint8_t        sub;
         /* list of addr_id */
-        u_int8_t        addrs_id;
+        uint8_t        addrs_id;
 };
 
 struct mp_fail {
-        u_int8_t        kind;
-        u_int8_t        len;
-        u_int8_t        sub;
-        u_int8_t        resv;
-        u_int8_t        data_seq[8];
+        uint8_t        kind;
+        uint8_t        len;
+        uint8_t        sub;
+        uint8_t        resv;
+        uint8_t        data_seq[8];
 };
 
 struct mp_close {
-        u_int8_t        kind;
-        u_int8_t        len;
-        u_int8_t        sub;
-        u_int8_t        rsv;
-        u_int8_t        key[8];
+        uint8_t        kind;
+        uint8_t        len;
+        uint8_t        sub;
+        uint8_t        rsv;
+        uint8_t        key[8];
 };
 
 struct mp_prio {
-        u_int8_t        kind;
-        u_int8_t        len;
-        u_int8_t        sub_b;
-        u_int8_t        addr_id;
+        uint8_t        kind;
+        uint8_t        len;
+        uint8_t        sub_b;
+        uint8_t        addr_id;
 };
 
 #define MP_PRIO_B                       0x01
@@ -343,7 +343,7 @@ remove_addr_print(netdissect_options *ndo,
                   const u_char *opt, u_int opt_len, u_char flags _U_)
 {
         struct mp_remove_addr *remove_addr = (struct mp_remove_addr *) opt;
-        u_int8_t *addr_id = &remove_addr->addrs_id;
+        uint8_t *addr_id = &remove_addr->addrs_id;
 
         if (opt_len < 4)
                 return 0;

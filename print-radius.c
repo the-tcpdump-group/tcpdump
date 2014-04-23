@@ -140,16 +140,16 @@ static void print_attr_time(netdissect_options *, register u_char *, u_int, u_sh
 static void print_attr_strange(netdissect_options *, register u_char *, u_int, u_short);
 
 
-struct radius_hdr { u_int8_t  code; /* Radius packet code  */
-                    u_int8_t  id;   /* Radius packet id    */
-                    u_int16_t len;  /* Radius total length */
-                    u_int8_t  auth[16]; /* Authenticator   */
+struct radius_hdr { uint8_t  code; /* Radius packet code  */
+                    uint8_t  id;   /* Radius packet id    */
+                    uint16_t len;  /* Radius total length */
+                    uint8_t  auth[16]; /* Authenticator   */
                   };
 
 #define MIN_RADIUS_LEN	20
 
-struct radius_attr { u_int8_t type; /* Attribute type   */
-                     u_int8_t len;  /* Attribute length */
+struct radius_attr { uint8_t type; /* Attribute type   */
+                     uint8_t len;  /* Attribute length */
                    };
 
 
@@ -565,8 +565,8 @@ static void
 print_attr_num(netdissect_options *ndo,
                register u_char *data, u_int length, u_short attr_code)
 {
-   u_int8_t tag;
-   u_int32_t timeout;
+   uint8_t tag;
+   uint32_t timeout;
 
    if (length != 4)
    {
@@ -579,7 +579,7 @@ print_attr_num(netdissect_options *ndo,
    if (attr_type[attr_code].siz_subtypes)
    {
       static const char **table;
-      u_int32_t data_value;
+      uint32_t data_value;
       table = attr_type[attr_code].subtypes;
 
       if ( (attr_code == TUNNEL_TYPE) || (attr_code == TUNNEL_MEDIUM) )
@@ -595,7 +595,7 @@ print_attr_num(netdissect_options *ndo,
       {
          data_value = EXTRACT_32BITS(data);
       }
-      if ( data_value <= (u_int32_t)(attr_type[attr_code].siz_subtypes - 1 +
+      if ( data_value <= (uint32_t)(attr_type[attr_code].siz_subtypes - 1 +
             attr_type[attr_code].first_subtype) &&
 	   data_value >= attr_type[attr_code].first_subtype )
          ND_PRINT((ndo, "%s", table[data_value]));

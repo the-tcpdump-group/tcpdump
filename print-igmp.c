@@ -42,10 +42,10 @@ static const char tstr[] = "[|igmp]";
  * The packet format for a traceroute request.
  */
 struct tr_query {
-    u_int32_t  tr_src;          /* traceroute source */
-    u_int32_t  tr_dst;          /* traceroute destination */
-    u_int32_t  tr_raddr;        /* traceroute response address */
-    u_int32_t  tr_rttlqid;      /* response ttl and qid */
+    uint32_t  tr_src;          /* traceroute source */
+    uint32_t  tr_dst;          /* traceroute destination */
+    uint32_t  tr_raddr;        /* traceroute response address */
+    uint32_t  tr_rttlqid;      /* response ttl and qid */
 };
 
 #define TR_GETTTL(x)        (int)(((x) >> 24) & 0xff)
@@ -56,17 +56,17 @@ struct tr_query {
  * beginning, followed by one tr_resp for each hop taken.
  */
 struct tr_resp {
-    u_int32_t tr_qarr;          /* query arrival time */
-    u_int32_t tr_inaddr;        /* incoming interface address */
-    u_int32_t tr_outaddr;       /* outgoing interface address */
-    u_int32_t tr_rmtaddr;       /* parent address in source tree */
-    u_int32_t tr_vifin;         /* input packet count on interface */
-    u_int32_t tr_vifout;        /* output packet count on interface */
-    u_int32_t tr_pktcnt;        /* total incoming packets for src-grp */
-    u_int8_t  tr_rproto;      /* routing proto deployed on router */
-    u_int8_t  tr_fttl;        /* ttl required to forward on outvif */
-    u_int8_t  tr_smask;       /* subnet mask for src addr */
-    u_int8_t  tr_rflags;      /* forwarding error codes */
+    uint32_t tr_qarr;          /* query arrival time */
+    uint32_t tr_inaddr;        /* incoming interface address */
+    uint32_t tr_outaddr;       /* outgoing interface address */
+    uint32_t tr_rmtaddr;       /* parent address in source tree */
+    uint32_t tr_vifin;         /* input packet count on interface */
+    uint32_t tr_vifout;        /* output packet count on interface */
+    uint32_t tr_pktcnt;        /* total incoming packets for src-grp */
+    uint8_t  tr_rproto;      /* routing proto deployed on router */
+    uint8_t  tr_fttl;        /* ttl required to forward on outvif */
+    uint8_t  tr_smask;       /* subnet mask for src addr */
+    uint8_t  tr_rflags;      /* forwarding error codes */
 };
 
 /* defs within mtrace */

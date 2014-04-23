@@ -47,9 +47,9 @@
 #include "l2vpn.h"
 
 struct bgp {
-	u_int8_t bgp_marker[16];
-	u_int16_t bgp_len;
-	u_int8_t bgp_type;
+	uint8_t bgp_marker[16];
+	uint16_t bgp_len;
+	uint8_t bgp_type;
 };
 #define BGP_SIZE		19	/* unaligned */
 
@@ -69,42 +69,42 @@ static const struct tok bgp_msg_values[] = {
 };
 
 struct bgp_open {
-	u_int8_t bgpo_marker[16];
-	u_int16_t bgpo_len;
-	u_int8_t bgpo_type;
-	u_int8_t bgpo_version;
-	u_int16_t bgpo_myas;
-	u_int16_t bgpo_holdtime;
-	u_int32_t bgpo_id;
-	u_int8_t bgpo_optlen;
+	uint8_t bgpo_marker[16];
+	uint16_t bgpo_len;
+	uint8_t bgpo_type;
+	uint8_t bgpo_version;
+	uint16_t bgpo_myas;
+	uint16_t bgpo_holdtime;
+	uint32_t bgpo_id;
+	uint8_t bgpo_optlen;
 	/* options should follow */
 };
 #define BGP_OPEN_SIZE		29	/* unaligned */
 
 struct bgp_opt {
-	u_int8_t bgpopt_type;
-	u_int8_t bgpopt_len;
+	uint8_t bgpopt_type;
+	uint8_t bgpopt_len;
 	/* variable length */
 };
 #define BGP_OPT_SIZE		2	/* some compilers may pad to 4 bytes */
 #define BGP_CAP_HEADER_SIZE	2	/* some compilers may pad to 4 bytes */
 
 struct bgp_notification {
-	u_int8_t bgpn_marker[16];
-	u_int16_t bgpn_len;
-	u_int8_t bgpn_type;
-	u_int8_t bgpn_major;
-	u_int8_t bgpn_minor;
+	uint8_t bgpn_marker[16];
+	uint16_t bgpn_len;
+	uint8_t bgpn_type;
+	uint8_t bgpn_major;
+	uint8_t bgpn_minor;
 };
 #define BGP_NOTIFICATION_SIZE		21	/* unaligned */
 
 struct bgp_route_refresh {
-    u_int8_t  bgp_marker[16];
-    u_int16_t len;
-    u_int8_t  type;
-    u_int8_t  afi[2]; /* the compiler messes this structure up               */
-    u_int8_t  res;    /* when doing misaligned sequences of int8 and int16   */
-    u_int8_t  safi;   /* afi should be int16 - so we have to access it using */
+    uint8_t  bgp_marker[16];
+    uint16_t len;
+    uint8_t  type;
+    uint8_t  afi[2]; /* the compiler messes this structure up               */
+    uint8_t  res;    /* when doing misaligned sequences of int8 and int16   */
+    uint8_t  safi;   /* afi should be int16 - so we have to access it using */
 };                    /* EXTRACT_16BITS(&bgp_route_refresh->afi) (sigh)      */
 #define BGP_ROUTE_REFRESH_SIZE          23
 
@@ -624,7 +624,7 @@ static int
 bgp_vpn_sg_print(netdissect_options *ndo,
                  const u_char *pptr, char *buf, u_int buflen) {
 
-    u_int8_t addr_length;
+    uint8_t addr_length;
     u_int total_length, offset;
 
     total_length = 0;
@@ -710,7 +710,7 @@ static int
 decode_rt_routing_info(netdissect_options *ndo,
                        const u_char *pptr, char *buf, u_int buflen)
 {
-	u_int8_t route_target[8];
+	uint8_t route_target[8];
 	u_int plen;
 
 	ND_TCHECK(pptr[0]);
@@ -855,7 +855,7 @@ static int
 decode_multicast_vpn(netdissect_options *ndo,
                      const u_char *pptr, char *buf, u_int buflen)
 {
-        u_int8_t route_type, route_length, addr_length, sg_length;
+        uint8_t route_type, route_length, addr_length, sg_length;
         u_int offset;
 
 	ND_TCHECK2(pptr[0], 2);
@@ -1174,7 +1174,7 @@ static int
 decode_clnp_prefix(netdissect_options *ndo,
                    const u_char *pptr, char *buf, u_int buflen)
 {
-        u_int8_t addr[19];
+        uint8_t addr[19];
 	u_int plen;
 
 	ND_TCHECK(pptr[0]);
@@ -1204,7 +1204,7 @@ static int
 decode_labeled_vpn_clnp_prefix(netdissect_options *ndo,
                                const u_char *pptr, char *buf, u_int buflen)
 {
-        u_int8_t addr[19];
+        uint8_t addr[19];
 	u_int plen;
 
 	ND_TCHECK(pptr[0]);
@@ -1248,7 +1248,7 @@ trunc:
  */
 static int
 bgp_attr_get_as_size(netdissect_options *ndo,
-                     u_int8_t bgpa_type, const u_char *pptr, int len)
+                     uint8_t bgpa_type, const u_char *pptr, int len)
 {
     const u_char *tptr = pptr;
 
@@ -1302,11 +1302,11 @@ bgp_attr_print(netdissect_options *ndo,
                u_int atype, const u_char *pptr, u_int len)
 {
 	int i;
-	u_int16_t af;
-	u_int8_t safi, snpa, nhlen;
+	uint16_t af;
+	uint8_t safi, snpa, nhlen;
         union { /* copy buffer for bandwidth values */
             float f;
-            u_int32_t i;
+            uint32_t i;
         } bw;
 	int advance;
 	u_int tlen;
@@ -1435,7 +1435,7 @@ bgp_attr_print(netdissect_options *ndo,
 			break;
 		}
 		while (tlen>0) {
-			u_int32_t comm;
+			uint32_t comm;
 			ND_TCHECK2(tptr[0], 4);
 			comm = EXTRACT_32BITS(tptr);
 			switch (comm) {
@@ -2008,7 +2008,7 @@ bgp_attr_print(netdissect_options *ndo,
 			break;
 		}
                 while (tlen>0) {
-                    u_int16_t extd_comm;
+                    uint16_t extd_comm;
 
                     ND_TCHECK2(tptr[0], 2);
                     extd_comm=EXTRACT_16BITS(tptr);
@@ -2092,7 +2092,7 @@ bgp_attr_print(netdissect_options *ndo,
 
         case BGPTYPE_PMSI_TUNNEL:
         {
-                u_int8_t tunnel_type, flags;
+                uint8_t tunnel_type, flags;
 
                 tunnel_type = *(tptr+1);
                 flags = *tptr;
@@ -2708,7 +2708,7 @@ bgp_print(netdissect_options *ndo,
 		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 	};
 	struct bgp bgp;
-	u_int16_t hlen;
+	uint16_t hlen;
 	char tokbuf[TOKBUFSIZE];
 
 	ep = dat + length;

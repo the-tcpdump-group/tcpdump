@@ -127,7 +127,7 @@ vrrp_print(netdissect_options *ndo,
 		ND_PRINT((ndo, ", authtype %s", tok2str(auth2str, NULL, auth_type)));
 		ND_PRINT((ndo, ", intvl %us, length %u", bp[5], len));
 	} else { /* version == 3 */
-		u_int16_t intvl = (bp[4] & 0x0f) << 8 | bp[5];
+		uint16_t intvl = (bp[4] & 0x0f) << 8 | bp[5];
 		ND_PRINT((ndo, ", intvl %ucs, length %u", intvl, len));
 	}
 
@@ -147,7 +147,7 @@ vrrp_print(netdissect_options *ndo,
 		}
 
 		if (version == 3 && ND_TTEST2(bp[0], len)) {
-			u_int16_t cksum = nextproto4_cksum(ndo, (struct ip *)bp2, bp,
+			uint16_t cksum = nextproto4_cksum(ndo, (struct ip *)bp2, bp,
 				len, len, IPPROTO_VRRP);
 			if (cksum)
 				ND_PRINT((ndo, ", (bad vrrp cksum %x)",

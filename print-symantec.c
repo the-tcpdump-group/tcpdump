@@ -33,16 +33,16 @@
 #include "ether.h"
 
 struct symantec_header {
-	u_int8_t  stuff1[6];
-	u_int16_t ether_type;
-	u_int8_t  stuff2[36];
+	uint8_t  stuff1[6];
+	uint16_t ether_type;
+	uint8_t  stuff2[36];
 };
 
 static inline void
 symantec_hdr_print(netdissect_options *ndo, register const u_char *bp, u_int length)
 {
 	register const struct symantec_header *sp;
-	u_int16_t etype;
+	uint16_t etype;
 
 	sp = (const struct symantec_header *)bp;
 

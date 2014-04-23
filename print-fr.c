@@ -96,7 +96,7 @@ static const struct tok frf_flag_values[] = {
  * save the flags dep. on address length
  */
 static int parse_q922_addr(const u_char *p, u_int *dlci,
-                           u_int *addr_len, u_int8_t *flags)
+                           u_int *addr_len, uint8_t *flags)
 {
 	if ((p[0] & FR_EA_BIT))
 		return -1;
@@ -133,7 +133,7 @@ static int parse_q922_addr(const u_char *p, u_int *dlci,
 char *q922_string(const u_char *p) {
 
     static u_int dlci, addr_len;
-    static u_int8_t flags[4];
+    static uint8_t flags[4];
     static char buffer[sizeof("DLCI xxxxxxxxxx")];
     memset(buffer, 0, sizeof(buffer));
 
@@ -182,7 +182,7 @@ fr_hdrlen(const u_char *p, u_int addr_len)
 
 static void
 fr_hdr_print(netdissect_options *ndo,
-             int length, u_int addr_len, u_int dlci, u_int8_t *flags, u_int16_t nlpid)
+             int length, u_int addr_len, u_int dlci, uint8_t *flags, uint16_t nlpid)
 {
     if (ndo->ndo_qflag) {
         ND_PRINT((ndo, "Q.922, DLCI %u, length %u: ",
@@ -230,12 +230,12 @@ u_int
 fr_print(netdissect_options *ndo,
          register const u_char *p, u_int length)
 {
-	u_int16_t extracted_ethertype;
+	uint16_t extracted_ethertype;
 	u_int dlci;
 	u_int addr_len;
-	u_int16_t nlpid;
+	uint16_t nlpid;
 	u_int hdr_len;
-	u_int8_t flags[4];
+	uint8_t flags[4];
 
 	if (parse_q922_addr(p, &dlci, &addr_len, flags)) {
 		ND_PRINT((ndo, "Q.922, invalid address"));
@@ -390,8 +390,8 @@ static const struct tok mfr_ctrl_ie_values[] = {
 #define MFR_ID_STRING_MAXLEN 50
 
 struct ie_tlv_header_t {
-    u_int8_t ie_type;
-    u_int8_t ie_len;
+    uint8_t ie_type;
+    uint8_t ie_len;
 };
 
 u_int
@@ -399,9 +399,9 @@ mfr_print(netdissect_options *ndo,
           register const u_char *p, u_int length)
 {
     u_int tlen,idx,hdr_len = 0;
-    u_int16_t sequence_num;
-    u_int8_t ie_type,ie_len;
-    const u_int8_t *tptr;
+    uint16_t sequence_num;
+    uint8_t ie_type,ie_len;
+    const uint8_t *tptr;
 
 
 /*
@@ -558,7 +558,7 @@ static void
 frf15_print(netdissect_options *ndo,
             const u_char *p, u_int length) {
 
-    u_int16_t sequence_num, flags;
+    uint16_t sequence_num, flags;
 
     flags = p[0]&MFR_BEC_MASK;
     sequence_num = (p[0]&0x1e)<<7 | p[1];

@@ -41,13 +41,13 @@
  * @dccph_seq - 24-bit sequence number
  */
 struct dccp_hdr {
-	u_int16_t	dccph_sport,
+	uint16_t	dccph_sport,
 			dccph_dport;
-	u_int8_t	dccph_doff;
-	u_int8_t	dccph_ccval_cscov;
-	u_int16_t	dccph_checksum;
-	u_int8_t	dccph_xtr;
-	u_int8_t	dccph_seq[3];
+	uint8_t	dccph_doff;
+	uint8_t	dccph_ccval_cscov;
+	uint16_t	dccph_checksum;
+	uint8_t	dccph_xtr;
+	uint8_t	dccph_seq[3];
 } UNALIGNED;
 
 /**
@@ -65,14 +65,14 @@ struct dccp_hdr {
  * @dccph_seq - 48-bit sequence number
  */
 struct dccp_hdr_ext {
-	u_int16_t	dccph_sport,
+	uint16_t	dccph_sport,
 			dccph_dport;
-	u_int8_t	dccph_doff;
-	u_int8_t	dccph_ccval_cscov;
-	u_int16_t	dccph_checksum;
-	u_int8_t	dccph_xtr;
-	u_int8_t	reserved;
-	u_int8_t	dccph_seq[6];
+	uint8_t	dccph_doff;
+	uint8_t	dccph_ccval_cscov;
+	uint16_t	dccph_checksum;
+	uint8_t	dccph_xtr;
+	uint8_t	reserved;
+	uint8_t	dccph_seq[6];
 } UNALIGNED;
 
 #define DCCPH_CCVAL(dh)	(((dh)->dccph_ccval_cscov >> 4) & 0xF)
@@ -87,7 +87,7 @@ struct dccp_hdr_ext {
  * @dccph_req_service - Service to which the client app wants to connect
  */
 struct dccp_hdr_request {
-	u_int32_t	dccph_req_service;
+	uint32_t	dccph_req_service;
 } UNALIGNED;
 
 /**
@@ -97,8 +97,8 @@ struct dccp_hdr_request {
  * @dccph_resp_service - Echoes the Service Code on a received DCCP-Request
  */
 struct dccp_hdr_response {
-	u_int8_t			dccph_resp_ack[8];	/* always 8 bytes */
-	u_int32_t			dccph_resp_service;
+	uint8_t			dccph_resp_ack[8];	/* always 8 bytes */
+	uint32_t			dccph_resp_service;
 } UNALIGNED;
 
 /**
@@ -108,8 +108,8 @@ struct dccp_hdr_response {
  * @dccph_reset_service - Echoes the Service Code on a received DCCP-Request
  */
 struct dccp_hdr_reset {
-	u_int8_t			dccph_reset_ack[8];	/* always 8 bytes */
-	u_int8_t			dccph_reset_code,
+	uint8_t			dccph_reset_ack[8];	/* always 8 bytes */
+	uint8_t			dccph_reset_code,
 					dccph_reset_data[3];
 } UNALIGNED;
 
@@ -179,36 +179,36 @@ static inline u_int dccp_csum_coverage(const struct dccp_hdr* dh, u_int len)
 
 	if (DCCPH_CSCOV(dh) == 0)
 		return len;
-	cov = (dh->dccph_doff + DCCPH_CSCOV(dh) - 1) * sizeof(u_int32_t);
+	cov = (dh->dccph_doff + DCCPH_CSCOV(dh) - 1) * sizeof(uint32_t);
 	return (cov > len)? len : cov;
 }
 
 static int dccp_cksum(netdissect_options *ndo, const struct ip *ip,
 	const struct dccp_hdr *dh, u_int len)
 {
-	return nextproto4_cksum(ndo, ip, (const u_int8_t *)(void *)dh, len,
+	return nextproto4_cksum(ndo, ip, (const uint8_t *)(void *)dh, len,
 				dccp_csum_coverage(dh, len), IPPROTO_DCCP);
 }
 
 #ifdef INET6
 static int dccp6_cksum(const struct ip6_hdr *ip6, const struct dccp_hdr *dh, u_int len)
 {
-	return nextproto6_cksum(ip6, (const u_int8_t *)(void *)dh, len,
+	return nextproto6_cksum(ip6, (const uint8_t *)(void *)dh, len,
 				dccp_csum_coverage(dh, len), IPPROTO_DCCP);
 }
 #endif
 
-static const char *dccp_reset_code(u_int8_t code)
+static const char *dccp_reset_code(uint8_t code)
 {
 	if (code >= __DCCP_RESET_CODE_LAST)
 		return "invalid";
 	return dccp_reset_codes[code];
 }
 
-static u_int64_t dccp_seqno(const u_char *bp)
+static uint64_t dccp_seqno(const u_char *bp)
 {
 	const struct dccp_hdr *dh = (const struct dccp_hdr *)bp;
-	u_int64_t seqno;
+	uint64_t seqno;
 
 	if (DCCPH_X(dh) != 0) {
 		const struct dccp_hdr_ext *dhx = (const struct dccp_hdr_ext *)bp;
@@ -229,7 +229,7 @@ static void dccp_print_ack_no(netdissect_options *ndo, const u_char *bp)
 {
 	const struct dccp_hdr *dh = (const struct dccp_hdr *)bp;
 	const u_char *ackp = bp + dccp_basic_hdr_len(dh);
-	u_int64_t ackno;
+	uint64_t ackno;
 
 	if (DCCPH_X(dh) != 0) {
 		ND_TCHECK2(*ackp, 8);
@@ -329,7 +329,7 @@ void dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 
 	/* checksum calculation */
 	if (ndo->ndo_vflag && ND_TTEST2(bp[0], len)) {
-		u_int16_t sum = 0, dccp_sum;
+		uint16_t sum = 0, dccp_sum;
 
 		dccp_sum = EXTRACT_16BITS(&dh->dccph_checksum);
 		ND_PRINT((ndo, "cksum 0x%04x ", dccp_sum));
@@ -509,7 +509,7 @@ static const struct tok dccp_option_values[] = {
 
 static int dccp_print_option(netdissect_options *ndo, const u_char *option, u_int hlen)
 {
-	u_int8_t optlen, i;
+	uint8_t optlen, i;
 
 	ND_TCHECK(*option);
 

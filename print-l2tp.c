@@ -281,13 +281,13 @@ print_octets(netdissect_options *ndo, const u_char *dat, u_int length)
 }
 
 static void
-print_16bits_val(netdissect_options *ndo, const u_int16_t *dat)
+print_16bits_val(netdissect_options *ndo, const uint16_t *dat)
 {
 	ND_PRINT((ndo, "%u", EXTRACT_16BITS(dat)));
 }
 
 static void
-print_32bits_val(netdissect_options *ndo, const u_int32_t *dat)
+print_32bits_val(netdissect_options *ndo, const uint32_t *dat)
 {
 	ND_PRINT((ndo, "%lu", (u_long)EXTRACT_32BITS(dat)));
 }
@@ -298,7 +298,7 @@ print_32bits_val(netdissect_options *ndo, const u_int32_t *dat)
 static void
 l2tp_msgtype_print(netdissect_options *ndo, const u_char *dat)
 {
-	u_int16_t *ptr = (u_int16_t*)dat;
+	uint16_t *ptr = (uint16_t*)dat;
 
 	ND_PRINT((ndo, "%s", tok2str(l2tp_msgtype2str, "MSGTYPE-#%u",
 	    EXTRACT_16BITS(ptr))));
@@ -307,7 +307,7 @@ l2tp_msgtype_print(netdissect_options *ndo, const u_char *dat)
 static void
 l2tp_result_code_print(netdissect_options *ndo, const u_char *dat, u_int length)
 {
-	u_int16_t *ptr = (u_int16_t *)dat;
+	uint16_t *ptr = (uint16_t *)dat;
 
 	ND_PRINT((ndo, "%u", EXTRACT_16BITS(ptr))); ptr++;	/* Result Code */
 	if (length > 2) {				/* Error Code (opt) */
@@ -320,7 +320,7 @@ l2tp_result_code_print(netdissect_options *ndo, const u_char *dat, u_int length)
 }
 
 static void
-l2tp_proto_ver_print(netdissect_options *ndo, const u_int16_t *dat)
+l2tp_proto_ver_print(netdissect_options *ndo, const uint16_t *dat)
 {
 	ND_PRINT((ndo, "%u.%u", (EXTRACT_16BITS(dat) >> 8),
 	    (EXTRACT_16BITS(dat) & 0xff)));
@@ -329,7 +329,7 @@ l2tp_proto_ver_print(netdissect_options *ndo, const u_int16_t *dat)
 static void
 l2tp_framing_cap_print(netdissect_options *ndo, const u_char *dat)
 {
-	u_int32_t *ptr = (u_int32_t *)dat;
+	uint32_t *ptr = (uint32_t *)dat;
 
 	if (EXTRACT_32BITS(ptr) &  L2TP_FRAMING_CAP_ASYNC_MASK) {
 		ND_PRINT((ndo, "A"));
@@ -342,7 +342,7 @@ l2tp_framing_cap_print(netdissect_options *ndo, const u_char *dat)
 static void
 l2tp_bearer_cap_print(netdissect_options *ndo, const u_char *dat)
 {
-	u_int32_t *ptr = (u_int32_t *)dat;
+	uint32_t *ptr = (uint32_t *)dat;
 
 	if (EXTRACT_32BITS(ptr) &  L2TP_BEARER_CAP_ANALOG_MASK) {
 		ND_PRINT((ndo, "A"));
@@ -355,7 +355,7 @@ l2tp_bearer_cap_print(netdissect_options *ndo, const u_char *dat)
 static void
 l2tp_q931_cc_print(netdissect_options *ndo, const u_char *dat, u_int length)
 {
-	print_16bits_val(ndo, (u_int16_t *)dat);
+	print_16bits_val(ndo, (uint16_t *)dat);
 	ND_PRINT((ndo, ", %02x", dat[2]));
 	if (length > 3) {
 		ND_PRINT((ndo, " "));
@@ -366,7 +366,7 @@ l2tp_q931_cc_print(netdissect_options *ndo, const u_char *dat, u_int length)
 static void
 l2tp_bearer_type_print(netdissect_options *ndo, const u_char *dat)
 {
-	u_int32_t *ptr = (u_int32_t *)dat;
+	uint32_t *ptr = (uint32_t *)dat;
 
 	if (EXTRACT_32BITS(ptr) &  L2TP_BEARER_TYPE_ANALOG_MASK) {
 		ND_PRINT((ndo, "A"));
@@ -379,7 +379,7 @@ l2tp_bearer_type_print(netdissect_options *ndo, const u_char *dat)
 static void
 l2tp_framing_type_print(netdissect_options *ndo, const u_char *dat)
 {
-	u_int32_t *ptr = (u_int32_t *)dat;
+	uint32_t *ptr = (uint32_t *)dat;
 
 	if (EXTRACT_32BITS(ptr) &  L2TP_FRAMING_TYPE_ASYNC_MASK) {
 		ND_PRINT((ndo, "A"));
@@ -398,7 +398,7 @@ l2tp_packet_proc_delay_print(netdissect_options *ndo)
 static void
 l2tp_proxy_auth_type_print(netdissect_options *ndo, const u_char *dat)
 {
-	u_int16_t *ptr = (u_int16_t *)dat;
+	uint16_t *ptr = (uint16_t *)dat;
 
 	ND_PRINT((ndo, "%s", tok2str(l2tp_authentype2str,
 			     "AuthType-#%u", EXTRACT_16BITS(ptr))));
@@ -407,7 +407,7 @@ l2tp_proxy_auth_type_print(netdissect_options *ndo, const u_char *dat)
 static void
 l2tp_proxy_auth_id_print(netdissect_options *ndo, const u_char *dat)
 {
-	u_int16_t *ptr = (u_int16_t *)dat;
+	uint16_t *ptr = (uint16_t *)dat;
 
 	ND_PRINT((ndo, "%u", EXTRACT_16BITS(ptr) & L2TP_PROXY_AUTH_ID_MASK));
 }
@@ -415,8 +415,8 @@ l2tp_proxy_auth_id_print(netdissect_options *ndo, const u_char *dat)
 static void
 l2tp_call_errors_print(netdissect_options *ndo, const u_char *dat)
 {
-	u_int16_t *ptr = (u_int16_t *)dat;
-	u_int16_t val_h, val_l;
+	uint16_t *ptr = (uint16_t *)dat;
+	uint16_t val_h, val_l;
 
 	ptr++;		/* skip "Reserved" */
 
@@ -448,8 +448,8 @@ l2tp_call_errors_print(netdissect_options *ndo, const u_char *dat)
 static void
 l2tp_accm_print(netdissect_options *ndo, const u_char *dat)
 {
-	u_int16_t *ptr = (u_int16_t *)dat;
-	u_int16_t val_h, val_l;
+	uint16_t *ptr = (uint16_t *)dat;
+	uint16_t val_h, val_l;
 
 	ptr++;		/* skip "Reserved" */
 
@@ -465,7 +465,7 @@ l2tp_accm_print(netdissect_options *ndo, const u_char *dat)
 static void
 l2tp_ppp_discon_cc_print(netdissect_options *ndo, const u_char *dat, u_int length)
 {
-	u_int16_t *ptr = (u_int16_t *)dat;
+	uint16_t *ptr = (uint16_t *)dat;
 
 	ND_PRINT((ndo, "%04x, ", EXTRACT_16BITS(ptr))); ptr++;	/* Disconnect Code */
 	ND_PRINT((ndo, "%04x ",  EXTRACT_16BITS(ptr))); ptr++;	/* Control Protocol Number */
@@ -482,8 +482,8 @@ static void
 l2tp_avp_print(netdissect_options *ndo, const u_char *dat, int length)
 {
 	u_int len;
-	const u_int16_t *ptr = (u_int16_t *)dat;
-	u_int16_t attr_type;
+	const uint16_t *ptr = (uint16_t *)dat;
+	uint16_t attr_type;
 	int hidden = FALSE;
 
 	if (length <= 0) {
@@ -589,7 +589,7 @@ l2tp_avp_print(netdissect_options *ndo, const u_char *dat, int length)
 			case L2TP_AVP_TX_CONN_SPEED:
 			case L2TP_AVP_PHY_CHANNEL_ID:
 			case L2TP_AVP_RX_CONN_SPEED:
-				print_32bits_val(ndo, (u_int32_t *)ptr);
+				print_32bits_val(ndo, (uint32_t *)ptr);
 				break;
 			case L2TP_AVP_BEARER_TYPE:
 				l2tp_bearer_type_print(ndo, (u_char *)ptr);
@@ -637,9 +637,9 @@ l2tp_print(netdissect_options *ndo, const u_char *dat, u_int length)
 {
 	const u_char *ptr = dat;
 	u_int cnt = 0;			/* total octets consumed */
-	u_int16_t pad;
+	uint16_t pad;
 	int flag_t, flag_l, flag_s, flag_o;
-	u_int16_t l2tp_len;
+	uint16_t l2tp_len;
 
 	flag_t = flag_l = flag_s = flag_o = FALSE;
 

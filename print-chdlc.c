@@ -114,19 +114,19 @@ chdlc_print(netdissect_options *ndo, register const u_char *p, u_int length) {
  * The fixed-length portion of a SLARP packet.
  */
 struct cisco_slarp {
-	u_int8_t code[4];
+	uint8_t code[4];
 #define SLARP_REQUEST	0
 #define SLARP_REPLY	1
 #define SLARP_KEEPALIVE	2
 	union {
 		struct {
-			u_int8_t addr[4];
-			u_int8_t mask[4];
+			uint8_t addr[4];
+			uint8_t mask[4];
 		} addr;
 		struct {
-			u_int8_t myseq[4];
-			u_int8_t yourseq[4];
-			u_int8_t rel[2];
+			uint8_t myseq[4];
+			uint8_t yourseq[4];
+			uint8_t rel[2];
 		} keep;
 	} un;
 };

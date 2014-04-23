@@ -121,7 +121,7 @@ static const struct tok pimv2_register_flag_values[] = {
  */
 
 struct pim {
-	u_int8_t pim_typever;
+	uint8_t pim_typever;
 			/* upper 4bit: PIM version number; 2 for PIMv2 */
 			/* lower 4bit: the PIM message type, currently they are:
 			 * Hello, Register, Register-Stop, Join/Prune,
@@ -648,7 +648,7 @@ pimv2_print(netdissect_options *ndo,
 	switch (PIM_TYPE(pim->pim_typever)) {
 	case PIMV2_TYPE_HELLO:
 	    {
-		u_int16_t otype, olen;
+		uint16_t otype, olen;
 		bp += 4;
 		while (bp < ep) {
 			ND_TCHECK2(bp[0], 4);
@@ -671,7 +671,7 @@ pimv2_print(netdissect_options *ndo,
 					ND_PRINT((ndo, "ERROR: Option Length != 4 Bytes (%u)", olen));
 				} else {
 					char t_bit;
-					u_int16_t lan_delay, override_interval;
+					uint16_t lan_delay, override_interval;
 					lan_delay = EXTRACT_16BITS(bp);
 					override_interval = EXTRACT_16BITS(bp+2);
 					t_bit = (lan_delay & 0x8000)? 1 : 0;
@@ -842,10 +842,10 @@ pimv2_print(netdissect_options *ndo,
          */
 
 	    {
-		u_int8_t ngroup;
-		u_int16_t holdtime;
-		u_int16_t njoin;
-		u_int16_t nprune;
+		uint8_t ngroup;
+		uint16_t holdtime;
+		uint16_t njoin;
+		uint16_t nprune;
 		int i, j;
 
 		bp += 4; len -= 4;
@@ -916,9 +916,9 @@ pimv2_print(netdissect_options *ndo,
 		bp += 4;
 
 		/* Fragment Tag, Hash Mask len, and BSR-priority */
-		if (bp + sizeof(u_int16_t) >= ep) break;
+		if (bp + sizeof(uint16_t) >= ep) break;
 		ND_PRINT((ndo, " tag=%x", EXTRACT_16BITS(bp)));
-		bp += sizeof(u_int16_t);
+		bp += sizeof(uint16_t);
 		if (bp >= ep) break;
 		ND_PRINT((ndo, " hashmlen=%d", bp[0]));
 		if (bp + 1 >= ep) break;

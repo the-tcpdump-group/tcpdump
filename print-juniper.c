@@ -362,8 +362,8 @@ static const struct tok juniper_ifle_values[] = {
 };
 
 struct juniper_cookie_table_t {
-    u_int32_t pictype;		/* pic type */
-    u_int8_t  cookie_len;       /* cookie len */
+    uint32_t pictype;		/* pic type */
+    uint8_t  cookie_len;       /* cookie len */
     const char *s;		/* pic name */
 };
 
@@ -405,17 +405,17 @@ static const struct juniper_cookie_table_t juniper_cookie_table[] = {
 };
 
 struct juniper_l2info_t {
-    u_int32_t length;
-    u_int32_t caplen;
-    u_int32_t pictype;
-    u_int8_t direction;
-    u_int8_t header_len;
-    u_int8_t cookie_len;
-    u_int8_t cookie_type;
-    u_int8_t cookie[8];
-    u_int8_t bundle;
-    u_int16_t proto;
-    u_int8_t flags;
+    uint32_t length;
+    uint32_t caplen;
+    uint32_t pictype;
+    uint8_t direction;
+    uint8_t header_len;
+    uint8_t cookie_len;
+    uint8_t cookie_type;
+    uint8_t cookie[8];
+    uint8_t bundle;
+    uint16_t proto;
+    uint8_t flags;
 };
 
 #define LS_COOKIE_ID            0x54
@@ -453,12 +453,12 @@ juniper_ggsn_print(netdissect_options *ndo,
 {
         struct juniper_l2info_t l2info;
         struct juniper_ggsn_header {
-            u_int8_t svc_id;
-            u_int8_t flags_len;
-            u_int8_t proto;
-            u_int8_t flags;
-            u_int8_t vlan_id[2];
-            u_int8_t res[2];
+            uint8_t svc_id;
+            uint8_t flags_len;
+            uint8_t proto;
+            uint8_t flags;
+            uint8_t vlan_id[2];
+            uint8_t res[2];
         };
         const struct juniper_ggsn_header *gh;
 
@@ -501,12 +501,12 @@ juniper_es_print(netdissect_options *ndo,
 {
         struct juniper_l2info_t l2info;
         struct juniper_ipsec_header {
-            u_int8_t sa_index[2];
-            u_int8_t ttl;
-            u_int8_t type;
-            u_int8_t spi[4];
-            u_int8_t src_ip[4];
-            u_int8_t dst_ip[4];
+            uint8_t sa_index[2];
+            uint8_t ttl;
+            uint8_t type;
+            uint8_t spi[4];
+            uint8_t src_ip[4];
+            uint8_t dst_ip[4];
         };
         u_int rewrite_len,es_type_bundle;
         const struct juniper_ipsec_header *ih;
@@ -573,10 +573,10 @@ juniper_monitor_print(netdissect_options *ndo,
 {
         struct juniper_l2info_t l2info;
         struct juniper_monitor_header {
-            u_int8_t pkt_type;
-            u_int8_t padding;
-            u_int8_t iif[2];
-            u_int8_t service_id[4];
+            uint8_t pkt_type;
+            uint8_t padding;
+            uint8_t iif[2];
+            uint8_t service_id[4];
         };
         const struct juniper_monitor_header *mh;
 
@@ -607,10 +607,10 @@ juniper_services_print(netdissect_options *ndo,
 {
         struct juniper_l2info_t l2info;
         struct juniper_services_header {
-            u_int8_t svc_id;
-            u_int8_t flags_len;
-            u_int8_t svc_set_id[2];
-            u_int8_t dir_iif[4];
+            uint8_t svc_id;
+            uint8_t flags_len;
+            uint8_t svc_set_id[2];
+            uint8_t dir_iif[4];
         };
         const struct juniper_services_header *sh;
 
@@ -731,7 +731,7 @@ juniper_pppoe_atm_print(netdissect_options *ndo,
                         const struct pcap_pkthdr *h, register const u_char *p)
 {
         struct juniper_l2info_t l2info;
-	u_int16_t extracted_ethertype;
+	uint16_t extracted_ethertype;
 
         l2info.pictype = DLT_JUNIPER_PPPOE_ATM;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0)
@@ -926,7 +926,7 @@ u_int
 juniper_atm1_print(netdissect_options *ndo,
                    const struct pcap_pkthdr *h, register const u_char *p)
 {
-        u_int16_t extracted_ethertype;
+        uint16_t extracted_ethertype;
 
         struct juniper_l2info_t l2info;
 
@@ -975,7 +975,7 @@ u_int
 juniper_atm2_print(netdissect_options *ndo,
                    const struct pcap_pkthdr *h, register const u_char *p)
 {
-        u_int16_t extracted_ethertype;
+        uint16_t extracted_ethertype;
 
         struct juniper_l2info_t l2info;
 
@@ -1151,8 +1151,8 @@ juniper_parse_header(netdissect_options *ndo,
 
     const struct juniper_cookie_table_t *lp = juniper_cookie_table;
     u_int idx, jnx_ext_len, jnx_header_len = 0;
-    u_int8_t tlv_type,tlv_len;
-    u_int32_t control_word;
+    uint8_t tlv_type,tlv_len;
+    uint32_t control_word;
     int tlv_value;
     const u_char *tptr;
 

@@ -1359,7 +1359,7 @@ ppp_hdlc(netdissect_options *ndo,
         if (length <= 0)
                 return;
 
-	b = (u_int8_t *)malloc(length);
+	b = (uint8_t *)malloc(length);
 	if (b == NULL)
 		return;
 
@@ -1703,7 +1703,7 @@ ppp_bsdos_if_print(netdissect_options *ndo _U_,
 #ifdef __bsdi__
 	register u_int length = h->len;
 	register u_int caplen = h->caplen;
-	u_int16_t ptype;
+	uint16_t ptype;
 	const u_char *q;
 	int i;
 

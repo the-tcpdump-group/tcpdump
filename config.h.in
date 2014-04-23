@@ -184,9 +184,6 @@
 /* Define to 1 if the system has the type `struct ether_addr'. */
 #undef HAVE_STRUCT_ETHER_ADDR
 
-/* Define to 1 if you have the <sys/bitypes.h> header file. */
-#undef HAVE_SYS_BITYPES_H
-
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
 
@@ -336,18 +333,6 @@
 /* Define to the type of a signed integer type of width exactly 8 bits if such
    a type exists and the standard includes do not define it. */
 #undef int8_t
-
-/* Define to `unsigned short' if u_int16_t not defined. */
-#undef u_int16_t
-
-/* Define to `unsigned int' if u_int32_t not defined. */
-#undef u_int32_t
-
-/* Define to `unsigned long long' if u_int64_t not defined. */
-#undef u_int64_t
-
-/* Define to `unsigned char' if u_int8_t not defined. */
-#undef u_int8_t
 
 /* Define to the type of an unsigned integer type of width exactly 16 bits if
    such a type exists and the standard includes do not define it. */
