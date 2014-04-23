@@ -43,8 +43,8 @@ struct tcphdr {
 	uint16_t	th_dport;		/* destination port */
 	tcp_seq		th_seq;			/* sequence number */
 	tcp_seq		th_ack;			/* acknowledgement number */
-	uint8_t	th_offx2;		/* data offset, rsvd */
-	uint8_t	th_flags;
+	uint8_t		th_offx2;		/* data offset, rsvd */
+	uint8_t		th_flags;
 	uint16_t	th_win;			/* window */
 	uint16_t	th_sum;			/* checksum */
 	uint16_t	th_urp;			/* urgent pointer */

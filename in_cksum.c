@@ -63,7 +63,7 @@ in_cksum(const struct cksum_vec *vec, int veclen)
 	int byte_swapped = 0;
 
 	union {
-		uint8_t	c[2];
+		uint8_t		c[2];
 		uint16_t	s;
 	} s_util;
 	union {

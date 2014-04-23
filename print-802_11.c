@@ -172,9 +172,9 @@ static const struct tok ctrl_str[] = {
 struct mgmt_header_t {
 	uint16_t	fc;
 	uint16_t 	duration;
-	uint8_t	da[6];
-	uint8_t	sa[6];
-	uint8_t	bssid[6];
+	uint8_t		da[6];
+	uint8_t		sa[6];
+	uint8_t		bssid[6];
 	uint16_t	seq_ctrl;
 };
 
@@ -189,54 +189,54 @@ struct mgmt_header_t {
 #define	CAPABILITY_PRIVACY(cap)	((cap) & 0x0010)
 
 struct ssid_t {
-	uint8_t	element_id;
-	uint8_t	length;
+	uint8_t		element_id;
+	uint8_t		length;
 	u_char		ssid[33];  /* 32 + 1 for null */
 };
 
 struct rates_t {
-	uint8_t	element_id;
-	uint8_t	length;
-	uint8_t	rate[16];
+	uint8_t		element_id;
+	uint8_t		length;
+	uint8_t		rate[16];
 };
 
 struct challenge_t {
-	uint8_t	element_id;
-	uint8_t	length;
-	uint8_t	text[254]; /* 1-253 + 1 for null */
+	uint8_t		element_id;
+	uint8_t		length;
+	uint8_t		text[254]; /* 1-253 + 1 for null */
 };
 
 struct fh_t {
-	uint8_t	element_id;
-	uint8_t	length;
+	uint8_t		element_id;
+	uint8_t		length;
 	uint16_t	dwell_time;
-	uint8_t	hop_set;
+	uint8_t		hop_set;
 	uint8_t 	hop_pattern;
-	uint8_t	hop_index;
+	uint8_t		hop_index;
 };
 
 struct ds_t {
-	uint8_t	element_id;
-	uint8_t	length;
-	uint8_t	channel;
+	uint8_t		element_id;
+	uint8_t		length;
+	uint8_t		channel;
 };
 
 struct cf_t {
-	uint8_t	element_id;
-	uint8_t	length;
-	uint8_t	count;
-	uint8_t	period;
+	uint8_t		element_id;
+	uint8_t		length;
+	uint8_t		count;
+	uint8_t		period;
 	uint16_t	max_duration;
 	uint16_t	dur_remaing;
 };
 
 struct tim_t {
-	uint8_t	element_id;
-	uint8_t	length;
-	uint8_t	count;
-	uint8_t	period;
-	uint8_t	bitmap_control;
-	uint8_t	bitmap[251];
+	uint8_t		element_id;
+	uint8_t		length;
+	uint8_t		count;
+	uint8_t		period;
+	uint8_t		bitmap_control;
+	uint8_t		bitmap[251];
 };
 
 #define	E_SSID 		0
@@ -295,9 +295,9 @@ struct mgmt_body_t {
 struct ctrl_rts_t {
 	uint16_t	fc;
 	uint16_t	duration;
-	uint8_t	ra[6];
-	uint8_t	ta[6];
-	uint8_t	fcs[4];
+	uint8_t		ra[6];
+	uint8_t		ta[6];
+	uint8_t		fcs[4];
 };
 
 #define	CTRL_RTS_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
@@ -306,8 +306,8 @@ struct ctrl_rts_t {
 struct ctrl_cts_t {
 	uint16_t	fc;
 	uint16_t	duration;
-	uint8_t	ra[6];
-	uint8_t	fcs[4];
+	uint8_t		ra[6];
+	uint8_t		fcs[4];
 };
 
 #define	CTRL_CTS_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+IEEE802_11_RA_LEN)
@@ -315,8 +315,8 @@ struct ctrl_cts_t {
 struct ctrl_ack_t {
 	uint16_t	fc;
 	uint16_t	duration;
-	uint8_t	ra[6];
-	uint8_t	fcs[4];
+	uint8_t		ra[6];
+	uint8_t		fcs[4];
 };
 
 #define	CTRL_ACK_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+IEEE802_11_RA_LEN)
@@ -324,9 +324,9 @@ struct ctrl_ack_t {
 struct ctrl_ps_poll_t {
 	uint16_t	fc;
 	uint16_t	aid;
-	uint8_t	bssid[6];
-	uint8_t	ta[6];
-	uint8_t	fcs[4];
+	uint8_t		bssid[6];
+	uint8_t		ta[6];
+	uint8_t		fcs[4];
 };
 
 #define	CTRL_PS_POLL_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_AID_LEN+\
@@ -335,9 +335,9 @@ struct ctrl_ps_poll_t {
 struct ctrl_end_t {
 	uint16_t	fc;
 	uint16_t	duration;
-	uint8_t	ra[6];
-	uint8_t	bssid[6];
-	uint8_t	fcs[4];
+	uint8_t		ra[6];
+	uint8_t		bssid[6];
+	uint8_t		fcs[4];
 };
 
 #define	CTRL_END_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
@@ -346,9 +346,9 @@ struct ctrl_end_t {
 struct ctrl_end_ack_t {
 	uint16_t	fc;
 	uint16_t	duration;
-	uint8_t	ra[6];
-	uint8_t	bssid[6];
-	uint8_t	fcs[4];
+	uint8_t		ra[6];
+	uint8_t		bssid[6];
+	uint8_t		fcs[4];
 };
 
 #define	CTRL_END_ACK_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
@@ -357,8 +357,8 @@ struct ctrl_end_ack_t {
 struct ctrl_ba_t {
 	uint16_t	fc;
 	uint16_t	duration;
-	uint8_t	ra[6];
-	uint8_t	fcs[4];
+	uint8_t		ra[6];
+	uint8_t		fcs[4];
 };
 
 #define	CTRL_BA_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+IEEE802_11_RA_LEN)
@@ -366,11 +366,11 @@ struct ctrl_ba_t {
 struct ctrl_bar_t {
 	uint16_t	fc;
 	uint16_t	dur;
-	uint8_t	ra[6];
-	uint8_t	ta[6];
+	uint8_t		ra[6];
+	uint8_t		ta[6];
 	uint16_t	ctl;
 	uint16_t	seq;
-	uint8_t	fcs[4];
+	uint8_t		fcs[4];
 };
 
 #define	CTRL_BAR_HDRLEN		(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
@@ -378,12 +378,12 @@ struct ctrl_bar_t {
 				 IEEE802_11_CTL_LEN+IEEE802_11_SEQ_LEN)
 
 struct meshcntl_t {
-	uint8_t	flags;
-	uint8_t	ttl;
-	uint8_t	seq[4];
-	uint8_t	addr4[6];
-	uint8_t	addr5[6];
-	uint8_t	addr6[6];
+	uint8_t		flags;
+	uint8_t		ttl;
+	uint8_t		seq[4];
+	uint8_t		addr4[6];
+	uint8_t		addr5[6];
+	uint8_t		addr6[6];
 };
 
 #define	IV_IV(iv)	((iv) & 0xFFFFFF)
@@ -443,12 +443,12 @@ struct meshcntl_t {
  * Note well: all radiotap fields are little-endian.
  */
 struct ieee80211_radiotap_header {
-	uint8_t	it_version;	/* Version 0. Only increases
+	uint8_t		it_version;	/* Version 0. Only increases
 					 * for drastic changes,
 					 * introduction of compatible
 					 * new fields does not count.
 					 */
-	uint8_t	it_pad;
+	uint8_t		it_pad;
 	uint16_t       it_len;         /* length of the whole
 					 * header in bytes, including
 					 * it_version, it_pad,
@@ -553,8 +553,8 @@ struct ieee80211_radiotap_header {
  *
  * IEEE80211_RADIOTAP_XCHANNEL          uint32_t	bitmap
  *					uint16_t	MHz
- *					uint8_t	channel number
- *					uint8_t	.5 dBm
+ *					uint8_t		channel number
+ *					uint8_t		.5 dBm
  *
  *	Extended channel specification: flags (see below) followed by
  *	frequency in MHz, the corresponding IEEE channel number, and
@@ -562,9 +562,9 @@ struct ieee80211_radiotap_header {
  *	units.  This property supersedes IEEE80211_RADIOTAP_CHANNEL
  *	and only one of the two should be present.
  *
- * IEEE80211_RADIOTAP_MCS		uint8_t	known
- *					uint8_t	flags
- *					uint8_t	mcs
+ * IEEE80211_RADIOTAP_MCS		uint8_t		known
+ *					uint8_t		flags
+ *					uint8_t		mcs
  *
  *	Bitset indicating which fields have known values, followed
  *	by bitset of flag values, followed by the MCS rate index as
@@ -691,7 +691,7 @@ struct radiotap_state
 {
 	uint32_t	present;
 
-	uint8_t	rate;
+	uint8_t		rate;
 };
 
 #define PRINT_SSID(p) \
@@ -2506,7 +2506,7 @@ print_radiotap_field(netdissect_options *ndo,
 {
 	union {
 		int8_t		i8;
-		uint8_t	u8;
+		uint8_t		u8;
 		int16_t		i16;
 		uint16_t	u16;
 		uint32_t	u32;

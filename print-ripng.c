@@ -68,14 +68,14 @@
 struct netinfo6 {
 	struct in6_addr	rip6_dest;
 	uint16_t	rip6_tag;
-	uint8_t	rip6_plen;
-	uint8_t	rip6_metric;
+	uint8_t		rip6_plen;
+	uint8_t		rip6_metric;
 };
 
 struct	rip6 {
-	uint8_t	rip6_cmd;
-	uint8_t	rip6_vers;
-	uint8_t	rip6_res1[2];
+	uint8_t		rip6_cmd;
+	uint8_t		rip6_vers;
+	uint8_t		rip6_res1[2];
 	union {
 		struct	netinfo6	ru6_nets[1];
 		char	ru6_tracefile[1];

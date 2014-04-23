@@ -49,7 +49,7 @@ struct ip6_mobility {
 	uint16_t ip6m_cksum;	/* sum of IPv6 pseudo-header and MH */
 	union {
 		uint16_t	ip6m_un_data16[1]; /* type-specific field */
-		uint8_t	ip6m_un_data8[2];  /* type-specific fiedl */
+		uint8_t		ip6m_un_data8[2];  /* type-specific field */
 	} ip6m_dataun;
 };
 

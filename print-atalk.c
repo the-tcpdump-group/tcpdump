@@ -51,12 +51,12 @@ static const struct tok type2str[] = {
 
 struct aarp {
 	uint16_t	htype, ptype;
-	uint8_t	halen, palen;
+	uint8_t		halen, palen;
 	uint16_t	op;
-	uint8_t	hsaddr[6];
-	uint8_t	psaddr[4];
-	uint8_t	hdaddr[6];
-	uint8_t	pdaddr[4];
+	uint8_t		hsaddr[6];
+	uint8_t		psaddr[4];
+	uint8_t		hdaddr[6];
+	uint8_t		pdaddr[4];
 };
 
 static void atp_print(netdissect_options *, const struct atATP *, u_int);

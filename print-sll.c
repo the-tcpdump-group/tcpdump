@@ -81,7 +81,7 @@ struct sll_header {
 	uint16_t	sll_pkttype;	/* packet type */
 	uint16_t	sll_hatype;	/* link-layer address type */
 	uint16_t	sll_halen;	/* link-layer address length */
-	uint8_t	sll_addr[SLL_ADDRLEN];	/* link-layer address */
+	uint8_t		sll_addr[SLL_ADDRLEN];	/* link-layer address */
 	uint16_t	sll_protocol;	/* protocol */
 };
 

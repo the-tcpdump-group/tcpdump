@@ -39,8 +39,8 @@ struct tsp_timeval {
 };
 
 struct tsp {
-	uint8_t	tsp_type;
-	uint8_t	tsp_vers;
+	uint8_t		tsp_type;
+	uint8_t		tsp_vers;
 	uint16_t	tsp_seq;
 	union {
 		struct tsp_timeval tspu_time;

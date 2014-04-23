@@ -38,16 +38,16 @@
 #define _NETINET6_AH_H_
 
 struct ah {
-	uint8_t	ah_nxt;		/* Next Header */
-	uint8_t	ah_len;		/* Length of data, in 32bit */
+	uint8_t		ah_nxt;		/* Next Header */
+	uint8_t		ah_len;		/* Length of data, in 32bit */
 	uint16_t	ah_reserve;	/* Reserved for future use */
 	uint32_t	ah_spi;		/* Security parameter index */
 	/* variable size, 32bit bound*/	/* Authentication data */
 };
 
 struct newah {
-	uint8_t	ah_nxt;		/* Next Header */
-	uint8_t	ah_len;		/* Length of data + 1, in 32bit */
+	uint8_t		ah_nxt;		/* Next Header */
+	uint8_t		ah_len;		/* Length of data + 1, in 32bit */
 	uint16_t	ah_reserve;	/* Reserved for future use */
 	uint32_t	ah_spi;		/* Security parameter index */
 	uint32_t	ah_seq;		/* Sequence number field */

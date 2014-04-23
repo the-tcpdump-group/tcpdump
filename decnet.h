@@ -53,7 +53,7 @@ typedef union etheraddress etheraddr;	/* Ethernet address */
 #define DN_MAXADDL	20		/* max size of DECnet address */
 struct dn_naddr {
 	uint16_t	a_len;		/* length of address */
-	uint8_t a_addr[DN_MAXADDL]; /* address as bytes */
+	uint8_t		a_addr[DN_MAXADDL]; /* address as bytes */
 };
 
 /*

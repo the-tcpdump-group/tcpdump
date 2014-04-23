@@ -43,11 +43,11 @@
 struct dccp_hdr {
 	uint16_t	dccph_sport,
 			dccph_dport;
-	uint8_t	dccph_doff;
-	uint8_t	dccph_ccval_cscov;
+	uint8_t		dccph_doff;
+	uint8_t		dccph_ccval_cscov;
 	uint16_t	dccph_checksum;
-	uint8_t	dccph_xtr;
-	uint8_t	dccph_seq[3];
+	uint8_t		dccph_xtr;
+	uint8_t		dccph_seq[3];
 } UNALIGNED;
 
 /**
@@ -67,12 +67,12 @@ struct dccp_hdr {
 struct dccp_hdr_ext {
 	uint16_t	dccph_sport,
 			dccph_dport;
-	uint8_t	dccph_doff;
-	uint8_t	dccph_ccval_cscov;
+	uint8_t		dccph_doff;
+	uint8_t		dccph_ccval_cscov;
 	uint16_t	dccph_checksum;
-	uint8_t	dccph_xtr;
-	uint8_t	reserved;
-	uint8_t	dccph_seq[6];
+	uint8_t		dccph_xtr;
+	uint8_t		reserved;
+	uint8_t		dccph_seq[6];
 } UNALIGNED;
 
 #define DCCPH_CCVAL(dh)	(((dh)->dccph_ccval_cscov >> 4) & 0xF)
@@ -97,7 +97,7 @@ struct dccp_hdr_request {
  * @dccph_resp_service - Echoes the Service Code on a received DCCP-Request
  */
 struct dccp_hdr_response {
-	uint8_t			dccph_resp_ack[8];	/* always 8 bytes */
+	uint8_t				dccph_resp_ack[8];	/* always 8 bytes */
 	uint32_t			dccph_resp_service;
 } UNALIGNED;
 
@@ -108,8 +108,8 @@ struct dccp_hdr_response {
  * @dccph_reset_service - Echoes the Service Code on a received DCCP-Request
  */
 struct dccp_hdr_reset {
-	uint8_t			dccph_reset_ack[8];	/* always 8 bytes */
-	uint8_t			dccph_reset_code,
+	uint8_t				dccph_reset_ack[8];	/* always 8 bytes */
+	uint8_t				dccph_reset_code,
 					dccph_reset_data[3];
 } UNALIGNED;
 
