@@ -512,8 +512,8 @@ extern void print_data(netdissect_options *, const unsigned char *, int);
 extern void decnet_print(netdissect_options *, const u_char *, u_int, u_int);
 extern void tcp_print(netdissect_options *, const u_char *, u_int, const u_char *, int);
 extern void ospf_print(netdissect_options *, const u_char *, u_int, const u_char *);
-extern int ospf_print_te_lsa(netdissect_options *, const u_int8_t *, u_int);
-extern int ospf_print_grace_lsa(netdissect_options *, const u_int8_t *, u_int);
+extern int ospf_print_te_lsa(netdissect_options *, const uint8_t *, u_int);
+extern int ospf_print_grace_lsa(netdissect_options *, const uint8_t *, u_int);
 extern u_int ppp_print(netdissect_options *, register const u_char *, u_int);
 extern u_int ppp_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
 extern u_int ppp_hdlc_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
@@ -529,7 +529,7 @@ extern void m3ua_print(netdissect_options *, const u_char *, const u_int);
 extern void ascii_print(netdissect_options *,u_int);
 extern void default_print(netdissect_options *,const u_char *, u_int);
 extern char *smb_errstr(netdissect_options *,int, int);
-extern const char *nt_errstr(netdissect_options *, u_int32_t);
+extern const char *nt_errstr(netdissect_options *, uint32_t);
 #endif
 
 extern u_int ipnet_if_print(netdissect_options *,const struct pcap_pkthdr *, const u_char *);
@@ -557,13 +557,13 @@ extern void babel_print(netdissect_options *, const u_char *, u_int);
 
 #if 0
 struct cksum_vec {
-	const u_int8_t	*ptr;
+	const uint8_t	*ptr;
 	int		len;
 };
-extern u_int16_t in_cksum(const struct cksum_vec *, int);
-extern u_int16_t in_cksum_shouldbe(u_int16_t, u_int16_t);
+extern uint16_t in_cksum(const struct cksum_vec *, int);
+extern uint16_t in_cksum_shouldbe(uint16_t, uint16_t);
 #endif
-extern int nextproto4_cksum(netdissect_options *ndo, const struct ip *, const u_int8_t *, u_int, u_int, u_int);
+extern int nextproto4_cksum(netdissect_options *ndo, const struct ip *, const uint8_t *, u_int, u_int, u_int);
 extern int decode_prefix4(netdissect_options *ndo, const u_char *, u_int, char *, u_int);
 #ifdef INET6
 extern int decode_prefix6(netdissect_options *ndo, const u_char *, u_int, char *, u_int);

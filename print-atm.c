@@ -246,7 +246,7 @@ static void
 sig_print(netdissect_options *ndo,
           const u_char *p, int caplen)
 {
-	bpf_u_int32 call_ref;
+	uint32_t call_ref;
 
 	if (caplen < PROTO_POS) {
 		ND_PRINT((ndo, "%s", tstr));

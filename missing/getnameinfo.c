@@ -107,7 +107,7 @@ getnameinfo(sa, salen, host, hostlen, serv, servlen, flags)
 	u_short port;
 	int family, i;
 	char *addr, *p;
-	u_int32_t v4a;
+	uint32_t v4a;
 	int h_error;
 	char numserv[512];
 	char numaddr[512];
@@ -163,7 +163,7 @@ getnameinfo(sa, salen, host, hostlen, serv, servlen, flags)
 
 	switch (sa->sa_family) {
 	case AF_INET:
-		v4a = (u_int32_t)
+                v4a = (uint32_t)
 			ntohl(((struct sockaddr_in *)sa)->sin_addr.s_addr);
 		if (IN_MULTICAST(v4a) || IN_EXPERIMENTAL(v4a))
 			flags |= NI_NUMERICHOST;

@@ -117,7 +117,7 @@ extern int32_t thiszone;	/* seconds offset from gmt to local time */
 /* Bail if "var" was not captured */
 #define TCHECK(var) TCHECK2(var, sizeof(var))
 
-extern int mask2plen(u_int32_t);
+extern int mask2plen(uint32_t);
 extern const char *tok2strary_internal(const char **, int, const char *, int);
 #define	tok2strary(a,f,i) tok2strary_internal(a, sizeof(a)/sizeof(a[0]),f,i)
 
@@ -141,8 +141,8 @@ extern const char *dnnum_string(u_short);
 
 /* checksum routines */
 extern void init_checksum(void);
-extern u_int16_t verify_crc10_cksum(u_int16_t, const u_char *, int);
-extern u_int16_t create_osi_cksum(const u_int8_t *, int, int);
+extern uint16_t verify_crc10_cksum(uint16_t, const u_char *, int);
+extern uint16_t create_osi_cksum(const uint8_t *, int, int);
 
 /* The printer routines. */
 
@@ -150,18 +150,18 @@ extern u_int16_t create_osi_cksum(const u_int8_t *, int, int);
 
 extern char *q922_string(const u_char *);
 extern char *smb_errstr(int, int);
-extern const char *nt_errstr(u_int32_t);
+extern const char *nt_errstr(uint32_t);
 
 #ifdef INET6
 extern int mask62plen(const u_char *);
 #endif /*INET6*/
 
 struct cksum_vec {
-	const u_int8_t	*ptr;
+	const uint8_t	*ptr;
 	int		len;
 };
-extern u_int16_t in_cksum(const struct cksum_vec *, int);
-extern u_int16_t in_cksum_shouldbe(u_int16_t, u_int16_t);
+extern uint16_t in_cksum(const struct cksum_vec *, int);
+extern uint16_t in_cksum_shouldbe(uint16_t, uint16_t);
 
 #ifndef HAVE_BPF_DUMP
 struct bpf_program;

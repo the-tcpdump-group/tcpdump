@@ -44,7 +44,6 @@
 #include <stdio.h>
 #include <winsock2.h>
 #include <Ws2tcpip.h>
-#include "bittypes.h"
 #include <ctype.h>
 #include <time.h>
 #include <io.h>
@@ -55,6 +54,84 @@
 #ifndef NBBY
 #define NBBY	8
 #endif
+
+#ifndef uint8_t
+#define uint8_t		unsigned char
+#endif
+
+#ifndef int8_t
+#define int8_t		signed char
+#endif
+
+#ifndef uint16_t
+#define uint16_t	unsigned short
+#endif
+
+#ifndef int16_t
+#define int16_t		signed short
+#endif
+
+#ifndef uint32_t
+#define uint32_t	unsigned int
+#endif
+
+#ifndef int32_t
+#define int32_t		signed int
+#endif
+
+#ifdef _MSC_EXTENSIONS
+
+#ifndef uint64_t
+#define uint64_t	unsigned _int64
+#endif
+
+#ifndef int64_t
+#define int64_t		_int64
+#endif
+
+#ifndef PRId64
+#define PRId64		"I64d"
+#endif
+
+#ifndef PRIo64
+#define PRIo64		"I64o"
+#endif
+
+#ifndef PRIu64
+#define PRIu64		"I64u"
+#endif
+
+#ifndef PRIx64
+#define PRIx64		"I64x"
+#endif
+
+#else /* _MSC_EXTENSIONS */
+
+#ifndef uint64_t
+#define uint64_t	unsigned long long
+#endif
+
+#ifndef int64_t
+#define int64_t		long long
+#endif
+
+#ifndef PRId64
+#define PRId64		"lld"
+#endif
+
+#ifndef PRIo64
+#define PRIo64		"llo"
+#endif
+
+#ifndef PRIu64
+#define PRIu64		"llu"
+#endif
+
+#ifndef PRIx64
+#define PRIx64		"llx"
+#endif
+
+#endif /* _MSC_EXTENSIONS */
 
 #if !defined(__MINGW32__) && !defined(__WATCOMC__)
 #define stat _stat

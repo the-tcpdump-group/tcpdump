@@ -148,14 +148,14 @@
  * TOS metric struct (will be 0 or more in router links update)
  */
 struct tos_metric {
-    u_int8_t tos_type;
-    u_int8_t reserved;
-    u_int8_t tos_metric[2];
+    uint8_t tos_type;
+    uint8_t reserved;
+    uint8_t tos_metric[2];
 };
 struct tos_link {
-    u_int8_t link_type;
-    u_int8_t link_tos_count;
-    u_int8_t tos_metric[2];
+    uint8_t link_type;
+    uint8_t link_tos_count;
+    uint8_t tos_metric[2];
 };
 union un_tos {
     struct tos_link link;
@@ -164,20 +164,20 @@ union un_tos {
 
 /* link state advertisement header */
 struct lsa_hdr {
-    u_int16_t ls_age;
-    u_int8_t ls_options;
-    u_int8_t ls_type;
+    uint16_t ls_age;
+    uint8_t ls_options;
+    uint8_t ls_type;
     union {
         struct in_addr lsa_id;
         struct { /* opaque LSAs change the LSA-ID field */
-            u_int8_t opaque_type;
-            u_int8_t opaque_id[3];
+            uint8_t opaque_type;
+            uint8_t opaque_id[3];
 	} opaque_field;
     } un_lsa_id;
     struct in_addr ls_router;
-    u_int32_t ls_seq;
-    u_int16_t ls_chksum;
-    u_int16_t ls_length;
+    uint32_t ls_seq;
+    uint16_t ls_chksum;
+    uint16_t ls_length;
 };
 
 /* link state advertisement */
@@ -188,9 +188,9 @@ struct lsa {
     union {
 	/* Router links advertisements */
 	struct {
-	    u_int8_t rla_flags;
-	    u_int8_t rla_zero[1];
-	    u_int16_t rla_count;
+	    uint8_t rla_flags;
+	    uint8_t rla_zero[1];
+	    uint16_t rla_count;
 	    struct rlalink {
 		struct in_addr link_id;
 		struct in_addr link_data;
@@ -207,14 +207,14 @@ struct lsa {
 	/* Summary links advertisements */
 	struct {
 	    struct in_addr sla_mask;
-	    u_int32_t sla_tosmetric[1];	/* may repeat	*/
+	    uint32_t sla_tosmetric[1];	/* may repeat	*/
 	} un_sla;
 
 	/* AS external links advertisements */
 	struct {
 	    struct in_addr asla_mask;
 	    struct aslametric {
-		u_int32_t asla_tosmetric;
+		uint32_t asla_tosmetric;
 		struct in_addr asla_forward;
 		struct in_addr asla_tag;
 	    } asla_metric[1];		/* may repeat	*/
@@ -222,34 +222,34 @@ struct lsa {
 
 	/* Multicast group membership */
 	struct mcla {
-	    u_int32_t mcla_vtype;
+	    uint32_t mcla_vtype;
 	    struct in_addr mcla_vid;
 	} un_mcla[1];
 
         /* Opaque TE LSA */
         struct {
-	    u_int16_t type;
-	    u_int16_t length;
-	    u_int8_t data[1]; /* may repeat   */
+	    uint16_t type;
+	    uint16_t length;
+	    uint8_t data[1]; /* may repeat   */
 	} un_te_lsa_tlv;
 
         /* Opaque Grace LSA */
         struct {
-	    u_int16_t type;
-	    u_int16_t length;
-	    u_int8_t data[1]; /* may repeat   */
+	    uint16_t type;
+	    uint16_t length;
+	    uint8_t data[1]; /* may repeat   */
 	} un_grace_tlv;
 
         /* Opaque Router information LSA */
         struct {
-	    u_int16_t type;
-	    u_int16_t length;
-	    u_int8_t data[1]; /* may repeat   */
+	    uint16_t type;
+	    uint16_t length;
+	    uint8_t data[1]; /* may repeat   */
 	} un_ri_tlv;
 
         /* Unknown LSA */
         struct unknown {
-	    u_int8_t data[1]; /* may repeat   */
+	    uint8_t data[1]; /* may repeat   */
 	} un_unknown[1];
 
     } lsa_un;
@@ -261,23 +261,23 @@ struct lsa {
  * the main header
  */
 struct ospfhdr {
-    u_int8_t ospf_version;
-    u_int8_t ospf_type;
-    u_int16_t ospf_len;
+    uint8_t ospf_version;
+    uint8_t ospf_type;
+    uint16_t ospf_len;
     struct in_addr ospf_routerid;
     struct in_addr ospf_areaid;
-    u_int16_t ospf_chksum;
-    u_int16_t ospf_authtype;
-    u_int8_t ospf_authdata[OSPF_AUTH_SIZE];
+    uint16_t ospf_chksum;
+    uint16_t ospf_authtype;
+    uint8_t ospf_authdata[OSPF_AUTH_SIZE];
     union {
 
 	/* Hello packet */
 	struct {
 	    struct in_addr hello_mask;
-	    u_int16_t hello_helloint;
-	    u_int8_t hello_options;
-	    u_int8_t hello_priority;
-	    u_int32_t hello_deadint;
+	    uint16_t hello_helloint;
+	    uint8_t hello_options;
+	    uint8_t hello_priority;
+	    uint32_t hello_deadint;
 	    struct in_addr hello_dr;
 	    struct in_addr hello_bdr;
 	    struct in_addr hello_neighbor[1]; /* may repeat	*/
@@ -285,21 +285,21 @@ struct ospfhdr {
 
 	/* Database Description packet */
 	struct {
-	    u_int16_t db_ifmtu;
-	    u_int8_t db_options;
-	    u_int8_t db_flags;
-	    u_int32_t db_seq;
+	    uint16_t db_ifmtu;
+	    uint8_t db_options;
+	    uint8_t db_flags;
+	    uint32_t db_seq;
 	    struct lsa_hdr db_lshdr[1]; /* may repeat	*/
 	} un_db;
 
 	/* Link State Request */
 	struct lsr {
-	    u_int8_t ls_type[4];
+	    uint8_t ls_type[4];
             union {
                 struct in_addr ls_stateid;
                 struct { /* opaque LSAs change the LSA-ID field */
-                    u_int8_t opaque_type;
-                    u_int8_t opaque_id[3];
+                    uint8_t opaque_type;
+                    uint8_t opaque_id[3];
                 } opaque_field;
             } un_ls_stateid;
 	    struct in_addr ls_router;
@@ -307,7 +307,7 @@ struct ospfhdr {
 
 	/* Link State Update */
 	struct {
-	    u_int32_t lsu_count;
+	    uint32_t lsu_count;
 	    struct lsa lsu_lsa[1]; /* may repeat	*/
 	} un_lsu;
 

@@ -44,9 +44,9 @@ extern const char *getname(netdissect_options *, const u_char *);
 #ifdef INET6
 extern const char *getname6(netdissect_options *, const u_char *);
 #endif
-extern const char *intoa(u_int32_t);
+extern const char *intoa(uint32_t);
 
-extern void init_addrtoname(netdissect_options *, u_int32_t, u_int32_t);
+extern void init_addrtoname(netdissect_options *, uint32_t, uint32_t);
 extern struct hnamemem *newhnamemem(void);
 #ifdef INET6
 extern struct h6namemem *newh6namemem(void);
