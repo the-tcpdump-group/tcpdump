@@ -20,10 +20,10 @@
 
 
 struct bootp {
-	uint8_t	bp_op;		/* packet opcode type */
-	uint8_t	bp_htype;	/* hardware addr type */
-	uint8_t	bp_hlen;	/* hardware addr length */
-	uint8_t	bp_hops;	/* gateway hops */
+	uint8_t		bp_op;		/* packet opcode type */
+	uint8_t		bp_htype;	/* hardware addr type */
+	uint8_t		bp_hlen;	/* hardware addr length */
+	uint8_t		bp_hops;	/* gateway hops */
 	uint32_t	bp_xid;		/* transaction ID */
 	uint16_t	bp_secs;	/* seconds since boot began */
 	uint16_t	bp_flags;	/* flags - see bootp_flag_values[]
@@ -32,10 +32,10 @@ struct bootp {
 	struct in_addr	bp_yiaddr;	/* 'your' IP address */
 	struct in_addr	bp_siaddr;	/* server IP address */
 	struct in_addr	bp_giaddr;	/* gateway IP address */
-	uint8_t	bp_chaddr[16];	/* client hardware address */
-	uint8_t	bp_sname[64];	/* server host name */
-	uint8_t	bp_file[128];	/* boot file name */
-	uint8_t	bp_vend[64];	/* vendor-specific area */
+	uint8_t		bp_chaddr[16];	/* client hardware address */
+	uint8_t		bp_sname[64];	/* server host name */
+	uint8_t		bp_file[128];	/* boot file name */
+	uint8_t		bp_vend[64];	/* vendor-specific area */
 } UNALIGNED;
 
 /*
@@ -208,14 +208,14 @@ struct bootp {
  */
 
 struct cmu_vend {
-	uint8_t	v_magic[4];	/* magic number */
+	uint8_t		v_magic[4];	/* magic number */
 	uint32_t	v_flags;	/* flags/opcodes, etc. */
 	struct in_addr	v_smask;	/* Subnet mask */
 	struct in_addr	v_dgate;	/* Default gateway */
 	struct in_addr	v_dns1, v_dns2; /* Domain name servers */
 	struct in_addr	v_ins1, v_ins2; /* IEN-116 name servers */
 	struct in_addr	v_ts1, v_ts2;	/* Time servers */
-	uint8_t	v_unused[24];	/* currently unused */
+	uint8_t		v_unused[24];	/* currently unused */
 } UNALIGNED;
 
 
