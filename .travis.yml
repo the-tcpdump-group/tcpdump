@@ -30,7 +30,7 @@ addons:
     project:
       name: $TRAVIS_REPO_SLUG
     # Where email notification of build analysis results will be sent
-    notification_email: tcpdump-workers@lists.tcpdump.org
+    #notification_email: tcpdump-workers@lists.tcpdump.org
     # Commands to prepare for build_command
     build_command_prepend: ./configure
     # This command will be added as an argument to "cov-build" to compile
