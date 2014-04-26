@@ -31,8 +31,8 @@ ppi_header_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	hdr = (const ppi_header_t *)bp;
 
-	len = EXTRACT_16BITS(&hdr->ppi_len);
-	dlt = EXTRACT_32BITS(&hdr->ppi_dlt);
+	len = EXTRACT_LE_16BITS(&hdr->ppi_len);
+	dlt = EXTRACT_LE_32BITS(&hdr->ppi_dlt);
 
 	if (!ndo->ndo_qflag) {
 		ND_PRINT((ndo,", V.%d DLT %s (%d) len %d", hdr->ppi_ver,
@@ -61,7 +61,7 @@ ppi_print(netdissect_options *ndo,
 		return;
 	}
 	hdr = (ppi_header_t *)p;
-	dlt = EXTRACT_32BITS(&hdr->ppi_dlt);
+	dlt = EXTRACT_LE_32BITS(&hdr->ppi_dlt);
 
 	if (ndo->ndo_eflag)
 		ppi_header_print(ndo, p, length);
