@@ -6,7 +6,7 @@
 # GCC build and must reproduce correctly on any other GCC build regardless of
 # the architecture.
 
-if grep '^CC = gcc$' ../Makefile >/dev/null
+if grep '^CC = .*gcc' ../Makefile >/dev/null
 then
   ./TESTonce lmp-v lmp.pcap lmp-v.out '-t -T lmp -v'
 else
