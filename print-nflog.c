@@ -39,8 +39,10 @@
 
 static const struct tok nflog_values[] = {
 	{ AF_INET,		"IPv4" },
+#ifdef INET6
 	{ AF_INET6,		"IPv6" },
-	{ 0,				NULL }
+#endif /*INET6*/
+	{ 0,			NULL }
 };
 
 static inline void
