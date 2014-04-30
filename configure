@@ -3779,6 +3779,7 @@ $as_echo "$ac_cv___attribute___format_function_pointer" >&6; }
 
 	fi
 fi
+
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -5458,6 +5459,19 @@ else
   case " $LIBOBJS " in
   *" strsep.$ac_objext "* ) ;;
   *) LIBOBJS="$LIBOBJS strsep.$ac_objext"
+ ;;
+esac
+
+fi
+
+ac_fn_c_check_func "$LINENO" "getopt_long" "ac_cv_func_getopt_long"
+if test "x$ac_cv_func_getopt_long" = xyes; then :
+  $as_echo "#define HAVE_GETOPT_LONG 1" >>confdefs.h
+
+else
+  case " $LIBOBJS " in
+  *" getopt_long.$ac_objext "* ) ;;
+  *) LIBOBJS="$LIBOBJS getopt_long.$ac_objext"
  ;;
 esac
 

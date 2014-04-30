@@ -359,7 +359,7 @@
 			</FileConfiguration>
 		</File>
 		<File
-			RelativePath="..\Src\getopt.c"
+			RelativePath="..\..\missing\getopt_long.c"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"

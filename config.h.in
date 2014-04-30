@@ -28,6 +28,9 @@
 /* Define to 1 if you have the `getnameinfo' function. */
 #undef HAVE_GETNAMEINFO
 
+/* Define to 1 if you have the `getopt_long' function. */
+#undef HAVE_GETOPT_LONG
+
 /* define if you have getrpcbynumber() */
 #undef HAVE_GETRPCBYNUMBER
 

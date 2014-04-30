@@ -46,7 +46,6 @@ The Regents of the University of California.  All rights reserved.\n";
 #include <tcpdump-stdinc.h>
 
 #ifdef WIN32
-#include "getopt.h"
 #include "w32_fzs.h"
 extern int strcasecmp (const char *__s1, const char *__s2);
 extern int SIZE_BUF;
@@ -58,6 +57,11 @@ extern int SIZE_BUF;
 #include <smi.h>
 #endif
 
+#ifdef HAVE_GETOPT_LONG
+#include <getopt.h>
+#else
+#include "getopt.h"
+#endif
 #include <pcap.h>
 #include <signal.h>
 #include <stdio.h>
@@ -599,6 +603,70 @@ show_devices_and_exit (void)
 #define Q_FLAG
 #endif
 
+static struct option longopts[] = {
+	{ NULL, no_argument, NULL, 'a' },
+	{ NULL, no_argument, NULL, 'A' },
+	{ NULL, no_argument, NULL, 'b' },
+#if defined(HAVE_PCAP_CREATE) || defined(WIN32)
+	{ NULL, required_argument, NULL, 'B' },
+#endif
+	{ NULL, required_argument, NULL, 'c' },
+	{ NULL, required_argument, NULL, 'C' },
+	{ NULL, no_argument, NULL, 'd' },
+	{ NULL, no_argument, NULL, 'D' },
+	{ NULL, no_argument, NULL, 'L' },
+	{ NULL, no_argument, NULL, 'e' },
+	{ NULL, required_argument, NULL, 'E' },
+	{ NULL, no_argument, NULL, 'f' },
+	{ NULL, required_argument, NULL, 'F' },
+	{ NULL, required_argument, NULL, 'G' },
+	{ NULL, no_argument, NULL, 'h' },
+	{ NULL, no_argument, NULL, 'H' },
+	{ NULL, required_argument, NULL, 'i' },
+#ifdef HAVE_PCAP_CREATE
+	{ NULL, no_argument, NULL, 'I' },
+#endif
+#ifdef HAVE_PCAP_SET_TSTAMP_TYPE
+	{ NULL, required_argument, NULL, 'j' },
+	{ NULL, no_argument, NULL, 'J' },
+#endif
+	{ NULL, no_argument, NULL, 'l' },
+	{ NULL, no_argument, NULL, 'K' },
+	{ NULL, required_argument, NULL, 'm' },
+	{ NULL, required_argument, NULL, 'M' },
+	{ NULL, no_argument, NULL, 'n' },
+	{ NULL, no_argument, NULL, 'N' },
+	{ NULL, no_argument, NULL, 'O' },
+	{ NULL, no_argument, NULL, 'p' },
+	{ NULL, no_argument, NULL, 'q' },
+#ifdef HAVE_PCAP_SETDIRECTION
+	{ NULL, required_argument, NULL, 'Q' },
+#endif
+	{ NULL, required_argument, NULL, 'r' },
+	{ NULL, no_argument, NULL, 'R' },
+	{ NULL, required_argument, NULL, 's' },
+	{ NULL, no_argument, NULL, 'S' },
+	{ NULL, no_argument, NULL, 't' },
+	{ NULL, required_argument, NULL, 'T' },
+	{ NULL, no_argument, NULL, 'u' },
+#ifdef HAVE_PCAP_DUMP_FLUSH
+	{ NULL, no_argument, NULL, 'U' },
+#endif
+	{ NULL, no_argument, NULL, 'v' },
+	{ NULL, required_argument, NULL, 'V' },
+	{ NULL, required_argument, NULL, 'w' },
+	{ NULL, required_argument, NULL, 'W' },
+	{ NULL, no_argument, NULL, 'x' },
+	{ NULL, no_argument, NULL, 'X' },
+	{ NULL, required_argument, NULL, 'y' },
+#if defined(HAVE_PCAP_DEBUG) || defined(HAVE_YYDEBUG)
+	{ NULL, no_argument, NULL, 'Y' },
+#endif
+	{ NULL, required_argument, NULL, 'z' },
+	{ NULL, required_argument, NULL, 'Z' },
+	{ NULL, 0, NULL, 0 }
+};
+
 #ifndef WIN32
 /* Drop root privileges and chroot if necessary */
 static void
@@ -817,7 +885,7 @@ main(int argc, char **argv)
 #endif
 
 	while (
-	    (op = getopt(argc, argv, "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOpq" Q_FLAG "r:Rs:StT:u" U_FLAG "vV:w:W:xXy:Yz:Z:")) != -1)
+	    (op = getopt_long(argc, argv, "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOpq" Q_FLAG "r:Rs:StT:u" U_FLAG "vV:w:W:xXy:Yz:Z:", longopts, NULL)) != -1)
 		switch (op) {
 
 		case 'a':

@@ -113,7 +113,7 @@ SOURCE=..\..\missing\dlnames.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\Src\getopt.c
+SOURCE=..\..\missing\getopt.c
 # End Source File
 # Begin Source File
 

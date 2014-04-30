@@ -236,6 +236,7 @@ HDR = \
 	ether.h \
 	ethertype.h \
 	extract.h \
+	getopt.h \
 	gmpls.h \
 	gmt2local.h \
 	interface.h \
@@ -312,6 +313,7 @@ EXTRA_DIST = \
 	missing/dlnames.c \
 	missing/datalinks.c \
 	missing/getnameinfo.c \
+	missing/getopt_long.c \
 	missing/inet_aton.c \
 	missing/inet_ntop.c \
 	missing/inet_pton.c \
@@ -342,9 +344,7 @@ EXTRA_DIST = \
 	tcpdump.1.in \
 	vfprintf.c \
 	win32/Include/errno.h \
-	win32/Include/getopt.h \
 	win32/Include/w32_fzs.h \
-	win32/Src/getopt.c \
 	win32/prj/GNUmakefile \
 	win32/prj/WinDump.dsp \
 	win32/prj/WinDump.dsw
@@ -368,6 +368,8 @@ dlnames.o: $(srcdir)/missing/dlnames.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/dlnames.c
 getnameinfo.o: $(srcdir)/missing/getnameinfo.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/getnameinfo.c
+getopt_long.o: $(srcdir)/missing/getopt_long.c
+	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/getopt_long.c
 inet_pton.o: $(srcdir)/missing/inet_pton.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/inet_pton.c
 inet_ntop.o: $(srcdir)/missing/inet_ntop.c
