@@ -79,6 +79,9 @@
 #define W_PREFIX	2
 #endif
 
+char *optarg;
+int optind, opterr, optopt;
+
 static int getopt_internal(int, char * const *, const char *,
 			   const struct option *, int *, int);
 static int parse_long_options(char * const *, const char *,
