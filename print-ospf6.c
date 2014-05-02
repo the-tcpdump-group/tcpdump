@@ -235,60 +235,53 @@ struct ospf6hdr {
     uint16_t ospf6_chksum;
     uint8_t ospf6_instanceid;
     uint8_t ospf6_rsvd;
-    union {
-
-	/* Hello packet */
-	struct {
-	    uint32_t hello_ifid;
-	    union {
-		uint8_t pri;
-		uint32_t opt;
-	    } hello_priandopt;
-#define hello_priority	hello_priandopt.pri
-#define hello_options	hello_priandopt.opt
-	    uint16_t hello_helloint;
-	    uint16_t hello_deadint;
-	    rtrid_t hello_dr;
-	    rtrid_t hello_bdr;
-	    rtrid_t hello_neighbor[1]; /* may repeat	*/
-	} un_hello;
-
-	/* Database Description packet */
-	struct {
-	    uint32_t db_options;
-	    uint16_t db_mtu;
-	    uint8_t db_mbz;
-	    uint8_t db_flags;
-	    uint32_t db_seq;
-	    struct lsa6_hdr db_lshdr[1]; /* may repeat	*/
-	} un_db;
-
-	/* Link State Request */
-	struct lsr6 {
-	    uint16_t ls_mbz;
-	    uint16_t ls_type;
-	    rtrid_t ls_stateid;
-	    rtrid_t ls_router;
-	} un_lsr[1];		/* may repeat	*/
-
-	/* Link State Update */
-	struct {
-	    uint32_t lsu_count;
-	    struct lsa6 lsu_lsa[1]; /* may repeat	*/
-	} un_lsu;
-
-	/* Link State Acknowledgement */
-	struct {
-	    struct lsa6_hdr lsa_lshdr[1]; /* may repeat	*/
-	} un_lsa ;
-    } ospf6_un ;
 };
 
-#define	ospf6_hello	ospf6_un.un_hello
-#define	ospf6_db	ospf6_un.un_db
-#define	ospf6_lsr	ospf6_un.un_lsr
-#define	ospf6_lsu	ospf6_un.un_lsu
-#define	ospf6_lsa	ospf6_un.un_lsa
+/*
+ * The OSPF6 header length is 16 bytes, regardless of how your compiler
+ * might choose to pad the above structure.
+ */
+#define OSPF6HDR_LEN    16
+
+/* Hello packet */
+struct hello6 {
+    uint32_t hello_ifid;
+    union {
+	uint8_t pri;
+	uint32_t opt;
+    } hello_priandopt;
+#define hello_priority	hello_priandopt.pri
+#define hello_options	hello_priandopt.opt
+    uint16_t hello_helloint;
+    uint16_t hello_deadint;
+    rtrid_t hello_dr;
+    rtrid_t hello_bdr;
+    rtrid_t hello_neighbor[1]; /* may repeat	*/
+};
+
+/* Database Description packet */
+struct dd6 {
+    uint32_t db_options;
+    uint16_t db_mtu;
+    uint8_t db_mbz;
+    uint8_t db_flags;
+    uint32_t db_seq;
+    struct lsa6_hdr db_lshdr[1]; /* may repeat	*/
+};
+
+/* Link State Request */
+struct lsr6 {
+    uint16_t ls_mbz;
+    uint16_t ls_type;
+    rtrid_t ls_stateid;
+    rtrid_t ls_router;
+};
+
+/* Link State Update */
+struct lsu6 {
+    uint32_t lsu_count;
+    struct lsa6 lsu_lsa[1]; /* may repeat	*/
+};
 
 static const char tstr[] = " [|ospf3]";
 
@@ -738,29 +731,31 @@ ospf6_decode_v3(netdissect_options *ndo,
 
 	switch (op->ospf6_type) {
 
-	case OSPF_TYPE_HELLO:
+	case OSPF_TYPE_HELLO: {
+		register const struct hello6 *hellop = (const struct hello6 *)((uint8_t *)op + OSPF6HDR_LEN);
+
 		ND_PRINT((ndo, "\n\tOptions [%s]",
 		          bittok2str(ospf6_option_values, "none",
-		          EXTRACT_32BITS(&op->ospf6_hello.hello_options))));
+		          EXTRACT_32BITS(&hellop->hello_options))));
 
-		ND_TCHECK(op->ospf6_hello.hello_deadint);
+		ND_TCHECK(hellop->hello_deadint);
 		ND_PRINT((ndo, "\n\t  Hello Timer %us, Dead Timer %us, Interface-ID %s, Priority %u",
-		          EXTRACT_16BITS(&op->ospf6_hello.hello_helloint),
-		          EXTRACT_16BITS(&op->ospf6_hello.hello_deadint),
-		          ipaddr_string(ndo, &op->ospf6_hello.hello_ifid),
-		          op->ospf6_hello.hello_priority));
+		          EXTRACT_16BITS(&hellop->hello_helloint),
+		          EXTRACT_16BITS(&hellop->hello_deadint),
+		          ipaddr_string(ndo, &hellop->hello_ifid),
+		          hellop->hello_priority));
 
-		ND_TCHECK(op->ospf6_hello.hello_dr);
-		if (EXTRACT_32BITS(&op->ospf6_hello.hello_dr) != 0)
+		ND_TCHECK(hellop->hello_dr);
+		if (EXTRACT_32BITS(&hellop->hello_dr) != 0)
 			ND_PRINT((ndo, "\n\t  Designated Router %s",
-			    ipaddr_string(ndo, &op->ospf6_hello.hello_dr)));
-		ND_TCHECK(op->ospf6_hello.hello_bdr);
-		if (EXTRACT_32BITS(&op->ospf6_hello.hello_bdr) != 0)
+			    ipaddr_string(ndo, &hellop->hello_dr)));
+		ND_TCHECK(hellop->hello_bdr);
+		if (EXTRACT_32BITS(&hellop->hello_bdr) != 0)
 			ND_PRINT((ndo, ", Backup Designated Router %s",
-			    ipaddr_string(ndo, &op->ospf6_hello.hello_bdr)));
+			    ipaddr_string(ndo, &hellop->hello_bdr)));
 		if (ndo->ndo_vflag > 1) {
 			ND_PRINT((ndo, "\n\t  Neighbor List:"));
-			ap = op->ospf6_hello.hello_neighbor;
+			ap = hellop->hello_neighbor;
 			while ((u_char *)ap < dataend) {
 				ND_TCHECK(*ap);
 				ND_PRINT((ndo, "\n\t    %s", ipaddr_string(ndo, ap)));
@@ -768,33 +763,37 @@ ospf6_decode_v3(netdissect_options *ndo,
 			}
 		}
 		break;	/* HELLO */
+	}
 
-	case OSPF_TYPE_DD:
-		ND_TCHECK(op->ospf6_db.db_options);
+	case OSPF_TYPE_DD: {
+		register const struct dd6 *ddp = (const struct dd6 *)((uint8_t *)op + OSPF6HDR_LEN);
+
+		ND_TCHECK(ddp->db_options);
 		ND_PRINT((ndo, "\n\tOptions [%s]",
 		          bittok2str(ospf6_option_values, "none",
-		          EXTRACT_32BITS(&op->ospf6_db.db_options))));
-		ND_TCHECK(op->ospf6_db.db_flags);
+		          EXTRACT_32BITS(&ddp->db_options))));
+		ND_TCHECK(ddp->db_flags);
 		ND_PRINT((ndo, ", DD Flags [%s]",
-		          bittok2str(ospf6_dd_flag_values,"none",op->ospf6_db.db_flags)));
+		          bittok2str(ospf6_dd_flag_values,"none",ddp->db_flags)));
 
-		ND_TCHECK(op->ospf6_db.db_seq);
+		ND_TCHECK(ddp->db_seq);
 		ND_PRINT((ndo, ", MTU %u, DD-Sequence 0x%08x",
-                       EXTRACT_16BITS(&op->ospf6_db.db_mtu),
-                       EXTRACT_32BITS(&op->ospf6_db.db_seq)));
+                       EXTRACT_16BITS(&ddp->db_mtu),
+                       EXTRACT_32BITS(&ddp->db_seq)));
 		if (ndo->ndo_vflag > 1) {
 			/* Print all the LS adv's */
-			lshp = op->ospf6_db.db_lshdr;
+			lshp = ddp->db_lshdr;
 			while ((u_char *)lshp < dataend) {
 				if (ospf6_print_lshdr(ndo, lshp++, dataend))
 					goto trunc;
 			}
 		}
 		break;
+	}
 
 	case OSPF_TYPE_LS_REQ:
 		if (ndo->ndo_vflag > 1) {
-			lsrp = op->ospf6_lsr;
+			lsrp = (const struct lsr6 *)((uint8_t *)op + OSPF6HDR_LEN);
 			while ((u_char *)lsrp < dataend) {
 				ND_TCHECK(*lsrp);
 				ND_PRINT((ndo, "\n\t  Advertising Router %s",
@@ -808,9 +807,11 @@ ospf6_decode_v3(netdissect_options *ndo,
 
 	case OSPF_TYPE_LS_UPDATE:
 		if (ndo->ndo_vflag > 1) {
-			lsap = op->ospf6_lsu.lsu_lsa;
-			ND_TCHECK(op->ospf6_lsu.lsu_count);
-			i = EXTRACT_32BITS(&op->ospf6_lsu.lsu_count);
+			register const struct lsu6 *lsup = (const struct lsu6 *)((uint8_t *)op + OSPF6HDR_LEN);
+
+			ND_TCHECK(lsup->lsu_count);
+			i = EXTRACT_32BITS(&lsup->lsu_count);
+			lsap = lsup->lsu_lsa;
 			while ((u_char *)lsap < dataend && i--) {
 				if (ospf6_print_lsa(ndo, lsap, dataend))
 					goto trunc;
@@ -820,10 +821,9 @@ ospf6_decode_v3(netdissect_options *ndo,
 		}
 		break;
 
-
 	case OSPF_TYPE_LS_ACK:
 		if (ndo->ndo_vflag > 1) {
-			lshp = op->ospf6_lsa.lsa_lshdr;
+			lshp = (const struct lsa6_hdr *)((uint8_t *)op + OSPF6HDR_LEN);
 			while ((u_char *)lshp < dataend) {
 				if (ospf6_print_lshdr(ndo, lshp++, dataend))
 					goto trunc;
@@ -927,11 +927,18 @@ ospf6_decode_v3_trailer(netdissect_options *ndo,
                         const struct ospf6hdr *op, const u_char *cp, const unsigned len)
 {
 	int llslen = 0;
-	u_char lls_hello = op->ospf6_type == OSPF_TYPE_HELLO &&
-	                   EXTRACT_32BITS(&op->ospf6_hello.hello_options) & OSPF6_OPTION_L;
-	u_char lls_dd    = op->ospf6_type == OSPF_TYPE_DD &&
-	                   EXTRACT_32BITS(&op->ospf6_db.db_options) & OSPF6_OPTION_L;
+	int lls_hello = 0;
+	int lls_dd = 0;
 
+	if (op->ospf6_type == OSPF_TYPE_HELLO) {
+		const struct hello6 *hellop = (const struct hello6 *)((uint8_t *)op + OSPF6HDR_LEN);
+		if (EXTRACT_32BITS(&hellop->hello_options) & OSPF6_OPTION_L)
+			lls_hello = 1;
+	} else if (op->ospf6_type == OSPF_TYPE_DD) {
+		const struct dd6 *ddp = (const struct dd6 *)((uint8_t *)op + OSPF6HDR_LEN);
+		if (EXTRACT_32BITS(&ddp->db_options) & OSPF6_OPTION_L)
+			lls_dd = 1;
+	}
 	if ((lls_hello || lls_dd) && (llslen = ospf6_print_lls(ndo, cp, len)) < 0)
 		goto trunc;
 	return ospf6_decode_at(ndo, cp + llslen, len - llslen);
