@@ -8,7 +8,7 @@
 
 if grep '^CC = .*gcc' ../Makefile >/dev/null
 then
-  ./TESTonce lmp-v lmp.pcap lmp-v.out '-t -T lmp -v'
+	perl ./TESTonce lmp-v lmp.pcap lmp-v.out '-t -T lmp -v'
 else
 	printf '    %-30s: TEST SKIPPED (compiler is not GCC)\n' 'lmp-v'
 fi

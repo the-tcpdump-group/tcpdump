@@ -32,7 +32,7 @@ runSimpleTests()
       '') continue;;
     esac
     [ "$only" != "" -a "$name" != "$only" ] && continue
-    if ./TESTonce $name $input $output "$options"
+    if perl ./TESTonce $name $input $output "$options"
     then
       passed=`expr $passed + 1`
       echo $passed >.passed
