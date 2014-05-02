@@ -41,12 +41,15 @@
 
 #ifdef WIN32
 
+#include <stdint.h>
 #include <stdio.h>
 #include <winsock2.h>
-#include <Ws2tcpip.h>
+#include <ws2tcpip.h>
+#include "bittypes.h"   /* in wpcap's Win32/include */
 #include <ctype.h>
 #include <time.h>
 #include <io.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <net/netdb.h>  /* in wpcap's Win32/include */
@@ -133,18 +136,14 @@
 
 #endif /* _MSC_EXTENSIONS */
 
-#if !defined(__MINGW32__) && !defined(__WATCOMC__)
+#ifdef _MSC_VER
 #define stat _stat
 #define open _open
 #define fstat _fstat
 #define read _read
 #define close _close
 #define O_RDONLY _O_RDONLY
-#endif /* __MINGW32__ */
-
-#ifdef __MINGW32__
-#include <stdint.h>
-#endif
+#endif  /* _MSC_VER */
 
 /* Protos for missing/x.c functions (ideally <missing/addrinfo.h>
  * should be used, but it clashes with <ws2tcpip.h>).
@@ -162,6 +161,12 @@ extern int inet_aton (const char *cp, struct in_addr *addr);
 
 #ifndef INET6_ADDRSTRLEN
 #define INET6_ADDRSTRLEN 46
+#endif
+
+/* It is in MSVC's <errno.h>, but not defined in MingW+Watcom.
+ */
+#ifndef EAFNOSUPPORT
+#define EAFNOSUPPORT WSAEAFNOSUPPORT
 #endif
 
 #ifndef caddr_t
@@ -233,10 +238,11 @@ typedef char* caddr_t;
  * Note: this also requires that padding be put into the structure,
  * at least for compilers where it's implemented as __attribute__((packed)).
  */
-#if defined(_MSC_VER) && defined(UNALIGNED)
-/* MSVC may have its own macro defined with the same name and purpose. */
-#else
+#if defined(__GNUC__)
+#undef UNALIGNED
 #define UNALIGNED	__attribute__((packed))
+#else
+ /* MSVC may have its own macro defined with the same name and purpose. */
 #endif
 
 #if defined(WIN32) || defined(MSDOS)
