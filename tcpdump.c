@@ -614,11 +614,15 @@ static struct option longopts[] = {
 	{ NULL, required_argument, NULL, 'C' },
 	{ NULL, no_argument, NULL, 'd' },
 	{ NULL, no_argument, NULL, 'D' },
-	{ NULL, no_argument, NULL, 'L' },
 	{ NULL, no_argument, NULL, 'e' },
 	{ NULL, required_argument, NULL, 'E' },
 	{ NULL, no_argument, NULL, 'f' },
 	{ NULL, required_argument, NULL, 'F' },
+	/*
+	 * NOTE: OS X tcpdump uses -g; we shouldn't use it except for
+	 * the same purpose (forcing non--v output for IP to be on one
+	 * line, making it more "g"repable).
+	 */
 	{ NULL, required_argument, NULL, 'G' },
 	{ NULL, no_argument, NULL, 'h' },
 	{ NULL, no_argument, NULL, 'H' },
@@ -630,14 +634,28 @@ static struct option longopts[] = {
 	{ NULL, required_argument, NULL, 'j' },
 	{ NULL, no_argument, NULL, 'J' },
 #endif
-	{ NULL, no_argument, NULL, 'l' },
+	/*
+	 * NOTE: OS X tcpdump uses -k; we shouldn't use it except for
+	 * the same purpose (printing packet comments in pcap-ng files).
+	 */
 	{ NULL, no_argument, NULL, 'K' },
+	{ NULL, no_argument, NULL, 'l' },
+	{ NULL, no_argument, NULL, 'L' },
 	{ NULL, required_argument, NULL, 'm' },
 	{ NULL, required_argument, NULL, 'M' },
 	{ NULL, no_argument, NULL, 'n' },
 	{ NULL, no_argument, NULL, 'N' },
+	/*
+	 * NOTE: OpenBSD tcpdump uses -o; we shouldn't use it except for 
+	 * the same purpose (trying to do OS fingerprinting for
+	 * hosts sending TCP SYN packets).
+	 */
 	{ NULL, no_argument, NULL, 'O' },
 	{ NULL, no_argument, NULL, 'p' },
+	/*
+	 * NOTE: OS X tcpdump uses -P; we shouldn't use it except for
+	 * the same purpose (writing pcap-ng rather than pcap files).
+	 */
 	{ NULL, no_argument, NULL, 'q' },
 #ifdef HAVE_PCAP_SETDIRECTION
 	{ NULL, required_argument, NULL, 'Q' },
