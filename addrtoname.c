@@ -756,7 +756,7 @@ init_servarray(netdissect_options *ndo)
 
 /* in libpcap.a (nametoaddr.c) */
 #if defined(WIN32) && !defined(USE_STATIC_LIBPCAP)
-__declspec(dllimport)
+extern __declspec(dllimport)
 #else
 extern
 #endif
