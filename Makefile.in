@@ -343,7 +343,6 @@ EXTRA_DIST = \
 	strcasecmp.c \
 	tcpdump.1.in \
 	vfprintf.c \
-	win32/Include/errno.h \
 	win32/Include/w32_fzs.h \
 	win32/prj/GNUmakefile \
 	win32/prj/WinDump.dsp \
