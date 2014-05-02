@@ -216,10 +216,10 @@ notation.
 Set the operating system capture buffer size to \fIbuffer_size\fP, in
 units of KiB (1024 bytes).
 .TP
-.B \-c
+.BI \-c " count"
 Exit after receiving \fIcount\fP packets.
 .TP
-.B \-C
+.BI \-C " file_size"
 Before writing a raw packet to a savefile, check whether the file is
 currently larger than \fIfile_size\fP and, if so, close the current
 savefile and open a new one.  Savefiles after the first savefile will
@@ -230,10 +230,6 @@ The units of \fIfile_size\fP are millions of bytes (1,000,000 bytes,
 not 1,048,576 bytes).
 .TP
 .B \-d
-.PD 0
-.TP
-.B \-\-list\-interfaces
-.PD
 Dump the compiled packet-matching code in a human readable form to
 standard output and stop.
 .TP
@@ -246,6 +242,10 @@ program fragment.
 Dump packet-matching code as decimal numbers (preceded with a count).
 .TP
 .B \-D
+.PD 0
+.TP
+.B \-\-list\-interfaces
+.PD
 Print the list of the network interfaces available on the system and on
 which
 .I tcpdump
@@ -325,11 +325,11 @@ because the capture is being done on the Linux "any" interface, which
 can capture on more than one interface, this option will not work
 correctly.
 .TP
-.B \-F
+.BI \-F " file"
 Use \fIfile\fP as input for the filter expression.
 An additional expression given on the command line is ignored.
 .TP
-.B \-G
+.BI \-G " rotate_seconds"
 If specified, rotates the dump file specified with the
 .B \-w
 option every \fIrotate_seconds\fP seconds.
@@ -483,12 +483,12 @@ and another set of data link types when in monitor mode (for example, it
 might support 802.11 headers, or 802.11 headers with radio information,
 only in monitor mode).
 .TP
-.B \-m
+.BI \-m " module"
 Load SMI MIB module definitions from file \fImodule\fR.
 This option
 can be used several times to load several MIB modules into \fItcpdump\fP.
 .TP
-.B \-M
+.BI \-M " secret"
 Use \fIsecret\fP as a shared secret for validating the digests found in
 TCP segments with the TCP-MD5 option (RFC 2385), if present.
 .TP
@@ -541,10 +541,10 @@ If specified, \fItcpdump\fP will not print replay prevention field.
 Since there is no protocol version field in ESP/AH specification,
 \fItcpdump\fP cannot deduce the version of ESP/AH protocol.
 .TP
-.B \-r
+.BI \-r " file"
 Read packets from \fIfile\fR (which was created with the
 .B \-w
-option).
+option or by other tools that write pcap or pcap-ng files).
 Standard input is used if \fIfile\fR is ``-''.
 .TP
 .B \-S
@@ -576,7 +576,7 @@ Setting
 for backwards compatibility with recent older versions of
 .IR tcpdump .
 .TP
-.B \-T
+.BI \-T " type"
 Force packets selected by "\fIexpression\fP" to be interpreted the
 specified \fItype\fR.
 Currently known types are
@@ -683,11 +683,11 @@ With
 .B \-X
 Telnet options are printed in hex as well.
 .TP
-.B \-V
+.BI \-V " file"
 Read a list of filenames from \fIfile\fR. Standard input is used
 if \fIfile\fR is ``-''.
 .TP
-.B \-w
+.BI \-w " file"
 Write the raw packets to \fIfile\fR rather than parsing and printing
 them out.
 They can later be printed with the \-r option.
@@ -767,7 +767,7 @@ its link level header, in hex and ASCII.
 .PD
 Set the data link type to use while capturing packets to \fIdatalinktype\fP.
 .TP
-.B \-z
+.BI \-z " postrotate-command"
 Used in conjunction with the
 .B -C
 or
@@ -775,7 +775,7 @@ or
 options, this will make
 .I tcpdump
 run "
-.I command file
+.I postrotate-command file
 " where
 .I file
 is the savefile being closed after each rotation. For example, specifying
@@ -792,10 +792,10 @@ different arguments, you can always write a shell script that will take the
 savefile name as the only argument, make the flags & arguments arrangements
 and execute the command that you want.
 .TP
-.B \-Z
+.BI \-Z " user"
 .PD 0
 .TP
-.B \-\-relinquish\-privileges
+.BI \-\-relinquish\-privileges= user
 .PD
 If
 .I tcpdump
