@@ -4,13 +4,13 @@
 
 if grep '^#define HAVE_LIBCRYPTO 1$' ../config.h >/dev/null
 then
-	perl ./TESTonce esp1 02-sunrise-sunset-esp.pcap esp1.out '-t -E "0x12345678@192.1.2.45 3des-cbc-hmac96:0x4043434545464649494a4a4c4c4f4f515152525454575758"'
-	perl ./TESTonce esp2 08-sunrise-sunset-esp2.pcap esp2.out '-t -E "0x12345678@192.1.2.45 3des-cbc-hmac96:0x43434545464649494a4a4c4c4f4f51515252545457575840,0xabcdabcd@192.0.1.1 3des-cbc-hmac96:0x434545464649494a4a4c4c4f4f5151525254545757584043"'
-	perl ./TESTonce esp3 02-sunrise-sunset-esp.pcap esp1.out '-t -E "3des-cbc-hmac96:0x4043434545464649494a4a4c4c4f4f515152525454575758"'
-	perl ./TESTonce esp4 08-sunrise-sunset-esp2.pcap esp2.out '-t -E "file esp-secrets.txt"'
-	perl ./TESTonce esp5 08-sunrise-sunset-aes.pcap esp5.out '-t -E "file esp-secrets.txt"'
-	perl ./TESTonce espudp1 espudp1.pcap espudp1.out '-nnnn -t -E "file esp-secrets.txt"'
-	perl ./TESTonce ikev2pI2 ikev2pI2.pcap ikev2pI2.out '-t -E "file ikev2pI2-secrets.txt" -v -v -v -v'
+	./TESTonce esp1 02-sunrise-sunset-esp.pcap esp1.out '-t -E "0x12345678@192.1.2.45 3des-cbc-hmac96:0x4043434545464649494a4a4c4c4f4f515152525454575758"'
+	./TESTonce esp2 08-sunrise-sunset-esp2.pcap esp2.out '-t -E "0x12345678@192.1.2.45 3des-cbc-hmac96:0x43434545464649494a4a4c4c4f4f51515252545457575840,0xabcdabcd@192.0.1.1 3des-cbc-hmac96:0x434545464649494a4a4c4c4f4f5151525254545757584043"'
+	./TESTonce esp3 02-sunrise-sunset-esp.pcap esp1.out '-t -E "3des-cbc-hmac96:0x4043434545464649494a4a4c4c4f4f515152525454575758"'
+	./TESTonce esp4 08-sunrise-sunset-esp2.pcap esp2.out '-t -E "file esp-secrets.txt"'
+	./TESTonce esp5 08-sunrise-sunset-aes.pcap esp5.out '-t -E "file esp-secrets.txt"'
+	./TESTonce espudp1 espudp1.pcap espudp1.out '-nnnn -t -E "file esp-secrets.txt"'
+	./TESTonce ikev2pI2 ikev2pI2.pcap ikev2pI2.out '-t -E "file ikev2pI2-secrets.txt" -v -v -v -v'
 else
 	FORMAT='    %-30s: TEST SKIPPED (compiled w/o OpenSSL)\n'
 	printf "$FORMAT" esp1
