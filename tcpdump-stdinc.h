@@ -41,10 +41,7 @@
 
 #ifdef WIN32
 
-#ifdef __MINGW32__
 #include <stdint.h>
-#endif
-
 #include <stdio.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
