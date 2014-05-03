@@ -4320,38 +4320,6 @@ fi
 		esac
 	fi
 	;;
-
-linux*)
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking Linux kernel version" >&5
-$as_echo_n "checking Linux kernel version... " >&6; }
- 	if test "$cross_compiling" = yes; then
- 		if ${ac_cv_linux_vers+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_cv_linux_vers=unknown
-fi
-
- 	else
- 		if ${ac_cv_linux_vers+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_cv_linux_vers=`uname -r 2>&1 | \
- 			sed -n -e '$s/.* //' -e '$s/\..*//p'`
-fi
-
- 	fi
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_linux_vers" >&5
-$as_echo "$ac_cv_linux_vers" >&6; }
- 	if test $ac_cv_linux_vers = unknown ; then
- 		as_fn_error $? "cannot determine linux version when cross-compiling" "$LINENO" 5
- 	fi
-	if test $ac_cv_linux_vers -lt 2 ; then
-		as_fn_error $? "version 2 or higher required; see the INSTALL doc for more info" "$LINENO" 5
-	fi
-	;;
-
-*)
-	;;
 esac
 
 

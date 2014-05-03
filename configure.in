@@ -89,28 +89,6 @@ darwin*)
 		esac
 	fi
 	;;
-
-linux*)
-	AC_MSG_CHECKING(Linux kernel version)
- 	if test "$cross_compiling" = yes; then
- 		AC_CACHE_VAL(ac_cv_linux_vers,
- 		    ac_cv_linux_vers=unknown)
- 	else
- 		AC_CACHE_VAL(ac_cv_linux_vers,
- 		    ac_cv_linux_vers=`uname -r 2>&1 | \
- 			sed -n -e '$s/.* //' -e '$s/\..*//p'`)
- 	fi
-	AC_MSG_RESULT($ac_cv_linux_vers)
- 	if test $ac_cv_linux_vers = unknown ; then
- 		AC_MSG_ERROR(cannot determine linux version when cross-compiling)
- 	fi
-	if test $ac_cv_linux_vers -lt 2 ; then
-		AC_MSG_ERROR(version 2 or higher required; see the INSTALL doc for more info)
-	fi
-	;;
-
-*)
-	;;
 esac
 
 
