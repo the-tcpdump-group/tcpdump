@@ -806,7 +806,7 @@ decode_mdt_vpn_nlri(netdissect_options *ndo,
     ND_TCHECK(pptr[0]);
 
     /* if the NLRI is not predefined length, quit.*/
-    if (*pptr != MDT_VPN_NLRI_LEN * NBBY)
+    if (*pptr != MDT_VPN_NLRI_LEN * 8)
 	return -1;
     pptr++;
 

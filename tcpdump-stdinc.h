@@ -54,10 +54,6 @@
 #include <sys/types.h>
 #include <net/netdb.h>  /* in wpcap's Win32/include */
 
-#ifndef NBBY
-#define NBBY	8
-#endif
-
 #ifndef uint8_t
 #define uint8_t		unsigned char
 #endif
