@@ -425,7 +425,7 @@ struct attrtype { const char *name;      /* Attribute name                 */
      { "Accounting Tunnel packets lost",  NULL, 0, 0, print_attr_num }, /*86*/
      { "NAS Port ID",                     NULL, 0, 0, print_attr_string },
      { "Framed Pool",                     NULL, 0, 0, print_attr_string },
-     { "Unassigned",                      NULL, 0, 0, NULL },
+     { "Chargeable User Identity",        NULL, 0, 0, print_attr_string },
      { "Tunnel Client Authentication ID", NULL, 0, 0, print_attr_string },
      { "Tunnel Server Authentication ID", NULL, 0, 0, print_attr_string },
      { "Unassigned",                      NULL, 0, 0, NULL }, /*92*/
