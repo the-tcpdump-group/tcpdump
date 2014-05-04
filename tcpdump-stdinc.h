@@ -234,11 +234,10 @@ typedef char* caddr_t;
  * Note: this also requires that padding be put into the structure,
  * at least for compilers where it's implemented as __attribute__((packed)).
  */
-#if defined(__GNUC__)
+#if !(defined(_MSC_VER) && defined(UNALIGNED))
+/* MSVC may have its own macro defined with the same name and purpose. */
 #undef UNALIGNED
 #define UNALIGNED	__attribute__((packed))
-#else
- /* MSVC may have its own macro defined with the same name and purpose. */
 #endif
 
 #if defined(WIN32) || defined(MSDOS)
