@@ -28,7 +28,6 @@
 
 #include <sys/stat.h>
 
-#include <errno.h>
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif

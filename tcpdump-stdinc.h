@@ -39,6 +39,8 @@
 #ifndef tcpdump_stdinc_h
 #define tcpdump_stdinc_h
 
+#include <errno.h>
+
 #ifdef WIN32
 
 #include <stdint.h>
@@ -49,7 +51,6 @@
 #include <ctype.h>
 #include <time.h>
 #include <io.h>
-#include <errno.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <net/netdb.h>  /* in wpcap's Win32/include */

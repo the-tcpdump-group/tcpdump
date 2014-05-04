@@ -43,7 +43,6 @@
 #include <tcpdump-stdinc.h>
 
 #include <stdio.h>
-#include <errno.h>
 
 /*
  *

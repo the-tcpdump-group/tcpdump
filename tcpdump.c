@@ -73,7 +73,6 @@ extern int SIZE_BUF;
 #include <sys/resource.h>
 #include <pwd.h>
 #include <grp.h>
-#include <errno.h>
 #endif /* WIN32 */
 
 /* capabilities convinience library */
