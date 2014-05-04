@@ -91,6 +91,7 @@ LIBNETDISSECT_SRC=\
 	print-ah.c \
 	print-ahcp.c \
 	print-aodv.c \
+	print-aoe.c \
 	print-ap1394.c \
 	print-arcnet.c \
 	print-arp.c \

@@ -522,6 +522,7 @@ extern void lldp_print(netdissect_options *, const u_char *, u_int);
 extern void rsvp_print(netdissect_options *, const u_char *, u_int);
 extern void timed_print(netdissect_options *, const u_char *);
 extern void m3ua_print(netdissect_options *, const u_char *, const u_int);
+extern void aoe_print(netdissect_options *, const u_char *, const u_int);
 
 /* stuff that has not yet been rototiled */
 
