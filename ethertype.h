@@ -181,6 +181,9 @@
 #ifndef	ETHERTYPE_CFM
 #define	ETHERTYPE_CFM           0x8902 /* 802.1ag */
 #endif
+#ifndef	ETHERTYPE_IEEE1905_1
+#define	ETHERTYPE_IEEE1905_1    0x893a /* IEEE 1905.1 */
+#endif
 #ifndef	ETHERTYPE_ISO
 #define	ETHERTYPE_ISO           0xfefe  /* nonstandard - used in Cisco HDLC encapsulation */
 #endif
