@@ -504,7 +504,7 @@ E.g.,
 if you give this flag then \fItcpdump\fP will print ``nic''
 instead of ``nic.ddn.mil''.
 .TP
-.B \--number
+.B \-\-number
 Print an optional packet number at the beginning of the line.
 .TP
 .B \-O
