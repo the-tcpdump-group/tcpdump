@@ -122,7 +122,8 @@ int32_t thiszone;		/* seconds offset from gmt to local time */
 /* Forwards */
 static RETSIGTYPE cleanup(int);
 static RETSIGTYPE child_cleanup(int);
-static void usage(void) __attribute__((noreturn));
+static void print_version(void);
+static void print_usage(void);
 static void show_dlts_and_exit(const char *device, pcap_t *pd) __attribute__((noreturn));
 
 static void print_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
@@ -638,12 +639,14 @@ show_devices_and_exit (void)
  * doesn't make sense; it should be --verbosity={N} or something such
  * as that.
  *
- * We do not currently have long options with no corresponding short
- * options; for those, we should define values outside the range of
- * ASCII graphic characters, make that the last component of the
- * entry for the long option, and have a case for that option in the
- * switch statement.
+ * For long options with no corresponding short options, we define values
+ * outside the range of ASCII graphic characters, make that the last
+ * component of the entry for the long option, and have a case for that
+ * option in the switch statement.
  */
+#define OPTION_NUMBER	128
+#define OPTION_VERSION	129
+
 static struct option longopts[] = {
 #if defined(HAVE_PCAP_CREATE) || defined(WIN32)
 	{ "buffer-size", required_argument, NULL, 'B' },
@@ -675,7 +678,8 @@ static struct option longopts[] = {
 	{ "debug-filter-parser", no_argument, NULL, 'Y' },
 #endif
 	{ "relinquish-privileges", required_argument, NULL, 'Z' },
-	{ "number", no_argument, NULL, 'z' + 1},
+	{ "number", no_argument, NULL, OPTION_NUMBER },
+	{ "version", no_argument, NULL, OPTION_VERSION },
 	{ NULL, 0, NULL, 0 }
 };
 
@@ -979,7 +983,8 @@ main(int argc, char **argv)
 			break;
 
 		case 'h':
-			usage();
+			print_usage();
+			exit(0);
 			break;
 
 		case 'H':
@@ -1257,12 +1262,18 @@ main(int argc, char **argv)
 			username = strdup(optarg);
 			break;
 
-		case 'z' + 1:
+		case OPTION_NUMBER:
 			gndo->ndo_packet_number = 1;
 			break;
 
+		case OPTION_VERSION:
+			print_version();
+			exit(0);
+			break;
+
 		default:
-			usage();
+			print_usage();
+			exit(1);
 			/* NOTREACHED */
 		}
 
@@ -2243,7 +2254,7 @@ static void verbose_stats_dump(int sig _U_)
 #endif
 
 static void
-usage(void)
+print_version(void)
 {
 	extern char version[];
 #ifndef HAVE_PCAP_LIB_VERSION
@@ -2270,6 +2281,12 @@ usage(void)
 	(void)fprintf(stderr, "libpcap version %s\n", pcap_version);
 #endif /* WIN32 */
 #endif /* HAVE_PCAP_LIB_VERSION */
+}
+
+static void
+print_usage(void)
+{
+	print_version();
 	(void)fprintf(stderr,
 "Usage: %s [-aAbd" D_FLAG "efhH" I_FLAG J_FLAG "KlLnNOpqRStu" U_FLAG "vxX]" B_FLAG_USAGE " [ -c count ]\n", program_name);
 	(void)fprintf(stderr,
@@ -2286,7 +2303,6 @@ usage(void)
 "\t\t[ -W filecount ] [ -y datalinktype ] [ -z command ]\n");
 	(void)fprintf(stderr,
 "\t\t[ -Z user ] [ expression ]\n");
-	exit(1);
 }
 
 
