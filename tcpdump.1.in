@@ -123,6 +123,9 @@ tcpdump \- dump traffic on a network
 ]
 .ti +8
 [
+.B \-\-version
+]
+[
 .I expression
 ]
 .br
@@ -353,6 +356,10 @@ option, filenames will take the form of `\fIfile\fP<count>'.
 .PD
 Print the tcpdump and libpcap version strings, print a usage message,
 and exit.
+.TP
+.B \-\-version
+.PD
+Print the tcpdump and libpcap version strings and exit.
 .TP
 .B \-H
 Attempt to detect 802.11s draft mesh headers.
