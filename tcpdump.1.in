@@ -68,6 +68,9 @@ tcpdump \- dump traffic on a network
 .br
 .ti +8
 [
+.B \-\-number
+]
+[
 .B \-Q
 .I in|out|inout
 ]
@@ -500,6 +503,9 @@ Don't print domain name qualification of host names.
 E.g.,
 if you give this flag then \fItcpdump\fP will print ``nic''
 instead of ``nic.ddn.mil''.
+.TP
+.B \--number
+Print an optional packet number at the beginning of the line.
 .TP
 .B \-O
 .PD 0

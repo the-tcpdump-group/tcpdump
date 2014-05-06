@@ -675,6 +675,7 @@ static struct option longopts[] = {
 	{ "debug-filter-parser", no_argument, NULL, 'Y' },
 #endif
 	{ "relinquish-privileges", required_argument, NULL, 'Z' },
+	{ "number", no_argument, NULL, 'z' + 1},
 	{ NULL, 0, NULL, 0 }
 };
 
@@ -1254,6 +1255,10 @@ main(int argc, char **argv)
 
 		case 'Z':
 			username = strdup(optarg);
+			break;
+
+		case 'z' + 1:
+			gndo->ndo_packet_number = 1;
 			break;
 
 		default:
@@ -2078,6 +2083,10 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 
 	print_info = (struct print_info *)user;
         ndo = print_info->ndo;
+
+	if(ndo->ndo_packet_number)
+		ND_PRINT((ndo, "%5u  ", packets_captured));
+
 	ts_print(ndo, &h->ts);
 
 	/*
@@ -2266,7 +2275,7 @@ usage(void)
 	(void)fprintf(stderr,
 "\t\t[ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]\n");
 	(void)fprintf(stderr,
-"\t\t[ -i interface ]" j_FLAG_USAGE " [ -M secret ]\n");
+"\t\t[ -i interface ]" j_FLAG_USAGE " [ -M secret ] [ --number ]\n");
 #ifdef HAVE_PCAP_SETDIRECTION
 	(void)fprintf(stderr,
 "\t\t[ -Q in|out|inout ]\n");
