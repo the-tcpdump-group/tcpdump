@@ -80,7 +80,7 @@
 #endif
 
 char *optarg;
-int optind, opterr, optopt;
+int optind, opterr = 1, optopt;
 
 static int getopt_internal(int, char * const *, const char *,
 			   const struct option *, int *, int);
