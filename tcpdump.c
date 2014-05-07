@@ -57,6 +57,10 @@ extern int SIZE_BUF;
 #include <smi.h>
 #endif
 
+#ifdef HAVE_LIBCRYPTO
+#include <openssl/crypto.h>
+#endif
+
 #ifdef HAVE_GETOPT_LONG
 #include <getopt.h>
 #else
@@ -2281,6 +2285,14 @@ print_version(void)
 	(void)fprintf(stderr, "libpcap version %s\n", pcap_version);
 #endif /* WIN32 */
 #endif /* HAVE_PCAP_LIB_VERSION */
+
+#if defined(HAVE_LIBCRYPTO) && defined(SSLEAY_VERSION)
+	(void)fprintf (stderr, "%s\n", SSLeay_version(SSLEAY_VERSION));
+#endif
+
+#if defined(HAVE_SMI_H)
+	(void)fprintf (stderr, "SMI-library: %s\n", smi_version_string);
+#endif
 }
 
 static void
