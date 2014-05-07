@@ -2257,6 +2257,7 @@ static void verbose_stats_dump(int sig _U_)
 }
 #endif
 
+USES_APPLE_DEPRECATED_API
 static void
 print_version(void)
 {
@@ -2294,6 +2295,7 @@ print_version(void)
 	(void)fprintf (stderr, "SMI-library: %s\n", smi_version_string);
 #endif
 }
+USES_APPLE_RST
 
 static void
 print_usage(void)
