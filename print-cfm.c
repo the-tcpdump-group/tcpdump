@@ -371,7 +371,7 @@ cfm_print(netdissect_options *ndo,
                 break;
 
             case CFM_CCM_MD_FORMAT_MAC:
-                ND_PRINT((ndo, "\n\t  MAC %s", etheraddr_string(ndo, 
+                ND_PRINT((ndo, "\n\t  MAC %s", etheraddr_string(ndo,
                            msg_ptr.cfm_ccm->md_name)));
                 break;
 

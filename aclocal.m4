@@ -1130,7 +1130,7 @@ dnl    documentation and/or other materials provided with the distribution.
 dnl 3. Neither the name of the project nor the names of its contributors
 dnl    may be used to endorse or promote products derived from this software
 dnl    without specific prior written permission.
-dnl 
+dnl
 dnl THIS SOFTWARE IS PROVIDED BY THE PROJECT AND CONTRIBUTORS ``AS IS'' AND
 dnl ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 dnl IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE

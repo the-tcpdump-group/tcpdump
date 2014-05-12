@@ -62,5 +62,5 @@ int	getopt_long_only(int, char * const *, const char *,
 
 extern char *optarg;			/* getopt(3) external variables */
 extern int optind, opterr, optopt;
- 
+
 #endif /* !_GETOPT_LONG_H_ */
