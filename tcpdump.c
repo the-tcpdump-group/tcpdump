@@ -730,6 +730,9 @@ droproot(const char *username, const char *chroot_dir)
 			    pcap_strerror(errno));
 			exit(1);
 		}
+		else {
+			printf("dropped privs to %s\n", username);
+		}
 #endif /* HAVE_CAP_NG_H */
 	}
 	else {
