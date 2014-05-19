@@ -6079,7 +6079,20 @@ fi
                         ac_fn_c_check_func "$LINENO" "pcap_list_datalinks" "ac_cv_func_pcap_list_datalinks"
 if test "x$ac_cv_func_pcap_list_datalinks" = xyes; then :
 
+
 $as_echo "#define HAVE_PCAP_LIST_DATALINKS 1" >>confdefs.h
+
+	    for ac_func in pcap_free_datalinks
+do :
+  ac_fn_c_check_func "$LINENO" "pcap_free_datalinks" "ac_cv_func_pcap_free_datalinks"
+if test "x$ac_cv_func_pcap_free_datalinks" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PCAP_FREE_DATALINKS 1
+_ACEOF
+
+fi
+done
+
 
 else
 
@@ -6092,12 +6105,16 @@ esac
 
 fi
 
-    ac_fn_c_check_func "$LINENO" "pcap_set_datalink" "ac_cv_func_pcap_set_datalink"
+    for ac_func in pcap_set_datalink
+do :
+  ac_fn_c_check_func "$LINENO" "pcap_set_datalink" "ac_cv_func_pcap_set_datalink"
 if test "x$ac_cv_func_pcap_set_datalink" = xyes; then :
-
-$as_echo "#define HAVE_PCAP_SET_DATALINK 1" >>confdefs.h
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PCAP_SET_DATALINK 1
+_ACEOF
 
 fi
+done
 
     ac_fn_c_check_func "$LINENO" "pcap_datalink_name_to_val" "ac_cv_func_pcap_datalink_name_to_val"
 if test "x$ac_cv_func_pcap_datalink_name_to_val" = xyes; then :
@@ -6146,7 +6163,7 @@ fi
 done
 
 
-                ac_fn_c_check_func "$LINENO" "pcap_dump_ftell" "ac_cv_func_pcap_dump_ftell"
+                    ac_fn_c_check_func "$LINENO" "pcap_dump_ftell" "ac_cv_func_pcap_dump_ftell"
 if test "x$ac_cv_func_pcap_dump_ftell" = xyes; then :
 
 $as_echo "#define HAVE_PCAP_DUMP_FTELL 1" >>confdefs.h

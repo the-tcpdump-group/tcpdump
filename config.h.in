@@ -100,6 +100,9 @@
 /* Define to 1 if you have the `pcap_findalldevs' function. */
 #undef HAVE_PCAP_FINDALLDEVS
 
+/* Define to 1 if you have the `pcap_free_datalinks' function. */
+#undef HAVE_PCAP_FREE_DATALINKS
+
 /* Define to 1 if the system has the type `pcap_if_t'. */
 #undef HAVE_PCAP_IF_T
 
@@ -115,7 +118,7 @@
 /* Define to 1 if you have the `pcap_setdirection' function. */
 #undef HAVE_PCAP_SETDIRECTION
 
-/* define if libpcap has pcap_set_datalink() */
+/* Define to 1 if you have the `pcap_set_datalink' function. */
 #undef HAVE_PCAP_SET_DATALINK
 
 /* Define to 1 if you have the `pcap_set_tstamp_type' function. */

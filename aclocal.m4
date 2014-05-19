@@ -615,14 +615,15 @@ reproduce this problem ourselves.])
     dnl if they're not present.
     dnl
     AC_CHECK_FUNC(pcap_list_datalinks,
-	AC_DEFINE(HAVE_PCAP_LIST_DATALINKS, 1,
-	    [define if libpcap has pcap_list_datalinks()]),
+	[
+	    AC_DEFINE(HAVE_PCAP_LIST_DATALINKS, 1,
+		[define if libpcap has pcap_list_datalinks()])
+	    AC_CHECK_FUNCS(pcap_free_datalinks)
+	],
 	[
 	    AC_LIBOBJ(datalinks)
 	])
-    AC_CHECK_FUNC(pcap_set_datalink,
-	AC_DEFINE(HAVE_PCAP_SET_DATALINK, 1,
-	    [define if libpcap has pcap_set_datalink()]))
+    AC_CHECK_FUNCS(pcap_set_datalink)
     AC_CHECK_FUNC(pcap_datalink_name_to_val,
 	[
 	    AC_DEFINE(HAVE_PCAP_DATALINK_NAME_TO_VAL, 1,
@@ -648,6 +649,7 @@ reproduce this problem ourselves.])
     dnl
     dnl Check for "pcap_dump_ftell()" and use a substitute version
     dnl if it's not present.
+    dnl
     AC_CHECK_FUNC(pcap_dump_ftell,
 	AC_DEFINE(HAVE_PCAP_DUMP_FTELL, 1,
 	    [define if libpcap has pcap_dump_ftell()]),
