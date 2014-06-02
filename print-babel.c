@@ -165,11 +165,9 @@ static const char *
 format_timestamp(const uint32_t i)
 {
     /* Rotating buffer. */
-    static char buf[2][sizeof("0000.000000s")];
-    static int x = 0;
-    x = (x + 1) % 2;
-    snprintf(buf[x], sizeof(buf[x]), "%u.%06us", i / 1000000, i % 1000000);
-    return buf[x];
+    static char buf[sizeof("0000.000000s")];
+    snprintf(buf, sizeof(buf), "%u.%06us", i / 1000000, i % 1000000);
+    return buf;
 }
 
 /* Return number of octets consumed from the input buffer (not the prefix length
@@ -320,9 +318,9 @@ subtlvs_print(netdissect_options *ndo,
                 if(sublen != 8)
                     goto corrupt;
                 t1 = EXTRACT_32BITS(cp);
+                ND_PRINT((ndo, " %s", format_timestamp(t1)));
                 t2 = EXTRACT_32BITS(cp + 4);
-                ND_PRINT((ndo, " %s|%s",
-                          format_timestamp(t1), format_timestamp(t2)));
+                ND_PRINT((ndo, "|%s", format_timestamp(t2)));
             } else
                 ND_PRINT((ndo, " (bogus)"));
             cp += sublen;
