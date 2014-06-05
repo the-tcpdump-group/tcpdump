@@ -320,6 +320,7 @@ bittok2str_internal(register const struct tok *lp, register const char *fmt,
         int buflen=0;
         register int rotbit; /* this is the bit we rotate through all bitpositions */
         register int tokval;
+        const char * sepstr = "";
 
 	while (lp != NULL && lp->s != NULL) {
             tokval=lp->v;   /* load our first value */
@@ -332,7 +333,8 @@ bittok2str_internal(register const struct tok *lp, register const char *fmt,
 		if (tokval == (v&rotbit)) {
                     /* ok we have found something */
                     buflen+=snprintf(buf+buflen, sizeof(buf)-buflen, "%s%s",
-                                     lp->s, sep ? ", " : "");
+                                     sepstr, lp->s);
+                    sepstr = sep ? ", " : "";
                     break;
                 }
                 rotbit=rotbit<<1; /* no match - lets shift and try again */
@@ -340,23 +342,10 @@ bittok2str_internal(register const struct tok *lp, register const char *fmt,
             lp++;
 	}
 
-        /* user didn't want string seperation - no need to cut off trailing seperators */
-        if (!sep) {
-            return (buf);
-        }
-
-        if (buflen != 0) { /* did we find anything */
-            /* yep, set the trailing zero 2 bytes before to eliminate the last comma & whitespace */
-            buf[buflen-2] = '\0';
-            return (buf);
-        }
-        else {
+        if (buflen == 0)
             /* bummer - lets print the "unknown" message as advised in the fmt string if we got one */
-            if (fmt == NULL)
-		fmt = "#%d";
-            (void)snprintf(buf, sizeof(buf), fmt, v);
-            return (buf);
-        }
+            (void)snprintf(buf, sizeof(buf), fmt == NULL ? "#%d" : fmt, v);
+        return (buf);
 }
 
 /*
