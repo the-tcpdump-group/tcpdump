@@ -273,9 +273,7 @@ olsr_print(netdissect_options *ndo,
         goto trunc;
     }
 
-    if (!ND_TTEST2(*tptr, sizeof(struct olsr_common))) {
-        goto trunc;
-    }
+    ND_TCHECK2(*tptr, sizeof(struct olsr_common));
 
     ptr.common = (struct olsr_common *)tptr;
     length = min(length, EXTRACT_16BITS(ptr.common->packet_len));
@@ -302,8 +300,7 @@ olsr_print(netdissect_options *ndo,
         } msgptr;
         int msg_len_valid = 0;
 
-        if (!ND_TTEST2(*tptr, sizeof(struct olsr_msg4)))
-            goto trunc;
+        ND_TCHECK2(*tptr, sizeof(struct olsr_msg4));
 
 #if INET6
         if (is_ipv6)
@@ -365,8 +362,7 @@ olsr_print(netdissect_options *ndo,
         switch (msg_type) {
         case OLSR_HELLO_MSG:
         case OLSR_HELLO_LQ_MSG:
-            if (!ND_TTEST2(*msg_data, sizeof(struct olsr_hello)))
-                goto trunc;
+            ND_TCHECK2(*msg_data, sizeof(struct olsr_hello));
 
             ptr.hello = (struct olsr_hello *)msg_data;
             ND_PRINT((ndo, "\n\t  hello-time %.3lfs, MPR willingness %u",
@@ -380,8 +376,7 @@ olsr_print(netdissect_options *ndo,
                 /*
                  * link-type.
                  */
-                if (!ND_TTEST2(*msg_data, sizeof(struct olsr_hello_link)))
-                    goto trunc;
+                ND_TCHECK2(*msg_data, sizeof(struct olsr_hello_link));
 
                 ptr.hello_link = (struct olsr_hello_link *)msg_data;
 
@@ -424,8 +419,7 @@ olsr_print(netdissect_options *ndo,
 
         case OLSR_TC_MSG:
         case OLSR_TC_LQ_MSG:
-            if (!ND_TTEST2(*msg_data, sizeof(struct olsr_tc)))
-                goto trunc;
+            ND_TCHECK2(*msg_data, sizeof(struct olsr_tc));
 
             ptr.tc = (struct olsr_tc *)msg_data;
             ND_PRINT((ndo, "\n\t    advertised neighbor seq 0x%04x",
@@ -455,8 +449,7 @@ olsr_print(netdissect_options *ndo,
 #endif
 
             while (msg_tlen >= addr_size) {
-                if (!ND_TTEST2(*msg_data, addr_size))
-                    goto trunc;
+                ND_TCHECK2(*msg_data, addr_size);
 #if INET6
                 ND_PRINT((ndo, "\n\t  interface address %s",
                         is_ipv6 ? ip6addr_string(ndo, msg_data) :
@@ -482,8 +475,7 @@ olsr_print(netdissect_options *ndo,
                 while (msg_tlen >= sizeof(struct olsr_hna6)) {
                     struct olsr_hna6 *hna6;
 
-                    if (!ND_TTEST2(*msg_data, sizeof(struct olsr_hna6)))
-                        goto trunc;
+                    ND_TCHECK2(*msg_data, sizeof(struct olsr_hna6));
 
                     hna6 = (struct olsr_hna6 *)msg_data;
 
@@ -500,8 +492,7 @@ olsr_print(netdissect_options *ndo,
             {
                 int col = 0;
                 while (msg_tlen >= sizeof(struct olsr_hna4)) {
-                    if (!ND_TTEST2(*msg_data, sizeof(struct olsr_hna4)))
-                        goto trunc;
+                    ND_TCHECK2(*msg_data, sizeof(struct olsr_hna4));
 
                     ptr.hna = (struct olsr_hna4 *)msg_data;
 
@@ -535,8 +526,7 @@ olsr_print(netdissect_options *ndo,
 
             if (msg_tlen < 4)
                 goto trunc;
-            if (!ND_TTEST2(*msg_data, 4))
-                goto trunc;
+            ND_TCHECK2(*msg_data, 4);
 
             ND_PRINT((ndo, "\n\t  Version %u, Entries %u%s",
                    EXTRACT_16BITS(msg_data),
@@ -553,8 +543,7 @@ olsr_print(netdissect_options *ndo,
 
                 if (msg_tlen < 4)
                     break;
-                if (!ND_TTEST2(*msg_data, 4))
-                    goto trunc;
+                ND_TCHECK2(*msg_data, 4);
 
                 name_entry_type = EXTRACT_16BITS(msg_data);
                 name_entry_len = EXTRACT_16BITS(msg_data+2);
@@ -580,8 +569,7 @@ olsr_print(netdissect_options *ndo,
                 if (msg_tlen < addr_size + name_entry_len + name_entry_padding)
                     goto trunc;
 
-                if (!ND_TTEST2(*msg_data, addr_size + name_entry_len + name_entry_padding))
-                    goto trunc;
+                ND_TCHECK2(*msg_data, addr_size + name_entry_len + name_entry_padding);
 
 #if INET6
                 if (is_ipv6)

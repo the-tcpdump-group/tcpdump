@@ -192,8 +192,7 @@ eap_print(netdissect_options *ndo,
                *(tptr+1),
                len));
 
-        if (!ND_TTEST2(*tptr, len))
-            goto trunc;
+        ND_TCHECK2(*tptr, len);
 
         if (type <= 2) { /* For EAP_REQUEST and EAP_RESPONSE only */
             subtype = *(tptr+4);

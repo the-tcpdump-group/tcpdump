@@ -130,8 +130,7 @@ vtp_print (netdissect_options *ndo,
 
     tptr = pptr;
 
-    if (!ND_TTEST2(*tptr, VTP_HEADER_LEN))
-	goto trunc;
+    ND_TCHECK2(*tptr, VTP_HEADER_LEN);
 
     type = *(tptr+1);
     ND_PRINT((ndo, "VTPv%u, Message %s (0x%02x), length %u",
@@ -240,8 +239,7 @@ vtp_print (netdissect_options *ndo,
 	    if (len == 0)
 		break;
 
-	    if (!ND_TTEST2(*tptr, len))
-		goto trunc;
+	    ND_TCHECK2(*tptr, len);
 
 	    vtp_vlan = (struct vtp_vlan_*)tptr;
 	    ND_PRINT((ndo, "\n\tVLAN info status %s, type %s, VLAN-id %u, MTU %u, SAID 0x%08x, Name %s",
@@ -280,8 +278,7 @@ vtp_print (netdissect_options *ndo,
                     return;
                 }
 
-                if (!ND_TTEST2(*tptr, tlv_len*2 +2))
-                    goto trunc;
+                ND_TCHECK2(*tptr, tlv_len * 2 +2);
 
                 tlv_value = EXTRACT_16BITS(tptr+2);
 

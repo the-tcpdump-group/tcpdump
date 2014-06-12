@@ -748,8 +748,7 @@ pimv2_print(netdissect_options *ndo,
 	{
 		struct ip *ip;
 
-		if (!ND_TTEST2(*(bp+4), PIMV2_REGISTER_FLAG_LEN))
-			goto trunc;
+		ND_TCHECK2(*(bp + 4), PIMV2_REGISTER_FLAG_LEN);
 
 		ND_PRINT((ndo, ", Flags [ %s ]\n\t",
 		          tok2str(pimv2_register_flag_values,

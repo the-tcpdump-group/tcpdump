@@ -53,8 +53,7 @@ dtp_print (netdissect_options *ndo, const u_char *pptr, u_int length)
 
     tptr = pptr;
 
-    if (!ND_TTEST2(*tptr, DTP_HEADER_LEN))
-	goto trunc;
+    ND_TCHECK2(*tptr, DTP_HEADER_LEN);
 
     ND_PRINT((ndo, "DTPv%u, length %u",
            (*tptr),
@@ -71,8 +70,7 @@ dtp_print (netdissect_options *ndo, const u_char *pptr, u_int length)
 
     while (tptr < (pptr+length)) {
 
-        if (!ND_TTEST2(*tptr, 4))
-            goto trunc;
+        ND_TCHECK2(*tptr, 4);
 
 	type = EXTRACT_16BITS(tptr);
         len  = EXTRACT_16BITS(tptr+2);

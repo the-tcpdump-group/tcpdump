@@ -167,8 +167,7 @@ vqp_print(netdissect_options *ndo, register const u_char *pptr, register u_int l
         }
 
         /* did we capture enough for fully decoding the object ? */
-        if (!ND_TTEST2(*tptr, vqp_obj_len))
-            goto trunc;
+        ND_TCHECK2(*tptr, vqp_obj_len);
 
         switch(vqp_obj_type) {
 	case VQP_OBJ_IP_ADDRESS:

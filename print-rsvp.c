@@ -658,8 +658,7 @@ _U_
 
     while(tlen>=sizeof(struct rsvp_object_header)) {
         /* did we capture enough for fully decoding the object header ? */
-        if (!ND_TTEST2(*tptr, sizeof(struct rsvp_object_header)))
-            goto trunc;
+        ND_TCHECK2(*tptr, sizeof(struct rsvp_object_header));
 
         rsvp_obj_header = (const struct rsvp_object_header *)tptr;
         rsvp_obj_len=EXTRACT_16BITS(rsvp_obj_header->length);

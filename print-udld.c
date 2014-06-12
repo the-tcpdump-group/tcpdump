@@ -89,8 +89,7 @@ udld_print (netdissect_options *ndo, const u_char *pptr, u_int length)
 
     tptr = pptr;
 
-    if (!ND_TTEST2(*tptr, UDLD_HEADER_LEN))
-	goto trunc;
+    ND_TCHECK2(*tptr, UDLD_HEADER_LEN);
 
     code = UDLD_EXTRACT_OPCODE(*tptr);
 
@@ -115,8 +114,7 @@ udld_print (netdissect_options *ndo, const u_char *pptr, u_int length)
 
     while (tptr < (pptr+length)) {
 
-        if (!ND_TTEST2(*tptr, 4))
-            goto trunc;
+        ND_TCHECK2(*tptr, 4);
 
 	type = EXTRACT_16BITS(tptr);
         len  = EXTRACT_16BITS(tptr+2);

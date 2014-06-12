@@ -96,24 +96,20 @@ cdp_print(netdissect_options *ndo,
 
         tptr = pptr; /* temporary pointer */
 
-	if (!ND_TTEST2(*tptr, CDP_HEADER_LEN))
-		goto trunc;
+	ND_TCHECK2(*tptr, CDP_HEADER_LEN);
 	ND_PRINT((ndo, "CDPv%u, ttl: %us", *tptr, *(tptr + 1)));
 	if (ndo->ndo_vflag)
 		ND_PRINT((ndo, ", checksum: %u (unverified), length %u", EXTRACT_16BITS(tptr), length));
 	tptr += CDP_HEADER_LEN;
 
 	while (tptr < (pptr+length)) {
-
-                if (!ND_TTEST2(*tptr, 4)) /* read out Type and Length */
-                    goto trunc;
+		ND_TCHECK2(*tptr, 4); /* read out Type and Length */
 		type = EXTRACT_16BITS(tptr);
 		len  = EXTRACT_16BITS(tptr+2); /* object length includes the 4 bytes header length */
                 tptr += 4;
                 len -= 4;
 
-		if (!ND_TTEST2(*tptr, len))
-			goto trunc;
+		ND_TCHECK2(*tptr, len);
 
                 if (ndo->ndo_vflag || type == 1) { /* in non-verbose mode just print Device-ID */
 

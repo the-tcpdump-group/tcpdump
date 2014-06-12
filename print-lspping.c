@@ -568,8 +568,7 @@ lspping_print(netdissect_options *ndo,
     while(tlen>(int)sizeof(struct lspping_tlv_header)) {
 
         /* did we capture enough for fully decoding the tlv header ? */
-        if (!ND_TTEST2(*tptr, sizeof(struct lspping_tlv_header)))
-            goto trunc;
+        ND_TCHECK2(*tptr, sizeof(struct lspping_tlv_header));
 
         lspping_tlv_header = (const struct lspping_tlv_header *)tptr;
         lspping_tlv_type=EXTRACT_16BITS(lspping_tlv_header->type);
@@ -595,8 +594,7 @@ lspping_print(netdissect_options *ndo,
         tlv_tlen=lspping_tlv_len; /* header not included -> no adjustment */
 
         /* did we capture enough for fully decoding the tlv ? */
-        if (!ND_TTEST2(*tptr, lspping_tlv_len))
-            goto trunc;
+        ND_TCHECK2(*tptr, lspping_tlv_len);
         tlv_hexdump=FALSE;
 
         switch(lspping_tlv_type) {
@@ -604,8 +602,7 @@ lspping_print(netdissect_options *ndo,
             while(tlv_tlen>(int)sizeof(struct lspping_tlv_header)) {
 
                 /* did we capture enough for fully decoding the subtlv header ? */
-                if (!ND_TTEST2(*tptr, sizeof(struct lspping_tlv_header)))
-                    goto trunc;
+                ND_TCHECK2(*tptr, sizeof(struct lspping_tlv_header));
                 subtlv_hexdump=FALSE;
 
                 lspping_subtlv_header = (const struct lspping_tlv_header *)tlv_tptr;
@@ -837,8 +834,7 @@ lspping_print(netdissect_options *ndo,
 
         case LSPPING_TLV_BFD_DISCRIMINATOR:
             tptr += sizeof(struct lspping_tlv_header);
-            if (!ND_TTEST2(*tptr, LSPPING_TLV_BFD_DISCRIMINATOR_LEN))
-                goto trunc;
+            ND_TCHECK2(*tptr, LSPPING_TLV_BFD_DISCRIMINATOR_LEN);
             ND_PRINT((ndo, "\n\t    BFD Discriminator 0x%08x", EXTRACT_32BITS(tptr)));
             break;
 
@@ -846,8 +842,7 @@ lspping_print(netdissect_options *ndo,
         {
             uint32_t vendor_id;
 
-            if (!ND_TTEST2(*tptr, LSPPING_TLV_VENDOR_ENTERPRISE_LEN))
-                goto trunc;
+            ND_TCHECK2(*tptr, LSPPING_TLV_VENDOR_ENTERPRISE_LEN);
             vendor_id = EXTRACT_32BITS(tlv_tptr);
             ND_PRINT((ndo, "\n\t    Vendor: %s (0x%04x)",
                    tok2str(smi_values, "Unknown", vendor_id),
