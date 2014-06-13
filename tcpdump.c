@@ -713,6 +713,9 @@ droproot(const char *username, const char *chroot_dir)
 		if (ret < 0) {
 			fprintf(stderr, "error : ret %d\n", ret);
 		}
+		else {
+			printf("dropped privs to %s\n", username);
+		}
 		/* We don't need CAP_SETUID and CAP_SETGID */
 		capng_update(CAPNG_DROP, CAPNG_EFFECTIVE, CAP_SETUID);
 		capng_update(CAPNG_DROP, CAPNG_EFFECTIVE, CAP_SETUID);
