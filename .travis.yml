@@ -1,5 +1,9 @@
 language: c
 
+os:
+  - linux
+  - osx
+
 compiler:
   - gcc
   - clang
@@ -12,7 +16,7 @@ env:
     - secure: "V3k6MtUxrZmzpzJrNdRGcv2PV3WpvIyxYhK3MR8mDmHANXGkRM3qvuTLyiWHfyYxX2KMkEnfYG8b8PPzNNyEXbFdRN9mhHWRyIYduimqdfZLpIz+/c8E/JnMdPo/N5ghPuD/d7pFEsbsWotpZUDyfMsif8QrqqbXDDWFqTgtQg0="
     # Coverity run condition (avoid matrix multiple runs), need customized
     # build script. Need an update if new matrix cases.
-    - coverity_scan_run_condition='"$CC" = gcc -a "$BUILD_IPV6" = true'
+    - coverity_scan_run_condition='"$TRAVIS_OS_NAME" = linux -a "$CC" = gcc -a "$BUILD_IPV6" = true'
     # Coverity script test mode (if true no uploading, avoid reaching the quota)
     # usual processing: false.
     - coverity_scan_script_test_mode=false
@@ -39,9 +43,18 @@ addons:
     # Pattern to match selecting branches that will run analysis
     branch_pattern: coverity_scan
 
+before_install:
+  - uname -a
+  - env | sort -f
+  - if [ "$TRAVIS_OS_NAME" = linux ]; then sudo apt-get update; fi
+  - if [ "$TRAVIS_OS_NAME" = osx ]; then brew update; fi
+
+install:
+  - if [ "$TRAVIS_OS_NAME" = linux ]; then sudo apt-get install libssl-dev libssl0.9.8 libssl1.0.0 libdnet-dev libsmi2-dev; fi
+  - if [ "$TRAVIS_OS_NAME" = osx ]; then brew install libsmi; fi
+
 before_script:
-  - sudo apt-get install libssl-dev libssl0.9.8 libssl1.0.0 libdnet-dev libsmi2-dev
-  - if [ "$BUILD_LIBPCAP" = true ]; then ( cd ../ && git clone git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure && make ); else sudo apt-get install libpcap-dev; fi
+  - if [ "$BUILD_LIBPCAP" = true ]; then (cd .. && git clone git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure && make); else sudo apt-get install libpcap-dev; fi
 
 script:
   - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then touch .devel configure; fi

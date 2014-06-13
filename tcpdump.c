@@ -711,7 +711,7 @@ droproot(const char *username, const char *chroot_dir)
 #ifdef HAVE_CAP_NG_H
 		int ret = capng_change_id(pw->pw_uid, pw->pw_gid, CAPNG_NO_FLAG);
 		if (ret < 0) {
-			printf("error : ret %d\n", ret);
+			fprintf(stderr, "error : ret %d\n", ret);
 		}
 		/* We don't need CAP_SETUID and CAP_SETGID */
 		capng_update(CAPNG_DROP, CAPNG_EFFECTIVE, CAP_SETUID);
