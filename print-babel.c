@@ -309,12 +309,12 @@ subtlvs_print(netdissect_options *ndo,
         case MESSAGE_SUB_TIMESTAMP:
             ND_PRINT((ndo, " sub-timestamp"));
             if(tlv_type == MESSAGE_HELLO) {
-                if(sublen != 4)
+                if(sublen < 4)
                     goto corrupt;
                 t1 = EXTRACT_32BITS(cp);
                 ND_PRINT((ndo, " %s", format_timestamp(t1)));
             } else if(tlv_type == MESSAGE_IHU) {
-                if(sublen != 8)
+                if(sublen < 8)
                     goto corrupt;
                 t1 = EXTRACT_32BITS(cp);
                 ND_PRINT((ndo, " %s", format_timestamp(t1)));
