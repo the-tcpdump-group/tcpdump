@@ -651,7 +651,7 @@ show_devices_and_exit (void)
 #define OPTION_NUMBER	128
 #define OPTION_VERSION	129
 
-static struct option longopts[] = {
+static const struct option longopts[] = {
 #if defined(HAVE_PCAP_CREATE) || defined(WIN32)
 	{ "buffer-size", required_argument, NULL, 'B' },
 #endif
