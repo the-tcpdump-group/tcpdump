@@ -648,9 +648,9 @@ show_devices_and_exit (void)
  * component of the entry for the long option, and have a case for that
  * option in the switch statement.
  */
-#define OPTION_NUMBER	128
-#define OPTION_VERSION	129
-#define OPTION_TSTAMP_PRECISION 130
+#define OPTION_NUMBER		128
+#define OPTION_VERSION		129
+#define OPTION_TSTAMP_PRECISION	130
 
 static const struct option longopts[] = {
 #if defined(HAVE_PCAP_CREATE) || defined(WIN32)
@@ -666,7 +666,9 @@ static const struct option longopts[] = {
 	{ "time-stamp-type", required_argument, NULL, 'j' },
 	{ "list-time-stamp-types", no_argument, NULL, 'J' },
 #endif
+#ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
 	{ "time-stamp-precision", required_argument, NULL, OPTION_TSTAMP_PRECISION},
+#endif
 	{ "dont-verify-checksums", no_argument, NULL, 'K' },
 	{ "list-data-link-types", no_argument, NULL, 'L' },
 	{ "no-optimize", no_argument, NULL, 'O' },
@@ -848,6 +850,7 @@ get_next_file(FILE *VFile, char *ptr)
 	return ret;
 }
 
+#ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
 static int
 tstamp_precision_from_string(const char *precision)
 {
@@ -859,6 +862,23 @@ tstamp_precision_from_string(const char *precision)
 
 	return -EINVAL;
 }
+
+static const char *
+tstamp_precision_to_string(int precision)
+{
+	switch (precision) {
+
+	case PCAP_TSTAMP_PRECISION_MICRO:
+		return "micro";
+
+	case PCAP_TSTAMP_PRECISION_NANO:
+		return "nano";
+
+	default:
+		return "unknown";
+	}
+}
+#endif
 
 int
 main(int argc, char **argv)
@@ -1295,11 +1315,13 @@ main(int argc, char **argv)
 			exit(0);
 			break;
 
+#ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
 		case OPTION_TSTAMP_PRECISION:
 			gndo->ndo_tstamp_precision = tstamp_precision_from_string(optarg);
 			if (gndo->ndo_tstamp_precision < 0)
 				error("unsupported time stamp precision");
 			break;
+#endif
 
 		default:
 			print_usage();
@@ -1392,10 +1414,12 @@ main(int argc, char **argv)
 			RFileName = VFileLine;
 		}
 
-		if (gndo->ndo_tstamp_precision == PCAP_TSTAMP_PRECISION_NANO)
-			pd = pcap_open_offline_with_tstamp_precision(RFileName, PCAP_TSTAMP_PRECISION_NANO, ebuf);
-		else
-			pd = pcap_open_offline_with_tstamp_precision(RFileName, PCAP_TSTAMP_PRECISION_MICRO, ebuf);
+#ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
+		pd = pcap_open_offline_with_tstamp_precision(RFileName,
+		    gndo->ndo_tstamp_precision, ebuf);
+#else
+		pd = pcap_open_offline(RFileName, ebuf);
+#endif
 
 		if (pd == NULL)
 			error("%s", ebuf);
@@ -1443,12 +1467,14 @@ main(int argc, char **argv)
 		if (Jflag)
 			show_tstamp_types_and_exit(device, pd);
 #endif
-		if (gndo->ndo_tstamp_precision == PCAP_TSTAMP_PRECISION_NANO) {
-			status = pcap_set_tstamp_precision(pd, PCAP_TSTAMP_PRECISION_NANO);
-			if (status != 0)
-				error("%s: Can't set nanosecond time stamp precision: %s",
-					device, pcap_statustostr(status));
-                }
+#ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
+		status = pcap_set_tstamp_precision(pd, gndo->ndo_tstamp_precision);
+		if (status != 0)
+			error("%s: Can't set %ssecond time stamp precision: %s",
+				device,
+				tstamp_precision_to_string(gndo->ndo_tstamp_precision),
+				pcap_statustostr(status));
+#endif
 
 		/*
 		 * Is this an interface that supports monitor mode?
@@ -2349,7 +2375,13 @@ print_usage(void)
 "\t\t[ -Q in|out|inout ]\n");
 #endif
 	(void)fprintf(stderr,
-"\t\t[ -r file ] [ -s snaplen ] [ -T type ] [ --version ] [ -V file ]\n");
+"\t\t[ -r file ] [ -s snaplen ] ");
+#ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
+	(void)fprintf(stderr, "[ --time-stamp-precision precision ]\n");
+	(void)fprintf(stderr,
+"\t\t");
+#endif
+	(void)fprintf(stderr, "[ -T type ] [ --version ] [ -V file ]\n");
 	(void)fprintf(stderr,
 "\t\t[ -w file ] [ -W filecount ] [ -y datalinktype ] [ -z command ]\n");
 	(void)fprintf(stderr,

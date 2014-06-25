@@ -121,6 +121,9 @@
 /* Define to 1 if you have the `pcap_set_datalink' function. */
 #undef HAVE_PCAP_SET_DATALINK
 
+/* Define to 1 if you have the `pcap_set_tstamp_precision' function. */
+#undef HAVE_PCAP_SET_TSTAMP_PRECISION
+
 /* Define to 1 if you have the `pcap_set_tstamp_type' function. */
 #undef HAVE_PCAP_SET_TSTAMP_TYPE
 

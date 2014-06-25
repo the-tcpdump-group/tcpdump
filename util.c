@@ -138,8 +138,26 @@ static char *
 ts_format(netdissect_options *ndo, int sec, int usec)
 {
 	static char buf[sizeof("00:00:00.000000000")];
-	const char *format = ndo->ndo_tstamp_precision == PCAP_TSTAMP_PRECISION_NANO ?
-                "%02d:%02d:%02d.%09u" : "%02d:%02d:%02d.%06u";
+	const char *format;
+
+#ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
+	switch (ndo->ndo_tstamp_precision) {
+
+	case PCAP_TSTAMP_PRECISION_MICRO:
+		format = "%02d:%02d:%02d.%06u";
+		break;
+
+	case PCAP_TSTAMP_PRECISION_NANO:
+		format = "%02d:%02d:%02d.%09u";
+		break;
+
+	default:
+		format = "%02d:%02d:%02d.{unknown precision}";
+		break;
+	}
+#else
+	format = "%02d:%02d:%02d.%06u";
+#endif
 
 	snprintf(buf, sizeof(buf), format,
                  sec / 3600, (sec % 3600) / 60, sec % 60, usec);

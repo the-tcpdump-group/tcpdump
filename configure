@@ -6580,6 +6580,21 @@ _ACEOF
 fi
 done
 
+	#
+	# And do we have pcap_set_tstamp_precision?  If so, we assume
+	# we also have pcap_open_offline_with_tstamp_precision.
+	#
+	for ac_func in pcap_set_tstamp_precision
+do :
+  ac_fn_c_check_func "$LINENO" "pcap_set_tstamp_precision" "ac_cv_func_pcap_set_tstamp_precision"
+if test "x$ac_cv_func_pcap_set_tstamp_precision" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PCAP_SET_TSTAMP_PRECISION 1
+_ACEOF
+
+fi
+done
+
 fi
 
 for ac_func in pcap_findalldevs pcap_dump_flush pcap_lib_version pcap_setdirection

@@ -720,6 +720,11 @@ if test $ac_cv_func_pcap_create = "yes" ; then
 	# pcap_list_tstamp_types and pcap_free_tstamp_types as well.
 	#
 	AC_CHECK_FUNCS(pcap_set_tstamp_type)
+	#
+	# And do we have pcap_set_tstamp_precision?  If so, we assume
+	# we also have pcap_open_offline_with_tstamp_precision.
+	#
+	AC_CHECK_FUNCS(pcap_set_tstamp_precision)
 fi
 
 AC_CHECK_FUNCS(pcap_findalldevs pcap_dump_flush pcap_lib_version pcap_setdirection)
