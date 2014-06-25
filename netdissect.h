@@ -209,15 +209,26 @@ struct netdissect_options {
  * Maximum snapshot length.  This should be enough to capture the full
  * packet on most network interfaces.
  *
- * Somewhat arbitrary, but chosen to be 1) big enough for maximum-size
- * Linux loopback packets and 2) small enough not to cause attempts to
- * allocate huge amounts of memory; some applications might use the
- * snapshot length in a savefile header to control the size of the buffer
- * they allocate, so a size of, say, 2^31-1 might not work well.
+ *
+ * Somewhat arbitrary, but chosen to be:
+ *
+ *    1) big enough for maximum-size Linux loopback packets (65549)
+ *       and some USB packets captured with USBPcap:
+ *
+ *           http://desowin.org/usbpcap/
+ *
+ *       (> 131072, < 262144)
+ *
+ * and
+ *
+ *    2) small enough not to cause attempts to allocate huge amounts of
+ *       memory; some applications might use the snapshot length in a
+ *       savefile header to control the size of the buffer they allocate,
+ *       so a size of, say, 2^31-1 might not work well.
  *
  * XXX - does it need to be bigger still?
  */
-#define MAXIMUM_SNAPLEN	131072
+#define MAXIMUM_SNAPLEN	262144
 
 /*
  * The default snapshot length is the maximum.
