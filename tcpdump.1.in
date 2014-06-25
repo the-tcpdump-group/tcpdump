@@ -123,8 +123,12 @@ tcpdump \- dump traffic on a network
 ]
 .ti +8
 [
+.BI \-\-time\-stamp\-precision= tstamp_precision
+]
+[
 .B \-\-version
 ]
+.ti +8
 [
 .I expression
 ]
@@ -433,13 +437,23 @@ time stamp type cannot be set for the interface, no time stamp types are
 listed.
 .TP
 .BI \-\-time\-stamp\-precision= tstamp_precision
-.PD
-Set the time stamp precision for the capture to
-\fItstamp_precision\fP. Currently supported are microseconds and
-nanoseconds. Note that availability of high precision time stamps (nanoseconds)
-and their actual accuracy is platform and HW dependent. Also note that when
-writing captures to the savefile, distinct magic number is used to distinguish
-savefiles which contains time stamps in nanoseconds.
+When capturing, set the time stamp precision for the capture to
+\fItstamp_precision\fP.  Note that availability of high precision time
+stamps (nanoseconds) and their actual accuracy is platform and hardware
+dependent.  Also note that when writing captures made with nanosecond
+accuracy to a savefile, the time stamps are written with nanosecond
+resolution, and the file is written with a different magic number, to
+indicate that the time stamps are in seconds and nanoseconds; not all
+programs that read pcap savefiles will be able to read those captures.
+.LP
+When reading a savefile, convert time stamps to the precision specified
+by \fItimestamp_precision\fP, and display them with that resolution.  If
+the precision specified is less than the precision of time stamps in the
+file, the conversion will lose precision.
+.LP
+The supported values for \fItimestamp_precision\fP are \fBmicro\fP for
+microsecond resolution and \fBnano\fP for nanosecond resolution.  The
+default is microsecond resolution.
 .TP
 .B \-K
 .PD 0
