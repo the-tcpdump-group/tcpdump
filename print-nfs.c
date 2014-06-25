@@ -905,7 +905,7 @@ xid_map_enter(netdissect_options *ndo,
 	if (++xid_map_next >= XIDMAPSIZE)
 		xid_map_next = 0;
 
-	xmep->xid = rp->rm_xid;
+	UNALIGNED_MEMCPY(&xmep->xid, &rp->rm_xid, sizeof(xmep->xid));
 	if (ip) {
 		xmep->ipver = 4;
 		UNALIGNED_MEMCPY(&xmep->client, &ip->ip_src, sizeof(ip->ip_src));
