@@ -1187,9 +1187,7 @@ static const char *status_text[] = {
 	"The request has not been successful as one or more parameters "
 	  "have invalid values",				/* 38 */
 	"The TS has not been created because the request cannot be honored. "
-	  "However, a suggested TSPEC is provided so that the initiating QSTA"
-	  "may attempt to set another TS with the suggested changes to the "
-	  "TSPEC",						/* 39 */
+	  "Try again with the suggested changes to the TSPEC",	/* 39 */
 	"Invalid Information Element",				/* 40 */
 	"Group Cipher is not valid",				/* 41 */
 	"Pairwise Cipher is not valid",				/* 42 */
