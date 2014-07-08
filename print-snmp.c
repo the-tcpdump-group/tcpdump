@@ -914,11 +914,10 @@ smi_decode_oid(netdissect_options *ndo,
 		        first = 0;
 			firstval = o / OIDMUX;
 			if (firstval > 2) firstval = 2;
-			if (*oidlen < oidsize) {
-			    oid[*oidlen] = firstval;
-			}
 			o -= firstval * OIDMUX;
-			if (*oidlen < oidsize) (*oidlen)++;
+			if (*oidlen < oidsize) {
+			    oid[(*oidlen)++] = firstval;
+			}
 		}
 		if (*oidlen < oidsize) {
 			oid[(*oidlen)++] = o;
