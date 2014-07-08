@@ -156,14 +156,18 @@ struct netdissect_options {
   /* pointer to void function to output stuff */
   void (*ndo_default_print)(netdissect_options *,
   		      register const u_char *bp, register u_int length);
+
+  /* pointer to function to print ^T output */
   void (*ndo_info)(netdissect_options *, int verbose);
 
+  /* pointer to function to do regular output */
   int  (*ndo_printf)(netdissect_options *,
 		     const char *fmt, ...)
 #ifdef __ATTRIBUTE___FORMAT_OK_FOR_FUNCTION_POINTERS
 		     __attribute__ ((format (printf, 2, 3)))
 #endif
 		     ;
+  /* pointer to function to output errors */
   void (*ndo_error)(netdissect_options *,
 		    const char *fmt, ...)
 #ifdef __ATTRIBUTE___NORETURN_OK_FOR_FUNCTION_POINTERS
@@ -173,6 +177,7 @@ struct netdissect_options {
 		     __attribute__ ((format (printf, 2, 3)))
 #endif /* __ATTRIBUTE___FORMAT_OK_FOR_FUNCTION_POINTERS */
 		     ;
+  /* pointer to function to output warnings */
   void (*ndo_warning)(netdissect_options *,
 		      const char *fmt, ...)
 #ifdef __ATTRIBUTE___FORMAT_OK_FOR_FUNCTION_POINTERS
