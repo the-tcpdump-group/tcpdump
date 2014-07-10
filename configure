@@ -703,6 +703,7 @@ with_smi
 enable_smb
 with_user
 with_chroot
+with_sandbox_capsicum
 enable_ipv6
 with_crypto
 '
@@ -1340,6 +1341,7 @@ Optional Packages:
   --without-smi           don't link with libsmi
   --with-user=USERNAME    drop privileges by default to USERNAME
   --with-chroot=DIRECTORY when dropping privileges, chroot to DIRECTORY
+ --with-sandbox-capsicum
   --with-crypto           use OpenSSL libcrypto [default=yes, if available]
 
 Some influential environment variables:
@@ -4513,6 +4515,48 @@ _ACEOF
 $as_echo "to \"$withval\"" >&6; }
 else
        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+# Check whether --with-sandbox-capsicum was given.
+if test "${with_sandbox_capsicum+set}" = set; then :
+  withval=$with_sandbox_capsicum;
+fi
+
+#
+# Check whether various functions are available.  If any are, set
+# ac_lbl_capsicum_function_seen to yes; if any are not, set
+# ac_lbl_capsicum_function_not_seen to yes.
+#
+# All of them must be available in order to enable capsicum sandboxing.
+#
+if test ! -z "$with_sandbox-capsicum" && test "$with_sandbox-capsicum" != "no" ; then
+	for ac_func in cap_enter cap_rights_init cap_rights_limit cap_ioctls_limit openat
+do :
+  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
+ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
+if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
+_ACEOF
+ ac_lbl_capsicum_function_seen=yes
+else
+  ac_lbl_capsicum_function_not_seen=yes
+fi
+done
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to sandbox using capsicum" >&5
+$as_echo_n "checking whether to sandbox using capsicum... " >&6; }
+if test "x$ac_lbl_capsicum_function_seen" = "xyes" -a "x$ac_lbl_capsicum_function_not_seen" != "xyes"; then
+
+$as_echo "#define HAVE_CAPSICUM 1" >>confdefs.h
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 fi
 
