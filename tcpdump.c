@@ -648,9 +648,8 @@ show_devices_and_exit (void)
  * component of the entry for the long option, and have a case for that
  * option in the switch statement.
  */
-#define OPTION_NUMBER		128
-#define OPTION_VERSION		129
-#define OPTION_TSTAMP_PRECISION	130
+#define OPTION_VERSION		128
+#define OPTION_TSTAMP_PRECISION	129
 
 static const struct option longopts[] = {
 #if defined(HAVE_PCAP_CREATE) || defined(WIN32)
@@ -686,7 +685,7 @@ static const struct option longopts[] = {
 	{ "debug-filter-parser", no_argument, NULL, 'Y' },
 #endif
 	{ "relinquish-privileges", required_argument, NULL, 'Z' },
-	{ "number", no_argument, NULL, OPTION_NUMBER },
+	{ "number", no_argument, NULL, '#' },
 	{ "version", no_argument, NULL, OPTION_VERSION },
 	{ NULL, 0, NULL, 0 }
 };
@@ -945,7 +944,7 @@ main(int argc, char **argv)
 #endif
 
 	while (
-	    (op = getopt_long(argc, argv, "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOpq" Q_FLAG "r:Rs:StT:u" U_FLAG "vV:w:W:xXy:Yz:Z:", longopts, NULL)) != -1)
+	    (op = getopt_long(argc, argv, "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOpq" Q_FLAG "r:Rs:StT:u" U_FLAG "vV:w:W:xXy:Yz:Z:#", longopts, NULL)) != -1)
 		switch (op) {
 
 		case 'a':
@@ -1306,7 +1305,7 @@ main(int argc, char **argv)
 			username = strdup(optarg);
 			break;
 
-		case OPTION_NUMBER:
+		case '#':
 			gndo->ndo_packet_number = 1;
 			break;
 
@@ -2365,7 +2364,7 @@ print_usage(void)
 {
 	print_version();
 	(void)fprintf(stderr,
-"Usage: %s [-aAbd" D_FLAG "efhH" I_FLAG J_FLAG "KlLnNOpqRStu" U_FLAG "vxX]" B_FLAG_USAGE " [ -c count ]\n", program_name);
+"Usage: %s [-aAbd" D_FLAG "efhH" I_FLAG J_FLAG "KlLnNOpqRStu" U_FLAG "vxX#]" B_FLAG_USAGE " [ -c count ]\n", program_name);
 	(void)fprintf(stderr,
 "\t\t[ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]\n");
 	(void)fprintf(stderr,

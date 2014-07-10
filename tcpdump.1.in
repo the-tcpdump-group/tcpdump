@@ -27,7 +27,7 @@ tcpdump \- dump traffic on a network
 .na
 .B tcpdump
 [
-.B \-AbdDefhHIJKlLnNOpqRStuUvxX
+.B \-AbdDefhHIJKlLnNOpqRStuUvxX#
 ] [
 .B \-B
 .I buffer_size
@@ -533,6 +533,9 @@ Don't print domain name qualification of host names.
 E.g.,
 if you give this flag then \fItcpdump\fP will print ``nic''
 instead of ``nic.ddn.mil''.
+.TP
+.B \-#
+.PD 0
 .TP
 .B \-\-number
 Print an optional packet number at the beginning of the line.
