@@ -541,6 +541,7 @@ instead of ``nic.ddn.mil''.
 .PD 0
 .TP
 .B \-\-number
+.PD
 Print an optional packet number at the beginning of the line.
 .TP
 .B \-O
