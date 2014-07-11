@@ -20,7 +20,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "6 May 2014"
+.TH TCPDUMP 1  "11 July 2014"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -31,7 +31,10 @@ tcpdump \- dump traffic on a network
 ] [
 .B \-B
 .I buffer_size
-] [
+]
+.br
+.ti +8
+[
 .B \-c
 .I count
 ]
