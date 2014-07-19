@@ -1,3 +1,8 @@
+Saturday Jul. 19, 2014 mcr@sandelman.ca
+  Summary for 4.6.1 tcpdump release
+	added FreeBSD capsicum
+	add a short option '#', same as long option '--number'
+
 Wednesday Jul. 2, 2014 mcr@sandelman.ca
   Summary for 4.6.0 tcpdump release
         all of tcpdump is now using the new "NDO" code base (Thanks Denis!)
