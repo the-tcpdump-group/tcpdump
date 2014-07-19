@@ -20,18 +20,21 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "6 May 2014"
+.TH TCPDUMP 1  "11 July 2014"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
 .na
 .B tcpdump
 [
-.B \-AbdDefhHIJKlLnNOpqRStuUvxX
+.B \-AbdDefhHIJKlLnNOpqRStuUvxX#
 ] [
 .B \-B
 .I buffer_size
-] [
+]
+.br
+.ti +8
+[
 .B \-c
 .I count
 ]
@@ -534,7 +537,11 @@ E.g.,
 if you give this flag then \fItcpdump\fP will print ``nic''
 instead of ``nic.ddn.mil''.
 .TP
+.B \-#
+.PD 0
+.TP
 .B \-\-number
+.PD
 Print an optional packet number at the beginning of the line.
 .TP
 .B \-O

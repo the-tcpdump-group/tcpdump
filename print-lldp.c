@@ -1180,9 +1180,12 @@ lldp_private_dcbx_print(netdissect_options *ndo,
 	    ND_PRINT((ndo, "\n\t      SubType: %d", *(tptr + 3)));
 	    ND_PRINT((ndo, "\n\t      Priority Allocation"));
 
+	    /*
+	     * Array of 8 4-bit priority group ID values; we fetch all
+	     * 32 bits and extract each nibble.
+	     */
 	    pgval = EXTRACT_32BITS(tptr+4);
 	    for (i = 0; i <= 7; i++) {
-		tval = *(tptr+4+(i/2));
 		ND_PRINT((ndo, "\n\t          PgId_%d: %d",
 			i, (pgval >> (28 - 4 * i)) & 0xF));
 	    }

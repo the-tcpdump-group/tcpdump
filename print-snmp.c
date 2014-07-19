@@ -898,6 +898,7 @@ smi_decode_oid(netdissect_options *ndo,
 	u_char *p = (u_char *)elem->data.raw;
 	uint32_t asnlen = elem->asnlen;
 	int o = 0, first = -1, i = asnlen;
+	unsigned int firstval;
 
 	for (*oidlen = 0; ndo->ndo_sflag && i-- > 0; p++) {
 		ND_TCHECK(*p);
@@ -911,12 +912,12 @@ smi_decode_oid(netdissect_options *ndo,
 		 */
 		if (first < 0) {
 		        first = 0;
+			firstval = o / OIDMUX;
+			if (firstval > 2) firstval = 2;
+			o -= firstval * OIDMUX;
 			if (*oidlen < oidsize) {
-			    oid[*oidlen] = o / OIDMUX;
-			    if (oid[*oidlen] > 2) oid[*oidlen] = 2;
+			    oid[(*oidlen)++] = firstval;
 			}
-			o -= oid[*oidlen] * OIDMUX;
-			if (*oidlen < oidsize) (*oidlen)++;
 		}
 		if (*oidlen < oidsize) {
 			oid[(*oidlen)++] = o;

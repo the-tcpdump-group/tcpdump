@@ -177,6 +177,27 @@ else
        AC_MSG_RESULT(no)
 fi
 
+AC_ARG_WITH(sandbox-capsicum, [ --with-sandbox-capsicum ])
+#
+# Check whether various functions are available.  If any are, set
+# ac_lbl_capsicum_function_seen to yes; if any are not, set
+# ac_lbl_capsicum_function_not_seen to yes.
+#
+# All of them must be available in order to enable capsicum sandboxing.
+#
+if test ! -z "$with_sandbox-capsicum" && test "$with_sandbox-capsicum" != "no" ; then
+	AC_CHECK_FUNCS(cap_enter cap_rights_init cap_rights_limit cap_ioctls_limit openat,
+	    ac_lbl_capsicum_function_seen=yes,
+	    ac_lbl_capsicum_function_not_seen=yes)
+fi
+AC_MSG_CHECKING([whether to sandbox using capsicum])
+if test "x$ac_lbl_capsicum_function_seen" = "xyes" -a "x$ac_lbl_capsicum_function_not_seen" != "xyes"; then
+	AC_DEFINE(HAVE_CAPSICUM, 1, [capsicum support available])
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+
 #
 # We must check this before checking whether to enable IPv6, because,
 # on some platforms (such as SunOS 5.x), the test program requires

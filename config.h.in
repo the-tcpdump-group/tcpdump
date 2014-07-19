@@ -9,6 +9,21 @@
 /* Define to 1 if you have the `bpf_dump' function. */
 #undef HAVE_BPF_DUMP
 
+/* capsicum support available */
+#undef HAVE_CAPSICUM
+
+/* Define to 1 if you have the `cap_enter' function. */
+#undef HAVE_CAP_ENTER
+
+/* Define to 1 if you have the `cap_ioctls_limit' function. */
+#undef HAVE_CAP_IOCTLS_LIMIT
+
+/* Define to 1 if you have the `cap_rights_init' function. */
+#undef HAVE_CAP_RIGHTS_INIT
+
+/* Define to 1 if you have the `cap_rights_limit' function. */
+#undef HAVE_CAP_RIGHTS_LIMIT
+
 /* Define to 1 if you have the declaration of `ether_ntohost', and to 0 if you
    don't. */
 #undef HAVE_DECL_ETHER_NTOHOST
@@ -66,6 +81,9 @@
 
 /* Define to 1 if you have the <net/pfvar.h> header file. */
 #undef HAVE_NET_PFVAR_H
+
+/* Define to 1 if you have the `openat' function. */
+#undef HAVE_OPENAT
 
 /* Define to 1 if you have the <openssl/evp.h> header file. */
 #undef HAVE_OPENSSL_EVP_H
