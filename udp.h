@@ -44,6 +44,8 @@ struct udphdr {
 	uint16_t	uh_sum;			/* udp checksum */
 };
 
+#define BOOTPS_PORT 67		/* RFC951 */
+#define BOOTPC_PORT 68		/* RFC951 */
 #define TFTP_PORT 69		/*XXX*/
 #define KERBEROS_PORT 88	/*XXX*/
 #define SUNRPC_PORT 111		/*XXX*/
