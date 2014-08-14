@@ -40,7 +40,8 @@
 
 static const char tstr[] = "[|cdp]";
 
-#define CDP_HEADER_LEN  4
+#define CDP_HEADER_LEN     4
+#define CDP_HEADER_OFFSET  2
 
 static const struct tok cdp_tlv_values[] = {
     { 0x01,             "Device-ID"},
@@ -99,15 +100,15 @@ cdp_print(netdissect_options *ndo,
 	ND_TCHECK2(*tptr, CDP_HEADER_LEN);
 	ND_PRINT((ndo, "CDPv%u, ttl: %us", *tptr, *(tptr + 1)));
 	if (ndo->ndo_vflag)
-		ND_PRINT((ndo, ", checksum: %u (unverified), length %u", EXTRACT_16BITS(tptr), length));
+		ND_PRINT((ndo, ", checksum: 0x%04x (unverified), length %u", EXTRACT_16BITS(tptr+CDP_HEADER_OFFSET), length));
 	tptr += CDP_HEADER_LEN;
 
 	while (tptr < (pptr+length)) {
-		ND_TCHECK2(*tptr, 4); /* read out Type and Length */
+		ND_TCHECK2(*tptr, CDP_HEADER_LEN); /* read out Type and Length */
 		type = EXTRACT_16BITS(tptr);
-		len  = EXTRACT_16BITS(tptr+2); /* object length includes the 4 bytes header length */
-                tptr += 4;
-                len -= 4;
+		len  = EXTRACT_16BITS(tptr+CDP_HEADER_OFFSET); /* object length includes the 4 bytes header length */
+                tptr += CDP_HEADER_LEN;
+                len -= CDP_HEADER_LEN;
 
 		ND_TCHECK2(*tptr, len);
 
@@ -163,15 +164,15 @@ cdp_print(netdissect_options *ndo,
 			break;
                     case 0x08: /* Protocol Hello Option - not documented */
 			break;
-                    case 0x09: /* VTP Mgmt Domain  - not documented */
+                    case 0x09: /* VTP Mgmt Domain  - CDPv2 */
                         ND_PRINT((ndo, "'"));
                         fn_printn(ndo, tptr, len, NULL);
                         ND_PRINT((ndo, "'"));
 			break;
-                    case 0x0a: /* Native VLAN ID - not documented */
+                    case 0x0a: /* Native VLAN ID - CDPv2 */
 			ND_PRINT((ndo, "%d", EXTRACT_16BITS(tptr)));
 			break;
-                    case 0x0b: /* Duplex - not documented */
+                    case 0x0b: /* Duplex - CDPv2 */
 			ND_PRINT((ndo, "%s", *(tptr) ? "full": "half"));
 			break;
 
