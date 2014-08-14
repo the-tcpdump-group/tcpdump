@@ -215,7 +215,7 @@ cdp_print(netdissect_options *ndo,
                     }
                 }
 		/* avoid infinite loop */
-		if (len == 0)
+		if (len < 0)
 			break;
 		tptr = tptr+len;
 	}
