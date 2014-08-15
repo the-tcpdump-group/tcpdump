@@ -88,14 +88,14 @@ cdp_print(netdissect_options *ndo,
           const u_char *pptr, u_int length, u_int caplen)
 {
 	int type, len, i, j;
-        const u_char *tptr;
+	const u_char *tptr;
 
 	if (caplen < CDP_HEADER_LEN) {
 		ND_PRINT((ndo, "%s", tstr));
 		return;
 	}
 
-        tptr = pptr; /* temporary pointer */
+	tptr = pptr; /* temporary pointer */
 
 	ND_TCHECK2(*tptr, CDP_HEADER_LEN);
 	ND_PRINT((ndo, "CDPv%u, ttl: %us", *tptr, *(tptr + 1)));
@@ -108,130 +108,130 @@ cdp_print(netdissect_options *ndo,
 		type = EXTRACT_16BITS(tptr);
 		len  = EXTRACT_16BITS(tptr+CDP_HEADER_OFFSET); /* object length includes the 4 bytes header length */
 		if (len < CDP_HEADER_LEN) {
-                    if (ndo->ndo_vflag)
-                        ND_PRINT((ndo, "\n\t%s (0x%02x), TLV length: %u byte%s (too short)",
-                               tok2str(cdp_tlv_values,"unknown field type", type),
-                               type,
-                               len,
-                               PLURAL_SUFFIX(len))); /* plural */
-                    else
-                        ND_PRINT((ndo, ", %s TLV length %u too short",
-                               tok2str(cdp_tlv_values,"unknown field type", type),
-                               len));
-                    break;
-                }
-                tptr += CDP_HEADER_LEN;
-                len -= CDP_HEADER_LEN;
+		    if (ndo->ndo_vflag)
+			ND_PRINT((ndo, "\n\t%s (0x%02x), TLV length: %u byte%s (too short)",
+			       tok2str(cdp_tlv_values,"unknown field type", type),
+			       type,
+			       len,
+			       PLURAL_SUFFIX(len))); /* plural */
+		    else
+			ND_PRINT((ndo, ", %s TLV length %u too short",
+			       tok2str(cdp_tlv_values,"unknown field type", type),
+			       len));
+		    break;
+		}
+		tptr += CDP_HEADER_LEN;
+		len -= CDP_HEADER_LEN;
 
 		ND_TCHECK2(*tptr, len);
 
-                if (ndo->ndo_vflag || type == 1) { /* in non-verbose mode just print Device-ID */
+		if (ndo->ndo_vflag || type == 1) { /* in non-verbose mode just print Device-ID */
 
-                    if (ndo->ndo_vflag)
-                        ND_PRINT((ndo, "\n\t%s (0x%02x), value length: %u byte%s: ",
-                               tok2str(cdp_tlv_values,"unknown field type", type),
-                               type,
-                               len,
-                               PLURAL_SUFFIX(len))); /* plural */
+		    if (ndo->ndo_vflag)
+			ND_PRINT((ndo, "\n\t%s (0x%02x), value length: %u byte%s: ",
+			       tok2str(cdp_tlv_values,"unknown field type", type),
+			       type,
+			       len,
+			       PLURAL_SUFFIX(len))); /* plural */
 
-                    switch (type) {
+		    switch (type) {
 
-                    case 0x01: /* Device-ID */
-                        if (!ndo->ndo_vflag)
-                            ND_PRINT((ndo, ", Device-ID "));
-                        ND_PRINT((ndo, "'"));
-                        fn_printn(ndo, tptr, len, NULL);
-                        ND_PRINT((ndo, "'"));
+		    case 0x01: /* Device-ID */
+			if (!ndo->ndo_vflag)
+			    ND_PRINT((ndo, ", Device-ID "));
+			ND_PRINT((ndo, "'"));
+			fn_printn(ndo, tptr, len, NULL);
+			ND_PRINT((ndo, "'"));
 			break;
-                    case 0x02: /* Address */
-                        if (cdp_print_addr(ndo, tptr, len) < 0)
-                            goto trunc;
+		    case 0x02: /* Address */
+			if (cdp_print_addr(ndo, tptr, len) < 0)
+			    goto trunc;
 			break;
-                    case 0x03: /* Port-ID */
-                        ND_PRINT((ndo, "'"));
-                        fn_printn(ndo, tptr, len, NULL);
-                        ND_PRINT((ndo, "'"));
+		    case 0x03: /* Port-ID */
+			ND_PRINT((ndo, "'"));
+			fn_printn(ndo, tptr, len, NULL);
+			ND_PRINT((ndo, "'"));
 			break;
-                    case 0x04: /* Capabilities */
+		    case 0x04: /* Capabilities */
 			ND_PRINT((ndo, "(0x%08x): %s",
-                               EXTRACT_32BITS(tptr),
-                               bittok2str(cdp_capability_values, "none", EXTRACT_32BITS(tptr))));
+			       EXTRACT_32BITS(tptr),
+			       bittok2str(cdp_capability_values, "none", EXTRACT_32BITS(tptr))));
 			break;
-                    case 0x05: /* Version */
-                        ND_PRINT((ndo, "\n\t  "));
-                        for (i=0;i<len;i++) {
-                            j = *(tptr+i);
-                            ND_PRINT((ndo, "%c", j));
-                            if (j == 0x0a) /* lets rework the version string to get a nice identation */
-                                ND_PRINT((ndo, "\t  "));
-                        }
+		    case 0x05: /* Version */
+			ND_PRINT((ndo, "\n\t  "));
+			for (i=0;i<len;i++) {
+			    j = *(tptr+i);
+			    ND_PRINT((ndo, "%c", j));
+			    if (j == 0x0a) /* lets rework the version string to get a nice identation */
+				ND_PRINT((ndo, "\t  "));
+			}
 			break;
-                    case 0x06: /* Platform */
-                        ND_PRINT((ndo, "'"));
-                        fn_printn(ndo, tptr, len, NULL);
-                        ND_PRINT((ndo, "'"));
+		    case 0x06: /* Platform */
+			ND_PRINT((ndo, "'"));
+			fn_printn(ndo, tptr, len, NULL);
+			ND_PRINT((ndo, "'"));
 			break;
-                    case 0x07: /* Prefixes */
+		    case 0x07: /* Prefixes */
 			if (cdp_print_prefixes(ndo, tptr, len) < 0)
-                            goto trunc;
+			    goto trunc;
 			break;
-                    case 0x08: /* Protocol Hello Option - not documented */
+		    case 0x08: /* Protocol Hello Option - not documented */
 			break;
-                    case 0x09: /* VTP Mgmt Domain  - CDPv2 */
-                        ND_PRINT((ndo, "'"));
-                        fn_printn(ndo, tptr, len, NULL);
-                        ND_PRINT((ndo, "'"));
+		    case 0x09: /* VTP Mgmt Domain  - CDPv2 */
+			ND_PRINT((ndo, "'"));
+			fn_printn(ndo, tptr, len, NULL);
+			ND_PRINT((ndo, "'"));
 			break;
-                    case 0x0a: /* Native VLAN ID - CDPv2 */
+		    case 0x0a: /* Native VLAN ID - CDPv2 */
 			ND_PRINT((ndo, "%d", EXTRACT_16BITS(tptr)));
 			break;
-                    case 0x0b: /* Duplex - CDPv2 */
+		    case 0x0b: /* Duplex - CDPv2 */
 			ND_PRINT((ndo, "%s", *(tptr) ? "full": "half"));
 			break;
 
-                    /* http://www.cisco.com/univercd/cc/td/doc/product/voice/ata/atarn/186rn21m.htm
-                     * plus more details from other sources
-                     */
-                    case 0x0e: /* ATA-186 VoIP VLAN request - incomplete doc. */
+		    /* http://www.cisco.com/univercd/cc/td/doc/product/voice/ata/atarn/186rn21m.htm
+		     * plus more details from other sources
+		     */
+		    case 0x0e: /* ATA-186 VoIP VLAN request - incomplete doc. */
 			ND_PRINT((ndo, "app %d, vlan %d", *(tptr), EXTRACT_16BITS(tptr + 1)));
 			break;
-                    case 0x10: /* ATA-186 VoIP VLAN assignment - incomplete doc. */
+		    case 0x10: /* ATA-186 VoIP VLAN assignment - incomplete doc. */
 			ND_PRINT((ndo, "%1.2fW", cdp_get_number(tptr, len) / 1000.0));
 			break;
-                    case 0x11: /* MTU - not documented */
+		    case 0x11: /* MTU - not documented */
 			ND_PRINT((ndo, "%u bytes", EXTRACT_32BITS(tptr)));
 			break;
-                    case 0x12: /* AVVID trust bitmap - not documented */
+		    case 0x12: /* AVVID trust bitmap - not documented */
 			ND_PRINT((ndo, "0x%02x", *(tptr)));
 			break;
-                    case 0x13: /* AVVID untrusted port CoS - not documented */
+		    case 0x13: /* AVVID untrusted port CoS - not documented */
 			ND_PRINT((ndo, "0x%02x", *(tptr)));
 			break;
-                    case 0x14: /* System Name - not documented */
-                        ND_PRINT((ndo, "'"));
-                        fn_printn(ndo, tptr, len, NULL);
-                        ND_PRINT((ndo, "'"));
+		    case 0x14: /* System Name - not documented */
+			ND_PRINT((ndo, "'"));
+			fn_printn(ndo, tptr, len, NULL);
+			ND_PRINT((ndo, "'"));
 			break;
-                    case 0x16: /* System Object ID - not documented */
+		    case 0x16: /* System Object ID - not documented */
 			if (cdp_print_addr(ndo, tptr, len) < 0)
 				goto trunc;
 			break;
-                    case 0x17: /* Physical Location - not documented */
+		    case 0x17: /* Physical Location - not documented */
 			ND_PRINT((ndo, "0x%02x", *(tptr)));
 			if (len > 1) {
 				ND_PRINT((ndo, "/"));
-	                        fn_printn(ndo, tptr + 1, len - 1, NULL);
-	                }
+				fn_printn(ndo, tptr + 1, len - 1, NULL);
+			}
 			break;
-                    default:
-                        print_unknown_data(ndo, tptr, "\n\t  ", len);
+		    default:
+			print_unknown_data(ndo, tptr, "\n\t  ", len);
 			break;
-                    }
-                }
+		    }
+		}
 		tptr = tptr+len;
 	}
-        if (ndo->ndo_vflag < 1)
-            ND_PRINT((ndo, ", length %u", caplen));
+	if (ndo->ndo_vflag < 1)
+	    ND_PRINT((ndo, ", length %u", caplen));
 
 	return;
 trunc:
@@ -251,7 +251,7 @@ trunc:
 
 static int
 cdp_print_addr(netdissect_options *ndo,
-               const u_char * p, int l)
+	       const u_char * p, int l)
 {
 	int pt, pl, al, num;
 	const u_char *endp = p + l;
@@ -346,7 +346,7 @@ trunc:
 
 static int
 cdp_print_prefixes(netdissect_options *ndo,
-                   const u_char * p, int l)
+		   const u_char * p, int l)
 {
 	if (l % 5)
 		goto trunc;
