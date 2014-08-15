@@ -40,8 +40,14 @@
 
 static const char tstr[] = "[|cdp]";
 
-#define CDP_HEADER_LEN     4
-#define CDP_HEADER_OFFSET  2
+#define CDP_HEADER_LEN             4
+#define CDP_HEADER_VERSION_OFFSET  0
+#define CDP_HEADER_TTL_OFFSET      1
+#define CDP_HEADER_CHECKSUM_OFFSET 2
+
+#define CDP_TLV_HEADER_LEN  4
+#define CDP_TLV_TYPE_OFFSET 0
+#define CDP_TLV_LEN_OFFSET  2
 
 static const struct tok cdp_tlv_values[] = {
     { 0x01,             "Device-ID"},
@@ -98,16 +104,17 @@ cdp_print(netdissect_options *ndo,
 	tptr = pptr; /* temporary pointer */
 
 	ND_TCHECK2(*tptr, CDP_HEADER_LEN);
-	ND_PRINT((ndo, "CDPv%u, ttl: %us", *tptr, *(tptr + 1)));
+	ND_PRINT((ndo, "CDPv%u, ttl: %us", *(tptr + CDP_HEADER_VERSION_OFFSET),
+					   *(tptr + CDP_HEADER_TTL_OFFSET)));
 	if (ndo->ndo_vflag)
-		ND_PRINT((ndo, ", checksum: 0x%04x (unverified), length %u", EXTRACT_16BITS(tptr+CDP_HEADER_OFFSET), length));
+		ND_PRINT((ndo, ", checksum: 0x%04x (unverified), length %u", EXTRACT_16BITS(tptr+CDP_HEADER_CHECKSUM_OFFSET), length));
 	tptr += CDP_HEADER_LEN;
 
 	while (tptr < (pptr+length)) {
-		ND_TCHECK2(*tptr, CDP_HEADER_LEN); /* read out Type and Length */
-		type = EXTRACT_16BITS(tptr);
-		len  = EXTRACT_16BITS(tptr+CDP_HEADER_OFFSET); /* object length includes the 4 bytes header length */
-		if (len < CDP_HEADER_LEN) {
+		ND_TCHECK2(*tptr, CDP_TLV_HEADER_LEN); /* read out Type and Length */
+		type = EXTRACT_16BITS(tptr+CDP_TLV_TYPE_OFFSET);
+		len  = EXTRACT_16BITS(tptr+CDP_TLV_LEN_OFFSET); /* object length includes the 4 bytes header length */
+		if (len < CDP_TLV_HEADER_LEN) {
 		    if (ndo->ndo_vflag)
 			ND_PRINT((ndo, "\n\t%s (0x%02x), TLV length: %u byte%s (too short)",
 			       tok2str(cdp_tlv_values,"unknown field type", type),
@@ -120,8 +127,8 @@ cdp_print(netdissect_options *ndo,
 			       len));
 		    break;
 		}
-		tptr += CDP_HEADER_LEN;
-		len -= CDP_HEADER_LEN;
+		tptr += CDP_TLV_HEADER_LEN;
+		len -= CDP_TLV_HEADER_LEN;
 
 		ND_TCHECK2(*tptr, len);
 
