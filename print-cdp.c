@@ -153,6 +153,8 @@ cdp_print(netdissect_options *ndo,
 			ND_PRINT((ndo, "'"));
 			break;
 		    case 0x04: /* Capabilities */
+			if (len < 4)
+			    goto trunc;
 			ND_PRINT((ndo, "(0x%08x): %s",
 			       EXTRACT_32BITS(tptr),
 			       bittok2str(cdp_capability_values, "none", EXTRACT_32BITS(tptr))));
@@ -183,9 +185,13 @@ cdp_print(netdissect_options *ndo,
 			ND_PRINT((ndo, "'"));
 			break;
 		    case 0x0a: /* Native VLAN ID - CDPv2 */
+			if (len < 2)
+			    goto trunc;
 			ND_PRINT((ndo, "%d", EXTRACT_16BITS(tptr)));
 			break;
 		    case 0x0b: /* Duplex - CDPv2 */
+			if (len < 1)
+			    goto trunc;
 			ND_PRINT((ndo, "%s", *(tptr) ? "full": "half"));
 			break;
 
@@ -193,18 +199,26 @@ cdp_print(netdissect_options *ndo,
 		     * plus more details from other sources
 		     */
 		    case 0x0e: /* ATA-186 VoIP VLAN request - incomplete doc. */
+			if (len < 3)
+			    goto trunc;
 			ND_PRINT((ndo, "app %d, vlan %d", *(tptr), EXTRACT_16BITS(tptr + 1)));
 			break;
 		    case 0x10: /* ATA-186 VoIP VLAN assignment - incomplete doc. */
 			ND_PRINT((ndo, "%1.2fW", cdp_get_number(tptr, len) / 1000.0));
 			break;
 		    case 0x11: /* MTU - not documented */
+			if (len < 4)
+			    goto trunc;
 			ND_PRINT((ndo, "%u bytes", EXTRACT_32BITS(tptr)));
 			break;
 		    case 0x12: /* AVVID trust bitmap - not documented */
+			if (len < 1)
+			    goto trunc;
 			ND_PRINT((ndo, "0x%02x", *(tptr)));
 			break;
 		    case 0x13: /* AVVID untrusted port CoS - not documented */
+			if (len < 1)
+			    goto trunc;
 			ND_PRINT((ndo, "0x%02x", *(tptr)));
 			break;
 		    case 0x14: /* System Name - not documented */
@@ -217,6 +231,8 @@ cdp_print(netdissect_options *ndo,
 				goto trunc;
 			break;
 		    case 0x17: /* Physical Location - not documented */
+			if (len < 1)
+			    goto trunc;
 			ND_PRINT((ndo, "0x%02x", *(tptr)));
 			if (len > 1) {
 				ND_PRINT((ndo, "/"));
@@ -261,7 +277,9 @@ cdp_print_addr(netdissect_options *ndo,
 	};
 #endif
 
-	ND_TCHECK2(*p, 2);
+	ND_TCHECK2(*p, 4);
+	if (p + 4 > endp)
+		goto trunc;
 	num = EXTRACT_32BITS(p);
 	p += 4;
 
