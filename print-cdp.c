@@ -106,6 +106,19 @@ cdp_print(netdissect_options *ndo,
 		ND_TCHECK2(*tptr, 4); /* read out Type and Length */
 		type = EXTRACT_16BITS(tptr);
 		len  = EXTRACT_16BITS(tptr+2); /* object length includes the 4 bytes header length */
+		if (len < 4) {
+                    if (ndo->ndo_vflag)
+                        ND_PRINT((ndo, "\n\t%s (0x%02x), length: %u byte%s (too short)",
+                               tok2str(cdp_tlv_values,"unknown field type", type),
+                               type,
+                               len,
+                               PLURAL_SUFFIX(len))); /* plural */
+                    else
+                        ND_PRINT((ndo, ", %s TLV length %u too short",
+                               tok2str(cdp_tlv_values,"unknown field type", type),
+                               len));
+                    break;
+                }
                 tptr += 4;
                 len -= 4;
 
@@ -214,9 +227,6 @@ cdp_print(netdissect_options *ndo,
 			break;
                     }
                 }
-		/* avoid infinite loop */
-		if (len == 0)
-			break;
 		tptr = tptr+len;
 	}
         if (ndo->ndo_vflag < 1)
