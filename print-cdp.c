@@ -109,7 +109,7 @@ cdp_print(netdissect_options *ndo,
 		len  = EXTRACT_16BITS(tptr+CDP_HEADER_OFFSET); /* object length includes the 4 bytes header length */
 		if (len < CDP_HEADER_LEN) {
                     if (ndo->ndo_vflag)
-                        ND_PRINT((ndo, "\n\t%s (0x%02x), length: %u byte%s (too short)",
+                        ND_PRINT((ndo, "\n\t%s (0x%02x), TLV length: %u byte%s (too short)",
                                tok2str(cdp_tlv_values,"unknown field type", type),
                                type,
                                len,
@@ -128,7 +128,7 @@ cdp_print(netdissect_options *ndo,
                 if (ndo->ndo_vflag || type == 1) { /* in non-verbose mode just print Device-ID */
 
                     if (ndo->ndo_vflag)
-                        ND_PRINT((ndo, "\n\t%s (0x%02x), length: %u byte%s: ",
+                        ND_PRINT((ndo, "\n\t%s (0x%02x), value length: %u byte%s: ",
                                tok2str(cdp_tlv_values,"unknown field type", type),
                                type,
                                len,
