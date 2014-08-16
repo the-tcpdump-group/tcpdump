@@ -202,7 +202,7 @@ cdp_print(netdissect_options *ndo,
 			ND_PRINT((ndo, "%s", *(tptr) ? "full": "half"));
 			break;
 
-		    /* http://www.cisco.com/univercd/cc/td/doc/product/voice/ata/atarn/186rn21m.htm
+		    /* http://www.cisco.com/c/en/us/td/docs/voice_ip_comm/cata/186/2_12_m/english/release/notes/186rn21m.html
 		     * plus more details from other sources
 		     */
 		    case 0x0e: /* ATA-186 VoIP VLAN request - incomplete doc. */
