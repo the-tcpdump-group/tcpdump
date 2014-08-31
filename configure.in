@@ -197,7 +197,9 @@ else
        AC_MSG_RESULT(no)
 fi
 
-AC_ARG_WITH(sandbox-capsicum, [ --with-sandbox-capsicum ])
+AC_ARG_WITH(sandbox-capsicum,
+	AS_HELP_STRING([--with-sandbox-capsicum],
+		       [use Capsicum security functions @<:@default=yes, if available@:>@]))
 #
 # Check whether various functions are available.  If any are, set
 # ac_lbl_capsicum_function_seen to yes; if any are not, set
