@@ -66,7 +66,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef HAVE_SMI_H
+#ifdef USE_LIBSMI
 #include <smi.h>
 #endif
 
@@ -867,7 +867,7 @@ asn1_decode(u_char *p, u_int length)
 }
 #endif
 
-#ifdef LIBSMI
+#ifdef USE_LIBSMI
 
 struct smi2be {
     SmiBasetype basetype;
@@ -1200,7 +1200,7 @@ varbind_print(netdissect_options *ndo,
 {
 	struct be elem;
 	int count = 0, ind;
-#ifdef LIBSMI
+#ifdef USE_LIBSMI
 	SmiNode *smiNode = NULL;
 #endif
 	int status;
@@ -1247,7 +1247,7 @@ varbind_print(netdissect_options *ndo,
 			asn1_print(ndo, &elem);
 			return;
 		}
-#ifdef LIBSMI
+#ifdef USE_LIBSMI
 		smiNode = smi_print_variable(ndo, &elem, &status);
 #else
 		status = asn1_print(ndo, &elem);
@@ -1273,7 +1273,7 @@ varbind_print(netdissect_options *ndo,
 			}
 		} else {
 		        if (elem.type != BE_NULL) {
-#ifdef LIBSMI
+#ifdef USE_LIBSMI
 				status = smi_print_value(ndo, smiNode, pduid, &elem);
 #else
 				status = asn1_print(ndo, &elem);

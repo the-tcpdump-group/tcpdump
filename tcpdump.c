@@ -53,7 +53,7 @@ extern int SIZE_BUF;
 #define uint UINT
 #endif /* WIN32 */
 
-#ifdef HAVE_SMI_H
+#ifdef USE_LIBSMI
 #include <smi.h>
 #endif
 
@@ -954,7 +954,7 @@ main(int argc, char **argv)
 	if (abort_on_misalignment(ebuf, sizeof(ebuf)) < 0)
 		error("%s", ebuf);
 
-#ifdef LIBSMI
+#ifdef USE_LIBSMI
 	smiInit("tcpdump");
 #endif
 
@@ -1135,7 +1135,7 @@ main(int argc, char **argv)
 			break;
 
 		case 'm':
-#ifdef LIBSMI
+#ifdef USE_LIBSMI
 			if (smiLoadModule(optarg) == 0) {
 				error("could not load MIB module %s", optarg);
 			}
@@ -2487,7 +2487,7 @@ print_version(void)
 	(void)fprintf (stderr, "%s\n", SSLeay_version(SSLEAY_VERSION));
 #endif
 
-#if defined(HAVE_SMI_H)
+#ifdef USE_LIBSMI
 	(void)fprintf (stderr, "SMI-library: %s\n", smi_version_string);
 #endif
 }

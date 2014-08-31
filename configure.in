@@ -98,12 +98,22 @@ AC_ARG_WITH(smi,
    with_smi=yes)
 
 if test "x$with_smi" != "xno" ; then
-AC_CHECK_HEADERS(smi.h)
-AC_CHECK_LIB(smi, smiInit)
-if test "$ac_cv_header_smi_h" = yes -a "$ac_cv_lib_smi_smiInit" = yes
-then
-AC_MSG_CHECKING([whether to enable libsmi])
-        AC_TRY_RUN([ /* libsmi available check */
+	AC_CHECK_HEADER(smi.h,
+	[
+		#
+		# OK, we found smi.h.  Do we have libsmi with smiInit?
+		#
+		AC_CHECK_LIB(smi, smiInit,
+		[
+			#
+			# OK, we have libsmi with smiInit.  Can we use it?
+			#
+			AC_MSG_CHECKING([whether to enable libsmi])
+			savedlibs="$LIBS"
+			LIBS="-lsmi $LIBS"
+			AC_TRY_RUN(
+				[
+/* libsmi available check */
 #include <smi.h>
 main()
 {
@@ -120,25 +130,35 @@ main()
     exit(4);
   exit(0);
 }
-],
-[ AC_MSG_RESULT(yes)
-  AC_DEFINE(LIBSMI, 1, [Define if you enable support for libsmi])
-  libsmi=yes],
-dnl autoconf documentation says that $? contains the exit value.
-dnl reality is that it does not.  We leave this in just in case
-dnl autoconf ever comes back to match the documentation.
-[ case $? in
-  1) AC_MSG_RESULT(no - smiInit failed) ;;
-  2) AC_MSG_RESULT(no - header/library version mismatch) ;;
-  3) AC_MSG_RESULT(no - can't determine library version) ;;
-  4) AC_MSG_RESULT(no - too old) ;;
-  *) AC_MSG_RESULT(no) ;;
-  esac
-  libsmi=no],
-[ AC_MSG_RESULT(not when cross-compiling)
-  libsmi=no]
-)
-fi
+				],
+				[
+					AC_MSG_RESULT(yes)
+					AC_DEFINE(USE_LIBSMI, 1,
+					    [Define if you enable support for libsmi])
+				],
+				[
+					dnl autoconf documentation says that
+					dnl $? contains the exit value.
+					dnl reality is that it does not.
+					dnl We leave this in just in case
+					dnl autoconf ever comes back to
+					dnl match the documentation.
+					case $? in
+					  1) AC_MSG_RESULT(no - smiInit failed) ;;
+					  2) AC_MSG_RESULT(no - header/library version mismatch) ;;
+					  3) AC_MSG_RESULT(no - can't determine library version) ;;
+					  4) AC_MSG_RESULT(no - too old) ;;
+					  *) AC_MSG_RESULT(no) ;;
+					esac
+					LIBS="$savedlibs"
+				],
+				[
+					AC_MSG_RESULT(not when cross-compiling)
+					LIBS="$savedlibs"
+				]
+			)
+		])
+	])
 fi
 
 AC_MSG_CHECKING([whether to enable the possibly-buggy SMB printer])
