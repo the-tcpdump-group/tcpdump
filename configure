@@ -1341,7 +1341,8 @@ Optional Packages:
   --without-smi           don't link with libsmi
   --with-user=USERNAME    drop privileges by default to USERNAME
   --with-chroot=DIRECTORY when dropping privileges, chroot to DIRECTORY
- --with-sandbox-capsicum
+  --with-sandbox-capsicum use Capsicum security functions [default=yes, if
+                          available]
   --with-crypto           use OpenSSL libcrypto [default=yes, if available]
 
 Some influential environment variables:
