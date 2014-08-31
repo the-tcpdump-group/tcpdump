@@ -61,9 +61,6 @@
 /* Define to 1 if you have the `rpc' library (-lrpc). */
 #undef HAVE_LIBRPC
 
-/* Define to 1 if you have the `smi' library (-lsmi). */
-#undef HAVE_LIBSMI
-
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
@@ -169,9 +166,6 @@
 /* Define to 1 if you have the `sigset' function. */
 #undef HAVE_SIGSET
 
-/* Define to 1 if you have the <smi.h> header file. */
-#undef HAVE_SMI_H
-
 /* Define to 1 if you have the `snprintf' function. */
 #undef HAVE_SNPRINTF
 
@@ -241,9 +235,6 @@
 /* if unaligned access fails */
 #undef LBL_ALIGN
 
-/* Define if you enable support for libsmi */
-#undef LIBSMI
-
 /* define if you need to include missing/addrinfo.h */
 #undef NEED_ADDRINFO_H
 
@@ -300,6 +291,9 @@
 
 /* define if you have ether_ntohost() and it works */
 #undef USE_ETHER_NTOHOST
+
+/* Define if you enable support for libsmi */
+#undef USE_LIBSMI
 
 /* define if should chroot when dropping privileges */
 #undef WITH_CHROOT

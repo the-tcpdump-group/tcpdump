@@ -4335,19 +4335,13 @@ fi
 
 
 if test "x$with_smi" != "xno" ; then
-for ac_header in smi.h
-do :
-  ac_fn_c_check_header_mongrel "$LINENO" "smi.h" "ac_cv_header_smi_h" "$ac_includes_default"
+	ac_fn_c_check_header_mongrel "$LINENO" "smi.h" "ac_cv_header_smi_h" "$ac_includes_default"
 if test "x$ac_cv_header_smi_h" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_SMI_H 1
-_ACEOF
 
-fi
-
-done
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for smiInit in -lsmi" >&5
+		#
+		# OK, we found smi.h.  Do we have libsmi with smiInit?
+		#
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for smiInit in -lsmi" >&5
 $as_echo_n "checking for smiInit in -lsmi... " >&6; }
 if ${ac_cv_lib_smi_smiInit+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -4384,27 +4378,26 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_smi_smiInit" >&5
 $as_echo "$ac_cv_lib_smi_smiInit" >&6; }
 if test "x$ac_cv_lib_smi_smiInit" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBSMI 1
-_ACEOF
 
-  LIBS="-lsmi $LIBS"
-
-fi
-
-if test "$ac_cv_header_smi_h" = yes -a "$ac_cv_lib_smi_smiInit" = yes
-then
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable libsmi" >&5
+			#
+			# OK, we have libsmi with smiInit.  Can we use it?
+			#
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable libsmi" >&5
 $as_echo_n "checking whether to enable libsmi... " >&6; }
-        if test "$cross_compiling" = yes; then :
-   { $as_echo "$as_me:${as_lineno-$LINENO}: result: not when cross-compiling" >&5
+			savedlibs="$LIBS"
+			LIBS="-lsmi $LIBS"
+			if test "$cross_compiling" = yes; then :
+
+					{ $as_echo "$as_me:${as_lineno-$LINENO}: result: not when cross-compiling" >&5
 $as_echo "not when cross-compiling" >&6; }
-  libsmi=no
+					LIBS="$savedlibs"
+
 
 else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
- /* libsmi available check */
+
+/* libsmi available check */
 #include <smi.h>
 main()
 {
@@ -4424,32 +4417,41 @@ main()
 
 _ACEOF
 if ac_fn_c_try_run "$LINENO"; then :
-   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+
+					{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
-$as_echo "#define LIBSMI 1" >>confdefs.h
+$as_echo "#define USE_LIBSMI 1" >>confdefs.h
 
-  libsmi=yes
+
 else
-   case $? in
-  1) { $as_echo "$as_me:${as_lineno-$LINENO}: result: no - smiInit failed" >&5
+
+																																			case $? in
+					  1) { $as_echo "$as_me:${as_lineno-$LINENO}: result: no - smiInit failed" >&5
 $as_echo "no - smiInit failed" >&6; } ;;
-  2) { $as_echo "$as_me:${as_lineno-$LINENO}: result: no - header/library version mismatch" >&5
+					  2) { $as_echo "$as_me:${as_lineno-$LINENO}: result: no - header/library version mismatch" >&5
 $as_echo "no - header/library version mismatch" >&6; } ;;
-  3) { $as_echo "$as_me:${as_lineno-$LINENO}: result: no - can't determine library version" >&5
+					  3) { $as_echo "$as_me:${as_lineno-$LINENO}: result: no - can't determine library version" >&5
 $as_echo "no - can't determine library version" >&6; } ;;
-  4) { $as_echo "$as_me:${as_lineno-$LINENO}: result: no - too old" >&5
+					  4) { $as_echo "$as_me:${as_lineno-$LINENO}: result: no - too old" >&5
 $as_echo "no - too old" >&6; } ;;
-  *) { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+					  *) { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; } ;;
-  esac
-  libsmi=no
+					esac
+					LIBS="$savedlibs"
+
 fi
 rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
   conftest.$ac_objext conftest.beam conftest.$ac_ext
 fi
 
+
 fi
+
+
+fi
+
+
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable the possibly-buggy SMB printer" >&5
