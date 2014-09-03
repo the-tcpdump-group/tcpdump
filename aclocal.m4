@@ -531,7 +531,7 @@ AC_DEFUN(AC_LBL_LIBPCAP,
 	    elif test -r $places/pcap.h; then
 		    $2="-I$places $$2"
 	    else
-                    AC_MSG_ERROR(cannot find pcap.h, see INSTALL)
+                    AC_MSG_ERROR(cannot find pcap.h: see INSTALL)
  	    fi
 	    AC_MSG_RESULT($libpcap)
 	    AC_PATH_PROG(PCAP_CONFIG, pcap-config,, $d)
