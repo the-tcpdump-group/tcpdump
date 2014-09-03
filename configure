@@ -5759,7 +5759,9 @@ $as_echo_n "checking for local pcap library... " >&6; }
     lastdir=FAIL
     places=`ls $srcdir/.. | sed -e 's,/$,,' -e "s,^,$srcdir/../," | \
 	egrep '/libpcap-[0-9]+\.[0-9]+(\.[0-9]*)?([ab][0-9]*|-PRE-GIT)?$'`
-    for dir in $places $srcdir/../libpcap $srcdir/libpcap ; do
+    places2=`ls .. | sed -e 's,/$,,' -e "s,^,../," | \
+	egrep '/libpcap-[0-9]+\.[0-9]+(\.[0-9]*)?([ab][0-9]*|-PRE-GIT)?$'`
+    for dir in $places $srcdir/../libpcap ../libpcap $srcdir/libpcap $places2 ; do
 	    basedir=`echo $dir | sed -e 's/[ab][0-9]*$//' | \
 	        sed -e 's/-PRE-GIT$//' `
 	    if test $lastdir = $basedir ; then
@@ -5955,13 +5957,23 @@ $as_echo "found -- -I$d added" >&6; }
 	    V_PCAPDEP=$libpcap
 	    places=`ls $srcdir/.. | sed -e 's,/$,,' -e "s,^,$srcdir/../," | \
     	 		egrep '/libpcap-[0-9]*.[0-9]*(.[0-9]*)?([ab][0-9]*)?$'`
+	    places2=`ls .. | sed -e 's,/$,,' -e "s,^,../," | \
+    	 		egrep '/libpcap-[0-9]*.[0-9]*(.[0-9]*)?([ab][0-9]*)?$'`
+            pcapH=FAIL
 	    if test -r $d/pcap.h; then
-		    V_INCLS="-I$d $V_INCLS"
-	    elif test -r $places/pcap.h; then
-		    V_INCLS="-I$places $V_INCLS"
+                    pcapH=$d
 	    else
-                    as_fn_error see INSTALL "cannot find pcap.h" "$LINENO" 5
+                for dir in $places $srcdir/../libpcap ../libpcap $srcdir/libpcap $places2 ; do
+                   if test -r $dir/pcap.h ; then
+                       pcapH=$dir
+                   fi
+                done
+            fi
+
+            if test $pcapH = FAIL ; then
+                    as_fn_error $? "cannot find pcap.h: see INSTALL" "$LINENO" 5
  	    fi
+            V_INCLS="-I$pcapH $V_INCLS"
 	    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $libpcap" >&5
 $as_echo "$libpcap" >&6; }
 	    # Extract the first word of "pcap-config", so it can be a program name with args.
