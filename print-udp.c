@@ -43,7 +43,6 @@
 
 #include "nameser.h"
 #include "nfs.h"
-#include "bootp.h"
 
 struct rtcphdr {
 	uint16_t rh_flags;	/* T:2 P:1 CNT:5 PT:8 */
@@ -571,7 +570,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 			timed_print(ndo, (const u_char *)(up + 1));
 		else if (ISPORT(TFTP_PORT))
 			tftp_print(ndo, (const u_char *)(up + 1), length);
-		else if (ISPORT(IPPORT_BOOTPC) || ISPORT(IPPORT_BOOTPS))
+		else if (ISPORT(BOOTPC_PORT) || ISPORT(BOOTPS_PORT))
 			bootp_print(ndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(RIP_PORT))
 			rip_print(ndo, (const u_char *)(up + 1), length);

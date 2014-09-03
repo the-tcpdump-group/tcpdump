@@ -66,7 +66,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef HAVE_SMI_H
+#ifdef USE_LIBSMI
 #include <smi.h>
 #endif
 
@@ -867,7 +867,7 @@ asn1_decode(u_char *p, u_int length)
 }
 #endif
 
-#ifdef LIBSMI
+#ifdef USE_LIBSMI
 
 struct smi2be {
     SmiBasetype basetype;
@@ -898,6 +898,7 @@ smi_decode_oid(netdissect_options *ndo,
 	u_char *p = (u_char *)elem->data.raw;
 	uint32_t asnlen = elem->asnlen;
 	int o = 0, first = -1, i = asnlen;
+	unsigned int firstval;
 
 	for (*oidlen = 0; ndo->ndo_sflag && i-- > 0; p++) {
 		ND_TCHECK(*p);
@@ -911,12 +912,12 @@ smi_decode_oid(netdissect_options *ndo,
 		 */
 		if (first < 0) {
 		        first = 0;
+			firstval = o / OIDMUX;
+			if (firstval > 2) firstval = 2;
+			o -= firstval * OIDMUX;
 			if (*oidlen < oidsize) {
-			    oid[*oidlen] = o / OIDMUX;
-			    if (oid[*oidlen] > 2) oid[*oidlen] = 2;
+			    oid[(*oidlen)++] = firstval;
 			}
-			o -= oid[*oidlen] * OIDMUX;
-			if (*oidlen < oidsize) (*oidlen)++;
 		}
 		if (*oidlen < oidsize) {
 			oid[(*oidlen)++] = o;
@@ -1199,7 +1200,7 @@ varbind_print(netdissect_options *ndo,
 {
 	struct be elem;
 	int count = 0, ind;
-#ifdef LIBSMI
+#ifdef USE_LIBSMI
 	SmiNode *smiNode = NULL;
 #endif
 	int status;
@@ -1246,7 +1247,7 @@ varbind_print(netdissect_options *ndo,
 			asn1_print(ndo, &elem);
 			return;
 		}
-#ifdef LIBSMI
+#ifdef USE_LIBSMI
 		smiNode = smi_print_variable(ndo, &elem, &status);
 #else
 		status = asn1_print(ndo, &elem);
@@ -1272,7 +1273,7 @@ varbind_print(netdissect_options *ndo,
 			}
 		} else {
 		        if (elem.type != BE_NULL) {
-#ifdef LIBSMI
+#ifdef USE_LIBSMI
 				status = smi_print_value(ndo, smiNode, pduid, &elem);
 #else
 				status = asn1_print(ndo, &elem);
