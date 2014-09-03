@@ -1,3 +1,7 @@
+Tuesday  Sep.  2, 2014 mcr@sandelman.ca
+	fix out-of-source-tree builds: find libpcap that is out of source
+	better configure check for libsmi
+
 Saturday Jul. 19, 2014 mcr@sandelman.ca
   Summary for 4.6.1 tcpdump release
 	added FreeBSD capsicum
