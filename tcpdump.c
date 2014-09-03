@@ -951,6 +951,13 @@ main(int argc, char **argv)
 	else
 		program_name = argv[0];
 
+	/*
+	 * On platforms where the CPU doesn't support unaligned loads,
+	 * force unaligned accesses to abort with SIGBUS, rather than
+	 * being fixed up (slowly) by the OS kernel; on those platforms,
+	 * misaligned accesses are bugs, and we want tcpdump to crash so
+	 * that the bugs are reported.
+	 */
 	if (abort_on_misalignment(ebuf, sizeof(ebuf)) < 0)
 		error("%s", ebuf);
 
