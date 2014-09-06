@@ -477,7 +477,7 @@ print_attr_string(netdissect_options *ndo,
                  ND_PRINT((ndo, "%s", tstr));
                  return;
               }
-              ND_PRINT((ndo, "Tag %u", *data));
+              ND_PRINT((ndo, "Tag[%u]", *data));
               data++;
               length--;
            }
