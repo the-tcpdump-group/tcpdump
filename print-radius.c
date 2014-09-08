@@ -457,7 +457,9 @@ print_attr_string(netdissect_options *ndo,
               return;
            }
            if (*data && (*data <=0x1F) )
-              ND_PRINT((ndo, "Tag %u, ",*data));
+              ND_PRINT((ndo, "Tag[%u] ", *data));
+           else
+              ND_PRINT((ndo, "Tag[Unused] "));
            data++;
            length--;
            ND_PRINT((ndo, "Salt %u ", EXTRACT_16BITS(data)));
@@ -477,7 +479,10 @@ print_attr_string(netdissect_options *ndo,
                  ND_PRINT((ndo, "%s", tstr));
                  return;
               }
-              ND_PRINT((ndo, "Tag[%u]", *data));
+              if (*data)
+                ND_PRINT((ndo, "Tag[%u] ", *data));
+              else
+                ND_PRINT((ndo, "Tag[Unused] "));
               data++;
               length--;
            }
@@ -565,7 +570,6 @@ static void
 print_attr_num(netdissect_options *ndo,
                register u_char *data, u_int length, u_short attr_code)
 {
-   uint8_t tag;
    uint32_t timeout;
 
    if (length != 4)
@@ -585,9 +589,9 @@ print_attr_num(netdissect_options *ndo,
       if ( (attr_code == TUNNEL_TYPE) || (attr_code == TUNNEL_MEDIUM) )
       {
          if (!*data)
-            ND_PRINT((ndo, "Tag[Unused]"));
+            ND_PRINT((ndo, "Tag[Unused] "));
          else
-            ND_PRINT((ndo, "Tag[%d]", *data));
+            ND_PRINT((ndo, "Tag[%d] ", *data));
          data++;
          data_value = EXTRACT_24BITS(data);
       }
@@ -648,12 +652,12 @@ print_attr_num(netdissect_options *ndo,
           break;
 
         case TUNNEL_PREFERENCE:
-            tag = *data;
-            data++;
-            if (tag == 0)
-               ND_PRINT((ndo, "Tag (Unused) %d", EXTRACT_24BITS(data)));
+            if (*data)
+               ND_PRINT((ndo, "Tag[%d] ", *data));
             else
-               ND_PRINT((ndo, "Tag (%d) %d", tag, EXTRACT_24BITS(data)));
+               ND_PRINT((ndo, "Tag[Unused] "));
+            data++;
+            ND_PRINT((ndo, "%d", EXTRACT_24BITS(data)));
           break;
 
         default:
