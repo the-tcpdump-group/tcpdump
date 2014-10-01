@@ -282,11 +282,10 @@ fr_print(netdissect_options *ndo,
 	        ip_print(ndo, p, length);
 		break;
 
-#ifdef INET6
 	case NLPID_IP6:
 		ip6_print(ndo, p, length);
 		break;
-#endif
+
 	case NLPID_CLNP:
 	case NLPID_ESIS:
 	case NLPID_ISIS:

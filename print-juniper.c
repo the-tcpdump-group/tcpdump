@@ -480,11 +480,9 @@ juniper_ggsn_print(netdissect_options *ndo,
         case JUNIPER_PROTO_IPV4:
             ip_print(ndo, p, l2info.length);
             break;
-#ifdef INET6
         case JUNIPER_PROTO_IPV6:
             ip6_print(ndo, p, l2info.length);
             break;
-#endif /* INET6 */
         default:
             if (!ndo->ndo_eflag)
                 ND_PRINT((ndo, "unknown GGSN proto (%u)", gh->proto));
@@ -784,11 +782,9 @@ juniper_mlppp_print(netdissect_options *ndo,
             else
                 ip_print(ndo, p, l2info.length);
             return l2info.header_len;
-#ifdef INET6
         case JUNIPER_LSQ_L3_PROTO_IPV6:
             ip6_print(ndo, p,l2info.length);
             return l2info.header_len;
-#endif
         case JUNIPER_LSQ_L3_PROTO_MPLS:
             mpls_print(ndo, p, l2info.length);
             return l2info.header_len;
@@ -840,11 +836,9 @@ juniper_mfr_print(netdissect_options *ndo,
             case JUNIPER_LSQ_L3_PROTO_IPV4:
                 ip_print(ndo, p, l2info.length);
                 return l2info.header_len;
-#ifdef INET6
             case JUNIPER_LSQ_L3_PROTO_IPV6:
                 ip6_print(ndo, p,l2info.length);
                 return l2info.header_len;
-#endif
             case JUNIPER_LSQ_L3_PROTO_MPLS:
                 mpls_print(ndo, p, l2info.length);
                 return l2info.header_len;
@@ -1071,7 +1065,6 @@ ip_heuristic_guess(netdissect_options *ndo,
     case 0x4f:
 	    ip_print(ndo, p, length);
 	    break;
-#ifdef INET6
     case 0x60:
     case 0x61:
     case 0x62:
@@ -1090,7 +1083,6 @@ ip_heuristic_guess(netdissect_options *ndo,
     case 0x6f:
         ip6_print(ndo, p, length);
         break;
-#endif
     default:
         return 0; /* did not find a ip header */
         break;

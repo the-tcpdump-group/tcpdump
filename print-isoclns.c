@@ -703,11 +703,9 @@ void isoclns_print(netdissect_options *ndo,
 		ip_print(ndo, p + 1, length - 1);
 		break;
 
-#ifdef INET6
 	case NLPID_IP6:
 		ip6_print(ndo, p + 1, length - 1);
 		break;
-#endif
 
 	case NLPID_PPP:
 		ppp_print(ndo, p + 1, length - 1);

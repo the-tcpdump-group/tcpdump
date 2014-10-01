@@ -564,8 +564,8 @@ extern u_int ieee802_11_if_print(netdissect_options *, const struct pcap_pkthdr 
 extern u_int ieee802_11_radio_avs_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
 extern u_int prism_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
 
-#ifdef INET6
 extern void ip6_print(netdissect_options *,const u_char *, u_int);
+#ifdef INET6
 extern int frag6_print(netdissect_options *, const u_char *, const u_char *);
 extern int rt6_print(netdissect_options *, const u_char *, const u_char *);
 extern int hbhopt_print(netdissect_options *, const u_char *);

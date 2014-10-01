@@ -436,12 +436,10 @@ again:
 		}
 		break;
 
-#ifdef INET6
 	case IPPROTO_IPV6:
 		/* ip6-in-ip encapsulation */
 		ip6_print(ndo, ipds->cp, ipds->len);
 		break;
-#endif /*INET6*/
 
 	case IPPROTO_RSVP:
 		rsvp_print(ndo, ipds->cp, ipds->len);
@@ -685,11 +683,9 @@ ipN_print(netdissect_options *ndo, register const u_char *bp, register u_int len
 	case 4:
 		ip_print (ndo, bp, length);
 		return;
-#ifdef INET6
 	case 6:
 		ip6_print (ndo, bp, length);
 		return;
-#endif
 	default:
 		ND_PRINT((ndo, "unknown ip %d", IP_V(&hdr)));
 		return;

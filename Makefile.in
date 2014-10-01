@@ -131,6 +131,7 @@ LIBNETDISSECT_SRC=\
 	print-igmp.c \
 	print-igrp.c \
 	print-ip.c \
+	print-ip6.c \
 	print-ipcomp.c \
 	print-ipfc.c \
 	print-ipnet.c \
@@ -329,7 +330,6 @@ EXTRA_DIST = \
 	print-dhcp6.c \
 	print-frag6.c \
 	print-icmp6.c \
-	print-ip6.c \
 	print-ip6opts.c \
 	print-mobility.c \
 	print-ospf6.c \

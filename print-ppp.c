@@ -1392,11 +1392,9 @@ ppp_hdlc(netdissect_options *ndo,
         case PPP_IP:
 		ip_print(ndo, b + 1, length - 1);
 		goto cleanup;
-#ifdef INET6
         case PPP_IPV6:
 		ip6_print(ndo, b + 1, length - 1);
 		goto cleanup;
-#endif
         default: /* no luck - try next guess */
 		break;
         }
@@ -1466,12 +1464,10 @@ handle_ppp(netdissect_options *ndo,
 	case PPP_IP:
 		ip_print(ndo, p, length);
 		break;
-#ifdef INET6
 	case ETHERTYPE_IPV6:	/*XXX*/
 	case PPP_IPV6:
 		ip6_print(ndo, p, length);
 		break;
-#endif
 	case ETHERTYPE_IPX:	/*XXX*/
 	case PPP_IPX:
 		ipx_print(ndo, p, length);
@@ -1781,11 +1777,9 @@ ppp_bsdos_if_print(netdissect_options *ndo _U_,
 			case PPP_IP:
 				ip_print(ndo, p, length);
 				break;
-#ifdef INET6
 			case PPP_IPV6:
 				ip6_print(ndo, p, length);
 				break;
-#endif
 			case PPP_MPLS_UCAST:
 			case PPP_MPLS_MCAST:
 				mpls_print(ndo, p, length);
@@ -1800,11 +1794,9 @@ ppp_bsdos_if_print(netdissect_options *ndo _U_,
 			case PPP_IP:
 				ip_print(ndo, p, length);
 				break;
-#ifdef INET6
 			case PPP_IPV6:
 				ip6_print(ndo, p, length);
 				break;
-#endif
 			case PPP_MPLS_UCAST:
 			case PPP_MPLS_MCAST:
 				mpls_print(ndo, p, length);
@@ -1832,11 +1824,9 @@ ppp_bsdos_if_print(netdissect_options *ndo _U_,
 	case PPP_IP:
 		ip_print(p, length);
 		break;
-#ifdef INET6
 	case PPP_IPV6:
 		ip6_print(ndo, p, length);
 		break;
-#endif
 	case PPP_MPLS_UCAST:
 	case PPP_MPLS_MCAST:
 		mpls_print(ndo, p, length);

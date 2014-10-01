@@ -326,11 +326,9 @@ arcnet_encap_print(netdissect_options *ndo, u_char arctype, const u_char *p,
 	        ip_print(ndo, p, length);
 		return (1);
 
-#ifdef INET6
 	case ARCTYPE_INET6:
 		ip6_print(ndo, p, length);
 		return (1);
-#endif /*INET6*/
 
 	case ARCTYPE_ARP_OLD:
 	case ARCTYPE_ARP:
