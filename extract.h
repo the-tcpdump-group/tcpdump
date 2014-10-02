@@ -170,7 +170,7 @@ EXTRACT_64BITS(const void *p)
 	            ((uint64_t)(*((const uint8_t *)(p) + 1)) << 24) | \
 	            ((uint64_t)(*((const uint8_t *)(p) + 2)) << 16) | \
 	            ((uint64_t)(*((const uint8_t *)(p) + 3)) << 8) | \
-	             ((uint64_t)(*((const uint8_t *)(p) + 4)) << 0)))
+	            ((uint64_t)(*((const uint8_t *)(p) + 4)) << 0)))
 
 #define EXTRACT_48BITS(p) \
 	((uint64_t)(((uint64_t)(*((const uint8_t *)(p) + 0)) << 40) | \
