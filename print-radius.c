@@ -37,6 +37,9 @@
  * RFC 2869:
  *      "RADIUS Extensions"
  *
+ * RFC 4675:
+ *      "RADIUS Attributes for Virtual LAN and Priority Support"
+ *
  * Alfredo Andres Omella (aandres@s21sec.com) v0.1 2000/09/15
  *
  * TODO: Among other things to print ok MacIntosh and Vendor values
@@ -109,6 +112,9 @@ static const struct tok radius_command_values[] = {
 #define ACCT_DELAY        41
 #define ACCT_SESSION_TIME 46
 
+#define EGRESS_VLAN_ID   56
+#define EGRESS_VLAN_NAME 58
+
 #define TUNNEL_TYPE        64
 #define TUNNEL_MEDIUM      65
 #define TUNNEL_CLIENT_END  66
@@ -130,6 +136,15 @@ static const struct tok radius_command_values[] = {
 /********************************/
 /* End Radius Attribute types */
 /********************************/
+
+#define RFC4675_TAGGED   0x31
+#define RFC4675_UNTAGGED 0x32
+
+static const struct tok rfc4675_tagged[] = {
+    { RFC4675_TAGGED,   "Tagged" },
+    { RFC4675_UNTAGGED, "Untagged" },
+    { 0, NULL}
+};
 
 
 static void print_attr_string(netdissect_options *, register u_char *, u_int, u_short );
@@ -209,6 +224,12 @@ static const char *login_serv[]={ "Telnet",
 static const char *term_action[]={ "Default",
                                    "RADIUS-Request",
                                  };
+
+/* Ingress-Filters Attribute standard values */
+static const char *ingress_filters[]={ NULL,
+                                       "Enabled",
+                                       "Disabled",
+                                     };
 
 /* NAS-Port-Type Attribute standard values */
 static const char *nas_port_type[]={ "Async",
@@ -392,10 +413,10 @@ struct attrtype { const char *name;      /* Attribute name                 */
      { "Accounting Output Giga",          NULL, 0, 0, print_attr_num },
      { "Unassigned",                      NULL, 0, 0, NULL }, /*54*/
      { "Event Timestamp",                 NULL, 0, 0, print_attr_time },
-     { "Unassigned",                      NULL, 0, 0, NULL }, /*56*/
-     { "Unassigned",                      NULL, 0, 0, NULL }, /*57*/
-     { "Unassigned",                      NULL, 0, 0, NULL }, /*58*/
-     { "Unassigned",                      NULL, 0, 0, NULL }, /*59*/
+     { "Egress VLAN ID",                  NULL, 0, 0, print_attr_num },
+     { "Ingress Filters",                 ingress_filters, TAM_SIZE(ingress_filters)-1, 1, print_attr_num },
+     { "Egress VLAN Name",                NULL, 0, 0, print_attr_string },
+     { "User Priority Table",             NULL, 0, 0, NULL },
      { "CHAP challenge",                  NULL, 0, 0, print_attr_string },
      { "NAS Port Type",                   nas_port_type, TAM_SIZE(nas_port_type), 0, print_attr_num },
      { "Port Limit",                      NULL, 0, 0, print_attr_num },
@@ -486,6 +507,13 @@ print_attr_string(netdissect_options *ndo,
               data++;
               length--;
            }
+        break;
+      case EGRESS_VLAN_NAME:
+           ND_PRINT((ndo, "%s (0x%02x) ",
+                  tok2str(rfc4675_tagged,"Unknown tag",*data),
+                  *data));
+           data++;
+           length--;
         break;
    }
 
@@ -656,6 +684,14 @@ print_attr_num(netdissect_options *ndo,
                ND_PRINT((ndo, "Tag[%d] ", *data));
             else
                ND_PRINT((ndo, "Tag[Unused] "));
+            data++;
+            ND_PRINT((ndo, "%d", EXTRACT_24BITS(data)));
+          break;
+
+        case EGRESS_VLAN_ID:
+            ND_PRINT((ndo, "%s (0x%02x) ",
+                   tok2str(rfc4675_tagged,"Unknown tag",*data),
+                   *data));
             data++;
             ND_PRINT((ndo, "%d", EXTRACT_24BITS(data)));
           break;
