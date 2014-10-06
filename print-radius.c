@@ -40,6 +40,9 @@
  * RFC 4675:
  *      "RADIUS Attributes for Virtual LAN and Priority Support"
  *
+ * RFC 5176:
+ *      "Dynamic Authorization Extensions to RADIUS"
+ *
  * Alfredo Andres Omella (aandres@s21sec.com) v0.1 2000/09/15
  *
  * TODO: Among other things to print ok MacIntosh and Vendor values
@@ -81,6 +84,12 @@ static const char tstr[] = " [|radius]";
 #define RADCMD_ACCESS_CHA  11 /* Access-Challenge    */
 #define RADCMD_STATUS_SER  12 /* Status-Server       */
 #define RADCMD_STATUS_CLI  13 /* Status-Client       */
+#define RADCMD_DISCON_REQ  40 /* Disconnect-Request  */
+#define RADCMD_DISCON_ACK  41 /* Disconnect-ACK      */
+#define RADCMD_DISCON_NAK  42 /* Disconnect-NAK      */
+#define RADCMD_COA_REQ     43 /* CoA-Request         */
+#define RADCMD_COA_ACK     44 /* CoA-ACK             */
+#define RADCMD_COA_NAK     45 /* CoA-NAK             */
 #define RADCMD_RESERVED   255 /* Reserved            */
 
 static const struct tok radius_command_values[] = {
@@ -92,6 +101,12 @@ static const struct tok radius_command_values[] = {
     { RADCMD_ACCESS_CHA, "Access Challenge" },
     { RADCMD_STATUS_SER, "Status Server" },
     { RADCMD_STATUS_CLI, "Status Client" },
+    { RADCMD_DISCON_REQ, "Disconnect Request" },
+    { RADCMD_DISCON_ACK, "Disconnect ACK" },
+    { RADCMD_DISCON_NAK, "Disconnect NAK" },
+    { RADCMD_COA_REQ,    "Change of Authorization Request" },
+    { RADCMD_COA_ACK,    "Change of Authorization ACK" },
+    { RADCMD_COA_NAK,    "Change of Authorization NAK" },
     { RADCMD_RESERVED,   "Reserved" },
     { 0, NULL}
 };

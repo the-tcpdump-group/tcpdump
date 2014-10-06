@@ -635,7 +635,8 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 		else if (ISPORT(RADIUS_PORT) ||
 			 ISPORT(RADIUS_NEW_PORT) ||
 			 ISPORT(RADIUS_ACCOUNTING_PORT) ||
-			 ISPORT(RADIUS_NEW_ACCOUNTING_PORT) )
+			 ISPORT(RADIUS_NEW_ACCOUNTING_PORT) ||
+			 ISPORT(RADIUS_COA_PORT) )
 			radius_print(ndo, (const u_char *)(up+1), length);
 		else if (dport == HSRP_PORT)
 			hsrp_print(ndo, (const u_char *)(up + 1), length);

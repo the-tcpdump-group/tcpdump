@@ -74,6 +74,7 @@ struct udphdr {
 #define RADIUS_NEW_PORT 1812
 #define RADIUS_ACCOUNTING_PORT 1646
 #define RADIUS_NEW_ACCOUNTING_PORT 1813
+#define RADIUS_COA_PORT 3799
 #define HSRP_PORT 1985		/*XXX*/
 #define LMP_PORT                701 /* rfc4204 */
 #define LWRES_PORT		921
