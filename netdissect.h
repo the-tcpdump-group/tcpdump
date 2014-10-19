@@ -281,6 +281,11 @@ extern int fn_printn(netdissect_options *, const u_char *, u_int, const u_char *
 extern int fn_printzp(netdissect_options *, const u_char *, u_int, const u_char *);
 extern const char *tok2str(const struct tok *, const char *, int);
 
+#define RESP_CODE_SECOND_TOKEN	0x00000001
+
+extern void txtproto_print(netdissect_options *, const u_char *, u_int,
+    const char *, const char **, u_int);
+
 #if 0
 extern char *read_infile(netdissect_options *, char *);
 extern char *copy_argv(netdissect_options *, char **);
@@ -544,6 +549,10 @@ extern void rsvp_print(netdissect_options *, const u_char *, u_int);
 extern void timed_print(netdissect_options *, const u_char *);
 extern void m3ua_print(netdissect_options *, const u_char *, const u_int);
 extern void aoe_print(netdissect_options *, const u_char *, const u_int);
+extern void ftp_print(netdissect_options *, const u_char *, u_int);
+extern void http_print(netdissect_options *, const u_char *, u_int);
+extern void rtsp_print(netdissect_options *, const u_char *, u_int);
+extern void smtp_print(netdissect_options *, const u_char *, u_int);
 
 /* stuff that has not yet been rototiled */
 
