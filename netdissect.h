@@ -281,7 +281,10 @@ extern int fn_printn(netdissect_options *, const u_char *, u_int, const u_char *
 extern int fn_printzp(netdissect_options *, const u_char *, u_int, const u_char *);
 extern const char *tok2str(const struct tok *, const char *, int);
 
-#define RESP_CODE_SECOND_TOKEN	0x00000001
+/*
+ * Flags for txtproto_print().
+ */
+#define RESP_CODE_SECOND_TOKEN	0x00000001	/* response code is second token in response line */
 
 extern void txtproto_print(netdissect_options *, const u_char *, u_int,
     const char *, const char **, u_int);
