@@ -633,6 +633,7 @@ print_txt_line(netdissect_options *ndo, const char *protoname,
 	 * in the buffer; treat this as if it were truncated.
 	 */
 trunc:
+	linelen = idx - startidx;
 	ND_PRINT((ndo, "%s%.*s[!%s]", prefix, (int)linelen, pptr + startidx,
 	    protoname));
 	return (0);
