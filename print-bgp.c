@@ -2715,7 +2715,7 @@ bgp_print(netdissect_options *ndo,
 	if (ndo->ndo_snapend < dat + length)
 		ep = ndo->ndo_snapend;
 
-	ND_PRINT((ndo, ": BGP, length: %u", length));
+	ND_PRINT((ndo, ": BGP"));
 
         if (ndo->ndo_vflag < 1) /* lets be less chatty */
                 return;
