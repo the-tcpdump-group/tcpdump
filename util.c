@@ -135,7 +135,11 @@ fn_printzp(netdissect_options *ndo,
  * Format the timestamp
  */
 static char *
-ts_format(netdissect_options *ndo, int sec, int usec)
+ts_format(netdissect_options *ndo
+#ifndef HAVE_PCAP_SET_TSTAMP_PRECISION
+_U_
+#endif
+, int sec, int usec)
 {
 	static char buf[sizeof("00:00:00.000000000")];
 	const char *format;
