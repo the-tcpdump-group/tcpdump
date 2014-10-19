@@ -378,7 +378,6 @@ udp_print(register const u_char *bp, u_int length,
 	else
 		ip6 = NULL;
 #endif /*INET6*/
-	cp = (u_char *)(up + 1);
 	if (!TTEST(up->uh_dport)) {
 		udpipaddr_print(ip, -1, -1);
 		(void)printf("[|udp]");
@@ -393,20 +392,24 @@ udp_print(register const u_char *bp, u_int length,
 		(void)printf("truncated-udp %d", length);
 		return;
 	}
+	ulen = EXTRACT_16BITS(&up->uh_ulen);
+	if (ulen < sizeof(struct udphdr)) {
+		udpipaddr_print(ip, sport, dport);
+		printf("truncated-udplength %d", ulen);
+		return;
+	}
+	ulen -= sizeof(struct udphdr);
 	length -= sizeof(struct udphdr);
+	if (ulen < length)
+		length = ulen;
 
+	cp = (u_char *)(up + 1);
 	if (cp > snapend) {
 		udpipaddr_print(ip, sport, dport);
-		(void)printf("[|udp]");
+		printf("[|udp]");
 		return;
 	}
 
-	ulen = EXTRACT_16BITS(&up->uh_ulen);
-	if (ulen < 8) {
-		udpipaddr_print(ip, sport, dport);
-		(void)printf("truncated-udplength %d", ulen);
-		return;
-	}
 	if (packettype) {
 		register struct sunrpc_msg *rp;
 		enum sunrpc_msg_type direction;
@@ -676,12 +679,23 @@ udp_print(register const u_char *bp, u_int length,
 			syslog_print((const u_char *)(up + 1), length);
                 else if (ISPORT(OTV_PORT))
 			otv_print((const u_char *)(up + 1), length);
-		else
-			(void)printf("UDP, length %u",
-			    (u_int32_t)(ulen - sizeof(*up)));
+		else {
+			if (ulen > length)
+				printf("UDP, bad length %u > %u",
+				    ulen, length);
+			else
+				printf("UDP, length %u",
+				    (uint32_t)(ulen - sizeof(*up)));
+		}
 #undef ISPORT
-	} else
-		(void)printf("UDP, length %u", (u_int32_t)(ulen - sizeof(*up)));
+	} else {
+		if (ulen > length)
+			printf("UDP, bad length %u > %u",
+			    ulen, length);
+		else
+			printf("UDP, length %u",
+			    (uint32_t)(ulen - sizeof(*up)));
+	}
 }
 
 
