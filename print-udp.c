@@ -367,7 +367,6 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 	else
 		ip6 = NULL;
 #endif /*INET6*/
-	cp = (u_char *)(up + 1);
 	if (!ND_TTEST(up->uh_dport)) {
 		udpipaddr_print(ndo, ip, -1, -1);
 		ND_PRINT((ndo, "[|udp]"));
@@ -382,20 +381,24 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 		ND_PRINT((ndo, "truncated-udp %d", length));
 		return;
 	}
+	ulen = EXTRACT_16BITS(&up->uh_ulen);
+	if (ulen < sizeof(struct udphdr)) {
+		udpipaddr_print(ndo, ip, sport, dport);
+		ND_PRINT((ndo, "truncated-udplength %d", ulen));
+		return;
+	}
+	ulen -= sizeof(struct udphdr);
 	length -= sizeof(struct udphdr);
+	if (ulen < length)
+		length = ulen;
 
+	cp = (u_char *)(up + 1);
 	if (cp > ndo->ndo_snapend) {
 		udpipaddr_print(ndo, ip, sport, dport);
 		ND_PRINT((ndo, "[|udp]"));
 		return;
 	}
 
-	ulen = EXTRACT_16BITS(&up->uh_ulen);
-	if (ulen < 8) {
-		udpipaddr_print(ndo, ip, sport, dport);
-		ND_PRINT((ndo, "truncated-udplength %d", ulen));
-		return;
-	}
 	if (ndo->ndo_packettype) {
 		register struct sunrpc_msg *rp;
 		enum sunrpc_msg_type direction;
@@ -676,12 +679,23 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 			otv_print(ndo, (const u_char *)(up + 1), length);
                 else if (ISPORT(VXLAN_PORT))
 			vxlan_print(ndo, (const u_char *)(up + 1), length);
+		else {
+			if (ulen > length)
+				ND_PRINT((ndo, "UDP, bad length %u > %u",
+				    ulen, length));
+			else
+				ND_PRINT((ndo, "UDP, length %u",
+				    (uint32_t)(ulen - sizeof(*up))));
+		}
+#undef ISPORT
+	} else {
+		if (ulen > length)
+			ND_PRINT((ndo, "UDP, bad length %u > %u",
+			    ulen, length));
 		else
 			ND_PRINT((ndo, "UDP, length %u",
 			    (uint32_t)(ulen - sizeof(*up))));
-#undef ISPORT
-	} else
-		ND_PRINT((ndo, "UDP, length %u", (uint32_t)(ulen - sizeof(*up))));
+	}
 }
 
 
