@@ -674,8 +674,7 @@ tcp_print(netdissect_options *ndo,
         }
 
         if (sport == TELNET_PORT || dport == TELNET_PORT) {
-                if (!ndo->ndo_qflag && ndo->ndo_vflag)
-                        telnet_print(ndo, bp, length);
+                telnet_print(ndo, bp, length);
         } else if (sport == SMTP_PORT || dport == SMTP_PORT) {
                 ND_PRINT((ndo, ": "));
                 smtp_print(ndo, bp, length);

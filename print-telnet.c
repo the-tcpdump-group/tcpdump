@@ -509,6 +509,11 @@ telnet_print(netdissect_options *ndo, const u_char *sp, u_int length)
 
 	osp = sp;
 
+	if (ndo->ndo_qflag) {
+		ND_PRINT((ndo, "[telnet]"));
+		return;
+	}
+
 	while (length > 0 && *sp == IAC) {
 		l = telnet_parse(ndo, sp, length, 0);
 		if (l < 0)
