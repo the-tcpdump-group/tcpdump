@@ -666,8 +666,7 @@ udp_print(register const u_char *bp, u_int length,
 				printf("UDP, bad length %u > %u",
 				    ulen, length);
 			else
-				printf("UDP, length %u",
-				    (uint32_t)(ulen - sizeof(*up)));
+				printf("UDP, length %u", ulen);
 		}
 #undef ISPORT
 	} else {
@@ -675,8 +674,7 @@ udp_print(register const u_char *bp, u_int length,
 			printf("UDP, bad length %u > %u",
 			    ulen, length);
 		else
-			printf("UDP, length %u",
-			    (uint32_t)(ulen - sizeof(*up)));
+			printf("UDP, length %u", ulen);
 	}
 }
 
