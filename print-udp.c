@@ -684,8 +684,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 				ND_PRINT((ndo, "UDP, bad length %u > %u",
 				    ulen, length));
 			else
-				ND_PRINT((ndo, "UDP, length %u",
-				    (uint32_t)(ulen - sizeof(*up))));
+				ND_PRINT((ndo, "UDP, length %u", ulen));
 		}
 #undef ISPORT
 	} else {
@@ -693,8 +692,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 			ND_PRINT((ndo, "UDP, bad length %u > %u",
 			    ulen, length));
 		else
-			ND_PRINT((ndo, "UDP, length %u",
-			    (uint32_t)(ulen - sizeof(*up))));
+			ND_PRINT((ndo, "UDP, length %u", ulen));
 	}
 }
 
