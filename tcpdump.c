@@ -1720,6 +1720,11 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
                 hdrlen = (*print_info->p.printer)(h, sp);
         }
                 
+	/*
+	 * Restore the original snapend, as a printer might have
+	 * changed it.
+	 */
+	snapend = sp + h->caplen;
 	if (Xflag) {
 		/*
 		 * Print the raw packet data in hex and ASCII.
