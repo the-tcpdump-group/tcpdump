@@ -102,7 +102,7 @@ hex_and_ascii_print_with_offset(register const char *ident,
 	char hexstuff[HEXDUMP_SHORTS_PER_LINE*HEXDUMP_HEXSTUFF_PER_SHORT+1], *hsp;
 	char asciistuff[ASCII_LINELENGTH+1], *asp;
 
-	caplength = (ndo->ndo_snapend >= cp) ? ndo->ndo_snapend - cp : 0;
+	caplength = (snapend >= cp) ? snapend - cp : 0;
 	if (length > caplength)
 		length = caplength;
 	nshorts = length / sizeof(u_short);
@@ -160,7 +160,7 @@ hex_print_with_offset(register const char *ident, register const u_char *cp, reg
 	register u_int i, s;
 	register int nshorts;
 
-	caplength = (ndo->ndo_snapend >= cp) ? ndo->ndo_snapend - cp : 0;
+	caplength = (snapend >= cp) ? snapend - cp : 0;
 	if (length > caplength)
 		length = caplength;
 	nshorts = (u_int) length / sizeof(u_short);
