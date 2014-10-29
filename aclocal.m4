@@ -438,27 +438,31 @@ AC_DEFUN(AC_LBL_LIBPCAP,
 		    LIBS="$LIBS $pfopen"
 	    fi
     fi
-    AC_MSG_CHECKING(for local pcap library)
-    libpcap=FAIL
-    lastdir=FAIL
-    places=`ls $srcdir/.. | sed -e 's,/$,,' -e "s,^,$srcdir/../," | \
-	egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT)?$'`
-    places2=`ls .. | sed -e 's,/$,,' -e "s,^,../," | \
-	egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT)?$'`
-    for dir in $places $srcdir/../libpcap ../libpcap $srcdir/libpcap $places2 ; do
-	    basedir=`echo $dir | sed -e 's/[[ab]][[0-9]]*$//' | \
-	        sed -e 's/-PRE-GIT$//' `
-	    if test $lastdir = $basedir ; then
-		    dnl skip alphas when an actual release is present
-		    continue;
-	    fi
-	    lastdir=$dir
-	    if test -r $dir/libpcap.a ; then
-		    libpcap=$dir/libpcap.a
-		    d=$dir
-		    dnl continue and select the last one that exists
-	    fi
-    done
+	libpcap=FAIL
+	AC_MSG_CHECKING(for local pcap library)
+	AC_ARG_WITH([system-libpcap],
+		[AS_HELP_STRING([--with-system-libpcap], [don't use local pcap library])])
+	if test "x$with_system_libpcap" != xyes ; then
+		lastdir=FAIL
+    	places=`ls $srcdir/.. | sed -e 's,/$,,' -e "s,^,$srcdir/../," | \
+		egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT)?$'`
+    	places2=`ls .. | sed -e 's,/$,,' -e "s,^,../," | \
+		egrep '/libpcap-[[0-9]]+\.[[0-9]]+(\.[[0-9]]*)?([[ab]][[0-9]]*|-PRE-GIT)?$'`
+    	for dir in $places $srcdir/../libpcap ../libpcap $srcdir/libpcap $places2 ; do
+	    	basedir=`echo $dir | sed -e 's/[[ab]][[0-9]]*$//' | \
+	        	sed -e 's/-PRE-GIT$//' `
+	    	if test $lastdir = $basedir ; then
+		    	dnl skip alphas when an actual release is present
+		    	continue;
+	    	fi
+	    	lastdir=$dir
+	    	if test -r $dir/libpcap.a ; then
+		    	libpcap=$dir/libpcap.a
+		    	d=$dir
+		    	dnl continue and select the last one that exists
+	    	fi
+		done
+	fi
     if test $libpcap = FAIL ; then
 	    AC_MSG_RESULT(not found)
 
