@@ -662,7 +662,7 @@ Print a delta (micro-second resolution) between current and previous line
 on each dump line.
 .TP
 .B \-tttt
-Print a timestamp in default format proceeded by date on each dump line.
+Print a timestamp in default format preceeded by date on each dump line.
 .TP
 .B \-ttttt
 Print a delta (micro-second resolution) between current and first line
