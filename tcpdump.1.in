@@ -140,7 +140,9 @@ tcpdump \- dump traffic on a network
 .SH DESCRIPTION
 .LP
 \fITcpdump\fP prints out a description of the contents of packets on a
-network interface that match the boolean \fIexpression\fP.  It can also
+network interface that match the boolean \fIexpression\fP; the
+description is preceded by a time stamp, printed, by default, as hours,
+minutes, seconds, and fractions of a second since midnight.  It can also
 be run with the
 .B \-w
 flag, which causes it to save the packet data to a file for later
@@ -655,14 +657,16 @@ an encapsulated PGM packet.
 \fIDon't\fP print a timestamp on each dump line.
 .TP
 .B \-tt
-Print an unformatted timestamp on each dump line.
+Print the timestamp, as seconds since January 1, 1970, 00:00:00, UTC, and
+fractions of a second since that time, on each dump line.
 .TP
 .B \-ttt
 Print a delta (micro-second resolution) between current and previous line
 on each dump line.
 .TP
 .B \-tttt
-Print a timestamp in default format proceeded by date on each dump line.
+Print a timestamp, as hours, minutes, seconds, and fractions of a second
+since midnight, preceded by the date, on each dump line.
 .TP
 .B \-ttttt
 Print a delta (micro-second resolution) between current and first line
