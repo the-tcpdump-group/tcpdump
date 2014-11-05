@@ -91,6 +91,7 @@ struct udphdr {
 #define LWAPP_CONTROL_PORT      12223 /* draft-ohara-capwap-lwapp-04.txt */
 #define OTV_PORT                8472  /* draft-hasmit-otv-04 */
 #define VXLAN_PORT              4789  /* draft-mahalingam-dutt-dcops-vxlan-04 */
+#define GENEVE_PORT             6081  /* draft-gross-geneve-02 */
 
 #ifdef INET6
 #define RIPNG_PORT 521		/*XXX*/
