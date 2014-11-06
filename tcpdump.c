@@ -43,6 +43,17 @@ The Regents of the University of California.  All rights reserved.\n";
 #include "config.h"
 #endif
 
+/*
+ * Mac OS X may ship pcap.h from libpcap 0.6 with a libpcap based on
+ * 0.8.  That means it has pcap_findalldevs() but the header doesn't
+ * define pcap_if_t, meaning that we can't actually *use* pcap_findalldevs().
+ */
+#ifdef HAVE_PCAP_FINDALLDEVS
+#ifndef HAVE_PCAP_IF_T
+#undef HAVE_PCAP_FINDALLDEVS
+#endif
+#endif
+
 #include <tcpdump-stdinc.h>
 
 #ifdef WIN32
@@ -613,12 +624,6 @@ show_devices_and_exit (void)
 #define j_FLAG_USAGE
 #define J_FLAG
 #endif /* PCAP_ERROR_TSTAMP_TYPE_NOTSUP */
-
-#ifdef HAVE_PCAP_FINDALLDEVS
-#ifndef HAVE_PCAP_IF_T
-#undef HAVE_PCAP_FINDALLDEVS
-#endif
-#endif
 
 #ifdef HAVE_PCAP_FINDALLDEVS
 #define D_FLAG	"D"
