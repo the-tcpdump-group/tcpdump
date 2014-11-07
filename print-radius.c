@@ -390,7 +390,7 @@ struct attrtype { const char *name;      /* Attribute name                 */
      { "Login-Service",                   login_serv, TAM_SIZE(login_serv), 0, print_attr_num },
      { "Login-TCP-Port",                  NULL, 0, 0, print_attr_num     },
      { "Unassigned",                      NULL, 0, 0, NULL }, /*17*/
-     { "Reply-Message",                           NULL, 0, 0, print_attr_string },
+     { "Reply-Message",                   NULL, 0, 0, print_attr_string },
      { "Callback-Number",                 NULL, 0, 0, print_attr_string },
      { "Callback-Id",                     NULL, 0, 0, print_attr_string },
      { "Unassigned",                      NULL, 0, 0, NULL }, /*21*/
