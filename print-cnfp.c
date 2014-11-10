@@ -118,7 +118,7 @@ cnfp_print(netdissect_options *ndo,
 
 	ND_PRINT((ndo, "%2u recs", nrecs));
 
-	for (; nrecs-- && (const u_char *)(nr + 1) <= ndo->ndo_snapend; nr++) {
+	for (; nrecs--; nr++) {
 		char buf[20];
 		char asbuf[20];
 
@@ -183,5 +183,10 @@ cnfp_print(netdissect_options *ndo,
 		       EXTRACT_32BITS(&nr->proto_tos) & 0xff,
 		       EXTRACT_32BITS(&nr->packets),
 		       EXTRACT_32BITS(&nr->octets), buf));
+
+                /* Exclude nh peer data for v5 as it doesn't apply for v5. */
+                if (5 == ver)
+                        nr = (struct nfrec *) ((struct in_addr *) nr - 1);
+
 	}
 }
