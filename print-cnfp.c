@@ -75,8 +75,7 @@ struct nfrec {
 };
 
 void
-cnfp_print(netdissect_options *ndo,
-           const u_char *cp, const u_char *bp _U_)
+cnfp_print(netdissect_options *ndo, const u_char *cp)
 {
 	register const struct nfhdr *nh;
 	register const struct nfrec *nr;
@@ -87,9 +86,7 @@ cnfp_print(netdissect_options *ndo,
 #endif
 
 	nh = (const struct nfhdr *)cp;
-
-	if ((const u_char *)(nh + 1) > ndo->ndo_snapend)
-		return;
+	ND_TCHECK(*nh);
 
 	nrecs = EXTRACT_32BITS(&nh->ver_cnt) & 0xffff;
 	ver = (EXTRACT_32BITS(&nh->ver_cnt) & 0xffff0000) >> 16;
@@ -110,18 +107,23 @@ cnfp_print(netdissect_options *ndo,
 	if (ver == 5 || ver == 6) {
 		ND_PRINT((ndo, "#%u, ", EXTRACT_32BITS(&nh->sequence)));
 		nr = (const struct nfrec *)&nh[1];
-		ndo->ndo_snaplen -= 24;
-	} else {
+	} else
 		nr = (const struct nfrec *)&nh->sequence;
-		ndo->ndo_snaplen -= 16;
-	}
 
 	ND_PRINT((ndo, "%2u recs", nrecs));
 
-	for (; nrecs-- && (const u_char *)(nr + 1) <= ndo->ndo_snapend; nr++) {
+	for (; nrecs != 0; nr++, nrecs--) {
 		char buf[20];
 		char asbuf[20];
 
+		/*
+		 * Make sure we have the entire record.
+		 */
+		if (ver == 5 || ver == 6) {
+			ND_TCHECK(nr->masks);
+		} else {
+			ND_TCHECK(nr->proto_tos);
+		}
 		ND_PRINT((ndo, "\n  started %u.%03u, last %u.%03u",
 		       EXTRACT_32BITS(&nr->start_time)/1000,
 		       EXTRACT_32BITS(&nr->start_time)%1000,
@@ -184,4 +186,9 @@ cnfp_print(netdissect_options *ndo,
 		       EXTRACT_32BITS(&nr->packets),
 		       EXTRACT_32BITS(&nr->octets), buf));
 	}
+	return;
+
+trunc:
+	ND_PRINT((ndo, "[|cnfp]"));
+	return;
 }

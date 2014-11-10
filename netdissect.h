@@ -478,7 +478,7 @@ extern u_int atm_if_print(netdissect_options *, const struct pcap_pkthdr *, cons
 extern void vtp_print(netdissect_options *, const u_char *, u_int);
 extern int mptcp_print(netdissect_options *, const u_char *, u_int, u_char);
 extern void ntp_print(netdissect_options *, const u_char *, u_int);
-extern void cnfp_print(netdissect_options *, const u_char *, const u_char *);
+extern void cnfp_print(netdissect_options *, const u_char *);
 extern void dvmrp_print(netdissect_options *, const u_char *, u_int);
 extern void egp_print(netdissect_options *, const u_char *, u_int);
 extern u_int enc_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);

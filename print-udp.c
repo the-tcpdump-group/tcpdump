@@ -444,7 +444,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 
 		case PT_CNFP:
 			udpipaddr_print(ndo, ip, sport, dport);
-			cnfp_print(ndo, cp, (const u_char *)ip);
+			cnfp_print(ndo, cp);
 			break;
 
 		case PT_TFTP:
