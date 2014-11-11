@@ -556,6 +556,7 @@ extern void ftp_print(netdissect_options *, const u_char *, u_int);
 extern void http_print(netdissect_options *, const u_char *, u_int);
 extern void rtsp_print(netdissect_options *, const u_char *, u_int);
 extern void smtp_print(netdissect_options *, const u_char *, u_int);
+extern void geneve_print(netdissect_options *, const u_char *, u_int);
 
 /* stuff that has not yet been rototiled */
 

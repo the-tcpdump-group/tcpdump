@@ -125,6 +125,7 @@ LIBNETDISSECT_SRC=\
 	print-forces.c \
 	print-fr.c \
 	print-ftp.c \
+	print-geneve.c \
 	print-geonet.c \
 	print-gre.c \
 	print-hsrp.c \

@@ -257,3 +257,6 @@ isis_4-v	ISIS_p2p_adjacency.pcap		isis_4-v.out	-t -v
 # ATA-over-Ethernet tests
 aoe_1		AoE_Linux.pcap		aoe_1.out	-t
 aoe_1-v		AoE_Linux.pcap		aoe_1-v.out	-t -v
+
+# Geneve tests
+geneve-v	geneve.pcap		geneve-vv.out	-t -vv
