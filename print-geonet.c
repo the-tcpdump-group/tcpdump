@@ -41,6 +41,8 @@
    Sub-part 1: Media-Independent Functionality
 */
 
+#define GEONET_ADDR_LEN 8
+
 static const struct tok msg_type_values[] = {
 	{   0, "CAM" },
 	{   1, "DENM" },
@@ -56,15 +58,11 @@ static const struct tok msg_type_values[] = {
 };
 
 static void
-print_btp_body(const u_char *bp, u_int length)
+print_btp_body(const u_char *bp)
 {
 	int version;
 	int msg_type;
 	const char *msg_type_str;
-
-	if (length <= 2) {
-		return;
-	}
 
 	/* Assuming ItsDpuHeader */
 	version = bp[0];
@@ -82,8 +80,9 @@ print_btp(const u_char *bp)
 	printf("; BTP Dst:%u Src:%u", dest, src);
 }
 
-static void
-print_long_pos_vector(const u_char *bp)
+static int
+print_long_pos_vector(netdissect_options *ndo,
+                      const u_char *bp)
 {
 	int i;
 	u_int32_t lat, lon;
@@ -95,10 +94,13 @@ print_long_pos_vector(const u_char *bp)
 	}
 	printf(" ");
 
+	if (!ND_TTEST2(*(bp+12), 8))
+		return (-1);
 	lat = EXTRACT_32BITS(bp+12);
 	printf("lat:%d ", lat);
 	lon = EXTRACT_32BITS(bp+16);
 	printf("lon:%d", lon);
+	return (0);
 }
 
 
@@ -109,137 +111,170 @@ print_long_pos_vector(const u_char *bp)
 void
 geonet_print(netdissect_options *ndo, const u_char *eth, const u_char *bp, u_int length)
 {
+	int version;
+	int next_hdr;
+	int hdr_type;
+	int hdr_subtype;
+	u_int16_t payload_length;
+	int hop_limit;
+	const char *next_hdr_txt = "Unknown";
+	const char *hdr_type_txt = "Unknown";
+	int hdr_size = -1;
+
 	printf("GeoNet src:%s; ", etheraddr_string(eth+6));
 
-	if (length >= 36) {
-		/* Process Common Header */
-		int version = bp[0] >> 4;
-		int next_hdr = bp[0] & 0x0f;
-		int hdr_type = bp[1] >> 4;
-		int hdr_subtype = bp[1] & 0x0f;
-		u_int16_t payload_length = EXTRACT_16BITS(bp+4);
-		int hop_limit = bp[7];
-		const char *next_hdr_txt = "Unknown";
-		const char *hdr_type_txt = "Unknown";
-		int hdr_size = -1;
+	/* Process Common Header */
+	if (length < 36)
+		goto malformed;
+		
+	ND_TCHECK2(*bp, 7);
+	version = bp[0] >> 4;
+	next_hdr = bp[0] & 0x0f;
+	hdr_type = bp[1] >> 4;
+	hdr_subtype = bp[1] & 0x0f;
+	payload_length = EXTRACT_16BITS(bp+4);
+	hop_limit = bp[7];
 
-		switch (next_hdr) {
-			case 0: next_hdr_txt = "Any"; break;
-			case 1: next_hdr_txt = "BTP-A"; break;
-			case 2: next_hdr_txt = "BTP-B"; break;
-			case 3: next_hdr_txt = "IPv6"; break;
-		}
+	switch (next_hdr) {
+		case 0: next_hdr_txt = "Any"; break;
+		case 1: next_hdr_txt = "BTP-A"; break;
+		case 2: next_hdr_txt = "BTP-B"; break;
+		case 3: next_hdr_txt = "IPv6"; break;
+	}
 
-		switch (hdr_type) {
-			case 0: hdr_type_txt = "Any"; break;
-			case 1: hdr_type_txt = "Beacon"; break;
-			case 2: hdr_type_txt = "GeoUnicast"; break;
-			case 3: switch (hdr_subtype) {
-					case 0: hdr_type_txt = "GeoAnycastCircle"; break;
-					case 1: hdr_type_txt = "GeoAnycastRect"; break;
-					case 2: hdr_type_txt = "GeoAnycastElipse"; break;
-				}
-				break;
-			case 4: switch (hdr_subtype) {
-					case 0: hdr_type_txt = "GeoBroadcastCircle"; break;
-					case 1: hdr_type_txt = "GeoBroadcastRect"; break;
-					case 2: hdr_type_txt = "GeoBroadcastElipse"; break;
-				}
-				break;
-			case 5: switch (hdr_subtype) {
-					case 0: hdr_type_txt = "TopoScopeBcast-SH"; break;
-					case 1: hdr_type_txt = "TopoScopeBcast-MH"; break;
-				}
-				break;
-			case 6: switch (hdr_subtype) {
-					case 0: hdr_type_txt = "LocService-Request"; break;
-					case 1: hdr_type_txt = "LocService-Reply"; break;
-				}
-				break;
-		}
+	switch (hdr_type) {
+		case 0: hdr_type_txt = "Any"; break;
+		case 1: hdr_type_txt = "Beacon"; break;
+		case 2: hdr_type_txt = "GeoUnicast"; break;
+		case 3: switch (hdr_subtype) {
+				case 0: hdr_type_txt = "GeoAnycastCircle"; break;
+				case 1: hdr_type_txt = "GeoAnycastRect"; break;
+				case 2: hdr_type_txt = "GeoAnycastElipse"; break;
+			}
+			break;
+		case 4: switch (hdr_subtype) {
+				case 0: hdr_type_txt = "GeoBroadcastCircle"; break;
+				case 1: hdr_type_txt = "GeoBroadcastRect"; break;
+				case 2: hdr_type_txt = "GeoBroadcastElipse"; break;
+			}
+			break;
+		case 5: switch (hdr_subtype) {
+				case 0: hdr_type_txt = "TopoScopeBcast-SH"; break;
+				case 1: hdr_type_txt = "TopoScopeBcast-MH"; break;
+			}
+			break;
+		case 6: switch (hdr_subtype) {
+				case 0: hdr_type_txt = "LocService-Request"; break;
+				case 1: hdr_type_txt = "LocService-Reply"; break;
+			}
+			break;
+	}
 
-		printf("v:%d ", version);
-		printf("NH:%d-%s ", next_hdr, next_hdr_txt);
-		printf("HT:%d-%d-%s ", hdr_type, hdr_subtype, hdr_type_txt);
-		printf("HopLim:%d ", hop_limit);
-		printf("Payload:%d ", payload_length);
-        	print_long_pos_vector(bp + 8);
+	printf("v:%d ", version);
+	printf("NH:%d-%s ", next_hdr, next_hdr_txt);
+	printf("HT:%d-%d-%s ", hdr_type, hdr_subtype, hdr_type_txt);
+	printf("HopLim:%d ", hop_limit);
+	printf("Payload:%d ", payload_length);
+	if (print_long_pos_vector(ndo, bp + 8) == -1)
+		goto trunc;
 
-		/* Skip Common Header */
-		length -= 36;
-		bp += 36;
+	/* Skip Common Header */
+	length -= 36;
+	bp += 36;
 
-		/* Process Extended Headers */
-		switch (hdr_type) {
-			case 0: /* Any */
-				hdr_size = 0;
-				break;
-			case 1: /* Beacon */
-				hdr_size = 0;
-				break;
-			case 2: /* GeoUnicast */
-				break;
-			case 3: switch (hdr_subtype) {
-					case 0: /* GeoAnycastCircle */
-						break;
-					case 1: /* GeoAnycastRect */
-						break;
-					case 2: /* GeoAnycastElipse */
-						break;
-				}
-				break;
-			case 4: switch (hdr_subtype) {
-					case 0: /* GeoBroadcastCircle */
-						break;
-					case 1: /* GeoBroadcastRect */
-						break;
-					case 2: /* GeoBroadcastElipse */
-						break;
-				}
-				break;
-			case 5: switch (hdr_subtype) {
-					case 0: /* TopoScopeBcast-SH */
-						hdr_size = 0;
-						break;
-					case 1: /* TopoScopeBcast-MH */
-						hdr_size = 68 - 36;
-						break;
-				}
-				break;
-			case 6: switch (hdr_subtype) {
-					case 0: /* LocService-Request */
-						break;
-					case 1: /* LocService-Reply */
-						break;
-				}
-				break;
-		}
-
-		/* Skip Extended headers */
-		if (hdr_size >= 0) {
-			length -= hdr_size;
-			bp += hdr_size;
-			switch (next_hdr) {
-				case 0: /* Any */
+	/* Process Extended Headers */
+	switch (hdr_type) {
+		case 0: /* Any */
+			hdr_size = 0;
+			break;
+		case 1: /* Beacon */
+			hdr_size = 0;
+			break;
+		case 2: /* GeoUnicast */
+			break;
+		case 3: switch (hdr_subtype) {
+				case 0: /* GeoAnycastCircle */
 					break;
-				case 1:
-				case 2: /* BTP A/B */
-					print_btp(bp);
-					length -= 4;
-					bp += 4;
-					print_btp_body(bp, length);
+				case 1: /* GeoAnycastRect */
 					break;
-				case 3: /* IPv6 */
+				case 2: /* GeoAnycastElipse */
 					break;
 			}
+			break;
+		case 4: switch (hdr_subtype) {
+				case 0: /* GeoBroadcastCircle */
+					break;
+				case 1: /* GeoBroadcastRect */
+					break;
+				case 2: /* GeoBroadcastElipse */
+					break;
+			}
+			break;
+		case 5: switch (hdr_subtype) {
+				case 0: /* TopoScopeBcast-SH */
+					hdr_size = 0;
+					break;
+				case 1: /* TopoScopeBcast-MH */
+					hdr_size = 68 - 36;
+					break;
+			}
+			break;
+		case 6: switch (hdr_subtype) {
+				case 0: /* LocService-Request */
+					break;
+				case 1: /* LocService-Reply */
+					break;
+			}
+			break;
+	}
+
+	/* Skip Extended headers */
+	if (hdr_size >= 0) {
+		if (length < (u_int)hdr_size)
+			goto malformed;
+		ND_TCHECK2(*bp, hdr_size);
+		length -= hdr_size;
+		bp += hdr_size;
+		switch (next_hdr) {
+			case 0: /* Any */
+				break;
+			case 1:
+			case 2: /* BTP A/B */
+				if (length < 4)
+					goto malformed;
+				ND_TCHECK2(*bp, 4);
+				print_btp(bp);
+				length -= 4;
+				bp += 4;
+				if (length >= 2) {
+					/*
+					 * XXX - did print_btp_body()
+					 * return if length < 2
+					 * because this is optional,
+					 * or was that just not
+					 * reporting genuine errors?
+					 */
+					ND_TCHECK2(*bp, 2);
+					print_btp_body(bp);
+				}
+				break;
+			case 3: /* IPv6 */
+				break;
 		}
-	} else {
-		printf("Malformed (small) ");
 	}
 
 	/* Print user data part */
 	if (ndo->ndo_vflag)
 		default_print(bp, length);
+	return;
+
+malformed:
+	printf(" Malformed (small) ");
+	/* XXX - print the remaining data as hex? */
+	return;
+
+trunc:
+	printf("[|geonet]");
 }
 
 
