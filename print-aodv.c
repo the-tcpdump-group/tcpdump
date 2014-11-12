@@ -37,9 +37,6 @@
 
 #include <tcpdump-stdinc.h>
 
-/* for offsetof */
-#include <stddef.h>
-
 #include "interface.h"
 #include "addrtoname.h"
 #include "extract.h"			/* must come after interface.h */
