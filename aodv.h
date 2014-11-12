@@ -134,13 +134,6 @@ struct aodv_rerr {
 	u_int8_t	rerr_flags;	/* various flags */
 	u_int8_t	rerr_zero0;	/* reserved, set to zero */
 	u_int8_t	rerr_dc;	/* destination count */
-	union {
-		struct	rerr_unreach dest[1];
-#ifdef INET6
-		struct	rerr_unreach6 dest6[1];
-		struct	rerr_unreach6_draft_01 dest6_draft_01[1];
-#endif
-	} r;
 };
 
 #define RERR_NODELETE		0x80	/* don't delete the link */
