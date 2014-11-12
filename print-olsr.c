@@ -181,7 +181,7 @@ struct olsr_lq_neighbor6 {
 /*
  * print a neighbor list with LQ extensions.
  */
-static void
+static int
 olsr_print_lq_neighbor4 (const u_char *msg_data, u_int hello_len)
 {
     struct olsr_lq_neighbor4 *lq_neighbor;
@@ -189,6 +189,8 @@ olsr_print_lq_neighbor4 (const u_char *msg_data, u_int hello_len)
     while (hello_len >= sizeof(struct olsr_lq_neighbor4)) {
 
         lq_neighbor = (struct olsr_lq_neighbor4 *)msg_data;
+        if (!TTEST(*lq_neighbor))
+            return (-1);
 
         printf("\n\t      neighbor %s, link-quality %.2lf%%"
                ", neighbor-link-quality %.2lf%%",
@@ -199,10 +201,11 @@ olsr_print_lq_neighbor4 (const u_char *msg_data, u_int hello_len)
         msg_data += sizeof(struct olsr_lq_neighbor4);
         hello_len -= sizeof(struct olsr_lq_neighbor4);
     }
+    return (0);
 }
 
 #if INET6
-static void
+static int
 olsr_print_lq_neighbor6 (const u_char *msg_data, u_int hello_len)
 {
     struct olsr_lq_neighbor6 *lq_neighbor;
@@ -210,6 +213,8 @@ olsr_print_lq_neighbor6 (const u_char *msg_data, u_int hello_len)
     while (hello_len >= sizeof(struct olsr_lq_neighbor6)) {
 
         lq_neighbor = (struct olsr_lq_neighbor6 *)msg_data;
+        if (!TTEST(*lq_neighbor))
+            return (-1);
 
         printf("\n\t      neighbor %s, link-quality %.2lf%%"
                ", neighbor-link-quality %.2lf%%",
@@ -220,13 +225,14 @@ olsr_print_lq_neighbor6 (const u_char *msg_data, u_int hello_len)
         msg_data += sizeof(struct olsr_lq_neighbor6);
         hello_len -= sizeof(struct olsr_lq_neighbor6);
     }
+    return (0);
 }
 #endif /* INET6 */
 
 /*
  * print a neighbor list.
  */
-static void
+static int
 olsr_print_neighbor (const u_char *msg_data, u_int hello_len)
 {
     int neighbor;
@@ -236,6 +242,8 @@ olsr_print_neighbor (const u_char *msg_data, u_int hello_len)
 
     while (hello_len >= sizeof(struct in_addr)) {
 
+        if (!TTEST2(*msg_data, sizeof(struct in_addr)))
+            return (-1);
         /* print 4 neighbors per line */
 
         printf("%s%s", ipaddr_string(msg_data),
@@ -244,6 +252,7 @@ olsr_print_neighbor (const u_char *msg_data, u_int hello_len)
         msg_data += sizeof(struct in_addr);
         hello_len -= sizeof(struct in_addr);
     }
+    return (0);
 }
 
 
@@ -328,6 +337,9 @@ olsr_print (const u_char *pptr, u_int length, int is_ipv6)
                     ME_TO_DOUBLE(msgptr.v6->vtime),
                     EXTRACT_16BITS(msgptr.v6->msg_seq),
                     msg_len, (msg_len_valid == 0) ? " (invalid)" : "");
+            if (!msg_len_valid) {
+                return;
+            }
 
             msg_tlen = msg_len - sizeof(struct olsr_msg6);
             msg_data = tptr + sizeof(struct olsr_msg6);
@@ -356,6 +368,9 @@ olsr_print (const u_char *pptr, u_int length, int is_ipv6)
                     ME_TO_DOUBLE(msgptr.v4->vtime),
                     EXTRACT_16BITS(msgptr.v4->msg_seq),
                     msg_len, (msg_len_valid == 0) ? " (invalid)" : "");
+            if (!msg_len_valid) {
+                return;
+            }
 
             msg_tlen = msg_len - sizeof(struct olsr_msg4);
             msg_data = tptr + sizeof(struct olsr_msg4);
@@ -364,8 +379,9 @@ olsr_print (const u_char *pptr, u_int length, int is_ipv6)
         switch (msg_type) {
         case OLSR_HELLO_MSG:
         case OLSR_HELLO_LQ_MSG:
-            if (!TTEST2(*msg_data, sizeof(struct olsr_hello)))
+            if (msg_tlen < sizeof(struct olsr_hello))
                 goto trunc;
+            TCHECK2(*msg_data, sizeof(struct olsr_hello));
 
             ptr.hello = (struct olsr_hello *)msg_data;
             printf("\n\t  hello-time %.3lfs, MPR willingness %u",
@@ -405,15 +421,21 @@ olsr_print (const u_char *pptr, u_int length, int is_ipv6)
                 msg_tlen -= sizeof(struct olsr_hello_link);
                 hello_len -= sizeof(struct olsr_hello_link);
 
+                TCHECK2(*msg_data, hello_len);
                 if (msg_type == OLSR_HELLO_MSG) {
-                    olsr_print_neighbor(msg_data, hello_len);
+                    if (olsr_print_neighbor(msg_data, hello_len) == -1)
+                        goto trunc;
                 } else {
 #if INET6
-                    if (is_ipv6)
-                        olsr_print_lq_neighbor6(msg_data, hello_len);
-                    else
+                    if (is_ipv6) {
+                        if (olsr_print_lq_neighbor6(msg_data, hello_len) == -1)
+                            goto trunc;
+                    } else
 #endif
-                        olsr_print_lq_neighbor4(msg_data, hello_len);
+                    {
+                        if (olsr_print_lq_neighbor4(msg_data, hello_len) == -1)
+                            goto trunc;
+                    }
                 }
 
                 msg_data += hello_len;
@@ -423,8 +445,9 @@ olsr_print (const u_char *pptr, u_int length, int is_ipv6)
 
         case OLSR_TC_MSG:
         case OLSR_TC_LQ_MSG:
-            if (!TTEST2(*msg_data, sizeof(struct olsr_tc)))
+            if (msg_tlen < sizeof(struct olsr_tc))
                 goto trunc;
+            TCHECK2(*msg_data, sizeof(struct olsr_tc));
 
             ptr.tc = (struct olsr_tc *)msg_data;
             printf("\n\t    advertised neighbor seq 0x%04x",
@@ -433,14 +456,19 @@ olsr_print (const u_char *pptr, u_int length, int is_ipv6)
             msg_tlen -= sizeof(struct olsr_tc);
 
             if (msg_type == OLSR_TC_MSG) {
-                olsr_print_neighbor(msg_data, msg_tlen);
+                if (olsr_print_neighbor(msg_data, msg_tlen) == -1)
+                    goto trunc;
             } else {
 #if INET6
-                if (is_ipv6)
-                    olsr_print_lq_neighbor6(msg_data, msg_tlen);
-                else
+                if (is_ipv6) {
+                    if (olsr_print_lq_neighbor6(msg_data, msg_tlen) == -1)
+                        goto trunc;
+                } else
 #endif
-                    olsr_print_lq_neighbor4(msg_data, msg_tlen);
+                {
+                    if (olsr_print_lq_neighbor4(msg_data, msg_tlen) == -1)
+                        goto trunc;
+                }
             }
             break;
 
