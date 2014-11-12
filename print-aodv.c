@@ -145,32 +145,29 @@ aodv_rrep(const struct aodv_rrep *ap, const u_char *dat, u_int length)
 static void
 aodv_rerr(const struct aodv_rerr *ap, const u_char *dat, u_int length)
 {
-	u_int i;
-	const struct rerr_unreach *dp = NULL;
-	int n, trunc;
+	u_int i, dc;
+	const struct rerr_unreach *dp;
 
 	if (snapend < dat) {
 		printf(" [|aodv]");
 		return;
 	}
 	i = min(length, (u_int)(snapend - dat));
-	if (i < offsetof(struct aodv_rerr, r)) {
+	if (i < sizeof(*ap)) {
 		printf(" [|rerr]");
 		return;
 	}
-	i -= offsetof(struct aodv_rerr, r);
-	dp = &ap->r.dest[0];
-	n = ap->rerr_dc * sizeof(ap->r.dest[0]);
+	i -= sizeof(*ap);
 	printf(" rerr %s [items %u] [%u]:",
 	    ap->rerr_flags & RERR_NODELETE ? "[D]" : "",
 	    ap->rerr_dc, length);
-	trunc = n - (i/sizeof(ap->r.dest[0]));
-	for (; i >= sizeof(ap->r.dest[0]);
-	    ++dp, i -= sizeof(ap->r.dest[0])) {
+	dp = (struct rerr_unreach *)(void *)(ap + 1);
+	for (dc = ap->rerr_dc; dc != 0 && i >= sizeof(*dp);
+	    ++dp, --dc, i -= sizeof(*dp)) {
 		printf(" {%s}(%ld)", ipaddr_string(&dp->u_da),
 		    (unsigned long)EXTRACT_32BITS(&dp->u_ds));
 	}
-	if (trunc)
+	if ((i % sizeof(*dp)) != 0)
 		printf("[|rerr]");
 }
 
@@ -253,28 +250,35 @@ aodv_v6_rrep(const struct aodv_rrep6 *ap _U_, const u_char *dat _U_, u_int lengt
 
 static void
 #ifdef INET6
-aodv_v6_rerr(const struct aodv_rerr *ap, u_int length)
+aodv_v6_rerr(const struct aodv_rerr *ap, const u_char *dat, u_int length)
 #else
-aodv_v6_rerr(const struct aodv_rerr *ap _U_, u_int length)
+aodv_v6_rerr(const struct aodv_rerr *ap _U_, const u_char *dat, u_int length)
 #endif
 {
 #ifdef INET6
-	const struct rerr_unreach6 *dp6 = NULL;
-	int i, j, n, trunc;
+	u_int i, dc;
+	const struct rerr_unreach6 *dp6;
 
-	i = length - offsetof(struct aodv_rerr, r);
-	j = sizeof(ap->r.dest6[0]);
-	dp6 = &ap->r.dest6[0];
-	n = ap->rerr_dc * j;
+	if (snapend < dat) {
+		printf(" [|aodv]");
+		return;
+	}
+	i = min(length, (u_int)(snapend - dat));
+        if (i < sizeof(*ap)) {
+		printf(" [|rerr]");
+		return;
+	}
+	i -= sizeof(*ap);
 	printf(" rerr %s [items %u] [%u]:",
 	    ap->rerr_flags & RERR_NODELETE ? "[D]" : "",
 	    ap->rerr_dc, length);
-	trunc = n - (i/j);
-	for (; i -= j >= 0; ++dp6) {
+	dp6 = (struct rerr_unreach6 *)(void *)(ap + 1);
+	for (dc = ap->rerr_dc; dc != 0 && i >= sizeof(*dp6);
+	    ++dp6, --dc, i -= sizeof(*dp6)) {
 		printf(" {%s}(%ld)", ip6addr_string(&dp6->u_da),
 		    (unsigned long)EXTRACT_32BITS(&dp6->u_ds));
 	}
-	if (trunc)
+	if ((i % sizeof(*dp6)) != 0)
 		printf("[|rerr]");
 #else
 	printf(" rerr %u", length);
@@ -360,28 +364,35 @@ aodv_v6_draft_01_rrep(const struct aodv_rrep6_draft_01 *ap _U_, const u_char *da
 
 static void
 #ifdef INET6
-aodv_v6_draft_01_rerr(const struct aodv_rerr *ap, u_int length)
+aodv_v6_draft_01_rerr(const struct aodv_rerr *ap, const u_char *dat, u_int length)
 #else
-aodv_v6_draft_01_rerr(const struct aodv_rerr *ap _U_, u_int length)
+aodv_v6_draft_01_rerr(const struct aodv_rerr *ap _U_, const u_char *dat, u_int length)
 #endif
 {
 #ifdef INET6
-	const struct rerr_unreach6_draft_01 *dp6 = NULL;
-	int i, j, n, trunc;
+	u_int i, dc;
+	const struct rerr_unreach6_draft_01 *dp6;
 
-	i = length - offsetof(struct aodv_rerr, r);
-	j = sizeof(ap->r.dest6_draft_01[0]);
-	dp6 = &ap->r.dest6_draft_01[0];
-	n = ap->rerr_dc * j;
+	if (snapend < dat) {
+		printf(" [|aodv]");
+		return;
+	}
+	i = min(length, (u_int)(snapend - dat));
+	if (i < sizeof(*ap)) {
+		printf(" [|rerr]");
+		return;
+	}
+	i -= sizeof(*ap);
 	printf(" rerr %s [items %u] [%u]:",
 	    ap->rerr_flags & RERR_NODELETE ? "[D]" : "",
 	    ap->rerr_dc, length);
-	trunc = n - (i/j);
-	for (; i -= j >= 0; ++dp6) {
+	dp6 = (struct rerr_unreach6_draft_01 *)(void *)(ap + 1);
+	for (dc = ap->rerr_dc; dc != 0 && i >= sizeof(*dp6);
+	    ++dp6, --dc, i -= sizeof(*dp6)) {
 		printf(" {%s}(%ld)", ip6addr_string(&dp6->u_da),
 		    (unsigned long)EXTRACT_32BITS(&dp6->u_ds));
 	}
-	if (trunc)
+	if ((i % sizeof(*dp6)) != 0)
 		printf("[|rerr]");
 #else
 	printf(" rerr %u", length);
@@ -391,7 +402,7 @@ aodv_v6_draft_01_rerr(const struct aodv_rerr *ap _U_, u_int length)
 void
 aodv_print(const u_char *dat, u_int length, int is_ip6)
 {
-	uint8_t msg_type;
+	u_int8_t msg_type;
 
 	/*
 	 * The message type is the first byte; make sure we have it
@@ -419,7 +430,7 @@ aodv_print(const u_char *dat, u_int length, int is_ip6)
 
 	case AODV_RERR:
 		if (is_ip6)
-			aodv_v6_rerr((const struct aodv_rerr *)dat, length);
+			aodv_v6_rerr((const struct aodv_rerr *)dat, dat, length);
 		else
 			aodv_rerr((const struct aodv_rerr *)dat, dat, length);
 		break;
@@ -437,7 +448,7 @@ aodv_print(const u_char *dat, u_int length, int is_ip6)
 		break;
 
 	case AODV_V6_DRAFT_01_RERR:
-		aodv_v6_draft_01_rerr((const struct aodv_rerr *)dat, length);
+		aodv_v6_draft_01_rerr((const struct aodv_rerr *)dat, dat, length);
 		break;
 
 	case AODV_V6_DRAFT_01_RREP_ACK:
