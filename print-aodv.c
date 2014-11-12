@@ -150,14 +150,15 @@ aodv_rerr(const u_char *dat, u_int length)
 	    ap->rerr_dc, length);
 	dp = (struct rerr_unreach *)(dat + sizeof(*ap));
 	i = length - sizeof(*ap);
-	for (dc = ap->rerr_dc; dc != 0 && i >= sizeof(*dp);
-	    ++dp, --dc, i -= sizeof(*dp)) {
+	for (dc = ap->rerr_dc; dc != 0; dc--) {
 		TCHECK(*dp);
+		if (i < sizeof(*dp))
+			goto trunc;
 		printf(" {%s}(%ld)", ipaddr_string(&dp->u_da),
 		    (unsigned long)EXTRACT_32BITS(&dp->u_ds));
+		dp++;
+		i -= sizeof(*dp);
 	}
-	if ((i % sizeof(*dp)) != 0)
-		goto trunc;
 	return;
 
 trunc:
@@ -259,14 +260,15 @@ aodv_v6_rerr(const u_char *dat _U_, u_int length)
 	    ap->rerr_dc, length);
 	dp6 = (struct rerr_unreach6 *)(void *)(ap + 1);
 	i = length - sizeof(*ap);
-	for (dc = ap->rerr_dc; dc != 0 && i >= sizeof(*dp6);
-	    ++dp6, --dc, i -= sizeof(*dp6)) {
+	for (dc = ap->rerr_dc; dc != 0; dc--) {
 		TCHECK(*dp6);
+		if (i < sizeof(*dp6))
+			goto trunc;
 		printf(" {%s}(%ld)", ip6addr_string(&dp6->u_da),
 		    (unsigned long)EXTRACT_32BITS(&dp6->u_ds));
+		dp6++;
+		i -= sizeof(*dp6);
 	}
-	if ((i % sizeof(*dp6)) != 0)
-		goto trunc;
 	return;
 
 trunc:
@@ -371,14 +373,15 @@ aodv_v6_draft_01_rerr(const u_char *dat _U_, u_int length)
 	    ap->rerr_dc, length);
 	dp6 = (struct rerr_unreach6_draft_01 *)(void *)(ap + 1);
 	i = length - sizeof(*ap);
-	for (dc = ap->rerr_dc; dc != 0 && i >= sizeof(*dp6);
-	    ++dp6, --dc, i -= sizeof(*dp6)) {
+	for (dc = ap->rerr_dc; dc != 0; dc--) {
 		TCHECK(*dp6);
+		if (i < sizeof(*dp6))
+			goto trunc;
 		printf(" {%s}(%ld)", ip6addr_string(&dp6->u_da),
 		    (unsigned long)EXTRACT_32BITS(&dp6->u_ds));
+		dp6++;
+		i -= sizeof(*dp6);
 	}
-	if ((i % sizeof(*dp6)) != 0)
-		goto trunc;
 	return;
 
 trunc:
