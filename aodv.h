@@ -151,19 +151,6 @@ struct aodv_rrep_ack {
 	u_int8_t	ra_zero0;
 };
 
-union aodv {
-	struct aodv_rreq rreq;
-	struct aodv_rrep rrep;
-	struct aodv_rerr rerr;
-	struct aodv_rrep_ack rrep_ack;
-#ifdef INET6
-	struct aodv_rreq6 rreq6;
-	struct aodv_rreq6_draft_01 rreq6_draft_01;
-	struct aodv_rrep6 rrep6;
-	struct aodv_rrep6_draft_01 rrep6_draft_01;
-#endif
-};
-
 #define	AODV_RREQ		1	/* route request */
 #define	AODV_RREP		2	/* route response */
 #define	AODV_RERR		3	/* error report */
