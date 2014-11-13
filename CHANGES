@@ -1,7 +1,15 @@
-Friday Nov.  7, 2014 guy@alum.mit.edu
-  Summary for 5.0.0 tcpdump release
+Friday Nov. 12, 2014 guy@alum.mit.edu
+  Summary for 4.7.0 tcpdump release
+        changes to hex printing of CDP packets	
 	Fix PPI printing
 	Radius: update Packet Type Codes and Attribute Types with RFC/IANA names
+	Add a routine to print "text protocols", and add FTP/HTTP/SMTP/RTSP support.
+	improvements to telnet printer, even if not -v
+	omit length for bcp, print-tcp uses it
+	formatting fixes for a bunch of protocols
+	new bounds checks for a number of protocols
+	split netflow 1,6, and 6 dissector up.
+	added geneve dissector
 
 Tuesday  Sep.  2, 2014 mcr@sandelman.ca
   Summary for 4.6.2 tcpdump release
