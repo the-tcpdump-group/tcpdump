@@ -260,3 +260,8 @@ aoe_1-v		AoE_Linux.pcap		aoe_1-v.out	-t -v
 
 # Geneve tests
 geneve-v	geneve.pcap		geneve-vv.out	-t -vv
+
+# crash tests
+aodv-crash	aodv-crash.pcap		aodv-crash-v.out	-t -v
+geonet-crash	geonet-crash.pcap	geonet-crash-v.out	-t -v
+olsr-crash	olsr-crash.pcap		olsr-crash-v.out	-t -v
