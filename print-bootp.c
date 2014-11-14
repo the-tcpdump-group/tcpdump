@@ -89,8 +89,6 @@ struct bootp {
  */
 #define VM_RFC1048	{ 99, 130, 83, 99 }
 
-
-
 /*
  * RFC1048 tag values used to specify what information is being supplied in
  * the vendor field of the packet.
