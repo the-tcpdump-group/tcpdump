@@ -271,7 +271,7 @@ union controlmsg
 /* Macros for decoding routing-info fields */
 #define	RI_COST(x)	((x)&0777)
 #define	RI_HOPS(x)	(((x)>>10)&037)
-
+
 /*
  * NSP protocol fields and values.
  */

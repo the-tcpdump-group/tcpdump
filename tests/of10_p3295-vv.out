@@ -730,8 +730,8 @@ IP (tos 0x0, ttl 64, id 55529, offset 0, flags [DF], proto TCP (6), length 128)
 	version 1.0, type STATS_REPLY, length 76, xid 0x0000001f
 	 type TABLE, flags 0x0000
 	 table_id 0, name 'classifier'
-	 wildcards 0x003fffff (IN_PORT, DL_VLAN, DL_SRC, DL_DST, DL_TYPE, NW_PROTO, TP_SRC, TP_DST, DL_VLAN_PCP, NW_TOS)
-	 max_entries 1000000, active_count 26, lookup_count 1158498983736653433, matched_count 1158498983736653433
+	  wildcards 0x003fffff (IN_PORT, DL_VLAN, DL_SRC, DL_DST, DL_TYPE, NW_PROTO, TP_SRC, TP_DST, DL_VLAN_PCP, NW_TOS)
+	  max_entries 1000000, active_count 26, lookup_count 1158498983736653433, matched_count 1158498983736653433
 IP (tos 0x0, ttl 64, id 794, offset 0, flags [DF], proto TCP (6), length 52)
     10.0.0.20.6633 > 10.0.0.50.35256: Flags [.], cksum 0x146c (incorrect -> 0x7eb8), seq 2237, ack 7057, win 203, options [nop,nop,TS val 220958721 ecr 194889063], length 0
 IP (tos 0x0, ttl 64, id 55530, offset 0, flags [DF], proto TCP (6), length 2948)

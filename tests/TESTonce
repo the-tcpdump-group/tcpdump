@@ -13,10 +13,10 @@ $output=$ARGV[2];
 $options=$ARGV[3];
 
 if ($^O eq 'MSWin32') {
-  $r = system "..\\windump -n -r $input $options 2>NUL | tee NEW/$output | diff -w $output - >DIFF/$output.diff";
+  $r = system "..\\windump -n -r $input $options 2>NUL | tee NEW/$output | diff $output - >DIFF/$output.diff";
  }
 else {
-  $r = system "../tcpdump 2>/dev/null -n -r $input $options | tee NEW/$output | diff -w $output - >DIFF/$output.diff";
+  $r = system "../tcpdump 2>/dev/null -n -r $input $options | tee NEW/$output | diff $output - >DIFF/$output.diff";
 }
 
 if($r == 0) {
