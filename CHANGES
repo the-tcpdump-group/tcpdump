@@ -1,3 +1,7 @@
+Thursday Nov. 20, 2014 guy@alum.mit.edu
+  Summary for 5.0.0 tcpdump release
+	DCCP: update Packet Types with RFC4340/IANA names
+
 Friday Nov. 12, 2014 guy@alum.mit.edu
   Summary for 4.7.0 tcpdump release
         changes to hex printing of CDP packets	
