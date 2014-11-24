@@ -530,7 +530,7 @@ decode_labeled_prefix4(netdissect_options *ndo,
            is added to the prefix length;
            we also do only read out just one label -
            there is no real application for advertisement of
-           stacked labels in a a single BGP message
+           stacked labels in a single BGP message
         */
 
 	if (24 > plen)
