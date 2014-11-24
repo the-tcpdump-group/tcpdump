@@ -1,8 +1,9 @@
-Thursday Nov. 20, 2014 guy@alum.mit.edu
+Friday Nov. 21, 2014 guy@alum.mit.edu
   Summary for 5.0.0 tcpdump release
 	Fix PPI printing
 	Radius: update Packet Type Codes and Attribute Types with RFC/IANA names
 	DCCP: update Packet Types with RFC4340/IANA names
+	Support for Generic Network Virtualization Encapsulation (Geneve).
 
 Tuesday  Sep.  2, 2014 mcr@sandelman.ca
   Summary for 4.6.2 tcpdump release

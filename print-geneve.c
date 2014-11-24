@@ -148,10 +148,8 @@ geneve_print(netdissect_options *ndo, const u_char *bp, u_int len)
     len -= 1;
 
     version = ver_opt >> VER_SHIFT;
-    if (version != 0) {
-        ND_PRINT((ndo, " ERROR: unknown-version %u", version));
-        return;
-    }
+    if (version != 0)
+        ND_PRINT((ndo, " (unknown version %u)", version));
 
     flags = *bp;
     bp += 1;
