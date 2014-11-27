@@ -803,8 +803,7 @@ rfc1048_print(netdissect_options *ndo,
 			case TAG_NETBIOS_NODE:
 				/* this option should be at least 1 byte long */
 				if (len < 1)  {
-					ND_PRINT((ndo, "ERROR: option %u len %u < 1 bytes",
-					    TAG_NETBIOS_NODE, len));
+					ND_PRINT((ndo, "ERROR: length < 1 bytes"));
 					break;
 				}
 				tag = *bp++;
@@ -815,8 +814,7 @@ rfc1048_print(netdissect_options *ndo,
 			case TAG_OPT_OVERLOAD:
 				/* this option should be at least 1 byte long */
 				if (len < 1)  {
-					ND_PRINT((ndo, "ERROR: option %u len %u < 1 bytes",
-					    TAG_OPT_OVERLOAD, len));
+					ND_PRINT((ndo, "ERROR: length < 1 bytes"));
 					break;
 				}
 				tag = *bp++;
@@ -827,8 +825,7 @@ rfc1048_print(netdissect_options *ndo,
 			case TAG_CLIENT_FQDN:
 				/* this option should be at least 3 bytes long */
 				if (len < 3)  {
-					ND_PRINT((ndo, "ERROR: option %u len %u < 3 bytes",
-					    TAG_CLIENT_FQDN, len));
+					ND_PRINT((ndo, "ERROR: length < 3 bytes"));
 					bp += len;
 					len = 0;
 					break;
@@ -854,8 +851,7 @@ rfc1048_print(netdissect_options *ndo,
 
 				/* this option should be at least 1 byte long */
 				if (len < 1)  {
-					ND_PRINT((ndo, "ERROR: option %u len %u < 1 bytes",
-					    TAG_CLIENT_ID, len));
+					ND_PRINT((ndo, "ERROR: length < 1 bytes"));
 					break;
 				}
 				type = *bp++;
@@ -926,8 +922,7 @@ rfc1048_print(netdissect_options *ndo,
 
 				/* this option should be at least 5 bytes long */
 				if (len < 5)  {
-					ND_PRINT((ndo, "ERROR: option %u len %u < 5 bytes",
-					    TAG_CLASSLESS_STATIC_RT, len));
+					ND_PRINT((ndo, "ERROR: length < 5 bytes"));
 					bp += len;
 					len = 0;
 					break;
