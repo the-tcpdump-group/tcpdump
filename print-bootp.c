@@ -189,13 +189,14 @@ struct bootp {
 #define	TAG_SLP_SCOPE		((uint8_t)  79)
 /* RFC 2937 */
 #define	TAG_NS_SEARCH		((uint8_t) 117)
+/* RFC 3004 - The User Class Option for DHCP */
+#define	TAG_USER_CLASS		((uint8_t)  77)
 /* RFC 3011 */
 #define	TAG_IP4_SUBNET_SELECT	((uint8_t) 118)
 /* RFC 3442 */
 #define TAG_CLASSLESS_STATIC_RT	((uint8_t) 121)
 #define TAG_CLASSLESS_STA_RT_MS	((uint8_t) 249)
 /* ftp://ftp.isi.edu/.../assignments/bootp-dhcp-extensions */
-#define	TAG_USER_CLASS		((uint8_t)  77)
 #define	TAG_SLP_NAMING_AUTH	((uint8_t)  80)
 #define	TAG_CLIENT_FQDN		((uint8_t)  81)
 #define	TAG_AGENT_CIRCUIT	((uint8_t)  82)
@@ -495,13 +496,14 @@ static const struct tok tag2str[] = {
 	{ TAG_SLP_SCOPE,	"bSLP-SCOPE" },	/*"b" is a little wrong */
 /* RFC 2937 */
 	{ TAG_NS_SEARCH,	"sNSSEARCH" },	/* XXX 's' */
+/* RFC 3004 - The User Class Option for DHCP */
+	{ TAG_USER_CLASS,	"$User-Class" },
 /* RFC 3011 */
 	{ TAG_IP4_SUBNET_SELECT, "iSUBNET" },
 /* RFC 3442 */
 	{ TAG_CLASSLESS_STATIC_RT, "$Classless-Static-Route" },
 	{ TAG_CLASSLESS_STA_RT_MS, "$Classless-Static-Route-Microsoft" },
 /* http://www.iana.org/assignments/bootp-dhcp-extensions/index.htm */
-	{ TAG_USER_CLASS,	"aCLASS" },
 	{ TAG_SLP_NAMING_AUTH,	"aSLP-NA" },
 	{ TAG_CLIENT_FQDN,	"$FQDN" },
 	{ TAG_AGENT_CIRCUIT,	"$Agent-Information" },
@@ -965,6 +967,48 @@ rfc1048_print(netdissect_options *ndo,
 					bp += sizeof(ul);
 					len -= (significant_octets + 4);
 					first = 0;
+				}
+			}
+			break;
+
+			case TAG_USER_CLASS:
+			{
+				u_int suboptnumber = 1;
+
+				first = 1;
+				if (len < 2)  {
+					ND_PRINT((ndo, "ERROR: length < 2 bytes"));
+					bp += len;
+					len = 0;
+					break;
+				}
+				while (len > 0) {
+					suboptlen = *bp++;
+					len--;
+					ND_PRINT((ndo, "\n\t      "));
+					ND_PRINT((ndo, "instance#%u: ", suboptnumber));
+					if (suboptlen == 0) {
+						ND_PRINT((ndo, "ERROR: suboption length must be non-zero"));
+						bp += len;
+						len = 0;
+						break;
+					}
+					if (len < suboptlen) {
+						ND_PRINT((ndo, "ERROR: malformed option"));
+						bp += len;
+						len = 0;
+						break;
+					}
+					ND_PRINT((ndo, "\""));
+					if (fn_printn(ndo, bp, suboptlen, ndo->ndo_snapend)) {
+						ND_PRINT((ndo, "\""));
+						goto trunc;
+					}
+					ND_PRINT((ndo, "\""));
+					ND_PRINT((ndo, ", length %d", suboptlen));
+					suboptnumber++;
+					len -= suboptlen;
+					bp += suboptlen;
 				}
 			}
 			break;
