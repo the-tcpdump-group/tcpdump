@@ -260,3 +260,6 @@ aoe_1-v		AoE_Linux.pcap		aoe_1-v.out	-t -v
 
 # Geneve tests
 geneve-v	geneve.pcap		geneve-vv.out	-t -vv
+
+# DHCP tests
+dhcp-rfc3004	dhcp-rfc3004.pcap	dhcp-rfc3004-v.out	-t -v
