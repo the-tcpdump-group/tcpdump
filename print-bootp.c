@@ -195,6 +195,8 @@ struct bootp {
 /* RFC 3442 */
 #define TAG_CLASSLESS_STATIC_RT	((uint8_t) 121)
 #define TAG_CLASSLESS_STA_RT_MS	((uint8_t) 249)
+/* RFC 5859 - TFTP Server Address Option for DHCPv4 */
+#define	TAG_TFTP_SERVER_ADDRESS	((uint8_t) 150)
 /* ftp://ftp.isi.edu/.../assignments/bootp-dhcp-extensions */
 #define	TAG_SLP_NAMING_AUTH	((uint8_t)  80)
 #define	TAG_CLIENT_FQDN		((uint8_t)  81)
@@ -500,6 +502,8 @@ static const struct tok tag2str[] = {
 /* RFC 3442 */
 	{ TAG_CLASSLESS_STATIC_RT, "$Classless-Static-Route" },
 	{ TAG_CLASSLESS_STA_RT_MS, "$Classless-Static-Route-Microsoft" },
+/* RFC 5859 - TFTP Server Address Option for DHCPv4 */
+	{ TAG_TFTP_SERVER_ADDRESS, "iTFTP-Server-Address" },
 /* http://www.iana.org/assignments/bootp-dhcp-extensions/index.htm */
 	{ TAG_SLP_NAMING_AUTH,	"aSLP-NA" },
 	{ TAG_CLIENT_FQDN,	"$FQDN" },
