@@ -851,7 +851,7 @@ rfc1048_print(netdissect_options *ndo,
 
 			case TAG_CLIENT_ID:
 			    {
-			    	int type;
+				int type;
 
 				/* this option should be at least 1 byte long */
 				if (len < 1) {
@@ -907,7 +907,8 @@ rfc1048_print(netdissect_options *ndo,
 					case AGENT_SUBOPTION_CIRCUIT_ID: /* fall through */
 					case AGENT_SUBOPTION_REMOTE_ID:
 					case AGENT_SUBOPTION_SUBSCRIBER_ID:
-						fn_printn(ndo, bp, suboptlen, NULL);
+						if (fn_printn(ndo, bp, suboptlen, ndo->ndo_snapend))
+							goto trunc;
 						break;
 
 					default:
