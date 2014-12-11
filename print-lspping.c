@@ -768,7 +768,7 @@ lspping_print(netdissect_options *ndo,
 
         case LSPPING_TLV_DOWNSTREAM_MAPPING:
             /* that strange thing with the downstream map TLV is that until now
-             * we do not know if its IPv4 or IPv6 , after we found the adress-type
+             * we do not know if its IPv4 or IPv6 , after we found the address-type
              * lets recast the tlv_tptr and move on */
 
             tlv_ptr.lspping_tlv_downstream_map_ipv4= \
