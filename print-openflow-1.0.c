@@ -637,12 +637,15 @@ trunc:
 static const u_char *
 of10_vendor_data_print(netdissect_options *ndo,
                        const u_char *cp, const u_char *ep, const u_int len) {
+	uint32_t vendor;
+
 	if (len < 4)
 		goto corrupt;
 	/* vendor */
 	ND_TCHECK2(*cp, 4);
-	ND_PRINT((ndo, ", vendor 0x%08x", EXTRACT_32BITS(cp)));
+	vendor = EXTRACT_32BITS(cp);
 	cp += 4;
+	ND_PRINT((ndo, ", vendor 0x%08x (%s)", vendor, of_vendor_name(vendor)));
 	/* data */
 	return of10_data_print(ndo, cp, ep, len - 4);
 

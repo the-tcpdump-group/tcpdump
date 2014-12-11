@@ -40,11 +40,30 @@
 #include "interface.h"
 #include "extract.h"
 #include "openflow.h"
+#include "oui.h"
 
 static const char tstr[] = " [|openflow]";
 static const char cstr[] = " (corrupt)";
 
 #define OF_VER_1_0    0x01
+
+const struct tok onf_exp_str[] = {
+	{ ONF_EXP_ONF,               "ONF Extensions"                                  },
+	{ ONF_EXP_BUTE,              "Budapest University of Technology and Economics" },
+	{ ONF_EXP_NOVIFLOW,          "NoviFlow"                                        },
+	{ ONF_EXP_L3,                "L3+ Extensions, Vendor Neutral"                  },
+	{ ONF_EXP_L4L7,              "L4-L7 Extensions"                                },
+	{ ONF_EXP_WMOB,              "Wireless and Mobility Extensions"                },
+	{ ONF_EXP_FABS,              "Forwarding Abstractions Extensions"              },
+	{ ONF_EXP_OTRANS,            "Optical Transport Extensions"                    },
+	{ 0, NULL }
+};
+
+const char *
+of_vendor_name(const uint32_t vendor) {
+	const struct tok *table = (vendor & 0xff000000) == 0 ? oui_values : onf_exp_str;
+	return tok2str(table, "unknown", vendor);
+}
 
 static void
 of_header_print(netdissect_options *ndo, const uint8_t version, const uint8_t type,
