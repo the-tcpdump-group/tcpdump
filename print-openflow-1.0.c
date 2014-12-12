@@ -15,6 +15,9 @@
  * tcpdump with "-vvvv" will do full decoding of OpenFlow and "-v" decoding of
  * the nested frames.
  *
+ * Partial decoding of Big Switch Networks vendor extensions is done after the
+ * oftest (OpenFlow Testing Framework) source code.
+ *
  *
  * Copyright (c) 2013 The TCPDUMP project
  * All rights reserved.
@@ -55,6 +58,7 @@
 #include "ether.h"
 #include "ethertype.h"
 #include "ipproto.h"
+#include "oui.h"
 #include "openflow.h"
 
 static const char tstr[] = " [|openflow]";
@@ -580,6 +584,80 @@ static const struct tok empty_str[] = {
 #define SERIAL_NUM_LEN             32
 #define OFP_VLAN_NONE          0xffff
 
+/* vendor extensions */
+#define BSN_SET_IP_MASK                    0
+#define BSN_GET_IP_MASK_REQUEST            1
+#define BSN_GET_IP_MASK_REPLY              2
+#define BSN_SET_MIRRORING                  3
+#define BSN_GET_MIRRORING_REQUEST          4
+#define BSN_GET_MIRRORING_REPLY            5
+#define BSN_SHELL_COMMAND                  6
+#define BSN_SHELL_OUTPUT                   7
+#define BSN_SHELL_STATUS                   8
+#define BSN_GET_INTERFACES_REQUEST         9
+#define BSN_GET_INTERFACES_REPLY          10
+#define BSN_SET_PKTIN_SUPPRESSION_REQUEST 11
+#define BSN_SET_L2_TABLE_REQUEST          12
+#define BSN_GET_L2_TABLE_REQUEST          13
+#define BSN_GET_L2_TABLE_REPLY            14
+#define BSN_VIRTUAL_PORT_CREATE_REQUEST   15
+#define BSN_VIRTUAL_PORT_CREATE_REPLY     16
+#define BSN_VIRTUAL_PORT_REMOVE_REQUEST   17
+#define BSN_BW_ENABLE_SET_REQUEST         18
+#define BSN_BW_ENABLE_GET_REQUEST         19
+#define BSN_BW_ENABLE_GET_REPLY           20
+#define BSN_BW_CLEAR_DATA_REQUEST         21
+#define BSN_BW_CLEAR_DATA_REPLY           22
+#define BSN_BW_ENABLE_SET_REPLY           23
+#define BSN_SET_L2_TABLE_REPLY            24
+#define BSN_SET_PKTIN_SUPPRESSION_REPLY   25
+#define BSN_VIRTUAL_PORT_REMOVE_REPLY     26
+#define BSN_HYBRID_GET_REQUEST            27
+#define BSN_HYBRID_GET_REPLY              28
+                                       /* 29 */
+                                       /* 30 */
+#define BSN_PDU_TX_REQUEST                31
+#define BSN_PDU_TX_REPLY                  32
+#define BSN_PDU_RX_REQUEST                33
+#define BSN_PDU_RX_REPLY                  34
+#define BSN_PDU_RX_TIMEOUT                35
+
+static const struct tok bsn_subtype_str[] = {
+	{ BSN_SET_IP_MASK,                   "SET_IP_MASK"                   },
+	{ BSN_GET_IP_MASK_REQUEST,           "GET_IP_MASK_REQUEST"           },
+	{ BSN_GET_IP_MASK_REPLY,             "GET_IP_MASK_REPLY"             },
+	{ BSN_SET_MIRRORING,                 "SET_MIRRORING"                 },
+	{ BSN_GET_MIRRORING_REQUEST,         "GET_MIRRORING_REQUEST"         },
+	{ BSN_GET_MIRRORING_REPLY,           "GET_MIRRORING_REPLY"           },
+	{ BSN_GET_INTERFACES_REQUEST,        "GET_INTERFACES_REQUEST"        },
+	{ BSN_GET_INTERFACES_REPLY,          "GET_INTERFACES_REPLY"          },
+	{ BSN_SET_PKTIN_SUPPRESSION_REQUEST, "SET_PKTIN_SUPPRESSION_REQUEST" },
+	{ BSN_SET_L2_TABLE_REQUEST,          "SET_L2_TABLE_REQUEST"          },
+	{ BSN_GET_L2_TABLE_REQUEST,          "GET_L2_TABLE_REQUEST"          },
+	{ BSN_GET_L2_TABLE_REPLY,            "GET_L2_TABLE_REPLY"            },
+	{ BSN_VIRTUAL_PORT_CREATE_REQUEST,   "VIRTUAL_PORT_CREATE_REQUEST"   },
+	{ BSN_VIRTUAL_PORT_CREATE_REPLY,     "VIRTUAL_PORT_CREATE_REPLY"     },
+	{ BSN_VIRTUAL_PORT_REMOVE_REQUEST,   "VIRTUAL_PORT_REMOVE_REQUEST"   },
+	{ BSN_BW_ENABLE_SET_REQUEST,         "BW_ENABLE_SET_REQUEST"         },
+	{ BSN_BW_ENABLE_GET_REQUEST,         "BW_ENABLE_GET_REQUEST"         },
+	{ BSN_BW_ENABLE_GET_REPLY,           "BW_ENABLE_GET_REPLY"           },
+	{ BSN_BW_CLEAR_DATA_REQUEST,         "BW_CLEAR_DATA_REQUEST"         },
+	{ BSN_BW_CLEAR_DATA_REPLY,           "BW_CLEAR_DATA_REPLY"           },
+	{ BSN_BW_ENABLE_SET_REPLY,           "BW_ENABLE_SET_REPLY"           },
+	{ BSN_SET_L2_TABLE_REPLY,            "SET_L2_TABLE_REPLY"            },
+	{ BSN_SET_PKTIN_SUPPRESSION_REPLY,   "SET_PKTIN_SUPPRESSION_REPLY"   },
+	{ BSN_VIRTUAL_PORT_REMOVE_REPLY,     "VIRTUAL_PORT_REMOVE_REPLY"     },
+	{ BSN_HYBRID_GET_REQUEST,            "HYBRID_GET_REQUEST"            },
+	{ BSN_HYBRID_GET_REPLY,              "HYBRID_GET_REPLY"              },
+	{ BSN_PDU_TX_REQUEST,                "PDU_TX_REQUEST"                },
+	{ BSN_PDU_TX_REPLY,                  "PDU_TX_REPLY"                  },
+	{ BSN_PDU_RX_REQUEST,                "PDU_RX_REQUEST"                },
+	{ BSN_PDU_RX_REPLY,                  "PDU_RX_REPLY"                  },
+	{ BSN_PDU_RX_TIMEOUT,                "PDU_RX_TIMEOUT"                },
+	{ 0, NULL }
+};
+
+
 static const char *
 vlan_str(const uint16_t vid) {
 	static char buf[sizeof("65535 (bogus)")];
@@ -628,6 +706,149 @@ of10_data_print(netdissect_options *ndo,
 		hex_and_ascii_print(ndo, "\n\t  ", cp, len);
 	return cp + len;
 
+trunc:
+	ND_PRINT((ndo, "%s", tstr));
+	return ep;
+}
+
+static const u_char *
+of10_bsn_message_print(netdissect_options *ndo,
+                       const u_char *cp, const u_char *ep, const u_int len) {
+	const u_char *cp0 = cp;
+	uint32_t subtype;
+
+	if (len < 4)
+		goto corrupt;
+	/* subtype */
+	ND_TCHECK2(*cp, 4);
+	subtype = EXTRACT_32BITS(cp);
+	cp += 4;
+	ND_PRINT((ndo, "\n\t subtype %s", tok2str(bsn_subtype_str, "unknown (0x%08x)", subtype)));
+	switch (subtype) {
+	case BSN_GET_IP_MASK_REQUEST:
+		/*
+		 *  0                   1                   2                   3
+		 *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+		 * +---------------+---------------+---------------+---------------+
+		 * |                            subtype                            |
+		 * +---------------+---------------+---------------+---------------+
+		 * |     index     |                      pad                      |
+		 * +---------------+---------------+---------------+---------------+
+		 * |                              pad                              |
+		 * +---------------+---------------+---------------+---------------+
+		 *
+		 */
+		if (len != 12)
+			goto corrupt;
+		/* index */
+		ND_TCHECK2(*cp, 1);
+		ND_PRINT((ndo, ", index %u", *cp));
+		cp += 1;
+		/* pad */
+		ND_TCHECK2(*cp, 7);
+		cp += 7;
+		break;
+	case BSN_SET_IP_MASK:
+	case BSN_GET_IP_MASK_REPLY:
+		/*
+		 *  0                   1                   2                   3
+		 *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+		 * +---------------+---------------+---------------+---------------+
+		 * |                            subtype                            |
+		 * +---------------+---------------+---------------+---------------+
+		 * |     index     |                      pad                      |
+		 * +---------------+---------------+---------------+---------------+
+		 * |                              mask                             |
+		 * +---------------+---------------+---------------+---------------+
+		 *
+		 */
+		if (len != 12)
+			goto corrupt;
+		/* index */
+		ND_TCHECK2(*cp, 1);
+		ND_PRINT((ndo, ", index %u", *cp));
+		cp += 1;
+		/* pad */
+		ND_TCHECK2(*cp, 3);
+		cp += 3;
+		/* mask */
+		ND_TCHECK2(*cp, 4);
+		ND_PRINT((ndo, ", mask %s", ipaddr_string(ndo, cp)));
+		cp += 4;
+		break;
+	case BSN_SET_MIRRORING:
+	case BSN_GET_MIRRORING_REQUEST:
+	case BSN_GET_MIRRORING_REPLY:
+		/*
+		 *  0                   1                   2                   3
+		 *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+		 * +---------------+---------------+---------------+---------------+
+		 * |                            subtype                            |
+		 * +---------------+---------------+---------------+---------------+
+		 * |     ports     |                      pad                      |
+		 * +---------------+---------------+---------------+---------------+
+		 *
+		 */
+		if (len != 8)
+			goto corrupt;
+		/* ports */
+		ND_TCHECK2(*cp, 1);
+		ND_PRINT((ndo, ", ports %u", *cp));
+		cp += 1;
+		/* pad */
+		ND_TCHECK2(*cp, 3);
+		cp += 3;
+		break;
+	case BSN_GET_INTERFACES_REQUEST:
+		/*
+		 *  0                   1                   2                   3
+		 *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+		 * +---------------+---------------+---------------+---------------+
+		 * |                            subtype                            |
+		 * +---------------+---------------+---------------+---------------+
+		 *
+		 */
+		if (len != 4)
+			goto corrupt;
+		break;
+	default:
+		ND_TCHECK2(*cp, len - 4);
+		cp += len - 4;
+	}
+	return cp;
+
+corrupt: /* skip the undersized data */
+	ND_PRINT((ndo, "%s", cstr));
+	ND_TCHECK2(*cp0, len);
+	return cp0 + len;
+trunc:
+	ND_PRINT((ndo, "%s", tstr));
+	return ep;
+}
+
+static const u_char *
+of10_vendor_message_print(netdissect_options *ndo,
+                          const u_char *cp, const u_char *ep, const u_int len) {
+	uint32_t vendor;
+	const u_char *(*decoder)(netdissect_options *, const u_char *, const u_char *, u_int);
+
+	if (len < 4)
+		goto corrupt;
+	/* vendor */
+	ND_TCHECK2(*cp, 4);
+	vendor = EXTRACT_32BITS(cp);
+	cp += 4;
+	ND_PRINT((ndo, ", vendor 0x%08x (%s)", vendor, of_vendor_name(vendor)));
+	/* data */
+	decoder =
+		vendor == OUI_BSN         ? of10_bsn_message_print         :
+		of10_data_print;
+	return decoder(ndo, cp, ep, len - 4);
+
+corrupt: /* skip the undersized data */
+	ND_PRINT((ndo, "%s", cstr));
+	ND_TCHECK2(*cp, len);
+	return cp + len;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
 	return ep;
@@ -2006,7 +2227,7 @@ of10_header_body_print(netdissect_options *ndo,
 			goto corrupt;
 		if (ndo->ndo_vflag < 1)
 			goto next_message;
-		return of10_vendor_data_print(ndo, cp, ep, len - OF_HEADER_LEN);
+		return of10_vendor_message_print(ndo, cp, ep, len - OF_HEADER_LEN);
 	case OFPT_PACKET_IN:
 		/* 2 mock octets count in OF_PACKET_IN_LEN but not in len */
 		if (len < OF_PACKET_IN_LEN - 2)
