@@ -800,6 +800,10 @@ of10_bsn_message_print(netdissect_options *ndo,
 		cp += 3;
 		break;
 	case BSN_GET_INTERFACES_REQUEST:
+	case BSN_GET_L2_TABLE_REQUEST:
+	case BSN_BW_ENABLE_GET_REQUEST:
+	case BSN_BW_CLEAR_DATA_REQUEST:
+	case BSN_HYBRID_GET_REQUEST:
 		/*
 		 *  0                   1                   2                   3
 		 *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -810,6 +814,24 @@ of10_bsn_message_print(netdissect_options *ndo,
 		 */
 		if (len != 4)
 			goto corrupt;
+		break;
+	case BSN_VIRTUAL_PORT_REMOVE_REQUEST:
+		/*
+		 *  0                   1                   2                   3
+		 *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+		 * +---------------+---------------+---------------+---------------+
+		 * |                            subtype                            |
+		 * +---------------+---------------+---------------+---------------+
+		 * |                           vport_no                            |
+		 * +---------------+---------------+---------------+---------------+
+		 *
+		 */
+		if (len != 8)
+			goto corrupt;
+		/* vport_no */
+		ND_TCHECK2(*cp, 4);
+		ND_PRINT((ndo, ", vport_no %u", EXTRACT_32BITS(cp)));
+		cp += 4;
 		break;
 	default:
 		ND_TCHECK2(*cp, len - 4);
