@@ -27,8 +27,8 @@
 static const char tstr[] = "[|forces]";
 
 /*
- * Per draft-ietf-forces-protocol-22
-*/
+ * RFC5810: Forwarding and Control Element Separation (ForCES) Protocol
+ */
 #define	ForCES_VERS	1
 #define	ForCES_HDRL	24
 #define	ForCES_ALNL	4U
