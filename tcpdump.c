@@ -2429,7 +2429,7 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 static void
 ndo_default_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
-	hex_and_ascii_print(ndo, "\n\t", bp, length); /* pass on lf and identation string */
+	hex_and_ascii_print(ndo, "\n\t", bp, length); /* pass on lf and indentation string */
 }
 
 void

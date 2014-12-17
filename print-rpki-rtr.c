@@ -120,7 +120,7 @@ static const struct tok rpki_rtr_error_codes[] = {
 };
 
 /*
- * Build a identation string for a given identation level.
+ * Build a indentation string for a given indentation level.
  * XXX this should be really in util.c
  */
 static char *
