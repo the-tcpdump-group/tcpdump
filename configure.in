@@ -212,6 +212,9 @@ AC_ARG_WITH(sandbox-capsicum,
 # All of the ones we check for must be available in order to enable
 # capsicum sandboxing.
 #
+# XXX - do we need to check for all of them, or are there some that, if
+# present, imply others are present?
+#
 if test ! -z "$with_sandbox-capsicum" && test "$with_sandbox-capsicum" != "no" ; then
 	AC_CHECK_FUNCS(cap_enter cap_rights_limit cap_ioctls_limit openat,
 	    ac_lbl_capsicum_function_seen=yes,
@@ -502,9 +505,11 @@ main()
 ],
 	td_cv_buggygetaddrinfo=no,
 	td_cv_buggygetaddrinfo=yes,
-	td_cv_buggygetaddrinfo=yes)])
+	td_cv_buggygetaddrinfo=unknown)])
 	if test "$td_cv_buggygetaddrinfo" = no; then
 		AC_MSG_RESULT(good)
+	elif test "$td_cv_buggygetaddrinfo" = unknown; then
+		AC_MSG_RESULT([unknown (cross-compiling)])
 	else
 		AC_MSG_RESULT(buggy)
 	fi
