@@ -18,9 +18,6 @@
 /* Define to 1 if you have the `cap_ioctls_limit' function. */
 #undef HAVE_CAP_IOCTLS_LIMIT
 
-/* Define to 1 if you have the `cap_rights_init' function. */
-#undef HAVE_CAP_RIGHTS_INIT
-
 /* Define to 1 if you have the `cap_rights_limit' function. */
 #undef HAVE_CAP_RIGHTS_LIMIT
 
