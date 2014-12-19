@@ -716,8 +716,10 @@ decode_rt_routing_info(netdissect_options *ndo,
 	ND_TCHECK(pptr[0]);
 	plen = pptr[0];   /* get prefix length */
 
-	if (0 == plen)
-		return 1; /* default route target */
+	if (0 == plen) {
+		snprintf(buf, buflen, "default route target");
+		return 1;
+	}
 
 	if (32 > plen)
 		return -1;
