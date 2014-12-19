@@ -555,7 +555,7 @@ linkaddr_string(netdissect_options *ndo, const u_char *ep, const unsigned int ty
 		return (etheraddr_string(ndo, ep));
 
 	if (type == LINKADDR_FRELAY)
-		return (q922_string(ep));
+		return (q922_string(ndo, ep, len));
 
 	tp = lookup_bytestring(ep, len);
 	if (tp->e_name)

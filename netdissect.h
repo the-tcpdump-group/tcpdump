@@ -345,6 +345,8 @@ extern const char *dnnum_string(netdissect_options *, u_short);
 
 #include <pcap.h>
 
+extern char *q922_string(netdissect_options *ndo, const u_char *, u_int);
+
 typedef u_int (*if_ndo_printer)(struct netdissect_options *ndo,
 				const struct pcap_pkthdr *, const u_char *);
 typedef u_int (*if_printer)(const struct pcap_pkthdr *, const u_char *);
