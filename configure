@@ -4534,10 +4534,15 @@ fi
 # ac_lbl_capsicum_function_seen to yes; if any are not, set
 # ac_lbl_capsicum_function_not_seen to yes.
 #
-# All of them must be available in order to enable capsicum sandboxing.
+# We don't check cap_rights_init(), as it's a macro, wrapping another
+# function, in at least some versions of FreeBSD, and AC_CHECK_FUNCS()
+# doesn't handle that.
+#
+# All of the ones we check for must be available in order to enable
+# capsicum sandboxing.
 #
 if test ! -z "$with_sandbox-capsicum" && test "$with_sandbox-capsicum" != "no" ; then
-	for ac_func in cap_enter cap_rights_init cap_rights_limit cap_ioctls_limit openat
+	for ac_func in cap_enter cap_rights_limit cap_ioctls_limit openat
 do :
   as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
