@@ -4541,6 +4541,9 @@ fi
 # All of the ones we check for must be available in order to enable
 # capsicum sandboxing.
 #
+# XXX - do we need to check for all of them, or are there some that, if
+# present, imply others are present?
+#
 if test ! -z "$with_sandbox-capsicum" && test "$with_sandbox-capsicum" != "no" ; then
 	for ac_func in cap_enter cap_rights_limit cap_ioctls_limit openat
 do :
@@ -5115,7 +5118,7 @@ $as_echo_n "checking getaddrinfo bug... " >&6; }
   $as_echo_n "(cached) " >&6
 else
   if test "$cross_compiling" = yes; then :
-  td_cv_buggygetaddrinfo=yes
+  td_cv_buggygetaddrinfo=unknown
 else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -5229,6 +5232,9 @@ fi
 	if test "$td_cv_buggygetaddrinfo" = no; then
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: good" >&5
 $as_echo "good" >&6; }
+	elif test "$td_cv_buggygetaddrinfo" = unknown; then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: unknown (cross-compiling)" >&5
+$as_echo "unknown (cross-compiling)" >&6; }
 	else
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: buggy" >&5
 $as_echo "buggy" >&6; }
