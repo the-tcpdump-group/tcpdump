@@ -205,10 +205,15 @@ AC_ARG_WITH(sandbox-capsicum,
 # ac_lbl_capsicum_function_seen to yes; if any are not, set
 # ac_lbl_capsicum_function_not_seen to yes.
 #
-# All of them must be available in order to enable capsicum sandboxing.
+# We don't check cap_rights_init(), as it's a macro, wrapping another
+# function, in at least some versions of FreeBSD, and AC_CHECK_FUNCS()
+# doesn't handle that.
+#
+# All of the ones we check for must be available in order to enable
+# capsicum sandboxing.
 #
 if test ! -z "$with_sandbox-capsicum" && test "$with_sandbox-capsicum" != "no" ; then
-	AC_CHECK_FUNCS(cap_enter cap_rights_init cap_rights_limit cap_ioctls_limit openat,
+	AC_CHECK_FUNCS(cap_enter cap_rights_limit cap_ioctls_limit openat,
 	    ac_lbl_capsicum_function_seen=yes,
 	    ac_lbl_capsicum_function_not_seen=yes)
 fi
