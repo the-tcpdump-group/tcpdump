@@ -77,12 +77,10 @@ extern int SIZE_BUF;
 #else
 #include "getopt_long.h"
 #endif
-#include <pcap.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <limits.h>
+/* Capsicum-specific code requires macros from <net/bpf.h>, which will fail
+ * to compile if <pcap.h> has already been included; including the headers
+ * in the opposite order works fine.
+ */
 #ifdef HAVE_CAPSICUM
 #include <sys/capability.h>
 #include <sys/ioccom.h>
@@ -90,6 +88,12 @@ extern int SIZE_BUF;
 #include <fcntl.h>
 #include <libgen.h>
 #endif	/* HAVE_CAPSICUM */
+#include <pcap.h>
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <limits.h>
 #ifndef WIN32
 #include <sys/wait.h>
 #include <sys/resource.h>
