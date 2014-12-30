@@ -32,7 +32,7 @@ esp0 02-sunrise-sunset-esp.pcap esp0.out -t -n
 isakmp1 isakmp-delete-segfault.pcap isakmp1.out -t
 isakmp2 isakmp-pointer-loop.pcap    isakmp2.out -t
 isakmp3 isakmp-identification-segfault.pcap isakmp3.out -t -v
-isakmp4 isakmp4500.pcap             isakmp4.out -t -E "file esp-secrets.txt"
+# isakmp4 is in crypto.sh
 isakmp5-v	ISAKMP_sa_setup.pcap		isakmp5-v.out	-t -v
 
 # Link Management Protocol tests
