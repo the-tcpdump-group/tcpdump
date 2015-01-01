@@ -8,6 +8,16 @@
  *
  * [OF10] http://www.openflow.org/documents/openflow-spec-v1.0.0.pdf
  *
+ * Most functions in this file take 3 arguments into account:
+ * * cp -- the pointer to the first octet to decode
+ * * len -- the length of the current structure as declared on the wire
+ * * ep -- the pointer to the end of the captured frame
+ * They return either the pointer to the next not-yet-decoded part of the frame
+ * or the value of ep, which means the current frame processing is over as it
+ * has been fully decoded or is malformed or truncated. This way it is possible
+ * to chain and nest such functions uniformly to decode an OF1.0 message, which
+ * consists of several layers of nested structures.
+ *
  * Decoding of Ethernet frames nested in OFPT_PACKET_IN and OFPT_PACKET_OUT
  * messages is done only when the verbosity level set by command-line argument
  * is "-vvv" or higher. In that case the verbosity level is temporarily
