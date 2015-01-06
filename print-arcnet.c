@@ -118,9 +118,8 @@ arcnet_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	u_int seqid = 0;
 	u_char arc_type;
 
-	if (caplen < ARC_HDRLEN) {
+	if (caplen < ARC_HDRLEN || length < ARC_HDRLEN) {
 		printf("[|arcnet]");
-		return (caplen);
 	}
 
 	ap = (const struct arc_header *)p;
@@ -139,14 +138,14 @@ arcnet_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	}
 
 	if (phds) {
-		if (caplen < ARC_HDRNEWLEN) {
+		if (caplen < ARC_HDRNEWLEN || length < ARC_HDRNEWLEN) {
 			arcnet_print(p, length, 0, 0, 0);
 			printf("[|phds]");
 			return (caplen);
 		}
 
 		if (ap->arc_flag == 0xff) {
-			if (caplen < ARC_HDRNEWLEN_EXC) {
+			if (caplen < ARC_HDRNEWLEN_EXC || length < ARC_HDRNEWLEN_EXC) {
 				arcnet_print(p, length, 0, 0, 0);
 				printf("[|phds extended]");
 				return (caplen);
@@ -205,7 +204,7 @@ arcnet_linux_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	int archdrlen = 0;
 	u_char arc_type;
 
-	if (caplen < ARC_LINUX_HDRLEN) {
+	if (caplen < ARC_LINUX_HDRLEN || length < ARC_LINUX_HDRLEN) {
 		printf("[|arcnet]");
 		return (caplen);
 	}
@@ -216,7 +215,7 @@ arcnet_linux_if_print(const struct pcap_pkthdr *h, const u_char *p)
 	switch (arc_type) {
 	default:
 		archdrlen = ARC_LINUX_HDRNEWLEN;
-		if (caplen < ARC_LINUX_HDRNEWLEN) {
+		if (caplen < ARC_LINUX_HDRNEWLEN || length < ARC_LINUX_HDRNEWLEN) {
 			printf("[|arcnet]");
 			return (caplen);
 		}
