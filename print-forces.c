@@ -1187,12 +1187,6 @@ otlv_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "%sOper TLV %s(0x%x) length %d\n", ib, ops->s, type,
 		       EXTRACT_16BITS(&otlv->length)));
 	}
-	/* empty TLVs like COMMIT and TRCOMMIT are empty, we stop here .. */
-	if (ops->flags & ZERO_TTLV) {
-		if (tll != 0)	/* instead of "if (tll)" - for readability .. */
-			ND_PRINT((ndo, "%s: Illegal - MUST be empty\n", ops->s));
-		return rc;
-	}
 	/* rest of ops must at least have 12B {pathinfo} */
 	if (tll < OP_MIN_SIZ) {
 		ND_PRINT((ndo, "\t\tOper TLV %s(0x%x) length %d\n", ops->s, type,
@@ -1203,6 +1197,7 @@ otlv_print(netdissect_options *ndo,
 
 	}
 
+	/* XXX - do anything with ops->flags? */
 	rc = ops->print(ndo, dp, tll, ops->op_msk, indent + 1);
 	return rc;
 
