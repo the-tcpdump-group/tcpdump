@@ -1188,7 +1188,7 @@ otlv_print(netdissect_options *ndo,
 		       EXTRACT_16BITS(&otlv->length)));
 	}
 	/* empty TLVs like COMMIT and TRCOMMIT are empty, we stop here .. */
-	if (!ops->flags & ZERO_TTLV) {
+	if (ops->flags & ZERO_TTLV) {
 		if (tll != 0)	/* instead of "if (tll)" - for readability .. */
 			ND_PRINT((ndo, "%s: Illegal - MUST be empty\n", ops->s));
 		return rc;
