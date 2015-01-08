@@ -43,6 +43,9 @@ addons:
     # Pattern to match selecting branches that will run analysis
     branch_pattern: coverity_scan
 
+git:
+  quiet: true
+
 before_install:
   - uname -a
   - date
