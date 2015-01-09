@@ -50,11 +50,11 @@ before_install:
   - uname -a
   - date
   - if [ "$TRAVIS_OS_NAME" = linux ]; then sudo apt-get -qq update; fi
-  - if [ "$TRAVIS_OS_NAME" = osx ]; then brew update; fi
+  - if [ "$TRAVIS_OS_NAME" = osx ]; then brew update >/dev/null; fi
 
 install:
   - if [ "$TRAVIS_OS_NAME" = linux ]; then sudo apt-get -qq install libssl-dev libssl0.9.8 libssl1.0.0 libdnet-dev libsmi2-dev; fi
-  - if [ "$TRAVIS_OS_NAME" = osx ]; then brew install libsmi; fi
+  - if [ "$TRAVIS_OS_NAME" = osx ]; then brew install libsmi | grep -v '%'; fi
 
 before_script:
   - if [ "$BUILD_LIBPCAP" = true ]; then (cd .. && echo '$ git clone [...] libpcap.git' && git clone --depth=50 --branch=master --quiet git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure && make); else sudo apt-get -qq install libpcap-dev; fi
