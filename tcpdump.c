@@ -739,10 +739,12 @@ droproot(const char *username, const char *chroot_dir)
 			printf("dropped privs to %s\n", username);
 		}
 		/* We don't need CAP_SETUID and CAP_SETGID */
-		capng_update(CAPNG_DROP, CAPNG_EFFECTIVE, CAP_SETUID);
-		capng_update(CAPNG_DROP, CAPNG_EFFECTIVE, CAP_SETUID);
-		capng_update(CAPNG_DROP, CAPNG_PERMITTED, CAP_SETUID);
-		capng_update(CAPNG_DROP, CAPNG_PERMITTED, CAP_SETUID);
+		capng_updatev(
+			CAPNG_DROP,
+			CAPNG_EFFECTIVE | CAPNG_PERMITTED,
+			CAP_SETUID,
+			CAP_SETGID,
+			-1);
 		capng_apply(CAPNG_SELECT_BOTH);
 
 #else
@@ -1695,27 +1697,23 @@ main(int argc, char **argv)
 	 * savefile doesn't handle the general case.
 	 */
 
+	if (getuid() == 0 || geteuid() == 0) {
 #ifdef HAVE_CAP_NG_H
-	/* We are running as root and we will be writing to savefile */
-	if ((getuid() == 0 || geteuid() == 0) && WFileName) {
-		if (username) {
-			/* Drop all capabilities from effective set */
-			capng_clear(CAPNG_EFFECTIVE);
+		/* Drop all capabilities from effective set */
+		capng_clear(CAPNG_EFFECTIVE);
+		/* We are running as root and we will be writing to savefile */
+		if (WFileName  && username) {
 			/* Add capabilities we will need*/
-			capng_update(CAPNG_ADD, CAPNG_PERMITTED, CAP_SETUID);
-			capng_update(CAPNG_ADD, CAPNG_PERMITTED, CAP_SETGID);
-			capng_update(CAPNG_ADD, CAPNG_PERMITTED, CAP_DAC_OVERRIDE);
-
-			capng_update(CAPNG_ADD, CAPNG_EFFECTIVE, CAP_SETUID);
-			capng_update(CAPNG_ADD, CAPNG_EFFECTIVE, CAP_SETGID);
-			capng_update(CAPNG_ADD, CAPNG_EFFECTIVE, CAP_DAC_OVERRIDE);
-
+			capng_updatev(
+				CAPNG_ADD,
+				CAPNG_PERMITTED | CAPNG_EFFECTIVE,
+				CAP_SETUID,
+				CAP_SETGID,
+				CAP_DAC_OVERRIDE,
+				-1);
 			capng_apply(CAPNG_SELECT_BOTH);
 		}
-	}
 #endif /* HAVE_CAP_NG_H */
-
-	if (getuid() == 0 || geteuid() == 0) {
 		if (username || chroot_dir)
 			droproot(username, chroot_dir);
 
