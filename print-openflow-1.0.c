@@ -26,7 +26,8 @@
  * the nested frames.
  *
  * Partial decoding of Big Switch Networks vendor extensions is done after the
- * oftest (OpenFlow Testing Framework) source code.
+ * oftest (OpenFlow Testing Framework) and Loxigen (library generator) source
+ * code.
  *
  *
  * Copyright (c) 2013 The TCPDUMP project
@@ -670,6 +671,29 @@ static const struct tok bsn_subtype_str[] = {
 	{ 0, NULL }
 };
 
+#define BSN_ACTION_MIRROR                  1
+#define BSN_ACTION_SET_TUNNEL_DST          2
+                                        /* 3 */
+#define BSN_ACTION_CHECKSUM                4
+
+static const struct tok bsn_action_subtype_str[] = {
+	{ BSN_ACTION_MIRROR,                 "MIRROR"                        },
+	{ BSN_ACTION_SET_TUNNEL_DST,         "SET_TUNNEL_DST"                },
+	{ BSN_ACTION_CHECKSUM,               "CHECKSUM"                      },
+	{ 0, NULL }
+};
+
+static const struct tok bsn_mirror_copy_stage_str[] = {
+	{ 0, "INGRESS" },
+	{ 1, "EGRESS"  },
+	{ 0, NULL },
+};
+
+static const struct tok bsn_onoff_str[] = {
+	{ 0, "OFF" },
+	{ 1, "ON"  },
+	{ 0, NULL },
+};
 
 static const char *
 vlan_str(const uint16_t vid) {
@@ -798,15 +822,15 @@ of10_bsn_message_print(netdissect_options *ndo,
 		 * +---------------+---------------+---------------+---------------+
 		 * |                            subtype                            |
 		 * +---------------+---------------+---------------+---------------+
-		 * |     ports     |                      pad                      |
+		 * | report m. p.  |                      pad                      |
 		 * +---------------+---------------+---------------+---------------+
 		 *
 		 */
 		if (len != 8)
 			goto corrupt;
-		/* ports */
+		/* report_mirror_ports */
 		ND_TCHECK2(*cp, 1);
-		ND_PRINT((ndo, ", ports %u", *cp));
+		ND_PRINT((ndo, ", report_mirror_ports %s", tok2str(bsn_onoff_str, "bogus (%u)", *cp)));
 		cp += 1;
 		/* pad */
 		ND_TCHECK2(*cp, 3);
@@ -846,6 +870,74 @@ of10_bsn_message_print(netdissect_options *ndo,
 		ND_PRINT((ndo, ", vport_no %u", EXTRACT_32BITS(cp)));
 		cp += 4;
 		break;
+	case BSN_SHELL_COMMAND:
+		/*
+		 *  0                   1                   2                   3
+		 *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+		 * +---------------+---------------+---------------+---------------+
+		 * |                            subtype                            |
+		 * +---------------+---------------+---------------+---------------+
+		 * |                            service                            |
+		 * +---------------+---------------+---------------+---------------+
+		 * |                             data ...
+		 * +---------------+---------------+--------
+		 *
+		 */
+		if (len < 8)
+			goto corrupt;
+		/* service */
+		ND_TCHECK2(*cp, 4);
+		ND_PRINT((ndo, ", service %u", EXTRACT_32BITS(cp)));
+		cp += 4;
+		/* data */
+		ND_PRINT((ndo, ", data '"));
+		if (fn_printn(ndo, cp, len - 8, ep)) {
+			ND_PRINT((ndo, "'"));
+			goto trunc;
+		}
+		ND_PRINT((ndo, "'"));
+		cp += len - 8;
+		break;
+	case BSN_SHELL_OUTPUT:
+		/*
+		 *  0                   1                   2                   3
+		 *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+		 * +---------------+---------------+---------------+---------------+
+		 * |                            subtype                            |
+		 * +---------------+---------------+---------------+---------------+
+		 * |                             data ...
+		 * +---------------+---------------+--------
+		 *
+		 */
+		if (len < 4)
+			goto corrupt;
+		/* data */
+		ND_PRINT((ndo, ", data '"));
+		if (fn_printn(ndo, cp, len - 4, ep)) {
+			ND_PRINT((ndo, "'"));
+			goto trunc;
+		}
+		ND_PRINT((ndo, "'"));
+		cp += len - 4;
+		break;
+	case BSN_SHELL_STATUS:
+		/*
+		 *  0                   1                   2                   3
+		 *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+		 * +---------------+---------------+---------------+---------------+
+		 * |                            subtype                            |
+		 * +---------------+---------------+---------------+---------------+
+		 * |                            status                             |
+		 * +---------------+---------------+---------------+---------------+
+		 *
+		 */
+		if (len != 8)
+			goto corrupt;
+		/* status */
+		ND_TCHECK2(*cp, 4);
+		ND_PRINT((ndo, ", status 0x%08x", EXTRACT_32BITS(cp)));
+		cp += 4;
+		break;
 	default:
 		ND_TCHECK2(*cp, len - 4);
 		cp += len - 4;
@@ -856,6 +948,107 @@ corrupt: /* skip the undersized data */
 	ND_PRINT((ndo, "%s", cstr));
 	ND_TCHECK2(*cp0, len);
 	return cp0 + len;
+trunc:
+	ND_PRINT((ndo, "%s", tstr));
+	return ep;
+}
+
+static const u_char *
+of10_bsn_actions_print(netdissect_options *ndo,
+                       const u_char *cp, const u_char *ep, const u_int len) {
+	const u_char *cp0 = cp;
+	uint32_t subtype, vlan_tag;
+
+	if (len < 4)
+		goto corrupt;
+	/* subtype */
+	ND_TCHECK2(*cp, 4);
+	subtype = EXTRACT_32BITS(cp);
+	cp += 4;
+	ND_PRINT((ndo, "\n\t  subtype %s", tok2str(bsn_action_subtype_str, "unknown (0x%08x)", subtype)));
+	switch (subtype) {
+	case BSN_ACTION_MIRROR:
+		/*
+		 *  0                   1                   2                   3
+		 *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+		 * +---------------+---------------+---------------+---------------+
+		 * |                            subtype                            |
+		 * +---------------+---------------+---------------+---------------+
+		 * |                           dest_port                           |
+		 * +---------------+---------------+---------------+---------------+
+		 * |                           vlan_tag                            |
+		 * +---------------+---------------+---------------+---------------+
+		 * |  copy_stage   |                      pad                      |
+		 * +---------------+---------------+---------------+---------------+
+		 *
+		 */
+		if (len != 16)
+			goto corrupt;
+		/* dest_port */
+		ND_TCHECK2(*cp, 4);
+		ND_PRINT((ndo, ", dest_port %u", EXTRACT_32BITS(cp)));
+		cp += 4;
+		/* vlan_tag */
+		ND_TCHECK2(*cp, 4);
+		vlan_tag = EXTRACT_32BITS(cp);
+		cp += 4;
+		switch (vlan_tag >> 16) {
+		case 0:
+			ND_PRINT((ndo, ", vlan_tag none"));
+			break;
+		case ETHERTYPE_8021Q:
+			ND_PRINT((ndo, ", vlan_tag 802.1Q (%s)", ieee8021q_tci_string(vlan_tag & 0xffff)));
+			break;
+		default:
+			ND_PRINT((ndo, ", vlan_tag unknown (0x%04x)", vlan_tag >> 16));
+		}
+		/* copy_stage */
+		ND_TCHECK2(*cp, 1);
+		ND_PRINT((ndo, ", copy_stage %s", tok2str(bsn_mirror_copy_stage_str, "unknown (%u)", *cp)));
+		cp += 1;
+		/* pad */
+		ND_TCHECK2(*cp, 3);
+		cp += 3;
+		break;
+	default:
+		ND_TCHECK2(*cp, len - 4);
+		cp += len - 4;
+	}
+
+	return cp;
+
+corrupt:
+	ND_PRINT((ndo, "%s", cstr));
+	ND_TCHECK2(*cp0, len);
+	return cp0 + len;
+trunc:
+	ND_PRINT((ndo, "%s", tstr));
+	return ep;
+}
+
+static const u_char *
+of10_vendor_action_print(netdissect_options *ndo,
+                         const u_char *cp, const u_char *ep, const u_int len) {
+	uint32_t vendor;
+	const u_char *(*decoder)(netdissect_options *, const u_char *, const u_char *, const u_int);
+
+	if (len < 4)
+		goto corrupt;
+	/* vendor */
+	ND_TCHECK2(*cp, 4);
+	vendor = EXTRACT_32BITS(cp);
+	cp += 4;
+	ND_PRINT((ndo, ", vendor 0x%08x (%s)", vendor, of_vendor_name(vendor)));
+	/* data */
+	decoder =
+		vendor == OUI_BSN         ? of10_bsn_actions_print         :
+		of10_data_print;
+	return decoder(ndo, cp, ep, len - 4);
+
+corrupt: /* skip the undersized data */
+	ND_PRINT((ndo, "%s", cstr));
+	ND_TCHECK2(*cp, len);
+	return cp + len;
 trunc:
 	ND_PRINT((ndo, "%s", tstr));
 	return ep;
@@ -1377,7 +1570,7 @@ of10_actions_print(netdissect_options *ndo,
 			cp += 4;
 			break;
 		case OFPAT_VENDOR:
-			if (ep == (cp = of10_vendor_data_print(ndo, cp, ep, alen - 4)))
+			if (ep == (cp = of10_vendor_action_print(ndo, cp, ep, alen - 4)))
 				return ep; /* end of snapshot */
 			break;
 		case OFPAT_STRIP_VLAN:
