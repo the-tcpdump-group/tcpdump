@@ -2414,8 +2414,7 @@ isis_print(netdissect_options *ndo,
 	break;
 
     default:
-	if (!print_unknown_data(ndo, pptr, "\n\t  ", length))
-	    return(0);
+	(void)print_unknown_data(ndo, pptr, "\n\t  ", length);
 	return (0);
     }
 
