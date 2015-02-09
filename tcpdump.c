@@ -736,7 +736,7 @@ droproot(const char *username, const char *chroot_dir)
 			fprintf(stderr, "error : ret %d\n", ret);
 		}
 		else {
-			printf("dropped privs to %s\n", username);
+			fprintf(stderr, "dropped privs to %s\n", username);
 		}
 		/* We don't need CAP_SETUID and CAP_SETGID */
 		capng_updatev(
@@ -758,7 +758,7 @@ droproot(const char *username, const char *chroot_dir)
 			exit(1);
 		}
 		else {
-			printf("dropped privs to %s\n", username);
+			fprintf(stderr, "dropped privs to %s\n", username);
 		}
 #endif /* HAVE_CAP_NG_H */
 	}
