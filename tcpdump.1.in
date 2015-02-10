@@ -546,6 +546,15 @@ instead of ``nic.ddn.mil''.
 .PD
 Print an optional packet number at the beginning of the line.
 .TP
+.B \-o
+.PD 0
+.TP
+.B \-\-immediate-mode
+.PD
+Output the packet as soon as it is received.
+This is only available if TPACKET_V3 is available in the kernel, in which case
+buffering may otherwise occur.
+.TP
 .B \-O
 .PD 0
 .TP

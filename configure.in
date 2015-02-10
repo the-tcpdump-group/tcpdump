@@ -1018,6 +1018,11 @@ AC_CHECK_HEADERS(pcap/nflog.h,,,[#include "tcpdump-stdinc.h"])
 AC_CHECK_HEADERS(pcap/usb.h,,,[#include "tcpdump-stdinc.h"])
 CPPFLAGS="$savedcppflags"
 
+#
+# Check for TPACKET_V3 to determine if set_immediate_mode should be exposed.
+#
+AC_CHECK_HEADERS(linux/if_packet.h,,,)
+
 AC_PROG_RANLIB
 AC_CHECK_TOOL([AR], [ar])
 
