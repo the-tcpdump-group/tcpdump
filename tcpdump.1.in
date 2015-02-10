@@ -128,6 +128,10 @@ tcpdump \- dump traffic on a network
 [
 .BI \-\-time\-stamp\-precision= tstamp_precision
 ]
+.ti +8
+[
+.B \-\-immediate\-mode
+]
 [
 .B \-\-version
 ]
@@ -420,6 +424,13 @@ monitor mode will be shown; if
 .B \-I
 is specified, only those link-layer types available when in monitor mode
 will be shown.
+.TP
+.BI \-\-immediate\-mode
+Capture in "immediate mode".  In this mode, packets are delivered to
+tcpdump as soon as they arrive, rather than being buffered for
+efficiency.  This is the default when printing packets rather than
+saving packets to a ``savefile'' if the packets are being printed to a
+terminal rather than to a file or pipe.
 .TP
 .BI \-j " tstamp_type"
 .PD 0

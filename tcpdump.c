@@ -669,6 +669,7 @@ show_devices_and_exit (void)
  */
 #define OPTION_VERSION		128
 #define OPTION_TSTAMP_PRECISION	129
+#define OPTION_IMMEDIATE_MODE	130
 
 static const struct option longopts[] = {
 #if defined(HAVE_PCAP_CREATE) || defined(WIN32)
@@ -700,6 +701,9 @@ static const struct option longopts[] = {
 	{ "packet-buffered", no_argument, NULL, 'U' },
 #endif
 	{ "linktype", required_argument, NULL, 'y' },
+#ifdef HAVE_PCAP_SET_IMMEDIATE_MODE
+	{ "immediate-mode", no_argument, NULL, OPTION_IMMEDIATE_MODE },
+#endif
 #if defined(HAVE_PCAP_DEBUG) || defined(HAVE_YYDEBUG)
 	{ "debug-filter-parser", no_argument, NULL, 'Y' },
 #endif
@@ -948,6 +952,7 @@ main(int argc, char **argv)
 	gndo->ndo_error=ndo_error;
 	gndo->ndo_warning=ndo_warning;
 	gndo->ndo_snaplen = DEFAULT_SNAPLEN;
+	gndo->ndo_immediate = 0;
 
 	cnt = -1;
 	device = NULL;
@@ -1355,6 +1360,12 @@ main(int argc, char **argv)
 			break;
 #endif
 
+#ifdef HAVE_PCAP_SET_IMMEDIATE_MODE
+		case OPTION_IMMEDIATE_MODE:
+			gndo->ndo_immediate = 1;
+			break;
+#endif
+
 		default:
 			print_usage();
 			exit(1);
@@ -1389,6 +1400,17 @@ main(int argc, char **argv)
 
 	if (VFileName != NULL && RFileName != NULL)
 		error("-V and -r are mutually exclusive.");
+
+#ifdef HAVE_PCAP_SET_IMMEDIATE_MODE
+	/*
+	 * If we're printing dissected packets to the standard output
+	 * rather than saving raw packets to a file, and the standard
+	 * output is a terminal, use immediate mode, as the user's
+	 * probably expecting to see packets pop up immediately.
+	 */
+	if (WFileName == NULL && isatty(1))
+		gndo->ndo_immediate = 1;
+#endif
 
 #ifdef WITH_CHROOT
 	/* if run as root, prepare for chrooting */
@@ -1515,6 +1537,15 @@ main(int argc, char **argv)
 				pcap_statustostr(status));
 #endif
 
+#ifdef HAVE_PCAP_SET_IMMEDIATE_MODE
+		if (gndo->ndo_immediate) {
+			status = pcap_set_immediate_mode(pd, 1);
+			if (status != 0)
+				error("%s: Can't set immediate mode: %s",
+				device,
+				pcap_statustostr(status));
+		}
+#endif
 		/*
 		 * Is this an interface that supports monitor mode?
 		 */
@@ -2533,6 +2564,9 @@ print_usage(void)
 	(void)fprintf(stderr, "[ --time-stamp-precision precision ]\n");
 	(void)fprintf(stderr,
 "\t\t");
+#endif
+#ifdef HAVE_PCAP_SET_IMMEDIATE_MODE
+	(void)fprintf(stderr, "[ --immediate-mode ] ");
 #endif
 	(void)fprintf(stderr, "[ -T type ] [ --version ] [ -V file ]\n");
 	(void)fprintf(stderr,
