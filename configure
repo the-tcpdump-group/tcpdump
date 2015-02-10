@@ -7412,6 +7412,22 @@ done
 
 CPPFLAGS="$savedcppflags"
 
+#
+# Check for TPACKET_V3 to determine if set_immediate_mode should be exposed.
+#
+for ac_header in linux/if_packet.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "linux/if_packet.h" "ac_cv_header_linux_if_packet_h" "$ac_includes_default"
+if test "x$ac_cv_header_linux_if_packet_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LINUX_IF_PACKET_H 1
+_ACEOF
+
+fi
+
+done
+
+
 if test -n "$ac_tool_prefix"; then
   # Extract the first word of "${ac_tool_prefix}ranlib", so it can be a program name with args.
 set dummy ${ac_tool_prefix}ranlib; ac_word=$2

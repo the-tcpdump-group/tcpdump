@@ -635,6 +635,17 @@ show_devices_and_exit (void)
 #define D_FLAG
 #endif
 
+#ifdef HAVE_LINUX_IF_PACKET_H
+#include <linux/if_packet.h>
+#ifdef TPACKET3_HDRLEN
+#define HAVE_TPACKET3
+#define o_FLAG "o"
+static int oflag = 0;
+#else
+#define o_FLAG
+#endif /* TPACKET3_HDRLEN */
+#endif /* HAVE_LINUX_IF_PACKET_H */
+
 #ifdef HAVE_PCAP_DUMP_FLUSH
 #define U_FLAG	"U"
 #else
@@ -690,6 +701,9 @@ static const struct option longopts[] = {
 #endif
 	{ "dont-verify-checksums", no_argument, NULL, 'K' },
 	{ "list-data-link-types", no_argument, NULL, 'L' },
+#ifdef HAVE_TPACKET3
+	{ "immediate-mode", no_argument, NULL, 'o' },
+#endif
 	{ "no-optimize", no_argument, NULL, 'O' },
 	{ "no-promiscuous-mode", no_argument, NULL, 'p' },
 #ifdef HAVE_PCAP_SETDIRECTION
@@ -982,7 +996,7 @@ main(int argc, char **argv)
 #endif
 
 	while (
-	    (op = getopt_long(argc, argv, "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOpq" Q_FLAG "r:Rs:StT:u" U_FLAG "vV:w:W:xXy:Yz:Z:#", longopts, NULL)) != -1)
+	    (op = getopt_long(argc, argv, "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nN" o_FLAG "Opq" Q_FLAG "r:Rs:StT:u" U_FLAG "vV:w:W:xXy:Yz:Z:#", longopts, NULL)) != -1)
 		switch (op) {
 
 		case 'a':
@@ -1186,6 +1200,9 @@ main(int argc, char **argv)
 			++Nflag;
 			break;
 
+		case 'o':
+			oflag = 1;
+			break;
 		case 'O':
 			Oflag = 0;
 			break;
@@ -1528,6 +1545,11 @@ main(int argc, char **argv)
 		if (Jflag)
 			show_tstamp_types_and_exit(device, pd);
 #endif
+#ifdef HAVE_TPACKET3
+		if (oflag) {
+			pcap_set_immediate_mode(pd, 1);
+		}
+#endif /* HAVE_TPACKET3 */
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
 		status = pcap_set_tstamp_precision(pd, gndo->ndo_tstamp_precision);
 		if (status != 0)
@@ -2549,7 +2571,7 @@ print_usage(void)
 {
 	print_version();
 	(void)fprintf(stderr,
-"Usage: %s [-aAbd" D_FLAG "efhH" I_FLAG J_FLAG "KlLnNOpqRStu" U_FLAG "vxX#]" B_FLAG_USAGE " [ -c count ]\n", program_name);
+"Usage: %s [-aAbd" D_FLAG "efhH" I_FLAG J_FLAG "KlLnN" o_FLAG "OpqRStu" U_FLAG "vxX#]" B_FLAG_USAGE " [ -c count ]\n", program_name);
 	(void)fprintf(stderr,
 "\t\t[ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]\n");
 	(void)fprintf(stderr,
