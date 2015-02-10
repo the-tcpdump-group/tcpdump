@@ -761,6 +761,54 @@ if test "$ac_cv_sockaddr_has_sa_len" = no; then
 	missing_includes=yes
 fi
 
+dnl
+dnl Check for "pcap_list_datalinks()", "pcap_set_datalink()",
+dnl and "pcap_datalink_name_to_val()", and use substitute versions
+dnl if they're not present.
+dnl
+AC_CHECK_FUNC(pcap_list_datalinks,
+	[
+	    AC_DEFINE(HAVE_PCAP_LIST_DATALINKS, 1,
+		[define if libpcap has pcap_list_datalinks()])
+	    AC_CHECK_FUNCS(pcap_free_datalinks)
+	],
+	[
+	    AC_LIBOBJ(datalinks)
+	])
+AC_CHECK_FUNCS(pcap_set_datalink)
+AC_CHECK_FUNC(pcap_datalink_name_to_val,
+	[
+	    AC_DEFINE(HAVE_PCAP_DATALINK_NAME_TO_VAL, 1,
+		[define if libpcap has pcap_datalink_name_to_val()])
+	    AC_CHECK_FUNC(pcap_datalink_val_to_description,
+		AC_DEFINE(HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION, 1,
+		    [define if libpcap has pcap_datalink_val_to_description()]),
+		[
+		    AC_LIBOBJ(dlnames)
+		])
+	],
+	[
+	    AC_LIBOBJ(dlnames)
+	])
+
+dnl
+dnl Check for "pcap_breakloop()"; you can't substitute for it if
+dnl it's absent (it has hooks into the live capture routines),
+dnl so just define the HAVE_ value if it's there.
+dnl
+AC_CHECK_FUNCS(pcap_breakloop)
+
+dnl
+dnl Check for "pcap_dump_ftell()" and use a substitute version
+dnl if it's not present.
+dnl
+AC_CHECK_FUNC(pcap_dump_ftell,
+	AC_DEFINE(HAVE_PCAP_DUMP_FTELL, 1,
+	    [define if libpcap has pcap_dump_ftell()]),
+	[
+	    AC_LIBOBJ(pcap_dump_ftell)
+	])
+
 #
 # Do we have the new open API?  Check for pcap_create, and assume that,
 # if we do, we also have pcap_activate() and the other new routines

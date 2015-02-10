@@ -6156,110 +6156,6 @@ reproduce this problem ourselves." "$LINENO" 5
 fi
 
 
-                        ac_fn_c_check_func "$LINENO" "pcap_list_datalinks" "ac_cv_func_pcap_list_datalinks"
-if test "x$ac_cv_func_pcap_list_datalinks" = xyes; then :
-
-
-$as_echo "#define HAVE_PCAP_LIST_DATALINKS 1" >>confdefs.h
-
-	    for ac_func in pcap_free_datalinks
-do :
-  ac_fn_c_check_func "$LINENO" "pcap_free_datalinks" "ac_cv_func_pcap_free_datalinks"
-if test "x$ac_cv_func_pcap_free_datalinks" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_PCAP_FREE_DATALINKS 1
-_ACEOF
-
-fi
-done
-
-
-else
-
-	    case " $LIBOBJS " in
-  *" datalinks.$ac_objext "* ) ;;
-  *) LIBOBJS="$LIBOBJS datalinks.$ac_objext"
- ;;
-esac
-
-
-fi
-
-    for ac_func in pcap_set_datalink
-do :
-  ac_fn_c_check_func "$LINENO" "pcap_set_datalink" "ac_cv_func_pcap_set_datalink"
-if test "x$ac_cv_func_pcap_set_datalink" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_PCAP_SET_DATALINK 1
-_ACEOF
-
-fi
-done
-
-    ac_fn_c_check_func "$LINENO" "pcap_datalink_name_to_val" "ac_cv_func_pcap_datalink_name_to_val"
-if test "x$ac_cv_func_pcap_datalink_name_to_val" = xyes; then :
-
-
-$as_echo "#define HAVE_PCAP_DATALINK_NAME_TO_VAL 1" >>confdefs.h
-
-	    ac_fn_c_check_func "$LINENO" "pcap_datalink_val_to_description" "ac_cv_func_pcap_datalink_val_to_description"
-if test "x$ac_cv_func_pcap_datalink_val_to_description" = xyes; then :
-
-$as_echo "#define HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION 1" >>confdefs.h
-
-else
-
-		    case " $LIBOBJS " in
-  *" dlnames.$ac_objext "* ) ;;
-  *) LIBOBJS="$LIBOBJS dlnames.$ac_objext"
- ;;
-esac
-
-
-fi
-
-
-else
-
-	    case " $LIBOBJS " in
-  *" dlnames.$ac_objext "* ) ;;
-  *) LIBOBJS="$LIBOBJS dlnames.$ac_objext"
- ;;
-esac
-
-
-fi
-
-
-                        for ac_func in pcap_breakloop
-do :
-  ac_fn_c_check_func "$LINENO" "pcap_breakloop" "ac_cv_func_pcap_breakloop"
-if test "x$ac_cv_func_pcap_breakloop" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_PCAP_BREAKLOOP 1
-_ACEOF
-
-fi
-done
-
-
-                    ac_fn_c_check_func "$LINENO" "pcap_dump_ftell" "ac_cv_func_pcap_dump_ftell"
-if test "x$ac_cv_func_pcap_dump_ftell" = xyes; then :
-
-$as_echo "#define HAVE_PCAP_DUMP_FTELL 1" >>confdefs.h
-
-else
-
-	    case " $LIBOBJS " in
-  *" pcap_dump_ftell.$ac_objext "* ) ;;
-  *) LIBOBJS="$LIBOBJS pcap_dump_ftell.$ac_objext"
- ;;
-esac
-
-
-fi
-
-
 
 #
 # Check for these after AC_LBL_LIBPCAP, so we link with the appropriate
@@ -6627,6 +6523,110 @@ $as_echo "$ac_cv_sockaddr_has_sa_len" >&6; }
 if test "$ac_cv_sockaddr_has_sa_len" = no; then
 	missing_includes=yes
 fi
+
+ac_fn_c_check_func "$LINENO" "pcap_list_datalinks" "ac_cv_func_pcap_list_datalinks"
+if test "x$ac_cv_func_pcap_list_datalinks" = xyes; then :
+
+
+$as_echo "#define HAVE_PCAP_LIST_DATALINKS 1" >>confdefs.h
+
+	    for ac_func in pcap_free_datalinks
+do :
+  ac_fn_c_check_func "$LINENO" "pcap_free_datalinks" "ac_cv_func_pcap_free_datalinks"
+if test "x$ac_cv_func_pcap_free_datalinks" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PCAP_FREE_DATALINKS 1
+_ACEOF
+
+fi
+done
+
+
+else
+
+	    case " $LIBOBJS " in
+  *" datalinks.$ac_objext "* ) ;;
+  *) LIBOBJS="$LIBOBJS datalinks.$ac_objext"
+ ;;
+esac
+
+
+fi
+
+for ac_func in pcap_set_datalink
+do :
+  ac_fn_c_check_func "$LINENO" "pcap_set_datalink" "ac_cv_func_pcap_set_datalink"
+if test "x$ac_cv_func_pcap_set_datalink" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PCAP_SET_DATALINK 1
+_ACEOF
+
+fi
+done
+
+ac_fn_c_check_func "$LINENO" "pcap_datalink_name_to_val" "ac_cv_func_pcap_datalink_name_to_val"
+if test "x$ac_cv_func_pcap_datalink_name_to_val" = xyes; then :
+
+
+$as_echo "#define HAVE_PCAP_DATALINK_NAME_TO_VAL 1" >>confdefs.h
+
+	    ac_fn_c_check_func "$LINENO" "pcap_datalink_val_to_description" "ac_cv_func_pcap_datalink_val_to_description"
+if test "x$ac_cv_func_pcap_datalink_val_to_description" = xyes; then :
+
+$as_echo "#define HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION 1" >>confdefs.h
+
+else
+
+		    case " $LIBOBJS " in
+  *" dlnames.$ac_objext "* ) ;;
+  *) LIBOBJS="$LIBOBJS dlnames.$ac_objext"
+ ;;
+esac
+
+
+fi
+
+
+else
+
+	    case " $LIBOBJS " in
+  *" dlnames.$ac_objext "* ) ;;
+  *) LIBOBJS="$LIBOBJS dlnames.$ac_objext"
+ ;;
+esac
+
+
+fi
+
+
+for ac_func in pcap_breakloop
+do :
+  ac_fn_c_check_func "$LINENO" "pcap_breakloop" "ac_cv_func_pcap_breakloop"
+if test "x$ac_cv_func_pcap_breakloop" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PCAP_BREAKLOOP 1
+_ACEOF
+
+fi
+done
+
+
+ac_fn_c_check_func "$LINENO" "pcap_dump_ftell" "ac_cv_func_pcap_dump_ftell"
+if test "x$ac_cv_func_pcap_dump_ftell" = xyes; then :
+
+$as_echo "#define HAVE_PCAP_DUMP_FTELL 1" >>confdefs.h
+
+else
+
+	    case " $LIBOBJS " in
+  *" pcap_dump_ftell.$ac_objext "* ) ;;
+  *) LIBOBJS="$LIBOBJS pcap_dump_ftell.$ac_objext"
+ ;;
+esac
+
+
+fi
+
 
 #
 # Do we have the new open API?  Check for pcap_create, and assume that,
