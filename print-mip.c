@@ -12,7 +12,7 @@
  * LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE.
  *
- * Original code by Håkon Struijk Holmen (hawken@thehawken.org) based
+ * Code by Håkon Struijk Holmen (hawken@thehawken.org) based
  *  on work by Ola Martin Lykkja (ola.lykkja@q-free.com)
  */
 
