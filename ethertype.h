@@ -196,5 +196,8 @@
 #ifndef	ETHERTYPE_GEONET
 #define	ETHERTYPE_GEONET        0x8947  /* ETSI GeoNetworking (Official IEEE registration from Jan 2013) */
 #endif
+#ifndef	ETHERTYPE_MIP
+#define	ETHERTYPE_MIP           0xFFFF  /* MIP (Minimal Interconnect Protocol) UiO teaching material */
+#endif
 
 extern const struct tok ethertype_values[];
