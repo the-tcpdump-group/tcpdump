@@ -267,3 +267,14 @@ geneve-tcp	geneve.pcap		geneve-tcp.out	-t "geneve && tcp"
 # DHCP tests
 dhcp-rfc3004	dhcp-rfc3004.pcap	dhcp-rfc3004-v.out	-t -v
 dhcp-rfc5859	dhcp-rfc5859.pcap	dhcp-rfc5859-v.out	-t -v
+
+# bad packets from Kevin Day
+kday1           kday1.pcap              kday1.out       -t -v
+kday2           kday2.pcap              kday2.out       -t -v
+kday3           kday3.pcap              kday3.out       -t -v
+kday4           kday4.pcap              kday4.out       -t -v
+kday5           kday5.pcap              kday5.out       -t -v
+kday6           kday6.pcap              kday6.out       -t -v
+kday7           kday7.pcap              kday7.out       -t -v
+kday8           kday8.pcap              kday8.out       -t -v
+                                            
