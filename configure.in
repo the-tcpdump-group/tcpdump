@@ -854,7 +854,7 @@ if test $ac_cv_func_pcap_lib_version = "no" ; then
        ac_lbl_cv_pcap_version_defined=yes,
        ac_lbl_cv_pcap_version_defined=no)
     if test "$ac_lbl_cv_pcap_version_defined" = yes ; then
-    	AC_MSG_RESULT(yes)
+	AC_MSG_RESULT(yes)
 	AC_DEFINE(HAVE_PCAP_VERSION, 1, [define if libpcap has pcap_version])
     else
 	AC_MSG_RESULT(no)
@@ -1108,6 +1108,35 @@ AC_ARG_WITH(crypto,
 if test "$want_libcrypto" != "no"; then
 	AC_CHECK_LIB(crypto, DES_cbc_encrypt)
 	AC_CHECK_HEADERS(openssl/evp.h)
+fi
+
+# Check for libcap-ng
+AC_MSG_CHECKING(whether to use libcap-ng)
+# Specify location for both includes and libraries.
+want_libcap_ng=ifavailable
+AC_ARG_WITH(cap_ng,
+    AS_HELP_STRING([--with-cap-ng],
+		   [use libcap-ng @<:@default=yes, if available@:>@]),
+[
+	if test $withval = no
+	then
+		want_libcap_ng=no
+		AC_MSG_RESULT(no)
+	elif test $withval = yes
+	then
+		want_libcap_ng=yes
+		AC_MSG_RESULT(yes)
+	fi
+],[
+	#
+	# Use libcap-ng if it's present, otherwise don't.
+	#
+	want_libcap_ng=ifavailable
+	AC_MSG_RESULT([yes, if available])
+])
+if test "$want_libcap_ng" != "no"; then
+	AC_CHECK_LIB(cap-ng, capng_change_id)
+	AC_CHECK_HEADERS(cap-ng.h)
 fi
 
 dnl

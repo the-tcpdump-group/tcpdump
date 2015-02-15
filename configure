@@ -707,6 +707,7 @@ with_sandbox_capsicum
 enable_ipv6
 with_system_libpcap
 with_crypto
+with_cap_ng
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1346,6 +1347,7 @@ Optional Packages:
                           available]
   --with-system-libpcap   don't use local pcap library
   --with-crypto           use OpenSSL libcrypto [default=yes, if available]
+  --with-cap-ng           use libcap-ng [default=yes, if available]
 
 Some influential environment variables:
   CC          C compiler command
@@ -6736,7 +6738,7 @@ fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
     if test "$ac_lbl_cv_pcap_version_defined" = yes ; then
-    	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
 $as_echo "#define HAVE_PCAP_VERSION 1" >>confdefs.h
@@ -8168,6 +8170,98 @@ do :
 if test "x$ac_cv_header_openssl_evp_h" = xyes; then :
   cat >>confdefs.h <<_ACEOF
 #define HAVE_OPENSSL_EVP_H 1
+_ACEOF
+
+fi
+
+done
+
+fi
+
+# Check for libcap-ng
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to use libcap-ng" >&5
+$as_echo_n "checking whether to use libcap-ng... " >&6; }
+# Specify location for both includes and libraries.
+want_libcap_ng=ifavailable
+
+# Check whether --with-cap_ng was given.
+if test "${with_cap_ng+set}" = set; then :
+  withval=$with_cap_ng;
+	if test $withval = no
+	then
+		want_libcap_ng=no
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+	elif test $withval = yes
+	then
+		want_libcap_ng=yes
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+	fi
+
+else
+
+	#
+	# Use libcap-ng if it's present, otherwise don't.
+	#
+	want_libcap_ng=ifavailable
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, if available" >&5
+$as_echo "yes, if available" >&6; }
+
+fi
+
+if test "$want_libcap_ng" != "no"; then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for capng_change_id in -lcap-ng" >&5
+$as_echo_n "checking for capng_change_id in -lcap-ng... " >&6; }
+if ${ac_cv_lib_cap_ng_capng_change_id+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lcap-ng  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char capng_change_id ();
+int
+main ()
+{
+return capng_change_id ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_cap_ng_capng_change_id=yes
+else
+  ac_cv_lib_cap_ng_capng_change_id=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_cap_ng_capng_change_id" >&5
+$as_echo "$ac_cv_lib_cap_ng_capng_change_id" >&6; }
+if test "x$ac_cv_lib_cap_ng_capng_change_id" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBCAP_NG 1
+_ACEOF
+
+  LIBS="-lcap-ng $LIBS"
+
+fi
+
+	for ac_header in cap-ng.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "cap-ng.h" "ac_cv_header_cap_ng_h" "$ac_includes_default"
+if test "x$ac_cv_header_cap_ng_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_CAP_NG_H 1
 _ACEOF
 
 fi

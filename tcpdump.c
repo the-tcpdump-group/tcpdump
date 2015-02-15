@@ -101,10 +101,18 @@ extern int SIZE_BUF;
 #include <grp.h>
 #endif /* WIN32 */
 
-/* capabilities convinience library */
+/* capabilities convenience library */
+/* If a code depends on HAVE_LIBCAP_NG, it depends also on HAVE_CAP_NG_H.
+ * If HAVE_CAP_NG_H is not defined, undefine HAVE_LIBCAP_NG.
+ * Thus, the later tests are done only on HAVE_LIBCAP_NG.
+ */
+#ifdef HAVE_LIBCAP_NG
 #ifdef HAVE_CAP_NG_H
 #include <cap-ng.h>
+#else
+#undef HAVE_LIBCAP_NG
 #endif /* HAVE_CAP_NG_H */
+#endif /* HAVE_LIBCAP_NG */
 
 #include "netdissect.h"
 #include "interface.h"
@@ -734,7 +742,7 @@ droproot(const char *username, const char *chroot_dir)
 				exit(1);
 			}
 		}
-#ifdef HAVE_CAP_NG_H
+#ifdef HAVE_LIBCAP_NG
 		int ret = capng_change_id(pw->pw_uid, pw->pw_gid, CAPNG_NO_FLAG);
 		if (ret < 0) {
 			fprintf(stderr, "error : ret %d\n", ret);
@@ -749,6 +757,7 @@ droproot(const char *username, const char *chroot_dir)
 			CAP_SETUID,
 			CAP_SETGID,
 			-1);
+
 		capng_apply(CAPNG_SELECT_BOTH);
 
 #else
@@ -764,7 +773,7 @@ droproot(const char *username, const char *chroot_dir)
 		else {
 			fprintf(stderr, "dropped privs to %s\n", username);
 		}
-#endif /* HAVE_CAP_NG_H */
+#endif /* HAVE_LIBCAP_NG */
 	}
 	else {
 		fprintf(stderr, "tcpdump: Couldn't find user '%.32s'\n",
@@ -1582,7 +1591,7 @@ main(int argc, char **argv)
 			status = pcap_set_tstamp_type(pd, jflag);
 			if (status < 0)
 				error("%s: Can't set time stamp type: %s",
-			    	    device, pcap_statustostr(status));
+			              device, pcap_statustostr(status));
 		}
 #endif
 		status = pcap_activate(pd);
@@ -1729,7 +1738,7 @@ main(int argc, char **argv)
 	 */
 
 	if (getuid() == 0 || geteuid() == 0) {
-#ifdef HAVE_CAP_NG_H
+#ifdef HAVE_LIBCAP_NG
 		/* Drop all capabilities from effective set */
 		capng_clear(CAPNG_EFFECTIVE);
 		/* We are running as root and we will be writing to savefile */
@@ -1744,7 +1753,7 @@ main(int argc, char **argv)
 				-1);
 			capng_apply(CAPNG_SELECT_BOTH);
 		}
-#endif /* HAVE_CAP_NG_H */
+#endif /* HAVE_LIBCAP_NG */
 		if (username || chroot_dir)
 			droproot(username, chroot_dir);
 
@@ -1783,10 +1792,10 @@ main(int argc, char **argv)
 		  MakeFilename(dumpinfo.CurrentFileName, WFileName, 0, 0);
 
 		p = pcap_dump_open(pd, dumpinfo.CurrentFileName);
-#ifdef HAVE_CAP_NG_H
+#ifdef HAVE_LIBCAP_NG
         /* Give up capabilities, clear Effective set */
         capng_clear(CAPNG_EFFECTIVE);
-#endif
+#endif /* HAVE_LIBCAP_NG */
 		if (p == NULL)
 			error("%s", pcap_geterr(pd));
 #ifdef HAVE_CAPSICUM
@@ -2200,10 +2209,10 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			else
 				MakeFilename(dump_info->CurrentFileName, dump_info->WFileName, 0, 0);
 
-#ifdef HAVE_CAP_NG_H
+#ifdef HAVE_LIBCAP_NG
 			capng_update(CAPNG_ADD, CAPNG_EFFECTIVE, CAP_DAC_OVERRIDE);
 			capng_apply(CAPNG_EFFECTIVE);
-#endif /* HAVE_CAP_NG_H */
+#endif /* HAVE_LIBCAP_NG */
 #ifdef HAVE_CAPSICUM
 			fd = openat(dump_info->dirfd,
 			    dump_info->CurrentFileName,
@@ -2221,10 +2230,10 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 #else	/* !HAVE_CAPSICUM */
 			dump_info->p = pcap_dump_open(dump_info->pd, dump_info->CurrentFileName);
 #endif
-#ifdef HAVE_CAP_NG_H
+#ifdef HAVE_LIBCAP_NG
 			capng_update(CAPNG_DROP, CAPNG_EFFECTIVE, CAP_DAC_OVERRIDE);
 			capng_apply(CAPNG_EFFECTIVE);
-#endif /* HAVE_CAP_NG_H */
+#endif /* HAVE_LIBCAP_NG */
 			if (dump_info->p == NULL)
 				error("%s", pcap_geterr(pd));
 #ifdef HAVE_CAPSICUM
