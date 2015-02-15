@@ -53,7 +53,7 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" = osx ]; then brew update >/dev/null; fi
 
 install:
-  - if [ "$TRAVIS_OS_NAME" = linux ]; then sudo apt-get -qq install libssl-dev libssl0.9.8 libssl1.0.0 libdnet-dev libsmi2-dev; fi
+  - if [ "$TRAVIS_OS_NAME" = linux ]; then sudo apt-get -qq install libssl-dev libssl0.9.8 libssl1.0.0 libdnet-dev libsmi2-dev libcap-ng-dev; fi
   - if [ "$TRAVIS_OS_NAME" = osx ]; then brew install libsmi | grep -v '%'; fi
 
 before_script:
