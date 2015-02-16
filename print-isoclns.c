@@ -2309,6 +2309,10 @@ isis_print(netdissect_options *ndo,
             length=pdu_len;
 	}
 
+        if(length > ndo->ndo_snaplen) {
+                goto trunc;
+        }
+
 	ND_TCHECK(*header_lsp);
 	ND_PRINT((ndo, "\n\t  lsp-id: %s, seq: 0x%08x, lifetime: %5us\n\t  chksum: 0x%04x",
                isis_print_id(header_lsp->lsp_id, LSP_ID_LEN),
@@ -3082,14 +3086,19 @@ osi_print_cksum(netdissect_options *ndo,
         uint16_t calculated_checksum;
 
         /* do not attempt to verify the checksum if it is zero */
-        if (!checksum) {
+        if (!checksum || checksum_offset > length) {
                 ND_PRINT((ndo, "(unverified)"));
         } else {
+                unsigned char *truncated = "trunc";
+                //printf("\nosi_print_cksum: %p %u %u %u\n", pptr, checksum_offset, length, ndo->ndo_snaplen);
+                //ND_TCHECK2(pptr, checksum_offset+length);
                 calculated_checksum = create_osi_cksum(pptr, checksum_offset, length);
                 if (checksum == calculated_checksum) {
                         ND_PRINT((ndo, " (correct)"));
                 } else {
-                        ND_PRINT((ndo, " (incorrect should be 0x%04x)", calculated_checksum));
+                        truncated = "incorrect";
+                        //trunc:
+                        ND_PRINT((ndo, " (%s should be 0x%04x)", truncated, calculated_checksum));
                 }
         }
 }
