@@ -1315,10 +1315,15 @@ dnname_string(u_short dnaddr)
 {
 #ifdef HAVE_DNET_HTOA
 	struct dn_naddr dna;
+	char *dnname;
 
 	dna.a_len = sizeof(short);
 	memcpy((char *)dna.a_addr, (char *)&dnaddr, sizeof(short));
-	return (strdup(dnet_htoa(&dna)));
+	dnname = dnet_htoa(&dna);
+	if(dnname != NULL)
+		return (strdup(dnname));
+	else
+		return(dnnum_string(dnaddr));
 #else
 	return(dnnum_string(dnaddr));	/* punt */
 #endif
