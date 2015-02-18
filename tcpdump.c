@@ -750,16 +750,6 @@ droproot(const char *username, const char *chroot_dir)
 		else {
 			fprintf(stderr, "dropped privs to %s\n", username);
 		}
-		/* We don't need CAP_SETUID and CAP_SETGID */
-		capng_updatev(
-			CAPNG_DROP,
-			CAPNG_EFFECTIVE | CAPNG_PERMITTED,
-			CAP_SETUID,
-			CAP_SETGID,
-			-1);
-
-		capng_apply(CAPNG_SELECT_BOTH);
-
 #else
 		if (initgroups(pw->pw_name, pw->pw_gid) != 0 ||
 		    setgid(pw->pw_gid) != 0 || setuid(pw->pw_uid) != 0) {
@@ -780,6 +770,17 @@ droproot(const char *username, const char *chroot_dir)
 		    username);
 		exit(1);
 	}
+#ifdef HAVE_LIBCAP_NG
+	/* We don't need CAP_SETUID and CAP_SETGID any more. */
+	capng_updatev(
+		CAPNG_DROP,
+		CAPNG_EFFECTIVE | CAPNG_PERMITTED,
+		CAP_SETUID,
+		CAP_SETGID,
+		-1);
+	capng_apply(CAPNG_SELECT_BOTH);
+#endif /* HAVE_LIBCAP_NG */
+
 }
 #endif /* WIN32 */
 
@@ -1739,20 +1740,25 @@ main(int argc, char **argv)
 
 	if (getuid() == 0 || geteuid() == 0) {
 #ifdef HAVE_LIBCAP_NG
-		/* Drop all capabilities from effective set */
-		capng_clear(CAPNG_EFFECTIVE);
-		/* We are running as root and we will be writing to savefile */
-		if (WFileName  && username) {
-			/* Add capabilities we will need*/
+		/* Initialize capng */
+		capng_clear(CAPNG_SELECT_BOTH);
+		if (username) {
 			capng_updatev(
 				CAPNG_ADD,
 				CAPNG_PERMITTED | CAPNG_EFFECTIVE,
 				CAP_SETUID,
 				CAP_SETGID,
-				CAP_DAC_OVERRIDE,
 				-1);
-			capng_apply(CAPNG_SELECT_BOTH);
 		}
+
+		if (WFileName) {
+			capng_update(
+				CAPNG_ADD,
+				CAPNG_PERMITTED | CAPNG_EFFECTIVE,
+				CAP_DAC_OVERRIDE
+				);
+		}
+		capng_apply(CAPNG_SELECT_BOTH);
 #endif /* HAVE_LIBCAP_NG */
 		if (username || chroot_dir)
 			droproot(username, chroot_dir);
@@ -1793,8 +1799,17 @@ main(int argc, char **argv)
 
 		p = pcap_dump_open(pd, dumpinfo.CurrentFileName);
 #ifdef HAVE_LIBCAP_NG
-        /* Give up capabilities, clear Effective set */
-        capng_clear(CAPNG_EFFECTIVE);
+		/* Give up CAP_DAC_OVERRIDE capability.
+		 * Only allow it to be restored if the -C or -G flag have been
+		 * set since we may need to create more files later on.
+		 */
+		capng_update(
+			CAPNG_DROP,
+			(Cflag || Gflag ? 0 : CAPNG_PERMITTED)
+				| CAPNG_EFFECTIVE,
+			CAP_DAC_OVERRIDE
+			);
+		capng_apply(CAPNG_SELECT_BOTH);
 #endif /* HAVE_LIBCAP_NG */
 		if (p == NULL)
 			error("%s", pcap_geterr(pd));
@@ -2211,7 +2226,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 
 #ifdef HAVE_LIBCAP_NG
 			capng_update(CAPNG_ADD, CAPNG_EFFECTIVE, CAP_DAC_OVERRIDE);
-			capng_apply(CAPNG_EFFECTIVE);
+			capng_apply(CAPNG_SELECT_BOTH);
 #endif /* HAVE_LIBCAP_NG */
 #ifdef HAVE_CAPSICUM
 			fd = openat(dump_info->dirfd,
@@ -2232,7 +2247,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 #endif
 #ifdef HAVE_LIBCAP_NG
 			capng_update(CAPNG_DROP, CAPNG_EFFECTIVE, CAP_DAC_OVERRIDE);
-			capng_apply(CAPNG_EFFECTIVE);
+			capng_apply(CAPNG_SELECT_BOTH);
 #endif /* HAVE_LIBCAP_NG */
 			if (dump_info->p == NULL)
 				error("%s", pcap_geterr(pd));
@@ -2279,6 +2294,10 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 		if (dump_info->CurrentFileName == NULL)
 			error("dump_packet_and_trunc: malloc");
 		MakeFilename(dump_info->CurrentFileName, dump_info->WFileName, Cflag_count, WflagChars);
+#ifdef HAVE_LIBCAP_NG
+		capng_update(CAPNG_ADD, CAPNG_EFFECTIVE, CAP_DAC_OVERRIDE);
+		capng_apply(CAPNG_SELECT_BOTH);
+#endif /* HAVE_LIBCAP_NG */
 #ifdef HAVE_CAPSICUM
 		fd = openat(dump_info->dirfd, dump_info->CurrentFileName,
 		    O_CREAT | O_WRONLY | O_TRUNC, 0644);
@@ -2295,6 +2314,10 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 #else	/* !HAVE_CAPSICUM */
 		dump_info->p = pcap_dump_open(dump_info->pd, dump_info->CurrentFileName);
 #endif
+#ifdef HAVE_LIBCAP_NG
+		capng_update(CAPNG_DROP, CAPNG_EFFECTIVE, CAP_DAC_OVERRIDE);
+		capng_apply(CAPNG_SELECT_BOTH);
+#endif /* HAVE_LIBCAP_NG */
 		if (dump_info->p == NULL)
 			error("%s", pcap_geterr(pd));
 #ifdef HAVE_CAPSICUM
