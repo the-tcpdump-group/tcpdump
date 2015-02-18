@@ -1814,10 +1814,14 @@ main(int argc, char **argv)
 		if (p == NULL)
 			error("%s", pcap_geterr(pd));
 #ifdef HAVE_CAPSICUM
-		cap_rights_init(&rights, CAP_SEEK, CAP_WRITE);
+		cap_rights_init(&rights, CAP_SEEK, CAP_WRITE, CAP_FCNTL);
 		if (cap_rights_limit(fileno(pcap_dump_file(p)), &rights) < 0 &&
 		    errno != ENOSYS) {
 			error("unable to limit dump descriptor");
+		}
+		if (cap_fcntls_limit(fileno(pcap_dump_file(p)), CAP_FCNTL_GETFL) < 0 &&
+		    errno != ENOSYS) {
+			error("unable to limit dump descriptor fcntls");
 		}
 #endif
 		if (Cflag != 0 || Gflag != 0) {
@@ -1834,6 +1838,10 @@ main(int argc, char **argv)
 			if (cap_rights_limit(dumpinfo.dirfd, &rights) < 0 &&
 			    errno != ENOSYS) {
 				error("unable to limit directory rights");
+			}
+			if (cap_fcntls_limit(dumpinfo.dirfd, CAP_FCNTL_GETFL) < 0 &&
+			    errno != ENOSYS) {
+				error("unable to limit dump descriptor fcntls");
 			}
 #else	/* !HAVE_CAPSICUM */
 			dumpinfo.WFileName = WFileName;
@@ -2327,11 +2335,15 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			if (dump_info->p == NULL)
 				error("%s", pcap_geterr(pd));
 #ifdef HAVE_CAPSICUM
-			cap_rights_init(&rights, CAP_SEEK, CAP_WRITE);
+			cap_rights_init(&rights, CAP_SEEK, CAP_WRITE, CAP_FCNTL);
 			if (cap_rights_limit(fileno(pcap_dump_file(dump_info->p)),
 			    &rights) < 0 && errno != ENOSYS) {
 				error("unable to limit dump descriptor");
 			}
+		if (cap_fcntls_limit(fileno(pcap_dump_file(dump_info->p)),
+		    CAP_FCNTL_GETFL) < 0 && errno != ENOSYS) {
+			error("unable to limit dump descriptor fcntls");
+		}
 #endif
 		}
 	}
