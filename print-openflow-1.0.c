@@ -909,8 +909,7 @@ of10_bsn_message_print(netdissect_options *ndo,
 		 * +---------------+---------------+--------
 		 *
 		 */
-		if (len < 4)
-			goto corrupt;
+		/* already checked that len >= 4 */
 		/* data */
 		ND_PRINT((ndo, ", data '"));
 		if (fn_printn(ndo, cp, len - 4, ep)) {
