@@ -210,7 +210,9 @@ your ``status'' character, typically control-T, although on some
 platforms, such as Mac OS X, the ``status'' character is not set by
 default, so you must set it with
 .BR stty (1)
-in order to use it) and will continue capturing packets.
+in order to use it) and will continue capturing packets. On platforms that
+do not support the SIGINFO signal, the same can be achieved by using the
+SIGUSR1 signal.
 .LP
 Reading packets from a network interface may require that you have
 special privileges; see the
