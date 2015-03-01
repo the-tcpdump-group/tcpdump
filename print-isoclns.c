@@ -1055,7 +1055,7 @@ esis_print(netdissect_options *ndo,
 
 	if (li < sizeof(struct esis_header_t) + 2) {
             ND_PRINT((ndo, " length indicator < min PDU size %d:", li));
-            while (--length != 0)
+            while (pptr < ndo->ndo_snapend)
                 ND_PRINT((ndo, "%02X", *pptr++));
             return;
 	}
