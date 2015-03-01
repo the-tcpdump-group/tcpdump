@@ -1068,7 +1068,7 @@ esis_print(const u_int8_t *pptr, u_int length)
 
 	if (li < sizeof(struct esis_header_t) + 2) {
             printf(" length indicator < min PDU size %d:", li);
-            while (--length != 0)
+            while (pptr < snapend)
                 printf("%02X", *pptr++);
             return;
 	}
