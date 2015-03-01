@@ -2,7 +2,7 @@
 # Configuration validation subroutine script.
 #   Copyright 1992-2015 Free Software Foundation, Inc.
 
-timestamp='2015-01-01'
+timestamp='2015-02-22'
 
 # This file is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
@@ -117,7 +117,7 @@ maybe_os=`echo $1 | sed 's/^\(.*\)-\([^-]*-[^-]*\)$/\2/'`
 case $maybe_os in
   nto-qnx* | linux-gnu* | linux-android* | linux-dietlibc | linux-newlib* | \
   linux-musl* | linux-uclibc* | uclinux-uclibc* | uclinux-gnu* | kfreebsd*-gnu* | \
-  knetbsd*-gnu* | netbsd*-gnu* | \
+  knetbsd*-gnu* | netbsd*-gnu* | netbsd*-eabi* | \
   kopensolaris*-gnu* | \
   storm-chaos* | os2-emx* | rtmk-nova*)
     os=-$maybe_os
