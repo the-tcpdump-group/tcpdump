@@ -842,6 +842,12 @@ AC_CHECK_HEADERS(pcap/bluetooth.h)
 AC_CHECK_HEADERS(pcap/usb.h)
 CPPFLAGS="$savedcppflags"
 
+#
+# Make sure we have a definition for C99's uintptr_t (regardless of
+# whether the environment is a C99 environment or not).
+#
+AC_TYPE_UINTPTR_T
+
 AC_CHECK_HEADERS(sys/bitypes.h)
 
 AC_CHECK_TYPE([int8_t], ,
