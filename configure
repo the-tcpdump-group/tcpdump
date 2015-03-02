@@ -6971,6 +6971,48 @@ _ACEOF
 
 
 #
+# Make sure we have a definition for C99's uintptr_t (regardless of
+# whether the environment is a C99 environment or not).
+#
+
+  ac_fn_c_check_type "$LINENO" "uintptr_t" "ac_cv_type_uintptr_t" "$ac_includes_default"
+if test "x$ac_cv_type_uintptr_t" = xyes; then :
+
+$as_echo "#define HAVE_UINTPTR_T 1" >>confdefs.h
+
+else
+  for ac_type in 'unsigned int' 'unsigned long int' \
+	'unsigned long long int'; do
+       cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$ac_includes_default
+int
+main ()
+{
+static int test_array [1 - 2 * !(sizeof (void *) <= sizeof ($ac_type))];
+test_array [0] = 0;
+return test_array [0];
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+cat >>confdefs.h <<_ACEOF
+#define uintptr_t $ac_type
+_ACEOF
+
+	  ac_type=
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+       test -z "$ac_type" && break
+     done
+fi
+
+
+
+#
 # Define the old BSD specified-width types in terms of the C99 types;
 # we may need them with libpcap include files.
 #
