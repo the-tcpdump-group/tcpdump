@@ -969,6 +969,12 @@ AC_TYPE_UINT32_T
 AC_TYPE_UINT64_T
 
 #
+# Make sure we have a definition for C99's uintptr_t (regardless of
+# whether the environment is a C99 environment or not).
+#
+AC_TYPE_UINTPTR_T
+
+#
 # Define the old BSD specified-width types in terms of the C99 types;
 # we may need them with libpcap include files.
 #
