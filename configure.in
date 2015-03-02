@@ -888,6 +888,11 @@ AC_TYPE_UINT32_T
 AC_TYPE_UINT64_T
 
 #
+# Make sure we have a definition for C99's uintptr_t (regardless of
+# whether the environment is a C99 environment or not).
+#
+AC_TYPE_UINTPTR_T
+
 # For now, we're using the old BSD-style u_intXX_t types, so check for
 # them.
 #

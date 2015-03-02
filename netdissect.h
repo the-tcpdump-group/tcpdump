@@ -236,9 +236,21 @@ struct netdissect_options {
  * "l" isn't so large that "ndo->ndo_snapend - (l)" underflows.
  *
  * The check is for <= rather than < because "l" might be 0.
+ *
+ * We cast the pointers to uintptr_t to make sure that the compiler
+ * doesn't optimize away any of these tests (which it is allowed to
+ * do, as adding an integer to, or subtracting an integer from, a
+ * pointer assumes that the pointer is a pointer to an element of an
+ * array and that the result of the addition or subtraction yields a
+ * pointer to another member of the array, so that, for example, if
+ * you subtract a positive integer from a pointer, the result is
+ * guaranteed to be less than the original pointer value). See
+ *
+ *	http://www.kb.cert.org/vuls/id/162289
  */
-#define ND_TTEST2(var, l) (ndo->ndo_snapend - (l) <= ndo->ndo_snapend && \
-			(const u_char *)&(var) <= ndo->ndo_snapend - (l))
+#define ND_TTEST2(var, l) \
+	((uintptr_t)ndo->ndo_snapend - (l) <= (uintptr_t)ndo->ndo_snapend && \
+	    (uintptr_t)&(var) <= (uintptr_t)ndo->ndo_snapend - (l))
 
 /* True if "var" was captured */
 #define ND_TTEST(var) ND_TTEST2(var, sizeof(var))
