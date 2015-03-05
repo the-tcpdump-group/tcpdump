@@ -143,7 +143,9 @@ static int parse_q922_addr(netdissect_options *ndo,
 	return 1;
 }
 
-char *q922_string(netdissect_options *ndo, const u_char *p, u_int length) {
+char *
+q922_string(netdissect_options *ndo, const u_char *p, u_int length)
+{
 
     static u_int dlci, addr_len;
     static uint8_t flags[4];
@@ -591,8 +593,8 @@ mfr_print(netdissect_options *ndo,
 
 static void
 frf15_print(netdissect_options *ndo,
-            const u_char *p, u_int length) {
-
+            const u_char *p, u_int length)
+{
     uint16_t sequence_num, flags;
 
     flags = p[0]&MFR_BEC_MASK;

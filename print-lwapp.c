@@ -162,8 +162,8 @@ struct lwapp_message_header {
 
 void
 lwapp_control_print(netdissect_options *ndo,
-                    const u_char *pptr, u_int len, int has_ap_ident) {
-
+                    const u_char *pptr, u_int len, int has_ap_ident)
+{
     const struct lwapp_transport_header *lwapp_trans_header;
     const struct lwapp_control_header *lwapp_control_header;
     const u_char *tptr;
@@ -285,8 +285,8 @@ lwapp_control_print(netdissect_options *ndo,
 
 void
 lwapp_data_print(netdissect_options *ndo,
-                 const u_char *pptr, u_int len) {
-
+                 const u_char *pptr, u_int len)
+{
     const struct lwapp_transport_header *lwapp_trans_header;
     const u_char *tptr;
     int tlen;

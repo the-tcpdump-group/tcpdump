@@ -60,21 +60,24 @@ const struct tok onf_exp_str[] = {
 };
 
 const char *
-of_vendor_name(const uint32_t vendor) {
+of_vendor_name(const uint32_t vendor)
+{
 	const struct tok *table = (vendor & 0xff000000) == 0 ? oui_values : onf_exp_str;
 	return tok2str(table, "unknown", vendor);
 }
 
 static void
 of_header_print(netdissect_options *ndo, const uint8_t version, const uint8_t type,
-                      const uint16_t length, const uint32_t xid) {
+                      const uint16_t length, const uint32_t xid)
+{
 	ND_PRINT((ndo, "\n\tversion unknown (0x%02x), type 0x%02x, length %u, xid 0x%08x",
 	       version, type, length, xid));
 }
 
 /* Print a single OpenFlow message. */
 static const u_char *
-of_header_body_print(netdissect_options *ndo, const u_char *cp, const u_char *ep) {
+of_header_body_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
+{
 	uint8_t version, type;
 	uint16_t length;
 	uint32_t xid;
@@ -129,7 +132,8 @@ trunc:
 /* Print a TCP segment worth of OpenFlow messages presuming the segment begins
  * on a message boundary. */
 void
-openflow_print(netdissect_options *ndo, const u_char *cp, const u_int len) {
+openflow_print(netdissect_options *ndo, const u_char *cp, const u_int len)
+{
 	const u_char *ep = cp + len;
 
 	ND_PRINT((ndo, ": OpenFlow"));

@@ -56,7 +56,8 @@ chdlc_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, register co
 }
 
 u_int
-chdlc_print(netdissect_options *ndo, register const u_char *p, u_int length) {
+chdlc_print(netdissect_options *ndo, register const u_char *p, u_int length)
+{
 	u_int proto;
 
 	proto = EXTRACT_16BITS(&p[2]);

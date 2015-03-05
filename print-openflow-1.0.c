@@ -696,7 +696,8 @@ static const struct tok bsn_onoff_str[] = {
 };
 
 static const char *
-vlan_str(const uint16_t vid) {
+vlan_str(const uint16_t vid)
+{
 	static char buf[sizeof("65535 (bogus)")];
 	const char *fmt;
 
@@ -708,7 +709,8 @@ vlan_str(const uint16_t vid) {
 }
 
 static const char *
-pcp_str(const uint8_t pcp) {
+pcp_str(const uint8_t pcp)
+{
 	static char buf[sizeof("255 (bogus)")];
 	snprintf(buf, sizeof(buf), pcp <= 7 ? "%u" : "%u (bogus)", pcp);
 	return buf;
@@ -716,7 +718,8 @@ pcp_str(const uint8_t pcp) {
 
 static void
 of10_bitmap_print(netdissect_options *ndo,
-                  const struct tok *t, const uint32_t v, const uint32_t u) {
+                  const struct tok *t, const uint32_t v, const uint32_t u)
+{
 	const char *sep = " (";
 
 	if (v == 0)
@@ -733,7 +736,8 @@ of10_bitmap_print(netdissect_options *ndo,
 
 static const u_char *
 of10_data_print(netdissect_options *ndo,
-                const u_char *cp, const u_char *ep, const u_int len) {
+                const u_char *cp, const u_char *ep, const u_int len)
+{
 	if (len == 0)
 		return cp;
 	/* data */
@@ -750,7 +754,8 @@ trunc:
 
 static const u_char *
 of10_bsn_message_print(netdissect_options *ndo,
-                       const u_char *cp, const u_char *ep, const u_int len) {
+                       const u_char *cp, const u_char *ep, const u_int len)
+{
 	const u_char *cp0 = cp;
 	uint32_t subtype;
 
@@ -954,7 +959,8 @@ trunc:
 
 static const u_char *
 of10_bsn_actions_print(netdissect_options *ndo,
-                       const u_char *cp, const u_char *ep, const u_int len) {
+                       const u_char *cp, const u_char *ep, const u_int len)
+{
 	const u_char *cp0 = cp;
 	uint32_t subtype, vlan_tag;
 
@@ -1027,7 +1033,8 @@ trunc:
 
 static const u_char *
 of10_vendor_action_print(netdissect_options *ndo,
-                         const u_char *cp, const u_char *ep, const u_int len) {
+                         const u_char *cp, const u_char *ep, const u_int len)
+{
 	uint32_t vendor;
 	const u_char *(*decoder)(netdissect_options *, const u_char *, const u_char *, const u_int);
 
@@ -1055,7 +1062,8 @@ trunc:
 
 static const u_char *
 of10_vendor_message_print(netdissect_options *ndo,
-                          const u_char *cp, const u_char *ep, const u_int len) {
+                          const u_char *cp, const u_char *ep, const u_int len)
+{
 	uint32_t vendor;
 	const u_char *(*decoder)(netdissect_options *, const u_char *, const u_char *, u_int);
 
@@ -1084,7 +1092,8 @@ trunc:
 /* Vendor ID is mandatory, data is optional. */
 static const u_char *
 of10_vendor_data_print(netdissect_options *ndo,
-                       const u_char *cp, const u_char *ep, const u_int len) {
+                       const u_char *cp, const u_char *ep, const u_int len)
+{
 	uint32_t vendor;
 
 	if (len < 4)
@@ -1108,7 +1117,8 @@ trunc:
 
 static const u_char *
 of10_packet_data_print(netdissect_options *ndo,
-                       const u_char *cp, const u_char *ep, const u_int len) {
+                       const u_char *cp, const u_char *ep, const u_int len)
+{
 	if (len == 0)
 		return cp;
 	/* data */
@@ -1130,7 +1140,8 @@ trunc:
 /* [OF10] Section 5.2.1 */
 static const u_char *
 of10_phy_ports_print(netdissect_options *ndo,
-                     const u_char *cp, const u_char *ep, u_int len) {
+                     const u_char *cp, const u_char *ep, u_int len)
+{
 	const u_char *cp0 = cp;
 	const u_int len0 = len;
 
@@ -1204,7 +1215,8 @@ trunc:
 /* [OF10] Section 5.2.2 */
 static const u_char *
 of10_queue_props_print(netdissect_options *ndo,
-                       const u_char *cp, const u_char *ep, u_int len) {
+                       const u_char *cp, const u_char *ep, u_int len)
+{
 	const u_char *cp0 = cp;
 	const u_int len0 = len;
 	uint16_t property, plen, rate;
@@ -1279,7 +1291,8 @@ trunc:
 /* ibid */
 static const u_char *
 of10_queues_print(netdissect_options *ndo,
-                  const u_char *cp, const u_char *ep, u_int len) {
+                  const u_char *cp, const u_char *ep, u_int len)
+{
 	const u_char *cp0 = cp;
 	const u_int len0 = len;
 	uint16_t desclen;
@@ -1326,7 +1339,8 @@ trunc:
 /* [OF10] Section 5.2.3 */
 static const u_char *
 of10_match_print(netdissect_options *ndo,
-                 const char *pfx, const u_char *cp, const u_char *ep) {
+                 const char *pfx, const u_char *cp, const u_char *ep)
+{
 	uint32_t wildcards;
 	uint16_t dl_type;
 	uint8_t nw_proto;
@@ -1430,7 +1444,8 @@ trunc:
 static const u_char *
 of10_actions_print(netdissect_options *ndo,
                    const char *pfx, const u_char *cp, const u_char *ep,
-                   u_int len) {
+                   u_int len)
+{
 	const u_char *cp0 = cp;
 	const u_int len0 = len;
 	uint16_t type, alen, output_port;
@@ -1595,7 +1610,8 @@ trunc:
 /* [OF10] Section 5.3.1 */
 static const u_char *
 of10_features_reply_print(netdissect_options *ndo,
-                          const u_char *cp, const u_char *ep, const u_int len) {
+                          const u_char *cp, const u_char *ep, const u_int len)
+{
 	/* datapath_id */
 	ND_TCHECK2(*cp, 8);
 	ND_PRINT((ndo, "\n\t dpid 0x%016" PRIx64, EXTRACT_64BITS(cp)));
@@ -1632,7 +1648,8 @@ trunc:
 /* [OF10] Section 5.3.3 */
 static const u_char *
 of10_flow_mod_print(netdissect_options *ndo,
-                    const u_char *cp, const u_char *ep, const u_int len) {
+                    const u_char *cp, const u_char *ep, const u_int len)
+{
 	uint16_t command;
 
 	/* match */
@@ -1689,7 +1706,8 @@ trunc:
 /* ibid */
 static const u_char *
 of10_port_mod_print(netdissect_options *ndo,
-                    const u_char *cp, const u_char *ep) {
+                    const u_char *cp, const u_char *ep)
+{
 	/* port_no */
 	ND_TCHECK2(*cp, 2);
 	ND_PRINT((ndo, "\n\t port_no %s", tok2str(ofpp_str, "%u", EXTRACT_16BITS(cp))));
@@ -1725,7 +1743,8 @@ trunc:
 /* [OF10] Section 5.3.5 */
 static const u_char *
 of10_stats_request_print(netdissect_options *ndo,
-                         const u_char *cp, const u_char *ep, u_int len) {
+                         const u_char *cp, const u_char *ep, u_int len)
+{
 	const u_char *cp0 = cp;
 	const u_int len0 = len;
 	uint16_t type;
@@ -1808,7 +1827,8 @@ trunc:
 /* ibid */
 static const u_char *
 of10_desc_stats_reply_print(netdissect_options *ndo,
-                            const u_char *cp, const u_char *ep, const u_int len) {
+                            const u_char *cp, const u_char *ep, const u_int len)
+{
 	if (len != OF_DESC_STATS_LEN)
 		goto corrupt;
 	/* mfr_desc */
@@ -1854,7 +1874,8 @@ trunc:
 /* ibid */
 static const u_char *
 of10_flow_stats_reply_print(netdissect_options *ndo,
-                            const u_char *cp, const u_char *ep, u_int len) {
+                            const u_char *cp, const u_char *ep, u_int len)
+{
 	const u_char *cp0 = cp;
 	const u_int len0 = len;
 	uint16_t entry_len;
@@ -1935,7 +1956,8 @@ trunc:
 static const u_char *
 of10_aggregate_stats_reply_print(netdissect_options *ndo,
                                  const u_char *cp, const u_char *ep,
-                                 const u_int len) {
+                                 const u_int len)
+{
 	if (len != OF_AGGREGATE_STATS_REPLY_LEN)
 		goto corrupt;
 	/* packet_count */
@@ -1966,7 +1988,8 @@ trunc:
 /* ibid */
 static const u_char *
 of10_table_stats_reply_print(netdissect_options *ndo,
-                             const u_char *cp, const u_char *ep, u_int len) {
+                             const u_char *cp, const u_char *ep, u_int len)
+{
 	const u_char *cp0 = cp;
 	const u_int len0 = len;
 
@@ -2024,7 +2047,8 @@ trunc:
 /* ibid */
 static const u_char *
 of10_port_stats_reply_print(netdissect_options *ndo,
-                            const u_char *cp, const u_char *ep, u_int len) {
+                            const u_char *cp, const u_char *ep, u_int len)
+{
 	const u_char *cp0 = cp;
 	const u_int len0 = len;
 
@@ -2108,7 +2132,8 @@ trunc:
 /* ibid */
 static const u_char *
 of10_queue_stats_reply_print(netdissect_options *ndo,
-                             const u_char *cp, const u_char *ep, u_int len) {
+                             const u_char *cp, const u_char *ep, u_int len)
+{
 	const u_char *cp0 = cp;
 	const u_int len0 = len;
 
@@ -2155,7 +2180,8 @@ trunc:
 /* ibid */
 static const u_char *
 of10_stats_reply_print(netdissect_options *ndo,
-                       const u_char *cp, const u_char *ep, const u_int len) {
+                       const u_char *cp, const u_char *ep, const u_int len)
+{
 	const u_char *cp0 = cp;
 	uint16_t type;
 
@@ -2194,7 +2220,8 @@ trunc:
 /* [OF10] Section 5.3.6 */
 static const u_char *
 of10_packet_out_print(netdissect_options *ndo,
-                      const u_char *cp, const u_char *ep, const u_int len) {
+                      const u_char *cp, const u_char *ep, const u_int len)
+{
 	const u_char *cp0 = cp;
 	const u_int len0 = len;
 	uint16_t actions_len;
@@ -2231,7 +2258,8 @@ trunc:
 /* [OF10] Section 5.4.1 */
 static const u_char *
 of10_packet_in_print(netdissect_options *ndo,
-                     const u_char *cp, const u_char *ep, const u_int len) {
+                     const u_char *cp, const u_char *ep, const u_int len)
+{
 	/* buffer_id */
 	ND_TCHECK2(*cp, 4);
 	ND_PRINT((ndo, "\n\t buffer_id %s", tok2str(bufferid_str, "0x%08x", EXTRACT_32BITS(cp))));
@@ -2263,7 +2291,8 @@ trunc:
 /* [OF10] Section 5.4.2 */
 static const u_char *
 of10_flow_removed_print(netdissect_options *ndo,
-                        const u_char *cp, const u_char *ep) {
+                        const u_char *cp, const u_char *ep)
+{
 	/* match */
 	if (ep == (cp = of10_match_print(ndo, "\n\t ", cp, ep)))
 		return ep; /* end of snapshot */
@@ -2316,7 +2345,8 @@ trunc:
 /* [OF10] Section 5.4.4 */
 static const u_char *
 of10_error_print(netdissect_options *ndo,
-                 const u_char *cp, const u_char *ep, const u_int len) {
+                 const u_char *cp, const u_char *ep, const u_int len)
+{
 	uint16_t type;
 	const struct tok *code_str;
 
@@ -2348,7 +2378,8 @@ trunc:
 const u_char *
 of10_header_body_print(netdissect_options *ndo,
                        const u_char *cp, const u_char *ep, const uint8_t type,
-                       const uint16_t len, const uint32_t xid) {
+                       const uint16_t len, const uint32_t xid)
+{
 	const u_char *cp0 = cp;
 	const u_int len0 = len;
 	/* Thus far message length is not less than the basic header size, but most

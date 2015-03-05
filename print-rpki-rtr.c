@@ -309,8 +309,8 @@ rpki_rtr_pdu_print (netdissect_options *ndo, const u_char *tptr, u_int indent)
 }
 
 void
-rpki_rtr_print(netdissect_options *ndo, register const u_char *pptr, register u_int len) {
-
+rpki_rtr_print(netdissect_options *ndo, register const u_char *pptr, register u_int len)
+{
     u_int tlen, pdu_type, pdu_len;
     const u_char *tptr;
     const rpki_rtr_pdu *pdu_header;

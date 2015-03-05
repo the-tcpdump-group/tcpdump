@@ -311,7 +311,8 @@ const char *icmp_tstamp_print(u_int);
 
 /* print the milliseconds since midnight UTC */
 const char *
-icmp_tstamp_print(u_int tstamp) {
+icmp_tstamp_print(u_int tstamp)
+{
     u_int msec,sec,min,hrs;
 
     static char buf[64];
