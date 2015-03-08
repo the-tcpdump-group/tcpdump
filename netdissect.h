@@ -116,6 +116,9 @@ struct netdissect_options {
   int ndo_jflag;                /* packet time stamp source */
   int ndo_pflag;                /* don't go promiscuous */
   int ndo_immediate;            /* use immediate mode */
+  int ndo_print_bytes_flag;     /* print subset of bytes flag */
+  uint8_t ndo_print_start;      /* print range start */
+  uint8_t ndo_print_end;        /* print range end */
 
   int ndo_Cflag;                /* rotate dump files after this many bytes */
   int ndo_Cflag_count;      /* Keep track of which file number we're writing */

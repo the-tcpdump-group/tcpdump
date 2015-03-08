@@ -224,6 +224,9 @@ extern netdissect_options *gndo;
 #define snaplen     gndo->ndo_snaplen
 #define snapend     gndo->ndo_snapend
 
+#define printstart gndo->ndo_snaplen
+#define printend gndo->ndo_snaplen
+
 extern void default_print(const u_char *, u_int);
 
 #endif
