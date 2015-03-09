@@ -134,3 +134,6 @@ struct tcphdr {
 #ifndef FTP_PORT
 #define FTP_PORT		21
 #endif
+#ifndef REDIS_PORT
+#define REDIS_PORT		6379
+#endif

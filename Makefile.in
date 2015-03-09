@@ -178,6 +178,7 @@ LIBNETDISSECT_SRC=\
 	print-pptp.c \
 	print-radius.c \
 	print-raw.c \
+	print-redis.c \
 	print-rip.c \
 	print-rpki-rtr.c \
 	print-rrcp.c \

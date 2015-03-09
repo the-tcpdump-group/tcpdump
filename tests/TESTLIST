@@ -267,3 +267,8 @@ geneve-tcp	geneve.pcap		geneve-tcp.out	-t "geneve && tcp"
 # DHCP tests
 dhcp-rfc3004	dhcp-rfc3004.pcap	dhcp-rfc3004-v.out	-t -v
 dhcp-rfc5859	dhcp-rfc5859.pcap	dhcp-rfc5859-v.out	-t -v
+
+# RESP tests
+resp_1      resp_1_benchmark.pcap   resp_1.out      -n -t
+resp_2      resp_2_inline.pcap      resp_2.out      -n -t
+resp_3      resp_3_malicious.pcap   resp_3.out      -n -t
