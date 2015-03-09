@@ -980,8 +980,9 @@ tstamp_precision_to_string(int precision)
  *	   what the standard I/O library happens to require this week.
  */
 static void
-set_dump_fd_capsicum_rights(int fd)
+set_dumper_capsicum_rights(pcap_dumper_t *p)
 {
+	int fd = fileno(pcap_dump_file(p));
 	cap_rights_t rights;
 
 	cap_rights_init(&rights, CAP_SEEK, CAP_WRITE, CAP_FCNTL);
@@ -1894,7 +1895,7 @@ main(int argc, char **argv)
 		if (p == NULL)
 			error("%s", pcap_geterr(pd));
 #ifdef HAVE_CAPSICUM
-		set_dump_fd_capsicum_rights(fileno(pcap_dump_file(p)));
+		set_dumper_capsicum_rights(p);
 #endif
 		if (Cflag != 0 || Gflag != 0) {
 #ifdef HAVE_CAPSICUM
@@ -2332,7 +2333,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			if (dump_info->p == NULL)
 				error("%s", pcap_geterr(pd));
 #ifdef HAVE_CAPSICUM
-			set_dump_fd_capsicum_rights(pcap_dump_file(dump_info->p)));
+			set_dumper_capsicum_rights(dump_info->p);
 #endif
 		}
 	}
@@ -2403,7 +2404,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			if (dump_info->p == NULL)
 				error("%s", pcap_geterr(pd));
 #ifdef HAVE_CAPSICUM
-			set_dump_fd_capsicum_rights(fileno(pcap_dump_file(dump_info->p)));
+			set_dumper_capsicum_rights(dump_info->p);
 #endif
 		}
 	}
