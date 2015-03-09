@@ -271,8 +271,9 @@ struct netdissect_options {
  *	http://www.kb.cert.org/vuls/id/162289
  */
 #define ND_TTEST2(var, l) \
+  ((l) >= 0 && \
 	((uintptr_t)ndo->ndo_snapend - (l) <= (uintptr_t)ndo->ndo_snapend && \
-	    (uintptr_t)&(var) <= (uintptr_t)ndo->ndo_snapend - (l))
+         (uintptr_t)&(var) <= (uintptr_t)ndo->ndo_snapend - (l)))
 
 /* True if "var" was captured */
 #define ND_TTEST(var) ND_TTEST2(var, sizeof(var))
