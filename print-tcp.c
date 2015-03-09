@@ -596,7 +596,7 @@ tcp_print(netdissect_options *ndo,
                                 switch(magic) {
 
                                 case 0xf989:
-                                        /* TCP Fast Open: draft-ietf-tcpm-fastopen-04 */
+                                        /* TCP Fast Open: RFC 7413 */
                                         if (datalen == 2) {
                                                 /* Fast Open Cookie Request */
                                                 ND_PRINT((ndo, "tfo cookiereq"));

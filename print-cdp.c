@@ -147,7 +147,7 @@ cdp_print(netdissect_options *ndo,
 			if (!ndo->ndo_vflag)
 			    ND_PRINT((ndo, ", Device-ID "));
 			ND_PRINT((ndo, "'"));
-			fn_printn(ndo, tptr, len, NULL);
+			(void)fn_printn(ndo, tptr, len, NULL);
 			ND_PRINT((ndo, "'"));
 			break;
 		    case 0x02: /* Address */
@@ -156,7 +156,7 @@ cdp_print(netdissect_options *ndo,
 			break;
 		    case 0x03: /* Port-ID */
 			ND_PRINT((ndo, "'"));
-			fn_printn(ndo, tptr, len, NULL);
+			(void)fn_printn(ndo, tptr, len, NULL);
 			ND_PRINT((ndo, "'"));
 			break;
 		    case 0x04: /* Capabilities */
@@ -171,13 +171,13 @@ cdp_print(netdissect_options *ndo,
 			for (i=0;i<len;i++) {
 			    j = *(tptr+i);
 			    ND_PRINT((ndo, "%c", j));
-			    if (j == 0x0a) /* lets rework the version string to get a nice identation */
+			    if (j == 0x0a) /* lets rework the version string to get a nice indentation */
 				ND_PRINT((ndo, "\t  "));
 			}
 			break;
 		    case 0x06: /* Platform */
 			ND_PRINT((ndo, "'"));
-			fn_printn(ndo, tptr, len, NULL);
+			(void)fn_printn(ndo, tptr, len, NULL);
 			ND_PRINT((ndo, "'"));
 			break;
 		    case 0x07: /* Prefixes */
@@ -188,7 +188,7 @@ cdp_print(netdissect_options *ndo,
 			break;
 		    case 0x09: /* VTP Mgmt Domain  - CDPv2 */
 			ND_PRINT((ndo, "'"));
-			fn_printn(ndo, tptr, len, NULL);
+			(void)fn_printn(ndo, tptr, len, NULL);
 			ND_PRINT((ndo, "'"));
 			break;
 		    case 0x0a: /* Native VLAN ID - CDPv2 */
@@ -230,7 +230,7 @@ cdp_print(netdissect_options *ndo,
 			break;
 		    case 0x14: /* System Name - not documented */
 			ND_PRINT((ndo, "'"));
-			fn_printn(ndo, tptr, len, NULL);
+			(void)fn_printn(ndo, tptr, len, NULL);
 			ND_PRINT((ndo, "'"));
 			break;
 		    case 0x16: /* System Object ID - not documented */
@@ -243,7 +243,7 @@ cdp_print(netdissect_options *ndo,
 			ND_PRINT((ndo, "0x%02x", *(tptr)));
 			if (len > 1) {
 				ND_PRINT((ndo, "/"));
-				fn_printn(ndo, tptr + 1, len - 1, NULL);
+				(void)fn_printn(ndo, tptr + 1, len - 1, NULL);
 			}
 			break;
 		    default:

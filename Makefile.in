@@ -246,7 +246,6 @@ HDR = \
 	gmpls.h \
 	gmt2local.h \
 	interface.h \
-	interface.h \
 	ip.h \
 	ip6.h \
 	ipproto.h \

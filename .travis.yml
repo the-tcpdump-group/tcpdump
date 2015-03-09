@@ -13,7 +13,7 @@ env:
     - BUILD_LIBPCAP=true
     # encrypted COVERITY_SCAN_TOKEN from
     # https://scan.coverity.com/projects/<project_id>/submit_build?tab=travis_ci
-    - secure: "V3k6MtUxrZmzpzJrNdRGcv2PV3WpvIyxYhK3MR8mDmHANXGkRM3qvuTLyiWHfyYxX2KMkEnfYG8b8PPzNNyEXbFdRN9mhHWRyIYduimqdfZLpIz+/c8E/JnMdPo/N5ghPuD/d7pFEsbsWotpZUDyfMsif8QrqqbXDDWFqTgtQg0="
+    - secure: "pcl5WdUhdnG5VpiyIKkVkNimnkvrnbWb8YOgw2ERJ0qNqIaF/Re4qV/rDXYe+AkRwAR071HQW6KlDnpeUlHKPNhmfzeUlmOxSatvdVPw+FV5KqOuidZbHDH/RiWvvlOyaJq26aDExFSDxV+98v39q+n1jNSqggHLe8o48zVK/+U="
     # Coverity run condition (avoid matrix multiple runs), need customized
     # build script. Need an update if new matrix cases.
     - coverity_scan_run_condition='"$TRAVIS_OS_NAME" = linux -a "$CC" = gcc -a "$BUILD_IPV6" = true'
@@ -43,21 +43,25 @@ addons:
     # Pattern to match selecting branches that will run analysis
     branch_pattern: coverity_scan
 
+git:
+  quiet: true
+
 before_install:
   - uname -a
-  - env | sort -f
-  - if [ "$TRAVIS_OS_NAME" = linux ]; then sudo apt-get update; fi
-  - if [ "$TRAVIS_OS_NAME" = osx ]; then brew update; fi
+  - date
+  - if [ "$TRAVIS_OS_NAME" = linux ]; then sudo apt-get -qq update; fi
+  - if [ "$TRAVIS_OS_NAME" = osx ]; then brew update >/dev/null; fi
 
 install:
-  - if [ "$TRAVIS_OS_NAME" = linux ]; then sudo apt-get install libssl-dev libssl0.9.8 libssl1.0.0 libdnet-dev libsmi2-dev; fi
-  - if [ "$TRAVIS_OS_NAME" = osx ]; then brew install libsmi; fi
+  - if [ "$TRAVIS_OS_NAME" = linux ]; then sudo apt-get -qq install libssl-dev libssl0.9.8 libssl1.0.0 libdnet-dev libsmi2-dev libcap-ng-dev; fi
+  - if [ "$TRAVIS_OS_NAME" = osx ]; then brew install libsmi | grep -v '%'; fi
 
 before_script:
-  - if [ "$BUILD_LIBPCAP" = true ]; then (cd .. && git clone git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure && make); else sudo apt-get install libpcap-dev; fi
+  - if [ "$BUILD_LIBPCAP" = true ]; then (cd .. && echo '$ git clone [...] libpcap.git' && git clone --depth=50 --branch=master --quiet git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure && make); else sudo apt-get -qq install libpcap-dev; fi
 
 script:
   - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then touch .devel configure; fi
   - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then if [ "$BUILD_IPV6" = true ]; then ./configure; else ./configure --disable-ipv6; fi; fi
   - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then make -s; fi
+  - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then sudo PATH=$PATH make install; fi
   - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then if [ "$BUILD_IPV6" = true ]; then make check; fi; fi

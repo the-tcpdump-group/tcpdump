@@ -87,17 +87,17 @@ struct udphdr {
 #define BFD_ECHO_PORT           3785 /* draft-katz-ward-bfd-v4v6-1hop-00.txt */
 #define WB_PORT			4567
 #define SFLOW_PORT              6343 /* http://www.sflow.org/developers/specifications.php */
-#define LWAPP_DATA_PORT         12222 /* draft-ohara-capwap-lwapp-04.txt */
-#define LWAPP_CONTROL_PORT      12223 /* draft-ohara-capwap-lwapp-04.txt */
+#define LWAPP_DATA_PORT         12222 /* RFC 5412 */
+#define LWAPP_CONTROL_PORT      12223 /* RFC 5412 */
 #define OTV_PORT                8472  /* draft-hasmit-otv-04 */
-#define VXLAN_PORT              4789  /* draft-mahalingam-dutt-dcops-vxlan-04 */
+#define VXLAN_PORT              4789  /* RFC 7348 */
 #define GENEVE_PORT             6081  /* draft-gross-geneve-02 */
 
 #ifdef INET6
-#define RIPNG_PORT 521		/*XXX*/
+#define RIPNG_PORT              521   /* RFC 2080 */
 #define DHCP6_SERV_PORT 546	/*XXX*/
 #define DHCP6_CLI_PORT 547	/*XXX*/
 #define AHCP_PORT 5359		/* draft-chroboczek-ahcp-00 */
-#define BABEL_PORT 6696
-#define BABEL_PORT_OLD 6697
+#define BABEL_PORT              6696  /* RFC 6126 errata */
+#define BABEL_PORT_OLD          6697  /* RFC 6126 */
 #endif

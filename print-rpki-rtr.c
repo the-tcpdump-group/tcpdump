@@ -120,7 +120,7 @@ static const struct tok rpki_rtr_error_codes[] = {
 };
 
 /*
- * Build a identation string for a given identation level.
+ * Build a indentation string for a given indentation level.
  * XXX this should be really in util.c
  */
 static char *
@@ -178,6 +178,7 @@ rpki_rtr_pdu_print (netdissect_options *ndo, const u_char *tptr, u_int indent)
     pdu_header = (rpki_rtr_pdu *)tptr;
     pdu_type = pdu_header->pdu_type;
     pdu_len = EXTRACT_32BITS(pdu_header->length);
+    ND_TCHECK2(tptr, pdu_len);
     hexdump = FALSE;
 
     ND_PRINT((ndo, "%sRPKI-RTRv%u, %s PDU (%u), length: %u",
@@ -286,6 +287,7 @@ rpki_rtr_pdu_print (netdissect_options *ndo, const u_char *tptr, u_int indent)
 		tptr += 4;
 		tlen -= 4;
 	    }
+            printf("text_length: %u tlen %u\n", text_length, tlen);
 	    if (text_length && (text_length <= tlen )) {
 		memcpy(buf, tptr, min(sizeof(buf)-1, text_length));
 		buf[text_length] = '\0';
@@ -306,11 +308,16 @@ rpki_rtr_pdu_print (netdissect_options *ndo, const u_char *tptr, u_int indent)
     if (ndo->ndo_vflag > 1 || (ndo->ndo_vflag && hexdump)) {
 	print_unknown_data(ndo,tptr,"\n\t  ", pdu_len);
     }
+    return;
+
+ trunc:
+    ND_PRINT((ndo, "|trunc"));
+    return;
 }
 
 void
-rpki_rtr_print(netdissect_options *ndo, register const u_char *pptr, register u_int len) {
-
+rpki_rtr_print(netdissect_options *ndo, register const u_char *pptr, register u_int len)
+{
     u_int tlen, pdu_type, pdu_len;
     const u_char *tptr;
     const rpki_rtr_pdu *pdu_header;

@@ -234,8 +234,8 @@ static int ldp_pdu_print(netdissect_options *, register const u_char *);
 static int
 ldp_tlv_print(netdissect_options *ndo,
               register const u_char *tptr,
-              u_short msg_tlen) {
-
+              u_short msg_tlen)
+{
     struct ldp_tlv_header {
         uint8_t type[2];
         uint8_t length[2];
@@ -545,8 +545,8 @@ badtlv:
 
 void
 ldp_print(netdissect_options *ndo,
-          register const u_char *pptr, register u_int len) {
-
+          register const u_char *pptr, register u_int len)
+{
     int processed;
     while (len > (sizeof(struct ldp_common_header) + sizeof(struct ldp_msg_header))) {
         processed = ldp_pdu_print(ndo, pptr);
@@ -559,8 +559,8 @@ ldp_print(netdissect_options *ndo,
 
 static int
 ldp_pdu_print(netdissect_options *ndo,
-              register const u_char *pptr) {
-
+              register const u_char *pptr)
+{
     const struct ldp_common_header *ldp_com_header;
     const struct ldp_msg_header *ldp_msg_header;
     const u_char *tptr,*msg_tptr;

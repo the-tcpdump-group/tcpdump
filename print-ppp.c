@@ -805,8 +805,8 @@ static const struct tok ppp_ml_flag_values[] = {
 
 static void
 handle_mlppp(netdissect_options *ndo,
-             const u_char *p, int length) {
-
+             const u_char *p, int length)
+{
     if (!ndo->ndo_eflag)
         ND_PRINT((ndo, "MLPPP, "));
 

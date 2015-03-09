@@ -56,7 +56,6 @@ static const char tstr[] = " [|bootp]";
  * without express or implied warranty.
  */
 
-
 struct bootp {
 	uint8_t		bp_op;		/* packet opcode type */
 	uint8_t		bp_htype;	/* hardware addr type */
@@ -76,8 +75,8 @@ struct bootp {
 	uint8_t		bp_vend[64];	/* vendor-specific area */
 } UNALIGNED;
 
-#define BOOTPREPLY		2
-#define BOOTPREQUEST		1
+#define BOOTPREPLY	2
+#define BOOTPREQUEST	1
 
 /*
  * Vendor magic cookie (v_magic) for CMU
@@ -88,8 +87,6 @@ struct bootp {
  * Vendor magic cookie (v_magic) for RFC1048
  */
 #define VM_RFC1048	{ 99, 130, 83, 99 }
-
-
 
 /*
  * RFC1048 tag values used to specify what information is being supplied in
@@ -191,13 +188,16 @@ struct bootp {
 #define	TAG_SLP_SCOPE		((uint8_t)  79)
 /* RFC 2937 */
 #define	TAG_NS_SEARCH		((uint8_t) 117)
+/* RFC 3004 - The User Class Option for DHCP */
+#define	TAG_USER_CLASS		((uint8_t)  77)
 /* RFC 3011 */
 #define	TAG_IP4_SUBNET_SELECT	((uint8_t) 118)
 /* RFC 3442 */
 #define TAG_CLASSLESS_STATIC_RT	((uint8_t) 121)
 #define TAG_CLASSLESS_STA_RT_MS	((uint8_t) 249)
+/* RFC 5859 - TFTP Server Address Option for DHCPv4 */
+#define	TAG_TFTP_SERVER_ADDRESS	((uint8_t) 150)
 /* ftp://ftp.isi.edu/.../assignments/bootp-dhcp-extensions */
-#define	TAG_USER_CLASS		((uint8_t)  77)
 #define	TAG_SLP_NAMING_AUTH	((uint8_t)  80)
 #define	TAG_CLIENT_FQDN		((uint8_t)  81)
 #define	TAG_AGENT_CIRCUIT	((uint8_t)  82)
@@ -223,17 +223,15 @@ struct bootp {
 #define	TAG_EXTENDED_REQUEST	((uint8_t) 126)
 #define	TAG_EXTENDED_OPTION	((uint8_t) 127)
 
-
 /* DHCP Message types (values for TAG_DHCP_MESSAGE option) */
-#define		DHCPDISCOVER	1
-#define		DHCPOFFER	2
-#define		DHCPREQUEST	3
-#define		DHCPDECLINE	4
-#define		DHCPACK		5
-#define		DHCPNAK		6
-#define		DHCPRELEASE	7
-#define		DHCPINFORM	8
-
+#define DHCPDISCOVER	1
+#define DHCPOFFER	2
+#define DHCPREQUEST	3
+#define DHCPDECLINE	4
+#define DHCPACK		5
+#define DHCPNAK		6
+#define DHCPRELEASE	7
+#define DHCPINFORM	8
 
 /*
  * "vendor" data permitted for CMU bootp clients.
@@ -267,14 +265,14 @@ static void cmu_print(netdissect_options *, const u_char *);
 static char *client_fqdn_flags(u_int flags);
 
 static const struct tok bootp_flag_values[] = {
-    { 0x8000,                   "Broadcast" },
-    { 0, NULL}
+	{ 0x8000,	"Broadcast" },
+	{ 0, NULL}
 };
 
 static const struct tok bootp_op_values[] = {
-    { BOOTPREQUEST,             "Request" },
-    { BOOTPREPLY,               "Reply" },
-    { 0, NULL}
+	{ BOOTPREQUEST,	"Request" },
+	{ BOOTPREPLY,	"Reply" },
+	{ 0, NULL}
 };
 
 /*
@@ -282,7 +280,7 @@ static const struct tok bootp_op_values[] = {
  */
 void
 bootp_print(netdissect_options *ndo,
-            register const u_char *cp, u_int length)
+	    register const u_char *cp, u_int length)
 {
 	register const struct bootp *bp;
 	static const u_char vm_cmu[4] = VM_CMU;
@@ -292,7 +290,7 @@ bootp_print(netdissect_options *ndo,
 	ND_TCHECK(bp->bp_op);
 
 	ND_PRINT((ndo, "BOOTP/DHCP, %s",
-	          tok2str(bootp_op_values, "unknown (0x%02x)", bp->bp_op)));
+		  tok2str(bootp_op_values, "unknown (0x%02x)", bp->bp_op)));
 
 	if (bp->bp_htype == 1 && bp->bp_hlen == 6 && bp->bp_op == BOOTPREQUEST) {
 		ND_TCHECK2(bp->bp_chaddr[0], 6);
@@ -323,7 +321,7 @@ bootp_print(netdissect_options *ndo,
 		ND_PRINT((ndo, ", secs %d", EXTRACT_16BITS(&bp->bp_secs)));
 
 	ND_PRINT((ndo, ", Flags [%s]",
-		bittok2str(bootp_flag_values, "none", EXTRACT_16BITS(&bp->bp_flags))));
+		  bittok2str(bootp_flag_values, "none", EXTRACT_16BITS(&bp->bp_flags))));
 	if (ndo->ndo_vflag > 1)
 		ND_PRINT((ndo, " (0x%04x)", EXTRACT_16BITS(&bp->bp_flags)));
 
@@ -377,10 +375,10 @@ bootp_print(netdissect_options *ndo,
 	/* Decode the vendor buffer */
 	ND_TCHECK(bp->bp_vend[0]);
 	if (memcmp((const char *)bp->bp_vend, vm_rfc1048,
-		 sizeof(uint32_t)) == 0)
+		    sizeof(uint32_t)) == 0)
 		rfc1048_print(ndo, bp->bp_vend);
 	else if (memcmp((const char *)bp->bp_vend, vm_cmu,
-		      sizeof(uint32_t)) == 0)
+			sizeof(uint32_t)) == 0)
 		cmu_print(ndo, bp->bp_vend);
 	else {
 		uint32_t ul;
@@ -497,13 +495,16 @@ static const struct tok tag2str[] = {
 	{ TAG_SLP_SCOPE,	"bSLP-SCOPE" },	/*"b" is a little wrong */
 /* RFC 2937 */
 	{ TAG_NS_SEARCH,	"sNSSEARCH" },	/* XXX 's' */
+/* RFC 3004 - The User Class Option for DHCP */
+	{ TAG_USER_CLASS,	"$User-Class" },
 /* RFC 3011 */
 	{ TAG_IP4_SUBNET_SELECT, "iSUBNET" },
 /* RFC 3442 */
 	{ TAG_CLASSLESS_STATIC_RT, "$Classless-Static-Route" },
 	{ TAG_CLASSLESS_STA_RT_MS, "$Classless-Static-Route-Microsoft" },
+/* RFC 5859 - TFTP Server Address Option for DHCPv4 */
+	{ TAG_TFTP_SERVER_ADDRESS, "iTFTP-Server-Address" },
 /* http://www.iana.org/assignments/bootp-dhcp-extensions/index.htm */
-	{ TAG_USER_CLASS,	"aCLASS" },
 	{ TAG_SLP_NAMING_AUTH,	"aSLP-NA" },
 	{ TAG_CLIENT_FQDN,	"$FQDN" },
 	{ TAG_AGENT_CIRCUIT,	"$Agent-Information" },
@@ -526,67 +527,67 @@ static const struct tok tag2str[] = {
 	{ TAG_NETINFO_PARENT_TAG, "aNITAG" },
 	{ TAG_URL,		"aURL" },
 	{ TAG_FAILOVER,		"bFAIL" },	/* XXX 'b' */
-	{ 0,			NULL }
+	{ 0, NULL }
 };
 /* 2-byte extended tags */
 static const struct tok xtag2str[] = {
-	{ 0,			NULL }
+	{ 0, NULL }
 };
 
 /* DHCP "options overload" types */
 static const struct tok oo2str[] = {
-	{ 1,			"file" },
-	{ 2,			"sname" },
-	{ 3,			"file+sname" },
-	{ 0,			NULL }
+	{ 1,	"file" },
+	{ 2,	"sname" },
+	{ 3,	"file+sname" },
+	{ 0, NULL }
 };
 
 /* NETBIOS over TCP/IP node type options */
 static const struct tok nbo2str[] = {
-	{ 0x1,			"b-node" },
-	{ 0x2,			"p-node" },
-	{ 0x4,			"m-node" },
-	{ 0x8,			"h-node" },
-	{ 0,			NULL }
+	{ 0x1,	"b-node" },
+	{ 0x2,	"p-node" },
+	{ 0x4,	"m-node" },
+	{ 0x8,	"h-node" },
+	{ 0, NULL }
 };
 
 /* ARP Hardware types, for Client-ID option */
 static const struct tok arp2str[] = {
-	{ 0x1,			"ether" },
-	{ 0x6,			"ieee802" },
-	{ 0x7,			"arcnet" },
-	{ 0xf,			"frelay" },
-	{ 0x17,			"strip" },
-	{ 0x18,			"ieee1394" },
-	{ 0,			NULL }
+	{ 0x1,	"ether" },
+	{ 0x6,	"ieee802" },
+	{ 0x7,	"arcnet" },
+	{ 0xf,	"frelay" },
+	{ 0x17,	"strip" },
+	{ 0x18,	"ieee1394" },
+	{ 0, NULL }
 };
 
 static const struct tok dhcp_msg_values[] = {
-        { DHCPDISCOVER, "Discover" },
-        { DHCPOFFER, "Offer" },
-        { DHCPREQUEST, "Request" },
-        { DHCPDECLINE, "Decline" },
-        { DHCPACK, "ACK" },
-        { DHCPNAK, "NACK" },
-        { DHCPRELEASE, "Release" },
-        { DHCPINFORM, "Inform" },
-        { 0,			NULL }
+	{ DHCPDISCOVER,	"Discover" },
+	{ DHCPOFFER,	"Offer" },
+	{ DHCPREQUEST,	"Request" },
+	{ DHCPDECLINE,	"Decline" },
+	{ DHCPACK,	"ACK" },
+	{ DHCPNAK,	"NACK" },
+	{ DHCPRELEASE,	"Release" },
+	{ DHCPINFORM,	"Inform" },
+	{ 0, NULL }
 };
 
-#define AGENT_SUBOPTION_CIRCUIT_ID 	1	/* RFC 3046 */
-#define AGENT_SUBOPTION_REMOTE_ID  	2	/* RFC 3046 */
-#define AGENT_SUBOPTION_SUBSCRIBER_ID 	6	/* RFC 3993 */
+#define AGENT_SUBOPTION_CIRCUIT_ID	1	/* RFC 3046 */
+#define AGENT_SUBOPTION_REMOTE_ID	2	/* RFC 3046 */
+#define AGENT_SUBOPTION_SUBSCRIBER_ID	6	/* RFC 3993 */
 static const struct tok agent_suboption_values[] = {
-        { AGENT_SUBOPTION_CIRCUIT_ID, "Circuit-ID" },
-        { AGENT_SUBOPTION_REMOTE_ID, "Remote-ID" },
-        { AGENT_SUBOPTION_SUBSCRIBER_ID, "Subscriber-ID" },
-        { 0,			NULL }
+	{ AGENT_SUBOPTION_CIRCUIT_ID,    "Circuit-ID" },
+	{ AGENT_SUBOPTION_REMOTE_ID,     "Remote-ID" },
+	{ AGENT_SUBOPTION_SUBSCRIBER_ID, "Subscriber-ID" },
+	{ 0, NULL }
 };
 
 
 static void
 rfc1048_print(netdissect_options *ndo,
-              register const u_char *bp)
+	      register const u_char *bp)
 {
 	register uint16_t tag;
 	register u_int len;
@@ -631,7 +632,7 @@ rfc1048_print(netdissect_options *ndo,
 		}
 
 		ND_PRINT((ndo, "\n\t    %s Option %u, length %u%s", cp, tag, len,
-		    len > 0 ? ": " : ""));
+			  len > 0 ? ": " : ""));
 
 		if (tag == TAG_PAD && ndo->ndo_vflag > 2) {
 			u_int ntag = 1;
@@ -804,9 +805,8 @@ rfc1048_print(netdissect_options *ndo,
 
 			case TAG_NETBIOS_NODE:
 				/* this option should be at least 1 byte long */
-				if (len < 1)  {
-					ND_PRINT((ndo, "ERROR: option %u len %u < 1 bytes",
-					    TAG_NETBIOS_NODE, len));
+				if (len < 1) {
+					ND_PRINT((ndo, "ERROR: length < 1 bytes"));
 					break;
 				}
 				tag = *bp++;
@@ -816,9 +816,8 @@ rfc1048_print(netdissect_options *ndo,
 
 			case TAG_OPT_OVERLOAD:
 				/* this option should be at least 1 byte long */
-				if (len < 1)  {
-					ND_PRINT((ndo, "ERROR: option %u len %u < 1 bytes",
-					    TAG_OPT_OVERLOAD, len));
+				if (len < 1) {
+					ND_PRINT((ndo, "ERROR: length < 1 bytes"));
 					break;
 				}
 				tag = *bp++;
@@ -828,9 +827,8 @@ rfc1048_print(netdissect_options *ndo,
 
 			case TAG_CLIENT_FQDN:
 				/* this option should be at least 3 bytes long */
-				if (len < 3)  {
-					ND_PRINT((ndo, "ERROR: option %u len %u < 3 bytes",
-					    TAG_CLIENT_FQDN, len));
+				if (len < 3) {
+					ND_PRINT((ndo, "ERROR: length < 3 bytes"));
 					bp += len;
 					len = 0;
 					break;
@@ -852,12 +850,12 @@ rfc1048_print(netdissect_options *ndo,
 				break;
 
 			case TAG_CLIENT_ID:
-			    {	int type;
+			    {
+				int type;
 
 				/* this option should be at least 1 byte long */
-				if (len < 1)  {
-					ND_PRINT((ndo, "ERROR: option %u len %u < 1 bytes",
-					    TAG_CLIENT_ID, len));
+				if (len < 1) {
+					ND_PRINT((ndo, "ERROR: length < 1 bytes"));
 					break;
 				}
 				type = *bp++;
@@ -893,23 +891,24 @@ rfc1048_print(netdissect_options *ndo,
 					len -= 2;
 					if (suboptlen > len) {
 						ND_PRINT((ndo, "\n\t      %s SubOption %u, length %u: length goes past end of option",
-						   tok2str(agent_suboption_values, "Unknown", subopt),
-						   subopt,
-						   suboptlen));
+							  tok2str(agent_suboption_values, "Unknown", subopt),
+							  subopt,
+							  suboptlen));
 						bp += len;
 						len = 0;
 						break;
 					}
 					ND_PRINT((ndo, "\n\t      %s SubOption %u, length %u: ",
-					   tok2str(agent_suboption_values, "Unknown", subopt),
-					   subopt,
-					   suboptlen));
+						  tok2str(agent_suboption_values, "Unknown", subopt),
+						  subopt,
+						  suboptlen));
 					switch (subopt) {
 
 					case AGENT_SUBOPTION_CIRCUIT_ID: /* fall through */
 					case AGENT_SUBOPTION_REMOTE_ID:
 					case AGENT_SUBOPTION_SUBSCRIBER_ID:
-						fn_printn(ndo, bp, suboptlen, NULL);
+						if (fn_printn(ndo, bp, suboptlen, ndo->ndo_snapend))
+							goto trunc;
 						break;
 
 					default:
@@ -918,18 +917,17 @@ rfc1048_print(netdissect_options *ndo,
 
 					len -= suboptlen;
 					bp += suboptlen;
-			    }
-			    break;
+				}
+				break;
 
 			case TAG_CLASSLESS_STATIC_RT:
 			case TAG_CLASSLESS_STA_RT_MS:
-			{
+			    {
 				u_int mask_width, significant_octets, i;
 
 				/* this option should be at least 5 bytes long */
-				if (len < 5)  {
-					ND_PRINT((ndo, "ERROR: option %u len %u < 5 bytes",
-					    TAG_CLASSLESS_STATIC_RT, len));
+				if (len < 5) {
+					ND_PRINT((ndo, "ERROR: length < 5 bytes"));
 					bp += len;
 					len = 0;
 					break;
@@ -941,7 +939,7 @@ rfc1048_print(netdissect_options *ndo,
 					len--;
 					/* mask_width <= 32 */
 					if (mask_width > 32) {
-						ND_PRINT((ndo, "[ERROR: Mask width (%d) > 32]",  mask_width));
+						ND_PRINT((ndo, "[ERROR: Mask width (%d) > 32]", mask_width));
 						bp += len;
 						len = 0;
 						break;
@@ -949,7 +947,7 @@ rfc1048_print(netdissect_options *ndo,
 					significant_octets = (mask_width + 7) / 8;
 					/* significant octets + router(4) */
 					if (len < significant_octets + 4) {
-						ND_PRINT((ndo, "[ERROR: Remaining length (%u) < %u bytes]",  len, significant_octets + 4));
+						ND_PRINT((ndo, "[ERROR: Remaining length (%u) < %u bytes]", len, significant_octets + 4));
 						bp += len;
 						len = 0;
 						break;
@@ -973,12 +971,54 @@ rfc1048_print(netdissect_options *ndo,
 					len -= (significant_octets + 4);
 					first = 0;
 				}
-			}
-			break;
+				break;
+			    }
+
+			case TAG_USER_CLASS:
+			    {
+				u_int suboptnumber = 1;
+
+				first = 1;
+				if (len < 2) {
+					ND_PRINT((ndo, "ERROR: length < 2 bytes"));
+					bp += len;
+					len = 0;
+					break;
+				}
+				while (len > 0) {
+					suboptlen = *bp++;
+					len--;
+					ND_PRINT((ndo, "\n\t      "));
+					ND_PRINT((ndo, "instance#%u: ", suboptnumber));
+					if (suboptlen == 0) {
+						ND_PRINT((ndo, "ERROR: suboption length must be non-zero"));
+						bp += len;
+						len = 0;
+						break;
+					}
+					if (len < suboptlen) {
+						ND_PRINT((ndo, "ERROR: malformed option"));
+						bp += len;
+						len = 0;
+						break;
+					}
+					ND_PRINT((ndo, "\""));
+					if (fn_printn(ndo, bp, suboptlen, ndo->ndo_snapend)) {
+						ND_PRINT((ndo, "\""));
+						goto trunc;
+					}
+					ND_PRINT((ndo, "\""));
+					ND_PRINT((ndo, ", length %d", suboptlen));
+					suboptnumber++;
+					len -= suboptlen;
+					bp += suboptlen;
+				}
+				break;
+			    }
 
 			default:
 				ND_PRINT((ndo, "[unknown special tag %u, size %u]",
-				    tag, len));
+					  tag, len));
 				bp += len;
 				len = 0;
 				break;
@@ -998,7 +1038,7 @@ trunc:
 
 static void
 cmu_print(netdissect_options *ndo,
-          register const u_char *bp)
+	  register const u_char *bp)
 {
 	register const struct cmu_vend *cmu;
 

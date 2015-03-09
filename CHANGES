@@ -1,6 +1,12 @@
+Thursday Nov. 20, 2014 guy@alum.mit.edu
+  Summary for 5.0.0 tcpdump release
+	DCCP: update Packet Types with RFC4340/IANA names
+        fixes for CVE-2015-0261: IPv6 mobility header check issue
+        fixes for CVE-2015-XXXX: kday packets
+
 Friday Nov. 12, 2014 guy@alum.mit.edu
   Summary for 4.7.0 tcpdump release
-        changes to hex printing of CDP packets	
+        changes to hex printing of CDP packets
 	Fix PPI printing
 	Radius: update Packet Type Codes and Attribute Types with RFC/IANA names
 	Add a routine to print "text protocols", and add FTP/HTTP/SMTP/RTSP support.
@@ -10,6 +16,7 @@ Friday Nov. 12, 2014 guy@alum.mit.edu
 	new bounds checks for a number of protocols
 	split netflow 1,6, and 6 dissector up.
 	added geneve dissector
+        CVE-2014-9140 PPP dissector fixed.
 
 Tuesday  Sep.  2, 2014 mcr@sandelman.ca
   Summary for 4.6.2 tcpdump release
