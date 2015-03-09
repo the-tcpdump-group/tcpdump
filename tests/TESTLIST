@@ -269,14 +269,21 @@ dhcp-rfc3004	dhcp-rfc3004.pcap	dhcp-rfc3004-v.out	-t -v
 dhcp-rfc5859	dhcp-rfc5859.pcap	dhcp-rfc5859-v.out	-t -v
 
 # bad packets from Kevin Day
-# cve-2015-2155 -- failures in processing pcap header.
+# cve-2015-2155 -- futz testing on FORCES printer
 kday1           kday1.pcap              kday1.out       -t -v
+# cve-2015-2153 -- futz testing on TCP printer
 kday2           kday2.pcap              kday2.out       -t -v
+# cve-2015-2153 -- futz testing on TCP printer
 kday3           kday3.pcap              kday3.out       -t -v
+# cve-2015-2153 -- futz testing on TCP printer
 kday4           kday4.pcap              kday4.out       -t -v
+# cve-2015-2153 -- futz testing on TCP printer
 kday5           kday5.pcap              kday5.out       -t -v
+# cve-2015-2154 -- ethernet printer
 kday6           kday6.pcap              kday6.out       -t -v
+# cve-2015-2153 -- futz testing on TCP printer
 kday7           kday7.pcap              kday7.out       -t -v
+# cve-2015-2153 -- futz testing on TCP printer
 kday8           kday8.pcap              kday8.out       -t -v
 
 # bad packets from reversex86.
