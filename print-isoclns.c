@@ -2309,10 +2309,6 @@ isis_print(netdissect_options *ndo,
             length=pdu_len;
 	}
 
-        if(length > ndo->ndo_snaplen) {
-                goto trunc;
-        }
-
 	ND_TCHECK(*header_lsp);
 	ND_PRINT((ndo, "\n\t  lsp-id: %s, seq: 0x%08x, lifetime: %5us\n\t  chksum: 0x%04x",
                isis_print_id(header_lsp->lsp_id, LSP_ID_LEN),
@@ -3085,8 +3081,15 @@ osi_print_cksum(netdissect_options *ndo,
 {
         uint16_t calculated_checksum;
 
-        /* do not attempt to verify the checksum if it is zero */
-        if (!checksum || checksum_offset > length) {
+        /* do not attempt to verify the checksum if it is zero,
+         * if the total length is nonsense,
+         * if the offset is nonsense,
+         * or the base pointer is not sane
+         */
+        if (!checksum
+            || length > ndo->ndo_snaplen
+            || checksum_offset > ndo->ndo_snaplen
+            || checksum_offset > length) {
                 ND_PRINT((ndo, "(unverified)"));
         } else {
                 unsigned char *truncated = "trunc";
