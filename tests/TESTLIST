@@ -269,6 +269,7 @@ dhcp-rfc3004	dhcp-rfc3004.pcap	dhcp-rfc3004-v.out	-t -v
 dhcp-rfc5859	dhcp-rfc5859.pcap	dhcp-rfc5859-v.out	-t -v
 
 # bad packets from Kevin Day
+# cve-2015-2155 -- failures in processing pcap header.
 kday1           kday1.pcap              kday1.out       -t -v
 kday2           kday2.pcap              kday2.out       -t -v
 kday3           kday3.pcap              kday3.out       -t -v
