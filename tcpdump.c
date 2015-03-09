@@ -678,6 +678,7 @@ show_devices_and_exit (void)
 #define OPTION_VERSION		128
 #define OPTION_TSTAMP_PRECISION	129
 #define OPTION_IMMEDIATE_MODE	130
+#define OPTION_PRINT_BYTES	131
 
 static const struct option longopts[] = {
 #if defined(HAVE_PCAP_CREATE) || defined(WIN32)
@@ -717,7 +718,7 @@ static const struct option longopts[] = {
 #endif
 	{ "relinquish-privileges", required_argument, NULL, 'Z' },
 	{ "number", no_argument, NULL, '#' },
-	{ "print-bytes", required_argument, NULL, 'P' },
+	{ "print-bytes", required_argument, NULL, OPTION_PRINT_BYTES },
 	{ "version", no_argument, NULL, OPTION_VERSION },
 	{ NULL, 0, NULL, 0 }
 };
@@ -1276,7 +1277,7 @@ main(int argc, char **argv)
 			++pflag;
 			break;
 
-		case 'P':
+		case OPTION_PRINT_BYTES:
 			if ((colon=strchr(optarg,':')) == 0) {
 				error("bad syntax");
 			}
