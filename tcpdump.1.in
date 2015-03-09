@@ -570,7 +570,7 @@ if you suspect a bug in the optimizer.
 .TP
 .B \-\-print\-bytes " start:length"
 .PD
-Used in conjunction with \-XX to limit printing to payload data between \fIstart\fP end \fIend\fP bytes.
+Used in conjunction with \-X to limit printing to packet data beyond the link level header,  between \fIstart\fP end \fIend\fP bytes.
 .TP
 .B \-p
 .PD 0

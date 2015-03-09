@@ -2490,12 +2490,7 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 			/*
 			 * Include the link-layer header.
 			 */
-			if(ndo->ndo_print_bytes_flag) {
-				hex_and_ascii_print(ndo, "\n\t", sp + hdrlen + ndo->ndo_print_start,
-				    ndo->ndo_print_end);
-			} else {
-				hex_and_ascii_print(ndo, "\n\t", sp, h->caplen);
-			}
+			hex_and_ascii_print(ndo, "\n\t", sp, h->caplen);
 		} else {
 			/*
 			 * Don't include the link-layer header - and if
@@ -2503,8 +2498,13 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 			 * print nothing.
 			 */
 			if (h->caplen > hdrlen)
-				hex_and_ascii_print(ndo, "\n\t", sp + hdrlen,
-				    h->caplen - hdrlen);
+				if(ndo->ndo_print_bytes_flag) {
+					hex_and_ascii_print_with_offset(ndo, "\n\t", sp + hdrlen + ndo->ndo_print_start,
+				    	ndo->ndo_print_end-ndo->ndo_print_start,ndo->ndo_print_start);
+				} else {
+					hex_and_ascii_print(ndo, "\n\t", sp + hdrlen,
+				    	h->caplen - hdrlen);
+				}
 		}
 	} else if (ndo->ndo_xflag) {
 		/*
@@ -2679,7 +2679,7 @@ print_usage(void)
 "\t\t[ -i interface ]" j_FLAG_USAGE " [ -M secret ] [ --number ]\n");
 #ifdef HAVE_PCAP_SETDIRECTION
 	(void)fprintf(stderr,
-"\t\t[ --print-bytes proto[start:end] ] [ -Q in|out|inout ]\n");
+"\t\t[ --print-bytes start:end ] [ -Q in|out|inout ]\n");
 #endif
 	(void)fprintf(stderr,
 "\t\t[ -r file ] [ -s snaplen ] ");
