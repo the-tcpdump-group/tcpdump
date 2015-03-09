@@ -2501,7 +2501,7 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 			if (h->caplen > hdrlen)
 				if(ndo->ndo_print_bytes_flag) {
 					hex_and_ascii_print_with_offset(ndo, "\n\t", sp + hdrlen + ndo->ndo_print_start,
-				    	ndo->ndo_print_end-ndo->ndo_print_start,ndo->ndo_print_start);
+				    	ndo->ndo_print_end-ndo->ndo_print_start+1,ndo->ndo_print_start);
 				} else {
 					hex_and_ascii_print(ndo, "\n\t", sp + hdrlen,
 				    	h->caplen - hdrlen);

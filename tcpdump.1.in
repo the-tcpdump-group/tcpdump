@@ -568,9 +568,9 @@ Do not run the packet-matching code optimizer.
 This is useful only
 if you suspect a bug in the optimizer.
 .TP
-.B \-\-print\-bytes " start:length"
+.B \-\-print\-bytes " start:end"
 .PD
-Used in conjunction with \-X to limit printing to packet data beyond the link level header,  between \fIstart\fP end \fIend\fP bytes.
+Used in conjunction with \-X to limit printing to packet data beyond the link level header,  from \fIstart\fP to \fIend\fP bytes.
 .TP
 .B \-p
 .PD 0
