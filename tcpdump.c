@@ -193,22 +193,12 @@ static void info(int);
 static u_int packets_captured;
 
 struct printer {
-        if_printer f;
-	int type;
-};
-
-
-struct ndo_printer {
-        if_ndo_printer f;
+	if_printer f;
 	int type;
 };
 
 
 static const struct printer printers[] = {
-	{ NULL,			0 },
-};
-
-static const struct ndo_printer ndo_printers[] = {
 	{ ether_if_print,	DLT_EN10MB },
 #ifdef DLT_IPNET
 	{ ipnet_if_print,	DLT_IPNET },
@@ -408,19 +398,6 @@ lookup_printer(int type)
 		if (type == p->type)
 			return p->f;
 
-	return NULL;
-	/* NOTREACHED */
-}
-
-if_ndo_printer
-lookup_ndo_printer(int type)
-{
-	const struct ndo_printer *p;
-
-	for (p = ndo_printers; p->f; ++p)
-		if (type == p->type)
-			return p->f;
-
 #if defined(DLT_USER2) && defined(DLT_PKTAP)
 	/*
 	 * Apple incorrectly chose to use DLT_USER2 for their PKTAP
@@ -439,7 +416,7 @@ lookup_ndo_printer(int type)
 	 * that.
 	 */
 	if (type == DLT_USER2) {
-		for (p = ndo_printers; p->f; ++p)
+		for (p = printers; p->f; ++p)
 			if (DLT_PKTAP == p->type)
 				return p->f;
 	}
@@ -459,11 +436,7 @@ extern char *optarg;
 
 struct print_info {
         netdissect_options *ndo;
-        union {
-                if_printer     printer;
-                if_ndo_printer ndo_printer;
-        } p;
-        int ndo_type;
+        if_printer printer;
 };
 
 struct dump_info {
@@ -548,8 +521,7 @@ show_dlts_and_exit(const char *device, pcap_t *pd)
 			/*
 			 * OK, does tcpdump handle that type?
 			 */
-			if (lookup_printer(dlts[n_dlts]) == NULL
-                            && lookup_ndo_printer(dlts[n_dlts]) == NULL)
+			if (lookup_printer(dlts[n_dlts]) == NULL)
 				(void) fprintf(stderr, " (printing not supported)");
 			fprintf(stderr, "\n");
 		} else {
@@ -862,20 +834,15 @@ get_print_info(int type)
 {
 	struct print_info printinfo;
 
-	printinfo.ndo_type = 1;
 	printinfo.ndo = gndo;
-	printinfo.p.ndo_printer = lookup_ndo_printer(type);
-	if (printinfo.p.ndo_printer == NULL) {
-		printinfo.p.printer = lookup_printer(type);
-		printinfo.ndo_type = 0;
-		if (printinfo.p.printer == NULL) {
-			gndo->ndo_dltname = pcap_datalink_val_to_name(type);
-			if (gndo->ndo_dltname != NULL)
-				error("packet printing is not supported for link type %s: use -w",
-				      gndo->ndo_dltname);
-			else
-				error("packet printing is not supported for link type %d: use -w", type);
-		}
+	printinfo.printer = lookup_printer(type);
+	if (printinfo.printer == NULL) {
+		gndo->ndo_dltname = pcap_datalink_val_to_name(type);
+		if (gndo->ndo_dltname != NULL)
+			error("packet printing is not supported for link type %s: use -w",
+			      gndo->ndo_dltname);
+		else
+			error("packet printing is not supported for link type %d: use -w", type);
 	}
 	return (printinfo);
 }
@@ -2465,11 +2432,7 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	 */
 	ndo->ndo_snapend = sp + h->caplen;
 
-        if(print_info->ndo_type) {
-                hdrlen = (*print_info->p.ndo_printer)(print_info->ndo, h, sp);
-        } else {
-                hdrlen = (*print_info->p.printer)(h, sp);
-        }
+        hdrlen = (*print_info->printer)(print_info->ndo, h, sp);
 
 	/*
 	 * Restore the original snapend, as a printer might have

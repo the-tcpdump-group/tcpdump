@@ -99,8 +99,7 @@ pktap_if_print(netdissect_options *ndo,
 	uint32_t dlt, hdrlen, rectype;
 	u_int caplen = h->caplen;
 	u_int length = h->len;
-	if_ndo_printer ndo_printer;
-        if_printer printer;
+	if_printer printer;
 	pktap_header_t *hdr;
 
 	if (caplen < sizeof(pktap_header_t) || length < sizeof(pktap_header_t)) {
@@ -142,9 +141,7 @@ pktap_if_print(netdissect_options *ndo,
 
 	case PKT_REC_PACKET:
 		if ((printer = lookup_printer(dlt)) != NULL) {
-			printer(h, p);
-		} else if ((ndo_printer = lookup_ndo_printer(dlt)) != NULL) {
-			ndo_printer(ndo, h, p);
+			printer(ndo, h, p);
 		} else {
 			if (!ndo->ndo_eflag)
 				pktap_header_print(ndo, (u_char *)hdr,

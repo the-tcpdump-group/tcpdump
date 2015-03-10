@@ -205,7 +205,7 @@ static uint32_t f_localnet;
  *
  * NOTE: ap is *NOT* necessarily part of the packet data (not even if
  * this is being called with the "ipaddr_string()" macro), so you
- * *CANNOT* use the TCHECK{2}/TTEST{2} macros on it.  Furthermore,
+ * *CANNOT* use the ND_TCHECK{2}/ND_TTEST{2} macros on it.  Furthermore,
  * even in cases where it *is* part of the packet data, the caller
  * would still have to check for a null return value, even if it's
  * just printing the return value with "%s" - not all versions of
