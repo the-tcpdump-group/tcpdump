@@ -3090,7 +3090,7 @@ osi_print_cksum(netdissect_options *ndo,
             || length > ndo->ndo_snaplen
             || checksum_offset > ndo->ndo_snaplen
             || checksum_offset > length) {
-                ND_PRINT((ndo, "(unverified)"));
+                ND_PRINT((ndo, " (unverified)"));
         } else {
                 unsigned char *truncated = "trunc";
 #if 0
