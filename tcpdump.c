@@ -2187,9 +2187,6 @@ static void
 dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
 	struct dump_info *dump_info;
-#ifdef HAVE_CAPSICUM
-	cap_rights_t rights;
-#endif
 
 	++packets_captured;
 
