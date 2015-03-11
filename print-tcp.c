@@ -669,6 +669,9 @@ tcp_print(netdissect_options *ndo,
                 case PT_ZMTP1:
                         zmtp1_print(ndo, bp, length);
                         break;
+                case PT_REDIS:
+                        redis_print(ndo, bp, length);
+                        break;
                 }
                 return;
         }
@@ -680,6 +683,8 @@ tcp_print(netdissect_options *ndo,
                 smtp_print(ndo, bp, length);
         } else if (sport == BGP_PORT || dport == BGP_PORT)
                 bgp_print(ndo, bp, length);
+        else if (sport == REDIS_PORT || dport == REDIS_PORT)
+                redis_print(ndo, bp, length);
         else if (sport == PPTP_PORT || dport == PPTP_PORT)
                 pptp_print(ndo, bp);
 #ifdef TCPDUMP_DO_SMB

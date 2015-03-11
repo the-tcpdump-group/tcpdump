@@ -81,6 +81,7 @@ extern char *strsep(char **, const char *);
 #define PT_PGM		14	/* [UDP-encapsulated] Pragmatic General Multicast */
 #define PT_PGM_ZMTP1	15	/* ZMTP/1.0 inside PGM (native or UDP-encapsulated) */
 #define PT_LMP		16	/* Link Management Protocol */
+#define PT_REDIS	17	/* REDIS protocol */
 
 #define ESRC(ep) ((ep)->ether_shost)
 #define EDST(ep) ((ep)->ether_dhost)
