@@ -661,6 +661,7 @@ show_devices_and_exit (void)
 #define OPTION_VERSION		128
 #define OPTION_TSTAMP_PRECISION	129
 #define OPTION_IMMEDIATE_MODE	130
+#define OPTION_LIMIT_FILE_SIZE	131
 
 static const struct option longopts[] = {
 #if defined(HAVE_PCAP_CREATE) || defined(WIN32)
@@ -680,6 +681,7 @@ static const struct option longopts[] = {
 	{ "time-stamp-precision", required_argument, NULL, OPTION_TSTAMP_PRECISION},
 #endif
 	{ "dont-verify-checksums", no_argument, NULL, 'K' },
+	{ "limit-file-size", required_argument, NULL, OPTION_LIMIT_FILE_SIZE },
 	{ "list-data-link-types", no_argument, NULL, 'L' },
 	{ "no-optimize", no_argument, NULL, 'O' },
 	{ "no-promiscuous-mode", no_argument, NULL, 'p' },
@@ -781,6 +783,42 @@ getWflagChars(int x)
 	return c;
 }
 
+static long
+getFileSize(char *x)
+{
+	long c = 0;
+	char suffix;
+	char buff[32];
+	suffix = x[strlen(x)-1];
+	if (isdigit(suffix)) 
+		if(atol(x))
+			return atol(x);
+		else
+			error("invalid file size parameter");
+
+	strncpy(buff,x,min(strlen(x)-1,sizeof(buff)));
+	switch (toupper(suffix)) {
+
+		case 'K':
+			c=atol(x)*1024;
+			break;
+		case 'M':
+			c=atol(x)*1024*1024;
+			break;
+		case 'G':
+			c=atol(x)*1024*1024*1024;
+			break;
+		case 'T':
+			c=atol(x)*1024*1024*1024*1024;
+			break;
+		default:
+			error("invalid file size parameter: bad suffix");
+	}
+	if (c == 0) 
+		error("invalid file size parameter");
+
+	return c;
+}
 
 static void
 MakeFilename(char *buffer, char *orig_name, int cnt, int max_chars)
@@ -1011,6 +1049,7 @@ main(int argc, char **argv)
 	gndo->ndo_warning=ndo_warning;
 	gndo->ndo_snaplen = DEFAULT_SNAPLEN;
 	gndo->ndo_immediate = 0;
+	gndo->ndo_limit_file_size = 0;
 
 	cnt = -1;
 	device = NULL;
@@ -1423,6 +1462,9 @@ main(int argc, char **argv)
 			gndo->ndo_immediate = 1;
 			break;
 #endif
+		case OPTION_LIMIT_FILE_SIZE:
+			gndo->ndo_limit_file_size = getFileSize(optarg);
+			break;
 
 		default:
 			print_usage();
@@ -1864,7 +1906,7 @@ main(int argc, char **argv)
 #ifdef HAVE_CAPSICUM
 		set_dumper_capsicum_rights(p);
 #endif
-		if (Cflag != 0 || Gflag != 0) {
+		if (Cflag != 0 || Gflag != 0 || gndo->ndo_limit_file_size != 0) {
 #ifdef HAVE_CAPSICUM
 			dumpinfo.WFileName = strdup(basename(WFileName));
 			dumpinfo.dirfd = open(dirname(WFileName),
@@ -2373,6 +2415,32 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 		}
 	}
 
+	if (gndo->ndo_limit_file_size != 0) {
+		long size = pcap_dump_ftell(dump_info->p);
+
+		if (size == -1)
+			error("ftell fails on output file");
+
+		if (size > gndo->ndo_limit_file_size) {
+			/* 
+			 * Close the current file
+			 */
+			pcap_dump_close(dump_info->p);
+
+			/*
+			 * Compress the file we just closed, if the user
+			 * asked for it.
+			 */
+			if (zflag != NULL)
+				compress_savefile(dump_info->CurrentFileName);
+
+			/* 
+			 * Reached the file size limit, so exit
+			 */
+			exit(0);
+		}
+	}
+
 	pcap_dump((u_char *)dump_info->p, h, sp);
 #ifdef HAVE_PCAP_DUMP_FLUSH
 	if (Uflag)
@@ -2625,7 +2693,9 @@ print_usage(void)
 	(void)fprintf(stderr,
 "\t\t[ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]\n");
 	(void)fprintf(stderr,
-"\t\t[ -i interface ]" j_FLAG_USAGE " [ -M secret ] [ --number ]\n");
+"\t\t[ -i interface ]" j_FLAG_USAGE " [ --limit-file-size max_size ]\n");
+	(void)fprintf(stderr,
+"\t\t[ -M secret ] [ --number ]\n");
 #ifdef HAVE_PCAP_SETDIRECTION
 	(void)fprintf(stderr,
 "\t\t[ -Q in|out|inout ]\n");
