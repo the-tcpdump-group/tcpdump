@@ -82,11 +82,6 @@ static const unsigned ip6m_hdrlen[IP6M_MAX + 1] = {
 	IP6M_MINLEN + 16, /* IP6M_BINDING_ERROR    */
 };
 
-/* XXX: unused */
-#define IP6MOPT_BU_MINLEN	10
-#define IP6MOPT_BA_MINLEN	13
-#define IP6MOPT_BR_MINLEN	2
-
 /* Mobility Header Options */
 #define IP6MOPT_MINLEN		2
 #define IP6MOPT_PAD1          0x0	/* Pad1 */
