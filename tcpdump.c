@@ -661,6 +661,7 @@ show_devices_and_exit (void)
 #define OPTION_VERSION		128
 #define OPTION_TSTAMP_PRECISION	129
 #define OPTION_IMMEDIATE_MODE	130
+#define OPTION_PRINT_BYTES	131
 
 static const struct option longopts[] = {
 #if defined(HAVE_PCAP_CREATE) || defined(WIN32)
@@ -700,6 +701,7 @@ static const struct option longopts[] = {
 #endif
 	{ "relinquish-privileges", required_argument, NULL, 'Z' },
 	{ "number", no_argument, NULL, '#' },
+	{ "print-bytes", required_argument, NULL, OPTION_PRINT_BYTES },
 	{ "version", no_argument, NULL, OPTION_VERSION },
 	{ NULL, 0, NULL, 0 }
 };
@@ -986,6 +988,7 @@ main(int argc, char **argv)
 	char *chroot_dir = NULL;
 	char *ret = NULL;
 	char *end;
+	char *colon;
 #ifdef HAVE_PCAP_FINDALLDEVS
 	pcap_if_t *devpointer;
 	int devnum;
@@ -1011,6 +1014,7 @@ main(int argc, char **argv)
 	gndo->ndo_warning=ndo_warning;
 	gndo->ndo_snaplen = DEFAULT_SNAPLEN;
 	gndo->ndo_immediate = 0;
+	gndo->ndo_print_bytes_flag=0;
 
 	cnt = -1;
 	device = NULL;
@@ -1250,6 +1254,21 @@ main(int argc, char **argv)
 
 		case 'p':
 			++pflag;
+			break;
+
+		case OPTION_PRINT_BYTES:
+			if ((colon=strchr(optarg,':')) == 0) {
+				error("bad syntax");
+			}
+			gndo->ndo_print_start = strtol(optarg, &end, 0);
+			gndo->ndo_print_end = strtol(colon+1, &end, 0);
+			if (gndo->ndo_print_start < 0 || 
+			    gndo->ndo_print_end   > IP_MAXPACKET || 
+			    gndo->ndo_print_start > gndo->ndo_print_end) {
+				error("bad syntax");
+			}
+			gndo->ndo_print_bytes_flag=1;
+
 			break;
 
 		case 'q':
@@ -2452,8 +2471,13 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 			 * print nothing.
 			 */
 			if (h->caplen > hdrlen)
-				hex_and_ascii_print(ndo, "\n\t", sp + hdrlen,
-				    h->caplen - hdrlen);
+				if(ndo->ndo_print_bytes_flag) {
+					hex_and_ascii_print_with_offset(ndo, "\n\t", sp + hdrlen + ndo->ndo_print_start,
+				    	ndo->ndo_print_end-ndo->ndo_print_start+1,ndo->ndo_print_start);
+				} else {
+					hex_and_ascii_print(ndo, "\n\t", sp + hdrlen,
+				    	h->caplen - hdrlen);
+				}
 		}
 	} else if (ndo->ndo_xflag) {
 		/*
@@ -2628,7 +2652,7 @@ print_usage(void)
 "\t\t[ -i interface ]" j_FLAG_USAGE " [ -M secret ] [ --number ]\n");
 #ifdef HAVE_PCAP_SETDIRECTION
 	(void)fprintf(stderr,
-"\t\t[ -Q in|out|inout ]\n");
+"\t\t[ --print-bytes start:end ] [ -Q in|out|inout ]\n");
 #endif
 	(void)fprintf(stderr,
 "\t\t[ -r file ] [ -s snaplen ] ");
