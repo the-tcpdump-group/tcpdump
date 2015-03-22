@@ -35,7 +35,6 @@
  *	@(#)in_cksum.c	8.1 (Berkeley) 6/10/93
  */
 
-#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif

@@ -18,7 +18,6 @@
  * Original code by Carles Kishimoto <carles.kishimoto@gmail.com>
  */
 
-#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

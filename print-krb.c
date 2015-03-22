@@ -21,7 +21,6 @@
  * Initial contribution from John Hawkinson (jhawk@mit.edu).
  */
 
-#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

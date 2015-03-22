@@ -21,7 +21,6 @@
  * From: NetBSD: print-arcnet.c,v 1.2 2000/04/24 13:02:28 itojun Exp
  */
 
-#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

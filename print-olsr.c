@@ -19,7 +19,6 @@
  * IPv6 additions by Florian Forster <octo at verplant.org>
  */
 
-#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

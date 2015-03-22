@@ -15,7 +15,6 @@
  * Original code by Hannes Gredler (hannes@juniper.net)
  */
 
-#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

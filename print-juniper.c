@@ -20,7 +20,6 @@
 __RCSID("NetBSD: print-juniper.c,v 1.3 2007/07/25 06:31:32 dogcow Exp ");
 #endif
 
-#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

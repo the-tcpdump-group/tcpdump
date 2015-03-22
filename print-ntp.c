@@ -23,7 +23,6 @@
  *	loosely based on print-bootp.c
  */
 
-#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
