@@ -2537,12 +2537,6 @@ ndo_default_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	hex_and_ascii_print(ndo, "\n\t", bp, length); /* pass on lf and indentation string */
 }
 
-void
-default_print(const u_char *bp, u_int length)
-{
-	ndo_default_print(gndo, bp, length);
-}
-
 #ifdef SIGNAL_REQ_INFO
 RETSIGTYPE requestinfo(int signo _U_)
 {
