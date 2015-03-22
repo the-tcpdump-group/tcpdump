@@ -1220,7 +1220,7 @@ main(int argc, char **argv)
 			if (smiLoadModule(optarg) == 0) {
 				error("could not load MIB module %s", optarg);
 			}
-			sflag = 1;
+			gndo->ndo_sflag = 1;
 #else
 			(void)fprintf(stderr, "%s: ignoring option `-m %s' ",
 				      program_name, optarg);
@@ -1958,7 +1958,7 @@ main(int argc, char **argv)
 #endif /* WIN32 */
 
 #ifdef HAVE_CAPSICUM
-	cansandbox = (nflag && VFileName == NULL && zflag == NULL);
+	cansandbox = (gndo->ndo_nflag && VFileName == NULL && zflag == NULL);
 	if (cansandbox && cap_enter() < 0 && errno != ENOSYS)
 		error("unable to enter the capability mode");
 	if (cap_sandboxed())
