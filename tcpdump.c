@@ -513,7 +513,7 @@ show_tstamp_types_and_exit(const char *device, pcap_t *pd)
 static void
 show_dlts_and_exit(const char *device, pcap_t *pd)
 {
-	int n_dlts;
+	int n_dlts, i;
 	int *dlts = 0;
 	const char *dlt_name;
 
@@ -539,22 +539,22 @@ show_dlts_and_exit(const char *device, pcap_t *pd)
 		(void) fprintf(stderr, "Data link types for %s (use option -y to set):\n",
 		    device);
 
-	while (--n_dlts >= 0) {
-		dlt_name = pcap_datalink_val_to_name(dlts[n_dlts]);
+	for (i = 0; i < n_dlts; i++) {
+		dlt_name = pcap_datalink_val_to_name(dlts[i]);
 		if (dlt_name != NULL) {
 			(void) fprintf(stderr, "  %s (%s)", dlt_name,
-			    pcap_datalink_val_to_description(dlts[n_dlts]));
+			    pcap_datalink_val_to_description(dlts[i]));
 
 			/*
 			 * OK, does tcpdump handle that type?
 			 */
-			if (lookup_printer(dlts[n_dlts]) == NULL
-                            && lookup_ndo_printer(dlts[n_dlts]) == NULL)
+			if (lookup_printer(dlts[i]) == NULL
+                            && lookup_ndo_printer(dlts[i]) == NULL)
 				(void) fprintf(stderr, " (printing not supported)");
 			fprintf(stderr, "\n");
 		} else {
 			(void) fprintf(stderr, "  DLT %d (printing not supported)\n",
-			    dlts[n_dlts]);
+			    dlts[i]);
 		}
 	}
 #ifdef HAVE_PCAP_FREE_DATALINKS
