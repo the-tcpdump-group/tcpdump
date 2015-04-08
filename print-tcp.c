@@ -63,6 +63,8 @@ static int tcp_verify_signature(netdissect_options *ndo,
 #endif
 
 static void print_tcp_rst_data(netdissect_options *, register const u_char *sp, u_int length);
+static void print_tcp_fastopen_option(netdissect_options *ndo, register const u_char *cp,
+                                      u_int datalen, int exp);
 
 #define MAX_RST_DATA_LEN	30
 
@@ -134,6 +136,7 @@ static const struct tok tcp_option_values[] = {
         { TCPOPT_AUTH, "enhanced auth" },
         { TCPOPT_UTO, "uto" },
         { TCPOPT_MPTCP, "mptcp" },
+        { TCPOPT_FASTOPEN, "tfo" },
         { TCPOPT_EXPERIMENT2, "exp" },
         { 0, NULL }
 };
@@ -583,6 +586,12 @@ tcp_print(netdissect_options *ndo,
                                         goto bad;
                                 break;
 
+                        case TCPOPT_FASTOPEN:
+                                datalen = len - 2;
+                                LENCHECK(datalen);
+                                print_tcp_fastopen_option(ndo, cp, datalen, FALSE);
+                                break;
+
                         case TCPOPT_EXPERIMENT2:
                                 datalen = len - 2;
                                 LENCHECK(datalen);
@@ -594,21 +603,8 @@ tcp_print(netdissect_options *ndo,
 
                                 switch(magic) {
 
-                                case 0xf989:
-                                        /* TCP Fast Open: RFC 7413 */
-                                        if (datalen == 2) {
-                                                /* Fast Open Cookie Request */
-                                                ND_PRINT((ndo, "tfo cookiereq"));
-                                        } else {
-                                                /* Fast Open Cookie */
-                                                if (datalen % 2 != 0 || datalen < 6 || datalen > 18) {
-                                                        ND_PRINT((ndo, "tfo malformed"));
-                                                } else {
-                                                        ND_PRINT((ndo, "tfo cookie "));
-                                                        for (i = 2; i < datalen; ++i)
-                                                                ND_PRINT((ndo, "%02x", cp[i]));
-                                                }
-                                        }
+                                case 0xf989: /* TCP Fast Open RFC 7413 */
+                                        print_tcp_fastopen_option(ndo, cp + 2, datalen - 2, TRUE);
                                         break;
 
                                 default:
@@ -794,6 +790,30 @@ print_tcp_rst_data(netdissect_options *ndo,
                 safeputchar(ndo, c);
         }
         ND_PRINT((ndo, "]"));
+}
+
+static void
+print_tcp_fastopen_option(netdissect_options *ndo, register const u_char *cp,
+                          u_int datalen, int exp)
+{
+        u_int i;
+
+        if (exp)
+                ND_PRINT((ndo, "tfo"));
+
+        if (datalen == 0) {
+                /* Fast Open Cookie Request */
+                ND_PRINT((ndo, " cookiereq"));
+        } else {
+                /* Fast Open Cookie */
+                if (datalen % 2 != 0 || datalen < 4 || datalen > 16) {
+                        ND_PRINT((ndo, " malformed"));
+                } else {
+                        ND_PRINT((ndo, " cookie "));
+                        for (i = 0; i < datalen; ++i)
+                                ND_PRINT((ndo, "%02x", cp[i]));
+                }
+        }
 }
 
 #ifdef HAVE_LIBCRYPTO
