@@ -289,9 +289,8 @@ rpki_rtr_pdu_print (netdissect_options *ndo, const u_char *tptr, u_int indent)
 	    }
 	    ND_TCHECK2(*tptr, text_length);
 	    if (text_length && (text_length <= tlen )) {
-		memcpy(buf, tptr, min(sizeof(buf)-1, text_length));
-		buf[min(sizeof(buf) - 1, text_length)] = '\0';
-		ND_PRINT((ndo, "%sError text: %s", indent_string(indent+2), buf));
+		ND_PRINT((ndo, "%sError text: ", indent_string(indent+2)));
+		fn_printn(ndo, buf, text_length, ndo->ndo_snapend);
 	    }
 	}
 	break;

@@ -30,14 +30,6 @@ IP (tos 0x0, ttl 64, id 36752, offset 0, flags [DF], proto TCP (6), length 399, 
 	  0x0030:  afc4 39a4 0db9 7aa5 6873 33e8
 	RPKI-RTRv65, Error Report PDU (10), length: 66
 	  Error code: Unknown (66), Encapsulated PDU length: 80
-	  Error text: ¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹Ã¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹¹
-
-
-
-
-
-
-
-
+	  Error text: 
 	[|RPKI-RTR]
 EXIT CODE 00000100
