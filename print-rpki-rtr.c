@@ -251,7 +251,6 @@ rpki_rtr_pdu_print (netdissect_options *ndo, const u_char *tptr, u_int indent)
 	{
 	    rpki_rtr_pdu_error_report *pdu;
 	    u_int encapsulated_pdu_length, text_length, tlen, error_code;
-	    u_char buf[80];
 
 	    pdu = (rpki_rtr_pdu_error_report *)tptr;
 	    encapsulated_pdu_length = EXTRACT_32BITS(pdu->encapsulated_pdu_length);
@@ -291,7 +290,7 @@ rpki_rtr_pdu_print (netdissect_options *ndo, const u_char *tptr, u_int indent)
 	    ND_TCHECK2(*tptr, text_length);
 	    if (text_length && (text_length <= tlen )) {
 		ND_PRINT((ndo, "%sError text: ", indent_string(indent+2)));
-		fn_printn(ndo, buf, text_length, ndo->ndo_snapend);
+		fn_printn(ndo, tptr, text_length, ndo->ndo_snapend);
 	    }
 	}
 	break;
