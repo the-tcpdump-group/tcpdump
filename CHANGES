@@ -1,3 +1,9 @@
+Monday April 10, 2015 guy@alum.mit.edu
+  Summary for 4.7.4 tcpdump release
+	RPKI to Router Protocol: Fix Segmentation Faults and other problems
+	RPKI to Router Protocol: print strings with fn_printn()
+	wb: fix some bounds checks
+
 Monday March. 11, 2015 mcr@sandelman.ca
   Summary for 4.7.3 tcpdump release
 	Capsicum fixes for FreeBSD 10
