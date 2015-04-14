@@ -1,6 +1,6 @@
 Tuesday April 14, 2015 guy@alum.mit.edu
   Summary for 4.8.0 tcpdump release
-	Fix "-x" for Apple DLT_PKTAP packets
+	Fix "-x" for Apple PKTAP and PPI packets
 
 Friday April 10, 2015 guy@alum.mit.edu
   Summary for 4.7.4 tcpdump release
