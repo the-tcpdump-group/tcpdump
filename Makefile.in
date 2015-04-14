@@ -236,7 +236,6 @@ HDR = \
 	ah.h \
 	appletalk.h \
 	atm.h \
-	atmuni31.h \
 	chdlc.h \
 	cpack.h \
 	ether.h \
