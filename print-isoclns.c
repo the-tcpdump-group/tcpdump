@@ -3092,14 +3092,18 @@ osi_print_cksum(netdissect_options *ndo,
                 ND_PRINT((ndo, " (unverified)"));
         } else {
                 const char *truncated = "trunc";
-                //printf("\nosi_print_cksum: %p %u %u %u\n", pptr, checksum_offset, length, ndo->ndo_snaplen);
-                //ND_TCHECK2(pptr, checksum_offset+length);
+#if 0
+                printf("\nosi_print_cksum: %p %u %u %u\n", pptr, checksum_offset, length, ndo->ndo_snaplen);
+                ND_TCHECK2(pptr, checksum_offset+length);
+#endif
                 calculated_checksum = create_osi_cksum(pptr, checksum_offset, length);
                 if (checksum == calculated_checksum) {
                         ND_PRINT((ndo, " (correct)"));
                 } else {
                         truncated = "incorrect";
-                        //trunc:
+#if 0
+                        trunc:
+#endif
                         ND_PRINT((ndo, " (%s should be 0x%04x)", truncated, calculated_checksum));
                 }
         }
