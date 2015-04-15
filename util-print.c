@@ -53,6 +53,8 @@
 
 #include "interface.h"
 
+int32_t thiszone;		/* seconds offset from gmt to local time */
+
 /*
  * Print out a null-terminated filename (or other ascii string).
  * If ep is NULL, assume no truncation check is needed.
