@@ -44,8 +44,11 @@
 #define	IEEE802_11_BSSID_LEN		6
 #define	IEEE802_11_RA_LEN		6
 #define	IEEE802_11_TA_LEN		6
+#define	IEEE802_11_ADDR1_LEN		6
 #define	IEEE802_11_SEQ_LEN		2
 #define	IEEE802_11_CTL_LEN		2
+#define	IEEE802_11_CARRIED_FC_LEN	2
+#define	IEEE802_11_HT_CONTROL_LEN	4
 #define	IEEE802_11_IV_LEN		3
 #define	IEEE802_11_KID_LEN		1
 
@@ -291,85 +294,90 @@ struct mgmt_body_t {
 	struct tim_t	tim;
 };
 
-struct ctrl_rts_t {
+struct ctrl_control_wrapper_hdr_t {
+	uint16_t	fc;
+	uint16_t	duration;
+	uint8_t		addr1[6];
+	uint16_t	carried_fc[2];
+	uint16_t	ht_control[4];
+};
+
+#define	CTRL_CONTROL_WRAPPER_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
+					 IEEE802_11_ADDR1_LEN+\
+					 IEEE802_11_CARRIED_FC_LEN+\
+					 IEEE802_11_HT_CONTROL_LEN)
+
+struct ctrl_rts_hdr_t {
 	uint16_t	fc;
 	uint16_t	duration;
 	uint8_t		ra[6];
 	uint8_t		ta[6];
-	uint8_t		fcs[4];
 };
 
 #define	CTRL_RTS_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
 			 IEEE802_11_RA_LEN+IEEE802_11_TA_LEN)
 
-struct ctrl_cts_t {
+struct ctrl_cts_hdr_t {
 	uint16_t	fc;
 	uint16_t	duration;
 	uint8_t		ra[6];
-	uint8_t		fcs[4];
 };
 
 #define	CTRL_CTS_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+IEEE802_11_RA_LEN)
 
-struct ctrl_ack_t {
+struct ctrl_ack_hdr_t {
 	uint16_t	fc;
 	uint16_t	duration;
 	uint8_t		ra[6];
-	uint8_t		fcs[4];
 };
 
 #define	CTRL_ACK_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+IEEE802_11_RA_LEN)
 
-struct ctrl_ps_poll_t {
+struct ctrl_ps_poll_hdr_t {
 	uint16_t	fc;
 	uint16_t	aid;
 	uint8_t		bssid[6];
 	uint8_t		ta[6];
-	uint8_t		fcs[4];
 };
 
 #define	CTRL_PS_POLL_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_AID_LEN+\
 				 IEEE802_11_BSSID_LEN+IEEE802_11_TA_LEN)
 
-struct ctrl_end_t {
+struct ctrl_end_hdr_t {
 	uint16_t	fc;
 	uint16_t	duration;
 	uint8_t		ra[6];
 	uint8_t		bssid[6];
-	uint8_t		fcs[4];
 };
 
 #define	CTRL_END_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
 			 IEEE802_11_RA_LEN+IEEE802_11_BSSID_LEN)
 
-struct ctrl_end_ack_t {
+struct ctrl_end_ack_hdr_t {
 	uint16_t	fc;
 	uint16_t	duration;
 	uint8_t		ra[6];
 	uint8_t		bssid[6];
-	uint8_t		fcs[4];
 };
 
 #define	CTRL_END_ACK_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
 				 IEEE802_11_RA_LEN+IEEE802_11_BSSID_LEN)
 
-struct ctrl_ba_t {
+struct ctrl_ba_hdr_t {
 	uint16_t	fc;
 	uint16_t	duration;
 	uint8_t		ra[6];
-	uint8_t		fcs[4];
 };
 
 #define	CTRL_BA_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+IEEE802_11_RA_LEN)
 
-struct ctrl_bar_t {
+struct ctrl_bar_hdr_t {
 	uint16_t	fc;
 	uint16_t	dur;
 	uint8_t		ra[6];
 	uint8_t		ta[6];
 	uint16_t	ctl;
 	uint16_t	seq;
-	uint8_t		fcs[4];
 };
 
 #define	CTRL_BAR_HDRLEN		(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
@@ -1984,58 +1992,58 @@ ctrl_body_print(netdissect_options *ndo,
 			return 0;
 		if (!ndo->ndo_eflag)
 			ND_PRINT((ndo, " RA:%s TA:%s CTL(%x) SEQ(%u) ",
-			    etheraddr_string(ndo, ((const struct ctrl_bar_t *)p)->ra),
-			    etheraddr_string(ndo, ((const struct ctrl_bar_t *)p)->ta),
-			    EXTRACT_LE_16BITS(&(((const struct ctrl_bar_t *)p)->ctl)),
-			    EXTRACT_LE_16BITS(&(((const struct ctrl_bar_t *)p)->seq))));
+			    etheraddr_string(ndo, ((const struct ctrl_bar_hdr_t *)p)->ra),
+			    etheraddr_string(ndo, ((const struct ctrl_bar_hdr_t *)p)->ta),
+			    EXTRACT_LE_16BITS(&(((const struct ctrl_bar_hdr_t *)p)->ctl)),
+			    EXTRACT_LE_16BITS(&(((const struct ctrl_bar_hdr_t *)p)->seq))));
 		break;
 	case CTRL_BA:
 		if (!ND_TTEST2(*p, CTRL_BA_HDRLEN))
 			return 0;
 		if (!ndo->ndo_eflag)
 			ND_PRINT((ndo, " RA:%s ",
-			    etheraddr_string(ndo, ((const struct ctrl_ba_t *)p)->ra)));
+			    etheraddr_string(ndo, ((const struct ctrl_ba_hdr_t *)p)->ra)));
 		break;
 	case CTRL_PS_POLL:
 		if (!ND_TTEST2(*p, CTRL_PS_POLL_HDRLEN))
 			return 0;
 		ND_PRINT((ndo, " AID(%x)",
-		    EXTRACT_LE_16BITS(&(((const struct ctrl_ps_poll_t *)p)->aid))));
+		    EXTRACT_LE_16BITS(&(((const struct ctrl_ps_poll_hdr_t *)p)->aid))));
 		break;
 	case CTRL_RTS:
 		if (!ND_TTEST2(*p, CTRL_RTS_HDRLEN))
 			return 0;
 		if (!ndo->ndo_eflag)
 			ND_PRINT((ndo, " TA:%s ",
-			    etheraddr_string(ndo, ((const struct ctrl_rts_t *)p)->ta)));
+			    etheraddr_string(ndo, ((const struct ctrl_rts_hdr_t *)p)->ta)));
 		break;
 	case CTRL_CTS:
 		if (!ND_TTEST2(*p, CTRL_CTS_HDRLEN))
 			return 0;
 		if (!ndo->ndo_eflag)
 			ND_PRINT((ndo, " RA:%s ",
-			    etheraddr_string(ndo, ((const struct ctrl_cts_t *)p)->ra)));
+			    etheraddr_string(ndo, ((const struct ctrl_cts_hdr_t *)p)->ra)));
 		break;
 	case CTRL_ACK:
 		if (!ND_TTEST2(*p, CTRL_ACK_HDRLEN))
 			return 0;
 		if (!ndo->ndo_eflag)
 			ND_PRINT((ndo, " RA:%s ",
-			    etheraddr_string(ndo, ((const struct ctrl_ack_t *)p)->ra)));
+			    etheraddr_string(ndo, ((const struct ctrl_ack_hdr_t *)p)->ra)));
 		break;
 	case CTRL_CF_END:
 		if (!ND_TTEST2(*p, CTRL_END_HDRLEN))
 			return 0;
 		if (!ndo->ndo_eflag)
 			ND_PRINT((ndo, " RA:%s ",
-			    etheraddr_string(ndo, ((const struct ctrl_end_t *)p)->ra)));
+			    etheraddr_string(ndo, ((const struct ctrl_end_hdr_t *)p)->ra)));
 		break;
 	case CTRL_END_ACK:
 		if (!ND_TTEST2(*p, CTRL_END_ACK_HDRLEN))
 			return 0;
 		if (!ndo->ndo_eflag)
 			ND_PRINT((ndo, " RA:%s ",
-			    etheraddr_string(ndo, ((const struct ctrl_end_ack_t *)p)->ra)));
+			    etheraddr_string(ndo, ((const struct ctrl_end_ack_hdr_t *)p)->ra)));
 		break;
 	}
 	return 1;
@@ -2165,42 +2173,42 @@ ctrl_header_print(netdissect_options *ndo,
 	switch (FC_SUBTYPE(fc)) {
 	case CTRL_BAR:
 		ND_PRINT((ndo, " RA:%s TA:%s CTL(%x) SEQ(%u) ",
-		    etheraddr_string(ndo, ((const struct ctrl_bar_t *)p)->ra),
-		    etheraddr_string(ndo, ((const struct ctrl_bar_t *)p)->ta),
-		    EXTRACT_LE_16BITS(&(((const struct ctrl_bar_t *)p)->ctl)),
-		    EXTRACT_LE_16BITS(&(((const struct ctrl_bar_t *)p)->seq))));
+		    etheraddr_string(ndo, ((const struct ctrl_bar_hdr_t *)p)->ra),
+		    etheraddr_string(ndo, ((const struct ctrl_bar_hdr_t *)p)->ta),
+		    EXTRACT_LE_16BITS(&(((const struct ctrl_bar_hdr_t *)p)->ctl)),
+		    EXTRACT_LE_16BITS(&(((const struct ctrl_bar_hdr_t *)p)->seq))));
 		break;
 	case CTRL_BA:
 		ND_PRINT((ndo, "RA:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_ba_t *)p)->ra)));
+		    etheraddr_string(ndo, ((const struct ctrl_ba_hdr_t *)p)->ra)));
 		break;
 	case CTRL_PS_POLL:
 		ND_PRINT((ndo, "BSSID:%s TA:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_ps_poll_t *)p)->bssid),
-		    etheraddr_string(ndo, ((const struct ctrl_ps_poll_t *)p)->ta)));
+		    etheraddr_string(ndo, ((const struct ctrl_ps_poll_hdr_t *)p)->bssid),
+		    etheraddr_string(ndo, ((const struct ctrl_ps_poll_hdr_t *)p)->ta)));
 		break;
 	case CTRL_RTS:
 		ND_PRINT((ndo, "RA:%s TA:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_rts_t *)p)->ra),
-		    etheraddr_string(ndo, ((const struct ctrl_rts_t *)p)->ta)));
+		    etheraddr_string(ndo, ((const struct ctrl_rts_hdr_t *)p)->ra),
+		    etheraddr_string(ndo, ((const struct ctrl_rts_hdr_t *)p)->ta)));
 		break;
 	case CTRL_CTS:
 		ND_PRINT((ndo, "RA:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_cts_t *)p)->ra)));
+		    etheraddr_string(ndo, ((const struct ctrl_cts_hdr_t *)p)->ra)));
 		break;
 	case CTRL_ACK:
 		ND_PRINT((ndo, "RA:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_ack_t *)p)->ra)));
+		    etheraddr_string(ndo, ((const struct ctrl_ack_hdr_t *)p)->ra)));
 		break;
 	case CTRL_CF_END:
 		ND_PRINT((ndo, "RA:%s BSSID:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_end_t *)p)->ra),
-		    etheraddr_string(ndo, ((const struct ctrl_end_t *)p)->bssid)));
+		    etheraddr_string(ndo, ((const struct ctrl_end_hdr_t *)p)->ra),
+		    etheraddr_string(ndo, ((const struct ctrl_end_hdr_t *)p)->bssid)));
 		break;
 	case CTRL_END_ACK:
 		ND_PRINT((ndo, "RA:%s BSSID:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_end_ack_t *)p)->ra),
-		    etheraddr_string(ndo, ((const struct ctrl_end_ack_t *)p)->bssid)));
+		    etheraddr_string(ndo, ((const struct ctrl_end_ack_hdr_t *)p)->ra),
+		    etheraddr_string(ndo, ((const struct ctrl_end_ack_hdr_t *)p)->bssid)));
 		break;
 	default:
 		ND_PRINT((ndo, "(H) Unknown Ctrl Subtype"));
@@ -2219,8 +2227,12 @@ extract_header_length(netdissect_options *ndo,
 		return MGMT_HDRLEN;
 	case T_CTRL:
 		switch (FC_SUBTYPE(fc)) {
+		case CTRL_CONTROL_WRAPPER:
+			return CTRL_CONTROL_WRAPPER_HDRLEN;
 		case CTRL_BAR:
 			return CTRL_BAR_HDRLEN;
+		case CTRL_BA:
+			return CTRL_BA_HDRLEN;
 		case CTRL_PS_POLL:
 			return CTRL_PS_POLL_HDRLEN;
 		case CTRL_RTS:
