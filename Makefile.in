@@ -70,7 +70,7 @@ DEPENDENCY_CFLAG = @DEPENDENCY_CFLAG@
 	@rm -f $@
 	$(CC) $(FULL_CFLAGS) -c $(srcdir)/$*.c
 
-CSRC =	setsignal.c tcpdump.c
+CSRC =	setsignal.c tcpdump.c util.c
 
 LIBNETDISSECT_SRC=\
 	addrtoname.c \
@@ -215,7 +215,7 @@ LIBNETDISSECT_SRC=\
 	print-zephyr.c \
 	print-zeromq.c \
 	signature.c \
-	util.c
+	util-print.c
 
 LOCALSRC = @LOCALSRC@
 GENSRC = version.c
