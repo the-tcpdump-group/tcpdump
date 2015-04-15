@@ -174,9 +174,9 @@ static const struct tok ctrl_str[] = {
 struct mgmt_header_t {
 	uint16_t	fc;
 	uint16_t 	duration;
-	uint8_t		da[6];
-	uint8_t		sa[6];
-	uint8_t		bssid[6];
+	uint8_t		da[IEEE802_11_DA_LEN];
+	uint8_t		sa[IEEE802_11_SA_LEN];
+	uint8_t		bssid[IEEE802_11_BSSID_LEN];
 	uint16_t	seq_ctrl;
 };
 
@@ -297,9 +297,9 @@ struct mgmt_body_t {
 struct ctrl_control_wrapper_hdr_t {
 	uint16_t	fc;
 	uint16_t	duration;
-	uint8_t		addr1[6];
-	uint16_t	carried_fc[2];
-	uint16_t	ht_control[4];
+	uint8_t		addr1[IEEE802_11_ADDR1_LEN];
+	uint16_t	carried_fc[IEEE802_11_CARRIED_FC_LEN];
+	uint16_t	ht_control[IEEE802_11_HT_CONTROL_LEN];
 };
 
 #define	CTRL_CONTROL_WRAPPER_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
@@ -310,8 +310,8 @@ struct ctrl_control_wrapper_hdr_t {
 struct ctrl_rts_hdr_t {
 	uint16_t	fc;
 	uint16_t	duration;
-	uint8_t		ra[6];
-	uint8_t		ta[6];
+	uint8_t		ra[IEEE802_11_RA_LEN];
+	uint8_t		ta[IEEE802_11_TA_LEN];
 };
 
 #define	CTRL_RTS_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
@@ -320,7 +320,7 @@ struct ctrl_rts_hdr_t {
 struct ctrl_cts_hdr_t {
 	uint16_t	fc;
 	uint16_t	duration;
-	uint8_t		ra[6];
+	uint8_t		ra[IEEE802_11_RA_LEN];
 };
 
 #define	CTRL_CTS_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+IEEE802_11_RA_LEN)
@@ -328,7 +328,7 @@ struct ctrl_cts_hdr_t {
 struct ctrl_ack_hdr_t {
 	uint16_t	fc;
 	uint16_t	duration;
-	uint8_t		ra[6];
+	uint8_t		ra[IEEE802_11_RA_LEN];
 };
 
 #define	CTRL_ACK_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+IEEE802_11_RA_LEN)
@@ -336,8 +336,8 @@ struct ctrl_ack_hdr_t {
 struct ctrl_ps_poll_hdr_t {
 	uint16_t	fc;
 	uint16_t	aid;
-	uint8_t		bssid[6];
-	uint8_t		ta[6];
+	uint8_t		bssid[IEEE802_11_BSSID_LEN];
+	uint8_t		ta[IEEE802_11_TA_LEN];
 };
 
 #define	CTRL_PS_POLL_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_AID_LEN+\
@@ -346,8 +346,8 @@ struct ctrl_ps_poll_hdr_t {
 struct ctrl_end_hdr_t {
 	uint16_t	fc;
 	uint16_t	duration;
-	uint8_t		ra[6];
-	uint8_t		bssid[6];
+	uint8_t		ra[IEEE802_11_RA_LEN];
+	uint8_t		bssid[IEEE802_11_BSSID_LEN];
 };
 
 #define	CTRL_END_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
@@ -356,8 +356,8 @@ struct ctrl_end_hdr_t {
 struct ctrl_end_ack_hdr_t {
 	uint16_t	fc;
 	uint16_t	duration;
-	uint8_t		ra[6];
-	uint8_t		bssid[6];
+	uint8_t		ra[IEEE802_11_RA_LEN];
+	uint8_t		bssid[IEEE802_11_BSSID_LEN];
 };
 
 #define	CTRL_END_ACK_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
@@ -366,7 +366,7 @@ struct ctrl_end_ack_hdr_t {
 struct ctrl_ba_hdr_t {
 	uint16_t	fc;
 	uint16_t	duration;
-	uint8_t		ra[6];
+	uint8_t		ra[IEEE802_11_RA_LEN];
 };
 
 #define	CTRL_BA_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+IEEE802_11_RA_LEN)
@@ -374,8 +374,8 @@ struct ctrl_ba_hdr_t {
 struct ctrl_bar_hdr_t {
 	uint16_t	fc;
 	uint16_t	dur;
-	uint8_t		ra[6];
-	uint8_t		ta[6];
+	uint8_t		ra[IEEE802_11_RA_LEN];
+	uint8_t		ta[IEEE802_11_TA_LEN];
 	uint16_t	ctl;
 	uint16_t	seq;
 };
