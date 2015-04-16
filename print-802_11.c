@@ -2050,10 +2050,6 @@ ctrl_body_print(netdissect_options *ndo,
 }
 
 /*
- * Print Header funcs
- */
-
-/*
  *  Data Frame - Address field contents
  *
  *  To Ds  | From DS | Addr 1 | Addr 2 | Addr 3 | Addr 4
@@ -2063,10 +2059,44 @@ ctrl_body_print(netdissect_options *ndo,
  *    1    |  1      |  RA    | TA     | DA     | SA
  */
 
+/*
+ * Function to get source and destination MAC addresses for a data frame.
+ */
 static void
-data_header_print(netdissect_options *ndo,
-                  uint16_t fc, const u_char *p, const uint8_t **srcp,
-                  const uint8_t **dstp)
+get_data_src_dst_mac(uint16_t fc, const u_char *p, const uint8_t **srcp,
+                     const uint8_t **dstp)
+{
+#define ADDR1  (p + 4)
+#define ADDR2  (p + 10)
+#define ADDR3  (p + 16)
+#define ADDR4  (p + 24)
+
+	if (!FC_TO_DS(fc) && !FC_FROM_DS(fc)) {
+		*srcp = ADDR2;
+		*dstp = ADDR1;
+	} else if (!FC_TO_DS(fc) && FC_FROM_DS(fc)) {
+		*srcp = ADDR3;
+		*dstp = ADDR1;
+	} else if (FC_TO_DS(fc) && !FC_FROM_DS(fc)) {
+		*srcp = ADDR2;
+		*dstp = ADDR3;
+	} else if (FC_TO_DS(fc) && FC_FROM_DS(fc)) {
+		*srcp = ADDR4;
+		*dstp = ADDR3;
+	}
+
+#undef ADDR1
+#undef ADDR2
+#undef ADDR3
+#undef ADDR4
+}
+
+/*
+ * Print Header funcs
+ */
+
+static void
+data_header_print(netdissect_options *ndo, uint16_t fc, const u_char *p)
 {
 	u_int subtype = FC_SUBTYPE(fc);
 
@@ -2093,42 +2123,18 @@ data_header_print(netdissect_options *ndo,
 #define ADDR4  (p + 24)
 
 	if (!FC_TO_DS(fc) && !FC_FROM_DS(fc)) {
-		if (srcp != NULL)
-			*srcp = ADDR2;
-		if (dstp != NULL)
-			*dstp = ADDR1;
-		if (!ndo->ndo_eflag)
-			return;
 		ND_PRINT((ndo, "DA:%s SA:%s BSSID:%s ",
 		    etheraddr_string(ndo, ADDR1), etheraddr_string(ndo, ADDR2),
 		    etheraddr_string(ndo, ADDR3)));
 	} else if (!FC_TO_DS(fc) && FC_FROM_DS(fc)) {
-		if (srcp != NULL)
-			*srcp = ADDR3;
-		if (dstp != NULL)
-			*dstp = ADDR1;
-		if (!ndo->ndo_eflag)
-			return;
 		ND_PRINT((ndo, "DA:%s BSSID:%s SA:%s ",
 		    etheraddr_string(ndo, ADDR1), etheraddr_string(ndo, ADDR2),
 		    etheraddr_string(ndo, ADDR3)));
 	} else if (FC_TO_DS(fc) && !FC_FROM_DS(fc)) {
-		if (srcp != NULL)
-			*srcp = ADDR2;
-		if (dstp != NULL)
-			*dstp = ADDR3;
-		if (!ndo->ndo_eflag)
-			return;
 		ND_PRINT((ndo, "BSSID:%s SA:%s DA:%s ",
 		    etheraddr_string(ndo, ADDR1), etheraddr_string(ndo, ADDR2),
 		    etheraddr_string(ndo, ADDR3)));
 	} else if (FC_TO_DS(fc) && FC_FROM_DS(fc)) {
-		if (srcp != NULL)
-			*srcp = ADDR4;
-		if (dstp != NULL)
-			*dstp = ADDR3;
-		if (!ndo->ndo_eflag)
-			return;
 		ND_PRINT((ndo, "RA:%s TA:%s DA:%s SA:%s ",
 		    etheraddr_string(ndo, ADDR1), etheraddr_string(ndo, ADDR2),
 		    etheraddr_string(ndo, ADDR3), etheraddr_string(ndo, ADDR4)));
@@ -2141,17 +2147,9 @@ data_header_print(netdissect_options *ndo,
 }
 
 static void
-mgmt_header_print(netdissect_options *ndo,
-                  const u_char *p, const uint8_t **srcp, const uint8_t **dstp)
+mgmt_header_print(netdissect_options *ndo, const u_char *p)
 {
 	const struct mgmt_header_t *hp = (const struct mgmt_header_t *) p;
-
-	if (srcp != NULL)
-		*srcp = hp->sa;
-	if (dstp != NULL)
-		*dstp = hp->da;
-	if (!ndo->ndo_eflag)
-		return;
 
 	ND_PRINT((ndo, "BSSID:%s DA:%s SA:%s ",
 	    etheraddr_string(ndo, (hp)->bssid), etheraddr_string(ndo, (hp)->da),
@@ -2159,17 +2157,8 @@ mgmt_header_print(netdissect_options *ndo,
 }
 
 static void
-ctrl_header_print(netdissect_options *ndo,
-                  uint16_t fc, const u_char *p, const uint8_t **srcp,
-                  const uint8_t **dstp)
+ctrl_header_print(netdissect_options *ndo, uint16_t fc, const u_char *p)
 {
-	if (srcp != NULL)
-		*srcp = NULL;
-	if (dstp != NULL)
-		*dstp = NULL;
-	if (!ndo->ndo_eflag)
-		return;
-
 	switch (FC_SUBTYPE(fc)) {
 	case CTRL_BAR:
 		ND_PRINT((ndo, " RA:%s TA:%s CTL(%x) SEQ(%u) ",
@@ -2267,15 +2256,12 @@ extract_mesh_header_length(const u_char *p)
 }
 
 /*
- * Print the 802.11 MAC header if eflag is set, and set "*srcp" and "*dstp"
- * to point to the source and destination MAC addresses in any case if
- * "srcp" and "dstp" aren't null.
+ * Print the 802.11 MAC header.
  */
 static void
 ieee_802_11_hdr_print(netdissect_options *ndo,
                       uint16_t fc, const u_char *p, u_int hdrlen,
-                      u_int meshdrlen, const uint8_t **srcp,
-                      const uint8_t **dstp)
+                      u_int meshdrlen)
 {
 	if (ndo->ndo_vflag) {
 		if (FC_MORE_DATA(fc))
@@ -2313,17 +2299,15 @@ ieee_802_11_hdr_print(netdissect_options *ndo,
 
 	switch (FC_TYPE(fc)) {
 	case T_MGMT:
-		mgmt_header_print(ndo, p, srcp, dstp);
+		mgmt_header_print(ndo, p);
 		break;
 	case T_CTRL:
-		ctrl_header_print(ndo, fc, p, srcp, dstp);
+		ctrl_header_print(ndo, fc, p);
 		break;
 	case T_DATA:
-		data_header_print(ndo, fc, p, srcp, dstp);
+		data_header_print(ndo, fc, p);
 		break;
 	default:
-		*srcp = NULL;
-		*dstp = NULL;
 		break;
 	}
 }
@@ -2381,7 +2365,8 @@ ieee802_11_print(netdissect_options *ndo,
 		return hdrlen;
 	}
 
-	ieee_802_11_hdr_print(ndo, fc, p, hdrlen, meshdrlen, &src, &dst);
+	if (ndo->ndo_eflag)
+		ieee_802_11_hdr_print(ndo, fc, p, hdrlen, meshdrlen);
 
 	/*
 	 * Go past the 802.11 header.
@@ -2392,6 +2377,10 @@ ieee802_11_print(netdissect_options *ndo,
 
 	switch (FC_TYPE(fc)) {
 	case T_MGMT:
+		if (FC_WEP(fc)) {
+			if (!ndo->ndo_eflag)
+				ND_PRINT((ndo, "WEP Encrypted "));
+		}
 		if (!mgmt_body_print(ndo, fc,
 		    (const struct mgmt_header_t *)(p - hdrlen), p, length)) {
 			ND_PRINT((ndo, "%s", tstr));
@@ -2409,25 +2398,31 @@ ieee802_11_print(netdissect_options *ndo,
 			return hdrlen;	/* no-data frame */
 		/* There may be a problem w/ AP not having this bit set */
 		if (FC_WEP(fc)) {
+			if (!ndo->ndo_eflag)
+				ND_PRINT((ndo, "WEP Encrypted "));
 			if (!wep_print(ndo, p)) {
 				ND_PRINT((ndo, "%s", tstr));
 				return hdrlen;
 			}
-		} else if (llc_print(ndo, p, length, caplen, dst, src,
-		    &extracted_ethertype) == 0) {
-			/*
-			 * Some kinds of LLC packet we cannot
-			 * handle intelligently
-			 */
-			if (!ndo->ndo_eflag)
-				ieee_802_11_hdr_print(ndo, fc, p - hdrlen, hdrlen,
-				    meshdrlen, NULL, NULL);
-			if (extracted_ethertype)
-				ND_PRINT((ndo, "(LLC %s) ",
-				    etherproto_string(
-				        htons(extracted_ethertype))));
-			if (!ndo->ndo_suppress_default_print)
-				ND_DEFAULTPRINT(p, caplen);
+		} else {
+			get_data_src_dst_mac(fc, p - hdrlen, &src, &dst);
+			if (llc_print(ndo, p, length, caplen, dst, src,
+			    &extracted_ethertype) == 0) {
+				/*
+				 * Some kinds of LLC packet we cannot
+				 * handle intelligently
+				 */
+				if (!ndo->ndo_eflag) {
+					ieee_802_11_hdr_print(ndo, fc, p - hdrlen,
+					    hdrlen, meshdrlen);
+				}
+				if (extracted_ethertype)
+					ND_PRINT((ndo, "(LLC %s) ",
+					    etherproto_string(
+					        htons(extracted_ethertype))));
+				if (!ndo->ndo_suppress_default_print)
+					ND_DEFAULTPRINT(p, caplen);
+			}
 		}
 		break;
 	default:
