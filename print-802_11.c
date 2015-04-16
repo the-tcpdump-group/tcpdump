@@ -2211,7 +2211,7 @@ ctrl_header_print(netdissect_options *ndo,
 		    etheraddr_string(ndo, ((const struct ctrl_end_ack_hdr_t *)p)->bssid)));
 		break;
 	default:
-		ND_PRINT((ndo, "(H) Unknown Ctrl Subtype"));
+		/* We shouldn't get here - we should already have quit */
 		break;
 	}
 }
@@ -2246,6 +2246,7 @@ extract_header_length(netdissect_options *ndo,
 		case CTRL_END_ACK:
 			return CTRL_END_ACK_HDRLEN;
 		default:
+			ND_PRINT((ndo, "unknown 802.11 ctrl frame subtype (%d)", FC_SUBTYPE(fc)));
 			return 0;
 		}
 	case T_DATA:
@@ -2254,7 +2255,7 @@ extract_header_length(netdissect_options *ndo,
 			len += 2;
 		return len;
 	default:
-		ND_PRINT((ndo, "unknown IEEE802.11 frame type (%d)", FC_TYPE(fc)));
+		ND_PRINT((ndo, "unknown 802.11 frame type (%d)", FC_TYPE(fc)));
 		return 0;
 	}
 }
@@ -2321,8 +2322,6 @@ ieee_802_11_hdr_print(netdissect_options *ndo,
 		data_header_print(ndo, fc, p, srcp, dstp);
 		break;
 	default:
-		ND_PRINT((ndo, "(header) unknown IEEE802.11 frame type (%d)",
-		    FC_TYPE(fc)));
 		*srcp = NULL;
 		*dstp = NULL;
 		break;
@@ -2364,6 +2363,10 @@ ieee802_11_print(netdissect_options *ndo,
 
 	fc = EXTRACT_LE_16BITS(p);
 	hdrlen = extract_header_length(ndo, fc);
+	if (hdrlen == 0) {
+		/* Unknown frame type or control frame subtype; quit. */
+		return (0);
+	}
 	if (pad)
 		hdrlen = roundup2(hdrlen, 4);
 	if (ndo->ndo_Hflag && FC_TYPE(fc) == T_DATA &&
@@ -2372,7 +2375,6 @@ ieee802_11_print(netdissect_options *ndo,
 		hdrlen += meshdrlen;
 	} else
 		meshdrlen = 0;
-
 
 	if (caplen < hdrlen) {
 		ND_PRINT((ndo, "%s", tstr));
@@ -2429,7 +2431,7 @@ ieee802_11_print(netdissect_options *ndo,
 		}
 		break;
 	default:
-		ND_PRINT((ndo, "unknown 802.11 frame type (%d)", FC_TYPE(fc)));
+		/* We shouldn't get here - we should already have quit */
 		break;
 	}
 
