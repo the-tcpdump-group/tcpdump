@@ -168,7 +168,7 @@ static const struct tok ctrl_str[] = {
 #define	FC_RETRY(fc)		((fc) & 0x0800)
 #define	FC_POWER_MGMT(fc)	((fc) & 0x1000)
 #define	FC_MORE_DATA(fc)	((fc) & 0x2000)
-#define	FC_WEP(fc)		((fc) & 0x4000)
+#define	FC_PROTECTED(fc)	((fc) & 0x4000)
 #define	FC_ORDER(fc)		((fc) & 0x8000)
 
 struct mgmt_header_t {
@@ -2274,8 +2274,8 @@ ieee_802_11_hdr_print(netdissect_options *ndo,
 			ND_PRINT((ndo, "Retry "));
 		if (FC_ORDER(fc))
 			ND_PRINT((ndo, "Strictly Ordered "));
-		if (FC_WEP(fc))
-			ND_PRINT((ndo, "WEP Encrypted "));
+		if (FC_PROTECTED(fc))
+			ND_PRINT((ndo, "Protected "));
 		if (FC_TYPE(fc) != T_CTRL || FC_SUBTYPE(fc) != CTRL_PS_POLL)
 			ND_PRINT((ndo, "%dus ",
 			    EXTRACT_LE_16BITS(
@@ -2377,9 +2377,9 @@ ieee802_11_print(netdissect_options *ndo,
 
 	switch (FC_TYPE(fc)) {
 	case T_MGMT:
-		if (FC_WEP(fc)) {
+		if (FC_PROTECTED(fc)) {
 			if (!ndo->ndo_eflag)
-				ND_PRINT((ndo, "WEP Encrypted "));
+				ND_PRINT((ndo, "Protected "));
 		}
 		if (!mgmt_body_print(ndo, fc,
 		    (const struct mgmt_header_t *)(p - hdrlen), p, length)) {
@@ -2397,9 +2397,9 @@ ieee802_11_print(netdissect_options *ndo,
 		if (DATA_FRAME_IS_NULL(FC_SUBTYPE(fc)))
 			return hdrlen;	/* no-data frame */
 		/* There may be a problem w/ AP not having this bit set */
-		if (FC_WEP(fc)) {
+		if (FC_PROTECTED(fc)) {
 			if (!ndo->ndo_eflag)
-				ND_PRINT((ndo, "WEP Encrypted "));
+				ND_PRINT((ndo, "Protected "));
 			if (!wep_print(ndo, p)) {
 				ND_PRINT((ndo, "%s", tstr));
 				return hdrlen;
