@@ -1290,7 +1290,7 @@ wep_print(netdissect_options *ndo,
 		return 0;
 	iv = EXTRACT_LE_32BITS(p);
 
-	ND_PRINT((ndo, "Data IV:%3x Pad %x KeyID %x", IV_IV(iv), IV_PAD(iv),
+	ND_PRINT((ndo, " IV:%3x Pad %x KeyID %x", IV_IV(iv), IV_PAD(iv),
 	    IV_KEYID(iv)));
 
 	return 1;
@@ -1937,6 +1937,10 @@ mgmt_body_print(netdissect_options *ndo,
                 const u_char *p, u_int length)
 {
 	ND_PRINT((ndo, "%s", tok2str(st_str, "Unhandled Management subtype(%x)", FC_SUBTYPE(fc))));
+
+	/* There may be a problem w/ AP not having this bit set */
+	if (FC_PROTECTED(fc))
+		return wep_print(ndo, p);
 	switch (FC_SUBTYPE(fc)) {
 	case ST_ASSOC_REQUEST:
 		return handle_assoc_request(ndo, p, length);
@@ -1957,12 +1961,6 @@ mgmt_body_print(netdissect_options *ndo,
 	case ST_DISASSOC:
 		return handle_disassoc(ndo, p, length);
 	case ST_AUTH:
-		if (!ND_TTEST2(*p, 3))
-			return 0;
-		if ((p[0] == 0 ) && (p[1] == 0) && (p[2] == 0)) {
-			ND_PRINT((ndo, "Authentication (Shared-Key)-3 "));
-			return wep_print(ndo, p);
-		}
 		return handle_auth(ndo, p, length);
 	case ST_DEAUTH:
 		return handle_deauth(ndo, pmh, p, length);
@@ -2377,10 +2375,6 @@ ieee802_11_print(netdissect_options *ndo,
 
 	switch (FC_TYPE(fc)) {
 	case T_MGMT:
-		if (FC_PROTECTED(fc)) {
-			if (!ndo->ndo_eflag)
-				ND_PRINT((ndo, "Protected "));
-		}
 		if (!mgmt_body_print(ndo, fc,
 		    (const struct mgmt_header_t *)(p - hdrlen), p, length)) {
 			ND_PRINT((ndo, "%s", tstr));
@@ -2398,6 +2392,7 @@ ieee802_11_print(netdissect_options *ndo,
 			return hdrlen;	/* no-data frame */
 		/* There may be a problem w/ AP not having this bit set */
 		if (FC_PROTECTED(fc)) {
+			ND_PRINT((ndo, "Data"));
 			if (!wep_print(ndo, p)) {
 				ND_PRINT((ndo, "%s", tstr));
 				return hdrlen;
