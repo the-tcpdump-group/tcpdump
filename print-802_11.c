@@ -1808,7 +1808,7 @@ handle_auth(netdissect_options *ndo,
 
 static int
 handle_deauth(netdissect_options *ndo,
-              const struct mgmt_header_t *pmh, const u_char *p, u_int length)
+              const uint8_t *src, const u_char *p, u_int length)
 {
 	struct mgmt_body_t  pbody;
 	const char *reason = NULL;
@@ -1828,7 +1828,7 @@ handle_deauth(netdissect_options *ndo,
 	if (ndo->ndo_eflag) {
 		ND_PRINT((ndo, ": %s", reason));
 	} else {
-		ND_PRINT((ndo, " (%s): %s", etheraddr_string(ndo, pmh->sa), reason));
+		ND_PRINT((ndo, " (%s): %s", etheraddr_string(ndo, src), reason));
 	}
 	return 1;
 }
@@ -1893,7 +1893,7 @@ handle_deauth(netdissect_options *ndo,
 
 static int
 handle_action(netdissect_options *ndo,
-              const struct mgmt_header_t *pmh, const u_char *p, u_int length)
+              const uint8_t *src, const u_char *p, u_int length)
 {
 	if (!ND_TTEST2(*p, 2))
 		return 0;
@@ -1902,7 +1902,7 @@ handle_action(netdissect_options *ndo,
 	if (ndo->ndo_eflag) {
 		ND_PRINT((ndo, ": "));
 	} else {
-		ND_PRINT((ndo, " (%s): ", etheraddr_string(ndo, pmh->sa)));
+		ND_PRINT((ndo, " (%s): ", etheraddr_string(ndo, src)));
 	}
 	switch (p[0]) {
 	case 0: ND_PRINT((ndo, "Spectrum Management Act#%d", p[1])); break;
@@ -1933,8 +1933,7 @@ handle_action(netdissect_options *ndo,
 
 static int
 mgmt_body_print(netdissect_options *ndo,
-                uint16_t fc, const struct mgmt_header_t *pmh,
-                const u_char *p, u_int length)
+                uint16_t fc, const uint8_t *src, const u_char *p, u_int length)
 {
 	ND_PRINT((ndo, "%s", tok2str(st_str, "Unhandled Management subtype(%x)", FC_SUBTYPE(fc))));
 
@@ -1963,9 +1962,9 @@ mgmt_body_print(netdissect_options *ndo,
 	case ST_AUTH:
 		return handle_auth(ndo, p, length);
 	case ST_DEAUTH:
-		return handle_deauth(ndo, pmh, p, length);
+		return handle_deauth(ndo, src, p, length);
 	case ST_ACTION:
-		return handle_action(ndo, pmh, p, length);
+		return handle_action(ndo, src, p, length);
 	default:
 		return 1;
 	}
@@ -2087,6 +2086,17 @@ get_data_src_dst_mac(uint16_t fc, const u_char *p, const uint8_t **srcp,
 #undef ADDR2
 #undef ADDR3
 #undef ADDR4
+}
+
+static void
+get_mgmt_src_dst_mac(const u_char *p, const uint8_t **srcp, const uint8_t **dstp)
+{
+	const struct mgmt_header_t *hp = (const struct mgmt_header_t *) p;
+
+	if (srcp != NULL)
+		*srcp = hp->sa;
+	if (dstp != NULL)
+		*dstp = hp->da;
 }
 
 /*
@@ -2375,8 +2385,8 @@ ieee802_11_print(netdissect_options *ndo,
 
 	switch (FC_TYPE(fc)) {
 	case T_MGMT:
-		if (!mgmt_body_print(ndo, fc,
-		    (const struct mgmt_header_t *)(p - hdrlen), p, length)) {
+		get_mgmt_src_dst_mac(p - hdrlen, &src, &dst);
+		if (!mgmt_body_print(ndo, fc, src, p, length)) {
 			ND_PRINT((ndo, "%s", tstr));
 			return hdrlen;
 		}
