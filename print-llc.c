@@ -230,13 +230,6 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 	dsap = dsap_field & ~LLC_IG;
 	ssap = ssap_field & ~LLC_GSAP;
 
-	/*
-	 * Skip LLC header.
-	 */
-	p += hdrlen;
-	length -= hdrlen;
-	caplen -= hdrlen;
-
 	if (ndo->ndo_eflag) {
                 ND_PRINT((ndo, "LLC, dsap %s (0x%02x) %s, ssap %s (0x%02x) %s",
                        tok2str(llc_values, "Unknown", dsap),
@@ -252,6 +245,13 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 			ND_PRINT((ndo, ", ctrl 0x%04x: ", control));
 		}
 	}
+
+	/*
+	 * Skip LLC header.
+	 */
+	p += hdrlen;
+	length -= hdrlen;
+	caplen -= hdrlen;
 
 	if (ssap == LLCSAP_SNAP && dsap == LLCSAP_SNAP
 	    && control == LLC_UI) {
