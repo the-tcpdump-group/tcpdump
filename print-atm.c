@@ -214,15 +214,20 @@ static const struct tok *oam_functype_values[16] = {
 /*
  * Print an RFC 1483 LLC-encapsulated ATM frame.
  */
-static void
+static u_int
 atm_llc_print(netdissect_options *ndo,
               const u_char *p, int length, int caplen)
 {
-	if (!llc_print(ndo, p, length, caplen, NULL, NULL)) {
-		/* ether_type not known, print raw packet */
+	int llc_hdrlen;
+
+	llc_hdrlen = llc_print(ndo, p, length, caplen, NULL, NULL);
+	if (llc_hdrlen < 0) {
+		/* packet not known, print raw packet */
 		if (!ndo->ndo_suppress_default_print)
 			ND_DEFAULTPRINT(p, caplen);
+		llc_hdrlen = -llc_hdrlen;
 	}
+	return (llc_hdrlen);
 }
 
 /*
@@ -310,7 +315,7 @@ atm_if_print(netdissect_options *ndo,
 		caplen -= 20;
 		hdrlen += 20;
 	}
-	atm_llc_print(ndo, p, length, caplen);
+	hdrlen += atm_llc_print(ndo, p, length, caplen);
 	return (hdrlen);
 }
 

@@ -2332,6 +2332,7 @@ ieee802_11_print(netdissect_options *ndo,
 	uint16_t fc;
 	u_int caplen, hdrlen, meshdrlen;
 	const uint8_t *src, *dst;
+	int llc_hdrlen;
 
 	caplen = orig_caplen;
 	/* Remove FCS, if present */
@@ -2408,14 +2409,17 @@ ieee802_11_print(netdissect_options *ndo,
 			}
 		} else {
 			get_data_src_dst_mac(fc, p - hdrlen, &src, &dst);
-			if (llc_print(ndo, p, length, caplen, dst, src) == 0) {
+			llc_hdrlen = llc_print(ndo, p, length, caplen, dst, src);
+			if (llc_hdrlen < 0) {
 				/*
 				 * Some kinds of LLC packet we cannot
 				 * handle intelligently
 				 */
 				if (!ndo->ndo_suppress_default_print)
 					ND_DEFAULTPRINT(p, caplen);
+				llc_hdrlen = -llc_hdrlen;
 			}
+			hdrlen += llc_hdrlen;
 		}
 		break;
 	default:

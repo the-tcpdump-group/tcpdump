@@ -197,6 +197,8 @@ sll_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 	u_int length = h->len;
 	register const struct sll_header *sllp;
 	u_short ether_type;
+	int llc_hdrlen;
+	u_int hdrlen;
 
 	if (caplen < SLL_HDR_LEN) {
 		/*
@@ -219,6 +221,7 @@ sll_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 	length -= SLL_HDR_LEN;
 	caplen -= SLL_HDR_LEN;
 	p += SLL_HDR_LEN;
+	hdrlen = SLL_HDR_LEN;
 
 	ether_type = EXTRACT_16BITS(&sllp->sll_protocol);
 
@@ -245,8 +248,10 @@ recurse:
 			 * 802.2.
 			 * Try to print the LLC-layer header & higher layers.
 			 */
-			if (llc_print(ndo, p, length, caplen, NULL, NULL) == 0)
+			llc_hdrlen = llc_print(ndo, p, length, caplen, NULL, NULL);
+			if (llc_hdrlen < 0)
 				goto unknown;	/* unknown LLC type */
+			hdrlen += llc_hdrlen;
 			break;
 
 		default:
@@ -263,9 +268,13 @@ recurse:
 		 * Print VLAN information, and then go back and process
 		 * the enclosed type field.
 		 */
-		if (caplen < 4 || length < 4) {
+		if (caplen < 4) {
 			ND_PRINT((ndo, "[|vlan]"));
-			return (SLL_HDR_LEN);
+			return (hdrlen + caplen);
+		}
+		if (length < 4) {
+			ND_PRINT((ndo, "[|vlan]"));
+			return (hdrlen + length);
 		}
 	        if (ndo->ndo_eflag) {
 	        	uint16_t tag = EXTRACT_16BITS(p);
@@ -283,6 +292,7 @@ recurse:
 		p += 4;
 		length -= 4;
 		caplen -= 4;
+		hdrlen += 4;
 		goto recurse;
 	} else {
 		if (ethertype_print(ndo, ether_type, p, length, caplen) == 0) {
@@ -294,5 +304,5 @@ recurse:
 		}
 	}
 
-	return (SLL_HDR_LEN);
+	return (hdrlen);
 }

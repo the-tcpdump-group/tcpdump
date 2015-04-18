@@ -137,9 +137,12 @@ static const struct oui_tok oui_to_tok[] = {
 };
 
 /*
- * Returns zero if we have a payload but haven't printed it (for example,
- * because it has unknown SAPs or has a SNAP header with an unknown OUI/
- * PID combination).
+ * If we printed information about the payload, returns the length of the LLC
+ * header, plus the length of any SNAP header following it.
+ *
+ * Otherwise (for example, if the packet has unknown SAPs or has a SNAP
+ * header with an unknown OUI/PID combination), returns the *negative*
+ * of that value.
  */
 int
 llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
@@ -147,12 +150,18 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 {
 	uint8_t dsap_field, dsap, ssap_field, ssap;
 	uint16_t control;
+	u_int hdrlen;
 	int is_u;
 
-	if (caplen < 3 || length < 3) {
+	if (caplen < 3) {
 		ND_PRINT((ndo, "[|llc]"));
 		ND_DEFAULTPRINT((u_char *)p, caplen);
-		return (1);
+		return (caplen);
+	}
+	if (length < 3) {
+		ND_PRINT((ndo, "[|llc]"));
+		ND_DEFAULTPRINT((u_char *)p, caplen);
+		return (length);
 	}
 
 	dsap_field = *p;
@@ -170,15 +179,21 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 		 * U frame.
 		 */
 		is_u = 1;
+		hdrlen = 3;	/* DSAP, SSAP, 1-byte control field */
 	} else {
 		/*
 		 * The control field in I and S frames is
 		 * 2 bytes...
 		 */
-		if (caplen < 4 || length < 4) {
+		if (caplen < 4) {
 			ND_PRINT((ndo, "[|llc]"));
 			ND_DEFAULTPRINT((u_char *)p, caplen);
-			return (1);
+			return (caplen);
+		}
+		if (length < 4) {
+			ND_PRINT((ndo, "[|llc]"));
+			ND_DEFAULTPRINT((u_char *)p, caplen);
+			return (length);
 		}
 
 		/*
@@ -186,6 +201,7 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 		 */
 		control = EXTRACT_LE_16BITS(p + 2);
 		is_u = 0;
+		hdrlen = 4;	/* DSAP, SSAP, 2-byte control field */
 	}
 
 	if (ssap_field == LLCSAP_GLOBAL && dsap_field == LLCSAP_GLOBAL) {
@@ -208,11 +224,18 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 		ND_PRINT((ndo, "IPX 802.3: "));
 
             ipx_print(ndo, p, length);
-            return (1);
+            return (0);		/* no LLC header */
 	}
 
 	dsap = dsap_field & ~LLC_IG;
 	ssap = ssap_field & ~LLC_GSAP;
+
+	/*
+	 * Skip LLC header.
+	 */
+	p += hdrlen;
+	length -= hdrlen;
+	caplen -= hdrlen;
 
 	/*
 	 * Check for SNAP UI packets; if we have one, there's no point
@@ -228,7 +251,15 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 		 * Does anybody ever bridge one form of LAN traffic
 		 * over a networking type that uses 802.2 LLC?
 		 */
-		return (snap_print(ndo, p+3, length-3, caplen-3, esrc, edst, 2));
+		if (!snap_print(ndo, p, length, caplen, esrc, edst, 2)) {
+			/*
+			 * Unknown packet type; tell our caller, by
+			 * returning a negative value, so they
+			 * can print the raw packet.
+			 */
+			return (-(hdrlen + 5));	/* include LLC and SNAP header */
+		} else
+			return (hdrlen + 5);	/* include LLC and SNAP header */
 	}
 
 	if (ndo->ndo_eflag) {
@@ -249,8 +280,8 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 
 	if (ssap == LLCSAP_8021D && dsap == LLCSAP_8021D &&
 	    control == LLC_UI) {
-		stp_print(ndo, p+3, length-3);
-		return (1);
+		stp_print(ndo, p, length);
+		return (hdrlen);
 	}
 
 	if (ssap == LLCSAP_IP && dsap == LLCSAP_IP &&
@@ -261,8 +292,8 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 		 * with the source and destination SAPs being
 		 * the IP SAP.
 		 */
-		ip_print(ndo, p+3, length-3);
-		return (1);
+		ip_print(ndo, p, length);
+		return (hdrlen);
 	}
 
 	if (ssap == LLCSAP_IPX && dsap == LLCSAP_IPX &&
@@ -271,14 +302,12 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 		 * This is an Ethernet_802.2 IPX frame, with an 802.3
 		 * header and an 802.2 LLC header with the source and
 		 * destination SAPs being the IPX SAP.
-		 *
-		 * Skip DSAP, LSAP, and control field.
 		 */
                 if (ndo->ndo_eflag)
                         ND_PRINT((ndo, "IPX 802.2: "));
 
-		ipx_print(ndo, p+3, length-3);
-		return (1);
+		ipx_print(ndo, p, length);
+		return (hdrlen);
 	}
 
 #ifdef TCPDUMP_DO_SMB
@@ -294,25 +323,14 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 		 * LLC_S_FMT, set in the first byte of the control field)
 		 * and UI frames (whose control field is just 3, LLC_U_FMT).
 		 */
-
-		/*
-		 * Skip the LLC header.
-		 */
-		if (is_u) {
-			p += 3;
-			length -= 3;
-		} else {
-			p += 4;
-			length -= 4;
-		}
 		netbeui_print(ndo, control, p, length);
-		return (1);
+		return (hdrlen);
 	}
 #endif
 	if (ssap == LLCSAP_ISONS && dsap == LLCSAP_ISONS
 	    && control == LLC_UI) {
-		isoclns_print(ndo, p + 3, length - 3, caplen - 3);
-		return (1);
+		isoclns_print(ndo, p, length, caplen);
+		return (hdrlen);
 	}
 
 	if (!ndo->ndo_eflag) {
@@ -342,14 +360,12 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 		ND_PRINT((ndo, "Unnumbered, %s, Flags [%s], length %u",
                        tok2str(llc_cmd_values, "%02x", LLC_U_CMD(control)),
                        tok2str(llc_flag_values,"?",(ssap_field & LLC_GSAP) | (control & LLC_U_POLL)),
-                       length));
-
-		p += 3;
+                       length + hdrlen));
 
 		if ((control & ~LLC_U_POLL) == LLC_XID) {
 			if (*p == LLC_XID_FI) {
 				ND_PRINT((ndo, ": %02x %02x", p[1], p[2]));
-				return (1);
+				return (hdrlen);
 			}
 		}
 	} else {
@@ -358,17 +374,17 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 				tok2str(llc_supervisory_values,"?",LLC_S_CMD(control)),
 				LLC_IS_NR(control),
 				tok2str(llc_flag_values,"?",(ssap_field & LLC_GSAP) | (control & LLC_IS_POLL)),
-                                length));
-			return (1);	/* no payload to print */
+                                length + hdrlen));
+			return (hdrlen);	/* no payload to print */
 		} else {
 			ND_PRINT((ndo, "Information, send seq %u, rcv seq %u, Flags [%s], length %u",
 				LLC_I_NS(control),
 				LLC_IS_NR(control),
 				tok2str(llc_flag_values,"?",(ssap_field & LLC_GSAP) | (control & LLC_IS_POLL)),
-                                length));
+                                length + hdrlen));
 		}
 	}
-	return (0);
+	return (-hdrlen);
 }
 
 static void

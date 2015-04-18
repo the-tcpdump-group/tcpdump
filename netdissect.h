@@ -387,10 +387,10 @@ extern void rrcp_print(netdissect_options *,const u_char *, u_int);
 extern void loopback_print(netdissect_options *, const u_char *, const u_int);
 extern void carp_print(netdissect_options *, const u_char *, u_int, int);
 
-extern void ether_print(netdissect_options *,
-                        const u_char *, u_int, u_int,
-                        void (*)(netdissect_options *, const u_char *),
-                        const u_char *);
+extern u_int ether_print(netdissect_options *,
+                         const u_char *, u_int, u_int,
+                         void (*)(netdissect_options *, const u_char *),
+                         const u_char *);
 
 extern u_int ether_if_print(netdissect_options *,
                             const struct pcap_pkthdr *,const u_char *);
@@ -454,7 +454,7 @@ extern u_int token_print(netdissect_options *, const u_char *, u_int, u_int);
 extern u_int token_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
 extern void vqp_print(netdissect_options *, register const u_char *, register u_int);
 extern void zephyr_print(netdissect_options *, const u_char *, int);
-extern void fddi_print(netdissect_options *, const u_char *, u_int, u_int);
+extern u_int fddi_print(netdissect_options *, const u_char *, u_int, u_int);
 extern u_int fddi_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
 extern void mpcp_print(netdissect_options *, const u_char *, u_int);
 extern void rpki_rtr_print(netdissect_options *, const u_char *, u_int);
