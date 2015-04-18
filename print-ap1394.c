@@ -56,8 +56,8 @@ ap1394_hdr_print(netdissect_options *ndo, register const u_char *bp, u_int lengt
 	fp = (const struct firewire_header *)bp;
 
 	ND_PRINT((ndo, "%s > %s",
-		     linkaddr_string(ndo, fp->firewire_dhost, LINKADDR_IEEE1394, FIREWIRE_EUI64_LEN),
-		     linkaddr_string(ndo, fp->firewire_shost, LINKADDR_IEEE1394, FIREWIRE_EUI64_LEN)));
+		     linkaddr_string(ndo, fp->firewire_shost, LINKADDR_IEEE1394, FIREWIRE_EUI64_LEN),
+		     linkaddr_string(ndo, fp->firewire_dhost, LINKADDR_IEEE1394, FIREWIRE_EUI64_LEN)));
 
 	firewire_type = EXTRACT_16BITS(&fp->firewire_type);
 	if (!ndo->ndo_qflag) {
