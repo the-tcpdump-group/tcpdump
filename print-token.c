@@ -112,14 +112,13 @@ token_hdr_print(netdissect_options *ndo,
 	srcname = etheraddr_string(ndo, fsrc);
 	dstname = etheraddr_string(ndo, fdst);
 
-	if (ndo->ndo_vflag)
-		ND_PRINT((ndo, "%02x %02x %s %s %d: ",
+	if (!ndo->ndo_qflag)
+		ND_PRINT((ndo, "%02x %02x ",
 		       trp->token_ac,
-		       trp->token_fc,
-		       srcname, dstname,
-		       length));
-	else
-		ND_PRINT((ndo, "%s %s %d: ", srcname, dstname, length));
+		       trp->token_fc));
+	ND_PRINT((ndo, "%s > %s, length %u: ",
+	       srcname, dstname,
+	       length));
 }
 
 static const char *broadcast_indicator[] = {

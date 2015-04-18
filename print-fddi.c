@@ -258,17 +258,11 @@ fddi_hdr_print(netdissect_options *ndo,
 	srcname = etheraddr_string(ndo, fsrc);
 	dstname = etheraddr_string(ndo, fdst);
 
-	if (ndo->ndo_vflag)
-		ND_PRINT((ndo, "%02x %s %s %d: ",
-		       fddip->fddi_fc,
-		       srcname, dstname,
-		       length));
-	else if (ndo->ndo_qflag)
-		ND_PRINT((ndo, "%s %s %d: ", srcname, dstname, length));
-	else {
+	if (!ndo->ndo_qflag)
 		print_fddi_fc(ndo, fddip->fddi_fc);
-		ND_PRINT((ndo, "%s %s %d: ", srcname, dstname, length));
-	}
+	ND_PRINT((ndo, "%s > %s, length %u: ",
+	       srcname, dstname,
+	       length));
 }
 
 static inline void

@@ -73,7 +73,7 @@ ipfc_hdr_print(netdissect_options *ndo,
 	/*
 	 * XXX - show the upper 16 bits?  Do so only if "vflag" is set?
 	 */
-	ND_PRINT((ndo, "%s %s %d: ", srcname, dstname, length));
+	ND_PRINT((ndo, "%s > %s, length %u: ", srcname, dstname, length));
 }
 
 static u_int
