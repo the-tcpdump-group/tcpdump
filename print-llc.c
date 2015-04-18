@@ -237,13 +237,22 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 	length -= hdrlen;
 	caplen -= hdrlen;
 
-	/*
-	 * Check for SNAP UI packets; if we have one, there's no point
-	 * in printing the LLC header information, as we already know it -
-	 * the relevant protocol-selection information is the SNAP OUI
-	 * and PID, so it's sufficient to print that for frames we
-	 * don't know how to print and for the "-e" flag.
-	 */
+	if (ndo->ndo_eflag) {
+                ND_PRINT((ndo, "LLC, dsap %s (0x%02x) %s, ssap %s (0x%02x) %s",
+                       tok2str(llc_values, "Unknown", dsap),
+                       dsap,
+                       tok2str(llc_ig_flag_values, "Unknown", dsap_field & LLC_IG),
+                       tok2str(llc_values, "Unknown", ssap),
+                       ssap,
+                       tok2str(llc_flag_values, "Unknown", ssap_field & LLC_GSAP)));
+
+		if (is_u) {
+			ND_PRINT((ndo, ", ctrl 0x%02x: ", control));
+		} else {
+			ND_PRINT((ndo, ", ctrl 0x%04x: ", control));
+		}
+	}
+
 	if (ssap == LLCSAP_SNAP && dsap == LLCSAP_SNAP
 	    && control == LLC_UI) {
 		/*
@@ -260,22 +269,6 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 			return (-(hdrlen + 5));	/* include LLC and SNAP header */
 		} else
 			return (hdrlen + 5);	/* include LLC and SNAP header */
-	}
-
-	if (ndo->ndo_eflag) {
-                ND_PRINT((ndo, "LLC, dsap %s (0x%02x) %s, ssap %s (0x%02x) %s",
-                       tok2str(llc_values, "Unknown", dsap),
-                       dsap,
-                       tok2str(llc_ig_flag_values, "Unknown", dsap_field & LLC_IG),
-                       tok2str(llc_values, "Unknown", ssap),
-                       ssap,
-                       tok2str(llc_flag_values, "Unknown", ssap_field & LLC_GSAP)));
-
-		if (is_u) {
-			ND_PRINT((ndo, ", ctrl 0x%02x: ", control));
-		} else {
-			ND_PRINT((ndo, ", ctrl 0x%04x: ", control));
-		}
 	}
 
 	if (ssap == LLCSAP_8021D && dsap == LLCSAP_8021D &&
@@ -387,30 +380,19 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 	return (-hdrlen);
 }
 
-static void
-snap_hdr_print(netdissect_options *ndo, const uint8_t *esrc, const uint8_t *edst,
-	uint32_t orgcode, u_short et, u_int length)
+static const struct tok *
+oui_to_struct_tok(uint32_t orgcode)
 {
 	const struct tok *tok = null_values;
 	const struct oui_tok *otp;
 
-	if (esrc != NULL && edst != NULL) {
-		ND_PRINT((ndo, "%s > %s ",
-				etheraddr_string(ndo, esrc),
-				etheraddr_string(ndo, edst)));
-	}
 	for (otp = &oui_to_tok[0]; otp->tok != NULL; otp++) {
 		if (otp->oui == orgcode) {
 			tok = otp->tok;
 			break;
 		}
 	}
-	ND_PRINT((ndo, "SNAP oui %s (0x%06x), %s %s (0x%04x), length %u: ",
-	     tok2str(oui_values, "Unknown", orgcode),
-	     orgcode,
-	     (orgcode == 0x000000 ? "ethertype" : "pid"),
-	     tok2str(tok, "Unknown", et),
-	     et, length));
+	return (tok);
 }
 
 int
@@ -430,9 +412,15 @@ snap_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 	if (ndo->ndo_eflag) {
 		/*
 		 * Somebody's already printed the MAC addresses, if there
-		 * are any, so just print the SNAP header.
+		 * are any, so just print the SNAP header, not the MAC
+		 * addresses.
 		 */
-		snap_hdr_print(ndo, NULL, NULL, orgcode, et, length - 5);
+		ND_PRINT((ndo, "oui %s (0x%06x), %s %s (0x%04x), length %u: ",
+		     tok2str(oui_values, "Unknown", orgcode),
+		     orgcode,
+		     (orgcode == 0x000000 ? "ethertype" : "pid"),
+		     tok2str(oui_to_struct_tok(orgcode), "Unknown", et),
+		     et, length - 5));
 	}
 	p += 5;
 	length -= 5;
@@ -561,8 +549,33 @@ snap_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 			return (1);
 		}
 	}
-	if (!ndo->ndo_eflag)
-		snap_hdr_print(ndo, esrc, edst, orgcode, et, length);
+	if (!ndo->ndo_eflag) {
+		/*
+		 * Nobody printed the MAC addresses, so print them, if
+		 * we have any.
+		 */
+		if (esrc != NULL && edst != NULL) {
+			ND_PRINT((ndo, "%s > %s ",
+				etheraddr_string(ndo, esrc),
+				etheraddr_string(ndo, edst)));
+		}
+		/*
+		 * Print the SNAP header, but if the OUI is 000000, don't
+		 * bother printing it, and report the PID as being an
+		 * ethertype.
+		 */
+		if (orgcode == 0x000000) {
+			ND_PRINT((ndo, "SNAP, ethertype %s (0x%04x), length %u: ",
+			     tok2str(ethertype_values, "Unknown", et),
+			     et, length));
+		} else {
+			ND_PRINT((ndo, "SNAP, oui %s (0x%06x), pid %s (0x%04x), length %u: ",
+			     tok2str(oui_values, "Unknown", orgcode),
+			     orgcode,
+			     tok2str(oui_to_struct_tok(orgcode), "Unknown", et),
+			     et, length));
+		}
+	}
 	return (0);
 
 trunc:
