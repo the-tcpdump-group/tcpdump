@@ -258,7 +258,7 @@ recurse:
 			/*FALLTHROUGH*/
 
 		unknown:
-			/* ether_type not known, print raw packet */
+			/* packet type not known, print raw packet */
 			if (!ndo->ndo_suppress_default_print)
 				ND_DEFAULTPRINT(p, caplen);
 			break;
