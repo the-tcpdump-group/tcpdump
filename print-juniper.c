@@ -919,8 +919,6 @@ u_int
 juniper_atm1_print(netdissect_options *ndo,
                    const struct pcap_pkthdr *h, register const u_char *p)
 {
-        uint16_t extracted_ethertype;
-
         struct juniper_l2info_t l2info;
 
         l2info.pictype = DLT_JUNIPER_ATM1;
@@ -967,8 +965,6 @@ u_int
 juniper_atm2_print(netdissect_options *ndo,
                    const struct pcap_pkthdr *h, register const u_char *p)
 {
-        uint16_t extracted_ethertype;
-
         struct juniper_l2info_t l2info;
 
         l2info.pictype = DLT_JUNIPER_ATM2;
