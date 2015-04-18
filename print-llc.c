@@ -255,12 +255,13 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 
 	if (ssap == LLCSAP_IP && dsap == LLCSAP_IP &&
 	    control == LLC_UI) {
-		if (caplen < 4 || length < 4) {
-			ND_PRINT((ndo, "[|llc]"));
-			ND_DEFAULTPRINT((u_char *)p, caplen);
-			return (1);
-		}
-		ip_print(ndo, p+4, length-4);
+		/*
+		 * This is an RFC 948-style IP packet, with
+		 * an 802.3 header and an 802.2 LLC header
+		 * with the source and destination SAPs being
+		 * the IP SAP.
+		 */
+		ip_print(ndo, p+3, length-3);
 		return (1);
 	}
 
