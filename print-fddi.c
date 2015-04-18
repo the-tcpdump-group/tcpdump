@@ -282,7 +282,6 @@ fddi_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 {
 	const struct fddi_header *fddip = (const struct fddi_header *)p;
 	struct ether_header ehdr;
-	u_short extracted_ethertype;
 
 	if (caplen < FDDI_HDRLEN) {
 		ND_PRINT((ndo, "[|fddi]"));
@@ -305,19 +304,11 @@ fddi_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 	/* Frame Control field determines interpretation of packet */
 	if ((fddip->fddi_fc & FDDIFC_CLFF) == FDDIFC_LLC_ASYNC) {
 		/* Try to print the LLC-layer header & higher layers */
-		if (llc_print(ndo, p, length, caplen, ESRC(&ehdr), EDST(&ehdr),
-		    &extracted_ethertype) == 0) {
+		if (llc_print(ndo, p, length, caplen, ESRC(&ehdr), EDST(&ehdr)) == 0) {
 			/*
 			 * Some kinds of LLC packet we cannot
 			 * handle intelligently
 			 */
-			if (!ndo->ndo_eflag)
-				fddi_hdr_print(ndo, fddip, length + FDDI_HDRLEN,
-				    ESRC(&ehdr), EDST(&ehdr));
-			if (extracted_ethertype) {
-				ND_PRINT((ndo, "(LLC %s) ",
-			etherproto_string(htons(extracted_ethertype))));
-			}
 			if (!ndo->ndo_suppress_default_print)
 				ND_DEFAULTPRINT(p, caplen);
 		}

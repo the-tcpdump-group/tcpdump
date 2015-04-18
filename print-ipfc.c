@@ -81,7 +81,6 @@ ipfc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 {
 	const struct ipfc_header *ipfcp = (const struct ipfc_header *)p;
 	struct ether_header ehdr;
-	u_short extracted_ethertype;
 
 	if (caplen < IPFC_HDRLEN) {
 		ND_PRINT((ndo, "[|ipfc]"));
@@ -101,19 +100,11 @@ ipfc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 	caplen -= IPFC_HDRLEN;
 
 	/* Try to print the LLC-layer header & higher layers */
-	if (llc_print(ndo, p, length, caplen, ESRC(&ehdr), EDST(&ehdr),
-	    &extracted_ethertype) == 0) {
+	if (llc_print(ndo, p, length, caplen, ESRC(&ehdr), EDST(&ehdr)) == 0) {
 		/*
 		 * Some kinds of LLC packet we cannot
 		 * handle intelligently
 		 */
-		if (!ndo->ndo_eflag)
-			ipfc_hdr_print(ndo, ipfcp, length + IPFC_HDRLEN,
-			    ESRC(&ehdr), EDST(&ehdr));
-		if (extracted_ethertype) {
-			ND_PRINT((ndo, "(LLC %s) ",
-		etherproto_string(htons(extracted_ethertype))));
-		}
 		if (!ndo->ndo_suppress_default_print)
 			ND_DEFAULTPRINT(p, caplen);
 	}

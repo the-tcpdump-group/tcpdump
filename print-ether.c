@@ -130,7 +130,6 @@ ether_print(netdissect_options *ndo,
 	struct ether_header *ep;
 	u_int orig_length;
 	u_short ether_type;
-	u_short extracted_ether_type;
 
 	if (caplen < ETHER_HDRLEN || length < ETHER_HDRLEN) {
 		ND_PRINT((ndo, "[|ether]"));
@@ -157,15 +156,8 @@ recurse:
 	 */
 	if (ether_type <= ETHERMTU) {
 		/* Try to print the LLC-layer header & higher layers */
-		if (llc_print(ndo, p, length, caplen, ESRC(ep), EDST(ep),
-		    &extracted_ether_type) == 0) {
+		if (llc_print(ndo, p, length, caplen, ESRC(ep), EDST(ep)) == 0) {
 			/* ether_type not known, print raw packet */
-			if (!ndo->ndo_eflag) {
-				if (print_encap_header != NULL)
-					(*print_encap_header)(ndo, encap_header_arg);
-				ether_hdr_print(ndo, (u_char *)ep, orig_length);
-			}
-
 			if (!ndo->ndo_suppress_default_print)
 				ND_DEFAULTPRINT(p, caplen);
 		}
@@ -205,15 +197,8 @@ recurse:
 		 * there's an LLC header and payload.
 		 */
 		/* Try to print the LLC-layer header & higher layers */
-		if (llc_print(ndo, p, length, caplen, ESRC(ep), EDST(ep),
-		    &extracted_ether_type) == 0) {
+		if (llc_print(ndo, p, length, caplen, ESRC(ep), EDST(ep)) == 0) {
 			/* ether_type not known, print raw packet */
-			if (!ndo->ndo_eflag) {
-				if (print_encap_header != NULL)
-					(*print_encap_header)(ndo, encap_header_arg);
-				ether_hdr_print(ndo, (u_char *)ep, orig_length);
-			}
-
 			if (!ndo->ndo_suppress_default_print)
 				ND_DEFAULTPRINT(p, caplen);
 		}

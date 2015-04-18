@@ -148,7 +148,6 @@ u_int
 token_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 {
 	const struct token_header *trp;
-	u_short extracted_ethertype;
 	struct ether_header ehdr;
 	u_int route_len = 0, hdr_len = TOKEN_HDRLEN;
 	int seg;
@@ -210,17 +209,8 @@ token_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 	/* Frame Control field determines interpretation of packet */
 	if (FRAME_TYPE(trp) == TOKEN_FC_LLC) {
 		/* Try to print the LLC-layer header & higher layers */
-		if (llc_print(ndo, p, length, caplen, ESRC(&ehdr), EDST(&ehdr),
-		    &extracted_ethertype) == 0) {
+		if (llc_print(ndo, p, length, caplen, ESRC(&ehdr), EDST(&ehdr)) == 0) {
 			/* ether_type not known, print raw packet */
-			if (!ndo->ndo_eflag)
-				token_hdr_print(ndo, trp,
-				    length + TOKEN_HDRLEN + route_len,
-				    ESRC(&ehdr), EDST(&ehdr));
-			if (extracted_ethertype) {
-				ND_PRINT((ndo, "(LLC %s) ",
-			etherproto_string(htons(extracted_ethertype))));
-			}
 			if (!ndo->ndo_suppress_default_print)
 				ND_DEFAULTPRINT(p, caplen);
 		}

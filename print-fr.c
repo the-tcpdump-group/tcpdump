@@ -330,7 +330,7 @@ fr_print(netdissect_options *ndo,
 		break;
 
 	case NLPID_SNAP:
-		if (snap_print(ndo, p, length, length, 0) == 0) {
+		if (snap_print(ndo, p, length, length, NULL, NULL, 0) == 0) {
 			/* ether_type not known, print raw packet */
                         if (!ndo->ndo_eflag)
                             fr_hdr_print(ndo, length + hdr_len, hdr_len,

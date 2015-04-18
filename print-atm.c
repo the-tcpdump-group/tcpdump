@@ -218,15 +218,8 @@ static void
 atm_llc_print(netdissect_options *ndo,
               const u_char *p, int length, int caplen)
 {
-	u_short extracted_ethertype;
-
-	if (!llc_print(ndo, p, length, caplen, NULL, NULL,
-	    &extracted_ethertype)) {
+	if (!llc_print(ndo, p, length, caplen, NULL, NULL)) {
 		/* ether_type not known, print raw packet */
-		if (extracted_ethertype) {
-			ND_PRINT((ndo, "(LLC %s) ",
-		etherproto_string(htons(extracted_ethertype))));
-		}
 		if (!ndo->ndo_suppress_default_print)
 			ND_DEFAULTPRINT(p, caplen);
 	}

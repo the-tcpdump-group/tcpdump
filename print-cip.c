@@ -61,7 +61,6 @@ cip_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 {
 	u_int caplen = h->caplen;
 	u_int length = h->len;
-	u_short extracted_ethertype;
 
 	if (memcmp(rfcllc, p, sizeof(rfcllc))==0 && caplen < RFC1483LLC_LEN) {
 		ND_PRINT((ndo, "[|cip]"));
@@ -75,15 +74,7 @@ cip_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 		/*
 		 * LLC header is present.  Try to print it & higher layers.
 		 */
-		if (llc_print(ndo, p, length, caplen, NULL, NULL,
-		    &extracted_ethertype) == 0) {
-			/* ether_type not known, print raw packet */
-			if (!ndo->ndo_eflag)
-				cip_print(ndo, length);
-			if (extracted_ethertype) {
-				ND_PRINT((ndo, "(LLC %s) ",
-			       etherproto_string(htons(extracted_ethertype))));
-			}
+		if (llc_print(ndo, p, length, caplen, NULL, NULL) == 0) {
 			if (!ndo->ndo_suppress_default_print)
 				ND_DEFAULTPRINT(p, caplen);
 		}

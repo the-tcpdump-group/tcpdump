@@ -197,7 +197,6 @@ sll_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char 
 	u_int length = h->len;
 	register const struct sll_header *sllp;
 	u_short ether_type;
-	u_short extracted_ethertype;
 
 	if (caplen < SLL_HDR_LEN) {
 		/*
@@ -246,23 +245,15 @@ recurse:
 			 * 802.2.
 			 * Try to print the LLC-layer header & higher layers.
 			 */
-			if (llc_print(ndo, p, length, caplen, NULL, NULL,
-			    &extracted_ethertype) == 0)
+			if (llc_print(ndo, p, length, caplen, NULL, NULL) == 0)
 				goto unknown;	/* unknown LLC type */
 			break;
 
 		default:
-			extracted_ethertype = 0;
 			/*FALLTHROUGH*/
 
 		unknown:
 			/* ether_type not known, print raw packet */
-			if (!ndo->ndo_eflag)
-				sll_print(ndo, sllp, length + SLL_HDR_LEN);
-			if (extracted_ethertype) {
-				ND_PRINT((ndo, "(LLC %s) ",
-			       etherproto_string(htons(extracted_ethertype))));
-			}
 			if (!ndo->ndo_suppress_default_print)
 				ND_DEFAULTPRINT(p, caplen);
 			break;

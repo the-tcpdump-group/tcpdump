@@ -937,8 +937,7 @@ juniper_atm1_print(netdissect_options *ndo,
         if (EXTRACT_24BITS(p) == 0xfefe03 || /* NLPID encaps ? */
             EXTRACT_24BITS(p) == 0xaaaa03) { /* SNAP encaps ? */
 
-            if (llc_print(ndo, p, l2info.length, l2info.caplen, NULL, NULL,
-                          &extracted_ethertype) != 0)
+            if (llc_print(ndo, p, l2info.length, l2info.caplen, NULL, NULL) != 0)
                 return l2info.header_len;
         }
 
@@ -986,8 +985,7 @@ juniper_atm2_print(netdissect_options *ndo,
         if (EXTRACT_24BITS(p) == 0xfefe03 || /* NLPID encaps ? */
             EXTRACT_24BITS(p) == 0xaaaa03) { /* SNAP encaps ? */
 
-            if (llc_print(ndo, p, l2info.length, l2info.caplen, NULL, NULL,
-                          &extracted_ethertype) != 0)
+            if (llc_print(ndo, p, l2info.length, l2info.caplen, NULL, NULL) != 0)
                 return l2info.header_len;
         }
 
