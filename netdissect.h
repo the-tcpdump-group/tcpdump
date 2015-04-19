@@ -81,9 +81,9 @@ extern const char *tok2strbuf(const struct tok *, const char *, u_int,
 			      char *buf, size_t bufsize);
 
 /* tok2str is deprecated */
-extern const char *tok2str(const struct tok *, const char *, int);
-extern char *bittok2str(const struct tok *, const char *, int);
-extern char *bittok2str_nosep(const struct tok *, const char *, int);
+extern const char *tok2str(const struct tok *, const char *, u_int);
+extern char *bittok2str(const struct tok *, const char *, u_int);
+extern char *bittok2str_nosep(const struct tok *, const char *, u_int);
 
 
 typedef struct netdissect_options netdissect_options;
@@ -293,7 +293,6 @@ extern void relts_print(netdissect_options *, int);
 extern int fn_print(netdissect_options *, const u_char *, const u_char *);
 extern int fn_printn(netdissect_options *, const u_char *, u_int, const u_char *);
 extern int fn_printzp(netdissect_options *, const u_char *, u_int, const u_char *);
-extern const char *tok2str(const struct tok *, const char *, int);
 
 /*
  * Flags for txtproto_print().
