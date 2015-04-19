@@ -370,6 +370,7 @@ extern int esp_print(netdissect_options *,
 		     const u_char *bp, const int length, const u_char *bp2,
 		     int *nhdr, int *padlen);
 extern void arp_print(netdissect_options *,const u_char *, u_int, u_int);
+extern void medsa_print(netdissect_options *, const u_char *, u_int, u_int);
 extern void tipc_print(netdissect_options *, const u_char *, u_int, u_int);
 extern void msnlb_print(netdissect_options *, const u_char *);
 extern void icmp6_print(netdissect_options *ndo, const u_char *,
