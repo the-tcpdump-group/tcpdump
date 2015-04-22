@@ -56,7 +56,6 @@
  #	@(#)snmp.awk.x	1.1 (LANL) 1/15/90
  */
 
-#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

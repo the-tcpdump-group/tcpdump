@@ -1,7 +1,7 @@
 /*
  * Oracle
  */
-#define NETDISSECT_REWORKED
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -45,7 +45,7 @@ ppi_header_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	ND_PRINT((ndo, ", length %u: ", length));
 }
 
-static void
+static u_int
 ppi_print(netdissect_options *ndo,
                const struct pcap_pkthdr *h, const u_char *p)
 {
@@ -55,21 +55,26 @@ ppi_print(netdissect_options *ndo,
 	u_int length = h->len;
 	uint16_t len;
 	uint32_t dlt;
+	uint32_t hdrlen;
 
 	if (caplen < sizeof(ppi_header_t)) {
 		ND_PRINT((ndo, "[|ppi]"));
-		return;
+		return (caplen);
 	}
 
 	hdr = (ppi_header_t *)p;
 	len = EXTRACT_LE_16BITS(&hdr->ppi_len);
+	if (caplen < len) {
+		/*
+		 * If we don't have the entire PPI header, don't
+		 * bother.
+		 */
+		ND_PRINT((ndo, "[|ppi]"));
+		return (caplen);
+	}
 	if (len < sizeof(ppi_header_t)) {
 		ND_PRINT((ndo, "[|ppi]"));
-		return;
-	}
-	if (caplen < len) {
-		ND_PRINT((ndo, "[|ppi]"));
-		return;
+		return (len);
 	}
 	dlt = EXTRACT_LE_32BITS(&hdr->ppi_dlt);
 
@@ -81,14 +86,16 @@ ppi_print(netdissect_options *ndo,
 	p += len;
 
 	if ((printer = lookup_printer(dlt)) != NULL) {
-		printer(ndo, h, p);
+		hdrlen = printer(ndo, h, p);
 	} else {
 		if (!ndo->ndo_eflag)
 			ppi_header_print(ndo, (u_char *)hdr, length + len);
 
 		if (!ndo->ndo_suppress_default_print)
 			ND_DEFAULTPRINT(p, caplen);
+		hdrlen = 0;
 	}
+	return (len + hdrlen);
 }
 
 /*
@@ -101,9 +108,7 @@ u_int
 ppi_if_print(netdissect_options *ndo,
                const struct pcap_pkthdr *h, const u_char *p)
 {
-	ppi_print(ndo, h, p);
-
-	return (sizeof(ppi_header_t));
+	return (ppi_print(ndo, h, p));
 }
 
 /*

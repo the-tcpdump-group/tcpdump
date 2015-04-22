@@ -24,7 +24,6 @@
  *    http://www.cisco.com/univercd/cc/td/doc/product/lan/trsrb/frames.htm
  */
 
-#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

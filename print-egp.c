@@ -18,7 +18,6 @@
  * Initial contribution from Jeff Honig (jch@MITCHELL.CIT.CORNELL.EDU).
  */
 
-#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

@@ -32,7 +32,6 @@
  * Ken Hornstein <kenh@cmf.nrl.navy.mil>
  */
 
-#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

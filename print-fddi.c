@@ -19,7 +19,6 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -259,17 +258,11 @@ fddi_hdr_print(netdissect_options *ndo,
 	srcname = etheraddr_string(ndo, fsrc);
 	dstname = etheraddr_string(ndo, fdst);
 
-	if (ndo->ndo_vflag)
-		ND_PRINT((ndo, "%02x %s %s %d: ",
-		       fddip->fddi_fc,
-		       srcname, dstname,
-		       length));
-	else if (ndo->ndo_qflag)
-		ND_PRINT((ndo, "%s %s %d: ", srcname, dstname, length));
-	else {
+	if (!ndo->ndo_qflag)
 		print_fddi_fc(ndo, fddip->fddi_fc);
-		ND_PRINT((ndo, "%s %s %d: ", srcname, dstname, length));
-	}
+	ND_PRINT((ndo, "%s > %s, length %u: ",
+	       srcname, dstname,
+	       length));
 }
 
 static inline void
@@ -278,16 +271,16 @@ fddi_smt_print(netdissect_options *ndo, const u_char *p _U_, u_int length _U_)
 	ND_PRINT((ndo, "<SMT printer not yet implemented>"));
 }
 
-void
+u_int
 fddi_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 {
 	const struct fddi_header *fddip = (const struct fddi_header *)p;
 	struct ether_header ehdr;
-	u_short extracted_ethertype;
+	int llc_hdrlen;
 
 	if (caplen < FDDI_HDRLEN) {
 		ND_PRINT((ndo, "[|fddi]"));
-		return;
+		return (caplen);
 	}
 
 	/*
@@ -306,32 +299,29 @@ fddi_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 	/* Frame Control field determines interpretation of packet */
 	if ((fddip->fddi_fc & FDDIFC_CLFF) == FDDIFC_LLC_ASYNC) {
 		/* Try to print the LLC-layer header & higher layers */
-		if (llc_print(ndo, p, length, caplen, ESRC(&ehdr), EDST(&ehdr),
-		    &extracted_ethertype) == 0) {
+		llc_hdrlen = llc_print(ndo, p, length, caplen, ESRC(&ehdr), EDST(&ehdr));
+		if (llc_hdrlen < 0) {
 			/*
 			 * Some kinds of LLC packet we cannot
 			 * handle intelligently
 			 */
-			if (!ndo->ndo_eflag)
-				fddi_hdr_print(ndo, fddip, length + FDDI_HDRLEN,
-				    ESRC(&ehdr), EDST(&ehdr));
-			if (extracted_ethertype) {
-				ND_PRINT((ndo, "(LLC %s) ",
-			etherproto_string(htons(extracted_ethertype))));
-			}
 			if (!ndo->ndo_suppress_default_print)
 				ND_DEFAULTPRINT(p, caplen);
+			llc_hdrlen = -llc_hdrlen;
 		}
-	} else if ((fddip->fddi_fc & FDDIFC_CLFF) == FDDIFC_SMT)
+	} else if ((fddip->fddi_fc & FDDIFC_CLFF) == FDDIFC_SMT) {
 		fddi_smt_print(ndo, p, caplen);
-	else {
+		llc_hdrlen = 0;
+	} else {
 		/* Some kinds of FDDI packet we cannot handle intelligently */
 		if (!ndo->ndo_eflag)
 			fddi_hdr_print(ndo, fddip, length + FDDI_HDRLEN, ESRC(&ehdr),
 			    EDST(&ehdr));
 		if (!ndo->ndo_suppress_default_print)
 			ND_DEFAULTPRINT(p, caplen);
+		llc_hdrlen = 0;
 	}
+	return (FDDI_HDRLEN + llc_hdrlen);
 }
 
 /*
@@ -343,7 +333,5 @@ fddi_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 u_int
 fddi_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, register const u_char *p)
 {
-	fddi_print(ndo, p, h->len, h->caplen);
-
-	return (FDDI_HDRLEN);
+	return (fddi_print(ndo, p, h->len, h->caplen));
 }

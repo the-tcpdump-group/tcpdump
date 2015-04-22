@@ -19,7 +19,6 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -74,19 +73,19 @@ ipfc_hdr_print(netdissect_options *ndo,
 	/*
 	 * XXX - show the upper 16 bits?  Do so only if "vflag" is set?
 	 */
-	ND_PRINT((ndo, "%s %s %d: ", srcname, dstname, length));
+	ND_PRINT((ndo, "%s > %s, length %u: ", srcname, dstname, length));
 }
 
-static void
+static u_int
 ipfc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 {
 	const struct ipfc_header *ipfcp = (const struct ipfc_header *)p;
 	struct ether_header ehdr;
-	u_short extracted_ethertype;
+	int llc_hdrlen;
 
 	if (caplen < IPFC_HDRLEN) {
 		ND_PRINT((ndo, "[|ipfc]"));
-		return;
+		return (caplen);
 	}
 	/*
 	 * Get the network addresses into a canonical form
@@ -102,22 +101,17 @@ ipfc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 	caplen -= IPFC_HDRLEN;
 
 	/* Try to print the LLC-layer header & higher layers */
-	if (llc_print(ndo, p, length, caplen, ESRC(&ehdr), EDST(&ehdr),
-	    &extracted_ethertype) == 0) {
+	llc_hdrlen = llc_print(ndo, p, length, caplen, ESRC(&ehdr), EDST(&ehdr));
+	if (llc_hdrlen < 0) {
 		/*
 		 * Some kinds of LLC packet we cannot
 		 * handle intelligently
 		 */
-		if (!ndo->ndo_eflag)
-			ipfc_hdr_print(ndo, ipfcp, length + IPFC_HDRLEN,
-			    ESRC(&ehdr), EDST(&ehdr));
-		if (extracted_ethertype) {
-			ND_PRINT((ndo, "(LLC %s) ",
-		etherproto_string(htons(extracted_ethertype))));
-		}
 		if (!ndo->ndo_suppress_default_print)
 			ND_DEFAULTPRINT(p, caplen);
+		llc_hdrlen = -llc_hdrlen;
 	}
+	return (IPFC_HDRLEN + llc_hdrlen);
 }
 
 /*
@@ -129,7 +123,5 @@ ipfc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 u_int
 ipfc_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, register const u_char *p)
 {
-	ipfc_print(ndo, p, h->len, h->caplen);
-
-	return (IPFC_HDRLEN);
+	return (ipfc_print(ndo, p, h->len, h->caplen));
 }

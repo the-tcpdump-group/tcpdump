@@ -7,7 +7,6 @@
  * BSD-style license that accompanies tcpdump or the GNU GPL version 2
  */
 
-#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

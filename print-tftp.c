@@ -21,7 +21,6 @@
  * Format and print trivial file transfer protocol packets.
  */
 
-#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

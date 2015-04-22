@@ -20,7 +20,6 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -45,8 +44,11 @@
 #define	IEEE802_11_BSSID_LEN		6
 #define	IEEE802_11_RA_LEN		6
 #define	IEEE802_11_TA_LEN		6
+#define	IEEE802_11_ADDR1_LEN		6
 #define	IEEE802_11_SEQ_LEN		2
 #define	IEEE802_11_CTL_LEN		2
+#define	IEEE802_11_CARRIED_FC_LEN	2
+#define	IEEE802_11_HT_CONTROL_LEN	4
 #define	IEEE802_11_IV_LEN		3
 #define	IEEE802_11_KID_LEN		1
 
@@ -166,15 +168,15 @@ static const struct tok ctrl_str[] = {
 #define	FC_RETRY(fc)		((fc) & 0x0800)
 #define	FC_POWER_MGMT(fc)	((fc) & 0x1000)
 #define	FC_MORE_DATA(fc)	((fc) & 0x2000)
-#define	FC_WEP(fc)		((fc) & 0x4000)
+#define	FC_PROTECTED(fc)	((fc) & 0x4000)
 #define	FC_ORDER(fc)		((fc) & 0x8000)
 
 struct mgmt_header_t {
 	uint16_t	fc;
 	uint16_t 	duration;
-	uint8_t		da[6];
-	uint8_t		sa[6];
-	uint8_t		bssid[6];
+	uint8_t		da[IEEE802_11_DA_LEN];
+	uint8_t		sa[IEEE802_11_SA_LEN];
+	uint8_t		bssid[IEEE802_11_BSSID_LEN];
 	uint16_t	seq_ctrl;
 };
 
@@ -292,85 +294,90 @@ struct mgmt_body_t {
 	struct tim_t	tim;
 };
 
-struct ctrl_rts_t {
+struct ctrl_control_wrapper_hdr_t {
 	uint16_t	fc;
 	uint16_t	duration;
-	uint8_t		ra[6];
-	uint8_t		ta[6];
-	uint8_t		fcs[4];
+	uint8_t		addr1[IEEE802_11_ADDR1_LEN];
+	uint16_t	carried_fc[IEEE802_11_CARRIED_FC_LEN];
+	uint16_t	ht_control[IEEE802_11_HT_CONTROL_LEN];
+};
+
+#define	CTRL_CONTROL_WRAPPER_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
+					 IEEE802_11_ADDR1_LEN+\
+					 IEEE802_11_CARRIED_FC_LEN+\
+					 IEEE802_11_HT_CONTROL_LEN)
+
+struct ctrl_rts_hdr_t {
+	uint16_t	fc;
+	uint16_t	duration;
+	uint8_t		ra[IEEE802_11_RA_LEN];
+	uint8_t		ta[IEEE802_11_TA_LEN];
 };
 
 #define	CTRL_RTS_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
 			 IEEE802_11_RA_LEN+IEEE802_11_TA_LEN)
 
-struct ctrl_cts_t {
+struct ctrl_cts_hdr_t {
 	uint16_t	fc;
 	uint16_t	duration;
-	uint8_t		ra[6];
-	uint8_t		fcs[4];
+	uint8_t		ra[IEEE802_11_RA_LEN];
 };
 
 #define	CTRL_CTS_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+IEEE802_11_RA_LEN)
 
-struct ctrl_ack_t {
+struct ctrl_ack_hdr_t {
 	uint16_t	fc;
 	uint16_t	duration;
-	uint8_t		ra[6];
-	uint8_t		fcs[4];
+	uint8_t		ra[IEEE802_11_RA_LEN];
 };
 
 #define	CTRL_ACK_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+IEEE802_11_RA_LEN)
 
-struct ctrl_ps_poll_t {
+struct ctrl_ps_poll_hdr_t {
 	uint16_t	fc;
 	uint16_t	aid;
-	uint8_t		bssid[6];
-	uint8_t		ta[6];
-	uint8_t		fcs[4];
+	uint8_t		bssid[IEEE802_11_BSSID_LEN];
+	uint8_t		ta[IEEE802_11_TA_LEN];
 };
 
 #define	CTRL_PS_POLL_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_AID_LEN+\
 				 IEEE802_11_BSSID_LEN+IEEE802_11_TA_LEN)
 
-struct ctrl_end_t {
+struct ctrl_end_hdr_t {
 	uint16_t	fc;
 	uint16_t	duration;
-	uint8_t		ra[6];
-	uint8_t		bssid[6];
-	uint8_t		fcs[4];
+	uint8_t		ra[IEEE802_11_RA_LEN];
+	uint8_t		bssid[IEEE802_11_BSSID_LEN];
 };
 
 #define	CTRL_END_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
 			 IEEE802_11_RA_LEN+IEEE802_11_BSSID_LEN)
 
-struct ctrl_end_ack_t {
+struct ctrl_end_ack_hdr_t {
 	uint16_t	fc;
 	uint16_t	duration;
-	uint8_t		ra[6];
-	uint8_t		bssid[6];
-	uint8_t		fcs[4];
+	uint8_t		ra[IEEE802_11_RA_LEN];
+	uint8_t		bssid[IEEE802_11_BSSID_LEN];
 };
 
 #define	CTRL_END_ACK_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
 				 IEEE802_11_RA_LEN+IEEE802_11_BSSID_LEN)
 
-struct ctrl_ba_t {
+struct ctrl_ba_hdr_t {
 	uint16_t	fc;
 	uint16_t	duration;
-	uint8_t		ra[6];
-	uint8_t		fcs[4];
+	uint8_t		ra[IEEE802_11_RA_LEN];
 };
 
 #define	CTRL_BA_HDRLEN	(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+IEEE802_11_RA_LEN)
 
-struct ctrl_bar_t {
+struct ctrl_bar_hdr_t {
 	uint16_t	fc;
 	uint16_t	dur;
-	uint8_t		ra[6];
-	uint8_t		ta[6];
+	uint8_t		ra[IEEE802_11_RA_LEN];
+	uint8_t		ta[IEEE802_11_TA_LEN];
 	uint16_t	ctl;
 	uint16_t	seq;
-	uint8_t		fcs[4];
 };
 
 #define	CTRL_BAR_HDRLEN		(IEEE802_11_FC_LEN+IEEE802_11_DUR_LEN+\
@@ -1283,7 +1290,7 @@ wep_print(netdissect_options *ndo,
 		return 0;
 	iv = EXTRACT_LE_32BITS(p);
 
-	ND_PRINT((ndo, "Data IV:%3x Pad %x KeyID %x", IV_IV(iv), IV_PAD(iv),
+	ND_PRINT((ndo, " IV:%3x Pad %x KeyID %x", IV_IV(iv), IV_PAD(iv),
 	    IV_KEYID(iv)));
 
 	return 1;
@@ -1801,7 +1808,7 @@ handle_auth(netdissect_options *ndo,
 
 static int
 handle_deauth(netdissect_options *ndo,
-              const struct mgmt_header_t *pmh, const u_char *p, u_int length)
+              const uint8_t *src, const u_char *p, u_int length)
 {
 	struct mgmt_body_t  pbody;
 	const char *reason = NULL;
@@ -1821,7 +1828,7 @@ handle_deauth(netdissect_options *ndo,
 	if (ndo->ndo_eflag) {
 		ND_PRINT((ndo, ": %s", reason));
 	} else {
-		ND_PRINT((ndo, " (%s): %s", etheraddr_string(ndo, pmh->sa), reason));
+		ND_PRINT((ndo, " (%s): %s", etheraddr_string(ndo, src), reason));
 	}
 	return 1;
 }
@@ -1886,7 +1893,7 @@ handle_deauth(netdissect_options *ndo,
 
 static int
 handle_action(netdissect_options *ndo,
-              const struct mgmt_header_t *pmh, const u_char *p, u_int length)
+              const uint8_t *src, const u_char *p, u_int length)
 {
 	if (!ND_TTEST2(*p, 2))
 		return 0;
@@ -1895,7 +1902,7 @@ handle_action(netdissect_options *ndo,
 	if (ndo->ndo_eflag) {
 		ND_PRINT((ndo, ": "));
 	} else {
-		ND_PRINT((ndo, " (%s): ", etheraddr_string(ndo, pmh->sa)));
+		ND_PRINT((ndo, " (%s): ", etheraddr_string(ndo, src)));
 	}
 	switch (p[0]) {
 	case 0: ND_PRINT((ndo, "Spectrum Management Act#%d", p[1])); break;
@@ -1926,10 +1933,13 @@ handle_action(netdissect_options *ndo,
 
 static int
 mgmt_body_print(netdissect_options *ndo,
-                uint16_t fc, const struct mgmt_header_t *pmh,
-                const u_char *p, u_int length)
+                uint16_t fc, const uint8_t *src, const u_char *p, u_int length)
 {
 	ND_PRINT((ndo, "%s", tok2str(st_str, "Unhandled Management subtype(%x)", FC_SUBTYPE(fc))));
+
+	/* There may be a problem w/ AP not having this bit set */
+	if (FC_PROTECTED(fc))
+		return wep_print(ndo, p);
 	switch (FC_SUBTYPE(fc)) {
 	case ST_ASSOC_REQUEST:
 		return handle_assoc_request(ndo, p, length);
@@ -1950,17 +1960,11 @@ mgmt_body_print(netdissect_options *ndo,
 	case ST_DISASSOC:
 		return handle_disassoc(ndo, p, length);
 	case ST_AUTH:
-		if (!ND_TTEST2(*p, 3))
-			return 0;
-		if ((p[0] == 0 ) && (p[1] == 0) && (p[2] == 0)) {
-			ND_PRINT((ndo, "Authentication (Shared-Key)-3 "));
-			return wep_print(ndo, p);
-		}
 		return handle_auth(ndo, p, length);
 	case ST_DEAUTH:
-		return handle_deauth(ndo, pmh, p, length);
+		return handle_deauth(ndo, src, p, length);
 	case ST_ACTION:
-		return handle_action(ndo, pmh, p, length);
+		return handle_action(ndo, src, p, length);
 	default:
 		return 1;
 	}
@@ -1985,66 +1989,62 @@ ctrl_body_print(netdissect_options *ndo,
 			return 0;
 		if (!ndo->ndo_eflag)
 			ND_PRINT((ndo, " RA:%s TA:%s CTL(%x) SEQ(%u) ",
-			    etheraddr_string(ndo, ((const struct ctrl_bar_t *)p)->ra),
-			    etheraddr_string(ndo, ((const struct ctrl_bar_t *)p)->ta),
-			    EXTRACT_LE_16BITS(&(((const struct ctrl_bar_t *)p)->ctl)),
-			    EXTRACT_LE_16BITS(&(((const struct ctrl_bar_t *)p)->seq))));
+			    etheraddr_string(ndo, ((const struct ctrl_bar_hdr_t *)p)->ra),
+			    etheraddr_string(ndo, ((const struct ctrl_bar_hdr_t *)p)->ta),
+			    EXTRACT_LE_16BITS(&(((const struct ctrl_bar_hdr_t *)p)->ctl)),
+			    EXTRACT_LE_16BITS(&(((const struct ctrl_bar_hdr_t *)p)->seq))));
 		break;
 	case CTRL_BA:
 		if (!ND_TTEST2(*p, CTRL_BA_HDRLEN))
 			return 0;
 		if (!ndo->ndo_eflag)
 			ND_PRINT((ndo, " RA:%s ",
-			    etheraddr_string(ndo, ((const struct ctrl_ba_t *)p)->ra)));
+			    etheraddr_string(ndo, ((const struct ctrl_ba_hdr_t *)p)->ra)));
 		break;
 	case CTRL_PS_POLL:
 		if (!ND_TTEST2(*p, CTRL_PS_POLL_HDRLEN))
 			return 0;
 		ND_PRINT((ndo, " AID(%x)",
-		    EXTRACT_LE_16BITS(&(((const struct ctrl_ps_poll_t *)p)->aid))));
+		    EXTRACT_LE_16BITS(&(((const struct ctrl_ps_poll_hdr_t *)p)->aid))));
 		break;
 	case CTRL_RTS:
 		if (!ND_TTEST2(*p, CTRL_RTS_HDRLEN))
 			return 0;
 		if (!ndo->ndo_eflag)
 			ND_PRINT((ndo, " TA:%s ",
-			    etheraddr_string(ndo, ((const struct ctrl_rts_t *)p)->ta)));
+			    etheraddr_string(ndo, ((const struct ctrl_rts_hdr_t *)p)->ta)));
 		break;
 	case CTRL_CTS:
 		if (!ND_TTEST2(*p, CTRL_CTS_HDRLEN))
 			return 0;
 		if (!ndo->ndo_eflag)
 			ND_PRINT((ndo, " RA:%s ",
-			    etheraddr_string(ndo, ((const struct ctrl_cts_t *)p)->ra)));
+			    etheraddr_string(ndo, ((const struct ctrl_cts_hdr_t *)p)->ra)));
 		break;
 	case CTRL_ACK:
 		if (!ND_TTEST2(*p, CTRL_ACK_HDRLEN))
 			return 0;
 		if (!ndo->ndo_eflag)
 			ND_PRINT((ndo, " RA:%s ",
-			    etheraddr_string(ndo, ((const struct ctrl_ack_t *)p)->ra)));
+			    etheraddr_string(ndo, ((const struct ctrl_ack_hdr_t *)p)->ra)));
 		break;
 	case CTRL_CF_END:
 		if (!ND_TTEST2(*p, CTRL_END_HDRLEN))
 			return 0;
 		if (!ndo->ndo_eflag)
 			ND_PRINT((ndo, " RA:%s ",
-			    etheraddr_string(ndo, ((const struct ctrl_end_t *)p)->ra)));
+			    etheraddr_string(ndo, ((const struct ctrl_end_hdr_t *)p)->ra)));
 		break;
 	case CTRL_END_ACK:
 		if (!ND_TTEST2(*p, CTRL_END_ACK_HDRLEN))
 			return 0;
 		if (!ndo->ndo_eflag)
 			ND_PRINT((ndo, " RA:%s ",
-			    etheraddr_string(ndo, ((const struct ctrl_end_ack_t *)p)->ra)));
+			    etheraddr_string(ndo, ((const struct ctrl_end_ack_hdr_t *)p)->ra)));
 		break;
 	}
 	return 1;
 }
-
-/*
- * Print Header funcs
- */
 
 /*
  *  Data Frame - Address field contents
@@ -2056,10 +2056,55 @@ ctrl_body_print(netdissect_options *ndo,
  *    1    |  1      |  RA    | TA     | DA     | SA
  */
 
+/*
+ * Function to get source and destination MAC addresses for a data frame.
+ */
 static void
-data_header_print(netdissect_options *ndo,
-                  uint16_t fc, const u_char *p, const uint8_t **srcp,
-                  const uint8_t **dstp)
+get_data_src_dst_mac(uint16_t fc, const u_char *p, const uint8_t **srcp,
+                     const uint8_t **dstp)
+{
+#define ADDR1  (p + 4)
+#define ADDR2  (p + 10)
+#define ADDR3  (p + 16)
+#define ADDR4  (p + 24)
+
+	if (!FC_TO_DS(fc) && !FC_FROM_DS(fc)) {
+		*srcp = ADDR2;
+		*dstp = ADDR1;
+	} else if (!FC_TO_DS(fc) && FC_FROM_DS(fc)) {
+		*srcp = ADDR3;
+		*dstp = ADDR1;
+	} else if (FC_TO_DS(fc) && !FC_FROM_DS(fc)) {
+		*srcp = ADDR2;
+		*dstp = ADDR3;
+	} else if (FC_TO_DS(fc) && FC_FROM_DS(fc)) {
+		*srcp = ADDR4;
+		*dstp = ADDR3;
+	}
+
+#undef ADDR1
+#undef ADDR2
+#undef ADDR3
+#undef ADDR4
+}
+
+static void
+get_mgmt_src_dst_mac(const u_char *p, const uint8_t **srcp, const uint8_t **dstp)
+{
+	const struct mgmt_header_t *hp = (const struct mgmt_header_t *) p;
+
+	if (srcp != NULL)
+		*srcp = hp->sa;
+	if (dstp != NULL)
+		*dstp = hp->da;
+}
+
+/*
+ * Print Header funcs
+ */
+
+static void
+data_header_print(netdissect_options *ndo, uint16_t fc, const u_char *p)
 {
 	u_int subtype = FC_SUBTYPE(fc);
 
@@ -2086,42 +2131,18 @@ data_header_print(netdissect_options *ndo,
 #define ADDR4  (p + 24)
 
 	if (!FC_TO_DS(fc) && !FC_FROM_DS(fc)) {
-		if (srcp != NULL)
-			*srcp = ADDR2;
-		if (dstp != NULL)
-			*dstp = ADDR1;
-		if (!ndo->ndo_eflag)
-			return;
 		ND_PRINT((ndo, "DA:%s SA:%s BSSID:%s ",
 		    etheraddr_string(ndo, ADDR1), etheraddr_string(ndo, ADDR2),
 		    etheraddr_string(ndo, ADDR3)));
 	} else if (!FC_TO_DS(fc) && FC_FROM_DS(fc)) {
-		if (srcp != NULL)
-			*srcp = ADDR3;
-		if (dstp != NULL)
-			*dstp = ADDR1;
-		if (!ndo->ndo_eflag)
-			return;
 		ND_PRINT((ndo, "DA:%s BSSID:%s SA:%s ",
 		    etheraddr_string(ndo, ADDR1), etheraddr_string(ndo, ADDR2),
 		    etheraddr_string(ndo, ADDR3)));
 	} else if (FC_TO_DS(fc) && !FC_FROM_DS(fc)) {
-		if (srcp != NULL)
-			*srcp = ADDR2;
-		if (dstp != NULL)
-			*dstp = ADDR3;
-		if (!ndo->ndo_eflag)
-			return;
 		ND_PRINT((ndo, "BSSID:%s SA:%s DA:%s ",
 		    etheraddr_string(ndo, ADDR1), etheraddr_string(ndo, ADDR2),
 		    etheraddr_string(ndo, ADDR3)));
 	} else if (FC_TO_DS(fc) && FC_FROM_DS(fc)) {
-		if (srcp != NULL)
-			*srcp = ADDR4;
-		if (dstp != NULL)
-			*dstp = ADDR3;
-		if (!ndo->ndo_eflag)
-			return;
 		ND_PRINT((ndo, "RA:%s TA:%s DA:%s SA:%s ",
 		    etheraddr_string(ndo, ADDR1), etheraddr_string(ndo, ADDR2),
 		    etheraddr_string(ndo, ADDR3), etheraddr_string(ndo, ADDR4)));
@@ -2134,17 +2155,9 @@ data_header_print(netdissect_options *ndo,
 }
 
 static void
-mgmt_header_print(netdissect_options *ndo,
-                  const u_char *p, const uint8_t **srcp, const uint8_t **dstp)
+mgmt_header_print(netdissect_options *ndo, const u_char *p)
 {
 	const struct mgmt_header_t *hp = (const struct mgmt_header_t *) p;
-
-	if (srcp != NULL)
-		*srcp = hp->sa;
-	if (dstp != NULL)
-		*dstp = hp->da;
-	if (!ndo->ndo_eflag)
-		return;
 
 	ND_PRINT((ndo, "BSSID:%s DA:%s SA:%s ",
 	    etheraddr_string(ndo, (hp)->bssid), etheraddr_string(ndo, (hp)->da),
@@ -2152,59 +2165,50 @@ mgmt_header_print(netdissect_options *ndo,
 }
 
 static void
-ctrl_header_print(netdissect_options *ndo,
-                  uint16_t fc, const u_char *p, const uint8_t **srcp,
-                  const uint8_t **dstp)
+ctrl_header_print(netdissect_options *ndo, uint16_t fc, const u_char *p)
 {
-	if (srcp != NULL)
-		*srcp = NULL;
-	if (dstp != NULL)
-		*dstp = NULL;
-	if (!ndo->ndo_eflag)
-		return;
-
 	switch (FC_SUBTYPE(fc)) {
 	case CTRL_BAR:
 		ND_PRINT((ndo, " RA:%s TA:%s CTL(%x) SEQ(%u) ",
-		    etheraddr_string(ndo, ((const struct ctrl_bar_t *)p)->ra),
-		    etheraddr_string(ndo, ((const struct ctrl_bar_t *)p)->ta),
-		    EXTRACT_LE_16BITS(&(((const struct ctrl_bar_t *)p)->ctl)),
-		    EXTRACT_LE_16BITS(&(((const struct ctrl_bar_t *)p)->seq))));
+		    etheraddr_string(ndo, ((const struct ctrl_bar_hdr_t *)p)->ra),
+		    etheraddr_string(ndo, ((const struct ctrl_bar_hdr_t *)p)->ta),
+		    EXTRACT_LE_16BITS(&(((const struct ctrl_bar_hdr_t *)p)->ctl)),
+		    EXTRACT_LE_16BITS(&(((const struct ctrl_bar_hdr_t *)p)->seq))));
 		break;
 	case CTRL_BA:
 		ND_PRINT((ndo, "RA:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_ba_t *)p)->ra)));
+		    etheraddr_string(ndo, ((const struct ctrl_ba_hdr_t *)p)->ra)));
 		break;
 	case CTRL_PS_POLL:
 		ND_PRINT((ndo, "BSSID:%s TA:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_ps_poll_t *)p)->bssid),
-		    etheraddr_string(ndo, ((const struct ctrl_ps_poll_t *)p)->ta)));
+		    etheraddr_string(ndo, ((const struct ctrl_ps_poll_hdr_t *)p)->bssid),
+		    etheraddr_string(ndo, ((const struct ctrl_ps_poll_hdr_t *)p)->ta)));
 		break;
 	case CTRL_RTS:
 		ND_PRINT((ndo, "RA:%s TA:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_rts_t *)p)->ra),
-		    etheraddr_string(ndo, ((const struct ctrl_rts_t *)p)->ta)));
+		    etheraddr_string(ndo, ((const struct ctrl_rts_hdr_t *)p)->ra),
+		    etheraddr_string(ndo, ((const struct ctrl_rts_hdr_t *)p)->ta)));
 		break;
 	case CTRL_CTS:
 		ND_PRINT((ndo, "RA:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_cts_t *)p)->ra)));
+		    etheraddr_string(ndo, ((const struct ctrl_cts_hdr_t *)p)->ra)));
 		break;
 	case CTRL_ACK:
 		ND_PRINT((ndo, "RA:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_ack_t *)p)->ra)));
+		    etheraddr_string(ndo, ((const struct ctrl_ack_hdr_t *)p)->ra)));
 		break;
 	case CTRL_CF_END:
 		ND_PRINT((ndo, "RA:%s BSSID:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_end_t *)p)->ra),
-		    etheraddr_string(ndo, ((const struct ctrl_end_t *)p)->bssid)));
+		    etheraddr_string(ndo, ((const struct ctrl_end_hdr_t *)p)->ra),
+		    etheraddr_string(ndo, ((const struct ctrl_end_hdr_t *)p)->bssid)));
 		break;
 	case CTRL_END_ACK:
 		ND_PRINT((ndo, "RA:%s BSSID:%s ",
-		    etheraddr_string(ndo, ((const struct ctrl_end_ack_t *)p)->ra),
-		    etheraddr_string(ndo, ((const struct ctrl_end_ack_t *)p)->bssid)));
+		    etheraddr_string(ndo, ((const struct ctrl_end_ack_hdr_t *)p)->ra),
+		    etheraddr_string(ndo, ((const struct ctrl_end_ack_hdr_t *)p)->bssid)));
 		break;
 	default:
-		ND_PRINT((ndo, "(H) Unknown Ctrl Subtype"));
+		/* We shouldn't get here - we should already have quit */
 		break;
 	}
 }
@@ -2220,8 +2224,12 @@ extract_header_length(netdissect_options *ndo,
 		return MGMT_HDRLEN;
 	case T_CTRL:
 		switch (FC_SUBTYPE(fc)) {
+		case CTRL_CONTROL_WRAPPER:
+			return CTRL_CONTROL_WRAPPER_HDRLEN;
 		case CTRL_BAR:
 			return CTRL_BAR_HDRLEN;
+		case CTRL_BA:
+			return CTRL_BA_HDRLEN;
 		case CTRL_PS_POLL:
 			return CTRL_PS_POLL_HDRLEN;
 		case CTRL_RTS:
@@ -2235,6 +2243,7 @@ extract_header_length(netdissect_options *ndo,
 		case CTRL_END_ACK:
 			return CTRL_END_ACK_HDRLEN;
 		default:
+			ND_PRINT((ndo, "unknown 802.11 ctrl frame subtype (%d)", FC_SUBTYPE(fc)));
 			return 0;
 		}
 	case T_DATA:
@@ -2243,7 +2252,7 @@ extract_header_length(netdissect_options *ndo,
 			len += 2;
 		return len;
 	default:
-		ND_PRINT((ndo, "unknown IEEE802.11 frame type (%d)", FC_TYPE(fc)));
+		ND_PRINT((ndo, "unknown 802.11 frame type (%d)", FC_TYPE(fc)));
 		return 0;
 	}
 }
@@ -2255,15 +2264,12 @@ extract_mesh_header_length(const u_char *p)
 }
 
 /*
- * Print the 802.11 MAC header if eflag is set, and set "*srcp" and "*dstp"
- * to point to the source and destination MAC addresses in any case if
- * "srcp" and "dstp" aren't null.
+ * Print the 802.11 MAC header.
  */
 static void
 ieee_802_11_hdr_print(netdissect_options *ndo,
                       uint16_t fc, const u_char *p, u_int hdrlen,
-                      u_int meshdrlen, const uint8_t **srcp,
-                      const uint8_t **dstp)
+                      u_int meshdrlen)
 {
 	if (ndo->ndo_vflag) {
 		if (FC_MORE_DATA(fc))
@@ -2276,8 +2282,8 @@ ieee_802_11_hdr_print(netdissect_options *ndo,
 			ND_PRINT((ndo, "Retry "));
 		if (FC_ORDER(fc))
 			ND_PRINT((ndo, "Strictly Ordered "));
-		if (FC_WEP(fc))
-			ND_PRINT((ndo, "WEP Encrypted "));
+		if (FC_PROTECTED(fc))
+			ND_PRINT((ndo, "Protected "));
 		if (FC_TYPE(fc) != T_CTRL || FC_SUBTYPE(fc) != CTRL_PS_POLL)
 			ND_PRINT((ndo, "%dus ",
 			    EXTRACT_LE_16BITS(
@@ -2301,19 +2307,15 @@ ieee_802_11_hdr_print(netdissect_options *ndo,
 
 	switch (FC_TYPE(fc)) {
 	case T_MGMT:
-		mgmt_header_print(ndo, p, srcp, dstp);
+		mgmt_header_print(ndo, p);
 		break;
 	case T_CTRL:
-		ctrl_header_print(ndo, fc, p, srcp, dstp);
+		ctrl_header_print(ndo, fc, p);
 		break;
 	case T_DATA:
-		data_header_print(ndo, fc, p, srcp, dstp);
+		data_header_print(ndo, fc, p);
 		break;
 	default:
-		ND_PRINT((ndo, "(header) unknown IEEE802.11 frame type (%d)",
-		    FC_TYPE(fc)));
-		*srcp = NULL;
-		*dstp = NULL;
 		break;
 	}
 }
@@ -2330,7 +2332,7 @@ ieee802_11_print(netdissect_options *ndo,
 	uint16_t fc;
 	u_int caplen, hdrlen, meshdrlen;
 	const uint8_t *src, *dst;
-	u_short extracted_ethertype;
+	int llc_hdrlen;
 
 	caplen = orig_caplen;
 	/* Remove FCS, if present */
@@ -2353,6 +2355,10 @@ ieee802_11_print(netdissect_options *ndo,
 
 	fc = EXTRACT_LE_16BITS(p);
 	hdrlen = extract_header_length(ndo, fc);
+	if (hdrlen == 0) {
+		/* Unknown frame type or control frame subtype; quit. */
+		return (0);
+	}
 	if (pad)
 		hdrlen = roundup2(hdrlen, 4);
 	if (ndo->ndo_Hflag && FC_TYPE(fc) == T_DATA &&
@@ -2362,13 +2368,13 @@ ieee802_11_print(netdissect_options *ndo,
 	} else
 		meshdrlen = 0;
 
-
 	if (caplen < hdrlen) {
 		ND_PRINT((ndo, "%s", tstr));
 		return hdrlen;
 	}
 
-	ieee_802_11_hdr_print(ndo, fc, p, hdrlen, meshdrlen, &src, &dst);
+	if (ndo->ndo_eflag)
+		ieee_802_11_hdr_print(ndo, fc, p, hdrlen, meshdrlen);
 
 	/*
 	 * Go past the 802.11 header.
@@ -2379,8 +2385,8 @@ ieee802_11_print(netdissect_options *ndo,
 
 	switch (FC_TYPE(fc)) {
 	case T_MGMT:
-		if (!mgmt_body_print(ndo, fc,
-		    (const struct mgmt_header_t *)(p - hdrlen), p, length)) {
+		get_mgmt_src_dst_mac(p - hdrlen, &src, &dst);
+		if (!mgmt_body_print(ndo, fc, src, p, length)) {
 			ND_PRINT((ndo, "%s", tstr));
 			return hdrlen;
 		}
@@ -2395,30 +2401,29 @@ ieee802_11_print(netdissect_options *ndo,
 		if (DATA_FRAME_IS_NULL(FC_SUBTYPE(fc)))
 			return hdrlen;	/* no-data frame */
 		/* There may be a problem w/ AP not having this bit set */
-		if (FC_WEP(fc)) {
+		if (FC_PROTECTED(fc)) {
+			ND_PRINT((ndo, "Data"));
 			if (!wep_print(ndo, p)) {
 				ND_PRINT((ndo, "%s", tstr));
 				return hdrlen;
 			}
-		} else if (llc_print(ndo, p, length, caplen, dst, src,
-		    &extracted_ethertype) == 0) {
-			/*
-			 * Some kinds of LLC packet we cannot
-			 * handle intelligently
-			 */
-			if (!ndo->ndo_eflag)
-				ieee_802_11_hdr_print(ndo, fc, p - hdrlen, hdrlen,
-				    meshdrlen, NULL, NULL);
-			if (extracted_ethertype)
-				ND_PRINT((ndo, "(LLC %s) ",
-				    etherproto_string(
-				        htons(extracted_ethertype))));
-			if (!ndo->ndo_suppress_default_print)
-				ND_DEFAULTPRINT(p, caplen);
+		} else {
+			get_data_src_dst_mac(fc, p - hdrlen, &src, &dst);
+			llc_hdrlen = llc_print(ndo, p, length, caplen, dst, src);
+			if (llc_hdrlen < 0) {
+				/*
+				 * Some kinds of LLC packet we cannot
+				 * handle intelligently
+				 */
+				if (!ndo->ndo_suppress_default_print)
+					ND_DEFAULTPRINT(p, caplen);
+				llc_hdrlen = -llc_hdrlen;
+			}
+			hdrlen += llc_hdrlen;
 		}
 		break;
 	default:
-		ND_PRINT((ndo, "unknown 802.11 frame type (%d)", FC_TYPE(fc)));
+		/* We shouldn't get here - we should already have quit */
 		break;
 	}
 

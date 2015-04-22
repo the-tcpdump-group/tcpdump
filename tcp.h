@@ -85,6 +85,7 @@ struct tcphdr {
 #define	TCPOPT_UTO		28	/* tcp user timeout (rfc5482) */
 #define	   TCPOLEN_UTO			4
 #define	TCPOPT_MPTCP		30	/* MPTCP options */
+#define TCPOPT_FASTOPEN		34	/* TCP Fast Open (rfc7413) */
 #define TCPOPT_EXPERIMENT2	254	/* experimental headers (rfc4727) */
 
 #define TCPOPT_TSTAMP_HDR	\

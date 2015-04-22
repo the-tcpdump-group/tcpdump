@@ -19,7 +19,6 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -123,7 +122,7 @@ ether_hdr_print(netdissect_options *ndo,
  * a pointer to a function that can print header information for that
  * frame's protocol, and an argument to pass to that function.
  */
-void
+u_int
 ether_print(netdissect_options *ndo,
             const u_char *p, u_int length, u_int caplen,
             void (*print_encap_header)(netdissect_options *ndo, const u_char *), const u_char *encap_header_arg)
@@ -131,11 +130,16 @@ ether_print(netdissect_options *ndo,
 	struct ether_header *ep;
 	u_int orig_length;
 	u_short ether_type;
-	u_short extracted_ether_type;
+	u_int hdrlen;
+	int llc_hdrlen;
 
-	if (caplen < ETHER_HDRLEN || length < ETHER_HDRLEN) {
+	if (caplen < ETHER_HDRLEN) {
 		ND_PRINT((ndo, "[|ether]"));
-		return;
+		return (caplen);
+	}
+	if (length < ETHER_HDRLEN) {
+		ND_PRINT((ndo, "[|ether]"));
+		return (length);
 	}
 
 	if (ndo->ndo_eflag) {
@@ -149,6 +153,7 @@ ether_print(netdissect_options *ndo,
 	caplen -= ETHER_HDRLEN;
 	ep = (struct ether_header *)p;
 	p += ETHER_HDRLEN;
+	hdrlen = ETHER_HDRLEN;
 
 	ether_type = EXTRACT_16BITS(&ep->ether_type);
 
@@ -158,18 +163,14 @@ recurse:
 	 */
 	if (ether_type <= ETHERMTU) {
 		/* Try to print the LLC-layer header & higher layers */
-		if (llc_print(ndo, p, length, caplen, ESRC(ep), EDST(ep),
-		    &extracted_ether_type) == 0) {
-			/* ether_type not known, print raw packet */
-			if (!ndo->ndo_eflag) {
-				if (print_encap_header != NULL)
-					(*print_encap_header)(ndo, encap_header_arg);
-				ether_hdr_print(ndo, (u_char *)ep, orig_length);
-			}
-
+		llc_hdrlen = llc_print(ndo, p, length, caplen, ESRC(ep), EDST(ep));
+		if (llc_hdrlen < 0) {
+			/* packet type not known, print raw packet */
 			if (!ndo->ndo_suppress_default_print)
 				ND_DEFAULTPRINT(p, caplen);
+			llc_hdrlen = -llc_hdrlen;
 		}
+		hdrlen += llc_hdrlen;
 	} else if (ether_type == ETHERTYPE_8021Q  ||
                 ether_type == ETHERTYPE_8021Q9100 ||
                 ether_type == ETHERTYPE_8021Q9200 ||
@@ -178,9 +179,13 @@ recurse:
 		 * Print VLAN information, and then go back and process
 		 * the enclosed type field.
 		 */
-		if (caplen < 4 || length < 4) {
+		if (caplen < 4) {
 			ND_PRINT((ndo, "[|vlan]"));
-			return;
+			return (hdrlen + caplen);
+		}
+		if (length < 4) {
+			ND_PRINT((ndo, "[|vlan]"));
+			return (hdrlen + length);
 		}
 	        if (ndo->ndo_eflag) {
 	        	uint16_t tag = EXTRACT_16BITS(p);
@@ -194,6 +199,7 @@ recurse:
 		p += 4;
 		length -= 4;
 		caplen -= 4;
+		hdrlen += 4;
 		goto recurse;
 	} else if (ether_type == ETHERTYPE_JUMBO) {
 		/*
@@ -206,18 +212,14 @@ recurse:
 		 * there's an LLC header and payload.
 		 */
 		/* Try to print the LLC-layer header & higher layers */
-		if (llc_print(ndo, p, length, caplen, ESRC(ep), EDST(ep),
-		    &extracted_ether_type) == 0) {
-			/* ether_type not known, print raw packet */
-			if (!ndo->ndo_eflag) {
-				if (print_encap_header != NULL)
-					(*print_encap_header)(ndo, encap_header_arg);
-				ether_hdr_print(ndo, (u_char *)ep, orig_length);
-			}
-
+		llc_hdrlen = llc_print(ndo, p, length, caplen, ESRC(ep), EDST(ep));
+		if (llc_hdrlen < 0) {
+			/* packet type not known, print raw packet */
 			if (!ndo->ndo_suppress_default_print)
 				ND_DEFAULTPRINT(p, caplen);
+			llc_hdrlen = -llc_hdrlen;
 		}
+		hdrlen += llc_hdrlen;
 	} else {
 		if (ethertype_print(ndo, ether_type, p, length, caplen) == 0) {
 			/* ether_type not known, print raw packet */
@@ -231,6 +233,7 @@ recurse:
 				ND_DEFAULTPRINT(p, caplen);
 		}
 	}
+	return (hdrlen);
 }
 
 /*
@@ -243,9 +246,7 @@ u_int
 ether_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
                const u_char *p)
 {
-	ether_print(ndo, p, h->len, h->caplen, NULL, NULL);
-
-	return (ETHER_HDRLEN);
+	return (ether_print(ndo, p, h->len, h->caplen, NULL, NULL));
 }
 
 /*
@@ -270,9 +271,7 @@ netanalyzer_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	}
 
 	/* Skip the pseudo-header. */
-	ether_print(ndo, p + 4, h->len - 4, h->caplen - 4, NULL, NULL);
-
-	return (4 + ETHER_HDRLEN);
+	return (4 + ether_print(ndo, p + 4, h->len - 4, h->caplen - 4, NULL, NULL));
 }
 
 /*
@@ -300,9 +299,7 @@ netanalyzer_transparent_if_print(netdissect_options *ndo,
 	}
 
 	/* Skip the pseudo-header, preamble, and SOF. */
-	ether_print(ndo, p + 12, h->len - 12, h->caplen - 12, NULL, NULL);
-
-	return (12 + ETHER_HDRLEN);
+	return (12 + ether_print(ndo, p + 12, h->len - 12, h->caplen - 12, NULL, NULL));
 }
 
 /*

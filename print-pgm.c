@@ -13,7 +13,6 @@
  * Original code by Andy Heffernan (ahh@juniper.net)
  */
 
-#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

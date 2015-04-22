@@ -13,7 +13,6 @@
  * Original code by Francesco Fondelli (francesco dot fondelli, gmail dot com)
  */
 
-#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

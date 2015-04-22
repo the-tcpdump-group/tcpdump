@@ -19,7 +19,6 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -141,7 +140,7 @@ pktap_if_print(netdissect_options *ndo,
 
 	case PKT_REC_PACKET:
 		if ((printer = lookup_printer(dlt)) != NULL) {
-			printer(ndo, h, p);
+			hdrlen += printer(ndo, h, p);
 		} else {
 			if (!ndo->ndo_eflag)
 				pktap_header_print(ndo, (u_char *)hdr,

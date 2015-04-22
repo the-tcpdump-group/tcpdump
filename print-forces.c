@@ -14,7 +14,6 @@
  *
  */
 
-#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -187,26 +186,28 @@ static const struct tok ForCES_LFBs[] = {
 	{0, NULL}
 };
 
+/* this is defined in RFC5810 section A.2 */
+/*   http://www.iana.org/assignments/forces/forces.xhtml#oper-tlv-types */
 enum {
-	F_OP_RSV,
-	F_OP_SET,
-	F_OP_SETPROP,
-	F_OP_SETRESP,
-	F_OP_SETPRESP,
-	F_OP_DEL,
-	F_OP_DELRESP,
-	F_OP_GET,
-	F_OP_GETPROP,
-	F_OP_GETRESP,
-	F_OP_GETPRESP,
-	F_OP_REPORT,
-	F_OP_COMMIT,
-	F_OP_RCOMMIT,
-	F_OP_RTRCOMP,
+	F_OP_RSV        = 0,
+	F_OP_SET        = 1,
+	F_OP_SETPROP    = 2,
+	F_OP_SETRESP    = 3,
+	F_OP_SETPRESP   = 4,
+	F_OP_DEL        = 5,
+	F_OP_DELRESP    = 6,
+	F_OP_GET        = 7,
+	F_OP_GETPROP    = 8,
+	F_OP_GETRESP    = 9,
+	F_OP_GETPRESP   = 10,
+	F_OP_REPORT     = 11,
+	F_OP_COMMIT     = 12,
+	F_OP_RCOMMIT    = 13,
+	F_OP_RTRCOMP    = 14,
 	_F_OP_MAX
 };
-
 #define F_OP_MAX	(_F_OP_MAX - 1)
+
 enum {
 	B_OP_SET = 1 << (F_OP_SET - 1),
 	B_OP_SETPROP = 1 << (F_OP_SETPROP - 1),
@@ -1198,7 +1199,9 @@ otlv_print(netdissect_options *ndo,
 	}
 
 	/* XXX - do anything with ops->flags? */
-	rc = ops->print(ndo, dp, tll, ops->op_msk, indent + 1);
+        if(ops->print) {
+                rc = ops->print(ndo, dp, tll, ops->op_msk, indent + 1);
+        }
 	return rc;
 
 trunc:

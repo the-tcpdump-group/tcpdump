@@ -20,7 +20,6 @@
 __RCSID("NetBSD: print-juniper.c,v 1.3 2007/07/25 06:31:32 dogcow Exp ");
 #endif
 
-#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -920,7 +919,7 @@ u_int
 juniper_atm1_print(netdissect_options *ndo,
                    const struct pcap_pkthdr *h, register const u_char *p)
 {
-        uint16_t extracted_ethertype;
+        int llc_hdrlen;
 
         struct juniper_l2info_t l2info;
 
@@ -938,8 +937,8 @@ juniper_atm1_print(netdissect_options *ndo,
         if (EXTRACT_24BITS(p) == 0xfefe03 || /* NLPID encaps ? */
             EXTRACT_24BITS(p) == 0xaaaa03) { /* SNAP encaps ? */
 
-            if (llc_print(ndo, p, l2info.length, l2info.caplen, NULL, NULL,
-                          &extracted_ethertype) != 0)
+            llc_hdrlen = llc_print(ndo, p, l2info.length, l2info.caplen, NULL, NULL);
+            if (llc_hdrlen > 0)
                 return l2info.header_len;
         }
 
@@ -969,7 +968,7 @@ u_int
 juniper_atm2_print(netdissect_options *ndo,
                    const struct pcap_pkthdr *h, register const u_char *p)
 {
-        uint16_t extracted_ethertype;
+        int llc_hdrlen;
 
         struct juniper_l2info_t l2info;
 
@@ -987,8 +986,8 @@ juniper_atm2_print(netdissect_options *ndo,
         if (EXTRACT_24BITS(p) == 0xfefe03 || /* NLPID encaps ? */
             EXTRACT_24BITS(p) == 0xaaaa03) { /* SNAP encaps ? */
 
-            if (llc_print(ndo, p, l2info.length, l2info.caplen, NULL, NULL,
-                          &extracted_ethertype) != 0)
+            llc_hdrlen = llc_print(ndo, p, l2info.length, l2info.caplen, NULL, NULL);
+            if (llc_hdrlen > 0)
                 return l2info.header_len;
         }
 

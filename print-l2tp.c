@@ -21,7 +21,6 @@
  * L2TP support contributed by Motonori Shindo (mshindo@mshindo.net)
  */
 
-#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

@@ -21,7 +21,6 @@
  * Initial contribution from Francis Dupont (francis.dupont@inria.fr)
  */
 
-#define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
