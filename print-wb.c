@@ -202,7 +202,7 @@ wb_id(netdissect_options *ndo,
 	len -= sizeof(*io) * nid;
 	io = (struct id_off *)(id + 1);
 	cp = (char *)(io + nid);
-	if (!ND_TTEST2(cp, len)) {
+	if (ND_TTEST2(cp, len)) {
 		ND_PRINT((ndo, "\""));
 		fn_print(ndo, (u_char *)cp, (u_char *)cp + len);
 		ND_PRINT((ndo, "\""));
@@ -267,7 +267,7 @@ wb_prep(netdissect_options *ndo,
 	}
 	n = EXTRACT_32BITS(&prep->pp_n);
 	ps = (const struct pgstate *)(prep + 1);
-	while (--n >= 0 && !ND_TTEST(*ps)) {
+	while (--n >= 0 && ND_TTEST(*ps)) {
 		const struct id_off *io, *ie;
 		char c = '<';
 
@@ -276,7 +276,7 @@ wb_prep(netdissect_options *ndo,
 		    ipaddr_string(ndo, &ps->page.p_sid),
 		    EXTRACT_32BITS(&ps->page.p_uid)));
 		io = (struct id_off *)(ps + 1);
-		for (ie = io + ps->nid; io < ie && !ND_TTEST(*io); ++io) {
+		for (ie = io + ps->nid; io < ie && ND_TTEST(*io); ++io) {
 			ND_PRINT((ndo, "%c%s:%u", c, ipaddr_string(ndo, &io->id),
 			    EXTRACT_32BITS(&io->off)));
 			c = ',';
