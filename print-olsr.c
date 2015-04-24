@@ -135,6 +135,26 @@ struct olsr_hna6 {
 };
 
 
+/** gateway HNA flags */
+enum gateway_hna_flags {
+  GW_HNA_FLAG_LINKSPEED   = 1 << 0,
+  GW_HNA_FLAG_IPV4        = 1 << 1,
+  GW_HNA_FLAG_IPV4_NAT    = 1 << 2,
+  GW_HNA_FLAG_IPV6        = 1 << 3,
+  GW_HNA_FLAG_IPV6PREFIX  = 1 << 4
+};
+
+/** gateway HNA field byte offsets in the netmask field of the HNA */
+enum gateway_hna_fields {
+  GW_HNA_PAD              = 0,
+  GW_HNA_FLAGS            = 1,
+  GW_HNA_UPLINK           = 2,
+  GW_HNA_DOWNLINK         = 3,
+  GW_HNA_V6PREFIXLEN      = 4,
+  GW_HNA_V6PREFIX         = 5
+};
+
+
 #define OLSR_EXTRACT_LINK_TYPE(link_code) (link_code & 0x3)
 #define OLSR_EXTRACT_NEIGHBOR_TYPE(link_code) (link_code >> 2)
 
@@ -166,6 +186,37 @@ struct olsr_lq_neighbor6 {
     uint8_t neighbor_link_quality;
     uint8_t res[2];
 };
+
+#define MAX_SMARTGW_SPEED    320000000
+
+/**
+ * Convert an encoded 1 byte transport value (5 bits mantissa, 3 bits exponent)
+ * to an uplink/downlink speed value
+ *
+ * @param value the encoded 1 byte transport value
+ * @return the uplink/downlink speed value (in kbit/s)
+ */
+static uint32_t deserialize_gw_speed(uint8_t value) {
+  uint32_t speed;
+  uint32_t exp;
+
+  if (!value) {
+    return 0;
+  }
+
+  if (value == UINT8_MAX) {
+    /* maximum value: also return maximum value */
+    return MAX_SMARTGW_SPEED;
+  }
+
+  speed = (value >> 3) + 1;
+  exp = value & 7;
+
+  while (exp-- > 0) {
+    speed *= 10;
+  }
+  return speed;
+}
 
 /*
  * macro to convert the 8-bit mantissa/exponent to a double float
@@ -533,10 +584,31 @@ olsr_print(netdissect_options *ndo,
                     ptr.hna = (struct olsr_hna4 *)msg_data;
 
                     /* print 4 prefixes per line */
-                    ND_PRINT((ndo, "%s%s/%u",
-                            col == 0 ? "\n\t    " : ", ",
-                            ipaddr_string(ndo, ptr.hna->network),
-                            mask2plen(EXTRACT_32BITS(ptr.hna->mask))));
+                    if (!ptr.hna->network[0] //
+                        && !ptr.hna->network[1] //
+                        && !ptr.hna->network[2] //
+                        && !ptr.hna->network[3] //
+                        && !ptr.hna->mask[GW_HNA_PAD] //
+                        && ptr.hna->mask[GW_HNA_FLAGS]) {
+                            /* smart gateway */
+                            ND_PRINT((ndo, "%sSmart-Gateway:%s%s%s%s%s %u/%u",
+                                col == 0 ? "\n\t    " : ", ", // indent
+                                // sgw
+                                (ptr.hna->mask[GW_HNA_FLAGS] & GW_HNA_FLAG_LINKSPEED) ? " LINKSPEED" : "", // LINKSPEED
+                                (ptr.hna->mask[GW_HNA_FLAGS] & GW_HNA_FLAG_IPV4) ? " IPV4" : "", // IPV4
+                                (ptr.hna->mask[GW_HNA_FLAGS] & GW_HNA_FLAG_IPV4_NAT) ? " IPV4-NAT" : "", // IPV4_NAT
+                                (ptr.hna->mask[GW_HNA_FLAGS] & GW_HNA_FLAG_IPV6) ? " IPV6" : "", // IPV6
+                                (ptr.hna->mask[GW_HNA_FLAGS] & GW_HNA_FLAG_IPV6PREFIX) ? " IPv6-PREFIX" : "", // IPv6PREFIX
+                                (ptr.hna->mask[GW_HNA_FLAGS] & GW_HNA_FLAG_LINKSPEED) ? deserialize_gw_speed(ptr.hna->mask[GW_HNA_UPLINK]) : 0, // uplink
+                                (ptr.hna->mask[GW_HNA_FLAGS] & GW_HNA_FLAG_LINKSPEED) ? deserialize_gw_speed(ptr.hna->mask[GW_HNA_DOWNLINK]) : 0 // downlink
+                                ));
+                    } else {
+                        /* normal route */
+                        ND_PRINT((ndo, "%s%s/%u",
+                                col == 0 ? "\n\t    " : ", ",
+                                ipaddr_string(ndo, ptr.hna->network),
+                                mask2plen(EXTRACT_32BITS(ptr.hna->mask))));
+                    }
 
                     msg_data += sizeof(struct olsr_hna4);
                     msg_tlen -= sizeof(struct olsr_hna4);
