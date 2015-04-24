@@ -735,14 +735,14 @@ main(int argc, char **argv)
 	int jflag=-1;			/* packet time stamp source */
 	int Oflag=1;			/* run filter code optimizer */
 	int pflag=0;			/* don't go promiscuous */
-	netdissect_options *ndo;
+	netdissect_options Ndo;
+	netdissect_options *ndo = &Ndo;
 
 #ifdef WIN32
 	if(wsockinit() != 0) return 1;
 #endif /* WIN32 */
 
-	if((ndo = calloc(1, sizeof(*ndo))) == NULL)
-		error("malloc ndo: %s", strerror(errno));
+	memset(ndo, 0, sizeof(*ndo));
 	ndo->ndo_Rflag=1;
 	ndo->ndo_dlt=-1;
 	ndo_set_function_pointers(ndo);
@@ -1779,7 +1779,6 @@ main(int argc, char **argv)
 	while (ret != NULL);
 
 	free(cmdbuf);
-	free(ndo);
 	exit(status == -1 ? 1 : 0);
 }
 
