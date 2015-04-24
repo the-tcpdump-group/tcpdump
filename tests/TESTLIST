@@ -289,3 +289,6 @@ kday8           kday8.pcap              kday8.out       -t -v
 # bad packets from reversex86.
 cve2015-0261_01    cve2015-0261-ipv6.pcap       cve2015-0261-ipv6.out -t -v
 cve2015-0261_02    cve2015-0261-crash.pcap      cve2015-0261-crash.out -t -v
+
+# OLSRv1 tests
+olsrv1_1	OLSRv1_HNA_sgw_1.pcap		OLSRv1_HNA_sgw_1.out	-t -v -n
