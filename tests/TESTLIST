@@ -268,6 +268,11 @@ geneve-tcp	geneve.pcap		geneve-tcp.out	-t "geneve && tcp"
 dhcp-rfc3004	dhcp-rfc3004.pcap	dhcp-rfc3004-v.out	-t -v
 dhcp-rfc5859	dhcp-rfc5859.pcap	dhcp-rfc5859-v.out	-t -v
 
+# MEDSA tests
+
+medsa		medsa.pcap		medsa.out	-t
+medsa-e		medsa.pcap		medsa-e.out	-t -e
+
 # bad packets from Kevin Day
 # cve-2015-2155 -- futz testing on FORCES printer
 kday1           kday1.pcap              kday1.out       -t -v

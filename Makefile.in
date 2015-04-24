@@ -155,6 +155,7 @@ LIBNETDISSECT_SRC=\
 	print-lwapp.c \
 	print-lwres.c \
 	print-m3ua.c \
+	print-medsa.c \
 	print-mobile.c \
 	print-mpcp.c \
 	print-mpls.c \
