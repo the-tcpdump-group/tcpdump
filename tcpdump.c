@@ -134,9 +134,6 @@ extern int SIZE_BUF;
 #define SIGNAL_REQ_INFO SIGUSR1
 #endif
 
-netdissect_options Gndo;
-netdissect_options *gndo = &Gndo;
-
 static int Cflag;			/* rotate dump files after this many bytes */
 static int Cflag_count;			/* Keep track of which file number we're writing */
 static int Dflag;			/* list available devices and exit */
@@ -738,11 +735,14 @@ main(int argc, char **argv)
 	int jflag=-1;			/* packet time stamp source */
 	int Oflag=1;			/* run filter code optimizer */
 	int pflag=0;			/* don't go promiscuous */
+	netdissect_options Gndo;
+	netdissect_options *gndo = &Gndo;
 
 #ifdef WIN32
 	if(wsockinit() != 0) return 1;
 #endif /* WIN32 */
 
+	memset(gndo, 0, sizeof(*gndo));
 	gndo->ndo_Rflag=1;
 	gndo->ndo_dlt=-1;
 	ndo_set_function_pointers(gndo);
@@ -1487,7 +1487,7 @@ main(int argc, char **argv)
 		free(cmdbuf);
 		exit(0);
 	}
-	init_print(localnet, netmask, timezone_offset);
+	init_print(gndo, localnet, netmask, timezone_offset);
 
 #ifndef WIN32
 	(void)setsignal(SIGPIPE, cleanup);
@@ -1636,7 +1636,7 @@ main(int argc, char **argv)
 #endif
 	} else {
 		type = pcap_datalink(pd);
-		printinfo = get_print_info(type);
+		printinfo = get_print_info(gndo, type);
 		callback = print_packet;
 		pcap_userdata = (u_char *)&printinfo;
 	}
@@ -1758,7 +1758,7 @@ main(int argc, char **argv)
 				new_dlt = pcap_datalink(pd);
 				if (WFileName && new_dlt != dlt)
 					error("%s: new dlt does not match original", RFileName);
-				printinfo = get_print_info(new_dlt);
+				printinfo = get_print_info(gndo, new_dlt);
 				dlt_name = pcap_datalink_val_to_name(new_dlt);
 				if (dlt_name == NULL) {
 					fprintf(stderr, "reading from file %s, link-type %u\n",

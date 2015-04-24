@@ -247,11 +247,12 @@ static int	tcpdump_printf(netdissect_options *ndo _U_, const char *fmt, ...)
 		     ;
 
 void
-init_print(u_int32_t localnet, u_int32_t mask, uint32_t timezone_offset)
+init_print(netdissect_options *ndo, u_int32_t localnet, u_int32_t mask,
+    uint32_t timezone_offset)
 {
 
 	thiszone = timezone_offset;
-	init_addrtoname(gndo, localnet, mask);
+	init_addrtoname(ndo, localnet, mask);
 	init_checksum();
 }
 
@@ -300,17 +301,18 @@ has_printer(int type)
 }
 
 struct print_info
-get_print_info(int type)
+get_print_info(netdissect_options *ndo, int type)
 {
+	const char *dltname;
 	struct print_info printinfo;
 
-	printinfo.ndo = gndo;
+	printinfo.ndo = ndo;
 	printinfo.printer = lookup_printer(type);
 	if (printinfo.printer == NULL) {
-		gndo->ndo_dltname = pcap_datalink_val_to_name(type);
-		if (gndo->ndo_dltname != NULL)
+		dltname = pcap_datalink_val_to_name(type);
+		if (dltname != NULL)
 			error("packet printing is not supported for link type %s: use -w",
-			      gndo->ndo_dltname);
+			      dltname);
 		else
 			error("packet printing is not supported for link type %d: use -w", type);
 	}
