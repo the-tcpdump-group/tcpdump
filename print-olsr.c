@@ -496,12 +496,14 @@ olsr_print(netdissect_options *ndo,
         }
 
         case OLSR_HNA_MSG:
-            ND_PRINT((ndo, "\n\t  Advertised networks (total %u)",
-                    (unsigned int) (msg_tlen / sizeof(struct olsr_hna6))));
 #if INET6
             if (is_ipv6)
             {
                 int i = 0;
+
+                ND_PRINT((ndo, "\n\t  Advertised networks (total %u)",
+                        (unsigned int) (msg_tlen / sizeof(struct olsr_hna6))));
+
                 while (msg_tlen >= sizeof(struct olsr_hna6)) {
                     struct olsr_hna6 *hna6;
 
@@ -521,6 +523,10 @@ olsr_print(netdissect_options *ndo,
 #endif
             {
                 int col = 0;
+
+                ND_PRINT((ndo, "\n\t  Advertised networks (total %u)",
+                        (unsigned int) (msg_tlen / sizeof(struct olsr_hna4))));
+
                 while (msg_tlen >= sizeof(struct olsr_hna4)) {
                     ND_TCHECK2(*msg_data, sizeof(struct olsr_hna4));
 
