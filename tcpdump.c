@@ -137,15 +137,24 @@ extern int SIZE_BUF;
 netdissect_options Gndo;
 netdissect_options *gndo = &Gndo;
 
+static int Cflag;			/* rotate dump files after this many bytes */
+static int Cflag_count;			/* Keep track of which file number we're writing */
 static int Dflag;			/* list available devices and exit */
 static int dflag;			/* print filter code */
+static int Gflag;			/* rotate dump files after this many seconds */
+static int Gflag_count;			/* number of files created with Gflag rotation */
+static time_t Gflag_time;		/* The last time_t the dump file was rotated. */
 static int Lflag;			/* list available data link types and exit */
+static int Iflag;			/* rfmon (monitor) mode */
 #ifdef HAVE_PCAP_SET_TSTAMP_TYPE
 static int Jflag;			/* list available time stamp types */
 #endif
 #ifdef HAVE_PCAP_SETDIRECTION
 int Qflag = -1;				/* restrict captured packet by send/receive direction */
 #endif
+static int Uflag;			/* "unbuffered" output of dump files */
+static int Wflag;			/* recycle output files after this number of files */
+static int WflagChars;
 static char *zflag = NULL;		/* compress each savefile using a specified command (like gzip or bzip2) */
 
 static int infodelay;
@@ -267,7 +276,7 @@ show_dlts_and_exit(const char *device, pcap_t *pd)
 	if (supports_monitor_mode)
 		(void) fprintf(stderr, "Data link types for %s %s (use option -y to set):\n",
 		    device,
-		    gndo->ndo_Iflag ? "when in monitor mode" : "when not in monitor mode");
+		    Iflag ? "when in monitor mode" : "when not in monitor mode");
 	else
 		(void) fprintf(stderr, "Data link types for %s (use option -y to set):\n",
 		    device);
@@ -550,11 +559,11 @@ MakeFilename(char *buffer, char *orig_name, int cnt, int max_chars)
             error("Makefilename: malloc");
 
         /* Process with strftime if Gflag is set. */
-        if (gndo->ndo_Gflag != 0) {
+        if (Gflag != 0) {
           struct tm *local_tm;
 
           /* Convert Gflag_time to a usable format */
-          if ((local_tm = localtime(&gndo->ndo_Gflag_time)) == NULL) {
+          if ((local_tm = localtime(&Gflag_time)) == NULL) {
                   error("MakeTimedFilename: localtime");
           }
 
@@ -725,13 +734,15 @@ main(int argc, char **argv)
 	cap_rights_t rights;
 	int cansandbox;
 #endif	/* HAVE_CAPSICUM */
+	int Bflag=0;			/* buffer size */
+	int jflag=-1;			/* packet time stamp source */
+	int Oflag=1;			/* run filter code optimizer */
+	int pflag=0;			/* don't go promiscuous */
 
 #ifdef WIN32
 	if(wsockinit() != 0) return 1;
 #endif /* WIN32 */
 
-	gndo->ndo_jflag=-1;	/* not set */
-        gndo->ndo_Oflag=1;
 	gndo->ndo_Rflag=1;
 	gndo->ndo_dlt=-1;
 	ndo_set_function_pointers(gndo);
@@ -783,8 +794,8 @@ main(int argc, char **argv)
 
 #if defined(HAVE_PCAP_CREATE) || defined(WIN32)
 		case 'B':
-			gndo->ndo_Bflag = atoi(optarg)*1024;
-			if (gndo->ndo_Bflag <= 0)
+			Bflag = atoi(optarg)*1024;
+			if (Bflag <= 0)
 				error("invalid packet buffer size %s", optarg);
 			break;
 #endif /* defined(HAVE_PCAP_CREATE) || defined(WIN32) */
@@ -796,8 +807,8 @@ main(int argc, char **argv)
 			break;
 
 		case 'C':
-			gndo->ndo_Cflag = atoi(optarg) * 1000000;
-			if (gndo->ndo_Cflag < 0)
+			Cflag = atoi(optarg) * 1000000;
+			if (Cflag < 0)
 				error("invalid file size %s", optarg);
 			break;
 
@@ -833,15 +844,15 @@ main(int argc, char **argv)
 			break;
 
 		case 'G':
-			gndo->ndo_Gflag = atoi(optarg);
-			if (gndo->ndo_Gflag < 0)
+			Gflag = atoi(optarg);
+			if (Gflag < 0)
 				error("invalid number of seconds %s", optarg);
 
                         /* We will create one file initially. */
-                        gndo->ndo_Gflag_count = 0;
+                        Gflag_count = 0;
 
 			/* Grab the current time for rotation use. */
-			if ((gndo->ndo_Gflag_time = time(NULL)) == (time_t)-1) {
+			if ((Gflag_time = time(NULL)) == (time_t)-1) {
 				error("main: can't get current time: %s",
 				    pcap_strerror(errno));
 			}
@@ -900,14 +911,14 @@ main(int argc, char **argv)
 
 #ifdef HAVE_PCAP_CREATE
 		case 'I':
-			++gndo->ndo_Iflag;
+			++Iflag;
 			break;
 #endif /* HAVE_PCAP_CREATE */
 
 #ifdef HAVE_PCAP_SET_TSTAMP_TYPE
 		case 'j':
-			gndo->ndo_jflag = pcap_tstamp_type_name_to_val(optarg);
-			if (gndo->ndo_jflag < 0)
+			jflag = pcap_tstamp_type_name_to_val(optarg);
+			if (jflag < 0)
 				error("invalid time stamp type %s", optarg);
 			break;
 
@@ -971,11 +982,11 @@ main(int argc, char **argv)
 			break;
 
 		case 'O':
-			gndo->ndo_Oflag = 0;
+			Oflag = 0;
 			break;
 
 		case 'p':
-			++gndo->ndo_pflag;
+			++pflag;
 			break;
 
 		case 'q':
@@ -1064,7 +1075,7 @@ main(int argc, char **argv)
 
 #ifdef HAVE_PCAP_DUMP_FLUSH
 		case 'U':
-			++gndo->ndo_Uflag;
+			++Uflag;
 			break;
 #endif
 
@@ -1081,10 +1092,10 @@ main(int argc, char **argv)
 			break;
 
 		case 'W':
-			gndo->ndo_Wflag = atoi(optarg);
-			if (gndo->ndo_Wflag < 0)
+			Wflag = atoi(optarg);
+			if (Wflag < 0)
 				error("invalid number of output files %s", optarg);
-			gndo->ndo_WflagChars = getWflagChars(gndo->ndo_Wflag);
+			WflagChars = getWflagChars(Wflag);
 			break;
 
 		case 'x':
@@ -1341,11 +1352,11 @@ main(int argc, char **argv)
 		if (status != 0)
 			error("%s: Can't set snapshot length: %s",
 			    device, pcap_statustostr(status));
-		status = pcap_set_promisc(pd, !gndo->ndo_pflag);
+		status = pcap_set_promisc(pd, !pflag);
 		if (status != 0)
 			error("%s: Can't set promiscuous mode: %s",
 			    device, pcap_statustostr(status));
-		if (gndo->ndo_Iflag) {
+		if (Iflag) {
 			status = pcap_set_rfmon(pd, 1);
 			if (status != 0)
 				error("%s: Can't set monitor mode: %s",
@@ -1355,15 +1366,15 @@ main(int argc, char **argv)
 		if (status != 0)
 			error("%s: pcap_set_timeout failed: %s",
 			    device, pcap_statustostr(status));
-		if (gndo->ndo_Bflag != 0) {
-			status = pcap_set_buffer_size(pd, gndo->ndo_Bflag);
+		if (Bflag != 0) {
+			status = pcap_set_buffer_size(pd, Bflag);
 			if (status != 0)
 				error("%s: Can't set buffer size: %s",
 				    device, pcap_statustostr(status));
 		}
 #ifdef HAVE_PCAP_SET_TSTAMP_TYPE
-                if (gndo->ndo_jflag != -1) {
-			status = pcap_set_tstamp_type(pd, gndo->ndo_jflag);
+                if (jflag != -1) {
+			status = pcap_set_tstamp_type(pd, jflag);
 			if (status < 0)
 				error("%s: Can't set time stamp type: %s",
 			              device, pcap_statustostr(status));
@@ -1468,7 +1479,7 @@ main(int argc, char **argv)
 	else
 		cmdbuf = copy_argv(&argv[optind]);
 
-	if (pcap_compile(pd, &fcode, cmdbuf, gndo->ndo_Oflag, netmask) < 0)
+	if (pcap_compile(pd, &fcode, cmdbuf, Oflag, netmask) < 0)
 		error("%s", pcap_geterr(pd));
 	if (dflag) {
 		bpf_dump(&fcode, dflag);
@@ -1565,8 +1576,8 @@ main(int argc, char **argv)
 			error("malloc of dumpinfo.CurrentFileName");
 
 		/* We do not need numbering for dumpfiles if Cflag isn't set. */
-		if (gndo->ndo_Cflag != 0)
-		  MakeFilename(dumpinfo.CurrentFileName, WFileName, 0, gndo->ndo_WflagChars);
+		if (Cflag != 0)
+		  MakeFilename(dumpinfo.CurrentFileName, WFileName, 0, WflagChars);
 		else
 		  MakeFilename(dumpinfo.CurrentFileName, WFileName, 0, 0);
 
@@ -1578,7 +1589,7 @@ main(int argc, char **argv)
 		 */
 		capng_update(
 			CAPNG_DROP,
-			(gndo->ndo_Cflag || gndo->ndo_Gflag ? 0 : CAPNG_PERMITTED)
+			(Cflag || Gflag ? 0 : CAPNG_PERMITTED)
 				| CAPNG_EFFECTIVE,
 			CAP_DAC_OVERRIDE
 			);
@@ -1589,7 +1600,7 @@ main(int argc, char **argv)
 #ifdef HAVE_CAPSICUM
 		set_dumper_capsicum_rights(p);
 #endif
-		if (gndo->ndo_Cflag != 0 || gndo->ndo_Gflag != 0) {
+		if (Cflag != 0 || Gflag != 0) {
 #ifdef HAVE_CAPSICUM
 			dumpinfo.WFileName = strdup(basename(WFileName));
 			dumpinfo.dirfd = open(dirname(WFileName),
@@ -1620,7 +1631,7 @@ main(int argc, char **argv)
 			pcap_userdata = (u_char *)p;
 		}
 #ifdef HAVE_PCAP_DUMP_FLUSH
-		if (gndo->ndo_Uflag)
+		if (Uflag)
 			pcap_dump_flush(p);
 #endif
 	} else {
@@ -1758,7 +1769,7 @@ main(int argc, char **argv)
 					RFileName, dlt_name,
 					pcap_datalink_val_to_description(new_dlt));
 				}
-				if (pcap_compile(pd, &fcode, cmdbuf, gndo->ndo_Oflag, netmask) < 0)
+				if (pcap_compile(pd, &fcode, cmdbuf, Oflag, netmask) < 0)
 					error("%s", pcap_geterr(pd));
 				if (pcap_setfilter(pd, &fcode) < 0)
 					error("%s", pcap_geterr(pd));
@@ -1927,7 +1938,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 	 * first thereby cancelling the Cflag boundary (since the file should
 	 * be 0).
 	 */
-	if (gndo->ndo_Gflag != 0) {
+	if (Gflag != 0) {
 		/* Check if it is time to rotate */
 		time_t t;
 
@@ -1939,16 +1950,16 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 
 
 		/* If the time is greater than the specified window, rotate */
-		if (t - gndo->ndo_Gflag_time >= gndo->ndo_Gflag) {
+		if (t - Gflag_time >= Gflag) {
 #ifdef HAVE_CAPSICUM
 			FILE *fp;
 			int fd;
 #endif
 
 			/* Update the Gflag_time */
-			gndo->ndo_Gflag_time = t;
+			Gflag_time = t;
 			/* Update Gflag_count */
-			gndo->ndo_Gflag_count++;
+			Gflag_count++;
 			/*
 			 * Close the current file and open a new one.
 			 */
@@ -1964,9 +1975,9 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			 * Check to see if we've exceeded the Wflag (when
 			 * not using Cflag).
 			 */
-			if (gndo->ndo_Cflag == 0 && gndo->ndo_Wflag > 0 && gndo->ndo_Gflag_count >= gndo->ndo_Wflag) {
+			if (Cflag == 0 && Wflag > 0 && Gflag_count >= Wflag) {
 				(void)fprintf(stderr, "Maximum file limit reached: %d\n",
-				    gndo->ndo_Wflag);
+				    Wflag);
 				exit(0);
 				/* NOTREACHED */
 			}
@@ -1981,16 +1992,16 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			 * so multiple files would end with 1,2,3 in the filename.
 			 * The counting is handled with the -C flow after this.
 			 */
-			gndo->ndo_Cflag_count = 0;
+			Cflag_count = 0;
 
 			/*
 			 * This is always the first file in the Cflag
 			 * rotation: e.g. 0
 			 * We also don't need numbering if Cflag is not set.
 			 */
-			if (gndo->ndo_Cflag != 0)
+			if (Cflag != 0)
 				MakeFilename(dump_info->CurrentFileName, dump_info->WFileName, 0,
-				    gndo->ndo_WflagChars);
+				    WflagChars);
 			else
 				MakeFilename(dump_info->CurrentFileName, dump_info->WFileName, 0, 0);
 
@@ -2032,12 +2043,12 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 	 * larger than Cflag - the last packet written to the
 	 * file could put it over Cflag.
 	 */
-	if (gndo->ndo_Cflag != 0) {
+	if (Cflag != 0) {
 		long size = pcap_dump_ftell(dump_info->p);
 
 		if (size == -1)
 			error("ftell fails on output file");
-		if (size > gndo->ndo_Cflag) {
+		if (size > Cflag) {
 #ifdef HAVE_CAPSICUM
 			FILE *fp;
 			int fd;
@@ -2055,17 +2066,17 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			if (zflag != NULL)
 				compress_savefile(dump_info->CurrentFileName);
 
-			gndo->ndo_Cflag_count++;
-			if (gndo->ndo_Wflag > 0) {
-				if (gndo->ndo_Cflag_count >= gndo->ndo_Wflag)
-					gndo->ndo_Cflag_count = 0;
+			Cflag_count++;
+			if (Wflag > 0) {
+				if (Cflag_count >= Wflag)
+					Cflag_count = 0;
 			}
 			if (dump_info->CurrentFileName != NULL)
 				free(dump_info->CurrentFileName);
 			dump_info->CurrentFileName = (char *)malloc(PATH_MAX + 1);
 			if (dump_info->CurrentFileName == NULL)
 				error("dump_packet_and_trunc: malloc");
-			MakeFilename(dump_info->CurrentFileName, dump_info->WFileName, gndo->ndo_Cflag_count, gndo->ndo_WflagChars);
+			MakeFilename(dump_info->CurrentFileName, dump_info->WFileName, Cflag_count, WflagChars);
 #ifdef HAVE_LIBCAP_NG
 			capng_update(CAPNG_ADD, CAPNG_EFFECTIVE, CAP_DAC_OVERRIDE);
 			capng_apply(CAPNG_SELECT_BOTH);
@@ -2100,7 +2111,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 
 	pcap_dump((u_char *)dump_info->p, h, sp);
 #ifdef HAVE_PCAP_DUMP_FLUSH
-	if (gndo->ndo_Uflag)
+	if (Uflag)
 		pcap_dump_flush(dump_info->p);
 #endif
 
@@ -2118,7 +2129,7 @@ dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 
 	pcap_dump(user, h, sp);
 #ifdef HAVE_PCAP_DUMP_FLUSH
-	if (gndo->ndo_Uflag)
+	if (Uflag)
 		pcap_dump_flush((pcap_dumper_t *)user);
 #endif
 
