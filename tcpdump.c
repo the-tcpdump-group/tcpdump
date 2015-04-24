@@ -735,19 +735,19 @@ main(int argc, char **argv)
 	int jflag=-1;			/* packet time stamp source */
 	int Oflag=1;			/* run filter code optimizer */
 	int pflag=0;			/* don't go promiscuous */
-	netdissect_options Gndo;
-	netdissect_options *gndo = &Gndo;
+	netdissect_options *ndo;
 
 #ifdef WIN32
 	if(wsockinit() != 0) return 1;
 #endif /* WIN32 */
 
-	memset(gndo, 0, sizeof(*gndo));
-	gndo->ndo_Rflag=1;
-	gndo->ndo_dlt=-1;
-	ndo_set_function_pointers(gndo);
-	gndo->ndo_snaplen = DEFAULT_SNAPLEN;
-	gndo->ndo_immediate = 0;
+	if((ndo = calloc(1, sizeof(*ndo))) == NULL)
+		error("malloc ndo: %s", strerror(errno));
+	ndo->ndo_Rflag=1;
+	ndo->ndo_dlt=-1;
+	ndo_set_function_pointers(ndo);
+	ndo->ndo_snaplen = DEFAULT_SNAPLEN;
+	ndo->ndo_immediate = 0;
 
 	cnt = -1;
 	device = NULL;
@@ -785,11 +785,11 @@ main(int argc, char **argv)
 			break;
 
 		case 'A':
-			++gndo->ndo_Aflag;
+			++ndo->ndo_Aflag;
 			break;
 
 		case 'b':
-			++gndo->ndo_bflag;
+			++ndo->ndo_bflag;
 			break;
 
 #if defined(HAVE_PCAP_CREATE) || defined(WIN32)
@@ -825,18 +825,18 @@ main(int argc, char **argv)
 			break;
 
 		case 'e':
-			++gndo->ndo_eflag;
+			++ndo->ndo_eflag;
 			break;
 
 		case 'E':
 #ifndef HAVE_LIBCRYPTO
 			warning("crypto code not compiled in");
 #endif
-			gndo->ndo_espsecret = optarg;
+			ndo->ndo_espsecret = optarg;
 			break;
 
 		case 'f':
-			++gndo->ndo_fflag;
+			++ndo->ndo_fflag;
 			break;
 
 		case 'F':
@@ -864,7 +864,7 @@ main(int argc, char **argv)
 			break;
 
 		case 'H':
-			++gndo->ndo_Hflag;
+			++ndo->ndo_Hflag;
 			break;
 
 		case 'i':
@@ -949,7 +949,7 @@ main(int argc, char **argv)
 			break;
 
 		case 'K':
-			++gndo->ndo_Kflag;
+			++ndo->ndo_Kflag;
 			break;
 
 		case 'm':
@@ -957,7 +957,7 @@ main(int argc, char **argv)
 			if (smiLoadModule(optarg) == 0) {
 				error("could not load MIB module %s", optarg);
 			}
-			gndo->ndo_sflag = 1;
+			ndo->ndo_sflag = 1;
 #else
 			(void)fprintf(stderr, "%s: ignoring option `-m %s' ",
 				      program_name, optarg);
@@ -970,15 +970,15 @@ main(int argc, char **argv)
 #ifndef HAVE_LIBCRYPTO
 			warning("crypto code not compiled in");
 #endif
-			gndo->ndo_sigsecret = optarg;
+			ndo->ndo_sigsecret = optarg;
 			break;
 
 		case 'n':
-			++gndo->ndo_nflag;
+			++ndo->ndo_nflag;
 			break;
 
 		case 'N':
-			++gndo->ndo_Nflag;
+			++ndo->ndo_Nflag;
 			break;
 
 		case 'O':
@@ -990,8 +990,8 @@ main(int argc, char **argv)
 			break;
 
 		case 'q':
-			++gndo->ndo_qflag;
-			++gndo->ndo_suppress_default_print;
+			++ndo->ndo_qflag;
+			++ndo->ndo_suppress_default_print;
 			break;
 
 #ifdef HAVE_PCAP_SETDIRECTION
@@ -1012,65 +1012,65 @@ main(int argc, char **argv)
 			break;
 
 		case 'R':
-			gndo->ndo_Rflag = 0;
+			ndo->ndo_Rflag = 0;
 			break;
 
 		case 's':
-			gndo->ndo_snaplen = strtol(optarg, &end, 0);
+			ndo->ndo_snaplen = strtol(optarg, &end, 0);
 			if (optarg == end || *end != '\0'
-			    || gndo->ndo_snaplen < 0 || gndo->ndo_snaplen > MAXIMUM_SNAPLEN)
+			    || ndo->ndo_snaplen < 0 || ndo->ndo_snaplen > MAXIMUM_SNAPLEN)
 				error("invalid snaplen %s", optarg);
-			else if (gndo->ndo_snaplen == 0)
-				gndo->ndo_snaplen = MAXIMUM_SNAPLEN;
+			else if (ndo->ndo_snaplen == 0)
+				ndo->ndo_snaplen = MAXIMUM_SNAPLEN;
 			break;
 
 		case 'S':
-			++gndo->ndo_Sflag;
+			++ndo->ndo_Sflag;
 			break;
 
 		case 't':
-			++gndo->ndo_tflag;
+			++ndo->ndo_tflag;
 			break;
 
 		case 'T':
 			if (strcasecmp(optarg, "vat") == 0)
-				gndo->ndo_packettype = PT_VAT;
+				ndo->ndo_packettype = PT_VAT;
 			else if (strcasecmp(optarg, "wb") == 0)
-				gndo->ndo_packettype = PT_WB;
+				ndo->ndo_packettype = PT_WB;
 			else if (strcasecmp(optarg, "rpc") == 0)
-				gndo->ndo_packettype = PT_RPC;
+				ndo->ndo_packettype = PT_RPC;
 			else if (strcasecmp(optarg, "rtp") == 0)
-				gndo->ndo_packettype = PT_RTP;
+				ndo->ndo_packettype = PT_RTP;
 			else if (strcasecmp(optarg, "rtcp") == 0)
-				gndo->ndo_packettype = PT_RTCP;
+				ndo->ndo_packettype = PT_RTCP;
 			else if (strcasecmp(optarg, "snmp") == 0)
-				gndo->ndo_packettype = PT_SNMP;
+				ndo->ndo_packettype = PT_SNMP;
 			else if (strcasecmp(optarg, "cnfp") == 0)
-				gndo->ndo_packettype = PT_CNFP;
+				ndo->ndo_packettype = PT_CNFP;
 			else if (strcasecmp(optarg, "tftp") == 0)
-				gndo->ndo_packettype = PT_TFTP;
+				ndo->ndo_packettype = PT_TFTP;
 			else if (strcasecmp(optarg, "aodv") == 0)
-				gndo->ndo_packettype = PT_AODV;
+				ndo->ndo_packettype = PT_AODV;
 			else if (strcasecmp(optarg, "carp") == 0)
-				gndo->ndo_packettype = PT_CARP;
+				ndo->ndo_packettype = PT_CARP;
 			else if (strcasecmp(optarg, "radius") == 0)
-				gndo->ndo_packettype = PT_RADIUS;
+				ndo->ndo_packettype = PT_RADIUS;
 			else if (strcasecmp(optarg, "zmtp1") == 0)
-				gndo->ndo_packettype = PT_ZMTP1;
+				ndo->ndo_packettype = PT_ZMTP1;
 			else if (strcasecmp(optarg, "vxlan") == 0)
-				gndo->ndo_packettype = PT_VXLAN;
+				ndo->ndo_packettype = PT_VXLAN;
 			else if (strcasecmp(optarg, "pgm") == 0)
-				gndo->ndo_packettype = PT_PGM;
+				ndo->ndo_packettype = PT_PGM;
 			else if (strcasecmp(optarg, "pgm_zmtp1") == 0)
-				gndo->ndo_packettype = PT_PGM_ZMTP1;
+				ndo->ndo_packettype = PT_PGM_ZMTP1;
 			else if (strcasecmp(optarg, "lmp") == 0)
-				gndo->ndo_packettype = PT_LMP;
+				ndo->ndo_packettype = PT_LMP;
 			else
 				error("unknown packet type `%s'", optarg);
 			break;
 
 		case 'u':
-			++gndo->ndo_uflag;
+			++ndo->ndo_uflag;
 			break;
 
 #ifdef HAVE_PCAP_DUMP_FLUSH
@@ -1080,7 +1080,7 @@ main(int argc, char **argv)
 #endif
 
 		case 'v':
-			++gndo->ndo_vflag;
+			++ndo->ndo_vflag;
 			break;
 
 		case 'V':
@@ -1099,21 +1099,21 @@ main(int argc, char **argv)
 			break;
 
 		case 'x':
-			++gndo->ndo_xflag;
-			++gndo->ndo_suppress_default_print;
+			++ndo->ndo_xflag;
+			++ndo->ndo_suppress_default_print;
 			break;
 
 		case 'X':
-			++gndo->ndo_Xflag;
-			++gndo->ndo_suppress_default_print;
+			++ndo->ndo_Xflag;
+			++ndo->ndo_suppress_default_print;
 			break;
 
 		case 'y':
-			gndo->ndo_dltname = optarg;
-			gndo->ndo_dlt =
-			  pcap_datalink_name_to_val(gndo->ndo_dltname);
-			if (gndo->ndo_dlt < 0)
-				error("invalid data link type %s", gndo->ndo_dltname);
+			ndo->ndo_dltname = optarg;
+			ndo->ndo_dlt =
+			  pcap_datalink_name_to_val(ndo->ndo_dltname);
+			if (ndo->ndo_dlt < 0)
+				error("invalid data link type %s", ndo->ndo_dltname);
 			break;
 
 #if defined(HAVE_PCAP_DEBUG) || defined(HAVE_YYDEBUG)
@@ -1139,7 +1139,7 @@ main(int argc, char **argv)
 			break;
 
 		case '#':
-			gndo->ndo_packet_number = 1;
+			ndo->ndo_packet_number = 1;
 			break;
 
 		case OPTION_VERSION:
@@ -1149,15 +1149,15 @@ main(int argc, char **argv)
 
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
 		case OPTION_TSTAMP_PRECISION:
-			gndo->ndo_tstamp_precision = tstamp_precision_from_string(optarg);
-			if (gndo->ndo_tstamp_precision < 0)
+			ndo->ndo_tstamp_precision = tstamp_precision_from_string(optarg);
+			if (ndo->ndo_tstamp_precision < 0)
 				error("unsupported time stamp precision");
 			break;
 #endif
 
 #ifdef HAVE_PCAP_SET_IMMEDIATE_MODE
 		case OPTION_IMMEDIATE_MODE:
-			gndo->ndo_immediate = 1;
+			ndo->ndo_immediate = 1;
 			break;
 #endif
 
@@ -1172,7 +1172,7 @@ main(int argc, char **argv)
 		show_devices_and_exit();
 #endif
 
-	switch (gndo->ndo_tflag) {
+	switch (ndo->ndo_tflag) {
 
 	case 0: /* Default */
 	case 4: /* Default + Date*/
@@ -1190,7 +1190,7 @@ main(int argc, char **argv)
 		break;
 	}
 
-	if (gndo->ndo_fflag != 0 && (VFileName != NULL || RFileName != NULL))
+	if (ndo->ndo_fflag != 0 && (VFileName != NULL || RFileName != NULL))
 		error("-f can not be used with -V or -r");
 
 	if (VFileName != NULL && RFileName != NULL)
@@ -1204,7 +1204,7 @@ main(int argc, char **argv)
 	 * probably expecting to see packets pop up immediately.
 	 */
 	if (WFileName == NULL && isatty(1))
-		gndo->ndo_immediate = 1;
+		ndo->ndo_immediate = 1;
 #endif
 
 #ifdef WITH_CHROOT
@@ -1265,7 +1265,7 @@ main(int argc, char **argv)
 
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
 		pd = pcap_open_offline_with_tstamp_precision(RFileName,
-		    gndo->ndo_tstamp_precision, ebuf);
+		    ndo->ndo_tstamp_precision, ebuf);
 #else
 		pd = pcap_open_offline(RFileName, ebuf);
 #endif
@@ -1324,16 +1324,16 @@ main(int argc, char **argv)
 			show_tstamp_types_and_exit(device, pd);
 #endif
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
-		status = pcap_set_tstamp_precision(pd, gndo->ndo_tstamp_precision);
+		status = pcap_set_tstamp_precision(pd, ndo->ndo_tstamp_precision);
 		if (status != 0)
 			error("%s: Can't set %ssecond time stamp precision: %s",
 				device,
-				tstamp_precision_to_string(gndo->ndo_tstamp_precision),
+				tstamp_precision_to_string(ndo->ndo_tstamp_precision),
 				pcap_statustostr(status));
 #endif
 
 #ifdef HAVE_PCAP_SET_IMMEDIATE_MODE
-		if (gndo->ndo_immediate) {
+		if (ndo->ndo_immediate) {
 			status = pcap_set_immediate_mode(pd, 1);
 			if (status != 0)
 				error("%s: Can't set immediate mode: %s",
@@ -1348,7 +1348,7 @@ main(int argc, char **argv)
 			supports_monitor_mode = 1;
 		else
 			supports_monitor_mode = 0;
-		status = pcap_set_snaplen(pd, gndo->ndo_snaplen);
+		status = pcap_set_snaplen(pd, ndo->ndo_snaplen);
 		if (status != 0)
 			error("%s: Can't set snapshot length: %s",
 			    device, pcap_statustostr(status));
@@ -1443,9 +1443,9 @@ main(int argc, char **argv)
 #endif /* !defined(HAVE_PCAP_CREATE) && defined(WIN32) */
 		if (Lflag)
 			show_dlts_and_exit(device, pd);
-		if (gndo->ndo_dlt >= 0) {
+		if (ndo->ndo_dlt >= 0) {
 #ifdef HAVE_PCAP_SET_DATALINK
-			if (pcap_set_datalink(pd, gndo->ndo_dlt) < 0)
+			if (pcap_set_datalink(pd, ndo->ndo_dlt) < 0)
 				error("%s", pcap_geterr(pd));
 #else
 			/*
@@ -1453,21 +1453,21 @@ main(int argc, char **argv)
 			 * data link type, so we only let them
 			 * set it to what it already is.
 			 */
-			if (gndo->ndo_dlt != pcap_datalink(pd)) {
+			if (ndo->ndo_dlt != pcap_datalink(pd)) {
 				error("%s is not one of the DLTs supported by this device\n",
-				      gndo->ndo_dltname);
+				      ndo->ndo_dltname);
 			}
 #endif
 			(void)fprintf(stderr, "%s: data link type %s\n",
-				      program_name, gndo->ndo_dltname);
+				      program_name, ndo->ndo_dltname);
 			(void)fflush(stderr);
 		}
 		i = pcap_snapshot(pd);
-		if (gndo->ndo_snaplen < i) {
-			warning("snaplen raised from %d to %d", gndo->ndo_snaplen, i);
-			gndo->ndo_snaplen = i;
+		if (ndo->ndo_snaplen < i) {
+			warning("snaplen raised from %d to %d", ndo->ndo_snaplen, i);
+			ndo->ndo_snaplen = i;
 		}
-                if(gndo->ndo_fflag != 0) {
+                if(ndo->ndo_fflag != 0) {
                         if (pcap_lookupnet(device, &localnet, &netmask, ebuf) < 0) {
                                 warning("foreign (-f) flag used but: %s", ebuf);
                         }
@@ -1487,7 +1487,7 @@ main(int argc, char **argv)
 		free(cmdbuf);
 		exit(0);
 	}
-	init_print(gndo, localnet, netmask, timezone_offset);
+	init_print(ndo, localnet, netmask, timezone_offset);
 
 #ifndef WIN32
 	(void)setsignal(SIGPIPE, cleanup);
@@ -1636,7 +1636,7 @@ main(int argc, char **argv)
 #endif
 	} else {
 		type = pcap_datalink(pd);
-		printinfo = get_print_info(gndo, type);
+		printinfo = get_print_info(ndo, type);
 		callback = print_packet;
 		pcap_userdata = (u_char *)&printinfo;
 	}
@@ -1650,7 +1650,7 @@ main(int argc, char **argv)
 		(void)setsignal(SIGNAL_REQ_INFO, requestinfo);
 #endif
 
-	if (gndo->ndo_vflag > 0 && WFileName) {
+	if (ndo->ndo_vflag > 0 && WFileName) {
 		/*
 		 * When capturing to a file, "-v" means tcpdump should,
 		 * every 10 secodns, "v"erbosely report the number of
@@ -1673,7 +1673,7 @@ main(int argc, char **argv)
 		 * to a file from the -V file).  Print a message to
 		 * the standard error on UN*X.
 		 */
-		if (!gndo->ndo_vflag && !WFileName) {
+		if (!ndo->ndo_vflag && !WFileName) {
 			(void)fprintf(stderr,
 			    "%s: verbose output suppressed, use -v or -vv for full protocol decode\n",
 			    program_name);
@@ -1683,18 +1683,18 @@ main(int argc, char **argv)
 		dlt_name = pcap_datalink_val_to_name(dlt);
 		if (dlt_name == NULL) {
 			(void)fprintf(stderr, "listening on %s, link-type %u, capture size %u bytes\n",
-			    device, dlt, gndo->ndo_snaplen);
+			    device, dlt, ndo->ndo_snaplen);
 		} else {
 			(void)fprintf(stderr, "listening on %s, link-type %s (%s), capture size %u bytes\n",
 			    device, dlt_name,
-			    pcap_datalink_val_to_description(dlt), gndo->ndo_snaplen);
+			    pcap_datalink_val_to_description(dlt), ndo->ndo_snaplen);
 		}
 		(void)fflush(stderr);
 	}
 #endif /* WIN32 */
 
 #ifdef HAVE_CAPSICUM
-	cansandbox = (gndo->ndo_nflag && VFileName == NULL && zflag == NULL);
+	cansandbox = (ndo->ndo_nflag && VFileName == NULL && zflag == NULL);
 	if (cansandbox && cap_enter() < 0 && errno != ENOSYS)
 		error("unable to enter the capability mode");
 	if (cap_sandboxed())
@@ -1758,7 +1758,7 @@ main(int argc, char **argv)
 				new_dlt = pcap_datalink(pd);
 				if (WFileName && new_dlt != dlt)
 					error("%s: new dlt does not match original", RFileName);
-				printinfo = get_print_info(gndo, new_dlt);
+				printinfo = get_print_info(ndo, new_dlt);
 				dlt_name = pcap_datalink_val_to_name(new_dlt);
 				if (dlt_name == NULL) {
 					fprintf(stderr, "reading from file %s, link-type %u\n",
@@ -1779,6 +1779,7 @@ main(int argc, char **argv)
 	while (ret != NULL);
 
 	free(cmdbuf);
+	free(ndo);
 	exit(status == -1 ? 1 : 0);
 }
 
