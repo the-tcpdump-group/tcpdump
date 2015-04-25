@@ -269,7 +269,6 @@ dhcp-rfc3004	dhcp-rfc3004.pcap	dhcp-rfc3004-v.out	-t -v
 dhcp-rfc5859	dhcp-rfc5859.pcap	dhcp-rfc5859-v.out	-t -v
 
 # MEDSA tests
-
 medsa		medsa.pcap		medsa.out	-t
 medsa-e		medsa.pcap		medsa-e.out	-t -e
 

@@ -80,9 +80,10 @@ static const struct tok code_values[] = {
 	{ 0, NULL },
 };
 
-static void medsa_print_full(netdissect_options *ndo,
-			    const struct medsa_pkthdr *medsa,
-			    u_int caplen)
+static void
+medsa_print_full(netdissect_options *ndo,
+		 const struct medsa_pkthdr *medsa,
+		 u_int caplen)
 {
 	u_char tag = TAG(medsa);
 
@@ -134,7 +135,7 @@ static void medsa_print_full(netdissect_options *ndo,
 
 void
 medsa_print(netdissect_options *ndo,
-	   const u_char *bp, u_int length, u_int caplen)
+	    const u_char *bp, u_int length, u_int caplen)
 {
 	register const struct ether_header *ep;
 	const struct medsa_pkthdr *medsa;
