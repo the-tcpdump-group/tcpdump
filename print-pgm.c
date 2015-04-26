@@ -626,7 +626,7 @@ pgm_print(netdissect_options *ndo,
 		    bp += addr_size;
 
 		    inet_ntop(nla_af, nla, nla_buf, sizeof(nla_buf));
-		    ND_PRINT((ndo, " REDIRECT %s",  (char *)nla));
+		    ND_PRINT((ndo, " REDIRECT %s",  nla_buf));
 		    opts_len -= 4 + addr_size;
 		    break;
 
@@ -757,7 +757,7 @@ pgm_print(netdissect_options *ndo,
 		    bp += addr_size;
 
 		    inet_ntop(nla_af, nla, nla_buf, sizeof(nla_buf));
-		    ND_PRINT((ndo, " PGMCC DATA %u %s", offset, (char*)nla));
+		    ND_PRINT((ndo, " PGMCC DATA %u %s", offset, nla_buf));
 		    opts_len -= 16;
 		    break;
 
@@ -790,7 +790,7 @@ pgm_print(netdissect_options *ndo,
 		    bp += addr_size;
 
 		    inet_ntop(nla_af, nla, nla_buf, sizeof(nla_buf));
-		    ND_PRINT((ndo, " PGMCC FEEDBACK %u %s", offset, (char*)nla));
+		    ND_PRINT((ndo, " PGMCC FEEDBACK %u %s", offset, nla_buf));
 		    opts_len -= 16;
 		    break;
 
