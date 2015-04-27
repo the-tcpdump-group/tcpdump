@@ -2218,7 +2218,7 @@ ikev2_n_print(netdissect_options *ndo, u_char tpay _U_,
 	const char *notify_name;
 	uint32_t type;
 
-	p = (const const struct ikev2_n *)ext;
+	p = (const struct ikev2_n *)ext;
 	ND_TCHECK(*p);
 	UNALIGNED_MEMCPY(&n, ext, sizeof(n));
 	ikev2_pay_print(ndo, NPSTR(ISAKMP_NPTYPE_N), n.h.critical);
