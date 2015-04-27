@@ -33,23 +33,23 @@
 #include "interface.h"
 
 struct z_packet {
-    char *version;
+    const char *version;
     int numfields;
     int kind;
-    char *uid;
+    const char *uid;
     int port;
     int auth;
     int authlen;
-    char *authdata;
-    char *class;
-    char *inst;
-    char *opcode;
-    char *sender;
+    const char *authdata;
+    const char *class;
+    const char *inst;
+    const char *opcode;
+    const char *sender;
     const char *recipient;
-    char *format;
+    const char *format;
     int cksum;
     int multi;
-    char *multi_uid;
+    const char *multi_uid;
     /* Other fields follow here.. */
 };
 
@@ -79,30 +79,30 @@ static const struct tok z_types[] = {
 
 static char z_buf[256];
 
-static char *
-parse_field(netdissect_options *ndo, char **pptr, int *len)
+static const char *
+parse_field(netdissect_options *ndo, const char **pptr, int *len)
 {
-    char *s;
+    const char *s;
 
     if (*len <= 0 || !pptr || !*pptr)
 	return NULL;
-    if (*pptr > (char *) ndo->ndo_snapend)
+    if (*pptr > (const char *) ndo->ndo_snapend)
 	return NULL;
 
     s = *pptr;
-    while (*pptr <= (char *) ndo->ndo_snapend && *len >= 0 && **pptr) {
+    while (*pptr <= (const char *) ndo->ndo_snapend && *len >= 0 && **pptr) {
 	(*pptr)++;
 	(*len)--;
     }
     (*pptr)++;
     (*len)--;
-    if (*len < 0 || *pptr > (char *) ndo->ndo_snapend)
+    if (*len < 0 || *pptr > (const char *) ndo->ndo_snapend)
 	return NULL;
     return s;
 }
 
 static const char *
-z_triple(char *class, char *inst, const char *recipient)
+z_triple(const char *class, const char *inst, const char *recipient)
 {
     if (!*recipient)
 	recipient = "*";
@@ -112,15 +112,17 @@ z_triple(char *class, char *inst, const char *recipient)
 }
 
 static const char *
-str_to_lower(char *string)
+str_to_lower(const char *string)
 {
+    char *zb_string;
+
     strncpy(z_buf, string, sizeof(z_buf));
     z_buf[sizeof(z_buf)-1] = '\0';
 
-    string = z_buf;
-    while (*string) {
-	*string = tolower((unsigned char)(*string));
-	string++;
+    zb_string = z_buf;
+    while (*zb_string) {
+	*zb_string = tolower((unsigned char)(*zb_string));
+	zb_string++;
     }
 
     return z_buf;
@@ -130,9 +132,9 @@ void
 zephyr_print(netdissect_options *ndo, const u_char *cp, int length)
 {
     struct z_packet z;
-    char *parse = (char *) cp;
+    const char *parse = (const char *) cp;
     int parselen = length;
-    char *s;
+    const char *s;
     int lose = 0;
 
     /* squelch compiler warnings */
@@ -192,7 +194,7 @@ zephyr_print(netdissect_options *ndo, const u_char *cp, int length)
     ND_PRINT((ndo, " %s", tok2str(z_types, "type %d", z.kind)));
     if (z.kind == Z_PACKET_SERVACK) {
 	/* Initialization to silence warnings */
-	char *ackdata = NULL;
+	const char *ackdata = NULL;
 	PARSE_FIELD_STR(ackdata);
 	if (!lose && strcmp(ackdata, "SENT"))
 	    ND_PRINT((ndo, "/%s", str_to_lower(ackdata)));
@@ -225,7 +227,7 @@ zephyr_print(netdissect_options *ndo, const u_char *cp, int length)
 								   "-nodefs"));
 		if (z.kind != Z_PACKET_SERVACK) {
 		    /* Initialization to silence warnings */
-		    char *c = NULL, *i = NULL, *r = NULL;
+		    const char *c = NULL, *i = NULL, *r = NULL;
 		    PARSE_FIELD_STR(c);
 		    PARSE_FIELD_STR(i);
 		    PARSE_FIELD_STR(r);

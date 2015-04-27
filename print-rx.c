@@ -521,9 +521,9 @@ static int is_ubik(uint32_t);
 void
 rx_print(netdissect_options *ndo,
          register const u_char *bp, int length, int sport, int dport,
-         u_char *bp2)
+         const u_char *bp2)
 {
-	register struct rx_header *rxh;
+	register const struct rx_header *rxh;
 	int i;
 	int32_t opcode;
 
@@ -532,7 +532,7 @@ rx_print(netdissect_options *ndo,
 		return;
 	}
 
-	rxh = (struct rx_header *) bp;
+	rxh = (const struct rx_header *) bp;
 
 	ND_PRINT((ndo, " rx %s", tok2str(rx_types, "type %d", rxh->type)));
 
@@ -950,7 +950,7 @@ fs_print(netdissect_options *ndo,
 			bp += sizeof(int32_t);
 			ND_TCHECK2(bp[0], i);
 			i = min(AFSOPAQUEMAX, i);
-			strncpy(a, (char *) bp, i);
+			strncpy(a, (const char *) bp, i);
 			a[i] = '\0';
 			acl_print(ndo, (u_char *) a, sizeof(a), (u_char *) a + i);
 			break;
@@ -1053,12 +1053,12 @@ fs_reply_print(netdissect_options *ndo,
                register const u_char *bp, int length, int32_t opcode)
 {
 	unsigned long i;
-	struct rx_header *rxh;
+	const struct rx_header *rxh;
 
 	if (length <= (int)sizeof(struct rx_header))
 		return;
 
-	rxh = (struct rx_header *) bp;
+	rxh = (const struct rx_header *) bp;
 
 	/*
 	 * Print out the afs call we're invoking.  The table used here was
@@ -1083,7 +1083,7 @@ fs_reply_print(netdissect_options *ndo,
 			bp += sizeof(int32_t);
 			ND_TCHECK2(bp[0], i);
 			i = min(AFSOPAQUEMAX, i);
-			strncpy(a, (char *) bp, i);
+			strncpy(a, (const char *) bp, i);
 			a[i] = '\0';
 			acl_print(ndo, (u_char *) a, sizeof(a), (u_char *) a + i);
 			break;
@@ -1298,12 +1298,12 @@ static void
 cb_reply_print(netdissect_options *ndo,
                register const u_char *bp, int length, int32_t opcode)
 {
-	struct rx_header *rxh;
+	const struct rx_header *rxh;
 
 	if (length <= (int)sizeof(struct rx_header))
 		return;
 
-	rxh = (struct rx_header *) bp;
+	rxh = (const struct rx_header *) bp;
 
 	/*
 	 * Print out the afs call we're invoking.  The table used here was
@@ -1492,13 +1492,13 @@ static void
 prot_reply_print(netdissect_options *ndo,
                  register const u_char *bp, int length, int32_t opcode)
 {
-	struct rx_header *rxh;
+	const struct rx_header *rxh;
 	unsigned long i;
 
 	if (length < (int)sizeof(struct rx_header))
 		return;
 
-	rxh = (struct rx_header *) bp;
+	rxh = (const struct rx_header *) bp;
 
 	/*
 	 * Print out the afs call we're invoking.  The table used here was
@@ -1699,13 +1699,13 @@ static void
 vldb_reply_print(netdissect_options *ndo,
                  register const u_char *bp, int length, int32_t opcode)
 {
-	struct rx_header *rxh;
+	const struct rx_header *rxh;
 	unsigned long i;
 
 	if (length < (int)sizeof(struct rx_header))
 		return;
 
-	rxh = (struct rx_header *) bp;
+	rxh = (const struct rx_header *) bp;
 
 	/*
 	 * Print out the afs call we're invoking.  The table used here was
@@ -1751,7 +1751,7 @@ vldb_reply_print(netdissect_options *ndo,
 				ND_TCHECK2(bp[0], sizeof(int32_t));
 				if (i < nservers)
 					ND_PRINT((ndo, " %s",
-					   intoa(((struct in_addr *) bp)->s_addr)));
+					   intoa(((const struct in_addr *) bp)->s_addr)));
 				bp += sizeof(int32_t);
 			}
 			ND_PRINT((ndo, " partitions"));
@@ -1798,7 +1798,7 @@ vldb_reply_print(netdissect_options *ndo,
 				ND_TCHECK2(bp[0], sizeof(int32_t));
 				if (i < nservers)
 					ND_PRINT((ndo, " %s",
-					   intoa(((struct in_addr *) bp)->s_addr)));
+					   intoa(((const struct in_addr *) bp)->s_addr)));
 				bp += sizeof(int32_t);
 			}
 			ND_PRINT((ndo, " partitions"));
@@ -1981,12 +1981,12 @@ static void
 kauth_reply_print(netdissect_options *ndo,
                   register const u_char *bp, int length, int32_t opcode)
 {
-	struct rx_header *rxh;
+	const struct rx_header *rxh;
 
 	if (length <= (int)sizeof(struct rx_header))
 		return;
 
-	rxh = (struct rx_header *) bp;
+	rxh = (const struct rx_header *) bp;
 
 	/*
 	 * Print out the afs call we're invoking.  The table used here was
@@ -2235,12 +2235,12 @@ static void
 vol_reply_print(netdissect_options *ndo,
                 register const u_char *bp, int length, int32_t opcode)
 {
-	struct rx_header *rxh;
+	const struct rx_header *rxh;
 
 	if (length <= (int)sizeof(struct rx_header))
 		return;
 
-	rxh = (struct rx_header *) bp;
+	rxh = (const struct rx_header *) bp;
 
 	/*
 	 * Print out the afs call we're invoking.  The table used here was
@@ -2462,12 +2462,12 @@ static void
 bos_reply_print(netdissect_options *ndo,
                 register const u_char *bp, int length, int32_t opcode)
 {
-	struct rx_header *rxh;
+	const struct rx_header *rxh;
 
 	if (length <= (int)sizeof(struct rx_header))
 		return;
 
-	rxh = (struct rx_header *) bp;
+	rxh = (const struct rx_header *) bp;
 
 	/*
 	 * Print out the afs call we're invoking.  The table used here was
@@ -2631,12 +2631,12 @@ static void
 ubik_reply_print(netdissect_options *ndo,
                  register const u_char *bp, int length, int32_t opcode)
 {
-	struct rx_header *rxh;
+	const struct rx_header *rxh;
 
 	if (length < (int)sizeof(struct rx_header))
 		return;
 
-	rxh = (struct rx_header *) bp;
+	rxh = (const struct rx_header *) bp;
 
 	/*
 	 * Print out the ubik call we're invoking.  This table was gleaned
@@ -2695,7 +2695,7 @@ static void
 rx_ack_print(netdissect_options *ndo,
              register const u_char *bp, int length)
 {
-	struct rx_ackPacket *rxa;
+	const struct rx_ackPacket *rxa;
 	int i, start, last;
 	uint32_t firstPacket;
 
@@ -2714,7 +2714,7 @@ rx_ack_print(netdissect_options *ndo,
 
 	ND_TCHECK2(bp[0], sizeof(struct rx_ackPacket) - RX_MAXACKS);
 
-	rxa = (struct rx_ackPacket *) bp;
+	rxa = (const struct rx_ackPacket *) bp;
 	bp += (sizeof(struct rx_ackPacket) - RX_MAXACKS);
 
 	/*

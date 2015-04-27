@@ -324,7 +324,7 @@ static const struct obj_abrev {
 struct be {
 	uint32_t asnlen;
 	union {
-		caddr_t raw;
+		const uint8_t *raw;
 		int32_t integer;
 		uint32_t uns;
 		const u_char *str;
@@ -524,7 +524,7 @@ asn1_parse(netdissect_options *ndo,
 
 			case OBJECTID:
 				elem->type = BE_OID;
-				elem->data.raw = (caddr_t)p;
+				elem->data.raw = (const uint8_t *)p;
 				break;
 
 			case ASN_NULL:
@@ -534,7 +534,7 @@ asn1_parse(netdissect_options *ndo,
 
 			default:
 				elem->type = BE_OCTET;
-				elem->data.raw = (caddr_t)p;
+				elem->data.raw = (const uint8_t *)p;
 				ND_PRINT((ndo, "[P/U/%s]", Class[class].Id[id]));
 				break;
 			}
@@ -544,7 +544,7 @@ asn1_parse(netdissect_options *ndo,
 			switch (id) {
 			case IPADDR:
 				elem->type = BE_INETADDR;
-				elem->data.raw = (caddr_t)p;
+				elem->data.raw = (const uint8_t *)p;
 				break;
 
 			case COUNTER:
@@ -577,7 +577,7 @@ asn1_parse(netdissect_options *ndo,
 
 			default:
 				elem->type = BE_OCTET;
-				elem->data.raw = (caddr_t)p;
+				elem->data.raw = (const uint8_t *)p;
 				ND_PRINT((ndo, "[P/A/%s]",
 					Class[class].Id[id]));
 				break;
@@ -607,7 +607,7 @@ asn1_parse(netdissect_options *ndo,
 			ND_PRINT((ndo, "[P/%s/%s]", Class[class].name, Class[class].Id[id]));
 			ND_TCHECK2(*p, elem->asnlen);
 			elem->type = BE_OCTET;
-			elem->data.raw = (caddr_t)p;
+			elem->data.raw = (const uint8_t *)p;
 			break;
 		}
 		break;
@@ -618,12 +618,12 @@ asn1_parse(netdissect_options *ndo,
 			switch (id) {
 			case SEQUENCE:
 				elem->type = BE_SEQ;
-				elem->data.raw = (caddr_t)p;
+				elem->data.raw = (const uint8_t *)p;
 				break;
 
 			default:
 				elem->type = BE_OCTET;
-				elem->data.raw = (caddr_t)p;
+				elem->data.raw = (const uint8_t *)p;
 				ND_PRINT((ndo, "C/U/%s", Class[class].Id[id]));
 				break;
 			}
@@ -631,12 +631,12 @@ asn1_parse(netdissect_options *ndo,
 
 		case CONTEXT:
 			elem->type = BE_PDU;
-			elem->data.raw = (caddr_t)p;
+			elem->data.raw = (const uint8_t *)p;
 			break;
 
 		default:
 			elem->type = BE_OCTET;
-			elem->data.raw = (caddr_t)p;
+			elem->data.raw = (const uint8_t *)p;
 			ND_PRINT((ndo, "C/%s/%s", Class[class].name, Class[class].Id[id]));
 			break;
 		}
@@ -660,7 +660,7 @@ static int
 asn1_print(netdissect_options *ndo,
            struct be *elem)
 {
-	u_char *p = (u_char *)elem->data.raw;
+	const u_char *p = (const u_char *)elem->data.raw;
 	uint32_t asnlen = elem->asnlen;
 	uint32_t i;
 
@@ -683,7 +683,7 @@ asn1_print(netdissect_options *ndo,
 			size_t a_len = strlen(a->oid);
 			for (; a->node; a++) {
 				ND_TCHECK2(*p, a_len);
-				if (memcmp(a->oid, (char *)p, a_len) == 0) {
+				if (memcmp(a->oid, p, a_len) == 0) {
 					objp = a->node->child;
 					i -= strlen(a->oid);
 					p += strlen(a->oid);
@@ -894,7 +894,7 @@ smi_decode_oid(netdissect_options *ndo,
                struct be *elem, unsigned int *oid,
                unsigned int oidsize, unsigned int *oidlen)
 {
-	u_char *p = (u_char *)elem->data.raw;
+	const u_char *p = (const u_char *)elem->data.raw;
 	uint32_t asnlen = elem->asnlen;
 	int o = 0, first = -1, i = asnlen;
 	unsigned int firstval;
@@ -1216,7 +1216,7 @@ varbind_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "[%d extra after SEQ of varbind]", length - count));
 	/* descend */
 	length = elem.asnlen;
-	np = (u_char *)elem.data.raw;
+	np = (const u_char *)elem.data.raw;
 
 	for (ind = 1; length > 0; ind++) {
 		const u_char *vbend;
@@ -1236,7 +1236,7 @@ varbind_print(netdissect_options *ndo,
 		vblength = length - count;
 		/* descend */
 		length = elem.asnlen;
-		np = (u_char *)elem.data.raw;
+		np = (const u_char *)elem.data.raw;
 
 		/* objName (OID) */
 		if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
@@ -1485,7 +1485,7 @@ pdu_print(netdissect_options *ndo,
 	ND_PRINT((ndo, " "));
 	/* descend into PDU */
 	length = pdu.asnlen;
-	np = (u_char *)pdu.data.raw;
+	np = (const u_char *)pdu.data.raw;
 
 	if (version == SNMP_VERSION_1 &&
 	    (pdu.id == GETBULKREQ || pdu.id == INFORMREQ ||
@@ -1539,7 +1539,7 @@ scopedpdu_print(netdissect_options *ndo,
 		return;
 	}
 	length = elem.asnlen;
-	np = (u_char *)elem.data.raw;
+	np = (const u_char *)elem.data.raw;
 
 	/* contextEngineID (OCTET STRING) */
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
@@ -1594,7 +1594,7 @@ community_print(netdissect_options *ndo,
 	}
 	/* default community */
 	if (!(elem.asnlen == sizeof(DEF_COMMUNITY) - 1 &&
-	    strncmp((char *)elem.data.str, DEF_COMMUNITY,
+	    strncmp((const char *)elem.data.str, DEF_COMMUNITY,
 	            sizeof(DEF_COMMUNITY) - 1) == 0))
 		/* ! "public" */
 		ND_PRINT((ndo, "C=%.*s ", (int)elem.asnlen, elem.data.str));
@@ -1623,7 +1623,7 @@ usm_print(netdissect_options *ndo,
 		return;
 	}
 	length = elem.asnlen;
-	np = (u_char *)elem.data.raw;
+	np = (const u_char *)elem.data.raw;
 
 	/* msgAuthoritativeEngineID (OCTET STRING) */
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
@@ -1724,7 +1724,7 @@ v3msg_print(netdissect_options *ndo,
 		return;
 	}
 	length = elem.asnlen;
-	np = (u_char *)elem.data.raw;
+	np = (const u_char *)elem.data.raw;
 
 	if (ndo->ndo_vflag) {
 		ND_PRINT((ndo, "{ "));
@@ -1863,7 +1863,7 @@ snmp_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "[%d extra after iSEQ]", length - count));
 	/* descend */
 	length = elem.asnlen;
-	np = (u_char *)elem.data.raw;
+	np = (const u_char *)elem.data.raw;
 
 	/* Version (INTEGER) */
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)

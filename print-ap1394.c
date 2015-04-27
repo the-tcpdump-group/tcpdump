@@ -82,7 +82,7 @@ ap1394_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 {
 	u_int length = h->len;
 	u_int caplen = h->caplen;
-	struct firewire_header *fp;
+	const struct firewire_header *fp;
 	u_short ether_type;
 
 	if (caplen < FIREWIRE_HDRLEN) {
@@ -95,14 +95,14 @@ ap1394_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_ch
 
 	length -= FIREWIRE_HDRLEN;
 	caplen -= FIREWIRE_HDRLEN;
-	fp = (struct firewire_header *)p;
+	fp = (const struct firewire_header *)p;
 	p += FIREWIRE_HDRLEN;
 
 	ether_type = EXTRACT_16BITS(&fp->firewire_type);
 	if (ethertype_print(ndo, ether_type, p, length, caplen) == 0) {
 		/* ether_type not known, print raw packet */
 		if (!ndo->ndo_eflag)
-			ap1394_hdr_print(ndo, (u_char *)fp, length + FIREWIRE_HDRLEN);
+			ap1394_hdr_print(ndo, (const u_char *)fp, length + FIREWIRE_HDRLEN);
 
 		if (!ndo->ndo_suppress_default_print)
 			ND_DEFAULTPRINT(p, caplen);

@@ -360,13 +360,13 @@ Parse_fh(register const unsigned char *fh, int len _U_, my_fsid *fsidp,
 		if (sizeof(*fsidp) > 14)
 		    memset((char *)fsidp, 0, sizeof(*fsidp));
 		/* just use the whole thing */
-		memcpy((char *)fsidp, (char *)fh, 14);
+		memcpy((char *)fsidp, (const char *)fh, 14);
 	    }
 	    else {
 		uint32_t tempa[4];	/* at least 16 bytes, maybe more */
 
 		memset((char *)tempa, 0, sizeof(tempa));
-		memcpy((char *)tempa, (char *)fh, 14); /* ensure alignment */
+		memcpy((char *)tempa, (const char *)fh, 14); /* ensure alignment */
 		fsidp->Fsid_dev.Minor = tempa[0] + (tempa[1]<<1);
 		fsidp->Fsid_dev.Major = tempa[2] + (tempa[3]<<1);
 		fsidp->fsid_code = 0;
@@ -377,7 +377,7 @@ Parse_fh(register const unsigned char *fh, int len _U_, my_fsid *fsidp,
 
 	    /* Caller must save (and null-terminate?) this value */
 	    if (fsnamep)
-		*fsnamep = (char *)&(fhp[1]);
+		*fsnamep = (const char *)&(fhp[1]);
 
 	    if (osnamep)
 		*osnamep = "VMS";

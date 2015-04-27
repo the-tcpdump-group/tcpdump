@@ -514,7 +514,7 @@ void sctp_print(netdissect_options *ndo,
 
   if( (u_long) endPacketPtr > (u_long) ndo->ndo_snapend)
     endPacketPtr = (const void *) ndo->ndo_snapend;
-  ip = (struct ip *)bp2;
+  ip = (const struct ip *)bp2;
 #ifdef INET6
   if (IP_V(ip) == 6)
     ip6 = (const struct ip6_hdr *)bp2;
@@ -588,7 +588,7 @@ void sctp_print(netdissect_options *ndo,
         break;
       }
 
-      ND_TCHECK2(*((uint8_t *)chunkDescPtr), chunkLength);
+      ND_TCHECK2(*((const uint8_t *)chunkDescPtr), chunkLength);
       chunkEnd = ((const u_char*)chunkDescPtr + chunkLength);
 
       align=chunkLength % 4;

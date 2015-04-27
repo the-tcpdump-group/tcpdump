@@ -206,7 +206,7 @@ ntp_print(netdissect_options *ndo,
 	register const struct ntpdata *bp;
 	int mode, version, leapind;
 
-	bp = (struct ntpdata *)cp;
+	bp = (const struct ntpdata *)cp;
 
 	ND_TCHECK(bp->status);
 
@@ -260,7 +260,7 @@ ntp_print(netdissect_options *ndo,
 		break;
 
 	case PRIM_REF:
-		if (fn_printn(ndo, (u_char *)&(bp->refid), 4, ndo->ndo_snapend))
+		if (fn_printn(ndo, (const u_char *)&(bp->refid), 4, ndo->ndo_snapend))
 			goto trunc;
 		break;
 

@@ -172,7 +172,7 @@ trunc:
 int
 hbhopt_print(netdissect_options *ndo, register const u_char *bp)
 {
-    const struct ip6_hbh *dp = (struct ip6_hbh *)bp;
+    const struct ip6_hbh *dp = (const struct ip6_hbh *)bp;
     int hbhlen = 0;
 
     ND_TCHECK(dp->ip6h_len);
@@ -192,7 +192,7 @@ hbhopt_print(netdissect_options *ndo, register const u_char *bp)
 int
 dstopt_print(netdissect_options *ndo, register const u_char *bp)
 {
-    const struct ip6_dest *dp = (struct ip6_dest *)bp;
+    const struct ip6_dest *dp = (const struct ip6_dest *)bp;
     int dstoptlen = 0;
 
     ND_TCHECK(dp->ip6d_len);

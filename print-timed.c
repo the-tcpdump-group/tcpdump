@@ -94,7 +94,7 @@ void
 timed_print(netdissect_options *ndo,
             register const u_char *bp)
 {
-	struct tsp *tsp = (struct tsp *)bp;
+	const struct tsp *tsp = (const struct tsp *)bp;
 	long sec, usec;
 
 	ND_TCHECK(tsp->tsp_type);
@@ -137,7 +137,7 @@ timed_print(netdissect_options *ndo,
 	}
 	ND_TCHECK(tsp->tsp_name);
 	ND_PRINT((ndo, " name "));
-	if (fn_print(ndo, (u_char *)tsp->tsp_name, (u_char *)tsp->tsp_name + sizeof(tsp->tsp_name)))
+	if (fn_print(ndo, (const u_char *)tsp->tsp_name, (const u_char *)tsp->tsp_name + sizeof(tsp->tsp_name)))
 		goto trunc;
 	return;
 

@@ -97,7 +97,7 @@ enc_if_print(netdissect_options *ndo,
 		goto out;
 	}
 
-	hdr = (struct enchdr *)p;
+	hdr = (const struct enchdr *)p;
 	flags = hdr->flags;
 	if (flags == 0)
 		ND_PRINT((ndo, "(unprotected): "));

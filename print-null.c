@@ -82,7 +82,7 @@ null_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char
 		return (NULL_HDRLEN);
 	}
 
-	memcpy((char *)&family, (char *)p, sizeof(family));
+	memcpy((char *)&family, (const char *)p, sizeof(family));
 
 	/*
 	 * This isn't necessarily in our host byte order; if this is

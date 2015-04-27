@@ -513,7 +513,7 @@ juniper_es_print(netdissect_options *ndo,
             return l2info.header_len;
 
         p+=l2info.header_len;
-        ih = (struct juniper_ipsec_header *)p;
+        ih = (const struct juniper_ipsec_header *)p;
 
         switch (ih->type) {
         case JUNIPER_IPSEC_O_ESP_ENCRYPT_ESP_AUTHEN_TYPE:
@@ -582,7 +582,7 @@ juniper_monitor_print(netdissect_options *ndo,
             return l2info.header_len;
 
         p+=l2info.header_len;
-        mh = (struct juniper_monitor_header *)p;
+        mh = (const struct juniper_monitor_header *)p;
 
         if (ndo->ndo_eflag)
             ND_PRINT((ndo, "service-id %u, iif %u, pkt-type %u: ",
@@ -616,7 +616,7 @@ juniper_services_print(netdissect_options *ndo,
             return l2info.header_len;
 
         p+=l2info.header_len;
-        sh = (struct juniper_services_header *)p;
+        sh = (const struct juniper_services_header *)p;
 
         if (ndo->ndo_eflag)
             ND_PRINT((ndo, "service-id %u flags 0x%02x service-set-id 0x%04x iif %u: ",

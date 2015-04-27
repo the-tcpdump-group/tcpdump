@@ -54,7 +54,7 @@ ipnet_hdr_print(netdissect_options *ndo, const u_char *bp, u_int length)
 static void
 ipnet_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 {
-	ipnet_hdr_t *hdr;
+	const ipnet_hdr_t *hdr;
 
 	if (caplen < sizeof(ipnet_hdr_t)) {
 		ND_PRINT((ndo, "[|ipnet]"));
@@ -66,7 +66,7 @@ ipnet_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 
 	length -= sizeof(ipnet_hdr_t);
 	caplen -= sizeof(ipnet_hdr_t);
-	hdr = (ipnet_hdr_t *)p;
+	hdr = (const ipnet_hdr_t *)p;
 	p += sizeof(ipnet_hdr_t);
 
 	switch (hdr->iph_family) {
@@ -81,7 +81,7 @@ ipnet_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 
 	default:
 		if (!ndo->ndo_eflag)
-			ipnet_hdr_print(ndo, (u_char *)hdr,
+			ipnet_hdr_print(ndo, (const u_char *)hdr,
 					length + sizeof(ipnet_hdr_t));
 
 		if (!ndo->ndo_suppress_default_print)

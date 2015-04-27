@@ -249,7 +249,7 @@ lwres_printbinlen(netdissect_options *ndo,
 
 static int
 lwres_printaddr(netdissect_options *ndo,
-                lwres_addr_t *ap)
+                const lwres_addr_t *ap)
 {
 	uint16_t l;
 	const char *p;
@@ -342,9 +342,9 @@ lwres_print(netdissect_options *ndo,
 		/*
 		 * queries
 		 */
-		lwres_gabnrequest_t *gabn;
-		lwres_gnbarequest_t *gnba;
-		lwres_grbnrequest_t *grbn;
+		const lwres_gabnrequest_t *gabn;
+		const lwres_gnbarequest_t *gnba;
+		const lwres_grbnrequest_t *grbn;
 		uint32_t l;
 
 		gabn = NULL;
@@ -355,7 +355,7 @@ lwres_print(netdissect_options *ndo,
 		case LWRES_OPCODE_NOOP:
 			break;
 		case LWRES_OPCODE_GETADDRSBYNAME:
-			gabn = (lwres_gabnrequest_t *)(np + 1);
+			gabn = (const lwres_gabnrequest_t *)(np + 1);
 			ND_TCHECK(gabn->namelen);
 			/* XXX gabn points to packed struct */
 			s = (const char *)&gabn->namelen +
@@ -389,7 +389,7 @@ lwres_print(netdissect_options *ndo,
 			s += advance;
 			break;
 		case LWRES_OPCODE_GETNAMEBYADDR:
-			gnba = (lwres_gnbarequest_t *)(np + 1);
+			gnba = (const lwres_gnbarequest_t *)(np + 1);
 			ND_TCHECK(gnba->addr);
 
 			/* BIND910: not used */
@@ -407,7 +407,7 @@ lwres_print(netdissect_options *ndo,
 			break;
 		case LWRES_OPCODE_GETRDATABYNAME:
 			/* XXX no trace, not tested */
-			grbn = (lwres_grbnrequest_t *)(np + 1);
+			grbn = (const lwres_grbnrequest_t *)(np + 1);
 			ND_TCHECK(grbn->namelen);
 
 			/* BIND910: not used */
@@ -441,9 +441,9 @@ lwres_print(netdissect_options *ndo,
 		/*
 		 * responses
 		 */
-		lwres_gabnresponse_t *gabn;
-		lwres_gnbaresponse_t *gnba;
-		lwres_grbnresponse_t *grbn;
+		const lwres_gabnresponse_t *gabn;
+		const lwres_gnbaresponse_t *gnba;
+		const lwres_grbnresponse_t *grbn;
 		uint32_t l, na;
 		uint32_t i;
 
@@ -455,7 +455,7 @@ lwres_print(netdissect_options *ndo,
 		case LWRES_OPCODE_NOOP:
 			break;
 		case LWRES_OPCODE_GETADDRSBYNAME:
-			gabn = (lwres_gabnresponse_t *)(np + 1);
+			gabn = (const lwres_gabnresponse_t *)(np + 1);
 			ND_TCHECK(gabn->realnamelen);
 			/* XXX gabn points to packed struct */
 			s = (const char *)&gabn->realnamelen +
@@ -488,14 +488,14 @@ lwres_print(netdissect_options *ndo,
 			/* addrs */
 			na = EXTRACT_16BITS(&gabn->naddrs);
 			for (i = 0; i < na; i++) {
-				advance = lwres_printaddr(ndo, (lwres_addr_t *)s);
+				advance = lwres_printaddr(ndo, (const lwres_addr_t *)s);
 				if (advance < 0)
 					goto trunc;
 				s += advance;
 			}
 			break;
 		case LWRES_OPCODE_GETNAMEBYADDR:
-			gnba = (lwres_gnbaresponse_t *)(np + 1);
+			gnba = (const lwres_gnbaresponse_t *)(np + 1);
 			ND_TCHECK(gnba->realnamelen);
 			/* XXX gnba points to packed struct */
 			s = (const char *)&gnba->realnamelen +
@@ -526,7 +526,7 @@ lwres_print(netdissect_options *ndo,
 			break;
 		case LWRES_OPCODE_GETRDATABYNAME:
 			/* XXX no trace, not tested */
-			grbn = (lwres_grbnresponse_t *)(np + 1);
+			grbn = (const lwres_grbnresponse_t *)(np + 1);
 			ND_TCHECK(grbn->nsigs);
 
 			/* BIND910: not used */

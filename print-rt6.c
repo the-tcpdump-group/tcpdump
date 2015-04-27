@@ -45,7 +45,7 @@ rt6_print(netdissect_options *ndo, register const u_char *bp, const u_char *bp2 
 	register const struct in6_addr *addr;
 	const struct in6_addr *last_addr = NULL;
 
-	dp = (struct ip6_rthdr *)bp;
+	dp = (const struct ip6_rthdr *)bp;
 	len = dp->ip6r_len;
 
 	/* 'ep' points to the end of available data. */
@@ -66,7 +66,7 @@ rt6_print(netdissect_options *ndo, register const u_char *bp, const u_char *bp2 
 #endif
 	case IPV6_RTHDR_TYPE_0:
 	case IPV6_RTHDR_TYPE_2:			/* Mobile IPv6 ID-20 */
-		dp0 = (struct ip6_rthdr0 *)dp;
+		dp0 = (const struct ip6_rthdr0 *)dp;
 
 		ND_TCHECK(dp0->ip6r0_reserved);
 		if (dp0->ip6r0_reserved || ndo->ndo_vflag) {
@@ -79,7 +79,7 @@ rt6_print(netdissect_options *ndo, register const u_char *bp, const u_char *bp2 
 		len >>= 1;
 		addr = &dp0->ip6r0_addr[0];
 		for (i = 0; i < len; i++) {
-			if ((u_char *)(addr + 1) > ep)
+			if ((const u_char *)(addr + 1) > ep)
 				goto trunc;
 
 			ND_PRINT((ndo, ", [%d]%s", i, ip6addr_string(ndo, addr)));
@@ -91,7 +91,7 @@ rt6_print(netdissect_options *ndo, register const u_char *bp, const u_char *bp2 
 		 * destination : the last address of the routing header
 		 */
 		if (last_addr != NULL) {
-			struct ip6_hdr *ip6 = (struct ip6_hdr *)bp2;
+			const struct ip6_hdr *ip6 = (const struct ip6_hdr *)bp2;
 			UNALIGNED_MEMCPY(&ip6->ip6_dst, last_addr, sizeof (struct in6_addr));
 		}
 		/*(*/

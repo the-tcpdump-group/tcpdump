@@ -48,13 +48,13 @@ ipcomp_print(netdissect_options *ndo, register const u_char *bp, int *nhdr _U_)
 	int advance;
 #endif
 
-	ipcomp = (struct ipcomp *)bp;
+	ipcomp = (const struct ipcomp *)bp;
 	cpi = EXTRACT_16BITS(&ipcomp->comp_cpi);
 
 	/* 'ep' points to the end of available data. */
 	ep = ndo->ndo_snapend;
 
-	if ((u_char *)(ipcomp + 1) >= ep - sizeof(struct ipcomp)) {
+	if ((const u_char *)(ipcomp + 1) >= ep - sizeof(struct ipcomp)) {
 		ND_PRINT((ndo, "[|IPCOMP]"));
 		goto fail;
 	}

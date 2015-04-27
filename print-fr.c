@@ -765,7 +765,7 @@ q933_print(netdissect_options *ndo,
            const u_char *p, u_int length)
 {
 	const u_char *ptemp = p;
-	struct ie_tlv_header_t  *ie_p;
+	const struct ie_tlv_header_t  *ie_p;
         int olen;
 	int is_ansi = 0;
         u_int codeset;
@@ -813,7 +813,7 @@ q933_print(netdissect_options *ndo,
 
 	/* Loop through the rest of IE */
 	while (length > sizeof(struct ie_tlv_header_t)) {
-		ie_p = (struct ie_tlv_header_t  *)ptemp;
+		ie_p = (const struct ie_tlv_header_t  *)ptemp;
 		if (length < sizeof(struct ie_tlv_header_t) ||
 		    length < sizeof(struct ie_tlv_header_t) + ie_p->ie_len) {
                     if (ndo->ndo_vflag) { /* not bark if there is just a trailer */

@@ -200,14 +200,14 @@ static inline u_int dccp_csum_coverage(const struct dccp_hdr* dh, u_int len)
 static int dccp_cksum(netdissect_options *ndo, const struct ip *ip,
 	const struct dccp_hdr *dh, u_int len)
 {
-	return nextproto4_cksum(ndo, ip, (const uint8_t *)(void *)dh, len,
+	return nextproto4_cksum(ndo, ip, (const uint8_t *)(const void *)dh, len,
 				dccp_csum_coverage(dh, len), IPPROTO_DCCP);
 }
 
 #ifdef INET6
 static int dccp6_cksum(const struct ip6_hdr *ip6, const struct dccp_hdr *dh, u_int len)
 {
-	return nextproto6_cksum(ip6, (const uint8_t *)(void *)dh, len,
+	return nextproto6_cksum(ip6, (const uint8_t *)(const void *)dh, len,
 				dccp_csum_coverage(dh, len), IPPROTO_DCCP);
 }
 #endif
@@ -282,7 +282,7 @@ void dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 
 	dh = (const struct dccp_hdr *)bp;
 
-	ip = (struct ip *)data2;
+	ip = (const struct ip *)data2;
 #ifdef INET6
 	if (IP_V(ip) == 6)
 		ip6 = (const struct ip6_hdr *)data2;
@@ -369,8 +369,8 @@ void dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 	dccph_type = DCCPH_TYPE(dh);
 	switch (dccph_type) {
 	case DCCP_PKT_REQUEST: {
-		struct dccp_hdr_request *dhr =
-			(struct dccp_hdr_request *)(bp + fixed_hdrlen);
+		const struct dccp_hdr_request *dhr =
+			(const struct dccp_hdr_request *)(bp + fixed_hdrlen);
 		fixed_hdrlen += 4;
 		if (len < fixed_hdrlen) {
 			ND_PRINT((ndo, "truncated-%s - %u bytes missing!",
@@ -385,8 +385,8 @@ void dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 		break;
 	}
 	case DCCP_PKT_RESPONSE: {
-		struct dccp_hdr_response *dhr =
-			(struct dccp_hdr_response *)(bp + fixed_hdrlen);
+		const struct dccp_hdr_response *dhr =
+			(const struct dccp_hdr_response *)(bp + fixed_hdrlen);
 		fixed_hdrlen += 12;
 		if (len < fixed_hdrlen) {
 			ND_PRINT((ndo, "truncated-%s - %u bytes missing!",
@@ -446,8 +446,8 @@ void dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 		ND_PRINT((ndo, "%s ", tok2str(dccp_pkt_type_str, "", dccph_type)));
 		break;
 	case DCCP_PKT_RESET: {
-		struct dccp_hdr_reset *dhr =
-			(struct dccp_hdr_reset *)(bp + fixed_hdrlen);
+		const struct dccp_hdr_reset *dhr =
+			(const struct dccp_hdr_reset *)(bp + fixed_hdrlen);
 		fixed_hdrlen += 12;
 		if (len < fixed_hdrlen) {
 			ND_PRINT((ndo, "truncated-%s - %u bytes missing!",

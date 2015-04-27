@@ -108,7 +108,7 @@ rip6_entry_print(netdissect_options *ndo, register const struct netinfo6 *ni, in
 void
 ripng_print(netdissect_options *ndo, const u_char *dat, unsigned int length)
 {
-	register const struct rip6 *rp = (struct rip6 *)dat;
+	register const struct rip6 *rp = (const struct rip6 *)dat;
 	register const struct netinfo6 *ni;
 	register u_int amt;
 	register u_int i;

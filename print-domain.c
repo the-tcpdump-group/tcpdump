@@ -665,7 +665,7 @@ ns_print(netdissect_options *ndo,
 		    DNS_CD(np) ? "%" : ""));
 
 		/* any weirdness? */
-		b2 = EXTRACT_16BITS(((u_short *)np)+1);
+		b2 = EXTRACT_16BITS(((const u_short *)np)+1);
 		if (b2 & 0x6cf)
 			ND_PRINT((ndo, " [b2&3=0x%x]", b2));
 

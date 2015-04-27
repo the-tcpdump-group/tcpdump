@@ -761,7 +761,7 @@ sflow_print_flow_sample(netdissect_options *ndo,
     if (len < sizeof(struct sflow_flow_sample_t))
 	return 1;
 
-    sflow_flow_sample = (struct sflow_flow_sample_t *)pointer;
+    sflow_flow_sample = (const struct sflow_flow_sample_t *)pointer;
 
     typesource = EXTRACT_32BITS(sflow_flow_sample->typesource);
     nrecords = EXTRACT_32BITS(sflow_flow_sample->records);

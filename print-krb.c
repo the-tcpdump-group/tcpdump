@@ -155,7 +155,7 @@ krb4_print(netdissect_options *ndo,
 #define IS_LENDIAN(kp)	(((kp)->type & 0x01) != 0)
 #define KTOHSP(kp, cp)	(IS_LENDIAN(kp) ? EXTRACT_LE_16BITS(cp) : EXTRACT_16BITS(cp))
 
-	kp = (struct krb *)cp;
+	kp = (const struct krb *)cp;
 
 	if ((&kp->type) >= ndo->ndo_snapend) {
 		ND_PRINT((ndo, "%s", tstr));
@@ -226,7 +226,7 @@ krb_print(netdissect_options *ndo,
 {
 	register const struct krb *kp;
 
-	kp = (struct krb *)dat;
+	kp = (const struct krb *)dat;
 
 	if (dat >= ndo->ndo_snapend) {
 		ND_PRINT((ndo, "%s", tstr));

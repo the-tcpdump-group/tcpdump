@@ -614,12 +614,12 @@ ip_print(netdissect_options *ndo,
 
             if ((hlen - sizeof(struct ip)) > 0) {
                 ND_PRINT((ndo, ", options ("));
-                ip_optprint(ndo, (u_char *)(ipds->ip + 1), hlen - sizeof(struct ip));
+                ip_optprint(ndo, (const u_char *)(ipds->ip + 1), hlen - sizeof(struct ip));
                 ND_PRINT((ndo, ")"));
             }
 
-	    if (!ndo->ndo_Kflag && (u_char *)ipds->ip + hlen <= ndo->ndo_snapend) {
-	        vec[0].ptr = (const uint8_t *)(void *)ipds->ip;
+	    if (!ndo->ndo_Kflag && (const u_char *)ipds->ip + hlen <= ndo->ndo_snapend) {
+	        vec[0].ptr = (const uint8_t *)(const void *)ipds->ip;
 	        vec[0].len = hlen;
 	        sum = in_cksum(vec, 1);
 		if (sum != 0) {

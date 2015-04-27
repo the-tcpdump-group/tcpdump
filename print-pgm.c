@@ -162,11 +162,11 @@ pgm_print(netdissect_options *ndo,
 	uint8_t opt_type, opt_len;
 	uint32_t seq, opts_len, len, offset;
 
-	pgm = (struct pgm_header *)bp;
-	ip = (struct ip *)bp2;
+	pgm = (const struct pgm_header *)bp;
+	ip = (const struct ip *)bp2;
 #ifdef INET6
 	if (IP_V(ip) == 6)
-		ip6 = (struct ip6_hdr *)bp2;
+		ip6 = (const struct ip6_hdr *)bp2;
 	else
 		ip6 = NULL;
 #else /* INET6 */
@@ -239,9 +239,9 @@ pgm_print(netdissect_options *ndo,
                      pgm->pgm_gsid[5]));
 	switch (pgm->pgm_type) {
 	case PGM_SPM: {
-	    struct pgm_spm *spm;
+	    const struct pgm_spm *spm;
 
-	    spm = (struct pgm_spm *)(pgm + 1);
+	    spm = (const struct pgm_spm *)(pgm + 1);
 	    ND_TCHECK(*spm);
 
 	    switch (EXTRACT_16BITS(&spm->pgms_nla_afi)) {
@@ -259,7 +259,7 @@ pgm_print(netdissect_options *ndo,
 		goto trunc;
 		break;
 	    }
-	    bp = (u_char *) (spm + 1);
+	    bp = (const u_char *) (spm + 1);
 	    ND_TCHECK2(*bp, addr_size);
 	    nla = bp;
 	    bp += addr_size;
@@ -274,21 +274,21 @@ pgm_print(netdissect_options *ndo,
 	}
 
 	case PGM_POLL: {
-	    struct pgm_poll *poll;
+	    const struct pgm_poll *poll;
 
-	    poll = (struct pgm_poll *)(pgm + 1);
+	    poll = (const struct pgm_poll *)(pgm + 1);
 	    ND_TCHECK(*poll);
 	    ND_PRINT((ndo, "POLL seq %u round %u",
 			 EXTRACT_32BITS(&poll->pgmp_seq),
                          EXTRACT_16BITS(&poll->pgmp_round)));
-	    bp = (u_char *) (poll + 1);
+	    bp = (const u_char *) (poll + 1);
 	    break;
 	}
 	case PGM_POLR: {
-	    struct pgm_polr *polr;
+	    const struct pgm_polr *polr;
 	    uint32_t ivl, rnd, mask;
 
-	    polr = (struct pgm_polr *)(pgm + 1);
+	    polr = (const struct pgm_polr *)(pgm + 1);
 	    ND_TCHECK(*polr);
 
 	    switch (EXTRACT_16BITS(&polr->pgmp_nla_afi)) {
@@ -306,7 +306,7 @@ pgm_print(netdissect_options *ndo,
 		goto trunc;
 		break;
 	    }
-	    bp = (u_char *) (polr + 1);
+	    bp = (const u_char *) (polr + 1);
 	    ND_TCHECK2(*bp, addr_size);
 	    nla = bp;
 	    bp += addr_size;
@@ -331,33 +331,33 @@ pgm_print(netdissect_options *ndo,
 	    break;
 	}
 	case PGM_ODATA: {
-	    struct pgm_data *odata;
+	    const struct pgm_data *odata;
 
-	    odata = (struct pgm_data *)(pgm + 1);
+	    odata = (const struct pgm_data *)(pgm + 1);
 	    ND_TCHECK(*odata);
 	    ND_PRINT((ndo, "ODATA trail %u seq %u",
 			 EXTRACT_32BITS(&odata->pgmd_trailseq),
 			 EXTRACT_32BITS(&odata->pgmd_seq)));
-	    bp = (u_char *) (odata + 1);
+	    bp = (const u_char *) (odata + 1);
 	    break;
 	}
 
 	case PGM_RDATA: {
-	    struct pgm_data *rdata;
+	    const struct pgm_data *rdata;
 
-	    rdata = (struct pgm_data *)(pgm + 1);
+	    rdata = (const struct pgm_data *)(pgm + 1);
 	    ND_TCHECK(*rdata);
 	    ND_PRINT((ndo, "RDATA trail %u seq %u",
 			 EXTRACT_32BITS(&rdata->pgmd_trailseq),
 			 EXTRACT_32BITS(&rdata->pgmd_seq)));
-	    bp = (u_char *) (rdata + 1);
+	    bp = (const u_char *) (rdata + 1);
 	    break;
 	}
 
 	case PGM_NAK:
 	case PGM_NULLNAK:
 	case PGM_NCF: {
-	    struct pgm_nak *nak;
+	    const struct pgm_nak *nak;
 	    const void *source, *group;
 	    int source_af, group_af;
 #ifdef INET6
@@ -366,7 +366,7 @@ pgm_print(netdissect_options *ndo,
 	    char source_buf[INET_ADDRSTRLEN], group_buf[INET_ADDRSTRLEN];
 #endif
 
-	    nak = (struct pgm_nak *)(pgm + 1);
+	    nak = (const struct pgm_nak *)(pgm + 1);
 	    ND_TCHECK(*nak);
 
 	    /*
@@ -388,7 +388,7 @@ pgm_print(netdissect_options *ndo,
 		goto trunc;
 		break;
 	    }
-	    bp = (u_char *) (nak + 1);
+	    bp = (const u_char *) (nak + 1);
 	    ND_TCHECK2(*bp, addr_size);
 	    source = bp;
 	    bp += addr_size;
@@ -441,13 +441,13 @@ pgm_print(netdissect_options *ndo,
 	}
 
 	case PGM_ACK: {
-	    struct pgm_ack *ack;
+	    const struct pgm_ack *ack;
 
-	    ack = (struct pgm_ack *)(pgm + 1);
+	    ack = (const struct pgm_ack *)(pgm + 1);
 	    ND_TCHECK(*ack);
 	    ND_PRINT((ndo, "ACK seq %u",
 			 EXTRACT_32BITS(&ack->pgma_rx_max_seq)));
-	    bp = (u_char *) (ack + 1);
+	    bp = (const u_char *) (ack + 1);
 	    break;
 	}
 

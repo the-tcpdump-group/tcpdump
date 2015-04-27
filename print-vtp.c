@@ -240,7 +240,7 @@ vtp_print (netdissect_options *ndo,
 
 	    ND_TCHECK2(*tptr, len);
 
-	    vtp_vlan = (struct vtp_vlan_*)tptr;
+	    vtp_vlan = (const struct vtp_vlan_*)tptr;
 	    ND_PRINT((ndo, "\n\tVLAN info status %s, type %s, VLAN-id %u, MTU %u, SAID 0x%08x, Name %s",
 		   tok2str(vtp_vlan_status,"Unknown",vtp_vlan->status),
 		   tok2str(vtp_vlan_type_values,"Unknown",vtp_vlan->type),

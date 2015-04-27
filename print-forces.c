@@ -385,20 +385,20 @@ struct forces_tlv {
 };
 
 #define F_ALN_LEN(len) ( ((len)+ForCES_ALNL-1) & ~(ForCES_ALNL-1) )
-#define	GET_TOP_TLV(fhdr) ((struct forces_tlv *)((fhdr) + sizeof (struct forcesh)))
+#define	GET_TOP_TLV(fhdr) ((const struct forces_tlv *)((fhdr) + sizeof (struct forcesh)))
 #define TLV_SET_LEN(len)  (F_ALN_LEN(TLV_HDRL) + (len))
 #define TLV_ALN_LEN(len)  F_ALN_LEN(TLV_SET_LEN(len))
 #define TLV_RDAT_LEN(tlv) ((int)(EXTRACT_16BITS(&(tlv)->length) - TLV_SET_LEN(0))
-#define TLV_DATA(tlvp)   ((void*)(((char*)(tlvp)) + TLV_SET_LEN(0)))
+#define TLV_DATA(tlvp)   ((const void*)(((const char*)(tlvp)) + TLV_SET_LEN(0)))
 #define GO_NXT_TLV(tlv,rlen) ((rlen) -= F_ALN_LEN(EXTRACT_16BITS(&(tlv)->length)), \
-		              (struct forces_tlv*)(((char*)(tlv)) \
+		              (const struct forces_tlv*)(((const char*)(tlv)) \
 				      + F_ALN_LEN(EXTRACT_16BITS(&(tlv)->length))))
 #define ILV_SET_LEN(len)  (F_ALN_LEN(ILV_HDRL) + (len))
 #define ILV_ALN_LEN(len)  F_ALN_LEN(ILV_SET_LEN(len))
 #define ILV_RDAT_LEN(ilv) ((int)(EXTRACT_32BITS(&(ilv)->length)) - ILV_SET_LEN(0))
-#define ILV_DATA(ilvp)   ((void*)(((char*)(ilvp)) + ILV_SET_LEN(0)))
+#define ILV_DATA(ilvp)   ((const void*)(((const char*)(ilvp)) + ILV_SET_LEN(0)))
 #define GO_NXT_ILV(ilv,rlen) ((rlen) -= F_ALN_LEN(EXTRACT_32BITS(&(ilv)->length)), \
-		              (struct forces_ilv *)(((char*)(ilv)) \
+		              (const struct forces_ilv *)(((const char*)(ilv)) \
 				      + F_ALN_LEN(EXTRACT_32BITS(&(ilv)->length))))
 #define INVALID_RLEN 1
 #define INVALID_STLN 2
@@ -645,9 +645,9 @@ prestlv_print(netdissect_options *ndo,
               register const u_char * pptr, register u_int len,
               uint16_t op_msk _U_, int indent)
 {
-	const struct forces_tlv *tlv = (struct forces_tlv *)pptr;
-	register const u_char *tdp = (u_char *) TLV_DATA(tlv);
-	struct res_val *r = (struct res_val *)tdp;
+	const struct forces_tlv *tlv = (const struct forces_tlv *)pptr;
+	register const u_char *tdp = (const u_char *) TLV_DATA(tlv);
+	const struct res_val *r = (const struct res_val *)tdp;
 	u_int dlen;
 
 	/*
@@ -683,9 +683,9 @@ fdatatlv_print(netdissect_options *ndo,
                register const u_char * pptr, register u_int len,
                uint16_t op_msk _U_, int indent)
 {
-	const struct forces_tlv *tlv = (struct forces_tlv *)pptr;
+	const struct forces_tlv *tlv = (const struct forces_tlv *)pptr;
 	u_int rlen;
-	register const u_char *tdp = (u_char *) TLV_DATA(tlv);
+	register const u_char *tdp = (const u_char *) TLV_DATA(tlv);
 	uint16_t type;
 
 	/*
@@ -719,7 +719,7 @@ sdatailv_print(netdissect_options *ndo,
                uint16_t op_msk _U_, int indent)
 {
 	u_int rlen;
-	const struct forces_ilv *ilv = (struct forces_ilv *)pptr;
+	const struct forces_ilv *ilv = (const struct forces_ilv *)pptr;
 	int invilv;
 
 	if (len < ILV_HDRL) {
@@ -733,7 +733,7 @@ sdatailv_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "Jamal - outstanding length <%d>\n", rlen));
 #endif
 		char *ib = indent_pr(indent, 1);
-		register const u_char *tdp = (u_char *) ILV_DATA(ilv);
+		register const u_char *tdp = (const u_char *) ILV_DATA(ilv);
 		ND_TCHECK(*ilv);
 		invilv = ilv_valid(ilv, rlen);
 		if (invilv) {
@@ -764,9 +764,9 @@ sdatatlv_print(netdissect_options *ndo,
                register const u_char * pptr, register u_int len,
                uint16_t op_msk, int indent)
 {
-	const struct forces_tlv *tlv = (struct forces_tlv *)pptr;
+	const struct forces_tlv *tlv = (const struct forces_tlv *)pptr;
 	u_int rlen;
-	register const u_char *tdp = (u_char *) TLV_DATA(tlv);
+	register const u_char *tdp = (const u_char *) TLV_DATA(tlv);
 	uint16_t type;
 
 	/*
@@ -793,10 +793,10 @@ pkeyitlv_print(netdissect_options *ndo,
                register const u_char * pptr, register u_int len,
                uint16_t op_msk, int indent)
 {
-	const struct forces_tlv *tlv = (struct forces_tlv *)pptr;
-	register const u_char *tdp = (u_char *) TLV_DATA(tlv);
+	const struct forces_tlv *tlv = (const struct forces_tlv *)pptr;
+	register const u_char *tdp = (const u_char *) TLV_DATA(tlv);
 	register const u_char *dp = tdp + 4;
-	const struct forces_tlv *kdtlv = (struct forces_tlv *)dp;
+	const struct forces_tlv *kdtlv = (const struct forces_tlv *)dp;
 	uint32_t id;
 	char *ib = indent_pr(indent, 0);
 	uint16_t type, tll;
@@ -821,7 +821,7 @@ pkeyitlv_print(netdissect_options *ndo,
 	 * go past the end of the containing TLV).
 	 */
 	tll = EXTRACT_16BITS(&kdtlv->length);
-	dp = (u_char *) TLV_DATA(kdtlv);
+	dp = (const u_char *) TLV_DATA(kdtlv);
 	return fdatatlv_print(ndo, dp, tll, op_msk, indent);
 
 trunc:
@@ -880,7 +880,7 @@ pdatacnt_print(netdissect_options *ndo,
 		}
 
 		if (op_msk & B_KEYIN) {
-			struct forces_tlv *keytlv;
+			const struct forces_tlv *keytlv;
 			uint16_t tll;
 
 			if (len < PTH_DESC_SIZE) {
@@ -892,7 +892,7 @@ pdatacnt_print(netdissect_options *ndo,
 			/* skip keyid */
 			pptr += 4;
 			len -= 4;
-			keytlv = (struct forces_tlv *)pptr;
+			keytlv = (const struct forces_tlv *)pptr;
 			/* skip header */
 			pptr += sizeof(struct forces_tlv);
 			len -= sizeof(struct forces_tlv);
@@ -915,7 +915,7 @@ pdatacnt_print(netdissect_options *ndo,
 	}
 
 	if (len) {
-		const struct forces_tlv *pdtlv = (struct forces_tlv *)pptr;
+		const struct forces_tlv *pdtlv = (const struct forces_tlv *)pptr;
 		uint16_t type;
 		uint16_t tll;
 		int pad = 0;
@@ -991,7 +991,7 @@ pdata_print(netdissect_options *ndo,
             register const u_char * pptr, register u_int len,
             uint16_t op_msk, int indent)
 {
-	const struct pathdata_h *pdh = (struct pathdata_h *)pptr;
+	const struct pathdata_h *pdh = (const struct pathdata_h *)pptr;
 	char *ib = indent_pr(indent, 0);
 	u_int minsize = 0;
 	int more_pd = 0;
@@ -1055,7 +1055,7 @@ genoptlv_print(netdissect_options *ndo,
                register const u_char * pptr, register u_int len,
                uint16_t op_msk, int indent)
 {
-	const struct forces_tlv *pdtlv = (struct forces_tlv *)pptr;
+	const struct forces_tlv *pdtlv = (const struct forces_tlv *)pptr;
 	uint16_t type;
 	int tll;
 	u_int invtlv;
@@ -1073,7 +1073,7 @@ genoptlv_print(netdissect_options *ndo,
 		 * length is large enough but not too large (it doesn't
 		 * go past the end of the containing TLV).
 		 */
-		register const u_char *dp = (u_char *) TLV_DATA(pdtlv);
+		register const u_char *dp = (const u_char *) TLV_DATA(pdtlv);
 		if (!ttlv_valid(type)) {
 			ND_PRINT((ndo, "%s TLV type 0x%x len %d\n",
 			       tok2str(ForCES_TLV_err, NULL, invtlv), type,
@@ -1101,7 +1101,7 @@ recpdoptlv_print(netdissect_options *ndo,
                  register const u_char * pptr, register u_int len,
                  uint16_t op_msk, int indent)
 {
-	const struct forces_tlv *pdtlv = (struct forces_tlv *)pptr;
+	const struct forces_tlv *pdtlv = (const struct forces_tlv *)pptr;
 	int tll;
 	u_int invtlv;
 	uint16_t type;
@@ -1122,7 +1122,7 @@ recpdoptlv_print(netdissect_options *ndo,
 		 */
 		ib = indent_pr(indent, 0);
 		type = EXTRACT_16BITS(&pdtlv->type);
-		dp = (u_char *) TLV_DATA(pdtlv);
+		dp = (const u_char *) TLV_DATA(pdtlv);
 		tll = EXTRACT_16BITS(&pdtlv->length) - TLV_HDRL;
 
 		if (ndo->ndo_vflag >= 3)
@@ -1170,7 +1170,7 @@ otlv_print(netdissect_options *ndo,
            const struct forces_tlv *otlv, uint16_t op_msk _U_, int indent)
 {
 	int rc = 0;
-	register const u_char *dp = (u_char *) TLV_DATA(otlv);
+	register const u_char *dp = (const u_char *) TLV_DATA(otlv);
 	uint16_t type;
 	int tll;
 	char *ib = indent_pr(indent, 0);
@@ -1348,7 +1348,7 @@ print_metailv(netdissect_options *ndo,
 	u_int rlen;
 	char *ib = indent_pr(indent, 0);
 	/* XXX: check header length */
-	const struct forces_ilv *ilv = (struct forces_ilv *)pptr;
+	const struct forces_ilv *ilv = (const struct forces_ilv *)pptr;
 
 	/*
 	 * print_metatlv() has ensured that len (what remains in the
@@ -1377,7 +1377,7 @@ print_metatlv(netdissect_options *ndo,
 	u_int dlen;
 	char *ib = indent_pr(indent, 0);
 	u_int rlen;
-	const struct forces_ilv *ilv = (struct forces_ilv *)pptr;
+	const struct forces_ilv *ilv = (const struct forces_ilv *)pptr;
 	int invilv;
 
 	/*
@@ -1399,7 +1399,7 @@ print_metatlv(netdissect_options *ndo,
 		 * length is large enough but not too large (it doesn't
 		 * go past the end of the containing TLV).
 		 */
-		print_metailv(ndo, (u_char *) ilv, 0, indent + 1);
+		print_metailv(ndo, (const u_char *) ilv, 0, indent + 1);
 		ilv = GO_NXT_ILV(ilv, rlen);
 	}
 
@@ -1438,7 +1438,7 @@ redirect_print(netdissect_options *ndo,
                register const u_char * pptr, register u_int len,
                uint16_t op_msk _U_, int indent)
 {
-	const struct forces_tlv *tlv = (struct forces_tlv *)pptr;
+	const struct forces_tlv *tlv = (const struct forces_tlv *)pptr;
 	u_int dlen;
 	u_int rlen;
 	u_int invtlv;
@@ -1470,10 +1470,10 @@ redirect_print(netdissect_options *ndo,
 		 * go past the end of the containing TLV).
 		 */
 		if (EXTRACT_16BITS(&tlv->type) == F_TLV_METD) {
-			print_metatlv(ndo, (u_char *) TLV_DATA(tlv),
+			print_metatlv(ndo, (const u_char *) TLV_DATA(tlv),
 				      EXTRACT_16BITS(&tlv->length), 0, indent);
 		} else if ((EXTRACT_16BITS(&tlv->type) == F_TLV_REDD)) {
-			print_reddata(ndo, (u_char *) TLV_DATA(tlv),
+			print_reddata(ndo, (const u_char *) TLV_DATA(tlv),
 				      EXTRACT_16BITS(&tlv->length), 0, indent);
 		} else {
 			ND_PRINT((ndo, "Unknown REDIRECT TLV 0x%x len %d\n",
@@ -1540,7 +1540,7 @@ lfbselect_print(netdissect_options *ndo,
 		       EXTRACT_32BITS(&lfbs->instance)));
 	}
 
-	otlv = (struct forces_tlv *)(lfbs + 1);
+	otlv = (const struct forces_tlv *)(lfbs + 1);
 
 	indent += 1;
 	while (rlen != 0) {
@@ -1562,7 +1562,7 @@ lfbselect_print(netdissect_options *ndo,
 			ND_PRINT((ndo,
 			          "\t\tINValid oper-TLV type 0x%x length %d for this ForCES message\n",
 			          EXTRACT_16BITS(&otlv->type), EXTRACT_16BITS(&otlv->length)));
-			invoptlv_print(ndo, (u_char *)otlv, rlen, 0, indent);
+			invoptlv_print(ndo, (const u_char *)otlv, rlen, 0, indent);
 		}
 		otlv = GO_NXT_TLV(otlv, rlen);
 	}
@@ -1644,7 +1644,7 @@ forces_type_print(netdissect_options *ndo,
 			       EXTRACT_16BITS(&tltlv->length),
 			       EXTRACT_16BITS(&tltlv->length) - TLV_HDRL));
 
-		rc = tops->print(ndo, (u_char *) TLV_DATA(tltlv),
+		rc = tops->print(ndo, (const u_char *) TLV_DATA(tltlv),
 				 EXTRACT_16BITS(&tltlv->length), tops->op_msk, 9);
 		if (rc < 0) {
 			return -1;

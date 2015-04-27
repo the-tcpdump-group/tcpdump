@@ -170,11 +170,11 @@ tcp_print(netdissect_options *ndo,
         register const struct ip6_hdr *ip6;
 #endif
 
-        tp = (struct tcphdr *)bp;
-        ip = (struct ip *)bp2;
+        tp = (const struct tcphdr *)bp;
+        ip = (const struct ip *)bp2;
 #ifdef INET6
         if (IP_V(ip) == 6)
-                ip6 = (struct ip6_hdr *)bp2;
+                ip6 = (const struct ip6_hdr *)bp2;
         else
                 ip6 = NULL;
 #endif /*INET6*/
@@ -724,23 +724,23 @@ tcp_print(netdissect_options *ndo,
                  * to NFS print routines.
                  */
                 uint32_t fraglen;
-                register struct sunrpc_msg *rp;
+                register const struct sunrpc_msg *rp;
                 enum sunrpc_msg_type direction;
 
                 fraglen = EXTRACT_32BITS(bp) & 0x7FFFFFFF;
                 if (fraglen > (length) - 4)
                         fraglen = (length) - 4;
-                rp = (struct sunrpc_msg *)(bp + 4);
+                rp = (const struct sunrpc_msg *)(bp + 4);
                 if (ND_TTEST(rp->rm_direction)) {
                         direction = (enum sunrpc_msg_type)EXTRACT_32BITS(&rp->rm_direction);
                         if (dport == NFS_PORT && direction == SUNRPC_CALL) {
                                 ND_PRINT((ndo, ": NFS request xid %u ", EXTRACT_32BITS(&rp->rm_xid)));
-                                nfsreq_print_noaddr(ndo, (u_char *)rp, fraglen, (u_char *)ip);
+                                nfsreq_print_noaddr(ndo, (const u_char *)rp, fraglen, (const u_char *)ip);
                                 return;
                         }
                         if (sport == NFS_PORT && direction == SUNRPC_REPLY) {
                                 ND_PRINT((ndo, ": NFS reply xid %u ", EXTRACT_32BITS(&rp->rm_xid)));
-                                nfsreply_print_noaddr(ndo, (u_char *)rp, fraglen, (u_char *)ip);
+                                nfsreply_print_noaddr(ndo, (const u_char *)rp, fraglen, (const u_char *)ip);
                                 return;
                         }
                 }
@@ -829,7 +829,7 @@ tcp_verify_signature(netdissect_options *ndo,
         MD5_CTX ctx;
         uint16_t savecsum, tlen;
 #ifdef INET6
-        struct ip6_hdr *ip6;
+        const struct ip6_hdr *ip6;
         uint32_t len32;
         uint8_t nxt;
 #endif
@@ -851,26 +851,26 @@ tcp_verify_signature(netdissect_options *ndo,
          * Step 1: Update MD5 hash with IP pseudo-header.
          */
         if (IP_V(ip) == 4) {
-                MD5_Update(&ctx, (char *)&ip->ip_src, sizeof(ip->ip_src));
-                MD5_Update(&ctx, (char *)&ip->ip_dst, sizeof(ip->ip_dst));
-                MD5_Update(&ctx, (char *)&zero_proto, sizeof(zero_proto));
-                MD5_Update(&ctx, (char *)&ip->ip_p, sizeof(ip->ip_p));
+                MD5_Update(&ctx, (const char *)&ip->ip_src, sizeof(ip->ip_src));
+                MD5_Update(&ctx, (const char *)&ip->ip_dst, sizeof(ip->ip_dst));
+                MD5_Update(&ctx, (const char *)&zero_proto, sizeof(zero_proto));
+                MD5_Update(&ctx, (const char *)&ip->ip_p, sizeof(ip->ip_p));
                 tlen = EXTRACT_16BITS(&ip->ip_len) - IP_HL(ip) * 4;
                 tlen = htons(tlen);
-                MD5_Update(&ctx, (char *)&tlen, sizeof(tlen));
+                MD5_Update(&ctx, (const char *)&tlen, sizeof(tlen));
 #ifdef INET6
         } else if (IP_V(ip) == 6) {
-                ip6 = (struct ip6_hdr *)ip;
-                MD5_Update(&ctx, (char *)&ip6->ip6_src, sizeof(ip6->ip6_src));
-                MD5_Update(&ctx, (char *)&ip6->ip6_dst, sizeof(ip6->ip6_dst));
+                ip6 = (const struct ip6_hdr *)ip;
+                MD5_Update(&ctx, (const char *)&ip6->ip6_src, sizeof(ip6->ip6_src));
+                MD5_Update(&ctx, (const char *)&ip6->ip6_dst, sizeof(ip6->ip6_dst));
                 len32 = htonl(EXTRACT_16BITS(&ip6->ip6_plen));
-                MD5_Update(&ctx, (char *)&len32, sizeof(len32));
+                MD5_Update(&ctx, (const char *)&len32, sizeof(len32));
                 nxt = 0;
-                MD5_Update(&ctx, (char *)&nxt, sizeof(nxt));
-                MD5_Update(&ctx, (char *)&nxt, sizeof(nxt));
-                MD5_Update(&ctx, (char *)&nxt, sizeof(nxt));
+                MD5_Update(&ctx, (const char *)&nxt, sizeof(nxt));
+                MD5_Update(&ctx, (const char *)&nxt, sizeof(nxt));
+                MD5_Update(&ctx, (const char *)&nxt, sizeof(nxt));
                 nxt = IPPROTO_TCP;
-                MD5_Update(&ctx, (char *)&nxt, sizeof(nxt));
+                MD5_Update(&ctx, (const char *)&nxt, sizeof(nxt));
 #endif
         } else {
 #ifdef INET6
@@ -887,7 +887,7 @@ tcp_verify_signature(netdissect_options *ndo,
          */
         savecsum = tp1.th_sum;
         tp1.th_sum = 0;
-        MD5_Update(&ctx, (char *)&tp1, sizeof(struct tcphdr));
+        MD5_Update(&ctx, (const char *)&tp1, sizeof(struct tcphdr));
         tp1.th_sum = savecsum;
         /*
          * Step 3: Update MD5 hash with TCP segment data, if present.

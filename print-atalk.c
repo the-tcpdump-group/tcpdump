@@ -379,7 +379,7 @@ nbp_print(netdissect_options *ndo,
           register u_char snode, register u_char skt)
 {
 	register const struct atNBPtuple *tp =
-		(const struct atNBPtuple *)((u_char *)np + nbpHeaderSize);
+		(const struct atNBPtuple *)((const u_char *)np + nbpHeaderSize);
 	int i;
 	const u_char *ep;
 

@@ -50,7 +50,7 @@ ppi_print(netdissect_options *ndo,
                const struct pcap_pkthdr *h, const u_char *p)
 {
 	if_printer printer;
-	ppi_header_t *hdr;
+	const ppi_header_t *hdr;
 	u_int caplen = h->caplen;
 	u_int length = h->len;
 	uint16_t len;
@@ -62,7 +62,7 @@ ppi_print(netdissect_options *ndo,
 		return (caplen);
 	}
 
-	hdr = (ppi_header_t *)p;
+	hdr = (const ppi_header_t *)p;
 	len = EXTRACT_LE_16BITS(&hdr->ppi_len);
 	if (caplen < len) {
 		/*
@@ -89,7 +89,7 @@ ppi_print(netdissect_options *ndo,
 		hdrlen = printer(ndo, h, p);
 	} else {
 		if (!ndo->ndo_eflag)
-			ppi_header_print(ndo, (u_char *)hdr, length + len);
+			ppi_header_print(ndo, (const u_char *)hdr, length + len);
 
 		if (!ndo->ndo_suppress_default_print)
 			ND_DEFAULTPRINT(p, caplen);

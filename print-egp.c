@@ -151,7 +151,7 @@ egpnrprint(netdissect_options *ndo,
 		net = 0;
 		netlen = 0;
 	}
-	cp = (uint8_t *)(egp + 1);
+	cp = (const uint8_t *)(egp + 1);
 
 	t_gateways = egp->egp_intgw + egp->egp_extgw;
 	for (gateways = 0; gateways < t_gateways; ++gateways) {
@@ -214,7 +214,7 @@ egp_print(netdissect_options *ndo,
 	register int code;
 	register int type;
 
-	egp = (struct egp_packet *)bp;
+	egp = (const struct egp_packet *)bp;
         if (!ND_TTEST2(*egp, length)) {
 		ND_PRINT((ndo, "[|egp]"));
 		return;

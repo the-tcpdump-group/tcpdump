@@ -198,7 +198,7 @@ mobility_print(netdissect_options *ndo,
 	unsigned mhlen, hlen;
 	uint8_t type;
 
-	mh = (struct ip6_mobility *)bp;
+	mh = (const struct ip6_mobility *)bp;
 
 	/* 'ep' points to the end of available data. */
 	ep = ndo->ndo_snapend;

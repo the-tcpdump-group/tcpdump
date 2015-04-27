@@ -81,14 +81,14 @@ lane_hdr_print(netdissect_options *ndo, const u_char *bp)
 void
 lane_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 {
-	struct lane_controlhdr *lec;
+	const struct lane_controlhdr *lec;
 
 	if (caplen < sizeof(struct lane_controlhdr)) {
 		ND_PRINT((ndo, "[|lane]"));
 		return;
 	}
 
-	lec = (struct lane_controlhdr *)p;
+	lec = (const struct lane_controlhdr *)p;
 	if (EXTRACT_16BITS(&lec->lec_header) == 0xff00) {
 		/*
 		 * LE Control.

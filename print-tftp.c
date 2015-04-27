@@ -130,7 +130,7 @@ tftp_print(netdissect_options *ndo,
 	case RRQ:
 	case WRQ:
 	case OACK:
-		p = (u_char *)tp->th_stuff;
+		p = (const u_char *)tp->th_stuff;
 		ND_PRINT((ndo, " "));
 		/* Print filename or first option */
 		if (opcode != OACK)

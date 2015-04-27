@@ -343,9 +343,9 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 	char buf[MAXHOSTNAMELEN + 100];
 	struct cksum_vec vec[1];
 
-	dp = (struct icmp *)bp;
-        ext_dp = (struct icmp_ext_t *)bp;
-	ip = (struct ip *)bp2;
+	dp = (const struct icmp *)bp;
+        ext_dp = (const struct icmp_ext_t *)bp;
+	ip = (const struct ip *)bp2;
 	str = buf;
 
 	ND_TCHECK(dp->icmp_code);
@@ -377,7 +377,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			ND_TCHECK(dp->icmp_ip.ip_p);
 			oip = &dp->icmp_ip;
 			hlen = IP_HL(oip) * 4;
-			ouh = (struct udphdr *)(((u_char *)oip) + hlen);
+			ouh = (const struct udphdr *)(((const u_char *)oip) + hlen);
 			ND_TCHECK(ouh->uh_dport);
 			dport = EXTRACT_16BITS(&ouh->uh_dport);
 			switch (oip->ip_p) {
@@ -408,7 +408,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		case ICMP_UNREACH_NEEDFRAG:
 		    {
 			register const struct mtu_discovery *mp;
-			mp = (struct mtu_discovery *)(u_char *)&dp->icmp_void;
+			mp = (const struct mtu_discovery *)(const u_char *)&dp->icmp_void;
 			mtu = EXTRACT_16BITS(&mp->nexthopmtu);
 			if (mtu) {
 				(void)snprintf(buf, sizeof(buf),
@@ -449,7 +449,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		(void)snprintf(buf, sizeof(buf), "router advertisement");
 		cp = buf + strlen(buf);
 
-		ihp = (struct ih_rdiscovery *)&dp->icmp_void;
+		ihp = (const struct ih_rdiscovery *)&dp->icmp_void;
 		ND_TCHECK(*ihp);
 		(void)strncpy(cp, " lifetime ", sizeof(buf) - (cp - buf));
 		cp = buf + strlen(buf);
@@ -558,7 +558,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		uint16_t sum, icmp_sum;
 		struct cksum_vec vec[1];
 		if (ND_TTEST2(*bp, plen)) {
-			vec[0].ptr = (const uint8_t *)(void *)dp;
+			vec[0].ptr = (const uint8_t *)(const void *)dp;
 			vec[0].len = plen;
 			sum = in_cksum(vec, 1);
 			if (sum != 0) {
@@ -577,7 +577,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 	if (ndo->ndo_vflag >= 1 && ICMP_ERRTYPE(dp->icmp_type)) {
 		bp += 8;
 		ND_PRINT((ndo, "\n\t"));
-		ip = (struct ip *)bp;
+		ip = (const struct ip *)bp;
 		ndo->ndo_snaplen = ndo->ndo_snapend - bp;
                 snapend_save = ndo->ndo_snapend;
 		ip_print(ndo, bp, EXTRACT_16BITS(&ip->ip_len));
@@ -626,11 +626,11 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
                    hlen));
 
             hlen -= 4; /* subtract common header size */
-            obj_tptr = (uint8_t *)ext_dp->icmp_ext_data;
+            obj_tptr = (const uint8_t *)ext_dp->icmp_ext_data;
 
             while (hlen > sizeof(struct icmp_mpls_ext_object_header_t)) {
 
-                icmp_mpls_ext_object_header = (struct icmp_mpls_ext_object_header_t *)obj_tptr;
+                icmp_mpls_ext_object_header = (const struct icmp_mpls_ext_object_header_t *)obj_tptr;
                 ND_TCHECK(*icmp_mpls_ext_object_header);
                 obj_tlen = EXTRACT_16BITS(icmp_mpls_ext_object_header->length);
                 obj_class_num = icmp_mpls_ext_object_header->class_num;

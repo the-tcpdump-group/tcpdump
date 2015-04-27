@@ -476,7 +476,7 @@ slow_oam_print(netdissect_options *ndo,
         const struct slow_oam_loopbackctrl_t *slow_oam_loopbackctrl;
     } tlv;
 
-    ptr.slow_oam_common_header = (struct slow_oam_common_header_t *)tptr;
+    ptr.slow_oam_common_header = (const struct slow_oam_common_header_t *)tptr;
     tptr += sizeof(struct slow_oam_common_header_t);
     tlen -= sizeof(struct slow_oam_common_header_t);
 

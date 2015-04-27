@@ -417,7 +417,7 @@ pim_print(netdissect_options *ndo,
           register const u_char *bp, register u_int len, u_int cksum)
 {
 	register const u_char *ep;
-	register struct pim *pim = (struct pim *)bp;
+	register const struct pim *pim = (const struct pim *)bp;
 
 	ep = (const u_char *)ndo->ndo_snapend;
 	if (bp >= ep)
@@ -624,7 +624,7 @@ pimv2_print(netdissect_options *ndo,
             register const u_char *bp, register u_int len, u_int cksum)
 {
 	register const u_char *ep;
-	register struct pim *pim = (struct pim *)bp;
+	register const struct pim *pim = (const struct pim *)bp;
 	int advance;
 
 	ep = (const u_char *)ndo->ndo_snapend;
@@ -745,7 +745,7 @@ pimv2_print(netdissect_options *ndo,
 
 	case PIMV2_TYPE_REGISTER:
 	{
-		struct ip *ip;
+		const struct ip *ip;
 
 		ND_TCHECK2(*(bp + 4), PIMV2_REGISTER_FLAG_LEN);
 
@@ -756,7 +756,7 @@ pimv2_print(netdissect_options *ndo,
 
 		bp += 8; len -= 8;
 		/* encapsulated multicast packet */
-		ip = (struct ip *)bp;
+		ip = (const struct ip *)bp;
 		switch (IP_V(ip)) {
                 case 0: /* Null header */
 			ND_PRINT((ndo, "IP-Null-header %s > %s",

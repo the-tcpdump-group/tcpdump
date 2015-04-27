@@ -155,12 +155,12 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 
 	if (caplen < 3) {
 		ND_PRINT((ndo, "[|llc]"));
-		ND_DEFAULTPRINT((u_char *)p, caplen);
+		ND_DEFAULTPRINT((const u_char *)p, caplen);
 		return (caplen);
 	}
 	if (length < 3) {
 		ND_PRINT((ndo, "[|llc]"));
-		ND_DEFAULTPRINT((u_char *)p, caplen);
+		ND_DEFAULTPRINT((const u_char *)p, caplen);
 		return (length);
 	}
 
@@ -187,12 +187,12 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 		 */
 		if (caplen < 4) {
 			ND_PRINT((ndo, "[|llc]"));
-			ND_DEFAULTPRINT((u_char *)p, caplen);
+			ND_DEFAULTPRINT((const u_char *)p, caplen);
 			return (caplen);
 		}
 		if (length < 4) {
 			ND_PRINT((ndo, "[|llc]"));
-			ND_DEFAULTPRINT((u_char *)p, caplen);
+			ND_DEFAULTPRINT((const u_char *)p, caplen);
 			return (length);
 		}
 

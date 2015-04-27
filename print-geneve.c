@@ -111,7 +111,7 @@ geneve_opts_print(netdissect_options *ndo, const u_char *bp, u_int len)
         }
 
         if (ndo->ndo_vflag > 1 && opt_len > 4) {
-            uint32_t *print_data = (uint32_t *)(bp + 4);
+            const uint32_t *print_data = (const uint32_t *)(bp + 4);
             int i;
 
             ND_PRINT((ndo, " data"));

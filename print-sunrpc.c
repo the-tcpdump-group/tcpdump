@@ -176,7 +176,7 @@ sunrpcrequest_print(netdissect_options *ndo, register const u_char *bp,
 	uint32_t x;
 	char srcid[20], dstid[20];	/*fits 32bit*/
 
-	rp = (struct sunrpc_msg *)bp;
+	rp = (const struct sunrpc_msg *)bp;
 
 	if (!ndo->ndo_nflag) {
 		snprintf(srcid, sizeof(srcid), "0x%x",
@@ -188,16 +188,16 @@ sunrpcrequest_print(netdissect_options *ndo, register const u_char *bp,
 		snprintf(dstid, sizeof(dstid), "0x%x", SUNRPC_PMAPPORT);
 	}
 
-	switch (IP_V((struct ip *)bp2)) {
+	switch (IP_V((const struct ip *)bp2)) {
 	case 4:
-		ip = (struct ip *)bp2;
+		ip = (const struct ip *)bp2;
 		ND_PRINT((ndo, "%s.%s > %s.%s: %d",
 		    ipaddr_string(ndo, &ip->ip_src), srcid,
 		    ipaddr_string(ndo, &ip->ip_dst), dstid, length));
 		break;
 #ifdef INET6
 	case 6:
-		ip6 = (struct ip6_hdr *)bp2;
+		ip6 = (const struct ip6_hdr *)bp2;
 		ND_PRINT((ndo, "%s.%s > %s.%s: %d",
 		    ip6addr_string(ndo, &ip6->ip6_src), srcid,
 		    ip6addr_string(ndo, &ip6->ip6_dst), dstid, length));

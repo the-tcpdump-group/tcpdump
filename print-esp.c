@@ -125,10 +125,10 @@ USES_APPLE_DEPRECATED_API
 int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 				      int initiator,
 				      u_char spii[8], u_char spir[8],
-				      u_char *buf, u_char *end)
+				      const u_char *buf, const u_char *end)
 {
 	struct sa_list *sa;
-	u_char *iv;
+	const u_char *iv;
 	int len;
 	EVP_CIPHER_CTX ctx;
 
@@ -563,21 +563,21 @@ esp_print(netdissect_options *ndo,
 	register const struct newesp *esp;
 	register const u_char *ep;
 #ifdef HAVE_LIBCRYPTO
-	struct ip *ip;
+	const struct ip *ip;
 	struct sa_list *sa = NULL;
 #ifdef INET6
-	struct ip6_hdr *ip6 = NULL;
+	const struct ip6_hdr *ip6 = NULL;
 #endif
 	int advance;
 	int len;
 	u_char *secret;
 	int ivlen = 0;
-	u_char *ivoff;
-	u_char *p;
+	const u_char *ivoff;
+	const u_char *p;
 	EVP_CIPHER_CTX ctx;
 #endif
 
-	esp = (struct newesp *)bp;
+	esp = (const struct newesp *)bp;
 
 #ifdef HAVE_LIBCRYPTO
 	secret = NULL;
@@ -592,7 +592,7 @@ esp_print(netdissect_options *ndo,
 	/* 'ep' points to the end of available data. */
 	ep = ndo->ndo_snapend;
 
-	if ((u_char *)(esp + 1) >= ep) {
+	if ((const u_char *)(esp + 1) >= ep) {
 		ND_PRINT((ndo, "[|ESP]"));
 		goto fail;
 	}
@@ -614,11 +614,11 @@ esp_print(netdissect_options *ndo,
 	if (ndo->ndo_sa_list_head == NULL)
 		goto fail;
 
-	ip = (struct ip *)bp2;
+	ip = (const struct ip *)bp2;
 	switch (IP_V(ip)) {
 #ifdef INET6
 	case 6:
-		ip6 = (struct ip6_hdr *)bp2;
+		ip6 = (const struct ip6_hdr *)bp2;
 		/* we do not attempt to decrypt jumbograms */
 		if (!EXTRACT_16BITS(&ip6->ip6_plen))
 			goto fail;
@@ -674,7 +674,7 @@ esp_print(netdissect_options *ndo,
 		ep = bp2 + len;
 	}
 
-	ivoff = (u_char *)(esp + 1) + 0;
+	ivoff = (const u_char *)(esp + 1) + 0;
 	ivlen = sa->ivlen;
 	secret = sa->secret;
 	ep = ep - sa->authlen;
@@ -688,7 +688,7 @@ esp_print(netdissect_options *ndo,
 		EVP_CipherInit(&ctx, NULL, NULL, p, 0);
 		EVP_Cipher(&ctx, p + ivlen, p + ivlen, ep - (p + ivlen));
 		EVP_CIPHER_CTX_cleanup(&ctx);
-		advance = ivoff - (u_char *)esp + ivlen;
+		advance = ivoff - (const u_char *)esp + ivlen;
 	} else
 		advance = sizeof(struct newesp);
 

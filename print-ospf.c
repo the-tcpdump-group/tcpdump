@@ -558,11 +558,11 @@ ospf_print_lsa(netdissect_options *ndo,
 	register int ls_length;
 	const uint8_t *tptr;
 
-	tptr = (uint8_t *)lsap->lsa_un.un_unknown; /* squelch compiler warnings */
+	tptr = (const uint8_t *)lsap->lsa_un.un_unknown; /* squelch compiler warnings */
         ls_length = ospf_print_lshdr(ndo, &lsap->ls_hdr);
         if (ls_length == -1)
                 return(NULL);
-	ls_end = (uint8_t *)lsap + ls_length;
+	ls_end = (const uint8_t *)lsap + ls_length;
 	ls_length -= sizeof(struct lsa_hdr);
 
 	switch (lsap->ls_hdr.ls_type) {
@@ -612,7 +612,7 @@ ospf_print_lsa(netdissect_options *ndo,
 
 			ospf_print_tos_metrics(ndo, &rlp->un_tos);
 
-			rlp = (struct rlalink *)((u_char *)(rlp + 1) +
+			rlp = (const struct rlalink *)((const u_char *)(rlp + 1) +
 			    ((rlp->un_tos.link.link_tos_count) * sizeof(union un_tos)));
 		}
 		break;
@@ -622,7 +622,7 @@ ospf_print_lsa(netdissect_options *ndo,
 		ND_PRINT((ndo, "\n\t    Mask %s\n\t    Connected Routers:",
 		    ipaddr_string(ndo, &lsap->lsa_un.un_nla.nla_mask)));
 		ap = lsap->lsa_un.un_nla.nla_router;
-		while ((u_char *)ap < ls_end) {
+		while ((const u_char *)ap < ls_end) {
 			ND_TCHECK(*ap);
 			ND_PRINT((ndo, "\n\t      %s", ipaddr_string(ndo, ap)));
 			++ap;
@@ -635,7 +635,7 @@ ospf_print_lsa(netdissect_options *ndo,
 		    ipaddr_string(ndo, &lsap->lsa_un.un_sla.sla_mask)));
 		ND_TCHECK(lsap->lsa_un.un_sla.sla_tosmetric);
 		lp = lsap->lsa_un.un_sla.sla_tosmetric;
-		while ((u_char *)lp < ls_end) {
+		while ((const u_char *)lp < ls_end) {
 			register uint32_t ul;
 
 			ND_TCHECK(*lp);
@@ -652,7 +652,7 @@ ospf_print_lsa(netdissect_options *ndo,
 	case LS_TYPE_SUM_ABR:
 		ND_TCHECK(lsap->lsa_un.un_sla.sla_tosmetric);
 		lp = lsap->lsa_un.un_sla.sla_tosmetric;
-		while ((u_char *)lp < ls_end) {
+		while ((const u_char *)lp < ls_end) {
 			register uint32_t ul;
 
 			ND_TCHECK(*lp);
@@ -674,7 +674,7 @@ ospf_print_lsa(netdissect_options *ndo,
 
 		ND_TCHECK(lsap->lsa_un.un_sla.sla_tosmetric);
 		almp = lsap->lsa_un.un_asla.asla_metric;
-		while ((u_char *)almp < ls_end) {
+		while ((const u_char *)almp < ls_end) {
 			register uint32_t ul;
 
 			ND_TCHECK(almp->asla_tosmetric);
@@ -704,7 +704,7 @@ ospf_print_lsa(netdissect_options *ndo,
 	case LS_TYPE_GROUP:
 		/* Multicast extensions as of 23 July 1991 */
 		mcp = lsap->lsa_un.un_mcla;
-		while ((u_char *)mcp < ls_end) {
+		while ((const u_char *)mcp < ls_end) {
 			ND_TCHECK(mcp->mcla_vid);
 			switch (EXTRACT_32BITS(&mcp->mcla_vtype)) {
 
@@ -733,7 +733,7 @@ ospf_print_lsa(netdissect_options *ndo,
 
 	    switch (*(&lsap->ls_hdr.un_lsa_id.opaque_field.opaque_type)) {
             case LS_OPAQUE_TYPE_RI:
-		tptr = (uint8_t *)(&lsap->lsa_un.un_ri_tlv.type);
+		tptr = (const uint8_t *)(&lsap->lsa_un.un_ri_tlv.type);
 
 		while (ls_length != 0) {
                     ND_TCHECK2(*tptr, 4);
@@ -781,14 +781,14 @@ ospf_print_lsa(netdissect_options *ndo,
                 break;
 
             case LS_OPAQUE_TYPE_GRACE:
-                if (ospf_print_grace_lsa(ndo, (uint8_t *)(&lsap->lsa_un.un_grace_tlv.type),
+                if (ospf_print_grace_lsa(ndo, (const uint8_t *)(&lsap->lsa_un.un_grace_tlv.type),
                                          ls_length) == -1) {
                     return(ls_end);
                 }
                 break;
 
 	    case LS_OPAQUE_TYPE_TE:
-                if (ospf_print_te_lsa(ndo, (uint8_t *)(&lsap->lsa_un.un_te_lsa_tlv.type),
+                if (ospf_print_te_lsa(ndo, (const uint8_t *)(&lsap->lsa_un.un_te_lsa_tlv.type),
                                       ls_length) == -1) {
                     return(ls_end);
                 }
@@ -796,7 +796,7 @@ ospf_print_lsa(netdissect_options *ndo,
 
             default:
                 if (ndo->ndo_vflag <= 1) {
-                    if (!print_unknown_data(ndo, (uint8_t *)lsap->lsa_un.un_unknown,
+                    if (!print_unknown_data(ndo, (const uint8_t *)lsap->lsa_un.un_unknown,
                                            "\n\t    ", ls_length))
                         return(ls_end);
                 }
@@ -806,7 +806,7 @@ ospf_print_lsa(netdissect_options *ndo,
 
         /* do we want to see an additionally hexdump ? */
         if (ndo->ndo_vflag> 1)
-            if (!print_unknown_data(ndo, (uint8_t *)lsap->lsa_un.un_unknown,
+            if (!print_unknown_data(ndo, (const uint8_t *)lsap->lsa_un.un_unknown,
                                    "\n\t    ", ls_length)) {
                 return(ls_end);
             }
@@ -844,8 +844,8 @@ ospf_decode_lls(netdissect_options *ndo,
 
     /* dig deeper if LLS data is available; see RFC4813 */
     length2 = EXTRACT_16BITS(&op->ospf_len);
-    dptr = (u_char *)op + length2;
-    dataend = (u_char *)op + length;
+    dptr = (const u_char *)op + length2;
+    dataend = (const u_char *)op + length;
 
     if (EXTRACT_16BITS(&op->ospf_authtype) == OSPF_AUTH_MD5) {
         dptr = dptr + op->ospf_authdata[3];
@@ -949,9 +949,9 @@ ospf_decode_v2(netdissect_options *ndo,
 			          ipaddr_string(ndo, &op->ospf_hello.hello_bdr)));
 
 		ap = op->ospf_hello.hello_neighbor;
-		if ((u_char *)ap < dataend)
+		if ((const u_char *)ap < dataend)
 			ND_PRINT((ndo, "\n\t  Neighbor List:"));
-		while ((u_char *)ap < dataend) {
+		while ((const u_char *)ap < dataend) {
 			ND_TCHECK(*ap);
 			ND_PRINT((ndo, "\n\t    %s", ipaddr_string(ndo, ap)));
 			++ap;
@@ -974,14 +974,14 @@ ospf_decode_v2(netdissect_options *ndo,
 
 		/* Print all the LS adv's */
 		lshp = op->ospf_db.db_lshdr;
-		while (((u_char *)lshp < dataend) && ospf_print_lshdr(ndo, lshp) != -1) {
+		while (((const u_char *)lshp < dataend) && ospf_print_lshdr(ndo, lshp) != -1) {
 			++lshp;
 		}
 		break;
 
 	case OSPF_TYPE_LS_REQ:
                 lsrp = op->ospf_lsr;
-                while ((u_char *)lsrp < dataend) {
+                while ((const u_char *)lsrp < dataend) {
                     ND_TCHECK(*lsrp);
 
                     ND_PRINT((ndo, "\n\t  Advertising Router: %s, %s LSA (%u)",
@@ -1046,7 +1046,7 @@ ospf_print(netdissect_options *ndo,
 	register const u_char *dataend;
 	register const char *cp;
 
-	op = (struct ospfhdr *)bp;
+	op = (const struct ospfhdr *)bp;
 
 	/* XXX Before we do anything else, strip off the MD5 trailer */
 	ND_TCHECK(op->ospf_authtype);

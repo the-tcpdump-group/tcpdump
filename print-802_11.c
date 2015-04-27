@@ -2834,10 +2834,10 @@ ieee802_11_radio_print(netdissect_options *ndo,
 	    (EXTRACT_LE_32BITS(__p) & BIT(IEEE80211_RADIOTAP_EXT)) != 0
 
 	struct cpack_state cpacker;
-	struct ieee80211_radiotap_header *hdr;
+	const struct ieee80211_radiotap_header *hdr;
 	uint32_t present, next_present;
 	uint32_t presentflags = 0;
-	uint32_t *presentp, *last_presentp;
+	const uint32_t *presentp, *last_presentp;
 	enum ieee80211_radiotap_type bit;
 	int bit0;
 	u_int len;
@@ -2851,7 +2851,7 @@ ieee802_11_radio_print(netdissect_options *ndo,
 		return caplen;
 	}
 
-	hdr = (struct ieee80211_radiotap_header *)p;
+	hdr = (const struct ieee80211_radiotap_header *)p;
 
 	len = EXTRACT_LE_16BITS(&hdr->it_len);
 
@@ -2859,11 +2859,11 @@ ieee802_11_radio_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "%s", tstr));
 		return caplen;
 	}
-	cpack_init(&cpacker, (uint8_t *)hdr, len); /* align against header start */
+	cpack_init(&cpacker, (const uint8_t *)hdr, len); /* align against header start */
 	cpack_advance(&cpacker, sizeof(*hdr)); /* includes the 1st bitmap */
 	for (last_presentp = &hdr->it_present;
 	     IS_EXTENDED(last_presentp) &&
-	     (u_char*)(last_presentp + 1) <= p + len;
+	     (const u_char*)(last_presentp + 1) <= p + len;
 	     last_presentp++)
 	  cpack_advance(&cpacker, sizeof(hdr->it_present)); /* more bitmaps */
 

@@ -274,7 +274,7 @@ aodv_rerr(netdissect_options *ndo, const u_char *dat, u_int length)
 	ND_PRINT((ndo, " rerr %s [items %u] [%u]:",
 	    ap->rerr_flags & RERR_NODELETE ? "[D]" : "",
 	    ap->rerr_dc, length));
-	dp = (struct rerr_unreach *)(dat + sizeof(*ap));
+	dp = (const struct rerr_unreach *)(dat + sizeof(*ap));
 	i = length - sizeof(*ap);
 	for (dc = ap->rerr_dc; dc != 0; dc--) {
 		ND_TCHECK(*dp);
@@ -384,7 +384,7 @@ aodv_v6_rerr(netdissect_options *ndo, const u_char *dat _U_, u_int length)
 	ND_PRINT((ndo, " rerr %s [items %u] [%u]:",
 	    ap->rerr_flags & RERR_NODELETE ? "[D]" : "",
 	    ap->rerr_dc, length));
-	dp6 = (struct rerr_unreach6 *)(void *)(ap + 1);
+	dp6 = (const struct rerr_unreach6 *)(const void *)(ap + 1);
 	i = length - sizeof(*ap);
 	for (dc = ap->rerr_dc; dc != 0; dc--) {
 		ND_TCHECK(*dp6);
@@ -497,7 +497,7 @@ aodv_v6_draft_01_rerr(netdissect_options *ndo, const u_char *dat _U_, u_int leng
 	ND_PRINT((ndo, " rerr %s [items %u] [%u]:",
 	    ap->rerr_flags & RERR_NODELETE ? "[D]" : "",
 	    ap->rerr_dc, length));
-	dp6 = (struct rerr_unreach6_draft_01 *)(void *)(ap + 1);
+	dp6 = (const struct rerr_unreach6_draft_01 *)(const void *)(ap + 1);
 	i = length - sizeof(*ap);
 	for (dc = ap->rerr_dc; dc != 0; dc--) {
 		ND_TCHECK(*dp6);

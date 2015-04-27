@@ -93,7 +93,7 @@ struct hsrp {
 void
 hsrp_print(netdissect_options *ndo, register const uint8_t *bp, register u_int len)
 {
-	struct hsrp *hp = (struct hsrp *) bp;
+	const struct hsrp *hp = (const struct hsrp *) bp;
 
 	ND_TCHECK(hp->hsrp_version);
 	ND_PRINT((ndo, "HSRPv%d", hp->hsrp_version));
