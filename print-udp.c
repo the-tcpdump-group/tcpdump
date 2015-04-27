@@ -96,7 +96,7 @@ static void
 vat_print(netdissect_options *ndo, const void *hdr, register const struct udphdr *up)
 {
 	/* vat/vt audio */
-	u_int ts = *(uint16_t *)hdr;
+	u_int ts = EXTRACT_16BITS(hdr);
 	if ((ts & 0xf060) != 0) {
 		/* probably vt */
 		ND_PRINT((ndo, "udp/vt %u %d / %d",
