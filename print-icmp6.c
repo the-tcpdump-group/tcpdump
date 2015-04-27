@@ -1784,7 +1784,7 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 			} else
 				dnsname_print(ndo, cp, ep);
 			if ((EXTRACT_16BITS(&ni6->ni_flags) & 0x01) != 0)
-				ND_PRINT((ndo," [TTL=%u]", *(uint32_t *)(ni6 + 1)));
+				ND_PRINT((ndo," [TTL=%u]", EXTRACT_32BITS(ni6 + 1)));
 			break;
 		case NI_QTYPE_NODEADDR:
 			if (needcomma)
