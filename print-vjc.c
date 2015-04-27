@@ -70,6 +70,13 @@
  * We therefore leave "proto" - which is the PPP protocol type - in place,
  * *not* marked as unused, for now, so that GCC warnings about the
  * unused argument remind us that we should fix this some day.
+ *
+ * XXX - also, it fetches the TCP checksum field in COMPRESSED_TCP
+ * packets directly, rather than with EXTRACT_16BITS(); RFC 1144 says
+ * it's "the unmodified TCP checksum", which would imply that it's
+ * big-endian, but perhaps, on the platform where this was developed,
+ * the packets were munged by the networking stack before being handed
+ * to the packet capture mechanism.
  */
 int
 vjc_print(netdissect_options *ndo, register const char *bp, u_short proto _U_)
