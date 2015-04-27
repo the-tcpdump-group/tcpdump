@@ -481,13 +481,7 @@ etheraddr_string(netdissect_options *ndo, register const u_char *ep)
 	if (!ndo->ndo_nflag) {
 		char buf2[BUFSIZE];
 
-		/*
-		 * We don't cast it to "const struct ether_addr *"
-		 * because some systems fail to declare the second
-		 * argument as a "const" pointer, even though they
-		 * don't modify what it points to.
-		 */
-		if (ether_ntohost(buf2, (struct ether_addr *)ep) == 0) {
+		if (ether_ntohost(buf2, (const struct ether_addr *)ep) == 0) {
 			tp->e_name = strdup(buf2);
 			return (tp->e_name);
 		}
@@ -880,13 +874,8 @@ init_etherarray(void)
 #ifdef USE_ETHER_NTOHOST
 		/*
 		 * Use YP/NIS version of name if available.
-		 *
-		 * We don't cast it to "const struct ether_addr *"
-		 * because some systems don't modify the Ethernet
-		 * address but fail to declare the second argument
-		 * as a "const" pointer.
 		 */
-		if (ether_ntohost(name, (struct ether_addr *)el->addr) == 0) {
+		if (ether_ntohost(name, (const struct ether_addr *)el->addr) == 0) {
 			tp->e_name = strdup(name);
 			continue;
 		}
