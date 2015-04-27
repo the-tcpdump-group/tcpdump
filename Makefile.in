@@ -265,6 +265,7 @@ HDR = \
 	oui.h \
 	pcap-missing.h \
 	ppp.h \
+	print.h \
 	rpc_auth.h \
 	rpc_msg.h \
 	rpl.h \
