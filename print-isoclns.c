@@ -1340,7 +1340,7 @@ isis_print_mt_port_cap_subtlv(netdissect_options *ndo,
         if (!ND_TTEST2(*(tptr), ISIS_SUBTLV_SPB_MCID_MIN_LEN))
           goto trunctlv;
 
-        subtlv_spb_mcid = (struct isis_subtlv_spb_mcid *)tptr;
+        subtlv_spb_mcid = (const struct isis_subtlv_spb_mcid *)tptr;
 
         ND_PRINT((ndo,  "\n\t         MCID: "));
         isis_print_mcid(ndo, &(subtlv_spb_mcid->mcid));
