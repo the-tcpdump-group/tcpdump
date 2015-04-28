@@ -271,6 +271,11 @@ struct netdissect_options {
  *	http://www.kb.cert.org/vuls/id/162289
  */
 
+/*
+ * Test in two parts to avoid these warnings:
+ * comparison of unsigned expression >= 0 is always true [-Wtype-limits],
+ * comparison is always true due to limited range of data type [-Wtype-limits].
+ */
 #define IS_NOT_NEGATIVE(x) (((x) > 0) || ((x) == 0))
 
 #define ND_TTEST2(var, l) \
