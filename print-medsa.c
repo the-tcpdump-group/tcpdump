@@ -158,9 +158,11 @@ medsa_print(netdissect_options *ndo,
 	ether_type = EXTRACT_16BITS(&medsa->ether_type);
 	if (ether_type <= ETHERMTU) {
 		/* Try to print the LLC-layer header & higher layers */
-		if (llc_print(ndo, bp, length, caplen, ESRC(ep), EDST(ep)) < 0)
-			/* ether_type not known, print raw packet */
-			ND_DEFAULTPRINT(bp, caplen);
+		if (llc_print(ndo, bp, length, caplen, ESRC(ep), EDST(ep)) < 0) {
+			/* packet type not known, print raw packet */
+			if (!ndo->ndo_suppress_default_print)
+				ND_DEFAULTPRINT(bp, caplen);
+		}
 	} else {
 		if (ndo->ndo_eflag)
 			ND_PRINT((ndo, "ethertype %s (0x%04x) ",
@@ -170,6 +172,12 @@ medsa_print(netdissect_options *ndo,
 
 		if (ethertype_print(ndo, ether_type, bp, length, caplen) == 0) {
 			/* ether_type not known, print raw packet */
+			if (!ndo->ndo_eflag)
+				ND_PRINT((ndo, "ethertype %s (0x%04x) ",
+					  tok2str(ethertype_values, "Unknown",
+						  ether_type),
+					  ether_type));
+
 			if (!ndo->ndo_suppress_default_print)
 				ND_DEFAULTPRINT(bp, caplen);
 		}
