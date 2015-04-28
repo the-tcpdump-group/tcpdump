@@ -168,7 +168,11 @@ medsa_print(netdissect_options *ndo,
 					  ether_type),
 				  ether_type));
 
-		ethertype_print(ndo, ether_type, bp, length, caplen);
+		if (ethertype_print(ndo, ether_type, bp, length, caplen) == 0) {
+			/* ether_type not known, print raw packet */
+			if (!ndo->ndo_suppress_default_print)
+				ND_DEFAULTPRINT(bp, caplen);
+		}
 	}
 	return;
 trunc:
