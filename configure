@@ -4730,7 +4730,7 @@ return gethostbyaddr ();
   return 0;
 }
 _ACEOF
-for ac_lib in '' nsl socket resolv
+for ac_lib in '' network nsl socket resolv
 do
   if test -z "$ac_lib"; then
     ac_res="none required"
