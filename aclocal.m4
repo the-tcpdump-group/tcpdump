@@ -1081,7 +1081,7 @@ AC_DEFUN(AC_LBL_LIBRARY_NET, [
     # libraries (i.e. libc):
     # Some OSes (eg. Solaris) place it in libnsl
     # Some strange OSes (SINIX) have it in libsocket:
-    AC_SEARCH_LIBS(gethostbyaddr, nsl socket resolv)
+    AC_SEARCH_LIBS(gethostbyaddr, network nsl socket resolv)
     # Unfortunately libsocket sometimes depends on libnsl and
     # AC_SEARCH_LIBS isn't up to the task of handling dependencies like this.
     if test "$ac_cv_search_gethostbyaddr" = "no"
