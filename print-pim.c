@@ -640,12 +640,14 @@ pimv2_check_checksum(const u_char *bp, const u_char *bp2, u_int len)
 		vec[0].len = len;
 		cksum = in_cksum(vec, 1);
 		return (cksum ? INCORRECT : CORRECT);
+#ifdef INET6
 	} else if (IP_V(ip) == 6) {
 		const struct ip6_hdr *ip6;
 
 		ip6 = (const struct ip6_hdr *)bp2;
 		cksum = nextproto6_cksum(ip6, bp, len, len, IPPROTO_PIM);
 		return (cksum ? INCORRECT : CORRECT);
+#endif
 	} else {
 		return (UNVERIFIED);
 	}
