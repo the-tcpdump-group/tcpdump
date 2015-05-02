@@ -223,8 +223,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		    }
 
 		case IPPROTO_PIM:
-			pim_print(ndo, cp, len, nextproto6_cksum(ip6, cp, len, len,
-							    IPPROTO_PIM));
+			pim_print(ndo, cp, len, (const u_char *)ip6);
 			return;
 
 		case IPPROTO_OSPF:
