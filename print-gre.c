@@ -314,15 +314,15 @@ gre_sre_print(netdissect_options *ndo, uint16_t af, uint8_t sreoff,
 	case GRESRE_IP:
 		ND_PRINT((ndo, ", (rtaf=ip"));
 		gre_sre_ip_print(ndo, sreoff, srelen, bp, len);
-		ND_PRINT((ndo, ") "));
+		ND_PRINT((ndo, ")"));
 		break;
 	case GRESRE_ASN:
 		ND_PRINT((ndo, ", (rtaf=asn"));
 		gre_sre_asn_print(ndo, sreoff, srelen, bp, len);
-		ND_PRINT((ndo, ") "));
+		ND_PRINT((ndo, ")"));
 		break;
 	default:
-		ND_PRINT((ndo, ", (rtaf=0x%x) ", af));
+		ND_PRINT((ndo, ", (rtaf=0x%x)", af));
 	}
 }
 
