@@ -323,7 +323,6 @@ ip_print_demux(netdissect_options *ndo,
 	       struct ip_print_demux_state *ipds)
 {
 	struct protoent *proto;
-	struct cksum_vec vec[1];
 
 again:
 	switch (ipds->nh) {
@@ -454,9 +453,7 @@ again:
 		break;
 
 	case IPPROTO_PIM:
-		vec[0].ptr = ipds->cp;
-		vec[0].len = ipds->len;
-		pim_print(ndo, ipds->cp, ipds->len, in_cksum(vec, 1));
+		pim_print(ndo, ipds->cp, ipds->len, (const u_char *)ipds->ip);
 		break;
 
 	case IPPROTO_VRRP:

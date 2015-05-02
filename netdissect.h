@@ -511,7 +511,7 @@ extern void tftp_print(netdissect_options *, const u_char *, u_int);
 extern void vrrp_print(netdissect_options *, const u_char *, u_int, const u_char *, int);
 extern void pimv1_print(netdissect_options *, const u_char *, u_int);
 extern void cisco_autorp_print(netdissect_options *, const u_char *, u_int);
-extern void pim_print(netdissect_options *, const u_char *, u_int, u_int);
+extern void pim_print(netdissect_options *, const u_char *, u_int, const u_char *);
 extern const u_char * ns_nprint (netdissect_options *, register const u_char *, register const u_char *);
 extern void ns_print(netdissect_options *, const u_char *, u_int, int);
 extern void bootp_print(netdissect_options *, const u_char *, u_int);
