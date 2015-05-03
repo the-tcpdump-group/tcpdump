@@ -2400,7 +2400,7 @@ ieee802_11_print(netdissect_options *ndo,
 				ND_PRINT((ndo, "%s", tstr));
 				return hdrlen;
 			}
-		} else if (llc_print(ndo, p, length, caplen, dst, src,
+		} else if (llc_print(ndo, p, length, caplen, src, dst,
 		    &extracted_ethertype) == 0) {
 			/*
 			 * Some kinds of LLC packet we cannot
