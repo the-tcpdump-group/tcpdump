@@ -2417,7 +2417,7 @@ ieee802_11_print(netdissect_options *ndo,
 			}
 		} else {
 			get_data_src_dst_mac(fc, p - hdrlen, &src, &dst);
-			llc_hdrlen = llc_print(ndo, p, length, caplen, dst, src);
+			llc_hdrlen = llc_print(ndo, p, length, caplen, src, dst);
 			if (llc_hdrlen < 0) {
 				/*
 				 * Some kinds of LLC packet we cannot
