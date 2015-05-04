@@ -22,7 +22,7 @@ enum ND_RPL_CODE {
     ND_RPL_SEC_DAG_IO = 0x81,
     ND_RPL_SEC_DAG    = 0x82,
     ND_RPL_SEC_DAG_ACK= 0x83,
-    ND_RPL_SEC_CONSIST= 0x84,
+    ND_RPL_SEC_CONSIST= 0x8A,
 };
 
 enum ND_RPL_DIO_FLAGS {
