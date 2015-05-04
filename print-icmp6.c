@@ -686,7 +686,7 @@ rpl_dio_printopt(netdissect_options *ndo,
                         ND_PRINT((ndo, " opt:pad0"));
                 } else {
                         ND_PRINT((ndo, " opt:%s len:%u ",
-                                  tok2str(rpl_subopt_values, "%subopt:%u", opt->rpl_dio_type),
+                                  tok2str(rpl_subopt_values, "subopt:%u", opt->rpl_dio_type),
                                   optlen));
                         if(ndo->ndo_vflag > 2) {
                                 unsigned int paylen = opt->rpl_dio_len;
