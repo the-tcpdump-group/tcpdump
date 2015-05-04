@@ -583,23 +583,37 @@ olsr_print(netdissect_options *ndo,
                     ptr.hna = (const struct olsr_hna4 *)msg_data;
 
                     /* print 4 prefixes per line */
-                    if (!ptr.hna->network[0] //
-                        && !ptr.hna->network[1] //
-                        && !ptr.hna->network[2] //
-                        && !ptr.hna->network[3] //
-                        && !ptr.hna->mask[GW_HNA_PAD] //
-                        && ptr.hna->mask[GW_HNA_FLAGS]) {
+                    if (!ptr.hna->network[0] && !ptr.hna->network[1] &&
+                        !ptr.hna->network[2] && !ptr.hna->network[3] &&
+                        !ptr.hna->mask[GW_HNA_PAD] &&
+                        ptr.hna->mask[GW_HNA_FLAGS]) {
                             /* smart gateway */
                             ND_PRINT((ndo, "%sSmart-Gateway:%s%s%s%s%s %u/%u",
-                                col == 0 ? "\n\t    " : ", ", // indent
-                                // sgw
-                                (ptr.hna->mask[GW_HNA_FLAGS] & GW_HNA_FLAG_LINKSPEED) ? " LINKSPEED" : "", // LINKSPEED
-                                (ptr.hna->mask[GW_HNA_FLAGS] & GW_HNA_FLAG_IPV4) ? " IPV4" : "", // IPV4
-                                (ptr.hna->mask[GW_HNA_FLAGS] & GW_HNA_FLAG_IPV4_NAT) ? " IPV4-NAT" : "", // IPV4_NAT
-                                (ptr.hna->mask[GW_HNA_FLAGS] & GW_HNA_FLAG_IPV6) ? " IPV6" : "", // IPV6
-                                (ptr.hna->mask[GW_HNA_FLAGS] & GW_HNA_FLAG_IPV6PREFIX) ? " IPv6-PREFIX" : "", // IPv6PREFIX
-                                (ptr.hna->mask[GW_HNA_FLAGS] & GW_HNA_FLAG_LINKSPEED) ? deserialize_gw_speed(ptr.hna->mask[GW_HNA_UPLINK]) : 0, // uplink
-                                (ptr.hna->mask[GW_HNA_FLAGS] & GW_HNA_FLAG_LINKSPEED) ? deserialize_gw_speed(ptr.hna->mask[GW_HNA_DOWNLINK]) : 0 // downlink
+                                col == 0 ? "\n\t    " : ", ", /* indent */
+                                /* sgw */
+                                /* LINKSPEED */
+                                (ptr.hna->mask[GW_HNA_FLAGS] &
+                                 GW_HNA_FLAG_LINKSPEED) ? " LINKSPEED" : "",
+                                /* IPV4 */
+                                (ptr.hna->mask[GW_HNA_FLAGS] &
+                                 GW_HNA_FLAG_IPV4) ? " IPV4" : "",
+                                /* IPV4-NAT */
+                                (ptr.hna->mask[GW_HNA_FLAGS] &
+                                 GW_HNA_FLAG_IPV4_NAT) ? " IPV4-NAT" : "",
+                                /* IPV6 */
+                                (ptr.hna->mask[GW_HNA_FLAGS] &
+                                 GW_HNA_FLAG_IPV6) ? " IPV6" : "",
+                                /* IPv6PREFIX */
+                                (ptr.hna->mask[GW_HNA_FLAGS] &
+                                 GW_HNA_FLAG_IPV6PREFIX) ? " IPv6-PREFIX" : "",
+                                /* uplink */
+                                (ptr.hna->mask[GW_HNA_FLAGS] &
+                                 GW_HNA_FLAG_LINKSPEED) ?
+                                 deserialize_gw_speed(ptr.hna->mask[GW_HNA_UPLINK]) : 0,
+                                /* downlink */
+                                (ptr.hna->mask[GW_HNA_FLAGS] &
+                                 GW_HNA_FLAG_LINKSPEED) ?
+                                 deserialize_gw_speed(ptr.hna->mask[GW_HNA_DOWNLINK]) : 0
                                 ));
                     } else {
                         /* normal route */
