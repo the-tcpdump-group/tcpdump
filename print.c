@@ -120,7 +120,7 @@ static const struct printer printers[] = {
 #ifdef DLT_PPP_ETHER
 	{ pppoe_if_print,	DLT_PPP_ETHER },
 #endif
-#if defined(DLT_PFLOG) && defined(HAVE_NET_PFVAR_H)
+#if defined(DLT_PFLOG) && defined(HAVE_NET_IF_PFLOG_H)
 	{ pflog_if_print,	DLT_PFLOG },
 #endif
 	{ token_if_print,	DLT_IEEE802 },

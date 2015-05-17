@@ -79,6 +79,9 @@
 /* Define to 1 if you have the <netinet/if_ether.h> header file. */
 #undef HAVE_NETINET_IF_ETHER_H
 
+/* Define to 1 if you have the <net/if_pflog.h> header file. */
+#undef HAVE_NET_IF_PFLOG_H
+
 /* Define to 1 if you have the <net/pfvar.h> header file. */
 #undef HAVE_NET_PFVAR_H
 

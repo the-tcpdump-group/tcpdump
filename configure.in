@@ -37,7 +37,13 @@ AC_CHECK_HEADERS(net/pfvar.h, , , [#include <sys/types.h>
 #include <sys/socket.h>
 #include <net/if.h>])
 if test "$ac_cv_header_net_pfvar_h" = yes; then
-	LOCALSRC="print-pflog.c $LOCALSRC"
+	AC_CHECK_HEADERS(net/if_pflog.h, , , [#include <sys/types.h>
+	#include <sys/socket.h>
+	#include <net/if.h>
+	#include <net/pfvar.h>])
+	if test "$ac_cv_header_net_if_pflog_h" = yes; then
+		LOCALSRC="print-pflog.c $LOCALSRC"
+	fi
 fi
 AC_CHECK_HEADERS(netinet/if_ether.h, , , [#include <sys/types.h>
 #include <sys/socket.h>])
