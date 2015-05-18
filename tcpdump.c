@@ -43,6 +43,11 @@ The Regents of the University of California.  All rights reserved.\n";
 #include "config.h"
 #endif
 
+#if defined(HAVE_DUP2) && defined(HAVE_SOCKETPAIR) && \
+  ( defined(HAVE_FORK) || defined(HAVE_VFORK) )
+#define WITH_PIPEOUTPUT 1
+#endif
+
 /*
  * Mac OS X may ship pcap.h from libpcap 0.6 with a libpcap based on
  * 0.8.  That means it has pcap_findalldevs() but the header doesn't
@@ -147,7 +152,10 @@ static int Jflag;			/* list available time stamp types */
 int Qflag = -1;				/* restrict captured packet by send/receive direction */
 #endif
 static char *zflag = NULL;		/* compress each savefile using a specified command (like gzip or bzip2) */
-
+#ifdef WITH_PIPEOUTPUT
+static char *pipeoutput = NULL;
+static char *compressor_arg[1024];
+#endif /* WITH_PIPEOUTPUT */
 static int infodelay;
 static int infoprint;
 
@@ -208,6 +216,65 @@ struct dump_info {
 	int	dirfd;
 #endif
 };
+
+#ifdef WITH_PIPEOUTPUT
+static void
+remap_to_pipe(const struct dump_info *dump_info)
+{
+    int pipefd[2];
+    pid_t compressor_pid;
+    int i;
+    int maxfd = getdtablesize();
+#define PIPEBUFSZ (8*1024*1024)
+    int dump_fd = fileno(pcap_dump_file(dump_info->p));
+
+    if (0 != socketpair(AF_UNIX, SOCK_STREAM, 0, pipefd)) {
+        error("Error creating pipe: '%s'\n", strerror(errno));
+    }
+#ifdef HAVE_SETSOCKOPT
+    int bufsz = PIPEBUFSZ;
+    if (0!= setsockopt(pipefd[0], SOL_SOCKET, SO_RCVBUF, &bufsz, sizeof(bufsz))) {
+        warning("setsockopt SO_RCVBUF failed\n");
+    }
+    bufsz = PIPEBUFSZ;
+    if (0!= setsockopt(pipefd[1], SOL_SOCKET, SO_SNDBUF, &bufsz, sizeof(bufsz))) {
+        warning("setsockopt SO_SNDBUF failed\n");
+    }
+#endif
+    compressor_pid =
+# ifdef HAVE_FORK
+        fork()
+# else
+        vfork()
+# endif
+        ;
+    if (compressor_pid == -1) {
+        error("Error forking compressor: '%s'\n", strerror(errno));
+    }
+    if (compressor_pid == 0) {
+        /* child */
+        if (-1 == dup2(pipefd[0], STDIN_FILENO)) {
+            error("Error DUP compressor stdin: '%s'\n", strerror(errno));
+        }
+        close(pipefd[0]);
+        if (-1 == dup2(dump_fd, STDOUT_FILENO)) {
+            error("Error DUP compressor stdout: '%s'\n", strerror(errno));
+        }
+        for (i=0; i<maxfd; ++i) {
+            if (i != STDIN_FILENO && i != STDOUT_FILENO)
+                close(i);
+        }
+        execvp(compressor_arg[0], compressor_arg);
+        /* should not return */
+        error("Return from execvp");
+    } else {
+        /* parent */
+        close(pipefd[0]); /* read end of pipe */
+        dup2(pipefd[1], dump_fd);
+        close(pipefd[1]);
+    }
+}
+#endif /* WITH_PIPEOUTPUT */
 
 #ifdef HAVE_PCAP_SET_TSTAMP_TYPE
 static void
@@ -421,8 +488,13 @@ show_devices_and_exit (void)
 #define OPTION_VERSION		128
 #define OPTION_TSTAMP_PRECISION	129
 #define OPTION_IMMEDIATE_MODE	130
-
+#ifdef WITH_PIPEOUTPUT
+#define OPTION_PIPEOUTPUT 1190
+#endif /* WITH_PIPEOUTPUT */
 static const struct option longopts[] = {
+#ifdef WITH_PIPEOUTPUT
+    { "pipeoutput", required_argument, NULL, OPTION_PIPEOUTPUT },
+#endif /* WITH_PIPEOUTPUT */
 #if defined(HAVE_PCAP_CREATE) || defined(WIN32)
 	{ "buffer-size", required_argument, NULL, 'B' },
 #endif
@@ -1150,6 +1222,21 @@ main(int argc, char **argv)
 			break;
 #endif
 
+#ifdef WITH_PIPEOUTPUT
+        case OPTION_PIPEOUTPUT:
+            pipeoutput = optarg;
+            {
+                    int i=0, argc=0;
+                    compressor_arg[argc] = pipeoutput;
+                    for ( ; pipeoutput[i] != '\0'; ++i) {
+                            if (pipeoutput[i] == ' ') {
+                                    pipeoutput[i] = '\0';
+                                    compressor_arg[++argc] = &pipeoutput[i+1];
+                            }
+                    }
+            }
+            break;
+#endif /* WITH_PIPEOUTPUT */
 		default:
 			print_usage();
 			exit(1);
@@ -1619,6 +1706,11 @@ main(int argc, char **argv)
 			callback = dump_packet;
 			pcap_userdata = (u_char *)p;
 		}
+#ifdef WITH_PIPEOUTPUT
+        if (pipeoutput) {
+            remap_to_pipe(&dumpinfo);
+        }
+#endif /* WITH_PIPEOUTPUT */
 #ifdef HAVE_PCAP_DUMP_FLUSH
 		if (gndo->ndo_Uflag)
 			pcap_dump_flush(p);
@@ -2015,6 +2107,11 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 #else	/* !HAVE_CAPSICUM */
 			dump_info->p = pcap_dump_open(dump_info->pd, dump_info->CurrentFileName);
 #endif
+#ifdef WITH_PIPEOUTPUT
+            if (pipeoutput) {
+                remap_to_pipe(dump_info);
+            }
+#endif /* WITH_PIPEOUTPUT */
 #ifdef HAVE_LIBCAP_NG
 			capng_update(CAPNG_DROP, CAPNG_EFFECTIVE, CAP_DAC_OVERRIDE);
 			capng_apply(CAPNG_SELECT_BOTH);
@@ -2047,7 +2144,6 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			 * Close the current file and open a new one.
 			 */
 			pcap_dump_close(dump_info->p);
-
 			/*
 			 * Compress the file we just closed, if the user
 			 * asked for it.
@@ -2086,6 +2182,11 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 #else	/* !HAVE_CAPSICUM */
 			dump_info->p = pcap_dump_open(dump_info->pd, dump_info->CurrentFileName);
 #endif
+#ifdef WITH_PIPEOUTPUT
+            if (pipeoutput) {
+                remap_to_pipe(dump_info);
+            }
+#endif /* WITH_PIPEOUTPUT */
 #ifdef HAVE_LIBCAP_NG
 			capng_update(CAPNG_DROP, CAPNG_EFFECTIVE, CAP_DAC_OVERRIDE);
 			capng_apply(CAPNG_SELECT_BOTH);
@@ -2272,6 +2373,9 @@ print_usage(void)
 	(void)fprintf(stderr, "[ -T type ] [ --version ] [ -V file ]\n");
 	(void)fprintf(stderr,
 "\t\t[ -w file ] [ -W filecount ] [ -y datalinktype ] [ -z command ]\n");
+#ifdef WITH_PIPEOUTPUT
+    (void)fprintf(stderr, "\t\t[ --pipeoutput command ]\n");
+#endif /* WITH_PIPEOUTPUT */
 	(void)fprintf(stderr,
 "\t\t[ -Z user ] [ expression ]\n");
 }
