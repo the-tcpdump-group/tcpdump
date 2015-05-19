@@ -102,6 +102,7 @@ static const struct tok isis_pdu_values[] = {
 #define ISIS_TLV_AUTH                10  /* iso10589, rfc3567 */
 #define ISIS_TLV_CHECKSUM            12  /* rfc3358 */
 #define ISIS_TLV_CHECKSUM_MINLEN 2
+#define ISIS_TLV_POI                 13  /* rfc6232 */
 #define ISIS_TLV_LSP_BUFFERSIZE      14  /* iso10589 rev2 */
 #define ISIS_TLV_LSP_BUFFERSIZE_MINLEN 2
 #define ISIS_TLV_EXT_IS_REACH        22  /* draft-ietf-isis-traffic-05 */
@@ -151,6 +152,7 @@ static const struct tok isis_tlv_values[] = {
     { ISIS_TLV_LSP,                "LSP entries"},
     { ISIS_TLV_AUTH,               "Authentication"},
     { ISIS_TLV_CHECKSUM,           "Checksum"},
+    { ISIS_TLV_POI,                "Purge Originator Identifier"},
     { ISIS_TLV_LSP_BUFFERSIZE,     "LSP Buffersize"},
     { ISIS_TLV_EXT_IS_REACH,       "Extended IS Reachability"},
     { ISIS_TLV_IS_ALIAS_ID,        "IS Alias ID"},
@@ -2883,6 +2885,22 @@ isis_print(netdissect_options *ndo,
              * see rfc3358 for details
              */
             osi_print_cksum(ndo, optr, EXTRACT_16BITS(tptr), tptr-optr, length);
+	    break;
+
+	case ISIS_TLV_POI:
+	    if (tlv_len >= SYSTEM_ID_LEN + 1) {
+		if (!ND_TTEST2(*tptr, SYSTEM_ID_LEN + 1))
+		    goto trunctlv;
+		ND_PRINT((ndo, "\n\t      Purge Originator System-ID: %s",
+		       isis_print_id(tptr + 1, SYSTEM_ID_LEN)));
+	    }
+
+	    if (tlv_len == 2 * SYSTEM_ID_LEN + 1) {
+		if (!ND_TTEST2(*tptr, 2 * SYSTEM_ID_LEN + 1))
+		    goto trunctlv;
+		ND_PRINT((ndo, "\n\t      Received from System-ID: %s",
+		       isis_print_id(tptr + SYSTEM_ID_LEN + 1, SYSTEM_ID_LEN)));
+	    }
 	    break;
 
 	case ISIS_TLV_MT_SUPPORTED:
