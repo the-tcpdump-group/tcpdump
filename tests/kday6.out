@@ -362,19 +362,8 @@ FRF.16 Frag, seq 693, Flags [Begin], UI e8! IS-IS, length 301989913
 	    Partition DIS TLV #4, length: 4
 	    Partition DIS TLV #4, length: 4
 	    Partition DIS TLV #4, length: 5
-	    unknown TLV #13, length: 178
-		0x0000:  c4e4 f9cb 0ce2 cd2e 175a 0bf3 b492 01fa
-		0x0010:  0e0e 0e0e 0e0e 0e0e 0e0e 0e0e 0e0e 0e0e
-		0x0020:  0e0e 0e0e 0e0e 0e0e 0e0e 0e0e 0e0e 0e0e
-		0x0030:  3a3a 3a3a 3a3a 3a3a 3a3a 3a3a 3a3a 3a3a
-		0x0040:  3a3a 3a0e 0e0e 0e0e 0e0e 0e0e 0e0e 0e28
-		0x0050:  0e0e 0e0e 0e0e 0e0e 0e0e 0e0e 0e0e 0e0e
-		0x0060:  0e0e 0e0e 0e0e 0e0e 0e0e 0e0e 0e0e 0e0e
-		0x0070:  0e0e 0e0e 0e0e 0e0e 0e0e 0e0e 0e0e 0e0e
-		0x0080:  0e0e 0e0e 0e0e 0e0e 0e0e 0e0e 0e0e 0e0e
-		0x0090:  0e0e 0e0e 0e0e 0e0e 0e0e 0e0e 0e0e 0e0e
-		0x00a0:  0e0e 0e0e 0e0e 0e0e 0e0e 0e0e 0e0e 0e0e
-		0x00b0:  0e0e
+	    Purge Originator Identifier TLV #13, length: 178
+	      Purge Originator System-ID: e4f9.cb0c.e2cd
 	    LSP Buffersize TLV #14, length: 14
 	      LSP Buffersize: 3598
 	    LSP Buffersize TLV #14, length: 14
