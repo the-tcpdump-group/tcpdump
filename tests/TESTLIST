@@ -217,6 +217,8 @@ pimv2_hellos-v		PIMv2_hellos.pcap		pimv2_hellos-v.out	-t -v
 
 # IS-IS tests
 isis_infloop-v	isis-infinite-loop.pcap		isis_infloop-v.out	-t -v
+isis_poi-v      isis_poi.pcap                   isis_poi.out            -t -v
+isis_poi2-v     isis_poi2.pcap                  isis_poi2.out           -t -v
 
 # RSVP tests
 rsvp_infloop-v	rsvp-infinite-loop.pcap		rsvp_infloop-v.out	-t -v
