@@ -101,7 +101,6 @@ struct netdissect_options {
   int ndo_sflag;		/* use the libsmi to translate OIDs */
   int ndo_Sflag;		/* print raw TCP sequence numbers */
   int ndo_tflag;		/* print packet arrival time */
-  int ndo_Uflag;		/* "unbuffered" output of dump files */
   int ndo_uflag;		/* Print undecoded NFS handles */
   int ndo_vflag;		/* verbose */
   int ndo_xflag;		/* print packet in hex */
@@ -109,21 +108,9 @@ struct netdissect_options {
   int ndo_Aflag;		/* print packet only in ascii observing TAB,
 				 * LF, CR and SPACE as graphical chars
 				 */
-  int ndo_Bflag;		/* buffer size */
-  int ndo_Iflag;		/* rfmon (monitor) mode */
-  int ndo_Oflag;                /* run filter code optimizer */
   int ndo_dlt;                  /* if != -1, ask libpcap for the DLT it names*/
-  int ndo_jflag;                /* packet time stamp source */
-  int ndo_pflag;                /* don't go promiscuous */
   int ndo_immediate;            /* use immediate mode */
 
-  int ndo_Cflag;                /* rotate dump files after this many bytes */
-  int ndo_Cflag_count;      /* Keep track of which file number we're writing */
-  int ndo_Gflag;            /* rotate dump files after this many seconds */
-  int ndo_Gflag_count;      /* number of files created with Gflag rotation */
-  time_t ndo_Gflag_time;    /* The last time_t the dump file was rotated. */
-  int ndo_Wflag;          /* recycle output files after this number of files */
-  int ndo_WflagChars;
   int ndo_Hflag;		/* dissect 802.11s draft mesh standard */
   int ndo_packet_number;	/* print a packet number in the beginning of line */
   int ndo_suppress_default_print; /* don't use default_print() for unknown packet types */
@@ -636,7 +623,5 @@ extern int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 
 extern void geonet_print(netdissect_options *ndo,const u_char *eth_hdr,const u_char *geo_pck, u_int len);
 extern void calm_fast_print(netdissect_options *ndo,const u_char *eth_hdr,const u_char *calm_pck, u_int len);
-
-extern netdissect_options *gndo;
 
 #endif  /* netdissect_h */
