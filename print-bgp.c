@@ -2196,13 +2196,6 @@ bgp_attr_print(netdissect_options *ndo,
 			}
 		    }
 
-		    /*
-		     * Header length includes TLV overhead.
-		     */
-		    if (length < 3) {
-			break;
-		    }
-
 		    tptr += length;
 		    tlen -= length;
 		}
