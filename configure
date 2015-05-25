@@ -1338,8 +1338,7 @@ Optional Packages:
   --without-smi           don't link with libsmi
   --with-user=USERNAME    drop privileges by default to USERNAME
   --with-chroot=DIRECTORY when dropping privileges, chroot to DIRECTORY
-  --with-crypto[=PATH]    use SSLeay libcrypto (located in directory PATH, if
-                          supplied). [default=yes, if available]
+  --with-crypto           use OpenSSL libcrypto [default=yes, if available]
 
 Some influential environment variables:
   CC          C compiler command
@@ -7373,11 +7372,11 @@ $as_echo "$ac_cv_var_h_errno" >&6; }
 	fi
 
 
-# Check for SSLeay
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to use SSLeay libcrypto" >&5
-$as_echo_n "checking whether to use SSLeay libcrypto... " >&6; }
+# Check for OpenSSL libcrypto
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to use OpenSSL libcrypto" >&5
+$as_echo_n "checking whether to use OpenSSL libcrypto... " >&6; }
 # Specify location for both includes and libraries.
-want_libcrypto=youmama
+want_libcrypto=ifavailable
 
 # Check whether --with-crypto was given.
 if test "${with_crypto+set}" = set; then :
@@ -7392,11 +7391,6 @@ $as_echo "no" >&6; }
 		want_libcrypto=yes
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-	else
-		want_libcrypto=yes
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-		crypto_dir=$withval
 	fi
 
 else
@@ -7411,121 +7405,7 @@ $as_echo "yes, if available" >&6; }
 fi
 
 if test "$want_libcrypto" != "no"; then
-	ac_cv_ssleay_path=no
-	incdir=no
-	if test "x$crypto_dir" = x; then
-		#
-		# Location not specified; check the default locations.
-		#
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking where SSLeay is located" >&5
-$as_echo_n "checking where SSLeay is located... " >&6; }
-		dirs="/usr /usr/local /usr/local/ssl /usr/pkg"
-		if test "x${host_alias}" != x; then
-			dirs="/usr/${host_alias} $dirs"
-		fi
-		for dir in $dirs; do
-
-	#
-	# Find the last component of $libdir; it's not necessarily
-	# "lib" - it might be "lib64" on, for example, x86-64
-	# Linux systems.
-	#
-	# We assume the directory in which we're looking for
-	# libcrypto has a subdirectory with that as its name.
-	#
-	tmplib=`echo "$libdir" | sed 's,.*/,,'`
-
-	#
-	# XXX - is there a better way to check if a given library is
-	# in a given directory than checking each of the possible
-	# shared library suffixes?
-	#
-	# Are there any other suffixes we need to look for?  Do we
-	# have to worry about ".so.{version}"?
-	#
-	# Or should we just look for "libcrypto.*"?
-	#
-	if test -d "$dir/$tmplib" -a \( -f "$dir/$tmplib/libcrypto.a" -o \
-		          	    -f "$dir/$tmplib/libcrypto.so" -o \
-		          	    -f "$dir/$tmplib/libcrypto.sl" -o \
-			  	    -f "$dir/$tmplib/libcrypto.dylib" \); then
-		ac_cv_ssleay_path="$dir"
-	fi
-
-	#
-	# Make sure we have the headers as well.
-	#
-	if test -d "$dir/include/openssl" -a -f "$dir/include/openssl/des.h"; then
-		incdir="-I$dir/include"
-	fi
-
-
-			if test "$ac_cv_ssleay_path" != "no" -a "$incdir" != "no"; then
-				break;
-			else
-				ac_cv_ssleay_path=no
-				incdir=no
-			fi
-		done
-		if test "$ac_cv_ssleay_path" != no; then
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_ssleay_path" >&5
-$as_echo "$ac_cv_ssleay_path" >&6; }
-		fi
-	else
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for SSLeay in $crypto_dir" >&5
-$as_echo_n "checking for SSLeay in $crypto_dir... " >&6; }
-
-	#
-	# Find the last component of $libdir; it's not necessarily
-	# "lib" - it might be "lib64" on, for example, x86-64
-	# Linux systems.
-	#
-	# We assume the directory in which we're looking for
-	# libcrypto has a subdirectory with that as its name.
-	#
-	tmplib=`echo "$libdir" | sed 's,.*/,,'`
-
-	#
-	# XXX - is there a better way to check if a given library is
-	# in a given directory than checking each of the possible
-	# shared library suffixes?
-	#
-	# Are there any other suffixes we need to look for?  Do we
-	# have to worry about ".so.{version}"?
-	#
-	# Or should we just look for "libcrypto.*"?
-	#
-	if test -d "$crypto_dir/$tmplib" -a \( -f "$crypto_dir/$tmplib/libcrypto.a" -o \
-		          	    -f "$crypto_dir/$tmplib/libcrypto.so" -o \
-		          	    -f "$crypto_dir/$tmplib/libcrypto.sl" -o \
-			  	    -f "$crypto_dir/$tmplib/libcrypto.dylib" \); then
-		ac_cv_ssleay_path="$crypto_dir"
-	fi
-
-	#
-	# Make sure we have the headers as well.
-	#
-	if test -d "$crypto_dir/include/openssl" -a -f "$crypto_dir/include/openssl/des.h"; then
-		incdir="-I$crypto_dir/include"
-	fi
-
-		if test "$ac_cv_ssleay_path" != no; then
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: found" >&5
-$as_echo "found" >&6; }
-		fi
-	fi
-	if test "$ac_cv_ssleay_path" != no; then
-		V_INCLS="$V_INCLS $incdir"
-		if test "$dir" != "/usr"; then
-			LDFLAGS="-L$dir/lib $LDFLAGS"
-		fi
-		if test -f $ac_cv_ssleay_path/lib/libRSAglue.a; then
-			LIBS="$LIBS -lRSAglue"
-		fi
-		if test -f $ac_cv_ssleay_path/lib/librsaref.a; then
-			LIBS="$LIBS -lrsaref"
-		fi
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for DES_cbc_encrypt in -lcrypto" >&5
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for DES_cbc_encrypt in -lcrypto" >&5
 $as_echo_n "checking for DES_cbc_encrypt in -lcrypto... " >&6; }
 if ${ac_cv_lib_crypto_DES_cbc_encrypt+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -7570,10 +7450,7 @@ _ACEOF
 
 fi
 
-
-		savedcppflags="$CPPFLAGS"
-		CPPFLAGS="$CPPFLAGS $V_INCLS"
-		for ac_header in openssl/evp.h
+	for ac_header in openssl/evp.h
 do :
   ac_fn_c_check_header_mongrel "$LINENO" "openssl/evp.h" "ac_cv_header_openssl_evp_h" "$ac_includes_default"
 if test "x$ac_cv_header_openssl_evp_h" = xyes; then :
@@ -7585,17 +7462,6 @@ fi
 
 done
 
-		CPPFLAGS="$savedcppflags"
-	else
-		#
-		# Not found.  Did the user explicitly ask for it?
-		#
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: not found" >&5
-$as_echo "not found" >&6; }
-		if test "$want_libcrypto" = yes; then
-			as_fn_error $? "SSLeay not found" "$LINENO" 5
-		fi
-	fi
 fi
 
 if test "$missing_includes" = "yes"; then
