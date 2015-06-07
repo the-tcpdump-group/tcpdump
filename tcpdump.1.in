@@ -434,6 +434,12 @@ efficiency.  This is the default when printing packets rather than
 saving packets to a ``savefile'' if the packets are being printed to a
 terminal rather than to a file or pipe.
 .TP
+.BI \-\-limit\-file\-size= max_size
+.PD
+Once the capture file exceeds \fImax_size\fP do not capture any further
+packets.  Default format is bytes, but suffixes k, m and g can be used to
+denote kilobytes, megabytes and gigabytes respectively.
+.TP
 .BI \-j " tstamp_type"
 .PD 0
 .TP
