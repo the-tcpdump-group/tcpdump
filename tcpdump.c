@@ -553,36 +553,43 @@ getWflagChars(int x)
 static long
 getFileSize(char *x)
 {
-	unsigned long c = 0;
-	char suffix;
 	char buff[32];
-	suffix = x[strlen(x)-1];
-	if (isdigit(suffix)) {
-		if(atol(x))
-			return atol(x);
-		else
-			error("invalid file size parameter");
+
+	if (strlen(x) > sizeof(buff))
+		error("invalid file size %s", x);
+
+	/* If just digits, convert from megabytes */
+	if (strspn(x,"01234567890") == strlen(x)) {
+		return atol(x)*1000*1000;
 	}
 
-	strncpy(buff,x,min(strlen(x)-1,sizeof(buff)));
-	switch (toupper(suffix)) {
-
-		case 'K':
-			c=atol(x)*1024;
-			break;
-		case 'M':
-			c=atol(x)*1024*1024;
-			break;
-		case 'G':
-			c=atol(x)*1024*1024*1024;
-			break;
-		default:
-			error("invalid file size parameter: bad suffix");
+	/* If ki/mi/gi suffix used, convert from kibibytes/mibibytes/gigibytes */
+	if (strlen(x)>2) {
+		strncpy(buff,x,strlen(x)-2);
+		if (strspn(buff,"01234567890") != strlen(buff))
+			error("invalid file size %s", buff);
+		if (strncasecmp(x+strlen(x)-2,"ki",2) == 0)
+			return atol(x)*1024;
+		if (strncasecmp(x+strlen(x)-2,"mi",2) == 0)
+			return atol(x)*1024*1024;
+		if (strncasecmp(x+strlen(x)-2,"gi",2) == 0)
+			return atol(x)*1024*1024*1024;
 	}
-	if (c == 0)
-		error("invalid file size parameter");
 
-	return c;
+	/* If k/m/g suffix used, convert from kilobytes/megabytes/gigabytes */
+	if (strlen(x)>1) {
+		strncpy(buff,x,strlen(x)-1);
+		if (strspn(buff,"01234567890") != strlen(buff))
+			error("invalid file size %s", buff);
+		if (tolower(x[strlen(x)-1]) == 'k')
+			return atol(buff)*1000;
+		if (tolower(x[strlen(x)-1]) == 'm')
+			return atol(buff)*1000*1000;
+		if (tolower(x[strlen(x)-1]) == 'g')
+			return atol(buff)*1000*1000*1000;
+	}
+
+	error("invalid file size %s", x);
 }
 
 static void
@@ -845,9 +852,7 @@ main(int argc, char **argv)
 			break;
 
 		case 'C':
-			Cflag = atoi(optarg) * 1000000;
-			if (Cflag < 0)
-				error("invalid file size %s", optarg);
+			Cflag = getFileSize(optarg);
 			break;
 
 		case 'd':
