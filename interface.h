@@ -119,11 +119,6 @@ extern char *copy_argv(char **);
 extern const char *dnname_string(u_short);
 extern const char *dnnum_string(u_short);
 
-/* checksum routines */
-extern void init_checksum(void);
-extern uint16_t verify_crc10_cksum(uint16_t, const u_char *, int);
-extern uint16_t create_osi_cksum(const uint8_t *, int, int);
-
 /* The printer routines. */
 
 #include <pcap.h>
