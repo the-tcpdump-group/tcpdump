@@ -65,23 +65,6 @@ extern char *strdup(const char *);
 extern char *strsep(char **, const char *);
 #endif
 
-#define PT_VAT		1	/* Visual Audio Tool */
-#define PT_WB		2	/* distributed White Board */
-#define PT_RPC		3	/* Remote Procedure Call */
-#define PT_RTP		4	/* Real-Time Applications protocol */
-#define PT_RTCP		5	/* Real-Time Applications control protocol */
-#define PT_SNMP		6	/* Simple Network Management Protocol */
-#define PT_CNFP		7	/* Cisco NetFlow protocol */
-#define PT_TFTP		8	/* trivial file transfer protocol */
-#define PT_AODV		9	/* Ad-hoc On-demand Distance Vector Protocol */
-#define PT_CARP		10	/* Common Address Redundancy Protocol */
-#define PT_RADIUS	11	/* RADIUS authentication Protocol */
-#define PT_ZMTP1	12	/* ZeroMQ Message Transport Protocol 1.0 */
-#define PT_VXLAN	13	/* Virtual eXtensible Local Area Network */
-#define PT_PGM		14	/* [UDP-encapsulated] Pragmatic General Multicast */
-#define PT_PGM_ZMTP1	15	/* ZMTP/1.0 inside PGM (native or UDP-encapsulated) */
-#define PT_LMP		16	/* Link Management Protocol */
-
 #define ESRC(ep) ((ep)->ether_shost)
 #define EDST(ep) ((ep)->ether_dhost)
 
