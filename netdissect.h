@@ -600,14 +600,13 @@ extern void ospf6_print(netdissect_options *, const u_char *, u_int);
 extern void babel_print(netdissect_options *, const u_char *, u_int);
 #endif /*INET6*/
 
-#if 0
 struct cksum_vec {
 	const uint8_t	*ptr;
 	int		len;
 };
 extern uint16_t in_cksum(const struct cksum_vec *, int);
 extern uint16_t in_cksum_shouldbe(uint16_t, uint16_t);
-#endif
+
 extern int nextproto4_cksum(netdissect_options *ndo, const struct ip *, const uint8_t *, u_int, u_int, u_int);
 extern int decode_prefix4(netdissect_options *ndo, const u_char *, u_int, char *, u_int);
 #ifdef INET6

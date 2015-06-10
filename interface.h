@@ -135,13 +135,6 @@ extern const char *nt_errstr(uint32_t);
 extern int mask62plen(const u_char *);
 #endif /*INET6*/
 
-struct cksum_vec {
-	const uint8_t	*ptr;
-	int		len;
-};
-extern uint16_t in_cksum(const struct cksum_vec *, int);
-extern uint16_t in_cksum_shouldbe(uint16_t, uint16_t);
-
 #ifndef HAVE_BPF_DUMP
 struct bpf_program;
 
