@@ -65,15 +65,6 @@ extern char *strdup(const char *);
 extern char *strsep(char **, const char *);
 #endif
 
-#define ESRC(ep) ((ep)->ether_shost)
-#define EDST(ep) ((ep)->ether_dhost)
-
-#ifndef NTOHL
-#define NTOHL(x)	(x) = ntohl(x)
-#define NTOHS(x)	(x) = ntohs(x)
-#define HTONL(x)	(x) = htonl(x)
-#define HTONS(x)	(x) = htons(x)
-#endif
 #endif
 
 extern char *program_name;	/* used to generate self-identifying messages */
