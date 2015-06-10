@@ -80,10 +80,6 @@ extern char *program_name;	/* used to generate self-identifying messages */
 
 extern int32_t thiszone;	/* seconds offset from gmt to local time */
 
-extern int mask2plen(uint32_t);
-extern const char *tok2strary_internal(const char **, int, const char *, int);
-#define	tok2strary(a,f,i) tok2strary_internal(a, sizeof(a)/sizeof(a[0]),f,i)
-
 extern void error(const char *, ...)
      __attribute__((noreturn))
 #ifdef __ATTRIBUTE___FORMAT_OK
@@ -102,10 +98,6 @@ extern char *copy_argv(char **);
 /* The printer routines. */
 
 #include <pcap.h>
-
-#ifdef INET6
-extern int mask62plen(const u_char *);
-#endif /*INET6*/
 
 #ifndef HAVE_BPF_DUMP
 struct bpf_program;

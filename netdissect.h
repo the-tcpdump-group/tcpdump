@@ -347,6 +347,14 @@ extern int unaligned_memcmp(const void *, const void *, size_t);
 extern const char *dnname_string(u_short);
 extern const char *dnnum_string(u_short);
 
+extern int mask2plen(uint32_t);
+extern const char *tok2strary_internal(const char **, int, const char *, int);
+#define	tok2strary(a,f,i) tok2strary_internal(a, sizeof(a)/sizeof(a[0]),f,i)
+
+#ifdef INET6
+extern int mask62plen(const u_char *);
+#endif /*INET6*/
+
 /* The printer routines. */
 
 #include <pcap.h>
