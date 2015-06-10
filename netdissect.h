@@ -344,10 +344,8 @@ extern int unaligned_memcmp(const void *, const void *, size_t);
 #define PLURAL_SUFFIX(n) \
 	(((n) != 1) ? "s" : "")
 
-#if 0
-extern const char *dnname_string(netdissect_options *, u_short);
-extern const char *dnnum_string(netdissect_options *, u_short);
-#endif
+extern const char *dnname_string(u_short);
+extern const char *dnnum_string(u_short);
 
 /* The printer routines. */
 
@@ -573,9 +571,9 @@ extern void geneve_print(netdissect_options *, const u_char *, u_int);
 #if 0
 extern void ascii_print(netdissect_options *,u_int);
 extern void default_print(netdissect_options *,const u_char *, u_int);
-extern char *smb_errstr(netdissect_options *,int, int);
-extern const char *nt_errstr(netdissect_options *, uint32_t);
 #endif
+extern char *smb_errstr(int, int);
+extern const char *nt_errstr(uint32_t);
 
 extern u_int ipnet_if_print(netdissect_options *,const struct pcap_pkthdr *, const u_char *);
 extern u_int ppi_if_print(netdissect_options *,const struct pcap_pkthdr *, const u_char *);

@@ -99,15 +99,9 @@ extern void warning(const char *, ...)
 extern char *read_infile(char *);
 extern char *copy_argv(char **);
 
-extern const char *dnname_string(u_short);
-extern const char *dnnum_string(u_short);
-
 /* The printer routines. */
 
 #include <pcap.h>
-
-extern char *smb_errstr(int, int);
-extern const char *nt_errstr(uint32_t);
 
 #ifdef INET6
 extern int mask62plen(const u_char *);
