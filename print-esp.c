@@ -50,6 +50,8 @@
 #include "interface.h"
 #include "extract.h"
 
+#include "ascii_strcasecmp.h"
+
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
  * All rights reserved.
@@ -331,8 +333,8 @@ espprint_decode_authalgo(netdissect_options *ndo,
 	}
 	*colon = '\0';
 
-	if(strcasecmp(colon,"sha1") == 0 ||
-	   strcasecmp(colon,"md5") == 0) {
+	if(ascii_strcasecmp(colon,"sha1") == 0 ||
+	   ascii_strcasecmp(colon,"md5") == 0) {
 		sa->authlen = 12;
 	}
 	return 1;
@@ -426,7 +428,7 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 	} else
 		decode = line;
 
-	if (spikey && strcasecmp(spikey, "file") == 0) {
+	if (spikey && ascii_strcasecmp(spikey, "file") == 0) {
 		/* open file and read it */
 		FILE *secretfile;
 		char  fileline[1024];
@@ -456,7 +458,7 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 		return;
 	}
 
-	if (spikey && strcasecmp(spikey, "ikev2") == 0) {
+	if (spikey && ascii_strcasecmp(spikey, "ikev2") == 0) {
 		esp_print_decode_ikeline(ndo, line, file, lineno);
 		return;
 	}

@@ -93,6 +93,10 @@ SOURCE=..\..\af.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\ascii_strcasecmp.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\bpf_dump.c
 # End Source File
 # Begin Source File
@@ -610,10 +614,6 @@ SOURCE=..\..\setsignal.c
 # Begin Source File
 
 SOURCE=..\..\smbutil.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\strcasecmp.c
 # End Source File
 # Begin Source File
 

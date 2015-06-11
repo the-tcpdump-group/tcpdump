@@ -5447,19 +5447,6 @@ esac
 
 fi
 
-ac_fn_c_check_func "$LINENO" "strcasecmp" "ac_cv_func_strcasecmp"
-if test "x$ac_cv_func_strcasecmp" = xyes; then :
-  $as_echo "#define HAVE_STRCASECMP 1" >>confdefs.h
-
-else
-  case " $LIBOBJS " in
-  *" strcasecmp.$ac_objext "* ) ;;
-  *) LIBOBJS="$LIBOBJS strcasecmp.$ac_objext"
- ;;
-esac
-
-fi
-
 ac_fn_c_check_func "$LINENO" "strlcat" "ac_cv_func_strlcat"
 if test "x$ac_cv_func_strlcat" = xyes; then :
   $as_echo "#define HAVE_STRLCAT 1" >>confdefs.h

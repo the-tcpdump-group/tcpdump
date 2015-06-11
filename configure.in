@@ -573,7 +573,7 @@ if test "$ac_cv_namereqd" = no; then
 	missing_includes=yes
 fi
 
-AC_REPLACE_FUNCS(vfprintf strcasecmp strlcat strlcpy strdup strsep getopt_long)
+AC_REPLACE_FUNCS(vfprintf strlcat strlcpy strdup strsep getopt_long)
 AC_CHECK_FUNCS(fork vfork strftime)
 AC_CHECK_FUNCS(setlinebuf alarm)
 

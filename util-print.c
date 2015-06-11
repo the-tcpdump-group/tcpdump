@@ -52,6 +52,7 @@
 #include <string.h>
 
 #include "interface.h"
+#include "ascii_strcasecmp.h"
 
 int32_t thiszone;		/* seconds offset from gmt to local time */
 
@@ -664,7 +665,7 @@ txtproto_print(netdissect_options *ndo, const u_char *pptr, u_int len,
 		if (idx != 0) {
 			/* Is this a valid request name? */
 			while ((cmd = *cmds++) != NULL) {
-				if (strcasecmp((const char *)token, cmd) == 0) {
+				if (ascii_strcasecmp((const char *)token, cmd) == 0) {
 					/* Yes. */
 					is_reqresp = 1;
 					break;

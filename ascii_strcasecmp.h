@@ -1,6 +1,9 @@
 /*
- * Copyright (c) 1990, 1993, 1994, 1995, 1996
+ * Copyright (c) 1988-1997
  *	The Regents of the University of California.  All rights reserved.
+ *
+ * Copyright (c) 1998-2012  Michael Richardson <mcr@tcpdump.org>
+ *      The TCPDUMP project
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that: (1) source code distributions
@@ -19,18 +22,12 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-/* Prototypes missing in Ultrix 4 */
-int	bcmp(const char *, const char *, u_int);
-void	bcopy(const void *, void *, u_int);
-void	bzero(void *, u_int);
-void	endservent(void);
-int	getopt(int, char * const *, const char *);
-#ifdef __STDC__
-struct timeval;
-struct timezone;
-#endif
-int	gettimeofday(struct timeval *, struct timezone *);
-int	ioctl(int, int, caddr_t);
-int	pfopen(char *, int);
-int	setlinebuf(FILE *);
-int	socket(int, int, int);
+#ifndef tcpdump_ascii_strcasecmp_h
+#define tcpdump_ascii_strcasecmp_h
+
+#include <stddef.h>
+
+extern int ascii_strcasecmp(const char *, const char *);
+extern int ascii_strncasecmp(const char *, const char *, size_t);
+
+#endif /* tcpdump_ascii_strcasecmp_h */

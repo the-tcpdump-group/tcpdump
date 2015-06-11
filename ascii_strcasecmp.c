@@ -10,20 +10,19 @@
  * is provided ``as is'' without express or implied warranty.
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-#include <tcpdump-stdinc.h>
-
-#include "interface.h"
+#include "ascii_strcasecmp.h"
 
 /*
- * This array is designed for mapping upper and lower case letter
+ * This array is designed for mapping upper and lower case letters
  * together for a case independent comparison.  The mappings are
- * based upon ascii character sequences.
+ * based upon ASCII character sequences; all values other than
+ * ASCII letters are mapped to themselves, so this is locale-
+ * independent and intended to be locale-independent, to avoid
+ * issues with, for example, "i" and "I" not being lower-case
+ * and upper-case versions of the same letter in Turkish, where
+ * there are separate "i with dot" and "i without dot" letters.
  */
-static const u_char charmap[] = {
+static const unsigned char charmap[] = {
 	'\000', '\001', '\002', '\003', '\004', '\005', '\006', '\007',
 	'\010', '\011', '\012', '\013', '\014', '\015', '\016', '\017',
 	'\020', '\021', '\022', '\023', '\024', '\025', '\026', '\027',
@@ -59,12 +58,12 @@ static const u_char charmap[] = {
 };
 
 int
-strcasecmp(s1, s2)
+ascii_strcasecmp(s1, s2)
 	const char *s1, *s2;
 {
-	register const u_char *cm = charmap,
-			*us1 = (u_char *)s1,
-			*us2 = (u_char *)s2;
+	register const unsigned char *cm = charmap,
+			*us1 = (const unsigned char *)s1,
+			*us2 = (const unsigned char *)s2;
 
 	while (cm[*us1] == cm[*us2++])
 		if (*us1++ == '\0')
@@ -73,16 +72,39 @@ strcasecmp(s1, s2)
 }
 
 int
-strncasecmp(s1, s2, n)
+ascii_strncasecmp(s1, s2, n)
 	const char *s1, *s2;
-	register int n;
+	register size_t n;
 {
-	register const u_char *cm = charmap,
-			*us1 = (u_char *)s1,
-			*us2 = (u_char *)s2;
+	register const unsigned char *cm = charmap,
+			*us1 = (const unsigned char *)s1,
+			*us2 = (const unsigned char *)s2;
 
-	while (--n >= 0 && cm[*us1] == cm[*us2++])
-		if (*us1++ == '\0')
+	for (;;) {
+		if (n == 0) {
+			/*
+			 * We've run out of characters that we should
+			 * compare, and they've all been equal; return
+			 * 0, to indicate that the prefixes are the
+			 * same.
+			 */
 			return(0);
-	return(n < 0 ? 0 : cm[*us1] - cm[*--us2]);
+		}
+		if (cm[*us1] != cm[*us2++]) {
+			/*
+			 * We've found a mismatch.
+			 */
+			break;
+		}
+		if (*us1++ == '\0') {
+			/*
+			 * We've run out of characters *to* compare,
+			 * and they've all been equal; return 0, to
+			 * indicate that the strings are the same.
+			 */
+			return(0);
+		}
+		n--;
+	}
+	return(cm[*us1] - cm[*--us2]);
 }
