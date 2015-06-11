@@ -553,43 +553,31 @@ getWflagChars(int x)
 static long
 getFileSize(char *x)
 {
-	char buff[32];
+	char *e;
+	long l;
 
-	if (strlen(x) > sizeof(buff))
+	l=strtol(x,&e,10);
+	if (strlen(e) == 0)
+		l *= 1000000;
+	else if (strcasecmp(e,"ki") == 0)
+		l *= 1024;
+	else if (strcasecmp(e,"mi") == 0)
+		l *= 1024*1024;
+	else if (strcasecmp(e,"gi") == 0)
+		l *= 1024*1024*1024;
+	else if (strcasecmp(e,"k") == 0)
+		l *= 1000;
+	else if (strcasecmp(e,"m") == 0)
+		l *= 1000*1000;
+	else if (strcasecmp(e,"m") == 0)
+		l *= 1000*1000*1000;
+	else
 		error("invalid file size %s", x);
 
-	/* If just digits, convert from megabytes */
-	if (strspn(x,"01234567890") == strlen(x)) {
-		return atol(x)*1000*1000;
-	}
+	if (l < 1)
+		error("invalid file size %s", x);
 
-	/* If ki/mi/gi suffix used, convert from kibibytes/mibibytes/gigibytes */
-	if (strlen(x)>2) {
-		strncpy(buff,x,strlen(x)-2);
-		if (strspn(buff,"01234567890") != strlen(buff))
-			error("invalid file size %s", buff);
-		if (strncasecmp(x+strlen(x)-2,"ki",2) == 0)
-			return atol(x)*1024;
-		if (strncasecmp(x+strlen(x)-2,"mi",2) == 0)
-			return atol(x)*1024*1024;
-		if (strncasecmp(x+strlen(x)-2,"gi",2) == 0)
-			return atol(x)*1024*1024*1024;
-	}
-
-	/* If k/m/g suffix used, convert from kilobytes/megabytes/gigabytes */
-	if (strlen(x)>1) {
-		strncpy(buff,x,strlen(x)-1);
-		if (strspn(buff,"01234567890") != strlen(buff))
-			error("invalid file size %s", buff);
-		if (tolower(x[strlen(x)-1]) == 'k')
-			return atol(buff)*1000;
-		if (tolower(x[strlen(x)-1]) == 'm')
-			return atol(buff)*1000*1000;
-		if (tolower(x[strlen(x)-1]) == 'g')
-			return atol(buff)*1000*1000*1000;
-	}
-
-	error("invalid file size %s", x);
+	return(l);
 }
 
 static void
