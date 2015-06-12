@@ -13,12 +13,10 @@
 #include "ascii_strcasecmp.h"
 
 /*
- * This array is designed for mapping upper and lower case letters
- * together for a case independent comparison.  The mappings are
- * based upon ASCII character sequences; all values other than
- * ASCII letters are mapped to themselves, so this is locale-
- * independent and intended to be locale-independent, to avoid
- * issues with, for example, "i" and "I" not being lower-case
+ * This array maps upper-case ASCII letters to their lower-case
+ * equivalents; all other byte values are mapped to themselves,
+ * so this is locale-independent and intended to be locale-independent,
+ * to avoid issues with, for example, "i" and "I" not being lower-case
  * and upper-case versions of the same letter in Turkish, where
  * there are separate "i with dot" and "i without dot" letters.
  */
@@ -47,10 +45,10 @@ static const unsigned char charmap[] = {
 	'\250', '\251', '\252', '\253', '\254', '\255', '\256', '\257',
 	'\260', '\261', '\262', '\263', '\264', '\265', '\266', '\267',
 	'\270', '\271', '\272', '\273', '\274', '\275', '\276', '\277',
-	'\300', '\341', '\342', '\343', '\344', '\345', '\346', '\347',
-	'\350', '\351', '\352', '\353', '\354', '\355', '\356', '\357',
-	'\360', '\361', '\362', '\363', '\364', '\365', '\366', '\367',
-	'\370', '\371', '\372', '\333', '\334', '\335', '\336', '\337',
+	'\300', '\301', '\302', '\303', '\304', '\305', '\306', '\307',
+	'\310', '\311', '\312', '\313', '\314', '\315', '\316', '\317',
+	'\320', '\321', '\322', '\323', '\324', '\325', '\326', '\327',
+	'\330', '\331', '\332', '\333', '\334', '\335', '\336', '\337',
 	'\340', '\341', '\342', '\343', '\344', '\345', '\346', '\347',
 	'\350', '\351', '\352', '\353', '\354', '\355', '\356', '\357',
 	'\360', '\361', '\362', '\363', '\364', '\365', '\366', '\367',
