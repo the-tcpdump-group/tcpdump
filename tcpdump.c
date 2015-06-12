@@ -559,17 +559,17 @@ getFileSize(char *x)
 	l = strtol(x, &e, 10);
 	if (strlen(e) == 0)
 		l *= 1000000;
-	else if (strcasecmp(e, "ki") == 0)
+	else if (ascii_strcasecmp(e, "ki") == 0)
 		l *= 1024;
-	else if (strcasecmp(e, "mi") == 0)
+	else if (ascii_strcasecmp(e, "mi") == 0)
 		l *= 1024 * 1024;
-	else if (strcasecmp(e, "gi") == 0)
+	else if (ascii_strcasecmp(e, "gi") == 0)
 		l *= 1024 * 1024 * 1024;
-	else if (strcasecmp(e, "k") == 0)
+	else if (ascii_strcasecmp(e, "k") == 0)
 		l *= 1000;
-	else if (strcasecmp(e, "m") == 0)
+	else if (ascii_strcasecmp(e, "m") == 0)
 		l *= 1000 * 1000;
-	else if (strcasecmp(e, "m") == 0)
+	else if (ascii_strcasecmp(e, "m") == 0)
 		l *= 1000 * 1000 * 1000;
 	else
 		error("invalid file size %s", x);
