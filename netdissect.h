@@ -344,10 +344,16 @@ extern int unaligned_memcmp(const void *, const void *, size_t);
 #define PLURAL_SUFFIX(n) \
 	(((n) != 1) ? "s" : "")
 
-#if 0
-extern const char *dnname_string(netdissect_options *, u_short);
-extern const char *dnnum_string(netdissect_options *, u_short);
-#endif
+extern const char *dnname_string(u_short);
+extern const char *dnnum_string(u_short);
+
+extern int mask2plen(uint32_t);
+extern const char *tok2strary_internal(const char **, int, const char *, int);
+#define	tok2strary(a,f,i) tok2strary_internal(a, sizeof(a)/sizeof(a[0]),f,i)
+
+#ifdef INET6
+extern int mask62plen(const u_char *);
+#endif /*INET6*/
 
 /* The printer routines. */
 
@@ -573,9 +579,9 @@ extern void geneve_print(netdissect_options *, const u_char *, u_int);
 #if 0
 extern void ascii_print(netdissect_options *,u_int);
 extern void default_print(netdissect_options *,const u_char *, u_int);
-extern char *smb_errstr(netdissect_options *,int, int);
-extern const char *nt_errstr(netdissect_options *, uint32_t);
 #endif
+extern char *smb_errstr(int, int);
+extern const char *nt_errstr(uint32_t);
 
 extern u_int ipnet_if_print(netdissect_options *,const struct pcap_pkthdr *, const u_char *);
 extern u_int ppi_if_print(netdissect_options *,const struct pcap_pkthdr *, const u_char *);
@@ -600,14 +606,18 @@ extern void ospf6_print(netdissect_options *, const u_char *, u_int);
 extern void babel_print(netdissect_options *, const u_char *, u_int);
 #endif /*INET6*/
 
-#if 0
+/* checksum routines */
+extern void init_checksum(void);
+extern uint16_t verify_crc10_cksum(uint16_t, const u_char *, int);
+extern uint16_t create_osi_cksum(const uint8_t *, int, int);
+
 struct cksum_vec {
 	const uint8_t	*ptr;
 	int		len;
 };
 extern uint16_t in_cksum(const struct cksum_vec *, int);
 extern uint16_t in_cksum_shouldbe(uint16_t, uint16_t);
-#endif
+
 extern int nextproto4_cksum(netdissect_options *ndo, const struct ip *, const uint8_t *, u_int, u_int, u_int);
 extern int decode_prefix4(netdissect_options *ndo, const u_char *, u_int, char *, u_int);
 #ifdef INET6

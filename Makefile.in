@@ -75,6 +75,7 @@ CSRC =	setsignal.c tcpdump.c util.c
 LIBNETDISSECT_SRC=\
 	addrtoname.c \
 	af.c \
+	ascii_strcasecmp.c \
 	checksum.c \
 	cpack.c \
 	gmpls.c \
@@ -237,6 +238,7 @@ HDR = \
 	af.h \
 	ah.h \
 	appletalk.h \
+	ascii_strcasecmp.h \
 	atm.h \
 	chdlc.h \
 	cpack.h \
@@ -346,7 +348,6 @@ EXTRA_DIST = \
 	send-ack.awk \
 	smbutil.c \
 	stime.awk \
-	strcasecmp.c \
 	tcpdump.1.in \
 	vfprintf.c \
 	win32/Include/w32_fzs.h \

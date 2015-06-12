@@ -58,7 +58,6 @@ The Regents of the University of California.  All rights reserved.\n";
 
 #ifdef WIN32
 #include "w32_fzs.h"
-extern int strcasecmp (const char *__s1, const char *__s2);
 extern int SIZE_BUF;
 #define off_t long
 #define uint UINT
@@ -121,6 +120,7 @@ extern int SIZE_BUF;
 #include "setsignal.h"
 #include "gmt2local.h"
 #include "pcap-missing.h"
+#include "ascii_strcasecmp.h"
 
 #include "print.h"
 
@@ -1027,11 +1027,11 @@ main(int argc, char **argv)
 
 #ifdef HAVE_PCAP_SETDIRECTION
 		case 'Q':
-			if (strcasecmp(optarg, "in") == 0)
+			if (ascii_strcasecmp(optarg, "in") == 0)
 				Qflag = PCAP_D_IN;
-			else if (strcasecmp(optarg, "out") == 0)
+			else if (ascii_strcasecmp(optarg, "out") == 0)
 				Qflag = PCAP_D_OUT;
-			else if (strcasecmp(optarg, "inout") == 0)
+			else if (ascii_strcasecmp(optarg, "inout") == 0)
 				Qflag = PCAP_D_INOUT;
 			else
 				error("unknown capture direction `%s'", optarg);
@@ -1064,37 +1064,37 @@ main(int argc, char **argv)
 			break;
 
 		case 'T':
-			if (strcasecmp(optarg, "vat") == 0)
+			if (ascii_strcasecmp(optarg, "vat") == 0)
 				ndo->ndo_packettype = PT_VAT;
-			else if (strcasecmp(optarg, "wb") == 0)
+			else if (ascii_strcasecmp(optarg, "wb") == 0)
 				ndo->ndo_packettype = PT_WB;
-			else if (strcasecmp(optarg, "rpc") == 0)
+			else if (ascii_strcasecmp(optarg, "rpc") == 0)
 				ndo->ndo_packettype = PT_RPC;
-			else if (strcasecmp(optarg, "rtp") == 0)
+			else if (ascii_strcasecmp(optarg, "rtp") == 0)
 				ndo->ndo_packettype = PT_RTP;
-			else if (strcasecmp(optarg, "rtcp") == 0)
+			else if (ascii_strcasecmp(optarg, "rtcp") == 0)
 				ndo->ndo_packettype = PT_RTCP;
-			else if (strcasecmp(optarg, "snmp") == 0)
+			else if (ascii_strcasecmp(optarg, "snmp") == 0)
 				ndo->ndo_packettype = PT_SNMP;
-			else if (strcasecmp(optarg, "cnfp") == 0)
+			else if (ascii_strcasecmp(optarg, "cnfp") == 0)
 				ndo->ndo_packettype = PT_CNFP;
-			else if (strcasecmp(optarg, "tftp") == 0)
+			else if (ascii_strcasecmp(optarg, "tftp") == 0)
 				ndo->ndo_packettype = PT_TFTP;
-			else if (strcasecmp(optarg, "aodv") == 0)
+			else if (ascii_strcasecmp(optarg, "aodv") == 0)
 				ndo->ndo_packettype = PT_AODV;
-			else if (strcasecmp(optarg, "carp") == 0)
+			else if (ascii_strcasecmp(optarg, "carp") == 0)
 				ndo->ndo_packettype = PT_CARP;
-			else if (strcasecmp(optarg, "radius") == 0)
+			else if (ascii_strcasecmp(optarg, "radius") == 0)
 				ndo->ndo_packettype = PT_RADIUS;
-			else if (strcasecmp(optarg, "zmtp1") == 0)
+			else if (ascii_strcasecmp(optarg, "zmtp1") == 0)
 				ndo->ndo_packettype = PT_ZMTP1;
-			else if (strcasecmp(optarg, "vxlan") == 0)
+			else if (ascii_strcasecmp(optarg, "vxlan") == 0)
 				ndo->ndo_packettype = PT_VXLAN;
-			else if (strcasecmp(optarg, "pgm") == 0)
+			else if (ascii_strcasecmp(optarg, "pgm") == 0)
 				ndo->ndo_packettype = PT_PGM;
-			else if (strcasecmp(optarg, "pgm_zmtp1") == 0)
+			else if (ascii_strcasecmp(optarg, "pgm_zmtp1") == 0)
 				ndo->ndo_packettype = PT_PGM_ZMTP1;
-			else if (strcasecmp(optarg, "lmp") == 0)
+			else if (ascii_strcasecmp(optarg, "lmp") == 0)
 				ndo->ndo_packettype = PT_LMP;
 			else
 				error("unknown packet type `%s'", optarg);

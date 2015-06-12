@@ -49,6 +49,8 @@ addrtoname.c	- address to hostname routines
 addrtoname.h	- address to hostname definitions
 ah.h		- IPSEC Authentication Header definitions
 appletalk.h	- AppleTalk definitions
+ascii_strcasecmp.c - locale-independent case-independent string comparison
+		routines
 atime.awk	- TCP ack awk script
 atm.h		- ATM traffic type definitions
 bpf_dump.c	- BPF program printing routines, in case libpcap doesn't
@@ -202,7 +204,6 @@ slcompress.h	- SLIP/PPP Van Jacobson compression (RFC1144) definitions
 smb.h		- SMB/CIFS definitions
 smbutil.c	- SMB/CIFS utility routines
 stime.awk	- TCP send awk script
-strcasecmp.c	- missing routine
 tcp.h		- TCP definitions
 tcpdump.1	- manual entry
 tcpdump.c	- main program
