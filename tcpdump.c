@@ -267,12 +267,13 @@ remap_to_pipe(const struct dump_info *dump_info)
             error("Error DUP compressor stdout: '%s'\n", strerror(errno));
         }
         for (i=0; i<maxfd; ++i) {
-            if (i != STDIN_FILENO && i != STDOUT_FILENO)
+            if (i != STDIN_FILENO && i != STDOUT_FILENO && i != STDERR_FILENO)
                 close(i);
         }
         execvp(compressor_arg[0], compressor_arg);
         /* should not return */
-        error("Return from execvp");
+        error("Failed to execute --pipeout command %s: %s\n",
+              compressor_arg[0], strerror(errno));
     } else {
         /* parent */
         close(pipefd[0]); /* read end of pipe */
