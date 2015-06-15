@@ -101,7 +101,6 @@ struct netdissect_options {
   int ndo_sflag;		/* use the libsmi to translate OIDs */
   int ndo_Sflag;		/* print raw TCP sequence numbers */
   int ndo_tflag;		/* print packet arrival time */
-  int ndo_Uflag;		/* "unbuffered" output of dump files */
   int ndo_uflag;		/* Print undecoded NFS handles */
   int ndo_vflag;		/* verbose */
   int ndo_xflag;		/* print packet in hex */
@@ -109,21 +108,9 @@ struct netdissect_options {
   int ndo_Aflag;		/* print packet only in ascii observing TAB,
 				 * LF, CR and SPACE as graphical chars
 				 */
-  int ndo_Bflag;		/* buffer size */
-  int ndo_Iflag;		/* rfmon (monitor) mode */
-  int ndo_Oflag;                /* run filter code optimizer */
   int ndo_dlt;                  /* if != -1, ask libpcap for the DLT it names*/
-  int ndo_jflag;                /* packet time stamp source */
-  int ndo_pflag;                /* don't go promiscuous */
   int ndo_immediate;            /* use immediate mode */
 
-  int ndo_Cflag;                /* rotate dump files after this many bytes */
-  int ndo_Cflag_count;      /* Keep track of which file number we're writing */
-  int ndo_Gflag;            /* rotate dump files after this many seconds */
-  int ndo_Gflag_count;      /* number of files created with Gflag rotation */
-  time_t ndo_Gflag_time;    /* The last time_t the dump file was rotated. */
-  int ndo_Wflag;          /* recycle output files after this number of files */
-  int ndo_WflagChars;
   int ndo_Hflag;		/* dissect 802.11s draft mesh standard */
   int ndo_packet_number;	/* print a packet number in the beginning of line */
   int ndo_suppress_default_print; /* don't use default_print() for unknown packet types */
@@ -357,10 +344,16 @@ extern int unaligned_memcmp(const void *, const void *, size_t);
 #define PLURAL_SUFFIX(n) \
 	(((n) != 1) ? "s" : "")
 
-#if 0
-extern const char *dnname_string(netdissect_options *, u_short);
-extern const char *dnnum_string(netdissect_options *, u_short);
-#endif
+extern const char *dnname_string(u_short);
+extern const char *dnnum_string(u_short);
+
+extern int mask2plen(uint32_t);
+extern const char *tok2strary_internal(const char **, int, const char *, int);
+#define	tok2strary(a,f,i) tok2strary_internal(a, sizeof(a)/sizeof(a[0]),f,i)
+
+#ifdef INET6
+extern int mask62plen(const u_char *);
+#endif /*INET6*/
 
 /* The printer routines. */
 
@@ -586,9 +579,9 @@ extern void geneve_print(netdissect_options *, const u_char *, u_int);
 #if 0
 extern void ascii_print(netdissect_options *,u_int);
 extern void default_print(netdissect_options *,const u_char *, u_int);
-extern char *smb_errstr(netdissect_options *,int, int);
-extern const char *nt_errstr(netdissect_options *, uint32_t);
 #endif
+extern char *smb_errstr(int, int);
+extern const char *nt_errstr(uint32_t);
 
 extern u_int ipnet_if_print(netdissect_options *,const struct pcap_pkthdr *, const u_char *);
 extern u_int ppi_if_print(netdissect_options *,const struct pcap_pkthdr *, const u_char *);
@@ -613,14 +606,18 @@ extern void ospf6_print(netdissect_options *, const u_char *, u_int);
 extern void babel_print(netdissect_options *, const u_char *, u_int);
 #endif /*INET6*/
 
-#if 0
+/* checksum routines */
+extern void init_checksum(void);
+extern uint16_t verify_crc10_cksum(uint16_t, const u_char *, int);
+extern uint16_t create_osi_cksum(const uint8_t *, int, int);
+
 struct cksum_vec {
 	const uint8_t	*ptr;
 	int		len;
 };
 extern uint16_t in_cksum(const struct cksum_vec *, int);
 extern uint16_t in_cksum_shouldbe(uint16_t, uint16_t);
-#endif
+
 extern int nextproto4_cksum(netdissect_options *ndo, const struct ip *, const uint8_t *, u_int, u_int, u_int);
 extern int decode_prefix4(netdissect_options *ndo, const u_char *, u_int, char *, u_int);
 #ifdef INET6
@@ -636,7 +633,5 @@ extern int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 
 extern void geonet_print(netdissect_options *ndo,const u_char *eth_hdr,const u_char *geo_pck, u_int len);
 extern void calm_fast_print(netdissect_options *ndo,const u_char *eth_hdr,const u_char *calm_pck, u_int len);
-
-extern netdissect_options *gndo;
 
 #endif  /* netdissect_h */

@@ -12,7 +12,7 @@ echo -e "\033[33;1mNote: PROJECT_NAME and COVERITY_SCAN_TOKEN are available on P
 
 PLATFORM=`uname`
 TOOL_ARCHIVE=/tmp/cov-analysis-${PLATFORM}.tgz
-TOOL_URL=https://scan.coverity.com/download/${PLATFORM}
+TOOL_URL=https://scan.coverity.com/download/cxx/${PLATFORM}
 TOOL_BASE=/tmp/coverity-scan-analysis
 UPLOAD_URL="http://scan5.coverity.com/cgi-bin/travis_upload.py"
 SCAN_URL="https://scan.coverity.com"

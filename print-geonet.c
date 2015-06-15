@@ -118,7 +118,7 @@ geonet_print(netdissect_options *ndo, const u_char *eth, const u_char *bp, u_int
 	/* Process Common Header */
 	if (length < 36)
 		goto malformed;
-		
+
 	ND_TCHECK2(*bp, 7);
 	version = bp[0] >> 4;
 	next_hdr = bp[0] & 0x0f;

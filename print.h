@@ -33,12 +33,12 @@ struct print_info {
 	if_printer printer;
 };
 
-void	init_print(u_int32_t localnet, u_int32_t mask,
+void	init_print(netdissect_options *ndo, u_int32_t localnet, u_int32_t mask,
 	    uint32_t timezone_offset);
 
 int	has_printer(int type);
 
-struct print_info	get_print_info(int type);
+struct print_info	get_print_info(netdissect_options *ndo, int type);
 
 void	pretty_print_packet(struct print_info *print_info,
 	    const struct pcap_pkthdr *h, const u_char *sp,
