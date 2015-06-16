@@ -53,6 +53,9 @@
  * RFC 5176:
  *      "Dynamic Authorization Extensions to RADIUS"
  *
+ * RFC 7155:
+ *      "Diameter Network Access Server Application"
+ *
  * Alfredo Andres Omella (aandres@s21sec.com) v0.1 2000/09/15
  *
  * TODO: Among other things to print ok MacIntosh and Vendor values
@@ -476,7 +479,8 @@ static struct attrtype {
      { "Tunnel-Client-Auth-ID",           NULL, 0, 0, print_attr_string },
      { "Tunnel-Server-Auth-ID",           NULL, 0, 0, print_attr_string },
      { "NAS-Filter-Rule",                 NULL, 0, 0, print_attr_string },
-     { "Unassigned",                      NULL, 0, 0, NULL }  /*93*/
+     { "Unassigned",                      NULL, 0, 0, NULL },  /*93*/
+     { "Originating-Line-Info",           NULL, 0, 0, NULL }
   };
 
 
