@@ -47,6 +47,9 @@
  * RFC 4675:
  *      "RADIUS Attributes for Virtual LAN and Priority Support"
  *
+ * RFC 4849:
+ *      "RADIUS Filter Rule Attribute"
+ *
  * RFC 5176:
  *      "Dynamic Authorization Extensions to RADIUS"
  *
@@ -472,7 +475,7 @@ static struct attrtype {
      { "CUI",                             NULL, 0, 0, print_attr_string },
      { "Tunnel-Client-Auth-ID",           NULL, 0, 0, print_attr_string },
      { "Tunnel-Server-Auth-ID",           NULL, 0, 0, print_attr_string },
-     { "Unassigned",                      NULL, 0, 0, NULL }, /*92*/
+     { "NAS-Filter-Rule",                 NULL, 0, 0, print_attr_string },
      { "Unassigned",                      NULL, 0, 0, NULL }  /*93*/
   };
 
