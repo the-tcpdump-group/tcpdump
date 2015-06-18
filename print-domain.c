@@ -528,7 +528,7 @@ ns_rprint(netdissect_options *ndo,
 	case T_OPT:
 		ND_PRINT((ndo, " UDPsize=%u", class));
 		if (opt_flags & 0x8000)
-			ND_PRINT((ndo, " OK"));
+			ND_PRINT((ndo, " DO"));
 		break;
 
 	case T_UNSPECA:		/* One long string */
