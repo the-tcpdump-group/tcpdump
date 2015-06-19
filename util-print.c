@@ -59,7 +59,7 @@ int32_t thiszone;		/* seconds offset from gmt to local time */
 /*
  * timestamp display buffer size, the biggest size of both formats is needed
  * sizeof("0000000000.000000000") > sizeof("00:00:00.000000000")
-*/
+ */
 #define TS_BUF_SIZE sizeof("0000000000.000000000")
 
 /*
@@ -193,6 +193,43 @@ _U_
 }
 
 /*
+ * Format the timestamp - Unix timeval style
+ */
+static char *
+ts_unix_format(netdissect_options *ndo
+#ifndef HAVE_PCAP_SET_TSTAMP_PRECISION
+_U_
+#endif
+, int sec, int usec, char *buf)
+{
+	const char *format;
+
+#ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
+	switch (ndo->ndo_tstamp_precision) {
+
+	case PCAP_TSTAMP_PRECISION_MICRO:
+		format = "%u.%06u";
+		break;
+
+	case PCAP_TSTAMP_PRECISION_NANO:
+		format = "%u.%09u";
+		break;
+
+	default:
+		format = "%u.{unknown}";
+		break;
+	}
+#else
+	format = "%u.%06u";
+#endif
+
+	snprintf(buf, TS_BUF_SIZE, format,
+		 (unsigned)sec, (unsigned)usec);
+
+	return buf;
+}
+
+/*
  * Print the timestamp
  */
 void
@@ -219,9 +256,8 @@ ts_print(netdissect_options *ndo,
 		break;
 
 	case 2: /* Unix timeval style */
-		ND_PRINT((ndo, "%u.%06u ",
-			     (unsigned)tvp->tv_sec,
-			     (unsigned)tvp->tv_usec));
+		ND_PRINT((ndo, "%s ", ts_unix_format(ndo,
+			  tvp->tv_sec, tvp->tv_usec, buf)));
 		break;
 
 	case 3: /* Microseconds since previous packet */
