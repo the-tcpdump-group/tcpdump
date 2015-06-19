@@ -57,6 +57,12 @@
 int32_t thiszone;		/* seconds offset from gmt to local time */
 
 /*
+ * timestamp display buffer size, the biggest size of both formats is needed
+ * sizeof("0000000000.000000000") > sizeof("00:00:00.000000000")
+*/
+#define TS_BUF_SIZE sizeof("0000000000.000000000")
+
+/*
  * Print out a null-terminated filename (or other ascii string).
  * If ep is NULL, assume no truncation check is needed.
  * Return true if truncated.
@@ -157,9 +163,8 @@ ts_format(netdissect_options *ndo
 #ifndef HAVE_PCAP_SET_TSTAMP_PRECISION
 _U_
 #endif
-, int sec, int usec)
+, int sec, int usec, char *buf)
 {
-	static char buf[sizeof("00:00:00.000000000")];
 	const char *format;
 
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
@@ -174,14 +179,14 @@ _U_
 		break;
 
 	default:
-		format = "%02d:%02d:%02d.{unknown precision}";
+		format = "%02d:%02d:%02d.{unknown}";
 		break;
 	}
 #else
 	format = "%02d:%02d:%02d.%06u";
 #endif
 
-	snprintf(buf, sizeof(buf), format,
+	snprintf(buf, TS_BUF_SIZE, format,
                  sec / 3600, (sec % 3600) / 60, sec % 60, usec);
 
         return buf;
@@ -201,12 +206,13 @@ ts_print(netdissect_options *ndo,
 	static unsigned b_usec;
 	int d_usec;
 	int d_sec;
+	char buf[TS_BUF_SIZE];
 
 	switch (ndo->ndo_tflag) {
 
 	case 0: /* Default */
 		s = (tvp->tv_sec + thiszone) % 86400;
-		ND_PRINT((ndo, "%s ", ts_format(ndo, s, tvp->tv_usec)));
+		ND_PRINT((ndo, "%s ", ts_format(ndo, s, tvp->tv_usec, buf)));
 		break;
 
 	case 1: /* No time stamp */
@@ -234,7 +240,7 @@ ts_print(netdissect_options *ndo,
                     d_sec--;
                 }
 
-                ND_PRINT((ndo, "%s ", ts_format(ndo, d_sec, d_usec)));
+                ND_PRINT((ndo, "%s ", ts_format(ndo, d_sec, d_usec, buf)));
 
                 if (ndo->ndo_tflag == 3) { /* set timestamp for last packet */
                     b_sec = tvp->tv_sec;
@@ -242,7 +248,7 @@ ts_print(netdissect_options *ndo,
                 }
 		break;
 
-	case 4: /* Default + Date*/
+	case 4: /* Default + Date */
 		s = (tvp->tv_sec + thiszone) % 86400;
 		Time = (tvp->tv_sec + thiszone) - s;
 		tm = gmtime (&Time);
@@ -251,7 +257,7 @@ ts_print(netdissect_options *ndo,
 		else
 			ND_PRINT((ndo, "%04d-%02d-%02d %s ",
                                tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday,
-                               ts_format(ndo, s, tvp->tv_usec)));
+                               ts_format(ndo, s, tvp->tv_usec, buf)));
 		break;
 	}
 }
