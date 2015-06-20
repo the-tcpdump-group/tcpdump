@@ -85,11 +85,9 @@ extern const char *tok2str(const struct tok *, const char *, u_int);
 extern char *bittok2str(const struct tok *, const char *, u_int);
 extern char *bittok2str_nosep(const struct tok *, const char *, u_int);
 
-
 typedef struct netdissect_options netdissect_options;
 
 struct netdissect_options {
-  int ndo_aflag;		/* translate network and broadcast addresses */
   int ndo_bflag;		/* print 4 byte ASes in ASDOT notation */
   int ndo_eflag;		/* print ethernet header */
   int ndo_fflag;		/* don't translate "foreign" IP address */
