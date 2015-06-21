@@ -136,15 +136,9 @@ struct netdissect_options {
   const u_char *ndo_packetp;
   const u_char *ndo_snapend;
 
-  /* bookkeeping for ^T output */
-  int ndo_infodelay;
-
   /* pointer to void function to output stuff */
   void (*ndo_default_print)(netdissect_options *,
   		      register const u_char *bp, register u_int length);
-
-  /* pointer to function to print ^T output */
-  void (*ndo_info)(netdissect_options *, int verbose);
 
   /* pointer to function to do regular output */
   int  (*ndo_printf)(netdissect_options *,
