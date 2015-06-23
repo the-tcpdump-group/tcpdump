@@ -21,12 +21,7 @@
 
 #include <tcpdump-stdinc.h>
 
-#include <pcap.h>
-#include <stdio.h>
-#include <string.h>
-
 #include "interface.h"
-#include "extract.h"
 #include "addrtoname.h"
 
 /*
@@ -47,12 +42,12 @@ calm_fast_print(netdissect_options *ndo, const u_char *eth, const u_char *bp, u_
 	length -= 2;
 	bp += 2;
 
-	printf("CALM FAST src:%s; ", etheraddr_string(eth+6));
-	printf("SrcNwref:%d; ", srcNwref);
-	printf("DstNwref:%d; ", dstNwref);
+	ND_PRINT((ndo, "CALM FAST src:%s; ", etheraddr_string(ndo, eth+6)));
+	ND_PRINT((ndo, "SrcNwref:%d; ", srcNwref));
+	ND_PRINT((ndo, "DstNwref:%d; ", dstNwref));
 
 	if (ndo->ndo_vflag)
-		default_print(bp, length);
+		ND_DEFAULTPRINT(bp, length);
 }
 
 

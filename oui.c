@@ -1,4 +1,4 @@
-/* 
+/*
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that: (1) source code
  * distributions retain the above copyright notice and this paragraph
@@ -12,11 +12,6 @@
  *
  * Original code by Hannes Gredler (hannes@juniper.net)
  */
-
-#ifndef lint
-static const char rcsid[] _U_ =
-    "@(#) $Header: /tcpdump/master/tcpdump/oui.c,v 1.9 2008-01-09 09:40:47 hannes Exp $ (LBL)";
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -43,6 +38,15 @@ const struct tok oui_values[] = {
     { OUI_IEEE_8023_PRIVATE, "IEEE 802.3 Private"},
     { OUI_TIA, "ANSI/TIA"},
     { OUI_DCBX, "DCBX"},
+    { OUI_NICIRA, "Nicira Networks" },
+    { OUI_BSN, "Big Switch Networks" },
+    { OUI_VELLO, "Vello Systems" },
+    { OUI_HP2, "HP" },
+    { OUI_HPLABS, "HP-Labs" },
+    { OUI_INFOBLOX, "Infoblox Inc" },
+    { OUI_ONLAB, "Open Networking Lab" },
+    { OUI_FREESCALE, "Freescale" },
+    { OUI_NETRONOME, "Netronome" },
     { 0, NULL }
 };
 
