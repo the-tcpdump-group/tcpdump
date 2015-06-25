@@ -40,6 +40,9 @@
  * RFC 2869:
  *      "RADIUS Extensions"
  *
+ * RFC 3162:
+ *      "RADIUS and IPv6"
+ *
  * RFC 3580:
  *      "IEEE 802.1X Remote Authentication Dial In User Service (RADIUS)"
  *      "Usage Guidelines"
@@ -178,6 +181,8 @@ static void print_attr_string(netdissect_options *, register const u_char *, u_i
 static void print_attr_num(netdissect_options *, register const u_char *, u_int, u_short );
 static void print_vendor_attr(netdissect_options *, register const u_char *, u_int, u_short );
 static void print_attr_address(netdissect_options *, register const u_char *, u_int, u_short);
+static void print_attr_address6(netdissect_options *, register const u_char *, u_int, u_short);
+static void print_attr_netmask6(netdissect_options *, register const u_char *, u_int, u_short);
 static void print_attr_time(netdissect_options *, register const u_char *, u_int, u_short);
 static void print_attr_strange(netdissect_options *, register const u_char *, u_int, u_short);
 
@@ -480,7 +485,13 @@ static struct attrtype {
      { "Tunnel-Server-Auth-ID",           NULL, 0, 0, print_attr_string },
      { "NAS-Filter-Rule",                 NULL, 0, 0, print_attr_string },
      { "Unassigned",                      NULL, 0, 0, NULL },  /*93*/
-     { "Originating-Line-Info",           NULL, 0, 0, NULL }
+     { "Originating-Line-Info",           NULL, 0, 0, NULL },
+     { "NAS-IPv6-Address",                NULL, 0, 0, print_attr_address6 },
+     { "Framed-Interface-ID",             NULL, 0, 0, NULL },
+     { "Framed-IPv6-Prefix",              NULL, 0, 0, print_attr_netmask6 },
+     { "Login-IPv6-Host",                 NULL, 0, 0, print_attr_address6 },
+     { "Framed-IPv6-Route",               NULL, 0, 0, print_attr_string },
+     { "Framed-IPv6-Pool",                NULL, 0, 0, print_attr_string }
   };
 
 
@@ -772,6 +783,63 @@ print_attr_address(netdissect_options *ndo,
           ND_PRINT((ndo, "%s", ipaddr_string(ndo, data)));
       break;
    }
+
+   return;
+
+   trunc:
+     ND_PRINT((ndo, "%s", tstr));
+}
+
+/*****************************/
+/* Print an attribute IPv6   */
+/* address value pointed by  */
+/* 'data' and 'length' size. */
+/*****************************/
+/* Returns nothing.          */
+/*****************************/
+static void
+print_attr_address6(netdissect_options *ndo,
+                   register const u_char *data, u_int length, u_short attr_code _U_)
+{
+   if (length != 16)
+   {
+       ND_PRINT((ndo, "ERROR: length %u != 16", length));
+       return;
+   }
+
+   ND_TCHECK2(data[0], 16);
+
+   ND_PRINT((ndo, "%s", ip6addr_string(ndo, data)));
+
+   return;
+
+   trunc:
+     ND_PRINT((ndo, "%s", tstr));
+}
+
+static void
+print_attr_netmask6(netdissect_options *ndo,
+                    register const u_char *data, u_int length, u_short attr_code _U_)
+{
+   u_char data2[18];
+
+   if (length < 2 || length > 18)
+   {
+       ND_PRINT((ndo, "ERROR: length %u not in range (2..18)", length));
+       return;
+   }
+   else if (data[1] > 128)
+   {
+      ND_PRINT((ndo, "ERROR: netmask %u not in range (0..128)", data[1]));
+      return;
+   }
+
+   ND_TCHECK2(data[0], length);
+   memset(data2, 0, sizeof(data2));
+   if (length > 2)
+      memcpy(data2, data+2, length-2);
+
+   ND_PRINT((ndo, "%s/%u", ip6addr_string(ndo, data2), data[1]));
 
    return;
 
