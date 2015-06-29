@@ -202,6 +202,7 @@ static const struct tok bgp_opt_values[] = {
 #define BGP_CAPCODE_RESTART            64 /* draft-ietf-idr-restart-05  */
 #define BGP_CAPCODE_AS_NEW             65 /* XXX */
 #define BGP_CAPCODE_DYN_CAP            67 /* XXX */
+#define BGP_CAPCODE_ADD_PATH           69 /* draft-ietf-idr-add-paths-10 */
 #define BGP_CAPCODE_RR_CISCO          128
 
 static const struct tok bgp_capcode_values[] = {
@@ -211,6 +212,7 @@ static const struct tok bgp_capcode_values[] = {
     { BGP_CAPCODE_RESTART,      "Graceful Restart"},
     { BGP_CAPCODE_AS_NEW,       "32-Bit AS Number"},
     { BGP_CAPCODE_DYN_CAP,      "Dynamic Capability"},
+    { BGP_CAPCODE_ADD_PATH,     "Multiple Paths"},
     { BGP_CAPCODE_RR_CISCO,     "Route Refresh (Cisco)"},
     { 0, NULL}
 };
@@ -459,6 +461,14 @@ static const struct tok bgp_extd_comm_ospf_rtype_values[] = {
   { BGP_OSPF_RTYPE_EXT, "External" },
   { BGP_OSPF_RTYPE_NSSA,"NSSA External" },
   { BGP_OSPF_RTYPE_SHAM,"MPLS-VPN Sham" },
+  { 0, NULL },
+};
+
+/* ADD-PATH Send/Receive field values */
+static const struct tok bgp_add_path_recvsend[] = {
+  { 1, "Receive" },
+  { 2, "Send" },
+  { 3, "Both" },
   { 0, NULL },
 };
 
@@ -2318,6 +2328,28 @@ bgp_capabilities_print(netdissect_options *ndo,
                         ND_PRINT((ndo, "\n\t\t 4 Byte AS %s",
                             as_printf(ndo, astostr, sizeof(astostr),
                             EXTRACT_32BITS(opt + i + 2))));
+                    }
+                    break;
+                case BGP_CAPCODE_ADD_PATH:
+                    cap_offset=2;
+                    if (tcap_len == 0) {
+                        ND_PRINT((ndo, " (bogus)")); /* length */
+                        break;
+                    }
+                    while (tcap_len > 0) {
+                        if (tcap_len < 4) {
+                            ND_PRINT((ndo, "\n\t\t(malformed)"));
+                            break;
+                        }
+                        ND_PRINT((ndo, "\n\t\tAFI %s (%u), SAFI %s (%u), Send/Receive: %s",
+                                  tok2str(af_values,"Unknown",EXTRACT_16BITS(opt+i+cap_offset)),
+                                  EXTRACT_16BITS(opt+i+cap_offset),
+                                  tok2str(bgp_safi_values,"Unknown",opt[i+cap_offset+2]),
+                                  opt[i+cap_offset+2],
+                                  tok2str(bgp_add_path_recvsend,"Bogus (0x%02x)",opt[i+cap_offset+3])
+                        ));
+                        tcap_len-=4;
+                        cap_offset+=4;
                     }
                     break;
                 default:
