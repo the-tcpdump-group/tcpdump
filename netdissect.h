@@ -76,7 +76,6 @@ struct tok {
 	const char *s;		/* string */
 };
 
-#define TOKBUFSIZE 128
 extern const char *tok2strbuf(const struct tok *, const char *, u_int,
 			      char *buf, size_t bufsize);
 

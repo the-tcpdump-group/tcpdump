@@ -62,6 +62,8 @@ int32_t thiszone;		/* seconds offset from gmt to local time */
  */
 #define TS_BUF_SIZE sizeof("0000000000.000000000")
 
+#define TOKBUFSIZE 128
+
 /*
  * Print out a null-terminated filename (or other ascii string).
  * If ep is NULL, assume no truncation check is needed.
@@ -383,7 +385,7 @@ const char *
 tok2str(register const struct tok *lp, register const char *fmt,
 	register u_int v)
 {
-	static char buf[4][128];
+	static char buf[4][TOKBUFSIZE];
 	static int idx = 0;
 	char *ret;
 
@@ -465,7 +467,7 @@ const char *
 tok2strary_internal(register const char **lp, int n, register const char *fmt,
 	register int v)
 {
-	static char buf[128];
+	static char buf[TOKBUFSIZE];
 
 	if (v >= 0 && v < n && lp[v] != NULL)
 		return lp[v];
