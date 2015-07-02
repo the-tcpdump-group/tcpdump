@@ -2172,9 +2172,9 @@ bgp_attr_print(netdissect_options *ndo,
 		    type = *tptr;
 		    length = EXTRACT_16BITS(tptr+1);
 
-		    printf("\n\t    %s TLV (%u), length %u",
-			   tok2str(bgp_aigp_values, "Unknown", type),
-			   type, length);
+		    ND_PRINT((ndo, "\n\t    %s TLV (%u), length %u",
+			      tok2str(bgp_aigp_values, "Unknown", type),
+			      type, length));
 
 
 		    /*
@@ -2186,7 +2186,8 @@ bgp_attr_print(netdissect_options *ndo,
 
 		    case BGP_AIGP_TLV:
 		        ND_TCHECK2(tptr[3], 8);
-			printf(", metric %" PRIu64, EXTRACT_64BITS(tptr+3));
+			ND_PRINT((ndo, ", metric %" PRIu64,
+				  EXTRACT_64BITS(tptr+3)));
 			break;
 
 		    default:
