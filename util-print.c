@@ -53,6 +53,7 @@
 
 #include "interface.h"
 #include "ascii_strcasecmp.h"
+#include "timeval-operations.h"
 
 int32_t thiszone;		/* seconds offset from gmt to local time */
 
@@ -241,11 +242,11 @@ ts_print(netdissect_options *ndo,
 	register int s;
 	struct tm *tm;
 	time_t Time;
-	static unsigned b_sec;
-	static unsigned b_usec;
-	int d_usec;
-	int d_sec;
 	char buf[TS_BUF_SIZE];
+	static struct timeval tv_ref;
+	struct timeval tv_result;
+	int negative_offset;
+	int nano_prec;
 
 	switch (ndo->ndo_tflag) {
 
@@ -262,28 +263,39 @@ ts_print(netdissect_options *ndo,
 			  tvp->tv_sec, tvp->tv_usec, buf)));
 		break;
 
-	case 3: /* Microseconds since previous packet */
-        case 5: /* Microseconds since first packet */
-		if (b_sec == 0) {
-                        /* init timestamp for first packet */
-                        b_usec = tvp->tv_usec;
-                        b_sec = tvp->tv_sec;
-                }
+	case 3: /* Microseconds/nanoseconds since previous packet */
+        case 5: /* Microseconds/nanoseconds since first packet */
+#ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
+		switch (ndo->ndo_tstamp_precision) {
+		case PCAP_TSTAMP_PRECISION_MICRO:
+			nano_prec = 0;
+			break;
+		case PCAP_TSTAMP_PRECISION_NANO:
+			nano_prec = 1;
+			break;
+		default:
+			nano_prec = 0;
+			break;
+		}
+#else
+		nano_prec = 0;
+#endif
+		if (!(tcpdump_timevalisset(&tv_ref)))
+			tv_ref = *tvp; /* set timestamp for first packet */
 
-                d_usec = tvp->tv_usec - b_usec;
-                d_sec = tvp->tv_sec - b_sec;
+		negative_offset = tcpdump_timevalcmp(tvp, &tv_ref, <);
+		if (negative_offset)
+			tcpdump_timevalsub(&tv_ref, tvp, &tv_result, nano_prec);
+		else
+			tcpdump_timevalsub(tvp, &tv_ref, &tv_result, nano_prec);
 
-                while (d_usec < 0) {
-                    d_usec += 1000000;
-                    d_sec--;
-                }
+		ND_PRINT((ndo, (negative_offset ? "-" : " ")));
 
-                ND_PRINT((ndo, "%s ", ts_format(ndo, d_sec, d_usec, buf)));
+		ND_PRINT((ndo, "%s ", ts_format(ndo,
+			  tv_result.tv_sec, tv_result.tv_usec, buf)));
 
-                if (ndo->ndo_tflag == 3) { /* set timestamp for last packet */
-                    b_sec = tvp->tv_sec;
-                    b_usec = tvp->tv_usec;
-                }
+                if (ndo->ndo_tflag == 3)
+			tv_ref = *tvp; /* set timestamp for previous packet */
 		break;
 
 	case 4: /* Default + Date */
