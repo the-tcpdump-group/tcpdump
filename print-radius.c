@@ -56,6 +56,9 @@
  * RFC 5176:
  *      "Dynamic Authorization Extensions to RADIUS"
  *
+ * RFC 5580:
+ *      "Carrying Location Objects in RADIUS and Diameter"
+ *
  * RFC 7155:
  *      "Diameter Network Access Server Application"
  *
@@ -163,6 +166,8 @@ static const struct tok radius_command_values[] = {
 
 #define TUNNEL_CLIENT_AUTH 90
 #define TUNNEL_SERVER_AUTH 91
+
+#define ERROR_CAUSE 101
 /********************************/
 /* End Radius Attribute types */
 /********************************/
@@ -382,6 +387,47 @@ static const char *prompt[]={ "No Echo",
                               "Echo",
                             };
 
+/* Error-Cause standard values */
+#define ERROR_CAUSE_RESIDUAL_CONTEXT_REMOVED 201
+#define ERROR_CAUSE_INVALID_EAP_PACKET 202
+#define ERROR_CAUSE_UNSUPPORTED_ATTRIBUTE 401
+#define ERROR_CAUSE_MISSING_ATTRIBUTE 402
+#define ERROR_CAUSE_NAS_IDENTIFICATION_MISMATCH 403
+#define ERROR_CAUSE_INVALID_REQUEST 404
+#define ERROR_CAUSE_UNSUPPORTED_SERVICE 405
+#define ERROR_CAUSE_UNSUPPORTED_EXTENSION 406
+#define ERROR_CAUSE_INVALID_ATTRIBUTE_VALUE 407
+#define ERROR_CAUSE_ADMINISTRATIVELY_PROHIBITED 501
+#define ERROR_CAUSE_PROXY_REQUEST_NOT_ROUTABLE 502
+#define ERROR_CAUSE_SESSION_CONTEXT_NOT_FOUND 503
+#define ERROR_CAUSE_SESSION_CONTEXT_NOT_REMOVABLE 504
+#define ERROR_CAUSE_PROXY_PROCESSING_ERROR 505
+#define ERROR_CAUSE_RESOURCES_UNAVAILABLE 506
+#define ERROR_CAUSE_REQUEST_INITIATED 507
+#define ERROR_CAUSE_MULTIPLE_SESSION_SELECTION_UNSUPPORTED 508
+#define ERROR_CAUSE_LOCATION_INFO_REQUIRED 509
+static const struct tok errorcausetype[] = {
+                                 { ERROR_CAUSE_RESIDUAL_CONTEXT_REMOVED,               "Residual Session Context Removed" },
+                                 { ERROR_CAUSE_INVALID_EAP_PACKET,                     "Invalid EAP Packet (Ignored)" },
+                                 { ERROR_CAUSE_UNSUPPORTED_ATTRIBUTE,                  "Unsupported Attribute" },
+                                 { ERROR_CAUSE_MISSING_ATTRIBUTE,                      "Missing Attribute" },
+                                 { ERROR_CAUSE_NAS_IDENTIFICATION_MISMATCH,            "NAS Identification Mismatch" },
+                                 { ERROR_CAUSE_INVALID_REQUEST,                        "Invalid Request" },
+                                 { ERROR_CAUSE_UNSUPPORTED_SERVICE,                    "Unsupported Service" },
+                                 { ERROR_CAUSE_UNSUPPORTED_EXTENSION,                  "Unsupported Extension" },
+                                 { ERROR_CAUSE_INVALID_ATTRIBUTE_VALUE,                "Invalid Attribute Value" },
+                                 { ERROR_CAUSE_ADMINISTRATIVELY_PROHIBITED,            "Administratively Prohibited" },
+                                 { ERROR_CAUSE_PROXY_REQUEST_NOT_ROUTABLE,             "Request Not Routable (Proxy)" },
+                                 { ERROR_CAUSE_SESSION_CONTEXT_NOT_FOUND,              "Session Context Not Found" },
+                                 { ERROR_CAUSE_SESSION_CONTEXT_NOT_REMOVABLE,          "Session Context Not Removable" },
+                                 { ERROR_CAUSE_PROXY_PROCESSING_ERROR,                 "Other Proxy Processing Error" },
+                                 { ERROR_CAUSE_RESOURCES_UNAVAILABLE,                  "Resources Unavailable" },
+                                 { ERROR_CAUSE_REQUEST_INITIATED,                      "Request Initiated" },
+                                 { ERROR_CAUSE_MULTIPLE_SESSION_SELECTION_UNSUPPORTED, "Multiple Session Selection Unsupported" },
+                                 { ERROR_CAUSE_LOCATION_INFO_REQUIRED,                 "Location Info Required" },
+																 { 0, NULL }
+                               };
+
 
 static struct attrtype {
                   const char *name;      /* Attribute name                 */
@@ -491,7 +537,8 @@ static struct attrtype {
      { "Framed-IPv6-Prefix",              NULL, 0, 0, print_attr_netmask6 },
      { "Login-IPv6-Host",                 NULL, 0, 0, print_attr_address6 },
      { "Framed-IPv6-Route",               NULL, 0, 0, print_attr_string },
-     { "Framed-IPv6-Pool",                NULL, 0, 0, print_attr_string }
+     { "Framed-IPv6-Pool",                NULL, 0, 0, print_attr_string },
+     { "Error-Cause",                     NULL, 0, 0, print_attr_strange }
   };
 
 
@@ -893,6 +940,7 @@ print_attr_strange(netdissect_options *ndo,
                    register const u_char *data, u_int length, u_short attr_code)
 {
    u_short len_data;
+   u_int error_cause_value;
 
    switch(attr_code)
    {
@@ -951,6 +999,18 @@ print_attr_strange(netdissect_options *ndo,
            ND_TCHECK2(data[0],8);
            len_data = 8;
            PRINT_HEX(len_data, data);
+        break;
+
+      case ERROR_CAUSE:
+           if (length != 4)
+           {
+               ND_PRINT((ndo, "Error: length %u != 4", length));
+               return;
+           }
+           ND_TCHECK2(data[0],4);
+
+           error_cause_value = EXTRACT_32BITS(data);
+           ND_PRINT((ndo, "Error cause %u: %s", error_cause_value, tok2str(errorcausetype, "Error-Cause %u not known", error_cause_value)));
         break;
    }
    return;
