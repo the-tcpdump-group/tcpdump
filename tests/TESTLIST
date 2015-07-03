@@ -373,3 +373,4 @@ heap-overflow-2	heap-overflow-2.pcap		heap-overflow-2.out	-t -v -n
 heapoverflow-atalk_print	heapoverflow-atalk_print.pcap	heapoverflow-atalk_print.out	-t -v -n
 heapoverflow-EXTRACT_16BITS	heapoverflow-EXTRACT_16BITS.pcap	heapoverflow-EXTRACT_16BITS.out	-t -v -n
 heapoverflow-ppp_hdlc_if_print	heapoverflow-ppp_hdlc_if_print.pcap	heapoverflow-ppp_hdlc_if_print.out	-t -v -n
+heapoverflow-sl_if_print	heapoverflow-sl_if_print.pcap	heapoverflow-sl_if_print.out	-t -v -n

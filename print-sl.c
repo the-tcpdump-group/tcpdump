@@ -68,12 +68,18 @@ sl_if_print(netdissect_options *ndo,
 		return (caplen);
 	}
 
+	caplen -= SLIP_HDRLEN;
 	length -= SLIP_HDRLEN;
 
 	ip = (const struct ip *)(p + SLIP_HDRLEN);
 
 	if (ndo->ndo_eflag)
 		sliplink_print(ndo, p, ip, length);
+
+	if (caplen < 1 || length < 1) {
+		ND_PRINT((ndo, "%s", tstr));
+		return (caplen + SLIP_HDRLEN);
+	}
 
 	switch (IP_V(ip)) {
 	case 4:
