@@ -120,14 +120,7 @@ struct netdissect_options {
 
   char *ndo_sigsecret;     	/* Signature verification secret key */
 
-  struct esp_algorithm *ndo_espsecret_xform;   /* cache of decoded  */
-  char                 *ndo_espsecret_key;
-
   int   ndo_packettype;	/* as specified by -T */
-
-  char *ndo_program_name;	/*used to generate self-identifying messages */
-
-  int32_t ndo_thiszone;	/* seconds offset from gmt to local time */
 
   int   ndo_snaplen;
 
@@ -287,11 +280,6 @@ extern int fn_printzp(netdissect_options *, const u_char *, u_int, const u_char 
 
 extern void txtproto_print(netdissect_options *, const u_char *, u_int,
     const char *, const char **, u_int);
-
-#if 0
-extern char *read_infile(netdissect_options *, char *);
-extern char *copy_argv(netdissect_options *, char **);
-#endif
 
 /*
  * Locale-independent macros for testing character properties and
@@ -567,10 +555,6 @@ extern void geneve_print(netdissect_options *, const u_char *, u_int);
 
 /* stuff that has not yet been rototiled */
 
-#if 0
-extern void ascii_print(netdissect_options *,u_int);
-extern void default_print(netdissect_options *,const u_char *, u_int);
-#endif
 extern char *smb_errstr(int, int);
 extern const char *nt_errstr(uint32_t);
 

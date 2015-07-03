@@ -86,8 +86,6 @@ extern void warning(const char *, ...)
 extern char *read_infile(char *);
 extern char *copy_argv(char **);
 
-/* The printer routines. */
-
 #include <pcap.h>
 
 #ifndef HAVE_BPF_DUMP
