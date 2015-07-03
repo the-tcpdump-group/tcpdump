@@ -609,7 +609,7 @@ tcp_print(netdissect_options *ndo,
                                 if (datalen)
                                         ND_PRINT((ndo, " 0x"));
                                 for (i = 0; i < datalen; ++i) {
-                                        LENCHECK(i);
+                                        LENCHECK(i + 1);
                                         ND_PRINT((ndo, "%02x", cp[i]));
                                 }
                                 break;
