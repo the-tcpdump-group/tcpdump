@@ -189,8 +189,6 @@ tcp_print(netdissect_options *ndo,
         sport = EXTRACT_16BITS(&tp->th_sport);
         dport = EXTRACT_16BITS(&tp->th_dport);
 
-        hlen = TH_OFF(tp) * 4;
-
         if (ip6) {
                 if (ip6->ip6_nxt == IPPROTO_TCP) {
                         ND_PRINT((ndo, "%s.%s > %s.%s: ",
@@ -215,13 +213,15 @@ tcp_print(netdissect_options *ndo,
                 }
         }
 
+        ND_TCHECK(*tp);
+
+        hlen = TH_OFF(tp) * 4;
+
         if (hlen < sizeof(*tp)) {
                 ND_PRINT((ndo, " tcp %d [bad hdr length %u - too short, < %lu]",
                              length - hlen, hlen, (unsigned long)sizeof(*tp)));
                 return;
         }
-
-        ND_TCHECK(*tp);
 
         seq = EXTRACT_32BITS(&tp->th_seq);
         ack = EXTRACT_32BITS(&tp->th_ack);
