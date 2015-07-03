@@ -56,6 +56,9 @@
  * RFC 4849:
  *      "RADIUS Filter Rule Attribute"
  *
+ * RFC 5090:
+ *      "RADIUS Extension for Digest Authentication"
+ *
  * RFC 5176:
  *      "Dynamic Authorization Extensions to RADIUS"
  *
@@ -542,7 +545,27 @@ static struct attrtype {
      { "Framed-IPv6-Route",               NULL, 0, 0, print_attr_string },
      { "Framed-IPv6-Pool",                NULL, 0, 0, print_attr_string },
      { "Error-Cause",                     NULL, 0, 0, print_attr_strange },
-     { "EAP-Key-Name",                    NULL, 0, 0, NULL }
+     { "EAP-Key-Name",                    NULL, 0, 0, NULL },
+     { "Digest-Response",                 NULL, 0, 0, print_attr_string },
+     { "Digest-Realm",                    NULL, 0, 0, print_attr_string },
+     { "Digest-Nonce",                    NULL, 0, 0, print_attr_string },
+     { "Digest-Response-Auth",            NULL, 0, 0, print_attr_string },
+     { "Digest-Nextnonce",                NULL, 0, 0, print_attr_string },
+     { "Digest-Method",                   NULL, 0, 0, print_attr_string },
+     { "Digest-URI",                      NULL, 0, 0, print_attr_string },
+     { "Digest-Qop",                      NULL, 0, 0, print_attr_string },
+     { "Digest-Algorithm",                NULL, 0, 0, print_attr_string },
+     { "Digest-Entity-Body-Hash",         NULL, 0, 0, print_attr_string },
+     { "Digest-CNonce",                   NULL, 0, 0, print_attr_string },
+     { "Digest-Nonce-Count",              NULL, 0, 0, print_attr_string },
+     { "Digest-Username",                 NULL, 0, 0, print_attr_string },
+     { "Digest-Opaque",                   NULL, 0, 0, print_attr_string },
+     { "Digest-Auth-Param",               NULL, 0, 0, print_attr_string },
+     { "Digest-AKA-Auts",                 NULL, 0, 0, print_attr_string },
+     { "Digest-Domain",                   NULL, 0, 0, print_attr_string },
+     { "Digest-Stale",                    NULL, 0, 0, print_attr_string },
+     { "Digest-HA1",                      NULL, 0, 0, print_attr_string },
+     { "SIP-AOR",                         NULL, 0, 0, print_attr_string }
   };
 
 
