@@ -565,7 +565,7 @@ extern const u_char * ns_nprint (netdissect_options *, register const u_char *, 
 extern void ns_print(netdissect_options *, const u_char *, u_int, int);
 extern void nsh_print(netdissect_options *ndo, const u_char *bp, u_int len);
 extern void ntp_print(netdissect_options *, const u_char *, u_int);
-extern int oam_print(netdissect_options *, const u_char *, u_int, u_int);
+extern void oam_print(netdissect_options *, const u_char *, u_int, u_int);
 extern void olsr_print(netdissect_options *, const u_char *, u_int, int);
 extern void openflow_print(netdissect_options *, const u_char *, const u_int);
 extern void ospf6_print(netdissect_options *, const u_char *, u_int);
