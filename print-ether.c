@@ -360,7 +360,11 @@ ethertype_print(netdissect_options *ndo,
 		return (1);
 
 	case ETHERTYPE_ISO:
-		isoclns_print(ndo, p + 1, length - 1, length - 1);
+		if (length == 0 || caplen == 0) {
+			ND_PRINT((ndo, " [|osi]"));
+			return (1);
+		}
+		isoclns_print(ndo, p + 1, length - 1, caplen - 1);
 		return(1);
 
 	case ETHERTYPE_PPPOED:
