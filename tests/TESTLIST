@@ -383,3 +383,4 @@ calm-fast-mac-lookup-heapoverflow	calm-fast-mac-lookup-heapoverflow.pcap	calm-fa
 geonet-mac-lookup-heapoverflow	geonet-mac-lookup-heapoverflow.pcap	geonet-mac-lookup-heapoverflow.out	-t -v -n
 radiotap-heapoverflow	radiotap-heapoverflow.pcap	radiotap-heapoverflow.out -t -v -n
 isoclns-heapoverflow	isoclns-heapoverflow.pcap	isoclns-heapoverflow.out	-t -v -n
+tcp-auth-heapoverflow	tcp-auth-heapoverflow.pcap	tcp-auth-heapoverflow.out	-t -v -n
