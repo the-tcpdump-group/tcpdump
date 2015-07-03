@@ -77,7 +77,14 @@ u_int
 ltalk_if_print(netdissect_options *ndo,
                const struct pcap_pkthdr *h, const u_char *p)
 {
-	return (llap_print(ndo, p, h->caplen));
+	u_int hdrlen;
+
+	hdrlen = llap_print(ndo, p, h->caplen);
+	if (hdrlen == 0) {
+		/* Cut short by the snapshot length. */
+		return (h->caplen);
+	}
+	return (hdrlen);
 }
 
 /*
@@ -93,6 +100,10 @@ llap_print(netdissect_options *ndo,
 	u_short snet;
 	u_int hdrlen;
 
+	if (!ND_TTEST2(*bp, sizeof(*lp))) {
+		ND_PRINT((ndo, " [|llap]"));
+		return (0);	/* cut short by the snapshot length */
+	}
 	if (length < sizeof(*lp)) {
 		ND_PRINT((ndo, " [|llap %u]", length));
 		return (length);
@@ -104,6 +115,10 @@ llap_print(netdissect_options *ndo,
 	switch (lp->type) {
 
 	case lapShortDDP:
+		if (!ND_TTEST2(*bp, ddpSSize)) {
+			ND_PRINT((ndo, " [|sddp]"));
+			return (0);	/* cut short by the snapshot length */
+		}
 		if (length < ddpSSize) {
 			ND_PRINT((ndo, " [|sddp %u]", length));
 			return (length);
@@ -120,6 +135,10 @@ llap_print(netdissect_options *ndo,
 		break;
 
 	case lapDDP:
+		if (!ND_TTEST2(*bp, ddpSize)) {
+			ND_PRINT((ndo, " [|ddp]"));
+			return (0);	/* cut short by the snapshot length */
+		}
 		if (length < ddpSize) {
 			ND_PRINT((ndo, " [|ddp %u]", length));
 			return (length);
@@ -166,6 +185,10 @@ atalk_print(netdissect_options *ndo,
         if(!ndo->ndo_eflag)
             ND_PRINT((ndo, "AT "));
 
+	if (!ND_TTEST2(*bp, ddpSize)) {
+		ND_PRINT((ndo, " [|ddp]"));
+		return;
+	}
 	if (length < ddpSize) {
 		ND_PRINT((ndo, " [|ddp %u]", length));
 		return;
