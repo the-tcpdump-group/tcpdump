@@ -79,7 +79,7 @@ ltalk_if_print(netdissect_options *ndo,
 {
 	u_int hdrlen;
 
-	hdrlen = llap_print(ndo, p, h->caplen);
+	hdrlen = llap_print(ndo, p, h->len);
 	if (hdrlen == 0) {
 		/* Cut short by the snapshot length. */
 		return (h->caplen);
