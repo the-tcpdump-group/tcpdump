@@ -377,3 +377,5 @@ heapoverflow-sl_if_print	heapoverflow-sl_if_print.pcap	heapoverflow-sl_if_print.
 heapoverflow-ip_print_demux	heapoverflow-ip_print_demux.pcap	heapoverflow-ip_print_demux.out	-t -v -n
 heapoverflow-in_checksum	heapoverflow-in_checksum.pcap	heapoverflow-in_checksum.out	-t -v -n
 heapoverflow-tcp_print	heapoverflow-tcp_print.pcap	heapoverflow-tcp_print.out	-t -v -n
+gre-heapoverflow-1	gre-heapoverflow-1.pcap	gre-heapoverflow-1.out	-t -v -n
+gre-heapoverflow-2	gre-heapoverflow-2.pcap	gre-heapoverflow-2.out	-t -v -n
