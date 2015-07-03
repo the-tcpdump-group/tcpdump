@@ -53,6 +53,9 @@
  * RFC 4675:
  *      "RADIUS Attributes for Virtual LAN and Priority Support"
  *
+ * RFC 4818:
+ *      "RADIUS Delegated-IPv6-Prefix Attribute"
+ *
  * RFC 4849:
  *      "RADIUS Filter Rule Attribute"
  *
@@ -565,7 +568,8 @@ static struct attrtype {
      { "Digest-Domain",                   NULL, 0, 0, print_attr_string },
      { "Digest-Stale",                    NULL, 0, 0, print_attr_string },
      { "Digest-HA1",                      NULL, 0, 0, print_attr_string },
-     { "SIP-AOR",                         NULL, 0, 0, print_attr_string }
+     { "SIP-AOR",                         NULL, 0, 0, print_attr_string },
+     { "Delegated-IPv6-Prefix",           NULL, 0, 0, print_attr_netmask6 }
   };
 
 
