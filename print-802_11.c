@@ -3115,6 +3115,9 @@ ieee802_11_radio_print(netdissect_options *ndo,
 
 	len = EXTRACT_LE_16BITS(&hdr->it_len);
 
+	/*
+	 * If we don't have the entire radiotap header, just give up.
+	 */
 	if (caplen < len) {
 		ND_PRINT((ndo, "%s", tstr));
 		return caplen;
@@ -3122,13 +3125,13 @@ ieee802_11_radio_print(netdissect_options *ndo,
 	cpack_init(&cpacker, (const uint8_t *)hdr, len); /* align against header start */
 	cpack_advance(&cpacker, sizeof(*hdr)); /* includes the 1st bitmap */
 	for (last_presentp = &hdr->it_present;
-	     IS_EXTENDED(last_presentp) &&
-	     (const u_char*)(last_presentp + 1) <= p + len;
+	     (const u_char*)(last_presentp + 1) <= p + len &&
+	     IS_EXTENDED(last_presentp);
 	     last_presentp++)
 	  cpack_advance(&cpacker, sizeof(hdr->it_present)); /* more bitmaps */
 
 	/* are there more bitmap extensions than bytes in header? */
-	if (IS_EXTENDED(last_presentp)) {
+	if ((const u_char*)(last_presentp + 1) > p + len) {
 		ND_PRINT((ndo, "%s", tstr));
 		return caplen;
 	}

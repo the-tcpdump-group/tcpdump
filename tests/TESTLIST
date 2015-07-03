@@ -381,3 +381,4 @@ gre-heapoverflow-1	gre-heapoverflow-1.pcap	gre-heapoverflow-1.out	-t -v -n
 gre-heapoverflow-2	gre-heapoverflow-2.pcap	gre-heapoverflow-2.out	-t -v -n
 calm-fast-mac-lookup-heapoverflow	calm-fast-mac-lookup-heapoverflow.pcap	calm-fast-mac-lookup-heapoverflow.out	-t -v -n
 geonet-mac-lookup-heapoverflow	geonet-mac-lookup-heapoverflow.pcap	geonet-mac-lookup-heapoverflow.out	-t -v -n
+radiotap-heapoverflow	radiotap-heapoverflow.pcap	radiotap-heapoverflow.out -t -v -n
