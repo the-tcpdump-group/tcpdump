@@ -47,6 +47,9 @@
  *      "IEEE 802.1X Remote Authentication Dial In User Service (RADIUS)"
  *      "Usage Guidelines"
  *
+ * RFC 4072:
+ *      "Diameter Extensible Authentication Protocol (EAP) Application"
+ *
  * RFC 4675:
  *      "RADIUS Attributes for Virtual LAN and Priority Support"
  *
@@ -538,7 +541,8 @@ static struct attrtype {
      { "Login-IPv6-Host",                 NULL, 0, 0, print_attr_address6 },
      { "Framed-IPv6-Route",               NULL, 0, 0, print_attr_string },
      { "Framed-IPv6-Pool",                NULL, 0, 0, print_attr_string },
-     { "Error-Cause",                     NULL, 0, 0, print_attr_strange }
+     { "Error-Cause",                     NULL, 0, 0, print_attr_strange },
+     { "EAP-Key-Name",                    NULL, 0, 0, NULL }
   };
 
 
