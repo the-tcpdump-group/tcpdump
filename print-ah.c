@@ -54,8 +54,10 @@ ah_print(netdissect_options *ndo, register const u_char *bp)
 	if (ndo->ndo_vflag)
 		ND_PRINT((ndo, ",sumlen=%d", sumlen));
 	ND_PRINT((ndo, ",seq=0x%x", EXTRACT_32BITS(ah + 1)));
-	if (bp + sizeof(struct ah) + sumlen > ep)
-		ND_PRINT((ndo, "[truncated]"));
+	if (!ND_TTEST2(*bp, sizeof(struct ah) + sumlen)) {
+		ND_PRINT((ndo, "[truncated]):"));
+		return -1;
+	}
 	ND_PRINT((ndo, "): "));
 
 	return sizeof(struct ah) + sumlen;
