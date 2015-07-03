@@ -371,3 +371,4 @@ bfd-raw-auth-sha1-v bfd-raw-auth-sha1.pcap bfd-raw-auth-sha1-v.out -t -v
 heap-overflow-1	heap-overflow-1.pcap		heap-overflow-1.out	-t -v -n
 heap-overflow-2	heap-overflow-2.pcap		heap-overflow-2.out	-t -v -n
 heapoverflow-atalk_print	heapoverflow-atalk_print.pcap	heapoverflow-atalk_print.out	-t -v -n
+heapoverflow-EXTRACT_16BITS	heapoverflow-EXTRACT_16BITS.pcap	heapoverflow-EXTRACT_16BITS.out	-t -v -n
