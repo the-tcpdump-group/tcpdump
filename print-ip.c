@@ -330,6 +330,10 @@ again:
 	switch (ipds->nh) {
 
 	case IPPROTO_AH:
+		if (!ND_TTEST(*ipds->cp)) {
+			ND_PRINT((ndo, "[|AH]"));
+			break;
+		}
 		ipds->nh = *ipds->cp;
 		ipds->advance = ah_print(ndo, ipds->cp);
 		if (ipds->advance <= 0)
