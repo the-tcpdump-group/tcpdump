@@ -746,7 +746,8 @@ juniper_pppoe_atm_print(netdissect_options *ndo,
         if (ethertype_print(ndo, extracted_ethertype,
                               p+ETHERTYPE_LEN,
                               l2info.length-ETHERTYPE_LEN,
-                              l2info.caplen-ETHERTYPE_LEN) == 0)
+                              l2info.caplen-ETHERTYPE_LEN,
+                              NULL, NULL) == 0)
             /* ether_type not known, probably it wasn't one */
             ND_PRINT((ndo, "unknown ethertype 0x%04x", extracted_ethertype));
 

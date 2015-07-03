@@ -93,6 +93,7 @@ ipfc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 {
 	const struct ipfc_header *ipfcp = (const struct ipfc_header *)p;
 	struct ether_header ehdr;
+	struct lladdr_info src, dst;
 	int llc_hdrlen;
 
 	if (caplen < IPFC_HDRLEN) {
@@ -107,13 +108,18 @@ ipfc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen)
 	if (ndo->ndo_eflag)
 		ipfc_hdr_print(ndo, ipfcp, length, ESRC(&ehdr), EDST(&ehdr));
 
+	src.addr = ESRC(&ehdr);
+	src.addr_string = etheraddr_string;
+	dst.addr = EDST(&ehdr);
+	dst.addr_string = etheraddr_string;
+
 	/* Skip over Network_Header */
 	length -= IPFC_HDRLEN;
 	p += IPFC_HDRLEN;
 	caplen -= IPFC_HDRLEN;
 
 	/* Try to print the LLC-layer header & higher layers */
-	llc_hdrlen = llc_print(ndo, p, length, caplen, ESRC(&ehdr), EDST(&ehdr));
+	llc_hdrlen = llc_print(ndo, p, length, caplen, &src, &dst);
 	if (llc_hdrlen < 0) {
 		/*
 		 * Some kinds of LLC packet we cannot

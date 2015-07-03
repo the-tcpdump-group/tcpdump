@@ -379,3 +379,5 @@ heapoverflow-in_checksum	heapoverflow-in_checksum.pcap	heapoverflow-in_checksum.
 heapoverflow-tcp_print	heapoverflow-tcp_print.pcap	heapoverflow-tcp_print.out	-t -v -n
 gre-heapoverflow-1	gre-heapoverflow-1.pcap	gre-heapoverflow-1.out	-t -v -n
 gre-heapoverflow-2	gre-heapoverflow-2.pcap	gre-heapoverflow-2.out	-t -v -n
+calm-fast-mac-lookup-heapoverflow	calm-fast-mac-lookup-heapoverflow.pcap	calm-fast-mac-lookup-heapoverflow.out	-t -v -n
+geonet-mac-lookup-heapoverflow	geonet-mac-lookup-heapoverflow.pcap	geonet-mac-lookup-heapoverflow.out	-t -v -n

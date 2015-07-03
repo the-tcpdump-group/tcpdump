@@ -297,7 +297,7 @@ recurse:
 		hdrlen += 4;
 		goto recurse;
 	} else {
-		if (ethertype_print(ndo, ether_type, p, length, caplen) == 0) {
+		if (ethertype_print(ndo, ether_type, p, length, caplen, NULL, NULL) == 0) {
 			/* ether_type not known, print raw packet */
 			if (!ndo->ndo_eflag)
 				sll_print(ndo, sllp, length + SLL_HDR_LEN);

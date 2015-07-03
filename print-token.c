@@ -151,6 +151,7 @@ token_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 	const struct token_header *trp;
 	int llc_hdrlen;
 	struct ether_header ehdr;
+	struct lladdr_info src, dst;
 	u_int route_len = 0, hdr_len = TOKEN_HDRLEN;
 	int seg;
 
@@ -203,6 +204,11 @@ token_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 			token_hdr_print(ndo, trp, length, ESRC(&ehdr), EDST(&ehdr));
 	}
 
+	src.addr = ESRC(&ehdr);
+	src.addr_string = etheraddr_string;
+	dst.addr = EDST(&ehdr);
+	dst.addr_string = etheraddr_string;
+
 	/* Skip over token ring MAC header and routing information */
 	length -= hdr_len;
 	p += hdr_len;
@@ -211,8 +217,7 @@ token_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen
 	/* Frame Control field determines interpretation of packet */
 	if (FRAME_TYPE(trp) == TOKEN_FC_LLC) {
 		/* Try to print the LLC-layer header & higher layers */
-		llc_hdrlen = llc_print(ndo, p, length, caplen, ESRC(&ehdr),
-		    EDST(&ehdr));
+		llc_hdrlen = llc_print(ndo, p, length, caplen, &src, &dst);
 		if (llc_hdrlen < 0) {
 			/* packet type not known, print raw packet */
 			if (!ndo->ndo_suppress_default_print)

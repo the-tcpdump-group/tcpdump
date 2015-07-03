@@ -30,6 +30,7 @@
 #include "netdissect.h"
 #include "ether.h"
 #include "ethertype.h"
+#include "addrtoname.h"
 #include "extract.h"
 
 static const char tstr[] = "[|MEDSA]";
@@ -141,6 +142,7 @@ medsa_print(netdissect_options *ndo,
 {
 	register const struct ether_header *ep;
 	const struct medsa_pkthdr *medsa;
+	struct lladdr_info src, dst;
 	u_short ether_type;
 
 	medsa = (const struct medsa_pkthdr *)bp;
@@ -157,10 +159,14 @@ medsa_print(netdissect_options *ndo,
 	length -= 8;
 	caplen -= 8;
 
+	src.addr = ESRC(ep);
+	src.addr_string = etheraddr_string;
+	dst.addr = EDST(ep);
+	dst.addr_string = etheraddr_string;
 	ether_type = EXTRACT_16BITS(&medsa->ether_type);
 	if (ether_type <= ETHERMTU) {
 		/* Try to print the LLC-layer header & higher layers */
-		if (llc_print(ndo, bp, length, caplen, ESRC(ep), EDST(ep)) < 0) {
+		if (llc_print(ndo, bp, length, caplen, &src, &dst) < 0) {
 			/* packet type not known, print raw packet */
 			if (!ndo->ndo_suppress_default_print)
 				ND_DEFAULTPRINT(bp, caplen);
@@ -172,7 +178,7 @@ medsa_print(netdissect_options *ndo,
 					  ether_type),
 				  ether_type));
 
-		if (ethertype_print(ndo, ether_type, bp, length, caplen) == 0) {
+		if (ethertype_print(ndo, ether_type, bp, length, caplen, &src, &dst) == 0) {
 			/* ether_type not known, print raw packet */
 			if (!ndo->ndo_eflag)
 				ND_PRINT((ndo, "ethertype %s (0x%04x) ",

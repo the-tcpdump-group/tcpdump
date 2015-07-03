@@ -137,6 +137,7 @@ ether_print(netdissect_options *ndo,
 	u_short length_type;
 	u_int hdrlen;
 	int llc_hdrlen;
+	struct lladdr_info src, dst;
 
 	if (caplen < ETHER_HDRLEN) {
 		ND_PRINT((ndo, "[|ether]"));
@@ -160,6 +161,10 @@ ether_print(netdissect_options *ndo,
 	p += ETHER_HDRLEN;
 	hdrlen = ETHER_HDRLEN;
 
+	src.addr = ESRC(ep);
+	src.addr_string = etheraddr_string;
+	dst.addr = EDST(ep);
+	dst.addr_string = etheraddr_string;
 	length_type = EXTRACT_16BITS(&ep->ether_length_type);
 
 recurse:
@@ -168,7 +173,7 @@ recurse:
 	 */
 	if (length_type <= ETHERMTU) {
 		/* Try to print the LLC-layer header & higher layers */
-		llc_hdrlen = llc_print(ndo, p, length, caplen, ESRC(ep), EDST(ep));
+		llc_hdrlen = llc_print(ndo, p, length, caplen, &src, &dst);
 		if (llc_hdrlen < 0) {
 			/* packet type not known, print raw packet */
 			if (!ndo->ndo_suppress_default_print)
@@ -217,7 +222,7 @@ recurse:
 		 * there's an LLC header and payload.
 		 */
 		/* Try to print the LLC-layer header & higher layers */
-		llc_hdrlen = llc_print(ndo, p, length, caplen, ESRC(ep), EDST(ep));
+		llc_hdrlen = llc_print(ndo, p, length, caplen, &src, &dst);
 		if (llc_hdrlen < 0) {
 			/* packet type not known, print raw packet */
 			if (!ndo->ndo_suppress_default_print)
@@ -226,7 +231,7 @@ recurse:
 		}
 		hdrlen += llc_hdrlen;
 	} else {
-		if (ethertype_print(ndo, length_type, p, length, caplen) == 0) {
+		if (ethertype_print(ndo, length_type, p, length, caplen, &src, &dst) == 0) {
 			/* type not known, print raw packet */
 			if (!ndo->ndo_eflag) {
 				if (print_encap_header != NULL)
@@ -317,7 +322,8 @@ netanalyzer_transparent_if_print(netdissect_options *ndo,
 int
 ethertype_print(netdissect_options *ndo,
                 u_short ether_type, const u_char *p,
-                u_int length, u_int caplen)
+                u_int length, u_int caplen,
+                const struct lladdr_info *src, const struct lladdr_info *dst)
 {
 	switch (ether_type) {
 
@@ -369,7 +375,7 @@ ethertype_print(netdissect_options *ndo,
 		return (1);
 
 	case ETHERTYPE_RRCP:
-	        rrcp_print(ndo, p - 14 , length + 14);
+	        rrcp_print(ndo, p, length, src, dst);
 		return (1);
 
 	case ETHERTYPE_PPP:
@@ -415,11 +421,11 @@ ethertype_print(netdissect_options *ndo,
 
         case ETHERTYPE_GEONET_OLD:
         case ETHERTYPE_GEONET:
-                geonet_print(ndo, p-14, p, length);
+                geonet_print(ndo, p, length, src);
                 return (1);
 
         case ETHERTYPE_CALM_FAST:
-                calm_fast_print(ndo, p-14, p, length);
+                calm_fast_print(ndo, p, length, src);
                 return (1);
 
 	case ETHERTYPE_AOE:

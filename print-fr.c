@@ -276,7 +276,8 @@ fr_print(netdissect_options *ndo,
                         if (ethertype_print(ndo, extracted_ethertype,
                                             p+addr_len+ETHERTYPE_LEN,
                                             length-addr_len-ETHERTYPE_LEN,
-                                            length-addr_len-ETHERTYPE_LEN) == 0)
+                                            length-addr_len-ETHERTYPE_LEN,
+                                            NULL, NULL) == 0)
                                 /* ether_type not known, probably it wasn't one */
                                 ND_PRINT((ndo, "UI %02x! ", p[addr_len]));
                         else
