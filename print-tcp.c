@@ -55,7 +55,7 @@ __RCSID("$NetBSD: print-tcp.c,v 1.8 2007/07/24 11:53:48 drochner Exp $");
 
 #ifdef HAVE_LIBCRYPTO
 #include <openssl/md5.h>
-#include <signature.h>
+#include "signature.h"
 
 static int tcp_verify_signature(netdissect_options *ndo,
                                 const struct ip *ip, const struct tcphdr *tp,
