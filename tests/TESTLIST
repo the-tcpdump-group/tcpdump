@@ -366,3 +366,6 @@ bfd-raw-auth-md5 bfd-raw-auth-md5.pcap bfd-raw-auth-md5.out -t
 bfd-raw-auth-md5-v bfd-raw-auth-md5.pcap bfd-raw-auth-md5-v.out -t -v
 bfd-raw-auth-sha1 bfd-raw-auth-sha1.pcap bfd-raw-auth-sha1.out -t
 bfd-raw-auth-sha1-v bfd-raw-auth-sha1.pcap bfd-raw-auth-sha1-v.out -t -v
+
+# bad packets from Hanno Böck
+heap-overflow-1	heap-overflow-1.pcap		heap-overflow-1.out	-t -v -n

@@ -681,24 +681,28 @@ trunc:
 void
 ipN_print(netdissect_options *ndo, register const u_char *bp, register u_int length)
 {
-	struct ip hdr;
-
-	if (length < 4) {
+	if (length < 1) {
 		ND_PRINT((ndo, "truncated-ip %d", length));
 		return;
 	}
-	memcpy (&hdr, bp, 4);
-	switch (IP_V(&hdr)) {
-	case 4:
+
+	ND_TCHECK(*bp);
+	switch (*bp & 0xF0) {
+	case 0x40:
 		ip_print (ndo, bp, length);
-		return;
-	case 6:
+		break;
+	case 0x60:
 		ip6_print (ndo, bp, length);
-		return;
+		break;
 	default:
-		ND_PRINT((ndo, "unknown ip %d", IP_V(&hdr)));
-		return;
+		ND_PRINT((ndo, "unknown ip %d", (*bp & 0xF0) >> 4));
+		break;
 	}
+	return;
+
+trunc:
+	ND_PRINT((ndo, "%s", tstr));
+	return;
 }
 
 /*
