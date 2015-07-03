@@ -622,11 +622,16 @@ enum checksum_status {
 };
 
 static enum checksum_status
-pimv2_check_checksum(netdissect_options *ndo, const u_char *bp, const u_char *bp2, u_int len)
+pimv2_check_checksum(netdissect_options *ndo, const u_char *bp,
+		     const u_char *bp2, u_int len)
 {
 	const struct ip *ip;
 	u_int cksum;
 
+	if (!ND_TTEST2(bp[0], len)) {
+		/* We don't have all the data. */
+		return (UNVERIFIED);
+	}
 	ip = (const struct ip *)bp2;
 	if (IP_V(ip) == 4) {
 		struct cksum_vec vec[1];
