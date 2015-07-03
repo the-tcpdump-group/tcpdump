@@ -1681,6 +1681,11 @@ ppp_hdlc_if_print(netdissect_options *ndo,
 		return (chdlc_if_print(ndo, h, p));
 
 	default:
+		if (caplen < 4) {
+			ND_PRINT((ndo, "[|ppp]"));
+			return (caplen);
+		}
+
 		if (ndo->ndo_eflag)
 			ND_PRINT((ndo, "%02x %02x %d ", p[0], p[1], length));
 		p += 2;
