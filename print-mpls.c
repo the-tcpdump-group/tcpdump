@@ -68,6 +68,10 @@ mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	ND_PRINT((ndo, "MPLS"));
 	do {
 		ND_TCHECK2(*p, sizeof(label_entry));
+		if (length < sizeof(label_entry)) {
+			ND_PRINT((ndo, "[|MPLS], length %u", length));
+			return;
+		}
 		label_entry = EXTRACT_32BITS(p);
 		ND_PRINT((ndo, "%s(label %u",
 		       (label_stack_depth && ndo->ndo_vflag) ? "\n\t" : " ",
@@ -82,6 +86,7 @@ mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		ND_PRINT((ndo, ", ttl %u)", MPLS_TTL(label_entry)));
 
 		p += sizeof(label_entry);
+		length -= sizeof(label_entry);
 	} while (!MPLS_STACK(label_entry));
 
 	/*
@@ -124,6 +129,11 @@ mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		 * Cisco sends control-plane traffic MPLS-encapsulated in
 		 * this fashion.
 		 */
+		ND_TCHECK(*p);
+		if (length < 1) {
+			/* nothing to print */
+			return;
+		}
 		switch(*p) {
 
 		case 0x45:

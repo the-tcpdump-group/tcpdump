@@ -391,3 +391,4 @@ llc-xid-heapoverflow	llc-xid-heapoverflow.pcap	llc-xid-heapoverflow.out	-t -v -n
 udp-length-heapoverflow	udp-length-heapoverflow.pcap	udp-length-heapoverflow.out	-t -v -n
 aarp-heapoverflow-1	aarp-heapoverflow-1.pcap	aarp-heapoverflow-1.out	-t -v -n
 aarp-heapoverflow-2	aarp-heapoverflow-2.pcap	aarp-heapoverflow-2.out	-t -v -n
+mpls-label-heapoverflow	mpls-label-heapoverflow.pcap	mpls-label-heapoverflow.out	-t -v -n
