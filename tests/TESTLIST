@@ -388,3 +388,4 @@ atm-oam-heapoverflow	atm-oam-heapoverflow.pcap	atm-oam-heapoverflow.out	-t -v -n
 tcp_header_heapoverflow	tcp_header_heapoverflow.pcap	tcp_header_heapoverflow.out	-t -v -n
 ipcomp-heapoverflow	ipcomp-heapoverflow.pcap	ipcomp-heapoverflow.out	-t -v -n
 llc-xid-heapoverflow	llc-xid-heapoverflow.pcap	llc-xid-heapoverflow.out	-t -v -n
+udp-length-heapoverflow	udp-length-heapoverflow.pcap	udp-length-heapoverflow.out	-t -v -n
