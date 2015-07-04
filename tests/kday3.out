@@ -1,7 +1,6 @@
 IP (tos 0x10, ttl 64, id 63177, offset 0, flags [DF], proto TCP (6), length 168)
     204.9.54.80.22 > 204.9.51.132.50079: Flags [P.], cksum 0x0282 (incorrect -> 0x3217), seq 1819218606:1819218722, ack 1238485076, win 1039, options [nop,nop,TS val 1340592078 ecr 941371882], length 116
-IP6, wrong link-layer encapsulation (tos 0x10, ttl 62, id 64806, offset 0, flags [DF], proto TCP (6), length 52, options (unknown 195 [bad length 159]), bad cksum 3da6 (->45ca)!)
-    27759 > 4782:  tcp 24 [bad hdr length 0 - too short, < 20]
+IP6, wrong link-layer encapsulation 
 IP (tos 0x10, ttl 62, id 62920, offset 0, flags [DF], proto TCP (6), length 52, bad cksum 4504 (->451a)!)
     204.9.51.132.50079 > 204.243.53.80.22: Flags [.], cksum 0x858b (incorrect -> 0x85a1), ack 1819218722, win 4092, options [nop,nop,TS val 941371913 ecr 1340592084], length 0
 IP (tos 0x0, ttl 64, id 63178, offset 0, flags [DF], proto TCP (6), length 52, bad cksum 3e8c (->438c)!)

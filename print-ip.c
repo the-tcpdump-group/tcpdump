@@ -530,13 +530,14 @@ ip_print(netdissect_options *ndo,
 
 	ipds->ip = (const struct ip *)bp;
 	ND_TCHECK(ipds->ip->ip_vhl);
-	if (IP_V(ipds->ip) != 4) { /* print version if != 4 */
+	if (IP_V(ipds->ip) != 4) { /* print version and fail if != 4 */
 	    if (IP_V(ipds->ip) == 6)
 	      ND_PRINT((ndo, "IP6, wrong link-layer encapsulation "));
 	    else
 	      ND_PRINT((ndo, "IP%u ", IP_V(ipds->ip)));
+	    return;
 	}
-	else if (!ndo->ndo_eflag)
+	if (!ndo->ndo_eflag)
 		ND_PRINT((ndo, "IP "));
 
 	ND_TCHECK(*ipds->ip);
