@@ -216,6 +216,15 @@ aarp_print(netdissect_options *ndo,
 
 	ND_PRINT((ndo, "aarp "));
 	ap = (const struct aarp *)bp;
+	if (!ND_TTEST(*ap)) {
+		/* Just bail if we don't have the whole chunk. */
+		ND_PRINT((ndo, " [|aarp]"));
+		return;
+	}
+	if (length < sizeof(*ap)) {	
+		ND_PRINT((ndo, " [|aarp %u]", length));
+		return;
+	}
 	if (EXTRACT_16BITS(&ap->htype) == 1 &&
 	    EXTRACT_16BITS(&ap->ptype) == ETHERTYPE_ATALK &&
 	    ap->halen == 6 && ap->palen == 4 )

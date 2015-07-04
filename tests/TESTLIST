@@ -389,3 +389,5 @@ tcp_header_heapoverflow	tcp_header_heapoverflow.pcap	tcp_header_heapoverflow.out
 ipcomp-heapoverflow	ipcomp-heapoverflow.pcap	ipcomp-heapoverflow.out	-t -v -n
 llc-xid-heapoverflow	llc-xid-heapoverflow.pcap	llc-xid-heapoverflow.out	-t -v -n
 udp-length-heapoverflow	udp-length-heapoverflow.pcap	udp-length-heapoverflow.out	-t -v -n
+aarp-heapoverflow-1	aarp-heapoverflow-1.pcap	aarp-heapoverflow-1.out	-t -v -n
+aarp-heapoverflow-2	aarp-heapoverflow-2.pcap	aarp-heapoverflow-2.out	-t -v -n
