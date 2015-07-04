@@ -44,22 +44,15 @@ int
 ipcomp_print(netdissect_options *ndo, register const u_char *bp, int *nhdr _U_)
 {
 	register const struct ipcomp *ipcomp;
-	register const u_char *ep;
 	uint16_t cpi;
 #if defined(HAVE_LIBZ) && defined(HAVE_ZLIB_H)
 	int advance;
 #endif
 
 	ipcomp = (const struct ipcomp *)bp;
+	ND_TCHECK(ipcomp->comp_cpi);
 	cpi = EXTRACT_16BITS(&ipcomp->comp_cpi);
 
-	/* 'ep' points to the end of available data. */
-	ep = ndo->ndo_snapend;
-
-	if ((const u_char *)(ipcomp + 1) >= ep - sizeof(struct ipcomp)) {
-		ND_PRINT((ndo, "[|IPCOMP]"));
-		goto fail;
-	}
 	ND_PRINT((ndo, "IPComp(cpi=0x%04x)", cpi));
 
 #if defined(HAVE_LIBZ) && defined(HAVE_ZLIB_H)
@@ -79,6 +72,10 @@ ipcomp_print(netdissect_options *ndo, register const u_char *bp, int *nhdr _U_)
 	return advance;
 
 #endif
+trunc:
+	ND_PRINT((ndo, "[|IPCOMP]"));
+#if defined(HAVE_LIBZ) && defined(HAVE_ZLIB_H)
 fail:
+#endif
 	return -1;
 }

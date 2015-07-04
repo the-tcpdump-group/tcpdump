@@ -386,3 +386,4 @@ isoclns-heapoverflow	isoclns-heapoverflow.pcap	isoclns-heapoverflow.out	-t -v -n
 tcp-auth-heapoverflow	tcp-auth-heapoverflow.pcap	tcp-auth-heapoverflow.out	-t -v -n
 atm-oam-heapoverflow	atm-oam-heapoverflow.pcap	atm-oam-heapoverflow.out	-t -v -n
 tcp_header_heapoverflow	tcp_header_heapoverflow.pcap	tcp_header_heapoverflow.out	-t -v -n
+ipcomp-heapoverflow	ipcomp-heapoverflow.pcap	ipcomp-heapoverflow.out	-t -v -n
