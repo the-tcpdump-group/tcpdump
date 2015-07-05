@@ -186,22 +186,22 @@ mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	 */
 	if (pt == PT_UNKNOWN) {
 		if (!ndo->ndo_suppress_default_print)
-			ND_DEFAULTPRINT(p, length - (p - bp));
+			ND_DEFAULTPRINT(p, length);
 		return;
 	}
 	ND_PRINT((ndo, ndo->ndo_vflag ? "\n\t" : " "));
 	switch (pt) {
 
 	case PT_IPV4:
-		ip_print(ndo, p, length - (p - bp));
+		ip_print(ndo, p, length);
 		break;
 
 	case PT_IPV6:
-		ip6_print(ndo, p, length - (p - bp));
+		ip6_print(ndo, p, length);
 		break;
 
 	case PT_OSI:
-		isoclns_print(ndo, p, length - (p - bp), length - (p - bp));
+		isoclns_print(ndo, p, length, length);
 		break;
 
 	default:
