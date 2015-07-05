@@ -365,14 +365,14 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 	sport = EXTRACT_16BITS(&up->uh_sport);
 	dport = EXTRACT_16BITS(&up->uh_dport);
 
-	if (!ND_TTEST(up->uh_ulen)) {
-		udpipaddr_print(ndo, ip, sport, dport);
-		ND_PRINT((ndo, "[|udp]"));
-		return;
-	}
 	if (length < sizeof(struct udphdr)) {
 		udpipaddr_print(ndo, ip, sport, dport);
 		ND_PRINT((ndo, "truncated-udp %d", length));
+		return;
+	}
+	if (!ND_TTEST(up->uh_ulen)) {
+		udpipaddr_print(ndo, ip, sport, dport);
+		ND_PRINT((ndo, "[|udp]"));
 		return;
 	}
 	ulen = EXTRACT_16BITS(&up->uh_ulen);
