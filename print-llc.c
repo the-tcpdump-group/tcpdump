@@ -358,14 +358,27 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
                        length + hdrlen));
 
 		if ((control & ~LLC_U_POLL) == LLC_XID) {
-			if (caplen < 2 || length < 2) {
+			if (length == 0) {
+				/*
+				 * XID with no payload.
+				 * This could, for example, be an SNA
+				 * "short form" XID.
+                                 */
+				return (hdrlen);
+			}
+			if (caplen < 1) {
 				ND_PRINT((ndo, "[|llc]"));
 				if (caplen > 0)
 					ND_DEFAULTPRINT((const u_char *)p, caplen);
 				return (hdrlen);
 			}
 			if (*p == LLC_XID_FI) {
-				ND_PRINT((ndo, ": %02x %02x", p[1], p[2]));
+				if (caplen < 3 || length < 3) {
+					ND_PRINT((ndo, "[|llc]"));
+					if (caplen > 0)
+						ND_DEFAULTPRINT((const u_char *)p, caplen);
+				} else
+					ND_PRINT((ndo, ": %02x %02x", p[1], p[2]));
 				return (hdrlen);
 			}
 		}
