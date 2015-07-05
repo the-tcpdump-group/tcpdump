@@ -418,9 +418,6 @@ dnl Some platforms may need -lnsl for getrpcbynumber.
 AC_SEARCH_LIBS(getrpcbynumber, nsl,
     AC_DEFINE(HAVE_GETRPCBYNUMBER, 1, [define if you have getrpcbynumber()]))
 
-dnl AC_CHECK_LIB(z, uncompress)
-dnl AC_CHECK_HEADERS(zlib.h)
-
 AC_LBL_LIBPCAP(V_PCAPDEP, V_INCLS)
 
 #

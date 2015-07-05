@@ -5451,7 +5451,6 @@ fi
 
 
 
-
                 LBL_LIBS="$LIBS"
     pfopen=/usr/examples/packetfilter/pfopen.c
     if test -f $pfopen ; then

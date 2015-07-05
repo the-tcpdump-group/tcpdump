@@ -524,7 +524,7 @@ extern void ip6_print(netdissect_options *, const u_char *, u_int);
 extern void ipN_print(netdissect_options *, const u_char *, u_int);
 extern void ip_print(netdissect_options *, const u_char *, u_int);
 extern void ip_print_inner(netdissect_options *, const u_char *, u_int, u_int nh, const u_char *);
-extern int ipcomp_print(netdissect_options *, register const u_char *, int *);
+extern void ipcomp_print(netdissect_options *, register const u_char *);
 extern void ipx_netbios_print(netdissect_options *, const u_char *, u_int);
 extern void ipx_print(netdissect_options *, const u_char *, u_int);
 extern void isakmp_print(netdissect_options *, const u_char *, u_int, const u_char *);

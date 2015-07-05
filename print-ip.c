@@ -358,14 +358,14 @@ again:
 
 	case IPPROTO_IPCOMP:
 	{
-		int enh;
-		ipds->advance = ipcomp_print(ndo, ipds->cp, &enh);
-		if (ipds->advance <= 0)
-			break;
-		ipds->cp += ipds->advance;
-		ipds->len -= ipds->advance;
-		ipds->nh = enh & 0xff;
-		goto again;
+		ipcomp_print(ndo, ipds->cp);
+		/*
+		 * Either this has decompressed the payload and
+		 * printed it, in which case there's nothing more
+		 * to do, or it hasn't, in which case there's
+		 * nothing more to do.
+		 */
+		break;
 	}
 
 	case IPPROTO_SCTP:
