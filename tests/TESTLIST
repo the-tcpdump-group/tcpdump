@@ -393,3 +393,8 @@ aarp-heapoverflow-1	aarp-heapoverflow-1.pcap	aarp-heapoverflow-1.out	-t -v -n
 aarp-heapoverflow-2	aarp-heapoverflow-2.pcap	aarp-heapoverflow-2.out	-t -v -n
 mpls-label-heapoverflow	mpls-label-heapoverflow.pcap	mpls-label-heapoverflow.out	-t -v -n
 bad-ipv4-version-pgm-heapoverflow	bad-ipv4-version-pgm-heapoverflow.pcap	bad-ipv4-version-pgm-heapoverflow.out	-t -v -n
+stp-heapoverflow-1	stp-heapoverflow-1.pcap	stp-heapoverflow-1.out	-t -v -n
+stp-heapoverflow-2	stp-heapoverflow-2.pcap	stp-heapoverflow-2.out	-t -v -n
+stp-heapoverflow-3	stp-heapoverflow-3.pcap	stp-heapoverflow-3.out	-t -v -n
+stp-heapoverflow-4	stp-heapoverflow-4.pcap	stp-heapoverflow-4.out	-t -v -n
+stp-heapoverflow-5	stp-heapoverflow-5.pcap	stp-heapoverflow-5.out	-t -v -n
