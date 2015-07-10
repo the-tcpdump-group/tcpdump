@@ -497,7 +497,6 @@ void dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 
 	/* process options */
 	if (hlen > fixed_hdrlen){
-		const u_char *cp;
 		u_int optlen;
 		cp = bp + fixed_hdrlen;
 		ND_PRINT((ndo, " <"));
