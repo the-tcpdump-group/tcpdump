@@ -161,6 +161,9 @@ static char *zflag = NULL;		/* compress each savefile using a specified command 
 #ifdef WITH_PIPEOUTPUT
 static char *pipeoutput = NULL;
 static char *compressor_arg[1024];
+#define PIPEOUTPUT_FILE_HDRSZ   sizeof(struct pcap_file_header)
+#define PIPEOUTPUT_PCKT_HDRSZ	16 /* =sizeof(struct pcap_sf_pkthdr) */
+static long file_bytesize = PIPEOUTPUT_FILE_HDRSZ;
 #endif /* WITH_PIPEOUTPUT */
 static int infodelay;
 static int infoprint;
@@ -225,15 +228,16 @@ struct dump_info {
 
 #ifdef WITH_PIPEOUTPUT
 static void
-remap_to_pipe(const struct dump_info *dump_info)
+remap_to_pipe(pcap_dumper_t *dumper)
 {
     int pipefd[2];
     pid_t compressor_pid;
     int i;
     int maxfd = getdtablesize();
 #define PIPEBUFSZ (8*1024*1024)
-    int dump_fd = fileno(pcap_dump_file(dump_info->p));
+    int dump_fd = fileno(pcap_dump_file(dumper));
 
+    if (!dumper) { return; }
     if (0 != socketpair(AF_UNIX, SOCK_STREAM, 0, pipefd)) {
         error("Error creating pipe: '%s'\n", strerror(errno));
     }
@@ -259,6 +263,9 @@ remap_to_pipe(const struct dump_info *dump_info)
     }
     if (compressor_pid == 0) {
         /* child */
+#ifdef HAVE_SETPGID
+        setpgid(0,0);
+#endif
         if (-1 == dup2(pipefd[0], STDIN_FILENO)) {
             error("Error DUP compressor stdin: '%s'\n", strerror(errno));
         }
@@ -1720,9 +1727,10 @@ main(int argc, char **argv)
 		}
 #ifdef WITH_PIPEOUTPUT
         if (pipeoutput) {
-            remap_to_pipe(&dumpinfo);
+            remap_to_pipe(p);
         }
 #endif /* WITH_PIPEOUTPUT */
+
 #ifdef HAVE_PCAP_DUMP_FLUSH
 		if (Uflag)
 			pcap_dump_flush(p);
@@ -1809,7 +1817,7 @@ main(int argc, char **argv)
 			}
 			(void)fflush(stdout);
 		}
-                if (status == -2) {
+        if (status == -2) {
 			/*
 			 * We got interrupted. If we are reading multiple
 			 * files (via -V) set these so that we stop.
@@ -1868,7 +1876,13 @@ main(int argc, char **argv)
 		}
 	}
 	while (ret != NULL);
-
+#ifdef WITH_PIPEOUTPUT
+    if (dumpinfo.p) {
+        pcap_dump_close(dumpinfo.p);
+        dumpinfo.p = NULL;
+        wait(NULL);
+    }
+#endif /* WITH_PIPEOUTPUT */
 	free(cmdbuf);
 	exit(status == -1 ? 1 : 0);
 }
@@ -2117,11 +2131,13 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 #else	/* !HAVE_CAPSICUM */
 			dump_info->p = pcap_dump_open(dump_info->pd, dump_info->CurrentFileName);
 #endif
+
 #ifdef WITH_PIPEOUTPUT
             if (pipeoutput) {
-                remap_to_pipe(dump_info);
+                remap_to_pipe(dump_info->p);
             }
 #endif /* WITH_PIPEOUTPUT */
+            
 #ifdef HAVE_LIBCAP_NG
 			capng_update(CAPNG_DROP, CAPNG_EFFECTIVE, CAP_DAC_OVERRIDE);
 			capng_apply(CAPNG_SELECT_BOTH);
@@ -2140,7 +2156,16 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 	 * file could put it over Cflag.
 	 */
 	if (Cflag != 0) {
-		long size = pcap_dump_ftell(dump_info->p);
+        long size = 0;
+#ifdef WITH_PIPEOUTPUT
+        if (pipeoutput) {
+            size = file_bytesize;
+        } else {
+            size = pcap_dump_ftell(dump_info->p);
+        }
+#else
+		size = pcap_dump_ftell(dump_info->p);
+#endif /* WITH_PIPEOUTPUT */
 
 		if (size == -1)
 			error("ftell fails on output file");
@@ -2193,10 +2218,13 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			dump_info->p = pcap_dump_open(dump_info->pd, dump_info->CurrentFileName);
 #endif
 #ifdef WITH_PIPEOUTPUT
+            file_bytesize = PIPEOUTPUT_FILE_HDRSZ;
+
             if (pipeoutput) {
-                remap_to_pipe(dump_info);
+                remap_to_pipe(dump_info->p);
             }
 #endif /* WITH_PIPEOUTPUT */
+
 #ifdef HAVE_LIBCAP_NG
 			capng_update(CAPNG_DROP, CAPNG_EFFECTIVE, CAP_DAC_OVERRIDE);
 			capng_apply(CAPNG_SELECT_BOTH);
@@ -2210,6 +2238,9 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 	}
 
 	pcap_dump((u_char *)dump_info->p, h, sp);
+#ifdef WITH_PIPEOUTPUT
+    file_bytesize += (h->caplen + PIPEOUTPUT_PCKT_HDRSZ);
+#endif /* WITH_PIPEOUTPUT */
 #ifdef HAVE_PCAP_DUMP_FLUSH
 	if (Uflag)
 		pcap_dump_flush(dump_info->p);

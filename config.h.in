@@ -172,6 +172,9 @@
 /* Define to 1 if you have the `setlinebuf' function. */
 #undef HAVE_SETLINEBUF
 
+/* Define to 1 if you have the `setpgid' function. */
+#undef HAVE_SETPGID
+
 /* Define to 1 if you have the `setsockopt' function. */
 #undef HAVE_SETSOCKOPT
 
