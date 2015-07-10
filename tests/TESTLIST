@@ -185,6 +185,8 @@ m3ua-vv isup.pcap isupvv.out -t -vv
 
 # syslog test case
 syslog-v	syslog_udp.pcap		syslog-v.out		-t -v
+# DNSSEC from https://bugzilla.redhat.com/show_bug.cgi?id=205842, -vv exposes EDNS DO
+dnssec-vv	dnssec.pcap		dnssec-vv.out		-t -vv
 
 #IPv6 tests
 ipv6-bad-version.pcap	ipv6-bad-version.pcap 	ipv6-bad-version.out	-t
