@@ -164,7 +164,8 @@ static RETSIGTYPE cleanup(int);
 static RETSIGTYPE child_cleanup(int);
 static void print_version(void);
 static void print_usage(void);
-static void show_dlts_and_exit(const char *device, pcap_t *pd) __attribute__((noreturn));
+static void show_tstamp_types_and_exit(const char *device) __attribute__((noreturn));
+static void show_dlts_and_exit(const char *device) __attribute__((noreturn));
 
 static void print_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void dump_packet_and_trunc(u_char *, const struct pcap_pkthdr *, const u_char *);
@@ -217,7 +218,7 @@ struct dump_info {
 
 #ifdef HAVE_PCAP_SET_TSTAMP_TYPE
 static void
-show_tstamp_types_and_exit(const char *device, pcap_t *pd)
+show_tstamp_types_and_exit(const char *device)
 {
 	int n_tstamp_types;
 	int *tstamp_types = 0;
@@ -250,7 +251,7 @@ show_tstamp_types_and_exit(const char *device, pcap_t *pd)
 #endif
 
 static void
-show_dlts_and_exit(const char *device, pcap_t *pd)
+show_dlts_and_exit(const char *device)
 {
 	int n_dlts, i;
 	int *dlts = 0;
@@ -1321,7 +1322,7 @@ main(int argc, char **argv)
 			error("%s", ebuf);
 #ifdef HAVE_PCAP_SET_TSTAMP_TYPE
 		if (Jflag)
-			show_tstamp_types_and_exit(device, pd);
+			show_tstamp_types_and_exit(device);
 #endif
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
 		status = pcap_set_tstamp_precision(pd, ndo->ndo_tstamp_precision);
@@ -1442,7 +1443,7 @@ main(int argc, char **argv)
 			}
 #endif /* !defined(HAVE_PCAP_CREATE) && defined(WIN32) */
 		if (Lflag)
-			show_dlts_and_exit(device, pd);
+			show_dlts_and_exit(device);
 		if (ndo->ndo_dlt >= 0) {
 #ifdef HAVE_PCAP_SET_DATALINK
 			if (pcap_set_datalink(pd, ndo->ndo_dlt) < 0)
