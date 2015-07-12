@@ -2211,7 +2211,7 @@ bgp_attr_print(netdissect_options *ndo,
                 len -=4;
 
                 while (len) {
-                    u_int aflags, atype, alenlen, alen;
+                    u_int aflags, alenlen, alen;
 
                     ND_TCHECK2(tptr[0], 2);
                     if (len < 2)
