@@ -787,8 +787,6 @@ pimv2_print(netdissect_options *ndo,
 				if (ndo->ndo_vflag > 1) {
 					const u_char *ptr = bp;
 					while (ptr < (bp+olen)) {
-						int advance;
-
 						ND_PRINT((ndo, "\n\t    "));
 						advance = pimv2_addr_print(ndo, ptr, pimv2_unicast, 0);
 						if (advance < 0) {

@@ -1354,27 +1354,27 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 #endif
 	case 2:
 	    {
-		const struct ipsecdoi_id *p;
-		struct ipsecdoi_id id;
+		const struct ipsecdoi_id *doi_p;
+		struct ipsecdoi_id doi_id;
 		struct protoent *pe;
 
-		p = (const struct ipsecdoi_id *)ext;
-		ND_TCHECK(*p);
-		UNALIGNED_MEMCPY(&id, ext, sizeof(id));
-		ND_PRINT((ndo," idtype=%s", STR_OR_ID(id.type, ipsecidtypestr)));
+		doi_p = (const struct ipsecdoi_id *)ext;
+		ND_TCHECK(*doi_p);
+		UNALIGNED_MEMCPY(&doi_id, ext, sizeof(doi_id));
+		ND_PRINT((ndo," idtype=%s", STR_OR_ID(doi_id.type, ipsecidtypestr)));
 		/* A protocol ID of 0 DOES NOT mean IPPROTO_IP! */
-		pe = id.proto_id ? getprotobynumber(id.proto_id) : NULL;
+		pe = doi_id.proto_id ? getprotobynumber(doi_id.proto_id) : NULL;
 		if (pe)
 			ND_PRINT((ndo," protoid=%s", pe->p_name));
 		else
-			ND_PRINT((ndo," protoid=%u", id.proto_id));
-		ND_PRINT((ndo," port=%d", ntohs(id.port)));
+			ND_PRINT((ndo," protoid=%u", doi_id.proto_id));
+		ND_PRINT((ndo," port=%d", ntohs(doi_id.port)));
 		if (!len)
 			break;
 		if (data == NULL)
 			goto trunc;
 		ND_TCHECK2(*data, len);
-		switch (id.type) {
+		switch (doi_id.type) {
 		case IPSECDOI_ID_IPV4_ADDR:
 			if (len < 4)
 				ND_PRINT((ndo," len=%d [bad: < 4]", len));

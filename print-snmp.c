@@ -676,8 +676,9 @@ asn1_print(netdissect_options *ndo,
 		break;
 
 	case BE_OID: {
-		int o = 0, first = -1, i = asnlen;
+		int o = 0, first = -1;
 
+		i = asnlen;
 		if (!ndo->ndo_sflag && !ndo->ndo_nflag && asnlen > 2) {
 			const struct obj_abrev *a = &obj_abrev_list[0];
 			size_t a_len = strlen(a->oid);
@@ -774,7 +775,8 @@ asn1_print(netdissect_options *ndo,
 
 	case BE_STR: {
 		register int printable = 1, first = 1;
-		const u_char *p = elem->data.str;
+
+		p = elem->data.str;
 		ND_TCHECK2(*p, asnlen);
 		for (i = asnlen; printable && i-- > 0; p++)
 			printable = ND_ISPRINT(*p);
