@@ -568,6 +568,8 @@ ataddr_string(netdissect_options *ndo,
 			tp->addr = i2;
 			tp->nxt = newhnamemem();
 			tp->name = strdup(nambuf);
+			if (tp->name == NULL)
+				error("ataddr_string: strdup(nambuf)");
 		}
 		fclose(fp);
 	}
@@ -585,6 +587,8 @@ ataddr_string(netdissect_options *ndo,
 			(void)snprintf(nambuf, sizeof(nambuf), "%s.%d",
 			    tp2->name, athost);
 			tp->name = strdup(nambuf);
+			if (tp->name == NULL)
+				error("ataddr_string: strdup(nambuf)");
 			return (tp->name);
 		}
 
@@ -595,6 +599,8 @@ ataddr_string(netdissect_options *ndo,
 	else
 		(void)snprintf(nambuf, sizeof(nambuf), "%d", atnet);
 	tp->name = strdup(nambuf);
+	if (tp->name == NULL)
+		error("ataddr_string: strdup(nambuf)");
 
 	return (tp->name);
 }
