@@ -71,7 +71,7 @@ extern int ether_ntohost(char *, const struct ether_addr *);
 /*
  * hash tables for whatever-to-name translations
  *
- * XXX there has to be error checks against strdup(3) failure
+ * error() called on strdup(3) failure
  */
 
 #define HASHNAMESIZE 4096
@@ -247,6 +247,8 @@ getname(netdissect_options *ndo, const u_char *ap)
 			char *dotp;
 
 			p->name = strdup(hp->h_name);
+			if (p->name == NULL)
+				error("getname: strdup(hp->h_name)");
 			if (ndo->ndo_Nflag) {
 				/* Remove domain qualifications */
 				dotp = strchr(p->name, '.');
@@ -257,6 +259,8 @@ getname(netdissect_options *ndo, const u_char *ap)
 		}
 	}
 	p->name = strdup(intoa(addr));
+	if (p->name == NULL)
+		error("getname: strdup(intoa(addr))");
 	return (p->name);
 }
 
@@ -298,6 +302,8 @@ getname6(netdissect_options *ndo, const u_char *ap)
 			char *dotp;
 
 			p->name = strdup(hp->h_name);
+			if (p->name == NULL)
+				error("getname6: strdup(hp->h_name)");
 			if (ndo->ndo_Nflag) {
 				/* Remove domain qualifications */
 				dotp = strchr(p->name, '.');
@@ -309,6 +315,8 @@ getname6(netdissect_options *ndo, const u_char *ap)
 	}
 	cp = inet_ntop(AF_INET6, &addr, ntop_buf, sizeof(ntop_buf));
 	p->name = strdup(cp);
+	if (p->name == NULL)
+		error("getname6: strdup(cp)");
 	return (p->name);
 }
 #endif /* INET6 */
@@ -483,6 +491,8 @@ etheraddr_string(netdissect_options *ndo, register const u_char *ep)
 
 		if (ether_ntohost(buf2, (const struct ether_addr *)ep) == 0) {
 			tp->e_name = strdup(buf2);
+			if (tp->e_name == NULL)
+				error("etheraddr_string: strdup(buf2)");
 			return (tp->e_name);
 		}
 	}
@@ -503,6 +513,8 @@ etheraddr_string(netdissect_options *ndo, register const u_char *ep)
 	} else
 		*cp = '\0';
 	tp->e_name = strdup(buf);
+	if (tp->e_name == NULL)
+		error("etheraddr_string: strdup(buf)");
 	return (tp->e_name);
 }
 
@@ -530,6 +542,8 @@ le64addr_string(const u_char *ep)
 	*cp = '\0';
 
 	tp->e_name = strdup(buf);
+	if (tp->e_name == NULL)
+		error("le64addr_string: strdup(buf)");
 
 	return (tp->e_name);
 }
@@ -591,6 +605,8 @@ etherproto_string(u_short port)
 	*cp++ = hex[port & 0xf];
 	*cp++ = '\0';
 	tp->name = strdup(buf);
+	if (tp->name == NULL)
+		error("etherproto_string: strdup(buf)");
 	return (tp->name);
 }
 
@@ -618,6 +634,8 @@ protoid_string(register const u_char *pi)
 	}
 	*cp = '\0';
 	tp->p_name = strdup(buf);
+	if (tp->p_name == NULL)
+		error("protoid_string: strdup(buf)");
 	return (tp->p_name);
 }
 
@@ -668,6 +686,8 @@ tcpport_string(u_short port)
 
 	(void)snprintf(buf, sizeof(buf), "%u", i);
 	tp->name = strdup(buf);
+	if (tp->name == NULL)
+		error("tcpport_string: strdup(buf)");
 	return (tp->name);
 }
 
@@ -687,6 +707,8 @@ udpport_string(register u_short port)
 
 	(void)snprintf(buf, sizeof(buf), "%u", i);
 	tp->name = strdup(buf);
+	if (tp->name == NULL)
+		error("udpport_string: strdup(buf)");
 	return (tp->name);
 }
 
@@ -713,6 +735,8 @@ ipxsap_string(u_short port)
 	*cp++ = hex[port & 0xf];
 	*cp++ = '\0';
 	tp->name = strdup(buf);
+	if (tp->name == NULL)
+		error("ipxsap_string: strdup(buf)");
 	return (tp->name);
 }
 
@@ -741,6 +765,9 @@ init_servarray(netdissect_options *ndo)
 			table->name = strdup(buf);
 		} else
 			table->name = strdup(sv->s_name);
+		if (table->name == NULL)
+			error("init_servarray: strdup");
+
 		table->addr = port;
 		table->nxt = newhnamemem();
 	}
@@ -808,6 +835,8 @@ init_protoidarray(void)
 		memcpy((char *)&protoid[3], (char *)&etype, 2);
 		tp = lookup_protoid(protoid);
 		tp->p_name = strdup(eproto_db[i].s);
+		if (tp->p_name == NULL)
+			error("init_protoidarray: strdup(eproto_db[i].s)");
 	}
 	/* Hardwire some SNAP proto ID names */
 	for (pl = protoidlist; pl->name != NULL; ++pl) {
@@ -859,6 +888,8 @@ init_etherarray(void)
 		while ((ep = pcap_next_etherent(fp)) != NULL) {
 			tp = lookup_emem(ep->addr);
 			tp->e_name = strdup(ep->name);
+			if (tp->e_name == NULL)
+				error("init_etherarray: strdup(ep->addr)");
 		}
 		(void)fclose(fp);
 	}
@@ -877,6 +908,8 @@ init_etherarray(void)
 		 */
 		if (ether_ntohost(name, (const struct ether_addr *)el->addr) == 0) {
 			tp->e_name = strdup(name);
+			if (tp->e_name == NULL)
+				error("init_etherarray: strdup(name)");
 			continue;
 		}
 #endif
