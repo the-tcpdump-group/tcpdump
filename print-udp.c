@@ -40,7 +40,6 @@
 #include "rpc_auth.h"
 #include "rpc_msg.h"
 
-#include "nameser.h"
 #include "nfs.h"
 
 struct rtcphdr {

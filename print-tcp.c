@@ -51,8 +51,6 @@ __RCSID("$NetBSD: print-tcp.c,v 1.8 2007/07/24 11:53:48 drochner Exp $");
 #include "rpc_auth.h"
 #include "rpc_msg.h"
 
-#include "nameser.h"
-
 #ifdef HAVE_LIBCRYPTO
 #include <openssl/md5.h>
 #include "signature.h"
@@ -700,8 +698,7 @@ tcp_print(netdissect_options *ndo,
                 ND_PRINT((ndo, ": "));
                 rtsp_print(ndo, bp, length);
         } else if (length > 2 &&
-                 (sport == NAMESERVER_PORT || dport == NAMESERVER_PORT ||
-                  sport == MULTICASTDNS_PORT || dport == MULTICASTDNS_PORT)) {
+                 (sport == NAMESERVER_PORT || dport == NAMESERVER_PORT)) {
                 /*
                  * TCP DNS query has 2byte length at the head.
                  * XXX packet could be unaligned, it can go strange

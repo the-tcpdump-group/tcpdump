@@ -44,6 +44,7 @@ struct udphdr {
 	uint16_t	uh_sum;			/* udp checksum */
 };
 
+#define NAMESERVER_PORT 53
 #define BOOTPS_PORT 67		/* RFC951 */
 #define BOOTPC_PORT 68		/* RFC951 */
 #define TFTP_PORT 69		/*XXX*/
@@ -86,6 +87,7 @@ struct udphdr {
 #define BFD_CONTROL_PORT        3784 /* draft-katz-ward-bfd-v4v6-1hop-00.txt */
 #define BFD_ECHO_PORT           3785 /* draft-katz-ward-bfd-v4v6-1hop-00.txt */
 #define WB_PORT			4567
+#define MULTICASTDNS_PORT       5353 /* RFC 6762 */
 #define SFLOW_PORT              6343 /* http://www.sflow.org/developers/specifications.php */
 #define LWAPP_DATA_PORT         12222 /* RFC 5412 */
 #define LWAPP_CONTROL_PORT      12223 /* RFC 5412 */

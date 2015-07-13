@@ -97,6 +97,9 @@ struct tcphdr {
 #ifndef SMTP_PORT
 #define SMTP_PORT		25
 #endif
+#ifndef NAMESERVER_PORT
+#define NAMESERVER_PORT         53
+#endif
 #ifndef BGP_PORT
 #define BGP_PORT                179
 #endif
