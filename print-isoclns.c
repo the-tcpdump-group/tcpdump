@@ -559,8 +559,8 @@ struct isis_tlv_ptp_adj {
     uint8_t neighbor_extd_local_circuit_id[4];
 };
 
-static void osi_print_cksum(netdissect_options *, const uint8_t *pptr, uint16_t checksum,
-                            u_int checksum_offset, u_int length);
+static void osi_print_cksum(netdissect_options *, const uint8_t *pptr,
+			    uint16_t checksum, int checksum_offset, int length);
 static int clnp_print(netdissect_options *, const uint8_t *, u_int);
 static void esis_print(netdissect_options *, const uint8_t *, u_int);
 static int isis_print(netdissect_options *, const uint8_t *, u_int);
@@ -3075,9 +3075,8 @@ isis_print(netdissect_options *ndo,
 }
 
 static void
-osi_print_cksum(netdissect_options *ndo,
-                const uint8_t *pptr, uint16_t checksum,
-                    u_int checksum_offset, u_int length)
+osi_print_cksum(netdissect_options *ndo, const uint8_t *pptr,
+	        uint16_t checksum, int checksum_offset, int length)
 {
         uint16_t calculated_checksum;
 
@@ -3087,6 +3086,8 @@ osi_print_cksum(netdissect_options *ndo,
          * or the base pointer is not sane
          */
         if (!checksum
+            || length < 0
+            || checksum_offset < 0
             || length > ndo->ndo_snaplen
             || checksum_offset > ndo->ndo_snaplen
             || checksum_offset > length) {
