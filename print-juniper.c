@@ -92,7 +92,7 @@ enum {
 };
 
 /* 1 byte type and 1-byte length */
-#define JUNIPER_EXT_TLV_OVERHEAD 2
+#define JUNIPER_EXT_TLV_OVERHEAD 2U
 
 static const struct tok jnx_ext_tlv_values[] = {
     { JUNIPER_EXT_TLV_IFD_IDX, "Device Interface Index" },
@@ -1203,9 +1203,11 @@ juniper_parse_header(netdissect_options *ndo,
             tlv_len = *(tptr++);
             tlv_value = 0;
 
-            /* sanity check */
+            /* sanity checks */
             if (tlv_type == 0 || tlv_len == 0)
                 break;
+            if (tlv_len+JUNIPER_EXT_TLV_OVERHEAD > jnx_ext_len)
+                goto trunc;
 
             if (ndo->ndo_vflag > 1)
                 ND_PRINT((ndo, "\n\t  %s Extension TLV #%u, length %u, value ",
