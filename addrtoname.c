@@ -222,7 +222,7 @@ getname(netdissect_options *ndo, const u_char *ap)
 {
 	register struct hostent *hp;
 	uint32_t addr;
-	static struct hnamemem *p;		/* static for longjmp() */
+	struct hnamemem *p;
 
 	memcpy(&addr, ap, sizeof(addr));
 	p = &hnametable[addr & (HASHNAMESIZE-1)];
@@ -276,7 +276,7 @@ getname6(netdissect_options *ndo, const u_char *ap)
 			uint16_t d;
 		} addra;
 	} addr;
-	static struct h6namemem *p;		/* static for longjmp() */
+	struct h6namemem *p;
 	register const char *cp;
 	char ntop_buf[INET6_ADDRSTRLEN];
 
