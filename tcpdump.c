@@ -1133,10 +1133,14 @@ main(int argc, char **argv)
 #endif
 		case 'z':
 			zflag = strdup(optarg);
+			if (zflag == NULL) 
+				error("Unable to allocate memory for -z argument");
 			break;
 
 		case 'Z':
 			username = strdup(optarg);
+			if (username == NULL)
+				error("Unable to allocate memory for -Z argument");
 			break;
 
 		case '#':
@@ -1604,6 +1608,10 @@ main(int argc, char **argv)
 		if (Cflag != 0 || Gflag != 0) {
 #ifdef HAVE_CAPSICUM
 			dumpinfo.WFileName = strdup(basename(WFileName));
+			if (dumpinfo.WFileName == NULL) {
+				error("Unable to allocate memory for file %s",
+				    WFileName);
+			}
 			dumpinfo.dirfd = open(dirname(WFileName),
 			    O_DIRECTORY | O_RDONLY);
 			if (dumpinfo.dirfd < 0) {
