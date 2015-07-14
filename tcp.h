@@ -109,6 +109,9 @@ struct tcphdr {
 #ifndef HTTP_PORT
 #define HTTP_PORT		80
 #endif
+#ifndef NETBIOS_NS_PORT
+#define NETBIOS_NS_PORT		137	/* RFC 1001, RFC 1002 */
+#endif
 #ifndef NETBIOS_SSN_PORT
 #define NETBIOS_SSN_PORT	139	/* RFC 1001, RFC 1002 */
 #endif
