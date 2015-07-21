@@ -355,7 +355,8 @@ bootp_print(netdissect_options *ndo,
 	ND_TCHECK2(bp->bp_sname[0], 1);		/* check first char only */
 	if (*bp->bp_sname) {
 		ND_PRINT((ndo, "\n\t  sname \""));
-		if (fn_print(ndo, bp->bp_sname, ndo->ndo_snapend)) {
+		if (fn_printztn(ndo, bp->bp_sname, (u_int)sizeof bp->bp_sname,
+		    ndo->ndo_snapend)) {
 			ND_PRINT((ndo, "\""));
 			ND_PRINT((ndo, "%s", tstr + 1));
 			return;
@@ -365,7 +366,8 @@ bootp_print(netdissect_options *ndo,
 	ND_TCHECK2(bp->bp_file[0], 1);		/* check first char only */
 	if (*bp->bp_file) {
 		ND_PRINT((ndo, "\n\t  file \""));
-		if (fn_print(ndo, bp->bp_file, ndo->ndo_snapend)) {
+		if (fn_printztn(ndo, bp->bp_file, (u_int)sizeof bp->bp_file,
+		    ndo->ndo_snapend)) {
 			ND_PRINT((ndo, "\""));
 			ND_PRINT((ndo, "%s", tstr + 1));
 			return;

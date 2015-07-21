@@ -332,6 +332,7 @@ extern void relts_print(netdissect_options *, int);
 
 extern void fn_print_char(netdissect_options *, u_char);
 extern int fn_print(netdissect_options *, const u_char *, const u_char *);
+extern u_int fn_printztn(netdissect_options *ndo, const u_char *, u_int, const u_char *);
 extern int fn_printn(netdissect_options *, const u_char *, u_int, const u_char *);
 extern int fn_printzp(netdissect_options *, const u_char *, u_int, const u_char *);
 
