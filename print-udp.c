@@ -613,6 +613,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 			 IS_SRC_OR_DST_PORT(RADIUS_NEW_PORT) ||
 			 IS_SRC_OR_DST_PORT(RADIUS_ACCOUNTING_PORT) ||
 			 IS_SRC_OR_DST_PORT(RADIUS_NEW_ACCOUNTING_PORT) ||
+			 IS_SRC_OR_DST_PORT(RADIUS_CISCO_COA_PORT) ||
 			 IS_SRC_OR_DST_PORT(RADIUS_COA_PORT) )
 			radius_print(ndo, (const u_char *)(up+1), length);
 		else if (dport == HSRP_PORT)
