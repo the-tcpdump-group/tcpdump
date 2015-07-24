@@ -243,7 +243,7 @@ struct udphdr {
 #define BFD_ECHO_PORT			3785	/* draft-katz-ward-bfd-v4v6-1hop-00.txt */
 #endif
 #ifndef RADIUS_COA_PORT
-#define RADIUS_COA_PORT			3799	/*XXX*/
+#define RADIUS_COA_PORT			3799	/* RFC 5176 */
 #endif
 #ifndef NFS_LOCK_DAEMON_PORT
 #define NFS_LOCK_DAEMON_PORT		4045	/*XXX*/
