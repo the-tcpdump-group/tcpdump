@@ -30,6 +30,8 @@
 
 /*
  * Time Synchronization Protocol
+ *
+ * http://docs.freebsd.org/44doc/smm/12.timed/paper.pdf
  */
 
 struct tsp_timeval {
