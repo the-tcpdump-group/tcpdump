@@ -1882,11 +1882,15 @@ is the current clock time in the form
 .fi
 .RE
 and is as accurate as the kernel's clock.
-The timestamp reflects the time the kernel first saw the packet.
-No attempt
-is made to account for the time lag between when the
-Ethernet interface removed the packet from the wire and when the kernel
-serviced the `new packet' interrupt.
+The timestamp reflects the time the kernel applied a time stamp to the packet.
+No attempt is made to account for the time lag between when the network
+interface finished receiving the packet from the network and when the
+kernel applied a time stamp to the packet; that time lag could include a
+delay between the time when the network interface finished receiving a
+packet from the network and the time when an interrupt was delivered to
+the kernel to get it to read the packet and a delay between the time
+when the kernel serviced the `new packet' interrupt and the time when it
+applied a time stamp to the packet.
 .SH "SEE ALSO"
 stty(1), pcap(3PCAP), bpf(4), nit(4P), pcap-savefile(@MAN_FILE_FORMATS@),
 pcap-filter(@MAN_MISC_INFO@), pcap-tstamp(@MAN_MISC_INFO@)
