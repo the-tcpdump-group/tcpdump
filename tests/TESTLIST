@@ -401,3 +401,4 @@ stp-heapoverflow-5	stp-heapoverflow-5.pcap	stp-heapoverflow-5.out	-t -v -n
 arp-too-long-tha	arp-too-long-tha.pcap	arp-too-long-tha.out	-t -v -n
 juniper_header-heapoverflow	juniper_header-heapoverflow.pcap	juniper_header-heapoverflow.out	-t -v -n
 tftp-heapoverflow	tftp-heapoverflow.pcap	tftp-heapoverflow.out	-t -v -n
+relts-0x80000000	relts-0x80000000.pcap	relts-0x80000000.out	-t -v -n
