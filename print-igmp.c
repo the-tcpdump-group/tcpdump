@@ -205,7 +205,7 @@ print_igmpv3_query(netdissect_options *ndo,
                    register const u_char *bp, register u_int len)
 {
     u_int mrc;
-    int mrt;
+    u_int mrt;
     u_int nsrcs;
     register u_int i;
 
@@ -227,7 +227,7 @@ print_igmpv3_query(netdissect_options *ndo,
         if (mrt < 600) {
             ND_PRINT((ndo, "%.1fs", mrt * 0.1));
         } else {
-            relts_print(ndo, mrt / 10);
+            unsigned_relts_print(ndo, mrt / 10);
         }
 	ND_PRINT((ndo, "]"));
     }

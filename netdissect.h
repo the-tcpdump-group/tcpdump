@@ -328,7 +328,8 @@ struct netdissect_options {
 #define ND_DEFAULTPRINT(ap, length) (*ndo->ndo_default_print)(ndo, ap, length)
 
 extern void ts_print(netdissect_options *, const struct timeval *);
-extern void relts_print(netdissect_options *, int);
+extern void signed_relts_print(netdissect_options *, int32_t);
+extern void unsigned_relts_print(netdissect_options *, uint32_t);
 
 extern void fn_print_char(netdissect_options *, u_char);
 extern int fn_print(netdissect_options *, const u_char *, const u_char *);
