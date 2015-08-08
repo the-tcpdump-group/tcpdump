@@ -387,53 +387,6 @@ ts_print(netdissect_options *ndo,
 }
 
 /*
- * Print a signed relative number of seconds (e.g. hold time, prune timer)
- * in the form 5m1s.  This does no truncation, so 32230861 seconds
- * is represented as 1y1w1d1h1m1s.
- */
-void
-signed_relts_print(netdissect_options *ndo,
-                   int32_t secs)
-{
-	uint32_t secs_abs;
-	static const char *lengths[] = {"y", "w", "d", "h", "m", "s"};
-	static const u_int seconds[] = {31536000, 604800, 86400, 3600, 60, 1};
-	const char **l = lengths;
-	const u_int *s = seconds;
-
-	if (secs == 0) {
-		ND_PRINT((ndo, "0s"));
-		return;
-	}
-	if (secs == -2147483648) {
-		/*
-		 * -2^31; you can't fit its absolute value into a 32-bit
-		 * signed integer.
-		 *
-		 * We calculate the right string by hand.
-		 */
-		ND_PRINT((ndo, "-68y5w3h14m8s"));
-		return;
-	}
-	if (secs < 0) {
-		/*
-		 * We now know -secs will fit into secs.
-		 */
-		ND_PRINT((ndo, "-"));
-		secs = -secs;
-	}
-	secs_abs = secs;
-	while (secs_abs > 0) {
-		if (secs_abs >= *s) {
-			ND_PRINT((ndo, "%d%s", secs_abs / *s, *l));
-			secs_abs -= (secs_abs / *s) * *s;
-		}
-		s++;
-		l++;
-	}
-}
-
-/*
  * Print an unsigned relative number of seconds (e.g. hold time, prune timer)
  * in the form 5m1s.  This does no truncation, so 32230861 seconds
  * is represented as 1y1w1d1h1m1s.
@@ -459,6 +412,35 @@ unsigned_relts_print(netdissect_options *ndo,
 		s++;
 		l++;
 	}
+}
+
+/*
+ * Print a signed relative number of seconds (e.g. hold time, prune timer)
+ * in the form 5m1s.  This does no truncation, so 32230861 seconds
+ * is represented as 1y1w1d1h1m1s.
+ */
+void
+signed_relts_print(netdissect_options *ndo,
+                   int32_t secs)
+{
+	if (secs == -2147483648) {
+		/*
+		 * -2^31; you can't fit its absolute value into a 32-bit
+		 * signed integer.
+		 *
+		 * We calculate the right string by hand.
+		 */
+		ND_PRINT((ndo, "-68y5w3h14m8s"));
+		return;
+	}
+	if (secs < 0) {
+		/*
+		 * We now know -secs will fit into secs.
+		 */
+		ND_PRINT((ndo, "-"));
+		secs = -secs;
+	}
+	unsigned_relts_print(ndo, secs);
 }
 
 /*
