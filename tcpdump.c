@@ -1662,7 +1662,7 @@ main(int argc, char **argv)
 	if (ndo->ndo_vflag > 0 && WFileName) {
 		/*
 		 * When capturing to a file, "-v" means tcpdump should,
-		 * every 10 secodns, "v"erbosely report the number of
+		 * every 10 seconds, "v"erbosely report the number of
 		 * packets captured.
 		 */
 #ifdef USE_WIN32_MM_TIMER
