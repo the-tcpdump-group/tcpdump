@@ -695,10 +695,10 @@ babel_print_v2(netdissect_options *ndo,
                 if(ae == 1)
                     src_plen += 96;
                 ND_PRINT((ndo, "(%u hops) for (%s, ",
-                          message[6], format_prefix(ndo, prefix, plen)));
+                          hopc, format_prefix(ndo, prefix, plen)));
                 ND_PRINT((ndo, "%s) seqno %u id %s",
                           format_prefix(ndo, src_prefix, src_plen),
-                          seqno, format_id(message + 8)));
+                          seqno, format_id(router_id)));
             }
         }
             break;
