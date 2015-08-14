@@ -306,3 +306,8 @@ olsrv1_1	OLSRv1_HNA_sgw_1.pcap		OLSRv1_HNA_sgw_1.out	-t -v
 
 # tests with unaligned data, to make sure they work on SPARC
 unaligned-nfs-1	unaligned-nfs-1.pcap	unaligned-nfs-1.out	-t -v
+
+# LISP tests
+lisp_eid_notify		lisp_eid_notify.pcap	lisp_eid_notify.out	-t -v
+lisp_eid_register	lisp_eid_register.pcap	lisp_eid_register.out	-t -v	
+lisp_ipv6_eid		lisp_ipv6.pcap		lisp_ipv6.out		-t -v
