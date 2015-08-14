@@ -462,6 +462,7 @@ extern void krb_print(netdissect_options *, const u_char *);
 extern void l2tp_print(netdissect_options *, const u_char *, u_int);
 extern void lane_print(netdissect_options *, const u_char *, u_int, u_int);
 extern void ldp_print(netdissect_options *, const u_char *, u_int);
+extern void lisp_print(netdissect_options *, const u_char *, u_int);
 extern u_int llap_print(netdissect_options *, const u_char *, u_int);
 extern int llc_print(netdissect_options *, const u_char *, u_int, u_int, const u_char *, const u_char *);
 extern void lldp_print(netdissect_options *, const u_char *, u_int);
