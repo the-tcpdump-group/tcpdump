@@ -579,4 +579,6 @@ extern int esp_print_decrypt_buffer_by_ikev2(netdissect_options *, int,
 					     u_char spii[8], u_char spir[8],
 					     const u_char *, const u_char *);
 
+extern void lisp_print(netdissect_options *, const u_char *, u_int);
+
 #endif  /* netdissect_h */

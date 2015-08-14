@@ -154,6 +154,7 @@ LIBNETDISSECT_SRC=\
 	print-l2tp.c \
 	print-lane.c \
 	print-ldp.c \
+	print-lisp.c \
 	print-llc.c \
 	print-lldp.c \
 	print-lmp.c \
