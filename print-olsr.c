@@ -240,8 +240,8 @@ olsr_print_lq_neighbor4(netdissect_options *ndo,
         if (!ND_TTEST(*lq_neighbor))
             return (-1);
 
-        ND_PRINT((ndo, "\n\t      neighbor %s, link-quality %.2lf%%"
-               ", neighbor-link-quality %.2lf%%",
+        ND_PRINT((ndo, "\n\t      neighbor %s, link-quality %.2f%%"
+               ", neighbor-link-quality %.2f%%",
                ipaddr_string(ndo, lq_neighbor->neighbor),
                ((double)lq_neighbor->link_quality/2.55),
                ((double)lq_neighbor->neighbor_link_quality/2.55)));
@@ -265,8 +265,8 @@ olsr_print_lq_neighbor6(netdissect_options *ndo,
         if (!ND_TTEST(*lq_neighbor))
             return (-1);
 
-        ND_PRINT((ndo, "\n\t      neighbor %s, link-quality %.2lf%%"
-               ", neighbor-link-quality %.2lf%%",
+        ND_PRINT((ndo, "\n\t      neighbor %s, link-quality %.2f%%"
+               ", neighbor-link-quality %.2f%%",
                ip6addr_string(ndo, lq_neighbor->neighbor),
                ((double)lq_neighbor->link_quality/2.55),
                ((double)lq_neighbor->neighbor_link_quality/2.55)));
@@ -377,7 +377,7 @@ olsr_print(netdissect_options *ndo,
             }
 
             ND_PRINT((ndo, "\n\t%s Message (%#04x), originator %s, ttl %u, hop %u"
-                    "\n\t  vtime %.3lfs, msg-seq 0x%04x, length %u%s",
+                    "\n\t  vtime %.3fs, msg-seq 0x%04x, length %u%s",
                     tok2str(olsr_msg_values, "Unknown", msg_type),
                     msg_type, ip6addr_string(ndo, msgptr.v6->originator),
                     msgptr.v6->ttl,
@@ -408,7 +408,7 @@ olsr_print(netdissect_options *ndo,
             }
 
             ND_PRINT((ndo, "\n\t%s Message (%#04x), originator %s, ttl %u, hop %u"
-                    "\n\t  vtime %.3lfs, msg-seq 0x%04x, length %u%s",
+                    "\n\t  vtime %.3fs, msg-seq 0x%04x, length %u%s",
                     tok2str(olsr_msg_values, "Unknown", msg_type),
                     msg_type, ipaddr_string(ndo, msgptr.v4->originator),
                     msgptr.v4->ttl,
@@ -432,7 +432,7 @@ olsr_print(netdissect_options *ndo,
             ND_TCHECK2(*msg_data, sizeof(struct olsr_hello));
 
             ptr.hello = (const struct olsr_hello *)msg_data;
-            ND_PRINT((ndo, "\n\t  hello-time %.3lfs, MPR willingness %u",
+            ND_PRINT((ndo, "\n\t  hello-time %.3fs, MPR willingness %u",
                    ME_TO_DOUBLE(ptr.hello->htime), ptr.hello->will));
             msg_data += sizeof(struct olsr_hello);
             msg_tlen -= sizeof(struct olsr_hello);
