@@ -790,7 +790,7 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 			_t = (time_t) EXTRACT_32BITS(bp); \
 			bp += sizeof(int32_t); \
 			tm = localtime(&_t); \
-			strftime(str, 256, "%Y/%m/%d %T", tm); \
+			strftime(str, 256, "%Y/%m/%d %H:%M:%S", tm); \
 			ND_PRINT((ndo, " %s", str)); \
 		}
 
