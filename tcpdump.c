@@ -493,12 +493,13 @@ droproot(const char *username, const char *chroot_dir)
 			}
 		}
 #ifdef HAVE_LIBCAP_NG
-		int ret = capng_change_id(pw->pw_uid, pw->pw_gid, CAPNG_NO_FLAG);
-		if (ret < 0) {
-			fprintf(stderr, "error : ret %d\n", ret);
-		}
-		else {
-			fprintf(stderr, "dropped privs to %s\n", username);
+		{
+			int ret = capng_change_id(pw->pw_uid, pw->pw_gid, CAPNG_NO_FLAG);
+			if (ret < 0) {
+				fprintf(stderr, "error : ret %d\n", ret);
+			} else {
+				fprintf(stderr, "dropped privs to %s\n", username);
+			}
 		}
 #else
 		if (initgroups(pw->pw_name, pw->pw_gid) != 0 ||
