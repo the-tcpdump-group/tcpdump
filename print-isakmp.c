@@ -354,7 +354,7 @@ enum ikev2_t_type {
 	IV2_T_PRF  = 2,
 	IV2_T_INTEG= 3,
 	IV2_T_DH   = 4,
-	IV2_T_ESN  = 5,
+	IV2_T_ESN  = 5
 };
 
 /* 3.4.  Key Exchange Payload */
@@ -374,7 +374,7 @@ enum ikev2_id_type {
 	ID_IPV6_ADDR=5,
 	ID_DER_ASN1_DN=9,
 	ID_DER_ASN1_GN=10,
-	ID_KEY_ID=11,
+	ID_KEY_ID=11
 };
 struct ikev2_id {
 	struct isakmp_gen h;
@@ -438,7 +438,7 @@ struct ikev2_auth {
 enum ikev2_auth_type {
 	IV2_RSA_SIG = 1,
 	IV2_SHARED  = 2,
-	IV2_DSS_SIG = 3,
+	IV2_DSS_SIG = 3
 };
 
 /* refer to RFC 2409 */
