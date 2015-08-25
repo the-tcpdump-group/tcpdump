@@ -301,3 +301,6 @@ cve2015-0261_02    cve2015-0261-crash.pcap      cve2015-0261-crash.out -t -v
 
 # OLSRv1 tests
 olsrv1_1	OLSRv1_HNA_sgw_1.pcap		OLSRv1_HNA_sgw_1.out	-t -v -n
+
+# tests with unaligned data, to make sure they work on SPARC
+unaligned-nfs-1	unaligned-nfs-1.pcap	unaligned-nfs-1.out	-t -v -n
