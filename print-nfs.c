@@ -932,13 +932,14 @@ xid_map_find(const struct sunrpc_msg *rp, const u_char *bp, uint32_t *proc,
 {
 	int i;
 	struct xid_map_entry *xmep;
-	uint32_t xid = rp->rm_xid;
+	uint32_t xid;
 	const struct ip *ip = (const struct ip *)bp;
 #ifdef INET6
 	const struct ip6_hdr *ip6 = (const struct ip6_hdr *)bp;
 #endif
 	int cmp;
 
+	UNALIGNED_MEMCPY(&xid, &rp->rm_xid, sizeof(xmep->xid));
 	/* Start searching from where we last left off */
 	i = xid_map_hint;
 	do {
