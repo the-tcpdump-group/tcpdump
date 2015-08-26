@@ -2695,10 +2695,10 @@ print_radiotap_field(netdissect_options *ndo,
 			ND_PRINT((ndo, "%2.1f Mb/s ", .5 * u.u8));
 		break;
 	case IEEE80211_RADIOTAP_DBM_ANTSIGNAL:
-		ND_PRINT((ndo, "%ddB signal ", u.i8));
+		ND_PRINT((ndo, "%ddBm signal ", u.i8));
 		break;
 	case IEEE80211_RADIOTAP_DBM_ANTNOISE:
-		ND_PRINT((ndo, "%ddB noise ", u.i8));
+		ND_PRINT((ndo, "%ddBm noise ", u.i8));
 		break;
 	case IEEE80211_RADIOTAP_DB_ANTSIGNAL:
 		ND_PRINT((ndo, "%ddB signal ", u.u8));
