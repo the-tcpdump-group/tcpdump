@@ -1297,7 +1297,7 @@ snmppdu_print(netdissect_options *ndo,
               u_short pduid, const u_char *np, u_int length)
 {
 	struct be elem;
-	int count = 0, error;
+	int count = 0, error_status;
 
 	/* reqId (Integer) */
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
@@ -1320,7 +1320,7 @@ snmppdu_print(netdissect_options *ndo,
 		asn1_print(ndo, &elem);
 		return;
 	}
-	error = 0;
+	error_status = 0;
 	if ((pduid == GETREQ || pduid == GETNEXTREQ || pduid == SETREQ
 	    || pduid == INFORMREQ || pduid == V2TRAP || pduid == REPORT)
 	    && elem.data.integer != 0) {
@@ -1332,7 +1332,7 @@ snmppdu_print(netdissect_options *ndo,
 	} else if (elem.data.integer != 0) {
 		char errbuf[20];
 		ND_PRINT((ndo, " %s", DECODE_ErrorStatus(elem.data.integer)));
-		error = elem.data.integer;
+		error_status = elem.data.integer;
 	}
 	length -= count;
 	np += count;
@@ -1352,15 +1352,12 @@ snmppdu_print(netdissect_options *ndo,
 	else if (pduid == GETBULKREQ)
 		ND_PRINT((ndo, " M=%d", elem.data.integer));
 	else if (elem.data.integer != 0) {
-		if (!error)
+		if (!error_status)
 			ND_PRINT((ndo, "[errorIndex(%d) w/o errorStatus]", elem.data.integer));
-		else {
+		else
 			ND_PRINT((ndo, "@%d", elem.data.integer));
-			error = elem.data.integer;
-		}
-	} else if (error) {
+	} else if (error_status) {
 		ND_PRINT((ndo, "[errorIndex==0]"));
-		error = 0;
 	}
 	length -= count;
 	np += count;
