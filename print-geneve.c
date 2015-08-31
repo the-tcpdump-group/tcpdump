@@ -111,14 +111,14 @@ geneve_opts_print(netdissect_options *ndo, const u_char *bp, u_int len)
         }
 
         if (ndo->ndo_vflag > 1 && opt_len > 4) {
-            const uint32_t *print_data = (const uint32_t *)(bp + 4);
+            const uint32_t *data = (const uint32_t *)(bp + 4);
             int i;
 
             ND_PRINT((ndo, " data"));
 
             for (i = 4; i < opt_len; i += 4) {
-                ND_PRINT((ndo, " %08x", EXTRACT_32BITS(print_data)));
-                print_data++;
+                ND_PRINT((ndo, " %08x", EXTRACT_32BITS(data)));
+                data++;
             }
         }
 
