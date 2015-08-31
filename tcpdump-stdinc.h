@@ -41,7 +41,7 @@
 
 #include <errno.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 
 #include <stdint.h>
 #include <stdio.h>
@@ -176,7 +176,7 @@ typedef char* caddr_t;
 #define vsnprintf _vsnprintf
 #define RETSIGTYPE void
 
-#else /* WIN32 */
+#else /* _WIN32 */
 
 #include <ctype.h>
 #include <unistd.h>
@@ -198,7 +198,7 @@ typedef char* caddr_t;
 
 #include <arpa/inet.h>
 
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 #ifndef HAVE___ATTRIBUTE__
 #define __attribute__(x)
@@ -241,7 +241,7 @@ typedef char* caddr_t;
 #define UNALIGNED	__attribute__((packed))
 #endif
 
-#if defined(WIN32) || defined(MSDOS)
+#if defined(_WIN32) || defined(MSDOS)
   #define FOPEN_READ_TXT   "rt"
   #define FOPEN_READ_BIN   "rb"
   #define FOPEN_WRITE_TXT  "wt"

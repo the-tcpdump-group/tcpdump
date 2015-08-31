@@ -56,13 +56,13 @@ The Regents of the University of California.  All rights reserved.\n";
 
 #include <tcpdump-stdinc.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include "w32_fzs.h"
 extern int strcasecmp (const char *__s1, const char *__s2);
 extern int SIZE_BUF;
 #define off_t long
 #define uint UINT
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 #ifdef USE_LIBSMI
 #include <smi.h>
@@ -94,12 +94,12 @@ extern int SIZE_BUF;
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
-#ifndef WIN32
+#ifndef _WIN32
 #include <sys/wait.h>
 #include <sys/resource.h>
 #include <pwd.h>
 #include <grp.h>
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 /* capabilities convenience library */
 /* If a code depends on HAVE_LIBCAP_NG, it depends also on HAVE_CAP_NG_H.
@@ -622,13 +622,13 @@ show_devices_and_exit (void)
  * Set up flags that might or might not be supported depending on the
  * version of libpcap we're using.
  */
-#if defined(HAVE_PCAP_CREATE) || defined(WIN32)
+#if defined(HAVE_PCAP_CREATE) || defined(_WIN32)
 #define B_FLAG		"B:"
 #define B_FLAG_USAGE	" [ -B size ]"
-#else /* defined(HAVE_PCAP_CREATE) || defined(WIN32) */
+#else /* defined(HAVE_PCAP_CREATE) || defined(_WIN32) */
 #define B_FLAG
 #define B_FLAG_USAGE
-#endif /* defined(HAVE_PCAP_CREATE) || defined(WIN32) */
+#endif /* defined(HAVE_PCAP_CREATE) || defined(_WIN32) */
 
 #ifdef HAVE_PCAP_CREATE
 #define I_FLAG		"I"
@@ -691,7 +691,7 @@ show_devices_and_exit (void)
 #define OPTION_IMMEDIATE_MODE	130
 
 static const struct option longopts[] = {
-#if defined(HAVE_PCAP_CREATE) || defined(WIN32)
+#if defined(HAVE_PCAP_CREATE) || defined(_WIN32)
 	{ "buffer-size", required_argument, NULL, 'B' },
 #endif
 	{ "list-interfaces", no_argument, NULL, 'D' },
@@ -732,7 +732,7 @@ static const struct option longopts[] = {
 	{ NULL, 0, NULL, 0 }
 };
 
-#ifndef WIN32
+#ifndef _WIN32
 /* Drop root privileges and chroot if necessary */
 static void
 droproot(const char *username, const char *chroot_dir)
@@ -793,7 +793,7 @@ droproot(const char *username, const char *chroot_dir)
 #endif /* HAVE_LIBCAP_NG */
 
 }
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 static int
 getWflagChars(int x)
@@ -1007,7 +1007,7 @@ main(int argc, char **argv)
 	int new_dlt;
 	const char *dlt_name;
 	struct bpf_program fcode;
-#ifndef WIN32
+#ifndef _WIN32
 	RETSIGTYPE (*oldhandler)(int);
 #endif
 	struct print_info printinfo;
@@ -1030,9 +1030,9 @@ main(int argc, char **argv)
 	int cansandbox;
 #endif	/* HAVE_CAPSICUM */
 
-#ifdef WIN32
+#ifdef _WIN32
 	if(wsockinit() != 0) return 1;
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 	jflag=-1;	/* not set */
         gndo->ndo_Oflag=1;
@@ -1088,13 +1088,13 @@ main(int argc, char **argv)
 			++bflag;
 			break;
 
-#if defined(HAVE_PCAP_CREATE) || defined(WIN32)
+#if defined(HAVE_PCAP_CREATE) || defined(_WIN32)
 		case 'B':
 			Bflag = atoi(optarg)*1024;
 			if (Bflag <= 0)
 				error("invalid packet buffer size %s", optarg);
 			break;
-#endif /* defined(HAVE_PCAP_CREATE) || defined(WIN32) */
+#endif /* defined(HAVE_PCAP_CREATE) || defined(_WIN32) */
 
 		case 'c':
 			cnt = atoi(optarg);
@@ -1224,24 +1224,24 @@ main(int argc, char **argv)
 #endif
 
 		case 'l':
-#ifdef WIN32
+#ifdef _WIN32
 			/*
 			 * _IOLBF is the same as _IOFBF in Microsoft's C
 			 * libraries; the only alternative they offer
 			 * is _IONBF.
 			 *
 			 * XXX - this should really be checking for MSVC++,
-			 * not WIN32, if, for example, MinGW has its own
+			 * not _WIN32, if, for example, MinGW has its own
 			 * C library that is more UNIX-compatible.
 			 */
 			setvbuf(stdout, NULL, _IONBF, 0);
-#else /* WIN32 */
+#else /* _WIN32 */
 #ifdef HAVE_SETLINEBUF
 			setlinebuf(stdout);
 #else
 			setvbuf(stdout, NULL, _IOLBF, 0);
 #endif
-#endif /* WIN32 */
+#endif /* _WIN32 */
 			break;
 
 		case 'K':
@@ -1531,7 +1531,7 @@ main(int argc, char **argv)
 		 * In either case, we're reading a savefile, not doing
 		 * a live capture.
 		 */
-#ifndef WIN32
+#ifndef _WIN32
 		/*
 		 * We don't need network access, so relinquish any set-UID
 		 * or set-GID privileges we have (if any).
@@ -1543,7 +1543,7 @@ main(int argc, char **argv)
 		 */
 		if (setgid(getgid()) != 0 || setuid(getuid()) != 0 )
 			fprintf(stderr, "Warning: setgid/setuid failed !\n");
-#endif /* WIN32 */
+#endif /* _WIN32 */
 		if (VFileName != NULL) {
 			if (VFileName[0] == '-' && VFileName[1] == '\0')
 				VFile = stdin;
@@ -1595,7 +1595,7 @@ main(int argc, char **argv)
 			if (device == NULL)
 				error("%s", ebuf);
 		}
-#ifdef WIN32
+#ifdef _WIN32
 		/*
 		 * Print a message to the standard error on Windows.
 		 * XXX - why do it here, with a different message?
@@ -1610,7 +1610,7 @@ main(int argc, char **argv)
 		}
 
 		fflush(stderr);
-#endif /* WIN32 */
+#endif /* _WIN32 */
 #ifdef HAVE_PCAP_CREATE
 		pd = pcap_create(device, ebuf);
 		if (pd == NULL)
@@ -1727,16 +1727,16 @@ main(int argc, char **argv)
 		/*
 		 * Let user own process after socket has been opened.
 		 */
-#ifndef WIN32
+#ifndef _WIN32
 		if (setgid(getgid()) != 0 || setuid(getuid()) != 0)
 			fprintf(stderr, "Warning: setgid/setuid failed !\n");
-#endif /* WIN32 */
-#if !defined(HAVE_PCAP_CREATE) && defined(WIN32)
+#endif /* _WIN32 */
+#if !defined(HAVE_PCAP_CREATE) && defined(_WIN32)
 		if(Bflag != 0)
 			if(pcap_setbuff(pd, Bflag)==-1){
 				error("%s", pcap_geterr(pd));
 			}
-#endif /* !defined(HAVE_PCAP_CREATE) && defined(WIN32) */
+#endif /* !defined(HAVE_PCAP_CREATE) && defined(_WIN32) */
 		if (Lflag)
 			show_dlts_and_exit(device, pd);
 		if (gndo->ndo_dlt >= 0) {
@@ -1786,21 +1786,21 @@ main(int argc, char **argv)
 	init_addrtoname(gndo, localnet, netmask);
         init_checksum();
 
-#ifndef WIN32
+#ifndef _WIN32
 	(void)setsignal(SIGPIPE, cleanup);
 	(void)setsignal(SIGTERM, cleanup);
 	(void)setsignal(SIGINT, cleanup);
-#endif /* WIN32 */
+#endif /* _WIN32 */
 #if defined(HAVE_FORK) || defined(HAVE_VFORK)
 	(void)setsignal(SIGCHLD, child_cleanup);
 #endif
 	/* Cooperate with nohup(1) */
-#ifndef WIN32
+#ifndef _WIN32
 	if ((oldhandler = setsignal(SIGHUP, cleanup)) != SIG_DFL)
 		(void)setsignal(SIGHUP, oldhandler);
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
-#ifndef WIN32
+#ifndef _WIN32
 	/*
 	 * If a user name was specified with "-Z", attempt to switch to
 	 * that user's UID.  This would probably be used with sudo,
@@ -1845,7 +1845,7 @@ main(int argc, char **argv)
 			droproot(username, chroot_dir);
 
 	}
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 	if (pcap_setfilter(pd, &fcode) < 0)
 		error("%s", pcap_geterr(pd));
@@ -1963,7 +1963,7 @@ main(int argc, char **argv)
 #endif
 	}
 
-#ifndef WIN32
+#ifndef _WIN32
 	if (RFileName == NULL) {
 		/*
 		 * Live capture (if -V was specified, we set RFileName
@@ -1988,7 +1988,7 @@ main(int argc, char **argv)
 		}
 		(void)fflush(stderr);
 	}
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 #ifdef HAVE_CAPSICUM
 	cansandbox = (nflag && VFileName == NULL && zflag == NULL);
@@ -2538,7 +2538,7 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 		info(0);
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 	/*
 	 * XXX - there should really be libpcap calls to get the version
 	 * number as a string (the string would be generated from #defines
@@ -2619,28 +2619,28 @@ print_version(void)
 {
 	extern char version[];
 #ifndef HAVE_PCAP_LIB_VERSION
-#if defined(WIN32) || defined(HAVE_PCAP_VERSION)
+#if defined(_WIN32) || defined(HAVE_PCAP_VERSION)
 	extern char pcap_version[];
-#else /* defined(WIN32) || defined(HAVE_PCAP_VERSION) */
+#else /* defined(_WIN32) || defined(HAVE_PCAP_VERSION) */
 	static char pcap_version[] = "unknown";
-#endif /* defined(WIN32) || defined(HAVE_PCAP_VERSION) */
+#endif /* defined(_WIN32) || defined(HAVE_PCAP_VERSION) */
 #endif /* HAVE_PCAP_LIB_VERSION */
 
 #ifdef HAVE_PCAP_LIB_VERSION
-#ifdef WIN32
+#ifdef _WIN32
 	(void)fprintf(stderr, "%s version %s, based on tcpdump version %s\n", program_name, WDversion, version);
-#else /* WIN32 */
+#else /* _WIN32 */
 	(void)fprintf(stderr, "%s version %s\n", program_name, version);
-#endif /* WIN32 */
+#endif /* _WIN32 */
 	(void)fprintf(stderr, "%s\n",pcap_lib_version());
 #else /* HAVE_PCAP_LIB_VERSION */
-#ifdef WIN32
+#ifdef _WIN32
 	(void)fprintf(stderr, "%s version %s, based on tcpdump version %s\n", program_name, WDversion, version);
 	(void)fprintf(stderr, "WinPcap version %s, based on libpcap version %s\n",Wpcap_version, pcap_version);
-#else /* WIN32 */
+#else /* _WIN32 */
 	(void)fprintf(stderr, "%s version %s\n", program_name, version);
 	(void)fprintf(stderr, "libpcap version %s\n", pcap_version);
-#endif /* WIN32 */
+#endif /* _WIN32 */
 #endif /* HAVE_PCAP_LIB_VERSION */
 
 #if defined(HAVE_LIBCRYPTO) && defined(SSLEAY_VERSION)

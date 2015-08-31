@@ -90,7 +90,7 @@ static struct hnamemem eprototable[HASHNAMESIZE];
 static struct hnamemem dnaddrtable[HASHNAMESIZE];
 static struct hnamemem ipxsaptable[HASHNAMESIZE];
 
-#if defined(INET6) && defined(WIN32)
+#if defined(INET6) && defined(_WIN32)
 /*
  * fake gethostbyaddr for Win2k/XP
  * gethostbyaddr() returns incorrect value when AF_INET6 is passed
@@ -128,7 +128,7 @@ win32_gethostbyaddr(const char *addr, int len, int type)
 	}
 }
 #define gethostbyaddr win32_gethostbyaddr
-#endif /* INET6 & WIN32 */
+#endif /* INET6 & _WIN32 */
 
 #ifdef INET6
 struct h6namemem {
@@ -755,7 +755,7 @@ init_servarray(netdissect_options *ndo)
 }
 
 /* in libpcap.a (nametoaddr.c) */
-#if defined(WIN32) && !defined(USE_STATIC_LIBPCAP)
+#if defined(_WIN32) && !defined(USE_STATIC_LIBPCAP)
 extern __declspec(dllimport)
 #else
 extern
