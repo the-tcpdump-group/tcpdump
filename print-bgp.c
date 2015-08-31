@@ -968,21 +968,21 @@ trunc:
  * the buffer would have overflowed; again, set buflen to 0 in
  * that case.
  */
-#define UPDATE_BUF_BUFLEN(buf, buflen, strlen) \
-    if (strlen<0) \
+#define UPDATE_BUF_BUFLEN(buf, buflen, stringlen) \
+    if (stringlen<0) \
        	buflen=0; \
-    else if ((u_int)strlen>buflen) \
+    else if ((u_int)stringlen>buflen) \
         buflen=0; \
     else { \
-        buflen-=strlen; \
-	buf+=strlen; \
+        buflen-=stringlen; \
+	buf+=stringlen; \
     }
 
 static int
 decode_labeled_vpn_l2(netdissect_options *ndo,
                       const u_char *pptr, char *buf, u_int buflen)
 {
-        int plen,tlen,strlen,tlv_type,tlv_len,ttlv_len;
+        int plen,tlen,stringlen,tlv_type,tlv_len,ttlv_len;
 
 	ND_TCHECK2(pptr[0], 2);
         plen=EXTRACT_16BITS(pptr);
@@ -996,12 +996,12 @@ decode_labeled_vpn_l2(netdissect_options *ndo,
 	    /* assume AD-only with RD, BGPNH */
 	    ND_TCHECK2(pptr[0],12);
 	    buf[0]='\0';
-	    strlen=snprintf(buf, buflen, "RD: %s, BGPNH: %s",
-			    bgp_vpn_rd_print(ndo, pptr),
-			    /* need something like getname(ndo, ) here */
-			    getname(ndo, pptr+8)
-			    );
-	    UPDATE_BUF_BUFLEN(buf, buflen, strlen);
+	    stringlen=snprintf(buf, buflen, "RD: %s, BGPNH: %s",
+			       bgp_vpn_rd_print(ndo, pptr),
+			       /* need something like getname(ndo, ) here */
+			       getname(ndo, pptr+8)
+			       );
+	    UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
 	    pptr+=12;
 	    tlen-=12;
 	    return plen;
@@ -1011,12 +1011,12 @@ decode_labeled_vpn_l2(netdissect_options *ndo,
 
 	    ND_TCHECK2(pptr[0],15);
 	    buf[0]='\0';
-	    strlen=snprintf(buf, buflen, "RD: %s, CE-ID: %u, Label-Block Offset: %u, Label Base %u",
-			    bgp_vpn_rd_print(ndo, pptr),
-			    EXTRACT_16BITS(pptr+8),
-			    EXTRACT_16BITS(pptr+10),
-			    EXTRACT_24BITS(pptr+12)>>4); /* the label is offsetted by 4 bits so lets shift it right */
-	    UPDATE_BUF_BUFLEN(buf, buflen, strlen);
+	    stringlen=snprintf(buf, buflen, "RD: %s, CE-ID: %u, Label-Block Offset: %u, Label Base %u",
+			       bgp_vpn_rd_print(ndo, pptr),
+			       EXTRACT_16BITS(pptr+8),
+			       EXTRACT_16BITS(pptr+10),
+			       EXTRACT_24BITS(pptr+12)>>4); /* the label is offsetted by 4 bits so lets shift it right */
+	    UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
 	    pptr+=15;
 	    tlen-=15;
 
@@ -1033,27 +1033,27 @@ decode_labeled_vpn_l2(netdissect_options *ndo,
 		switch(tlv_type) {
 		case 1:
 		    if (buflen!=0) {
-			strlen=snprintf(buf,buflen, "\n\t\tcircuit status vector (%u) length: %u: 0x",
-					tlv_type,
-					tlv_len);
-			UPDATE_BUF_BUFLEN(buf, buflen, strlen);
+			stringlen=snprintf(buf,buflen, "\n\t\tcircuit status vector (%u) length: %u: 0x",
+					   tlv_type,
+					   tlv_len);
+			UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
 		    }
 		    ttlv_len=ttlv_len/8+1; /* how many bytes do we need to read ? */
 		    while (ttlv_len>0) {
 			ND_TCHECK(pptr[0]);
 			if (buflen!=0) {
-			    strlen=snprintf(buf,buflen, "%02x",*pptr++);
-			    UPDATE_BUF_BUFLEN(buf, buflen, strlen);
+			    stringlen=snprintf(buf,buflen, "%02x",*pptr++);
+			    UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
 			}
 			ttlv_len--;
 		    }
 		    break;
 		default:
 		    if (buflen!=0) {
-			strlen=snprintf(buf,buflen, "\n\t\tunknown TLV #%u, length: %u",
-					tlv_type,
-					tlv_len);
-			UPDATE_BUF_BUFLEN(buf, buflen, strlen);
+			stringlen=snprintf(buf,buflen, "\n\t\tunknown TLV #%u, length: %u",
+					   tlv_type,
+					   tlv_len);
+			UPDATE_BUF_BUFLEN(buf, buflen, stringlen);
 		    }
 		    break;
 		}
