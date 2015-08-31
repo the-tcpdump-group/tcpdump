@@ -42,7 +42,7 @@ struct rtentry;
 
 static const char tstr[] = "[|decnet]";
 
-#ifndef WIN32
+#ifndef _WIN32
 typedef uint8_t byte[1];		/* single byte field */
 #else
 /*
@@ -50,7 +50,7 @@ typedef uint8_t byte[1];		/* single byte field */
  */
 typedef unsigned char Byte[1];		/* single byte field */
 #define byte Byte
-#endif /* WIN32 */
+#endif /* _WIN32 */
 typedef uint8_t word[2];		/* 2 byte field */
 typedef uint8_t longword[4];		/* 4 bytes field */
 
