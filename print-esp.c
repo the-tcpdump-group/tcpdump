@@ -432,7 +432,7 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 		/* open file and read it */
 		FILE *secretfile;
 		char  fileline[1024];
-		int   lineno=0;
+		int   subfile_lineno=0;
 		char  *nl;
 		char *filename = line;
 
@@ -443,7 +443,7 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 		}
 
 		while (fgets(fileline, sizeof(fileline)-1, secretfile) != NULL) {
-			lineno++;
+			subfile_lineno++;
 			/* remove newline from the line */
 			nl = strchr(fileline, '\n');
 			if (nl)
@@ -451,7 +451,7 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 			if (fileline[0] == '#') continue;
 			if (fileline[0] == '\0') continue;
 
-			esp_print_decode_onesecret(ndo, fileline, filename, lineno);
+			esp_print_decode_onesecret(ndo, fileline, filename, subfile_lineno);
 		}
 		fclose(secretfile);
 
