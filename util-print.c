@@ -69,6 +69,7 @@ int32_t thiszone;		/* seconds offset from gmt to local time */
  * Print out a null-terminated filename (or other ascii string).
  * If ep is NULL, assume no truncation check is needed.
  * Return true if truncated.
+ * Stop at ep (if given) or before the null char, whichever is first.
  */
 int
 fn_print(netdissect_options *ndo,
@@ -101,6 +102,7 @@ fn_print(netdissect_options *ndo,
  * Print out a counted filename (or other ascii string).
  * If ep is NULL, assume no truncation check is needed.
  * Return true if truncated.
+ * Stop at ep (if given) or after n bytes, whichever is first.
  */
 int
 fn_printn(netdissect_options *ndo,
@@ -128,6 +130,8 @@ fn_printn(netdissect_options *ndo,
  * Print out a null-padded filename (or other ascii string).
  * If ep is NULL, assume no truncation check is needed.
  * Return true if truncated.
+ * Stop at ep (if given) or after n bytes or before the null char,
+ * whichever is first.
  */
 int
 fn_printzp(netdissect_options *ndo,
