@@ -37,7 +37,7 @@ struct rtentry;
 #include <string.h>
 
 #include "extract.h"
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
 
 static const char tstr[] = "[|decnet]";

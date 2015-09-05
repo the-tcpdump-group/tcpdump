@@ -25,7 +25,7 @@
 
 #include <tcpdump-stdinc.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"            /* must come after interface.h */
 

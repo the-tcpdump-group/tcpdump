@@ -31,7 +31,7 @@
 
 #include "ip6.h"
 
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
 

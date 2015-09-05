@@ -33,7 +33,7 @@
 #include <time.h>
 #endif
 
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
 

@@ -53,7 +53,7 @@
 
 #include <stdio.h>
 
-#include "interface.h"
+#include "netdissect.h"
 
 #define TELCMDS
 #define TELOPTS

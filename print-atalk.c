@@ -30,7 +30,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
 #include "ethertype.h"
 #include "extract.h"			/* must come after interface.h */

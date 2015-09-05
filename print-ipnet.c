@@ -4,7 +4,7 @@
 
 #include <tcpdump-stdinc.h>
 
-#include "interface.h"
+#include "netdissect.h"
 
 typedef struct ipnet_hdr {
 	uint8_t		iph_version;

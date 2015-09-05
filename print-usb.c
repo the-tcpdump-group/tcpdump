@@ -25,7 +25,7 @@
 
 #include <tcpdump-stdinc.h>
 
-#include "interface.h"
+#include "netdissect.h"
 
 
 #if defined(HAVE_PCAP_USB_H) && defined(DLT_USB_LINUX)

@@ -14,7 +14,7 @@
 
 #include <string.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "extract.h"
 #include "smb.h"
 

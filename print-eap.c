@@ -27,7 +27,7 @@
 
 #include <tcpdump-stdinc.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "extract.h"
 
 #define	EAP_FRAME_TYPE_PACKET		0

@@ -27,7 +27,7 @@
 
 #include <string.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "af.h"
 
 /*

@@ -43,7 +43,7 @@
 #include <tcpdump-stdinc.h>
 #include <stdio.h>
 
-#include "interface.h"
+#include "netdissect.h"
 
 #define ASCII_LINELENGTH 300
 #define HEXDUMP_BYTES_PER_LINE 16

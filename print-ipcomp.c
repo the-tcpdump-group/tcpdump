@@ -35,7 +35,7 @@ struct ipcomp {
 #include <zlib.h>
 #endif
 
-#include "interface.h"
+#include "netdissect.h"
 #include "extract.h"
 
 int

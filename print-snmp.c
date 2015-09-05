@@ -69,7 +69,7 @@
 #include <smi.h>
 #endif
 
-#include "interface.h"
+#include "netdissect.h"
 
 #undef OPAQUE  /* defined in <wingdi.h> */
 

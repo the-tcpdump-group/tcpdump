@@ -32,7 +32,7 @@
 
 #include <string.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"			/* must come after interface.h */
 #include "nlpid.h"

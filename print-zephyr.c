@@ -30,7 +30,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "interface.h"
+#include "netdissect.h"
 
 struct z_packet {
     const char *version;

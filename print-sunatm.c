@@ -39,7 +39,7 @@
 struct mbuf;
 struct rtentry;
 
-#include "interface.h"
+#include "netdissect.h"
 #include "extract.h"
 
 #include "atm.h"

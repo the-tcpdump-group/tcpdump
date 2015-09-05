@@ -29,7 +29,7 @@
 
 #include "ah.h"
 
-#include "interface.h"
+#include "netdissect.h"
 #include "extract.h"
 
 int

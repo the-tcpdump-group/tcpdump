@@ -17,7 +17,7 @@
 
 #include <stdio.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "extract.h"
 
 #define	RSTP_EXTRACT_PORT_ROLE(x) (((x)&0x0C)>>2)

@@ -25,7 +25,7 @@
 
 #include <tcpdump-stdinc.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "ether.h"
 #include "ethertype.h"
 #include "extract.h"			/* must come after interface.h */

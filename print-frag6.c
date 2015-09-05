@@ -28,7 +28,7 @@
 #include <tcpdump-stdinc.h>
 
 #include "ip6.h"
-#include "interface.h"
+#include "netdissect.h"
 #include "extract.h"
 
 int

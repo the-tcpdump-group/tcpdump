@@ -17,7 +17,7 @@
 
 #include <string.h>
 
-#include "interface.h"
+#include "netdissect.h"
 
 /* Check for a string but not go beyond length
  * Return TRUE on match, FALSE otherwise

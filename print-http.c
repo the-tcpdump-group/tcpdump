@@ -25,7 +25,7 @@ static const char rcsid[] _U_ =
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "extract.h"
 
 /*
