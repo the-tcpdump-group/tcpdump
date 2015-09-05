@@ -311,10 +311,12 @@ get_print_info(netdissect_options *ndo, int type)
 	if (printinfo.printer == NULL) {
 		dltname = pcap_datalink_val_to_name(type);
 		if (dltname != NULL)
-			error("packet printing is not supported for link type %s: use -w",
-			      dltname);
+			(*ndo->ndo_error)(ndo,
+					  "packet printing is not supported for link type %s: use -w",
+					  dltname);
 		else
-			error("packet printing is not supported for link type %d: use -w", type);
+			(*ndo->ndo_error)(ndo,
+					  "packet printing is not supported for link type %d: use -w", type);
 	}
 	return (printinfo);
 }

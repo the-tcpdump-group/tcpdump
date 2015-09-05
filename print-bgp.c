@@ -1211,7 +1211,7 @@ decode_clnp_prefix(netdissect_options *ndo,
 			((0xff00 >> (plen % 8)) & 0xff);
 	}
 	snprintf(buf, buflen, "%s/%d",
-                 isonsap_string(addr,(plen + 7) / 8),
+                 isonsap_string(ndo, addr,(plen + 7) / 8),
                  plen);
 
 	return 1 + (plen + 7) / 8;
@@ -1248,7 +1248,7 @@ decode_labeled_vpn_clnp_prefix(netdissect_options *ndo,
         /* the label may get offsetted by 4 bits so lets shift it right */
 	snprintf(buf, buflen, "RD: %s, %s/%d, label:%u %s",
                  bgp_vpn_rd_print(ndo, pptr+4),
-                 isonsap_string(addr,(plen + 7) / 8),
+                 isonsap_string(ndo, addr,(plen + 7) / 8),
                  plen,
                  EXTRACT_24BITS(pptr+1)>>4,
                  ((pptr[3]&1)==0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
@@ -1645,7 +1645,7 @@ bgp_attr_print(netdissect_options *ndo,
                         case (AFNUM_NSAP<<8 | SAFNUM_MULTICAST):
                         case (AFNUM_NSAP<<8 | SAFNUM_UNIMULTICAST):
                             ND_TCHECK2(tptr[0], tlen);
-                            ND_PRINT((ndo, "%s", isonsap_string(tptr, tlen)));
+                            ND_PRINT((ndo, "%s", isonsap_string(ndo, tptr, tlen)));
                             tptr += tlen;
                             tlen = 0;
                             break;
@@ -1660,7 +1660,7 @@ bgp_attr_print(netdissect_options *ndo,
                                 ND_TCHECK2(tptr[0], tlen);
                                 ND_PRINT((ndo, "RD: %s, %s",
                                        bgp_vpn_rd_print(ndo, tptr),
-                                       isonsap_string(tptr+BGP_VPN_RD_LEN,tlen-BGP_VPN_RD_LEN)));
+                                       isonsap_string(ndo, tptr+BGP_VPN_RD_LEN,tlen-BGP_VPN_RD_LEN)));
                                 /* rfc986 mapped IPv4 address ? */
                                 if (EXTRACT_32BITS(tptr+BGP_VPN_RD_LEN) ==  0x47000601)
                                     ND_PRINT((ndo, " = %s", getname(ndo, tptr+BGP_VPN_RD_LEN+4)));

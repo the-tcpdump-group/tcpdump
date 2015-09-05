@@ -807,8 +807,8 @@ clnp_print(netdissect_options *ndo,
         if (ndo->ndo_vflag < 1) {
             ND_PRINT((ndo, "%s%s > %s, %s, length %u",
                    ndo->ndo_eflag ? "" : ", ",
-                   isonsap_string(source_address, source_address_length),
-                   isonsap_string(dest_address, dest_address_length),
+                   isonsap_string(ndo, source_address, source_address_length),
+                   isonsap_string(ndo, dest_address, dest_address_length),
                    tok2str(clnp_pdu_values,"unknown (%u)",clnp_pdu_type),
                    length));
             return (1);
@@ -832,9 +832,9 @@ clnp_print(netdissect_options *ndo,
 
         ND_PRINT((ndo, "\n\tsource address (length %u): %s\n\tdest   address (length %u): %s",
                source_address_length,
-               isonsap_string(source_address, source_address_length),
+               isonsap_string(ndo, source_address, source_address_length),
                dest_address_length,
-               isonsap_string(dest_address, dest_address_length)));
+               isonsap_string(ndo, dest_address, dest_address_length)));
 
         if (clnp_flags & CLNP_SEGMENT_PART) {
             	clnp_segment_header = (const struct clnp_segment_header_t *) pptr;
@@ -905,7 +905,7 @@ clnp_print(netdissect_options *ndo,
                                     ND_TCHECK2(*source_address, source_address_length);
                                     ND_PRINT((ndo, "\n\t    NSAP address (length %u): %s",
                                            source_address_length,
-                                           isonsap_string(source_address, source_address_length)));
+                                           isonsap_string(ndo, source_address, source_address_length)));
                             }
                             tlen-=source_address_length+1;
                     }
@@ -1111,7 +1111,7 @@ esis_print(netdissect_options *ndo,
 		dst = pptr;
 		pptr += dstl;
                 li -= dstl;
-		ND_PRINT((ndo, "\n\t  %s", isonsap_string(dst, dstl)));
+		ND_PRINT((ndo, "\n\t  %s", isonsap_string(ndo, dst, dstl)));
 
 		ND_TCHECK(*pptr);
 		if (li < 1) {
@@ -1148,7 +1148,7 @@ esis_print(netdissect_options *ndo,
 		if (netal == 0)
 			ND_PRINT((ndo, "\n\t  %s", etheraddr_string(ndo, snpa)));
 		else
-			ND_PRINT((ndo, "\n\t  %s", isonsap_string(neta, netal)));
+			ND_PRINT((ndo, "\n\t  %s", isonsap_string(ndo, neta, netal)));
 		break;
 	}
 
@@ -1181,7 +1181,7 @@ esis_print(netdissect_options *ndo,
             	}
                 ND_PRINT((ndo, "\n\t  NET (length: %u): %s",
                        source_address_length,
-                       isonsap_string(pptr, source_address_length)));
+                       isonsap_string(ndo, pptr, source_address_length)));
                 pptr += source_address_length;
                 li -= source_address_length;
                 source_address_number--;
@@ -1203,7 +1203,7 @@ esis_print(netdissect_options *ndo,
                 ND_PRINT((ndo, ", bad ish/li"));
                 return;
             }
-            ND_PRINT((ndo, "\n\t  NET (length: %u): %s", source_address_length, isonsap_string(pptr, source_address_length)));
+            ND_PRINT((ndo, "\n\t  NET (length: %u): %s", source_address_length, isonsap_string(ndo, pptr, source_address_length)));
             pptr += source_address_length;
             li -= source_address_length;
             break;
@@ -2462,7 +2462,7 @@ isis_print(netdissect_options *ndo,
 	    while (tmp && alen < tmp) {
 		ND_PRINT((ndo, "\n\t      Area address (length: %u): %s",
                        alen,
-                       isonsap_string(tptr, alen)));
+                       isonsap_string(ndo, tptr, alen)));
 		tptr += alen;
 		tmp -= alen + 1;
 		if (tmp==0) /* if this is the last area address do not attemt a boundary check */
@@ -3020,7 +3020,7 @@ isis_print(netdissect_options *ndo,
                 if (!ND_TTEST2(*tptr, prefix_len / 2))
                     goto trunctlv;
                 ND_PRINT((ndo, "\n\t\tAddress: %s/%u",
-                       isonsap_string(tptr, prefix_len / 2), prefix_len * 4));
+                       isonsap_string(ndo, tptr, prefix_len / 2), prefix_len * 4));
                 tptr+=prefix_len/2;
                 tmp-=prefix_len/2;
             }

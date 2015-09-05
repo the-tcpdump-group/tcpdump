@@ -566,7 +566,7 @@ ataddr_string(netdissect_options *ndo,
 			     tp->nxt; tp = tp->nxt)
 				;
 			tp->addr = i2;
-			tp->nxt = newhnamemem();
+			tp->nxt = newhnamemem(ndo);
 			tp->name = strdup(nambuf);
 			if (tp->name == NULL)
 				(*ndo->ndo_error)(ndo,
@@ -584,7 +584,7 @@ ataddr_string(netdissect_options *ndo,
 	for (tp2 = &hnametable[i & (HASHNAMESIZE-1)]; tp2->nxt; tp2 = tp2->nxt)
 		if (tp2->addr == i) {
 			tp->addr = (atnet << 8) | athost;
-			tp->nxt = newhnamemem();
+			tp->nxt = newhnamemem(ndo);
 			(void)snprintf(nambuf, sizeof(nambuf), "%s.%d",
 			    tp2->name, athost);
 			tp->name = strdup(nambuf);
@@ -595,7 +595,7 @@ ataddr_string(netdissect_options *ndo,
 		}
 
 	tp->addr = (atnet << 8) | athost;
-	tp->nxt = newhnamemem();
+	tp->nxt = newhnamemem(ndo);
 	if (athost != 255)
 		(void)snprintf(nambuf, sizeof(nambuf), "%d.%d", atnet, athost);
 	else

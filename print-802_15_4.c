@@ -138,7 +138,7 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 		case 0x03:
 			panid = EXTRACT_LE_16BITS(p);
 			p += 2;
-			ND_PRINT((ndo,"%04x:%s ", panid, le64addr_string(p)));
+			ND_PRINT((ndo,"%04x:%s ", panid, le64addr_string(ndo, p)));
 			p += 8;
 			break;
 		}
@@ -164,7 +164,7 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 				panid = EXTRACT_LE_16BITS(p);
 				p += 2;
 			}
-                        ND_PRINT((ndo,"%04x:%s ", panid, le64addr_string(p)));
+                        ND_PRINT((ndo,"%04x:%s ", panid, le64addr_string(ndo, p)));
 			p += 8;
 			break;
 		}

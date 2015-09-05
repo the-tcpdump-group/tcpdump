@@ -386,14 +386,14 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 				(void)snprintf(buf, sizeof(buf),
 					"%s tcp port %s unreachable",
 					ipaddr_string(ndo, &oip->ip_dst),
-					tcpport_string(dport));
+					tcpport_string(ndo, dport));
 				break;
 
 			case IPPROTO_UDP:
 				(void)snprintf(buf, sizeof(buf),
 					"%s udp port %s unreachable",
 					ipaddr_string(ndo, &oip->ip_dst),
-					udpport_string(dport));
+					udpport_string(ndo, dport));
 				break;
 
 			default:
@@ -556,7 +556,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 	ND_PRINT((ndo, "ICMP %s, length %u", str, plen));
 	if (ndo->ndo_vflag && !fragmented) { /* don't attempt checksumming if this is a frag */
 		uint16_t sum, icmp_sum;
-		
+
 		if (ND_TTEST2(*bp, plen)) {
 			vec[0].ptr = (const uint8_t *)(const void *)dp;
 			vec[0].len = plen;

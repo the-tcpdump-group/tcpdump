@@ -957,12 +957,12 @@ icmp6_print(netdissect_options *ndo,
 			case IPPROTO_TCP:
 				ND_PRINT((ndo,", %s tcp port %s",
 					ip6addr_string(ndo, &oip->ip6_dst),
-                                          tcpport_string(dport)));
+                                          tcpport_string(ndo, dport)));
 				break;
 			case IPPROTO_UDP:
 				ND_PRINT((ndo,", %s udp port %s",
 					ip6addr_string(ndo, &oip->ip6_dst),
-                                          udpport_string(dport)));
+                                          udpport_string(ndo, dport)));
 				break;
 			default:
 				ND_PRINT((ndo,", %s protocol %d port %d unreachable",

@@ -164,7 +164,7 @@ ipx_sap_print(netdissect_options *ndo, const u_short *ipx, u_int length)
 	    ND_PRINT((ndo, "ipx-sap-nearest-req"));
 
 	ND_TCHECK(ipx[0]);
-	ND_PRINT((ndo, " %s", ipxsap_string(htons(EXTRACT_16BITS(&ipx[0])))));
+	ND_PRINT((ndo, " %s", ipxsap_string(ndo, htons(EXTRACT_16BITS(&ipx[0])))));
 	break;
 
       case 2:
@@ -176,7 +176,7 @@ ipx_sap_print(netdissect_options *ndo, const u_short *ipx, u_int length)
 
 	for (i = 0; i < 8 && length > 0; i++) {
 	    ND_TCHECK(ipx[0]);
-	    ND_PRINT((ndo, " %s '", ipxsap_string(htons(EXTRACT_16BITS(&ipx[0])))));
+	    ND_PRINT((ndo, " %s '", ipxsap_string(ndo, htons(EXTRACT_16BITS(&ipx[0])))));
 	    if (fn_printzp(ndo, (const u_char *)&ipx[1], 48, ndo->ndo_snapend)) {
 		ND_PRINT((ndo, "'"));
 		goto trunc;
