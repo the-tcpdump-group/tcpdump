@@ -287,7 +287,8 @@ tcp_print(netdissect_options *ndo,
                                         th->nxt = (struct tcp_seq_hash6 *)
                                                 calloc(1, sizeof(*th));
                                         if (th->nxt == NULL)
-                                                error("tcp_print: calloc");
+                                                (*ndo->ndo_error)(ndo,
+								  "tcp_print: calloc");
                                 }
                                 th->addr = tha;
                                 if (rev)
@@ -343,7 +344,8 @@ tcp_print(netdissect_options *ndo,
                                         th->nxt = (struct tcp_seq_hash *)
                                                 calloc(1, sizeof(*th));
                                         if (th->nxt == NULL)
-                                                error("tcp_print: calloc");
+                                                (*ndo->ndo_error)(ndo,
+								  "tcp_print: calloc");
                                 }
                                 th->addr = tha;
                                 if (rev)

@@ -1295,7 +1295,7 @@ print_reason(netdissect_options *ndo,
 }
 
 const char *
-dnnum_string(u_short dnaddr)
+dnnum_string(netdissect_options *ndo, u_short dnaddr)
 {
 	char *str;
 	size_t siz;
@@ -1304,13 +1304,13 @@ dnnum_string(u_short dnaddr)
 
 	str = (char *)malloc(siz = sizeof("00.0000"));
 	if (str == NULL)
-		error("dnnum_string: malloc");
+		(*ndo->ndo_error)(ndo, "dnnum_string: malloc");
 	snprintf(str, siz, "%d.%d", area, node);
 	return(str);
 }
 
 const char *
-dnname_string(u_short dnaddr)
+dnname_string(netdissect_options *ndo, u_short dnaddr)
 {
 #ifdef HAVE_DNET_HTOA
 	struct dn_naddr dna;
@@ -1322,9 +1322,9 @@ dnname_string(u_short dnaddr)
 	if(dnname != NULL)
 		return (strdup(dnname));
 	else
-		return(dnnum_string(dnaddr));
+		return(dnnum_string(ndo, dnaddr));
 #else
-	return(dnnum_string(dnaddr));	/* punt */
+	return(dnnum_string(ndo, dnaddr));	/* punt */
 #endif
 }
 

@@ -323,8 +323,8 @@ extern int unaligned_memcmp(const void *, const void *, size_t);
 #define PLURAL_SUFFIX(n) \
 	(((n) != 1) ? "s" : "")
 
-extern const char *dnname_string(u_short);
-extern const char *dnnum_string(u_short);
+extern const char *dnname_string(netdissect_options *, u_short);
+extern const char *dnnum_string(netdissect_options *, u_short);
 
 extern int mask2plen(uint32_t);
 extern const char *tok2strary_internal(const char **, int, const char *, int);

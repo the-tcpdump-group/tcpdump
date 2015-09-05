@@ -1190,9 +1190,9 @@ dnaddr_string(netdissect_options *ndo, u_short dnaddr)
 	tp->addr = dnaddr;
 	tp->nxt = newhnamemem();
 	if (ndo->ndo_nflag)
-		tp->name = dnnum_string(dnaddr);
+		tp->name = dnnum_string(ndo, dnaddr);
 	else
-		tp->name = dnname_string(dnaddr);
+		tp->name = dnname_string(ndo, dnaddr);
 
 	return(tp->name);
 }
