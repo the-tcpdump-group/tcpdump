@@ -54,7 +54,7 @@ int vsnprintf (char *str, size_t sz, const char *format, va_list ap)
      __attribute__((format (printf, 3, 0)))
 #endif /* __ATTRIBUTE___FORMAT_OK */
      ;
-#endif /* !defined(HAVE_SNPRINTF) */
+#endif /* !defined(HAVE_VSNPRINTF) */
 
 #ifndef HAVE_STRLCAT
 extern size_t strlcat (char *, const char *, size_t);
