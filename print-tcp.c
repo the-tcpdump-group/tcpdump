@@ -476,7 +476,7 @@ tcp_print(netdissect_options *ndo,
                         case TCPOPT_SACK:
                                 datalen = len - 2;
                                 if (datalen % 8 != 0) {
-                                        ND_PRINT((ndo, "malformed sack"));
+                                        ND_PRINT((ndo, "invalid sack"));
                                 } else {
                                         uint32_t s, e;
 
@@ -806,7 +806,7 @@ print_tcp_fastopen_option(netdissect_options *ndo, register const u_char *cp,
         } else {
                 /* Fast Open Cookie */
                 if (datalen % 2 != 0 || datalen < 4 || datalen > 16) {
-                        ND_PRINT((ndo, " malformed"));
+                        ND_PRINT((ndo, " invalid"));
                 } else {
                         ND_PRINT((ndo, " cookie "));
                         for (i = 0; i < datalen; ++i)

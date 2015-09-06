@@ -996,7 +996,7 @@ rfc1048_print(netdissect_options *ndo,
 						break;
 					}
 					if (len < suboptlen) {
-						ND_PRINT((ndo, "ERROR: malformed option"));
+						ND_PRINT((ndo, "ERROR: invalid option"));
 						bp += len;
 						len = 0;
 						break;

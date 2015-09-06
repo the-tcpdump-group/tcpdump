@@ -2450,7 +2450,7 @@ isis_print(netdissect_options *ndo,
                tlv_type,
                tlv_len));
 
-        if (tlv_len == 0) /* something is malformed */
+        if (tlv_len == 0) /* something is invalid */
 	    continue;
 
         /* now check if we have a decoder otherwise do a hexdump at the end*/
@@ -2670,7 +2670,7 @@ isis_print(netdissect_options *ndo,
 		    ND_PRINT((ndo, "%02x", *(tptr + i)));
 		}
 		if (tlv_len != ISIS_SUBTLV_AUTH_MD5_LEN+1)
-                    ND_PRINT((ndo, ", (malformed subTLV) "));
+                    ND_PRINT((ndo, ", (invalid subTLV) "));
 
 #ifdef HAVE_LIBCRYPTO
                 sigcheck = signature_verify(ndo, optr, length,
@@ -2916,7 +2916,7 @@ isis_print(netdissect_options *ndo,
                     tptr+=mt_len;
                     tmp-=mt_len;
 		} else {
-		    ND_PRINT((ndo, "\n\t      malformed MT-ID"));
+		    ND_PRINT((ndo, "\n\t      invalid MT-ID"));
 		    break;
 		}
 	    }

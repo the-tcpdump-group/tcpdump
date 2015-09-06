@@ -42,7 +42,7 @@
 #include "addrtoname.h"
 
 static const char tstr[] = " [|loopback]";
-static const char cstr[] = " (corrupt)";
+static const char cstr[] = " (invalid)";
 
 #define LOOPBACK_REPLY   1
 #define LOOPBACK_FWDDATA 2
@@ -60,7 +60,7 @@ loopback_message_print(netdissect_options *ndo, const u_char *cp, const u_int le
 	uint16_t function;
 
 	if (len < 2)
-		goto corrupt;
+		goto invalid;
 	/* function */
 	ND_TCHECK2(*cp, 2);
 	function = EXTRACT_LE_16BITS(cp);
@@ -70,7 +70,7 @@ loopback_message_print(netdissect_options *ndo, const u_char *cp, const u_int le
 	switch (function) {
 		case LOOPBACK_REPLY:
 			if (len < 4)
-				goto corrupt;
+				goto invalid;
 			/* receipt number */
 			ND_TCHECK2(*cp, 2);
 			ND_PRINT((ndo, ", receipt number %u", EXTRACT_LE_16BITS(cp)));
@@ -81,7 +81,7 @@ loopback_message_print(netdissect_options *ndo, const u_char *cp, const u_int le
 			break;
 		case LOOPBACK_FWDDATA:
 			if (len < 8)
-				goto corrupt;
+				goto invalid;
 			/* forwarding address */
 			ND_TCHECK2(*cp, ETHER_ADDR_LEN);
 			ND_PRINT((ndo, ", forwarding address %s", etheraddr_string(ndo, cp)));
@@ -96,7 +96,7 @@ loopback_message_print(netdissect_options *ndo, const u_char *cp, const u_int le
 	}
 	return;
 
-corrupt:
+invalid:
 	ND_PRINT((ndo, "%s", cstr));
 	ND_TCHECK2(*cp, ep - cp);
 	return;
@@ -112,7 +112,7 @@ loopback_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 
 	ND_PRINT((ndo, "Loopback"));
 	if (len < 2)
-		goto corrupt;
+		goto invalid;
 	/* skipCount */
 	ND_TCHECK2(*cp, 2);
 	skipCount = EXTRACT_LE_16BITS(cp);
@@ -121,11 +121,11 @@ loopback_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 	if (skipCount % 8)
 		ND_PRINT((ndo, " (bogus)"));
 	if (skipCount > len - 2)
-		goto corrupt;
+		goto invalid;
 	loopback_message_print(ndo, cp + skipCount, len - 2 - skipCount);
 	return;
 
-corrupt:
+invalid:
 	ND_PRINT((ndo, "%s", cstr));
 	ND_TCHECK2(*cp, ep - cp);
 	return;

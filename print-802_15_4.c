@@ -111,7 +111,7 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 	if (ndo->ndo_vflag)
 		ND_PRINT((ndo,"seq %02x ", seq));
 	if (hdrlen == -1) {
-		ND_PRINT((ndo,"malformed! "));
+		ND_PRINT((ndo,"invalid! "));
 		return caplen;
 	}
 

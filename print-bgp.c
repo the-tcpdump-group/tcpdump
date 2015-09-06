@@ -2339,7 +2339,7 @@ bgp_capabilities_print(netdissect_options *ndo,
                     }
                     while (tcap_len > 0) {
                         if (tcap_len < 4) {
-                            ND_PRINT((ndo, "\n\t\t(malformed)"));
+                            ND_PRINT((ndo, "\n\t\t(invalid)"));
                             break;
                         }
                         ND_PRINT((ndo, "\n\t\tAFI %s (%u), SAFI %s (%u), Send/Receive: %s",

@@ -52,7 +52,7 @@ babel_print(netdissect_options *ndo,
     ND_TCHECK2(*cp, 4);
 
     if(cp[0] != 42) {
-        ND_PRINT((ndo, " malformed header"));
+        ND_PRINT((ndo, " invalid header"));
         return;
     } else {
         ND_PRINT((ndo, " %d", cp[1]));
@@ -286,10 +286,10 @@ subtlvs_print(netdissect_options *ndo,
             continue;
         }
         if(cp == ep)
-            goto corrupt;
+            goto invalid;
         sublen = *cp++;
         if(cp + sublen > ep)
-            goto corrupt;
+            goto invalid;
 
         switch(subtype) {
         case MESSAGE_SUB_PADN:
@@ -315,12 +315,12 @@ subtlvs_print(netdissect_options *ndo,
             ND_PRINT((ndo, " sub-timestamp"));
             if(tlv_type == MESSAGE_HELLO) {
                 if(sublen < 4)
-                    goto corrupt;
+                    goto invalid;
                 t1 = EXTRACT_32BITS(cp);
                 ND_PRINT((ndo, " %s", format_timestamp(t1)));
             } else if(tlv_type == MESSAGE_IHU) {
                 if(sublen < 8)
-                    goto corrupt;
+                    goto invalid;
                 t1 = EXTRACT_32BITS(cp);
                 ND_PRINT((ndo, " %s", format_timestamp(t1)));
                 t2 = EXTRACT_32BITS(cp + 4);
@@ -336,12 +336,12 @@ subtlvs_print(netdissect_options *ndo,
     } /* while */
     return;
 
- corrupt:
-    ND_PRINT((ndo, " (corrupt)"));
+ invalid:
+    ND_PRINT((ndo, " (invalid)"));
 }
 
 #define ICHECK(i, l) \
-	if ((i) + (l) > bodylen || (i) + (l) > length) goto corrupt;
+	if ((i) + (l) > bodylen || (i) + (l) > length) goto invalid;
 
 static void
 babel_print_v2(netdissect_options *ndo,
@@ -355,7 +355,7 @@ babel_print_v2(netdissect_options *ndo,
 
     ND_TCHECK2(*cp, 4);
     if (length < 4)
-        goto corrupt;
+        goto invalid;
     bodylen = EXTRACT_16BITS(cp + 2);
     ND_PRINT((ndo, " (%u)", bodylen));
 
@@ -396,7 +396,7 @@ babel_print_v2(netdissect_options *ndo,
                 ND_PRINT((ndo, " ack-req"));
             else {
                 ND_PRINT((ndo, "\n\tAcknowledgment Request "));
-                if(len < 6) goto corrupt;
+                if(len < 6) goto invalid;
                 nonce = EXTRACT_16BITS(message + 4);
                 interval = EXTRACT_16BITS(message + 6);
                 ND_PRINT((ndo, "%04x %s", nonce, format_interval(interval)));
@@ -410,7 +410,7 @@ babel_print_v2(netdissect_options *ndo,
                 ND_PRINT((ndo, " ack"));
             else {
                 ND_PRINT((ndo, "\n\tAcknowledgment "));
-                if(len < 2) goto corrupt;
+                if(len < 2) goto invalid;
                 nonce = EXTRACT_16BITS(message + 2);
                 ND_PRINT((ndo, "%04x", nonce));
             }
@@ -423,7 +423,7 @@ babel_print_v2(netdissect_options *ndo,
                 ND_PRINT((ndo, " hello"));
             else {
                 ND_PRINT((ndo, "\n\tHello "));
-                if(len < 6) goto corrupt;
+                if(len < 6) goto invalid;
                 seqno = EXTRACT_16BITS(message + 4);
                 interval = EXTRACT_16BITS(message + 6);
                 ND_PRINT((ndo, "seqno %u interval %s", seqno, format_interval(interval)));
@@ -442,7 +442,7 @@ babel_print_v2(netdissect_options *ndo,
                 u_char address[16];
                 int rc;
                 ND_PRINT((ndo, "\n\tIHU "));
-                if(len < 6) goto corrupt;
+                if(len < 6) goto invalid;
                 txcost = EXTRACT_16BITS(message + 4);
                 interval = EXTRACT_16BITS(message + 6);
                 rc = network_address(message[2], message + 8, len - 6, address);
@@ -462,7 +462,7 @@ babel_print_v2(netdissect_options *ndo,
                 ND_PRINT((ndo, " router-id"));
             else {
                 ND_PRINT((ndo, "\n\tRouter Id"));
-                if(len < 10) goto corrupt;
+                if(len < 10) goto invalid;
                 ND_PRINT((ndo, " %s", format_id(message + 4)));
             }
         }
@@ -475,9 +475,9 @@ babel_print_v2(netdissect_options *ndo,
                 int rc;
                 u_char nh[16];
                 ND_PRINT((ndo, "\n\tNext Hop"));
-                if(len < 2) goto corrupt;
+                if(len < 2) goto invalid;
                 rc = network_address(message[2], message + 4, len - 2, nh);
-                if(rc < 0) goto corrupt;
+                if(rc < 0) goto invalid;
                 ND_PRINT((ndo, " %s", format_address(ndo, nh)));
             }
         }
@@ -499,13 +499,13 @@ babel_print_v2(netdissect_options *ndo,
                 int rc;
                 u_char prefix[16];
                 ND_PRINT((ndo, "\n\tUpdate"));
-                if(len < 10) goto corrupt;
+                if(len < 10) goto invalid;
                 plen = message[4] + (message[2] == 1 ? 96 : 0);
                 rc = network_prefix(message[2], message[4], message[5],
                                     message + 12,
                                     message[2] == 1 ? v4_prefix : v6_prefix,
                                     len - 10, prefix);
-                if(rc < 0) goto corrupt;
+                if(rc < 0) goto invalid;
                 interval = EXTRACT_16BITS(message + 6);
                 seqno = EXTRACT_16BITS(message + 8);
                 metric = EXTRACT_16BITS(message + 10);
@@ -535,11 +535,11 @@ babel_print_v2(netdissect_options *ndo,
                 int rc;
                 u_char prefix[16], plen;
                 ND_PRINT((ndo, "\n\tRequest "));
-                if(len < 2) goto corrupt;
+                if(len < 2) goto invalid;
                 plen = message[3] + (message[2] == 1 ? 96 : 0);
                 rc = network_prefix(message[2], message[3], 0,
                                     message + 4, NULL, len - 2, prefix);
-                if(rc < 0) goto corrupt;
+                if(rc < 0) goto invalid;
                 ND_PRINT((ndo, "for %s",
                        message[2] == 0 ? "any" : format_prefix(ndo, prefix, plen)));
             }
@@ -554,11 +554,11 @@ babel_print_v2(netdissect_options *ndo,
                 u_short seqno;
                 u_char prefix[16], plen;
                 ND_PRINT((ndo, "\n\tMH-Request "));
-                if(len < 14) goto corrupt;
+                if(len < 14) goto invalid;
                 seqno = EXTRACT_16BITS(message + 4);
                 rc = network_prefix(message[2], message[3], 0,
                                     message + 16, NULL, len - 14, prefix);
-                if(rc < 0) goto corrupt;
+                if(rc < 0) goto invalid;
                 plen = message[3] + (message[2] == 1 ? 96 : 0);
                 ND_PRINT((ndo, "(%u hops) for %s seqno %u id %s",
                        message[6], format_prefix(ndo, prefix, plen),
@@ -571,7 +571,7 @@ babel_print_v2(netdissect_options *ndo,
                 ND_PRINT((ndo, " tspc"));
             else {
                 ND_PRINT((ndo, "\n\tTS/PC "));
-                if(len < 6) goto corrupt;
+                if(len < 6) goto invalid;
                 ND_PRINT((ndo, "timestamp %u packetcounter %u", EXTRACT_32BITS (message + 4),
                        EXTRACT_16BITS(message + 2)));
             }
@@ -582,7 +582,7 @@ babel_print_v2(netdissect_options *ndo,
             else {
                 unsigned j;
                 ND_PRINT((ndo, "\n\tHMAC "));
-                if(len < 18) goto corrupt;
+                if(len < 18) goto invalid;
                 ND_PRINT((ndo, "key-id %u digest-%u ", EXTRACT_16BITS(message + 2), len - 2));
                 for (j = 0; j < len - 2; j++)
                     ND_PRINT((ndo, "%02X", message[4 + j]));
@@ -600,7 +600,7 @@ babel_print_v2(netdissect_options *ndo,
                 int rc;
                 int parsed_len = 10;
                 ND_PRINT((ndo, "\n\tSS-Update"));
-                if(len < 10) goto corrupt;
+                if(len < 10) goto invalid;
                 ae = message[2];
                 src_plen = message[3];
                 plen = message[4];
@@ -611,13 +611,13 @@ babel_print_v2(netdissect_options *ndo,
                 rc = network_prefix(ae, plen, omitted, message + 2 + parsed_len,
                                     ae == 1 ? v4_prefix : v6_prefix,
                                     len - parsed_len, prefix);
-                if(rc < 0) goto corrupt;
+                if(rc < 0) goto invalid;
                 if(ae == 1)
                     plen += 96;
                 parsed_len += rc;
                 rc = network_prefix(ae, src_plen, 0, message + 2 + parsed_len,
                                     NULL, len - parsed_len, src_prefix);
-                if(rc < 0) goto corrupt;
+                if(rc < 0) goto invalid;
                 if(ae == 1)
                     src_plen += 96;
                 parsed_len += rc;
@@ -641,19 +641,19 @@ babel_print_v2(netdissect_options *ndo,
                 int rc, parsed_len = 3;
                 u_char ae, plen, src_plen, prefix[16], src_prefix[16];
                 ND_PRINT((ndo, "\n\tSS-Request "));
-                if(len < 3) goto corrupt;
+                if(len < 3) goto invalid;
                 ae = message[2];
                 plen = message[3];
                 src_plen = message[4];
                 rc = network_prefix(ae, plen, 0, message + 2 + parsed_len,
                                     NULL, len - parsed_len, prefix);
-                if(rc < 0) goto corrupt;
+                if(rc < 0) goto invalid;
                 if(ae == 1)
                     plen += 96;
                 parsed_len += rc;
                 rc = network_prefix(ae, src_plen, 0, message + 2 + parsed_len,
                                     NULL, len - parsed_len, src_prefix);
-                if(rc < 0) goto corrupt;
+                if(rc < 0) goto invalid;
                 if(ae == 1)
                     src_plen += 96;
                 parsed_len += rc;
@@ -676,7 +676,7 @@ babel_print_v2(netdissect_options *ndo,
                 u_char ae, plen, src_plen, prefix[16], src_prefix[16], hopc;
                 const u_char *router_id = NULL;
                 ND_PRINT((ndo, "\n\tSS-MH-Request "));
-                if(len < 14) goto corrupt;
+                if(len < 14) goto invalid;
                 ae = message[2];
                 plen = message[3];
                 seqno = EXTRACT_16BITS(message + 4);
@@ -685,13 +685,13 @@ babel_print_v2(netdissect_options *ndo,
                 router_id = message + 8;
                 rc = network_prefix(ae, plen, 0, message + 2 + parsed_len,
                                     NULL, len - parsed_len, prefix);
-                if(rc < 0) goto corrupt;
+                if(rc < 0) goto invalid;
                 if(ae == 1)
                     plen += 96;
                 parsed_len += rc;
                 rc = network_prefix(ae, src_plen, 0, message + 2 + parsed_len,
                                     NULL, len - parsed_len, src_prefix);
-                if(rc < 0) goto corrupt;
+                if(rc < 0) goto invalid;
                 if(ae == 1)
                     src_plen += 96;
                 ND_PRINT((ndo, "(%u hops) for (%s, ",
@@ -717,7 +717,7 @@ babel_print_v2(netdissect_options *ndo,
     ND_PRINT((ndo, " %s", tstr));
     return;
 
- corrupt:
-    ND_PRINT((ndo, " (corrupt)"));
+ invalid:
+    ND_PRINT((ndo, " (invalid)"));
     return;
 }
