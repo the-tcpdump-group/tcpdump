@@ -245,17 +245,17 @@ static const struct tok dh6opt_str[] = {
 };
 
 static const struct tok dh6opt_stcode_str[] = {
-	{ DH6OPT_STCODE_SUCCESS,          "success"            },
-	{ DH6OPT_STCODE_UNSPECFAIL,       "unspec failure"     },
-	{ DH6OPT_STCODE_NOADDRAVAIL,      "no addresses"       },
-	{ DH6OPT_STCODE_NOBINDING,        "no binding"         },
-	{ DH6OPT_STCODE_NOTONLINK,        "not on-link"        },
-	{ DH6OPT_STCODE_USEMULTICAST,     "use multicast"      },
-	{ DH6OPT_STCODE_NOPREFIXAVAIL,    "no prefixes"        },
-	{ DH6OPT_STCODE_UNKNOWNQUERYTYPE, "unknown query type" },
-	{ DH6OPT_STCODE_MALFORMEDQUERY,   "malformed query"    },
-	{ DH6OPT_STCODE_NOTCONFIGURED,    "not configured"     },
-	{ DH6OPT_STCODE_NOTALLOWED,       "not allowed"        },
+	{ DH6OPT_STCODE_SUCCESS,          "Success"          }, /* RFC3315 */
+	{ DH6OPT_STCODE_UNSPECFAIL,       "UnspecFail"       }, /* RFC3315 */
+	{ DH6OPT_STCODE_NOADDRAVAIL,      "NoAddrsAvail"     }, /* RFC3315 */
+	{ DH6OPT_STCODE_NOBINDING,        "NoBinding"        }, /* RFC3315 */
+	{ DH6OPT_STCODE_NOTONLINK,        "NotOnLink"        }, /* RFC3315 */
+	{ DH6OPT_STCODE_USEMULTICAST,     "UseMulticast"     }, /* RFC3315 */
+	{ DH6OPT_STCODE_NOPREFIXAVAIL,    "NoPrefixAvail"    }, /* RFC3633 */
+	{ DH6OPT_STCODE_UNKNOWNQUERYTYPE, "UnknownQueryType" }, /* RFC5007 */
+	{ DH6OPT_STCODE_MALFORMEDQUERY,   "MalformedQuery"   }, /* RFC5007 */
+	{ DH6OPT_STCODE_NOTCONFIGURED,    "NotConfigured"    }, /* RFC5007 */
+	{ DH6OPT_STCODE_NOTALLOWED,       "NotAllowed"       }, /* RFC5007 */
 	{ 0, NULL }
 };
 
