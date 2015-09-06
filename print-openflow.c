@@ -42,7 +42,7 @@
 #include "oui.h"
 
 static const char tstr[] = " [|openflow]";
-static const char cstr[] = " (invalid)";
+static const char istr[] = " (invalid)";
 
 #define OF_VER_1_0    0x01
 
@@ -120,7 +120,7 @@ of_header_body_print(netdissect_options *ndo, const u_char *cp, const u_char *ep
 	}
 
 invalid: /* fail current packet */
-	ND_PRINT((ndo, "%s", cstr));
+	ND_PRINT((ndo, "%s", istr));
 	ND_TCHECK2(*cp, ep - cp);
 	return ep;
 trunc:

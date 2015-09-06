@@ -40,7 +40,7 @@
 #include "addrtoname.h"
 
 static const char tstr[] = " [|ahcp]";
-static const char cstr[] = "(invalid)";
+static const char istr[] = " (invalid)";
 
 #define AHCP_MAGIC_NUMBER 43
 #define AHCP_VERSION_1 1
@@ -118,7 +118,7 @@ ahcp_time_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 	return 0;
 
 invalid:
-	ND_PRINT((ndo, ": %s", cstr));
+	ND_PRINT((ndo, "%s", istr));
 	ND_TCHECK2(*cp, ep - cp);
 	return 0;
 trunc:
@@ -136,7 +136,7 @@ ahcp_seconds_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 	return 0;
 
 invalid:
-	ND_PRINT((ndo, ": %s", cstr));
+	ND_PRINT((ndo, "%s", istr));
 	ND_TCHECK2(*cp, ep - cp);
 	return 0;
 trunc:
@@ -164,7 +164,7 @@ ahcp_ipv6_addresses_print(netdissect_options *ndo, const u_char *cp, const u_cha
 	return 0;
 
 invalid:
-	ND_PRINT((ndo, ": %s", cstr));
+	ND_PRINT((ndo, "%s", istr));
 	ND_TCHECK2(*cp, ep - cp);
 	return 0;
 trunc:
@@ -188,7 +188,7 @@ ahcp_ipv4_addresses_print(netdissect_options *ndo, const u_char *cp, const u_cha
 	return 0;
 
 invalid:
-	ND_PRINT((ndo, ": %s", cstr));
+	ND_PRINT((ndo, "%s", istr));
 	ND_TCHECK2(*cp, ep - cp);
 	return 0;
 trunc:
@@ -216,7 +216,7 @@ ahcp_ipv6_prefixes_print(netdissect_options *ndo, const u_char *cp, const u_char
 	return 0;
 
 invalid:
-	ND_PRINT((ndo, ": %s", cstr));
+	ND_PRINT((ndo, "%s", istr));
 	ND_TCHECK2(*cp, ep - cp);
 	return 0;
 trunc:
@@ -240,7 +240,7 @@ ahcp_ipv4_prefixes_print(netdissect_options *ndo, const u_char *cp, const u_char
 	return 0;
 
 invalid:
-	ND_PRINT((ndo, ": %s", cstr));
+	ND_PRINT((ndo, "%s", istr));
 	ND_TCHECK2(*cp, ep - cp);
 	return 0;
 trunc:
@@ -301,7 +301,7 @@ ahcp1_options_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 	return;
 
 invalid:
-	ND_PRINT((ndo, " %s", cstr));
+	ND_PRINT((ndo, "%s", istr));
 	ND_TCHECK2(*cp, ep - cp);
 	return;
 trunc:
@@ -346,7 +346,7 @@ ahcp1_body_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 	return;
 
 invalid:
-	ND_PRINT((ndo, " %s", cstr));
+	ND_PRINT((ndo, "%s", istr));
 	ND_TCHECK2(*cp, ep - cp);
 	return;
 trunc:
@@ -412,7 +412,7 @@ ahcp_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 	return;
 
 invalid:
-	ND_PRINT((ndo, " %s", cstr));
+	ND_PRINT((ndo, "%s", istr));
 	ND_TCHECK2(*cp, ep - cp);
 	return;
 trunc:

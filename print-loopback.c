@@ -42,7 +42,7 @@
 #include "addrtoname.h"
 
 static const char tstr[] = " [|loopback]";
-static const char cstr[] = " (invalid)";
+static const char istr[] = " (invalid)";
 
 #define LOOPBACK_REPLY   1
 #define LOOPBACK_FWDDATA 2
@@ -97,7 +97,7 @@ loopback_message_print(netdissect_options *ndo, const u_char *cp, const u_int le
 	return;
 
 invalid:
-	ND_PRINT((ndo, "%s", cstr));
+	ND_PRINT((ndo, "%s", istr));
 	ND_TCHECK2(*cp, ep - cp);
 	return;
 trunc:
@@ -126,7 +126,7 @@ loopback_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 	return;
 
 invalid:
-	ND_PRINT((ndo, "%s", cstr));
+	ND_PRINT((ndo, "%s", istr));
 	ND_TCHECK2(*cp, ep - cp);
 	return;
 trunc:

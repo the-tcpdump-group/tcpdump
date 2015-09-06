@@ -32,7 +32,7 @@
 #include "extract.h"
 
 static const char tstr[] = " [|m3ua]";
-static const char cstr[] = " (invalid)";
+static const char istr[] = " (invalid)";
 
 /* RFC 4666 */
 
@@ -229,7 +229,7 @@ tag_value_print(netdissect_options *ndo,
   return;
 
 invalid:
-  ND_PRINT((ndo, "%s", cstr));
+  ND_PRINT((ndo, "%s", istr));
   ND_TCHECK2(*buf, size);
   return;
 trunc:
@@ -277,7 +277,7 @@ m3ua_tags_print(netdissect_options *ndo,
   return;
 
 invalid:
-  ND_PRINT((ndo, "%s", cstr));
+  ND_PRINT((ndo, "%s", istr));
   ND_TCHECK2(*buf, size);
   return;
 trunc:
@@ -329,7 +329,7 @@ m3ua_print(netdissect_options *ndo,
   return;
 
 invalid:
-  ND_PRINT((ndo, "%s", cstr));
+  ND_PRINT((ndo, "%s", istr));
   ND_TCHECK2(*buf, size);
   return;
 trunc:

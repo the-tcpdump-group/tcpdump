@@ -41,7 +41,7 @@
 #include "ether.h"
 
 static const char tstr[] = " [|aoe]";
-static const char cstr[] = " (invalid)";
+static const char istr[] = " (invalid)";
 
 #define AOE_V1 1
 #define ATA_SECTOR_SIZE 512
@@ -197,7 +197,7 @@ aoev1_issue_print(netdissect_options *ndo,
 	return;
 
 invalid:
-	ND_PRINT((ndo, "%s", cstr));
+	ND_PRINT((ndo, "%s", istr));
 	ND_TCHECK2(*cp, ep - cp);
 	return;
 trunc:
@@ -246,7 +246,7 @@ aoev1_query_print(netdissect_options *ndo,
 	return;
 
 invalid:
-	ND_PRINT((ndo, "%s", cstr));
+	ND_PRINT((ndo, "%s", istr));
 	ND_TCHECK2(*cp, ep - cp);
 	return;
 trunc:
@@ -297,7 +297,7 @@ aoev1_mac_print(netdissect_options *ndo,
 	return;
 
 invalid:
-	ND_PRINT((ndo, "%s", cstr));
+	ND_PRINT((ndo, "%s", istr));
 	ND_TCHECK2(*cp, ep - cp);
 	return;
 trunc:
@@ -332,7 +332,7 @@ aoev1_reserve_print(netdissect_options *ndo,
 	return;
 
 invalid:
-	ND_PRINT((ndo, "%s", cstr));
+	ND_PRINT((ndo, "%s", istr));
 	ND_TCHECK2(*cp, ep - cp);
 	return;
 trunc:
@@ -390,7 +390,7 @@ aoev1_print(netdissect_options *ndo,
 	return;
 
 invalid:
-	ND_PRINT((ndo, "%s", cstr));
+	ND_PRINT((ndo, "%s", istr));
 	ND_TCHECK2(*cp, ep - cp);
 	return;
 trunc:
@@ -422,7 +422,7 @@ aoe_print(netdissect_options *ndo,
 	return;
 
 invalid:
-	ND_PRINT((ndo, "%s", cstr));
+	ND_PRINT((ndo, "%s", istr));
 	ND_TCHECK2(*cp, ep - cp);
 	return;
 trunc:
