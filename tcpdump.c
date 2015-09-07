@@ -760,9 +760,9 @@ main(int argc, char **argv)
 	WFileName = NULL;
 	dlt = -1;
 	if ((cp = strrchr(argv[0], '/')) != NULL)
-		program_name = cp + 1;
+		ndo->program_name = program_name = cp + 1;
 	else
-		program_name = argv[0];
+		ndo->program_name = program_name = argv[0];
 
 	/*
 	 * On platforms where the CPU doesn't support unaligned loads,

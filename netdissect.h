@@ -111,14 +111,15 @@ struct netdissect_options {
   int ndo_Hflag;		/* dissect 802.11s draft mesh standard */
   int ndo_packet_number;	/* print a packet number in the beginning of line */
   int ndo_suppress_default_print; /* don't use default_print() for unknown packet types */
-  int ndo_tstamp_precision;   /* requested time stamp precision */
+  int ndo_tstamp_precision;	/* requested time stamp precision */
   const char *ndo_dltname;
+  const char *program_name;	/* Name of the program using the library */
 
   char *ndo_espsecret;
   struct sa_list *ndo_sa_list_head;  /* used by print-esp.c */
   struct sa_list *ndo_sa_default;
 
-  char *ndo_sigsecret;     	/* Signature verification secret key */
+  char *ndo_sigsecret;		/* Signature verification secret key */
 
   int   ndo_packettype;	/* as specified by -T */
 
@@ -130,7 +131,7 @@ struct netdissect_options {
 
   /* pointer to void function to output stuff */
   void (*ndo_default_print)(netdissect_options *,
-  		      register const u_char *bp, register u_int length);
+		      register const u_char *bp, register u_int length);
 
   /* pointer to function to do regular output */
   int  (*ndo_printf)(netdissect_options *,

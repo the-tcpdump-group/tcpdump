@@ -422,11 +422,12 @@ ndo_default_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 /* VARARGS */
 static void
-ndo_error(netdissect_options *ndo _U_, const char *fmt, ...)
+ndo_error(netdissect_options *ndo, const char *fmt, ...)
 {
 	va_list ap;
 
-	(void)fprintf(stderr, "%s: ", program_name);
+	if(ndo->program_name)
+		(void)fprintf(stderr, "%s: ", ndo->program_name);
 	va_start(ap, fmt);
 	(void)vfprintf(stderr, fmt, ap);
 	va_end(ap);
@@ -441,11 +442,13 @@ ndo_error(netdissect_options *ndo _U_, const char *fmt, ...)
 
 /* VARARGS */
 static void
-ndo_warning(netdissect_options *ndo _U_, const char *fmt, ...)
+ndo_warning(netdissect_options *ndo, const char *fmt, ...)
 {
 	va_list ap;
 
-	(void)fprintf(stderr, "%s: WARNING: ", program_name);
+	if(ndo->program_name)
+		(void)fprintf(stderr, "%s: ", ndo->program_name);
+	(void)fprintf(stderr, "WARNING: ");
 	va_start(ap, fmt);
 	(void)vfprintf(stderr, fmt, ap);
 	va_end(ap);
