@@ -18,7 +18,7 @@
 
 #include "netdissect.h"
 #include "addrtoname.h"
-#include "extract.h"			/* must come after interface.h */
+#include "extract.h"
 #include "ip.h"
 #ifdef INET6
 #include "ip6.h"

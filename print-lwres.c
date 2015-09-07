@@ -40,7 +40,7 @@
 
 #include "netdissect.h"
 #include "addrtoname.h"
-#include "extract.h"                    /* must come after interface.h */
+#include "extract.h"
 
 /* BIND9 lib/lwres/include/lwres */
 typedef uint32_t lwres_uint32_t;

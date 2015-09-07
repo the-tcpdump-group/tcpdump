@@ -37,7 +37,7 @@
 #include "ip6.h"
 #include "netdissect.h"
 #include "addrtoname.h"
-#include "extract.h"		/* must come after interface.h */
+#include "extract.h"
 
 /* Mobility header */
 struct ip6_mobility {

@@ -33,7 +33,7 @@
 #include <tcpdump-stdinc.h>
 
 #include "netdissect.h"
-#include "extract.h"			/* must come after interface.h */
+#include "extract.h"
 #include "mpls.h"
 
 static const char *mpls_labelname[] = {

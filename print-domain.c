@@ -31,7 +31,7 @@
 
 #include "netdissect.h"
 #include "addrtoname.h"
-#include "extract.h"                    /* must come after interface.h */
+#include "extract.h"
 
 static const char *ns_ops[] = {
 	"", " inv_q", " stat", " op3", " notify", " update", " op6", " op7",

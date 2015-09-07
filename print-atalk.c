@@ -33,7 +33,7 @@
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "ethertype.h"
-#include "extract.h"			/* must come after interface.h */
+#include "extract.h"
 #include "appletalk.h"
 
 static const char tstr[] = "[|atalk]";
