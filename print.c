@@ -240,7 +240,7 @@ static void	ndo_warning(netdissect_options *ndo _U_, const char *fmt, ...)
 #endif /* __ATTRIBUTE___FORMAT_OK */
 		    ;
 
-static int	tcpdump_printf(netdissect_options *ndo _U_, const char *fmt, ...)
+static int	ndo_printf(netdissect_options *ndo _U_, const char *fmt, ...)
 #ifdef __ATTRIBUTE___FORMAT_OK
 		     __attribute ((format (printf, 2, 3)))
 #endif /* __ATTRIBUTE___FORMAT_OK */
@@ -460,7 +460,7 @@ ndo_warning(netdissect_options *ndo, const char *fmt, ...)
 }
 
 static int
-tcpdump_printf(netdissect_options *ndo _U_, const char *fmt, ...)
+ndo_printf(netdissect_options *ndo _U_, const char *fmt, ...)
 {
 	va_list args;
 	int ret;
@@ -477,7 +477,7 @@ ndo_set_function_pointers(netdissect_options *ndo)
 {
 
 	ndo->ndo_default_print=ndo_default_print;
-	ndo->ndo_printf=tcpdump_printf;
+	ndo->ndo_printf=ndo_printf;
 	ndo->ndo_error=ndo_error;
 	ndo->ndo_warning=ndo_warning;
 }
