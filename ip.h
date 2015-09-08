@@ -33,8 +33,8 @@
  *	@(#)ip.h	8.2 (Berkeley) 6/1/94
  */
 
-#ifndef TCPDUMP_IP_H
-#define TCPDUMP_IP_H
+#ifndef netdissect_ip_h
+#define netdissect_ip_h
 
 /*
  * Definitions for internet protocol version 4.
@@ -161,4 +161,4 @@ struct	ip_timestamp {
 #define	IPTTLDEC	1		/* subtracted when forwarding */
 
 #define	IP_MSS		576		/* default maximum segment size */
-#endif /* TCPDUMP_IP_H */
+#endif /* netdissect_ip_h */
