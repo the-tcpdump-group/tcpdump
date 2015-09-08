@@ -32,7 +32,7 @@ The Regents of the University of California.  All rights reserved.\n";
 #endif
 
 /*
- * tcpdump - monitor tcp/ip traffic on an ethernet.
+ * tcpdump - dump traffic on a network
  *
  * First written in 1987 by Van Jacobson, Lawrence Berkeley Laboratory.
  * Mercilessly hacked and occasionally improved since then via the
