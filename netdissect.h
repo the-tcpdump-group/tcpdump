@@ -98,13 +98,13 @@ struct netdissect_options {
   int ndo_Sflag;		/* print raw TCP sequence numbers */
   int ndo_tflag;		/* print packet arrival time */
   int ndo_uflag;		/* Print undecoded NFS handles */
-  int ndo_vflag;		/* verbose */
+  int ndo_vflag;		/* verbosity level */
   int ndo_xflag;		/* print packet in hex */
   int ndo_Xflag;		/* print packet in hex/ascii */
   int ndo_Aflag;		/* print packet only in ascii observing TAB,
 				 * LF, CR and SPACE as graphical chars
 				 */
-  int ndo_dlt;                  /* if != -1, ask libpcap for the DLT it names*/
+  int ndo_dlt;                  /* if != -1, ask libpcap for the DLT it names */
   int ndo_immediate;            /* use immediate mode */
 
   int ndo_Hflag;		/* dissect 802.11s draft mesh standard */
