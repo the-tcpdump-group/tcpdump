@@ -479,7 +479,8 @@ droproot(const char *username, const char *chroot_dir)
 	struct passwd *pw = NULL;
 
 	if (chroot_dir && !username) {
-		fprintf(stderr, "tcpdump: Chroot without dropping root is insecure\n");
+		fprintf(stderr, "%s: Chroot without dropping root is insecure\n",
+			program_name);
 		exit(1);
 	}
 
@@ -487,8 +488,8 @@ droproot(const char *username, const char *chroot_dir)
 	if (pw) {
 		if (chroot_dir) {
 			if (chroot(chroot_dir) != 0 || chdir ("/") != 0) {
-				fprintf(stderr, "tcpdump: Couldn't chroot/chdir to '%.64s': %s\n",
-				    chroot_dir, pcap_strerror(errno));
+				fprintf(stderr, "%s: Couldn't chroot/chdir to '%.64s': %s\n",
+					program_name, chroot_dir, pcap_strerror(errno));
 				exit(1);
 			}
 		}
@@ -504,11 +505,11 @@ droproot(const char *username, const char *chroot_dir)
 #else
 		if (initgroups(pw->pw_name, pw->pw_gid) != 0 ||
 		    setgid(pw->pw_gid) != 0 || setuid(pw->pw_uid) != 0) {
-			fprintf(stderr, "tcpdump: Couldn't change to '%.32s' uid=%lu gid=%lu: %s\n",
-			    username,
-			    (unsigned long)pw->pw_uid,
-			    (unsigned long)pw->pw_gid,
-			    pcap_strerror(errno));
+			fprintf(stderr, "%s: Couldn't change to '%.32s' uid=%lu gid=%lu: %s\n",
+				program_name, username,
+				(unsigned long)pw->pw_uid,
+				(unsigned long)pw->pw_gid,
+				pcap_strerror(errno));
 			exit(1);
 		}
 		else {
@@ -517,8 +518,8 @@ droproot(const char *username, const char *chroot_dir)
 #endif /* HAVE_LIBCAP_NG */
 	}
 	else {
-		fprintf(stderr, "tcpdump: Couldn't find user '%.32s'\n",
-		    username);
+		fprintf(stderr, "%s: Couldn't find user '%.32s'\n",
+			program_name, username);
 		exit(1);
 	}
 #ifdef HAVE_LIBCAP_NG
@@ -1129,7 +1130,7 @@ main(int argc, char **argv)
 #endif
 		case 'z':
 			zflag = strdup(optarg);
-			if (zflag == NULL) 
+			if (zflag == NULL)
 				error("Unable to allocate memory for -z argument");
 			break;
 
