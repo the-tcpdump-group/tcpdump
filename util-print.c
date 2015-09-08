@@ -284,14 +284,14 @@ ts_print(netdissect_options *ndo,
 #else
 		nano_prec = 0;
 #endif
-		if (!(tcpdump_timevalisset(&tv_ref)))
+		if (!(netdissect_timevalisset(&tv_ref)))
 			tv_ref = *tvp; /* set timestamp for first packet */
 
-		negative_offset = tcpdump_timevalcmp(tvp, &tv_ref, <);
+		negative_offset = netdissect_timevalcmp(tvp, &tv_ref, <);
 		if (negative_offset)
-			tcpdump_timevalsub(&tv_ref, tvp, &tv_result, nano_prec);
+			netdissect_timevalsub(&tv_ref, tvp, &tv_result, nano_prec);
 		else
-			tcpdump_timevalsub(tvp, &tv_ref, &tv_result, nano_prec);
+			netdissect_timevalsub(tvp, &tv_ref, &tv_result, nano_prec);
 
 		ND_PRINT((ndo, (negative_offset ? "-" : " ")));
 

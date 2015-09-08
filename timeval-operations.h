@@ -25,8 +25,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef tcpdump_timeval_operations_h
-#define tcpdump_timeval_operations_h
+#ifndef netdissect_timeval_operations_h
+#define netdissect_timeval_operations_h
 
 /* Operations on timevals. */
 
@@ -38,16 +38,16 @@
 #define _NANO_PER_SEC 1000000000
 #endif
 
-#define tcpdump_timevalclear(tvp) ((tvp)->tv_sec = (tvp)->tv_usec = 0)
+#define netdissect_timevalclear(tvp) ((tvp)->tv_sec = (tvp)->tv_usec = 0)
 
-#define tcpdump_timevalisset(tvp) ((tvp)->tv_sec || (tvp)->tv_usec)
+#define netdissect_timevalisset(tvp) ((tvp)->tv_sec || (tvp)->tv_usec)
 
-#define tcpdump_timevalcmp(tvp, uvp, cmp)      \
+#define netdissect_timevalcmp(tvp, uvp, cmp)      \
 	(((tvp)->tv_sec == (uvp)->tv_sec) ?    \
 	 ((tvp)->tv_usec cmp (uvp)->tv_usec) : \
 	 ((tvp)->tv_sec cmp (uvp)->tv_sec))
 
-#define tcpdump_timevaladd(tvp, uvp, vvp, nano_prec)              \
+#define netdissect_timevaladd(tvp, uvp, vvp, nano_prec)           \
 	do {                                                      \
 		(vvp)->tv_sec = (tvp)->tv_sec + (uvp)->tv_sec;    \
 		(vvp)->tv_usec = (tvp)->tv_usec + (uvp)->tv_usec; \
@@ -64,7 +64,7 @@
 		}                                                 \
 	} while (0)
 
-#define tcpdump_timevalsub(tvp, uvp, vvp, nano_prec)               \
+#define netdissect_timevalsub(tvp, uvp, vvp, nano_prec)            \
 	do {                                                       \
 		(vvp)->tv_sec = (tvp)->tv_sec - (uvp)->tv_sec;     \
 		(vvp)->tv_usec = (tvp)->tv_usec - (uvp)->tv_usec;  \
@@ -75,4 +75,4 @@
 		}                                                  \
 	} while (0)
 
-#endif /* tcpdump_timeval_operations_h */
+#endif /* netdissect_timeval_operations_h */
