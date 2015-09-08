@@ -403,7 +403,7 @@ show_devices_and_exit (void)
 #define Q_FLAG
 #endif
 
-#define SHORTOPTS "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOpq" Q_FLAG "r:Rs:StT:u" U_FLAG "vV:w:W:xXy:Yz:Z:#"
+#define SHORTOPTS "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOpq" Q_FLAG "r:s:StT:u" U_FLAG "vV:w:W:xXy:Yz:Z:#"
 
 /*
  * Long options.
@@ -745,7 +745,6 @@ main(int argc, char **argv)
 #endif /* _WIN32 */
 
 	memset(ndo, 0, sizeof(*ndo));
-	ndo->ndo_Rflag=1;
 	ndo->ndo_dlt=-1;
 	ndo_set_function_pointers(ndo);
 	ndo->ndo_snaplen = DEFAULT_SNAPLEN;
@@ -1011,10 +1010,6 @@ main(int argc, char **argv)
 
 		case 'r':
 			RFileName = optarg;
-			break;
-
-		case 'R':
-			ndo->ndo_Rflag = 0;
 			break;
 
 		case 's':
@@ -2269,7 +2264,7 @@ print_usage(void)
 {
 	print_version();
 	(void)fprintf(stderr,
-"Usage: %s [-aAbd" D_FLAG "efhH" I_FLAG J_FLAG "KlLnNOpqRStu" U_FLAG "vxX#]" B_FLAG_USAGE " [ -c count ]\n", program_name);
+"Usage: %s [-aAbd" D_FLAG "efhH" I_FLAG J_FLAG "KlLnNOpqStu" U_FLAG "vxX#]" B_FLAG_USAGE " [ -c count ]\n", program_name);
 	(void)fprintf(stderr,
 "\t\t[ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]\n");
 	(void)fprintf(stderr,

@@ -94,7 +94,6 @@ struct netdissect_options {
   int ndo_nflag;		/* leave addresses as numbers */
   int ndo_Nflag;		/* remove domains from printed host names */
   int ndo_qflag;		/* quick (shorter) output */
-  int ndo_Rflag;		/* print sequence # field in AH/ESP*/
   int ndo_sflag;		/* use the libsmi to translate OIDs */
   int ndo_Sflag;		/* print raw TCP sequence numbers */
   int ndo_tflag;		/* print packet arrival time */

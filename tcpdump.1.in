@@ -27,7 +27,7 @@ tcpdump \- dump traffic on a network
 .na
 .B tcpdump
 [
-.B \-AbdDefhHIJKlLnNOpqRStuUvxX#
+.B \-AbdDefhHIJKlLnNOpqStuUvxX#
 ] [
 .B \-B
 .I buffer_size
@@ -592,12 +592,6 @@ on all platforms.
 Quick (quiet?) output.
 Print less protocol information so output
 lines are shorter.
-.TP
-.B \-R
-Assume ESP/AH packets to be based on old specification (RFC1825 to RFC1829).
-If specified, \fItcpdump\fP will not print replay prevention field.
-Since there is no protocol version field in ESP/AH specification,
-\fItcpdump\fP cannot deduce the version of ESP/AH protocol.
 .TP
 .BI \-r " file"
 Read packets from \fIfile\fR (which was created with the
