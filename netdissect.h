@@ -553,8 +553,6 @@ extern void rtsp_print(netdissect_options *, const u_char *, u_int);
 extern void smtp_print(netdissect_options *, const u_char *, u_int);
 extern void geneve_print(netdissect_options *, const u_char *, u_int);
 
-/* stuff that has not yet been rototiled */
-
 extern char *smb_errstr(int, int);
 extern const char *nt_errstr(uint32_t);
 
