@@ -959,7 +959,7 @@ main(int argc, char **argv)
 			if (smiLoadModule(optarg) == 0) {
 				error("could not load MIB module %s", optarg);
 			}
-			ndo->ndo_sflag = 1;
+			ndo->ndo_mflag = 1;
 #else
 			(void)fprintf(stderr, "%s: ignoring option `-m %s' ",
 				      program_name, optarg);

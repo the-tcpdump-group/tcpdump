@@ -679,7 +679,7 @@ asn1_print(netdissect_options *ndo,
 		int o = 0, first = -1;
 
 		i = asnlen;
-		if (!ndo->ndo_sflag && !ndo->ndo_nflag && asnlen > 2) {
+		if (!ndo->ndo_mflag && !ndo->ndo_nflag && asnlen > 2) {
 			const struct obj_abrev *a = &obj_abrev_list[0];
 			size_t a_len = strlen(a->oid);
 			for (; a->node; a++) {
@@ -695,7 +695,7 @@ asn1_print(netdissect_options *ndo,
 			}
 		}
 
-		for (; !ndo->ndo_sflag && i-- > 0; p++) {
+		for (; !ndo->ndo_mflag && i-- > 0; p++) {
 			ND_TCHECK(*p);
 			o = (o << ASN_SHIFT7) + (*p & ~ASN_BIT8);
 			if (*p & ASN_LONGLEN)
@@ -901,7 +901,7 @@ smi_decode_oid(netdissect_options *ndo,
 	int o = 0, first = -1, i = asnlen;
 	unsigned int firstval;
 
-	for (*oidlen = 0; ndo->ndo_sflag && i-- > 0; p++) {
+	for (*oidlen = 0; ndo->ndo_mflag && i-- > 0; p++) {
 		ND_TCHECK(*p);
 	        o = (o << ASN_SHIFT7) + (*p & ~ASN_BIT8);
 		if (*p & ASN_LONGLEN)
