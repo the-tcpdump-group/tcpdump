@@ -7422,7 +7422,7 @@ savedcppflags="$CPPFLAGS"
 CPPFLAGS="$CPPFLAGS $V_INCLS"
 for ac_header in pcap/bluetooth.h
 do :
-  ac_fn_c_check_header_compile "$LINENO" "pcap/bluetooth.h" "ac_cv_header_pcap_bluetooth_h" "#include \"tcpdump-stdinc.h\"
+  ac_fn_c_check_header_compile "$LINENO" "pcap/bluetooth.h" "ac_cv_header_pcap_bluetooth_h" "#include \"netdissect-stdinc.h\"
 "
 if test "x$ac_cv_header_pcap_bluetooth_h" = xyes; then :
   cat >>confdefs.h <<_ACEOF
@@ -7435,7 +7435,7 @@ done
 
 for ac_header in pcap/nflog.h
 do :
-  ac_fn_c_check_header_compile "$LINENO" "pcap/nflog.h" "ac_cv_header_pcap_nflog_h" "#include \"tcpdump-stdinc.h\"
+  ac_fn_c_check_header_compile "$LINENO" "pcap/nflog.h" "ac_cv_header_pcap_nflog_h" "#include \"netdissect-stdinc.h\"
 "
 if test "x$ac_cv_header_pcap_nflog_h" = xyes; then :
   cat >>confdefs.h <<_ACEOF
@@ -7448,7 +7448,7 @@ done
 
 for ac_header in pcap/usb.h
 do :
-  ac_fn_c_check_header_compile "$LINENO" "pcap/usb.h" "ac_cv_header_pcap_usb_h" "#include \"tcpdump-stdinc.h\"
+  ac_fn_c_check_header_compile "$LINENO" "pcap/usb.h" "ac_cv_header_pcap_usb_h" "#include \"netdissect-stdinc.h\"
 "
 if test "x$ac_cv_header_pcap_usb_h" = xyes; then :
   cat >>confdefs.h <<_ACEOF

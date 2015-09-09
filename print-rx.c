@@ -39,7 +39,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include "netdissect.h"
 #include "addrtoname.h"

@@ -33,7 +33,7 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #ifdef __bsdi__
 #include <net/slcompress.h>

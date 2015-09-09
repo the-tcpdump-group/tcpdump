@@ -32,7 +32,7 @@
 #endif
 
 #ifdef INET6
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include "ip6.h"
 #include "netdissect.h"

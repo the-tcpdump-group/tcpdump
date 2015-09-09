@@ -25,7 +25,7 @@
 
 #ifdef INET6
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include "netdissect.h"
 #include "addrtoname.h"

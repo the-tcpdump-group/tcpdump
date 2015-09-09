@@ -54,7 +54,7 @@ The Regents of the University of California.  All rights reserved.\n";
 #endif
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #ifdef _WIN32
 #include "w32_fzs.h"

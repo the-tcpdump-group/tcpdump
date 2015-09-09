@@ -32,12 +32,12 @@
 /*
  * Include the appropriate OS header files on Windows and various flavors
  * of UNIX, include various non-OS header files on Windows, and define
- * various items as needed, to isolate most of tcpdump's platform
+ * various items as needed, to isolate most of netdissect's platform
  * differences to this one file.
  */
 
-#ifndef tcpdump_stdinc_h
-#define tcpdump_stdinc_h
+#ifndef netdissect_stdinc_h
+#define netdissect_stdinc_h
 
 #include <errno.h>
 
@@ -349,4 +349,4 @@ typedef char* caddr_t;
 #define max(a,b) ((b)>(a)?(b):(a))
 #endif
 
-#endif /* tcpdump_stdinc_h */
+#endif /* netdissect_stdinc_h */

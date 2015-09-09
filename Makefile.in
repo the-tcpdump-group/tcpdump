@@ -276,7 +276,7 @@ HDR = \
 	slcompress.h \
 	smb.h \
 	tcp.h \
-	tcpdump-stdinc.h \
+	netdissect-stdinc.h \
 	timeval-operations.h \
 	udp.h
 

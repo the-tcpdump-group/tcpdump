@@ -26,7 +26,7 @@
 
 #include <string.h>
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include "netdissect.h"
 #include "addrtoname.h"

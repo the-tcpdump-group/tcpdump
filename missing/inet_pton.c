@@ -36,7 +36,7 @@
  * SUCH DAMAGE.
  */
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 int
 inet_pton(int af, const char *src, void *dst)

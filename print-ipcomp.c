@@ -23,7 +23,7 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 struct ipcomp {
 	uint8_t comp_nxt;	/* Next Header */

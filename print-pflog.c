@@ -32,7 +32,7 @@
 #include <net/pfvar.h>
 #include <net/if_pflog.h>
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include "netdissect.h"
 #include "extract.h"

@@ -36,7 +36,7 @@
  * SUCH DAMAGE.
  */
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 /* Minimal implementation of inet_aton.
  * Cannot distinguish between failure and a local broadcast address. */
