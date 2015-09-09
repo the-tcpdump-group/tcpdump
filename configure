@@ -7948,10 +7948,10 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
 
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -Wpedantic option" >&5
-$as_echo_n "checking whether the compiler supports the -Wpedantic option... " >&6; }
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -pedantic option" >&5
+$as_echo_n "checking whether the compiler supports the -pedantic option... " >&6; }
 	save_CFLAGS="$CFLAGS"
-	CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error -Wpedantic"
+	CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error -pedantic"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -7968,7 +7968,7 @@ if ac_fn_c_try_compile "$LINENO"; then :
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 		CFLAGS="$save_CFLAGS"
-		V_CCOPT="$V_CCOPT -Wpedantic"
+		V_CCOPT="$V_CCOPT -pedantic"
 
 else
 
