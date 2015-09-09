@@ -56,8 +56,7 @@ static const unsigned char charmap[] = {
 };
 
 int
-ascii_strcasecmp(s1, s2)
-	const char *s1, *s2;
+ascii_strcasecmp(const char *s1, const char *s2)
 {
 	register const unsigned char *cm = charmap,
 			*us1 = (const unsigned char *)s1,
@@ -70,9 +69,7 @@ ascii_strcasecmp(s1, s2)
 }
 
 int
-ascii_strncasecmp(s1, s2, n)
-	const char *s1, *s2;
-	register size_t n;
+ascii_strncasecmp(const char *s1, const char *s2, register size_t n)
 {
 	register const unsigned char *cm = charmap,
 			*us1 = (const unsigned char *)s1,
