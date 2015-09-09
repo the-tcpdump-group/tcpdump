@@ -982,6 +982,7 @@ AC_DEFUN(AC_LBL_DEVEL,
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wshadow)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wdeclaration-after-statement)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -Wpedantic)
+		    AC_LBL_CHECK_COMPILER_OPT($1, -Wold-style-definition)
 		    AC_LBL_CHECK_COMPILER_OPT($1, -W)
 	    fi
 	    AC_LBL_CHECK_DEPENDENCY_GENERATION_OPT()
