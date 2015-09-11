@@ -51,7 +51,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "ascii_strcasecmp.h"
 #include "timeval-operations.h"
 
@@ -475,7 +475,7 @@ bittok2str(register const struct tok *lp, register const char *fmt,
 
 /*
  * Convert a value to a string using an array; the macro
- * tok2strary() in <interface.h> is the public interface to
+ * tok2strary() in <netdissect.h> is the public interface to
  * this function and ensures that the second argument is
  * correct for bounds-checking.
  */

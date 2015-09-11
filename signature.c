@@ -23,7 +23,7 @@
 
 #include <string.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "signature.h"
 
 #ifdef HAVE_LIBCRYPTO

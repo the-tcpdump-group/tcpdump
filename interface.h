@@ -69,8 +69,6 @@ extern char *strsep(char **, const char *);
 
 extern char *program_name;	/* used to generate self-identifying messages */
 
-extern int32_t thiszone;	/* seconds offset from gmt to local time */
-
 extern void error(const char *, ...)
      __attribute__((noreturn))
 #ifdef __ATTRIBUTE___FORMAT_OK
@@ -94,5 +92,3 @@ struct bpf_program;
 extern void bpf_dump(const struct bpf_program *, int);
 
 #endif
-
-#include "netdissect.h"

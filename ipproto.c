@@ -19,7 +19,7 @@
 
 #include <netdissect-stdinc.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "ipproto.h"
 
 const struct tok ipproto_values[] = {

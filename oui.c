@@ -18,7 +18,7 @@
 #endif
 
 #include <netdissect-stdinc.h>
-#include "interface.h"
+#include "netdissect.h"
 #include "oui.h"
 
 /* FIXME complete OUI list using a script */

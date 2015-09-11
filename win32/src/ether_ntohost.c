@@ -30,7 +30,7 @@
 #include <netdissect-stdinc.h>
 
 #include "ether.h"
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
 
 typedef struct ether_addr {

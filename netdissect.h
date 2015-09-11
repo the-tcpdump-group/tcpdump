@@ -40,6 +40,8 @@
 
 #include "ip.h" /* struct ip for nextproto4_cksum() */
 
+extern int32_t thiszone;	/* seconds offset from gmt to local time */
+
 #if !defined(HAVE_SNPRINTF)
 int snprintf (char *str, size_t sz, const char *format, ...)
 #ifdef __ATTRIBUTE___FORMAT_OK

@@ -19,7 +19,7 @@
 
 #include <netdissect-stdinc.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "gmpls.h"
 
 /* rfc3471 */

@@ -28,7 +28,7 @@
 #include <string.h>
 #include <assert.h>
 
-#include "interface.h"
+#include "netdissect.h"
 
 /*
  * CRC-10 table generated using the following Python snippet:

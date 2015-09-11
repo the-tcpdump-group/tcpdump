@@ -49,7 +49,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "nfsfh.h"
 
 /*

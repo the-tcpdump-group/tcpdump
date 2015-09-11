@@ -27,7 +27,7 @@
 
 #include <stdio.h>
 
-#include "interface.h"
+#include "netdissect.h"
 
 void
 bpf_dump(const struct bpf_program *p, int option)
