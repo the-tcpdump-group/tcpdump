@@ -57,7 +57,11 @@ The Regents of the University of California.  All rights reserved.\n";
 #include <netdissect-stdinc.h>
 
 #ifdef _WIN32
-#include "w32_fzs.h"
+#ifndef _WINSOCKAPI_
+#define _WINSOCKAPI_ /* Prevent inclusion of winsock.h in windows.h */
+#endif /* _WINSOCKAPI_ */
+#include <windows.h>
+#include <winsock2.h>
 extern int SIZE_BUF;
 #define off_t long
 #define uint UINT
@@ -741,10 +745,6 @@ main(int argc, char **argv)
 	netdissect_options Ndo;
 	netdissect_options *ndo = &Ndo;
 
-#ifdef _WIN32
-	if(wsockinit() != 0) return 1;
-#endif /* _WIN32 */
-
 	memset(ndo, 0, sizeof(*ndo));
 	ndo->ndo_dlt=-1;
 	ndo_set_function_pointers(ndo);
@@ -763,6 +763,11 @@ main(int argc, char **argv)
 		ndo->program_name = program_name = cp + 1;
 	else
 		ndo->program_name = program_name = argv[0];
+
+#ifdef _WIN32
+	if (pcap_wsockinit() != 0)
+		error("Attempting to initialize Winsock failed");
+#endif /* _WIN32 */
 
 	/*
 	 * On platforms where the CPU doesn't support unaligned loads,
