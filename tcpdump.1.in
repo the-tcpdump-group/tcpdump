@@ -247,8 +247,12 @@ savefile and open a new one.  Savefiles after the first savefile will
 have the name specified with the
 .B \-w
 flag, with a number after it, starting at 1 and continuing upward.
-The units of \fIfile_size\fP are millions of bytes (1,000,000 bytes,
-not 1,048,576 bytes).
+If no suffix provided, the units of \fIfile_size\fP are millions of
+bytes (1,000,000 bytes, not 1,048,576 bytes).  Suffixes k, m and g may
+be used to represent kilobytes (1,000 bytes), megabytes (1,000,000 bytes) and
+gigabytes (1,000,000,000 bytes) respectively.  Similarly, suffixes ki, mi and
+gi may be used to represent kibibytes (1,024 bytes), mibibytes
+(1,048,576 bytes) and gigibytes (1,073,741,824 bytes).
 .TP
 .B \-d
 Dump the compiled packet-matching code in a human readable form to
@@ -433,6 +437,12 @@ tcpdump as soon as they arrive, rather than being buffered for
 efficiency.  This is the default when printing packets rather than
 saving packets to a ``savefile'' if the packets are being printed to a
 terminal rather than to a file or pipe.
+.TP
+.BI \-\-limit\-file\-size= max_size
+.PD
+Once the capture file exceeds \fImax_size\fP do not capture any further
+packets.  Format of \fImax_size\fP is identical to \fI-C\fP parameter, being
+in millions of bytes but supporting ki/mi/gi/k/m/g suffixes.
 .TP
 .BI \-j " tstamp_type"
 .PD 0
