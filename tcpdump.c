@@ -1423,7 +1423,8 @@ main(int argc, char **argv)
 #endif /* HAVE_PCAP_SETDIRECTION */
 #else
 		*ebuf = '\0';
-		pd = pcap_open_live(device, snaplen, !pflag, 1000, ebuf);
+		pd = pcap_open_live(device, ndo->ndo_snaplen, !pflag, 1000,
+		    ebuf);
 		if (pd == NULL)
 			error("%s", ebuf);
 		else if (*ebuf)
