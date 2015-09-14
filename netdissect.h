@@ -111,7 +111,6 @@ struct netdissect_options {
 				 * LF, CR and SPACE as graphical chars
 				 */
   int ndo_dlt;                  /* if != -1, ask libpcap for the DLT it names */
-  int ndo_immediate;            /* use immediate mode */
 
   int ndo_Hflag;		/* dissect 802.11s draft mesh standard */
   int ndo_packet_number;	/* print a packet number in the beginning of line */

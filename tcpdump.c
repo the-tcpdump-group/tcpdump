@@ -742,12 +742,12 @@ main(int argc, char **argv)
 	int pflag=0;			/* don't go promiscuous */
 	netdissect_options Ndo;
 	netdissect_options *ndo = &Ndo;
+	int immediate_mode = 0;
 
 	memset(ndo, 0, sizeof(*ndo));
 	ndo->ndo_dlt=-1;
 	ndo_set_function_pointers(ndo);
 	ndo->ndo_snaplen = DEFAULT_SNAPLEN;
-	ndo->ndo_immediate = 0;
 
 	cnt = -1;
 	device = NULL;
@@ -1162,7 +1162,7 @@ main(int argc, char **argv)
 
 #ifdef HAVE_PCAP_SET_IMMEDIATE_MODE
 		case OPTION_IMMEDIATE_MODE:
-			ndo->ndo_immediate = 1;
+			immediate_mode = 1;
 			break;
 #endif
 
@@ -1209,7 +1209,7 @@ main(int argc, char **argv)
 	 * probably expecting to see packets pop up immediately.
 	 */
 	if (WFileName == NULL && isatty(1))
-		ndo->ndo_immediate = 1;
+		immediate_mode = 1;
 #endif
 
 #ifdef WITH_CHROOT
@@ -1338,7 +1338,7 @@ main(int argc, char **argv)
 #endif
 
 #ifdef HAVE_PCAP_SET_IMMEDIATE_MODE
-		if (ndo->ndo_immediate) {
+		if (immediate_mode) {
 			status = pcap_set_immediate_mode(pd, 1);
 			if (status != 0)
 				error("%s: Can't set immediate mode: %s",
