@@ -1054,7 +1054,7 @@ smi_print_variable(netdissect_options *ndo,
 
 static int
 smi_print_value(netdissect_options *ndo,
-                SmiNode *smiNode, u_char pduid, struct be *elem)
+                SmiNode *smiNode, u_short pduid, struct be *elem)
 {
 	unsigned int i, oid[128], oidlen;
 	SmiType *smiType;
@@ -1197,7 +1197,7 @@ smi_print_value(netdissect_options *ndo,
  */
 static void
 varbind_print(netdissect_options *ndo,
-              u_char pduid, const u_char *np, u_int length)
+              u_short pduid, const u_char *np, u_int length)
 {
 	struct be elem;
 	int count = 0, ind;
