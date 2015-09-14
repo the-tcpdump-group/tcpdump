@@ -56,10 +56,6 @@ The Regents of the University of California.  All rights reserved.\n";
 
 #include <netdissect-stdinc.h>
 
-#ifdef _WIN32
-#define off_t long
-#endif /* _WIN32 */
-
 #ifdef USE_LIBSMI
 #include <smi.h>
 #endif
