@@ -736,16 +736,18 @@ main(int argc, char **argv)
 	cap_rights_t rights;
 	int cansandbox;
 #endif	/* HAVE_CAPSICUM */
-	int Bflag=0;			/* buffer size */
-	int jflag=-1;			/* packet time stamp source */
-	int Oflag=1;			/* run filter code optimizer */
-	int pflag=0;			/* don't go promiscuous */
+	int Bflag = 0;			/* buffer size */
+	int jflag = -1;			/* packet time stamp source */
+	int Oflag = 1;			/* run filter code optimizer */
+	int pflag = 0;			/* don't go promiscuous */
+	int yflag_dlt = -1;
+	const char *yflag_dlt_name = NULL;
+
 	netdissect_options Ndo;
 	netdissect_options *ndo = &Ndo;
 	int immediate_mode = 0;
 
 	memset(ndo, 0, sizeof(*ndo));
-	ndo->ndo_dlt=-1;
 	ndo_set_function_pointers(ndo);
 	ndo->ndo_snaplen = DEFAULT_SNAPLEN;
 
@@ -1110,11 +1112,11 @@ main(int argc, char **argv)
 			break;
 
 		case 'y':
-			ndo->ndo_dltname = optarg;
-			ndo->ndo_dlt =
-			  pcap_datalink_name_to_val(ndo->ndo_dltname);
-			if (ndo->ndo_dlt < 0)
-				error("invalid data link type %s", ndo->ndo_dltname);
+			yflag_dlt_name = optarg;
+			yflag_dlt =
+				pcap_datalink_name_to_val(yflag_dlt_name);
+			if (yflag_dlt < 0)
+				error("invalid data link type %s", yflag_dlt_name);
 			break;
 
 #if defined(HAVE_PCAP_DEBUG) || defined(HAVE_YYDEBUG)
@@ -1448,9 +1450,9 @@ main(int argc, char **argv)
 #endif /* !defined(HAVE_PCAP_CREATE) && defined(_WIN32) */
 		if (Lflag)
 			show_dlts_and_exit(device);
-		if (ndo->ndo_dlt >= 0) {
+		if (yflag_dlt >= 0) {
 #ifdef HAVE_PCAP_SET_DATALINK
-			if (pcap_set_datalink(pd, ndo->ndo_dlt) < 0)
+			if (pcap_set_datalink(pd, yflag_dlt) < 0)
 				error("%s", pcap_geterr(pd));
 #else
 			/*
@@ -1458,13 +1460,13 @@ main(int argc, char **argv)
 			 * data link type, so we only let them
 			 * set it to what it already is.
 			 */
-			if (ndo->ndo_dlt != pcap_datalink(pd)) {
+			if (yflag_dlt != pcap_datalink(pd)) {
 				error("%s is not one of the DLTs supported by this device\n",
-				      ndo->ndo_dltname);
+				      yflag_dlt_name);
 			}
 #endif
 			(void)fprintf(stderr, "%s: data link type %s\n",
-				      program_name, ndo->ndo_dltname);
+				      program_name, yflag_dlt_name);
 			(void)fflush(stderr);
 		}
 		i = pcap_snapshot(pd);

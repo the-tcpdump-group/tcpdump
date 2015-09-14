@@ -110,13 +110,10 @@ struct netdissect_options {
   int ndo_Aflag;		/* print packet only in ascii observing TAB,
 				 * LF, CR and SPACE as graphical chars
 				 */
-  int ndo_dlt;                  /* if != -1, ask libpcap for the DLT it names */
-
   int ndo_Hflag;		/* dissect 802.11s draft mesh standard */
   int ndo_packet_number;	/* print a packet number in the beginning of line */
   int ndo_suppress_default_print; /* don't use default_print() for unknown packet types */
   int ndo_tstamp_precision;	/* requested time stamp precision */
-  const char *ndo_dltname;
   const char *program_name;	/* Name of the program using the library */
 
   char *ndo_espsecret;
