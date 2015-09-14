@@ -46,6 +46,7 @@
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
+#include <ctype.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
