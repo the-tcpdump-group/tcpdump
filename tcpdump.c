@@ -58,7 +58,6 @@ The Regents of the University of California.  All rights reserved.\n";
 
 #ifdef _WIN32
 #define off_t long
-#define uint UINT
 #endif /* _WIN32 */
 
 #ifdef USE_LIBSMI
