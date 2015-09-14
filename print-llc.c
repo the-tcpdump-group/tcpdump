@@ -150,7 +150,7 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 {
 	uint8_t dsap_field, dsap, ssap_field, ssap;
 	uint16_t control;
-	u_int hdrlen;
+	int hdrlen;
 	int is_u;
 
 	if (caplen < 3) {
