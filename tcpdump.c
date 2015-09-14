@@ -57,12 +57,6 @@ The Regents of the University of California.  All rights reserved.\n";
 #include <netdissect-stdinc.h>
 
 #ifdef _WIN32
-#ifndef _WINSOCKAPI_
-#define _WINSOCKAPI_ /* Prevent inclusion of winsock.h in windows.h */
-#endif /* _WINSOCKAPI_ */
-#include <windows.h>
-#include <winsock2.h>
-extern int SIZE_BUF;
 #define off_t long
 #define uint UINT
 #endif /* _WIN32 */
