@@ -131,7 +131,7 @@ void
 geneve_print(netdissect_options *ndo, const u_char *bp, u_int len)
 {
     uint8_t ver_opt;
-    uint version;
+    u_int version;
     uint8_t flags;
     uint16_t prot;
     uint32_t vni;
