@@ -330,12 +330,12 @@ p_sfix(netdissect_options *ndo,
 
 	i = EXTRACT_16BITS(&sfp->int_part);
 	f = EXTRACT_16BITS(&sfp->fraction);
-	ff = f / 65536.0;	/* shift radix point by 16 bits */
-	f = ff * 1000000.0;	/* Treat fraction as parts per million */
+	ff = f / 65536.0f;	/* shift radix point by 16 bits */
+	f = ff * 1000000.0f;	/* Treat fraction as parts per million */
 	ND_PRINT((ndo, "%d.%06d", i, f));
 }
 
-#define	FMAXINT	(4294967296.0)	/* floating point rep. of MAXINT */
+#define	FMAXINT	(4294967296.0f)	/* floating point rep. of MAXINT */
 
 static void
 p_ntp_time(netdissect_options *ndo,
@@ -349,10 +349,10 @@ p_ntp_time(netdissect_options *ndo,
 	i = EXTRACT_32BITS(&lfp->int_part);
 	uf = EXTRACT_32BITS(&lfp->fraction);
 	ff = uf;
-	if (ff < 0.0)		/* some compilers are buggy */
+	if (ff < 0.0f)		/* some compilers are buggy */
 		ff += FMAXINT;
 	ff = ff / FMAXINT;	/* shift radix point by 32 bits */
-	f = ff * 1000000000.0;	/* treat fraction as parts per billion */
+	f = ff * 1000000000.0f;	/* treat fraction as parts per billion */
 	ND_PRINT((ndo, "%u.%09d", i, f));
 
 #ifdef HAVE_STRFTIME
@@ -417,10 +417,10 @@ p_ntp_delta(netdissect_options *ndo,
 	}
 
 	ff = f;
-	if (ff < 0.0)		/* some compilers are buggy */
+	if (ff < 0.0f)		/* some compilers are buggy */
 		ff += FMAXINT;
 	ff = ff / FMAXINT;	/* shift radix point by 32 bits */
-	f = ff * 1000000000.0;	/* treat fraction as parts per billion */
+	f = ff * 1000000000.0f;	/* treat fraction as parts per billion */
 	ND_PRINT((ndo, "%s%d.%09d", signbit ? "-" : "+", i, f));
 }
 
