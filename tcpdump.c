@@ -711,7 +711,6 @@ main(int argc, char **argv)
 	int timezone_offset = 0;
 	register char *cp, *infile, *cmdbuf, *device, *RFileName, *VFileName, *WFileName;
 	pcap_handler callback;
-	int type;
 	int dlt;
 	int new_dlt;
 	const char *dlt_name;
@@ -719,7 +718,6 @@ main(int argc, char **argv)
 #ifndef _WIN32
 	RETSIGTYPE (*oldhandler)(int);
 #endif
-	struct print_info printinfo;
 	struct dump_info dumpinfo;
 	u_char *pcap_userdata;
 	char ebuf[PCAP_ERRBUF_SIZE];
@@ -1646,10 +1644,10 @@ main(int argc, char **argv)
 			pcap_dump_flush(p);
 #endif
 	} else {
-		type = pcap_datalink(pd);
-		printinfo = get_print_info(ndo, type);
+		dlt = pcap_datalink(pd);
+		ndo->ndo_if_printer = get_if_printer(ndo, dlt);
 		callback = print_packet;
-		pcap_userdata = (u_char *)&printinfo;
+		pcap_userdata = (u_char *)ndo;
 	}
 
 #ifdef SIGNAL_REQ_INFO
@@ -1767,7 +1765,7 @@ main(int argc, char **argv)
 				new_dlt = pcap_datalink(pd);
 				if (WFileName && new_dlt != dlt)
 					error("%s: new dlt does not match original", RFileName);
-				printinfo = get_print_info(ndo, new_dlt);
+				ndo->ndo_if_printer = get_if_printer(ndo, new_dlt);
 				dlt_name = pcap_datalink_val_to_name(new_dlt);
 				if (dlt_name == NULL) {
 					fprintf(stderr, "reading from file %s, link-type %u\n",
@@ -2150,15 +2148,11 @@ dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 static void
 print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
-	struct print_info *print_info;
-
 	++packets_captured;
 
 	++infodelay;
 
-	print_info = (struct print_info *)user;
-
-	pretty_print_packet(print_info, h, sp, packets_captured);
+	pretty_print_packet((netdissect_options *)user, h, sp, packets_captured);
 
 	--infodelay;
 	if (infoprint)

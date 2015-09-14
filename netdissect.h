@@ -37,6 +37,7 @@
 /* snprintf et al */
 
 #include <stdarg.h>
+#include <pcap.h>
 
 #include "ip.h" /* struct ip for nextproto4_cksum() */
 
@@ -88,6 +89,9 @@ extern char *bittok2str_nosep(const struct tok *, const char *, u_int);
 
 typedef struct netdissect_options netdissect_options;
 
+typedef u_int (*if_printer)(netdissect_options *ndo,
+			    const struct pcap_pkthdr *, const u_char *);
+
 struct netdissect_options {
   int ndo_bflag;		/* print 4 byte ASes in ASDOT notation */
   int ndo_eflag;		/* print ethernet header */
@@ -130,9 +134,12 @@ struct netdissect_options {
   const u_char *ndo_packetp;
   const u_char *ndo_snapend;
 
+  /* pointer to the if_printer function */
+  if_printer ndo_if_printer;
+
   /* pointer to void function to output stuff */
   void (*ndo_default_print)(netdissect_options *,
-		      register const u_char *bp, register u_int length);
+			    register const u_char *bp, register u_int length);
 
   /* pointer to function to do regular output */
   int  (*ndo_printf)(netdissect_options *,
@@ -338,12 +345,7 @@ extern int mask62plen(const u_char *);
 
 /* The printer routines. */
 
-#include <pcap.h>
-
 extern char *q922_string(netdissect_options *ndo, const u_char *, u_int);
-
-typedef u_int (*if_printer)(struct netdissect_options *ndo,
-				const struct pcap_pkthdr *, const u_char *);
 
 extern if_printer lookup_printer(int);
 
