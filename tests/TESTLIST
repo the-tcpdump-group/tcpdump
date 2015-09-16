@@ -1,3 +1,5 @@
+# The Option -n is useless in TESTLIST. It is already set in TESTonce.
+
 # Various flags applied to a TCP session.
 #
 # We cannot rely on, for example, "print-x.out" and
@@ -26,7 +28,7 @@ bgp-aigp	bgp-aigp.pcap	bgp-aigp.out	-t -v
 eapon1 eapon1.pcap eapon1.out -t
 
 # ESP tests
-esp0 02-sunrise-sunset-esp.pcap esp0.out -t -n
+esp0 02-sunrise-sunset-esp.pcap esp0.out -t
 # more ESP tests in crypto.sh
 
 # ISAKMP tests
@@ -175,7 +177,7 @@ of10_7050q-v	of10_7050q.pcap		of10_7050q-v.out	-t -v
 of10_7050sx_bsn-vv	of10_7050sx_bsn.pcap		of10_7050sx_bsn-vv.out	-t -vv
 
 # GeoNetworking and CALM FAST tests
-geonet-calm-fast	geonet_and_calm_fast.pcap	geonet_and_calm_fast.out	-t -vv -n
+geonet-calm-fast	geonet_and_calm_fast.pcap	geonet_and_calm_fast.out	-t -vv
 
 # M3UA tests
 m3ua isup.pcap isup.out -t
@@ -300,7 +302,7 @@ cve2015-0261_01    cve2015-0261-ipv6.pcap       cve2015-0261-ipv6.out -t -v
 cve2015-0261_02    cve2015-0261-crash.pcap      cve2015-0261-crash.out -t -v
 
 # OLSRv1 tests
-olsrv1_1	OLSRv1_HNA_sgw_1.pcap		OLSRv1_HNA_sgw_1.out	-t -v -n
+olsrv1_1	OLSRv1_HNA_sgw_1.pcap		OLSRv1_HNA_sgw_1.out	-t -v
 
 # tests with unaligned data, to make sure they work on SPARC
-unaligned-nfs-1	unaligned-nfs-1.pcap	unaligned-nfs-1.out	-t -v -n
+unaligned-nfs-1	unaligned-nfs-1.pcap	unaligned-nfs-1.out	-t -v
