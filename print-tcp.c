@@ -44,9 +44,7 @@ __RCSID("$NetBSD: print-tcp.c,v 1.8 2007/07/24 11:53:48 drochner Exp $");
 #include "tcp.h"
 
 #include "ip.h"
-#ifdef INET6
 #include "ip6.h"
-#endif
 #include "ipproto.h"
 #include "rpc_auth.h"
 #include "rpc_msg.h"
@@ -80,7 +78,6 @@ struct tcp_seq_hash {
         tcp_seq ack;
 };
 
-#ifdef INET6
 struct tha6 {
         struct in6_addr src;
         struct in6_addr dst;
@@ -93,7 +90,6 @@ struct tcp_seq_hash6 {
         tcp_seq seq;
         tcp_seq ack;
 };
-#endif
 
 #define TSEQ_HASHSIZE 919
 
@@ -101,9 +97,7 @@ struct tcp_seq_hash6 {
 #define ZEROLENOPT(o) ((o) == TCPOPT_EOL || (o) == TCPOPT_NOP)
 
 static struct tcp_seq_hash tcp_seq_hash4[TSEQ_HASHSIZE];
-#ifdef INET6
 static struct tcp_seq_hash6 tcp_seq_hash6[TSEQ_HASHSIZE];
-#endif
 
 static const struct tok tcp_flag_values[] = {
         { TH_FIN, "F" },
@@ -164,18 +158,14 @@ tcp_print(netdissect_options *ndo,
         u_int utoval;
         uint16_t magic;
         register int rev;
-#ifdef INET6
         register const struct ip6_hdr *ip6;
-#endif
 
         tp = (const struct tcphdr *)bp;
         ip = (const struct ip *)bp2;
-#ifdef INET6
         if (IP_V(ip) == 6)
                 ip6 = (const struct ip6_hdr *)bp2;
         else
                 ip6 = NULL;
-#endif /*INET6*/
         ch = '\0';
         if (!ND_TTEST(tp->th_dport)) {
                 ND_PRINT((ndo, "%s > %s: [|tcp]",
@@ -189,7 +179,6 @@ tcp_print(netdissect_options *ndo,
 
         hlen = TH_OFF(tp) * 4;
 
-#ifdef INET6
         if (ip6) {
                 if (ip6->ip6_nxt == IPPROTO_TCP) {
                         ND_PRINT((ndo, "%s.%s > %s.%s: ",
@@ -201,9 +190,7 @@ tcp_print(netdissect_options *ndo,
                         ND_PRINT((ndo, "%s > %s: ",
                                      tcpport_string(ndo, sport), tcpport_string(ndo, dport)));
                 }
-        } else
-#endif /*INET6*/
-        {
+        } else {
                 if (ip->ip_p == IPPROTO_TCP) {
                         ND_PRINT((ndo, "%s.%s > %s.%s: ",
                                      ipaddr_string(ndo, &ip->ip_src),
@@ -249,7 +236,6 @@ tcp_print(netdissect_options *ndo,
                  * both directions).
                  */
                 rev = 0;
-#ifdef INET6
                 if (ip6) {
                         register struct tcp_seq_hash6 *th;
                         struct tcp_seq_hash6 *tcp_seq_hash;
@@ -305,9 +291,6 @@ tcp_print(netdissect_options *ndo,
                         thseq = th->seq;
                         thack = th->ack;
                 } else {
-#else  /*INET6*/
-                {
-#endif /*INET6*/
                         register struct tcp_seq_hash *th;
                         struct tcp_seq_hash *tcp_seq_hash;
                         const struct in_addr *src, *dst;
@@ -388,9 +371,7 @@ tcp_print(netdissect_options *ndo,
                                 else
                                         ND_PRINT((ndo, " (correct)"));
                         }
-                }
-#ifdef INET6
-                else if (IP_V(ip) == 6 && ip6->ip6_plen) {
+                } else if (IP_V(ip) == 6 && ip6->ip6_plen) {
                         if (ND_TTEST2(tp->th_sport, length)) {
                                 sum = nextproto6_cksum(ip6, (const uint8_t *)tp,
 							length, length, IPPROTO_TCP);
@@ -405,7 +386,6 @@ tcp_print(netdissect_options *ndo,
 
                         }
                 }
-#endif
         }
 
         length -= hlen;
@@ -827,11 +807,9 @@ tcp_verify_signature(netdissect_options *ndo,
         char zero_proto = 0;
         MD5_CTX ctx;
         uint16_t savecsum, tlen;
-#ifdef INET6
         const struct ip6_hdr *ip6;
         uint32_t len32;
         uint8_t nxt;
-#endif
 
 	if (data + length > ndo->ndo_snapend) {
 		ND_PRINT((ndo, "snaplen too short, "));
@@ -857,7 +835,6 @@ tcp_verify_signature(netdissect_options *ndo,
                 tlen = EXTRACT_16BITS(&ip->ip_len) - IP_HL(ip) * 4;
                 tlen = htons(tlen);
                 MD5_Update(&ctx, (const char *)&tlen, sizeof(tlen));
-#ifdef INET6
         } else if (IP_V(ip) == 6) {
                 ip6 = (const struct ip6_hdr *)ip;
                 MD5_Update(&ctx, (const char *)&ip6->ip6_src, sizeof(ip6->ip6_src));
@@ -870,13 +847,8 @@ tcp_verify_signature(netdissect_options *ndo,
                 MD5_Update(&ctx, (const char *)&nxt, sizeof(nxt));
                 nxt = IPPROTO_TCP;
                 MD5_Update(&ctx, (const char *)&nxt, sizeof(nxt));
-#endif
         } else {
-#ifdef INET6
 		ND_PRINT((ndo, "IP version not 4 or 6, "));
-#else
-		ND_PRINT((ndo, "IP version not 4, "));
-#endif
                 return (CANT_CHECK_SIGNATURE);
         }
 

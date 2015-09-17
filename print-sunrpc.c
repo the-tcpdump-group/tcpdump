@@ -55,9 +55,7 @@
 #include "extract.h"
 
 #include "ip.h"
-#ifdef INET6
 #include "ip6.h"
-#endif
 
 #include "rpc_auth.h"
 #include "rpc_msg.h"
@@ -170,9 +168,7 @@ sunrpcrequest_print(netdissect_options *ndo, register const u_char *bp,
 {
 	register const struct sunrpc_msg *rp;
 	register const struct ip *ip;
-#ifdef INET6
 	register const struct ip6_hdr *ip6;
-#endif
 	uint32_t x;
 	char srcid[20], dstid[20];	/*fits 32bit*/
 
@@ -195,14 +191,12 @@ sunrpcrequest_print(netdissect_options *ndo, register const u_char *bp,
 		    ipaddr_string(ndo, &ip->ip_src), srcid,
 		    ipaddr_string(ndo, &ip->ip_dst), dstid, length));
 		break;
-#ifdef INET6
 	case 6:
 		ip6 = (const struct ip6_hdr *)bp2;
 		ND_PRINT((ndo, "%s.%s > %s.%s: %d",
 		    ip6addr_string(ndo, &ip6->ip6_src), srcid,
 		    ip6addr_string(ndo, &ip6->ip6_dst), dstid, length));
 		break;
-#endif
 	default:
 		ND_PRINT((ndo, "%s.%s > %s.%s: %d", "?", srcid, "?", dstid, length));
 		break;

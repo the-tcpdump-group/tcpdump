@@ -722,7 +722,6 @@ _U_
                 obj_tlen-=8;
                 obj_tptr+=8;
                 break;
-#ifdef INET6
             case RSVP_CTYPE_IPV6:
                 if (obj_tlen < 20)
                     return -1;
@@ -761,7 +760,6 @@ _U_
                 obj_tlen-=26;
                 obj_tptr+=26;
                 break;
-#endif
             case RSVP_CTYPE_13: /* IPv4 p2mp LSP Tunnel */
                 if (obj_tlen < 12)
                     return -1;
@@ -801,7 +799,6 @@ _U_
                 obj_tlen-=sizeof(struct in_addr);
                 obj_tptr+=sizeof(struct in_addr);
                 break;
-#ifdef INET6
             case RSVP_CTYPE_IPV6:
                 if (obj_tlen < sizeof(struct in6_addr))
                     return -1;
@@ -811,7 +808,6 @@ _U_
                 obj_tlen-=sizeof(struct in6_addr);
                 obj_tptr+=sizeof(struct in6_addr);
                 break;
-#endif
             default:
                 hexdump=TRUE;
             }
@@ -828,7 +824,6 @@ _U_
                 obj_tlen-=sizeof(struct in_addr);
                 obj_tptr+=sizeof(struct in_addr);
                 break;
-#ifdef INET6
             case RSVP_CTYPE_IPV6:
                 if (obj_tlen < sizeof(struct in6_addr))
                     return-1;
@@ -838,7 +833,6 @@ _U_
                 obj_tlen-=sizeof(struct in6_addr);
                 obj_tptr+=sizeof(struct in6_addr);
                 break;
-#endif
             default:
                 hexdump=TRUE;
             }
@@ -913,7 +907,6 @@ _U_
                 obj_tlen-=8;
                 obj_tptr+=8;
                 break;
-#ifdef INET6
             case RSVP_CTYPE_IPV6:
                 if (obj_tlen < 20)
                     return-1;
@@ -938,7 +931,6 @@ _U_
                 obj_tlen-=40;
                 obj_tptr+=40;
                 break;
-#endif
             case RSVP_CTYPE_TUNNEL_IPV4:
                 if (obj_tlen < 8)
                     return-1;
@@ -1189,14 +1181,12 @@ _U_
                             ND_PRINT((ndo, "%s    UNI IPv4 TNA address: %s",
                                    ident, ipaddr_string(ndo, obj_tptr + 4)));
                             break;
-#ifdef INET6
                         case AFNUM_INET6:
                             if (subobj_len < 20)
                                 return -1;
                             ND_PRINT((ndo, "%s    UNI IPv6 TNA address: %s",
                                    ident, ip6addr_string(ndo, obj_tptr + 4)));
                             break;
-#endif
                         case AFNUM_NSAP:
                             if (subobj_len) {
                                 /* unless we have a TLV parser lets just hexdump */
@@ -1270,7 +1260,6 @@ _U_
                 if (obj_tlen)
                     hexdump=TRUE; /* unless we have a TLV parser lets just hexdump */
                 break;
-#ifdef INET6
             case RSVP_CTYPE_4: /* fall through - FIXME add TLV parser */
             case RSVP_CTYPE_IPV6:
                 if (obj_tlen < 20)
@@ -1283,7 +1272,6 @@ _U_
                 obj_tptr+=20;
                 hexdump=TRUE; /* unless we have a TLV parser lets just hexdump */
                 break;
-#endif
             default:
                 hexdump=TRUE;
             }
@@ -1359,7 +1347,6 @@ _U_
                 obj_tlen-=8;
                 obj_tptr+=8;
                 break;
-#ifdef INET6
             case RSVP_CTYPE_IPV6:
                 if (obj_tlen < 20)
                     return-1;
@@ -1404,7 +1391,6 @@ _U_
                 obj_tlen-=40;
                 obj_tptr+=40;
                 break;
-#endif
             case RSVP_CTYPE_TUNNEL_IPV4:
                 if (obj_tlen < 8)
                     return-1;
@@ -1546,7 +1532,6 @@ _U_
                 obj_tlen-=8;
                 obj_tptr+=8;
                 break;
-#ifdef INET6
             case RSVP_CTYPE_4: /* fall through - FIXME add TLV parser */
             case RSVP_CTYPE_IPV6:
                 if (obj_tlen < 20)
@@ -1573,7 +1558,6 @@ _U_
                 obj_tlen-=20;
                 obj_tptr+=20;
                 break;
-#endif
             default:
                 hexdump=TRUE;
             }
@@ -1749,7 +1733,6 @@ _U_
                 obj_tlen-=4;
                 obj_tptr+=4;
                 break;
-#ifdef INET6
             case RSVP_CTYPE_IPV6:
                 if (obj_tlen < 16)
                     return-1;
@@ -1759,7 +1742,6 @@ _U_
                 obj_tlen-=16;
                 obj_tptr+=16;
                 break;
-#endif
             default:
                 hexdump=TRUE;
             }

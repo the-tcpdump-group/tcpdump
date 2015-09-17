@@ -535,12 +535,10 @@ pimv2_addr_print(netdissect_options *ndo,
 			af = AF_INET;
 			len = sizeof(struct in_addr);
 			break;
-#ifdef INET6
 		case 2:
 			af = AF_INET6;
 			len = sizeof(struct in6_addr);
 			break;
-#endif
 		default:
 			return -1;
 		}
@@ -552,11 +550,9 @@ pimv2_addr_print(netdissect_options *ndo,
 		case sizeof(struct in_addr):
 			af = AF_INET;
 			break;
-#ifdef INET6
 		case sizeof(struct in6_addr):
 			af = AF_INET6;
 			break;
-#endif
 		default:
 			return -1;
 			break;
@@ -573,12 +569,10 @@ pimv2_addr_print(netdissect_options *ndo,
 			if (!silent)
 				ND_PRINT((ndo, "%s", ipaddr_string(ndo, bp)));
 		}
-#ifdef INET6
 		else if (af == AF_INET6) {
 			if (!silent)
 				ND_PRINT((ndo, "%s", ip6addr_string(ndo, bp)));
 		}
-#endif
 		return hdrlen + len;
 	case pimv2_group:
 	case pimv2_source:
@@ -590,7 +584,6 @@ pimv2_addr_print(netdissect_options *ndo,
 					ND_PRINT((ndo, "/%u", bp[1]));
 			}
 		}
-#ifdef INET6
 		else if (af == AF_INET6) {
 			if (!silent) {
 				ND_PRINT((ndo, "%s", ip6addr_string(ndo, bp + 2)));
@@ -598,7 +591,6 @@ pimv2_addr_print(netdissect_options *ndo,
 					ND_PRINT((ndo, "/%u", bp[1]));
 			}
 		}
-#endif
 		if (bp[0] && !silent) {
 			if (at == pimv2_group) {
 				ND_PRINT((ndo, "(0x%02x)", bp[0]));
@@ -641,14 +633,12 @@ pimv2_check_checksum(const u_char *bp, const u_char *bp2, u_int len)
 		vec[0].len = len;
 		cksum = in_cksum(vec, 1);
 		return (cksum ? INCORRECT : CORRECT);
-#ifdef INET6
 	} else if (IP_V(ip) == 6) {
 		const struct ip6_hdr *ip6;
 
 		ip6 = (const struct ip6_hdr *)bp2;
 		cksum = nextproto6_cksum(ip6, bp, len, len, IPPROTO_PIM);
 		return (cksum ? INCORRECT : CORRECT);
-#endif
 	} else {
 		return (UNVERIFIED);
 	}

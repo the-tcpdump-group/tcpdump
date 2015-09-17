@@ -23,8 +23,6 @@
 #include "config.h"
 #endif
 
-#ifdef INET6
-
 #include <netdissect-stdinc.h>
 
 #include <string.h>
@@ -107,4 +105,3 @@ rt6_print(netdissect_options *ndo, register const u_char *bp, const u_char *bp2 
 	ND_PRINT((ndo, "[|srcrt]"));
 	return -1;
 }
-#endif /* INET6 */

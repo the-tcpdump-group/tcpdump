@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1995, 1996, 1997 Kungliga Tekniska Högskolan
+ * Copyright (c) 1999 Kungliga Tekniska HÃ¶gskolan
  * (Royal Institute of Technology, Stockholm, Sweden).
  * All rights reserved.
  *
@@ -17,7 +17,7 @@
  * 3. All advertising materials mentioning features or use of this software
  *    must display the following acknowledgement:
  *      This product includes software developed by the Kungliga Tekniska
- *      Högskolan and its contributors.
+ *      HÃ¶gskolan and its contributors.
  *
  * 4. Neither the name of the Institute nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
@@ -36,18 +36,7 @@
  * SUCH DAMAGE.
  */
 
-#include <netdissect-stdinc.h>
+/* Address to printable string translation routines. */
 
-/* Minimal implementation of inet_aton.
- * Cannot distinguish between failure and a local broadcast address. */
-
-#ifndef INADDR_NONE
-#define INADDR_NONE 0xffffffff
-#endif
-
-int
-inet_aton(const char *cp, struct in_addr *addr)
-{
-  addr->s_addr = inet_addr(cp);
-  return (addr->s_addr == INADDR_NONE) ? 0 : 1;
-}
+extern const char *addrtostr(const void *src, char *dst, size_t size);
+extern const char *addrtostr6(const void *src, char *dst, size_t size);

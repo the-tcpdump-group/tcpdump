@@ -31,7 +31,6 @@
 #include "config.h"
 #endif
 
-#ifdef INET6
 #include <netdissect-stdinc.h>
 
 #include "ip6.h"
@@ -330,4 +329,3 @@ mobility_print(netdissect_options *ndo,
 	ND_PRINT((ndo, "[|MOBILITY]"));
 	return(mhlen);
 }
-#endif /* INET6 */

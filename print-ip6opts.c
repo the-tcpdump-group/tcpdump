@@ -31,7 +31,6 @@
 #include "config.h"
 #endif
 
-#ifdef INET6
 #include <netdissect-stdinc.h>
 
 #include "ip6.h"
@@ -210,4 +209,3 @@ dstopt_print(netdissect_options *ndo, register const u_char *bp)
     ND_PRINT((ndo, "[|DSTOPT]"));
     return(-1);
 }
-#endif /* INET6 */

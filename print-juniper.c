@@ -1032,10 +1032,8 @@ juniper_ppp_heuristic_guess(netdissect_options *ndo,
     case PPP_PAP :
     case PPP_CHAP :
     case PPP_ML :
-#ifdef INET6
     case PPP_IPV6 :
     case PPP_IPV6CP :
-#endif
         ppp_print(ndo, p, length);
         break;
 

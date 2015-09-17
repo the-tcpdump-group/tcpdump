@@ -1949,11 +1949,7 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
                          const uint8_t *tptr, const char *ident, uint16_t afi)
 {
     char ident_buffer[20];
-#ifdef INET6
     uint8_t prefix[sizeof(struct in6_addr)]; /* shared copy buffer for IPv4 and IPv6 prefixes */
-#else
-    uint8_t prefix[sizeof(struct in_addr)]; /* shared copy buffer for IPv4 prefixes */
-#endif
     u_int metric, status_byte, bit_length, byte_length, sublen, processed, subtlvtype, subtlvlen;
 
     if (!ND_TTEST2(*tptr, 4))
@@ -1974,7 +1970,6 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
             return (0);
         }
         processed++;
-#ifdef INET6
     } else if (afi == AF_INET6) {
         if (!ND_TTEST2(*tptr, 1)) /* fetch status & prefix_len byte */
             return (0);
@@ -1987,7 +1982,6 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
             return (0);
         }
         processed+=2;
-#endif
     } else
         return (0); /* somebody is fooling us */
 
@@ -2005,13 +1999,11 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
                ident,
                ipaddr_string(ndo, prefix),
                bit_length));
-#ifdef INET6
-    if (afi == AF_INET6)
+    else if (afi == AF_INET6)
         ND_PRINT((ndo, "%sIPv6 prefix: %s/%u",
                ident,
                ip6addr_string(ndo, prefix),
                bit_length));
-#endif
 
     ND_PRINT((ndo, ", Distribution: %s, Metric: %u",
            ISIS_MASK_TLV_EXTD_IP_UPDOWN(status_byte) ? "down" : "up",
@@ -2019,17 +2011,13 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
 
     if (afi == AF_INET && ISIS_MASK_TLV_EXTD_IP_SUBTLV(status_byte))
         ND_PRINT((ndo, ", sub-TLVs present"));
-#ifdef INET6
-    if (afi == AF_INET6)
+    else if (afi == AF_INET6)
         ND_PRINT((ndo, ", %s%s",
                ISIS_MASK_TLV_EXTD_IP6_IE(status_byte) ? "External" : "Internal",
                ISIS_MASK_TLV_EXTD_IP6_SUBTLV(status_byte) ? ", sub-TLVs present" : ""));
-#endif
 
     if ((afi == AF_INET  && ISIS_MASK_TLV_EXTD_IP_SUBTLV(status_byte))
-#ifdef INET6
      || (afi == AF_INET6 && ISIS_MASK_TLV_EXTD_IP6_SUBTLV(status_byte))
-#endif
 	) {
         /* assume that one prefix can hold more
            than one subTLV - therefore the first byte must reflect
@@ -2605,7 +2593,6 @@ isis_print(netdissect_options *ndo,
 	    }
 	    break;
 
-#ifdef INET6
 	case ISIS_TLV_IP6_REACH:
 	    while (tmp>0) {
                 ext_ip_len = isis_print_extd_ip_reach(ndo, tptr, "\n\t      ", AF_INET6);
@@ -2645,7 +2632,6 @@ isis_print(netdissect_options *ndo,
 		tmp -= sizeof(struct in6_addr);
 	    }
 	    break;
-#endif
 	case ISIS_TLV_AUTH:
 	    if (!ND_TTEST2(*tptr, 1))
 		goto trunctlv;

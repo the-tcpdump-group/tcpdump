@@ -59,6 +59,7 @@ extern int ether_ntohost(char *, const struct ether_addr *);
 
 #include "netdissect.h"
 #include "addrtoname.h"
+#include "addrtostr.h"
 #include "llc.h"
 #include "setsignal.h"
 #include "extract.h"
@@ -89,7 +90,7 @@ static struct hnamemem eprototable[HASHNAMESIZE];
 static struct hnamemem dnaddrtable[HASHNAMESIZE];
 static struct hnamemem ipxsaptable[HASHNAMESIZE];
 
-#if defined(INET6) && defined(_WIN32)
+#ifdef _WIN32
 /*
  * fake gethostbyaddr for Win2k/XP
  * gethostbyaddr() returns incorrect value when AF_INET6 is passed
@@ -127,9 +128,8 @@ win32_gethostbyaddr(const char *addr, int len, int type)
 	}
 }
 #define gethostbyaddr win32_gethostbyaddr
-#endif /* INET6 & _WIN32 */
+#endif /* _WIN32 */
 
-#ifdef INET6
 struct h6namemem {
 	struct in6_addr addr;
 	char *name;
@@ -137,7 +137,6 @@ struct h6namemem {
 };
 
 static struct h6namemem h6nametable[HASHNAMESIZE];
-#endif /* INET6 */
 
 struct enamemem {
 	u_short e_addr0;
@@ -265,7 +264,6 @@ getname(netdissect_options *ndo, const u_char *ap)
 	return (p->name);
 }
 
-#ifdef INET6
 /*
  * Return a name for the IP6 address pointed to by ap.  This address
  * is assumed to be in network byte order.
@@ -315,13 +313,12 @@ getname6(netdissect_options *ndo, const u_char *ap)
 			return (p->name);
 		}
 	}
-	cp = inet_ntop(AF_INET6, &addr, ntop_buf, sizeof(ntop_buf));
+	cp = addrtostr6(ap, ntop_buf, sizeof(ntop_buf));
 	p->name = strdup(cp);
 	if (p->name == NULL)
 		(*ndo->ndo_error)(ndo, "getname6: strdup(cp)");
 	return (p->name);
 }
-#endif /* INET6 */
 
 static const char hex[] = "0123456789abcdef";
 
@@ -1225,7 +1222,6 @@ newhnamemem(netdissect_options *ndo)
 	return (p);
 }
 
-#ifdef INET6
 /* Return a zero'ed h6namemem struct and cuts down on calloc() overhead */
 struct h6namemem *
 newh6namemem(netdissect_options *ndo)
@@ -1244,7 +1240,6 @@ newh6namemem(netdissect_options *ndo)
 	p = ptr++;
 	return (p);
 }
-#endif /* INET6 */
 
 /* Represent TCI part of the 802.1Q 4-octet tag as text. */
 const char *

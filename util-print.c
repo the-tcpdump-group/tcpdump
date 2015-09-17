@@ -525,7 +525,6 @@ mask2plen(uint32_t mask)
 	return (prefix_len);
 }
 
-#ifdef INET6
 int
 mask62plen(const u_char *mask)
 {
@@ -552,7 +551,6 @@ mask62plen(const u_char *mask)
 	}
 	return (cidr_len);
 }
-#endif /* INET6 */
 
 /*
  * Routine to print out information for text-based protocols such as FTP,

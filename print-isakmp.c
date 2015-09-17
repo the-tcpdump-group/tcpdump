@@ -48,9 +48,7 @@
 #include "extract.h"
 
 #include "ip.h"
-#ifdef INET6
 #include "ip6.h"
-#endif
 
 /* refer to RFC 2408 */
 
@@ -647,9 +645,7 @@ ikev1_print(netdissect_options *ndo,
 int ninitiator = 0;
 union inaddr_u {
 	struct in_addr in4;
-#ifdef INET6
 	struct in6_addr in6;
-#endif
 };
 struct {
 	cookie_t initiator;
@@ -781,9 +777,7 @@ cookie_record(cookie_t *in, const u_char *bp2)
 {
 	int i;
 	const struct ip *ip;
-#ifdef INET6
 	const struct ip6_hdr *ip6;
-#endif
 
 	i = cookie_find(in);
 	if (0 <= i) {
@@ -798,14 +792,12 @@ cookie_record(cookie_t *in, const u_char *bp2)
 		UNALIGNED_MEMCPY(&cookiecache[ninitiator].iaddr.in4, &ip->ip_src, sizeof(struct in_addr));
 		UNALIGNED_MEMCPY(&cookiecache[ninitiator].raddr.in4, &ip->ip_dst, sizeof(struct in_addr));
 		break;
-#ifdef INET6
 	case 6:
 		ip6 = (const struct ip6_hdr *)bp2;
 		cookiecache[ninitiator].version = 6;
 		UNALIGNED_MEMCPY(&cookiecache[ninitiator].iaddr.in6, &ip6->ip6_src, sizeof(struct in6_addr));
 		UNALIGNED_MEMCPY(&cookiecache[ninitiator].raddr.in6, &ip6->ip6_dst, sizeof(struct in6_addr));
 		break;
-#endif
 	default:
 		return;
 	}
@@ -819,9 +811,7 @@ static int
 cookie_sidecheck(int i, const u_char *bp2, int initiator)
 {
 	const struct ip *ip;
-#ifdef INET6
 	const struct ip6_hdr *ip6;
-#endif
 
 	ip = (const struct ip *)bp2;
 	switch (IP_V(ip)) {
@@ -836,7 +826,6 @@ cookie_sidecheck(int i, const u_char *bp2, int initiator)
 				return 1;
 		}
 		break;
-#ifdef INET6
 	case 6:
 		if (cookiecache[i].version != 6)
 			return 0;
@@ -849,7 +838,6 @@ cookie_sidecheck(int i, const u_char *bp2, int initiator)
 				return 1;
 		}
 		break;
-#endif /* INET6 */
 	default:
 		break;
 	}
@@ -1406,7 +1394,6 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 			len = 0;
 			break;
 		    }
-#ifdef INET6
 		case IPSECDOI_ID_IPV6_ADDR:
 			if (len < 16)
 				ND_PRINT((ndo," len=%d [bad: < 16]", len));
@@ -1432,7 +1419,6 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 			len = 0;
 			break;
 		    }
-#endif /*INET6*/
 		case IPSECDOI_ID_IPV4_ADDR_RANGE:
 			if (len < 8)
 				ND_PRINT((ndo," len=%d [bad: < 8]", len));
@@ -1443,7 +1429,6 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 			}
 			len = 0;
 			break;
-#ifdef INET6
 		case IPSECDOI_ID_IPV6_ADDR_RANGE:
 			if (len < 32)
 				ND_PRINT((ndo," len=%d [bad: < 32]", len));
@@ -1454,7 +1439,6 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 			}
 			len = 0;
 			break;
-#endif /*INET6*/
 		case IPSECDOI_ID_DER_ASN1_DN:
 		case IPSECDOI_ID_DER_ASN1_GN:
 		case IPSECDOI_ID_KEY_ID:

@@ -126,11 +126,7 @@ format_prefix(netdissect_options *ndo, const u_char *prefix, unsigned char plen)
     if(plen >= 96 && memcmp(prefix, v4prefix, 12) == 0)
         snprintf(buf, 50, "%s/%u", ipaddr_string(ndo, prefix + 12), plen - 96);
     else
-#ifdef INET6
         snprintf(buf, 50, "%s/%u", ip6addr_string(ndo, prefix), plen);
-#else
-        snprintf(buf, 50, "IPv6 addresses not supported");
-#endif
     buf[49] = '\0';
     return buf;
 }
@@ -141,11 +137,7 @@ format_address(netdissect_options *ndo, const u_char *prefix)
     if(memcmp(prefix, v4prefix, 12) == 0)
         return ipaddr_string(ndo, prefix + 12);
     else
-#ifdef INET6
         return ip6addr_string(ndo, prefix);
-#else
-        return "IPv6 addresses not supported";
-#endif
 }
 
 static const char *

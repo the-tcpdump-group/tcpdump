@@ -36,9 +36,7 @@
 #include "nfsfh.h"
 
 #include "ip.h"
-#ifdef INET6
 #include "ip6.h"
-#endif
 #include "rpc_auth.h"
 #include "rpc_msg.h"
 
@@ -203,15 +201,8 @@ print_nfsaddr(netdissect_options *ndo,
               const u_char *bp, const char *s, const char *d)
 {
 	const struct ip *ip;
-#ifdef INET6
 	const struct ip6_hdr *ip6;
 	char srcaddr[INET6_ADDRSTRLEN], dstaddr[INET6_ADDRSTRLEN];
-#else
-#ifndef INET_ADDRSTRLEN
-#define INET_ADDRSTRLEN	16
-#endif
-	char srcaddr[INET_ADDRSTRLEN], dstaddr[INET_ADDRSTRLEN];
-#endif
 
 	srcaddr[0] = dstaddr[0] = '\0';
 	switch (IP_V((const struct ip *)bp)) {
@@ -220,7 +211,6 @@ print_nfsaddr(netdissect_options *ndo,
 		strlcpy(srcaddr, ipaddr_string(ndo, &ip->ip_src), sizeof(srcaddr));
 		strlcpy(dstaddr, ipaddr_string(ndo, &ip->ip_dst), sizeof(dstaddr));
 		break;
-#ifdef INET6
 	case 6:
 		ip6 = (const struct ip6_hdr *)bp;
 		strlcpy(srcaddr, ip6addr_string(ndo, &ip6->ip6_src),
@@ -228,7 +218,6 @@ print_nfsaddr(netdissect_options *ndo,
 		strlcpy(dstaddr, ip6addr_string(ndo, &ip6->ip6_dst),
 		    sizeof(dstaddr));
 		break;
-#endif
 	default:
 		strlcpy(srcaddr, "?", sizeof(srcaddr));
 		strlcpy(dstaddr, "?", sizeof(dstaddr));
@@ -850,13 +839,8 @@ nfs_printfh(netdissect_options *ndo,
 struct xid_map_entry {
 	uint32_t	xid;		/* transaction ID (net order) */
 	int ipver;			/* IP version (4 or 6) */
-#ifdef INET6
 	struct in6_addr	client;		/* client IP address (net order) */
 	struct in6_addr	server;		/* server IP address (net order) */
-#else
-	struct in_addr	client;		/* client IP address (net order) */
-	struct in_addr	server;		/* server IP address (net order) */
-#endif
 	uint32_t	proc;		/* call proc number (host order) */
 	uint32_t	vers;		/* program version (host order) */
 };
@@ -879,9 +863,7 @@ xid_map_enter(netdissect_options *ndo,
               const struct sunrpc_msg *rp, const u_char *bp)
 {
 	const struct ip *ip = NULL;
-#ifdef INET6
 	const struct ip6_hdr *ip6 = NULL;
-#endif
 	struct xid_map_entry *xmep;
 
 	if (!ND_TTEST(rp->rm_call.cb_vers))
@@ -890,11 +872,9 @@ xid_map_enter(netdissect_options *ndo,
 	case 4:
 		ip = (const struct ip *)bp;
 		break;
-#ifdef INET6
 	case 6:
 		ip6 = (const struct ip6_hdr *)bp;
 		break;
-#endif
 	default:
 		return (1);
 	}
@@ -910,13 +890,11 @@ xid_map_enter(netdissect_options *ndo,
 		UNALIGNED_MEMCPY(&xmep->client, &ip->ip_src, sizeof(ip->ip_src));
 		UNALIGNED_MEMCPY(&xmep->server, &ip->ip_dst, sizeof(ip->ip_dst));
 	}
-#ifdef INET6
 	else if (ip6) {
 		xmep->ipver = 6;
 		UNALIGNED_MEMCPY(&xmep->client, &ip6->ip6_src, sizeof(ip6->ip6_src));
 		UNALIGNED_MEMCPY(&xmep->server, &ip6->ip6_dst, sizeof(ip6->ip6_dst));
 	}
-#endif
 	xmep->proc = EXTRACT_32BITS(&rp->rm_call.cb_proc);
 	xmep->vers = EXTRACT_32BITS(&rp->rm_call.cb_vers);
 	return (1);
@@ -934,9 +912,7 @@ xid_map_find(const struct sunrpc_msg *rp, const u_char *bp, uint32_t *proc,
 	struct xid_map_entry *xmep;
 	uint32_t xid;
 	const struct ip *ip = (const struct ip *)bp;
-#ifdef INET6
 	const struct ip6_hdr *ip6 = (const struct ip6_hdr *)bp;
-#endif
 	int cmp;
 
 	UNALIGNED_MEMCPY(&xid, &rp->rm_xid, sizeof(xmep->xid));
@@ -956,7 +932,6 @@ xid_map_find(const struct sunrpc_msg *rp, const u_char *bp, uint32_t *proc,
 				cmp = 0;
 			}
 			break;
-#ifdef INET6
 		case 6:
 			if (UNALIGNED_MEMCMP(&ip6->ip6_src, &xmep->server,
 				   sizeof(ip6->ip6_src)) != 0 ||
@@ -965,7 +940,6 @@ xid_map_find(const struct sunrpc_msg *rp, const u_char *bp, uint32_t *proc,
 				cmp = 0;
 			}
 			break;
-#endif
 		default:
 			cmp = 0;
 			break;

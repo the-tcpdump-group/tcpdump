@@ -33,9 +33,7 @@
 #include "udp.h"
 
 #include "ip.h"
-#ifdef INET6
 #include "ip6.h"
-#endif
 #include "ipproto.h"
 #include "rpc_auth.h"
 #include "rpc_msg.h"
@@ -277,19 +275,16 @@ static int udp_cksum(netdissect_options *ndo, register const struct ip *ip,
 				IPPROTO_UDP);
 }
 
-#ifdef INET6
 static int udp6_cksum(const struct ip6_hdr *ip6, const struct udphdr *up,
 	u_int len)
 {
 	return nextproto6_cksum(ip6, (const uint8_t *)(const void *)up, len, len,
 	    IPPROTO_UDP);
 }
-#endif
 
 static void
 udpipaddr_print(netdissect_options *ndo, const struct ip *ip, int sport, int dport)
 {
-#ifdef INET6
 	const struct ip6_hdr *ip6;
 
 	if (IP_V(ip) == 6)
@@ -317,9 +312,7 @@ udpipaddr_print(netdissect_options *ndo, const struct ip *ip, int sport, int dpo
 					udpport_string(ndo, dport)));
 			}
 		}
-	} else
-#endif /*INET6*/
-	{
+	} else {
 		if (ip->ip_p == IPPROTO_UDP) {
 			if (sport == -1) {
 				ND_PRINT((ndo, "%s > %s: ",
@@ -351,20 +344,16 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 	register const u_char *cp;
 	register const u_char *ep = bp + length;
 	uint16_t sport, dport, ulen;
-#ifdef INET6
 	register const struct ip6_hdr *ip6;
-#endif
 
 	if (ep > ndo->ndo_snapend)
 		ep = ndo->ndo_snapend;
 	up = (const struct udphdr *)bp;
 	ip = (const struct ip *)bp2;
-#ifdef INET6
 	if (IP_V(ip) == 6)
 		ip6 = (const struct ip6_hdr *)bp2;
 	else
 		ip6 = NULL;
-#endif /*INET6*/
 	if (!ND_TTEST(up->uh_dport)) {
 		udpipaddr_print(ndo, ip, -1, -1);
 		ND_PRINT((ndo, "[|udp]"));
@@ -453,11 +442,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 		case PT_AODV:
 			udpipaddr_print(ndo, ip, sport, dport);
 			aodv_print(ndo, (const u_char *)(up + 1), length,
-#ifdef INET6
 			    ip6 != NULL);
-#else
-			    0);
-#endif
 			break;
 
 		case PT_RADIUS:
@@ -543,7 +528,6 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 					ND_PRINT((ndo, "[udp sum ok] "));
 			}
 		}
-#ifdef INET6
 		else if (IP_V(ip) == 6 && ip6->ip6_plen) {
 			/* for IPv6, UDP checksum is mandatory */
 			if (ND_TTEST2(cp[0], length)) {
@@ -558,7 +542,6 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 					ND_PRINT((ndo, "[udp sum ok] "));
 			}
 		}
-#endif
 	}
 
 	if (!ndo->ndo_qflag) {
@@ -577,11 +560,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 			rip_print(ndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(AODV_PORT))
 			aodv_print(ndo, (const u_char *)(up + 1), length,
-#ifdef INET6
 			    ip6 != NULL);
-#else
-			    0);
-#endif
 	        else if (ISPORT(ISAKMP_PORT))
 			 isakmp_print(ndo, (const u_char *)(up + 1), length, bp2);
   	        else if (ISPORT(ISAKMP_PORT_NATT))
@@ -616,7 +595,6 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 			 (dport >= RX_PORT_LOW && dport <= RX_PORT_HIGH))
 			rx_print(ndo, (const void *)(up + 1), length, sport, dport,
 				 (const u_char *) ip);
-#ifdef INET6
 		else if (ISPORT(RIPNG_PORT))
 			ripng_print(ndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(DHCP6_SERV_PORT) || ISPORT(DHCP6_CLI_PORT))
@@ -625,7 +603,6 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 			ahcp_print(ndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(BABEL_PORT) || ISPORT(BABEL_PORT_OLD))
 			babel_print(ndo, (const u_char *)(up + 1), length);
-#endif /*INET6*/
 		/*
 		 * Kludge in test for whiteboard packets.
 		 */
@@ -647,11 +624,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 			ldp_print(ndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(OLSR_PORT))
 			olsr_print(ndo, (const u_char *)(up + 1), length,
-#if INET6
 					(IP_V(ip) == 6) ? 1 : 0);
-#else
-					0);
-#endif
 		else if (ISPORT(MPLS_LSP_PING_PORT))
 			lspping_print(ndo, (const u_char *)(up + 1), length);
 		else if (dport == BFD_CONTROL_PORT ||

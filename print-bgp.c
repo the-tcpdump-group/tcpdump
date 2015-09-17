@@ -603,12 +603,10 @@ bgp_vpn_ip_print(netdissect_options *ndo,
         ND_TCHECK2(pptr[0], sizeof(struct in_addr));
         snprintf(pos, sizeof(addr), "%s", ipaddr_string(ndo, pptr));
         break;
-#ifdef INET6
     case (sizeof(struct in6_addr) << 3): /* 128 */
         ND_TCHECK2(pptr[0], sizeof(struct in6_addr));
         snprintf(pos, sizeof(addr), "%s", ip6addr_string(ndo, pptr));
         break;
-#endif
     default:
         snprintf(pos, sizeof(addr), "bogus address length %u", addr_length);
         break;
@@ -1071,7 +1069,6 @@ trunc:
         return -2;
 }
 
-#ifdef INET6
 int
 decode_prefix6(netdissect_options *ndo,
                const u_char *pd, u_int itemlen, char *buf, u_int buflen)
@@ -1188,7 +1185,6 @@ decode_labeled_vpn_prefix6(netdissect_options *ndo,
 trunc:
 	return -2;
 }
-#endif
 
 static int
 decode_clnp_prefix(netdissect_options *ndo,
@@ -1520,7 +1516,6 @@ bgp_attr_print(netdissect_options *ndo,
                 case (AFNUM_INET<<8 | SAFNUM_VPNUNIMULTICAST):
                 case (AFNUM_INET<<8 | SAFNUM_MULTICAST_VPN):
 		case (AFNUM_INET<<8 | SAFNUM_MDT):
-#ifdef INET6
                 case (AFNUM_INET6<<8 | SAFNUM_UNICAST):
                 case (AFNUM_INET6<<8 | SAFNUM_MULTICAST):
                 case (AFNUM_INET6<<8 | SAFNUM_UNIMULTICAST):
@@ -1528,7 +1523,6 @@ bgp_attr_print(netdissect_options *ndo,
                 case (AFNUM_INET6<<8 | SAFNUM_VPNUNICAST):
                 case (AFNUM_INET6<<8 | SAFNUM_VPNMULTICAST):
                 case (AFNUM_INET6<<8 | SAFNUM_VPNUNIMULTICAST):
-#endif
                 case (AFNUM_NSAP<<8 | SAFNUM_UNICAST):
                 case (AFNUM_NSAP<<8 | SAFNUM_MULTICAST):
                 case (AFNUM_NSAP<<8 | SAFNUM_UNIMULTICAST):
@@ -1596,7 +1590,6 @@ bgp_attr_print(netdissect_options *ndo,
                                 tptr += (sizeof(struct in_addr)+BGP_VPN_RD_LEN);
                             }
                             break;
-#ifdef INET6
                         case (AFNUM_INET6<<8 | SAFNUM_UNICAST):
                         case (AFNUM_INET6<<8 | SAFNUM_MULTICAST):
                         case (AFNUM_INET6<<8 | SAFNUM_UNIMULTICAST):
@@ -1626,7 +1619,6 @@ bgp_attr_print(netdissect_options *ndo,
                                 tptr += (sizeof(struct in6_addr)+BGP_VPN_RD_LEN);
                             }
                             break;
-#endif
                         case (AFNUM_VPLS<<8 | SAFNUM_VPLS):
                         case (AFNUM_L2VPN<<8 | SAFNUM_VPNUNICAST):
                         case (AFNUM_L2VPN<<8 | SAFNUM_VPNMULTICAST):
@@ -1664,11 +1656,9 @@ bgp_attr_print(netdissect_options *ndo,
                                 /* rfc986 mapped IPv4 address ? */
                                 if (EXTRACT_32BITS(tptr+BGP_VPN_RD_LEN) ==  0x47000601)
                                     ND_PRINT((ndo, " = %s", getname(ndo, tptr+BGP_VPN_RD_LEN+4)));
-#ifdef INET6
                                 /* rfc1888 mapped IPv6 address ? */
                                 else if (EXTRACT_24BITS(tptr+BGP_VPN_RD_LEN) ==  0x350000)
                                     ND_PRINT((ndo, " = %s", getname6(ndo, tptr+BGP_VPN_RD_LEN+3)));
-#endif
                                 tptr += tlen;
                                 tlen = 0;
                             }
@@ -1769,7 +1759,6 @@ bgp_attr_print(netdissect_options *ndo,
                         else
                             ND_PRINT((ndo, "\n\t      %s", buf));
 		       break;
-#ifdef INET6
                     case (AFNUM_INET6<<8 | SAFNUM_UNICAST):
                     case (AFNUM_INET6<<8 | SAFNUM_MULTICAST):
                     case (AFNUM_INET6<<8 | SAFNUM_UNIMULTICAST):
@@ -1805,7 +1794,6 @@ bgp_attr_print(netdissect_options *ndo,
                         else
                             ND_PRINT((ndo, "\n\t      %s", buf));
                         break;
-#endif
                     case (AFNUM_VPLS<<8 | SAFNUM_VPLS):
                     case (AFNUM_L2VPN<<8 | SAFNUM_VPNUNICAST):
                     case (AFNUM_L2VPN<<8 | SAFNUM_VPNMULTICAST):
@@ -1910,7 +1898,6 @@ bgp_attr_print(netdissect_options *ndo,
                         else
                             ND_PRINT((ndo, "\n\t      %s", buf));
                         break;
-#ifdef INET6
                     case (AFNUM_INET6<<8 | SAFNUM_UNICAST):
                     case (AFNUM_INET6<<8 | SAFNUM_MULTICAST):
                     case (AFNUM_INET6<<8 | SAFNUM_UNIMULTICAST):
@@ -1946,7 +1933,6 @@ bgp_attr_print(netdissect_options *ndo,
                         else
                             ND_PRINT((ndo, "\n\t      %s", buf));
                         break;
-#endif
                     case (AFNUM_VPLS<<8 | SAFNUM_VPLS):
                     case (AFNUM_L2VPN<<8 | SAFNUM_VPNUNICAST):
                     case (AFNUM_L2VPN<<8 | SAFNUM_VPNMULTICAST):
@@ -2443,10 +2429,6 @@ bgp_update_print(netdissect_options *ndo,
 	int withdrawn_routes_len;
 	int len;
 	int i;
-#ifndef INET6
-	char buf[MAXHOSTNAMELEN + 100];
-	int wpfx;
-#endif
 
 	ND_TCHECK2(dat[0], BGP_SIZE);
 	if (length < BGP_SIZE)
@@ -2471,36 +2453,9 @@ bgp_update_print(netdissect_options *ndo,
 		ND_TCHECK2(p[0], withdrawn_routes_len);
 		if (length < withdrawn_routes_len)
 			goto trunc;
-#ifdef INET6
 		ND_PRINT((ndo, "\n\t  Withdrawn routes: %d bytes", withdrawn_routes_len));
 		p += withdrawn_routes_len;
 		length -= withdrawn_routes_len;
-#else
-		if (withdrawn_routes_len < 2)
-			goto trunc;
-		length -= 2;
-		withdrawn_routes_len -= 2;
-
-
-		ND_PRINT((ndo, "\n\t  Withdrawn routes:"));
-
-		while(withdrawn_routes_len > 0) {
-			wpfx = decode_prefix4(ndo, p, withdrawn_routes_len, buf, sizeof(buf));
-			if (wpfx == -1) {
-				ND_PRINT((ndo, "\n\t    (illegal prefix length)"));
-				break;
-			} else if (wpfx == -2)
-				goto trunc;
-			else if (wpfx == -3)
-				goto trunc; /* bytes left, but not enough */
-			else {
-				ND_PRINT((ndo, "\n\t    %s", buf));
-				p += wpfx;
-				length -= wpfx;
-				withdrawn_routes_len -= wpfx;
-			}
-		}
-#endif
 	}
 
 	ND_TCHECK2(p[0], 2);

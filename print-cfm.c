@@ -249,11 +249,9 @@ cfm_mgmt_addr_print(netdissect_options *ndo,
         ND_PRINT((ndo, ", %s", ipaddr_string(ndo, tptr + 1)));
         break;
 
-#ifdef INET6
     case AFNUM_INET6:
         ND_PRINT((ndo, ", %s", ip6addr_string(ndo, tptr + 1)));
         break;
-#endif
 
     default:
         hexdump = TRUE;

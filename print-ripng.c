@@ -23,8 +23,6 @@
 #include "config.h"
 #endif
 
-#ifdef INET6
-
 #include <netdissect-stdinc.h>
 
 #include "netdissect.h"
@@ -172,4 +170,3 @@ ripng_print(netdissect_options *ndo, const u_char *dat, unsigned int length)
 	if (rp->rip6_vers != RIP6_VERSION)
 		ND_PRINT((ndo, " [vers %d]", rp->rip6_vers));
 }
-#endif /* INET6 */

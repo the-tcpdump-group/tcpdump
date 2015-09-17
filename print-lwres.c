@@ -268,14 +268,12 @@ lwres_printaddr(netdissect_options *ndo,
 		ND_PRINT((ndo, " %s", ipaddr_string(ndo, p)));
 		p += sizeof(struct in_addr);
 		break;
-#ifdef INET6
 	case 2:	/* IPv6 */
 		if (l < 16)
 			return -1;
 		ND_PRINT((ndo, " %s", ip6addr_string(ndo, p)));
 		p += sizeof(struct in6_addr);
 		break;
-#endif
 	default:
 		ND_PRINT((ndo, " %u/", EXTRACT_32BITS(&ap->family)));
 		for (i = 0; i < l; i++)

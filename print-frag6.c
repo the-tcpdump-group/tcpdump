@@ -23,8 +23,6 @@
 #include "config.h"
 #endif
 
-#ifdef INET6
-
 #include <netdissect-stdinc.h>
 
 #include "ip6.h"
@@ -67,4 +65,3 @@ trunc:
 	ND_PRINT((ndo, "[|frag]"));
 	return -1;
 }
-#endif /* INET6 */

@@ -335,9 +335,7 @@ extern int mask2plen(uint32_t);
 extern const char *tok2strary_internal(const char **, int, const char *, int);
 #define	tok2strary(a,f,i) tok2strary_internal(a, sizeof(a)/sizeof(a[0]),f,i)
 
-#ifdef INET6
 extern int mask62plen(const u_char *);
-#endif /*INET6*/
 
 /* The printer routines. */
 
@@ -567,7 +565,6 @@ extern u_int ieee802_11_radio_avs_if_print(netdissect_options *, const struct pc
 extern u_int prism_if_print(netdissect_options *, const struct pcap_pkthdr *, const u_char *);
 
 extern void ip6_print(netdissect_options *,const u_char *, u_int);
-#ifdef INET6
 extern int frag6_print(netdissect_options *, const u_char *, const u_char *);
 extern int rt6_print(netdissect_options *, const u_char *, const u_char *);
 extern int hbhopt_print(netdissect_options *, const u_char *);
@@ -577,7 +574,6 @@ extern int mobility_print(netdissect_options *, const u_char *, const u_char *);
 extern void dhcp6_print(netdissect_options *, const u_char *, u_int);
 extern void ospf6_print(netdissect_options *, const u_char *, u_int);
 extern void babel_print(netdissect_options *, const u_char *, u_int);
-#endif /*INET6*/
 
 /* checksum routines */
 extern void init_checksum(void);
@@ -593,9 +589,7 @@ extern uint16_t in_cksum_shouldbe(uint16_t, uint16_t);
 
 extern int nextproto4_cksum(netdissect_options *ndo, const struct ip *, const uint8_t *, u_int, u_int, u_int);
 extern int decode_prefix4(netdissect_options *ndo, const u_char *, u_int, char *, u_int);
-#ifdef INET6
 extern int decode_prefix6(netdissect_options *ndo, const u_char *, u_int, char *, u_int);
-#endif
 
 extern void esp_print_decodesecret(netdissect_options *ndo);
 extern int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,

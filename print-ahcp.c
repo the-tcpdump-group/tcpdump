@@ -153,11 +153,7 @@ ahcp_ipv6_addresses_print(netdissect_options *ndo, const u_char *cp, const u_cha
 		if (cp + 16 > ep)
 			goto invalid;
 		ND_TCHECK2(*cp, 16);
-#ifdef INET6
 		ND_PRINT((ndo, "%s%s", sep, ip6addr_string(ndo, cp)));
-#else
-		ND_PRINT((ndo, "%s(compiled w/o IPv6)", sep));
-#endif /* INET6 */
 		cp += 16;
 		sep = ", ";
 	}
@@ -205,11 +201,7 @@ ahcp_ipv6_prefixes_print(netdissect_options *ndo, const u_char *cp, const u_char
 		if (cp + 17 > ep)
 			goto invalid;
 		ND_TCHECK2(*cp, 17);
-#ifdef INET6
 		ND_PRINT((ndo, "%s%s/%u", sep, ip6addr_string(ndo, cp), *(cp + 16)));
-#else
-		ND_PRINT((ndo, "%s(compiled w/o IPv6)/%u", sep, *(cp + 16)));
-#endif /* INET6 */
 		cp += 17;
 		sep = ", ";
 	}
