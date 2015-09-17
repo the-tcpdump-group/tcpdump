@@ -2195,17 +2195,13 @@ RETSIGTYPE requestinfo(int signo _U_)
 void CALLBACK verbose_stats_dump (UINT timer_id _U_, UINT msg _U_, DWORD_PTR arg _U_,
 				  DWORD_PTR dw1 _U_, DWORD_PTR dw2 _U_)
 {
-	struct pcap_stat stat;
-
-	if (infodelay == 0 && pcap_stats(pd, &stat) >= 0)
+	if (infodelay == 0)
 		fprintf(stderr, "Got %u\r", packets_captured);
 }
 #elif defined(HAVE_ALARM)
 static void verbose_stats_dump(int sig _U_)
 {
-	struct pcap_stat stat;
-
-	if (infodelay == 0 && pcap_stats(pd, &stat) >= 0)
+	if (infodelay == 0)
 		fprintf(stderr, "Got %u\r", packets_captured);
 	alarm(1);
 }
