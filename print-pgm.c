@@ -274,14 +274,14 @@ pgm_print(netdissect_options *ndo,
 	}
 
 	case PGM_POLL: {
-	    const struct pgm_poll *poll;
+	    const struct pgm_poll *poll_msg;
 
-	    poll = (const struct pgm_poll *)(pgm + 1);
-	    ND_TCHECK(*poll);
+	    poll_msg = (const struct pgm_poll *)(pgm + 1);
+	    ND_TCHECK(*poll_msg);
 	    ND_PRINT((ndo, "POLL seq %u round %u",
-			 EXTRACT_32BITS(&poll->pgmp_seq),
-                         EXTRACT_16BITS(&poll->pgmp_round)));
-	    bp = (const u_char *) (poll + 1);
+			 EXTRACT_32BITS(&poll_msg->pgmp_seq),
+                         EXTRACT_16BITS(&poll_msg->pgmp_round)));
+	    bp = (const u_char *) (poll_msg + 1);
 	    break;
 	}
 	case PGM_POLR: {
