@@ -612,7 +612,7 @@ Print absolute, rather than relative, TCP sequence numbers.
 .BI \-\-snapshot\-length= snaplen
 .PD
 Snarf \fIsnaplen\fP bytes of data from each packet rather than the
-default of 65535 bytes.
+default of 262144 bytes.
 Packets truncated because of a limited snapshot
 are indicated in the output with ``[|\fIproto\fP]'', where \fIproto\fP
 is the name of the protocol level at which the truncation has occurred.
@@ -624,7 +624,7 @@ lost.
 You should limit \fIsnaplen\fP to the smallest number that will
 capture the protocol information you're interested in.
 Setting
-\fIsnaplen\fP to 0 sets it to the default of 65535,
+\fIsnaplen\fP to 0 sets it to the default of 262144,
 for backwards compatibility with recent older versions of
 .IR tcpdump .
 .TP
