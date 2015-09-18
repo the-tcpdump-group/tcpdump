@@ -28,7 +28,7 @@
 #ifndef print_h
 #define print_h
 
-void	init_print(netdissect_options *ndo, u_int32_t localnet, u_int32_t mask,
+void	init_print(netdissect_options *ndo, uint32_t localnet, uint32_t mask,
 	    uint32_t timezone_offset);
 
 int	has_printer(int type);
