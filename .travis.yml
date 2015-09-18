@@ -17,13 +17,10 @@ env:
     - secure: "pcl5WdUhdnG5VpiyIKkVkNimnkvrnbWb8YOgw2ERJ0qNqIaF/Re4qV/rDXYe+AkRwAR071HQW6KlDnpeUlHKPNhmfzeUlmOxSatvdVPw+FV5KqOuidZbHDH/RiWvvlOyaJq26aDExFSDxV+98v39q+n1jNSqggHLe8o48zVK/+U="
     # Coverity run condition (avoid matrix multiple runs), need customized
     # build script. Need an update if new matrix cases.
-    - coverity_scan_run_condition='"$TRAVIS_OS_NAME" = linux -a "$CC" = gcc -a "$BUILD_IPV6" = true'
+    - coverity_scan_run_condition='"$TRAVIS_OS_NAME" = linux -a "$CC" = gcc'
     # Coverity script test mode (if true no uploading, avoid reaching the quota)
     # usual processing: false.
     - coverity_scan_script_test_mode=false
-  matrix:
-    - BUILD_IPV6=true
-    - BUILD_IPV6=false
 
 addons:
   coverity_scan:
@@ -69,7 +66,7 @@ before_script:
 
 script:
   - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then touch .devel configure; fi
-  - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then if [ "$BUILD_IPV6" = true ]; then ./configure --prefix=/tmp; else ./configure --prefix=/tmp --disable-ipv6; fi; fi
+  - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then ./configure --prefix=/tmp; fi
   - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then make -s; fi
   - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then PATH=$PATH make install; fi
-  - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then if [ "$BUILD_IPV6" = true ]; then make check; fi; fi
+  - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then make check; fi
