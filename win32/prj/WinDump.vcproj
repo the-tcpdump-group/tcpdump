@@ -44,7 +44,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="4"
 				AdditionalIncludeDirectories="../../../winpcap/wpcap/libpcap/bpf,../../../winpcap/wpcap/libpcap,../../../winpcap/wpcap/libpcap/Win32/Include,../../../winpcap/wpcap/libpcap/Win32/Include/net,../../Win32/Include,../../linux-Include,../../lbl,../../,../../../winpcap/wpcap/win32-extensions"
-				PreprocessorDefinitions="_DEBUG;_WINDOWS;INET6;WIN32;_CONSOLE;__STDC__;WPCAP;HAVE_ADDRINFO=1;HAVE_SOCKADDR_STORAGE=1;HAVE_PCAP_LIST_DATALINKS=1;HAVE_PCAP_SET_DATALINK=1;HAVE_PCAP_DATALINK_NAME_TO_VAL=1;HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION=1;HAVE_PCAP_DUMP_FTELL=1;HAVE_BPF_DUMP=1;HAVE_PCAP_DUMP_FLUSH=1;HAVE_PCAP_FINDALLDEVS=1;HAVE_PCAP_IF_T=1;HAVE_PCAP_LIB_VERSION=1;HAVE_REMOTE;_U_=;_CRT_SECURE_NO_WARNINGS;USE_ETHER_NTOHOST"
+				PreprocessorDefinitions="_DEBUG;_WINDOWS;_CONSOLE;__STDC__;WPCAP;HAVE_PCAP_LIST_DATALINKS=1;HAVE_PCAP_SET_DATALINK=1;HAVE_PCAP_DATALINK_NAME_TO_VAL=1;HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION=1;HAVE_PCAP_DUMP_FTELL=1;HAVE_BPF_DUMP=1;HAVE_PCAP_DUMP_FLUSH=1;HAVE_PCAP_FINDALLDEVS=1;HAVE_PCAP_IF_T=1;HAVE_PCAP_LIB_VERSION=1;HAVE_REMOTE;_U_=;_CRT_SECURE_NO_WARNINGS;USE_ETHER_NTOHOST"
 				MinimalRebuild="true"
 				RuntimeLibrary="1"
 				PrecompiledHeaderFile=".\Debug/WinDump.pch"
@@ -140,7 +140,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="../../../winpcap/wpcap/libpcap/bpf,../../../winpcap/wpcap/libpcap,../../../winpcap/wpcap/libpcap/Win32/Include,../../../winpcap/wpcap/libpcap/Win32/Include/net,../../Win32/Include,../../linux-Include,../../lbl,../../,../../../winpcap/wpcap/win32-extensions"
-				PreprocessorDefinitions="NDEBUG;INET6;WIN32;_CONSOLE;__STDC__;WPCAP;HAVE_ADDRINFO=1;HAVE_SOCKADDR_STORAGE=1;HAVE_PCAP_LIST_DATALINKS=1;HAVE_PCAP_SET_DATALINK=1;HAVE_PCAP_DATALINK_NAME_TO_VAL=1;HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION=1;HAVE_PCAP_DUMP_FTELL=1;HAVE_BPF_DUMP=1;HAVE_PCAP_DUMP_FLUSH=1;HAVE_PCAP_FINDALLDEVS=1;HAVE_PCAP_IF_T=1;HAVE_PCAP_LIB_VERSION=1;HAVE_REMOTE;_U_=;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="NDEBUG;_CONSOLE;__STDC__;WPCAP;HAVE_PCAP_LIST_DATALINKS=1;HAVE_PCAP_SET_DATALINK=1;HAVE_PCAP_DATALINK_NAME_TO_VAL=1;HAVE_PCAP_DATALINK_VAL_TO_DESCRIPTION=1;HAVE_PCAP_DUMP_FTELL=1;HAVE_BPF_DUMP=1;HAVE_PCAP_DUMP_FLUSH=1;HAVE_PCAP_FINDALLDEVS=1;HAVE_PCAP_IF_T=1;HAVE_PCAP_LIB_VERSION=1;HAVE_REMOTE;_U_=;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -206,6 +206,28 @@
 	<Files>
 		<File
 			RelativePath="..\..\addrtoname.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\addrtostr.c"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
@@ -447,51 +469,7 @@
 			</FileConfiguration>
 		</File>
 		<File
-			RelativePath="..\..\missing\inet_aton.c"
-			>
-			<FileConfiguration
-				Name="Debug|Win32"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions=""
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions=""
-				/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath="..\..\missing\inet_ntop.c"
-			>
-			<FileConfiguration
-				Name="Debug|Win32"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions=""
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions=""
-				/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath="..\..\missing\inet_pton.c"
+			RelativePath="..\..\in_cksum.c"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
@@ -667,6 +645,28 @@
 			</FileConfiguration>
 		</File>
 		<File
+			RelativePath="..\..\print-802_15_4.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
 			RelativePath="..\..\print-ah.c"
 			>
 			<FileConfiguration
@@ -689,7 +689,51 @@
 			</FileConfiguration>
 		</File>
 		<File
+			RelativePath="..\..\print-ahcp.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
 			RelativePath="..\..\print-aodv.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\print-aoe.c"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
@@ -843,6 +887,28 @@
 			</FileConfiguration>
 		</File>
 		<File
+			RelativePath="..\..\print-babel.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
 			RelativePath="..\..\print-beep.c"
 			>
 			<FileConfiguration
@@ -932,6 +998,50 @@
 		</File>
 		<File
 			RelativePath="..\..\print-bt.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\print-calm-fast.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\print-carp.c"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
@@ -1349,6 +1459,28 @@
 			</FileConfiguration>
 		</File>
 		<File
+			RelativePath="..\..\print-forces.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
 			RelativePath="..\..\print-fr.c"
 			>
 			<FileConfiguration
@@ -1393,6 +1525,72 @@
 			</FileConfiguration>
 		</File>
 		<File
+			RelativePath="..\..\print-ftp.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\print-geneve.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\print-geonet.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
 			RelativePath="..\..\print-gre.c"
 			>
 			<FileConfiguration
@@ -1416,6 +1614,28 @@
 		</File>
 		<File
 			RelativePath="..\..\print-hsrp.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\print-http.c"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
@@ -1614,6 +1834,28 @@
 		</File>
 		<File
 			RelativePath="..\..\print-ipfc.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\print-ipnet.c"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
@@ -1877,6 +2119,28 @@
 			</FileConfiguration>
 		</File>
 		<File
+			RelativePath="..\..\print-loopback.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
 			RelativePath="..\..\print-lspping.c"
 			>
 			<FileConfiguration
@@ -1922,6 +2186,50 @@
 		</File>
 		<File
 			RelativePath="..\..\print-lwres.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\print-m3ua.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\print-medsa.c"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
@@ -2031,6 +2339,28 @@
 			</FileConfiguration>
 		</File>
 		<File
+			RelativePath="..\..\print-mptcp.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
 			RelativePath="..\..\print-msdp.c"
 			>
 			<FileConfiguration
@@ -2053,7 +2383,29 @@
 			</FileConfiguration>
 		</File>
 		<File
-			RelativePath="..\..\print-netbios.c"
+			RelativePath="..\..\print-msnlb.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\print-nflog.c"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
@@ -2163,6 +2515,50 @@
 			</FileConfiguration>
 		</File>
 		<File
+			RelativePath="..\..\print-openflow-1.0.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\print-openflow.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
 			RelativePath="..\..\print-ospf.c"
 			>
 			<FileConfiguration
@@ -2207,6 +2603,28 @@
 			</FileConfiguration>
 		</File>
 		<File
+			RelativePath="..\..\print-otv.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
 			RelativePath="..\..\print-pgm.c"
 			>
 			<FileConfiguration
@@ -2230,6 +2648,50 @@
 		</File>
 		<File
 			RelativePath="..\..\print-pim.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\print-pktap.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\print-ppi.c"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
@@ -2493,6 +2955,28 @@
 			</FileConfiguration>
 		</File>
 		<File
+			RelativePath="..\..\print-rtsp.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
 			RelativePath="..\..\print-rx.c"
 			>
 			<FileConfiguration
@@ -2648,6 +3132,28 @@
 		</File>
 		<File
 			RelativePath="..\..\print-smb.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\print-smtp.c"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
@@ -2889,6 +3395,28 @@
 			</FileConfiguration>
 		</File>
 		<File
+			RelativePath="..\..\print-tipc.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
 			RelativePath="..\..\print-token.c"
 			>
 			<FileConfiguration
@@ -2934,6 +3462,28 @@
 		</File>
 		<File
 			RelativePath="..\..\print-udp.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\print-usb.c"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
@@ -3043,6 +3593,28 @@
 			</FileConfiguration>
 		</File>
 		<File
+			RelativePath="..\..\print-vxlan.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
 			RelativePath="..\..\print-wb.c"
 			>
 			<FileConfiguration
@@ -3111,6 +3683,24 @@
 		<File
 			RelativePath="..\..\signature.c"
 			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
 		</File>
 		<File
 			RelativePath="..\..\smbutil.c"
@@ -3200,12 +3790,118 @@
 				/>
 			</FileConfiguration>
 		</File>
-		
+
 		<File RelativePath="..\Src\ether_ntohost.c">
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
 		</File>
-		
+
 		<File
-			RelativePath="..\..\Tcpdump.c"
+			RelativePath="..\..\print-zeromq.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\print.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\strtoaddr.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\tcpdump.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\util-print.c"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
