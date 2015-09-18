@@ -146,8 +146,6 @@
 #define O_RDONLY _O_RDONLY
 #endif  /* _MSC_VER */
 
-extern int inet_aton (const char *cp, struct in_addr *addr);
-
 /*
  * With MSVC, for C, __inline is used to make a function an inline.
  */
