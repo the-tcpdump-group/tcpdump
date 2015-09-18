@@ -2146,8 +2146,8 @@ bgp_attr_print(netdissect_options *ndo,
         }
 	case BGPTYPE_AIGP:
 	{
-		u_int8_t type;
-		u_int16_t length;
+		uint8_t type;
+		uint16_t length;
 
 		ND_TCHECK2(tptr[0], 3);
 
