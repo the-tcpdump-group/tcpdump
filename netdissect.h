@@ -530,7 +530,7 @@ extern void nbt_udp138_print(netdissect_options *, const u_char *, int);
 extern void smb_tcp_print(netdissect_options *, const u_char *, int);
 extern void netbeui_print(netdissect_options *, u_short, const u_char *, int);
 extern void ipx_netbios_print(netdissect_options *, const u_char *, u_int);
-extern void print_data(netdissect_options *, const unsigned char *, int);
+extern void smb_print_data(netdissect_options *, const unsigned char *, int);
 extern void decnet_print(netdissect_options *, const u_char *, u_int, u_int);
 extern void tcp_print(netdissect_options *, const u_char *, u_int, const u_char *, int);
 extern void ospf_print(netdissect_options *, const u_char *, u_int, const u_char *);
