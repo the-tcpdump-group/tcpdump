@@ -51,13 +51,11 @@
 #include <stdio.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
-#include "bittypes.h"   /* in wpcap's Win32/include */
 #include <ctype.h>
 #include <time.h>
 #include <io.h>
 #include <fcntl.h>
 #include <sys/types.h>
-#include <net/netdb.h>  /* in wpcap's Win32/include */
 
 #ifndef uint8_t
 #define uint8_t		unsigned char
@@ -137,6 +135,17 @@
 
 #endif /* _MSC_EXTENSIONS */
 
+/*
+ * Suppress definition of intN_t in bittypes.h, as included by <pcap/pcap.h>
+ * on Windows.
+ * (Yes, HAVE_U_INTn_T, as the definition guards are UN*X-oriented, and
+ * we check for u_intN_t in the UN*X configure script.)
+ */
+#define HAVE_U_INT8_T
+#define HAVE_U_INT16_T
+#define HAVE_U_INT32_T
+#define HAVE_U_INT64_T
+
 #ifdef _MSC_VER
 #define stat _stat
 #define open _open
@@ -151,6 +160,10 @@
  */
 #ifdef _MSC_VER
 #define inline __inline
+#endif
+
+#ifdef AF_INET6
+#define HAVE_OS_IPV6_SUPPORT
 #endif
 
 #ifndef INET6_ADDRSTRLEN
