@@ -885,20 +885,18 @@ main(int argc, char **argv)
 
 				if (pcap_findalldevs(&devpointer, ebuf) < 0)
 					error("%s", ebuf);
-				else {
-					/*
-					 * Look for the devnum-th entry
-					 * in the list of devices
-					 * (1-based).
-					 */
-					for (i = 0;
-					    i < devnum-1 && devpointer != NULL;
-					    i++, devpointer = devpointer->next)
-						;
-					if (devpointer == NULL)
-						error("Invalid adapter index");
-				}
-				device = devpointer->name;
+				/*
+				 * Look for the devnum-th entry in the
+				 * list of devices (1-based).
+				 */
+				for (i = 0;
+				    i < devnum-1 && devpointer != NULL;
+				    i++, devpointer = devpointer->next)
+					;
+				if (devpointer == NULL)
+					error("Invalid adapter index");
+				device = strdup(devpointer->name);
+				pcap_freealldevs(devpointer);
 				break;
 			}
 #endif /* HAVE_PCAP_FINDALLDEVS */
@@ -1292,8 +1290,11 @@ main(int argc, char **argv)
 		 */
 		if (device == NULL) {
 #ifdef HAVE_PCAP_FINDALLDEVS
-			if (pcap_findalldevs(&devpointer, ebuf) >= 0 && devpointer != NULL)
-				device = devpointer->name;
+			if (pcap_findalldevs(&devpointer, ebuf) >= 0 &&
+			    devpointer != NULL) {
+				device = strdup(devpointer->name);
+				pcap_freealldevs(devpointer);
+			}
 #else /* HAVE_PCAP_FINDALLDEVS */
 			device = pcap_lookupdev(ebuf);
 #endif
