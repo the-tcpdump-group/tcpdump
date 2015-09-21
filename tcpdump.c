@@ -1291,7 +1291,12 @@ main(int argc, char **argv)
 		 * We're doing a live capture.
 		 */
 		if (device == NULL) {
+#ifdef HAVE_PCAP_FINDALLDEVS
+			if (pcap_findalldevs(&devpointer, ebuf) >= 0 && devpointer != NULL)
+				device = devpointer->name;
+#else /* HAVE_PCAP_FINDALLDEVS */
 			device = pcap_lookupdev(ebuf);
+#endif
 			if (device == NULL)
 				error("%s", ebuf);
 		}
