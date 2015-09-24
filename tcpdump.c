@@ -716,7 +716,7 @@ main(int argc, char **argv)
 	char *ret = NULL;
 	char *end;
 #ifdef HAVE_PCAP_FINDALLDEVS
-	pcap_if_t *devpointer;
+	pcap_if_t *p, *devpointer;
 	int devnum;
 #endif
 	int status;
@@ -889,13 +889,13 @@ main(int argc, char **argv)
 				 * Look for the devnum-th entry in the
 				 * list of devices (1-based).
 				 */
-				for (i = 0;
-				    i < devnum-1 && devpointer != NULL;
-				    i++, devpointer = devpointer->next)
+				for (i = 0, p = devpointer;
+				    i < devnum-1 && p != NULL;
+				    i++, p = p->next)
 					;
-				if (devpointer == NULL)
+				if (p == NULL)
 					error("Invalid adapter index");
-				device = strdup(devpointer->name);
+				device = strdup(p->name);
 				pcap_freealldevs(devpointer);
 				break;
 			}
