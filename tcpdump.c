@@ -299,23 +299,21 @@ show_dlts_and_exit(const char *device)
 static void
 show_devices_and_exit (void)
 {
-	pcap_if_t *devpointer;
+	pcap_if_t *p, *devpointer;
 	char ebuf[PCAP_ERRBUF_SIZE];
 	int i;
 
 	if (pcap_findalldevs(&devpointer, ebuf) < 0)
 		error("%s", ebuf);
-	else {
-		for (i = 0; devpointer != NULL; i++) {
-			printf("%d.%s", i+1, devpointer->name);
-			if (devpointer->description != NULL)
-				printf(" (%s)", devpointer->description);
-			if (devpointer->flags != 0)
-				printf(" [%s]", bittok2str(status_flags, "none", devpointer->flags));
-			printf("\n");
-			devpointer = devpointer->next;
-		}
+	for (i = 0, p = devpointer; p != NULL; i++, p = p->next) {
+		printf("%d.%s", i+1, p->name);
+		if (p->description != NULL)
+			printf(" (%s)", p->description);
+		if (p->flags != 0)
+			printf(" [%s]", bittok2str(status_flags, "none", p->flags));
+		printf("\n");
 	}
+	pcap_freealldevs(devpointer);
 	exit(0);
 }
 #endif /* HAVE_PCAP_FINDALLDEVS */
