@@ -2209,7 +2209,7 @@ struct ieee80211_radiotap_header {
 					 * new fields does not count.
 					 */
 	uint8_t		it_pad;
-	uint16_t       it_len;         /* length of the whole
+	uint16_t	it_len;		/* length of the whole
 					 * header in bytes, including
 					 * it_version, it_pad,
 					 * it_len, and data fields.
