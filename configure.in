@@ -894,8 +894,20 @@ AC_ARG_WITH(crypto,
 	AC_MSG_RESULT([yes, if available])
 ])
 if test "$want_libcrypto" != "no"; then
-	AC_CHECK_LIB(crypto, DES_cbc_encrypt)
-	AC_CHECK_HEADERS(openssl/evp.h)
+	#
+	# Don't check for libcrypto unless we have its headers;
+	# Apple, bless their pointy little heads, apparently ship
+	# libcrypto as a library, but not the header files, in
+	# El Capitan, probably because they don't want you writing
+	# nasty portable code that could run on other UN*Xes, they
+	# want you writing code that uses their Shiny New Crypto
+	# Library and that only runs on OS X.
+	#
+	AC_CHECK_HEADER(openssl/crypto.h,
+	[
+		AC_CHECK_LIB(crypto, DES_cbc_encrypt)
+		AC_CHECK_HEADERS(openssl/evp.h)
+	])
 fi
 
 # Check for libcap-ng

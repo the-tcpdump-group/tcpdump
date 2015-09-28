@@ -7820,7 +7820,19 @@ $as_echo "yes, if available" >&6; }
 fi
 
 if test "$want_libcrypto" != "no"; then
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for DES_cbc_encrypt in -lcrypto" >&5
+	#
+	# Don't check for libcrypto unless we have its headers;
+	# Apple, bless their pointy little heads, apparently ship
+	# libcrypto as a library, but not the header files, in
+	# El Capitan, probably because they don't want you writing
+	# nasty portable code that could run on other UN*Xes, they
+	# want you writing code that uses their Shiny New Crypto
+	# Library and that only runs on OS X.
+	#
+	ac_fn_c_check_header_mongrel "$LINENO" "openssl/crypto.h" "ac_cv_header_openssl_crypto_h" "$ac_includes_default"
+if test "x$ac_cv_header_openssl_crypto_h" = xyes; then :
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for DES_cbc_encrypt in -lcrypto" >&5
 $as_echo_n "checking for DES_cbc_encrypt in -lcrypto... " >&6; }
 if ${ac_cv_lib_crypto_DES_cbc_encrypt+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -7865,7 +7877,7 @@ _ACEOF
 
 fi
 
-	for ac_header in openssl/evp.h
+		for ac_header in openssl/evp.h
 do :
   ac_fn_c_check_header_mongrel "$LINENO" "openssl/evp.h" "ac_cv_header_openssl_evp_h" "$ac_includes_default"
 if test "x$ac_cv_header_openssl_evp_h" = xyes; then :
@@ -7876,6 +7888,10 @@ _ACEOF
 fi
 
 done
+
+
+fi
+
 
 fi
 
