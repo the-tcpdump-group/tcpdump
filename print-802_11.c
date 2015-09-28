@@ -2214,7 +2214,7 @@ struct ieee80211_radiotap_header {
 					 * it_version, it_pad,
 					 * it_len, and data fields.
 					 */
-	uint32_t       it_present;     /* A bitmap telling which
+	uint32_t	it_present;	/* A bitmap telling which
 					 * fields are present. Set bit 31
 					 * (0x80000000) to extend the
 					 * bitmap by another 32 bits.
