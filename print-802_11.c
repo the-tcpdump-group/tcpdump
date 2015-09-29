@@ -2481,7 +2481,7 @@ print_chaninfo(netdissect_options *ndo,
                int freq, int flags, int presentflags)
 {
 	ND_PRINT((ndo, "%u MHz", freq));
-	if (presentflags & IEEE80211_RADIOTAP_MCS) {
+	if (presentflags & (1 << IEEE80211_RADIOTAP_MCS)) {
 		/*
 		 * We have the MCS field, so this is 11n, regardless
 		 * of what the channel flags say.
