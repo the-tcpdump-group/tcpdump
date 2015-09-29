@@ -257,7 +257,18 @@ AC_DEFUN(AC_LBL_CHECK_COMPILER_OPT,
     [
 	AC_MSG_CHECKING([whether the compiler supports the $2 option])
 	save_CFLAGS="$CFLAGS"
-	CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error $2"
+	if expr "x$2" : "x-W.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error $2"
+	elif expr "x$2" : "x-f.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS -Werror $2"
+	elif expr "x$2" : "x-m.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS -Werror $2"
+	else
+	    CFLAGS="$CFLAGS $2"
+	fi
 	AC_TRY_COMPILE(
 	    [],
 	    [return 0],
