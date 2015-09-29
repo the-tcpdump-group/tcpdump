@@ -2478,30 +2478,41 @@ struct radiotap_state
 
 static void
 print_chaninfo(netdissect_options *ndo,
-               int freq, int flags)
+               int freq, int flags, int presentflags)
 {
 	ND_PRINT((ndo, "%u MHz", freq));
-	if (IS_CHAN_FHSS(flags))
-		ND_PRINT((ndo, " FHSS"));
-	if (IS_CHAN_A(flags)) {
-		if (flags & IEEE80211_CHAN_HALF)
-			ND_PRINT((ndo, " 11a/10Mhz"));
-		else if (flags & IEEE80211_CHAN_QUARTER)
-			ND_PRINT((ndo, " 11a/5Mhz"));
-		else
-			ND_PRINT((ndo, " 11a"));
+	if (presentflags & IEEE80211_RADIOTAP_MCS) {
+		/*
+		 * We have the MCS field, so this is 11n, regardless
+		 * of what the channel flags say.
+		 */
+		ND_PRINT((ndo, " 11n"));
+	} else {
+		if (IS_CHAN_FHSS(flags))
+			ND_PRINT((ndo, " FHSS"));
+		if (IS_CHAN_A(flags)) {
+			if (flags & IEEE80211_CHAN_HALF)
+				ND_PRINT((ndo, " 11a/10Mhz"));
+			else if (flags & IEEE80211_CHAN_QUARTER)
+				ND_PRINT((ndo, " 11a/5Mhz"));
+			else
+				ND_PRINT((ndo, " 11a"));
+		}
+		if (IS_CHAN_ANYG(flags)) {
+			if (flags & IEEE80211_CHAN_HALF)
+				ND_PRINT((ndo, " 11g/10Mhz"));
+			else if (flags & IEEE80211_CHAN_QUARTER)
+				ND_PRINT((ndo, " 11g/5Mhz"));
+			else
+				ND_PRINT((ndo, " 11g"));
+		} else if (IS_CHAN_B(flags))
+			ND_PRINT((ndo, " 11b"));
+		if (flags & IEEE80211_CHAN_TURBO)
+			ND_PRINT((ndo, " Turbo"));
 	}
-	if (IS_CHAN_ANYG(flags)) {
-		if (flags & IEEE80211_CHAN_HALF)
-			ND_PRINT((ndo, " 11g/10Mhz"));
-		else if (flags & IEEE80211_CHAN_QUARTER)
-			ND_PRINT((ndo, " 11g/5Mhz"));
-		else
-			ND_PRINT((ndo, " 11g"));
-	} else if (IS_CHAN_B(flags))
-		ND_PRINT((ndo, " 11b"));
-	if (flags & IEEE80211_CHAN_TURBO)
-		ND_PRINT((ndo, " Turbo"));
+	/*
+	 * These apply to 11n.
+	 */
 	if (flags & IEEE80211_CHAN_HT20)
 		ND_PRINT((ndo, " ht/20"));
 	else if (flags & IEEE80211_CHAN_HT40D)
@@ -2647,7 +2658,7 @@ print_radiotap_field(netdissect_options *ndo,
 		 */
 		if (presentflags & (1 << IEEE80211_RADIOTAP_XCHANNEL))
 			break;
-		print_chaninfo(ndo, u.u16, u2.u16);
+		print_chaninfo(ndo, u.u16, u2.u16, presentflags);
 		break;
 	case IEEE80211_RADIOTAP_FHSS:
 		ND_PRINT((ndo, "fhset %d fhpat %d ", u.u16 & 0xff, (u.u16 >> 8) & 0xff));
@@ -2741,7 +2752,7 @@ print_radiotap_field(netdissect_options *ndo,
 		/* Do nothing for now */
 		break;
 	case IEEE80211_RADIOTAP_XCHANNEL:
-		print_chaninfo(ndo, u2.u16, u.u32);
+		print_chaninfo(ndo, u2.u16, u.u32, presentflags);
 		break;
 	case IEEE80211_RADIOTAP_MCS: {
 		static const char *bandwidth[4] = {
@@ -2806,7 +2817,7 @@ print_radiotap_field(netdissect_options *ndo,
 		if (u.u8 & IEEE80211_RADIOTAP_MCS_GUARD_INTERVAL_KNOWN) {
 			ND_PRINT((ndo, "%s GI ",
 				(u2.u8 & IEEE80211_RADIOTAP_MCS_SHORT_GI) ?
-				"short" : "lon"));
+				"short" : "long"));
 		}
 		if (u.u8 & IEEE80211_RADIOTAP_MCS_HT_FORMAT_KNOWN) {
 			ND_PRINT((ndo, "%s ",
