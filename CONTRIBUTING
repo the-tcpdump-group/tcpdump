@@ -55,47 +55,47 @@ Please, read these lines.
 
 Some remarks
 ------------
-- A thorough reading of some other printers code is usefull.
+a) A thorough reading of some other printers code is usefull.
 
-- Put the the normative reference if any as comments (RFC, etc.).
+b) Put the the normative reference if any as comments (RFC, etc.).
 
-- Put the the format of packets/headers/options as comments.
+c) Put the the format of packets/headers/options as comments.
 
-- The printer may receive incomplete packet in the buffer, truncated at any
-  random position, for example by capturing with '-s size' option.
-  Thus use ND_TTEST, ND_TTEST2, ND_TCHECK or ND_TCHECK2 for bound checking.
-  For ND_TCHECK2:
-    Define : static const char tstr[] = " [|protocol]";
-    Define a label: trunc
-    Print with: ND_PRINT((ndo, "%s", tstr));
-  You can test the code via:
-    sudo ./tcpdump -s snaplen [-v][v][...] -i lo # in a terminal
-    sudo tcpreplay -i lo sample.pcap             # in another terminal
-  You should try several values for snaplen to do various truncation.
+d) The printer may receive incomplete packet in the buffer, truncated at any
+   random position, for example by capturing with '-s size' option.
+   Thus use ND_TTEST, ND_TTEST2, ND_TCHECK or ND_TCHECK2 for bound checking.
+   For ND_TCHECK2:
+     Define : static const char tstr[] = " [|protocol]";
+     Define a label: trunc
+     Print with: ND_PRINT((ndo, "%s", tstr));
+   You can test the code via:
+     sudo ./tcpdump -s snaplen [-v][v][...] -i lo # in a terminal
+     sudo tcpreplay -i lo sample.pcap             # in another terminal
+   You should try several values for snaplen to do various truncation.
 
-- Do invalid packet checks in code: Think that your code can receive in input
-  not only a valid packet but any arbitrary random sequence of octets (packet
-  corrupted in transit or built by a fuzz tester).
+e) Do invalid packet checks in code: Think that your code can receive in input
+   not only a valid packet but any arbitrary random sequence of octets (packet
+   corrupted in transit or built by a fuzz tester).
 
-- Use 'struct tok' for indexed strings and print them with
-  tok2str() or bittok2str() (for flags).
+f) Use 'struct tok' for indexed strings and print them with
+   tok2str() or bittok2str() (for flags).
 
-- Avoid empty lines in output of printers.
+g) Avoid empty lines in output of printers.
 
-- A commit message must have:
-  First line: Capitalized short summary in the imperative (70 chars or less)
+h) A commit message must have:
+   First line: Capitalized short summary in the imperative (70 chars or less)
 
-  Body: Detailed explanatory text, if necessary.  Fold up it to approximately
-  72 characters. There must be an empty line separating the summary from
-  the body.
+   Body: Detailed explanatory text, if necessary.  Fold up it to approximately
+   72 characters. There must be an empty line separating the summary from
+   the body.
 
-- Avoid non-ASCII characters in code and commit messages.
+i) Avoid non-ASCII characters in code and commit messages.
 
-- Use the style of the modified sources.
+j) Use the style of the modified sources.
 
-- Don't mix declarations and code
+k) Don't mix declarations and code
 
-- Don't use // for comments
-  Not all C compilers accept C++/C99 comments by default.
+l) Don't use // for comments
+   Not all C compilers accept C++/C99 comments by default.
 
-- Avoid trailing tabs/spaces
+m) Avoid trailing tabs/spaces
