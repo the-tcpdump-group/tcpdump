@@ -248,6 +248,9 @@ struct udphdr {
 #ifndef NFS_LOCK_DAEMON_PORT
 #define NFS_LOCK_DAEMON_PORT		4045	/*XXX*/
 #endif
+#ifndef LISP_CONTROL_PORT
+#define LISP_CONTROL_PORT		4342	/* RFC 6830 */
+#endif
 #ifndef ISAKMP_PORT_NATT
 #define ISAKMP_PORT_NATT		4500	/* rfc3948 */
 #endif
