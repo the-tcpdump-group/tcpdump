@@ -104,9 +104,7 @@
 #include <stdlib.h>
 
 #include "ip.h"
-#ifdef INET6
 #include "ip6.h"
-#endif
 
 #include "extract.h"
 #include "interface.h"
@@ -313,12 +311,8 @@ void lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			break;
 		case IPv6_AFI:
 			ND_TCHECK2(*(packet_iterator + packet_offset), 16);
-			#ifdef INET6
 			ND_PRINT((ndo, " EID %s/%u,", getname6(ndo,
 				packet_iterator + packet_offset), mask_len));
-			#else
-			ND_PRINT((ndo, " IPv6 EID,"));
-			#endif
 			packet_offset += 16;
 			break;
 		default:
@@ -349,11 +343,7 @@ void lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 				break;
 			case IPv6_AFI:
 				ND_TCHECK2(*(packet_iterator + packet_offset), 16);
-				#ifdef INET6
 				ND_PRINT((ndo, " LOC %s", getname6(ndo, loc_ip_pointer)));
-				#else
-				ND_PRINT((ndo, " LOC IPv6"));
-				#endif
 				packet_offset += 16;
 				break;
 			default:
