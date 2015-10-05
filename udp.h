@@ -98,7 +98,7 @@ struct udphdr {
 #ifndef APPLETALK_ECHO
 #define APPLETALK_ECHO			204	/*XXX*/
 #endif
-#ifndef APPLETALK_ZONE_INFO_PORT	
+#ifndef APPLETALK_ZONE_INFO_PORT
 #define APPLETALK_ZONE_INFO_PORT	206	/*XXX*/
 #endif
 #ifndef LDAP_PORT
