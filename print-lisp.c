@@ -107,7 +107,6 @@
 #include "ip6.h"
 
 #include "extract.h"
-#include "interface.h"
 #include "addrtoname.h"
 
 #define IPv4_AFI			1
@@ -394,7 +393,7 @@ static inline uint8_t extract_lisp_type(uint8_t lisp_hdr_flags)
 
 static inline uint8_t is_xtr_data_present(uint8_t type, uint8_t lisp_hdr_flags)
 {
-	uint8_t xtr_present;
+	uint8_t xtr_present = 0;
 
 	if (type == LISP_MAP_REGISTER)
 		xtr_present = (lisp_hdr_flags) & LISP_MAP_REGISTER_IBIT_MASK;
