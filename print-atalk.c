@@ -221,7 +221,7 @@ aarp_print(netdissect_options *ndo,
 		ND_PRINT((ndo, " [|aarp]"));
 		return;
 	}
-	if (length < sizeof(*ap)) {	
+	if (length < sizeof(*ap)) {
 		ND_PRINT((ndo, " [|aarp %u]", length));
 		return;
 	}
