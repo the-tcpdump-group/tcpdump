@@ -186,38 +186,38 @@ static const struct tok lisp_loc_flag[] = {
 };
 
 typedef struct map_register_hdr {
-	uint8_t type_and_flag;
-	uint8_t reserved;
-	uint8_t reserved_and_flag2;
-	uint8_t record_count;
-	uint64_t nonce;
-	uint16_t key_id;
-	uint16_t auth_data_len;
-} UNALIGNED lisp_map_register_hdr;
+	nd_uint8_t type_and_flag;
+	nd_uint8_t reserved;
+	nd_uint8_t reserved_and_flag2;
+	nd_uint8_t record_count;
+	nd_uint64_t nonce;
+	nd_uint16_t key_id;
+	nd_uint16_t auth_data_len;
+} lisp_map_register_hdr;
 
 #define MAP_REGISTER_HDR_LEN sizeof(lisp_map_register_hdr)
 
 typedef struct map_register_eid {
-	uint32_t ttl;
-	uint8_t locator_count;
-	uint8_t eid_prefix_mask_length;
-	uint8_t act_auth_inc_res;
-	uint8_t reserved;
-	uint8_t reserved_version_hi;
-	uint8_t version_low;
-	uint16_t eid_prefix_afi;
-} UNALIGNED lisp_map_register_eid;
+	nd_uint32_t ttl;
+	nd_uint8_t locator_count;
+	nd_uint8_t eid_prefix_mask_length;
+	nd_uint8_t act_auth_inc_res;
+	nd_uint8_t reserved;
+	nd_uint8_t reserved_version_hi;
+	nd_uint8_t version_low;
+	nd_uint16_t eid_prefix_afi;
+} lisp_map_register_eid;
 
 #define MAP_REGISTER_EID_LEN sizeof(lisp_map_register_eid)
 
 typedef struct map_register_loc {
-	uint8_t priority;
-	uint8_t weight;
-	uint8_t m_priority;
-	uint8_t m_weight;
-	uint16_t unused_and_flag;
-	uint16_t locator_afi;
-} UNALIGNED lisp_map_register_loc;
+	nd_uint8_t priority;
+	nd_uint8_t weight;
+	nd_uint8_t m_priority;
+	nd_uint8_t m_weight;
+	nd_uint16_t unused_and_flag;
+	nd_uint16_t locator_afi;
+} lisp_map_register_loc;
 
 #define MAP_REGISTER_LOC_LEN sizeof(lisp_map_register_loc)
 
