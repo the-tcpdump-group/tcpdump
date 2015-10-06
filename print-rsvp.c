@@ -29,6 +29,8 @@
 #include "af.h"
 #include "signature.h"
 
+static const char istr[] = " (invalid)";
+
 /*
  * RFC 2205 common header
  *
@@ -1170,6 +1172,9 @@ _U_
                            tok2str(af_values, "Unknown", af), af,
                            subobj_len));
 
+                    if(subobj_len == 0)
+                        goto invalid;
+
                     switch(subobj_type) {
                     case RSVP_GEN_UNI_SUBOBJ_SOURCE_TNA_ADDRESS:
                     case RSVP_GEN_UNI_SUBOBJ_DESTINATION_TNA_ADDRESS:
@@ -1769,6 +1774,9 @@ _U_
         tlen-=rsvp_obj_len;
     }
     return 0;
+invalid:
+    ND_PRINT((ndo, "%s", istr));
+    return -1;
 trunc:
     ND_PRINT((ndo, "\n\t\t packet exceeded snapshot"));
     return -1;
