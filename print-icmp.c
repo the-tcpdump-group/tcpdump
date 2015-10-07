@@ -479,7 +479,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			    " [size %d]", size);
 			break;
 		}
-		idp = (struct id_rdiscovery *)&dp->icmp_data;
+		idp = (const struct id_rdiscovery *)&dp->icmp_data;
 		while (num-- > 0) {
 			ND_TCHECK(*idp);
 			(void)snprintf(cp, sizeof(buf) - (cp - buf), " {%s %u}",
@@ -598,7 +598,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
              * however not all implementations set the length field proper.
              */
             if (!ext_dp->icmp_length) {
-                vec[0].ptr = (const uint8_t *)(void *)&ext_dp->icmp_ext_version_res;
+                vec[0].ptr = (const uint8_t *)(const void *)&ext_dp->icmp_ext_version_res;
                 vec[0].len = plen - ICMP_EXTD_MINLEN;
                 if (in_cksum(vec, 1)) {
                     return;
@@ -618,7 +618,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
             }
 
             hlen = plen - ICMP_EXTD_MINLEN;
-            vec[0].ptr = (const uint8_t *)(void *)&ext_dp->icmp_ext_version_res;
+            vec[0].ptr = (const uint8_t *)(const void *)&ext_dp->icmp_ext_version_res;
             vec[0].len = hlen;
             ND_PRINT((ndo, ", checksum 0x%04x (%scorrect), length %u",
                    EXTRACT_16BITS(ext_dp->icmp_ext_checksum),
