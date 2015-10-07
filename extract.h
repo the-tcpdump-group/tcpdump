@@ -20,29 +20,6 @@
  */
 
 /*
- * Data types corresponding to multi-byte integral values within data
- * structures.  These are defined as arrays of octets, so that they're
- * not aligned on their "natural" boundaries, and so that you *must*
- * use the EXTRACT_ macros to extract them (which you should be doing
- * *anyway*, so as not to assume a particular byte order or alignment
- * in your code).
- */
-typedef unsigned char nd_uint16_t[2];
-typedef unsigned char nd_uint24_t[3];
-typedef unsigned char nd_uint32_t[4];
-typedef unsigned char nd_uint40_t[5];
-typedef unsigned char nd_uint48_t[6];
-typedef unsigned char nd_uint56_t[7];
-typedef unsigned char nd_uint64_t[8];
-
-/*
- * Data types corresponding to single-byte integral values, for
- * completeness.
- */
-typedef unsigned char nd_uint8_t;
-typedef signed char nd_int8_t;
-
-/*
  * Macros to extract possibly-unaligned big-endian integral values.
  */
 #ifdef LBL_ALIGN

@@ -688,8 +688,8 @@ rx_cache_insert(netdissect_options *ndo,
 		rx_cache_next = 0;
 
 	rxent->callnum = rxh->callNumber;
-	rxent->client = ip->ip_src;
-	rxent->server = ip->ip_dst;
+	UNALIGNED_MEMCPY(&rxent->client, &ip->ip_src, sizeof(uint32_t));
+	UNALIGNED_MEMCPY(&rxent->server, &ip->ip_dst, sizeof(uint32_t));
 	rxent->dport = dport;
 	rxent->serviceId = rxh->serviceId;
 	rxent->opcode = EXTRACT_32BITS(bp + sizeof(struct rx_header));
@@ -708,8 +708,11 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 {
 	int i;
 	struct rx_cache_entry *rxent;
-	uint32_t clip = ip->ip_dst.s_addr;
-	uint32_t sip = ip->ip_src.s_addr;
+	uint32_t clip;
+	uint32_t sip;
+
+	UNALIGNED_MEMCPY(&clip, &ip->ip_dst, sizeof(uint32_t));
+	UNALIGNED_MEMCPY(&sip, &ip->ip_src, sizeof(uint32_t));
 
 	/* Start the search where we last left off */
 

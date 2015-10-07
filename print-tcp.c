@@ -293,25 +293,22 @@ tcp_print(netdissect_options *ndo,
                 } else {
                         register struct tcp_seq_hash *th;
                         struct tcp_seq_hash *tcp_seq_hash;
-                        const struct in_addr *src, *dst;
                         struct tha tha;
 
                         tcp_seq_hash = tcp_seq_hash4;
-                        src = &ip->ip_src;
-                        dst = &ip->ip_dst;
                         if (sport > dport)
                                 rev = 1;
                         else if (sport == dport) {
-                                if (UNALIGNED_MEMCMP(src, dst, sizeof ip->ip_dst) > 0)
+                                if (UNALIGNED_MEMCMP(&ip->ip_src, &ip->ip_dst, sizeof ip->ip_dst) > 0)
                                         rev = 1;
                         }
                         if (rev) {
-                                UNALIGNED_MEMCPY(&tha.src, dst, sizeof ip->ip_dst);
-                                UNALIGNED_MEMCPY(&tha.dst, src, sizeof ip->ip_src);
+                                UNALIGNED_MEMCPY(&tha.src, &ip->ip_dst, sizeof ip->ip_dst);
+                                UNALIGNED_MEMCPY(&tha.dst, &ip->ip_src, sizeof ip->ip_src);
                                 tha.port = dport << 16 | sport;
                         } else {
-                                UNALIGNED_MEMCPY(&tha.dst, dst, sizeof ip->ip_dst);
-                                UNALIGNED_MEMCPY(&tha.src, src, sizeof ip->ip_src);
+                                UNALIGNED_MEMCPY(&tha.dst, &ip->ip_dst, sizeof ip->ip_dst);
+                                UNALIGNED_MEMCPY(&tha.src, &ip->ip_src, sizeof ip->ip_src);
                                 tha.port = sport << 16 | dport;
                         }
 
