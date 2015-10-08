@@ -4500,7 +4500,7 @@ $as_echo "yes" >&6; }
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The SMB printer may have exploitable buffer overflows!!!" >&5
 $as_echo "$as_me: WARNING: The SMB printer may have exploitable buffer overflows!!!" >&2;}
 
-$as_echo "#define TCPDUMP_DO_SMB 1" >>confdefs.h
+$as_echo "#define ENABLE_SMB 1" >>confdefs.h
 
 	LOCALSRC="print-smb.c smbutil.c $LOCALSRC"
 	;;

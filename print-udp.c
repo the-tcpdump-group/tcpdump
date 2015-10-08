@@ -577,7 +577,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 			krb_print(ndo, (const void *)(up + 1));
 		else if (ISPORT(L2TP_PORT))
 			l2tp_print(ndo, (const u_char *)(up + 1), length);
-#ifdef TCPDUMP_DO_SMB
+#ifdef ENABLE_SMB
 		else if (ISPORT(NETBIOS_NS_PORT))
 			nbt_udp137_print(ndo, (const u_char *)(up + 1), length);
 		else if (ISPORT(NETBIOS_DGRAM_PORT))

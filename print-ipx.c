@@ -123,7 +123,7 @@ ipx_decode(netdissect_options *ndo, const struct ipxHdr *ipx, const u_char *data
 	break;
       case IPX_SKT_NETBIOS:
 	ND_PRINT((ndo, "ipx-netbios %d", length));
-#ifdef TCPDUMP_DO_SMB
+#ifdef ENABLE_SMB
 	ipx_netbios_print(ndo, datap, length);
 #endif
 	break;
@@ -132,7 +132,7 @@ ipx_decode(netdissect_options *ndo, const struct ipxHdr *ipx, const u_char *data
 	break;
       case IPX_SKT_NWLINK_DGM:
 	ND_PRINT((ndo, "ipx-nwlink-dgm %d", length));
-#ifdef TCPDUMP_DO_SMB
+#ifdef ENABLE_SMB
 	ipx_netbios_print(ndo, datap, length);
 #endif
 	break;

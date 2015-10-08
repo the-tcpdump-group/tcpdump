@@ -303,7 +303,7 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 		return (hdrlen);
 	}
 
-#ifdef TCPDUMP_DO_SMB
+#ifdef ENABLE_SMB
 	if (ssap == LLCSAP_NETBEUI && dsap == LLCSAP_NETBEUI
 	    && (!(control & LLC_S_FMT) || control == LLC_U_FMT)) {
 		/*
