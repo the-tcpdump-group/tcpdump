@@ -27,7 +27,7 @@
  */
 
 /*
- * tcpdump filter for LISP - Locator/Identifier Separation Protocol
+ * netdissect printer for LISP - Locator/Identifier Separation Protocol
  * RFC 6830
  *
  *
