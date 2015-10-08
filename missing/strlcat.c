@@ -32,11 +32,11 @@
 #include <config.h>
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include <string.h>
 
-#include "interface.h"
+#include "netdissect.h"
 
 /*
  * Appends src to string dst of size siz (unlike strncat, siz is the

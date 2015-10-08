@@ -26,9 +26,9 @@
 
 #include <string.h>
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
 
 #define RFC1483LLC_LEN	8

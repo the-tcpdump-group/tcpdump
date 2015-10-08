@@ -23,7 +23,7 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 struct mbuf;
 struct rtentry;
@@ -37,12 +37,12 @@ struct rtentry;
 #include <string.h>
 
 #include "extract.h"
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
 
 static const char tstr[] = "[|decnet]";
 
-#ifndef WIN32
+#ifndef _WIN32
 typedef uint8_t byte[1];		/* single byte field */
 #else
 /*
@@ -50,7 +50,7 @@ typedef uint8_t byte[1];		/* single byte field */
  */
 typedef unsigned char Byte[1];		/* single byte field */
 #define byte Byte
-#endif /* WIN32 */
+#endif /* _WIN32 */
 typedef uint8_t word[2];		/* 2 byte field */
 typedef uint8_t longword[4];		/* 4 bytes field */
 
@@ -1295,7 +1295,7 @@ print_reason(netdissect_options *ndo,
 }
 
 const char *
-dnnum_string(u_short dnaddr)
+dnnum_string(netdissect_options *ndo, u_short dnaddr)
 {
 	char *str;
 	size_t siz;
@@ -1304,13 +1304,13 @@ dnnum_string(u_short dnaddr)
 
 	str = (char *)malloc(siz = sizeof("00.0000"));
 	if (str == NULL)
-		error("dnnum_string: malloc");
+		(*ndo->ndo_error)(ndo, "dnnum_string: malloc");
 	snprintf(str, siz, "%d.%d", area, node);
 	return(str);
 }
 
 const char *
-dnname_string(u_short dnaddr)
+dnname_string(netdissect_options *ndo, u_short dnaddr)
 {
 #ifdef HAVE_DNET_HTOA
 	struct dn_naddr dna;
@@ -1322,9 +1322,9 @@ dnname_string(u_short dnaddr)
 	if(dnname != NULL)
 		return (strdup(dnname));
 	else
-		return(dnnum_string(dnaddr));
+		return(dnnum_string(ndo, dnaddr));
 #else
-	return(dnnum_string(dnaddr));	/* punt */
+	return(dnnum_string(ndo, dnaddr));	/* punt */
 #endif
 }
 

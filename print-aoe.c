@@ -33,15 +33,15 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
 #include "ether.h"
 
 static const char tstr[] = " [|aoe]";
-static const char cstr[] = " (corrupt)";
+static const char istr[] = " (invalid)";
 
 #define AOE_V1 1
 #define ATA_SECTOR_SIZE 512
@@ -147,7 +147,7 @@ aoev1_issue_print(netdissect_options *ndo,
 	const u_char *ep = cp + len;
 
 	if (len < AOEV1_ISSUE_ARG_LEN)
-		goto corrupt;
+		goto invalid;
 	/* AFlags */
 	ND_TCHECK2(*cp, 1);
 	ND_PRINT((ndo, "\n\tAFlags: [%s]", bittok2str(aoev1_aflag_str, "none", *cp)));
@@ -196,8 +196,8 @@ aoev1_issue_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "\n\tData: %u bytes", len - AOEV1_ISSUE_ARG_LEN));
 	return;
 
-corrupt:
-	ND_PRINT((ndo, "%s", cstr));
+invalid:
+	ND_PRINT((ndo, "%s", istr));
 	ND_TCHECK2(*cp, ep - cp);
 	return;
 trunc:
@@ -212,7 +212,7 @@ aoev1_query_print(netdissect_options *ndo,
 	uint16_t cslen;
 
 	if (len < AOEV1_QUERY_ARG_LEN)
-		goto corrupt;
+		goto invalid;
 	/* Buffer Count */
 	ND_TCHECK2(*cp, 2);
 	ND_PRINT((ndo, "\n\tBuffer Count: %u", EXTRACT_16BITS(cp)));
@@ -235,7 +235,7 @@ aoev1_query_print(netdissect_options *ndo,
 	cslen = EXTRACT_16BITS(cp);
 	cp += 2;
 	if (cslen > AOEV1_MAX_CONFSTR_LEN || AOEV1_QUERY_ARG_LEN + cslen > len)
-		goto corrupt;
+		goto invalid;
 	/* Config String */
 	ND_TCHECK2(*cp, cslen);
 	if (cslen) {
@@ -245,8 +245,8 @@ aoev1_query_print(netdissect_options *ndo,
 	}
 	return;
 
-corrupt:
-	ND_PRINT((ndo, "%s", cstr));
+invalid:
+	ND_PRINT((ndo, "%s", istr));
 	ND_TCHECK2(*cp, ep - cp);
 	return;
 trunc:
@@ -261,7 +261,7 @@ aoev1_mac_print(netdissect_options *ndo,
 	uint8_t dircount, i;
 
 	if (len < AOEV1_MAC_ARG_LEN)
-		goto corrupt;
+		goto invalid;
 	/* Reserved */
 	ND_TCHECK2(*cp, 1);
 	cp += 1;
@@ -279,7 +279,7 @@ aoev1_mac_print(netdissect_options *ndo,
 	cp += 1;
 	ND_PRINT((ndo, ", Dir Count: %u", dircount));
 	if (AOEV1_MAC_ARG_LEN + dircount * 8 > len)
-		goto corrupt;
+		goto invalid;
 	/* directives */
 	for (i = 0; i < dircount; i++) {
 		/* Reserved */
@@ -296,8 +296,8 @@ aoev1_mac_print(netdissect_options *ndo,
 	}
 	return;
 
-corrupt:
-	ND_PRINT((ndo, "%s", cstr));
+invalid:
+	ND_PRINT((ndo, "%s", istr));
 	ND_TCHECK2(*cp, ep - cp);
 	return;
 trunc:
@@ -312,7 +312,7 @@ aoev1_reserve_print(netdissect_options *ndo,
 	uint8_t nmacs, i;
 
 	if (len < AOEV1_RESERVE_ARG_LEN || (len - AOEV1_RESERVE_ARG_LEN) % ETHER_ADDR_LEN)
-		goto corrupt;
+		goto invalid;
 	/* RCmd */
 	ND_TCHECK2(*cp, 1);
 	ND_PRINT((ndo, "\n\tRCmd: %s", tok2str(aoev1_rcmd_str, "Unknown (0x%02x)", *cp)));
@@ -323,7 +323,7 @@ aoev1_reserve_print(netdissect_options *ndo,
 	cp += 1;
 	ND_PRINT((ndo, ", NMacs: %u", nmacs));
 	if (AOEV1_RESERVE_ARG_LEN + nmacs * ETHER_ADDR_LEN != len)
-		goto corrupt;
+		goto invalid;
 	/* addresses */
 	for (i = 0; i < nmacs; i++) {
 		ND_PRINT((ndo, "\n\tEthernet Address %u: %s", i, etheraddr_string(ndo, cp)));
@@ -331,8 +331,8 @@ aoev1_reserve_print(netdissect_options *ndo,
 	}
 	return;
 
-corrupt:
-	ND_PRINT((ndo, "%s", cstr));
+invalid:
+	ND_PRINT((ndo, "%s", istr));
 	ND_TCHECK2(*cp, ep - cp);
 	return;
 trunc:
@@ -349,7 +349,7 @@ aoev1_print(netdissect_options *ndo,
 	void (*cmd_decoder)(netdissect_options *, const u_char *, const u_int);
 
 	if (len < AOEV1_COMMON_HDR_LEN)
-		goto corrupt;
+		goto invalid;
 	/* Flags */
 	flags = *cp & 0x0F;
 	ND_PRINT((ndo, ", Flags: [%s]", bittok2str(aoev1_flag_str, "none", flags)));
@@ -389,8 +389,8 @@ aoev1_print(netdissect_options *ndo,
 		cmd_decoder(ndo, cp, len - AOEV1_COMMON_HDR_LEN);
 	return;
 
-corrupt:
-	ND_PRINT((ndo, "%s", cstr));
+invalid:
+	ND_PRINT((ndo, "%s", istr));
 	ND_TCHECK2(*cp, ep - cp);
 	return;
 trunc:
@@ -407,7 +407,7 @@ aoe_print(netdissect_options *ndo,
 	ND_PRINT((ndo, "AoE length %u", len));
 
 	if (len < 1)
-		goto corrupt;
+		goto invalid;
 	/* Ver/Flags */
 	ND_TCHECK2(*cp, 1);
 	ver = (*cp & 0xF0) >> 4;
@@ -421,8 +421,8 @@ aoe_print(netdissect_options *ndo,
 	}
 	return;
 
-corrupt:
-	ND_PRINT((ndo, "%s", cstr));
+invalid:
+	ND_PRINT((ndo, "%s", istr));
 	ND_TCHECK2(*cp, ep - cp);
 	return;
 trunc:

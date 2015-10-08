@@ -36,9 +36,9 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
 
@@ -324,9 +324,7 @@ add_addr_print(netdissect_options *ndo,
                         ND_PRINT((ndo, ":%u", EXTRACT_16BITS(add_addr->u.v4.port)));
                 break;
         case 6:
-#ifdef INET6
                 ND_PRINT((ndo, " %s", ip6addr_string(ndo, add_addr->u.v6.addr)));
-#endif
                 if (opt_len == 22)
                         ND_PRINT((ndo, ":%u", EXTRACT_16BITS(add_addr->u.v6.port)));
                 break;

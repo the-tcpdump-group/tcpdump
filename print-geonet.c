@@ -19,9 +19,9 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
 
@@ -117,7 +117,7 @@ geonet_print(netdissect_options *ndo, const u_char *eth, const u_char *bp, u_int
 
 	/* Process Common Header */
 	if (length < 36)
-		goto malformed;
+		goto invalid;
 
 	ND_TCHECK2(*bp, 7);
 	version = bp[0] >> 4;
@@ -223,7 +223,7 @@ geonet_print(netdissect_options *ndo, const u_char *eth, const u_char *bp, u_int
 	/* Skip Extended headers */
 	if (hdr_size >= 0) {
 		if (length < (u_int)hdr_size)
-			goto malformed;
+			goto invalid;
 		ND_TCHECK2(*bp, hdr_size);
 		length -= hdr_size;
 		bp += hdr_size;
@@ -233,7 +233,7 @@ geonet_print(netdissect_options *ndo, const u_char *eth, const u_char *bp, u_int
 			case 1:
 			case 2: /* BTP A/B */
 				if (length < 4)
-					goto malformed;
+					goto invalid;
 				ND_TCHECK2(*bp, 4);
 				print_btp(ndo, bp);
 				length -= 4;
@@ -260,7 +260,7 @@ geonet_print(netdissect_options *ndo, const u_char *eth, const u_char *bp, u_int
 		ND_DEFAULTPRINT(bp, length);
 	return;
 
-malformed:
+invalid:
 	ND_PRINT((ndo, " Malformed (small) "));
 	/* XXX - print the remaining data as hex? */
 	return;

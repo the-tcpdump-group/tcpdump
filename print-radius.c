@@ -37,6 +37,10 @@
  * RFC 2869:
  *      "RADIUS Extensions"
  *
+ * RFC 3580:
+ *      "IEEE 802.1X Remote Authentication Dial In User Service (RADIUS)"
+ *      "Usage Guidelines"
+ *
  * RFC 4675:
  *      "RADIUS Attributes for Virtual LAN and Priority Support"
  *
@@ -52,11 +56,11 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include <string.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
 #include "oui.h"
@@ -330,6 +334,7 @@ static const char *tunnel_type[]={ NULL,
                                    "GRE",
                                    "DVS",
                                    "IP-in-IP Tunneling",
+                                   "VLAN",
                                  };
 
 /* Tunnel-Medium-Type Attribute standard values */

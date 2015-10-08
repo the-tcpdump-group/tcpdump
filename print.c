@@ -32,10 +32,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include "netdissect.h"
-#include "interface.h"
 #include "addrtoname.h"
 #include "print.h"
 
@@ -224,7 +223,6 @@ static const struct printer printers[] = {
 	{ NULL,			0 },
 };
 
-
 static void	ndo_default_print(netdissect_options *ndo, const u_char *bp,
 		    u_int length);
 
@@ -240,14 +238,14 @@ static void	ndo_warning(netdissect_options *ndo _U_, const char *fmt, ...)
 #endif /* __ATTRIBUTE___FORMAT_OK */
 		    ;
 
-static int	tcpdump_printf(netdissect_options *ndo _U_, const char *fmt, ...)
+static int	ndo_printf(netdissect_options *ndo _U_, const char *fmt, ...)
 #ifdef __ATTRIBUTE___FORMAT_OK
 		     __attribute ((format (printf, 2, 3)))
 #endif /* __ATTRIBUTE___FORMAT_OK */
 		     ;
 
 void
-init_print(netdissect_options *ndo, u_int32_t localnet, u_int32_t mask,
+init_print(netdissect_options *ndo, uint32_t localnet, uint32_t mask,
     uint32_t timezone_offset)
 {
 
@@ -296,37 +294,34 @@ lookup_printer(int type)
 int
 has_printer(int type)
 {
-
 	return (lookup_printer(type) != NULL);
 }
 
-struct print_info
-get_print_info(netdissect_options *ndo, int type)
+if_printer
+get_if_printer(netdissect_options *ndo, int type)
 {
 	const char *dltname;
-	struct print_info printinfo;
+	if_printer printer;
 
-	printinfo.ndo = ndo;
-	printinfo.printer = lookup_printer(type);
-	if (printinfo.printer == NULL) {
+	printer = lookup_printer(type);
+	if (printer == NULL) {
 		dltname = pcap_datalink_val_to_name(type);
 		if (dltname != NULL)
-			error("packet printing is not supported for link type %s: use -w",
-			      dltname);
+			(*ndo->ndo_error)(ndo,
+					  "packet printing is not supported for link type %s: use -w",
+					  dltname);
 		else
-			error("packet printing is not supported for link type %d: use -w", type);
+			(*ndo->ndo_error)(ndo,
+					  "packet printing is not supported for link type %d: use -w", type);
 	}
-	return (printinfo);
+	return printer;
 }
 
 void
-pretty_print_packet(struct print_info *print_info, const struct pcap_pkthdr *h,
+pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
     const u_char *sp, u_int packets_captured)
 {
 	u_int hdrlen;
-        netdissect_options *ndo;
-
-        ndo = print_info->ndo;
 
 	if(ndo->ndo_packet_number)
 		ND_PRINT((ndo, "%5u  ", packets_captured));
@@ -341,7 +336,7 @@ pretty_print_packet(struct print_info *print_info, const struct pcap_pkthdr *h,
 	 */
 	ndo->ndo_snapend = sp + h->caplen;
 
-        hdrlen = (*print_info->printer)(print_info->ndo, h, sp);
+        hdrlen = (ndo->ndo_if_printer)(ndo, h, sp);
 
 	/*
 	 * Restore the original snapend, as a printer might have
@@ -420,11 +415,12 @@ ndo_default_print(netdissect_options *ndo, const u_char *bp, u_int length)
 
 /* VARARGS */
 static void
-ndo_error(netdissect_options *ndo _U_, const char *fmt, ...)
+ndo_error(netdissect_options *ndo, const char *fmt, ...)
 {
 	va_list ap;
 
-	(void)fprintf(stderr, "%s: ", program_name);
+	if(ndo->program_name)
+		(void)fprintf(stderr, "%s: ", ndo->program_name);
 	va_start(ap, fmt);
 	(void)vfprintf(stderr, fmt, ap);
 	va_end(ap);
@@ -439,11 +435,13 @@ ndo_error(netdissect_options *ndo _U_, const char *fmt, ...)
 
 /* VARARGS */
 static void
-ndo_warning(netdissect_options *ndo _U_, const char *fmt, ...)
+ndo_warning(netdissect_options *ndo, const char *fmt, ...)
 {
 	va_list ap;
 
-	(void)fprintf(stderr, "%s: WARNING: ", program_name);
+	if(ndo->program_name)
+		(void)fprintf(stderr, "%s: ", ndo->program_name);
+	(void)fprintf(stderr, "WARNING: ");
 	va_start(ap, fmt);
 	(void)vfprintf(stderr, fmt, ap);
 	va_end(ap);
@@ -455,7 +453,7 @@ ndo_warning(netdissect_options *ndo _U_, const char *fmt, ...)
 }
 
 static int
-tcpdump_printf(netdissect_options *ndo _U_, const char *fmt, ...)
+ndo_printf(netdissect_options *ndo _U_, const char *fmt, ...)
 {
 	va_list args;
 	int ret;
@@ -470,9 +468,8 @@ tcpdump_printf(netdissect_options *ndo _U_, const char *fmt, ...)
 void
 ndo_set_function_pointers(netdissect_options *ndo)
 {
-
 	ndo->ndo_default_print=ndo_default_print;
-	ndo->ndo_printf=tcpdump_printf;
+	ndo->ndo_printf=ndo_printf;
 	ndo->ndo_error=ndo_error;
 	ndo->ndo_warning=ndo_warning;
 }

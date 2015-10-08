@@ -39,9 +39,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
 
@@ -688,8 +688,8 @@ rx_cache_insert(netdissect_options *ndo,
 		rx_cache_next = 0;
 
 	rxent->callnum = rxh->callNumber;
-	rxent->client = ip->ip_src;
-	rxent->server = ip->ip_dst;
+	UNALIGNED_MEMCPY(&rxent->client, &ip->ip_src, sizeof(uint32_t));
+	UNALIGNED_MEMCPY(&rxent->server, &ip->ip_dst, sizeof(uint32_t));
 	rxent->dport = dport;
 	rxent->serviceId = rxh->serviceId;
 	rxent->opcode = EXTRACT_32BITS(bp + sizeof(struct rx_header));
@@ -708,8 +708,11 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 {
 	int i;
 	struct rx_cache_entry *rxent;
-	uint32_t clip = ip->ip_dst.s_addr;
-	uint32_t sip = ip->ip_src.s_addr;
+	uint32_t clip;
+	uint32_t sip;
+
+	UNALIGNED_MEMCPY(&clip, &ip->ip_dst, sizeof(uint32_t));
+	UNALIGNED_MEMCPY(&sip, &ip->ip_src, sizeof(uint32_t));
 
 	/* Start the search where we last left off */
 
@@ -751,63 +754,63 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 			ND_PRINT((ndo, " fid %d/%d/%d", (int) n1, (int) n2, (int) n3)); \
 		}
 
-#define STROUT(MAX) { unsigned int i; \
+#define STROUT(MAX) { unsigned int _i; \
 			ND_TCHECK2(bp[0], sizeof(int32_t)); \
-			i = EXTRACT_32BITS(bp); \
-			if (i > (MAX)) \
+			_i = EXTRACT_32BITS(bp); \
+			if (_i > (MAX)) \
 				goto trunc; \
 			bp += sizeof(int32_t); \
 			ND_PRINT((ndo, " \"")); \
-			if (fn_printn(ndo, bp, i, ndo->ndo_snapend)) \
+			if (fn_printn(ndo, bp, _i, ndo->ndo_snapend)) \
 				goto trunc; \
 			ND_PRINT((ndo, "\"")); \
-			bp += ((i + sizeof(int32_t) - 1) / sizeof(int32_t)) * sizeof(int32_t); \
+			bp += ((_i + sizeof(int32_t) - 1) / sizeof(int32_t)) * sizeof(int32_t); \
 		}
 
-#define INTOUT() { int i; \
+#define INTOUT() { int _i; \
 			ND_TCHECK2(bp[0], sizeof(int32_t)); \
-			i = (int) EXTRACT_32BITS(bp); \
+			_i = (int) EXTRACT_32BITS(bp); \
 			bp += sizeof(int32_t); \
-			ND_PRINT((ndo, " %d", i)); \
+			ND_PRINT((ndo, " %d", _i)); \
 		}
 
-#define UINTOUT() { unsigned long i; \
+#define UINTOUT() { unsigned long _i; \
 			ND_TCHECK2(bp[0], sizeof(int32_t)); \
-			i = EXTRACT_32BITS(bp); \
+			_i = EXTRACT_32BITS(bp); \
 			bp += sizeof(int32_t); \
-			ND_PRINT((ndo, " %lu", i)); \
+			ND_PRINT((ndo, " %lu", _i)); \
 		}
 
-#define UINT64OUT() { uint64_t i; \
+#define UINT64OUT() { uint64_t _i; \
 			ND_TCHECK2(bp[0], sizeof(uint64_t)); \
-			i = EXTRACT_64BITS(bp); \
+			_i = EXTRACT_64BITS(bp); \
 			bp += sizeof(uint64_t); \
-			ND_PRINT((ndo, " %" PRIu64, i)); \
+			ND_PRINT((ndo, " %" PRIu64, _i)); \
 		}
 
-#define DATEOUT() { time_t t; struct tm *tm; char str[256]; \
+#define DATEOUT() { time_t _t; struct tm *tm; char str[256]; \
 			ND_TCHECK2(bp[0], sizeof(int32_t)); \
-			t = (time_t) EXTRACT_32BITS(bp); \
+			_t = (time_t) EXTRACT_32BITS(bp); \
 			bp += sizeof(int32_t); \
-			tm = localtime(&t); \
-			strftime(str, 256, "%Y/%m/%d %T", tm); \
+			tm = localtime(&_t); \
+			strftime(str, 256, "%Y/%m/%d %H:%M:%S", tm); \
 			ND_PRINT((ndo, " %s", str)); \
 		}
 
-#define STOREATTROUT() { unsigned long mask, i; \
+#define STOREATTROUT() { unsigned long mask, _i; \
 			ND_TCHECK2(bp[0], (sizeof(int32_t)*6)); \
 			mask = EXTRACT_32BITS(bp); bp += sizeof(int32_t); \
 			if (mask) ND_PRINT((ndo, " StoreStatus")); \
 		        if (mask & 1) { ND_PRINT((ndo, " date")); DATEOUT(); } \
 			else bp += sizeof(int32_t); \
-			i = EXTRACT_32BITS(bp); bp += sizeof(int32_t); \
-		        if (mask & 2) ND_PRINT((ndo, " owner %lu", i));  \
-			i = EXTRACT_32BITS(bp); bp += sizeof(int32_t); \
-		        if (mask & 4) ND_PRINT((ndo, " group %lu", i)); \
-			i = EXTRACT_32BITS(bp); bp += sizeof(int32_t); \
-		        if (mask & 8) ND_PRINT((ndo, " mode %lo", i & 07777)); \
-			i = EXTRACT_32BITS(bp); bp += sizeof(int32_t); \
-		        if (mask & 16) ND_PRINT((ndo, " segsize %lu", i)); \
+			_i = EXTRACT_32BITS(bp); bp += sizeof(int32_t); \
+		        if (mask & 2) ND_PRINT((ndo, " owner %lu", _i));  \
+			_i = EXTRACT_32BITS(bp); bp += sizeof(int32_t); \
+		        if (mask & 4) ND_PRINT((ndo, " group %lu", _i)); \
+			_i = EXTRACT_32BITS(bp); bp += sizeof(int32_t); \
+		        if (mask & 8) ND_PRINT((ndo, " mode %lo", _i & 07777)); \
+			_i = EXTRACT_32BITS(bp); bp += sizeof(int32_t); \
+		        if (mask & 16) ND_PRINT((ndo, " segsize %lu", _i)); \
 			/* undocumented in 3.3 docu */ \
 		        if (mask & 1024) ND_PRINT((ndo, " fsync"));  \
 		}
@@ -821,7 +824,7 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 			ND_PRINT((ndo, " %d.%d", epoch, counter)); \
 		}
 
-#define AFSUUIDOUT() {uint32_t temp; int i; \
+#define AFSUUIDOUT() {uint32_t temp; int _i; \
 			ND_TCHECK2(bp[0], 11*sizeof(uint32_t)); \
 			temp = EXTRACT_32BITS(bp); \
 			bp += sizeof(uint32_t); \
@@ -832,7 +835,7 @@ rx_cache_find(const struct rx_header *rxh, const struct ip *ip, int sport,
 			temp = EXTRACT_32BITS(bp); \
 			bp += sizeof(uint32_t); \
 			ND_PRINT((ndo, "%04x", temp)); \
-			for (i = 0; i < 8; i++) { \
+			for (_i = 0; _i < 8; _i++) { \
 				temp = EXTRACT_32BITS(bp); \
 				bp += sizeof(uint32_t); \
 				ND_PRINT((ndo, "%02x", (unsigned char) temp)); \
@@ -1104,8 +1107,6 @@ fs_reply_print(netdissect_options *ndo,
 			;
 		}
 	} else if (rxh->type == RX_PACKET_TYPE_ABORT) {
-		int i;
-
 		/*
 		 * Otherwise, just print out the return code
 		 */

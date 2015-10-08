@@ -23,11 +23,11 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include <stdio.h>
 
-#include "interface.h"
+#include "netdissect.h"
 
 void
 bpf_dump(const struct bpf_program *p, int option)

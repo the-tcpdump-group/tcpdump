@@ -23,11 +23,11 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include <stdio.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
 #include "af.h"
@@ -1280,13 +1280,11 @@ lldp_network_addr_print(netdissect_options *ndo, const u_char *tptr, u_int len)
           return NULL;
         pfunc = getname;
         break;
-#ifdef INET6
     case AFNUM_INET6:
         if (len < 16)
           return NULL;
         pfunc = getname6;
         break;
-#endif
     case AFNUM_802:
         if (len < 6)
           return NULL;

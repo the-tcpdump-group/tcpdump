@@ -26,11 +26,11 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include <stdio.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
 
@@ -123,7 +123,7 @@ ipx_decode(netdissect_options *ndo, const struct ipxHdr *ipx, const u_char *data
 	break;
       case IPX_SKT_NETBIOS:
 	ND_PRINT((ndo, "ipx-netbios %d", length));
-#ifdef TCPDUMP_DO_SMB
+#ifdef ENABLE_SMB
 	ipx_netbios_print(ndo, datap, length);
 #endif
 	break;
@@ -132,7 +132,7 @@ ipx_decode(netdissect_options *ndo, const struct ipxHdr *ipx, const u_char *data
 	break;
       case IPX_SKT_NWLINK_DGM:
 	ND_PRINT((ndo, "ipx-nwlink-dgm %d", length));
-#ifdef TCPDUMP_DO_SMB
+#ifdef ENABLE_SMB
 	ipx_netbios_print(ndo, datap, length);
 #endif
 	break;
@@ -164,7 +164,7 @@ ipx_sap_print(netdissect_options *ndo, const u_short *ipx, u_int length)
 	    ND_PRINT((ndo, "ipx-sap-nearest-req"));
 
 	ND_TCHECK(ipx[0]);
-	ND_PRINT((ndo, " %s", ipxsap_string(htons(EXTRACT_16BITS(&ipx[0])))));
+	ND_PRINT((ndo, " %s", ipxsap_string(ndo, htons(EXTRACT_16BITS(&ipx[0])))));
 	break;
 
       case 2:
@@ -176,7 +176,7 @@ ipx_sap_print(netdissect_options *ndo, const u_short *ipx, u_int length)
 
 	for (i = 0; i < 8 && length > 0; i++) {
 	    ND_TCHECK(ipx[0]);
-	    ND_PRINT((ndo, " %s '", ipxsap_string(htons(EXTRACT_16BITS(&ipx[0])))));
+	    ND_PRINT((ndo, " %s '", ipxsap_string(ndo, htons(EXTRACT_16BITS(&ipx[0])))));
 	    if (fn_printzp(ndo, (const u_char *)&ipx[1], 48, ndo->ndo_snapend)) {
 		ND_PRINT((ndo, "'"));
 		goto trunc;

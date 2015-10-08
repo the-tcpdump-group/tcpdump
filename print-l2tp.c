@@ -25,9 +25,9 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "extract.h"
 
 #define L2TP_FLAG_TYPE		0x8000	/* Type (0=Data, 1=Control) */

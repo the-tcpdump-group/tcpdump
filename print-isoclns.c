@@ -28,11 +28,11 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include <string.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
 #include "ether.h"
 #include "nlpid.h"
@@ -560,8 +560,8 @@ struct isis_tlv_ptp_adj {
     uint8_t neighbor_extd_local_circuit_id[4];
 };
 
-static void osi_print_cksum(netdissect_options *, const uint8_t *pptr, uint16_t checksum,
-                            u_int checksum_offset, u_int length);
+static void osi_print_cksum(netdissect_options *, const uint8_t *pptr,
+			    uint16_t checksum, int checksum_offset, int length);
 static int clnp_print(netdissect_options *, const uint8_t *, u_int);
 static void esis_print(netdissect_options *, const uint8_t *, u_int);
 static int isis_print(netdissect_options *, const uint8_t *, u_int);
@@ -807,8 +807,8 @@ clnp_print(netdissect_options *ndo,
         if (ndo->ndo_vflag < 1) {
             ND_PRINT((ndo, "%s%s > %s, %s, length %u",
                    ndo->ndo_eflag ? "" : ", ",
-                   isonsap_string(source_address, source_address_length),
-                   isonsap_string(dest_address, dest_address_length),
+                   isonsap_string(ndo, source_address, source_address_length),
+                   isonsap_string(ndo, dest_address, dest_address_length),
                    tok2str(clnp_pdu_values,"unknown (%u)",clnp_pdu_type),
                    length));
             return (1);
@@ -832,9 +832,9 @@ clnp_print(netdissect_options *ndo,
 
         ND_PRINT((ndo, "\n\tsource address (length %u): %s\n\tdest   address (length %u): %s",
                source_address_length,
-               isonsap_string(source_address, source_address_length),
+               isonsap_string(ndo, source_address, source_address_length),
                dest_address_length,
-               isonsap_string(dest_address, dest_address_length)));
+               isonsap_string(ndo, dest_address, dest_address_length)));
 
         if (clnp_flags & CLNP_SEGMENT_PART) {
             	clnp_segment_header = (const struct clnp_segment_header_t *) pptr;
@@ -905,7 +905,7 @@ clnp_print(netdissect_options *ndo,
                                     ND_TCHECK2(*source_address, source_address_length);
                                     ND_PRINT((ndo, "\n\t    NSAP address (length %u): %s",
                                            source_address_length,
-                                           isonsap_string(source_address, source_address_length)));
+                                           isonsap_string(ndo, source_address, source_address_length)));
                             }
                             tlen-=source_address_length+1;
                     }
@@ -1111,7 +1111,7 @@ esis_print(netdissect_options *ndo,
 		dst = pptr;
 		pptr += dstl;
                 li -= dstl;
-		ND_PRINT((ndo, "\n\t  %s", isonsap_string(dst, dstl)));
+		ND_PRINT((ndo, "\n\t  %s", isonsap_string(ndo, dst, dstl)));
 
 		ND_TCHECK(*pptr);
 		if (li < 1) {
@@ -1148,7 +1148,7 @@ esis_print(netdissect_options *ndo,
 		if (netal == 0)
 			ND_PRINT((ndo, "\n\t  %s", etheraddr_string(ndo, snpa)));
 		else
-			ND_PRINT((ndo, "\n\t  %s", isonsap_string(neta, netal)));
+			ND_PRINT((ndo, "\n\t  %s", isonsap_string(ndo, neta, netal)));
 		break;
 	}
 
@@ -1181,7 +1181,7 @@ esis_print(netdissect_options *ndo,
             	}
                 ND_PRINT((ndo, "\n\t  NET (length: %u): %s",
                        source_address_length,
-                       isonsap_string(pptr, source_address_length)));
+                       isonsap_string(ndo, pptr, source_address_length)));
                 pptr += source_address_length;
                 li -= source_address_length;
                 source_address_number--;
@@ -1203,7 +1203,7 @@ esis_print(netdissect_options *ndo,
                 ND_PRINT((ndo, ", bad ish/li"));
                 return;
             }
-            ND_PRINT((ndo, "\n\t  NET (length: %u): %s", source_address_length, isonsap_string(pptr, source_address_length)));
+            ND_PRINT((ndo, "\n\t  NET (length: %u): %s", source_address_length, isonsap_string(ndo, pptr, source_address_length)));
             pptr += source_address_length;
             li -= source_address_length;
             break;
@@ -1949,11 +1949,7 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
                          const uint8_t *tptr, const char *ident, uint16_t afi)
 {
     char ident_buffer[20];
-#ifdef INET6
     uint8_t prefix[sizeof(struct in6_addr)]; /* shared copy buffer for IPv4 and IPv6 prefixes */
-#else
-    uint8_t prefix[sizeof(struct in_addr)]; /* shared copy buffer for IPv4 prefixes */
-#endif
     u_int metric, status_byte, bit_length, byte_length, sublen, processed, subtlvtype, subtlvlen;
 
     if (!ND_TTEST2(*tptr, 4))
@@ -1974,7 +1970,6 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
             return (0);
         }
         processed++;
-#ifdef INET6
     } else if (afi == AF_INET6) {
         if (!ND_TTEST2(*tptr, 1)) /* fetch status & prefix_len byte */
             return (0);
@@ -1987,7 +1982,6 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
             return (0);
         }
         processed+=2;
-#endif
     } else
         return (0); /* somebody is fooling us */
 
@@ -2005,13 +1999,11 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
                ident,
                ipaddr_string(ndo, prefix),
                bit_length));
-#ifdef INET6
-    if (afi == AF_INET6)
+    else if (afi == AF_INET6)
         ND_PRINT((ndo, "%sIPv6 prefix: %s/%u",
                ident,
                ip6addr_string(ndo, prefix),
                bit_length));
-#endif
 
     ND_PRINT((ndo, ", Distribution: %s, Metric: %u",
            ISIS_MASK_TLV_EXTD_IP_UPDOWN(status_byte) ? "down" : "up",
@@ -2019,17 +2011,13 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
 
     if (afi == AF_INET && ISIS_MASK_TLV_EXTD_IP_SUBTLV(status_byte))
         ND_PRINT((ndo, ", sub-TLVs present"));
-#ifdef INET6
-    if (afi == AF_INET6)
+    else if (afi == AF_INET6)
         ND_PRINT((ndo, ", %s%s",
                ISIS_MASK_TLV_EXTD_IP6_IE(status_byte) ? "External" : "Internal",
                ISIS_MASK_TLV_EXTD_IP6_SUBTLV(status_byte) ? ", sub-TLVs present" : ""));
-#endif
 
     if ((afi == AF_INET  && ISIS_MASK_TLV_EXTD_IP_SUBTLV(status_byte))
-#ifdef INET6
      || (afi == AF_INET6 && ISIS_MASK_TLV_EXTD_IP6_SUBTLV(status_byte))
-#endif
 	) {
         /* assume that one prefix can hold more
            than one subTLV - therefore the first byte must reflect
@@ -2450,7 +2438,7 @@ isis_print(netdissect_options *ndo,
                tlv_type,
                tlv_len));
 
-        if (tlv_len == 0) /* something is malformed */
+        if (tlv_len == 0) /* something is invalid */
 	    continue;
 
         /* now check if we have a decoder otherwise do a hexdump at the end*/
@@ -2462,7 +2450,7 @@ isis_print(netdissect_options *ndo,
 	    while (tmp && alen < tmp) {
 		ND_PRINT((ndo, "\n\t      Area address (length: %u): %s",
                        alen,
-                       isonsap_string(tptr, alen)));
+                       isonsap_string(ndo, tptr, alen)));
 		tptr += alen;
 		tmp -= alen + 1;
 		if (tmp==0) /* if this is the last area address do not attemt a boundary check */
@@ -2605,7 +2593,6 @@ isis_print(netdissect_options *ndo,
 	    }
 	    break;
 
-#ifdef INET6
 	case ISIS_TLV_IP6_REACH:
 	    while (tmp>0) {
                 ext_ip_len = isis_print_extd_ip_reach(ndo, tptr, "\n\t      ", AF_INET6);
@@ -2645,7 +2632,6 @@ isis_print(netdissect_options *ndo,
 		tmp -= sizeof(struct in6_addr);
 	    }
 	    break;
-#endif
 	case ISIS_TLV_AUTH:
 	    if (!ND_TTEST2(*tptr, 1))
 		goto trunctlv;
@@ -2670,7 +2656,7 @@ isis_print(netdissect_options *ndo,
 		    ND_PRINT((ndo, "%02x", *(tptr + i)));
 		}
 		if (tlv_len != ISIS_SUBTLV_AUTH_MD5_LEN+1)
-                    ND_PRINT((ndo, ", (malformed subTLV) "));
+                    ND_PRINT((ndo, ", (invalid subTLV) "));
 
 #ifdef HAVE_LIBCRYPTO
                 sigcheck = signature_verify(ndo, optr, length,
@@ -2916,7 +2902,7 @@ isis_print(netdissect_options *ndo,
                     tptr+=mt_len;
                     tmp-=mt_len;
 		} else {
-		    ND_PRINT((ndo, "\n\t      malformed MT-ID"));
+		    ND_PRINT((ndo, "\n\t      invalid MT-ID"));
 		    break;
 		}
 	    }
@@ -3020,7 +3006,7 @@ isis_print(netdissect_options *ndo,
                 if (!ND_TTEST2(*tptr, prefix_len / 2))
                     goto trunctlv;
                 ND_PRINT((ndo, "\n\t\tAddress: %s/%u",
-                       isonsap_string(tptr, prefix_len / 2), prefix_len * 4));
+                       isonsap_string(ndo, tptr, prefix_len / 2), prefix_len * 4));
                 tptr+=prefix_len/2;
                 tmp-=prefix_len/2;
             }
@@ -3092,9 +3078,8 @@ isis_print(netdissect_options *ndo,
 }
 
 static void
-osi_print_cksum(netdissect_options *ndo,
-                const uint8_t *pptr, uint16_t checksum,
-                    u_int checksum_offset, u_int length)
+osi_print_cksum(netdissect_options *ndo, const uint8_t *pptr,
+	        uint16_t checksum, int checksum_offset, int length)
 {
         uint16_t calculated_checksum;
 
@@ -3104,6 +3089,8 @@ osi_print_cksum(netdissect_options *ndo,
          * or the base pointer is not sane
          */
         if (!checksum
+            || length < 0
+            || checksum_offset < 0
             || length > ndo->ndo_snaplen
             || checksum_offset > ndo->ndo_snaplen
             || checksum_offset > length) {
