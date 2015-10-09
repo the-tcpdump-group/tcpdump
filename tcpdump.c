@@ -236,7 +236,8 @@ remap_to_pipe(pcap_dumper_t *dumper)
         error("Error creating pipe: '%s'\n", strerror(errno));
     }
 #ifdef HAVE_SETSOCKOPT
-    int bufsz = PIPEBUFSZ;
+    int bufsz;
+    bufsz = PIPEBUFSZ;
     if (0!= setsockopt(pipefd[0], SOL_SOCKET, SO_RCVBUF, &bufsz, sizeof(bufsz))) {
         warning("setsockopt SO_RCVBUF failed\n");
     }
@@ -1237,12 +1238,12 @@ main(int argc, char **argv)
         case OPTION_PIPEOUTPUT:
             pipeoutput = optarg;
             {
-                    int i=0, argc=0;
-                    compressor_arg[argc] = pipeoutput;
-                    for ( ; pipeoutput[i] != '\0'; ++i) {
-                            if (pipeoutput[i] == ' ') {
+                    int ii=0, cc=0;
+                    compressor_arg[cc] = pipeoutput;
+                    for ( ; pipeoutput[ii] != '\0'; ++i) {
+                            if (pipeoutput[ii] == ' ') {
                                     pipeoutput[i] = '\0';
-                                    compressor_arg[++argc] = &pipeoutput[i+1];
+                                    compressor_arg[++cc] = &pipeoutput[ii+1];
                             }
                     }
             }
