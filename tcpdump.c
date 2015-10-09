@@ -1883,7 +1883,7 @@ main(int argc, char **argv)
 	}
 	while (ret != NULL);
 #ifdef WITH_PIPEOUTPUT
-    if (dumpinfo.p) {
+    if (pipeoutput && dumpinfo.p) {
         pcap_dump_close(dumpinfo.p);
         dumpinfo.p = NULL;
         wait(NULL);
