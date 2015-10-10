@@ -311,3 +311,7 @@ unaligned-nfs-1	unaligned-nfs-1.pcap	unaligned-nfs-1.out	-t -v
 lisp_eid_notify		lisp_eid_notify.pcap	lisp_eid_notify.out	-t -v
 lisp_eid_register	lisp_eid_register.pcap	lisp_eid_register.out	-t -v
 lisp_ipv6_eid		lisp_ipv6.pcap		lisp_ipv6.out		-t -v
+
+# pcap invalid versions (first: version = 1.4 ; second: version = 2.5)
+pcap-invalid-version-1 pcap-invalid-version-1.pcap pcap-invalid-version-1.out -t
+pcap-invalid-version-2 pcap-invalid-version-2.pcap pcap-invalid-version-2.out -t
