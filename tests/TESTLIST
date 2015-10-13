@@ -45,6 +45,12 @@ lmp		lmp.pcap		lmp.out -t -T lmp
 # MPLS tests
 mpls-ldp-hello	mpls-ldp-hello.pcap	mpls-ldp-hello.out -t -v
 ldp_infloop	ldp-infinite-loop.pcap	ldp_infloop.out -t
+lspping-fec-ldp    lspping-fec-ldp.pcap lspping-fec-ldp.out -t
+lspping-fec-ldp-v  lspping-fec-ldp.pcap lspping-fec-ldp-v.out -t -v
+lspping-fec-ldp-vv lspping-fec-ldp.pcap lspping-fec-ldp-vv.out -t -vv
+lspping-fec-rsvp    lspping-fec-rsvp.pcap lspping-fec-rsvp.out -t
+lspping-fec-rsvp-v  lspping-fec-rsvp.pcap lspping-fec-rsvp-v.out -t -v
+lspping-fec-rsvp-vv lspping-fec-rsvp.pcap lspping-fec-rsvp-vv.out -t -vv
 
 # OSPF tests
 ospf-gmpls	ospf-gmpls.pcap				ospf-gmpls.out		-t -v
