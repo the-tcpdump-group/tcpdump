@@ -1555,7 +1555,7 @@ main(int argc, char **argv)
 		error("%s", pcap_geterr(pd));
 #ifdef HAVE_CAPSICUM
 	if (RFileName == NULL && VFileName == NULL) {
-		static const unsigned long cmds[] = { BIOCGSTATS };
+		static const unsigned long cmds[] = { BIOCGSTATS, BIOCROTZBUF };
 
 		cap_rights_init(&rights, CAP_IOCTL, CAP_READ);
 		if (cap_rights_limit(pcap_fileno(pd), &rights) < 0 &&
