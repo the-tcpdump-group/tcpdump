@@ -240,6 +240,8 @@ isis_poi2-v     isis_poi2.pcap                  isis_poi2.out           -t -v
 
 # RSVP tests
 rsvp_infloop-v	rsvp-infinite-loop.pcap		rsvp_infloop-v.out	-t -v
+# fuzzed pcap
+rsvp-inf-loop-2-v rsvp-inf-loop-2.pcap rsvp-inf-loop-2-v.out -t -v
 
 # HDLC tests
 hdlc1	chdlc-slarp.pcap	hdlc1.out	-t
