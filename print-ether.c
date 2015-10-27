@@ -189,7 +189,7 @@ recurse:
 			return (hdrlen + length);
 		}
 	        if (ndo->ndo_eflag) {
-	        	uint16_t tag = EXTRACT_16BITS(p);
+			uint16_t tag = EXTRACT_16BITS(p);
 
 			ND_PRINT((ndo, "%s, ", ieee8021q_tci_string(tag)));
 		}
@@ -239,9 +239,9 @@ recurse:
 
 /*
  * This is the top level routine of the printer.  'p' points
- * to the ether header of the packet, 'h->ts' is the timestamp,
- * 'h->len' is the length of the packet off the wire, and 'h->caplen'
- * is the number of bytes actually captured.
+ * to the ether header of the packet, 'h->len' is the length
+ * of the packet off the wire, and 'h->caplen' is the number
+ * of bytes actually captured.
  */
 u_int
 ether_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
@@ -252,9 +252,9 @@ ether_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 
 /*
  * This is the top level routine of the printer.  'p' points
- * to the ether header of the packet, 'h->ts' is the timestamp,
- * 'h->len' is the length of the packet off the wire, and 'h->caplen'
- * is the number of bytes actually captured.
+ * to the ether header of the packet, 'h->len' is the length
+ * of the packet off the wire, and 'h->caplen' is the number
+ * of bytes actually captured.
  *
  * This is for DLT_NETANALYZER, which has a 4-byte pseudo-header
  * before the Ethernet header.
@@ -277,9 +277,9 @@ netanalyzer_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 
 /*
  * This is the top level routine of the printer.  'p' points
- * to the ether header of the packet, 'h->ts' is the timestamp,
- * 'h->len' is the length of the packet off the wire, and 'h->caplen'
- * is the number of bytes actually captured.
+ * to the ether header of the packet, 'h->len' is the length
+ * of the packet off the wire, and 'h->caplen' is the number
+ * of bytes actually captured.
  *
  * This is for DLT_NETANALYZER_TRANSPARENT, which has a 4-byte
  * pseudo-header, a 7-byte Ethernet preamble, and a 1-byte Ethernet SOF
@@ -327,7 +327,7 @@ ethertype_print(netdissect_options *ndo,
 
 	case ETHERTYPE_ARP:
 	case ETHERTYPE_REVARP:
-  	        arp_print(ndo, p, length, caplen);
+	        arp_print(ndo, p, length, caplen);
 		return (1);
 
 	case ETHERTYPE_DN:
