@@ -86,7 +86,7 @@ zmtp1_print_frame(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 	if (cp[0] != 0xFF) {
 		header_len = 1; /* length */
 		body_len_declared = cp[0];
-		ND_PRINT((ndo, " frame flags+body  (8-bit) length %" PRIu64 "u", body_len_declared));
+		ND_PRINT((ndo, " frame flags+body  (8-bit) length %" PRIu64, body_len_declared));
 	} else {
 		header_len = 1 + 8; /* 0xFF, length */
 		ND_PRINT((ndo, " frame flags+body (64-bit) length"));
