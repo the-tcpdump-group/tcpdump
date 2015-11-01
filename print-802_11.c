@@ -2330,6 +2330,15 @@ struct ieee80211_radiotap_header {
  *	by bitset of flag values, followed by the MCS rate index as
  *	in IEEE 802.11n.
  *
+ *
+ * IEEE80211_RADIOTAP_AMPDU_STATUS	u32, u16, u8, u8	unitless
+ *
+ *	Contains the AMPDU information for the subframe.
+ *
+ * IEEE80211_RADIOTAP_VHT	u16, u8, u8, u8[4], u8, u8, u16
+ *
+ *	Contains VHT information about this frame.
+ *
  * IEEE80211_RADIOTAP_VENDOR_NAMESPACE
  *					uint8_t  OUI[3]
  *                                   uint8_t  subspace
@@ -2360,6 +2369,8 @@ enum ieee80211_radiotap_type {
 	/* NB: gap for netbsd definitions */
 	IEEE80211_RADIOTAP_XCHANNEL = 18,
 	IEEE80211_RADIOTAP_MCS = 19,
+	IEEE80211_RADIOTAP_AMPDU_STATUS = 20,
+	IEEE80211_RADIOTAP_VHT = 21,
 	IEEE80211_RADIOTAP_NAMESPACE = 29,
 	IEEE80211_RADIOTAP_VENDOR_NAMESPACE = 30,
 	IEEE80211_RADIOTAP_EXT = 31
@@ -2427,6 +2438,8 @@ enum ieee80211_radiotap_type {
 #define IEEE80211_RADIOTAP_MCS_HT_FORMAT_KNOWN		0x08
 #define IEEE80211_RADIOTAP_MCS_FEC_TYPE_KNOWN		0x10
 #define IEEE80211_RADIOTAP_MCS_STBC_KNOWN		0x20
+#define IEEE80211_RADIOTAP_MCS_NESS_KNOWN		0x40
+#define IEEE80211_RADIOTAP_MCS_NESS_BIT_1		0x80
 
 /* For IEEE80211_RADIOTAP_MCS flags */
 #define IEEE80211_RADIOTAP_MCS_BANDWIDTH_MASK	0x03
@@ -2442,6 +2455,43 @@ enum ieee80211_radiotap_type {
 #define		IEEE80211_RADIOTAP_MCS_STBC_2	2
 #define		IEEE80211_RADIOTAP_MCS_STBC_3	3
 #define IEEE80211_RADIOTAP_MCS_STBC_SHIFT	5
+#define IEEE80211_RADIOTAP_MCS_NESS_BIT_0	0x80
+
+/* For IEEE80211_RADIOTAP_AMPDU_STATUS */
+#define IEEE80211_RADIOTAP_AMPDU_REPORT_ZEROLEN		0x0001
+#define IEEE80211_RADIOTAP_AMPDU_IS_ZEROLEN		0x0002
+#define IEEE80211_RADIOTAP_AMPDU_LAST_KNOWN		0x0004
+#define IEEE80211_RADIOTAP_AMPDU_IS_LAST		0x0008
+#define IEEE80211_RADIOTAP_AMPDU_DELIM_CRC_ERR		0x0010
+#define IEEE80211_RADIOTAP_AMPDU_DELIM_CRC_KNOWN	0x0020
+
+/* For IEEE80211_RADIOTAP_VHT known */
+#define IEEE80211_RADIOTAP_VHT_STBC_KNOWN			0x0001
+#define IEEE80211_RADIOTAP_VHT_TXOP_PS_NA_KNOWN			0x0002
+#define IEEE80211_RADIOTAP_VHT_GUARD_INTERVAL_KNOWN		0x0004
+#define IEEE80211_RADIOTAP_VHT_SGI_NSYM_DIS_KNOWN		0x0008
+#define IEEE80211_RADIOTAP_VHT_LDPC_EXTRA_OFDM_SYM_KNOWN	0x0010
+#define IEEE80211_RADIOTAP_VHT_BEAMFORMED_KNOWN			0x0020
+#define IEEE80211_RADIOTAP_VHT_BANDWIDTH_KNOWN			0x0040
+#define IEEE80211_RADIOTAP_VHT_GROUP_ID_KNOWN			0x0080
+#define IEEE80211_RADIOTAP_VHT_PARTIAL_AID_KNOWN		0x0100
+
+/* For IEEE80211_RADIOTAP_VHT flags */
+#define IEEE80211_RADIOTAP_VHT_STBC			0x01
+#define IEEE80211_RADIOTAP_VHT_TXOP_PS_NA		0x02
+#define IEEE80211_RADIOTAP_VHT_SHORT_GI			0x04
+#define IEEE80211_RADIOTAP_VHT_SGI_NSYM_M10_9		0x08
+#define IEEE80211_RADIOTAP_VHT_LDPC_EXTRA_OFDM_SYM	0x10
+#define IEEE80211_RADIOTAP_VHT_BEAMFORMED		0x20
+
+#define IEEE80211_RADIOTAP_VHT_BANDWIDTH_MASK	0x1f
+
+#define IEEE80211_RADIOTAP_VHT_NSS_MASK		0x0f
+#define IEEE80211_RADIOTAP_VHT_MCS_MASK		0xf0
+#define IEEE80211_RADIOTAP_VHT_MCS_SHIFT	4
+
+#define IEEE80211_RADIOTAP_CODING_LDPC_USERn			0x01
+
 
 /* Radiotap state */
 /*  This is used to save state when parsing/processing parameters */
@@ -2534,7 +2584,9 @@ print_radiotap_field(netdissect_options *ndo,
 		uint16_t	u16;
 		uint32_t	u32;
 		uint64_t	u64;
-	} u, u2, u3, u4;
+	} u, u2, u3, u4, u5, u6;
+	uint8_t mcs_nss[4];
+	u_int i;
 	int rc;
 
 	switch (bit) {
@@ -2602,6 +2654,42 @@ print_radiotap_field(netdissect_options *ndo,
 		if (rc != 0)
 			break;
 		rc = cpack_uint8(s, &u3.u8);
+		break;
+	case IEEE80211_RADIOTAP_AMPDU_STATUS:
+		rc = cpack_uint32(s, &u.u32);
+		if (rc != 0)
+			break;
+		rc = cpack_uint16(s, &u2.u16);
+		if (rc != 0)
+			break;
+		rc = cpack_uint8(s, &u3.u8);
+		if (rc != 0)
+			break;
+		rc = cpack_uint8(s, &u4.u8);
+		break;
+	case IEEE80211_RADIOTAP_VHT:
+		rc = cpack_uint16(s, &u.u16);
+		if (rc != 0)
+			break;
+		rc = cpack_uint8(s, &u2.u8);
+		if (rc != 0)
+			break;
+		rc = cpack_uint8(s, &u3.u8);
+		if (rc != 0)
+			goto fail;
+		for (i = 0; i < 4; i++) {
+			rc = cpack_uint8(s, &mcs_nss[i]);
+			if (rc != 0)
+				goto fail;
+		}
+		rc = cpack_uint8(s, &u4.u8);
+		if (rc != 0)
+			break;
+		rc = cpack_uint8(s, &u5.u8);
+		if (rc != 0)
+			goto fail;
+		rc = cpack_uint16(s, &u6.u16);
+	fail:
 		break;
 	case IEEE80211_RADIOTAP_VENDOR_NAMESPACE: {
 		uint8_t vns[3];
@@ -2755,7 +2843,7 @@ print_radiotap_field(netdissect_options *ndo,
 		print_chaninfo(ndo, u2.u16, u.u32, presentflags);
 		break;
 	case IEEE80211_RADIOTAP_MCS: {
-		static const char *bandwidth[4] = {
+		static const char *ht_bandwidth[4] = {
 			"20 MHz",
 			"40 MHz",
 			"20 MHz (L)",
@@ -2812,7 +2900,7 @@ print_radiotap_field(netdissect_options *ndo,
 		}
 		if (u.u8 & IEEE80211_RADIOTAP_MCS_BANDWIDTH_KNOWN) {
 			ND_PRINT((ndo, "%s ",
-				bandwidth[u2.u8 & IEEE80211_RADIOTAP_MCS_BANDWIDTH_MASK]));
+				ht_bandwidth[u2.u8 & IEEE80211_RADIOTAP_MCS_BANDWIDTH_MASK]));
 		}
 		if (u.u8 & IEEE80211_RADIOTAP_MCS_GUARD_INTERVAL_KNOWN) {
 			ND_PRINT((ndo, "%s GI ",
@@ -2834,6 +2922,68 @@ print_radiotap_field(netdissect_options *ndo,
 				(u2.u8 & IEEE80211_RADIOTAP_MCS_STBC_MASK) >> IEEE80211_RADIOTAP_MCS_STBC_SHIFT));
 		}
 
+		break;
+		}
+	case IEEE80211_RADIOTAP_AMPDU_STATUS:
+		break;
+	case IEEE80211_RADIOTAP_VHT: {
+		static const char *vht_bandwidth[32] = {
+			"20 MHz",
+			"40 MHz",
+			"20 MHz (L)",
+			"20 MHz (U)",
+			"80 MHz",
+			"80 MHz (L)",
+			"80 MHz (U)",
+			"80 MHz (LL)",
+			"80 MHz (LU)",
+			"80 MHz (UL)",
+			"80 MHz (UU)",
+			"160 MHz",
+			"160 MHz (L)",
+			"160 MHz (U)",
+			"160 MHz (LL)",
+			"160 MHz (LU)",
+			"160 MHz (UL)",
+			"160 MHz (UU)",
+			"160 MHz (LLL)",
+			"160 MHz (LLU)",
+			"160 MHz (LUL)",
+			"160 MHz (UUU)",
+			"160 MHz (ULL)",
+			"160 MHz (ULU)",
+			"160 MHz (UUL)",
+			"160 MHz (UUU)"
+			"unknown (26)",
+			"unknown (27)",
+			"unknown (28)",
+			"unknown (29)",
+			"unknown (30)",
+			"unknown (31)"
+		};
+
+		for (i = 0; i < 4; i++) {
+			u_int nss, mcs;
+			nss = mcs_nss[i] & IEEE80211_RADIOTAP_VHT_NSS_MASK;
+			mcs = (mcs_nss[i] & IEEE80211_RADIOTAP_VHT_MCS_MASK) >> IEEE80211_RADIOTAP_VHT_MCS_SHIFT;
+
+			if (nss == 0)
+				continue;
+
+			ND_PRINT((ndo, "User %u MCS %u ", i, mcs));
+			ND_PRINT((ndo, "%s FEC ",
+				(u4.u8 & (IEEE80211_RADIOTAP_CODING_LDPC_USERn << i)) ?
+				"LDPC" : "BCC"));
+		}
+		if (u.u16 & IEEE80211_RADIOTAP_VHT_BANDWIDTH_KNOWN) {
+			ND_PRINT((ndo, "%s ",
+				vht_bandwidth[u3.u8 & IEEE80211_RADIOTAP_VHT_BANDWIDTH_MASK]));
+		}
+		if (u.u16 & IEEE80211_RADIOTAP_VHT_GUARD_INTERVAL_KNOWN) {
+			ND_PRINT((ndo, "%s GI ",
+				(u2.u8 & IEEE80211_RADIOTAP_VHT_SHORT_GI) ?
+				"short" : "long"));
+		}
 		break;
 		}
 	}
