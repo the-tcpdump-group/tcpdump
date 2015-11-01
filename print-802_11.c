@@ -2953,7 +2953,7 @@ print_radiotap_field(netdissect_options *ndo,
 			"160 MHz (ULL)",
 			"160 MHz (ULU)",
 			"160 MHz (UUL)",
-			"160 MHz (UUU)"
+			"160 MHz (UUU)",
 			"unknown (26)",
 			"unknown (27)",
 			"unknown (28)",
