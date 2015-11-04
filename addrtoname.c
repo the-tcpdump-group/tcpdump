@@ -60,6 +60,7 @@ extern int ether_ntohost(char *, const struct ether_addr *);
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "addrtostr.h"
+#include "ethertype.h"
 #include "llc.h"
 #include "setsignal.h"
 #include "extract.h"
@@ -777,16 +778,32 @@ init_servarray(netdissect_options *ndo)
 	endservent();
 }
 
-/* in libpcap.a (nametoaddr.c) */
-#if defined(_WIN32) && !defined(USE_STATIC_LIBPCAP)
-extern __declspec(dllimport)
-#else
-extern
-#endif
-const struct eproto {
+static const struct eproto {
 	const char *s;
 	u_short p;
-} eproto_db[];
+} eproto_db[] = {
+	{ "pup", ETHERTYPE_PUP },
+	{ "xns", ETHERTYPE_NS },
+	{ "ip", ETHERTYPE_IP },
+	{ "ip6", ETHERTYPE_IPV6 },
+	{ "arp", ETHERTYPE_ARP },
+	{ "rarp", ETHERTYPE_REVARP },
+	{ "sprite", ETHERTYPE_SPRITE },
+	{ "mopdl", ETHERTYPE_MOPDL },
+	{ "moprc", ETHERTYPE_MOPRC },
+	{ "decnet", ETHERTYPE_DN },
+	{ "lat", ETHERTYPE_LAT },
+	{ "sca", ETHERTYPE_SCA },
+	{ "lanbridge", ETHERTYPE_LANBRIDGE },
+	{ "vexp", ETHERTYPE_VEXP },
+	{ "vprod", ETHERTYPE_VPROD },
+	{ "atalk", ETHERTYPE_ATALK },
+	{ "atalkarp", ETHERTYPE_AARP },
+	{ "loopback", ETHERTYPE_LOOPBACK },
+	{ "decdts", ETHERTYPE_DECDTS },
+	{ "decdns", ETHERTYPE_DECDNS },
+	{ (char *)0, 0 }
+};
 
 static void
 init_eprotoarray(netdissect_options *ndo)
