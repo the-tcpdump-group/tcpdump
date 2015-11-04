@@ -561,7 +561,7 @@ struct isis_tlv_ptp_adj {
     uint8_t neighbor_extd_local_circuit_id[4];
 };
 
-static void osi_print_cksum(netdissect_options *, const uint8_t *pptr,
+static int osi_print_cksum(netdissect_options *, const uint8_t *pptr,
 			    uint16_t checksum, int checksum_offset, int length);
 static int clnp_print(netdissect_options *, const uint8_t *, u_int);
 static void esis_print(netdissect_options *, const uint8_t *, u_int);
@@ -666,8 +666,9 @@ struct isis_tlv_lsp {
 #define ISIS_CSNP_HEADER_SIZE (sizeof(struct isis_csnp_header))
 #define ISIS_PSNP_HEADER_SIZE (sizeof(struct isis_psnp_header))
 
-void isoclns_print(netdissect_options *ndo,
-                   const uint8_t *p, u_int length, u_int caplen)
+void
+isoclns_print(netdissect_options *ndo,
+              const uint8_t *p, u_int length, u_int caplen)
 {
 	if (caplen <= 1) { /* enough bytes on the wire ? */
 		ND_PRINT((ndo, "|OSI"));
@@ -825,8 +826,9 @@ clnp_print(netdissect_options *ndo,
                EXTRACT_16BITS(clnp_header->segment_length),
                EXTRACT_16BITS(clnp_header->cksum)));
 
-        osi_print_cksum(ndo, optr, EXTRACT_16BITS(clnp_header->cksum), 7,
-                        clnp_header->length_indicator);
+        if (osi_print_cksum(ndo, optr, EXTRACT_16BITS(clnp_header->cksum), 7,
+                            clnp_header->length_indicator) == 0)
+                goto trunc;
 
         ND_PRINT((ndo, "\n\tFlags [%s]",
                bittok2str(clnp_flag_values, "none", clnp_flags)));
@@ -1080,7 +1082,8 @@ esis_print(netdissect_options *ndo,
         ND_PRINT((ndo, ", v: %u%s", esis_header->version, esis_header->version == ESIS_VERSION ? "" : "unsupported" ));
         ND_PRINT((ndo, ", checksum: 0x%04x", EXTRACT_16BITS(esis_header->cksum)));
 
-        osi_print_cksum(ndo, pptr, EXTRACT_16BITS(esis_header->cksum), 7, li);
+        if (osi_print_cksum(ndo, pptr, EXTRACT_16BITS(esis_header->cksum), 7, li) == 0)
+                goto trunc;
 
         ND_PRINT((ndo, ", holding time: %us, length indicator: %u",
                   EXTRACT_16BITS(esis_header->holdtime), li));
@@ -1864,8 +1867,6 @@ isis_print_is_reach_subtlv(netdissect_options *ndo,
         return(1);
 
 trunc:
-    ND_PRINT((ndo, "%s", ident));
-    ND_PRINT((ndo, "%s", tstr));
     return(0);
 }
 
@@ -2331,8 +2332,10 @@ isis_print(netdissect_options *ndo,
                EXTRACT_16BITS(header_lsp->checksum)));
 
 
-        osi_print_cksum(ndo, (uint8_t *)header_lsp->lsp_id,
-                        EXTRACT_16BITS(header_lsp->checksum), 12, length-12);
+        if (osi_print_cksum(ndo, (uint8_t *)header_lsp->lsp_id,
+                            EXTRACT_16BITS(header_lsp->checksum),
+                            12, length-12) == 0)
+                                goto trunc;
 
         /*
          * Clear checksum and lifetime prior to signature verification.
@@ -2894,7 +2897,9 @@ isis_print(netdissect_options *ndo,
              * to avoid conflicts the checksum TLV is zeroed.
              * see rfc3358 for details
              */
-            osi_print_cksum(ndo, optr, EXTRACT_16BITS(tptr), tptr-optr, length);
+            if (osi_print_cksum(ndo, optr, EXTRACT_16BITS(tptr), tptr-optr,
+                length) == 0)
+                    goto trunc;
 	    break;
 
 	case ISIS_TLV_MT_SUPPORTED:
@@ -3086,7 +3091,7 @@ isis_print(netdissect_options *ndo,
     return(1);
 }
 
-static void
+static int
 osi_print_cksum(netdissect_options *ndo, const uint8_t *pptr,
 	        uint16_t checksum, int checksum_offset, int length)
 {
@@ -3104,23 +3109,22 @@ osi_print_cksum(netdissect_options *ndo, const uint8_t *pptr,
             || checksum_offset > ndo->ndo_snaplen
             || checksum_offset > length) {
                 ND_PRINT((ndo, " (unverified)"));
+                return 1;
         } else {
-                unsigned char *truncated = "trunc";
 #if 0
                 printf("\nosi_print_cksum: %p %u %u %u\n", pptr, checksum_offset, length, ndo->ndo_snaplen);
-                ND_TCHECK2(pptr, checksum_offset+length);
 #endif
+                ND_TCHECK2(*pptr, length);
                 calculated_checksum = create_osi_cksum(pptr, checksum_offset, length);
                 if (checksum == calculated_checksum) {
                         ND_PRINT((ndo, " (correct)"));
                 } else {
-                        truncated = "incorrect";
-#if 0
-                        trunc:
-#endif
-                        ND_PRINT((ndo, " (%s should be 0x%04x)", truncated, calculated_checksum));
+                        ND_PRINT((ndo, " (incorrect should be 0x%04x)", calculated_checksum));
                 }
+                return 1;
         }
+trunc:
+        return 0;
 }
 
 /*
