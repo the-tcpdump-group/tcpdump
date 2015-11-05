@@ -246,6 +246,7 @@ isis_4-v	ISIS_p2p_adjacency.pcap		isis_4-v.out	-t -v
 # fuzzed pcap
 isis-seg-fault-1-v isis-seg-fault-1.pcap isis-seg-fault-1-v.out -t -v
 isis-seg-fault-2-v isis-seg-fault-2.pcap isis-seg-fault-2-v.out -t -v
+isis-seg-fault-3-v isis-seg-fault-3.pcap isis-seg-fault-3-v.out -t -v
 
 # RSVP tests
 rsvp_infloop-v	rsvp-infinite-loop.pcap		rsvp_infloop-v.out	-t -v
