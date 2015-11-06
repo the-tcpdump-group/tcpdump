@@ -29,6 +29,7 @@
 #include "af.h"
 #include "signature.h"
 
+static const char tstr[] = " [|rsvp]";
 static const char istr[] = " (invalid)";
 
 /*
@@ -498,6 +499,7 @@ rsvp_intserv_print(netdissect_options *ndo,
     if (obj_tlen < 4)
         return 0;
     parameter_id = *(tptr);
+    ND_TCHECK2(*(tptr + 2), 2);
     parameter_length = EXTRACT_16BITS(tptr+2)<<2; /* convert wordcount to bytecount */
 
     ND_PRINT((ndo, "\n\t      Parameter ID: %s (%u), length: %u, Flags: [0x%02x]",
@@ -519,6 +521,7 @@ rsvp_intserv_print(netdissect_options *ndo,
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         */
         if (parameter_length == 4)
+	    ND_TCHECK2(*(tptr + 4), 4);
             ND_PRINT((ndo, "\n\t\tIS hop count: %u", EXTRACT_32BITS(tptr + 4)));
         break;
 
@@ -531,6 +534,7 @@ rsvp_intserv_print(netdissect_options *ndo,
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         */
         if (parameter_length == 4) {
+	    ND_TCHECK2(*(tptr + 4), 4);
             bw.i = EXTRACT_32BITS(tptr+4);
             ND_PRINT((ndo, "\n\t\tPath b/w estimate: %.10g Mbps", bw.f / 125000));
         }
@@ -545,6 +549,7 @@ rsvp_intserv_print(netdissect_options *ndo,
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         */
         if (parameter_length == 4) {
+	    ND_TCHECK2(*(tptr + 4), 4);
             ND_PRINT((ndo, "\n\t\tMinimum path latency: "));
             if (EXTRACT_32BITS(tptr+4) == 0xffffffff)
                 ND_PRINT((ndo, "don't care"));
@@ -563,6 +568,7 @@ rsvp_intserv_print(netdissect_options *ndo,
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         */
         if (parameter_length == 4)
+	    ND_TCHECK2(*(tptr + 4), 4);
             ND_PRINT((ndo, "\n\t\tComposed MTU: %u bytes", EXTRACT_32BITS(tptr + 4)));
         break;
     case 127:
@@ -583,6 +589,7 @@ rsvp_intserv_print(netdissect_options *ndo,
         */
 
         if (parameter_length == 20) {
+	    ND_TCHECK2(*(tptr + 4), 20);
             bw.i = EXTRACT_32BITS(tptr+4);
             ND_PRINT((ndo, "\n\t\tToken Bucket Rate: %.10g Mbps", bw.f / 125000));
             bw.i = EXTRACT_32BITS(tptr+8);
@@ -606,6 +613,7 @@ rsvp_intserv_print(netdissect_options *ndo,
         */
 
         if (parameter_length == 8) {
+	    ND_TCHECK2(*(tptr + 4), 8);
             bw.i = EXTRACT_32BITS(tptr+4);
             ND_PRINT((ndo, "\n\t\tRate: %.10g Mbps", bw.f / 125000));
             ND_PRINT((ndo, "\n\t\tSlack Term: %u", EXTRACT_32BITS(tptr + 8)));
@@ -617,6 +625,7 @@ rsvp_intserv_print(netdissect_options *ndo,
     case 135:
     case 136:
         if (parameter_length == 4)
+	    ND_TCHECK2(*(tptr + 4), 4);
             ND_PRINT((ndo, "\n\t\tValue: %u", EXTRACT_32BITS(tptr + 4)));
         break;
 
@@ -625,11 +634,15 @@ rsvp_intserv_print(netdissect_options *ndo,
             print_unknown_data(ndo, tptr + 4, "\n\t\t", parameter_length);
     }
     return (parameter_length+4); /* header length 4 bytes */
+
+trunc:
+    ND_PRINT((ndo, "%s", tstr));
+    return 0;
 }
 
 static int
 rsvp_obj_print(netdissect_options *ndo,
-                const u_char *pptr
+               const u_char *pptr
 #ifndef HAVE_LIBCRYPTO
 _U_
 #endif
@@ -1778,7 +1791,8 @@ invalid:
     ND_PRINT((ndo, "%s", istr));
     return -1;
 trunc:
-    ND_PRINT((ndo, "\n\t\t packet exceeded snapshot"));
+    ND_PRINT((ndo, "\n\t\t"));
+    ND_PRINT((ndo, "%s", tstr));
     return -1;
 }
 
@@ -1920,5 +1934,6 @@ rsvp_print(netdissect_options *ndo,
 
     return;
 trunc:
-    ND_PRINT((ndo, "\n\t\t packet exceeded snapshot"));
+    ND_PRINT((ndo, "\n\t\t"));
+    ND_PRINT((ndo, "%s", tstr));
 }
