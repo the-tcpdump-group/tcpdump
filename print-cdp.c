@@ -169,9 +169,11 @@ cdp_print(netdissect_options *ndo,
 			ND_PRINT((ndo, "\n\t  "));
 			for (i=0;i<len;i++) {
 			    j = *(tptr+i);
-			    ND_PRINT((ndo, "%c", j));
-			    if (j == 0x0a) /* lets rework the version string to get a nice indentation */
-				ND_PRINT((ndo, "\t  "));
+			    if (j == '\n') /* lets rework the version string to
+					      get a nice indentation */
+				ND_PRINT((ndo, "\n\t  "));
+			    else
+				fn_print_char(ndo, j);
 			}
 			break;
 		    case 0x06: /* Platform */

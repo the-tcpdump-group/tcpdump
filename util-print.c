@@ -67,6 +67,23 @@ int32_t thiszone;		/* seconds offset from gmt to local time */
 #define TOKBUFSIZE 128
 
 /*
+ * Print out a character, filtering out the non-printable ones
+ */
+void
+fn_print_char(netdissect_options *ndo, u_char c)
+{
+	if (!ND_ISASCII(c)) {
+		c = ND_TOASCII(c);
+		ND_PRINT((ndo, "M-"));
+	}
+	if (!ND_ISPRINT(c)) {
+		c ^= 0x40;	/* DEL to ?, others to alpha */
+		ND_PRINT((ndo, "^"));
+	}
+	ND_PRINT((ndo, "%c", c));
+}
+
+/*
  * Print out a null-terminated filename (or other ascii string).
  * If ep is NULL, assume no truncation check is needed.
  * Return true if truncated.
