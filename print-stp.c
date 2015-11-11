@@ -284,12 +284,14 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
     ND_TCHECK_16BITS(ptr + MST_BPDU_VER3_LEN_OFFSET);
     ND_PRINT((ndo, "\n\tv3len %d, ", EXTRACT_16BITS(ptr + MST_BPDU_VER3_LEN_OFFSET)));
     ND_TCHECK_32BITS(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 12);
-    ND_PRINT((ndo, "MCID Name %s, rev %u, "
+    ND_PRINT((ndo, "MCID Name "));
+    if (fn_printzp(ndo, ptr + MST_BPDU_CONFIG_NAME_OFFSET, 32, ndo->ndo_snapend))
+	goto trunc;
+    ND_PRINT((ndo, ", rev %u, "
             "\n\t\tdigest %08x%08x%08x%08x, ",
-            ptr + MST_BPDU_CONFIG_NAME_OFFSET,
 	          EXTRACT_16BITS(ptr + MST_BPDU_CONFIG_NAME_OFFSET + 32),
-      	    EXTRACT_32BITS(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET),
-        	  EXTRACT_32BITS(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 4),
+	          EXTRACT_32BITS(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET),
+	          EXTRACT_32BITS(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 4),
 	          EXTRACT_32BITS(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 8),
 	          EXTRACT_32BITS(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 12)));
 
@@ -355,12 +357,14 @@ stp_print_spb_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
     }
 
     ptr = (const u_char *)stp_bpdu;
-    if (!ND_TTEST_32BITS(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET+16))
-        return 0;
+    ND_TCHECK_32BITS(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET + 16);
 
-    ND_PRINT((ndo, "\n\tv4len %d AUXMCID Name %s, Rev %u, \n\t\tdigest %08x%08x%08x%08x",
-            EXTRACT_16BITS (ptr + offset),
-            ptr + offset + SPB_BPDU_CONFIG_NAME_OFFSET,
+    ND_PRINT((ndo, "\n\tv4len %d, ", EXTRACT_16BITS (ptr + offset)));
+    ND_PRINT((ndo, "AUXMCID Name "));
+    if (fn_printzp(ndo, ptr + offset + SPB_BPDU_CONFIG_NAME_OFFSET, 32,
+		   ndo->ndo_snapend))
+	goto trunc;
+    ND_PRINT((ndo, ", Rev %u, \n\t\tdigest %08x%08x%08x%08x",
             EXTRACT_16BITS(ptr + offset + SPB_BPDU_CONFIG_REV_OFFSET),
             EXTRACT_32BITS(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET),
             EXTRACT_32BITS(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET + 4),
@@ -386,6 +390,9 @@ stp_print_spb_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
             EXTRACT_32BITS(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET+12),
             EXTRACT_32BITS(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET+16)));
     return 1;
+
+trunc:
+    return 0;
 }
 
 /*
@@ -490,7 +497,7 @@ stp_print(netdissect_options *ndo, const u_char *p, u_int length)
     }
 
     return;
- trunc:
+trunc:
     ND_PRINT((ndo, "[|stp %d]", length));
 }
 

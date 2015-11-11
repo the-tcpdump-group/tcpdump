@@ -127,6 +127,7 @@ spb	            spb.pcap	            spb.out -t
 
 # SPB BPDUv4 tests
 spb_bpduv4      spb_bpduv4.pcap       spb_bpduv4.out -t
+spb_bpduv4-v	spb_bpduv4.pcap       spb_bpduv4-v.out -t -v
 
 # DCB Tests
 dcb_ets         dcb_ets.pcap          dcb_ets.out   -t -vv
