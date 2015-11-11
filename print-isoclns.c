@@ -1304,12 +1304,8 @@ isis_print_mcid(netdissect_options *ndo,
   ND_TCHECK(*mcid);
   ND_PRINT((ndo,  "ID: %d, Name: ", mcid->format_id));
 
-  for(i=0; i<32; i++)
-  {
-    ND_PRINT((ndo, "%c", mcid->name[i]));
-    if(mcid->name[i] == '\0')
-        break;
-  }
+  if (fn_printzp(ndo, mcid->name, 32, ndo->ndo_snapend))
+    goto trunc;
 
   ND_PRINT((ndo, "\n\t              Lvl: %d", EXTRACT_16BITS(mcid->revision_lvl)));
 
@@ -1871,7 +1867,6 @@ trunc:
     return(0);
 }
 
-
 /*
  * this is the common IS-REACH decoder it is called
  * from various EXTD-IS REACH style TLVs (22,24,222)
@@ -2320,7 +2315,6 @@ isis_print(netdissect_options *ndo,
                EXTRACT_16BITS(header_lsp->remaining_lifetime),
                EXTRACT_16BITS(header_lsp->checksum)));
 
-
         if (osi_print_cksum(ndo, (uint8_t *)header_lsp->lsp_id,
                             EXTRACT_16BITS(header_lsp->checksum),
                             12, length-12) == 0)
@@ -2333,7 +2327,6 @@ isis_print(netdissect_options *ndo,
         header_lsp->checksum[1] = 0;
         header_lsp->remaining_lifetime[0] = 0;
         header_lsp->remaining_lifetime[1] = 0;
-
 
 	ND_PRINT((ndo, ", PDU length: %u, Flags: [ %s",
                pdu_len,
@@ -2656,11 +2649,8 @@ isis_print(netdissect_options *ndo,
 
 	    switch (*tptr) {
 	    case ISIS_SUBTLV_AUTH_SIMPLE:
-		for(i=1;i<tlv_len;i++) {
-		    if (!ND_TTEST2(*(tptr + i), 1))
-			goto trunctlv;
-		    ND_PRINT((ndo, "%c", *(tptr + i)));
-		}
+		if (fn_printzp(ndo, tptr + 1, tlv_len - 1, ndo->ndo_snapend))
+		    goto trunctlv;
 		break;
 	    case ISIS_SUBTLV_AUTH_MD5:
 		for(i=1;i<tlv_len;i++) {
@@ -2803,12 +2793,8 @@ isis_print(netdissect_options *ndo,
 
 	case ISIS_TLV_HOSTNAME:
 	    ND_PRINT((ndo, "\n\t      Hostname: "));
-	    while (tmp>0) {
-		if (!ND_TTEST2(*tptr, 1))
-		    goto trunctlv;
-		ND_PRINT((ndo, "%c", *tptr++));
-                tmp--;
-	    }
+	    if (fn_printzp(ndo, tptr, tmp, ndo->ndo_snapend))
+		goto trunctlv;
 	    break;
 
 	case ISIS_TLV_SHARED_RISK_GROUP:
