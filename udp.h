@@ -263,6 +263,9 @@ struct udphdr {
 #ifndef VXLAN_PORT
 #define VXLAN_PORT			4789	/* RFC 7348 */
 #endif
+#ifndef VXLAN_GPE_PORT
+#define VXLAN_GPE_PORT			4790	/* draft-ietf-nvo3-vxlan-gpe-01 */
+#endif
 #ifndef SIP_DS_PORT
 #define SIP_DS_PORT			5059	/*XXX*/
 #endif
