@@ -235,7 +235,6 @@ trunc:
 #define SPB_BPDU_AGREEMENT_RES2_OFFSET    SPB_BPDU_AGREEMENT_RES1_OFFSET + 4
 #define SPB_BPDU_AGREEMENT_DIGEST_OFFSET  SPB_BPDU_AGREEMENT_RES2_OFFSET + 4
 
-
 static int
 stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
                     u_int length)
@@ -262,7 +261,7 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
                    RSTP_EXTRACT_PORT_ROLE(stp_bpdu->flags))));
 
     ND_TCHECK(stp_bpdu->root_path_cost);
-    ND_PRINT((ndo, "CIST root-id %s, CIST ext-pathcost %u ",
+    ND_PRINT((ndo, "CIST root-id %s, CIST ext-pathcost %u",
            stp_print_bridge_id((const u_char *)&stp_bpdu->root_id),
            EXTRACT_32BITS(&stp_bpdu->root_path_cost)));
 
@@ -271,7 +270,7 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
            stp_print_bridge_id((const u_char *)&stp_bpdu->bridge_id)));
 
     ND_TCHECK(stp_bpdu->port_id);
-    ND_PRINT((ndo, "CIST port-id %04x, ", EXTRACT_16BITS(&stp_bpdu->port_id)));
+    ND_PRINT((ndo, "CIST port-id %04x,", EXTRACT_16BITS(&stp_bpdu->port_id)));
 
     ND_TCHECK(stp_bpdu->forward_delay);
     ND_PRINT((ndo, "\n\tmessage-age %.2fs, max-age %.2fs"
@@ -287,7 +286,7 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
     ND_PRINT((ndo, "MCID Name "));
     if (fn_printzp(ndo, ptr + MST_BPDU_CONFIG_NAME_OFFSET, 32, ndo->ndo_snapend))
 	goto trunc;
-    ND_PRINT((ndo, ", rev %u, "
+    ND_PRINT((ndo, ", rev %u,"
             "\n\t\tdigest %08x%08x%08x%08x, ",
 	          EXTRACT_16BITS(ptr + MST_BPDU_CONFIG_NAME_OFFSET + 32),
 	          EXTRACT_32BITS(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET),
@@ -296,7 +295,7 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
 	          EXTRACT_32BITS(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 12)));
 
     ND_TCHECK_32BITS(ptr + MST_BPDU_CIST_INT_PATH_COST_OFFSET);
-    ND_PRINT((ndo, "CIST int-root-pathcost %u, ",
+    ND_PRINT((ndo, "CIST int-root-pathcost %u,",
             EXTRACT_32BITS(ptr + MST_BPDU_CIST_INT_PATH_COST_OFFSET)));
 
     ND_TCHECK_BRIDGE_ID(ptr + MST_BPDU_CIST_BRIDGE_ID_OFFSET);
@@ -364,7 +363,7 @@ stp_print_spb_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
     if (fn_printzp(ndo, ptr + offset + SPB_BPDU_CONFIG_NAME_OFFSET, 32,
 		   ndo->ndo_snapend))
 	goto trunc;
-    ND_PRINT((ndo, ", Rev %u, \n\t\tdigest %08x%08x%08x%08x",
+    ND_PRINT((ndo, ", Rev %u,\n\t\tdigest %08x%08x%08x%08x",
             EXTRACT_16BITS(ptr + offset + SPB_BPDU_CONFIG_REV_OFFSET),
             EXTRACT_32BITS(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET),
             EXTRACT_32BITS(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET + 4),
@@ -372,8 +371,8 @@ stp_print_spb_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
             EXTRACT_32BITS(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET + 12)));
 
     ND_PRINT((ndo, "\n\tAgreement num %d, Discarded Agreement num %d, Agreement valid-"
-            "flag %d, \n\tRestricted role-flag: %d, Format id %d cap %d, "
-            "Convention id %d cap %d, \n\tEdge count %d, "
+            "flag %d,\n\tRestricted role-flag: %d, Format id %d cap %d, "
+            "Convention id %d cap %d,\n\tEdge count %d, "
             "Agreement digest %08x%08x%08x%08x%08x\n",
             ptr[offset + SPB_BPDU_AGREEMENT_OFFSET]>>6,
             ptr[offset + SPB_BPDU_AGREEMENT_OFFSET]>>4 & 0x3,
