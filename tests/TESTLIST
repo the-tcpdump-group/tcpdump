@@ -410,3 +410,8 @@ arp-too-long-tha	arp-too-long-tha.pcap	arp-too-long-tha.out	-t -v -n
 juniper_header-heapoverflow	juniper_header-heapoverflow.pcap	juniper_header-heapoverflow.out	-t -v -n
 tftp-heapoverflow	tftp-heapoverflow.pcap	tftp-heapoverflow.out	-t -v -n
 relts-0x80000000	relts-0x80000000.pcap	relts-0x80000000.out	-t -v -n
+
+# RTP tests
+# fuzzed pcap
+rtp-seg-fault-1  rtp-seg-fault-1.pcap  rtp-seg-fault-1.out  -t -v -T rtp
+rtp-seg-fault-2  rtp-seg-fault-2.pcap  rtp-seg-fault-2.out  -t -v -T rtp
