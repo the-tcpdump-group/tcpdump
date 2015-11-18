@@ -114,39 +114,25 @@ strtoaddr(const char *src, void *dst)
 	if (c != '\0' && !isspace(c))
 		return (0);
 	/*
-	 * Concoct the address according to
-	 * the number of parts specified.
+	 * Find the number of parts specified.
+	 * It must be 4; we only support dotted quads, we don't
+	 * support shorthand.
 	 */
 	n = pp - parts + 1;
-	/* Takes dotted-quad only.  it does not take shorthand. */
 	if (n != 4)
 		return (0);
-	switch (n) {
-
-	case 0:
-		return (0);		/* initial nondigit */
-
-	case 1:				/* a -- 32 bits */
-		break;
-
-	case 2:				/* a.b -- 8.24 bits */
-		if (parts[0] > 0xff || val > 0xffffff)
-			return (0);
-		val |= parts[0] << 24;
-		break;
-
-	case 3:				/* a.b.c -- 8.8.16 bits */
-		if ((parts[0] | parts[1]) > 0xff || val > 0xffff)
-			return (0);
-		val |= (parts[0] << 24) | (parts[1] << 16);
-		break;
-
-	case 4:				/* a.b.c.d -- 8.8.8.8 bits */
-		if ((parts[0] | parts[1] | parts[2] | val) > 0xff)
-			return (0);
-		val |= (parts[0] << 24) | (parts[1] << 16) | (parts[2] << 8);
-		break;
-	}
+	/*
+	 * parts[0-2] were set to the first 3 parts of the address;
+	 * val was set to the 4th part.
+	 *
+	 * Check if any part is bigger than 255.
+	 */
+	if ((parts[0] | parts[1] | parts[2] | val) > 0xff)
+		return (0);
+	/*
+	 * Add the other three parts to val.
+	 */
+	val |= (parts[0] << 24) | (parts[1] << 16) | (parts[2] << 8);
 	if (dst) {
 		val = htonl(val);
 		memcpy(dst, &val, NS_INADDRSZ);
