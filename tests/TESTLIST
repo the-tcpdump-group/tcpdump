@@ -279,6 +279,8 @@ cdp-v		3560_CDP.pcap		cdp-v.out		-t -v
 udld-v		UDLD.pcap		udld-v.out		-t -v
 lldp_mud-v	lldp_mudurl.pcap	lldp_mudurl-v.out	-t -e -v
 lldp_mud-vv	lldp_mudurl.pcap	lldp_mudurl-vv.out	-t -e -vv
+# fuzzed pcap
+udld-inf-loop-1-v  udld-inf-loop-1.pcap  udld-inf-loop-1-v.out  -t -v
 
 # EIGRP tests
 eigrp1-v	EIGRP_adjacency.pcap	eigrp1-v.out	-t -v
