@@ -93,7 +93,6 @@
  *  +-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -108,6 +107,9 @@
 
 #include "extract.h"
 #include "addrtoname.h"
+
+static const char tstr[] = " [|LISP]";
+static const char istr[] = " (invalid)";
 
 #define IPv4_AFI			1
 #define IPv6_AFI			2
@@ -278,7 +280,7 @@ void lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	packet_offset += auth_data_len;
 
 	if (record_count == 0)
-		goto malformed;
+		goto invalid;
 
 	/* Print all the EID records */
 	while ((length > packet_offset) && (record_count--)) {
@@ -359,13 +361,13 @@ void lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	}
 
 	/*
-	 * Print xTR and Site ID. Handle the fact that the packet could be malformed.
+	 * Print xTR and Site ID. Handle the fact that the packet could be invalid.
 	 * If the xTR_ID_Present bit is not set, and we still have data to display,
 	 * show it as hex data.
 	 */
 	if (xtr_present) {
 		if (!ND_TTEST2(*(packet_iterator + packet_offset), 24))
-			goto malformed;
+			goto invalid;
 		hex_print_with_offset(ndo, "\n    xTR-ID: ", packet_iterator + packet_offset, 16, 0);
 		ND_PRINT((ndo, "\n    SITE-ID: %" PRIu64,
 			EXTRACT_64BITS(packet_iterator + packet_offset + 16)));
@@ -378,13 +380,12 @@ void lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	}
 	return;
 trunc:
-	ND_PRINT((ndo, "\n    [|LISP]"));
+	ND_PRINT((ndo, "\n   %s", tstr));
 	return;
-malformed:
-	ND_PRINT((ndo, "\n    (malformed-packet)"));
+invalid:
+	ND_PRINT((ndo, "\n   %s", istr));
 	return;
 }
-
 
 static inline uint8_t extract_lisp_type(uint8_t lisp_hdr_flags)
 {
@@ -425,7 +426,6 @@ static void lisp_hdr_flag(netdissect_options *ndo, const lisp_map_register_hdr *
 	return;
 }
 
-
 static void action_flag(netdissect_options *ndo, uint8_t act_auth_inc_res)
 {
 	uint8_t action;
@@ -441,7 +441,6 @@ static void action_flag(netdissect_options *ndo, uint8_t act_auth_inc_res)
 	action = act_auth_inc_res >> 5;
 	ND_PRINT((ndo, " %s,", tok2str(lisp_eid_action, "unknown", action)));
 }
-
 
 static void loc_hdr_flag(netdissect_options *ndo, uint16_t flag)
 {
