@@ -150,7 +150,8 @@ nflog_if_print(netdissect_options *ndo,
 					htonl(*(u_int32_t *)(p+sizeof(nflog_tlv_t)))));
 				break;
 			case NFULA_PREFIX:
-				ND_PRINT((ndo, "Prefix:%.*s ",size-sizeof(nflog_tlv_t),
+				if(p[sizeof(nflog_tlv_t)])
+				    ND_PRINT((ndo, "Prefix:%.*s ",size-sizeof(nflog_tlv_t),
 							p+sizeof(nflog_tlv_t)));
 				break;
 			case NFULA_IFINDEX_INDEV:
