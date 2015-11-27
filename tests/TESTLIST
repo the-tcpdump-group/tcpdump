@@ -51,6 +51,8 @@ lspping-fec-ldp-vv lspping-fec-ldp.pcap lspping-fec-ldp-vv.out -t -vv
 lspping-fec-rsvp    lspping-fec-rsvp.pcap lspping-fec-rsvp.out -t
 lspping-fec-rsvp-v  lspping-fec-rsvp.pcap lspping-fec-rsvp-v.out -t -v
 lspping-fec-rsvp-vv lspping-fec-rsvp.pcap lspping-fec-rsvp-vv.out -t -vv
+mpls-traceroute   mpls-traceroute.pcap mpls-traceroute.out -t
+mpls-traceroute-v mpls-traceroute.pcap mpls-traceroute-v.out -t -v
 
 # OSPF tests
 ospf-gmpls	ospf-gmpls.pcap				ospf-gmpls.out		-t -v
