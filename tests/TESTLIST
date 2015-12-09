@@ -62,6 +62,8 @@ ospf3_auth-vv	ospf3_auth.pcap				ospf3_auth-vv.out 	-t -v -v
 ospf3_bc-vv	OSPFv3_broadcast_adjacency.pcap		ospf3_bc-vv.out		-t -v -v
 ospf3_mp-vv	OSPFv3_multipoint_adjacencies.pcap	ospf3_mp-vv.out		-t -v -v
 ospf3_nbma-vv	OSPFv3_NBMA_adjacencies.pcap		ospf3_nbma-vv.out	-t -v -v
+# fuzzed pcap
+ospf2-seg-fault-1-v  ospf2-seg-fault-1.pcap  ospf2-seg-fault-1-v.out  -t -v
 
 # IKEv2 tests
 ikev2four	ikev2four.pcap		ikev2four.out	-t -v
