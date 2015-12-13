@@ -1888,10 +1888,11 @@ static void
 compress_savefile(const char *filename)
 {
 # ifdef HAVE_FORK
-	if (fork())
+	#define test_fork fork()
 # else
-	if (vfork())
+	#define test_fork vfork()
 # endif
+	if(test_fork)
 		return;
 	/*
 	 * Set to lowest priority so that this doesn't disturb the capture
