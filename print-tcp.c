@@ -645,53 +645,50 @@ tcp_print(netdissect_options *ndo,
                 return;
         }
 
-        if (sport == TELNET_PORT || dport == TELNET_PORT) {
+        if (IS_SRC_OR_DST_PORT(TELNET_PORT)) {
                 telnet_print(ndo, bp, length);
-        } else if (sport == SMTP_PORT || dport == SMTP_PORT) {
+        } else if (IS_SRC_OR_DST_PORT(SMTP_PORT)) {
                 ND_PRINT((ndo, ": "));
                 smtp_print(ndo, bp, length);
-        } else if (sport == BGP_PORT || dport == BGP_PORT)
+        } else if (IS_SRC_OR_DST_PORT(BGP_PORT))
                 bgp_print(ndo, bp, length);
-        else if (sport == PPTP_PORT || dport == PPTP_PORT)
+        else if (IS_SRC_OR_DST_PORT(PPTP_PORT))
                 pptp_print(ndo, bp);
 #ifdef ENABLE_SMB
-        else if (sport == NETBIOS_SSN_PORT || dport == NETBIOS_SSN_PORT)
+        else if (IS_SRC_OR_DST_PORT(NETBIOS_SSN_PORT))
                 nbt_tcp_print(ndo, bp, length);
-	else if (sport == SMB_PORT || dport == SMB_PORT)
+	else if (IS_SRC_OR_DST_PORT(SMB_PORT))
 		smb_tcp_print(ndo, bp, length);
 #endif
-        else if (sport == BEEP_PORT || dport == BEEP_PORT)
+        else if (IS_SRC_OR_DST_PORT(BEEP_PORT))
                 beep_print(ndo, bp, length);
-        else if (sport == OPENFLOW_PORT_OLD || dport == OPENFLOW_PORT_OLD ||
-                 sport == OPENFLOW_PORT_IANA || dport == OPENFLOW_PORT_IANA)
+        else if (IS_SRC_OR_DST_PORT(OPENFLOW_PORT_OLD) || IS_SRC_OR_DST_PORT(OPENFLOW_PORT_IANA))
                 openflow_print(ndo, bp, length);
-        else if (sport == FTP_PORT || dport == FTP_PORT) {
+        else if (IS_SRC_OR_DST_PORT(FTP_PORT)) {
                 ND_PRINT((ndo, ": "));
                 ftp_print(ndo, bp, length);
-        } else if (sport == HTTP_PORT || dport == HTTP_PORT ||
-            sport == HTTP_PORT_ALT || dport == HTTP_PORT_ALT) {
+        } else if (IS_SRC_OR_DST_PORT(HTTP_PORT) || IS_SRC_OR_DST_PORT(HTTP_PORT_ALT)) {
                 ND_PRINT((ndo, ": "));
                 http_print(ndo, bp, length);
-        } else if (sport == RTSP_PORT || dport == RTSP_PORT ||
-            sport == RTSP_PORT_ALT || dport == RTSP_PORT_ALT) {
+        } else if (IS_SRC_OR_DST_PORT(RTSP_PORT) || IS_SRC_OR_DST_PORT(RTSP_PORT_ALT)) {
                 ND_PRINT((ndo, ": "));
                 rtsp_print(ndo, bp, length);
         } else if (length > 2 &&
-                 (sport == NAMESERVER_PORT || dport == NAMESERVER_PORT)) {
+                 (IS_SRC_OR_DST_PORT(NAMESERVER_PORT))) {
                 /*
                  * TCP DNS query has 2byte length at the head.
                  * XXX packet could be unaligned, it can go strange
                  */
                 ns_print(ndo, bp + 2, length - 2, 0);
-        } else if (sport == MSDP_PORT || dport == MSDP_PORT) {
+        } else if (IS_SRC_OR_DST_PORT(MSDP_PORT)) {
                 msdp_print(ndo, bp, length);
-        } else if (sport == RPKI_RTR_PORT || dport == RPKI_RTR_PORT) {
+        } else if (IS_SRC_OR_DST_PORT(RPKI_RTR_PORT)) {
                 rpki_rtr_print(ndo, bp, length);
         }
-        else if (length > 0 && (sport == LDP_PORT || dport == LDP_PORT)) {
+        else if (length > 0 && (IS_SRC_OR_DST_PORT(LDP_PORT))) {
                 ldp_print(ndo, bp, length);
         }
-        else if ((sport == NFS_PORT || dport == NFS_PORT) &&
+        else if ((IS_SRC_OR_DST_PORT(NFS_PORT)) &&
                  length >= 4 && ND_TTEST2(*bp, 4)) {
                 /*
                  * If data present, header length valid, and NFS port used,

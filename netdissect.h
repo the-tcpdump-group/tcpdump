@@ -223,6 +223,9 @@ struct netdissect_options {
 #define max(a,b) ((b)>(a)?(b):(a))
 #endif
 
+/* For source or destination ports tests (UDP, TCP, ...) */
+#define IS_SRC_OR_DST_PORT(p) (sport == (p) || dport == (p))
+
 /*
  * Maximum snapshot length.  This should be enough to capture the full
  * packet on most network interfaces.
