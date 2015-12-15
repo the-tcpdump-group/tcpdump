@@ -1486,6 +1486,7 @@ main(int argc, char **argv)
 		bpf_dump(&fcode, dflag);
 		pcap_close(pd);
 		free(cmdbuf);
+		pcap_freecode(&fcode);
 		exit(0);
 	}
 	init_print(ndo, localnet, netmask, timezone_offset);
@@ -1782,6 +1783,7 @@ main(int argc, char **argv)
 	while (ret != NULL);
 
 	free(cmdbuf);
+	pcap_freecode(&fcode);
 	exit(status == -1 ? 1 : 0);
 }
 
