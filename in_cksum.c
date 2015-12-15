@@ -92,7 +92,7 @@ in_cksum(const struct cksum_vec *vec, int veclen)
 		/*
 		 * Force to even boundary.
 		 */
-		if ((1 & (unsigned long) w) && (mlen > 0)) {
+		if ((1 & (uintptr_t) w) && (mlen > 0)) {
 			REDUCE;
 			sum <<= 8;
 			s_util.c[0] = *(const uint8_t *)w;
