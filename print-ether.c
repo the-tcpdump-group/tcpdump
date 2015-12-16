@@ -101,17 +101,19 @@ ether_hdr_print(netdissect_options *ndo,
 
 	ether_type = EXTRACT_16BITS(&ep->ether_type);
 	if (!ndo->ndo_qflag) {
-	        if (ether_type <= ETHERMTU)
-		          ND_PRINT((ndo, ", 802.3"));
-                else
-		          ND_PRINT((ndo, ", ethertype %s (0x%04x)",
+	        if (ether_type <= ETHERMTU) {
+		        ND_PRINT((ndo, ", 802.3"));
+			length = ether_type;
+		} else
+		        ND_PRINT((ndo, ", ethertype %s (0x%04x)",
 				       tok2str(ethertype_values,"Unknown", ether_type),
                                        ether_type));
         } else {
-                if (ether_type <= ETHERMTU)
-                          ND_PRINT((ndo, ", 802.3"));
-                else
-                          ND_PRINT((ndo, ", %s", tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", ether_type)));
+                if (ether_type <= ETHERMTU) {
+                        ND_PRINT((ndo, ", 802.3"));
+			length = ether_type;
+		} else
+                        ND_PRINT((ndo, ", %s", tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", ether_type)));
         }
 
 	ND_PRINT((ndo, ", length %u: ", length));
