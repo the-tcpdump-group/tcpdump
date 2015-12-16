@@ -200,6 +200,9 @@ struct udphdr {
 #ifndef RADIUS_ACCOUNTING_PORT
 #define RADIUS_ACCOUNTING_PORT		1646
 #endif
+#ifndef RADIUS_CISCO_COA_PORT
+#define RADIUS_CISCO_COA_PORT		1700
+#endif
 #ifndef L2TP_PORT
 #define L2TP_PORT			1701	/*XXX*/
 #endif
