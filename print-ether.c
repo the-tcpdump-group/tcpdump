@@ -91,7 +91,7 @@ ether_hdr_print(netdissect_options *ndo,
                 const u_char *bp, u_int length)
 {
 	register const struct ether_header *ep;
-	uint16_t ether_type;
+	uint16_t length_type;
 
 	ep = (const struct ether_header *)bp;
 
@@ -99,21 +99,21 @@ ether_hdr_print(netdissect_options *ndo,
 		     etheraddr_string(ndo, ESRC(ep)),
 		     etheraddr_string(ndo, EDST(ep))));
 
-	ether_type = EXTRACT_16BITS(&ep->ether_type);
+	length_type = EXTRACT_16BITS(&ep->ether_length_type);
 	if (!ndo->ndo_qflag) {
-	        if (ether_type <= ETHERMTU) {
+	        if (length_type <= ETHERMTU) {
 		        ND_PRINT((ndo, ", 802.3"));
-			length = ether_type;
+			length = length_type;
 		} else
 		        ND_PRINT((ndo, ", ethertype %s (0x%04x)",
-				       tok2str(ethertype_values,"Unknown", ether_type),
-                                       ether_type));
+				       tok2str(ethertype_values,"Unknown", length_type),
+                                       length_type));
         } else {
-                if (ether_type <= ETHERMTU) {
+                if (length_type <= ETHERMTU) {
                         ND_PRINT((ndo, ", 802.3"));
-			length = ether_type;
+			length = length_type;
 		} else
-                        ND_PRINT((ndo, ", %s", tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", ether_type)));
+                        ND_PRINT((ndo, ", %s", tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", length_type)));
         }
 
 	ND_PRINT((ndo, ", length %u: ", length));
@@ -132,7 +132,7 @@ ether_print(netdissect_options *ndo,
 {
 	const struct ether_header *ep;
 	u_int orig_length;
-	u_short ether_type;
+	u_short length_type;
 	u_int hdrlen;
 	int llc_hdrlen;
 
@@ -158,13 +158,13 @@ ether_print(netdissect_options *ndo,
 	p += ETHER_HDRLEN;
 	hdrlen = ETHER_HDRLEN;
 
-	ether_type = EXTRACT_16BITS(&ep->ether_type);
+	length_type = EXTRACT_16BITS(&ep->ether_length_type);
 
 recurse:
 	/*
 	 * Is it (gag) an 802.3 encapsulation?
 	 */
-	if (ether_type <= ETHERMTU) {
+	if (length_type <= ETHERMTU) {
 		/* Try to print the LLC-layer header & higher layers */
 		llc_hdrlen = llc_print(ndo, p, length, caplen, ESRC(ep), EDST(ep));
 		if (llc_hdrlen < 0) {
@@ -174,10 +174,10 @@ recurse:
 			llc_hdrlen = -llc_hdrlen;
 		}
 		hdrlen += llc_hdrlen;
-	} else if (ether_type == ETHERTYPE_8021Q  ||
-                ether_type == ETHERTYPE_8021Q9100 ||
-                ether_type == ETHERTYPE_8021Q9200 ||
-                ether_type == ETHERTYPE_8021QinQ) {
+	} else if (length_type == ETHERTYPE_8021Q  ||
+                length_type == ETHERTYPE_8021Q9100 ||
+                length_type == ETHERTYPE_8021Q9200 ||
+                length_type == ETHERTYPE_8021QinQ) {
 		/*
 		 * Print VLAN information, and then go back and process
 		 * the enclosed type field.
@@ -196,15 +196,15 @@ recurse:
 			ND_PRINT((ndo, "%s, ", ieee8021q_tci_string(tag)));
 		}
 
-		ether_type = EXTRACT_16BITS(p + 2);
-		if (ndo->ndo_eflag && ether_type > ETHERMTU)
-			ND_PRINT((ndo, "ethertype %s, ", tok2str(ethertype_values,"0x%04x", ether_type)));
+		length_type = EXTRACT_16BITS(p + 2);
+		if (ndo->ndo_eflag && length_type > ETHERMTU)
+			ND_PRINT((ndo, "ethertype %s, ", tok2str(ethertype_values,"0x%04x", length_type)));
 		p += 4;
 		length -= 4;
 		caplen -= 4;
 		hdrlen += 4;
 		goto recurse;
-	} else if (ether_type == ETHERTYPE_JUMBO) {
+	} else if (length_type == ETHERTYPE_JUMBO) {
 		/*
 		 * Alteon jumbo frames.
 		 * See
@@ -224,8 +224,8 @@ recurse:
 		}
 		hdrlen += llc_hdrlen;
 	} else {
-		if (ethertype_print(ndo, ether_type, p, length, caplen) == 0) {
-			/* ether_type not known, print raw packet */
+		if (ethertype_print(ndo, length_type, p, length, caplen) == 0) {
+			/* type not known, print raw packet */
 			if (!ndo->ndo_eflag) {
 				if (print_encap_header != NULL)
 					(*print_encap_header)(ndo, encap_header_arg);
