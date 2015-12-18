@@ -2626,8 +2626,8 @@ bgp_notification_print(netdissect_options *ndo,
             break;
         case BGP_NOTIFY_MAJOR_FSM:
             printf(" subcode %s (%u)",
-		   tok2strbuf(bgp_notify_minor_fsm_values, "Unknown",
-			      bgpn.bgpn_minor, tokbuf, sizeof(tokbuf)),
+		   tok2str(bgp_notify_minor_fsm_values, "Unknown",
+			      bgpn.bgpn_minor),
 		   bgpn.bgpn_minor);
         case BGP_NOTIFY_MAJOR_CAP:
             ND_PRINT((ndo, " subcode %s (%u)",
