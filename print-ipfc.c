@@ -23,11 +23,11 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include <string.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
 
 #include "ether.h"
@@ -71,7 +71,19 @@ ipfc_hdr_print(netdissect_options *ndo,
 	dstname = etheraddr_string(ndo, ipfcdst);
 
 	/*
-	 * XXX - show the upper 16 bits?  Do so only if "vflag" is set?
+	 * XXX - should we show the upper 16 bits of the addresses?
+	 * Do so only if "vflag" is set?
+	 * Section 3.3 "FC Port and Node Network Addresses" says that
+	 *
+	 *    In this specification, both the Source and Destination
+	 *    4-bit NAA identifiers SHALL be set to binary '0001'
+	 *    indicating that an IEEE 48-bit MAC address is contained
+	 *    in the lower 48 bits of the network address fields. The
+	 *    high order 12 bits in the network address fields SHALL
+	 *    be set to 0x0000.
+	 *
+	 * so, for captures following this specification, the upper 16
+	 * bits should be 0x1000, followed by a MAC address.
 	 */
 	ND_PRINT((ndo, "%s > %s, length %u: ", srcname, dstname, length));
 }

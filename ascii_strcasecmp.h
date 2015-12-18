@@ -22,12 +22,12 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#ifndef tcpdump_ascii_strcasecmp_h
-#define tcpdump_ascii_strcasecmp_h
+#ifndef netdissect_ascii_strcasecmp_h
+#define netdissect_ascii_strcasecmp_h
 
 #include <stddef.h>
 
 extern int ascii_strcasecmp(const char *, const char *);
 extern int ascii_strncasecmp(const char *, const char *, size_t);
 
-#endif /* tcpdump_ascii_strcasecmp_h */
+#endif /* netdissect_ascii_strcasecmp_h */

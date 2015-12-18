@@ -25,9 +25,9 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
 #include "ether.h"
@@ -77,8 +77,6 @@ rrcp_print(netdissect_options *ndo,
 	uint8_t rrcp_proto;
 	uint8_t rrcp_opcode;
 	register const struct ether_header *ep;
-	char proto_str[16];
-	char opcode_str[32];
 
 	ep = (const struct ether_header *)cp;
 	rrcp = cp + ETHER_HDRLEN;
@@ -90,11 +88,11 @@ rrcp_print(netdissect_options *ndo,
         ND_PRINT((ndo, "%s > %s, %s %s",
 		etheraddr_string(ndo, ESRC(ep)),
 		etheraddr_string(ndo, EDST(ep)),
-		tok2strbuf(proto_values,"RRCP-0x%02x",rrcp_proto,proto_str,sizeof(proto_str)),
+		tok2str(proto_values,"RRCP-0x%02x",rrcp_proto),
 		((*(rrcp + RRCP_OPCODE_ISREPLY_OFFSET)) & RRCP_ISREPLY) ? "reply" : "query"));
 	if (rrcp_proto==1){
     	    ND_PRINT((ndo, ": %s",
-		     tok2strbuf(opcode_values,"unknown opcode (0x%02x)",rrcp_opcode,opcode_str,sizeof(opcode_str))));
+		     tok2str(opcode_values,"unknown opcode (0x%02x)",rrcp_opcode)));
 	}
 	if (rrcp_opcode==1 || rrcp_opcode==2){
 	    ND_TCHECK2(*(rrcp + RRCP_REG_ADDR_OFFSET), 6);

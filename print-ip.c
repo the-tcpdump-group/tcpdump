@@ -23,13 +23,13 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include <string.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
-#include "extract.h"			/* must come after interface.h */
+#include "extract.h"
 
 #include "ip.h"
 #include "ipproto.h"
@@ -122,7 +122,7 @@ ip_finddst(netdissect_options *ndo,
 		}
 	}
 trunc:
-	UNALIGNED_MEMCPY(&retval, &ip->ip_dst.s_addr, sizeof(uint32_t));
+	UNALIGNED_MEMCPY(&retval, &ip->ip_dst, sizeof(uint32_t));
 	return retval;
 }
 
@@ -147,9 +147,9 @@ nextproto4_cksum(netdissect_options *ndo,
 	ph.len = htons((uint16_t)len);
 	ph.mbz = 0;
 	ph.proto = next_proto;
-	UNALIGNED_MEMCPY(&ph.src, &ip->ip_src.s_addr, sizeof(uint32_t));
+	UNALIGNED_MEMCPY(&ph.src, &ip->ip_src, sizeof(uint32_t));
 	if (IP_HL(ip) == 5)
-		UNALIGNED_MEMCPY(&ph.dst, &ip->ip_dst.s_addr, sizeof(uint32_t));
+		UNALIGNED_MEMCPY(&ph.dst, &ip->ip_dst, sizeof(uint32_t));
 	else
 		ph.dst = ip_finddst(ndo, ip);
 

@@ -32,9 +32,9 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "extract.h"
 
 static const char tstr[] = " [|zmtp1]";
@@ -86,22 +86,18 @@ zmtp1_print_frame(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 	if (cp[0] != 0xFF) {
 		header_len = 1; /* length */
 		body_len_declared = cp[0];
-		if (body_len_declared == 0)
-			return cp + header_len; /* skip to next frame */
-		ND_PRINT((ndo, " frame flags+body  (8-bit) length %u", cp[0]));
-		ND_TCHECK2(*cp, header_len + 1); /* length, flags */
-		flags = cp[1];
+		ND_PRINT((ndo, " frame flags+body  (8-bit) length %" PRIu64, body_len_declared));
 	} else {
 		header_len = 1 + 8; /* 0xFF, length */
 		ND_PRINT((ndo, " frame flags+body (64-bit) length"));
 		ND_TCHECK2(*cp, header_len); /* 0xFF, length */
 		body_len_declared = EXTRACT_64BITS(cp + 1);
-		if (body_len_declared == 0)
-			return cp + header_len; /* skip to next frame */
 		ND_PRINT((ndo, " %" PRIu64, body_len_declared));
-		ND_TCHECK2(*cp, header_len + 1); /* 0xFF, length, flags */
-		flags = cp[9];
 	}
+	if (body_len_declared == 0)
+		return cp + header_len; /* skip to the next frame */
+	ND_TCHECK2(*cp, header_len + 1); /* ..., flags */
+	flags = cp[header_len];
 
 	body_len_captured = ep - cp - header_len;
 	if (body_len_declared > body_len_captured)

@@ -17,8 +17,8 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
-#include "interface.h"
+#include <netdissect-stdinc.h>
+#include "netdissect.h"
 #include "l2vpn.h"
 
 /* draft-ietf-pwe3-iana-allocation-04 */

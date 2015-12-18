@@ -26,11 +26,11 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
-#include "extract.h"			/* must come after interface.h */
+#include "extract.h"
 
 #include "llc.h"
 #include "ethertype.h"
@@ -150,7 +150,7 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 {
 	uint8_t dsap_field, dsap, ssap_field, ssap;
 	uint16_t control;
-	u_int hdrlen;
+	int hdrlen;
 	int is_u;
 
 	if (caplen < 3) {
@@ -303,7 +303,7 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 		return (hdrlen);
 	}
 
-#ifdef TCPDUMP_DO_SMB
+#ifdef ENABLE_SMB
 	if (ssap == LLCSAP_NETBEUI && dsap == LLCSAP_NETBEUI
 	    && (!(control & LLC_S_FMT) || control == LLC_U_FMT)) {
 		/*

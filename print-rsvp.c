@@ -19,15 +19,18 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
 #include "ethertype.h"
 #include "gmpls.h"
 #include "af.h"
 #include "signature.h"
+
+static const char tstr[] = " [|rsvp]";
+static const char istr[] = " (invalid)";
 
 /*
  * RFC 2205 common header
@@ -496,6 +499,7 @@ rsvp_intserv_print(netdissect_options *ndo,
     if (obj_tlen < 4)
         return 0;
     parameter_id = *(tptr);
+    ND_TCHECK2(*(tptr + 2), 2);
     parameter_length = EXTRACT_16BITS(tptr+2)<<2; /* convert wordcount to bytecount */
 
     ND_PRINT((ndo, "\n\t      Parameter ID: %s (%u), length: %u, Flags: [0x%02x]",
@@ -517,6 +521,7 @@ rsvp_intserv_print(netdissect_options *ndo,
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         */
         if (parameter_length == 4)
+	    ND_TCHECK2(*(tptr + 4), 4);
             ND_PRINT((ndo, "\n\t\tIS hop count: %u", EXTRACT_32BITS(tptr + 4)));
         break;
 
@@ -529,6 +534,7 @@ rsvp_intserv_print(netdissect_options *ndo,
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         */
         if (parameter_length == 4) {
+	    ND_TCHECK2(*(tptr + 4), 4);
             bw.i = EXTRACT_32BITS(tptr+4);
             ND_PRINT((ndo, "\n\t\tPath b/w estimate: %.10g Mbps", bw.f / 125000));
         }
@@ -543,6 +549,7 @@ rsvp_intserv_print(netdissect_options *ndo,
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         */
         if (parameter_length == 4) {
+	    ND_TCHECK2(*(tptr + 4), 4);
             ND_PRINT((ndo, "\n\t\tMinimum path latency: "));
             if (EXTRACT_32BITS(tptr+4) == 0xffffffff)
                 ND_PRINT((ndo, "don't care"));
@@ -561,6 +568,7 @@ rsvp_intserv_print(netdissect_options *ndo,
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         */
         if (parameter_length == 4)
+	    ND_TCHECK2(*(tptr + 4), 4);
             ND_PRINT((ndo, "\n\t\tComposed MTU: %u bytes", EXTRACT_32BITS(tptr + 4)));
         break;
     case 127:
@@ -581,6 +589,7 @@ rsvp_intserv_print(netdissect_options *ndo,
         */
 
         if (parameter_length == 20) {
+	    ND_TCHECK2(*(tptr + 4), 20);
             bw.i = EXTRACT_32BITS(tptr+4);
             ND_PRINT((ndo, "\n\t\tToken Bucket Rate: %.10g Mbps", bw.f / 125000));
             bw.i = EXTRACT_32BITS(tptr+8);
@@ -604,6 +613,7 @@ rsvp_intserv_print(netdissect_options *ndo,
         */
 
         if (parameter_length == 8) {
+	    ND_TCHECK2(*(tptr + 4), 8);
             bw.i = EXTRACT_32BITS(tptr+4);
             ND_PRINT((ndo, "\n\t\tRate: %.10g Mbps", bw.f / 125000));
             ND_PRINT((ndo, "\n\t\tSlack Term: %u", EXTRACT_32BITS(tptr + 8)));
@@ -615,6 +625,7 @@ rsvp_intserv_print(netdissect_options *ndo,
     case 135:
     case 136:
         if (parameter_length == 4)
+	    ND_TCHECK2(*(tptr + 4), 4);
             ND_PRINT((ndo, "\n\t\tValue: %u", EXTRACT_32BITS(tptr + 4)));
         break;
 
@@ -623,11 +634,15 @@ rsvp_intserv_print(netdissect_options *ndo,
             print_unknown_data(ndo, tptr + 4, "\n\t\t", parameter_length);
     }
     return (parameter_length+4); /* header length 4 bytes */
+
+trunc:
+    ND_PRINT((ndo, "%s", tstr));
+    return 0;
 }
 
 static int
 rsvp_obj_print(netdissect_options *ndo,
-                const u_char *pptr
+               const u_char *pptr
 #ifndef HAVE_LIBCRYPTO
 _U_
 #endif
@@ -722,7 +737,6 @@ _U_
                 obj_tlen-=8;
                 obj_tptr+=8;
                 break;
-#ifdef INET6
             case RSVP_CTYPE_IPV6:
                 if (obj_tlen < 20)
                     return -1;
@@ -761,7 +775,6 @@ _U_
                 obj_tlen-=26;
                 obj_tptr+=26;
                 break;
-#endif
             case RSVP_CTYPE_13: /* IPv4 p2mp LSP Tunnel */
                 if (obj_tlen < 12)
                     return -1;
@@ -801,7 +814,6 @@ _U_
                 obj_tlen-=sizeof(struct in_addr);
                 obj_tptr+=sizeof(struct in_addr);
                 break;
-#ifdef INET6
             case RSVP_CTYPE_IPV6:
                 if (obj_tlen < sizeof(struct in6_addr))
                     return -1;
@@ -811,7 +823,6 @@ _U_
                 obj_tlen-=sizeof(struct in6_addr);
                 obj_tptr+=sizeof(struct in6_addr);
                 break;
-#endif
             default:
                 hexdump=TRUE;
             }
@@ -828,7 +839,6 @@ _U_
                 obj_tlen-=sizeof(struct in_addr);
                 obj_tptr+=sizeof(struct in_addr);
                 break;
-#ifdef INET6
             case RSVP_CTYPE_IPV6:
                 if (obj_tlen < sizeof(struct in6_addr))
                     return-1;
@@ -838,7 +848,6 @@ _U_
                 obj_tlen-=sizeof(struct in6_addr);
                 obj_tptr+=sizeof(struct in6_addr);
                 break;
-#endif
             default:
                 hexdump=TRUE;
             }
@@ -913,7 +922,6 @@ _U_
                 obj_tlen-=8;
                 obj_tptr+=8;
                 break;
-#ifdef INET6
             case RSVP_CTYPE_IPV6:
                 if (obj_tlen < 20)
                     return-1;
@@ -938,7 +946,6 @@ _U_
                 obj_tlen-=40;
                 obj_tptr+=40;
                 break;
-#endif
             case RSVP_CTYPE_TUNNEL_IPV4:
                 if (obj_tlen < 8)
                     return-1;
@@ -1178,6 +1185,9 @@ _U_
                            tok2str(af_values, "Unknown", af), af,
                            subobj_len));
 
+                    if(subobj_len == 0)
+                        goto invalid;
+
                     switch(subobj_type) {
                     case RSVP_GEN_UNI_SUBOBJ_SOURCE_TNA_ADDRESS:
                     case RSVP_GEN_UNI_SUBOBJ_DESTINATION_TNA_ADDRESS:
@@ -1189,14 +1199,12 @@ _U_
                             ND_PRINT((ndo, "%s    UNI IPv4 TNA address: %s",
                                    ident, ipaddr_string(ndo, obj_tptr + 4)));
                             break;
-#ifdef INET6
                         case AFNUM_INET6:
                             if (subobj_len < 20)
                                 return -1;
                             ND_PRINT((ndo, "%s    UNI IPv6 TNA address: %s",
                                    ident, ip6addr_string(ndo, obj_tptr + 4)));
                             break;
-#endif
                         case AFNUM_NSAP:
                             if (subobj_len) {
                                 /* unless we have a TLV parser lets just hexdump */
@@ -1270,7 +1278,6 @@ _U_
                 if (obj_tlen)
                     hexdump=TRUE; /* unless we have a TLV parser lets just hexdump */
                 break;
-#ifdef INET6
             case RSVP_CTYPE_4: /* fall through - FIXME add TLV parser */
             case RSVP_CTYPE_IPV6:
                 if (obj_tlen < 20)
@@ -1283,7 +1290,6 @@ _U_
                 obj_tptr+=20;
                 hexdump=TRUE; /* unless we have a TLV parser lets just hexdump */
                 break;
-#endif
             default:
                 hexdump=TRUE;
             }
@@ -1359,7 +1365,6 @@ _U_
                 obj_tlen-=8;
                 obj_tptr+=8;
                 break;
-#ifdef INET6
             case RSVP_CTYPE_IPV6:
                 if (obj_tlen < 20)
                     return-1;
@@ -1404,7 +1409,6 @@ _U_
                 obj_tlen-=40;
                 obj_tptr+=40;
                 break;
-#endif
             case RSVP_CTYPE_TUNNEL_IPV4:
                 if (obj_tlen < 8)
                     return-1;
@@ -1546,7 +1550,6 @@ _U_
                 obj_tlen-=8;
                 obj_tptr+=8;
                 break;
-#ifdef INET6
             case RSVP_CTYPE_4: /* fall through - FIXME add TLV parser */
             case RSVP_CTYPE_IPV6:
                 if (obj_tlen < 20)
@@ -1573,7 +1576,6 @@ _U_
                 obj_tlen-=20;
                 obj_tptr+=20;
                 break;
-#endif
             default:
                 hexdump=TRUE;
             }
@@ -1749,7 +1751,6 @@ _U_
                 obj_tlen-=4;
                 obj_tptr+=4;
                 break;
-#ifdef INET6
             case RSVP_CTYPE_IPV6:
                 if (obj_tlen < 16)
                     return-1;
@@ -1759,7 +1760,6 @@ _U_
                 obj_tlen-=16;
                 obj_tptr+=16;
                 break;
-#endif
             default:
                 hexdump=TRUE;
             }
@@ -1787,8 +1787,12 @@ _U_
         tlen-=rsvp_obj_len;
     }
     return 0;
+invalid:
+    ND_PRINT((ndo, "%s", istr));
+    return -1;
 trunc:
-    ND_PRINT((ndo, "\n\t\t packet exceeded snapshot"));
+    ND_PRINT((ndo, "\n\t\t"));
+    ND_PRINT((ndo, "%s", tstr));
     return -1;
 }
 
@@ -1930,5 +1934,6 @@ rsvp_print(netdissect_options *ndo,
 
     return;
 trunc:
-    ND_PRINT((ndo, "\n\t\t packet exceeded snapshot"));
+    ND_PRINT((ndo, "\n\t\t"));
+    ND_PRINT((ndo, "%s", tstr));
 }

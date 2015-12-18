@@ -31,12 +31,11 @@
 #include "config.h"
 #endif
 
-#ifdef INET6
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include "ip6.h"
 
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
 
@@ -210,4 +209,3 @@ dstopt_print(netdissect_options *ndo, register const u_char *bp)
     ND_PRINT((ndo, "[|DSTOPT]"));
     return(-1);
 }
-#endif /* INET6 */

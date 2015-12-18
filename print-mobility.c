@@ -31,13 +31,12 @@
 #include "config.h"
 #endif
 
-#ifdef INET6
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include "ip6.h"
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
-#include "extract.h"		/* must come after interface.h */
+#include "extract.h"
 
 /* Mobility header */
 struct ip6_mobility {
@@ -330,4 +329,3 @@ mobility_print(netdissect_options *ndo,
 	ND_PRINT((ndo, "[|MOBILITY]"));
 	return(mhlen);
 }
-#endif /* INET6 */

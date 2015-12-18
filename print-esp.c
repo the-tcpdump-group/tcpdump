@@ -25,7 +25,7 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include <string.h>
 #include <stdlib.h>
@@ -42,15 +42,14 @@
 #endif
 #endif
 
-#include "ip.h"
-#ifdef INET6
-#include "ip6.h"
-#endif
-
-#include "interface.h"
+#include "netdissect.h"
+#include "strtoaddr.h"
 #include "extract.h"
 
 #include "ascii_strcasecmp.h"
+
+#include "ip.h"
+#include "ip6.h"
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -99,9 +98,7 @@ struct newesp {
 #ifdef HAVE_LIBCRYPTO
 union inaddr_u {
 	struct in_addr in4;
-#ifdef INET6
 	struct in6_addr in6;
-#endif
 };
 struct sa_list {
 	struct sa_list	*next;
@@ -432,7 +429,7 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 		/* open file and read it */
 		FILE *secretfile;
 		char  fileline[1024];
-		int   lineno=0;
+		int   subfile_lineno=0;
 		char  *nl;
 		char *filename = line;
 
@@ -443,7 +440,7 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 		}
 
 		while (fgets(fileline, sizeof(fileline)-1, secretfile) != NULL) {
-			lineno++;
+			subfile_lineno++;
 			/* remove newline from the line */
 			nl = strchr(fileline, '\n');
 			if (nl)
@@ -451,7 +448,7 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 			if (fileline[0] == '#') continue;
 			if (fileline[0] == '\0') continue;
 
-			esp_print_decode_onesecret(ndo, fileline, filename, lineno);
+			esp_print_decode_onesecret(ndo, fileline, filename, subfile_lineno);
 		}
 		fclose(secretfile);
 
@@ -478,17 +475,14 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 
 		sa1.spi = spino;
 
-#ifdef INET6
-		if (inet_pton(AF_INET6, spikey, &sa1.daddr.in6) == 1) {
+		if (strtoaddr6(spikey, &sa1.daddr.in6) == 1) {
 			sa1.daddr_version = 6;
-		} else
-#endif
-			if (inet_pton(AF_INET, spikey, &sa1.daddr.in4) == 1) {
-				sa1.daddr_version = 4;
-			} else {
-				(*ndo->ndo_warning)(ndo, "print_esp: can not decode IP# %s\n", spikey);
-				return;
-			}
+		} else if (strtoaddr(spikey, &sa1.daddr.in4) == 1) {
+			sa1.daddr_version = 4;
+		} else {
+			(*ndo->ndo_warning)(ndo, "print_esp: can not decode IP# %s\n", spikey);
+			return;
+		}
 	}
 
 	if (decode) {
@@ -567,9 +561,7 @@ esp_print(netdissect_options *ndo,
 #ifdef HAVE_LIBCRYPTO
 	const struct ip *ip;
 	struct sa_list *sa = NULL;
-#ifdef INET6
 	const struct ip6_hdr *ip6 = NULL;
-#endif
 	int advance;
 	int len;
 	u_char *secret;
@@ -618,7 +610,6 @@ esp_print(netdissect_options *ndo,
 
 	ip = (const struct ip *)bp2;
 	switch (IP_V(ip)) {
-#ifdef INET6
 	case 6:
 		ip6 = (const struct ip6_hdr *)bp2;
 		/* we do not attempt to decrypt jumbograms */
@@ -637,7 +628,6 @@ esp_print(netdissect_options *ndo,
 			}
 		}
 		break;
-#endif /*INET6*/
 	case 4:
 		/* nexthdr & padding are in the last fragment */
 		if (EXTRACT_16BITS(&ip->ip_off) & IP_MF)

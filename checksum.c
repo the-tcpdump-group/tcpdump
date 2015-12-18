@@ -21,14 +21,14 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 
-#include "interface.h"
+#include "netdissect.h"
 
 /*
  * CRC-10 table generated using the following Python snippet:
@@ -145,17 +145,17 @@ create_osi_cksum (const uint8_t *pptr, int checksum_offset, int length)
     uint32_t c0;
     uint32_t c1;
     uint16_t checksum;
-    int index;
+    int idx;
 
     c0 = 0;
     c1 = 0;
 
-    for (index = 0; index < length; index++) {
+    for (idx = 0; idx < length; idx++) {
         /*
          * Ignore the contents of the checksum field.
          */
-        if (index == checksum_offset ||
-            index == checksum_offset+1) {
+        if (idx == checksum_offset ||
+            idx == checksum_offset+1) {
             c1 += c0;
             pptr++;
         } else {

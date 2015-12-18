@@ -21,11 +21,11 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include <string.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "extract.h"
 #include "addrtoname.h"
 
@@ -231,7 +231,6 @@ rpki_rtr_pdu_print (netdissect_options *ndo, const u_char *tptr, u_int indent)
 	}
 	break;
 
-#ifdef INET6
     case RPKI_RTR_IPV6_PREFIX_PDU:
 	{
 	    const rpki_rtr_pdu_ipv6_prefix *pdu;
@@ -244,7 +243,6 @@ rpki_rtr_pdu_print (netdissect_options *ndo, const u_char *tptr, u_int indent)
 		   EXTRACT_32BITS(pdu->as), pdu->flags));
 	}
 	break;
-#endif
 
     case RPKI_RTR_ERROR_REPORT_PDU:
 	{

@@ -24,9 +24,9 @@ __RCSID("NetBSD: print-juniper.c,v 1.3 2007/07/25 06:31:32 dogcow Exp ");
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
 #include "ppp.h"
@@ -1032,10 +1032,8 @@ juniper_ppp_heuristic_guess(netdissect_options *ndo,
     case PPP_PAP :
     case PPP_CHAP :
     case PPP_ML :
-#ifdef INET6
     case PPP_IPV6 :
     case PPP_IPV6CP :
-#endif
         ppp_print(ndo, p, length);
         break;
 

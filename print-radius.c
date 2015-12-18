@@ -37,6 +37,10 @@
  * RFC 2869:
  *      "RADIUS Extensions"
  *
+ * RFC 3580:
+ *      "IEEE 802.1X Remote Authentication Dial In User Service (RADIUS)"
+ *      "Usage Guidelines"
+ *
  * RFC 4675:
  *      "RADIUS Attributes for Virtual LAN and Priority Support"
  *
@@ -52,11 +56,11 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include <string.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
 #include "oui.h"
@@ -330,6 +334,7 @@ static const char *tunnel_type[]={ NULL,
                                    "GRE",
                                    "DVS",
                                    "IP-in-IP Tunneling",
+                                   "VLAN",
                                  };
 
 /* Tunnel-Medium-Type Attribute standard values */
@@ -532,7 +537,7 @@ print_attr_string(netdissect_options *ndo,
    }
 
    for (i=0; *data && i < length ; i++, data++)
-       ND_PRINT((ndo, "%c", (*data < 32 || *data > 128) ? '.' : *data));
+       ND_PRINT((ndo, "%c", (*data < 32 || *data > 126) ? '.' : *data));
 
    return;
 
@@ -592,7 +597,7 @@ print_vendor_attr(netdissect_options *ndo,
                vendor_type,
                vendor_length));
         for (idx = 0; idx < vendor_length ; idx++, data++)
-            ND_PRINT((ndo, "%c", (*data < 32 || *data > 128) ? '.' : *data));
+            ND_PRINT((ndo, "%c", (*data < 32 || *data > 126) ? '.' : *data));
         length-=vendor_length;
     }
     return;

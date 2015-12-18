@@ -23,15 +23,13 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include <string.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
-
-#ifdef INET6
 
 #include "ip6.h"
 #include "ipproto.h"
@@ -263,13 +261,3 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 trunc:
 	ND_PRINT((ndo, "[|ip6]"));
 }
-
-#else /* INET6 */
-
-void
-ip6_print(netdissect_options *ndo, const u_char *bp _U_, u_int length)
-{
-	ND_PRINT((ndo, "IP6, length: %u (printing not supported)", length));
-}
-
-#endif /* INET6 */

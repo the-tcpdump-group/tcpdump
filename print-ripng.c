@@ -23,11 +23,9 @@
 #include "config.h"
 #endif
 
-#ifdef INET6
+#include <netdissect-stdinc.h>
 
-#include <tcpdump-stdinc.h>
-
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
 
@@ -172,4 +170,3 @@ ripng_print(netdissect_options *ndo, const u_char *dat, unsigned int length)
 	if (rp->rip6_vers != RIP6_VERSION)
 		ND_PRINT((ndo, " [vers %d]", rp->rip6_vers));
 }
-#endif /* INET6 */

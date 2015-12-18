@@ -23,14 +23,14 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include <stdio.h>
 #include <string.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
-#include "extract.h"			/* must come after interface.h */
+#include "extract.h"
 
 #include "ip.h"
 #include "udp.h"
@@ -386,14 +386,14 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 				(void)snprintf(buf, sizeof(buf),
 					"%s tcp port %s unreachable",
 					ipaddr_string(ndo, &oip->ip_dst),
-					tcpport_string(dport));
+					tcpport_string(ndo, dport));
 				break;
 
 			case IPPROTO_UDP:
 				(void)snprintf(buf, sizeof(buf),
 					"%s udp port %s unreachable",
 					ipaddr_string(ndo, &oip->ip_dst),
-					udpport_string(dport));
+					udpport_string(ndo, dport));
 				break;
 
 			default:
@@ -479,7 +479,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			    " [size %d]", size);
 			break;
 		}
-		idp = (struct id_rdiscovery *)&dp->icmp_data;
+		idp = (const struct id_rdiscovery *)&dp->icmp_data;
 		while (num-- > 0) {
 			ND_TCHECK(*idp);
 			(void)snprintf(cp, sizeof(buf) - (cp - buf), " {%s %u}",
@@ -556,7 +556,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 	ND_PRINT((ndo, "ICMP %s, length %u", str, plen));
 	if (ndo->ndo_vflag && !fragmented) { /* don't attempt checksumming if this is a frag */
 		uint16_t sum, icmp_sum;
-		struct cksum_vec vec[1];
+
 		if (ND_TTEST2(*bp, plen)) {
 			vec[0].ptr = (const uint8_t *)(const void *)dp;
 			vec[0].len = plen;
@@ -598,7 +598,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
              * however not all implementations set the length field proper.
              */
             if (!ext_dp->icmp_length) {
-                vec[0].ptr = (const uint8_t *)(void *)&ext_dp->icmp_ext_version_res;
+                vec[0].ptr = (const uint8_t *)(const void *)&ext_dp->icmp_ext_version_res;
                 vec[0].len = plen - ICMP_EXTD_MINLEN;
                 if (in_cksum(vec, 1)) {
                     return;
@@ -618,7 +618,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
             }
 
             hlen = plen - ICMP_EXTD_MINLEN;
-            vec[0].ptr = (const uint8_t *)(void *)&ext_dp->icmp_ext_version_res;
+            vec[0].ptr = (const uint8_t *)(const void *)&ext_dp->icmp_ext_version_res;
             vec[0].len = hlen;
             ND_PRINT((ndo, ", checksum 0x%04x (%scorrect), length %u",
                    EXTRACT_16BITS(ext_dp->icmp_ext_checksum),

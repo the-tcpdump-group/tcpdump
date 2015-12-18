@@ -23,15 +23,13 @@
 #include "config.h"
 #endif
 
-#ifdef INET6
-
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include <string.h>
 
 #include "ip6.h"
 
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
 
@@ -107,4 +105,3 @@ rt6_print(netdissect_options *ndo, register const u_char *bp, const u_char *bp2 
 	ND_PRINT((ndo, "[|srcrt]"));
 	return -1;
 }
-#endif /* INET6 */

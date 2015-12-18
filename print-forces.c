@@ -18,9 +18,9 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "extract.h"
 
 static const char tstr[] = "[|forces]";
@@ -222,7 +222,7 @@ enum {
 	B_OP_REPORT = 1 << (F_OP_REPORT - 1),
 	B_OP_COMMIT = 1 << (F_OP_COMMIT - 1),
 	B_OP_RCOMMIT = 1 << (F_OP_RCOMMIT - 1),
-	B_OP_RTRCOMP = 1 << (F_OP_RTRCOMP - 1),
+	B_OP_RTRCOMP = 1 << (F_OP_RTRCOMP - 1)
 };
 
 struct optlv_h {

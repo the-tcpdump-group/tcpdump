@@ -60,7 +60,7 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -69,7 +69,7 @@
 #include <smi.h>
 #endif
 
-#include "interface.h"
+#include "netdissect.h"
 
 #undef OPAQUE  /* defined in <wingdi.h> */
 
@@ -676,9 +676,10 @@ asn1_print(netdissect_options *ndo,
 		break;
 
 	case BE_OID: {
-		int o = 0, first = -1, i = asnlen;
+		int o = 0, first = -1;
 
-		if (!ndo->ndo_sflag && !ndo->ndo_nflag && asnlen > 2) {
+		i = asnlen;
+		if (!ndo->ndo_mflag && !ndo->ndo_nflag && asnlen > 2) {
 			const struct obj_abrev *a = &obj_abrev_list[0];
 			size_t a_len = strlen(a->oid);
 			for (; a->node; a++) {
@@ -694,7 +695,7 @@ asn1_print(netdissect_options *ndo,
 			}
 		}
 
-		for (; !ndo->ndo_sflag && i-- > 0; p++) {
+		for (; !ndo->ndo_mflag && i-- > 0; p++) {
 			ND_TCHECK(*p);
 			o = (o << ASN_SHIFT7) + (*p & ~ASN_BIT8);
 			if (*p & ASN_LONGLEN)
@@ -774,7 +775,8 @@ asn1_print(netdissect_options *ndo,
 
 	case BE_STR: {
 		register int printable = 1, first = 1;
-		const u_char *p = elem->data.str;
+
+		p = elem->data.str;
 		ND_TCHECK2(*p, asnlen);
 		for (i = asnlen; printable && i-- > 0; p++)
 			printable = ND_ISPRINT(*p);
@@ -899,7 +901,7 @@ smi_decode_oid(netdissect_options *ndo,
 	int o = 0, first = -1, i = asnlen;
 	unsigned int firstval;
 
-	for (*oidlen = 0; ndo->ndo_sflag && i-- > 0; p++) {
+	for (*oidlen = 0; ndo->ndo_mflag && i-- > 0; p++) {
 		ND_TCHECK(*p);
 	        o = (o << ASN_SHIFT7) + (*p & ~ASN_BIT8);
 		if (*p & ASN_LONGLEN)
@@ -1052,7 +1054,7 @@ smi_print_variable(netdissect_options *ndo,
 
 static int
 smi_print_value(netdissect_options *ndo,
-                SmiNode *smiNode, u_char pduid, struct be *elem)
+                SmiNode *smiNode, u_short pduid, struct be *elem)
 {
 	unsigned int i, oid[128], oidlen;
 	SmiType *smiType;
@@ -1195,7 +1197,7 @@ smi_print_value(netdissect_options *ndo,
  */
 static void
 varbind_print(netdissect_options *ndo,
-              u_char pduid, const u_char *np, u_int length)
+              u_short pduid, const u_char *np, u_int length)
 {
 	struct be elem;
 	int count = 0, ind;
@@ -1295,7 +1297,7 @@ snmppdu_print(netdissect_options *ndo,
               u_short pduid, const u_char *np, u_int length)
 {
 	struct be elem;
-	int count = 0, error;
+	int count = 0, error_status;
 
 	/* reqId (Integer) */
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
@@ -1318,7 +1320,7 @@ snmppdu_print(netdissect_options *ndo,
 		asn1_print(ndo, &elem);
 		return;
 	}
-	error = 0;
+	error_status = 0;
 	if ((pduid == GETREQ || pduid == GETNEXTREQ || pduid == SETREQ
 	    || pduid == INFORMREQ || pduid == V2TRAP || pduid == REPORT)
 	    && elem.data.integer != 0) {
@@ -1330,7 +1332,7 @@ snmppdu_print(netdissect_options *ndo,
 	} else if (elem.data.integer != 0) {
 		char errbuf[20];
 		ND_PRINT((ndo, " %s", DECODE_ErrorStatus(elem.data.integer)));
-		error = elem.data.integer;
+		error_status = elem.data.integer;
 	}
 	length -= count;
 	np += count;
@@ -1350,15 +1352,12 @@ snmppdu_print(netdissect_options *ndo,
 	else if (pduid == GETBULKREQ)
 		ND_PRINT((ndo, " M=%d", elem.data.integer));
 	else if (elem.data.integer != 0) {
-		if (!error)
+		if (!error_status)
 			ND_PRINT((ndo, "[errorIndex(%d) w/o errorStatus]", elem.data.integer));
-		else {
+		else
 			ND_PRINT((ndo, "@%d", elem.data.integer));
-			error = elem.data.integer;
-		}
-	} else if (error) {
+	} else if (error_status) {
 		ND_PRINT((ndo, "[errorIndex==0]"));
-		error = 0;
 	}
 	length -= count;
 	np += count;

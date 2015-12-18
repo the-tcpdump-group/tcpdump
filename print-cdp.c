@@ -28,13 +28,13 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include <string.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
-#include "extract.h"			/* must come after interface.h */
+#include "extract.h"
 #include "nlpid.h"
 
 static const char tstr[] = "[|cdp]";
@@ -169,9 +169,11 @@ cdp_print(netdissect_options *ndo,
 			ND_PRINT((ndo, "\n\t  "));
 			for (i=0;i<len;i++) {
 			    j = *(tptr+i);
-			    ND_PRINT((ndo, "%c", j));
-			    if (j == 0x0a) /* lets rework the version string to get a nice indentation */
-				ND_PRINT((ndo, "\t  "));
+			    if (j == '\n') /* lets rework the version string to
+					      get a nice indentation */
+				ND_PRINT((ndo, "\n\t  "));
+			    else
+				fn_print_char(ndo, j);
 			}
 			break;
 		    case 0x06: /* Platform */
@@ -277,11 +279,9 @@ cdp_print_addr(netdissect_options *ndo,
 {
 	int pt, pl, al, num;
 	const u_char *endp = p + l;
-#ifdef INET6
 	static const u_char prot_ipv6[] = {
 		0xaa, 0xaa, 0x03, 0x00, 0x00, 0x00, 0x86, 0xdd
 	};
-#endif
 
 	ND_TCHECK2(*p, 4);
 	if (p + 4 > endp)
@@ -316,7 +316,6 @@ cdp_print_addr(netdissect_options *ndo,
 			ND_PRINT((ndo, "IPv4 (%u) %s", num, ipaddr_string(ndo, p)));
 			p += 4;
 		}
-#ifdef INET6
 		else if (pt == PT_IEEE_802_2 && pl == 8 &&
 		    memcmp(p, prot_ipv6, 8) == 0 && al == 16) {
 			/*
@@ -333,7 +332,6 @@ cdp_print_addr(netdissect_options *ndo,
 			ND_PRINT((ndo, "IPv6 (%u) %s", num, ip6addr_string(ndo, p)));
 			p += al;
 		}
-#endif
 		else {
 			/*
 			 * Generic case: just print raw data

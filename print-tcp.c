@@ -32,30 +32,26 @@ __RCSID("$NetBSD: print-tcp.c,v 1.8 2007/07/24 11:53:48 drochner Exp $");
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include <stdlib.h>
 #include <string.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
 
 #include "tcp.h"
 
 #include "ip.h"
-#ifdef INET6
 #include "ip6.h"
-#endif
 #include "ipproto.h"
 #include "rpc_auth.h"
 #include "rpc_msg.h"
 
-#include "nameser.h"
-
 #ifdef HAVE_LIBCRYPTO
 #include <openssl/md5.h>
-#include <signature.h>
+#include "signature.h"
 
 static int tcp_verify_signature(netdissect_options *ndo,
                                 const struct ip *ip, const struct tcphdr *tp,
@@ -82,7 +78,6 @@ struct tcp_seq_hash {
         tcp_seq ack;
 };
 
-#ifdef INET6
 struct tha6 {
         struct in6_addr src;
         struct in6_addr dst;
@@ -95,7 +90,6 @@ struct tcp_seq_hash6 {
         tcp_seq seq;
         tcp_seq ack;
 };
-#endif
 
 #define TSEQ_HASHSIZE 919
 
@@ -103,9 +97,7 @@ struct tcp_seq_hash6 {
 #define ZEROLENOPT(o) ((o) == TCPOPT_EOL || (o) == TCPOPT_NOP)
 
 static struct tcp_seq_hash tcp_seq_hash4[TSEQ_HASHSIZE];
-#ifdef INET6
 static struct tcp_seq_hash6 tcp_seq_hash6[TSEQ_HASHSIZE];
-#endif
 
 static const struct tok tcp_flag_values[] = {
         { TH_FIN, "F" },
@@ -166,18 +158,14 @@ tcp_print(netdissect_options *ndo,
         u_int utoval;
         uint16_t magic;
         register int rev;
-#ifdef INET6
         register const struct ip6_hdr *ip6;
-#endif
 
         tp = (const struct tcphdr *)bp;
         ip = (const struct ip *)bp2;
-#ifdef INET6
         if (IP_V(ip) == 6)
                 ip6 = (const struct ip6_hdr *)bp2;
         else
                 ip6 = NULL;
-#endif /*INET6*/
         ch = '\0';
         if (!ND_TTEST(tp->th_dport)) {
                 ND_PRINT((ndo, "%s > %s: [|tcp]",
@@ -191,30 +179,27 @@ tcp_print(netdissect_options *ndo,
 
         hlen = TH_OFF(tp) * 4;
 
-#ifdef INET6
         if (ip6) {
                 if (ip6->ip6_nxt == IPPROTO_TCP) {
                         ND_PRINT((ndo, "%s.%s > %s.%s: ",
                                      ip6addr_string(ndo, &ip6->ip6_src),
-                                     tcpport_string(sport),
+                                     tcpport_string(ndo, sport),
                                      ip6addr_string(ndo, &ip6->ip6_dst),
-                                     tcpport_string(dport)));
+                                     tcpport_string(ndo, dport)));
                 } else {
                         ND_PRINT((ndo, "%s > %s: ",
-                                     tcpport_string(sport), tcpport_string(dport)));
+                                     tcpport_string(ndo, sport), tcpport_string(ndo, dport)));
                 }
-        } else
-#endif /*INET6*/
-        {
+        } else {
                 if (ip->ip_p == IPPROTO_TCP) {
                         ND_PRINT((ndo, "%s.%s > %s.%s: ",
                                      ipaddr_string(ndo, &ip->ip_src),
-                                     tcpport_string(sport),
+                                     tcpport_string(ndo, sport),
                                      ipaddr_string(ndo, &ip->ip_dst),
-                                     tcpport_string(dport)));
+                                     tcpport_string(ndo, dport)));
                 } else {
                         ND_PRINT((ndo, "%s > %s: ",
-                                     tcpport_string(sport), tcpport_string(dport)));
+                                     tcpport_string(ndo, sport), tcpport_string(ndo, dport)));
                 }
         }
 
@@ -251,7 +236,6 @@ tcp_print(netdissect_options *ndo,
                  * both directions).
                  */
                 rev = 0;
-#ifdef INET6
                 if (ip6) {
                         register struct tcp_seq_hash6 *th;
                         struct tcp_seq_hash6 *tcp_seq_hash;
@@ -289,7 +273,8 @@ tcp_print(netdissect_options *ndo,
                                         th->nxt = (struct tcp_seq_hash6 *)
                                                 calloc(1, sizeof(*th));
                                         if (th->nxt == NULL)
-                                                error("tcp_print: calloc");
+                                                (*ndo->ndo_error)(ndo,
+								  "tcp_print: calloc");
                                 }
                                 th->addr = tha;
                                 if (rev)
@@ -306,30 +291,24 @@ tcp_print(netdissect_options *ndo,
                         thseq = th->seq;
                         thack = th->ack;
                 } else {
-#else  /*INET6*/
-                {
-#endif /*INET6*/
                         register struct tcp_seq_hash *th;
                         struct tcp_seq_hash *tcp_seq_hash;
-                        const struct in_addr *src, *dst;
                         struct tha tha;
 
                         tcp_seq_hash = tcp_seq_hash4;
-                        src = &ip->ip_src;
-                        dst = &ip->ip_dst;
                         if (sport > dport)
                                 rev = 1;
                         else if (sport == dport) {
-                                if (UNALIGNED_MEMCMP(src, dst, sizeof ip->ip_dst) > 0)
+                                if (UNALIGNED_MEMCMP(&ip->ip_src, &ip->ip_dst, sizeof ip->ip_dst) > 0)
                                         rev = 1;
                         }
                         if (rev) {
-                                UNALIGNED_MEMCPY(&tha.src, dst, sizeof ip->ip_dst);
-                                UNALIGNED_MEMCPY(&tha.dst, src, sizeof ip->ip_src);
+                                UNALIGNED_MEMCPY(&tha.src, &ip->ip_dst, sizeof ip->ip_dst);
+                                UNALIGNED_MEMCPY(&tha.dst, &ip->ip_src, sizeof ip->ip_src);
                                 tha.port = dport << 16 | sport;
                         } else {
-                                UNALIGNED_MEMCPY(&tha.dst, dst, sizeof ip->ip_dst);
-                                UNALIGNED_MEMCPY(&tha.src, src, sizeof ip->ip_src);
+                                UNALIGNED_MEMCPY(&tha.dst, &ip->ip_dst, sizeof ip->ip_dst);
+                                UNALIGNED_MEMCPY(&tha.src, &ip->ip_src, sizeof ip->ip_src);
                                 tha.port = sport << 16 | dport;
                         }
 
@@ -345,7 +324,8 @@ tcp_print(netdissect_options *ndo,
                                         th->nxt = (struct tcp_seq_hash *)
                                                 calloc(1, sizeof(*th));
                                         if (th->nxt == NULL)
-                                                error("tcp_print: calloc");
+                                                (*ndo->ndo_error)(ndo,
+								  "tcp_print: calloc");
                                 }
                                 th->addr = tha;
                                 if (rev)
@@ -388,9 +368,7 @@ tcp_print(netdissect_options *ndo,
                                 else
                                         ND_PRINT((ndo, " (correct)"));
                         }
-                }
-#ifdef INET6
-                else if (IP_V(ip) == 6 && ip6->ip6_plen) {
+                } else if (IP_V(ip) == 6 && ip6->ip6_plen) {
                         if (ND_TTEST2(tp->th_sport, length)) {
                                 sum = nextproto6_cksum(ip6, (const uint8_t *)tp,
 							length, length, IPPROTO_TCP);
@@ -405,7 +383,6 @@ tcp_print(netdissect_options *ndo,
 
                         }
                 }
-#endif
         }
 
         length -= hlen;
@@ -476,7 +453,7 @@ tcp_print(netdissect_options *ndo,
                         case TCPOPT_SACK:
                                 datalen = len - 2;
                                 if (datalen % 8 != 0) {
-                                        ND_PRINT((ndo, "malformed sack"));
+                                        ND_PRINT((ndo, "invalid sack"));
                                 } else {
                                         uint32_t s, e;
 
@@ -668,54 +645,50 @@ tcp_print(netdissect_options *ndo,
                 return;
         }
 
-        if (sport == TELNET_PORT || dport == TELNET_PORT) {
+        if (IS_SRC_OR_DST_PORT(TELNET_PORT)) {
                 telnet_print(ndo, bp, length);
-        } else if (sport == SMTP_PORT || dport == SMTP_PORT) {
+        } else if (IS_SRC_OR_DST_PORT(SMTP_PORT)) {
                 ND_PRINT((ndo, ": "));
                 smtp_print(ndo, bp, length);
-        } else if (sport == BGP_PORT || dport == BGP_PORT)
+        } else if (IS_SRC_OR_DST_PORT(BGP_PORT))
                 bgp_print(ndo, bp, length);
-        else if (sport == PPTP_PORT || dport == PPTP_PORT)
+        else if (IS_SRC_OR_DST_PORT(PPTP_PORT))
                 pptp_print(ndo, bp);
-#ifdef TCPDUMP_DO_SMB
-        else if (sport == NETBIOS_SSN_PORT || dport == NETBIOS_SSN_PORT)
+#ifdef ENABLE_SMB
+        else if (IS_SRC_OR_DST_PORT(NETBIOS_SSN_PORT))
                 nbt_tcp_print(ndo, bp, length);
-	else if (sport == SMB_PORT || dport == SMB_PORT)
+	else if (IS_SRC_OR_DST_PORT(SMB_PORT))
 		smb_tcp_print(ndo, bp, length);
 #endif
-        else if (sport == BEEP_PORT || dport == BEEP_PORT)
+        else if (IS_SRC_OR_DST_PORT(BEEP_PORT))
                 beep_print(ndo, bp, length);
-        else if (sport == OPENFLOW_PORT_OLD || dport == OPENFLOW_PORT_OLD ||
-                 sport == OPENFLOW_PORT_IANA || dport == OPENFLOW_PORT_IANA)
+        else if (IS_SRC_OR_DST_PORT(OPENFLOW_PORT_OLD) || IS_SRC_OR_DST_PORT(OPENFLOW_PORT_IANA))
                 openflow_print(ndo, bp, length);
-        else if (sport == FTP_PORT || dport == FTP_PORT) {
+        else if (IS_SRC_OR_DST_PORT(FTP_PORT)) {
                 ND_PRINT((ndo, ": "));
                 ftp_print(ndo, bp, length);
-        } else if (sport == HTTP_PORT || dport == HTTP_PORT ||
-            sport == HTTP_PORT_ALT || dport == HTTP_PORT_ALT) {
+        } else if (IS_SRC_OR_DST_PORT(HTTP_PORT) || IS_SRC_OR_DST_PORT(HTTP_PORT_ALT)) {
                 ND_PRINT((ndo, ": "));
                 http_print(ndo, bp, length);
-        } else if (sport == RTSP_PORT || dport == RTSP_PORT ||
-            sport == RTSP_PORT_ALT || dport == RTSP_PORT_ALT) {
+        } else if (IS_SRC_OR_DST_PORT(RTSP_PORT) || IS_SRC_OR_DST_PORT(RTSP_PORT_ALT)) {
                 ND_PRINT((ndo, ": "));
                 rtsp_print(ndo, bp, length);
         } else if (length > 2 &&
-                 (sport == NAMESERVER_PORT || dport == NAMESERVER_PORT ||
-                  sport == MULTICASTDNS_PORT || dport == MULTICASTDNS_PORT)) {
+                 (IS_SRC_OR_DST_PORT(NAMESERVER_PORT))) {
                 /*
                  * TCP DNS query has 2byte length at the head.
                  * XXX packet could be unaligned, it can go strange
                  */
                 ns_print(ndo, bp + 2, length - 2, 0);
-        } else if (sport == MSDP_PORT || dport == MSDP_PORT) {
+        } else if (IS_SRC_OR_DST_PORT(MSDP_PORT)) {
                 msdp_print(ndo, bp, length);
-        } else if (sport == RPKI_RTR_PORT || dport == RPKI_RTR_PORT) {
+        } else if (IS_SRC_OR_DST_PORT(RPKI_RTR_PORT)) {
                 rpki_rtr_print(ndo, bp, length);
         }
-        else if (length > 0 && (sport == LDP_PORT || dport == LDP_PORT)) {
+        else if (length > 0 && (IS_SRC_OR_DST_PORT(LDP_PORT))) {
                 ldp_print(ndo, bp, length);
         }
-        else if ((sport == NFS_PORT || dport == NFS_PORT) &&
+        else if ((IS_SRC_OR_DST_PORT(NFS_PORT)) &&
                  length >= 4 && ND_TTEST2(*bp, 4)) {
                 /*
                  * If data present, header length valid, and NFS port used,
@@ -807,7 +780,7 @@ print_tcp_fastopen_option(netdissect_options *ndo, register const u_char *cp,
         } else {
                 /* Fast Open Cookie */
                 if (datalen % 2 != 0 || datalen < 4 || datalen > 16) {
-                        ND_PRINT((ndo, " malformed"));
+                        ND_PRINT((ndo, " invalid"));
                 } else {
                         ND_PRINT((ndo, " cookie "));
                         for (i = 0; i < datalen; ++i)
@@ -828,11 +801,9 @@ tcp_verify_signature(netdissect_options *ndo,
         char zero_proto = 0;
         MD5_CTX ctx;
         uint16_t savecsum, tlen;
-#ifdef INET6
         const struct ip6_hdr *ip6;
         uint32_t len32;
         uint8_t nxt;
-#endif
 
 	if (data + length > ndo->ndo_snapend) {
 		ND_PRINT((ndo, "snaplen too short, "));
@@ -858,7 +829,6 @@ tcp_verify_signature(netdissect_options *ndo,
                 tlen = EXTRACT_16BITS(&ip->ip_len) - IP_HL(ip) * 4;
                 tlen = htons(tlen);
                 MD5_Update(&ctx, (const char *)&tlen, sizeof(tlen));
-#ifdef INET6
         } else if (IP_V(ip) == 6) {
                 ip6 = (const struct ip6_hdr *)ip;
                 MD5_Update(&ctx, (const char *)&ip6->ip6_src, sizeof(ip6->ip6_src));
@@ -871,13 +841,8 @@ tcp_verify_signature(netdissect_options *ndo,
                 MD5_Update(&ctx, (const char *)&nxt, sizeof(nxt));
                 nxt = IPPROTO_TCP;
                 MD5_Update(&ctx, (const char *)&nxt, sizeof(nxt));
-#endif
         } else {
-#ifdef INET6
 		ND_PRINT((ndo, "IP version not 4 or 6, "));
-#else
-		ND_PRINT((ndo, "IP version not 4, "));
-#endif
                 return (CANT_CHECK_SIGNATURE);
         }
 

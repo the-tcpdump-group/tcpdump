@@ -207,6 +207,7 @@ stime.awk	- TCP send awk script
 tcp.h		- TCP definitions
 tcpdump.1	- manual entry
 tcpdump.c	- main program
+timeval-operations.h - timeval operations macros
 udp.h		- UDP definitions
 util.c		- utility routines
 vfprintf.c	- emulation routine

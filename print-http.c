@@ -20,12 +20,12 @@ static const char rcsid[] _U_ =
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "extract.h"
 
 /*

@@ -1,3 +1,5 @@
+# The Option -n is useless in TESTLIST. It is already set in TESTonce.
+
 # Various flags applied to a TCP session.
 #
 # We cannot rely on, for example, "print-x.out" and
@@ -26,7 +28,7 @@ bgp-aigp	bgp-aigp.pcap	bgp-aigp.out	-t -v
 eapon1 eapon1.pcap eapon1.out -t
 
 # ESP tests
-esp0 02-sunrise-sunset-esp.pcap esp0.out -t -n
+esp0 02-sunrise-sunset-esp.pcap esp0.out -t
 # more ESP tests in crypto.sh
 
 # ISAKMP tests
@@ -43,6 +45,14 @@ lmp		lmp.pcap		lmp.out -t -T lmp
 # MPLS tests
 mpls-ldp-hello	mpls-ldp-hello.pcap	mpls-ldp-hello.out -t -v
 ldp_infloop	ldp-infinite-loop.pcap	ldp_infloop.out -t
+lspping-fec-ldp    lspping-fec-ldp.pcap lspping-fec-ldp.out -t
+lspping-fec-ldp-v  lspping-fec-ldp.pcap lspping-fec-ldp-v.out -t -v
+lspping-fec-ldp-vv lspping-fec-ldp.pcap lspping-fec-ldp-vv.out -t -vv
+lspping-fec-rsvp    lspping-fec-rsvp.pcap lspping-fec-rsvp.out -t
+lspping-fec-rsvp-v  lspping-fec-rsvp.pcap lspping-fec-rsvp-v.out -t -v
+lspping-fec-rsvp-vv lspping-fec-rsvp.pcap lspping-fec-rsvp-vv.out -t -vv
+mpls-traceroute   mpls-traceroute.pcap mpls-traceroute.out -t
+mpls-traceroute-v mpls-traceroute.pcap mpls-traceroute-v.out -t -v
 
 # OSPF tests
 ospf-gmpls	ospf-gmpls.pcap				ospf-gmpls.out		-t -v
@@ -175,7 +185,7 @@ of10_7050q-v	of10_7050q.pcap		of10_7050q-v.out	-t -v
 of10_7050sx_bsn-vv	of10_7050sx_bsn.pcap		of10_7050sx_bsn-vv.out	-t -vv
 
 # GeoNetworking and CALM FAST tests
-geonet-calm-fast	geonet_and_calm_fast.pcap	geonet_and_calm_fast.out	-t -vv -n
+geonet-calm-fast	geonet_and_calm_fast.pcap	geonet_and_calm_fast.out	-t -vv
 
 # M3UA tests
 m3ua isup.pcap isup.out -t
@@ -185,9 +195,11 @@ m3ua-vv isup.pcap isupvv.out -t -vv
 
 # syslog test case
 syslog-v	syslog_udp.pcap		syslog-v.out		-t -v
+# DNSSEC from https://bugzilla.redhat.com/show_bug.cgi?id=205842, -vv exposes EDNS DO
+dnssec-vv	dnssec.pcap		dnssec-vv.out		-t -vv
 
 #IPv6 tests
-ipv6-bad-version.pcap	ipv6-bad-version.pcap 	ipv6-bad-version.out	-t
+ipv6-bad-version	ipv6-bad-version.pcap 	ipv6-bad-version.out	-t
 ipv6-routing-header	ipv6-routing-header.pcap	ipv6-routing-header.out -t -v
 
 # Loopback/CTP test case
@@ -237,6 +249,7 @@ decnet		DECnet_Phone.pcap	decnet.out	-t
 radius-v	RADIUS.pcap	radius-v.out	-t -v
 radius-rfc4675	RADIUS-RFC4675.pcap	radius-rfc4675-v.out	-t -v
 radius-rfc5176	RADIUS-RFC5176.pcap	radius-rfc5176-v.out	-t -v
+radius-port1700	RADIUS-port1700.pcap	radius-port1700-v.out	-t -v
 
 # link-level protocols
 dtp-v		DTP.pcap		dtp-v.out		-t -v
@@ -298,4 +311,20 @@ cve2015-0261_01    cve2015-0261-ipv6.pcap       cve2015-0261-ipv6.out -t -v
 cve2015-0261_02    cve2015-0261-crash.pcap      cve2015-0261-crash.out -t -v
 
 # OLSRv1 tests
-olsrv1_1	OLSRv1_HNA_sgw_1.pcap		OLSRv1_HNA_sgw_1.out	-t -v -n
+olsrv1_1	OLSRv1_HNA_sgw_1.pcap		OLSRv1_HNA_sgw_1.out	-t -v
+
+# tests with unaligned data, to make sure they work on SPARC
+unaligned-nfs-1	unaligned-nfs-1.pcap	unaligned-nfs-1.out	-t -v
+
+# LISP tests
+lisp_eid_notify		lisp_eid_notify.pcap	lisp_eid_notify.out	-t -v
+lisp_eid_register	lisp_eid_register.pcap	lisp_eid_register.out	-t -v
+lisp_ipv6_eid		lisp_ipv6.pcap		lisp_ipv6.out		-t -v
+
+# pcap invalid versions (first: version = 1.4 ; second: version = 2.5)
+pcap-invalid-version-1 pcap-invalid-version-1.pcap pcap-invalid-version-1.out -t
+pcap-invalid-version-2 pcap-invalid-version-2.pcap pcap-invalid-version-2.out -t
+
+# pcap-ng invalid version (first: version = 0.1 ; second: version = 1.1)
+pcap-ng-invalid-vers-1 pcap-ng-invalid-vers-1.pcap pcap-ng-invalid-vers-1.out -t
+pcap-ng-invalid-vers-2 pcap-ng-invalid-vers-2.pcap pcap-ng-invalid-vers-2.out -t

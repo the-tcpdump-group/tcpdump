@@ -19,9 +19,9 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "extract.h"
 #include "ethertype.h"
 
@@ -111,14 +111,14 @@ geneve_opts_print(netdissect_options *ndo, const u_char *bp, u_int len)
         }
 
         if (ndo->ndo_vflag > 1 && opt_len > 4) {
-            const uint32_t *print_data = (const uint32_t *)(bp + 4);
+            const uint32_t *data = (const uint32_t *)(bp + 4);
             int i;
 
             ND_PRINT((ndo, " data"));
 
             for (i = 4; i < opt_len; i += 4) {
-                ND_PRINT((ndo, " %08x", EXTRACT_32BITS(print_data)));
-                print_data++;
+                ND_PRINT((ndo, " %08x", EXTRACT_32BITS(data)));
+                data++;
             }
         }
 
@@ -131,7 +131,7 @@ void
 geneve_print(netdissect_options *ndo, const u_char *bp, u_int len)
 {
     uint8_t ver_opt;
-    uint version;
+    u_int version;
     uint8_t flags;
     uint16_t prot;
     uint32_t vni;

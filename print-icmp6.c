@@ -23,15 +23,14 @@
 #include "config.h"
 #endif
 
-#ifdef INET6
-
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include <stdio.h>
 #include <string.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "addrtoname.h"
+#include "addrtostr.h"
 #include "extract.h"
 
 #include "ip6.h"
@@ -957,12 +956,12 @@ icmp6_print(netdissect_options *ndo,
 			case IPPROTO_TCP:
 				ND_PRINT((ndo,", %s tcp port %s",
 					ip6addr_string(ndo, &oip->ip6_dst),
-                                          tcpport_string(dport)));
+                                          tcpport_string(ndo, dport)));
 				break;
 			case IPPROTO_UDP:
 				ND_PRINT((ndo,", %s udp port %s",
 					ip6addr_string(ndo, &oip->ip6_dst),
-                                          udpport_string(dport)));
+                                          udpport_string(ndo, dport)));
 				break;
 			default:
 				ND_PRINT((ndo,", %s protocol %d port %d unreachable",
@@ -1903,7 +1902,7 @@ icmp6_rrenum_print(netdissect_options *ndo, const u_char *bp, const u_char *ep)
 			ND_PRINT((ndo,",min=%u", match->rpm_minlen));
 			ND_PRINT((ndo,",max=%u", match->rpm_maxlen));
 		}
-		if (inet_ntop(AF_INET6, &match->rpm_prefix, hbuf, sizeof(hbuf)))
+		if (addrtostr6(&match->rpm_prefix, hbuf, sizeof(hbuf)))
 			ND_PRINT((ndo,",%s/%u", hbuf, match->rpm_matchlen));
 		else
 			ND_PRINT((ndo,",?/%u", match->rpm_matchlen));
@@ -1946,8 +1945,7 @@ icmp6_rrenum_print(netdissect_options *ndo, const u_char *bp, const u_char *ep)
 					ND_PRINT((ndo,"pltime=%u,",
                                                   EXTRACT_32BITS(&use->rpu_pltime)));
 			}
-			if (inet_ntop(AF_INET6, &use->rpu_prefix, hbuf,
-			    sizeof(hbuf)))
+			if (addrtostr6(&use->rpu_prefix, hbuf, sizeof(hbuf)))
 				ND_PRINT((ndo,"%s/%u/%u", hbuf, use->rpu_uselen,
                                           use->rpu_keeplen));
 			else
@@ -1963,8 +1961,6 @@ icmp6_rrenum_print(netdissect_options *ndo, const u_char *bp, const u_char *ep)
 trunc:
 	ND_PRINT((ndo,"[|icmp6]"));
 }
-
-#endif /* INET6 */
 
 /*
  * Local Variables:

@@ -39,20 +39,22 @@
 #include "config.h"
 #endif
 
-#include <tcpdump-stdinc.h>
+#include <netdissect-stdinc.h>
 
 #include <sys/stat.h>
 
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
+#include <ctype.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "interface.h"
+#include "netdissect.h"
 #include "ascii_strcasecmp.h"
+#include "timeval-operations.h"
 
 int32_t thiszone;		/* seconds offset from gmt to local time */
 
@@ -62,10 +64,30 @@ int32_t thiszone;		/* seconds offset from gmt to local time */
  */
 #define TS_BUF_SIZE sizeof("0000000000.000000000")
 
+#define TOKBUFSIZE 128
+
+/*
+ * Print out a character, filtering out the non-printable ones
+ */
+void
+fn_print_char(netdissect_options *ndo, u_char c)
+{
+	if (!ND_ISASCII(c)) {
+		c = ND_TOASCII(c);
+		ND_PRINT((ndo, "M-"));
+	}
+	if (!ND_ISPRINT(c)) {
+		c ^= 0x40;	/* DEL to ?, others to alpha */
+		ND_PRINT((ndo, "^"));
+	}
+	ND_PRINT((ndo, "%c", c));
+}
+
 /*
  * Print out a null-terminated filename (or other ascii string).
  * If ep is NULL, assume no truncation check is needed.
  * Return true if truncated.
+ * Stop at ep (if given) or before the null char, whichever is first.
  */
 int
 fn_print(netdissect_options *ndo,
@@ -98,6 +120,7 @@ fn_print(netdissect_options *ndo,
  * Print out a counted filename (or other ascii string).
  * If ep is NULL, assume no truncation check is needed.
  * Return true if truncated.
+ * Stop at ep (if given) or after n bytes, whichever is first.
  */
 int
 fn_printn(netdissect_options *ndo,
@@ -125,6 +148,8 @@ fn_printn(netdissect_options *ndo,
  * Print out a null-padded filename (or other ascii string).
  * If ep is NULL, assume no truncation check is needed.
  * Return true if truncated.
+ * Stop at ep (if given) or after n bytes or before the null char,
+ * whichever is first.
  */
 int
 fn_printzp(netdissect_options *ndo,
@@ -239,11 +264,11 @@ ts_print(netdissect_options *ndo,
 	register int s;
 	struct tm *tm;
 	time_t Time;
-	static unsigned b_sec;
-	static unsigned b_usec;
-	int d_usec;
-	int d_sec;
 	char buf[TS_BUF_SIZE];
+	static struct timeval tv_ref;
+	struct timeval tv_result;
+	int negative_offset;
+	int nano_prec;
 
 	switch (ndo->ndo_tflag) {
 
@@ -260,28 +285,39 @@ ts_print(netdissect_options *ndo,
 			  tvp->tv_sec, tvp->tv_usec, buf)));
 		break;
 
-	case 3: /* Microseconds since previous packet */
-        case 5: /* Microseconds since first packet */
-		if (b_sec == 0) {
-                        /* init timestamp for first packet */
-                        b_usec = tvp->tv_usec;
-                        b_sec = tvp->tv_sec;
-                }
+	case 3: /* Microseconds/nanoseconds since previous packet */
+        case 5: /* Microseconds/nanoseconds since first packet */
+#ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
+		switch (ndo->ndo_tstamp_precision) {
+		case PCAP_TSTAMP_PRECISION_MICRO:
+			nano_prec = 0;
+			break;
+		case PCAP_TSTAMP_PRECISION_NANO:
+			nano_prec = 1;
+			break;
+		default:
+			nano_prec = 0;
+			break;
+		}
+#else
+		nano_prec = 0;
+#endif
+		if (!(netdissect_timevalisset(&tv_ref)))
+			tv_ref = *tvp; /* set timestamp for first packet */
 
-                d_usec = tvp->tv_usec - b_usec;
-                d_sec = tvp->tv_sec - b_sec;
+		negative_offset = netdissect_timevalcmp(tvp, &tv_ref, <);
+		if (negative_offset)
+			netdissect_timevalsub(&tv_ref, tvp, &tv_result, nano_prec);
+		else
+			netdissect_timevalsub(tvp, &tv_ref, &tv_result, nano_prec);
 
-                while (d_usec < 0) {
-                    d_usec += 1000000;
-                    d_sec--;
-                }
+		ND_PRINT((ndo, (negative_offset ? "-" : " ")));
 
-                ND_PRINT((ndo, "%s ", ts_format(ndo, d_sec, d_usec, buf)));
+		ND_PRINT((ndo, "%s ", ts_format(ndo,
+			  tv_result.tv_sec, tv_result.tv_usec, buf)));
 
-                if (ndo->ndo_tflag == 3) { /* set timestamp for last packet */
-                    b_sec = tvp->tv_sec;
-                    b_usec = tvp->tv_usec;
-                }
+                if (ndo->ndo_tflag == 3)
+			tv_ref = *tvp; /* set timestamp for previous packet */
 		break;
 
 	case 4: /* Default + Date */
@@ -383,7 +419,7 @@ const char *
 tok2str(register const struct tok *lp, register const char *fmt,
 	register u_int v)
 {
-	static char buf[4][128];
+	static char buf[4][TOKBUFSIZE];
 	static int idx = 0;
 	char *ret;
 
@@ -457,7 +493,7 @@ bittok2str(register const struct tok *lp, register const char *fmt,
 
 /*
  * Convert a value to a string using an array; the macro
- * tok2strary() in <interface.h> is the public interface to
+ * tok2strary() in <netdissect.h> is the public interface to
  * this function and ensures that the second argument is
  * correct for bounds-checking.
  */
@@ -465,7 +501,7 @@ const char *
 tok2strary_internal(register const char **lp, int n, register const char *fmt,
 	register int v)
 {
-	static char buf[128];
+	static char buf[TOKBUFSIZE];
 
 	if (v >= 0 && v < n && lp[v] != NULL)
 		return lp[v];
@@ -506,7 +542,6 @@ mask2plen(uint32_t mask)
 	return (prefix_len);
 }
 
-#ifdef INET6
 int
 mask62plen(const u_char *mask)
 {
@@ -533,7 +568,6 @@ mask62plen(const u_char *mask)
 	}
 	return (cidr_len);
 }
-#endif /* INET6 */
 
 /*
  * Routine to print out information for text-based protocols such as FTP,

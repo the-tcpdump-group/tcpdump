@@ -69,8 +69,6 @@ extern char *strsep(char **, const char *);
 
 extern char *program_name;	/* used to generate self-identifying messages */
 
-extern int32_t thiszone;	/* seconds offset from gmt to local time */
-
 extern void error(const char *, ...)
      __attribute__((noreturn))
 #ifdef __ATTRIBUTE___FORMAT_OK
@@ -86,8 +84,6 @@ extern void warning(const char *, ...)
 extern char *read_infile(char *);
 extern char *copy_argv(char **);
 
-/* The printer routines. */
-
 #include <pcap.h>
 
 #ifndef HAVE_BPF_DUMP
@@ -96,5 +92,3 @@ struct bpf_program;
 extern void bpf_dump(const struct bpf_program *, int);
 
 #endif
-
-#include "netdissect.h"
