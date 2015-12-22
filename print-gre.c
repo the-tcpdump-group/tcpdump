@@ -369,7 +369,7 @@ gre_sre_ip_print(netdissect_options *ndo, uint8_t sreoff, uint8_t srelen,
 	}
 
 	while (srelen != 0) {
-		if (!ND_TTEST2(*bp, sizeof(struct in_addr)))
+		if (!ND_TTEST2(*bp, 4))
 			return (0);
 		if (len < 4)
 			return (0);
