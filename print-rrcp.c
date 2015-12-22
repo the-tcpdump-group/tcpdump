@@ -85,7 +85,7 @@ rrcp_print(netdissect_options *ndo,
 	rrcp_proto = *(rrcp + RRCP_PROTO_OFFSET);
 	ND_TCHECK(*(rrcp + RRCP_OPCODE_ISREPLY_OFFSET));
 	rrcp_opcode = (*(rrcp + RRCP_OPCODE_ISREPLY_OFFSET)) & RRCP_OPCODE_MASK;
-        ND_PRINT((ndo, "%s > %s, %s %s",
+	ND_PRINT((ndo, "%s > %s, %s %s",
 		etheraddr_string(ndo, ESRC(ep)),
 		etheraddr_string(ndo, EDST(ep)),
 		tok2str(proto_values,"RRCP-0x%02x",rrcp_proto),
@@ -97,8 +97,8 @@ rrcp_print(netdissect_options *ndo,
 	if (rrcp_opcode==1 || rrcp_opcode==2){
 	    ND_TCHECK2(*(rrcp + RRCP_REG_ADDR_OFFSET), 6);
     	    ND_PRINT((ndo, " addr=0x%04x, data=0x%08x",
-                     EXTRACT_LE_16BITS(rrcp + RRCP_REG_ADDR_OFFSET),
-                     EXTRACT_LE_32BITS(rrcp + RRCP_REG_DATA_OFFSET)));
+		     EXTRACT_LE_16BITS(rrcp + RRCP_REG_ADDR_OFFSET),
+		     EXTRACT_LE_32BITS(rrcp + RRCP_REG_DATA_OFFSET)));
 	}
 	if (rrcp_proto==1){
 	    ND_TCHECK2(*(rrcp + RRCP_AUTHKEY_OFFSET), 2);
