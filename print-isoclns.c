@@ -31,6 +31,7 @@
 #include <netdissect-stdinc.h>
 
 #include <string.h>
+#include <stdlib.h>
 
 #include "netdissect.h"
 #include "addrtoname.h"
@@ -2063,7 +2064,7 @@ isis_print(netdissect_options *ndo,
 
     const struct isis_iih_lan_header *header_iih_lan;
     const struct isis_iih_ptp_header *header_iih_ptp;
-    struct isis_lsp_header *header_lsp;
+    const struct isis_lsp_header *header_lsp;
     const struct isis_csnp_header *header_csnp;
     const struct isis_psnp_header *header_psnp;
 
@@ -2078,6 +2079,9 @@ isis_print(netdissect_options *ndo,
     u_short packet_len,pdu_len, key_id;
     u_int i,vendor_id;
     int sigcheck;
+#ifdef HAVE_LIBCRYPTO
+    uint8_t *packet_copy;
+#endif
 
     packet_len=length;
     optr = p; /* initialize the _o_riginal pointer to the packet start -
@@ -2088,7 +2092,7 @@ isis_print(netdissect_options *ndo,
     pptr = p+(ISIS_COMMON_HEADER_SIZE);
     header_iih_lan = (const struct isis_iih_lan_header *)pptr;
     header_iih_ptp = (const struct isis_iih_ptp_header *)pptr;
-    header_lsp = (struct isis_lsp_header *)pptr;
+    header_lsp = (const struct isis_lsp_header *)pptr;
     header_csnp = (const struct isis_csnp_header *)pptr;
     header_psnp = (const struct isis_psnp_header *)pptr;
 
@@ -2315,18 +2319,10 @@ isis_print(netdissect_options *ndo,
                EXTRACT_16BITS(header_lsp->remaining_lifetime),
                EXTRACT_16BITS(header_lsp->checksum)));
 
-        if (osi_print_cksum(ndo, (uint8_t *)header_lsp->lsp_id,
+        if (osi_print_cksum(ndo, (const uint8_t *)header_lsp->lsp_id,
                             EXTRACT_16BITS(header_lsp->checksum),
                             12, length-12) == 0)
                                 goto trunc;
-
-        /*
-         * Clear checksum and lifetime prior to signature verification.
-         */
-        header_lsp->checksum[0] = 0;
-        header_lsp->checksum[1] = 0;
-        header_lsp->remaining_lifetime[0] = 0;
-        header_lsp->remaining_lifetime[1] = 0;
 
 	ND_PRINT((ndo, ", PDU length: %u, Flags: [ %s",
                pdu_len,
@@ -2662,8 +2658,35 @@ isis_print(netdissect_options *ndo,
                     ND_PRINT((ndo, ", (invalid subTLV) "));
 
 #ifdef HAVE_LIBCRYPTO
-                sigcheck = signature_verify(ndo, optr, length,
-                                            (unsigned char *)tptr + 1);
+                /*
+                 * Make a copy of the packet, so we don't overwrite the
+                 * original.
+                 */
+                ND_TCHECK2(*optr, packet_len);
+                packet_copy = malloc(packet_len);
+                if (packet_copy == NULL)
+                    sigcheck = CANT_ALLOCATE_COPY;
+                else {
+                    struct isis_lsp_header *header_lsp_copy;
+                    u_int8_t *tptr_copy;
+
+                    memcpy(packet_copy, optr, packet_len);
+
+                    /*
+                     * Clear checksum and lifetime in the copy prior to
+                     * signature verification.
+                     */
+                    header_lsp_copy = (struct isis_lsp_header *)(packet_copy + ISIS_COMMON_HEADER_SIZE);
+                    header_lsp_copy->checksum[0] = 0;
+                    header_lsp_copy->checksum[1] = 0;
+                    header_lsp_copy->remaining_lifetime[0] = 0;
+                    header_lsp_copy->remaining_lifetime[1] = 0;
+
+                    tptr_copy = packet_copy + (tptr - optr);
+                    sigcheck = signature_verify(ndo, packet_copy, length,
+                                                tptr_copy + 1);
+                    free(packet_copy);
+                }
 #else
                 sigcheck = CANT_CHECK_SIGNATURE;
 #endif

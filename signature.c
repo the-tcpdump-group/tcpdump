@@ -33,6 +33,7 @@
 const struct tok signature_check_values[] = {
     { SIGNATURE_VALID, "valid"},
     { SIGNATURE_INVALID, "invalid"},
+    { CANT_ALLOCATE_COPY, "can't allocate memory"},
     { CANT_CHECK_SIGNATURE, "unchecked"},
     { 0, NULL }
 };
