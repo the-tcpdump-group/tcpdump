@@ -1862,12 +1862,12 @@ rsvp_print(netdissect_options *ndo,
          */
         while(tlen > 0) {
             const u_char *subpptr=tptr, *subtptr;
+            u_short subplen, subtlen;
 
             subtptr=subpptr;
 
             rsvp_com_header = (const struct rsvp_common_header *)subpptr;
             ND_TCHECK(*rsvp_com_header);
-            u_short subplen, subtlen;
 
             /*
              * Sanity checking of the header.
