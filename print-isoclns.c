@@ -31,7 +31,6 @@
 #include <netdissect-stdinc.h>
 
 #include <string.h>
-#include <stdlib.h>
 
 #include "netdissect.h"
 #include "addrtoname.h"
