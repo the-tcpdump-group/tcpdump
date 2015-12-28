@@ -2052,6 +2052,20 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
 }
 
 /*
+ * Clear checksum and lifetime prior to signature verification.
+ */
+static void
+isis_clear_checksum_lifetime(void *header)
+{
+    struct isis_lsp_header *header_lsp = (struct isis_lsp_header *) header;
+
+    header_lsp->checksum[0] = 0;
+    header_lsp->checksum[1] = 0;
+    header_lsp->remaining_lifetime[0] = 0;
+    header_lsp->remaining_lifetime[1] = 0;
+}
+
+/*
  * isis_print
  * Decode IS-IS packets.  Return 0 on error.
  */
@@ -2079,9 +2093,6 @@ isis_print(netdissect_options *ndo,
     u_short packet_len,pdu_len, key_id;
     u_int i,vendor_id;
     int sigcheck;
-#ifdef HAVE_LIBCRYPTO
-    uint8_t *packet_copy;
-#endif
 
     packet_len=length;
     optr = p; /* initialize the _o_riginal pointer to the packet start -
@@ -2658,35 +2669,9 @@ isis_print(netdissect_options *ndo,
                     ND_PRINT((ndo, ", (invalid subTLV) "));
 
 #ifdef HAVE_LIBCRYPTO
-                /*
-                 * Make a copy of the packet, so we don't overwrite the
-                 * original.
-                 */
-                ND_TCHECK2(*optr, packet_len);
-                packet_copy = malloc(packet_len);
-                if (packet_copy == NULL)
-                    sigcheck = CANT_ALLOCATE_COPY;
-                else {
-                    struct isis_lsp_header *header_lsp_copy;
-                    u_int8_t *tptr_copy;
-
-                    memcpy(packet_copy, optr, packet_len);
-
-                    /*
-                     * Clear checksum and lifetime in the copy prior to
-                     * signature verification.
-                     */
-                    header_lsp_copy = (struct isis_lsp_header *)(packet_copy + ISIS_COMMON_HEADER_SIZE);
-                    header_lsp_copy->checksum[0] = 0;
-                    header_lsp_copy->checksum[1] = 0;
-                    header_lsp_copy->remaining_lifetime[0] = 0;
-                    header_lsp_copy->remaining_lifetime[1] = 0;
-
-                    tptr_copy = packet_copy + (tptr - optr);
-                    sigcheck = signature_verify(ndo, packet_copy, length,
-                                                tptr_copy + 1);
-                    free(packet_copy);
-                }
+                sigcheck = signature_verify(ndo, optr, length, tptr + 1,
+                                            isis_clear_checksum_lifetime,
+                                            header_lsp);
 #else
                 sigcheck = CANT_CHECK_SIGNATURE;
 #endif

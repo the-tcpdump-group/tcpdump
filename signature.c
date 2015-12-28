@@ -22,6 +22,7 @@
 #include <netdissect-stdinc.h>
 
 #include <string.h>
+#include <stdlib.h>
 
 #include "netdissect.h"
 #include "signature.h"
@@ -116,31 +117,80 @@ USES_APPLE_RST
  * Currently only MD5 is supported.
  */
 int
-signature_verify(netdissect_options *ndo,
-                 const u_char *pptr, u_int plen, u_char *sig_ptr)
+signature_verify(netdissect_options *ndo, const u_char *pptr, u_int plen,
+                 const u_char *sig_ptr, void (*clear_rtn)(void *),
+                 const void *clear_arg)
 {
-    uint8_t rcvsig[16];
+    uint8_t *packet_copy, *sig_copy;
     uint8_t sig[16];
     unsigned int i;
-
-    /*
-     * Save the signature before clearing it.
-     */
-    memcpy(rcvsig, sig_ptr, sizeof(rcvsig));
-    memset(sig_ptr, 0, sizeof(rcvsig));
 
     if (!ndo->ndo_sigsecret) {
         return (CANT_CHECK_SIGNATURE);
     }
 
-    signature_compute_hmac_md5(pptr, plen, (unsigned char *)ndo->ndo_sigsecret,
+    /*
+     * Do we have all the packet data to be checked?
+     */
+    if (!ND_TTEST2(pptr, plen)) {
+        /* No. */
+        return (CANT_CHECK_SIGNATURE);
+    }
+
+    /*
+     * Do we have the entire signature to check?
+     */
+    if (!ND_TTEST2(sig_ptr, sizeof(sig))) {
+        /* No. */
+        return (CANT_CHECK_SIGNATURE);
+    }
+    if ((sig_ptr + sizeof(sig) - pptr) > plen) {
+        /* No. */
+        return (CANT_CHECK_SIGNATURE);
+    }
+
+    /*
+     * Make a copy of the packet, so we don't overwrite the original.
+     */
+    packet_copy = malloc(plen);
+    if (packet_copy == NULL) {
+        return (CANT_ALLOCATE_COPY);
+    }
+
+    memcpy(packet_copy, pptr, plen);
+
+    /*
+     * Clear the signature in the copy.
+     */
+    sig_copy = packet_copy + (sig_ptr - pptr);
+    memset(sig_copy, 0, sizeof(sig));
+
+    /*
+     * Clear anything else that needs to be cleared in the copy.
+     * Our caller is assumed to have vetted the clear_arg pointer.
+     */
+    (*clear_rtn)((void *)(packet_copy + ((const u_int8_t *)clear_arg - pptr)));
+
+    /*
+     * Compute the signature.
+     */
+    signature_compute_hmac_md5(packet_copy, plen,
+                               (unsigned char *)ndo->ndo_sigsecret,
                                strlen(ndo->ndo_sigsecret), sig);
 
-    if (memcmp(rcvsig, sig, sizeof(sig)) == 0) {
+    /*
+     * Free the copy.
+     */
+    free(packet_copy);
+
+    /*
+     * Does the computed signature match the signature in the packet?
+     */
+    if (memcmp(sig_ptr, sig, sizeof(sig)) == 0) {
+        /* Yes. */
         return (SIGNATURE_VALID);
-
     } else {
-
+        /* No - print the computed signature. */
         for (i = 0; i < sizeof(sig); ++i) {
             ND_PRINT((ndo, "%02x", sig[i]));
         }

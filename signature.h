@@ -25,4 +25,5 @@
 #define CANT_CHECK_SIGNATURE	3
 
 extern const struct tok signature_check_values[];
-extern int signature_verify(netdissect_options *, const u_char *, u_int, u_char *);
+extern int signature_verify(netdissect_options *, const u_char *, u_int,
+                            const u_char *, void (*)(void *), const void *);

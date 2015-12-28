@@ -640,6 +640,18 @@ trunc:
     return 0;
 }
 
+/*
+ * Clear checksum prior to signature verification.
+ */
+static void
+rsvp_clear_checksum(void *header)
+{
+    struct rsvp_common_header *rsvp_com_header = (struct rsvp_common_header *) header;
+
+    rsvp_com_header->checksum[0] = 0;
+    rsvp_com_header->checksum[1] = 0;
+}
+
 static int
 rsvp_obj_print(netdissect_options *ndo,
                const u_char *pptr
@@ -651,7 +663,12 @@ _U_
 _U_
 #endif
 , const u_char *tptr,
-                const char *ident, u_int tlen)
+                const char *ident, u_int tlen,
+                const struct rsvp_common_header *rsvp_com_header
+#ifndef HAVE_LIBCRYPTO
+_U_
+#endif
+)
 {
     const struct rsvp_object_header *rsvp_obj_header;
     const u_char *obj_tptr;
@@ -1666,8 +1683,10 @@ _U_
                        EXTRACT_32BITS(obj_ptr.rsvp_obj_integrity->digest + 12)));
 
 #ifdef HAVE_LIBCRYPTO
-                sigcheck = signature_verify(ndo, pptr, plen, (unsigned char *)obj_ptr.\
-                                             rsvp_obj_integrity->digest);
+                sigcheck = signature_verify(ndo, pptr, plen,
+                                            obj_ptr.rsvp_obj_integrity->digest,
+                                            rsvp_clear_checksum,
+                                            rsvp_com_header);
 #else
                 sigcheck = CANT_CHECK_SIGNATURE;
 #endif
@@ -1800,13 +1819,13 @@ void
 rsvp_print(netdissect_options *ndo,
            register const u_char *pptr, register u_int len)
 {
-    struct rsvp_common_header *rsvp_com_header;
+    const struct rsvp_common_header *rsvp_com_header;
     const u_char *tptr,*subtptr;
     u_short plen, tlen, subtlen;
 
     tptr=pptr;
 
-    rsvp_com_header = (struct rsvp_common_header *)pptr;
+    rsvp_com_header = (const struct rsvp_common_header *)pptr;
     ND_TCHECK(*rsvp_com_header);
 
     /*
@@ -1840,12 +1859,6 @@ rsvp_print(netdissect_options *ndo,
            rsvp_com_header->ttl,
            EXTRACT_16BITS(rsvp_com_header->checksum)));
 
-    /*
-     * Clear checksum prior to signature verification.
-     */
-    rsvp_com_header->checksum[0] = 0;
-    rsvp_com_header->checksum[1] = 0;
-
     if (tlen < sizeof(const struct rsvp_common_header)) {
         ND_PRINT((ndo, "ERROR: common header too short %u < %lu", tlen,
                (unsigned long)sizeof(const struct rsvp_common_header)));
@@ -1860,7 +1873,7 @@ rsvp_print(netdissect_options *ndo,
     case RSVP_MSGTYPE_AGGREGATE:
         while(tlen > 0) {
             subtptr=tptr;
-            rsvp_com_header = (struct rsvp_common_header *)subtptr;
+            rsvp_com_header = (const struct rsvp_common_header *)subtptr;
             ND_TCHECK(*rsvp_com_header);
 
             /*
@@ -1882,12 +1895,6 @@ rsvp_print(netdissect_options *ndo,
                    rsvp_com_header->ttl,
                    EXTRACT_16BITS(rsvp_com_header->checksum)));
 
-            /*
-             * Clear checksum prior to signature verification.
-             */
-            rsvp_com_header->checksum[0] = 0;
-            rsvp_com_header->checksum[1] = 0;
-
             if (subtlen < sizeof(const struct rsvp_common_header)) {
                 ND_PRINT((ndo, "ERROR: common header too short %u < %lu", subtlen,
                        (unsigned long)sizeof(const struct rsvp_common_header)));
@@ -1903,7 +1910,7 @@ rsvp_print(netdissect_options *ndo,
             subtptr+=sizeof(const struct rsvp_common_header);
             subtlen-=sizeof(const struct rsvp_common_header);
 
-            if (rsvp_obj_print(ndo, pptr, plen, subtptr, "\n\t    ", subtlen) == -1)
+            if (rsvp_obj_print(ndo, pptr, plen, subtptr, "\n\t    ", subtlen, rsvp_com_header) == -1)
                 return;
 
             tptr+=subtlen+sizeof(const struct rsvp_common_header);
@@ -1923,7 +1930,7 @@ rsvp_print(netdissect_options *ndo,
     case RSVP_MSGTYPE_HELLO:
     case RSVP_MSGTYPE_ACK:
     case RSVP_MSGTYPE_SREFRESH:
-        if (rsvp_obj_print(ndo, pptr, plen, tptr, "\n\t  ", tlen) == -1)
+        if (rsvp_obj_print(ndo, pptr, plen, tptr, "\n\t  ", tlen, rsvp_com_header) == -1)
             return;
         break;
 
