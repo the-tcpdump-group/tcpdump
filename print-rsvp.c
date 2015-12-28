@@ -84,7 +84,7 @@ struct rsvp_object_header {
 #define	RSVP_MSGTYPE_PATHTEAR   5
 #define	RSVP_MSGTYPE_RESVTEAR   6
 #define	RSVP_MSGTYPE_RESVCONF   7
-#define RSVP_MSGTYPE_AGGREGATE  12
+#define RSVP_MSGTYPE_BUNDLE     12
 #define RSVP_MSGTYPE_ACK        13
 #define RSVP_MSGTYPE_HELLO_OLD  14      /* ancient Hellos */
 #define RSVP_MSGTYPE_SREFRESH   15
@@ -98,7 +98,7 @@ static const struct tok rsvp_msg_type_values[] = {
     { RSVP_MSGTYPE_PATHTEAR,	"PathTear" },
     { RSVP_MSGTYPE_RESVTEAR,	"ResvTear" },
     { RSVP_MSGTYPE_RESVCONF,	"ResvConf" },
-    { RSVP_MSGTYPE_AGGREGATE,	"Aggregate" },
+    { RSVP_MSGTYPE_BUNDLE,	"Bundle" },
     { RSVP_MSGTYPE_ACK,	        "Acknowledgement" },
     { RSVP_MSGTYPE_HELLO_OLD,	"Hello (Old)" },
     { RSVP_MSGTYPE_SREFRESH,	"Refresh" },
@@ -1804,8 +1804,8 @@ rsvp_print(netdissect_options *ndo,
            register const u_char *pptr, register u_int len)
 {
     const struct rsvp_common_header *rsvp_com_header;
-    const u_char *tptr,*subtptr;
-    u_short plen, tlen, subtlen;
+    const u_char *tptr;
+    u_short plen, tlen;
 
     tptr=pptr;
 
@@ -1854,11 +1854,20 @@ rsvp_print(netdissect_options *ndo,
 
     switch(rsvp_com_header->msg_type) {
 
-    case RSVP_MSGTYPE_AGGREGATE:
+    case RSVP_MSGTYPE_BUNDLE:
+        /*
+         * Process each submessage in the bundle message.
+         * Bundle messages may not contain bundle submessages, so we don't
+         * need to handle bundle submessages specially.
+         */
         while(tlen > 0) {
-            subtptr=tptr;
-            rsvp_com_header = (const struct rsvp_common_header *)subtptr;
+            const u_char *subpptr=tptr, *subtptr;
+
+            subtptr=subpptr;
+
+            rsvp_com_header = (const struct rsvp_common_header *)subpptr;
             ND_TCHECK(*rsvp_com_header);
+            u_short subplen, subtlen;
 
             /*
              * Sanity checking of the header.
@@ -1868,7 +1877,8 @@ rsvp_print(netdissect_options *ndo,
                        RSVP_EXTRACT_VERSION(rsvp_com_header->version_flags)));
                 return;
             }
-            subtlen=EXTRACT_16BITS(rsvp_com_header->length);
+
+            subplen = subtlen = EXTRACT_16BITS(rsvp_com_header->length);
 
             ND_PRINT((ndo, "\n\t  RSVPv%u %s Message (%u), Flags: [%s], length: %u, ttl: %u, checksum: 0x%04x",
                    RSVP_EXTRACT_VERSION(rsvp_com_header->version_flags),
@@ -1894,7 +1904,10 @@ rsvp_print(netdissect_options *ndo,
             subtptr+=sizeof(const struct rsvp_common_header);
             subtlen-=sizeof(const struct rsvp_common_header);
 
-            if (rsvp_obj_print(ndo, pptr, plen, subtptr, "\n\t    ", subtlen, rsvp_com_header) == -1)
+            /*
+             * Print all objects in the submessage.
+             */
+            if (rsvp_obj_print(ndo, subpptr, subplen, subtptr, "\n\t    ", subtlen, rsvp_com_header) == -1)
                 return;
 
             tptr+=subtlen+sizeof(const struct rsvp_common_header);
@@ -1914,6 +1927,9 @@ rsvp_print(netdissect_options *ndo,
     case RSVP_MSGTYPE_HELLO:
     case RSVP_MSGTYPE_ACK:
     case RSVP_MSGTYPE_SREFRESH:
+        /*
+         * Print all objects in the message.
+         */
         if (rsvp_obj_print(ndo, pptr, plen, tptr, "\n\t  ", tlen, rsvp_com_header) == -1)
             return;
         break;
