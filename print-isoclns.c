@@ -2667,13 +2667,9 @@ isis_print(netdissect_options *ndo,
 		if (tlv_len != ISIS_SUBTLV_AUTH_MD5_LEN+1)
                     ND_PRINT((ndo, ", (invalid subTLV) "));
 
-#ifdef HAVE_LIBCRYPTO
                 sigcheck = signature_verify(ndo, optr, length, tptr + 1,
                                             isis_clear_checksum_lifetime,
                                             header_lsp);
-#else
-                sigcheck = CANT_CHECK_SIGNATURE;
-#endif
                 ND_PRINT((ndo, " (%s)", tok2str(signature_check_values, "Unknown", sigcheck)));
 
 		break;

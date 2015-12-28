@@ -654,21 +654,9 @@ rsvp_clear_checksum(void *header)
 
 static int
 rsvp_obj_print(netdissect_options *ndo,
-               const u_char *pptr
-#ifndef HAVE_LIBCRYPTO
-_U_
-#endif
-, u_int plen
-#ifndef HAVE_LIBCRYPTO
-_U_
-#endif
-, const u_char *tptr,
-                const char *ident, u_int tlen,
-                const struct rsvp_common_header *rsvp_com_header
-#ifndef HAVE_LIBCRYPTO
-_U_
-#endif
-)
+               const u_char *pptr, u_int plen, const u_char *tptr,
+               const char *ident, u_int tlen,
+               const struct rsvp_common_header *rsvp_com_header)
 {
     const struct rsvp_object_header *rsvp_obj_header;
     const u_char *obj_tptr;
@@ -1682,14 +1670,10 @@ _U_
                        EXTRACT_32BITS(obj_ptr.rsvp_obj_integrity->digest+8),
                        EXTRACT_32BITS(obj_ptr.rsvp_obj_integrity->digest + 12)));
 
-#ifdef HAVE_LIBCRYPTO
                 sigcheck = signature_verify(ndo, pptr, plen,
                                             obj_ptr.rsvp_obj_integrity->digest,
                                             rsvp_clear_checksum,
                                             rsvp_com_header);
-#else
-                sigcheck = CANT_CHECK_SIGNATURE;
-#endif
                 ND_PRINT((ndo, " (%s)", tok2str(signature_check_values, "Unknown", sigcheck)));
 
                 obj_tlen+=sizeof(struct rsvp_obj_integrity_t);

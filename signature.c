@@ -109,9 +109,7 @@ signature_compute_hmac_md5(const uint8_t *text, int text_len, unsigned char *key
     MD5_Final(digest, &context);          /* finish up 2nd pass */
 }
 USES_APPLE_RST
-#endif
 
-#ifdef HAVE_LIBCRYPTO
 /*
  * Verify a cryptographic signature of the packet.
  * Currently only MD5 is supported.
@@ -197,6 +195,14 @@ signature_verify(netdissect_options *ndo, const u_char *pptr, u_int plen,
 
         return (SIGNATURE_INVALID);
     }
+}
+#else
+int
+signature_verify(netdissect_options *ndo _U_, const u_char *pptr _U_,
+                 u_int plen _U_, const u_char *sig_ptr _U_,
+                 void (*clear_rtn)(void *) _U_, const void *clear_arg _U_)
+{
+    return (CANT_CHECK_SIGNATURE);
 }
 #endif
 
