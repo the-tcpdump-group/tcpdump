@@ -399,6 +399,7 @@ fi
 AC_REPLACE_FUNCS(vfprintf strlcat strlcpy strdup strsep getopt_long)
 AC_CHECK_FUNCS(fork vfork strftime)
 AC_CHECK_FUNCS(setlinebuf alarm)
+AC_CHECK_FUNCS(dup2 socketpair setsockopt setpgid)
 
 needsnprintf=no
 AC_CHECK_FUNCS(vsnprintf snprintf,,

@@ -126,6 +126,10 @@ tcpdump \- dump traffic on a network
 ]
 .ti +8
 [
+.BI \-\-pipeoutput= pipe-command
+]
+.ti +8
+[
 .BI \-\-time\-stamp\-precision= tstamp_precision
 ]
 .ti +8
@@ -845,6 +849,33 @@ And in case you would like to use a command that itself takes flags or
 different arguments, you can always write a shell script that will take the
 savefile name as the only argument, make the flags & arguments arrangements
 and execute the command that you want.
+.TP
+.BI \-\-pipeoutput " pipe-command"
+Used in conjunction with the
+.B \-w
+option,
+.I tcpdump 
+will pipe output through "
+.I pipe-command
+" before saving it to a file.
+For example, specifying
+.RS
+.RS
+.nf
+\fB-w "pcap_%F-%T.gz" -G 3 -W 60 --pipeoutput gzip\fP
+.fi
+.RE
+will compress each file with gzip 
+.I before 
+saving it to disk. Compared with post-processing equivalent of
+.RS
+.nf
+\fB-w "pcap_%F-%T" -G 3 -W 60 -z gzip\fP
+.fi
+.RE
+the former has the advantage of reducing disk bandwidth at the expense of 
+increased CPU usage.  This option is not available on all platforms.
+.RE
 .TP
 .BI \-Z " user"
 .PD 0
