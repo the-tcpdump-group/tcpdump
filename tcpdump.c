@@ -130,7 +130,19 @@ The Regents of the University of California.  All rights reserved.\n";
 static int Cflag;			/* rotate dump files after this many bytes */
 static int Cflag_count;			/* Keep track of which file number we're writing */
 static int Dflag;			/* list available devices and exit */
-static int dflag;			/* print filter code */
+/*
+ * This is exported because, in some versions of libpcap, if libpcap
+ * is built with optimizer debugging code (which is *NOT* the default
+ * configuration!), the library *imports*(!) a variable named dflag,
+ * under the expectation that tcpdump is exporting it, to govern
+ * how much debugging information to print when optimizing
+ * the generated BPF code.
+ *
+ * This is a horrible hack; newer versions of libpcap don't import
+ * dflag but, instead, *if* built with optimizer debugging code,
+ * *export* a routine to set that flag.
+ */
+int dflag;				/* print filter code */
 static int Gflag;			/* rotate dump files after this many seconds */
 static int Gflag_count;			/* number of files created with Gflag rotation */
 static time_t Gflag_time;		/* The last time_t the dump file was rotated. */
@@ -208,6 +220,57 @@ struct dump_info {
 	int	dirfd;
 #endif
 };
+
+#if defined(HAVE_PCAP_SET_PARSER_DEBUG)
+/*
+ * We have pcap_set_parser_debug() in libpcap; declare it (it's not declared
+ * by any libpcap header, because it's a special hack, only available if
+ * libpcap was configured to include it, and only intended for use by
+ * libpcap developers trying to debug the parser for filter expressions).
+ */
+#ifdef _WIN32
+__declspec(dllimport)
+#else /* _WIN32 */
+extern
+#endif /* _WIN32 */
+void pcap_set_parser_debug(int);
+#elif defined(HAVE_PCAP_DEBUG) || defined(HAVE_YYDEBUG)
+/*
+ * We don't have pcap_set_parser_debug() in libpcap, but we do have
+ * pcap_debug or yydebug.  Make a local version of pcap_set_parser_debug()
+ * to set the flag, and define HAVE_PCAP_SET_PARSER_DEBUG.
+ */
+static void
+pcap_set_parser_debug(int value)
+{
+#ifdef HAVE_PCAP_DEBUG
+	extern int pcap_debug;
+
+	pcap_debug = value;
+#else /* HAVE_PCAP_DEBUG */
+	extern int yydebug;
+
+	yydebug = value;
+#endif /* HAVE_PCAP_DEBUG */
+}
+
+#define HAVE_PCAP_SET_PARSER_DEBUG
+#endif
+
+#if defined(HAVE_PCAP_SET_OPTIMIZER_DEBUG)
+/*
+ * We have pcap_set_optimizer_debug() in libpcap; declare it (it's not declared
+ * by any libpcap header, because it's a special hack, only available if
+ * libpcap was configured to include it, and only intended for use by
+ * libpcap developers trying to debug the optimizer for filter expressions).
+ */
+#ifdef _WIN32
+__declspec(dllimport)
+#else /* _WIN32 */
+extern
+#endif /* _WIN32 */
+void pcap_set_optimizer_debug(int);
+#endif
 
 #ifdef HAVE_PCAP_SET_TSTAMP_TYPE
 static void
@@ -453,7 +516,7 @@ static const struct option longopts[] = {
 #ifdef HAVE_PCAP_SET_IMMEDIATE_MODE
 	{ "immediate-mode", no_argument, NULL, OPTION_IMMEDIATE_MODE },
 #endif
-#if defined(HAVE_PCAP_DEBUG) || defined(HAVE_YYDEBUG)
+#ifdef HAVE_PCAP_SET_PARSER_DEBUG
 	{ "debug-filter-parser", no_argument, NULL, 'Y' },
 #endif
 	{ "relinquish-privileges", required_argument, NULL, 'Z' },
@@ -1104,17 +1167,11 @@ main(int argc, char **argv)
 				error("invalid data link type %s", yflag_dlt_name);
 			break;
 
-#if defined(HAVE_PCAP_DEBUG) || defined(HAVE_YYDEBUG)
+#ifdef HAVE_PCAP_SET_PARSER_DEBUG
 		case 'Y':
 			{
 			/* Undocumented flag */
-#ifdef HAVE_PCAP_DEBUG
-			extern int pcap_debug;
-			pcap_debug = 1;
-#else
-			extern int yydebug;
-			yydebug = 1;
-#endif
+			pcap_set_parser_debug(1);
 			}
 			break;
 #endif
@@ -1476,6 +1533,9 @@ main(int argc, char **argv)
 	else
 		cmdbuf = copy_argv(&argv[optind]);
 
+#ifdef HAVE_PCAP_SET_OPTIMIZER_DEBUG
+	pcap_set_optimizer_debug(dflag);
+#endif
 	if (pcap_compile(pd, &fcode, cmdbuf, Oflag, netmask) < 0)
 		error("%s", pcap_geterr(pd));
 	if (dflag) {

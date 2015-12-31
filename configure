@@ -6258,18 +6258,38 @@ $as_echo "#define HAVE_PCAP_VERSION 1" >>confdefs.h
 $as_echo "no" >&6; }
     fi
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether pcap_debug is defined by libpcap" >&5
+
+#
+# Check for special debugging functions
+#
+for ac_func in pcap_set_parser_debug
+do :
+  ac_fn_c_check_func "$LINENO" "pcap_set_parser_debug" "ac_cv_func_pcap_set_parser_debug"
+if test "x$ac_cv_func_pcap_set_parser_debug" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PCAP_SET_PARSER_DEBUG 1
+_ACEOF
+
+fi
+done
+
+if test "$ac_cv_func_pcap_set_parser_debug" = "no" ; then
+	#
+	# OK, we don't have pcap_set_parser_debug() to set the libpcap
+	# filter expression parser debug flag; can we directly set the
+	# flag?
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether pcap_debug is defined by libpcap" >&5
 $as_echo_n "checking whether pcap_debug is defined by libpcap... " >&6; }
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
 int
 main ()
 {
 
-	extern int pcap_debug;
+		extern int pcap_debug;
 
-	return pcap_debug;
+		return pcap_debug;
 
   ;
   return 0;
@@ -6282,30 +6302,30 @@ else
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
-if test "$ac_lbl_cv_pcap_debug_defined" = yes ; then
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+	if test "$ac_lbl_cv_pcap_debug_defined" = yes ; then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
 $as_echo "#define HAVE_PCAP_DEBUG 1" >>confdefs.h
 
-else
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+	else
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-	#
-	# OK, what about "yydebug"?
-	#
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether yydebug is defined by libpcap" >&5
+		#
+		# OK, what about "yydebug"?
+		#
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether yydebug is defined by libpcap" >&5
 $as_echo_n "checking whether yydebug is defined by libpcap... " >&6; }
-	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+		cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
 int
 main ()
 {
 
-		extern int yydebug;
+			extern int yydebug;
 
-		return yydebug;
+			return yydebug;
 
   ;
   return 0;
@@ -6318,17 +6338,29 @@ else
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
-	if test "$ac_lbl_cv_yydebug_defined" = yes ; then
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+		if test "$ac_lbl_cv_yydebug_defined" = yes ; then
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
 $as_echo "#define HAVE_YYDEBUG 1" >>confdefs.h
 
-	else
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+		else
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
+		fi
 	fi
 fi
+for ac_func in pcap_set_optimizer_debug
+do :
+  ac_fn_c_check_func "$LINENO" "pcap_set_optimizer_debug" "ac_cv_func_pcap_set_optimizer_debug"
+if test "x$ac_cv_func_pcap_set_optimizer_debug" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PCAP_SET_OPTIMIZER_DEBUG 1
+_ACEOF
+
+fi
+done
+
 ac_fn_c_check_func "$LINENO" "bpf_dump" "ac_cv_func_bpf_dump"
 if test "x$ac_cv_func_bpf_dump" = xyes; then :
   $as_echo "#define HAVE_BPF_DUMP 1" >>confdefs.h

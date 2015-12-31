@@ -644,39 +644,51 @@ if test $ac_cv_func_pcap_lib_version = "no" ; then
 	AC_MSG_RESULT(no)
     fi
 fi
-AC_MSG_CHECKING(whether pcap_debug is defined by libpcap)
-AC_TRY_LINK([],
-   [
-	extern int pcap_debug;
 
-	return pcap_debug;
-   ],
-   ac_lbl_cv_pcap_debug_defined=yes,
-   ac_lbl_cv_pcap_debug_defined=no)
-if test "$ac_lbl_cv_pcap_debug_defined" = yes ; then
-	AC_MSG_RESULT(yes)
-	AC_DEFINE(HAVE_PCAP_DEBUG, 1, [define if libpcap has pcap_debug])
-else
-	AC_MSG_RESULT(no)
+#
+# Check for special debugging functions
+#
+AC_CHECK_FUNCS(pcap_set_parser_debug)
+if test "$ac_cv_func_pcap_set_parser_debug" = "no" ; then
 	#
-	# OK, what about "yydebug"?
-	#
-	AC_MSG_CHECKING(whether yydebug is defined by libpcap)
+	# OK, we don't have pcap_set_parser_debug() to set the libpcap
+	# filter expression parser debug flag; can we directly set the
+	# flag?
+	AC_MSG_CHECKING(whether pcap_debug is defined by libpcap)
 	AC_TRY_LINK([],
 	   [
-		extern int yydebug;
+		extern int pcap_debug;
 
-		return yydebug;
+		return pcap_debug;
 	   ],
-	   ac_lbl_cv_yydebug_defined=yes,
-	   ac_lbl_cv_yydebug_defined=no)
-	if test "$ac_lbl_cv_yydebug_defined" = yes ; then
+	   ac_lbl_cv_pcap_debug_defined=yes,
+	   ac_lbl_cv_pcap_debug_defined=no)
+	if test "$ac_lbl_cv_pcap_debug_defined" = yes ; then
 		AC_MSG_RESULT(yes)
-		AC_DEFINE(HAVE_YYDEBUG, 1, [define if libpcap has yydebug])
+		AC_DEFINE(HAVE_PCAP_DEBUG, 1, [define if libpcap has pcap_debug])
 	else
 		AC_MSG_RESULT(no)
+		#
+		# OK, what about "yydebug"?
+		#
+		AC_MSG_CHECKING(whether yydebug is defined by libpcap)
+		AC_TRY_LINK([],
+		   [
+			extern int yydebug;
+
+			return yydebug;
+		   ],
+		   ac_lbl_cv_yydebug_defined=yes,
+		   ac_lbl_cv_yydebug_defined=no)
+		if test "$ac_lbl_cv_yydebug_defined" = yes ; then
+			AC_MSG_RESULT(yes)
+			AC_DEFINE(HAVE_YYDEBUG, 1, [define if libpcap has yydebug])
+		else
+			AC_MSG_RESULT(no)
+		fi
 	fi
 fi
+AC_CHECK_FUNCS(pcap_set_optimizer_debug)
 AC_REPLACE_FUNCS(bpf_dump)	dnl moved to libpcap in 0.6
 
 V_GROUP=0
