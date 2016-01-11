@@ -2492,16 +2492,6 @@ enum ieee80211_radiotap_type {
 
 #define IEEE80211_RADIOTAP_CODING_LDPC_USERn			0x01
 
-
-/* Radiotap state */
-/*  This is used to save state when parsing/processing parameters */
-struct radiotap_state
-{
-	uint32_t	present;
-
-	uint8_t		rate;
-};
-
 #define	IEEE80211_CHAN_FHSS \
 	(IEEE80211_CHAN_2GHZ | IEEE80211_CHAN_GFSK)
 #define	IEEE80211_CHAN_A \
@@ -2575,7 +2565,7 @@ print_chaninfo(netdissect_options *ndo,
 static int
 print_radiotap_field(netdissect_options *ndo,
                      struct cpack_state *s, uint32_t bit, uint8_t *flags,
-                     struct radiotap_state *state, uint32_t presentflags)
+                     uint32_t presentflags)
 {
 	union {
 		int8_t		i8;
@@ -2598,11 +2588,6 @@ print_radiotap_field(netdissect_options *ndo,
 		break;
 	case IEEE80211_RADIOTAP_RATE:
 		rc = cpack_uint8(s, &u.u8);
-		if (rc != 0)
-			break;
-
-		/* Save state rate */
-		state->rate = u.u8;
 		break;
 	case IEEE80211_RADIOTAP_DB_ANTSIGNAL:
 	case IEEE80211_RADIOTAP_DB_ANTNOISE:
@@ -2691,36 +2676,6 @@ print_radiotap_field(netdissect_options *ndo,
 		rc = cpack_uint16(s, &u6.u16);
 	fail:
 		break;
-	case IEEE80211_RADIOTAP_VENDOR_NAMESPACE: {
-		uint8_t vns[3];
-		uint16_t length;
-		uint8_t subspace;
-
-		if ((cpack_align_and_reserve(s, 2)) == NULL) {
-			rc = -1;
-			break;
-		}
-
-		rc = cpack_uint8(s, &vns[0]);
-		if (rc != 0)
-			break;
-		rc = cpack_uint8(s, &vns[1]);
-		if (rc != 0)
-			break;
-		rc = cpack_uint8(s, &vns[2]);
-		if (rc != 0)
-			break;
-		rc = cpack_uint8(s, &subspace);
-		if (rc != 0)
-			break;
-		rc = cpack_uint16(s, &length);
-		if (rc != 0)
-			break;
-
-		/* Skip up to length */
-		s->c_next += length;
-		break;
-	}
 	default:
 		/* this bit indicates a field whose
 		 * size we do not know, so we cannot
@@ -2734,9 +2689,6 @@ print_radiotap_field(netdissect_options *ndo,
 		ND_PRINT((ndo, "%s", tstr));
 		return rc;
 	}
-
-	/* Preserve the state present flags */
-	state->present = presentflags;
 
 	switch (bit) {
 	case IEEE80211_RADIOTAP_CHANNEL:
@@ -2990,31 +2942,76 @@ print_radiotap_field(netdissect_options *ndo,
 	return 0;
 }
 
-static u_int
-ieee802_11_radio_print(netdissect_options *ndo,
-                       const u_char *p, u_int length, u_int caplen)
+
+static int
+print_in_radiotap_namespace(netdissect_options *ndo,
+                            struct cpack_state *s, uint8_t *flags,
+                            uint32_t presentflags, int bit0)
 {
 #define	BITNO_32(x) (((x) >> 16) ? 16 + BITNO_16((x) >> 16) : BITNO_16((x)))
 #define	BITNO_16(x) (((x) >> 8) ? 8 + BITNO_8((x) >> 8) : BITNO_8((x)))
 #define	BITNO_8(x) (((x) >> 4) ? 4 + BITNO_4((x) >> 4) : BITNO_4((x)))
 #define	BITNO_4(x) (((x) >> 2) ? 2 + BITNO_2((x) >> 2) : BITNO_2((x)))
 #define	BITNO_2(x) (((x) & 2) ? 1 : 0)
+	uint32_t present, next_present;
+	int bitno;
+	enum ieee80211_radiotap_type bit;
+	int rc;
+
+	for (present = presentflags; present; present = next_present) {
+		/*
+		 * Clear the least significant bit that is set.
+		 */
+		next_present = present & (present - 1);
+
+		/*
+		 * Get the bit number, within this presence word,
+		 * of the remaining least significant bit that
+		 * is set.
+		 */
+		bitno = BITNO_32(present ^ next_present);
+
+		/*
+		 * Stop if this is one of the "same meaning
+		 * in all presence flags" bits.
+		 */
+		if (bitno >= IEEE80211_RADIOTAP_NAMESPACE)
+			break;
+
+		/*
+		 * Get the radiotap bit number of that bit.
+		 */
+		bit = (enum ieee80211_radiotap_type)(bit0 + bitno);
+
+		rc = print_radiotap_field(ndo, s, bit, flags, presentflags);
+		if (rc != 0)
+			return rc;
+	}
+
+	return 0;
+}
+
+static u_int
+ieee802_11_radio_print(netdissect_options *ndo,
+                       const u_char *p, u_int length, u_int caplen)
+{
 #define	BIT(n)	(1U << n)
 #define	IS_EXTENDED(__p)	\
 	    (EXTRACT_LE_32BITS(__p) & BIT(IEEE80211_RADIOTAP_EXT)) != 0
 
 	struct cpack_state cpacker;
 	const struct ieee80211_radiotap_header *hdr;
-	uint32_t present, next_present;
-	uint32_t presentflags = 0;
+	uint32_t presentflags;
 	const uint32_t *presentp, *last_presentp;
-	enum ieee80211_radiotap_type bit;
+	int vendor_namespace;
+	uint8_t vendor_oui[3];
+	uint8_t vendor_subnamespace;
+	uint16_t skip_length;
 	int bit0;
 	u_int len;
 	uint8_t flags;
 	int pad;
 	u_int fcslen;
-	struct radiotap_state state;
 
 	if (caplen < sizeof(*hdr)) {
 		ND_PRINT((ndo, "%s", tstr));
@@ -3043,34 +3040,133 @@ ieee802_11_radio_print(netdissect_options *ndo,
 		return caplen;
 	}
 
+	/*
+	 * Start out at the beginning of the default radiotap namespace.
+	 */
+	bit0 = 0;
+	vendor_namespace = 0;
+	memset(vendor_oui, 0, 3);
+	vendor_subnamespace = 0;
+	skip_length = 0;
 	/* Assume no flags */
 	flags = 0;
 	/* Assume no Atheros padding between 802.11 header and body */
 	pad = 0;
 	/* Assume no FCS at end of frame */
 	fcslen = 0;
-	for (bit0 = 0, presentp = &hdr->it_present; presentp <= last_presentp;
-	     presentp++, bit0 += 32) {
+	for (presentp = &hdr->it_present; presentp <= last_presentp;
+	    presentp++) {
 		presentflags = EXTRACT_LE_32BITS(presentp);
 
-		/* Clear state. */
-		memset(&state, 0, sizeof(state));
+		/*
+		 * If this is a vendor namespace, we don't handle it.
+		 */
+		if (vendor_namespace) {
+			/*
+			 * Skip past the stuff we don't understand.
+			 * If we add support for any vendor namespaces,
+			 * it'd be added here; use vendor_oui and
+			 * vendor_subnamespace to interpret the fields.
+			 */
+			if (cpack_advance(&cpacker, skip_length) != 0) {
+				/*
+				 * Ran out of space in the packet.
+				 */
+				break;
+			}
 
-		for (present = EXTRACT_LE_32BITS(presentp); present;
-		     present = next_present) {
-			/* clear the least significant bit that is set */
-			next_present = present & (present - 1);
+			/*
+			 * We've skipped it all; nothing more to
+			 * skip.
+			 */
+			skip_length = 0;
+		} else {
+			if (print_in_radiotap_namespace(ndo, &cpacker,
+			    &flags, presentflags, bit0) != 0) {
+				/*
+				 * Fatal error - can't process anything
+				 * more in the radiotap header.
+				 */
+				break;
+			}
+		}
 
-			/* extract the least significant bit that is set */
-			bit = (enum ieee80211_radiotap_type)
-			    (bit0 + BITNO_32(present ^ next_present));
+		/*
+		 * Handle the namespace switch bits; we've already handled
+		 * the extension bit in all but the last word above.
+		 */
+		switch (presentflags &
+		    (BIT(IEEE80211_RADIOTAP_NAMESPACE)|BIT(IEEE80211_RADIOTAP_VENDOR_NAMESPACE))) {
 
-			if (print_radiotap_field(ndo, &cpacker, bit, &flags, &state, presentflags) != 0)
-				goto out;
+		case 0:
+			/*
+			 * We're not changing namespaces.
+			 * advance to the next 32 bits in the current
+			 * namespace.
+			 */
+			bit0 += 32;
+			break;
+
+		case BIT(IEEE80211_RADIOTAP_NAMESPACE):
+			/*
+			 * We're switching to the radiotap namespace.
+			 * Reset the presence-bitmap index to 0, and
+			 * reset the namespace to the default radiotap
+			 * namespace.
+			 */
+			bit0 = 0;
+			vendor_namespace = 0;
+			memset(vendor_oui, 0, 3);
+			vendor_subnamespace = 0;
+			skip_length = 0;
+			break;
+
+		case BIT(IEEE80211_RADIOTAP_VENDOR_NAMESPACE):
+			/*
+			 * We're switching to a vendor namespace.
+			 * Reset the presence-bitmap index to 0,
+			 * note that we're in a vendor namespace,
+			 * and fetch the fields of the Vendor Namespace
+			 * item.
+			 */
+			bit0 = 0;
+			vendor_namespace = 1;
+			if ((cpack_align_and_reserve(&cpacker, 2)) == NULL) {
+				ND_PRINT((ndo, "%s", tstr));
+				break;
+			}
+			if (cpack_uint8(&cpacker, &vendor_oui[0]) != 0) {
+				ND_PRINT((ndo, "%s", tstr));
+				break;
+			}
+			if (cpack_uint8(&cpacker, &vendor_oui[1]) != 0) {
+				ND_PRINT((ndo, "%s", tstr));
+				break;
+			}
+			if (cpack_uint8(&cpacker, &vendor_oui[2]) != 0) {
+				ND_PRINT((ndo, "%s", tstr));
+				break;
+			}
+			if (cpack_uint8(&cpacker, &vendor_subnamespace) != 0) {
+				ND_PRINT((ndo, "%s", tstr));
+				break;
+			}
+			if (cpack_uint16(&cpacker, &skip_length) != 0) {
+				ND_PRINT((ndo, "%s", tstr));
+				break;
+			}
+			break;
+
+		default:
+			/*
+			 * Illegal combination.  The behavior in this
+			 * case is undefined by the radiotap spec; we
+			 * just ignore both bits.
+			 */
+			break;
 		}
 	}
 
-out:
 	if (flags & IEEE80211_RADIOTAP_F_DATAPAD)
 		pad = 1;	/* Atheros padding */
 	if (flags & IEEE80211_RADIOTAP_F_FCS)
