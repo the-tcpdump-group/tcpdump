@@ -495,14 +495,6 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 			}
 #endif
 		}
-		if (ND_TTEST(((const struct LAP *)cp)->type) &&
-		    ((const struct LAP *)cp)->type == lapDDP &&
-		    (atalk_port(sport) || atalk_port(dport))) {
-			if (ndo->ndo_vflag)
-				ND_PRINT((ndo, "kip "));
-			llap_print(ndo, cp, length);
-			return;
-		}
 	}
 
 	if (ndo->ndo_vflag && !ndo->ndo_Kflag && !fragmented) {
@@ -654,7 +646,13 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 			geneve_print(ndo, (const u_char *)(up + 1), length);
 		else if (IS_SRC_OR_DST_PORT(LISP_CONTROL_PORT))
 			lisp_print(ndo, (const u_char *)(up + 1), length);
-		else {
+		else if (ND_TTEST(((const struct LAP *)cp)->type) &&
+		    ((const struct LAP *)cp)->type == lapDDP &&
+		    (atalk_port(sport) || atalk_port(dport))) {
+			if (ndo->ndo_vflag)
+				ND_PRINT((ndo, "kip "));
+			llap_print(ndo, cp, length);
+		} else {
 			if (ulen > length)
 				ND_PRINT((ndo, "UDP, bad length %u > %u",
 				    ulen, length));
