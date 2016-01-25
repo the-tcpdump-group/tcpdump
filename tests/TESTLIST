@@ -288,6 +288,9 @@ dhcp-rfc5859	dhcp-rfc5859.pcap	dhcp-rfc5859-v.out	-t -v
 medsa		medsa.pcap		medsa.out	-t
 medsa-e		medsa.pcap		medsa-e.out	-t -e
 
+# VXLAN tests
+vxlan  vxlan.pcap  vxlan.out  -# -t -e
+
 # bad packets from Kevin Day
 # cve-2015-2155 -- futz testing on FORCES printer
 kday1           kday1.pcap              kday1.out       -t -v
