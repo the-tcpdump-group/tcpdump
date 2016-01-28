@@ -77,6 +77,8 @@ typedef signed char nd_int8_t;
 #include "ip.h" /* struct ip for nextproto4_cksum() */
 
 extern int32_t thiszone;	/* seconds offset from gmt to local time */
+/* invalid string to print '(invalid)' for malformed or corrupted packets */
+extern const char istr[];
 
 #if !defined(HAVE_SNPRINTF)
 int snprintf (char *str, size_t sz, const char *format, ...)

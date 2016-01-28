@@ -57,6 +57,8 @@
 #include "timeval-operations.h"
 
 int32_t thiszone;		/* seconds offset from gmt to local time */
+/* invalid string to print '(invalid)' for malformed or corrupted packets */
+const char istr[] = " (invalid)";
 
 /*
  * timestamp display buffer size, the biggest size of both formats is needed

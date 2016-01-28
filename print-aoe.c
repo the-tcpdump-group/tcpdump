@@ -41,7 +41,6 @@
 #include "ether.h"
 
 static const char tstr[] = " [|aoe]";
-static const char istr[] = " (invalid)";
 
 #define AOE_V1 1
 #define ATA_SECTOR_SIZE 512

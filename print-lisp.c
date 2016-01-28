@@ -109,7 +109,6 @@
 #include "addrtoname.h"
 
 static const char tstr[] = " [|LISP]";
-static const char istr[] = " (invalid)";
 
 #define IPv4_AFI			1
 #define IPv6_AFI			2

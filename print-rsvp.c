@@ -30,7 +30,6 @@
 #include "signature.h"
 
 static const char tstr[] = " [|rsvp]";
-static const char istr[] = " (invalid)";
 
 /*
  * RFC 2205 common header

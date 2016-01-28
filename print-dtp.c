@@ -28,7 +28,6 @@
 #include "extract.h"
 
 static const char tstr[] = " [|dtp]";
-static const char istr[] = " (invalid)";
 
 #define DTP_HEADER_LEN			1
 #define DTP_DOMAIN_TLV			0x0001

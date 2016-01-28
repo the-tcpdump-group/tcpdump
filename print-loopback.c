@@ -42,7 +42,6 @@
 #include "addrtoname.h"
 
 static const char tstr[] = " [|loopback]";
-static const char istr[] = " (invalid)";
 
 #define LOOPBACK_REPLY   1
 #define LOOPBACK_FWDDATA 2

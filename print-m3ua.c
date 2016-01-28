@@ -32,7 +32,6 @@
 #include "extract.h"
 
 static const char tstr[] = " [|m3ua]";
-static const char istr[] = " (invalid)";
 
 /* RFC 4666 */
 

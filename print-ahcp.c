@@ -40,7 +40,6 @@
 #include "addrtoname.h"
 
 static const char tstr[] = " [|ahcp]";
-static const char istr[] = " (invalid)";
 
 #define AHCP_MAGIC_NUMBER 43
 #define AHCP_VERSION_1 1

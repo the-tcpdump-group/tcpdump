@@ -27,7 +27,6 @@
 #include "extract.h"
 
 static const char tstr[] = " [|udld]";
-static const char istr[] = " (invalid)";
 
 #define UDLD_HEADER_LEN			4
 #define UDLD_DEVICE_ID_TLV		0x0001

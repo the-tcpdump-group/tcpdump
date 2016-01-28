@@ -35,7 +35,6 @@
 #include "ospf.h"
 
 static const char tstr[] = " [|ospf2]";
-static const char istr[] = " (invalid)";
 
 static const struct tok ospf_option_values[] = {
         { OSPF_OPTION_T,	"MultiTopology" }, /* draft-ietf-ospf-mt-09 */

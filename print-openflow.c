@@ -42,7 +42,6 @@
 #include "oui.h"
 
 static const char tstr[] = " [|openflow]";
-static const char istr[] = " (invalid)";
 
 #define OF_VER_1_0    0x01
 
