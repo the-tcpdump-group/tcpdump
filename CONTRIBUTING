@@ -75,7 +75,9 @@ d) The printer may receive incomplete packet in the buffer, truncated at any
 
 e) Do invalid packet checks in code: Think that your code can receive in input
    not only a valid packet but any arbitrary random sequence of octets (packet
-   corrupted in transit or built by a fuzz tester).
+   - built malformed originally by the sender or by a fuzz tester,
+   - became corrupted in transit).
+   Print with: ND_PRINT((ndo, "%s", istr));	/* to print " (invalid)" */
 
 f) Use 'struct tok' for indexed strings and print them with
    tok2str() or bittok2str() (for flags).
