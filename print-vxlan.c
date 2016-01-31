@@ -22,6 +22,10 @@
 #include "netdissect.h"
 #include "extract.h"
 
+static const char tstr[] = " [|VXLAN]";
+
+#define VXLAN_HDR_LEN 8
+
 /*
  * VXLAN header, RFC7348
  *               Virtual eXtensible Local Area Network (VXLAN): A Framework
@@ -42,10 +46,10 @@ vxlan_print(netdissect_options *ndo, const u_char *bp, u_int len)
     uint8_t flags;
     uint32_t vni;
 
-    if (len < 8) {
-        ND_PRINT((ndo, "[|VXLAN]"));
-        return;
-    }
+    if (len < VXLAN_HDR_LEN)
+        goto trunc;
+
+    ND_TCHECK2(*bp, VXLAN_HDR_LEN);
 
     flags = *bp;
     bp += 4;
@@ -57,5 +61,10 @@ vxlan_print(netdissect_options *ndo, const u_char *bp, u_int len)
     ND_PRINT((ndo, "flags [%s] (0x%02x), ", flags & 0x08 ? "I" : ".", flags));
     ND_PRINT((ndo, "vni %u\n", vni));
 
-    ether_print(ndo, bp, len - 8, len - 8, NULL, NULL);
+    ether_print(ndo, bp, len - VXLAN_HDR_LEN, len - VXLAN_HDR_LEN, NULL, NULL);
+
+    return;
+
+trunc:
+    ND_PRINT((ndo, "%s", tstr));
 }
