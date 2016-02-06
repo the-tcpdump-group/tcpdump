@@ -291,6 +291,11 @@ medsa-e		medsa.pcap		medsa-e.out	-t -e
 # VXLAN tests
 vxlan  vxlan.pcap  vxlan.out  -# -t -e
 
+# CVEs 2014 malformed packets from Steffen Bauch
+cve-2014-8767-OLSR cve-2014-8767-OLSR.pcap cve-2014-8767-OLSR.out -t -v
+cve-2014-8768-Geonet cve-2014-8768-Geonet.pcap cve-2014-8768-Geonet.out -t -v
+cve-2014-8769-AODV cve-2014-8769-AODV.pcap cve-2014-8769-AODV.out -t -v
+
 # bad packets from Kevin Day
 # cve-2015-2155 -- futz testing on FORCES printer
 kday1           kday1.pcap              kday1.out       -t -v
