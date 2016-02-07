@@ -577,12 +577,13 @@ droproot(const char *username, const char *chroot_dir)
 		exit(1);
 	}
 #ifdef HAVE_LIBCAP_NG
-	/* We don't need CAP_SETUID and CAP_SETGID any more. */
+	/* We don't need CAP_SETUID, CAP_SETGID and CAP_SYS_CHROOT any more. */
 	capng_updatev(
 		CAPNG_DROP,
 		CAPNG_EFFECTIVE | CAPNG_PERMITTED,
 		CAP_SETUID,
 		CAP_SETGID,
+		CAP_SYS_CHROOT,
 		-1);
 	capng_apply(CAPNG_SELECT_BOTH);
 #endif /* HAVE_LIBCAP_NG */
@@ -1591,6 +1592,13 @@ main(int argc, char **argv)
 				CAP_SETUID,
 				CAP_SETGID,
 				-1);
+		}
+		if (chroot_dir) {
+			capng_update(
+				CAPNG_ADD,
+				CAPNG_PERMITTED | CAPNG_EFFECTIVE,
+				CAP_SYS_CHROOT
+				);
 		}
 
 		if (WFileName) {
