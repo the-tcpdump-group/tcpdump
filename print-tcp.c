@@ -758,7 +758,7 @@ print_tcp_rst_data(netdissect_options *ndo,
                 ND_PRINT((ndo, "+"));			/* indicate we truncate */
         }
         ND_PRINT((ndo, " "));
-        while (length-- && sp <= ndo->ndo_snapend) {
+        while (length-- && sp < ndo->ndo_snapend) {
                 c = *sp++;
                 safeputchar(ndo, c);
         }
