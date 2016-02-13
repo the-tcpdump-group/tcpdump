@@ -275,11 +275,11 @@ static int udp_cksum(netdissect_options *ndo, register const struct ip *ip,
 				IPPROTO_UDP);
 }
 
-static int udp6_cksum(const struct ip6_hdr *ip6, const struct udphdr *up,
-	u_int len)
+static int udp6_cksum(netdissect_options *ndo, const struct ip6_hdr *ip6,
+		      const struct udphdr *up, u_int len)
 {
-	return nextproto6_cksum(ip6, (const uint8_t *)(const void *)up, len, len,
-	    IPPROTO_UDP);
+	return nextproto6_cksum(ndo, ip6, (const uint8_t *)(const void *)up, len, len,
+				IPPROTO_UDP);
 }
 
 static void
@@ -523,7 +523,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 		else if (IP_V(ip) == 6 && ip6->ip6_plen) {
 			/* for IPv6, UDP checksum is mandatory */
 			if (ND_TTEST2(cp[0], length)) {
-				sum = udp6_cksum(ip6, up, length + sizeof(struct udphdr));
+				sum = udp6_cksum(ndo, ip6, up, length + sizeof(struct udphdr));
 				udp_sum = EXTRACT_16BITS(&up->uh_sum);
 
 	                        if (sum != 0) {

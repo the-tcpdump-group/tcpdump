@@ -620,10 +620,10 @@ print_lladdr(netdissect_options *ndo, const uint8_t *p, size_t l)
 	}
 }
 
-static int icmp6_cksum(const struct ip6_hdr *ip6, const struct icmp6_hdr *icp,
-	u_int len)
+static int icmp6_cksum(netdissect_options *ndo, const struct ip6_hdr *ip6,
+	const struct icmp6_hdr *icp, u_int len)
 {
-	return nextproto6_cksum(ip6, (const uint8_t *)(const void *)icp, len, len,
+	return nextproto6_cksum(ndo, ip6, (const uint8_t *)(const void *)icp, len, len,
 				IPPROTO_ICMPV6);
 }
 
@@ -908,7 +908,7 @@ icmp6_print(netdissect_options *ndo,
 
 		if (ND_TTEST2(bp[0], length)) {
 			udp_sum = EXTRACT_16BITS(&dp->icmp6_cksum);
-			sum = icmp6_cksum(ip, dp, length);
+			sum = icmp6_cksum(ndo, ip, dp, length);
 			if (sum != 0)
 				ND_PRINT((ndo,"[bad icmp6 cksum 0x%04x -> 0x%04x!] ",
                                                 udp_sum,

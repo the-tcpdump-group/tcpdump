@@ -143,6 +143,16 @@ tcp_cksum(netdissect_options *ndo,
 				IPPROTO_TCP);
 }
 
+static int
+tcp6_cksum(netdissect_options *ndo,
+           register const struct ip6_hdr *ip6,
+           register const struct tcphdr *tp,
+           register u_int len)
+{
+	return nextproto6_cksum(ndo, ip6, (const uint8_t *)tp, len, len,
+				IPPROTO_TCP);
+}
+
 void
 tcp_print(netdissect_options *ndo,
           register const u_char *bp, register u_int length,
@@ -370,8 +380,7 @@ tcp_print(netdissect_options *ndo,
                         }
                 } else if (IP_V(ip) == 6 && ip6->ip6_plen) {
                         if (ND_TTEST2(tp->th_sport, length)) {
-                                sum = nextproto6_cksum(ip6, (const uint8_t *)tp,
-							length, length, IPPROTO_TCP);
+                                sum = tcp6_cksum(ndo, ip6, tp, length);
                                 tcp_sum = EXTRACT_16BITS(&tp->th_sum);
 
                                 ND_PRINT((ndo, ", cksum 0x%04x", tcp_sum));

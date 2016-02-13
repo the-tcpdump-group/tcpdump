@@ -202,9 +202,10 @@ static int dccp_cksum(netdissect_options *ndo, const struct ip *ip,
 				dccp_csum_coverage(dh, len), IPPROTO_DCCP);
 }
 
-static int dccp6_cksum(const struct ip6_hdr *ip6, const struct dccp_hdr *dh, u_int len)
+static int dccp6_cksum(netdissect_options *ndo, const struct ip6_hdr *ip6,
+	const struct dccp_hdr *dh, u_int len)
 {
-	return nextproto6_cksum(ip6, (const uint8_t *)(const void *)dh, len,
+	return nextproto6_cksum(ndo, ip6, (const uint8_t *)(const void *)dh, len,
 				dccp_csum_coverage(dh, len), IPPROTO_DCCP);
 }
 
@@ -342,7 +343,7 @@ void dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
 		if (IP_V(ip) == 4)
 			sum = dccp_cksum(ndo, ip, dh, len);
 		else if (IP_V(ip) == 6)
-			sum = dccp6_cksum(ip6, dh, len);
+			sum = dccp6_cksum(ndo, ip6, dh, len);
 		if (sum != 0)
 			ND_PRINT((ndo, "(incorrect -> 0x%04x)",in_cksum_shouldbe(dccp_sum, sum)));
 		else

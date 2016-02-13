@@ -75,6 +75,7 @@ typedef signed char nd_int8_t;
 #include <pcap.h>
 
 #include "ip.h" /* struct ip for nextproto4_cksum() */
+#include "ip6.h" /* struct ip6 for nextproto6_cksum() */
 
 extern int32_t thiszone;	/* seconds offset from gmt to local time */
 /* invalid string to print '(invalid)' for malformed or corrupted packets */
@@ -602,6 +603,9 @@ extern uint16_t in_cksum(const struct cksum_vec *, int);
 extern uint16_t in_cksum_shouldbe(uint16_t, uint16_t);
 
 extern int nextproto4_cksum(netdissect_options *, const struct ip *, const uint8_t *, u_int, u_int, u_int);
+
+/* in print-ip6.c */
+extern int nextproto6_cksum(netdissect_options *, const struct ip6_hdr *, const uint8_t *, u_int, u_int, u_int);
 
 /* Utilities */
 extern int mask2plen(uint32_t);

@@ -56,12 +56,6 @@ rt6_print(netdissect_options *ndo, register const u_char *bp, const u_char *bp2 
 	ND_PRINT((ndo, ", segleft=%d", dp->ip6r_segleft));
 
 	switch (dp->ip6r_type) {
-#ifndef IPV6_RTHDR_TYPE_0
-#define IPV6_RTHDR_TYPE_0 0
-#endif
-#ifndef IPV6_RTHDR_TYPE_2
-#define IPV6_RTHDR_TYPE_2 2
-#endif
 	case IPV6_RTHDR_TYPE_0:
 	case IPV6_RTHDR_TYPE_2:			/* Mobile IPv6 ID-20 */
 		dp0 = (const struct ip6_rthdr0 *)dp;
@@ -83,14 +77,6 @@ rt6_print(netdissect_options *ndo, register const u_char *bp, const u_char *bp2 
 			ND_PRINT((ndo, ", [%d]%s", i, ip6addr_string(ndo, addr)));
 			last_addr = addr;
 			addr++;
-		}
-		/*
-		 * the destination address used in the pseudo-header is that of the final
-		 * destination : the last address of the routing header
-		 */
-		if (last_addr != NULL) {
-			const struct ip6_hdr *ip6 = (const struct ip6_hdr *)bp2;
-			UNALIGNED_MEMCPY(&ip6->ip6_dst, last_addr, sizeof (struct in6_addr));
 		}
 		/*(*/
 		ND_PRINT((ndo, ") "));
