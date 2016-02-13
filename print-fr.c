@@ -596,6 +596,10 @@ frf15_print(netdissect_options *ndo,
 {
     uint16_t sequence_num, flags;
 
+    if (length < 2)
+        goto trunc;
+    ND_TCHECK2(*p, 2);
+
     flags = p[0]&MFR_BEC_MASK;
     sequence_num = (p[0]&0x1e)<<7 | p[1];
 
@@ -613,7 +617,10 @@ frf15_print(netdissect_options *ndo,
  * model is end-to-end or interface based wether we want to print
  * another Q.922 header
  */
+     return;
 
+trunc:
+     ND_PRINT((ndo, "[|frf15]"));
 }
 
 /*
@@ -771,11 +778,10 @@ q933_print(netdissect_options *ndo,
         u_int codeset;
         u_int ie_is_known = 0;
 
-	if (length < 9) {	/* shortest: Q.933a LINK VERIFY */
-		ND_PRINT((ndo, "[|q.933]"));
-		return;
-	}
+	if (length < 9)	/* shortest: Q.933a LINK VERIFY */
+		goto trunc;
 
+	ND_TCHECK2(*p, 3);
         codeset = p[2]&0x0f;   /* extract the codeset */
 
 	if (p[2] == MSG_ANSI_LOCKING_SHIFT) {
@@ -823,6 +829,12 @@ q933_print(netdissect_options *ndo,
 		    }
                     return;
 		}
+		if (!ND_TTEST(*ie_p)) {
+			if (ndo->ndo_vflag)
+				ND_PRINT((ndo, "\n"));
+			ND_PRINT((ndo, "\n[|q.933]"));
+			return;
+		}
 
                 /* lets do the full IE parsing only in verbose mode
                  * however some IEs (DLCI Status, Link Verify)
@@ -835,10 +847,14 @@ q933_print(netdissect_options *ndo,
                            ie_p->ie_len));
 		}
 
-                /* sanity check */
+                /* sanity checks */
                 if (ie_p->ie_type == 0 || ie_p->ie_len == 0) {
                     return;
 		}
+                if (length < ie_p->ie_len + 2) {
+                    goto trunc;
+                }
+                ND_TCHECK2(*ptemp, ie_p->ie_len + 2);
 
                 if (fr_q933_print_ie_codeset[codeset] != NULL) {
                     ie_is_known = fr_q933_print_ie_codeset[codeset](ndo, ie_p, ptemp);
@@ -853,12 +869,16 @@ q933_print(netdissect_options *ndo,
                     print_unknown_data(ndo, ptemp+2, "\n\t  ", ie_p->ie_len);
 		}
 
-		length = length - ie_p->ie_len - 2;
-		ptemp = ptemp + ie_p->ie_len + 2;
+		length -= ie_p->ie_len + 2;
+		ptemp += ie_p->ie_len + 2;
 	}
         if (!ndo->ndo_vflag) {
             ND_PRINT((ndo, ", length %u", olen));
 	}
+	return;
+
+trunc:
+	ND_PRINT((ndo, "[|q.933]"));
 }
 
 static int
