@@ -2564,146 +2564,50 @@ print_chaninfo(netdissect_options *ndo,
 
 static int
 print_radiotap_field(netdissect_options *ndo,
-                     struct cpack_state *s, uint32_t bit, uint8_t *flags,
+                     struct cpack_state *s, uint32_t bit, uint8_t *flagsp,
                      uint32_t presentflags)
 {
-	union {
-		int8_t		i8;
-		uint8_t		u8;
-		int16_t		i16;
-		uint16_t	u16;
-		uint32_t	u32;
-		uint64_t	u64;
-	} u, u2, u3, u4, u5, u6;
-	uint8_t mcs_nss[4];
 	u_int i;
 	int rc;
 
 	switch (bit) {
-	case IEEE80211_RADIOTAP_FLAGS:
-		rc = cpack_uint8(s, &u.u8);
+
+	case IEEE80211_RADIOTAP_TSFT: {
+		uint64_t tsft;
+
+		rc = cpack_uint64(s, &tsft);
 		if (rc != 0)
-			break;
-		*flags = u.u8;
+			goto trunc;
+		ND_PRINT((ndo, "%" PRIu64 "us tsft ", tsft));
 		break;
-	case IEEE80211_RADIOTAP_RATE:
-		rc = cpack_uint8(s, &u.u8);
-		break;
-	case IEEE80211_RADIOTAP_DB_ANTSIGNAL:
-	case IEEE80211_RADIOTAP_DB_ANTNOISE:
-	case IEEE80211_RADIOTAP_ANTENNA:
-		rc = cpack_uint8(s, &u.u8);
-		break;
-	case IEEE80211_RADIOTAP_DBM_ANTSIGNAL:
-	case IEEE80211_RADIOTAP_DBM_ANTNOISE:
-		rc = cpack_int8(s, &u.i8);
-		break;
-	case IEEE80211_RADIOTAP_CHANNEL:
-		rc = cpack_uint16(s, &u.u16);
-		if (rc != 0)
-			break;
-		rc = cpack_uint16(s, &u2.u16);
-		break;
-	case IEEE80211_RADIOTAP_FHSS:
-	case IEEE80211_RADIOTAP_LOCK_QUALITY:
-	case IEEE80211_RADIOTAP_TX_ATTENUATION:
-	case IEEE80211_RADIOTAP_RX_FLAGS:
-		rc = cpack_uint16(s, &u.u16);
-		break;
-	case IEEE80211_RADIOTAP_DB_TX_ATTENUATION:
-		rc = cpack_uint8(s, &u.u8);
-		break;
-	case IEEE80211_RADIOTAP_DBM_TX_POWER:
-		rc = cpack_int8(s, &u.i8);
-		break;
-	case IEEE80211_RADIOTAP_TSFT:
-		rc = cpack_uint64(s, &u.u64);
-		break;
-	case IEEE80211_RADIOTAP_XCHANNEL:
-		rc = cpack_uint32(s, &u.u32);
-		if (rc != 0)
-			break;
-		rc = cpack_uint16(s, &u2.u16);
-		if (rc != 0)
-			break;
-		rc = cpack_uint8(s, &u3.u8);
-		if (rc != 0)
-			break;
-		rc = cpack_uint8(s, &u4.u8);
-		break;
-	case IEEE80211_RADIOTAP_MCS:
-		rc = cpack_uint8(s, &u.u8);
-		if (rc != 0)
-			break;
-		rc = cpack_uint8(s, &u2.u8);
-		if (rc != 0)
-			break;
-		rc = cpack_uint8(s, &u3.u8);
-		break;
-	case IEEE80211_RADIOTAP_AMPDU_STATUS:
-		rc = cpack_uint32(s, &u.u32);
-		if (rc != 0)
-			break;
-		rc = cpack_uint16(s, &u2.u16);
-		if (rc != 0)
-			break;
-		rc = cpack_uint8(s, &u3.u8);
-		if (rc != 0)
-			break;
-		rc = cpack_uint8(s, &u4.u8);
-		break;
-	case IEEE80211_RADIOTAP_VHT:
-		rc = cpack_uint16(s, &u.u16);
-		if (rc != 0)
-			break;
-		rc = cpack_uint8(s, &u2.u8);
-		if (rc != 0)
-			break;
-		rc = cpack_uint8(s, &u3.u8);
-		if (rc != 0)
-			goto fail;
-		for (i = 0; i < 4; i++) {
-			rc = cpack_uint8(s, &mcs_nss[i]);
-			if (rc != 0)
-				goto fail;
 		}
-		rc = cpack_uint8(s, &u4.u8);
-		if (rc != 0)
-			break;
-		rc = cpack_uint8(s, &u5.u8);
-		if (rc != 0)
-			goto fail;
-		rc = cpack_uint16(s, &u6.u16);
-	fail:
-		break;
-	default:
-		/* this bit indicates a field whose
-		 * size we do not know, so we cannot
-		 * proceed.  Just print the bit number.
-		 */
-		ND_PRINT((ndo, "[bit %u] ", bit));
-		return -1;
-	}
 
-	if (rc != 0) {
-		ND_PRINT((ndo, "%s", tstr));
-		return rc;
-	}
+	case IEEE80211_RADIOTAP_FLAGS: {
+		uint8_t flagsval;
 
-	switch (bit) {
-	case IEEE80211_RADIOTAP_CHANNEL:
-		/*
-		 * If CHANNEL and XCHANNEL are both present, skip
-		 * CHANNEL.
-		 */
-		if (presentflags & (1 << IEEE80211_RADIOTAP_XCHANNEL))
-			break;
-		print_chaninfo(ndo, u.u16, u2.u16, presentflags);
+		rc = cpack_uint8(s, &flagsval);
+		if (rc != 0)
+			goto trunc;
+		*flagsp = flagsval;
+		if (flagsval & IEEE80211_RADIOTAP_F_CFP)
+			ND_PRINT((ndo, "cfp "));
+		if (flagsval & IEEE80211_RADIOTAP_F_SHORTPRE)
+			ND_PRINT((ndo, "short preamble "));
+		if (flagsval & IEEE80211_RADIOTAP_F_WEP)
+			ND_PRINT((ndo, "wep "));
+		if (flagsval & IEEE80211_RADIOTAP_F_FRAG)
+			ND_PRINT((ndo, "fragmented "));
+		if (flagsval & IEEE80211_RADIOTAP_F_BADFCS)
+			ND_PRINT((ndo, "bad-fcs "));
 		break;
-	case IEEE80211_RADIOTAP_FHSS:
-		ND_PRINT((ndo, "fhset %d fhpat %d ", u.u16 & 0xff, (u.u16 >> 8) & 0xff));
-		break;
-	case IEEE80211_RADIOTAP_RATE:
+		}
+
+	case IEEE80211_RADIOTAP_RATE: {
+		uint8_t rate;
+
+		rc = cpack_uint8(s, &rate);
+		if (rc != 0)
+			goto trunc;
 		/*
 		 * XXX On FreeBSD rate & 0x80 means we have an MCS. On
 		 * Linux and AirPcap it does not.  (What about
@@ -2725,7 +2629,7 @@ print_radiotap_field(netdissect_options *ndo,
 		 * setting.  Such rates do exist, e.g. 11n
 		 * MCS 7 at 20 MHz with a long guard interval.
 		 */
-		if (u.u8 >= 0x80 && u.u8 <= 0x8f) {
+		if (rate >= 0x80 && rate <= 0x8f) {
 			/*
 			 * XXX - we don't know the channel width
 			 * or guard interval length, so we can't
@@ -2742,59 +2646,172 @@ print_radiotap_field(netdissect_options *ndo,
 			 * information from Flags, at least on
 			 * FreeBSD?
 			 */
-			ND_PRINT((ndo, "MCS %u ", u.u8 & 0x7f));
+			ND_PRINT((ndo, "MCS %u ", rate & 0x7f));
 		} else
-			ND_PRINT((ndo, "%2.1f Mb/s ", .5 * u.u8));
+			ND_PRINT((ndo, "%2.1f Mb/s ", .5 * rate));
 		break;
-	case IEEE80211_RADIOTAP_DBM_ANTSIGNAL:
-		ND_PRINT((ndo, "%ddBm signal ", u.i8));
+		}
+
+	case IEEE80211_RADIOTAP_CHANNEL: {
+		uint16_t frequency;
+		uint16_t flags;
+
+		rc = cpack_uint16(s, &frequency);
+		if (rc != 0)
+			goto trunc;
+		rc = cpack_uint16(s, &flags);
+		if (rc != 0)
+			goto trunc;
+		/*
+		 * If CHANNEL and XCHANNEL are both present, skip
+		 * CHANNEL.
+		 */
+		if (presentflags & (1 << IEEE80211_RADIOTAP_XCHANNEL))
+			break;
+		print_chaninfo(ndo, frequency, flags, presentflags);
 		break;
-	case IEEE80211_RADIOTAP_DBM_ANTNOISE:
-		ND_PRINT((ndo, "%ddBm noise ", u.i8));
+		}
+
+	case IEEE80211_RADIOTAP_FHSS: {
+		uint8_t hopset;
+		uint8_t hoppat;
+
+		rc = cpack_uint8(s, &hopset);
+		if (rc != 0)
+			goto trunc;
+		rc = cpack_uint8(s, &hoppat);
+		if (rc != 0)
+			goto trunc;
+		ND_PRINT((ndo, "fhset %d fhpat %d ", hopset, hoppat));
 		break;
-	case IEEE80211_RADIOTAP_DB_ANTSIGNAL:
-		ND_PRINT((ndo, "%ddB signal ", u.u8));
+		}
+
+	case IEEE80211_RADIOTAP_DBM_ANTSIGNAL: {
+		int8_t dbm_antsignal;
+
+		rc = cpack_int8(s, &dbm_antsignal);
+		if (rc != 0)
+			goto trunc;
+		ND_PRINT((ndo, "%ddBm signal ", dbm_antsignal));
 		break;
-	case IEEE80211_RADIOTAP_DB_ANTNOISE:
-		ND_PRINT((ndo, "%ddB noise ", u.u8));
+		}
+
+	case IEEE80211_RADIOTAP_DBM_ANTNOISE: {
+		int8_t dbm_antnoise;
+
+		rc = cpack_int8(s, &dbm_antnoise);
+		if (rc != 0)
+			goto trunc;
+		ND_PRINT((ndo, "%ddBm noise ", dbm_antnoise));
 		break;
-	case IEEE80211_RADIOTAP_LOCK_QUALITY:
-		ND_PRINT((ndo, "%u sq ", u.u16));
+		}
+
+	case IEEE80211_RADIOTAP_LOCK_QUALITY: {
+		uint16_t lock_quality;
+
+		rc = cpack_uint16(s, &lock_quality);
+		if (rc != 0)
+			goto trunc;
+		ND_PRINT((ndo, "%u sq ", lock_quality));
 		break;
-	case IEEE80211_RADIOTAP_TX_ATTENUATION:
-		ND_PRINT((ndo, "%d tx power ", -(int)u.u16));
+		}
+
+	case IEEE80211_RADIOTAP_TX_ATTENUATION: {
+		uint16_t tx_attenuation;
+
+		rc = cpack_uint16(s, &tx_attenuation);
+		if (rc != 0)
+			goto trunc;
+		ND_PRINT((ndo, "%d tx power ", -(int)tx_attenuation));
 		break;
-	case IEEE80211_RADIOTAP_DB_TX_ATTENUATION:
-		ND_PRINT((ndo, "%ddB tx power ", -(int)u.u8));
+		}
+
+	case IEEE80211_RADIOTAP_DB_TX_ATTENUATION: {
+		uint8_t db_tx_attenuation;
+
+		rc = cpack_uint8(s, &db_tx_attenuation);
+		if (rc != 0)
+			goto trunc;
+		ND_PRINT((ndo, "%ddB tx attenuation ", -(int)db_tx_attenuation));
 		break;
-	case IEEE80211_RADIOTAP_DBM_TX_POWER:
-		ND_PRINT((ndo, "%ddBm tx power ", u.i8));
+		}
+
+	case IEEE80211_RADIOTAP_DBM_TX_POWER: {
+		int8_t dbm_tx_power;
+
+		rc = cpack_int8(s, &dbm_tx_power);
+		if (rc != 0)
+			goto trunc;
+		ND_PRINT((ndo, "%ddBm tx power ", dbm_tx_power));
 		break;
-	case IEEE80211_RADIOTAP_FLAGS:
-		if (u.u8 & IEEE80211_RADIOTAP_F_CFP)
-			ND_PRINT((ndo, "cfp "));
-		if (u.u8 & IEEE80211_RADIOTAP_F_SHORTPRE)
-			ND_PRINT((ndo, "short preamble "));
-		if (u.u8 & IEEE80211_RADIOTAP_F_WEP)
-			ND_PRINT((ndo, "wep "));
-		if (u.u8 & IEEE80211_RADIOTAP_F_FRAG)
-			ND_PRINT((ndo, "fragmented "));
-		if (u.u8 & IEEE80211_RADIOTAP_F_BADFCS)
-			ND_PRINT((ndo, "bad-fcs "));
+		}
+
+	case IEEE80211_RADIOTAP_ANTENNA: {
+		uint8_t antenna;
+
+		rc = cpack_uint8(s, &antenna);
+		if (rc != 0)
+			goto trunc;
+		ND_PRINT((ndo, "antenna %u ", antenna));
 		break;
-	case IEEE80211_RADIOTAP_ANTENNA:
-		ND_PRINT((ndo, "antenna %d ", u.u8));
+		}
+
+	case IEEE80211_RADIOTAP_DB_ANTSIGNAL: {
+		uint8_t db_antsignal;
+
+		rc = cpack_uint8(s, &db_antsignal);
+		if (rc != 0)
+			goto trunc;
+		ND_PRINT((ndo, "%ddB signal ", db_antsignal));
 		break;
-	case IEEE80211_RADIOTAP_TSFT:
-		ND_PRINT((ndo, "%" PRIu64 "us tsft ", u.u64));
+		}
+
+	case IEEE80211_RADIOTAP_DB_ANTNOISE: {
+		uint8_t db_antnoise;
+
+		rc = cpack_uint8(s, &db_antnoise);
+		if (rc != 0)
+			goto trunc;
+		ND_PRINT((ndo, "%ddB noise ", db_antnoise));
 		break;
-	case IEEE80211_RADIOTAP_RX_FLAGS:
+		}
+
+	case IEEE80211_RADIOTAP_RX_FLAGS: {
+		uint16_t rx_flags;
+
+		rc = cpack_uint16(s, &rx_flags);
+		if (rc != 0)
+			goto trunc;
 		/* Do nothing for now */
 		break;
-	case IEEE80211_RADIOTAP_XCHANNEL:
-		print_chaninfo(ndo, u2.u16, u.u32, presentflags);
+		}
+
+	case IEEE80211_RADIOTAP_XCHANNEL: {
+		uint32_t flags;
+		uint16_t frequency;
+		uint8_t channel;
+		uint8_t maxpower;
+
+		rc = cpack_uint32(s, &flags);
+		if (rc != 0)
+			goto trunc;
+		rc = cpack_uint16(s, &frequency);
+		if (rc != 0)
+			goto trunc;
+		rc = cpack_uint8(s, &channel);
+		if (rc != 0)
+			goto trunc;
+		rc = cpack_uint8(s, &maxpower);
+		if (rc != 0)
+			goto trunc;
+		print_chaninfo(ndo, frequency, flags, presentflags);
 		break;
+		}
+
 	case IEEE80211_RADIOTAP_MCS: {
+		uint8_t known;
+		uint8_t flags;
+		uint8_t mcs_index;
 		static const char *ht_bandwidth[4] = {
 			"20 MHz",
 			"40 MHz",
@@ -2803,15 +2820,24 @@ print_radiotap_field(netdissect_options *ndo,
 		};
 		float htrate;
 
-		if (u.u8 & IEEE80211_RADIOTAP_MCS_MCS_INDEX_KNOWN) {
+		rc = cpack_uint8(s, &known);
+		if (rc != 0)
+			goto trunc;
+		rc = cpack_uint8(s, &flags);
+		if (rc != 0)
+			goto trunc;
+		rc = cpack_uint8(s, &mcs_index);
+		if (rc != 0)
+			goto trunc;
+		if (known & IEEE80211_RADIOTAP_MCS_MCS_INDEX_KNOWN) {
 			/*
 			 * We know the MCS index.
 			 */
-			if (u3.u8 <= MAX_MCS_INDEX) {
+			if (mcs_index <= MAX_MCS_INDEX) {
 				/*
 				 * And it's in-range.
 				 */
-				if (u.u8 & (IEEE80211_RADIOTAP_MCS_BANDWIDTH_KNOWN|IEEE80211_RADIOTAP_MCS_GUARD_INTERVAL_KNOWN)) {
+				if (known & (IEEE80211_RADIOTAP_MCS_BANDWIDTH_KNOWN|IEEE80211_RADIOTAP_MCS_GUARD_INTERVAL_KNOWN)) {
 					/*
 					 * And we know both the bandwidth and
 					 * the guard interval, so we can look
@@ -2819,9 +2845,9 @@ print_radiotap_field(netdissect_options *ndo,
 					 */
 					htrate =
 						ieee80211_float_htrates \
-							[u3.u8] \
-							[((u2.u8 & IEEE80211_RADIOTAP_MCS_BANDWIDTH_MASK) == IEEE80211_RADIOTAP_MCS_BANDWIDTH_40 ? 1 : 0)] \
-							[((u2.u8 & IEEE80211_RADIOTAP_MCS_SHORT_GI) ? 1 : 0)];
+							[mcs_index] \
+							[((flags & IEEE80211_RADIOTAP_MCS_BANDWIDTH_MASK) == IEEE80211_RADIOTAP_MCS_BANDWIDTH_40 ? 1 : 0)] \
+							[((flags & IEEE80211_RADIOTAP_MCS_SHORT_GI) ? 1 : 0)];
 				} else {
 					/*
 					 * We don't know both the bandwidth
@@ -2841,44 +2867,71 @@ print_radiotap_field(netdissect_options *ndo,
 				 * We have the rate.
 				 * Print it.
 				 */
-				ND_PRINT((ndo, "%.1f Mb/s MCS %u ", htrate, u3.u8));
+				ND_PRINT((ndo, "%.1f Mb/s MCS %u ", htrate, mcs_index));
 			} else {
 				/*
 				 * We at least have the MCS index.
 				 * Print it.
 				 */
-				ND_PRINT((ndo, "MCS %u ", u3.u8));
+				ND_PRINT((ndo, "MCS %u ", mcs_index));
 			}
 		}
-		if (u.u8 & IEEE80211_RADIOTAP_MCS_BANDWIDTH_KNOWN) {
+		if (known & IEEE80211_RADIOTAP_MCS_BANDWIDTH_KNOWN) {
 			ND_PRINT((ndo, "%s ",
-				ht_bandwidth[u2.u8 & IEEE80211_RADIOTAP_MCS_BANDWIDTH_MASK]));
+				ht_bandwidth[flags & IEEE80211_RADIOTAP_MCS_BANDWIDTH_MASK]));
 		}
-		if (u.u8 & IEEE80211_RADIOTAP_MCS_GUARD_INTERVAL_KNOWN) {
+		if (known & IEEE80211_RADIOTAP_MCS_GUARD_INTERVAL_KNOWN) {
 			ND_PRINT((ndo, "%s GI ",
-				(u2.u8 & IEEE80211_RADIOTAP_MCS_SHORT_GI) ?
+				(flags & IEEE80211_RADIOTAP_MCS_SHORT_GI) ?
 				"short" : "long"));
 		}
-		if (u.u8 & IEEE80211_RADIOTAP_MCS_HT_FORMAT_KNOWN) {
+		if (known & IEEE80211_RADIOTAP_MCS_HT_FORMAT_KNOWN) {
 			ND_PRINT((ndo, "%s ",
-				(u2.u8 & IEEE80211_RADIOTAP_MCS_HT_GREENFIELD) ?
+				(flags & IEEE80211_RADIOTAP_MCS_HT_GREENFIELD) ?
 				"greenfield" : "mixed"));
 		}
-		if (u.u8 & IEEE80211_RADIOTAP_MCS_FEC_TYPE_KNOWN) {
+		if (known & IEEE80211_RADIOTAP_MCS_FEC_TYPE_KNOWN) {
 			ND_PRINT((ndo, "%s FEC ",
-				(u2.u8 & IEEE80211_RADIOTAP_MCS_FEC_LDPC) ?
+				(flags & IEEE80211_RADIOTAP_MCS_FEC_LDPC) ?
 				"LDPC" : "BCC"));
 		}
-		if (u.u8 & IEEE80211_RADIOTAP_MCS_STBC_KNOWN) {
+		if (known & IEEE80211_RADIOTAP_MCS_STBC_KNOWN) {
 			ND_PRINT((ndo, "RX-STBC%u ",
-				(u2.u8 & IEEE80211_RADIOTAP_MCS_STBC_MASK) >> IEEE80211_RADIOTAP_MCS_STBC_SHIFT));
+				(flags & IEEE80211_RADIOTAP_MCS_STBC_MASK) >> IEEE80211_RADIOTAP_MCS_STBC_SHIFT));
+		}
+		break;
 		}
 
+	case IEEE80211_RADIOTAP_AMPDU_STATUS: {
+		uint32_t reference_num;
+		uint16_t flags;
+		uint8_t delim_crc;
+		uint8_t reserved;
+
+		rc = cpack_uint32(s, &reference_num);
+		if (rc != 0)
+			goto trunc;
+		rc = cpack_uint16(s, &flags);
+		if (rc != 0)
+			goto trunc;
+		rc = cpack_uint8(s, &delim_crc);
+		if (rc != 0)
+			goto trunc;
+		rc = cpack_uint8(s, &reserved);
+		if (rc != 0)
+			goto trunc;
+		/* Do nothing for now */
 		break;
 		}
-	case IEEE80211_RADIOTAP_AMPDU_STATUS:
-		break;
+
 	case IEEE80211_RADIOTAP_VHT: {
+		uint16_t known;
+		uint8_t flags;
+		uint8_t bandwidth;
+		uint8_t mcs_nss[4];
+		uint8_t coding;
+		uint8_t group_id;
+		uint16_t partial_aid;
 		static const char *vht_bandwidth[32] = {
 			"20 MHz",
 			"40 MHz",
@@ -2914,6 +2967,29 @@ print_radiotap_field(netdissect_options *ndo,
 			"unknown (31)"
 		};
 
+		rc = cpack_uint16(s, &known);
+		if (rc != 0)
+			goto trunc;
+		rc = cpack_uint8(s, &flags);
+		if (rc != 0)
+			goto trunc;
+		rc = cpack_uint8(s, &bandwidth);
+		if (rc != 0)
+			goto trunc;
+		for (i = 0; i < 4; i++) {
+			rc = cpack_uint8(s, &mcs_nss[i]);
+			if (rc != 0)
+				goto trunc;
+		}
+		rc = cpack_uint8(s, &coding);
+		if (rc != 0)
+			goto trunc;
+		rc = cpack_uint8(s, &group_id);
+		if (rc != 0)
+			goto trunc;
+		rc = cpack_uint16(s, &partial_aid);
+		if (rc != 0)
+			goto trunc;
 		for (i = 0; i < 4; i++) {
 			u_int nss, mcs;
 			nss = mcs_nss[i] & IEEE80211_RADIOTAP_VHT_NSS_MASK;
@@ -2924,22 +3000,35 @@ print_radiotap_field(netdissect_options *ndo,
 
 			ND_PRINT((ndo, "User %u MCS %u ", i, mcs));
 			ND_PRINT((ndo, "%s FEC ",
-				(u4.u8 & (IEEE80211_RADIOTAP_CODING_LDPC_USERn << i)) ?
+				(coding & (IEEE80211_RADIOTAP_CODING_LDPC_USERn << i)) ?
 				"LDPC" : "BCC"));
 		}
-		if (u.u16 & IEEE80211_RADIOTAP_VHT_BANDWIDTH_KNOWN) {
+		if (known & IEEE80211_RADIOTAP_VHT_BANDWIDTH_KNOWN) {
 			ND_PRINT((ndo, "%s ",
-				vht_bandwidth[u3.u8 & IEEE80211_RADIOTAP_VHT_BANDWIDTH_MASK]));
+				vht_bandwidth[bandwidth & IEEE80211_RADIOTAP_VHT_BANDWIDTH_MASK]));
 		}
-		if (u.u16 & IEEE80211_RADIOTAP_VHT_GUARD_INTERVAL_KNOWN) {
+		if (known & IEEE80211_RADIOTAP_VHT_GUARD_INTERVAL_KNOWN) {
 			ND_PRINT((ndo, "%s GI ",
-				(u2.u8 & IEEE80211_RADIOTAP_VHT_SHORT_GI) ?
+				(flags & IEEE80211_RADIOTAP_VHT_SHORT_GI) ?
 				"short" : "long"));
 		}
 		break;
 		}
+
+	default:
+		/* this bit indicates a field whose
+		 * size we do not know, so we cannot
+		 * proceed.  Just print the bit number.
+		 */
+		ND_PRINT((ndo, "[bit %u] ", bit));
+		return -1;
 	}
+
 	return 0;
+
+trunc:
+	ND_PRINT((ndo, "%s", tstr));
+	return rc;
 }
 
 
