@@ -106,8 +106,9 @@ static const struct tok bfd_v1_authentication_values[] = {
 #define	BFD_EXTRACT_DIAG(x)     ((x)&0x1f)
 
 static const struct tok bfd_port_values[] = {
-    { BFD_CONTROL_PORT, "Control" },
-    { BFD_ECHO_PORT,    "Echo" },
+    { BFD_CONTROL_PORT,      "Control" },
+    { BFD_ECHO_PORT,         "Echo" },
+    { BFD_MHOP_CONTROL_PORT, "Multihop-Control" },
     { 0, NULL }
 };
 
@@ -166,7 +167,7 @@ bfd_print(netdissect_options *ndo, register const u_char *pptr,
         uint8_t version = 0;
 
         bfd_header = (const struct bfd_header_t *)pptr;
-        if (port == BFD_CONTROL_PORT) {
+        if (port == BFD_CONTROL_PORT || port == BFD_MHOP_CONTROL_PORT) {
             ND_TCHECK(*bfd_header);
             version = BFD_EXTRACT_VERSION(bfd_header->version_diag);
         } else if (port == BFD_ECHO_PORT) {
@@ -210,6 +211,11 @@ bfd_print(netdissect_options *ndo, register const u_char *pptr,
 
             /* BFDv1 */
         case (BFD_CONTROL_PORT << 8 | 1):
+	    /* 
+             * Fall-through. No difference between Singlehop and Multihop 
+             * control packets except UDP port numbers 
+             */
+	case (BFD_MHOP_CONTROL_PORT << 8 | 1):
             if (ndo->ndo_vflag < 1)
             {
                 ND_PRINT((ndo, "BFDv%u, %s, State %s, Flags: [%s], length: %u",
