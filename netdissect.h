@@ -479,6 +479,7 @@ extern void ftp_print(netdissect_options *, const u_char *, u_int);
 extern void geneve_print(netdissect_options *, const u_char *, u_int);
 extern void geonet_print(netdissect_options *, const u_char *, const u_char *, u_int);
 extern void gre_print(netdissect_options *, const u_char *, u_int);
+extern void gue_print(netdissect_options *, const u_char *, u_int);
 extern int hbhopt_print(netdissect_options *, const u_char *);
 extern void hex_and_ascii_print(netdissect_options *, const char *, const u_char *, u_int);
 extern void hex_and_ascii_print_with_offset(netdissect_options *, const char *, const u_char *, u_int, u_int);

@@ -275,6 +275,9 @@ struct udphdr {
 #ifndef AHCP_PORT
 #define AHCP_PORT			5359	/* draft-chroboczek-ahcp-00 */
 #endif
+#ifndef GUE_PORT
+#define GUE_PORT			6080	/* draft-ietf-nvo3-gue-02 */
+#endif
 #ifndef GENEVE_PORT
 #define GENEVE_PORT			6081	/* draft-gross-geneve-02 */
 #endif

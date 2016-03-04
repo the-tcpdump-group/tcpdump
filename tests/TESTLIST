@@ -336,3 +336,6 @@ pcap-invalid-version-2 pcap-invalid-version-2.pcap pcap-invalid-version-2.out -t
 # pcap-ng invalid version (first: version = 0.1 ; second: version = 1.1)
 pcap-ng-invalid-vers-1 pcap-ng-invalid-vers-1.pcap pcap-ng-invalid-vers-1.out -t
 pcap-ng-invalid-vers-2 pcap-ng-invalid-vers-2.pcap pcap-ng-invalid-vers-2.out -t
+
+gue	gue.pcap	gue.out	-t
+gue-v	gue.pcap	gue-v.out	-t -v
