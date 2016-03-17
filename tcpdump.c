@@ -1270,7 +1270,21 @@ main(int argc, char **argv)
 	}
 #endif
 
-	if (RFileName != NULL || VFileName != NULL) {
+	if (gndo->ndo_dlt >= 0 && dflag) {
+		/*
+		 * Dump compiled filter without opening anything if a
+		 * link type was provided.
+		 */
+#ifndef _WIN32
+		/*
+		 * We don't need network access, so relinquish any set-UID
+		 * or set-GID privileges we have (if any).
+		 */
+		if (setgid(getgid()) != 0 || setuid(getuid()) != 0 )
+			fprintf(stderr, "Warning: setgid/setuid failed !\n");
+#endif /* _WIN32 */
+		 pd = pcap_open_dead(gndo->ndo_dlt, 65535);
+	} else if (RFileName != NULL || VFileName != NULL) {
 		/*
 		 * If RFileName is non-null, it's the pathname of a
 		 * savefile to read.  If VFileName is non-null, it's
