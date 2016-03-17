@@ -1829,8 +1829,6 @@ main(int argc, char **argv)
 					RFileName, dlt_name,
 					pcap_datalink_val_to_description(new_dlt));
 				}
-				if (pcap_compile(pd, &fcode, cmdbuf, Oflag, netmask) < 0)
-					error("%s", pcap_geterr(pd));
 				if (pcap_setfilter(pd, &fcode) < 0)
 					error("%s", pcap_geterr(pd));
 			}
