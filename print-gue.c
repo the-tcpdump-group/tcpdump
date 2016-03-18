@@ -100,7 +100,7 @@ gue_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 	} else {
 		prot = GUE_PROTO(flags);
 	}
-	
+
 	/* Length of additional headers */
 	hlen = GUE_HLEN(flags);
 	hlen *= 4;
@@ -111,13 +111,13 @@ gue_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 	if (len < 2)
 		goto trunc;
 	flags = EXTRACT_16BITS(bp);
-	
+
 	if (flags) {
 		ND_PRINT((ndo, ", flags %04x", flags));
 	}
-	
+
 	// (E)FLAGS field
-	
+
 	len -= 2;
 	bp += 2;
 
@@ -131,12 +131,6 @@ gue_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 		/* Control packet, nothing else to show. */
 		return;
 	}
-	
-	/* Somewhat arbitrary threshold. At least ip_print() seems to read
-	   some fields before checking length so expect at least a full IPv4
-	   header at this stage. */
-	if (len < sizeof(struct ip))
-		goto trunc;
 
         if (ndo->ndo_vflag < 1)
             ND_PRINT((ndo, ": ")); /* put in a colon as protocol demarc */
@@ -145,6 +139,10 @@ gue_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 
 	switch (prot) {
  	case IPPROTO_IPV4:
+ 		/* ip_print() reads some fields before checking length. */
+		if (len < sizeof(struct ip))
+			goto trunc;
+
 		ip_print(ndo, bp, len);
 		break;
  	case IPPROTO_IPV6:
