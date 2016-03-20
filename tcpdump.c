@@ -762,7 +762,6 @@ main(int argc, char **argv)
 	register char *cp, *infile, *cmdbuf, *device, *RFileName, *VFileName, *WFileName;
 	pcap_handler callback;
 	int dlt;
-	int new_dlt;
 	const char *dlt_name;
 	struct bpf_program fcode;
 #ifndef _WIN32
@@ -1804,6 +1803,8 @@ main(int argc, char **argv)
 		if (VFileName != NULL) {
 			ret = get_next_file(VFile, VFileLine);
 			if (ret) {
+				int new_dlt;
+
 				RFileName = VFileLine;
 				pd = pcap_open_offline(RFileName, ebuf);
 				if (pd == NULL)
@@ -1816,23 +1817,54 @@ main(int argc, char **argv)
 				}
 #endif
 				new_dlt = pcap_datalink(pd);
-				if (WFileName && new_dlt != dlt)
-					error("%s: new dlt does not match original", RFileName);
-				ndo->ndo_if_printer = get_if_printer(ndo, new_dlt);
-				dlt_name = pcap_datalink_val_to_name(new_dlt);
+				if (new_dlt != dlt) {
+					/*
+					 * The new file has a different
+					 * link-layer header type from the
+					 * previous one.
+					 */
+					if (WFileName != NULL) {
+						/*
+						 * We're writing raw packets
+						 * that match the filter to
+						 * a pcap file.  pcap files
+						 * don't support multiple
+						 * different link-layer
+						 * header types, so we fail
+						 * here.
+						 */
+						error("%s: new dlt does not match original", RFileName);
+					}
+
+					/*
+					 * We're printing the decoded packets;
+					 * switch to the new DLT.
+					 *
+					 * To do that, we need to recompile
+					 * the filter, change the printer,
+					 * and change the DLT name.
+					 */
+					dlt = new_dlt;
+					if (pcap_compile(pd, &fcode, cmdbuf, Oflag, netmask) < 0)
+						error("%s", pcap_geterr(pd));
+					if (pcap_setfilter(pd, &fcode) < 0)
+						error("%s", pcap_geterr(pd));
+					ndo->ndo_if_printer = get_if_printer(ndo, dlt);
+					dlt_name = pcap_datalink_val_to_name(dlt);
+				}
+
+				/*
+				 * Report the new file.
+				 */
 				if (dlt_name == NULL) {
 					fprintf(stderr, "reading from file %s, link-type %u\n",
-					RFileName, new_dlt);
+					    RFileName, dlt);
 				} else {
 					fprintf(stderr,
 					"reading from file %s, link-type %s (%s)\n",
-					RFileName, dlt_name,
-					pcap_datalink_val_to_description(new_dlt));
+					    RFileName, dlt_name,
+					    pcap_datalink_val_to_description(dlt));
 				}
-				if (pcap_compile(pd, &fcode, cmdbuf, Oflag, netmask) < 0)
-					error("%s", pcap_geterr(pd));
-				if (pcap_setfilter(pd, &fcode) < 0)
-					error("%s", pcap_geterr(pd));
 			}
 		}
 	}
