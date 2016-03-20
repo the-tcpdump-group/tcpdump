@@ -1840,18 +1840,23 @@ main(int argc, char **argv)
 					 * We're printing the decoded packets;
 					 * switch to the new DLT.
 					 *
-					 * To do that, we need to recompile
-					 * the filter, change the printer,
-					 * and change the DLT name.
+					 * To do that, we need to change
+					 * the printer, change the DLT name,
+					 * and recompile the filter with
+					 * the new DLT.
 					 */
 					dlt = new_dlt;
-					if (pcap_compile(pd, &fcode, cmdbuf, Oflag, netmask) < 0)
-						error("%s", pcap_geterr(pd));
-					if (pcap_setfilter(pd, &fcode) < 0)
-						error("%s", pcap_geterr(pd));
 					ndo->ndo_if_printer = get_if_printer(ndo, dlt);
 					dlt_name = pcap_datalink_val_to_name(dlt);
+					if (pcap_compile(pd, &fcode, cmdbuf, Oflag, netmask) < 0)
+						error("%s", pcap_geterr(pd));
 				}
+
+				/*
+				 * Set the filter on the new file.
+				 */
+				if (pcap_setfilter(pd, &fcode) < 0)
+					error("%s", pcap_geterr(pd));
 
 				/*
 				 * Report the new file.
