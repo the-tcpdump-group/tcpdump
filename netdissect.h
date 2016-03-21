@@ -585,10 +585,12 @@ extern void vqp_print(netdissect_options *, register const u_char *, register u_
 extern void vrrp_print(netdissect_options *, const u_char *, u_int, const u_char *, int);
 extern void vtp_print(netdissect_options *, const u_char *, u_int);
 extern void vxlan_print(netdissect_options *, const u_char *, u_int);
+extern void vxlan_gpe_print(netdissect_options *ndo, const u_char *bp, u_int len);
 extern void wb_print(netdissect_options *, const void *, u_int);
 extern void zephyr_print(netdissect_options *, const u_char *, int);
 extern void zmtp1_print(netdissect_options *, const u_char *, u_int);
 extern void zmtp1_print_datagram(netdissect_options *, const u_char *, const u_int);
+extern void nsh_print(netdissect_options *ndo, const u_char *bp, u_int len);
 
 /* checksum routines */
 extern void init_checksum(void);

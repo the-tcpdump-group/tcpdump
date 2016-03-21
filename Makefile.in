@@ -225,6 +225,8 @@ LIBNETDISSECT_SRC=\
 	print-vrrp.c \
 	print-vtp.c \
 	print-vxlan.c \
+	print-vxlan-gpe.c \
+	print-nsh.c \
 	print-wb.c \
 	print-zephyr.c \
 	print-zeromq.c \
