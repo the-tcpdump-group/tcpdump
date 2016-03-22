@@ -173,6 +173,7 @@ LIBNETDISSECT_SRC=\
 	print-msnlb.c \
 	print-nflog.c \
 	print-nfs.c \
+	print-nsh.c \
 	print-ntp.c \
 	print-null.c \
 	print-olsr.c \
@@ -226,7 +227,6 @@ LIBNETDISSECT_SRC=\
 	print-vtp.c \
 	print-vxlan.c \
 	print-vxlan-gpe.c \
-	print-nsh.c \
 	print-wb.c \
 	print-zephyr.c \
 	print-zeromq.c \
