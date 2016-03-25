@@ -97,12 +97,23 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
     ND_PRINT((ndo, "service-path-id 0x%06x, ", service_path_id));
     ND_PRINT((ndo, "service-index 0x%x", service_index));
 
-    /* print Context Headers */
+    /* Make sure we have all the headers */
     if (len < length * NSH_HDR_WORD_SIZE)
         goto trunc;
 
     ND_TCHECK2(*bp, length * NSH_HDR_WORD_SIZE);
 
+    /*
+     * length includes the lengths of the Base and Service Path headers.
+     * That means it must be at least 2.
+     */
+    if (length < 2)
+        goto trunc;
+
+    /*
+     * Print, or skip, the Context Headers.
+     * (length - 2) is the length of those headers.
+     */
     if (ndo->ndo_vflag > 2) {
         if (md_type == 0x01) {
             for (n = 0; n < length - 2; n++) {
