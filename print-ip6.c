@@ -344,7 +344,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		case IPPROTO_ESP:
 		    {
 			int enh, padlen;
-			advance = esp_print(ndo, cp, len, (const u_char *)ip6, &enh, &padlen);
+			advance = esp_print(ndo, cp, len, (const struct ip *)ip6, &enh, &padlen);
 			nh = enh & 0xff;
 			len -= padlen;
 			break;

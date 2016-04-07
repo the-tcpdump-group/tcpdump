@@ -310,7 +310,9 @@ Algorithms may be
 \fB3des-cbc\fP,
 \fBblowfish-cbc\fP,
 \fBrc3-cbc\fP,
-\fBcast128-cbc\fP, or
+\fBcast128-cbc\fP,
+\fB3des-cbc-hmac96\fP,
+\fBaes256-cbc-hmac96\fP, or
 \fBnone\fP.
 The default is \fBdes-cbc\fP.
 The ability to decrypt packets is only present if \fItcpdump\fP was compiled
@@ -331,6 +333,11 @@ In addition to the above syntax, the syntax \fIfile name\fP may be used
 to have tcpdump read the provided file in. The file is opened upon
 receiving the first ESP packet, so any special permissions that tcpdump
 may have been given should already have been given up.
+.IP
+If this option is given in combination with the
+.B \-w
+option, decrypted packets will be written to the dump file along with
+the original packets.
 .TP
 .B \-f
 Print `foreign' IPv4 addresses numerically rather than symbolically
