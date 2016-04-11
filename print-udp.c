@@ -646,6 +646,8 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 			geneve_print(ndo, (const u_char *)(up + 1), length);
 		else if (IS_SRC_OR_DST_PORT(LISP_CONTROL_PORT))
 			lisp_print(ndo, (const u_char *)(up + 1), length);
+		else if (IS_SRC_OR_DST_PORT(VXLAN_GPE_PORT))
+			vxlan_gpe_print(ndo, (const u_char *)(up + 1), length);
 		else if (dport == GUE_PORT)
 			gue_print(ndo, (const u_char *)(up + 1), length);
 		else if (ND_TTEST(((const struct LAP *)cp)->type) &&

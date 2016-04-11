@@ -534,6 +534,7 @@ extern void nfsreply_print_noaddr(netdissect_options *, const u_char *, u_int, c
 extern void nfsreq_print_noaddr(netdissect_options *, const u_char *, u_int, const u_char *);
 extern const u_char * ns_nprint (netdissect_options *, register const u_char *, register const u_char *);
 extern void ns_print(netdissect_options *, const u_char *, u_int, int);
+extern void nsh_print(netdissect_options *ndo, const u_char *bp, u_int len);
 extern void ntp_print(netdissect_options *, const u_char *, u_int);
 extern int oam_print(netdissect_options *, const u_char *, u_int, u_int);
 extern void olsr_print(netdissect_options *, const u_char *, u_int, int);
@@ -585,6 +586,7 @@ extern int vjc_print(netdissect_options *, register const char *, u_short);
 extern void vqp_print(netdissect_options *, register const u_char *, register u_int);
 extern void vrrp_print(netdissect_options *, const u_char *, u_int, const u_char *, int);
 extern void vtp_print(netdissect_options *, const u_char *, u_int);
+extern void vxlan_gpe_print(netdissect_options *ndo, const u_char *bp, u_int len);
 extern void vxlan_print(netdissect_options *, const u_char *, u_int);
 extern void wb_print(netdissect_options *, const void *, u_int);
 extern void zephyr_print(netdissect_options *, const u_char *, int);
