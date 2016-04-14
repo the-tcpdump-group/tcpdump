@@ -41,7 +41,6 @@ rt6_print(netdissect_options *ndo, register const u_char *bp, const u_char *bp2 
 	register const u_char *ep;
 	int i, len;
 	register const struct in6_addr *addr;
-	const struct in6_addr *last_addr = NULL;
 
 	dp = (const struct ip6_rthdr *)bp;
 	len = dp->ip6r_len;
@@ -75,7 +74,6 @@ rt6_print(netdissect_options *ndo, register const u_char *bp, const u_char *bp2 
 				goto trunc;
 
 			ND_PRINT((ndo, ", [%d]%s", i, ip6addr_string(ndo, addr)));
-			last_addr = addr;
 			addr++;
 		}
 		/*(*/
