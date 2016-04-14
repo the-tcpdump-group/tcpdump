@@ -851,10 +851,10 @@ q933_print(netdissect_options *ndo,
                 if (ie_p->ie_type == 0 || ie_p->ie_len == 0) {
                     return;
 		}
-                if (length < ie_p->ie_len + 2) {
+                if (length < ie_p->ie_len + 2U) {
                     goto trunc;
                 }
-                ND_TCHECK2(*ptemp, ie_p->ie_len + 2);
+                ND_TCHECK2(*ptemp, ie_p->ie_len + 2U);
 
                 if (fr_q933_print_ie_codeset[codeset] != NULL) {
                     ie_is_known = fr_q933_print_ie_codeset[codeset](ndo, ie_p, ptemp);
@@ -869,8 +869,8 @@ q933_print(netdissect_options *ndo,
                     print_unknown_data(ndo, ptemp+2, "\n\t  ", ie_p->ie_len);
 		}
 
-		length -= ie_p->ie_len + 2;
-		ptemp += ie_p->ie_len + 2;
+		length -= ie_p->ie_len + 2U;
+		ptemp += ie_p->ie_len + 2U;
 	}
         if (!ndo->ndo_vflag) {
             ND_PRINT((ndo, ", length %u", olen));
