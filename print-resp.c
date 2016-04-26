@@ -37,9 +37,10 @@
 
 #include <netdissect-stdinc.h>
 #include "netdissect.h"
-
+#include <limits.h>
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #include "extract.h"
 
@@ -238,6 +239,8 @@ trunc:
 static int
 resp_print_bulk_string(netdissect_options *ndo, register const u_char *bp, int length) {
     int length_cur = length, string_len;
+    long strtol_ret;
+    char *p;
 
     ND_TCHECK(*bp);
 
@@ -246,7 +249,13 @@ resp_print_bulk_string(netdissect_options *ndo, register const u_char *bp, int l
     ND_TCHECK(*bp);
 
     /* <length> */
-    string_len = atoi((const char *)bp);
+    errno = 0;
+    strtol_ret = strtol((const char *)bp, &p, 10);
+    if (errno != 0 || p == (const char *)bp || strtol_ret < -1 ||
+        strtol_ret > INT_MAX)
+        string_len = -2; /* invalid */
+    else
+        string_len = (int)strtol_ret;
 
     /* move to \r\n */
     MOVE_FORWARD(bp, length_cur);
@@ -286,6 +295,8 @@ trunc:
 static int
 resp_print_bulk_array(netdissect_options *ndo, register const u_char *bp, int length) {
     int length_cur = length, array_len, i, ret_len = 0;
+    long strtol_ret;
+    char *p;
 
     ND_TCHECK(*bp);
 
@@ -294,7 +305,13 @@ resp_print_bulk_array(netdissect_options *ndo, register const u_char *bp, int le
     ND_TCHECK(*bp);
 
     /* <array_length> */
-    array_len = atoi((const char *)bp);
+    errno = 0;
+    strtol_ret = strtol((const char *)bp, &p, 10);
+    if (errno != 0 || p == (const char *)bp || strtol_ret < -1 ||
+        strtol_ret > INT_MAX)
+        array_len = -2; /* invalid */
+    else
+        array_len = (int)strtol_ret;
 
     /* move to \r\n */
     MOVE_FORWARD(bp, length_cur);

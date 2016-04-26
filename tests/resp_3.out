@@ -54,7 +54,7 @@ IP 127.0.0.1.52766 > 127.0.0.1.6379: Flags [.], ack 113, win 342, options [nop,n
 IP 127.0.0.1.52767 > 127.0.0.1.6379: Flags [S], seq 3453687710, win 43690, options [mss 65495,sackOK,TS val 1132419549 ecr 0,nop,wscale 7], length 0
 IP 127.0.0.1.6379 > 127.0.0.1.52767: Flags [S.], seq 4076862539, ack 3453687711, win 43690, options [mss 65495,sackOK,TS val 1132419549 ecr 1132419549,nop,wscale 7], length 0
 IP 127.0.0.1.52767 > 127.0.0.1.6379: Flags [.], ack 1, win 342, options [nop,nop,TS val 1132419549 ecr 1132419549], length 0
-IP 127.0.0.1.52767 > 127.0.0.1.6379: Flags [P.], seq 1:39, ack 1, win 342, options [nop,nop,TS val 1132419549 ecr 1132419549], length 38: RESP null
+IP 127.0.0.1.52767 > 127.0.0.1.6379: Flags [P.], seq 1:39, ack 1, win 342, options [nop,nop,TS val 1132419549 ecr 1132419549], length 38: RESP invalid
 IP 127.0.0.1.6379 > 127.0.0.1.52767: Flags [.], ack 39, win 342, options [nop,nop,TS val 1132419549 ecr 1132419549], length 0
 IP 127.0.0.1.6379 > 127.0.0.1.52767: Flags [P.], seq 1:48, ack 39, win 342, options [nop,nop,TS val 1132419549 ecr 1132419549], length 47: RESP "ERR Protocol error: invalid multibulk length"
 IP 127.0.0.1.52767 > 127.0.0.1.6379: Flags [.], ack 48, win 342, options [nop,nop,TS val 1132419549 ecr 1132419549], length 0
