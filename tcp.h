@@ -81,9 +81,10 @@ struct tcphdr {
 #define TCPOPT_SIGNATURE	19	/* Keyed MD5 (rfc2385) */
 #define    TCPOLEN_SIGNATURE		18
 #define TCP_SIGLEN 16			/* length of an option 19 digest */
-#define TCPOPT_AUTH             20      /* Enhanced AUTH option */
+#define TCPOPT_SCPS		20	/* SCPS-TP (CCSDS 714.0-B-2) */
 #define	TCPOPT_UTO		28	/* tcp user timeout (rfc5482) */
 #define	   TCPOLEN_UTO			4
+#define TCPOPT_AUTH		29	/* Enhanced AUTH option (rfc5925) */
 #define	TCPOPT_MPTCP		30	/* MPTCP options */
 #define TCPOPT_FASTOPEN		34	/* TCP Fast Open (rfc7413) */
 #define TCPOPT_EXPERIMENT2	254	/* experimental headers (rfc4727) */
