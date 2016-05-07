@@ -226,7 +226,9 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
             if (ndo->ndo_eflag)
 		ND_PRINT("IPX 802.3: ");
 
+#ifndef ND_MINIMAL
             ipx_print(ndo, p, length);
+#endif
             return (0);		/* no LLC header */
 	}
 
@@ -302,7 +304,9 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
                 if (ndo->ndo_eflag)
                         ND_PRINT("IPX 802.2: ");
 
+#ifndef ND_MINIMAL
 		ipx_print(ndo, p, length);
+#endif
 		return (hdrlen);
 	}
 
@@ -325,7 +329,9 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 #endif
 	if (ssap == LLCSAP_ISONS && dsap == LLCSAP_ISONS
 	    && control == LLC_UI) {
+#ifndef ND_MINIMAL
 		isoclns_print(ndo, p, length);
+#endif
 		return (hdrlen);
 	}
 
@@ -487,6 +493,7 @@ snap_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
                 case PID_CISCO_CDP:
                         cdp_print(ndo, p, length, caplen);
                         return (1);
+#ifndef ND_MINIMAL
                 case PID_CISCO_DTP:
                         dtp_print(ndo, p, length);
                         return (1);
@@ -496,6 +503,7 @@ snap_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
                 case PID_CISCO_VTP:
                         vtp_print(ndo, p, length);
                         return (1);
+#endif
                 case PID_CISCO_PVST:
                 case PID_CISCO_VLANBRIDGE:
                         stp_print(ndo, p, length);
@@ -547,7 +555,9 @@ snap_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 			 * What remains is an 802.5 Token Ring
 			 * packet.
 			 */
+#ifndef ND_MINIMAL
 			token_print(ndo, p, length, caplen);
+#endif
 			return (1);
 
 		case PID_RFC2684_FDDI_FCS:
@@ -567,7 +577,9 @@ snap_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 			/*
 			 * What remains is an FDDI packet.
 			 */
+#ifndef ND_MINIMAL
 			fddi_print(ndo, p, length, caplen);
+#endif
 			return (1);
 
 		case PID_RFC2684_BPDU:

@@ -362,6 +362,7 @@ ethertype_print(netdissect_options *ndo,
 	        arp_print(ndo, p, length, caplen);
 		return (1);
 
+#ifndef ND_MINIMAL
 	case ETHERTYPE_DN:
 		decnet_print(ndo, p, length, caplen);
 		return (1);
@@ -388,6 +389,7 @@ ethertype_print(netdissect_options *ndo,
 		}
 		isoclns_print(ndo, p + 1, length - 1);
 		return(1);
+#endif
 
 	case ETHERTYPE_PPPOED:
 	case ETHERTYPE_PPPOES:
@@ -400,9 +402,11 @@ ethertype_print(netdissect_options *ndo,
 	        eap_print(ndo, p, length);
 		return (1);
 
+#ifndef ND_MINIMAL
 	case ETHERTYPE_RRCP:
 	        rrcp_print(ndo, p, length, src, dst);
 		return (1);
+#endif
 
 	case ETHERTYPE_PPP:
 		if (length) {
@@ -411,6 +415,7 @@ ethertype_print(netdissect_options *ndo,
 		}
 		return (1);
 
+#ifndef ND_MINIMAL
 	case ETHERTYPE_MPCP:
 	        mpcp_print(ndo, p, length);
 		return (1);
@@ -423,11 +428,13 @@ ethertype_print(netdissect_options *ndo,
 	case ETHERTYPE_CFM_OLD:
 		cfm_print(ndo, p, length);
 		return (1);
+#endif
 
 	case ETHERTYPE_LLDP:
 		lldp_print(ndo, p, length);
 		return (1);
 
+#ifndef ND_MINIMAL
         case ETHERTYPE_NSH:
                 nsh_print(ndo, p, length);
                 return (1);
@@ -465,6 +472,7 @@ ethertype_print(netdissect_options *ndo,
 	case ETHERTYPE_MEDSA:
 		medsa_print(ndo, p, length, caplen, src, dst);
 		return (1);
+#endif
 
 	case ETHERTYPE_LAT:
 	case ETHERTYPE_SCA:

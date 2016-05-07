@@ -347,6 +347,7 @@ ip_print_demux(netdissect_options *ndo,
 again:
 	switch (ipds->nh) {
 
+#ifndef ND_MINIMAL
 	case IPPROTO_AH:
 		if (!ND_TTEST_1(ipds->cp)) {
 			ND_PRINT("[|AH]");
@@ -385,14 +386,17 @@ again:
 		 */
 		break;
 	}
+#endif
 
 	case IPPROTO_SCTP:
 		sctp_print(ndo, ipds->cp, (const u_char *)ipds->ip, ipds->len);
 		break;
 
+#ifndef ND_MINIMAL
 	case IPPROTO_DCCP:
 		dccp_print(ndo, ipds->cp, (const u_char *)ipds->ip, ipds->len);
 		break;
+#endif
 
 	case IPPROTO_TCP:
 		/* pass on the MF bit plus the offset to detect fragments */
@@ -412,6 +416,7 @@ again:
 			   ipds->off & (IP_MF|IP_OFFMASK));
 		break;
 
+#ifndef ND_MINIMAL
 	case IPPROTO_PIGP:
 		/*
 		 * XXX - the current IANA protocol number assignments
@@ -432,14 +437,17 @@ again:
 	case IPPROTO_EIGRP:
 		eigrp_print(ndo, ipds->cp, ipds->len);
 		break;
+#endif
 
 	case IPPROTO_ND:
 		ND_PRINT(" nd %u", ipds->len);
 		break;
 
+#ifndef ND_MINIMAL
 	case IPPROTO_EGP:
 		egp_print(ndo, ipds->cp, ipds->len);
 		break;
+#endif
 
 	case IPPROTO_OSPF:
 		ospf_print(ndo, ipds->cp, ipds->len, (const u_char *)ipds->ip);
@@ -472,6 +480,7 @@ again:
 		gre_print(ndo, ipds->cp, ipds->len);
 		break;
 
+#ifndef ND_MINIMAL
 	case IPPROTO_MOBILE:
 		mobile_print(ndo, ipds->cp, ipds->len);
 		break;
@@ -479,6 +488,7 @@ again:
 	case IPPROTO_PIM:
 		pim_print(ndo, ipds->cp, ipds->len, (const u_char *)ipds->ip);
 		break;
+#endif
 
 	case IPPROTO_VRRP:
 		if (ndo->ndo_packettype == PT_CARP) {
@@ -486,22 +496,28 @@ again:
 				ND_PRINT("carp %s > %s: ",
 					     ipaddr_string(ndo, ipds->ip->ip_src),
 					     ipaddr_string(ndo, ipds->ip->ip_dst));
+#ifndef ND_MINIMAL
 			carp_print(ndo, ipds->cp, ipds->len,
 				EXTRACT_U_1(ipds->ip->ip_ttl));
+#endif
 		} else {
 			if (ndo->ndo_vflag)
 				ND_PRINT("vrrp %s > %s: ",
 					     ipaddr_string(ndo, ipds->ip->ip_src),
 					     ipaddr_string(ndo, ipds->ip->ip_dst));
+#ifndef ND_MINIMAL
 			vrrp_print(ndo, ipds->cp, ipds->len,
 				(const u_char *)ipds->ip,
 				EXTRACT_U_1(ipds->ip->ip_ttl));
+#endif
 		}
 		break;
 
+#ifndef ND_MINIMAL
 	case IPPROTO_PGM:
 		pgm_print(ndo, ipds->cp, ipds->len, (const u_char *)ipds->ip);
 		break;
+#endif
 
 	default:
 		if (ndo->ndo_nflag==0 && (p_name = netdb_protoname(ipds->nh)) != NULL)

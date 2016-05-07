@@ -51,6 +51,53 @@ static const struct printer printers[] = {
 #ifdef DLT_IPNET
 	{ ipnet_if_print,	DLT_IPNET },
 #endif
+#ifdef DLT_NETANALYZER
+	{ netanalyzer_if_print, DLT_NETANALYZER },
+#endif
+#ifdef DLT_NETANALYZER_TRANSPARENT
+	{ netanalyzer_transparent_if_print, DLT_NETANALYZER_TRANSPARENT },
+#endif
+#ifdef DLT_LOOP
+	{ null_if_print,	DLT_LOOP },
+#endif
+	{ null_if_print,	DLT_NULL },
+	{ raw_if_print,		DLT_RAW },
+#ifdef DLT_IPV4
+	{ raw_if_print,		DLT_IPV4 },
+#endif
+#ifdef DLT_IPV6
+	{ raw_if_print,		DLT_IPV6 },
+#endif
+#ifdef DLT_PPP_ETHER
+	{ pppoe_if_print,	DLT_PPP_ETHER },
+#endif
+#ifdef DLT_LINUX_SLL
+	{ sll_if_print,		DLT_LINUX_SLL },
+#endif
+#ifdef DLT_IEEE802_11_RADIO
+	{ ieee802_11_radio_if_print,	DLT_IEEE802_11_RADIO },
+#endif
+#ifdef DLT_IEEE802_11
+	{ ieee802_11_if_print,	DLT_IEEE802_11},
+#endif
+#ifdef DLT_IEEE802_11_RADIO_AVS
+	{ ieee802_11_radio_avs_if_print,	DLT_IEEE802_11_RADIO_AVS },
+#endif
+#ifdef DLT_PRISM_HEADER
+	{ prism_if_print,	DLT_PRISM_HEADER },
+#endif
+	{ ppp_if_print,		DLT_PPP },
+#ifdef DLT_PPP_WITHDIRECTION
+	{ ppp_if_print,		DLT_PPP_WITHDIRECTION },
+#endif
+#ifdef DLT_PPP_BSDOS
+	{ ppp_bsdos_if_print,	DLT_PPP_BSDOS },
+#endif
+#ifdef DLT_PPP_SERIAL
+	{ ppp_hdlc_if_print,	DLT_PPP_SERIAL },
+#endif
+
+#ifndef ND_MINIMAL
 #ifdef DLT_IEEE802_15_4
 	{ ieee802_15_4_if_print, DLT_IEEE802_15_4 },
 #endif
@@ -60,27 +107,14 @@ static const struct printer printers[] = {
 #ifdef DLT_PPI
 	{ ppi_if_print,		DLT_PPI },
 #endif
-#ifdef DLT_NETANALYZER
-	{ netanalyzer_if_print, DLT_NETANALYZER },
-#endif
-#ifdef DLT_NETANALYZER_TRANSPARENT
-	{ netanalyzer_transparent_if_print, DLT_NETANALYZER_TRANSPARENT },
-#endif
-#ifdef DLT_NFLOG
-	{ nflog_if_print,	DLT_NFLOG},
+#ifdef DLT_ATM_CLIP
+	{ cip_if_print,		DLT_ATM_CLIP },
 #endif
 #ifdef DLT_CIP
 	{ cip_if_print,	 	DLT_CIP },
 #endif
-#ifdef DLT_ATM_CLIP
-	{ cip_if_print,		DLT_ATM_CLIP },
-#endif
 #ifdef DLT_IP_OVER_FC
 	{ ipfc_if_print,	DLT_IP_OVER_FC },
-#endif
-	{ null_if_print,	DLT_NULL },
-#ifdef DLT_LOOP
-	{ null_if_print,	DLT_LOOP },
 #endif
 #ifdef DLT_APPLE_IP_OVER_IEEE1394
 	{ ap1394_if_print,	DLT_APPLE_IP_OVER_IEEE1394 },
@@ -94,13 +128,6 @@ static const struct printer printers[] = {
 	{ arcnet_if_print,	DLT_ARCNET },
 #ifdef DLT_ARCNET_LINUX
 	{ arcnet_linux_if_print, DLT_ARCNET_LINUX },
-#endif
-	{ raw_if_print,		DLT_RAW },
-#ifdef DLT_IPV4
-	{ raw_if_print,		DLT_IPV4 },
-#endif
-#ifdef DLT_IPV6
-	{ raw_if_print,		DLT_IPV6 },
 #endif
 #ifdef DLT_USB_LINUX
 	{ usb_linux_48_byte_if_print, DLT_USB_LINUX},
@@ -117,20 +144,8 @@ static const struct printer printers[] = {
 #ifdef DLT_HDLC
 	{ chdlc_if_print,	DLT_HDLC },
 #endif
-#ifdef DLT_PPP_ETHER
-	{ pppoe_if_print,	DLT_PPP_ETHER },
-#endif
-#if defined(DLT_PFLOG) && defined(HAVE_NET_IF_PFLOG_H)
-	{ pflog_if_print,	DLT_PFLOG },
-#endif
 	{ token_if_print,	DLT_IEEE802 },
 	{ fddi_if_print,	DLT_FDDI },
-#ifdef DLT_LINUX_SLL
-	{ sll_if_print,		DLT_LINUX_SLL },
-#endif
-#ifdef DLT_LINUX_SLL2
-	{ sll2_if_print,	DLT_LINUX_SLL2 },
-#endif
 #ifdef DLT_FR
 	{ fr_if_print,		DLT_FR },
 #endif
@@ -199,31 +214,19 @@ static const struct printer printers[] = {
 #ifdef DLT_JUNIPER_CHDLC
 	{ juniper_chdlc_if_print,	DLT_JUNIPER_CHDLC },
 #endif
+#ifdef DLT_LANE8023
+	{ lane_if_print,        DLT_LANE8023 },
+#endif
+#ifdef DLT_NFLOG
+	{ nflog_if_print,	DLT_NFLOG},
+#endif
+#if defined(DLT_PFLOG) && defined(HAVE_NET_IF_PFLOG_H)
+	{ pflog_if_print,	DLT_PFLOG },
+#endif
 #ifdef DLT_PKTAP
 	{ pktap_if_print,	DLT_PKTAP },
 #endif
-#ifdef DLT_IEEE802_11_RADIO
-	{ ieee802_11_radio_if_print,	DLT_IEEE802_11_RADIO },
-#endif
-#ifdef DLT_IEEE802_11
-	{ ieee802_11_if_print,	DLT_IEEE802_11},
-#endif
-#ifdef DLT_IEEE802_11_RADIO_AVS
-	{ ieee802_11_radio_avs_if_print,	DLT_IEEE802_11_RADIO_AVS },
-#endif
-#ifdef DLT_PRISM_HEADER
-	{ prism_if_print,	DLT_PRISM_HEADER },
-#endif
-	{ ppp_if_print,		DLT_PPP },
-#ifdef DLT_PPP_WITHDIRECTION
-	{ ppp_if_print,		DLT_PPP_WITHDIRECTION },
-#endif
-#ifdef DLT_PPP_BSDOS
-	{ ppp_bsdos_if_print,	DLT_PPP_BSDOS },
-#endif
-#ifdef DLT_PPP_SERIAL
-	{ ppp_hdlc_if_print,	DLT_PPP_SERIAL },
-#endif
+#endif /* ND_MINIMAL */
 	{ NULL,			0 },
 };
 

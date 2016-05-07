@@ -446,7 +446,9 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 
 		case PT_WB:
 			udpipaddr_print(ndo, ip, sport, dport);
+#ifndef ND_MINIMAL
 			wb_print(ndo, (const u_char *)(up + 1), length);
+#endif
 			break;
 
 		case PT_RPC:
@@ -479,7 +481,9 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 
 		case PT_CNFP:
 			udpipaddr_print(ndo, ip, sport, dport);
+#ifndef ND_MINIMAL
 			cnfp_print(ndo, cp);
+#endif
 			break;
 
 		case PT_TFTP:
@@ -500,17 +504,23 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 
 		case PT_VXLAN:
 			udpipaddr_print(ndo, ip, sport, dport);
+#ifndef ND_MINIMAL
 			vxlan_print(ndo, (const u_char *)(up + 1), length);
+#endif
 			break;
 
 		case PT_PGM:
 		case PT_PGM_ZMTP1:
 			udpipaddr_print(ndo, ip, sport, dport);
+#ifndef ND_MINIMAL
 			pgm_print(ndo, cp, length, bp2);
+#endif
 			break;
 		case PT_LMP:
 			udpipaddr_print(ndo, ip, sport, dport);
+#ifndef ND_MINIMAL
 			lmp_print(ndo, cp, length);
+#endif
 			break;
 		}
 		return;
@@ -593,29 +603,37 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			domain_print(ndo, (const u_char *)(up + 1), length, 0);
 		else if (IS_SRC_OR_DST_PORT(MULTICASTDNS_PORT))
 			domain_print(ndo, (const u_char *)(up + 1), length, 1);
+#ifndef ND_MINIMAL
 		else if (IS_SRC_OR_DST_PORT(TIMED_PORT))
 			timed_print(ndo, (const u_char *)(up + 1));
+#endif
 		else if (IS_SRC_OR_DST_PORT(TFTP_PORT))
 			tftp_print(ndo, (const u_char *)(up + 1), length);
 		else if (IS_SRC_OR_DST_PORT(BOOTPC_PORT) || IS_SRC_OR_DST_PORT(BOOTPS_PORT))
 			bootp_print(ndo, (const u_char *)(up + 1), length);
+#ifndef ND_MINIMAL
 		else if (IS_SRC_OR_DST_PORT(RIP_PORT))
 			rip_print(ndo, (const u_char *)(up + 1), length);
+#endif
 		else if (IS_SRC_OR_DST_PORT(AODV_PORT))
 			aodv_print(ndo, (const u_char *)(up + 1), length,
 			    ip6 != NULL);
+#ifndef ND_MINIMAL
 	        else if (IS_SRC_OR_DST_PORT(ISAKMP_PORT))
 			 isakmp_print(ndo, (const u_char *)(up + 1), length, bp2);
 	        else if (IS_SRC_OR_DST_PORT(ISAKMP_PORT_NATT))
 			 isakmp_rfc3948_print(ndo, (const u_char *)(up + 1), length, bp2);
 	        else if (IS_SRC_OR_DST_PORT(ISAKMP_PORT_USER1) || IS_SRC_OR_DST_PORT(ISAKMP_PORT_USER2))
 			isakmp_print(ndo, (const u_char *)(up + 1), length, bp2);
+#endif
 		else if (IS_SRC_OR_DST_PORT(SNMP_PORT) || IS_SRC_OR_DST_PORT(SNMPTRAP_PORT))
 			snmp_print(ndo, (const u_char *)(up + 1), length);
 		else if (IS_SRC_OR_DST_PORT(NTP_PORT))
 			ntp_print(ndo, (const u_char *)(up + 1), length);
+#ifndef ND_MINIMAL
 		else if (IS_SRC_OR_DST_PORT(KERBEROS_PORT) || IS_SRC_OR_DST_PORT(KERBEROS_SEC_PORT))
 			krb_print(ndo, (const u_char *)(up + 1));
+#endif
 		else if (IS_SRC_OR_DST_PORT(L2TP_PORT))
 			l2tp_print(ndo, (const u_char *)(up + 1), length);
 #ifdef ENABLE_SMB
@@ -626,6 +644,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 #endif
 		else if (dport == VAT_PORT)
 			vat_print(ndo, (const void *)(up + 1), length);
+#ifndef ND_MINIMAL
 		else if (IS_SRC_OR_DST_PORT(ZEPHYR_SRV_PORT) || IS_SRC_OR_DST_PORT(ZEPHYR_CLT_PORT))
 			zephyr_print(ndo, (const u_char *)(up + 1), length);
 		/*
@@ -653,6 +672,7 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			wb_print(ndo, (const u_char *)(up + 1), length);
 		else if (IS_SRC_OR_DST_PORT(CISCO_AUTORP_PORT))
 			cisco_autorp_print(ndo, (const u_char *)(up + 1), length);
+#endif
 		else if (IS_SRC_OR_DST_PORT(RADIUS_PORT) ||
 			 IS_SRC_OR_DST_PORT(RADIUS_NEW_PORT) ||
 			 IS_SRC_OR_DST_PORT(RADIUS_ACCOUNTING_PORT) ||
@@ -660,15 +680,18 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			 IS_SRC_OR_DST_PORT(RADIUS_CISCO_COA_PORT) ||
 			 IS_SRC_OR_DST_PORT(RADIUS_COA_PORT) )
 			radius_print(ndo, (const u_char *)(up+1), length);
+#ifndef ND_MINIMAL
 		else if (dport == HSRP_PORT)
 			hsrp_print(ndo, (const u_char *)(up + 1), length);
 		else if (IS_SRC_OR_DST_PORT(LWRES_PORT))
 			lwres_print(ndo, (const u_char *)(up + 1), length);
 		else if (IS_SRC_OR_DST_PORT(LDP_PORT))
 			ldp_print(ndo, (const u_char *)(up + 1), length);
+#endif
 		else if (IS_SRC_OR_DST_PORT(OLSR_PORT))
 			olsr_print(ndo, (const u_char *)(up + 1), length,
 					(IP_V(ip) == 6) ? 1 : 0);
+#ifndef ND_MINIMAL
 		else if (IS_SRC_OR_DST_PORT(MPLS_LSP_PING_PORT))
 			lspping_print(ndo, (const u_char *)(up + 1), length);
 		else if (dport == BFD_CONTROL_PORT ||
@@ -686,10 +709,12 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
                         lwapp_control_print(ndo, (const u_char *)(up + 1), length, 0);
                 else if (IS_SRC_OR_DST_PORT(LWAPP_DATA_PORT))
                         lwapp_data_print(ndo, (const u_char *)(up + 1), length);
+#endif
                 else if (IS_SRC_OR_DST_PORT(SIP_PORT))
 			sip_print(ndo, (const u_char *)(up + 1), length);
                 else if (IS_SRC_OR_DST_PORT(SYSLOG_PORT))
 			syslog_print(ndo, (const u_char *)(up + 1), length);
+#ifndef ND_MINIMAL
                 else if (IS_SRC_OR_DST_PORT(OTV_PORT))
 			otv_print(ndo, (const u_char *)(up + 1), length);
                 else if (IS_SRC_OR_DST_PORT(VXLAN_PORT))
@@ -706,7 +731,9 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			if (ndo->ndo_vflag)
 				ND_PRINT("kip ");
 			llap_print(ndo, cp, length);
-		} else {
+		}
+#endif
+		else {
 			if (ulen > length)
 				ND_PRINT("UDP, bad length %u > %u",
 				    ulen, length);
