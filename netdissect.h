@@ -219,6 +219,7 @@ struct netdissect_options {
 #define PT_PGM_ZMTP1	15	/* ZMTP/1.0 inside PGM (native or UDP-encapsulated) */
 #define PT_LMP		16	/* Link Management Protocol */
 #define PT_RESP		17	/* RESP */
+#define PT_COAP		18	/* The Constrained Application Protocol */
 
 #ifndef min
 #define min(a,b) ((a)>(b)?(b):(a))
@@ -460,6 +461,7 @@ extern void cfm_print(netdissect_options *, const u_char *, u_int);
 extern u_int chdlc_print(netdissect_options *, register const u_char *, u_int);
 extern void cisco_autorp_print(netdissect_options *, const u_char *, u_int);
 extern void cnfp_print(netdissect_options *, const u_char *);
+extern void coap_print(netdissect_options *, const u_char *, u_int);
 extern void dccp_print(netdissect_options *, const u_char *, const u_char *, u_int);
 extern void decnet_print(netdissect_options *, const u_char *, u_int, u_int);
 extern void dhcp6_print(netdissect_options *, const u_char *, u_int);

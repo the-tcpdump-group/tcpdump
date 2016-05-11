@@ -464,6 +464,10 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 			udpipaddr_print(ndo, ip, sport, dport);
 			lmp_print(ndo, cp, length);
 			break;
+		case PT_COAP:
+			udpipaddr_print(ndo, ip, sport, dport);
+			coap_print(ndo, cp, length);
+			break;
 		}
 		return;
 	}
