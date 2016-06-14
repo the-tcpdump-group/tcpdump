@@ -1066,6 +1066,7 @@ set(NETDISSECT_SOURCE_LIST_C
     print-vjc.c
     print-vqp.c
     print-vrrp.c
+    print-vsock.c
     print-vtp.c
     print-vxlan.c
     print-vxlan-gpe.c

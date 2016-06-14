@@ -3549,6 +3549,28 @@
 			</FileConfiguration>
 		</File>
 		<File
+			RelativePath="..\..\print-vsock.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""
+				/>
+			</FileConfiguration>
+		</File>
+		<File
 			RelativePath="..\..\print-vtp.c"
 			>
 			<FileConfiguration

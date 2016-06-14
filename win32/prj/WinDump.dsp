@@ -696,6 +696,10 @@ SOURCE="..\..\print-vqp.c"
 SOURCE="..\..\print-vrrp.c"
 # End Source File
 # Begin Source File
+#
+SOURCE="..\..\print-vsock.c"
+# End Source File
+# Begin Source File
 
 SOURCE="..\..\print-vtp.c"
 # End Source File

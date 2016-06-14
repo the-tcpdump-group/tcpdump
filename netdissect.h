@@ -520,6 +520,7 @@ extern u_int symantec_if_print IF_PRINTER_ARGS;
 extern u_int token_if_print IF_PRINTER_ARGS;
 extern u_int usb_linux_48_byte_if_print IF_PRINTER_ARGS;
 extern u_int usb_linux_64_byte_if_print IF_PRINTER_ARGS;
+extern u_int vsock_if_print IF_PRINTER_ARGS;
 
 /*
  * Structure passed to some printers to allow them to print
