@@ -22,6 +22,8 @@ then
 		./TESTonce espudp1 espudp1.pcap espudp1.out '-nnnn -t -E "file esp-secrets.txt"'
 		./TESTonce ikev2pI2 ikev2pI2.pcap ikev2pI2.out '-t -E "file ikev2pI2-secrets.txt" -v -v -v -v'
 		./TESTonce isakmp4 isakmp4500.pcap isakmp4.out '-t -E "file esp-secrets.txt"'
+		./TESTonce esp6a 08-sunrise-sunset-aes.pcap esp6a.out '-t -E "file esp-secrets.txt" -w esp6-temp.pcap'
+		./TESTonce esp6b esp6-temp.pcap esp6b.out '-t -n -e -XX'
 	fi
 else
 	FORMAT='    %-30s: TEST SKIPPED (compiled w/o OpenSSL)\n'

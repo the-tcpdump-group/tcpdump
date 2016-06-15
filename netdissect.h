@@ -155,6 +155,7 @@ struct netdissect_options {
   int ndo_tstamp_precision;	/* requested time stamp precision */
   const char *program_name;	/* Name of the program using the library */
 
+  int ndo_espdecrypt;
   char *ndo_espsecret;
   struct sa_list *ndo_sa_list_head;  /* used by print-esp.c */
   struct sa_list *ndo_sa_default;
@@ -469,7 +470,8 @@ extern void dvmrp_print(netdissect_options *, const u_char *, u_int);
 extern void eap_print(netdissect_options *, const u_char *, u_int);
 extern void egp_print(netdissect_options *, const u_char *, u_int);
 extern void eigrp_print(netdissect_options *, const u_char *, u_int);
-extern int esp_print(netdissect_options *, const u_char *, const int, const u_char *, int *, int *);
+extern int esp_print(netdissect_options *, const u_char *, const int, const struct ip *, int *, int *);
+extern int esp_decrypt(netdissect_options *, const struct pcap_pkthdr *, const u_char *, struct pcap_pkthdr *);
 extern u_int ether_print(netdissect_options *, const u_char *, u_int, u_int, void (*)(netdissect_options *, const u_char *), const u_char *);
 extern int ethertype_print(netdissect_options *, u_short, const u_char *, u_int, u_int);
 extern u_int fddi_print(netdissect_options *, const u_char *, u_int, u_int);

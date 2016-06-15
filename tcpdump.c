@@ -215,10 +215,15 @@ struct dump_info {
 	char	*WFileName;
 	char	*CurrentFileName;
 	pcap_t	*pd;
-	pcap_dumper_t *p;
 #ifdef HAVE_CAPSICUM
 	int	dirfd;
 #endif
+};
+
+struct dump_context {
+	pcap_dumper_t *p;
+	netdissect_options *ndo;
+	struct dump_info *dump_info;
 };
 
 #if defined(HAVE_PCAP_SET_PARSER_DEBUG)
@@ -767,6 +772,7 @@ main(int argc, char **argv)
 #ifndef _WIN32
 	RETSIGTYPE (*oldhandler)(int);
 #endif
+	struct dump_context dumpcontext;
 	struct dump_info dumpinfo;
 	u_char *pcap_userdata;
 	char ebuf[PCAP_ERRBUF_SIZE];
@@ -889,6 +895,7 @@ main(int argc, char **argv)
 			warning("crypto code not compiled in");
 #endif
 			ndo->ndo_espsecret = optarg;
+			ndo->ndo_espdecrypt = 1;
 			break;
 
 		case 'f':
@@ -1659,6 +1666,8 @@ main(int argc, char **argv)
 #ifdef HAVE_CAPSICUM
 		set_dumper_capsicum_rights(p);
 #endif
+		dumpcontext.p = p;
+		dumpcontext.ndo = ndo;
 		if (Cflag != 0 || Gflag != 0) {
 #ifdef HAVE_CAPSICUM
 			dumpinfo.WFileName = strdup(basename(WFileName));
@@ -1687,11 +1696,12 @@ main(int argc, char **argv)
 #endif
 			callback = dump_packet_and_trunc;
 			dumpinfo.pd = pd;
-			dumpinfo.p = p;
-			pcap_userdata = (u_char *)&dumpinfo;
+			dumpcontext.dump_info = &dumpinfo;
+			pcap_userdata = (u_char *)&dumpcontext;
 		} else {
 			callback = dump_packet;
-			pcap_userdata = (u_char *)p;
+			dumpcontext.dump_info = NULL;
+			pcap_userdata = (u_char *)&dumpcontext;
 		}
 #ifdef HAVE_PCAP_DUMP_FLUSH
 		if (Uflag)
@@ -2036,13 +2046,16 @@ compress_savefile(const char *filename)
 static void
 dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
+	struct dump_context *dump_context;
 	struct dump_info *dump_info;
+	struct pcap_pkthdr decrypt_h;
 
 	++packets_captured;
 
 	++infodelay;
 
-	dump_info = (struct dump_info *)user;
+	dump_context = (struct dump_context *)user;
+	dump_info = dump_context->dump_info;
 
 	/*
 	 * XXX - this won't force the file to rotate on the specified time
@@ -2077,7 +2090,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			/*
 			 * Close the current file and open a new one.
 			 */
-			pcap_dump_close(dump_info->p);
+			pcap_dump_close(dump_context->p);
 
 			/*
 			 * Compress the file we just closed, if the user asked for it
@@ -2136,18 +2149,18 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 				error("unable to fdopen file %s",
 				    dump_info->CurrentFileName);
 			}
-			dump_info->p = pcap_dump_fopen(dump_info->pd, fp);
+			dump_context->p = pcap_dump_fopen(dump_info->pd, fp);
 #else	/* !HAVE_CAPSICUM */
-			dump_info->p = pcap_dump_open(dump_info->pd, dump_info->CurrentFileName);
+			dump_context->p = pcap_dump_open(dump_info->pd, dump_info->CurrentFileName);
 #endif
 #ifdef HAVE_LIBCAP_NG
 			capng_update(CAPNG_DROP, CAPNG_EFFECTIVE, CAP_DAC_OVERRIDE);
 			capng_apply(CAPNG_SELECT_BOTH);
 #endif /* HAVE_LIBCAP_NG */
-			if (dump_info->p == NULL)
+			if (dump_context->p == NULL)
 				error("%s", pcap_geterr(pd));
 #ifdef HAVE_CAPSICUM
-			set_dumper_capsicum_rights(dump_info->p);
+			set_dumper_capsicum_rights(dump_context->p);
 #endif
 		}
 	}
@@ -2158,7 +2171,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 	 * file could put it over Cflag.
 	 */
 	if (Cflag != 0) {
-		long size = pcap_dump_ftell(dump_info->p);
+		long size = pcap_dump_ftell(dump_context->p);
 
 		if (size == -1)
 			error("ftell fails on output file");
@@ -2171,7 +2184,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			/*
 			 * Close the current file and open a new one.
 			 */
-			pcap_dump_close(dump_info->p);
+			pcap_dump_close(dump_context->p);
 
 			/*
 			 * Compress the file we just closed, if the user
@@ -2207,26 +2220,29 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 				error("unable to fdopen file %s",
 				    dump_info->CurrentFileName);
 			}
-			dump_info->p = pcap_dump_fopen(dump_info->pd, fp);
+			dump_context->p = pcap_dump_fopen(dump_info->pd, fp);
 #else	/* !HAVE_CAPSICUM */
-			dump_info->p = pcap_dump_open(dump_info->pd, dump_info->CurrentFileName);
+			dump_context->p = pcap_dump_open(dump_info->pd, dump_info->CurrentFileName);
 #endif
 #ifdef HAVE_LIBCAP_NG
 			capng_update(CAPNG_DROP, CAPNG_EFFECTIVE, CAP_DAC_OVERRIDE);
 			capng_apply(CAPNG_SELECT_BOTH);
 #endif /* HAVE_LIBCAP_NG */
-			if (dump_info->p == NULL)
+			if (dump_context->p == NULL)
 				error("%s", pcap_geterr(pd));
 #ifdef HAVE_CAPSICUM
-			set_dumper_capsicum_rights(dump_info->p);
+			set_dumper_capsicum_rights(dump_context->p);
 #endif
 		}
 	}
 
-	pcap_dump((u_char *)dump_info->p, h, sp);
+	pcap_dump((u_char *)dump_context->p, h, sp);
+	if (dump_context->ndo->ndo_espdecrypt && esp_decrypt(dump_context->ndo, h, sp, &decrypt_h)) {
+		pcap_dump((u_char *)dump_context->p, &decrypt_h, sp);
+	}
 #ifdef HAVE_PCAP_DUMP_FLUSH
 	if (Uflag)
-		pcap_dump_flush(dump_info->p);
+		pcap_dump_flush(dump_context->p);
 #endif
 
 	--infodelay;
@@ -2237,11 +2253,17 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 static void
 dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
-	++packets_captured;
+	struct dump_context *dump_context;
+	struct pcap_pkthdr decrypt_h;
 
+	++packets_captured;
 	++infodelay;
 
-	pcap_dump(user, h, sp);
+	dump_context = (struct dump_context *)user;
+	pcap_dump((u_char *)dump_context->p, h, sp);
+	if (dump_context->ndo->ndo_espdecrypt && esp_decrypt(dump_context->ndo, h, sp, &decrypt_h)) {
+		pcap_dump((u_char *)dump_context->p, &decrypt_h, sp);
+	}
 #ifdef HAVE_PCAP_DUMP_FLUSH
 	if (Uflag)
 		pcap_dump_flush((pcap_dumper_t *)user);

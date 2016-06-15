@@ -2952,7 +2952,7 @@ isakmp_rfc3948_print(netdissect_options *ndo,
 
 		ND_PRINT((ndo, "UDP-encap: "));
 
-		advance = esp_print(ndo, bp, length, bp2, &enh, &padlen);
+		advance = esp_print(ndo, bp, length, (const struct ip *)bp2, &enh, &padlen);
 		if(advance <= 0)
 			return;
 

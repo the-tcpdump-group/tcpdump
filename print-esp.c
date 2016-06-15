@@ -48,8 +48,10 @@
 
 #include "ascii_strcasecmp.h"
 
+#include "ether.h"
 #include "ip.h"
 #include "ip6.h"
+#include "udp.h"
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -161,7 +163,7 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 	if (EVP_CipherInit(&ctx, sa->evp, sa->secret, NULL, 0) < 0)
 		(*ndo->ndo_warning)(ndo, "espkey init failed");
 	EVP_CipherInit(&ctx, NULL, NULL, iv, 0);
-	EVP_Cipher(&ctx, buf, buf, len);
+	EVP_Cipher(&ctx, (u_char *)buf, buf, len);
 	EVP_CIPHER_CTX_cleanup(&ctx);
 
 	ndo->ndo_packetp = buf;
@@ -539,64 +541,35 @@ void esp_print_decodesecret(netdissect_options *ndo)
 USES_APPLE_DEPRECATED_API
 #endif
 int
-esp_print(netdissect_options *ndo,
-	  const u_char *bp, const int length, const u_char *bp2
-#ifndef HAVE_LIBCRYPTO
-	_U_
-#endif
-	,
-	int *nhdr
-#ifndef HAVE_LIBCRYPTO
-	_U_
-#endif
-	,
-	int *padlen
-#ifndef HAVE_LIBCRYPTO
-	_U_
-#endif
-	)
+esp_decrypt_payload(netdissect_options *ndo,
+		    const u_char *bp, u_char *tp, const struct ip *ip,
+		    const u_char *ep, int *nhdr, int *padlen, int *olen)
 {
-	register const struct newesp *esp;
-	register const u_char *ep;
-#ifdef HAVE_LIBCRYPTO
-	const struct ip *ip;
+	const struct newesp *esp;
+	const u_char *bp2;
 	struct sa_list *sa = NULL;
 	const struct ip6_hdr *ip6 = NULL;
 	int advance;
 	int len;
+	int olen_update, olen_final;
 	u_char *secret;
 	int ivlen = 0;
 	const u_char *ivoff;
-	const u_char *p;
+	u_char *p;
 	EVP_CIPHER_CTX ctx;
-#endif
 
+#ifndef HAVE_LIBCRYPTO
+	goto fail;
+#else
 	esp = (const struct newesp *)bp;
-
-#ifdef HAVE_LIBCRYPTO
 	secret = NULL;
 	advance = 0;
-#endif
 
 #if 0
 	/* keep secret out of a register */
 	p = (u_char *)&secret;
 #endif
 
-	/* 'ep' points to the end of available data. */
-	ep = ndo->ndo_snapend;
-
-	if ((const u_char *)(esp + 1) >= ep) {
-		ND_PRINT((ndo, "[|ESP]"));
-		goto fail;
-	}
-	ND_PRINT((ndo, "ESP(spi=0x%08x", EXTRACT_32BITS(&esp->esp_spi)));
-	ND_PRINT((ndo, ",seq=0x%x)", EXTRACT_32BITS(&esp->esp_seq)));
-	ND_PRINT((ndo, ", length %u", length));
-
-#ifndef HAVE_LIBCRYPTO
-	goto fail;
-#else
 	/* initiailize SAs */
 	if (ndo->ndo_sa_list_head == NULL) {
 		if (!ndo->ndo_espsecret)
@@ -608,10 +581,10 @@ esp_print(netdissect_options *ndo,
 	if (ndo->ndo_sa_list_head == NULL)
 		goto fail;
 
-	ip = (const struct ip *)bp2;
+	bp2 = (const u_char *)ip;
 	switch (IP_V(ip)) {
 	case 6:
-		ip6 = (const struct ip6_hdr *)bp2;
+		ip6 = (const struct ip6_hdr *)ip;
 		/* we do not attempt to decrypt jumbograms */
 		if (!EXTRACT_16BITS(&ip6->ip6_plen))
 			goto fail;
@@ -676,11 +649,21 @@ esp_print(netdissect_options *ndo,
 		if (EVP_CipherInit(&ctx, sa->evp, secret, NULL, 0) < 0)
 			(*ndo->ndo_warning)(ndo, "espkey init failed");
 
-		p = ivoff;
+		p = (u_char *)ivoff;
 		EVP_CipherInit(&ctx, NULL, NULL, p, 0);
-		EVP_Cipher(&ctx, p + ivlen, p + ivlen, ep - (p + ivlen));
+		EVP_CIPHER_CTX_set_padding(&ctx, 0); /* Disable padding */
+
+		if (EVP_DecryptUpdate(&ctx, p + ivlen, &olen_update, p + ivlen, ep - (p + ivlen)) != 1) {
+			EVP_CIPHER_CTX_cleanup(&ctx);
+			goto fail;
+		}
+		if (EVP_DecryptFinal_ex(&ctx, p + ivlen + olen_update, &olen_final) != 1) {
+			goto fail;
+		}
 		EVP_CIPHER_CTX_cleanup(&ctx);
 		advance = ivoff - (const u_char *)esp + ivlen;
+		if (tp)
+			memmove(tp, p + ivlen, olen_update + olen_final);
 	} else
 		advance = sizeof(struct newesp);
 
@@ -694,6 +677,60 @@ esp_print(netdissect_options *ndo,
 	if (nhdr)
 		*nhdr = *(ep - 1);
 
+	if (olen)
+		*olen = olen_update + olen_final;
+
+	return advance;
+#endif
+
+fail:
+	return -1;
+}
+
+#ifdef HAVE_LIBCRYPTO
+USES_APPLE_DEPRECATED_API
+#endif
+int
+esp_print(netdissect_options *ndo,
+	  const u_char *bp, const int length, const struct ip *ip
+#ifndef HAVE_LIBCRYPTO
+	_U_
+#endif
+	,
+	int *nhdr
+#ifndef HAVE_LIBCRYPTO
+	_U_
+#endif
+	,
+	int *padlen
+#ifndef HAVE_LIBCRYPTO
+	_U_
+#endif
+	)
+{
+	register const struct newesp *esp;
+	register const u_char *ep;
+	int advance;
+	esp = (const struct newesp *)bp;
+
+	/* 'ep' points to the end of available data. */
+	ep = ndo->ndo_snapend;
+
+	if ((const u_char *)(esp + 1) >= ep) {
+		ND_PRINT((ndo, "[|ESP]"));
+		goto fail;
+	}
+	ND_PRINT((ndo, "ESP(spi=0x%08x", EXTRACT_32BITS(&esp->esp_spi)));
+	ND_PRINT((ndo, ",seq=0x%x)", EXTRACT_32BITS(&esp->esp_seq)));
+	ND_PRINT((ndo, ", length %u", length));
+
+#ifndef HAVE_LIBCRYPTO
+	goto fail;
+#else
+	advance = esp_decrypt_payload(ndo, bp, NULL, ip, ep, nhdr, padlen, NULL);
+	if (advance < 0)
+		goto fail;
+
 	ND_PRINT((ndo, ": "));
 	return advance;
 #endif
@@ -701,6 +738,60 @@ esp_print(netdissect_options *ndo,
 fail:
 	return -1;
 }
+
+#ifdef HAVE_LIBCRYPTO
+USES_APPLE_DEPRECATED_API
+#endif
+int
+esp_decrypt(netdissect_options *ndo,
+	    const struct pcap_pkthdr *h, const u_char *sp, struct pcap_pkthdr *decrypt_h)
+{
+	u_char *decrypt_sp;
+	struct ether_header *ether_h;
+	struct ip *ip_h, *decrypt_ip_h;
+	struct udphdr *udp_h;
+	int ilen, olen;
+
+	if (h->caplen < h->len) {
+		(*ndo->ndo_warning)(ndo, "Captured packet is truncated");
+		return 0;
+	}
+
+	ether_h = (struct ether_header*)sp;
+	sp = sp + ETHER_HDRLEN;
+	decrypt_sp = (u_char *)sp;
+	ip_h = (struct ip *)sp;
+	sp = sp + (IP_HL(ip_h)*4);
+
+	if (ip_h->ip_p == IPPROTO_ESP) {
+		ilen = EXTRACT_16BITS(&ip_h->ip_len) - (IP_HL(ip_h)*4);
+	} else if (ip_h->ip_p == IPPROTO_UDP) {
+		/* Check if ESP is UDP ENC UDP Port 4500 */
+		udp_h = (struct udphdr*)sp;
+		if (EXTRACT_16BITS(&udp_h->uh_sport) == ISAKMP_PORT_NATT
+		    || EXTRACT_16BITS(&udp_h->uh_dport) == ISAKMP_PORT_NATT) {
+			sp = sp + sizeof(struct udphdr);
+			ilen = EXTRACT_16BITS(&udp_h->uh_ulen) - sizeof(*udp_h);
+		} else {
+			return 0;
+		}
+	}
+	else {
+		return 0;
+	}
+
+	const u_char *ep = sp + ilen;
+	int advance = esp_decrypt_payload(ndo, sp, decrypt_sp, ip_h, ep, NULL, NULL, &olen);
+	if (advance < 0)
+		return 0;
+
+	decrypt_h->ts = h->ts;
+	decrypt_h->len = olen + ETHER_HDRLEN;
+	decrypt_h->caplen = olen + ETHER_HDRLEN;
+
+	return 1;
+}
+
 #ifdef HAVE_LIBCRYPTO
 USES_APPLE_RST
 #endif

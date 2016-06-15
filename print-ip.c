@@ -340,8 +340,7 @@ again:
 	{
 		int enh, padlen;
 		ipds->advance = esp_print(ndo, ipds->cp, ipds->len,
-				    (const u_char *)ipds->ip,
-				    &enh, &padlen);
+				    ipds->ip, &enh, &padlen);
 		if (ipds->advance <= 0)
 			break;
 		ipds->cp += ipds->advance;
