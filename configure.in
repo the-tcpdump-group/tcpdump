@@ -918,7 +918,16 @@ if test "$want_libcrypto" != "no"; then
 	AC_CHECK_HEADER(openssl/crypto.h,
 	[
 		AC_CHECK_LIB(crypto, DES_cbc_encrypt)
-		AC_CHECK_HEADERS(openssl/evp.h)
+		if test "$ac_cv_lib_crypto_DES_cbc_encrypt" = "yes"; then
+			AC_CHECK_HEADERS(openssl/evp.h)
+			#
+			# OK, do we have EVP_CIPHER_CTX_new?
+			# If so, we use it to allocate an
+			# EVP_CIPHER_CTX, as EVP_CIPHER_CTX may be
+			# opaque; otherwise, we allocate it ourselves.
+			#
+			AC_CHECK_FUNCS(EVP_CIPHER_CTX_new)
+		fi
 	])
 fi
 
