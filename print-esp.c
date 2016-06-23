@@ -128,7 +128,7 @@ EVP_CIPHER_CTX_new(void)
 {
 	EVP_CIPHER_CTX *ctx;
 
-	ctx = malloc(sizeof (EVP_CIPHER_CTX));
+	ctx = malloc(sizeof(*ctx));
 	if (ctx == NULL)
 		return (NULL);
 	memset(ctx, 0, sizeof(*ctx));
