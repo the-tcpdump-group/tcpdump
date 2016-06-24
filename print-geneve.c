@@ -183,7 +183,7 @@ geneve_print(netdissect_options *ndo, const u_char *bp, u_int len)
 
     if (len < opts_len) {
         ND_PRINT((ndo, " truncated-geneve - %u bytes missing",
-                  len - opts_len));
+                  opts_len - len));
         return;
     }
 
