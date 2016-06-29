@@ -1115,6 +1115,8 @@ main(int argc, char **argv)
 				ndo->ndo_packettype = PT_PGM_ZMTP1;
 			else if (ascii_strcasecmp(optarg, "lmp") == 0)
 				ndo->ndo_packettype = PT_LMP;
+            else if (strcasecmp(optarg, "resp") == 0)
+                ndo->ndo_packettype = PT_RESP;
 			else
 				error("unknown packet type `%s'", optarg);
 			break;
@@ -1847,7 +1849,6 @@ main(int argc, char **argv)
 					 */
 					dlt = new_dlt;
 					ndo->ndo_if_printer = get_if_printer(ndo, dlt);
-					dlt_name = pcap_datalink_val_to_name(dlt);
 					if (pcap_compile(pd, &fcode, cmdbuf, Oflag, netmask) < 0)
 						error("%s", pcap_geterr(pd));
 				}
@@ -1861,6 +1862,7 @@ main(int argc, char **argv)
 				/*
 				 * Report the new file.
 				 */
+				dlt_name = pcap_datalink_val_to_name(dlt);
 				if (dlt_name == NULL) {
 					fprintf(stderr, "reading from file %s, link-type %u\n",
 					    RFileName, dlt);
@@ -2386,7 +2388,7 @@ print_usage(void)
 #endif
 	(void)fprintf(stderr, "[ -T type ] [ --version ] [ -V file ]\n");
 	(void)fprintf(stderr,
-"\t\t[ -w file ] [ -W filecount ] [ -y datalinktype ] [ -z command ]\n");
+"\t\t[ -w file ] [ -W filecount ] [ -y datalinktype ] [ -z postrotate-command ]\n");
 	(void)fprintf(stderr,
 "\t\t[ -Z user ] [ expression ]\n");
 }

@@ -154,3 +154,6 @@ struct tcphdr {
 #ifndef BEEP_PORT
 #define BEEP_PORT		10288
 #endif
+#ifndef REDIS_PORT
+#define REDIS_PORT		6379
+#endif

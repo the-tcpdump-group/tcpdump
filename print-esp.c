@@ -117,6 +117,32 @@ struct sa_list {
 	int		secretlen;
 };
 
+#ifndef HAVE_EVP_CIPHER_CTX_NEW
+/*
+ * Allocate an EVP_CIPHER_CTX.
+ * Used if we have an older version of OpenSSL that doesn't provide
+ * routines to allocate and free them.
+ */
+static EVP_CIPHER_CTX *
+EVP_CIPHER_CTX_new(void)
+{
+	EVP_CIPHER_CTX *ctx;
+
+	ctx = malloc(sizeof(*ctx));
+	if (ctx == NULL)
+		return (NULL);
+	memset(ctx, 0, sizeof(*ctx));
+	return (ctx);
+}
+
+static void
+EVP_CIPHER_CTX_free(EVP_CIPHER_CTX *ctx)
+{
+	EVP_CIPHER_CTX_cleanup(ctx);
+	free(ctx);
+}
+#endif
+
 /*
  * this will adjust ndo_packetp and ndo_snapend to new buffer!
  */
@@ -129,7 +155,7 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 	struct sa_list *sa;
 	const u_char *iv;
 	int len;
-	EVP_CIPHER_CTX ctx;
+	EVP_CIPHER_CTX *ctx;
 
 	/* initiator arg is any non-zero value */
 	if(initiator) initiator=1;
@@ -157,12 +183,14 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 
 	if(end <= buf) return 0;
 
-	memset(&ctx, 0, sizeof(ctx));
-	if (EVP_CipherInit(&ctx, sa->evp, sa->secret, NULL, 0) < 0)
+	ctx = EVP_CIPHER_CTX_new();
+	if (ctx == NULL)
+		return 0;
+	if (EVP_CipherInit(ctx, sa->evp, sa->secret, NULL, 0) < 0)
 		(*ndo->ndo_warning)(ndo, "espkey init failed");
-	EVP_CipherInit(&ctx, NULL, NULL, iv, 0);
-	EVP_Cipher(&ctx, buf, buf, len);
-	EVP_CIPHER_CTX_cleanup(&ctx);
+	EVP_CipherInit(ctx, NULL, NULL, iv, 0);
+	EVP_Cipher(ctx, buf, buf, len);
+	EVP_CIPHER_CTX_free(ctx);
 
 	ndo->ndo_packetp = buf;
 	ndo->ndo_snapend = end;
@@ -568,7 +596,7 @@ esp_print(netdissect_options *ndo,
 	int ivlen = 0;
 	const u_char *ivoff;
 	const u_char *p;
-	EVP_CIPHER_CTX ctx;
+	EVP_CIPHER_CTX *ctx;
 #endif
 
 	esp = (const struct newesp *)bp;
@@ -672,15 +700,18 @@ esp_print(netdissect_options *ndo,
 	ep = ep - sa->authlen;
 
 	if (sa->evp) {
-		memset(&ctx, 0, sizeof(ctx));
-		if (EVP_CipherInit(&ctx, sa->evp, secret, NULL, 0) < 0)
-			(*ndo->ndo_warning)(ndo, "espkey init failed");
+		ctx = EVP_CIPHER_CTX_new();
+		if (ctx != NULL) {
+			if (EVP_CipherInit(ctx, sa->evp, secret, NULL, 0) < 0)
+				(*ndo->ndo_warning)(ndo, "espkey init failed");
 
-		p = ivoff;
-		EVP_CipherInit(&ctx, NULL, NULL, p, 0);
-		EVP_Cipher(&ctx, p + ivlen, p + ivlen, ep - (p + ivlen));
-		EVP_CIPHER_CTX_cleanup(&ctx);
-		advance = ivoff - (const u_char *)esp + ivlen;
+			p = ivoff;
+			EVP_CipherInit(ctx, NULL, NULL, p, 0);
+			EVP_Cipher(ctx, p + ivlen, p + ivlen, ep - (p + ivlen));
+			EVP_CIPHER_CTX_free(ctx);
+			advance = ivoff - (const u_char *)esp + ivlen;
+		} else
+			advance = sizeof(struct newesp);
 	} else
 		advance = sizeof(struct newesp);
 

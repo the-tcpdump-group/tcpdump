@@ -218,6 +218,7 @@ struct netdissect_options {
 #define PT_PGM		14	/* [UDP-encapsulated] Pragmatic General Multicast */
 #define PT_PGM_ZMTP1	15	/* ZMTP/1.0 inside PGM (native or UDP-encapsulated) */
 #define PT_LMP		16	/* Link Management Protocol */
+#define PT_RESP		17	/* RESP */
 
 #ifndef min
 #define min(a,b) ((a)>(b)?(b):(a))
@@ -554,6 +555,7 @@ extern int print_unknown_data(netdissect_options *, const u_char *, const char *
 extern char *q922_string(netdissect_options *, const u_char *, u_int);
 extern void q933_print(netdissect_options *, const u_char *, u_int);
 extern void radius_print(netdissect_options *, const u_char *, u_int);
+extern void resp_print(netdissect_options *, const u_char *, u_int);
 extern void rip_print(netdissect_options *, const u_char *, u_int);
 extern void ripng_print(netdissect_options *, const u_char *, unsigned int);
 extern void rpki_rtr_print(netdissect_options *, const u_char *, u_int);

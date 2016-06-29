@@ -650,6 +650,9 @@ tcp_print(netdissect_options *ndo,
                 case PT_ZMTP1:
                         zmtp1_print(ndo, bp, length);
                         break;
+                case PT_RESP:
+                        resp_print(ndo, bp, length);
+                        break;
                 }
                 return;
         }
@@ -663,6 +666,8 @@ tcp_print(netdissect_options *ndo,
                 bgp_print(ndo, bp, length);
         else if (IS_SRC_OR_DST_PORT(PPTP_PORT))
                 pptp_print(ndo, bp);
+        else if (IS_SRC_OR_DST_PORT(REDIS_PORT))
+                resp_print(ndo, bp, length);
 #ifdef ENABLE_SMB
         else if (IS_SRC_OR_DST_PORT(NETBIOS_SSN_PORT))
                 nbt_tcp_print(ndo, bp, length);

@@ -638,6 +638,7 @@ Currently known types are
 \fBlmp\fR (Link Management Protocol),
 \fBpgm\fR (Pragmatic General Multicast),
 \fBpgm_zmtp1\fR (ZMTP/1.0 inside PGM/EPGM),
+\fBresp\fR (REdis Serialization Protocol),
 \fBradius\fR (RADIUS),
 \fBrpc\fR (Remote Procedure Call),
 \fBrtp\fR (Real-Time Applications protocol),

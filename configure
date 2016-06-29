@@ -8041,7 +8041,8 @@ _ACEOF
 
 fi
 
-		for ac_header in openssl/evp.h
+		if test "$ac_cv_lib_crypto_DES_cbc_encrypt" = "yes"; then
+			for ac_header in openssl/evp.h
 do :
   ac_fn_c_check_header_mongrel "$LINENO" "openssl/evp.h" "ac_cv_header_openssl_evp_h" "$ac_includes_default"
 if test "x$ac_cv_header_openssl_evp_h" = xyes; then :
@@ -8053,6 +8054,24 @@ fi
 
 done
 
+			#
+			# OK, do we have EVP_CIPHER_CTX_new?
+			# If so, we use it to allocate an
+			# EVP_CIPHER_CTX, as EVP_CIPHER_CTX may be
+			# opaque; otherwise, we allocate it ourselves.
+			#
+			for ac_func in EVP_CIPHER_CTX_new
+do :
+  ac_fn_c_check_func "$LINENO" "EVP_CIPHER_CTX_new" "ac_cv_func_EVP_CIPHER_CTX_new"
+if test "x$ac_cv_func_EVP_CIPHER_CTX_new" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_EVP_CIPHER_CTX_NEW 1
+_ACEOF
+
+fi
+done
+
+		fi
 
 fi
 
