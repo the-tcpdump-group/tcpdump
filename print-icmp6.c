@@ -651,18 +651,7 @@ const struct tok rpl_subopt_values[] = {
 static void
 rpl_format_dagid(char dagid_str[65], const u_char *dagid)
 {
-        char *d = dagid_str;
-        int  i;
-
-        for(i=0;i<16;i++) {
-                if(isprint(dagid[i])) {
-                        *d++ = dagid[i];
-                } else {
-                        snprintf(d,5,"0x%02x", dagid[i]); /* 4 + null char */
-                        d += 4;
-                }
-        }
-        *d++ = '\0';
+        inet_ntop(AF_INET6, dagid, dagid_str, 64);
 }
 
 static void
