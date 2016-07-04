@@ -1061,6 +1061,7 @@ rsvp_obj_print(netdissect_options *ndo,
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_IPV4:
                 while(obj_tlen >= 4 ) {
+                    ND_TCHECK2(*obj_tptr, 2);
                     ND_PRINT((ndo, "%s  Subobject Type: %s, length %u",
                            ident,
                            tok2str(rsvp_obj_xro_values,
