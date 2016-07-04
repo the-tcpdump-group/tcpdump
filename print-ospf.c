@@ -575,7 +575,7 @@ static const struct tok ospf_topology_values[] = {
 /*
  * Print all the per-topology metrics.
  */
-static void
+static int
 ospf_print_tos_metrics(netdissect_options *ndo,
                        const union un_tos *tos)
 {
@@ -588,7 +588,8 @@ ospf_print_tos_metrics(netdissect_options *ndo,
     /*
      * All but the first metric contain a valid topology id.
      */
-    while (toscount) {
+    while (toscount > 0) {
+        ND_TCHECK(*tos);
         ND_PRINT((ndo, "\n\t\ttopology %s (%u), metric %u",
                tok2str(ospf_topology_values, "Unknown",
                        metric_count ? tos->metrics.tos_type : 0),
@@ -598,6 +599,9 @@ ospf_print_tos_metrics(netdissect_options *ndo,
         tos++;
         toscount--;
     }
+    return 0;
+trunc:
+    return 1;
 }
 
 /*
@@ -671,7 +675,8 @@ ospf_print_lsa(netdissect_options *ndo,
 				return (ls_end);
 			}
 
-			ospf_print_tos_metrics(ndo, &rlp->un_tos);
+			if (ospf_print_tos_metrics(ndo, &rlp->un_tos))
+				goto trunc;
 
 			rlp = (const struct rlalink *)((const u_char *)(rlp + 1) +
 			    ((rlp->un_tos.link.link_tos_count) * sizeof(union un_tos)));
