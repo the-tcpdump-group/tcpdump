@@ -784,7 +784,7 @@ rpl_daoack_print(netdissect_options *ndo,
         bp += ND_RPL_DAOACK_MIN_LEN;
         length -= ND_RPL_DAOACK_MIN_LEN;
         if(RPL_DAOACK_D(daoack->rpl_flags)) {
-                ND_TCHECK2(daoack->rpl_dagid, 16);
+                ND_TCHECK2(daoack->rpl_dagid, DAGID_LEN);
                 if (length < DAGID_LEN)
                 	goto tooshort;
                 rpl_format_dagid(dagid_str, daoack->rpl_dagid);
