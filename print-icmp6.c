@@ -649,12 +649,6 @@ const struct tok rpl_subopt_values[] = {
 };
 
 static void
-rpl_format_dagid(char dagid_str[65], const u_char *dagid)
-{
-        inet_ntop(AF_INET6, dagid, dagid_str, 64);
-}
-
-static void
 rpl_dio_printopt(netdissect_options *ndo,
                  const struct rpl_dio_genoption *opt,
                  u_int length)
@@ -699,10 +693,10 @@ rpl_dio_print(netdissect_options *ndo,
               const u_char *bp, u_int length)
 {
         const struct nd_rpl_dio *dio = (const struct nd_rpl_dio *)bp;
-        char dagid_str[65];
+        const char *dagid_str;
 
         ND_TCHECK(*dio);
-        rpl_format_dagid(dagid_str, dio->rpl_dagid);
+        dagid_str = ip6addr_string (ndo, dio->rpl_dagid);
 
         ND_PRINT((ndo, " [dagid:%s,seq:%u,instance:%u,rank:%u,%smop:%s,prf:%u]",
                   dagid_str,
@@ -728,20 +722,19 @@ rpl_dao_print(netdissect_options *ndo,
               const u_char *bp, u_int length)
 {
         const struct nd_rpl_dao *dao = (const struct nd_rpl_dao *)bp;
-        char dagid_str[65];
+        const char *dagid_str = "<elided>";
 
         ND_TCHECK(*dao);
         if (length < ND_RPL_DAO_MIN_LEN)
         	goto tooshort;
 
-        strcpy(dagid_str,"<elided>");
         bp += ND_RPL_DAO_MIN_LEN;
         length -= ND_RPL_DAO_MIN_LEN;
         if(RPL_DAO_D(dao->rpl_flags)) {
                 ND_TCHECK2(dao->rpl_dagid, DAGID_LEN);
                 if (length < DAGID_LEN)
                 	goto tooshort;
-                rpl_format_dagid(dagid_str, dao->rpl_dagid);
+                dagid_str = ip6addr_string (ndo, dao->rpl_dagid);
                 bp += DAGID_LEN;
                 length -= DAGID_LEN;
         }
@@ -774,20 +767,19 @@ rpl_daoack_print(netdissect_options *ndo,
                  const u_char *bp, u_int length)
 {
         const struct nd_rpl_daoack *daoack = (const struct nd_rpl_daoack *)bp;
-        char dagid_str[65];
+        const char *dagid_str = "<elided>";
 
         ND_TCHECK2(*daoack, ND_RPL_DAOACK_MIN_LEN);
         if (length < ND_RPL_DAOACK_MIN_LEN)
         	goto tooshort;
 
-        strcpy(dagid_str,"<elided>");
         bp += ND_RPL_DAOACK_MIN_LEN;
         length -= ND_RPL_DAOACK_MIN_LEN;
         if(RPL_DAOACK_D(daoack->rpl_flags)) {
                 ND_TCHECK2(daoack->rpl_dagid, DAGID_LEN);
                 if (length < DAGID_LEN)
                 	goto tooshort;
-                rpl_format_dagid(dagid_str, daoack->rpl_dagid);
+                dagid_str = ip6addr_string (ndo, daoack->rpl_dagid);
                 bp += DAGID_LEN;
                 length -= DAGID_LEN;
         }
