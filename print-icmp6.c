@@ -1685,7 +1685,7 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 				break;
 			}
 			ND_PRINT((ndo,", subject=%s",
-                                  getname(ndo, (const u_char *)(ni6 + 1))));
+                                  ipaddr_string(ndo, ni6 + 1)));
 			break;
 		default:
 			ND_PRINT((ndo,", unknown subject"));

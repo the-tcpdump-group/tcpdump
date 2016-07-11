@@ -305,7 +305,7 @@ void lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 		switch (eid_afi) {
 		case IPv4_AFI:
 			ND_TCHECK2(*(packet_iterator + packet_offset), 4);
-			ND_PRINT((ndo, " EID %s/%u,", getname(ndo,
+			ND_PRINT((ndo, " EID %s/%u,", ipaddr_string(ndo,
 				packet_iterator + packet_offset), mask_len));
 			packet_offset += 4;
 			break;
@@ -338,7 +338,7 @@ void lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			switch (loc_afi) {
 			case IPv4_AFI:
 				ND_TCHECK2(*(packet_iterator + packet_offset), 4);
-				ND_PRINT((ndo, " LOC %s", getname(ndo, loc_ip_pointer)));
+				ND_PRINT((ndo, " LOC %s", ipaddr_string(ndo, loc_ip_pointer)));
 				packet_offset += 4;
 				break;
 			case IPv6_AFI:
