@@ -1088,10 +1088,10 @@ icmp6_print(netdissect_options *ndo,
 	case ND_REDIRECT:
 #define RDR(i) ((const struct nd_redirect *)(i))
                          ND_TCHECK(RDR(dp)->nd_rd_dst);
-                         ND_PRINT((ndo,", %s", getname6(ndo, (const u_char *)&RDR(dp)->nd_rd_dst)));
+                         ND_PRINT((ndo,", %s", ip6addr_string(ndo, &RDR(dp)->nd_rd_dst)));
 		ND_TCHECK(RDR(dp)->nd_rd_target);
 		ND_PRINT((ndo," to %s",
-                          getname6(ndo, (const u_char*)&RDR(dp)->nd_rd_target)));
+                          ip6addr_string(ndo, &RDR(dp)->nd_rd_target)));
 #define REDIRECTLEN 40
 		if (ndo->ndo_vflag) {
 			icmp6_opt_print(ndo, (const u_char *)dp + REDIRECTLEN,
@@ -1657,7 +1657,7 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 				break;
 			}
 			ND_PRINT((ndo,", subject=%s",
-                                  getname6(ndo, (const u_char *)(ni6 + 1))));
+                                  ip6addr_string(ndo, ni6 + 1)));
 			break;
 		case ICMP6_NI_SUBJ_FQDN:
 			ND_PRINT((ndo,", subject=DNS name"));
@@ -1782,7 +1782,7 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 			while (i < siz) {
 				if (i + sizeof(struct in6_addr) + sizeof(int32_t) > siz)
 					break;
-				ND_PRINT((ndo," %s", getname6(ndo, bp + i)));
+				ND_PRINT((ndo," %s", ip6addr_string(ndo, bp + i)));
 				i += sizeof(struct in6_addr);
 				ND_PRINT((ndo,"(%d)", (int32_t)EXTRACT_32BITS(bp + i)));
 				i += sizeof(int32_t);

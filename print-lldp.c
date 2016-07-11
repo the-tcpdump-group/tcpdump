@@ -1283,6 +1283,7 @@ lldp_network_addr_print(netdissect_options *ndo, const u_char *tptr, u_int len)
     case AFNUM_INET6:
         if (len < 16)
           return NULL;
+        /* This cannot be assigned to ip6addr_string(), which is a macro. */
         pfunc = getname6;
         break;
     case AFNUM_802:

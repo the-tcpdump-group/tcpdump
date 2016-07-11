@@ -1092,7 +1092,7 @@ decode_prefix6(netdissect_options *ndo,
 		addr.s6_addr[plenbytes - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
 	}
-	snprintf(buf, buflen, "%s/%d", getname6(ndo, (u_char *)&addr), plen);
+	snprintf(buf, buflen, "%s/%d", ip6addr_string(ndo, &addr), plen);
 	return 1 + plenbytes;
 
 trunc:
@@ -1133,7 +1133,7 @@ decode_labeled_prefix6(netdissect_options *ndo,
 	}
         /* the label may get offsetted by 4 bits so lets shift it right */
 	snprintf(buf, buflen, "%s/%d, label:%u %s",
-                 getname6(ndo, (u_char *)&addr),
+                 ip6addr_string(ndo, &addr),
                  plen,
                  EXTRACT_24BITS(pptr+1)>>4,
                  ((pptr[3]&1)==0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
@@ -1175,7 +1175,7 @@ decode_labeled_vpn_prefix6(netdissect_options *ndo,
         /* the label may get offsetted by 4 bits so lets shift it right */
 	snprintf(buf, buflen, "RD: %s, %s/%d, label:%u %s",
                  bgp_vpn_rd_print(ndo, pptr+4),
-                 getname6(ndo, (u_char *)&addr),
+                 ip6addr_string(ndo, &addr),
                  plen,
                  EXTRACT_24BITS(pptr+1)>>4,
                  ((pptr[3]&1)==0) ? "(BOGUS: Bottom of Stack NOT set!)" : "(bottom)" );
@@ -1599,7 +1599,7 @@ bgp_attr_print(netdissect_options *ndo,
                                 tlen = 0;
                             } else {
                                 ND_TCHECK2(tptr[0], sizeof(struct in6_addr));
-                                ND_PRINT((ndo, "%s", getname6(ndo, tptr)));
+                                ND_PRINT((ndo, "%s", ip6addr_string(ndo, tptr)));
                                 tlen -= sizeof(struct in6_addr);
                                 tptr += sizeof(struct in6_addr);
                             }
@@ -1614,7 +1614,7 @@ bgp_attr_print(netdissect_options *ndo,
                                 ND_TCHECK2(tptr[0], sizeof(struct in6_addr)+BGP_VPN_RD_LEN);
                                 ND_PRINT((ndo, "RD: %s, %s",
                                        bgp_vpn_rd_print(ndo, tptr),
-                                       getname6(ndo, tptr+BGP_VPN_RD_LEN)));
+                                       ip6addr_string(ndo, tptr+BGP_VPN_RD_LEN)));
                                 tlen -= (sizeof(struct in6_addr)+BGP_VPN_RD_LEN);
                                 tptr += (sizeof(struct in6_addr)+BGP_VPN_RD_LEN);
                             }
@@ -1658,7 +1658,7 @@ bgp_attr_print(netdissect_options *ndo,
                                     ND_PRINT((ndo, " = %s", getname(ndo, tptr+BGP_VPN_RD_LEN+4)));
                                 /* rfc1888 mapped IPv6 address ? */
                                 else if (EXTRACT_24BITS(tptr+BGP_VPN_RD_LEN) ==  0x350000)
-                                    ND_PRINT((ndo, " = %s", getname6(ndo, tptr+BGP_VPN_RD_LEN+3)));
+                                    ND_PRINT((ndo, " = %s", ip6addr_string(ndo, tptr+BGP_VPN_RD_LEN+3)));
                                 tptr += tlen;
                                 tlen = 0;
                             }
