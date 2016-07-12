@@ -328,7 +328,7 @@ igmp_print(netdissect_options *ndo,
         break;
     }
 
-    if (ndo->ndo_vflag && ND_TTEST2(bp[0], len)) {
+    if (ndo->ndo_vflag && len >= 4 && ND_TTEST2(bp[0], len)) {
         /* Check the IGMP checksum */
         vec[0].ptr = bp;
         vec[0].len = len;
