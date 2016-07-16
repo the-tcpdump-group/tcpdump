@@ -753,6 +753,71 @@ set_dumper_capsicum_rights(pcap_dumper_t *p)
 }
 #endif
 
+
+#ifdef HAVE_PCAP_FINDALLDEVS
+static char *
+search_numeric_adapter_name(char *device, char *ebuf, size_t size_ebuf)
+{
+	/*
+	 * If the argument is a number, treat it as
+	 * an index into the list of adapters, as
+	 * printed by "tcpdump -D".
+	 *
+	 * This should be OK on UNIX systems, as interfaces
+	 * shouldn't have names that begin with digits.
+	 * It can be useful on Windows, where more than
+	 * one interface can have the same name.
+	 */
+
+	register int i;
+	int devnum;
+	char *end;
+	pcap_if_t *dev, *devlist;
+
+	devnum = strtol(device, &end, 10);
+	if (device != end && *end == '\0') {
+		if (devnum <= 0) {
+			/* Return error for negative number input.
+			 * Additionally, handle ZERO because strtol
+			 * converts input of "-0" to a ZERO
+			 */
+			strncpy(ebuf,"Invalid adapter index", size_ebuf-1);
+			return NULL;
+		}
+
+		if (pcap_findalldevs(&devlist, ebuf) < 0) {
+			/* ebuf contains error message from pcap_findalldevs */
+			return NULL;
+		}
+
+		/*
+		 * Look for the devnum-th entry in the
+		 * list of devices (1-based).
+		 */
+		for (i = 0, dev = devlist;
+		    i < devnum-1 && dev != NULL;
+		    i++, dev = dev->next)
+			;
+
+		if (dev == NULL) {
+			strncpy(ebuf,"Invalid adapter index", size_ebuf-1);
+			return NULL;
+		}
+
+		free(device); /* device is a strdup'ed string at this stage. Free it first*/
+		device = strdup(dev->name);
+		pcap_freealldevs(devlist);
+	}
+	else {
+		/* Leave the original message in ebuf (as on entry) untouched */
+		return NULL;
+	}
+
+	return device;
+}
+#endif /* HAVE_PCAP_FINDALLDEVS */
+
+
 int
 main(int argc, char **argv)
 {
@@ -778,6 +843,7 @@ main(int argc, char **argv)
 #ifdef HAVE_PCAP_FINDALLDEVS
 	pcap_if_t *dev, *devlist;
 	int devnum;
+	int bool_dev_autopicked = 0;
 #endif
 	int status;
 	FILE *VFile;
@@ -926,42 +992,9 @@ main(int argc, char **argv)
 		case 'i':
 			if (optarg[0] == '0' && optarg[1] == 0)
 				error("Invalid adapter index");
-
-#ifdef HAVE_PCAP_FINDALLDEVS
-			/*
-			 * If the argument is a number, treat it as
-			 * an index into the list of adapters, as
-			 * printed by "tcpdump -D".
-			 *
-			 * This should be OK on UNIX systems, as interfaces
-			 * shouldn't have names that begin with digits.
-			 * It can be useful on Windows, where more than
-			 * one interface can have the same name.
-			 */
-			devnum = strtol(optarg, &end, 10);
-			if (optarg != end && *end == '\0') {
-				if (devnum < 0)
-					error("Invalid adapter index");
-
-				if (pcap_findalldevs(&devlist, ebuf) < 0)
-					error("%s", ebuf);
-				/*
-				 * Look for the devnum-th entry in the
-				 * list of devices (1-based).
-				 */
-				for (i = 0, dev = devlist;
-				    i < devnum-1 && dev != NULL;
-				    i++, dev = dev->next)
-					;
-				if (dev == NULL)
-					error("Invalid adapter index");
-				device = strdup(dev->name);
-				pcap_freealldevs(devlist);
-				break;
-			}
-#endif /* HAVE_PCAP_FINDALLDEVS */
-			device = optarg;
+			device = strdup(optarg);
 			break;
+
 
 #ifdef HAVE_PCAP_CREATE
 		case 'I':
@@ -1346,6 +1379,7 @@ main(int argc, char **argv)
 			    devlist != NULL) {
 				device = strdup(devlist->name);
 				pcap_freealldevs(devlist);
+				bool_dev_autopicked = 1;
 			}
 #else /* HAVE_PCAP_FINDALLDEVS */
 			device = pcap_lookupdev(ebuf);
@@ -1371,8 +1405,29 @@ main(int argc, char **argv)
 #endif /* _WIN32 */
 #ifdef HAVE_PCAP_CREATE
 		pd = pcap_create(device, ebuf);
-		if (pd == NULL)
+		if (pd == NULL) {
+#ifdef HAVE_PCAP_FINDALLDEVS
+			if (!bool_dev_autopicked) {
+				device = search_numeric_adapter_name(device, ebuf, sizeof(ebuf));
+				if(device == NULL)
+					error("%s", ebuf);
+
+				pd = pcap_create(device, ebuf);
+				if(pd == NULL)
+					error("%s", ebuf);
+			}
+			else {
+				/*
+				 * If device was auto picked by tcpdump and pcap_create failed then there
+				 * is nothing else to be done. Return error.
+				 */
+				error("%s", ebuf);
+			}
+#else /* HAVE_PCAP_FINDALLDEVS */
 			error("%s", ebuf);
+#endif /* HAVE_PCAP_FINDALLDEVS */
+		}
+
 #ifdef HAVE_PCAP_SET_TSTAMP_TYPE
 		if (Jflag)
 			show_tstamp_types_and_exit(device);
