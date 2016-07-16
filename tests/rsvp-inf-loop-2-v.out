@@ -9,8 +9,4 @@ IP (tos 0x0, ttl 254, id 0, offset 0, flags [none], proto RSVP (46), length 268,
 	    Refresh Period: 30000ms
 	  ERO Object (20) Flags: [reject if unknown], Class-Type: IPv4 (1), length: 36
 	    Subobject Type: IPv4 prefix, length 8, Strict, 10.1.2.2/32, Flags: [none]
-	    Subobject Type: IPv4 prefix, length 8, Strict, 10.2.3.2/70, Flags: [none]
-	    Subobject Type: IPv4 prefix, length 8, Strict, 10.2.65.3/32, Flags: [none]
-	    Subobject Type: IPv4 prefix, length 8, Strict, 10.33.0.1/32, Flags: [none]
-	  Generalized UNI Object (229) Flags: [ignore and forward if unknown], Class-Type: 1 (1), length: 8
-	    Subobject Type: Unknown (8), AF: Reserved (0), length: 0 (invalid)
+	    Subobject Type: IPv4 prefix, length 8 ERROR: Prefix length 70 != 32 (invalid)
