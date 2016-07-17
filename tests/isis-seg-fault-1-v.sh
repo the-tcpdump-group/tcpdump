@@ -8,10 +8,10 @@ test_name=isis-seg-fault-1-v
 
 if [ ! -f ../Makefile ]
 then
-	printf '    %-30s: TEST SKIPPED (no Makefile)\n' $test_name
+	printf '    %-35s: TEST SKIPPED (no Makefile)\n' $test_name
 elif grep '^CC = .*gcc' ../Makefile >/dev/null
 then
   ./TESTonce $test_name isis-seg-fault-1.pcap isis-seg-fault-1-v.out '-t -v'
 else
-	printf '    %-30s: TEST SKIPPED (compiler is not GCC)\n' $test_name
+	printf '    %-35s: TEST SKIPPED (compiler is not GCC)\n' $test_name
 fi

@@ -36,11 +36,11 @@ else {
 }
 
 if($r == 0) {
-  printf "    %-30s: passed\n", $name;
+  printf "    %-35s: passed\n", $name;
   unlink "DIFF/$output.diff";
   exit 0;
 }
-printf "    %-30s: TEST FAILED", $name;
+printf "    %-35s: TEST FAILED", $name;
 open FOUT, '>>failure-outputs.txt';
 printf FOUT "Failed test: $name\n\n";
 close FOUT;
