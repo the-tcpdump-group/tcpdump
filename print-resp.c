@@ -141,7 +141,8 @@ static int resp_print_inline(netdissect_options *, register const u_char *, int)
  */
 #define RESP_PRINT_SEGMENT(_ndo, _bp, _len)            \
         ND_PRINT((_ndo, " \""));                       \
-        fn_printn(_ndo, _bp, _len, _ndo->ndo_snapend); \
+        if (fn_printn(_ndo, _bp, _len, _ndo->ndo_snapend)) \
+		goto trunc; \
         fn_print_char(_ndo, '"');
 
 void
