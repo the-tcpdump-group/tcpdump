@@ -1,0 +1,14 @@
+IP6 ::1.56830 > ::1.5683: CoAP<0xa3ea[CON]> 0xeaa32b3a 0.02 POST: Uri-Path=rd Content-Format=application/link-format Uri-Query=ep=testlwm2mclient Uri-Query=b=U Uri-Query=lt=300 [Payload 109 bytes]
+IP6 ::1.5683 > ::1.56830: CoAP<0xa3ea[ACK]> 0xeaa32b3a 2.01 Created: Location-Path=rd Location-Path=PLeUw9gQcW
+IP6 ::1.5683 > ::1.56830: CoAP<0x0c0c[CON]> 0x6cecda23 0.01 GET: Uri-Path=1 Uri-Path=0 Uri-Path=1
+IP6 ::1.56830 > ::1.5683: CoAP<0x0c0c[ACK]> 0x6cecda23 2.05 Content: Content-Format=text/plain;charset=utf-8 [Payload 4 bytes]
+IP6 ::1.5683 > ::1.56830: CoAP<0x0c0d[CON]> 0xa7c2b9df 0.01 GET: Uri-Path=1 Uri-Path=0 Uri-Path=2
+IP6 ::1.56830 > ::1.5683: CoAP<0x0c0d[ACK]> 0xa7c2b9df 2.05 Content: Content-Format=text/plain;charset=utf-8 [Payload 2 bytes]
+IP6 ::1.5683 > ::1.56830: CoAP<0x0c0e[CON]> 0x2f03 0.01 GET: Observe=0 Uri-Path=1 Uri-Path=0 Uri-Path=1
+IP6 ::1.56830 > ::1.5683: CoAP<0x0c0e[ACK]> 0x2f03 2.05 Content: Observe=0 Content-Format=text/plain;charset=utf-8 [Payload 4 bytes]
+IP6 ::1.5683 > ::1.56830: CoAP<0x0c0f[CON]> 0xc5bd 0.01 GET: Observe=0 Uri-Path=1 Uri-Path=0 Uri-Path=1
+IP6 ::1.56830 > ::1.5683: CoAP<0x0c0f[ACK]> 0xc5bd 2.05 Content: Observe=1 Content-Format=text/plain;charset=utf-8 [Payload 4 bytes]
+IP6 ::1.5683 > ::1.56830: CoAP<0x0c10[CON]> 0xd67b6cbca7fb 0.01 GET: Observe=0 Uri-Path=1 Uri-Path=0 Uri-Path=1
+IP6 ::1.56830 > ::1.5683: CoAP<0x0c10[ACK]> 0xd67b6cbca7fb 2.05 Content: Observe=2 Content-Format=text/plain;charset=utf-8 [Payload 4 bytes]
+IP6 ::1.5683 > ::1.56830: CoAP<0x0c11[CON]> 0x97f3d1adc4d8 0.03 PUT: Uri-Path=1 Uri-Path=0 Uri-Path=1 Content-Format=text/plain;charset=utf-8 [Payload 4 bytes]
+IP6 ::1.56830 > ::1.5683: CoAP<0x0c11[ACK]> 0x97f3d1adc4d8 2.04 Changed:

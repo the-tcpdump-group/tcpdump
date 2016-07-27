@@ -114,6 +114,7 @@ LIBNETDISSECT_SRC=\
 	print-chdlc.c \
 	print-cip.c \
 	print-cnfp.c \
+	print-coap.c \
 	print-dccp.c \
 	print-decnet.c \
 	print-dhcp6.c \

@@ -118,6 +118,7 @@ print-cdp.c	- Cisco Discovery Protocol printer routines
 print-chdlc.c	- Cisco HDLC printer routines
 print-cip.c	- Classical-IP over ATM routines
 print-cnfp.c	- Cisco NetFlow printer routines
+print-coap.c	- Constrained Application Protocol routines
 print-dccp.c	- DCCP printer routines
 print-decnet.c	- DECnet printer routines
 print-dhcp6.c	- IPv6 DHCP printer routines
