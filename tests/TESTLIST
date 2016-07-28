@@ -347,3 +347,6 @@ nsh-over-vxlan-gpe-vvv nsh-over-vxlan-gpe.pcap nsh-over-vxlan-gpe-vvv.out -t -vv
 resp_1      resp_1_benchmark.pcap   resp_1.out      -n -t
 resp_2      resp_2_inline.pcap      resp_2.out      -n -t
 resp_3      resp_3_malicious.pcap   resp_3.out      -n -t
+
+# HNCP tests
+hncp        hncp.pcap    hncp.out    -n -vvv -t
