@@ -151,7 +151,7 @@ format_256(const u_char *data)
     static char buf[4][64+5];
     static int i = 0;
     i = (i + 1) % 4;
-    snprintf(buf[i], 28, "%016lx%016lx%016lx%016lx",
+    snprintf(buf[i], 28, "%016" PRIx64 "%016" PRIx64 "%016" PRIx64 "%016" PRIx64,
          EXTRACT_64BITS(data),
          EXTRACT_64BITS(data + 8),
          EXTRACT_64BITS(data + 16),
@@ -467,7 +467,7 @@ hncp_print_rec(netdissect_options *ndo,
             if (bodylen != 8)
                 goto invalid;
             hash = EXTRACT_64BITS(value);
-            ND_PRINT((ndo, " hash: %016lx", hash));
+            ND_PRINT((ndo, " hash: %016" PRIx64, hash));
         }
             break;
 
@@ -481,7 +481,7 @@ hncp_print_rec(netdissect_options *ndo,
             sequence_number = EXTRACT_32BITS(value + 4);
             time = format_interval(EXTRACT_32BITS(value + 8));
             hash = EXTRACT_64BITS(value + 12);
-            ND_PRINT((ndo, " NID: %s seqno: %u %s hash: %016lx",
+            ND_PRINT((ndo, " NID: %s seqno: %u %s hash: %016" PRIx64,
                 node_identifier,
                 sequence_number,
                 time,
