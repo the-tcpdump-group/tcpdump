@@ -299,6 +299,9 @@ struct udphdr {
 #ifndef ISAKMP_PORT_USER1
 #define ISAKMP_PORT_USER1		7500	/*XXX - nonstandard*/
 #endif
+#ifndef HNCP_PORT
+#define HNCP_PORT			8231	/* RFC 7788 */
+#endif
 #ifndef OTV_PORT
 #define OTV_PORT			8472	/* draft-hasmit-otv-04 */
 #endif
