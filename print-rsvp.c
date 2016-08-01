@@ -1061,20 +1061,37 @@ rsvp_obj_print(netdissect_options *ndo,
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_IPV4:
                 while(obj_tlen >= 4 ) {
+		    u_char length;
+
+		    ND_TCHECK2(*obj_tptr, 4);
+		    length = *(obj_tptr + 1);
                     ND_PRINT((ndo, "%s  Subobject Type: %s, length %u",
                            ident,
                            tok2str(rsvp_obj_xro_values,
                                    "Unknown %u",
                                    RSVP_OBJ_XRO_MASK_SUBOBJ(*obj_tptr)),
-                           *(obj_tptr + 1)));
+                           length));
 
-                    if (*(obj_tptr+1) == 0) { /* prevent infinite loops */
+                    if (length == 0) { /* prevent infinite loops */
                         ND_PRINT((ndo, "%s  ERROR: zero length ERO subtype", ident));
                         break;
                     }
 
                     switch(RSVP_OBJ_XRO_MASK_SUBOBJ(*obj_tptr)) {
+		    u_char prefix_length;
+
                     case RSVP_OBJ_XRO_IPV4:
+			if (length != 8) {
+				ND_PRINT((ndo, " ERROR: length != 8"));
+				goto invalid;
+			}
+			ND_TCHECK2(*obj_tptr, 8);
+			prefix_length = *(obj_tptr+6);
+			if (prefix_length != 32) {
+				ND_PRINT((ndo, " ERROR: Prefix length %u != 32",
+					  prefix_length));
+				goto invalid;
+			}
                         ND_PRINT((ndo, ", %s, %s/%u, Flags: [%s]",
                                RSVP_OBJ_XRO_MASK_LOOSE(*obj_tptr) ? "Loose" : "Strict",
                                ipaddr_string(ndo, obj_tptr+2),
@@ -1084,6 +1101,11 @@ rsvp_obj_print(netdissect_options *ndo,
                                    *(obj_tptr + 7)))); /* rfc3209 says that this field is rsvd. */
                     break;
                     case RSVP_OBJ_XRO_LABEL:
+			if (length != 8) {
+				ND_PRINT((ndo, " ERROR: length != 8"));
+				goto invalid;
+			}
+			ND_TCHECK2(*obj_tptr, 8);
                         ND_PRINT((ndo, ", Flags: [%s] (%#x), Class-Type: %s (%u), %u",
                                bittok2str(rsvp_obj_rro_label_flag_values,
                                    "none",
