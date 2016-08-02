@@ -39,7 +39,7 @@ static const struct tok nsh_flags [] = {
 
 #define NSH_BASE_HDR_LEN 4
 #define NSH_SERVICE_PATH_HDR_LEN 4
-#define NSH_HDR_WORD_SIZE 4
+#define NSH_HDR_WORD_SIZE 4U
 
 /*
  * NSH, draft-ietf-sfc-nsh-01 Network Service Header
