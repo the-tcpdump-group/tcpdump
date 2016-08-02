@@ -472,19 +472,19 @@ hncp_print_rec(netdissect_options *ndo,
             break;
 
         case DNCP_NODE_STATE: {
-            const char *node_identifier, *time;
+            const char *node_identifier, *interval;
             uint32_t sequence_number;
             uint64_t hash;
             if (bodylen < 20)
                 goto invalid;
             node_identifier = format_nid(value);
             sequence_number = EXTRACT_32BITS(value + 4);
-            time = format_interval(EXTRACT_32BITS(value + 8));
+            interval = format_interval(EXTRACT_32BITS(value + 8));
             hash = EXTRACT_64BITS(value + 12);
             ND_PRINT((ndo, " NID: %s seqno: %u %s hash: %016" PRIx64,
                 node_identifier,
                 sequence_number,
-                time,
+                interval,
                 hash
             ));
             hncp_print_rec(ndo, value+20, bodylen-20, indent+1);
