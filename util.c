@@ -51,6 +51,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef USE_LIBSMI
+#include <smi.h>
+#endif
+
+
 #include "interface.h"
 
 /* VARARGS */
@@ -68,7 +73,7 @@ error(const char *fmt, ...)
 		if (fmt[-1] != '\n')
 			(void)fputc('\n', stderr);
 	}
-	exit(1);
+	tcpdump_exit(1);
 	/* NOTREACHED */
 }
 
@@ -87,6 +92,17 @@ warning(const char *fmt, ...)
 		if (fmt[-1] != '\n')
 			(void)fputc('\n', stderr);
 	}
+}
+
+
+extern void tcpdump_exit(int status)
+{
+
+#ifdef USE_LIBSMI
+    smiExit();
+#endif
+
+    exit(status);
 }
 
 /*
