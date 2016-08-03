@@ -81,7 +81,7 @@ extern void warning(const char *, ...)
 #endif /* __ATTRIBUTE___FORMAT_OK */
      ;
 
-extern void tcpdump_exit(int status) __attribute__((noreturn));
+extern void exit_tcpdump(int status) __attribute__((noreturn));
 
 extern char *read_infile(char *);
 extern char *copy_argv(char **);

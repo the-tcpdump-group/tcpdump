@@ -288,7 +288,7 @@ show_tstamp_types_and_exit(const char *device)
 	if (n_tstamp_types == 0) {
 		fprintf(stderr, "Time stamp type cannot be set for %s\n",
 		    device);
-		tcpdump_exit(0);
+		exit_tcpdump(0);
 	}
 	fprintf(stderr, "Time stamp types for %s (use option -j to set):\n",
 	    device);
@@ -302,7 +302,7 @@ show_tstamp_types_and_exit(const char *device)
 		}
 	}
 	pcap_free_tstamp_types(tstamp_types);
-	tcpdump_exit(0);
+	exit_tcpdump(0);
 }
 #endif
 
@@ -355,7 +355,7 @@ show_dlts_and_exit(const char *device)
 #ifdef HAVE_PCAP_FREE_DATALINKS
 	pcap_free_datalinks(dlts);
 #endif
-	tcpdump_exit(0);
+	exit_tcpdump(0);
 }
 
 #ifdef HAVE_PCAP_FINDALLDEVS
@@ -377,7 +377,7 @@ show_devices_and_exit (void)
 		printf("\n");
 	}
 	pcap_freealldevs(devlist);
-	tcpdump_exit(0);
+	exit_tcpdump(0);
 }
 #endif /* HAVE_PCAP_FINDALLDEVS */
 
@@ -535,7 +535,7 @@ droproot(const char *username, const char *chroot_dir)
 	if (chroot_dir && !username) {
 		fprintf(stderr, "%s: Chroot without dropping root is insecure\n",
 			program_name);
-		tcpdump_exit(1);
+		exit_tcpdump(1);
 	}
 
 	pw = getpwnam(username);
@@ -544,7 +544,7 @@ droproot(const char *username, const char *chroot_dir)
 			if (chroot(chroot_dir) != 0 || chdir ("/") != 0) {
 				fprintf(stderr, "%s: Couldn't chroot/chdir to '%.64s': %s\n",
 					program_name, chroot_dir, pcap_strerror(errno));
-				tcpdump_exit(1);
+				exit_tcpdump(1);
 			}
 		}
 #ifdef HAVE_LIBCAP_NG
@@ -564,7 +564,7 @@ droproot(const char *username, const char *chroot_dir)
 				(unsigned long)pw->pw_uid,
 				(unsigned long)pw->pw_gid,
 				pcap_strerror(errno));
-			tcpdump_exit(1);
+			exit_tcpdump(1);
 		}
 		else {
 			fprintf(stderr, "dropped privs to %s\n", username);
@@ -574,7 +574,7 @@ droproot(const char *username, const char *chroot_dir)
 	else {
 		fprintf(stderr, "%s: Couldn't find user '%.32s'\n",
 			program_name, username);
-		tcpdump_exit(1);
+		exit_tcpdump(1);
 	}
 #ifdef HAVE_LIBCAP_NG
 	/* We don't need CAP_SETUID and CAP_SETGID any more. */
@@ -916,7 +916,7 @@ main(int argc, char **argv)
 
 		case 'h':
 			print_usage();
-			tcpdump_exit(0);
+			exit_tcpdump(0);
 			break;
 
 		case 'H':
@@ -1190,7 +1190,7 @@ main(int argc, char **argv)
 
 		case OPTION_VERSION:
 			print_version();
-			tcpdump_exit(0);
+			exit_tcpdump(0);
 			break;
 
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
@@ -1209,7 +1209,7 @@ main(int argc, char **argv)
 
 		default:
 			print_usage();
-			tcpdump_exit(1);
+			exit_tcpdump(1);
 			/* NOTREACHED */
 		}
 
@@ -1544,7 +1544,7 @@ main(int argc, char **argv)
 		pcap_close(pd);
 		free(cmdbuf);
 		pcap_freecode(&fcode);
-		tcpdump_exit(0);
+		exit_tcpdump(0);
 	}
 	init_print(ndo, localnet, netmask, timezone_offset);
 
@@ -1879,7 +1879,7 @@ main(int argc, char **argv)
 
 	free(cmdbuf);
 	pcap_freecode(&fcode);
-	tcpdump_exit(status == -1 ? 1 : 0);
+	exit_tcpdump(status == -1 ? 1 : 0);
 }
 
 /* make a clean exit on interrupts */
@@ -1919,7 +1919,7 @@ cleanup(int signo _U_)
 		(void)fflush(stdout);
 		info(1);
 	}
-	tcpdump_exit(0);
+	exit_tcpdump(0);
 #endif
 }
 
@@ -2019,7 +2019,7 @@ compress_savefile(const char *filename)
 			filename,
 			pcap_strerror(errno));
 #ifdef HAVE_FORK
-	tcpdump_exit(1);
+	exit_tcpdump(1);
 #else
 	_exit(1);
 #endif
@@ -2092,7 +2092,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			if (Cflag == 0 && Wflag > 0 && Gflag_count >= Wflag) {
 				(void)fprintf(stderr, "Maximum file limit reached: %d\n",
 				    Wflag);
-				tcpdump_exit(0);
+				exit_tcpdump(0);
 				/* NOTREACHED */
 			}
 			if (dump_info->CurrentFileName != NULL)

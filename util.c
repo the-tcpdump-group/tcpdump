@@ -73,7 +73,7 @@ error(const char *fmt, ...)
 		if (fmt[-1] != '\n')
 			(void)fputc('\n', stderr);
 	}
-	tcpdump_exit(1);
+	exit_tcpdump(1);
 	/* NOTREACHED */
 }
 
@@ -95,7 +95,7 @@ warning(const char *fmt, ...)
 }
 
 
-extern void tcpdump_exit(int status)
+extern void exit_tcpdump(int status)
 {
 
 #ifdef USE_LIBSMI

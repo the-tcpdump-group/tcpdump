@@ -430,7 +430,7 @@ ndo_error(netdissect_options *ndo, const char *fmt, ...)
 		if (fmt[-1] != '\n')
 			(void)fputc('\n', stderr);
 	}
-	tcpdump_exit(1);
+	exit_tcpdump(1);
 	/* NOTREACHED */
 }
 
