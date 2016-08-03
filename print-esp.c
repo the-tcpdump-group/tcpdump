@@ -43,6 +43,7 @@
 #endif
 
 #include "netdissect.h"
+#include "interface.h"
 #include "strtoaddr.h"
 #include "extract.h"
 
@@ -464,7 +465,7 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 		secretfile = fopen(filename, FOPEN_READ_TXT);
 		if (secretfile == NULL) {
 			perror(filename);
-			exit(3);
+			exit_tcpdump(3);
 		}
 
 		while (fgets(fileline, sizeof(fileline)-1, secretfile) != NULL) {

@@ -35,6 +35,7 @@
 #include <netdissect-stdinc.h>
 
 #include "netdissect.h"
+#include "interface.h"
 #include "addrtoname.h"
 #include "print.h"
 
@@ -429,7 +430,7 @@ ndo_error(netdissect_options *ndo, const char *fmt, ...)
 		if (fmt[-1] != '\n')
 			(void)fputc('\n', stderr);
 	}
-	exit(1);
+	exit_tcpdump(1);
 	/* NOTREACHED */
 }
 
