@@ -62,10 +62,6 @@ The Regents of the University of California.  All rights reserved.\n";
 #include <fcntl.h>
 #endif
 
-#ifdef USE_LIBSMI
-#include <smi.h>
-#endif
-
 #ifdef HAVE_LIBCRYPTO
 #include <openssl/crypto.h>
 #endif
@@ -1149,16 +1145,14 @@ main(int argc, char **argv)
 			break;
 
 		case 'm':
-#ifdef USE_LIBSMI
-			if (smiLoadModule(optarg) == 0) {
-				error("could not load MIB module %s", optarg);
+			if (nd_have_smi_support()) {
+				if (nd_load_smi_module(optarg, ebuf, sizeof ebuf) == -1)
+					error("%s", ebuf);
+			} else {
+				(void)fprintf(stderr, "%s: ignoring option `-m %s' ",
+					      program_name, optarg);
+				(void)fprintf(stderr, "(no libsmi support)\n");
 			}
-			ndo->ndo_mflag = 1;
-#else
-			(void)fprintf(stderr, "%s: ignoring option `-m %s' ",
-				      program_name, optarg);
-			(void)fprintf(stderr, "(no libsmi support)\n");
-#endif
 			break;
 
 		case 'M':
@@ -2476,6 +2470,7 @@ print_version(void)
 	static char pcap_version[] = "unknown";
 #endif /* defined(_WIN32) || defined(HAVE_PCAP_VERSION) */
 #endif /* HAVE_PCAP_LIB_VERSION */
+	const char *smi_version_string;
 
 #ifdef HAVE_PCAP_LIB_VERSION
 #ifdef _WIN32
@@ -2498,9 +2493,9 @@ print_version(void)
 	(void)fprintf (stderr, "%s\n", SSLeay_version(SSLEAY_VERSION));
 #endif
 
-#ifdef USE_LIBSMI
-	(void)fprintf (stderr, "SMI-library: %s\n", smi_version_string);
-#endif
+	smi_version_string = nd_smi_version_string();
+	if (smi_version_string != NULL)
+		(void)fprintf (stderr, "SMI-library: %s\n", smi_version_string);
 }
 USES_APPLE_RST
 
