@@ -429,6 +429,7 @@ ndo_error(netdissect_options *ndo, const char *fmt, ...)
 		if (fmt[-1] != '\n')
 			(void)fputc('\n', stderr);
 	}
+	nd_cleanup();
 	exit(1);
 	/* NOTREACHED */
 }

@@ -125,6 +125,11 @@ extern const char *tok2str(const struct tok *, const char *, u_int);
 extern char *bittok2str(const struct tok *, const char *, u_int);
 extern char *bittok2str_nosep(const struct tok *, const char *, u_int);
 
+/* Initialize netdissect. */
+extern int nd_init(char *, size_t);
+/* Clean up netdissect. */
+extern void nd_cleanup(void);
+
 typedef struct netdissect_options netdissect_options;
 
 #define IF_PRINTER_ARGS (netdissect_options *, const struct pcap_pkthdr *, const u_char *)

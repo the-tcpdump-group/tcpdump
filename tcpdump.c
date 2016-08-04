@@ -56,6 +56,12 @@ The Regents of the University of California.  All rights reserved.\n";
 
 #include <netdissect-stdinc.h>
 
+#include <sys/stat.h>
+
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
+
 #ifdef USE_LIBSMI
 #include <smi.h>
 #endif
@@ -77,12 +83,12 @@ The Regents of the University of California.  All rights reserved.\n";
 #include <sys/capability.h>
 #include <sys/ioccom.h>
 #include <net/bpf.h>
-#include <fcntl.h>
 #include <libgen.h>
 #endif	/* HAVE_CAPSICUM */
 #include <pcap.h>
 #include <signal.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
@@ -165,6 +171,18 @@ static int infoprint;
 char *program_name;
 
 /* Forwards */
+static void error(const char *, ...)
+     __attribute__((noreturn))
+#ifdef __ATTRIBUTE___FORMAT_OK
+     __attribute__((format (printf, 1, 2)))
+#endif /* __ATTRIBUTE___FORMAT_OK */
+     ;
+static void warning(const char *, ...)
+#ifdef __ATTRIBUTE___FORMAT_OK
+     __attribute__((format (printf, 1, 2)))
+#endif /* __ATTRIBUTE___FORMAT_OK */
+     ;
+static void exit_tcpdump(int) __attribute__((noreturn));
 static RETSIGTYPE cleanup(int);
 static RETSIGTYPE child_cleanup(int);
 static void print_version(void);
@@ -272,6 +290,49 @@ extern
 void pcap_set_optimizer_debug(int);
 #endif
 
+/* VARARGS */
+static void
+error(const char *fmt, ...)
+{
+	va_list ap;
+
+	(void)fprintf(stderr, "%s: ", program_name);
+	va_start(ap, fmt);
+	(void)vfprintf(stderr, fmt, ap);
+	va_end(ap);
+	if (*fmt) {
+		fmt += strlen(fmt);
+		if (fmt[-1] != '\n')
+			(void)fputc('\n', stderr);
+	}
+	exit_tcpdump(1);
+	/* NOTREACHED */
+}
+
+/* VARARGS */
+static void
+warning(const char *fmt, ...)
+{
+	va_list ap;
+
+	(void)fprintf(stderr, "%s: WARNING: ", program_name);
+	va_start(ap, fmt);
+	(void)vfprintf(stderr, fmt, ap);
+	va_end(ap);
+	if (*fmt) {
+		fmt += strlen(fmt);
+		if (fmt[-1] != '\n')
+			(void)fputc('\n', stderr);
+	}
+}
+
+static void
+exit_tcpdump(int status)
+{
+	nd_cleanup();
+	exit(status);
+}
+
 #ifdef HAVE_PCAP_SET_TSTAMP_TYPE
 static void
 show_tstamp_types_and_exit(const char *device)
@@ -288,7 +349,7 @@ show_tstamp_types_and_exit(const char *device)
 	if (n_tstamp_types == 0) {
 		fprintf(stderr, "Time stamp type cannot be set for %s\n",
 		    device);
-		exit(0);
+		exit_tcpdump(0);
 	}
 	fprintf(stderr, "Time stamp types for %s (use option -j to set):\n",
 	    device);
@@ -302,7 +363,7 @@ show_tstamp_types_and_exit(const char *device)
 		}
 	}
 	pcap_free_tstamp_types(tstamp_types);
-	exit(0);
+	exit_tcpdump(0);
 }
 #endif
 
@@ -355,7 +416,7 @@ show_dlts_and_exit(const char *device)
 #ifdef HAVE_PCAP_FREE_DATALINKS
 	pcap_free_datalinks(dlts);
 #endif
-	exit(0);
+	exit_tcpdump(0);
 }
 
 #ifdef HAVE_PCAP_FINDALLDEVS
@@ -377,7 +438,7 @@ show_devices_and_exit (void)
 		printf("\n");
 	}
 	pcap_freealldevs(devlist);
-	exit(0);
+	exit_tcpdump(0);
 }
 #endif /* HAVE_PCAP_FINDALLDEVS */
 
@@ -535,7 +596,7 @@ droproot(const char *username, const char *chroot_dir)
 	if (chroot_dir && !username) {
 		fprintf(stderr, "%s: Chroot without dropping root is insecure\n",
 			program_name);
-		exit(1);
+		exit_tcpdump(1);
 	}
 
 	pw = getpwnam(username);
@@ -544,7 +605,7 @@ droproot(const char *username, const char *chroot_dir)
 			if (chroot(chroot_dir) != 0 || chdir ("/") != 0) {
 				fprintf(stderr, "%s: Couldn't chroot/chdir to '%.64s': %s\n",
 					program_name, chroot_dir, pcap_strerror(errno));
-				exit(1);
+				exit_tcpdump(1);
 			}
 		}
 #ifdef HAVE_LIBCAP_NG
@@ -564,7 +625,7 @@ droproot(const char *username, const char *chroot_dir)
 				(unsigned long)pw->pw_uid,
 				(unsigned long)pw->pw_gid,
 				pcap_strerror(errno));
-			exit(1);
+			exit_tcpdump(1);
 		}
 		else {
 			fprintf(stderr, "dropped privs to %s\n", username);
@@ -574,7 +635,7 @@ droproot(const char *username, const char *chroot_dir)
 	else {
 		fprintf(stderr, "%s: Couldn't find user '%.32s'\n",
 			program_name, username);
-		exit(1);
+		exit_tcpdump(1);
 	}
 #ifdef HAVE_LIBCAP_NG
 	/* We don't need CAP_SETUID and CAP_SETGID any more. */
@@ -753,6 +814,85 @@ set_dumper_capsicum_rights(pcap_dumper_t *p)
 }
 #endif
 
+/*
+ * Copy arg vector into a new buffer, concatenating arguments with spaces.
+ */
+static char *
+copy_argv(register char **argv)
+{
+	register char **p;
+	register u_int len = 0;
+	char *buf;
+	char *src, *dst;
+
+	p = argv;
+	if (*p == 0)
+		return 0;
+
+	while (*p)
+		len += strlen(*p++) + 1;
+
+	buf = (char *)malloc(len);
+	if (buf == NULL)
+		error("copy_argv: malloc");
+
+	p = argv;
+	dst = buf;
+	while ((src = *p++) != NULL) {
+		while ((*dst++ = *src++) != '\0')
+			;
+		dst[-1] = ' ';
+	}
+	dst[-1] = '\0';
+
+	return buf;
+}
+
+/*
+ * On Windows, we need to open the file in binary mode, so that
+ * we get all the bytes specified by the size we get from "fstat()".
+ * On UNIX, that's not necessary.  O_BINARY is defined on Windows;
+ * we define it as 0 if it's not defined, so it does nothing.
+ */
+#ifndef O_BINARY
+#define O_BINARY	0
+#endif
+
+static char *
+read_infile(char *fname)
+{
+	register int i, fd, cc;
+	register char *cp;
+	struct stat buf;
+
+	fd = open(fname, O_RDONLY|O_BINARY);
+	if (fd < 0)
+		error("can't open %s: %s", fname, pcap_strerror(errno));
+
+	if (fstat(fd, &buf) < 0)
+		error("can't stat %s: %s", fname, pcap_strerror(errno));
+
+	cp = malloc((u_int)buf.st_size + 1);
+	if (cp == NULL)
+		error("malloc(%d) for %s: %s", (u_int)buf.st_size + 1,
+			fname, pcap_strerror(errno));
+	cc = read(fd, cp, (u_int)buf.st_size);
+	if (cc < 0)
+		error("read %s: %s", fname, pcap_strerror(errno));
+	if (cc != buf.st_size)
+		error("short read %s (%d != %d)", fname, cc, (int)buf.st_size);
+
+	close(fd);
+	/* replace "# comment" with spaces */
+	for (i = 0; i < cc; i++) {
+		if (cp[i] == '#')
+			while (i < cc && cp[i] != '\n')
+				cp[i++] = ' ';
+	}
+	cp[cc] = '\0';
+	return (cp);
+}
+
 int
 main(int argc, char **argv)
 {
@@ -796,6 +936,12 @@ main(int argc, char **argv)
 	netdissect_options *ndo = &Ndo;
 	int immediate_mode = 0;
 
+	/*
+	 * Initialize the netdissect code.
+	 */
+	if (nd_init(ebuf, sizeof ebuf) == -1)
+		error("%s", ebuf);
+
 	memset(ndo, 0, sizeof(*ndo));
 	ndo_set_function_pointers(ndo);
 	ndo->ndo_snaplen = DEFAULT_SNAPLEN;
@@ -827,10 +973,6 @@ main(int argc, char **argv)
 	 */
 	if (abort_on_misalignment(ebuf, sizeof(ebuf)) < 0)
 		error("%s", ebuf);
-
-#ifdef USE_LIBSMI
-	smiInit("tcpdump");
-#endif
 
 	while (
 	    (op = getopt_long(argc, argv, SHORTOPTS, longopts, NULL)) != -1)
@@ -916,7 +1058,7 @@ main(int argc, char **argv)
 
 		case 'h':
 			print_usage();
-			exit(0);
+			exit_tcpdump(0);
 			break;
 
 		case 'H':
@@ -1190,7 +1332,7 @@ main(int argc, char **argv)
 
 		case OPTION_VERSION:
 			print_version();
-			exit(0);
+			exit_tcpdump(0);
 			break;
 
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
@@ -1209,7 +1351,7 @@ main(int argc, char **argv)
 
 		default:
 			print_usage();
-			exit(1);
+			exit_tcpdump(1);
 			/* NOTREACHED */
 		}
 
@@ -1544,7 +1686,7 @@ main(int argc, char **argv)
 		pcap_close(pd);
 		free(cmdbuf);
 		pcap_freecode(&fcode);
-		exit(0);
+		exit_tcpdump(0);
 	}
 	init_print(ndo, localnet, netmask, timezone_offset);
 
@@ -1879,7 +2021,7 @@ main(int argc, char **argv)
 
 	free(cmdbuf);
 	pcap_freecode(&fcode);
-	exit(status == -1 ? 1 : 0);
+	exit_tcpdump(status == -1 ? 1 : 0);
 }
 
 /* make a clean exit on interrupts */
@@ -1919,7 +2061,7 @@ cleanup(int signo _U_)
 		(void)fflush(stdout);
 		info(1);
 	}
-	exit(0);
+	exit_tcpdump(0);
 #endif
 }
 
@@ -2092,7 +2234,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			if (Cflag == 0 && Wflag > 0 && Gflag_count >= Wflag) {
 				(void)fprintf(stderr, "Maximum file limit reached: %d\n",
 				    Wflag);
-				exit(0);
+				exit_tcpdump(0);
 				/* NOTREACHED */
 			}
 			if (dump_info->CurrentFileName != NULL)
