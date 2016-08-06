@@ -27,8 +27,9 @@
 #endif
 
 #include <netdissect-stdinc.h>
-
 #include "netdissect.h"
+#include <string.h>
+#include <stdio.h>
 
 #ifdef USE_LIBSMI
 #include <smi.h>
@@ -74,7 +75,7 @@ nd_init(char *errbuf, size_t errbuf_size)
 	 * Clears the error buffer, and uses it so we don't get
 	 * "unused argument" warnings at compile time.
 	 */
-	snprintf(errbuf, errbuf_size, "");
+	strlcpy(errbuf, "", errbuf_size);
 	return (0);
 }
 
