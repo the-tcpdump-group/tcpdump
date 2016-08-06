@@ -48,6 +48,7 @@ nd_init(char *errbuf, size_t errbuf_size)
 #ifdef _WIN32
 	WORD wVersionRequested;
 	WSADATA wsaData;
+	int err;
 
 	/*
 	 * Request Winsock 2.2; we expect Winsock 2.
