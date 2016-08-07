@@ -188,12 +188,12 @@ addrtostr6 (const void *src, char *dst, size_t size)
      *tp++ = ':';
   *tp++ = '\0';
 
-  /* Check for overflow, copy, and we're done.
+  /* Copy and check for overflow.
    */
-  if ((size_t)(tp - tmp) > size)
+  if (strlcpy (dst, tmp, size) >= size)
   {
     errno = ENOSPC;
     return (NULL);
   }
-  return strcpy (dst, tmp);
+  return (dst);
 }
