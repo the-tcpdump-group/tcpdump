@@ -119,7 +119,7 @@ pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	}
 
 #define MIN_PFLOG_HDRLEN	45
-	hdr = (struct pfloghdr *)p;
+	hdr = (const struct pfloghdr *)p;
 	if (hdr->length < MIN_PFLOG_HDRLEN) {
 		ND_PRINT((ndo, "[pflog: invalid header length!]"));
 		return (hdr->length);	/* XXX: not really */
@@ -132,7 +132,6 @@ pflog_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	}
 
 	/* print what we know */
-	hdr = (struct pfloghdr *)p;
 	ND_TCHECK(*hdr);
 	if (ndo->ndo_eflag)
 		pflog_print(ndo, hdr);
