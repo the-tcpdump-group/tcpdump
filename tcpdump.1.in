@@ -400,7 +400,7 @@ If the
 flag is supported, an interface number as printed by that flag can be
 used as the
 .I interface
-argument.
+argument, if no interface on the system has that number as a name.
 .TP
 .B \-I
 .PD 0
