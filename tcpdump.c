@@ -958,8 +958,17 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 
 #ifdef HAVE_PCAP_CREATE
 	pc = pcap_create(device, ebuf);
-	if (pc == NULL)
+	if (pc == NULL) {
+		/*
+		 * If this failed with "No such device", that means
+		 * the interface doesn't exist; return NULL, so that
+		 * the caller can see whether the device name is
+		 * actually an interface index.
+		 */
+		if (strstr(ebuf, "No such device") != NULL)
+			return (NULL);
 		error("%s", ebuf);
+	}
 #ifdef HAVE_PCAP_SET_TSTAMP_TYPE
 	if (Jflag)
 		show_tstamp_types_and_exit(device);
@@ -1070,9 +1079,18 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 #else /* HAVE_PCAP_CREATE */
 	*ebuf = '\0';
 	pc = pcap_open_live(device, ndo->ndo_snaplen, !pflag, 1000, ebuf);
-	if (pc == NULL)
+	if (pc == NULL) {
+		/*
+		 * If this failed with "No such device", that means
+		 * the interface doesn't exist; return NULL, so that
+		 * the caller can see whether the device name is
+		 * actually an interface index.
+		 */
+		if (strstr(ebuf, "No such device") != NULL)
+			return (NULL);
 		error("%s", ebuf);
-	else if (*ebuf)
+	}
+	if (*ebuf)
 		warning("%s", ebuf);
 #endif /* HAVE_PCAP_CREATE */
 
