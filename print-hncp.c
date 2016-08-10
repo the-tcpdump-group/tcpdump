@@ -364,7 +364,7 @@ hncp_print_rec(netdissect_options *ndo,
 
     u_int i, t;
 
-    uint32_t last_type_mask = -1;
+    uint32_t last_type_mask = 0xffffffffU;
     int last_type_count = -1;
 
     const u_char *tlv, *value;
