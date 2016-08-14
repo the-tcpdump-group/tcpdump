@@ -21,6 +21,8 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+/* \summary: IPSEC Authentication Header printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

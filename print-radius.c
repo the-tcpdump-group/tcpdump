@@ -19,6 +19,9 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
+
+/* \summary: Radius protocol printer */
+
 /*
  * Radius printer routines as specified on:
  *

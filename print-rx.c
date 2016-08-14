@@ -20,6 +20,9 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
+
+/* \summary: AFS RX printer */
+
 /*
  * This code unmangles RX packets.  RX is the mutant form of RPC that AFS
  * uses to communicate between clients and servers.

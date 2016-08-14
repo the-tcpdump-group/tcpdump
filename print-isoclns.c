@@ -24,6 +24,8 @@
  * complete IS-IS & CLNP support.
  */
 
+/* \summary: ISO CLNS, ESIS, and ISIS printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

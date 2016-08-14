@@ -21,6 +21,8 @@
  * Original code by Greg Stark <gsstark@mit.edu>
  */
 
+/* \summary: PPP-over-Ethernet (PPPoE) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

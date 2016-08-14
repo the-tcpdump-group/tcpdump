@@ -23,6 +23,8 @@
  *	loosely based on print-bootp.c
  */
 
+/* \summary: Network Time Protocol (NTP) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

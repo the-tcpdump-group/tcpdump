@@ -19,6 +19,8 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+/* \summary: Compressed Serial Line Internet Protocol printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

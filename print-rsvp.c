@@ -15,6 +15,8 @@
  * Original code by Hannes Gredler (hannes@juniper.net)
  */
 
+/* \summary: Resource ReSerVation Protocol (RSVP) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

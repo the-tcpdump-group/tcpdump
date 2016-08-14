@@ -22,6 +22,8 @@
  * Contributed by Brad Parker (brad@fcr.com).
  */
 
+/* \summary: Novell IPX printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

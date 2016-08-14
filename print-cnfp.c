@@ -30,6 +30,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* \summary: Cisco NetFlow protocol printer */
+
 /*
  * Cisco NetFlow protocol
  *

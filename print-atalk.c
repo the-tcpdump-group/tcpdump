@@ -21,6 +21,8 @@
  * Format and print AppleTalk packets.
  */
 
+/* \summary: AppleTalk printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

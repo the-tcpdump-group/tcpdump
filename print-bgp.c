@@ -30,6 +30,8 @@
  * complete BGP support.
  */
 
+/* \summary: Border Gateway Protocol (BGP) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

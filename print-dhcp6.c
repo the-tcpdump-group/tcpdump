@@ -26,6 +26,9 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+
+/* \summary: IPv6 DHCP printer */
+
 /*
  * RFC3315: DHCPv6
  * supported DHCPv6 options:

@@ -23,6 +23,8 @@
  * FOR A PARTICULAR PURPOSE.
  */
 
+/* \summary: Virtual Router Redundancy Protocol (VRRP) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

@@ -21,6 +21,8 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+/* \summary: IPSEC Encapsulating Security Payload (ESP) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

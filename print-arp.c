@@ -19,6 +19,8 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+/* \summary: Address Resolution Protocol (ARP) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

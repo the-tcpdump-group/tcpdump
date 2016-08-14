@@ -6,6 +6,8 @@
  * or later
  */
 
+/* \summary: SMB/CIFS printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

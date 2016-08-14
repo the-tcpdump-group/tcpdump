@@ -56,6 +56,8 @@
  #	@(#)snmp.awk.x	1.1 (LANL) 1/15/90
  */
 
+/* \summary: Simple Network Management Protocol (SNMP) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

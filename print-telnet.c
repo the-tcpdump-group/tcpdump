@@ -45,6 +45,8 @@
  *      are preserved in all copies.
  */
 
+/* \summary: Telnet option printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
