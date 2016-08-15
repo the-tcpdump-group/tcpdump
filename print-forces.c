@@ -14,6 +14,10 @@
  *
  */
 
+/* \summary: Forwarding and Control Element Separation (ForCES) Protocol printer */
+
+/* specification: RFC 5810 */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -25,9 +29,6 @@
 
 static const char tstr[] = "[|forces]";
 
-/*
- * RFC5810: Forwarding and Control Element Separation (ForCES) Protocol
- */
 #define	ForCES_VERS	1
 #define	ForCES_HDRL	24
 #define	ForCES_ALNL	4U

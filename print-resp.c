@@ -1,7 +1,4 @@
 /*
- * This file implements decoding of the REdis Serialization Protocol.
- *
- *
  * Copyright (c) 2015 The TCPDUMP project
  * All rights reserved.
  *
@@ -29,6 +26,8 @@
  *
  * Initial contribution by Andrew Darqui (andrew.darqui@gmail.com).
  */
+
+/* \summary: REdis Serialization Protocol (RESP) printer */
 
 #define NETDISSECT_REWORKED
 #ifdef HAVE_CONFIG_H

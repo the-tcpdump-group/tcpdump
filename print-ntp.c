@@ -18,7 +18,6 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * Format and print ntp packets.
  *	By Jeffrey Mogul/DECWRL
  *	loosely based on print-bootp.c
  */

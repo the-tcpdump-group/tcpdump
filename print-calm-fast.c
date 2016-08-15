@@ -15,6 +15,8 @@
  * Original code by Ola Martin Lykkja (ola.lykkja@q-free.com)
  */
 
+/* \summary: Communication access for land mobiles (CALM) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

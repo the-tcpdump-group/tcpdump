@@ -20,6 +20,8 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+/* \summary: IEEE 802.15.4 printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

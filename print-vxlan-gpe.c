@@ -21,6 +21,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* \summary: Generic Protocol Extension for VXLAN (VXLAN GPE) printer */
+
+/* specification: draft-ietf-nvo3-vxlan-gpe-01 */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

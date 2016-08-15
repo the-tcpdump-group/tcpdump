@@ -25,6 +25,8 @@
  * DAMAGE.
  */
 
+/* \summary: DLT_NFLOG printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

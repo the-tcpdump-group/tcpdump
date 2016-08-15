@@ -14,6 +14,8 @@
  *  and Steinar Haug (sthaug@nethelp.no)
  */
 
+/* \summary: Label Distribution Protocol (LDP) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

@@ -12,12 +12,12 @@
  * LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE.
  *
- * support for the IEEE Link Discovery Protocol as per 802.1AB
- *
  * Original code by Hannes Gredler (hannes@juniper.net)
  * IEEE and TIA extensions by Carles Kishimoto <carles.kishimoto@gmail.com>
  * DCBX extensions by Kaladhar Musunuru <kaladharm@sourceforge.net>
  */
+
+/* \summary: IEEE 802.1ab Link Layer Discovery Protocol (LLDP) printer */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

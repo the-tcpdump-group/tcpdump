@@ -12,10 +12,10 @@
  * LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE.
  *
- * Dynamic Trunk Protocol (DTP)
- *
  * Original code by Carles Kishimoto <carles.kishimoto@gmail.com>
  */
+
+/* \summary: Dynamic Trunking Protocol (DTP) printer */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

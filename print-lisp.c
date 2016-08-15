@@ -26,9 +26,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* \summary: - Locator/Identifier Separation Protocol (LISP) printer */
+
 /*
- * netdissect printer for LISP - Locator/Identifier Separation Protocol
- * RFC 6830
+ * specification: RFC 6830
  *
  *
  * The Map-Register message format is:

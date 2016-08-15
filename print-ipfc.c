@@ -19,6 +19,10 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+/* \summary: IP over Fibre Channel printer */
+
+/* specification: RFC 2625 */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -31,10 +35,6 @@
 #include "addrtoname.h"
 
 #include "ether.h"
-
-/*
- * RFC 2625 IP-over-Fibre Channel.
- */
 
 struct ipfc_header {
 	u_char  ipfc_dhost[8];

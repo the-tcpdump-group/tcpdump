@@ -12,10 +12,10 @@
  * LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE.
  *
- * Support for the IEEE Connectivity Fault Management Protocols as per 802.1ag.
- *
  * Original code by Hannes Gredler (hannes@juniper.net)
  */
+
+/* \summary: IEEE 802.1ag Connectivity Fault Management (CFM) protocols printer */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

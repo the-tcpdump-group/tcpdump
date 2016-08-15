@@ -12,12 +12,14 @@
  * LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE.
  *
- * The SFLOW protocol as per http://www.sflow.org/developers/specifications.php
- *
  * Original code by Carles Kishimoto <carles.kishimoto@gmail.com>
  *
  * Expansion and refactoring by Rick Jones <rick.jones2@hp.com>
  */
+
+/* \summary: sFlow protocol printer */
+
+/* specification: http://www.sflow.org/developers/specifications.php */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

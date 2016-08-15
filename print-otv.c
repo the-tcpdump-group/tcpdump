@@ -13,6 +13,10 @@
  * Original code by Francesco Fondelli (francesco dot fondelli, gmail dot com)
  */
 
+/* \summary: Overlay Transport Virtualization (OTV) printer */
+
+/* specification: draft-hasmit-otv-04 */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

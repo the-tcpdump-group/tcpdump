@@ -1,9 +1,4 @@
 /*
- * This module implements decoding of the Loopback Protocol, originally
- * defined as the Configuration Testing Protocol. It is based on the following
- * specification:
- * http://www.mit.edu/people/jhawk/ctp.pdf
- *
  * Copyright (c) 2014 The TCPDUMP project
  * All rights reserved.
  *
@@ -28,6 +23,13 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/* \summary: Loopback Protocol printer */
+
+/*
+ * originally defined as the Ethernet Configuration Testing Protocol.
+ * specification: http://www.mit.edu/people/jhawk/ctp.pdf
  */
 
 #ifdef HAVE_CONFIG_H

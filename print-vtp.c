@@ -12,8 +12,6 @@
  * LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE.
  *
- * VLAN TRUNKING PROTOCOL (VTP)
- *
  * Reference documentation:
  *  http://www.cisco.com/en/US/tech/tk389/tk689/technologies_tech_note09186a0080094c52.shtml
  *  http://www.cisco.com/warp/public/473/21.html
@@ -21,6 +19,8 @@
  *
  * Original code ode by Carles Kishimoto <carles.kishimoto@gmail.com>
  */
+
+/* \summary: Cisco VLAN Trunking Protocol (VTP) printer */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

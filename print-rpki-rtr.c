@@ -12,10 +12,12 @@
  * LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE.
  *
- * support for the The RPKI/Router Protocol as RFC6810
- *
  * Original code by Hannes Gredler (hannes@juniper.net)
  */
+
+/* \summary: Resource Public Key Infrastructure (RPKI) to Router Protocol printer */
+
+/* specification: RFC 6810 */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
