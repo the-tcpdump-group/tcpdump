@@ -15,6 +15,8 @@
 
 /* \summary: Bidirectional Forwarding Detection (BFD) printer */
 
+/* specification: RFC 5880 (for version 1) */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -47,12 +49,12 @@
  */
 
 /*
- *  Control packet, BFDv1, draft-ietf-bfd-base-02.txt
+ *  Control packet, BFDv1, RFC 5880
  *
  *     0                   1                   2                   3
  *     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *    |Vers |  Diag   |Sta|P|F|C|A|D|R|  Detect Mult  |    Length     |
+ *    |Vers |  Diag   |Sta|P|F|C|A|D|M|  Detect Mult  |    Length     |
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *    |                       My Discriminator                        |
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -147,7 +149,7 @@ static const struct tok bfd_v1_flag_values[] = {
     { 0x08, "Control Plane Independent" },
     { BFD_FLAG_AUTH, "Authentication Present" },
     { 0x02, "Demand" },
-    { 0x01, "Reserved" },
+    { 0x01, "Multipoint" },
     { 0, NULL }
 };
 
