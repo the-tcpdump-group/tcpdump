@@ -40,6 +40,8 @@
 #include "addrtoname.h"
 #include "extract.h"
 
+static const char tstr[] = "[|MOBILITY]";
+
 /* Mobility header */
 struct ip6_mobility {
 	uint8_t ip6m_pproto;	/* following payload protocol (for PG) */
@@ -107,7 +109,7 @@ static const unsigned ip6m_hdrlen[IP6M_MAX + 1] = {
 #define IP6MOPT_AUTH          0x5	/* Binding Authorization Data */
 #define IP6MOPT_AUTH_MINLEN    12
 
-static void
+static int
 mobility_opt_print(netdissect_options *ndo,
                    const u_char *bp, const unsigned len)
 {
@@ -181,10 +183,10 @@ mobility_opt_print(netdissect_options *ndo,
 			break;
 		}
 	}
-	return;
+	return 0;
 
 trunc:
-	ND_PRINT((ndo, "[trunc] "));
+	return 1;
 }
 
 /*
@@ -238,7 +240,7 @@ mobility_print(netdissect_options *ndo,
 	case IP6M_HOME_TEST_INIT:
 	case IP6M_CAREOF_TEST_INIT:
 		hlen = IP6M_MINLEN;
-    		if (ndo->ndo_vflag) {
+		if (ndo->ndo_vflag) {
 			ND_TCHECK2(*mh, hlen + 8);
 			ND_PRINT((ndo, " %s Init Cookie=%08x:%08x",
 			       type == IP6M_HOME_TEST_INIT ? "Home" : "Care-of",
@@ -252,7 +254,7 @@ mobility_print(netdissect_options *ndo,
 		ND_TCHECK(mh->ip6m_data16[0]);
 		ND_PRINT((ndo, " nonce id=0x%x", EXTRACT_16BITS(&mh->ip6m_data16[0])));
 		hlen = IP6M_MINLEN;
-    		if (ndo->ndo_vflag) {
+		if (ndo->ndo_vflag) {
 			ND_TCHECK2(*mh, hlen + 8);
 			ND_PRINT((ndo, " %s Init Cookie=%08x:%08x",
 			       type == IP6M_HOME_TEST ? "Home" : "Care-of",
@@ -260,7 +262,7 @@ mobility_print(netdissect_options *ndo,
 			       EXTRACT_32BITS(&bp[hlen + 4])));
 		}
 		hlen += 8;
-    		if (ndo->ndo_vflag) {
+		if (ndo->ndo_vflag) {
 			ND_TCHECK2(*mh, hlen + 8);
 			ND_PRINT((ndo, " %s Keygen Token=%08x:%08x",
 			       type == IP6M_HOME_TEST ? "Home" : "Care-of",
@@ -322,12 +324,13 @@ mobility_print(netdissect_options *ndo,
 		return(mhlen);
 		break;
 	}
-    	if (ndo->ndo_vflag)
-		mobility_opt_print(ndo, &bp[hlen], mhlen - hlen);
+	if (ndo->ndo_vflag)
+		if (mobility_opt_print(ndo, &bp[hlen], mhlen - hlen))
+			goto trunc;;
 
 	return(mhlen);
 
  trunc:
-	ND_PRINT((ndo, "[|MOBILITY]"));
+	ND_PRINT((ndo, "%s", tstr));
 	return(mhlen);
 }
