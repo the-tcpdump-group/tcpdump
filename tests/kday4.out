@@ -18,10 +18,7 @@ IP (tos 0x0, ttl 64, id 36752, offset 0, flags [DF], proto TCP (6), length 399, 
 	  0x0030:  afc4 39a4 0db9 7aa5 6873 33e8
 	RPKI-RTRv65, Error Report PDU (10), length: 66
 	  Error code: Unknown (66), Encapsulated PDU length: 37
-	    -----encapsulated PDU-----|trunc|trunc
-	RPKI-RTRv115, Error Report PDU (10), length: 66
-	  Error code: Unknown (66), Encapsulated PDU length: 12
-	    -----encapsulated PDU-----|trunc|trunc
+	    -----encapsulated PDU-----
 	[|RPKI-RTR]
 IP (tos 0x10, ttl 62, id 64806, offset 0, flags [DF], proto TCP (6), length 52)
     204.9.51.132.50079 > 204.9.54.80.22: Flags [.], cksum 0x8611 (incorrect -> 0xa678), ack 1819218606, win 4094, options [nop,nop,TS val 941371775 ecr 4294967242], length 0
@@ -38,10 +35,7 @@ IP (tos 0x0, ttl 64, id 36752, offset 0, flags [DF], proto TCP (6), length 399, 
 	  0x0030:  afc4 39a4 0db9 7aa5 6873 33e8
 	RPKI-RTRv65, Error Report PDU (10), length: 66
 	  Error code: Unknown (66), Encapsulated PDU length: 37
-	    -----encapsulated PDU-----|trunc|trunc
-	RPKI-RTRv115, Error Report PDU (10), length: 66
-	  Error code: Unknown (66), Encapsulated PDU length: 12
-	    -----encapsulated PDU-----|trunc|trunc
+	    -----encapsulated PDU-----
 	[|RPKI-RTR]
 IP truncated-ip - 768 bytes missing! (tos 0x10, ttl 62, id 64806, offset 0, flags [DF], proto TCP (6), length 820, bad cksum 3da6 (->3aa6)!)
     204.9.51.132.50079 > 204.9.54.80.22: Flags [.], seq 0:768, ack 1, win 4094, options [nop,nop,TS val 941371775 ecr 4294967242], length 768
@@ -59,6 +53,6 @@ IP (tos 0x0, ttl 64, id 36752, offset 0, flags [DF], proto TCP (6), length 399, 
 	RPKI-RTRv65, Error Report PDU (10), length: 66
 	  Error code: Unknown (66), Encapsulated PDU length: 100
 	  Error text: ^@^@^@M-^?M-^?^_^[pM-xWM-nhMM-}M_M-YM-=M-G^I0M-,M-^AvM-3mM-L^Q:M-?^RM-^QM-q^FNM-^aM-tbM-^WM-/M-D9M-$^MM-9zM-%hs3M-hA^J^@B^@^@^@B^@^@^@%M-Dz^HM-i^RM-^DM-5M-^\M->0H^H^@E^P^@4M-}&@^@>^F
-	RPKI-RTRv115, Error Report PDU (10), length: 66|trunc
+	RPKI-RTRv115, Error Report PDU (10), length: 66
 	[|RPKI-RTR]
 EXIT CODE 00000100

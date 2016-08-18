@@ -31,6 +31,8 @@
 #include "extract.h"
 #include "addrtoname.h"
 
+static const char tstr[] = "[|RPKI-RTR]";
+
 /*
  * RPKI/Router PDU header
  *
@@ -169,7 +171,7 @@ indent_string (u_int indent)
 /*
  * Print a single PDU.
  */
-static void
+static int
 rpki_rtr_pdu_print (netdissect_options *ndo, const u_char *tptr, u_int indent)
 {
     const rpki_rtr_pdu *pdu_header;
@@ -271,7 +273,8 @@ rpki_rtr_pdu_print (netdissect_options *ndo, const u_char *tptr, u_int indent)
 	    if (encapsulated_pdu_length &&
 		(encapsulated_pdu_length <= tlen)) {
 		ND_PRINT((ndo, "%s-----encapsulated PDU-----", indent_string(indent+4)));
-		rpki_rtr_pdu_print(ndo, tptr, indent+2);
+		if (rpki_rtr_pdu_print(ndo, tptr, indent+2))
+			goto trunc;
 	    }
 
 	    tptr += encapsulated_pdu_length;
@@ -307,11 +310,10 @@ rpki_rtr_pdu_print (netdissect_options *ndo, const u_char *tptr, u_int indent)
     if (ndo->ndo_vflag > 1 || (ndo->ndo_vflag && hexdump)) {
 	print_unknown_data(ndo,tptr,"\n\t  ", pdu_len);
     }
-    return;
+    return 0;
 
- trunc:
-    ND_PRINT((ndo, "|trunc"));
-    return;
+trunc:
+    return 1;
 }
 
 void
@@ -350,14 +352,15 @@ rpki_rtr_print(netdissect_options *ndo, register const u_char *pptr, register u_
 	/*
 	 * Print the PDU.
 	 */
-	rpki_rtr_pdu_print(ndo, tptr, 8);
+	if (rpki_rtr_pdu_print(ndo, tptr, 8))
+		goto trunc;
 
         tlen -= pdu_len;
         tptr += pdu_len;
     }
     return;
- trunc:
-    ND_PRINT((ndo, "\n\t[|RPKI-RTR]"));
+trunc:
+    ND_PRINT((ndo, "\n\t%s", tstr));
 }
 
 /*
