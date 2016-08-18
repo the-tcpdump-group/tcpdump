@@ -6,19 +6,19 @@ IP6 (hlim 64, next-header UDP (17) payload length: 12) fe80::21e:64ff:fe23:4d34.
 IP6 (hlim 64, next-header UDP (17) payload length: 80) fe80::218:f3ff:fea9:914e.8231 > fe80::21e:64ff:fe23:4d34.8231: [udp sum ok] hncp (72)
 	Node endpoint (12) NID: 31:da:78:d2 EPID: 03000000
 	Network state (12) hash: 2ae5f77255200bcc
-	Node state (24) NID: 31:da:78:d2 seqno: 19 290.16s hash: 800088c8e0714638
-	Node state (24) NID: 61:69:ed:63 seqno: 12 521.77s hash: 011fffa1da966148
+	Node state (24) NID: 31:da:78:d2 seqno: 19 160.088s hash: 800088c8e0714638
+	Node state (24) NID: 61:69:ed:63 seqno: 12 969.681s hash: 011fffa1da966148
 IP6 (hlim 64, next-header UDP (17) payload length: 16) fe80::21e:64ff:fe23:4d34.8231 > fe80::218:f3ff:fea9:914e.8231: [udp sum ok] hncp (8)
 	Request node state (8) NID: 31:da:78:d2
 IP6 (hlim 64, next-header UDP (17) payload length: 16) fe80::21e:64ff:fe23:4d34.8231 > fe80::218:f3ff:fea9:914e.8231: [udp sum ok] hncp (8)
 	Request node state (8) NID: 61:69:ed:63
 IP6 (hlim 64, next-header UDP (17) payload length: 332) fe80::218:f3ff:fea9:914e.8231 > fe80::21e:64ff:fe23:4d34.8231: [udp sum ok] hncp (324)
 	Node endpoint (12) NID: 31:da:78:d2 EPID: 03000000
-	Node state (312) NID: 31:da:78:d2 seqno: 19 290.33s hash: 800088c8e0714638
+	Node state (312) NID: 31:da:78:d2 seqno: 19 160.105s hash: 800088c8e0714638
 		Peer (16) Peer-NID: 61:69:ed:63 Peer-EPID: 01000000 Local-EPID: 01000000
 		HNCP-Version (22) M: 0 P: 4 H: 4 L: 4 User-agent: hnetd/cac971d
 		External-Connection (52)
-			Delegated-Prefix (36) VLSO: 5.99s PLSO: 2.99s Prefix: 10.0.0.0/8
+			Delegated-Prefix (36) VLSO: 0.599s PLSO: 0.299s Prefix: 10.0.0.0/8
 				Prefix-Policy (5) type: Internet connectivity
 			DHCPv4-Data (10)
 				DNS-server (6) 192.168.1.254
@@ -32,11 +32,11 @@ IP6 (hlim 64, next-header UDP (17) payload length: 332) fe80::218:f3ff:fea9:914e
 		Node-Name (23) IP-Address: 10.0.101.27 Name: "r1"
 IP6 (hlim 64, next-header UDP (17) payload length: 564) fe80::218:f3ff:fea9:914e.8231 > fe80::21e:64ff:fe23:4d34.8231: [udp sum ok] hncp (556)
 	Node endpoint (12) NID: 31:da:78:d2 EPID: 03000000
-	Node state (544) NID: 61:69:ed:63 seqno: 12 521.95s hash: 011fffa1da966148
+	Node state (544) NID: 61:69:ed:63 seqno: 12 969.699s hash: 011fffa1da966148
 		Peer (16) Peer-NID: 31:da:78:d2 Peer-EPID: 01000000 Local-EPID: 01000000
 		HNCP-Version (22) M: 0 P: 4 H: 4 L: 4 User-agent: hnetd/cac971d
 		External-Connection (23)
-			Delegated-Prefix (19) VLSO: 5.99s PLSO: 2.99s Prefix: fd1f:f88c:e207::/48
+			Delegated-Prefix (19) VLSO: 0.599s PLSO: 0.299s Prefix: fd1f:f88c:e207::/48
 		Assigned-Prefix (18) EPID: 01000000 Prty: 2 Prefix: fd1f:f88c:e207::/64
 		Assigned-Prefix (18) EPID: 03000000 Prty: 2 Prefix: fd1f:f88c:e207:17::/64
 		Assigned-Prefix (25) EPID: 03000000 Prty: 2 Prefix: 10.0.116.0/24
