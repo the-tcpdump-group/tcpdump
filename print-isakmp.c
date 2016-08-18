@@ -1465,7 +1465,7 @@ trunc:
 
 static const u_char *
 ikev1_cert_print(netdissect_options *ndo, u_char tpay _U_,
-		 const struct isakmp_gen *ext, u_int item_len _U_,
+		 const struct isakmp_gen *ext, u_int item_len,
 		 const u_char *ep _U_, uint32_t phase _U_,
 		 uint32_t doi0 _U_,
 		 uint32_t proto0 _U_, int depth _U_)
@@ -1498,7 +1498,7 @@ trunc:
 
 static const u_char *
 ikev1_cr_print(netdissect_options *ndo, u_char tpay _U_,
-	       const struct isakmp_gen *ext, u_int item_len _U_,
+	       const struct isakmp_gen *ext, u_int item_len,
 	       const u_char *ep _U_, uint32_t phase _U_, uint32_t doi0 _U_,
 	       uint32_t proto0 _U_, int depth _U_)
 {
@@ -1580,7 +1580,7 @@ static const u_char *
 ikev1_nonce_print(netdissect_options *ndo, u_char tpay _U_,
 		  const struct isakmp_gen *ext,
 		  u_int item_len _U_,
-		  const u_char *ep _U_,
+		  const u_char *ep,
 		  uint32_t phase _U_, uint32_t doi _U_,
 		  uint32_t proto _U_, int depth _U_)
 {
@@ -1968,9 +1968,9 @@ trunc:
 static const u_char *
 ikev2_sa_print(netdissect_options *ndo, u_char tpay,
 		const struct isakmp_gen *ext1,
-		u_int item_len _U_, const u_char *ep _U_,
+		u_int item_len _U_, const u_char *ep,
 		uint32_t phase _U_, uint32_t doi _U_,
-		uint32_t proto _U_, int depth _U_)
+		uint32_t proto _U_, int depth)
 {
 	struct isakmp_gen e;
 	int    osa_length, sa_length;
@@ -2127,7 +2127,7 @@ ikev2_cr_print(netdissect_options *ndo, u_char tpay,
 static const u_char *
 ikev2_auth_print(netdissect_options *ndo, u_char tpay,
 		const struct isakmp_gen *ext,
-		u_int item_len _U_, const u_char *ep _U_,
+		u_int item_len _U_, const u_char *ep,
 		uint32_t phase _U_, uint32_t doi _U_,
 		uint32_t proto _U_, int depth _U_)
 {
@@ -2163,7 +2163,7 @@ trunc:
 static const u_char *
 ikev2_nonce_print(netdissect_options *ndo, u_char tpay,
 		const struct isakmp_gen *ext,
-		u_int item_len _U_, const u_char *ep _U_,
+		u_int item_len _U_, const u_char *ep,
 		uint32_t phase _U_, uint32_t doi _U_,
 		uint32_t proto _U_, int depth _U_)
 {
@@ -2193,7 +2193,7 @@ trunc:
 static const u_char *
 ikev2_n_print(netdissect_options *ndo, u_char tpay _U_,
 		const struct isakmp_gen *ext,
-		u_int item_len _U_, const u_char *ep _U_,
+		u_int item_len, const u_char *ep,
 		uint32_t phase _U_, uint32_t doi _U_,
 		uint32_t proto _U_, int depth _U_)
 {

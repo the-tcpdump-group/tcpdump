@@ -1415,7 +1415,7 @@ trunc:
 static int
 print_reddata(netdissect_options *ndo,
               register const u_char * pptr, register u_int len,
-              uint16_t op_msk _U_, int indent _U_)
+              uint16_t op_msk _U_, int indent)
 {
 	u_int dlen;
 	char *ib = indent_pr(indent, 0);
