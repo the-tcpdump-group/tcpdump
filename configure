@@ -7235,6 +7235,49 @@ $as_echo "no" >&6; }
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -Wassign-enum option" >&5
+$as_echo_n "checking whether the compiler supports the -Wassign-enum option... " >&6; }
+	save_CFLAGS="$CFLAGS"
+	if expr "x-Wassign-enum" : "x-W.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error -Wassign-enum"
+	elif expr "x-Wassign-enum" : "x-f.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS -Werror -Wassign-enum"
+	elif expr "x-Wassign-enum" : "x-m.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS -Werror -Wassign-enum"
+	else
+	    CFLAGS="$CFLAGS -Wassign-enum"
+	fi
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+return 0
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+		CFLAGS="$save_CFLAGS"
+		V_CCOPT="$V_CCOPT -Wassign-enum"
+
+else
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		CFLAGS="$save_CFLAGS"
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
 	    fi
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports generating dependencies" >&5
