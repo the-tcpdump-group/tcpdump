@@ -653,12 +653,12 @@ nfsreq_print_noaddr(netdissect_options *ndo,
 		break;
 
 	case NFSPROC_SYMLINK:
-		if ((dp = parsereq(ndo, rp, length)) != 0 &&
-		    (dp = parsefhn(ndo, dp, v3)) != 0) {
+		if ((dp = parsereq(ndo, rp, length)) != NULL &&
+		    (dp = parsefhn(ndo, dp, v3)) != NULL) {
 			ND_PRINT((ndo, " ->"));
-			if (v3 && (dp = parse_sattr3(ndo, dp, &sa3)) == 0)
+			if (v3 && (dp = parse_sattr3(ndo, dp, &sa3)) == NULL)
 				break;
-			if (parsefn(ndo, dp) == 0)
+			if (parsefn(ndo, dp) == NULL)
 				break;
 			if (v3 && ndo->ndo_vflag)
 				print_sattr3(ndo, &sa3, ndo->ndo_vflag);
@@ -667,12 +667,12 @@ nfsreq_print_noaddr(netdissect_options *ndo,
 		break;
 
 	case NFSPROC_MKNOD:
-		if ((dp = parsereq(ndo, rp, length)) != 0 &&
-		    (dp = parsefhn(ndo, dp, v3)) != 0) {
+		if ((dp = parsereq(ndo, rp, length)) != NULL &&
+		    (dp = parsefhn(ndo, dp, v3)) != NULL) {
 			ND_TCHECK(*dp);
 			type = (nfs_type)EXTRACT_32BITS(dp);
 			dp++;
-			if ((dp = parse_sattr3(ndo, dp, &sa3)) == 0)
+			if ((dp = parse_sattr3(ndo, dp, &sa3)) == NULL)
 				break;
 			ND_PRINT((ndo, " %s", tok2str(type2str, "unk-ft %d", type)));
 			if (ndo->ndo_vflag && (type == NFCHR || type == NFBLK)) {
@@ -1344,7 +1344,7 @@ parsewccres(netdissect_options *ndo,
 
 	if (!(dp = parsestatus(ndo, dp, &er)))
 		return (0);
-	return parse_wcc_data(ndo, dp, verbose) != 0;
+	return parse_wcc_data(ndo, dp, verbose) != NULL;
 }
 
 static const uint32_t *
@@ -1576,7 +1576,7 @@ interp_reply(netdissect_options *ndo,
 		if (!(dp = parserep(ndo, rp, length)))
 			break;
 		if (v3) {
-			if (parsecreateopres(ndo, dp, ndo->ndo_vflag) != 0)
+			if (parsecreateopres(ndo, dp, ndo->ndo_vflag) != NULL)
 				return;
 		} else {
 			if (parsediropres(ndo, dp) != 0)
@@ -1588,10 +1588,10 @@ interp_reply(netdissect_options *ndo,
 		if (!(dp = parserep(ndo, rp, length)))
 			break;
 		if (v3) {
-			if (parsecreateopres(ndo, dp, ndo->ndo_vflag) != 0)
+			if (parsecreateopres(ndo, dp, ndo->ndo_vflag) != NULL)
 				return;
 		} else {
-			if (parsestatus(ndo, dp, &er) != 0)
+			if (parsestatus(ndo, dp, &er) != NULL)
 				return;
 		}
 		break;
@@ -1599,7 +1599,7 @@ interp_reply(netdissect_options *ndo,
 	case NFSPROC_MKNOD:
 		if (!(dp = parserep(ndo, rp, length)))
 			break;
-		if (parsecreateopres(ndo, dp, ndo->ndo_vflag) != 0)
+		if (parsecreateopres(ndo, dp, ndo->ndo_vflag) != NULL)
 			return;
 		break;
 
@@ -1611,7 +1611,7 @@ interp_reply(netdissect_options *ndo,
 			if (parsewccres(ndo, dp, ndo->ndo_vflag))
 				return;
 		} else {
-			if (parsestatus(ndo, dp, &er) != 0)
+			if (parsestatus(ndo, dp, &er) != NULL)
 				return;
 		}
 		break;
@@ -1632,7 +1632,7 @@ interp_reply(netdissect_options *ndo,
 			}
 			return;
 		} else {
-			if (parsestatus(ndo, dp, &er) != 0)
+			if (parsestatus(ndo, dp, &er) != NULL)
 				return;
 		}
 		break;
@@ -1653,7 +1653,7 @@ interp_reply(netdissect_options *ndo,
 				return;
 			}
 		} else {
-			if (parsestatus(ndo, dp, &er) != 0)
+			if (parsestatus(ndo, dp, &er) != NULL)
 				return;
 		}
 		break;

@@ -828,7 +828,7 @@ copy_argv(register char **argv)
 	char *src, *dst;
 
 	p = argv;
-	if (*p == 0)
+	if (*p == NULL)
 		return 0;
 
 	while (*p)

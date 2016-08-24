@@ -1205,7 +1205,7 @@ dnaddr_string(netdissect_options *ndo, u_short dnaddr)
 {
 	register struct hnamemem *tp;
 
-	for (tp = &dnaddrtable[dnaddr & (HASHNAMESIZE-1)]; tp->nxt != 0;
+	for (tp = &dnaddrtable[dnaddr & (HASHNAMESIZE-1)]; tp->nxt != NULL;
 	     tp = tp->nxt)
 		if (tp->addr == dnaddr)
 			return (tp->name);
