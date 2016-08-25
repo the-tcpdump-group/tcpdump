@@ -842,7 +842,7 @@ lmp_print(netdissect_options *ndo,
 
 	    default:
 		hexdump = TRUE;
-	    };
+	    }
 
 	break;
 

@@ -1924,7 +1924,7 @@ kauth_print(netdissect_options *ndo,
 	bp += sizeof(struct rx_header) + 4;
 
 	switch (kauth_op) {
-		case 1:		/* Authenticate old */;
+		case 1:		/* Authenticate old */
 		case 21:	/* Authenticate */
 		case 22:	/* Authenticate-V2 */
 		case 2:		/* Change PW */
