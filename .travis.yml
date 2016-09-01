@@ -70,3 +70,5 @@ script:
   - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then make -s; fi
   - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then PATH=$PATH make install; fi
   - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then make check; fi
+  - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then ./tcpdump -D; fi
+  - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then ./tcpdump -J; fi
