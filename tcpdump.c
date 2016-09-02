@@ -157,7 +157,7 @@ static int Jflag;			/* list available time stamp types */
 static int jflag = -1;			/* packet time stamp source */
 static int pflag;			/* don't go promiscuous */
 #ifdef HAVE_PCAP_SETDIRECTION
-int Qflag = -1;				/* restrict captured packet by send/receive direction */
+static int Qflag = -1;			/* restrict captured packet by send/receive direction */
 #endif
 static int Uflag;			/* "unbuffered" output of dump files */
 static int Wflag;			/* recycle output files after this number of files */
