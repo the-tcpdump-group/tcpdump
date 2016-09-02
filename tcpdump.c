@@ -189,6 +189,9 @@ static void print_version(void);
 static void print_usage(void);
 static void show_tstamp_types_and_exit(const char *device) __attribute__((noreturn));
 static void show_dlts_and_exit(const char *device) __attribute__((noreturn));
+#ifdef HAVE_PCAP_FINDALLDEVS
+static void show_devices_and_exit (void) __attribute__((noreturn));
+#endif
 
 static void print_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void dump_packet_and_trunc(u_char *, const struct pcap_pkthdr *, const u_char *);
