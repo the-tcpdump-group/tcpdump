@@ -187,7 +187,7 @@ static RETSIGTYPE cleanup(int);
 static RETSIGTYPE child_cleanup(int);
 static void print_version(void);
 static void print_usage(void);
-static void show_tstamp_types_and_exit(const char *device) __attribute__((noreturn));
+static void show_tstamp_types_and_exit(pcap_t *, const char *device) __attribute__((noreturn));
 static void show_dlts_and_exit(const char *device) __attribute__((noreturn));
 #ifdef HAVE_PCAP_FINDALLDEVS
 static void show_devices_and_exit (void) __attribute__((noreturn));
@@ -340,16 +340,16 @@ exit_tcpdump(int status)
 
 #ifdef HAVE_PCAP_SET_TSTAMP_TYPE
 static void
-show_tstamp_types_and_exit(const char *device)
+show_tstamp_types_and_exit(pcap_t *pc, const char *device)
 {
 	int n_tstamp_types;
 	int *tstamp_types = 0;
 	const char *tstamp_type_name;
 	int i;
 
-	n_tstamp_types = pcap_list_tstamp_types(pd, &tstamp_types);
+	n_tstamp_types = pcap_list_tstamp_types(pc, &tstamp_types);
 	if (n_tstamp_types < 0)
-		error("%s", pcap_geterr(pd));
+		error("%s", pcap_geterr(pc));
 
 	if (n_tstamp_types == 0) {
 		fprintf(stderr, "Time stamp type cannot be set for %s\n",
@@ -974,7 +974,7 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 	}
 #ifdef HAVE_PCAP_SET_TSTAMP_TYPE
 	if (Jflag)
-		show_tstamp_types_and_exit(device);
+		show_tstamp_types_and_exit(pc, device);
 #endif
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
 	status = pcap_set_tstamp_precision(pc, ndo->ndo_tstamp_precision);
