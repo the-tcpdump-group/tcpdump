@@ -188,7 +188,7 @@ static RETSIGTYPE child_cleanup(int);
 static void print_version(void);
 static void print_usage(void);
 static void show_tstamp_types_and_exit(pcap_t *, const char *device) __attribute__((noreturn));
-static void show_dlts_and_exit(const char *device) __attribute__((noreturn));
+static void show_dlts_and_exit(pcap_t *, const char *device) __attribute__((noreturn));
 #ifdef HAVE_PCAP_FINDALLDEVS
 static void show_devices_and_exit (void) __attribute__((noreturn));
 #endif
@@ -373,15 +373,15 @@ show_tstamp_types_and_exit(pcap_t *pc, const char *device)
 #endif
 
 static void
-show_dlts_and_exit(const char *device)
+show_dlts_and_exit(pcap_t *pc, const char *device)
 {
 	int n_dlts, i;
 	int *dlts = 0;
 	const char *dlt_name;
 
-	n_dlts = pcap_list_datalinks(pd, &dlts);
+	n_dlts = pcap_list_datalinks(pc, &dlts);
 	if (n_dlts < 0)
-		error("%s", pcap_geterr(pd));
+		error("%s", pcap_geterr(pc));
 	else if (n_dlts == 0 || !dlts)
 		error("No data link types.");
 
@@ -1729,7 +1729,7 @@ main(int argc, char **argv)
 			}
 #endif /* !defined(HAVE_PCAP_CREATE) && defined(_WIN32) */
 		if (Lflag)
-			show_dlts_and_exit(device);
+			show_dlts_and_exit(pd, device);
 		if (yflag_dlt >= 0) {
 #ifdef HAVE_PCAP_SET_DATALINK
 			if (pcap_set_datalink(pd, yflag_dlt) < 0)
