@@ -54,7 +54,7 @@ static const uint32_t *parse_post_op_attr(netdissect_options *, const uint32_t *
 /*
  * Mapping of old NFS Version 2 RPC numbers to generic numbers.
  */
-uint32_t nfsv3_procid[NFS_NPROCS] = {
+static uint32_t nfsv3_procid[NFS_NPROCS] = {
 	NFSPROC_NULL,
 	NFSPROC_GETATTR,
 	NFSPROC_SETATTR,
@@ -855,10 +855,10 @@ struct xid_map_entry {
 
 #define	XIDMAPSIZE	64
 
-struct xid_map_entry xid_map[XIDMAPSIZE];
+static struct xid_map_entry xid_map[XIDMAPSIZE];
 
-int	xid_map_next = 0;
-int	xid_map_hint = 0;
+static int xid_map_next = 0;
+static int xid_map_hint = 0;
 
 static int
 xid_map_enter(netdissect_options *ndo,

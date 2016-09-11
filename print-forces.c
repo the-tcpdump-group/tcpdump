@@ -288,7 +288,7 @@ static inline const struct optlv_h *get_forces_optlv_h(uint16_t opt)
 #define IND_CHR ' '
 #define IND_PREF '\n'
 #define IND_SUF 0x0
-char ind_buf[IND_SIZE];
+static char ind_buf[IND_SIZE];
 
 static inline char *indent_pr(int indent, int nlpref)
 {

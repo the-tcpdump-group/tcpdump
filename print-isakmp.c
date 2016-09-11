@@ -644,12 +644,12 @@ ikev1_print(netdissect_options *ndo,
 	    const u_char *bp2, struct isakmp *base);
 
 #define MAXINITIATORS	20
-int ninitiator = 0;
+static int ninitiator = 0;
 union inaddr_u {
 	struct in_addr in4;
 	struct in6_addr in6;
 };
-struct {
+static struct {
 	cookie_t initiator;
 	u_int version;
 	union inaddr_u iaddr;

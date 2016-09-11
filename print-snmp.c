@@ -254,7 +254,7 @@ static const char *Form[] = {
  * A structure for the OID tree for the compiled-in MIB.
  * This is stored as a general-order tree.
  */
-struct obj {
+static struct obj {
 	const char	*desc;		/* name of object */
 	u_char	oid;			/* sub-id following parent */
 	u_char	type;			/* object type (unused) */

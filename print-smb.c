@@ -1310,7 +1310,7 @@ out:
 /*
    print netbeui frames
 */
-struct nbf_strings {
+static struct nbf_strings {
 	const char	*name;
 	const char	*nonverbose;
 	const char	*verbose;

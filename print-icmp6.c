@@ -629,7 +629,7 @@ static int icmp6_cksum(netdissect_options *ndo, const struct ip6_hdr *ip6,
 				IPPROTO_ICMPV6);
 }
 
-const struct tok rpl_mop_values[] = {
+static const struct tok rpl_mop_values[] = {
         { RPL_DIO_NONSTORING,         "nonstoring"},
         { RPL_DIO_STORING,            "storing"},
         { RPL_DIO_NONSTORING_MULTICAST, "nonstoring-multicast"},
@@ -637,7 +637,7 @@ const struct tok rpl_mop_values[] = {
         { 0, NULL},
 };
 
-const struct tok rpl_subopt_values[] = {
+static const struct tok rpl_subopt_values[] = {
         { RPL_OPT_PAD0, "pad0"},
         { RPL_OPT_PADN, "padN"},
         { RPL_DIO_METRICS, "metrics"},
