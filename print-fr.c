@@ -622,7 +622,7 @@ frf15_print(netdissect_options *ndo,
      return;
 
 trunc:
-     ND_PRINT((ndo, "[|frf15]"));
+     ND_PRINT((ndo, "[|frf.15]"));
 }
 
 /*
