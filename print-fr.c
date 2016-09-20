@@ -812,7 +812,7 @@ q933_print(netdissect_options *ndo,
 
         olen = length; /* preserve the original length for non verbose mode */
 
-	if (length < (u_int)(2 - is_ansi)) {
+	if (length < (u_int)(2 + is_ansi)) {
 		ND_PRINT((ndo, "[|q.933]"));
 		return;
 	}
