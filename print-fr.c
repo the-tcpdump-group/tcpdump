@@ -775,7 +775,7 @@ q933_print(netdissect_options *ndo,
 {
 	const u_char *ptemp = p;
 	const struct ie_tlv_header_t  *ie_p;
-        int olen;
+	u_int olen;
 	u_int is_ansi = 0;
         u_int codeset;
         u_int ie_is_known = 0;
