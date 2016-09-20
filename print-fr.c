@@ -776,7 +776,7 @@ q933_print(netdissect_options *ndo,
 	const u_char *ptemp = p;
 	const struct ie_tlv_header_t  *ie_p;
         int olen;
-	int is_ansi = 0;
+	u_int is_ansi = 0;
         u_int codeset;
         u_int ie_is_known = 0;
 
@@ -812,7 +812,7 @@ q933_print(netdissect_options *ndo,
 
         olen = length; /* preserve the original length for non verbose mode */
 
-	if (length < (u_int)(2 + is_ansi)) {
+	if (length < 2 + is_ansi) {
 		ND_PRINT((ndo, "[|q.933]"));
 		return;
 	}
