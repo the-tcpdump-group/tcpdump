@@ -18,10 +18,11 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * Format and print ntp packets.
  *	By Jeffrey Mogul/DECWRL
  *	loosely based on print-bootp.c
  */
+
+/* \summary: Network Time Protocol (NTP) printer */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

@@ -27,6 +27,8 @@
  * SUCH DAMAGE.
  */
 
+/* \summary: IPv6 mobility printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

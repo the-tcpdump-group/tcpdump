@@ -26,6 +26,8 @@
  * SUCH DAMAGE.
  */
 
+/* \summary: Babel Routing Protocol printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -40,7 +42,6 @@
 #include "extract.h"
 
 static const char tstr[] = "[|babel]";
-static const char istr[] = " (invalid)";
 
 static void babel_print_v2(netdissect_options *, const u_char *cp, u_int length);
 

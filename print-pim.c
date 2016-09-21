@@ -19,6 +19,8 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+/* \summary: Protocol Independent Multicast (PIM) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -620,7 +622,7 @@ enum checksum_status {
 };
 
 static enum checksum_status
-pimv2_check_checksum(const u_char *bp, const u_char *bp2, u_int len)
+pimv2_check_checksum(netdissect_options *ndo, const u_char *bp, const u_char *bp2, u_int len)
 {
 	const struct ip *ip;
 	u_int cksum;
@@ -637,7 +639,7 @@ pimv2_check_checksum(const u_char *bp, const u_char *bp2, u_int len)
 		const struct ip6_hdr *ip6;
 
 		ip6 = (const struct ip6_hdr *)bp2;
-		cksum = nextproto6_cksum(ip6, bp, len, len, IPPROTO_PIM);
+		cksum = nextproto6_cksum(ndo, ip6, bp, len, len, IPPROTO_PIM);
 		return (cksum ? INCORRECT : CORRECT);
 	} else {
 		return (UNVERIFIED);
@@ -672,7 +674,7 @@ pimv2_print(netdissect_options *ndo,
 			 * The checksum only covers the packet header,
 			 * not the encapsulated packet.
 			 */
-			cksum_status = pimv2_check_checksum(bp, bp2, 8);
+			cksum_status = pimv2_check_checksum(ndo, bp, bp2, 8);
 			if (cksum_status == INCORRECT) {
 				/*
 				 * To quote RFC 4601, "For interoperability
@@ -680,13 +682,13 @@ pimv2_print(netdissect_options *ndo,
 				 * calculated over the entire PIM Register
 				 * message should also be accepted."
 				 */
-				cksum_status = pimv2_check_checksum(bp, bp2, len);
+				cksum_status = pimv2_check_checksum(ndo, bp, bp2, len);
 			}
 		} else {
 			/*
 			 * The checksum covers the entire packet.
 			 */
-			cksum_status = pimv2_check_checksum(bp, bp2, len);
+			cksum_status = pimv2_check_checksum(ndo, bp, bp2, len);
 		}
 		switch (cksum_status) {
 

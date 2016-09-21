@@ -21,6 +21,8 @@
  * OSPF support contributed by Jeffrey Honig (jch@mitchell.cit.cornell.edu)
  */
 
+/* \summary: Open Shortest Path First (OSPF) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -35,7 +37,6 @@
 #include "ospf.h"
 
 static const char tstr[] = " [|ospf2]";
-static const char istr[] = " (invalid)";
 
 static const struct tok ospf_option_values[] = {
         { OSPF_OPTION_T,	"MultiTopology" }, /* draft-ietf-ospf-mt-09 */
@@ -567,16 +568,16 @@ trunc:
 
 /* draft-ietf-ospf-mt-09 */
 static const struct tok ospf_topology_values[] = {
-    { 0, "default " },
-    { 1, "multicast " },
-    { 2, "management " },
+    { 0, "default" },
+    { 1, "multicast" },
+    { 2, "management" },
     { 0, NULL }
 };
 
 /*
  * Print all the per-topology metrics.
  */
-static void
+static int
 ospf_print_tos_metrics(netdissect_options *ndo,
                        const union un_tos *tos)
 {
@@ -589,9 +590,10 @@ ospf_print_tos_metrics(netdissect_options *ndo,
     /*
      * All but the first metric contain a valid topology id.
      */
-    while (toscount) {
-        ND_PRINT((ndo, "\n\t\ttopology %s(%u), metric %u",
-               tok2str(ospf_topology_values, "",
+    while (toscount > 0) {
+        ND_TCHECK(*tos);
+        ND_PRINT((ndo, "\n\t\ttopology %s (%u), metric %u",
+               tok2str(ospf_topology_values, "Unknown",
                        metric_count ? tos->metrics.tos_type : 0),
                metric_count ? tos->metrics.tos_type : 0,
                EXTRACT_16BITS(&tos->metrics.tos_metric)));
@@ -599,6 +601,9 @@ ospf_print_tos_metrics(netdissect_options *ndo,
         tos++;
         toscount--;
     }
+    return 0;
+trunc:
+    return 1;
 }
 
 /*
@@ -672,7 +677,8 @@ ospf_print_lsa(netdissect_options *ndo,
 				return (ls_end);
 			}
 
-			ospf_print_tos_metrics(ndo, &rlp->un_tos);
+			if (ospf_print_tos_metrics(ndo, &rlp->un_tos))
+				goto trunc;
 
 			rlp = (const struct rlalink *)((const u_char *)(rlp + 1) +
 			    ((rlp->un_tos.link.link_tos_count) * sizeof(union un_tos)));
@@ -703,8 +709,8 @@ ospf_print_lsa(netdissect_options *ndo,
 			ND_TCHECK(*lp);
 			ul = EXTRACT_32BITS(lp);
                         topology = (ul & SLA_MASK_TOS) >> SLA_SHIFT_TOS;
-			ND_PRINT((ndo, "\n\t\ttopology %s(%u) metric %d",
-                               tok2str(ospf_topology_values, "", topology),
+			ND_PRINT((ndo, "\n\t\ttopology %s (%u) metric %d",
+                               tok2str(ospf_topology_values, "Unknown", topology),
                                topology,
                                ul & SLA_MASK_METRIC));
 			++lp;
@@ -720,8 +726,8 @@ ospf_print_lsa(netdissect_options *ndo,
 			ND_TCHECK(*lp);
 			ul = EXTRACT_32BITS(lp);
                         topology = (ul & SLA_MASK_TOS) >> SLA_SHIFT_TOS;
-			ND_PRINT((ndo, "\n\t\ttopology %s(%u) metric %d",
-                               tok2str(ospf_topology_values, "", topology),
+			ND_PRINT((ndo, "\n\t\ttopology %s (%u) metric %d",
+                               tok2str(ospf_topology_values, "Unknown", topology),
                                topology,
                                ul & SLA_MASK_METRIC));
 			++lp;
@@ -742,8 +748,8 @@ ospf_print_lsa(netdissect_options *ndo,
 			ND_TCHECK(almp->asla_tosmetric);
 			ul = EXTRACT_32BITS(&almp->asla_tosmetric);
                         topology = ((ul & ASLA_MASK_TOS) >> ASLA_SHIFT_TOS);
-			ND_PRINT((ndo, "\n\t\ttopology %s(%u), type %d, metric",
-                               tok2str(ospf_topology_values, "", topology),
+			ND_PRINT((ndo, "\n\t\ttopology %s (%u), type %d, metric",
+                               tok2str(ospf_topology_values, "Unknown", topology),
                                topology,
                                (ul & ASLA_FLAG_EXTERNAL) ? 2 : 1));
 			if ((ul & ASLA_MASK_METRIC) == 0xffffff)

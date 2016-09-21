@@ -32,6 +32,10 @@
  * SUCH DAMAGE.
  */
 
+/* \summary: Multipath TCP (MPTCP) printer */
+
+/* specification: RFC 6824 */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

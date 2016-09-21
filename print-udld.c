@@ -12,10 +12,12 @@
  * LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE.
  *
- * UNIDIRECTIONAL LINK DETECTION (UDLD) as per RFC5171
- *
  * Original code by Carles Kishimoto <carles.kishimoto@gmail.com>
  */
+
+/* \summary: Cisco UniDirectional Link Detection (UDLD) protocol printer */
+
+/* specification: RFC 5171 */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -27,7 +29,6 @@
 #include "extract.h"
 
 static const char tstr[] = " [|udld]";
-static const char istr[] = " (invalid)";
 
 #define UDLD_HEADER_LEN			4
 #define UDLD_DEVICE_ID_TLV		0x0001

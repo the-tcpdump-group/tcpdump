@@ -19,6 +19,8 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+/* \summary: UDP printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -275,11 +277,11 @@ static int udp_cksum(netdissect_options *ndo, register const struct ip *ip,
 				IPPROTO_UDP);
 }
 
-static int udp6_cksum(const struct ip6_hdr *ip6, const struct udphdr *up,
-	u_int len)
+static int udp6_cksum(netdissect_options *ndo, const struct ip6_hdr *ip6,
+		      const struct udphdr *up, u_int len)
 {
-	return nextproto6_cksum(ip6, (const uint8_t *)(const void *)up, len, len,
-	    IPPROTO_UDP);
+	return nextproto6_cksum(ndo, ip6, (const uint8_t *)(const void *)up, len, len,
+				IPPROTO_UDP);
 }
 
 static void
@@ -495,14 +497,6 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 			}
 #endif
 		}
-		if (ND_TTEST(((const struct LAP *)cp)->type) &&
-		    ((const struct LAP *)cp)->type == lapDDP &&
-		    (atalk_port(sport) || atalk_port(dport))) {
-			if (ndo->ndo_vflag)
-				ND_PRINT((ndo, "kip "));
-			llap_print(ndo, cp, length);
-			return;
-		}
 	}
 
 	if (ndo->ndo_vflag && !ndo->ndo_Kflag && !fragmented) {
@@ -531,7 +525,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 		else if (IP_V(ip) == 6 && ip6->ip6_plen) {
 			/* for IPv6, UDP checksum is mandatory */
 			if (ND_TTEST2(cp[0], length)) {
-				sum = udp6_cksum(ip6, up, length + sizeof(struct udphdr));
+				sum = udp6_cksum(ndo, ip6, up, length + sizeof(struct udphdr));
 				udp_sum = EXTRACT_16BITS(&up->uh_sum);
 
 	                        if (sum != 0) {
@@ -602,6 +596,8 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 			ahcp_print(ndo, (const u_char *)(up + 1), length);
 		else if (IS_SRC_OR_DST_PORT(BABEL_PORT) || IS_SRC_OR_DST_PORT(BABEL_PORT_OLD))
 			babel_print(ndo, (const u_char *)(up + 1), length);
+		else if (IS_SRC_OR_DST_PORT(HNCP_PORT))
+			hncp_print(ndo, (const u_char *)(up + 1), length);
 		/*
 		 * Kludge in test for whiteboard packets.
 		 */
@@ -654,7 +650,15 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 			geneve_print(ndo, (const u_char *)(up + 1), length);
 		else if (IS_SRC_OR_DST_PORT(LISP_CONTROL_PORT))
 			lisp_print(ndo, (const u_char *)(up + 1), length);
-		else {
+		else if (IS_SRC_OR_DST_PORT(VXLAN_GPE_PORT))
+			vxlan_gpe_print(ndo, (const u_char *)(up + 1), length);
+		else if (ND_TTEST(((const struct LAP *)cp)->type) &&
+		    ((const struct LAP *)cp)->type == lapDDP &&
+		    (atalk_port(sport) || atalk_port(dport))) {
+			if (ndo->ndo_vflag)
+				ND_PRINT((ndo, "kip "));
+			llap_print(ndo, cp, length);
+		} else {
 			if (ulen > length)
 				ND_PRINT((ndo, "UDP, bad length %u > %u",
 				    ulen, length));
@@ -677,4 +681,3 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
  * c-basic-offset: 8
  * End:
  */
-

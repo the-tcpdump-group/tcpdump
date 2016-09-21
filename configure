@@ -1343,7 +1343,8 @@ Optional Packages:
   --with-sandbox-capsicum use Capsicum security functions [default=yes, if
                           available]
   --with-system-libpcap   don't use local pcap library
-  --with-crypto           use OpenSSL libcrypto [default=yes, if available]
+  --with-crypto[=DIR]     use OpenSSL/libressl libcrypto (located in directory
+                          DIR, if specified) [default=yes, if available]
   --with-cap-ng           use libcap-ng [default=yes, if available]
 
 Some influential environment variables:
@@ -6258,18 +6259,38 @@ $as_echo "#define HAVE_PCAP_VERSION 1" >>confdefs.h
 $as_echo "no" >&6; }
     fi
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether pcap_debug is defined by libpcap" >&5
+
+#
+# Check for special debugging functions
+#
+for ac_func in pcap_set_parser_debug
+do :
+  ac_fn_c_check_func "$LINENO" "pcap_set_parser_debug" "ac_cv_func_pcap_set_parser_debug"
+if test "x$ac_cv_func_pcap_set_parser_debug" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PCAP_SET_PARSER_DEBUG 1
+_ACEOF
+
+fi
+done
+
+if test "$ac_cv_func_pcap_set_parser_debug" = "no" ; then
+	#
+	# OK, we don't have pcap_set_parser_debug() to set the libpcap
+	# filter expression parser debug flag; can we directly set the
+	# flag?
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether pcap_debug is defined by libpcap" >&5
 $as_echo_n "checking whether pcap_debug is defined by libpcap... " >&6; }
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
 int
 main ()
 {
 
-	extern int pcap_debug;
+		extern int pcap_debug;
 
-	return pcap_debug;
+		return pcap_debug;
 
   ;
   return 0;
@@ -6282,30 +6303,30 @@ else
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
-if test "$ac_lbl_cv_pcap_debug_defined" = yes ; then
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+	if test "$ac_lbl_cv_pcap_debug_defined" = yes ; then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
 $as_echo "#define HAVE_PCAP_DEBUG 1" >>confdefs.h
 
-else
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+	else
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-	#
-	# OK, what about "yydebug"?
-	#
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether yydebug is defined by libpcap" >&5
+		#
+		# OK, what about "yydebug"?
+		#
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether yydebug is defined by libpcap" >&5
 $as_echo_n "checking whether yydebug is defined by libpcap... " >&6; }
-	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+		cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
 int
 main ()
 {
 
-		extern int yydebug;
+			extern int yydebug;
 
-		return yydebug;
+			return yydebug;
 
   ;
   return 0;
@@ -6318,17 +6339,29 @@ else
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
-	if test "$ac_lbl_cv_yydebug_defined" = yes ; then
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+		if test "$ac_lbl_cv_yydebug_defined" = yes ; then
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
 $as_echo "#define HAVE_YYDEBUG 1" >>confdefs.h
 
-	else
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+		else
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
+		fi
 	fi
 fi
+for ac_func in pcap_set_optimizer_debug
+do :
+  ac_fn_c_check_func "$LINENO" "pcap_set_optimizer_debug" "ac_cv_func_pcap_set_optimizer_debug"
+if test "x$ac_cv_func_pcap_set_optimizer_debug" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PCAP_SET_OPTIMIZER_DEBUG 1
+_ACEOF
+
+fi
+done
+
 ac_fn_c_check_func "$LINENO" "bpf_dump" "ac_cv_func_bpf_dump"
 if test "x$ac_cv_func_bpf_dump" = xyes; then :
   $as_echo "#define HAVE_BPF_DUMP 1" >>confdefs.h
@@ -7627,6 +7660,49 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
 
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -Wused-but-marked-unused option" >&5
+$as_echo_n "checking whether the compiler supports the -Wused-but-marked-unused option... " >&6; }
+	save_CFLAGS="$CFLAGS"
+	if expr "x-Wused-but-marked-unused" : "x-W.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error -Wused-but-marked-unused"
+	elif expr "x-Wused-but-marked-unused" : "x-f.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS -Werror -Wused-but-marked-unused"
+	elif expr "x-Wused-but-marked-unused" : "x-m.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS -Werror -Wused-but-marked-unused"
+	else
+	    CFLAGS="$CFLAGS -Wused-but-marked-unused"
+	fi
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+return 0
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+		CFLAGS="$save_CFLAGS"
+		V_CCOPT="$V_CCOPT -Wused-but-marked-unused"
+
+else
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		CFLAGS="$save_CFLAGS"
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -W option" >&5
 $as_echo_n "checking whether the compiler supports the -W option... " >&6; }
 	save_CFLAGS="$CFLAGS"
@@ -7919,9 +7995,9 @@ $as_echo "#define LBL_ALIGN 1" >>confdefs.h
 
     fi
 
-# Check for OpenSSL libcrypto
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to use OpenSSL libcrypto" >&5
-$as_echo_n "checking whether to use OpenSSL libcrypto... " >&6; }
+# Check for OpenSSL/libressl libcrypto
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to use OpenSSL/libressl libcrypto" >&5
+$as_echo_n "checking whether to use OpenSSL/libressl libcrypto... " >&6; }
 # Specify location for both includes and libraries.
 want_libcrypto=ifavailable
 
@@ -7930,20 +8006,38 @@ if test "${with_crypto+set}" = set; then :
   withval=$with_crypto;
 	if test $withval = no
 	then
+		# User doesn't want to link with libcrypto.
 		want_libcrypto=no
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 	elif test $withval = yes
 	then
+		# User wants to link with libcrypto but hasn't specified
+		# a directory.
 		want_libcrypto=yes
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
+	else
+		# User wants to link with libcrypto and has specified
+		# a directory, so use the provided value.
+		want_libcrypto=yes
+		libcrypto_root=$withval
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, using the version installed in $withval" >&5
+$as_echo "yes, using the version installed in $withval" >&6; }
+
+		#
+		# Put the subdirectories of the libcrypto root directory
+		# at the front of the header and library search path.
+		#
+		CFLAGS="-I$withval/include $CFLAGS"
+		LIBS="-L$withval/lib $LIBS"
 	fi
 
 else
 
 	#
-	# Use libcrypto if it's present, otherwise don't.
+	# Use libcrypto if it's present, otherwise don't; no directory
+	# was specified.
 	#
 	want_libcrypto=ifavailable
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, if available" >&5
@@ -8009,7 +8103,8 @@ _ACEOF
 
 fi
 
-		for ac_header in openssl/evp.h
+		if test "$ac_cv_lib_crypto_DES_cbc_encrypt" = "yes"; then
+			for ac_header in openssl/evp.h
 do :
   ac_fn_c_check_header_mongrel "$LINENO" "openssl/evp.h" "ac_cv_header_openssl_evp_h" "$ac_includes_default"
 if test "x$ac_cv_header_openssl_evp_h" = xyes; then :
@@ -8021,6 +8116,24 @@ fi
 
 done
 
+			#
+			# OK, do we have EVP_CIPHER_CTX_new?
+			# If so, we use it to allocate an
+			# EVP_CIPHER_CTX, as EVP_CIPHER_CTX may be
+			# opaque; otherwise, we allocate it ourselves.
+			#
+			for ac_func in EVP_CIPHER_CTX_new
+do :
+  ac_fn_c_check_func "$LINENO" "EVP_CIPHER_CTX_new" "ac_cv_func_EVP_CIPHER_CTX_new"
+if test "x$ac_cv_func_EVP_CIPHER_CTX_new" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_EVP_CIPHER_CTX_NEW 1
+_ACEOF
+
+fi
+done
+
+		fi
 
 fi
 

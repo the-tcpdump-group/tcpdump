@@ -70,7 +70,7 @@ DEPENDENCY_CFLAG = @DEPENDENCY_CFLAG@
 	@rm -f $@
 	$(CC) $(FULL_CFLAGS) -c $(srcdir)/$*.c
 
-CSRC =	setsignal.c tcpdump.c util.c
+CSRC =	setsignal.c tcpdump.c
 
 LIBNETDISSECT_SRC=\
 	addrtoname.c \
@@ -134,6 +134,7 @@ LIBNETDISSECT_SRC=\
 	print-geneve.c \
 	print-geonet.c \
 	print-gre.c \
+	print-hncp.c \
 	print-hsrp.c \
 	print-http.c \
 	print-icmp.c \
@@ -173,6 +174,7 @@ LIBNETDISSECT_SRC=\
 	print-msnlb.c \
 	print-nflog.c \
 	print-nfs.c \
+	print-nsh.c \
 	print-ntp.c \
 	print-null.c \
 	print-olsr.c \
@@ -190,6 +192,7 @@ LIBNETDISSECT_SRC=\
 	print-pptp.c \
 	print-radius.c \
 	print-raw.c \
+	print-resp.c \
 	print-rip.c \
 	print-ripng.c \
 	print-rpki-rtr.c \
@@ -225,9 +228,11 @@ LIBNETDISSECT_SRC=\
 	print-vrrp.c \
 	print-vtp.c \
 	print-vxlan.c \
+	print-vxlan-gpe.c \
 	print-wb.c \
 	print-zephyr.c \
 	print-zeromq.c \
+	netdissect.c \
 	signature.c \
 	strtoaddr.c \
 	util-print.c

@@ -25,6 +25,8 @@
  * DAMAGE.
  */
 
+/* \summary: DLT_NFLOG printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -80,7 +82,7 @@ nflog_if_print(netdissect_options *ndo,
 		return h_size;
 	}
 
-	if (!(hdr->nflog_version) == 0) {
+	if (hdr->nflog_version != 0) {
 		ND_PRINT((ndo, "version %u (unknown)", hdr->nflog_version));
 		return h_size;
 	}

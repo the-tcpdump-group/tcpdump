@@ -13,11 +13,13 @@
  * LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE.
  *
- * Optimized Link State Protocl (OLSR) as per rfc3626
- *
  * Original code by Hannes Gredler <hannes@juniper.net>
  * IPv6 additions by Florian Forster <octo at verplant.org>
  */
+
+/* \summary: Optimized Link State Routing Protocol (OLSR) printer */
+
+/* specification: RFC 3626 */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

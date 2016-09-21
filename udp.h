@@ -240,10 +240,10 @@ struct udphdr {
 #define SUBVERSION_PORT			3690	/*XXX*/
 #endif
 #ifndef BFD_CONTROL_PORT
-#define BFD_CONTROL_PORT		3784	/* draft-katz-ward-bfd-v4v6-1hop-00.txt */
+#define BFD_CONTROL_PORT		3784	/* RFC 5881 */
 #endif
 #ifndef BFD_ECHO_PORT
-#define BFD_ECHO_PORT			3785	/* draft-katz-ward-bfd-v4v6-1hop-00.txt */
+#define BFD_ECHO_PORT			3785	/* RFC 5881 */
 #endif
 #ifndef RADIUS_COA_PORT
 #define RADIUS_COA_PORT			3799	/* RFC 5176 */
@@ -262,6 +262,9 @@ struct udphdr {
 #endif
 #ifndef VXLAN_PORT
 #define VXLAN_PORT			4789	/* RFC 7348 */
+#endif
+#ifndef VXLAN_GPE_PORT
+#define VXLAN_GPE_PORT			4790	/* draft-ietf-nvo3-vxlan-gpe-01 */
 #endif
 #ifndef SIP_DS_PORT
 #define SIP_DS_PORT			5059	/*XXX*/
@@ -295,6 +298,9 @@ struct udphdr {
 #endif
 #ifndef ISAKMP_PORT_USER1
 #define ISAKMP_PORT_USER1		7500	/*XXX - nonstandard*/
+#endif
+#ifndef HNCP_PORT
+#define HNCP_PORT			8231	/* RFC 7788 */
 #endif
 #ifndef OTV_PORT
 #define OTV_PORT			8472	/* draft-hasmit-otv-04 */

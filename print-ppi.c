@@ -2,6 +2,8 @@
  * Oracle
  */
 
+/* \summary: Oracle DLT_PPI printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -56,6 +58,7 @@ ppi_print(netdissect_options *ndo,
 	uint16_t len;
 	uint32_t dlt;
 	uint32_t hdrlen;
+	struct pcap_pkthdr nhdr;
 
 	if (caplen < sizeof(ppi_header_t)) {
 		ND_PRINT((ndo, "[|ppi]"));
@@ -86,7 +89,10 @@ ppi_print(netdissect_options *ndo,
 	p += len;
 
 	if ((printer = lookup_printer(dlt)) != NULL) {
-		hdrlen = printer(ndo, h, p);
+		nhdr = *h;
+		nhdr.caplen = caplen;
+		nhdr.len = length;
+		hdrlen = printer(ndo, &nhdr, p);
 	} else {
 		if (!ndo->ndo_eflag)
 			ppi_header_print(ndo, (const u_char *)hdr, length + len);

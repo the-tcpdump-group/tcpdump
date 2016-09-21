@@ -24,6 +24,8 @@
  * complete IS-IS & CLNP support.
  */
 
+/* \summary: ISO CLNS, ESIS, and ISIS printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -2051,6 +2053,20 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
 }
 
 /*
+ * Clear checksum and lifetime prior to signature verification.
+ */
+static void
+isis_clear_checksum_lifetime(void *header)
+{
+    struct isis_lsp_header *header_lsp = (struct isis_lsp_header *) header;
+
+    header_lsp->checksum[0] = 0;
+    header_lsp->checksum[1] = 0;
+    header_lsp->remaining_lifetime[0] = 0;
+    header_lsp->remaining_lifetime[1] = 0;
+}
+
+/*
  * isis_print
  * Decode IS-IS packets.  Return 0 on error.
  */
@@ -2063,7 +2079,7 @@ isis_print(netdissect_options *ndo,
 
     const struct isis_iih_lan_header *header_iih_lan;
     const struct isis_iih_ptp_header *header_iih_ptp;
-    struct isis_lsp_header *header_lsp;
+    const struct isis_lsp_header *header_lsp;
     const struct isis_csnp_header *header_csnp;
     const struct isis_psnp_header *header_psnp;
 
@@ -2088,7 +2104,7 @@ isis_print(netdissect_options *ndo,
     pptr = p+(ISIS_COMMON_HEADER_SIZE);
     header_iih_lan = (const struct isis_iih_lan_header *)pptr;
     header_iih_ptp = (const struct isis_iih_ptp_header *)pptr;
-    header_lsp = (struct isis_lsp_header *)pptr;
+    header_lsp = (const struct isis_lsp_header *)pptr;
     header_csnp = (const struct isis_csnp_header *)pptr;
     header_psnp = (const struct isis_psnp_header *)pptr;
 
@@ -2315,18 +2331,10 @@ isis_print(netdissect_options *ndo,
                EXTRACT_16BITS(header_lsp->remaining_lifetime),
                EXTRACT_16BITS(header_lsp->checksum)));
 
-        if (osi_print_cksum(ndo, (uint8_t *)header_lsp->lsp_id,
+        if (osi_print_cksum(ndo, (const uint8_t *)header_lsp->lsp_id,
                             EXTRACT_16BITS(header_lsp->checksum),
                             12, length-12) == 0)
                                 goto trunc;
-
-        /*
-         * Clear checksum and lifetime prior to signature verification.
-         */
-        header_lsp->checksum[0] = 0;
-        header_lsp->checksum[1] = 0;
-        header_lsp->remaining_lifetime[0] = 0;
-        header_lsp->remaining_lifetime[1] = 0;
 
 	ND_PRINT((ndo, ", PDU length: %u, Flags: [ %s",
                pdu_len,
@@ -2661,12 +2669,9 @@ isis_print(netdissect_options *ndo,
 		if (tlv_len != ISIS_SUBTLV_AUTH_MD5_LEN+1)
                     ND_PRINT((ndo, ", (invalid subTLV) "));
 
-#ifdef HAVE_LIBCRYPTO
-                sigcheck = signature_verify(ndo, optr, length,
-                                            (unsigned char *)tptr + 1);
-#else
-                sigcheck = CANT_CHECK_SIGNATURE;
-#endif
+                sigcheck = signature_verify(ndo, optr, length, tptr + 1,
+                                            isis_clear_checksum_lifetime,
+                                            header_lsp);
                 ND_PRINT((ndo, " (%s)", tok2str(signature_check_values, "Unknown", sigcheck)));
 
 		break;

@@ -19,6 +19,8 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+/* \summary: Routing Information Protocol (RIP) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

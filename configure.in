@@ -644,39 +644,51 @@ if test $ac_cv_func_pcap_lib_version = "no" ; then
 	AC_MSG_RESULT(no)
     fi
 fi
-AC_MSG_CHECKING(whether pcap_debug is defined by libpcap)
-AC_TRY_LINK([],
-   [
-	extern int pcap_debug;
 
-	return pcap_debug;
-   ],
-   ac_lbl_cv_pcap_debug_defined=yes,
-   ac_lbl_cv_pcap_debug_defined=no)
-if test "$ac_lbl_cv_pcap_debug_defined" = yes ; then
-	AC_MSG_RESULT(yes)
-	AC_DEFINE(HAVE_PCAP_DEBUG, 1, [define if libpcap has pcap_debug])
-else
-	AC_MSG_RESULT(no)
+#
+# Check for special debugging functions
+#
+AC_CHECK_FUNCS(pcap_set_parser_debug)
+if test "$ac_cv_func_pcap_set_parser_debug" = "no" ; then
 	#
-	# OK, what about "yydebug"?
-	#
-	AC_MSG_CHECKING(whether yydebug is defined by libpcap)
+	# OK, we don't have pcap_set_parser_debug() to set the libpcap
+	# filter expression parser debug flag; can we directly set the
+	# flag?
+	AC_MSG_CHECKING(whether pcap_debug is defined by libpcap)
 	AC_TRY_LINK([],
 	   [
-		extern int yydebug;
+		extern int pcap_debug;
 
-		return yydebug;
+		return pcap_debug;
 	   ],
-	   ac_lbl_cv_yydebug_defined=yes,
-	   ac_lbl_cv_yydebug_defined=no)
-	if test "$ac_lbl_cv_yydebug_defined" = yes ; then
+	   ac_lbl_cv_pcap_debug_defined=yes,
+	   ac_lbl_cv_pcap_debug_defined=no)
+	if test "$ac_lbl_cv_pcap_debug_defined" = yes ; then
 		AC_MSG_RESULT(yes)
-		AC_DEFINE(HAVE_YYDEBUG, 1, [define if libpcap has yydebug])
+		AC_DEFINE(HAVE_PCAP_DEBUG, 1, [define if libpcap has pcap_debug])
 	else
 		AC_MSG_RESULT(no)
+		#
+		# OK, what about "yydebug"?
+		#
+		AC_MSG_CHECKING(whether yydebug is defined by libpcap)
+		AC_TRY_LINK([],
+		   [
+			extern int yydebug;
+
+			return yydebug;
+		   ],
+		   ac_lbl_cv_yydebug_defined=yes,
+		   ac_lbl_cv_yydebug_defined=no)
+		if test "$ac_lbl_cv_yydebug_defined" = yes ; then
+			AC_MSG_RESULT(yes)
+			AC_DEFINE(HAVE_YYDEBUG, 1, [define if libpcap has yydebug])
+		else
+			AC_MSG_RESULT(no)
+		fi
 	fi
 fi
+AC_CHECK_FUNCS(pcap_set_optimizer_debug)
 AC_REPLACE_FUNCS(bpf_dump)	dnl moved to libpcap in 0.6
 
 V_GROUP=0
@@ -869,26 +881,43 @@ AC_LBL_SOCKADDR_SA_LEN
 
 AC_LBL_UNALIGNED_ACCESS
 
-# Check for OpenSSL libcrypto
-AC_MSG_CHECKING(whether to use OpenSSL libcrypto)
+# Check for OpenSSL/libressl libcrypto
+AC_MSG_CHECKING(whether to use OpenSSL/libressl libcrypto)
 # Specify location for both includes and libraries.
 want_libcrypto=ifavailable
 AC_ARG_WITH(crypto,
-    AS_HELP_STRING([--with-crypto],
-		   [use OpenSSL libcrypto @<:@default=yes, if available@:>@]),
+    AS_HELP_STRING([--with-crypto]@<:@=DIR@:>@,
+		   [use OpenSSL/libressl libcrypto (located in directory DIR, if specified) @<:@default=yes, if available@:>@]),
 [
 	if test $withval = no
 	then
+		# User doesn't want to link with libcrypto.
 		want_libcrypto=no
 		AC_MSG_RESULT(no)
 	elif test $withval = yes
 	then
+		# User wants to link with libcrypto but hasn't specified
+		# a directory.
 		want_libcrypto=yes
 		AC_MSG_RESULT(yes)
+	else
+		# User wants to link with libcrypto and has specified
+		# a directory, so use the provided value.
+		want_libcrypto=yes
+		libcrypto_root=$withval
+		AC_MSG_RESULT([yes, using the version installed in $withval])
+
+		#
+		# Put the subdirectories of the libcrypto root directory
+		# at the front of the header and library search path.
+		#
+		CFLAGS="-I$withval/include $CFLAGS"
+		LIBS="-L$withval/lib $LIBS"
 	fi
 ],[
 	#
-	# Use libcrypto if it's present, otherwise don't.
+	# Use libcrypto if it's present, otherwise don't; no directory
+	# was specified.
 	#
 	want_libcrypto=ifavailable
 	AC_MSG_RESULT([yes, if available])
@@ -906,7 +935,16 @@ if test "$want_libcrypto" != "no"; then
 	AC_CHECK_HEADER(openssl/crypto.h,
 	[
 		AC_CHECK_LIB(crypto, DES_cbc_encrypt)
-		AC_CHECK_HEADERS(openssl/evp.h)
+		if test "$ac_cv_lib_crypto_DES_cbc_encrypt" = "yes"; then
+			AC_CHECK_HEADERS(openssl/evp.h)
+			#
+			# OK, do we have EVP_CIPHER_CTX_new?
+			# If so, we use it to allocate an
+			# EVP_CIPHER_CTX, as EVP_CIPHER_CTX may be
+			# opaque; otherwise, we allocate it ourselves.
+			#
+			AC_CHECK_FUNCS(EVP_CIPHER_CTX_new)
+		fi
 	])
 fi
 

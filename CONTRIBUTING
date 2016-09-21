@@ -1,14 +1,14 @@
-Some informations for Contributors
-----------------------------------
-Your want to contribute to Tcpdump, Thanks!
+Some Information for Contributors
+---------------------------------
+You want to contribute to Tcpdump, Thanks!
 Please, read these lines.
 
 1) Fork the Tcpdump repository on GitHub from
    https://github.com/the-tcpdump-group/tcpdump
    (See https://help.github.com/articles/fork-a-repo/)
 
-2) Setup an optionnal Travis-CI build
-   You can setup a travis build for your fork. So, your can test your changes
+2) Setup an optional Travis-CI build
+   You can setup a travis build for your fork. So, you can test your changes
    on Linux and OSX before sending pull requests.
    (See http://docs.travis-ci.com/user/getting-started/)
 
@@ -55,11 +55,11 @@ Please, read these lines.
 
 Some remarks
 ------------
-a) A thorough reading of some other printers code is usefull.
+a) A thorough reading of some other printers code is useful.
 
-b) Put the the normative reference if any as comments (RFC, etc.).
+b) Put the normative reference if any as comments (RFC, etc.).
 
-c) Put the the format of packets/headers/options as comments.
+c) Put the format of packets/headers/options as comments.
 
 d) The printer may receive incomplete packet in the buffer, truncated at any
    random position, for example by capturing with '-s size' option.
@@ -75,7 +75,9 @@ d) The printer may receive incomplete packet in the buffer, truncated at any
 
 e) Do invalid packet checks in code: Think that your code can receive in input
    not only a valid packet but any arbitrary random sequence of octets (packet
-   corrupted in transit or built by a fuzz tester).
+   - built malformed originally by the sender or by a fuzz tester,
+   - became corrupted in transit).
+   Print with: ND_PRINT((ndo, "%s", istr));	/* to print " (invalid)" */
 
 f) Use 'struct tok' for indexed strings and print them with
    tok2str() or bittok2str() (for flags).
@@ -85,7 +87,7 @@ g) Avoid empty lines in output of printers.
 h) A commit message must have:
    First line: Capitalized short summary in the imperative (70 chars or less)
 
-   Body: Detailed explanatory text, if necessary.  Fold up it to approximately
+   Body: Detailed explanatory text, if necessary. Fold it to approximately
    72 characters. There must be an empty line separating the summary from
    the body.
 

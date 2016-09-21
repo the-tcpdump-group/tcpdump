@@ -56,6 +56,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* \summary: OpenFlow protocol version 1.0 printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -72,7 +74,6 @@
 #include "openflow.h"
 
 static const char tstr[] = " [|openflow]";
-static const char istr[] = " (invalid)";
 
 #define OFPT_HELLO                    0x00
 #define OFPT_ERROR                    0x01

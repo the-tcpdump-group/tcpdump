@@ -34,6 +34,9 @@
 /* Define to 1 if you have the `ether_ntohost' function. */
 #undef HAVE_ETHER_NTOHOST
 
+/* Define to 1 if you have the `EVP_CIPHER_CTX_new' function. */
+#undef HAVE_EVP_CIPHER_CTX_NEW
+
 /* Define to 1 if you have the <fcntl.h> header file. */
 #undef HAVE_FCNTL_H
 
@@ -141,6 +144,12 @@
 
 /* Define to 1 if you have the `pcap_set_immediate_mode' function. */
 #undef HAVE_PCAP_SET_IMMEDIATE_MODE
+
+/* Define to 1 if you have the `pcap_set_optimizer_debug' function. */
+#undef HAVE_PCAP_SET_OPTIMIZER_DEBUG
+
+/* Define to 1 if you have the `pcap_set_parser_debug' function. */
+#undef HAVE_PCAP_SET_PARSER_DEBUG
 
 /* Define to 1 if you have the `pcap_set_tstamp_precision' function. */
 #undef HAVE_PCAP_SET_TSTAMP_PRECISION

@@ -15,6 +15,8 @@
  * Original code by Hannes Gredler (hannes@juniper.net)
  */
 
+/* \summary: Resource ReSerVation Protocol (RSVP) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -30,7 +32,6 @@
 #include "signature.h"
 
 static const char tstr[] = " [|rsvp]";
-static const char istr[] = " (invalid)";
 
 /*
  * RFC 2205 common header
@@ -84,7 +85,7 @@ struct rsvp_object_header {
 #define	RSVP_MSGTYPE_PATHTEAR   5
 #define	RSVP_MSGTYPE_RESVTEAR   6
 #define	RSVP_MSGTYPE_RESVCONF   7
-#define RSVP_MSGTYPE_AGGREGATE  12
+#define RSVP_MSGTYPE_BUNDLE     12
 #define RSVP_MSGTYPE_ACK        13
 #define RSVP_MSGTYPE_HELLO_OLD  14      /* ancient Hellos */
 #define RSVP_MSGTYPE_SREFRESH   15
@@ -98,7 +99,7 @@ static const struct tok rsvp_msg_type_values[] = {
     { RSVP_MSGTYPE_PATHTEAR,	"PathTear" },
     { RSVP_MSGTYPE_RESVTEAR,	"ResvTear" },
     { RSVP_MSGTYPE_RESVCONF,	"ResvConf" },
-    { RSVP_MSGTYPE_AGGREGATE,	"Aggregate" },
+    { RSVP_MSGTYPE_BUNDLE,	"Bundle" },
     { RSVP_MSGTYPE_ACK,	        "Acknowledgement" },
     { RSVP_MSGTYPE_HELLO_OLD,	"Hello (Old)" },
     { RSVP_MSGTYPE_SREFRESH,	"Refresh" },
@@ -640,18 +641,23 @@ trunc:
     return 0;
 }
 
+/*
+ * Clear checksum prior to signature verification.
+ */
+static void
+rsvp_clear_checksum(void *header)
+{
+    struct rsvp_common_header *rsvp_com_header = (struct rsvp_common_header *) header;
+
+    rsvp_com_header->checksum[0] = 0;
+    rsvp_com_header->checksum[1] = 0;
+}
+
 static int
 rsvp_obj_print(netdissect_options *ndo,
-               const u_char *pptr
-#ifndef HAVE_LIBCRYPTO
-_U_
-#endif
-, u_int plen
-#ifndef HAVE_LIBCRYPTO
-_U_
-#endif
-, const u_char *tptr,
-                const char *ident, u_int tlen)
+               const u_char *pptr, u_int plen, const u_char *tptr,
+               const char *ident, u_int tlen,
+               const struct rsvp_common_header *rsvp_com_header)
 {
     const struct rsvp_object_header *rsvp_obj_header;
     const u_char *obj_tptr;
@@ -1057,20 +1063,37 @@ _U_
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_IPV4:
                 while(obj_tlen >= 4 ) {
+		    u_char length;
+
+		    ND_TCHECK2(*obj_tptr, 4);
+		    length = *(obj_tptr + 1);
                     ND_PRINT((ndo, "%s  Subobject Type: %s, length %u",
                            ident,
                            tok2str(rsvp_obj_xro_values,
                                    "Unknown %u",
                                    RSVP_OBJ_XRO_MASK_SUBOBJ(*obj_tptr)),
-                           *(obj_tptr + 1)));
+                           length));
 
-                    if (*(obj_tptr+1) == 0) { /* prevent infinite loops */
+                    if (length == 0) { /* prevent infinite loops */
                         ND_PRINT((ndo, "%s  ERROR: zero length ERO subtype", ident));
                         break;
                     }
 
                     switch(RSVP_OBJ_XRO_MASK_SUBOBJ(*obj_tptr)) {
+		    u_char prefix_length;
+
                     case RSVP_OBJ_XRO_IPV4:
+			if (length != 8) {
+				ND_PRINT((ndo, " ERROR: length != 8"));
+				goto invalid;
+			}
+			ND_TCHECK2(*obj_tptr, 8);
+			prefix_length = *(obj_tptr+6);
+			if (prefix_length != 32) {
+				ND_PRINT((ndo, " ERROR: Prefix length %u != 32",
+					  prefix_length));
+				goto invalid;
+			}
                         ND_PRINT((ndo, ", %s, %s/%u, Flags: [%s]",
                                RSVP_OBJ_XRO_MASK_LOOSE(*obj_tptr) ? "Loose" : "Strict",
                                ipaddr_string(ndo, obj_tptr+2),
@@ -1080,6 +1103,11 @@ _U_
                                    *(obj_tptr + 7)))); /* rfc3209 says that this field is rsvd. */
                     break;
                     case RSVP_OBJ_XRO_LABEL:
+			if (length != 8) {
+				ND_PRINT((ndo, " ERROR: length != 8"));
+				goto invalid;
+			}
+			ND_TCHECK2(*obj_tptr, 8);
                         ND_PRINT((ndo, ", Flags: [%s] (%#x), Class-Type: %s (%u), %u",
                                bittok2str(rsvp_obj_rro_label_flag_values,
                                    "none",
@@ -1665,12 +1693,10 @@ _U_
                        EXTRACT_32BITS(obj_ptr.rsvp_obj_integrity->digest+8),
                        EXTRACT_32BITS(obj_ptr.rsvp_obj_integrity->digest + 12)));
 
-#ifdef HAVE_LIBCRYPTO
-                sigcheck = signature_verify(ndo, pptr, plen, (unsigned char *)obj_ptr.\
-                                             rsvp_obj_integrity->digest);
-#else
-                sigcheck = CANT_CHECK_SIGNATURE;
-#endif
+                sigcheck = signature_verify(ndo, pptr, plen,
+                                            obj_ptr.rsvp_obj_integrity->digest,
+                                            rsvp_clear_checksum,
+                                            rsvp_com_header);
                 ND_PRINT((ndo, " (%s)", tok2str(signature_check_values, "Unknown", sigcheck)));
 
                 obj_tlen+=sizeof(struct rsvp_obj_integrity_t);
@@ -1800,13 +1826,13 @@ void
 rsvp_print(netdissect_options *ndo,
            register const u_char *pptr, register u_int len)
 {
-    struct rsvp_common_header *rsvp_com_header;
-    const u_char *tptr,*subtptr;
-    u_short plen, tlen, subtlen;
+    const struct rsvp_common_header *rsvp_com_header;
+    const u_char *tptr;
+    u_short plen, tlen;
 
     tptr=pptr;
 
-    rsvp_com_header = (struct rsvp_common_header *)pptr;
+    rsvp_com_header = (const struct rsvp_common_header *)pptr;
     ND_TCHECK(*rsvp_com_header);
 
     /*
@@ -1840,12 +1866,6 @@ rsvp_print(netdissect_options *ndo,
            rsvp_com_header->ttl,
            EXTRACT_16BITS(rsvp_com_header->checksum)));
 
-    /*
-     * Clear checksum prior to signature verification.
-     */
-    rsvp_com_header->checksum[0] = 0;
-    rsvp_com_header->checksum[1] = 0;
-
     if (tlen < sizeof(const struct rsvp_common_header)) {
         ND_PRINT((ndo, "ERROR: common header too short %u < %lu", tlen,
                (unsigned long)sizeof(const struct rsvp_common_header)));
@@ -1857,10 +1877,19 @@ rsvp_print(netdissect_options *ndo,
 
     switch(rsvp_com_header->msg_type) {
 
-    case RSVP_MSGTYPE_AGGREGATE:
+    case RSVP_MSGTYPE_BUNDLE:
+        /*
+         * Process each submessage in the bundle message.
+         * Bundle messages may not contain bundle submessages, so we don't
+         * need to handle bundle submessages specially.
+         */
         while(tlen > 0) {
-            subtptr=tptr;
-            rsvp_com_header = (struct rsvp_common_header *)subtptr;
+            const u_char *subpptr=tptr, *subtptr;
+            u_short subplen, subtlen;
+
+            subtptr=subpptr;
+
+            rsvp_com_header = (const struct rsvp_common_header *)subpptr;
             ND_TCHECK(*rsvp_com_header);
 
             /*
@@ -1871,7 +1900,8 @@ rsvp_print(netdissect_options *ndo,
                        RSVP_EXTRACT_VERSION(rsvp_com_header->version_flags)));
                 return;
             }
-            subtlen=EXTRACT_16BITS(rsvp_com_header->length);
+
+            subplen = subtlen = EXTRACT_16BITS(rsvp_com_header->length);
 
             ND_PRINT((ndo, "\n\t  RSVPv%u %s Message (%u), Flags: [%s], length: %u, ttl: %u, checksum: 0x%04x",
                    RSVP_EXTRACT_VERSION(rsvp_com_header->version_flags),
@@ -1881,12 +1911,6 @@ rsvp_print(netdissect_options *ndo,
                    subtlen,
                    rsvp_com_header->ttl,
                    EXTRACT_16BITS(rsvp_com_header->checksum)));
-
-            /*
-             * Clear checksum prior to signature verification.
-             */
-            rsvp_com_header->checksum[0] = 0;
-            rsvp_com_header->checksum[1] = 0;
 
             if (subtlen < sizeof(const struct rsvp_common_header)) {
                 ND_PRINT((ndo, "ERROR: common header too short %u < %lu", subtlen,
@@ -1903,7 +1927,10 @@ rsvp_print(netdissect_options *ndo,
             subtptr+=sizeof(const struct rsvp_common_header);
             subtlen-=sizeof(const struct rsvp_common_header);
 
-            if (rsvp_obj_print(ndo, pptr, plen, subtptr, "\n\t    ", subtlen) == -1)
+            /*
+             * Print all objects in the submessage.
+             */
+            if (rsvp_obj_print(ndo, subpptr, subplen, subtptr, "\n\t    ", subtlen, rsvp_com_header) == -1)
                 return;
 
             tptr+=subtlen+sizeof(const struct rsvp_common_header);
@@ -1923,7 +1950,10 @@ rsvp_print(netdissect_options *ndo,
     case RSVP_MSGTYPE_HELLO:
     case RSVP_MSGTYPE_ACK:
     case RSVP_MSGTYPE_SREFRESH:
-        if (rsvp_obj_print(ndo, pptr, plen, tptr, "\n\t  ", tlen) == -1)
+        /*
+         * Print all objects in the message.
+         */
+        if (rsvp_obj_print(ndo, pptr, plen, tptr, "\n\t  ", tlen, rsvp_com_header) == -1)
             return;
         break;
 

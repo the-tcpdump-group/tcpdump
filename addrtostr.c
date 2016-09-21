@@ -106,8 +106,9 @@ addrtostr6 (const void *src, char *dst, size_t size)
    * to use pointer overlays.  All the world's not a VAX.
    */
   const u_char *srcaddr = (const u_char *)src;
-  char  tmp [INET6_ADDRSTRLEN+1];
-  char *tp;
+  char *dp;
+  size_t space_left, added_space;
+  int snprintfed;
   struct {
     long base;
     long len;
@@ -149,7 +150,17 @@ addrtostr6 (const void *src, char *dst, size_t size)
 
   /* Format the result.
    */
-  tp = tmp;
+  dp = dst;
+  space_left = size;
+#define APPEND_CHAR(c) \
+    { \
+        if (space_left == 0) { \
+            errno = ENOSPC; \
+            return (NULL); \
+        } \
+        *dp++ = c; \
+        space_left--; \
+    }
   for (i = 0; i < (IN6ADDRSZ / INT16SZ); i++)
   {
     /* Are we inside the best run of 0x00's?
@@ -157,43 +168,47 @@ addrtostr6 (const void *src, char *dst, size_t size)
     if (best.base != -1 && i >= best.base && i < (best.base + best.len))
     {
       if (i == best.base)
-         *tp++ = ':';
+      	 APPEND_CHAR(':');
       continue;
     }
 
     /* Are we following an initial run of 0x00s or any real hex?
      */
     if (i != 0)
-       *tp++ = ':';
+       APPEND_CHAR(':');
 
     /* Is this address an encapsulated IPv4?
      */
     if (i == 6 && best.base == 0 &&
         (best.len == 6 || (best.len == 5 && words[5] == 0xffff)))
     {
-      if (!addrtostr(srcaddr+12, tp, sizeof(tmp) - (tp - tmp)))
+      if (!addrtostr(srcaddr+12, dp, space_left))
       {
         errno = ENOSPC;
         return (NULL);
       }
-      tp += strlen(tp);
+      added_space = strlen(dp);
+      dp += added_space;
+      space_left -= added_space;
       break;
     }
-    tp += sprintf (tp, "%lx", words[i]);
+    snprintfed = snprintf (dp, space_left, "%lx", words[i]);
+    if (snprintfed < 0)
+        return (NULL);
+    if ((size_t) snprintfed >= space_left)
+    {
+        errno = ENOSPC;
+        return (NULL);
+    }
+    dp += snprintfed;
+    space_left -= snprintfed;
   }
 
   /* Was it a trailing run of 0x00's?
    */
   if (best.base != -1 && (best.base + best.len) == (IN6ADDRSZ / INT16SZ))
-     *tp++ = ':';
-  *tp++ = '\0';
+     APPEND_CHAR(':');
+  APPEND_CHAR('\0');
 
-  /* Check for overflow, copy, and we're done.
-   */
-  if ((size_t)(tp - tmp) > size)
-  {
-    errno = ENOSPC;
-    return (NULL);
-  }
-  return strcpy (dst, tmp);
+  return (dst);
 }

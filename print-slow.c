@@ -18,6 +18,8 @@
  * Original code by Hannes Gredler (hannes@juniper.net)
  */
 
+/* \summary: IEEE "slow protocols" (802.3ad/802.3ah) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -244,7 +246,7 @@ struct lacp_marker_tlv_terminator_t {
 static void slow_marker_lacp_print(netdissect_options *, register const u_char *, register u_int);
 static void slow_oam_print(netdissect_options *, register const u_char *, register u_int);
 
-const struct slow_common_header_t *slow_com_header;
+static const struct slow_common_header_t *slow_com_header;
 
 void
 slow_print(netdissect_options *ndo,

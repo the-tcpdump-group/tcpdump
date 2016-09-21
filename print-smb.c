@@ -6,6 +6,8 @@
  * or later
  */
 
+/* \summary: SMB/CIFS printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -1308,7 +1310,7 @@ out:
 /*
    print netbeui frames
 */
-struct nbf_strings {
+static struct nbf_strings {
 	const char	*name;
 	const char	*nonverbose;
 	const char	*verbose;

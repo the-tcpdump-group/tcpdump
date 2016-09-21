@@ -1,8 +1,4 @@
 /*
- * This module implements decoding of the ATA over Ethernet (AoE) protocol
- * according to the following specification:
- * http://support.coraid.com/documents/AoEr11.txt
- *
  * Copyright (c) 2014 The TCPDUMP project
  * All rights reserved.
  *
@@ -29,6 +25,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* \summary: ATA over Ethernet (AoE) protocol printer */
+
+/* specification: http://brantleycoilecompany.com/AoEr11.pdf */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -41,7 +41,6 @@
 #include "ether.h"
 
 static const char tstr[] = " [|aoe]";
-static const char istr[] = " (invalid)";
 
 #define AOE_V1 1
 #define ATA_SECTOR_SIZE 512

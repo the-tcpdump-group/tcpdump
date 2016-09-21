@@ -23,6 +23,8 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+/* \summary: TCP printer */
+
 #ifndef lint
 #else
 __RCSID("$NetBSD: print-tcp.c,v 1.8 2007/07/24 11:53:48 drochner Exp $");
@@ -140,6 +142,16 @@ tcp_cksum(netdissect_options *ndo,
           register u_int len)
 {
 	return nextproto4_cksum(ndo, ip, (const uint8_t *)tp, len, len,
+				IPPROTO_TCP);
+}
+
+static int
+tcp6_cksum(netdissect_options *ndo,
+           register const struct ip6_hdr *ip6,
+           register const struct tcphdr *tp,
+           register u_int len)
+{
+	return nextproto6_cksum(ndo, ip6, (const uint8_t *)tp, len, len,
 				IPPROTO_TCP);
 }
 
@@ -370,8 +382,7 @@ tcp_print(netdissect_options *ndo,
                         }
                 } else if (IP_V(ip) == 6 && ip6->ip6_plen) {
                         if (ND_TTEST2(tp->th_sport, length)) {
-                                sum = nextproto6_cksum(ip6, (const uint8_t *)tp,
-							length, length, IPPROTO_TCP);
+                                sum = tcp6_cksum(ndo, ip6, tp, length);
                                 tcp_sum = EXTRACT_16BITS(&tp->th_sum);
 
                                 ND_PRINT((ndo, ", cksum 0x%04x", tcp_sum));
@@ -641,6 +652,9 @@ tcp_print(netdissect_options *ndo,
                 case PT_ZMTP1:
                         zmtp1_print(ndo, bp, length);
                         break;
+                case PT_RESP:
+                        resp_print(ndo, bp, length);
+                        break;
                 }
                 return;
         }
@@ -654,6 +668,8 @@ tcp_print(netdissect_options *ndo,
                 bgp_print(ndo, bp, length);
         else if (IS_SRC_OR_DST_PORT(PPTP_PORT))
                 pptp_print(ndo, bp);
+        else if (IS_SRC_OR_DST_PORT(REDIS_PORT))
+                resp_print(ndo, bp, length);
 #ifdef ENABLE_SMB
         else if (IS_SRC_OR_DST_PORT(NETBIOS_SSN_PORT))
                 nbt_tcp_print(ndo, bp, length);
@@ -758,7 +774,7 @@ print_tcp_rst_data(netdissect_options *ndo,
                 ND_PRINT((ndo, "+"));			/* indicate we truncate */
         }
         ND_PRINT((ndo, " "));
-        while (length-- && sp <= ndo->ndo_snapend) {
+        while (length-- && sp < ndo->ndo_snapend) {
                 c = *sp++;
                 safeputchar(ndo, c);
         }

@@ -56,6 +56,8 @@
  #	@(#)snmp.awk.x	1.1 (LANL) 1/15/90
  */
 
+/* \summary: Simple Network Management Protocol (SNMP) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -252,7 +254,7 @@ static const char *Form[] = {
  * A structure for the OID tree for the compiled-in MIB.
  * This is stored as a general-order tree.
  */
-struct obj {
+static struct obj {
 	const char	*desc;		/* name of object */
 	u_char	oid;			/* sub-id following parent */
 	u_char	type;			/* object type (unused) */
@@ -679,46 +681,49 @@ asn1_print(netdissect_options *ndo,
 		int o = 0, first = -1;
 
 		i = asnlen;
-		if (!ndo->ndo_mflag && !ndo->ndo_nflag && asnlen > 2) {
-			const struct obj_abrev *a = &obj_abrev_list[0];
-			size_t a_len = strlen(a->oid);
-			for (; a->node; a++) {
-				ND_TCHECK2(*p, a_len);
-				if (memcmp(a->oid, p, a_len) == 0) {
-					objp = a->node->child;
-					i -= strlen(a->oid);
-					p += strlen(a->oid);
-					ND_PRINT((ndo, "%s", a->prefix));
-					first = 1;
-					break;
+		if (!nd_smi_module_loaded) {
+			if (!ndo->ndo_nflag && asnlen > 2) {
+				const struct obj_abrev *a = &obj_abrev_list[0];
+				size_t a_len = strlen(a->oid);
+				for (; a->node; a++) {
+					ND_TCHECK2(*p, a_len);
+					if (memcmp(a->oid, p, a_len) == 0) {
+						objp = a->node->child;
+						i -= strlen(a->oid);
+						p += strlen(a->oid);
+						ND_PRINT((ndo, "%s", a->prefix));
+						first = 1;
+						break;
+					}
 				}
 			}
-		}
 
-		for (; !ndo->ndo_mflag && i-- > 0; p++) {
-			ND_TCHECK(*p);
-			o = (o << ASN_SHIFT7) + (*p & ~ASN_BIT8);
-			if (*p & ASN_LONGLEN)
-			        continue;
+			for (; i-- > 0; p++) {
+				ND_TCHECK(*p);
+				o = (o << ASN_SHIFT7) + (*p & ~ASN_BIT8);
+				if (*p & ASN_LONGLEN)
+				        continue;
 
-			/*
-			 * first subitem encodes two items with 1st*OIDMUX+2nd
-			 * (see X.690:1997 clause 8.19 for the details)
-			 */
-			if (first < 0) {
-			        int s;
-				if (!ndo->ndo_nflag)
-					objp = mibroot;
-				first = 0;
-				s = o / OIDMUX;
-				if (s > 2) s = 2;
-				OBJ_PRINT(s, first);
-				o -= s * OIDMUX;
+				/*
+				 * first subitem encodes two items with
+				 * 1st*OIDMUX+2nd
+				 * (see X.690:1997 clause 8.19 for the details)
+				 */
+				if (first < 0) {
+				        int s;
+					if (!ndo->ndo_nflag)
+						objp = mibroot;
+					first = 0;
+					s = o / OIDMUX;
+					if (s > 2) s = 2;
+					OBJ_PRINT(s, first);
+					o -= s * OIDMUX;
+				}
+				OBJ_PRINT(o, first);
+				if (--first < 0)
+					first = 0;
+				o = 0;
 			}
-			OBJ_PRINT(o, first);
-			if (--first < 0)
-				first = 0;
-			o = 0;
 		}
 		break;
 	}
@@ -901,29 +906,31 @@ smi_decode_oid(netdissect_options *ndo,
 	int o = 0, first = -1, i = asnlen;
 	unsigned int firstval;
 
-	for (*oidlen = 0; ndo->ndo_mflag && i-- > 0; p++) {
-		ND_TCHECK(*p);
-	        o = (o << ASN_SHIFT7) + (*p & ~ASN_BIT8);
-		if (*p & ASN_LONGLEN)
-		    continue;
+	if (nd_smi_module_loaded) {
+		for (*oidlen = 0; i-- > 0; p++) {
+			ND_TCHECK(*p);
+		        o = (o << ASN_SHIFT7) + (*p & ~ASN_BIT8);
+			if (*p & ASN_LONGLEN)
+			    continue;
 
-		/*
-		 * first subitem encodes two items with 1st*OIDMUX+2nd
-		 * (see X.690:1997 clause 8.19 for the details)
-		 */
-		if (first < 0) {
-		        first = 0;
-			firstval = o / OIDMUX;
-			if (firstval > 2) firstval = 2;
-			o -= firstval * OIDMUX;
-			if (*oidlen < oidsize) {
-			    oid[(*oidlen)++] = firstval;
+			/*
+			 * first subitem encodes two items with 1st*OIDMUX+2nd
+			 * (see X.690:1997 clause 8.19 for the details)
+			 */
+			if (first < 0) {
+		        	first = 0;
+				firstval = o / OIDMUX;
+				if (firstval > 2) firstval = 2;
+				o -= firstval * OIDMUX;
+				if (*oidlen < oidsize) {
+				    oid[(*oidlen)++] = firstval;
+				}
 			}
+			if (*oidlen < oidsize) {
+				oid[(*oidlen)++] = o;
+			}
+			o = 0;
 		}
-		if (*oidlen < oidsize) {
-			oid[(*oidlen)++] = o;
-		}
-		o = 0;
 	}
 	return 0;
 

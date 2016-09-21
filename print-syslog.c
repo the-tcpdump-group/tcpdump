@@ -14,6 +14,8 @@
  * FOR A PARTICULAR PURPOSE.
  */
 
+/* \summary: Syslog protocol printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

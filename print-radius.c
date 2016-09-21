@@ -19,6 +19,9 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
+
+/* \summary: Radius protocol printer */
+
 /*
  * Radius printer routines as specified on:
  *
@@ -369,7 +372,8 @@ static const char *prompt[]={ "No Echo",
                             };
 
 
-struct attrtype { const char *name;      /* Attribute name                 */
+static struct attrtype {
+                  const char *name;      /* Attribute name                 */
                   const char **subtypes; /* Standard Values (if any)       */
                   u_char siz_subtypes;   /* Size of total standard values  */
                   u_char first_subtype;  /* First standard value is 0 or 1 */

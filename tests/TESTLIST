@@ -288,6 +288,14 @@ dhcp-rfc5859	dhcp-rfc5859.pcap	dhcp-rfc5859-v.out	-t -v
 medsa		medsa.pcap		medsa.out	-t
 medsa-e		medsa.pcap		medsa-e.out	-t -e
 
+# VXLAN tests
+vxlan  vxlan.pcap  vxlan.out  -# -t -e
+
+# CVEs 2014 malformed packets from Steffen Bauch
+cve-2014-8767-OLSR cve-2014-8767-OLSR.pcap cve-2014-8767-OLSR.out -t -v
+cve-2014-8768-Geonet cve-2014-8768-Geonet.pcap cve-2014-8768-Geonet.out -t -v
+cve-2014-8769-AODV cve-2014-8769-AODV.pcap cve-2014-8769-AODV.out -t -v
+
 # bad packets from Kevin Day
 # cve-2015-2155 -- futz testing on FORCES printer
 kday1           kday1.pcap              kday1.out       -t -v
@@ -328,3 +336,25 @@ pcap-invalid-version-2 pcap-invalid-version-2.pcap pcap-invalid-version-2.out -t
 # pcap-ng invalid version (first: version = 0.1 ; second: version = 1.1)
 pcap-ng-invalid-vers-1 pcap-ng-invalid-vers-1.pcap pcap-ng-invalid-vers-1.out -t
 pcap-ng-invalid-vers-2 pcap-ng-invalid-vers-2.pcap pcap-ng-invalid-vers-2.out -t
+
+# NSH over VxLAN-GPE
+nsh-over-vxlan-gpe     nsh-over-vxlan-gpe.pcap nsh-over-vxlan-gpe.out     -t
+nsh-over-vxlan-gpe-v   nsh-over-vxlan-gpe.pcap nsh-over-vxlan-gpe-v.out   -t -v
+nsh-over-vxlan-gpe-vv  nsh-over-vxlan-gpe.pcap nsh-over-vxlan-gpe-vv.out  -t -vv
+nsh-over-vxlan-gpe-vvv nsh-over-vxlan-gpe.pcap nsh-over-vxlan-gpe-vvv.out -t -vvv
+
+# RESP tests
+resp_1      resp_1_benchmark.pcap   resp_1.out      -n -t
+resp_2      resp_2_inline.pcap      resp_2.out      -n -t
+resp_3      resp_3_malicious.pcap   resp_3.out      -n -t
+
+# HNCP tests
+hncp        hncp.pcap    hncp.out    -n -vvv -t
+
+# BFD tests with authentication fields
+bfd-raw-auth-simple bfd-raw-auth-simple.pcap bfd-raw-auth-simple.out -t
+bfd-raw-auth-simple-v bfd-raw-auth-simple.pcap bfd-raw-auth-simple-v.out -t -v
+bfd-raw-auth-md5 bfd-raw-auth-md5.pcap bfd-raw-auth-md5.out -t
+bfd-raw-auth-md5-v bfd-raw-auth-md5.pcap bfd-raw-auth-md5-v.out -t -v
+bfd-raw-auth-sha1 bfd-raw-auth-sha1.pcap bfd-raw-auth-sha1.out -t
+bfd-raw-auth-sha1-v bfd-raw-auth-sha1.pcap bfd-raw-auth-sha1-v.out -t -v

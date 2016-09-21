@@ -103,7 +103,7 @@ EXTRACT_32BITS(const void *p)
 static inline uint64_t
 EXTRACT_64BITS(const void *p)
 {
-	return ((uint64_t)(((uint64_t)ntohl(((const unaligned_uint32_t *)(p) + 0)->val)) << 32 | \
+	return ((uint64_t)(((uint64_t)ntohl(((const unaligned_uint32_t *)(p) + 0)->val)) << 32 |
 		((uint64_t)ntohl(((const unaligned_uint32_t *)(p) + 1)->val)) << 0));
 }
 
@@ -153,7 +153,7 @@ EXTRACT_32BITS(const void *p)
 static inline uint64_t
 EXTRACT_64BITS(const void *p)
 {
-	return ((uint64_t)(((uint64_t)ntohl(*((const uint32_t *)(p) + 0))) << 32 | \
+	return ((uint64_t)(((uint64_t)ntohl(*((const uint32_t *)(p) + 0))) << 32 |
 		((uint64_t)ntohl(*((const uint32_t *)(p) + 1))) << 0));
 
 }

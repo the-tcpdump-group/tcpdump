@@ -400,7 +400,7 @@ If the
 flag is supported, an interface number as printed by that flag can be
 used as the
 .I interface
-argument.
+argument, if no interface on the system has that number as a name.
 .TP
 .B \-I
 .PD 0
@@ -638,6 +638,7 @@ Currently known types are
 \fBlmp\fR (Link Management Protocol),
 \fBpgm\fR (Pragmatic General Multicast),
 \fBpgm_zmtp1\fR (ZMTP/1.0 inside PGM/EPGM),
+\fBresp\fR (REdis Serialization Protocol),
 \fBradius\fR (RADIUS),
 \fBrpc\fR (Remote Procedure Call),
 \fBrtp\fR (Real-Time Applications protocol),

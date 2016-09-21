@@ -19,6 +19,14 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+/* \summary: Transparent Inter-Process Communication (TIPC) protocol printer */
+
+/*
+ * specification:
+ *	http://tipc.sourceforge.net/doc/draft-spec-tipc-07.html
+ *	http://tipc.sourceforge.net/doc/tipc_message_formats.html
+ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -31,13 +39,6 @@
 #include "extract.h"
 
 static const char tstr[] = "[|TIPC]";
-
-/*
- * Transparent Inter-Process Communication (TIPC) protocol.
- *
- *	http://tipc.sourceforge.net/doc/draft-spec-tipc-07.html
- *	http://tipc.sourceforge.net/doc/tipc_message_formats.html
- */
 
 #define TIPC_USER_LOW_IMPORTANCE	0
 #define TIPC_USER_MEDIUM_IMPORTANCE	1

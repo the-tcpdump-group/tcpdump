@@ -15,6 +15,8 @@
  * Original code by Hannes Gredler (hannes@juniper.net)
  */
 
+/* \summary: DLT_JUNIPER_* printers */
+
 #ifndef lint
 #else
 __RCSID("NetBSD: print-juniper.c,v 1.3 2007/07/25 06:31:32 dogcow Exp ");

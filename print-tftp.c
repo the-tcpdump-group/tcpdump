@@ -17,9 +17,9 @@
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
- *
- * Format and print trivial file transfer protocol packets.
  */
+
+/* \summary: Trivial File Transfer Protocol (TFTP) printer */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

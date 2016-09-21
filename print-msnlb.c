@@ -26,6 +26,8 @@
  * SUCH DAMAGE.
  */
 
+/* \summary: MS Network Load Balancing's (NLB) heartbeat printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

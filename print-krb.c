@@ -21,6 +21,8 @@
  * Initial contribution from John Hawkinson (jhawk@mit.edu).
  */
 
+/* \summary: Kerberos printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

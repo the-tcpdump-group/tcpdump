@@ -1,8 +1,4 @@
 /*
- * This module implements decoding of AHCP (Ad Hoc Configuration Protocol) based
- * on draft-chroboczek-ahcp-00 and source code of ahcpd-0.53.
- *
- *
  * Copyright (c) 2013 The TCPDUMP project
  * All rights reserved.
  *
@@ -29,6 +25,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* \summary: Ad Hoc Configuration Protocol (AHCP) printer */
+
+/* Based on draft-chroboczek-ahcp-00 and source code of ahcpd-0.53 */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -40,7 +40,6 @@
 #include "addrtoname.h"
 
 static const char tstr[] = " [|ahcp]";
-static const char istr[] = " (invalid)";
 
 #define AHCP_MAGIC_NUMBER 43
 #define AHCP_VERSION_1 1

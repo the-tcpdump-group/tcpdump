@@ -30,6 +30,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* \summary: version-independent OpenFlow printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -42,7 +44,6 @@
 #include "oui.h"
 
 static const char tstr[] = " [|openflow]";
-static const char istr[] = " (invalid)";
 
 #define OF_VER_1_0    0x01
 

@@ -1,9 +1,4 @@
 /*
- * This module implements decoding of the Loopback Protocol, originally
- * defined as the Configuration Testing Protocol. It is based on the following
- * specification:
- * http://www.mit.edu/people/jhawk/ctp.pdf
- *
  * Copyright (c) 2014 The TCPDUMP project
  * All rights reserved.
  *
@@ -30,6 +25,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* \summary: Loopback Protocol printer */
+
+/*
+ * originally defined as the Ethernet Configuration Testing Protocol.
+ * specification: http://www.mit.edu/people/jhawk/ctp.pdf
+ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -42,7 +44,6 @@
 #include "addrtoname.h"
 
 static const char tstr[] = " [|loopback]";
-static const char istr[] = " (invalid)";
 
 #define LOOPBACK_REPLY   1
 #define LOOPBACK_FWDDATA 2

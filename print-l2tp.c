@@ -21,6 +21,8 @@
  * L2TP support contributed by Motonori Shindo (mshindo@mshindo.net)
  */
 
+/* \summary: Layer Two Tunneling Protocol (L2TP) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

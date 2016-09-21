@@ -27,6 +27,8 @@
  * SUCH DAMAGE.
  */
 
+/* \summary: Cisco Hot Standby Router Protocol (HSRP) printer */
+
 /* Cisco Hot Standby Router Protocol (HSRP). */
 
 #ifdef HAVE_CONFIG_H

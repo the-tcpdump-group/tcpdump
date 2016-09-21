@@ -19,6 +19,8 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+/* \summary: Fiber Distributed Data Interface (FDDI) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -83,9 +85,9 @@ struct fddi_header {
  * Some FDDI interfaces use bit-swapped addresses.
  */
 #if defined(ultrix) || defined(__alpha) || defined(__bsdi) || defined(__NetBSD__) || defined(__linux__)
-int	fddi_bitswap = 0;
+static int fddi_bitswap = 0;
 #else
-int	fddi_bitswap = 1;
+static int fddi_bitswap = 1;
 #endif
 
 /*

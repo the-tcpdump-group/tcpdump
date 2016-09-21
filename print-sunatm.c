@@ -30,6 +30,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* \summary: SunATM DLPI capture printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

@@ -319,6 +319,7 @@ typedef char* caddr_t;
  * define struct in6_addr so that we can use it for IPv6 addresses.
  */
 #ifndef HAVE_OS_IPV6_SUPPORT
+#ifndef AF_INET6
 #define AF_INET6	24
 
 struct in6_addr {
@@ -329,11 +330,12 @@ struct in6_addr {
 	} __u6_addr;			/* 128-bit IP6 address */
 };
 #endif
+#endif
 
 #ifndef NI_MAXHOST
 #define	NI_MAXHOST	1025
 #endif
-  
+
 #ifndef INET_ADDRSTRLEN
 #define INET_ADDRSTRLEN 16
 #endif

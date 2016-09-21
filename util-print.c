@@ -57,6 +57,8 @@
 #include "timeval-operations.h"
 
 int32_t thiszone;		/* seconds offset from gmt to local time */
+/* invalid string to print '(invalid)' for malformed or corrupted packets */
+const char istr[] = " (invalid)";
 
 /*
  * timestamp display buffer size, the biggest size of both formats is needed
@@ -781,7 +783,7 @@ txtproto_print(netdissect_options *ndo, const u_char *pptr, u_int len,
 
 	/* Capitalize the protocol name */
 	for (pnp = protoname; *pnp != '\0'; pnp++)
-		ND_PRINT((ndo, "%c", toupper(*pnp)));
+		ND_PRINT((ndo, "%c", toupper((u_char)*pnp)));
 
 	if (is_reqresp) {
 		/*
