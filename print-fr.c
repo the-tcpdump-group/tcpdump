@@ -705,7 +705,7 @@ static const struct tok fr_q933_msg_values[] = {
 #define FR_LMI_CCITT_LINK_VERIFY_IE	0x53
 #define FR_LMI_CCITT_PVC_STATUS_IE	0x57
 
-static const struct tok fr_q933_ie_values_codeset5[] = {
+static const struct tok fr_q933_ie_values_codeset_0_5[] = {
     { FR_LMI_ANSI_REPORT_TYPE_IE, "ANSI Report Type" },
     { FR_LMI_ANSI_LINK_VERIFY_IE_91, "ANSI Link Verify" },
     { FR_LMI_ANSI_LINK_VERIFY_IE, "ANSI Link Verify" },
@@ -729,12 +729,12 @@ static const struct tok fr_lmi_report_type_ie_values[] = {
 
 /* array of 16 codesets - currently we only support codepage 0 and 5 */
 static const struct tok *fr_q933_ie_codesets[] = {
-    fr_q933_ie_values_codeset5,
+    fr_q933_ie_values_codeset_0_5,
     NULL,
     NULL,
     NULL,
     NULL,
-    fr_q933_ie_values_codeset5,
+    fr_q933_ie_values_codeset_0_5,
     NULL,
     NULL,
     NULL,
@@ -747,7 +747,7 @@ static const struct tok *fr_q933_ie_codesets[] = {
     NULL
 };
 
-static int fr_q933_print_ie_codeset5(netdissect_options *ndo, u_int iecode,
+static int fr_q933_print_ie_codeset_0_5(netdissect_options *ndo, u_int iecode,
     u_int ielength, const u_char *p);
 
 typedef int (*codeset_pr_func_t)(netdissect_options *, u_int iecode,
@@ -755,12 +755,12 @@ typedef int (*codeset_pr_func_t)(netdissect_options *, u_int iecode,
 
 /* array of 16 codesets - currently we only support codepage 0 and 5 */
 static const codeset_pr_func_t fr_q933_print_ie_codeset[] = {
-    fr_q933_print_ie_codeset5,
+    fr_q933_print_ie_codeset_0_5,
     NULL,
     NULL,
     NULL,
     NULL,
-    fr_q933_print_ie_codeset5,
+    fr_q933_print_ie_codeset_0_5,
     NULL,
     NULL,
     NULL,
@@ -1062,7 +1062,7 @@ trunc:
 }
 
 static int
-fr_q933_print_ie_codeset5(netdissect_options *ndo, u_int iecode,
+fr_q933_print_ie_codeset_0_5(netdissect_options *ndo, u_int iecode,
                           u_int ielength, const u_char *p)
 {
         u_int dlci;
@@ -1071,6 +1071,13 @@ fr_q933_print_ie_codeset5(netdissect_options *ndo, u_int iecode,
 
         case FR_LMI_ANSI_REPORT_TYPE_IE: /* fall through */
         case FR_LMI_CCITT_REPORT_TYPE_IE:
+            if (ielength < 1) {
+                if (!ndo->ndo_vflag) {
+                    ND_PRINT((ndo, ", "));
+	        }
+                ND_PRINT((ndo, "Invalid REPORT TYPE IE"));
+                return 1;
+            }
             if (ndo->ndo_vflag) {
                 ND_PRINT((ndo, "%s (%u)",
                        tok2str(fr_lmi_report_type_ie_values,"unknown",p[0]),
@@ -1084,6 +1091,10 @@ fr_q933_print_ie_codeset5(netdissect_options *ndo, u_int iecode,
             if (!ndo->ndo_vflag) {
                 ND_PRINT((ndo, ", "));
 	    }
+            if (ielength < 2) {
+                ND_PRINT((ndo, "Invalid VERIFY IE"));
+                return 1;
+            }
             ND_PRINT((ndo, "TX Seq: %3d, RX Seq: %3d", p[0], p[1]));
             return 1;
 
@@ -1102,6 +1113,7 @@ fr_q933_print_ie_codeset5(netdissect_options *ndo, u_int iecode,
                 (ielength > 5) ||
                 !(p[ielength - 1] & 0x80)) {
                 ND_PRINT((ndo, "Invalid DLCI IE"));
+                return 1;
 	    }
 
             dlci = ((p[0] & 0x3F) << 4) | ((p[1] & 0x78) >> 3);
