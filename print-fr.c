@@ -1092,7 +1092,7 @@ fr_q933_print_ie_codeset_0_5(netdissect_options *ndo, u_int iecode,
                 ND_PRINT((ndo, ", "));
 	    }
             if (ielength < 2) {
-                ND_PRINT((ndo, "Invalid VERIFY IE"));
+                ND_PRINT((ndo, "Invalid LINK VERIFY IE"));
                 return 1;
             }
             ND_PRINT((ndo, "TX Seq: %3d, RX Seq: %3d", p[0], p[1]));
@@ -1112,7 +1112,7 @@ fr_q933_print_ie_codeset_0_5(netdissect_options *ndo, u_int iecode,
                                    !(p[3] & 0x80))) ||
                 (ielength > 5) ||
                 !(p[ielength - 1] & 0x80)) {
-                ND_PRINT((ndo, "Invalid DLCI IE"));
+                ND_PRINT((ndo, "Invalid DLCI in PVC STATUS IE"));
                 return 1;
 	    }
 
