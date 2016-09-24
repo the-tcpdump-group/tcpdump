@@ -619,10 +619,10 @@ frf15_print(netdissect_options *ndo,
  * model is end-to-end or interface based wether we want to print
  * another Q.922 header
  */
-     return;
+    return;
 
 trunc:
-     ND_PRINT((ndo, "[|frf.15]"));
+    ND_PRINT((ndo, "[|frf.15]"));
 }
 
 /*
