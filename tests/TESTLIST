@@ -385,6 +385,7 @@ heap-overflow-2	heap-overflow-2.pcap		heap-overflow-2.out	-t -v -n
 heapoverflow-atalk_print	heapoverflow-atalk_print.pcap	heapoverflow-atalk_print.out	-t -v -n
 heapoverflow-EXTRACT_16BITS	heapoverflow-EXTRACT_16BITS.pcap	heapoverflow-EXTRACT_16BITS.out	-t -v -n
 heapoverflow-ppp_hdlc_if_print	heapoverflow-ppp_hdlc_if_print.pcap	heapoverflow-ppp_hdlc_if_print.out	-t -v -n
+heapoverflow-q933_printq	heapoverflow-q933_printq.pcap	heapoverflow-q933_printq.out	-t -v -n
 heapoverflow-sl_if_print	heapoverflow-sl_if_print.pcap	heapoverflow-sl_if_print.out	-t -v -n
 heapoverflow-ip_print_demux	heapoverflow-ip_print_demux.pcap	heapoverflow-ip_print_demux.out	-t -v -n
 heapoverflow-in_checksum	heapoverflow-in_checksum.pcap	heapoverflow-in_checksum.out	-t -v -n
@@ -396,6 +397,7 @@ geonet-mac-lookup-heapoverflow	geonet-mac-lookup-heapoverflow.pcap	geonet-mac-lo
 radiotap-heapoverflow	radiotap-heapoverflow.pcap	radiotap-heapoverflow.out -t -v -n
 isoclns-heapoverflow	isoclns-heapoverflow.pcap	isoclns-heapoverflow.out	-t -v -n
 tcp-auth-heapoverflow	tcp-auth-heapoverflow.pcap	tcp-auth-heapoverflow.out	-t -v -n
+frf15-heapoverflow	frf15-heapoverflow.pcap	frf15-heapoverflow.out	-t -v -n
 atm-oam-heapoverflow	atm-oam-heapoverflow.pcap	atm-oam-heapoverflow.out	-t -v -n
 tcp_header_heapoverflow	tcp_header_heapoverflow.pcap	tcp_header_heapoverflow.out	-t -v -n
 ipcomp-heapoverflow	ipcomp-heapoverflow.pcap	ipcomp-heapoverflow.out	-t -v -n
