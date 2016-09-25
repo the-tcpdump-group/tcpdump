@@ -105,7 +105,7 @@
 static int is_UCX(const unsigned char *, u_int);
 
 void
-Parse_fh(register const unsigned char *fh, int len, my_fsid *fsidp,
+Parse_fh(register const unsigned char *fh, u_int len, my_fsid *fsidp,
 	 uint32_t *inop,
 	 const char **osnamep, /* if non-NULL, return OS name here */
 	 const char **fsnamep, /* if non-NULL, return server fs name here (for VMS) */
@@ -114,7 +114,7 @@ Parse_fh(register const unsigned char *fh, int len, my_fsid *fsidp,
 	register const unsigned char *fhp = fh;
 	uint32_t temp;
 	int fhtype = FHT_UNKNOWN;
-	int i;
+	u_int i;
 
 	/*
 	 * Require at least 16 bytes of file handle; it's variable-length
@@ -422,7 +422,7 @@ Parse_fh(register const unsigned char *fh, int len, my_fsid *fsidp,
 	    (void)fprintf(stderr, "\n");
 #endif
 	    /* Save the actual handle, so it can be display with -u */
-	    for (i = 0; i < len*4; i++)
+	    for (i = 0; i < len*4 && i*2 < sizeof(fsidp->Opaque_Handle) - 1; i++)
 	    	(void)snprintf(&(fsidp->Opaque_Handle[i*2]), 3, "%.2X", fhp[i]);
 
 	    /* XXX for now, give "bogus" values to aid debugging */
@@ -452,7 +452,7 @@ Parse_fh(register const unsigned char *fh, int len, my_fsid *fsidp,
 static int
 is_UCX(const unsigned char *fhp, u_int len)
 {
-	register int i;
+	register u_int i;
 	int seen_null = 0;
 
 	/*
