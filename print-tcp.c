@@ -464,7 +464,7 @@ tcp_print(netdissect_options *ndo,
                         case TCPOPT_SACK:
                                 datalen = len - 2;
                                 if (datalen % 8 != 0) {
-                                        ND_PRINT((ndo, "invalid sack"));
+                                        ND_PRINT((ndo, " invalid sack"));
                                 } else {
                                         uint32_t s, e;
 
@@ -512,6 +512,7 @@ tcp_print(netdissect_options *ndo,
                         case TCPOPT_SIGNATURE:
                                 datalen = TCP_SIGLEN;
                                 LENCHECK(datalen);
+                                ND_PRINT((ndo, " "));
 #ifdef HAVE_LIBCRYPTO
                                 switch (tcp_verify_signature(ndo, ip, tp,
                                                              bp + TH_OFF(tp) * 4, length, cp)) {
@@ -537,7 +538,7 @@ tcp_print(netdissect_options *ndo,
                                 break;
 
                         case TCPOPT_AUTH:
-                                ND_PRINT((ndo, "keyid %d", *cp++));
+                                ND_PRINT((ndo, " keyid %d", *cp++));
                                 datalen = len - 3;
                                 for (i = 0; i < datalen; ++i) {
                                         LENCHECK(i);
@@ -559,7 +560,7 @@ tcp_print(netdissect_options *ndo,
                                 datalen = 2;
                                 LENCHECK(datalen);
                                 utoval = EXTRACT_16BITS(cp);
-                                ND_PRINT((ndo, "0x%x", utoval));
+                                ND_PRINT((ndo, " 0x%x", utoval));
                                 if (utoval & 0x0001)
                                         utoval = (utoval >> 1) * 60;
                                 else
@@ -577,6 +578,7 @@ tcp_print(netdissect_options *ndo,
                         case TCPOPT_FASTOPEN:
                                 datalen = len - 2;
                                 LENCHECK(datalen);
+                                ND_PRINT((ndo, " "));
                                 print_tcp_fastopen_option(ndo, cp, datalen, FALSE);
                                 break;
 
