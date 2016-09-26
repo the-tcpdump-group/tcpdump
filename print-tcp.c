@@ -538,6 +538,7 @@ tcp_print(netdissect_options *ndo,
                                 break;
 
                         case TCPOPT_AUTH:
+                                LENCHECK(1);
                                 ND_PRINT((ndo, " keyid %d", *cp++));
                                 datalen = len - 3;
                                 for (i = 0; i < datalen; ++i) {
