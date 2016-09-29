@@ -122,19 +122,24 @@ struct bgp_route_refresh {
 #define BGPTYPE_ATOMIC_AGGREGATE	6
 #define BGPTYPE_AGGREGATOR		7
 #define	BGPTYPE_COMMUNITIES		8	/* RFC1997 */
-#define	BGPTYPE_ORIGINATOR_ID		9	/* RFC1998 */
-#define	BGPTYPE_CLUSTER_LIST		10	/* RFC1998 */
-#define	BGPTYPE_DPA			11	/* draft-ietf-idr-bgp-dpa */
-#define	BGPTYPE_ADVERTISERS		12	/* RFC1863 */
-#define	BGPTYPE_RCID_PATH		13	/* RFC1863 */
-#define BGPTYPE_MP_REACH_NLRI		14	/* RFC2283 */
-#define BGPTYPE_MP_UNREACH_NLRI		15	/* RFC2283 */
-#define BGPTYPE_EXTD_COMMUNITIES        16      /* draft-ietf-idr-bgp-ext-communities */
-#define BGPTYPE_AS4_PATH	        17      /* RFC4893 */
-#define BGPTYPE_AGGREGATOR4		18      /* RFC4893 */
-#define BGPTYPE_PMSI_TUNNEL             22      /* draft-ietf-l3vpn-2547bis-mcast-bgp-02.txt */
-#define BGPTYPE_AIGP                    26      /* RFC7311 */
-#define BGPTYPE_ATTR_SET               128      /* draft-marques-ppvpn-ibgp */
+#define	BGPTYPE_ORIGINATOR_ID		9	/* RFC4456 */
+#define	BGPTYPE_CLUSTER_LIST		10	/* RFC4456 */
+#define	BGPTYPE_DPA			11	/* deprecated, draft-ietf-idr-bgp-dpa */
+#define	BGPTYPE_ADVERTISERS		12	/* deprecated RFC1863 */
+#define	BGPTYPE_RCID_PATH		13	/* deprecated RFC1863 */
+#define BGPTYPE_MP_REACH_NLRI		14	/* RFC4760 */
+#define BGPTYPE_MP_UNREACH_NLRI		15	/* RFC4760 */
+#define BGPTYPE_EXTD_COMMUNITIES        16      /* RFC4360 */
+#define BGPTYPE_AS4_PATH	        17      /* RFC6793 */
+#define BGPTYPE_AGGREGATOR4		18      /* RFC6793 */
+#define BGPTYPE_PMSI_TUNNEL             22      /* RFC6514 */
+#define BGPTYPE_TUNNEL_ENCAP            23      /* RFC5512 */
+#define BGPTYPE_TRAFFIC_ENG             24      /* RFC5543 */
+#define BGPTYPE_IPV6_EXTD_COMMUNITIES   25      /* RFC5701 */
+#define BGPTYPE_AIGP                    26      /* draft-ietf-idr-aigp */
+#define BGPTYPE_PE_DISTINGUISHER_LABEL  27      /* RFC6514 */
+#define BGPTYPE_ENTROPY_LABEL           28      /* RFC6790 */
+#define BGPTYPE_ATTR_SET               128      /* RFC6368 */
 
 #define BGP_MP_NLRI_MINSIZE              3       /* End of RIB Marker detection */
 
@@ -158,7 +163,12 @@ static const struct tok bgp_attr_values[] = {
     { BGPTYPE_MP_UNREACH_NLRI,  "Multi-Protocol Unreach NLRI"},
     { BGPTYPE_EXTD_COMMUNITIES, "Extended Community"},
     { BGPTYPE_PMSI_TUNNEL,      "PMSI Tunnel"},
+    { BGPTYPE_TUNNEL_ENCAP,     "Tunnel Encapsulation"},
+    { BGPTYPE_TRAFFIC_ENG,      "Traffic Engineering"},
+    { BGPTYPE_IPV6_EXTD_COMMUNITIES, "IPv6 Extended Community"},
     { BGPTYPE_AIGP,             "Accumulated IGP Metric"},
+    { BGPTYPE_PE_DISTINGUISHER_LABEL, "PE Distinguisher Label"},
+    { BGPTYPE_ENTROPY_LABEL,    "Entropy Label"},
     { BGPTYPE_ATTR_SET,         "Attribute Set"},
     { 255,                      "Reserved for development"},
     { 0, NULL}
@@ -198,23 +208,31 @@ static const struct tok bgp_opt_values[] = {
     { 0, NULL}
 };
 
-#define BGP_CAPCODE_MP                  1
-#define BGP_CAPCODE_RR                  2
-#define BGP_CAPCODE_ORF                 3 /* XXX */
-#define BGP_CAPCODE_RESTART            64 /* draft-ietf-idr-restart-05  */
-#define BGP_CAPCODE_AS_NEW             65 /* XXX */
-#define BGP_CAPCODE_DYN_CAP            67 /* XXX */
-#define BGP_CAPCODE_ADD_PATH           69 /* draft-ietf-idr-add-paths-10 */
+#define BGP_CAPCODE_MP                  1 /* RFC2858 */
+#define BGP_CAPCODE_RR                  2 /* RFC2918 */
+#define BGP_CAPCODE_ORF                 3 /* RFC5291 */
+#define BGP_CAPCODE_MR                  4 /* RFC3107 */
+#define BGP_CAPCODE_EXT_NH              5 /* RFC5549 */
+#define BGP_CAPCODE_RESTART            64 /* RFC4724  */
+#define BGP_CAPCODE_AS_NEW             65 /* RFC6793 */
+#define BGP_CAPCODE_DYN_CAP            67 /* draft-ietf-idr-dynamic-cap */
+#define BGP_CAPCODE_MULTISESS          68 /* draft-ietf-idr-bgp-multisession */
+#define BGP_CAPCODE_ADD_PATH           69 /* draft-ietf-idr-add-paths */
+#define BGP_CAPCODE_ENH_RR             70 /* draft-keyur-bgp-enhanced-route-refresh */
 #define BGP_CAPCODE_RR_CISCO          128
 
 static const struct tok bgp_capcode_values[] = {
     { BGP_CAPCODE_MP,           "Multiprotocol Extensions"},
     { BGP_CAPCODE_RR,           "Route Refresh"},
     { BGP_CAPCODE_ORF,          "Cooperative Route Filtering"},
+    { BGP_CAPCODE_MR,           "Multiple Routes to a Destination"},
+    { BGP_CAPCODE_EXT_NH,       "Extended Next Hop Encoding"},
     { BGP_CAPCODE_RESTART,      "Graceful Restart"},
     { BGP_CAPCODE_AS_NEW,       "32-Bit AS Number"},
     { BGP_CAPCODE_DYN_CAP,      "Dynamic Capability"},
+    { BGP_CAPCODE_MULTISESS,    "Multisession BGP"},
     { BGP_CAPCODE_ADD_PATH,     "Multiple Paths"},
+    { BGP_CAPCODE_ENH_RR,       "Enhanced Route Refresh"},
     { BGP_CAPCODE_RR_CISCO,     "Route Refresh (Cisco)"},
     { 0, NULL}
 };
@@ -284,6 +302,13 @@ static const struct tok bgp_notify_minor_update_values[] = {
     { 0, NULL}
 };
 
+static struct tok bgp_notify_minor_fsm_values[] = {
+    { 1,                        "In OpenSent State"},
+    { 2,                        "In OpenConfirm State"},
+    { 3,                        "In Established State"},
+    { 0, NULL }
+};
+
 static const struct tok bgp_notify_minor_cap_values[] = {
     { 1,                        "Invalid Action Value" },
     { 2,                        "Invalid Capability Length" },
@@ -335,20 +360,23 @@ static const struct tok bgp_aigp_values[] = {
 #define SAFNUM_RES                      0
 #define SAFNUM_UNICAST                  1
 #define SAFNUM_MULTICAST                2
-#define SAFNUM_UNIMULTICAST             3
+#define SAFNUM_UNIMULTICAST             3       /* deprecated now */
 /* labeled BGP RFC3107 */
 #define SAFNUM_LABUNICAST               4
-/* draft-ietf-l3vpn-2547bis-mcast-bgp-02.txt */
+/* RFC6514 */
 #define SAFNUM_MULTICAST_VPN            5
-#define SAFNUM_TUNNEL                   64 /* XXX */
-#define SAFNUM_VPLS                     65 /* XXX */
-/* draft-nalawade-idr-mdt-safi-03 */
+/* draft-nalawade-kapoor-tunnel-safi */
+#define SAFNUM_TUNNEL                   64
+/* RFC4761 */
+#define SAFNUM_VPLS                     65
+/* RFC6037 */
 #define SAFNUM_MDT                      66
-/* Section 4.3.4 of draft-rosen-rfc2547bis-03.txt  */
+/* RFC4364 */
 #define SAFNUM_VPNUNICAST               128
+/* RFC6513 */
 #define SAFNUM_VPNMULTICAST             129
-#define SAFNUM_VPNUNIMULTICAST          130
-/* draft-marques-ppvpn-rt-constrain-01.txt */
+#define SAFNUM_VPNUNIMULTICAST          130     /* deprecated now */
+/* RFC4684 */
 #define SAFNUM_RT_ROUTING_INFO          132
 
 #define BGP_VPN_RD_LEN                  8
@@ -2597,6 +2625,11 @@ bgp_notification_print(netdissect_options *ndo,
 			      bgpn.bgpn_minor),
 		   bgpn.bgpn_minor));
             break;
+        case BGP_NOTIFY_MAJOR_FSM:
+            printf(" subcode %s (%u)",
+		   tok2str(bgp_notify_minor_fsm_values, "Unknown",
+			      bgpn.bgpn_minor),
+		   bgpn.bgpn_minor);
         case BGP_NOTIFY_MAJOR_CAP:
             ND_PRINT((ndo, " subcode %s (%u)",
 		   tok2str(bgp_notify_minor_cap_values, "Unknown",
