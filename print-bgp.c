@@ -217,7 +217,7 @@ static const struct tok bgp_opt_values[] = {
 #define BGP_CAPCODE_AS_NEW             65 /* RFC6793 */
 #define BGP_CAPCODE_DYN_CAP            67 /* draft-ietf-idr-dynamic-cap */
 #define BGP_CAPCODE_MULTISESS          68 /* draft-ietf-idr-bgp-multisession */
-#define BGP_CAPCODE_ADD_PATH           69 /* draft-ietf-idr-add-paths */
+#define BGP_CAPCODE_ADD_PATH           69 /* RFC7911 */
 #define BGP_CAPCODE_ENH_RR             70 /* draft-keyur-bgp-enhanced-route-refresh */
 #define BGP_CAPCODE_RR_CISCO          128
 
