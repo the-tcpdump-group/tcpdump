@@ -142,7 +142,7 @@ signature_verify(netdissect_options *ndo, const u_char *pptr, u_int plen,
         /* No. */
         return (CANT_CHECK_SIGNATURE);
     }
-    if ((sig_ptr + sizeof(sig) - pptr) > plen) {
+    if (sig_ptr + sizeof(sig) > pptr + plen) {
         /* No. */
         return (CANT_CHECK_SIGNATURE);
     }
