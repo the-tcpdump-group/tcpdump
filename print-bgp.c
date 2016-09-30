@@ -302,7 +302,7 @@ static const struct tok bgp_notify_minor_update_values[] = {
     { 0, NULL}
 };
 
-static struct tok bgp_notify_minor_fsm_values[] = {
+static const struct tok bgp_notify_minor_fsm_values[] = {
     { 1,                        "In OpenSent State"},
     { 2,                        "In OpenConfirm State"},
     { 3,                        "In Established State"},
@@ -2626,10 +2626,10 @@ bgp_notification_print(netdissect_options *ndo,
 		   bgpn.bgpn_minor));
             break;
         case BGP_NOTIFY_MAJOR_FSM:
-            printf(" subcode %s (%u)",
+            ND_PRINT((ndo, " subcode %s (%u)",
 		   tok2str(bgp_notify_minor_fsm_values, "Unknown",
 			      bgpn.bgpn_minor),
-		   bgpn.bgpn_minor);
+		   bgpn.bgpn_minor));
         case BGP_NOTIFY_MAJOR_CAP:
             ND_PRINT((ndo, " subcode %s (%u)",
 		   tok2str(bgp_notify_minor_cap_values, "Unknown",
