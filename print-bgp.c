@@ -136,7 +136,7 @@ struct bgp_route_refresh {
 #define BGPTYPE_TUNNEL_ENCAP            23      /* RFC5512 */
 #define BGPTYPE_TRAFFIC_ENG             24      /* RFC5543 */
 #define BGPTYPE_IPV6_EXTD_COMMUNITIES   25      /* RFC5701 */
-#define BGPTYPE_AIGP                    26      /* draft-ietf-idr-aigp */
+#define BGPTYPE_AIGP                    26      /* RFC7311 */
 #define BGPTYPE_PE_DISTINGUISHER_LABEL  27      /* RFC6514 */
 #define BGPTYPE_ENTROPY_LABEL           28      /* RFC6790 */
 #define BGPTYPE_ATTR_SET               128      /* RFC6368 */
