@@ -56,6 +56,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* \summary: OpenFlow protocol version 1.0 printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

@@ -19,6 +19,8 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+/* \summary: IP Payload Compression Protocol (IPComp) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

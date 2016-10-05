@@ -14,6 +14,8 @@
  * FOR A PARTICULAR PURPOSE.
  */
 
+/* \summary: Enhanced Interior Gateway Routing Protocol (EIGRP) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

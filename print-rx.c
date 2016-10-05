@@ -20,6 +20,9 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
+
+/* \summary: AFS RX printer */
+
 /*
  * This code unmangles RX packets.  RX is the mutant form of RPC that AFS
  * uses to communicate between clients and servers.
@@ -1921,7 +1924,7 @@ kauth_print(netdissect_options *ndo,
 	bp += sizeof(struct rx_header) + 4;
 
 	switch (kauth_op) {
-		case 1:		/* Authenticate old */;
+		case 1:		/* Authenticate old */
 		case 21:	/* Authenticate */
 		case 22:	/* Authenticate-V2 */
 		case 2:		/* Change PW */

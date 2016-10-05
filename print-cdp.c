@@ -24,6 +24,8 @@
  *    http://www.cisco.com/univercd/cc/td/doc/product/lan/trsrb/frames.htm
  */
 
+/* \summary: Cisco Discovery Protocol (CDP) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

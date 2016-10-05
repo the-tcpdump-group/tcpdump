@@ -69,21 +69,6 @@ extern char *strsep(char **, const char *);
 
 extern char *program_name;	/* used to generate self-identifying messages */
 
-extern void error(const char *, ...)
-     __attribute__((noreturn))
-#ifdef __ATTRIBUTE___FORMAT_OK
-     __attribute__((format (printf, 1, 2)))
-#endif /* __ATTRIBUTE___FORMAT_OK */
-     ;
-extern void warning(const char *, ...)
-#ifdef __ATTRIBUTE___FORMAT_OK
-     __attribute__((format (printf, 1, 2)))
-#endif /* __ATTRIBUTE___FORMAT_OK */
-     ;
-
-extern char *read_infile(char *);
-extern char *copy_argv(char **);
-
 #include <pcap.h>
 
 #ifndef HAVE_BPF_DUMP

@@ -21,6 +21,8 @@
  * PPTP support contributed by Motonori Shindo (mshindo@mshindo.net)
  */
 
+/* \summary: Point-to-Point Tunnelling Protocol (PPTP) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

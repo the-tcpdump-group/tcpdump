@@ -5,9 +5,10 @@
  * BSD-style license that accompanies tcpdump or the GNU General
  * Public License
  *
- * Format and print IEEE 802.1d spanning tree protocol packets.
  * Contributed by Lennert Buytenhek <buytenh@gnu.org>
  */
+
+/* \summary: IEEE 802.1d Spanning Tree Protocol (STP) printer */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

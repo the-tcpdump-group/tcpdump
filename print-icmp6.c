@@ -19,6 +19,8 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+/* \summary: IPv6 Internet Control Message Protocol (ICMPv6) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -627,7 +629,7 @@ static int icmp6_cksum(netdissect_options *ndo, const struct ip6_hdr *ip6,
 				IPPROTO_ICMPV6);
 }
 
-const struct tok rpl_mop_values[] = {
+static const struct tok rpl_mop_values[] = {
         { RPL_DIO_NONSTORING,         "nonstoring"},
         { RPL_DIO_STORING,            "storing"},
         { RPL_DIO_NONSTORING_MULTICAST, "nonstoring-multicast"},
@@ -635,7 +637,7 @@ const struct tok rpl_mop_values[] = {
         { 0, NULL},
 };
 
-const struct tok rpl_subopt_values[] = {
+static const struct tok rpl_subopt_values[] = {
         { RPL_OPT_PAD0, "pad0"},
         { RPL_OPT_PADN, "padN"},
         { RPL_DIO_METRICS, "metrics"},
@@ -647,23 +649,6 @@ const struct tok rpl_subopt_values[] = {
         { RPL_DAO_RPLTARGET_DESC, "rpltargetdesc"},
         { 0, NULL},
 };
-
-static void
-rpl_format_dagid(char dagid_str[65], const u_char *dagid)
-{
-        char *d = dagid_str;
-        int  i;
-
-        for(i=0;i<16;i++) {
-                if(isprint(dagid[i])) {
-                        *d++ = dagid[i];
-                } else {
-                        snprintf(d,5,"0x%02x", dagid[i]); /* 4 + null char */
-                        d += 4;
-                }
-        }
-        *d++ = '\0';
-}
 
 static void
 rpl_dio_printopt(netdissect_options *ndo,
@@ -710,10 +695,10 @@ rpl_dio_print(netdissect_options *ndo,
               const u_char *bp, u_int length)
 {
         const struct nd_rpl_dio *dio = (const struct nd_rpl_dio *)bp;
-        char dagid_str[65];
+        const char *dagid_str;
 
         ND_TCHECK(*dio);
-        rpl_format_dagid(dagid_str, dio->rpl_dagid);
+        dagid_str = ip6addr_string (ndo, dio->rpl_dagid);
 
         ND_PRINT((ndo, " [dagid:%s,seq:%u,instance:%u,rank:%u,%smop:%s,prf:%u]",
                   dagid_str,
@@ -739,20 +724,19 @@ rpl_dao_print(netdissect_options *ndo,
               const u_char *bp, u_int length)
 {
         const struct nd_rpl_dao *dao = (const struct nd_rpl_dao *)bp;
-        char dagid_str[65];
+        const char *dagid_str = "<elided>";
 
         ND_TCHECK(*dao);
         if (length < ND_RPL_DAO_MIN_LEN)
         	goto tooshort;
 
-        strcpy(dagid_str,"<elided>");
         bp += ND_RPL_DAO_MIN_LEN;
         length -= ND_RPL_DAO_MIN_LEN;
         if(RPL_DAO_D(dao->rpl_flags)) {
                 ND_TCHECK2(dao->rpl_dagid, DAGID_LEN);
                 if (length < DAGID_LEN)
                 	goto tooshort;
-                rpl_format_dagid(dagid_str, dao->rpl_dagid);
+                dagid_str = ip6addr_string (ndo, dao->rpl_dagid);
                 bp += DAGID_LEN;
                 length -= DAGID_LEN;
         }
@@ -785,20 +769,19 @@ rpl_daoack_print(netdissect_options *ndo,
                  const u_char *bp, u_int length)
 {
         const struct nd_rpl_daoack *daoack = (const struct nd_rpl_daoack *)bp;
-        char dagid_str[65];
+        const char *dagid_str = "<elided>";
 
         ND_TCHECK2(*daoack, ND_RPL_DAOACK_MIN_LEN);
         if (length < ND_RPL_DAOACK_MIN_LEN)
         	goto tooshort;
 
-        strcpy(dagid_str,"<elided>");
         bp += ND_RPL_DAOACK_MIN_LEN;
         length -= ND_RPL_DAOACK_MIN_LEN;
         if(RPL_DAOACK_D(daoack->rpl_flags)) {
-                ND_TCHECK2(daoack->rpl_dagid, 16);
+                ND_TCHECK2(daoack->rpl_dagid, DAGID_LEN);
                 if (length < DAGID_LEN)
                 	goto tooshort;
-                rpl_format_dagid(dagid_str, daoack->rpl_dagid);
+                dagid_str = ip6addr_string (ndo, daoack->rpl_dagid);
                 bp += DAGID_LEN;
                 length -= DAGID_LEN;
         }
@@ -1099,10 +1082,10 @@ icmp6_print(netdissect_options *ndo,
 	case ND_REDIRECT:
 #define RDR(i) ((const struct nd_redirect *)(i))
                          ND_TCHECK(RDR(dp)->nd_rd_dst);
-                         ND_PRINT((ndo,", %s", getname6(ndo, (const u_char *)&RDR(dp)->nd_rd_dst)));
+                         ND_PRINT((ndo,", %s", ip6addr_string(ndo, &RDR(dp)->nd_rd_dst)));
 		ND_TCHECK(RDR(dp)->nd_rd_target);
 		ND_PRINT((ndo," to %s",
-                          getname6(ndo, (const u_char*)&RDR(dp)->nd_rd_target)));
+                          ip6addr_string(ndo, &RDR(dp)->nd_rd_target)));
 #define REDIRECTLEN 40
 		if (ndo->ndo_vflag) {
 			icmp6_opt_print(ndo, (const u_char *)dp + REDIRECTLEN,
@@ -1668,7 +1651,7 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 				break;
 			}
 			ND_PRINT((ndo,", subject=%s",
-                                  getname6(ndo, (const u_char *)(ni6 + 1))));
+                                  ip6addr_string(ndo, ni6 + 1)));
 			break;
 		case ICMP6_NI_SUBJ_FQDN:
 			ND_PRINT((ndo,", subject=DNS name"));
@@ -1696,7 +1679,7 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 				break;
 			}
 			ND_PRINT((ndo,", subject=%s",
-                                  getname(ndo, (const u_char *)(ni6 + 1))));
+                                  ipaddr_string(ndo, ni6 + 1)));
 			break;
 		default:
 			ND_PRINT((ndo,", unknown subject"));
@@ -1793,7 +1776,7 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 			while (i < siz) {
 				if (i + sizeof(struct in6_addr) + sizeof(int32_t) > siz)
 					break;
-				ND_PRINT((ndo," %s", getname6(ndo, bp + i)));
+				ND_PRINT((ndo," %s", ip6addr_string(ndo, bp + i)));
 				i += sizeof(struct in6_addr);
 				ND_PRINT((ndo,"(%d)", (int32_t)EXTRACT_32BITS(bp + i)));
 				i += sizeof(int32_t);

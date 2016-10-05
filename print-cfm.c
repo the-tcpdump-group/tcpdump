@@ -12,10 +12,10 @@
  * LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE.
  *
- * Support for the IEEE Connectivity Fault Management Protocols as per 802.1ag.
- *
  * Original code by Hannes Gredler (hannes@juniper.net)
  */
+
+/* \summary: IEEE 802.1ag Connectivity Fault Management (CFM) protocols printer */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -75,7 +75,7 @@ struct cfm_ccm_t {
  * Timer Bases for the CCM Interval field.
  * Expressed in units of seconds.
  */
-const float ccm_interval_base[8] = {0, 0.003333, 0.01, 0.1, 1, 10, 60, 600};
+static const float ccm_interval_base[8] = {0, 0.003333, 0.01, 0.1, 1, 10, 60, 600};
 #define CCM_INTERVAL_MIN_MULTIPLIER 3.25
 #define CCM_INTERVAL_MAX_MULTIPLIER 3.5
 

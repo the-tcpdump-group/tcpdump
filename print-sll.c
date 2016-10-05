@@ -19,6 +19,8 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+/* \summary: Linux cooked sockets capture printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

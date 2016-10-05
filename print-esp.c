@@ -21,6 +21,8 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+/* \summary: IPSEC Encapsulating Security Payload (ESP) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -463,8 +465,9 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 
 		secretfile = fopen(filename, FOPEN_READ_TXT);
 		if (secretfile == NULL) {
-			perror(filename);
-			exit(3);
+			(*ndo->ndo_error)(ndo, "print_esp: can't open %s: %s\n",
+			    filename, strerror(errno));
+			return;
 		}
 
 		while (fgets(fileline, sizeof(fileline)-1, secretfile) != NULL) {

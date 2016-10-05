@@ -13,6 +13,10 @@
  * Original code by Francesco Fondelli (francesco dot fondelli, gmail dot com)
  */
 
+/* \summary: Virtual eXtensible Local Area Network (VXLAN) printer */
+
+/* specification: RFC 7348 */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

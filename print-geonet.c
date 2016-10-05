@@ -15,6 +15,8 @@
  * Original code by Ola Martin Lykkja (ola.lykkja@q-free.com)
  */
 
+/* \summary: ISO CALM FAST and ETSI GeoNetworking printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

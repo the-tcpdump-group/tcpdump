@@ -22,6 +22,8 @@
  * complete PPP support.
  */
 
+/* \summary: Point to Point Protocol (PPP) printer */
+
 /*
  * TODO:
  * o resolve XXX as much as possible

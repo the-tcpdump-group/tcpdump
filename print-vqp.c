@@ -12,10 +12,10 @@
  * LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE.
  *
- * support for the Cisco prop. VQP Protocol
- *
  * Original code by Carles Kishimoto <Carles.Kishimoto@bsc.es>
  */
+
+/* \summary: Cisco VLAN Query Protocol (VQP) printer */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

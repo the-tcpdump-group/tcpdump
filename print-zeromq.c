@@ -1,7 +1,4 @@
 /*
- * This file implements decoding of ZeroMQ network protocol(s).
- *
- *
  * Copyright (c) 2013 The TCPDUMP project
  * All rights reserved.
  *
@@ -27,6 +24,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
+/* \summary: ZeroMQ Message Transport Protocol (ZMTP) printer */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

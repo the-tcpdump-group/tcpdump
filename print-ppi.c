@@ -2,6 +2,8 @@
  * Oracle
  */
 
+/* \summary: Oracle DLT_PPI printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

@@ -19,6 +19,10 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+/* \summary: PPP Van Jacobson compression printer */
+
+/* specification: RFC 1144 */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

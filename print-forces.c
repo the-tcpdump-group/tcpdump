@@ -14,6 +14,10 @@
  *
  */
 
+/* \summary: Forwarding and Control Element Separation (ForCES) Protocol printer */
+
+/* specification: RFC 5810 */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -25,9 +29,6 @@
 
 static const char tstr[] = "[|forces]";
 
-/*
- * RFC5810: Forwarding and Control Element Separation (ForCES) Protocol
- */
 #define	ForCES_VERS	1
 #define	ForCES_HDRL	24
 #define	ForCES_ALNL	4U
@@ -287,7 +288,7 @@ static inline const struct optlv_h *get_forces_optlv_h(uint16_t opt)
 #define IND_CHR ' '
 #define IND_PREF '\n'
 #define IND_SUF 0x0
-char ind_buf[IND_SIZE];
+static char ind_buf[IND_SIZE];
 
 static inline char *indent_pr(int indent, int nlpref)
 {
@@ -1414,7 +1415,7 @@ trunc:
 static int
 print_reddata(netdissect_options *ndo,
               register const u_char * pptr, register u_int len,
-              uint16_t op_msk _U_, int indent _U_)
+              uint16_t op_msk _U_, int indent)
 {
 	u_int dlen;
 	char *ib = indent_pr(indent, 0);

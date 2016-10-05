@@ -7,6 +7,8 @@
  * BSD-style license that accompanies tcpdump or the GNU GPL version 2
  */
 
+/* \summary: Datagram Congestion Control Protocol (DCCP) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

@@ -21,6 +21,8 @@
  * From: NetBSD: print-arcnet.c,v 1.2 2000/04/24 13:02:28 itojun Exp
  */
 
+/* \summary: Attached Resource Computer NETwork (ARCNET) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

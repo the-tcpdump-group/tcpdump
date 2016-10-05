@@ -33,6 +33,8 @@
  * SUCH DAMAGE.
  */
 
+/* \summary: Stream Control Transmission Protocol (SCTP) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -691,7 +693,7 @@ void sctp_print(netdissect_options *ndo,
  	    sctpPacketLengthRemaining -= sizeof(*init);
 	    chunkLengthRemaining -= sizeof(*init);
 
-#if(0) /* ALC you can add code for optional params here */
+#if 0 /* ALC you can add code for optional params here */
 	    if( chunkLengthRemaining != 0 )
 	      ND_PRINT((ndo, " @@@@@ UNFINISHED @@@@@@%s\n",
 		     "Optional params present, but not printed."));
@@ -719,7 +721,7 @@ void sctp_print(netdissect_options *ndo,
             sctpPacketLengthRemaining -= sizeof(*init);
             chunkLengthRemaining -= sizeof(*init);
 
-#if(0) /* ALC you can add code for optional params here */
+#if 0 /* ALC you can add code for optional params here */
 	    if( chunkLengthRemaining != 0 )
 	      ND_PRINT((ndo, " @@@@@ UNFINISHED @@@@@@%s\n",
 		     "Optional params present, but not printed."));

@@ -19,6 +19,8 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+/* \summary: Distance Vector Multicast Routing Protocol printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

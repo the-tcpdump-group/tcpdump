@@ -1343,7 +1343,8 @@ Optional Packages:
   --with-sandbox-capsicum use Capsicum security functions [default=yes, if
                           available]
   --with-system-libpcap   don't use local pcap library
-  --with-crypto           use OpenSSL libcrypto [default=yes, if available]
+  --with-crypto[=DIR]     use OpenSSL/libressl libcrypto (located in directory
+                          DIR, if specified) [default=yes, if available]
   --with-cap-ng           use libcap-ng [default=yes, if available]
 
 Some influential environment variables:
@@ -7659,6 +7660,49 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
 
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -Wused-but-marked-unused option" >&5
+$as_echo_n "checking whether the compiler supports the -Wused-but-marked-unused option... " >&6; }
+	save_CFLAGS="$CFLAGS"
+	if expr "x-Wused-but-marked-unused" : "x-W.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS $ac_lbl_unknown_warning_option_error -Wused-but-marked-unused"
+	elif expr "x-Wused-but-marked-unused" : "x-f.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS -Werror -Wused-but-marked-unused"
+	elif expr "x-Wused-but-marked-unused" : "x-m.*" >/dev/null
+	then
+	    CFLAGS="$CFLAGS -Werror -Wused-but-marked-unused"
+	else
+	    CFLAGS="$CFLAGS -Wused-but-marked-unused"
+	fi
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+return 0
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+		CFLAGS="$save_CFLAGS"
+		V_CCOPT="$V_CCOPT -Wused-but-marked-unused"
+
+else
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		CFLAGS="$save_CFLAGS"
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports the -W option" >&5
 $as_echo_n "checking whether the compiler supports the -W option... " >&6; }
 	save_CFLAGS="$CFLAGS"
@@ -7951,9 +7995,9 @@ $as_echo "#define LBL_ALIGN 1" >>confdefs.h
 
     fi
 
-# Check for OpenSSL libcrypto
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to use OpenSSL libcrypto" >&5
-$as_echo_n "checking whether to use OpenSSL libcrypto... " >&6; }
+# Check for OpenSSL/libressl libcrypto
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to use OpenSSL/libressl libcrypto" >&5
+$as_echo_n "checking whether to use OpenSSL/libressl libcrypto... " >&6; }
 # Specify location for both includes and libraries.
 want_libcrypto=ifavailable
 
@@ -7962,20 +8006,38 @@ if test "${with_crypto+set}" = set; then :
   withval=$with_crypto;
 	if test $withval = no
 	then
+		# User doesn't want to link with libcrypto.
 		want_libcrypto=no
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 	elif test $withval = yes
 	then
+		# User wants to link with libcrypto but hasn't specified
+		# a directory.
 		want_libcrypto=yes
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
+	else
+		# User wants to link with libcrypto and has specified
+		# a directory, so use the provided value.
+		want_libcrypto=yes
+		libcrypto_root=$withval
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, using the version installed in $withval" >&5
+$as_echo "yes, using the version installed in $withval" >&6; }
+
+		#
+		# Put the subdirectories of the libcrypto root directory
+		# at the front of the header and library search path.
+		#
+		CFLAGS="-I$withval/include $CFLAGS"
+		LIBS="-L$withval/lib $LIBS"
 	fi
 
 else
 
 	#
-	# Use libcrypto if it's present, otherwise don't.
+	# Use libcrypto if it's present, otherwise don't; no directory
+	# was specified.
 	#
 	want_libcrypto=ifavailable
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, if available" >&5

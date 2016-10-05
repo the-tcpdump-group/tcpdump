@@ -125,6 +125,20 @@ extern const char *tok2str(const struct tok *, const char *, u_int);
 extern char *bittok2str(const struct tok *, const char *, u_int);
 extern char *bittok2str_nosep(const struct tok *, const char *, u_int);
 
+/* Initialize netdissect. */
+extern int nd_init(char *, size_t);
+/* Clean up netdissect. */
+extern void nd_cleanup(void);
+
+/* Do we have libsmi support? */
+extern int nd_have_smi_support(void);
+/* Load an SMI module. */
+extern int nd_load_smi_module(const char *, char *, size_t);
+/* Flag indicating whether an SMI module has been loaded. */
+extern int nd_smi_module_loaded;
+/* Version number of the SMI library, or NULL if we don't have libsmi support. */
+extern const char *nd_smi_version_string(void);
+
 typedef struct netdissect_options netdissect_options;
 
 #define IF_PRINTER_ARGS (netdissect_options *, const struct pcap_pkthdr *, const u_char *)
@@ -139,7 +153,6 @@ struct netdissect_options {
   int ndo_nflag;		/* leave addresses as numbers */
   int ndo_Nflag;		/* remove domains from printed host names */
   int ndo_qflag;		/* quick (shorter) output */
-  int ndo_mflag;		/* use the libsmi to translate OIDs */
   int ndo_Sflag;		/* print raw TCP sequence numbers */
   int ndo_tflag;		/* print packet arrival time */
   int ndo_uflag;		/* Print undecoded NFS handles */
@@ -486,6 +499,7 @@ extern void hex_and_ascii_print(netdissect_options *, const char *, const u_char
 extern void hex_and_ascii_print_with_offset(netdissect_options *, const char *, const u_char *, u_int, u_int);
 extern void hex_print(netdissect_options *, const char *ident, const u_char *cp, u_int);
 extern void hex_print_with_offset(netdissect_options *, const char *ident, const u_char *cp, u_int, u_int);
+extern void hncp_print(netdissect_options *, const u_char *, u_int);
 extern void hsrp_print(netdissect_options *, const u_char *, u_int);
 extern void http_print(netdissect_options *, const u_char *, u_int);
 extern void icmp6_print(netdissect_options *, const u_char *, u_int, const u_char *, int);

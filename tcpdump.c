@@ -56,8 +56,10 @@ The Regents of the University of California.  All rights reserved.\n";
 
 #include <netdissect-stdinc.h>
 
-#ifdef USE_LIBSMI
-#include <smi.h>
+#include <sys/stat.h>
+
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h>
 #endif
 
 #ifdef HAVE_LIBCRYPTO
@@ -77,12 +79,12 @@ The Regents of the University of California.  All rights reserved.\n";
 #include <sys/capability.h>
 #include <sys/ioccom.h>
 #include <net/bpf.h>
-#include <fcntl.h>
 #include <libgen.h>
 #endif	/* HAVE_CAPSICUM */
 #include <pcap.h>
 #include <signal.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
@@ -127,6 +129,7 @@ The Regents of the University of California.  All rights reserved.\n";
 #define SIGNAL_REQ_INFO SIGUSR1
 #endif
 
+static int Bflag;			/* buffer size */
 static int Cflag;			/* rotate dump files after this many bytes */
 static int Cflag_count;			/* Keep track of which file number we're writing */
 static int Dflag;			/* list available devices and exit */
@@ -151,13 +154,16 @@ static int Iflag;			/* rfmon (monitor) mode */
 #ifdef HAVE_PCAP_SET_TSTAMP_TYPE
 static int Jflag;			/* list available time stamp types */
 #endif
+static int jflag = -1;			/* packet time stamp source */
+static int pflag;			/* don't go promiscuous */
 #ifdef HAVE_PCAP_SETDIRECTION
-int Qflag = -1;				/* restrict captured packet by send/receive direction */
+static int Qflag = -1;			/* restrict captured packet by send/receive direction */
 #endif
 static int Uflag;			/* "unbuffered" output of dump files */
 static int Wflag;			/* recycle output files after this number of files */
 static int WflagChars;
 static char *zflag = NULL;		/* compress each savefile using a specified command (like gzip or bzip2) */
+static int immediate_mode;
 
 static int infodelay;
 static int infoprint;
@@ -165,12 +171,27 @@ static int infoprint;
 char *program_name;
 
 /* Forwards */
+static void error(const char *, ...)
+     __attribute__((noreturn))
+#ifdef __ATTRIBUTE___FORMAT_OK
+     __attribute__((format (printf, 1, 2)))
+#endif /* __ATTRIBUTE___FORMAT_OK */
+     ;
+static void warning(const char *, ...)
+#ifdef __ATTRIBUTE___FORMAT_OK
+     __attribute__((format (printf, 1, 2)))
+#endif /* __ATTRIBUTE___FORMAT_OK */
+     ;
+static void exit_tcpdump(int) __attribute__((noreturn));
 static RETSIGTYPE cleanup(int);
 static RETSIGTYPE child_cleanup(int);
 static void print_version(void);
 static void print_usage(void);
-static void show_tstamp_types_and_exit(const char *device) __attribute__((noreturn));
-static void show_dlts_and_exit(const char *device) __attribute__((noreturn));
+static void show_tstamp_types_and_exit(pcap_t *, const char *device) __attribute__((noreturn));
+static void show_dlts_and_exit(pcap_t *, const char *device) __attribute__((noreturn));
+#ifdef HAVE_PCAP_FINDALLDEVS
+static void show_devices_and_exit (void) __attribute__((noreturn));
+#endif
 
 static void print_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void dump_packet_and_trunc(u_char *, const struct pcap_pkthdr *, const u_char *);
@@ -192,6 +213,7 @@ RETSIGTYPE requestinfo(int);
 static void info(int);
 static u_int packets_captured;
 
+#ifdef HAVE_PCAP_FINDALLDEVS
 static const struct tok status_flags[] = {
 #ifdef PCAP_IF_UP
 	{ PCAP_IF_UP,       "Up"       },
@@ -202,6 +224,7 @@ static const struct tok status_flags[] = {
 	{ PCAP_IF_LOOPBACK, "Loopback" },
 	{ 0, NULL }
 };
+#endif
 
 static pcap_t *pd;
 
@@ -272,23 +295,66 @@ extern
 void pcap_set_optimizer_debug(int);
 #endif
 
+/* VARARGS */
+static void
+error(const char *fmt, ...)
+{
+	va_list ap;
+
+	(void)fprintf(stderr, "%s: ", program_name);
+	va_start(ap, fmt);
+	(void)vfprintf(stderr, fmt, ap);
+	va_end(ap);
+	if (*fmt) {
+		fmt += strlen(fmt);
+		if (fmt[-1] != '\n')
+			(void)fputc('\n', stderr);
+	}
+	exit_tcpdump(1);
+	/* NOTREACHED */
+}
+
+/* VARARGS */
+static void
+warning(const char *fmt, ...)
+{
+	va_list ap;
+
+	(void)fprintf(stderr, "%s: WARNING: ", program_name);
+	va_start(ap, fmt);
+	(void)vfprintf(stderr, fmt, ap);
+	va_end(ap);
+	if (*fmt) {
+		fmt += strlen(fmt);
+		if (fmt[-1] != '\n')
+			(void)fputc('\n', stderr);
+	}
+}
+
+static void
+exit_tcpdump(int status)
+{
+	nd_cleanup();
+	exit(status);
+}
+
 #ifdef HAVE_PCAP_SET_TSTAMP_TYPE
 static void
-show_tstamp_types_and_exit(const char *device)
+show_tstamp_types_and_exit(pcap_t *pc, const char *device)
 {
 	int n_tstamp_types;
 	int *tstamp_types = 0;
 	const char *tstamp_type_name;
 	int i;
 
-	n_tstamp_types = pcap_list_tstamp_types(pd, &tstamp_types);
+	n_tstamp_types = pcap_list_tstamp_types(pc, &tstamp_types);
 	if (n_tstamp_types < 0)
-		error("%s", pcap_geterr(pd));
+		error("%s", pcap_geterr(pc));
 
 	if (n_tstamp_types == 0) {
 		fprintf(stderr, "Time stamp type cannot be set for %s\n",
 		    device);
-		exit(0);
+		exit_tcpdump(0);
 	}
 	fprintf(stderr, "Time stamp types for %s (use option -j to set):\n",
 	    device);
@@ -302,20 +368,20 @@ show_tstamp_types_and_exit(const char *device)
 		}
 	}
 	pcap_free_tstamp_types(tstamp_types);
-	exit(0);
+	exit_tcpdump(0);
 }
 #endif
 
 static void
-show_dlts_and_exit(const char *device)
+show_dlts_and_exit(pcap_t *pc, const char *device)
 {
 	int n_dlts, i;
 	int *dlts = 0;
 	const char *dlt_name;
 
-	n_dlts = pcap_list_datalinks(pd, &dlts);
+	n_dlts = pcap_list_datalinks(pc, &dlts);
 	if (n_dlts < 0)
-		error("%s", pcap_geterr(pd));
+		error("%s", pcap_geterr(pc));
 	else if (n_dlts == 0 || !dlts)
 		error("No data link types.");
 
@@ -355,7 +421,7 @@ show_dlts_and_exit(const char *device)
 #ifdef HAVE_PCAP_FREE_DATALINKS
 	pcap_free_datalinks(dlts);
 #endif
-	exit(0);
+	exit_tcpdump(0);
 }
 
 #ifdef HAVE_PCAP_FINDALLDEVS
@@ -377,7 +443,7 @@ show_devices_and_exit (void)
 		printf("\n");
 	}
 	pcap_freealldevs(devlist);
-	exit(0);
+	exit_tcpdump(0);
 }
 #endif /* HAVE_PCAP_FINDALLDEVS */
 
@@ -535,7 +601,7 @@ droproot(const char *username, const char *chroot_dir)
 	if (chroot_dir && !username) {
 		fprintf(stderr, "%s: Chroot without dropping root is insecure\n",
 			program_name);
-		exit(1);
+		exit_tcpdump(1);
 	}
 
 	pw = getpwnam(username);
@@ -544,7 +610,7 @@ droproot(const char *username, const char *chroot_dir)
 			if (chroot(chroot_dir) != 0 || chdir ("/") != 0) {
 				fprintf(stderr, "%s: Couldn't chroot/chdir to '%.64s': %s\n",
 					program_name, chroot_dir, pcap_strerror(errno));
-				exit(1);
+				exit_tcpdump(1);
 			}
 		}
 #ifdef HAVE_LIBCAP_NG
@@ -564,7 +630,7 @@ droproot(const char *username, const char *chroot_dir)
 				(unsigned long)pw->pw_uid,
 				(unsigned long)pw->pw_gid,
 				pcap_strerror(errno));
-			exit(1);
+			exit_tcpdump(1);
 		}
 		else {
 			fprintf(stderr, "dropped privs to %s\n", username);
@@ -574,7 +640,7 @@ droproot(const char *username, const char *chroot_dir)
 	else {
 		fprintf(stderr, "%s: Couldn't find user '%.32s'\n",
 			program_name, username);
-		exit(1);
+		exit_tcpdump(1);
 	}
 #ifdef HAVE_LIBCAP_NG
 	/* We don't need CAP_SETUID and CAP_SETGID any more. */
@@ -753,6 +819,287 @@ set_dumper_capsicum_rights(pcap_dumper_t *p)
 }
 #endif
 
+/*
+ * Copy arg vector into a new buffer, concatenating arguments with spaces.
+ */
+static char *
+copy_argv(register char **argv)
+{
+	register char **p;
+	register u_int len = 0;
+	char *buf;
+	char *src, *dst;
+
+	p = argv;
+	if (*p == NULL)
+		return 0;
+
+	while (*p)
+		len += strlen(*p++) + 1;
+
+	buf = (char *)malloc(len);
+	if (buf == NULL)
+		error("copy_argv: malloc");
+
+	p = argv;
+	dst = buf;
+	while ((src = *p++) != NULL) {
+		while ((*dst++ = *src++) != '\0')
+			;
+		dst[-1] = ' ';
+	}
+	dst[-1] = '\0';
+
+	return buf;
+}
+
+/*
+ * On Windows, we need to open the file in binary mode, so that
+ * we get all the bytes specified by the size we get from "fstat()".
+ * On UNIX, that's not necessary.  O_BINARY is defined on Windows;
+ * we define it as 0 if it's not defined, so it does nothing.
+ */
+#ifndef O_BINARY
+#define O_BINARY	0
+#endif
+
+static char *
+read_infile(char *fname)
+{
+	register int i, fd, cc;
+	register char *cp;
+	struct stat buf;
+
+	fd = open(fname, O_RDONLY|O_BINARY);
+	if (fd < 0)
+		error("can't open %s: %s", fname, pcap_strerror(errno));
+
+	if (fstat(fd, &buf) < 0)
+		error("can't stat %s: %s", fname, pcap_strerror(errno));
+
+	cp = malloc((u_int)buf.st_size + 1);
+	if (cp == NULL)
+		error("malloc(%d) for %s: %s", (u_int)buf.st_size + 1,
+			fname, pcap_strerror(errno));
+	cc = read(fd, cp, (u_int)buf.st_size);
+	if (cc < 0)
+		error("read %s: %s", fname, pcap_strerror(errno));
+	if (cc != buf.st_size)
+		error("short read %s (%d != %d)", fname, cc, (int)buf.st_size);
+
+	close(fd);
+	/* replace "# comment" with spaces */
+	for (i = 0; i < cc; i++) {
+		if (cp[i] == '#')
+			while (i < cc && cp[i] != '\n')
+				cp[i++] = ' ';
+	}
+	cp[cc] = '\0';
+	return (cp);
+}
+
+#ifdef HAVE_PCAP_FINDALLDEVS
+static long
+parse_interface_number(const char *device)
+{
+	long devnum;
+	char *end;
+
+	devnum = strtol(device, &end, 10);
+	if (device != end && *end == '\0') {
+		/*
+		 * It's all-numeric, but is it a valid number?
+		 */
+		if (devnum <= 0) {
+			/*
+			 * No, it's not an ordinal.
+			 */
+			error("Invalid adapter index");
+		}
+		return (devnum);
+	} else {
+		/*
+		 * It's not all-numeric; return -1, so our caller
+		 * knows that.
+		 */
+		return (-1);
+	}
+}
+
+static char *
+find_interface_by_number(long devnum)
+{
+	pcap_if_t *dev, *devlist;
+	long i;
+	char ebuf[PCAP_ERRBUF_SIZE];
+	char *device;
+
+	if (pcap_findalldevs(&devlist, ebuf) < 0)
+		error("%s", ebuf);
+	/*
+	 * Look for the devnum-th entry in the list of devices (1-based).
+	 */
+	for (i = 0, dev = devlist; i < devnum-1 && dev != NULL;
+	    i++, dev = dev->next)
+		;
+	if (dev == NULL)
+		error("Invalid adapter index");
+	device = strdup(dev->name);
+	pcap_freealldevs(devlist);
+	return (device);
+}
+#endif
+
+static pcap_t *
+open_interface(const char *device, netdissect_options *ndo, char *ebuf)
+{
+	pcap_t *pc;
+#ifdef HAVE_PCAP_CREATE
+	int status;
+	char *cp;
+#endif
+
+#ifdef HAVE_PCAP_CREATE
+	pc = pcap_create(device, ebuf);
+	if (pc == NULL) {
+		/*
+		 * If this failed with "No such device", that means
+		 * the interface doesn't exist; return NULL, so that
+		 * the caller can see whether the device name is
+		 * actually an interface index.
+		 */
+		if (strstr(ebuf, "No such device") != NULL)
+			return (NULL);
+		error("%s", ebuf);
+	}
+#ifdef HAVE_PCAP_SET_TSTAMP_TYPE
+	if (Jflag)
+		show_tstamp_types_and_exit(pc, device);
+#endif
+#ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
+	status = pcap_set_tstamp_precision(pc, ndo->ndo_tstamp_precision);
+	if (status != 0)
+		error("%s: Can't set %ssecond time stamp precision: %s",
+			device,
+			tstamp_precision_to_string(ndo->ndo_tstamp_precision),
+			pcap_statustostr(status));
+#endif
+
+#ifdef HAVE_PCAP_SET_IMMEDIATE_MODE
+	if (immediate_mode) {
+		status = pcap_set_immediate_mode(pc, 1);
+		if (status != 0)
+			error("%s: Can't set immediate mode: %s",
+			device,
+			pcap_statustostr(status));
+	}
+#endif
+	/*
+	 * Is this an interface that supports monitor mode?
+	 */
+	if (pcap_can_set_rfmon(pc) == 1)
+		supports_monitor_mode = 1;
+	else
+		supports_monitor_mode = 0;
+	status = pcap_set_snaplen(pc, ndo->ndo_snaplen);
+	if (status != 0)
+		error("%s: Can't set snapshot length: %s",
+		    device, pcap_statustostr(status));
+	status = pcap_set_promisc(pc, !pflag);
+	if (status != 0)
+		error("%s: Can't set promiscuous mode: %s",
+		    device, pcap_statustostr(status));
+	if (Iflag) {
+		status = pcap_set_rfmon(pc, 1);
+		if (status != 0)
+			error("%s: Can't set monitor mode: %s",
+			    device, pcap_statustostr(status));
+	}
+	status = pcap_set_timeout(pc, 1000);
+	if (status != 0)
+		error("%s: pcap_set_timeout failed: %s",
+		    device, pcap_statustostr(status));
+	if (Bflag != 0) {
+		status = pcap_set_buffer_size(pc, Bflag);
+		if (status != 0)
+			error("%s: Can't set buffer size: %s",
+			    device, pcap_statustostr(status));
+	}
+#ifdef HAVE_PCAP_SET_TSTAMP_TYPE
+	if (jflag != -1) {
+		status = pcap_set_tstamp_type(pc, jflag);
+		if (status < 0)
+			error("%s: Can't set time stamp type: %s",
+		              device, pcap_statustostr(status));
+	}
+#endif
+	status = pcap_activate(pc);
+	if (status < 0) {
+		/*
+		 * pcap_activate() failed.
+		 */
+		cp = pcap_geterr(pc);
+		if (status == PCAP_ERROR)
+			error("%s", cp);
+		else if (status == PCAP_ERROR_NO_SUCH_DEVICE) {
+			/*
+			 * Return an error for our caller to handle.
+			 */
+			pcap_close(pc);
+			snprintf(ebuf, PCAP_ERRBUF_SIZE, "%s: %s\n(%s)",
+			    device, pcap_statustostr(status), cp);
+			return (NULL);
+		} else if (status == PCAP_ERROR_PERM_DENIED && *cp != '\0')
+			error("%s: %s\n(%s)", device,
+			    pcap_statustostr(status), cp);
+		else
+			error("%s: %s", device,
+			    pcap_statustostr(status));
+	} else if (status > 0) {
+		/*
+		 * pcap_activate() succeeded, but it's warning us
+		 * of a problem it had.
+		 */
+		cp = pcap_geterr(pc);
+		if (status == PCAP_WARNING)
+			warning("%s", cp);
+		else if (status == PCAP_WARNING_PROMISC_NOTSUP &&
+		         *cp != '\0')
+			warning("%s: %s\n(%s)", device,
+			    pcap_statustostr(status), cp);
+		else
+			warning("%s: %s", device,
+			    pcap_statustostr(status));
+	}
+#ifdef HAVE_PCAP_SETDIRECTION
+	if (Qflag != -1) {
+		status = pcap_setdirection(pc, Qflag);
+		if (status != 0)
+			error("%s: pcap_setdirection() failed: %s",
+			      device,  pcap_geterr(pc));
+		}
+#endif /* HAVE_PCAP_SETDIRECTION */
+#else /* HAVE_PCAP_CREATE */
+	*ebuf = '\0';
+	pc = pcap_open_live(device, ndo->ndo_snaplen, !pflag, 1000, ebuf);
+	if (pc == NULL) {
+		/*
+		 * If this failed with "No such device", that means
+		 * the interface doesn't exist; return NULL, so that
+		 * the caller can see whether the device name is
+		 * actually an interface index.
+		 */
+		if (strstr(ebuf, "No such device") != NULL)
+			return (NULL);
+		error("%s", ebuf);
+	}
+	if (*ebuf)
+		warning("%s", ebuf);
+#endif /* HAVE_PCAP_CREATE */
+
+	return (pc);
+}
+
 int
 main(int argc, char **argv)
 {
@@ -776,8 +1123,8 @@ main(int argc, char **argv)
 	char *ret = NULL;
 	char *end;
 #ifdef HAVE_PCAP_FINDALLDEVS
-	pcap_if_t *dev, *devlist;
-	int devnum;
+	pcap_if_t *devlist;
+	long devnum;
 #endif
 	int status;
 	FILE *VFile;
@@ -785,16 +1132,18 @@ main(int argc, char **argv)
 	cap_rights_t rights;
 	int cansandbox;
 #endif	/* HAVE_CAPSICUM */
-	int Bflag = 0;			/* buffer size */
-	int jflag = -1;			/* packet time stamp source */
 	int Oflag = 1;			/* run filter code optimizer */
-	int pflag = 0;			/* don't go promiscuous */
 	int yflag_dlt = -1;
 	const char *yflag_dlt_name = NULL;
 
 	netdissect_options Ndo;
 	netdissect_options *ndo = &Ndo;
-	int immediate_mode = 0;
+
+	/*
+	 * Initialize the netdissect code.
+	 */
+	if (nd_init(ebuf, sizeof ebuf) == -1)
+		error("%s", ebuf);
 
 	memset(ndo, 0, sizeof(*ndo));
 	ndo_set_function_pointers(ndo);
@@ -828,10 +1177,6 @@ main(int argc, char **argv)
 	if (abort_on_misalignment(ebuf, sizeof(ebuf)) < 0)
 		error("%s", ebuf);
 
-#ifdef USE_LIBSMI
-	smiInit("tcpdump");
-#endif
-
 	while (
 	    (op = getopt_long(argc, argv, SHORTOPTS, longopts, NULL)) != -1)
 		switch (op) {
@@ -864,7 +1209,7 @@ main(int argc, char **argv)
 
 		case 'C':
 			Cflag = atoi(optarg) * 1000000;
-			if (Cflag < 0)
+			if (Cflag <= 0)
 				error("invalid file size %s", optarg);
 			break;
 
@@ -916,7 +1261,7 @@ main(int argc, char **argv)
 
 		case 'h':
 			print_usage();
-			exit(0);
+			exit_tcpdump(0);
 			break;
 
 		case 'H':
@@ -924,42 +1269,6 @@ main(int argc, char **argv)
 			break;
 
 		case 'i':
-			if (optarg[0] == '0' && optarg[1] == 0)
-				error("Invalid adapter index");
-
-#ifdef HAVE_PCAP_FINDALLDEVS
-			/*
-			 * If the argument is a number, treat it as
-			 * an index into the list of adapters, as
-			 * printed by "tcpdump -D".
-			 *
-			 * This should be OK on UNIX systems, as interfaces
-			 * shouldn't have names that begin with digits.
-			 * It can be useful on Windows, where more than
-			 * one interface can have the same name.
-			 */
-			devnum = strtol(optarg, &end, 10);
-			if (optarg != end && *end == '\0') {
-				if (devnum < 0)
-					error("Invalid adapter index");
-
-				if (pcap_findalldevs(&devlist, ebuf) < 0)
-					error("%s", ebuf);
-				/*
-				 * Look for the devnum-th entry in the
-				 * list of devices (1-based).
-				 */
-				for (i = 0, dev = devlist;
-				    i < devnum-1 && dev != NULL;
-				    i++, dev = dev->next)
-					;
-				if (dev == NULL)
-					error("Invalid adapter index");
-				device = strdup(dev->name);
-				pcap_freealldevs(devlist);
-				break;
-			}
-#endif /* HAVE_PCAP_FINDALLDEVS */
 			device = optarg;
 			break;
 
@@ -1007,16 +1316,14 @@ main(int argc, char **argv)
 			break;
 
 		case 'm':
-#ifdef USE_LIBSMI
-			if (smiLoadModule(optarg) == 0) {
-				error("could not load MIB module %s", optarg);
+			if (nd_have_smi_support()) {
+				if (nd_load_smi_module(optarg, ebuf, sizeof ebuf) == -1)
+					error("%s", ebuf);
+			} else {
+				(void)fprintf(stderr, "%s: ignoring option `-m %s' ",
+					      program_name, optarg);
+				(void)fprintf(stderr, "(no libsmi support)\n");
 			}
-			ndo->ndo_mflag = 1;
-#else
-			(void)fprintf(stderr, "%s: ignoring option `-m %s' ",
-				      program_name, optarg);
-			(void)fprintf(stderr, "(no libsmi support)\n");
-#endif
 			break;
 
 		case 'M':
@@ -1115,8 +1422,8 @@ main(int argc, char **argv)
 				ndo->ndo_packettype = PT_PGM_ZMTP1;
 			else if (ascii_strcasecmp(optarg, "lmp") == 0)
 				ndo->ndo_packettype = PT_LMP;
-            else if (strcasecmp(optarg, "resp") == 0)
-                ndo->ndo_packettype = PT_RESP;
+			else if (ascii_strcasecmp(optarg, "resp") == 0)
+				ndo->ndo_packettype = PT_RESP;
 			else
 				error("unknown packet type `%s'", optarg);
 			break;
@@ -1145,7 +1452,7 @@ main(int argc, char **argv)
 
 		case 'W':
 			Wflag = atoi(optarg);
-			if (Wflag < 0)
+			if (Wflag <= 0)
 				error("invalid number of output files %s", optarg);
 			WflagChars = getWflagChars(Wflag);
 			break;
@@ -1190,7 +1497,7 @@ main(int argc, char **argv)
 
 		case OPTION_VERSION:
 			print_version();
-			exit(0);
+			exit_tcpdump(0);
 			break;
 
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
@@ -1209,7 +1516,7 @@ main(int argc, char **argv)
 
 		default:
 			print_usage();
-			exit(1);
+			exit_tcpdump(1);
 			/* NOTREACHED */
 		}
 
@@ -1341,148 +1648,73 @@ main(int argc, char **argv)
 		 * We're doing a live capture.
 		 */
 		if (device == NULL) {
+			/*
+			 * No interface was specified.  Pick one.
+			 */
 #ifdef HAVE_PCAP_FINDALLDEVS
+			/*
+			 * Find the list of interfaces, and pick
+			 * the first interface.
+			 */
 			if (pcap_findalldevs(&devlist, ebuf) >= 0 &&
 			    devlist != NULL) {
 				device = strdup(devlist->name);
 				pcap_freealldevs(devlist);
 			}
 #else /* HAVE_PCAP_FINDALLDEVS */
+			/*
+			 * Use whatever interface pcap_lookupdev()
+			 * chooses.
+			 */
 			device = pcap_lookupdev(ebuf);
 #endif
 			if (device == NULL)
 				error("%s", ebuf);
 		}
-#ifdef _WIN32
+
 		/*
-		 * Print a message to the standard error on Windows.
-		 * XXX - why do it here, with a different message?
+		 * Try to open the interface with the specified name.
 		 */
-		if(strlen(device) == 1)	/* we assume that an ASCII string is always longer than 1 char */
-		{						/* a Unicode string has a \0 as second byte (so strlen() is 1) */
-			fprintf(stderr, "%s: listening on %ws\n", program_name, device);
-		}
-		else
-		{
-			fprintf(stderr, "%s: listening on %s\n", program_name, device);
+		pd = open_interface(device, ndo, ebuf);
+		if (pd == NULL) {
+			/*
+			 * That failed.  If we can get a list of
+			 * interfaces, and the interface name
+			 * is purely numeric, try to use it as
+			 * a 1-based index in the list of
+			 * interfaces.
+			 */
+#ifdef HAVE_PCAP_FINDALLDEVS
+			devnum = parse_interface_number(device);
+			if (devnum == -1) {
+				/*
+				 * It's not a number; just report
+				 * the open error and fail.
+				 */
+				error("%s", ebuf);
+			}
+
+			/*
+			 * OK, it's a number; try to find the
+			 * interface with that index, and try
+			 * to open it.
+			 *
+			 * find_interface_by_number() exits if it
+			 * couldn't be found.
+			 */
+			device = find_interface_by_number(devnum);
+			pd = open_interface(device, ndo, ebuf);
+			if (pd == NULL)
+				error("%s", ebuf);
+#else /* HAVE_PCAP_FINDALLDEVS */
+			/*
+			 * We can't get a list of interfaces; just
+			 * fail.
+			 */
+			error("%s", ebuf);
+#endif /* HAVE_PCAP_FINDALLDEVS */
 		}
 
-		fflush(stderr);
-#endif /* _WIN32 */
-#ifdef HAVE_PCAP_CREATE
-		pd = pcap_create(device, ebuf);
-		if (pd == NULL)
-			error("%s", ebuf);
-#ifdef HAVE_PCAP_SET_TSTAMP_TYPE
-		if (Jflag)
-			show_tstamp_types_and_exit(device);
-#endif
-#ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
-		status = pcap_set_tstamp_precision(pd, ndo->ndo_tstamp_precision);
-		if (status != 0)
-			error("%s: Can't set %ssecond time stamp precision: %s",
-				device,
-				tstamp_precision_to_string(ndo->ndo_tstamp_precision),
-				pcap_statustostr(status));
-#endif
-
-#ifdef HAVE_PCAP_SET_IMMEDIATE_MODE
-		if (immediate_mode) {
-			status = pcap_set_immediate_mode(pd, 1);
-			if (status != 0)
-				error("%s: Can't set immediate mode: %s",
-				device,
-				pcap_statustostr(status));
-		}
-#endif
-		/*
-		 * Is this an interface that supports monitor mode?
-		 */
-		if (pcap_can_set_rfmon(pd) == 1)
-			supports_monitor_mode = 1;
-		else
-			supports_monitor_mode = 0;
-		status = pcap_set_snaplen(pd, ndo->ndo_snaplen);
-		if (status != 0)
-			error("%s: Can't set snapshot length: %s",
-			    device, pcap_statustostr(status));
-		status = pcap_set_promisc(pd, !pflag);
-		if (status != 0)
-			error("%s: Can't set promiscuous mode: %s",
-			    device, pcap_statustostr(status));
-		if (Iflag) {
-			status = pcap_set_rfmon(pd, 1);
-			if (status != 0)
-				error("%s: Can't set monitor mode: %s",
-				    device, pcap_statustostr(status));
-		}
-		status = pcap_set_timeout(pd, 1000);
-		if (status != 0)
-			error("%s: pcap_set_timeout failed: %s",
-			    device, pcap_statustostr(status));
-		if (Bflag != 0) {
-			status = pcap_set_buffer_size(pd, Bflag);
-			if (status != 0)
-				error("%s: Can't set buffer size: %s",
-				    device, pcap_statustostr(status));
-		}
-#ifdef HAVE_PCAP_SET_TSTAMP_TYPE
-                if (jflag != -1) {
-			status = pcap_set_tstamp_type(pd, jflag);
-			if (status < 0)
-				error("%s: Can't set time stamp type: %s",
-			              device, pcap_statustostr(status));
-		}
-#endif
-		status = pcap_activate(pd);
-		if (status < 0) {
-			/*
-			 * pcap_activate() failed.
-			 */
-			cp = pcap_geterr(pd);
-			if (status == PCAP_ERROR)
-				error("%s", cp);
-			else if ((status == PCAP_ERROR_NO_SUCH_DEVICE ||
-			          status == PCAP_ERROR_PERM_DENIED) &&
-			         *cp != '\0')
-				error("%s: %s\n(%s)", device,
-				    pcap_statustostr(status), cp);
-			else
-				error("%s: %s", device,
-				    pcap_statustostr(status));
-		} else if (status > 0) {
-			/*
-			 * pcap_activate() succeeded, but it's warning us
-			 * of a problem it had.
-			 */
-			cp = pcap_geterr(pd);
-			if (status == PCAP_WARNING)
-				warning("%s", cp);
-			else if (status == PCAP_WARNING_PROMISC_NOTSUP &&
-			         *cp != '\0')
-				warning("%s: %s\n(%s)", device,
-				    pcap_statustostr(status), cp);
-			else
-				warning("%s: %s", device,
-				    pcap_statustostr(status));
-		}
-#ifdef HAVE_PCAP_SETDIRECTION
-		if (Qflag != -1) {
-			status = pcap_setdirection(pd, Qflag);
-			if (status != 0)
-				error("%s: pcap_setdirection() failed: %s",
-				      device,  pcap_geterr(pd));
-		}
-#endif /* HAVE_PCAP_SETDIRECTION */
-#else
-		*ebuf = '\0';
-		pd = pcap_open_live(device, ndo->ndo_snaplen, !pflag, 1000,
-		    ebuf);
-		if (pd == NULL)
-			error("%s", ebuf);
-		else if (*ebuf)
-			warning("%s", ebuf);
-#endif /* HAVE_PCAP_CREATE */
 		/*
 		 * Let user own process after socket has been opened.
 		 */
@@ -1497,7 +1729,7 @@ main(int argc, char **argv)
 			}
 #endif /* !defined(HAVE_PCAP_CREATE) && defined(_WIN32) */
 		if (Lflag)
-			show_dlts_and_exit(device);
+			show_dlts_and_exit(pd, device);
 		if (yflag_dlt >= 0) {
 #ifdef HAVE_PCAP_SET_DATALINK
 			if (pcap_set_datalink(pd, yflag_dlt) < 0)
@@ -1544,7 +1776,7 @@ main(int argc, char **argv)
 		pcap_close(pd);
 		free(cmdbuf);
 		pcap_freecode(&fcode);
-		exit(0);
+		exit_tcpdump(0);
 	}
 	init_print(ndo, localnet, netmask, timezone_offset);
 
@@ -1729,7 +1961,6 @@ main(int argc, char **argv)
 #endif
 	}
 
-#ifndef _WIN32
 	if (RFileName == NULL) {
 		/*
 		 * Live capture (if -V was specified, we set RFileName
@@ -1754,7 +1985,6 @@ main(int argc, char **argv)
 		}
 		(void)fflush(stderr);
 	}
-#endif /* _WIN32 */
 
 #ifdef HAVE_CAPSICUM
 	cansandbox = (ndo->ndo_nflag && VFileName == NULL && zflag == NULL);
@@ -1879,7 +2109,7 @@ main(int argc, char **argv)
 
 	free(cmdbuf);
 	pcap_freecode(&fcode);
-	exit(status == -1 ? 1 : 0);
+	exit_tcpdump(status == -1 ? 1 : 0);
 }
 
 /* make a clean exit on interrupts */
@@ -1919,7 +2149,7 @@ cleanup(int signo _U_)
 		(void)fflush(stdout);
 		info(1);
 	}
-	exit(0);
+	exit_tcpdump(0);
 #endif
 }
 
@@ -2092,7 +2322,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 			if (Cflag == 0 && Wflag > 0 && Gflag_count >= Wflag) {
 				(void)fprintf(stderr, "Maximum file limit reached: %d\n",
 				    Wflag);
-				exit(0);
+				exit_tcpdump(0);
 				/* NOTREACHED */
 			}
 			if (dump_info->CurrentFileName != NULL)
@@ -2334,6 +2564,7 @@ print_version(void)
 	static char pcap_version[] = "unknown";
 #endif /* defined(_WIN32) || defined(HAVE_PCAP_VERSION) */
 #endif /* HAVE_PCAP_LIB_VERSION */
+	const char *smi_version_string;
 
 #ifdef HAVE_PCAP_LIB_VERSION
 #ifdef _WIN32
@@ -2356,9 +2587,9 @@ print_version(void)
 	(void)fprintf (stderr, "%s\n", SSLeay_version(SSLEAY_VERSION));
 #endif
 
-#ifdef USE_LIBSMI
-	(void)fprintf (stderr, "SMI-library: %s\n", smi_version_string);
-#endif
+	smi_version_string = nd_smi_version_string();
+	if (smi_version_string != NULL)
+		(void)fprintf (stderr, "SMI-library: %s\n", smi_version_string);
 }
 USES_APPLE_RST
 

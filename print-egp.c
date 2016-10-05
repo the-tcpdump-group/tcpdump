@@ -18,6 +18,8 @@
  * Initial contribution from Jeff Honig (jch@MITCHELL.CIT.CORNELL.EDU).
  */
 
+/* \summary: Exterior Gateway Protocol (EGP) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

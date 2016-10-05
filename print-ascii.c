@@ -36,6 +36,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* \summary: ASCII packet dump printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

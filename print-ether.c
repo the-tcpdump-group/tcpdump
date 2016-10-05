@@ -19,6 +19,8 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+/* \summary: Ethernet printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

@@ -19,6 +19,8 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+/* \summary: UDP printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -594,6 +596,8 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 			ahcp_print(ndo, (const u_char *)(up + 1), length);
 		else if (IS_SRC_OR_DST_PORT(BABEL_PORT) || IS_SRC_OR_DST_PORT(BABEL_PORT_OLD))
 			babel_print(ndo, (const u_char *)(up + 1), length);
+		else if (IS_SRC_OR_DST_PORT(HNCP_PORT))
+			hncp_print(ndo, (const u_char *)(up + 1), length);
 		/*
 		 * Kludge in test for whiteboard packets.
 		 */
@@ -679,4 +683,3 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
  * c-basic-offset: 8
  * End:
  */
-

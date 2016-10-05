@@ -21,6 +21,8 @@
  * Initial contribution from Francis Dupont (francis.dupont@inria.fr)
  */
 
+/* \summary: Interior Gateway Routing Protocol (IGRP) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

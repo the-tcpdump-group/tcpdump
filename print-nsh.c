@@ -21,6 +21,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* \summary: Network Service Header (NSH) printer */
+
+/* specification: draft-ietf-sfc-nsh-01 */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -39,11 +43,7 @@ static const struct tok nsh_flags [] = {
 
 #define NSH_BASE_HDR_LEN 4
 #define NSH_SERVICE_PATH_HDR_LEN 4
-#define NSH_HDR_WORD_SIZE 4
-
-/*
- * NSH, draft-ietf-sfc-nsh-01 Network Service Header
- */
+#define NSH_HDR_WORD_SIZE 4U
 
 void
 nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)

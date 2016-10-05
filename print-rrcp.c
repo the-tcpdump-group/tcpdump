@@ -21,6 +21,8 @@
  * and Realtek Echo Protocol (RRCP-REP) packets.
  */
 
+/* \summary: Realtek Remote Control Protocol (RRCP) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

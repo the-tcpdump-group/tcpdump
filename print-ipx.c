@@ -18,9 +18,10 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  *
- * Format and print Novell IPX packets.
  * Contributed by Brad Parker (brad@fcr.com).
  */
+
+/* \summary: Novell IPX printer */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

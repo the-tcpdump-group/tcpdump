@@ -12,10 +12,10 @@
  * LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE.
  *
- * support for the IEEE MPCP protocol as per 802.3ah
- *
  * Original code by Hannes Gredler (hannes@juniper.net)
  */
+
+/* \summary: IEEE 802.3ah Multi-Point Control Protocol (MPCP) printer */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

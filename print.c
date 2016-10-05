@@ -226,19 +226,19 @@ static const struct printer printers[] = {
 static void	ndo_default_print(netdissect_options *ndo, const u_char *bp,
 		    u_int length);
 
-static void	ndo_error(netdissect_options *ndo _U_, const char *fmt, ...)
+static void	ndo_error(netdissect_options *ndo, const char *fmt, ...)
 		    __attribute__((noreturn))
 #ifdef __ATTRIBUTE___FORMAT_OK
 		    __attribute__((format (printf, 2, 3)))
 #endif /* __ATTRIBUTE___FORMAT_OK */
 		    ;
-static void	ndo_warning(netdissect_options *ndo _U_, const char *fmt, ...)
+static void	ndo_warning(netdissect_options *ndo, const char *fmt, ...)
 #ifdef __ATTRIBUTE___FORMAT_OK
 		    __attribute__((format (printf, 2, 3)))
 #endif /* __ATTRIBUTE___FORMAT_OK */
 		    ;
 
-static int	ndo_printf(netdissect_options *ndo _U_, const char *fmt, ...)
+static int	ndo_printf(netdissect_options *ndo, const char *fmt, ...)
 #ifdef __ATTRIBUTE___FORMAT_OK
 		     __attribute ((format (printf, 2, 3)))
 #endif /* __ATTRIBUTE___FORMAT_OK */
@@ -429,6 +429,7 @@ ndo_error(netdissect_options *ndo, const char *fmt, ...)
 		if (fmt[-1] != '\n')
 			(void)fputc('\n', stderr);
 	}
+	nd_cleanup();
 	exit(1);
 	/* NOTREACHED */
 }
@@ -453,7 +454,7 @@ ndo_warning(netdissect_options *ndo, const char *fmt, ...)
 }
 
 static int
-ndo_printf(netdissect_options *ndo _U_, const char *fmt, ...)
+ndo_printf(netdissect_options *ndo, const char *fmt, ...)
 {
 	va_list args;
 	int ret;

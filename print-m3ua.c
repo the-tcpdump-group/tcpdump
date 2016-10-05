@@ -22,6 +22,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* \summary: Message Transfer Part 3 (MTP3) User Adaptation Layer (M3UA) printer */
+
+/* RFC 4666 */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -32,8 +36,6 @@
 #include "extract.h"
 
 static const char tstr[] = " [|m3ua]";
-
-/* RFC 4666 */
 
 #define M3UA_REL_1_0 1
 

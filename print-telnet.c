@@ -45,6 +45,8 @@
  *      are preserved in all copies.
  */
 
+/* \summary: Telnet option printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -87,7 +89,7 @@
 #define SYNCH	242		/* for telfunc calls */
 
 #ifdef TELCMDS
-const char *telcmds[] = {
+static const char *telcmds[] = {
 	"EOF", "SUSP", "ABORT", "EOR",
 	"SE", "NOP", "DMARK", "BRK", "IP", "AO", "AYT", "EC",
 	"EL", "GA", "SB", "WILL", "WONT", "DO", "DONT", "IAC", 0,
@@ -148,7 +150,7 @@ extern char *telcmds[];
 
 #define	NTELOPTS	(1+TELOPT_NEW_ENVIRON)
 #ifdef TELOPTS
-const char *telopts[NTELOPTS+1] = {
+static const char *telopts[NTELOPTS+1] = {
 	"BINARY", "ECHO", "RCP", "SUPPRESS GO AHEAD", "NAME",
 	"STATUS", "TIMING MARK", "RCTE", "NAOL", "NAOP",
 	"NAOCRD", "NAOHTS", "NAOHTD", "NAOFFD", "NAOVTS",

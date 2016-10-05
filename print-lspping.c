@@ -13,6 +13,8 @@
  * Original code by Hannes Gredler (hannes@juniper.net)
  */
 
+/* \summary: MPLS LSP PING printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

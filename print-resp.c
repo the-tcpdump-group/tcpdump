@@ -1,7 +1,4 @@
 /*
- * This file implements decoding of the REdis Serialization Protocol.
- *
- *
  * Copyright (c) 2015 The TCPDUMP project
  * All rights reserved.
  *
@@ -30,7 +27,8 @@
  * Initial contribution by Andrew Darqui (andrew.darqui@gmail.com).
  */
 
-#define NETDISSECT_REWORKED
+/* \summary: REdis Serialization Protocol (RESP) printer */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -141,7 +139,8 @@ static int resp_print_inline(netdissect_options *, register const u_char *, int)
  */
 #define RESP_PRINT_SEGMENT(_ndo, _bp, _len)            \
         ND_PRINT((_ndo, " \""));                       \
-        fn_printn(_ndo, _bp, _len, _ndo->ndo_snapend); \
+        if (fn_printn(_ndo, _bp, _len, _ndo->ndo_snapend)) \
+		goto trunc; \
         fn_print_char(_ndo, '"');
 
 void

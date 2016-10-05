@@ -348,6 +348,17 @@ resp_1      resp_1_benchmark.pcap   resp_1.out      -n -t
 resp_2      resp_2_inline.pcap      resp_2.out      -n -t
 resp_3      resp_3_malicious.pcap   resp_3.out      -n -t
 
+# HNCP tests
+hncp        hncp.pcap    hncp.out    -n -vvv -t
+
+# BFD tests with authentication fields
+bfd-raw-auth-simple bfd-raw-auth-simple.pcap bfd-raw-auth-simple.out -t
+bfd-raw-auth-simple-v bfd-raw-auth-simple.pcap bfd-raw-auth-simple-v.out -t -v
+bfd-raw-auth-md5 bfd-raw-auth-md5.pcap bfd-raw-auth-md5.out -t
+bfd-raw-auth-md5-v bfd-raw-auth-md5.pcap bfd-raw-auth-md5-v.out -t -v
+bfd-raw-auth-sha1 bfd-raw-auth-sha1.pcap bfd-raw-auth-sha1.out -t
+bfd-raw-auth-sha1-v bfd-raw-auth-sha1.pcap bfd-raw-auth-sha1-v.out -t -v
+
 # GUE (UDP encapsulation)
 gue	gue.pcap	gue.out	-t
 gue-v	gue.pcap	gue-v.out	-t -v
