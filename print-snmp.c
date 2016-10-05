@@ -653,6 +653,56 @@ trunc:
 	return -1;
 }
 
+static int
+asn1_print_octets(netdissect_options *ndo, struct be *elem)
+{
+	const u_char *p = (const u_char *)elem->data.raw;
+	uint32_t asnlen = elem->asnlen;
+	uint32_t i;
+
+	ND_TCHECK2(*p, asnlen);
+	for (i = asnlen; i-- > 0; p++)
+		ND_PRINT((ndo, "_%.2x", *p));
+	return 0;
+
+trunc:
+	ND_PRINT((ndo, "%s", tstr));
+	return -1;
+}
+
+static int
+asn1_print_string(netdissect_options *ndo, struct be *elem)
+{
+	register int printable = 1, first = 1;
+	const u_char *p;
+	uint32_t asnlen = elem->asnlen;
+	uint32_t i;
+
+	p = elem->data.str;
+	ND_TCHECK2(*p, asnlen);
+	for (i = asnlen; printable && i-- > 0; p++)
+		printable = ND_ISPRINT(*p);
+	p = elem->data.str;
+	if (printable) {
+		ND_PRINT((ndo, "\""));
+		if (fn_printn(ndo, p, asnlen, ndo->ndo_snapend)) {
+			ND_PRINT((ndo, "\""));
+			goto trunc;
+		}
+		ND_PRINT((ndo, "\""));
+	} else {
+		for (i = asnlen; i-- > 0; p++) {
+			ND_PRINT((ndo, first ? "%.2x" : "_%.2x", *p));
+			first = 0;
+		}
+	}
+	return 0;
+
+trunc:
+	ND_PRINT((ndo, "%s", tstr));
+	return -1;
+}
+
 /*
  * Display the ASN.1 object represented by the BE object.
  * This used to be an integral part of asn1_parse() before the intermediate
@@ -669,9 +719,8 @@ asn1_print(netdissect_options *ndo,
 	switch (elem->type) {
 
 	case BE_OCTET:
-		ND_TCHECK2(*p, asnlen);
-		for (i = asnlen; i-- > 0; p++)
-			ND_PRINT((ndo, "_%.2x", *p));
+		if (asn1_print_octets(ndo, elem) == -1)
+			return -1;
 		break;
 
 	case BE_NULL:
@@ -778,28 +827,10 @@ asn1_print(netdissect_options *ndo,
 		break;
 	}
 
-	case BE_STR: {
-		register int printable = 1, first = 1;
-
-		p = elem->data.str;
-		ND_TCHECK2(*p, asnlen);
-		for (i = asnlen; printable && i-- > 0; p++)
-			printable = ND_ISPRINT(*p);
-		p = elem->data.str;
-		if (printable) {
-			ND_PRINT((ndo, "\""));
-			if (fn_printn(ndo, p, asnlen, ndo->ndo_snapend)) {
-				ND_PRINT((ndo, "\""));
-				goto trunc;
-			}
-			ND_PRINT((ndo, "\""));
-		} else
-			for (i = asnlen; i-- > 0; p++) {
-				ND_PRINT((ndo, first ? "%.2x" : "_%.2x", *p));
-				first = 0;
-			}
+	case BE_STR:
+		if (asn1_print_string(ndo, elem) == -1)
+			return -1;
 		break;
-	}
 
 	case BE_SEQ:
 		ND_PRINT((ndo, "Seq(%u)", elem->asnlen));
@@ -1534,7 +1565,7 @@ scopedpdu_print(netdissect_options *ndo,
                 const u_char *np, u_int length, int version)
 {
 	struct be elem;
-	int i, count = 0;
+	int count = 0;
 
 	/* Sequence */
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
@@ -1558,10 +1589,9 @@ scopedpdu_print(netdissect_options *ndo,
 	length -= count;
 	np += count;
 
-	ND_PRINT((ndo, "E= "));
-	for (i = 0; i < (int)elem.asnlen; i++) {
-		ND_PRINT((ndo, "0x%02X", elem.data.str[i]));
-	}
+	ND_PRINT((ndo, "E="));
+	if (asn1_print_octets(ndo, &elem) == -1)
+		return;
 	ND_PRINT((ndo, " "));
 
 	/* contextName (OCTET STRING) */
@@ -1575,7 +1605,10 @@ scopedpdu_print(netdissect_options *ndo,
 	length -= count;
 	np += count;
 
-	ND_PRINT((ndo, "C=%.*s ", (int)elem.asnlen, elem.data.str));
+	ND_PRINT((ndo, "C="));
+	if (asn1_print_string(ndo, &elem) == -1)
+		return;
+	ND_PRINT((ndo, " "));
 
 	pdu_print(ndo, np, length, version);
 }
@@ -1601,9 +1634,13 @@ community_print(netdissect_options *ndo,
 	/* default community */
 	if (!(elem.asnlen == sizeof(DEF_COMMUNITY) - 1 &&
 	    strncmp((const char *)elem.data.str, DEF_COMMUNITY,
-	            sizeof(DEF_COMMUNITY) - 1) == 0))
+	            sizeof(DEF_COMMUNITY) - 1) == 0)) {
 		/* ! "public" */
-		ND_PRINT((ndo, "C=%.*s ", (int)elem.asnlen, elem.data.str));
+		ND_PRINT((ndo, "C="));
+		if (asn1_print_string(ndo, &elem) == -1)
+			return;
+		ND_PRINT((ndo, " "));
+	}
 	length -= count;
 	np += count;
 
@@ -1679,7 +1716,10 @@ usm_print(netdissect_options *ndo,
 	length -= count;
         np += count;
 
-	ND_PRINT((ndo, "U=%.*s ", (int)elem.asnlen, elem.data.str));
+	ND_PRINT((ndo, "U="));
+	if (asn1_print_string(ndo, &elem) == -1)
+		return;
+	ND_PRINT((ndo, " "));
 
 	/* msgAuthenticationParameters (OCTET STRING) */
 	if ((count = asn1_parse(ndo, np, length, &elem)) < 0)
