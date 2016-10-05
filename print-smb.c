@@ -806,9 +806,6 @@ print_smb(netdissect_options *ndo,
 
     ND_TCHECK(buf[9]);
     request = (buf[9] & 0x80) ? 0 : 1;
-    flags2 = EXTRACT_LE_16BITS(&buf[10]);
-    unicodestr = flags2 & 0x8000;
-    nterrcodes = flags2 & 0x4000;
     startbuf = buf;
 
     command = buf[4];
@@ -822,6 +819,11 @@ print_smb(netdissect_options *ndo,
 
     if (ndo->ndo_vflag < 2)
 	return;
+
+    ND_TCHECK_16BITS(&buf[10]);
+    flags2 = EXTRACT_LE_16BITS(&buf[10]);
+    unicodestr = flags2 & 0x8000;
+    nterrcodes = flags2 & 0x4000;
 
     /* print out the header */
     smb_fdata(ndo, buf, fmt_smbheader, buf + 33, unicodestr);
