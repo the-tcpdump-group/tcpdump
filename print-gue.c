@@ -90,7 +90,7 @@ gue_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	u_int len = length;
 	uint16_t flags, prot;
-	u_int control, hlen;
+	u_int hlen;
 
 	/* Boundary checking done above */
 	flags = EXTRACT_16BITS(bp);
@@ -116,8 +116,7 @@ gue_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 		ND_PRINT((ndo, ", flags %04x", flags));
 	}
 
-	// (E)FLAGS field
-
+	/* (E)FLAGS field */
 	len -= 2;
 	bp += 2;
 
