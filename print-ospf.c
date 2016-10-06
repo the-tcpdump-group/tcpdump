@@ -996,6 +996,7 @@ ospf_decode_v2(netdissect_options *ndo,
 		break;
 
 	case OSPF_TYPE_HELLO:
+		ND_TCHECK(op->ospf_hello.hello_options);
 		ND_PRINT((ndo, "\n\tOptions [%s]",
 		          bittok2str(ospf_option_values,"none",op->ospf_hello.hello_options)));
 
