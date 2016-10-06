@@ -2630,11 +2630,13 @@ bgp_notification_print(netdissect_options *ndo,
 		   tok2str(bgp_notify_minor_fsm_values, "Unknown",
 			      bgpn.bgpn_minor),
 		   bgpn.bgpn_minor));
+            break;
         case BGP_NOTIFY_MAJOR_CAP:
             ND_PRINT((ndo, " subcode %s (%u)",
 		   tok2str(bgp_notify_minor_cap_values, "Unknown",
 			      bgpn.bgpn_minor),
 		   bgpn.bgpn_minor));
+            break;
         case BGP_NOTIFY_MAJOR_CEASE:
             ND_PRINT((ndo, ", subcode %s (%u)",
 		   tok2str(bgp_notify_minor_cease_values, "Unknown",
