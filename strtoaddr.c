@@ -34,7 +34,7 @@
 #endif
 
 #ifndef NS_INT16SZ
-#define NS_INT16SZ	2	/* #/bytes of data in a u_int16_t */
+#define NS_INT16SZ	2	/* #/bytes of data in a uint16_t */
 #endif
 
 /*%

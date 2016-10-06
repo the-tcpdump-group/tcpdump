@@ -167,7 +167,7 @@ signature_verify(netdissect_options *ndo, const u_char *pptr, u_int plen,
      * Clear anything else that needs to be cleared in the copy.
      * Our caller is assumed to have vetted the clear_arg pointer.
      */
-    (*clear_rtn)((void *)(packet_copy + ((const u_int8_t *)clear_arg - pptr)));
+    (*clear_rtn)((void *)(packet_copy + ((const uint8_t *)clear_arg - pptr)));
 
     /*
      * Compute the signature.
