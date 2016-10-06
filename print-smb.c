@@ -1167,10 +1167,12 @@ nbt_udp137_print(netdissect_options *ndo,
 	    p = smb_fdata(ndo, p, "Name=[n1]\n#", maxbuf, 0);
 	    if (p == NULL)
 		goto out;
+	    ND_TCHECK_16BITS(p);
 	    restype = EXTRACT_16BITS(p);
 	    p = smb_fdata(ndo, p, "ResType=[rw]\nResClass=[rw]\nTTL=[rD]\n", p + 8, 0);
 	    if (p == NULL)
 		goto out;
+	    ND_TCHECK_16BITS(p);
 	    rdlen = EXTRACT_16BITS(p);
 	    ND_PRINT((ndo, "ResourceLength=%d\nResourceData=\n", rdlen));
 	    p += 2;
