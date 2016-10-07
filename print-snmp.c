@@ -447,13 +447,18 @@ asn1_parse(netdissect_options *ndo,
 		 * bit set.  XXX - this doesn't handle a value
 		 * that won't fit in 32 bits.
 		 */
-		for (id = 0; *p & ASN_BIT8; len--, hdr++, p++) {
+		id = 0;
+		ND_TCHECK(*p);
+		while (*p & ASN_BIT8) {
 			if (len < 1) {
 				ND_PRINT((ndo, "[Xtagfield?]"));
 				return -1;
 			}
-			ND_TCHECK(*p);
 			id = (id << 7) | (*p & ~ASN_BIT8);
+			len--;
+			hdr++;
+			p++;
+			ND_TCHECK(*p);
 		}
 		if (len < 1) {
 			ND_PRINT((ndo, "[Xtagfield?]"));
