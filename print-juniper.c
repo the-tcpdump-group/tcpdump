@@ -28,6 +28,8 @@ __RCSID("NetBSD: print-juniper.c,v 1.3 2007/07/25 06:31:32 dogcow Exp ");
 
 #include <netdissect-stdinc.h>
 
+#include <string.h>
+
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
@@ -819,6 +821,7 @@ juniper_mfr_print(netdissect_options *ndo,
 {
         struct juniper_l2info_t l2info;
 
+        memset(&l2info, 0, sizeof(l2info));
         l2info.pictype = DLT_JUNIPER_MFR;
         if (juniper_parse_header(ndo, p, h, &l2info) == 0)
             return l2info.header_len;
