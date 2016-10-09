@@ -380,16 +380,20 @@ ldp_tlv_print(netdissect_options *ndo,
 	    break;
 	case LDP_FEC_MARTINI_VC:
             /*
+             * We assume the type was supposed to be one of the MPLS
+             * Pseudowire Types.
+             */
+            TLV_TCHECK(7);
+            vc_info_len = *(tptr+2);
+
+            /*
 	     * According to RFC 4908, the VC info Length field can be zero,
 	     * in which case not only are there no interface parameters,
 	     * there's no VC ID.
 	     */
-            TLV_TCHECK(7);
-            vc_info_len = *(tptr+2);
-
             if (vc_info_len == 0) {
                 ND_PRINT((ndo, ": %s, %scontrol word, group-ID %u, VC-info-length: %u",
-                       tok2str(l2vpn_encaps_values, "Unknown", EXTRACT_16BITS(tptr)&0x7fff),
+                       tok2str(mpls_pw_types_values, "Unknown", EXTRACT_16BITS(tptr)&0x7fff),
                        EXTRACT_16BITS(tptr)&0x8000 ? "" : "no ",
                        EXTRACT_32BITS(tptr+3),
                        vc_info_len));
@@ -399,7 +403,7 @@ ldp_tlv_print(netdissect_options *ndo,
             /* Make sure we have the VC ID as well */
             TLV_TCHECK(11);
 	    ND_PRINT((ndo, ": %s, %scontrol word, group-ID %u, VC-ID %u, VC-info-length: %u",
-		   tok2str(l2vpn_encaps_values, "Unknown", EXTRACT_16BITS(tptr)&0x7fff),
+		   tok2str(mpls_pw_types_values, "Unknown", EXTRACT_16BITS(tptr)&0x7fff),
 		   EXTRACT_16BITS(tptr)&0x8000 ? "" : "no ",
                    EXTRACT_32BITS(tptr+3),
 		   EXTRACT_32BITS(tptr+7),

@@ -60,8 +60,8 @@ const struct tok l2vpn_encaps_values[] = {
  */
 const struct tok mpls_pw_types_values[] = {
     { 0x0000, "Reserved"},
-    { 0x0001, "Frame Relay"},
-    { 0x0002, "ATM AAL5 VCC transport"},
+    { 0x0001, "Frame Relay DLCI (Martini Mode)"},
+    { 0x0002, "ATM AAL5 SDU VCC transport"},
     { 0x0003, "ATM transparent cell transport"},
     { 0x0004, "Ethernet VLAN"},
     { 0x0005, "Ethernet"},
