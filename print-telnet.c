@@ -57,6 +57,8 @@
 
 #include "netdissect.h"
 
+static const char tstr[] = " [|telnet]";
+
 #define TELCMDS
 #define TELOPTS
 
@@ -495,7 +497,7 @@ done:
 	return sp - osp;
 
 trunc:
-	ND_PRINT((ndo, "[|telnet]"));
+	ND_PRINT((ndo, "%s", tstr));
 pktend:
 	return -1;
 #undef FETCH
@@ -510,6 +512,7 @@ telnet_print(netdissect_options *ndo, const u_char *sp, u_int length)
 
 	osp = sp;
 
+	ND_TCHECK(*sp);
 	while (length > 0 && *sp == IAC) {
 		/*
 		 * Parse the Telnet command without printing it,
@@ -538,6 +541,7 @@ telnet_print(netdissect_options *ndo, const u_char *sp, u_int length)
 
 		sp += l;
 		length -= l;
+		ND_TCHECK(*sp);
 	}
 	if (!first) {
 		if (ndo->ndo_Xflag && 2 < ndo->ndo_vflag)
@@ -545,4 +549,7 @@ telnet_print(netdissect_options *ndo, const u_char *sp, u_int length)
 		else
 			ND_PRINT((ndo, "]"));
 	}
+	return;
+trunc:
+	ND_PRINT((ndo, "%s", tstr));
 }
