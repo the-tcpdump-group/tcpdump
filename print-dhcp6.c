@@ -105,8 +105,8 @@ static const struct tok dh6_msgtype_str[] = {
 /* DHCP6 base packet format */
 struct dhcp6 {
 	union {
-		uint8_t m;
-		uint32_t x;
+		nd_uint8_t m;
+		nd_uint32_t x;
 	} dh6_msgtypexid;
 	/* options follow */
 };
@@ -116,10 +116,10 @@ struct dhcp6 {
 
 /* DHCPv6 relay messages */
 struct dhcp6_relay {
-	uint8_t dh6relay_msgtype;
-	uint8_t dh6relay_hcnt;
-	uint8_t dh6relay_linkaddr[16];	/* XXX: badly aligned */
-	uint8_t dh6relay_peeraddr[16];
+	nd_uint8_t dh6relay_msgtype;
+	nd_uint8_t dh6relay_hcnt;
+	nd_uint8_t dh6relay_linkaddr[16];	/* XXX: badly aligned */
+	nd_uint8_t dh6relay_peeraddr[16];
 	/* options follow */
 };
 
@@ -263,8 +263,8 @@ static const struct tok dh6opt_stcode_str[] = {
 };
 
 struct dhcp6opt {
-	uint16_t dh6opt_type;
-	uint16_t dh6opt_len;
+	nd_uint16_t dh6opt_type;
+	nd_uint16_t dh6opt_len;
 	/* type-dependent data follows */
 };
 

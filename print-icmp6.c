@@ -284,13 +284,13 @@ struct nd_opt_hdr {		/* Neighbor discovery option header */
 #define ND_OPT_DNSSL			31
 
 struct nd_opt_prefix_info {	/* prefix information */
-	uint8_t		nd_opt_pi_type;
-	uint8_t		nd_opt_pi_len;
-	uint8_t		nd_opt_pi_prefix_len;
-	uint8_t		nd_opt_pi_flags_reserved;
-	uint8_t		nd_opt_pi_valid_time[4];
-	uint8_t		nd_opt_pi_preferred_time[4];
-	uint8_t		nd_opt_pi_reserved2[4];
+	nd_uint8_t		nd_opt_pi_type;
+	nd_uint8_t		nd_opt_pi_len;
+	nd_uint8_t		nd_opt_pi_prefix_len;
+	nd_uint8_t		nd_opt_pi_flags_reserved;
+	nd_uint32_t		nd_opt_pi_valid_time;
+	nd_uint32_t		nd_opt_pi_preferred_time;
+	nd_uint32_t		nd_opt_pi_reserved2;
 	struct in6_addr	nd_opt_pi_prefix;
 };
 
