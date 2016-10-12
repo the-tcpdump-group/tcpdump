@@ -139,6 +139,7 @@ struct bgp_route_refresh {
 #define BGPTYPE_AIGP                    26      /* RFC7311 */
 #define BGPTYPE_PE_DISTINGUISHER_LABEL  27      /* RFC6514 */
 #define BGPTYPE_ENTROPY_LABEL           28      /* RFC6790 */
+#define BGPTYPE_LARGE_COMMUNITY		30	/* draft-ietf-idr-large-community-02 */
 #define BGPTYPE_ATTR_SET               128      /* RFC6368 */
 
 #define BGP_MP_NLRI_MINSIZE              3       /* End of RIB Marker detection */
@@ -169,6 +170,7 @@ static const struct tok bgp_attr_values[] = {
     { BGPTYPE_AIGP,             "Accumulated IGP Metric"},
     { BGPTYPE_PE_DISTINGUISHER_LABEL, "PE Distinguisher Label"},
     { BGPTYPE_ENTROPY_LABEL,    "Entropy Label"},
+    { BGPTYPE_LARGE_COMMUNITY,  "Large Community"},
     { BGPTYPE_ATTR_SET,         "Attribute Set"},
     { 255,                      "Reserved for development"},
     { 0, NULL}
@@ -200,7 +202,6 @@ static const struct tok bgp_as_path_segment_close_values[] = {
 
 #define BGP_OPT_AUTH                    1
 #define BGP_OPT_CAP                     2
-
 
 static const struct tok bgp_opt_values[] = {
     { BGP_OPT_AUTH,             "Authentication Information"},
@@ -355,7 +356,6 @@ static const struct tok bgp_aigp_values[] = {
     { 0, NULL}
 };
 
-
 /* Subsequent address family identifier, RFC2283 section 7 */
 #define SAFNUM_RES                      0
 #define SAFNUM_UNICAST                  1
@@ -429,7 +429,6 @@ static const struct tok bgp_safi_values[] = {
 #define BGP_EXT_COM_VRF_RT_IMP  0x010b  /* RFC-ietf-l3vpn-2547bis-mcast-bgp-08.txt */
 #define BGP_EXT_COM_L2VPN_RT_0  0x000a  /* L2VPN Identifier,Format AS(2bytes):AN(4bytes) */
 #define BGP_EXT_COM_L2VPN_RT_1  0xF10a  /* L2VPN Identifier,Format IP address:AN(2bytes) */
-
 
 /* http://www.cisco.com/en/US/tech/tk436/tk428/technologies_tech_note09186a00801eb09a.shtml  */
 #define BGP_EXT_COM_EIGRP_GEN   0x8800
@@ -706,7 +705,6 @@ bgp_vpn_sg_print(netdissect_options *ndo,
 trunc:
     return (total_length);
 }
-
 
 /* RDs and RTs share the same semantics
  * we use bgp_vpn_rd_print for
@@ -1373,7 +1371,6 @@ bgp_attr_print(netdissect_options *ndo,
 						tptr[0])));
 		}
 		break;
-
 
         /*
          * Process AS4 byte path and AS2 byte path attributes here.
@@ -2191,7 +2188,6 @@ bgp_attr_print(netdissect_options *ndo,
 			      tok2str(bgp_aigp_values, "Unknown", type),
 			      type, length));
 
-
 		    /*
 		     * Check if we can read the TLV data.
 		     */
@@ -2267,7 +2263,23 @@ bgp_attr_print(netdissect_options *ndo,
 		}
                 break;
 
-
+	case BGPTYPE_LARGE_COMMUNITY:
+		if (len == 0 || len % 12) {
+			ND_PRINT((ndo, "invalid len"));
+			break;
+		}
+		ND_PRINT((ndo, "\n\t    "));
+		while (len > 0) {
+			ND_TCHECK2(*tptr, 12);
+			ND_PRINT((ndo, "%u:%u:%u%s",
+				 EXTRACT_32BITS(tptr),
+				 EXTRACT_32BITS(tptr + 4),
+				 EXTRACT_32BITS(tptr + 8),
+				 (len > 12) ? ", " : ""));
+                        tptr += 12;
+                        len -= 12;
+		}
+		break;
 	default:
 	    ND_TCHECK2(*pptr,len);
             ND_PRINT((ndo, "\n\t    no Attribute %u decoder", atype)); /* we have no decoder for the attribute */
