@@ -66,7 +66,6 @@ static const struct tok ospf_rla_flag_values[] = {
 };
 
 static const struct tok type2str[] = {
-	{ OSPF_TYPE_UMD,	"UMD" },
 	{ OSPF_TYPE_HELLO,	"Hello" },
 	{ OSPF_TYPE_DD,		"Database Description" },
 	{ OSPF_TYPE_LS_REQ,	"LS-Request" },
@@ -988,13 +987,6 @@ ospf_decode_v2(netdissect_options *ndo,
 
 	switch (op->ospf_type) {
 
-	case OSPF_TYPE_UMD:
-		/*
-		 * Rob Coltun's special monitoring packets;
-		 * do nothing
-		 */
-		break;
-
 	case OSPF_TYPE_HELLO:
 		ND_TCHECK(op->ospf_hello.hello_options);
 		ND_PRINT((ndo, "\n\tOptions [%s]",
@@ -1127,7 +1119,7 @@ ospf_print(netdissect_options *ndo,
 	/* If the type is valid translate it, or just print the type */
 	/* value.  If it's not valid, say so and return */
 	ND_TCHECK(op->ospf_type);
-	cp = tok2str(type2str, "unknown LS-type", op->ospf_type);
+	cp = tok2str(type2str, "unknown LS-type %u", op->ospf_type);
 	ND_PRINT((ndo, "OSPFv%u, %s, length %u", op->ospf_version, cp, length));
 	if (*cp == 'u')
 		return;

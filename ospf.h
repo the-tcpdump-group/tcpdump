@@ -20,7 +20,6 @@
  *
  * OSPF support contributed by Jeffrey Honig (jch@mitchell.cit.cornell.edu)
  */
-#define	OSPF_TYPE_UMD           0	/* UMd's special monitoring packets */
 #define	OSPF_TYPE_HELLO         1	/* Hello */
 #define	OSPF_TYPE_DD            2	/* Database Description */
 #define	OSPF_TYPE_LS_REQ        3	/* Link State Request */
