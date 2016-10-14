@@ -244,11 +244,11 @@ LIBNETDISSECT_OBJ=$(LIBNETDISSECT_SRC:.c=.o) ${LOCALSRC:.c=.o} ${LIBOBJS}
 LIBNETDISSECT=libnetdissect.a
 
 
-SRC =	$(CSRC) $(GENSRC) $(LOCALSRC) $(LIBNETDISSECT_SRC)
+SRC =	$(CSRC) $(GENSRC) $(LOCALSRC)
 
 # We would like to say "OBJ = $(SRC:.c=.o)" but Ultrix's make cannot
 # hack the extra indirection
-OBJ =	$(CSRC:.c=.o) $(GENSRC:.c=.o) $(LIBNETDISSECT_OBJ)
+OBJ =	$(CSRC:.c=.o) $(GENSRC:.c=.o)
 HDR = \
 	addrtoname.h \
 	addrtostr.h \
@@ -309,9 +309,9 @@ TAGHDR = \
 	/usr/include/netinet/udp.h \
 	/usr/include/protocols/routed.h
 
-TAGFILES = $(SRC) $(HDR) $(TAGHDR)
+TAGFILES = $(SRC) $(HDR) $(TAGHDR) $(LIBNETDISSECT_SRC)
 
-CLEANFILES = $(PROG) $(OBJ) $(GENSRC)
+CLEANFILES = $(PROG) $(OBJ) $(GENSRC) $(LIBNETDISSECT_OBJ)
 
 EXTRA_DIST = \
 	CHANGES \
@@ -375,11 +375,11 @@ EXTRA_DIST = \
 
 TEST_DIST= `find tests \( -name 'DIFF' -prune \) -o \( -name NEW -prune \) -o -type f \! -name '.*' \! -name '*~' -print`
 
-all: $(PROG) $(LIBNETDISSECT)
+all: $(PROG)
 
-$(PROG): $(OBJ) @V_PCAPDEP@
+$(PROG): $(OBJ) @V_PCAPDEP@ $(LIBNETDISSECT)
 	@rm -f $@
-	$(CC) $(FULL_CFLAGS) $(LDFLAGS) -o $@ $(OBJ) $(LIBS)
+	$(CC) $(FULL_CFLAGS) $(LDFLAGS) -o $@ $(OBJ) $(LIBNETDISSECT) $(LIBS)
 
 $(LIBNETDISSECT): $(LIBNETDISSECT_OBJ)
 	@rm -f $@
@@ -419,7 +419,7 @@ uninstall:
 	rm -f $(DESTDIR)$(mandir)/man1/$(PROG).1
 
 lint: $(GENSRC)
-	lint -hbxn $(SRC) | \
+	lint -hbxn $(SRC) $(LIBNETDISSECT_SRC) | \
 	    grep -v 'struct/union .* never defined' | \
 	    grep -v 'possible pointer alignment problem'
 
@@ -456,4 +456,4 @@ testlist:
 	echo $(TEST_DIST)
 
 depend: $(GENSRC)
-	$(MKDEP) -c "$(CC)" -m "$(DEPENDENCY_CFLAG)" $(DEFS) $(INCLS) $(SRC)
+	$(MKDEP) -c "$(CC)" -m "$(DEPENDENCY_CFLAG)" $(DEFS) $(INCLS) $(SRC) $(LIBNETDISSECT_SRC)
