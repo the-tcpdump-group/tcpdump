@@ -108,6 +108,9 @@ pppoe           pppoe.pcap             pppoe.out       -t
 pppoes          pppoes.pcap            pppoes.out      -t
 pppoes_id       pppoes.pcap            pppoes_id.out   -t pppoes 0x3b
 
+# PPP tests
+truncated_aack  truncated-aack.pcap    trunc_aack.out  -t
+
 # IGMP tests
 igmpv1		IGMP_V1.pcap		igmpv1.out		-t
 igmpv2		IGMP_V2.pcap		igmpv2.out		-t
