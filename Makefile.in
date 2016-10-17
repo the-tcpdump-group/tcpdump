@@ -316,11 +316,14 @@ CLEANFILES = $(PROG) $(OBJ) $(GENSRC)
 
 EXTRA_DIST = \
 	CHANGES \
+	CONTRIBUTING \
 	CREDITS \
 	INSTALL.txt \
 	LICENSE \
 	Makefile.in \
 	Makefile-devel-adds \
+	PLATFORMS \
+	README \
 	README.md \
 	Readme.Win32 \
 	VERSION \
