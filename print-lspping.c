@@ -637,10 +637,11 @@ lspping_print(netdissect_options *ndo,
         switch(lspping_tlv_type) {
         case LSPPING_TLV_TARGET_FEC_STACK:
             while (tlv_tlen != 0) {
-                /* Does the subTLV go past the end of the TLV? */
+                /* Does the subTLV header go past the end of the TLV? */
                 if (tlv_tlen < sizeof(struct lspping_tlv_header)) {
-                    subtlv_hexdump = TRUE;
-                    goto subtlv_too_short;
+                    ND_PRINT((ndo, "\n\t      TLV is too short"));
+                    tlv_hexdump = TRUE;
+                    goto tlv_tooshort;
                 }
                 /* did we capture enough for fully decoding the subtlv header ? */
                 ND_TCHECK2(*tlv_tptr, sizeof(struct lspping_tlv_header));
@@ -653,8 +654,9 @@ lspping_print(netdissect_options *ndo,
 
                 /* Does the subTLV go past the end of the TLV? */
                 if (tlv_tlen < lspping_subtlv_len+sizeof(struct lspping_tlv_header)) {
-                    subtlv_hexdump = TRUE;
-                    goto subtlv_too_short;
+                    ND_PRINT((ndo, "\n\t      TLV is too short"));
+                    tlv_hexdump = TRUE;
+                    goto tlv_tooshort;
                 }
 
                 /* Did we capture enough for fully decoding the subTLV? */
@@ -856,7 +858,6 @@ lspping_print(netdissect_options *ndo,
                     break;
                 }
                 /* do we want to see an additionally subtlv hexdump ? */
-            subtlv_too_short:
                 if (ndo->ndo_vflag > 1 || subtlv_hexdump==TRUE)
                     print_unknown_data(ndo, tlv_tptr+sizeof(struct lspping_tlv_header), \
                                        "\n\t      ",
@@ -880,7 +881,8 @@ lspping_print(netdissect_options *ndo,
             /* Does the header go past the end of the TLV? */
             if (tlv_tlen < sizeof(struct lspping_tlv_downstream_map_t)) {
                 ND_PRINT((ndo, "\n\t      TLV is too short"));
-                goto map_tlv_tooshort;
+                tlv_hexdump = TRUE;
+                goto tlv_tooshort;
             }
             /* Did we capture enough to get the address family? */
             ND_TCHECK2(*tlv_tptr, sizeof(struct lspping_tlv_downstream_map_t));
@@ -905,7 +907,8 @@ lspping_print(netdissect_options *ndo,
                 /* Does the data go past the end of the TLV? */
                 if (tlv_tlen < sizeof(struct lspping_tlv_downstream_map_ipv4_t)) {
                     ND_PRINT((ndo, "\n\t      TLV is too short"));
-                    goto map_tlv_tooshort;
+                    tlv_hexdump = TRUE;
+                    goto tlv_tooshort;
                 }
                 /* Did we capture enough for this part of the TLV? */
                 ND_TCHECK2(*tlv_tptr, sizeof(struct lspping_tlv_downstream_map_ipv4_t));
@@ -923,7 +926,8 @@ lspping_print(netdissect_options *ndo,
                 /* Does the data go past the end of the TLV? */
                 if (tlv_tlen < sizeof(struct lspping_tlv_downstream_map_ipv4_unmb_t)) {
                     ND_PRINT((ndo, "\n\t      TLV is too short"));
-                    goto map_tlv_tooshort;
+                    tlv_hexdump = TRUE;
+                    goto tlv_tooshort;
                 }
                 /* Did we capture enough for this part of the TLV? */
                 ND_TCHECK2(*tlv_tptr, sizeof(struct lspping_tlv_downstream_map_ipv4_unmb_t));
@@ -941,7 +945,8 @@ lspping_print(netdissect_options *ndo,
                 /* Does the data go past the end of the TLV? */
                 if (tlv_tlen < sizeof(struct lspping_tlv_downstream_map_ipv6_t)) {
                     ND_PRINT((ndo, "\n\t      TLV is too short"));
-                    goto map_tlv_tooshort;
+                    tlv_hexdump = TRUE;
+                    goto tlv_tooshort;
                 }
                 /* Did we capture enough for this part of the TLV? */
                 ND_TCHECK2(*tlv_tptr, sizeof(struct lspping_tlv_downstream_map_ipv6_t));
@@ -959,7 +964,8 @@ lspping_print(netdissect_options *ndo,
                 /* Does the data go past the end of the TLV? */
                 if (tlv_tlen < sizeof(struct lspping_tlv_downstream_map_ipv6_unmb_t)) {
                     ND_PRINT((ndo, "\n\t      TLV is too short"));
-                    goto map_tlv_tooshort;
+                    tlv_hexdump = TRUE;
+                    goto tlv_tooshort;
                 }
                 /* Did we capture enough for this part of the TLV? */
                 ND_TCHECK2(*tlv_tptr, sizeof(struct lspping_tlv_downstream_map_ipv6_unmb_t));
@@ -982,7 +988,8 @@ lspping_print(netdissect_options *ndo,
             /* Does the data go past the end of the TLV? */
             if (tlv_tlen < sizeof(struct lspping_tlv_downstream_map_info_t)) {
                 ND_PRINT((ndo, "\n\t      TLV is too short"));
-                goto map_tlv_tooshort;
+                tlv_hexdump = TRUE;
+                goto tlv_tooshort;
             }
             /* Did we capture enough for this part of the TLV? */
             ND_TCHECK2(*tlv_tptr, sizeof(struct lspping_tlv_downstream_map_info_t));
@@ -997,7 +1004,6 @@ lspping_print(netdissect_options *ndo,
 
             /* FIXME print downstream labels */
 
-        map_tlv_tooshort:
             tlv_hexdump=TRUE; /* dump the TLV until code complete */
 
             break;
@@ -1005,6 +1011,8 @@ lspping_print(netdissect_options *ndo,
         case LSPPING_TLV_BFD_DISCRIMINATOR:
             if (tlv_tlen < LSPPING_TLV_BFD_DISCRIMINATOR_LEN) {
                 ND_PRINT((ndo, "\n\t      TLV is too short"));
+                tlv_hexdump = TRUE;
+                goto tlv_tooshort;
             } else {
                 ND_TCHECK2(*tptr, LSPPING_TLV_BFD_DISCRIMINATOR_LEN);
                 ND_PRINT((ndo, "\n\t    BFD Discriminator 0x%08x", EXTRACT_32BITS(tptr)));
@@ -1017,6 +1025,8 @@ lspping_print(netdissect_options *ndo,
 
             if (tlv_tlen < LSPPING_TLV_VENDOR_ENTERPRISE_LEN) {
                 ND_PRINT((ndo, "\n\t      TLV is too short"));
+                tlv_hexdump = TRUE;
+                goto tlv_tooshort;
             } else {
                 ND_TCHECK2(*tptr, LSPPING_TLV_VENDOR_ENTERPRISE_LEN);
                 vendor_id = EXTRACT_32BITS(tlv_tptr);
@@ -1041,6 +1051,7 @@ lspping_print(netdissect_options *ndo,
             break;
         }
         /* do we want to see an additionally tlv hexdump ? */
+    tlv_tooshort:
         if (ndo->ndo_vflag > 1 || tlv_hexdump==TRUE)
             print_unknown_data(ndo, tptr+sizeof(struct lspping_tlv_header), "\n\t    ",
                                lspping_tlv_len);
