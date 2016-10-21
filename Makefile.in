@@ -302,7 +302,6 @@ HDR = \
 TAGHDR = \
 	/usr/include/arpa/tftp.h \
 	/usr/include/net/if_arp.h \
-	/usr/include/net/slip.h \
 	/usr/include/netinet/if_ether.h \
 	/usr/include/netinet/in.h \
 	/usr/include/netinet/ip_icmp.h \
@@ -439,6 +438,9 @@ distclean:
 
 check: tcpdump
 	(cd tests && ./TESTrun.sh)
+
+extags: $(TAGFILES)
+	ctags $(TAGFILES)
 
 tags: $(TAGFILES)
 	ctags -wtd $(TAGFILES)
