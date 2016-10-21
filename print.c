@@ -401,7 +401,7 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 		}
 	}
 
-	putchar('\n');
+	ND_PRINT((ndo, "\n"));
 }
 
 /*
