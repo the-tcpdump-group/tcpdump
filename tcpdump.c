@@ -458,7 +458,7 @@ show_devices_and_exit (void)
  * OS X tcpdump uses -g to force non--v output for IP to be on one
  * line, making it more "g"repable;
  *
- * OS X tcpdump uses -k tospecify that packet comments in pcap-ng files
+ * OS X tcpdump uses -k to specify that packet comments in pcap-ng files
  * should be printed;
  *
  * OpenBSD tcpdump uses -o to indicate that OS fingerprinting should be done
