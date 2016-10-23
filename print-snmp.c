@@ -276,28 +276,46 @@ static struct obj {
  * Currently, this includes the prefixes for the Internet MIB, the
  * private enterprises tree, and the experimental tree.
  */
+#define OID_FIRST_OCTET(x, y)	(((x)*40) + (y))	/* X.690 8.19.4 */
+
+#ifndef NO_ABREV_MIB
+static const uint8_t mib_oid[] = { OID_FIRST_OCTET(1, 3), 6, 1, 2, 1 };
+#endif
+#ifndef NO_ABREV_ENTER
+static const uint8_t enterprises_oid[] = { OID_FIRST_OCTET(1, 3), 6, 1, 4, 1 };
+#endif
+#ifndef NO_ABREV_EXPERI
+static const uint8_t experimental_oid[] = { OID_FIRST_OCTET(1, 3), 6, 1, 3 };
+#endif
+#ifndef NO_ABBREV_SNMPMODS
+static const uint8_t snmpModules_oid[] = { OID_FIRST_OCTET(1, 3), 6, 1, 6, 3 };
+#endif
+
+#define OBJ_ABBREV_ENTRY(prefix, obj) \
+	{ prefix, &_ ## obj ## _obj, obj ## _oid, sizeof (obj ## _oid) }
 static const struct obj_abrev {
 	const char *prefix;		/* prefix for this abrev */
 	struct obj *node;		/* pointer into object table */
-	const char *oid;		/* ASN.1 encoded OID */
+	const uint8_t *oid;		/* ASN.1 encoded OID */
+	size_t oid_len;			/* length of OID */
 } obj_abrev_list[] = {
 #ifndef NO_ABREV_MIB
 	/* .iso.org.dod.internet.mgmt.mib */
-	{ "",	&_mib_obj,		"\53\6\1\2\1" },
+	OBJ_ABBREV_ENTRY("",	mib),
 #endif
 #ifndef NO_ABREV_ENTER
 	/* .iso.org.dod.internet.private.enterprises */
-	{ "E:",	&_enterprises_obj,	"\53\6\1\4\1" },
+	OBJ_ABBREV_ENTRY("E:",	enterprises),
 #endif
 #ifndef NO_ABREV_EXPERI
 	/* .iso.org.dod.internet.experimental */
-	{ "X:",	&_experimental_obj,	"\53\6\1\3" },
+	OBJ_ABBREV_ENTRY("X:",	experimental),
 #endif
 #ifndef NO_ABBREV_SNMPMODS
 	/* .iso.org.dod.internet.snmpV2.snmpModules */
-        { "S:", &_snmpModules_obj,      "\53\6\1\6\3" },
+	OBJ_ABBREV_ENTRY("S:",	snmpModules),
 #endif
-	{ 0,0,0 }
+	{ 0,0,0,0 }
 };
 
 /*
@@ -737,14 +755,14 @@ asn1_print(netdissect_options *ndo,
 			if (!ndo->ndo_nflag && asnlen > 2) {
 				const struct obj_abrev *a = &obj_abrev_list[0];
 				for (; a->node; a++) {
-					size_t a_len = strlen(a->oid);
-					ND_TCHECK2(*p, a_len);
-					if (memcmp(a->oid, p, a_len) == 0) {
+					if (i < a->oid_len)
+						continue;
+					if (!ND_TTEST2(*p, a->oid_len))
+						continue;
+					if (memcmp(a->oid, p, a->oid_len) == 0) {
 						objp = a->node->child;
-						if (i < a_len)
-							goto trunc;
-						i -= a_len;
-						p += a_len;
+						i -= a->oid_len;
+						p += a->oid_len;
 						ND_PRINT((ndo, "%s", a->prefix));
 						first = 1;
 						break;
