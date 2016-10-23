@@ -520,6 +520,10 @@ asn1_parse(netdissect_options *ndo,
 				elem->type = BE_INT;
 				data = 0;
 
+				if (elem->asnlen == 0) {
+					ND_PRINT((ndo, "[asnlen=0]"));
+					return -1;
+				}
 				ND_TCHECK2(*p, elem->asnlen);
 				if (*p & ASN_BIT8)	/* negative */
 					data = -1;
@@ -717,7 +721,7 @@ static int
 asn1_print(netdissect_options *ndo,
            struct be *elem)
 {
-	const u_char *p = (const u_char *)elem->data.raw;
+	const u_char *p;
 	uint32_t asnlen = elem->asnlen;
 	uint32_t i;
 
@@ -734,17 +738,20 @@ asn1_print(netdissect_options *ndo,
 	case BE_OID: {
 		int o = 0, first = -1;
 
+		p = (const u_char *)elem->data.raw;
 		i = asnlen;
 		if (!nd_smi_module_loaded) {
-			if (!ndo->ndo_nflag && asnlen > 2) {
+			if (!ndo->ndo_nflag&& asnlen > 2) {
 				const struct obj_abrev *a = &obj_abrev_list[0];
-				size_t a_len = strlen(a->oid);
 				for (; a->node; a++) {
+					size_t a_len = strlen(a->oid);
 					ND_TCHECK2(*p, a_len);
 					if (memcmp(a->oid, p, a_len) == 0) {
 						objp = a->node->child;
-						i -= strlen(a->oid);
-						p += strlen(a->oid);
+						if (i < a_len)
+							goto trunc;
+						i -= a_len;
+						p += a_len;
 						ND_PRINT((ndo, "%s", a->prefix));
 						first = 1;
 						break;
@@ -844,6 +851,7 @@ asn1_print(netdissect_options *ndo,
 	case BE_INETADDR:
 		if (asnlen != ASNLEN_INETADDR)
 			ND_PRINT((ndo, "[inetaddr len!=%d]", ASNLEN_INETADDR));
+		p = (const u_char *)elem->data.raw;
 		ND_TCHECK2(*p, asnlen);
 		for (i = asnlen; i-- != 0; p++) {
 			ND_PRINT((ndo, (i == asnlen-1) ? "%u" : ".%u", *p));
@@ -1933,7 +1941,7 @@ snmp_print(netdissect_options *ndo,
 			ND_PRINT((ndo, "{ %s ", SnmpVersion[elem.data.integer]));
 		break;
 	default:
-	        ND_PRINT((ndo, "[version = %d]", elem.data.integer));
+	        ND_PRINT((ndo, "SNMP [version = %d]", elem.data.integer));
 		return;
 	}
 	version = elem.data.integer;
