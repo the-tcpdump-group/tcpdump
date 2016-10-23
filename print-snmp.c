@@ -330,10 +330,7 @@ struct be {
 		int32_t integer;
 		uint32_t uns;
 		const u_char *str;
-	        struct {
-		        uint32_t high;
-		        uint32_t low;
-		} uns64;
+		uint64_t uns64;
 	} data;
 	u_short id;
 	u_char form, class;		/* tag info */
@@ -572,17 +569,13 @@ asn1_parse(netdissect_options *ndo,
 			}
 
 			case COUNTER64: {
-				register uint32_t high, low;
+				register uint64_t data64;
 				ND_TCHECK2(*p, elem->asnlen);
 			        elem->type = BE_UNS64;
-				high = 0, low = 0;
-				for (i = elem->asnlen; i-- > 0; p++) {
-				        high = (high << 8) |
-					    ((low & 0xFF000000) >> 24);
-					low = (low << 8) | *p;
-				}
-				elem->data.uns64.high = high;
-				elem->data.uns64.low = low;
+				data64 = 0;
+				for (i = elem->asnlen; i-- > 0; p++)
+					data64 = (data64 << 8) + *p;
+				elem->data.uns64 = data64;
 				break;
 			}
 
@@ -741,7 +734,7 @@ asn1_print(netdissect_options *ndo,
 		p = (const u_char *)elem->data.raw;
 		i = asnlen;
 		if (!nd_smi_module_loaded) {
-			if (!ndo->ndo_nflag&& asnlen > 2) {
+			if (!ndo->ndo_nflag && asnlen > 2) {
 				const struct obj_abrev *a = &obj_abrev_list[0];
 				for (; a->node; a++) {
 					size_t a_len = strlen(a->oid);
@@ -797,47 +790,9 @@ asn1_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "%u", elem->data.uns));
 		break;
 
-	case BE_UNS64: {	/* idea borrowed from by Marshall Rose */
-	        double d;
-		int j, carry;
-		char *cpf, *cpl, last[6], first[30];
-		if (elem->data.uns64.high == 0) {
-			ND_PRINT((ndo, "%u", elem->data.uns64.low));
-			break;
-		}
-		d = elem->data.uns64.high * 4294967296.0;	/* 2^32 */
-		if (elem->data.uns64.high <= 0x1fffff) {
-		        d += elem->data.uns64.low;
-#if 0 /*is looks illegal, but what is the intention?*/
-			ND_PRINT((ndo, "%.f", d));
-#else
-			ND_PRINT((ndo, "%f", d));
-#endif
-			break;
-		}
-		d += (elem->data.uns64.low & 0xfffff000);
-#if 0 /*is looks illegal, but what is the intention?*/
-		snprintf(first, sizeof(first), "%.f", d);
-#else
-		snprintf(first, sizeof(first), "%f", d);
-#endif
-		snprintf(last, sizeof(last), "%5.5d",
-		    elem->data.uns64.low & 0xfff);
-		for (carry = 0, cpf = first+strlen(first)-1, cpl = last+4;
-		     cpl >= last;
-		     cpf--, cpl--) {
-		        j = carry + (*cpf - '0') + (*cpl - '0');
-			if (j > 9) {
-			        j -= 10;
-				carry = 1;
-			} else {
-			        carry = 0;
-		        }
-			*cpf = j + '0';
-		}
-		ND_PRINT((ndo, "%s", first));
+	case BE_UNS64:
+		ND_PRINT((ndo, "%" PRIu64, elem->data.uns64));
 		break;
-	}
 
 	case BE_STR:
 		if (asn1_print_string(ndo, elem) == -1)
