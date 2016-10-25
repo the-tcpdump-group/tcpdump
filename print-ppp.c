@@ -944,6 +944,9 @@ handle_pap(netdissect_options *ndo,
 
 	switch (code) {
 	case PAP_AREQ:
+		/* A valid Authenticate-Request is 6 or more octets long. */
+		if (len < 6)
+			goto trunc;
 		if (length - (p - p0) < 1)
 			return;
 		ND_TCHECK(*p);
