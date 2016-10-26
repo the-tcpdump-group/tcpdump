@@ -1,6 +1,34 @@
-Tuesday April 14, 2015 guy@alum.mit.edu
-  Summary for 4.8.0 tcpdump release
+Tuesday October 25, 2016 mcr@sandelman.ca
+  Summary for 4.8.1 tcpdump release
 	Fix "-x" for Apple PKTAP and PPI packets
+        Use PRIx64 to print a 64-bit number in hex.
+        Printer for HNCP (RFCs 7787 and 7788).
+        dagid is always an IPv6 address, not an opaque 128-bit string, and other fixes to RPL printer.
+        RSVP: Add bounds and length checks
+        OSPF: Do more bounds checking
+        Handle OpenSSL 1.1.x.
+        Initial support for the REdis Serialization Protocol known as RESP.
+        Add printing function for Generic Protocol Extension for VXLAN
+            draft-ietf-nvo3-vxlan-gpe-01
+        Network Service Header: draft-ietf-sfc-nsh-01
+        Don't recompile the filter if the new file has the same DLT.
+        Pass an adjusted struct pcap_pkthdr to the sub-printer.
+        Add three test cases for already fixed CVEs
+           CVE-2014-8767: OLSR
+           CVE-2014-8768: Geonet
+           CVE-2014-8769: AODV
+        Don't do the DDP-over-UDP heuristic first: GitHub issue #499.
+        Use the new debugging routines in libpcap.
+        Harmonize TCP source or destination ports tests with UDP ones
+        Introduce data types to use for integral values in packet structures.
+        RSVP: Fix an infinite loop
+        Support of Type 3 and Type 4 LISP packets.
+        Don't require IPv6 library support in order to support IPv6 addresses.
+        Many many changes to support libnetdissect usage.
+        Add a test that makes unaligned accesses: GitHub issue #478.
+        add a DNSSEC test case: GH #445 and GH #467.
+        BGP: add decoding of ADD-PATH capability
+        fixes to LLC header printing, and RFC948-style IP packets
 
 Friday April 10, 2015 guy@alum.mit.edu
   Summary for 4.7.4 tcpdump release
