@@ -139,7 +139,7 @@ struct bgp_route_refresh {
 #define BGPTYPE_AIGP                    26      /* RFC7311 */
 #define BGPTYPE_PE_DISTINGUISHER_LABEL  27      /* RFC6514 */
 #define BGPTYPE_ENTROPY_LABEL           28      /* RFC6790 */
-#define BGPTYPE_LARGE_COMMUNITY		30	/* draft-ietf-idr-large-community-02 */
+#define BGPTYPE_LARGE_COMMUNITY		32	/* draft-ietf-idr-large-community-05 */
 #define BGPTYPE_ATTR_SET               128      /* RFC6368 */
 
 #define BGP_MP_NLRI_MINSIZE              3       /* End of RIB Marker detection */
