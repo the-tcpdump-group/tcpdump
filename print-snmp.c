@@ -751,51 +751,49 @@ asn1_print(netdissect_options *ndo,
 
 		p = (const u_char *)elem->data.raw;
 		i = asnlen;
-		if (!nd_smi_module_loaded) {
-			if (!ndo->ndo_nflag && asnlen > 2) {
-				const struct obj_abrev *a = &obj_abrev_list[0];
-				for (; a->node; a++) {
-					if (i < a->oid_len)
-						continue;
-					if (!ND_TTEST2(*p, a->oid_len))
-						continue;
-					if (memcmp(a->oid, p, a->oid_len) == 0) {
-						objp = a->node->child;
-						i -= a->oid_len;
-						p += a->oid_len;
-						ND_PRINT((ndo, "%s", a->prefix));
-						first = 1;
-						break;
-					}
+		if (!ndo->ndo_nflag && asnlen > 2) {
+			const struct obj_abrev *a = &obj_abrev_list[0];
+			for (; a->node; a++) {
+				if (i < a->oid_len)
+					continue;
+				if (!ND_TTEST2(*p, a->oid_len))
+					continue;
+				if (memcmp(a->oid, p, a->oid_len) == 0) {
+					objp = a->node->child;
+					i -= a->oid_len;
+					p += a->oid_len;
+					ND_PRINT((ndo, "%s", a->prefix));
+					first = 1;
+					break;
 				}
 			}
+		}
 
-			for (; i-- > 0; p++) {
-				ND_TCHECK(*p);
-				o = (o << ASN_SHIFT7) + (*p & ~ASN_BIT8);
-				if (*p & ASN_LONGLEN)
-				        continue;
+		for (; i-- > 0; p++) {
+			ND_TCHECK(*p);
+			o = (o << ASN_SHIFT7) + (*p & ~ASN_BIT8);
+			if (*p & ASN_LONGLEN)
+			        continue;
 
-				/*
-				 * first subitem encodes two items with
-				 * 1st*OIDMUX+2nd
-				 * (see X.690:1997 clause 8.19 for the details)
-				 */
-				if (first < 0) {
-				        int s;
-					if (!ndo->ndo_nflag)
-						objp = mibroot;
-					first = 0;
-					s = o / OIDMUX;
-					if (s > 2) s = 2;
-					OBJ_PRINT(s, first);
-					o -= s * OIDMUX;
-				}
-				OBJ_PRINT(o, first);
-				if (--first < 0)
-					first = 0;
-				o = 0;
+			/*
+			 * first subitem encodes two items with
+			 * 1st*OIDMUX+2nd
+			 * (see X.690:1997 clause 8.19 for the details)
+			 */
+			if (first < 0) {
+			        int s;
+				if (!ndo->ndo_nflag)
+					objp = mibroot;
+				first = 0;
+				s = o / OIDMUX;
+				if (s > 2) s = 2;
+				OBJ_PRINT(s, first);
+				o -= s * OIDMUX;
 			}
+			OBJ_PRINT(o, first);
+			if (--first < 0)
+				first = 0;
+			o = 0;
 		}
 		break;
 	}
@@ -923,31 +921,29 @@ smi_decode_oid(netdissect_options *ndo,
 	int o = 0, first = -1, i = asnlen;
 	unsigned int firstval;
 
-	if (nd_smi_module_loaded) {
-		for (*oidlen = 0; i-- > 0; p++) {
-			ND_TCHECK(*p);
-		        o = (o << ASN_SHIFT7) + (*p & ~ASN_BIT8);
-			if (*p & ASN_LONGLEN)
-			    continue;
+	for (*oidlen = 0; i-- > 0; p++) {
+		ND_TCHECK(*p);
+	        o = (o << ASN_SHIFT7) + (*p & ~ASN_BIT8);
+		if (*p & ASN_LONGLEN)
+		    continue;
 
-			/*
-			 * first subitem encodes two items with 1st*OIDMUX+2nd
-			 * (see X.690:1997 clause 8.19 for the details)
-			 */
-			if (first < 0) {
-		        	first = 0;
-				firstval = o / OIDMUX;
-				if (firstval > 2) firstval = 2;
-				o -= firstval * OIDMUX;
-				if (*oidlen < oidsize) {
-				    oid[(*oidlen)++] = firstval;
-				}
-			}
+		/*
+		 * first subitem encodes two items with 1st*OIDMUX+2nd
+		 * (see X.690:1997 clause 8.19 for the details)
+		 */
+		if (first < 0) {
+	        	first = 0;
+			firstval = o / OIDMUX;
+			if (firstval > 2) firstval = 2;
+			o -= firstval * OIDMUX;
 			if (*oidlen < oidsize) {
-				oid[(*oidlen)++] = o;
+			    oid[(*oidlen)++] = firstval;
 			}
-			o = 0;
 		}
+		if (*oidlen < oidsize) {
+			oid[(*oidlen)++] = o;
+		}
+		o = 0;
 	}
 	return 0;
 
@@ -1054,6 +1050,10 @@ smi_print_variable(netdissect_options *ndo,
 	SmiNode *smiNode = NULL;
 	unsigned int i;
 
+	if (!nd_smi_module_loaded) {
+		*status = asn1_print(ndo, elem);
+		return NULL;
+	}
 	*status = smi_decode_oid(ndo, elem, oid, sizeof(oid) / sizeof(unsigned int),
 	    &oidlen);
 	if (*status < 0)
@@ -1139,22 +1139,24 @@ smi_print_value(netdissect_options *ndo,
 	        if (smiType->basetype == SMI_BASETYPE_BITS) {
 		        /* print bit labels */
 		} else {
-		        smi_decode_oid(ndo, elem, oid,
-				       sizeof(oid)/sizeof(unsigned int),
-				       &oidlen);
-			smiNode = smiGetNodeByOID(oidlen, oid);
-			if (smiNode) {
-			        if (ndo->ndo_vflag) {
-					ND_PRINT((ndo, "%s::", smiGetNodeModule(smiNode)->name));
-				}
-				ND_PRINT((ndo, "%s", smiNode->name));
-				if (smiNode->oidlen < oidlen) {
-				        for (i = smiNode->oidlen;
-					     i < oidlen; i++) {
-					        ND_PRINT((ndo, ".%u", oid[i]));
+			if (nd_smi_module_loaded &&
+			    smi_decode_oid(ndo, elem, oid,
+					   sizeof(oid)/sizeof(unsigned int),
+					   &oidlen) == 0) {
+				smiNode = smiGetNodeByOID(oidlen, oid);
+				if (smiNode) {
+				        if (ndo->ndo_vflag) {
+						ND_PRINT((ndo, "%s::", smiGetNodeModule(smiNode)->name));
 					}
+					ND_PRINT((ndo, "%s", smiNode->name));
+					if (smiNode->oidlen < oidlen) {
+					        for (i = smiNode->oidlen;
+						     i < oidlen; i++) {
+						        ND_PRINT((ndo, ".%u", oid[i]));
+						}
+					}
+					done++;
 				}
-				done++;
 			}
 		}
 		break;
