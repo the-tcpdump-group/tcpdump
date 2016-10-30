@@ -136,6 +136,25 @@ static const struct tok dh6opt_str[] = {
     { 0, NULL }
 };
 
+/*
+ * For IPv4-mapped IPv6 addresses, length of the prefix that precedes
+ * the 4 bytes of IPv4 address at the end of the IPv6 address.
+ */
+#define IPV4_MAPPED_HEADING_LEN    12
+
+/*
+ * Is an IPv6 address an IPv4-mapped address?
+ */
+static inline int
+is_ipv4_mapped_address(const u_char *addr)
+{
+    /* The value of the prefix */
+    static const u_char ipv4_mapped_heading[IPV4_MAPPED_HEADING_LEN] =
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0xFF };
+
+    return memcmp(addr, ipv4_mapped_heading, IPV4_MAPPED_HEADING_LEN) == 0;
+}
+
 static const char *
 format_nid(const u_char *data)
 {
@@ -175,8 +194,8 @@ format_interval(const uint32_t n)
 static const char *
 format_ip6addr(netdissect_options *ndo, const u_char *cp)
 {
-    if (EXTRACT_64BITS(cp) == 0x0 && EXTRACT_32BITS(cp+8) == 0xffff)
-        return ipaddr_string(ndo, cp + 12);
+    if (is_ipv4_mapped_address(cp))
+        return ipaddr_string(ndo, cp + IPV4_MAPPED_HEADING_LEN);
     else
         return ip6addr_string(ndo, cp);
 }
@@ -186,11 +205,9 @@ print_prefix(netdissect_options *ndo, const u_char *prefix, u_int max_length)
 {
     int plenbytes;
     char buf[sizeof("xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx::/128")];
-    /* First 12 bytes of an IPv4-mapped IPv6 address */
-    static const u_char ipv4_mapped_heading[12] =
-        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0xFF };
 
-    if (prefix[0] >= 96 && max_length >= 13 && memcmp(prefix+1, ipv4_mapped_heading, 12) == 0) {
+    if (prefix[0] >= 96 && max_length >= IPV4_MAPPED_HEADING_LEN + 1 &&
+        is_ipv4_mapped_address(&prefix[1])) {
         struct in_addr addr;
         u_int plen;
 
@@ -201,15 +218,15 @@ print_prefix(netdissect_options *ndo, const u_char *prefix, u_int max_length)
 
         memset(&addr, 0, sizeof(addr));
         plenbytes = (plen + 7) / 8;
-        if (max_length < (u_int)plenbytes)
+        if (max_length < (u_int)plenbytes + IPV4_MAPPED_HEADING_LEN)
             return -3;
-        memcpy(&addr, &prefix[13], plenbytes);
+        memcpy(&addr, &prefix[1 + IPV4_MAPPED_HEADING_LEN], plenbytes);
         if (plen % 8) {
 		((u_char *)&addr)[plenbytes - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
 	}
 	snprintf(buf, sizeof(buf), "%s/%d", ipaddr_string(ndo, &addr), plen);
-        plenbytes += 13;
+        plenbytes += 1 + IPV4_MAPPED_HEADING_LEN;
     } else {
         plenbytes = decode_prefix6(ndo, prefix, max_length, buf, sizeof(buf));
     }
