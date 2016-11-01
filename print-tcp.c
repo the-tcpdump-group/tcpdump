@@ -129,7 +129,7 @@ static const struct tok tcp_option_values[] = {
         { TCPOPT_SIGNATURE, "md5" },
         { TCPOPT_SCPS, "scps" },
         { TCPOPT_UTO, "uto" },
-        { TCPOPT_AUTH, "enhanced auth" },
+        { TCPOPT_TCPAO, "tcp-ao" },
         { TCPOPT_MPTCP, "mptcp" },
         { TCPOPT_FASTOPEN, "tfo" },
         { TCPOPT_EXPERIMENT2, "exp" },
@@ -544,15 +544,25 @@ tcp_print(netdissect_options *ndo,
                                 ND_PRINT((ndo, " cap %02x id %u", cp[0], cp[1]));
                                 break;
 
-                        case TCPOPT_AUTH:
-                                ND_PRINT((ndo, " keyid %d", *cp++));
-                                datalen = len - 3;
-                                for (i = 0; i < datalen; ++i) {
-                                        LENCHECK(i);
-                                        ND_PRINT((ndo, "%02x", cp[i]));
+                        case TCPOPT_TCPAO:
+                                datalen = len - 2;
+                                LENCHECK(datalen);
+                                /* RFC 5925 Section 2.2:
+                                 * "The Length value MUST be greater than or equal to 4."
+                                 * (This includes the Kind and Length fields already processed
+                                 * at this point.)
+                                 */
+                                if (datalen < 2) {
+                                        ND_PRINT((ndo, " invalid"));
+                                } else {
+                                        ND_PRINT((ndo, " keyid %u rnextkeyid %u", cp[0], cp[1]));
+                                        if (datalen > 2) {
+                                                ND_PRINT((ndo, " mac "));
+                                                for (i = 2; i < datalen; i++)
+                                                        ND_PRINT((ndo, "%02x", cp[i]));
+                                        }
                                 }
                                 break;
-
 
                         case TCPOPT_EOL:
                         case TCPOPT_NOP:
