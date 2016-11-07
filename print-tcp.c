@@ -127,9 +127,8 @@ static const struct tok tcp_option_values[] = {
         { TCPOPT_CCNEW, "ccnew" },
         { TCPOPT_CCECHO, "" },
         { TCPOPT_SIGNATURE, "md5" },
-        { TCPOPT_SCPS, "scps" },
-        { TCPOPT_UTO, "uto" },
         { TCPOPT_AUTH, "enhanced auth" },
+        { TCPOPT_UTO, "uto" },
         { TCPOPT_MPTCP, "mptcp" },
         { TCPOPT_FASTOPEN, "tfo" },
         { TCPOPT_EXPERIMENT2, "exp" },
@@ -536,12 +535,6 @@ tcp_print(netdissect_options *ndo,
                                 for (i = 0; i < TCP_SIGLEN; ++i)
                                         ND_PRINT((ndo, "%02x", cp[i]));
 #endif
-                                break;
-
-                        case TCPOPT_SCPS:
-                                datalen = 2;
-                                LENCHECK(datalen);
-                                ND_PRINT((ndo, " cap %02x id %u", cp[0], cp[1]));
                                 break;
 
                         case TCPOPT_AUTH:
