@@ -177,8 +177,6 @@ mptcp		mptcp.pcap		mptcp.out		-t
 mptcp-fclose	mptcp-fclose.pcap	mptcp-fclose.out	-t
 # TFO tests
 tfo		tfo-5c1fa7f9ae91.pcap	tfo.out		-t
-# SCPS
-scps_invalid	scps_invalid.pcap	scps_invalid.out	-t
 
 # IEEE 802.11 tests
 802.11_exthdr	ieee802.11_exthdr.pcap	ieee802.11_exthdr.out	-t -v
