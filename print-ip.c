@@ -655,14 +655,12 @@ ip_print(netdissect_options *ndo,
 	     * next level protocol header.  print the ip addr
 	     * and the protocol.
 	     */
-		if (ipds->off & 0x1fff) {
-			ND_PRINT((ndo, "%s > %s:", ipaddr_string(ndo, &ipds->ip->ip_src),
+		ND_PRINT((ndo, "%s > %s:", ipaddr_string(ndo, &ipds->ip->ip_src),
 			          ipaddr_string(ndo, &ipds->ip->ip_dst)));
-			if (!ndo->ndo_nflag && (proto = getprotobynumber(ipds->ip->ip_p)) != NULL)
-				ND_PRINT((ndo, " %s", proto->p_name));
-			else
-				ND_PRINT((ndo, " ip-proto-%d", ipds->ip->ip_p));
-		}
+		if (!ndo->ndo_nflag && (proto = getprotobynumber(ipds->ip->ip_p)) != NULL)
+			ND_PRINT((ndo, " %s", proto->p_name));
+		else
+			ND_PRINT((ndo, " ip-proto-%d", ipds->ip->ip_p));
 	}
 	return;
 
