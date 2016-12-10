@@ -647,22 +647,24 @@ ip_print(netdissect_options *ndo,
 		}
 		ip_print_demux(ndo, ipds);
 	} else {
-	    /* Ultra quiet now means that all this stuff should be suppressed */
-	    if (ndo->ndo_qflag > 1) return;
+		/*
+		 * Ultra quiet now means that all this stuff should be
+		 * suppressed.
+		 */
+		if (ndo->ndo_qflag > 1)
+			return;
 
-	    /*
-	     * if this isn't the first frag, we're missing the
-	     * next level protocol header.  print the ip addr
-	     * and the protocol.
-	     */
-		if (ipds->off & 0x1fff) {
-			ND_PRINT((ndo, "%s > %s:", ipaddr_string(ndo, &ipds->ip->ip_src),
-			          ipaddr_string(ndo, &ipds->ip->ip_dst)));
-			if (!ndo->ndo_nflag && (proto = getprotobynumber(ipds->ip->ip_p)) != NULL)
-				ND_PRINT((ndo, " %s", proto->p_name));
-			else
-				ND_PRINT((ndo, " ip-proto-%d", ipds->ip->ip_p));
-		}
+		/*
+		 * This isn't the first frag, so we're missing the
+		 * next level protocol header.  print the ip addr
+		 * and the protocol.
+		 */
+		ND_PRINT((ndo, "%s > %s:", ipaddr_string(ndo, &ipds->ip->ip_src),
+		          ipaddr_string(ndo, &ipds->ip->ip_dst)));
+		if (!ndo->ndo_nflag && (proto = getprotobynumber(ipds->ip->ip_p)) != NULL)
+			ND_PRINT((ndo, " %s", proto->p_name));
+		else
+			ND_PRINT((ndo, " ip-proto-%d", ipds->ip->ip_p));
 	}
 	return;
 
