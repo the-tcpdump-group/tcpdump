@@ -581,14 +581,21 @@ ip_print(netdissect_options *ndo,
             ND_PRINT((ndo, "(tos 0x%x", (int)ipds->ip->ip_tos));
             /* ECN bits */
             switch (ipds->ip->ip_tos & 0x03) {
+
+            case 0:
+                break;
+
             case 1:
                 ND_PRINT((ndo, ",ECT(1)"));
                 break;
+
             case 2:
                 ND_PRINT((ndo, ",ECT(0)"));
                 break;
+
             case 3:
                 ND_PRINT((ndo, ",CE"));
+                break;
             }
 
             if (ipds->ip->ip_ttl >= 1)
