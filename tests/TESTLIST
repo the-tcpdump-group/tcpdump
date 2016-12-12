@@ -154,6 +154,7 @@ dhcpv6-ia-ta	dhcpv6-ia-ta.pcap	dhcpv6-ia-ta.out	-t -v
 dhcpv6-ntp-server	dhcpv6-ntp-server.pcap	dhcpv6-ntp-server.out	-t -v
 dhcpv6-sip-server-d	dhcpv6-sip-server-d.pcap	dhcpv6-sip-server-d.out -t -v
 dhcpv6-domain-list	dhcpv6-domain-list.pcap	dhcpv6-domain-list.out	-t -v
+dhcpv6-mud	dhcpv6-mud.pcap		dhcpv6-mud.out -t -vv
 
 # ZeroMQ/PGM tests
 # ZMTP/1.0 over TCP
@@ -289,6 +290,7 @@ geneve-tcp	geneve.pcap		geneve-tcp.out	-t "geneve && tcp"
 # DHCP tests
 dhcp-rfc3004	dhcp-rfc3004.pcap	dhcp-rfc3004-v.out	-t -v
 dhcp-rfc5859	dhcp-rfc5859.pcap	dhcp-rfc5859-v.out	-t -v
+dhcp-mud	dhcp-mud.pcap		dhcp-mud.out	-t -vv
 
 # MEDSA tests
 medsa		medsa.pcap		medsa.out	-t
