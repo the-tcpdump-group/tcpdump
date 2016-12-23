@@ -293,6 +293,7 @@ bootp_print(netdissect_options *ndo,
 	ND_PRINT((ndo, "BOOTP/DHCP, %s",
 		  tok2str(bootp_op_values, "unknown (0x%02x)", bp->bp_op)));
 
+	ND_TCHECK(bp->bp_hlen);
 	if (bp->bp_htype == 1 && bp->bp_hlen == 6 && bp->bp_op == BOOTPREQUEST) {
 		ND_TCHECK2(bp->bp_chaddr[0], 6);
 		ND_PRINT((ndo, " from %s", etheraddr_string(ndo, bp->bp_chaddr)));
