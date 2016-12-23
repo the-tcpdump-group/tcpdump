@@ -798,11 +798,13 @@ clnp_print(netdissect_options *ndo,
 
         pptr += sizeof(struct clnp_header_t);
         li -= sizeof(struct clnp_header_t);
+	ND_TCHECK(*pptr);
         dest_address_length = *pptr;
         dest_address = pptr + 1;
 
         pptr += (1 + dest_address_length);
         li -= (1 + dest_address_length);
+	ND_TCHECK(*pptr);
         source_address_length = *pptr;
         source_address = pptr +1;
 
