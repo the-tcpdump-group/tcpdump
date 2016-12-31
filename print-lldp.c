@@ -944,7 +944,8 @@ lldp_private_iana_print(netdissect_options *ndo,
 
     switch (subtype) {
     case LLDP_IANA_SUBTYPE_MUDURL:
-      ND_PRINT((ndo,"\n\t  MUD-URL=%.*s",tlv_len-4,tptr+4));
+      ND_PRINT((ndo,"\n\t  MUD-URL="));
+      fn_printn(ndo,tptr+4,tlv_len-4,NULL);
       break;
     default:
       hexdump=TRUE;

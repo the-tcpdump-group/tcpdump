@@ -750,7 +750,9 @@ dhcp6opt_print(netdissect_options *ndo,
 			  break;
 			}
 			tp=(u_char *) (dh6o + 1);
-			ND_PRINT((ndo,"=%.*s)",(int) optlen,tp));
+			ND_PRINT((ndo,"="));
+			fn_printn(ndo,tp,(int) optlen,NULL);
+			ND_PRINT((ndo,")"));
 			break;
 		    
 
