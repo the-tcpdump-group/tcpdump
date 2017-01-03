@@ -123,6 +123,70 @@ static const struct tok radius_command_values[] = {
     { 0, NULL}
 };
 
+/* EAP Packet Types */
+#define     EAP_TYPE_NO_PROPOSED    0
+#define     EAP_TYPE_IDENTITY       1
+#define     EAP_TYPE_NOTIFICATION   2
+#define     EAP_TYPE_NAK            3
+#define     EAP_TYPE_MD5_CHALLENGE  4
+#define     EAP_TYPE_OTP            5
+#define     EAP_TYPE_GTC            6
+#define     EAP_TYPE_TLS            13      /* RFC 2716 */
+#define     EAP_TYPE_SIM            18      /* RFC 4186 */
+#define     EAP_TYPE_TTLS           21      /* draft-funk-eap-ttls-v0-01.txt */
+#define     EAP_TYPE_AKA            23      /* RFC 4187 */
+#define     EAP_TYPE_FAST           43      /* RFC 4851 */
+#define     EAP_TYPE_EXPANDED_TYPES 254
+#define     EAP_TYPE_EXPERIMENTAL   255
+
+static const struct tok eap_type_values[] = {
+    { EAP_TYPE_NO_PROPOSED, "No proposed" },
+    { EAP_TYPE_IDENTITY,    "Identity" },
+    { EAP_TYPE_NOTIFICATION,    "Notification" },
+    { EAP_TYPE_NAK,         "Nak" },
+    { EAP_TYPE_MD5_CHALLENGE,   "MD5-challenge" },
+    { EAP_TYPE_OTP,         "OTP" },
+    { EAP_TYPE_GTC,         "GTC" },
+    { EAP_TYPE_TLS,         "TLS" },
+    { EAP_TYPE_SIM,         "SIM" },
+    { EAP_TYPE_TTLS,        "TTLS" },
+    { EAP_TYPE_AKA,         "AKA" },
+    { EAP_TYPE_FAST,        "FAST" },
+    { EAP_TYPE_EXPANDED_TYPES,  "Expanded types" },
+    { EAP_TYPE_EXPERIMENTAL,    "Experimental" },
+    { 0, NULL}
+};
+
+/* EAP Codes */
+#define     EAP_REQUEST     1
+#define     EAP_RESPONSE    2
+#define     EAP_SUCCESS     3
+#define     EAP_FAILURE     4
+
+static const struct tok eap_code_values[] = {
+    { EAP_REQUEST,  "Request" },
+    { EAP_RESPONSE, "Response" },
+    { EAP_SUCCESS,  "Success" },
+    { EAP_FAILURE,  "Failure" },
+    { 0, NULL}
+};
+
+#define EAP_TLS_EXTRACT_BIT_L(x)    (((x)&0x80)>>7)
+
+/* RFC 2716 - EAP TLS bits */
+#define EAP_TLS_FLAGS_LEN_INCLUDED      (1 << 7)
+#define EAP_TLS_FLAGS_MORE_FRAGMENTS        (1 << 6)
+#define EAP_TLS_FLAGS_START         (1 << 5)
+
+static const struct tok eap_tls_flags_values[] = {
+    { EAP_TLS_FLAGS_LEN_INCLUDED, "L bit" },
+    { EAP_TLS_FLAGS_MORE_FRAGMENTS, "More fragments bit"},
+    { EAP_TLS_FLAGS_START, "Start bit"},
+    { 0, NULL}
+};
+
+#define EAP_TTLS_VERSION(x)     ((x)&0x07)
+
 /********************************/
 /* Begin Radius Attribute types */
 /********************************/
@@ -150,6 +214,8 @@ static const struct tok radius_command_values[] = {
 
 #define ARAP_PASS          70
 #define ARAP_FEATURES      71
+
+#define EAP_MESSAGE        79
 
 #define TUNNEL_PRIV_GROUP  81
 #define TUNNEL_ASSIGN_ID   82
@@ -496,6 +562,8 @@ print_attr_string(netdissect_options *ndo,
                   register const u_char *data, u_int length, u_short attr_code)
 {
    register u_int i;
+   u_int type, subtype;
+   int count=0, len;
 
    ND_TCHECK2(data[0],length);
 
@@ -540,6 +608,68 @@ print_attr_string(netdissect_options *ndo,
                   *data));
            data++;
            length--;
+        break;
+      case EAP_MESSAGE:
+           type = *data;
+           len = EXTRACT_16BITS(data+2);
+           ND_PRINT((ndo, "\n\t\t %s (%u), id %u, len %u",
+                  tok2str(eap_code_values, "unknown", type),
+                  type, *(data+1), len));
+           if ((type == 1) || (type == 2)) /* For EAP_REQUEST and EAP_RESPONSE only */
+           {
+              subtype = *(data+4);
+              ND_PRINT((ndo, "\n\t\t Type %s (%u)",
+              tok2str(eap_type_values, "unknown", *(data+4)),
+                      *(data + 4)));
+              switch (subtype)
+              {
+                 case EAP_TYPE_IDENTITY:
+                      if (len - 5 > 0) {
+                         ND_PRINT((ndo, ", Identity: "));
+                         safeputs(ndo, data + 5, len - 5);
+                      }
+                   break;
+
+                 case EAP_TYPE_NOTIFICATION:
+                      if (len - 5 > 0) {
+                         ND_PRINT((ndo, ", Notification: "));
+                         safeputs(ndo, data + 5, len - 5);
+                      }
+                   break;
+
+                 case EAP_TYPE_NAK:
+                      count = 5;
+                     /*
+                      * one or more octets indicating the desired authentication
+                      * type one octet per type
+                      */
+                      while (count < len) {
+                         ND_PRINT((ndo, " %s (%u),",
+                                   tok2str(eap_type_values, "unknown", *(data+count)),
+                                   *(data + count)));
+                         count++;
+                      }
+                   break;
+
+                 case EAP_TYPE_TTLS:
+                      ND_PRINT((ndo, " TTLSv%u",
+                             EAP_TTLS_VERSION(*(data + 5)))); /* fall through */
+                 case EAP_TYPE_TLS:
+                      ND_PRINT((ndo, " flags [%s] 0x%02x,",
+                             bittok2str(eap_tls_flags_values, "none", *(data+5)),
+                             *(data + 5)));
+
+                      if (EAP_TLS_EXTRACT_BIT_L(*(data+5))) {
+                         ND_PRINT((ndo, " len %u", EXTRACT_32BITS(data + 6)));
+                      }
+                   break;
+
+                 default:
+                   break;
+              }
+           }
+           length-=len;
+           data+=len;
         break;
    }
 
