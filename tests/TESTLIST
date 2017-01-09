@@ -419,6 +419,10 @@ juniper_header-heapoverflow	juniper_header-heapoverflow.pcap	juniper_header-heap
 tftp-heapoverflow	tftp-heapoverflow.pcap	tftp-heapoverflow.out	-t -v -n
 relts-0x80000000	relts-0x80000000.pcap	relts-0x80000000.out	-t -v -n
 
+# bad packets from Brian Carpenter
+ipv6hdr-heapoverflow	ipv6hdr-heapoverflow.pcap	ipv6hdr-heapoverflow.out	-t
+ipv6hdr-heapoverflow-v	ipv6hdr-heapoverflow.pcap	ipv6hdr-heapoverflow-v.out	-t -v
+
 # RTP tests
 # fuzzed pcap
 rtp-seg-fault-1  rtp-seg-fault-1.pcap  rtp-seg-fault-1.out  -t -v -T rtp
