@@ -170,7 +170,7 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
         ip6_print(ndo, bp, next_len);
         break;
     case 0x3:
-        ether_print(ndo, bp, next_len, next_len, NULL, NULL);
+        ether_print(ndo, bp, next_len, ndo->ndo_snapend - bp, NULL, NULL);
         break;
     default:
         ND_PRINT((ndo, "ERROR: unknown-next-protocol"));

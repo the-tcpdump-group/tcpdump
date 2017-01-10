@@ -126,6 +126,8 @@ ether_hdr_print(netdissect_options *ndo,
  * This might be encapsulated within another frame; we might be passed
  * a pointer to a function that can print header information for that
  * frame's protocol, and an argument to pass to that function.
+ *
+ * FIXME: caplen can and should be derived from ndo->ndo_snapend and p.
  */
 u_int
 ether_print(netdissect_options *ndo,
