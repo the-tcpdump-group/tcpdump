@@ -422,6 +422,7 @@ relts-0x80000000	relts-0x80000000.pcap	relts-0x80000000.out	-t -v -n
 # bad packets from Brian Carpenter
 ipv6hdr-heapoverflow	ipv6hdr-heapoverflow.pcap	ipv6hdr-heapoverflow.out	-t
 ipv6hdr-heapoverflow-v	ipv6hdr-heapoverflow.pcap	ipv6hdr-heapoverflow-v.out	-t -v
+otv-heapoverflow-1	otv-heapoverflow-1.pcap		otv-heapoverflow-1.out		-t -c10
 
 # RTP tests
 # fuzzed pcap
