@@ -276,7 +276,7 @@ fr_print(netdissect_options *ndo,
                         if (ethertype_print(ndo, extracted_ethertype,
                                             p+addr_len+ETHERTYPE_LEN,
                                             length-addr_len-ETHERTYPE_LEN,
-                                            length-addr_len-ETHERTYPE_LEN,
+                                            ndo->ndo_snapend-p-addr_len-ETHERTYPE_LEN,
                                             NULL, NULL) == 0)
                                 /* ether_type not known, probably it wasn't one */
                                 ND_PRINT((ndo, "UI %02x! ", p[addr_len]));
@@ -329,11 +329,11 @@ fr_print(netdissect_options *ndo,
 	case NLPID_CLNP:
 	case NLPID_ESIS:
 	case NLPID_ISIS:
-		isoclns_print(ndo, p - 1, length + 1, length + 1); /* OSI printers need the NLPID field */
+		isoclns_print(ndo, p - 1, length + 1, ndo->ndo_snapend - p + 1); /* OSI printers need the NLPID field */
 		break;
 
 	case NLPID_SNAP:
-		if (snap_print(ndo, p, length, length, NULL, NULL, 0) == 0) {
+		if (snap_print(ndo, p, length, ndo->ndo_snapend - p, NULL, NULL, 0) == 0) {
 			/* ether_type not known, print raw packet */
                         if (!ndo->ndo_eflag)
                             fr_hdr_print(ndo, length + hdr_len, hdr_len,

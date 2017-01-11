@@ -97,9 +97,9 @@ chdlc_print(netdissect_options *ndo, register const u_char *p, u_int length)
                 if (*(p+1) == 0x81 ||
                     *(p+1) == 0x82 ||
                     *(p+1) == 0x83)
-                    isoclns_print(ndo, p + 1, length - 1, length - 1);
+                    isoclns_print(ndo, p + 1, length - 1, ndo->ndo_snapend - p - 1);
                 else
-                    isoclns_print(ndo, p, length, length);
+                    isoclns_print(ndo, p, length, ndo->ndo_snapend - p);
                 break;
 	default:
                 if (!ndo->ndo_eflag)
