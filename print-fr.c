@@ -906,6 +906,7 @@ q933_print(netdissect_options *ndo,
 	ND_PRINT((ndo, "%s, codeset %u", is_ansi ? "ANSI" : "CCITT", codeset));
 
 	if (call_ref_length != 0) {
+		ND_TCHECK(p[0]);
 		if (call_ref_length > 1 || p[0] != 0) {
 			/*
 			 * Not a dummy call reference.

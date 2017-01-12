@@ -424,6 +424,7 @@ ipv6hdr-heapoverflow	ipv6hdr-heapoverflow.pcap	ipv6hdr-heapoverflow.out	-t
 ipv6hdr-heapoverflow-v	ipv6hdr-heapoverflow.pcap	ipv6hdr-heapoverflow-v.out	-t -v
 otv-heapoverflow-1	otv-heapoverflow-1.pcap		otv-heapoverflow-1.out		-t -c10
 otv-heapoverflow-2	otv-heapoverflow-2.pcap		otv-heapoverflow-2.out		-t -c10
+q933-heapoverflow-2	q933-heapoverflow-2.pcap	q933-heapoverflow-2.out		-t
 
 # RTP tests
 # fuzzed pcap
