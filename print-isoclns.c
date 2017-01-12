@@ -790,6 +790,14 @@ clnp_print(netdissect_options *ndo,
             ND_PRINT((ndo, "version %d packet not supported", clnp_header->version));
             return (0);
         }
+        if (li < sizeof(struct clnp_header_t)) {
+            ND_PRINT((ndo, "li < size of fixed part of CLNP header"));
+            return (0);
+        }
+        if (li > length) {
+            ND_PRINT((ndo, "li > size of packet"));
+            return (0);
+        }
 
         /* FIXME further header sanity checking */
 
@@ -798,18 +806,38 @@ clnp_print(netdissect_options *ndo,
 
         pptr += sizeof(struct clnp_header_t);
         li -= sizeof(struct clnp_header_t);
+
+        if (li < 1) {
+            ND_PRINT((ndo, "li < size of fixed part of CLNP header and addresses"));
+            return (0);
+        }
 	ND_TCHECK(*pptr);
         dest_address_length = *pptr;
-        dest_address = pptr + 1;
+        pptr += 1;
+        li -= 1;
+        if (li < dest_address_length) {
+            ND_PRINT((ndo, "li < size of fixed part of CLNP header and addresses"));
+            return (0);
+        }
+        dest_address = pptr;
+        pptr += dest_address_length;
+        li -= dest_address_length;
 
-        pptr += (1 + dest_address_length);
-        li -= (1 + dest_address_length);
+        if (li < 1) {
+            ND_PRINT((ndo, "li < size of fixed part of CLNP header and addresses"));
+            return (0);
+        }
 	ND_TCHECK(*pptr);
         source_address_length = *pptr;
-        source_address = pptr +1;
-
-        pptr += (1 + source_address_length);
-        li -= (1 + source_address_length);
+        pptr += 1;
+        li -= 1;
+        if (li < source_address_length) {
+            ND_PRINT((ndo, "li < size of fixed part of CLNP header and addresses"));
+            return (0);
+        }
+        source_address = pptr;
+        pptr += source_address_length;
+        li -= source_address_length;
 
         if (ndo->ndo_vflag < 1) {
             ND_PRINT((ndo, "%s%s > %s, %s, length %u",
@@ -845,6 +873,10 @@ clnp_print(netdissect_options *ndo,
                isonsap_string(ndo, dest_address, dest_address_length)));
 
         if (clnp_flags & CLNP_SEGMENT_PART) {
+                if (li < sizeof(const struct clnp_segment_header_t)) {
+                    ND_PRINT((ndo, "li < size of fixed part of CLNP header, addresses, and segment part"));
+                    return (0);
+                }
             	clnp_segment_header = (const struct clnp_segment_header_t *) pptr;
                 ND_TCHECK(*clnp_segment_header);
                 ND_PRINT((ndo, "\n\tData Unit ID: 0x%04x, Segment Offset: %u, Total PDU Length: %u",
@@ -860,19 +892,19 @@ clnp_print(netdissect_options *ndo,
             u_int op, opli;
             const uint8_t *tptr;
 
-            ND_TCHECK2(*pptr, 2);
             if (li < 2) {
                 ND_PRINT((ndo, ", bad opts/li"));
                 return (0);
             }
+            ND_TCHECK2(*pptr, 2);
             op = *pptr++;
             opli = *pptr++;
             li -= 2;
-            ND_TCHECK2(*pptr, opli);
             if (opli > li) {
                 ND_PRINT((ndo, ", opt (%d) too long", op));
                 return (0);
             }
+            ND_TCHECK2(*pptr, opli);
             li -= opli;
             tptr = pptr;
             tlen = opli;
@@ -882,11 +914,23 @@ clnp_print(netdissect_options *ndo,
                    op,
                    opli));
 
+            /*
+             * We've already checked that the entire option is present
+             * in the captured packet with the ND_TCHECK2() call.
+             * Therefore, we don't need to do ND_TCHECK()/ND_TCHECK2()
+	     * checks.
+	     * We do, however, need to check tlen, to make sure we
+	     * don't run past the end of the option.
+	     */
             switch (op) {
 
 
             case CLNP_OPTION_ROUTE_RECORDING: /* those two options share the format */
             case CLNP_OPTION_SOURCE_ROUTING:
+                    if (tlen < 2) {
+                            ND_PRINT((ndo, ", bad opt len"));
+                            return (0);
+                    }
                     ND_PRINT((ndo, "%s %s",
                            tok2str(clnp_option_sr_rr_values,"Unknown",*tptr),
                            tok2str(clnp_option_sr_rr_string_values, "Unknown Option %u", op)));
@@ -920,10 +964,18 @@ clnp_print(netdissect_options *ndo,
                     break;
 
             case CLNP_OPTION_PRIORITY:
+                    if (tlen < 1) {
+                            ND_PRINT((ndo, ", bad opt len"));
+                            return (0);
+                    }
                     ND_PRINT((ndo, "0x%1x", *tptr&0x0f));
                     break;
 
             case CLNP_OPTION_QOS_MAINTENANCE:
+                    if (tlen < 1) {
+                            ND_PRINT((ndo, ", bad opt len"));
+                            return (0);
+                    }
                     ND_PRINT((ndo, "\n\t    Format Code: %s",
                            tok2str(clnp_option_scope_values, "Reserved", *tptr&CLNP_OPTION_SCOPE_MASK)));
 
@@ -935,12 +987,20 @@ clnp_print(netdissect_options *ndo,
                     break;
 
             case CLNP_OPTION_SECURITY:
+                    if (tlen < 2) {
+                            ND_PRINT((ndo, ", bad opt len"));
+                            return (0);
+                    }
                     ND_PRINT((ndo, "\n\t    Format Code: %s, Security-Level %u",
                            tok2str(clnp_option_scope_values,"Reserved",*tptr&CLNP_OPTION_SCOPE_MASK),
                            *(tptr+1)));
                     break;
 
             case CLNP_OPTION_DISCARD_REASON:
+                if (tlen < 1) {
+                        ND_PRINT((ndo, ", bad opt len"));
+                        return (0);
+                }
                 rfd_error_major = (*tptr&0xf0) >> 4;
                 rfd_error_minor = *tptr&0x0f;
                 ND_PRINT((ndo, "\n\t    Class: %s Error (0x%01x), %s (0x%01x)",
