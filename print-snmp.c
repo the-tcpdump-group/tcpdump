@@ -519,6 +519,7 @@ asn1_parse(netdissect_options *ndo,
 		ND_PRINT((ndo, "[id?%c/%s/%d]", *Form[form], Class[class].name, id));
 		return -1;
 	}
+	ND_TCHECK2(*p, elem->asnlen);
 
 	switch (form) {
 	case PRIMITIVE:
@@ -539,7 +540,6 @@ asn1_parse(netdissect_options *ndo,
 					ND_PRINT((ndo, "[asnlen=0]"));
 					return -1;
 				}
-				ND_TCHECK2(*p, elem->asnlen);
 				if (*p & ASN_BIT8)	/* negative */
 					data = -1;
 				for (i = elem->asnlen; i-- > 0; p++)
@@ -577,7 +577,6 @@ asn1_parse(netdissect_options *ndo,
 			case GAUGE:
 			case TIMETICKS: {
 				register uint32_t data;
-				ND_TCHECK2(*p, elem->asnlen);
 				elem->type = BE_UNS;
 				data = 0;
 				for (i = elem->asnlen; i-- > 0; p++)
@@ -588,7 +587,6 @@ asn1_parse(netdissect_options *ndo,
 
 			case COUNTER64: {
 				register uint64_t data64;
-				ND_TCHECK2(*p, elem->asnlen);
 			        elem->type = BE_UNS64;
 				data64 = 0;
 				for (i = elem->asnlen; i-- > 0; p++)
@@ -627,7 +625,6 @@ asn1_parse(netdissect_options *ndo,
 
 		default:
 			ND_PRINT((ndo, "[P/%s/%s]", Class[class].name, Class[class].Id[id]));
-			ND_TCHECK2(*p, elem->asnlen);
 			elem->type = BE_OCTET;
 			elem->data.raw = (const uint8_t *)p;
 			break;
