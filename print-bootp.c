@@ -212,8 +212,9 @@ struct bootp {
 #define	TAG_CLIENT_GUID		((uint8_t)  97)
 #define	TAG_LDAP_URL		((uint8_t)  95)
 #define	TAG_6OVER4		((uint8_t)  96)
-#define	TAG_PRINTER_NAME	((uint8_t) 100)
-#define	TAG_MDHCP_SERVER	((uint8_t) 101)
+/* RFC 4833, TZ codes */
+#define	TAG_TZ_PCODE    	((uint8_t) 100)
+#define	TAG_TZ_TCODE    	((uint8_t) 101)
 #define	TAG_IPX_COMPAT		((uint8_t) 110)
 #define	TAG_NETINFO_PARENT	((uint8_t) 112)
 #define	TAG_NETINFO_PARENT_TAG	((uint8_t) 113)
@@ -221,6 +222,7 @@ struct bootp {
 #define	TAG_FAILOVER		((uint8_t) 115)
 #define	TAG_EXTENDED_REQUEST	((uint8_t) 126)
 #define	TAG_EXTENDED_OPTION	((uint8_t) 127)
+#define TAG_MUDURL              ((uint8_t) 161)
 
 /* DHCP Message types (values for TAG_DHCP_MESSAGE option) */
 #define DHCPDISCOVER	1
@@ -519,13 +521,14 @@ static const struct tok tag2str[] = {
 	{ TAG_CLIENT_GUID,	"bGUID" },	/* XXX 'b' */
 	{ TAG_LDAP_URL,		"aLDAP" },
 	{ TAG_6OVER4,		"i6o4" },
-	{ TAG_PRINTER_NAME,	"aPRTR" },
-	{ TAG_MDHCP_SERVER,	"bMDHCP" },	/* XXX 'b' */
+	{ TAG_TZ_PCODE, 	"aPOSIX-TZ" },
+	{ TAG_TZ_TCODE, 	"aTZ-Name" },
 	{ TAG_IPX_COMPAT,	"bIPX" },	/* XXX 'b' */
 	{ TAG_NETINFO_PARENT,	"iNI" },
 	{ TAG_NETINFO_PARENT_TAG, "aNITAG" },
 	{ TAG_URL,		"aURL" },
 	{ TAG_FAILOVER,		"bFAIL" },	/* XXX 'b' */
+	{ TAG_MUDURL,           "aMUD-URL" },
 	{ 0, NULL }
 };
 /* 2-byte extended tags */

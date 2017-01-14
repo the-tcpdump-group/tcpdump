@@ -18,6 +18,7 @@ extern const struct tok smi_values[];
 
 #define OUI_ENCAP_ETHER 0x000000        /* encapsulated Ethernet */
 #define OUI_CISCO       0x00000c        /* Cisco protocols */
+#define OUI_IANA        0x00005E	/* IANA */
 #define OUI_NORTEL      0x000081        /* Nortel SONMP */
 #define OUI_CISCO_90    0x0000f8        /* Cisco bridging */
 #define OUI_RFC2684     0x0080c2        /* RFC 2427/2684 bridged Ethernet */

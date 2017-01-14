@@ -194,6 +194,7 @@ struct dhcp6_relay {
 #  define DH6OPT_NTP_SUBOPTION_MC_ADDR 2
 #  define DH6OPT_NTP_SUBOPTION_SRV_FQDN 3
 #define DH6OPT_AFTR_NAME 64
+#define DH6OPT_MUDURL 112
 
 static const struct tok dh6opt_str[] = {
 	{ DH6OPT_CLIENTID,           "client-ID"            },
@@ -244,6 +245,7 @@ static const struct tok dh6opt_str[] = {
 	{ DH6OPT_LQ_CLIENT_LINK,     "LQ-client-link"       },
 	{ DH6OPT_NTP_SERVER,         "NTP-server"           },
 	{ DH6OPT_AFTR_NAME,          "AFTR-Name"            },
+	{ DH6OPT_MUDURL,             "MUD-URL"              },
 	{ 0, NULL }
 };
 
@@ -740,6 +742,20 @@ dhcp6opt_print(netdissect_options *ndo,
 			}
 			ND_PRINT((ndo, ")"));
 			break;
+		case DH6OPT_NEW_POSIX_TIMEZONE: /* all three of these options */
+		case DH6OPT_NEW_TZDB_TIMEZONE:	/* are encoded similarly */
+		case DH6OPT_MUDURL:		/* although GMT might not work */
+		        if ( optlen < 5 ) {
+			  ND_PRINT((ndo," ?)"));
+			  break;
+			}
+			tp=(u_char *) (dh6o + 1);
+			ND_PRINT((ndo,"="));
+			fn_printn(ndo,tp,(int) optlen,NULL);
+			ND_PRINT((ndo,")"));
+			break;
+		    
+
 		default:
 			ND_PRINT((ndo, ")"));
 			break;
