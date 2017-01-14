@@ -790,12 +790,16 @@ clnp_print(netdissect_options *ndo,
             ND_PRINT((ndo, "version %d packet not supported", clnp_header->version));
             return (0);
         }
-        if (li < sizeof(struct clnp_header_t)) {
-            ND_PRINT((ndo, "li < size of fixed part of CLNP header"));
+
+	if (li > length) {
+            ND_PRINT((ndo, " length indicator(%u) > PDU size (%u)!", li, length));
             return (0);
-        }
-        if (li > length) {
-            ND_PRINT((ndo, "li > size of packet"));
+	}
+
+        if (li < sizeof(struct clnp_header_t)) {
+            ND_PRINT((ndo, " length indicator %u < min PDU size:", li));
+            while (pptr < ndo->ndo_snapend)
+                ND_PRINT((ndo, "%02X", *pptr++));
             return (0);
         }
 
@@ -819,6 +823,7 @@ clnp_print(netdissect_options *ndo,
             ND_PRINT((ndo, "li < size of fixed part of CLNP header and addresses"));
             return (0);
         }
+        ND_TCHECK2(*pptr, dest_address_length);
         dest_address = pptr;
         pptr += dest_address_length;
         li -= dest_address_length;
@@ -835,6 +840,7 @@ clnp_print(netdissect_options *ndo,
             ND_PRINT((ndo, "li < size of fixed part of CLNP header and addresses"));
             return (0);
         }
+        ND_TCHECK2(*pptr, source_address_length);
         source_address = pptr;
         pptr += source_address_length;
         li -= source_address_length;
@@ -1118,12 +1124,12 @@ esis_print(netdissect_options *ndo,
         }
 
 	if (li > length) {
-            ND_PRINT((ndo, " length indicator(%d) > PDU size (%d)!", li, length));
+            ND_PRINT((ndo, " length indicator(%u) > PDU size (%u)!", li, length));
             return;
 	}
 
 	if (li < sizeof(struct esis_header_t) + 2) {
-            ND_PRINT((ndo, " length indicator < min PDU size %d:", li));
+            ND_PRINT((ndo, " length indicator %u < min PDU size:", li));
             while (pptr < ndo->ndo_snapend)
                 ND_PRINT((ndo, "%02X", *pptr++));
             return;
