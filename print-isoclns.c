@@ -924,9 +924,9 @@ clnp_print(netdissect_options *ndo,
              * We've already checked that the entire option is present
              * in the captured packet with the ND_TCHECK2() call.
              * Therefore, we don't need to do ND_TCHECK()/ND_TCHECK2()
-	     * checks.
-	     * We do, however, need to check tlen, to make sure we
-	     * don't run past the end of the option.
+             * checks.
+             * We do, however, need to check tlen, to make sure we
+             * don't run past the end of the option.
 	     */
             switch (op) {
 
@@ -1731,12 +1731,12 @@ isis_print_ip_reach_subtlv(netdissect_options *ndo,
                            const uint8_t *tptr, int subt, int subl,
                            const char *ident)
 {
-        /* first lets see if we know the subTLVs name*/
-	ND_PRINT((ndo, "%s%s subTLV #%u, length: %u",
-	          ident, tok2str(isis_ext_ip_reach_subtlv_values, "unknown", subt),
-	          subt, subl));
+    /* first lets see if we know the subTLVs name*/
+    ND_PRINT((ndo, "%s%s subTLV #%u, length: %u",
+              ident, tok2str(isis_ext_ip_reach_subtlv_values, "unknown", subt),
+              subt, subl));
 
-	ND_TCHECK2(*tptr,subl);
+    ND_TCHECK2(*tptr,subl);
 
     switch(subt) {
     case ISIS_SUBTLV_EXTD_IP_REACH_MGMT_PREFIX_COLOR: /* fall through */
