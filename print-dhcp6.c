@@ -304,6 +304,7 @@ dhcp6opt_print(netdissect_options *ndo,
 			goto trunc;
 		opttype = EXTRACT_16BITS(&dh6o->dh6opt_type);
 		ND_PRINT((ndo, " (%s", tok2str(dh6opt_str, "opt_%u", opttype)));
+		ND_TCHECK2(*(cp + sizeof(*dh6o)), optlen);
 		switch (opttype) {
 		case DH6OPT_CLIENTID:
 		case DH6OPT_SERVERID:
