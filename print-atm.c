@@ -345,24 +345,18 @@ static const struct tok msgtype2str[] = {
 
 static void
 sig_print(netdissect_options *ndo,
-          const u_char *p, int caplen)
+          const u_char *p)
 {
 	uint32_t call_ref;
 
-	if (caplen < PROTO_POS) {
-		ND_PRINT((ndo, "%s", tstr));
-		return;
-	}
+	ND_TCHECK(p[PROTO_POS]);
 	if (p[PROTO_POS] == Q2931) {
 		/*
 		 * protocol:Q.2931 for User to Network Interface
 		 * (UNI 3.1) signalling
 		 */
 		ND_PRINT((ndo, "Q.2931"));
-		if (caplen < MSG_TYPE_POS) {
-			ND_PRINT((ndo, " %s", tstr));
-			return;
-		}
+		ND_TCHECK(p[MSG_TYPE_POS]);
 		ND_PRINT((ndo, ":%s ",
 		    tok2str(msgtype2str, "msgtype#%d", p[MSG_TYPE_POS])));
 
@@ -378,6 +372,10 @@ sig_print(netdissect_options *ndo,
 		/* SCCOP with some unknown protocol atop it */
 		ND_PRINT((ndo, "SSCOP, proto %d ", p[PROTO_POS]));
 	}
+	return;
+
+trunc:
+	ND_PRINT((ndo, " %s", tstr));
 }
 
 /*
@@ -395,7 +393,7 @@ atm_print(netdissect_options *ndo,
 		switch (vci) {
 
 		case VCI_PPC:
-			sig_print(ndo, p, caplen);
+			sig_print(ndo, p);
 			return;
 
 		case VCI_BCC:
