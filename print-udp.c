@@ -135,13 +135,13 @@ rtp_print(netdissect_options *ndo, const void *hdr, u_int len,
 	hasopt = 0;
 	hasext = 0;
 	if ((i0 >> 30) == 1) {
-		/* rtp v1 */
+		/* rtp v1 - draft-ietf-avt-rtp-04 */
 		hasopt = i0 & 0x800000;
 		contype = (i0 >> 16) & 0x3f;
 		hasmarker = i0 & 0x400000;
 		ptype = "rtpv1";
 	} else {
-		/* rtp v2 */
+		/* rtp v2 - RFC 3550 */
 		hasext = i0 & 0x10000000;
 		contype = (i0 >> 16) & 0x7f;
 		hasmarker = i0 & 0x800000;
@@ -163,7 +163,7 @@ rtp_print(netdissect_options *ndo, const void *hdr, u_int len,
 		if (hasopt) {
 			u_int i2, optlen;
 			do {
-				i2 = ip[0];
+				i2 = EXTRACT_32BITS(ip);
 				optlen = (i2 >> 16) & 0xff;
 				if (optlen == 0 || optlen > len) {
 					ND_PRINT((ndo, " !opt"));
@@ -175,7 +175,7 @@ rtp_print(netdissect_options *ndo, const void *hdr, u_int len,
 		}
 		if (hasext) {
 			u_int i2, extlen;
-			i2 = ip[0];
+			i2 = EXTRACT_32BITS(ip);
 			extlen = (i2 & 0xffff) + 1;
 			if (extlen > len) {
 				ND_PRINT((ndo, " !ext"));
@@ -184,7 +184,7 @@ rtp_print(netdissect_options *ndo, const void *hdr, u_int len,
 			ip += extlen;
 		}
 		if (contype == 0x1f) /*XXX H.261 */
-			ND_PRINT((ndo, " 0x%04x", ip[0] >> 16));
+			ND_PRINT((ndo, " 0x%04x", EXTRACT_32BITS(ip) >> 16));
 	}
 }
 
