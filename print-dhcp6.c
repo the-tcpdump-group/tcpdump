@@ -745,16 +745,15 @@ dhcp6opt_print(netdissect_options *ndo,
 		case DH6OPT_NEW_POSIX_TIMEZONE: /* all three of these options */
 		case DH6OPT_NEW_TZDB_TIMEZONE:	/* are encoded similarly */
 		case DH6OPT_MUDURL:		/* although GMT might not work */
-		        if ( optlen < 5 ) {
-			  ND_PRINT((ndo," ?)"));
-			  break;
+		        if (optlen < 5) {
+				ND_PRINT((ndo, " ?)"));
+				break;
 			}
-			tp=(u_char *) (dh6o + 1);
-			ND_PRINT((ndo,"="));
-			fn_printn(ndo,tp,(int) optlen,NULL);
-			ND_PRINT((ndo,")"));
+			tp = (const u_char *)(dh6o + 1);
+			ND_PRINT((ndo, "="));
+			fn_printn(ndo, tp, (u_int)optlen, NULL);
+			ND_PRINT((ndo, ")"));
 			break;
-		    
 
 		default:
 			ND_PRINT((ndo, ")"));
