@@ -26,7 +26,7 @@
 const struct tok oui_values[] = {
     { OUI_ENCAP_ETHER, "Ethernet" },
     { OUI_CISCO, "Cisco" },
-    { OUI_IANA, "IANA"   },
+    { OUI_IANA, "IANA" },
     { OUI_NORTEL, "Nortel Networks SONMP" },
     { OUI_CISCO_90, "Cisco bridged" },
     { OUI_RFC2684, "Ethernet bridged" },
