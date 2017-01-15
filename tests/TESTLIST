@@ -431,6 +431,7 @@ atm-heapoverflow	atm-heapoverflow.pcap		atm-heapoverflow.out		-t -c1 -e
 snmp-heapoverflow-1	snmp-heapoverflow-1.pcap	snmp-heapoverflow-1.out		-t
 snmp-heapoverflow-2	snmp-heapoverflow-2.pcap	snmp-heapoverflow-2.out		-t
 isoclns-heapoverflow-2	isoclns-heapoverflow-2.pcap	isoclns-heapoverflow-2.out	-t -e -c1
+isoclns-heapoverflow-3	isoclns-heapoverflow-3.pcap	isoclns-heapoverflow-3.out	-t -e -c1
 
 # RTP tests
 # fuzzed pcap
