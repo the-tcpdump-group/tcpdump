@@ -1852,10 +1852,9 @@ trunc:
 }
 
 static const u_char *
-ikev2_t_print(netdissect_options *ndo, u_char tpay _U_, int pcount,
+ikev2_t_print(netdissect_options *ndo, int tcount,
 	      const struct isakmp_gen *ext, u_int item_len,
-	      const u_char *ep, uint32_t phase _U_, uint32_t doi _U_,
-	      uint32_t proto _U_, int depth _U_)
+	      const u_char *ep)
 {
 	const struct ikev2_t *p;
 	struct ikev2_t t;
@@ -1905,11 +1904,11 @@ ikev2_t_print(netdissect_options *ndo, u_char tpay _U_, int pcount,
 	}
 
 	if (idstr)
-		ND_PRINT((ndo," #%u type=%s id=%s ", pcount,
+		ND_PRINT((ndo," #%u type=%s id=%s ", tcount,
 			  STR_OR_ID(t.t_type, ikev2_t_type_map),
 			  idstr));
 	else
-		ND_PRINT((ndo," #%u type=%s id=%u ", pcount,
+		ND_PRINT((ndo," #%u type=%s id=%u ", tcount,
 			  STR_OR_ID(t.t_type, ikev2_t_type_map),
 			  t.t_id));
 	cp = (const u_char *)(p + 1);
@@ -1931,34 +1930,97 @@ trunc:
 
 static const u_char *
 ikev2_p_print(netdissect_options *ndo, u_char tpay _U_, int pcount _U_,
-	      const struct isakmp_gen *ext, u_int item_len _U_,
-	       const u_char *ep, uint32_t phase, uint32_t doi0,
-	       uint32_t proto0 _U_, int depth)
+	      const struct isakmp_gen *ext, u_int oprop_length,
+	      const u_char *ep, int depth)
 {
 	const struct ikev2_p *p;
 	struct ikev2_p prop;
+	u_int prop_length;
 	const u_char *cp;
+	int i;
+	int tcount;
+	u_char np;
+	struct isakmp_gen e;
+	u_int item_len;
 
 	p = (const struct ikev2_p *)ext;
 	ND_TCHECK(*p);
 	UNALIGNED_MEMCPY(&prop, ext, sizeof(prop));
+
 	ikev2_pay_print(ndo, NPSTR(ISAKMP_NPTYPE_P), prop.h.critical);
 
+	/*
+	 * ikev2_sa_print() guarantees that this is >= 4.
+	 */
+	prop_length = oprop_length - 4;
 	ND_PRINT((ndo," #%u protoid=%s transform=%d len=%u",
 		  prop.p_no,  PROTOIDSTR(prop.prot_id),
-		  prop.num_t, ntohs(prop.h.len)));
+		  prop.num_t, oprop_length));
+	cp = (const u_char *)(p + 1);
+
 	if (prop.spi_size) {
+		if (prop_length < prop.spi_size)
+			goto toolong;
 		ND_PRINT((ndo," spi="));
-		if (!rawprint(ndo, (const uint8_t *)(p + 1), prop.spi_size))
+		if (!rawprint(ndo, (const uint8_t *)cp, prop.spi_size))
 			goto trunc;
+		cp += prop.spi_size;
+		prop_length -= prop.spi_size;
 	}
 
-	ext = (const struct isakmp_gen *)((const u_char *)(p + 1) + prop.spi_size);
-	ND_TCHECK(*ext);
+	/*
+	 * Print the transforms.
+	 */
+	tcount = 0;
+	for (np = ISAKMP_NPTYPE_T; np != 0; np = e.np) {
+		tcount++;
+		ext = (const struct isakmp_gen *)cp;
+		if (prop_length < sizeof(*ext))
+			goto toolong;
+		ND_TCHECK(*ext);
 
-	cp = ikev2_sub_print(ndo, NULL, ISAKMP_NPTYPE_T, ext, ep, phase, doi0,
-			     prop.prot_id, depth);
+		UNALIGNED_MEMCPY(&e, ext, sizeof(e));
 
+		/*
+		 * Since we can't have a payload length of less than 4 bytes,
+		 * we need to bail out here if the generic header is nonsensical
+		 * or truncated, otherwise we could loop forever processing
+		 * zero-length items or otherwise misdissect the packet.
+		 */
+		item_len = ntohs(e.len);
+		if (item_len <= 4)
+			goto trunc;
+
+		if (prop_length < item_len)
+			goto toolong;
+		ND_TCHECK2(*cp, item_len);
+
+		depth++;
+		ND_PRINT((ndo,"\n"));
+		for (i = 0; i < depth; i++)
+			ND_PRINT((ndo,"    "));
+		ND_PRINT((ndo,"("));
+		if (np == ISAKMP_NPTYPE_T) {
+			cp = ikev2_t_print(ndo, tcount, ext, item_len, ep);
+			if (cp == NULL) {
+				/* error, already reported */
+				return NULL;
+			}
+		} else {
+			ND_PRINT((ndo, "%s", NPSTR(np)));
+			cp += item_len;
+		}
+		ND_PRINT((ndo,")"));
+		depth--;
+		prop_length -= item_len;
+	}
+	return cp;
+toolong:
+	/*
+	 * Skip the rest of the proposal.
+	 */
+	cp += prop_length;
+	ND_PRINT((ndo," [|%s]", NPSTR(ISAKMP_NPTYPE_P)));
 	return cp;
 trunc:
 	ND_PRINT((ndo," [|%s]", NPSTR(ISAKMP_NPTYPE_P)));
@@ -1968,26 +2030,86 @@ trunc:
 static const u_char *
 ikev2_sa_print(netdissect_options *ndo, u_char tpay,
 		const struct isakmp_gen *ext1,
-		u_int item_len _U_, const u_char *ep,
+		u_int osa_length, const u_char *ep,
 		uint32_t phase _U_, uint32_t doi _U_,
 		uint32_t proto _U_, int depth)
 {
+	const struct isakmp_gen *ext;
 	struct isakmp_gen e;
-	int    osa_length, sa_length;
+	u_int sa_length;
+	const u_char *cp;
+	int i;
+	int pcount;
+	u_char np;
+	u_int item_len;
 
 	ND_TCHECK(*ext1);
 	UNALIGNED_MEMCPY(&e, ext1, sizeof(e));
 	ikev2_pay_print(ndo, "sa", e.critical);
 
+	/*
+	 * ikev2_sub0_print() guarantees that this is >= 4.
+	 */
 	osa_length= ntohs(e.len);
 	sa_length = osa_length - 4;
 	ND_PRINT((ndo," len=%d", sa_length));
 
-	ikev2_sub_print(ndo, NULL, ISAKMP_NPTYPE_P,
-			ext1+1, ep,
-			0, 0, 0, depth);
+	/*
+	 * Print the payloads.
+	 */
+	cp = (const u_char *)(ext1 + 1);
+	pcount = 0;
+	for (np = ISAKMP_NPTYPE_P; np != 0; np = e.np) {
+		pcount++;
+		ext = (const struct isakmp_gen *)cp;
+		if (sa_length < sizeof(*ext))
+			goto toolong;
+		ND_TCHECK(*ext);
 
-	return (const u_char *)ext1 + osa_length;
+		UNALIGNED_MEMCPY(&e, ext, sizeof(e));
+
+		/*
+		 * Since we can't have a payload length of less than 4 bytes,
+		 * we need to bail out here if the generic header is nonsensical
+		 * or truncated, otherwise we could loop forever processing
+		 * zero-length items or otherwise misdissect the packet.
+		 */
+		item_len = ntohs(e.len);
+		if (item_len <= 4)
+			goto trunc;
+
+		if (sa_length < item_len)
+			goto toolong;
+		ND_TCHECK2(*cp, item_len);
+
+		depth++;
+		ND_PRINT((ndo,"\n"));
+		for (i = 0; i < depth; i++)
+			ND_PRINT((ndo,"    "));
+		ND_PRINT((ndo,"("));
+		if (np == ISAKMP_NPTYPE_P) {
+			cp = ikev2_p_print(ndo, np, pcount, ext, item_len,
+					   ep, depth);
+			if (cp == NULL) {
+				/* error, already reported */
+				return NULL;
+			}
+		} else {
+			ND_PRINT((ndo, "%s", NPSTR(np)));
+			cp += item_len;
+		}
+		ND_PRINT((ndo,")"));
+		depth--;
+		sa_length -= item_len;
+	}
+	return cp;
+toolong:
+	/*
+	 * Skip the rest of the SA.
+	 */
+	cp += sa_length;
+	ND_PRINT((ndo," [|%s]", NPSTR(tpay)));
+	return cp;
 trunc:
 	ND_PRINT((ndo," [|%s]", NPSTR(tpay)));
 	return NULL;
@@ -2709,7 +2831,7 @@ done:
 
 static const u_char *
 ikev2_sub0_print(netdissect_options *ndo, struct isakmp *base,
-		 u_char np, int pcount,
+		 u_char np,
 		 const struct isakmp_gen *ext, const u_char *ep,
 		 uint32_t phase, uint32_t doi, uint32_t proto, int depth)
 {
@@ -2731,13 +2853,7 @@ ikev2_sub0_print(netdissect_options *ndo, struct isakmp *base,
 	if (item_len <= 4)
 		return NULL;
 
-	if(np == ISAKMP_NPTYPE_P) {
-		cp = ikev2_p_print(ndo, np, pcount, ext, item_len,
-				   ep, phase, doi, proto, depth);
-	} else if(np == ISAKMP_NPTYPE_T) {
-		cp = ikev2_t_print(ndo, np, pcount, ext, item_len,
-				   ep, phase, doi, proto, depth);
-	} else if(np == ISAKMP_NPTYPE_v2E) {
+	if (np == ISAKMP_NPTYPE_v2E) {
 		cp = ikev2_e_print(ndo, base, np, ext, item_len,
 				   ep, phase, doi, proto, depth);
 	} else if (NPFUNC(np)) {
@@ -2745,7 +2861,7 @@ ikev2_sub0_print(netdissect_options *ndo, struct isakmp *base,
 		 * XXX - what if item_len is too short, or too long,
 		 * for this payload type?
 		 */
-		cp = (*npfunc[np])(ndo, np, /*pcount,*/ ext, item_len,
+		cp = (*npfunc[np])(ndo, np, ext, item_len,
 				   ep, phase, doi, proto, depth);
 	} else {
 		ND_PRINT((ndo,"%s", NPSTR(np)));
@@ -2766,13 +2882,10 @@ ikev2_sub_print(netdissect_options *ndo,
 {
 	const u_char *cp;
 	int i;
-	int pcount;
 	struct isakmp_gen e;
 
 	cp = (const u_char *)ext;
-	pcount = 0;
 	while (np) {
-		pcount++;
 		ND_TCHECK(*ext);
 
 		UNALIGNED_MEMCPY(&e, ext, sizeof(e));
@@ -2784,7 +2897,7 @@ ikev2_sub_print(netdissect_options *ndo,
 		for (i = 0; i < depth; i++)
 			ND_PRINT((ndo,"    "));
 		ND_PRINT((ndo,"("));
-		cp = ikev2_sub0_print(ndo, base, np, pcount,
+		cp = ikev2_sub0_print(ndo, base, np,
 				      ext, ep, phase, doi, proto, depth);
 		ND_PRINT((ndo,")"));
 		depth--;
