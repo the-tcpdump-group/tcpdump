@@ -185,7 +185,7 @@ rtp_print(netdissect_options *ndo, const void *hdr, u_int len,
 		if (hasopt) {
 			u_int i2, optlen;
 			do {
-				ND_TCHECK2(*ip, 4);
+				ND_TCHECK_32BITS(ip);
 				i2 = EXTRACT_32BITS(ip);
 				optlen = (i2 >> 16) & 0xff;
 				if (optlen == 0 || optlen > len) {
@@ -198,7 +198,7 @@ rtp_print(netdissect_options *ndo, const void *hdr, u_int len,
 		}
 		if (hasext) {
 			u_int i2, extlen;
-			ND_TCHECK2(*ip, 4);
+			ND_TCHECK_32BITS(ip);
 			i2 = EXTRACT_32BITS(ip);
 			extlen = (i2 & 0xffff) + 1;
 			if (extlen > len) {
@@ -207,7 +207,7 @@ rtp_print(netdissect_options *ndo, const void *hdr, u_int len,
 			}
 			ip += extlen;
 		}
-		ND_TCHECK(*ip);
+		ND_TCHECK_32BITS(ip);
 		if (contype == 0x1f) /*XXX H.261 */
 			ND_PRINT((ndo, " 0x%04x", EXTRACT_32BITS(ip) >> 16));
 	}
