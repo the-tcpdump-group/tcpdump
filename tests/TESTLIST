@@ -70,6 +70,8 @@ ikev2four	ikev2four.pcap		ikev2four.out	-t -v
 ikev2fourv	ikev2four.pcap		ikev2fourv.out	-t -v -v -v
 ikev2fourv4	ikev2four.pcap		ikev2fourv4.out	-t -v -v -v -v
 # ikev2pI2 test in crypto.sh
+ikev2pI2-segfault	ikev2pI2-segfault.pcap	ikev2pI2-segfault.out	-t
+ikev2pI2-segfault-v	ikev2pI2-segfault.pcap	ikev2pI2-segfault-v.out	-t -v
 
 # IETF ROLL RPL packets
 dio02           rpl-19-pickdag.pcap         rpl-19-pickdag.out  -t -v -v
