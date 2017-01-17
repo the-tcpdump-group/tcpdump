@@ -425,7 +425,7 @@ signed_relts_print(netdissect_options *ndo,
 {
 	if (secs < 0) {
 		ND_PRINT((ndo, "-"));
-		if (secs == -2147483648) {
+		if (secs == INT32_MIN) {
 			/*
 			 * -2^31; you can't fit its absolute value into
 			 * a 32-bit signed integer.
