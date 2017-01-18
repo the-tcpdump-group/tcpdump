@@ -439,7 +439,7 @@ ethertype_print(netdissect_options *ndo,
 		return (1);
 
 	case ETHERTYPE_MEDSA:
-		medsa_print(ndo, p, length, caplen);
+		medsa_print(ndo, p, length, caplen, src, dst);
 		return (1);
 
 	case ETHERTYPE_LAT:
