@@ -532,8 +532,14 @@ static void esp_print_decode_onesecret(netdissect_options *ndo, char *line,
 USES_APPLE_DEPRECATED_API
 static void esp_init(netdissect_options *ndo _U_)
 {
-
+	/*
+	 * 0.9.6 doesn't appear to define OPENSSL_API_COMPAT, so
+	 * we check whether it's undefined or it's less than the
+	 * value for 1.1.0.
+	 */
+#if !defined(OPENSSL_API_COMPAT) || OPENSSL_API_COMPAT < 0x10100000L
 	OpenSSL_add_all_algorithms();
+#endif
 	EVP_add_cipher_alias(SN_des_ede3_cbc, "3des");
 }
 USES_APPLE_RST
