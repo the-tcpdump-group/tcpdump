@@ -51,6 +51,7 @@ const struct tok ipproto_values[] = {
     { IPPROTO_SCTP, "SCTP" },
     { IPPROTO_MOBILITY, "Mobility" },
     { IPPROTO_CARP, "CARP" },
+    { IPPROTO_PFSYNC, "pfsync" },
     { 0, NULL }
 };
 

@@ -479,6 +479,11 @@ again:
 		pgm_print(ndo, ipds->cp, ipds->len, (const u_char *)ipds->ip);
 		break;
 
+#ifdef HAVE_NET_PFVAR_H
+	case IPPROTO_PFSYNC:
+		pfsync_ip_print(ndo, ipds->cp, ipds->len);
+		break;
+#endif
 	default:
 		if (ndo->ndo_nflag==0 && (proto = getprotobynumber(ipds->nh)) != NULL)
 			ND_PRINT((ndo, " %s", proto->p_name));

@@ -352,6 +352,7 @@ EXTRA_DIST = \
 	packetdat.awk \
 	pcap_dump_ftell.c \
 	print-pflog.c \
+	print-pfsync.c \
 	print-smb.c \
 	send-ack.awk \
 	smbutil.c \
