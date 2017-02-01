@@ -114,7 +114,7 @@ addrtostr6 (const void *src, char *dst, size_t size)
     long len;
   } best, cur;
   u_long words [IN6ADDRSZ / INT16SZ];
-  u_int  i;
+  int  i;
 
   /* Preprocess:
    *  Copy the input (bytewise) array into a wordwise array.
