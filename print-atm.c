@@ -369,7 +369,7 @@ sig_print(netdissect_options *ndo,
 		call_ref = EXTRACT_24BITS(&p[CALL_REF_POS]);
 		ND_PRINT((ndo, "CALL_REF:0x%06x", call_ref));
 	} else {
-		/* SCCOP with some unknown protocol atop it */
+		/* SSCOP with some unknown protocol atop it */
 		ND_PRINT((ndo, "SSCOP, proto %d ", p[PROTO_POS]));
 	}
 	return;
