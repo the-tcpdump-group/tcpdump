@@ -12,8 +12,8 @@
 /* capsicum support available */
 #undef HAVE_CAPSICUM
 
-/* Casper library available */
-#undef HAVE_CASPER
+/* Define to 1 if you have the `cap_enter' function. */
+#undef HAVE_CAP_ENTER
 
 /* Define to 1 if you have the `cap_ioctls_limit' function. */
 #undef HAVE_CAP_IOCTLS_LIMIT
@@ -23,6 +23,9 @@
 
 /* Define to 1 if you have the `cap_rights_limit' function. */
 #undef HAVE_CAP_RIGHTS_LIMIT
+
+/* Casper support available */
+#undef HAVE_CASPER
 
 /* Define to 1 if you have the declaration of `ether_ntohost', and to 0 if you
    don't. */
