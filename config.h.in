@@ -12,8 +12,8 @@
 /* capsicum support available */
 #undef HAVE_CAPSICUM
 
-/* Define to 1 if you have the `cap_enter' function. */
-#undef HAVE_CAP_ENTER
+/* Casper library available */
+#undef HAVE_CASPER
 
 /* Define to 1 if you have the `cap_ioctls_limit' function. */
 #undef HAVE_CAP_IOCTLS_LIMIT

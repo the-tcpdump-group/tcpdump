@@ -225,10 +225,19 @@ if test ! -z "$with_sandbox-capsicum" && test "$with_sandbox-capsicum" != "no" ;
 	AC_CHECK_FUNCS(cap_enter cap_rights_limit cap_ioctls_limit openat,
 	    ac_lbl_capsicum_function_seen=yes,
 	    ac_lbl_capsicum_function_not_seen=yes)
+	AC_CHECK_LIB(casper, cap_init, LIBS="$LIBS -lcasper")
+	AC_CHECK_LIB(cap_dns, cap_gethostbyaddr, LIBS="$LIBS -lcap_dns")
 fi
 AC_MSG_CHECKING([whether to sandbox using capsicum])
 if test "x$ac_lbl_capsicum_function_seen" = "xyes" -a "x$ac_lbl_capsicum_function_not_seen" != "xyes"; then
 	AC_DEFINE(HAVE_CAPSICUM, 1, [capsicum support available])
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+AC_MSG_CHECKING([whether to sandbox using Casper library])
+if test "x$ac_cv_lib_casper_cap_init" = "xyes" -a "x$ac_cv_lib_cap_dns_cap_gethostbyaddr" = "xyes"; then
+	AC_DEFINE(HAVE_CASPER, 1, [Casper support available])
 	AC_MSG_RESULT(yes)
 else
 	AC_MSG_RESULT(no)
