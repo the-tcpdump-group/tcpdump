@@ -86,19 +86,19 @@ vxlan_gpe_print(netdissect_options *ndo, const u_char *bp, u_int len)
 
     switch (next_protocol) {
     case 0x1:
-        ip_print(ndo, bp, len - 8);
+        ip_print(ndo, bp, len - VXLAN_GPE_HDR_LEN);
         break;
     case 0x2:
-        ip6_print(ndo, bp, len - 8);
+        ip6_print(ndo, bp, len - VXLAN_GPE_HDR_LEN);
         break;
     case 0x3:
-        ether_print(ndo, bp, len - 8, ndo->ndo_snapend - bp, NULL, NULL);
+        ether_print(ndo, bp, len - VXLAN_GPE_HDR_LEN, ndo->ndo_snapend - bp, NULL, NULL);
         break;
     case 0x4:
-        nsh_print(ndo, bp, len - 8);
+        nsh_print(ndo, bp, len - VXLAN_GPE_HDR_LEN);
         break;
     case 0x5:
-        mpls_print(ndo, bp, len - 8);
+        mpls_print(ndo, bp, len - VXLAN_GPE_HDR_LEN);
         break;
     default:
         ND_PRINT((ndo, "ERROR: unknown-next-protocol"));

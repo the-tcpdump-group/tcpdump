@@ -26,6 +26,8 @@
 #include "netdissect.h"
 #include "extract.h"
 
+#define OTV_HDR_LEN 8
+
 /*
  * OTV header, draft-hasmit-otv-04
  *
@@ -44,7 +46,7 @@ otv_print(netdissect_options *ndo, const u_char *bp, u_int len)
     uint8_t flags;
 
     ND_PRINT((ndo, "OTV, "));
-    if (len < 8)
+    if (len < OTV_HDR_LEN)
         goto trunc;
 
     ND_TCHECK(*bp);
@@ -64,7 +66,7 @@ otv_print(netdissect_options *ndo, const u_char *bp, u_int len)
     ND_TCHECK(*bp);
     bp += 1;
 
-    ether_print(ndo, bp, len - 8, ndo->ndo_snapend - bp, NULL, NULL);
+    ether_print(ndo, bp, len - OTV_HDR_LEN, ndo->ndo_snapend - bp, NULL, NULL);
     return;
 
 trunc:
