@@ -1092,6 +1092,26 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 		} else if (status == PCAP_ERROR_PERM_DENIED && *cp != '\0')
 			error("%s: %s\n(%s)", device,
 			    pcap_statustostr(status), cp);
+#ifdef __FreeBSD__
+		else if (status == PCAP_ERROR_RFMON_NOTSUP &&
+		    strncmp(device, "wlan", 4) == 0) {
+			char parent[8], newdev[8];
+			char sysctl[32];
+			size_t s = sizeof(parent);
+
+			snprintf(sysctl, sizeof(sysctl),
+			    "net.wlan.%d.%%parent", atoi(device + 4));
+			sysctlbyname(sysctl, parent, &s, NULL, 0);
+			strlcpy(newdev, device, sizeof(newdev));
+			/* Suggest a new wlan device. */
+			newdev[strlen(newdev)-1]++;
+			error("%s is not a monitor mode VAP\n"
+			    "To create a new monitor mode VAP use:\n"
+			    "  ifconfig %s create wlandev %s wlanmode monitor\n"
+			    "and use %s as the tcpdump interface",
+			    device, newdev, parent, newdev);
+		}
+#endif
 		else
 			error("%s: %s", device,
 			    pcap_statustostr(status));
