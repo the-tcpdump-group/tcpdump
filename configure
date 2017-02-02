@@ -4588,12 +4588,104 @@ else
 fi
 done
 
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for cap_init in -lcasper" >&5
+$as_echo_n "checking for cap_init in -lcasper... " >&6; }
+if ${ac_cv_lib_casper_cap_init+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lcasper  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char cap_init ();
+int
+main ()
+{
+return cap_init ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_casper_cap_init=yes
+else
+  ac_cv_lib_casper_cap_init=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_casper_cap_init" >&5
+$as_echo "$ac_cv_lib_casper_cap_init" >&6; }
+if test "x$ac_cv_lib_casper_cap_init" = xyes; then :
+  LIBS="$LIBS -lcasper"
+fi
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for cap_gethostbyaddr in -lcap_dns" >&5
+$as_echo_n "checking for cap_gethostbyaddr in -lcap_dns... " >&6; }
+if ${ac_cv_lib_cap_dns_cap_gethostbyaddr+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lcap_dns  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char cap_gethostbyaddr ();
+int
+main ()
+{
+return cap_gethostbyaddr ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_cap_dns_cap_gethostbyaddr=yes
+else
+  ac_cv_lib_cap_dns_cap_gethostbyaddr=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_cap_dns_cap_gethostbyaddr" >&5
+$as_echo "$ac_cv_lib_cap_dns_cap_gethostbyaddr" >&6; }
+if test "x$ac_cv_lib_cap_dns_cap_gethostbyaddr" = xyes; then :
+  LIBS="$LIBS -lcap_dns"
+fi
+
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to sandbox using capsicum" >&5
 $as_echo_n "checking whether to sandbox using capsicum... " >&6; }
 if test "x$ac_lbl_capsicum_function_seen" = "xyes" -a "x$ac_lbl_capsicum_function_not_seen" != "xyes"; then
 
 $as_echo "#define HAVE_CAPSICUM 1" >>confdefs.h
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to sandbox using Casper library" >&5
+$as_echo_n "checking whether to sandbox using Casper library... " >&6; }
+if test "x$ac_cv_lib_casper_cap_init" = "xyes" -a "x$ac_cv_lib_cap_dns_cap_gethostbyaddr" = "xyes"; then
+
+$as_echo "#define HAVE_CASPER 1" >>confdefs.h
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }

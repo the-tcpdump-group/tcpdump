@@ -80,6 +80,11 @@ The Regents of the University of California.  All rights reserved.\n";
 #include <sys/ioccom.h>
 #include <net/bpf.h>
 #include <libgen.h>
+#ifdef HAVE_CASPER
+#include <libcasper.h>
+#include <casper/cap_dns.h>
+#include <sys/nv.h>
+#endif	/* HAVE_CASPER */
 #endif	/* HAVE_CAPSICUM */
 #include <pcap.h>
 #include <signal.h>
@@ -169,6 +174,10 @@ static int infodelay;
 static int infoprint;
 
 char *program_name;
+
+#ifdef HAVE_CASPER
+cap_channel_t *capdns;
+#endif
 
 /* Forwards */
 static void error(const char *, ...)
@@ -719,6 +728,35 @@ get_next_file(FILE *VFile, char *ptr)
 
 	return ret;
 }
+
+#ifdef HAVE_CASPER
+static cap_channel_t *
+capdns_setup(void)
+{
+	cap_channel_t *capcas, *capdnsloc;
+	const char *types[1];
+	int families[2];
+
+	capcas = cap_init();
+	if (capcas == NULL)
+		error("unable to create casper process");
+	capdnsloc = cap_service_open(capcas, "system.dns");
+	/* Casper capability no longer needed. */
+	cap_close(capcas);
+	if (capdnsloc == NULL)
+		error("unable to open system.dns service");
+	/* Limit system.dns to reverse DNS lookups. */
+	types[0] = "ADDR";
+	if (cap_dns_type_limit(capdnsloc, types, 1) < 0)
+		error("unable to limit access to system.dns service");
+	families[0] = AF_INET;
+	families[1] = AF_INET6;
+	if (cap_dns_family_limit(capdnsloc, families, 2) < 0)
+		error("unable to limit access to system.dns service");
+
+	return (capdnsloc);
+}
+#endif	/* HAVE_CASPER */
 
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
 static int
@@ -1779,6 +1817,12 @@ main(int argc, char **argv)
 		pcap_freecode(&fcode);
 		exit_tcpdump(0);
 	}
+
+#ifdef HAVE_CASPER
+	if (!ndo->ndo_nflag)
+		capdns = capdns_setup();
+#endif	/* HAVE_CASPER */
+
 	init_print(ndo, localnet, netmask, timezone_offset);
 
 #ifndef _WIN32
@@ -1995,7 +2039,12 @@ main(int argc, char **argv)
 	}
 
 #ifdef HAVE_CAPSICUM
-	cansandbox = (ndo->ndo_nflag && VFileName == NULL && zflag == NULL);
+	cansandbox = (VFileName == NULL && zflag == NULL);
+#ifdef HAVE_CASPER
+	cansandbox = (cansandbox && (ndo->ndo_nflag || capdns != NULL));
+#else
+	cansandbox = (cansandbox && ndo->ndo_nflag);
+#endif /* HAVE_CASPER */
 	if (cansandbox && cap_enter() < 0 && errno != ENOSYS)
 		error("unable to enter the capability mode");
 #endif	/* HAVE_CAPSICUM */

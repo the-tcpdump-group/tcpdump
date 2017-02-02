@@ -26,6 +26,11 @@
 #include "config.h"
 #endif
 
+#ifdef HAVE_CASPER
+#include <libcasper.h>
+#include <casper/cap_dns.h>
+#endif /* HAVE_CASPER */
+
 #include <netdissect-stdinc.h>
 
 #ifdef USE_ETHER_NTOHOST
@@ -197,6 +202,9 @@ intoa(uint32_t addr)
 
 static uint32_t f_netmask;
 static uint32_t f_localnet;
+#ifdef HAVE_CASPER
+extern cap_channel_t *capdns;
+#endif
 
 /*
  * Return a name for the IP address pointed to by ap.  This address
@@ -242,7 +250,13 @@ getname(netdissect_options *ndo, const u_char *ap)
 	 */
 	if (!ndo->ndo_nflag &&
 	    (addr & f_netmask) == f_localnet) {
-		hp = gethostbyaddr((char *)&addr, 4, AF_INET);
+#ifdef HAVE_CASPER
+		if (capdns != NULL) {
+			hp = cap_gethostbyaddr(capdns, (char *)&addr, 4,
+			    AF_INET);
+		} else
+#endif
+			hp = gethostbyaddr((char *)&addr, 4, AF_INET);
 		if (hp) {
 			char *dotp;
 
@@ -297,7 +311,14 @@ getname6(netdissect_options *ndo, const u_char *ap)
 	 * Do not print names if -n was given.
 	 */
 	if (!ndo->ndo_nflag) {
-		hp = gethostbyaddr((char *)&addr, sizeof(addr), AF_INET6);
+#ifdef HAVE_CASPER
+		if (capdns != NULL) {
+			hp = cap_gethostbyaddr(capdns, (char *)&addr,
+			    sizeof(addr), AF_INET6);
+		} else
+#endif
+			hp = gethostbyaddr((char *)&addr, sizeof(addr),
+			    AF_INET6);
 		if (hp) {
 			char *dotp;
 
