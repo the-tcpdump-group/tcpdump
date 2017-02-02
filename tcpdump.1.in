@@ -20,7 +20,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH TCPDUMP 1  "17 September 2015"
+.TH TCPDUMP 1  "2 February 2017"
 .SH NAME
 tcpdump \- dump traffic on a network
 .SH SYNOPSIS
@@ -1919,12 +1919,12 @@ The original distribution is available via anonymous ftp:
 IPv6/IPsec support is added by WIDE/KAME project.
 This program uses Eric Young's SSLeay library, under specific configurations.
 .SH BUGS
-Please send problems, bugs, questions, desirable enhancements, patches
-etc. to:
+To report a security issue please send an e-mail to security@tcpdump.org.
 .LP
-.RS
-tcpdump-workers@lists.tcpdump.org
-.RE
+To report bugs and other problems, contribute patches, request a
+feature, provide generic feedback etc please see the file
+.I CONTRIBUTING
+in the tcpdump source tree root.
 .LP
 NIT doesn't let you watch your own outbound traffic, BPF will.
 We recommend that you use the latter.
