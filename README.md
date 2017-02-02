@@ -3,9 +3,9 @@
 [![Build
 Status](https://travis-ci.org/the-tcpdump-group/tcpdump.png)](https://travis-ci.org/the-tcpdump-group/tcpdump)
 
-TCPDUMP 4.x.y  
-Now maintained by "The Tcpdump Group"  
-See 		www.tcpdump.org  
+TCPDUMP 4.x.y
+Now maintained by "The Tcpdump Group"
+See 		www.tcpdump.org
 
 Please send inquiries/comments/reports to:
 
@@ -21,7 +21,7 @@ Please submit patches by forking the branch on GitHub at:
 
 and issuing a pull request.
 
-formerly from 	Lawrence Berkeley National Laboratory  
+formerly from 	Lawrence Berkeley National Laboratory
 		Network Research Group <tcpdump@ee.lbl.gov>  
 		ftp://ftp.ee.lbl.gov/old/tcpdump.tar.Z (3.4)
 
