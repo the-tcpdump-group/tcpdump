@@ -2653,6 +2653,14 @@ print_version(void)
 	smi_version_string = nd_smi_version_string();
 	if (smi_version_string != NULL)
 		(void)fprintf (stderr, "SMI-library: %s\n", smi_version_string);
+
+#if defined(__SANITIZE_ADDRESS__)
+	(void)fprintf (stderr, "Compiled with AddressSanitizer/GCC.\n");
+#elif defined(__has_feature)
+#  if __has_feature(address_sanitizer)
+	(void)fprintf (stderr, "Compiled with AddressSanitizer/CLang.\n");
+#  endif
+#endif /* __SANITIZE_ADDRESS__ or __has_feature */
 }
 USES_APPLE_RST
 
