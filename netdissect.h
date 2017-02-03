@@ -525,7 +525,7 @@ extern void ipx_netbios_print(netdissect_options *, const u_char *, u_int);
 extern void ipx_print(netdissect_options *, const u_char *, u_int);
 extern void isakmp_print(netdissect_options *, const u_char *, u_int, const u_char *);
 extern void isakmp_rfc3948_print(netdissect_options *, const u_char *, u_int, const u_char *);
-extern void isoclns_print(netdissect_options *, const u_char *, u_int, u_int);
+extern void isoclns_print(netdissect_options *, const u_char *, u_int);
 extern void krb_print(netdissect_options *, const u_char *);
 extern void l2tp_print(netdissect_options *, const u_char *, u_int);
 extern void lane_print(netdissect_options *, const u_char *, u_int, u_int);

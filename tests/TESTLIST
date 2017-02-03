@@ -439,6 +439,7 @@ stp-v4-length-sigsegv	stp-v4-length-sigsegv.pcap	stp-v4-length-sigsegv.out
 hoobr_pimv1		hoobr_pimv1.pcap		hoobr_pimv1.out
 hoobr_safeputs		hoobr_safeputs.pcap		hoobr_safeputs.out
 isakmp-rfc3948-oobr	isakmp-rfc3948-oobr.pcap	isakmp-rfc3948-oobr.out
+isoclns-oobr		isoclns-oobr.pcap		isoclns-oobr.out
 
 # bad packets from Wilfried Kirsch
 slip-bad-direction	slip-bad-direction.pcap		slip-bad-direction.out	-ve

@@ -670,10 +670,9 @@ struct isis_tlv_lsp {
 #define ISIS_PSNP_HEADER_SIZE (sizeof(struct isis_psnp_header))
 
 void
-isoclns_print(netdissect_options *ndo,
-              const uint8_t *p, u_int length, u_int caplen)
+isoclns_print(netdissect_options *ndo, const uint8_t *p, u_int length)
 {
-	if (caplen <= 1) { /* enough bytes on the wire ? */
+	if (!ND_TTEST(*p)) { /* enough bytes on the wire ? */
 		ND_PRINT((ndo, "|OSI"));
 		return;
 	}
@@ -685,7 +684,7 @@ isoclns_print(netdissect_options *ndo,
 
 	case NLPID_CLNP:
 		if (!clnp_print(ndo, p, length))
-			print_unknown_data(ndo, p, "\n\t", caplen);
+			print_unknown_data(ndo, p, "\n\t", length);
 		break;
 
 	case NLPID_ESIS:
@@ -694,7 +693,7 @@ isoclns_print(netdissect_options *ndo,
 
 	case NLPID_ISIS:
 		if (!isis_print(ndo, p, length))
-			print_unknown_data(ndo, p, "\n\t", caplen);
+			print_unknown_data(ndo, p, "\n\t", length);
 		break;
 
 	case NLPID_NULLNS:
@@ -721,8 +720,8 @@ isoclns_print(netdissect_options *ndo,
 		if (!ndo->ndo_eflag)
 			ND_PRINT((ndo, "OSI NLPID 0x%02x unknown", *p));
 		ND_PRINT((ndo, "%slength: %u", ndo->ndo_eflag ? "" : ", ", length));
-		if (caplen > 1)
-			print_unknown_data(ndo, p, "\n\t", caplen);
+		if (length > 1)
+			print_unknown_data(ndo, p, "\n\t", length);
 		break;
 	}
 }

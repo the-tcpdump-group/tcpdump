@@ -1484,7 +1484,7 @@ handle_ppp(netdissect_options *ndo,
 		ipx_print(ndo, p, length);
 		break;
 	case PPP_OSI:
-		isoclns_print(ndo, p, length, length);
+		isoclns_print(ndo, p, length);
 		break;
 	case PPP_MPLS_UCAST:
 	case PPP_MPLS_MCAST:
