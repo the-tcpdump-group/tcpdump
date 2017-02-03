@@ -119,6 +119,7 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 	u_int len = length;
 	uint16_t flags, prot;
 
+	/* 16 bits ND_TCHECKed in gre_print() */
 	flags = EXTRACT_16BITS(bp);
         if (ndo->ndo_vflag)
             ND_PRINT((ndo, ", Flags [%s]",
@@ -246,6 +247,7 @@ gre_print_1(netdissect_options *ndo, const u_char *bp, u_int length)
 	u_int len = length;
 	uint16_t flags, prot;
 
+	/* 16 bits ND_TCHECKed in gre_print() */
 	flags = EXTRACT_16BITS(bp);
 	len -= 2;
 	bp += 2;
