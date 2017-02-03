@@ -1,10 +1,6 @@
 Wednesday January 18, 2017 devel.fx.lebail@orange.fr
   Summary for 4.9.0 tcpdump release
     General updates:
-    Improve separation frontend/backend (tcpdump/libnetdissect)
-    Don't require IPv6 library support in order to support IPv6 addresses
-    Introduce data types to use for integral values in packet structures
-    Fix display of timestamps with -tt, -ttt and -ttttt options
     Fix some heap overflows found with American Fuzzy Lop by Hanno Boeck and others
         (More information in the log with CVE-2016-* and CVE-2017-*)
     Change the way protocols print link-layer addresses (Fix heap overflows
@@ -35,14 +31,6 @@ Wednesday January 18, 2017 devel.fx.lebail@orange.fr
     Don't drop CAP_SYS_CHROOT before chrooting
     Fixes issue where statistics not reported when -G and -W options used
 
-    New printers supporting:
-    Generic Protocol Extension for VXLAN (VXLAN-GPE)
-    Home Networking Control Protocol (HNCP), RFCs 7787 and 7788
-    Locator/Identifier Separation Protocol (LISP), type 3 and type 4 packets
-    Marvell Extended Distributed Switch Architecture header (MEDSA)
-    Network Service Header (NSH)
-    REdis Serialization Protocol (RESP)
-
     Updated printers:
     802.11: Beginnings of 11ac radiotap support
     802.11: Check the Protected bit for management frames
@@ -61,7 +49,6 @@ Wednesday January 18, 2017 devel.fx.lebail@orange.fr
     ATM: Fix an incorrect bounds check
     BFD: Update specification from draft to RFC 5880
     BFD: Update to print optional authentication field
-    BGP: Add decoding of ADD-PATH capability
     BGP: Add support for the AIGP attribute (RFC7311)
     BGP: Print LARGE_COMMUNITY Path Attribute
     BGP: Update BGP numbers from IANA; Print minor values for FSM notification
@@ -78,7 +65,6 @@ Wednesday January 18, 2017 devel.fx.lebail@orange.fr
     DTP: Improve packet integrity checks
     EGP: Fix bounds checks
     ESP: Don't use OpenSSL_add_all_algorithms() in OpenSSL 1.1.0 or later
-    ESP: Handle OpenSSL 1.1.x
     Ethernet: Add some bounds checking before calling isoclns_print (Fix a heap overflow)
     Ethernet: Print the Length/Type field as length when needed
     FDDI: Fix -e output for FDDI
@@ -87,7 +73,6 @@ Wednesday January 18, 2017 devel.fx.lebail@orange.fr
     Geneve: Fix error message with invalid option length; Update list option classes
     HNCP: Fix incorrect time interval format. Fix handling of IPv4 prefixes
     ICMP6: Fetch a 32-bit big-endian quantity with EXTRACT_32BITS()
-    ICMP6: dagid is always an IPv6 address, not an opaque 128-bit string
     IGMP: Add a length check
     IP: Add a bounds check (Fix a heap overflow)
     IP: Check before fetching the protocol version (Fix a heap overflow)
@@ -115,7 +100,6 @@ Wednesday January 18, 2017 devel.fx.lebail@orange.fr
     MPLS LSP ping: Update printing for RFC 4379, bug fixes, more bounds checks
     MPLS: "length" is now the *remaining* packet length
     MPLS: Add bounds and length checks (Fix a heap overflow)
-    NFS: Add a test that makes unaligned accesses
     NFS: Don't assume the ONC RPC header is nicely aligned
     NFS: Don't overflow the Opaque_Handle buffer (Fix a segmentation fault)
     NFS: Don't run past the end of an NFSv3 file handle
@@ -130,7 +114,6 @@ Wednesday January 18, 2017 devel.fx.lebail@orange.fr
     PGM: Print the formatted IP address, not the raw binary address, as a string
     PIM: Add some bounds checking (Fix a heap overflow)
     PIMv2: Fix checksumming of Register messages
-    PPI: Pass an adjusted struct pcap_pkthdr to the sub-printer
     PPP: Add some bounds checks (Fix a heap overflow)
     PPP: Report invalid PAP AACK/ANAK packets
     Q.933: Add a missing bounds check
@@ -171,16 +154,46 @@ Wednesday January 18, 2017 devel.fx.lebail@orange.fr
     UDLD: Fix an infinite loop
     UDP: Add a bounds check (Fix a heap overflow)
     UDP: Check against the packet length first
-    UDP: Don't do the DDP-over-UDP heuristic check up front
     VAT: Add some bounds checks
     VTP: Add a test on Mgmt Domain Name length
     VTP: Add bounds checks and filter out non-printable characters
     VXLAN: Add a bound check and a test case
     ZeroMQ: Fix an infinite loop
 
-Tuesday April 14, 2015 guy@alum.mit.edu
-  Summary for 4.8.0 tcpdump release
+Tuesday October 25, 2016 mcr@sandelman.ca
+  Summary for 4.8.1 tcpdump release
 	Fix "-x" for Apple PKTAP and PPI packets
+        Improve separation frontend/backend (tcpdump/libnetdissect)
+        Fix display of timestamps with -tt, -ttt and -ttttt options
+        Add support for the Marvell Extended Distributed Switch Architecture header
+        Use PRIx64 to print a 64-bit number in hex.
+        Printer for HNCP (RFCs 7787 and 7788).
+        dagid is always an IPv6 address, not an opaque 128-bit string, and other fixes to RPL printer.
+        RSVP: Add bounds and length checks
+        OSPF: Do more bounds checking
+        Handle OpenSSL 1.1.x.
+        Initial support for the REdis Serialization Protocol known as RESP.
+        Add printing function for Generic Protocol Extension for VXLAN
+            draft-ietf-nvo3-vxlan-gpe-01
+        Network Service Header: draft-ietf-sfc-nsh-01
+        Don't recompile the filter if the new file has the same DLT.
+        Pass an adjusted struct pcap_pkthdr to the sub-printer.
+        Add three test cases for already fixed CVEs
+           CVE-2014-8767: OLSR
+           CVE-2014-8768: Geonet
+           CVE-2014-8769: AODV
+        Don't do the DDP-over-UDP heuristic first: GitHub issue #499.
+        Use the new debugging routines in libpcap.
+        Harmonize TCP source or destination ports tests with UDP ones
+        Introduce data types to use for integral values in packet structures.
+        RSVP: Fix an infinite loop
+        Support of Type 3 and Type 4 LISP packets.
+        Don't require IPv6 library support in order to support IPv6 addresses.
+        Many many changes to support libnetdissect usage.
+        Add a test that makes unaligned accesses: GitHub issue #478.
+        add a DNSSEC test case: GH #445 and GH #467.
+        BGP: add decoding of ADD-PATH capability
+        fixes to LLC header printing, and RFC948-style IP packets
 
 Friday April 10, 2015 guy@alum.mit.edu
   Summary for 4.7.4 tcpdump release
