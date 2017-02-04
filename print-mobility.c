@@ -332,5 +332,5 @@ mobility_print(netdissect_options *ndo,
 
  trunc:
 	ND_PRINT((ndo, "%s", tstr));
-	return(mhlen);
+	return(-1);
 }
