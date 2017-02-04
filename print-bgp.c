@@ -895,6 +895,7 @@ static const struct tok bgp_multicast_vpn_route_type_values[] = {
     { BGP_MULTICAST_VPN_ROUTE_TYPE_SOURCE_ACTIVE, "Source-Active"},
     { BGP_MULTICAST_VPN_ROUTE_TYPE_SHARED_TREE_JOIN, "Shared Tree Join"},
     { BGP_MULTICAST_VPN_ROUTE_TYPE_SOURCE_TREE_JOIN, "Source Tree Join"},
+    { 0, NULL}
 };
 
 static int

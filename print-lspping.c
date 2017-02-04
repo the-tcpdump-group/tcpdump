@@ -104,6 +104,7 @@ static const struct tok lspping_return_code_values[] = {
     { 11, "No label entry at stack-depth"},
     { 12, "Protocol not associated with interface at FEC stack depth"},
     { 13, "Premature termination of ping due to label stack shrinking to a single label"},
+    { 0,  NULL},
 };
 
 

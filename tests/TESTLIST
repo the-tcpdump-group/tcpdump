@@ -453,6 +453,8 @@ icmp-cksum-oobr-1	icmp-cksum-oobr-1.pcap		icmp-cksum-oobr-1.out	-vvv -e
 icmp-cksum-oobr-2	icmp-cksum-oobr-2.pcap		icmp-cksum-oobr-2.out	-vvv -e
 icmp-cksum-oobr-3	icmp-cksum-oobr-3.pcap		icmp-cksum-oobr-3.out	-vvv -e
 icmp-cksum-oobr-4	icmp-cksum-oobr-4.pcap		icmp-cksum-oobr-4.out	-vvv -e
+tok2str-oobr-1		tok2str-oobr-1.pcap		tok2str-oobr-1.out	-vvv -e
+tok2str-oobr-2		tok2str-oobr-2.pcap		tok2str-oobr-2.out	-vvv -e
 
 # RTP tests
 # fuzzed pcap
