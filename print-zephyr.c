@@ -76,7 +76,8 @@ static const struct tok z_types[] = {
     { Z_PACKET_SERVACK,		"serv-ack" },
     { Z_PACKET_SERVNAK,		"serv-nak" },
     { Z_PACKET_CLIENTACK,	"client-ack" },
-    { Z_PACKET_STAT,		"stat" }
+    { Z_PACKET_STAT,		"stat" },
+    { 0,			NULL }
 };
 
 static char z_buf[256];

@@ -590,6 +590,7 @@ static const struct tok lldp_evb_mode_values[]={
     { LLDP_EVB_MODE_EVB_BRIDGE, "EVB Bridge"},
     { LLDP_EVB_MODE_EVB_STATION, "EVB Staion"},
     { LLDP_EVB_MODE_RESERVED, "Reserved for future Standardization"},
+    { 0, NULL},
 };
 
 #define NO_OF_BITS 8
