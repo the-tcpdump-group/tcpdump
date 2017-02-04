@@ -50,7 +50,7 @@ struct cfm_common_header_t {
 #define	CFM_OPCODE_LTM 5
 
 static const struct tok cfm_opcode_values[] = {
-    { CFM_OPCODE_CCM, "Continouity Check Message"},
+    { CFM_OPCODE_CCM, "Continuity Check Message"},
     { CFM_OPCODE_LBR, "Loopback Reply"},
     { CFM_OPCODE_LBM, "Loopback Message"},
     { CFM_OPCODE_LTR, "Linktrace Reply"},
