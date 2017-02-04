@@ -45,13 +45,13 @@ rt6_print(netdissect_options *ndo, register const u_char *bp, const u_char *bp2 
 	register const struct in6_addr *addr;
 
 	dp = (const struct ip6_rthdr *)bp;
-	len = dp->ip6r_len;
 
 	/* 'ep' points to the end of available data. */
 	ep = ndo->ndo_snapend;
 
 	ND_TCHECK(dp->ip6r_segleft);
 
+	len = dp->ip6r_len;
 	ND_PRINT((ndo, "srcrt (len=%d", dp->ip6r_len));	/*)*/
 	ND_PRINT((ndo, ", type=%d", dp->ip6r_type));
 	ND_PRINT((ndo, ", segleft=%d", dp->ip6r_segleft));
