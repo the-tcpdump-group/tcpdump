@@ -1919,7 +1919,7 @@ The original distribution is available via anonymous ftp:
 IPv6/IPsec support is added by WIDE/KAME project.
 This program uses Eric Young's SSLeay library, under specific configurations.
 .SH BUGS
-To report a security issue please send an e-mail to security@tcpdump.org.
+To report a security issue please send an e-mail to \%security@tcpdump.org.
 .LP
 To report bugs and other problems, contribute patches, request a
 feature, provide generic feedback etc please see the file
