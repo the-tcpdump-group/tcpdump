@@ -429,6 +429,8 @@ otv-heapoverflow-1	otv-heapoverflow-1.pcap		otv-heapoverflow-1.out		-c10
 otv-heapoverflow-2	otv-heapoverflow-2.pcap		otv-heapoverflow-2.out		-c10
 q933-heapoverflow-2	q933-heapoverflow-2.pcap	q933-heapoverflow-2.out
 atm-heapoverflow	atm-heapoverflow.pcap		atm-heapoverflow.out		-c1 -e
+ipv6-next-header-oobr-1	ipv6-next-header-oobr-1.pcap	ipv6-next-header-oobr-1.out
+ipv6-next-header-oobr-2	ipv6-next-header-oobr-2.pcap	ipv6-next-header-oobr-2.out
 
 # bad packets from Kamil Frankowicz
 snmp-heapoverflow-1	snmp-heapoverflow-1.pcap	snmp-heapoverflow-1.out
