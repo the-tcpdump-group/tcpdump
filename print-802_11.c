@@ -1189,8 +1189,7 @@ parse_elements(netdissect_options *ndo,
 			offset += 3;
 			length -= 3;
 
-			memcpy(tim.bitmap, p + (tim.length - 3),
-			    (tim.length - 3));
+			memcpy(tim.bitmap, p + offset + 3, tim.length - 3);
 			offset += tim.length - 3;
 			length -= tim.length - 3;
 			/*
