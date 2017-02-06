@@ -463,6 +463,7 @@ eigrp-tlv-oobr		eigrp-tlv-oobr.pcap		eigrp-tlv-oobr.out	-vvv -e
 zephyr-oobr		zephyr-oobr.pcap		zephyr-oobr.out		-vvv -e
 bgp-as-path-oobr	bgp-as-path-oobr.pcap		bgp-as-path-oobr.out	-vvv -e
 isakmp-no-none-np	isakmp-no-none-np.pcap		isakmp-no-none-np.out	-vvv -e
+telnet-iac-check-oobr	telnet-iac-check-oobr.pcap	telnet-iac-check-oobr.out	-vvv -e
 
 # RTP tests
 # fuzzed pcap
