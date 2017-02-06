@@ -1401,6 +1401,7 @@ bgp_attr_print(netdissect_options *ndo,
 			ND_TCHECK(tptr[0]);
                         ND_PRINT((ndo, "%s", tok2str(bgp_as_path_segment_open_values,
 						"?", tptr[0])));
+			ND_TCHECK(tptr[1]);
                         for (i = 0; i < tptr[1] * as_size; i += as_size) {
                             ND_TCHECK2(tptr[2 + i], as_size);
 			    ND_PRINT((ndo, "%s ",

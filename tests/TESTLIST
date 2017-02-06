@@ -461,6 +461,7 @@ tok2str-oobr-1		tok2str-oobr-1.pcap		tok2str-oobr-1.out	-vvv -e
 tok2str-oobr-2		tok2str-oobr-2.pcap		tok2str-oobr-2.out	-vvv -e
 eigrp-tlv-oobr		eigrp-tlv-oobr.pcap		eigrp-tlv-oobr.out	-vvv -e
 zephyr-oobr		zephyr-oobr.pcap		zephyr-oobr.out		-vvv -e
+bgp-as-path-oobr	bgp-as-path-oobr.pcap		bgp-as-path-oobr.out	-vvv -e
 
 # RTP tests
 # fuzzed pcap
