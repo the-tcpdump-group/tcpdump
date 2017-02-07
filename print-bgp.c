@@ -2182,35 +2182,42 @@ bgp_attr_print(netdissect_options *ndo,
 		uint8_t type;
 		uint16_t length;
 
-		ND_TCHECK2(tptr[0], 3);
-
 		tlen = len;
 
 		while (tlen >= 3) {
 
+		    ND_TCHECK2(tptr[0], 3);
+
 		    type = *tptr;
 		    length = EXTRACT_16BITS(tptr+1);
+		    tptr += 3;
+		    tlen -= 3;
 
 		    ND_PRINT((ndo, "\n\t    %s TLV (%u), length %u",
 			      tok2str(bgp_aigp_values, "Unknown", type),
 			      type, length));
 
+		    if (length < 3)
+			goto trunc;
+		    length -= 3;
+
 		    /*
 		     * Check if we can read the TLV data.
 		     */
-		    ND_TCHECK2(tptr[3], length - 3);
+		    ND_TCHECK2(tptr[3], length);
 
 		    switch (type) {
 
 		    case BGP_AIGP_TLV:
-		        ND_TCHECK2(tptr[3], 8);
+		        if (length < 8)
+		            goto trunc;
 			ND_PRINT((ndo, ", metric %" PRIu64,
-				  EXTRACT_64BITS(tptr+3)));
+				  EXTRACT_64BITS(tptr)));
 			break;
 
 		    default:
 			if (ndo->ndo_vflag <= 1) {
-			    print_unknown_data(ndo, tptr+3,"\n\t      ", length-3);
+			    print_unknown_data(ndo, tptr,"\n\t      ", length);
 			}
 		    }
 
