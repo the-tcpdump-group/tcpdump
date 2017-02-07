@@ -306,6 +306,7 @@ pimv1_print(netdissect_options *ndo,
 			pimv1_join_prune_print(ndo, &bp[8], len - 8);
 		break;
 	}
+	ND_TCHECK(bp[4]);
 	if ((bp[4] >> 4) != 1)
 		ND_PRINT((ndo, " [v%d]", bp[4] >> 4));
 	return;
