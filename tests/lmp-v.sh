@@ -13,7 +13,7 @@ then
 	printf '    %-35s: TEST SKIPPED (no Makefile)\n' 'lmp-v'
 elif grep '^CC = .*gcc' ../Makefile >/dev/null
 then
-  ./TESTonce lmp-v lmp.pcap lmp-v.out '-t -T lmp -v'
+  ./TESTonce lmp-v lmp.pcap lmp-v.out '-T lmp -v'
 else
 	printf '    %-35s: TEST SKIPPED (compiler is not GCC)\n' 'lmp-v'
 fi

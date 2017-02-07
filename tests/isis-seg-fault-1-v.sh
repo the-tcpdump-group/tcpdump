@@ -11,7 +11,7 @@ then
 	printf '    %-35s: TEST SKIPPED (no Makefile)\n' $test_name
 elif grep '^CC = .*gcc' ../Makefile >/dev/null
 then
-  ./TESTonce $test_name isis-seg-fault-1.pcap isis-seg-fault-1-v.out '-t -v'
+  ./TESTonce $test_name isis-seg-fault-1.pcap isis-seg-fault-1-v.out '-v'
 else
 	printf '    %-35s: TEST SKIPPED (compiler is not GCC)\n' $test_name
 fi
