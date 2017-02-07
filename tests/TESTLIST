@@ -450,6 +450,7 @@ isoclns-oobr		isoclns-oobr.pcap		isoclns-oobr.out
 nfs-attr-oobr		nfs-attr-oobr.pcap		nfs-attr-oobr.out
 decnet-oobr		decnet-oobr.pcap		decnet-oobr.out
 oobr_parse_elements	oobr_parse_elements.pcap	oobr_parse_elements.out
+hoobr_ripng_print	hoobr_ripng_print.pcap		hoobr_ripng_print.out
 
 # bad packets from Wilfried Kirsch
 slip-bad-direction	slip-bad-direction.pcap		slip-bad-direction.out	-ve
