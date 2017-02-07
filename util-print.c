@@ -904,7 +904,7 @@ safeputs(netdissect_options *ndo,
 {
 	u_int idx = 0;
 
-	while (*s && idx < maxlen) {
+	while (idx < maxlen && *s) {
 		safeputchar(ndo, *s);
 		idx++;
 		s++;
