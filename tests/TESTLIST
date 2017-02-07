@@ -451,6 +451,9 @@ nfs-attr-oobr		nfs-attr-oobr.pcap		nfs-attr-oobr.out
 decnet-oobr		decnet-oobr.pcap		decnet-oobr.out
 oobr_parse_elements	oobr_parse_elements.pcap	oobr_parse_elements.out
 hoobr_ripng_print	hoobr_ripng_print.pcap		hoobr_ripng_print.out
+hoobr_juniper		hoobr_juniper.pcap		hoobr_juniper.out
+hoobr_juniper2		hoobr_juniper2.pcap		hoobr_juniper2.out
+hoobr_juniper3		hoobr_juniper3.pcap		hoobr_juniper3.out
 
 # bad packets from Wilfried Kirsch
 slip-bad-direction	slip-bad-direction.pcap		slip-bad-direction.out	-ve
