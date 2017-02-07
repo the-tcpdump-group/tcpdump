@@ -481,8 +481,10 @@ resp_get_length(netdissect_options *ndo, register const u_char *bp, int len, con
         ND_TCHECK(*bp);
         c = *bp;
         if (!(c >= '0' && c <= '9')) {
-            if (!saw_digit)
+            if (!saw_digit) {
+                bp++;
                 goto invalid;
+            }
             break;
         }
         c -= '0';
@@ -510,15 +512,19 @@ resp_get_length(netdissect_options *ndo, register const u_char *bp, int len, con
     if (len == 0)
         goto trunc;
     ND_TCHECK(*bp);
-    if (*bp != '\r')
+    if (*bp != '\r') {
+        bp++;
         goto invalid;
+    }
     bp++;
     len--;
     if (len == 0)
         goto trunc;
     ND_TCHECK(*bp);
-    if (*bp != '\n')
+    if (*bp != '\n') {
+        bp++;
         goto invalid;
+    }
     bp++;
     len--;
     *endp = bp;
@@ -531,8 +537,10 @@ resp_get_length(netdissect_options *ndo, register const u_char *bp, int len, con
     return (too_large ? -3 : result);
 
 trunc:
+    *endp = bp;
     return (-2);
 
 invalid:
+    *endp = bp;
     return (-5);
 }
