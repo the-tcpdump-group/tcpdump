@@ -91,6 +91,17 @@ then
 			exitcode=1
 		fi
 	fi
+	if ./TESTonce bgp-as-path-oobr-ssl bgp-as-path-oobr.pcap bgp-as-path-oobr-ssl.out '-vvv -e'
+	then
+		passed=`expr $passed + 1`
+		echo $passed >.passed
+	else
+		failed=`expr $failed + 1`
+		echo $failed >.failed
+		exitcode=1
+	fi
+	FORMAT='    %-35s: TEST SKIPPED (compiled w/OpenSSL)\n'
+	printf "$FORMAT" bgp-as-path-oobr-nossl
 else
 	FORMAT='    %-35s: TEST SKIPPED (compiled w/o OpenSSL)\n'
 	printf "$FORMAT" esp1
@@ -101,6 +112,16 @@ else
 	printf "$FORMAT" espudp1
 	printf "$FORMAT" ikev2pI2
 	printf "$FORMAT" isakmp4
+	printf "$FORMAT" bgp-as-path-oobr-ssl
+	if ./TESTonce bgp-as-path-oobr-nossl bgp-as-path-oobr.pcap bgp-as-path-oobr-nossl.out '-vvv -e'
+	then
+		passed=`expr $passed + 1`
+		echo $passed >.passed
+	else
+		failed=`expr $failed + 1`
+		echo $failed >.failed
+		exitcode=1
+	fi
 fi
 
 exit $exitcode

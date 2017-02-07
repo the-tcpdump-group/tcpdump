@@ -463,7 +463,6 @@ tok2str-oobr-1		tok2str-oobr-1.pcap		tok2str-oobr-1.out	-vvv -e
 tok2str-oobr-2		tok2str-oobr-2.pcap		tok2str-oobr-2.out	-vvv -e
 eigrp-tlv-oobr		eigrp-tlv-oobr.pcap		eigrp-tlv-oobr.out	-vvv -e
 zephyr-oobr		zephyr-oobr.pcap		zephyr-oobr.out		-vvv -e
-bgp-as-path-oobr	bgp-as-path-oobr.pcap		bgp-as-path-oobr.out	-vvv -e
 isakmp-no-none-np	isakmp-no-none-np.pcap		isakmp-no-none-np.out	-vvv -e
 telnet-iac-check-oobr	telnet-iac-check-oobr.pcap	telnet-iac-check-oobr.out	-vvv -e
 resp_4_infiniteloop	resp_4_infiniteloop.pcap	resp_4_infiniteloop.out	-vvv -e
