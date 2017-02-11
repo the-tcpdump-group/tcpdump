@@ -471,6 +471,7 @@ zephyr-oobr		zephyr-oobr.pcap		zephyr-oobr.out		-vvv -e
 isakmp-no-none-np	isakmp-no-none-np.pcap		isakmp-no-none-np.out	-vvv -e
 telnet-iac-check-oobr	telnet-iac-check-oobr.pcap	telnet-iac-check-oobr.out	-vvv -e
 resp_4_infiniteloop	resp_4_infiniteloop.pcap	resp_4_infiniteloop.out	-vvv -e
+dns_fwdptr		dns_fwdptr.pcap			dns_fwdptr.out		-vvv -e
 
 # RTP tests
 # fuzzed pcap
@@ -480,3 +481,11 @@ rtp-seg-fault-2  rtp-seg-fault-2.pcap  rtp-seg-fault-2.out  -v -T rtp
 # NFS tests
 # fuzzed pcap
 nfs-seg-fault-1  nfs-seg-fault-1.pcap  nfs-seg-fault-1.out
+
+# DNS infinite loop tests
+#
+# See http://marc.info/?l=tcpdump-workers&m=95552439022555
+#
+dns-zlip-1		dns-zlip-1.pcap		dns-zlip-1.out
+dns-zlip-2		dns-zlip-2.pcap		dns-zlip-2.out
+dns-zlip-3		dns-zlip-3.pcap		dns-zlip-3.out
