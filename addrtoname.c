@@ -150,8 +150,6 @@ struct enamemem {
 	u_short e_addr2;
 	const char *e_name;
 	u_char *e_nsap;			/* used only for nsaptable[] */
-#define e_bs e_nsap			/* for bytestringtable */
-	size_t e_namelen;		/* for bytestringtable */
 	struct enamemem *e_nxt;
 };
 
@@ -425,7 +423,7 @@ lookup_bytestring(netdissect_options *ndo, register const u_char *bs,
 	tp->bs_addr1 = j;
 	tp->bs_addr2 = k;
 
-	tp->bs_bytes = (u_char *) calloc(1, nlen + 1);
+	tp->bs_bytes = (u_char *) calloc(1, nlen);
 	if (tp->bs_bytes == NULL)
 		(*ndo->ndo_error)(ndo, "lookup_bytestring: calloc");
 
@@ -459,11 +457,11 @@ lookup_nsap(netdissect_options *ndo, register const u_char *nsap,
 
 	tp = &nsaptable[(i ^ j) & (HASHNAMESIZE-1)];
 	while (tp->e_nxt)
-		if (tp->e_addr0 == i &&
+		if (nsap_length == tp->e_nsap[0] &&
+		    tp->e_addr0 == i &&
 		    tp->e_addr1 == j &&
 		    tp->e_addr2 == k &&
-		    tp->e_nsap[0] == nsap_length &&
-		    memcmp((const char *)&(nsap[1]),
+		    memcmp((const char *)nsap,
 			(char *)&(tp->e_nsap[1]), nsap_length) == 0)
 			return tp;
 		else
