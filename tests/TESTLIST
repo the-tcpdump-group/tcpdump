@@ -476,6 +476,8 @@ isakmp-no-none-np	isakmp-no-none-np.pcap		isakmp-no-none-np.out	-vvv -e
 telnet-iac-check-oobr	telnet-iac-check-oobr.pcap	telnet-iac-check-oobr.out	-vvv -e
 resp_4_infiniteloop	resp_4_infiniteloop.pcap	resp_4_infiniteloop.out	-vvv -e
 dns_fwdptr		dns_fwdptr.pcap			dns_fwdptr.out		-vvv -e
+isis-areaaddr-oobr-1	isis-areaaddr-oobr-1.pcap	isis-areaaddr-oobr-1.out		-vvv -e
+isis-areaaddr-oobr-2	isis-areaaddr-oobr-2.pcap	isis-areaaddr-oobr-2.out		-vvv -e
 
 # RTP tests
 # fuzzed pcap

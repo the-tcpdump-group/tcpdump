@@ -2532,6 +2532,7 @@ isis_print(netdissect_options *ndo,
 	    ND_TCHECK2(*tptr, 1);
 	    alen = *tptr++;
 	    while (tmp && alen < tmp) {
+	        ND_TCHECK2(*tptr, alen);
 		ND_PRINT((ndo, "\n\t      Area address (length: %u): %s",
                        alen,
                        isonsap_string(ndo, tptr, alen)));
