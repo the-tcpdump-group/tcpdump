@@ -651,7 +651,7 @@ lldp_private_8021_print(netdissect_options *ndo,
     int subtype, hexdump = FALSE;
     u_int sublen;
     u_int tval;
-    uint8_t i;
+    u_int i;
 
     if (tlv_len < 4) {
         return hexdump;
@@ -787,9 +787,9 @@ lldp_private_8021_print(netdissect_options *ndo,
         ND_PRINT((ndo, "\n\t    Application Priority Table"));
         while(i<sublen) {
         	tval=*(tptr+i+5);
-        	ND_PRINT((ndo, "\n\t      Priority: %d, RES: %d, Sel: %d",
-        		 tval >> 5, (tval >> 3) & 0x03, (tval & 0x07)));
-        	ND_PRINT((ndo, "Protocol ID: %d", EXTRACT_16BITS(tptr + i + 5)));
+        	ND_PRINT((ndo, "\n\t      Priority: %u, RES: %u, Sel: %u, Protocol ID: %u",
+        		 tval >> 5, (tval >> 3) & 0x03, (tval & 0x07),
+        		 EXTRACT_16BITS(tptr + i + 5)));
         	i=i+3;
         }
         break;
