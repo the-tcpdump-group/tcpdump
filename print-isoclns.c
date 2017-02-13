@@ -2038,7 +2038,7 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
         }
         processed++;
     } else if (afi == AF_INET6) {
-        if (!ND_TTEST2(*tptr, 1)) /* fetch status & prefix_len byte */
+        if (!ND_TTEST2(*tptr, 2)) /* fetch status & prefix_len byte */
             return (0);
         status_byte=*(tptr++);
         bit_length=*(tptr++);
