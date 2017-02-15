@@ -368,8 +368,11 @@ cfm_print(netdissect_options *ndo,
                    md_nameformat,
                    md_namelength));
 
-            /* -2 for the MA short name format and length */
-            if (md_namelength > names_data_remaining - 2) {
+            /*
+             * -3 for the MA short name format and length and one byte
+             * of MA short name.
+             */
+            if (md_namelength > names_data_remaining - 3) {
                 ND_PRINT((ndo, " (too large, must be <= %u)", names_data_remaining - 2));
                 return;
             }
