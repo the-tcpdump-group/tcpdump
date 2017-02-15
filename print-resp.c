@@ -503,15 +503,11 @@ resp_get_length(netdissect_options *ndo, register const u_char *bp, int len, con
         len--;
         saw_digit = 1;
     }
-    if (!saw_digit)
-        goto invalid;
 
     /*
-     * OK, the next thing should be \r\n.
+     * OK, we found a non-digit character.  It should be a \r, followed
+     * by a \n.
      */
-    if (len == 0)
-        goto trunc;
-    ND_TCHECK(*bp);
     if (*bp != '\r') {
         bp++;
         goto invalid;
