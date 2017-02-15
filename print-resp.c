@@ -493,7 +493,7 @@ resp_get_length(netdissect_options *ndo, register const u_char *bp, int len, con
             too_large = 1;
         } else {
             result *= 10;
-            if (result == INT_MAX && c > (INT_MAX % 10)) {
+            if (result == ((INT_MAX / 10) * 10) && c > (INT_MAX % 10)) {
                 /* This will overflow an int when we add c */
                 too_large = 1;
             } else
