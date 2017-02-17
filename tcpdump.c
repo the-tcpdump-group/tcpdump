@@ -44,9 +44,10 @@ The Regents of the University of California.  All rights reserved.\n";
 #endif
 
 /*
- * Mac OS X may ship pcap.h from libpcap 0.6 with a libpcap based on
- * 0.8.  That means it has pcap_findalldevs() but the header doesn't
- * define pcap_if_t, meaning that we can't actually *use* pcap_findalldevs().
+ * Some older versions of Mac OS X may ship pcap.h from libpcap 0.6 with a
+ * libpcap based on 0.8.  That means it has pcap_findalldevs() but the
+ * header doesn't define pcap_if_t, meaning that we can't actually *use*
+ * pcap_findalldevs().
  */
 #ifdef HAVE_PCAP_FINDALLDEVS
 #ifndef HAVE_PCAP_IF_T
