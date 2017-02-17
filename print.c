@@ -329,8 +329,8 @@ pretty_print_packet(netdissect_options *ndo, const struct pcap_pkthdr *h,
 	ts_print(ndo, &h->ts);
 
 	/*
-	 * Some printers want to check that they're not walking off the
-	 * end of the packet.
+	 * Printers must check that they're not walking off the end of
+	 * the packet.
 	 * Rather than pass it all the way down, we set this member
 	 * of the netdissect_options structure.
 	 */
