@@ -807,11 +807,15 @@ nfs_printfh(netdissect_options *ndo,
 
 	if (sfsname) {
 		/* file system ID is ASCII, not numeric, for this server OS */
-		static char temp[NFSX_V3FHMAX+1];
+		char temp[NFSX_V3FHMAX+1];
+		u_int stringlen;
 
 		/* Make sure string is null-terminated */
-		strncpy(temp, sfsname, NFSX_V3FHMAX);
-		temp[sizeof(temp) - 1] = '\0';
+		stringlen = len;
+		if (stringlen > NFSX_V3FHMAX)
+			stringlen = NFSX_V3FHMAX;
+		strncpy(temp, sfsname, stringlen);
+		temp[stringlen] = '\0';
 		/* Remove trailing spaces */
 		spacep = strchr(temp, ' ');
 		if (spacep)
