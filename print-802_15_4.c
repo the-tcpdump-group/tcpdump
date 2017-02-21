@@ -122,7 +122,7 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 			return hdrlen;
 		}
 		if (ndo->ndo_vflag)
-			ND_PRINT((ndo,"%04x:%04x ", panid, EXTRACT_LE_16BITS(p + 2)));
+			ND_PRINT((ndo,"%04x:%04x ", panid, EXTRACT_LE_16BITS(p)));
 		p += 2;
 		caplen -= 2;
 		hdrlen += 2;
