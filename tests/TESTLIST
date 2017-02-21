@@ -489,6 +489,7 @@ pimv2-oobr-4		pimv2-oobr-4.pcap		pimv2-oobr-4.out		-vvv -e
 802_15_4-oobr-1		802_15_4-oobr-1.pcap		802_15_4-oobr-1.out	-vvv -e
 802_15_4-oobr-2		802_15_4-oobr-2.pcap		802_15_4-oobr-2.out	-vvv -e
 802_15_4-data		802_15_4-data.pcap		802_15_4-data.out	-vvv -e
+802_15_4_beacon		802_15_4_beacon.pcap		802_15_4_beacon.out	-vvv -e
 
 # RTP tests
 # fuzzed pcap
