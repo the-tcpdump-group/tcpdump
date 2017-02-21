@@ -141,7 +141,7 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 			return hdrlen;
 		}
 		if (ndo->ndo_vflag)
-			ND_PRINT((ndo,"%04x:%s ", panid, le64addr_string(ndo, p + 2)));
+			ND_PRINT((ndo,"%04x:%s ", panid, le64addr_string(ndo, p)));
 		p += 8;
 		caplen -= 8;
 		hdrlen += 8;
