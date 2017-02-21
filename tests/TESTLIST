@@ -490,6 +490,8 @@ pimv2-oobr-4		pimv2-oobr-4.pcap		pimv2-oobr-4.out		-vvv -e
 802_15_4-data		802_15_4-data.pcap		802_15_4-data.out	-vvv -e
 802_15_4_beacon		802_15_4_beacon.pcap		802_15_4_beacon.out	-vvv -e
 lmpv1_busyloop		lmpv1_busyloop.pcap		lmpv1_busyloop.out	-vvv -e
+juniper_atm1		juniper_atm1.pcap		juniper_atm1.out	-vvv -e
+juniper_es		juniper_es.pcap			juniper_es.out	-vvv -e
 
 # RTP tests
 # fuzzed pcap

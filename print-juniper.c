@@ -1367,6 +1367,7 @@ juniper_parse_header(netdissect_options *ndo,
             if (ndo->ndo_eflag) ND_PRINT((ndo, ": ")); /* print demarc b/w L2/L3*/
 
 
+            ND_TCHECK_16BITS(p+l2info->cookie_len);
             l2info->proto = EXTRACT_16BITS(p+l2info->cookie_len);
             break;
         }
