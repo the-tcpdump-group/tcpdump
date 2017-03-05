@@ -870,7 +870,7 @@ xid_map_enter(netdissect_options *ndo,
 	const struct ip6_hdr *ip6 = NULL;
 	struct xid_map_entry *xmep;
 
-	if (!ND_TTEST(rp->rm_call.cb_vers))
+	if (!ND_TTEST(rp->rm_call.cb_proc))
 		return (0);
 	switch (IP_V((const struct ip *)bp)) {
 	case 4:
@@ -899,11 +899,7 @@ xid_map_enter(netdissect_options *ndo,
 		UNALIGNED_MEMCPY(&xmep->client, &ip6->ip6_src, sizeof(ip6->ip6_src));
 		UNALIGNED_MEMCPY(&xmep->server, &ip6->ip6_dst, sizeof(ip6->ip6_dst));
 	}
-	if (!ND_TTEST(rp->rm_call.cb_proc))
-		return (0);
 	xmep->proc = EXTRACT_32BITS(&rp->rm_call.cb_proc);
-	if (!ND_TTEST(rp->rm_call.cb_vers))
-		return (0);
 	xmep->vers = EXTRACT_32BITS(&rp->rm_call.cb_vers);
 	return (1);
 }
