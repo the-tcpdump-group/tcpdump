@@ -436,6 +436,7 @@ ipv6-next-header-oobr-1	ipv6-next-header-oobr-1.pcap	ipv6-next-header-oobr-1.out
 ipv6-next-header-oobr-2	ipv6-next-header-oobr-2.pcap	ipv6-next-header-oobr-2.out
 ipv6-rthdr-oobr		ipv6-rthdr-oobr.pcap		ipv6-rthdr-oobr.out
 ieee802.11_tim_ie_oobr	ieee802.11_tim_ie_oobr.pcap	ieee802.11_tim_ie_oobr.out
+decnet-shorthdr-oobr	decnet-shorthdr-oobr.pcap	decnet-shorthdr-oobr.out
 
 # bad packets from Kamil Frankowicz
 snmp-heapoverflow-1	snmp-heapoverflow-1.pcap	snmp-heapoverflow-1.out
