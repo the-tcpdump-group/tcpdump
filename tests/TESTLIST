@@ -499,6 +499,7 @@ juniper_es		juniper_es.pcap			juniper_es.out	-vvv -e
 
 # bad packets from Yannick Formaggio
 l2tp-avp-overflow	l2tp-avp-overflow.pcap		l2tp-avp-overflow.out	-v
+pktap-heap-overflow	pktap-heap-overflow.pcap	pktap-heap-overflow.out	-v
 
 # RTP tests
 # fuzzed pcap
