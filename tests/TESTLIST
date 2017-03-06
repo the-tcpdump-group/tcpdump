@@ -439,6 +439,7 @@ ieee802.11_tim_ie_oobr	ieee802.11_tim_ie_oobr.pcap	ieee802.11_tim_ie_oobr.out
 decnet-shorthdr-oobr	decnet-shorthdr-oobr.pcap	decnet-shorthdr-oobr.out
 isakmp-3948-oobr-2	isakmp-3948-oobr-2.pcap		isakmp-3948-oobr-2.out
 ieee802.11_rates_oobr	ieee802.11_rates_oobr.pcap	ieee802.11_rates_oobr.out
+ipv6-mobility-header-oobr	ipv6-mobility-header-oobr.pcap	ipv6-mobility-header-oobr.out
 
 # bad packets from Kamil Frankowicz
 snmp-heapoverflow-1	snmp-heapoverflow-1.pcap	snmp-heapoverflow-1.out
