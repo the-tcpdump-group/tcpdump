@@ -500,6 +500,9 @@ lmpv1_busyloop		lmpv1_busyloop.pcap		lmpv1_busyloop.out	-vvv -e
 juniper_atm1		juniper_atm1.pcap		juniper_atm1.out	-vvv -e
 juniper_es		juniper_es.pcap			juniper_es.out	-vvv -e
 
+# bad packets from Yannick Formaggio
+l2tp-avp-overflow	l2tp-avp-overflow.pcap		l2tp-avp-overflow.out	-v
+
 # RTP tests
 # fuzzed pcap
 rtp-seg-fault-1  rtp-seg-fault-1.pcap  rtp-seg-fault-1.out  -v -T rtp
