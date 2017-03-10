@@ -1721,7 +1721,7 @@ bgp_attr_print(netdissect_options *ndo,
 			ND_PRINT((ndo, ", no SNPA"));
                 }
 
-		while (len - (tptr - pptr) > 0) {
+		while (tptr < pptr + len) {
                     switch (af<<8 | safi) {
                     case (AFNUM_INET<<8 | SAFNUM_UNICAST):
                     case (AFNUM_INET<<8 | SAFNUM_MULTICAST):
@@ -1889,7 +1889,7 @@ bgp_attr_print(netdissect_options *ndo,
 
 		tptr += 3;
 
-		while (len - (tptr - pptr) > 0) {
+		while (tptr < pptr + len) {
                     switch (af<<8 | safi) {
                     case (AFNUM_INET<<8 | SAFNUM_UNICAST):
                     case (AFNUM_INET<<8 | SAFNUM_MULTICAST):
