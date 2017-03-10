@@ -62,7 +62,6 @@ echo '------------------------------------------------'
 printf "%4u tests failed\n" $failed
 printf "%4u tests passed\n" $passed
 echo
-echo
 cat failure-outputs.txt
 echo
 echo
