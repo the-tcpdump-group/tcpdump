@@ -29,11 +29,11 @@
 
 #include <string.h>
 
-#include "ip6.h"
-
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
+
+#include "ip6.h"
 
 int
 rt6_print(netdissect_options *ndo, register const u_char *bp, const u_char *bp2 _U_)
