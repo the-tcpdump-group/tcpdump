@@ -27,9 +27,10 @@
 
 #include <netdissect-stdinc.h>
 
-#include "ip6.h"
 #include "netdissect.h"
 #include "extract.h"
+
+#include "ip6.h"
 
 int
 frag6_print(netdissect_options *ndo, register const u_char *bp, register const u_char *bp2)
