@@ -36,10 +36,11 @@
 
 #include <netdissect-stdinc.h>
 
-#include "ip6.h"
 #include "netdissect.h"
 #include "addrtoname.h"
 #include "extract.h"
+
+#include "ip6.h"
 
 static const char tstr[] = "[|MOBILITY]";
 
