@@ -504,6 +504,9 @@ juniper_es		juniper_es.pcap			juniper_es.out	-vvv -e
 l2tp-avp-overflow	l2tp-avp-overflow.pcap		l2tp-avp-overflow.out	-v
 pktap-heap-overflow	pktap-heap-overflow.pcap	pktap-heap-overflow.out	-v
 
+# bad packets from Bhargava Shastry
+lldp_asan		lldp_asan.pcap			lldp_asan.out	-v
+
 # RTP tests
 # fuzzed pcap
 rtp-seg-fault-1  rtp-seg-fault-1.pcap  rtp-seg-fault-1.out  -v -T rtp
