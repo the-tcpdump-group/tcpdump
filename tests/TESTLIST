@@ -510,6 +510,7 @@ pktap-heap-overflow	pktap-heap-overflow.pcap	pktap-heap-overflow.out	-v
 # bad packets from Bhargava Shastry
 lldp_asan		lldp_asan.pcap			lldp_asan.out	-v
 extract_read2_asan	extract_read2_asan.pcap		extract_read2_asan.out	-v
+getname_2_read4_asan	getname_2_read4_asan.pcap	getname_2_read4_asan.out	-v
 
 # RTP tests
 # fuzzed pcap
