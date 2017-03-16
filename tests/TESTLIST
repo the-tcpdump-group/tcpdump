@@ -512,6 +512,7 @@ wb-oobr			wb-oobr.pcap			wb-oobr.out	-v
 lldp_asan		lldp_asan.pcap			lldp_asan.out	-v
 extract_read2_asan	extract_read2_asan.pcap		extract_read2_asan.out	-v
 getname_2_read4_asan	getname_2_read4_asan.pcap	getname_2_read4_asan.out	-v
+eap_extract_read2_asan	eap_extract_read2_asan.pcap	eap_extract_read2_asan.out	-v
 
 # RTP tests
 # fuzzed pcap
