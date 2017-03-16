@@ -582,6 +582,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 		ip = (const struct ip *)bp;
 		ndo->ndo_snaplen = ndo->ndo_snapend - bp;
                 snapend_save = ndo->ndo_snapend;
+		ND_TCHECK_16BITS(&ip->ip_len);
 		ip_print(ndo, bp, EXTRACT_16BITS(&ip->ip_len));
                 ndo->ndo_snapend = snapend_save;
 	}
