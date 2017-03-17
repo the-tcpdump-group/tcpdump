@@ -442,6 +442,9 @@ stp-v4-length-sigsegv	stp-v4-length-sigsegv.pcap	stp-v4-length-sigsegv.out
 hoobr_pimv1		hoobr_pimv1.pcap		hoobr_pimv1.out
 hoobr_safeputs		hoobr_safeputs.pcap		hoobr_safeputs.out
 
+# bad packets from Wilfried Kirsch
+slip-bad-direction	slip-bad-direction.pcap		slip-bad-direction.out	-ve
+
 # RTP tests
 # fuzzed pcap
 rtp-seg-fault-1  rtp-seg-fault-1.pcap  rtp-seg-fault-1.out  -v -T rtp
