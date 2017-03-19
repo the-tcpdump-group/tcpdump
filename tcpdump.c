@@ -130,7 +130,7 @@ The Regents of the University of California.  All rights reserved.\n";
 #endif
 
 static int Bflag;			/* buffer size */
-static int Cflag;			/* rotate dump files after this many bytes */
+static long Cflag;			/* rotate dump files after this many bytes */
 static int Cflag_count;			/* Keep track of which file number we're writing */
 static int Dflag;			/* list available devices and exit */
 /*
