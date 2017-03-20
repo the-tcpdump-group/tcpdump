@@ -72,6 +72,7 @@ const struct tok ethertype_values[] = {
     { ETHERTYPE_RRCP,           "RRCP" },
     { ETHERTYPE_MS_NLB_HB,      "MS NLB heartbeat" },
     { ETHERTYPE_JUMBO,          "Jumbo" },
+    { ETHERTYPE_NSH,            "NSH" },
     { ETHERTYPE_LOOPBACK,       "Loopback" },
     { ETHERTYPE_ISO,            "OSI" },
     { ETHERTYPE_GRE_ISO,        "GRE-OSI" },
@@ -407,6 +408,10 @@ ethertype_print(netdissect_options *ndo,
 	case ETHERTYPE_LLDP:
 		lldp_print(ndo, p, length);
 		return (1);
+
+        case ETHERTYPE_NSH:
+                nsh_print(ndo, p, length);
+                return (1);
 
         case ETHERTYPE_LOOPBACK:
 		loopback_print(ndo, p, length);
