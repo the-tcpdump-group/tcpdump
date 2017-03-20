@@ -361,7 +361,9 @@ pcap-invalid-version-2 pcap-invalid-version-2.pcap pcap-invalid-version-2.out -t
 pcap-ng-invalid-vers-1 pcap-ng-invalid-vers-1.pcap pcap-ng-invalid-vers-1.out -t
 pcap-ng-invalid-vers-2 pcap-ng-invalid-vers-2.pcap pcap-ng-invalid-vers-2.out -t
 
-# NSH over VxLAN-GPE
+# NSH tests
+nsh                    nsh.pcap                nsh.out                    -t
+nsh-vvv                nsh.pcap                nsh-vvv.out                -t -vvv
 nsh-over-vxlan-gpe     nsh-over-vxlan-gpe.pcap nsh-over-vxlan-gpe.out     -t
 nsh-over-vxlan-gpe-v   nsh-over-vxlan-gpe.pcap nsh-over-vxlan-gpe-v.out   -t -v
 nsh-over-vxlan-gpe-vv  nsh-over-vxlan-gpe.pcap nsh-over-vxlan-gpe-vv.out  -t -vv

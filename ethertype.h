@@ -145,6 +145,9 @@
 #ifndef ETHERTYPE_PPPOES
 #define ETHERTYPE_PPPOES	0x8864
 #endif
+#ifndef ETHERTYPE_NSH
+#define ETHERTYPE_NSH		0x894F
+#endif
 #ifndef ETHERTYPE_PPPOED2
 #define ETHERTYPE_PPPOED2	0x3c12
 #endif
