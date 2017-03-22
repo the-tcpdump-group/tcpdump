@@ -541,6 +541,7 @@ pim_header_asan		pim_header_asan.pcap		pim_header_asan.out	-v
 pim_header_asan-2	pim_header_asan-2.pcap		pim_header_asan-2.out	-v
 pim_header_asan-3	pim_header_asan-3.pcap		pim_header_asan-3.out	-v
 ip6_frag_asan		ip6_frag_asan.pcap		ip6_frag_asan.out	-v
+radius_attr_asan	radius_attr_asan.pcap		radius_attr_asan.out	-v
 
 # RTP tests
 # fuzzed pcap
