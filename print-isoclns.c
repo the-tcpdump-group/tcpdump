@@ -1217,10 +1217,18 @@ esis_print(netdissect_options *ndo,
 		pptr += netal;
                 li -= netal;
 
-		if (netal == 0)
-			ND_PRINT((ndo, "\n\t  %s", etheraddr_string(ndo, snpa)));
+		if (snpal == 6)
+			ND_PRINT((ndo, "\n\t  SNPA (length: %u): %s",
+			       snpal,
+			       etheraddr_string(ndo, snpa)));
 		else
-			ND_PRINT((ndo, "\n\t  %s", isonsap_string(ndo, neta, netal)));
+			ND_PRINT((ndo, "\n\t  SNPA (length: %u): %s",
+			       snpal,
+			       linkaddr_string(ndo, snpa, LINKADDR_OTHER, snpal)));
+		if (netal != 0)
+			ND_PRINT((ndo, "\n\t  NET (length: %u) %s",
+			       netal,
+			       isonsap_string(ndo, neta, netal)));
 		break;
 	}
 
