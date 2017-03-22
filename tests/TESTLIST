@@ -527,6 +527,7 @@ ip_printroute_asan	ip_printroute_asan.pcap		ip_printroute_asan.out	-v
 mobility_opt_asan	mobility_opt_asan.pcap		mobility_opt_asan.out	-v
 mobility_opt_asan_2	mobility_opt_asan_2.pcap	mobility_opt_asan_2.out	-v
 mobility_opt_asan_3	mobility_opt_asan_3.pcap	mobility_opt_asan_3.out	-v
+mobility_opt_asan_4	mobility_opt_asan_4.pcap	mobility_opt_asan_4.out	-v
 
 # RTP tests
 # fuzzed pcap
