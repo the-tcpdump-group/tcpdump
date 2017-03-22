@@ -150,6 +150,7 @@ mobility_opt_print(netdissect_options *ndo,
 				goto trunc;
 			}
 			/* units of 4 secs */
+			ND_TCHECK_16BITS(&bp[i+2]);
 			ND_PRINT((ndo, "(refresh: %u)",
 				EXTRACT_16BITS(&bp[i+2]) << 2));
 			break;
