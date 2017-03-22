@@ -223,6 +223,7 @@ vtp_print (netdissect_options *ndo,
 	 *
 	 */
 
+	ND_TCHECK_32BITS(tptr);
 	ND_PRINT((ndo, ", Config Rev %x", EXTRACT_32BITS(tptr)));
 
 	/*
@@ -243,6 +244,7 @@ vtp_print (netdissect_options *ndo,
 	tptr += 4;
 	while (tptr < (pptr+length)) {
 
+	    ND_TCHECK_8BITS(tptr);
 	    len = *tptr;
 	    if (len == 0)
 		break;
