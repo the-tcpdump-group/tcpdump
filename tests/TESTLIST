@@ -535,6 +535,7 @@ bootp_asan		bootp_asan.pcap			bootp_asan.out		-v
 ppp_ccp_config_deflate_option_asan	ppp_ccp_config_deflate_option_asan.pcap	ppp_ccp_config_deflate_option_asan.out	-v
 pim_header_asan		pim_header_asan.pcap		pim_header_asan.out		-v
 pim_header_asan-2	pim_header_asan-2.pcap		pim_header_asan-2.out		-v
+pim_header_asan-3	pim_header_asan-3.pcap		pim_header_asan-3.out		-v
 
 # RTP tests
 # fuzzed pcap
