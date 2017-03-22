@@ -518,6 +518,7 @@ esis_snpa_asan-2	esis_snpa_asan-2.pcap		esis_snpa_asan-2.out	-v
 esis_snpa_asan-3	esis_snpa_asan-3.pcap		esis_snpa_asan-3.out	-v
 esis_snpa_asan-4	esis_snpa_asan-4.pcap		esis_snpa_asan-4.out	-v
 esis_snpa_asan-5	esis_snpa_asan-5.pcap		esis_snpa_asan-5.out	-v
+dhcp6_reconf_asan	dhcp6_reconf_asan.pcap		dhcp6_reconf_asan.out	-v
 
 # RTP tests
 # fuzzed pcap
