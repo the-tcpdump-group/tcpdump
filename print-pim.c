@@ -694,17 +694,11 @@ static void
 pimv2_print(netdissect_options *ndo,
             register const u_char *bp, register u_int len, const u_char *bp2)
 {
-	register const u_char *ep;
 	register const struct pim *pim = (const struct pim *)bp;
 	int advance;
 	enum checksum_status cksum_status;
 	int pimv2_addr_len;
 
-	ep = (const u_char *)ndo->ndo_snapend;
-	if (bp >= ep)
-		return;
-	if (ep > bp + len)
-		ep = bp + len;
 	if (len < 2)
 		goto trunc;
 	ND_TCHECK(pim->pim_rsv);
@@ -1049,7 +1043,7 @@ pimv2_print(netdissect_options *ndo,
 		bp += advance;
 		len -= advance;
 
-		for (i = 0; bp < ep; i++) {
+		for (i = 0; len > 0; i++) {
 			/* Encoded-Group Address */
 			ND_PRINT((ndo, " (group%d: ", i));
 			if ((advance = pimv2_addr_print(ndo, bp, len, pimv2_group, pimv2_addr_len, 0)) < 0)
@@ -1071,7 +1065,7 @@ pimv2_print(netdissect_options *ndo,
 			bp += 4;
 			len -= 4;
 
-			for (j = 0; j < frpcnt && bp < ep; j++) {
+			for (j = 0; j < frpcnt && len > 0; j++) {
 				/* each RP info */
 				ND_PRINT((ndo, " RP%d=", j));
 				if ((advance = pimv2_addr_print(ndo, bp, len,
@@ -1148,7 +1142,7 @@ pimv2_print(netdissect_options *ndo,
 		len -= advance;
 
 		/* Encoded-Group Addresses */
-		for (i = 0; i < pfxcnt && bp < ep; i++) {
+		for (i = 0; i < pfxcnt && len > 0; i++) {
 			ND_PRINT((ndo, " Group%d=", i));
 			if ((advance = pimv2_addr_print(ndo, bp, len, pimv2_group, pimv2_addr_len, 0)) < 0)
 				goto trunc;
