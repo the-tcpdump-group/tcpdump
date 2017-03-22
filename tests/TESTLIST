@@ -525,6 +525,7 @@ vtp_asan		vtp_asan.pcap			vtp_asan.out	-v
 icmp6_mobileprefix_asan	icmp6_mobileprefix_asan.pcap	icmp6_mobileprefix_asan.out	-v
 ip_printroute_asan	ip_printroute_asan.pcap		ip_printroute_asan.out	-v
 mobility_opt_asan	mobility_opt_asan.pcap		mobility_opt_asan.out	-v
+mobility_opt_asan_2	mobility_opt_asan_2.pcap	mobility_opt_asan_2.out	-v
 
 # RTP tests
 # fuzzed pcap

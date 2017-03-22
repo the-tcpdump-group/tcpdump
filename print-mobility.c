@@ -166,6 +166,8 @@ mobility_opt_print(netdissect_options *ndo,
 				ND_PRINT((ndo, "(ni: trunc)"));
 				goto trunc;
 			}
+			ND_TCHECK_16BITS(&bp[i+2]);
+			ND_TCHECK_16BITS(&bp[i+4]);
 			ND_PRINT((ndo, "(ni: ho=0x%04x co=0x%04x)",
 				EXTRACT_16BITS(&bp[i+2]),
 				EXTRACT_16BITS(&bp[i+4])));
