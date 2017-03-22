@@ -1401,7 +1401,7 @@ lldp_mgmt_addr_tlv_print(netdissect_options *ndo,
     if (tlen) {
         oid_len = *tptr;
 
-        if (tlen < oid_len) {
+        if (tlen < 1U + oid_len) {
             return 0;
         }
         if (oid_len) {
