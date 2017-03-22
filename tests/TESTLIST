@@ -534,6 +534,7 @@ isis_stlv_asan-3	isis_stlv_asan-3.pcap		isis_stlv_asan-3.out	-v
 isis_stlv_asan-4	isis_stlv_asan-4.pcap		isis_stlv_asan-4.out	-v
 lldp_mgmt_addr_tlv_asan	lldp_mgmt_addr_tlv_asan.pcap	lldp_mgmt_addr_tlv_asan.out	-v
 bootp_asan		bootp_asan.pcap			bootp_asan.out		-v
+ppp_ccp_config_deflate_option_asan	ppp_ccp_config_deflate_option_asan.pcap	ppp_ccp_config_deflate_option_asan.out	-v
 
 # RTP tests
 # fuzzed pcap
