@@ -510,6 +510,11 @@ lldp_asan		lldp_asan.pcap			lldp_asan.out	-v
 extract_read2_asan	extract_read2_asan.pcap		extract_read2_asan.out	-v
 getname_2_read4_asan	getname_2_read4_asan.pcap	getname_2_read4_asan.out	-v
 eap_extract_read2_asan	eap_extract_read2_asan.pcap	eap_extract_read2_asan.out	-v
+esis_snpa_asan		esis_snpa_asan.pcap		esis_snpa_asan.out	-v
+esis_snpa_asan-2	esis_snpa_asan-2.pcap		esis_snpa_asan-2.out	-v
+esis_snpa_asan-3	esis_snpa_asan-3.pcap		esis_snpa_asan-3.out	-v
+esis_snpa_asan-4	esis_snpa_asan-4.pcap		esis_snpa_asan-4.out	-v
+esis_snpa_asan-5	esis_snpa_asan-5.pcap		esis_snpa_asan-5.out	-v
 
 # RTP tests
 # fuzzed pcap
