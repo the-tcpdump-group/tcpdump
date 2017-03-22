@@ -1131,6 +1131,7 @@ icmp6_print(netdissect_options *ndo,
 		if (ndo->ndo_vflag) {
 			ND_TCHECK(dp->icmp6_data16[0]);
 			ND_PRINT((ndo,", id 0x%04x", EXTRACT_16BITS(&dp->icmp6_data16[0])));
+			ND_TCHECK(dp->icmp6_data16[1]);
 			if (dp->icmp6_data16[1] & 0xc0)
 				ND_PRINT((ndo," "));
 			if (dp->icmp6_data16[1] & 0x80)
