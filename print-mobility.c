@@ -159,6 +159,7 @@ mobility_opt_print(netdissect_options *ndo,
 				ND_PRINT((ndo, "(altcoa: trunc)"));
 				goto trunc;
 			}
+			ND_TCHECK_128BITS(&bp[i+2]);
 			ND_PRINT((ndo, "(alt-CoA: %s)", ip6addr_string(ndo, &bp[i+2])));
 			break;
 		case IP6MOPT_NONCEID:
