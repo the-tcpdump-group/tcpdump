@@ -1403,6 +1403,7 @@ isis_print_mt_port_cap_subtlv(netdissect_options *ndo,
 
   while (len > 2)
   {
+    ND_TCHECK2(*tptr, 2);
     stlv_type = *(tptr++);
     stlv_len  = *(tptr++);
 
@@ -1415,11 +1416,18 @@ isis_print_mt_port_cap_subtlv(netdissect_options *ndo,
     /*len -= TLV_TYPE_LEN_OFFSET;*/
     len = len -2;
 
+    /* Make sure the subTLV fits within the space left */
+    if (len < stlv_len)
+      goto trunc;
+    /* Make sure the entire subTLV is in the captured data */
+    ND_TCHECK2(*(tptr), stlv_len);
+
     switch (stlv_type)
     {
       case ISIS_SUBTLV_SPB_MCID:
       {
-        ND_TCHECK2(*(tptr), ISIS_SUBTLV_SPB_MCID_MIN_LEN);
+      	if (stlv_len < ISIS_SUBTLV_SPB_MCID_MIN_LEN)
+      	  goto trunc;
 
         subtlv_spb_mcid = (const struct isis_subtlv_spb_mcid *)tptr;
 
@@ -1434,15 +1442,17 @@ isis_print_mt_port_cap_subtlv(netdissect_options *ndo,
 
           /*tptr += SPB_MCID_MIN_LEN;
             len -= SPB_MCID_MIN_LEN; */
-        tptr = tptr + sizeof(struct isis_subtlv_spb_mcid);
-        len = len - sizeof(struct isis_subtlv_spb_mcid);
+        tptr = tptr + ISIS_SUBTLV_SPB_MCID_MIN_LEN;
+        len = len - ISIS_SUBTLV_SPB_MCID_MIN_LEN;
+        stlv_len = stlv_len - ISIS_SUBTLV_SPB_MCID_MIN_LEN;
 
         break;
       }
 
       case ISIS_SUBTLV_SPB_DIGEST:
       {
-        ND_TCHECK2(*(tptr), ISIS_SUBTLV_SPB_DIGEST_MIN_LEN);
+        if (stlv_len < ISIS_SUBTLV_SPB_DIGEST_MIN_LEN)
+          goto trunc;
 
         ND_PRINT((ndo, "\n\t        RES: %d V: %d A: %d D: %d",
                         (*(tptr) >> 5), (((*tptr)>> 4) & 0x01),
@@ -1461,18 +1471,15 @@ isis_print_mt_port_cap_subtlv(netdissect_options *ndo,
         }
 
         len = len - ISIS_SUBTLV_SPB_DIGEST_MIN_LEN;
+        stlv_len = stlv_len - ISIS_SUBTLV_SPB_DIGEST_MIN_LEN;
 
         break;
       }
 
       case ISIS_SUBTLV_SPB_BVID:
       {
-        ND_TCHECK2(*(tptr), stlv_len);
-
-        while (len >= ISIS_SUBTLV_SPB_BVID_MIN_LEN)
+        while (stlv_len >= ISIS_SUBTLV_SPB_BVID_MIN_LEN)
         {
-          ND_TCHECK2(*(tptr), ISIS_SUBTLV_SPB_BVID_MIN_LEN);
-
           ND_PRINT((ndo, "\n\t           ECT: %08x",
                       EXTRACT_32BITS(tptr)));
 
@@ -1485,14 +1492,17 @@ isis_print_mt_port_cap_subtlv(netdissect_options *ndo,
 
           tptr = tptr + 2;
           len = len - ISIS_SUBTLV_SPB_BVID_MIN_LEN;
+          stlv_len = stlv_len - ISIS_SUBTLV_SPB_BVID_MIN_LEN;
         }
 
         break;
       }
 
       default:
-          break;
+        break;
     }
+    tptr += stlv_len;
+    len -= stlv_len;
   }
 
   return 0;
@@ -1511,6 +1521,7 @@ isis_print_mt_capability_subtlv(netdissect_options *ndo,
 
   while (len > 2)
   {
+    ND_TCHECK2(*tptr, 2);
     stlv_type = *(tptr++);
     stlv_len  = *(tptr++);
 
@@ -1522,11 +1533,17 @@ isis_print_mt_capability_subtlv(netdissect_options *ndo,
 
     len = len - 2;
 
+    /* Make sure the subTLV fits within the space left */
+    if (len < stlv_len)
+      goto trunc;
+    /* Make sure the entire subTLV is in the captured data */
+    ND_TCHECK2(*(tptr), stlv_len);
+
     switch (stlv_type)
     {
       case ISIS_SUBTLV_SPB_INSTANCE:
-
-          ND_TCHECK2(*tptr, ISIS_SUBTLV_SPB_INSTANCE_MIN_LEN);
+          if (stlv_len < ISIS_SUBTLV_SPB_INSTANCE_MIN_LEN)
+            goto trunc;
 
           ND_PRINT((ndo, "\n\t        CIST Root-ID: %08x", EXTRACT_32BITS(tptr)));
           tptr = tptr+4;
@@ -1548,10 +1565,12 @@ isis_print_mt_capability_subtlv(netdissect_options *ndo,
           tmp = *(tptr++);
 
           len = len - ISIS_SUBTLV_SPB_INSTANCE_MIN_LEN;
+          stlv_len = stlv_len - ISIS_SUBTLV_SPB_INSTANCE_MIN_LEN;
 
           while (tmp)
           {
-            ND_TCHECK2(*tptr, ISIS_SUBTLV_SPB_INSTANCE_VLAN_TUPLE_LEN);
+            if (stlv_len < ISIS_SUBTLV_SPB_INSTANCE_VLAN_TUPLE_LEN)
+              goto trunc;
 
             ND_PRINT((ndo, "\n\t         U:%d, M:%d, A:%d, RES:%d",
                       *(tptr) >> 7, (*(tptr) >> 6) & 0x01,
@@ -1569,14 +1588,15 @@ isis_print_mt_capability_subtlv(netdissect_options *ndo,
 
             tptr = tptr + 3;
             len = len - ISIS_SUBTLV_SPB_INSTANCE_VLAN_TUPLE_LEN;
+            stlv_len = stlv_len - ISIS_SUBTLV_SPB_INSTANCE_VLAN_TUPLE_LEN;
             tmp--;
           }
 
           break;
 
       case ISIS_SUBTLV_SPBM_SI:
-
-          ND_TCHECK2(*tptr, 8);
+          if (stlv_len < 8)
+            goto trunc;
 
           ND_PRINT((ndo, "\n\t        BMAC: %08x", EXTRACT_32BITS(tptr)));
           tptr = tptr+4;
@@ -1608,6 +1628,8 @@ isis_print_mt_capability_subtlv(netdissect_options *ndo,
       default:
         break;
     }
+    tptr += stlv_len;
+    len -= stlv_len;
   }
   return 0;
 
