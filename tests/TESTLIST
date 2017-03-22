@@ -528,6 +528,7 @@ mobility_opt_asan	mobility_opt_asan.pcap		mobility_opt_asan.out	-v
 mobility_opt_asan_2	mobility_opt_asan_2.pcap	mobility_opt_asan_2.out	-v
 mobility_opt_asan_3	mobility_opt_asan_3.pcap	mobility_opt_asan_3.out	-v
 mobility_opt_asan_4	mobility_opt_asan_4.pcap	mobility_opt_asan_4.out	-v
+mobility_opt_asan_5	mobility_opt_asan_5.pcap	mobility_opt_asan_5.out	-v
 isis_stlv_asan		isis_stlv_asan.pcap		isis_stlv_asan.out	-v
 isis_stlv_asan-2	isis_stlv_asan-2.pcap		isis_stlv_asan-2.out	-v
 isis_stlv_asan-3	isis_stlv_asan-3.pcap		isis_stlv_asan-3.out	-v
