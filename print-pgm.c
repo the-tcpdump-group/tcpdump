@@ -457,6 +457,10 @@ pgm_print(netdissect_options *ndo,
 		    ND_PRINT((ndo, "[Total option length leaves no room for final option]"));
 		    return;
 		}
+		if (!ND_TTEST2(*bp, 2)) {
+		    ND_PRINT((ndo, " [|OPT]"));
+		    return;
+		}
 		opt_type = *bp++;
 		opt_len = *bp++;
 		if (opt_len < PGM_MIN_OPT_LEN) {
