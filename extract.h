@@ -281,3 +281,6 @@ EXTRACT_64BITS(const void *p)
 
 #define ND_TTEST_64BITS(p) ND_TTEST2(*(p), 8)
 #define ND_TCHECK_64BITS(p) ND_TCHECK2(*(p), 8)
+
+#define ND_TTEST_128BITS(p) ND_TTEST2(*(p), 16)
+#define ND_TCHECK_128BITS(p) ND_TCHECK2(*(p), 16)
