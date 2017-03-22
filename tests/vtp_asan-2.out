@@ -1,0 +1,3 @@
+FRF.16 Frag, seq 193, Flags [Begin, End], UI 08! VTPv69, Message Subset advertisement (0x02), length 2126400013
+	Domain name: , Seq number: 0, Config Rev fb499603
+	VLAN info status Unknown, type TrCRF, VLAN-id 256, MTU 771, SAID 0x03030303, Name ^C^I^C[|vtp]
