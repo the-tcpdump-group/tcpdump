@@ -169,13 +169,12 @@ pgm_print(netdissect_options *ndo,
 			ND_PRINT((ndo, "%s > %s: [|pgm]",
 				ip6addr_string(ndo, &ip6->ip6_src),
 				ip6addr_string(ndo, &ip6->ip6_dst)));
-			return;
 		} else {
 			ND_PRINT((ndo, "%s > %s: [|pgm]",
 				ipaddr_string(ndo, &ip->ip_src),
 				ipaddr_string(ndo, &ip->ip_dst)));
-			return;
 		}
+		return;
 	}
 
 	sport = EXTRACT_16BITS(&pgm->pgm_sport);
@@ -362,6 +361,7 @@ pgm_print(netdissect_options *ndo,
 	     * and stopping if we don't have enough.
 	     */
 	    bp += (2 * sizeof(uint16_t));
+	    ND_TCHECK_16BITS(bp);
 	    switch (EXTRACT_16BITS(bp)) {
 	    case AFNUM_INET:
 		ND_TCHECK2(*bp, sizeof(struct in_addr));
