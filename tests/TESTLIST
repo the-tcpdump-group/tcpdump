@@ -544,6 +544,7 @@ ppp_ccp_config_deflate_option_asan	ppp_ccp_config_deflate_option_asan.pcap	ppp_c
 pim_header_asan		pim_header_asan.pcap		pim_header_asan.out	-v
 pim_header_asan-2	pim_header_asan-2.pcap		pim_header_asan-2.out	-v
 pim_header_asan-3	pim_header_asan-3.pcap		pim_header_asan-3.out	-v
+pim_header_asan-4	pim_header_asan-4.pcap		pim_header_asan-4.out	-v
 ip6_frag_asan		ip6_frag_asan.pcap		ip6_frag_asan.out	-v
 radius_attr_asan	radius_attr_asan.pcap		radius_attr_asan.out	-v
 ospf6_decode_v3_asan	ospf6_decode_v3_asan.pcap	ospf6_decode_v3_asan.out -v
