@@ -156,7 +156,6 @@ zep_print(netdissect_options *ndo,
     }
 
     if (inner_len != 0) {
-      u_int ret;
       /* Call 802.15.4 dissector. */
       ND_PRINT((ndo, "\n\t"));
       if (ieee802_15_4_print(ndo, bp, inner_len)) {

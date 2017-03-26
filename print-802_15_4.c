@@ -465,6 +465,7 @@ ieee802_15_4_addr_len(uint16_t addr_type)
     return 8;
     break;
   }
+  return 0;
 }
 
 /*
@@ -966,7 +967,6 @@ ieee802_15_4_print_mlme_ie(netdissect_options *ndo,
       p += 7;
       sub_ie_len -= 7;
       if (channel_page == 9 || channel_page == 10) {
-	int len, i;
 	len = (number_of_channels + 7) / 8;
 	if (sub_ie_len < len) {
 	  ND_PRINT((ndo, "[ERROR: IE truncated]"));
@@ -1168,7 +1168,7 @@ ieee802_15_4_print_mlme_ie_list(netdissect_options *ndo,
 				const u_char *p,
 				uint16_t ie_len)
 {
-  int len, ie, sub_ie_len, sub_id, i, type;
+  int ie, sub_ie_len, sub_id, i, type;
 
   do {
     if (ie_len < 2) {
@@ -1404,7 +1404,7 @@ ieee802_15_4_print_command_data(netdissect_options *ndo,
 				const u_char *p,
 				u_int caplen)
 {
-  int i;
+  u_int i;
 
   switch (command_id) {
   case 0x01: /* Assocation Request */
@@ -1429,7 +1429,6 @@ ieee802_15_4_print_command_data(netdissect_options *ndo,
       ND_PRINT((ndo, "Invalid Assocation response command length"));
       return -1;
     } else {
-      uint8_t cap_info;
       ND_PRINT((ndo, "Short address = "));
       ieee802_15_4_print_addr(ndo, p, 2);
       switch (EXTRACT_LE_8BITS(p + 2)) {
@@ -1587,11 +1586,11 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
   int len, frame_version, pan_id_comp;
   int frame_type;
   int src_pan, dst_pan, src_addr_len, dst_addr_len;
-  int security_level, miclen;
+  int security_level, miclen = 0;
   int payload_ie_present;
   uint8_t seq, fcs_len;
   uint32_t fcs, crc_check;
-  const u_char *mic_start;
+  const u_char *mic_start = NULL;
 
   payload_ie_present = 0;
 
@@ -1759,7 +1758,7 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
   } else {
     ND_PRINT((ndo, "-:"));
   }
-  if (caplen < dst_addr_len) {
+  if (caplen < (u_int) dst_addr_len) {
     ND_PRINT((ndo, "[ERROR: Truncated before dst_addr]"));
     return 0;
   }
@@ -1781,7 +1780,7 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
   } else {
     ND_PRINT((ndo, "-:"));
   }
-  if (caplen < src_addr_len) {
+  if (caplen < (u_int) src_addr_len) {
     ND_PRINT((ndo, "[ERROR: Truncated before dst_addr]"));
     return 0;
   }
@@ -1821,13 +1820,12 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
 
   /* Remove MIC */
   if (miclen > 0) {
-    if (caplen < miclen) {
+    if (caplen < (u_int) miclen) {
       ND_PRINT((ndo, "[ERROR: Truncated before MIC]"));
       return 0;
     }
     caplen -= miclen;
     mic_start = p + caplen;
-	
   }
 
   /* Parse Information elements if present */
@@ -1860,7 +1858,7 @@ ieee802_15_4_std_frames(netdissect_options *ndo,
     ND_PRINT((ndo, "\n\tMIC "));
 	
     for(len = 0; len < miclen; len += 4) {
-      ND_PRINT((ndo, "%08x", EXTRACT_32BITS(p + caplen + len)));
+      ND_PRINT((ndo, "%08x", EXTRACT_32BITS(mic_start + len)));
     }
     ND_PRINT((ndo, " "));
   }
@@ -1967,11 +1965,11 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
 {
   int len, frame_version, pan_id_present;
   int src_addr_len, dst_addr_len;
-  int security_level, miclen;
+  int security_level, miclen = 0;
   int ie_present, payload_ie_present, security_enabled;
   uint8_t seq, fcs_len;
   uint32_t fcs, crc_check;
-  const u_char *mic_start;
+  const u_char *mic_start = NULL;
 
   pan_id_present = 0;
   ie_present = 0;
@@ -2064,7 +2062,7 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
   } else {
     ND_PRINT((ndo, "-:"));
   }
-  if (caplen < dst_addr_len) {
+  if (caplen < (u_int) dst_addr_len) {
     ND_PRINT((ndo, "[ERROR: Truncated before dst_addr]"));
     return 0;
   }
@@ -2076,7 +2074,7 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
 
   /* Print src PAN and address. */
   ND_PRINT((ndo, " -:"));
-  if (caplen < src_addr_len) {
+  if (caplen < (u_int) src_addr_len) {
     ND_PRINT((ndo, "[ERROR: Truncated before dst_addr]"));
     return 0;
   }
@@ -2117,13 +2115,12 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
 
   /* Remove MIC */
   if (miclen > 0) {
-    if (caplen < miclen) {
+    if (caplen < (u_int) miclen) {
       ND_PRINT((ndo, "[ERROR: Truncated before MIC]"));
       return 0;
     }
     caplen -= miclen;
     mic_start = p + caplen;
-	
   }
 
   /* Parse Information elements if present */
@@ -2156,7 +2153,7 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
     ND_PRINT((ndo, "\n\tMIC "));
 	
     for(len = 0; len < miclen; len += 4) {
-      ND_PRINT((ndo, "%08x", EXTRACT_32BITS(p + caplen + len)));
+      ND_PRINT((ndo, "%08x", EXTRACT_32BITS(mic_start + len)));
     }
     ND_PRINT((ndo, " "));
   }
@@ -2184,9 +2181,10 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
  * Returns FALSE in case of error.
  */
 static u_int
-ieee802_15_4_frag_frame(netdissect_options *ndo,
-			const u_char *p, u_int caplen,
-			uint16_t fc)
+ieee802_15_4_frag_frame(netdissect_options *ndo __attribute__ ((unused)),
+			const u_char *p __attribute__ ((unused)),
+			u_int caplen __attribute__ ((unused)),
+			uint16_t fc __attribute__ ((unused)))
 {
   /* Not implement yet, might be bit hard to implement, as the
    * information to set up the fragment is coming in the previous frame
@@ -2241,6 +2239,7 @@ ieee802_15_4_print(netdissect_options *ndo,
     return 0;
     break;
   }
+  return 0;
 }
 
 /*

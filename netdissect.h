@@ -520,6 +520,7 @@ extern void hsrp_print(netdissect_options *, const u_char *, u_int);
 extern void http_print(netdissect_options *, const u_char *, u_int);
 extern void icmp6_print(netdissect_options *, const u_char *, u_int, const u_char *, int);
 extern void icmp_print(netdissect_options *, const u_char *, u_int, const u_char *, int);
+extern u_int ieee802_15_4_print(netdissect_options *ndo, const u_char *p, u_int caplen);
 extern void igmp_print(netdissect_options *, const u_char *, u_int);
 extern void igrp_print(netdissect_options *, const u_char *, u_int);
 extern void ip6_print(netdissect_options *, const u_char *, u_int);
