@@ -669,7 +669,7 @@ cfm_print(netdissect_options *ndo,
                     ND_PRINT((ndo, "\n\t  (TLV too short)"));
                     return;
                 }
-                
+
                 mgmt_addr_length = *tptr;
                 tptr++;
                 tlen--;
