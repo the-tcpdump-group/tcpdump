@@ -2282,10 +2282,10 @@ ieee802_15_4_mp_frame(netdissect_options *ndo,
  * Returns FALSE in case of error.
  */
 static u_int
-ieee802_15_4_frag_frame(netdissect_options *ndo __attribute__ ((unused)),
-			const u_char *p __attribute__ ((unused)),
-			u_int caplen __attribute__ ((unused)),
-			uint16_t fc __attribute__ ((unused)))
+ieee802_15_4_frag_frame(netdissect_options *ndo _U_,
+			const u_char *p _U_,
+			u_int caplen _U_,
+			uint16_t fc _U_)
 {
   /* Not implement yet, might be bit hard to implement, as the
    * information to set up the fragment is coming in the previous frame
