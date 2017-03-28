@@ -188,7 +188,7 @@ static const char *p_ie_names[] = {
   "Vendor Specific Nested IE",	/* 0x02 */
   "Multiplexed IE (802.15.9)",	/* 0x03 */
   "Omnibus Payload Group IE",	/* 0x04 */
-  "Reserved 0x05",		/* 0x05 */
+  "IETF IE",			/* 0x05 */
   "Reserved 0x06",		/* 0x06 */
   "Reserved 0x07",		/* 0x07 */
   "Reserved 0x08",		/* 0x08 */
@@ -1273,6 +1273,107 @@ ieee802_15_4_print_payload_ie_list(netdissect_options *ndo,
 		    EXTRACT_LE_8BITS(p + 2)));
 	  ND_PRINT((ndo, "Data = "));
 	  for(i = 3; i < ie_len; i++) {
+	    ND_PRINT((ndo, "%02x ", EXTRACT_LE_8BITS(p + i)));
+	  }
+	}
+	break;
+      case 0x3: /* Multiplexed IE (802.15.9) */
+	if (ie_len < 1) {
+	  ND_PRINT((ndo, "[ERROR: Transaction control byte missing]"));
+	} else {
+	  int transfer_type, tid, fragment_number, data_start;
+	  transfer_type = EXTRACT_LE_8BITS(p) & 0x7;
+	  tid = EXTRACT_LE_8BITS(p) >> 3;
+	  switch (transfer_type) {
+	  case 0x00: /* Full upper layer frame. */
+	  case 0x01: /* Full upper layer frame with small Multiplex ID. */
+	    data_start = 1;
+	    ND_PRINT((ndo, "Type = Full upper layer fragment%s, ",
+		      (transfer_type == 0x01 ?
+		       " with small Multiplex ID" : "")));
+	    if (transfer_type == 0x00) {
+	      if (ie_len < 3) {
+		ND_PRINT((ndo, "[ERROR: Multiplex ID missing]"));
+	      } else {
+		data_start = 3;
+		ND_PRINT((ndo, "tid = 0x%02x, Multiplex ID = 0x%04x, ",
+			  tid, EXTRACT_LE_16BITS(p + 1)));
+	      }
+	    } else {
+	      ND_PRINT((ndo, "Multiplex ID = 0x%04x, ", tid));
+	    }
+	    ND_PRINT((ndo, "Upper layer data = "));
+	    for(i = data_start; i < ie_len; i++) {
+	      ND_PRINT((ndo, "%02x ", EXTRACT_LE_8BITS(p + i)));
+	    }
+	    break;
+	  case 0x02: /* First, or middle, Fragments */
+	  case 0x04: /* Last fragment */
+	    if (ie_len < 2) {
+	      ND_PRINT((ndo, "[ERROR: fragment number missing]"));
+	    } else {
+	      fragment_number = EXTRACT_LE_8BITS(p + 1);
+	      ND_PRINT((ndo, "Type = %s, tid = 0x%02x, fragment = 0x%02x, ",
+			(transfer_type == 0x02 ?
+			 (fragment_number == 0 ?
+			  "First fragment" : "Middle fragment") :
+			 "Last fragment"), tid,
+			fragment_number));
+	      data_start = 2;
+	      if (fragment_number == 0) {
+		if (ie_len < 6) {
+		  ND_PRINT((ndo, "[ERROR: Total upper layer size or multiplex ID missing]"));
+		} else {
+		  int total_size, multiplex_id;
+		  total_size = EXTRACT_LE_16BITS(p + 2);
+		  multiplex_id = EXTRACT_LE_16BITS(p + 4);
+		  ND_PRINT((ndo, "Total upper layer size = 0x%04x, Multiplex ID = 0x%04x, ",
+			    total_size, multiplex_id));
+		}
+		data_start = 6;
+	      }
+	      ND_PRINT((ndo, "Upper layer data = "));
+	      for(i = data_start; i < ie_len; i++) {
+		ND_PRINT((ndo, "%02x ", EXTRACT_LE_8BITS(p + i)));
+	      }
+	    }
+	    break;
+	  case 0x06: /* Abort code */
+	    if (ie_len == 1) {
+	      ND_PRINT((ndo, "Type = Abort, tid = 0x%02x, no max size given",
+			tid));
+	    } else if (ie_len == 3) {
+	      ND_PRINT((ndo, "Type = Abort, tid = 0x%02x, max size = 0x%04x",
+			tid, EXTRACT_LE_16BITS(p + 1)));
+	    } else {
+	      ND_PRINT((ndo, "Type = Abort, tid = 0x%02x, invalid length = %d (not 1 or 3)",
+			tid, ie_len));
+	      ND_PRINT((ndo, "Abort data = "));
+	      for(i = 1; i < ie_len; i++) {
+		ND_PRINT((ndo, "%02x ", EXTRACT_LE_8BITS(p + i)));
+	      }
+	    }
+	    break;
+	  case 0x03: /* Reserved */
+	  case 0x05: /* Reserved */
+	  case 0x07: /* Reserved */
+	    ND_PRINT((ndo, "Type = %d (Reserved), tid = 0x%02x, ",
+		      transfer_type, tid));
+	    ND_PRINT((ndo, "Upper layer data = "));
+	    for(i = 1; i < ie_len; i++) {
+	      ND_PRINT((ndo, "%02x ", EXTRACT_LE_8BITS(p + i)));
+	    }
+	    break;
+	  }
+	}
+	break;
+      case 0x5: /* IETF IE */
+	if (ie_len < 1) {
+	  ND_PRINT((ndo, "[ERROR: Subtype ID missing]"));
+	} else {	
+	  ND_PRINT((ndo, "Subtype ID = 0x%02x, Subtype content = ",
+		    EXTRACT_LE_8BITS(p)));
+	  for(i = 1; i < ie_len; i++) {
 	    ND_PRINT((ndo, "%02x ", EXTRACT_LE_8BITS(p + i)));
 	  }
 	}
