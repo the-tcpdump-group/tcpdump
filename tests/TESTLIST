@@ -24,6 +24,7 @@ mpbgp-linklocal-nexthop mpbgp-linklocal-nexthop.pcap mpbgp-linklocal-nexthop.out
 bgp_infloop-v		bgp-infinite-loop.pcap		bgp_infloop-v.out	-t -v
 bgp-aigp	bgp-aigp.pcap	bgp-aigp.out	-t -v
 bgp-large-community bgp-large-community.pcap bgp-large-community.out -t -v
+bgp-shutdown-communication bgp-shutdown-communication.pcap bgp-shutdown-communication.out -t -v -n
 
 # EAP tests
 eapon1 eapon1.pcap eapon1.out -t
