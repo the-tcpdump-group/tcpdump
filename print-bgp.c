@@ -2679,7 +2679,7 @@ bgp_notification_print(netdissect_options *ndo,
 	     * draft-ietf-idr-shutdown describes a method to send a communication
 	     * intended for human consumption regarding the Administrative Shutdown
 	     */
-	    if((bgpn.bgpn_minor == BGP_NOTIFY_MINOR_CEASE_SHUT ||
+	    if ((bgpn.bgpn_minor == BGP_NOTIFY_MINOR_CEASE_SHUT ||
 		bgpn.bgpn_minor == BGP_NOTIFY_MINOR_CEASE_RESET) &&
 		length >= BGP_NOTIFICATION_SIZE + 1) {
 		    tptr = dat + BGP_NOTIFICATION_SIZE;
@@ -2687,7 +2687,8 @@ bgp_notification_print(netdissect_options *ndo,
 		    shutdown_comm_length = *(tptr);
 		    remainder_offset = 0;
 		    /* garbage, hexdump it all */
-		    if (shutdown_comm_length > BGP_NOTIFY_MINOR_CEASE_ADMIN_SHUTDOWN_LEN) {
+		    if (shutdown_comm_length > BGP_NOTIFY_MINOR_CEASE_ADMIN_SHUTDOWN_LEN ||
+			shutdown_comm_length > length - (BGP_NOTIFICATION_SIZE + 1)) {
 			    ND_PRINT((ndo, ", invalid Shutdown Communication length"));
 		    }
 		    else if (shutdown_comm_length == 0) {
@@ -2698,7 +2699,7 @@ bgp_notification_print(netdissect_options *ndo,
 		    else {
 			    ND_TCHECK2(*(tptr+1), shutdown_comm_length);
 			    ND_PRINT((ndo, ", Shutdown Communication (length: %u): \"", shutdown_comm_length));
-			    safeputs(ndo, tptr+1, shutdown_comm_length);
+			    fn_printn(ndo, tptr+1, shutdown_comm_length, NULL);
 			    ND_PRINT((ndo, "\""));
 			    remainder_offset += shutdown_comm_length + 1;
 		    }
