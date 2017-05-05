@@ -2699,7 +2699,7 @@ bgp_notification_print(netdissect_options *ndo,
 		    else {
 			    ND_TCHECK2(*(tptr+1), shutdown_comm_length);
 			    ND_PRINT((ndo, ", Shutdown Communication (length: %u): \"", shutdown_comm_length));
-			    fn_printn(ndo, tptr+1, shutdown_comm_length, NULL);
+			    (void)fn_printn(ndo, tptr+1, shutdown_comm_length, NULL);
 			    ND_PRINT((ndo, "\""));
 			    remainder_offset += shutdown_comm_length + 1;
 		    }
