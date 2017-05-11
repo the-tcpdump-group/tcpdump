@@ -1264,7 +1264,7 @@ print_ccp_config_options(netdissect_options *ndo,
 		ND_TCHECK2(*(p + 2), 1);
 		ND_PRINT((ndo, ": Window: %uK, Method: %s (0x%x), MBZ: %u, CHK: %u",
 			(p[2] & 0xf0) >> 4,
-			((p[2] & 0x0f) == 8) ? "zlib" : "unkown",
+			((p[2] & 0x0f) == 8) ? "zlib" : "unknown",
 			p[2] & 0x0f, (p[3] & 0xfc) >> 2, p[3] & 0x03));
 		break;
 
