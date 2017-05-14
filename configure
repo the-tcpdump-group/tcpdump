@@ -8161,7 +8161,23 @@ $as_echo "yes, if available" >&6; }
 fi
 
 if test "$want_libcrypto" != "no"; then
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for DES_cbc_encrypt in -lcrypto" >&5
+	#
+	# If we don't have the header, no point in checking the
+	# library.
+	#
+	# Yes, there are OSes that provide the library but not
+	# the header.  (I'm looking at *you*, recent versions of
+	# OS X/macOS.)
+	#
+	for ac_header in openssl/crypto.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "openssl/crypto.h" "ac_cv_header_openssl_crypto_h" "$ac_includes_default"
+if test "x$ac_cv_header_openssl_crypto_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_OPENSSL_CRYPTO_H 1
+_ACEOF
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for DES_cbc_encrypt in -lcrypto" >&5
 $as_echo_n "checking for DES_cbc_encrypt in -lcrypto... " >&6; }
 if ${ac_cv_lib_crypto_DES_cbc_encrypt+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -8206,13 +8222,18 @@ _ACEOF
 
 fi
 
-	for ac_header in openssl/evp.h
+		for ac_header in openssl/evp.h
 do :
   ac_fn_c_check_header_mongrel "$LINENO" "openssl/evp.h" "ac_cv_header_openssl_evp_h" "$ac_includes_default"
 if test "x$ac_cv_header_openssl_evp_h" = xyes; then :
   cat >>confdefs.h <<_ACEOF
 #define HAVE_OPENSSL_EVP_H 1
 _ACEOF
+
+fi
+
+done
+
 
 fi
 

@@ -1112,8 +1112,19 @@ AC_ARG_WITH(crypto,
 	AC_MSG_RESULT([yes, if available])
 ])
 if test "$want_libcrypto" != "no"; then
-	AC_CHECK_LIB(crypto, DES_cbc_encrypt)
-	AC_CHECK_HEADERS(openssl/evp.h)
+	#
+	# If we don't have the header, no point in checking the
+	# library.
+	#
+	# Yes, there are OSes that provide the library but not
+	# the header.  (I'm looking at *you*, recent versions of
+	# OS X/macOS.)
+	#
+	AC_CHECK_HEADERS(openssl/crypto.h,
+	[
+		AC_CHECK_LIB(crypto, DES_cbc_encrypt)
+		AC_CHECK_HEADERS(openssl/evp.h)
+	])
 fi
 
 # Check for libcap-ng
