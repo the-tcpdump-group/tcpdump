@@ -690,14 +690,14 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 				ND_PRINT((ndo, "kip "));
 			llap_print(ndo, cp, length);
 		} else {
-			if (ulen > length)
+			if (ulen > length && !fragmented)
 				ND_PRINT((ndo, "UDP, bad length %u > %u",
 				    ulen, length));
 			else
 				ND_PRINT((ndo, "UDP, length %u", ulen));
 		}
 	} else {
-		if (ulen > length)
+		if (ulen > length && !fragmented)
 			ND_PRINT((ndo, "UDP, bad length %u > %u",
 			    ulen, length));
 		else
