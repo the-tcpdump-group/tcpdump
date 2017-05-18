@@ -446,3 +446,12 @@ rtp-seg-fault-2  rtp-seg-fault-2.pcap  rtp-seg-fault-2.out  -t -v -T rtp
 # NFS tests
 # fuzzed pcap
 nfs-seg-fault-1  nfs-seg-fault-1.pcap  nfs-seg-fault-1.out  -t
+
+# MACsec
+macsec-encrypted       macsec-encrypted.pcap          macsec-encrypted.out        -t -e
+macsec-changed         macsec-changed.pcap            macsec-changed.out          -t -e
+macsec-integonly       macsec-integonly.pcap          macsec-integonly.out        -t -e
+macsec-snap            macsec-snap.pcap               macsec-snap.out             -t -e
+macsec-short-shorter   macsec-short-shorter.pcap      macsec-short-shorter.out    -t -e
+macsec-short-longer    macsec-short-longer.pcap       macsec-short-longer.out     -t -e
+macsec-short-valid     macsec-short-valid.pcap        macsec-short-valid.out      -t -e

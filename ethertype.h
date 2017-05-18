@@ -118,6 +118,9 @@
 #ifndef	ETHERTYPE_8021QinQ
 #define	ETHERTYPE_8021QinQ      0x88a8
 #endif
+#ifndef ETHERTYPE_MACSEC
+#define ETHERTYPE_MACSEC	0x88e5
+#endif
 #ifndef ETHERTYPE_IPX
 #define ETHERTYPE_IPX		0x8137
 #endif

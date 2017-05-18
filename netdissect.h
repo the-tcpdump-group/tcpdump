@@ -547,6 +547,9 @@ extern void lwapp_control_print(netdissect_options *, const u_char *, u_int, int
 extern void lwapp_data_print(netdissect_options *, const u_char *, u_int);
 extern void lwres_print(netdissect_options *, const u_char *, u_int);
 extern void m3ua_print(netdissect_options *, const u_char *, const u_int);
+extern int macsec_print(netdissect_options *, const u_char **,
+			 u_int *, u_int *, u_int *,
+			 u_short *);
 extern void medsa_print(netdissect_options *, const u_char *, u_int, u_int, const struct lladdr_info *, const struct lladdr_info *);
 extern u_int mfr_print(netdissect_options *, register const u_char *, u_int);
 extern void mobile_print(netdissect_options *, const u_char *, u_int);

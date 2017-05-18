@@ -42,6 +42,7 @@ const struct tok ethertype_values[] = {
     { ETHERTYPE_8021Q9100,	"802.1Q-9100" },
     { ETHERTYPE_8021QinQ,	"802.1Q-QinQ" },
     { ETHERTYPE_8021Q9200,	"802.1Q-9200" },
+    { ETHERTYPE_MACSEC,		"802.1AE MACsec" },
     { ETHERTYPE_VMAN,		"VMAN" },
     { ETHERTYPE_PUP,            "PUP" },
     { ETHERTYPE_ARP,            "ARP"},
@@ -214,6 +215,18 @@ recurse:
 		caplen -= 4;
 		hdrlen += 4;
 		goto recurse;
+	} else if (length_type == ETHERTYPE_MACSEC) {
+		/*
+		 * MACsec, aka IEEE 802.1AE-2006
+		 * Print the header, and try to print the payload if it's not encrypted
+		 */
+		int ret = macsec_print(ndo, &p, &length, &caplen, &hdrlen, &length_type);
+		if (ret < 0)
+			goto recurse;
+		else if (ret == 0)
+			goto raw;
+		else
+			return ret;
 	} else if (length_type == ETHERTYPE_JUMBO) {
 		/*
 		 * Alteon jumbo frames.
@@ -235,6 +248,7 @@ recurse:
 		hdrlen += llc_hdrlen;
 	} else {
 		if (ethertype_print(ndo, length_type, p, length, caplen, &src, &dst) == 0) {
+raw:
 			/* type not known, print raw packet */
 			if (!ndo->ndo_eflag) {
 				if (print_encap_header != NULL)

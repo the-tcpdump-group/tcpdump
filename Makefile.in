@@ -164,6 +164,7 @@ LIBNETDISSECT_SRC=\
 	print-lwapp.c \
 	print-lwres.c \
 	print-m3ua.c \
+	print-macsec.c \
 	print-medsa.c \
 	print-mobile.c \
 	print-mobility.c \
