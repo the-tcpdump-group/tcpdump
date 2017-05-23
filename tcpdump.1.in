@@ -1099,7 +1099,7 @@ TCP Packets
 \fI(N.B.:The following description assumes familiarity with
 the TCP protocol described in RFC-793.
 If you are not familiar
-with the protocol, neither this description nor \fItcpdump\fP will
+with the protocol, this description will not
 be of much use to you.)\fP
 .LP
 The general format of a tcp protocol line is:
