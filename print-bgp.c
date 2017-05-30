@@ -308,6 +308,7 @@ static const struct tok bgp_notify_minor_update_values[] = {
 };
 
 static const struct tok bgp_notify_minor_fsm_values[] = {
+    { 0,                        "Unspecified Error"},
     { 1,                        "In OpenSent State"},
     { 2,                        "In OpenConfirm State"},
     { 3,                        "In Established State"},
