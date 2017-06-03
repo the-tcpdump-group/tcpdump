@@ -3128,7 +3128,7 @@ osi_print_cksum(netdissect_options *ndo, const uint8_t *pptr,
                 ND_PRINT((ndo, " (unverified)"));
         } else {
 #if 0
-                printf("\nosi_print_cksum: %p %u %u %u\n", pptr, checksum_offset, length, ndo->ndo_snaplen);
+                printf("\nosi_print_cksum: %p %u %u\n", pptr, checksum_offset, length);
 #endif
                 calculated_checksum = create_osi_cksum(pptr, checksum_offset, length);
                 if (checksum == calculated_checksum) {
