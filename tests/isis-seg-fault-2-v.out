@@ -219,4 +219,4 @@ IS-IS, length 1497
 		0x0080:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa
 		0x0090:  aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa
 		0x00a0:  aaaa aaaa aaaa aaaa aaaa
-	      164 straggler bytes
+	    unknown TLV #170, length: 170 [|isis]
