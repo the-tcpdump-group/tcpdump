@@ -264,14 +264,13 @@ struct netdissect_options {
  *       savefile header to control the size of the buffer they allocate,
  *       so a size of, say, 2^31-1 might not work well.
  *
- * XXX - does it need to be bigger still?
+ * XXX - does it need to be bigger still?  Note that, for versions of
+ * libpcap with pcap_create()/pcap_activate(), if no -s flag is specified
+ * or -s 0 is specified, we won't set the snapshot length at all, and will
+ * let libpcap choose a snapshot length; newer versions may choose a bigger
+ * value than 262144 for D-Bus, for example.
  */
 #define MAXIMUM_SNAPLEN	262144
-
-/*
- * The default snapshot length is the maximum.
- */
-#define DEFAULT_SNAPLEN	MAXIMUM_SNAPLEN
 
 #define ESRC(ep) ((ep)->ether_shost)
 #define EDST(ep) ((ep)->ether_dhost)

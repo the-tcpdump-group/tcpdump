@@ -1045,10 +1045,16 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 		supports_monitor_mode = 1;
 	else
 		supports_monitor_mode = 0;
-	status = pcap_set_snaplen(pc, ndo->ndo_snaplen);
-	if (status != 0)
-		error("%s: Can't set snapshot length: %s",
-		    device, pcap_statustostr(status));
+	if (ndo->ndo_snaplen != 0) {
+		/*
+		 * A snapshot length was explicitly specified;
+		 * use it.
+		 */
+		status = pcap_set_snaplen(pc, ndo->ndo_snaplen);
+		if (status != 0)
+			error("%s: Can't set snapshot length: %s",
+			    device, pcap_statustostr(status));
+	}
 	status = pcap_set_promisc(pc, !pflag);
 	if (status != 0)
 		error("%s: Can't set promiscuous mode: %s",
@@ -1149,6 +1155,12 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 #endif /* HAVE_PCAP_SETDIRECTION */
 #else /* HAVE_PCAP_CREATE */
 	*ebuf = '\0';
+	/*
+	 * If no snapshot length was specified, or a length of 0 was
+	 * specified, default to 256KB.
+	 */
+	if (ndo->ndo_snaplen == 0)
+		ndo->ndo_snaplen = 262144;
 	pc = pcap_open_live(device, ndo->ndo_snaplen, !pflag, 1000, ebuf);
 	if (pc == NULL) {
 		/*
@@ -1215,7 +1227,6 @@ main(int argc, char **argv)
 
 	memset(ndo, 0, sizeof(*ndo));
 	ndo_set_function_pointers(ndo);
-	ndo->ndo_snaplen = DEFAULT_SNAPLEN;
 
 	cnt = -1;
 	device = NULL;
@@ -1445,8 +1456,6 @@ main(int argc, char **argv)
 			if (optarg == end || *end != '\0'
 			    || ndo->ndo_snaplen < 0 || ndo->ndo_snaplen > MAXIMUM_SNAPLEN)
 				error("invalid snaplen %s", optarg);
-			else if (ndo->ndo_snaplen == 0)
-				ndo->ndo_snaplen = MAXIMUM_SNAPLEN;
 			break;
 
 		case 'S':
@@ -1784,7 +1793,8 @@ main(int argc, char **argv)
 		}
 
 		/*
-		 * Let user own process after socket has been opened.
+		 * Let user own process after capture device has
+		 * been opened.
 		 */
 #ifndef _WIN32
 		if (setgid(getgid()) != 0 || setuid(getuid()) != 0)
@@ -1819,7 +1829,11 @@ main(int argc, char **argv)
 		}
 		i = pcap_snapshot(pd);
 		if (ndo->ndo_snaplen < i) {
-			warning("snaplen raised from %d to %d", ndo->ndo_snaplen, i);
+			if (ndo->ndo_snaplen != 0)
+				warning("snaplen raised from %d to %d", ndo->ndo_snaplen, i);
+			ndo->ndo_snaplen = i;
+		} else if (ndo->ndo_snaplen > i) {
+			warning("snaplen lowered from %d to %d", ndo->ndo_snaplen, i);
 			ndo->ndo_snaplen = i;
 		}
                 if(ndo->ndo_fflag != 0) {
