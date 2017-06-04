@@ -133,6 +133,53 @@ nflog_if_print(netdissect_options *ndo,
 			caplen -= sizeof(nflog_tlv_t);
 			break;
 		}
+		  switch(tlv->tlv_type) {
+			case NFULA_PACKET_HDR:
+			case NFULA_TIMESTAMP:
+				break;
+			case NFULA_MARK:
+				ND_PRINT((ndo, "MARK:%x ",
+					htonl(*(u_int32_t *)(p+sizeof(nflog_tlv_t)))));
+				break;
+			case NFULA_UID:
+				if(ndo->ndo_vflag)
+				    ND_PRINT((ndo, "UID:%x ",
+					htonl(*(u_int32_t *)(p+sizeof(nflog_tlv_t)))));
+				break;
+			case NFULA_GID:
+				if(ndo->ndo_vflag)
+				    ND_PRINT((ndo, "GID:%x ",
+					htonl(*(u_int32_t *)(p+sizeof(nflog_tlv_t)))));
+				break;
+			case NFULA_PREFIX:
+				if(p[sizeof(nflog_tlv_t)])
+				    ND_PRINT((ndo, "Prefix:%.*s ",size-sizeof(nflog_tlv_t),
+							p+sizeof(nflog_tlv_t)));
+				break;
+			case NFULA_IFINDEX_INDEV:
+				if(ndo->ndo_vflag > 1)
+				    ND_PRINT((ndo, "iif:%x ",
+					htonl(*(u_int32_t *)(p+sizeof(nflog_tlv_t)))));
+				break;
+			case NFULA_IFINDEX_OUTDEV:
+				if(ndo->ndo_vflag > 1)
+				    ND_PRINT((ndo, "oif:%x ",
+					htonl(*(u_int32_t *)(p+sizeof(nflog_tlv_t)))));
+				break;
+			case NFULA_IFINDEX_PHYSINDEV:
+				if(ndo->ndo_vflag > 1)
+				    ND_PRINT((ndo, "phiif:%x ",
+					htonl(*(u_int32_t *)(p+sizeof(nflog_tlv_t)))));
+				break;
+			case NFULA_IFINDEX_PHYSOUTDEV:
+				if(ndo->ndo_vflag > 1)
+				    ND_PRINT((ndo, "phoif:%x ",
+					htonl(*(u_int32_t *)(p+sizeof(nflog_tlv_t)))));
+				break;
+			default:
+				if (ndo->ndo_vflag > 2)
+				  ND_PRINT((ndo, "RC:%d/len:%d ",tlv->tlv_type,size));
+		}
 
 		p += size;
 		h_size += size;
