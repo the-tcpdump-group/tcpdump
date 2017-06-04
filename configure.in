@@ -42,7 +42,7 @@ if test "$ac_cv_header_net_pfvar_h" = yes; then
 	#include <net/if.h>
 	#include <net/pfvar.h>])
 	if test "$ac_cv_header_net_if_pflog_h" = yes; then
-		LOCALSRC="print-pflog.c $LOCALSRC"
+		LOCALSRC="print-pflog.c print-pfsync.c $LOCALSRC"
 	fi
 fi
 AC_CHECK_HEADERS(netinet/if_ether.h, , , [#include <sys/types.h>
