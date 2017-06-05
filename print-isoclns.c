@@ -2200,7 +2200,7 @@ isis_print(netdissect_options *ndo,
     }
 
     if (isis_header->fixed_len < ISIS_COMMON_HEADER_SIZE) {
-	ND_PRINT((ndo, "fixed header length %u < minimum header size %u", isis_header->fixed_len, ISIS_COMMON_HEADER_SIZE));
+	ND_PRINT((ndo, "fixed header length %u < minimum header size %u", isis_header->fixed_len, (u_int)ISIS_COMMON_HEADER_SIZE));
 	return (0);
     }
 
