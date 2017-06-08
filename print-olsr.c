@@ -422,6 +422,9 @@ olsr_print(netdissect_options *ndo,
             msg_data = tptr + sizeof(struct olsr_msg4);
         }
 
+        if (!msg_len_valid)
+            return;
+
         switch (msg_type) {
         case OLSR_HELLO_MSG:
         case OLSR_HELLO_LQ_MSG:
