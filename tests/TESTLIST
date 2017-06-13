@@ -557,6 +557,7 @@ mlppp-oobr		mlppp-oobr.pcap			mlppp-oobr.out
 
 # bad packets from Kim Gwan Yeong
 mptcp-dss-oobr		mptcp-dss-oobr.pcap		mptcp-dss-oobr.out	-v
+icmp6_nodeinfo_oobr	icmp6_nodeinfo_oobr.pcap	icmp6_nodeinfo_oobr.out
 
 # RTP tests
 # fuzzed pcap
