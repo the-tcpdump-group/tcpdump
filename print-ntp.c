@@ -279,7 +279,9 @@ ntp_print(netdissect_options *ndo,
 		return;
 
 	default:
-		ND_PRINT((ndo, "%s", ipaddr_string(ndo, &(bp->refid))));
+		/* In NTPv4 (RFC 5905) refid is an IPv4 address or first 32 bits of
+		   MD5 sum of IPv6 address */
+		ND_PRINT((ndo, "%08x", EXTRACT_32BITS(&bp->refid)));
 		break;
 	}
 
