@@ -309,10 +309,10 @@ ntp_print(netdissect_options *ndo,
 
 	if ( (sizeof(struct ntpdata) - length) == 16) { 	/* Optional: key-id */
 		ND_TCHECK(bp->key_id);
-		ND_PRINT((ndo, "\n\tKey id: %u", bp->key_id));
+		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_32BITS(&bp->key_id)));
 	} else if ( (sizeof(struct ntpdata) - length) == 0) { 	/* Optional: key-id + authentication */
 		ND_TCHECK(bp->key_id);
-		ND_PRINT((ndo, "\n\tKey id: %u", bp->key_id));
+		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_32BITS(&bp->key_id)));
 		ND_TCHECK2(bp->message_digest, sizeof (bp->message_digest));
                 ND_PRINT((ndo, "\n\tAuthentication: %08x%08x%08x%08x",
         		       EXTRACT_32BITS(bp->message_digest),
