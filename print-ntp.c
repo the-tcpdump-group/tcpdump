@@ -116,7 +116,7 @@ struct s_fixedpt {
 struct ntpdata {
 	u_char status;		/* status of local clock and leap info */
 	u_char stratum;		/* Stratum level */
-	u_char ppoll;		/* poll value */
+	int ppoll:8;		/* poll value */
 	int precision:8;
 	struct s_fixedpt root_delay;
 	struct s_fixedpt root_dispersion;
@@ -170,6 +170,7 @@ struct ntpdata {
 static void p_sfix(netdissect_options *ndo, const struct s_fixedpt *);
 static void p_ntp_time(netdissect_options *, const struct l_fixedpt *);
 static void p_ntp_delta(netdissect_options *, const struct l_fixedpt *, const struct l_fixedpt *);
+static void p_poll(netdissect_options *, register const int);
 
 static const struct tok ntp_mode_values[] = {
     { MODE_UNSPEC,    "unspecified" },
@@ -236,8 +237,10 @@ ntp_print(netdissect_options *ndo,
 		bp->stratum,
 		tok2str(ntp_stratum_values, (bp->stratum >=2 && bp->stratum<=15) ? "secondary reference" : "reserved", bp->stratum)));
 
-	ND_TCHECK(bp->ppoll);
-	ND_PRINT((ndo, ", poll %u (%us)", bp->ppoll, 1 << bp->ppoll));
+	/* Can't ND_TCHECK bp->ppoll bitfield so bp->stratum + 2 instead */
+	ND_TCHECK2(bp->stratum, 2);
+	ND_PRINT((ndo, ", poll %d", bp->ppoll));
+	p_poll(ndo, bp->ppoll);
 
 	/* Can't ND_TCHECK bp->precision bitfield so bp->distance + 0 instead */
 	ND_TCHECK2(bp->root_delay, 0);
@@ -423,5 +426,19 @@ p_ntp_delta(netdissect_options *ndo,
 	ff = ff / FMAXINT;			/* shift radix point by 32 bits */
 	f = (uint32_t)(ff * 1000000000.0);	/* treat fraction as parts per billion */
 	ND_PRINT((ndo, "%s%d.%09d", signbit ? "-" : "+", i, f));
+}
+
+/* Prints polling interval in log2 as seconds or fraction of second */
+static void
+p_poll(netdissect_options *ndo,
+       register const int poll)
+{
+	if (poll <= -32 || poll >= 32)
+		return;
+
+	if (poll >= 0)
+		ND_PRINT((ndo, " (%us)", 1U << poll));
+	else
+		ND_PRINT((ndo, " (1/%us)", 1U << -poll));
 }
 
