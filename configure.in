@@ -1008,5 +1008,5 @@ AC_OUTPUT_COMMANDS([if test -f .devel; then
 	cat Makefile-devel-adds >> Makefile
 	make depend
 fi])
-AC_OUTPUT(Makefile tcpdump.1)
+AC_OUTPUT(Makefile CMakeLists.txt tcpdump.1)
 exit 0

@@ -3662,9 +3662,9 @@ fi
 
 CFLAGS="$save_CFLAGS"
 if test "$ac_cv___attribute___unused" = "yes"; then
-  V_DEFS="$V_DEFS -D_U_=\"__attribute__((unused))\""
+  V_DEFS="$V_DEFS \"-D_U_=__attribute__((unused))\""
 else
-  V_DEFS="$V_DEFS -D_U_=\"\""
+  V_DEFS="$V_DEFS -D_U_="
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv___attribute___unused" >&5
 $as_echo "$ac_cv___attribute___unused" >&6; }
@@ -8436,7 +8436,7 @@ ac_config_headers="$ac_config_headers config.h"
 
 ac_config_commands="$ac_config_commands default-1"
 
-ac_config_files="$ac_config_files Makefile tcpdump.1"
+ac_config_files="$ac_config_files Makefile CMakeLists.txt tcpdump.1"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -9140,6 +9140,7 @@ do
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
     "default-1") CONFIG_COMMANDS="$CONFIG_COMMANDS default-1" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+    "CMakeLists.txt") CONFIG_FILES="$CONFIG_FILES CMakeLists.txt" ;;
     "tcpdump.1") CONFIG_FILES="$CONFIG_FILES tcpdump.1" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;

@@ -15,6 +15,33 @@ directory), run ./configure (a shell script).  "configure" will
 determine your system attributes and generate an appropriate Makefile
 from Makefile.in.  Now build tcpdump by running "make".
 
+    ./configure
+    make
+
+For convenience ./configure also generates a file "CMakeLists.txt" from
+the file "CMakeLists.txt.in". Then you can open the project tcpdump
+using a CMake-friendly IDE as Qt Creator, KDevelop, GNOME Builder, 
+NetBeans, CLion, Visual Studio, Code::Blocks, Eclipse... and many more.
+
+You can also use "CMakeLists.txt" to build from command line:
+
+    ./configure
+    mkdir your-build-directory
+    cd    your-build-directory
+    cmake ..         # Generate Makefiles on Unix-like OS
+    cmake --build .  # Same as just "make"
+
+You can also replace "make" by "ninja" (see ninja-build.org)
+
+    ./configure
+    mkdir build
+    cd    build
+    cmake .. -G Ninja  # Generate Ninja build files
+    cmake --build .    # Same as just "ninja"
+
+However the current "CMakeLists.txt" is still for developers only,
+and cannot (yet?) be used to install tcpdump or to replace "./configure".
+
 If everything builds ok, su and type "make install".  This will install
 tcpdump and the manual entry.  Any user will be able to use tcpdump to
 read saved captures.  Whether a user will be able to capture traffic

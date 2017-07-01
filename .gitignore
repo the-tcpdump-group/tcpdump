@@ -1,6 +1,8 @@
 *.orig
 *.rej
 Makefile
+CMakeLists.txt
+CMakeLists.txt.user
 *~
 *.o
 libnetdissect.a
