@@ -156,7 +156,8 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 {
 	struct sa_list *sa;
 	const u_char *iv;
-	int len;
+	u_char *buf_mut, *output_buffer;
+	int len, block_size, cipher_nid, output_buffer_size ;
 	EVP_CIPHER_CTX *ctx;
 
 	/* initiator arg is any non-zero value */
@@ -190,14 +191,29 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 		return 0;
 	if (EVP_CipherInit(ctx, sa->evp, sa->secret, NULL, 0) < 0)
 		(*ndo->ndo_warning)(ndo, "espkey init failed");
-	EVP_CipherInit(ctx, NULL, NULL, iv, 0);
-	EVP_Cipher(ctx, buf, buf, len);
+        EVP_CipherInit(ctx, NULL, NULL, iv, 0);
+
+        /* We need a block size */
+        block_size = EVP_CIPHER_CTX_block_size(ctx);
+        /* We need the buffer size to be multiple of a block size */
+        output_buffer_size = len + (block_size - len % block_size);
+        output_buffer = (u_char *)calloc(output_buffer_size, sizeof(u_char));
+	/* EVP_Cipher output buffer should be different from the input one.
+         * Also it should be of size that is multiple of cipher block size. */
+	EVP_Cipher(ctx, output_buffer, buf, len);
 	EVP_CIPHER_CTX_free(ctx);
+
+        buf_mut = (u_char*) buf;
+        /* Of course this is wrong, because buf is a const buffer, but changing this
+         * would require more complicated fix. */
+        memcpy(buf_mut, output_buffer, len);
+        free(output_buffer);
 
 	ndo->ndo_packetp = buf;
 	ndo->ndo_snapend = end;
 
 	return 1;
+
 
 }
 USES_APPLE_RST
@@ -606,6 +622,8 @@ esp_print(netdissect_options *ndo,
 	const u_char *ivoff;
 	const u_char *p;
 	EVP_CIPHER_CTX *ctx;
+        u_char *buf_mut, *output_buffer;
+        int block_size, cipher_nid, output_buffer_size;
 #endif
 
 	esp = (const struct newesp *)bp;
@@ -716,8 +734,19 @@ esp_print(netdissect_options *ndo,
 
 			p = ivoff;
 			EVP_CipherInit(ctx, NULL, NULL, p, 0);
-			EVP_Cipher(ctx, p + ivlen, p + ivlen, ep - (p + ivlen));
+                        len = ep - (p + ivlen);
+
+                        /* We need a block size */
+                        block_size = EVP_CIPHER_CTX_block_size(ctx);
+                        /* We need the buffer size to be multiple of a block size */
+                        output_buffer_size = len + (block_size - len % block_size);
+                        output_buffer = (u_char *)calloc(output_buffer_size, sizeof(u_char));
+                        /* EVP_Cipher output buffer should be different from the input one.
+                         * Also it should be of size that is multiple of cipher block size. */
+                        EVP_Cipher(ctx, output_buffer, p + ivlen, len);
 			EVP_CIPHER_CTX_free(ctx);
+                        memcpy(p + ivlen, output_buffer, len);
+                        free(output_buffer);
 			advance = ivoff - (const u_char *)esp + ivlen;
 		} else
 			advance = sizeof(struct newesp);
