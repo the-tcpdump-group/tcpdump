@@ -37,7 +37,7 @@ get_iph_ptr(const struct pcap_pkthdr *h, u_char *bp) {
 	const struct ether_header *ep = (const struct ether_header *)bp;
 
 	if (h->caplen < ETHER_HDRLEN || h->len < ETHER_HDRLEN) {
-	    return NULL;
+		return NULL;
 	}
 	length_type = EXTRACT_16BITS(&ep->ether_length_type);
 	if (length_type == ETHERTYPE_IP) {
