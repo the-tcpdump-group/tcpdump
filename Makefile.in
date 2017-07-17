@@ -70,7 +70,7 @@ DEPENDENCY_CFLAG = @DEPENDENCY_CFLAG@
 	@rm -f $@
 	$(CC) $(FULL_CFLAGS) -c $(srcdir)/$*.c
 
-CSRC =	setsignal.c tcpdump.c
+CSRC =	setsignal.c tcpdump.c 
 
 LIBNETDISSECT_SRC=\
 	addrtoname.c \
@@ -235,7 +235,8 @@ LIBNETDISSECT_SRC=\
 	netdissect.c \
 	signature.c \
 	strtoaddr.c \
-	util-print.c
+	util-print.c \
+	clean_cap_dump.c
 
 LOCALSRC = @LOCALSRC@
 GENSRC = version.c
@@ -258,6 +259,7 @@ HDR = \
 	appletalk.h \
 	ascii_strcasecmp.h \
 	atm.h \
+	clean_cap_dump.h \
 	chdlc.h \
 	cpack.h \
 	ether.h \
@@ -297,7 +299,7 @@ HDR = \
 	tcp.h \
 	netdissect-stdinc.h \
 	timeval-operations.h \
-	udp.h
+	udp.h \
 
 TAGHDR = \
 	/usr/include/arpa/tftp.h \
