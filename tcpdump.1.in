@@ -27,7 +27,7 @@ tcpdump \- dump traffic on a network
 .na
 .B tcpdump
 [
-.B \-AbdDefhHIJKlLnNOpqStuUvxX#
+.B \-0AbdDefhHIJKlLnNOpqStuUvxX#
 ] [
 .B \-B
 .I buffer_size
@@ -130,6 +130,11 @@ tcpdump \- dump traffic on a network
 ]
 .ti +8
 [
+.BI \-\-external\-mask
+.I mask_ip
+]
+.ti +8
+[
 .B \-\-immediate\-mode
 ]
 [
@@ -220,6 +225,12 @@ special privileges; see the
 man page for details.  Reading a saved packet file doesn't require
 special privileges.
 .SH OPTIONS
+.TP
+.B \-0
+Zero out payload bytes beyond TCP or UDP headers.
+.TP
+.B \-00
+Remove payload bytes beyond TCP or UDP headers.
 .TP
 .B \-A
 Print each packet (minus its link level header) in ASCII.  Handy for
@@ -627,6 +638,14 @@ Setting
 \fIsnaplen\fP to 0 sets it to the default of 262144,
 for backwards compatibility with recent older versions of
 .IR tcpdump .
+.TP
+.BI \-* " mask_ip"
+.PD 0
+.TP
+.BI \-\-external\-mask " mask_ip"
+.PD
+Mask external IPv4 addresses (non-RFC 1918, plus other reserved spaces)
+to the designated IP.
 .TP
 .BI \-T " type"
 Force packets selected by "\fIexpression\fP" to be interpreted the
