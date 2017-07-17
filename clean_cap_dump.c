@@ -1,14 +1,6 @@
 /* CyberReboot edition:
  *
- * In new creating sanitization methods for tcpdump, it became necessary
- * to make modifications to pcap_dump() supplied by pcap/sf-pcap -- and in
- * so doing, required an awareness of internal structs located in the
- * pcap-int.h (a component of libpcap). To simplify things, required data
- * structs have been extrapolated and given new names to avoid conflict,
- * and while these are completely extricated from libpcap's internal
- * structure, data types and sizes should be identical (as they've been
- * shamelessly cut-and-pasted from pcap-int.h).
- *
+ * Author: achang@cyberreboot.org
  *
  */
 
