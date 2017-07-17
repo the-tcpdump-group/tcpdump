@@ -43,6 +43,7 @@ get_iph_ptr(const struct pcap_pkthdr *h, u_char *bp) {
     u_char *s;
     const struct ip *ip;
     const struct ether_header *ep = (const struct ether_header *)bp;
+
     if (h->caplen < ETHER_HDRLEN || h->len < ETHER_HDRLEN) {
         return NULL;
     }
@@ -146,6 +147,7 @@ int
 mask_ip(u_char *iph, int len, const char * maskIP) {
     struct ip *ip = (struct ip *)iph;
     uint32_t m = 0;
+    
     inet_pton(AF_INET, maskIP, &m);
 
     if (validate_iph_len(iph, len) < 0)
