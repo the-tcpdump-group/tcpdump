@@ -1588,17 +1588,16 @@ main(int argc, char **argv)
 			ndo->ndo_packet_number = 1;
 			break;
 
-        case '0':       // CyberReboot: new flag
-            ++no_payload;
-            break;
+		case '0':      /* CyberReboot: new flag */ 
+			++no_payload;
+			break;
 
-        case '*':       // CyberReboot: new flag
-            if (verify_IP(optarg) < 0)
-                error("IP address mask is not a legal IP address");
-            ++mask_external_ip;
-            dumpinfo.maskIP = optarg;
-            break;
-
+		case '*':       /* CyberReboot: new flag */
+			if (verify_IP(optarg) < 0)
+				error("IP address mask is not a legal IP address");
+ 			++mask_external_ip;
+			dumpinfo.maskIP = optarg;
+			break;
 		case OPTION_VERSION:
 			print_version();
 			exit_tcpdump(0);
@@ -2398,7 +2397,7 @@ static void
 dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
 	struct dump_info *dump_info;
-    int dlt;
+	int dlt;
 
 	++packets_captured;
 
@@ -2586,14 +2585,13 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 		}
 	}
 
-    // CyberReboot dump insert:
-    if (no_payload > 0 || mask_external_ip > 0) {
-        //printf("DEBUG: packet #%d\n", packets_captured);
-        pcap_mod_and_dump((u_char *)dump_info->p, h, sp, pcap_datalink(dump_info->pd),
-                          no_payload, mask_external_ip, dump_info->maskIP);
-    } else {
-        pcap_dump((u_char *)dump_info->p, h, sp);
-    }
+	/* CyberReboot dump insert: */
+	if (no_payload > 0 || mask_external_ip > 0) {
+		pcap_mod_and_dump((u_char *)dump_info->p, h, sp, pcap_datalink(dump_info->pd),
+				  no_payload, mask_external_ip, dump_info->maskIP);
+	} else {
+		pcap_dump((u_char *)dump_info->p, h, sp);
+	}
 
 #ifdef HAVE_PCAP_DUMP_FLUSH
 	if (Uflag)
@@ -2611,16 +2609,15 @@ dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	++packets_captured;
 	++infodelay;
 
-    struct dump_info *dump_info = (struct dump_info *)user;
+	struct dump_info *dump_info = (struct dump_info *)user;
 
-    // CyberReboot dump insert:
-    if (no_payload > 0 || mask_external_ip > 0) {
-        //printf("DEBUG: packet #%d\n", packets_captured);
-        pcap_mod_and_dump((u_char *)dump_info->p, h, sp, pcap_datalink(dump_info->pd),
-                          no_payload, mask_external_ip, dump_info->maskIP);
-    } else {
-        pcap_dump((u_char *)dump_info->p, h, sp);
-    }
+	/* CyberReboot dump insert: */
+	if (no_payload > 0 || mask_external_ip > 0) {
+		pcap_mod_and_dump((u_char *)dump_info->p, h, sp, pcap_datalink(dump_info->pd),
+				no_payload, mask_external_ip, dump_info->maskIP);
+	} else {
+		pcap_dump((u_char *)dump_info->p, h, sp);
+	}
 
 #ifdef HAVE_PCAP_DUMP_FLUSH
 	if (Uflag)
@@ -2638,6 +2635,9 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	++packets_captured;
 
 	++infodelay;
+	if (no_payload > 0 || mask_external_ip > 0) {
+		warning("Not saving to pcap file; ignoring -0 and -* flags");
+	}
 	pretty_print_packet((netdissect_options *)user, h, sp, packets_captured);
 
 	--infodelay;
