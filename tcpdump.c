@@ -1187,7 +1187,7 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 }
 
 /* Returns 0 if the given string is a valid IP address; else, returns -1. */
-int
+static int
 verify_IP(char *ip) {
 	struct sockaddr_in sa;
 	if (inet_pton(AF_INET, ip, &(sa.sin_addr)) == 1)
@@ -2405,7 +2405,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 
 	dump_info = (struct dump_info *)user;
 
-	if ((no_payload > 0 || mask_external_ip > 0) && pcap_datalink(user->pd) != DLT_EN10MB) {
+	if ((no_payload > 0 || mask_external_ip > 0) && pcap_datalink(dump_info->pd) != DLT_EN10MB) {
 		error("-0 and -* flags are only available for Ethernet data link type; exiting");
 		exit_tcpdump(0);
 	}
@@ -2611,14 +2611,15 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 static void
 dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
+	struct dump_info *dump_info;
 	++packets_captured;
 	++infodelay;
 
-	struct dump_info *dump_info = (struct dump_info *)user;
+	dump_info = (struct dump_info *)user;
 
 	/* CyberReboot dump insert: */
 	if (no_payload > 0 || mask_external_ip > 0) {
-		if (pcap_datalink(user->pd) != DLT_EN10MB) {
+		if (pcap_datalink(dump_info->pd) != DLT_EN10MB) {
 			error("-0 and -* flags are only available for Ethernet data link type; exiting");
 			exit_tcpdump(0);
 		}
