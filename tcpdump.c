@@ -176,11 +176,11 @@ static int Wflag;			/* recycle output files after this number of files */
 static int WflagChars;
 static char *zflag = NULL;		/* compress each savefile using a specified command (like gzip or bzip2) */
 static int immediate_mode;
-static int no_payload = 0;       	/* CyberReboot: clear away payload */
-static int mask_external_ip = 0; 	/* CyberReboot: mask external IPs */
+static int no_payload = 0;       /* CyberReboot: ndo_0flag copy; clear away payload */
+static int mask_external_ip = 0; /* CyberReboot: ndo_starflag copy; mask external IPs */
 
-static int infodelay;     
-static int infoprint;    
+static int infodelay;
+static int infoprint;
 
 char *program_name;
 
@@ -695,25 +695,25 @@ getWflagChars(int x)
 static void
 MakeFilename(char *buffer, char *orig_name, int cnt, int max_chars)
 {
-	char *filename = malloc(PATH_MAX + 1);
-	if (filename == NULL)
-	error("Makefilename: malloc");
+        char *filename = malloc(PATH_MAX + 1);
+        if (filename == NULL)
+            error("Makefilename: malloc");
 
         /* Process with strftime if Gflag is set. */
         if (Gflag != 0) {
-		struct tm *local_tm;
+          struct tm *local_tm;
 
-		/* Convert Gflag_time to a usable format */
-		if ((local_tm = localtime(&Gflag_time)) == NULL) {
-			error("MakeTimedFilename: localtime");
-		}
+          /* Convert Gflag_time to a usable format */
+          if ((local_tm = localtime(&Gflag_time)) == NULL) {
+                  error("MakeTimedFilename: localtime");
+          }
 
-		/* There's no good way to detect an error in strftime since a return
-		 * value of 0 isn't necessarily failure.
-		 */
-		strftime(filename, PATH_MAX, orig_name, local_tm);
-	} else {
-		strncpy(filename, orig_name, PATH_MAX);
+          /* There's no good way to detect an error in strftime since a return
+           * value of 0 isn't necessarily failure.
+           */
+          strftime(filename, PATH_MAX, orig_name, local_tm);
+        } else {
+          strncpy(filename, orig_name, PATH_MAX);
         }
 
 	if (cnt == 0 && max_chars == 0)
@@ -721,7 +721,7 @@ MakeFilename(char *buffer, char *orig_name, int cnt, int max_chars)
 	else
 		if (snprintf(buffer, PATH_MAX + 1, "%s%0*d", filename, max_chars, cnt) > PATH_MAX)
                   /* Report an error if the filename is too large */
-			error("too many output files or filename is too long (> %d)", PATH_MAX);
+                  error("too many output files or filename is too long (> %d)", PATH_MAX);
         free(filename);
 }
 
@@ -1191,7 +1191,7 @@ int
 verify_IP(char *ip) {
 	struct sockaddr_in sa;
 	if (inet_pton(AF_INET, ip, &(sa.sin_addr)) == 1)
-		return 0;
+       		 return 0;
 	return -1;
 }
 
@@ -1271,8 +1271,7 @@ main(int argc, char **argv)
 	if (abort_on_misalignment(ebuf, sizeof(ebuf)) < 0)
 		error("%s", ebuf);
 
-	while (
-		(op = getopt_long(argc, argv, SHORTOPTS, longopts, NULL)) != -1)
+	while ((op = getopt_long(argc, argv, SHORTOPTS, longopts, NULL)) != -1)
 		switch (op) {
 
 		case 'a':
@@ -1598,12 +1597,6 @@ main(int argc, char **argv)
 			dumpinfo.maskIP = optarg;
 			break;
 
-		case '*':       /* CyberReboot: new flag */
-			if (verify_IP(optarg) < 0)
-				error("IP address mask is not a legal IP address");
- 			++mask_external_ip;
-			dumpinfo.maskIP = optarg;
-			break;
 		case OPTION_VERSION:
 			print_version();
 			exit_tcpdump(0);
@@ -1727,7 +1720,7 @@ main(int argc, char **argv)
 
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
 		pd = pcap_open_offline_with_tstamp_precision(RFileName,
-			ndo->ndo_tstamp_precision, ebuf);
+		    ndo->ndo_tstamp_precision, ebuf);
 #else
 		pd = pcap_open_offline(RFileName, ebuf);
 #endif
@@ -2061,6 +2054,8 @@ main(int argc, char **argv)
     			pcap_dump_flush(p);
 #endif
 	} else {
+		if (no_payload > 0 || mask_external_ip > 0)
+			warning("Flags -0 or -* set without savefile will be ignored.");
 		dlt = pcap_datalink(pd);
 		ndo->ndo_if_printer = get_if_printer(ndo, dlt);
 		callback = print_packet;
@@ -2403,7 +2398,7 @@ static void
 dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
 	struct dump_info *dump_info;
-	int dlt;
+    int dlt;
 
 	++packets_captured;
 
@@ -2591,13 +2586,13 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 		}
 	}
 
-	/* CyberReboot dump insert: */
-	if (no_payload > 0 || mask_external_ip > 0) {
-		pcap_mod_and_dump((u_char *)dump_info->p, h, sp, pcap_datalink(dump_info->pd),
-				no_payload, mask_external_ip, dump_info->maskIP);
-	} else {
-		pcap_dump((u_char *)dump_info->p, h, sp);
-	}
+    /* CyberReboot dump insert: */
+    if (no_payload > 0 || mask_external_ip > 0) {
+        pcap_mod_and_dump((u_char *)dump_info->p, h, sp, pcap_datalink(dump_info->pd),
+                          no_payload, mask_external_ip, dump_info->maskIP);
+    } else {
+        pcap_dump((u_char *)dump_info->p, h, sp);
+    }
 
 #ifdef HAVE_PCAP_DUMP_FLUSH
 	if (Uflag)
@@ -2615,15 +2610,15 @@ dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	++packets_captured;
 	++infodelay;
 
-	struct dump_info *dump_info = (struct dump_info *)user;
+    struct dump_info *dump_info = (struct dump_info *)user;
 
-	/* CyberReboot dump insert: */
-	if (no_payload > 0 || mask_external_ip > 0) {
-		pcap_mod_and_dump((u_char *)dump_info->p, h, sp, pcap_datalink(dump_info->pd),
-				  no_payload, mask_external_ip, dump_info->maskIP);
-	} else {
-		pcap_dump((u_char *)dump_info->p, h, sp);
-	}
+    /* CyberReboot dump insert: */
+    if (no_payload > 0 || mask_external_ip > 0) {
+        pcap_mod_and_dump((u_char *)dump_info->p, h, sp, pcap_datalink(dump_info->pd),
+                          no_payload, mask_external_ip, dump_info->maskIP);
+    } else {
+        pcap_dump((u_char *)dump_info->p, h, sp);
+    }
 
 #ifdef HAVE_PCAP_DUMP_FLUSH
 	if (Uflag)
@@ -2639,11 +2634,8 @@ static void
 print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
 	++packets_captured;
-
 	++infodelay;
-	if (no_payload > 0 || mask_external_ip > 0) {
-		warning("Not saving to pcap file; ignoring -0 and -* flags");
-	}
+
 	pretty_print_packet((netdissect_options *)user, h, sp, packets_captured);
 
 	--infodelay;

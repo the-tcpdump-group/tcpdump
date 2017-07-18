@@ -1,13 +1,9 @@
-/* CyberReboot edition:
- *
- * Author: achang@cyberreboot.org
- */
-
-
 #ifndef clean_cap_dump_h
 #define clean_cap_dump_h
 
 #include <pcap/pcap.h>
+
+
 
 
 /* CyberReboot edition:
@@ -38,8 +34,8 @@ struct clean_cap_timeval {
 } clean_cap_timeval;
 
 struct clean_cap_sf_pkthdr {
-	struct clean_cap_timeval ts;  	/* time stamp */
-	bpf_u_int32 caplen;		/* length of portion present */
+	struct clean_cap_timeval ts;	/* time stamp */
+	bpf_u_int32 caplen;	   	/* length of portion present */
 	bpf_u_int32 len;		/* length this packet (off wire) */
 } clean_cap_sf_pkthdr;
 
@@ -48,12 +44,12 @@ struct netblock {
 	uint32_t netmask;
 } netblock;
 
-
 /* Takes over the packet mods and pcap_dump when the new flags are called */
 void pcap_mod_and_dump(u_char *, const struct pcap_pkthdr *, const u_char *,
-		int, int, int, const char *);
+                  int, int, int, const char *);
 
 u_char * get_iph_ptr(const struct pcap_pkthdr *, u_char *);
 int mask_ip(u_char *, int, const char *);
+
 
 #endif

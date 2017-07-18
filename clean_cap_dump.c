@@ -1,6 +1,14 @@
 /* CyberReboot edition:
  *
- * Author: achang@cyberreboot.org
+ * In new creating sanitization methods for tcpdump, it became necessary
+ * to make modifications to pcap_dump() supplied by pcap/sf-pcap -- and in
+ * so doing, required an awareness of internal structs located in the
+ * pcap-int.h (a component of libpcap). To simplify things, required data
+ * structs have been extrapolated and given new names to avoid conflict,
+ * and while these are completely extricated from libpcap's internal
+ * structure, data types and sizes should be identical (as they've been
+ * shamelessly cut-and-pasted from pcap-int.h).
+ *
  *
  */
 
@@ -24,7 +32,6 @@
 #include "tcp.h"
 #include "udp.h"
 
-
 #define MAXPACKET   65549
 
 
@@ -42,8 +49,8 @@ get_iph_ptr(const struct pcap_pkthdr *h, u_char *bp) {
 	length_type = EXTRACT_16BITS(&ep->ether_length_type);
 	if (length_type == ETHERTYPE_IP) {
 		s = bp + ETHER_HDRLEN;
-		ip = (const struct ip *)s;
-		if (IP_V(ip) == 4)
+	ip = (const struct ip *)s;
+	if (IP_V(ip) == 4)
 		return s;
 	}
 	return NULL;
@@ -74,11 +81,11 @@ network_uint_to_nd_ipv4(uint32_t a) {
 }
 
 /* Returns 1 if IP address presented in nd_ipv4 falls within reserved IP range;
-* else returns 0. */
+ * else returns 0. */
 int
 is_reserved(nd_ipv4 a) {
 	/* List of all the reserved IPv4 address spaces, per RFC5735,
-	* ...PROVIDED IN NETWORK BYTE ORDER!! */
+	 * ...PROVIDED IN NETWORK BYTE ORDER!! */
 	struct netblock specialblock[] = {
 		{ .netip = 0x00000000, .netmask = 0x000000ff  }, /* 0.0.0.0/8 */
 		{ .netip = 0x0000000a, .netmask = 0x000000ff  }, /* 10.0.0.0/8 */
@@ -96,7 +103,6 @@ is_reserved(nd_ipv4 a) {
 		{ .netip = 0x000000f0, .netmask = 0x000000f0  }, /* 240.0.0.0/4 */
 		{ .netip = 0xffffffff, .netmask = 0xffffffff  }  /* 255.255.255.255 */
 	};
-
 	int sb_sz = sizeof(specialblock)/sizeof(specialblock[0]);
 	int reserved = 0;
 
@@ -141,7 +147,6 @@ int
 mask_ip(u_char *iph, int len, const char * maskIP) {
 	struct ip *ip = (struct ip *)iph;
 	uint32_t m = 0;
-
 	inet_pton(AF_INET, maskIP, &m);
 
 	if (validate_iph_len(iph, len) < 0)
@@ -161,7 +166,7 @@ mask_ip(u_char *iph, int len, const char * maskIP) {
 
 void
 pcap_mod_and_dump(u_char *user, const struct pcap_pkthdr *h, const u_char *sp,
-      int dlt, int no_payload_flag, int mask_ip_flag, const char *maskIP) {
+	      int dlt, int no_payload_flag, int mask_ip_flag, const char *maskIP) {
 	register FILE *f;
 	struct clean_cap_sf_pkthdr sf_hdr;
 	u_char *ip, *nh, *p_end;
@@ -197,7 +202,6 @@ pcap_mod_and_dump(u_char *user, const struct pcap_pkthdr *h, const u_char *sp,
 		if (no_payload_flag > 0 && validate_iph_len(ip, p_len) > -1) {
 			struct ip *p = (struct ip *)ip;
 			int ph_len = IP_HL(p) * 4;
-
 			if (p-> ip_p != IPPROTO_TCP && p-> ip_p != IPPROTO_UDP) {
 				break;
 			}
@@ -208,8 +212,8 @@ pcap_mod_and_dump(u_char *user, const struct pcap_pkthdr *h, const u_char *sp,
 					break;
 				}
 				p_end = ip + ph_len + p_len;
-			}
-			else if (p->ip_p == IPPROTO_UDP) {
+
+			} else if (p->ip_p == IPPROTO_UDP) {
 				struct udphdr *u = (struct udphdr *)(ip+ph_len);
 				if (p_len < sizeof(struct udphdr) ||
 				    EXTRACT_16BITS(&u->uh_ulen) < sizeof(struct udphdr)) {
@@ -218,20 +222,17 @@ pcap_mod_and_dump(u_char *user, const struct pcap_pkthdr *h, const u_char *sp,
 					p_end = (u_char *)(ip + ph_len + sizeof(struct udphdr));
 				}
 			}
+
 			if (no_payload_flag > 1) {
-				sf_hdr.caplen = modp_len = p_end - modp;
+			    sf_hdr.caplen = modp_len = p_end - modp;
 			} else {
 				size_t diff = p_end - modp;
 				memset(p_end, 0, h->len - diff);
 			}
 		}
 		break;
-
-	/* For any other DLT support, put here. Otherwise:
-	*
-	* default:
-	*    printf("DEBUG: not Ethernet LL.\n");
-	*/
+	default:
+		printf("DEBUG: not Ethernet LL.\n");
 	}
 
 	(void)fwrite(&sf_hdr, sizeof(sf_hdr), 1, f);
