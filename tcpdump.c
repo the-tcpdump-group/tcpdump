@@ -695,25 +695,25 @@ getWflagChars(int x)
 static void
 MakeFilename(char *buffer, char *orig_name, int cnt, int max_chars)
 {
-        char *filename = malloc(PATH_MAX + 1);
-        if (filename == NULL)
-        error("Makefilename: malloc");
+	char *filename = malloc(PATH_MAX + 1);
+	if (filename == NULL)
+	error("Makefilename: malloc");
 
         /* Process with strftime if Gflag is set. */
         if (Gflag != 0) {
-          struct tm *local_tm;
+		struct tm *local_tm;
 
-          /* Convert Gflag_time to a usable format */
-          if ((local_tm = localtime(&Gflag_time)) == NULL) {
-                  error("MakeTimedFilename: localtime");
-          }
+		/* Convert Gflag_time to a usable format */
+		if ((local_tm = localtime(&Gflag_time)) == NULL) {
+			error("MakeTimedFilename: localtime");
+		}
 
-          /* There's no good way to detect an error in strftime since a return
-           * value of 0 isn't necessarily failure.
-           */
-          strftime(filename, PATH_MAX, orig_name, local_tm);
-        } else {
-          strncpy(filename, orig_name, PATH_MAX);
+		/* There's no good way to detect an error in strftime since a return
+		 * value of 0 isn't necessarily failure.
+		 */
+		strftime(filename, PATH_MAX, orig_name, local_tm);
+	} else {
+		strncpy(filename, orig_name, PATH_MAX);
         }
 
 	if (cnt == 0 && max_chars == 0)
@@ -721,7 +721,7 @@ MakeFilename(char *buffer, char *orig_name, int cnt, int max_chars)
 	else
 		if (snprintf(buffer, PATH_MAX + 1, "%s%0*d", filename, max_chars, cnt) > PATH_MAX)
                   /* Report an error if the filename is too large */
-                  error("too many output files or filename is too long (> %d)", PATH_MAX);
+			error("too many output files or filename is too long (> %d)", PATH_MAX);
         free(filename);
 }
 
@@ -1587,6 +1587,7 @@ main(int argc, char **argv)
 			ndo->ndo_packet_number = 1;
 			break;
 
+<<<<<<< 6386443723ea6dc24bb821c9aa928a2ab20da774
 		case '0':       /* CyberReboot: new flag */
 			++no_payload;
 			break;
@@ -1597,7 +1598,18 @@ main(int argc, char **argv)
 			++mask_external_ip;
 			dumpinfo.maskIP = optarg;
 			break;
+=======
+		case '0':      /* CyberReboot: new flag */ 
+			++no_payload;
+			break;
+>>>>>>> Changed indentation to tabs (8-char width); also added a warning that the flags are ignored
 
+		case '*':       /* CyberReboot: new flag */
+			if (verify_IP(optarg) < 0)
+				error("IP address mask is not a legal IP address");
+ 			++mask_external_ip;
+			dumpinfo.maskIP = optarg;
+			break;
 		case OPTION_VERSION:
 			print_version();
 			exit_tcpdump(0);
@@ -2397,7 +2409,7 @@ static void
 dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
 	struct dump_info *dump_info;
-    int dlt;
+	int dlt;
 
 	++packets_captured;
 
@@ -2588,7 +2600,11 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 	/* CyberReboot dump insert: */
 	if (no_payload > 0 || mask_external_ip > 0) {
 		pcap_mod_and_dump((u_char *)dump_info->p, h, sp, pcap_datalink(dump_info->pd),
+<<<<<<< 6386443723ea6dc24bb821c9aa928a2ab20da774
 				no_payload, mask_external_ip, dump_info->maskIP);
+=======
+				  no_payload, mask_external_ip, dump_info->maskIP);
+>>>>>>> Changed indentation to tabs (8-char width); also added a warning that the flags are ignored
 	} else {
 		pcap_dump((u_char *)dump_info->p, h, sp);
 	}
@@ -2614,7 +2630,11 @@ dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	/* CyberReboot dump insert: */
 	if (no_payload > 0 || mask_external_ip > 0) {
 		pcap_mod_and_dump((u_char *)dump_info->p, h, sp, pcap_datalink(dump_info->pd),
+<<<<<<< 6386443723ea6dc24bb821c9aa928a2ab20da774
 				  no_payload, mask_external_ip, dump_info->maskIP);
+=======
+				no_payload, mask_external_ip, dump_info->maskIP);
+>>>>>>> Changed indentation to tabs (8-char width); also added a warning that the flags are ignored
 	} else {
 		pcap_dump((u_char *)dump_info->p, h, sp);
 	}
@@ -2635,6 +2655,9 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	++packets_captured;
 
 	++infodelay;
+	if (no_payload > 0 || mask_external_ip > 0) {
+		warning("Not saving to pcap file; ignoring -0 and -* flags");
+	}
 	pretty_print_packet((netdissect_options *)user, h, sp, packets_captured);
 
 	--infodelay;

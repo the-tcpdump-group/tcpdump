@@ -187,7 +187,7 @@ pcap_mod_and_dump(u_char *user, const struct pcap_pkthdr *h, const u_char *sp,
 	switch(dlt) {
 	case DLT_EN10MB:
 		if ((ip = get_iph_ptr(h, modp)) == NULL)
-		break;
+		    break;
 		p_len -= ETHER_HDRLEN;
 
 		if (mask_ip_flag && maskIP != NULL) {

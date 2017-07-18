@@ -33,25 +33,25 @@
  * the file was written.
  */
 struct clean_cap_timeval {
-    int tv_sec;		/* seconds */
-    int tv_usec;	/* microseconds */
+	int tv_sec;	/* seconds */
+	int tv_usec;	/* microseconds */
 } clean_cap_timeval;
 
 struct clean_cap_sf_pkthdr {
-    struct clean_cap_timeval ts;  /* time stamp */
-    bpf_u_int32 caplen;		      /* length of portion present */
-    bpf_u_int32 len;		      /* length this packet (off wire) */
+	struct clean_cap_timeval ts;  	/* time stamp */
+	bpf_u_int32 caplen;		/* length of portion present */
+	bpf_u_int32 len;		/* length this packet (off wire) */
 } clean_cap_sf_pkthdr;
 
 struct netblock {
-    uint32_t netip;
-    uint32_t netmask;
+	uint32_t netip;
+	uint32_t netmask;
 } netblock;
 
 
 /* Takes over the packet mods and pcap_dump when the new flags are called */
 void pcap_mod_and_dump(u_char *, const struct pcap_pkthdr *, const u_char *,
-                  int, int, int, const char *);
+		int, int, int, const char *);
 
 u_char * get_iph_ptr(const struct pcap_pkthdr *, u_char *);
 int mask_ip(u_char *, int, const char *);
