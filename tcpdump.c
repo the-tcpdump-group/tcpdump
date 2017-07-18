@@ -127,7 +127,7 @@ The Regents of the University of California.  All rights reserved.\n";
 #include "gmt2local.h"
 #include "pcap-missing.h"
 #include "ascii_strcasecmp.h"
-#include "clean_cap_dump.h" // CyberReboot addition
+#include "clean_cap_dump.h" /* CyberReboot addition */
 
 #include "print.h"
 
@@ -1240,7 +1240,6 @@ main(int argc, char **argv)
 	if (nd_init(ebuf, sizeof ebuf) == -1)
 		error("%s", ebuf);
 
-    // cool way to set all flags to zero. - @lilchurro
 	memset(ndo, 0, sizeof(*ndo));
 	ndo_set_function_pointers(ndo);
 
@@ -1879,7 +1878,7 @@ main(int argc, char **argv)
 #endif
 	if (pcap_compile(pd, &fcode, cmdbuf, Oflag, netmask) < 0)
 		error("%s", pcap_geterr(pd));
-	if (dflag) { // print filter code
+	if (dflag) { 
 		bpf_dump(&fcode, dflag);
 		pcap_close(pd);
 		free(cmdbuf);
