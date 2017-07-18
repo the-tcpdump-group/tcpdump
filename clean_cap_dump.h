@@ -10,7 +10,8 @@
 #include <pcap/pcap.h>
 
 
-/*
+/* CyberReboot edition:
+ *
  * In new creating sanitization methods for tcpdump, it became necessary
  * to make modifications to pcap_dump() supplied by pcap/sf-pcap -- and in
  * so doing, required an awareness of internal structs located in the

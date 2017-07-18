@@ -127,7 +127,7 @@ The Regents of the University of California.  All rights reserved.\n";
 #include "gmt2local.h"
 #include "pcap-missing.h"
 #include "ascii_strcasecmp.h"
-#include "clean_cap_dump.h" // CyberReboot addition
+#include "clean_cap_dump.h" /* CyberReboot addition */
 
 #include "print.h"
 
@@ -257,7 +257,7 @@ struct dump_info {
 	char	*CurrentFileName;
 	pcap_t	*pd;
 	pcap_dumper_t *p;
-    char    *maskIP;
+	char    *maskIP;
 #ifdef HAVE_CAPSICUM
 	int	dirfd;
 #endif
@@ -605,7 +605,7 @@ static const struct option longopts[] = {
 	{ "debug-filter-parser", no_argument, NULL, 'Y' },
 #endif
 	{ "relinquish-privileges", required_argument, NULL, 'Z' },
-    { "external-mask", required_argument, NULL, '*' },
+	{ "external-mask", required_argument, NULL, '*' },
 	{ "number", no_argument, NULL, '#' },
 	{ "version", no_argument, NULL, OPTION_VERSION },
 	{ NULL, 0, NULL, 0 }
@@ -697,7 +697,7 @@ MakeFilename(char *buffer, char *orig_name, int cnt, int max_chars)
 {
         char *filename = malloc(PATH_MAX + 1);
         if (filename == NULL)
-            error("Makefilename: malloc");
+        error("Makefilename: malloc");
 
         /* Process with strftime if Gflag is set. */
         if (Gflag != 0) {
@@ -1189,10 +1189,10 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 /* Returns 0 if the given string is a valid IP address; else, returns -1. */
 int
 verify_IP(char *ip) {
-    struct sockaddr_in sa;
-    if (inet_pton(AF_INET, ip, &(sa.sin_addr)) == 1)
-        return 0;
-    return -1;
+	struct sockaddr_in sa;
+	if (inet_pton(AF_INET, ip, &(sa.sin_addr)) == 1)
+		return 0;
+	return -1;
 }
 
 int
@@ -1240,7 +1240,6 @@ main(int argc, char **argv)
 	if (nd_init(ebuf, sizeof ebuf) == -1)
 		error("%s", ebuf);
 
-    // cool way to set all flags to zero. - @lilchurro
 	memset(ndo, 0, sizeof(*ndo));
 	ndo_set_function_pointers(ndo);
 
@@ -1273,7 +1272,7 @@ main(int argc, char **argv)
 		error("%s", ebuf);
 
 	while (
-	    (op = getopt_long(argc, argv, SHORTOPTS, longopts, NULL)) != -1)
+		(op = getopt_long(argc, argv, SHORTOPTS, longopts, NULL)) != -1)
 		switch (op) {
 
 		case 'a':
@@ -1588,16 +1587,16 @@ main(int argc, char **argv)
 			ndo->ndo_packet_number = 1;
 			break;
 
-        case '0':       // CyberReboot: new flag
-            ++no_payload;
-            break;
+		case '0':       /* CyberReboot: new flag */
+			++no_payload;
+			break;
 
-        case '*':       // CyberReboot: new flag
-            if (verify_IP(optarg) < 0)
-                error("IP address mask is not a legal IP address");
-            ++mask_external_ip;
-            dumpinfo.maskIP = optarg;
-            break;
+		case '*':       /* CyberReboot: new flag */
+			if (verify_IP(optarg) < 0)
+			error("IP address mask is not a legal IP address");
+			++mask_external_ip;
+			dumpinfo.maskIP = optarg;
+			break;
 
 		case OPTION_VERSION:
 			print_version();
@@ -1722,7 +1721,7 @@ main(int argc, char **argv)
 
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
 		pd = pcap_open_offline_with_tstamp_precision(RFileName,
-		    ndo->ndo_tstamp_precision, ebuf);
+			ndo->ndo_tstamp_precision, ebuf);
 #else
 		pd = pcap_open_offline(RFileName, ebuf);
 #endif
@@ -1880,7 +1879,7 @@ main(int argc, char **argv)
 #endif
 	if (pcap_compile(pd, &fcode, cmdbuf, Oflag, netmask) < 0)
 		error("%s", pcap_geterr(pd));
-	if (dflag) { // print filter code
+	if (dflag) { 
 		bpf_dump(&fcode, dflag);
 		pcap_close(pd);
 		free(cmdbuf);
@@ -2586,14 +2585,13 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 		}
 	}
 
-    // CyberReboot dump insert:
-    if (no_payload > 0 || mask_external_ip > 0) {
-        //printf("DEBUG: packet #%d\n", packets_captured);
-        pcap_mod_and_dump((u_char *)dump_info->p, h, sp, pcap_datalink(dump_info->pd),
-                          no_payload, mask_external_ip, dump_info->maskIP);
-    } else {
-        pcap_dump((u_char *)dump_info->p, h, sp);
-    }
+	/* CyberReboot dump insert: */
+	if (no_payload > 0 || mask_external_ip > 0) {
+		pcap_mod_and_dump((u_char *)dump_info->p, h, sp, pcap_datalink(dump_info->pd),
+				no_payload, mask_external_ip, dump_info->maskIP);
+	} else {
+		pcap_dump((u_char *)dump_info->p, h, sp);
+	}
 
 #ifdef HAVE_PCAP_DUMP_FLUSH
 	if (Uflag)
@@ -2611,16 +2609,15 @@ dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	++packets_captured;
 	++infodelay;
 
-    struct dump_info *dump_info = (struct dump_info *)user;
+	struct dump_info *dump_info = (struct dump_info *)user;
 
-    // CyberReboot dump insert:
-    if (no_payload > 0 || mask_external_ip > 0) {
-        //printf("DEBUG: packet #%d\n", packets_captured);
-        pcap_mod_and_dump((u_char *)dump_info->p, h, sp, pcap_datalink(dump_info->pd),
-                          no_payload, mask_external_ip, dump_info->maskIP);
-    } else {
-        pcap_dump((u_char *)dump_info->p, h, sp);
-    }
+	/* CyberReboot dump insert: */
+	if (no_payload > 0 || mask_external_ip > 0) {
+		pcap_mod_and_dump((u_char *)dump_info->p, h, sp, pcap_datalink(dump_info->pd),
+				  no_payload, mask_external_ip, dump_info->maskIP);
+	} else {
+		pcap_dump((u_char *)dump_info->p, h, sp);
+	}
 
 #ifdef HAVE_PCAP_DUMP_FLUSH
 	if (Uflag)
