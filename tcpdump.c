@@ -87,6 +87,7 @@ The Regents of the University of California.  All rights reserved.\n";
 #include <sys/nv.h>
 #endif	/* HAVE_CASPER */
 #endif	/* HAVE_CAPSICUM */
+#include <arpa/inet.h>
 #include <pcap.h>
 #include <signal.h>
 #include <stdio.h>
@@ -126,6 +127,7 @@ The Regents of the University of California.  All rights reserved.\n";
 #include "gmt2local.h"
 #include "pcap-missing.h"
 #include "ascii_strcasecmp.h"
+#include "clean_cap_dump.h" /* CyberReboot addition */
 
 #include "print.h"
 
@@ -174,6 +176,8 @@ static int Wflag;			/* recycle output files after this number of files */
 static int WflagChars;
 static char *zflag = NULL;		/* compress each savefile using a specified command (like gzip or bzip2) */
 static int immediate_mode;
+static int no_payload = 0;       /* CyberReboot: ndo_0flag copy; clear away payload */
+static int mask_external_ip = 0; /* CyberReboot: ndo_starflag copy; mask external IPs */
 
 static int infodelay;
 static int infoprint;
@@ -253,6 +257,7 @@ struct dump_info {
 	char	*CurrentFileName;
 	pcap_t	*pd;
 	pcap_dumper_t *p;
+	char    *maskIP;
 #ifdef HAVE_CAPSICUM
 	int	dirfd;
 #endif
@@ -537,7 +542,7 @@ show_devices_and_exit (void)
 #define Q_FLAG
 #endif
 
-#define SHORTOPTS "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOpq" Q_FLAG "r:s:StT:u" U_FLAG "vV:w:W:xXy:Yz:Z:#"
+#define SHORTOPTS "0aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOpq" Q_FLAG "r:s:StT:u" U_FLAG "vV:w:W:xXy:Yz:Z:#*:"
 
 /*
  * Long options.
@@ -600,6 +605,7 @@ static const struct option longopts[] = {
 	{ "debug-filter-parser", no_argument, NULL, 'Y' },
 #endif
 	{ "relinquish-privileges", required_argument, NULL, 'Z' },
+	{ "external-mask", required_argument, NULL, '*' },
 	{ "number", no_argument, NULL, '#' },
 	{ "version", no_argument, NULL, OPTION_VERSION },
 	{ NULL, 0, NULL, 0 }
@@ -1180,6 +1186,15 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 	return (pc);
 }
 
+/* Returns 0 if the given string is a valid IP address; else, returns -1. */
+static int
+verify_IP(char *ip) {
+	struct sockaddr_in sa;
+	if (inet_pton(AF_INET, ip, &(sa.sin_addr)) == 1)
+		return 0;
+	return -1;
+}
+
 int
 main(int argc, char **argv)
 {
@@ -1256,8 +1271,7 @@ main(int argc, char **argv)
 	if (abort_on_misalignment(ebuf, sizeof(ebuf)) < 0)
 		error("%s", ebuf);
 
-	while (
-	    (op = getopt_long(argc, argv, SHORTOPTS, longopts, NULL)) != -1)
+	while ((op = getopt_long(argc, argv, SHORTOPTS, longopts, NULL)) != -1)
 		switch (op) {
 
 		case 'a':
@@ -1572,6 +1586,17 @@ main(int argc, char **argv)
 			ndo->ndo_packet_number = 1;
 			break;
 
+		case '0':       /* CyberReboot: new flag */
+			++no_payload;
+			break;
+
+		case '*':       /* CyberReboot: new flag */
+			if (verify_IP(optarg) < 0)
+				error("IP address mask is not a legal IP address");
+			++mask_external_ip;
+			dumpinfo.maskIP = optarg;
+			break;
+
 		case OPTION_VERSION:
 			print_version();
 			exit_tcpdump(0);
@@ -1853,7 +1878,7 @@ main(int argc, char **argv)
 #endif
 	if (pcap_compile(pd, &fcode, cmdbuf, Oflag, netmask) < 0)
 		error("%s", pcap_geterr(pd));
-	if (dflag) {
+	if (dflag) { 
 		bpf_dump(&fcode, dflag);
 		pcap_close(pd);
 		free(cmdbuf);
@@ -1935,7 +1960,6 @@ main(int argc, char **argv)
 
 	}
 #endif /* _WIN32 */
-
 	if (pcap_setfilter(pd, &fcode) < 0)
 		error("%s", pcap_geterr(pd));
 #ifdef HAVE_CAPSICUM
@@ -1991,6 +2015,8 @@ main(int argc, char **argv)
 #ifdef HAVE_CAPSICUM
 		set_dumper_capsicum_rights(p);
 #endif
+		dumpinfo.pd = pd;
+		dumpinfo.p = p;
 		if (Cflag != 0 || Gflag != 0) {
 #ifdef HAVE_CAPSICUM
 			dumpinfo.WFileName = strdup(basename(WFileName));
@@ -2018,18 +2044,18 @@ main(int argc, char **argv)
 			dumpinfo.WFileName = WFileName;
 #endif
 			callback = dump_packet_and_trunc;
-			dumpinfo.pd = pd;
-			dumpinfo.p = p;
 			pcap_userdata = (u_char *)&dumpinfo;
 		} else {
 			callback = dump_packet;
-			pcap_userdata = (u_char *)p;
+			pcap_userdata = (u_char *)&dumpinfo;
 		}
 #ifdef HAVE_PCAP_DUMP_FLUSH
 		if (Uflag)
-			pcap_dump_flush(p);
+    			pcap_dump_flush(p);
 #endif
 	} else {
+		if (no_payload > 0 || mask_external_ip > 0)
+			warning("Flags -0 or -* set without savefile will be ignored.");
 		dlt = pcap_datalink(pd);
 		ndo->ndo_if_printer = get_if_printer(ndo, dlt);
 		callback = print_packet;
@@ -2114,7 +2140,7 @@ main(int argc, char **argv)
 			}
 			(void)fflush(stdout);
 		}
-                if (status == -2) {
+		if (status == -2) {
 			/*
 			 * We got interrupted. If we are reading multiple
 			 * files (via -V) set these so that we stop.
@@ -2126,8 +2152,7 @@ main(int argc, char **argv)
 			/*
 			 * Error.  Report it.
 			 */
-			(void)fprintf(stderr, "%s: pcap_loop: %s\n",
-			    program_name, pcap_geterr(pd));
+			(void)fprintf(stderr, "%s: pcap_loop: %s\n", program_name, pcap_geterr(pd));
 		}
 		if (RFileName == NULL) {
 			/*
@@ -2312,6 +2337,7 @@ info(register int verbose)
 		    stats.ps_ifdrop, PLURAL_SUFFIX(stats.ps_ifdrop));
 	} else
 		putc('\n', stderr);
+
 	infoprint = 0;
 }
 
@@ -2378,6 +2404,11 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 	++infodelay;
 
 	dump_info = (struct dump_info *)user;
+
+	if ((no_payload > 0 || mask_external_ip > 0) && pcap_datalink(dump_info->pd) != DLT_EN10MB) {
+		error("-0 and -* flags are only available for Ethernet data link type; exiting");
+		exit_tcpdump(0);
+	}
 
 	/*
 	 * XXX - this won't force the file to rotate on the specified time
@@ -2559,7 +2590,14 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 		}
 	}
 
-	pcap_dump((u_char *)dump_info->p, h, sp);
+	/* CyberReboot dump insert: */
+	if (no_payload > 0 || mask_external_ip > 0) {
+		pcap_mod_and_dump((u_char *)dump_info->p, h, sp, pcap_datalink(dump_info->pd),
+				  no_payload, mask_external_ip, dump_info->maskIP);
+	} else {
+		pcap_dump((u_char *)dump_info->p, h, sp);
+	}
+
 #ifdef HAVE_PCAP_DUMP_FLUSH
 	if (Uflag)
 		pcap_dump_flush(dump_info->p);
@@ -2573,14 +2611,28 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 static void
 dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
+	struct dump_info *dump_info;
 	++packets_captured;
-
 	++infodelay;
 
-	pcap_dump(user, h, sp);
+	dump_info = (struct dump_info *)user;
+
+	/* CyberReboot dump insert: */
+	if (no_payload > 0 || mask_external_ip > 0) {
+		if (pcap_datalink(dump_info->pd) != DLT_EN10MB) {
+			error("-0 and -* flags are only available for Ethernet data link type; exiting");
+			exit_tcpdump(0);
+		}
+
+		pcap_mod_and_dump((u_char *)dump_info->p, h, sp, pcap_datalink(dump_info->pd),
+				  no_payload, mask_external_ip, dump_info->maskIP);
+	} else {
+		pcap_dump((u_char *)dump_info->p, h, sp);
+	}
+
 #ifdef HAVE_PCAP_DUMP_FLUSH
 	if (Uflag)
-		pcap_dump_flush((pcap_dumper_t *)user);
+		pcap_dump_flush((pcap_dumper_t *)dump_info->p);
 #endif
 
 	--infodelay;
@@ -2592,7 +2644,6 @@ static void
 print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
 	++packets_captured;
-
 	++infodelay;
 
 	pretty_print_packet((netdissect_options *)user, h, sp, packets_captured);
@@ -2712,7 +2763,7 @@ print_usage(void)
 {
 	print_version();
 	(void)fprintf(stderr,
-"Usage: %s [-aAbd" D_FLAG "efhH" I_FLAG J_FLAG "KlLnNOpqStu" U_FLAG "vxX#]" B_FLAG_USAGE " [ -c count ]\n", program_name);
+"Usage: %s [-aAbd" D_FLAG "efhH" I_FLAG J_FLAG "KlLnNOpqStu" U_FLAG "vxX0*#]" B_FLAG_USAGE " [ -c count ]\n", program_name);
 	(void)fprintf(stderr,
 "\t\t[ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]\n");
 	(void)fprintf(stderr,
