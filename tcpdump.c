@@ -1587,22 +1587,16 @@ main(int argc, char **argv)
 			ndo->ndo_packet_number = 1;
 			break;
 
-<<<<<<< 6386443723ea6dc24bb821c9aa928a2ab20da774
 		case '0':       /* CyberReboot: new flag */
 			++no_payload;
 			break;
 
 		case '*':       /* CyberReboot: new flag */
 			if (verify_IP(optarg) < 0)
-			error("IP address mask is not a legal IP address");
+				error("IP address mask is not a legal IP address");
 			++mask_external_ip;
 			dumpinfo.maskIP = optarg;
 			break;
-=======
-		case '0':      /* CyberReboot: new flag */ 
-			++no_payload;
-			break;
->>>>>>> Changed indentation to tabs (8-char width); also added a warning that the flags are ignored
 
 		case '*':       /* CyberReboot: new flag */
 			if (verify_IP(optarg) < 0)
@@ -2600,11 +2594,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 	/* CyberReboot dump insert: */
 	if (no_payload > 0 || mask_external_ip > 0) {
 		pcap_mod_and_dump((u_char *)dump_info->p, h, sp, pcap_datalink(dump_info->pd),
-<<<<<<< 6386443723ea6dc24bb821c9aa928a2ab20da774
 				no_payload, mask_external_ip, dump_info->maskIP);
-=======
-				  no_payload, mask_external_ip, dump_info->maskIP);
->>>>>>> Changed indentation to tabs (8-char width); also added a warning that the flags are ignored
 	} else {
 		pcap_dump((u_char *)dump_info->p, h, sp);
 	}
@@ -2630,11 +2620,7 @@ dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	/* CyberReboot dump insert: */
 	if (no_payload > 0 || mask_external_ip > 0) {
 		pcap_mod_and_dump((u_char *)dump_info->p, h, sp, pcap_datalink(dump_info->pd),
-<<<<<<< 6386443723ea6dc24bb821c9aa928a2ab20da774
 				  no_payload, mask_external_ip, dump_info->maskIP);
-=======
-				no_payload, mask_external_ip, dump_info->maskIP);
->>>>>>> Changed indentation to tabs (8-char width); also added a warning that the flags are ignored
 	} else {
 		pcap_dump((u_char *)dump_info->p, h, sp);
 	}

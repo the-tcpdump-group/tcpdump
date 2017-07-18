@@ -113,7 +113,7 @@ is_reserved(nd_ipv4 a) {
 }
 
 /* Takes as input the IP header struct pointer and length of packet, and
-* returns -1 if the IP header is parseable; else returns 0. */
+ * returns -1 if the IP header is parseable; else returns 0. */
 int
 validate_iph_len(u_char *iph, int len) {
 	struct ip *ip = (struct ip *)iph;
@@ -135,8 +135,8 @@ validate_iph_len(u_char *iph, int len) {
 }
 
 /* Compare the addresses to reserved address ranges and mask if it's not within
-* range. Returns 0 if successful, -1 on malformed datagram, 1 if not reserveds.
-*/
+ * range. Returns 0 if successful, -1 on malformed datagram, 1 if not reserveds.
+ */
 int
 mask_ip(u_char *iph, int len, const char * maskIP) {
 	struct ip *ip = (struct ip *)iph;
@@ -171,7 +171,7 @@ pcap_mod_and_dump(u_char *user, const struct pcap_pkthdr *h, const u_char *sp,
 
 	if ((modp = (u_char *)malloc(MAXPACKET)) == NULL) {
 		fprintf(stderr,
-		    "Unable to malloc %d bytes for packet modification", MAXPACKET);
+			"Unable to malloc %d bytes for packet modification", MAXPACKET);
 		exit(1);
 	} else
 		memset(modp, '\0', MAXPACKET);
@@ -187,14 +187,14 @@ pcap_mod_and_dump(u_char *user, const struct pcap_pkthdr *h, const u_char *sp,
 	switch(dlt) {
 	case DLT_EN10MB:
 		if ((ip = get_iph_ptr(h, modp)) == NULL)
-		    break;
+			break;
 		p_len -= ETHER_HDRLEN;
 
 		if (mask_ip_flag && maskIP != NULL) {
 			mask_ip(ip, p_len, maskIP);
 		}
 
-		if (no_payload_flag > 0 && validate_iph_len(ip, p_len) > -1) { 
+		if (no_payload_flag > 0 && validate_iph_len(ip, p_len) > -1) {
 			struct ip *p = (struct ip *)ip;
 			int ph_len = IP_HL(p) * 4;
 
