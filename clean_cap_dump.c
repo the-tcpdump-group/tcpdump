@@ -56,7 +56,7 @@ get_iph_ptr(const struct pcap_pkthdr *h, u_char *bp) {
 	return NULL;
 }
 
-uint32_t
+static uint32_t
 nd_ipv4_to_network_uint(nd_ipv4 a) {
 	char ip[INET_ADDRSTRLEN];
 	uint32_t ip_uint = 0;
@@ -68,7 +68,7 @@ nd_ipv4_to_network_uint(nd_ipv4 a) {
 	return ip_uint;
 }
 
-nd_ipv4
+static nd_ipv4
 network_uint_to_nd_ipv4(uint32_t a) {
 	nd_ipv4 addr;
 
@@ -82,7 +82,7 @@ network_uint_to_nd_ipv4(uint32_t a) {
 
 /* Returns 1 if IP address presented in nd_ipv4 falls within reserved IP range;
  * else returns 0. */
-int
+static int
 is_reserved(nd_ipv4 a) {
 	/* List of all the reserved IPv4 address spaces, per RFC5735,
 	 * ...PROVIDED IN NETWORK BYTE ORDER!! */
@@ -105,9 +105,10 @@ is_reserved(nd_ipv4 a) {
 	};
 	int sb_sz = sizeof(specialblock)/sizeof(specialblock[0]);
 	int reserved = 0;
-
+	int i = 0;
 	uint32_t addr = nd_ipv4_to_network_uint(a);
-	for (int i = 0; i < sb_sz; i++) {
+
+	for (i = 0; i < sb_sz; i++) {
 		if ((addr & specialblock[i].netmask) == 
 		    (specialblock[i].netip & specialblock[i].netmask)) {
 			reserved = 1;
@@ -120,8 +121,8 @@ is_reserved(nd_ipv4 a) {
 
 /* Takes as input the IP header struct pointer and length of packet, and
  * returns -1 if the IP header is parseable; else returns 0. */
-int
-validate_iph_len(u_char *iph, int len) {
+static int
+validate_iph_len(u_char *iph, unsigned int len) {
 	struct ip *ip = (struct ip *)iph;
 	if (IP_V(ip) != 4) {
 		printf("DEBUG: Not IP4 packet -- version %u\n", IP_V(ip));
@@ -144,7 +145,7 @@ validate_iph_len(u_char *iph, int len) {
  * range. Returns 0 if successful, -1 on malformed datagram, 1 if not reserveds.
  */
 int
-mask_ip(u_char *iph, int len, const char * maskIP) {
+mask_ip(u_char *iph, unsigned int len, const char * maskIP) {
 	struct ip *ip = (struct ip *)iph;
 	uint32_t m = 0;
 	inet_pton(AF_INET, maskIP, &m);
@@ -169,9 +170,9 @@ pcap_mod_and_dump(u_char *user, const struct pcap_pkthdr *h, const u_char *sp,
 	      int dlt, int no_payload_flag, int mask_ip_flag, const char *maskIP) {
 	register FILE *f;
 	struct clean_cap_sf_pkthdr sf_hdr;
-	u_char *ip, *nh, *p_end;
+	u_char *ip, *p_end;
 	u_char *modp;
-	int p_len, modp_len;
+	unsigned int p_len, modp_len;
 	p_len = modp_len = h->caplen;
 
 	if ((modp = (u_char *)malloc(MAXPACKET)) == NULL) {

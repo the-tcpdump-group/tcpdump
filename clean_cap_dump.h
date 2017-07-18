@@ -49,7 +49,7 @@ void pcap_mod_and_dump(u_char *, const struct pcap_pkthdr *, const u_char *,
                   int, int, int, const char *);
 
 u_char * get_iph_ptr(const struct pcap_pkthdr *, u_char *);
-int mask_ip(u_char *, int, const char *);
+int mask_ip(u_char *, unsigned int, const char *);
 
 
 #endif
