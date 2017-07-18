@@ -232,8 +232,10 @@ pcap_mod_and_dump(u_char *user, const struct pcap_pkthdr *h, const u_char *sp,
 			}
 		}
 		break;
-	default:
-		printf("DEBUG: not Ethernet LL.\n");
+
+	/* default:
+	 *	printf("DEBUG: not Ethernet LL.\n");
+	 */
 	}
 
 	(void)fwrite(&sf_hdr, sizeof(sf_hdr), 1, f);
