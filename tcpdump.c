@@ -1191,7 +1191,7 @@ int
 verify_IP(char *ip) {
 	struct sockaddr_in sa;
 	if (inet_pton(AF_INET, ip, &(sa.sin_addr)) == 1)
-       		 return 0;
+		return 0;
 	return -1;
 }
 
@@ -2015,8 +2015,8 @@ main(int argc, char **argv)
 #ifdef HAVE_CAPSICUM
 		set_dumper_capsicum_rights(p);
 #endif
-        dumpinfo.pd = pd;
-        dumpinfo.p = p;
+		dumpinfo.pd = pd;
+		dumpinfo.p = p;
 		if (Cflag != 0 || Gflag != 0) {
 #ifdef HAVE_CAPSICUM
 			dumpinfo.WFileName = strdup(basename(WFileName));
@@ -2140,7 +2140,7 @@ main(int argc, char **argv)
 			}
 			(void)fflush(stdout);
 		}
-        if (status == -2) {
+		if (status == -2) {
 			/*
 			 * We got interrupted. If we are reading multiple
 			 * files (via -V) set these so that we stop.
@@ -2335,10 +2335,10 @@ info(register int verbose)
 			putc('\n', stderr);
 		(void)fprintf(stderr, "%u packet%s dropped by interface\n",
 		    stats.ps_ifdrop, PLURAL_SUFFIX(stats.ps_ifdrop));
-    } else
-        putc('\n', stderr);
+	} else
+		putc('\n', stderr);
 
-    infoprint = 0;
+	infoprint = 0;
 }
 
 #if defined(HAVE_FORK) || defined(HAVE_VFORK)
@@ -2398,13 +2398,17 @@ static void
 dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
 	struct dump_info *dump_info;
-    int dlt;
 
 	++packets_captured;
 
 	++infodelay;
 
 	dump_info = (struct dump_info *)user;
+
+	if ((no_payload > 0 || mask_external_ip > 0) && pcap_datalink(user->pd) != DLT_EN10MB) {
+		error("-0 and -* flags are only available for Ethernet data link type; exiting");
+		exit_tcpdump(0);
+	}
 
 	/*
 	 * XXX - this won't force the file to rotate on the specified time
@@ -2586,13 +2590,13 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 		}
 	}
 
-    /* CyberReboot dump insert: */
-    if (no_payload > 0 || mask_external_ip > 0) {
-        pcap_mod_and_dump((u_char *)dump_info->p, h, sp, pcap_datalink(dump_info->pd),
-                          no_payload, mask_external_ip, dump_info->maskIP);
-    } else {
-        pcap_dump((u_char *)dump_info->p, h, sp);
-    }
+	/* CyberReboot dump insert: */
+	if (no_payload > 0 || mask_external_ip > 0) {
+		pcap_mod_and_dump((u_char *)dump_info->p, h, sp, pcap_datalink(dump_info->pd),
+				  no_payload, mask_external_ip, dump_info->maskIP);
+	} else {
+		pcap_dump((u_char *)dump_info->p, h, sp);
+	}
 
 #ifdef HAVE_PCAP_DUMP_FLUSH
 	if (Uflag)
@@ -2610,15 +2614,20 @@ dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 	++packets_captured;
 	++infodelay;
 
-    struct dump_info *dump_info = (struct dump_info *)user;
+	struct dump_info *dump_info = (struct dump_info *)user;
 
-    /* CyberReboot dump insert: */
-    if (no_payload > 0 || mask_external_ip > 0) {
-        pcap_mod_and_dump((u_char *)dump_info->p, h, sp, pcap_datalink(dump_info->pd),
-                          no_payload, mask_external_ip, dump_info->maskIP);
-    } else {
-        pcap_dump((u_char *)dump_info->p, h, sp);
-    }
+	/* CyberReboot dump insert: */
+	if (no_payload > 0 || mask_external_ip > 0) {
+		if (pcap_datalink(user->pd) != DLT_EN10MB) {
+			error("-0 and -* flags are only available for Ethernet data link type; exiting");
+			exit_tcpdump(0);
+		}
+
+		pcap_mod_and_dump((u_char *)dump_info->p, h, sp, pcap_datalink(dump_info->pd),
+				  no_payload, mask_external_ip, dump_info->maskIP);
+	} else {
+		pcap_dump((u_char *)dump_info->p, h, sp);
+	}
 
 #ifdef HAVE_PCAP_DUMP_FLUSH
 	if (Uflag)
