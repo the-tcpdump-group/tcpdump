@@ -475,6 +475,7 @@ stp_print(netdissect_options *ndo, const u_char *p, u_int length)
             if (stp_bpdu->protocol_version == STP_PROTO_SPB)
             {
               /* Validate v4 length */
+              ND_TCHECK_16BITS(p + MST_BPDU_VER3_LEN_OFFSET + mstp_len);
               spb_len = EXTRACT_16BITS (p + MST_BPDU_VER3_LEN_OFFSET + mstp_len);
               spb_len += 2;
               if (length < (sizeof(struct stp_bpdu_) + mstp_len + spb_len) ||
