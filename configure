@@ -3794,6 +3794,57 @@ fi
 $as_echo "$ac_cv___attribute___format_function_pointer" >&6; }
 
 	fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether __attribute__((fallthrough)) can be used without warnings" >&5
+$as_echo_n "checking whether __attribute__((fallthrough)) can be used without warnings... " >&6; }
+if ${ac_cv___attribute___fallthrough+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+save_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS $ac_lbl_cc_force_warning_errors"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+#include <stdio.h>
+
+int
+main(int argc, char **argv)
+{
+	int x = 1;
+	switch (x)
+	{
+	case 1:
+		printf ("x == %d\n", x);
+		__attribute__ ((fallthrough));
+	case 2:
+		printf ("x == %d\n", x);
+		break;
+	default:
+		return 0;
+	}
+	return x;
+}
+
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ac_cv___attribute___fallthrough=yes
+else
+  ac_cv___attribute___fallthrough=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+
+CFLAGS="$save_CFLAGS"
+if test "$ac_cv___attribute___fallthrough" = "yes"; then
+
+$as_echo "#define __ATTRIBUTE___FALLTHROUGH_OK 1" >>confdefs.h
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv___attribute___fallthrough" >&5
+$as_echo "$ac_cv___attribute___fallthrough" >&6; }
+
 fi
 
 ac_ext=c

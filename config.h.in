@@ -331,6 +331,10 @@
    #define below would cause a syntax error. */
 #undef _UINT8_T
 
+/* define if your compiler allows __attribute__((fallthrough)) without a
+   warning */
+#undef __ATTRIBUTE___FALLTHROUGH_OK
+
 /* define if your compiler allows __attribute__((format)) without a warning */
 #undef __ATTRIBUTE___FORMAT_OK
 

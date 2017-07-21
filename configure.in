@@ -30,6 +30,7 @@ if test "$ac_cv___attribute__" = "yes"; then
 	if test "$ac_cv___attribute___format" = "yes"; then
 		AC_C___ATTRIBUTE___FORMAT_FUNCTION_POINTER
 	fi
+	AC_C___ATTRIBUTE___FALLTHROUGH
 fi
 
 AC_CHECK_HEADERS(fcntl.h rpc/rpc.h rpc/rpcent.h netdnet/dnetdb.h)

@@ -401,4 +401,10 @@ struct in6_addr {
 #define max(a,b) ((b)>(a)?(b):(a))
 #endif
 
+#ifdef __ATTRIBUTE___FALLTHROUGH_OK
+#  define ND_FALL_THROUGH __attribute__ ((fallthrough))
+#else
+#  define ND_FALL_THROUGH
+#endif /* __ATTRIBUTE___FALLTHROUGH_OK */
+
 #endif /* netdissect_stdinc_h */
