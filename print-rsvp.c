@@ -1768,6 +1768,7 @@ rsvp_obj_print(netdissect_options *ndo,
             default:
                 hexdump=TRUE;
             }
+            break;
 
         case RSVP_OBJ_S2L:
             switch (rsvp_obj_ctype) {
@@ -1792,6 +1793,7 @@ rsvp_obj_print(netdissect_options *ndo,
             default:
                 hexdump=TRUE;
             }
+            break;
 
         /*
          *  FIXME those are the defined objects that lack a decoder
