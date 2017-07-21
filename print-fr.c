@@ -512,6 +512,7 @@ mfr_print(netdissect_options *ndo,
                     break;
                 }
                 /* fall through and hexdump if no unix timestamp */
+                ND_FALL_THROUGH;
 
                 /*
                  * FIXME those are the defined IEs that lack a decoder
