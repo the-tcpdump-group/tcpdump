@@ -1,3 +1,11 @@
+  Summary for 4.9.1 tcpdump release
+    Make assorted documentation updates and fix a few typos in tcpdump output.
+    Fixup -C for file size >2GB (GH #488).
+    Show AddressSanitizer presence in version output.
+    Fix a bug in test scripts (exposed in GH #613).
+    On FreeBSD adjust Capsicum capabilities for netmap.
+    On Linux fix a use-after-free when the requested interface does not exist.
+
 Wednesday January 18, 2017 devel.fx.lebail@orange.fr
   Summary for 4.9.0 tcpdump release
     General updates:
