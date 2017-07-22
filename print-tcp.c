@@ -252,12 +252,12 @@ tcp_print(netdissect_options *ndo,
                 if (ip6) {
                         register struct tcp_seq_hash6 *th;
                         struct tcp_seq_hash6 *tcp_seq_hash;
-                        const struct in6_addr *src, *dst;
+                        const void *src, *dst;
                         struct tha6 tha;
 
                         tcp_seq_hash = tcp_seq_hash6;
-                        src = &ip6->ip6_src;
-                        dst = &ip6->ip6_dst;
+                        src = (const void *)&ip6->ip6_src;
+                        dst = (const void *)&ip6->ip6_dst;
                         if (sport > dport)
                                 rev = 1;
                         else if (sport == dport) {
