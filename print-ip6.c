@@ -50,7 +50,7 @@ ip6_finddst(netdissect_options *ndo, struct in6_addr *dst,
 	const u_char *cp;
 	int advance;
 	u_int nh;
-	const struct in6_addr *dst_addr;
+	const void *dst_addr;
 	const struct ip6_rthdr *dp;
 	const struct ip6_rthdr0 *dp0;
 	const struct in6_addr *addr;
@@ -59,7 +59,7 @@ ip6_finddst(netdissect_options *ndo, struct in6_addr *dst,
 	cp = (const u_char *)ip6;
 	advance = sizeof(struct ip6_hdr);
 	nh = ip6->ip6_nxt;
-	dst_addr = &ip6->ip6_dst;
+	dst_addr = (const void *)&ip6->ip6_dst;
 
 	while (cp < ndo->ndo_snapend) {
 		cp += advance;
@@ -112,7 +112,7 @@ ip6_finddst(netdissect_options *ndo, struct in6_addr *dst,
 					if ((const u_char *)(addr + 1) > ndo->ndo_snapend)
 						goto trunc;
 
-					dst_addr = addr;
+					dst_addr = (const void *)addr;
 					addr++;
 				}
 				break;
