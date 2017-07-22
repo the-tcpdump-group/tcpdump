@@ -1,4 +1,6 @@
+Sunday July 23, 2017 denis@ovsienko.info
   Summary for 4.9.1 tcpdump release
+    CVE-2017-11108/Fix bounds checking for STP.
     Make assorted documentation updates and fix a few typos in tcpdump output.
     Fixup -C for file size >2GB (GH #488).
     Show AddressSanitizer presence in version output.
