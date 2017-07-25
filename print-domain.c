@@ -306,6 +306,7 @@ const struct tok ns_type2str[] = {
 	{ T_MAILB,	"MAILB" },		/* RFC 1035 */
 	{ T_MAILA,	"MAILA" },		/* RFC 1035 */
 	{ T_ANY,	"ANY" },
+	{ T_XPF,	"XPF" },		/* draft-bellis-dnsop-xpf-02 */
 	{ 0,		NULL }
 };
 
@@ -567,6 +568,50 @@ ns_rprint(netdissect_options *ndo,
 			return(NULL);
 		ND_PRINT((ndo, " otherlen=%u", EXTRACT_16BITS(cp)));
 		cp += 2;
+	    }
+	case T_XPF:
+	    {
+		ND_PRINT((ndo, " ["));
+		char ntop_buf[INET6_ADDRSTRLEN];
+		if (!ND_TTEST2(*cp, 1))
+			return(NULL);
+		int ver = EXTRACT_LE_8BITS(cp);
+		ND_PRINT((ndo, "IPv%u", ver));
+		cp += 1;
+		if (!ND_TTEST2(*cp, 1))
+			return(NULL);
+		int proto = EXTRACT_LE_8BITS(cp);
+		ND_PRINT((ndo, " %s", proto & IPPROTO_UDP ? "UDP" : "TCP"));
+		cp += 1;
+		switch(ver) {
+			case 4:
+				if (!ND_TTEST2(*cp, 8))
+					return(NULL);
+				ND_PRINT((ndo, " src=%s", intoa(htonl(EXTRACT_32BITS(cp)))));
+				cp += 4;
+				ND_PRINT((ndo, " dst=%s", intoa(htonl(EXTRACT_32BITS(cp)))));
+				cp += 4;
+				break;
+			case 6:
+				if (!ND_TTEST2(*cp, 32))
+					return(NULL);
+				ND_PRINT((ndo, " src=%s", addrtostr6(cp, ntop_buf, sizeof(ntop_buf))));
+				cp += 16;
+				ND_PRINT((ndo, " dst=%s", addrtostr6(cp, ntop_buf, sizeof(ntop_buf))));
+				cp += 16;
+				break;
+			default:
+				return(NULL);
+		}
+		if (!ND_TTEST2(*cp, 2))
+			return(NULL);
+		ND_PRINT((ndo, " sport=%u", EXTRACT_16BITS(cp)));
+		cp += 2;
+		if (!ND_TTEST2(*cp, 2))
+			return(NULL);
+		ND_PRINT((ndo, " dport=%u", EXTRACT_16BITS(cp)));
+		cp += 2;
+		ND_PRINT((ndo, "]"));
 	    }
 	}
 	return (rp);		/* XXX This isn't always right */

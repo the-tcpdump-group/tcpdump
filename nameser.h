@@ -176,6 +176,7 @@
 #define T_GID		102		/* group ID */
 #define T_UNSPEC	103		/* Unspecified format (binary data) */
 #define T_UNSPECA	104		/* "unspecified ascii". Ugly MIT hack */
+#define T_XPF		65422		/* draft-bellis-dnsop-xpf-02 */
 	/* Query type values which do not appear in resource records */
 #define T_TKEY		249		/* Transaction Key [RFC2930] */
 #define T_TSIG		250		/* Transaction Signature [RFC2845] */
