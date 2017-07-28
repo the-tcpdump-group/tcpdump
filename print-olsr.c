@@ -13,7 +13,7 @@
  * LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE.
  *
- * Original code by Hannes Gredler <hannes@juniper.net>
+ * Original code by Hannes Gredler <hannes@gredler.at>
  * IPv6 additions by Florian Forster <octo at verplant.org>
  */
 

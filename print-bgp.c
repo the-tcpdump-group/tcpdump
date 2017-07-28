@@ -26,7 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * Extensively modified by Hannes Gredler (hannes@juniper.net) for more
+ * Extensively modified by Hannes Gredler (hannes@gredler.at) for more
  * complete BGP support.
  */
 

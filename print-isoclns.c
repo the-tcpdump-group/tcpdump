@@ -20,7 +20,7 @@
  *
  * Original code by Matt Thomas, Digital Equipment Corporation
  *
- * Extensively modified by Hannes Gredler (hannes@juniper.net) for more
+ * Extensively modified by Hannes Gredler (hannes@gredler.at) for more
  * complete IS-IS & CLNP support.
  */
 

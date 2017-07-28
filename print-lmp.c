@@ -10,7 +10,7 @@
  * LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE.
  *
- * Original code by Hannes Gredler (hannes@juniper.net)
+ * Original code by Hannes Gredler (hannes@gredler.at)
  * Support for LMP service discovery extensions (defined by UNI 1.0) added
  * by Manu Pathak (mapathak@cisco.com), May 2005
  */

@@ -12,7 +12,7 @@
  * LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE.
  *
- * Original code by Hannes Gredler (hannes@juniper.net)
+ * Original code by Hannes Gredler (hannes@gredler.at)
  */
 
 /* \summary: IEEE 802.1ag Connectivity Fault Management (CFM) protocols printer */

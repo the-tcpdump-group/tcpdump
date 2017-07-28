@@ -12,7 +12,7 @@
  * LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE.
  *
- * Original code by Hannes Gredler (hannes@juniper.net)
+ * Original code by Hannes Gredler (hannes@gredler.at)
  * IEEE and TIA extensions by Carles Kishimoto <carles.kishimoto@gmail.com>
  * DCBX extensions by Kaladhar Musunuru <kaladharm@sourceforge.net>
  */
