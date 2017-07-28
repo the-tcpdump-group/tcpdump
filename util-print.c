@@ -21,7 +21,7 @@
 
 /*
  * txtproto_print() derived from original code by Hannes Gredler
- * (hannes@juniper.net):
+ * (hannes@gredler.at):
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that: (1) source code
