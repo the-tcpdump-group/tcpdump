@@ -318,6 +318,8 @@ dhcpv6_print(netdissect_options *ndo,
 
     i = 0;
     while (i < length) {
+        if (i + 4 > length)
+            return -1;
         tlv = cp + i;
         type = EXTRACT_16BITS(tlv);
         optlen = EXTRACT_16BITS(tlv + 2);
@@ -329,6 +331,8 @@ dhcpv6_print(netdissect_options *ndo,
 
         ND_PRINT((ndo, "%s", tok2str(dh6opt_str, "Unknown", type)));
         ND_PRINT((ndo," (%u)", optlen + 4 ));
+        if (i + 4 + optlen > length)
+            return -1;
 
         switch (type) {
             case DH6OPT_DNS_SERVERS:
