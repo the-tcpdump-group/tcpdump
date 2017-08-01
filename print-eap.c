@@ -34,6 +34,7 @@
 #define	EAP_FRAME_TYPE_LOGOFF		2
 #define	EAP_FRAME_TYPE_KEY		3
 #define	EAP_FRAME_TYPE_ENCAP_ASF_ALERT	4
+#define EAP_FRAME_TYPE_MKA		5
 
 struct eap_frame_t {
     nd_uint8_t  version;
@@ -47,7 +48,25 @@ static const struct tok eap_frame_type_values[] = {
     { EAP_FRAME_TYPE_LOGOFF,      	"EAPOL logoff" },
     { EAP_FRAME_TYPE_KEY,      		"EAPOL key" },
     { EAP_FRAME_TYPE_ENCAP_ASF_ALERT, 	"Encapsulated ASF alert" },
+    { EAP_FRAME_TYPE_MKA,              "EAPOL-MKA" },
     { 0, NULL}
+};
+
+#define MACSEC_CAP_NONE                 0
+#define MACSEC_CAP_INTEGRITY_ONLY       1
+#define MACSEC_CAP_INT_CONF             2
+#define MACSEC_CAP_INT_CONF_WITH_OFFSET 3
+
+static const struct tok eapol_mka_macsec_cap_values[] = {
+	{ MACSEC_CAP_NONE,
+		"MACsec is not implemented" },
+	{ MACSEC_CAP_INTEGRITY_ONLY,
+		"Integrity without confidentiality" },
+	{ MACSEC_CAP_INT_CONF,
+		"Integrity with confidentiality / no confidentiality offset" },
+	{ MACSEC_CAP_INT_CONF_WITH_OFFSET,
+		"Integrity with confidentiality / confidentiality offset" },
+	{ 0, NULL }
 };
 
 /* RFC 3748 */
@@ -142,6 +161,300 @@ static const struct tok eap_aka_subtype_values[] = {
     { EAP_AKA_CLIENT_ERROR,	"Client error" },
     { 0, NULL}
 };
+
+static uint16_t
+get_parameter_set_body_length(const u_char *p)
+{
+       uint16_t x = EXTRACT_16BITS(p);
+       return (uint16_t) ((x & 0xFFF));
+}
+
+static void
+decode_mka_parameter_set(
+               netdissect_options *ndo,
+               const u_char *p,
+               const uint32_t index,
+               const uint16_t parameter_set_body_len)
+{
+    uint32_t i = 0;
+    while (i < parameter_set_body_len) {
+        if (i % 20 == 0) {
+            ND_PRINT((ndo, "\n\t\t %02x",
+            *(p + index + 4 + i)));
+        }
+        else {
+            ND_PRINT((ndo, "%02x",
+            *(p + index + 4 + i)));
+        }
+        i++;
+    }
+}
+
+static void
+decode_mka_peer_list_parameter_sets(
+               netdissect_options *ndo,
+               const u_char *p,
+               uint32_t index,
+               const uint16_t parameter_set_body_len)
+{
+    uint32_t i, n;
+
+    ND_PRINT((ndo, "\n\t\t Parameter set body length: %d",
+                parameter_set_body_len));
+    n = parameter_set_body_len / 16;
+    index += 4;
+    for (i = 0; i < n; i++) {
+        ND_PRINT((ndo, "\n\t\t Actor's Member Id: 0x%08x%08x%08x",
+                    EXTRACT_32BITS(p + index),
+                    EXTRACT_32BITS(p + index + 4),
+                    EXTRACT_32BITS(p + index + 8)));
+        ND_PRINT((ndo, "\n\t\t Actor's Message Number: 0x%08x",
+                    EXTRACT_32BITS(p + index + 12)));
+        index += 16;
+    }
+}
+
+static void decode_mka_sak_use_parameter_set(
+               netdissect_options *ndo,
+               const u_char *p,
+               uint32_t index,
+               const uint16_t parameter_set_body_len)
+{
+    uint16_t two_bytes = EXTRACT_16BITS(p + index + 1);
+    uint8_t latest_key_an = (uint8_t) ((two_bytes & 0xC000) >> 14);
+    uint8_t latest_key_tx = (uint8_t) ((two_bytes & 0x2000) >> 13);
+    uint8_t latest_key_rx = (uint8_t) ((two_bytes & 0x1000) >> 12);
+    uint8_t old_key_an = (uint8_t) ((two_bytes & 0xC00) >> 10);
+    uint8_t old_key_tx = (uint8_t) ((two_bytes & 0x200) >> 9);
+    uint8_t old_key_rx = (uint8_t) ((two_bytes & 0x100) >> 8);
+    uint8_t plain_tx = (uint8_t) ((two_bytes & 0x80) >> 7);
+    uint8_t plain_rx = (uint8_t) ((two_bytes & 0x40) >> 6);
+    uint8_t delay_protect = (uint8_t) ((two_bytes & 0x10) >> 4);
+
+    ND_PRINT((ndo, "\n\t MACsec SAK Use:"));
+    ND_PRINT((ndo, "\n\t\t Latest Key AN: %u\
+                \n\t\t Latest Key tx: %u\
+                \n\t\t Latest Key rx: %u\
+                \n\t\t Old Key AN: %u\
+                \n\t\t Old Key tx: %u\
+                \n\t\t Old Key rx: %u\
+                \n\t\t Plain tx: %u\
+                \n\t\t Plain rx: %u\
+                \n\t\t Delay protect: %u",
+                latest_key_an,
+                latest_key_tx,
+                latest_key_rx,
+                old_key_an,
+                old_key_tx,
+                old_key_rx,
+                plain_tx,
+                plain_rx,
+                delay_protect));
+    ND_PRINT((ndo, "\n\t\t Parameter set body length: %d",
+                parameter_set_body_len));
+    ND_PRINT((ndo, "\n\t\t Latest Key - Key Server Member Id: 0x%08x%08x%08x",
+                EXTRACT_32BITS(p + index + 4),
+                EXTRACT_32BITS(p + index + 8),
+                EXTRACT_32BITS(p + index + 12)));
+    ND_PRINT((ndo, "\n\t\t Latest Key - Key Number: 0x%08x",
+                EXTRACT_32BITS(p + index + 16)));
+    ND_PRINT((ndo, "\n\t\t Latest Key - Lowest Acceptable PN: 0x%08x",
+                EXTRACT_32BITS(p + index + 20)));
+    ND_PRINT((ndo, "\n\t\t Old Key - Key Server Member Id: 0x%08x%08x%08x",
+                EXTRACT_32BITS(p + index + 24),
+                EXTRACT_32BITS(p + index + 28),
+                EXTRACT_32BITS(p + index + 32)));
+    ND_PRINT((ndo, "\n\t\t Old Key - Key Number: 0x%08x",
+                EXTRACT_32BITS(p + index + 36)));
+    ND_PRINT((ndo, "\n\t\t Old Key - Lowest Acceptable PN: 0x%08x",
+                EXTRACT_32BITS(p + index + 40)));
+}
+
+static void decode_mka_distributed_sak_parameter_set(
+               netdissect_options *ndo,
+               const u_char *p,
+               uint32_t index,
+               const uint16_t parameter_set_body_len)
+{
+    if (parameter_set_body_len > 0) {
+        uint16_t two_bytes = EXTRACT_16BITS(p + index + 1);
+        uint8_t dist_an = (uint8_t) ((two_bytes & 0xC000) >> 14);
+        uint8_t offset = (uint8_t) ((two_bytes & 0x3000) >> 12);
+
+        ND_PRINT((ndo, "\n\t Distributed SAK:"));
+        ND_PRINT((ndo, "\n\t\t Distributed AN: %u\
+                    \n\t\t Confidentiality offset: %u\
+                    \n\t\t Parameter set body length: %d\
+                    \n\t\t Key Number: 0x%08x",
+                        dist_an,
+                        offset,
+                        parameter_set_body_len,
+                        EXTRACT_32BITS(p + index + 4)));
+        if (parameter_set_body_len == 28) {
+            /*
+             * The default cipher suite, GCM-AES-128, is being used.
+             * */
+            ND_PRINT((ndo, "\n\t\t AES Key Wrap of SAK: 0x%08x%08x%08x%08x%08x%08x",
+                        EXTRACT_32BITS(p + index + 8),
+                        EXTRACT_32BITS(p + index + 12),
+                        EXTRACT_32BITS(p + index + 16),
+                        EXTRACT_32BITS(p + index + 20),
+                        EXTRACT_32BITS(p + index + 24),
+                        EXTRACT_32BITS(p + index + 28)));
+        }
+        else if (parameter_set_body_len == 36) {
+            /*
+             * The cipher suite being used is not GCM-AES-128.
+             * */
+            ND_PRINT((ndo, "\n\t\t MACsec Cipher Suite: 0x%08x%08x",
+                        EXTRACT_32BITS(p + index + 8),
+                        EXTRACT_32BITS(p + index + 12)));
+            ND_PRINT((ndo, "\n\t\t AES Key Wrap of SAK: 0x%08x%08x%08x%08x%08x%08x",
+                        EXTRACT_32BITS(p + index + 16),
+                        EXTRACT_32BITS(p + index + 20),
+                        EXTRACT_32BITS(p + index + 24),
+                        EXTRACT_32BITS(p + index + 28),
+                        EXTRACT_32BITS(p + index + 32),
+                        EXTRACT_32BITS(p + index + 36)));
+        }
+        else {
+            /* Unexpected value */
+            uint32_t i = 0;
+            while (i < parameter_set_body_len) {
+                if (i % 20 == 0) {
+                    ND_PRINT((ndo, "\n\t\t %02x",
+                    *(p + index + 8 + i)));
+                }
+                else {
+                    ND_PRINT((ndo, "%02x",
+                    *(p + index + 8 + i)));
+                }
+                i++;
+            }
+        }
+    }
+    else {
+            ND_PRINT((ndo, "\n\t\t Parameter set body length: %d",
+                        parameter_set_body_len));
+    }
+}
+
+static void decode_mka_distributed_cak_parameter_set(
+               netdissect_options *ndo,
+               const u_char *p,
+               uint32_t index,
+               const uint16_t parameter_set_body_len)
+{
+    ND_PRINT((ndo, "\n\t Distributed CAK Use:"));
+    ND_PRINT((ndo, "\n\t\t Parameter set body length: %d",
+                parameter_set_body_len));
+    ND_PRINT((ndo, "\n\t\t AES Key Wrap of CAK: 0x%08x%08x%08x%08x%08x%08x",
+                EXTRACT_32BITS(p + index + 4),
+                EXTRACT_32BITS(p + index + 8),
+                EXTRACT_32BITS(p + index + 12),
+                EXTRACT_32BITS(p + index + 16),
+                EXTRACT_32BITS(p + index + 20),
+                EXTRACT_32BITS(p + index + 24)));
+    uint32_t cak_name_len = parameter_set_body_len - 24;
+    uint32_t i = 0;
+    ND_PRINT((ndo, "\n\t\t CAK Key Name:"));
+    while (i < cak_name_len) {
+        if (i % 20 == 0) {
+            ND_PRINT((ndo, "\n\t\t %02x", *(p + index + 28 + i)));
+        }
+        else {
+            ND_PRINT((ndo, "%02x", *(p + index + 28 + i)));
+        }
+    }
+}
+
+static uint32_t
+decode_mka_parameter_sets(netdissect_options *ndo,
+                       const u_char *p,
+                       uint32_t index)
+{
+    uint8_t         param_set_type;
+    uint16_t        param_set_body_len;
+    uint8_t         b = 1;
+
+    param_set_type = *(p + index);
+    while (b) {
+        param_set_body_len = get_parameter_set_body_length(p + index + 2);
+        ND_TCHECK2(p[index], 4 + param_set_body_len);
+        switch (param_set_type) {
+        case 1:
+            /* Live Peer List                       */
+            ND_PRINT((ndo, "\n\t Live Peer List:"));
+            decode_mka_peer_list_parameter_sets(
+                    ndo,
+                    p,
+                    index,
+                    param_set_body_len);
+            break;
+        case 2:
+            /* Potential Peer List                  */
+            ND_PRINT((ndo, "\n\t Potential Peer List:"));
+            decode_mka_peer_list_parameter_sets(
+                    ndo,
+                    p,
+                    index,
+                    param_set_body_len);
+            break;
+        case 3:
+            /* MACsec SAK Use parameter set         */
+            decode_mka_sak_use_parameter_set(
+                    ndo,
+                    p,
+                    index,
+                    param_set_body_len);
+            break;
+        case 4:
+            /* Distributed SAK parameter set        */
+            decode_mka_distributed_sak_parameter_set(
+                    ndo,
+                    p,
+                    index,
+                    param_set_body_len);
+            break;
+        case 5:
+            /* Distributed CAK parameter set        */
+            decode_mka_distributed_cak_parameter_set(
+                    ndo,
+                    p,
+                    index,
+                    param_set_body_len);
+            break;
+
+        default:
+            ND_PRINT((ndo, "\n\t Unknown parameter set (%d):",
+                        param_set_type));
+            ND_PRINT((ndo, "\n\t\t Parameter set body length: %d",
+                        param_set_body_len));
+            decode_mka_parameter_set(
+                ndo,
+                p,
+                index,
+                param_set_body_len);
+            break;
+        }
+
+        /* Update the index (always 4 + the length of the body) */
+        index += 4 + param_set_body_len;
+
+        /* Get next parameter set type  */
+        param_set_type = *(p + index);
+        if (param_set_type == 255) {
+            b = 0;
+        }
+    }
+    return index;
+
+trunc:
+       ND_PRINT((ndo, "\n\t[|MKPDU]"));
+
+       /* Return last index if ND_TEST2() fails.       */
+       return index;
+}
 
 /*
  * Print EAP requests / responses
@@ -288,6 +601,73 @@ eapol_print(netdissect_options *ndo,
         return;
     case EAP_FRAME_TYPE_LOGOFF:
     case EAP_FRAME_TYPE_ENCAP_ASF_ALERT:
+       break;
+    case EAP_FRAME_TYPE_MKA:
+       /* The first parameter set is always the "Basic Parameter Set"  */
+       ND_TCHECK2(tptr[0], 32);
+
+       uint8_t mka_version_id = *tptr;
+       uint8_t ks_priority = *(tptr + 1);
+       uint16_t two_bytes = EXTRACT_16BITS(tptr + 2);
+       uint8_t ks = ((two_bytes & 0x8000) >> 15);
+       uint8_t macsec_desired = ((two_bytes & 0x4000) >> 14);
+       uint8_t macsec_cap = (uint8_t) ((two_bytes & 0x3000) >> 12);
+       uint16_t param_set_body_len = get_parameter_set_body_length(tptr + 2);
+
+       ND_PRINT((ndo, "\n\t Basic Parameter Set:"));
+       ND_PRINT((ndo, "\n\t\t MKA Version Id: %d", mka_version_id));
+       ND_PRINT((ndo, "\n\t\t Key Server Priority: %d", ks_priority));
+       ND_PRINT((ndo, "\n\t\t Key Server: %d", ks));
+       ND_PRINT((ndo, "\n\t\t MACsec Desired: %d", macsec_desired));
+       ND_PRINT((ndo, "\n\t\t MACsec Capability: %d (%s)",
+                   macsec_cap,
+                   tok2str(eapol_mka_macsec_cap_values, "none", macsec_cap)));
+       ND_PRINT((ndo, "\n\t\t Parameter set body length: %d",
+                   param_set_body_len));
+       ND_PRINT((ndo, "\n\t\t SCI: 0x%08x%08x",
+                   EXTRACT_32BITS(tptr + 4),
+                   EXTRACT_32BITS(tptr + 8)));
+       ND_PRINT((ndo, "\n\t\t Actor's Member Id: 0x%08x%08x%08x",
+                   EXTRACT_32BITS(tptr + 12),
+                   EXTRACT_32BITS(tptr + 16),
+                   EXTRACT_32BITS(tptr + 20)));
+       ND_PRINT((ndo, "\n\t\t Actor's Message Number: 0x%08x",
+                   EXTRACT_32BITS(tptr + 24)));
+       ND_PRINT((ndo, "\n\t\t Algorithm Agility: 0x%08x",
+                   EXTRACT_32BITS(tptr + 28)));
+       uint32_t remaining = param_set_body_len - 28;
+       uint32_t index = 32;
+       ND_TCHECK2(tptr[index], remaining);
+       ND_PRINT((ndo, "\n\t\t CAK Name: "));
+       while (remaining) {
+           ND_PRINT((ndo, "%02x", *(tptr + index)));
+           index++;
+           remaining--;
+       }
+
+       /* Decode the next parameter sets               */
+       if (*(tptr + index) < 255) {
+           index = decode_mka_parameter_sets(ndo, tptr, index);
+       }
+
+       /* ICV Indicator - The last parameter set       */
+       ND_TCHECK2(tptr[index], 4);
+       ND_PRINT((ndo, "\n\t ICV Indicator:"));
+       ND_PRINT((ndo, "\n\t\t Parameter set type: %d", *(tptr + index)));
+       index += 2;
+       uint16_t icv_len = get_parameter_set_body_length(tptr + index);
+       ND_PRINT((ndo, "\n\t\t ICV length: %d", icv_len));
+
+       /* The ICV itself is at the end of the data     */
+       index += 2;
+       ND_TCHECK2(tptr[index], icv_len);
+       ND_PRINT((ndo, "\n\t ICV: "));
+       while (icv_len) {
+           ND_PRINT((ndo, "%02x", *(tptr + index)));
+           index++;
+           icv_len--;
+       }
+       break;
     default:
         break;
     }
