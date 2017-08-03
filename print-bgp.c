@@ -2123,11 +2123,11 @@ bgp_attr_print(netdissect_options *ndo,
         {
                 uint8_t tunnel_type, flags;
 
+                ND_TCHECK2(tptr[0], 5);
                 tunnel_type = *(tptr+1);
                 flags = *tptr;
                 tlen = len;
 
-                ND_TCHECK2(tptr[0], 5);
                 ND_PRINT((ndo, "\n\t    Tunnel-type %s (%u), Flags [%s], MPLS Label %u",
                        tok2str(bgp_pmsi_tunnel_values, "Unknown", tunnel_type),
                        tunnel_type,
