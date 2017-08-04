@@ -1262,6 +1262,7 @@ cb_print(netdissect_options *ndo,
 			if (j == 0)
 				ND_PRINT((ndo, " <none!>"));
 
+			ND_TCHECK_32BITS(bp);
 			j = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 
@@ -2533,6 +2534,10 @@ ubik_print(netdissect_options *ndo,
 	 * gleaned from ubik/ubik_int.xg
 	 */
 
+	/* Every function that calls this function first makes a bounds check
+	 * for (sizeof(rx_header) + 4) bytes, so long as it remains this way
+	 * the line below will not over-read.
+	 */
 	ubik_op = EXTRACT_32BITS(bp + sizeof(struct rx_header));
 
 	ND_PRINT((ndo, " ubik call %s", tok2str(ubik_req, "op#%d", ubik_op)));
