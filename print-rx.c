@@ -2577,6 +2577,7 @@ ubik_print(netdissect_options *ndo,
 			INTOUT();
 			ND_PRINT((ndo, " length"));
 			INTOUT();
+			ND_TCHECK_32BITS(bp);
 			temp = EXTRACT_32BITS(bp);
 			bp += sizeof(int32_t);
 			tok2str(ubik_lock_types, "type %d", temp);
