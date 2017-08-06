@@ -565,6 +565,7 @@ hncp_dhcpv4data-oobr	hncp_dhcpv4data-oobr.pcap	hncp_dhcpv4data-oobr.out -v -c1
 vqp-oobr		vqp-oobr.pcap			vqp-oobr.out		-v -c1
 bgp_pmsi_tunnel-oobr	bgp_pmsi_tunnel-oobr.pcap	bgp_pmsi_tunnel-oobr.out -v -c1
 bgp_mvpn_6_and_7	bgp_mvpn_6_and_7.pcap		bgp_mvpn_6_and_7.out	-v -c1
+rsvp_fast_reroute-oobr	rsvp_fast_reroute-oobr.pcap	rsvp_fast_reroute-oobr.out -v -c1
 
 # bad packets from Katie Holly
 mlppp-oobr		mlppp-oobr.pcap			mlppp-oobr.out
