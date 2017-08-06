@@ -1334,7 +1334,7 @@ esis_print(netdissect_options *ndo,
 
             case ESIS_OPTION_PROTOCOLS:
                 while (opli>0) {
-                    ND_TCHECK(*pptr);
+                    ND_TCHECK(*tptr);
                     ND_PRINT((ndo, "%s (0x%02x)",
                            tok2str(nlpid_values,
                                    "unknown",
@@ -1367,7 +1367,7 @@ esis_print(netdissect_options *ndo,
             pptr += opli;
         }
 trunc:
-	return;
+        ND_PRINT((ndo, "[|esis]"));
 }
 
 static void
