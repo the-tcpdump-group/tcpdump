@@ -1205,6 +1205,17 @@ rsvp_obj_print(netdissect_options *ndo,
 		/* read variable length subobjects */
 		total_subobj_len = obj_tlen;
                 while(total_subobj_len > 0) {
+                    /* If RFC 3476 Section 3.1 defined that a sub-object of the
+                     * GENERALIZED_UNI RSVP object must have the Length field as
+                     * a multiple of 4, instead of the check below it would be
+                     * better to test total_subobj_len only once before the loop.
+                     * So long as it does not define it and this while loop does
+                     * not implement such a requirement, let's accept that within
+                     * each iteration subobj_len may happen to be a multiple of 1
+                     * and test it and total_subobj_len respectively.
+                     */
+                    if (total_subobj_len < 4)
+                        goto invalid;
                     subobj_len  = EXTRACT_16BITS(obj_tptr);
                     subobj_type = (EXTRACT_16BITS(obj_tptr+2))>>8;
                     af = (EXTRACT_16BITS(obj_tptr+2))&0x00FF;
@@ -1216,7 +1227,13 @@ rsvp_obj_print(netdissect_options *ndo,
                            tok2str(af_values, "Unknown", af), af,
                            subobj_len));
 
-                    if(subobj_len == 0)
+                    /* In addition to what is explained above, the same spec does not
+                     * explicitly say that the same Length field includes the 4-octet
+                     * sub-object header, but as long as this while loop implements it
+                     * as it does include, let's keep the check below consistent with
+                     * the rest of the code.
+                     */
+                    if(subobj_len < 4 || subobj_len > total_subobj_len)
                         goto invalid;
 
                     switch(subobj_type) {
