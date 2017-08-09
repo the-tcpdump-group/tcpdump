@@ -898,6 +898,9 @@ lldp_private_8023_print(netdissect_options *ndo,
         break;
 
     case LLDP_PRIVATE_8023_SUBTYPE_MTU:
+        if (tlv_len < 6) {
+            return hexdump;
+        }
         ND_PRINT((ndo, "\n\t    MTU size %u", EXTRACT_16BITS(tptr + 4)));
         break;
 
