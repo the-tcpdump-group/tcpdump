@@ -158,8 +158,8 @@ struct netdissect_options {
   int ndo_uflag;		/* Print undecoded NFS handles */
   int ndo_vflag;		/* verbosity level */
   int ndo_xflag;		/* print packet in hex */
-  int ndo_Xflag;		/* print packet in hex/ascii */
-  int ndo_Aflag;		/* print packet only in ascii observing TAB,
+  int ndo_Xflag;		/* print packet in hex/ASCII */
+  int ndo_Aflag;		/* print packet only in ASCII observing TAB,
 				 * LF, CR and SPACE as graphical chars
 				 */
   int ndo_Hflag;		/* dissect 802.11s draft mesh standard */

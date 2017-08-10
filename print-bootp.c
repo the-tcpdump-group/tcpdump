@@ -406,7 +406,7 @@ trunc:
  *     s - short (16 bits)
  *     b - period-seperated decimal bytes (variable length)
  *     x - colon-seperated hex bytes (variable length)
- *     a - ascii string (variable length)
+ *     a - ASCII string (variable length)
  *     B - on/off (8 bits)
  *     $ - special (explicit code to handle)
  */
@@ -424,7 +424,7 @@ static const struct tok tag2str[] = {
 	{ TAG_LPR_SERVER,	"iLPR-Server" },	/* lpr server (RFC1179) */
 	{ TAG_IMPRESS_SERVER,	"iIM" },	/* impress servers (Imagen) */
 	{ TAG_RLP_SERVER,	"iRL" },	/* resource location (RFC887) */
-	{ TAG_HOSTNAME,		"aHostname" },	/* ascii hostname */
+	{ TAG_HOSTNAME,		"aHostname" },	/* ASCII hostname */
 	{ TAG_BOOTSIZE,		"sBS" },	/* 512 byte blocks */
 	{ TAG_END,		" END" },
 /* RFC1497 tags */
@@ -704,7 +704,7 @@ rfc1048_print(netdissect_options *ndo,
 		switch (c) {
 
 		case 'a':
-			/* ascii strings */
+			/* ASCII strings */
 			ND_PRINT((ndo, "\""));
 			if (fn_printn(ndo, bp, len, ndo->ndo_snapend)) {
 				ND_PRINT((ndo, "\""));
