@@ -1861,6 +1861,8 @@ isis_print_is_reach_subtlv(netdissect_options *ndo,
             break;
         case ISIS_SUBTLV_EXT_IS_REACH_BW_CONSTRAINTS: /* fall through */
         case ISIS_SUBTLV_EXT_IS_REACH_BW_CONSTRAINTS_OLD:
+            if (subl == 0)
+                break;
             ND_PRINT((ndo, "%sBandwidth Constraints Model ID: %s (%u)",
                    ident,
                    tok2str(diffserv_te_bc_values, "unknown", *tptr),
@@ -1868,7 +1870,6 @@ isis_print_is_reach_subtlv(netdissect_options *ndo,
             tptr++;
             /* decode BCs until the subTLV ends */
             for (te_class = 0; te_class < (subl-1)/4; te_class++) {
-                ND_TCHECK2(*tptr, 4);
                 bw.i = EXTRACT_32BITS(tptr);
                 ND_PRINT((ndo, "%s  Bandwidth constraint CT%u: %.3f Mbps",
                        ident,
