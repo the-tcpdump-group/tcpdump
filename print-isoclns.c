@@ -1931,13 +1931,15 @@ isis_print_is_reach_subtlv(netdissect_options *ndo,
               case GMPLS_PSC2:
               case GMPLS_PSC3:
               case GMPLS_PSC4:
-                ND_TCHECK2(*tptr, 6);
+                if (subl < 6)
+                    break;
                 bw.i = EXTRACT_32BITS(tptr);
                 ND_PRINT((ndo, "%s  Min LSP Bandwidth: %.3f Mbps", ident, bw.f * 8 / 1000000));
                 ND_PRINT((ndo, "%s  Interface MTU: %u", ident, EXTRACT_16BITS(tptr + 4)));
                 break;
               case GMPLS_TSC:
-                ND_TCHECK2(*tptr, 8);
+                if (subl < 8)
+                    break;
                 bw.i = EXTRACT_32BITS(tptr);
                 ND_PRINT((ndo, "%s  Min LSP Bandwidth: %.3f Mbps", ident, bw.f * 8 / 1000000));
                 ND_PRINT((ndo, "%s  Indication %s", ident,
