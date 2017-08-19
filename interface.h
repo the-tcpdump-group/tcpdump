@@ -26,6 +26,8 @@
 #include "os-proto.h"
 #endif
 
+#include "funcattrs.h"
+
 /* snprintf et al */
 
 #include <stdarg.h>
@@ -35,19 +37,13 @@
 #endif
 
 #if !defined(HAVE_SNPRINTF)
-int snprintf(char *, size_t, const char *, ...)
-#ifdef __ATTRIBUTE___FORMAT_OK
-     __attribute__((format(printf, 3, 4)))
-#endif /* __ATTRIBUTE___FORMAT_OK */
-     ;
+int snprintf(char *, size_t, FORMAT_STRING(const char *), ...)
+     PRINTFLIKE(3, 4);
 #endif /* !defined(HAVE_SNPRINTF) */
 
 #if !defined(HAVE_VSNPRINTF)
-int vsnprintf(char *, size_t, const char *, va_list)
-#ifdef __ATTRIBUTE___FORMAT_OK
-     __attribute__((format(printf, 3, 0)))
-#endif /* __ATTRIBUTE___FORMAT_OK */
-     ;
+int vsnprintf(char *, size_t, FORMAT_STRING(const char *), va_list)
+     PRINTFLIKE(3, 0);
 #endif /* !defined(HAVE_VSNPRINTF) */
 
 #ifndef HAVE_STRLCAT
