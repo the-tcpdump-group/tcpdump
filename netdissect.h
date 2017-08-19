@@ -82,19 +82,13 @@ extern int32_t thiszone;	/* seconds offset from gmt to local time */
 extern const char istr[];
 
 #if !defined(HAVE_SNPRINTF)
-int snprintf (char *str, size_t sz, const char *format, ...)
-#ifdef __ATTRIBUTE___FORMAT_OK
-     __attribute__((format (printf, 3, 4)))
-#endif /* __ATTRIBUTE___FORMAT_OK */
-     ;
+int snprintf (char *str, size_t sz, FORMAT_STRING(const char *format), ...)
+     PRINTFLIKE(3, 4);
 #endif /* !defined(HAVE_SNPRINTF) */
 
 #if !defined(HAVE_VSNPRINTF)
-int vsnprintf (char *str, size_t sz, const char *format, va_list ap)
-#ifdef __ATTRIBUTE___FORMAT_OK
-     __attribute__((format (printf, 3, 0)))
-#endif /* __ATTRIBUTE___FORMAT_OK */
-     ;
+int vsnprintf (char *str, size_t sz, FORMAT_STRING(const char *format),
+     va_list ap) PRINTFLIKE(3, 0);
 #endif /* !defined(HAVE_VSNPRINTF) */
 
 #ifndef HAVE_STRLCAT

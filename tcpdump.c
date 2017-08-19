@@ -171,26 +171,17 @@ static int infoprint;
 char *program_name;
 
 /* Forwards */
-static void error(const char *, ...)
-     __attribute__((noreturn))
-#ifdef __ATTRIBUTE___FORMAT_OK
-     __attribute__((format (printf, 1, 2)))
-#endif /* __ATTRIBUTE___FORMAT_OK */
-     ;
-static void warning(const char *, ...)
-#ifdef __ATTRIBUTE___FORMAT_OK
-     __attribute__((format (printf, 1, 2)))
-#endif /* __ATTRIBUTE___FORMAT_OK */
-     ;
-static void exit_tcpdump(int) __attribute__((noreturn));
+static void error(FORMAT_STRING(const char *), ...) NORETURN PRINTFLIKE(1, 2);
+static void warning(FORMAT_STRING(const char *), ...) PRINTFLIKE(1, 2);
+static void exit_tcpdump(int) NORETURN;
 static RETSIGTYPE cleanup(int);
 static RETSIGTYPE child_cleanup(int);
 static void print_version(void);
 static void print_usage(void);
-static void show_tstamp_types_and_exit(pcap_t *, const char *device) __attribute__((noreturn));
-static void show_dlts_and_exit(pcap_t *, const char *device) __attribute__((noreturn));
+static void show_tstamp_types_and_exit(pcap_t *, const char *device) NORETURN;
+static void show_dlts_and_exit(pcap_t *, const char *device) NORETURN;
 #ifdef HAVE_PCAP_FINDALLDEVS
-static void show_devices_and_exit (void) __attribute__((noreturn));
+static void show_devices_and_exit (void) NORETURN;
 #endif
 
 static void print_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
