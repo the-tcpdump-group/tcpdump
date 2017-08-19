@@ -335,17 +335,6 @@
    warning */
 #undef __ATTRIBUTE___FALLTHROUGH_OK
 
-/* define if your compiler allows __attribute__((format)) without a warning */
-#undef __ATTRIBUTE___FORMAT_OK
-
-/* define if your compiler allows __attribute__((format)) to be applied to
-   function pointers */
-#undef __ATTRIBUTE___FORMAT_OK_FOR_FUNCTION_POINTERS
-
-/* define if your compiler allows __attribute__((noreturn)) to be applied to
-   function pointers */
-#undef __ATTRIBUTE___NORETURN_OK_FOR_FUNCTION_POINTERS
-
 /* to handle Ultrix compilers that don't support const in prototypes */
 #undef const
 

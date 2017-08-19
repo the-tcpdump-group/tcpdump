@@ -186,27 +186,15 @@ struct netdissect_options {
   /* pointer to function to do regular output */
   int  (*ndo_printf)(netdissect_options *,
 		     const char *fmt, ...)
-#ifdef __ATTRIBUTE___FORMAT_OK_FOR_FUNCTION_POINTERS
-		     __attribute__ ((format (printf, 2, 3)))
-#endif
-		     ;
+		     PRINTFLIKE_FUNCPTR(2, 3);
   /* pointer to function to output errors */
-  void (*ndo_error)(netdissect_options *,
-		    const char *fmt, ...)
-#ifdef __ATTRIBUTE___NORETURN_OK_FOR_FUNCTION_POINTERS
-		     __attribute__ ((noreturn))
-#endif /* __ATTRIBUTE___NORETURN_OK_FOR_FUNCTION_POINTERS */
-#ifdef __ATTRIBUTE___FORMAT_OK_FOR_FUNCTION_POINTERS
-		     __attribute__ ((format (printf, 2, 3)))
-#endif /* __ATTRIBUTE___FORMAT_OK_FOR_FUNCTION_POINTERS */
-		     ;
+  void NORETURN_FUNCPTR (*ndo_error)(netdissect_options *,
+				     const char *fmt, ...)
+				     PRINTFLIKE_FUNCPTR(2, 3);
   /* pointer to function to output warnings */
   void (*ndo_warning)(netdissect_options *,
 		      const char *fmt, ...)
-#ifdef __ATTRIBUTE___FORMAT_OK_FOR_FUNCTION_POINTERS
-		     __attribute__ ((format (printf, 2, 3)))
-#endif
-		     ;
+		      PRINTFLIKE_FUNCPTR(2, 3);
 };
 
 #define PT_VAT		1	/* Visual Audio Tool */

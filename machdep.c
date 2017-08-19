@@ -31,20 +31,12 @@
  */
 #include <netdissect-stdinc.h>
 
-#ifndef HAVE___ATTRIBUTE__
-#define __attribute__(x)
-#endif /* HAVE___ATTRIBUTE__ */
-
 #ifdef __osf__
 #include <sys/sysinfo.h>
 #include <sys/proc.h>
 
 #if !defined(HAVE_SNPRINTF)
-int snprintf(char *, size_t, const char *, ...)
-#ifdef __ATTRIBUTE___FORMAT_OK
-     __attribute__((format(printf, 3, 4)))
-#endif /* __ATTRIBUTE___FORMAT_OK */
-     ;
+int snprintf(char *, size_t, const char *, ...) PRINTFLIKE(3, 4);
 #endif /* !defined(HAVE_SNPRINTF) */
 #endif /* __osf__ */
 

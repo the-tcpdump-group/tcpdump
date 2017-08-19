@@ -76,13 +76,25 @@
    * HP aCC A.06.10 and later.
    */
   #define NORETURN __attribute((noreturn))
+
+  /*
+   * However, GCC didn't support that for function *pointers* until GCC
+   * 4.1.0; see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3481.
+   */
+  #if (defined(__GNUC__) && ((__GNUC__ * 100 + __GNUC_MINOR__) < 401))
+    #define NORETURN_FUNCPTR
+  #else
+    #define NORETURN_FUNCPTR __attribute((noreturn))
+  #endif
 #elif defined(_MSC_VER)
   /*
    * MSVC.
    */
   #define NORETURN __declspec(noreturn)
+  #define NORETURN_FUNCPTR __declspec(noreturn)
 #else
   #define NORETURN
+  #define NORETURN_FUNCPTR
 #endif
 
 /*
@@ -101,8 +113,19 @@
    * or HP aCC A.06.10 and later.
    */
   #define PRINTFLIKE(x,y) __attribute__((__format__(__printf__,x,y)))
+
+  /*
+   * However, GCC didn't support that for function *pointers* until GCC
+   * 4.1.0; see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3481.
+   */
+  #if (defined(__GNUC__) && ((__GNUC__ * 100 + __GNUC_MINOR__) < 401))
+    #define PRINTFLIKE_FUNCPTR(x,y)
+  #else
+    #define PRINTFLIKE_FUNCPTR(x,y) __attribute__((__format__(__printf__,x,y)))
+  #endif
 #else
   #define PRINTFLIKE(x,y)
+  #define PRINTFLIKE_FUNCPTR(x,y)
 #endif
 
 /*
