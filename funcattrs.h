@@ -80,8 +80,11 @@
   /*
    * However, GCC didn't support that for function *pointers* until GCC
    * 4.1.0; see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3481.
+   *
+   * Sun C/Oracle Studio C doesn't seem to support it, either.
    */
-  #if (defined(__GNUC__) && ((__GNUC__ * 100 + __GNUC_MINOR__) < 401))
+  #if (defined(__GNUC__) && ((__GNUC__ * 100 + __GNUC_MINOR__) < 401)) \
+      || (defined(__SUNPRO_C))
     #define NORETURN_FUNCPTR
   #else
     #define NORETURN_FUNCPTR __attribute((noreturn))
