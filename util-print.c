@@ -498,6 +498,8 @@ tok2strbuf(register const struct tok *lp, register const char *fmt,
 
 /*
  * Convert a token value to a string; use "fmt" if not found.
+ * Uses tok2strbuf() on one of four local static buffers of size TOKBUFSIZE
+ * in round-robin fashion.
  */
 const char *
 tok2str(register const struct tok *lp, register const char *fmt,
