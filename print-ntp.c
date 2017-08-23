@@ -141,6 +141,7 @@ struct ntpdata {
  */
 #define	NTPVERSION_1	0x08
 #define	VERSIONMASK	0x38
+#define	VERSIONSHIFT	3
 #define LEAPMASK	0xc0
 #ifdef MODEMASK
 #undef MODEMASK					/* Solaris sucks */
@@ -212,7 +213,7 @@ ntp_print(netdissect_options *ndo,
 
 	ND_TCHECK(bp->status);
 
-	version = (int)(bp->status & VERSIONMASK) >> 3;
+	version = (int)(bp->status & VERSIONMASK) >> VERSIONSHIFT;
 	ND_PRINT((ndo, "NTPv%d", version));
 
 	mode = bp->status & MODEMASK;
