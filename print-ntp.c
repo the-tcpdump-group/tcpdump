@@ -309,7 +309,7 @@ ntp_time_print(netdissect_options *ndo,
 	switch (bp->stratum) {
 
 	case UNSPECIFIED:
-		ND_PRINT((ndo, "(unspec)"));
+		ND_PRINT((ndo, "%#08x", (unsigned) td->refid));
 		break;
 
 	case PRIM_REF:
