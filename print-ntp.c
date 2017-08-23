@@ -608,17 +608,20 @@ static void
 ntp_time_print(netdissect_options *ndo,
 	       register const struct ntp_time_data *bp, u_int length)
 {
-	uint8_t version, mode;
+	uint8_t mode, version;
 	uint32_t refid;
 	unsigned i_lev = 1;		/* indent level */
 
 	if (length < NTP_TIMEMSG_MINLEN)
 		goto invalid;
 
-	version = (bp->status & VERSIONMASK) >> VERSIONSHIFT;
-	mode = (bp->status & MODEMASK) >> MODESHIFT;
-	if (length < NTP_TIMEMSG_MINLEN)
-		goto invalid;
+	ND_TCHECK(bp->status);
+
+	version = (int)(bp->status & VERSIONMASK) >> VERSIONSHIFT;
+
+	mode = bp->status & MODEMASK;
+	if (!ndo->ndo_vflag)
+		return;
 
 	ND_TCHECK(bp->stratum);
 	indent(ndo, i_lev);
