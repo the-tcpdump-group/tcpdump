@@ -672,3 +672,6 @@ lldp-app-priority	lldp-app-priority.pcap	lldp-app-priority.out	-v
 
 # DNS URI RR support tests
 dns-uri		dns-uri.pcap	dns-uri.out
+
+# AF_VSOCK tests
+vsock-1	vsock-1.pcap	vsock-1.out
