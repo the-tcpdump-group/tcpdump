@@ -602,3 +602,7 @@ nfs-seg-fault-1  nfs-seg-fault-1.pcap  nfs-seg-fault-1.out
 dns-zlip-1		dns-zlip-1.pcap		dns-zlip-1.out
 dns-zlip-2		dns-zlip-2.pcap		dns-zlip-2.out
 dns-zlip-3		dns-zlip-3.pcap		dns-zlip-3.out
+
+# NTP tests
+ntp-time	ntp-time.pcap		ntp-time.out		-v
+ntp-control	ntp-control.pcap	ntp-control.out		-v
