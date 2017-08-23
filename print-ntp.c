@@ -143,10 +143,12 @@ struct ntpdata {
 #define	VERSIONMASK	0x38
 #define	VERSIONSHIFT	3
 #define LEAPMASK	0xc0
+#define LEAPSHIFT	6
 #ifdef MODEMASK
 #undef MODEMASK					/* Solaris sucks */
 #endif
 #define	MODEMASK	0x07
+#define	MODESHIFT	0
 
 /*
  *	Code values
@@ -157,7 +159,7 @@ struct ntpdata {
 #define	MODE_CLIENT	3	/* client */
 #define	MODE_SERVER	4	/* server */
 #define	MODE_BROADCAST	5	/* broadcast */
-#define	MODE_RES1	6	/* reserved */
+#define	MODE_CONTROL	6	/* control message */
 #define	MODE_RES2	7	/* reserved */
 
 /*
@@ -180,7 +182,7 @@ static const struct tok ntp_mode_values[] = {
     { MODE_CLIENT,    "Client" },
     { MODE_SERVER,    "Server" },
     { MODE_BROADCAST, "Broadcast" },
-    { MODE_RES1,      "Reserved" },
+    { MODE_CONTROL,   "Control Message" },
     { MODE_RES2,      "Reserved" },
     { 0, NULL }
 };
