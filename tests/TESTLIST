@@ -453,3 +453,7 @@ rtp-seg-fault-2  rtp-seg-fault-2.pcap  rtp-seg-fault-2.out  -v -T rtp
 # NFS tests
 # fuzzed pcap
 nfs-seg-fault-1  nfs-seg-fault-1.pcap  nfs-seg-fault-1.out
+
+# NTP tests
+ntp-time	ntp-time.pcap		ntp-time.out		-v
+ntp-control	ntp-control.pcap	ntp-control.out		-v
