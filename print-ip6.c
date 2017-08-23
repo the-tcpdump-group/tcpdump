@@ -396,6 +396,10 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			rsvp_print(ndo, cp, len);
 			return;
 
+		case IPPROTO_EIGRP:
+			eigrp_print(ndo, cp, len);
+			return;
+
 		case IPPROTO_NONE:
 			ND_PRINT((ndo, "no next header"));
 			return;
