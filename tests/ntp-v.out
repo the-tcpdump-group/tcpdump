@@ -1,7 +1,7 @@
 IP (tos 0x0, ttl 64, id 58037, offset 0, flags [DF], proto UDP (17), length 100)
     192.168.100.2.58054 > 192.168.100.1.123: NTPv4, Client, length 72
 	Leap indicator:  (0), Stratum 0 (unspecified), poll 0 (1s), precision 32
-	Root Delay: 0.000000, Root dispersion: 0.000000, Reference-ID: (unspec)
+	Root Delay: 0.000000, Root dispersion: 0.000000, Reference-ID: 00000000
 	  Reference Timestamp:  0.000000000
 	  Originator Timestamp: 0.000000000
 	  Receive Timestamp:    0.000000000
@@ -13,7 +13,7 @@ IP (tos 0x0, ttl 64, id 58037, offset 0, flags [DF], proto UDP (17), length 100)
 IP (tos 0xb8, ttl 64, id 24722, offset 0, flags [DF], proto UDP (17), length 80)
     192.168.100.1.123 > 192.168.100.2.58054: NTPv4, Server, length 52
 	Leap indicator: clock unsynchronized (192), Stratum 0 (unspecified), poll 3 (8s), precision -23
-	Root Delay: 0.000000, Root dispersion: 0.001373, Reference-ID: (unspec)
+	Root Delay: 0.000000, Root dispersion: 0.001373, Reference-ID: 0x53544550
 	  Reference Timestamp:  0.000000000
 	  Originator Timestamp: 2763234513.007738396 (1987-07-25T21:08:33)
 	  Receive Timestamp:    3706870329.516015118 (2017-06-19T14:12:09)
@@ -24,7 +24,7 @@ IP (tos 0xb8, ttl 64, id 24722, offset 0, flags [DF], proto UDP (17), length 80)
 IP (tos 0x0, ttl 64, id 5777, offset 0, flags [DF], proto UDP (17), length 100)
     192.168.100.2.42818 > 192.168.100.1.123: NTPv4, Client, length 72
 	Leap indicator:  (0), Stratum 0 (unspecified), poll 0 (1s), precision 32
-	Root Delay: 0.000000, Root dispersion: 0.000000, Reference-ID: (unspec)
+	Root Delay: 0.000000, Root dispersion: 0.000000, Reference-ID: 00000000
 	  Reference Timestamp:  0.000000000
 	  Originator Timestamp: 3706870757.473833108 (2017-06-19T14:19:17)
 	  Receive Timestamp:    1802554105.693999877 (1957-02-13T21:28:25)
@@ -48,7 +48,7 @@ IP (tos 0x0, ttl 64, id 64601, offset 0, flags [DF], proto UDP (17), length 100)
 IP (tos 0x0, ttl 64, id 31502, offset 0, flags [DF], proto UDP (17), length 76)
     192.168.100.2.53144 > 192.168.100.1.123: NTPv4, Client, length 48
 	Leap indicator: clock unsynchronized (192), Stratum 0 (unspecified), poll 3 (8s), precision -6
-	Root Delay: 1.000000, Root dispersion: 1.000000, Reference-ID: (unspec)
+	Root Delay: 1.000000, Root dispersion: 1.000000, Reference-ID: 00000000
 	  Reference Timestamp:  0.000000000
 	  Originator Timestamp: 0.000000000
 	  Receive Timestamp:    0.000000000
@@ -68,7 +68,7 @@ IP (tos 0x0, ttl 64, id 456, offset 0, flags [DF], proto UDP (17), length 76)
 IP (tos 0xc0, ttl 64, id 4575, offset 0, flags [DF], proto UDP (17), length 96)
     192.168.100.2.123 > 192.168.100.1.123: NTPv4, Client, length 68
 	Leap indicator: clock unsynchronized (192), Stratum 0 (unspecified), poll 6 (64s), precision -25
-	Root Delay: 0.000000, Root dispersion: 0.000000, Reference-ID: (unspec)
+	Root Delay: 0.000000, Root dispersion: 0.000000, Reference-ID: 0x494e4954
 	  Reference Timestamp:  0.000000000
 	  Originator Timestamp: 0.000000000
 	  Receive Timestamp:    0.000000000
