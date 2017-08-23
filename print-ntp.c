@@ -196,10 +196,10 @@ static const struct tok ntp_mode_values[] = {
 };
 
 static const struct tok ntp_leapind_values[] = {
-    { NO_WARNING,     "" },
+    { NO_WARNING,     "Nominal" },
     { PLUS_SEC,       "+1s" },
     { MINUS_SEC,      "-1s" },
-    { ALARM,          "clock unsynchronized" },
+    { ALARM,          "clock unsync." },
     { 0, NULL }
 };
 
@@ -258,9 +258,6 @@ ntp_time_print(netdissect_options *ndo,
 {
 	int mode, version, leapind;
 
-	if (length < NTP_TIMEMSG_MINLEN)
-		goto invalid;
-
 	ND_TCHECK(bp->status);
 
 	version = (int)(bp->status & VERSIONMASK) >> VERSIONSHIFT;
@@ -292,6 +289,9 @@ ntp_time_print(netdissect_options *ndo,
 	ND_PRINT((ndo, ", poll %d", bp->ppoll));
 	p_poll(ndo, bp->ppoll);
 
+	/* Can't ND_TCHECK td->precision bitfield, so check next field with
+	 * length zero instead
+	 */
 	ND_TCHECK(bp->precision);
 	ND_PRINT((ndo, ", precision %d", bp->precision));
 
@@ -309,7 +309,7 @@ ntp_time_print(netdissect_options *ndo,
 	switch (bp->stratum) {
 
 	case UNSPECIFIED:
-		ND_PRINT((ndo, "%#08x", (unsigned) td->refid));
+		ND_PRINT((ndo, "%#08x", (unsigned) EXTRACT_32BITS(bp->refid)));
 		break;
 
 	case PRIM_REF:
@@ -382,11 +382,6 @@ ntp_time_print(netdissect_options *ndo,
 	} else if (length > NTP_TIMEMSG_MINLEN) {
 		ND_PRINT((ndo, "\n\t(%u more bytes after the header)", length - NTP_TIMEMSG_MINLEN));
 	}
-	return;
-
-invalid:
-	ND_PRINT((ndo, " %s", istr));
-	ND_TCHECK2(*bp, length);
 	return;
 
 trunc:
