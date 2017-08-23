@@ -494,7 +494,7 @@ ntp_print(netdissect_options *ndo,
 	else if (mode == MODE_CONTROL)
 		ntp_control_print(ndo, &bp->cd, length);
 	else
-		{;}			/* XXX: not implemented! */
+		ND_PRINT((ndo, ", mode==%u not implemented!", mode));
 	return;
 
 trunc:
