@@ -295,6 +295,7 @@ eigrp1-v	EIGRP_adjacency.pcap	eigrp1-v.out	-v
 eigrp2-v	EIGRP_goodbye.pcap	eigrp2-v.out	-v
 eigrp3-v	EIGRP_subnet_down.pcap	eigrp3-v.out	-v
 eigrp4-v	EIGRP_subnet_up.pcap	eigrp4-v.out	-v
+eigrp5		EIGRP_ipv6.pcap		eigrp5.out
 
 # ATA-over-Ethernet tests
 aoe_1		AoE_Linux.pcap		aoe_1.out
