@@ -113,7 +113,7 @@ struct s_fixedpt {
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 
-struct ntpdata {
+struct ntp_time_data {
 	u_char status;		/* status of local clock and leap info */
 	u_char stratum;		/* Stratum level */
 	u_char ppoll;		/* poll value */
@@ -129,12 +129,12 @@ struct ntpdata {
         uint8_t  message_digest[16];
 };
 /*
- *	Leap Second Codes (high order two bits)
+ *	Leap Second Codes
  */
-#define	NO_WARNING	0x00	/* no warning */
-#define	PLUS_SEC	0x40	/* add a second (61 seconds) */
-#define	MINUS_SEC	0x80	/* minus a second (59 seconds) */
-#define	ALARM		0xc0	/* alarm condition (clock unsynchronized) */
+#define	LI_NOMINAL	0x00	/* no warning */
+#define	LI_ADD_LEAP	0x01	/* add a second (61 seconds) */
+#define	LI_DEL_LEAP	0x02	/* minus a second (59 seconds) */
+#define	LI_ALARM	0x03	/* alarm condition (clock unsynchronized) */
 
 /*
  *	Clock Status Bits that Encode Version
@@ -187,10 +187,10 @@ static const struct tok ntp_mode_values[] = {
 };
 
 static const struct tok ntp_leapind_values[] = {
-    { NO_WARNING,     "" },
-    { PLUS_SEC,       "+1s" },
-    { MINUS_SEC,      "-1s" },
-    { ALARM,          "clock unsynchronized" },
+    { LI_NOMINAL,     "Nominal" },
+    { LI_ADD_LEAP,    "Add leap" },
+    { LI_DEL_LEAP,    "Del leap" },
+    { LI_ALARM,       "clock unsync." },
     { 0, NULL }
 };
 
@@ -200,24 +200,206 @@ static const struct tok ntp_stratum_values[] = {
 	{ 0, NULL }
 };
 
+/* draft-ietf-ntp-mode-6-cmds-02
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |LI |  VN |Mode |R|E|M| OpCode  |       Sequence Number         |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |            Status             |       Association ID          |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |            Offset             |            Count              |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                                                               |
+ * /                    Data (up to 468 bytes)                     /
+ * |                                                               |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                    Padding (optional)                         |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                                                               |
+ * /              Authenticator (optional, 96 bytes)               /
+ * |                                                               |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *
+ *               Figure 1: NTP Control Message Header
+ */
+struct ntp_control_data {
+	u_char		magic;		/* LI, VN, Mode */
+	u_char		control;	/* R, E, M, OpCode */
+	uint16_t	sequence;	/* Sequence Number */
+	uint16_t	status;		/* Status */
+	uint16_t	assoc;		/* Association ID */
+	uint16_t	offset;		/* Offset */
+	uint16_t	count;		/* Count */
+	u_char		data[564];	/* Data, [Padding, [Authenticator]] */
+};
+
+union ntpdata {
+	struct ntp_time_data	td;
+	struct ntp_control_data	cd;
+};
+
 /*
- * Print ntp requests
+ * Print NTP time requests and responses
+ */
+static void
+ntp_time_print(netdissect_options *ndo,
+	       register const struct ntp_time_data *td, u_int length)
+{
+	ND_TCHECK(td->stratum);
+	ND_PRINT((ndo, ", Stratum %u (%s)",
+		td->stratum,
+		tok2str(ntp_stratum_values,
+			(td->stratum >= 2 && td->stratum <= 15) ?
+			"secondary reference" : "reserved", td->stratum)));
+
+	ND_TCHECK(td->ppoll);
+	ND_PRINT((ndo, ", poll %u (%us)", td->ppoll, 1 << td->ppoll));
+
+	/* Can't ND_TCHECK bp->precision bitfield so bp->distance + 0 instead */
+	ND_TCHECK2(td->root_delay, 0);
+	ND_PRINT((ndo, ", precision %d", td->precision));
+
+	ND_TCHECK(td->root_delay);
+	ND_PRINT((ndo, "\n\tRoot Delay: "));
+	p_sfix(ndo, &td->root_delay);
+
+	ND_TCHECK(td->root_dispersion);
+	ND_PRINT((ndo, ", Root dispersion: "));
+	p_sfix(ndo, &td->root_dispersion);
+
+	ND_TCHECK(td->refid);
+	ND_PRINT((ndo, ", Reference-ID: "));
+	/* Interpretation depends on stratum */
+	switch (td->stratum) {
+	case UNSPECIFIED:
+		ND_PRINT((ndo, "(unspec)"));
+		break;
+
+	case PRIM_REF:
+		if (fn_printn(ndo, (const u_char *)&(td->refid), 4,
+			      ndo->ndo_snapend))
+			goto trunc;
+		break;
+
+	case INFO_QUERY:
+		ND_PRINT((ndo, "%s INFO_QUERY",
+			  ipaddr_string(ndo, &(td->refid))));
+		/* this doesn't have more content */
+		return;
+
+	case INFO_REPLY:
+		ND_PRINT((ndo, "%s INFO_REPLY",
+			  ipaddr_string(ndo, &(td->refid))));
+		/* this is too complex to be worth printing */
+		return;
+
+	default:
+		ND_PRINT((ndo, "%s", ipaddr_string(ndo, &(td->refid))));
+		break;
+	}
+
+	ND_TCHECK(td->ref_timestamp);
+	ND_PRINT((ndo, "\n\t  Reference Timestamp:  "));
+	p_ntp_time(ndo, &(td->ref_timestamp));
+
+	ND_TCHECK(td->org_timestamp);
+	ND_PRINT((ndo, "\n\t  Originator Timestamp: "));
+	p_ntp_time(ndo, &(td->org_timestamp));
+
+	ND_TCHECK(td->rec_timestamp);
+	ND_PRINT((ndo, "\n\t  Receive Timestamp:    "));
+	p_ntp_time(ndo, &(td->rec_timestamp));
+
+	ND_TCHECK(td->xmt_timestamp);
+	ND_PRINT((ndo, "\n\t  Transmit Timestamp:   "));
+	p_ntp_time(ndo, &(td->xmt_timestamp));
+
+	ND_PRINT((ndo, "\n\t    Originator - Receive Timestamp:  "));
+	p_ntp_delta(ndo, &(td->org_timestamp), &(td->rec_timestamp));
+
+	ND_PRINT((ndo, "\n\t    Originator - Transmit Timestamp: "));
+	p_ntp_delta(ndo, &(td->org_timestamp), &(td->xmt_timestamp));
+
+	if ( (sizeof(*td) - length) == 16) { 	/* Optional: key-id */
+		ND_TCHECK(td->key_id);
+		ND_PRINT((ndo, "\n\tKey id: %u", td->key_id));
+	} else if ( (sizeof(*td) - length) == 0) {
+		/* Optional: key-id + authentication */
+		ND_TCHECK(td->key_id);
+		ND_PRINT((ndo, "\n\tKey id: %u", td->key_id));
+		ND_TCHECK2(td->message_digest, sizeof (td->message_digest));
+                ND_PRINT((ndo, "\n\tAuthentication: %08x%08x%08x%08x",
+			  EXTRACT_32BITS(td->message_digest),
+		               EXTRACT_32BITS(td->message_digest + 4),
+		               EXTRACT_32BITS(td->message_digest + 8),
+		               EXTRACT_32BITS(td->message_digest + 12)));
+        }
+	return;
+
+trunc:
+	ND_PRINT((ndo, " [|ntp]"));
+}
+
+/*
+ * Print NTP control message requests and responses
+ */
+static void
+ntp_control_print(netdissect_options *ndo,
+		  register const struct ntp_control_data *cd, u_int length)
+{
+	u_char R, E, M, opcode;
+	uint16_t sequence, status, assoc, offset, count;
+
+	R = (cd->control & 0x80) != 0;
+	E = (cd->control & 0x40) != 0;
+	M = (cd->control & 0x20) != 0;
+	opcode = cd->control & 0x1f;
+	ND_PRINT((ndo, ", %s, %s, %s, OpCode=%u\n",
+		  R ? "Response" : "Request", E ? "Error" : "OK",
+		  M ? "More" : "Last", (unsigned)opcode));
+
+	sequence = EXTRACT_16BITS(&cd->sequence);
+	ND_PRINT((ndo, "\tSequence=%hu", sequence));
+
+	status = EXTRACT_16BITS(&cd->status);
+	ND_PRINT((ndo, ", Status=%#hx", status));
+
+	assoc = EXTRACT_16BITS(&cd->assoc);
+	ND_PRINT((ndo, ", Assoc.=%hu", assoc));
+
+	offset = EXTRACT_16BITS(&cd->offset);
+	ND_PRINT((ndo, ", Offset=%hu", offset));
+
+	count = EXTRACT_16BITS(&cd->count);
+	ND_PRINT((ndo, ", Count=%hu", count));
+
+	if ((cd->data - (const u_char *)cd) + count > length)
+		goto trunc;
+	if (count != 0)
+		ND_PRINT((ndo, "\n\tTO-BE-DONE: data not interpreted"));
+	return;
+
+trunc:
+	ND_PRINT((ndo, " [|ntp]"));
+}
+
+/*
+ * Print NTP requests, handling the common VN, LI, and Mode
  */
 void
 ntp_print(netdissect_options *ndo,
           register const u_char *cp, u_int length)
 {
-	register const struct ntpdata *bp;
+	register const union ntpdata *bp = (const union ntpdata *)cp;
 	int mode, version, leapind;
 
-	bp = (const struct ntpdata *)cp;
+	ND_TCHECK(bp->td.status);
 
-	ND_TCHECK(bp->status);
-
-	version = (int)(bp->status & VERSIONMASK) >> VERSIONSHIFT;
+	version = (bp->td.status & VERSIONMASK) >> VERSIONSHIFT;
 	ND_PRINT((ndo, "NTPv%d", version));
 
-	mode = bp->status & MODEMASK;
+	mode = (bp->td.status & MODEMASK) >> MODESHIFT;
 	if (!ndo->ndo_vflag) {
 		ND_PRINT((ndo, ", %s, length %u",
 		          tok2str(ntp_mode_values, "Unknown mode", mode),
@@ -225,99 +407,20 @@ ntp_print(netdissect_options *ndo,
 		return;
 	}
 
-	ND_PRINT((ndo, ", length %u\n\t%s",
-	          length,
-	          tok2str(ntp_mode_values, "Unknown mode", mode)));
+	ND_PRINT((ndo, ", %s, length %u\n",
+	          tok2str(ntp_mode_values, "Unknown mode", mode), length));
 
-	leapind = bp->status & LEAPMASK;
-	ND_PRINT((ndo, ", Leap indicator: %s (%u)",
+	leapind = (bp->td.status & LEAPMASK) >> LEAPSHIFT;
+	ND_PRINT((ndo, "\tLeap indicator: %s (%u)",
 	          tok2str(ntp_leapind_values, "Unknown", leapind),
 	          leapind));
 
-	ND_TCHECK(bp->stratum);
-	ND_PRINT((ndo, ", Stratum %u (%s)",
-		bp->stratum,
-		tok2str(ntp_stratum_values, (bp->stratum >=2 && bp->stratum<=15) ? "secondary reference" : "reserved", bp->stratum)));
-
-	ND_TCHECK(bp->ppoll);
-	ND_PRINT((ndo, ", poll %u (%us)", bp->ppoll, 1 << bp->ppoll));
-
-	/* Can't ND_TCHECK bp->precision bitfield so bp->distance + 0 instead */
-	ND_TCHECK2(bp->root_delay, 0);
-	ND_PRINT((ndo, ", precision %d", bp->precision));
-
-	ND_TCHECK(bp->root_delay);
-	ND_PRINT((ndo, "\n\tRoot Delay: "));
-	p_sfix(ndo, &bp->root_delay);
-
-	ND_TCHECK(bp->root_dispersion);
-	ND_PRINT((ndo, ", Root dispersion: "));
-	p_sfix(ndo, &bp->root_dispersion);
-
-	ND_TCHECK(bp->refid);
-	ND_PRINT((ndo, ", Reference-ID: "));
-	/* Interpretation depends on stratum */
-	switch (bp->stratum) {
-
-	case UNSPECIFIED:
-		ND_PRINT((ndo, "(unspec)"));
-		break;
-
-	case PRIM_REF:
-		if (fn_printn(ndo, (const u_char *)&(bp->refid), 4, ndo->ndo_snapend))
-			goto trunc;
-		break;
-
-	case INFO_QUERY:
-		ND_PRINT((ndo, "%s INFO_QUERY", ipaddr_string(ndo, &(bp->refid))));
-		/* this doesn't have more content */
-		return;
-
-	case INFO_REPLY:
-		ND_PRINT((ndo, "%s INFO_REPLY", ipaddr_string(ndo, &(bp->refid))));
-		/* this is too complex to be worth printing */
-		return;
-
-	default:
-		ND_PRINT((ndo, "%s", ipaddr_string(ndo, &(bp->refid))));
-		break;
-	}
-
-	ND_TCHECK(bp->ref_timestamp);
-	ND_PRINT((ndo, "\n\t  Reference Timestamp:  "));
-	p_ntp_time(ndo, &(bp->ref_timestamp));
-
-	ND_TCHECK(bp->org_timestamp);
-	ND_PRINT((ndo, "\n\t  Originator Timestamp: "));
-	p_ntp_time(ndo, &(bp->org_timestamp));
-
-	ND_TCHECK(bp->rec_timestamp);
-	ND_PRINT((ndo, "\n\t  Receive Timestamp:    "));
-	p_ntp_time(ndo, &(bp->rec_timestamp));
-
-	ND_TCHECK(bp->xmt_timestamp);
-	ND_PRINT((ndo, "\n\t  Transmit Timestamp:   "));
-	p_ntp_time(ndo, &(bp->xmt_timestamp));
-
-	ND_PRINT((ndo, "\n\t    Originator - Receive Timestamp:  "));
-	p_ntp_delta(ndo, &(bp->org_timestamp), &(bp->rec_timestamp));
-
-	ND_PRINT((ndo, "\n\t    Originator - Transmit Timestamp: "));
-	p_ntp_delta(ndo, &(bp->org_timestamp), &(bp->xmt_timestamp));
-
-	if ( (sizeof(struct ntpdata) - length) == 16) { 	/* Optional: key-id */
-		ND_TCHECK(bp->key_id);
-		ND_PRINT((ndo, "\n\tKey id: %u", bp->key_id));
-	} else if ( (sizeof(struct ntpdata) - length) == 0) { 	/* Optional: key-id + authentication */
-		ND_TCHECK(bp->key_id);
-		ND_PRINT((ndo, "\n\tKey id: %u", bp->key_id));
-		ND_TCHECK2(bp->message_digest, sizeof (bp->message_digest));
-                ND_PRINT((ndo, "\n\tAuthentication: %08x%08x%08x%08x",
-        		       EXTRACT_32BITS(bp->message_digest),
-		               EXTRACT_32BITS(bp->message_digest + 4),
-		               EXTRACT_32BITS(bp->message_digest + 8),
-		               EXTRACT_32BITS(bp->message_digest + 12)));
-        }
+	if (mode >= MODE_UNSPEC && mode <= MODE_BROADCAST)
+		ntp_time_print(ndo, &bp->td, length);
+	else if (mode == MODE_CONTROL)
+		ntp_control_print(ndo, &bp->cd, length);
+	else
+		{;}			/* XXX: not implemented! */
 	return;
 
 trunc:
