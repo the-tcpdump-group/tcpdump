@@ -256,7 +256,9 @@ ntp_time_print(netdissect_options *ndo,
 	ND_TCHECK(td->ppoll);
 	ND_PRINT((ndo, ", poll %u (%us)", td->ppoll, 1 << td->ppoll));
 
-	/* Can't ND_TCHECK bp->precision bitfield so bp->distance + 0 instead */
+	/* Can't ND_TCHECK td->precision bitfield, so check next field with
+	 * length zero instead
+	 */
 	ND_TCHECK2(td->root_delay, 0);
 	ND_PRINT((ndo, ", precision %d", td->precision));
 
@@ -321,19 +323,19 @@ ntp_time_print(netdissect_options *ndo,
 	ND_PRINT((ndo, "\n\t    Originator - Transmit Timestamp: "));
 	p_ntp_delta(ndo, &(td->org_timestamp), &(td->xmt_timestamp));
 
-	if ( (sizeof(*td) - length) == 16) { 	/* Optional: key-id */
+	if ((sizeof(*td) - length) == 16) { 	/* Optional: key-id */
 		ND_TCHECK(td->key_id);
 		ND_PRINT((ndo, "\n\tKey id: %u", td->key_id));
-	} else if ( (sizeof(*td) - length) == 0) {
+	} else if ((sizeof(*td) - length) == 0) {
 		/* Optional: key-id + authentication */
 		ND_TCHECK(td->key_id);
 		ND_PRINT((ndo, "\n\tKey id: %u", td->key_id));
 		ND_TCHECK2(td->message_digest, sizeof (td->message_digest));
                 ND_PRINT((ndo, "\n\tAuthentication: %08x%08x%08x%08x",
 			  EXTRACT_32BITS(td->message_digest),
-		               EXTRACT_32BITS(td->message_digest + 4),
-		               EXTRACT_32BITS(td->message_digest + 8),
-		               EXTRACT_32BITS(td->message_digest + 12)));
+			  EXTRACT_32BITS(td->message_digest + 4),
+			  EXTRACT_32BITS(td->message_digest + 8),
+			  EXTRACT_32BITS(td->message_digest + 12)));
         }
 	return;
 
