@@ -234,6 +234,80 @@ struct ntp_control_data {
 	u_char		data[564];	/* Data, [Padding, [Authenticator]] */
 };
 
+/* Operation Code (OpCode) for NTP control messages */
+typedef	enum {
+	OPC_Reserved_0,		/* reserved (0) */
+	OPC_Read_Status,	/* read status command/response (1) */
+	OPC_Read_Vars,		/* read variables command/response (2) */
+	OPC_Write_Vars,		/* write variables command/response (3) */
+	OPC_Read_Clock_Vars,	/* read clock variables command/response (4) */
+	OPC_Write_Clock_Vars,	/* write clock variables command/response (5) */
+	OPC_Set_Trap,		/* set trap address/port command/response (6) */
+	OPC_Trap_Response,	/* trap response (7) */
+	OPC_Configuration,	/* runtime configuration command/response (8) */
+	OPC_Export_Config,	/* export configuration command/response (9) */
+	OPC_Get_Remote_Status,	/* retrieve remote stats command/response (10) */
+	OPC_Get_List,		/* retrieve ordered list command/response (11) */
+	OPC_Reserved_12,		/* reserved (12) */
+	OPC_Reserved_13,		/* reserved (13) */
+	OPC_Reserved_14,		/* reserved (14) */
+	OPC_Reserved_15,		/* reserved (15) */
+	OPC_Reserved_16,		/* reserved (16) */
+	OPC_Reserved_17,		/* reserved (17) */
+	OPC_Reserved_18,		/* reserved (18) */
+	OPC_Reserved_19,		/* reserved (19) */
+	OPC_Reserved_20,		/* reserved (20) */
+	OPC_Reserved_21,		/* reserved (21) */
+	OPC_Reserved_22,		/* reserved (22) */
+	OPC_Reserved_23,		/* reserved (23) */
+	OPC_Reserved_24,		/* reserved (24) */
+	OPC_Reserved_25,		/* reserved (25) */
+	OPC_Reserved_26,		/* reserved (26) */
+	OPC_Reserved_27,		/* reserved (27) */
+	OPC_Reserved_28,		/* reserved (28) */
+	OPC_Reserved_29,		/* reserved (29) */
+	OPC_Reserved_30,		/* reserved (30) */
+	OPC_Request_Nonce,	/* request nonce command/response (12) */
+	OPC_Unset_Trap		/* unset trap address/port command/response (31) */
+} NTP_Control_OpCode;
+
+static const struct tok ntp_control_op_values[] = {
+	{ OPC_Reserved_0,		"reserved" },
+	{ OPC_Read_Status,		"read status" },
+	{ OPC_Read_Vars,		"read variables" },
+	{ OPC_Write_Vars,		"write variables" },
+	{ OPC_Read_Clock_Vars,		"read clock variables" },
+	{ OPC_Write_Clock_Vars,		"write clock variables" },
+	{ OPC_Set_Trap,			"set trap address/port" },
+	{ OPC_Trap_Response,		"trap response (7)" },
+	{ OPC_Configuration,		"runtime configuration" },
+	{ OPC_Export_Config,		"export configuration" },
+	{ OPC_Get_Remote_Status,	"retrieve remote stats" },
+	{ OPC_Get_List,			"retrieve ordered list" },
+	{ OPC_Reserved_12,		"reserved" },
+	{ OPC_Reserved_13,		"reserved" },
+	{ OPC_Reserved_14,		"reserved" },
+	{ OPC_Reserved_15,		"reserved" },
+	{ OPC_Reserved_16,		"reserved" },
+	{ OPC_Reserved_17,		"reserved" },
+	{ OPC_Reserved_18,		"reserved" },
+	{ OPC_Reserved_19,		"reserved" },
+	{ OPC_Reserved_20,		"reserved" },
+	{ OPC_Reserved_21,		"reserved" },
+	{ OPC_Reserved_22,		"reserved" },
+	{ OPC_Reserved_23,		"reserved" },
+	{ OPC_Reserved_24,		"reserved" },
+	{ OPC_Reserved_25,		"reserved" },
+	{ OPC_Reserved_26,		"reserved" },
+	{ OPC_Reserved_27,		"reserved" },
+	{ OPC_Reserved_28,		"reserved" },
+	{ OPC_Reserved_29,		"reserved" },
+	{ OPC_Reserved_30,		"reserved" },
+	{ OPC_Request_Nonce,		"request nonce" },
+	{ OPC_Unset_Trap,		"unset trap address/port" },
+	{ 0, NULL }
+};
+
 union ntpdata {
 	struct ntp_time_data	td;
 	struct ntp_control_data	cd;
@@ -247,7 +321,7 @@ ntp_time_print(netdissect_options *ndo,
 	       register const struct ntp_time_data *td, u_int length)
 {
 	ND_TCHECK(td->stratum);
-	ND_PRINT((ndo, ", Stratum %u (%s)",
+	ND_PRINT((ndo, "\n\tStratum %u (%s)",
 		td->stratum,
 		tok2str(ntp_stratum_values,
 			(td->stratum >= 2 && td->stratum <= 15) ?
@@ -302,27 +376,32 @@ ntp_time_print(netdissect_options *ndo,
 	}
 
 	ND_TCHECK(td->ref_timestamp);
-	ND_PRINT((ndo, "\n\t  Reference Timestamp:  "));
+	ND_PRINT((ndo, "\n\tReference Timestamp:  "));
 	p_ntp_time(ndo, &(td->ref_timestamp));
 
-	ND_TCHECK(td->org_timestamp);
-	ND_PRINT((ndo, "\n\t  Originator Timestamp: "));
-	p_ntp_time(ndo, &(td->org_timestamp));
+	if (ndo->ndo_vflag > 1) {
+		ND_TCHECK(td->org_timestamp);
+		ND_PRINT((ndo, "\n\tOriginator Timestamp: "));
+		p_ntp_time(ndo, &(td->org_timestamp));
 
-	ND_TCHECK(td->rec_timestamp);
-	ND_PRINT((ndo, "\n\t  Receive Timestamp:    "));
-	p_ntp_time(ndo, &(td->rec_timestamp));
+		ND_TCHECK(td->rec_timestamp);
+		ND_PRINT((ndo, "\n\tReceive Timestamp:    "));
+		p_ntp_time(ndo, &(td->rec_timestamp));
 
-	ND_TCHECK(td->xmt_timestamp);
-	ND_PRINT((ndo, "\n\t  Transmit Timestamp:   "));
-	p_ntp_time(ndo, &(td->xmt_timestamp));
+		ND_TCHECK(td->xmt_timestamp);
+		ND_PRINT((ndo, "\n\tTransmit Timestamp:   "));
+		p_ntp_time(ndo, &(td->xmt_timestamp));
 
-	ND_PRINT((ndo, "\n\t    Originator - Receive Timestamp:  "));
-	p_ntp_delta(ndo, &(td->org_timestamp), &(td->rec_timestamp));
+		if (ndo->ndo_vflag > 2) {
+			ND_PRINT((ndo, "\n\t    Originator - Receive delta:  "));
+			p_ntp_delta(ndo, &(td->org_timestamp),
+				    &(td->rec_timestamp));
 
-	ND_PRINT((ndo, "\n\t    Originator - Transmit Timestamp: "));
-	p_ntp_delta(ndo, &(td->org_timestamp), &(td->xmt_timestamp));
-
+			ND_PRINT((ndo, "\n\t    Originator - Transmit delta: "));
+			p_ntp_delta(ndo, &(td->org_timestamp),
+				    &(td->xmt_timestamp));
+		}
+	}
 	if ((sizeof(*td) - length) == 16) { 	/* Optional: key-id */
 		ND_TCHECK(td->key_id);
 		ND_PRINT((ndo, "\n\tKey id: %u", td->key_id));
@@ -353,33 +432,64 @@ ntp_control_print(netdissect_options *ndo,
 	u_char R, E, M, opcode;
 	uint16_t sequence, status, assoc, offset, count;
 
+	ND_TCHECK(cd->control);
 	R = (cd->control & 0x80) != 0;
 	E = (cd->control & 0x40) != 0;
 	M = (cd->control & 0x20) != 0;
 	opcode = cd->control & 0x1f;
-	ND_PRINT((ndo, ", %s, %s, %s, OpCode=%u\n",
-		  R ? "Response" : "Request", E ? "Error" : "OK",
-		  M ? "More" : "Last", (unsigned)opcode));
+	if (ndo->ndo_vflag < 2) {
+		ND_PRINT((ndo, "\n\tREM=%c%c%c, OpCode=%u\n",
+			  R ? 'R' : '_', E ? 'E' : '_', M ? 'M' : '_',
+			  (unsigned)opcode));
+	} else {
+		ND_PRINT((ndo, "\n\t%s, %s, %s, OpCode=%s\n",
+			  R ? "Response" : "Request", E ? "Error" : "OK",
+			  M ? "More" : "Last",
+			  tok2str(ntp_control_op_values, NULL, opcode)));
+	}
 
+	ND_TCHECK(cd->sequence);
 	sequence = EXTRACT_16BITS(&cd->sequence);
 	ND_PRINT((ndo, "\tSequence=%hu", sequence));
 
+	ND_TCHECK(cd->status);
 	status = EXTRACT_16BITS(&cd->status);
 	ND_PRINT((ndo, ", Status=%#hx", status));
 
+	ND_TCHECK(cd->assoc);
 	assoc = EXTRACT_16BITS(&cd->assoc);
 	ND_PRINT((ndo, ", Assoc.=%hu", assoc));
 
+	ND_TCHECK(cd->offset);
 	offset = EXTRACT_16BITS(&cd->offset);
 	ND_PRINT((ndo, ", Offset=%hu", offset));
 
+	ND_TCHECK(cd->count);
 	count = EXTRACT_16BITS(&cd->count);
 	ND_PRINT((ndo, ", Count=%hu", count));
 
-	if ((cd->data - (const u_char *)cd) + count > length)
-		goto trunc;
-	if (count != 0)
-		ND_PRINT((ndo, "\n\tTO-BE-DONE: data not interpreted"));
+	if ((int) (length - sizeof(*cd)) > 0)
+		ND_PRINT((ndo, "\n\t%u extra octets",
+			  length - (unsigned)sizeof(*cd)));
+	if (count != 0) {
+		ND_TCHECK2(cd->data, 1);
+		switch (opcode) {
+		case OPC_Read_Vars:
+		case OPC_Write_Vars:
+		case OPC_Read_Clock_Vars:
+		case OPC_Write_Clock_Vars:
+			/* data is expected to be mostly text */
+			if (ndo->ndo_vflag > 2) {
+				ND_PRINT((ndo, ", data:\n\t    "));
+				fn_print(ndo, cd->data, ndo->ndo_snapend);
+			}
+			break;
+		default:
+			/* data is binary format */
+			ND_PRINT((ndo, "\n\tTO-BE-DONE:"
+				  " data not interpreted"));
+		}
+	}
 	return;
 
 trunc:
@@ -398,24 +508,17 @@ ntp_print(netdissect_options *ndo,
 
 	ND_TCHECK(bp->td.status);
 
+	leapind = (bp->td.status & LEAPMASK) >> LEAPSHIFT;
 	version = (bp->td.status & VERSIONMASK) >> VERSIONSHIFT;
-	ND_PRINT((ndo, "NTPv%d", version));
-
 	mode = (bp->td.status & MODEMASK) >> MODESHIFT;
-	if (!ndo->ndo_vflag) {
-		ND_PRINT((ndo, ", %s, length %u",
-		          tok2str(ntp_mode_values, "Unknown mode", mode),
-		          length));
+	if (ndo->ndo_vflag == 0) {
+		ND_PRINT((ndo, "NTP LI=%u, VN=%u, Mode=%u, length=%u",
+			  leapind, version, mode, length));
 		return;
 	}
-
-	ND_PRINT((ndo, ", %s, length %u\n",
-	          tok2str(ntp_mode_values, "Unknown mode", mode), length));
-
-	leapind = (bp->td.status & LEAPMASK) >> LEAPSHIFT;
-	ND_PRINT((ndo, "\tLeap indicator: %s (%u)",
-	          tok2str(ntp_leapind_values, "Unknown", leapind),
-	          leapind));
+	ND_PRINT((ndo, "NTP leap indicator=%s, Version=%u, Mode=%s, length=%u",
+		  tok2str(ntp_leapind_values, "Unknown", leapind), version,
+		  tok2str(ntp_mode_values, "Unknown mode", mode), length));
 
 	if (mode >= MODE_UNSPEC && mode <= MODE_BROADCAST)
 		ntp_time_print(ndo, &bp->td, length);
