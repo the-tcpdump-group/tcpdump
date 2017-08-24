@@ -247,7 +247,7 @@ ntp_time_print(netdissect_options *ndo,
 	       register const struct ntp_time_data *td, u_int length)
 {
 	ND_TCHECK(td->stratum);
-	ND_PRINT((ndo, ", Stratum %u (%s)",
+	ND_PRINT((ndo, "\n\tStratum %u (%s)",
 		td->stratum,
 		tok2str(ntp_stratum_values,
 			(td->stratum >= 2 && td->stratum <= 15) ?
@@ -357,9 +357,16 @@ ntp_control_print(netdissect_options *ndo,
 	E = (cd->control & 0x40) != 0;
 	M = (cd->control & 0x20) != 0;
 	opcode = cd->control & 0x1f;
-	ND_PRINT((ndo, ", %s, %s, %s, OpCode=%u\n",
-		  R ? "Response" : "Request", E ? "Error" : "OK",
-		  M ? "More" : "Last", (unsigned)opcode));
+	if (ndo->ndo_vflag < 2) {
+		ND_PRINT((ndo, "\n\tREM=%c%c%c, OpCode=%u\n",
+			  R ? 'R' : '_', E ? 'E' : '_', M ? 'M' : '_',
+			  (unsigned)opcode));
+	} else {
+		ND_PRINT((ndo, "\n\t%s, %s, %s, OpCode=%u\n",
+			  R ? "Response" : "Request", E ? "Error" : "OK",
+			  M ? "More" : "Last",
+			  (unsigned)opcode));
+	}
 
 	sequence = EXTRACT_16BITS(&cd->sequence);
 	ND_PRINT((ndo, "\tSequence=%hu", sequence));
@@ -376,10 +383,9 @@ ntp_control_print(netdissect_options *ndo,
 	count = EXTRACT_16BITS(&cd->count);
 	ND_PRINT((ndo, ", Count=%hu", count));
 
-	if ((cd->data - (const u_char *)cd) + count > length)
-		goto trunc;
-	if (count != 0)
-		ND_PRINT((ndo, "\n\tTO-BE-DONE: data not interpreted"));
+	if ((int) (length - sizeof(*cd)) > 0)
+		ND_PRINT((ndo, "\n\t%u extra octets",
+			  length - (unsigned)sizeof(*cd)));
 	return;
 
 trunc:
@@ -398,24 +404,17 @@ ntp_print(netdissect_options *ndo,
 
 	ND_TCHECK(bp->td.status);
 
+	leapind = (bp->td.status & LEAPMASK) >> LEAPSHIFT;
 	version = (bp->td.status & VERSIONMASK) >> VERSIONSHIFT;
-	ND_PRINT((ndo, "NTPv%d", version));
-
 	mode = (bp->td.status & MODEMASK) >> MODESHIFT;
-	if (!ndo->ndo_vflag) {
-		ND_PRINT((ndo, ", %s, length %u",
-		          tok2str(ntp_mode_values, "Unknown mode", mode),
-		          length));
+	if (ndo->ndo_vflag == 0) {
+		ND_PRINT((ndo, "NTP LI=%u, VN=%u, Mode=%u, length=%u",
+			  leapind, version, mode, length));
 		return;
 	}
-
-	ND_PRINT((ndo, ", %s, length %u\n",
-	          tok2str(ntp_mode_values, "Unknown mode", mode), length));
-
-	leapind = (bp->td.status & LEAPMASK) >> LEAPSHIFT;
-	ND_PRINT((ndo, "\tLeap indicator: %s (%u)",
-	          tok2str(ntp_leapind_values, "Unknown", leapind),
-	          leapind));
+	ND_PRINT((ndo, "NTP leap indicator=%s, Version=%u, Mode=%s, length=%u",
+		  tok2str(ntp_leapind_values, "Unknown", leapind), version,
+		  tok2str(ntp_mode_values, "Unknown mode", mode), length));
 
 	if (mode >= MODE_UNSPEC && mode <= MODE_BROADCAST)
 		ntp_time_print(ndo, &bp->td, length);
