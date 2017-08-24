@@ -249,6 +249,85 @@ struct ntp_control_data {
 	nd_uint8_t	data[564];	/* Data, [Padding, [Authenticator]] */
 };
 
+/* Operation Code (OpCode) for NTP control messages */
+typedef	enum {
+	OPC_Reserved_0,		/* reserved (0) */
+	OPC_Read_Status,	/* read status command/response (1) */
+	OPC_Read_Vars,		/* read variables command/response (2) */
+	OPC_Write_Vars,		/* write variables command/response (3) */
+	OPC_Read_Clock_Vars,	/* read clock variables command/response (4) */
+	OPC_Write_Clock_Vars,	/* write clock variables command/response (5) */
+	OPC_Set_Trap,		/* set trap address/port command/response (6) */
+	OPC_Trap_Response,	/* trap response (7) */
+	OPC_Configuration,	/* runtime configuration command/response (8) */
+	OPC_Export_Config,	/* export configuration command/response (9) */
+	OPC_Get_Remote_Status,	/* retrieve remote stats command/response (10) */
+	OPC_Get_List,		/* retrieve ordered list command/response (11) */
+	OPC_Reserved_12,		/* reserved (12) */
+	OPC_Reserved_13,		/* reserved (13) */
+	OPC_Reserved_14,		/* reserved (14) */
+	OPC_Reserved_15,		/* reserved (15) */
+	OPC_Reserved_16,		/* reserved (16) */
+	OPC_Reserved_17,		/* reserved (17) */
+	OPC_Reserved_18,		/* reserved (18) */
+	OPC_Reserved_19,		/* reserved (19) */
+	OPC_Reserved_20,		/* reserved (20) */
+	OPC_Reserved_21,		/* reserved (21) */
+	OPC_Reserved_22,		/* reserved (22) */
+	OPC_Reserved_23,		/* reserved (23) */
+	OPC_Reserved_24,		/* reserved (24) */
+	OPC_Reserved_25,		/* reserved (25) */
+	OPC_Reserved_26,		/* reserved (26) */
+	OPC_Reserved_27,		/* reserved (27) */
+	OPC_Reserved_28,		/* reserved (28) */
+	OPC_Reserved_29,		/* reserved (29) */
+	OPC_Reserved_30,		/* reserved (30) */
+	OPC_Request_Nonce,	/* request nonce command/response (12) */
+	OPC_Unset_Trap		/* unset trap address/port command/response (31) */
+} NTP_Control_OpCode;
+
+static const struct tok ntp_control_op_values[] = {
+	{ OPC_Reserved_0,		"reserved" },
+	{ OPC_Read_Status,		"read status" },
+	{ OPC_Read_Vars,		"read variables" },
+	{ OPC_Write_Vars,		"write variables" },
+	{ OPC_Read_Clock_Vars,		"read clock variables" },
+	{ OPC_Write_Clock_Vars,		"write clock variables" },
+	{ OPC_Set_Trap,			"set trap address/port" },
+	{ OPC_Trap_Response,		"trap response (7)" },
+	{ OPC_Configuration,		"runtime configuration" },
+	{ OPC_Export_Config,		"export configuration" },
+	{ OPC_Get_Remote_Status,	"retrieve remote stats" },
+	{ OPC_Get_List,			"retrieve ordered list" },
+	{ OPC_Reserved_12,		"reserved" },
+	{ OPC_Reserved_13,		"reserved" },
+	{ OPC_Reserved_14,		"reserved" },
+	{ OPC_Reserved_15,		"reserved" },
+	{ OPC_Reserved_16,		"reserved" },
+	{ OPC_Reserved_17,		"reserved" },
+	{ OPC_Reserved_18,		"reserved" },
+	{ OPC_Reserved_19,		"reserved" },
+	{ OPC_Reserved_20,		"reserved" },
+	{ OPC_Reserved_21,		"reserved" },
+	{ OPC_Reserved_22,		"reserved" },
+	{ OPC_Reserved_23,		"reserved" },
+	{ OPC_Reserved_24,		"reserved" },
+	{ OPC_Reserved_25,		"reserved" },
+	{ OPC_Reserved_26,		"reserved" },
+	{ OPC_Reserved_27,		"reserved" },
+	{ OPC_Reserved_28,		"reserved" },
+	{ OPC_Reserved_29,		"reserved" },
+	{ OPC_Reserved_30,		"reserved" },
+	{ OPC_Request_Nonce,		"request nonce" },
+	{ OPC_Unset_Trap,		"unset trap address/port" },
+	{ 0, NULL }
+};
+
+union ntpdata {
+	struct ntp_time_data	td;
+	struct ntp_control_data	cd;
+};
+
 /*
  * Print NTP time requests and responses
  */
@@ -394,10 +473,10 @@ ntp_control_print(netdissect_options *ndo,
 			  R ? 'R' : '_', E ? 'E' : '_', M ? 'M' : '_',
 			  (unsigned)opcode));
 	} else {
-		ND_PRINT((ndo, "\n\t%s, %s, %s, OpCode=%u\n",
+		ND_PRINT((ndo, "\n\t%s, %s, %s, OpCode=%s\n",
 			  R ? "Response" : "Request", E ? "Error" : "OK",
 			  M ? "More" : "Last",
-			  (unsigned)opcode));
+			  tok2str(ntp_control_op_values, NULL, opcode)));
 	}
 
 	ND_TCHECK(cd->sequence);
@@ -423,6 +502,24 @@ ntp_control_print(netdissect_options *ndo,
 	if ((int) (length - sizeof(*cd)) > 0)
 		ND_PRINT((ndo, "\n\t%u extra octets",
 			  length - (unsigned)sizeof(*cd)));
+	if (count != 0) {
+		ND_TCHECK2(cd->data, 1);
+		switch (opcode) {
+		case OPC_Read_Vars:
+		case OPC_Write_Vars:
+		case OPC_Read_Clock_Vars:
+		case OPC_Write_Clock_Vars:
+			/* data is expected to be mostly text */
+			ND_PRINT((ndo, ", data:\n\t"));
+			if (ndo->ndo_vflag > 2)
+				fn_print(ndo, cd->data, ndo->ndo_snapend);
+			break;
+		default:
+			/* data is binary format */
+			ND_PRINT((ndo, "\n\tTO-BE-DONE:"
+				  " data not interpreted"));
+		}
+	}
 	return;
 
 invalid:
@@ -433,11 +530,6 @@ invalid:
 trunc:
 	ND_PRINT((ndo, " %s", tstr));
 }
-
-union ntpdata {
-	struct ntp_time_data	td;
-	struct ntp_control_data	cd;
-};
 
 /*
  * Print NTP requests, handling the common VN, LI, and Mode

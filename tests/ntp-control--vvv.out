@@ -1,63 +1,76 @@
 IP6 (flowlabel 0x62d8a, hlim 64, next-header UDP (17) payload length: 20) ::1.38531 > ::1.123: [bad udp cksum 0x0027 -> 0x5280!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=12
-	Request, OK, Last, OpCode=2
+	Request, OK, Last, OpCode=read variables
 	Sequence=68, Status=0, Assoc.=0, Offset=0, Count=0
 IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length: 416) ::1.123 > ::1.38531: [bad udp cksum 0x01b3 -> 0x412f!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=408
-	Response, OK, Last, OpCode=2
-	Sequence=68, Status=0x618, Assoc.=0, Offset=0, Count=394
+	Response, OK, Last, OpCode=read variables
+	Sequence=68, Status=0x618, Assoc.=0, Offset=0, Count=394, data:
+	version="ntpd 4.2.8p10@1.3728-o Fri May 26 14:07:29 UTC 2017 (1)",^M^Jprocessor="x86_64", system="Linux/4.4.79-18.26-default", leap=0,^M^Jstratum=3, precision=-21, rootdelay=0.708, rootdisp=69.839,^M^Jrefid=132.199.4.1, reftime=0xdd47f049.03498a9f,^M^Jclock=0xdd47f314.9cc5a445, peer=48829, tc=8, mintc=3, offset=-0.486633,^M^Jfrequency=-76.397, sys_jitter=0.000000, clk_jitter=0.314,^M^Jclk_wander=0.063^M^J
 IP6 (flowlabel 0x62d8a, hlim 64, next-header UDP (17) payload length: 20) ::1.38531 > ::1.123: [bad udp cksum 0x0027 -> 0x5280!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=12
-	Request, OK, Last, OpCode=1
+	Request, OK, Last, OpCode=read status
 	Sequence=69, Status=0, Assoc.=0, Offset=0, Count=0
 IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length: 40) ::1.123 > ::1.38531: [bad udp cksum 0x003b -> 0xfba0!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=32
-	Response, OK, Last, OpCode=1
+	Response, OK, Last, OpCode=read status
 	Sequence=69, Status=0x618, Assoc.=0, Offset=0, Count=20
+	TO-BE-DONE: data not interpreted
 IP6 (flowlabel 0x62d8a, hlim 64, next-header UDP (17) payload length: 20) ::1.38531 > ::1.123: [bad udp cksum 0x0027 -> 0x527f!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=12
-	Request, OK, Last, OpCode=1
+	Request, OK, Last, OpCode=read status
 	Sequence=70, Status=0, Assoc.=0, Offset=0, Count=0
 IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length: 40) ::1.123 > ::1.38531: [bad udp cksum 0x003b -> 0xfb9f!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=32
-	Response, OK, Last, OpCode=1
+	Response, OK, Last, OpCode=read status
 	Sequence=70, Status=0x618, Assoc.=0, Offset=0, Count=20
+	TO-BE-DONE: data not interpreted
 IP6 (flowlabel 0x62d8a, hlim 64, next-header UDP (17) payload length: 20) ::1.38531 > ::1.123: [bad udp cksum 0x0027 -> 0x93c3!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=12
-	Request, OK, Last, OpCode=2
+	Request, OK, Last, OpCode=read variables
 	Sequence=71, Status=0, Assoc.=48825, Offset=0, Count=0
 IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length: 488) ::1.123 > ::1.38531: [bad udp cksum 0x01fb -> 0x5350!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=480
-	Response, OK, More, OpCode=2
-	Sequence=71, Status=0x8011, Assoc.=48825, Offset=0, Count=468
+	Response, OK, More, OpCode=read variables
+	Sequence=71, Status=0x8011, Assoc.=48825, Offset=0, Count=468, data:
+	srcadr=141.30.228.4, srcport=123, dstadr=132.199.152.129, dstport=123,^M^Jleap=3, stratum=16, precision=-21, rootdelay=0.000, rootdisp=0.000,^M^Jrefid=STEP, reftime=0x00000000.00000000, rec=0x00000000.00000000,^M^Jreach=0x0, unreach=235, hmode=3, pmode=0, hpoll=10, ppoll=10, headway=0,^M^Jflash=0x1600, keyid=0, offset=0.000, delay=0.000, dispersion=15937.500,^M^Jjitter=0.000, xleave=0.075,^M^Jfiltdelay= 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00,^M^Jfiltoffset= 0.00 0.00 0.00 0.00
 IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length: 128) ::1.123 > ::1.38531: [bad udp cksum 0x0093 -> 0xbcc4!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=120
-	Response, OK, Last, OpCode=2
-	Sequence=71, Status=0x8011, Assoc.=48825, Offset=468, Count=106
+	Response, OK, Last, OpCode=read variables
+	Sequence=71, Status=0x8011, Assoc.=48825, Offset=468, Count=106, data:
+	 0.00 0.00 0.00 0.00,^M^Jfiltdisp= 16000.00 16000.00 16000.00 16000.00 16000.00 16000.00 16000.00 16000.00^M^J
 IP6 (flowlabel 0x62d8a, hlim 64, next-header UDP (17) payload length: 20) ::1.38531 > ::1.123: [bad udp cksum 0x0027 -> 0x93c1!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=12
-	Request, OK, Last, OpCode=2
+	Request, OK, Last, OpCode=read variables
 	Sequence=72, Status=0, Assoc.=48826, Offset=0, Count=0
 IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length: 488) ::1.123 > ::1.38531: [bad udp cksum 0x01fb -> 0xc0d5!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=480
-	Response, OK, More, OpCode=2
-	Sequence=72, Status=0x8011, Assoc.=48826, Offset=0, Count=468
+	Response, OK, More, OpCode=read variables
+	Sequence=72, Status=0x8011, Assoc.=48826, Offset=0, Count=468, data:
+	srcadr=129.70.132.37, srcport=123, dstadr=132.199.152.129, dstport=123,^M^Jleap=3, stratum=16, precision=-21, rootdelay=0.000, rootdisp=0.000,^M^Jrefid=STEP, reftime=0x00000000.00000000, rec=0x00000000.00000000,^M^Jreach=0x0, unreach=237, hmode=3, pmode=0, hpoll=10, ppoll=10, headway=0,^M^Jflash=0x1600, keyid=0, offset=0.000, delay=0.000, dispersion=15937.500,^M^Jjitter=0.000, xleave=0.074,^M^Jfiltdelay= 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00,^M^Jfiltoffset= 0.00 0.00 0.00 0.0
 IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length: 128) ::1.123 > ::1.38531: [bad udp cksum 0x0093 -> 0x88c5!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=120
-	Response, OK, Last, OpCode=2
-	Sequence=72, Status=0x8011, Assoc.=48826, Offset=468, Count=107
+	Response, OK, Last, OpCode=read variables
+	Sequence=72, Status=0x8011, Assoc.=48826, Offset=468, Count=107, data:
+	0 0.00 0.00 0.00 0.00,^M^Jfiltdisp= 16000.00 16000.00 16000.00 16000.00 16000.00 16000.00 16000.00 16000.00^M^J
 IP6 (flowlabel 0x62d8a, hlim 64, next-header UDP (17) payload length: 20) ::1.38531 > ::1.123: [bad udp cksum 0x0027 -> 0x93bf!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=12
-	Request, OK, Last, OpCode=2
+	Request, OK, Last, OpCode=read variables
 	Sequence=73, Status=0, Assoc.=48827, Offset=0, Count=0
 IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length: 488) ::1.123 > ::1.38531: [bad udp cksum 0x01fb -> 0x5c4a!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=480
-	Response, OK, More, OpCode=2
-	Sequence=73, Status=0x8011, Assoc.=48827, Offset=0, Count=468
+	Response, OK, More, OpCode=read variables
+	Sequence=73, Status=0x8011, Assoc.=48827, Offset=0, Count=468, data:
+	srcadr=81.7.4.127, srcport=123, dstadr=132.199.152.129, dstport=123,^M^Jleap=3, stratum=16, precision=-21, rootdelay=0.000, rootdisp=0.000,^M^Jrefid=STEP, reftime=0x00000000.00000000, rec=0x00000000.00000000,^M^Jreach=0x0, unreach=236, hmode=3, pmode=0, hpoll=10, ppoll=10, headway=0,^M^Jflash=0x1600, keyid=0, offset=0.000, delay=0.000, dispersion=15937.500,^M^Jjitter=0.000, xleave=0.078,^M^Jfiltdelay= 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00,^M^Jfiltoffset= 0.00 0.00 0.00 0.00 0
 IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length: 124) ::1.123 > ::1.38531: [bad udp cksum 0x008f -> 0xdcfa!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=116
-	Response, OK, Last, OpCode=2
-	Sequence=73, Status=0x8011, Assoc.=48827, Offset=468, Count=104
+	Response, OK, Last, OpCode=read variables
+	Sequence=73, Status=0x8011, Assoc.=48827, Offset=468, Count=104, data:
+	.00 0.00 0.00 0.00,^M^Jfiltdisp= 16000.00 16000.00 16000.00 16000.00 16000.00 16000.00 16000.00 16000.00^M^J
 IP6 (flowlabel 0x62d8a, hlim 64, next-header UDP (17) payload length: 20) ::1.38531 > ::1.123: [bad udp cksum 0x0027 -> 0x93bd!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=12
-	Request, OK, Last, OpCode=2
+	Request, OK, Last, OpCode=read variables
 	Sequence=74, Status=0, Assoc.=48828, Offset=0, Count=0
 IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length: 488) ::1.123 > ::1.38531: [bad udp cksum 0x01fb -> 0x5634!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=480
-	Response, OK, More, OpCode=2
-	Sequence=74, Status=0x8011, Assoc.=48828, Offset=0, Count=468
+	Response, OK, More, OpCode=read variables
+	Sequence=74, Status=0x8011, Assoc.=48828, Offset=0, Count=468, data:
+	srcadr=80.153.195.191, srcport=123, dstadr=132.199.152.129, dstport=123,^M^Jleap=3, stratum=16, precision=-21, rootdelay=0.000, rootdisp=0.000,^M^Jrefid=STEP, reftime=0x00000000.00000000, rec=0x00000000.00000000,^M^Jreach=0x0, unreach=235, hmode=3, pmode=0, hpoll=10, ppoll=10, headway=0,^M^Jflash=0x1600, keyid=0, offset=0.000, delay=0.000, dispersion=15937.500,^M^Jjitter=0.000, xleave=0.076,^M^Jfiltdelay= 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00,^M^Jfiltoffset= 0.00 0.00 0.00 0.
 IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length: 128) ::1.123 > ::1.38531: [bad udp cksum 0x0093 -> 0x8c8c!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=120
-	Response, OK, Last, OpCode=2
-	Sequence=74, Status=0x8011, Assoc.=48828, Offset=468, Count=108
+	Response, OK, Last, OpCode=read variables
+	Sequence=74, Status=0x8011, Assoc.=48828, Offset=468, Count=108, data:
+	00 0.00 0.00 0.00 0.00,^M^Jfiltdisp= 16000.00 16000.00 16000.00 16000.00 16000.00 16000.00 16000.00 16000.00^M^J
 IP6 (flowlabel 0x62d8a, hlim 64, next-header UDP (17) payload length: 20) ::1.38531 > ::1.123: [bad udp cksum 0x0027 -> 0x93bb!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=12
-	Request, OK, Last, OpCode=2
+	Request, OK, Last, OpCode=read variables
 	Sequence=75, Status=0, Assoc.=48829, Offset=0, Count=0
 IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length: 488) ::1.123 > ::1.38531: [bad udp cksum 0x01fb -> 0x9c1f!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=480
-	Response, OK, More, OpCode=2
-	Sequence=75, Status=0x961a, Assoc.=48829, Offset=0, Count=468
+	Response, OK, More, OpCode=read variables
+	Sequence=75, Status=0x961a, Assoc.=48829, Offset=0, Count=468, data:
+	srcadr=132.199.4.1, srcport=123, dstadr=132.199.152.129, dstport=123,^M^Jleap=0, stratum=2, precision=-24, rootdelay=0.366, rootdisp=48.447,^M^Jrefid=132.199.7.201, reftime=0xdd47eaf5.567e0c01,^M^Jrec=0xdd47f259.0347fbfb, reach=0xff, unreach=0, hmode=3, pmode=4,^M^Jhpoll=8, ppoll=8, headway=0, flash=0x0, keyid=0, offset=-0.487,^M^Jdelay=0.342, dispersion=20.215, jitter=0.421, xleave=0.063,^M^Jfiltdelay= 0.35 0.38 0.37 0.35 0.38 0.37 0.34 0.35,^M^Jfiltoffset= 0.22 0.09 -0.06 -0.
 IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length: 108) ::1.123 > ::1.38531: [bad udp cksum 0x007f -> 0x77be!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=100
-	Response, OK, Last, OpCode=2
-	Sequence=75, Status=0x961a, Assoc.=48829, Offset=468, Count=85
+	Response, OK, Last, OpCode=read variables
+	Sequence=75, Status=0x961a, Assoc.=48829, Offset=468, Count=85, data:
+	14 -0.24 -0.35 -0.49 -0.65,^M^Jfiltdisp= 0.00 4.05 7.92 11.87 15.80 19.65 23.51 27.38^M^J
