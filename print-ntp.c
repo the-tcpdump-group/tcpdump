@@ -508,10 +508,11 @@ p_sfix(netdissect_options *ndo,
 	f = EXTRACT_16BITS(&sfp->fraction);
 	ff = f / 65536.0;		/* shift radix point by 16 bits */
 	f = (int)(ff * 1000000.0);	/* Treat fraction as parts per million */
+	/* Note: The actual resolution is only about 15 microseconds */
 	ND_PRINT((ndo, "%d.%06d", i, f));
 }
 
-#define	FMAXINT	(4294967296.0)	/* floating point rep. of MAXINT */
+#define	FMAXINT	(4294967296.0)	/* floating point rep. of MAXINT (32 bit) */
 
 static void
 p_ntp_time(netdissect_options *ndo,
@@ -528,7 +529,12 @@ p_ntp_time(netdissect_options *ndo,
 	if (ff < 0.0)		/* some compilers are buggy */
 		ff += FMAXINT;
 	ff = ff / FMAXINT;			/* shift radix point by 32 bits */
-	f = (uint32_t)(ff * 1000000000.0);	/* treat fraction as parts per billion */
+	/* Note: The actual resolution is almost by a factor of 10 higher,
+	 * but for practical reasons the sub-nanosecond resolution can be
+	 * ignored. OK, let's round up at least...
+	 */
+	/* treat fraction as parts per billion */
+	f = (uint32_t)(ff * 1000000000.0 + 0.5);
 	ND_PRINT((ndo, "%u.%09d", i, f));
 
 #ifdef HAVE_STRFTIME
@@ -596,8 +602,9 @@ p_ntp_delta(netdissect_options *ndo,
 	ff = f;
 	if (ff < 0.0)		/* some compilers are buggy */
 		ff += FMAXINT;
-	ff = ff / FMAXINT;			/* shift radix point by 32 bits */
-	f = (uint32_t)(ff * 1000000000.0);	/* treat fraction as parts per billion */
+	ff = ff / FMAXINT;		/* shift radix point by 32 bits */
+	/* treat fraction as parts per billion */
+	f = (uint32_t)(ff * 1000000000.0 + 0.5);
 	ND_PRINT((ndo, "%s%d.%09d", signbit ? "-" : "+", i, f));
 }
 
@@ -614,4 +621,3 @@ p_poll(netdissect_options *ndo,
 	else
 		ND_PRINT((ndo, " (1/%us)", 1U << -poll_interval));
 }
-
