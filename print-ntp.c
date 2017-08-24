@@ -441,10 +441,11 @@ p_sfix(netdissect_options *ndo,
 	f = EXTRACT_16BITS(&sfp->fraction);
 	ff = f / 65536.0;		/* shift radix point by 16 bits */
 	f = (int)(ff * 1000000.0);	/* Treat fraction as parts per million */
+	/* Note: The actual resolution is only about 15 microseconds */
 	ND_PRINT((ndo, "%d.%06d", i, f));
 }
 
-#define	FMAXINT	(4294967296.0)	/* floating point rep. of MAXINT */
+#define	FMAXINT	(4294967296.0)	/* floating point rep. of MAXINT (32 bit) */
 
 static void
 p_ntp_time(netdissect_options *ndo,
@@ -461,21 +462,27 @@ p_ntp_time(netdissect_options *ndo,
 	if (ff < 0.0)		/* some compilers are buggy */
 		ff += FMAXINT;
 	ff = ff / FMAXINT;			/* shift radix point by 32 bits */
-	f = (uint32_t)(ff * 1000000000.0);	/* treat fraction as parts per billion */
+	/* Note: The actual resolution is almost by a factor of 10 higher,
+	 * but for practical reasons the sub-nanosecond resolution can be
+	 * ignored. OK, let's round up at least...
+	 */
+	/* treat fraction as parts per billion */
+	f = (uint32_t)(ff * 1000000000.0 + 0.5);
 	ND_PRINT((ndo, "%u.%09d", i, f));
 
 #ifdef HAVE_STRFTIME
 	/*
-	 * print the time in human-readable format.
+	 * print the UTC time in human-readable format.
 	 */
 	if (i) {
 	    time_t seconds = i - JAN_1970;
 	    struct tm *tm;
 	    char time_buf[128];
 
-	    tm = localtime(&seconds);
-	    strftime(time_buf, sizeof (time_buf), "%Y/%m/%d %H:%M:%S", tm);
-	    ND_PRINT((ndo, " (%s)", time_buf));
+	    tm = gmtime(&seconds);
+	    /* use ISO 8601 (RFC3339) format */
+	    strftime(time_buf, sizeof (time_buf), "%Y-%m-%dT%H:%M:%S", tm);
+	    ND_PRINT((ndo, " (%s.%04u)", time_buf, (unsigned)(ff * 10000 + 0.5)));
 	}
 #endif
 }
@@ -528,8 +535,8 @@ p_ntp_delta(netdissect_options *ndo,
 	ff = f;
 	if (ff < 0.0)		/* some compilers are buggy */
 		ff += FMAXINT;
-	ff = ff / FMAXINT;			/* shift radix point by 32 bits */
-	f = (uint32_t)(ff * 1000000000.0);	/* treat fraction as parts per billion */
+	ff = ff / FMAXINT;		/* shift radix point by 32 bits */
+	/* treat fraction as parts per billion */
+	f = (uint32_t)(ff * 1000000000.0 + 0.5);
 	ND_PRINT((ndo, "%s%d.%09d", signbit ? "-" : "+", i, f));
 }
-
