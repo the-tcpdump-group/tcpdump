@@ -376,27 +376,32 @@ ntp_time_print(netdissect_options *ndo,
 	}
 
 	ND_TCHECK(td->ref_timestamp);
-	ND_PRINT((ndo, "\n\t  Reference Timestamp:  "));
+	ND_PRINT((ndo, "\n\tReference Timestamp:  "));
 	p_ntp_time(ndo, &(td->ref_timestamp));
 
-	ND_TCHECK(td->org_timestamp);
-	ND_PRINT((ndo, "\n\t  Originator Timestamp: "));
-	p_ntp_time(ndo, &(td->org_timestamp));
+	if (ndo->ndo_vflag > 1) {
+		ND_TCHECK(td->org_timestamp);
+		ND_PRINT((ndo, "\n\tOriginator Timestamp: "));
+		p_ntp_time(ndo, &(td->org_timestamp));
 
-	ND_TCHECK(td->rec_timestamp);
-	ND_PRINT((ndo, "\n\t  Receive Timestamp:    "));
-	p_ntp_time(ndo, &(td->rec_timestamp));
+		ND_TCHECK(td->rec_timestamp);
+		ND_PRINT((ndo, "\n\tReceive Timestamp:    "));
+		p_ntp_time(ndo, &(td->rec_timestamp));
 
-	ND_TCHECK(td->xmt_timestamp);
-	ND_PRINT((ndo, "\n\t  Transmit Timestamp:   "));
-	p_ntp_time(ndo, &(td->xmt_timestamp));
+		ND_TCHECK(td->xmt_timestamp);
+		ND_PRINT((ndo, "\n\tTransmit Timestamp:   "));
+		p_ntp_time(ndo, &(td->xmt_timestamp));
 
-	ND_PRINT((ndo, "\n\t    Originator - Receive Timestamp:  "));
-	p_ntp_delta(ndo, &(td->org_timestamp), &(td->rec_timestamp));
+		if (ndo->ndo_vflag > 2) {
+			ND_PRINT((ndo, "\n\t    Originator - Receive delta:  "));
+			p_ntp_delta(ndo, &(td->org_timestamp),
+				    &(td->rec_timestamp));
 
-	ND_PRINT((ndo, "\n\t    Originator - Transmit Timestamp: "));
-	p_ntp_delta(ndo, &(td->org_timestamp), &(td->xmt_timestamp));
-
+			ND_PRINT((ndo, "\n\t    Originator - Transmit delta: "));
+			p_ntp_delta(ndo, &(td->org_timestamp),
+				    &(td->xmt_timestamp));
+		}
+	}
 	if ((sizeof(*td) - length) == 16) { 	/* Optional: key-id */
 		ND_TCHECK(td->key_id);
 		ND_PRINT((ndo, "\n\tKey id: %u", td->key_id));
@@ -474,9 +479,10 @@ ntp_control_print(netdissect_options *ndo,
 		case OPC_Read_Clock_Vars:
 		case OPC_Write_Clock_Vars:
 			/* data is expected to be mostly text */
-			ND_PRINT((ndo, ", data:\n\t"));
-			if (ndo->ndo_vflag > 2)
+			if (ndo->ndo_vflag > 2) {
+				ND_PRINT((ndo, ", data:\n\t    "));
 				fn_print(ndo, cd->data, ndo->ndo_snapend);
+			}
 			break;
 		default:
 			/* data is binary format */
