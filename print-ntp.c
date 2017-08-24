@@ -387,35 +387,40 @@ ntp_time_print(netdissect_options *ndo,
 	}
 
 	ND_TCHECK(bp->ref_timestamp);
-	ND_PRINT((ndo, "\n\t  Reference Timestamp:  "));
+	ND_PRINT((ndo, "\n\tReference Timestamp:  "));
 	p_ntp_time(ndo, &(bp->ref_timestamp));
 
-	ND_TCHECK(bp->org_timestamp);
-	ND_PRINT((ndo, "\n\t  Originator Timestamp: "));
-	p_ntp_time(ndo, &(bp->org_timestamp));
+	if (ndo->ndo_vflag > 1) {
+		ND_TCHECK(bp->org_timestamp);
+		ND_PRINT((ndo, "\n\tOriginator Timestamp: "));
+		p_ntp_time(ndo, &(bp->org_timestamp));
 
-	ND_TCHECK(bp->rec_timestamp);
-	ND_PRINT((ndo, "\n\t  Receive Timestamp:    "));
-	p_ntp_time(ndo, &(bp->rec_timestamp));
+		ND_TCHECK(bp->rec_timestamp);
+		ND_PRINT((ndo, "\n\tReceive Timestamp:    "));
+		p_ntp_time(ndo, &(bp->rec_timestamp));
 
-	ND_TCHECK(bp->xmt_timestamp);
-	ND_PRINT((ndo, "\n\t  Transmit Timestamp:   "));
-	p_ntp_time(ndo, &(bp->xmt_timestamp));
+		ND_TCHECK(bp->xmt_timestamp);
+		ND_PRINT((ndo, "\n\tTransmit Timestamp:   "));
+		p_ntp_time(ndo, &(bp->xmt_timestamp));
 
-	ND_PRINT((ndo, "\n\t    Originator - Receive Timestamp:  "));
-	p_ntp_delta(ndo, &(bp->org_timestamp), &(bp->rec_timestamp));
+		if (ndo->ndo_vflag > 2) {
+			ND_PRINT((ndo, "\n\t    Originator - Receive delta:  "));
+			p_ntp_delta(ndo, &(bp->org_timestamp),
+				    &(bp->rec_timestamp));
 
-	ND_PRINT((ndo, "\n\t    Originator - Transmit Timestamp: "));
-	p_ntp_delta(ndo, &(bp->org_timestamp), &(bp->xmt_timestamp));
-
-	/* FIXME: this code is not aware of any extension fields */
-	if (length == NTP_TIMEMSG_MINLEN + 4) { 	/* Optional: key-id (crypto-NAK) */
+			ND_PRINT((ndo, "\n\t    Originator - Transmit delta: "));
+			p_ntp_delta(ndo, &(bp->org_timestamp),
+				    &(bp->xmt_timestamp));
+		}
+	}
+	if ((sizeof(*bp) - length) == 16) { 	/* Optional: key-id */
 		ND_TCHECK(bp->key_id);
-		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_32BITS(&bp->key_id)));
-	} else if (length == NTP_TIMEMSG_MINLEN + 4 + 16) { 	/* Optional: key-id + 128-bit digest */
+		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_32BITS(bp->key_id)));
+	} else if ((sizeof(*bp) - length) == 0) {
+		/* Optional: key-id + authentication */
 		ND_TCHECK(bp->key_id);
-		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_32BITS(&bp->key_id)));
-		ND_TCHECK2(bp->message_digest, 16);
+		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_32BITS(bp->key_id)));
+		ND_TCHECK2(bp->message_digest, sizeof (bp->message_digest));
                 ND_PRINT((ndo, "\n\tAuthentication: %08x%08x%08x%08x",
         		       EXTRACT_32BITS(bp->message_digest),
 		               EXTRACT_32BITS(bp->message_digest + 4),
@@ -497,9 +502,10 @@ ntp_control_print(netdissect_options *ndo,
 		case OPC_Read_Clock_Vars:
 		case OPC_Write_Clock_Vars:
 			/* data is expected to be mostly text */
-			ND_PRINT((ndo, ", data:\n\t"));
-			if (ndo->ndo_vflag > 2)
+			if (ndo->ndo_vflag > 2) {
+				ND_PRINT((ndo, ", data:\n\t    "));
 				fn_print(ndo, cd->data, ndo->ndo_snapend);
+			}
 			break;
 		default:
 			/* data is binary format */
