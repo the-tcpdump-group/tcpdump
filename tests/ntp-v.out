@@ -5,9 +5,9 @@ IP (tos 0x0, ttl 64, id 58037, offset 0, flags [DF], proto UDP (17), length 100)
 	  Reference Timestamp:  0.000000000
 	  Originator Timestamp: 0.000000000
 	  Receive Timestamp:    0.000000000
-	  Transmit Timestamp:   2763234513.007738396 (1987-07-25T21:08:33)
+	  Transmit Timestamp:   2763234513.007738396 (1987-07-25T21:08:33.0077)
 	    Originator - Receive Timestamp:  0.000000000
-	    Originator - Transmit Timestamp: 2763234513.007738396 (1987-07-25T21:08:33)
+	    Originator - Transmit Timestamp: 2763234513.007738396 (1987-07-25T21:08:33.0077)
 	Key id: 8
 	Authentication: 57ea530f6d74350cc5286bfec1ab8ca747c73584
 IP (tos 0xb8, ttl 64, id 24722, offset 0, flags [DF], proto UDP (17), length 80)
@@ -15,9 +15,9 @@ IP (tos 0xb8, ttl 64, id 24722, offset 0, flags [DF], proto UDP (17), length 80)
 	Leap indicator: clock unsync. (192), Stratum 0 (unspecified), poll 3 (8s), precision -23
 	Root Delay: 0.000000, Root dispersion: 0.001373, Reference-ID: 0x53544550
 	  Reference Timestamp:  0.000000000
-	  Originator Timestamp: 2763234513.007738396 (1987-07-25T21:08:33)
-	  Receive Timestamp:    3706870329.516015118 (2017-06-19T14:12:09)
-	  Transmit Timestamp:   3706870329.516074048 (2017-06-19T14:12:09)
+	  Originator Timestamp: 2763234513.007738396 (1987-07-25T21:08:33.0077)
+	  Receive Timestamp:    3706870329.516015118 (2017-06-19T14:12:09.5160)
+	  Transmit Timestamp:   3706870329.516074048 (2017-06-19T14:12:09.5161)
 	    Originator - Receive Timestamp:  +943635816.508276722
 	    Originator - Transmit Timestamp: +943635816.508335651
 	Key id: 0
@@ -26,9 +26,9 @@ IP (tos 0x0, ttl 64, id 5777, offset 0, flags [DF], proto UDP (17), length 100)
 	Leap indicator: Nominal (0), Stratum 0 (unspecified), poll 0 (1s), precision 32
 	Root Delay: 0.000000, Root dispersion: 0.000000, Reference-ID: 0x00000000
 	  Reference Timestamp:  0.000000000
-	  Originator Timestamp: 3706870757.473833109 (2017-06-19T14:19:17)
-	  Receive Timestamp:    1802554105.693999877 (1957-02-13T21:28:25)
-	  Transmit Timestamp:   2929527464.107565978 (1992-10-31T13:37:44)
+	  Originator Timestamp: 3706870757.473833109 (2017-06-19T14:19:17.4738)
+	  Receive Timestamp:    1802554105.693999877 (1957-02-13T21:28:25.6940)
+	  Transmit Timestamp:   2929527464.107565978 (1992-10-31T13:37:44.1076)
 	    Originator - Receive Timestamp:  -1904316651.779833231
 	    Originator - Transmit Timestamp: -777343293.366267130
 	Key id: 8
@@ -37,10 +37,10 @@ IP (tos 0x0, ttl 64, id 64601, offset 0, flags [DF], proto UDP (17), length 100)
     192.168.100.1.123 > 192.168.100.2.42818: NTPv4, Server, length 72
 	Leap indicator: Nominal (0), Stratum 2 (secondary reference), poll 0 (1s), precision -23
 	Root Delay: 0.155502, Root dispersion: 0.001571, Reference-ID: 0x0a051b0a
-	  Reference Timestamp:  3706870757.720418354 (2017-06-19T14:19:17)
-	  Originator Timestamp: 2929527464.107565978 (1992-10-31T13:37:44)
-	  Receive Timestamp:    3706870758.494427815 (2017-06-19T14:19:18)
-	  Transmit Timestamp:   3706870758.494546877 (2017-06-19T14:19:18)
+	  Reference Timestamp:  3706870757.720418354 (2017-06-19T14:19:17.7204)
+	  Originator Timestamp: 2929527464.107565978 (1992-10-31T13:37:44.1076)
+	  Receive Timestamp:    3706870758.494427815 (2017-06-19T14:19:18.4944)
+	  Transmit Timestamp:   3706870758.494546877 (2017-06-19T14:19:18.4945)
 	    Originator - Receive Timestamp:  +777343294.386861837
 	    Originator - Transmit Timestamp: +777343294.386980899
 	Key id: 8
@@ -52,17 +52,17 @@ IP (tos 0x0, ttl 64, id 31502, offset 0, flags [DF], proto UDP (17), length 76)
 	  Reference Timestamp:  0.000000000
 	  Originator Timestamp: 0.000000000
 	  Receive Timestamp:    0.000000000
-	  Transmit Timestamp:   3706870974.488488493 (2017-06-19T14:22:54)
+	  Transmit Timestamp:   3706870974.488488493 (2017-06-19T14:22:54.4885)
 	    Originator - Receive Timestamp:  0.000000000
-	    Originator - Transmit Timestamp: 3706870974.488488493 (2017-06-19T14:22:54)
+	    Originator - Transmit Timestamp: 3706870974.488488493 (2017-06-19T14:22:54.4885)
 IP (tos 0x0, ttl 64, id 456, offset 0, flags [DF], proto UDP (17), length 76)
     192.168.100.1.123 > 192.168.100.2.53144: NTPv4, Server, length 48
 	Leap indicator: Nominal (0), Stratum 2 (secondary reference), poll 3 (8s), precision -23
 	Root Delay: 0.155456, Root dispersion: 0.001007, Reference-ID: 0x0a051b0a
-	  Reference Timestamp:  3706870972.021018557 (2017-06-19T14:22:52)
-	  Originator Timestamp: 3706870974.488488493 (2017-06-19T14:22:54)
-	  Receive Timestamp:    3706870974.488540574 (2017-06-19T14:22:54)
-	  Transmit Timestamp:   3706870974.488665335 (2017-06-19T14:22:54)
+	  Reference Timestamp:  3706870972.021018557 (2017-06-19T14:22:52.0210)
+	  Originator Timestamp: 3706870974.488488493 (2017-06-19T14:22:54.4885)
+	  Receive Timestamp:    3706870974.488540574 (2017-06-19T14:22:54.4885)
+	  Transmit Timestamp:   3706870974.488665335 (2017-06-19T14:22:54.4887)
 	    Originator - Receive Timestamp:  +0.000052081
 	    Originator - Transmit Timestamp: +0.000176843
 IP (tos 0xc0, ttl 64, id 4575, offset 0, flags [DF], proto UDP (17), length 96)
@@ -72,19 +72,19 @@ IP (tos 0xc0, ttl 64, id 4575, offset 0, flags [DF], proto UDP (17), length 96)
 	  Reference Timestamp:  0.000000000
 	  Originator Timestamp: 0.000000000
 	  Receive Timestamp:    0.000000000
-	  Transmit Timestamp:   3706872432.800841171 (2017-06-19T14:47:12)
+	  Transmit Timestamp:   3706872432.800841171 (2017-06-19T14:47:12.8008)
 	    Originator - Receive Timestamp:  0.000000000
-	    Originator - Transmit Timestamp: 3706872432.800841171 (2017-06-19T14:47:12)
+	    Originator - Transmit Timestamp: 3706872432.800841171 (2017-06-19T14:47:12.8008)
 	Key id: 8
 	Authentication: d5378a09c04da845732097104348843a
 IP (tos 0xb8, ttl 64, id 6653, offset 0, flags [DF], proto UDP (17), length 96)
     192.168.100.1.123 > 192.168.100.2.123: NTPv4, Server, length 68
 	Leap indicator: Nominal (0), Stratum 2 (secondary reference), poll 6 (64s), precision -23
 	Root Delay: 0.116577, Root dispersion: 0.001739, Reference-ID: 0x0a0ba0ee
-	  Reference Timestamp:  3706872421.265296223 (2017-06-19T14:47:01)
-	  Originator Timestamp: 3706872432.800841171 (2017-06-19T14:47:12)
-	  Receive Timestamp:    3706872432.799168336 (2017-06-19T14:47:12)
-	  Transmit Timestamp:   3706872432.799217266 (2017-06-19T14:47:12)
+	  Reference Timestamp:  3706872421.265296223 (2017-06-19T14:47:01.2653)
+	  Originator Timestamp: 3706872432.800841171 (2017-06-19T14:47:12.8008)
+	  Receive Timestamp:    3706872432.799168336 (2017-06-19T14:47:12.7992)
+	  Transmit Timestamp:   3706872432.799217266 (2017-06-19T14:47:12.7992)
 	    Originator - Receive Timestamp:  -0.001672835
 	    Originator - Transmit Timestamp: -0.001623905
 	Key id: 8

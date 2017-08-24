@@ -547,7 +547,8 @@ p_ntp_time(netdissect_options *ndo,
 		} else {
 		    /* use ISO 8601 (RFC3339) format */
 		    strftime(time_buf, sizeof (time_buf), "%Y-%m-%dT%H:%M:%S", tm);
-		    ND_PRINT((ndo, " (%s)", time_buf));
+		    ND_PRINT((ndo, " (%s.%04u)", time_buf,
+			      (unsigned)(ff * 10000 + 0.5)));
 		}
 	    }
 	}
