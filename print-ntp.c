@@ -443,18 +443,23 @@ ntp_control_print(netdissect_options *ndo,
 			  tok2str(ntp_control_op_values, NULL, opcode)));
 	}
 
+	ND_TCHECK(cd->sequence);
 	sequence = EXTRACT_16BITS(&cd->sequence);
 	ND_PRINT((ndo, "\tSequence=%hu", sequence));
 
+	ND_TCHECK(cd->status);
 	status = EXTRACT_16BITS(&cd->status);
 	ND_PRINT((ndo, ", Status=%#hx", status));
 
+	ND_TCHECK(cd->assoc);
 	assoc = EXTRACT_16BITS(&cd->assoc);
 	ND_PRINT((ndo, ", Assoc.=%hu", assoc));
 
+	ND_TCHECK(cd->offset);
 	offset = EXTRACT_16BITS(&cd->offset);
 	ND_PRINT((ndo, ", Offset=%hu", offset));
 
+	ND_TCHECK(cd->count);
 	count = EXTRACT_16BITS(&cd->count);
 	ND_PRINT((ndo, ", Count=%hu", count));
 
