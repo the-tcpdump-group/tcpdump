@@ -1435,8 +1435,8 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 		case IPSECDOI_ID_IPV6_ADDR_SUBNET:
 		    {
 			const u_char *mask;
-			if (len < 20)
-				ND_PRINT((ndo," len=%d [bad: < 20]", len));
+			if (len < 32)
+				ND_PRINT((ndo," len=%d [bad: < 32]", len));
 			else {
 				mask = (const u_char *)(data + sizeof(struct in6_addr));
 				/*XXX*/
