@@ -358,15 +358,16 @@ p_ntp_time(netdissect_options *ndo,
 
 #ifdef HAVE_STRFTIME
 	/*
-	 * print the time in human-readable format.
+	 * print the UTC time in human-readable format.
 	 */
 	if (i) {
 	    time_t seconds = i - JAN_1970;
 	    struct tm *tm;
 	    char time_buf[128];
 
-	    tm = localtime(&seconds);
-	    strftime(time_buf, sizeof (time_buf), "%Y/%m/%d %H:%M:%S", tm);
+	    tm = gmtime(&seconds);
+	    /* use ISO 8601 (RFC3339) format */
+	    strftime(time_buf, sizeof (time_buf), "%Y-%m-%dT%H:%M:%S", tm);
 	    ND_PRINT((ndo, " (%s)", time_buf));
 	}
 #endif
