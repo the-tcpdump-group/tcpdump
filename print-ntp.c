@@ -324,10 +324,27 @@ static const struct tok ntp_control_op_values[] = {
 };
 
 /* draft-ietf-ntp-mode-6-cmds-02 (Figure 2: Status Word Formats)
+ *  0                   1
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * | LI| Clock Src | Count | Code  |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *        System Status Word
+ *
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |  Status | SEL | Count | Code  |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *         Peer Status Word
+ *
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * |   Error Code  |   Reserved    |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *         Error Status Word
+ *
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |   Reserved    | Count | Code  |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *         Clock Status Word
  */
 /* Error Status for NTP control messages */
 typedef	enum {
@@ -486,6 +503,71 @@ trunc:
 }
 
 /*
+ * Print NTP control message's Error Status Word
+ */
+static void
+ntp_control_print_ESW(netdissect_options *ndo, uint16_t status)
+{
+	if (ndo->ndo_vflag > 1) {
+		ND_PRINT((ndo, ", ErrStat=%s (%#hx)",
+			  tok2str(ntp_CES_values, "reserved(%u)", status >> 8),
+			  status));
+	} else {
+		ND_PRINT((ndo, ", ErrStat=%#hx", status));
+	}
+}
+
+/*
+ * Print NTP control message's System Status Word
+ */
+static void
+ntp_control_print_SSW(netdissect_options *ndo, uint16_t status)
+{
+	u_char LI, clock_src, ecount, code;
+
+	LI = (status >> 14) & 0x03;
+	clock_src = (status >> 8) & 0x3f;
+	ecount = (status >> 4) & 0x0f;
+	code = status & 0x0f;
+	ND_PRINT((ndo, ", SysStat=%#4x (LI=%u, ClockSrc=%u, Count=%u, Code=%u)",
+		  status, LI, clock_src, ecount, code));
+	/* decode LI, Clock Source, System Event Code */
+}
+
+/*
+ * Print NTP control message's Peer Status Word
+ */
+static void
+ntp_control_print_PSW(netdissect_options *ndo, uint16_t status)
+{
+	u_char pstat, sel, ecount, code;
+
+	pstat = (status >> 11) & 0x1f;
+	sel = (status >> 8) & 0x07;
+	ecount = (status >> 4) & 0x0f;
+	code = status & 0x0f;
+	ND_PRINT((ndo, ", PeerStat=%#4x (Status=%u, Sel=%u, Count=%u, Code=%u)",
+		  status, pstat, sel, ecount, code));
+	/* decode Peer Status, Peer Selection, Peer Event Code */
+}
+
+/*
+ * Print NTP control message's Clock Status Word
+ */
+static void
+ntp_control_print_CSW(netdissect_options *ndo, uint16_t status)
+{
+	u_char reserved, ecount, code;
+
+	reserved = (status >> 8) & 0xff;
+	ecount = (status >> 4) & 0x0f;
+	code = status & 0x0f;
+	ND_PRINT((ndo, ", ClkStat=%#4x (Resvd=%u, Count=%u, Code=%u)",
+		  status, reserved, ecount, code));
+	/* decode Peer Event Code */
+}
+
+/*
  * Print NTP control message requests and responses
  */
 static void
@@ -520,22 +602,29 @@ ntp_control_print(netdissect_options *ndo,
 
 	ND_TCHECK(cd->status);
 	status = EXTRACT_BE_U_2(&cd->status);
-	if (ndo->ndo_vflag > 1) {
-		if (E) {
-			ND_PRINT((ndo, ", Status=%s (%#hx)",
-				  tok2str(ntp_CES_values, "reserved",
-					  status >> 8), status));
-		} else {
-			/* handle these cases! */
-			ND_PRINT((ndo, ", Status=%#hx", status));
-		}
-	} else {
-		ND_PRINT((ndo, ", Status=%#hx", status));
-	}
 
 	ND_TCHECK(cd->assoc);
 	assoc = EXTRACT_BE_U_2(&cd->assoc);
 	ND_PRINT((ndo, ", Assoc.=%hu", assoc));
+
+	if (E) {
+		ntp_control_print_ESW(ndo, status);
+	} else if (opcode == OPC_Read_Vars || opcode == OPC_Read_Status ||
+		   (opcode == OPC_Write_Vars && assoc != 0)) {
+		if (assoc == 0) {
+			/* See "3.1.  System Status Word" */
+			ntp_control_print_SSW(ndo, status);
+		} else {
+			/* See "3.2.  Peer Status Word" */
+			ntp_control_print_PSW(ndo, status);
+		}
+	} else if (opcode == OPC_Read_Clock_Vars ||
+		   opcode == OPC_Write_Clock_Vars) {
+		/* See "3.3.  Clock Status Word" */
+		ntp_control_print_CSW(ndo, status);
+	} else {
+		ND_PRINT((ndo, ", Status=%#hx", status));
+	}
 
 	ND_TCHECK(cd->offset);
 	offset = EXTRACT_BE_U_2(&cd->offset);
