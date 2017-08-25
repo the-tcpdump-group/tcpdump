@@ -308,6 +308,36 @@ static const struct tok ntp_control_op_values[] = {
 	{ 0, NULL }
 };
 
+/* draft-ietf-ntp-mode-6-cmds-02 (Figure 2: Status Word Formats)
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |   Error Code  |   Reserved    |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *         Error Status Word
+ */
+/* Error Status for NTP control messages */
+typedef	enum {
+	CES_Unspec,		/* unspecified (0) */
+	CES_AuthFail,		/* authentication failure (1) */
+	CES_BadMessage,		/* invalid message length or format (2) */
+	CES_BadOpcode,		/* invalid opcode (3) */
+	CES_BadAssoc,		/* unknown association identifier (4) */
+	CES_BadVar,		/* unknown variable name (5) */
+	CES_BadVal,		/* invalid variable value (6) */
+	CES_Prohibited		/* administratively prohibited (7) */
+} Control_Error_Status;
+
+static const struct tok ntp_CES_values[] = {
+	{ CES_Unspec,		"unspecified" },
+	{ CES_AuthFail,		"auth. failure" },
+	{ CES_BadMessage,	"invalid message" },
+	{ CES_BadOpcode,	"invalid opcode" },
+	{ CES_BadAssoc,		"unknown assoc. id" },
+	{ CES_BadVar,		"unknown variable" },
+	{ CES_BadVal,		"invalid value" },
+	{ CES_Prohibited,	"prohibited" },
+	{ 0, NULL }
+};
+
 union ntpdata {
 	struct ntp_time_data	td;
 	struct ntp_control_data	cd;
@@ -454,7 +484,18 @@ ntp_control_print(netdissect_options *ndo,
 
 	ND_TCHECK(cd->status);
 	status = EXTRACT_16BITS(&cd->status);
-	ND_PRINT((ndo, ", Status=%#hx", status));
+	if (ndo->ndo_vflag > 1) {
+		if (E) {
+			ND_PRINT((ndo, ", Status=%s (%#hx)",
+				  tok2str(ntp_CES_values, "reserved",
+					  status >> 8), status));
+		} else {
+			/* handle these cases! */
+			ND_PRINT((ndo, ", Status=%#hx", status));
+		}
+	} else {
+		ND_PRINT((ndo, ", Status=%#hx", status));
+	}
 
 	ND_TCHECK(cd->assoc);
 	assoc = EXTRACT_16BITS(&cd->assoc);
