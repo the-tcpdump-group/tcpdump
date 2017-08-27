@@ -51,6 +51,7 @@
 
 #include "ip.h"
 #include "ip6.h"
+#include "ipproto.h"
 
 /* refer to RFC 2408 */
 
@@ -1346,15 +1347,15 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 	    {
 		const struct ipsecdoi_id *doi_p;
 		struct ipsecdoi_id doi_id;
-		struct protoent *pe;
+		const char *p_name;
 
 		doi_p = (const struct ipsecdoi_id *)ext;
 		ND_TCHECK(*doi_p);
 		UNALIGNED_MEMCPY(&doi_id, ext, sizeof(doi_id));
 		ND_PRINT((ndo," idtype=%s", STR_OR_ID(doi_id.type, ipsecidtypestr)));
 		/* A protocol ID of 0 DOES NOT mean IPPROTO_IP! */
-		if (!ndo->ndo_nflag && doi_id.proto_id && (pe = getprotobynumber(doi_id.proto_id)) != NULL)
-			ND_PRINT((ndo," protoid=%s", pe->p_name));
+		if (!ndo->ndo_nflag && doi_id.proto_id && (p_name = netdb_protoname(doi_id.proto_id)) != NULL)
+			ND_PRINT((ndo," protoid=%s", p_name));
 		else
 			ND_PRINT((ndo," protoid=%u", doi_id.proto_id));
 		ND_PRINT((ndo," port=%d", ntohs(doi_id.port)));

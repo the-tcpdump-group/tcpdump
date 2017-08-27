@@ -159,7 +159,7 @@ cnfp_v1_print(netdissect_options *ndo, const u_char *cp)
 {
 	register const struct nfhdr_v1 *nh;
 	register const struct nfrec_v1 *nr;
-	struct protoent *pent;
+	const char *p_name;
 	int nrecs, ver;
 #if 0
 	time_t t;
@@ -211,13 +211,13 @@ cnfp_v1_print(netdissect_options *ndo, const u_char *cp)
 
 		ND_PRINT((ndo, ">> %s\n    ", intoa(nr->nhop_ina.s_addr)));
 
-		if (!ndo->ndo_nflag && (pent = getprotobynumber(nr->proto)) != NULL)
-			ND_PRINT((ndo, "%s ", pent->p_name));
+		if (!ndo->ndo_nflag && (p_name = netdb_protoname(nr->proto)) != NULL)
+			ND_PRINT((ndo, "%s ", p_name));
 		else
 			ND_PRINT((ndo, "%u ", nr->proto));
 
 		/* tcp flags for tcp only */
-		if (pent && pent->p_proto == IPPROTO_TCP) {
+		if (nr->proto == IPPROTO_TCP) {
 			int flags;
 			flags = nr->tcp_flags;
 			ND_PRINT((ndo, "%s%s%s%s%s%s%s",
@@ -248,7 +248,7 @@ cnfp_v5_print(netdissect_options *ndo, const u_char *cp)
 {
 	register const struct nfhdr_v5 *nh;
 	register const struct nfrec_v5 *nr;
-	struct protoent *pent;
+	const char *p_name;
 	int nrecs, ver;
 #if 0
 	time_t t;
@@ -307,13 +307,13 @@ cnfp_v5_print(netdissect_options *ndo, const u_char *cp)
 
 		ND_PRINT((ndo, ">> %s\n    ", intoa(nr->nhop_ina.s_addr)));
 
-		if (!ndo->ndo_nflag && (pent = getprotobynumber(nr->proto)) != NULL)
-			ND_PRINT((ndo, "%s ", pent->p_name));
+		if (!ndo->ndo_nflag && (p_name = netdb_protoname(nr->proto)) != NULL)
+			ND_PRINT((ndo, "%s ", p_name));
 		else
 			ND_PRINT((ndo, "%u ", nr->proto));
 
 		/* tcp flags for tcp only */
-		if (pent && pent->p_proto == IPPROTO_TCP) {
+		if (nr->proto == IPPROTO_TCP) {
 			int flags;
 			flags = nr->tcp_flags;
 			ND_PRINT((ndo, "%s%s%s%s%s%s%s",
@@ -344,7 +344,7 @@ cnfp_v6_print(netdissect_options *ndo, const u_char *cp)
 {
 	register const struct nfhdr_v6 *nh;
 	register const struct nfrec_v6 *nr;
-	struct protoent *pent;
+	const char *p_name;
 	int nrecs, ver;
 #if 0
 	time_t t;
@@ -403,13 +403,13 @@ cnfp_v6_print(netdissect_options *ndo, const u_char *cp)
 
 		ND_PRINT((ndo, ">> %s\n    ", intoa(nr->nhop_ina.s_addr)));
 
-		if (!ndo->ndo_nflag && (pent = getprotobynumber(nr->proto)) != NULL)
-			ND_PRINT((ndo, "%s ", pent->p_name));
+		if (!ndo->ndo_nflag && (p_name = netdb_protoname(nr->proto)) != NULL)
+			ND_PRINT((ndo, "%s ", p_name));
 		else
 			ND_PRINT((ndo, "%u ", nr->proto));
 
 		/* tcp flags for tcp only */
-		if (pent && pent->p_proto == IPPROTO_TCP) {
+		if (nr->proto == IPPROTO_TCP) {
 			int flags;
 			flags = nr->tcp_flags;
 			ND_PRINT((ndo, "%s%s%s%s%s%s%s",
