@@ -324,7 +324,7 @@ static void
 ip_print_demux(netdissect_options *ndo,
 	       struct ip_print_demux_state *ipds)
 {
-	struct protoent *proto;
+	const char *p_name;
 
 again:
 	switch (ipds->nh) {
@@ -484,8 +484,8 @@ again:
 		break;
 
 	default:
-		if (ndo->ndo_nflag==0 && (proto = getprotobynumber(ipds->nh)) != NULL)
-			ND_PRINT((ndo, " %s", proto->p_name));
+		if (ndo->ndo_nflag==0 && (p_name = netdb_protoname(ipds->nh)) != NULL)
+			ND_PRINT((ndo, " %s", p_name));
 		else
 			ND_PRINT((ndo, " ip-proto-%d", ipds->nh));
 		ND_PRINT((ndo, " %d", ipds->len));
@@ -526,7 +526,7 @@ ip_print(netdissect_options *ndo,
 	u_int hlen;
 	struct cksum_vec vec[1];
 	uint16_t sum, ip_sum;
-	struct protoent *proto;
+	const char *p_name;
 
 	ipds->ip = (const struct ip *)bp;
 	ND_TCHECK(ipds->ip->ip_vhl);
@@ -671,8 +671,8 @@ ip_print(netdissect_options *ndo,
 		 */
 		ND_PRINT((ndo, "%s > %s:", ipaddr_string(ndo, &ipds->ip->ip_src),
 		          ipaddr_string(ndo, &ipds->ip->ip_dst)));
-		if (!ndo->ndo_nflag && (proto = getprotobynumber(ipds->ip->ip_p)) != NULL)
-			ND_PRINT((ndo, " %s", proto->p_name));
+		if (!ndo->ndo_nflag && (p_name = netdb_protoname(ipds->ip->ip_p)) != NULL)
+			ND_PRINT((ndo, " %s", p_name));
 		else
 			ND_PRINT((ndo, " ip-proto-%d", ipds->ip->ip_p));
 	}
