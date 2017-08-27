@@ -129,10 +129,7 @@ extern const struct tok ipproto_values[];
 #define IPPROTO_IPCOMP		108
 #endif
 #ifndef IPPROTO_VRRP
-#define IPPROTO_VRRP		112
-#endif
-#ifndef IPPROTO_CARP
-#define IPPROTO_CARP		112
+#define IPPROTO_VRRP		112 /* See also CARP. */
 #endif
 #ifndef IPPROTO_PGM
 #define IPPROTO_PGM             113

@@ -46,11 +46,10 @@ const struct tok ipproto_values[] = {
     { IPPROTO_OSPF, "OSPF" },
     { IPPROTO_PIM, "PIM" },
     { IPPROTO_IPCOMP, "Compressed IP" },
-    { IPPROTO_VRRP, "VRRP" },
+    { IPPROTO_VRRP, "VRRP" }, /* See also CARP. */
     { IPPROTO_PGM, "PGM" },
     { IPPROTO_SCTP, "SCTP" },
     { IPPROTO_MOBILITY, "Mobility" },
-    { IPPROTO_CARP, "CARP" },
     { 0, NULL }
 };
 
