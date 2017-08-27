@@ -211,11 +211,10 @@ cnfp_v1_print(netdissect_options *ndo, const u_char *cp)
 
 		ND_PRINT((ndo, ">> %s\n    ", intoa(nr->nhop_ina.s_addr)));
 
-		pent = getprotobynumber(nr->proto);
-		if (!pent || ndo->ndo_nflag)
-			ND_PRINT((ndo, "%u ", nr->proto));
-		else
+		if (!ndo->ndo_nflag && (pent = getprotobynumber(nr->proto)) != NULL)
 			ND_PRINT((ndo, "%s ", pent->p_name));
+		else
+			ND_PRINT((ndo, "%u ", nr->proto));
 
 		/* tcp flags for tcp only */
 		if (pent && pent->p_proto == IPPROTO_TCP) {
@@ -308,11 +307,10 @@ cnfp_v5_print(netdissect_options *ndo, const u_char *cp)
 
 		ND_PRINT((ndo, ">> %s\n    ", intoa(nr->nhop_ina.s_addr)));
 
-		pent = getprotobynumber(nr->proto);
-		if (!pent || ndo->ndo_nflag)
-			ND_PRINT((ndo, "%u ", nr->proto));
-		else
+		if (!ndo->ndo_nflag && (pent = getprotobynumber(nr->proto)) != NULL)
 			ND_PRINT((ndo, "%s ", pent->p_name));
+		else
+			ND_PRINT((ndo, "%u ", nr->proto));
 
 		/* tcp flags for tcp only */
 		if (pent && pent->p_proto == IPPROTO_TCP) {
@@ -405,11 +403,10 @@ cnfp_v6_print(netdissect_options *ndo, const u_char *cp)
 
 		ND_PRINT((ndo, ">> %s\n    ", intoa(nr->nhop_ina.s_addr)));
 
-		pent = getprotobynumber(nr->proto);
-		if (!pent || ndo->ndo_nflag)
-			ND_PRINT((ndo, "%u ", nr->proto));
-		else
+		if (!ndo->ndo_nflag && (pent = getprotobynumber(nr->proto)) != NULL)
 			ND_PRINT((ndo, "%s ", pent->p_name));
+		else
+			ND_PRINT((ndo, "%u ", nr->proto));
 
 		/* tcp flags for tcp only */
 		if (pent && pent->p_proto == IPPROTO_TCP) {

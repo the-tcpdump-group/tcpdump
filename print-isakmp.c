@@ -1353,8 +1353,7 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 		UNALIGNED_MEMCPY(&doi_id, ext, sizeof(doi_id));
 		ND_PRINT((ndo," idtype=%s", STR_OR_ID(doi_id.type, ipsecidtypestr)));
 		/* A protocol ID of 0 DOES NOT mean IPPROTO_IP! */
-		pe = doi_id.proto_id ? getprotobynumber(doi_id.proto_id) : NULL;
-		if (pe)
+		if (!ndo->ndo_nflag && doi_id.proto_id && (pe = getprotobynumber(doi_id.proto_id)) != NULL)
 			ND_PRINT((ndo," protoid=%s", pe->p_name));
 		else
 			ND_PRINT((ndo," protoid=%u", doi_id.proto_id));
