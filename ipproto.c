@@ -343,6 +343,7 @@ static const char *netdb_protocol_names[256] = {
 	NULL,                /* 249 (unassigned) */
 	NULL,                /* 250 (unassigned) */
 	NULL,                /* 251 (unassigned) */
+	NULL,                /* 252 (unassigned) */
 	"exptest-253",       /* 253 (Use for experimentation and testing,
 	                      *     RFC 3692)
 	                      */
