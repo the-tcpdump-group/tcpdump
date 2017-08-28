@@ -441,6 +441,88 @@ static const struct tok ntp_CES_values[] = {
 	{ 0, NULL }
 };
 
+/* Peer Status for NTP control messages */
+typedef	enum {
+	PSS_Configured,		/* configured (peer.config) (0) */
+	PSS_AuthEnabled,	/* authentic. enabled (peer.authenable) (1) */
+	PSS_AuthOK,		/* aithentication OK (peer.authentic) (2) */
+	PSS_Reachable,		/* reachability OK (peer.reach != 0) (3) */
+	PSS_BroadcastAssoc	/* broadcast association (4) */
+} Control_Peer_Status;
+
+static const struct tok ntp_PSS_values[] = {
+	{ PSS_Configured,	"configured" },
+	{ PSS_AuthEnabled,	"auth. enabled" },
+	{ PSS_AuthOK,		"auth. OK" },
+	{ PSS_Reachable,	"reachable" },
+	{ PSS_BroadcastAssoc,	"broadcast assoc." },
+	{ 0, NULL }
+};
+
+/* Peer Selection for NTP control messages */
+typedef	enum {
+	PSL_Rejected,		/* rejected (0) */
+	PSL_DiscardIntersect,	/* discarded by intersection algorithm (1) */
+	PSL_DiscardOverflow,	/* discarded by table overflow (2) */
+	PSL_DiscardCluster,	/* discarded by cluster algorithm (3) */
+	PSL_IncludeCombine,	/* included by combine algorithm (4) */
+	PSL_Backup,		/* backup source (5) */
+	PSL_SystemPeer,		/* system peer (6) */
+	PSL_PPSPeer		/* PPS (pulse per second) peer (7) */
+} Control_Peer_Selection;
+
+static const struct tok ntp_PSL_values[] = {
+	{ PSL_Rejected,		"rejected" },
+	{ PSL_DiscardIntersect,	"discarded (intersect)" },
+	{ PSL_DiscardOverflow,	"discarded (overflow)" },
+	{ PSL_DiscardCluster,	"discarded (cluster)" },
+	{ PSL_IncludeCombine,	"included (combine)" },
+	{ PSL_Backup,		"backup source" },
+	{ PSL_SystemPeer,	"system peer" },
+	{ PSL_PPSPeer,		"PPS peer" },
+	{ 0, NULL }
+};
+
+/* Peer Event Code for NTP control messages */
+typedef	enum {
+	PEC_Unspecified,	/* unspecified (0) */
+	PEC_Mobilized,		/* association mobilized (1) */
+	PEC_Demobilized,	/* association demobilized (2) */
+	PEC_PeerUnreachable,	/* peer unreachable (3) */
+	PEC_PeerReachable,	/* peer reachable (4) */
+	PEC_AssocRestart,	/* association restarted or timed out (5) */
+	PEC_NoReply,		/* no reply (6) */
+	PEC_KoD_RATE,		/* peer rate limit exceeded (KoD RATE) (7) */
+	PEC_KoD_DENY,		/* access denied (KoD DENY) (8) */
+	PEC_LeapSec_Armed,	/* leap second ins/del armed by peer vote (9) */
+	PEC_System_Peer,	/* became system peer (10) */
+	PEC_RefclkEvent,	/* reference clock event (11) */
+	PEC_AuthFailed,		/* authentication failed (12) */
+	PEC_SpikeSuppressed,	/* popcorn spike suppressed (13) */
+	PEC_InterleavedEntered,	/* entering interleaved mode (14) */
+	PEC_InterleaveLeft	/* recovering from interleave error (15) */
+} Control_Peer_Event_Code;
+
+static const struct tok ntp_PEC_values[] = {
+	{ PEC_Unspecified,		"unspecified" },
+	{ PEC_Mobilized,		"association mobilized" },
+	{ PEC_Demobilized,		"association demobilized" },
+	{ PEC_PeerUnreachable,		"peer unreachable" },
+	{ PEC_PeerReachable,		"peer reachable" },
+	{ PEC_AssocRestart,		"association restarted" },
+	{ PEC_NoReply,			"no reply" },
+	{ PEC_KoD_RATE,			"peer rate limit exceeded" },
+	{ PEC_KoD_DENY,			"access denied" },
+	{ PEC_LeapSec_Armed,		"leap second ins/del armed" },
+	{ PEC_System_Peer,		"system peer" },
+	{ PEC_RefclkEvent,		"reference clock event" },
+	{ PEC_AuthFailed,		"authentication failed" },
+	{ PEC_SpikeSuppressed,		"popcorn spike suppressed" },
+	{ PEC_InterleavedEntered,	"entering interleaved" },
+	{ PEC_InterleaveLeft,		"recovering from interleave error" },
+	{ 0, NULL }
+};
+
 union ntpdata {
 	struct ntp_time_data	td;
 	struct ntp_control_data	cd;
@@ -648,7 +730,8 @@ ntp_control_print_SSW(netdissect_options *ndo, uint16_t status,
  * Print NTP control message's Peer Status Word
  */
 static void
-ntp_control_print_PSW(netdissect_options *ndo, uint16_t status)
+ntp_control_print_PSW(netdissect_options *ndo, uint16_t status,
+		      const char *indent)
 {
 	u_char pstat, sel, ecount, code;
 
@@ -656,9 +739,31 @@ ntp_control_print_PSW(netdissect_options *ndo, uint16_t status)
 	sel = (status >> 8) & 0x07;
 	ecount = (status >> 4) & 0x0f;
 	code = status & 0x0f;
-	ND_PRINT((ndo, ", PeerStat=%#4x (Status=%u, Sel=%u, Count=%u, Code=%u)",
-		  status, pstat, sel, ecount, code));
-	/* decode Peer Status, Peer Selection, Peer Event Code */
+
+	switch (ndo->ndo_vflag){
+	case 0:
+		break;
+	case 1:
+		ND_PRINT((ndo, "%sPeerStat=%#04x", indent, status));
+		break;
+	case 2:
+		ND_PRINT((ndo, "%sPeerStat=%#04x", indent, status));
+		ND_PRINT((ndo, " (Status=%#02x, Sel=%u, Count=%u, Code=%u)",
+			  pstat, sel, ecount, code));
+		break;
+	case 3:
+	default:	/* unless a higher verbosity is defined */
+		/* decode Peer Status, Peer Selection, Peer Event Code */
+		ND_PRINT((ndo, "%sPeerStat=%#04x", indent, status));
+		ND_PRINT((ndo, "%s\tStatus=%#02x (%s)", indent,
+			  pstat, bittok2str(ntp_PSS_values, NULL, pstat)));
+		ND_PRINT((ndo, "%s\tSel=%u (%s)", indent,
+			  sel, tok2str(ntp_PSL_values, NULL, sel)));
+		ND_PRINT((ndo, "%s\tCount=%u", indent, ecount));
+		ND_PRINT((ndo, "%s\tEvent=%u (%s)", indent,
+			  code, tok2str(ntp_PEC_values, NULL, code)));
+		break;
+	}
 }
 
 /*
@@ -674,7 +779,6 @@ ntp_control_print_CSW(netdissect_options *ndo, uint16_t status)
 	code = status & 0x0f;
 	ND_PRINT((ndo, ", ClkStat=%#4x (Resvd=%u, Count=%u, Code=%u)",
 		  status, reserved, ecount, code));
-	/* decode Peer Event Code */
 }
 
 /*
@@ -738,7 +842,7 @@ ntp_control_print(netdissect_options *ndo,
 			ntp_control_print_SSW(ndo, status, "\n\t\t");
 		} else {
 			/* See "3.2.  Peer Status Word" */
-			ntp_control_print_PSW(ndo, status);
+			ntp_control_print_PSW(ndo, status, "\n\t\t");
 		}
 	} else if (opcode == OPC_Read_Clock_Vars ||
 		   opcode == OPC_Write_Clock_Vars) {
