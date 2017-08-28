@@ -455,5 +455,11 @@ rtp-seg-fault-2  rtp-seg-fault-2.pcap  rtp-seg-fault-2.out  -v -T rtp
 nfs-seg-fault-1  nfs-seg-fault-1.pcap  nfs-seg-fault-1.out
 
 # NTP tests
-ntp-time	ntp-time.pcap		ntp-time.out		-v
-ntp-control	ntp-control.pcap	ntp-control.out		-v
+ntp-time		ntp-time.pcap		ntp-time.out
+ntp-time--v		ntp-time.pcap		ntp-time--v.out		-v
+ntp-time--vv		ntp-time.pcap		ntp-time--vv.out	-vv
+ntp-time--vvv		ntp-time.pcap		ntp-time--vvv.out	-vvv
+ntp-control		ntp-control.pcap	ntp-control.out
+ntp-control--v		ntp-control.pcap	ntp-control--v.out	-v
+ntp-control--vv		ntp-control.pcap	ntp-control--vv.out	-vv
+ntp-control--vvv	ntp-control.pcap	ntp-control--vvv.out	-vvv
