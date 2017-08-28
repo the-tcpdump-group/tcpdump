@@ -523,6 +523,37 @@ static const struct tok ntp_PEC_values[] = {
 	{ 0, NULL }
 };
 
+/* Clock Status for NTP control messages */
+typedef	enum {
+	CCS_Nominal,		/* clock operating within nominals (0) */
+	CCS_ReplyTimeout,	/* reply timeout (1) */
+	CCS_BadReplyFormat,	/* bad reply format (2) */
+	CCS_Fault,		/* hardware or software fault (3) */
+	CCS_PropagationFailure,	/* propagation failure (4) */
+	CCS_BadDate,		/* bad date format or value (5) */
+	CCS_BadTime,		/* bad time format or value (6) */
+	CCS_Reserved_7,		/* reserved (7) */
+	CCS_Reserved_8,		/* reserved (8) */
+	CCS_Reserved_9,		/* reserved (9) */
+	CCS_Reserved_10,	/* reserved (10) */
+	CCS_Reserved_11,	/* reserved (11) */
+	CCS_Reserved_12,	/* reserved (12) */
+	CCS_Reserved_13,	/* reserved (13) */
+	CCS_Reserved_14,	/* reserved (14) */
+	CCS_Reserved_15		/* reserved (15) */
+} Control_Clock_Status;
+
+static const struct tok ntp_CCS_values[] = {
+	{ CCS_Nominal,			"nominal operation" },
+	{ CCS_ReplyTimeout,		"reply timeout" },
+	{ CCS_BadReplyFormat,		"bad reply format" },
+	{ CCS_Fault,			"hardware or software fault" },
+	{ CCS_PropagationFailure,	"propagation failure" },
+	{ CCS_BadDate,			"bad date" },
+	{ CCS_BadTime,			"bad time" },
+	{ 0, NULL }
+};
+
 union ntpdata {
 	struct ntp_time_data	td;
 	struct ntp_control_data	cd;
@@ -770,15 +801,35 @@ ntp_control_print_PSW(netdissect_options *ndo, uint16_t status,
  * Print NTP control message's Clock Status Word
  */
 static void
-ntp_control_print_CSW(netdissect_options *ndo, uint16_t status)
+ntp_control_print_CSW(netdissect_options *ndo, uint16_t status,
+		      const char *indent)
 {
 	u_char reserved, ecount, code;
 
 	reserved = (status >> 8) & 0xff;
 	ecount = (status >> 4) & 0x0f;
 	code = status & 0x0f;
-	ND_PRINT((ndo, ", ClkStat=%#4x (Resvd=%u, Count=%u, Code=%u)",
-		  status, reserved, ecount, code));
+
+	switch (ndo->ndo_vflag){
+	case 0:
+		break;
+	case 1:
+		ND_PRINT((ndo, "%sClkStat=%#04x", indent, status));
+		break;
+	case 2:
+		ND_PRINT((ndo, "%sClkStat=%#04x (Resvd=%u, Count=%u, Code=%u)",
+			  indent, status, reserved, ecount, code));
+		break;
+	case 3:
+	default:	/* unless a higher verbosity is defined */
+		/* decode Clock Status Code */
+		ND_PRINT((ndo, "%sClkStat=%#04x", indent, status));
+		ND_PRINT((ndo, "%s\tReserved=%#02x", indent, reserved));
+		ND_PRINT((ndo, "%s\tCount=%u", indent, ecount));
+		ND_PRINT((ndo, "%s\tCode=%#02x (%s)", indent,
+			  code, tok2str(ntp_CCS_values, "reserved(%u)", code)));
+		break;
+	}
 }
 
 /*
@@ -847,7 +898,7 @@ ntp_control_print(netdissect_options *ndo,
 	} else if (opcode == OPC_Read_Clock_Vars ||
 		   opcode == OPC_Write_Clock_Vars) {
 		/* See "3.3.  Clock Status Word" */
-		ntp_control_print_CSW(ndo, status);
+		ntp_control_print_CSW(ndo, status, "\n\t\t");
 	} else {
 		ND_PRINT((ndo, ", Status=%#hx", status));
 	}
