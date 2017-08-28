@@ -834,7 +834,7 @@ ntp_control_print(netdissect_options *ndo,
 
 	ND_TCHECK(cd->status);
 	status = EXTRACT_16BITS(&cd->status);
-	ND_PRINT((ndo, "%sStatus=%hu", indent, status));
+	ND_PRINT((ndo, "%sStatus=%#04x", indent, status));
 
 	ND_TCHECK(cd->assoc);
 	assoc = EXTRACT_16BITS(&cd->assoc);
@@ -864,7 +864,7 @@ ntp_control_print(netdissect_options *ndo,
 		/* See "3.3.  Clock Status Word" */
 		ntp_control_print_CSW(ndo, status, "\n\t\t");
 	} else {
-		ND_PRINT((ndo, ", Status=%#hx", status));
+		ND_PRINT((ndo, ", Status=%#04hx", status));
 	}
 
 	if ((int) (length - sizeof(*cd)) > 0)
