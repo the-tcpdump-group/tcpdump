@@ -331,6 +331,77 @@ static const struct tok ntp_control_op_values[] = {
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *         Clock Status Word
  */
+
+/* Clock Src for NTP control messages */
+typedef	enum {
+	ClSrc_Unspec,		/* unspecified or unknown (0) */
+	ClSrc_Atomic,		/* calibrated atomic clock (1) */
+	ClSrc_LF,		/* LF (band 4) or LF (band 5) radio (2) */
+	ClSrc_HF,		/* HF (band 7) radio (3) */
+	ClSrc_UHF,		/* UHF (band 9) radio (4) */
+	ClSrc_LocalNet,		/* local net e.g., DCN, TSP, DTS) (5) */
+	ClSrc_NTP,		/* UDP/NTP (6) */
+	ClSrc_TIME,		/* UDP/TIME (7) */
+	ClSrc_MANUAL,		/* eyeball-and-wristwatch (8) */
+	ClSrc_MODEM,		/* telephone modem (9) */
+	ClSrc_Reserved_10	/* reserved (10) */
+	/* 11-63 are reserved, also */
+} Control_Clock_Src;
+
+static const struct tok ntp_ClSrc_values[] = {
+	{ ClSrc_Unspec,		"unspecified or unknown" },
+	{ ClSrc_Atomic,		"atomic clock" },
+	{ ClSrc_LF,		"VLF or LF radio clock" },
+	{ ClSrc_HF,		"HF radio clock" },
+	{ ClSrc_UHF,		"UHF radio clock" },
+	{ ClSrc_LocalNet,	"local net" },
+	{ ClSrc_NTP,		"UDP/NTP" },
+	{ ClSrc_TIME,		"UDP/TIME" },
+	{ ClSrc_MANUAL,		"eyeball-and-wristwatch" },
+	{ ClSrc_MODEM,		"telephone modem" },
+	{ 0, NULL }
+};
+
+/* System Event Code for NTP control messages */
+typedef	enum {
+	SEC_Unspec,		/* unspecified (0) */
+	SEC_NoDriftFile,	/* frequency correction file not available (1) */
+	SEC_FreqStep,	/* frequency correction started (freq. stepped) (2) */
+	SEC_SpikeStep,	/* spike detected and ignored, starting stepout timer (3) */
+	SEC_FreqTraining,	/* frequency training started (4) */
+	SEC_ClockSync,		/* clock synchronized (5) */
+	SEC_SysRestart,		/* system restarted (6) */
+	SEC_PanicStop,	/* panic stop (required step > panic threshold) (7) */
+	SEC_NoSysPeer,		/* no system peer (8) */
+	SEC_LeapSecArmed,	/* leap second insertion/deletion armed (9) */
+	SEC_LeapSecDisarmed,	/* leap second disarmed (10) */
+	SEC_LeapSecDone,	/* leap second inserted or deleted (11) */
+	SEC_ClockStep,		/* clock stepped (stepout timer expired) (12) */
+	SEC_KernelDiscChanged,	/* kernel loop discipline status changed (13) */
+	SEC_LeapSecTabLoaded,	/* leapseconds table loaded from file (14) */
+	SEC_LeapSecTabOutdated	/* leapseconds table outdated (15) */
+} Control_System_Event_Code;
+
+static const struct tok ntp_SEC_values[] = {
+	{ SEC_Unspec,			"unspecified" },
+	{ SEC_NoDriftFile,		"no drift file" },
+	{ SEC_FreqStep,			"frequency stepped" },
+	{ SEC_SpikeStep,		"spike detected" },
+	{ SEC_FreqTraining,		"frequency training started" },
+	{ SEC_ClockSync,		"clock synchromized" },
+	{ SEC_SysRestart,		"system restarted" },
+	{ SEC_PanicStop,		"panic stop" },
+	{ SEC_NoSysPeer,		"no system peer" },
+	{ SEC_LeapSecArmed,		"leap second ins/del armed" },
+	{ SEC_LeapSecDisarmed,		"leap second ins/del disarmed" },
+	{ SEC_LeapSecDone,		"leap seconds ins/del done" },
+	{ SEC_ClockStep,		"clock stepped" },
+	{ SEC_KernelDiscChanged,	"kernel status changed" },
+	{ SEC_LeapSecTabLoaded,		"leap seconds table loaded" },
+	{ SEC_LeapSecTabOutdated,	"leap seconds table outdated" },
+	{ 0, NULL }
+};
+
 /* Error Status for NTP control messages */
 typedef	enum {
 	CES_Unspec,		/* unspecified (0) */
@@ -473,14 +544,29 @@ trunc:
  * Print NTP control message's Error Status Word
  */
 static void
-ntp_control_print_ESW(netdissect_options *ndo, uint16_t status)
+ntp_control_print_ESW(netdissect_options *ndo, uint16_t status,
+		      const char *indent)
 {
-	if (ndo->ndo_vflag > 1) {
-		ND_PRINT((ndo, ", ErrStat=%s (%#hx)",
-			  tok2str(ntp_CES_values, "reserved(%u)", status >> 8),
-			  status));
-	} else {
-		ND_PRINT((ndo, ", ErrStat=%#hx", status));
+	u_char ecode, reserved;
+
+	ecode = status >> 8;
+	reserved = status & 0xff;
+	switch (ndo->ndo_vflag){
+	case 0:
+		break;
+	case 1:
+		ND_PRINT((ndo, "%sErrStat=%#hx", indent, status));
+		break;
+	case 2:
+		ND_PRINT((ndo, "%sErrStat=%#04hx (Code=%#hx, Reserved=%#hx)",
+			  indent, status, ecode, reserved));
+		break;
+	case 3:
+	default:	/* unless a higher verbosity is defined */
+		ND_PRINT((ndo, "%sErrStat=%#04hx (Code=%s (%hu), Reserved=%#x)",
+			  indent, status, tok2str(ntp_CES_values, "reserved(%u)",
+						  ecode), ecode, reserved));
+		break;
 	}
 }
 
@@ -488,7 +574,8 @@ ntp_control_print_ESW(netdissect_options *ndo, uint16_t status)
  * Print NTP control message's System Status Word
  */
 static void
-ntp_control_print_SSW(netdissect_options *ndo, uint16_t status)
+ntp_control_print_SSW(netdissect_options *ndo, uint16_t status,
+		      const char *indent)
 {
 	u_char LI, clock_src, ecount, code;
 
@@ -496,9 +583,32 @@ ntp_control_print_SSW(netdissect_options *ndo, uint16_t status)
 	clock_src = (status >> 8) & 0x3f;
 	ecount = (status >> 4) & 0x0f;
 	code = status & 0x0f;
-	ND_PRINT((ndo, ", SysStat=%#4x (LI=%u, ClockSrc=%u, Count=%u, Code=%u)",
-		  status, LI, clock_src, ecount, code));
-	/* decode LI, Clock Source, System Event Code */
+	
+	switch (ndo->ndo_vflag){
+	case 0:
+		break;
+	case 1:
+		ND_PRINT((ndo, "%sSysStat=%#04x", indent, status));
+		break;
+	case 2:
+		ND_PRINT((ndo, "%sSysStat=%#04x", indent, status));
+		ND_PRINT((ndo, " (LI=%u, ClockSrc=%u, Count=%u, Code=%u)",
+			  LI, clock_src, ecount, code));
+		break;
+	case 3:
+	default:	/* unless a higher verbosity is defined */
+		/* decode LI, Clock Source, System Event Code */
+		ND_PRINT((ndo, "%sSysStat=%#04x", indent, status));
+		ND_PRINT((ndo, "%s\tLI=%u (%s)", indent,
+			  LI, tok2str(ntp_leapind_values, NULL, LI)));
+		ND_PRINT((ndo, "%s\tClockSrc=%u (%s)", indent,
+			  clock_src, tok2str(ntp_ClSrc_values, "reserved(%u)",
+					     clock_src)));
+		ND_PRINT((ndo, "%s\tCount=%u", indent, ecount));
+		ND_PRINT((ndo, "%s\tEvent=%u (%s)", indent,
+			  code, tok2str(ntp_SEC_values, NULL, code)));
+		break;
+	}
 }
 
 /*
@@ -543,18 +653,21 @@ ntp_control_print(netdissect_options *ndo,
 {
 	u_char R, E, M, opcode;
 	uint16_t sequence, status, assoc, offset, count;
+	const char *indent;
 
+	indent = "\n\t";
 	ND_TCHECK(cd->control);
 	R = (cd->control & 0x80) != 0;
 	E = (cd->control & 0x40) != 0;
 	M = (cd->control & 0x20) != 0;
 	opcode = cd->control & 0x1f;
+	
 	if (ndo->ndo_vflag < 2) {
-		ND_PRINT((ndo, "\n\tREM=%c%c%c, OpCode=%u\n",
+		ND_PRINT((ndo, "%sREM=%c%c%c, OpCode=%u", indent,
 			  R ? 'R' : '_', E ? 'E' : '_', M ? 'M' : '_',
 			  (unsigned)opcode));
 	} else {
-		ND_PRINT((ndo, "\n\t%s, %s, %s, OpCode=%s\n",
+		ND_PRINT((ndo, "%sR=%s, E=%s, M=%s, OpCode=%s", indent,
 			  R ? "Response" : "Request", E ? "Error" : "OK",
 			  M ? "More" : "Last",
 			  tok2str(ntp_control_op_values, NULL, opcode)));
@@ -562,22 +675,31 @@ ntp_control_print(netdissect_options *ndo,
 
 	ND_TCHECK(cd->sequence);
 	sequence = EXTRACT_16BITS(&cd->sequence);
-	ND_PRINT((ndo, "\tSequence=%hu", sequence));
+	ND_PRINT((ndo, ", Sequence=%hu", sequence));
 
 	ND_TCHECK(cd->status);
 	status = EXTRACT_16BITS(&cd->status);
+	ND_PRINT((ndo, "%sStatus=%hu", indent, status));
 
 	ND_TCHECK(cd->assoc);
 	assoc = EXTRACT_16BITS(&cd->assoc);
 	ND_PRINT((ndo, ", Assoc.=%hu", assoc));
 
+	ND_TCHECK(cd->offset);
+	offset = EXTRACT_16BITS(&cd->offset);
+	ND_PRINT((ndo, ", Offset=%hu", offset));
+
+	ND_TCHECK(cd->count);
+	count = EXTRACT_16BITS(&cd->count);
+	ND_PRINT((ndo, ", Count=%hu", count));
+
 	if (E) {
-		ntp_control_print_ESW(ndo, status);
+		ntp_control_print_ESW(ndo, status, "\n\t\t");
 	} else if (opcode == OPC_Read_Vars || opcode == OPC_Read_Status ||
 		   (opcode == OPC_Write_Vars && assoc != 0)) {
 		if (assoc == 0) {
 			/* See "3.1.  System Status Word" */
-			ntp_control_print_SSW(ndo, status);
+			ntp_control_print_SSW(ndo, status, "\n\t\t");
 		} else {
 			/* See "3.2.  Peer Status Word" */
 			ntp_control_print_PSW(ndo, status);
@@ -589,14 +711,6 @@ ntp_control_print(netdissect_options *ndo,
 	} else {
 		ND_PRINT((ndo, ", Status=%#hx", status));
 	}
-
-	ND_TCHECK(cd->offset);
-	offset = EXTRACT_16BITS(&cd->offset);
-	ND_PRINT((ndo, ", Offset=%hu", offset));
-
-	ND_TCHECK(cd->count);
-	count = EXTRACT_16BITS(&cd->count);
-	ND_PRINT((ndo, ", Count=%hu", count));
 
 	if ((int) (length - sizeof(*cd)) > 0)
 		ND_PRINT((ndo, "\n\t%u extra octets",
@@ -610,14 +724,15 @@ ntp_control_print(netdissect_options *ndo,
 		case OPC_Write_Clock_Vars:
 			/* data is expected to be mostly text */
 			if (ndo->ndo_vflag > 2) {
-				ND_PRINT((ndo, ", data:\n\t    "));
+				ND_PRINT((ndo, "%sdata:%s    ",
+					  indent, indent));
 				fn_print(ndo, cd->data, ndo->ndo_snapend);
 			}
 			break;
 		default:
 			/* data is binary format */
-			ND_PRINT((ndo, "\n\tTO-BE-DONE:"
-				  " data not interpreted"));
+			ND_PRINT((ndo, "%sTO-BE-DONE: data not interpreted",
+				  indent));
 		}
 	}
 	return;
