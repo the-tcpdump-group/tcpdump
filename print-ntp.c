@@ -952,6 +952,10 @@ ntp_print(netdissect_options *ndo,
 	leapind = (bp->td.status & LEAPMASK) >> LEAPSHIFT;
 	version = (bp->td.status & VERSIONMASK) >> VERSIONSHIFT;
 	mode = (bp->td.status & MODEMASK) >> MODESHIFT;
+	if (version < 1) {
+		ND_PRINT((ndo, "NTP before version 1 or not NTP"));
+		return;
+	}
 	if (ndo->ndo_vflag == 0) {
 		ND_PRINT((ndo, "NTP LI=%u, VN=%u, Mode=%u, length=%u",
 			  leapind, version, mode, length));
@@ -963,10 +967,10 @@ ntp_print(netdissect_options *ndo,
 
 	if (mode >= MODE_UNSPEC && mode <= MODE_BROADCAST)
 		ntp_time_print(ndo, &bp->td, length);
-	else if (mode == MODE_CONTROL)
+	else if (version > 1 && mode == MODE_CONTROL)
 		ntp_control_print(ndo, &bp->cd, length);
 	else
-		ND_PRINT((ndo, ", mode==%u not implemented!", mode));
+		ND_PRINT((ndo, ", mode==%u unexpected!", mode));
 	return;
 
 trunc:
