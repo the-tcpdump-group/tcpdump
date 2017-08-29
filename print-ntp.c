@@ -181,7 +181,6 @@ struct ntp_time_data {
 static void p_sfix(netdissect_options *ndo, const struct s_fixedpt *);
 static void p_ntp_time(netdissect_options *, const struct l_fixedpt *);
 static void p_ntp_delta(netdissect_options *, const struct l_fixedpt *, const struct l_fixedpt *);
-static void p_poll(netdissect_options *, register const int);
 
 static const struct tok ntp_mode_values[] = {
     { MODE_UNSPEC,    "unspecified" },
@@ -578,7 +577,14 @@ ntp_time_print(netdissect_options *ndo,
 
 	ND_TCHECK(bp->ppoll);
 	ND_PRINT((ndo, ", poll %d", bp->ppoll));
-	p_poll(ndo, bp->ppoll);
+	if (bp->ppoll >= -32 && bp->ppoll <= 32) {
+		if (bp->ppoll >= 0)
+			ND_PRINT((ndo, " (%us)", 1U << bp->ppoll));
+		else
+			ND_PRINT((ndo, " (1/%us)", 1U << -bp->ppoll));
+	} else {
+		ND_PRINT((ndo, " [most likely invalid]"));
+	}
 
 	ND_TCHECK(bp->precision);
 	ND_PRINT((ndo, ", precision %d", bp->precision));
@@ -1107,18 +1113,4 @@ p_ntp_delta(netdissect_options *ndo,
 	/* treat fraction as parts per billion */
 	f = (uint32_t)(ff * 1000000000.0 + 0.5);
 	ND_PRINT((ndo, "%s%d.%09d", signbit ? "-" : "+", i, f));
-}
-
-/* Prints polling interval in log2 as seconds or fraction of second */
-static void
-p_poll(netdissect_options *ndo,
-       register const int poll_interval)
-{
-	if (poll_interval <= -32 || poll_interval >= 32)
-		return;
-
-	if (poll_interval >= 0)
-		ND_PRINT((ndo, " (%us)", 1U << poll_interval));
-	else
-		ND_PRINT((ndo, " (1/%us)", 1U << -poll_interval));
 }
