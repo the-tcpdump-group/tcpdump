@@ -734,19 +734,19 @@ esp_print(netdissect_options *ndo,
 
 			p = ivoff;
 			EVP_CipherInit(ctx, NULL, NULL, p, 0);
-                        len = ep - (p + ivlen);
+			len = ep - (p + ivlen);
 
-                        /* We need a block size */
-                        block_size = EVP_CIPHER_CTX_block_size(ctx);
-                        /* We need the buffer size to be multiple of a block size */
-                        output_buffer_size = len + (block_size - len % block_size);
-                        output_buffer = (u_char *)calloc(output_buffer_size, sizeof(u_char));
-                        /* EVP_Cipher output buffer should be different from the input one.
-                         * Also it should be of size that is multiple of cipher block size. */
-                        EVP_Cipher(ctx, output_buffer, p + ivlen, len);
+			/* We need a block size */
+			block_size = EVP_CIPHER_CTX_block_size(ctx);
+			/* We need the buffer size to be multiple of a block size */
+			output_buffer_size = len + (block_size - len % block_size);
+			output_buffer = (u_char *)calloc(output_buffer_size, sizeof(u_char));
+			/* EVP_Cipher output buffer should be different from the input one.
+			 * Also it should be of size that is multiple of cipher block size. */
+			EVP_Cipher(ctx, output_buffer, p + ivlen, len);
 			EVP_CIPHER_CTX_free(ctx);
-                        memcpy(p + ivlen, output_buffer, len);
-                        free(output_buffer);
+			memcpy(p + ivlen, output_buffer, len);
+			free(output_buffer);
 			advance = ivoff - (const u_char *)esp + ivlen;
 		} else
 			advance = sizeof(struct newesp);
