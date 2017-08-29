@@ -650,11 +650,11 @@ ntp_time_print(netdissect_options *ndo,
 	}
 	if ((sizeof(*td) - length) == 16) { 	/* Optional: key-id */
 		ND_TCHECK(td->key_id);
-		ND_PRINT((ndo, "\n\tKey id: %u", td->key_id));
+		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_32BITS(&td->key_id)));
 	} else if ((sizeof(*td) - length) == 0) {
 		/* Optional: key-id + authentication */
 		ND_TCHECK(td->key_id);
-		ND_PRINT((ndo, "\n\tKey id: %u", td->key_id));
+		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_32BITS(&td->key_id)));
 		ND_TCHECK2(td->message_digest, sizeof (td->message_digest));
                 ND_PRINT((ndo, "\n\tAuthentication: %08x%08x%08x%08x",
 			  EXTRACT_32BITS(td->message_digest),
