@@ -1179,7 +1179,7 @@ ntp_print(netdissect_options *ndo,
 	else if (version > 1 && mode == MODE_CONTROL)
 		ntp_control_print(ndo, &bp->cd, length);
 	else
-		ND_PRINT((ndo, ", mode==%u not implemented!", mode));
+		ND_PRINT((ndo, ", mode==%u unexpected!", mode));
 	return;
 
 trunc:
