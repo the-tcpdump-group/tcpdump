@@ -622,8 +622,8 @@ esp_print(netdissect_options *ndo,
 	const u_char *ivoff;
 	const u_char *p;
 	EVP_CIPHER_CTX *ctx;
-        u_char *buf_mut, *output_buffer;
-        int block_size, cipher_nid, output_buffer_size;
+	u_char *buf_mut, *output_buffer;
+	int block_size, cipher_nid, output_buffer_size;
 #endif
 
 	esp = (const struct newesp *)bp;
