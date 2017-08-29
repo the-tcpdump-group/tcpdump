@@ -402,7 +402,7 @@ static const struct tok ntp_SEC_values[] = {
 	{ SEC_FreqStep,			"frequency stepped" },
 	{ SEC_SpikeStep,		"spike detected" },
 	{ SEC_FreqTraining,		"frequency training started" },
-	{ SEC_ClockSync,		"clock synchromized" },
+	{ SEC_ClockSync,		"clock synchronized" },
 	{ SEC_SysRestart,		"system restarted" },
 	{ SEC_PanicStop,		"panic stop" },
 	{ SEC_NoSysPeer,		"no system peer" },
