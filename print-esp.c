@@ -157,7 +157,7 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 	struct sa_list *sa;
 	const u_char *iv;
 	u_char *buf_mut, *output_buffer;
-	int len, block_size, cipher_nid, output_buffer_size ;
+	int len, block_size, output_buffer_size;
 	EVP_CIPHER_CTX *ctx;
 
 	/* initiator arg is any non-zero value */
@@ -623,7 +623,7 @@ esp_print(netdissect_options *ndo,
 	const u_char *p;
 	EVP_CIPHER_CTX *ctx;
 	u_char *buf_mut, *output_buffer;
-	int block_size, cipher_nid, output_buffer_size;
+	int block_size, output_buffer_size;
 #endif
 
 	esp = (const struct newesp *)bp;
