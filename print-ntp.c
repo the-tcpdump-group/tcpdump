@@ -116,7 +116,7 @@ struct s_fixedpt {
 struct ntp_time_data {
 	u_char status;		/* status of local clock and leap info */
 	u_char stratum;		/* Stratum level */
-	u_char ppoll;		/* poll value */
+	int ppoll:8;		/* poll value */
 	int precision:8;
 	struct s_fixedpt root_delay;
 	struct s_fixedpt root_dispersion;
@@ -558,8 +558,19 @@ ntp_time_print(netdissect_options *ndo,
 			(td->stratum >= 2 && td->stratum <= 15) ?
 			"secondary reference" : "reserved", td->stratum)));
 
-	ND_TCHECK(td->ppoll);
-	ND_PRINT((ndo, ", poll %u (%us)", td->ppoll, 1 << td->ppoll));
+	/* Can't ND_TCHECK() ppoll bitfield, so check indirectly via
+	 * td->stratum + 2 instead.
+	 */
+	ND_TCHECK2(td->stratum, 2);
+	ND_PRINT((ndo, ", poll %d", td->ppoll));
+	if (td->ppoll >= -32 && td->ppoll <= 32) {
+		if (td->ppoll >= 0)
+			ND_PRINT((ndo, " (%us)", 1U << td->ppoll));
+		else
+			ND_PRINT((ndo, " (1/%us)", 1U << -td->ppoll));
+	} else {
+		ND_PRINT((ndo, " [most likely invalid]"));
+	}
 
 	/* Can't ND_TCHECK td->precision bitfield, so check next field with
 	 * length zero instead
