@@ -565,6 +565,10 @@ static void
 ntp_time_print(netdissect_options *ndo,
 	       register const struct ntp_time_data *bp, u_int length)
 {
+	u_char version, mode;
+
+	version = (bp->status & VERSIONMASK) >> VERSIONSHIFT;
+	mode = (bp->status & MODEMASK) >> MODESHIFT;
 	if (length < NTP_TIMEMSG_MINLEN)
 		goto invalid;
 
@@ -598,34 +602,33 @@ ntp_time_print(netdissect_options *ndo,
 	p_sfix(ndo, &bp->root_dispersion);
 
 	ND_TCHECK(bp->refid);
-	ND_PRINT((ndo, ", Reference-ID: "));
-	/* Interpretation depends on stratum */
-	switch (bp->stratum) {
-
-	case UNSPECIFIED:
-		ND_PRINT((ndo, "0x%08x", EXTRACT_BE_U_4(&bp->refid)));
-		break;
-
-	case PRIM_REF:
-		if (fn_printn(ndo, (const u_char *)&(bp->refid), 4, ndo->ndo_snapend))
-			goto trunc;
-		break;
-
-	case INFO_QUERY:
-		ND_PRINT((ndo, "%s INFO_QUERY", ipaddr_string(ndo, &(bp->refid))));
-		/* this doesn't have more content */
-		return;
-
-	case INFO_REPLY:
-		ND_PRINT((ndo, "%s INFO_REPLY", ipaddr_string(ndo, &(bp->refid))));
-		/* this is too complex to be worth printing */
-		return;
-
-	default:
-		/* In NTPv4 (RFC 5905) refid is an IPv4 address or first 32 bits of
-		   MD5 sum of IPv6 address */
-		ND_PRINT((ndo, "0x%08x", EXTRACT_BE_U_4(&bp->refid)));
-		break;
+	ND_PRINT((ndo, ", Reference-ID: 0x%08x", EXTRACT_BE_U_4(&bp->refid)));
+	/* Interpretation depends on stratum and NTP version: */
+	/* RFC 5905 (NTPv4), section "7.3. Packet Header Variables":
+	 * "If using the IPv4 address family, the identifier is the four-octet
+	 * IPv4 address.  If using the IPv6 address family, it is the first
+	 * four octets of the MD5 hash of the IPv6 address."
+	 */
+	if (bp->stratum < 2) {
+		if (bp->stratum == 0 && version > 3 && bp->refid != 0 &&
+		    mode > MODE_UNSPEC && mode < MODE_CONTROL) {
+			/* Kiss-of-Death (KoD) code */
+			ND_PRINT((ndo, " ("));
+			if (fn_printn(ndo, (const u_char *)&(bp->refid), 4,
+				      ndo->ndo_snapend))
+				goto trunc;
+			ND_PRINT((ndo, ")"));
+		} else if (bp->stratum == PRIM_REF) {
+			/* Reference Clock Identifier */
+			ND_PRINT((ndo, " ("));
+			if (fn_printn(ndo, (const u_char *)&(bp->refid), 4,
+				      ndo->ndo_snapend))
+				goto trunc;
+			ND_PRINT((ndo, ")"));
+		}
+	} else if (version < 4) {
+		/* up to NTPv3 it's the IPv4 address */
+		ND_PRINT((ndo, ", (%s)", ipaddr_string(ndo, &(bp->refid))));
 	}
 
 	ND_TCHECK(bp->ref_timestamp);
