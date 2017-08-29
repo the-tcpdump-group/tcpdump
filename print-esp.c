@@ -156,7 +156,7 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 {
 	struct sa_list *sa;
 	const u_char *iv;
-	u_char *buf_mut, *output_buffer;
+	u_char *output_buffer;
 	int len, block_size, output_buffer_size;
 	EVP_CIPHER_CTX *ctx;
 
@@ -203,10 +203,11 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 	EVP_Cipher(ctx, output_buffer, buf, len);
 	EVP_CIPHER_CTX_free(ctx);
 
-	buf_mut = (u_char*) buf;
-	/* Of course this is wrong, because buf is a const buffer, but changing this
-	 * would require more complicated fix. */
-	memcpy(buf_mut, output_buffer, len);
+	/*
+	 * XXX - of course this is wrong, because buf is a const buffer,
+	 * but changing this would require a more complicated fix.
+	 */
+	memcpy(buf, output_buffer, len);
 	free(output_buffer);
 
 	ndo->ndo_packetp = buf;
@@ -745,6 +746,11 @@ esp_print(netdissect_options *ndo,
 			 * Also it should be of size that is multiple of cipher block size. */
 			EVP_Cipher(ctx, output_buffer, p + ivlen, len);
 			EVP_CIPHER_CTX_free(ctx);
+			/*
+			 * XXX - of course this is wrong, because buf is a
+			 * const buffer, but changing this would require a
+			 * more complicated fix.
+			 */
 			memcpy(p + ivlen, output_buffer, len);
 			free(output_buffer);
 			advance = ivoff - (const u_char *)esp + ivlen;
