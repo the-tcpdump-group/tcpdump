@@ -310,7 +310,7 @@ dhcp-rfc3004	dhcp-rfc3004.pcap	dhcp-rfc3004-v.out	-v
 dhcp-rfc5859	dhcp-rfc5859.pcap	dhcp-rfc5859-v.out	-v
 dhcp-mud	dhcp-mud.pcap		dhcp-mud.out	-vv
 
-# MEDSA tests
+# MEDSA (NTP?) tests
 medsa		medsa.pcap		medsa.out
 medsa-e		medsa.pcap		medsa-e.out	-e
 
@@ -448,3 +448,13 @@ rtp-seg-fault-2  rtp-seg-fault-2.pcap  rtp-seg-fault-2.out  -v -T rtp
 # NFS tests
 # fuzzed pcap
 nfs-seg-fault-1  nfs-seg-fault-1.pcap  nfs-seg-fault-1.out
+
+# NTP tests
+ntp-time		ntp-time.pcap		ntp-time.out
+ntp-time--v		ntp-time.pcap		ntp-time--v.out		-v
+ntp-time--vv		ntp-time.pcap		ntp-time--vv.out	-vv
+ntp-time--vvv		ntp-time.pcap		ntp-time--vvv.out	-vvv
+ntp-control		ntp-control.pcap	ntp-control.out
+ntp-control--v		ntp-control.pcap	ntp-control--v.out	-v
+ntp-control--vv		ntp-control.pcap	ntp-control--vv.out	-vv
+ntp-control--vvv	ntp-control.pcap	ntp-control--vvv.out	-vvv
