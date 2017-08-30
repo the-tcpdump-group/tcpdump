@@ -113,6 +113,12 @@ struct s_fixedpt {
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 
+/* Length of the NTP message with the mandatory fields ("the header")
+ * and without any optional fields (extension, Key Identifier,
+ * Message Digest).
+ */
+#define NTP_MSG_MINLEN 48
+
 struct ntpdata {
 	u_char status;		/* status of local clock and leap info */
 	u_char stratum;		/* Stratum level */
@@ -210,6 +216,11 @@ ntp_print(netdissect_options *ndo,
 {
 	register const struct ntpdata *bp;
 	int mode, version, leapind;
+
+	if (length < NTP_MSG_MINLEN) {
+		ND_PRINT((ndo, "NTP, length %u", length));
+		goto invalid;
+	}
 
 	bp = (const struct ntpdata *)cp;
 
@@ -310,10 +321,11 @@ ntp_print(netdissect_options *ndo,
 	ND_PRINT((ndo, "\n\t    Originator - Transmit Timestamp: "));
 	p_ntp_delta(ndo, &(bp->org_timestamp), &(bp->xmt_timestamp));
 
-	if ( (sizeof(struct ntpdata) - length) == 20) { 	/* Optional: key-id (crypto-NAK) */
+	/* FIXME: this code is not aware of any extension fields */
+	if (length == NTP_MSG_MINLEN + 4) { 	/* Optional: key-id (crypto-NAK) */
 		ND_TCHECK(bp->key_id);
 		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_32BITS(&bp->key_id)));
-	} else if ( (sizeof(struct ntpdata) - length) == 4) { 	/* Optional: key-id + 128-bit digest */
+	} else if (length == NTP_MSG_MINLEN + 4 + 16) { 	/* Optional: key-id + 128-bit digest */
 		ND_TCHECK(bp->key_id);
 		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_32BITS(&bp->key_id)));
 		ND_TCHECK2(bp->message_digest, 16);
@@ -322,7 +334,7 @@ ntp_print(netdissect_options *ndo,
 		               EXTRACT_32BITS(bp->message_digest + 4),
 		               EXTRACT_32BITS(bp->message_digest + 8),
 		               EXTRACT_32BITS(bp->message_digest + 12)));
-	} else if ( (sizeof(struct ntpdata) - length) == 0) { 	/* Optional: key-id + 160-bit digest */
+	} else if (length == NTP_MSG_MINLEN + 4 + 20) { 	/* Optional: key-id + 160-bit digest */
 		ND_TCHECK(bp->key_id);
 		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_32BITS(&bp->key_id)));
 		ND_TCHECK2(bp->message_digest, 20);
@@ -332,7 +344,14 @@ ntp_print(netdissect_options *ndo,
 		               EXTRACT_32BITS(bp->message_digest + 8),
 		               EXTRACT_32BITS(bp->message_digest + 12),
 		               EXTRACT_32BITS(bp->message_digest + 16)));
-        }
+	} else if (length > NTP_MSG_MINLEN) {
+		ND_PRINT((ndo, "\n\t(%u more bytes after the header)", length - NTP_MSG_MINLEN));
+	}
+	return;
+
+invalid:
+	ND_PRINT((ndo, " %s", istr));
+	ND_TCHECK2(*cp, length);
 	return;
 
 trunc:
