@@ -114,19 +114,19 @@ struct s_fixedpt {
  */
 
 struct ntp_time_data {
-	u_char status;		/* status of local clock and leap info */
-	u_char stratum;		/* Stratum level */
+	nd_uint8_t status;		/* status of local clock and leap info */
+	nd_uint8_t stratum;		/* Stratum level */
 	int ppoll:8;		/* poll value */
 	int precision:8;
 	struct s_fixedpt root_delay;
 	struct s_fixedpt root_dispersion;
-	uint32_t refid;
+	nd_uint32_t refid;
 	struct l_fixedpt ref_timestamp;
 	struct l_fixedpt org_timestamp;
 	struct l_fixedpt rec_timestamp;
 	struct l_fixedpt xmt_timestamp;
-        uint32_t key_id;
-        uint8_t  message_digest[16];
+        nd_uint32_t key_id;
+        nd_uint8_t  message_digest[16];
 };
 /*
  *	Leap Second Codes
@@ -224,14 +224,14 @@ static const struct tok ntp_stratum_values[] = {
  *               Figure 1: NTP Control Message Header
  */
 struct ntp_control_data {
-	u_char		magic;		/* LI, VN, Mode */
-	u_char		control;	/* R, E, M, OpCode */
-	uint16_t	sequence;	/* Sequence Number */
-	uint16_t	status;		/* Status */
-	uint16_t	assoc;		/* Association ID */
-	uint16_t	offset;		/* Offset */
-	uint16_t	count;		/* Count */
-	u_char		data[564];	/* Data, [Padding, [Authenticator]] */
+	nd_uint8_t	magic;		/* LI, VN, Mode */
+	nd_uint8_t	control;	/* R, E, M, OpCode */
+	nd_uint16_t	sequence;	/* Sequence Number */
+	nd_uint16_t	status;		/* Status */
+	nd_uint16_t	assoc;		/* Association ID */
+	nd_uint16_t	offset;		/* Offset */
+	nd_uint16_t	count;		/* Count */
+	nd_uint8_t	data[564];	/* Data, [Padding, [Authenticator]] */
 };
 
 /* Operation Code (OpCode) for NTP control messages */
@@ -551,7 +551,7 @@ static void
 ntp_time_print(netdissect_options *ndo,
 	       register const struct ntp_time_data *td, u_int length)
 {
-	u_char version, mode;
+	uint8_t version, mode;
 
 	version = (td->status & VERSIONMASK) >> VERSIONSHIFT;
 	mode = (td->status & MODEMASK) >> MODESHIFT;
@@ -675,7 +675,7 @@ static void
 ntp_control_print_ESW(netdissect_options *ndo, uint16_t status,
 		      const char *indent)
 {
-	u_char ecode, reserved;
+	uint8_t ecode, reserved;
 
 	ecode = status >> 8;
 	reserved = status & 0xff;
@@ -705,7 +705,7 @@ static void
 ntp_control_print_SSW(netdissect_options *ndo, uint16_t status,
 		      const char *indent)
 {
-	u_char LI, clock_src, ecount, code;
+	uint8_t LI, clock_src, ecount, code;
 
 	LI = (status >> 14) & 0x03;
 	clock_src = (status >> 8) & 0x3f;
@@ -746,7 +746,7 @@ static void
 ntp_control_print_PSW(netdissect_options *ndo, uint16_t status,
 		      const char *indent)
 {
-	u_char pstat, sel, ecount, code;
+	uint8_t pstat, sel, ecount, code;
 
 	pstat = (status >> 11) & 0x1f;
 	sel = (status >> 8) & 0x07;
@@ -786,7 +786,7 @@ static void
 ntp_control_print_CSW(netdissect_options *ndo, uint16_t status,
 		      const char *indent)
 {
-	u_char reserved, ecount, code;
+	uint8_t reserved, ecount, code;
 
 	reserved = (status >> 8) & 0xff;
 	ecount = (status >> 4) & 0x0f;
@@ -821,7 +821,7 @@ static void
 ntp_control_print(netdissect_options *ndo,
 		  register const struct ntp_control_data *cd, u_int length)
 {
-	u_char R, E, M, opcode;
+	uint8_t R, E, M, opcode;
 	uint16_t sequence, status, assoc, offset, count;
 	const char *indent;
 
