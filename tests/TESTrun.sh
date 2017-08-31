@@ -11,22 +11,15 @@ runComplexTests()
   for i in *.sh
   do
     case $i in TEST*.sh) continue;; esac
-    if sh ./$i
-    then
-      passed=`expr $passed + 1`
-      echo $passed >.passed
-    else
-      failed=`expr $failed + 1`
-      echo $failed >.failed
-    fi
+    sh ./$i
   done
 }
 
 runSimpleTests()
 {
+  passed=`cat .passed`
+  failed=`cat .failed`
   only=$1
-  echo $passed >.passed
-  echo $failed >.failed
   cat TESTLIST | while read name input output options
   do
     case $name in
@@ -50,6 +43,8 @@ runSimpleTests()
   failed=`cat .failed`
 }
 
+echo $passed >.passed
+echo $failed >.failed
 if [ $# -eq 0 ]
 then
   runComplexTests
