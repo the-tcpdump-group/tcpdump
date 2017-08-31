@@ -22,8 +22,8 @@ else {
     # we used to do this as a nice pipeline, but the problem is that $r fails to
     # to be set properly if the tcpdump core dumps.
     $r = system "../tcpdump 2>/dev/null -n -t -r $input $options >NEW/$output";
-    if($r == 0x100) {
-        # this means tcpdump exited with code 1.
+    if($r != 0) {
+        # this means tcpdump failed.
         open(OUTPUT, ">>"."NEW/$output") || die "fail to open $output\n";
         printf OUTPUT "EXIT CODE %08x\n", $r;
         close(OUTPUT);
