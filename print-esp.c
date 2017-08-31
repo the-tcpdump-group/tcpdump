@@ -190,6 +190,9 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 	ctx = EVP_CIPHER_CTX_new();
 	if (ctx == NULL)
 		return 0;
+	if (EVP_CipherInit(ctx, sa->evp, sa->secret, NULL, 0) < 0)
+		(*ndo->ndo_warning)(ndo, "espkey init failed");
+	EVP_CipherInit(ctx, NULL, NULL, iv, 0);
 	/*
 	 * Allocate a buffer for the decrypted data.
 	 * The output buffer must be separate from the input buffer, and
@@ -202,9 +205,6 @@ int esp_print_decrypt_buffer_by_ikev2(netdissect_options *ndo,
 		(*ndo->ndo_warning)(ndo, "can't allocate memory for decryption buffer");
 		return 0;
 	}
-	if (EVP_CipherInit(ctx, sa->evp, sa->secret, NULL, 0) < 0)
-		(*ndo->ndo_warning)(ndo, "espkey init failed");
-	EVP_CipherInit(ctx, NULL, NULL, iv, 0);
 	EVP_Cipher(ctx, output_buffer, buf, len);
 	EVP_CIPHER_CTX_free(ctx);
 
@@ -735,6 +735,13 @@ esp_print(netdissect_options *ndo,
 	if (sa->evp) {
 		ctx = EVP_CIPHER_CTX_new();
 		if (ctx != NULL) {
+			if (EVP_CipherInit(ctx, sa->evp, secret, NULL, 0) < 0)
+				(*ndo->ndo_warning)(ndo, "espkey init failed");
+
+			p = ivoff;
+			EVP_CipherInit(ctx, NULL, NULL, p, 0);
+			len = ep - (p + ivlen);
+
 			/*
 			 * Allocate a buffer for the decrypted data.
 			 * The output buffer must be separate from the
@@ -748,13 +755,6 @@ esp_print(netdissect_options *ndo,
 				(*ndo->ndo_warning)(ndo, "can't allocate memory for decryption buffer");
 				return -1;
 			}
-
-			if (EVP_CipherInit(ctx, sa->evp, secret, NULL, 0) < 0)
-				(*ndo->ndo_warning)(ndo, "espkey init failed");
-
-			p = ivoff;
-			EVP_CipherInit(ctx, NULL, NULL, p, 0);
-			len = ep - (p + ivlen);
 
 			EVP_Cipher(ctx, output_buffer, p + ivlen, len);
 			EVP_CIPHER_CTX_free(ctx);
