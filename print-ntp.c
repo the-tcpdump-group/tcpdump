@@ -133,8 +133,8 @@ struct ntp_time_data {
 	struct l_fixedpt org_timestamp;
 	struct l_fixedpt rec_timestamp;
 	struct l_fixedpt xmt_timestamp;
-	nd_uint32_t key_id;
-	nd_uint8_t  message_digest[20];
+        nd_uint32_t key_id;
+        nd_uint8_t  message_digest[16];
 };
 /*
  *	Leap Second Codes (high order two bits)
@@ -565,7 +565,7 @@ static void
 ntp_time_print(netdissect_options *ndo,
 	       register const struct ntp_time_data *bp, u_int length)
 {
-	u_char version, mode;
+	uint8_t version, mode;
 
 	version = (bp->status & VERSIONMASK) >> VERSIONSHIFT;
 	mode = (bp->status & MODEMASK) >> MODESHIFT;
@@ -702,7 +702,7 @@ static void
 ntp_control_print_ESW(netdissect_options *ndo, uint16_t status,
 		      const char *indent)
 {
-	u_char ecode, reserved;
+	uint8_t ecode, reserved;
 
 	ecode = status >> 8;
 	reserved = status & 0xff;
@@ -732,7 +732,7 @@ static void
 ntp_control_print_SSW(netdissect_options *ndo, uint16_t status,
 		      const char *indent)
 {
-	u_char LI, clock_src, ecount, code;
+	uint8_t LI, clock_src, ecount, code;
 
 	LI = (status >> 14) & 0x03;
 	clock_src = (status >> 8) & 0x3f;
@@ -773,7 +773,7 @@ static void
 ntp_control_print_PSW(netdissect_options *ndo, uint16_t status,
 		      const char *indent)
 {
-	u_char pstat, sel, ecount, code;
+	uint8_t pstat, sel, ecount, code;
 
 	pstat = (status >> 11) & 0x1f;
 	sel = (status >> 8) & 0x07;
@@ -813,7 +813,7 @@ static void
 ntp_control_print_CSW(netdissect_options *ndo, uint16_t status,
 		      const char *indent)
 {
-	u_char reserved, ecount, code;
+	uint8_t reserved, ecount, code;
 
 	reserved = (status >> 8) & 0xff;
 	ecount = (status >> 4) & 0x0f;
@@ -848,7 +848,7 @@ static void
 ntp_control_print(netdissect_options *ndo,
 		  register const struct ntp_control_data *cd, u_int length)
 {
-	u_char R, E, M, opcode;
+	uint8_t R, E, M, opcode;
 	uint16_t sequence, status, assoc, offset, count;
 	const char *indent;
 
