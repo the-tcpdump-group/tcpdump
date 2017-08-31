@@ -1,7 +1,7 @@
 IP (tos 0x0, ttl 64, id 58037, offset 0, flags [DF], proto UDP (17), length 100)
     192.168.100.2.58054 > 192.168.100.1.123: NTP leap indicator=Nominal, Version=4, Mode=Client, length=72
 	Stratum 0 (unspecified), poll 0 (1s), precision 32
-	Root Delay: 0.000000, Root dispersion: 0.000000, Reference-ID: 0x00000000 (^@^@^@^@)
+	Root Delay: 0.000000, Root dispersion: 0.000000, Reference-ID: 0x00000000
 	Reference Timestamp:  0.000000000
 	Key id: 8
 	Authentication: 57ea530f6d74350cc5286bfec1ab8ca747c73584
@@ -14,7 +14,7 @@ IP (tos 0xb8, ttl 64, id 24722, offset 0, flags [DF], proto UDP (17), length 80)
 IP (tos 0x0, ttl 64, id 5777, offset 0, flags [DF], proto UDP (17), length 100)
     192.168.100.2.42818 > 192.168.100.1.123: NTP leap indicator=Nominal, Version=4, Mode=Client, length=72
 	Stratum 0 (unspecified), poll 0 (1s), precision 32
-	Root Delay: 0.000000, Root dispersion: 0.000000, Reference-ID: 0x00000000 (^@^@^@^@)
+	Root Delay: 0.000000, Root dispersion: 0.000000, Reference-ID: 0x00000000
 	Reference Timestamp:  0.000000000
 	Key id: 8
 	Authentication: 8b7e640979156264f3faa5ae979656dd86502431
@@ -28,7 +28,7 @@ IP (tos 0x0, ttl 64, id 64601, offset 0, flags [DF], proto UDP (17), length 100)
 IP (tos 0x0, ttl 64, id 31502, offset 0, flags [DF], proto UDP (17), length 76)
     192.168.100.2.53144 > 192.168.100.1.123: NTP leap indicator=clock unsync., Version=4, Mode=Client, length=48
 	Stratum 0 (unspecified), poll 3 (8s), precision -6
-	Root Delay: 1.000000, Root dispersion: 1.000000, Reference-ID: 0x00000000 (^@^@^@^@)
+	Root Delay: 1.000000, Root dispersion: 1.000000, Reference-ID: 0x00000000
 	Reference Timestamp:  0.000000000
 IP (tos 0x0, ttl 64, id 456, offset 0, flags [DF], proto UDP (17), length 76)
     192.168.100.1.123 > 192.168.100.2.53144: NTP leap indicator=Nominal, Version=4, Mode=Server, length=48
