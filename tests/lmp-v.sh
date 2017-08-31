@@ -15,8 +15,17 @@ then
 	printf '    %-35s: TEST SKIPPED (no Makefile)\n' 'lmp-v'
 elif grep '^CC = .*gcc' ../Makefile >/dev/null
 then
-	./TESTonce lmp-v lmp.pcap lmp-v.out '-T lmp -v'
-	[ $? -eq 0 ] || exitcode=1
+	passed=`cat .passed`
+	failed=`cat .failed`
+	if ./TESTonce lmp-v lmp.pcap lmp-v.out '-T lmp -v'
+	then
+		passed=`expr $passed + 1`
+		echo $passed >.passed
+	else
+		failed=`expr $failed + 1`
+		echo $failed >.failed
+		exitcode=1
+	fi
 else
 	printf '    %-35s: TEST SKIPPED (compiler is not GCC)\n' 'lmp-v'
 fi
