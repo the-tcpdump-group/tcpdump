@@ -14,8 +14,10 @@ runComplexTests()
     if sh ./$i
     then
       passed=`expr $passed + 1`
+      echo $passed >.passed
     else
       failed=`expr $failed + 1`
+      echo $failed >.failed
     fi
   done
 }
