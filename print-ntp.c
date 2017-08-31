@@ -718,6 +718,7 @@ ntp_control_print_ESW(netdissect_options *ndo, uint16_t status,
 		break;
 	case 3:
 	default:	/* unless a higher verbosity is defined */
+		/* FIXME: the codes for NTPv3 are different */
 		ND_PRINT((ndo, "%sErrStat=%#04hx (Code=%s (%hu), Reserved=%#x)",
 			  indent, status, tok2str(ntp_CES_values, "reserved(%u)",
 						  ecode), ecode, reserved));
@@ -760,6 +761,7 @@ ntp_control_print_SSW(netdissect_options *ndo, uint16_t status,
 			  clock_src, tok2str(ntp_ClSrc_values, "reserved(%u)",
 					     clock_src)));
 		ND_PRINT((ndo, "%s\tCount=%u", indent, ecount));
+		/* FIXME: the codes for NTPv3 are different */
 		ND_PRINT((ndo, "%s\tEvent=%u (%s)", indent,
 			  code, tok2str(ntp_SEC_values, NULL, code)));
 		break;
@@ -797,9 +799,11 @@ ntp_control_print_PSW(netdissect_options *ndo, uint16_t status,
 		ND_PRINT((ndo, "%sPeerStat=%#04x", indent, status));
 		ND_PRINT((ndo, "%s\tStatus=%#02x (%s)", indent,
 			  pstat, bittok2str(ntp_PSS_values, NULL, pstat)));
+		/* FIXME: the codes for NTPv3 may be different */
 		ND_PRINT((ndo, "%s\tSel=%u (%s)", indent,
 			  sel, tok2str(ntp_PSL_values, NULL, sel)));
 		ND_PRINT((ndo, "%s\tCount=%u", indent, ecount));
+		/* FIXME: the codes for NTPv3 are different */
 		ND_PRINT((ndo, "%s\tEvent=%u (%s)", indent,
 			  code, tok2str(ntp_PEC_values, NULL, code)));
 		break;
@@ -815,6 +819,7 @@ ntp_control_print_CSW(netdissect_options *ndo, uint16_t status,
 {
 	uint8_t reserved, ecount, code;
 
+	/* FIXME: the format for NTPv3 is different */
 	reserved = (status >> 8) & 0xff;
 	ecount = (status >> 4) & 0x0f;
 	code = status & 0x0f;
@@ -833,6 +838,7 @@ ntp_control_print_CSW(netdissect_options *ndo, uint16_t status,
 	default:	/* unless a higher verbosity is defined */
 		/* decode Clock Status Code */
 		ND_PRINT((ndo, "%sClkStat=%#04x", indent, status));
+		/* FIXME: the codes for NTPv3 are different */
 		ND_PRINT((ndo, "%s\tReserved=%#02x", indent, reserved));
 		ND_PRINT((ndo, "%s\tCount=%u", indent, ecount));
 		ND_PRINT((ndo, "%s\tCode=%#02x (%s)", indent,
