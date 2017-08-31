@@ -552,6 +552,7 @@ ntp_time_print(netdissect_options *ndo,
 	       register const struct ntp_time_data *td, u_int length)
 {
 	uint8_t version, mode;
+	uint32_t refid;
 
 	version = (td->status & VERSIONMASK) >> VERSIONSHIFT;
 	mode = (td->status & MODEMASK) >> MODESHIFT;
@@ -592,7 +593,8 @@ ntp_time_print(netdissect_options *ndo,
 	p_sfix(ndo, &td->root_dispersion);
 
 	ND_TCHECK(td->refid);
-	ND_PRINT((ndo, ", Reference-ID: %#08x", EXTRACT_32BITS(&td->refid)));
+	refid = EXTRACT_32BITS(&td->refid);
+	ND_PRINT((ndo, ", Reference-ID: %#08x", refid));
 	/* Interpretation depends on stratum and NTP version: */
 	/* RFC 5905 (NTPv4), section "7.3. Packet Header Variables":
 	 * "If using the IPv4 address family, the identifier is the four-octet
@@ -600,25 +602,25 @@ ntp_time_print(netdissect_options *ndo,
 	 * four octets of the MD5 hash of the IPv6 address."
 	 */
 	if (td->stratum < 2) {
-		if (td->stratum == 0 && version > 3 && td->refid != 0 &&
+		if (td->stratum == 0 && version > 3 && refid != 0UL &&
 		    mode > MODE_UNSPEC && mode < MODE_CONTROL) {
 			/* Kiss-of-Death (KoD) code */
 			ND_PRINT((ndo, " ("));
-			if (fn_printn(ndo, (const u_char *)&(td->refid), 4,
+			if (fn_printn(ndo, (const u_char *)&td->refid, 4,
 				      ndo->ndo_snapend))
 				goto trunc;
 			ND_PRINT((ndo, ")"));
 		} else if (td->stratum == PRIM_REF) {
 			/* Reference Clock Identifier */
 			ND_PRINT((ndo, " ("));
-			if (fn_printn(ndo, (const u_char *)&(td->refid), 4,
+			if (fn_printn(ndo, (const u_char *)&td->refid, 4,
 				      ndo->ndo_snapend))
 				goto trunc;
 			ND_PRINT((ndo, ")"));
 		}
 	} else if (version < 4) {
 		/* up to NTPv3 it's the IPv4 address */
-		ND_PRINT((ndo, ", (%s)", ipaddr_string(ndo, &(td->refid))));
+		ND_PRINT((ndo, ", (%s)", ipaddr_string(ndo, &td->refid)));
 	}
 
 	ND_TCHECK(td->ref_timestamp);
