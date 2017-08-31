@@ -571,6 +571,7 @@ olsr-oobr-1		olsr-oobr-1.pcap		olsr-oobr-1.out	-v
 olsr-oobr-2		olsr-oobr-2.pcap		olsr-oobr-2.out	-v
 ikev1_id_ipv6_addr_subnet-oobr	ikev1_id_ipv6_addr_subnet-oobr.pcap	ikev1_id_ipv6_addr_subnet-oobr.out	-v
 isakmp-various-oobr	isakmp-various-oobr.pcap	isakmp-various-oobr.out	-v
+aoe-oobr-1		aoe-oobr-1.pcap			aoe-oobr-1.out	-v -c1
 
 # bad packets from Katie Holly
 mlppp-oobr		mlppp-oobr.pcap			mlppp-oobr.out
