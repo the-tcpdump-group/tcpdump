@@ -1,3 +1,9 @@
+  Summary for 4.9.2 tcpdump release
+    Do not use getprotobynumber() for protocol name resolution.
+    Improve errors detection in the test scripts.
+    Fix a segfault with OpenSSL 1.1 and improve OpenSSL usage.
+    Clean up IS-IS printing.
+
 Sunday July 23, 2017 denis@ovsienko.info
   Summary for 4.9.1 tcpdump release
     CVE-2017-11108/Fix bounds checking for STP.
