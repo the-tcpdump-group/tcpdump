@@ -545,6 +545,17 @@ union ntpdata {
 };
 
 /*
+ * output indent for level `n' on a new line
+ */
+static void
+indent(netdissect_options *ndo, unsigned n)
+{
+	ND_PRINT((ndo, "\n"));
+	while (n-- != 0)
+		ND_PRINT((ndo, "    "));
+}
+
+/*
  * Print NTP time requests and responses
  */
 static void
@@ -553,12 +564,14 @@ ntp_time_print(netdissect_options *ndo,
 {
 	uint8_t version, mode;
 	uint32_t refid;
+	unsigned i_lev = 1;		/* indent level */
 
 	version = (td->status & VERSIONMASK) >> VERSIONSHIFT;
 	mode = (td->status & MODEMASK) >> MODESHIFT;
 
 	ND_TCHECK(td->stratum);
-	ND_PRINT((ndo, "\n\tStratum %u (%s)",
+	indent(ndo, i_lev);
+	ND_PRINT((ndo, "Stratum %u (%s)",
 		td->stratum,
 		tok2str(ntp_stratum_values,
 			(td->stratum >= 2 && td->stratum <= 15) ?
@@ -585,7 +598,8 @@ ntp_time_print(netdissect_options *ndo,
 	ND_PRINT((ndo, ", precision %d", td->precision));
 
 	ND_TCHECK(td->root_delay);
-	ND_PRINT((ndo, "\n\tRoot Delay: "));
+	indent(ndo, i_lev);
+	ND_PRINT((ndo, "Root Delay: "));
 	p_sfix(ndo, &td->root_delay);
 
 	ND_TCHECK(td->root_dispersion);
@@ -624,41 +638,50 @@ ntp_time_print(netdissect_options *ndo,
 	}
 
 	ND_TCHECK(td->ref_timestamp);
-	ND_PRINT((ndo, "\n\tReference Timestamp:  "));
+	indent(ndo, i_lev);
+	ND_PRINT((ndo, "Reference Timestamp:  "));
 	p_ntp_time(ndo, &(td->ref_timestamp));
 
 	if (ndo->ndo_vflag > 1) {
 		ND_TCHECK(td->org_timestamp);
-		ND_PRINT((ndo, "\n\tOriginator Timestamp: "));
+		indent(ndo, i_lev);
+		ND_PRINT((ndo, "Originator Timestamp: "));
 		p_ntp_time(ndo, &(td->org_timestamp));
 
 		ND_TCHECK(td->rec_timestamp);
-		ND_PRINT((ndo, "\n\tReceive Timestamp:    "));
+		indent(ndo, i_lev);
+		ND_PRINT((ndo, "Receive Timestamp:    "));
 		p_ntp_time(ndo, &(td->rec_timestamp));
 
 		ND_TCHECK(td->xmt_timestamp);
-		ND_PRINT((ndo, "\n\tTransmit Timestamp:   "));
+		indent(ndo, i_lev);
+		ND_PRINT((ndo, "Transmit Timestamp:   "));
 		p_ntp_time(ndo, &(td->xmt_timestamp));
 
 		if (ndo->ndo_vflag > 2) {
-			ND_PRINT((ndo, "\n\t    Originator - Receive delta:  "));
+			indent(ndo, i_lev + 1);
+			ND_PRINT((ndo, "Originator - Receive delta:  "));
 			p_ntp_delta(ndo, &(td->org_timestamp),
 				    &(td->rec_timestamp));
 
-			ND_PRINT((ndo, "\n\t    Originator - Transmit delta: "));
+			indent(ndo, i_lev + 1);
+			ND_PRINT((ndo, "Originator - Transmit delta: "));
 			p_ntp_delta(ndo, &(td->org_timestamp),
 				    &(td->xmt_timestamp));
 		}
 	}
 	if ((sizeof(*td) - length) == 16) { 	/* Optional: key-id */
 		ND_TCHECK(td->key_id);
-		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_32BITS(&td->key_id)));
+		indent(ndo, i_lev);
+		ND_PRINT((ndo, "Key id: %u", EXTRACT_32BITS(&td->key_id)));
 	} else if ((sizeof(*td) - length) == 0) {
 		/* Optional: key-id + authentication */
 		ND_TCHECK(td->key_id);
-		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_32BITS(&td->key_id)));
+		indent(ndo, i_lev);
+		ND_PRINT((ndo, "Key id: %u", EXTRACT_32BITS(&td->key_id)));
 		ND_TCHECK2(td->message_digest, sizeof (td->message_digest));
-                ND_PRINT((ndo, "\n\tAuthentication: %08x%08x%08x%08x",
+		indent(ndo, i_lev);
+                ND_PRINT((ndo, "Authentication: %08x%08x%08x%08x",
 			  EXTRACT_32BITS(td->message_digest),
 			  EXTRACT_32BITS(td->message_digest + 4),
 			  EXTRACT_32BITS(td->message_digest + 8),
@@ -675,7 +698,7 @@ trunc:
  */
 static void
 ntp_control_print_ESW(netdissect_options *ndo, uint16_t status,
-		      const char *indent)
+		      const unsigned i_lev)
 {
 	uint8_t ecode, reserved;
 
@@ -685,18 +708,21 @@ ntp_control_print_ESW(netdissect_options *ndo, uint16_t status,
 	case 0:
 		break;
 	case 1:
-		ND_PRINT((ndo, "%sErrStat=%#hx", indent, status));
+		indent(ndo, i_lev);
+		ND_PRINT((ndo, "ErrStat=%#hx", status));
 		break;
 	case 2:
-		ND_PRINT((ndo, "%sErrStat=%#04hx (Code=%#hx, Reserved=%#hx)",
-			  indent, status, ecode, reserved));
+		indent(ndo, i_lev);
+		ND_PRINT((ndo, "ErrStat=%#04hx (Code=%#hx, Reserved=%#hx)",
+			  status, ecode, reserved));
 		break;
 	case 3:
 	default:	/* unless a higher verbosity is defined */
 		/* FIXME: the codes for NTPv3 are different */
-		ND_PRINT((ndo, "%sErrStat=%#04hx (Code=%s (%hu), Reserved=%#x)",
-			  indent, status, tok2str(ntp_CES_values, "reserved(%u)",
-						  ecode), ecode, reserved));
+		indent(ndo, i_lev);
+		ND_PRINT((ndo, "ErrStat=%#04hx (Code=%s (%hu), Reserved=%#x)",
+			  status, tok2str(ntp_CES_values, "reserved(%u)",
+					  ecode), ecode, reserved));
 		break;
 	}
 }
@@ -706,7 +732,7 @@ ntp_control_print_ESW(netdissect_options *ndo, uint16_t status,
  */
 static void
 ntp_control_print_SSW(netdissect_options *ndo, uint16_t status,
-		      const char *indent)
+		      const unsigned i_lev)
 {
 	uint8_t LI, clock_src, ecount, code;
 
@@ -719,25 +745,32 @@ ntp_control_print_SSW(netdissect_options *ndo, uint16_t status,
 	case 0:
 		break;
 	case 1:
-		ND_PRINT((ndo, "%sSysStat=%#04x", indent, status));
+		indent(ndo, i_lev);
+		ND_PRINT((ndo, "SysStat=%#04x", status));
 		break;
 	case 2:
-		ND_PRINT((ndo, "%sSysStat=%#04x", indent, status));
+		indent(ndo, i_lev);
+		ND_PRINT((ndo, "SysStat=%#04x", status));
 		ND_PRINT((ndo, " (LI=%u, ClockSrc=%u, Count=%u, Code=%u)",
 			  LI, clock_src, ecount, code));
 		break;
 	case 3:
 	default:	/* unless a higher verbosity is defined */
 		/* decode LI, Clock Source, System Event Code */
-		ND_PRINT((ndo, "%sSysStat=%#04x", indent, status));
-		ND_PRINT((ndo, "%s\tLI=%u (%s)", indent,
+		indent(ndo, i_lev);
+		ND_PRINT((ndo, "SysStat=%#04x", status));
+		indent(ndo, i_lev + 1);
+		ND_PRINT((ndo, "LI=%u (%s)",
 			  LI, tok2str(ntp_leapind_values, NULL, LI)));
-		ND_PRINT((ndo, "%s\tClockSrc=%u (%s)", indent,
+		indent(ndo, i_lev + 1);
+		ND_PRINT((ndo, "ClockSrc=%u (%s)",
 			  clock_src, tok2str(ntp_ClSrc_values, "reserved(%u)",
 					     clock_src)));
-		ND_PRINT((ndo, "%s\tCount=%u", indent, ecount));
+		indent(ndo, i_lev + 1);
+		ND_PRINT((ndo, "Count=%u", ecount));
 		/* FIXME: the codes for NTPv3 are different */
-		ND_PRINT((ndo, "%s\tEvent=%u (%s)", indent,
+		indent(ndo, i_lev + 1);
+		ND_PRINT((ndo, "Event=%u (%s)",
 			  code, tok2str(ntp_SEC_values, NULL, code)));
 		break;
 	}
@@ -748,7 +781,7 @@ ntp_control_print_SSW(netdissect_options *ndo, uint16_t status,
  */
 static void
 ntp_control_print_PSW(netdissect_options *ndo, uint16_t status,
-		      const char *indent)
+		      const unsigned i_lev, const char *sep)
 {
 	uint8_t pstat, sel, ecount, code;
 
@@ -757,29 +790,41 @@ ntp_control_print_PSW(netdissect_options *ndo, uint16_t status,
 	ecount = (status >> 4) & 0x0f;
 	code = status & 0x0f;
 
+	/* special case: continue line with `sep' if defined; otherwise start
+	 * with new line
+	 */
+	if (sep != NULL)
+		ND_PRINT((ndo, "%s", sep));
+	else
+		indent(ndo, i_lev);
+
 	switch (ndo->ndo_vflag){
 	case 0:
 		break;
 	case 1:
-		ND_PRINT((ndo, "%sPeerStat=%#04x", indent, status));
+		ND_PRINT((ndo, "PeerStat=%#04x", status));
 		break;
 	case 2:
-		ND_PRINT((ndo, "%sPeerStat=%#04x", indent, status));
+		ND_PRINT((ndo, "PeerStat=%#04x", status));
 		ND_PRINT((ndo, " (Status=%#02x, Sel=%u, Count=%u, Code=%u)",
 			  pstat, sel, ecount, code));
 		break;
 	case 3:
 	default:	/* unless a higher verbosity is defined */
 		/* decode Peer Status, Peer Selection, Peer Event Code */
-		ND_PRINT((ndo, "%sPeerStat=%#04x", indent, status));
-		ND_PRINT((ndo, "%s\tStatus=%#02x (%s)", indent,
+		ND_PRINT((ndo, "PeerStat=%#04x", status));
+		indent(ndo, i_lev + 1);
+		ND_PRINT((ndo, "Status=%#02x (%s)",
 			  pstat, bittok2str(ntp_PSS_values, NULL, pstat)));
 		/* FIXME: the codes for NTPv3 may be different */
-		ND_PRINT((ndo, "%s\tSel=%u (%s)", indent,
+		indent(ndo, i_lev + 1);
+		ND_PRINT((ndo, "Sel=%u (%s)",
 			  sel, tok2str(ntp_PSL_values, NULL, sel)));
-		ND_PRINT((ndo, "%s\tCount=%u", indent, ecount));
+		indent(ndo, i_lev + 1);
+		ND_PRINT((ndo, "Count=%u", ecount));
 		/* FIXME: the codes for NTPv3 are different */
-		ND_PRINT((ndo, "%s\tEvent=%u (%s)", indent,
+		indent(ndo, i_lev + 1);
+		ND_PRINT((ndo, "Event=%u (%s)",
 			  code, tok2str(ntp_PEC_values, NULL, code)));
 		break;
 	}
@@ -790,7 +835,7 @@ ntp_control_print_PSW(netdissect_options *ndo, uint16_t status,
  */
 static void
 ntp_control_print_CSW(netdissect_options *ndo, uint16_t status,
-		      const char *indent)
+		      const unsigned i_lev)
 {
 	uint8_t reserved, ecount, code;
 
@@ -803,20 +848,26 @@ ntp_control_print_CSW(netdissect_options *ndo, uint16_t status,
 	case 0:
 		break;
 	case 1:
-		ND_PRINT((ndo, "%sClkStat=%#04x", indent, status));
+		indent(ndo, i_lev);
+		ND_PRINT((ndo, "ClkStat=%#04x", status));
 		break;
 	case 2:
-		ND_PRINT((ndo, "%sClkStat=%#04x (Resvd=%u, Count=%u, Code=%u)",
-			  indent, status, reserved, ecount, code));
+		indent(ndo, i_lev);
+		ND_PRINT((ndo, "ClkStat=%#04x (Resvd=%u, Count=%u, Code=%u)",
+			  status, reserved, ecount, code));
 		break;
 	case 3:
 	default:	/* unless a higher verbosity is defined */
 		/* decode Clock Status Code */
-		ND_PRINT((ndo, "%sClkStat=%#04x", indent, status));
+		indent(ndo, i_lev);
+		ND_PRINT((ndo, "ClkStat=%#04x", status));
 		/* FIXME: the codes for NTPv3 are different */
-		ND_PRINT((ndo, "%s\tReserved=%#02x", indent, reserved));
-		ND_PRINT((ndo, "%s\tCount=%u", indent, ecount));
-		ND_PRINT((ndo, "%s\tCode=%#02x (%s)", indent,
+		indent(ndo, i_lev + 1);
+		ND_PRINT((ndo, "Reserved=%#02x", reserved));
+		indent(ndo, i_lev + 1);
+		ND_PRINT((ndo, "Count=%u", ecount));
+		indent(ndo, i_lev + 1);
+		ND_PRINT((ndo, "Code=%#02x (%s)",
 			  code, tok2str(ntp_CCS_values, "reserved(%u)", code)));
 		break;
 	}
@@ -831,9 +882,8 @@ ntp_control_print(netdissect_options *ndo,
 {
 	uint8_t R, E, M, opcode;
 	uint16_t sequence, status, assoc, offset, count;
-	const char *indent;
+	unsigned i_lev = 1;		/* indent level */
 
-	indent = "\n\t";
 	ND_TCHECK(cd->control);
 	R = (cd->control & 0x80) != 0;
 	E = (cd->control & 0x40) != 0;
@@ -841,11 +891,13 @@ ntp_control_print(netdissect_options *ndo,
 	opcode = cd->control & 0x1f;
 	
 	if (ndo->ndo_vflag < 2) {
-		ND_PRINT((ndo, "%sREM=%c%c%c, OpCode=%u", indent,
+		indent(ndo, i_lev);
+		ND_PRINT((ndo, "REM=%c%c%c, OpCode=%u",
 			  R ? 'R' : '_', E ? 'E' : '_', M ? 'M' : '_',
 			  (unsigned)opcode));
 	} else {
-		ND_PRINT((ndo, "%sR=%s, E=%s, M=%s, OpCode=%s", indent,
+		indent(ndo, i_lev);
+		ND_PRINT((ndo, "R=%s, E=%s, M=%s, OpCode=%s",
 			  R ? "Response" : "Request", E ? "Error" : "OK",
 			  M ? "More" : "Last",
 			  tok2str(ntp_control_op_values, NULL, opcode)));
@@ -857,7 +909,11 @@ ntp_control_print(netdissect_options *ndo,
 
 	ND_TCHECK(cd->status);
 	status = EXTRACT_16BITS(&cd->status);
-	ND_PRINT((ndo, "%sStatus=%#04x", indent, status));
+	if (ndo->ndo_vflag >= 2)
+		indent(ndo, i_lev);
+	else
+		ND_PRINT((ndo, ", "));
+	ND_PRINT((ndo, "Status=%#04x", status));
 
 	ND_TCHECK(cd->assoc);
 	assoc = EXTRACT_16BITS(&cd->assoc);
@@ -872,27 +928,29 @@ ntp_control_print(netdissect_options *ndo,
 	ND_PRINT((ndo, ", Count=%hu", count));
 
 	if (E) {
-		ntp_control_print_ESW(ndo, status, "\n\t\t");
+		ntp_control_print_ESW(ndo, status, i_lev + 1);
 	} else if (opcode == OPC_Read_Vars || opcode == OPC_Read_Status ||
 		   (opcode == OPC_Write_Vars && assoc != 0)) {
 		if (assoc == 0) {
 			/* See "3.1.  System Status Word" */
-			ntp_control_print_SSW(ndo, status, "\n\t\t");
+			ntp_control_print_SSW(ndo, status, i_lev + 1);
 		} else {
 			/* See "3.2.  Peer Status Word" */
-			ntp_control_print_PSW(ndo, status, "\n\t\t");
+			ntp_control_print_PSW(ndo, status, i_lev + 1, NULL);
 		}
 	} else if (opcode == OPC_Read_Clock_Vars ||
 		   opcode == OPC_Write_Clock_Vars) {
 		/* See "3.3.  Clock Status Word" */
-		ntp_control_print_CSW(ndo, status, "\n\t\t");
+		ntp_control_print_CSW(ndo, status, i_lev + 1);
 	} else {
 		ND_PRINT((ndo, ", Status=%#04hx", status));
 	}
 
-	if ((int) (length - sizeof(*cd)) > 0)
-		ND_PRINT((ndo, "\n\t%u extra octets",
+	if ((int) (length - sizeof(*cd)) > 0) {
+		indent(ndo, i_lev);
+		ND_PRINT((ndo, "%u extra octets",
 			  length - (unsigned)sizeof(*cd)));
+	}
 	if (count != 0) {
 		ND_TCHECK2(cd->data, 1);
 		switch (opcode) {
@@ -902,8 +960,9 @@ ntp_control_print(netdissect_options *ndo,
 		case OPC_Write_Clock_Vars:
 			/* data is expected to be mostly text */
 			if (ndo->ndo_vflag > 2) {
-				ND_PRINT((ndo, "%sdata:%s    ",
-					  indent, indent));
+				indent(ndo, i_lev);
+				ND_PRINT((ndo, "data:"));
+				indent(ndo, i_lev + 1);
 				fn_print(ndo, cd->data, ndo->ndo_snapend);
 			}
 			break;
