@@ -968,8 +968,7 @@ ntp_control_print(netdissect_options *ndo,
 			break;
 		default:
 			/* data is binary format */
-			ND_PRINT((ndo, "%sTO-BE-DONE: data not interpreted",
-				  indent));
+			ND_PRINT((ndo, "TO-BE-DONE: data not interpreted"));
 		}
 	}
 	return;
