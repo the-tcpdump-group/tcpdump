@@ -994,7 +994,7 @@ ntp_control_print(netdissect_options *ndo,
 		/* See "3.3.  Clock Status Word" */
 		ntp_control_print_CSW(ndo, status, i_lev + 1);
 	} else {
-		ND_PRINT((ndo, ", Status=%#04hx", status));
+		/* generic Status output before already, no need to repeat it */
 	}
 
 	if ((int) (length - sizeof(*cd)) > 0) {
