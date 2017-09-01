@@ -1014,7 +1014,12 @@ ntp_control_print(netdissect_options *ndo,
 		} else if (opcode == OPC_Read_Vars ||
 			   opcode == OPC_Write_Vars ||
 			   opcode == OPC_Read_Clock_Vars ||
-			   opcode == OPC_Write_Clock_Vars) {
+			   opcode == OPC_Write_Clock_Vars ||
+			   opcode == OPC_Trap_Response ||
+			   opcode == OPC_Configure ||
+			   opcode == OPC_Get_Remote_Status ||
+			   opcode == OPC_Get_List ||
+			   opcode == OPC_Request_Nounce) {
 			is_text_data = 1;
 		} else {
 			/* data is unknown or binary format */
