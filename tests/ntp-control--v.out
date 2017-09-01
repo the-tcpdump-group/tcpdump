@@ -1,86 +1,73 @@
 IP6 (flowlabel 0x62d8a, hlim 64, next-header UDP (17) payload length: 20) ::1.38531 > ::1.123: [bad udp cksum 0x0027 -> 0x5280!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=12
-	REM=___, OpCode=2, Sequence=68
-	Status=0000, Assoc.=0, Offset=0, Count=0
-		SysStat=0000
+    REM=___, OpCode=2, Sequence=68, Status=0000, Assoc.=0, Offset=0, Count=0
+        SysStat=0000
 IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length: 416) ::1.123 > ::1.38531: [bad udp cksum 0x01b3 -> 0x412f!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=408
-	REM=R__, OpCode=2, Sequence=68
-	Status=0x618, Assoc.=0, Offset=0, Count=394
-		SysStat=0x618
+    REM=R__, OpCode=2, Sequence=68, Status=0x618, Assoc.=0, Offset=0, Count=394
+        SysStat=0x618
 IP6 (flowlabel 0x62d8a, hlim 64, next-header UDP (17) payload length: 20) ::1.38531 > ::1.123: [bad udp cksum 0x0027 -> 0x5280!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=12
-	REM=___, OpCode=1, Sequence=69
-	Status=0000, Assoc.=0, Offset=0, Count=0
-		SysStat=0000
+    REM=___, OpCode=1, Sequence=69, Status=0000, Assoc.=0, Offset=0, Count=0
+        SysStat=0000
 IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length: 40) ::1.123 > ::1.38531: [bad udp cksum 0x003b -> 0xfba0!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=32
-	REM=R__, OpCode=1, Sequence=69
-	Status=0x618, Assoc.=0, Offset=0, Count=20
-		SysStat=0x618
-	TO-BE-DONE: data not interpreted
+    REM=R__, OpCode=1, Sequence=69, Status=0x618, Assoc.=0, Offset=0, Count=20
+        SysStat=0x618
+        assoc=48829: PeerStat=0x961a
+        assoc=48828: PeerStat=0x8011
+        assoc=48827: PeerStat=0x8011
+        assoc=48826: PeerStat=0x8011
+        assoc=48825: PeerStat=0x8011
 IP6 (flowlabel 0x62d8a, hlim 64, next-header UDP (17) payload length: 20) ::1.38531 > ::1.123: [bad udp cksum 0x0027 -> 0x527f!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=12
-	REM=___, OpCode=1, Sequence=70
-	Status=0000, Assoc.=0, Offset=0, Count=0
-		SysStat=0000
+    REM=___, OpCode=1, Sequence=70, Status=0000, Assoc.=0, Offset=0, Count=0
+        SysStat=0000
 IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length: 40) ::1.123 > ::1.38531: [bad udp cksum 0x003b -> 0xfb9f!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=32
-	REM=R__, OpCode=1, Sequence=70
-	Status=0x618, Assoc.=0, Offset=0, Count=20
-		SysStat=0x618
-	TO-BE-DONE: data not interpreted
+    REM=R__, OpCode=1, Sequence=70, Status=0x618, Assoc.=0, Offset=0, Count=20
+        SysStat=0x618
+        assoc=48829: PeerStat=0x961a
+        assoc=48828: PeerStat=0x8011
+        assoc=48827: PeerStat=0x8011
+        assoc=48826: PeerStat=0x8011
+        assoc=48825: PeerStat=0x8011
 IP6 (flowlabel 0x62d8a, hlim 64, next-header UDP (17) payload length: 20) ::1.38531 > ::1.123: [bad udp cksum 0x0027 -> 0x93c3!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=12
-	REM=___, OpCode=2, Sequence=71
-	Status=0000, Assoc.=48825, Offset=0, Count=0
-		PeerStat=0000
+    REM=___, OpCode=2, Sequence=71, Status=0000, Assoc.=48825, Offset=0, Count=0
+        PeerStat=0000
 IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length: 488) ::1.123 > ::1.38531: [bad udp cksum 0x01fb -> 0x5350!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=480
-	REM=R_M, OpCode=2, Sequence=71
-	Status=0x8011, Assoc.=48825, Offset=0, Count=468
-		PeerStat=0x8011
+    REM=R_M, OpCode=2, Sequence=71, Status=0x8011, Assoc.=48825, Offset=0, Count=468
+        PeerStat=0x8011
 IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length: 128) ::1.123 > ::1.38531: [bad udp cksum 0x0093 -> 0xbcc4!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=120
-	REM=R__, OpCode=2, Sequence=71
-	Status=0x8011, Assoc.=48825, Offset=468, Count=106
-		PeerStat=0x8011
+    REM=R__, OpCode=2, Sequence=71, Status=0x8011, Assoc.=48825, Offset=468, Count=106
+        PeerStat=0x8011
 IP6 (flowlabel 0x62d8a, hlim 64, next-header UDP (17) payload length: 20) ::1.38531 > ::1.123: [bad udp cksum 0x0027 -> 0x93c1!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=12
-	REM=___, OpCode=2, Sequence=72
-	Status=0000, Assoc.=48826, Offset=0, Count=0
-		PeerStat=0000
+    REM=___, OpCode=2, Sequence=72, Status=0000, Assoc.=48826, Offset=0, Count=0
+        PeerStat=0000
 IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length: 488) ::1.123 > ::1.38531: [bad udp cksum 0x01fb -> 0xc0d5!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=480
-	REM=R_M, OpCode=2, Sequence=72
-	Status=0x8011, Assoc.=48826, Offset=0, Count=468
-		PeerStat=0x8011
+    REM=R_M, OpCode=2, Sequence=72, Status=0x8011, Assoc.=48826, Offset=0, Count=468
+        PeerStat=0x8011
 IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length: 128) ::1.123 > ::1.38531: [bad udp cksum 0x0093 -> 0x88c5!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=120
-	REM=R__, OpCode=2, Sequence=72
-	Status=0x8011, Assoc.=48826, Offset=468, Count=107
-		PeerStat=0x8011
+    REM=R__, OpCode=2, Sequence=72, Status=0x8011, Assoc.=48826, Offset=468, Count=107
+        PeerStat=0x8011
 IP6 (flowlabel 0x62d8a, hlim 64, next-header UDP (17) payload length: 20) ::1.38531 > ::1.123: [bad udp cksum 0x0027 -> 0x93bf!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=12
-	REM=___, OpCode=2, Sequence=73
-	Status=0000, Assoc.=48827, Offset=0, Count=0
-		PeerStat=0000
+    REM=___, OpCode=2, Sequence=73, Status=0000, Assoc.=48827, Offset=0, Count=0
+        PeerStat=0000
 IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length: 488) ::1.123 > ::1.38531: [bad udp cksum 0x01fb -> 0x5c4a!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=480
-	REM=R_M, OpCode=2, Sequence=73
-	Status=0x8011, Assoc.=48827, Offset=0, Count=468
-		PeerStat=0x8011
+    REM=R_M, OpCode=2, Sequence=73, Status=0x8011, Assoc.=48827, Offset=0, Count=468
+        PeerStat=0x8011
 IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length: 124) ::1.123 > ::1.38531: [bad udp cksum 0x008f -> 0xdcfa!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=116
-	REM=R__, OpCode=2, Sequence=73
-	Status=0x8011, Assoc.=48827, Offset=468, Count=104
-		PeerStat=0x8011
+    REM=R__, OpCode=2, Sequence=73, Status=0x8011, Assoc.=48827, Offset=468, Count=104
+        PeerStat=0x8011
 IP6 (flowlabel 0x62d8a, hlim 64, next-header UDP (17) payload length: 20) ::1.38531 > ::1.123: [bad udp cksum 0x0027 -> 0x93bd!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=12
-	REM=___, OpCode=2, Sequence=74
-	Status=0000, Assoc.=48828, Offset=0, Count=0
-		PeerStat=0000
+    REM=___, OpCode=2, Sequence=74, Status=0000, Assoc.=48828, Offset=0, Count=0
+        PeerStat=0000
 IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length: 488) ::1.123 > ::1.38531: [bad udp cksum 0x01fb -> 0x5634!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=480
-	REM=R_M, OpCode=2, Sequence=74
-	Status=0x8011, Assoc.=48828, Offset=0, Count=468
-		PeerStat=0x8011
+    REM=R_M, OpCode=2, Sequence=74, Status=0x8011, Assoc.=48828, Offset=0, Count=468
+        PeerStat=0x8011
 IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length: 128) ::1.123 > ::1.38531: [bad udp cksum 0x0093 -> 0x8c8c!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=120
-	REM=R__, OpCode=2, Sequence=74
-	Status=0x8011, Assoc.=48828, Offset=468, Count=108
-		PeerStat=0x8011
+    REM=R__, OpCode=2, Sequence=74, Status=0x8011, Assoc.=48828, Offset=468, Count=108
+        PeerStat=0x8011
 IP6 (flowlabel 0x62d8a, hlim 64, next-header UDP (17) payload length: 20) ::1.38531 > ::1.123: [bad udp cksum 0x0027 -> 0x93bb!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=12
-	REM=___, OpCode=2, Sequence=75
-	Status=0000, Assoc.=48829, Offset=0, Count=0
-		PeerStat=0000
+    REM=___, OpCode=2, Sequence=75, Status=0000, Assoc.=48829, Offset=0, Count=0
+        PeerStat=0000
 IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length: 488) ::1.123 > ::1.38531: [bad udp cksum 0x01fb -> 0x9c1f!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=480
-	REM=R_M, OpCode=2, Sequence=75
-	Status=0x961a, Assoc.=48829, Offset=0, Count=468
-		PeerStat=0x961a
+    REM=R_M, OpCode=2, Sequence=75, Status=0x961a, Assoc.=48829, Offset=0, Count=468
+        PeerStat=0x961a
 IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length: 108) ::1.123 > ::1.38531: [bad udp cksum 0x007f -> 0x77be!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=100
-	REM=R__, OpCode=2, Sequence=75
-	Status=0x961a, Assoc.=48829, Offset=468, Count=85
-		PeerStat=0x961a
+    REM=R__, OpCode=2, Sequence=75, Status=0x961a, Assoc.=48829, Offset=468, Count=85
+        PeerStat=0x961a
