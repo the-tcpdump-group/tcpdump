@@ -903,6 +903,25 @@ ntp_control_print_CSW(netdissect_options *ndo, uint16_t status,
 }
 
 /*
+ * Print associations and status as returned by OPC_Read_Status
+ */
+static void
+ntp_control_print_assocs(netdissect_options *ndo, const uint8_t *dp,
+			 uint16_t count, const unsigned i_lev)
+{
+	/* process list of <<association identifier>> <<status word>> */
+	for (; count >= 4; dp += 4, count -= 4) {
+		ND_TCHECK2(*dp, 4);
+		indent(ndo, i_lev);
+		ND_PRINT((ndo, "assoc=%5u: ", EXTRACT_16BITS(dp)));
+		ntp_control_print_PSW(ndo, EXTRACT_16BITS(dp + 2), i_lev, "");
+	}
+	return;
+trunc:
+	ND_PRINT((ndo, " [|ntp]"));
+}
+
+/*
  * Print NTP control message requests and responses
  */
 static void
@@ -984,12 +1003,25 @@ ntp_control_print(netdissect_options *ndo,
 			  length - (unsigned)sizeof(*cd)));
 	}
 	if (count != 0) {
-		ND_TCHECK2(cd->data, 1);
-		switch (opcode) {
-		case OPC_Read_Vars:
-		case OPC_Write_Vars:
-		case OPC_Read_Clock_Vars:
-		case OPC_Write_Clock_Vars:
+		uint8_t is_text_data = 0;
+
+		if (opcode == OPC_Read_Status) {
+			if (R && assoc == 0) {
+				ntp_control_print_assocs(ndo, cd->data, count,
+							 i_lev + 1);
+			} else		/* request may contain variable names */
+				is_text_data = 1;
+		} else if (opcode == OPC_Read_Vars ||
+			   opcode == OPC_Write_Vars ||
+			   opcode == OPC_Read_Clock_Vars ||
+			   opcode == OPC_Write_Clock_Vars) {
+			is_text_data = 1;
+		} else {
+			/* data is unknown or binary format */
+			indent(ndo, i_lev);
+			ND_PRINT((ndo, "TO-BE-DONE: data not interpreted"));
+		}
+		if (is_text_data) {	/* common case from selector above */
 			/* data is expected to be mostly text */
 			if (ndo->ndo_vflag > 2) {
 				indent(ndo, i_lev);
@@ -997,12 +1029,7 @@ ntp_control_print(netdissect_options *ndo,
 				indent(ndo, i_lev + 1);
 				fn_print(ndo, cd->data, ndo->ndo_snapend);
 			}
-			break;
-		default:
-			/* data is binary format */
-			indent(ndo, i_lev);
-			ND_PRINT((ndo, "TO-BE-DONE: data not interpreted"));
-		}
+		}	/* else: selector should have processed data */
 	}
 	return;
 

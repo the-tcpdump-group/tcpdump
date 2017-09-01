@@ -14,7 +14,11 @@ IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length
     R=Response, E=OK, M=Last, OpCode=read status, Sequence=69
     Status=0x618, Assoc.=0, Offset=0, Count=20
         SysStat=0x618 (LI=0, ClockSrc=6, Count=1, Code=8)
-    TO-BE-DONE: data not interpreted
+        assoc=48829: PeerStat=0x961a (Status=0x12, Sel=6, Count=1, Code=10)
+        assoc=48828: PeerStat=0x8011 (Status=0x10, Sel=0, Count=1, Code=1)
+        assoc=48827: PeerStat=0x8011 (Status=0x10, Sel=0, Count=1, Code=1)
+        assoc=48826: PeerStat=0x8011 (Status=0x10, Sel=0, Count=1, Code=1)
+        assoc=48825: PeerStat=0x8011 (Status=0x10, Sel=0, Count=1, Code=1)
 IP6 (flowlabel 0x62d8a, hlim 64, next-header UDP (17) payload length: 20) ::1.38531 > ::1.123: [bad udp cksum 0x0027 -> 0x527f!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=12
     R=Request, E=OK, M=Last, OpCode=read status, Sequence=70
     Status=0000, Assoc.=0, Offset=0, Count=0
@@ -23,7 +27,11 @@ IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length
     R=Response, E=OK, M=Last, OpCode=read status, Sequence=70
     Status=0x618, Assoc.=0, Offset=0, Count=20
         SysStat=0x618 (LI=0, ClockSrc=6, Count=1, Code=8)
-    TO-BE-DONE: data not interpreted
+        assoc=48829: PeerStat=0x961a (Status=0x12, Sel=6, Count=1, Code=10)
+        assoc=48828: PeerStat=0x8011 (Status=0x10, Sel=0, Count=1, Code=1)
+        assoc=48827: PeerStat=0x8011 (Status=0x10, Sel=0, Count=1, Code=1)
+        assoc=48826: PeerStat=0x8011 (Status=0x10, Sel=0, Count=1, Code=1)
+        assoc=48825: PeerStat=0x8011 (Status=0x10, Sel=0, Count=1, Code=1)
 IP6 (flowlabel 0x62d8a, hlim 64, next-header UDP (17) payload length: 20) ::1.38531 > ::1.123: [bad udp cksum 0x0027 -> 0x93c3!] NTP leap indicator=Nominal, Version=2, Mode=Control Message, length=12
     R=Request, E=OK, M=Last, OpCode=read variables, Sequence=71
     Status=0000, Assoc.=48825, Offset=0, Count=0
