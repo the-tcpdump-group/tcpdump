@@ -139,10 +139,10 @@ struct ntp_time_data {
 /*
  *	Leap Second Codes (high order two bits)
  */
-#define	NO_WARNING	0x00	/* no warning */
-#define	PLUS_SEC	0x40	/* add a second (61 seconds) */
-#define	MINUS_SEC	0x80	/* minus a second (59 seconds) */
-#define	ALARM		0xc0	/* alarm condition (clock unsynchronized) */
+#define	LI_NOMINAL	0x00	/* no warning */
+#define	LI_ADD_LEAP	0x01	/* add a second (61 seconds) */
+#define	LI_DEL_LEAP	0x02	/* minus a second (59 seconds) */
+#define	LI_ALARM	0x03	/* alarm condition (clock unsynchronized) */
 
 /*
  *	Clock Status Bits that Encode Version
@@ -195,10 +195,10 @@ static const struct tok ntp_mode_values[] = {
 };
 
 static const struct tok ntp_leapind_values[] = {
-    { NO_WARNING,     "Nominal" },
-    { PLUS_SEC,       "+1s" },
-    { MINUS_SEC,      "-1s" },
-    { ALARM,          "clock unsync." },
+    { LI_NOMINAL,     "Nominal" },
+    { LI_ADD_LEAP,    "Add leap" },
+    { LI_DEL_LEAP,    "Del leap" },
+    { LI_ALARM,       "clock unsync." },
     { 0, NULL }
 };
 
