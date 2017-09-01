@@ -1,16 +1,16 @@
 IP (tos 0x0, ttl 64, id 3928, offset 0, flags [DF], proto UDP (17), length 220)
-    127.0.0.1.32795 > 127.0.0.1.123: NTP leap indicator=Nominal, Version=2, Mode=Reserved, length=192, mode==7 unexpected!
+    127.0.0.1.32795 > 127.0.0.1.123: NTP leap indicator=0 (Nominal), Version=2, Mode=7 (Reserved), length=192, mode==7 unexpected!
 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto UDP (17), length 72)
-    127.0.0.1.123 > 127.0.0.1.32795: NTP leap indicator=leap_del, Version=2, Mode=Reserved, length=44, mode==7 unexpected!
+    127.0.0.1.123 > 127.0.0.1.32795: NTP leap indicator=2 (leap_del), Version=2, Mode=7 (Reserved), length=44, mode==7 unexpected!
 IP (tos 0x0, ttl 64, id 3929, offset 0, flags [DF], proto UDP (17), length 220)
-    127.0.0.1.32795 > 127.0.0.1.123: NTP leap indicator=Nominal, Version=2, Mode=Reserved, length=192, mode==7 unexpected!
+    127.0.0.1.32795 > 127.0.0.1.123: NTP leap indicator=0 (Nominal), Version=2, Mode=7 (Reserved), length=192, mode==7 unexpected!
 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto UDP (17), length 60)
-    127.0.0.1.123 > 127.0.0.1.32795: NTP leap indicator=leap_del, Version=2, Mode=Reserved, length=32, mode==7 unexpected!
+    127.0.0.1.123 > 127.0.0.1.32795: NTP leap indicator=2 (leap_del), Version=2, Mode=7 (Reserved), length=32, mode==7 unexpected!
 IP (tos 0x0, ttl 64, id 3930, offset 0, flags [DF], proto UDP (17), length 220)
-    127.0.0.1.32795 > 127.0.0.1.123: NTP leap indicator=Nominal, Version=2, Mode=Reserved, length=192, mode==7 unexpected!
+    127.0.0.1.32795 > 127.0.0.1.123: NTP leap indicator=0 (Nominal), Version=2, Mode=7 (Reserved), length=192, mode==7 unexpected!
 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto UDP (17), length 96)
-    127.0.0.1.123 > 127.0.0.1.32795: NTP leap indicator=leap_del, Version=2, Mode=Reserved, length=68, mode==7 unexpected!
+    127.0.0.1.123 > 127.0.0.1.32795: NTP leap indicator=2 (leap_del), Version=2, Mode=7 (Reserved), length=68, mode==7 unexpected!
 IP (tos 0x0, ttl 64, id 3931, offset 0, flags [DF], proto UDP (17), length 220)
-    127.0.0.1.32795 > 127.0.0.1.123: NTP leap indicator=Nominal, Version=2, Mode=Reserved, length=192, mode==7 unexpected!
+    127.0.0.1.32795 > 127.0.0.1.123: NTP leap indicator=0 (Nominal), Version=2, Mode=7 (Reserved), length=192, mode==7 unexpected!
 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto UDP (17), length 468)
-    127.0.0.1.123 > 127.0.0.1.32795: NTP leap indicator=leap_del, Version=2, Mode=Reserved, length=440, mode==7 unexpected!
+    127.0.0.1.123 > 127.0.0.1.32795: NTP leap indicator=2 (leap_del), Version=2, Mode=7 (Reserved), length=440, mode==7 unexpected!

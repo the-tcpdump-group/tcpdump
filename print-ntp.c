@@ -742,16 +742,16 @@ ntp_control_print_ESW(netdissect_options *ndo, uint16_t status,
 		break;
 	case 2:
 		indent(ndo, i_lev);
-		ND_PRINT((ndo, "ErrStat=%#04hx (Code=%#hx, Reserved=%#hx)",
+		ND_PRINT((ndo, "ErrStat=%#04hx (Code=%hu, Reserved=%#hx)",
 			  status, ecode, reserved));
 		break;
 	case 3:
 	default:	/* unless a higher verbosity is defined */
 		/* FIXME: the codes for NTPv3 are different */
 		indent(ndo, i_lev);
-		ND_PRINT((ndo, "ErrStat=%#04hx (Code=%s (%hu), Reserved=%#x)",
-			  status, tok2str(ntp_CES_values, "reserved(%u)",
-					  ecode), ecode, reserved));
+		ND_PRINT((ndo, "ErrStat=%#04hx (Code=%hu (%s), Reserved=%#hx)",
+			  status, ecode, tok2str(ntp_CES_values, "reserved(%u)",
+						 ecode), reserved));
 		break;
 	}
 }
@@ -948,9 +948,9 @@ ntp_control_print(netdissect_options *ndo,
 			  (unsigned)opcode));
 	} else {
 		indent(ndo, i_lev);
-		ND_PRINT((ndo, "R=%s, E=%s, M=%s, OpCode=%s",
+		ND_PRINT((ndo, "R=%s, E=%s, M=%s, OpCode=%u (%s)",
 			  R ? "Response" : "Request", E ? "Error" : "OK",
-			  M ? "More" : "Last",
+			  M ? "More" : "Last", opcode,
 			  tok2str(ntp_control_op_values, NULL, opcode)));
 	}
 
@@ -1071,9 +1071,11 @@ ntp_print(netdissect_options *ndo,
 			  leapind, version, mode, length));
 		return;
 	}
-	ND_PRINT((ndo, "NTP leap indicator=%s, Version=%u, Mode=%s, length=%u",
-		  tok2str(ntp_leapind_values, "Unknown", leapind), version,
-		  tok2str(ntp_mode_values, "Unknown mode", mode), length));
+	ND_PRINT((ndo, "NTP leap indicator=%u (%s), Version=%u, Mode=%u (%s)",
+		  leapind, tok2str(ntp_leapind_values, "Unknown", leapind),
+		  version,
+		  mode, tok2str(ntp_mode_values, "Unknown mode", mode)));
+	ND_PRINT((ndo, ", length=%u", length));
 
 	if (mode >= MODE_UNSPEC && mode <= MODE_BROADCAST)
 		ntp_time_print(ndo, &bp->td, length);
