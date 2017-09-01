@@ -258,11 +258,11 @@ typedef	enum {
 	OPC_Write_Clock_Vars,	/* write clock variables command/response (5) */
 	OPC_Set_Trap,		/* set trap address/port command/response (6) */
 	OPC_Trap_Response,	/* trap response (7) */
-	OPC_Configuration,	/* runtime configuration command/response (8) */
+	OPC_Configure,		/* runtime configuration command/response (8) */
 	OPC_Export_Config,	/* export configuration command/response (9) */
 	OPC_Get_Remote_Status,	/* retrieve remote stats command/response (10) */
-	OPC_Get_List,		/* retrieve ordered list command/response (11) */
-	OPC_Reserved_12,		/* reserved (12) */
+	OPC_Get_List,		/* retrieve ordered list command/resp. (11) */
+	OPC_Request_Nounce,	/* request client-specific nonce cmd/resp (12) */
 	OPC_Reserved_13,		/* reserved (13) */
 	OPC_Reserved_14,		/* reserved (14) */
 	OPC_Reserved_15,		/* reserved (15) */
@@ -294,11 +294,11 @@ static const struct tok ntp_control_op_values[] = {
 	{ OPC_Write_Clock_Vars,		"write clock variables" },
 	{ OPC_Set_Trap,			"set trap address/port" },
 	{ OPC_Trap_Response,		"trap response (7)" },
-	{ OPC_Configuration,		"runtime configuration" },
+	{ OPC_Configure,		"runtime configuration" },
 	{ OPC_Export_Config,		"export configuration" },
 	{ OPC_Get_Remote_Status,	"retrieve remote stats" },
 	{ OPC_Get_List,			"retrieve ordered list" },
-	{ OPC_Reserved_12,		"reserved" },
+	{ OPC_Request_Nounce,		"request nonce" },
 	{ OPC_Reserved_13,		"reserved" },
 	{ OPC_Reserved_14,		"reserved" },
 	{ OPC_Reserved_15,		"reserved" },
