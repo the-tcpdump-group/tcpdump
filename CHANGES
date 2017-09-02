@@ -3,6 +3,11 @@
     Improve errors detection in the test scripts.
     Fix a segfault with OpenSSL 1.1 and improve OpenSSL usage.
     Clean up IS-IS printing.
+    Fix buffer overflow vulnerabilities:
+      CVE-2017-11543 (SLIP)
+    Fix buffer over-read vulnerabilities:
+      CVE-2017-11541 (safeputs)
+      CVE-2017-11542 (PIMv1)
 
 Sunday July 23, 2017 denis@ovsienko.info
   Summary for 4.9.1 tcpdump release
