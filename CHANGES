@@ -1,5 +1,6 @@
   Summary for 4.9.2 tcpdump release
-    Do not use getprotobynumber() for protocol name resolution.
+    Do not use getprotobynumber() for protocol name resolution.  Do not do
+      any protocol name resolution if -n is specified.
     Improve errors detection in the test scripts.
     Fix a segfault with OpenSSL 1.1 and improve OpenSSL usage.
     Clean up IS-IS printing.
