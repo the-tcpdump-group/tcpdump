@@ -466,14 +466,14 @@ p_ntp_delta(netdissect_options *ndo,
 /* Prints polling interval in log2 as seconds or fraction of second */
 static void
 p_poll(netdissect_options *ndo,
-       register const int poll)
+       register const int poll_interval)
 {
-	if (poll <= -32 || poll >= 32)
+	if (poll_interval <= -32 || poll_interval >= 32)
 		return;
 
-	if (poll >= 0)
-		ND_PRINT((ndo, " (%us)", 1U << poll));
+	if (poll_interval >= 0)
+		ND_PRINT((ndo, " (%us)", 1U << poll_interval));
 	else
-		ND_PRINT((ndo, " (1/%us)", 1U << -poll));
+		ND_PRINT((ndo, " (1/%us)", 1U << -poll_interval));
 }
 
