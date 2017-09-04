@@ -406,6 +406,7 @@ ntp_control_print(netdissect_options *ndo,
 	if (length < NTP_CTRLMSG_MINLEN)
 		goto invalid;
 
+	ND_TCHECK(cd->control);
 	R = (cd->control & 0x80) != 0;
 	E = (cd->control & 0x40) != 0;
 	M = (cd->control & 0x20) != 0;
@@ -414,25 +415,32 @@ ntp_control_print(netdissect_options *ndo,
 		  R ? "Response" : "Request", E ? "Error" : "OK",
 		  M ? "More" : "Last", (unsigned)opcode));
 
+	ND_TCHECK(cd->sequence);
 	sequence = EXTRACT_16BITS(&cd->sequence);
 	ND_PRINT((ndo, "\tSequence=%hu", sequence));
 
+	ND_TCHECK(cd->status);
 	status = EXTRACT_16BITS(&cd->status);
 	ND_PRINT((ndo, ", Status=%#hx", status));
 
+	ND_TCHECK(cd->assoc);
 	assoc = EXTRACT_16BITS(&cd->assoc);
 	ND_PRINT((ndo, ", Assoc.=%hu", assoc));
 
+	ND_TCHECK(cd->offset);
 	offset = EXTRACT_16BITS(&cd->offset);
 	ND_PRINT((ndo, ", Offset=%hu", offset));
 
+	ND_TCHECK(cd->count);
 	count = EXTRACT_16BITS(&cd->count);
 	ND_PRINT((ndo, ", Count=%hu", count));
 
 	if (NTP_CTRLMSG_MINLEN + count > length)
 		goto invalid;
-	if (count != 0)
+	if (count != 0) {
+		ND_TCHECK2(cd->data, count);
 		ND_PRINT((ndo, "\n\tTO-BE-DONE: data not interpreted"));
+	}
 	return;
 
 invalid:
