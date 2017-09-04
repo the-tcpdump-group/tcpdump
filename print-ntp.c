@@ -115,11 +115,11 @@ struct s_fixedpt {
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 
-/* Length of the NTP message with the mandatory fields ("the header")
+/* Length of the NTP data message with the mandatory fields ("the header")
  * and without any optional fields (extension, Key Identifier,
  * Message Digest).
  */
-#define NTP_MSG_MINLEN 48
+#define NTP_TIMEMSG_MINLEN 48U
 
 struct ntp_time_data {
 	nd_uint8_t status;		/* status of local clock and leap info */
@@ -232,6 +232,12 @@ static const struct tok ntp_stratum_values[] = {
  *
  *               Figure 1: NTP Control Message Header
  */
+
+/* Length of the NTP control message with the mandatory fields ("the header")
+ * and without any optional fields (Data, Padding, Authenticator).
+ */
+#define NTP_CTRLMSG_MINLEN 12U
+
 struct ntp_control_data {
 	nd_uint8_t	magic;		/* LI, VN, Mode */
 	nd_uint8_t	control;	/* R, E, M, OpCode */
@@ -252,10 +258,8 @@ ntp_time_print(netdissect_options *ndo,
 {
 	int mode, version, leapind;
 
-	if (length < NTP_MSG_MINLEN) {
-		ND_PRINT((ndo, "NTP, length %u", length));
+	if (length < NTP_TIMEMSG_MINLEN)
 		goto invalid;
-	}
 
 	ND_TCHECK(bp->status);
 
@@ -353,10 +357,10 @@ ntp_time_print(netdissect_options *ndo,
 	p_ntp_delta(ndo, &(bp->org_timestamp), &(bp->xmt_timestamp));
 
 	/* FIXME: this code is not aware of any extension fields */
-	if (length == NTP_MSG_MINLEN + 4) { 	/* Optional: key-id (crypto-NAK) */
+	if (length == NTP_TIMEMSG_MINLEN + 4) { 	/* Optional: key-id (crypto-NAK) */
 		ND_TCHECK(bp->key_id);
 		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_32BITS(&bp->key_id)));
-	} else if (length == NTP_MSG_MINLEN + 4 + 16) { 	/* Optional: key-id + 128-bit digest */
+	} else if (length == NTP_TIMEMSG_MINLEN + 4 + 16) { 	/* Optional: key-id + 128-bit digest */
 		ND_TCHECK(bp->key_id);
 		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_32BITS(&bp->key_id)));
 		ND_TCHECK2(bp->message_digest, 16);
@@ -365,7 +369,7 @@ ntp_time_print(netdissect_options *ndo,
 		               EXTRACT_32BITS(bp->message_digest + 4),
 		               EXTRACT_32BITS(bp->message_digest + 8),
 		               EXTRACT_32BITS(bp->message_digest + 12)));
-	} else if (length == NTP_MSG_MINLEN + 4 + 20) { 	/* Optional: key-id + 160-bit digest */
+	} else if (length == NTP_TIMEMSG_MINLEN + 4 + 20) { 	/* Optional: key-id + 160-bit digest */
 		ND_TCHECK(bp->key_id);
 		ND_PRINT((ndo, "\n\tKey id: %u", EXTRACT_32BITS(&bp->key_id)));
 		ND_TCHECK2(bp->message_digest, 20);
@@ -375,8 +379,8 @@ ntp_time_print(netdissect_options *ndo,
 		               EXTRACT_32BITS(bp->message_digest + 8),
 		               EXTRACT_32BITS(bp->message_digest + 12),
 		               EXTRACT_32BITS(bp->message_digest + 16)));
-	} else if (length > NTP_MSG_MINLEN) {
-		ND_PRINT((ndo, "\n\t(%u more bytes after the header)", length - NTP_MSG_MINLEN));
+	} else if (length > NTP_TIMEMSG_MINLEN) {
+		ND_PRINT((ndo, "\n\t(%u more bytes after the header)", length - NTP_TIMEMSG_MINLEN));
 	}
 	return;
 
@@ -398,6 +402,9 @@ ntp_control_print(netdissect_options *ndo,
 {
 	u_char R, E, M, opcode;
 	uint16_t sequence, status, assoc, offset, count;
+
+	if (length < NTP_CTRLMSG_MINLEN)
+		goto invalid;
 
 	R = (cd->control & 0x80) != 0;
 	E = (cd->control & 0x40) != 0;
@@ -422,10 +429,15 @@ ntp_control_print(netdissect_options *ndo,
 	count = EXTRACT_16BITS(&cd->count);
 	ND_PRINT((ndo, ", Count=%hu", count));
 
-	if ((cd->data - (const u_char *)cd) + count > length)
-		goto trunc;
+	if (NTP_CTRLMSG_MINLEN + count > length)
+		goto invalid;
 	if (count != 0)
 		ND_PRINT((ndo, "\n\tTO-BE-DONE: data not interpreted"));
+	return;
+
+invalid:
+	ND_PRINT((ndo, " %s", istr));
+	ND_TCHECK2(*cd, length);
 	return;
 
 trunc:
