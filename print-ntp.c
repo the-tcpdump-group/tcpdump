@@ -68,13 +68,13 @@ static const char tstr[] = " [|ntp]";
  *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
 struct l_fixedpt {
-	uint32_t int_part;
-	uint32_t fraction;
+	nd_uint32_t int_part;
+	nd_uint32_t fraction;
 };
 
 struct s_fixedpt {
-	uint16_t int_part;
-	uint16_t fraction;
+	nd_uint16_t int_part;
+	nd_uint16_t fraction;
 };
 
 /* rfc2030
@@ -122,19 +122,19 @@ struct s_fixedpt {
 #define NTP_MSG_MINLEN 48
 
 struct ntp_time_data {
-	u_char status;		/* status of local clock and leap info */
-	u_char stratum;		/* Stratum level */
-	int ppoll:8;		/* poll value */
-	int precision:8;
+	nd_uint8_t status;		/* status of local clock and leap info */
+	nd_uint8_t stratum;		/* Stratum level */
+	nd_int8_t ppoll;		/* poll value */
+	nd_int8_t precision;
 	struct s_fixedpt root_delay;
 	struct s_fixedpt root_dispersion;
-	uint32_t refid;
+	nd_uint32_t refid;
 	struct l_fixedpt ref_timestamp;
 	struct l_fixedpt org_timestamp;
 	struct l_fixedpt rec_timestamp;
 	struct l_fixedpt xmt_timestamp;
-        uint32_t key_id;
-        uint8_t  message_digest[20];
+	nd_uint32_t key_id;
+	nd_uint8_t  message_digest[20];
 };
 /*
  *	Leap Second Codes (high order two bits)
@@ -233,14 +233,14 @@ static const struct tok ntp_stratum_values[] = {
  *               Figure 1: NTP Control Message Header
  */
 struct ntp_control_data {
-	u_char		magic;		/* LI, VN, Mode */
-	u_char		control;	/* R, E, M, OpCode */
-	uint16_t	sequence;	/* Sequence Number */
-	uint16_t	status;		/* Status */
-	uint16_t	assoc;		/* Association ID */
-	uint16_t	offset;		/* Offset */
-	uint16_t	count;		/* Count */
-	u_char		data[564];	/* Data, [Padding, [Authenticator]] */
+	nd_uint8_t	magic;		/* LI, VN, Mode */
+	nd_uint8_t	control;	/* R, E, M, OpCode */
+	nd_uint16_t	sequence;	/* Sequence Number */
+	nd_uint16_t	status;		/* Status */
+	nd_uint16_t	assoc;		/* Association ID */
+	nd_uint16_t	offset;		/* Offset */
+	nd_uint16_t	count;		/* Count */
+	nd_uint8_t	data[564];	/* Data, [Padding, [Authenticator]] */
 };
 
 /*
@@ -284,13 +284,11 @@ ntp_time_print(netdissect_options *ndo,
 		bp->stratum,
 		tok2str(ntp_stratum_values, (bp->stratum >=2 && bp->stratum<=15) ? "secondary reference" : "reserved", bp->stratum)));
 
-	/* Can't ND_TCHECK bp->ppoll bitfield so bp->stratum + 2 instead */
-	ND_TCHECK2(bp->stratum, 2);
+	ND_TCHECK(bp->ppoll);
 	ND_PRINT((ndo, ", poll %d", bp->ppoll));
 	p_poll(ndo, bp->ppoll);
 
-	/* Can't ND_TCHECK bp->precision bitfield so bp->distance + 0 instead */
-	ND_TCHECK2(bp->root_delay, 0);
+	ND_TCHECK(bp->precision);
 	ND_PRINT((ndo, ", precision %d", bp->precision));
 
 	ND_TCHECK(bp->root_delay);
