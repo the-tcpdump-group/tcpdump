@@ -119,7 +119,7 @@ struct s_fixedpt {
  */
 #define NTP_MSG_MINLEN 48
 
-struct ntpdata {
+struct ntp_time_data {
 	u_char status;		/* status of local clock and leap info */
 	u_char stratum;		/* Stratum level */
 	int ppoll:8;		/* poll value */
@@ -207,22 +207,53 @@ static const struct tok ntp_stratum_values[] = {
 	{ 0, NULL }
 };
 
-/*
- * Print ntp requests
+/* draft-ietf-ntp-mode-6-cmds-02
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |LI |  VN |Mode |R|E|M| OpCode  |       Sequence Number         |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |            Status             |       Association ID          |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |            Offset             |            Count              |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                                                               |
+ * /                    Data (up to 468 bytes)                     /
+ * |                                                               |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                    Padding (optional)                         |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                                                               |
+ * /              Authenticator (optional, 96 bytes)               /
+ * |                                                               |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *
+ *               Figure 1: NTP Control Message Header
  */
-void
-ntp_print(netdissect_options *ndo,
-          register const u_char *cp, u_int length)
+struct ntp_control_data {
+	u_char		magic;		/* LI, VN, Mode */
+	u_char		control;	/* R, E, M, OpCode */
+	uint16_t	sequence;	/* Sequence Number */
+	uint16_t	status;		/* Status */
+	uint16_t	assoc;		/* Association ID */
+	uint16_t	offset;		/* Offset */
+	uint16_t	count;		/* Count */
+	u_char		data[564];	/* Data, [Padding, [Authenticator]] */
+};
+
+/*
+ * Print NTP time requests and responses
+ */
+static void
+ntp_time_print(netdissect_options *ndo,
+	       register const struct ntp_time_data *bp, u_int length)
 {
-	register const struct ntpdata *bp;
 	int mode, version, leapind;
 
 	if (length < NTP_MSG_MINLEN) {
 		ND_PRINT((ndo, "NTP, length %u", length));
 		goto invalid;
 	}
-
-	bp = (const struct ntpdata *)cp;
 
 	ND_TCHECK(bp->status);
 
@@ -351,7 +382,99 @@ ntp_print(netdissect_options *ndo,
 
 invalid:
 	ND_PRINT((ndo, " %s", istr));
-	ND_TCHECK2(*cp, length);
+	ND_TCHECK2(*bp, length);
+	return;
+
+trunc:
+	ND_PRINT((ndo, " [|ntp]"));
+}
+
+/*
+ * Print NTP control message requests and responses
+ */
+static void
+ntp_control_print(netdissect_options *ndo,
+		  register const struct ntp_control_data *cd, u_int length)
+{
+	u_char R, E, M, opcode;
+	uint16_t sequence, status, assoc, offset, count;
+
+	R = (cd->control & 0x80) != 0;
+	E = (cd->control & 0x40) != 0;
+	M = (cd->control & 0x20) != 0;
+	opcode = cd->control & 0x1f;
+	ND_PRINT((ndo, ", %s, %s, %s, OpCode=%u\n",
+		  R ? "Response" : "Request", E ? "Error" : "OK",
+		  M ? "More" : "Last", (unsigned)opcode));
+
+	sequence = EXTRACT_16BITS(&cd->sequence);
+	ND_PRINT((ndo, "\tSequence=%hu", sequence));
+
+	status = EXTRACT_16BITS(&cd->status);
+	ND_PRINT((ndo, ", Status=%#hx", status));
+
+	assoc = EXTRACT_16BITS(&cd->assoc);
+	ND_PRINT((ndo, ", Assoc.=%hu", assoc));
+
+	offset = EXTRACT_16BITS(&cd->offset);
+	ND_PRINT((ndo, ", Offset=%hu", offset));
+
+	count = EXTRACT_16BITS(&cd->count);
+	ND_PRINT((ndo, ", Count=%hu", count));
+
+	if ((cd->data - (const u_char *)cd) + count > length)
+		goto trunc;
+	if (count != 0)
+		ND_PRINT((ndo, "\n\tTO-BE-DONE: data not interpreted"));
+	return;
+
+trunc:
+	ND_PRINT((ndo, " [|ntp]"));
+}
+
+union ntpdata {
+	struct ntp_time_data	td;
+	struct ntp_control_data	cd;
+};
+
+/*
+ * Print NTP requests, handling the common VN, LI, and Mode
+ */
+void
+ntp_print(netdissect_options *ndo,
+          register const u_char *cp, u_int length)
+{
+	register const union ntpdata *bp = (const union ntpdata *)cp;
+	int mode, version, leapind;
+
+	ND_TCHECK(bp->td.status);
+
+	version = (bp->td.status & VERSIONMASK) >> VERSIONSHIFT;
+	ND_PRINT((ndo, "NTPv%d", version));
+
+	mode = (bp->td.status & MODEMASK) >> MODESHIFT;
+	if (!ndo->ndo_vflag) {
+		ND_PRINT((ndo, ", %s, length %u",
+		          tok2str(ntp_mode_values, "Unknown mode", mode),
+		          length));
+		return;
+	}
+
+	ND_PRINT((ndo, ", %s, length %u\n",
+	          tok2str(ntp_mode_values, "Unknown mode", mode), length));
+
+	/* leapind = (bp->td.status & LEAPMASK) >> LEAPSHIFT; */
+	leapind = (bp->td.status & LEAPMASK);
+	ND_PRINT((ndo, "\tLeap indicator: %s (%u)",
+	          tok2str(ntp_leapind_values, "Unknown", leapind),
+	          leapind));
+
+	if (mode >= MODE_UNSPEC && mode <= MODE_BROADCAST)
+		ntp_time_print(ndo, &bp->td, length);
+	else if (mode == MODE_CONTROL)
+		ntp_control_print(ndo, &bp->cd, length);
+	else
+		{;}			/* XXX: not implemented! */
 	return;
 
 trunc:
