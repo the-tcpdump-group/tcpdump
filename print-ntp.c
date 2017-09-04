@@ -922,6 +922,27 @@ trunc:
 }
 
 /*
+ * Print NTP message authentication digest
+ */
+static void
+print_ntp_digest(netdissect_options *ndo, const unsigned i_lev,
+		 const uint32_t *digest, unsigned length)
+{
+	int first = 1;
+
+	while (length >= sizeof(uint32_t)) {
+		if (first) {
+			first = 0;
+			ND_PRINT((ndo, ", Digest="));
+		} else
+			ND_PRINT((ndo, " "));
+		ND_PRINT((ndo, "%08x", EXTRACT_32BITS(digest)));
+		++digest;
+		length -= sizeof(uint32_t);
+	}
+}
+
+/*
  * Print NTP control message requests and responses
  */
 static void
@@ -931,6 +952,7 @@ ntp_control_print(netdissect_options *ndo,
 	uint8_t R, E, M, opcode;
 	uint16_t sequence, status, assoc, offset, count;
 	unsigned i_lev = 1;		/* indent level */
+	int unprocessed;
 
 	if (length < NTP_CTRLMSG_MINLEN)
 		goto invalid;
@@ -1035,6 +1057,40 @@ ntp_control_print(netdissect_options *ndo,
 				fn_print(ndo, cd->data, ndo->ndo_snapend);
 			}
 		}	/* else: selector should have processed data */
+	}
+	unprocessed = length - (cd->data - (const uint8_t *)cd + count);
+	if (unprocessed > 0) {
+		uintptr_t endpos;
+		unsigned padlen;
+
+		endpos = (uintptr_t) (cd->data - (const uint8_t *)cd + count);
+#if 0
+		padlen = 4 * ((endpos + 3) / 4) - endpos;
+#else
+		/* ntpq 4.2.8p6 at least adds additional padding at 8 octets */
+		padlen = 8 * ((endpos + 7) / 8) - endpos;
+#endif
+		if (padlen != 0) {
+			ND_PRINT((ndo, ", PadLen=%u", padlen));
+		}
+		unprocessed -= padlen;
+		if (unprocessed > 0) {
+			const nd_uint32_t *key_id;
+
+			indent(ndo, i_lev);
+			ND_PRINT((ndo, "MAC:"));
+			key_id = (const nd_uint32_t *)
+				((const uint8_t *)cd + endpos + padlen);
+			ND_TCHECK(*key_id);
+			indent(ndo, i_lev + 1);
+			ND_PRINT((ndo, "KeyID=%u", EXTRACT_32BITS(*key_id)));
+			unprocessed -= sizeof(*key_id);
+
+			++key_id;	/* digest follows Key ID */
+			ND_TCHECK2(*key_id, unprocessed);
+			print_ntp_digest(ndo, i_lev + 1, (uint32_t *) key_id,
+					 unprocessed);
+		}
 	}
 	return;
 
