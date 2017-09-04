@@ -1060,16 +1060,28 @@ ntp_control_print(netdissect_options *ndo,
 		padlen = 8 * ((endpos + 7) / 8) - endpos;
 #endif
 		if (padlen != 0) {
+			uint8_t bad_pad;
+			unsigned pc;
+			const uint8_t *pp;
+
+			for (pc = padlen, pp = ((const uint8_t *) cd) + endpos,
+				     bad_pad = 0; pc != 0; --pc, ++pp) {
+				if (*pp != 0)
+					++bad_pad;
+			}
+			endpos += padlen;
+			unprocessed -= padlen;
 			ND_PRINT((ndo, ", PadLen=%u", padlen));
+			if (bad_pad)
+				ND_PRINT((ndo, "(%u BAD!)", bad_pad));
 		}
-		unprocessed -= padlen;
 		if (unprocessed > 0) {
 			const nd_uint32_t *key_id;
 
 			indent(ndo, i_lev);
 			ND_PRINT((ndo, "MAC:"));
 			key_id = (const nd_uint32_t *)
-				((const uint8_t *)cd + endpos + padlen);
+				((const uint8_t *)cd + endpos);
 			ND_TCHECK(*key_id);
 			indent(ndo, i_lev + 1);
 			ND_PRINT((ndo, "KeyID=%u", EXTRACT_32BITS(*key_id)));
