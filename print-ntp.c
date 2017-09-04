@@ -38,6 +38,8 @@
 #include "addrtoname.h"
 #include "extract.h"
 
+static const char tstr[] = " [|ntp]";
+
 /*
  * Based on ntp.h from the U of MD implementation
  *	This file is based on Version 2 of the NTP spec (RFC1119).
@@ -386,7 +388,7 @@ invalid:
 	return;
 
 trunc:
-	ND_PRINT((ndo, " [|ntp]"));
+	ND_PRINT((ndo, " %s", tstr));
 }
 
 /*
@@ -429,7 +431,7 @@ ntp_control_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT((ndo, " [|ntp]"));
+	ND_PRINT((ndo, " %s", tstr));
 }
 
 union ntpdata {
@@ -478,7 +480,7 @@ ntp_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT((ndo, " [|ntp]"));
+	ND_PRINT((ndo, " %s", tstr));
 }
 
 static void
