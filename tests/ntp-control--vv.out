@@ -91,4 +91,4 @@ IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length
 IP6 (class 0xb8, flowlabel 0x834cf, hlim 64, next-header UDP (17) payload length: 108) ::1.123 > ::1.38531: [bad udp cksum 0x007f -> 0x77be!] NTP leap indicator=0 (Nominal), Version=2, Mode=6 (Control Message), length=100
     R=Response, E=OK, M=Last, OpCode=2 (read variables), Sequence=75
     Status=0x961a, Assoc.=48829, Offset=468, Count=85
-        PeerStat=0x961a (Status=0x12, Sel=6, Count=1, Code=10), PadLen=7(4 BAD!)
+        PeerStat=0x961a (Status=0x12, Sel=6, Count=1, Code=10), PadLen=7(> remaining(3)!)
