@@ -937,6 +937,14 @@ print_ntp_digest(netdissect_options *ndo, const unsigned i_lev,
 				indent(ndo, i_lev);
 			else
 				ND_PRINT((ndo, ", "));
+			switch (length) {
+			case 16:
+				ND_PRINT((ndo, "MD5-"));
+				break;
+			case 20:
+				ND_PRINT((ndo, "SHA1-"));
+				break;
+			}
 			ND_PRINT((ndo, "Digest="));
 		} else
 			ND_PRINT((ndo, " "));
@@ -1103,7 +1111,7 @@ ntp_control_print(netdissect_options *ndo,
 			const nd_uint32_t *key_id;
 
 			indent(ndo, i_lev);
-			ND_PRINT((ndo, "MAC:"));
+			ND_PRINT((ndo, "MAC(size %u):", unprocessed));
 			key_id = (const nd_uint32_t *)
 				((const uint8_t *)cd + endpos);
 			ND_TCHECK(*key_id);
