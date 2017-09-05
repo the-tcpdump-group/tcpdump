@@ -278,7 +278,7 @@ static const struct optlv_h OPTLV_msg[F_OP_MAX + 1] = {
 
 static inline const struct optlv_h *get_forces_optlv_h(uint16_t opt)
 {
-	if (opt > F_OP_MAX || opt <= F_OP_RSV)
+	if (opt > F_OP_MAX || opt == F_OP_RSV)
 		return &OPTLV_msg[F_OP_RSV];
 
 	return &OPTLV_msg[opt];
