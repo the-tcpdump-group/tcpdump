@@ -917,8 +917,9 @@ ntp_control_print_assocs(netdissect_options *ndo, const uint8_t *dp,
 		ntp_control_print_PSW(ndo, EXTRACT_BE_U_2(dp + 2), i_lev, "");
 	}
 	return;
+
 trunc:
-	ND_PRINT((ndo, " [|ntp]"));
+	ND_PRINT((ndo, " %s", tstr));
 }
 
 /*
