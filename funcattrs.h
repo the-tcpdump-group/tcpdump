@@ -92,9 +92,11 @@
 #elif defined(_MSC_VER)
   /*
    * MSVC.
+   * It doesn't allow __declspec(noreturn) to be applied to function
+   * pointers.
    */
   #define NORETURN __declspec(noreturn)
-  #define NORETURN_FUNCPTR __declspec(noreturn)
+  #define NORETURN_FUNCPTR
 #else
   #define NORETURN
   #define NORETURN_FUNCPTR
