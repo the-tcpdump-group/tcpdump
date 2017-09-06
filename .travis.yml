@@ -22,6 +22,9 @@ env:
     # usual processing: false.
     - coverity_scan_script_test_mode=false
 
+matrix:
+  fast_finish: true
+
 addons:
   coverity_scan:
     # customized build script URL
