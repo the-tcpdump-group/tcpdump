@@ -257,7 +257,7 @@ typedef	enum {
 	OPC_Export_Config,	/* export configuration command/response (9) */
 	OPC_Get_Remote_Status,	/* retrieve remote stats command/response (10) */
 	OPC_Get_List,		/* retrieve ordered list command/resp. (11) */
-	OPC_Request_Nounce,	/* request client-specific nonce cmd/resp (12) */
+	OPC_Request_Nonce,	/* request client-specific nonce cmd/resp (12) */
 	OPC_Reserved_13,		/* reserved (13) */
 	OPC_Reserved_14,		/* reserved (14) */
 	OPC_Reserved_15,		/* reserved (15) */
@@ -276,7 +276,6 @@ typedef	enum {
 	OPC_Reserved_28,		/* reserved (28) */
 	OPC_Reserved_29,		/* reserved (29) */
 	OPC_Reserved_30,		/* reserved (30) */
-	OPC_Request_Nonce,	/* request nonce command/response (12) */
 	OPC_Unset_Trap		/* unset trap address/port command/response (31) */
 } NTP_Control_OpCode;
 
@@ -293,7 +292,7 @@ static const struct tok ntp_control_op_values[] = {
 	{ OPC_Export_Config,		"export configuration" },
 	{ OPC_Get_Remote_Status,	"retrieve remote stats" },
 	{ OPC_Get_List,			"retrieve ordered list" },
-	{ OPC_Request_Nounce,		"request nonce" },
+	{ OPC_Request_Nonce,		"request nonce" },
 	{ OPC_Reserved_13,		"reserved" },
 	{ OPC_Reserved_14,		"reserved" },
 	{ OPC_Reserved_15,		"reserved" },
@@ -1039,7 +1038,7 @@ ntp_control_print(netdissect_options *ndo,
 			   opcode == OPC_Configure ||
 			   opcode == OPC_Get_Remote_Status ||
 			   opcode == OPC_Get_List ||
-			   opcode == OPC_Request_Nounce) {
+			   opcode == OPC_Request_Nonce) {
 			is_text_data = 1;
 		} else {
 			/* data is unknown or binary format */
