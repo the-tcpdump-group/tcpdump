@@ -1724,20 +1724,21 @@ main(int argc, char **argv)
 			 * Find the list of interfaces, and pick
 			 * the first interface.
 			 */
-			if (pcap_findalldevs(&devlist, ebuf) >= 0 &&
-			    devlist != NULL) {
-				device = strdup(devlist->name);
-				pcap_freealldevs(devlist);
-			}
+			if (pcap_findalldevs(&devlist, ebuf) == -1)
+				error("%s", ebuf);
+			if (devlist == NULL)
+				error("no interfaces available for capture");
+			device = strdup(devlist->name);
+			pcap_freealldevs(devlist);
 #else /* HAVE_PCAP_FINDALLDEVS */
 			/*
 			 * Use whatever interface pcap_lookupdev()
 			 * chooses.
 			 */
 			device = pcap_lookupdev(ebuf);
-#endif
 			if (device == NULL)
 				error("%s", ebuf);
+#endif
 		}
 
 		/*
