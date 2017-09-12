@@ -63,7 +63,7 @@
    49  09:18:56.000000 IP 10.0.0.1.88 > 0.234.154.214.24074:  v4 be KDC_REQUEST: ^O^O^O^O.^DM-2M-!^BM-W^CM-!^B@^D 0min ^P.^VM-^H [|krb]
    50  00:00:00.000000 IP 10.0.0.1.88 > 0.234.154.214.24074:  v4 be KDC_REQUEST: ^O^O^O^O^O7M-^@M-^?M-^@^D^O^O^O^O^O^P.M-^?M-^?^O^O^O@^VM-^H [|krb]
    51  00:34:08.000000 IP 10.0.0.1.88 > 0.234.154.214.24074:  v4 be KDC_REQUEST: ^O^O^O^O.^DM-^@M-^?M-^?M-^?^CM-!^B@^D 0min ^P.^VM-^H [|krb]
-   52  18:12:16.000000 IP 208.21.42.58.6697 > 110.228.104.254.30952: babel 2 (2056) update (invalid)
+   52  18:12:16.000000 IP 208.21.42.58.6697 > 110.228.104.254.30952: babel 2 (2056) (invalid)
    53  00:00:07.008320 IP 208.21.2.184.1512 > 10.1.1.99.496:  auto-rp candidate-advert Hold 16m16s RP 1.235.99.5 PIMv? [rsvd=0xe8] 4.0.0.31/0 bidir,255.0.0.0/33[rsvd=0x14] [|cisco_autorp]
    54  [Error converting time] IP 41.0.0.1.88 > 32.235.154.214.24074:  v4 be KDC_REQUEST: M-h^AM-p.PQM-a^QM-x^CM-P^U^BM-8^J^AM-kc^EM-h^K^B@^D [|krb]
    55  00:00:00.000000 IP 208.21.2.184.1512 > 10.1.1.99.496:  auto-rp candidate-advert Hold 16m16s RP 1.235.99.5 PIMv? [rsvd=0xe8] 4.0.100.177/0 bidir,!172.0.176.22/177[rsvd=0xb0] [|cisco_autorp]
