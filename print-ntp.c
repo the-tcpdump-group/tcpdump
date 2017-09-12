@@ -579,6 +579,9 @@ ntp_time_print(netdissect_options *ndo,
 	uint32_t refid;
 	unsigned i_lev = 1;		/* indent level */
 
+	if (length < NTP_TIMEMSG_MINLEN)
+		goto invalid;
+
 	version = (bp->status & VERSIONMASK) >> VERSIONSHIFT;
 	mode = (bp->status & MODEMASK) >> MODESHIFT;
 	if (length < NTP_TIMEMSG_MINLEN)
@@ -1138,7 +1141,7 @@ ntp_control_print(netdissect_options *ndo,
 invalid:
 	ND_PRINT((ndo, " %s", istr));
 	ND_TCHECK2(*cd, length);
- 	return;
+	return;
 
 trunc:
 	ND_PRINT((ndo, " %s", tstr));
