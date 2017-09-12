@@ -1097,11 +1097,19 @@ ntp_control_print(netdissect_options *ndo,
 				}
 				endpos += padlen;
 				unprocessed -= padlen;
-				ND_PRINT((ndo, ", PadLen=%u", padlen));
+				if (ndo->ndo_vflag > 2 && count != 0)
+					indent(ndo, i_lev);
+				else
+					ND_PRINT((ndo, ", "));
+				ND_PRINT((ndo, "PadLen=%u", padlen));
 				if (bad_pad)
 					ND_PRINT((ndo, "(%u BAD!)", bad_pad));
 			} else {
-				ND_PRINT((ndo, ", PadLen=%u(> remaining(%d)!)",
+				if (ndo->ndo_vflag > 2 && count != 0)
+					indent(ndo, i_lev);
+				else
+					ND_PRINT((ndo, ", "));
+				ND_PRINT((ndo, "PadLen=%u(> remaining(%d)!)",
 					  padlen, unprocessed));
 				endpos += unprocessed;
 				unprocessed = 0;
