@@ -583,6 +583,7 @@ icmp6_nodeinfo_oobr	icmp6_nodeinfo_oobr.pcap	icmp6_nodeinfo_oobr.out
 
 # bad packets from Henri Salo
 rx_ubik-oobr		rx_ubik-oobr.pcap		rx_ubik-oobr.out -c1
+babel_update_oobr	babel_update_oobr.pcap	babel_update_oobr.out	-c 52
 
 # RTP tests
 # fuzzed pcap

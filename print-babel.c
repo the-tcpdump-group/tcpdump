@@ -480,7 +480,7 @@ babel_print_v2(netdissect_options *ndo,
         case MESSAGE_UPDATE: {
             if (!ndo->ndo_vflag) {
                 ND_PRINT((ndo, " update"));
-                if(len < 1)
+                if(len < 10)
                     ND_PRINT((ndo, "/truncated"));
                 else
                     ND_PRINT((ndo, "%s%s%s",
