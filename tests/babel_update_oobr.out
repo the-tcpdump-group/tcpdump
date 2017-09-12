@@ -63,4 +63,4 @@ IP 10.0.0.1.88 > 0.234.154.214.24074:  v4 be KDC_REQUEST: .M-oM-^?M-^?@M-^?M-^@M
 IP 10.0.0.1.88 > 0.234.154.214.24074:  v4 be KDC_REQUEST: ^O^O^O^O.^DM-2M-!^BM-W^CM-!^B@^D 0min ^P.^VM-^H [|kerberos]
 IP 10.0.0.1.88 > 0.234.154.214.24074:  v4 be KDC_REQUEST: ^O^O^O^O^O7M-^@M-^?M-^@^D^O^O^O^O^O^P.M-^?M-^?^O^O^O@^VM-^H [|kerberos]
 IP 10.0.0.1.88 > 0.234.154.214.24074:  v4 be KDC_REQUEST: ^O^O^O^O.^DM-^@M-^?M-^?M-^?^CM-!^B@^D 0min ^P.^VM-^H [|kerberos]
-IP 208.21.42.58.6697 > 110.228.104.254.30952: babel 2 (2056) update/truncated update/truncated update/truncated [|babel]
+IP 208.21.42.58.6697 > 110.228.104.254.30952: babel 2 (2056) (invalid)

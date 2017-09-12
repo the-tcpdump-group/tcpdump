@@ -352,6 +352,8 @@ babel_print_v2(netdissect_options *ndo,
         goto invalid;
     bodylen = EXTRACT_16BITS(cp + 2);
     ND_PRINT((ndo, " (%u)", bodylen));
+    if (4U + bodylen > length)
+        goto invalid;
 
     /* Process the TLVs in the body */
     i = 0;
