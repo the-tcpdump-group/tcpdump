@@ -443,7 +443,7 @@ static const struct tok ntp_CES_values[] = {
 typedef	enum {
 	PSS_Configured,		/* configured (peer.config) (0) */
 	PSS_AuthEnabled,	/* authentic. enabled (peer.authenable) (1) */
-	PSS_AuthOK,		/* aithentication OK (peer.authentic) (2) */
+	PSS_AuthOK,		/* authentication OK (peer.authentic) (2) */
 	PSS_Reachable,		/* reachability OK (peer.reach != 0) (3) */
 	PSS_BroadcastAssoc	/* broadcast association (4) */
 } Control_Peer_Status;
