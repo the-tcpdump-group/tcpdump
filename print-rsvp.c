@@ -139,7 +139,7 @@ static const struct tok rsvp_header_flag_values[] = {
 #define	RSVP_OBJ_LABEL_SET          36  /* rfc3473 */
 #define	RSVP_OBJ_PROTECTION         37  /* rfc3473 */
 #define RSVP_OBJ_S2L                50  /* rfc4875 */
-#define	RSVP_OBJ_DETOUR             63  /* draft-ietf-mpls-rsvp-lsp-fastreroute-07 */
+#define	RSVP_OBJ_DETOUR             63  /* rfc4090 */
 #define	RSVP_OBJ_CLASSTYPE          66  /* rfc4124 */
 #define RSVP_OBJ_CLASSTYPE_OLD      125 /* draft-ietf-tewg-diff-te-proto-07 */
 #define	RSVP_OBJ_SUGGESTED_LABEL    129 /* rfc3473 */
@@ -148,7 +148,7 @@ static const struct tok rsvp_header_flag_values[] = {
 #define	RSVP_OBJ_NOTIFY_REQ         195 /* rfc3473 */
 #define	RSVP_OBJ_ADMIN_STATUS       196 /* rfc3473 */
 #define	RSVP_OBJ_PROPERTIES         204 /* juniper proprietary */
-#define	RSVP_OBJ_FASTREROUTE        205 /* draft-ietf-mpls-rsvp-lsp-fastreroute-07 */
+#define	RSVP_OBJ_FASTREROUTE        205 /* rfc4090 */
 #define	RSVP_OBJ_SESSION_ATTRIBUTE  207 /* rfc3209 */
 #define RSVP_OBJ_GENERALIZED_UNI    229 /* OIF RSVP extensions UNI 1.0 Signaling, Rel. 2 */
 #define RSVP_OBJ_CALL_ID            230 /* rfc3474 */
@@ -339,7 +339,7 @@ static const struct tok rsvp_obj_xro_values[] = {
     { 0, NULL}
 };
 
-/* draft-ietf-mpls-rsvp-lsp-fastreroute-07.txt */
+/* RFC4090 */
 static const struct tok rsvp_obj_rro_flag_values[] = {
     { 0x01,	              "Local protection available" },
     { 0x02,                   "Local protection in use" },
