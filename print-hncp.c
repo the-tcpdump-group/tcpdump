@@ -68,8 +68,8 @@ hncp_print(netdissect_options *ndo,
 #define HNCP_EXTERNAL_CONNECTION   33
 #define HNCP_DELEGATED_PREFIX      34
 #define HNCP_PREFIX_POLICY         43
-#define HNCP_DHCPV4_DATA           37
-#define HNCP_DHCPV6_DATA           38
+#define HNCP_DHCPV4_DATA           37 /* This is correct, see RFC 7788 Errata ID 5113. */
+#define HNCP_DHCPV6_DATA           38 /* idem */
 #define HNCP_ASSIGNED_PREFIX       35
 #define HNCP_NODE_ADDRESS          36
 #define HNCP_DNS_DELEGATED_ZONE    39
