@@ -581,12 +581,12 @@ ldp_pdu_print(netdissect_options *ndo,
     }
 
     pdu_len = EXTRACT_16BITS(&ldp_com_header->pdu_length);
-    if (pdu_len < sizeof(const struct ldp_common_header)-4) {
+    if (pdu_len < sizeof(struct ldp_common_header)-4) {
         /* length too short */
         ND_PRINT((ndo, "%sLDP, pdu-length: %u (too short, < %u)",
                (ndo->ndo_vflag < 1) ? "" : "\n\t",
                pdu_len,
-               (u_int)(sizeof(const struct ldp_common_header)-4)));
+               (u_int)(sizeof(struct ldp_common_header)-4)));
         return 0;
     }
 
@@ -602,8 +602,8 @@ ldp_pdu_print(netdissect_options *ndo,
         return 0;
 
     /* ok they seem to want to know everything - lets fully decode it */
-    tptr = pptr + sizeof(const struct ldp_common_header);
-    tlen = pdu_len - (sizeof(const struct ldp_common_header)-4);	/* Type & Length fields not included */
+    tptr = pptr + sizeof(struct ldp_common_header);
+    tlen = pdu_len - (sizeof(struct ldp_common_header)-4);	/* Type & Length fields not included */
 
     while(tlen>0) {
         /* did we capture enough for fully decoding the msg header ? */

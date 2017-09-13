@@ -693,7 +693,7 @@ rsvp_obj_print(netdissect_options *ndo,
         }
         if(rsvp_obj_len < sizeof(struct rsvp_object_header)) {
             ND_PRINT((ndo, "%sERROR: object header too short %u < %lu", ident, rsvp_obj_len,
-                   (unsigned long)sizeof(const struct rsvp_object_header)));
+                   (unsigned long)sizeof(struct rsvp_object_header)));
             return -1;
         }
 
@@ -1889,14 +1889,14 @@ rsvp_print(netdissect_options *ndo,
            rsvp_com_header->ttl,
            EXTRACT_16BITS(rsvp_com_header->checksum)));
 
-    if (tlen < sizeof(const struct rsvp_common_header)) {
+    if (tlen < sizeof(struct rsvp_common_header)) {
         ND_PRINT((ndo, "ERROR: common header too short %u < %lu", tlen,
-               (unsigned long)sizeof(const struct rsvp_common_header)));
+               (unsigned long)sizeof(struct rsvp_common_header)));
         return;
     }
 
-    tptr+=sizeof(const struct rsvp_common_header);
-    tlen-=sizeof(const struct rsvp_common_header);
+    tptr+=sizeof(struct rsvp_common_header);
+    tlen-=sizeof(struct rsvp_common_header);
 
     switch(rsvp_com_header->msg_type) {
 
@@ -1935,9 +1935,9 @@ rsvp_print(netdissect_options *ndo,
                    rsvp_com_header->ttl,
                    EXTRACT_16BITS(rsvp_com_header->checksum)));
 
-            if (subtlen < sizeof(const struct rsvp_common_header)) {
+            if (subtlen < sizeof(struct rsvp_common_header)) {
                 ND_PRINT((ndo, "ERROR: common header too short %u < %lu", subtlen,
-                       (unsigned long)sizeof(const struct rsvp_common_header)));
+                       (unsigned long)sizeof(struct rsvp_common_header)));
                 return;
             }
 
@@ -1947,8 +1947,8 @@ rsvp_print(netdissect_options *ndo,
                 return;
             }
 
-            subtptr+=sizeof(const struct rsvp_common_header);
-            subtlen-=sizeof(const struct rsvp_common_header);
+            subtptr+=sizeof(struct rsvp_common_header);
+            subtlen-=sizeof(struct rsvp_common_header);
 
             /*
              * Print all objects in the submessage.
@@ -1956,8 +1956,8 @@ rsvp_print(netdissect_options *ndo,
             if (rsvp_obj_print(ndo, subpptr, subplen, subtptr, "\n\t    ", subtlen, rsvp_com_header) == -1)
                 return;
 
-            tptr+=subtlen+sizeof(const struct rsvp_common_header);
-            tlen-=subtlen+sizeof(const struct rsvp_common_header);
+            tptr+=subtlen+sizeof(struct rsvp_common_header);
+            tlen-=subtlen+sizeof(struct rsvp_common_header);
         }
 
         break;

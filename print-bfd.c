@@ -183,7 +183,7 @@ auth_print(netdissect_options *ndo, register const u_char *pptr)
         const struct bfd_auth_header_t *bfd_auth_header;
         int i;
 
-        pptr += sizeof (const struct bfd_header_t);
+        pptr += sizeof (struct bfd_header_t);
         bfd_auth_header = (const struct bfd_auth_header_t *)pptr;
         ND_TCHECK(*bfd_auth_header);
         ND_PRINT((ndo, "\n\tAuthentication: %s (%u), length: %u",

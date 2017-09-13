@@ -148,8 +148,8 @@ vqp_print(netdissect_options *ndo, register const u_char *pptr, register u_int l
            len));
 
     /* skip VQP Common header */
-    tptr+=sizeof(const struct vqp_common_header_t);
-    tlen-=sizeof(const struct vqp_common_header_t);
+    tptr+=sizeof(struct vqp_common_header_t);
+    tlen-=sizeof(struct vqp_common_header_t);
 
     while (nitems > 0 && tlen > 0) {
 

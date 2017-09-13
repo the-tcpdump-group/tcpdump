@@ -269,7 +269,7 @@ eigrp_print(netdissect_options *ndo, register const u_char *pptr, register u_int
            EXTRACT_32BITS(&eigrp_com_header->asn),
            tlen));
 
-    tptr+=sizeof(const struct eigrp_common_header);
+    tptr+=sizeof(struct eigrp_common_header);
 
     while(tlen>0) {
         /* did we capture enough for fully decoding the object header ? */

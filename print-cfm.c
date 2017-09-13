@@ -320,7 +320,7 @@ cfm_print(netdissect_options *ndo,
 
     ND_PRINT((ndo, "\n\tFirst TLV offset %u", cfm_common_header->first_tlv_offset));
 
-    tptr += sizeof(const struct cfm_common_header_t);
+    tptr += sizeof(struct cfm_common_header_t);
     tlen = length - sizeof(struct cfm_common_header_t);
 
     /*

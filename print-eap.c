@@ -177,8 +177,8 @@ eap_print(netdissect_options *ndo,
            eap->version,
            EXTRACT_16BITS(eap->length)));
 
-    tptr += sizeof(const struct eap_frame_t);
-    tlen -= sizeof(const struct eap_frame_t);
+    tptr += sizeof(struct eap_frame_t);
+    tlen -= sizeof(struct eap_frame_t);
 
     switch (eap->type) {
     case EAP_FRAME_TYPE_PACKET:

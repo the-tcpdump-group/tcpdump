@@ -877,7 +877,7 @@ clnp_print(netdissect_options *ndo,
                isonsap_string(ndo, dest_address, dest_address_length)));
 
         if (clnp_flags & CLNP_SEGMENT_PART) {
-                if (li < sizeof(const struct clnp_segment_header_t)) {
+                if (li < sizeof(struct clnp_segment_header_t)) {
                     ND_PRINT((ndo, "li < size of fixed part of CLNP header, addresses, and segment part"));
                     return (0);
                 }
@@ -887,8 +887,8 @@ clnp_print(netdissect_options *ndo,
                        EXTRACT_16BITS(clnp_segment_header->data_unit_id),
                        EXTRACT_16BITS(clnp_segment_header->segment_offset),
                        EXTRACT_16BITS(clnp_segment_header->total_length)));
-                pptr+=sizeof(const struct clnp_segment_header_t);
-                li-=sizeof(const struct clnp_segment_header_t);
+                pptr+=sizeof(struct clnp_segment_header_t);
+                li-=sizeof(struct clnp_segment_header_t);
         }
 
         /* now walk the options */

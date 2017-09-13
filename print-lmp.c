@@ -469,7 +469,7 @@ lmp_print(netdissect_options *ndo,
            tok2str(lmp_msg_type_values, "unknown, type: %u",lmp_com_header->msg_type),
            bittok2str(lmp_header_flag_values,"none",lmp_com_header->flags),
            tlen));
-    if (tlen < sizeof(const struct lmp_common_header)) {
+    if (tlen < sizeof(struct lmp_common_header)) {
         ND_PRINT((ndo, " (too short)"));
         return;
     }
@@ -478,8 +478,8 @@ lmp_print(netdissect_options *ndo,
         tlen = len;
     }
 
-    tptr+=sizeof(const struct lmp_common_header);
-    tlen-=sizeof(const struct lmp_common_header);
+    tptr+=sizeof(struct lmp_common_header);
+    tlen-=sizeof(struct lmp_common_header);
 
     while(tlen>0) {
         /* did we capture enough for fully decoding the object header ? */
