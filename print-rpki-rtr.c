@@ -48,7 +48,6 @@ typedef struct rpki_rtr_pdu_ {
     } u;
     u_char length[4];
 } rpki_rtr_pdu;
-#define RPKI_RTR_PDU_OVERHEAD (offsetof(rpki_rtr_pdu, rpki_rtr_pdu_msg))
 
 /*
  * IPv4 Prefix PDU.
