@@ -223,9 +223,9 @@ cfm_network_addr_print(netdissect_options *ndo,
     u_int hexdump =  FALSE;
 
     /*
-     * Altough AFIs are tpically 2 octects wide,
+     * Although AFIs are typically 2 octects wide,
      * 802.1ab specifies that this field width
-     * is only once octet
+     * is only one octet.
      */
     if (length < 1) {
         ND_PRINT((ndo, "\n\t  Network Address Type (invalid, no data"));
