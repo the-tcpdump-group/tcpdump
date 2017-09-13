@@ -42,10 +42,6 @@
  * sizeof(int) < 4.  sizeof(int) > 4 is fine; all the world's not a VAX.
  */
 
-#ifndef NS_IN6ADDRSZ
-#define NS_IN6ADDRSZ   16   /* IPv6 T_AAAA */
-#endif
-
 /* int
  * strtoaddr(src, dst)
  *	convert presentation level IPv4 address to network order binary form.
