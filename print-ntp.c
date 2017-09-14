@@ -133,8 +133,8 @@ struct ntp_time_data {
 	struct l_fixedpt org_timestamp;
 	struct l_fixedpt rec_timestamp;
 	struct l_fixedpt xmt_timestamp;
-        nd_uint32_t key_id;
-        nd_uint8_t  message_digest[16];
+	nd_uint32_t key_id;
+	nd_uint8_t  message_digest[20];
 };
 /*
  *	Leap Second Codes (high order two bits)
@@ -569,6 +569,39 @@ indent(netdissect_options *ndo, unsigned n)
 }
 
 /*
+ * Print NTP message authentication digest
+ */
+static void
+print_ntp_digest(netdissect_options *ndo, const unsigned i_lev,
+		 const uint32_t *digest, unsigned length)
+{
+	int first = 1;
+
+	while (length >= sizeof(uint32_t)) {
+		if (first) {
+			first = 0;
+			if (i_lev != 0)
+				indent(ndo, i_lev);
+			else
+				ND_PRINT((ndo, ", "));
+			switch (length) {
+			case 16:
+				ND_PRINT((ndo, "MD5-"));
+				break;
+			case 20:
+				ND_PRINT((ndo, "SHA1-"));
+				break;
+			}
+			ND_PRINT((ndo, "Digest="));
+		} else
+			ND_PRINT((ndo, " "));
+		ND_PRINT((ndo, "%08x", EXTRACT_BE_U_4(digest)));
+		++digest;
+		length -= sizeof(uint32_t);
+	}
+}
+
+/*
  * Print NTP time requests and responses
  */
 static void
@@ -682,36 +715,30 @@ ntp_time_print(netdissect_options *ndo,
 				    &(bp->xmt_timestamp));
 		}
 	}
-	if ((sizeof(*bp) - length) == 16) { 	/* Optional: key-id */
+	if (length - NTP_TIMEMSG_MINLEN == 4) { 	/* Optional: key-id */
 		ND_TCHECK(bp->key_id);
 		indent(ndo, i_lev);
 		ND_PRINT((ndo, "Key id: %u", EXTRACT_BE_U_4(bp->key_id)));
-	} else if ((sizeof(*bp) - length) == 0) {
-		/* Optional: key-id + authentication */
+	} else if (length - NTP_TIMEMSG_MINLEN == 4 + 16) {
+		/* Optional: key-id + 128 bit digest */
 		ND_TCHECK(bp->key_id);
 		indent(ndo, i_lev);
 		ND_PRINT((ndo, "Key id: %u", EXTRACT_BE_U_4(bp->key_id)));
-		ND_TCHECK2(bp->message_digest, sizeof (bp->message_digest));
-		indent(ndo, i_lev);
-                ND_PRINT((ndo, "Authentication: %08x%08x%08x%08x",
-			  EXTRACT_BE_U_4(bp->message_digest),
-			  EXTRACT_BE_U_4(bp->message_digest + 4),
-			  EXTRACT_BE_U_4(bp->message_digest + 8),
-			  EXTRACT_BE_U_4(bp->message_digest + 12)));
-	} else if (length == NTP_TIMEMSG_MINLEN + 4 + 20) { 	/* Optional: key-id + 160-bit digest */
+		ND_TCHECK2(bp->message_digest, 16);
+		print_ntp_digest(ndo, 0, (const uint32_t *) bp->message_digest,
+				 16);
+	} else if (length - NTP_TIMEMSG_MINLEN == 4 + 20) {
+		/* Optional: key-id + 160-bit digest */
 		ND_TCHECK(bp->key_id);
 		indent(ndo, i_lev);
 		ND_PRINT((ndo, "Key id: %u", EXTRACT_BE_U_4(&bp->key_id)));
 		ND_TCHECK2(bp->message_digest, 20);
-		indent(ndo, i_lev);
-		ND_PRINT((ndo, "Authentication: %08x%08x%08x%08x%08x",
-			  EXTRACT_BE_U_4(bp->message_digest),
-			  EXTRACT_BE_U_4(bp->message_digest + 4),
-			  EXTRACT_BE_U_4(bp->message_digest + 8),
-			  EXTRACT_BE_U_4(bp->message_digest + 12),
-			  EXTRACT_BE_U_4(bp->message_digest + 16)));
+		print_ntp_digest(ndo, 0, (const uint32_t *) bp->message_digest,
+				 20);
 	} else if (length > NTP_TIMEMSG_MINLEN) {
-		ND_PRINT((ndo, "\n\t(%u more bytes after the header)", length - NTP_TIMEMSG_MINLEN));
+		indent(ndo, i_lev);
+		ND_PRINT((ndo, "(%u unprocessed octets)",
+			  length - NTP_TIMEMSG_MINLEN));
 	}
 	return;
 
@@ -922,39 +949,6 @@ ntp_control_print_assocs(netdissect_options *ndo, const uint8_t *dp,
 
 trunc:
 	ND_PRINT((ndo, " %s", tstr));
-}
-
-/*
- * Print NTP message authentication digest
- */
-static void
-print_ntp_digest(netdissect_options *ndo, const unsigned i_lev,
-		 const uint32_t *digest, unsigned length)
-{
-	int first = 1;
-
-	while (length >= sizeof(uint32_t)) {
-		if (first) {
-			first = 0;
-			if (i_lev != 0)
-				indent(ndo, i_lev);
-			else
-				ND_PRINT((ndo, ", "));
-			switch (length) {
-			case 16:
-				ND_PRINT((ndo, "MD5-"));
-				break;
-			case 20:
-				ND_PRINT((ndo, "SHA1-"));
-				break;
-			}
-			ND_PRINT((ndo, "Digest="));
-		} else
-			ND_PRINT((ndo, " "));
-		ND_PRINT((ndo, "%08x", EXTRACT_BE_U_4(digest)));
-		++digest;
-		length -= sizeof(uint32_t);
-	}
 }
 
 /*
