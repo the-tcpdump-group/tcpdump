@@ -352,8 +352,10 @@ getname6(netdissect_options *ndo, const u_char *ap)
 	return (p->name);
 }
 
-static const char hex[16] = "0123456789abcdef";
-
+static const char hex[16] = {
+	'0', '1', '2', '3', '4', '5', '6', '7',
+	'8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
+};
 
 /* Find the hash node that corresponds the ether address 'ep' */
 
