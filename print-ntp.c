@@ -225,7 +225,7 @@ static const struct tok ntp_stratum_values[] = {
  * |                    Padding (optional)                         |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * |                                                               |
- * /              Authenticator (optional, 96 bytes)               /
+ * /              Authenticator (optional, 96 bits)                /
  * |                                                               |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
