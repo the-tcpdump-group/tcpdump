@@ -457,6 +457,10 @@ mfr_print(netdissect_options *ndo,
  */
 
     ND_TCHECK2(*p, 4); /* minimum frame header length */
+    if (length < 4) {
+        ND_PRINT((ndo, "Message too short (%u bytes)", length));
+        return length;
+    }
 
     if ((p[0] & MFR_BEC_MASK) == MFR_CTRL_FRAME && p[1] == 0) {
         ND_PRINT((ndo, "FRF.16 Control, Flags [%s], %s, length %u",
