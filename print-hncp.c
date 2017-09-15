@@ -265,7 +265,7 @@ dhcpv4_print(netdissect_options *ndo,
              const u_char *cp, u_int length, int indent)
 {
     u_int i, t;
-    const u_char *tlv, *value;
+    const uint8_t *tlv, *value;
     uint8_t type, optlen;
 
     i = 0;
@@ -273,8 +273,8 @@ dhcpv4_print(netdissect_options *ndo,
         if (i + 2 > length)
             return -1;
         tlv = cp + i;
-        type = (uint8_t)tlv[0];
-        optlen = (uint8_t)tlv[1];
+        type = tlv[0];
+        optlen = tlv[1];
         value = tlv + 2;
 
         ND_PRINT((ndo, "\n"));
@@ -408,7 +408,7 @@ hncp_print_rec(netdissect_options *ndo,
     uint32_t last_type_mask = 0xffffffffU;
     int last_type_count = -1;
 
-    const u_char *tlv, *value;
+    const uint8_t *tlv, *value;
     uint16_t type, bodylen;
     uint32_t type_mask;
 
@@ -728,7 +728,7 @@ hncp_print_rec(netdissect_options *ndo,
                 ND_PRINT((ndo, " %s", istr));
                 break;
             }
-            prty = (uint8_t)(value[4] & 0xf);
+            prty = value[4] & 0xf;
             ND_PRINT((ndo, " EPID: %08x Prty: %u",
                 EXTRACT_32BITS(value),
                 prty
