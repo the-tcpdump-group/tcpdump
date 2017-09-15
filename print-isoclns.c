@@ -109,7 +109,7 @@ static const struct tok isis_pdu_values[] = {
 #define ISIS_TLV_POI                 13  /* rfc6232 */
 #define ISIS_TLV_LSP_BUFFERSIZE      14  /* iso10589 rev2 */
 #define ISIS_TLV_LSP_BUFFERSIZE_MINLEN 2
-#define ISIS_TLV_EXT_IS_REACH        22  /* draft-ietf-isis-traffic-05 */
+#define ISIS_TLV_EXT_IS_REACH        22  /* rfc5305 */
 #define ISIS_TLV_IS_ALIAS_ID         24  /* draft-ietf-isis-ext-lsp-frags-02 */
 #define ISIS_TLV_DECNET_PHASE4       42
 #define ISIS_TLV_LUCENT_PRIVATE      66
@@ -120,8 +120,8 @@ static const struct tok isis_pdu_values[] = {
 #define ISIS_TLV_IDRP_INFO_MINLEN      1
 #define ISIS_TLV_IPADDR              132 /* rfc1195 */
 #define ISIS_TLV_IPAUTH              133 /* rfc1195 */
-#define ISIS_TLV_TE_ROUTER_ID        134 /* draft-ietf-isis-traffic-05 */
-#define ISIS_TLV_EXTD_IP_REACH       135 /* draft-ietf-isis-traffic-05 */
+#define ISIS_TLV_TE_ROUTER_ID        134 /* rfc5305 */
+#define ISIS_TLV_EXTD_IP_REACH       135 /* rfc5305 */
 #define ISIS_TLV_HOSTNAME            137 /* rfc2763 */
 #define ISIS_TLV_SHARED_RISK_GROUP   138 /* draft-ietf-isis-gmpls-extensions */
 #define ISIS_TLV_MT_PORT_CAP         143 /* rfc6165 */
@@ -338,16 +338,16 @@ static const struct tok clnp_option_qos_global_values[] = {
     { 0, NULL }
 };
 
-#define ISIS_SUBTLV_EXT_IS_REACH_ADMIN_GROUP           3 /* draft-ietf-isis-traffic-05 */
+#define ISIS_SUBTLV_EXT_IS_REACH_ADMIN_GROUP           3 /* rfc5305 */
 #define ISIS_SUBTLV_EXT_IS_REACH_LINK_LOCAL_REMOTE_ID  4 /* rfc4205 */
-#define ISIS_SUBTLV_EXT_IS_REACH_LINK_REMOTE_ID        5 /* draft-ietf-isis-traffic-05 */
-#define ISIS_SUBTLV_EXT_IS_REACH_IPV4_INTF_ADDR        6 /* draft-ietf-isis-traffic-05 */
-#define ISIS_SUBTLV_EXT_IS_REACH_IPV4_NEIGHBOR_ADDR    8 /* draft-ietf-isis-traffic-05 */
-#define ISIS_SUBTLV_EXT_IS_REACH_MAX_LINK_BW           9 /* draft-ietf-isis-traffic-05 */
-#define ISIS_SUBTLV_EXT_IS_REACH_RESERVABLE_BW        10 /* draft-ietf-isis-traffic-05 */
+#define ISIS_SUBTLV_EXT_IS_REACH_LINK_REMOTE_ID        5 /* rfc5305 */
+#define ISIS_SUBTLV_EXT_IS_REACH_IPV4_INTF_ADDR        6 /* rfc5305 */
+#define ISIS_SUBTLV_EXT_IS_REACH_IPV4_NEIGHBOR_ADDR    8 /* rfc5305 */
+#define ISIS_SUBTLV_EXT_IS_REACH_MAX_LINK_BW           9 /* rfc5305 */
+#define ISIS_SUBTLV_EXT_IS_REACH_RESERVABLE_BW        10 /* rfc5305 */
 #define ISIS_SUBTLV_EXT_IS_REACH_UNRESERVED_BW        11 /* rfc4124 */
 #define ISIS_SUBTLV_EXT_IS_REACH_BW_CONSTRAINTS_OLD   12 /* draft-ietf-tewg-diff-te-proto-06 */
-#define ISIS_SUBTLV_EXT_IS_REACH_TE_METRIC            18 /* draft-ietf-isis-traffic-05 */
+#define ISIS_SUBTLV_EXT_IS_REACH_TE_METRIC            18 /* rfc5305 */
 #define ISIS_SUBTLV_EXT_IS_REACH_LINK_ATTRIBUTE       19 /* draft-ietf-isis-link-attr-01 */
 #define ISIS_SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE 20 /* rfc4205 */
 #define ISIS_SUBTLV_EXT_IS_REACH_INTF_SW_CAP_DESCR    21 /* rfc4205 */
