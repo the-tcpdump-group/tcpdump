@@ -50,8 +50,8 @@ static const char tstr[] = " [|isis]";
  */
 
 #define SYSTEM_ID_LEN	ETHER_ADDR_LEN
-#define NODE_ID_LEN     SYSTEM_ID_LEN+1
-#define LSP_ID_LEN      SYSTEM_ID_LEN+2
+#define NODE_ID_LEN     (SYSTEM_ID_LEN+1)
+#define LSP_ID_LEN      (SYSTEM_ID_LEN+2)
 
 #define ISIS_VERSION	1
 #define ESIS_VERSION	1
@@ -1983,7 +1983,7 @@ isis_print_ext_is_reach(netdissect_options *ndo,
         return(0);
 
     ND_PRINT((ndo, "%sIS Neighbor: %s", ident, isis_print_id(tptr, NODE_ID_LEN)));
-    tptr+=(NODE_ID_LEN);
+    tptr+=NODE_ID_LEN;
 
     if (tlv_type != ISIS_TLV_IS_ALIAS_ID) { /* the Alias TLV Metric field is implicit 0 */
         if (!ND_TTEST2(*tptr, 3))    /* and is therefore skipped */
@@ -2894,8 +2894,8 @@ isis_print(netdissect_options *ndo,
 	        break;
 	    ND_TCHECK2(*tptr, NODE_ID_LEN);
 	    ND_PRINT((ndo, "\n\t      IS Neighbor: %s", isis_print_id(tptr, NODE_ID_LEN)));
-	    tptr+=(NODE_ID_LEN);
-	    tmp-=(NODE_ID_LEN);
+	    tptr+=NODE_ID_LEN;
+	    tmp-=NODE_ID_LEN;
 
 	    if (tmp < 1)
 	        break;
