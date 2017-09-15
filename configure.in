@@ -754,23 +754,19 @@ if test -f /dev/bpf0 ; then
 fi
 
 #
-# Make sure we have definitions for all the C99 specified-width types
-# (regardless of whether the environment is a C99 environment or not).
-#
-AC_TYPE_INT8_T
-AC_TYPE_INT16_T
-AC_TYPE_INT32_T
-AC_TYPE_INT64_T
-AC_TYPE_UINT8_T
-AC_TYPE_UINT16_T
-AC_TYPE_UINT32_T
-AC_TYPE_UINT64_T
-
-#
 # Make sure we have a definition for C99's uintptr_t (regardless of
 # whether the environment is a C99 environment or not).
 #
 AC_TYPE_UINTPTR_T
+
+#
+# Check whether we have pcap/pcap-inttypes.h.
+# If we do, we use that to get the C99 types defined.
+#
+savedcppflags="$CPPFLAGS"
+CPPFLAGS="$CPPFLAGS $V_INCLS"
+AC_CHECK_HEADERS(pcap/pcap-inttypes.h)
+CPPFLAGS="$savedcppflags"
 
 #
 # Define the old BSD specified-width types in terms of the C99 types;
@@ -802,70 +798,11 @@ AC_CHECK_TYPE([u_int64_t], ,
 ])
 
 #
-# Check for <inttypes.h>
-#
-AC_CHECK_HEADERS(inttypes.h,
-  [
-    #
-    # OK, we have inttypes.h, but does it define all the PRI[doxu]64 macros?
-    # Some systems have an inttypes.h that doesn't define all of them.
-    #
-    AC_MSG_CHECKING([[whether inttypes.h defines the PRI[doxu]64 macros]])
-    AC_COMPILE_IFELSE(
-      [
-	AC_LANG_SOURCE(
-	  [[
-	    #include <inttypes.h>
-	    #include <stdio.h>
-	    #include <sys/types.h>
-
-	    main()
-	    {
-	      printf("%" PRId64 "\n", (uint64_t)1);
-	      printf("%" PRIo64 "\n", (uint64_t)1);
-	      printf("%" PRIx64 "\n", (uint64_t)1);
-	      printf("%" PRIu64 "\n", (uint64_t)1);
-	    }
-	  ]])
-      ],
-      [
-	AC_MSG_RESULT(yes)
-	ac_lbl_inttypes_h_defines_formats=yes
-      ],
-      [
-	AC_MSG_RESULT(no)
-	ac_lbl_inttypes_h_defines_formats=no
-      ])
-  ],
-  [
-    #
-    # We don't have inttypes.h, so it obviously can't define those
-    # macros.
-    #
-    ac_lbl_inttypes_h_defines_formats=no
-  ])
-if test "$ac_lbl_inttypes_h_defines_formats" = no; then
-  AC_LBL_CHECK_64BIT_FORMAT(l,
-    [
-      AC_LBL_CHECK_64BIT_FORMAT(ll,
-        [
-          AC_LBL_CHECK_64BIT_FORMAT(L,
-	    [
-	      AC_LBL_CHECK_64BIT_FORMAT(q,
-	        [
-	          AC_MSG_ERROR([neither %llx nor %Lx nor %qx worked on a 64-bit integer])
-	        ])
-	    ])
-	])
-    ])
-fi
-
-#
 # Check for some headers introduced in later versions of libpcap
 # and used by some printers.
 #
-# Those headers use the {u_}intN_t types, so we must do this after
-# we check for what's needed to get them defined.
+# Those headers might use the {u_}intN_t types, so we must do this
+# after we check for what's needed to get them defined.
 #
 savedcppflags="$CPPFLAGS"
 CPPFLAGS="$CPPFLAGS $V_INCLS"

@@ -142,6 +142,9 @@
 /* Define to 1 if you have the <pcap/nflog.h> header file. */
 #undef HAVE_PCAP_NFLOG_H
 
+/* Define to 1 if you have the <pcap/pcap-inttypes.h> header file. */
+#undef HAVE_PCAP_PCAP_INTTYPES_H
+
 /* Define to 1 if you have the `pcap_setdirection' function. */
 #undef HAVE_PCAP_SETDIRECTION
 
@@ -277,18 +280,6 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* define if the platform doesn't define PRId64 */
-#undef PRId64
-
-/* define if the platform doesn't define PRIo64 */
-#undef PRIo64
-
-/* define if the platform doesn't define PRIx64 */
-#undef PRIu64
-
-/* define if the platform doesn't define PRIu64 */
-#undef PRIx64
-
 /* Define as the return type of signal handlers (`int' or `void'). */
 #undef RETSIGTYPE
 
@@ -319,21 +310,6 @@
 /* define on AIX to get certain functions */
 #undef _SUN
 
-/* Define for Solaris 2.5.1 so the uint32_t typedef from <sys/synch.h>,
-   <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
-   #define below would cause a syntax error. */
-#undef _UINT32_T
-
-/* Define for Solaris 2.5.1 so the uint64_t typedef from <sys/synch.h>,
-   <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
-   #define below would cause a syntax error. */
-#undef _UINT64_T
-
-/* Define for Solaris 2.5.1 so the uint8_t typedef from <sys/synch.h>,
-   <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
-   #define below would cause a syntax error. */
-#undef _UINT8_T
-
 /* define if your compiler allows __attribute__((fallthrough)) without a
    warning */
 #undef __ATTRIBUTE___FALLTHROUGH_OK
@@ -343,22 +319,6 @@
 
 /* Define as token for inline if inlining supported */
 #undef inline
-
-/* Define to the type of a signed integer type of width exactly 16 bits if
-   such a type exists and the standard includes do not define it. */
-#undef int16_t
-
-/* Define to the type of a signed integer type of width exactly 32 bits if
-   such a type exists and the standard includes do not define it. */
-#undef int32_t
-
-/* Define to the type of a signed integer type of width exactly 64 bits if
-   such a type exists and the standard includes do not define it. */
-#undef int64_t
-
-/* Define to the type of a signed integer type of width exactly 8 bits if such
-   a type exists and the standard includes do not define it. */
-#undef int8_t
 
 /* Define to `uint16_t' if u_int16_t not defined. */
 #undef u_int16_t
@@ -371,22 +331,6 @@
 
 /* Define to `uint8_t' if u_int8_t not defined. */
 #undef u_int8_t
-
-/* Define to the type of an unsigned integer type of width exactly 16 bits if
-   such a type exists and the standard includes do not define it. */
-#undef uint16_t
-
-/* Define to the type of an unsigned integer type of width exactly 32 bits if
-   such a type exists and the standard includes do not define it. */
-#undef uint32_t
-
-/* Define to the type of an unsigned integer type of width exactly 64 bits if
-   such a type exists and the standard includes do not define it. */
-#undef uint64_t
-
-/* Define to the type of an unsigned integer type of width exactly 8 bits if
-   such a type exists and the standard includes do not define it. */
-#undef uint8_t
 
 /* Define to the type of an unsigned integer type wide enough to hold a
    pointer, if such a type exists, and if the system does not define it. */
