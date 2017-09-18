@@ -612,3 +612,7 @@ ntp-control		ntp-control.pcap	ntp-control.out
 ntp-control--v		ntp-control.pcap	ntp-control--v.out	-v
 ntp-control--vv		ntp-control.pcap	ntp-control--vv.out	-vv
 ntp-control--vvv	ntp-control.pcap	ntp-control--vvv.out	-vvv
+ntp-mode7		ntp-mode7.pcap		ntp-mode7.out
+ntp-mode7--v		ntp-mode7.pcap		ntp-mode7--v.out	-v
+ntp-mode7--vv		ntp-mode7.pcap		ntp-mode7--vv.out	-vv
+ntp-mode7--vvv		ntp-mode7.pcap		ntp-mode7--vvv.out	-vvv
