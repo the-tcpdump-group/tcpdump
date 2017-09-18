@@ -1362,6 +1362,62 @@ trunc:
    return 4;
 }
 
+/*
+ * The only way to know that a BGP UPDATE message is using add path is
+ * by checking if the capability is in the OPEN message which we may have missed.
+ * So this function checks if it is possible that the update could contain add path
+ * and if so it checks that standard BGP doesn't make sense.
+ */
+
+static int
+check_add_path(const u_char *pptr, u_int length, u_int max_prefix_length) {
+
+    u_int offset, prefix_length;
+    if (length < 5) {
+        return 0;
+    }
+
+    /* check if it could be add path */
+    for(offset = 0; offset < length;) {
+        offset += 4;
+        prefix_length = pptr[offset];
+        /*
+         * Add 4 to cover the path id
+         * and check the prefix length isn't greater than 32/128.
+         */
+        if (prefix_length > max_prefix_length) {
+            return 0;
+        }
+        /* Add 1 for the prefix_length byte and prefix_length to cover the address */
+        offset += 1 + ((prefix_length + 7) / 8);
+    }
+    /* check we haven't gone past the end of the section */
+    if (offset > length) {
+        return 0;
+    }
+
+    /* check it's not standard BGP */
+    for(offset = 0; offset < length; ) {
+        prefix_length = pptr[offset];
+        /*
+         * If the prefix_length is zero (0.0.0.0/0)
+         * and since it's not the only address (length >= 5)
+         * then it is add-path
+         */
+        if (prefix_length < 1 || prefix_length > max_prefix_length) {
+            return 1;
+        }
+        offset += 1 + ((prefix_length + 7) / 8);
+    }
+    if (offset > length) {
+        return 1;
+    }
+
+    /* assume not add-path by default */
+    return 0;
+}
+
+
 static int
 bgp_attr_print(netdissect_options *ndo,
                u_int atype, const u_char *pptr, u_int len)
@@ -1378,6 +1434,7 @@ bgp_attr_print(netdissect_options *ndo,
 	const u_char *tptr;
 	char buf[MAXHOSTNAMELEN + 100];
         int  as_size;
+        int add_path4, add_path6, path_id;
 
         tptr = pptr;
         tlen=len;
@@ -1742,11 +1799,18 @@ bgp_attr_print(netdissect_options *ndo,
 			ND_PRINT((ndo, ", no SNPA"));
                 }
 
+                add_path4 = check_add_path(tptr, (len-(tptr - pptr)), 32);
+                add_path6 = check_add_path(tptr, (len-(tptr - pptr)), 128);
+
 		while (tptr < pptr + len) {
                     switch (af<<8 | safi) {
                     case (AFNUM_INET<<8 | SAFNUM_UNICAST):
                     case (AFNUM_INET<<8 | SAFNUM_MULTICAST):
                     case (AFNUM_INET<<8 | SAFNUM_UNIMULTICAST):
+                        if (add_path4) {
+                            path_id = EXTRACT_32BITS(tptr);
+                            tptr += 4;
+                        }
                         advance = decode_prefix4(ndo, tptr, len, buf, sizeof(buf));
                         if (advance == -1)
                             ND_PRINT((ndo, "\n\t    (illegal prefix length)"));
@@ -1756,6 +1820,9 @@ bgp_attr_print(netdissect_options *ndo,
                             break; /* bytes left, but not enough */
                         else
                             ND_PRINT((ndo, "\n\t      %s", buf));
+                            if (add_path4) {
+                                ND_PRINT((ndo, "   Path Id: %d", path_id));
+                            }
                         break;
                     case (AFNUM_INET<<8 | SAFNUM_LABUNICAST):
                         advance = decode_labeled_prefix4(ndo, tptr, len, buf, sizeof(buf));
@@ -1811,6 +1878,10 @@ bgp_attr_print(netdissect_options *ndo,
                     case (AFNUM_INET6<<8 | SAFNUM_UNICAST):
                     case (AFNUM_INET6<<8 | SAFNUM_MULTICAST):
                     case (AFNUM_INET6<<8 | SAFNUM_UNIMULTICAST):
+                        if (add_path6) {
+                            path_id = EXTRACT_32BITS(tptr);
+                            tptr += 4;
+                        }
                         advance = decode_prefix6(ndo, tptr, len, buf, sizeof(buf));
                         if (advance == -1)
                             ND_PRINT((ndo, "\n\t    (illegal prefix length)"));
@@ -1820,6 +1891,9 @@ bgp_attr_print(netdissect_options *ndo,
                             break; /* bytes left, but not enough */
                         else
                             ND_PRINT((ndo, "\n\t      %s", buf));
+                            if (add_path6) {
+                                ND_PRINT((ndo, "   Path Id: %d", path_id));
+                            }
                         break;
                     case (AFNUM_INET6<<8 | SAFNUM_LABUNICAST):
                         advance = decode_labeled_prefix6(ndo, tptr, len, buf, sizeof(buf));
@@ -1910,11 +1984,18 @@ bgp_attr_print(netdissect_options *ndo,
 
 		tptr += 3;
 
+                add_path4 = check_add_path(tptr, (len-(tptr - pptr)), 32);
+                add_path6 = check_add_path(tptr, (len-(tptr - pptr)), 128);
+
 		while (tptr < pptr + len) {
                     switch (af<<8 | safi) {
                     case (AFNUM_INET<<8 | SAFNUM_UNICAST):
                     case (AFNUM_INET<<8 | SAFNUM_MULTICAST):
                     case (AFNUM_INET<<8 | SAFNUM_UNIMULTICAST):
+                        if (add_path4) {
+                            path_id = EXTRACT_32BITS(tptr);
+                            tptr += 4;
+                        }
                         advance = decode_prefix4(ndo, tptr, len, buf, sizeof(buf));
                         if (advance == -1)
                             ND_PRINT((ndo, "\n\t    (illegal prefix length)"));
@@ -1924,6 +2005,9 @@ bgp_attr_print(netdissect_options *ndo,
                             break; /* bytes left, but not enough */
                         else
                             ND_PRINT((ndo, "\n\t      %s", buf));
+                            if (add_path4) {
+                                ND_PRINT((ndo, "   Path Id: %d", path_id));
+                            }
                         break;
                     case (AFNUM_INET<<8 | SAFNUM_LABUNICAST):
                         advance = decode_labeled_prefix4(ndo, tptr, len, buf, sizeof(buf));
@@ -1950,6 +2034,10 @@ bgp_attr_print(netdissect_options *ndo,
                     case (AFNUM_INET6<<8 | SAFNUM_UNICAST):
                     case (AFNUM_INET6<<8 | SAFNUM_MULTICAST):
                     case (AFNUM_INET6<<8 | SAFNUM_UNIMULTICAST):
+                        if (add_path6) {
+                            path_id = EXTRACT_32BITS(tptr);
+                            tptr += 4;
+                        }
                         advance = decode_prefix6(ndo, tptr, len, buf, sizeof(buf));
                         if (advance == -1)
                             ND_PRINT((ndo, "\n\t    (illegal prefix length)"));
@@ -1959,6 +2047,9 @@ bgp_attr_print(netdissect_options *ndo,
                             break; /* bytes left, but not enough */
                         else
                             ND_PRINT((ndo, "\n\t      %s", buf));
+                            if (add_path6) {
+                                ND_PRINT((ndo, "   Path Id: %d", path_id));
+                            }
                         break;
                     case (AFNUM_INET6<<8 | SAFNUM_LABUNICAST):
                         advance = decode_labeled_prefix6(ndo, tptr, len, buf, sizeof(buf));
@@ -2498,6 +2589,8 @@ bgp_update_print(netdissect_options *ndo,
 	struct bgp bgp;
 	const u_char *p;
 	int withdrawn_routes_len;
+        char buf[MAXHOSTNAMELEN + 100];
+        int wpfx;
 	int len;
 	int i;
 
@@ -2516,17 +2609,40 @@ bgp_update_print(netdissect_options *ndo,
 	p += 2;
 	length -= 2;
 	if (withdrawn_routes_len) {
-		/*
-		 * Without keeping state from the original NLRI message,
-		 * it's not possible to tell if this a v4 or v6 route,
-		 * so only try to decode it if we're not v6 enabled.
-	         */
 		ND_TCHECK2(p[0], withdrawn_routes_len);
 		if (length < withdrawn_routes_len)
 			goto trunc;
-		ND_PRINT((ndo, "\n\t  Withdrawn routes: %d bytes", withdrawn_routes_len));
-		p += withdrawn_routes_len;
-		length -= withdrawn_routes_len;
+                if (withdrawn_routes_len < 2)
+                        goto trunc;
+
+                ND_PRINT((ndo, "\n\t  Withdrawn routes:"));
+                int add_path, path_id;
+                add_path = check_add_path(p, withdrawn_routes_len, 32);
+                while(withdrawn_routes_len > 0) {
+                        if (add_path) {
+                                path_id = EXTRACT_32BITS(p);
+                                p += 4;
+                                length -= 4;
+                                withdrawn_routes_len -= 4;
+                        }
+                        wpfx = decode_prefix4(ndo, p, withdrawn_routes_len, buf, sizeof(buf));
+                        if (wpfx == -1) {
+                                ND_PRINT((ndo, "\n\t    (illegal prefix length)"));
+                                break;
+                        } else if (wpfx == -2)
+                                goto trunc;
+                        else if (wpfx == -3)
+                                goto trunc; /* bytes left, but not enough */
+                        else {
+                                ND_PRINT((ndo, "\n\t    %s", buf));
+                                if (add_path) {
+                                    ND_PRINT((ndo, "   Path Id: %d", path_id));
+                                }
+                                p += wpfx;
+                                length -= wpfx;
+                                withdrawn_routes_len -= wpfx;
+                        }
+                }
 	}
 
 	ND_TCHECK2(p[0], 2);
@@ -2597,17 +2713,15 @@ bgp_update_print(netdissect_options *ndo,
 	}
 
 	if (length) {
-		/*
-		 * XXX - what if they're using the "Advertisement of
-		 * Multiple Paths in BGP" feature:
-		 *
-		 * https://datatracker.ietf.org/doc/draft-ietf-idr-add-paths/
-		 *
-		 * http://tools.ietf.org/html/draft-ietf-idr-add-paths-06
-		 */
+                int add_path = check_add_path(p, length, 32);
+                int path_id;
 		ND_PRINT((ndo, "\n\t  Updated routes:"));
-		while (length) {
-			char buf[MAXHOSTNAMELEN + 100];
+		while (length > 0) {
+		        if (add_path) {
+                                path_id = EXTRACT_32BITS(p);
+                                p += 4;
+                                length -= 4;
+                        }
 			i = decode_prefix4(ndo, p, length, buf, sizeof(buf));
 			if (i == -1) {
 				ND_PRINT((ndo, "\n\t    (illegal prefix length)"));
@@ -2617,9 +2731,12 @@ bgp_update_print(netdissect_options *ndo,
 			else if (i == -3)
 				goto trunc; /* bytes left, but not enough */
 			else {
-				ND_PRINT((ndo, "\n\t    %s", buf));
-				p += i;
-				length -= i;
+                                ND_PRINT((ndo, "\n\t    %s", buf));
+			        if (add_path) {
+                                        ND_PRINT((ndo, "   Path Id: %d", path_id));
+				}
+			        p += i;
+                                length -= i;
 			}
 		}
 	}
