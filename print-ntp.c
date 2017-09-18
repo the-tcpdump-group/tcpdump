@@ -168,7 +168,7 @@ struct ntp_time_data {
 #define	MODE_SERVER	4	/* server */
 #define	MODE_BROADCAST	5	/* broadcast */
 #define	MODE_CONTROL	6	/* control message */
-#define	MODE_RES2	7	/* reserved */
+#define	MODE_RESERVED	7	/* reserved */
 
 /*
  *	Stratum Definitions
@@ -190,7 +190,7 @@ static const struct tok ntp_mode_values[] = {
     { MODE_SERVER,    "Server" },
     { MODE_BROADCAST, "Broadcast" },
     { MODE_CONTROL,   "Control Message" },
-    { MODE_RES2,      "Reserved" },
+    { MODE_RESERVED,  "Reserved" },
     { 0, NULL }
 };
 
@@ -552,9 +552,41 @@ static const struct tok ntp_CCS_values[] = {
 	{ 0, NULL }
 };
 
+/* draft-ietf-ntp-mode-6-cmds-02
+ *  0                   1                   2                   3
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |R|M| VN  |Mode |A|  Sequence   | Implementation|   Req Code    |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |  Err  |        Count          |  MBZ  |       Size            |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                                                               |
+ * /                    Data (up to 500 bytes)                     /
+ * |                                                               |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                Encryption KeyID (when A bit set)              |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |                                                               |
+ * /          Message Authentication Code (when A bit set)         /
+ * |                                                               |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *           Figure 3: NTP Remote Facility Message Header
+ */
+struct ntp_reserved_data {
+	nd_uint8_t	magic;		/* R, M, VN, Mode */
+	nd_uint16_t	sequence;	/* A, Sequence */
+	nd_uint8_t	implem;		/* Implementation */
+	nd_uint8_t	req_code;	/* Req Code */
+	nd_uint16_t	err_count;	/* Err, Count */
+	nd_uint16_t	mbz_size;	/* MBZ, Size */
+	nd_uint8_t	data[1];	/* Data, [KeyID, [MAC]] */
+	/* as Data is variable in size, we just reserve one octet */
+};
+
 union ntpdata {
 	struct ntp_time_data	td;
 	struct ntp_control_data	cd;
+	struct ntp_reserved_data rd;
 };
 
 /*
@@ -1145,6 +1177,54 @@ trunc:
 }
 
 /*
+ * Print NTP reserved (mode 7) requests and responses
+ */
+static void
+ntp_reserved_print(netdissect_options *ndo,
+		  register const struct ntp_reserved_data *rd, u_int length)
+{
+	uint8_t R, M, mode;
+	uint8_t A, err, mbz;
+	uint16_t s, sequence;
+	uint16_t count, size;
+	unsigned i_lev = 1;		/* indent level */
+
+	ND_TCHECK(rd->magic);
+	s = EXTRACT_16BITS(&rd->magic);
+	R = (s & 0x8000) >> 15;
+	M = (s & 0x4000) >> 14;
+	mode = (rd->magic & MODEMASK) >> MODESHIFT;
+	indent(ndo, i_lev);
+	ND_PRINT((ndo, "R=%u, M=%u, mode==%u (reserved)", R, M, mode));
+
+	ND_TCHECK(rd->sequence);
+	s = EXTRACT_16BITS(&rd->sequence);
+	A = (s & 0x8000) >> 15;
+	sequence = (s & 0x7fff) >> 1;
+	ND_PRINT((ndo, ", A=%u, M=%u, Sequence=%u", A, M, sequence));
+
+	ND_PRINT((ndo, ", Implem.=%u, ReqCode=%u", rd->implem, rd->req_code));
+
+	ND_TCHECK(rd->err_count);
+	s = EXTRACT_16BITS(&rd->err_count);
+	err = (s & 0xf000) >> 12;
+	count = (s & 0x0fff);
+	indent(ndo, i_lev);
+	ND_PRINT((ndo, "Err=%u, Count=%u", err, count));
+
+	ND_TCHECK(rd->mbz_size);
+	s = EXTRACT_16BITS(&rd->mbz_size);
+	mbz = (s & 0xf000) >> 12;
+	size = (s & 0x0fff);
+	ND_PRINT((ndo, ", MBZ=%u, Size=%u", mbz, size));
+
+	ND_PRINT((ndo, ", total length=%u", length));
+	return;
+trunc:
+	ND_PRINT((ndo, " %s", tstr));
+}
+
+/*
  * Print NTP requests, handling the common VN, LI, and Mode
  */
 void
@@ -1163,23 +1243,27 @@ ntp_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "NTP before version 1 or not NTP"));
 		return;
 	}
+	ND_PRINT((ndo, "NTP"));
+
 	if (ndo->ndo_vflag == 0) {
-		ND_PRINT((ndo, "NTP LI=%u, VN=%u, Mode=%u, length=%u",
-			  leapind, version, mode, length));
+		if (mode != MODE_RESERVED)
+			ND_PRINT((ndo, " LI=%u,", leapind));
+		ND_PRINT((ndo, " VN=%u, Mode=%u, length=%u",
+			  version, mode, length));
 		return;
 	}
-	ND_PRINT((ndo, "NTP leap indicator=%u (%s), Version=%u, Mode=%u (%s)",
-		  leapind, tok2str(ntp_leapind_values, "Unknown", leapind),
-		  version,
-		  mode, tok2str(ntp_mode_values, "Unknown mode", mode)));
-	ND_PRINT((ndo, ", length=%u", length));
+	if (mode != MODE_RESERVED)
+		ND_PRINT((ndo, " leap indicator=%u (%s),", leapind,
+			  tok2str(ntp_leapind_values, "Unknown", leapind)));
+	ND_PRINT((ndo, " Version=%u, Mode=%u (%s), length=%u", version,
+		  mode, tok2str(ntp_mode_values, "Unknown mode", mode), length));
 
 	if (mode >= MODE_UNSPEC && mode <= MODE_BROADCAST)
 		ntp_time_print(ndo, &bp->td, length);
 	else if (version > 1 && mode == MODE_CONTROL)
 		ntp_control_print(ndo, &bp->cd, length);
 	else
-		ND_PRINT((ndo, ", mode==%u unexpected!", mode));
+		ntp_reserved_print(ndo, &bp->rd, length);
 	return;
 
 trunc:
