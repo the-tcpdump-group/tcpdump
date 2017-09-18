@@ -1,32 +1,32 @@
 IP (tos 0x0, ttl 64, id 3928, offset 0, flags [DF], proto UDP (17), length 220)
     127.0.0.1.32795 > 127.0.0.1.123: NTP Version=2, Mode=7 (Reserved), length=192
-    R=0, M=0, mode==7 (reserved), A=0, M=0, Sequence=1, Implem.=28, ReqCode=0
+    R=0, M=0, mode=7 (reserved), A=0, M=0, Sequence=1, Implem.=28, ReqCode=0
     Err=0, Count=0, MBZ=0, Size=0, total length=192
 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto UDP (17), length 72)
     127.0.0.1.123 > 127.0.0.1.32795: NTP Version=2, Mode=7 (Reserved), length=44
-    R=1, M=0, mode==7 (reserved), A=0, M=0, Sequence=1, Implem.=28, ReqCode=0
+    R=1, M=0, mode=7 (reserved), A=0, M=0, Sequence=1, Implem.=28, ReqCode=0
     Err=0, Count=256, MBZ=2, Size=1024, total length=44
 IP (tos 0x0, ttl 64, id 3929, offset 0, flags [DF], proto UDP (17), length 220)
     127.0.0.1.32795 > 127.0.0.1.123: NTP Version=2, Mode=7 (Reserved), length=192
-    R=0, M=0, mode==7 (reserved), A=0, M=0, Sequence=1, Implem.=8, ReqCode=0
+    R=0, M=0, mode=7 (reserved), A=0, M=0, Sequence=1, Implem.=8, ReqCode=0
     Err=0, Count=0, MBZ=0, Size=0, total length=192
 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto UDP (17), length 60)
     127.0.0.1.123 > 127.0.0.1.32795: NTP Version=2, Mode=7 (Reserved), length=32
-    R=1, M=0, mode==7 (reserved), A=0, M=0, Sequence=1, Implem.=8, ReqCode=0
+    R=1, M=0, mode=7 (reserved), A=0, M=0, Sequence=1, Implem.=8, ReqCode=0
     Err=0, Count=256, MBZ=1, Size=2048, total length=32
 IP (tos 0x0, ttl 64, id 3930, offset 0, flags [DF], proto UDP (17), length 220)
     127.0.0.1.32795 > 127.0.0.1.123: NTP Version=2, Mode=7 (Reserved), length=192
-    R=0, M=0, mode==7 (reserved), A=0, M=0, Sequence=1, Implem.=38, ReqCode=0
+    R=0, M=0, mode=7 (reserved), A=0, M=0, Sequence=1, Implem.=38, ReqCode=0
     Err=0, Count=0, MBZ=0, Size=0, total length=192
 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto UDP (17), length 96)
     127.0.0.1.123 > 127.0.0.1.32795: NTP Version=2, Mode=7 (Reserved), length=68
-    R=1, M=0, mode==7 (reserved), A=0, M=0, Sequence=1, Implem.=38, ReqCode=0
+    R=1, M=0, mode=7 (reserved), A=0, M=0, Sequence=1, Implem.=38, ReqCode=0
     Err=0, Count=256, MBZ=3, Size=3072, total length=68
 IP (tos 0x0, ttl 64, id 3931, offset 0, flags [DF], proto UDP (17), length 220)
     127.0.0.1.32795 > 127.0.0.1.123: NTP Version=2, Mode=7 (Reserved), length=192
-    R=0, M=0, mode==7 (reserved), A=0, M=0, Sequence=1, Implem.=1, ReqCode=0
+    R=0, M=0, mode=7 (reserved), A=0, M=0, Sequence=1, Implem.=1, ReqCode=0
     Err=0, Count=0, MBZ=0, Size=0, total length=192
 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto UDP (17), length 468)
     127.0.0.1.123 > 127.0.0.1.32795: NTP Version=2, Mode=7 (Reserved), length=440
-    R=1, M=0, mode==7 (reserved), A=0, M=0, Sequence=1, Implem.=1, ReqCode=0
+    R=1, M=0, mode=7 (reserved), A=0, M=0, Sequence=1, Implem.=1, ReqCode=0
     Err=0, Count=1536, MBZ=4, Size=2175, total length=440
