@@ -104,6 +104,7 @@ static const struct tok lspping_return_code_values[] = {
     { 11, "No label entry at stack-depth"},
     { 12, "Protocol not associated with interface at FEC stack depth"},
     { 13, "Premature termination of ping due to label stack shrinking to a single label"},
+    { 0,  NULL},
 };
 
 
@@ -522,7 +523,7 @@ lspping_print(netdissect_options *ndo,
 
     tptr=pptr;
     lspping_com_header = (const struct lspping_common_header *)pptr;
-    if (len < sizeof(const struct lspping_common_header))
+    if (len < sizeof(struct lspping_common_header))
         goto tooshort;
     ND_TCHECK(*lspping_com_header);
 
@@ -595,8 +596,8 @@ lspping_print(netdissect_options *ndo,
     else
         ND_PRINT((ndo, "no timestamp"));
 
-    tptr+=sizeof(const struct lspping_common_header);
-    tlen-=sizeof(const struct lspping_common_header);
+    tptr+=sizeof(struct lspping_common_header);
+    tlen-=sizeof(struct lspping_common_header);
 
     while (tlen != 0) {
         /* Does the TLV go past the end of the packet? */

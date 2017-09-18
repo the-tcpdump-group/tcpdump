@@ -20,6 +20,13 @@
  */
 
 /*
+ * For 8-bit values; provided for the sake of completeness.  Byte order
+ * isn't relevant, and alignment isn't an issue.
+ */
+#define EXTRACT_8BITS(p)	(*(p))
+#define EXTRACT_LE_8BITS(p)	(*(p))
+
+/*
  * Inline functions or macros to extract possibly-unaligned big-endian
  * integral values.
  */
@@ -226,7 +233,6 @@ EXTRACT_64BITS(const void *p)
  * Macros to extract possibly-unaligned little-endian integral values.
  * XXX - do loads on little-endian machines that support unaligned loads?
  */
-#define EXTRACT_LE_8BITS(p) (*(p))
 #define EXTRACT_LE_16BITS(p) \
 	((uint16_t)(((uint16_t)(*((const uint8_t *)(p) + 1)) << 8) | \
 	            ((uint16_t)(*((const uint8_t *)(p) + 0)) << 0)))
@@ -275,3 +281,6 @@ EXTRACT_64BITS(const void *p)
 
 #define ND_TTEST_64BITS(p) ND_TTEST2(*(p), 8)
 #define ND_TCHECK_64BITS(p) ND_TCHECK2(*(p), 8)
+
+#define ND_TTEST_128BITS(p) ND_TTEST2(*(p), 16)
+#define ND_TCHECK_128BITS(p) ND_TCHECK2(*(p), 16)

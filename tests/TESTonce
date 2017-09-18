@@ -40,7 +40,7 @@ if($r == 0) {
   unlink "DIFF/$output.diff";
   exit 0;
 }
-printf "    %-35s: TEST FAILED", $name;
+printf "    %-35s: TEST FAILED(%s)", $name, $r == -1 ? $! : "exit $?";
 open FOUT, '>>failure-outputs.txt';
 printf FOUT "Failed test: $name\n\n";
 close FOUT;

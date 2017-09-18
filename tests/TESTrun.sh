@@ -2,8 +2,6 @@
 
 mkdir -p NEW
 mkdir -p DIFF
-passed=0
-failed=0
 cat /dev/null > failure-outputs.txt
 
 runComplexTests()
@@ -13,12 +11,12 @@ runComplexTests()
     case $i in TEST*.sh) continue;; esac
     sh ./$i
   done
+  passed=`cat .passed`
+  failed=`cat .failed`
 }
 
 runSimpleTests()
 {
-  passed=`cat .passed`
-  failed=`cat .failed`
   only=$1
   cat TESTLIST | while read name input output options
   do
@@ -43,6 +41,8 @@ runSimpleTests()
   failed=`cat .failed`
 }
 
+passed=0
+failed=0
 echo $passed >.passed
 echo $failed >.failed
 if [ $# -eq 0 ]

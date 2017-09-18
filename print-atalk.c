@@ -280,7 +280,6 @@ static void
 atp_print(netdissect_options *ndo,
           register const struct atATP *ap, u_int length)
 {
-	char c;
 	uint32_t data;
 
 	if ((const u_char *)(ap + 1) > ndo->ndo_snapend) {
@@ -346,7 +345,7 @@ atp_print(netdissect_options *ndo,
 
 		/* there shouldn't be any control flags */
 		if (ap->control & (atpXO|atpEOM|atpSTS)) {
-			c = '[';
+			char c = '[';
 			if (ap->control & atpXO) {
 				ND_PRINT((ndo, "%cXO", c));
 				c = ',';
@@ -357,7 +356,6 @@ atp_print(netdissect_options *ndo,
 			}
 			if (ap->control & atpSTS) {
 				ND_PRINT((ndo, "%cSTS", c));
-				c = ',';
 			}
 			ND_PRINT((ndo, "]"));
 		}
@@ -377,7 +375,6 @@ static void
 atp_bitmap_print(netdissect_options *ndo,
                  register u_char bm)
 {
-	register char c;
 	register int i;
 
 	/*
@@ -386,7 +383,7 @@ atp_bitmap_print(netdissect_options *ndo,
 	 * (gcc is smart enough to eliminate it, at least on the Sparc).
 	 */
 	if ((bm + 1) & (bm & 0xff)) {
-		c = '<';
+		register char c = '<';
 		for (i = 0; bm; ++i) {
 			if (bm & 1) {
 				ND_PRINT((ndo, "%c%d", c, i));

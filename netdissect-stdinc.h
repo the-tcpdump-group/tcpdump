@@ -41,13 +41,119 @@
 
 #include <errno.h>
 
+/*
+ * Get the C99 types, and the PRI[doux]64 format strings, defined.
+ */
+#ifdef HAVE_PCAP_PCAP_INTTYPES_H
+  /*
+   * We have pcap/pcap-inttypes.h; use that, as it'll do all the
+   * work, and won't cause problems if a file includes this file
+   * and later includes a pcap header file that also includes
+   * pcap/pcap-inttypes.h.
+   */
+  #include <pcap/pcap-inttypes.h>
+#else
+  /*
+   * OK, we don't have pcap/pcap-inttypes.h, so we'll have to
+   * do the work ourselves, but at least we don't have to
+   * worry about other headers including it and causing
+   * clashes.
+   */
+  #if defined(_MSC_VER)
+    /*
+     * Compiler is MSVC.
+     */
+    #if _MSC_VER >= 1800
+      /*
+       * VS 2013 or newer; we have <inttypes.h>.
+       */
+      #include <inttypes.h>
+    #else
+      /*
+       * Earlier VS; we have to define this stuff ourselves.
+       */
+      typedef unsigned char uint8_t;
+      typedef signed char int8_t;
+      typedef unsigned short uint16_t;
+      typedef signed short int16_t;
+      typedef unsigned int uint32_t;
+      typedef signed int int32_t;
+      #ifdef _MSC_EXTENSIONS
+        typedef unsigned _int64 uint64_t;
+        typedef _int64 int64_t;
+      #else /* _MSC_EXTENSIONS */
+        typedef unsigned long long uint64_t;
+        typedef long long int64_t;
+      #endif
+    #endif
+
+    /*
+     * Suppress definition of intN_t in bittypes.h, which might be included
+     * by <pcap/pcap.h> in older versions of WinPcap.
+     * (Yes, HAVE_U_INTn_T, as the definition guards are UN*X-oriented, and
+     * we check for u_intN_t in the UN*X configure script.)
+     */
+    #define HAVE_U_INT8_T
+    #define HAVE_U_INT16_T
+    #define HAVE_U_INT32_T
+    #define HAVE_U_INT64_T
+
+    /*
+     * These may be defined by <inttypes.h>.  If not, define them
+     * ourselves.
+     *
+     * XXX - for MSVC, we always want the _MSC_EXTENSIONS versions.
+     * What about other compilers?  If, as the MinGW Web site says MinGW
+     * does, the other compilers just use Microsoft's run-time library,
+     * then they should probably use the _MSC_EXTENSIONS even if the
+     * compiler doesn't define _MSC_EXTENSIONS.
+     */
+    #ifndef PRId64
+      #ifdef _MSC_EXTENSIONS
+        #define PRId64	"I64d"
+      #else
+        #define PRId64	"lld"
+      #endif
+    #endif /* PRId64 */
+
+    #ifndef PRIo64
+      #ifdef _MSC_EXTENSIONS
+        #define PRIo64	"I64o"
+      #else
+        #define PRIo64	"llo"
+      #endif
+    #endif /* PRIo64 */
+
+    #ifndef PRIx64
+      #ifdef _MSC_EXTENSIONS
+        #define PRIx64	"I64x"
+      #else
+        #define PRIx64	"llx"
+      #endif
+    #endif
+
+    #ifndef PRIu64
+      #ifdef _MSC_EXTENSIONS
+        #define PRIu64	"I64u"
+      #else
+        #define PRIu64	"llu"
+      #endif
+    #endif
+  #elif defined(__MINGW32__) || !defined(_WIN32)
+    /*
+     * Compiler is MinGW or target is UN*X or MS-DOS.  Just use
+     * <inttypes.h>.
+     */
+    #include <inttypes.h>
+  #endif
+#endif /* HAVE_PCAP_PCAP_INTTYPES_H */
+
 #ifdef _WIN32
 
 /*
  * Includes and definitions for Windows.
  */
 
-#include <stdint.h>
 #include <stdio.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -56,95 +162,6 @@
 #include <io.h>
 #include <fcntl.h>
 #include <sys/types.h>
-
-#ifndef uint8_t
-#define uint8_t		unsigned char
-#endif
-
-#ifndef int8_t
-#define int8_t		signed char
-#endif
-
-#ifndef uint16_t
-#define uint16_t	unsigned short
-#endif
-
-#ifndef int16_t
-#define int16_t		signed short
-#endif
-
-#ifndef uint32_t
-#define uint32_t	unsigned int
-#endif
-
-#ifndef int32_t
-#define int32_t		signed int
-#endif
-
-#ifdef _MSC_EXTENSIONS
-
-#ifndef uint64_t
-#define uint64_t	unsigned _int64
-#endif
-
-#ifndef int64_t
-#define int64_t		_int64
-#endif
-
-#ifndef PRId64
-#define PRId64		"I64d"
-#endif
-
-#ifndef PRIo64
-#define PRIo64		"I64o"
-#endif
-
-#ifndef PRIu64
-#define PRIu64		"I64u"
-#endif
-
-#ifndef PRIx64
-#define PRIx64		"I64x"
-#endif
-
-#else /* _MSC_EXTENSIONS */
-
-#ifndef uint64_t
-#define uint64_t	unsigned long long
-#endif
-
-#ifndef int64_t
-#define int64_t		long long
-#endif
-
-#ifndef PRId64
-#define PRId64		"lld"
-#endif
-
-#ifndef PRIo64
-#define PRIo64		"llo"
-#endif
-
-#ifndef PRIu64
-#define PRIu64		"llu"
-#endif
-
-#ifndef PRIx64
-#define PRIx64		"llx"
-#endif
-
-#endif /* _MSC_EXTENSIONS */
-
-/*
- * Suppress definition of intN_t in bittypes.h, as included by <pcap/pcap.h>
- * on Windows.
- * (Yes, HAVE_U_INTn_T, as the definition guards are UN*X-oriented, and
- * we check for u_intN_t in the UN*X configure script.)
- */
-#define HAVE_U_INT8_T
-#define HAVE_U_INT16_T
-#define HAVE_U_INT32_T
-#define HAVE_U_INT64_T
 
 #ifdef _MSC_VER
 #define stat _stat
@@ -194,11 +211,6 @@ typedef char* caddr_t;
 #include <ctype.h>
 #include <unistd.h>
 #include <netdb.h>
-#if HAVE_INTTYPES_H
-#include <inttypes.h>
-#elif HAVE_STDINT_H
-#include <stdint.h>
-#endif
 #include <sys/param.h>
 #include <sys/types.h>			/* concession to AIX */
 #include <sys/time.h>

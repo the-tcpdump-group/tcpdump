@@ -139,7 +139,7 @@ static const struct tok rsvp_header_flag_values[] = {
 #define	RSVP_OBJ_LABEL_SET          36  /* rfc3473 */
 #define	RSVP_OBJ_PROTECTION         37  /* rfc3473 */
 #define RSVP_OBJ_S2L                50  /* rfc4875 */
-#define	RSVP_OBJ_DETOUR             63  /* draft-ietf-mpls-rsvp-lsp-fastreroute-07 */
+#define	RSVP_OBJ_DETOUR             63  /* rfc4090 */
 #define	RSVP_OBJ_CLASSTYPE          66  /* rfc4124 */
 #define RSVP_OBJ_CLASSTYPE_OLD      125 /* draft-ietf-tewg-diff-te-proto-07 */
 #define	RSVP_OBJ_SUGGESTED_LABEL    129 /* rfc3473 */
@@ -148,7 +148,7 @@ static const struct tok rsvp_header_flag_values[] = {
 #define	RSVP_OBJ_NOTIFY_REQ         195 /* rfc3473 */
 #define	RSVP_OBJ_ADMIN_STATUS       196 /* rfc3473 */
 #define	RSVP_OBJ_PROPERTIES         204 /* juniper proprietary */
-#define	RSVP_OBJ_FASTREROUTE        205 /* draft-ietf-mpls-rsvp-lsp-fastreroute-07 */
+#define	RSVP_OBJ_FASTREROUTE        205 /* rfc4090 */
 #define	RSVP_OBJ_SESSION_ATTRIBUTE  207 /* rfc3209 */
 #define RSVP_OBJ_GENERALIZED_UNI    229 /* OIF RSVP extensions UNI 1.0 Signaling, Rel. 2 */
 #define RSVP_OBJ_CALL_ID            230 /* rfc3474 */
@@ -339,7 +339,7 @@ static const struct tok rsvp_obj_xro_values[] = {
     { 0, NULL}
 };
 
-/* draft-ietf-mpls-rsvp-lsp-fastreroute-07.txt */
+/* RFC4090 */
 static const struct tok rsvp_obj_rro_flag_values[] = {
     { 0x01,	              "Local protection available" },
     { 0x02,                   "Local protection in use" },
@@ -659,7 +659,7 @@ rsvp_clear_checksum(void *header)
 static int
 rsvp_obj_print(netdissect_options *ndo,
                const u_char *pptr, u_int plen, const u_char *tptr,
-               const char *ident, u_int tlen,
+               const char *indent, u_int tlen,
                const struct rsvp_common_header *rsvp_com_header)
 {
     const struct rsvp_object_header *rsvp_obj_header;
@@ -688,17 +688,17 @@ rsvp_obj_print(netdissect_options *ndo,
         rsvp_obj_ctype=rsvp_obj_header->ctype;
 
         if(rsvp_obj_len % 4) {
-            ND_PRINT((ndo, "%sERROR: object header size %u not a multiple of 4", ident, rsvp_obj_len));
+            ND_PRINT((ndo, "%sERROR: object header size %u not a multiple of 4", indent, rsvp_obj_len));
             return -1;
         }
         if(rsvp_obj_len < sizeof(struct rsvp_object_header)) {
-            ND_PRINT((ndo, "%sERROR: object header too short %u < %lu", ident, rsvp_obj_len,
-                   (unsigned long)sizeof(const struct rsvp_object_header)));
+            ND_PRINT((ndo, "%sERROR: object header too short %u < %lu", indent, rsvp_obj_len,
+                   (unsigned long)sizeof(struct rsvp_object_header)));
             return -1;
         }
 
         ND_PRINT((ndo, "%s%s Object (%u) Flags: [%s",
-               ident,
+               indent,
                tok2str(rsvp_obj_values,
                        "Unknown",
                        rsvp_obj_header->class_num),
@@ -717,7 +717,7 @@ rsvp_obj_print(netdissect_options *ndo,
                rsvp_obj_len));
 
         if(tlen < rsvp_obj_len) {
-            ND_PRINT((ndo, "%sERROR: object goes past end of objects TLV", ident));
+            ND_PRINT((ndo, "%sERROR: object goes past end of objects TLV", indent));
             return -1;
         }
 
@@ -736,11 +736,11 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 8)
                     return -1;
                 ND_PRINT((ndo, "%s  IPv4 DestAddress: %s, Protocol ID: 0x%02x",
-                       ident,
+                       indent,
                        ipaddr_string(ndo, obj_tptr),
                        *(obj_tptr + sizeof(struct in_addr))));
                 ND_PRINT((ndo, "%s  Flags: [0x%02x], DestPort %u",
-                       ident,
+                       indent,
                        *(obj_tptr+5),
                        EXTRACT_16BITS(obj_tptr + 6)));
                 obj_tlen-=8;
@@ -750,11 +750,11 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 20)
                     return -1;
                 ND_PRINT((ndo, "%s  IPv6 DestAddress: %s, Protocol ID: 0x%02x",
-                       ident,
+                       indent,
                        ip6addr_string(ndo, obj_tptr),
                        *(obj_tptr + sizeof(struct in6_addr))));
                 ND_PRINT((ndo, "%s  Flags: [0x%02x], DestPort %u",
-                       ident,
+                       indent,
                        *(obj_tptr+sizeof(struct in6_addr)+1),
                        EXTRACT_16BITS(obj_tptr + sizeof(struct in6_addr) + 2)));
                 obj_tlen-=20;
@@ -765,7 +765,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 36)
                     return -1;
                 ND_PRINT((ndo, "%s  IPv6 Tunnel EndPoint: %s, Tunnel ID: 0x%04x, Extended Tunnel ID: %s",
-                       ident,
+                       indent,
                        ip6addr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr+18),
                        ip6addr_string(ndo, obj_tptr + 20)));
@@ -777,7 +777,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 26)
                     return -1;
                 ND_PRINT((ndo, "%s  IPv6 P2MP LSP ID: 0x%08x, Tunnel ID: 0x%04x, Extended Tunnel ID: %s",
-                       ident,
+                       indent,
                        EXTRACT_32BITS(obj_tptr),
                        EXTRACT_16BITS(obj_tptr+6),
                        ip6addr_string(ndo, obj_tptr + 8)));
@@ -788,7 +788,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 12)
                     return -1;
                 ND_PRINT((ndo, "%s  IPv4 P2MP LSP ID: %s, Tunnel ID: 0x%04x, Extended Tunnel ID: %s",
-                       ident,
+                       indent,
                        ipaddr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr+6),
                        ipaddr_string(ndo, obj_tptr + 8)));
@@ -800,7 +800,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 12)
                     return -1;
                 ND_PRINT((ndo, "%s  IPv4 Tunnel EndPoint: %s, Tunnel ID: 0x%04x, Extended Tunnel ID: %s",
-                       ident,
+                       indent,
                        ipaddr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr+6),
                        ipaddr_string(ndo, obj_tptr + 8)));
@@ -818,7 +818,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < sizeof(struct in_addr))
                     return -1;
                 ND_PRINT((ndo, "%s  IPv4 Receiver Address: %s",
-                       ident,
+                       indent,
                        ipaddr_string(ndo, obj_tptr)));
                 obj_tlen-=sizeof(struct in_addr);
                 obj_tptr+=sizeof(struct in_addr);
@@ -827,7 +827,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < sizeof(struct in6_addr))
                     return -1;
                 ND_PRINT((ndo, "%s  IPv6 Receiver Address: %s",
-                       ident,
+                       indent,
                        ip6addr_string(ndo, obj_tptr)));
                 obj_tlen-=sizeof(struct in6_addr);
                 obj_tptr+=sizeof(struct in6_addr);
@@ -843,7 +843,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < sizeof(struct in_addr))
                     return -1;
                 ND_PRINT((ndo, "%s  IPv4 Notify Node Address: %s",
-                       ident,
+                       indent,
                        ipaddr_string(ndo, obj_tptr)));
                 obj_tlen-=sizeof(struct in_addr);
                 obj_tptr+=sizeof(struct in_addr);
@@ -852,7 +852,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < sizeof(struct in6_addr))
                     return-1;
                 ND_PRINT((ndo, "%s  IPv6 Notify Node Address: %s",
-                       ident,
+                       indent,
                        ip6addr_string(ndo, obj_tptr)));
                 obj_tlen-=sizeof(struct in6_addr);
                 obj_tptr+=sizeof(struct in6_addr);
@@ -869,7 +869,7 @@ rsvp_obj_print(netdissect_options *ndo,
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_1:
                 while(obj_tlen >= 4 ) {
-                    ND_PRINT((ndo, "%s  Label: %u", ident, EXTRACT_32BITS(obj_tptr)));
+                    ND_PRINT((ndo, "%s  Label: %u", indent, EXTRACT_32BITS(obj_tptr)));
                     obj_tlen-=4;
                     obj_tptr+=4;
                 }
@@ -878,7 +878,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 4)
                     return-1;
                 ND_PRINT((ndo, "%s  Generalized Label: %u",
-                       ident,
+                       indent,
                        EXTRACT_32BITS(obj_tptr)));
                 obj_tlen-=4;
                 obj_tptr+=4;
@@ -887,9 +887,9 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 12)
                     return-1;
                 ND_PRINT((ndo, "%s  Waveband ID: %u%s  Start Label: %u, Stop Label: %u",
-                       ident,
+                       indent,
                        EXTRACT_32BITS(obj_tptr),
-                       ident,
+                       indent,
                        EXTRACT_32BITS(obj_tptr+4),
                        EXTRACT_32BITS(obj_tptr + 8)));
                 obj_tlen-=12;
@@ -906,7 +906,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 4)
                     return-1;
                 ND_PRINT((ndo, "%s  Reservation Style: %s, Flags: [0x%02x]",
-                       ident,
+                       indent,
                        tok2str(rsvp_resstyle_values,
                                "Unknown",
                                EXTRACT_24BITS(obj_tptr+1)),
@@ -925,7 +925,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 8)
                     return-1;
                 ND_PRINT((ndo, "%s  Source Address: %s, Source Port: %u",
-                       ident,
+                       indent,
                        ipaddr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr + 6)));
                 obj_tlen-=8;
@@ -935,7 +935,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 20)
                     return-1;
                 ND_PRINT((ndo, "%s  Source Address: %s, Source Port: %u",
-                       ident,
+                       indent,
                        ip6addr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr + 18)));
                 obj_tlen-=20;
@@ -946,10 +946,10 @@ rsvp_obj_print(netdissect_options *ndo,
                     return-1;
                 ND_PRINT((ndo, "%s  IPv6 Tunnel Sender Address: %s, LSP ID: 0x%04x"
                        "%s  Sub-Group Originator ID: %s, Sub-Group ID: 0x%04x",
-                       ident,
+                       indent,
                        ip6addr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr+18),
-                       ident,
+                       indent,
                        ip6addr_string(ndo, obj_tptr+20),
                        EXTRACT_16BITS(obj_tptr + 38)));
                 obj_tlen-=40;
@@ -959,7 +959,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 8)
                     return-1;
                 ND_PRINT((ndo, "%s  IPv4 Tunnel Sender Address: %s, LSP-ID: 0x%04x",
-                       ident,
+                       indent,
                        ipaddr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr + 6)));
                 obj_tlen-=8;
@@ -970,10 +970,10 @@ rsvp_obj_print(netdissect_options *ndo,
                     return-1;
                 ND_PRINT((ndo, "%s  IPv4 Tunnel Sender Address: %s, LSP ID: 0x%04x"
                        "%s  Sub-Group Originator ID: %s, Sub-Group ID: 0x%04x",
-                       ident,
+                       indent,
                        ipaddr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr+6),
-                       ident,
+                       indent,
                        ipaddr_string(ndo, obj_tptr+8),
                        EXTRACT_16BITS(obj_tptr + 12)));
                 obj_tlen-=16;
@@ -989,7 +989,7 @@ rsvp_obj_print(netdissect_options *ndo,
             case RSVP_CTYPE_1:
                 while(obj_tlen >= 4 ) {
                     ND_PRINT((ndo, "%s  L3 Protocol ID: %s",
-                           ident,
+                           indent,
                            tok2str(ethertype_values,
                                    "Unknown Protocol (0x%04x)",
                                    EXTRACT_16BITS(obj_tptr + 2))));
@@ -1001,17 +1001,17 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 12)
                     return-1;
                 ND_PRINT((ndo, "%s  L3 Protocol ID: %s",
-                       ident,
+                       indent,
                        tok2str(ethertype_values,
                                "Unknown Protocol (0x%04x)",
                                EXTRACT_16BITS(obj_tptr + 2))));
                 ND_PRINT((ndo, ",%s merge capability",((*(obj_tptr + 4)) & 0x80) ? "no" : "" ));
                 ND_PRINT((ndo, "%s  Minimum VPI/VCI: %u/%u",
-                       ident,
+                       indent,
                        (EXTRACT_16BITS(obj_tptr+4))&0xfff,
                        (EXTRACT_16BITS(obj_tptr + 6)) & 0xfff));
                 ND_PRINT((ndo, "%s  Maximum VPI/VCI: %u/%u",
-                       ident,
+                       indent,
                        (EXTRACT_16BITS(obj_tptr+8))&0xfff,
                        (EXTRACT_16BITS(obj_tptr + 10)) & 0xfff));
                 obj_tlen-=12;
@@ -1021,12 +1021,12 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 12)
                     return-1;
                 ND_PRINT((ndo, "%s  L3 Protocol ID: %s",
-                       ident,
+                       indent,
                        tok2str(ethertype_values,
                                "Unknown Protocol (0x%04x)",
                                EXTRACT_16BITS(obj_tptr + 2))));
                 ND_PRINT((ndo, "%s  Minimum/Maximum DLCI: %u/%u, %s%s bit DLCI",
-                       ident,
+                       indent,
                        (EXTRACT_32BITS(obj_tptr+4))&0x7fffff,
                        (EXTRACT_32BITS(obj_tptr+8))&0x7fffff,
                        (((EXTRACT_16BITS(obj_tptr+4)>>7)&3) == 0 ) ? "10" : "",
@@ -1038,13 +1038,13 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 4)
                     return-1;
                 ND_PRINT((ndo, "%s  LSP Encoding Type: %s (%u)",
-                       ident,
+                       indent,
                        tok2str(gmpls_encoding_values,
                                "Unknown",
                                *obj_tptr),
 		       *obj_tptr));
                 ND_PRINT((ndo, "%s  Switching Type: %s (%u), Payload ID: %s (0x%04x)",
-                       ident,
+                       indent,
                        tok2str(gmpls_switch_cap_values,
                                "Unknown",
                                *(obj_tptr+1)),
@@ -1071,14 +1071,14 @@ rsvp_obj_print(netdissect_options *ndo,
 		    ND_TCHECK2(*obj_tptr, 4);
 		    length = *(obj_tptr + 1);
                     ND_PRINT((ndo, "%s  Subobject Type: %s, length %u",
-                           ident,
+                           indent,
                            tok2str(rsvp_obj_xro_values,
                                    "Unknown %u",
                                    RSVP_OBJ_XRO_MASK_SUBOBJ(*obj_tptr)),
                            length));
 
                     if (length == 0) { /* prevent infinite loops */
-                        ND_PRINT((ndo, "%s  ERROR: zero length ERO subtype", ident));
+                        ND_PRINT((ndo, "%s  ERROR: zero length ERO subtype", indent));
                         break;
                     }
 
@@ -1138,7 +1138,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 8)
                     return-1;
                 ND_PRINT((ndo, "%s  Source Instance: 0x%08x, Destination Instance: 0x%08x",
-                       ident,
+                       indent,
                        EXTRACT_32BITS(obj_tptr),
                        EXTRACT_32BITS(obj_tptr + 4)));
                 obj_tlen-=8;
@@ -1155,7 +1155,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 8)
                     return-1;
                 ND_PRINT((ndo, "%s  Restart  Time: %ums, Recovery Time: %ums",
-                       ident,
+                       indent,
                        EXTRACT_32BITS(obj_tptr),
                        EXTRACT_32BITS(obj_tptr + 4)));
                 obj_tlen-=8;
@@ -1174,11 +1174,11 @@ rsvp_obj_print(netdissect_options *ndo,
                 namelen = *(obj_tptr+3);
                 if (obj_tlen < 4+namelen)
                     return-1;
-                ND_PRINT((ndo, "%s  Session Name: ", ident));
+                ND_PRINT((ndo, "%s  Session Name: ", indent));
                 for (i = 0; i < namelen; i++)
                     safeputchar(ndo, *(obj_tptr + 4 + i));
                 ND_PRINT((ndo, "%s  Setup Priority: %u, Holding Priority: %u, Flags: [%s] (%#x)",
-                       ident,
+                       indent,
                        (int)*obj_tptr,
                        (int)*(obj_tptr+1),
                        bittok2str(rsvp_session_attribute_flag_values,
@@ -1205,18 +1205,35 @@ rsvp_obj_print(netdissect_options *ndo,
 		/* read variable length subobjects */
 		total_subobj_len = obj_tlen;
                 while(total_subobj_len > 0) {
+                    /* If RFC 3476 Section 3.1 defined that a sub-object of the
+                     * GENERALIZED_UNI RSVP object must have the Length field as
+                     * a multiple of 4, instead of the check below it would be
+                     * better to test total_subobj_len only once before the loop.
+                     * So long as it does not define it and this while loop does
+                     * not implement such a requirement, let's accept that within
+                     * each iteration subobj_len may happen to be a multiple of 1
+                     * and test it and total_subobj_len respectively.
+                     */
+                    if (total_subobj_len < 4)
+                        goto invalid;
                     subobj_len  = EXTRACT_16BITS(obj_tptr);
                     subobj_type = (EXTRACT_16BITS(obj_tptr+2))>>8;
                     af = (EXTRACT_16BITS(obj_tptr+2))&0x00FF;
 
                     ND_PRINT((ndo, "%s  Subobject Type: %s (%u), AF: %s (%u), length: %u",
-                           ident,
+                           indent,
                            tok2str(rsvp_obj_generalized_uni_values, "Unknown", subobj_type),
                            subobj_type,
                            tok2str(af_values, "Unknown", af), af,
                            subobj_len));
 
-                    if(subobj_len == 0)
+                    /* In addition to what is explained above, the same spec does not
+                     * explicitly say that the same Length field includes the 4-octet
+                     * sub-object header, but as long as this while loop implements it
+                     * as it does include, let's keep the check below consistent with
+                     * the rest of the code.
+                     */
+                    if(subobj_len < 4 || subobj_len > total_subobj_len)
                         goto invalid;
 
                     switch(subobj_type) {
@@ -1228,13 +1245,13 @@ rsvp_obj_print(netdissect_options *ndo,
                             if (subobj_len < 8)
                                 return -1;
                             ND_PRINT((ndo, "%s    UNI IPv4 TNA address: %s",
-                                   ident, ipaddr_string(ndo, obj_tptr + 4)));
+                                   indent, ipaddr_string(ndo, obj_tptr + 4)));
                             break;
                         case AFNUM_INET6:
                             if (subobj_len < 20)
                                 return -1;
                             ND_PRINT((ndo, "%s    UNI IPv6 TNA address: %s",
-                                   ident, ip6addr_string(ndo, obj_tptr + 4)));
+                                   indent, ip6addr_string(ndo, obj_tptr + 4)));
                             break;
                         case AFNUM_NSAP:
                             if (subobj_len) {
@@ -1258,7 +1275,7 @@ rsvp_obj_print(netdissect_options *ndo,
                         }
 
                         ND_PRINT((ndo, "%s    U-bit: %x, Label type: %u, Logical port id: %u, Label: %u",
-                               ident,
+                               indent,
                                ((EXTRACT_32BITS(obj_tptr+4))>>31),
                                ((EXTRACT_32BITS(obj_tptr+4))&0xFF),
                                EXTRACT_32BITS(obj_tptr+8),
@@ -1271,7 +1288,7 @@ rsvp_obj_print(netdissect_options *ndo,
                         }
 
                         ND_PRINT((ndo, "%s    Service level: %u",
-                               ident, (EXTRACT_32BITS(obj_tptr + 4)) >> 24));
+                               indent, (EXTRACT_32BITS(obj_tptr + 4)) >> 24));
                         break;
 
                     default:
@@ -1301,7 +1318,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 8)
                     return-1;
                 ND_PRINT((ndo, "%s  Previous/Next Interface: %s, Logical Interface Handle: 0x%08x",
-                       ident,
+                       indent,
                        ipaddr_string(ndo, obj_tptr),
                        EXTRACT_32BITS(obj_tptr + 4)));
                 obj_tlen-=8;
@@ -1314,7 +1331,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 20)
                     return-1;
                 ND_PRINT((ndo, "%s  Previous/Next Interface: %s, Logical Interface Handle: 0x%08x",
-                       ident,
+                       indent,
                        ip6addr_string(ndo, obj_tptr),
                        EXTRACT_32BITS(obj_tptr + 16)));
                 obj_tlen-=20;
@@ -1332,7 +1349,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 4)
                     return-1;
                 ND_PRINT((ndo, "%s  Refresh Period: %ums",
-                       ident,
+                       indent,
                        EXTRACT_32BITS(obj_tptr)));
                 obj_tlen-=4;
                 obj_tptr+=4;
@@ -1351,7 +1368,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 4)
                     return-1;
                 ND_PRINT((ndo, "%s  Msg-Version: %u, length: %u",
-                       ident,
+                       indent,
                        (*obj_tptr & 0xf0) >> 4,
                        EXTRACT_16BITS(obj_tptr + 2) << 2));
                 obj_tptr+=4; /* get to the start of the service header */
@@ -1360,7 +1377,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 while (obj_tlen >= 4) {
                     intserv_serv_tlen=EXTRACT_16BITS(obj_tptr+2)<<2;
                     ND_PRINT((ndo, "%s  Service Type: %s (%u), break bit %s set, Service length: %u",
-                           ident,
+                           indent,
                            tok2str(rsvp_intserv_service_type_values,"unknown",*(obj_tptr)),
                            *(obj_tptr),
                            (*(obj_tptr+1)&0x80) ? "" : "not",
@@ -1390,7 +1407,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 8)
                     return-1;
                 ND_PRINT((ndo, "%s  Source Address: %s, Source Port: %u",
-                       ident,
+                       indent,
                        ipaddr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr + 6)));
                 obj_tlen-=8;
@@ -1400,7 +1417,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 20)
                     return-1;
                 ND_PRINT((ndo, "%s  Source Address: %s, Source Port: %u",
-                       ident,
+                       indent,
                        ip6addr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr + 18)));
                 obj_tlen-=20;
@@ -1410,7 +1427,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 20)
                     return-1;
                 ND_PRINT((ndo, "%s  Source Address: %s, Flow Label: %u",
-                       ident,
+                       indent,
                        ip6addr_string(ndo, obj_tptr),
                        EXTRACT_24BITS(obj_tptr + 17)));
                 obj_tlen-=20;
@@ -1420,7 +1437,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 20)
                     return-1;
                 ND_PRINT((ndo, "%s  Source Address: %s, LSP-ID: 0x%04x",
-                       ident,
+                       indent,
                        ipaddr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr + 18)));
                 obj_tlen-=20;
@@ -1431,10 +1448,10 @@ rsvp_obj_print(netdissect_options *ndo,
                     return-1;
                 ND_PRINT((ndo, "%s  IPv6 Tunnel Sender Address: %s, LSP ID: 0x%04x"
                        "%s  Sub-Group Originator ID: %s, Sub-Group ID: 0x%04x",
-                       ident,
+                       indent,
                        ip6addr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr+18),
-                       ident,
+                       indent,
                        ip6addr_string(ndo, obj_tptr+20),
                        EXTRACT_16BITS(obj_tptr + 38)));
                 obj_tlen-=40;
@@ -1444,7 +1461,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 8)
                     return-1;
                 ND_PRINT((ndo, "%s  Source Address: %s, LSP-ID: 0x%04x",
-                       ident,
+                       indent,
                        ipaddr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr + 6)));
                 obj_tlen-=8;
@@ -1455,10 +1472,10 @@ rsvp_obj_print(netdissect_options *ndo,
                     return-1;
                 ND_PRINT((ndo, "%s  IPv4 Tunnel Sender Address: %s, LSP ID: 0x%04x"
                        "%s  Sub-Group Originator ID: %s, Sub-Group ID: 0x%04x",
-                       ident,
+                       indent,
                        ipaddr_string(ndo, obj_tptr),
                        EXTRACT_16BITS(obj_tptr+6),
-                       ident,
+                       indent,
                        ipaddr_string(ndo, obj_tptr+8),
                        EXTRACT_16BITS(obj_tptr + 12)));
                 obj_tlen-=16;
@@ -1472,20 +1489,20 @@ rsvp_obj_print(netdissect_options *ndo,
         case RSVP_OBJ_FASTREROUTE:
             /* the differences between c-type 1 and 7 are minor */
             obj_ptr.rsvp_obj_frr = (const struct rsvp_obj_frr_t *)obj_tptr;
-            bw.i = EXTRACT_32BITS(obj_ptr.rsvp_obj_frr->bandwidth);
 
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_1: /* new style */
                 if (obj_tlen < sizeof(struct rsvp_obj_frr_t))
                     return-1;
+                bw.i = EXTRACT_32BITS(obj_ptr.rsvp_obj_frr->bandwidth);
                 ND_PRINT((ndo, "%s  Setup Priority: %u, Holding Priority: %u, Hop-limit: %u, Bandwidth: %.10g Mbps",
-                       ident,
+                       indent,
                        (int)obj_ptr.rsvp_obj_frr->setup_prio,
                        (int)obj_ptr.rsvp_obj_frr->hold_prio,
                        (int)obj_ptr.rsvp_obj_frr->hop_limit,
                         bw.f * 8 / 1000000));
                 ND_PRINT((ndo, "%s  Include-any: 0x%08x, Exclude-any: 0x%08x, Include-all: 0x%08x",
-                       ident,
+                       indent,
                        EXTRACT_32BITS(obj_ptr.rsvp_obj_frr->include_any),
                        EXTRACT_32BITS(obj_ptr.rsvp_obj_frr->exclude_any),
                        EXTRACT_32BITS(obj_ptr.rsvp_obj_frr->include_all)));
@@ -1496,14 +1513,15 @@ rsvp_obj_print(netdissect_options *ndo,
             case RSVP_CTYPE_TUNNEL_IPV4: /* old style */
                 if (obj_tlen < 16)
                     return-1;
+                bw.i = EXTRACT_32BITS(obj_ptr.rsvp_obj_frr->bandwidth);
                 ND_PRINT((ndo, "%s  Setup Priority: %u, Holding Priority: %u, Hop-limit: %u, Bandwidth: %.10g Mbps",
-                       ident,
+                       indent,
                        (int)obj_ptr.rsvp_obj_frr->setup_prio,
                        (int)obj_ptr.rsvp_obj_frr->hold_prio,
                        (int)obj_ptr.rsvp_obj_frr->hop_limit,
                         bw.f * 8 / 1000000));
                 ND_PRINT((ndo, "%s  Include Colors: 0x%08x, Exclude Colors: 0x%08x",
-                       ident,
+                       indent,
                        EXTRACT_32BITS(obj_ptr.rsvp_obj_frr->include_any),
                        EXTRACT_32BITS(obj_ptr.rsvp_obj_frr->exclude_any)));
                 obj_tlen-=16;
@@ -1520,7 +1538,7 @@ rsvp_obj_print(netdissect_options *ndo,
             case RSVP_CTYPE_TUNNEL_IPV4:
                 while(obj_tlen >= 8) {
                     ND_PRINT((ndo, "%s  PLR-ID: %s, Avoid-Node-ID: %s",
-                           ident,
+                           indent,
                            ipaddr_string(ndo, obj_tptr),
                            ipaddr_string(ndo, obj_tptr + 4)));
                     obj_tlen-=8;
@@ -1537,7 +1555,7 @@ rsvp_obj_print(netdissect_options *ndo,
             switch(rsvp_obj_ctype) {
             case RSVP_CTYPE_1:
                 ND_PRINT((ndo, "%s  CT: %u",
-                       ident,
+                       indent,
                        EXTRACT_32BITS(obj_tptr) & 0x7));
                 obj_tlen-=4;
                 obj_tptr+=4;
@@ -1556,10 +1574,10 @@ rsvp_obj_print(netdissect_options *ndo,
                 error_code=*(obj_tptr+5);
                 error_value=EXTRACT_16BITS(obj_tptr+6);
                 ND_PRINT((ndo, "%s  Error Node Address: %s, Flags: [0x%02x]%s  Error Code: %s (%u)",
-                       ident,
+                       indent,
                        ipaddr_string(ndo, obj_tptr),
                        *(obj_tptr+4),
-                       ident,
+                       indent,
                        tok2str(rsvp_obj_error_code_values,"unknown",error_code),
                        error_code));
                 switch (error_code) {
@@ -1588,10 +1606,10 @@ rsvp_obj_print(netdissect_options *ndo,
                 error_code=*(obj_tptr+17);
                 error_value=EXTRACT_16BITS(obj_tptr+18);
                 ND_PRINT((ndo, "%s  Error Node Address: %s, Flags: [0x%02x]%s  Error Code: %s (%u)",
-                       ident,
+                       indent,
                        ip6addr_string(ndo, obj_tptr),
                        *(obj_tptr+16),
-                       ident,
+                       indent,
                        tok2str(rsvp_obj_error_code_values,"unknown",error_code),
                        error_code));
 
@@ -1619,7 +1637,7 @@ rsvp_obj_print(netdissect_options *ndo,
                     return-1;
                 padbytes = EXTRACT_16BITS(obj_tptr+2);
                 ND_PRINT((ndo, "%s  TLV count: %u, padding bytes: %u",
-                       ident,
+                       indent,
                        EXTRACT_16BITS(obj_tptr),
                        padbytes));
                 obj_tlen-=4;
@@ -1627,7 +1645,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 /* loop through as long there is anything longer than the TLV header (2) */
                 while(obj_tlen >= 2 + padbytes) {
                     ND_PRINT((ndo, "%s    %s TLV (0x%02x), length: %u", /* length includes header */
-                           ident,
+                           indent,
                            tok2str(rsvp_obj_prop_tlv_values,"unknown",*obj_tptr),
                            *obj_tptr,
                            *(obj_tptr + 1)));
@@ -1654,7 +1672,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 8)
                     return-1;
                 ND_PRINT((ndo, "%s  Flags [0x%02x], epoch: %u",
-                       ident,
+                       indent,
                        *obj_tptr,
                        EXTRACT_24BITS(obj_tptr + 1)));
                 obj_tlen-=4;
@@ -1662,7 +1680,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 /* loop through as long there are no messages left */
                 while(obj_tlen >= 4) {
                     ND_PRINT((ndo, "%s    Message-ID 0x%08x (%u)",
-                           ident,
+                           indent,
                            EXTRACT_32BITS(obj_tptr),
                            EXTRACT_32BITS(obj_tptr)));
                     obj_tlen-=4;
@@ -1681,7 +1699,7 @@ rsvp_obj_print(netdissect_options *ndo,
                     return-1;
                 obj_ptr.rsvp_obj_integrity = (const struct rsvp_obj_integrity_t *)obj_tptr;
                 ND_PRINT((ndo, "%s  Key-ID 0x%04x%08x, Sequence 0x%08x%08x, Flags [%s]",
-                       ident,
+                       indent,
                        EXTRACT_16BITS(obj_ptr.rsvp_obj_integrity->key_id),
                        EXTRACT_32BITS(obj_ptr.rsvp_obj_integrity->key_id+2),
                        EXTRACT_32BITS(obj_ptr.rsvp_obj_integrity->sequence),
@@ -1690,7 +1708,7 @@ rsvp_obj_print(netdissect_options *ndo,
                                   "none",
                                   obj_ptr.rsvp_obj_integrity->flags)));
                 ND_PRINT((ndo, "%s  MD5-sum 0x%08x%08x%08x%08x ",
-                       ident,
+                       indent,
                        EXTRACT_32BITS(obj_ptr.rsvp_obj_integrity->digest),
                        EXTRACT_32BITS(obj_ptr.rsvp_obj_integrity->digest+4),
                        EXTRACT_32BITS(obj_ptr.rsvp_obj_integrity->digest+8),
@@ -1715,7 +1733,7 @@ rsvp_obj_print(netdissect_options *ndo,
             case RSVP_CTYPE_1:
                 if (obj_tlen < 4)
                     return-1;
-                ND_PRINT((ndo, "%s  Flags [%s]", ident,
+                ND_PRINT((ndo, "%s  Flags [%s]", indent,
                        bittok2str(rsvp_obj_admin_status_flag_values, "none",
                                   EXTRACT_32BITS(obj_tptr))));
                 obj_tlen-=4;
@@ -1733,7 +1751,7 @@ rsvp_obj_print(netdissect_options *ndo,
                     return-1;
                 action = (EXTRACT_16BITS(obj_tptr)>>8);
 
-                ND_PRINT((ndo, "%s  Action: %s (%u), Label type: %u", ident,
+                ND_PRINT((ndo, "%s  Action: %s (%u), Label type: %u", indent,
                        tok2str(rsvp_obj_label_set_action_values, "Unknown", action),
                        action, ((EXTRACT_32BITS(obj_tptr) & 0x7F))));
 
@@ -1744,7 +1762,7 @@ rsvp_obj_print(netdissect_options *ndo,
 		    /* only a couple of subchannels are expected */
 		    if (obj_tlen < 12)
 			return -1;
-		    ND_PRINT((ndo, "%s  Start range: %u, End range: %u", ident,
+		    ND_PRINT((ndo, "%s  Start range: %u, End range: %u", indent,
                            EXTRACT_32BITS(obj_tptr+4),
                            EXTRACT_32BITS(obj_tptr + 8)));
 		    obj_tlen-=12;
@@ -1756,7 +1774,7 @@ rsvp_obj_print(netdissect_options *ndo,
                     obj_tptr+=4;
                     subchannel = 1;
                     while(obj_tlen >= 4 ) {
-                        ND_PRINT((ndo, "%s  Subchannel #%u: %u", ident, subchannel,
+                        ND_PRINT((ndo, "%s  Subchannel #%u: %u", indent, subchannel,
                                EXTRACT_32BITS(obj_tptr)));
                         obj_tptr+=4;
                         obj_tlen-=4;
@@ -1776,7 +1794,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 4)
                     return-1;
                 ND_PRINT((ndo, "%s  Sub-LSP destination address: %s",
-                       ident, ipaddr_string(ndo, obj_tptr)));
+                       indent, ipaddr_string(ndo, obj_tptr)));
 
                 obj_tlen-=4;
                 obj_tptr+=4;
@@ -1785,7 +1803,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 if (obj_tlen < 16)
                     return-1;
                 ND_PRINT((ndo, "%s  Sub-LSP destination address: %s",
-                       ident, ip6addr_string(ndo, obj_tptr)));
+                       indent, ip6addr_string(ndo, obj_tptr)));
 
                 obj_tlen-=16;
                 obj_tptr+=16;
@@ -1871,14 +1889,14 @@ rsvp_print(netdissect_options *ndo,
            rsvp_com_header->ttl,
            EXTRACT_16BITS(rsvp_com_header->checksum)));
 
-    if (tlen < sizeof(const struct rsvp_common_header)) {
+    if (tlen < sizeof(struct rsvp_common_header)) {
         ND_PRINT((ndo, "ERROR: common header too short %u < %lu", tlen,
-               (unsigned long)sizeof(const struct rsvp_common_header)));
+               (unsigned long)sizeof(struct rsvp_common_header)));
         return;
     }
 
-    tptr+=sizeof(const struct rsvp_common_header);
-    tlen-=sizeof(const struct rsvp_common_header);
+    tptr+=sizeof(struct rsvp_common_header);
+    tlen-=sizeof(struct rsvp_common_header);
 
     switch(rsvp_com_header->msg_type) {
 
@@ -1917,9 +1935,9 @@ rsvp_print(netdissect_options *ndo,
                    rsvp_com_header->ttl,
                    EXTRACT_16BITS(rsvp_com_header->checksum)));
 
-            if (subtlen < sizeof(const struct rsvp_common_header)) {
+            if (subtlen < sizeof(struct rsvp_common_header)) {
                 ND_PRINT((ndo, "ERROR: common header too short %u < %lu", subtlen,
-                       (unsigned long)sizeof(const struct rsvp_common_header)));
+                       (unsigned long)sizeof(struct rsvp_common_header)));
                 return;
             }
 
@@ -1929,8 +1947,8 @@ rsvp_print(netdissect_options *ndo,
                 return;
             }
 
-            subtptr+=sizeof(const struct rsvp_common_header);
-            subtlen-=sizeof(const struct rsvp_common_header);
+            subtptr+=sizeof(struct rsvp_common_header);
+            subtlen-=sizeof(struct rsvp_common_header);
 
             /*
              * Print all objects in the submessage.
@@ -1938,8 +1956,8 @@ rsvp_print(netdissect_options *ndo,
             if (rsvp_obj_print(ndo, subpptr, subplen, subtptr, "\n\t    ", subtlen, rsvp_com_header) == -1)
                 return;
 
-            tptr+=subtlen+sizeof(const struct rsvp_common_header);
-            tlen-=subtlen+sizeof(const struct rsvp_common_header);
+            tptr+=subtlen+sizeof(struct rsvp_common_header);
+            tlen-=subtlen+sizeof(struct rsvp_common_header);
         }
 
         break;

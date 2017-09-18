@@ -214,9 +214,9 @@ lwapp_control_print(netdissect_options *ndo,
 
     if (has_ap_ident) {
         ND_PRINT((ndo, "\n\tAP identity: %s", etheraddr_string(ndo, tptr)));
-        tptr+=sizeof(const struct lwapp_transport_header)+6;
+        tptr+=sizeof(struct lwapp_transport_header)+6;
     } else {
-        tptr+=sizeof(const struct lwapp_transport_header);
+        tptr+=sizeof(struct lwapp_transport_header);
     }
 
     while(tlen>0) {
@@ -329,8 +329,8 @@ lwapp_data_print(netdissect_options *ndo,
            lwapp_trans_header->frag_id,
            tlen));
 
-    tptr+=sizeof(const struct lwapp_transport_header);
-    tlen-=sizeof(const struct lwapp_transport_header);
+    tptr+=sizeof(struct lwapp_transport_header);
+    tlen-=sizeof(struct lwapp_transport_header);
 
     /* FIX - An IEEE 802.11 frame follows - hexdump for now */
     print_unknown_data(ndo, tptr, "\n\t", tlen);

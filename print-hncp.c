@@ -68,8 +68,8 @@ hncp_print(netdissect_options *ndo,
 #define HNCP_EXTERNAL_CONNECTION   33
 #define HNCP_DELEGATED_PREFIX      34
 #define HNCP_PREFIX_POLICY         43
-#define HNCP_DHCPV4_DATA           37
-#define HNCP_DHCPV6_DATA           38
+#define HNCP_DHCPV4_DATA           37 /* This is correct, see RFC 7788 Errata ID 5113. */
+#define HNCP_DHCPV6_DATA           38 /* idem */
 #define HNCP_ASSIGNED_PREFIX       35
 #define HNCP_NODE_ADDRESS          36
 #define HNCP_DNS_DELEGATED_ZONE    39
@@ -265,14 +265,16 @@ dhcpv4_print(netdissect_options *ndo,
              const u_char *cp, u_int length, int indent)
 {
     u_int i, t;
-    const u_char *tlv, *value;
+    const uint8_t *tlv, *value;
     uint8_t type, optlen;
 
     i = 0;
     while (i < length) {
+        if (i + 2 > length)
+            return -1;
         tlv = cp + i;
-        type = (uint8_t)tlv[0];
-        optlen = (uint8_t)tlv[1];
+        type = tlv[0];
+        optlen = tlv[1];
         value = tlv + 2;
 
         ND_PRINT((ndo, "\n"));
@@ -281,6 +283,8 @@ dhcpv4_print(netdissect_options *ndo,
 
         ND_PRINT((ndo, "%s", tok2str(dh4opt_str, "Unknown", type)));
         ND_PRINT((ndo," (%u)", optlen + 2 ));
+        if (i + 2 + optlen > length)
+            return -1;
 
         switch (type) {
         case DH4OPT_DNS_SERVERS:
@@ -318,6 +322,8 @@ dhcpv6_print(netdissect_options *ndo,
 
     i = 0;
     while (i < length) {
+        if (i + 4 > length)
+            return -1;
         tlv = cp + i;
         type = EXTRACT_16BITS(tlv);
         optlen = EXTRACT_16BITS(tlv + 2);
@@ -329,6 +335,8 @@ dhcpv6_print(netdissect_options *ndo,
 
         ND_PRINT((ndo, "%s", tok2str(dh6opt_str, "Unknown", type)));
         ND_PRINT((ndo," (%u)", optlen + 4 ));
+        if (i + 4 + optlen > length)
+            return -1;
 
         switch (type) {
             case DH6OPT_DNS_SERVERS:
@@ -400,7 +408,7 @@ hncp_print_rec(netdissect_options *ndo,
     uint32_t last_type_mask = 0xffffffffU;
     int last_type_count = -1;
 
-    const u_char *tlv, *value;
+    const uint8_t *tlv, *value;
     uint16_t type, bodylen;
     uint32_t type_mask;
 
@@ -720,7 +728,7 @@ hncp_print_rec(netdissect_options *ndo,
                 ND_PRINT((ndo, " %s", istr));
                 break;
             }
-            prty = (uint8_t)(value[4] & 0xf);
+            prty = value[4] & 0xf;
             ND_PRINT((ndo, " EPID: %08x Prty: %u",
                 EXTRACT_32BITS(value),
                 prty

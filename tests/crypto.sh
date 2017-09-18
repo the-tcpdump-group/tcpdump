@@ -1,13 +1,13 @@
 #!/bin/sh
 
 exitcode=0
+passed=`cat .passed`
+failed=`cat .failed`
 
 # Only attempt OpenSSL-specific tests when compiled with the library.
 
 if grep '^#define HAVE_LIBCRYPTO 1$' ../config.h >/dev/null
 then
-	passed=`cat .passed`
-	failed=`cat .failed`
 	if ./TESTonce esp1 02-sunrise-sunset-esp.pcap esp1.out '-E "0x12345678@192.1.2.45 3des-cbc-hmac96:0x4043434545464649494a4a4c4c4f4f515152525454575758"'
 	then
 		passed=`expr $passed + 1`
@@ -91,6 +91,27 @@ then
 			exitcode=1
 		fi
 	fi
+	if ./TESTonce bgp-as-path-oobr-ssl bgp-as-path-oobr.pcap bgp-as-path-oobr-ssl.out '-vvv -e'
+	then
+		passed=`expr $passed + 1`
+		echo $passed >.passed
+	else
+		failed=`expr $failed + 1`
+		echo $failed >.failed
+		exitcode=1
+	fi
+	if ./TESTonce bgp-aigp-oobr-ssl bgp-aigp-oobr.pcap bgp-aigp-oobr-ssl.out '-vvv -e'
+	then
+		passed=`expr $passed + 1`
+		echo $passed >.passed
+	else
+		failed=`expr $failed + 1`
+		echo $failed >.failed
+		exitcode=1
+	fi
+	FORMAT='    %-35s: TEST SKIPPED (compiled w/OpenSSL)\n'
+	printf "$FORMAT" bgp-as-path-oobr-nossl
+	printf "$FORMAT" bgp-aigp-oobr-nossl
 else
 	FORMAT='    %-35s: TEST SKIPPED (compiled w/o OpenSSL)\n'
 	printf "$FORMAT" esp1
@@ -101,6 +122,26 @@ else
 	printf "$FORMAT" espudp1
 	printf "$FORMAT" ikev2pI2
 	printf "$FORMAT" isakmp4
+	printf "$FORMAT" bgp-as-path-oobr-ssl
+	printf "$FORMAT" bgp-aigp-oobr-ssl
+	if ./TESTonce bgp-as-path-oobr-nossl bgp-as-path-oobr.pcap bgp-as-path-oobr-nossl.out '-vvv -e'
+	then
+		passed=`expr $passed + 1`
+		echo $passed >.passed
+	else
+		failed=`expr $failed + 1`
+		echo $failed >.failed
+		exitcode=1
+	fi
+	if ./TESTonce bgp-aigp-oobr-nossl bgp-aigp-oobr.pcap bgp-aigp-oobr-nossl.out '-vvv -e'
+	then
+		passed=`expr $passed + 1`
+		echo $passed >.passed
+	else
+		failed=`expr $failed + 1`
+		echo $failed >.failed
+		exitcode=1
+	fi
 fi
 
 exit $exitcode

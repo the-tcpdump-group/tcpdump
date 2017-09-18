@@ -47,8 +47,14 @@
  * RFC 4675:
  *      "RADIUS Attributes for Virtual LAN and Priority Support"
  *
+ * RFC 4849:
+ *      "RADIUS Filter Rule Attribute"
+ *
  * RFC 5176:
  *      "Dynamic Authorization Extensions to RADIUS"
+ *
+ * RFC 7155:
+ *      "Diameter Network Access Server Application"
  *
  * Alfredo Andres Omella (aandres@s21sec.com) v0.1 2000/09/15
  *
@@ -472,8 +478,9 @@ static struct attrtype {
      { "CUI",                             NULL, 0, 0, print_attr_string },
      { "Tunnel-Client-Auth-ID",           NULL, 0, 0, print_attr_string },
      { "Tunnel-Server-Auth-ID",           NULL, 0, 0, print_attr_string },
-     { "Unassigned",                      NULL, 0, 0, NULL }, /*92*/
-     { "Unassigned",                      NULL, 0, 0, NULL }  /*93*/
+     { "NAS-Filter-Rule",                 NULL, 0, 0, print_attr_string },
+     { "Unassigned",                      NULL, 0, 0, NULL },  /*93*/
+     { "Originating-Line-Info",           NULL, 0, 0, NULL }
   };
 
 
@@ -496,10 +503,7 @@ print_attr_string(netdissect_options *ndo,
    {
       case TUNNEL_PASS:
            if (length < 3)
-           {
-              ND_PRINT((ndo, "%s", tstr));
-              return;
-           }
+              goto trunc;
            if (*data && (*data <=0x1F) )
               ND_PRINT((ndo, "Tag[%u] ", *data));
            else
@@ -519,10 +523,7 @@ print_attr_string(netdissect_options *ndo,
            if (*data <= 0x1F)
            {
               if (length < 1)
-              {
-                 ND_PRINT((ndo, "%s", tstr));
-                 return;
-              }
+                 goto trunc;
               if (*data)
                 ND_PRINT((ndo, "Tag[%u] ", *data));
               else
@@ -532,6 +533,8 @@ print_attr_string(netdissect_options *ndo,
            }
         break;
       case EGRESS_VLAN_NAME:
+           if (length < 1)
+              goto trunc;
            ND_PRINT((ndo, "%s (0x%02x) ",
                   tok2str(rfc4675_tagged,"Unknown tag",*data),
                   *data));
@@ -540,7 +543,7 @@ print_attr_string(netdissect_options *ndo,
         break;
    }
 
-   for (i=0; *data && i < length ; i++, data++)
+   for (i=0; i < length && *data; i++, data++)
        ND_PRINT((ndo, "%c", (*data < 32 || *data > 126) ? '.' : *data));
 
    return;

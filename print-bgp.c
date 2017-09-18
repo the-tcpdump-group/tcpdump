@@ -418,15 +418,15 @@ static const struct tok bgp_safi_values[] = {
 #define BGP_EXT_COM_LINKBAND    0x4004  /* Link Bandwidth,Format AS(2B):Bandwidth(4B) */
                                         /* rfc2547 bgp-mpls-vpns */
 #define BGP_EXT_COM_VPN_ORIGIN  0x0005  /* OSPF Domain ID / VPN of Origin  - draft-rosen-vpns-ospf-bgp-mpls */
-#define BGP_EXT_COM_VPN_ORIGIN2 0x0105  /* duplicate - keep for backwards compatability */
-#define BGP_EXT_COM_VPN_ORIGIN3 0x0205  /* duplicate - keep for backwards compatability */
-#define BGP_EXT_COM_VPN_ORIGIN4 0x8005  /* duplicate - keep for backwards compatability */
+#define BGP_EXT_COM_VPN_ORIGIN2 0x0105  /* duplicate - keep for backwards compatibility */
+#define BGP_EXT_COM_VPN_ORIGIN3 0x0205  /* duplicate - keep for backwards compatibility */
+#define BGP_EXT_COM_VPN_ORIGIN4 0x8005  /* duplicate - keep for backwards compatibility */
 
 #define BGP_EXT_COM_OSPF_RTYPE  0x0306  /* OSPF Route Type,Format Area(4B):RouteType(1B):Options(1B) */
-#define BGP_EXT_COM_OSPF_RTYPE2 0x8000  /* duplicate - keep for backwards compatability */
+#define BGP_EXT_COM_OSPF_RTYPE2 0x8000  /* duplicate - keep for backwards compatibility */
 
 #define BGP_EXT_COM_OSPF_RID    0x0107  /* OSPF Router ID,Format RouterID(4B):Unused(2B) */
-#define BGP_EXT_COM_OSPF_RID2   0x8001  /* duplicate - keep for backwards compatability */
+#define BGP_EXT_COM_OSPF_RID2   0x8001  /* duplicate - keep for backwards compatibility */
 
 #define BGP_EXT_COM_L2INFO      0x800a  /* draft-kompella-ppvpn-l2vpn */
 
@@ -761,11 +761,18 @@ decode_rt_routing_info(netdissect_options *ndo,
 {
 	uint8_t route_target[8];
 	u_int plen;
+	char asbuf[sizeof(astostr)]; /* bgp_vpn_rd_print() overwrites astostr */
 
+	/* NLRI "prefix length" from RFC 2858 Section 4. */
 	ND_TCHECK(pptr[0]);
 	plen = pptr[0];   /* get prefix length */
 
+	/* NLRI "prefix" (ibid), valid lengths are { 0, 32, 33, ..., 96 } bits.
+	 * RFC 4684 Section 4 defines the layout of "origin AS" and "route
+	 * target" fields inside the "prefix" depending on its length.
+	 */
 	if (0 == plen) {
+		/* Without "origin AS", without "route target". */
 		snprintf(buf, buflen, "default route target");
 		return 1;
 	}
@@ -773,20 +780,29 @@ decode_rt_routing_info(netdissect_options *ndo,
 	if (32 > plen)
 		return -1;
 
+	/* With at least "origin AS", possibly with "route target". */
+	ND_TCHECK_32BITS(pptr + 1);
+	as_printf(ndo, asbuf, sizeof(asbuf), EXTRACT_32BITS(pptr + 1));
+
         plen-=32; /* adjust prefix length */
 
 	if (64 < plen)
 		return -1;
 
+	/* From now on (plen + 7) / 8 evaluates to { 0, 1, 2, ..., 8 }
+	 * and gives the number of octets in the variable-length "route
+	 * target" field inside this NLRI "prefix". Look for it.
+	 */
 	memset(&route_target, 0, sizeof(route_target));
-	ND_TCHECK2(pptr[1], (plen + 7) / 8);
-	memcpy(&route_target, &pptr[1], (plen + 7) / 8);
+	ND_TCHECK2(pptr[5], (plen + 7) / 8);
+	memcpy(&route_target, &pptr[5], (plen + 7) / 8);
+	/* Which specification says to do this? */
 	if (plen % 8) {
 		((u_char *)&route_target)[(plen + 7) / 8 - 1] &=
 			((0xff00 >> (plen % 8)) & 0xff);
 	}
 	snprintf(buf, buflen, "origin AS: %s, route target %s",
-	    as_printf(ndo, astostr, sizeof(astostr), EXTRACT_32BITS(pptr+1)),
+	    asbuf,
 	    bgp_vpn_rd_print(ndo, (u_char *)&route_target));
 
 	return 5 + (plen + 7) / 8;
@@ -900,6 +916,7 @@ static const struct tok bgp_multicast_vpn_route_type_values[] = {
     { BGP_MULTICAST_VPN_ROUTE_TYPE_SOURCE_ACTIVE, "Source-Active"},
     { BGP_MULTICAST_VPN_ROUTE_TYPE_SHARED_TREE_JOIN, "Shared Tree Join"},
     { BGP_MULTICAST_VPN_ROUTE_TYPE_SOURCE_TREE_JOIN, "Source Tree Join"},
+    { 0, NULL}
 };
 
 static int
@@ -964,13 +981,13 @@ decode_multicast_vpn(netdissect_options *ndo,
 
         case BGP_MULTICAST_VPN_ROUTE_TYPE_SHARED_TREE_JOIN: /* fall through */
         case BGP_MULTICAST_VPN_ROUTE_TYPE_SOURCE_TREE_JOIN:
-            ND_TCHECK2(pptr[0], BGP_VPN_RD_LEN);
+            ND_TCHECK2(pptr[0], BGP_VPN_RD_LEN + 4);
             offset = strlen(buf);
 	    snprintf(buf + offset, buflen - offset, ", RD: %s, Source-AS %s",
 		bgp_vpn_rd_print(ndo, pptr),
 		as_printf(ndo, astostr, sizeof(astostr),
 		EXTRACT_32BITS(pptr + BGP_VPN_RD_LEN)));
-            pptr += BGP_VPN_RD_LEN;
+            pptr += BGP_VPN_RD_LEN + 4;
 
             bgp_vpn_sg_print(ndo, pptr, buf, buflen);
             break;
@@ -1405,6 +1422,7 @@ bgp_attr_print(netdissect_options *ndo,
 			ND_TCHECK(tptr[0]);
                         ND_PRINT((ndo, "%s", tok2str(bgp_as_path_segment_open_values,
 						"?", tptr[0])));
+			ND_TCHECK(tptr[1]);
                         for (i = 0; i < tptr[1] * as_size; i += as_size) {
                             ND_TCHECK2(tptr[2 + i], as_size);
 			    ND_PRINT((ndo, "%s ",
@@ -1724,7 +1742,7 @@ bgp_attr_print(netdissect_options *ndo,
 			ND_PRINT((ndo, ", no SNPA"));
                 }
 
-		while (len - (tptr - pptr) > 0) {
+		while (tptr < pptr + len) {
                     switch (af<<8 | safi) {
                     case (AFNUM_INET<<8 | SAFNUM_UNICAST):
                     case (AFNUM_INET<<8 | SAFNUM_MULTICAST):
@@ -1892,7 +1910,7 @@ bgp_attr_print(netdissect_options *ndo,
 
 		tptr += 3;
 
-		while (len - (tptr - pptr) > 0) {
+		while (tptr < pptr + len) {
                     switch (af<<8 | safi) {
                     case (AFNUM_INET<<8 | SAFNUM_UNICAST):
                     case (AFNUM_INET<<8 | SAFNUM_MULTICAST):
@@ -2121,11 +2139,11 @@ bgp_attr_print(netdissect_options *ndo,
         {
                 uint8_t tunnel_type, flags;
 
+                ND_TCHECK2(tptr[0], 5);
                 tunnel_type = *(tptr+1);
                 flags = *tptr;
                 tlen = len;
 
-                ND_TCHECK2(tptr[0], 5);
                 ND_PRINT((ndo, "\n\t    Tunnel-type %s (%u), Flags [%s], MPLS Label %u",
                        tok2str(bgp_pmsi_tunnel_values, "Unknown", tunnel_type),
                        tunnel_type,
@@ -2180,35 +2198,42 @@ bgp_attr_print(netdissect_options *ndo,
 		uint8_t type;
 		uint16_t length;
 
-		ND_TCHECK2(tptr[0], 3);
-
 		tlen = len;
 
 		while (tlen >= 3) {
 
+		    ND_TCHECK2(tptr[0], 3);
+
 		    type = *tptr;
 		    length = EXTRACT_16BITS(tptr+1);
+		    tptr += 3;
+		    tlen -= 3;
 
 		    ND_PRINT((ndo, "\n\t    %s TLV (%u), length %u",
 			      tok2str(bgp_aigp_values, "Unknown", type),
 			      type, length));
 
+		    if (length < 3)
+			goto trunc;
+		    length -= 3;
+
 		    /*
 		     * Check if we can read the TLV data.
 		     */
-		    ND_TCHECK2(tptr[3], length - 3);
+		    ND_TCHECK2(tptr[3], length);
 
 		    switch (type) {
 
 		    case BGP_AIGP_TLV:
-		        ND_TCHECK2(tptr[3], 8);
+		        if (length < 8)
+		            goto trunc;
 			ND_PRINT((ndo, ", metric %" PRIu64,
-				  EXTRACT_64BITS(tptr+3)));
+				  EXTRACT_64BITS(tptr)));
 			break;
 
 		    default:
 			if (ndo->ndo_vflag <= 1) {
-			    print_unknown_data(ndo, tptr+3,"\n\t      ", length-3);
+			    print_unknown_data(ndo, tptr,"\n\t      ", length);
 			}
 		    }
 
