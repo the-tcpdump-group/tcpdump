@@ -1195,7 +1195,7 @@ ntp_reserved_print(netdissect_options *ndo,
 	M = (s & 0x4000) >> 14;
 	mode = (rd->magic & MODEMASK) >> MODESHIFT;
 	indent(ndo, i_lev);
-	ND_PRINT((ndo, "R=%u, M=%u, mode==%u (reserved)", R, M, mode));
+	ND_PRINT((ndo, "R=%u, M=%u, mode=%u (reserved)", R, M, mode));
 
 	ND_TCHECK(rd->sequence);
 	s = EXTRACT_BE_U_2(&rd->sequence);
