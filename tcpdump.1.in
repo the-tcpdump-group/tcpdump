@@ -1458,7 +1458,7 @@ Some offsets and field values may be expressed as names
 rather than as numeric values. For example tcp[13] may
 be replaced with tcp[tcpflags]. The following TCP flag
 field values are also available: tcp-fin, tcp-syn, tcp-rst,
-tcp-push, tcp-act, tcp-urg.
+tcp-push, tcp-ack, tcp-urg.
 .PP
 This can be demonstrated as:
 .RS
