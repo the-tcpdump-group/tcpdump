@@ -573,6 +573,7 @@ ikev1_id_ipv6_addr_subnet-oobr	ikev1_id_ipv6_addr_subnet-oobr.pcap	ikev1_id_ipv6
 isakmp-various-oobr	isakmp-various-oobr.pcap	isakmp-various-oobr.out	-v
 aoe-oobr-1		aoe-oobr-1.pcap			aoe-oobr-1.out	-v -c1
 frf16_magic_ie-oobr	frf16_magic_ie-oobr.pcap	frf16_magic_ie-oobr.out	-v -c1
+rx_serviceid_oobr	rx_serviceid_oobr.pcap		rx_serviceid_oobr.out -c3
 
 # bad packets from Katie Holly
 mlppp-oobr		mlppp-oobr.pcap			mlppp-oobr.out
