@@ -70,12 +70,12 @@ static const char tstr[] = " [|ntp]";
 struct l_fixedpt {
 	nd_uint32_t int_part;
 	nd_uint32_t fraction;
-};
+} UNALIGNED;
 
 struct s_fixedpt {
 	nd_uint16_t int_part;
 	nd_uint16_t fraction;
-};
+} UNALIGNED;
 
 /* rfc2030
  *                      1                   2                   3
@@ -135,7 +135,7 @@ struct ntp_time_data {
 	struct l_fixedpt xmt_timestamp;
 	nd_uint32_t key_id;
 	nd_uint8_t  message_digest[20];
-};
+} UNALIGNED;
 /*
  *	Leap Second Codes (high order two bits)
  */
@@ -247,7 +247,7 @@ struct ntp_control_data {
 	nd_uint16_t	offset;		/* Offset */
 	nd_uint16_t	count;		/* Count */
 	nd_uint8_t	data[564];	/* Data, [Padding, [Authenticator]] */
-};
+} UNALIGNED;
 
 /*
  * Print NTP time requests and responses
