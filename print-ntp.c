@@ -256,32 +256,8 @@ static void
 ntp_time_print(netdissect_options *ndo,
 	       register const struct ntp_time_data *bp, u_int length)
 {
-	int mode, version, leapind;
-
 	if (length < NTP_TIMEMSG_MINLEN)
 		goto invalid;
-
-	ND_TCHECK(bp->status);
-
-	version = (int)(bp->status & VERSIONMASK) >> VERSIONSHIFT;
-	ND_PRINT((ndo, "NTPv%d", version));
-
-	mode = bp->status & MODEMASK;
-	if (!ndo->ndo_vflag) {
-		ND_PRINT((ndo, ", %s, length %u",
-		          tok2str(ntp_mode_values, "Unknown mode", mode),
-		          length));
-		return;
-	}
-
-	ND_PRINT((ndo, ", length %u\n\t%s",
-	          length,
-	          tok2str(ntp_mode_values, "Unknown mode", mode)));
-
-	leapind = bp->status & LEAPMASK;
-	ND_PRINT((ndo, ", Leap indicator: %s (%u)",
-	          tok2str(ntp_leapind_values, "Unknown", leapind),
-	          leapind));
 
 	ND_TCHECK(bp->stratum);
 	ND_PRINT((ndo, ", Stratum %u (%s)",
