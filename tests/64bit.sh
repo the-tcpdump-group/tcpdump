@@ -7,7 +7,7 @@ failed=`cat .failed`
 # Only attempt tests with times outside the range of 32-bit time_t
 # when running on a 64-bit processor.
 
-if file ../tcpdump | egrep -q '64|PA-RISC2.0'
+if file ../tcpdump | grep -q '64|PA-RISC2.0'
 then
 	#
 	# The file type of tcpdump contains the number 64 or the string
