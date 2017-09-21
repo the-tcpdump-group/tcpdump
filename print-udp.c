@@ -589,10 +589,8 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 			 isakmp_print(ndo, (const u_char *)(up + 1), length, bp2);
 	        else if (IS_SRC_OR_DST_PORT(ISAKMP_PORT_NATT))
 			 isakmp_rfc3948_print(ndo, (const u_char *)(up + 1), length, bp2);
-#if 1 /*???*/
 	        else if (IS_SRC_OR_DST_PORT(ISAKMP_PORT_USER1) || IS_SRC_OR_DST_PORT(ISAKMP_PORT_USER2))
 			isakmp_print(ndo, (const u_char *)(up + 1), length, bp2);
-#endif
 		else if (IS_SRC_OR_DST_PORT(SNMP_PORT) || IS_SRC_OR_DST_PORT(SNMPTRAP_PORT))
 			snmp_print(ndo, (const u_char *)(up + 1), length);
 		else if (IS_SRC_OR_DST_PORT(NTP_PORT))
