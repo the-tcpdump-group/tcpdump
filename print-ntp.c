@@ -48,7 +48,7 @@ static const char tstr[] = " [|ntp]";
 /*
  *  Definitions for the masses
  */
-#define	JAN_1970	2208988800U	/* 1970 - 1900 in seconds */
+#define	JAN_1970	2208988800	/* 1970 - 1900 in seconds */
 
 /*
  * Structure definitions for NTP fixed point values
@@ -498,7 +498,7 @@ static void
 p_ntp_time(netdissect_options *ndo,
            register const struct l_fixedpt *lfp)
 {
-	register int32_t i;
+	register uint32_t i;
 	register uint32_t uf;
 	register uint32_t f;
 	register double ff;
@@ -517,14 +517,33 @@ p_ntp_time(netdissect_options *ndo,
 	 * print the UTC time in human-readable format.
 	 */
 	if (i) {
-	    time_t seconds = i - JAN_1970;
+	    int64_t seconds_64bit = (int64_t)i - JAN_1970;
+	    time_t seconds;
 	    struct tm *tm;
 	    char time_buf[128];
 
-	    tm = gmtime(&seconds);
-	    /* use ISO 8601 (RFC3339) format */
-	    strftime(time_buf, sizeof (time_buf), "%Y-%m-%dT%H:%M:%S", tm);
-	    ND_PRINT((ndo, " (%s)", time_buf));
+	    seconds = (time_t)seconds_64bit;
+	    if (seconds != seconds_64bit) {
+		/*
+		 * It doesn't fit into a time_t, so we can't hand it
+		 * to gmtime.
+		 */
+		ND_PRINT((ndo, " (unrepresentable)"));
+	    } else {
+		tm = gmtime(&seconds);
+		if (tm == NULL) {
+		    /*
+		     * gmtime() can't handle it.
+		     * (Yes, that might happen with some version of
+		     * Microsoft's C library.)
+		     */
+		    ND_PRINT((ndo, " (unrepresentable)"));
+		} else {
+		    /* use ISO 8601 (RFC3339) format */
+		    strftime(time_buf, sizeof (time_buf), "%Y-%m-%dT%H:%M:%S", tm);
+		    ND_PRINT((ndo, " (%s)", time_buf));
+		}
+	    }
 	}
 #endif
 }

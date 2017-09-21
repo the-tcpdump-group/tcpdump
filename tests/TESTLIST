@@ -209,7 +209,9 @@ m3ua-vv isup.pcap isupvv.out -vv
 
 # NFLOG test case moved to nflog-e.sh
 
-# NTP tests moved to 64bit.sh
+# NTP tests
+ntp ntp.pcap ntp.out
+ntp ntp.pcap ntp-v.out -v
 
 # syslog test case
 syslog-v	syslog_udp.pcap		syslog-v.out		-v
