@@ -211,7 +211,7 @@ m3ua-vv isup.pcap isupvv.out -vv
 
 # NTP tests
 ntp ntp.pcap ntp.out
-ntp ntp.pcap ntp-v.out -v
+ntp-v ntp.pcap ntp-v.out -v
 
 # syslog test case
 syslog-v	syslog_udp.pcap		syslog-v.out		-v
