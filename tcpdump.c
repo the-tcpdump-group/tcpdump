@@ -1178,6 +1178,7 @@ main(int argc, char **argv)
 	bpf_u_int32 localnet =0 , netmask = 0;
 	int timezone_offset = 0;
 	register char *cp, *infile, *cmdbuf, *device, *RFileName, *VFileName, *WFileName;
+	char *endp;
 	pcap_handler callback;
 	int dlt;
 	const char *dlt_name;
@@ -1278,9 +1279,17 @@ main(int argc, char **argv)
 			break;
 
 		case 'C':
-			Cflag = atoi(optarg) * 1000000;
-			if (Cflag <= 0)
+			errno = 0;
+			Cflag = strtol(optarg, &endp, 10);
+			if (endp == optarg || *endp != '\0' || errno != 0
+			    || Cflag <= 0)
 				error("invalid file size %s", optarg);
+			/*
+			 * Will multiplying it by 1000000 overflow?
+			 */
+			if (Cflag > LONG_MAX / 1000000)
+				error("file size %s is too large", optarg);
+			Cflag *= 1000000;
 			break;
 
 		case 'd':
@@ -2484,6 +2493,11 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 	 * XXX - this won't prevent capture files from getting
 	 * larger than Cflag - the last packet written to the
 	 * file could put it over Cflag.
+	 *
+	 * XXX - this only handles a Cflag value > 2^31-1 on
+	 * LP64 platforms; to handle ILP32 (32-bit UN*X and
+	 * Windows) or LLP64 (64-bit Windows) would require
+	 * a libpcap API that returns a 64-bit file offset.
 	 */
 	if (Cflag != 0) {
 		long size = pcap_dump_ftell(dump_info->p);
