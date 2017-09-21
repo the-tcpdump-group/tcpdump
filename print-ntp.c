@@ -48,7 +48,7 @@ static const char tstr[] = " [|ntp]";
 /*
  *  Definitions for the masses
  */
-#define	JAN_1970	2208988800	/* 1970 - 1900 in seconds */
+#define	JAN_1970	INT64_T_CONSTANT(2208988800)	/* 1970 - 1900 in seconds */
 
 /*
  * Structure definitions for NTP fixed point values

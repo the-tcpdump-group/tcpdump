@@ -164,6 +164,21 @@
 #include <sys/types.h>
 
 #ifdef _MSC_VER
+  /*
+   * Compiler is MSVC.
+   *
+   * Microsoft's documentation doesn't speak of LL as a valid
+   * suffix for 64-bit integers, so we'll just use i64.
+   */
+  #define INT64_T_CONSTANT(constant)	(constant##i64)
+#else
+  /*
+   * Non-Microsoft compiler; assume LL works.
+   */
+  #define INT64_T_CONSTANT(constant)	(constant##LL)
+#endif
+
+#ifdef _MSC_VER
 #define stat _stat
 #define open _open
 #define fstat _fstat
@@ -222,6 +237,11 @@ typedef char* caddr_t;
 #endif
 
 #include <arpa/inet.h>
+
+/*
+ * Assume LL works.
+ */
+#define INT64_T_CONSTANT(constant)	(constant##LL)
 
 #endif /* _WIN32 */
 
