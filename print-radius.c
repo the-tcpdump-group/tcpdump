@@ -899,25 +899,28 @@ static void
 print_attr_netmask6(netdissect_options *ndo,
                     register const u_char *data, u_int length, u_short attr_code _U_)
 {
-   u_char data2[18];
+   u_char data2[16];
 
    if (length < 2 || length > 18)
    {
        ND_PRINT((ndo, "ERROR: length %u not in range (2..18)", length));
        return;
    }
-   else if (data[1] > 128)
+   ND_TCHECK2(data[0], length);
+   if (data[1] > 128)
    {
       ND_PRINT((ndo, "ERROR: netmask %u not in range (0..128)", data[1]));
       return;
    }
 
-   ND_TCHECK2(data[0], length);
    memset(data2, 0, sizeof(data2));
    if (length > 2)
       memcpy(data2, data+2, length-2);
 
    ND_PRINT((ndo, "%s/%u", ip6addr_string(ndo, data2), data[1]));
+
+   if (data[1] > 8 * (length - 2))
+      ND_PRINT((ndo, " (inconsistent prefix length)"));
 
    return;
 
