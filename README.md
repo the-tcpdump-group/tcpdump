@@ -69,7 +69,7 @@ documentation.
 
 Current versions can be found at www.tcpdump.org.
 
- - The TCPdump team
+ - The TCPdump group
 
 original text by: Steve McCanne, Craig Leres, Van Jacobson
 
