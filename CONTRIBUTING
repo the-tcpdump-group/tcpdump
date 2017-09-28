@@ -80,8 +80,10 @@ How to add new code and to update existing code
    Each line in this file has the following format:
    test-name   sample.pcap   sample.out   tcpdump-options
 
-   the sample.out file can be build by:
+   The sample.out file can be build by:
    (cd tests && ../tcpdump -n -t -r sample.pcap tcpdump-options > sample.out)
+
+   Or, for convenience, use "./update-test.sh test-name"
 
    It is often useful to have test outputs with different verbosity levels
    (none, -v, -vv, -vvv, etc.) depending on the code.
