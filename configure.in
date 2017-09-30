@@ -618,7 +618,8 @@ fi
 # Check for a miscellaneous collection of functions which we use
 # if we have them.
 #
-AC_CHECK_FUNCS(pcap_findalldevs pcap_dump_flush pcap_lib_version pcap_setdirection pcap_set_immediate_mode)
+AC_CHECK_FUNCS(pcap_findalldevs pcap_dump_flush pcap_lib_version)
+AC_CHECK_FUNCS(pcap_setdirection pcap_set_immediate_mode pcap_dump_ftell64)
 if test $ac_cv_func_pcap_findalldevs = "yes" ; then
 dnl Check for Mac OS X, which may ship pcap.h from 0.6 but libpcap may
 dnl be 0.8; this means that lib has pcap_findalldevs but header doesn't

@@ -124,6 +124,9 @@
 /* define if libpcap has pcap_dump_ftell() */
 #undef HAVE_PCAP_DUMP_FTELL
 
+/* Define to 1 if you have the `pcap_dump_ftell64' function. */
+#undef HAVE_PCAP_DUMP_FTELL64
+
 /* Define to 1 if you have the `pcap_findalldevs' function. */
 #undef HAVE_PCAP_FINDALLDEVS
 
