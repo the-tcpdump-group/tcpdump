@@ -65,8 +65,14 @@
  * RFC 5176:
  *      "Dynamic Authorization Extensions to RADIUS"
  *
+ * RFC 5447:
+ *      "Diameter Mobile IPv6"
+ *
  * RFC 5580:
  *      "Carrying Location Objects in RADIUS and Diameter"
+ *
+ * RFC 6572:
+ *      "RADIUS Support for Proxy Mobile IPv6"
  *
  * RFC 7155:
  *      "Diameter Network Access Server Application"
@@ -196,7 +202,9 @@ static void print_vendor_attr(netdissect_options *, const u_char *, u_int, u_sho
 static void print_attr_address(netdissect_options *, const u_char *, u_int, u_short);
 static void print_attr_address6(netdissect_options *, const u_char *, u_int, u_short);
 static void print_attr_netmask6(netdissect_options *, const u_char *, u_int, u_short);
+static void print_attr_mip6_home_link_prefix(netdissect_options *, const u_char *, u_int, u_short);
 static void print_attr_time(netdissect_options *, const u_char *, u_int, u_short);
+static void print_attr_vector64(netdissect_options *, register const u_char *, u_int, u_short);
 static void print_attr_strange(netdissect_options *, const u_char *, u_int, u_short);
 
 
@@ -436,6 +444,27 @@ static const struct tok errorcausetype[] = {
 																 { 0, NULL }
                                };
 
+/* MIP6-Feature-Vector standard values */
+#define MIP6_INTEGRATED 0x0000000000000001
+#define LOCAL_HOME_AGENT_ASSIGNMENT 0x0000000000000002
+#define PMIP6_SUPPORTED 0x0000010000000000
+#define IP4_HOA_SUPPORTED 0x0000020000000000
+#define LOCAL_MAG_ROUTING_SUPPORTED 0x0000040000000000
+#define IP4_TRANSPORT_SUPPORTED 0x0000800000000000
+#define IP4_HOA_ONLY_SUPPORTED 0x0001000000000000
+static struct mip6_feature_vector {
+                  uint64_t v;
+                  const char *s;
+                } mip6_feature_vector[] = {
+                                 { MIP6_INTEGRATED,             "MIP6_INTEGRATED" },
+                                 { LOCAL_HOME_AGENT_ASSIGNMENT, "LOCAL_HOME_AGENT_ASSIGNMENT" },
+                                 { PMIP6_SUPPORTED,             "PMIP6_SUPPORTED" },
+                                 { IP4_HOA_SUPPORTED,           "IP4_HOA_SUPPORTED" },
+                                 { LOCAL_MAG_ROUTING_SUPPORTED, "LOCAL_MAG_ROUTING_SUPPORTED" },
+                                 { IP4_TRANSPORT_SUPPORTED,     "IP4_TRANSPORT_SUPPORTED" },
+                                 { IP4_HOA_ONLY_SUPPORTED,      "IP4_HOA_ONLY_SUPPORTED" }
+                               };
+
 
 static struct attrtype {
                   const char *name;      /* Attribute name                 */
@@ -569,6 +598,8 @@ static struct attrtype {
      { "Digest-HA1",                      NULL, 0, 0, print_attr_string },
      { "SIP-AOR",                         NULL, 0, 0, print_attr_string },
      { "Delegated-IPv6-Prefix",           NULL, 0, 0, print_attr_netmask6 },
+     { "MIP6-Feature-Vector",             NULL, 0, 0, print_attr_vector64 },
+     { "MIP6-Home-Link-Prefix",           NULL, 0, 0, print_attr_mip6_home_link_prefix },
   };
 
 
@@ -927,6 +958,30 @@ print_attr_netmask6(netdissect_options *ndo,
      nd_print_trunc(ndo);
 }
 
+static void
+print_attr_mip6_home_link_prefix(netdissect_options *ndo,
+                    const u_char *data, u_int length, u_short attr_code _U_)
+{
+   if (length != 17)
+   {
+      ND_PRINT("ERROR: length %u != 17", length);
+      return;
+   }
+   ND_TCHECK_LEN(data, length);
+   if (EXTRACT_U_1(data) > 128)
+   {
+      ND_PRINT("ERROR: netmask %u not in range (0..128)", EXTRACT_U_1(data));
+      return;
+   }
+
+   ND_PRINT("%s/%u", ip6addr_string(ndo, data + 1), EXTRACT_U_1(data));
+
+   return;
+
+   trunc:
+     nd_print_trunc(ndo);
+}
+
 /*************************************/
 /* Print an attribute of 'secs since */
 /* January 1, 1970 00:00 UTC' value  */
@@ -955,6 +1010,33 @@ print_attr_time(netdissect_options *ndo,
    /* Get rid of the newline */
    string[24] = '\0';
    ND_PRINT("%.24s", string);
+   return;
+
+   trunc:
+     nd_print_trunc(ndo);
+}
+
+static void
+print_attr_vector64(netdissect_options *ndo,
+                 register const u_char *data, u_int length, u_short attr_code _U_)
+{
+   uint64_t data_value, i;
+
+   if (length != 8)
+   {
+       ND_PRINT("ERROR: length %u != 8", length);
+       return;
+   }
+
+   ND_TCHECK_8(data[0]);
+
+   data_value = EXTRACT_BE_U_8(data);
+   for (i = 0; i < TAM_SIZE(mip6_feature_vector); i++) {
+       if (data_value & mip6_feature_vector[i].v) {
+           ND_PRINT(" %s", mip6_feature_vector[i].s);
+       }
+   }
+
    return;
 
    trunc:
