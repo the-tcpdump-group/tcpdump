@@ -687,6 +687,9 @@ tcp_print(netdissect_options *ndo,
         } else if (IS_SRC_OR_DST_PORT(SMTP_PORT)) {
                 ND_PRINT((ndo, ": "));
                 smtp_print(ndo, bp, length);
+        } else if (IS_SRC_OR_DST_PORT(WHOIS_PORT)) {
+                ND_PRINT((ndo, ": "));
+                txtproto_print(ndo, bp, length, "whois", NULL, 0); /* RFC 3912 */
         } else if (IS_SRC_OR_DST_PORT(BGP_PORT))
                 bgp_print(ndo, bp, length);
         else if (IS_SRC_OR_DST_PORT(PPTP_PORT))

@@ -379,6 +379,10 @@ resp_1 resp_1_benchmark.pcap resp_1.out
 resp_2 resp_2_inline.pcap    resp_2.out
 resp_3 resp_3_malicious.pcap resp_3.out
 
+# WHOIS tests
+whois			whois.pcap		whois.out
+whois-v		whois.pcap		whois-v.out	-v
+
 # HNCP tests
 hncp hncp.pcap hncp.out -vvv
 

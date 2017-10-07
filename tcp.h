@@ -104,6 +104,9 @@ struct tcphdr {
 #ifndef SMTP_PORT
 #define SMTP_PORT		25
 #endif
+#ifndef WHOIS_PORT
+#define WHOIS_PORT		43
+#endif
 #ifndef NAMESERVER_PORT
 #define NAMESERVER_PORT		53
 #endif
