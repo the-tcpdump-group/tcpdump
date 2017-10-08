@@ -47,6 +47,8 @@
 #include "af.h"
 #include "l2vpn.h"
 
+static const char tstr[] = "[|BGP]";
+
 struct bgp {
 	uint8_t bgp_marker[16];
 	uint16_t bgp_len;
@@ -1013,7 +1015,7 @@ trunc:
  */
 #define UPDATE_BUF_BUFLEN(buf, buflen, stringlen) \
     if (stringlen<0) \
-       	buflen=0; \
+        buflen=0; \
     else if ((u_int)stringlen>buflen) \
         buflen=0; \
     else { \
@@ -1482,7 +1484,7 @@ bgp_attr_print(netdissect_options *ndo,
 		}
 		ND_TCHECK2(tptr[0], 8);
 		ND_PRINT((ndo, " AS #%s, origin %s",
-	   	    as_printf(ndo, astostr, sizeof(astostr), EXTRACT_32BITS(tptr)),
+		    as_printf(ndo, astostr, sizeof(astostr), EXTRACT_32BITS(tptr)),
 		    ipaddr_string(ndo, tptr + 4)));
 		break;
 	case BGPTYPE_COMMUNITIES:
@@ -2361,6 +2363,7 @@ bgp_capabilities_print(netdissect_options *ndo,
                     tcap_len-=2;
                     cap_offset=4;
                     while(tcap_len>=4) {
+                        ND_TCHECK_8BITS(opt + i + cap_offset + 3);
                         ND_PRINT((ndo, "\n\t\t  AFI %s (%u), SAFI %s (%u), Forwarding state preserved: %s",
                                tok2str(af_values,"Unknown",
                                           EXTRACT_16BITS(opt+i+cap_offset)),
@@ -2424,7 +2427,7 @@ bgp_capabilities_print(netdissect_options *ndo,
         return;
 
 trunc:
-	ND_PRINT((ndo, "[|BGP]"));
+	ND_PRINT((ndo, "%s", tstr));
 }
 
 static void
@@ -2487,7 +2490,7 @@ bgp_open_print(netdissect_options *ndo,
 	}
 	return;
 trunc:
-	ND_PRINT((ndo, "[|BGP]"));
+	ND_PRINT((ndo, "%s", tstr));
 }
 
 static void
@@ -2624,7 +2627,7 @@ bgp_update_print(netdissect_options *ndo,
 	}
 	return;
 trunc:
-	ND_PRINT((ndo, "[|BGP]"));
+	ND_PRINT((ndo, "%s", tstr));
 }
 
 static void
@@ -2705,7 +2708,7 @@ bgp_notification_print(netdissect_options *ndo,
 
 	return;
 trunc:
-	ND_PRINT((ndo, "[|BGP]"));
+	ND_PRINT((ndo, "%s", tstr));
 }
 
 static void
@@ -2739,7 +2742,7 @@ bgp_route_refresh_print(netdissect_options *ndo,
 
         return;
 trunc:
-	ND_PRINT((ndo, "[|BGP]"));
+	ND_PRINT((ndo, "%s", tstr));
 }
 
 static int
@@ -2779,7 +2782,7 @@ bgp_header_print(netdissect_options *ndo,
 	}
 	return 1;
 trunc:
-	ND_PRINT((ndo, "[|BGP]"));
+	ND_PRINT((ndo, "%s", tstr));
 	return 0;
 }
 
@@ -2828,7 +2831,7 @@ bgp_print(netdissect_options *ndo,
 		memcpy(&bgp, p, BGP_SIZE);
 
 		if (start != p)
-			ND_PRINT((ndo, " [|BGP]"));
+			ND_PRINT((ndo, " %s", tstr));
 
 		hlen = ntohs(bgp.bgp_len);
 		if (hlen < BGP_SIZE) {
@@ -2854,7 +2857,7 @@ bgp_print(netdissect_options *ndo,
 	return;
 
 trunc:
-	ND_PRINT((ndo, " [|BGP]"));
+	ND_PRINT((ndo, "%s", tstr));
 }
 
 /*
