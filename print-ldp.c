@@ -437,19 +437,24 @@ ldp_tlv_print(netdissect_options *ndo,
 
                 switch(vc_info_tlv_type) {
                 case LDP_FEC_MARTINI_IFPARM_MTU:
+                    ND_TCHECK_16BITS(tptr + 2);
                     ND_PRINT((ndo, ": %u", EXTRACT_16BITS(tptr+2)));
                     break;
 
                 case LDP_FEC_MARTINI_IFPARM_DESC:
                     ND_PRINT((ndo, ": "));
-                    for (idx = 2; idx < vc_info_tlv_len; idx++)
+                    for (idx = 2; idx < vc_info_tlv_len; idx++) {
+                        ND_TCHECK_8BITS(tptr + idx);
                         safeputchar(ndo, *(tptr + idx));
+                    }
                     break;
 
                 case LDP_FEC_MARTINI_IFPARM_VCCV:
+                    ND_TCHECK_8BITS(tptr + 2);
                     ND_PRINT((ndo, "\n\t\t  Control Channels (0x%02x) = [%s]",
                            *(tptr+2),
                            bittok2str(ldp_fec_martini_ifparm_vccv_cc_values, "none", *(tptr+2))));
+                    ND_TCHECK_8BITS(tptr + 3);
                     ND_PRINT((ndo, "\n\t\t  CV Types (0x%02x) = [%s]",
                            *(tptr+3),
                            bittok2str(ldp_fec_martini_ifparm_vccv_cv_values, "none", *(tptr+3))));
