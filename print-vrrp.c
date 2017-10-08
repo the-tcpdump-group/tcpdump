@@ -142,9 +142,11 @@ vrrp_print(netdissect_options *ndo,
 
 			vec[0].ptr = bp;
 			vec[0].len = len;
-			if (in_cksum(vec, 1))
+			if (in_cksum(vec, 1)) {
+				ND_TCHECK_16BITS(&bp[6]);
 				ND_PRINT((ndo, ", (bad vrrp cksum %x)",
 					EXTRACT_16BITS(&bp[6])));
+			}
 		}
 
 		if (version == 3 && ND_TTEST2(bp[0], len)) {
