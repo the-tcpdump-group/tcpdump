@@ -2351,6 +2351,8 @@ bgp_capabilities_print(netdissect_options *ndo,
                            opt[i+5]));
                     break;
                 case BGP_CAPCODE_RESTART:
+                    /* Restart Flags (4 bits), Restart Time in seconds (12 bits) */
+                    ND_TCHECK_16BITS(opt + i + 2);
                     ND_PRINT((ndo, "\n\t\tRestart Flags: [%s], Restart Time %us",
                            ((opt[i+2])&0x80) ? "R" : "none",
                            EXTRACT_16BITS(opt+i+2)&0xfff));
