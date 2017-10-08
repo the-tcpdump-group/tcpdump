@@ -564,6 +564,7 @@ icmp_print(netdissect_options *ndo, const u_char *bp, u_int plen, const u_char *
 			vec[0].len = plen;
 			sum = in_cksum(vec, 1);
 			if (sum != 0) {
+				ND_TCHECK_16BITS(&dp->icmp_cksum);
 				uint16_t icmp_sum = EXTRACT_16BITS(&dp->icmp_cksum);
 				ND_PRINT((ndo, " (wrong icmp cksum %x (->%x)!)",
 					     icmp_sum,
