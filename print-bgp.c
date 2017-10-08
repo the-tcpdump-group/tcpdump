@@ -2342,6 +2342,8 @@ bgp_capabilities_print(netdissect_options *ndo,
                 ND_TCHECK2(opt[i+2], cap_len);
                 switch (cap_type) {
                 case BGP_CAPCODE_MP:
+                    /* AFI (16 bits), Reserved (8 bits), SAFI (8 bits) */
+                    ND_TCHECK_8BITS(opt + i + 5);
                     ND_PRINT((ndo, "\n\t\tAFI %s (%u), SAFI %s (%u)",
                            tok2str(af_values, "Unknown",
                                       EXTRACT_16BITS(opt+i+2)),
