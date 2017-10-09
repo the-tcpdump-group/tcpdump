@@ -569,7 +569,7 @@ static struct attrtype {
      { "Digest-Stale",                    NULL, 0, 0, print_attr_string },
      { "Digest-HA1",                      NULL, 0, 0, print_attr_string },
      { "SIP-AOR",                         NULL, 0, 0, print_attr_string },
-     { "Delegated-IPv6-Prefix",           NULL, 0, 0, print_attr_netmask6 }
+     { "Delegated-IPv6-Prefix",           NULL, 0, 0, print_attr_netmask6 },
   };
 
 
