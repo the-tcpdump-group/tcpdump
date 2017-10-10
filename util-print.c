@@ -827,14 +827,21 @@ txtproto_print(netdissect_options *ndo, const u_char *pptr, u_int len,
 	u_int idx, eol;
 	u_char token[MAX_TOKEN+1];
 	const char *cmd;
-	int is_reqresp = 0;
+	int print_this = 0;
 	const char *pnp;
 
 	if (cmds != NULL) {
 		/*
 		 * This protocol has more than just request and
 		 * response lines; see whether this looks like a
-		 * request or response.
+		 * request or response and, if so, print it and,
+		 * in verbose mode, print everything after it.
+		 *
+		 * This is for HTTP-like protocols, where we
+		 * want to print requests and responses, but
+		 * don't want to print continuations of request
+		 * or response bodies in packets that don't
+		 * contain the request or response line.
 		 */
 		idx = fetch_token(ndo, pptr, 0, len, token, sizeof(token));
 		if (idx != 0) {
@@ -842,7 +849,7 @@ txtproto_print(netdissect_options *ndo, const u_char *pptr, u_int len,
 			while ((cmd = *cmds++) != NULL) {
 				if (ascii_strcasecmp((const char *)token, cmd) == 0) {
 					/* Yes. */
-					is_reqresp = 1;
+					print_this = 1;
 					break;
 				}
 			}
@@ -864,28 +871,36 @@ txtproto_print(netdissect_options *ndo, const u_char *pptr, u_int len,
 				if (isdigit(token[0]) && isdigit(token[1]) &&
 				    isdigit(token[2]) && token[3] == '\0') {
 					/* Yes. */
-					is_reqresp = 1;
+					print_this = 1;
 				}
 			}
 		}
 	} else {
 		/*
-		 * This protocol has only request and response lines
-		 * (e.g., FTP, where all the data goes over a
-		 * different connection); assume the payload is
-		 * a request or response.
+		 * Either:
+		 *
+		 * 1) This protocol has only request and response lines
+		 *    (e.g., FTP, where all the data goes over a different
+		 *    connection); assume the payload is a request or
+		 *    response.
+		 *
+		 * or
+		 *
+		 * 2) This protocol is just text, so that we should
+		 *    always, at minimum, print the first line and,
+		 *    in verbose mode, print all lines.
 		 */
-		is_reqresp = 1;
+		print_this = 1;
 	}
 
 	/* Capitalize the protocol name */
 	for (pnp = protoname; *pnp != '\0'; pnp++)
 		ND_PRINT((ndo, "%c", toupper((u_char)*pnp)));
 
-	if (is_reqresp) {
+	if (print_this) {
 		/*
 		 * In non-verbose mode, just print the protocol, followed
-		 * by the first line as the request or response info.
+		 * by the first line.
 		 *
 		 * In verbose mode, print lines as text until we run out
 		 * of characters or see something that's not a
