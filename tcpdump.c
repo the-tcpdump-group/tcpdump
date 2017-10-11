@@ -248,6 +248,7 @@ struct dump_info {
 	char	*CurrentFileName;
 	pcap_t	*pd;
 	pcap_dumper_t *p;
+	netdissect_options *ndo;
 #ifdef HAVE_CAPSICUM
 	int	dirfd;
 #endif
@@ -557,6 +558,7 @@ show_devices_and_exit (void)
 #define OPTION_VERSION		128
 #define OPTION_TSTAMP_PRECISION	129
 #define OPTION_IMMEDIATE_MODE	130
+#define OPTION_PRINT		131
 
 static const struct option longopts[] = {
 #if defined(HAVE_PCAP_CREATE) || defined(_WIN32)
@@ -596,6 +598,7 @@ static const struct option longopts[] = {
 #endif
 	{ "relinquish-privileges", required_argument, NULL, 'Z' },
 	{ "number", no_argument, NULL, '#' },
+	{ "print", no_argument, NULL, OPTION_PRINT },
 	{ "version", no_argument, NULL, OPTION_VERSION },
 	{ NULL, 0, NULL, 0 }
 };
@@ -1179,7 +1182,7 @@ int
 main(int argc, char **argv)
 {
 	register int cnt, op, i;
-	bpf_u_int32 localnet =0 , netmask = 0;
+	bpf_u_int32 localnet = 0, netmask = 0;
 	int timezone_offset = 0;
 	register char *cp, *infile, *cmdbuf, *device, *RFileName, *VFileName, *WFileName;
 	char *endp;
@@ -1211,6 +1214,7 @@ main(int argc, char **argv)
 	int Oflag = 1;			/* run filter code optimizer */
 	int yflag_dlt = -1;
 	const char *yflag_dlt_name = NULL;
+	int print = 0;
 
 	netdissect_options Ndo;
 	netdissect_options *ndo = &Ndo;
@@ -1603,6 +1607,10 @@ main(int argc, char **argv)
 			break;
 #endif
 
+		case OPTION_PRINT:
+			print = 1;
+			break;
+
 		default:
 			print_usage();
 			exit_tcpdump(1);
@@ -1641,11 +1649,14 @@ main(int argc, char **argv)
 #ifdef HAVE_PCAP_SET_IMMEDIATE_MODE
 	/*
 	 * If we're printing dissected packets to the standard output
-	 * rather than saving raw packets to a file, and the standard
-	 * output is a terminal, use immediate mode, as the user's
-	 * probably expecting to see packets pop up immediately.
+	 * and the standard output is a terminal, use immediate mode,
+	 * as the user's probably expecting to see packets pop up
+	 * immediately.
+	 *
+	 * XXX - set the timeout to a lower value, instead?  If so,
+	 * what value would be appropriate?
 	 */
-	if (WFileName == NULL && isatty(1))
+	if ((WFileName == NULL || print) && isatty(1))
 		immediate_mode = 1;
 #endif
 
@@ -2036,8 +2047,18 @@ main(int argc, char **argv)
 			pcap_userdata = (u_char *)&dumpinfo;
 		} else {
 			callback = dump_packet;
-			pcap_userdata = (u_char *)p;
+			dumpinfo.WFileName = WFileName;
+			dumpinfo.pd = pd;
+			dumpinfo.p = p;
+			pcap_userdata = (u_char *)&dumpinfo;
 		}
+		if (print) {
+			dlt = pcap_datalink(pd);
+			ndo->ndo_if_printer = get_if_printer(ndo, dlt);
+			dumpinfo.ndo = ndo;
+		} else
+			dumpinfo.ndo = NULL;
+
 #ifdef HAVE_PCAP_DUMP_FLUSH
 		if (Uflag)
 			pcap_dump_flush(p);
@@ -2058,11 +2079,11 @@ main(int argc, char **argv)
 		(void)setsignal(SIGNAL_REQ_INFO, requestinfo);
 #endif
 
-	if (ndo->ndo_vflag > 0 && WFileName) {
+	if (ndo->ndo_vflag > 0 && WFileName && !print) {
 		/*
-		 * When capturing to a file, "-v" means tcpdump should,
-		 * every 10 seconds, "v"erbosely report the number of
-		 * packets captured.
+		 * When capturing to a file, if "--print" wasn't specified,
+		 *"-v" means tcpdump should, every 10 seconds,
+		 * "v"erbosely report the number of packets captured.
 		 */
 #ifdef USE_WIN32_MM_TIMER
 		/* call verbose_stats_dump() each 1000 +/-100msec */
@@ -2588,6 +2609,9 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 		pcap_dump_flush(dump_info->p);
 #endif
 
+	if (dump_info->ndo != NULL)
+		pretty_print_packet(dump_info->ndo, h, sp, packets_captured);
+
 	--infodelay;
 	if (infoprint)
 		info(0);
@@ -2596,15 +2620,22 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 static void
 dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
+	struct dump_info *dump_info;
+
 	++packets_captured;
 
 	++infodelay;
 
-	pcap_dump(user, h, sp);
+	dump_info = (struct dump_info *)user;
+
+	pcap_dump((u_char *)dump_info->p, h, sp);
 #ifdef HAVE_PCAP_DUMP_FLUSH
 	if (Uflag)
-		pcap_dump_flush((pcap_dumper_t *)user);
+		pcap_dump_flush(dump_info->p);
 #endif
+
+	if (dump_info->ndo != NULL)
+		pretty_print_packet(dump_info->ndo, h, sp, packets_captured);
 
 	--infodelay;
 	if (infoprint)
@@ -2740,14 +2771,17 @@ print_usage(void)
 "\t\t[ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]\n");
 	(void)fprintf(stderr,
 "\t\t[ -i interface ]" j_FLAG_USAGE " [ -M secret ] [ --number ]\n");
+	(void)fprintf(stderr,
+"\t\t[ --print ]");
 #ifdef HAVE_PCAP_SETDIRECTION
 	(void)fprintf(stderr,
-"\t\t[ -Q in|out|inout ]\n");
+" [ -Q in|out|inout ]");
 #endif
 	(void)fprintf(stderr,
-"\t\t[ -r file ] [ -s snaplen ] ");
+" [ -r file ] [ -s snaplen ]\n");
 #ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
-	(void)fprintf(stderr, "[ --time-stamp-precision precision ]\n");
+	(void)fprintf(stderr,
+"\t\t[ --time-stamp-precision precision ]\n");
 	(void)fprintf(stderr,
 "\t\t");
 #endif
