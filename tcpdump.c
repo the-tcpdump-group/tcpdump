@@ -147,6 +147,7 @@ static long Cflag;			/* rotate dump files after this many bytes */
 #endif
 static int Cflag_count;			/* Keep track of which file number we're writing */
 static int Dflag;			/* list available devices and exit */
+static int rotate_now = 0;              /* user forced rotate after next packet */
 /*
  * This is exported because, in some versions of libpcap, if libpcap
  * is built with optimizer debugging code (which is *NOT* the default
@@ -193,6 +194,7 @@ static NORETURN void error(FORMAT_STRING(const char *), ...) PRINTFLIKE(1, 2);
 static void warning(FORMAT_STRING(const char *), ...) PRINTFLIKE(1, 2);
 static NORETURN void exit_tcpdump(int);
 static RETSIGTYPE cleanup(int);
+static RETSIGTYPE rotate(int);
 static RETSIGTYPE child_cleanup(int);
 static void print_version(void);
 static void print_usage(void);
@@ -1896,6 +1898,7 @@ main(int argc, char **argv)
 	(void)setsignal(SIGPIPE, cleanup);
 	(void)setsignal(SIGTERM, cleanup);
 	(void)setsignal(SIGINT, cleanup);
+	(void)setsignal(SIGUSR2, rotate);
 #endif /* _WIN32 */
 #if defined(HAVE_FORK) || defined(HAVE_VFORK)
 	(void)setsignal(SIGCHLD, child_cleanup);
@@ -2433,11 +2436,12 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 
 
 		/* If the time is greater than the specified window, rotate */
-		if (t - Gflag_time >= Gflag) {
+		if ( (t - Gflag_time >= Gflag) || rotate_now != 0) {
 #ifdef HAVE_CAPSICUM
 			FILE *fp;
 			int fd;
 #endif
+			rotate_now = 0;
 
 			/* Update the Gflag_time */
 			Gflag_time = t;
@@ -2542,11 +2546,12 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 
 		if (size == -1)
 			error("ftell fails on output file");
-		if (size > Cflag) {
+		if (size > Cflag || rotate_now) {
 #ifdef HAVE_CAPSICUM
 			FILE *fp;
 			int fd;
 #endif
+			rotate_now = 0;
 
 			/*
 			 * Close the current file and open a new one.
@@ -2692,6 +2697,12 @@ RETSIGTYPE requestinfo(int signo _U_)
 		info(0);
 }
 #endif
+
+
+RETSIGTYPE rotate(int signo _U_)
+{
+	rotate_now = 1;
+}
 
 /*
  * Called once each second in verbose mode while dumping to file
