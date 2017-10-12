@@ -2693,6 +2693,18 @@ RETSIGTYPE requestinfo(int signo _U_)
 }
 #endif
 
+static void
+print_packets_captured (void)
+{
+	static u_int prev_packets_captured, first = 1;
+
+	if (infodelay == 0 && (first || packets_captured != prev_packets_captured)) {
+		fprintf(stderr, "Got %u\r", packets_captured);
+		first = 0;
+		prev_packets_captured = packets_captured;
+	}
+}
+
 /*
  * Called once each second in verbose mode while dumping to file
  */
@@ -2700,14 +2712,12 @@ RETSIGTYPE requestinfo(int signo _U_)
 void CALLBACK verbose_stats_dump (UINT timer_id _U_, UINT msg _U_, DWORD_PTR arg _U_,
 				  DWORD_PTR dw1 _U_, DWORD_PTR dw2 _U_)
 {
-	if (infodelay == 0)
-		fprintf(stderr, "Got %u\r", packets_captured);
+	print_packets_captured();
 }
 #elif defined(HAVE_ALARM)
 static void verbose_stats_dump(int sig _U_)
 {
-	if (infodelay == 0)
-		fprintf(stderr, "Got %u\r", packets_captured);
+	print_packets_captured();
 	alarm(1);
 }
 #endif
