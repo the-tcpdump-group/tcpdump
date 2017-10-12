@@ -1225,7 +1225,7 @@ The \fBS\fP indicates that the \fISYN\fP flag was set.
 The packet sequence number was 768512 and it contained no data.
 (The notation is `first:last' which means `sequence
 numbers \fIfirst\fP
-up to but not including \fIlast\fP.)
+up to but not including \fIlast\fP'.)
 There was no piggy-backed ack, the available receive window was 4096
 bytes and there was a max-segment-size option requesting an mss of
 1024 bytes.
