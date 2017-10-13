@@ -728,7 +728,7 @@ IP and ICMP header checksum.
 .IP
 When writing to a file with the
 .B \-w
-option, report, every 10 seconds, the number of packets captured.
+option, report, once per second, the number of packets captured.
 .TP
 .B \-vv
 Even more verbose output.

@@ -2082,7 +2082,7 @@ main(int argc, char **argv)
 	if (ndo->ndo_vflag > 0 && WFileName && !print) {
 		/*
 		 * When capturing to a file, if "--print" wasn't specified,
-		 *"-v" means tcpdump should, every 10 seconds,
+		 *"-v" means tcpdump should, once per second,
 		 * "v"erbosely report the number of packets captured.
 		 */
 #ifdef USE_WIN32_MM_TIMER
