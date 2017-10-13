@@ -1914,7 +1914,7 @@ The original distribution is available via anonymous ftp:
 .RE
 .LP
 IPv6/IPsec support is added by WIDE/KAME project.
-This program uses Eric Young's SSLeay library, under specific configurations.
+This program uses OpenSSL/LibreSSL, under specific configurations.
 .SH BUGS
 To report a security issue please send an e-mail to \%security@tcpdump.org.
 .LP
