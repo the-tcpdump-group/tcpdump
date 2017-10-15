@@ -2760,6 +2760,9 @@ print_version(void)
 	smi_version_string = nd_smi_version_string();
 	if (smi_version_string != NULL)
 		(void)fprintf (stderr, "SMI-library: %s\n", smi_version_string);
+#ifdef HAVE_DNET_HTOA
+	(void)fprintf(stderr, "libdnet unknown version\n");
+#endif
 
 #if defined(__SANITIZE_ADDRESS__)
 	(void)fprintf (stderr, "Compiled with AddressSanitizer/GCC.\n");
