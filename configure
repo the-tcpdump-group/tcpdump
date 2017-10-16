@@ -7411,40 +7411,6 @@ $as_echo "$as_me: WARNING: can't find $name" >&2;}
 	    fi
     fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if sockaddr struct has the sa_len member" >&5
-$as_echo_n "checking if sockaddr struct has the sa_len member... " >&6; }
-    if ${ac_cv_lbl_sockaddr_has_sa_len+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-#	include <sys/types.h>
-#	include <sys/socket.h>
-int
-main ()
-{
-u_int i = sizeof(((struct sockaddr *)0)->sa_len)
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  ac_cv_lbl_sockaddr_has_sa_len=yes
-else
-  ac_cv_lbl_sockaddr_has_sa_len=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-fi
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lbl_sockaddr_has_sa_len" >&5
-$as_echo "$ac_cv_lbl_sockaddr_has_sa_len" >&6; }
-    if test $ac_cv_lbl_sockaddr_has_sa_len = yes ; then
-
-$as_echo "#define HAVE_SOCKADDR_SA_LEN 1" >>confdefs.h
-
-    fi
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking if unaligned accesses fail" >&5
 $as_echo_n "checking if unaligned accesses fail... " >&6; }
     if ${ac_cv_lbl_unaligned_fail+:} false; then :

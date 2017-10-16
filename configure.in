@@ -817,8 +817,6 @@ AC_CHECK_TOOL([AR], [ar])
 
 AC_LBL_DEVEL(V_CCOPT)
 
-AC_LBL_SOCKADDR_SA_LEN
-
 AC_LBL_UNALIGNED_ACCESS
 
 # Check for OpenSSL/libressl libcrypto
