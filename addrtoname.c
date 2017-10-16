@@ -67,7 +67,6 @@ extern int ether_ntohost(char *, const struct ether_addr *);
 #include "addrtostr.h"
 #include "ethertype.h"
 #include "llc.h"
-#include "setsignal.h"
 #include "extract.h"
 #include "oui.h"
 

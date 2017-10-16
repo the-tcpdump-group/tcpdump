@@ -412,8 +412,6 @@ if test $needsnprintf = yes; then
 	AC_LIBOBJ(snprintf)
 fi
 
-AC_LBL_TYPE_SIGNAL
-
 AC_SEARCH_LIBS(dnet_htoa, dnet,
     AC_DEFINE(HAVE_DNET_HTOA, 1, [define if you have the dnet_htoa function]))
 

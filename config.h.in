@@ -187,12 +187,6 @@
 /* Define to 1 if you have the `setlinebuf' function. */
 #undef HAVE_SETLINEBUF
 
-/* Define to 1 if you have the `sigaction' function. */
-#undef HAVE_SIGACTION
-
-/* Define to 1 if you have the `sigset' function. */
-#undef HAVE_SIGSET
-
 /* Define to 1 if you have the `snprintf' function. */
 #undef HAVE_SNPRINTF
 
@@ -280,12 +274,6 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* Define as the return type of signal handlers (`int' or `void'). */
-#undef RETSIGTYPE
-
-/* return value of signal handlers */
-#undef RETSIGVAL
-
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
@@ -303,9 +291,6 @@
 
 /* define if should drop privileges by default */
 #undef WITH_USER
-
-/* get BSD semantics on Irix */
-#undef _BSD_SIGNALS
 
 /* define on AIX to get certain functions */
 #undef _SUN

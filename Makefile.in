@@ -70,7 +70,7 @@ DEPENDENCY_CFLAG = @DEPENDENCY_CFLAG@
 	@rm -f $@
 	$(CC) $(FULL_CFLAGS) -c $(srcdir)/$*.c
 
-CSRC =	setsignal.c tcpdump.c
+CSRC =	tcpdump.c
 
 LIBNETDISSECT_SRC=\
 	addrtoname.c \
@@ -290,7 +290,6 @@ HDR = \
 	rpc_auth.h \
 	rpc_msg.h \
 	rpl.h \
-	setsignal.h \
 	signature.h \
 	slcompress.h \
 	smb.h \

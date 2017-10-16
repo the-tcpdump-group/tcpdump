@@ -122,7 +122,6 @@ The Regents of the University of California.  All rights reserved.\n";
 #include "interface.h"
 #include "addrtoname.h"
 #include "machdep.h"
-#include "setsignal.h"
 #include "gmt2local.h"
 #include "pcap-missing.h"
 #include "ascii_strcasecmp.h"
@@ -192,8 +191,9 @@ cap_channel_t *capdns;
 static NORETURN void error(FORMAT_STRING(const char *), ...) PRINTFLIKE(1, 2);
 static void warning(FORMAT_STRING(const char *), ...) PRINTFLIKE(1, 2);
 static NORETURN void exit_tcpdump(int);
-static RETSIGTYPE cleanup(int);
-static RETSIGTYPE child_cleanup(int);
+static void (*setsignal (int sig, void (*func)(int)))(int);
+static void cleanup(int);
+static void child_cleanup(int);
 static void print_version(void);
 static void print_usage(void);
 static NORETURN void show_tstamp_types_and_exit(pcap_t *, const char *device);
@@ -208,7 +208,7 @@ static void dump_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void droproot(const char *, const char *);
 
 #ifdef SIGNAL_REQ_INFO
-RETSIGTYPE requestinfo(int);
+void requestinfo(int);
 #endif
 
 #if defined(USE_WIN32_MM_TIMER)
@@ -1191,7 +1191,7 @@ main(int argc, char **argv)
 	const char *dlt_name;
 	struct bpf_program fcode;
 #ifndef _WIN32
-	RETSIGTYPE (*oldhandler)(int);
+	void (*oldhandler)(int);
 #endif
 	struct dump_info dumpinfo;
 	u_char *pcap_userdata;
@@ -2251,8 +2251,29 @@ main(int argc, char **argv)
 	exit_tcpdump(status == -1 ? 1 : 0);
 }
 
+/*
+ * Catch a signal.
+ */
+static void
+(*setsignal (int sig, void (*func)(int)))(int)
+{
+#ifdef _WIN32
+	return (signal(sig, func));
+#else
+	struct sigaction old, new;
+
+	memset(&new, 0, sizeof(new));
+	new.sa_handler = func;
+	if (sig == SIGCHLD)
+		new.sa_flags = SA_RESTART;
+	if (sigaction(sig, &new, &old) < 0)
+		return (SIG_ERR);
+	return (old.sa_handler);
+#endif
+}
+
 /* make a clean exit on interrupts */
-static RETSIGTYPE
+static void
 cleanup(int signo _U_)
 {
 #ifdef USE_WIN32_MM_TIMER
@@ -2297,7 +2318,7 @@ cleanup(int signo _U_)
   waiting a child processes to die
  */
 #if defined(HAVE_FORK) || defined(HAVE_VFORK)
-static RETSIGTYPE
+static void
 child_cleanup(int signo _U_)
 {
   wait(NULL);
@@ -2684,7 +2705,7 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 #endif
 
 #ifdef SIGNAL_REQ_INFO
-RETSIGTYPE requestinfo(int signo _U_)
+void requestinfo(int signo _U_)
 {
 	if (infodelay)
 		++infoprint;
