@@ -2747,7 +2747,6 @@ USES_APPLE_DEPRECATED_API
 static void
 print_version(void)
 {
-	extern char version[];
 #ifndef HAVE_PCAP_LIB_VERSION
 #if defined(_WIN32) || defined(HAVE_PCAP_VERSION)
 	extern char pcap_version[];
@@ -2757,21 +2756,11 @@ print_version(void)
 #endif /* HAVE_PCAP_LIB_VERSION */
 	const char *smi_version_string;
 
+	(void)fprintf(stderr, "%s version " PACKAGE_VERSION "\n", program_name);
 #ifdef HAVE_PCAP_LIB_VERSION
-#ifdef _WIN32
-	(void)fprintf(stderr, "%s version %s, based on tcpdump version %s\n", program_name, WDversion, version);
-#else /* _WIN32 */
-	(void)fprintf(stderr, "%s version %s\n", program_name, version);
-#endif /* _WIN32 */
 	(void)fprintf(stderr, "%s\n",pcap_lib_version());
 #else /* HAVE_PCAP_LIB_VERSION */
-#ifdef _WIN32
-	(void)fprintf(stderr, "%s version %s, based on tcpdump version %s\n", program_name, WDversion, version);
-	(void)fprintf(stderr, "WinPcap version %s, based on libpcap version %s\n",Wpcap_version, pcap_version);
-#else /* _WIN32 */
-	(void)fprintf(stderr, "%s version %s\n", program_name, version);
 	(void)fprintf(stderr, "libpcap version %s\n", pcap_version);
-#endif /* _WIN32 */
 #endif /* HAVE_PCAP_LIB_VERSION */
 
 #if defined(HAVE_LIBCRYPTO) && defined(SSLEAY_VERSION)

@@ -238,7 +238,6 @@ LIBNETDISSECT_SRC=\
 	util-print.c
 
 LOCALSRC = @LOCALSRC@
-GENSRC = version.c
 LIBOBJS = @LIBOBJS@
 
 LIBNETDISSECT_OBJ=$(LIBNETDISSECT_SRC:.c=.o) ${LOCALSRC:.c=.o} ${LIBOBJS}
@@ -394,19 +393,6 @@ strlcpy.o: $(srcdir)/missing/strlcpy.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/strlcpy.c
 strsep.o: $(srcdir)/missing/strsep.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/strsep.c
-
-version.o: version.c
-	$(CC) $(FULL_CFLAGS) -c version.c
-
-version.c: $(srcdir)/VERSION
-	@rm -f $@
-	if grep GIT ${srcdir}/VERSION >/dev/null; then \
-		read ver <${srcdir}/VERSION; \
-		echo $$ver | tr -d '\012'; \
-		date +_%Y_%m_%d; \
-	else \
-		cat ${srcdir}/VERSION; \
-	fi | sed -e 's/.*/const char version[] = "&";/' > $@
 
 install: all
 	[ -d $(DESTDIR)$(sbindir) ] || \
