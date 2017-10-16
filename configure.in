@@ -61,8 +61,6 @@ struct rtentry;
 #include <net/if.h>])
 fi
 
-AC_HEADER_TIME
-
 case "$host_os" in
 
 darwin*)

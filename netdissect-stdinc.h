@@ -231,9 +231,7 @@ typedef char* caddr_t;
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-#ifdef TIME_WITH_SYS_TIME
 #include <time.h>
-#endif
 
 #include <arpa/inet.h>
 
