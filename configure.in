@@ -815,8 +815,6 @@ AC_CHECK_TOOL([AR], [ar])
 
 AC_LBL_DEVEL(V_CCOPT)
 
-AC_LBL_UNALIGNED_ACCESS
-
 # Check for OpenSSL/libressl libcrypto
 AC_MSG_CHECKING(whether to use OpenSSL/libressl libcrypto)
 # Specify location for both includes and libraries.

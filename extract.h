@@ -62,19 +62,54 @@
 #define UNALIGNED_OK
 #endif
 
-#ifdef LBL_ALIGN
+#if (defined(__i386__) || defined(_M_IX86) || defined(__X86__) || defined(__x86_64__) || defined(_M_X64)) || \
+    (defined(__arm__) || defined(_M_ARM) || defined(__aarch64__)) || \
+    (defined(__m68k__) && (!defined(__mc68000__) && !defined(__mc68010__))) || \
+    (defined(__ppc__) || defined(__ppc64__) || defined(_M_PPC) || defined(_ARCH_PPC) || defined(_ARCH_PPC64)) || \
+    (defined(__s390__) || defined(__s390x__) || defined(__zarch__))
 /*
- * The processor doesn't natively handle unaligned loads.
+ * The processor natively handles unaligned loads, so we can just
+ * cast the pointer and fetch through it.
+ *
+ * XXX - are those all the x86 tests we need?
+ * XXX - do we need to worry about ARMv1 through ARMv5, which didn't
+ * support unaligned loads, and, if so, do we need to worry about all
+ * of them, or just some of them, e.g. ARMv5?
+ * XXX - are those the only 68k tests we need not to generated
+ * unaligned accesses if the target is the 68000 or 68010?
+ * XXX - are there any tests we don't need, because some definitions are for
+ * compilers that also predefine the GCC symbols?
+ * XXX - do we need to test for both 32-bit and 64-bit versions of those
+ * architectures in all cases?
  */
-#if defined(__GNUC__) && defined(HAVE___ATTRIBUTE__) && \
+static inline uint16_t UNALIGNED_OK
+EXTRACT_16BITS(const void *p)
+{
+	return ((uint16_t)ntohs(*(const uint16_t *)(p)));
+}
+
+static inline uint32_t UNALIGNED_OK
+EXTRACT_32BITS(const void *p)
+{
+	return ((uint32_t)ntohl(*(const uint32_t *)(p)));
+}
+
+static inline uint64_t UNALIGNED_OK
+EXTRACT_64BITS(const void *p)
+{
+	return ((uint64_t)(((uint64_t)ntohl(*((const uint32_t *)(p) + 0))) << 32 |
+		((uint64_t)ntohl(*((const uint32_t *)(p) + 1))) << 0));
+
+}
+#elif defined(__GNUC__) && defined(HAVE___ATTRIBUTE__) && \
     (defined(__alpha) || defined(__alpha__) || \
      defined(__mips) || defined(__mips__))
-
 /*
-* This is a GCC-compatible compiler and we have __attribute__, which
- * we assume that mean we have __attribute__((packed)), and this is
- * MIPS or Alpha, which has instructions that can help when doing
- * unaligned loads.
+ * This is MIPS or Alpha, which don't natively handle unaligned loads,
+ * but which have instructions that can help when doing unaligned
+ * loads, and this is a GCC-compatible compiler and we have __attribute__,
+ * which we assume that mean we have __attribute__((packed)), which
+ * we can use to convince the compiler to generate those instructions.
  *
  * Declare packed structures containing a uint16_t and a uint32_t,
  * cast the pointer to point to one of those, and fetch through it;
@@ -146,10 +181,10 @@ EXTRACT_64BITS(const void *p)
 	return ((uint64_t)(((uint64_t)ntohl(((const unaligned_uint32_t *)(p) + 0)->val)) << 32 |
 		((uint64_t)ntohl(((const unaligned_uint32_t *)(p) + 1)->val)) << 0));
 }
-
-#else /* have to do it a byte at a time */
+#else
 /*
- * This isn't a GCC-compatible compiler, we don't have __attribute__,
+ * This architecture doesn't natively support unaligned loads, and either
+ * this isn't a GCC-compatible compiler, we don't have __attribute__,
  * or we do but we don't know of any better way with this instruction
  * set to do unaligned loads, so do unaligned loads of big-endian
  * quantities the hard way - fetch the bytes one at a time and
@@ -172,33 +207,7 @@ EXTRACT_64BITS(const void *p)
 	            ((uint64_t)(*((const uint8_t *)(p) + 5)) << 16) | \
 	            ((uint64_t)(*((const uint8_t *)(p) + 6)) << 8) | \
 	            ((uint64_t)(*((const uint8_t *)(p) + 7)) << 0)))
-#endif /* must special-case unaligned accesses */
-#else /* LBL_ALIGN */
-/*
- * The processor natively handles unaligned loads, so we can just
- * cast the pointer and fetch through it.
- */
-static inline uint16_t UNALIGNED_OK
-EXTRACT_16BITS(const void *p)
-{
-	return ((uint16_t)ntohs(*(const uint16_t *)(p)));
-}
-
-static inline uint32_t UNALIGNED_OK
-EXTRACT_32BITS(const void *p)
-{
-	return ((uint32_t)ntohl(*(const uint32_t *)(p)));
-}
-
-static inline uint64_t UNALIGNED_OK
-EXTRACT_64BITS(const void *p)
-{
-	return ((uint64_t)(((uint64_t)ntohl(*((const uint32_t *)(p) + 0))) << 32 |
-		((uint64_t)ntohl(*((const uint32_t *)(p) + 1))) << 0));
-
-}
-
-#endif /* LBL_ALIGN */
+#endif /* unaligned access checks */
 
 #define EXTRACT_24BITS(p) \
 	((uint32_t)(((uint32_t)(*((const uint8_t *)(p) + 0)) << 16) | \

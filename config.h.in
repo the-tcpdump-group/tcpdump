@@ -247,9 +247,6 @@
 /* define if your compiler has __attribute__ */
 #undef HAVE___ATTRIBUTE__
 
-/* if unaligned access fails */
-#undef LBL_ALIGN
-
 /* Define to 1 if netinet/ether.h declares `ether_ntohost' */
 #undef NETINET_ETHER_H_DECLARES_ETHER_NTOHOST
 

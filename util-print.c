@@ -946,11 +946,38 @@ safeputchar(netdissect_options *ndo,
 	ND_PRINT((ndo, (c < 0x80 && ND_ISPRINT(c)) ? "%c" : "\\0x%02x", c));
 }
 
-#ifdef LBL_ALIGN
+#if (defined(__i386__) || defined(_M_IX86) || defined(__X86__) || defined(__x86_64__) || defined(_M_X64)) || \
+    (defined(__arm__) || defined(_M_ARM) || defined(__aarch64__)) || \
+    (defined(__m68k__) && (!defined(__mc68000__) && !defined(__mc68010__))) || \
+    (defined(__ppc__) || defined(__ppc64__) || defined(_M_PPC) || defined(_ARCH_PPC) || defined(_ARCH_PPC64)) || \
+    (defined(__s390__) || defined(__s390x__) || defined(__zarch__)) || \
+    defined(__vax__)
 /*
- * Some compilers try to optimize memcpy(), using the alignment constraint
- * on the argument pointer type.  by using this function, we try to avoid the
- * optimization.
+ * The procesor natively handles unaligned loads, so just use memcpy()
+ * and memcmp(), to enable those optimizations.
+ *
+ * XXX - are those all the x86 tests we need?
+ * XXX - do we need to worry about ARMv1 through ARMv5, which didn't
+ * support unaligned loads, and, if so, do we need to worry about all
+ * of them, or just some of them, e.g. ARMv5?
+ * XXX - are those the only 68k tests we need not to generated
+ * unaligned accesses if the target is the 68000 or 68010?
+ * XXX - are there any tests we don't need, because some definitions are for
+ * compilers that also predefine the GCC symbols?
+ * XXX - do we need to test for both 32-bit and 64-bit versions of those
+ * architectures in all cases?
+ */
+#else
+/*
+ * The processor doesn't natively handle unaligned loads,
+ * and the compiler might "helpfully" optimize memcpy()
+ * and memcmp(), when handed pointers that would normally
+ * be properly aligned, into sequences that assume proper
+ * alignment.
+ *
+ * Do copies and compares of possibly-unaligned data by
+ * calling routines that wrap memcpy() and memcmp(), to
+ * prevent that optimization.
  */
 void
 unaligned_memcpy(void *p, const void *q, size_t l)
