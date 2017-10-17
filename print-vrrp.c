@@ -152,9 +152,11 @@ vrrp_print(netdissect_options *ndo,
 		if (version == 3 && ND_TTEST2(bp[0], len)) {
 			uint16_t cksum = nextproto4_cksum(ndo, (const struct ip *)bp2, bp,
 				len, len, IPPROTO_VRRP);
-			if (cksum)
+			if (cksum) {
+				ND_TCHECK_16BITS(&bp[6]);
 				ND_PRINT((ndo, ", (bad vrrp cksum %x)",
 					EXTRACT_16BITS(&bp[6])));
+			}
 		}
 
 		ND_PRINT((ndo, ", addrs"));
