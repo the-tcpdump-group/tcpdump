@@ -31,6 +31,8 @@
 #include "addrtoname.h"
 #include "gmpls.h"
 
+static const char tstr[] = " [|LMP]";
+
 /*
  * LMP common header
  *
@@ -367,6 +369,7 @@ lmp_print_data_link_subobjs(netdissect_options *ndo, const u_char *obj_tptr,
     } bw;
 
     while (total_subobj_len > 0 && hexdump == FALSE ) {
+	ND_TCHECK_16BITS(obj_tptr + offset);
 	subobj_type = EXTRACT_8BITS(obj_tptr + offset);
 	subobj_len  = EXTRACT_8BITS(obj_tptr + offset + 1);
 	ND_PRINT((ndo, "\n\t    Subobject, Type: %s (%u), Length: %u",
@@ -389,11 +392,13 @@ lmp_print_data_link_subobjs(netdissect_options *ndo, const u_char *obj_tptr,
 	}
 	switch(subobj_type) {
 	case INT_SWITCHING_TYPE_SUBOBJ:
+	    ND_TCHECK_8BITS(obj_tptr + offset + 2);
 	    ND_PRINT((ndo, "\n\t      Switching Type: %s (%u)",
 		tok2str(gmpls_switch_cap_values,
 			"Unknown",
 			EXTRACT_8BITS(obj_tptr + offset + 2)),
 			EXTRACT_8BITS(obj_tptr + offset + 2)));
+	    ND_TCHECK_8BITS(obj_tptr + offset + 3);
 	    ND_PRINT((ndo, "\n\t      Encoding Type: %s (%u)",
 		tok2str(gmpls_encoding_values,
 			"Unknown",
@@ -403,11 +408,13 @@ lmp_print_data_link_subobjs(netdissect_options *ndo, const u_char *obj_tptr,
 	    bw.i = EXTRACT_32BITS(obj_tptr+offset+4);
 	    ND_PRINT((ndo, "\n\t      Min Reservable Bandwidth: %.3f Mbps",
                 bw.f*8/1000000));
+	    ND_TCHECK_32BITS(obj_tptr + offset + 8);
 	    bw.i = EXTRACT_32BITS(obj_tptr+offset+8);
 	    ND_PRINT((ndo, "\n\t      Max Reservable Bandwidth: %.3f Mbps",
                 bw.f*8/1000000));
 	    break;
 	case WAVELENGTH_SUBOBJ:
+	    ND_TCHECK_32BITS(obj_tptr + offset + 4);
 	    ND_PRINT((ndo, "\n\t      Wavelength: %u",
 		EXTRACT_32BITS(obj_tptr+offset+4)));
 	    break;
@@ -1141,7 +1148,7 @@ lmp_print(netdissect_options *ndo,
     }
     return;
 trunc:
-    ND_PRINT((ndo, "\n\t\t packet exceeded snapshot"));
+    ND_PRINT((ndo, "%s", tstr));
 }
 /*
  * Local Variables:
