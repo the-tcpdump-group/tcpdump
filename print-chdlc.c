@@ -32,6 +32,7 @@
 #include "ethertype.h"
 #include "extract.h"
 #include "chdlc.h"
+#include "nlpid.h"
 
 static void chdlc_slarp_print(netdissect_options *, const u_char *, u_int);
 
@@ -94,9 +95,9 @@ chdlc_print(netdissect_options *ndo, register const u_char *p, u_int length)
                 if (length < 2)
                     goto trunc;
                 ND_TCHECK_16BITS(p);
-                if (*(p+1) == 0x81 ||
-                    *(p+1) == 0x82 ||
-                    *(p+1) == 0x83)
+                if (*(p+1) == NLPID_CLNP ||
+                    *(p+1) == NLPID_ESIS ||
+                    *(p+1) == NLPID_ISIS)
                     isoclns_print(ndo, p + 1, length - 1);
                 else
                     isoclns_print(ndo, p, length);
