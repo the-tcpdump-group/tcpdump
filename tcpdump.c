@@ -1397,7 +1397,7 @@ main(int argc, char **argv)
 			 * Will multiplying it by 1000000 overflow?
 			 */
 #ifdef HAVE_PCAP_DUMP_FTELL64
-			if (Cflag > INT64_T_CONSTANT(0x7fffffffffffffffU) / 1000000)
+			if (Cflag > INT64_T_CONSTANT(0x7fffffffffffffff) / 1000000)
 #else
 			if (Cflag > LONG_MAX / 1000000)
 #endif
