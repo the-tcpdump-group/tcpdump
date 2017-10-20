@@ -130,6 +130,9 @@
 /* Define to 1 if you have the `pcap_findalldevs' function. */
 #undef HAVE_PCAP_FINDALLDEVS
 
+/* Define to 1 if you have the `pcap_findalldevs_ex' function. */
+#undef HAVE_PCAP_FINDALLDEVS_EX
+
 /* Define to 1 if you have the `pcap_free_datalinks' function. */
 #undef HAVE_PCAP_FREE_DATALINKS
 
@@ -144,6 +147,9 @@
 
 /* Define to 1 if you have the <pcap/nflog.h> header file. */
 #undef HAVE_PCAP_NFLOG_H
+
+/* Define to 1 if you have the `pcap_open' function. */
+#undef HAVE_PCAP_OPEN
 
 /* Define to 1 if you have the <pcap/pcap-inttypes.h> header file. */
 #undef HAVE_PCAP_PCAP_INTTYPES_H

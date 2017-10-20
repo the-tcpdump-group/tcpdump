@@ -87,6 +87,9 @@ The Regents of the University of California.  All rights reserved.\n";
 #include <sys/nv.h>
 #endif	/* HAVE_CASPER */
 #endif	/* HAVE_CAPSICUM */
+#ifdef HAVE_PCAP_OPEN
+#define HAVE_REMOTE
+#endif
 #include <pcap.h>
 #include <signal.h>
 #include <stdio.h>
@@ -145,7 +148,13 @@ static int64_t Cflag;			/* rotate dump files after this many bytes */
 static long Cflag;			/* rotate dump files after this many bytes */
 #endif
 static int Cflag_count;			/* Keep track of which file number we're writing */
+#ifdef HAVE_PCAP_FINDALLDEVS
 static int Dflag;			/* list available devices and exit */
+#endif
+#ifdef HAVE_PCAP_FINDALLDEVS_EX
+static char *remote_interfaces_source;	/* list available devices from this source and exit */
+#endif
+
 /*
  * This is exported because, in some versions of libpcap, if libpcap
  * is built with optimizer debugging code (which is *NOT* the default
@@ -200,6 +209,9 @@ static NORETURN void show_tstamp_types_and_exit(pcap_t *, const char *device);
 static NORETURN void show_dlts_and_exit(pcap_t *, const char *device);
 #ifdef HAVE_PCAP_FINDALLDEVS
 static NORETURN void show_devices_and_exit(void);
+#endif
+#ifdef HAVE_PCAP_FINDALLDEVS_EX
+static NORETURN void show_remote_devices_and_exit(void);
 #endif
 
 static void print_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
@@ -436,13 +448,37 @@ show_dlts_and_exit(pcap_t *pc, const char *device)
 
 #ifdef HAVE_PCAP_FINDALLDEVS
 static void
-show_devices_and_exit (void)
+show_devices_and_exit(void)
 {
 	pcap_if_t *dev, *devlist;
 	char ebuf[PCAP_ERRBUF_SIZE];
 	int i;
 
 	if (pcap_findalldevs(&devlist, ebuf) < 0)
+		error("%s", ebuf);
+	for (i = 0, dev = devlist; dev != NULL; i++, dev = dev->next) {
+		printf("%d.%s", i+1, dev->name);
+		if (dev->description != NULL)
+			printf(" (%s)", dev->description);
+		if (dev->flags != 0)
+			printf(" [%s]", bittok2str(status_flags, "none", dev->flags));
+		printf("\n");
+	}
+	pcap_freealldevs(devlist);
+	exit_tcpdump(0);
+}
+#endif /* HAVE_PCAP_FINDALLDEVS */
+
+#ifdef HAVE_PCAP_FINDALLDEVS_EX
+static void
+show_remote_devices_and_exit(void)
+{
+	pcap_if_t *dev, *devlist;
+	char ebuf[PCAP_ERRBUF_SIZE];
+	int i;
+
+	if (pcap_findalldevs_ex(remote_interfaces_source, NULL, &devlist,
+	    ebuf) < 0)
 		error("%s", ebuf);
 	for (i = 0, dev = devlist; dev != NULL; i++, dev = dev->next) {
 		printf("%d.%s", i+1, dev->name);
@@ -499,6 +535,12 @@ show_devices_and_exit (void)
 #define B_FLAG_USAGE
 #endif /* defined(HAVE_PCAP_CREATE) || defined(_WIN32) */
 
+#ifdef HAVE_PCAP_FINDALLDEVS
+#define D_FLAG	"D"
+#else
+#define D_FLAG
+#endif
+
 #ifdef HAVE_PCAP_CREATE
 #define I_FLAG		"I"
 #else /* HAVE_PCAP_CREATE */
@@ -515,22 +557,18 @@ show_devices_and_exit (void)
 #define J_FLAG
 #endif /* PCAP_ERROR_TSTAMP_TYPE_NOTSUP */
 
-#ifdef HAVE_PCAP_FINDALLDEVS
-#define D_FLAG	"D"
+#ifdef HAVE_PCAP_SETDIRECTION
+#define Q_FLAG "Q:"
+#define Q_FLAG_USAGE " [ -Q in|out|inout ]"
 #else
-#define D_FLAG
+#define Q_FLAG
+#define Q_FLAG_USAGE
 #endif
 
 #ifdef HAVE_PCAP_DUMP_FLUSH
 #define U_FLAG	"U"
 #else
 #define U_FLAG
-#endif
-
-#ifdef HAVE_PCAP_SETDIRECTION
-#define Q_FLAG "Q:"
-#else
-#define Q_FLAG
 #endif
 
 #define SHORTOPTS "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOpq" Q_FLAG "r:s:StT:u" U_FLAG "vV:w:W:xXy:Yz:Z:#"
@@ -555,16 +593,20 @@ show_devices_and_exit (void)
  * component of the entry for the long option, and have a case for that
  * option in the switch statement.
  */
-#define OPTION_VERSION		128
-#define OPTION_TSTAMP_PRECISION	129
-#define OPTION_IMMEDIATE_MODE	130
-#define OPTION_PRINT		131
+#define OPTION_VERSION			128
+#define OPTION_TSTAMP_PRECISION		129
+#define OPTION_IMMEDIATE_MODE		130
+#define OPTION_PRINT			131
+#define OPTION_LIST_REMOTE_INTERFACES	132
 
 static const struct option longopts[] = {
 #if defined(HAVE_PCAP_CREATE) || defined(_WIN32)
 	{ "buffer-size", required_argument, NULL, 'B' },
 #endif
 	{ "list-interfaces", no_argument, NULL, 'D' },
+#ifdef HAVE_PCAP_FINDALLDEVS_EX
+	{ "list-remote-interfaces", required_argument, NULL, OPTION_LIST_REMOTE_INTERFACES },
+#endif
 	{ "help", no_argument, NULL, 'h' },
 	{ "interface", required_argument, NULL, 'i' },
 #ifdef HAVE_PCAP_CREATE
@@ -602,6 +644,24 @@ static const struct option longopts[] = {
 	{ "version", no_argument, NULL, OPTION_VERSION },
 	{ NULL, 0, NULL, 0 }
 };
+
+#ifdef HAVE_PCAP_FINDALLDEVS_EX
+#define LIST_REMOTE_INTERFACES_USAGE "[ --list-remote-interfaces remote-source  ]"
+#else
+#define LIST_REMOTE_INTERFACES_USAGE
+#endif
+
+#ifdef HAVE_PCAP_SET_IMMEDIATE_MODE
+#define IMMEDIATE_MODE_USAGE " [ --immediate-mode ]"
+#else
+#define IMMEDIATE_MODE_USAGE ""
+#endif
+
+#ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
+#define TIME_STAMP_PRECISION_USAGE " [ --time-stamp-precision precision ]"
+#else
+#define TIME_STAMP_PRECISION_USAGE
+#endif
 
 #ifndef _WIN32
 /* Drop root privileges and chroot if necessary */
@@ -992,6 +1052,13 @@ find_interface_by_number(long devnum)
 }
 #endif
 
+#ifdef HAVE_PCAP_OPEN
+/*
+ * Prefix for rpcap URLs.
+ */
+static char rpcap_prefix[] = "rpcap://";
+#endif
+
 static pcap_t *
 open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 {
@@ -1000,6 +1067,36 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 	int status;
 	char *cp;
 #endif
+
+#ifdef HAVE_PCAP_OPEN
+	/*
+	 * Is this an rpcap URL?
+	 */
+	if (strncmp(device, rpcap_prefix, sizeof(rpcap_prefix) - 1) == 0) {
+		/*
+		 * Yes.  Open it with pcap_open().
+		 */
+		*ebuf = '\0';
+fprintf(stderr, "Opening %s\n", device);
+		pc = pcap_open(device, ndo->ndo_snaplen,
+		    pflag ? 0 : PCAP_OPENFLAG_PROMISCUOUS, 1000, NULL,
+		    ebuf);
+		if (pc == NULL) {
+			/*
+			 * If this failed with "No such device", that means
+			 * the interface doesn't exist; return NULL, so that
+			 * the caller can see whether the device name is
+			 * actually an interface index.
+			 */
+			if (strstr(ebuf, "No such device") != NULL)
+				return (NULL);
+			error("%s", ebuf);
+		}
+		if (*ebuf)
+			warning("%s", ebuf);
+		return (pc);
+	}
+#endif /* HAVE_PCAP_OPEN */
 
 #ifdef HAVE_PCAP_CREATE
 	pc = pcap_create(device, ebuf);
@@ -1312,9 +1409,17 @@ main(int argc, char **argv)
 			++dflag;
 			break;
 
+#ifdef HAVE_PCAP_FINDALLDEVS
 		case 'D':
 			Dflag++;
 			break;
+#endif
+
+#ifdef HAVE_PCAP_FINDALLDEVS_EX
+		case OPTION_LIST_REMOTE_INTERFACES:
+			remote_interfaces_source = optarg;
+			break;
+#endif
 
 		case 'L':
 			Lflag++;
@@ -1620,6 +1725,10 @@ main(int argc, char **argv)
 #ifdef HAVE_PCAP_FINDALLDEVS
 	if (Dflag)
 		show_devices_and_exit();
+#endif
+#ifdef HAVE_PCAP_FINDALLDEVS_EX
+	if (remote_interfaces_source != NULL)
+		show_remote_devices_and_exit();
 #endif
 
 	switch (ndo->ndo_tflag) {
@@ -2793,29 +2902,21 @@ print_usage(void)
 	(void)fprintf(stderr,
 "\t\t[ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]\n");
 	(void)fprintf(stderr,
-"\t\t[ -i interface ]" j_FLAG_USAGE " [ -M secret ] [ --number ]\n");
+"\t\t[ -i interface ]" IMMEDIATE_MODE_USAGE j_FLAG_USAGE "\n");
+#ifdef HAVE_PCAP_FINDALLDEVS_EX
 	(void)fprintf(stderr,
-"\t\t[ --print ]");
-#ifdef HAVE_PCAP_SETDIRECTION
-	(void)fprintf(stderr,
-" [ -Q in|out|inout ]");
+"\t\t" LIST_REMOTE_INTERFACES_USAGE "\n");
 #endif
 	(void)fprintf(stderr,
-" [ -r file ] [ -s snaplen ]\n");
-#ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
+"\t\t[ -M secret ] [ --number ] [ --print ]" Q_FLAG_USAGE "\n");
 	(void)fprintf(stderr,
-"\t\t[ --time-stamp-precision precision ]\n");
+"\t\t[ -r file ] [ -s snaplen ]" TIME_STAMP_PRECISION_USAGE "\n");
 	(void)fprintf(stderr,
-"\t\t");
-#endif
-#ifdef HAVE_PCAP_SET_IMMEDIATE_MODE
-	(void)fprintf(stderr, "[ --immediate-mode ] ");
-#endif
-	(void)fprintf(stderr, "[ -T type ] [ --version ] [ -V file ]\n");
+"\t\t[ -T type ] [ --version ] [ -V file ] [ -w file ]\n");
 	(void)fprintf(stderr,
-"\t\t[ -w file ] [ -W filecount ] [ -y datalinktype ] [ -z postrotate-command ]\n");
+"\t\t[ -W filecount ] [ -y datalinktype ]\n");
 	(void)fprintf(stderr,
-"\t\t[ -Z user ] [ expression ]\n");
+"\t\t[ -z postrotate-command ] [ -Z user ] [ expression ]\n");
 }
 /*
  * Local Variables:
