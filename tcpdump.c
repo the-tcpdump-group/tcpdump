@@ -142,7 +142,7 @@ The Regents of the University of California.  All rights reserved.\n";
 #endif
 
 static int Bflag;			/* buffer size */
-#ifdef HAVE_PCAP_FTELL64
+#ifdef HAVE_PCAP_DUMP_FTELL64
 static int64_t Cflag;			/* rotate dump files after this many bytes */
 #else
 static long Cflag;			/* rotate dump files after this many bytes */
@@ -1385,7 +1385,7 @@ main(int argc, char **argv)
 
 		case 'C':
 			errno = 0;
-#ifdef HAVE_PCAP_FTELL64
+#ifdef HAVE_PCAP_DUMP_FTELL64
 			Cflag = strtoint64_t(optarg, &endp, 10);
 #else
 			Cflag = strtol(optarg, &endp, 10);
@@ -1396,7 +1396,7 @@ main(int argc, char **argv)
 			/*
 			 * Will multiplying it by 1000000 overflow?
 			 */
-#ifdef HAVE_PCAP_FTELL64
+#ifdef HAVE_PCAP_DUMP_FTELL64
 			if (Cflag > INT64_T_CONSTANT(0x7fffffffffffffffU) / 1000000)
 #else
 			if (Cflag > LONG_MAX / 1000000)
@@ -2658,7 +2658,7 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 	 * file could put it over Cflag.
 	 */
 	if (Cflag != 0) {
-#ifdef HAVE_PCAP_FTELL64
+#ifdef HAVE_PCAP_DUMP_FTELL64
 		int64_t size = pcap_dump_ftell64(dump_info->p);
 #else
 		/*

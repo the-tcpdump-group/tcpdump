@@ -85,6 +85,11 @@
         typedef unsigned long long uint64_t;
         typedef long long int64_t;
       #endif
+
+      /*
+       * We have _strtoi64().  Use that for strtoint64_t().
+       */
+      #define strtoint64_t	_strtoi64
     #endif
 
     /*
@@ -166,14 +171,35 @@
 #ifdef _MSC_VER
   /*
    * Compiler is MSVC.
-   *
+   */
+  #if _MSC_VER >= 1800
+    /*
+     * VS 2013 or newer; we have strtoll().  Use that for strtoint64_t().
+     */
+    #define strtoint64_t	strtoll
+  #else
+    /*
+     * Earlier VS; we don't have strtoll(), but we do have
+     * _strtoi64().  Use that for strtoint64_t().
+     */
+    #define strtoint64_t	_strtoi64
+  #endif
+
+  /*
    * Microsoft's documentation doesn't speak of LL as a valid
    * suffix for 64-bit integers, so we'll just use i64.
    */
   #define INT64_T_CONSTANT(constant)	(constant##i64)
 #else
   /*
-   * Non-Microsoft compiler; assume LL works.
+   * Non-Microsoft compiler.
+   *
+   * XXX - should we use strtoll or should we use _strtoi64()?
+   */
+  #define strtoint64_t		strtoll
+
+  /*
+   * Assume LL works.
    */
   #define INT64_T_CONSTANT(constant)	(constant##LL)
 #endif
@@ -234,6 +260,11 @@ typedef char* caddr_t;
 #include <time.h>
 
 #include <arpa/inet.h>
+
+/*
+ * Assume all UN*Xes have strtoll(), and use it for strtoint64_t().
+ */
+#define strtoint64_t	strtoll
 
 /*
  * Assume LL works.
