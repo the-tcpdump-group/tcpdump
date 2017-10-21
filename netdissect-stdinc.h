@@ -421,7 +421,20 @@ struct in6_addr {
 #define DIAG_JOINSTR(x,y) XSTRINGIFY(x ## y)
 #define DIAG_DO_PRAGMA(x) _Pragma (#x)
 
-#if defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 402
+/*
+ * The current clang compilers also define __GNUC__ and __GNUC_MINOR__
+ * thus we need to test the clang case before the GCC one
+ */
+#if defined(__clang__)
+#  if (__clang_major__ * 100) + __clang_minor__ >= 208
+#    define DIAG_PRAGMA(x) DIAG_DO_PRAGMA(clang diagnostic x)
+#    define DIAG_OFF(x) DIAG_PRAGMA(push) DIAG_PRAGMA(ignored DIAG_JOINSTR(-W,x))
+#    define DIAG_ON(x) DIAG_PRAGMA(pop)
+#  else
+#    define DIAG_OFF(x)
+#    define DIAG_ON(x)
+#  endif
+#elif defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 402
 #  define DIAG_PRAGMA(x) DIAG_DO_PRAGMA(GCC diagnostic x)
 #  if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406
 #    define DIAG_OFF(x) DIAG_PRAGMA(push) DIAG_PRAGMA(ignored DIAG_JOINSTR(-W,x))
@@ -430,13 +443,18 @@ struct in6_addr {
 #    define DIAG_OFF(x) DIAG_PRAGMA(ignored DIAG_JOINSTR(-W,x))
 #    define DIAG_ON(x)  DIAG_PRAGMA(warning DIAG_JOINSTR(-W,x))
 #  endif
-#elif defined(__clang__) && ((__clang_major__ * 100) + __clang_minor__ >= 208)
-#  define DIAG_PRAGMA(x) DIAG_DO_PRAGMA(clang diagnostic x)
-#  define DIAG_OFF(x) DIAG_PRAGMA(push) DIAG_PRAGMA(ignored DIAG_JOINSTR(-W,x))
-#  define DIAG_ON(x) DIAG_PRAGMA(pop)
 #else
 #  define DIAG_OFF(x)
 #  define DIAG_ON(x)
+#endif
+
+/* Use for clang specific warnings */
+#ifdef __clang__
+#  define DIAG_OFF_CLANG(x) DIAG_OFF(x)
+#  define DIAG_ON_CLANG(x)  DIAG_ON(x)
+#else
+#  define DIAG_OFF_CLANG(x)
+#  define DIAG_ON_CLANG(x)
 #endif
 
 /*
