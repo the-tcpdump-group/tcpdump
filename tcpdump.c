@@ -716,6 +716,7 @@ droproot(const char *username, const char *chroot_dir)
 	}
 #ifdef HAVE_LIBCAP_NG
 	/* We don't need CAP_SETUID, CAP_SETGID and CAP_SYS_CHROOT any more. */
+DIAG_OFF_CLANG(assign-enum)
 	capng_updatev(
 		CAPNG_DROP,
 		CAPNG_EFFECTIVE | CAPNG_PERMITTED,
@@ -723,6 +724,7 @@ droproot(const char *username, const char *chroot_dir)
 		CAP_SETGID,
 		CAP_SYS_CHROOT,
 		-1);
+DIAG_ON_CLANG(assign-enum)
 	capng_apply(CAPNG_SELECT_BOTH);
 #endif /* HAVE_LIBCAP_NG */
 
@@ -2039,27 +2041,33 @@ main(int argc, char **argv)
 		/* Initialize capng */
 		capng_clear(CAPNG_SELECT_BOTH);
 		if (username) {
+DIAG_OFF_CLANG(assign-enum)
 			capng_updatev(
 				CAPNG_ADD,
 				CAPNG_PERMITTED | CAPNG_EFFECTIVE,
 				CAP_SETUID,
 				CAP_SETGID,
 				-1);
+DIAG_ON_CLANG(assign-enum)
 		}
 		if (chroot_dir) {
+DIAG_OFF_CLANG(assign-enum)
 			capng_update(
 				CAPNG_ADD,
 				CAPNG_PERMITTED | CAPNG_EFFECTIVE,
 				CAP_SYS_CHROOT
 				);
+DIAG_ON_CLANG(assign-enum)
 		}
 
 		if (WFileName) {
+DIAG_OFF_CLANG(assign-enum)
 			capng_update(
 				CAPNG_ADD,
 				CAPNG_PERMITTED | CAPNG_EFFECTIVE,
 				CAP_DAC_OVERRIDE
 				);
+DIAG_ON_CLANG(assign-enum)
 		}
 		capng_apply(CAPNG_SELECT_BOTH);
 #endif /* HAVE_LIBCAP_NG */
