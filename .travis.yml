@@ -21,6 +21,9 @@ env:
     # Coverity script test mode (if true no uploading, avoid reaching the quota)
     # usual processing: false.
     - coverity_scan_script_test_mode=false
+  matrix:
+    - REMOTE=disable
+    - REMOTE=enable
 
 matrix:
   fast_finish: true
@@ -66,7 +69,7 @@ install:
   - if [ "$TRAVIS_OS_NAME" = osx ]; then brew install libsmi | grep -v '%'; fi
 
 before_script:
-  - if [ "$BUILD_LIBPCAP" = true ]; then (cd .. && echo '$ git clone [...] libpcap.git' && git clone --depth=50 --branch=master --quiet git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure && make); fi
+  - if [ "$BUILD_LIBPCAP" = true ]; then (cd .. && echo '$ git clone [...] libpcap.git' && git clone --depth=50 --branch=master --quiet git://github.com/the-tcpdump-group/libpcap.git && cd libpcap && ./configure "--${REMOTE}-remote" && make); fi
 
 script:
   - if [ "$COVERITY_SCAN_BRANCH" != 1 ]; then touch .devel configure; fi
