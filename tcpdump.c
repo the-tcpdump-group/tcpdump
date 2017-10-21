@@ -2004,8 +2004,8 @@ main(int argc, char **argv)
 #ifndef _WIN32
 	(void)setsignal(SIGPIPE, cleanup);
 	(void)setsignal(SIGTERM, cleanup);
-	(void)setsignal(SIGINT, cleanup);
 #endif /* _WIN32 */
+	(void)setsignal(SIGINT, cleanup);
 #if defined(HAVE_FORK) || defined(HAVE_VFORK)
 	(void)setsignal(SIGCHLD, child_cleanup);
 #endif
