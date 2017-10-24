@@ -57,6 +57,9 @@ extern int ether_ntohost(char *, const struct ether_addr *);
 
 #include <pcap.h>
 #include <pcap-namedb.h>
+#ifndef HAVE_GETSERVENT
+#include <getservent.h>
+#endif
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>

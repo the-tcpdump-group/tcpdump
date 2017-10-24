@@ -381,6 +381,8 @@ datalinks.o: $(srcdir)/missing/datalinks.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/datalinks.c
 dlnames.o: $(srcdir)/missing/dlnames.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/dlnames.c
+getservent.o: $(srcdir)/missing/getservent.c
+	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/getservent.c
 getopt_long.o: $(srcdir)/missing/getopt_long.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/getopt_long.c
 snprintf.o: $(srcdir)/missing/snprintf.c
