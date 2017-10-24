@@ -264,6 +264,7 @@ HDR = \
 	extract.h \
 	funcattrs.h \
 	getopt_long.h \
+	getservent.h \
 	gmpls.h \
 	gmt2local.h \
 	interface.h \
@@ -342,6 +343,7 @@ EXTRA_DIST = \
 	missing/dlnames.c \
 	missing/datalinks.c \
 	missing/getopt_long.c \
+	missing/getservent.c \
 	missing/snprintf.c \
 	missing/strdup.c \
 	missing/strlcat.c \
