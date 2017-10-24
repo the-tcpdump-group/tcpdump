@@ -55,7 +55,7 @@
 */
 #define __PATH_SYSROOT "PREFIX"
 #define __PATH_ETC_INET "/etc/"
-#define __PATH_SERVICES __PATH_SYSROOT__PATH_ETC_INET"services"
+#define __PATH_SERVICES __PATH_ETC_INET"services"
 #endif
 
 #define MAXALIASES 35
