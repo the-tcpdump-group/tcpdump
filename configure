@@ -5006,6 +5006,19 @@ esac
 
 fi
 
+ac_fn_c_check_func "$LINENO" "getservent" "ac_cv_func_getservent"
+if test "x$ac_cv_func_getservent" = xyes; then :
+  $as_echo "#define HAVE_GETSERVENT 1" >>confdefs.h
+
+else
+  case " $LIBOBJS " in
+  *" getservent.$ac_objext "* ) ;;
+  *) LIBOBJS="$LIBOBJS getservent.$ac_objext"
+ ;;
+esac
+
+fi
+
 ac_fn_c_check_func "$LINENO" "getopt_long" "ac_cv_func_getopt_long"
 if test "x$ac_cv_func_getopt_long" = xyes; then :
   $as_echo "#define HAVE_GETOPT_LONG 1" >>confdefs.h
