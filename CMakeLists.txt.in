@@ -1,0 +1,297 @@
+#  Copyright (c) 2017 The TCPdump team
+#
+#  2-clause BSD license
+
+#
+# The file "CMakeLists.txt" is generated from "CMakeLists.txt.in" by the script ./configure
+# Remember to edit "CMakeLists.txt.in", not "CMakeLists.txt"
+#
+# Please keep correspondance between "Makefile.in" and "CMakeLists.txt.in" to ease maintenance.
+# Please verify your CMake-related changes using these command line options:
+# mkdir -p build ; cd build ; cmake .. -Wdeprecated -Wdev --warn-uninitialized
+#
+
+cmake_minimum_required(VERSION 2.8.12)
+# The most recent feature used in this file is "add_compile_options()"
+# that requires at least CMake-2.8.12 (Oct 2013)
+
+project(tcpdump LANGUAGES C)
+
+add_compile_options(@V_CCOPT@)
+string(REPLACE "-I" " " V_INCLS "@V_INCLS@")
+include_directories(. ${V_INCLS})
+add_definitions(@DEFS@ @CPPFLAGS@ @V_DEFS@)
+add_compile_options(@CFLAGS@)
+
+
+# Standard LIBS
+string(REPLACE " "  ""  LIBS "@LIBS@")
+string(REPLACE "-l" ";" LIBS ${LIBS})
+
+set(CSRC setsignal.c tcpdump.c)
+
+set(LIBNETDISSECT_SRC
+	addrtoname.c
+	addrtostr.c
+	af.c
+	ascii_strcasecmp.c
+	checksum.c
+	cpack.c
+	gmpls.c
+	gmt2local.c
+	in_cksum.c
+	ipproto.c
+	l2vpn.c
+	machdep.c
+	nlpid.c
+	oui.c
+	parsenfsfh.c
+	print.c
+	print-802_11.c
+	print-802_15_4.c
+	print-ah.c
+	print-ahcp.c
+	print-aodv.c
+	print-aoe.c
+	print-ap1394.c
+	print-arcnet.c
+	print-arp.c
+	print-ascii.c
+	print-atalk.c
+	print-atm.c
+	print-babel.c
+	print-beep.c
+	print-bfd.c
+	print-bgp.c
+	print-bootp.c
+	print-bt.c
+	print-calm-fast.c
+	print-carp.c
+	print-cdp.c
+	print-cfm.c
+	print-chdlc.c
+	print-cip.c
+	print-cnfp.c
+	print-dccp.c
+	print-decnet.c
+	print-dhcp6.c
+	print-domain.c
+	print-dtp.c
+	print-dvmrp.c
+	print-eap.c
+	print-egp.c
+	print-eigrp.c
+	print-enc.c
+	print-esp.c
+	print-ether.c
+	print-fddi.c
+	print-forces.c
+	print-fr.c
+	print-frag6.c
+	print-ftp.c
+	print-geneve.c
+	print-geonet.c
+	print-gre.c
+	print-hncp.c
+	print-hsrp.c
+	print-http.c
+	print-icmp.c
+	print-icmp6.c
+	print-igmp.c
+	print-igrp.c
+	print-ip.c
+	print-ip6.c
+	print-ip6opts.c
+	print-ipcomp.c
+	print-ipfc.c
+	print-ipnet.c
+	print-ipx.c
+	print-isakmp.c
+	print-isoclns.c
+	print-juniper.c
+	print-krb.c
+	print-l2tp.c
+	print-lane.c
+	print-ldp.c
+	print-lisp.c
+	print-llc.c
+	print-lldp.c
+	print-lmp.c
+	print-loopback.c
+	print-lspping.c
+	print-lwapp.c
+	print-lwres.c
+	print-m3ua.c
+	print-medsa.c
+	print-mobile.c
+	print-mobility.c
+	print-mpcp.c
+	print-mpls.c
+	print-mptcp.c
+	print-msdp.c
+	print-msnlb.c
+	print-nflog.c
+	print-nfs.c
+	print-nsh.c
+	print-ntp.c
+	print-null.c
+	print-olsr.c
+	print-openflow-1.0.c
+	print-openflow.c
+	print-ospf.c
+	print-ospf6.c
+	print-otv.c
+	print-pgm.c
+	print-pim.c
+	print-pktap.c
+	print-ppi.c
+	print-ppp.c
+	print-pppoe.c
+	print-pptp.c
+	print-radius.c
+	print-raw.c
+	print-resp.c
+	print-rip.c
+	print-ripng.c
+	print-rpki-rtr.c
+	print-rrcp.c
+	print-rsvp.c
+	print-rt6.c
+	print-rtsp.c
+	print-rx.c
+	print-sctp.c
+	print-sflow.c
+	print-sip.c
+	print-sl.c
+	print-sll.c
+	print-slow.c
+	print-smtp.c
+	print-snmp.c
+	print-stp.c
+	print-sunatm.c
+	print-sunrpc.c
+	print-symantec.c
+	print-syslog.c
+	print-tcp.c
+	print-telnet.c
+	print-tftp.c
+	print-timed.c
+	print-tipc.c
+	print-token.c
+	print-udld.c
+	print-udp.c
+	print-usb.c
+	print-vjc.c
+	print-vqp.c
+	print-vrrp.c
+	print-vtp.c
+	print-vxlan.c
+	print-vxlan-gpe.c
+	print-wb.c
+	print-zephyr.c
+	print-zeromq.c
+	netdissect.c
+	signature.c
+	strtoaddr.c
+	util-print.c
+)
+
+set(LOCALSRC @LOCALSRC@)
+set(GENSRC ${CMAKE_BINARY_DIR}/version.c)
+set(LIBOBJDIR "")
+string(REPLACE " "     ""  LIBOBJS "@LIBOBJS@")
+string(REPLACE "$U.o"  ";" LIBOBJS ${LIBOBJS})
+
+add_library(netdissect ${LIBNETDISSECT_SRC} ${LOCALSRC})
+# The dependecy between netdissect and LIBOBJS
+# is defined further below (at about line 268)
+
+set(HDR
+	addrtoname.h
+	addrtostr.h
+	af.h
+	ah.h
+	appletalk.h
+	ascii_strcasecmp.h
+	atm.h
+	chdlc.h
+	cpack.h
+	ether.h
+	ethertype.h
+	extract.h
+	getopt_long.h
+	gmpls.h
+	gmt2local.h
+	interface.h
+	ip.h
+	ip6.h
+	ipproto.h
+	l2vpn.h
+	llc.h
+	machdep.h
+	mib.h
+	mpls.h
+	nameser.h
+	netdissect.h
+	nfs.h
+	nfsfh.h
+	nlpid.h
+	openflow.h
+	ospf.h
+	oui.h
+	pcap-missing.h
+	ppp.h
+	print.h
+	rpc_auth.h
+	rpc_msg.h
+	rpl.h
+	setsignal.h
+	signature.h
+	slcompress.h
+	smb.h
+	strtoaddr.h
+	tcp.h
+	netdissect-stdinc.h
+	timeval-operations.h
+	udp.h
+)
+
+set(TAGHDR
+	/usr/include/arpa/tftp.h
+	/usr/include/net/if_arp.h
+	/usr/include/netinet/if_ether.h
+	/usr/include/netinet/in.h
+	/usr/include/netinet/ip_icmp.h
+	/usr/include/netinet/tcp.h
+	/usr/include/netinet/udp.h
+	/usr/include/protocols/routed.h
+)
+
+add_library(datalinks   EXCLUDE_FROM_ALL missing/datalinks.c)
+add_library(dlnames     EXCLUDE_FROM_ALL missing/dlnames.c)
+add_library(getopt_long EXCLUDE_FROM_ALL missing/getopt_long.c)
+add_library(snprintf    EXCLUDE_FROM_ALL missing/snprintf.c)
+add_library(strdup      EXCLUDE_FROM_ALL missing/strdup.c)
+add_library(strlcat     EXCLUDE_FROM_ALL missing/strlcat.c)
+add_library(strlcpy     EXCLUDE_FROM_ALL missing/strlcpy.c)
+add_library(strsep      EXCLUDE_FROM_ALL missing/strsep.c)
+target_link_libraries(netdissect ${LIBOBJS})
+
+# Generate the file build/version.c
+# When there is GIT in the file VERSION, the below CMake statements corresponds to this sed expression:
+# sed 's/.*/const char version[] = "&_$(date +_%Y_%m_%d)";/'<VERSION >${GENSRC}
+file(STRINGS VERSION version LIMIT_COUNT 1)
+if(${version} MATCHES GIT)
+    string(TIMESTAMP _YYYY_MM_DD _%Y_%m_%d)
+else()
+    set(_YYYY_MM_DD)  # Empty string
+endif()
+file(GENERATE OUTPUT ${GENSRC} CONTENT "const char version[] = \"${version}${_YYYY_MM_DD}\";")
+
+add_library(tcpdump_headers ${HDR})
+add_library(usr_inc_headers ${TAGHDR})
+set_target_properties(tcpdump_headers PROPERTIES LINKER_LANGUAGE C)
+set_target_properties(usr_inc_headers PROPERTIES LINKER_LANGUAGE C)
+
+add_executable(tcpdump ${CSRC} ${GENSRC})
+target_link_libraries(tcpdump netdissect ${LIBS} tcpdump_headers usr_inc_headers)

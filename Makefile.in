@@ -320,6 +320,7 @@ EXTRA_DIST = \
 	INSTALL.txt \
 	LICENSE \
 	Makefile.in \
+	CMakeLists.txt.in \
 	Makefile-devel-adds \
 	PLATFORMS \
 	README \
