@@ -178,14 +178,20 @@ yes)	AC_MSG_RESULT(yes)
 	;;
 esac
 
-AC_ARG_WITH(user, [  --with-user=USERNAME    drop privileges by default to USERNAME])
+AC_ARG_WITH(user,
+[  --with-user=USERNAME    drop privileges by default to USERNAME
+  --without-user          dont drop privileges by default])
 AC_MSG_CHECKING([whether to drop root privileges by default])
 if test ! -z "$with_user" ; then
        AC_DEFINE_UNQUOTED(WITH_USER, "$withval",
            [define if should drop privileges by default])
        AC_MSG_RESULT(to \"$withval\")
 else
-       AC_MSG_RESULT(no)
+       if test ! -z "$without_user" ; then
+           AC_MSG_RESULT(no)
+       else
+           AC_MSG_FAILURE([no user to drop privileges to specified. if you really want this, use --without-user])
+       fi
 fi
 
 AC_ARG_WITH(chroot, [  --with-chroot=DIRECTORY when dropping privileges, chroot to DIRECTORY])
