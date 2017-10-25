@@ -55,6 +55,9 @@
 /* define if you have getrpcbynumber() */
 #undef HAVE_GETRPCBYNUMBER
 
+/* Define to 1 if you have the `getservent' function. */
+#undef HAVE_GETSERVENT
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 

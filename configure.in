@@ -400,7 +400,7 @@ if test "$td_cv_decl_netdnet_dnetdb_h_dnet_htoa" = yes; then
 	    [define if you have a dnet_htoa declaration in <netdnet/dnetdb.h>])
 fi
 
-AC_REPLACE_FUNCS(vfprintf strlcat strlcpy strdup strsep getopt_long)
+AC_REPLACE_FUNCS(vfprintf strlcat strlcpy strdup strsep getservent getopt_long)
 AC_CHECK_FUNCS(fork vfork strftime)
 AC_CHECK_FUNCS(setlinebuf alarm)
 

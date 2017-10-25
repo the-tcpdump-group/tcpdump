@@ -264,6 +264,7 @@ HDR = \
 	extract.h \
 	funcattrs.h \
 	getopt_long.h \
+	getservent.h \
 	gmpls.h \
 	gmt2local.h \
 	interface.h \
@@ -342,6 +343,7 @@ EXTRA_DIST = \
 	missing/dlnames.c \
 	missing/datalinks.c \
 	missing/getopt_long.c \
+	missing/getservent.c \
 	missing/snprintf.c \
 	missing/strdup.c \
 	missing/strlcat.c \
@@ -381,6 +383,8 @@ datalinks.o: $(srcdir)/missing/datalinks.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/datalinks.c
 dlnames.o: $(srcdir)/missing/dlnames.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/dlnames.c
+getservent.o: $(srcdir)/missing/getservent.c
+	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/getservent.c
 getopt_long.o: $(srcdir)/missing/getopt_long.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/getopt_long.c
 snprintf.o: $(srcdir)/missing/snprintf.c
