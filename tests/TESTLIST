@@ -598,6 +598,7 @@ babel_update_oobr	babel_update_oobr.pcap	babel_update_oobr.out	-c 52
 
 # bad packets from Junjie Wang
 ospf6_print_lshdr-oobr	ospf6_print_lshdr-oobr.pcapng	ospf6_print_lshdr-oobr.out	-vv -c15
+rpl-dao-oobr		rpl-dao-oobr.pcapng		rpl-dao-oobr.out		-vv -c1
 
 # RTP tests
 # fuzzed pcap
