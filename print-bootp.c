@@ -388,6 +388,7 @@ bootp_print(netdissect_options *ndo,
 	else {
 		uint32_t ul;
 
+		ND_TCHECK_32BITS(&bp->bp_vend);
 		ul = EXTRACT_32BITS(&bp->bp_vend);
 		if (ul != 0)
 			ND_PRINT((ndo, "\n\t  Vendor-#0x%x", ul));
