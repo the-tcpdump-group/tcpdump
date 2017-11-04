@@ -596,6 +596,9 @@ icmp6_nodeinfo_oobr	icmp6_nodeinfo_oobr.pcap	icmp6_nodeinfo_oobr.out
 rx_ubik-oobr		rx_ubik-oobr.pcap		rx_ubik-oobr.out -c1
 babel_update_oobr	babel_update_oobr.pcap	babel_update_oobr.out	-c 52
 
+# bad packets from Junjie Wang
+ospf6_print_lshdr-oobr	ospf6_print_lshdr-oobr.pcapng	ospf6_print_lshdr-oobr.out	-vv -c15
+
 # RTP tests
 # fuzzed pcap
 rtp-seg-fault-1  rtp-seg-fault-1.pcap  rtp-seg-fault-1.out  -v -T rtp
