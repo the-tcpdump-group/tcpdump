@@ -220,7 +220,7 @@
 #define inline __inline
 #endif
 
-#ifdef AF_INET6
+#if defined(AF_INET6) && !defined(HAVE_OS_IPV6_SUPPORT)
 #define HAVE_OS_IPV6_SUPPORT
 #endif
 

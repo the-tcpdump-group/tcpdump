@@ -4738,8 +4738,12 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 /* AF_INET6 available check */
 #include <sys/types.h>
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
 #include <sys/socket.h>
 #include <netinet/in.h>
+#endif
 #ifdef AF_INET6
 void
 foo(struct in6_addr *addr)
