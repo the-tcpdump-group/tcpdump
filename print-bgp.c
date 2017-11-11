@@ -2593,6 +2593,8 @@ bgp_update_print(netdissect_options *ndo,
         int wpfx;
 	int len;
 	int i;
+        int add_path;
+        int path_id;
 
 	ND_TCHECK2(dat[0], BGP_SIZE);
 	if (length < BGP_SIZE)
@@ -2616,7 +2618,6 @@ bgp_update_print(netdissect_options *ndo,
                         goto trunc;
 
                 ND_PRINT((ndo, "\n\t  Withdrawn routes:"));
-                int add_path, path_id;
                 add_path = check_add_path(p, withdrawn_routes_len, 32);
                 while(withdrawn_routes_len > 0) {
                         if (add_path) {
@@ -2713,8 +2714,7 @@ bgp_update_print(netdissect_options *ndo,
 	}
 
 	if (length) {
-                int add_path = check_add_path(p, length, 32);
-                int path_id;
+                add_path = check_add_path(p, length, 32);
 		ND_PRINT((ndo, "\n\t  Updated routes:"));
 		while (length > 0) {
 		        if (add_path) {
