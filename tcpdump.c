@@ -87,6 +87,9 @@ The Regents of the University of California.  All rights reserved.\n";
 #include <sys/nv.h>
 #endif	/* HAVE_CASPER */
 #endif	/* HAVE_CAPSICUM */
+#ifdef HAVE_PCAP_OPEN
+#define HAVE_REMOTE
+#endif
 #include <pcap.h>
 #include <signal.h>
 #include <stdio.h>
@@ -122,7 +125,6 @@ The Regents of the University of California.  All rights reserved.\n";
 #include "interface.h"
 #include "addrtoname.h"
 #include "machdep.h"
-#include "setsignal.h"
 #include "gmt2local.h"
 #include "pcap-missing.h"
 #include "ascii_strcasecmp.h"
@@ -140,9 +142,19 @@ The Regents of the University of California.  All rights reserved.\n";
 #endif
 
 static int Bflag;			/* buffer size */
+#ifdef HAVE_PCAP_DUMP_FTELL64
+static int64_t Cflag;			/* rotate dump files after this many bytes */
+#else
 static long Cflag;			/* rotate dump files after this many bytes */
+#endif
 static int Cflag_count;			/* Keep track of which file number we're writing */
+#ifdef HAVE_PCAP_FINDALLDEVS
 static int Dflag;			/* list available devices and exit */
+#endif
+#ifdef HAVE_PCAP_FINDALLDEVS_EX
+static char *remote_interfaces_source;	/* list available devices from this source and exit */
+#endif
+
 /*
  * This is exported because, in some versions of libpcap, if libpcap
  * is built with optimizer debugging code (which is *NOT* the default
@@ -188,14 +200,18 @@ cap_channel_t *capdns;
 static NORETURN void error(FORMAT_STRING(const char *), ...) PRINTFLIKE(1, 2);
 static void warning(FORMAT_STRING(const char *), ...) PRINTFLIKE(1, 2);
 static NORETURN void exit_tcpdump(int);
-static RETSIGTYPE cleanup(int);
-static RETSIGTYPE child_cleanup(int);
+static void (*setsignal (int sig, void (*func)(int)))(int);
+static void cleanup(int);
+static void child_cleanup(int);
 static void print_version(void);
 static void print_usage(void);
 static NORETURN void show_tstamp_types_and_exit(pcap_t *, const char *device);
 static NORETURN void show_dlts_and_exit(pcap_t *, const char *device);
 #ifdef HAVE_PCAP_FINDALLDEVS
 static NORETURN void show_devices_and_exit(void);
+#endif
+#ifdef HAVE_PCAP_FINDALLDEVS_EX
+static NORETURN void show_remote_devices_and_exit(void);
 #endif
 
 static void print_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
@@ -204,7 +220,7 @@ static void dump_packet(u_char *, const struct pcap_pkthdr *, const u_char *);
 static void droproot(const char *, const char *);
 
 #ifdef SIGNAL_REQ_INFO
-RETSIGTYPE requestinfo(int);
+void requestinfo(int);
 #endif
 
 #if defined(USE_WIN32_MM_TIMER)
@@ -244,6 +260,7 @@ struct dump_info {
 	char	*CurrentFileName;
 	pcap_t	*pd;
 	pcap_dumper_t *p;
+	netdissect_options *ndo;
 #ifdef HAVE_CAPSICUM
 	int	dirfd;
 #endif
@@ -431,13 +448,37 @@ show_dlts_and_exit(pcap_t *pc, const char *device)
 
 #ifdef HAVE_PCAP_FINDALLDEVS
 static void
-show_devices_and_exit (void)
+show_devices_and_exit(void)
 {
 	pcap_if_t *dev, *devlist;
 	char ebuf[PCAP_ERRBUF_SIZE];
 	int i;
 
 	if (pcap_findalldevs(&devlist, ebuf) < 0)
+		error("%s", ebuf);
+	for (i = 0, dev = devlist; dev != NULL; i++, dev = dev->next) {
+		printf("%d.%s", i+1, dev->name);
+		if (dev->description != NULL)
+			printf(" (%s)", dev->description);
+		if (dev->flags != 0)
+			printf(" [%s]", bittok2str(status_flags, "none", dev->flags));
+		printf("\n");
+	}
+	pcap_freealldevs(devlist);
+	exit_tcpdump(0);
+}
+#endif /* HAVE_PCAP_FINDALLDEVS */
+
+#ifdef HAVE_PCAP_FINDALLDEVS_EX
+static void
+show_remote_devices_and_exit(void)
+{
+	pcap_if_t *dev, *devlist;
+	char ebuf[PCAP_ERRBUF_SIZE];
+	int i;
+
+	if (pcap_findalldevs_ex(remote_interfaces_source, NULL, &devlist,
+	    ebuf) < 0)
 		error("%s", ebuf);
 	for (i = 0, dev = devlist; dev != NULL; i++, dev = dev->next) {
 		printf("%d.%s", i+1, dev->name);
@@ -494,6 +535,12 @@ show_devices_and_exit (void)
 #define B_FLAG_USAGE
 #endif /* defined(HAVE_PCAP_CREATE) || defined(_WIN32) */
 
+#ifdef HAVE_PCAP_FINDALLDEVS
+#define D_FLAG	"D"
+#else
+#define D_FLAG
+#endif
+
 #ifdef HAVE_PCAP_CREATE
 #define I_FLAG		"I"
 #else /* HAVE_PCAP_CREATE */
@@ -510,22 +557,18 @@ show_devices_and_exit (void)
 #define J_FLAG
 #endif /* PCAP_ERROR_TSTAMP_TYPE_NOTSUP */
 
-#ifdef HAVE_PCAP_FINDALLDEVS
-#define D_FLAG	"D"
+#ifdef HAVE_PCAP_SETDIRECTION
+#define Q_FLAG "Q:"
+#define Q_FLAG_USAGE " [ -Q in|out|inout ]"
 #else
-#define D_FLAG
+#define Q_FLAG
+#define Q_FLAG_USAGE
 #endif
 
 #ifdef HAVE_PCAP_DUMP_FLUSH
 #define U_FLAG	"U"
 #else
 #define U_FLAG
-#endif
-
-#ifdef HAVE_PCAP_SETDIRECTION
-#define Q_FLAG "Q:"
-#else
-#define Q_FLAG
 #endif
 
 #define SHORTOPTS "aAb" B_FLAG "c:C:d" D_FLAG "eE:fF:G:hHi:" I_FLAG j_FLAG J_FLAG "KlLm:M:nNOpq" Q_FLAG "r:s:StT:u" U_FLAG "vV:w:W:xXy:Yz:Z:#"
@@ -550,15 +593,20 @@ show_devices_and_exit (void)
  * component of the entry for the long option, and have a case for that
  * option in the switch statement.
  */
-#define OPTION_VERSION		128
-#define OPTION_TSTAMP_PRECISION	129
-#define OPTION_IMMEDIATE_MODE	130
+#define OPTION_VERSION			128
+#define OPTION_TSTAMP_PRECISION		129
+#define OPTION_IMMEDIATE_MODE		130
+#define OPTION_PRINT			131
+#define OPTION_LIST_REMOTE_INTERFACES	132
 
 static const struct option longopts[] = {
 #if defined(HAVE_PCAP_CREATE) || defined(_WIN32)
 	{ "buffer-size", required_argument, NULL, 'B' },
 #endif
 	{ "list-interfaces", no_argument, NULL, 'D' },
+#ifdef HAVE_PCAP_FINDALLDEVS_EX
+	{ "list-remote-interfaces", required_argument, NULL, OPTION_LIST_REMOTE_INTERFACES },
+#endif
 	{ "help", no_argument, NULL, 'h' },
 	{ "interface", required_argument, NULL, 'i' },
 #ifdef HAVE_PCAP_CREATE
@@ -592,9 +640,28 @@ static const struct option longopts[] = {
 #endif
 	{ "relinquish-privileges", required_argument, NULL, 'Z' },
 	{ "number", no_argument, NULL, '#' },
+	{ "print", no_argument, NULL, OPTION_PRINT },
 	{ "version", no_argument, NULL, OPTION_VERSION },
 	{ NULL, 0, NULL, 0 }
 };
+
+#ifdef HAVE_PCAP_FINDALLDEVS_EX
+#define LIST_REMOTE_INTERFACES_USAGE "[ --list-remote-interfaces remote-source  ]"
+#else
+#define LIST_REMOTE_INTERFACES_USAGE
+#endif
+
+#ifdef HAVE_PCAP_SET_IMMEDIATE_MODE
+#define IMMEDIATE_MODE_USAGE " [ --immediate-mode ]"
+#else
+#define IMMEDIATE_MODE_USAGE ""
+#endif
+
+#ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
+#define TIME_STAMP_PRECISION_USAGE " [ --time-stamp-precision precision ]"
+#else
+#define TIME_STAMP_PRECISION_USAGE
+#endif
 
 #ifndef _WIN32
 /* Drop root privileges and chroot if necessary */
@@ -649,6 +716,7 @@ droproot(const char *username, const char *chroot_dir)
 	}
 #ifdef HAVE_LIBCAP_NG
 	/* We don't need CAP_SETUID, CAP_SETGID and CAP_SYS_CHROOT any more. */
+DIAG_OFF_CLANG(assign-enum)
 	capng_updatev(
 		CAPNG_DROP,
 		CAPNG_EFFECTIVE | CAPNG_PERMITTED,
@@ -656,6 +724,7 @@ droproot(const char *username, const char *chroot_dir)
 		CAP_SETGID,
 		CAP_SYS_CHROOT,
 		-1);
+DIAG_ON_CLANG(assign-enum)
 	capng_apply(CAPNG_SELECT_BOTH);
 #endif /* HAVE_LIBCAP_NG */
 
@@ -985,6 +1054,13 @@ find_interface_by_number(long devnum)
 }
 #endif
 
+#ifdef HAVE_PCAP_OPEN
+/*
+ * Prefix for rpcap URLs.
+ */
+static char rpcap_prefix[] = "rpcap://";
+#endif
+
 static pcap_t *
 open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 {
@@ -993,6 +1069,36 @@ open_interface(const char *device, netdissect_options *ndo, char *ebuf)
 	int status;
 	char *cp;
 #endif
+
+#ifdef HAVE_PCAP_OPEN
+	/*
+	 * Is this an rpcap URL?
+	 */
+	if (strncmp(device, rpcap_prefix, sizeof(rpcap_prefix) - 1) == 0) {
+		/*
+		 * Yes.  Open it with pcap_open().
+		 */
+		*ebuf = '\0';
+fprintf(stderr, "Opening %s\n", device);
+		pc = pcap_open(device, ndo->ndo_snaplen,
+		    pflag ? 0 : PCAP_OPENFLAG_PROMISCUOUS, 1000, NULL,
+		    ebuf);
+		if (pc == NULL) {
+			/*
+			 * If this failed with "No such device", that means
+			 * the interface doesn't exist; return NULL, so that
+			 * the caller can see whether the device name is
+			 * actually an interface index.
+			 */
+			if (strstr(ebuf, "No such device") != NULL)
+				return (NULL);
+			error("%s", ebuf);
+		}
+		if (*ebuf)
+			warning("%s", ebuf);
+		return (pc);
+	}
+#endif /* HAVE_PCAP_OPEN */
 
 #ifdef HAVE_PCAP_CREATE
 	pc = pcap_create(device, ebuf);
@@ -1175,15 +1281,16 @@ int
 main(int argc, char **argv)
 {
 	register int cnt, op, i;
-	bpf_u_int32 localnet =0 , netmask = 0;
+	bpf_u_int32 localnet = 0, netmask = 0;
 	int timezone_offset = 0;
 	register char *cp, *infile, *cmdbuf, *device, *RFileName, *VFileName, *WFileName;
+	char *endp;
 	pcap_handler callback;
 	int dlt;
 	const char *dlt_name;
 	struct bpf_program fcode;
 #ifndef _WIN32
-	RETSIGTYPE (*oldhandler)(int);
+	void (*oldhandler)(int);
 #endif
 	struct dump_info dumpinfo;
 	u_char *pcap_userdata;
@@ -1206,6 +1313,7 @@ main(int argc, char **argv)
 	int Oflag = 1;			/* run filter code optimizer */
 	int yflag_dlt = -1;
 	const char *yflag_dlt_name = NULL;
+	int print = 0;
 
 	netdissect_options Ndo;
 	netdissect_options *ndo = &Ndo;
@@ -1278,18 +1386,42 @@ main(int argc, char **argv)
 			break;
 
 		case 'C':
-			Cflag = atoi(optarg) * 1000000;
-			if (Cflag <= 0)
+			errno = 0;
+#ifdef HAVE_PCAP_DUMP_FTELL64
+			Cflag = strtoint64_t(optarg, &endp, 10);
+#else
+			Cflag = strtol(optarg, &endp, 10);
+#endif
+			if (endp == optarg || *endp != '\0' || errno != 0
+			    || Cflag <= 0)
 				error("invalid file size %s", optarg);
+			/*
+			 * Will multiplying it by 1000000 overflow?
+			 */
+#ifdef HAVE_PCAP_DUMP_FTELL64
+			if (Cflag > INT64_T_CONSTANT(0x7fffffffffffffff) / 1000000)
+#else
+			if (Cflag > LONG_MAX / 1000000)
+#endif
+				error("file size %s is too large", optarg);
+			Cflag *= 1000000;
 			break;
 
 		case 'd':
 			++dflag;
 			break;
 
+#ifdef HAVE_PCAP_FINDALLDEVS
 		case 'D':
 			Dflag++;
 			break;
+#endif
+
+#ifdef HAVE_PCAP_FINDALLDEVS_EX
+		case OPTION_LIST_REMOTE_INTERFACES:
+			remote_interfaces_source = optarg;
+			break;
+#endif
 
 		case 'L':
 			Lflag++;
@@ -1582,6 +1714,10 @@ main(int argc, char **argv)
 			break;
 #endif
 
+		case OPTION_PRINT:
+			print = 1;
+			break;
+
 		default:
 			print_usage();
 			exit_tcpdump(1);
@@ -1591,6 +1727,10 @@ main(int argc, char **argv)
 #ifdef HAVE_PCAP_FINDALLDEVS
 	if (Dflag)
 		show_devices_and_exit();
+#endif
+#ifdef HAVE_PCAP_FINDALLDEVS_EX
+	if (remote_interfaces_source != NULL)
+		show_remote_devices_and_exit();
 #endif
 
 	switch (ndo->ndo_tflag) {
@@ -1620,11 +1760,14 @@ main(int argc, char **argv)
 #ifdef HAVE_PCAP_SET_IMMEDIATE_MODE
 	/*
 	 * If we're printing dissected packets to the standard output
-	 * rather than saving raw packets to a file, and the standard
-	 * output is a terminal, use immediate mode, as the user's
-	 * probably expecting to see packets pop up immediately.
+	 * and the standard output is a terminal, use immediate mode,
+	 * as the user's probably expecting to see packets pop up
+	 * immediately.
+	 *
+	 * XXX - set the timeout to a lower value, instead?  If so,
+	 * what value would be appropriate?
 	 */
-	if (WFileName == NULL && isatty(1))
+	if ((WFileName == NULL || print) && isatty(1))
 		immediate_mode = 1;
 #endif
 
@@ -1863,8 +2006,8 @@ main(int argc, char **argv)
 #ifndef _WIN32
 	(void)setsignal(SIGPIPE, cleanup);
 	(void)setsignal(SIGTERM, cleanup);
-	(void)setsignal(SIGINT, cleanup);
 #endif /* _WIN32 */
+	(void)setsignal(SIGINT, cleanup);
 #if defined(HAVE_FORK) || defined(HAVE_VFORK)
 	(void)setsignal(SIGCHLD, child_cleanup);
 #endif
@@ -1898,27 +2041,33 @@ main(int argc, char **argv)
 		/* Initialize capng */
 		capng_clear(CAPNG_SELECT_BOTH);
 		if (username) {
+DIAG_OFF_CLANG(assign-enum)
 			capng_updatev(
 				CAPNG_ADD,
 				CAPNG_PERMITTED | CAPNG_EFFECTIVE,
 				CAP_SETUID,
 				CAP_SETGID,
 				-1);
+DIAG_ON_CLANG(assign-enum)
 		}
 		if (chroot_dir) {
+DIAG_OFF_CLANG(assign-enum)
 			capng_update(
 				CAPNG_ADD,
 				CAPNG_PERMITTED | CAPNG_EFFECTIVE,
 				CAP_SYS_CHROOT
 				);
+DIAG_ON_CLANG(assign-enum)
 		}
 
 		if (WFileName) {
+DIAG_OFF_CLANG(assign-enum)
 			capng_update(
 				CAPNG_ADD,
 				CAPNG_PERMITTED | CAPNG_EFFECTIVE,
 				CAP_DAC_OVERRIDE
 				);
+DIAG_ON_CLANG(assign-enum)
 		}
 		capng_apply(CAPNG_SELECT_BOTH);
 #endif /* HAVE_LIBCAP_NG */
@@ -2015,8 +2164,18 @@ main(int argc, char **argv)
 			pcap_userdata = (u_char *)&dumpinfo;
 		} else {
 			callback = dump_packet;
-			pcap_userdata = (u_char *)p;
+			dumpinfo.WFileName = WFileName;
+			dumpinfo.pd = pd;
+			dumpinfo.p = p;
+			pcap_userdata = (u_char *)&dumpinfo;
 		}
+		if (print) {
+			dlt = pcap_datalink(pd);
+			ndo->ndo_if_printer = get_if_printer(ndo, dlt);
+			dumpinfo.ndo = ndo;
+		} else
+			dumpinfo.ndo = NULL;
+
 #ifdef HAVE_PCAP_DUMP_FLUSH
 		if (Uflag)
 			pcap_dump_flush(p);
@@ -2037,11 +2196,11 @@ main(int argc, char **argv)
 		(void)setsignal(SIGNAL_REQ_INFO, requestinfo);
 #endif
 
-	if (ndo->ndo_vflag > 0 && WFileName) {
+	if (ndo->ndo_vflag > 0 && WFileName && !print) {
 		/*
-		 * When capturing to a file, "-v" means tcpdump should,
-		 * every 10 seconds, "v"erbosely report the number of
-		 * packets captured.
+		 * When capturing to a file, if "--print" wasn't specified,
+		 *"-v" means tcpdump should, once per second,
+		 * "v"erbosely report the number of packets captured.
 		 */
 #ifdef USE_WIN32_MM_TIMER
 		/* call verbose_stats_dump() each 1000 +/-100msec */
@@ -2209,8 +2368,29 @@ main(int argc, char **argv)
 	exit_tcpdump(status == -1 ? 1 : 0);
 }
 
+/*
+ * Catch a signal.
+ */
+static void
+(*setsignal (int sig, void (*func)(int)))(int)
+{
+#ifdef _WIN32
+	return (signal(sig, func));
+#else
+	struct sigaction old, new;
+
+	memset(&new, 0, sizeof(new));
+	new.sa_handler = func;
+	if (sig == SIGCHLD)
+		new.sa_flags = SA_RESTART;
+	if (sigaction(sig, &new, &old) < 0)
+		return (SIG_ERR);
+	return (old.sa_handler);
+#endif
+}
+
 /* make a clean exit on interrupts */
-static RETSIGTYPE
+static void
 cleanup(int signo _U_)
 {
 #ifdef USE_WIN32_MM_TIMER
@@ -2255,7 +2435,7 @@ cleanup(int signo _U_)
   waiting a child processes to die
  */
 #if defined(HAVE_FORK) || defined(HAVE_VFORK)
-static RETSIGTYPE
+static void
 child_cleanup(int signo _U_)
 {
   wait(NULL);
@@ -2486,7 +2666,17 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 	 * file could put it over Cflag.
 	 */
 	if (Cflag != 0) {
+#ifdef HAVE_PCAP_DUMP_FTELL64
+		int64_t size = pcap_dump_ftell64(dump_info->p);
+#else
+		/*
+		 * XXX - this only handles a Cflag value > 2^31-1 on
+		 * LP64 platforms; to handle ILP32 (32-bit UN*X and
+		 * Windows) or LLP64 (64-bit Windows) would require
+		 * a version of libpcap with pcap_dump_ftell64().
+		 */
 		long size = pcap_dump_ftell(dump_info->p);
+#endif
 
 		if (size == -1)
 			error("ftell fails on output file");
@@ -2557,6 +2747,9 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 		pcap_dump_flush(dump_info->p);
 #endif
 
+	if (dump_info->ndo != NULL)
+		pretty_print_packet(dump_info->ndo, h, sp, packets_captured);
+
 	--infodelay;
 	if (infoprint)
 		info(0);
@@ -2565,15 +2758,22 @@ dump_packet_and_trunc(u_char *user, const struct pcap_pkthdr *h, const u_char *s
 static void
 dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 {
+	struct dump_info *dump_info;
+
 	++packets_captured;
 
 	++infodelay;
 
-	pcap_dump(user, h, sp);
+	dump_info = (struct dump_info *)user;
+
+	pcap_dump((u_char *)dump_info->p, h, sp);
 #ifdef HAVE_PCAP_DUMP_FLUSH
 	if (Uflag)
-		pcap_dump_flush((pcap_dumper_t *)user);
+		pcap_dump_flush(dump_info->p);
 #endif
+
+	if (dump_info->ndo != NULL)
+		pretty_print_packet(dump_info->ndo, h, sp, packets_captured);
 
 	--infodelay;
 	if (infoprint)
@@ -2622,7 +2822,7 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 #endif
 
 #ifdef SIGNAL_REQ_INFO
-RETSIGTYPE requestinfo(int signo _U_)
+void requestinfo(int signo _U_)
 {
 	if (infodelay)
 		++infoprint;
@@ -2631,6 +2831,18 @@ RETSIGTYPE requestinfo(int signo _U_)
 }
 #endif
 
+static void
+print_packets_captured (void)
+{
+	static u_int prev_packets_captured, first = 1;
+
+	if (infodelay == 0 && (first || packets_captured != prev_packets_captured)) {
+		fprintf(stderr, "Got %u\r", packets_captured);
+		first = 0;
+		prev_packets_captured = packets_captured;
+	}
+}
+
 /*
  * Called once each second in verbose mode while dumping to file
  */
@@ -2638,14 +2850,12 @@ RETSIGTYPE requestinfo(int signo _U_)
 void CALLBACK verbose_stats_dump (UINT timer_id _U_, UINT msg _U_, DWORD_PTR arg _U_,
 				  DWORD_PTR dw1 _U_, DWORD_PTR dw2 _U_)
 {
-	if (infodelay == 0)
-		fprintf(stderr, "Got %u\r", packets_captured);
+	print_packets_captured();
 }
 #elif defined(HAVE_ALARM)
 static void verbose_stats_dump(int sig _U_)
 {
-	if (infodelay == 0)
-		fprintf(stderr, "Got %u\r", packets_captured);
+	print_packets_captured();
 	alarm(1);
 }
 #endif
@@ -2654,7 +2864,6 @@ USES_APPLE_DEPRECATED_API
 static void
 print_version(void)
 {
-	extern char version[];
 #ifndef HAVE_PCAP_LIB_VERSION
 #if defined(_WIN32) || defined(HAVE_PCAP_VERSION)
 	extern char pcap_version[];
@@ -2664,21 +2873,11 @@ print_version(void)
 #endif /* HAVE_PCAP_LIB_VERSION */
 	const char *smi_version_string;
 
+	(void)fprintf(stderr, "%s version " PACKAGE_VERSION "\n", program_name);
 #ifdef HAVE_PCAP_LIB_VERSION
-#ifdef _WIN32
-	(void)fprintf(stderr, "%s version %s, based on tcpdump version %s\n", program_name, WDversion, version);
-#else /* _WIN32 */
-	(void)fprintf(stderr, "%s version %s\n", program_name, version);
-#endif /* _WIN32 */
 	(void)fprintf(stderr, "%s\n",pcap_lib_version());
 #else /* HAVE_PCAP_LIB_VERSION */
-#ifdef _WIN32
-	(void)fprintf(stderr, "%s version %s, based on tcpdump version %s\n", program_name, WDversion, version);
-	(void)fprintf(stderr, "WinPcap version %s, based on libpcap version %s\n",Wpcap_version, pcap_version);
-#else /* _WIN32 */
-	(void)fprintf(stderr, "%s version %s\n", program_name, version);
 	(void)fprintf(stderr, "libpcap version %s\n", pcap_version);
-#endif /* _WIN32 */
 #endif /* HAVE_PCAP_LIB_VERSION */
 
 #if defined(HAVE_LIBCRYPTO) && defined(SSLEAY_VERSION)
@@ -2688,6 +2887,9 @@ print_version(void)
 	smi_version_string = nd_smi_version_string();
 	if (smi_version_string != NULL)
 		(void)fprintf (stderr, "SMI-library: %s\n", smi_version_string);
+#ifdef HAVE_DNET_HTOA
+	(void)fprintf(stderr, "libdnet unknown version\n");
+#endif
 
 #if defined(__SANITIZE_ADDRESS__)
 	(void)fprintf (stderr, "Compiled with AddressSanitizer/GCC.\n");
@@ -2708,26 +2910,21 @@ print_usage(void)
 	(void)fprintf(stderr,
 "\t\t[ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds ]\n");
 	(void)fprintf(stderr,
-"\t\t[ -i interface ]" j_FLAG_USAGE " [ -M secret ] [ --number ]\n");
-#ifdef HAVE_PCAP_SETDIRECTION
+"\t\t[ -i interface ]" IMMEDIATE_MODE_USAGE j_FLAG_USAGE "\n");
+#ifdef HAVE_PCAP_FINDALLDEVS_EX
 	(void)fprintf(stderr,
-"\t\t[ -Q in|out|inout ]\n");
+"\t\t" LIST_REMOTE_INTERFACES_USAGE "\n");
 #endif
 	(void)fprintf(stderr,
-"\t\t[ -r file ] [ -s snaplen ] ");
-#ifdef HAVE_PCAP_SET_TSTAMP_PRECISION
-	(void)fprintf(stderr, "[ --time-stamp-precision precision ]\n");
+"\t\t[ -M secret ] [ --number ] [ --print ]" Q_FLAG_USAGE "\n");
 	(void)fprintf(stderr,
-"\t\t");
-#endif
-#ifdef HAVE_PCAP_SET_IMMEDIATE_MODE
-	(void)fprintf(stderr, "[ --immediate-mode ] ");
-#endif
-	(void)fprintf(stderr, "[ -T type ] [ --version ] [ -V file ]\n");
+"\t\t[ -r file ] [ -s snaplen ]" TIME_STAMP_PRECISION_USAGE "\n");
 	(void)fprintf(stderr,
-"\t\t[ -w file ] [ -W filecount ] [ -y datalinktype ] [ -z postrotate-command ]\n");
+"\t\t[ -T type ] [ --version ] [ -V file ] [ -w file ]\n");
 	(void)fprintf(stderr,
-"\t\t[ -Z user ] [ expression ]\n");
+"\t\t[ -W filecount ] [ -y datalinktype ]\n");
+	(void)fprintf(stderr,
+"\t\t[ -z postrotate-command ] [ -Z user ] [ expression ]\n");
 }
 /*
  * Local Variables:

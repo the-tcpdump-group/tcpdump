@@ -13,8 +13,9 @@ dnl
 # config.sub.
 #
 
-AC_PREREQ(2.61)
-AC_INIT(tcpdump.c)
+AC_PREREQ(2.64)
+AC_INIT(tcpdump, m4_esyscmd_s([cat VERSION]))
+AC_CONFIG_SRCDIR(tcpdump.c)
 
 AC_CANONICAL_HOST
 
@@ -60,8 +61,6 @@ struct mbuf;
 struct rtentry;
 #include <net/if.h>])
 fi
-
-AC_HEADER_TIME
 
 case "$host_os" in
 
@@ -259,8 +258,12 @@ AC_COMPILE_IFELSE(
 	[[
 /* AF_INET6 available check */
 #include <sys/types.h>
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
 #include <sys/socket.h>
 #include <netinet/in.h>
+#endif
 #ifdef AF_INET6
 void
 foo(struct in6_addr *addr)
@@ -401,7 +404,7 @@ if test "$td_cv_decl_netdnet_dnetdb_h_dnet_htoa" = yes; then
 	    [define if you have a dnet_htoa declaration in <netdnet/dnetdb.h>])
 fi
 
-AC_REPLACE_FUNCS(vfprintf strlcat strlcpy strdup strsep getopt_long)
+AC_REPLACE_FUNCS(vfprintf strlcat strlcpy strdup strsep getservent getopt_long)
 AC_CHECK_FUNCS(fork vfork strftime)
 AC_CHECK_FUNCS(setlinebuf alarm)
 
@@ -411,8 +414,6 @@ AC_CHECK_FUNCS(vsnprintf snprintf,,
 if test $needsnprintf = yes; then
 	AC_LIBOBJ(snprintf)
 fi
-
-AC_LBL_TYPE_SIGNAL
 
 AC_SEARCH_LIBS(dnet_htoa, dnet,
     AC_DEFINE(HAVE_DNET_HTOA, 1, [define if you have the dnet_htoa function]))
@@ -618,7 +619,7 @@ fi
 # Check for a miscellaneous collection of functions which we use
 # if we have them.
 #
-AC_CHECK_FUNCS(pcap_findalldevs pcap_dump_flush pcap_lib_version pcap_setdirection pcap_set_immediate_mode)
+AC_CHECK_FUNCS(pcap_findalldevs)
 if test $ac_cv_func_pcap_findalldevs = "yes" ; then
 dnl Check for Mac OS X, which may ship pcap.h from 0.6 but libpcap may
 dnl be 0.8; this means that lib has pcap_findalldevs but header doesn't
@@ -628,7 +629,7 @@ dnl have pcap_if_t.
     AC_CHECK_TYPES(pcap_if_t, , , [#include <pcap.h>])
     CPPFLAGS="$savedcppflags"
 fi
-
+AC_CHECK_FUNCS(pcap_dump_flush pcap_lib_version)
 if test $ac_cv_func_pcap_lib_version = "no" ; then
     AC_MSG_CHECKING(whether pcap_version is defined by libpcap)
     AC_TRY_LINK([],
@@ -646,6 +647,8 @@ if test $ac_cv_func_pcap_lib_version = "no" ; then
 	AC_MSG_RESULT(no)
     fi
 fi
+AC_CHECK_FUNCS(pcap_setdirection pcap_set_immediate_mode pcap_dump_ftell64)
+AC_CHECK_FUNCS(pcap_open pcap_findalldevs_ex)
 
 #
 # Check for special debugging functions
@@ -815,10 +818,6 @@ AC_PROG_RANLIB
 AC_CHECK_TOOL([AR], [ar])
 
 AC_LBL_DEVEL(V_CCOPT)
-
-AC_LBL_SOCKADDR_SA_LEN
-
-AC_LBL_UNALIGNED_ACCESS
 
 # Check for OpenSSL/libressl libcrypto
 AC_MSG_CHECKING(whether to use OpenSSL/libressl libcrypto)

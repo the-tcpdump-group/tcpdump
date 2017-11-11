@@ -143,7 +143,7 @@ struct netdissect_options {
   int ndo_bflag;		/* print 4 byte ASes in ASDOT notation */
   int ndo_eflag;		/* print ethernet header */
   int ndo_fflag;		/* don't translate "foreign" IP address */
-  int ndo_Kflag;		/* don't check TCP checksums */
+  int ndo_Kflag;		/* don't check IP, TCP or UDP checksums */
   int ndo_nflag;		/* leave addresses as numbers */
   int ndo_Nflag;		/* remove domains from printed host names */
   int ndo_qflag;		/* quick (shorter) output */
@@ -340,7 +340,30 @@ extern void txtproto_print(netdissect_options *, const u_char *, u_int,
 extern void safeputchar(netdissect_options *, const u_char);
 extern void safeputs(netdissect_options *, const u_char *, const u_int);
 
-#ifdef LBL_ALIGN
+#if (defined(__i386__) || defined(_M_IX86) || defined(__X86__) || defined(__x86_64__) || defined(_M_X64)) || \
+    (defined(__arm__) || defined(_M_ARM) || defined(__aarch64__)) || \
+    (defined(__m68k__) && (!defined(__mc68000__) && !defined(__mc68010__))) || \
+    (defined(__ppc__) || defined(__ppc64__) || defined(_M_PPC) || defined(_ARCH_PPC) || defined(_ARCH_PPC64)) || \
+    (defined(__s390__) || defined(__s390x__) || defined(__zarch__)) || \
+    defined(__vax__)
+/*
+ * The procesor natively handles unaligned loads, so just use memcpy()
+ * and memcmp(), to enable those optimizations.
+ *
+ * XXX - are those all the x86 tests we need?
+ * XXX - do we need to worry about ARMv1 through ARMv5, which didn't
+ * support unaligned loads, and, if so, do we need to worry about all
+ * of them, or just some of them, e.g. ARMv5?
+ * XXX - are those the only 68k tests we need not to generated
+ * unaligned accesses if the target is the 68000 or 68010?
+ * XXX - are there any tests we don't need, because some definitions are for
+ * compilers that also predefine the GCC symbols?
+ * XXX - do we need to test for both 32-bit and 64-bit versions of those
+ * architectures in all cases?
+ */
+#define UNALIGNED_MEMCPY(p, q, l)	memcpy((p), (q), (l))
+#define UNALIGNED_MEMCMP(p, q, l)	memcmp((p), (q), (l))
+#else
 /*
  * The processor doesn't natively handle unaligned loads,
  * and the compiler might "helpfully" optimize memcpy()
@@ -356,13 +379,6 @@ extern void unaligned_memcpy(void *, const void *, size_t);
 extern int unaligned_memcmp(const void *, const void *, size_t);
 #define UNALIGNED_MEMCPY(p, q, l)	unaligned_memcpy((p), (q), (l))
 #define UNALIGNED_MEMCMP(p, q, l)	unaligned_memcmp((p), (q), (l))
-#else
-/*
- * The procesor natively handles unaligned loads, so just use memcpy()
- * and memcmp(), to enable those optimizations.
- */
-#define UNALIGNED_MEMCPY(p, q, l)	memcpy((p), (q), (l))
-#define UNALIGNED_MEMCMP(p, q, l)	memcmp((p), (q), (l))
 #endif
 
 #define PLURAL_SUFFIX(n) \

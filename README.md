@@ -57,7 +57,7 @@ about tcpdump and how to interpret its output, pick up this book.
 Some tools for viewing and analyzing tcpdump trace files are available
 from the Internet Traffic Archive:
 
-* http://www.sigcomm.org/ITA/
+* http://ita.ee.lbl.gov/
 
 Another tool that tcpdump users might find useful is tcpslice:
 
@@ -69,7 +69,7 @@ documentation.
 
 Current versions can be found at www.tcpdump.org.
 
- - The TCPdump team
+ - The TCPdump group
 
 original text by: Steve McCanne, Craig Leres, Van Jacobson
 

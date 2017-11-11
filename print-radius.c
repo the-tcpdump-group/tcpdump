@@ -40,18 +40,33 @@
  * RFC 2869:
  *      "RADIUS Extensions"
  *
+ * RFC 3162:
+ *      "RADIUS and IPv6"
+ *
  * RFC 3580:
  *      "IEEE 802.1X Remote Authentication Dial In User Service (RADIUS)"
  *      "Usage Guidelines"
  *
+ * RFC 4072:
+ *      "Diameter Extensible Authentication Protocol (EAP) Application"
+ *
  * RFC 4675:
  *      "RADIUS Attributes for Virtual LAN and Priority Support"
+ *
+ * RFC 4818:
+ *      "RADIUS Delegated-IPv6-Prefix Attribute"
  *
  * RFC 4849:
  *      "RADIUS Filter Rule Attribute"
  *
+ * RFC 5090:
+ *      "RADIUS Extension for Digest Authentication"
+ *
  * RFC 5176:
  *      "Dynamic Authorization Extensions to RADIUS"
+ *
+ * RFC 5580:
+ *      "Carrying Location Objects in RADIUS and Diameter"
  *
  * RFC 7155:
  *      "Diameter Network Access Server Application"
@@ -160,6 +175,8 @@ static const struct tok radius_command_values[] = {
 
 #define TUNNEL_CLIENT_AUTH 90
 #define TUNNEL_SERVER_AUTH 91
+
+#define ERROR_CAUSE 101
 /********************************/
 /* End Radius Attribute types */
 /********************************/
@@ -178,6 +195,8 @@ static void print_attr_string(netdissect_options *, register const u_char *, u_i
 static void print_attr_num(netdissect_options *, register const u_char *, u_int, u_short );
 static void print_vendor_attr(netdissect_options *, register const u_char *, u_int, u_short );
 static void print_attr_address(netdissect_options *, register const u_char *, u_int, u_short);
+static void print_attr_address6(netdissect_options *, register const u_char *, u_int, u_short);
+static void print_attr_netmask6(netdissect_options *, register const u_char *, u_int, u_short);
 static void print_attr_time(netdissect_options *, register const u_char *, u_int, u_short);
 static void print_attr_strange(netdissect_options *, register const u_char *, u_int, u_short);
 
@@ -377,6 +396,47 @@ static const char *prompt[]={ "No Echo",
                               "Echo",
                             };
 
+/* Error-Cause standard values */
+#define ERROR_CAUSE_RESIDUAL_CONTEXT_REMOVED 201
+#define ERROR_CAUSE_INVALID_EAP_PACKET 202
+#define ERROR_CAUSE_UNSUPPORTED_ATTRIBUTE 401
+#define ERROR_CAUSE_MISSING_ATTRIBUTE 402
+#define ERROR_CAUSE_NAS_IDENTIFICATION_MISMATCH 403
+#define ERROR_CAUSE_INVALID_REQUEST 404
+#define ERROR_CAUSE_UNSUPPORTED_SERVICE 405
+#define ERROR_CAUSE_UNSUPPORTED_EXTENSION 406
+#define ERROR_CAUSE_INVALID_ATTRIBUTE_VALUE 407
+#define ERROR_CAUSE_ADMINISTRATIVELY_PROHIBITED 501
+#define ERROR_CAUSE_PROXY_REQUEST_NOT_ROUTABLE 502
+#define ERROR_CAUSE_SESSION_CONTEXT_NOT_FOUND 503
+#define ERROR_CAUSE_SESSION_CONTEXT_NOT_REMOVABLE 504
+#define ERROR_CAUSE_PROXY_PROCESSING_ERROR 505
+#define ERROR_CAUSE_RESOURCES_UNAVAILABLE 506
+#define ERROR_CAUSE_REQUEST_INITIATED 507
+#define ERROR_CAUSE_MULTIPLE_SESSION_SELECTION_UNSUPPORTED 508
+#define ERROR_CAUSE_LOCATION_INFO_REQUIRED 509
+static const struct tok errorcausetype[] = {
+                                 { ERROR_CAUSE_RESIDUAL_CONTEXT_REMOVED,               "Residual Session Context Removed" },
+                                 { ERROR_CAUSE_INVALID_EAP_PACKET,                     "Invalid EAP Packet (Ignored)" },
+                                 { ERROR_CAUSE_UNSUPPORTED_ATTRIBUTE,                  "Unsupported Attribute" },
+                                 { ERROR_CAUSE_MISSING_ATTRIBUTE,                      "Missing Attribute" },
+                                 { ERROR_CAUSE_NAS_IDENTIFICATION_MISMATCH,            "NAS Identification Mismatch" },
+                                 { ERROR_CAUSE_INVALID_REQUEST,                        "Invalid Request" },
+                                 { ERROR_CAUSE_UNSUPPORTED_SERVICE,                    "Unsupported Service" },
+                                 { ERROR_CAUSE_UNSUPPORTED_EXTENSION,                  "Unsupported Extension" },
+                                 { ERROR_CAUSE_INVALID_ATTRIBUTE_VALUE,                "Invalid Attribute Value" },
+                                 { ERROR_CAUSE_ADMINISTRATIVELY_PROHIBITED,            "Administratively Prohibited" },
+                                 { ERROR_CAUSE_PROXY_REQUEST_NOT_ROUTABLE,             "Request Not Routable (Proxy)" },
+                                 { ERROR_CAUSE_SESSION_CONTEXT_NOT_FOUND,              "Session Context Not Found" },
+                                 { ERROR_CAUSE_SESSION_CONTEXT_NOT_REMOVABLE,          "Session Context Not Removable" },
+                                 { ERROR_CAUSE_PROXY_PROCESSING_ERROR,                 "Other Proxy Processing Error" },
+                                 { ERROR_CAUSE_RESOURCES_UNAVAILABLE,                  "Resources Unavailable" },
+                                 { ERROR_CAUSE_REQUEST_INITIATED,                      "Request Initiated" },
+                                 { ERROR_CAUSE_MULTIPLE_SESSION_SELECTION_UNSUPPORTED, "Multiple Session Selection Unsupported" },
+                                 { ERROR_CAUSE_LOCATION_INFO_REQUIRED,                 "Location Info Required" },
+																 { 0, NULL }
+                               };
+
 
 static struct attrtype {
                   const char *name;      /* Attribute name                 */
@@ -480,7 +540,36 @@ static struct attrtype {
      { "Tunnel-Server-Auth-ID",           NULL, 0, 0, print_attr_string },
      { "NAS-Filter-Rule",                 NULL, 0, 0, print_attr_string },
      { "Unassigned",                      NULL, 0, 0, NULL },  /*93*/
-     { "Originating-Line-Info",           NULL, 0, 0, NULL }
+     { "Originating-Line-Info",           NULL, 0, 0, NULL },
+     { "NAS-IPv6-Address",                NULL, 0, 0, print_attr_address6 },
+     { "Framed-Interface-ID",             NULL, 0, 0, NULL },
+     { "Framed-IPv6-Prefix",              NULL, 0, 0, print_attr_netmask6 },
+     { "Login-IPv6-Host",                 NULL, 0, 0, print_attr_address6 },
+     { "Framed-IPv6-Route",               NULL, 0, 0, print_attr_string },
+     { "Framed-IPv6-Pool",                NULL, 0, 0, print_attr_string },
+     { "Error-Cause",                     NULL, 0, 0, print_attr_strange },
+     { "EAP-Key-Name",                    NULL, 0, 0, NULL },
+     { "Digest-Response",                 NULL, 0, 0, print_attr_string },
+     { "Digest-Realm",                    NULL, 0, 0, print_attr_string },
+     { "Digest-Nonce",                    NULL, 0, 0, print_attr_string },
+     { "Digest-Response-Auth",            NULL, 0, 0, print_attr_string },
+     { "Digest-Nextnonce",                NULL, 0, 0, print_attr_string },
+     { "Digest-Method",                   NULL, 0, 0, print_attr_string },
+     { "Digest-URI",                      NULL, 0, 0, print_attr_string },
+     { "Digest-Qop",                      NULL, 0, 0, print_attr_string },
+     { "Digest-Algorithm",                NULL, 0, 0, print_attr_string },
+     { "Digest-Entity-Body-Hash",         NULL, 0, 0, print_attr_string },
+     { "Digest-CNonce",                   NULL, 0, 0, print_attr_string },
+     { "Digest-Nonce-Count",              NULL, 0, 0, print_attr_string },
+     { "Digest-Username",                 NULL, 0, 0, print_attr_string },
+     { "Digest-Opaque",                   NULL, 0, 0, print_attr_string },
+     { "Digest-Auth-Param",               NULL, 0, 0, print_attr_string },
+     { "Digest-AKA-Auts",                 NULL, 0, 0, print_attr_string },
+     { "Digest-Domain",                   NULL, 0, 0, print_attr_string },
+     { "Digest-Stale",                    NULL, 0, 0, print_attr_string },
+     { "Digest-HA1",                      NULL, 0, 0, print_attr_string },
+     { "SIP-AOR",                         NULL, 0, 0, print_attr_string },
+     { "Delegated-IPv6-Prefix",           NULL, 0, 0, print_attr_netmask6 },
   };
 
 
@@ -779,6 +868,66 @@ print_attr_address(netdissect_options *ndo,
      ND_PRINT((ndo, "%s", tstr));
 }
 
+/*****************************/
+/* Print an attribute IPv6   */
+/* address value pointed by  */
+/* 'data' and 'length' size. */
+/*****************************/
+/* Returns nothing.          */
+/*****************************/
+static void
+print_attr_address6(netdissect_options *ndo,
+                   register const u_char *data, u_int length, u_short attr_code _U_)
+{
+   if (length != 16)
+   {
+       ND_PRINT((ndo, "ERROR: length %u != 16", length));
+       return;
+   }
+
+   ND_TCHECK2(data[0], 16);
+
+   ND_PRINT((ndo, "%s", ip6addr_string(ndo, data)));
+
+   return;
+
+   trunc:
+     ND_PRINT((ndo, "%s", tstr));
+}
+
+static void
+print_attr_netmask6(netdissect_options *ndo,
+                    register const u_char *data, u_int length, u_short attr_code _U_)
+{
+   u_char data2[16];
+
+   if (length < 2 || length > 18)
+   {
+       ND_PRINT((ndo, "ERROR: length %u not in range (2..18)", length));
+       return;
+   }
+   ND_TCHECK2(data[0], length);
+   if (data[1] > 128)
+   {
+      ND_PRINT((ndo, "ERROR: netmask %u not in range (0..128)", data[1]));
+      return;
+   }
+
+   memset(data2, 0, sizeof(data2));
+   if (length > 2)
+      memcpy(data2, data+2, length-2);
+
+   ND_PRINT((ndo, "%s/%u", ip6addr_string(ndo, data2), data[1]));
+
+   if (data[1] > 8 * (length - 2))
+      ND_PRINT((ndo, " (inconsistent prefix length)"));
+
+   return;
+
+   trunc:
+     ND_PRINT((ndo, "%s", tstr));
+}
+
 /*************************************/
 /* Print an attribute of 'secs since */
 /* January 1, 1970 00:00 UTC' value  */
@@ -825,6 +974,7 @@ print_attr_strange(netdissect_options *ndo,
                    register const u_char *data, u_int length, u_short attr_code)
 {
    u_short len_data;
+   u_int error_cause_value;
 
    switch(attr_code)
    {
@@ -883,6 +1033,18 @@ print_attr_strange(netdissect_options *ndo,
            ND_TCHECK2(data[0],8);
            len_data = 8;
            PRINT_HEX(len_data, data);
+        break;
+
+      case ERROR_CAUSE:
+           if (length != 4)
+           {
+               ND_PRINT((ndo, "Error: length %u != 4", length));
+               return;
+           }
+           ND_TCHECK2(data[0],4);
+
+           error_cause_value = EXTRACT_32BITS(data);
+           ND_PRINT((ndo, "Error cause %u: %s", error_cause_value, tok2str(errorcausetype, "Error-Cause %u not known", error_cause_value)));
         break;
    }
    return;

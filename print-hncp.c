@@ -396,7 +396,7 @@ print_type_in_line(netdissect_options *ndo,
     }
 }
 
-void
+static void
 hncp_print_rec(netdissect_options *ndo,
                const u_char *cp, u_int length, int indent)
 {

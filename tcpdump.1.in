@@ -38,23 +38,31 @@ tcpdump \- dump traffic on a network
 .B \-c
 .I count
 ]
-.br
-.ti +8
 [
 .B \-C
 .I file_size
-] [
-.B \-G
-.I rotate_seconds
-] [
+]
+.ti +8
+[
+.B \-E
+.I spi@ipaddr algo:secret,...
+]
+.ti +8
+[
 .B \-F
 .I file
 ]
-.br
-.ti +8
+[
+.B \-G
+.I rotate_seconds
+]
 [
 .B \-i
 .I interface
+]
+.ti +8
+[
+.B \-\-immediate\-mode
 ]
 [
 .B \-j
@@ -64,14 +72,16 @@ tcpdump \- dump traffic on a network
 .B \-m
 .I module
 ]
+.ti +8
 [
 .B \-M
 .I secret
 ]
-.br
-.ti +8
 [
 .B \-\-number
+]
+[
+.B \-\-print
 ]
 [
 .B \-Q
@@ -83,10 +93,6 @@ tcpdump \- dump traffic on a network
 .I file
 ]
 [
-.B \-V
-.I file
-]
-[
 .B \-s
 .I snaplen
 ]
@@ -95,27 +101,26 @@ tcpdump \- dump traffic on a network
 .I type
 ]
 [
+.B \-\-version
+]
+.ti +8
+[
+.B \-V
+.I file
+]
+[
 .B \-w
 .I file
 ]
-.br
-.ti +8
 [
 .B \-W
 .I filecount
 ]
-.br
-.ti +8
-[
-.B \-E
-.I spi@ipaddr algo:secret,...
-]
-.br
-.ti +8
 [
 .B \-y
 .I datalinktype
 ]
+.ti +8
 [
 .B \-z
 .I postrotate-command
@@ -127,13 +132,6 @@ tcpdump \- dump traffic on a network
 .ti +8
 [
 .BI \-\-time\-stamp\-precision= tstamp_precision
-]
-.ti +8
-[
-.B \-\-immediate\-mode
-]
-[
-.B \-\-version
 ]
 .ti +8
 [
@@ -463,12 +461,12 @@ accuracy to a savefile, the time stamps are written with nanosecond
 resolution, and the file is written with a different magic number, to
 indicate that the time stamps are in seconds and nanoseconds; not all
 programs that read pcap savefiles will be able to read those captures.
-.LP
+.IP
 When reading a savefile, convert time stamps to the precision specified
 by \fItimestamp_precision\fP, and display them with that resolution.  If
 the precision specified is less than the precision of time stamps in the
 file, the conversion will lose precision.
-.LP
+.IP
 The supported values for \fItimestamp_precision\fP are \fBmicro\fP for
 microsecond resolution and \fBnano\fP for nanosecond resolution.  The
 default is microsecond resolution.
@@ -578,6 +576,12 @@ into promiscuous mode.
 Note that the interface might be in promiscuous
 mode for some other reason; hence, `-p' cannot be used as an abbreviation for
 `ether host {local-hw-addr} or ether broadcast'.
+.TP
+.BI \-\-print
+Print parsed packet output, even if the raw packets are being saved to a
+file with the
+.B \-w
+flag.
 .TP
 .BI \-Q " direction"
 .PD 0
@@ -690,7 +694,9 @@ Print undecoded NFS handles.
 .PD
 If the
 .B \-w
-option is not specified, make the printed packet output
+option is not specified, or if it is specified but the
+.B \-\-print
+flag is also specified, make the printed packet output
 ``packet-buffered''; i.e., as the description of the contents of each
 packet is printed, it will be written to the standard output, rather
 than, when not writing to a terminal, being written only when the output
@@ -722,7 +728,7 @@ IP and ICMP header checksum.
 .IP
 When writing to a file with the
 .B \-w
-option, report, every 10 seconds, the number of packets captured.
+option, report, once per second, the number of packets captured.
 .TP
 .B \-vv
 Even more verbose output.
@@ -1219,7 +1225,7 @@ The \fBS\fP indicates that the \fISYN\fP flag was set.
 The packet sequence number was 768512 and it contained no data.
 (The notation is `first:last' which means `sequence
 numbers \fIfirst\fP
-up to but not including \fIlast\fP.)
+up to but not including \fIlast\fP'.)
 There was no piggy-backed ack, the available receive window was 4096
 bytes and there was a max-segment-size option requesting an mss of
 1024 bytes.
@@ -1458,7 +1464,7 @@ Some offsets and field values may be expressed as names
 rather than as numeric values. For example tcp[13] may
 be replaced with tcp[tcpflags]. The following TCP flag
 field values are also available: tcp-fin, tcp-syn, tcp-rst,
-tcp-push, tcp-act, tcp-urg.
+tcp-push, tcp-ack, tcp-urg.
 .PP
 This can be demonstrated as:
 .RS
@@ -1908,7 +1914,7 @@ The original distribution is available via anonymous ftp:
 .RE
 .LP
 IPv6/IPsec support is added by WIDE/KAME project.
-This program uses Eric Young's SSLeay library, under specific configurations.
+This program uses OpenSSL/LibreSSL, under specific configurations.
 .SH BUGS
 To report a security issue please send an e-mail to \%security@tcpdump.org.
 .LP

@@ -48,7 +48,7 @@ static const char tstr[] = " [|ntp]";
 /*
  *  Definitions for the masses
  */
-#define	JAN_1970	2208988800U	/* 1970 - 1900 in seconds */
+#define	JAN_1970	INT64_T_CONSTANT(2208988800)	/* 1970 - 1900 in seconds */
 
 /*
  * Structure definitions for NTP fixed point values
@@ -256,32 +256,8 @@ static void
 ntp_time_print(netdissect_options *ndo,
 	       register const struct ntp_time_data *bp, u_int length)
 {
-	int mode, version, leapind;
-
 	if (length < NTP_TIMEMSG_MINLEN)
 		goto invalid;
-
-	ND_TCHECK(bp->status);
-
-	version = (int)(bp->status & VERSIONMASK) >> VERSIONSHIFT;
-	ND_PRINT((ndo, "NTPv%d", version));
-
-	mode = bp->status & MODEMASK;
-	if (!ndo->ndo_vflag) {
-		ND_PRINT((ndo, ", %s, length %u",
-		          tok2str(ntp_mode_values, "Unknown mode", mode),
-		          length));
-		return;
-	}
-
-	ND_PRINT((ndo, ", length %u\n\t%s",
-	          length,
-	          tok2str(ntp_mode_values, "Unknown mode", mode)));
-
-	leapind = bp->status & LEAPMASK;
-	ND_PRINT((ndo, ", Leap indicator: %s (%u)",
-	          tok2str(ntp_leapind_values, "Unknown", leapind),
-	          leapind));
 
 	ND_TCHECK(bp->stratum);
 	ND_PRINT((ndo, ", Stratum %u (%s)",
@@ -522,7 +498,7 @@ static void
 p_ntp_time(netdissect_options *ndo,
            register const struct l_fixedpt *lfp)
 {
-	register int32_t i;
+	register uint32_t i;
 	register uint32_t uf;
 	register uint32_t f;
 	register double ff;
@@ -541,14 +517,33 @@ p_ntp_time(netdissect_options *ndo,
 	 * print the UTC time in human-readable format.
 	 */
 	if (i) {
-	    time_t seconds = i - JAN_1970;
+	    int64_t seconds_64bit = (int64_t)i - JAN_1970;
+	    time_t seconds;
 	    struct tm *tm;
 	    char time_buf[128];
 
-	    tm = gmtime(&seconds);
-	    /* use ISO 8601 (RFC3339) format */
-	    strftime(time_buf, sizeof (time_buf), "%Y-%m-%dT%H:%M:%S", tm);
-	    ND_PRINT((ndo, " (%s)", time_buf));
+	    seconds = (time_t)seconds_64bit;
+	    if (seconds != seconds_64bit) {
+		/*
+		 * It doesn't fit into a time_t, so we can't hand it
+		 * to gmtime.
+		 */
+		ND_PRINT((ndo, " (unrepresentable)"));
+	    } else {
+		tm = gmtime(&seconds);
+		if (tm == NULL) {
+		    /*
+		     * gmtime() can't handle it.
+		     * (Yes, that might happen with some version of
+		     * Microsoft's C library.)
+		     */
+		    ND_PRINT((ndo, " (unrepresentable)"));
+		} else {
+		    /* use ISO 8601 (RFC3339) format */
+		    strftime(time_buf, sizeof (time_buf), "%Y-%m-%dT%H:%M:%S", tm);
+		    ND_PRINT((ndo, " (%s)", time_buf));
+		}
+	    }
 	}
 #endif
 }

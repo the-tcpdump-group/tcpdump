@@ -85,6 +85,11 @@
         typedef unsigned long long uint64_t;
         typedef long long int64_t;
       #endif
+
+      /*
+       * We have _strtoi64().  Use that for strtoint64_t().
+       */
+      #define strtoint64_t	_strtoi64
     #endif
 
     /*
@@ -164,6 +169,42 @@
 #include <sys/types.h>
 
 #ifdef _MSC_VER
+  /*
+   * Compiler is MSVC.
+   */
+  #if _MSC_VER >= 1800
+    /*
+     * VS 2013 or newer; we have strtoll().  Use that for strtoint64_t().
+     */
+    #define strtoint64_t	strtoll
+  #else
+    /*
+     * Earlier VS; we don't have strtoll(), but we do have
+     * _strtoi64().  Use that for strtoint64_t().
+     */
+    #define strtoint64_t	_strtoi64
+  #endif
+
+  /*
+   * Microsoft's documentation doesn't speak of LL as a valid
+   * suffix for 64-bit integers, so we'll just use i64.
+   */
+  #define INT64_T_CONSTANT(constant)	(constant##i64)
+#else
+  /*
+   * Non-Microsoft compiler.
+   *
+   * XXX - should we use strtoll or should we use _strtoi64()?
+   */
+  #define strtoint64_t		strtoll
+
+  /*
+   * Assume LL works.
+   */
+  #define INT64_T_CONSTANT(constant)	(constant##LL)
+#endif
+
+#ifdef _MSC_VER
 #define stat _stat
 #define open _open
 #define fstat _fstat
@@ -179,7 +220,7 @@
 #define inline __inline
 #endif
 
-#ifdef AF_INET6
+#if defined(AF_INET6) && !defined(HAVE_OS_IPV6_SUPPORT)
 #define HAVE_OS_IPV6_SUPPORT
 #endif
 
@@ -200,7 +241,6 @@ typedef char* caddr_t;
 #define MAXHOSTNAMELEN	64
 #define snprintf _snprintf
 #define vsnprintf _vsnprintf
-#define RETSIGTYPE void
 
 #else /* _WIN32 */
 
@@ -217,11 +257,19 @@ typedef char* caddr_t;
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-#ifdef TIME_WITH_SYS_TIME
 #include <time.h>
-#endif
 
 #include <arpa/inet.h>
+
+/*
+ * Assume all UN*Xes have strtoll(), and use it for strtoint64_t().
+ */
+#define strtoint64_t	strtoll
+
+/*
+ * Assume LL works.
+ */
+#define INT64_T_CONSTANT(constant)	(constant##LL)
 
 #endif /* _WIN32 */
 
@@ -373,7 +421,20 @@ struct in6_addr {
 #define DIAG_JOINSTR(x,y) XSTRINGIFY(x ## y)
 #define DIAG_DO_PRAGMA(x) _Pragma (#x)
 
-#if defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 402
+/*
+ * The current clang compilers also define __GNUC__ and __GNUC_MINOR__
+ * thus we need to test the clang case before the GCC one
+ */
+#if defined(__clang__)
+#  if (__clang_major__ * 100) + __clang_minor__ >= 208
+#    define DIAG_PRAGMA(x) DIAG_DO_PRAGMA(clang diagnostic x)
+#    define DIAG_OFF(x) DIAG_PRAGMA(push) DIAG_PRAGMA(ignored DIAG_JOINSTR(-W,x))
+#    define DIAG_ON(x) DIAG_PRAGMA(pop)
+#  else
+#    define DIAG_OFF(x)
+#    define DIAG_ON(x)
+#  endif
+#elif defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 402
 #  define DIAG_PRAGMA(x) DIAG_DO_PRAGMA(GCC diagnostic x)
 #  if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406
 #    define DIAG_OFF(x) DIAG_PRAGMA(push) DIAG_PRAGMA(ignored DIAG_JOINSTR(-W,x))
@@ -382,13 +443,18 @@ struct in6_addr {
 #    define DIAG_OFF(x) DIAG_PRAGMA(ignored DIAG_JOINSTR(-W,x))
 #    define DIAG_ON(x)  DIAG_PRAGMA(warning DIAG_JOINSTR(-W,x))
 #  endif
-#elif defined(__clang__) && ((__clang_major__ * 100) + __clang_minor__ >= 208)
-#  define DIAG_PRAGMA(x) DIAG_DO_PRAGMA(clang diagnostic x)
-#  define DIAG_OFF(x) DIAG_PRAGMA(push) DIAG_PRAGMA(ignored DIAG_JOINSTR(-W,x))
-#  define DIAG_ON(x) DIAG_PRAGMA(pop)
 #else
 #  define DIAG_OFF(x)
 #  define DIAG_ON(x)
+#endif
+
+/* Use for clang specific warnings */
+#ifdef __clang__
+#  define DIAG_OFF_CLANG(x) DIAG_OFF(x)
+#  define DIAG_ON_CLANG(x)  DIAG_ON(x)
+#else
+#  define DIAG_OFF_CLANG(x)
+#  define DIAG_ON_CLANG(x)
 #endif
 
 /*

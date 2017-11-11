@@ -827,14 +827,21 @@ txtproto_print(netdissect_options *ndo, const u_char *pptr, u_int len,
 	u_int idx, eol;
 	u_char token[MAX_TOKEN+1];
 	const char *cmd;
-	int is_reqresp = 0;
+	int print_this = 0;
 	const char *pnp;
 
 	if (cmds != NULL) {
 		/*
 		 * This protocol has more than just request and
 		 * response lines; see whether this looks like a
-		 * request or response.
+		 * request or response and, if so, print it and,
+		 * in verbose mode, print everything after it.
+		 *
+		 * This is for HTTP-like protocols, where we
+		 * want to print requests and responses, but
+		 * don't want to print continuations of request
+		 * or response bodies in packets that don't
+		 * contain the request or response line.
 		 */
 		idx = fetch_token(ndo, pptr, 0, len, token, sizeof(token));
 		if (idx != 0) {
@@ -842,7 +849,7 @@ txtproto_print(netdissect_options *ndo, const u_char *pptr, u_int len,
 			while ((cmd = *cmds++) != NULL) {
 				if (ascii_strcasecmp((const char *)token, cmd) == 0) {
 					/* Yes. */
-					is_reqresp = 1;
+					print_this = 1;
 					break;
 				}
 			}
@@ -864,28 +871,36 @@ txtproto_print(netdissect_options *ndo, const u_char *pptr, u_int len,
 				if (isdigit(token[0]) && isdigit(token[1]) &&
 				    isdigit(token[2]) && token[3] == '\0') {
 					/* Yes. */
-					is_reqresp = 1;
+					print_this = 1;
 				}
 			}
 		}
 	} else {
 		/*
-		 * This protocol has only request and response lines
-		 * (e.g., FTP, where all the data goes over a
-		 * different connection); assume the payload is
-		 * a request or response.
+		 * Either:
+		 *
+		 * 1) This protocol has only request and response lines
+		 *    (e.g., FTP, where all the data goes over a different
+		 *    connection); assume the payload is a request or
+		 *    response.
+		 *
+		 * or
+		 *
+		 * 2) This protocol is just text, so that we should
+		 *    always, at minimum, print the first line and,
+		 *    in verbose mode, print all lines.
 		 */
-		is_reqresp = 1;
+		print_this = 1;
 	}
 
 	/* Capitalize the protocol name */
 	for (pnp = protoname; *pnp != '\0'; pnp++)
 		ND_PRINT((ndo, "%c", toupper((u_char)*pnp)));
 
-	if (is_reqresp) {
+	if (print_this) {
 		/*
 		 * In non-verbose mode, just print the protocol, followed
-		 * by the first line as the request or response info.
+		 * by the first line.
 		 *
 		 * In verbose mode, print lines as text until we run out
 		 * of characters or see something that's not a
@@ -931,11 +946,38 @@ safeputchar(netdissect_options *ndo,
 	ND_PRINT((ndo, (c < 0x80 && ND_ISPRINT(c)) ? "%c" : "\\0x%02x", c));
 }
 
-#ifdef LBL_ALIGN
+#if (defined(__i386__) || defined(_M_IX86) || defined(__X86__) || defined(__x86_64__) || defined(_M_X64)) || \
+    (defined(__arm__) || defined(_M_ARM) || defined(__aarch64__)) || \
+    (defined(__m68k__) && (!defined(__mc68000__) && !defined(__mc68010__))) || \
+    (defined(__ppc__) || defined(__ppc64__) || defined(_M_PPC) || defined(_ARCH_PPC) || defined(_ARCH_PPC64)) || \
+    (defined(__s390__) || defined(__s390x__) || defined(__zarch__)) || \
+    defined(__vax__)
 /*
- * Some compilers try to optimize memcpy(), using the alignment constraint
- * on the argument pointer type.  by using this function, we try to avoid the
- * optimization.
+ * The procesor natively handles unaligned loads, so just use memcpy()
+ * and memcmp(), to enable those optimizations.
+ *
+ * XXX - are those all the x86 tests we need?
+ * XXX - do we need to worry about ARMv1 through ARMv5, which didn't
+ * support unaligned loads, and, if so, do we need to worry about all
+ * of them, or just some of them, e.g. ARMv5?
+ * XXX - are those the only 68k tests we need not to generated
+ * unaligned accesses if the target is the 68000 or 68010?
+ * XXX - are there any tests we don't need, because some definitions are for
+ * compilers that also predefine the GCC symbols?
+ * XXX - do we need to test for both 32-bit and 64-bit versions of those
+ * architectures in all cases?
+ */
+#else
+/*
+ * The processor doesn't natively handle unaligned loads,
+ * and the compiler might "helpfully" optimize memcpy()
+ * and memcmp(), when handed pointers that would normally
+ * be properly aligned, into sequences that assume proper
+ * alignment.
+ *
+ * Do copies and compares of possibly-unaligned data by
+ * calling routines that wrap memcpy() and memcmp(), to
+ * prevent that optimization.
  */
 void
 unaligned_memcpy(void *p, const void *q, size_t l)

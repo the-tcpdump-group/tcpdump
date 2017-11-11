@@ -276,9 +276,11 @@ decnet		DECnet_Phone.pcap	decnet.out
 
 # RADIUS tests
 radius-v	RADIUS.pcap	radius-v.out	-v
+radius-rfc3162	RADIUS-RFC3162.pcap	radius-rfc3162-v.out	-v
 radius-rfc4675	RADIUS-RFC4675.pcap	radius-rfc4675-v.out	-v
 radius-rfc5176	RADIUS-RFC5176.pcap	radius-rfc5176-v.out	-v
 radius-port1700	RADIUS-port1700.pcap	radius-port1700-v.out	-v
+radius-rfc5176-2	RADIUS-RFC5176-2.pcap	radius-rfc5176-2-v.out	-v
 
 # link-level protocols
 dtp-v		DTP.pcap		dtp-v.out		-v
@@ -377,6 +379,10 @@ nsh-over-vxlan-gpe-vvv nsh-over-vxlan-gpe.pcap nsh-over-vxlan-gpe-vvv.out -vvv
 resp_1 resp_1_benchmark.pcap resp_1.out
 resp_2 resp_2_inline.pcap    resp_2.out
 resp_3 resp_3_malicious.pcap resp_3.out
+
+# WHOIS tests
+whois			whois.pcap		whois.out
+whois-v		whois.pcap		whois-v.out	-v
 
 # HNCP tests
 hncp hncp.pcap hncp.out -vvv
@@ -603,3 +609,19 @@ nfs-seg-fault-1  nfs-seg-fault-1.pcap  nfs-seg-fault-1.out
 dns-zlip-1		dns-zlip-1.pcap		dns-zlip-1.out
 dns-zlip-2		dns-zlip-2.pcap		dns-zlip-2.out
 dns-zlip-3		dns-zlip-3.pcap		dns-zlip-3.out
+
+# NTP tests
+ntp			ntp.pcap		ntp.out
+ntp-v			ntp.pcap		ntp-v.out		-v
+ntp-time		ntp-time.pcap		ntp-time.out
+ntp-time--v		ntp-time.pcap		ntp-time--v.out		-v
+ntp-time--vv		ntp-time.pcap		ntp-time--vv.out	-vv
+ntp-time--vvv		ntp-time.pcap		ntp-time--vvv.out	-vvv
+ntp-control		ntp-control.pcap	ntp-control.out
+ntp-control--v		ntp-control.pcap	ntp-control--v.out	-v
+ntp-control--vv		ntp-control.pcap	ntp-control--vv.out	-vv
+ntp-control--vvv	ntp-control.pcap	ntp-control--vvv.out	-vvv
+ntp-mode7		ntp-mode7.pcap		ntp-mode7.out
+ntp-mode7--v		ntp-mode7.pcap		ntp-mode7--v.out	-v
+ntp-mode7--vv		ntp-mode7.pcap		ntp-mode7--vv.out	-vv
+ntp-mode7--vvv		ntp-mode7.pcap		ntp-mode7--vvv.out	-vvv

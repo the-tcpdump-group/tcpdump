@@ -70,7 +70,7 @@ DEPENDENCY_CFLAG = @DEPENDENCY_CFLAG@
 	@rm -f $@
 	$(CC) $(FULL_CFLAGS) -c $(srcdir)/$*.c
 
-CSRC =	setsignal.c tcpdump.c
+CSRC =	tcpdump.c
 
 LIBNETDISSECT_SRC=\
 	addrtoname.c \
@@ -238,7 +238,6 @@ LIBNETDISSECT_SRC=\
 	util-print.c
 
 LOCALSRC = @LOCALSRC@
-GENSRC = version.c
 LIBOBJS = @LIBOBJS@
 
 LIBNETDISSECT_OBJ=$(LIBNETDISSECT_SRC:.c=.o) ${LOCALSRC:.c=.o} ${LIBOBJS}
@@ -265,6 +264,7 @@ HDR = \
 	extract.h \
 	funcattrs.h \
 	getopt_long.h \
+	getservent.h \
 	gmpls.h \
 	gmt2local.h \
 	interface.h \
@@ -290,7 +290,6 @@ HDR = \
 	rpc_auth.h \
 	rpc_msg.h \
 	rpl.h \
-	setsignal.h \
 	signature.h \
 	slcompress.h \
 	smb.h \
@@ -344,6 +343,7 @@ EXTRA_DIST = \
 	missing/dlnames.c \
 	missing/datalinks.c \
 	missing/getopt_long.c \
+	missing/getservent.c \
 	missing/snprintf.c \
 	missing/strdup.c \
 	missing/strlcat.c \
@@ -383,6 +383,8 @@ datalinks.o: $(srcdir)/missing/datalinks.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/datalinks.c
 dlnames.o: $(srcdir)/missing/dlnames.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/dlnames.c
+getservent.o: $(srcdir)/missing/getservent.c
+	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/getservent.c
 getopt_long.o: $(srcdir)/missing/getopt_long.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/getopt_long.c
 snprintf.o: $(srcdir)/missing/snprintf.c
@@ -395,19 +397,6 @@ strlcpy.o: $(srcdir)/missing/strlcpy.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/strlcpy.c
 strsep.o: $(srcdir)/missing/strsep.c
 	$(CC) $(FULL_CFLAGS) -o $@ -c $(srcdir)/missing/strsep.c
-
-version.o: version.c
-	$(CC) $(FULL_CFLAGS) -c version.c
-
-version.c: $(srcdir)/VERSION
-	@rm -f $@
-	if grep GIT ${srcdir}/VERSION >/dev/null; then \
-		read ver <${srcdir}/VERSION; \
-		echo $$ver | tr -d '\012'; \
-		date +_%Y_%m_%d; \
-	else \
-		cat ${srcdir}/VERSION; \
-	fi | sed -e 's/.*/const char version[] = "&";/' > $@
 
 install: all
 	[ -d $(DESTDIR)$(sbindir) ] || \
