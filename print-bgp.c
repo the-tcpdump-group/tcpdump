@@ -2610,12 +2610,10 @@ bgp_update_print(netdissect_options *ndo,
 	withdrawn_routes_len = EXTRACT_16BITS(p);
 	p += 2;
 	length -= 2;
-	if (withdrawn_routes_len) {
+	if (withdrawn_routes_len > 1) {
 		ND_TCHECK2(p[0], withdrawn_routes_len);
 		if (length < withdrawn_routes_len)
 			goto trunc;
-                if (withdrawn_routes_len < 2)
-                        goto trunc;
 
                 ND_PRINT((ndo, "\n\t  Withdrawn routes:"));
                 add_path = check_add_path(p, withdrawn_routes_len, 32);
@@ -2644,7 +2642,10 @@ bgp_update_print(netdissect_options *ndo,
                                 withdrawn_routes_len -= wpfx;
                         }
                 }
-	}
+	} else {
+                p += withdrawn_routes_len;
+                length -= withdrawn_routes_len;
+        }
 
 	ND_TCHECK2(p[0], 2);
 	if (length < 2)
