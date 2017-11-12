@@ -3,9 +3,6 @@
 /* define if you want to build the possibly-buggy SMB printer */
 #undef ENABLE_SMB
 
-/* Define to 1 if you have the `alarm' function. */
-#undef HAVE_ALARM
-
 /* Define to 1 if you have the `bpf_dump' function. */
 #undef HAVE_BPF_DUMP
 
@@ -26,6 +23,10 @@
 
 /* Casper support available */
 #undef HAVE_CASPER
+
+/* Define to 1 if you have the declaration of `alarm', and to 0 if you don't.
+   */
+#undef HAVE_DECL_ALARM
 
 /* Define to 1 if you have the declaration of `ether_ntohost', and to 0 if you
    don't. */

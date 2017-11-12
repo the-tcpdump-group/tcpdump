@@ -405,8 +405,9 @@ if test "$td_cv_decl_netdnet_dnetdb_h_dnet_htoa" = yes; then
 fi
 
 AC_REPLACE_FUNCS(vfprintf strlcat strlcpy strdup strsep getservent getopt_long)
-AC_CHECK_FUNCS(fork vfork strftime)
-AC_CHECK_FUNCS(setlinebuf alarm)
+AC_CHECK_FUNCS(fork vfork strftime setlinebuf)
+
+AC_CHECK_DECLS_ONCE(alarm)
 
 needsnprintf=no
 AC_CHECK_FUNCS(vsnprintf snprintf,,

@@ -227,7 +227,7 @@ void requestinfo(int);
   #include <MMsystem.h>
   static UINT timer_id;
   static void CALLBACK verbose_stats_dump(UINT, UINT, DWORD_PTR, DWORD_PTR, DWORD_PTR);
-#elif defined(HAVE_ALARM)
+#elif defined(HAVE_DECL_ALARM)
   static void verbose_stats_dump(int sig);
 #endif
 
@@ -2206,7 +2206,7 @@ DIAG_ON_CLANG(assign-enum)
 		/* call verbose_stats_dump() each 1000 +/-100msec */
 		timer_id = timeSetEvent(1000, 100, verbose_stats_dump, 0, TIME_PERIODIC);
 		setvbuf(stderr, NULL, _IONBF, 0);
-#elif defined(HAVE_ALARM)
+#elif defined(HAVE_DECL_ALARM)
 		(void)setsignal(SIGALRM, verbose_stats_dump);
 		alarm(1);
 #endif
@@ -2397,7 +2397,7 @@ cleanup(int signo _U_)
 	if (timer_id)
 		timeKillEvent(timer_id);
 	timer_id = 0;
-#elif defined(HAVE_ALARM)
+#elif defined(HAVE_DECL_ALARM)
 	alarm(0);
 #endif
 
@@ -2852,7 +2852,7 @@ void CALLBACK verbose_stats_dump (UINT timer_id _U_, UINT msg _U_, DWORD_PTR arg
 {
 	print_packets_captured();
 }
-#elif defined(HAVE_ALARM)
+#elif defined(HAVE_DECL_ALARM)
 static void verbose_stats_dump(int sig _U_)
 {
 	print_packets_captured();
