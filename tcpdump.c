@@ -2794,33 +2794,6 @@ print_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
 		info(0);
 }
 
-#ifdef _WIN32
-	/*
-	 * XXX - there should really be libpcap calls to get the version
-	 * number as a string (the string would be generated from #defines
-	 * at run time, so that it's not generated from string constants
-	 * in the library, as, on many UNIX systems, those constants would
-	 * be statically linked into the application executable image, and
-	 * would thus reflect the version of libpcap on the system on
-	 * which the application was *linked*, not the system on which it's
-	 * *running*.
-	 *
-	 * That routine should be documented, unlike the "version[]"
-	 * string, so that UNIX vendors providing their own libpcaps
-	 * don't omit it (as a couple of vendors have...).
-	 *
-	 * Packet.dll should perhaps also export a routine to return the
-	 * version number of the Packet.dll code, to supply the
-	 * "Wpcap_version" information on Windows.
-	 */
-	char WDversion[]="current-git.tcpdump.org";
-#if !defined(HAVE_GENERATED_VERSION)
-	char version[]="current-git.tcpdump.org";
-#endif
-	char pcap_version[]="current-git.tcpdump.org";
-	char Wpcap_version[]="3.1";
-#endif
-
 #ifdef SIGNAL_REQ_INFO
 void requestinfo(int signo _U_)
 {
@@ -2865,17 +2838,17 @@ static void
 print_version(void)
 {
 #ifndef HAVE_PCAP_LIB_VERSION
-#if defined(_WIN32) || defined(HAVE_PCAP_VERSION)
+  #ifdef HAVE_PCAP_VERSION
 	extern char pcap_version[];
-#else /* defined(_WIN32) || defined(HAVE_PCAP_VERSION) */
+  #else /* HAVE_PCAP_VERSION */
 	static char pcap_version[] = "unknown";
-#endif /* defined(_WIN32) || defined(HAVE_PCAP_VERSION) */
+  #endif /* HAVE_PCAP_VERSION */
 #endif /* HAVE_PCAP_LIB_VERSION */
 	const char *smi_version_string;
 
 	(void)fprintf(stderr, "%s version " PACKAGE_VERSION "\n", program_name);
 #ifdef HAVE_PCAP_LIB_VERSION
-	(void)fprintf(stderr, "%s\n",pcap_lib_version());
+	(void)fprintf(stderr, "%s\n", pcap_lib_version());
 #else /* HAVE_PCAP_LIB_VERSION */
 	(void)fprintf(stderr, "libpcap version %s\n", pcap_version);
 #endif /* HAVE_PCAP_LIB_VERSION */
