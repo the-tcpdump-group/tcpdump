@@ -223,13 +223,15 @@ static void droproot(const char *, const char *);
 void requestinfo(int);
 #endif
 
-#if defined(USE_WIN32_MM_TIMER)
-  #include <MMsystem.h>
-  static UINT timer_id;
-  static void CALLBACK verbose_stats_dump(UINT, UINT, DWORD_PTR, DWORD_PTR, DWORD_PTR);
-#elif defined(HAVE_ALARM)
+#ifdef _WIN32
+  #ifdef USE_WIN32_MM_TIMER
+    #include <MMsystem.h>
+    static UINT timer_id;
+    static void CALLBACK verbose_stats_dump(UINT, UINT, DWORD_PTR, DWORD_PTR, DWORD_PTR);
+  #endif /* USE_WIN32_MM_TIMER */
+#else /* _WIN32 */
   static void verbose_stats_dump(int sig);
-#endif
+#endif /* _WIN32 */
 
 static void info(int);
 static u_int packets_captured;
@@ -2202,14 +2204,17 @@ DIAG_ON_CLANG(assign-enum)
 		 *"-v" means tcpdump should, once per second,
 		 * "v"erbosely report the number of packets captured.
 		 */
-#ifdef USE_WIN32_MM_TIMER
+#ifdef _WIN32
+  #ifdef USE_WIN32_MM_TIMER
 		/* call verbose_stats_dump() each 1000 +/-100msec */
 		timer_id = timeSetEvent(1000, 100, verbose_stats_dump, 0, TIME_PERIODIC);
 		setvbuf(stderr, NULL, _IONBF, 0);
-#elif defined(HAVE_ALARM)
+  #endif /* USE_WIN32_MM_TIMER */
+#else /* _WIN32 */
+		/* UN*X has alarm() */
 		(void)setsignal(SIGALRM, verbose_stats_dump);
 		alarm(1);
-#endif
+#endif /* _WIN32 */
 	}
 
 	if (RFileName == NULL) {
@@ -2393,13 +2398,15 @@ static void
 static void
 cleanup(int signo _U_)
 {
-#ifdef USE_WIN32_MM_TIMER
+#ifdef _WIN32
+  #ifdef USE_WIN32_MM_TIMER
 	if (timer_id)
 		timeKillEvent(timer_id);
 	timer_id = 0;
-#elif defined(HAVE_ALARM)
+  #endif /* USE_WIN32_MM_TIMER */
+#else /* _WIN32 */
 	alarm(0);
-#endif
+#endif /* _WIN32 */
 
 #ifdef HAVE_PCAP_BREAKLOOP
 	/*
@@ -2819,19 +2826,21 @@ print_packets_captured (void)
 /*
  * Called once each second in verbose mode while dumping to file
  */
-#ifdef USE_WIN32_MM_TIMER
+#ifdef _WIN32
+  #ifdef USE_WIN32_MM_TIMER
 void CALLBACK verbose_stats_dump (UINT timer_id _U_, UINT msg _U_, DWORD_PTR arg _U_,
 				  DWORD_PTR dw1 _U_, DWORD_PTR dw2 _U_)
 {
 	print_packets_captured();
 }
-#elif defined(HAVE_ALARM)
+  #endif /* USE_WIN32_MM_TIMER */
+#else /* _WIN32 */
 static void verbose_stats_dump(int sig _U_)
 {
 	print_packets_captured();
 	alarm(1);
 }
-#endif
+#endif /* _WIN32 */
 
 USES_APPLE_DEPRECATED_API
 static void

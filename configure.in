@@ -406,7 +406,7 @@ fi
 
 AC_REPLACE_FUNCS(vfprintf strlcat strlcpy strdup strsep getservent getopt_long)
 AC_CHECK_FUNCS(fork vfork strftime)
-AC_CHECK_FUNCS(setlinebuf alarm)
+AC_CHECK_FUNCS(setlinebuf)
 
 needsnprintf=no
 AC_CHECK_FUNCS(vsnprintf snprintf,,
