@@ -286,6 +286,9 @@
 /* Define if you enable support for libsmi */
 #undef USE_LIBSMI
 
+/* Define to 1 to use the Windows Multimedia Timer */
+#undef USE_WIN32_MM_TIMER
+
 /* define if should chroot when dropping privileges */
 #undef WITH_CHROOT
 

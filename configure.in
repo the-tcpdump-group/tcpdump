@@ -90,6 +90,11 @@ darwin*)
 		esac
 	fi
 	;;
+*mingw*)
+	AC_DEFINE(USE_WIN32_MM_TIMER, 1,
+		[Define to 1 to use the Windows Multimedia Timer])
+	LIBS="$LIBS -lws2_32 -lwinmm"
+	;;
 esac
 
 
