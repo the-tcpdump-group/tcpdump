@@ -2203,7 +2203,17 @@ DIAG_ON_CLANG(assign-enum)
 		 * "v"erbosely report the number of packets captured.
 		 */
 #ifdef _WIN32
-		/* call verbose_stats_dump() each 1000 +/-100msec */
+		/*
+		 * call verbose_stats_dump() each 1000 +/-100msec
+		 *
+		 * XXX - as of XP/Server 2003, this is deprecated in
+		 * favor of CreateTimerQueueTimer().  We should
+		 * probably use that, instead.  (And
+		 *
+		 *  https://blogs.msdn.microsoft.com/oldnewthing/20151230-00/?p=92741
+		 *
+		 * suggests that it dates back to W2K.)
+		 */
 		timer_id = timeSetEvent(1000, 100, verbose_stats_dump, 0, TIME_PERIODIC);
 		setvbuf(stderr, NULL, _IONBF, 0);
 #else /* _WIN32 */
