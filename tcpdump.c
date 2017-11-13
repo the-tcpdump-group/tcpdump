@@ -225,9 +225,8 @@ void requestinfo(int);
 #endif
 
 #ifdef _WIN32
-    #include <MMsystem.h>
-    static UINT timer_id;
-    static void CALLBACK verbose_stats_dump(UINT, UINT, DWORD_PTR, DWORD_PTR, DWORD_PTR);
+    static HANDLE timer_handle = INVALID_HANDLE;
+    static void CALLBACK verbose_stats_dump(PVOID param, BOOLEAN timer_fired);
 #else /* _WIN32 */
   static void verbose_stats_dump(int sig);
 #endif /* _WIN32 */
@@ -2205,17 +2204,16 @@ DIAG_ON_CLANG(assign-enum)
 		 */
 #ifdef _WIN32
 		/*
-		 * call verbose_stats_dump() each 1000 +/-100msec
+		 * https://blogs.msdn.microsoft.com/oldnewthing/20151230-00/?p=92741
 		 *
-		 * XXX - as of XP/Server 2003, this is deprecated in
-		 * favor of CreateTimerQueueTimer().  We should
-		 * probably use that, instead.  (And
+		 * suggests that this dates back to W2K.
 		 *
-		 *  https://blogs.msdn.microsoft.com/oldnewthing/20151230-00/?p=92741
-		 *
-		 * suggests that it dates back to W2K.)
+		 * I don't know what a "long wait" is, but we'll assume
+		 * that printing the stats could be a "long wait".
 		 */
-		timer_id = timeSetEvent(1000, 100, verbose_stats_dump, 0, TIME_PERIODIC);
+		CreateTimerQueueTimer(&timer_handle, NULL,
+		    verbose_stats_dump, NULL, 1000, 1000
+		    WT_EXECUTEDEFAULT|WT_EXECUTELONGFUNCTION);
 		setvbuf(stderr, NULL, _IONBF, 0);
 #else /* _WIN32 */
 		/*
@@ -2414,9 +2412,11 @@ static void
 cleanup(int signo _U_)
 {
 #ifdef _WIN32
-	if (timer_id)
-		timeKillEvent(timer_id);
-	timer_id = 0;
+	if (timer_handle != INVALID_HANDLE) {
+		DeleteTimerQueueTimer(NULL, timer_handle, NULL);
+		CloseHandle(timer_handle);
+		timer_handle = INVALID_HANDLE;
+        }
 #else /* _WIN32 */
 	struct itimerval timer;
 
@@ -2846,8 +2846,8 @@ print_packets_captured (void)
  * Called once each second in verbose mode while dumping to file
  */
 #ifdef _WIN32
-void CALLBACK verbose_stats_dump (UINT timer_id _U_, UINT msg _U_, DWORD_PTR arg _U_,
-				  DWORD_PTR dw1 _U_, DWORD_PTR dw2 _U_)
+static void CALLBACK verbose_stats_dump(PVOID param _U_,
+    BOOLEAN timer_fired _U_)
 {
 	print_packets_captured();
 }
