@@ -98,6 +98,7 @@ The Regents of the University of California.  All rights reserved.\n";
 #include <string.h>
 #include <limits.h>
 #ifndef _WIN32
+#include <sys/time.h>
 #include <sys/wait.h>
 #include <sys/resource.h>
 #include <pwd.h>
@@ -2217,9 +2218,17 @@ DIAG_ON_CLANG(assign-enum)
 		timer_id = timeSetEvent(1000, 100, verbose_stats_dump, 0, TIME_PERIODIC);
 		setvbuf(stderr, NULL, _IONBF, 0);
 #else /* _WIN32 */
-		/* UN*X has alarm() */
+		/*
+		 * Assume this is UN*X, and that it has setitimer(); that
+		 * dates back to UNIX 95.
+		 */
+		struct itimerval timer;
 		(void)setsignal(SIGALRM, verbose_stats_dump);
-		alarm(1);
+		timer.it_interval.tv_sec = 1;
+		timer.it_interval.tv_usec = 0;
+		timer.it_value.tv_sec = 1;
+		timer.it_value.tv_usec = 1;
+		setitimer(ITIMER_REAL, &timer, NULL);
 #endif /* _WIN32 */
 	}
 
@@ -2409,7 +2418,13 @@ cleanup(int signo _U_)
 		timeKillEvent(timer_id);
 	timer_id = 0;
 #else /* _WIN32 */
-	alarm(0);
+	struct itimerval timer;
+
+	timer.it_interval.tv_sec = 0;
+	timer.it_interval.tv_usec = 0;
+	timer.it_value.tv_sec = 0;
+	timer.it_value.tv_usec = 0;
+	setitimer(ITIMER_REAL, &timer, NULL);
 #endif /* _WIN32 */
 
 #ifdef HAVE_PCAP_BREAKLOOP
@@ -2840,7 +2855,6 @@ void CALLBACK verbose_stats_dump (UINT timer_id _U_, UINT msg _U_, DWORD_PTR arg
 static void verbose_stats_dump(int sig _U_)
 {
 	print_packets_captured();
-	alarm(1);
 }
 #endif /* _WIN32 */
 
