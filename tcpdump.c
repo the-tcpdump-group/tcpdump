@@ -97,7 +97,9 @@ The Regents of the University of California.  All rights reserved.\n";
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
-#ifndef _WIN32
+#ifdef _WIN32
+#include <windows.h>
+#else
 #include <sys/time.h>
 #include <sys/wait.h>
 #include <sys/resource.h>
