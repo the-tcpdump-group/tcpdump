@@ -227,7 +227,7 @@ void requestinfo(int);
 #endif
 
 #ifdef _WIN32
-    static HANDLE timer_handle = INVALID_HANDLE;
+    static HANDLE timer_handle = INVALID_HANDLE_VALUE;
     static void CALLBACK verbose_stats_dump(PVOID param, BOOLEAN timer_fired);
 #else /* _WIN32 */
   static void verbose_stats_dump(int sig);
@@ -2214,7 +2214,7 @@ DIAG_ON_CLANG(assign-enum)
 		 * that printing the stats could be a "long wait".
 		 */
 		CreateTimerQueueTimer(&timer_handle, NULL,
-		    verbose_stats_dump, NULL, 1000, 1000
+		    verbose_stats_dump, NULL, 1000, 1000,
 		    WT_EXECUTEDEFAULT|WT_EXECUTELONGFUNCTION);
 		setvbuf(stderr, NULL, _IONBF, 0);
 #else /* _WIN32 */
@@ -2414,10 +2414,10 @@ static void
 cleanup(int signo _U_)
 {
 #ifdef _WIN32
-	if (timer_handle != INVALID_HANDLE) {
+	if (timer_handle != INVALID_HANDLE_VALUE) {
 		DeleteTimerQueueTimer(NULL, timer_handle, NULL);
 		CloseHandle(timer_handle);
-		timer_handle = INVALID_HANDLE;
+		timer_handle = INVALID_HANDLE_VALUE;
         }
 #else /* _WIN32 */
 	struct itimerval timer;
