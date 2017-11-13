@@ -224,11 +224,9 @@ void requestinfo(int);
 #endif
 
 #ifdef _WIN32
-  #ifdef USE_WIN32_MM_TIMER
     #include <MMsystem.h>
     static UINT timer_id;
     static void CALLBACK verbose_stats_dump(UINT, UINT, DWORD_PTR, DWORD_PTR, DWORD_PTR);
-  #endif /* USE_WIN32_MM_TIMER */
 #else /* _WIN32 */
   static void verbose_stats_dump(int sig);
 #endif /* _WIN32 */
@@ -2205,11 +2203,9 @@ DIAG_ON_CLANG(assign-enum)
 		 * "v"erbosely report the number of packets captured.
 		 */
 #ifdef _WIN32
-  #ifdef USE_WIN32_MM_TIMER
 		/* call verbose_stats_dump() each 1000 +/-100msec */
 		timer_id = timeSetEvent(1000, 100, verbose_stats_dump, 0, TIME_PERIODIC);
 		setvbuf(stderr, NULL, _IONBF, 0);
-  #endif /* USE_WIN32_MM_TIMER */
 #else /* _WIN32 */
 		/* UN*X has alarm() */
 		(void)setsignal(SIGALRM, verbose_stats_dump);
@@ -2399,11 +2395,9 @@ static void
 cleanup(int signo _U_)
 {
 #ifdef _WIN32
-  #ifdef USE_WIN32_MM_TIMER
 	if (timer_id)
 		timeKillEvent(timer_id);
 	timer_id = 0;
-  #endif /* USE_WIN32_MM_TIMER */
 #else /* _WIN32 */
 	alarm(0);
 #endif /* _WIN32 */
@@ -2827,13 +2821,11 @@ print_packets_captured (void)
  * Called once each second in verbose mode while dumping to file
  */
 #ifdef _WIN32
-  #ifdef USE_WIN32_MM_TIMER
 void CALLBACK verbose_stats_dump (UINT timer_id _U_, UINT msg _U_, DWORD_PTR arg _U_,
 				  DWORD_PTR dw1 _U_, DWORD_PTR dw2 _U_)
 {
 	print_packets_captured();
 }
-  #endif /* USE_WIN32_MM_TIMER */
 #else /* _WIN32 */
 static void verbose_stats_dump(int sig _U_)
 {
