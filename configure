@@ -5246,7 +5246,7 @@ fi
                 LBL_LIBS="$LIBS"
     pfopen=/usr/examples/packetfilter/pfopen.c
     if test -f $pfopen ; then
-	    for ac_func in pfopen
+        for ac_func in pfopen
 do :
   ac_fn_c_check_func "$LINENO" "pfopen" "ac_cv_func_pfopen"
 if test "x$ac_cv_func_pfopen" = xyes; then :
@@ -5257,14 +5257,14 @@ _ACEOF
 fi
 done
 
-	    if test $ac_cv_func_pfopen = "no" ; then
-		    { $as_echo "$as_me:${as_lineno-$LINENO}: result: Using $pfopen" >&5
+        if test $ac_cv_func_pfopen = "no" ; then
+            { $as_echo "$as_me:${as_lineno-$LINENO}: result: Using $pfopen" >&5
 $as_echo "Using $pfopen" >&6; }
-		    LIBS="$LIBS $pfopen"
-	    fi
+            LIBS="$LIBS $pfopen"
+        fi
     fi
-	libpcap=FAIL
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for local pcap library" >&5
+    libpcap=FAIL
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for local pcap library" >&5
 $as_echo_n "checking for local pcap library... " >&6; }
 
 # Check whether --with-system-libpcap was given.
@@ -5272,33 +5272,33 @@ if test "${with_system_libpcap+set}" = set; then :
   withval=$with_system_libpcap;
 fi
 
-	if test "x$with_system_libpcap" != xyes ; then
-		lastdir=FAIL
-    	places=`ls $srcdir/.. | sed -e 's,/$,,' -e "s,^,$srcdir/../," | \
-		egrep '/libpcap-[0-9]+\.[0-9]+(\.[0-9]*)?([ab][0-9]*|-PRE-GIT)?$'`
-    	places2=`ls .. | sed -e 's,/$,,' -e "s,^,../," | \
-		egrep '/libpcap-[0-9]+\.[0-9]+(\.[0-9]*)?([ab][0-9]*|-PRE-GIT)?$'`
-    	for dir in $places $srcdir/../libpcap ../libpcap $srcdir/libpcap $places2 ; do
-	    	basedir=`echo $dir | sed -e 's/[ab][0-9]*$//' | \
-	        	sed -e 's/-PRE-GIT$//' `
-	    	if test $lastdir = $basedir ; then
-		    			    	continue;
-	    	fi
-	    	lastdir=$dir
-	    	if test -r $dir/libpcap.a ; then
-		    	libpcap=$dir/libpcap.a
-		    	d=$dir
-		    		    	fi
-		done
-	fi
+    if test "x$with_system_libpcap" != xyes ; then
+        lastdir=FAIL
+        places=`ls $srcdir/.. | sed -e 's,/$,,' -e "s,^,$srcdir/../," | \
+            egrep '/libpcap-[0-9]+\.[0-9]+(\.[0-9]*)?([ab][0-9]*|-PRE-GIT)?$'`
+        places2=`ls .. | sed -e 's,/$,,' -e "s,^,../," | \
+            egrep '/libpcap-[0-9]+\.[0-9]+(\.[0-9]*)?([ab][0-9]*|-PRE-GIT)?$'`
+        for dir in $places $srcdir/../libpcap ../libpcap $srcdir/libpcap $places2 ; do
+            basedir=`echo $dir | sed -e 's/[ab][0-9]*$//' | \
+                sed -e 's/-PRE-GIT$//' `
+            if test $lastdir = $basedir ; then
+                                continue;
+            fi
+            lastdir=$dir
+            if test -r $dir/libpcap.a ; then
+                libpcap=$dir/libpcap.a
+                d=$dir
+                            fi
+        done
+    fi
     if test $libpcap = FAIL ; then
-	    { $as_echo "$as_me:${as_lineno-$LINENO}: result: not found" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: not found" >&5
 $as_echo "not found" >&6; }
 
-	    #
-	    # Look for pcap-config.
-	    #
-	    if test -n "$ac_tool_prefix"; then
+        #
+        # Look for pcap-config.
+        #
+        if test -n "$ac_tool_prefix"; then
   # Extract the first word of "${ac_tool_prefix}pcap-config", so it can be a program name with args.
 set dummy ${ac_tool_prefix}pcap-config; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
@@ -5396,26 +5396,26 @@ else
   PCAP_CONFIG="$ac_cv_path_PCAP_CONFIG"
 fi
 
-	    if test -n "$PCAP_CONFIG" ; then
-		#
-		# Found - use it to get the include flags for
-		# libpcap and the flags to link with libpcap.
-		#
-		# Please read section 11.6 "Shell Substitutions"
-		# in the autoconf manual before doing anything
-		# to this that involves quoting.  Especially note
-		# the statement "There is just no portable way to use
-		# double-quoted strings inside double-quoted back-quoted
-		# expressions (pfew!)."
-		#
-		cflags=`"$PCAP_CONFIG" --cflags`
-		V_INCLS="$cflags $V_INCLS"
-		libpcap=`"$PCAP_CONFIG" --libs`
-	    else
-		#
-		# Not found; look for pcap.
-		#
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lpcap" >&5
+        if test -n "$PCAP_CONFIG" ; then
+            #
+            # Found - use it to get the include flags for
+            # libpcap and the flags to link with libpcap.
+            #
+            # Please read section 11.6 "Shell Substitutions"
+            # in the autoconf manual before doing anything
+            # to this that involves quoting.  Especially note
+            # the statement "There is just no portable way to use
+            # double-quoted strings inside double-quoted back-quoted
+            # expressions (pfew!)."
+            #
+            cflags=`"$PCAP_CONFIG" --cflags`
+            V_INCLS="$cflags $V_INCLS"
+            libpcap=`"$PCAP_CONFIG" --libs`
+        else
+            #
+            # Not found; look for pcap.
+            #
+            { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lpcap" >&5
 $as_echo_n "checking for main in -lpcap... " >&6; }
 if ${ac_cv_lib_pcap_main+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -5449,52 +5449,52 @@ if test "x$ac_cv_lib_pcap_main" = xyes; then :
   libpcap="-lpcap"
 fi
 
-		if test $libpcap = FAIL ; then
-		    as_fn_error $? "see the INSTALL doc for more info" "$LINENO" 5
-		fi
-																																								{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for extraneous pcap header directories" >&5
-$as_echo_n "checking for extraneous pcap header directories... " >&6; }
-		if test \( ! -r /usr/local/include/pcap.h \) -a \
-			\( ! -r /usr/include/pcap.h \); then
-		    if test -r /usr/local/include/pcap/pcap.h; then
-			d="/usr/local/include/pcap"
-		    elif test -r /usr/include/pcap/pcap.h; then
-			d="/usr/include/pcap"
-		    fi
-		fi
-		if test -z "$d" ; then
-		    { $as_echo "$as_me:${as_lineno-$LINENO}: result: not found" >&5
-$as_echo "not found" >&6; }
-		else
-		    V_INCLS="-I$d $V_INCLS"
-		    { $as_echo "$as_me:${as_lineno-$LINENO}: result: found -- -I$d added" >&5
-$as_echo "found -- -I$d added" >&6; }
-		fi
-	    fi
-    else
-	    V_PCAPDEP=$libpcap
-	    places=`ls $srcdir/.. | sed -e 's,/$,,' -e "s,^,$srcdir/../," | \
-    	 		egrep '/libpcap-[0-9]*.[0-9]*(.[0-9]*)?([ab][0-9]*)?$'`
-	    places2=`ls .. | sed -e 's,/$,,' -e "s,^,../," | \
-    	 		egrep '/libpcap-[0-9]*.[0-9]*(.[0-9]*)?([ab][0-9]*)?$'`
-            pcapH=FAIL
-	    if test -r $d/pcap.h; then
-                    pcapH=$d
-	    else
-                for dir in $places $srcdir/../libpcap ../libpcap $srcdir/libpcap $places2 ; do
-                   if test -r $dir/pcap.h ; then
-                       pcapH=$dir
-                   fi
-                done
+            if test $libpcap = FAIL ; then
+                as_fn_error $? "see the INSTALL doc for more info" "$LINENO" 5
             fi
+                                                                                                                                                                                                                                                { $as_echo "$as_me:${as_lineno-$LINENO}: checking for extraneous pcap header directories" >&5
+$as_echo_n "checking for extraneous pcap header directories... " >&6; }
+            if test \( ! -r /usr/local/include/pcap.h \) -a \
+                    \( ! -r /usr/include/pcap.h \); then
+                if test -r /usr/local/include/pcap/pcap.h; then
+                    d="/usr/local/include/pcap"
+                elif test -r /usr/include/pcap/pcap.h; then
+                    d="/usr/include/pcap"
+                fi
+            fi
+            if test -z "$d" ; then
+                { $as_echo "$as_me:${as_lineno-$LINENO}: result: not found" >&5
+$as_echo "not found" >&6; }
+            else
+                V_INCLS="-I$d $V_INCLS"
+                { $as_echo "$as_me:${as_lineno-$LINENO}: result: found -- -I$d added" >&5
+$as_echo "found -- -I$d added" >&6; }
+            fi
+        fi
+    else
+        V_PCAPDEP=$libpcap
+        places=`ls $srcdir/.. | sed -e 's,/$,,' -e "s,^,$srcdir/../," | \
+                 egrep '/libpcap-[0-9]*.[0-9]*(.[0-9]*)?([ab][0-9]*)?$'`
+        places2=`ls .. | sed -e 's,/$,,' -e "s,^,../," | \
+                 egrep '/libpcap-[0-9]*.[0-9]*(.[0-9]*)?([ab][0-9]*)?$'`
+        pcapH=FAIL
+        if test -r $d/pcap.h; then
+            pcapH=$d
+        else
+            for dir in $places $srcdir/../libpcap ../libpcap $srcdir/libpcap $places2 ; do
+               if test -r $dir/pcap.h ; then
+                   pcapH=$dir
+               fi
+            done
+        fi
 
-            if test $pcapH = FAIL ; then
-                    as_fn_error $? "cannot find pcap.h: see INSTALL" "$LINENO" 5
- 	    fi
-            V_INCLS="-I$pcapH $V_INCLS"
-	    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $libpcap" >&5
+        if test $pcapH = FAIL ; then
+            as_fn_error $? "cannot find pcap.h: see INSTALL" "$LINENO" 5
+        fi
+        V_INCLS="-I$pcapH $V_INCLS"
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: $libpcap" >&5
 $as_echo "$libpcap" >&6; }
-	    # Extract the first word of "pcap-config", so it can be a program name with args.
+        # Extract the first word of "pcap-config", so it can be a program name with args.
 set dummy pcap-config; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
@@ -5534,66 +5534,67 @@ $as_echo "no" >&6; }
 fi
 
 
-	    if test -n "$PCAP_CONFIG"; then
-		#
-		# The libpcap directory has a pcap-config script.
-		# Use it to get any additioal libraries needed
-		# to link with the libpcap archive library in
-		# that directory.
-		#
-		# Please read section 11.6 "Shell Substitutions"
-		# in the autoconf manual before doing anything
-		# to this that involves quoting.  Especially note
-		# the statement "There is just no portable way to use
-		# double-quoted strings inside double-quoted back-quoted
-		# expressions (pfew!)."
-		#
-		additional_libs=`"$PCAP_CONFIG" --additional-libs --static`
-		libpcap="$libpcap $additional_libs"
-	    fi
     fi
-    LIBS="$libpcap $LIBS"
-    if ! test -n "$PCAP_CONFIG" ; then
-	#
-	# We don't have pcap-config; find out any additional link flags
-	# we need.  (If we have pcap-config, we assume it tells us what
-	# we need.)
-	#
-	case "$host_os" in
 
-	aix*)
-	    #
-	    # If libpcap is DLPI-based, we have to use /lib/pse.exp if
-	    # present, as we use the STREAMS routines.
-	    #
-	    # (XXX - true only if we're linking with a static libpcap?)
-	    #
-	    pseexe="/lib/pse.exp"
-	    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $pseexe" >&5
+    if test -n "$PCAP_CONFIG"; then
+        #
+        # The libpcap directory has a pcap-config script.
+        # Use it to get any additional libraries needed
+        # to link with the libpcap archive library in
+        # that directory.
+        #
+        # Please read section 11.6 "Shell Substitutions"
+        # in the autoconf manual before doing anything
+        # to this that involves quoting.  Especially note
+        # the statement "There is just no portable way to use
+        # double-quoted strings inside double-quoted back-quoted
+        # expressions (pfew!)."
+        #
+        additional_libs=`"$PCAP_CONFIG" --additional-libs --static`
+        libpcap="$libpcap $additional_libs"
+    else
+        #
+        # We don't have pcap-config; find out any additional link flags
+        # we need.  (If we have pcap-config, we assume it tells us what
+        # we need.)
+        #
+        case "$host_os" in
+
+        aix*)
+            #
+            # If libpcap is DLPI-based, we have to use /lib/pse.exp if
+            # present, as we use the STREAMS routines.
+            #
+            # (XXX - true only if we're linking with a static libpcap?)
+            #
+            pseexe="/lib/pse.exp"
+            { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $pseexe" >&5
 $as_echo_n "checking for $pseexe... " >&6; }
-	    if test -f $pseexe ; then
-		    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+            if test -f $pseexe ; then
+                { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-		    LIBS="$LIBS -I:$pseexe"
-	    fi
+                LIBS="$LIBS -I:$pseexe"
+            fi
 
-	    #
-	    # If libpcap is BPF-based, we need "-lodm" and "-lcfg", as
-	    # we use them to load the BPF module.
-	    #
-	    # (XXX - true only if we're linking with a static libpcap?)
-	    #
-	    LIBS="$LIBS -lodm -lcfg"
-	    ;;
-	esac
+            #
+            # If libpcap is BPF-based, we need "-lodm" and "-lcfg", as
+            # we use them to load the BPF module.
+            #
+            # (XXX - true only if we're linking with a static libpcap?)
+            #
+            LIBS="$LIBS -lodm -lcfg"
+            ;;
+        esac
     fi
+
+    LIBS="$libpcap $LIBS"
 
                                     ac_fn_c_check_func "$LINENO" "pcap_loop" "ac_cv_func_pcap_loop"
 if test "x$ac_cv_func_pcap_loop" = xyes; then :
 
 else
 
-	    as_fn_error $? "This is a bug, please follow the guidelines in CONTRIBUTING and include the
+        as_fn_error $? "This is a bug, please follow the guidelines in CONTRIBUTING and include the
 config.log file in your report.  If you have downloaded libpcap from
 tcpdump.org, and built it yourself, please also include the config.log
 file from the libpcap source directory, the Makefile from the libpcap
