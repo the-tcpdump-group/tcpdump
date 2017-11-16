@@ -265,8 +265,9 @@ static int dccp_print_option(netdissect_options *, const u_char *, u_int);
  * @data2 - beginning of enclosing
  * @len - lenght of ip packet
  */
-void dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
-		u_int len)
+void
+dccp_print(netdissect_options *ndo, const u_char *bp, const u_char *data2,
+	   u_int len)
 {
 	const struct dccp_hdr *dh;
 	const struct ip *ip;

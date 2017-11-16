@@ -229,7 +229,8 @@ static void lisp_hdr_flag(netdissect_options *, const lisp_map_register_hdr *);
 static void action_flag(netdissect_options *, uint8_t);
 static void loc_hdr_flag(netdissect_options *, uint16_t);
 
-void lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
+void
+lisp_print(netdissect_options *ndo, const u_char *bp, u_int length)
 {
 	uint8_t type;
 	uint8_t mask_len;

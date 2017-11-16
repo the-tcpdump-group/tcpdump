@@ -490,10 +490,11 @@ static inline int isForCES_port(u_short Port)
 	return 0;
 }
 
-void sctp_print(netdissect_options *ndo,
-                const u_char *bp,        /* beginning of sctp packet */
-                const u_char *bp2,       /* beginning of enclosing */
-                u_int sctpPacketLength)  /* ip packet */
+void
+sctp_print(netdissect_options *ndo,
+           const u_char *bp,        /* beginning of sctp packet */
+           const u_char *bp2,       /* beginning of enclosing */
+           u_int sctpPacketLength)  /* ip packet */
 {
   u_int sctpPacketLengthRemaining;
   const struct sctpHeader *sctpPktHdr;
