@@ -620,7 +620,7 @@ extern void vxlan_print(netdissect_options *, const u_char *, u_int);
 extern void wb_print(netdissect_options *, const void *, u_int);
 extern void zephyr_print(netdissect_options *, const u_char *, int);
 extern void zmtp1_print(netdissect_options *, const u_char *, u_int);
-extern void zmtp1_print_datagram(netdissect_options *, const u_char *, const u_int);
+extern void zmtp1_datagram_print(netdissect_options *, const u_char *, const u_int);
 
 /* checksum routines */
 extern void init_checksum(void);

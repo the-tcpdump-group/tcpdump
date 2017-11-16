@@ -827,7 +827,7 @@ pgm_print(netdissect_options *ndo,
 	ND_PRINT((ndo, " [%u]", length));
 	if (ndo->ndo_packettype == PT_PGM_ZMTP1 &&
 	    (pgm->pgm_type == PGM_ODATA || pgm->pgm_type == PGM_RDATA))
-		zmtp1_print_datagram(ndo, bp, EXTRACT_16BITS(&pgm->pgm_length));
+		zmtp1_datagram_print(ndo, bp, EXTRACT_16BITS(&pgm->pgm_length));
 
 	return;
 

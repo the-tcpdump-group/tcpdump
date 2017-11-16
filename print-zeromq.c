@@ -210,7 +210,7 @@ trunc:
 }
 
 void
-zmtp1_print_datagram(netdissect_options *ndo, const u_char *cp, const u_int len)
+zmtp1_datagram_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 {
 	const u_char *ep = min(ndo->ndo_snapend, cp + len);
 
