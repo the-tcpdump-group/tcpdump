@@ -165,7 +165,7 @@ static const struct tok proc2str[] = {
 static char *progstr(uint32_t);
 
 void
-sunrpcrequest_print(netdissect_options *ndo, register const u_char *bp,
+sunrpc_print(netdissect_options *ndo, register const u_char *bp,
                     register u_int length, register const u_char *bp2)
 {
 	register const struct sunrpc_msg *rp;

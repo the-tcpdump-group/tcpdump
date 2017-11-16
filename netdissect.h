@@ -601,7 +601,7 @@ extern void smtp_print(netdissect_options *, const u_char *, u_int);
 extern int snap_print(netdissect_options *, const u_char *, u_int, u_int, const struct lladdr_info *, const struct lladdr_info *, u_int);
 extern void snmp_print(netdissect_options *, const u_char *, u_int);
 extern void stp_print(netdissect_options *, const u_char *, u_int);
-extern void sunrpcrequest_print(netdissect_options *, const u_char *, u_int, const u_char *);
+extern void sunrpc_print(netdissect_options *, const u_char *, u_int, const u_char *);
 extern void syslog_print(netdissect_options *, const u_char *, u_int);
 extern void tcp_print(netdissect_options *, const u_char *, u_int, const u_char *, int);
 extern void telnet_print(netdissect_options *, const u_char *, u_int);

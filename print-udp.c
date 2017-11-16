@@ -439,7 +439,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 			rp = (const struct sunrpc_msg *)(up + 1);
 			direction = (enum sunrpc_msg_type)EXTRACT_32BITS(&rp->rm_direction);
 			if (direction == SUNRPC_CALL)
-				sunrpcrequest_print(ndo, (const u_char *)rp, length,
+				sunrpc_print(ndo, (const u_char *)rp, length,
 				    (const u_char *)ip);
 			else
 				nfsreply_print(ndo, (const u_char *)rp, length,
@@ -523,7 +523,7 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 			}
 #ifdef notdef
 			if (dport == SUNRPC_PORT && direction == SUNRPC_CALL) {
-				sunrpcrequest_print((const u_char *)rp, length, (const u_char *)ip);
+				sunrpc_print((const u_char *)rp, length, (const u_char *)ip);
 				return;
 			}
 #endif
