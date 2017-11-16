@@ -561,7 +561,7 @@ extern void nfsreply_print(netdissect_options *, const u_char *, u_int, const u_
 extern void nfsreply_print_noaddr(netdissect_options *, const u_char *, u_int, const u_char *);
 extern void nfsreq_print_noaddr(netdissect_options *, const u_char *, u_int, const u_char *);
 extern const u_char * ns_nprint (netdissect_options *, register const u_char *, register const u_char *);
-extern void ns_print(netdissect_options *, const u_char *, u_int, int);
+extern void domain_print(netdissect_options *, const u_char *, u_int, int);
 extern void nsh_print(netdissect_options *ndo, const u_char *bp, u_int len);
 extern void ntp_print(netdissect_options *, const u_char *, u_int);
 extern void oam_print(netdissect_options *, const u_char *, u_int, u_int);

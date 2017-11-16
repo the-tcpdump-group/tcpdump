@@ -571,9 +571,9 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 
 	if (!ndo->ndo_qflag) {
 		if (IS_SRC_OR_DST_PORT(NAMESERVER_PORT))
-			ns_print(ndo, (const u_char *)(up + 1), length, 0);
+			domain_print(ndo, (const u_char *)(up + 1), length, 0);
 		else if (IS_SRC_OR_DST_PORT(MULTICASTDNS_PORT))
-			ns_print(ndo, (const u_char *)(up + 1), length, 1);
+			domain_print(ndo, (const u_char *)(up + 1), length, 1);
 		else if (IS_SRC_OR_DST_PORT(TIMED_PORT))
 			timed_print(ndo, (const u_char *)(up + 1));
 		else if (IS_SRC_OR_DST_PORT(TFTP_PORT))

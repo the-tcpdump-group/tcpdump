@@ -574,7 +574,7 @@ ns_rprint(netdissect_options *ndo,
 }
 
 void
-ns_print(netdissect_options *ndo,
+domain_print(netdissect_options *ndo,
          register const u_char *bp, u_int length, int is_mdns)
 {
 	register const HEADER *np;

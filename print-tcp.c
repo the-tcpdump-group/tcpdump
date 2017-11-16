@@ -721,7 +721,7 @@ tcp_print(netdissect_options *ndo,
                  * TCP DNS query has 2byte length at the head.
                  * XXX packet could be unaligned, it can go strange
                  */
-                ns_print(ndo, bp + 2, length - 2, 0);
+                domain_print(ndo, bp + 2, length - 2, 0);
         } else if (IS_SRC_OR_DST_PORT(MSDP_PORT)) {
                 msdp_print(ndo, bp, length);
         } else if (IS_SRC_OR_DST_PORT(RPKI_RTR_PORT)) {
