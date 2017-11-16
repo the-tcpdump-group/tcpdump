@@ -511,13 +511,13 @@ udp_print(netdissect_options *ndo, register const u_char *bp, u_int length,
 			direction = (enum sunrpc_msg_type)EXTRACT_32BITS(&rp->rm_direction);
 			if (dport == NFS_PORT && direction == SUNRPC_CALL) {
 				ND_PRINT((ndo, "NFS request xid %u ", EXTRACT_32BITS(&rp->rm_xid)));
-				nfsreq_print_noaddr(ndo, (const u_char *)rp, length,
+				nfsreq_noaddr_print(ndo, (const u_char *)rp, length,
 				    (const u_char *)ip);
 				return;
 			}
 			if (sport == NFS_PORT && direction == SUNRPC_REPLY) {
 				ND_PRINT((ndo, "NFS reply xid %u ", EXTRACT_32BITS(&rp->rm_xid)));
-				nfsreply_print_noaddr(ndo, (const u_char *)rp, length,
+				nfsreply_noaddr_print(ndo, (const u_char *)rp, length,
 				    (const u_char *)ip);
 				return;
 			}

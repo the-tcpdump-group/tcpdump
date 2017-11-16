@@ -750,12 +750,12 @@ tcp_print(netdissect_options *ndo,
                         direction = (enum sunrpc_msg_type)EXTRACT_32BITS(&rp->rm_direction);
                         if (dport == NFS_PORT && direction == SUNRPC_CALL) {
                                 ND_PRINT((ndo, ": NFS request xid %u ", EXTRACT_32BITS(&rp->rm_xid)));
-                                nfsreq_print_noaddr(ndo, (const u_char *)rp, fraglen, (const u_char *)ip);
+                                nfsreq_noaddr_print(ndo, (const u_char *)rp, fraglen, (const u_char *)ip);
                                 return;
                         }
                         if (sport == NFS_PORT && direction == SUNRPC_REPLY) {
                                 ND_PRINT((ndo, ": NFS reply xid %u ", EXTRACT_32BITS(&rp->rm_xid)));
-                                nfsreply_print_noaddr(ndo, (const u_char *)rp, fraglen, (const u_char *)ip);
+                                nfsreply_noaddr_print(ndo, (const u_char *)rp, fraglen, (const u_char *)ip);
                                 return;
                         }
                 }

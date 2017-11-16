@@ -341,7 +341,7 @@ nfsreply_print(netdissect_options *ndo,
 	}
 	print_nfsaddr(ndo, bp2, srcid, dstid);
 
-	nfsreply_print_noaddr(ndo, bp, length, bp2);
+	nfsreply_noaddr_print(ndo, bp, length, bp2);
 	return;
 
 trunc:
@@ -350,7 +350,7 @@ trunc:
 }
 
 void
-nfsreply_print_noaddr(netdissect_options *ndo,
+nfsreply_noaddr_print(netdissect_options *ndo,
                       register const u_char *bp, u_int length,
                       register const u_char *bp2)
 {
@@ -518,7 +518,7 @@ parsefhn(netdissect_options *ndo,
 }
 
 void
-nfsreq_print_noaddr(netdissect_options *ndo,
+nfsreq_noaddr_print(netdissect_options *ndo,
                     register const u_char *bp, u_int length,
                     register const u_char *bp2)
 {
