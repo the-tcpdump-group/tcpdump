@@ -347,7 +347,6 @@ cdp_print_addr(netdissect_options *ndo,
 			ND_TCHECK2(*p, 2);
 			if (p + 2 > endp)
 				goto trunc;
-			al = (*p << 8) + *(p + 1);
 			ND_PRINT((ndo, ", al=%d, a=", al));
 			p += 2;
 			ND_TCHECK2(*p, al);
