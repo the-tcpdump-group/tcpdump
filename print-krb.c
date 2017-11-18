@@ -155,7 +155,7 @@ krb4_print(netdissect_options *ndo,
 #define PRINT		if ((cp = c_print(ndo, cp, ndo->ndo_snapend)) == NULL) goto trunc
 /*  True if struct krb is little endian */
 #define IS_LENDIAN(kp)	(((kp)->type & 0x01) != 0)
-#define KTOHSP(kp, cp)	(IS_LENDIAN(kp) ? EXTRACT_LE_16BITS(cp) : EXTRACT_16BITS(cp))
+#define KTOHSP(kp, cp)	(IS_LENDIAN(kp) ? EXTRACT_LE_16BITS(cp) : EXTRACT_BE_16BITS(cp))
 
 	kp = (const struct krb *)cp;
 

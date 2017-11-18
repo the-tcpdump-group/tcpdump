@@ -668,22 +668,22 @@ lldp_private_8021_print(netdissect_options *ndo,
             return hexdump;
         }
         ND_PRINT((ndo, "\n\t    port vlan id (PVID): %u",
-               EXTRACT_16BITS(tptr + 4)));
+               EXTRACT_BE_16BITS(tptr + 4)));
         break;
     case LLDP_PRIVATE_8021_SUBTYPE_PROTOCOL_VLAN_ID:
         if (tlv_len < 7) {
             return hexdump;
         }
         ND_PRINT((ndo, "\n\t    port and protocol vlan id (PPVID): %u, flags [%s] (0x%02x)",
-               EXTRACT_16BITS(tptr+5),
-	       bittok2str(lldp_8021_port_protocol_id_values, "none", *(tptr+4)),
+               EXTRACT_BE_16BITS(tptr + 5),
+               bittok2str(lldp_8021_port_protocol_id_values, "none", *(tptr+4)),
 	       *(tptr + 4)));
         break;
     case LLDP_PRIVATE_8021_SUBTYPE_VLAN_NAME:
         if (tlv_len < 6) {
             return hexdump;
         }
-        ND_PRINT((ndo, "\n\t    vlan id (VID): %u", EXTRACT_16BITS(tptr + 4)));
+        ND_PRINT((ndo, "\n\t    vlan id (VID): %u", EXTRACT_BE_16BITS(tptr + 4)));
         if (tlv_len < 7) {
             return hexdump;
         }
@@ -789,7 +789,7 @@ lldp_private_8021_print(netdissect_options *ndo,
         	tval=*(tptr+i+5);
         	ND_PRINT((ndo, "\n\t      Priority: %u, RES: %u, Sel: %u, Protocol ID: %u",
         		 tval >> 5, (tval >> 3) & 0x03, (tval & 0x07),
-        		 EXTRACT_16BITS(tptr + i + 5)));
+			 EXTRACT_BE_16BITS(tptr + i + 5)));
         	i=i+3;
         }
         break;
@@ -822,14 +822,14 @@ lldp_private_8021_print(netdissect_options *ndo,
         tval=*(tptr+4);
         ND_PRINT((ndo, "\n\t    Role: %d, RES: %d, Scomp: %d ",
         	tval >> 7, (tval >> 4) & 0x07, (tval >> 3) & 0x01));
-        ND_PRINT((ndo, "ChnCap: %d", EXTRACT_16BITS(tptr + 6) & 0x0fff));
+        ND_PRINT((ndo, "ChnCap: %d", EXTRACT_BE_16BITS(tptr + 6) & 0x0fff));
         sublen=tlv_len-8;
         if(sublen%3!=0) {
         	return hexdump;
         }
         i=0;
         while(i<sublen) {
-        	tval=EXTRACT_24BITS(tptr+i+8);
+		tval=EXTRACT_BE_24BITS(tptr + i + 8);
         	ND_PRINT((ndo, "\n\t    SCID: %d, SVID: %d",
         		tval >> 12, tval & 0x000fff));
         	i=i+3;
@@ -871,11 +871,11 @@ lldp_private_8023_print(netdissect_options *ndo,
                bittok2str(lldp_8023_autonegotiation_values, "none", *(tptr+4)),
                *(tptr + 4)));
         ND_PRINT((ndo, "\n\t    PMD autoneg capability [%s] (0x%04x)",
-               bittok2str(lldp_pmd_capability_values,"unknown", EXTRACT_16BITS(tptr+5)),
-               EXTRACT_16BITS(tptr + 5)));
+               bittok2str(lldp_pmd_capability_values,"unknown", EXTRACT_BE_16BITS(tptr + 5)),
+               EXTRACT_BE_16BITS(tptr + 5)));
         ND_PRINT((ndo, "\n\t    MAU type %s (0x%04x)",
-               tok2str(lldp_mau_types_values, "unknown", EXTRACT_16BITS(tptr+7)),
-               EXTRACT_16BITS(tptr + 7)));
+               tok2str(lldp_mau_types_values, "unknown", EXTRACT_BE_16BITS(tptr + 7)),
+               EXTRACT_BE_16BITS(tptr + 7)));
         break;
 
     case LLDP_PRIVATE_8023_SUBTYPE_MDIPOWER:
@@ -894,14 +894,14 @@ lldp_private_8023_print(netdissect_options *ndo,
         }
         ND_PRINT((ndo, "\n\t    aggregation status [%s], aggregation port ID %u",
                bittok2str(lldp_aggregation_values, "none", *(tptr+4)),
-               EXTRACT_32BITS(tptr + 5)));
+               EXTRACT_BE_32BITS(tptr + 5)));
         break;
 
     case LLDP_PRIVATE_8023_SUBTYPE_MTU:
         if (tlv_len < 6) {
             return hexdump;
         }
-        ND_PRINT((ndo, "\n\t    MTU size %u", EXTRACT_16BITS(tptr + 4)));
+        ND_PRINT((ndo, "\n\t    MTU size %u", EXTRACT_BE_16BITS(tptr + 4)));
         break;
 
     default:
@@ -921,7 +921,7 @@ lldp_extract_latlon(const u_char *tptr)
     uint64_t latlon;
 
     latlon = *tptr & 0x3;
-    latlon = (latlon << 32) | EXTRACT_32BITS(tptr+1);
+    latlon = (latlon << 32) | EXTRACT_BE_32BITS(tptr + 1);
 
     return latlon;
 }
@@ -989,7 +989,7 @@ lldp_private_tia_print(netdissect_options *ndo,
         }
         ND_PRINT((ndo, "\n\t    Media capabilities [%s] (0x%04x)",
                bittok2str(lldp_tia_capabilities_values, "none",
-                          EXTRACT_16BITS(tptr + 4)), EXTRACT_16BITS(tptr + 4)));
+                          EXTRACT_BE_16BITS(tptr + 4)), EXTRACT_BE_16BITS(tptr + 4)));
         ND_PRINT((ndo, "\n\t    Device type [%s] (0x%02x)",
                tok2str(lldp_tia_device_type_values, "unknown", *(tptr+6)),
                *(tptr + 6)));
@@ -1005,11 +1005,11 @@ lldp_private_tia_print(netdissect_options *ndo,
         ND_PRINT((ndo, ", Flags [%s]", bittok2str(
                    lldp_tia_network_policy_bits_values, "none", *(tptr + 5))));
         ND_PRINT((ndo, "\n\t    Vlan id %u",
-               LLDP_EXTRACT_NETWORK_POLICY_VLAN(EXTRACT_16BITS(tptr + 5))));
+               LLDP_EXTRACT_NETWORK_POLICY_VLAN(EXTRACT_BE_16BITS(tptr + 5))));
         ND_PRINT((ndo, ", L2 priority %u",
-               LLDP_EXTRACT_NETWORK_POLICY_L2_PRIORITY(EXTRACT_16BITS(tptr + 6))));
+               LLDP_EXTRACT_NETWORK_POLICY_L2_PRIORITY(EXTRACT_BE_16BITS(tptr + 6))));
         ND_PRINT((ndo, ", DSCP value %u",
-               LLDP_EXTRACT_NETWORK_POLICY_DSCP(EXTRACT_16BITS(tptr + 6))));
+               LLDP_EXTRACT_NETWORK_POLICY_DSCP(EXTRACT_BE_16BITS(tptr + 6))));
         break;
 
     case LLDP_PRIVATE_TIA_SUBTYPE_LOCAL_ID:
@@ -1034,8 +1034,8 @@ lldp_private_tia_print(netdissect_options *ndo,
                    tok2str(lldp_tia_location_altitude_type_values, "unknown",(*(tptr+15)>>4)),
                    (*(tptr + 15) >> 4)));
             ND_PRINT((ndo, "\n\t    Altitude resolution %u, altitude value 0x%x",
-                   (EXTRACT_16BITS(tptr+15)>>6)&0x3f,
-                   ((EXTRACT_32BITS(tptr + 16) & 0x3fffffff))));
+                   (EXTRACT_BE_16BITS(tptr + 15)>>6)&0x3f,
+                   ((EXTRACT_BE_32BITS(tptr + 16) & 0x3fffffff))));
             ND_PRINT((ndo, "\n\t    Datum %s (0x%02x)",
                    tok2str(lldp_tia_location_datum_type_values, "unknown", *(tptr+20)),
                    *(tptr + 20)));
@@ -1114,7 +1114,7 @@ lldp_private_tia_print(netdissect_options *ndo,
         ND_PRINT((ndo, "\n\t    Power priority [%s] (0x%02x)",
                tok2str(lldp_tia_power_priority_values, "none", *(tptr+4)&0x0f),
                *(tptr + 4) & 0x0f));
-        power_val = EXTRACT_16BITS(tptr+5);
+        power_val = EXTRACT_BE_16BITS(tptr + 5);
         if (power_val < LLDP_TIA_POWER_VAL_MAX) {
             ND_PRINT((ndo, ", Power %.1f Watts", ((float)power_val) / 10));
         } else {
@@ -1176,7 +1176,7 @@ lldp_private_dcbx_print(netdissect_options *ndo,
 
         ND_TCHECK2(*tptr, sizeof(tlv));
 
-        tlv = EXTRACT_16BITS(tptr);
+        tlv = EXTRACT_BE_16BITS(tptr);
 
         tlv_type = LLDP_EXTRACT_TYPE(tlv);
         tlv_len = LLDP_EXTRACT_LEN(tlv);
@@ -1205,9 +1205,9 @@ lldp_private_dcbx_print(netdissect_options *ndo,
 		LLDP_DCBX_CONTROL_TLV, tlv_len));
 	    ND_PRINT((ndo, "\n\t      Oper_Version: %d", *tptr));
 	    ND_PRINT((ndo, "\n\t      Max_Version: %d", *(tptr + 1)));
-	    ND_PRINT((ndo, "\n\t      Sequence Number: %d", EXTRACT_32BITS(tptr + 2)));
+	    ND_PRINT((ndo, "\n\t      Sequence Number: %d", EXTRACT_BE_32BITS(tptr + 2)));
 	    ND_PRINT((ndo, "\n\t      Acknowledgement Number: %d",
-					EXTRACT_32BITS(tptr + 6)));
+					EXTRACT_BE_32BITS(tptr + 6)));
 	    break;
         case LLDP_DCBX_PRIORITY_GROUPS_TLV:
             if (tlv_len < 17) {
@@ -1229,7 +1229,7 @@ lldp_private_dcbx_print(netdissect_options *ndo,
 	     * Array of 8 4-bit priority group ID values; we fetch all
 	     * 32 bits and extract each nibble.
 	     */
-	    pgval = EXTRACT_32BITS(tptr+4);
+	    pgval = EXTRACT_BE_32BITS(tptr + 4);
 	    for (i = 0; i <= 7; i++) {
 		ND_PRINT((ndo, "\n\t          PgId_%d: %d",
 			i, (pgval >> (28 - 4 * i)) & 0xF));
@@ -1280,8 +1280,8 @@ lldp_private_dcbx_print(netdissect_options *ndo,
 	    while (tval >= 6) {
 		ND_PRINT((ndo, "\n\t      Application Value"));
 		ND_PRINT((ndo, "\n\t          Application Protocol ID: 0x%04x",
-			EXTRACT_16BITS(mptr)));
-		uval = EXTRACT_24BITS(mptr+2);
+			EXTRACT_BE_16BITS(mptr)));
+		uval = EXTRACT_BE_24BITS(mptr + 2);
 		ND_PRINT((ndo, "\n\t          SF (0x%x) Application Protocol ID is %s",
 			(uval >> 22),
 			(uval >> 22) ? "Socket Number" : "L2 EtherType"));
@@ -1393,7 +1393,7 @@ lldp_mgmt_addr_tlv_print(netdissect_options *ndo,
     ND_PRINT((ndo, "\n\t  %s Interface Numbering (%u): %u",
            tok2str(lldp_intf_numb_subtype_values, "Unknown", intf_num_subtype),
            intf_num_subtype,
-           EXTRACT_32BITS(tptr + 1)));
+           EXTRACT_BE_32BITS(tptr + 1)));
 
     tptr += LLDP_INTF_NUM_LEN;
     tlen -= LLDP_INTF_NUM_LEN;
@@ -1435,7 +1435,7 @@ lldp_print(netdissect_options *ndo,
 
         ND_TCHECK2(*tptr, sizeof(tlv));
 
-        tlv = EXTRACT_16BITS(tptr);
+        tlv = EXTRACT_BE_16BITS(tptr);
 
         tlv_type = LLDP_EXTRACT_TYPE(tlv);
         tlv_len = LLDP_EXTRACT_LEN(tlv);
@@ -1549,7 +1549,7 @@ lldp_print(netdissect_options *ndo,
                 if (tlv_len < 2) {
                     goto trunc;
                 }
-                ND_PRINT((ndo, ": TTL %us", EXTRACT_16BITS(tptr)));
+                ND_PRINT((ndo, ": TTL %us", EXTRACT_BE_16BITS(tptr)));
             }
             break;
 
@@ -1587,8 +1587,8 @@ lldp_print(netdissect_options *ndo,
                 if (tlv_len < 4) {
                     goto trunc;
                 }
-                cap = EXTRACT_16BITS(tptr);
-                ena_cap = EXTRACT_16BITS(tptr+2);
+                cap = EXTRACT_BE_16BITS(tptr);
+                ena_cap = EXTRACT_BE_16BITS(tptr + 2);
                 ND_PRINT((ndo, "\n\t  System  Capabilities [%s] (0x%04x)",
                        bittok2str(lldp_cap_values, "none", cap), cap));
                 ND_PRINT((ndo, "\n\t  Enabled Capabilities [%s] (0x%04x)",
@@ -1609,7 +1609,7 @@ lldp_print(netdissect_options *ndo,
                 if (tlv_len < 3) {
                     goto trunc;
                 }
-                oui = EXTRACT_24BITS(tptr);
+                oui = EXTRACT_BE_24BITS(tptr);
                 ND_PRINT((ndo, ": OUI %s (0x%06x)", tok2str(oui_values, "Unknown", oui), oui));
 
                 switch (oui) {

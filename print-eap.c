@@ -167,7 +167,7 @@ eap_print(netdissect_options *ndo,
                tok2str(eap_frame_type_values, "unknown", eap->type),
                eap->type,
                eap->version,
-               EXTRACT_16BITS(eap->length)));
+               EXTRACT_BE_16BITS(eap->length)));
 	return;
     }
 
@@ -175,7 +175,7 @@ eap_print(netdissect_options *ndo,
            tok2str(eap_frame_type_values, "unknown", eap->type),
            eap->type,
            eap->version,
-           EXTRACT_16BITS(eap->length)));
+           EXTRACT_BE_16BITS(eap->length)));
 
     tptr += sizeof(struct eap_frame_t);
     tlen -= sizeof(struct eap_frame_t);
@@ -185,7 +185,7 @@ eap_print(netdissect_options *ndo,
         ND_TCHECK_8BITS(tptr);
         type = *(tptr);
         ND_TCHECK_16BITS(tptr+2);
-        len = EXTRACT_16BITS(tptr+2);
+        len = EXTRACT_BE_16BITS(tptr + 2);
         ND_PRINT((ndo, ", %s (%u), id %u, len %u",
                tok2str(eap_code_values, "unknown", type),
                type,
@@ -245,7 +245,7 @@ eap_print(netdissect_options *ndo,
 
                 if (EAP_TLS_EXTRACT_BIT_L(*(tptr+5))) {
                     ND_TCHECK_32BITS(tptr + 6);
-		    ND_PRINT((ndo, " len %u", EXTRACT_32BITS(tptr + 6)));
+		    ND_PRINT((ndo, " len %u", EXTRACT_BE_32BITS(tptr + 6)));
                 }
                 break;
 
@@ -259,7 +259,7 @@ eap_print(netdissect_options *ndo,
 
                 if (EAP_TLS_EXTRACT_BIT_L(*(tptr+5))) {
                     ND_TCHECK_32BITS(tptr + 6);
-                    ND_PRINT((ndo, " len %u", EXTRACT_32BITS(tptr + 6)));
+                    ND_PRINT((ndo, " len %u", EXTRACT_BE_32BITS(tptr + 6)));
                 }
 
                 /* FIXME - TLV attributes follow */

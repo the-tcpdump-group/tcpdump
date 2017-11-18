@@ -214,11 +214,11 @@ aoev1_query_print(netdissect_options *ndo,
 		goto invalid;
 	/* Buffer Count */
 	ND_TCHECK2(*cp, 2);
-	ND_PRINT((ndo, "\n\tBuffer Count: %u", EXTRACT_16BITS(cp)));
+	ND_PRINT((ndo, "\n\tBuffer Count: %u", EXTRACT_BE_16BITS(cp)));
 	cp += 2;
 	/* Firmware Version */
 	ND_TCHECK2(*cp, 2);
-	ND_PRINT((ndo, ", Firmware Version: %u", EXTRACT_16BITS(cp)));
+	ND_PRINT((ndo, ", Firmware Version: %u", EXTRACT_BE_16BITS(cp)));
 	cp += 2;
 	/* Sector Count */
 	ND_TCHECK2(*cp, 1);
@@ -231,7 +231,7 @@ aoev1_query_print(netdissect_options *ndo,
 	cp += 1;
 	/* Config String Length */
 	ND_TCHECK2(*cp, 2);
-	cslen = EXTRACT_16BITS(cp);
+	cslen = EXTRACT_BE_16BITS(cp);
 	cp += 2;
 	if (cslen > AOEV1_MAX_CONFSTR_LEN || AOEV1_QUERY_ARG_LEN + cslen > len)
 		goto invalid;
@@ -362,7 +362,7 @@ aoev1_print(netdissect_options *ndo,
 	cp += 1;
 	/* Major */
 	ND_TCHECK2(*cp, 2);
-	ND_PRINT((ndo, "\n\tMajor: 0x%04x", EXTRACT_16BITS(cp)));
+	ND_PRINT((ndo, "\n\tMajor: 0x%04x", EXTRACT_BE_16BITS(cp)));
 	cp += 2;
 	/* Minor */
 	ND_TCHECK2(*cp, 1);
@@ -375,7 +375,7 @@ aoev1_print(netdissect_options *ndo,
 	ND_PRINT((ndo, ", Command: %s", tok2str(cmdcode_str, "Unknown (0x%02x)", command)));
 	/* Tag */
 	ND_TCHECK2(*cp, 4);
-	ND_PRINT((ndo, ", Tag: 0x%08x", EXTRACT_32BITS(cp)));
+	ND_PRINT((ndo, ", Tag: 0x%08x", EXTRACT_BE_32BITS(cp)));
 	cp += 4;
 	/* Arg */
 	cmd_decoder =

@@ -59,7 +59,7 @@ chdlc_print(netdissect_options *ndo, register const u_char *p, u_int length)
 	if (length < CHDLC_HDRLEN)
 		goto trunc;
 	ND_TCHECK2(*p, CHDLC_HDRLEN);
-	proto = EXTRACT_16BITS(&p[2]);
+	proto = EXTRACT_BE_16BITS(&p[2]);
 	if (ndo->ndo_eflag) {
                 ND_PRINT((ndo, "%s, ethertype %s (0x%04x), length %u: ",
                        tok2str(chdlc_cast_values, "0x%02x", p[0]),
@@ -151,7 +151,7 @@ chdlc_slarp_print(netdissect_options *ndo, const u_char *cp, u_int length)
 
 	slarp = (const struct cisco_slarp *)cp;
 	ND_TCHECK2(*slarp, SLARP_MIN_LEN);
-	switch (EXTRACT_32BITS(&slarp->code)) {
+	switch (EXTRACT_BE_32BITS(&slarp->code)) {
 	case SLARP_REQUEST:
 		ND_PRINT((ndo, "request"));
 		/*
@@ -171,14 +171,14 @@ chdlc_slarp_print(netdissect_options *ndo, const u_char *cp, u_int length)
 		break;
 	case SLARP_KEEPALIVE:
 		ND_PRINT((ndo, "keepalive: mineseen=0x%08x, yourseen=0x%08x, reliability=0x%04x",
-                       EXTRACT_32BITS(&slarp->un.keep.myseq),
-                       EXTRACT_32BITS(&slarp->un.keep.yourseq),
-                       EXTRACT_16BITS(&slarp->un.keep.rel)));
+                       EXTRACT_BE_32BITS(&slarp->un.keep.myseq),
+                       EXTRACT_BE_32BITS(&slarp->un.keep.yourseq),
+                       EXTRACT_BE_16BITS(&slarp->un.keep.rel)));
 
                 if (length >= SLARP_MAX_LEN) { /* uptime-stamp is optional */
                         cp += SLARP_MIN_LEN;
                         ND_TCHECK2(*cp, 4);
-                        sec = EXTRACT_32BITS(cp) / 1000;
+                        sec = EXTRACT_BE_32BITS(cp) / 1000;
                         min = sec / 60; sec -= min * 60;
                         hrs = min / 60; min -= hrs * 60;
                         days = hrs / 24; hrs -= days * 24;
@@ -186,7 +186,7 @@ chdlc_slarp_print(netdissect_options *ndo, const u_char *cp, u_int length)
                 }
 		break;
 	default:
-		ND_PRINT((ndo, "0x%02x unknown", EXTRACT_32BITS(&slarp->code)));
+		ND_PRINT((ndo, "0x%02x unknown", EXTRACT_BE_32BITS(&slarp->code)));
                 if (ndo->ndo_vflag <= 1)
                     print_unknown_data(ndo,cp+4,"\n\t",length-4);
 		break;

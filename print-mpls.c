@@ -72,7 +72,7 @@ mpls_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			ND_PRINT((ndo, "[|MPLS], length %u", length));
 			return;
 		}
-		label_entry = EXTRACT_32BITS(p);
+		label_entry = EXTRACT_BE_32BITS(p);
 		ND_PRINT((ndo, "%s(label %u",
 		       (label_stack_depth && ndo->ndo_vflag) ? "\n\t" : " ",
        		       MPLS_LABEL(label_entry)));

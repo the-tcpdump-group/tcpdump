@@ -332,11 +332,11 @@ ns_qprint(netdissect_options *ndo,
 		return(NULL);
 
 	/* print the qtype */
-	i = EXTRACT_16BITS(cp);
+	i = EXTRACT_BE_16BITS(cp);
 	cp += 2;
 	ND_PRINT((ndo, " %s", tok2str(ns_type2str, "Type%d", i)));
 	/* print the qclass (if it's not IN) */
-	i = EXTRACT_16BITS(cp);
+	i = EXTRACT_BE_16BITS(cp);
 	cp += 2;
 	if (is_mdns)
 		class = (i & ~C_QU);
@@ -373,10 +373,10 @@ ns_rprint(netdissect_options *ndo,
 		return (ndo->ndo_snapend);
 
 	/* print the type/qtype */
-	typ = EXTRACT_16BITS(cp);
+	typ = EXTRACT_BE_16BITS(cp);
 	cp += 2;
 	/* print the class (if it's not IN and the type isn't OPT) */
-	i = EXTRACT_16BITS(cp);
+	i = EXTRACT_BE_16BITS(cp);
 	cp += 2;
 	if (is_mdns)
 		class = (i & ~C_CACHE_FLUSH);
@@ -392,13 +392,13 @@ ns_rprint(netdissect_options *ndo,
 	if (typ == T_OPT) {
 		/* get opt flags */
 		cp += 2;
-		opt_flags = EXTRACT_16BITS(cp);
+		opt_flags = EXTRACT_BE_16BITS(cp);
 		/* ignore rest of ttl field */
 		cp += 2;
 	} else if (ndo->ndo_vflag > 2) {
 		/* print ttl */
 		ND_PRINT((ndo, " ["));
-		unsigned_relts_print(ndo, EXTRACT_32BITS(cp));
+		unsigned_relts_print(ndo, EXTRACT_BE_32BITS(cp));
 		ND_PRINT((ndo, "]"));
 		cp += 4;
 	} else {
@@ -406,7 +406,7 @@ ns_rprint(netdissect_options *ndo,
 		cp += 4;
 	}
 
-	len = EXTRACT_16BITS(cp);
+	len = EXTRACT_BE_16BITS(cp);
 	cp += 2;
 
 	rp = cp + len;
@@ -419,7 +419,7 @@ ns_rprint(netdissect_options *ndo,
 	case T_A:
 		if (!ND_TTEST2(*cp, sizeof(struct in_addr)))
 			return(NULL);
-		ND_PRINT((ndo, " %s", intoa(htonl(EXTRACT_32BITS(cp)))));
+		ND_PRINT((ndo, " %s", intoa(htonl(EXTRACT_BE_32BITS(cp)))));
 		break;
 
 	case T_NS:
@@ -444,15 +444,15 @@ ns_rprint(netdissect_options *ndo,
 			return(NULL);
 		if (!ND_TTEST2(*cp, 5 * 4))
 			return(NULL);
-		ND_PRINT((ndo, " %u", EXTRACT_32BITS(cp)));
+		ND_PRINT((ndo, " %u", EXTRACT_BE_32BITS(cp)));
 		cp += 4;
-		ND_PRINT((ndo, " %u", EXTRACT_32BITS(cp)));
+		ND_PRINT((ndo, " %u", EXTRACT_BE_32BITS(cp)));
 		cp += 4;
-		ND_PRINT((ndo, " %u", EXTRACT_32BITS(cp)));
+		ND_PRINT((ndo, " %u", EXTRACT_BE_32BITS(cp)));
 		cp += 4;
-		ND_PRINT((ndo, " %u", EXTRACT_32BITS(cp)));
+		ND_PRINT((ndo, " %u", EXTRACT_BE_32BITS(cp)));
 		cp += 4;
-		ND_PRINT((ndo, " %u", EXTRACT_32BITS(cp)));
+		ND_PRINT((ndo, " %u", EXTRACT_BE_32BITS(cp)));
 		cp += 4;
 		break;
 	case T_MX:
@@ -461,7 +461,7 @@ ns_rprint(netdissect_options *ndo,
 			return(NULL);
 		if (ns_nprint(ndo, cp + 2, bp) == NULL)
 			return(NULL);
-		ND_PRINT((ndo, " %d", EXTRACT_16BITS(cp)));
+		ND_PRINT((ndo, " %d", EXTRACT_BE_16BITS(cp)));
 		break;
 
 	case T_TXT:
@@ -480,8 +480,8 @@ ns_rprint(netdissect_options *ndo,
 			return(NULL);
 		if (ns_nprint(ndo, cp + 6, bp) == NULL)
 			return(NULL);
-		ND_PRINT((ndo, ":%d %d %d", EXTRACT_16BITS(cp + 4),
-			EXTRACT_16BITS(cp), EXTRACT_16BITS(cp + 2)));
+		ND_PRINT((ndo, ":%d %d %d", EXTRACT_BE_16BITS(cp + 4),
+			  EXTRACT_BE_16BITS(cp), EXTRACT_BE_16BITS(cp + 2)));
 		break;
 
 	case T_AAAA:
@@ -550,23 +550,23 @@ ns_rprint(netdissect_options *ndo,
 		cp += 6;
 		if (!ND_TTEST2(*cp, 2))
 			return(NULL);
-		ND_PRINT((ndo, " fudge=%u", EXTRACT_16BITS(cp)));
+		ND_PRINT((ndo, " fudge=%u", EXTRACT_BE_16BITS(cp)));
 		cp += 2;
 		if (!ND_TTEST2(*cp, 2))
 			return(NULL);
-		ND_PRINT((ndo, " maclen=%u", EXTRACT_16BITS(cp)));
-		cp += 2 + EXTRACT_16BITS(cp);
+		ND_PRINT((ndo, " maclen=%u", EXTRACT_BE_16BITS(cp)));
+		cp += 2 + EXTRACT_BE_16BITS(cp);
 		if (!ND_TTEST2(*cp, 2))
 			return(NULL);
-		ND_PRINT((ndo, " origid=%u", EXTRACT_16BITS(cp)));
+		ND_PRINT((ndo, " origid=%u", EXTRACT_BE_16BITS(cp)));
 		cp += 2;
 		if (!ND_TTEST2(*cp, 2))
 			return(NULL);
-		ND_PRINT((ndo, " error=%u", EXTRACT_16BITS(cp)));
+		ND_PRINT((ndo, " error=%u", EXTRACT_BE_16BITS(cp)));
 		cp += 2;
 		if (!ND_TTEST2(*cp, 2))
 			return(NULL);
-		ND_PRINT((ndo, " otherlen=%u", EXTRACT_16BITS(cp)));
+		ND_PRINT((ndo, " otherlen=%u", EXTRACT_BE_16BITS(cp)));
 		cp += 2;
 	    }
 	}
@@ -585,15 +585,15 @@ domain_print(netdissect_options *ndo,
 	np = (const HEADER *)bp;
 	ND_TCHECK(*np);
 	/* get the byte-order right */
-	qdcount = EXTRACT_16BITS(&np->qdcount);
-	ancount = EXTRACT_16BITS(&np->ancount);
-	nscount = EXTRACT_16BITS(&np->nscount);
-	arcount = EXTRACT_16BITS(&np->arcount);
+	qdcount = EXTRACT_BE_16BITS(&np->qdcount);
+	ancount = EXTRACT_BE_16BITS(&np->ancount);
+	nscount = EXTRACT_BE_16BITS(&np->nscount);
+	arcount = EXTRACT_BE_16BITS(&np->arcount);
 
 	if (DNS_QR(np)) {
 		/* this is a response */
 		ND_PRINT((ndo, "%d%s%s%s%s%s%s",
-			EXTRACT_16BITS(&np->id),
+			EXTRACT_BE_16BITS(&np->id),
 			ns_ops[DNS_OPCODE(np)],
 			ns_resp[DNS_RCODE(np)],
 			DNS_AA(np)? "*" : "",
@@ -606,7 +606,7 @@ domain_print(netdissect_options *ndo,
 		/* Print QUESTION section on -vv */
 		cp = (const u_char *)(np + 1);
 		while (qdcount--) {
-			if (qdcount < EXTRACT_16BITS(&np->qdcount) - 1)
+			if (qdcount < EXTRACT_BE_16BITS(&np->qdcount) - 1)
 				ND_PRINT((ndo, ","));
 			if (ndo->ndo_vflag > 1) {
 				ND_PRINT((ndo, " q:"));
@@ -660,12 +660,12 @@ domain_print(netdissect_options *ndo,
 	}
 	else {
 		/* this is a request */
-		ND_PRINT((ndo, "%d%s%s%s", EXTRACT_16BITS(&np->id), ns_ops[DNS_OPCODE(np)],
-		    DNS_RD(np) ? "+" : "",
-		    DNS_CD(np) ? "%" : ""));
+		ND_PRINT((ndo, "%d%s%s%s", EXTRACT_BE_16BITS(&np->id), ns_ops[DNS_OPCODE(np)],
+			  DNS_RD(np) ? "+" : "",
+			  DNS_CD(np) ? "%" : ""));
 
 		/* any weirdness? */
-		b2 = EXTRACT_16BITS(((const u_short *)np)+1);
+		b2 = EXTRACT_BE_16BITS(((const u_short *)np) + 1);
 		if (b2 & 0x6cf)
 			ND_PRINT((ndo, " [b2&3=0x%x]", b2));
 

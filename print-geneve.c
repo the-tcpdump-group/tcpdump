@@ -112,7 +112,7 @@ geneve_opts_print(netdissect_options *ndo, const u_char *bp, u_int len)
         ND_PRINT((ndo, "%s", sep));
         sep = ", ";
 
-        opt_class = EXTRACT_16BITS(bp);
+        opt_class = EXTRACT_BE_16BITS(bp);
         opt_type = *(bp + 2);
         opt_len = 4 + ((*(bp + 3) & OPT_LEN_MASK) * 4);
 
@@ -132,7 +132,7 @@ geneve_opts_print(netdissect_options *ndo, const u_char *bp, u_int len)
             ND_PRINT((ndo, " data"));
 
             for (i = 4; i < opt_len; i += 4) {
-                ND_PRINT((ndo, " %08x", EXTRACT_32BITS(data)));
+                ND_PRINT((ndo, " %08x", EXTRACT_BE_32BITS(data)));
                 data++;
             }
         }
@@ -171,11 +171,11 @@ geneve_print(netdissect_options *ndo, const u_char *bp, u_int len)
     bp += 1;
     len -= 1;
 
-    prot = EXTRACT_16BITS(bp);
+    prot = EXTRACT_BE_16BITS(bp);
     bp += 2;
     len -= 2;
 
-    vni = EXTRACT_24BITS(bp);
+    vni = EXTRACT_BE_24BITS(bp);
     bp += 3;
     len -= 3;
 

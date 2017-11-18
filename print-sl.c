@@ -199,7 +199,7 @@ print_sl_change(netdissect_options *ndo,
 	register u_int i;
 
 	if ((i = *cp++) == 0) {
-		i = EXTRACT_16BITS(cp);
+		i = EXTRACT_BE_16BITS(cp);
 		cp += 2;
 	}
 	ND_PRINT((ndo, " %s%d", str, i));
@@ -213,7 +213,7 @@ print_sl_winchange(netdissect_options *ndo,
 	register short i;
 
 	if ((i = *cp++) == 0) {
-		i = EXTRACT_16BITS(cp);
+		i = EXTRACT_BE_16BITS(cp);
 		cp += 2;
 	}
 	if (i >= 0)

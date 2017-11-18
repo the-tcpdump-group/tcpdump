@@ -239,14 +239,14 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
           return;
 	}
 
-	payload_len = EXTRACT_16BITS(&ip6->ip6_plen);
+	payload_len = EXTRACT_BE_16BITS(&ip6->ip6_plen);
 	len = payload_len + sizeof(struct ip6_hdr);
 	if (length < len)
 		ND_PRINT((ndo, "truncated-ip6 - %u bytes missing!",
 			len - length));
 
         if (ndo->ndo_vflag) {
-            flow = EXTRACT_32BITS(&ip6->ip6_flow);
+            flow = EXTRACT_BE_32BITS(&ip6->ip6_flow);
             ND_PRINT((ndo, "("));
 #if 0
             /* rfc1883 */

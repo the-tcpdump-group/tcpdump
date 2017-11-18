@@ -599,7 +599,7 @@ print_attr_string(netdissect_options *ndo,
               ND_PRINT((ndo, "Tag[Unused] "));
            data++;
            length--;
-           ND_PRINT((ndo, "Salt %u ", EXTRACT_16BITS(data)));
+           ND_PRINT((ndo, "Salt %u ", EXTRACT_BE_16BITS(data)));
            data+=2;
            length-=2;
         break;
@@ -656,7 +656,7 @@ print_vendor_attr(netdissect_options *ndo,
     if (length < 4)
         goto trunc;
     ND_TCHECK2(*data, 4);
-    vendor_id = EXTRACT_32BITS(data);
+    vendor_id = EXTRACT_BE_32BITS(data);
     data+=4;
     length-=4;
 
@@ -736,11 +736,11 @@ print_attr_num(netdissect_options *ndo,
          else
             ND_PRINT((ndo, "Tag[%d] ", *data));
          data++;
-         data_value = EXTRACT_24BITS(data);
+         data_value = EXTRACT_BE_24BITS(data);
       }
       else
       {
-         data_value = EXTRACT_32BITS(data);
+         data_value = EXTRACT_BE_32BITS(data);
       }
       if ( data_value <= (uint32_t)(attr_type[attr_code].siz_subtypes - 1 +
             attr_type[attr_code].first_subtype) &&
@@ -754,10 +754,10 @@ print_attr_num(netdissect_options *ndo,
       switch(attr_code) /* Be aware of special cases... */
       {
         case FRM_IPX:
-             if (EXTRACT_32BITS( data) == 0xFFFFFFFE )
+             if (EXTRACT_BE_32BITS(data) == 0xFFFFFFFE )
                 ND_PRINT((ndo, "NAS Select"));
              else
-                ND_PRINT((ndo, "%d", EXTRACT_32BITS(data)));
+                ND_PRINT((ndo, "%d", EXTRACT_BE_32BITS(data)));
           break;
 
         case SESSION_TIMEOUT:
@@ -765,7 +765,7 @@ print_attr_num(netdissect_options *ndo,
         case ACCT_DELAY:
         case ACCT_SESSION_TIME:
         case ACCT_INT_INTERVAL:
-             timeout = EXTRACT_32BITS( data);
+             timeout = EXTRACT_BE_32BITS(data);
              if ( timeout < 60 )
                 ND_PRINT((ndo,  "%02d secs", timeout));
              else
@@ -781,15 +781,15 @@ print_attr_num(netdissect_options *ndo,
           break;
 
         case FRM_ATALK_LINK:
-             if (EXTRACT_32BITS(data) )
-                ND_PRINT((ndo, "%d", EXTRACT_32BITS(data)));
+             if (EXTRACT_BE_32BITS(data))
+                ND_PRINT((ndo, "%d", EXTRACT_BE_32BITS(data)));
              else
                 ND_PRINT((ndo, "Unnumbered"));
           break;
 
         case FRM_ATALK_NETWORK:
-             if (EXTRACT_32BITS(data) )
-                ND_PRINT((ndo, "%d", EXTRACT_32BITS(data)));
+             if (EXTRACT_BE_32BITS(data))
+                ND_PRINT((ndo, "%d", EXTRACT_BE_32BITS(data)));
              else
                 ND_PRINT((ndo, "NAS assigned"));
           break;
@@ -800,7 +800,7 @@ print_attr_num(netdissect_options *ndo,
             else
                ND_PRINT((ndo, "Tag[Unused] "));
             data++;
-            ND_PRINT((ndo, "%d", EXTRACT_24BITS(data)));
+            ND_PRINT((ndo, "%d", EXTRACT_BE_24BITS(data)));
           break;
 
         case EGRESS_VLAN_ID:
@@ -808,11 +808,11 @@ print_attr_num(netdissect_options *ndo,
                    tok2str(rfc4675_tagged,"Unknown tag",*data),
                    *data));
             data++;
-            ND_PRINT((ndo, "%d", EXTRACT_24BITS(data)));
+            ND_PRINT((ndo, "%d", EXTRACT_BE_24BITS(data)));
           break;
 
         default:
-             ND_PRINT((ndo, "%d", EXTRACT_32BITS(data)));
+             ND_PRINT((ndo, "%d", EXTRACT_BE_32BITS(data)));
           break;
 
       } /* switch */
@@ -848,10 +848,10 @@ print_attr_address(netdissect_options *ndo,
    {
       case FRM_IPADDR:
       case LOG_IPHOST:
-           if (EXTRACT_32BITS(data) == 0xFFFFFFFF )
+           if (EXTRACT_BE_32BITS(data) == 0xFFFFFFFF )
               ND_PRINT((ndo, "User Selected"));
            else
-              if (EXTRACT_32BITS(data) == 0xFFFFFFFE )
+              if (EXTRACT_BE_32BITS(data) == 0xFFFFFFFE )
                  ND_PRINT((ndo, "NAS Select"));
               else
                  ND_PRINT((ndo, "%s",ipaddr_string(ndo, data)));
@@ -951,7 +951,7 @@ print_attr_time(netdissect_options *ndo,
 
    ND_TCHECK2(data[0],4);
 
-   attr_time = EXTRACT_32BITS(data);
+   attr_time = EXTRACT_BE_32BITS(data);
    strlcpy(string, ctime(&attr_time), sizeof(string));
    /* Get rid of the newline */
    string[24] = '\0';
@@ -1043,7 +1043,7 @@ print_attr_strange(netdissect_options *ndo,
            }
            ND_TCHECK2(data[0],4);
 
-           error_cause_value = EXTRACT_32BITS(data);
+           error_cause_value = EXTRACT_BE_32BITS(data);
            ND_PRINT((ndo, "Error cause %u: %s", error_cause_value, tok2str(errorcausetype, "Error-Cause %u not known", error_cause_value)));
         break;
    }
@@ -1123,7 +1123,7 @@ radius_print(netdissect_options *ndo,
 
    ND_TCHECK2(*dat, MIN_RADIUS_LEN);
    rad = (const struct radius_hdr *)dat;
-   len = EXTRACT_16BITS(&rad->len);
+   len = EXTRACT_BE_16BITS(&rad->len);
 
    if (len < MIN_RADIUS_LEN)
    {

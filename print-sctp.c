@@ -516,8 +516,8 @@ sctp_print(netdissect_options *ndo,
   ND_TCHECK(*sctpPktHdr);
   sctpPacketLengthRemaining = sctpPacketLength;
 
-  sourcePort = EXTRACT_16BITS(&sctpPktHdr->source);
-  destPort = EXTRACT_16BITS(&sctpPktHdr->destination);
+  sourcePort = EXTRACT_BE_16BITS(&sctpPktHdr->source);
+  destPort = EXTRACT_BE_16BITS(&sctpPktHdr->destination);
 
   ip = (const struct ip *)bp2;
   if (IP_V(ip) == 6)
@@ -570,7 +570,7 @@ sctp_print(netdissect_options *ndo,
         break;
       }
       ND_TCHECK(*chunkDescPtr);
-      chunkLength = EXTRACT_16BITS(&chunkDescPtr->chunkLength);
+      chunkLength = EXTRACT_BE_16BITS(&chunkDescPtr->chunkLength);
       if (chunkLength < sizeof(*chunkDescPtr)) {
         ND_PRINT((ndo, "%s%d) [Bad chunk length %u, < size of chunk descriptor]", sep, chunkCount+1, chunkLength));
         break;
@@ -631,10 +631,10 @@ sctp_print(netdissect_options *ndo,
 	    }
 	    dataHdrPtr=(const struct sctpDataPart*)bp;
 
-	    ppid = EXTRACT_32BITS(&dataHdrPtr->payloadtype);
-	    ND_PRINT((ndo, "[TSN: %u] ", EXTRACT_32BITS(&dataHdrPtr->TSN)));
-	    ND_PRINT((ndo, "[SID: %u] ", EXTRACT_16BITS(&dataHdrPtr->streamId)));
-	    ND_PRINT((ndo, "[SSEQ %u] ", EXTRACT_16BITS(&dataHdrPtr->sequence)));
+	    ppid = EXTRACT_BE_32BITS(&dataHdrPtr->payloadtype);
+	    ND_PRINT((ndo, "[TSN: %u] ", EXTRACT_BE_32BITS(&dataHdrPtr->TSN)));
+	    ND_PRINT((ndo, "[SID: %u] ", EXTRACT_BE_16BITS(&dataHdrPtr->streamId)));
+	    ND_PRINT((ndo, "[SSEQ %u] ", EXTRACT_BE_16BITS(&dataHdrPtr->sequence)));
 	    ND_PRINT((ndo, "[PPID %s] ",
 		    tok2str(PayloadProto_idents, "0x%x", ppid)));
 
@@ -685,11 +685,11 @@ sctp_print(netdissect_options *ndo,
 		return;
 	    }
 	    init=(const struct sctpInitiation*)bp;
-	    ND_PRINT((ndo, "[init tag: %u] ", EXTRACT_32BITS(&init->initTag)));
-	    ND_PRINT((ndo, "[rwnd: %u] ", EXTRACT_32BITS(&init->rcvWindowCredit)));
-	    ND_PRINT((ndo, "[OS: %u] ", EXTRACT_16BITS(&init->NumPreopenStreams)));
-	    ND_PRINT((ndo, "[MIS: %u] ", EXTRACT_16BITS(&init->MaxInboundStreams)));
-	    ND_PRINT((ndo, "[init TSN: %u] ", EXTRACT_32BITS(&init->initialTSN)));
+	    ND_PRINT((ndo, "[init tag: %u] ", EXTRACT_BE_32BITS(&init->initTag)));
+	    ND_PRINT((ndo, "[rwnd: %u] ", EXTRACT_BE_32BITS(&init->rcvWindowCredit)));
+	    ND_PRINT((ndo, "[OS: %u] ", EXTRACT_BE_16BITS(&init->NumPreopenStreams)));
+	    ND_PRINT((ndo, "[MIS: %u] ", EXTRACT_BE_16BITS(&init->MaxInboundStreams)));
+	    ND_PRINT((ndo, "[init TSN: %u] ", EXTRACT_BE_32BITS(&init->initialTSN)));
 	    bp += sizeof(*init);
  	    sctpPacketLengthRemaining -= sizeof(*init);
 	    chunkLengthRemaining -= sizeof(*init);
@@ -713,11 +713,11 @@ sctp_print(netdissect_options *ndo,
 		return;
 	    }
 	    init=(const struct sctpInitiation*)bp;
-	    ND_PRINT((ndo, "[init tag: %u] ", EXTRACT_32BITS(&init->initTag)));
-	    ND_PRINT((ndo, "[rwnd: %u] ", EXTRACT_32BITS(&init->rcvWindowCredit)));
-	    ND_PRINT((ndo, "[OS: %u] ", EXTRACT_16BITS(&init->NumPreopenStreams)));
-	    ND_PRINT((ndo, "[MIS: %u] ", EXTRACT_16BITS(&init->MaxInboundStreams)));
-	    ND_PRINT((ndo, "[init TSN: %u] ", EXTRACT_32BITS(&init->initialTSN)));
+	    ND_PRINT((ndo, "[init tag: %u] ", EXTRACT_BE_32BITS(&init->initTag)));
+	    ND_PRINT((ndo, "[rwnd: %u] ", EXTRACT_BE_32BITS(&init->rcvWindowCredit)));
+	    ND_PRINT((ndo, "[OS: %u] ", EXTRACT_BE_16BITS(&init->NumPreopenStreams)));
+	    ND_PRINT((ndo, "[MIS: %u] ", EXTRACT_BE_16BITS(&init->MaxInboundStreams)));
+	    ND_PRINT((ndo, "[init TSN: %u] ", EXTRACT_BE_32BITS(&init->initialTSN)));
             bp += sizeof(*init);
             sctpPacketLengthRemaining -= sizeof(*init);
             chunkLengthRemaining -= sizeof(*init);
@@ -744,10 +744,10 @@ sctp_print(netdissect_options *ndo,
 	      return;
 	    }
 	    sack=(const struct sctpSelectiveAck*)bp;
-	    ND_PRINT((ndo, "[cum ack %u] ", EXTRACT_32BITS(&sack->highestConseqTSN)));
-	    ND_PRINT((ndo, "[a_rwnd %u] ", EXTRACT_32BITS(&sack->updatedRwnd)));
-	    ND_PRINT((ndo, "[#gap acks %u] ", EXTRACT_16BITS(&sack->numberOfdesc)));
-	    ND_PRINT((ndo, "[#dup tsns %u] ", EXTRACT_16BITS(&sack->numDupTsns)));
+	    ND_PRINT((ndo, "[cum ack %u] ", EXTRACT_BE_32BITS(&sack->highestConseqTSN)));
+	    ND_PRINT((ndo, "[a_rwnd %u] ", EXTRACT_BE_32BITS(&sack->updatedRwnd)));
+	    ND_PRINT((ndo, "[#gap acks %u] ", EXTRACT_BE_16BITS(&sack->numberOfdesc)));
+	    ND_PRINT((ndo, "[#dup tsns %u] ", EXTRACT_BE_16BITS(&sack->numDupTsns)));
             bp += sizeof(*sack);
 	    sctpPacketLengthRemaining -= sizeof(*sack);
             chunkLengthRemaining -= sizeof(*sack);
@@ -755,7 +755,7 @@ sctp_print(netdissect_options *ndo,
 
 	    /* print gaps */
 	    for (fragNo=0;
-		 chunkLengthRemaining != 0 && fragNo < EXTRACT_16BITS(&sack->numberOfdesc);
+		 chunkLengthRemaining != 0 && fragNo < EXTRACT_BE_16BITS(&sack->numberOfdesc);
 		 bp += sizeof(*frag), sctpPacketLengthRemaining -= sizeof(*frag), chunkLengthRemaining -= sizeof(*frag), fragNo++) {
 	      if (chunkLengthRemaining < sizeof(*frag)) {
 		ND_PRINT((ndo, "bogus chunk length %u]", chunkLength));
@@ -764,13 +764,13 @@ sctp_print(netdissect_options *ndo,
 	      frag = (const struct sctpSelectiveFrag *)bp;
 	      ND_PRINT((ndo, "\n\t\t[gap ack block #%d: start = %u, end = %u] ",
 		     fragNo+1,
-		     EXTRACT_32BITS(&sack->highestConseqTSN) + EXTRACT_16BITS(&frag->fragmentStart),
-		     EXTRACT_32BITS(&sack->highestConseqTSN) + EXTRACT_16BITS(&frag->fragmentEnd)));
+		     EXTRACT_BE_32BITS(&sack->highestConseqTSN) + EXTRACT_BE_16BITS(&frag->fragmentStart),
+		     EXTRACT_BE_32BITS(&sack->highestConseqTSN) + EXTRACT_BE_16BITS(&frag->fragmentEnd)));
 	    }
 
 	    /* print duplicate TSNs */
 	    for (tsnNo=0;
-		 chunkLengthRemaining != 0 && tsnNo<EXTRACT_16BITS(&sack->numDupTsns);
+		 chunkLengthRemaining != 0 && tsnNo<EXTRACT_BE_16BITS(&sack->numDupTsns);
 		 bp += 4, sctpPacketLengthRemaining -= 4, chunkLengthRemaining -= 4, tsnNo++) {
 	      if (chunkLengthRemaining < 4) {
 		ND_PRINT((ndo, "bogus chunk length %u]", chunkLength));
@@ -778,7 +778,7 @@ sctp_print(netdissect_options *ndo,
 	      }
               dupTSN = (const u_char *)bp;
 	      ND_PRINT((ndo, "\n\t\t[dup TSN #%u: %u] ", tsnNo+1,
-	        EXTRACT_32BITS(dupTSN)));
+	        EXTRACT_BE_32BITS(dupTSN)));
 	    }
 	    break;
 	  }

@@ -317,35 +317,35 @@ bootp_print(netdissect_options *ndo,
 	/* Only print interesting fields */
 	if (bp->bp_hops)
 		ND_PRINT((ndo, ", hops %d", bp->bp_hops));
-	if (EXTRACT_32BITS(&bp->bp_xid))
-		ND_PRINT((ndo, ", xid 0x%x", EXTRACT_32BITS(&bp->bp_xid)));
-	if (EXTRACT_16BITS(&bp->bp_secs))
-		ND_PRINT((ndo, ", secs %d", EXTRACT_16BITS(&bp->bp_secs)));
+	if (EXTRACT_BE_32BITS(&bp->bp_xid))
+		ND_PRINT((ndo, ", xid 0x%x", EXTRACT_BE_32BITS(&bp->bp_xid)));
+	if (EXTRACT_BE_16BITS(&bp->bp_secs))
+		ND_PRINT((ndo, ", secs %d", EXTRACT_BE_16BITS(&bp->bp_secs)));
 
 	ND_TCHECK(bp->bp_flags);
 	ND_PRINT((ndo, ", Flags [%s]",
-		  bittok2str(bootp_flag_values, "none", EXTRACT_16BITS(&bp->bp_flags))));
+		  bittok2str(bootp_flag_values, "none", EXTRACT_BE_16BITS(&bp->bp_flags))));
 	if (ndo->ndo_vflag > 1)
-		ND_PRINT((ndo, " (0x%04x)", EXTRACT_16BITS(&bp->bp_flags)));
+		ND_PRINT((ndo, " (0x%04x)", EXTRACT_BE_16BITS(&bp->bp_flags)));
 
 	/* Client's ip address */
 	ND_TCHECK(bp->bp_ciaddr);
-	if (EXTRACT_32BITS(&bp->bp_ciaddr.s_addr))
+	if (EXTRACT_BE_32BITS(&bp->bp_ciaddr.s_addr))
 		ND_PRINT((ndo, "\n\t  Client-IP %s", ipaddr_string(ndo, &bp->bp_ciaddr)));
 
 	/* 'your' ip address (bootp client) */
 	ND_TCHECK(bp->bp_yiaddr);
-	if (EXTRACT_32BITS(&bp->bp_yiaddr.s_addr))
+	if (EXTRACT_BE_32BITS(&bp->bp_yiaddr.s_addr))
 		ND_PRINT((ndo, "\n\t  Your-IP %s", ipaddr_string(ndo, &bp->bp_yiaddr)));
 
 	/* Server's ip address */
 	ND_TCHECK(bp->bp_siaddr);
-	if (EXTRACT_32BITS(&bp->bp_siaddr.s_addr))
+	if (EXTRACT_BE_32BITS(&bp->bp_siaddr.s_addr))
 		ND_PRINT((ndo, "\n\t  Server-IP %s", ipaddr_string(ndo, &bp->bp_siaddr)));
 
 	/* Gateway's ip address */
 	ND_TCHECK(bp->bp_giaddr);
-	if (EXTRACT_32BITS(&bp->bp_giaddr.s_addr))
+	if (EXTRACT_BE_32BITS(&bp->bp_giaddr.s_addr))
 		ND_PRINT((ndo, "\n\t  Gateway-IP %s", ipaddr_string(ndo, &bp->bp_giaddr)));
 
 	/* Client's Ethernet address */
@@ -388,7 +388,7 @@ bootp_print(netdissect_options *ndo,
 	else {
 		uint32_t ul;
 
-		ul = EXTRACT_32BITS(&bp->bp_vend);
+		ul = EXTRACT_BE_32BITS(&bp->bp_vend);
 		if (ul != 0)
 			ND_PRINT((ndo, "\n\t  Vendor-#0x%x", ul));
 	}
@@ -607,7 +607,7 @@ rfc1048_print(netdissect_options *ndo,
 	ND_PRINT((ndo, "\n\t  Vendor-rfc1048 Extensions"));
 
 	/* Step over magic cookie */
-	ND_PRINT((ndo, "\n\t    Magic Cookie 0x%08x", EXTRACT_32BITS(bp)));
+	ND_PRINT((ndo, "\n\t    Magic Cookie 0x%08x", EXTRACT_BE_32BITS(bp)));
 	bp += sizeof(int32_t);
 
 	/* Loop while we there is a tag left in the buffer */
@@ -619,7 +619,7 @@ rfc1048_print(netdissect_options *ndo,
 			return;
 		if (tag == TAG_EXTENDED_OPTION) {
 			ND_TCHECK2(*(bp + 1), 2);
-			tag = EXTRACT_16BITS(bp + 1);
+			tag = EXTRACT_BE_16BITS(bp + 1);
 			/* XXX we don't know yet if the IANA will
 			 * preclude overlap of 1-byte and 2-byte spaces.
 			 * If not, we need to offset tag after this step.
@@ -680,7 +680,7 @@ rfc1048_print(netdissect_options *ndo,
 			first = 1;
 			while (len > 1) {
 				len -= 2;
-				us = EXTRACT_16BITS(bp);
+				us = EXTRACT_BE_16BITS(bp);
 				bp += 2;
 				cp = tok2str(xtag2str, "?xT%u", us);
 				if (!first)
@@ -723,7 +723,7 @@ rfc1048_print(netdissect_options *ndo,
 			while (len >= sizeof(ul)) {
 				if (!first)
 					ND_PRINT((ndo, ","));
-				ul = EXTRACT_32BITS(bp);
+				ul = EXTRACT_BE_32BITS(bp);
 				if (c == 'i') {
 					ul = htonl(ul);
 					ND_PRINT((ndo, "%s", ipaddr_string(ndo, &ul)));
@@ -758,7 +758,7 @@ rfc1048_print(netdissect_options *ndo,
 			while (len >= sizeof(us)) {
 				if (!first)
 					ND_PRINT((ndo, ","));
-				us = EXTRACT_16BITS(bp);
+				us = EXTRACT_BE_16BITS(bp);
 				ND_PRINT((ndo, "%u", us));
 				bp += sizeof(us);
 				len -= sizeof(us);

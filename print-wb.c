@@ -50,7 +50,7 @@ static const char tstr[] = "[|wb]";
 #define DOP_ROUNDUP(x)	((((int)(x)) + (DOP_ALIGN - 1)) & ~(DOP_ALIGN - 1))
 #define DOP_NEXT(d)\
 	((const struct dophdr *)((const u_char *)(d) + \
-				DOP_ROUNDUP(EXTRACT_16BITS(&(d)->dh_len) + sizeof(*(d)))))
+				DOP_ROUNDUP(EXTRACT_BE_16BITS(&(d)->dh_len) + sizeof(*(d)))))
 
 /*
  * Format of the whiteboard packet header.
@@ -192,14 +192,14 @@ wb_id(netdissect_options *ndo,
 	len -= sizeof(*id);
 
 	ND_PRINT((ndo, " %u/%s:%u (max %u/%s:%u) ",
-	       EXTRACT_32BITS(&id->pi_ps.slot),
+	       EXTRACT_BE_32BITS(&id->pi_ps.slot),
 	       ipaddr_string(ndo, &id->pi_ps.page.p_sid),
-	       EXTRACT_32BITS(&id->pi_ps.page.p_uid),
-	       EXTRACT_32BITS(&id->pi_mslot),
+	       EXTRACT_BE_32BITS(&id->pi_ps.page.p_uid),
+	       EXTRACT_BE_32BITS(&id->pi_mslot),
 	       ipaddr_string(ndo, &id->pi_mpage.p_sid),
-	       EXTRACT_32BITS(&id->pi_mpage.p_uid)));
+	       EXTRACT_BE_32BITS(&id->pi_mpage.p_uid)));
 
-	nid = EXTRACT_16BITS(&id->pi_ps.nid);
+	nid = EXTRACT_BE_16BITS(&id->pi_ps.nid);
 	len -= sizeof(*io) * nid;
 	io = (const struct id_off *)(id + 1);
 	cp = (const char *)(io + nid);
@@ -212,7 +212,7 @@ wb_id(netdissect_options *ndo,
 	c = '<';
 	for (i = 0; i < nid && ND_TTEST(*io); ++io, ++i) {
 		ND_PRINT((ndo, "%c%s:%u",
-		    c, ipaddr_string(ndo, &io->id), EXTRACT_32BITS(&io->off)));
+		    c, ipaddr_string(ndo, &io->id), EXTRACT_BE_32BITS(&io->off)));
 		c = ',';
 	}
 	if (i >= nid) {
@@ -233,9 +233,9 @@ wb_rreq(netdissect_options *ndo,
 	ND_PRINT((ndo, " please repair %s %s:%u<%u:%u>",
 	       ipaddr_string(ndo, &rreq->pr_id),
 	       ipaddr_string(ndo, &rreq->pr_page.p_sid),
-	       EXTRACT_32BITS(&rreq->pr_page.p_uid),
-	       EXTRACT_32BITS(&rreq->pr_sseq),
-	       EXTRACT_32BITS(&rreq->pr_eseq)));
+	       EXTRACT_BE_32BITS(&rreq->pr_page.p_uid),
+	       EXTRACT_BE_32BITS(&rreq->pr_sseq),
+	       EXTRACT_BE_32BITS(&rreq->pr_eseq)));
 	return (0);
 }
 
@@ -248,9 +248,9 @@ wb_preq(netdissect_options *ndo,
 		return (-1);
 
 	ND_PRINT((ndo, " need %u/%s:%u",
-	       EXTRACT_32BITS(&preq->pp_low),
+	       EXTRACT_BE_32BITS(&preq->pp_low),
 	       ipaddr_string(ndo, &preq->pp_page.p_sid),
-	       EXTRACT_32BITS(&preq->pp_page.p_uid)));
+	       EXTRACT_BE_32BITS(&preq->pp_page.p_uid)));
 	return (0);
 }
 
@@ -265,20 +265,20 @@ wb_prep(netdissect_options *ndo,
 	ND_PRINT((ndo, " wb-prep:"));
 	if (len < sizeof(*prep) || !ND_TTEST(*prep))
 		return (-1);
-	n = EXTRACT_32BITS(&prep->pp_n);
+	n = EXTRACT_BE_32BITS(&prep->pp_n);
 	ps = (const struct pgstate *)(prep + 1);
 	while (--n >= 0 && ND_TTEST(*ps)) {
 		const struct id_off *io, *ie;
 		char c = '<';
 
 		ND_PRINT((ndo, " %u/%s:%u",
-		    EXTRACT_32BITS(&ps->slot),
+		    EXTRACT_BE_32BITS(&ps->slot),
 		    ipaddr_string(ndo, &ps->page.p_sid),
-		    EXTRACT_32BITS(&ps->page.p_uid)));
+		    EXTRACT_BE_32BITS(&ps->page.p_uid)));
 		io = (const struct id_off *)(ps + 1);
 		for (ie = io + ps->nid; io < ie && ND_TTEST(*io); ++io) {
 			ND_PRINT((ndo, "%c%s:%u", c, ipaddr_string(ndo, &io->id),
-			    EXTRACT_32BITS(&io->off)));
+			    EXTRACT_BE_32BITS(&io->off)));
 			c = ',';
 		}
 		ND_PRINT((ndo, ">"));
@@ -328,7 +328,7 @@ wb_dops(netdissect_options *ndo, const struct pkt_dop *dop,
 		else {
 			ND_PRINT((ndo, " %s", dopstr[t]));
 			if (t == DT_SKIP || t == DT_HOLE) {
-				uint32_t ts = EXTRACT_32BITS(&dh->dh_ts);
+				uint32_t ts = EXTRACT_BE_32BITS(&dh->dh_ts);
 				ND_PRINT((ndo, "%d", ts - ss + 1));
 				if (ss > ts || ts > es) {
 					ND_PRINT((ndo, "[|]"));
@@ -358,14 +358,14 @@ wb_rrep(netdissect_options *ndo,
 	ND_PRINT((ndo, " for %s %s:%u<%u:%u>",
 	    ipaddr_string(ndo, &rrep->pr_id),
 	    ipaddr_string(ndo, &dop->pd_page.p_sid),
-	    EXTRACT_32BITS(&dop->pd_page.p_uid),
-	    EXTRACT_32BITS(&dop->pd_sseq),
-	    EXTRACT_32BITS(&dop->pd_eseq)));
+	    EXTRACT_BE_32BITS(&dop->pd_page.p_uid),
+	    EXTRACT_BE_32BITS(&dop->pd_sseq),
+	    EXTRACT_BE_32BITS(&dop->pd_eseq)));
 
 	if (ndo->ndo_vflag)
 		return (wb_dops(ndo, dop,
-		    EXTRACT_32BITS(&dop->pd_sseq),
-		    EXTRACT_32BITS(&dop->pd_eseq)));
+		    EXTRACT_BE_32BITS(&dop->pd_sseq),
+		    EXTRACT_BE_32BITS(&dop->pd_eseq)));
 	return (0);
 }
 
@@ -380,14 +380,14 @@ wb_drawop(netdissect_options *ndo,
 
 	ND_PRINT((ndo, " %s:%u<%u:%u>",
 	    ipaddr_string(ndo, &dop->pd_page.p_sid),
-	    EXTRACT_32BITS(&dop->pd_page.p_uid),
-	    EXTRACT_32BITS(&dop->pd_sseq),
-	    EXTRACT_32BITS(&dop->pd_eseq)));
+	    EXTRACT_BE_32BITS(&dop->pd_page.p_uid),
+	    EXTRACT_BE_32BITS(&dop->pd_sseq),
+	    EXTRACT_BE_32BITS(&dop->pd_eseq)));
 
 	if (ndo->ndo_vflag)
 		return (wb_dops(ndo, dop,
-				EXTRACT_32BITS(&dop->pd_sseq),
-				EXTRACT_32BITS(&dop->pd_eseq)));
+				EXTRACT_BE_32BITS(&dop->pd_sseq),
+				EXTRACT_BE_32BITS(&dop->pd_eseq)));
 	return (0);
 }
 

@@ -941,7 +941,7 @@ nbt_tcp_print(netdissect_options *ndo,
 	goto trunc;
     maxbuf = data + caplen;
     type = data[0];
-    nbt_len = EXTRACT_16BITS(data + 2);
+    nbt_len = EXTRACT_BE_16BITS(data + 2);
     length -= 4;
     caplen -= 4;
 
@@ -1107,15 +1107,15 @@ nbt_udp137_print(netdissect_options *ndo,
     int total, i;
 
     ND_TCHECK2(data[10], 2);
-    name_trn_id = EXTRACT_16BITS(data);
+    name_trn_id = EXTRACT_BE_16BITS(data);
     response = (data[2] >> 7);
     opcode = (data[2] >> 3) & 0xF;
     nm_flags = ((data[2] & 0x7) << 4) + (data[3] >> 4);
     rcode = data[3] & 0xF;
-    qdcount = EXTRACT_16BITS(data + 4);
-    ancount = EXTRACT_16BITS(data + 6);
-    nscount = EXTRACT_16BITS(data + 8);
-    arcount = EXTRACT_16BITS(data + 10);
+    qdcount = EXTRACT_BE_16BITS(data + 4);
+    ancount = EXTRACT_BE_16BITS(data + 6);
+    nscount = EXTRACT_BE_16BITS(data + 8);
+    arcount = EXTRACT_BE_16BITS(data + 10);
     startbuf = data;
 
     if (maxbuf <= data)
@@ -1168,12 +1168,12 @@ nbt_udp137_print(netdissect_options *ndo,
 	    if (p == NULL)
 		goto out;
 	    ND_TCHECK_16BITS(p);
-	    restype = EXTRACT_16BITS(p);
+	    restype = EXTRACT_BE_16BITS(p);
 	    p = smb_fdata(ndo, p, "ResType=[rw]\nResClass=[rw]\nTTL=[rD]\n", p + 8, 0);
 	    if (p == NULL)
 		goto out;
 	    ND_TCHECK_16BITS(p);
-	    rdlen = EXTRACT_16BITS(p);
+	    rdlen = EXTRACT_BE_16BITS(p);
 	    ND_PRINT((ndo, "ResourceLength=%d\nResourceData=\n", rdlen));
 	    p += 2;
 	    if (rdlen == 6) {
@@ -1250,7 +1250,7 @@ smb_tcp_print(netdissect_options *ndo,
     if (caplen < 4)
 	goto trunc;
     maxbuf = data + caplen;
-    smb_len = EXTRACT_24BITS(data + 1);
+    smb_len = EXTRACT_BE_24BITS(data + 1);
     length -= 4;
     caplen -= 4;
 

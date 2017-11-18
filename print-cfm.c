@@ -361,8 +361,8 @@ cfm_print(netdissect_options *ndo,
         }
 
         ND_PRINT((ndo, "\n\t  Sequence Number 0x%08x, MA-End-Point-ID 0x%04x",
-               EXTRACT_32BITS(msg_ptr.cfm_ccm->sequence),
-               EXTRACT_16BITS(msg_ptr.cfm_ccm->ma_epi)));
+               EXTRACT_BE_32BITS(msg_ptr.cfm_ccm->sequence),
+               EXTRACT_BE_16BITS(msg_ptr.cfm_ccm->ma_epi)));
 
         namesp = msg_ptr.cfm_ccm->names;
         names_data_remaining = sizeof(msg_ptr.cfm_ccm->names);
@@ -477,7 +477,7 @@ cfm_print(netdissect_options *ndo,
                bittok2str(cfm_ltm_flag_values, "none", cfm_common_header->flags)));
 
         ND_PRINT((ndo, "\n\t  Transaction-ID 0x%08x, ttl %u",
-               EXTRACT_32BITS(msg_ptr.cfm_ltm->transaction_id),
+               EXTRACT_BE_32BITS(msg_ptr.cfm_ltm->transaction_id),
                msg_ptr.cfm_ltm->ttl));
 
         ND_PRINT((ndo, "\n\t  Original-MAC %s, Target-MAC %s",
@@ -500,7 +500,7 @@ cfm_print(netdissect_options *ndo,
                bittok2str(cfm_ltr_flag_values, "none", cfm_common_header->flags)));
 
         ND_PRINT((ndo, "\n\t  Transaction-ID 0x%08x, ttl %u",
-               EXTRACT_32BITS(msg_ptr.cfm_ltr->transaction_id),
+               EXTRACT_BE_32BITS(msg_ptr.cfm_ltr->transaction_id),
                msg_ptr.cfm_ltr->ttl));
 
         ND_PRINT((ndo, "\n\t  Replay-Action %s (%u)",
@@ -545,7 +545,7 @@ cfm_print(netdissect_options *ndo,
         if (tlen < sizeof(struct cfm_tlv_header_t))
             goto tooshort;
         ND_TCHECK2(*tptr, sizeof(struct cfm_tlv_header_t));
-        cfm_tlv_len=EXTRACT_16BITS(&cfm_tlv_header->length);
+        cfm_tlv_len=EXTRACT_BE_16BITS(&cfm_tlv_header->length);
 
         ND_PRINT((ndo, ", length %u", cfm_tlv_len));
 
@@ -586,8 +586,8 @@ cfm_print(netdissect_options *ndo,
                 return;
             }
             ND_PRINT((ndo, ", Vendor: %s (%u), Sub-Type %u",
-                   tok2str(oui_values,"Unknown", EXTRACT_24BITS(tptr)),
-                   EXTRACT_24BITS(tptr),
+                   tok2str(oui_values,"Unknown", EXTRACT_BE_24BITS(tptr)),
+                   EXTRACT_BE_24BITS(tptr),
                    *(tptr + 3)));
             hexdump = TRUE;
             break;

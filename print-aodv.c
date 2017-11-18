@@ -192,7 +192,7 @@ aodv_extension(netdissect_options *ndo,
 			break;
 		}
 		ND_PRINT((ndo, "\n\text HELLO %ld ms",
-		    (unsigned long)EXTRACT_32BITS(&ah->interval)));
+		    (unsigned long) EXTRACT_BE_32BITS(&ah->interval)));
 		break;
 
 	default:
@@ -222,11 +222,11 @@ aodv_rreq(netdissect_options *ndo, const u_char *dat, u_int length)
 	    ap->rreq_type & RREQ_DEST ? "[D]" : "",
 	    ap->rreq_type & RREQ_UNKNOWN ? "[U] " : " ",
 	    ap->rreq_hops,
-	    (unsigned long)EXTRACT_32BITS(&ap->rreq_id),
+	    (unsigned long) EXTRACT_BE_32BITS(&ap->rreq_id),
 	    ipaddr_string(ndo, &ap->rreq_da),
-	    (unsigned long)EXTRACT_32BITS(&ap->rreq_ds),
+	    (unsigned long) EXTRACT_BE_32BITS(&ap->rreq_ds),
 	    ipaddr_string(ndo, &ap->rreq_oa),
-	    (unsigned long)EXTRACT_32BITS(&ap->rreq_os)));
+	    (unsigned long) EXTRACT_BE_32BITS(&ap->rreq_os)));
 	i = length - sizeof(*ap);
 	if (i >= sizeof(struct aodv_ext))
 		aodv_extension(ndo, (const struct aodv_ext *)(dat + sizeof(*ap)), i);
@@ -252,9 +252,9 @@ aodv_rrep(netdissect_options *ndo, const u_char *dat, u_int length)
 	    ap->rrep_ps & RREP_PREFIX_MASK,
 	    ap->rrep_hops,
 	    ipaddr_string(ndo, &ap->rrep_da),
-	    (unsigned long)EXTRACT_32BITS(&ap->rrep_ds),
+	    (unsigned long) EXTRACT_BE_32BITS(&ap->rrep_ds),
 	    ipaddr_string(ndo, &ap->rrep_oa),
-	    (unsigned long)EXTRACT_32BITS(&ap->rrep_life)));
+	    (unsigned long) EXTRACT_BE_32BITS(&ap->rrep_life)));
 	i = length - sizeof(*ap);
 	if (i >= sizeof(struct aodv_ext))
 		aodv_extension(ndo, (const struct aodv_ext *)(dat + sizeof(*ap)), i);
@@ -284,7 +284,7 @@ aodv_rerr(netdissect_options *ndo, const u_char *dat, u_int length)
 		if (i < sizeof(*dp))
 			goto trunc;
 		ND_PRINT((ndo, " {%s}(%ld)", ipaddr_string(ndo, &dp->u_da),
-		    (unsigned long)EXTRACT_32BITS(&dp->u_ds)));
+		    (unsigned long) EXTRACT_BE_32BITS(&dp->u_ds)));
 		dp++;
 		i -= sizeof(*dp);
 	}
@@ -311,11 +311,11 @@ aodv_v6_rreq(netdissect_options *ndo, const u_char *dat, u_int length)
 	    ap->rreq_type & RREQ_DEST ? "[D]" : "",
 	    ap->rreq_type & RREQ_UNKNOWN ? "[U] " : " ",
 	    ap->rreq_hops,
-	    (unsigned long)EXTRACT_32BITS(&ap->rreq_id),
+	    (unsigned long) EXTRACT_BE_32BITS(&ap->rreq_id),
 	    ip6addr_string(ndo, &ap->rreq_da),
-	    (unsigned long)EXTRACT_32BITS(&ap->rreq_ds),
+	    (unsigned long) EXTRACT_BE_32BITS(&ap->rreq_ds),
 	    ip6addr_string(ndo, &ap->rreq_oa),
-	    (unsigned long)EXTRACT_32BITS(&ap->rreq_os)));
+	    (unsigned long) EXTRACT_BE_32BITS(&ap->rreq_os)));
 	i = length - sizeof(*ap);
 	if (i >= sizeof(struct aodv_ext))
 		aodv_extension(ndo, (const struct aodv_ext *)(dat + sizeof(*ap)), i);
@@ -341,9 +341,9 @@ aodv_v6_rrep(netdissect_options *ndo, const u_char *dat, u_int length)
 	    ap->rrep_ps & RREP_PREFIX_MASK,
 	    ap->rrep_hops,
 	    ip6addr_string(ndo, &ap->rrep_da),
-	    (unsigned long)EXTRACT_32BITS(&ap->rrep_ds),
+	    (unsigned long) EXTRACT_BE_32BITS(&ap->rrep_ds),
 	    ip6addr_string(ndo, &ap->rrep_oa),
-	    (unsigned long)EXTRACT_32BITS(&ap->rrep_life)));
+	    (unsigned long) EXTRACT_BE_32BITS(&ap->rrep_life)));
 	i = length - sizeof(*ap);
 	if (i >= sizeof(struct aodv_ext))
 		aodv_extension(ndo, (const struct aodv_ext *)(dat + sizeof(*ap)), i);
@@ -373,7 +373,7 @@ aodv_v6_rerr(netdissect_options *ndo, const u_char *dat, u_int length)
 		if (i < sizeof(*dp6))
 			goto trunc;
 		ND_PRINT((ndo, " {%s}(%ld)", ip6addr_string(ndo, &dp6->u_da),
-		    (unsigned long)EXTRACT_32BITS(&dp6->u_ds)));
+		    (unsigned long) EXTRACT_BE_32BITS(&dp6->u_ds)));
 		dp6++;
 		i -= sizeof(*dp6);
 	}
@@ -400,11 +400,11 @@ aodv_v6_draft_01_rreq(netdissect_options *ndo, const u_char *dat, u_int length)
 	    ap->rreq_type & RREQ_DEST ? "[D]" : "",
 	    ap->rreq_type & RREQ_UNKNOWN ? "[U] " : " ",
 	    ap->rreq_hops,
-	    (unsigned long)EXTRACT_32BITS(&ap->rreq_id),
+	    (unsigned long) EXTRACT_BE_32BITS(&ap->rreq_id),
 	    ip6addr_string(ndo, &ap->rreq_da),
-	    (unsigned long)EXTRACT_32BITS(&ap->rreq_ds),
+	    (unsigned long) EXTRACT_BE_32BITS(&ap->rreq_ds),
 	    ip6addr_string(ndo, &ap->rreq_oa),
-	    (unsigned long)EXTRACT_32BITS(&ap->rreq_os)));
+	    (unsigned long) EXTRACT_BE_32BITS(&ap->rreq_os)));
 	i = length - sizeof(*ap);
 	if (i >= sizeof(struct aodv_ext))
 		aodv_extension(ndo, (const struct aodv_ext *)(dat + sizeof(*ap)), i);
@@ -430,9 +430,9 @@ aodv_v6_draft_01_rrep(netdissect_options *ndo, const u_char *dat, u_int length)
 	    ap->rrep_ps & RREP_PREFIX_MASK,
 	    ap->rrep_hops,
 	    ip6addr_string(ndo, &ap->rrep_da),
-	    (unsigned long)EXTRACT_32BITS(&ap->rrep_ds),
+	    (unsigned long) EXTRACT_BE_32BITS(&ap->rrep_ds),
 	    ip6addr_string(ndo, &ap->rrep_oa),
-	    (unsigned long)EXTRACT_32BITS(&ap->rrep_life)));
+	    (unsigned long) EXTRACT_BE_32BITS(&ap->rrep_life)));
 	i = length - sizeof(*ap);
 	if (i >= sizeof(struct aodv_ext))
 		aodv_extension(ndo, (const struct aodv_ext *)(dat + sizeof(*ap)), i);
@@ -462,7 +462,7 @@ aodv_v6_draft_01_rerr(netdissect_options *ndo, const u_char *dat, u_int length)
 		if (i < sizeof(*dp6))
 			goto trunc;
 		ND_PRINT((ndo, " {%s}(%ld)", ip6addr_string(ndo, &dp6->u_da),
-		    (unsigned long)EXTRACT_32BITS(&dp6->u_ds)));
+		    (unsigned long) EXTRACT_BE_32BITS(&dp6->u_ds)));
 		dp6++;
 		i -= sizeof(*dp6);
 	}

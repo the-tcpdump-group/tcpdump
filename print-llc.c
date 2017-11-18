@@ -428,8 +428,8 @@ snap_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 	ND_TCHECK2(*p, 5);
 	if (caplen < 5 || length < 5)
 		goto trunc;
-	orgcode = EXTRACT_24BITS(p);
-	et = EXTRACT_16BITS(p + 3);
+	orgcode = EXTRACT_BE_24BITS(p);
+	et = EXTRACT_BE_16BITS(p + 3);
 
 	if (ndo->ndo_eflag) {
 		/*

@@ -200,7 +200,7 @@ fr_hdr_print(netdissect_options *ndo,
             ND_PRINT((ndo, "Q.922, hdr-len %u, DLCI %u, Flags [%s], NLPID %s (0x%02x), length %u: ",
                          addr_len,
                          dlci,
-                         bittok2str(fr_header_flag_values, "none", EXTRACT_32BITS(flags)),
+                         bittok2str(fr_header_flag_values, "none", EXTRACT_BE_32BITS(flags)),
                          tok2str(nlpid_values,"unknown", nlpid),
                          nlpid,
                          length));
@@ -208,7 +208,7 @@ fr_hdr_print(netdissect_options *ndo,
             ND_PRINT((ndo, "Q.922, hdr-len %u, DLCI %u, Flags [%s], cisco-ethertype %s (0x%04x), length %u: ",
                          addr_len,
                          dlci,
-                         bittok2str(fr_header_flag_values, "none", EXTRACT_32BITS(flags)),
+                         bittok2str(fr_header_flag_values, "none", EXTRACT_BE_32BITS(flags)),
                          tok2str(ethertype_values, "unknown", nlpid),
                          nlpid,
                          length));
@@ -267,7 +267,7 @@ fr_print(netdissect_options *ndo,
                         /* no Ethertype */
                         ND_PRINT((ndo, "UI %02x! ", p[addr_len]));
                 } else {
-                        extracted_ethertype = EXTRACT_16BITS(p+addr_len);
+                        extracted_ethertype = EXTRACT_BE_16BITS(p + addr_len);
 
                         if (ndo->ndo_eflag)
                                 fr_hdr_print(ndo, length, addr_len, dlci,
@@ -493,7 +493,7 @@ mfr_print(netdissect_options *ndo,
             switch (ie_type) {
 
             case MFR_CTRL_IE_MAGIC_NUM:
-                ND_PRINT((ndo, "0x%08x", EXTRACT_32BITS(tptr)));
+                ND_PRINT((ndo, "0x%08x", EXTRACT_BE_32BITS(tptr)));
                 break;
 
             case MFR_CTRL_IE_BUNDLE_ID: /* same message format */

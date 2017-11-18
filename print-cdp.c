@@ -108,13 +108,13 @@ cdp_print(netdissect_options *ndo,
 	ND_PRINT((ndo, "CDPv%u, ttl: %us", *(tptr + CDP_HEADER_VERSION_OFFSET),
 					   *(tptr + CDP_HEADER_TTL_OFFSET)));
 	if (ndo->ndo_vflag)
-		ND_PRINT((ndo, ", checksum: 0x%04x (unverified), length %u", EXTRACT_16BITS(tptr+CDP_HEADER_CHECKSUM_OFFSET), length));
+		ND_PRINT((ndo, ", checksum: 0x%04x (unverified), length %u", EXTRACT_BE_16BITS(tptr + CDP_HEADER_CHECKSUM_OFFSET), length));
 	tptr += CDP_HEADER_LEN;
 
 	while (tptr < (pptr+length)) {
 		ND_TCHECK2(*tptr, CDP_TLV_HEADER_LEN); /* read out Type and Length */
-		type = EXTRACT_16BITS(tptr+CDP_TLV_TYPE_OFFSET);
-		len  = EXTRACT_16BITS(tptr+CDP_TLV_LEN_OFFSET); /* object length includes the 4 bytes header length */
+		type = EXTRACT_BE_16BITS(tptr + CDP_TLV_TYPE_OFFSET);
+		len  = EXTRACT_BE_16BITS(tptr + CDP_TLV_LEN_OFFSET); /* object length includes the 4 bytes header length */
 		if (len < CDP_TLV_HEADER_LEN) {
 		    if (ndo->ndo_vflag)
 			ND_PRINT((ndo, "\n\t%s (0x%02x), TLV length: %u byte%s (too short)",
@@ -164,8 +164,8 @@ cdp_print(netdissect_options *ndo,
 			if (len < 4)
 			    goto trunc;
 			ND_PRINT((ndo, "(0x%08x): %s",
-			       EXTRACT_32BITS(tptr),
-			       bittok2str(cdp_capability_values, "none", EXTRACT_32BITS(tptr))));
+			       EXTRACT_BE_32BITS(tptr),
+			       bittok2str(cdp_capability_values, "none", EXTRACT_BE_32BITS(tptr))));
 			break;
 		    case 0x05: /* Version */
 			ND_PRINT((ndo, "\n\t  "));
@@ -197,7 +197,7 @@ cdp_print(netdissect_options *ndo,
 		    case 0x0a: /* Native VLAN ID - CDPv2 */
 			if (len < 2)
 			    goto trunc;
-			ND_PRINT((ndo, "%d", EXTRACT_16BITS(tptr)));
+			ND_PRINT((ndo, "%d", EXTRACT_BE_16BITS(tptr)));
 			break;
 		    case 0x0b: /* Duplex - CDPv2 */
 			if (len < 1)
@@ -211,7 +211,7 @@ cdp_print(netdissect_options *ndo,
 		    case 0x0e: /* ATA-186 VoIP VLAN request - incomplete doc. */
 			if (len < 3)
 			    goto trunc;
-			ND_PRINT((ndo, "app %d, vlan %d", *(tptr), EXTRACT_16BITS(tptr + 1)));
+			ND_PRINT((ndo, "app %d, vlan %d", *(tptr), EXTRACT_BE_16BITS(tptr + 1)));
 			break;
 		    case 0x10: /* ATA-186 VoIP VLAN assignment - incomplete doc. */
 			ND_PRINT((ndo, "%1.2fW", cdp_get_number(tptr, len) / 1000.0));
@@ -219,7 +219,7 @@ cdp_print(netdissect_options *ndo,
 		    case 0x11: /* MTU - not documented */
 			if (len < 4)
 			    goto trunc;
-			ND_PRINT((ndo, "%u bytes", EXTRACT_32BITS(tptr)));
+			ND_PRINT((ndo, "%u bytes", EXTRACT_BE_32BITS(tptr)));
 			break;
 		    case 0x12: /* AVVID trust bitmap - not documented */
 			if (len < 1)
@@ -288,7 +288,7 @@ cdp_print_addr(netdissect_options *ndo,
 	ND_TCHECK2(*p, 4);
 	if (p + 4 > endp)
 		goto trunc;
-	num = EXTRACT_32BITS(p);
+	num = EXTRACT_BE_32BITS(p);
 	p += 4;
 
 	while (p < endp && num >= 0) {
@@ -302,7 +302,7 @@ cdp_print_addr(netdissect_options *ndo,
 		ND_TCHECK2(p[pl], 2);
 		if (p + pl + 2 > endp)
 			goto trunc;
-		al = EXTRACT_16BITS(&p[pl]);	/* address length */
+		al = EXTRACT_BE_16BITS(&p[pl]);	/* address length */
 
 		if (pt == PT_NLPID && pl == 1 && *p == NLPID_IP && al == 4) {
 			/*

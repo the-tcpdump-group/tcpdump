@@ -125,7 +125,7 @@ ip6_opt_print(netdissect_options *ndo, const u_char *bp, int len)
 		ND_PRINT((ndo, "(rtalert: invalid len %d)", bp[i + 1]));
 		goto trunc;
 	    }
-	    ND_PRINT((ndo, "(rtalert: 0x%04x) ", EXTRACT_16BITS(&bp[i + 2])));
+	    ND_PRINT((ndo, "(rtalert: 0x%04x) ", EXTRACT_BE_16BITS(&bp[i + 2])));
 	    break;
 	case IP6OPT_JUMBO:
 	    if (len - i < IP6OPT_JUMBO_LEN) {
@@ -136,7 +136,7 @@ ip6_opt_print(netdissect_options *ndo, const u_char *bp, int len)
 		ND_PRINT((ndo, "(jumbo: invalid len %d)", bp[i + 1]));
 		goto trunc;
 	    }
-	    ND_PRINT((ndo, "(jumbo: %u) ", EXTRACT_32BITS(&bp[i + 2])));
+	    ND_PRINT((ndo, "(jumbo: %u) ", EXTRACT_BE_32BITS(&bp[i + 2])));
 	    break;
         case IP6OPT_HOME_ADDRESS:
 	    if (len - i < IP6OPT_HOMEADDR_MINLEN) {

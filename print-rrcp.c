@@ -105,7 +105,7 @@ rrcp_print(netdissect_options *ndo,
 	if (rrcp_proto==1){
 	    ND_TCHECK2(*(cp + RRCP_AUTHKEY_OFFSET), 2);
     	    ND_PRINT((ndo, ", auth=0x%04x",
-		  EXTRACT_16BITS(cp + RRCP_AUTHKEY_OFFSET)));
+		  EXTRACT_BE_16BITS(cp + RRCP_AUTHKEY_OFFSET)));
 	}
 	if (rrcp_proto==1 && rrcp_opcode==0 &&
 	     ((*(cp + RRCP_OPCODE_ISREPLY_OFFSET)) & RRCP_ISREPLY)){
@@ -114,13 +114,13 @@ rrcp_print(netdissect_options *ndo,
 		     *(cp + RRCP_DOWNLINK_PORT_OFFSET),
 		     *(cp + RRCP_UPLINK_PORT_OFFSET),
 		     etheraddr_string(ndo, cp + RRCP_UPLINK_MAC_OFFSET),
-		     EXTRACT_32BITS(cp + RRCP_VENDOR_ID_OFFSET),
-		     EXTRACT_16BITS(cp + RRCP_CHIP_ID_OFFSET)));
+		     EXTRACT_BE_32BITS(cp + RRCP_VENDOR_ID_OFFSET),
+		     EXTRACT_BE_16BITS(cp + RRCP_CHIP_ID_OFFSET)));
 	}else if (rrcp_opcode==1 || rrcp_opcode==2 || rrcp_proto==2){
 	    ND_TCHECK2(*(cp + RRCP_COOKIE2_OFFSET), 4);
 	    ND_PRINT((ndo, ", cookie=0x%08x%08x ",
-		    EXTRACT_32BITS(cp + RRCP_COOKIE2_OFFSET),
-		    EXTRACT_32BITS(cp + RRCP_COOKIE1_OFFSET)));
+		    EXTRACT_BE_32BITS(cp + RRCP_COOKIE2_OFFSET),
+		    EXTRACT_BE_32BITS(cp + RRCP_COOKIE1_OFFSET)));
 	}
 	return;
 

@@ -284,13 +284,13 @@ print_octets(netdissect_options *ndo, const u_char *dat, u_int length)
 static void
 print_16bits_val(netdissect_options *ndo, const uint16_t *dat)
 {
-	ND_PRINT((ndo, "%u", EXTRACT_16BITS(dat)));
+	ND_PRINT((ndo, "%u", EXTRACT_BE_16BITS(dat)));
 }
 
 static void
 print_32bits_val(netdissect_options *ndo, const uint32_t *dat)
 {
-	ND_PRINT((ndo, "%lu", (u_long)EXTRACT_32BITS(dat)));
+	ND_PRINT((ndo, "%lu", (u_long) EXTRACT_BE_32BITS(dat)));
 }
 
 /***********************************/
@@ -306,7 +306,7 @@ l2tp_msgtype_print(netdissect_options *ndo, const u_char *dat, u_int length)
 		return;
 	}
 	ND_PRINT((ndo, "%s", tok2str(l2tp_msgtype2str, "MSGTYPE-#%u",
-	    EXTRACT_16BITS(ptr))));
+	    EXTRACT_BE_16BITS(ptr))));
 }
 
 static void
@@ -319,7 +319,7 @@ l2tp_result_code_print(netdissect_options *ndo, const u_char *dat, u_int length)
 		ND_PRINT((ndo, "AVP too short"));
 		return;
 	}
-	ND_PRINT((ndo, "%u", EXTRACT_16BITS(ptr)));
+	ND_PRINT((ndo, "%u", EXTRACT_BE_16BITS(ptr)));
 	ptr++;
 	length -= 2;
 
@@ -330,7 +330,7 @@ l2tp_result_code_print(netdissect_options *ndo, const u_char *dat, u_int length)
 		ND_PRINT((ndo, " AVP too short"));
 		return;
 	}
-	ND_PRINT((ndo, "/%u", EXTRACT_16BITS(ptr)));
+	ND_PRINT((ndo, "/%u", EXTRACT_BE_16BITS(ptr)));
 	ptr++;
 	length -= 2;
 
@@ -348,8 +348,8 @@ l2tp_proto_ver_print(netdissect_options *ndo, const uint16_t *dat, u_int length)
 		ND_PRINT((ndo, "AVP too short"));
 		return;
 	}
-	ND_PRINT((ndo, "%u.%u", (EXTRACT_16BITS(dat) >> 8),
-	    (EXTRACT_16BITS(dat) & 0xff)));
+	ND_PRINT((ndo, "%u.%u", (EXTRACT_BE_16BITS(dat) >> 8),
+		  (EXTRACT_BE_16BITS(dat) & 0xff)));
 }
 
 static void
@@ -361,10 +361,10 @@ l2tp_framing_cap_print(netdissect_options *ndo, const u_char *dat, u_int length)
 		ND_PRINT((ndo, "AVP too short"));
 		return;
 	}
-	if (EXTRACT_32BITS(ptr) &  L2TP_FRAMING_CAP_ASYNC_MASK) {
+	if (EXTRACT_BE_32BITS(ptr) &  L2TP_FRAMING_CAP_ASYNC_MASK) {
 		ND_PRINT((ndo, "A"));
 	}
-	if (EXTRACT_32BITS(ptr) &  L2TP_FRAMING_CAP_SYNC_MASK) {
+	if (EXTRACT_BE_32BITS(ptr) &  L2TP_FRAMING_CAP_SYNC_MASK) {
 		ND_PRINT((ndo, "S"));
 	}
 }
@@ -378,10 +378,10 @@ l2tp_bearer_cap_print(netdissect_options *ndo, const u_char *dat, u_int length)
 		ND_PRINT((ndo, "AVP too short"));
 		return;
 	}
-	if (EXTRACT_32BITS(ptr) &  L2TP_BEARER_CAP_ANALOG_MASK) {
+	if (EXTRACT_BE_32BITS(ptr) &  L2TP_BEARER_CAP_ANALOG_MASK) {
 		ND_PRINT((ndo, "A"));
 	}
-	if (EXTRACT_32BITS(ptr) &  L2TP_BEARER_CAP_DIGITAL_MASK) {
+	if (EXTRACT_BE_32BITS(ptr) &  L2TP_BEARER_CAP_DIGITAL_MASK) {
 		ND_PRINT((ndo, "D"));
 	}
 }
@@ -412,10 +412,10 @@ l2tp_bearer_type_print(netdissect_options *ndo, const u_char *dat, u_int length)
 		ND_PRINT((ndo, "AVP too short"));
 		return;
 	}
-	if (EXTRACT_32BITS(ptr) &  L2TP_BEARER_TYPE_ANALOG_MASK) {
+	if (EXTRACT_BE_32BITS(ptr) &  L2TP_BEARER_TYPE_ANALOG_MASK) {
 		ND_PRINT((ndo, "A"));
 	}
-	if (EXTRACT_32BITS(ptr) &  L2TP_BEARER_TYPE_DIGITAL_MASK) {
+	if (EXTRACT_BE_32BITS(ptr) &  L2TP_BEARER_TYPE_DIGITAL_MASK) {
 		ND_PRINT((ndo, "D"));
 	}
 }
@@ -429,10 +429,10 @@ l2tp_framing_type_print(netdissect_options *ndo, const u_char *dat, u_int length
 		ND_PRINT((ndo, "AVP too short"));
 		return;
 	}
-	if (EXTRACT_32BITS(ptr) &  L2TP_FRAMING_TYPE_ASYNC_MASK) {
+	if (EXTRACT_BE_32BITS(ptr) &  L2TP_FRAMING_TYPE_ASYNC_MASK) {
 		ND_PRINT((ndo, "A"));
 	}
-	if (EXTRACT_32BITS(ptr) &  L2TP_FRAMING_TYPE_SYNC_MASK) {
+	if (EXTRACT_BE_32BITS(ptr) &  L2TP_FRAMING_TYPE_SYNC_MASK) {
 		ND_PRINT((ndo, "S"));
 	}
 }
@@ -453,7 +453,7 @@ l2tp_proxy_auth_type_print(netdissect_options *ndo, const u_char *dat, u_int len
 		return;
 	}
 	ND_PRINT((ndo, "%s", tok2str(l2tp_authentype2str,
-			     "AuthType-#%u", EXTRACT_16BITS(ptr))));
+			     "AuthType-#%u", EXTRACT_BE_16BITS(ptr))));
 }
 
 static void
@@ -465,7 +465,7 @@ l2tp_proxy_auth_id_print(netdissect_options *ndo, const u_char *dat, u_int lengt
 		ND_PRINT((ndo, "AVP too short"));
 		return;
 	}
-	ND_PRINT((ndo, "%u", EXTRACT_16BITS(ptr) & L2TP_PROXY_AUTH_ID_MASK));
+	ND_PRINT((ndo, "%u", EXTRACT_BE_16BITS(ptr) & L2TP_PROXY_AUTH_ID_MASK));
 }
 
 static void
@@ -485,48 +485,48 @@ l2tp_call_errors_print(netdissect_options *ndo, const u_char *dat, u_int length)
 		ND_PRINT((ndo, "AVP too short"));
 		return;
 	}
-	val_h = EXTRACT_16BITS(ptr); ptr++; length -= 2;
-	val_l = EXTRACT_16BITS(ptr); ptr++; length -= 2;
+	val_h = EXTRACT_BE_16BITS(ptr); ptr++; length -= 2;
+	val_l = EXTRACT_BE_16BITS(ptr); ptr++; length -= 2;
 	ND_PRINT((ndo, "CRCErr=%u ", (val_h<<16) + val_l));
 
 	if (length < 4) {
 		ND_PRINT((ndo, "AVP too short"));
 		return;
 	}
-	val_h = EXTRACT_16BITS(ptr); ptr++; length -= 2;
-	val_l = EXTRACT_16BITS(ptr); ptr++; length -= 2;
+	val_h = EXTRACT_BE_16BITS(ptr); ptr++; length -= 2;
+	val_l = EXTRACT_BE_16BITS(ptr); ptr++; length -= 2;
 	ND_PRINT((ndo, "FrameErr=%u ", (val_h<<16) + val_l));
 
 	if (length < 4) {
 		ND_PRINT((ndo, "AVP too short"));
 		return;
 	}
-	val_h = EXTRACT_16BITS(ptr); ptr++; length -= 2;
-	val_l = EXTRACT_16BITS(ptr); ptr++; length -= 2;
+	val_h = EXTRACT_BE_16BITS(ptr); ptr++; length -= 2;
+	val_l = EXTRACT_BE_16BITS(ptr); ptr++; length -= 2;
 	ND_PRINT((ndo, "HardOver=%u ", (val_h<<16) + val_l));
 
 	if (length < 4) {
 		ND_PRINT((ndo, "AVP too short"));
 		return;
 	}
-	val_h = EXTRACT_16BITS(ptr); ptr++; length -= 2;
-	val_l = EXTRACT_16BITS(ptr); ptr++; length -= 2;
+	val_h = EXTRACT_BE_16BITS(ptr); ptr++; length -= 2;
+	val_l = EXTRACT_BE_16BITS(ptr); ptr++; length -= 2;
 	ND_PRINT((ndo, "BufOver=%u ", (val_h<<16) + val_l));
 
 	if (length < 4) {
 		ND_PRINT((ndo, "AVP too short"));
 		return;
 	}
-	val_h = EXTRACT_16BITS(ptr); ptr++; length -= 2;
-	val_l = EXTRACT_16BITS(ptr); ptr++; length -= 2;
+	val_h = EXTRACT_BE_16BITS(ptr); ptr++; length -= 2;
+	val_l = EXTRACT_BE_16BITS(ptr); ptr++; length -= 2;
 	ND_PRINT((ndo, "Timeout=%u ", (val_h<<16) + val_l));
 
 	if (length < 4) {
 		ND_PRINT((ndo, "AVP too short"));
 		return;
 	}
-	val_h = EXTRACT_16BITS(ptr); ptr++;
-	val_l = EXTRACT_16BITS(ptr); ptr++;
+	val_h = EXTRACT_BE_16BITS(ptr); ptr++;
+	val_l = EXTRACT_BE_16BITS(ptr); ptr++;
 	ND_PRINT((ndo, "AlignErr=%u ", (val_h<<16) + val_l));
 }
 
@@ -547,16 +547,16 @@ l2tp_accm_print(netdissect_options *ndo, const u_char *dat, u_int length)
 		ND_PRINT((ndo, "AVP too short"));
 		return;
 	}
-	val_h = EXTRACT_16BITS(ptr); ptr++; length -= 2;
-	val_l = EXTRACT_16BITS(ptr); ptr++; length -= 2;
+	val_h = EXTRACT_BE_16BITS(ptr); ptr++; length -= 2;
+	val_l = EXTRACT_BE_16BITS(ptr); ptr++; length -= 2;
 	ND_PRINT((ndo, "send=%08x ", (val_h<<16) + val_l));
 
 	if (length < 4) {
 		ND_PRINT((ndo, "AVP too short"));
 		return;
 	}
-	val_h = EXTRACT_16BITS(ptr); ptr++;
-	val_l = EXTRACT_16BITS(ptr); ptr++;
+	val_h = EXTRACT_BE_16BITS(ptr); ptr++;
+	val_l = EXTRACT_BE_16BITS(ptr); ptr++;
 	ND_PRINT((ndo, "recv=%08x ", (val_h<<16) + val_l));
 }
 
@@ -570,11 +570,11 @@ l2tp_ppp_discon_cc_print(netdissect_options *ndo, const u_char *dat, u_int lengt
 		return;
 	}
 	/* Disconnect Code */
-	ND_PRINT((ndo, "%04x, ", EXTRACT_16BITS(dat)));
+	ND_PRINT((ndo, "%04x, ", EXTRACT_BE_16BITS(dat)));
 	dat += 2;
 	length -= 2;
 	/* Control Protocol Number */
-	ND_PRINT((ndo, "%04x ",  EXTRACT_16BITS(dat)));
+	ND_PRINT((ndo, "%04x ",  EXTRACT_BE_16BITS(dat)));
 	dat += 2;
 	length -= 2;
 	/* Direction */
@@ -604,7 +604,7 @@ l2tp_avp_print(netdissect_options *ndo, const u_char *dat, int length)
 	ND_PRINT((ndo, " "));
 
 	ND_TCHECK(*ptr);	/* Flags & Length */
-	len = EXTRACT_16BITS(ptr) & L2TP_AVP_HDR_LEN_MASK;
+	len = EXTRACT_BE_16BITS(ptr) & L2TP_AVP_HDR_LEN_MASK;
 
 	/* If it is not long enough to contain the header, we'll give up. */
 	if (len < 6)
@@ -625,26 +625,26 @@ l2tp_avp_print(netdissect_options *ndo, const u_char *dat, int length)
 	 * check whether we go past the end of the AVP.
 	 */
 
-	if (EXTRACT_16BITS(ptr) & L2TP_AVP_HDR_FLAG_MANDATORY) {
+	if (EXTRACT_BE_16BITS(ptr) & L2TP_AVP_HDR_FLAG_MANDATORY) {
 		ND_PRINT((ndo, "*"));
 	}
-	if (EXTRACT_16BITS(ptr) & L2TP_AVP_HDR_FLAG_HIDDEN) {
+	if (EXTRACT_BE_16BITS(ptr) & L2TP_AVP_HDR_FLAG_HIDDEN) {
 		hidden = TRUE;
 		ND_PRINT((ndo, "?"));
 	}
 	ptr++;
 
-	if (EXTRACT_16BITS(ptr)) {
+	if (EXTRACT_BE_16BITS(ptr)) {
 		/* Vendor Specific Attribute */
-	        ND_PRINT((ndo, "VENDOR%04x:", EXTRACT_16BITS(ptr))); ptr++;
-		ND_PRINT((ndo, "ATTR%04x", EXTRACT_16BITS(ptr))); ptr++;
+	        ND_PRINT((ndo, "VENDOR%04x:", EXTRACT_BE_16BITS(ptr))); ptr++;
+		ND_PRINT((ndo, "ATTR%04x", EXTRACT_BE_16BITS(ptr))); ptr++;
 		ND_PRINT((ndo, "("));
 		print_octets(ndo, (const u_char *)ptr, len-6);
 		ND_PRINT((ndo, ")"));
 	} else {
 		/* IETF-defined Attributes */
 		ptr++;
-		attr_type = EXTRACT_16BITS(ptr); ptr++;
+		attr_type = EXTRACT_BE_16BITS(ptr); ptr++;
 		ND_PRINT((ndo, "%s", tok2str(l2tp_avp2str, "AVP-#%u", attr_type)));
 		ND_PRINT((ndo, "("));
 		if (hidden) {
@@ -776,9 +776,9 @@ l2tp_print(netdissect_options *ndo, const u_char *dat, u_int length)
 	flag_t = flag_l = flag_s = flag_o = FALSE;
 
 	ND_TCHECK2(*ptr, 2);	/* Flags & Version */
-	if ((EXTRACT_16BITS(ptr) & L2TP_VERSION_MASK) == L2TP_VERSION_L2TP) {
+	if ((EXTRACT_BE_16BITS(ptr) & L2TP_VERSION_MASK) == L2TP_VERSION_L2TP) {
 		ND_PRINT((ndo, " l2tp:"));
-	} else if ((EXTRACT_16BITS(ptr) & L2TP_VERSION_MASK) == L2TP_VERSION_L2F) {
+	} else if ((EXTRACT_BE_16BITS(ptr) & L2TP_VERSION_MASK) == L2TP_VERSION_L2F) {
 		ND_PRINT((ndo, " l2f:"));
 		return;		/* nothing to do */
 	} else {
@@ -787,23 +787,23 @@ l2tp_print(netdissect_options *ndo, const u_char *dat, u_int length)
 	}
 
 	ND_PRINT((ndo, "["));
-	if (EXTRACT_16BITS(ptr) & L2TP_FLAG_TYPE) {
+	if (EXTRACT_BE_16BITS(ptr) & L2TP_FLAG_TYPE) {
 		flag_t = TRUE;
 		ND_PRINT((ndo, "T"));
 	}
-	if (EXTRACT_16BITS(ptr) & L2TP_FLAG_LENGTH) {
+	if (EXTRACT_BE_16BITS(ptr) & L2TP_FLAG_LENGTH) {
 		flag_l = TRUE;
 		ND_PRINT((ndo, "L"));
 	}
-	if (EXTRACT_16BITS(ptr) & L2TP_FLAG_SEQUENCE) {
+	if (EXTRACT_BE_16BITS(ptr) & L2TP_FLAG_SEQUENCE) {
 		flag_s = TRUE;
 		ND_PRINT((ndo, "S"));
 	}
-	if (EXTRACT_16BITS(ptr) & L2TP_FLAG_OFFSET) {
+	if (EXTRACT_BE_16BITS(ptr) & L2TP_FLAG_OFFSET) {
 		flag_o = TRUE;
 		ND_PRINT((ndo, "O"));
 	}
-	if (EXTRACT_16BITS(ptr) & L2TP_FLAG_PRIORITY)
+	if (EXTRACT_BE_16BITS(ptr) & L2TP_FLAG_PRIORITY)
 		ND_PRINT((ndo, "P"));
 	ND_PRINT((ndo, "]"));
 
@@ -812,7 +812,7 @@ l2tp_print(netdissect_options *ndo, const u_char *dat, u_int length)
 
 	if (flag_l) {
 		ND_TCHECK2(*ptr, 2);	/* Length */
-		l2tp_len = EXTRACT_16BITS(ptr);
+		l2tp_len = EXTRACT_BE_16BITS(ptr);
 		ptr += 2;
 		cnt += 2;
 	} else {
@@ -820,28 +820,28 @@ l2tp_print(netdissect_options *ndo, const u_char *dat, u_int length)
 	}
 
 	ND_TCHECK2(*ptr, 2);		/* Tunnel ID */
-	ND_PRINT((ndo, "(%u/", EXTRACT_16BITS(ptr)));
+	ND_PRINT((ndo, "(%u/", EXTRACT_BE_16BITS(ptr)));
 	ptr += 2;
 	cnt += 2;
 	ND_TCHECK2(*ptr, 2);		/* Session ID */
-	ND_PRINT((ndo, "%u)",  EXTRACT_16BITS(ptr)));
+	ND_PRINT((ndo, "%u)",  EXTRACT_BE_16BITS(ptr)));
 	ptr += 2;
 	cnt += 2;
 
 	if (flag_s) {
 		ND_TCHECK2(*ptr, 2);	/* Ns */
-		ND_PRINT((ndo, "Ns=%u,", EXTRACT_16BITS(ptr)));
+		ND_PRINT((ndo, "Ns=%u,", EXTRACT_BE_16BITS(ptr)));
 		ptr += 2;
 		cnt += 2;
 		ND_TCHECK2(*ptr, 2);	/* Nr */
-		ND_PRINT((ndo, "Nr=%u",  EXTRACT_16BITS(ptr)));
+		ND_PRINT((ndo, "Nr=%u",  EXTRACT_BE_16BITS(ptr)));
 		ptr += 2;
 		cnt += 2;
 	}
 
 	if (flag_o) {
 		ND_TCHECK2(*ptr, 2);	/* Offset Size */
-		pad =  EXTRACT_16BITS(ptr);
+		pad =  EXTRACT_BE_16BITS(ptr);
 		ptr += (2 + pad);
 		cnt += (2 + pad);
 	}

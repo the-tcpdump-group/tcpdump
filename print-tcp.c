@@ -187,8 +187,8 @@ tcp_print(netdissect_options *ndo,
                 return;
         }
 
-        sport = EXTRACT_16BITS(&tp->th_sport);
-        dport = EXTRACT_16BITS(&tp->th_dport);
+        sport = EXTRACT_BE_16BITS(&tp->th_sport);
+        dport = EXTRACT_BE_16BITS(&tp->th_dport);
 
         if (ip6) {
                 if (ip6->ip6_nxt == IPPROTO_TCP) {
@@ -224,10 +224,10 @@ tcp_print(netdissect_options *ndo,
                 return;
         }
 
-        seq = EXTRACT_32BITS(&tp->th_seq);
-        ack = EXTRACT_32BITS(&tp->th_ack);
-        win = EXTRACT_16BITS(&tp->th_win);
-        urp = EXTRACT_16BITS(&tp->th_urp);
+        seq = EXTRACT_BE_32BITS(&tp->th_seq);
+        ack = EXTRACT_BE_32BITS(&tp->th_ack);
+        win = EXTRACT_BE_16BITS(&tp->th_win);
+        urp = EXTRACT_BE_16BITS(&tp->th_urp);
 
         if (ndo->ndo_qflag) {
                 ND_PRINT((ndo, "tcp %d", length - hlen));
@@ -372,7 +372,7 @@ tcp_print(netdissect_options *ndo,
                 if (IP_V(ip) == 4) {
                         if (ND_TTEST2(tp->th_sport, length)) {
                                 sum = tcp_cksum(ndo, ip, tp, length);
-                                tcp_sum = EXTRACT_16BITS(&tp->th_sum);
+                                tcp_sum = EXTRACT_BE_16BITS(&tp->th_sum);
 
                                 ND_PRINT((ndo, ", cksum 0x%04x", tcp_sum));
                                 if (sum != 0)
@@ -384,7 +384,7 @@ tcp_print(netdissect_options *ndo,
                 } else if (IP_V(ip) == 6 && ip6->ip6_plen) {
                         if (ND_TTEST2(tp->th_sport, length)) {
                                 sum = tcp6_cksum(ndo, ip6, tp, length);
-                                tcp_sum = EXTRACT_16BITS(&tp->th_sum);
+                                tcp_sum = EXTRACT_BE_16BITS(&tp->th_sum);
 
                                 ND_PRINT((ndo, ", cksum 0x%04x", tcp_sum));
                                 if (sum != 0)
@@ -453,7 +453,7 @@ tcp_print(netdissect_options *ndo,
                         case TCPOPT_MAXSEG:
                                 datalen = 2;
                                 LENCHECK(datalen);
-                                ND_PRINT((ndo, " %u", EXTRACT_16BITS(cp)));
+                                ND_PRINT((ndo, " %u", EXTRACT_BE_16BITS(cp)));
                                 break;
 
                         case TCPOPT_WSCALE:
@@ -472,9 +472,9 @@ tcp_print(netdissect_options *ndo,
                                         ND_PRINT((ndo, " %d ", datalen / 8));
                                         for (i = 0; i < datalen; i += 8) {
                                                 LENCHECK(i + 4);
-                                                s = EXTRACT_32BITS(cp + i);
+                                                s = EXTRACT_BE_32BITS(cp + i);
                                                 LENCHECK(i + 8);
-                                                e = EXTRACT_32BITS(cp + i + 4);
+                                                e = EXTRACT_BE_32BITS(cp + i + 4);
                                                 if (rev) {
                                                         s -= thseq;
                                                         e -= thseq;
@@ -499,15 +499,15 @@ tcp_print(netdissect_options *ndo,
                                  */
                                 datalen = 4;
                                 LENCHECK(datalen);
-                                ND_PRINT((ndo, " %u", EXTRACT_32BITS(cp)));
+                                ND_PRINT((ndo, " %u", EXTRACT_BE_32BITS(cp)));
                                 break;
 
                         case TCPOPT_TIMESTAMP:
                                 datalen = 8;
                                 LENCHECK(datalen);
                                 ND_PRINT((ndo, " val %u ecr %u",
-                                             EXTRACT_32BITS(cp),
-                                             EXTRACT_32BITS(cp + 4)));
+                                             EXTRACT_BE_32BITS(cp),
+                                             EXTRACT_BE_32BITS(cp + 4)));
                                 break;
 
                         case TCPOPT_SIGNATURE:
@@ -580,7 +580,7 @@ tcp_print(netdissect_options *ndo,
                         case TCPOPT_UTO:
                                 datalen = 2;
                                 LENCHECK(datalen);
-                                utoval = EXTRACT_16BITS(cp);
+                                utoval = EXTRACT_BE_16BITS(cp);
                                 ND_PRINT((ndo, " 0x%x", utoval));
                                 if (utoval & 0x0001)
                                         utoval = (utoval >> 1) * 60;
@@ -609,7 +609,7 @@ tcp_print(netdissect_options *ndo,
                                 if (datalen < 2)
                                         goto bad;
                                 /* RFC6994 */
-                                magic = EXTRACT_16BITS(cp);
+                                magic = EXTRACT_BE_16BITS(cp);
                                 ND_PRINT((ndo, "-"));
 
                                 switch(magic) {
@@ -742,19 +742,19 @@ tcp_print(netdissect_options *ndo,
                 register const struct sunrpc_msg *rp;
                 enum sunrpc_msg_type direction;
 
-                fraglen = EXTRACT_32BITS(bp) & 0x7FFFFFFF;
+                fraglen = EXTRACT_BE_32BITS(bp) & 0x7FFFFFFF;
                 if (fraglen > (length) - 4)
                         fraglen = (length) - 4;
                 rp = (const struct sunrpc_msg *)(bp + 4);
                 if (ND_TTEST(rp->rm_direction)) {
-                        direction = (enum sunrpc_msg_type)EXTRACT_32BITS(&rp->rm_direction);
+                        direction = (enum sunrpc_msg_type) EXTRACT_BE_32BITS(&rp->rm_direction);
                         if (dport == NFS_PORT && direction == SUNRPC_CALL) {
-                                ND_PRINT((ndo, ": NFS request xid %u ", EXTRACT_32BITS(&rp->rm_xid)));
+                                ND_PRINT((ndo, ": NFS request xid %u ", EXTRACT_BE_32BITS(&rp->rm_xid)));
                                 nfsreq_noaddr_print(ndo, (const u_char *)rp, fraglen, (const u_char *)ip);
                                 return;
                         }
                         if (sport == NFS_PORT && direction == SUNRPC_REPLY) {
-                                ND_PRINT((ndo, ": NFS reply xid %u ", EXTRACT_32BITS(&rp->rm_xid)));
+                                ND_PRINT((ndo, ": NFS reply xid %u ", EXTRACT_BE_32BITS(&rp->rm_xid)));
                                 nfsreply_noaddr_print(ndo, (const u_char *)rp, fraglen, (const u_char *)ip);
                                 return;
                         }
@@ -868,14 +868,14 @@ tcp_verify_signature(netdissect_options *ndo,
                 MD5_Update(&ctx, (const char *)&ip->ip_dst, sizeof(ip->ip_dst));
                 MD5_Update(&ctx, (const char *)&zero_proto, sizeof(zero_proto));
                 MD5_Update(&ctx, (const char *)&ip->ip_p, sizeof(ip->ip_p));
-                tlen = EXTRACT_16BITS(&ip->ip_len) - IP_HL(ip) * 4;
+                tlen = EXTRACT_BE_16BITS(&ip->ip_len) - IP_HL(ip) * 4;
                 tlen = htons(tlen);
                 MD5_Update(&ctx, (const char *)&tlen, sizeof(tlen));
         } else if (IP_V(ip) == 6) {
                 ip6 = (const struct ip6_hdr *)ip;
                 MD5_Update(&ctx, (const char *)&ip6->ip6_src, sizeof(ip6->ip6_src));
                 MD5_Update(&ctx, (const char *)&ip6->ip6_dst, sizeof(ip6->ip6_dst));
-                len32 = htonl(EXTRACT_16BITS(&ip6->ip6_plen));
+                len32 = htonl(EXTRACT_BE_16BITS(&ip6->ip6_plen));
                 MD5_Update(&ctx, (const char *)&len32, sizeof(len32));
                 nxt = 0;
                 MD5_Update(&ctx, (const char *)&nxt, sizeof(nxt));

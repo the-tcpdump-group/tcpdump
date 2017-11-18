@@ -3275,7 +3275,7 @@ ieee802_11_avs_radio_print(netdissect_options *ndo,
 		return caplen;
 	}
 
-	caphdr_len = EXTRACT_32BITS(p + 4);
+	caphdr_len = EXTRACT_BE_32BITS(p + 4);
 	if (caphdr_len < 8) {
 		/*
 		 * Yow!  The capture header length is claimed not
@@ -3327,7 +3327,7 @@ prism_if_print(netdissect_options *ndo,
 		return caplen;
 	}
 
-	msgcode = EXTRACT_32BITS(p);
+	msgcode = EXTRACT_BE_32BITS(p);
 	if (msgcode == WLANCAP_MAGIC_COOKIE_V1 ||
 	    msgcode == WLANCAP_MAGIC_COOKIE_V2)
 		return ieee802_11_avs_radio_print(ndo, p, length, caplen);

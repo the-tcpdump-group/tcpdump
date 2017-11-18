@@ -244,8 +244,8 @@ egp_print(netdissect_options *ndo,
         if (!ndo->ndo_vflag) {
             ND_PRINT((ndo, "EGPv%u, AS %u, seq %u, length %u",
                    egp->egp_version,
-                   EXTRACT_16BITS(&egp->egp_as),
-                   EXTRACT_16BITS(&egp->egp_sequence),
+                   EXTRACT_BE_16BITS(&egp->egp_as),
+                   EXTRACT_BE_16BITS(&egp->egp_sequence),
                    length));
             return;
         } else
@@ -281,8 +281,8 @@ egp_print(netdissect_options *ndo,
 				break;
 			}
 			ND_PRINT((ndo, " hello:%d poll:%d",
-			       EXTRACT_16BITS(&egp->egp_hello),
-			       EXTRACT_16BITS(&egp->egp_poll)));
+			       EXTRACT_BE_16BITS(&egp->egp_hello),
+			       EXTRACT_BE_16BITS(&egp->egp_poll)));
 			break;
 
 		case EGPC_REFUSE:
@@ -363,10 +363,10 @@ egp_print(netdissect_options *ndo,
 		else
 			ND_PRINT((ndo, " [status %d]", status));
 
-		if (EXTRACT_16BITS(&egp->egp_reason) <= EGPR_UVERSION)
-			ND_PRINT((ndo, " %s", egp_reasons[EXTRACT_16BITS(&egp->egp_reason)]));
+		if (EXTRACT_BE_16BITS(&egp->egp_reason) <= EGPR_UVERSION)
+			ND_PRINT((ndo, " %s", egp_reasons[EXTRACT_BE_16BITS(&egp->egp_reason)]));
 		else
-			ND_PRINT((ndo, " [reason %d]", EXTRACT_16BITS(&egp->egp_reason)));
+			ND_PRINT((ndo, " [reason %d]", EXTRACT_BE_16BITS(&egp->egp_reason)));
 		break;
 
 	default:

@@ -704,7 +704,7 @@ rpl_dio_print(netdissect_options *ndo,
                   dagid_str,
                   dio->rpl_dtsn,
                   dio->rpl_instanceid,
-                  EXTRACT_16BITS(&dio->rpl_dagrank),
+                  EXTRACT_BE_16BITS(&dio->rpl_dagrank),
                   RPL_DIO_GROUNDED(dio->rpl_mopprf) ? "grounded,":"",
                   tok2str(rpl_mop_values, "mop%u", RPL_DIO_MOP(dio->rpl_mopprf)),
                   RPL_DIO_PRF(dio->rpl_mopprf)));
@@ -890,7 +890,7 @@ icmp6_print(netdissect_options *ndo,
 		uint16_t sum, udp_sum;
 
 		if (ND_TTEST2(bp[0], length)) {
-			udp_sum = EXTRACT_16BITS(&dp->icmp6_cksum);
+			udp_sum = EXTRACT_BE_16BITS(&dp->icmp6_cksum);
 			sum = icmp6_cksum(ndo, ip, dp, length);
 			if (sum != 0)
 				ND_PRINT((ndo,"[bad icmp6 cksum 0x%04x -> 0x%04x!] ",
@@ -934,7 +934,7 @@ icmp6_print(netdissect_options *ndo,
 			    == NULL)
 				goto trunc;
 
-			dport = EXTRACT_16BITS(&ouh->uh_dport);
+			dport = EXTRACT_BE_16BITS(&ouh->uh_dport);
 			switch (prot) {
 			case IPPROTO_TCP:
 				ND_PRINT((ndo,", %s tcp port %s",
@@ -963,7 +963,7 @@ icmp6_print(netdissect_options *ndo,
 		break;
 	case ICMP6_PACKET_TOO_BIG:
 		ND_TCHECK(dp->icmp6_mtu);
-		ND_PRINT((ndo,", mtu %u", EXTRACT_32BITS(&dp->icmp6_mtu)));
+		ND_PRINT((ndo,", mtu %u", EXTRACT_BE_32BITS(&dp->icmp6_mtu)));
 		break;
 	case ICMP6_TIME_EXCEEDED:
 		ND_TCHECK(oip->ip6_dst);
@@ -984,13 +984,13 @@ icmp6_print(netdissect_options *ndo,
 		ND_TCHECK(oip->ip6_dst);
 		switch (dp->icmp6_code) {
 		case ICMP6_PARAMPROB_HEADER:
-                        ND_PRINT((ndo,", erroneous - octet %u", EXTRACT_32BITS(&dp->icmp6_pptr)));
+                        ND_PRINT((ndo,", erroneous - octet %u", EXTRACT_BE_32BITS(&dp->icmp6_pptr)));
                         break;
 		case ICMP6_PARAMPROB_NEXTHEADER:
-                        ND_PRINT((ndo,", next header - octet %u", EXTRACT_32BITS(&dp->icmp6_pptr)));
+                        ND_PRINT((ndo,", next header - octet %u", EXTRACT_BE_32BITS(&dp->icmp6_pptr)));
                         break;
 		case ICMP6_PARAMPROB_OPTION:
-                        ND_PRINT((ndo,", option - octet %u", EXTRACT_32BITS(&dp->icmp6_pptr)));
+                        ND_PRINT((ndo,", option - octet %u", EXTRACT_BE_32BITS(&dp->icmp6_pptr)));
                         break;
 		default:
                         ND_PRINT((ndo,", code-#%d",
@@ -1001,7 +1001,7 @@ icmp6_print(netdissect_options *ndo,
 	case ICMP6_ECHO_REQUEST:
 	case ICMP6_ECHO_REPLY:
                 ND_TCHECK(dp->icmp6_seq);
-                ND_PRINT((ndo,", seq %u", EXTRACT_16BITS(&dp->icmp6_seq)));
+                ND_PRINT((ndo,", seq %u", EXTRACT_BE_16BITS(&dp->icmp6_seq)));
 		break;
 	case ICMP6_MEMBERSHIP_QUERY:
 		if (length == MLD_MINLEN) {
@@ -1038,9 +1038,9 @@ icmp6_print(netdissect_options *ndo,
                                   (u_int)p->nd_ra_curhoplimit,
                                   bittok2str(icmp6_opt_ra_flag_values,"none",(p->nd_ra_flags_reserved)),
                                   get_rtpref(p->nd_ra_flags_reserved),
-                                  EXTRACT_16BITS(&p->nd_ra_router_lifetime),
-                                  EXTRACT_32BITS(&p->nd_ra_reachable),
-                                  EXTRACT_32BITS(&p->nd_ra_retransmit)));
+                                  EXTRACT_BE_16BITS(&p->nd_ra_router_lifetime),
+                                  EXTRACT_BE_32BITS(&p->nd_ra_reachable),
+                                  EXTRACT_BE_32BITS(&p->nd_ra_retransmit)));
 
 			icmp6_opt_print(ndo, (const u_char *)dp + RTADVLEN,
 					length - RTADVLEN);
@@ -1071,7 +1071,7 @@ icmp6_print(netdissect_options *ndo,
                         ND_PRINT((ndo,", Flags [%s]",
                                   bittok2str(icmp6_nd_na_flag_values,
                                              "none",
-                                             EXTRACT_32BITS(&p->nd_na_flags_reserved))));
+                                             EXTRACT_BE_32BITS(&p->nd_na_flags_reserved))));
 #define NDADVLEN 24
 			icmp6_opt_print(ndo, (const u_char *)dp + NDADVLEN,
 					length - NDADVLEN);
@@ -1110,7 +1110,7 @@ icmp6_print(netdissect_options *ndo,
 	case ICMP6_MOBILEPREFIX_SOLICIT: /* fall through */
 	case ICMP6_HADISCOV_REQUEST:
                 ND_TCHECK(dp->icmp6_data16[0]);
-                ND_PRINT((ndo,", id 0x%04x", EXTRACT_16BITS(&dp->icmp6_data16[0])));
+                ND_PRINT((ndo,", id 0x%04x", EXTRACT_BE_16BITS(&dp->icmp6_data16[0])));
                 break;
 	case ICMP6_HADISCOV_REPLY:
 		if (ndo->ndo_vflag) {
@@ -1118,7 +1118,7 @@ icmp6_print(netdissect_options *ndo,
 			const u_char *cp;
 
 			ND_TCHECK(dp->icmp6_data16[0]);
-			ND_PRINT((ndo,", id 0x%04x", EXTRACT_16BITS(&dp->icmp6_data16[0])));
+			ND_PRINT((ndo,", id 0x%04x", EXTRACT_BE_16BITS(&dp->icmp6_data16[0])));
 			cp = (const u_char *)dp + length;
 			in6 = (const struct in6_addr *)(dp + 1);
 			for (; (const u_char *)in6 < cp; in6++) {
@@ -1130,7 +1130,7 @@ icmp6_print(netdissect_options *ndo,
 	case ICMP6_MOBILEPREFIX_ADVERT:
 		if (ndo->ndo_vflag) {
 			ND_TCHECK(dp->icmp6_data16[0]);
-			ND_PRINT((ndo,", id 0x%04x", EXTRACT_16BITS(&dp->icmp6_data16[0])));
+			ND_PRINT((ndo,", id 0x%04x", EXTRACT_BE_16BITS(&dp->icmp6_data16[0])));
 			ND_TCHECK(dp->icmp6_data16[1]);
 			if (dp->icmp6_data16[1] & 0xc0)
 				ND_PRINT((ndo," "));
@@ -1211,7 +1211,7 @@ get_upperlayer(netdissect_options *ndo, const u_char *bp, u_int *prot)
 			if (!ND_TTEST(fragh->ip6f_offlg))
 				return(NULL);
 			/* fragments with non-zero offset are meaningless */
-			if ((EXTRACT_16BITS(&fragh->ip6f_offlg) & IP6F_OFF_MASK) != 0)
+			if ((EXTRACT_BE_16BITS(&fragh->ip6f_offlg) & IP6F_OFF_MASK) != 0)
 				return(NULL);
 			nh = fragh->ip6f_nxt;
 			hlen = sizeof(struct ip6_frag);
@@ -1291,8 +1291,8 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
                                   opp->nd_opt_pi_prefix_len,
                                   (op->nd_opt_len != 4) ? "badlen" : "",
                                   bittok2str(icmp6_opt_pi_flag_values, "none", opp->nd_opt_pi_flags_reserved),
-                                  get_lifetime(EXTRACT_32BITS(&opp->nd_opt_pi_valid_time))));
-                        ND_PRINT((ndo,", pref. time %s", get_lifetime(EXTRACT_32BITS(&opp->nd_opt_pi_preferred_time))));
+                                  get_lifetime(EXTRACT_BE_32BITS(&opp->nd_opt_pi_valid_time))));
+                        ND_PRINT((ndo,", pref. time %s", get_lifetime(EXTRACT_BE_32BITS(&opp->nd_opt_pi_preferred_time))));
 			break;
 		case ND_OPT_REDIRECTED_HEADER:
                         print_unknown_data(ndo, bp,"\n\t    ",op->nd_opt_len<<3);
@@ -1302,14 +1302,14 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 			opm = (const struct nd_opt_mtu *)op;
 			ND_TCHECK(opm->nd_opt_mtu_mtu);
 			ND_PRINT((ndo," %u%s",
-                               EXTRACT_32BITS(&opm->nd_opt_mtu_mtu),
-                                  (op->nd_opt_len != 1) ? "bad option length" : "" ));
+                               EXTRACT_BE_32BITS(&opm->nd_opt_mtu_mtu),
+                               (op->nd_opt_len != 1) ? "bad option length" : "" ));
                         break;
 		case ND_OPT_RDNSS:
 			oprd = (const struct nd_opt_rdnss *)op;
 			l = (op->nd_opt_len - 1) / 2;
 			ND_PRINT((ndo," lifetime %us,",
-                                  EXTRACT_32BITS(&oprd->nd_opt_rdnss_lifetime)));
+                                  EXTRACT_BE_32BITS(&oprd->nd_opt_rdnss_lifetime)));
 			for (i = 0; i < l; i++) {
 				ND_TCHECK(oprd->nd_opt_rdnss_addr[i]);
 				ND_PRINT((ndo," addr: %s",
@@ -1319,7 +1319,7 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 		case ND_OPT_DNSSL:
 			opds = (const struct nd_opt_dnssl *)op;
 			ND_PRINT((ndo," lifetime %us, domain(s):",
-                                  EXTRACT_32BITS(&opds->nd_opt_dnssl_lifetime)));
+                                  EXTRACT_BE_32BITS(&opds->nd_opt_dnssl_lifetime)));
 			domp = cp + 8; /* domain names, variable-sized, RFC1035-encoded */
 			while (domp < cp + (op->nd_opt_len << 3) && *domp != '\0')
 			{
@@ -1331,14 +1331,14 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 		case ND_OPT_ADVINTERVAL:
 			opa = (const struct nd_opt_advinterval *)op;
 			ND_TCHECK(opa->nd_opt_adv_interval);
-			ND_PRINT((ndo," %ums", EXTRACT_32BITS(&opa->nd_opt_adv_interval)));
+			ND_PRINT((ndo," %ums", EXTRACT_BE_32BITS(&opa->nd_opt_adv_interval)));
 			break;
                 case ND_OPT_HOMEAGENT_INFO:
 			oph = (const struct nd_opt_homeagent_info *)op;
 			ND_TCHECK(oph->nd_opt_hai_lifetime);
 			ND_PRINT((ndo," preference %u, lifetime %u",
-                                  EXTRACT_16BITS(&oph->nd_opt_hai_preference),
-                                  EXTRACT_16BITS(&oph->nd_opt_hai_lifetime)));
+                                  EXTRACT_BE_16BITS(&oph->nd_opt_hai_preference),
+                                  EXTRACT_BE_16BITS(&oph->nd_opt_hai_lifetime)));
 			break;
 		case ND_OPT_ROUTE_INFO:
 			opri = (const struct nd_opt_route_info *)op;
@@ -1363,7 +1363,7 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
                                   opri->nd_opt_rti_prefixlen));
 			ND_PRINT((ndo,", pref=%s", get_rtpref(opri->nd_opt_rti_flags)));
 			ND_PRINT((ndo,", lifetime=%s",
-                                  get_lifetime(EXTRACT_32BITS(&opri->nd_opt_rti_lifetime))));
+                                  get_lifetime(EXTRACT_BE_32BITS(&opri->nd_opt_rti_lifetime))));
 			break;
 		default:
                         if (ndo->ndo_vflag <= 1) {
@@ -1399,7 +1399,7 @@ mld6_print(netdissect_options *ndo, const u_char *bp)
 	if ((const u_char *)mp + sizeof(*mp) > ep)
 		return;
 
-	ND_PRINT((ndo,"max resp delay: %d ", EXTRACT_16BITS(&mp->mld6_maxdelay)));
+	ND_PRINT((ndo,"max resp delay: %d ", EXTRACT_BE_16BITS(&mp->mld6_maxdelay)));
 	ND_PRINT((ndo,"addr: %s", ip6addr_string(ndo, &mp->mld6_addr)));
 }
 
@@ -1417,7 +1417,7 @@ mldv2_report_print(netdissect_options *ndo, const u_char *bp, u_int len)
     }
 
     ND_TCHECK(icp->icmp6_data16[1]);
-    ngroups = EXTRACT_16BITS(&icp->icmp6_data16[1]);
+    ngroups = EXTRACT_BE_16BITS(&icp->icmp6_data16[1]);
     ND_PRINT((ndo,", %d group record(s)", ngroups));
     if (ndo->ndo_vflag > 0) {
 	/* Print the group records */
@@ -1476,7 +1476,7 @@ mldv2_query_print(netdissect_options *ndo, const u_char *bp, u_int len)
 	return;
     }
     ND_TCHECK(icp->icmp6_data16[0]);
-    mrc = EXTRACT_16BITS(&icp->icmp6_data16[0]);
+    mrc = EXTRACT_BE_16BITS(&icp->icmp6_data16[0]);
     if (mrc < 32768) {
 	mrt = mrc;
     } else {
@@ -1505,7 +1505,7 @@ mldv2_query_print(netdissect_options *ndo, const u_char *bp, u_int len)
     }
 
     ND_TCHECK2(bp[26], 2);
-    nsrcs = EXTRACT_16BITS(&bp[26]);
+    nsrcs = EXTRACT_BE_16BITS(&bp[26]);
     if (nsrcs > 0) {
 	if (len < 28 + nsrcs * sizeof(struct in6_addr))
 	    ND_PRINT((ndo," [invalid number of sources]"));
@@ -1590,13 +1590,13 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 		ND_TCHECK2(*dp, sizeof(*ni6));
 		ni6 = (const struct icmp6_nodeinfo *)dp;
 		ND_PRINT((ndo," ("));	/*)*/
-		switch (EXTRACT_16BITS(&ni6->ni_qtype)) {
+		switch (EXTRACT_BE_16BITS(&ni6->ni_qtype)) {
 		case NI_QTYPE_NOOP:
 			ND_PRINT((ndo,"noop"));
 			break;
 		case NI_QTYPE_SUPTYPES:
 			ND_PRINT((ndo,"supported qtypes"));
-			i = EXTRACT_16BITS(&ni6->ni_flags);
+			i = EXTRACT_BE_16BITS(&ni6->ni_flags);
 			if (i)
 				ND_PRINT((ndo," [%s]", (i & 0x01) ? "C" : ""));
 			break;
@@ -1732,7 +1732,7 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 			break;
 		}
 
-		switch (EXTRACT_16BITS(&ni6->ni_qtype)) {
+		switch (EXTRACT_BE_16BITS(&ni6->ni_qtype)) {
 		case NI_QTYPE_NOOP:
 			if (needcomma)
 				ND_PRINT((ndo,", "));
@@ -1745,7 +1745,7 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 			if (needcomma)
 				ND_PRINT((ndo,", "));
 			ND_PRINT((ndo,"supported qtypes"));
-			i = EXTRACT_16BITS(&ni6->ni_flags);
+			i = EXTRACT_BE_16BITS(&ni6->ni_flags);
 			if (i)
 				ND_PRINT((ndo," [%s]", (i & 0x01) ? "C" : ""));
 			break;
@@ -1768,8 +1768,8 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 				ND_PRINT((ndo,"\""));
 			} else
 				dnsname_print(ndo, cp, ep);
-			if ((EXTRACT_16BITS(&ni6->ni_flags) & 0x01) != 0)
-				ND_PRINT((ndo," [TTL=%u]", EXTRACT_32BITS(ni6 + 1)));
+			if ((EXTRACT_BE_16BITS(&ni6->ni_flags) & 0x01) != 0)
+				ND_PRINT((ndo," [TTL=%u]", EXTRACT_BE_32BITS(ni6 + 1)));
 			break;
 		case NI_QTYPE_NODEADDR:
 			if (needcomma)
@@ -1781,7 +1781,7 @@ icmp6_nodeinfo_print(netdissect_options *ndo, u_int icmp6len, const u_char *bp, 
 					break;
 				ND_PRINT((ndo," %s", ip6addr_string(ndo, bp + i)));
 				i += sizeof(struct in6_addr);
-				ND_PRINT((ndo,"(%d)", (int32_t)EXTRACT_32BITS(bp + i)));
+				ND_PRINT((ndo,"(%d)", (int32_t) EXTRACT_BE_32BITS(bp + i)));
 				i += sizeof(int32_t);
 			}
 			i = ni6->ni_flags;
@@ -1844,7 +1844,7 @@ icmp6_rrenum_print(netdissect_options *ndo, const u_char *bp, const u_char *ep)
 		break;
 	}
 
-        ND_PRINT((ndo,", seq=%u", EXTRACT_32BITS(&rr6->rr_seqnum)));
+        ND_PRINT((ndo,", seq=%u", EXTRACT_BE_32BITS(&rr6->rr_seqnum)));
 
 	if (ndo->ndo_vflag) {
 #define F(x, y)	((rr6->rr_flags) & (x) ? (y) : "")
@@ -1857,9 +1857,9 @@ icmp6_rrenum_print(netdissect_options *ndo, const u_char *bp, const u_char *ep)
                                   F(ICMP6_RR_FLAGS_PREVDONE, "P")));
 		}
                 ND_PRINT((ndo,"seg=%u,", rr6->rr_segnum));
-                ND_PRINT((ndo,"maxdelay=%u", EXTRACT_16BITS(&rr6->rr_maxdelay)));
+                ND_PRINT((ndo,"maxdelay=%u", EXTRACT_BE_16BITS(&rr6->rr_maxdelay)));
 		if (rr6->rr_reserved)
-			ND_PRINT((ndo,"rsvd=0x%x", EXTRACT_32BITS(&rr6->rr_reserved)));
+			ND_PRINT((ndo,"rsvd=0x%x", EXTRACT_BE_32BITS(&rr6->rr_reserved)));
 		/*[*/
 		ND_PRINT((ndo,"]"));
 #undef F
@@ -1924,12 +1924,12 @@ icmp6_rrenum_print(netdissect_options *ndo, const u_char *bp, const u_char *ep)
 					ND_PRINT((ndo,"vltime=infty,"));
 				else
 					ND_PRINT((ndo,"vltime=%u,",
-                                                  EXTRACT_32BITS(&use->rpu_vltime)));
+                                                  EXTRACT_BE_32BITS(&use->rpu_vltime)));
 				if (~use->rpu_pltime == 0)
 					ND_PRINT((ndo,"pltime=infty,"));
 				else
 					ND_PRINT((ndo,"pltime=%u,",
-                                                  EXTRACT_32BITS(&use->rpu_pltime)));
+                                                  EXTRACT_BE_32BITS(&use->rpu_pltime)));
 			}
 			if (addrtostr6(&use->rpu_prefix, hbuf, sizeof(hbuf)))
 				ND_PRINT((ndo,"%s/%u/%u", hbuf, use->rpu_uselen,

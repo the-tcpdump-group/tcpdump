@@ -418,10 +418,10 @@ slow_marker_lacp_print(netdissect_options *ndo,
             ND_PRINT((ndo, "\n\t  System %s, System Priority %u, Key %u" \
                    ", Port %u, Port Priority %u\n\t  State Flags [%s]",
                    etheraddr_string(ndo, tlv_ptr.lacp_tlv_actor_partner_info->sys),
-                   EXTRACT_16BITS(tlv_ptr.lacp_tlv_actor_partner_info->sys_pri),
-                   EXTRACT_16BITS(tlv_ptr.lacp_tlv_actor_partner_info->key),
-                   EXTRACT_16BITS(tlv_ptr.lacp_tlv_actor_partner_info->port),
-                   EXTRACT_16BITS(tlv_ptr.lacp_tlv_actor_partner_info->port_pri),
+                   EXTRACT_BE_16BITS(tlv_ptr.lacp_tlv_actor_partner_info->sys_pri),
+                   EXTRACT_BE_16BITS(tlv_ptr.lacp_tlv_actor_partner_info->key),
+                   EXTRACT_BE_16BITS(tlv_ptr.lacp_tlv_actor_partner_info->port),
+                   EXTRACT_BE_16BITS(tlv_ptr.lacp_tlv_actor_partner_info->port_pri),
                    bittok2str(lacp_tlv_actor_partner_info_state_values,
                               "none",
                               tlv_ptr.lacp_tlv_actor_partner_info->state)));
@@ -439,7 +439,7 @@ slow_marker_lacp_print(netdissect_options *ndo,
             tlv_ptr.lacp_tlv_collector_info = (const struct lacp_tlv_collector_info_t *)tlv_tptr;
 
             ND_PRINT((ndo, "\n\t  Max Delay %u",
-                   EXTRACT_16BITS(tlv_ptr.lacp_tlv_collector_info->max_delay)));
+                   EXTRACT_BE_16BITS(tlv_ptr.lacp_tlv_collector_info->max_delay)));
 
             break;
 
@@ -455,8 +455,8 @@ slow_marker_lacp_print(netdissect_options *ndo,
 
             ND_PRINT((ndo, "\n\t  Request System %s, Request Port %u, Request Transaction ID 0x%08x",
                    etheraddr_string(ndo, tlv_ptr.marker_tlv_marker_info->req_sys),
-                   EXTRACT_16BITS(tlv_ptr.marker_tlv_marker_info->req_port),
-                   EXTRACT_32BITS(tlv_ptr.marker_tlv_marker_info->req_trans_id)));
+                   EXTRACT_BE_16BITS(tlv_ptr.marker_tlv_marker_info->req_port),
+                   EXTRACT_BE_32BITS(tlv_ptr.marker_tlv_marker_info->req_trans_id)));
 
             break;
 
@@ -526,7 +526,7 @@ slow_oam_print(netdissect_options *ndo,
            tok2str(slow_oam_code_values, "Unknown (%u)", ptr.slow_oam_common_header->code),
            bittok2str(slow_oam_flag_values,
                       "none",
-                      EXTRACT_16BITS(&ptr.slow_oam_common_header->flags))));
+                      EXTRACT_BE_16BITS(&ptr.slow_oam_common_header->flags))));
 
     switch (ptr.slow_oam_common_header->code) {
     case SLOW_OAM_CODE_INFO:
@@ -576,7 +576,7 @@ slow_oam_print(netdissect_options *ndo,
 
                 ND_PRINT((ndo, "\n\t    OAM-Version %u, Revision %u",
                        tlv.slow_oam_info->oam_version,
-                       EXTRACT_16BITS(&tlv.slow_oam_info->revision)));
+                       EXTRACT_BE_16BITS(&tlv.slow_oam_info->revision)));
 
                 ND_PRINT((ndo, "\n\t    State-Parser-Action %s, State-MUX-Action %s",
                        tok2str(slow_oam_info_type_state_parser_values, "Reserved",
@@ -586,13 +586,13 @@ slow_oam_print(netdissect_options *ndo,
                 ND_PRINT((ndo, "\n\t    OAM-Config Flags [%s], OAM-PDU-Config max-PDU size %u",
                        bittok2str(slow_oam_info_type_oam_config_values, "none",
                                   tlv.slow_oam_info->oam_config),
-                       EXTRACT_16BITS(&tlv.slow_oam_info->oam_pdu_config) &
+                       EXTRACT_BE_16BITS(&tlv.slow_oam_info->oam_pdu_config) &
                        OAM_INFO_TYPE_PDU_SIZE_MASK));
                 ND_PRINT((ndo, "\n\t    OUI %s (0x%06x), Vendor-Private 0x%08x",
                        tok2str(oui_values, "Unknown",
-                               EXTRACT_24BITS(&tlv.slow_oam_info->oui)),
-                       EXTRACT_24BITS(&tlv.slow_oam_info->oui),
-                       EXTRACT_32BITS(&tlv.slow_oam_info->vendor_private)));
+                               EXTRACT_BE_24BITS(&tlv.slow_oam_info->oui)),
+                       EXTRACT_BE_24BITS(&tlv.slow_oam_info->oui),
+                       EXTRACT_BE_32BITS(&tlv.slow_oam_info->vendor_private)));
                 break;
 
             case SLOW_OAM_INFO_TYPE_ORG_SPECIFIC:
@@ -621,7 +621,7 @@ slow_oam_print(netdissect_options *ndo,
         if (tlen < 2)
             goto tooshort;
         ND_TCHECK2(*tptr, 2);
-        ND_PRINT((ndo, "\n\t  Sequence Number %u", EXTRACT_16BITS(tptr)));
+        ND_PRINT((ndo, "\n\t  Sequence Number %u", EXTRACT_BE_16BITS(tptr)));
         tlen -= 2;
         tptr += 2;
 
@@ -677,12 +677,12 @@ slow_oam_print(netdissect_options *ndo,
                        "\n\t    Errors %" PRIu64
                        "\n\t    Error Running Total %" PRIu64
                        "\n\t    Event Running Total %u",
-                       EXTRACT_16BITS(&tlv.slow_oam_link_event->time_stamp)*100,
-                       EXTRACT_64BITS(&tlv.slow_oam_link_event->window),
-                       EXTRACT_64BITS(&tlv.slow_oam_link_event->threshold),
-                       EXTRACT_64BITS(&tlv.slow_oam_link_event->errors),
-                       EXTRACT_64BITS(&tlv.slow_oam_link_event->errors_running_total),
-                       EXTRACT_32BITS(&tlv.slow_oam_link_event->event_running_total)));
+                       EXTRACT_BE_16BITS(&tlv.slow_oam_link_event->time_stamp)*100,
+                       EXTRACT_BE_64BITS(&tlv.slow_oam_link_event->window),
+                       EXTRACT_BE_64BITS(&tlv.slow_oam_link_event->threshold),
+                       EXTRACT_BE_64BITS(&tlv.slow_oam_link_event->errors),
+                       EXTRACT_BE_64BITS(&tlv.slow_oam_link_event->errors_running_total),
+                       EXTRACT_BE_32BITS(&tlv.slow_oam_link_event->event_running_total)));
                 break;
 
             case SLOW_OAM_LINK_EVENT_ORG_SPECIFIC:

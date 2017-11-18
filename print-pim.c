@@ -148,11 +148,11 @@ pimv1_join_prune_print(netdissect_options *ndo,
 
 	/* If it's a single group and a single source, use 1-line output. */
 	if (ND_TTEST2(bp[0], 30) && bp[11] == 1 &&
-	    ((njoin = EXTRACT_16BITS(&bp[20])) + EXTRACT_16BITS(&bp[22])) == 1) {
+	    ((njoin = EXTRACT_BE_16BITS(&bp[20])) + EXTRACT_BE_16BITS(&bp[22])) == 1) {
 		int hold;
 
 		ND_PRINT((ndo, " RPF %s ", ipaddr_string(ndo, bp)));
-		hold = EXTRACT_16BITS(&bp[6]);
+		hold = EXTRACT_BE_16BITS(&bp[6]);
 		if (hold != 180) {
 			ND_PRINT((ndo, "Hold "));
 			unsigned_relts_print(ndo, hold);
@@ -160,7 +160,7 @@ pimv1_join_prune_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "%s (%s/%d, %s", njoin ? "Join" : "Prune",
 		ipaddr_string(ndo, &bp[26]), bp[25] & 0x3f,
 		ipaddr_string(ndo, &bp[12])));
-		if (EXTRACT_32BITS(&bp[16]) != 0xffffffff)
+		if (EXTRACT_BE_32BITS(&bp[16]) != 0xffffffff)
 			ND_PRINT((ndo, "/%s", ipaddr_string(ndo, &bp[16])));
 		ND_PRINT((ndo, ") %s%s %s",
 		    (bp[24] & 0x01) ? "Sparse" : "Dense",
@@ -183,7 +183,7 @@ pimv1_join_prune_print(netdissect_options *ndo,
 	if (ndo->ndo_vflag > 1)
 		ND_PRINT((ndo, "\n"));
 	ND_PRINT((ndo, " Hold time: "));
-	unsigned_relts_print(ndo, EXTRACT_16BITS(&bp[2]));
+	unsigned_relts_print(ndo, EXTRACT_BE_16BITS(&bp[2]));
 	if (ndo->ndo_vflag < 2)
 		return;
 	bp += 4;
@@ -209,15 +209,15 @@ pimv1_join_prune_print(netdissect_options *ndo,
 		if (len < 4)
 			goto trunc;
 		ND_TCHECK2(bp[0], sizeof(struct in_addr));
-		if (EXTRACT_32BITS(&bp[0]) != 0xffffffff)
+		if (EXTRACT_BE_32BITS(&bp[0]) != 0xffffffff)
 			ND_PRINT((ndo, "/%s", ipaddr_string(ndo, &bp[0])));
 		bp += 4;
 		len -= 4;
 		if (len < 4)
 			goto trunc;
 		ND_TCHECK2(bp[0], 4);
-		njoin = EXTRACT_16BITS(&bp[0]);
-		nprune = EXTRACT_16BITS(&bp[2]);
+		njoin = EXTRACT_BE_16BITS(&bp[0]);
+		nprune = EXTRACT_BE_16BITS(&bp[2]);
 		ND_PRINT((ndo, " joined: %d pruned: %d", njoin, nprune));
 		bp += 4;
 		len -= 4;
@@ -278,7 +278,7 @@ pimv1_print(netdissect_options *ndo,
 		if (ndo->ndo_vflag) {
 			ND_TCHECK2(bp[10],2);
 			ND_PRINT((ndo, " (Hold-time "));
-			unsigned_relts_print(ndo, EXTRACT_16BITS(&bp[10]));
+			unsigned_relts_print(ndo, EXTRACT_BE_16BITS(&bp[10]));
 			ND_PRINT((ndo, ")"));
 		}
 		break;
@@ -297,23 +297,23 @@ pimv1_print(netdissect_options *ndo,
 		if (ndo->ndo_vflag) {
 			ND_TCHECK2(bp[22], 2);
 			ND_PRINT((ndo, " group %s", ipaddr_string(ndo, &bp[8])));
-			if (EXTRACT_32BITS(&bp[12]) != 0xffffffff)
+			if (EXTRACT_BE_32BITS(&bp[12]) != 0xffffffff)
 				ND_PRINT((ndo, "/%s", ipaddr_string(ndo, &bp[12])));
 			ND_PRINT((ndo, " RP %s hold ", ipaddr_string(ndo, &bp[16])));
-			unsigned_relts_print(ndo, EXTRACT_16BITS(&bp[22]));
+			unsigned_relts_print(ndo, EXTRACT_BE_16BITS(&bp[22]));
 		}
 		break;
 	case PIMV1_TYPE_ASSERT:
 		ND_TCHECK2(bp[16], sizeof(struct in_addr));
 		ND_PRINT((ndo, " for %s > %s", ipaddr_string(ndo, &bp[16]),
 		    ipaddr_string(ndo, &bp[8])));
-		if (EXTRACT_32BITS(&bp[12]) != 0xffffffff)
+		if (EXTRACT_BE_32BITS(&bp[12]) != 0xffffffff)
 			ND_PRINT((ndo, "/%s", ipaddr_string(ndo, &bp[12])));
 		ND_TCHECK2(bp[24], 4);
 		ND_PRINT((ndo, " %s pref %d metric %d",
 		    (bp[20] & 0x80) ? "RP-tree" : "SPT",
-		EXTRACT_32BITS(&bp[20]) & 0x7fffffff,
-		EXTRACT_32BITS(&bp[24])));
+		EXTRACT_BE_32BITS(&bp[20]) & 0x7fffffff,
+		EXTRACT_BE_32BITS(&bp[24])));
 		break;
 	case PIMV1_TYPE_JOIN_PRUNE:
 	case PIMV1_TYPE_GRAFT:
@@ -371,9 +371,9 @@ cisco_autorp_print(netdissect_options *ndo,
 
 	ND_TCHECK2(bp[2], 2);
 	ND_PRINT((ndo, " Hold "));
-	hold = EXTRACT_16BITS(&bp[2]);
+	hold = EXTRACT_BE_16BITS(&bp[2]);
 	if (hold)
-		unsigned_relts_print(ndo, EXTRACT_16BITS(&bp[2]));
+		unsigned_relts_print(ndo, EXTRACT_BE_16BITS(&bp[2]));
 	else
 		ND_PRINT((ndo, "FOREVER"));
 
@@ -709,8 +709,8 @@ pimv2_print(netdissect_options *ndo,
 	if (len < 4)
 		goto trunc;
 	ND_TCHECK(pim->pim_cksum);
-	ND_PRINT((ndo, ", cksum 0x%04x ", EXTRACT_16BITS(&pim->pim_cksum)));
-	if (EXTRACT_16BITS(&pim->pim_cksum) == 0) {
+	ND_PRINT((ndo, ", cksum 0x%04x ", EXTRACT_BE_16BITS(&pim->pim_cksum)));
+	if (EXTRACT_BE_16BITS(&pim->pim_cksum) == 0) {
 		ND_PRINT((ndo, "(unverified)"));
 	} else {
 		if (PIM_TYPE(pim->pim_typever) == PIMV2_TYPE_REGISTER) {
@@ -760,8 +760,8 @@ pimv2_print(netdissect_options *ndo,
 			if (len < 4)
 				goto trunc;
 			ND_TCHECK2(bp[0], 4);
-			otype = EXTRACT_16BITS(&bp[0]);
-			olen = EXTRACT_16BITS(&bp[2]);
+			otype = EXTRACT_BE_16BITS(&bp[0]);
+			olen = EXTRACT_BE_16BITS(&bp[2]);
 			ND_PRINT((ndo, "\n\t  %s Option (%u), length %u, Value: ",
 			          tok2str(pimv2_hello_option_values, "Unknown", otype),
 			          otype,
@@ -777,7 +777,8 @@ pimv2_print(netdissect_options *ndo,
 				if (olen != 2) {
 					ND_PRINT((ndo, "ERROR: Option Length != 2 Bytes (%u)", olen));
 				} else {
-					unsigned_relts_print(ndo, EXTRACT_16BITS(bp));
+					unsigned_relts_print(ndo,
+							     EXTRACT_BE_16BITS(bp));
 				}
 				break;
 
@@ -787,8 +788,8 @@ pimv2_print(netdissect_options *ndo,
 				} else {
 					char t_bit;
 					uint16_t lan_delay, override_interval;
-					lan_delay = EXTRACT_16BITS(bp);
-					override_interval = EXTRACT_16BITS(bp+2);
+					lan_delay = EXTRACT_BE_16BITS(bp);
+					override_interval = EXTRACT_BE_16BITS(bp + 2);
 					t_bit = (lan_delay & 0x8000)? 1 : 0;
 					lan_delay &= ~0x8000;
 					ND_PRINT((ndo, "\n\t    T-bit=%d, LAN delay %dms, Override interval %dms",
@@ -803,7 +804,7 @@ pimv2_print(netdissect_options *ndo,
 					ND_PRINT((ndo, "Bi-Directional Capability (Old)"));
 					break;
 				case 4:
-					ND_PRINT((ndo, "%u", EXTRACT_32BITS(bp)));
+					ND_PRINT((ndo, "%u", EXTRACT_BE_32BITS(bp)));
 					break;
 				default:
 					ND_PRINT((ndo, "ERROR: Option Length != 4 Bytes (%u)", olen));
@@ -815,7 +816,7 @@ pimv2_print(netdissect_options *ndo,
 				if (olen != 4) {
 					ND_PRINT((ndo, "ERROR: Option Length != 4 Bytes (%u)", olen));
 				} else {
-					ND_PRINT((ndo, "0x%08x", EXTRACT_32BITS(bp)));
+					ND_PRINT((ndo, "0x%08x", EXTRACT_BE_32BITS(bp)));
 				}
 				break;
 
@@ -828,8 +829,8 @@ pimv2_print(netdissect_options *ndo,
 						ND_PRINT((ndo, ", interval "));
 						unsigned_relts_print(ndo, *(bp+1));
 					}
-					if (EXTRACT_16BITS(bp+2) != 0) {
-						ND_PRINT((ndo, " ?0x%04x?", EXTRACT_16BITS(bp+2)));
+					if (EXTRACT_BE_16BITS(bp + 2) != 0) {
+						ND_PRINT((ndo, " ?0x%04x?", EXTRACT_BE_16BITS(bp + 2)));
 					}
 				}
 				break;
@@ -877,7 +878,7 @@ pimv2_print(netdissect_options *ndo,
 		ND_PRINT((ndo, ", Flags [ %s ]\n\t",
 		          tok2str(pimv2_register_flag_values,
 		          "none",
-		          EXTRACT_32BITS(bp))));
+		          EXTRACT_BE_32BITS(bp))));
 
 		bp += 4; len -= 4;
 		/* encapsulated multicast packet */
@@ -976,7 +977,7 @@ pimv2_print(netdissect_options *ndo,
 			goto trunc;
 		ND_TCHECK2(*bp, 4);
 		ngroup = bp[1];
-		holdtime = EXTRACT_16BITS(&bp[2]);
+		holdtime = EXTRACT_BE_16BITS(&bp[2]);
 		ND_PRINT((ndo, "\n\t  %u group(s)", ngroup));
 		if (PIM_TYPE(pim->pim_typever) != 7) {	/*not for Graft-ACK*/
 			ND_PRINT((ndo, ", holdtime: "));
@@ -994,8 +995,8 @@ pimv2_print(netdissect_options *ndo,
 			if (len < 4)
 				goto trunc;
 			ND_TCHECK2(*bp, 4);
-			njoin = EXTRACT_16BITS(&bp[0]);
-			nprune = EXTRACT_16BITS(&bp[2]);
+			njoin = EXTRACT_BE_16BITS(&bp[0]);
+			nprune = EXTRACT_BE_16BITS(&bp[2]);
 			ND_PRINT((ndo, ", joined sources: %u, pruned sources: %u", njoin, nprune));
 			bp += 4; len -= 4;
 			for (j = 0; j < njoin; j++) {
@@ -1022,7 +1023,7 @@ pimv2_print(netdissect_options *ndo,
 		if (len < 2)
 			goto trunc;
 		ND_TCHECK_16BITS(bp);
-		ND_PRINT((ndo, " tag=%x", EXTRACT_16BITS(bp)));
+		ND_PRINT((ndo, " tag=%x", EXTRACT_BE_16BITS(bp)));
 		bp += 2;
 		len -= 2;
 		if (len < 1)
@@ -1080,7 +1081,8 @@ pimv2_print(netdissect_options *ndo,
 					goto trunc;
 				ND_TCHECK_16BITS(bp);
 				ND_PRINT((ndo, ",holdtime="));
-				unsigned_relts_print(ndo, EXTRACT_16BITS(bp));
+				unsigned_relts_print(ndo,
+						     EXTRACT_BE_16BITS(bp));
 				if (len < 3)
 					goto trunc;
 				ND_TCHECK(bp[2]);
@@ -1108,8 +1110,8 @@ pimv2_print(netdissect_options *ndo,
 		ND_TCHECK2(*bp, 8);
 		if (bp[0] & 0x80)
 			ND_PRINT((ndo, " RPT"));
-		ND_PRINT((ndo, " pref=%u", EXTRACT_32BITS(&bp[0]) & 0x7fffffff));
-		ND_PRINT((ndo, " metric=%u", EXTRACT_32BITS(&bp[4])));
+		ND_PRINT((ndo, " pref=%u", EXTRACT_BE_32BITS(&bp[0]) & 0x7fffffff));
+		ND_PRINT((ndo, " metric=%u", EXTRACT_BE_32BITS(&bp[4])));
 		break;
 
 	case PIMV2_TYPE_CANDIDATE_RP:
@@ -1130,7 +1132,7 @@ pimv2_print(netdissect_options *ndo,
 			goto trunc;
 		ND_TCHECK_16BITS(&bp[2]);
 		ND_PRINT((ndo, " holdtime="));
-		unsigned_relts_print(ndo, EXTRACT_16BITS(&bp[2]));
+		unsigned_relts_print(ndo, EXTRACT_BE_16BITS(&bp[2]));
 		bp += 4;
 		len -= 4;
 
@@ -1172,7 +1174,7 @@ pimv2_print(netdissect_options *ndo,
 			goto trunc;
 		ND_TCHECK_16BITS(bp);
 		ND_PRINT((ndo, " TUNR "));
-		unsigned_relts_print(ndo, EXTRACT_16BITS(bp));
+		unsigned_relts_print(ndo, EXTRACT_BE_16BITS(bp));
 		break;
 
 

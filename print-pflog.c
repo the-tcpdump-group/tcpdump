@@ -90,8 +90,8 @@ pflog_print(netdissect_options *ndo, const struct pfloghdr *hdr)
 {
 	uint32_t rulenr, subrulenr;
 
-	rulenr = EXTRACT_32BITS(&hdr->rulenr);
-	subrulenr = EXTRACT_32BITS(&hdr->subrulenr);
+	rulenr = EXTRACT_BE_32BITS(&hdr->rulenr);
+	subrulenr = EXTRACT_BE_32BITS(&hdr->subrulenr);
 	if (subrulenr == (uint32_t)-1)
 		ND_PRINT((ndo, "rule %u/", rulenr));
 	else
