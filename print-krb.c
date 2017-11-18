@@ -32,6 +32,23 @@
 #include "netdissect.h"
 #include "extract.h"
 
+/*
+ * Kerberos 4:
+ *
+ * Athena Technical Plan
+ * Section E.2.1
+ * Kerberos Authentication and Authorization System
+ * by S. P. Miller, B. C. Neuman, J. I. Schiller, and J. H. Saltzer
+ *
+ * http://web.mit.edu/Saltzer/www/publications/athenaplan/e.2.1.pdf
+ *
+ * 7. Appendix I Design Specifications
+ *
+ * Kerberos 5:
+ *
+ * RFC 1510, RFC 2630, etc.
+ */
+
 static const char tstr[] = " [|kerberos]";
 
 static const u_char *c_print(netdissect_options *, register const u_char *, register const u_char *);
