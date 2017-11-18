@@ -526,7 +526,7 @@ decnet_print(netdissect_options *ndo,
 
 	rhp = (const union routehdr *)&(ap[sizeof(short)]);
 	ND_TCHECK(rhp->rh_short.sh_flags);
-	mflags = EXTRACT_LE_8BITS(rhp->rh_short.sh_flags);
+	mflags = EXTRACT_8BITS(rhp->rh_short.sh_flags);
 
 	if (mflags & RMF_PAD) {
 	    /* pad bytes of some sort in front of message */
@@ -543,7 +543,7 @@ decnet_print(netdissect_options *ndo,
 	    caplen -= padlen;
 	    rhp = (const union routehdr *)&(ap[sizeof(short)]);
 	    ND_TCHECK(rhp->rh_short.sh_flags);
-	    mflags = EXTRACT_LE_8BITS(rhp->rh_short.sh_flags);
+	    mflags = EXTRACT_8BITS(rhp->rh_short.sh_flags);
 	}
 
 	if (mflags & RMF_FVER) {
@@ -570,7 +570,7 @@ decnet_print(netdissect_options *ndo,
 		EXTRACT_LE_16BITS(rhp->rh_long.lg_dst.dne_remote.dne_nodeaddr);
 	    src =
 		EXTRACT_LE_16BITS(rhp->rh_long.lg_src.dne_remote.dne_nodeaddr);
-	    hops = EXTRACT_LE_8BITS(rhp->rh_long.lg_visits);
+	    hops = EXTRACT_8BITS(rhp->rh_long.lg_visits);
 	    nspp = &(ap[sizeof(short) + sizeof(struct longhdr)]);
 	    nsplen = length - sizeof(struct longhdr);
 	    break;
@@ -578,7 +578,7 @@ decnet_print(netdissect_options *ndo,
 	    ND_TCHECK(rhp->rh_short);
 	    dst = EXTRACT_LE_16BITS(rhp->rh_short.sh_dst);
 	    src = EXTRACT_LE_16BITS(rhp->rh_short.sh_src);
-	    hops = (EXTRACT_LE_8BITS(rhp->rh_short.sh_visits) & VIS_MASK)+1;
+	    hops = (EXTRACT_8BITS(rhp->rh_short.sh_visits) & VIS_MASK)+1;
 	    nspp = &(ap[sizeof(short) + sizeof(struct shorthdr)]);
 	    nsplen = length - sizeof(struct shorthdr);
 	    break;
@@ -615,7 +615,7 @@ print_decnet_ctlmsg(netdissect_options *ndo,
                     u_int caplen)
 {
 	/* Our caller has already checked for mflags */
-	int mflags = EXTRACT_LE_8BITS(rhp->rh_short.sh_flags);
+	int mflags = EXTRACT_8BITS(rhp->rh_short.sh_flags);
 	register const union controlmsg *cmp = (const union controlmsg *)rhp;
 	int src, dst, info, blksize, eco, ueco, hello, other, vers;
 	etheraddr srcea, rtea;
@@ -630,11 +630,11 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 		goto trunc;
 	    ND_TCHECK(cmp->cm_init);
 	    src = EXTRACT_LE_16BITS(cmp->cm_init.in_src);
-	    info = EXTRACT_LE_8BITS(cmp->cm_init.in_info);
+	    info = EXTRACT_8BITS(cmp->cm_init.in_info);
 	    blksize = EXTRACT_LE_16BITS(cmp->cm_init.in_blksize);
-	    vers = EXTRACT_LE_8BITS(cmp->cm_init.in_vers);
-	    eco = EXTRACT_LE_8BITS(cmp->cm_init.in_eco);
-	    ueco = EXTRACT_LE_8BITS(cmp->cm_init.in_ueco);
+	    vers = EXTRACT_8BITS(cmp->cm_init.in_vers);
+	    eco = EXTRACT_8BITS(cmp->cm_init.in_eco);
+	    ueco = EXTRACT_8BITS(cmp->cm_init.in_ueco);
 	    hello = EXTRACT_LE_16BITS(cmp->cm_init.in_hello);
 	    print_t_info(ndo, info);
 	    ND_PRINT((ndo,
@@ -649,7 +649,7 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 		goto trunc;
 	    ND_TCHECK(cmp->cm_ver);
 	    src = EXTRACT_LE_16BITS(cmp->cm_ver.ve_src);
-	    other = EXTRACT_LE_8BITS(cmp->cm_ver.ve_fcnval);
+	    other = EXTRACT_8BITS(cmp->cm_ver.ve_fcnval);
 	    ND_PRINT((ndo, "src %s fcnval %o", dnaddr_string(ndo, src), other));
 	    ret = 1;
 	    break;
@@ -659,7 +659,7 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 		goto trunc;
 	    ND_TCHECK(cmp->cm_test);
 	    src = EXTRACT_LE_16BITS(cmp->cm_test.te_src);
-	    other = EXTRACT_LE_8BITS(cmp->cm_test.te_data);
+	    other = EXTRACT_8BITS(cmp->cm_test.te_data);
 	    ND_PRINT((ndo, "src %s data %o", dnaddr_string(ndo, src), other));
 	    ret = 1;
 	    break;
@@ -688,15 +688,15 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 	    if (length < sizeof(struct rhellomsg))
 		goto trunc;
 	    ND_TCHECK(cmp->cm_rhello);
-	    vers = EXTRACT_LE_8BITS(cmp->cm_rhello.rh_vers);
-	    eco = EXTRACT_LE_8BITS(cmp->cm_rhello.rh_eco);
-	    ueco = EXTRACT_LE_8BITS(cmp->cm_rhello.rh_ueco);
+	    vers = EXTRACT_8BITS(cmp->cm_rhello.rh_vers);
+	    eco = EXTRACT_8BITS(cmp->cm_rhello.rh_eco);
+	    ueco = EXTRACT_8BITS(cmp->cm_rhello.rh_ueco);
 	    memcpy((char *)&srcea, (const char *)&(cmp->cm_rhello.rh_src),
 		sizeof(srcea));
 	    src = EXTRACT_LE_16BITS(srcea.dne_remote.dne_nodeaddr);
-	    info = EXTRACT_LE_8BITS(cmp->cm_rhello.rh_info);
+	    info = EXTRACT_8BITS(cmp->cm_rhello.rh_info);
 	    blksize = EXTRACT_LE_16BITS(cmp->cm_rhello.rh_blksize);
-	    priority = EXTRACT_LE_8BITS(cmp->cm_rhello.rh_priority);
+	    priority = EXTRACT_8BITS(cmp->cm_rhello.rh_priority);
 	    hello = EXTRACT_LE_16BITS(cmp->cm_rhello.rh_hello);
 	    print_i_info(ndo, info);
 	    ND_PRINT((ndo,
@@ -711,20 +711,20 @@ print_decnet_ctlmsg(netdissect_options *ndo,
 	    if (length < sizeof(struct ehellomsg))
 		goto trunc;
 	    ND_TCHECK(cmp->cm_ehello);
-	    vers = EXTRACT_LE_8BITS(cmp->cm_ehello.eh_vers);
-	    eco = EXTRACT_LE_8BITS(cmp->cm_ehello.eh_eco);
-	    ueco = EXTRACT_LE_8BITS(cmp->cm_ehello.eh_ueco);
+	    vers = EXTRACT_8BITS(cmp->cm_ehello.eh_vers);
+	    eco = EXTRACT_8BITS(cmp->cm_ehello.eh_eco);
+	    ueco = EXTRACT_8BITS(cmp->cm_ehello.eh_ueco);
 	    memcpy((char *)&srcea, (const char *)&(cmp->cm_ehello.eh_src),
 		sizeof(srcea));
 	    src = EXTRACT_LE_16BITS(srcea.dne_remote.dne_nodeaddr);
-	    info = EXTRACT_LE_8BITS(cmp->cm_ehello.eh_info);
+	    info = EXTRACT_8BITS(cmp->cm_ehello.eh_info);
 	    blksize = EXTRACT_LE_16BITS(cmp->cm_ehello.eh_blksize);
 	    /*seed*/
 	    memcpy((char *)&rtea, (const char *)&(cmp->cm_ehello.eh_router),
 		sizeof(rtea));
 	    dst = EXTRACT_LE_16BITS(rtea.dne_remote.dne_nodeaddr);
 	    hello = EXTRACT_LE_16BITS(cmp->cm_ehello.eh_hello);
-	    other = EXTRACT_LE_8BITS(cmp->cm_ehello.eh_data);
+	    other = EXTRACT_8BITS(cmp->cm_ehello.eh_data);
 	    print_i_info(ndo, info);
 	    ND_PRINT((ndo,
 	"vers %d eco %d ueco %d src %s blksize %d rtr %s hello %d data %o",
@@ -860,7 +860,7 @@ print_nsp(netdissect_options *ndo,
 	if (nsplen < sizeof(struct nsphdr))
 		goto trunc;
 	ND_TCHECK(*nsphp);
-	flags = EXTRACT_LE_8BITS(nsphp->nh_flags);
+	flags = EXTRACT_8BITS(nsphp->nh_flags);
 	dst = EXTRACT_LE_16BITS(nsphp->nh_dst);
 	src = EXTRACT_LE_16BITS(nsphp->nh_src);
 
@@ -973,8 +973,8 @@ print_nsp(netdissect_options *ndo,
 		    }
 		    ND_PRINT((ndo, "seg %d ", ack & SGQ_MASK));
 		    ND_TCHECK(*lsmp);
-		    lsflags = EXTRACT_LE_8BITS(lsmp->ls_lsflags);
-		    fcval = EXTRACT_LE_8BITS(lsmp->ls_fcval);
+		    lsflags = EXTRACT_8BITS(lsmp->ls_lsflags);
+		    fcval = EXTRACT_8BITS(lsmp->ls_fcval);
 		    switch (lsflags & LSI_MASK) {
 		    case LSI_DATA:
 			ND_PRINT((ndo, "dat seg count %d ", fcval));
@@ -1083,8 +1083,8 @@ print_nsp(netdissect_options *ndo,
 		    if (nsplen < sizeof(struct cimsg))
 			goto trunc;
 		    ND_TCHECK(*cimp);
-		    services = EXTRACT_LE_8BITS(cimp->ci_services);
-		    info = EXTRACT_LE_8BITS(cimp->ci_info);
+		    services = EXTRACT_8BITS(cimp->ci_services);
+		    info = EXTRACT_8BITS(cimp->ci_info);
 		    segsize = EXTRACT_LE_16BITS(cimp->ci_segsize);
 
 		    switch (services & COS_MASK) {
@@ -1124,10 +1124,10 @@ print_nsp(netdissect_options *ndo,
 		    if (nsplen < sizeof(struct ccmsg))
 			goto trunc;
 		    ND_TCHECK(*ccmp);
-		    services = EXTRACT_LE_8BITS(ccmp->cc_services);
-		    info = EXTRACT_LE_8BITS(ccmp->cc_info);
+		    services = EXTRACT_8BITS(ccmp->cc_services);
+		    info = EXTRACT_8BITS(ccmp->cc_info);
 		    segsize = EXTRACT_LE_16BITS(ccmp->cc_segsize);
-		    optlen = EXTRACT_LE_8BITS(ccmp->cc_optlen);
+		    optlen = EXTRACT_8BITS(ccmp->cc_optlen);
 
 		    switch (services & COS_MASK) {
 		    case COS_NONE:
@@ -1170,7 +1170,7 @@ print_nsp(netdissect_options *ndo,
 			goto trunc;
 		    ND_TCHECK(*dimp);
 		    reason = EXTRACT_LE_16BITS(dimp->di_reason);
-		    optlen = EXTRACT_LE_8BITS(dimp->di_optlen);
+		    optlen = EXTRACT_8BITS(dimp->di_optlen);
 
 		    print_reason(ndo, reason);
 		    if (optlen) {

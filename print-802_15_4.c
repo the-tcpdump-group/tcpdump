@@ -78,7 +78,7 @@ ieee802_15_4_if_print(netdissect_options *ndo,
 	hdrlen = 3;
 
 	fc = EXTRACT_LE_16BITS(p);
-	seq = EXTRACT_LE_8BITS(p + 2);
+	seq = EXTRACT_8BITS(p + 2);
 
 	p += 3;
 	caplen -= 3;
