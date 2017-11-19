@@ -840,7 +840,7 @@ rfc1048_print(netdissect_options *ndo,
 					break;
 				}
 				if (*bp)
-					ND_PRINT((ndo, "[%s] ", client_fqdn_flags(*bp)));
+					ND_PRINT((ndo, "[%s] ", client_fqdn_flags(EXTRACT_8BITS(bp))));
 				bp++;
 				if (*bp || *(bp+1))
 					ND_PRINT((ndo, "%u/%u ", *bp, *(bp+1)));
