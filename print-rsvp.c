@@ -1074,7 +1074,7 @@ rsvp_obj_print(netdissect_options *ndo,
                            indent,
                            tok2str(rsvp_obj_xro_values,
                                    "Unknown %u",
-                                   RSVP_OBJ_XRO_MASK_SUBOBJ(*obj_tptr)),
+                                   RSVP_OBJ_XRO_MASK_SUBOBJ(EXTRACT_8BITS(obj_tptr))),
                            length));
 
                     if (length == 0) { /* prevent infinite loops */
@@ -1082,7 +1082,7 @@ rsvp_obj_print(netdissect_options *ndo,
                         break;
                     }
 
-                    switch(RSVP_OBJ_XRO_MASK_SUBOBJ(*obj_tptr)) {
+                    switch(RSVP_OBJ_XRO_MASK_SUBOBJ(EXTRACT_8BITS(obj_tptr))) {
 		    u_char prefix_length;
 
                     case RSVP_OBJ_XRO_IPV4:
