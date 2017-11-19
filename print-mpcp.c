@@ -164,7 +164,7 @@ mpcp_print(netdissect_options *ndo, register const u_char *pptr, register u_int 
                grant_numbers,
                bittok2str(mpcp_grant_flag_values,
                           "?",
-                          *tptr &~ MPCP_GRANT_NUMBER_MASK)));
+                          EXTRACT_8BITS(tptr) & ~MPCP_GRANT_NUMBER_MASK)));
         tptr++;
 
         for (grant = 1; grant <= grant_numbers; grant++) {
