@@ -23,6 +23,23 @@
 
 /* \summary: Realtek Remote Control Protocol (RRCP) printer */
 
+/*
+ * See, for example, section 8.20 "Realtek Remote Control Protocol" of
+ *
+ *    http://realtek.info/pdf/rtl8324.pdf
+ *
+ * and section 7.22 "Realtek Remote Control Protocol" of
+ *
+ *    http://realtek.info/pdf/rtl8326.pdf
+ *
+ * and this page on the OpenRRCP Wiki:
+ *
+ *    http://openrrcp.org.ru/wiki/rrcp_protocol
+ *
+ * NOTE: none of them indicate the byte order of multi-byte fields in any
+ * obvious fashion.
+ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
