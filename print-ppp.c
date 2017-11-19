@@ -822,7 +822,7 @@ handle_mlppp(netdissect_options *ndo,
 
     ND_PRINT((ndo, "seq 0x%03x, Flags [%s], length %u",
            (EXTRACT_BE_16BITS(p))&0x0fff, /* only support 12-Bit sequence space for now */
-           bittok2str(ppp_ml_flag_values, "none", *p & 0xc0),
+           bittok2str(ppp_ml_flag_values, "none", EXTRACT_8BITS(p) & 0xc0),
            length));
 }
 
