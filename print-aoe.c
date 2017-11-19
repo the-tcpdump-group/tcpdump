@@ -227,7 +227,7 @@ aoev1_query_print(netdissect_options *ndo,
 	/* AoE/CCmd */
 	ND_TCHECK2(*cp, 1);
 	ND_PRINT((ndo, ", AoE: %u, CCmd: %s", (*cp & 0xF0) >> 4,
-	          tok2str(aoev1_ccmd_str, "Unknown (0x02x)", *cp & 0x0F)));
+	          tok2str(aoev1_ccmd_str, "Unknown (0x02x)", EXTRACT_8BITS(cp) & 0x0F)));
 	cp += 1;
 	/* Config String Length */
 	ND_TCHECK2(*cp, 2);

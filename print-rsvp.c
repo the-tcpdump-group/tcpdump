@@ -1118,7 +1118,7 @@ rsvp_obj_print(netdissect_options *ndo,
                                *(obj_tptr+2),
                                tok2str(rsvp_ctype_values,
                                        "Unknown",
-                                       *(obj_tptr+3) + 256*RSVP_OBJ_RRO),
+                                       EXTRACT_8BITS((obj_tptr + 3)) + (256 * RSVP_OBJ_RRO)),
                                *(obj_tptr+3),
                                EXTRACT_BE_32BITS(obj_tptr + 4)));
                     }

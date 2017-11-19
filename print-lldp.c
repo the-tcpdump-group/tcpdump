@@ -1031,7 +1031,7 @@ lldp_private_tia_print(netdissect_options *ndo,
             ND_PRINT((ndo, "\n\t    Longitude resolution %u, longitude value %" PRIu64,
                    (*(tptr + 10) >> 2), lldp_extract_latlon(tptr + 10)));
             ND_PRINT((ndo, "\n\t    Altitude type %s (%u)",
-                   tok2str(lldp_tia_location_altitude_type_values, "unknown",(*(tptr+15)>>4)),
+                   tok2str(lldp_tia_location_altitude_type_values, "unknown",EXTRACT_8BITS((tptr + 15)) >> 4),
                    (*(tptr + 15) >> 4)));
             ND_PRINT((ndo, "\n\t    Altitude resolution %u, altitude value 0x%x",
                    (EXTRACT_BE_16BITS(tptr + 15)>>6)&0x3f,
@@ -1110,9 +1110,9 @@ lldp_private_tia_print(netdissect_options *ndo,
         ND_PRINT((ndo, "\n\t    Power type [%s]",
                (*(tptr + 4) & 0xC0 >> 6) ? "PD device" : "PSE device"));
         ND_PRINT((ndo, ", Power source [%s]",
-               tok2str(lldp_tia_power_source_values, "none", (*(tptr + 4) & 0x30) >> 4)));
+               tok2str(lldp_tia_power_source_values, "none", (EXTRACT_8BITS((tptr + 4)) & 0x30) >> 4)));
         ND_PRINT((ndo, "\n\t    Power priority [%s] (0x%02x)",
-               tok2str(lldp_tia_power_priority_values, "none", *(tptr+4)&0x0f),
+               tok2str(lldp_tia_power_priority_values, "none", EXTRACT_8BITS((tptr + 4)) & 0x0f),
                *(tptr + 4) & 0x0f));
         power_val = EXTRACT_BE_16BITS(tptr + 5);
         if (power_val < LLDP_TIA_POWER_VAL_MAX) {

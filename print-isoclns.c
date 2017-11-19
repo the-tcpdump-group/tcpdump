@@ -981,7 +981,7 @@ clnp_print(netdissect_options *ndo,
                             return (0);
                     }
                     ND_PRINT((ndo, "\n\t    Format Code: %s",
-                           tok2str(clnp_option_scope_values, "Reserved", *tptr&CLNP_OPTION_SCOPE_MASK)));
+                           tok2str(clnp_option_scope_values, "Reserved", EXTRACT_8BITS(tptr) & CLNP_OPTION_SCOPE_MASK)));
 
                     if ((*tptr&CLNP_OPTION_SCOPE_MASK) == CLNP_OPTION_SCOPE_GLOBAL)
                             ND_PRINT((ndo, "\n\t    QoS Flags [%s]",
@@ -996,7 +996,7 @@ clnp_print(netdissect_options *ndo,
                             return (0);
                     }
                     ND_PRINT((ndo, "\n\t    Format Code: %s, Security-Level %u",
-                           tok2str(clnp_option_scope_values,"Reserved",*tptr&CLNP_OPTION_SCOPE_MASK),
+                           tok2str(clnp_option_scope_values,"Reserved",EXTRACT_8BITS(tptr) & CLNP_OPTION_SCOPE_MASK),
                            *(tptr+1)));
                     break;
 
