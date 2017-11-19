@@ -1382,7 +1382,7 @@ of10_match_print(netdissect_options *ndo,
 	/* dl_vlan_pcp */
 	ND_TCHECK2(*cp, 1);
 	if (! (wildcards & OFPFW_DL_VLAN_PCP))
-		ND_PRINT((ndo, "%smatch dl_vlan_pcp %s", pfx, pcp_str(*cp)));
+		ND_PRINT((ndo, "%smatch dl_vlan_pcp %s", pfx, pcp_str(EXTRACT_8BITS(cp))));
 	cp += 1;
 	/* pad1 */
 	ND_TCHECK2(*cp, 1);
@@ -1534,7 +1534,7 @@ of10_actions_print(netdissect_options *ndo,
 		case OFPAT_SET_VLAN_PCP:
 			/* vlan_pcp */
 			ND_TCHECK2(*cp, 1);
-			ND_PRINT((ndo, ", vlan_pcp %s", pcp_str(*cp)));
+			ND_PRINT((ndo, ", vlan_pcp %s", pcp_str(EXTRACT_8BITS(cp))));
 			cp += 1;
 			/* pad */
 			ND_TCHECK2(*cp, 3);
