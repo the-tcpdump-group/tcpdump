@@ -240,7 +240,7 @@ eap_print(netdissect_options *ndo,
                     ND_PRINT((ndo, " TTLSv%u",
                            EAP_TTLS_VERSION(*(tptr + 5))));
                 ND_PRINT((ndo, " flags [%s] 0x%02x,",
-                       bittok2str(eap_tls_flags_values, "none", *(tptr+5)),
+                       bittok2str(eap_tls_flags_values, "none", EXTRACT_8BITS((tptr + 5))),
                        *(tptr + 5)));
 
                 if (EAP_TLS_EXTRACT_BIT_L(*(tptr+5))) {
@@ -254,7 +254,7 @@ eap_print(netdissect_options *ndo,
                 ND_PRINT((ndo, " FASTv%u",
                        EAP_TTLS_VERSION(*(tptr + 5))));
                 ND_PRINT((ndo, " flags [%s] 0x%02x,",
-                       bittok2str(eap_tls_flags_values, "none", *(tptr+5)),
+                       bittok2str(eap_tls_flags_values, "none", EXTRACT_8BITS((tptr + 5))),
                        *(tptr + 5)));
 
                 if (EAP_TLS_EXTRACT_BIT_L(*(tptr+5))) {

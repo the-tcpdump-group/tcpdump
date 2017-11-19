@@ -1896,8 +1896,8 @@ isis_print_is_reach_subtlv(netdissect_options *ndo,
         case ISIS_SUBTLV_EXT_IS_REACH_LINK_PROTECTION_TYPE:
             if (subl >= 2) {
               ND_PRINT((ndo, ", %s, Priority %u",
-		   bittok2str(gmpls_link_prot_values, "none", *tptr),
-                   *(tptr+1)));
+		   bittok2str(gmpls_link_prot_values, "none", EXTRACT_8BITS(tptr)),
+		   *(tptr+1)));
             }
             break;
         case ISIS_SUBTLV_SPB_METRIC:
@@ -2997,7 +2997,7 @@ isis_print(netdissect_options *ndo,
                 break;
             ND_TCHECK2(*tptr, ISIS_TLV_RESTART_SIGNALING_FLAGLEN);
             ND_PRINT((ndo, "\n\t      Flags [%s]",
-                   bittok2str(isis_restart_flag_values, "none", *tptr)));
+                   bittok2str(isis_restart_flag_values, "none", EXTRACT_8BITS(tptr))));
             tptr+=ISIS_TLV_RESTART_SIGNALING_FLAGLEN;
             tmp-=ISIS_TLV_RESTART_SIGNALING_FLAGLEN;
 

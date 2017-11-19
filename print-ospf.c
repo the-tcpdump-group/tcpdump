@@ -414,7 +414,7 @@ ospf_print_te_lsa(netdissect_options *ndo,
 			goto invalid;
 		    }
                     ND_PRINT((ndo, ", %s",
-                             bittok2str(gmpls_link_prot_values, "none", *tptr)));
+                             bittok2str(gmpls_link_prot_values, "none", EXTRACT_8BITS(tptr))));
                     break;
                 case LS_OPAQUE_TE_LINK_SUBTLV_INTF_SW_CAP_DESCR:
 		    if (subtlv_length < 36) {

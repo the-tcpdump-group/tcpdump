@@ -112,7 +112,7 @@ udld_print (netdissect_options *ndo, const u_char *pptr, u_int length)
            UDLD_EXTRACT_VERSION(*tptr),
            tok2str(udld_code_values, "Reserved", code),
            code,
-           bittok2str(udld_flags_values, "none", *(tptr+1)),
+           bittok2str(udld_flags_values, "none", EXTRACT_8BITS((tptr + 1))),
            *(tptr+1),
            length));
 

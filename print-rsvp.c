@@ -1103,7 +1103,7 @@ rsvp_obj_print(netdissect_options *ndo,
                                *(obj_tptr+6),
                                bittok2str(rsvp_obj_rro_flag_values,
                                    "none",
-                                   *(obj_tptr + 7)))); /* rfc3209 says that this field is rsvd. */
+                                   EXTRACT_8BITS((obj_tptr + 7))))); /* rfc3209 says that this field is rsvd. */
                     break;
                     case RSVP_OBJ_XRO_LABEL:
 			if (length != 8) {
@@ -1114,7 +1114,7 @@ rsvp_obj_print(netdissect_options *ndo,
                         ND_PRINT((ndo, ", Flags: [%s] (%#x), Class-Type: %s (%u), %u",
                                bittok2str(rsvp_obj_rro_label_flag_values,
                                    "none",
-                                   *(obj_tptr+2)),
+                                   EXTRACT_8BITS((obj_tptr + 2))),
                                *(obj_tptr+2),
                                tok2str(rsvp_ctype_values,
                                        "Unknown",
@@ -1183,7 +1183,7 @@ rsvp_obj_print(netdissect_options *ndo,
                        (int)*(obj_tptr+1),
                        bittok2str(rsvp_session_attribute_flag_values,
                                   "none",
-                                  *(obj_tptr+2)),
+                                  EXTRACT_8BITS((obj_tptr + 2))),
                        *(obj_tptr + 2)));
                 obj_tlen-=4+*(obj_tptr+3);
                 obj_tptr+=4+*(obj_tptr+3);

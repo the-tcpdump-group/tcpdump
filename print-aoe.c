@@ -149,7 +149,7 @@ aoev1_issue_print(netdissect_options *ndo,
 		goto invalid;
 	/* AFlags */
 	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, "\n\tAFlags: [%s]", bittok2str(aoev1_aflag_str, "none", *cp)));
+	ND_PRINT((ndo, "\n\tAFlags: [%s]", bittok2str(aoev1_aflag_str, "none", EXTRACT_8BITS(cp))));
 	cp += 1;
 	/* Err/Feature */
 	ND_TCHECK2(*cp, 1);

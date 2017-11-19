@@ -676,8 +676,8 @@ lldp_private_8021_print(netdissect_options *ndo,
         }
         ND_PRINT((ndo, "\n\t    port and protocol vlan id (PPVID): %u, flags [%s] (0x%02x)",
                EXTRACT_BE_16BITS(tptr + 5),
-               bittok2str(lldp_8021_port_protocol_id_values, "none", *(tptr+4)),
-	       *(tptr + 4)));
+               bittok2str(lldp_8021_port_protocol_id_values, "none", EXTRACT_8BITS((tptr + 4))),
+               *(tptr + 4)));
         break;
     case LLDP_PRIVATE_8021_SUBTYPE_VLAN_NAME:
         if (tlv_len < 6) {
@@ -868,7 +868,7 @@ lldp_private_8023_print(netdissect_options *ndo,
             return hexdump;
         }
         ND_PRINT((ndo, "\n\t    autonegotiation [%s] (0x%02x)",
-               bittok2str(lldp_8023_autonegotiation_values, "none", *(tptr+4)),
+               bittok2str(lldp_8023_autonegotiation_values, "none", EXTRACT_8BITS((tptr + 4))),
                *(tptr + 4)));
         ND_PRINT((ndo, "\n\t    PMD autoneg capability [%s] (0x%04x)",
                bittok2str(lldp_pmd_capability_values,"unknown", EXTRACT_BE_16BITS(tptr + 5)),
@@ -883,7 +883,7 @@ lldp_private_8023_print(netdissect_options *ndo,
             return hexdump;
         }
         ND_PRINT((ndo, "\n\t    MDI power support [%s], power pair %s, power class %s",
-               bittok2str(lldp_mdi_values, "none", *(tptr+4)),
+               bittok2str(lldp_mdi_values, "none", EXTRACT_8BITS((tptr + 4))),
                tok2str(lldp_mdi_power_pairs_values, "unknown", *(tptr+5)),
                tok2str(lldp_mdi_power_class_values, "unknown", *(tptr + 6))));
         break;
@@ -893,7 +893,7 @@ lldp_private_8023_print(netdissect_options *ndo,
             return hexdump;
         }
         ND_PRINT((ndo, "\n\t    aggregation status [%s], aggregation port ID %u",
-               bittok2str(lldp_aggregation_values, "none", *(tptr+4)),
+               bittok2str(lldp_aggregation_values, "none", EXTRACT_8BITS((tptr + 4))),
                EXTRACT_BE_32BITS(tptr + 5)));
         break;
 
@@ -1003,7 +1003,7 @@ lldp_private_tia_print(netdissect_options *ndo,
                tok2str(lldp_tia_application_type_values, "none", *(tptr+4)),
                *(tptr + 4)));
         ND_PRINT((ndo, ", Flags [%s]", bittok2str(
-                   lldp_tia_network_policy_bits_values, "none", *(tptr + 5))));
+                   lldp_tia_network_policy_bits_values, "none", EXTRACT_8BITS((tptr + 5)))));
         ND_PRINT((ndo, "\n\t    Vlan id %u",
                LLDP_EXTRACT_NETWORK_POLICY_VLAN(EXTRACT_BE_16BITS(tptr + 5))));
         ND_PRINT((ndo, ", L2 priority %u",
