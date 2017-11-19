@@ -770,7 +770,7 @@ clnp_print(netdissect_options *ndo,
         u_int li,tlen,nsap_offset,source_address_length,dest_address_length, clnp_pdu_type, clnp_flags;
 	const struct clnp_header_t *clnp_header;
 	const struct clnp_segment_header_t *clnp_segment_header;
-        uint8_t rfd_error_major,rfd_error_minor;
+        uint8_t rfd_error,rfd_error_major,rfd_error_minor;
 
 	clnp_header = (const struct clnp_header_t *) pptr;
         ND_TCHECK(*clnp_header);
@@ -1005,8 +1005,9 @@ clnp_print(netdissect_options *ndo,
                         ND_PRINT((ndo, ", bad opt len"));
                         return (0);
                 }
-                rfd_error_major = (*tptr&0xf0) >> 4;
-                rfd_error_minor = *tptr&0x0f;
+                rfd_error = EXTRACT_8BITS(tptr);
+                rfd_error_major = (rfd_error&0xf0) >> 4;
+                rfd_error_minor = rfd_error&0x0f;
                 ND_PRINT((ndo, "\n\t    Class: %s Error (0x%01x), %s (0x%01x)",
                        tok2str(clnp_option_rfd_class_values,"Unknown",rfd_error_major),
                        rfd_error_major,
