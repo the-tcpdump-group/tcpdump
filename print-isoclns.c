@@ -2653,7 +2653,8 @@ isis_print(netdissect_options *ndo,
             ND_PRINT((ndo, "\n\t      %s",
                    tok2str(isis_is_reach_virtual_values,
                            "bogus virtual flag 0x%02x",
-                           EXTRACT_8BITS(tptr++))));
+                           EXTRACT_8BITS(tptr))));
+	    tptr++;
 	    tlv_is_reach = (const struct isis_tlv_is_reach *)tptr;
             while (tmp >= sizeof(struct isis_tlv_is_reach)) {
 		ND_TCHECK(*tlv_is_reach);
@@ -2902,7 +2903,8 @@ isis_print(netdissect_options *ndo,
 	    if (tmp < 1)
 	        break;
 	    ND_TCHECK2(*tptr, 1);
-	    ND_PRINT((ndo, ", Flags: [%s]", ISIS_MASK_TLV_SHARED_RISK_GROUP(EXTRACT_8BITS(tptr++)) ? "numbered" : "unnumbered"));
+	    ND_PRINT((ndo, ", Flags: [%s]", ISIS_MASK_TLV_SHARED_RISK_GROUP(EXTRACT_8BITS(tptr)) ? "numbered" : "unnumbered"));
+	    tptr++;
 	    tmp--;
 
 	    if (tmp < sizeof(struct in_addr))

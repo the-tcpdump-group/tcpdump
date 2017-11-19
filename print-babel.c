@@ -298,7 +298,8 @@ subtlvs_print(netdissect_options *ndo,
             }
             sep = " ";
             while(sublen--) {
-                ND_PRINT((ndo, "%s%s", sep, tok2str(diversity_str, "%u", EXTRACT_8BITS(cp++))));
+                ND_PRINT((ndo, "%s%s", sep, tok2str(diversity_str, "%u", EXTRACT_8BITS(cp))));
+                cp++;
                 sep = "-";
             }
             if(tlv_type != MESSAGE_UPDATE &&
