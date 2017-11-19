@@ -1098,7 +1098,7 @@ rsvp_obj_print(netdissect_options *ndo,
 				goto invalid;
 			}
                         ND_PRINT((ndo, ", %s, %s/%u, Flags: [%s]",
-                               RSVP_OBJ_XRO_MASK_LOOSE(*obj_tptr) ? "Loose" : "Strict",
+                               RSVP_OBJ_XRO_MASK_LOOSE(EXTRACT_8BITS(obj_tptr)) ? "Loose" : "Strict",
                                ipaddr_string(ndo, obj_tptr+2),
                                *(obj_tptr+6),
                                bittok2str(rsvp_obj_rro_flag_values,
