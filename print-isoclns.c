@@ -678,7 +678,7 @@ isoclns_print(netdissect_options *ndo, const uint8_t *p, u_int length)
 	}
 
 	if (ndo->ndo_eflag)
-		ND_PRINT((ndo, "OSI NLPID %s (0x%02x): ", tok2str(nlpid_values, "Unknown", *p), *p));
+		ND_PRINT((ndo, "OSI NLPID %s (0x%02x): ", tok2str(nlpid_values, "Unknown", EXTRACT_8BITS(p)), *p));
 
 	switch (*p) {
 
@@ -936,7 +936,7 @@ clnp_print(netdissect_options *ndo,
                             return (0);
                     }
                     ND_PRINT((ndo, "%s %s",
-                           tok2str(clnp_option_sr_rr_values,"Unknown",*tptr),
+                           tok2str(clnp_option_sr_rr_values,"Unknown",EXTRACT_8BITS(tptr)),
                            tok2str(clnp_option_sr_rr_string_values, "Unknown Option %u", op)));
                     nsap_offset=*(tptr+1);
                     if (nsap_offset == 0) {
@@ -1340,7 +1340,7 @@ esis_print(netdissect_options *ndo,
                     ND_PRINT((ndo, "%s (0x%02x)",
                            tok2str(nlpid_values,
                                    "unknown",
-                                   *tptr),
+                                   EXTRACT_8BITS(tptr)),
                            *tptr));
                     if (opli>1) /* further NPLIDs ? - put comma */
                         ND_PRINT((ndo, ", "));
@@ -1867,7 +1867,7 @@ isis_print_is_reach_subtlv(netdissect_options *ndo,
                 break;
             ND_PRINT((ndo, "%sBandwidth Constraints Model ID: %s (%u)",
                    ident,
-                   tok2str(diffserv_te_bc_values, "unknown", *tptr),
+                   tok2str(diffserv_te_bc_values, "unknown", EXTRACT_8BITS(tptr)),
                    *tptr));
             tptr++;
             /* decode BCs until the subTLV ends */
@@ -1916,7 +1916,7 @@ isis_print_is_reach_subtlv(netdissect_options *ndo,
                    ident,
                    tok2str(gmpls_switch_cap_values, "Unknown", gmpls_switch_cap)));
               ND_PRINT((ndo, ", LSP Encoding: %s",
-                   tok2str(gmpls_encoding_values, "Unknown", *(tptr + 1))));
+                   tok2str(gmpls_encoding_values, "Unknown", EXTRACT_8BITS((tptr + 1)))));
 	      tptr+=4;
               ND_PRINT((ndo, "%s  Max LSP Bandwidth:", ident));
               for (priority_level = 0; priority_level < 8; priority_level++) {
@@ -1945,7 +1945,7 @@ isis_print_is_reach_subtlv(netdissect_options *ndo,
                 bw.i = EXTRACT_BE_32BITS(tptr);
                 ND_PRINT((ndo, "%s  Min LSP Bandwidth: %.3f Mbps", ident, bw.f * 8 / 1000000));
                 ND_PRINT((ndo, "%s  Indication %s", ident,
-                       tok2str(gmpls_switch_cap_tsc_indication_values, "Unknown (%u)", *(tptr + 4))));
+                       tok2str(gmpls_switch_cap_tsc_indication_values, "Unknown (%u)", EXTRACT_8BITS((tptr + 4)))));
                 break;
               default:
                 /* there is some optional stuff left to decode but this is as of yet
@@ -2653,7 +2653,7 @@ isis_print(netdissect_options *ndo,
             ND_PRINT((ndo, "\n\t      %s",
                    tok2str(isis_is_reach_virtual_values,
                            "bogus virtual flag 0x%02x",
-                           *tptr++)));
+                           EXTRACT_8BITS(tptr++))));
 	    tlv_is_reach = (const struct isis_tlv_is_reach *)tptr;
             while (tmp >= sizeof(struct isis_tlv_is_reach)) {
 		ND_TCHECK(*tlv_is_reach);
@@ -2755,7 +2755,7 @@ isis_print(netdissect_options *ndo,
             ND_PRINT((ndo, "\n\t      %s: ",
                    tok2str(isis_subtlv_auth_values,
                            "unknown Authentication type 0x%02x",
-                           *tptr)));
+                           EXTRACT_8BITS(tptr))));
 
 	    switch (*tptr) {
 	    case ISIS_SUBTLV_AUTH_SIMPLE:
@@ -2798,8 +2798,8 @@ isis_print(netdissect_options *ndo,
 	    if(tmp>=1) {
 		ND_TCHECK2(*tptr, 1);
 		ND_PRINT((ndo, "\n\t      Adjacency State: %s (%u)",
-		       tok2str(isis_ptp_adjancey_values, "unknown", *tptr),
-                        *tptr));
+		       tok2str(isis_ptp_adjancey_values, "unknown", EXTRACT_8BITS(tptr)),
+		       *tptr));
 		tmp--;
 	    }
 	    if(tmp>sizeof(tlv_ptp_adj->extd_local_circuit_id)) {
@@ -2828,7 +2828,7 @@ isis_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "%s (0x%02x)",
                        tok2str(nlpid_values,
                                "unknown",
-                               *tptr),
+                               EXTRACT_8BITS(tptr)),
                        *tptr));
 		if (tmp>1) /* further NPLIDs ? - put comma */
 		    ND_PRINT((ndo, ", "));
@@ -3027,7 +3027,7 @@ isis_print(netdissect_options *ndo,
             ND_PRINT((ndo, "\n\t      Inter-Domain Information Type: %s",
                    tok2str(isis_subtlv_idrp_values,
                            "Unknown (0x%02x)",
-                           *tptr)));
+                           EXTRACT_8BITS(tptr))));
             switch (*tptr++) {
             case ISIS_SUBTLV_IDRP_ASN:
                 ND_TCHECK2(*tptr, 2); /* fetch AS number */

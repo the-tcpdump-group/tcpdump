@@ -796,7 +796,7 @@ lmp_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "\n\t    Data links: %u",
 			EXTRACT_BE_32BITS(obj_tptr + 4)));
                 ND_PRINT((ndo, "\n\t    Encoding type: %s",
-			tok2str(gmpls_encoding_values, "Unknown", *(obj_tptr+8))));
+			tok2str(gmpls_encoding_values, "Unknown", EXTRACT_8BITS((obj_tptr + 8)))));
                 ND_PRINT((ndo, "\n\t    Verify Transport Mechanism: %u (0x%x)%s",
 			EXTRACT_BE_16BITS(obj_tptr + 10),
 			EXTRACT_BE_16BITS(obj_tptr + 10),

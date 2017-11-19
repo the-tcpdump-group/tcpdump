@@ -566,7 +566,7 @@ cfm_print(netdissect_options *ndo,
                 return;
             }
             ND_PRINT((ndo, ", Status: %s (%u)",
-                   tok2str(cfm_tlv_port_status_values, "Unknown", *tptr),
+                   tok2str(cfm_tlv_port_status_values, "Unknown", EXTRACT_8BITS(tptr)),
                    *tptr));
             break;
 
@@ -576,7 +576,7 @@ cfm_print(netdissect_options *ndo,
                 return;
             }
             ND_PRINT((ndo, ", Status: %s (%u)",
-                   tok2str(cfm_tlv_interface_status_values, "Unknown", *tptr),
+                   tok2str(cfm_tlv_interface_status_values, "Unknown", EXTRACT_8BITS(tptr)),
                    *tptr));
             break;
 

@@ -884,8 +884,8 @@ lldp_private_8023_print(netdissect_options *ndo,
         }
         ND_PRINT((ndo, "\n\t    MDI power support [%s], power pair %s, power class %s",
                bittok2str(lldp_mdi_values, "none", EXTRACT_8BITS((tptr + 4))),
-               tok2str(lldp_mdi_power_pairs_values, "unknown", *(tptr+5)),
-               tok2str(lldp_mdi_power_class_values, "unknown", *(tptr + 6))));
+               tok2str(lldp_mdi_power_pairs_values, "unknown", EXTRACT_8BITS((tptr + 5))),
+               tok2str(lldp_mdi_power_class_values, "unknown", EXTRACT_8BITS((tptr + 6)))));
         break;
 
     case LLDP_PRIVATE_8023_SUBTYPE_LINKAGGR:
@@ -991,7 +991,7 @@ lldp_private_tia_print(netdissect_options *ndo,
                bittok2str(lldp_tia_capabilities_values, "none",
                           EXTRACT_BE_16BITS(tptr + 4)), EXTRACT_BE_16BITS(tptr + 4)));
         ND_PRINT((ndo, "\n\t    Device type [%s] (0x%02x)",
-               tok2str(lldp_tia_device_type_values, "unknown", *(tptr+6)),
+               tok2str(lldp_tia_device_type_values, "unknown", EXTRACT_8BITS((tptr + 6))),
                *(tptr + 6)));
         break;
 
@@ -1000,7 +1000,7 @@ lldp_private_tia_print(netdissect_options *ndo,
             return hexdump;
         }
         ND_PRINT((ndo, "\n\t    Application type [%s] (0x%02x)",
-               tok2str(lldp_tia_application_type_values, "none", *(tptr+4)),
+               tok2str(lldp_tia_application_type_values, "none", EXTRACT_8BITS((tptr + 4))),
                *(tptr + 4)));
         ND_PRINT((ndo, ", Flags [%s]", bittok2str(
                    lldp_tia_network_policy_bits_values, "none", EXTRACT_8BITS((tptr + 5)))));
@@ -1037,7 +1037,7 @@ lldp_private_tia_print(netdissect_options *ndo,
                    (EXTRACT_BE_16BITS(tptr + 15)>>6)&0x3f,
                    ((EXTRACT_BE_32BITS(tptr + 16) & 0x3fffffff))));
             ND_PRINT((ndo, "\n\t    Datum %s (0x%02x)",
-                   tok2str(lldp_tia_location_datum_type_values, "unknown", *(tptr+20)),
+                   tok2str(lldp_tia_location_datum_type_values, "unknown", EXTRACT_8BITS((tptr + 20))),
                    *(tptr + 20)));
             break;
 
@@ -1054,7 +1054,7 @@ lldp_private_tia_print(netdissect_options *ndo,
             }
             ND_PRINT((ndo, "\n\t    LCI length %u, LCI what %s (0x%02x), Country-code ",
                    lci_len,
-                   tok2str(lldp_tia_location_lci_what_values, "unknown", *(tptr+6)),
+                   tok2str(lldp_tia_location_lci_what_values, "unknown", EXTRACT_8BITS((tptr + 6))),
                    *(tptr + 6)));
 
             /* Country code */

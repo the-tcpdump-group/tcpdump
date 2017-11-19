@@ -835,7 +835,7 @@ of10_bsn_message_print(netdissect_options *ndo,
 			goto invalid;
 		/* report_mirror_ports */
 		ND_TCHECK2(*cp, 1);
-		ND_PRINT((ndo, ", report_mirror_ports %s", tok2str(bsn_onoff_str, "bogus (%u)", *cp)));
+		ND_PRINT((ndo, ", report_mirror_ports %s", tok2str(bsn_onoff_str, "bogus (%u)", EXTRACT_8BITS(cp))));
 		cp += 1;
 		/* pad */
 		ND_TCHECK2(*cp, 3);
@@ -1009,7 +1009,7 @@ of10_bsn_actions_print(netdissect_options *ndo,
 		}
 		/* copy_stage */
 		ND_TCHECK2(*cp, 1);
-		ND_PRINT((ndo, ", copy_stage %s", tok2str(bsn_mirror_copy_stage_str, "unknown (%u)", *cp)));
+		ND_PRINT((ndo, ", copy_stage %s", tok2str(bsn_mirror_copy_stage_str, "unknown (%u)", EXTRACT_8BITS(cp))));
 		cp += 1;
 		/* pad */
 		ND_TCHECK2(*cp, 3);
@@ -1784,7 +1784,7 @@ of10_stats_request_print(netdissect_options *ndo,
 			return ep; /* end of snapshot */
 		/* table_id */
 		ND_TCHECK2(*cp, 1);
-		ND_PRINT((ndo, "\n\t table_id %s", tok2str(tableid_str, "%u", *cp)));
+		ND_PRINT((ndo, "\n\t table_id %s", tok2str(tableid_str, "%u", EXTRACT_8BITS(cp))));
 		cp += 1;
 		/* pad */
 		ND_TCHECK2(*cp, 1);
@@ -1899,7 +1899,7 @@ of10_flow_stats_reply_print(netdissect_options *ndo,
 		cp += 2;
 		/* table_id */
 		ND_TCHECK2(*cp, 1);
-		ND_PRINT((ndo, ", table_id %s", tok2str(tableid_str, "%u", *cp)));
+		ND_PRINT((ndo, ", table_id %s", tok2str(tableid_str, "%u", EXTRACT_8BITS(cp))));
 		cp += 1;
 		/* pad */
 		ND_TCHECK2(*cp, 1);
@@ -2005,7 +2005,7 @@ of10_table_stats_reply_print(netdissect_options *ndo,
 			goto invalid;
 		/* table_id */
 		ND_TCHECK2(*cp, 1);
-		ND_PRINT((ndo, "\n\t table_id %s", tok2str(tableid_str, "%u", *cp)));
+		ND_PRINT((ndo, "\n\t table_id %s", tok2str(tableid_str, "%u", EXTRACT_8BITS(cp))));
 		cp += 1;
 		/* pad */
 		ND_TCHECK2(*cp, 3);
@@ -2283,7 +2283,7 @@ of10_packet_in_print(netdissect_options *ndo,
 	cp += 2;
 	/* reason */
 	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, ", reason %s", tok2str(ofpr_str, "invalid (0x%02x)", *cp)));
+	ND_PRINT((ndo, ", reason %s", tok2str(ofpr_str, "invalid (0x%02x)", EXTRACT_8BITS(cp))));
 	cp += 1;
 	/* pad */
 	ND_TCHECK2(*cp, 1);
@@ -2316,7 +2316,7 @@ of10_flow_removed_print(netdissect_options *ndo,
 	cp += 2;
 	/* reason */
 	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, ", reason %s", tok2str(ofprr_str, "unknown (0x%02x)", *cp)));
+	ND_PRINT((ndo, ", reason %s", tok2str(ofprr_str, "unknown (0x%02x)", EXTRACT_8BITS(cp))));
 	cp += 1;
 	/* pad */
 	ND_TCHECK2(*cp, 1);
@@ -2457,7 +2457,7 @@ of10_header_body_print(netdissect_options *ndo,
 			goto next_message;
 		/* reason */
 		ND_TCHECK2(*cp, 1);
-		ND_PRINT((ndo, "\n\t reason %s", tok2str(ofppr_str, "invalid (0x%02x)", *cp)));
+		ND_PRINT((ndo, "\n\t reason %s", tok2str(ofppr_str, "invalid (0x%02x)", EXTRACT_8BITS(cp))));
 		cp += 1;
 		/* pad */
 		ND_TCHECK2(*cp, 7);

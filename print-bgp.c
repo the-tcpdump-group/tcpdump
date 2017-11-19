@@ -2111,7 +2111,7 @@ bgp_attr_print(netdissect_options *ndo,
                                ipaddr_string(ndo, tptr+2),
                                tok2str(bgp_extd_comm_ospf_rtype_values,
 					  "unknown (0x%02x)",
-					  *(tptr+6)),
+					  EXTRACT_8BITS((tptr + 6))),
                                (*(tptr+7) &  BGP_OSPF_RTYPE_METRIC_TYPE) ? "E2" : "",
                                ((*(tptr+6) == BGP_OSPF_RTYPE_EXT) || (*(tptr+6) == BGP_OSPF_RTYPE_NSSA)) ? "E1" : ""));
                         break;
@@ -2119,8 +2119,8 @@ bgp_attr_print(netdissect_options *ndo,
                         ND_PRINT((ndo, ": %s Control Flags [0x%02x]:MTU %u",
                                tok2str(l2vpn_encaps_values,
 					  "unknown encaps",
-					  *(tptr+2)),
-                                       *(tptr+3),
+					  EXTRACT_8BITS((tptr + 2))),
+                               *(tptr+3),
                                EXTRACT_BE_16BITS(tptr + 4)));
                         break;
                     case BGP_EXT_COM_SOURCE_AS:
@@ -2698,7 +2698,7 @@ bgp_notification_print(netdissect_options *ndo,
 		       tok2str(af_values, "Unknown",
 				  EXTRACT_BE_16BITS(tptr)),
 		       EXTRACT_BE_16BITS(tptr),
-		       tok2str(bgp_safi_values, "Unknown", *(tptr+2)),
+		       tok2str(bgp_safi_values, "Unknown", EXTRACT_8BITS((tptr + 2))),
 		       *(tptr+2),
 		       EXTRACT_BE_32BITS(tptr + 3)));
 	    }

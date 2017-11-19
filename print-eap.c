@@ -227,7 +227,7 @@ eap_print(netdissect_options *ndo,
                 while (count < len) {
                     ND_TCHECK_8BITS(tptr+count);
                     ND_PRINT((ndo, " %s (%u),",
-                           tok2str(eap_type_values, "unknown", *(tptr+count)),
+                           tok2str(eap_type_values, "unknown", EXTRACT_8BITS((tptr + count))),
                            *(tptr + count)));
                     count++;
                 }
@@ -269,7 +269,7 @@ eap_print(netdissect_options *ndo,
             case EAP_TYPE_SIM:
                 ND_TCHECK_8BITS(tptr + 5);
                 ND_PRINT((ndo, " subtype [%s] 0x%02x,",
-                       tok2str(eap_aka_subtype_values, "unknown", *(tptr+5)),
+                       tok2str(eap_aka_subtype_values, "unknown", EXTRACT_8BITS((tptr + 5))),
                        *(tptr + 5)));
 
                 /* FIXME - TLV attributes follow */

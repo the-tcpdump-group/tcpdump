@@ -625,7 +625,7 @@ print_attr_string(netdissect_options *ndo,
            if (length < 1)
               goto trunc;
            ND_PRINT((ndo, "%s (0x%02x) ",
-                  tok2str(rfc4675_tagged,"Unknown tag",*data),
+                  tok2str(rfc4675_tagged,"Unknown tag",EXTRACT_8BITS(data)),
                   *data));
            data++;
            length--;
@@ -805,7 +805,7 @@ print_attr_num(netdissect_options *ndo,
 
         case EGRESS_VLAN_ID:
             ND_PRINT((ndo, "%s (0x%02x) ",
-                   tok2str(rfc4675_tagged,"Unknown tag",*data),
+                   tok2str(rfc4675_tagged,"Unknown tag",EXTRACT_8BITS(data)),
                    *data));
             data++;
             ND_PRINT((ndo, "%d", EXTRACT_BE_24BITS(data)));

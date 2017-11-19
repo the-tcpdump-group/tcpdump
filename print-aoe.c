@@ -266,11 +266,11 @@ aoev1_mac_print(netdissect_options *ndo,
 	cp += 1;
 	/* MCmd */
 	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, "\n\tMCmd: %s", tok2str(aoev1_mcmd_str, "Unknown (0x%02x)", *cp)));
+	ND_PRINT((ndo, "\n\tMCmd: %s", tok2str(aoev1_mcmd_str, "Unknown (0x%02x)", EXTRACT_8BITS(cp))));
 	cp += 1;
 	/* MError */
 	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, ", MError: %s", tok2str(aoev1_merror_str, "Unknown (0x%02x)", *cp)));
+	ND_PRINT((ndo, ", MError: %s", tok2str(aoev1_merror_str, "Unknown (0x%02x)", EXTRACT_8BITS(cp))));
 	cp += 1;
 	/* Dir Count */
 	ND_TCHECK2(*cp, 1);
@@ -286,7 +286,7 @@ aoev1_mac_print(netdissect_options *ndo,
 		cp += 1;
 		/* DCmd */
 		ND_TCHECK2(*cp, 1);
-		ND_PRINT((ndo, "\n\t DCmd: %s", tok2str(aoev1_dcmd_str, "Unknown (0x%02x)", *cp)));
+		ND_PRINT((ndo, "\n\t DCmd: %s", tok2str(aoev1_dcmd_str, "Unknown (0x%02x)", EXTRACT_8BITS(cp))));
 		cp += 1;
 		/* Ethernet Address */
 		ND_TCHECK2(*cp, ETHER_ADDR_LEN);
@@ -314,7 +314,7 @@ aoev1_reserve_print(netdissect_options *ndo,
 		goto invalid;
 	/* RCmd */
 	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, "\n\tRCmd: %s", tok2str(aoev1_rcmd_str, "Unknown (0x%02x)", *cp)));
+	ND_PRINT((ndo, "\n\tRCmd: %s", tok2str(aoev1_rcmd_str, "Unknown (0x%02x)", EXTRACT_8BITS(cp))));
 	cp += 1;
 	/* NMacs (correlated with the length) */
 	ND_TCHECK2(*cp, 1);
@@ -358,7 +358,7 @@ aoev1_print(netdissect_options *ndo,
 	/* Error */
 	ND_TCHECK2(*cp, 1);
 	if (flags & AOEV1_FLAG_E)
-		ND_PRINT((ndo, "\n\tError: %s", tok2str(aoev1_errcode_str, "Invalid (%u)", *cp)));
+		ND_PRINT((ndo, "\n\tError: %s", tok2str(aoev1_errcode_str, "Invalid (%u)", EXTRACT_8BITS(cp))));
 	cp += 1;
 	/* Major */
 	ND_TCHECK2(*cp, 2);

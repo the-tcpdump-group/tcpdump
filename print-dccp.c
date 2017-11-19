@@ -545,7 +545,7 @@ static int dccp_print_option(netdissect_options *ndo, const u_char *option, u_in
 				ND_PRINT((ndo, "CCID option %u optlen too short", *option));
 			else
 				ND_PRINT((ndo, "%s optlen too short",
-					  tok2str(dccp_option_values, "Option %u", *option)));
+					  tok2str(dccp_option_values, "Option %u", EXTRACT_8BITS(option))));
 			return 0;
 		}
 	} else
@@ -557,7 +557,7 @@ static int dccp_print_option(netdissect_options *ndo, const u_char *option, u_in
 				  *option));
 		else
 			ND_PRINT((ndo, "%s optlen goes past header length",
-				  tok2str(dccp_option_values, "Option %u", *option)));
+				  tok2str(dccp_option_values, "Option %u", EXTRACT_8BITS(option))));
 		return 0;
 	}
 	ND_TCHECK2(*option, optlen);
@@ -575,7 +575,7 @@ static int dccp_print_option(netdissect_options *ndo, const u_char *option, u_in
 				break;
 		}
 	} else {
-		ND_PRINT((ndo, "%s", tok2str(dccp_option_values, "Option %u", *option)));
+		ND_PRINT((ndo, "%s", tok2str(dccp_option_values, "Option %u", EXTRACT_8BITS(option))));
 		switch (*option) {
 		case 32:
 		case 33:

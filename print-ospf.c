@@ -230,7 +230,7 @@ ospf_print_grace_lsa(netdissect_options *ndo,
                 return -1;
             }
             ND_PRINT((ndo, "%s (%u)",
-                   tok2str(lsa_opaque_grace_tlv_reason_values, "Unknown", *tptr),
+                   tok2str(lsa_opaque_grace_tlv_reason_values, "Unknown", EXTRACT_8BITS(tptr)),
                    *tptr));
             break;
 
@@ -382,7 +382,7 @@ ospf_print_te_lsa(netdissect_options *ndo,
 		    }
 		    /* BC Model Id (1 octet) + Reserved (3 octets) */
                     ND_PRINT((ndo, "\n\t\tBandwidth Constraints Model ID: %s (%u)",
-                           tok2str(diffserv_te_bc_values, "unknown", *tptr),
+                           tok2str(diffserv_te_bc_values, "unknown", EXTRACT_8BITS(tptr)),
                            *tptr));
 		    if (subtlv_length % 4 != 0) {
 			ND_PRINT((ndo, "\n\t\tlength %u != N x 4", subtlv_length));
@@ -423,9 +423,9 @@ ospf_print_te_lsa(netdissect_options *ndo,
 		    }
 		    /* Switching Cap (1 octet) + Encoding (1) +  Reserved (2) */
                     ND_PRINT((ndo, "\n\t\tInterface Switching Capability: %s",
-                           tok2str(gmpls_switch_cap_values, "Unknown", *(tptr))));
+                           tok2str(gmpls_switch_cap_values, "Unknown", EXTRACT_8BITS((tptr)))));
                     ND_PRINT((ndo, "\n\t\tLSP Encoding: %s\n\t\tMax LSP Bandwidth:",
-                           tok2str(gmpls_encoding_values, "Unknown", *(tptr + 1))));
+                           tok2str(gmpls_encoding_values, "Unknown", EXTRACT_8BITS((tptr + 1)))));
                     for (priority_level = 0; priority_level < 8; priority_level++) {
                         bw.i = EXTRACT_BE_32BITS(tptr + 4 + (priority_level * 4));
                         ND_PRINT((ndo, "\n\t\t  priority level %d: %.3f Mbps",
@@ -439,7 +439,7 @@ ospf_print_te_lsa(netdissect_options *ndo,
 			goto invalid;
 		    }
                     ND_PRINT((ndo, ", %s (%u)",
-                           tok2str(lsa_opaque_te_tlv_link_type_sub_tlv_values,"unknown",*tptr),
+                           tok2str(lsa_opaque_te_tlv_link_type_sub_tlv_values,"unknown",EXTRACT_8BITS(tptr)),
                            *tptr));
                     break;
 

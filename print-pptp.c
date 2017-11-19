@@ -338,7 +338,7 @@ pptp_err_code_print(netdissect_options *ndo,
 {
 	ND_PRINT((ndo, " ERR_CODE(%u", *err_code));
 	if (ndo->ndo_vflag) {
-		ND_PRINT((ndo, ":%s", tok2str(pptp_errcode_str, "?", *err_code)));
+		ND_PRINT((ndo, ":%s", tok2str(pptp_errcode_str, "?", EXTRACT_8BITS(err_code))));
 	}
 	ND_PRINT((ndo, ")"));
 }
@@ -493,7 +493,7 @@ pptp_result_code_print(netdissect_options *ndo,
 			ctrl_msg_type == PPTP_CTRL_MSG_TYPE_CDN      ? pptp_cdn_str :
 			NULL; /* assertion error */
 		if (dict != NULL)
-			ND_PRINT((ndo, ":%s", tok2str(dict, "?", *result_code)));
+			ND_PRINT((ndo, ":%s", tok2str(dict, "?", EXTRACT_8BITS(result_code))));
 	}
 	ND_PRINT((ndo, ")"));
 }

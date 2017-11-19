@@ -1041,14 +1041,14 @@ rsvp_obj_print(netdissect_options *ndo,
                        indent,
                        tok2str(gmpls_encoding_values,
                                "Unknown",
-                               *obj_tptr),
-		       *obj_tptr));
+                               EXTRACT_8BITS(obj_tptr)),
+                       *obj_tptr));
                 ND_PRINT((ndo, "%s  Switching Type: %s (%u), Payload ID: %s (0x%04x)",
                        indent,
                        tok2str(gmpls_switch_cap_values,
                                "Unknown",
-                               *(obj_tptr+1)),
-		       *(obj_tptr+1),
+                               EXTRACT_8BITS((obj_tptr + 1))),
+                       *(obj_tptr+1),
                        tok2str(gmpls_payload_values,
                                "Unknown",
                                EXTRACT_BE_16BITS(obj_tptr + 2)),
@@ -1378,7 +1378,7 @@ rsvp_obj_print(netdissect_options *ndo,
                     intserv_serv_tlen=EXTRACT_BE_16BITS(obj_tptr + 2)<<2;
                     ND_PRINT((ndo, "%s  Service Type: %s (%u), break bit %s set, Service length: %u",
                            indent,
-                           tok2str(rsvp_intserv_service_type_values,"unknown",*(obj_tptr)),
+                           tok2str(rsvp_intserv_service_type_values,"unknown",EXTRACT_8BITS((obj_tptr))),
                            *(obj_tptr),
                            (*(obj_tptr+1)&0x80) ? "" : "not",
                            intserv_serv_tlen));
@@ -1646,7 +1646,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 while(obj_tlen >= 2 + padbytes) {
                     ND_PRINT((ndo, "%s    %s TLV (0x%02x), length: %u", /* length includes header */
                            indent,
-                           tok2str(rsvp_obj_prop_tlv_values,"unknown",*obj_tptr),
+                           tok2str(rsvp_obj_prop_tlv_values,"unknown",EXTRACT_8BITS(obj_tptr)),
                            *obj_tptr,
                            *(obj_tptr + 1)));
                     if (obj_tlen < *(obj_tptr+1))
