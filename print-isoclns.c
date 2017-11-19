@@ -2902,7 +2902,7 @@ isis_print(netdissect_options *ndo,
 	    if (tmp < 1)
 	        break;
 	    ND_TCHECK2(*tptr, 1);
-	    ND_PRINT((ndo, ", Flags: [%s]", ISIS_MASK_TLV_SHARED_RISK_GROUP(*tptr++) ? "numbered" : "unnumbered"));
+	    ND_PRINT((ndo, ", Flags: [%s]", ISIS_MASK_TLV_SHARED_RISK_GROUP(EXTRACT_8BITS(tptr++)) ? "numbered" : "unnumbered"));
 	    tmp--;
 
 	    if (tmp < sizeof(struct in_addr))
