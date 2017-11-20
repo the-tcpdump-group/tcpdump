@@ -220,7 +220,7 @@ ip_printts(netdissect_options *ndo,
 		if (ptr == len)
 			type = " ^ ";
 		ND_TCHECK2(cp[len], hoplen);
-		ND_PRINT((ndo, "%s%d@%s", type, EXTRACT_BE_32BITS(&cp[len + hoplen - 4]),
+		ND_PRINT((ndo, "%s%d@%s", type, EXTRACT_BE_32BITS(cp + len + hoplen - 4),
 			  hoplen!=8 ? "" : ipaddr_string(ndo, &cp[len])));
 		type = " ";
 	}
@@ -302,8 +302,8 @@ ip_optprint(netdissect_options *ndo,
 				break;
 			}
 			ND_TCHECK(cp[3]);
-			if (EXTRACT_BE_16BITS(&cp[2]) != 0)
-				ND_PRINT((ndo, " value %u", EXTRACT_BE_16BITS(&cp[2])));
+			if (EXTRACT_BE_16BITS(cp + 2) != 0)
+				ND_PRINT((ndo, " value %u", EXTRACT_BE_16BITS(cp + 2)));
 			break;
 
 		case IPOPT_NOP:       /* nothing to print - fall through */

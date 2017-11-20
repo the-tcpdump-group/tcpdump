@@ -366,7 +366,7 @@ sig_print(netdissect_options *ndo,
 		 * do from the caplen test above, we also know we have
 		 * the call reference.
 		 */
-		call_ref = EXTRACT_BE_24BITS(&p[CALL_REF_POS]);
+		call_ref = EXTRACT_BE_24BITS(p + CALL_REF_POS);
 		ND_PRINT((ndo, "CALL_REF:0x%06x", call_ref));
 	} else {
 		/* SSCOP with some unknown protocol atop it */

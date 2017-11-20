@@ -1435,8 +1435,8 @@ bgp_attr_print(netdissect_options *ndo,
 			    ND_PRINT((ndo, "%s ",
 				as_printf(ndo, astostr, sizeof(astostr),
 				as_size == 2 ?
-				EXTRACT_BE_16BITS(&tptr[2 + i]) :
-				EXTRACT_BE_32BITS(&tptr[2 + i]))));
+				EXTRACT_BE_16BITS(tptr + i + 2) :
+				EXTRACT_BE_32BITS(tptr + i + 2))));
                         }
 			ND_TCHECK(tptr[0]);
                         ND_PRINT((ndo, "%s", tok2str(bgp_as_path_segment_close_values,

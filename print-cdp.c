@@ -302,7 +302,7 @@ cdp_print_addr(netdissect_options *ndo,
 		ND_TCHECK2(p[pl], 2);
 		if (p + pl + 2 > endp)
 			goto trunc;
-		al = EXTRACT_BE_16BITS(&p[pl]);	/* address length */
+		al = EXTRACT_BE_16BITS(p + pl);	/* address length */
 
 		if (pt == PT_NLPID && pl == 1 && *p == NLPID_IP && al == 4) {
 			/*

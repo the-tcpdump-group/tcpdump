@@ -152,7 +152,7 @@ mobility_opt_print(netdissect_options *ndo,
 			/* units of 4 secs */
 			ND_TCHECK_16BITS(&bp[i+2]);
 			ND_PRINT((ndo, "(refresh: %u)",
-				EXTRACT_BE_16BITS(&bp[i + 2]) << 2));
+				EXTRACT_BE_16BITS(bp + i + 2) << 2));
 			break;
 		case IP6MOPT_ALTCOA:
 			if (len - i < IP6MOPT_ALTCOA_MINLEN) {
@@ -170,8 +170,8 @@ mobility_opt_print(netdissect_options *ndo,
 			ND_TCHECK_16BITS(&bp[i+2]);
 			ND_TCHECK_16BITS(&bp[i+4]);
 			ND_PRINT((ndo, "(ni: ho=0x%04x co=0x%04x)",
-				EXTRACT_BE_16BITS(&bp[i + 2]),
-				EXTRACT_BE_16BITS(&bp[i + 4])));
+				EXTRACT_BE_16BITS(bp + i + 2),
+				EXTRACT_BE_16BITS(bp + i + 4)));
 			break;
 		case IP6MOPT_AUTH:
 			if (len - i < IP6MOPT_AUTH_MINLEN) {
@@ -250,8 +250,8 @@ mobility_print(netdissect_options *ndo,
 			ND_TCHECK_32BITS(&bp[hlen + 4]);
 			ND_PRINT((ndo, " %s Init Cookie=%08x:%08x",
 			       type == IP6M_HOME_TEST_INIT ? "Home" : "Care-of",
-			       EXTRACT_BE_32BITS(&bp[hlen]),
-			       EXTRACT_BE_32BITS(&bp[hlen + 4])));
+			       EXTRACT_BE_32BITS(bp + hlen),
+			       EXTRACT_BE_32BITS(bp + hlen + 4)));
 		}
 		hlen += 8;
 		break;
@@ -264,16 +264,16 @@ mobility_print(netdissect_options *ndo,
 			ND_TCHECK_32BITS(&bp[hlen + 4]);
 			ND_PRINT((ndo, " %s Init Cookie=%08x:%08x",
 			       type == IP6M_HOME_TEST ? "Home" : "Care-of",
-			       EXTRACT_BE_32BITS(&bp[hlen]),
-			       EXTRACT_BE_32BITS(&bp[hlen + 4])));
+			       EXTRACT_BE_32BITS(bp + hlen),
+			       EXTRACT_BE_32BITS(bp + hlen + 4)));
 		}
 		hlen += 8;
 		if (ndo->ndo_vflag) {
 			ND_TCHECK_32BITS(&bp[hlen + 4]);
 			ND_PRINT((ndo, " %s Keygen Token=%08x:%08x",
 			       type == IP6M_HOME_TEST ? "Home" : "Care-of",
-			       EXTRACT_BE_32BITS(&bp[hlen]),
-			       EXTRACT_BE_32BITS(&bp[hlen + 4])));
+			       EXTRACT_BE_32BITS(bp + hlen),
+			       EXTRACT_BE_32BITS(bp + hlen + 4)));
 		}
 		hlen += 8;
 		break;
@@ -299,7 +299,7 @@ mobility_print(netdissect_options *ndo,
 		hlen += 1;
 		ND_TCHECK_16BITS(&bp[hlen]);
 		/* units of 4 secs */
-		ND_PRINT((ndo, " lifetime=%u", EXTRACT_BE_16BITS(&bp[hlen]) << 2));
+		ND_PRINT((ndo, " lifetime=%u", EXTRACT_BE_16BITS(bp + hlen) << 2));
 		hlen += 2;
 		break;
 	case IP6M_BINDING_ACK:
@@ -311,11 +311,11 @@ mobility_print(netdissect_options *ndo,
 		/* Reserved (7bits) */
 		hlen = IP6M_MINLEN;
 		ND_TCHECK_16BITS(&bp[hlen]);
-		ND_PRINT((ndo, " seq#=%u", EXTRACT_BE_16BITS(&bp[hlen])));
+		ND_PRINT((ndo, " seq#=%u", EXTRACT_BE_16BITS(bp + hlen)));
 		hlen += 2;
 		ND_TCHECK_16BITS(&bp[hlen]);
 		/* units of 4 secs */
-		ND_PRINT((ndo, " lifetime=%u", EXTRACT_BE_16BITS(&bp[hlen]) << 2));
+		ND_PRINT((ndo, " lifetime=%u", EXTRACT_BE_16BITS(bp + hlen) << 2));
 		hlen += 2;
 		break;
 	case IP6M_BINDING_ERROR:

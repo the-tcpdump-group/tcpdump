@@ -59,7 +59,7 @@ chdlc_print(netdissect_options *ndo, register const u_char *p, u_int length)
 	if (length < CHDLC_HDRLEN)
 		goto trunc;
 	ND_TCHECK2(*p, CHDLC_HDRLEN);
-	proto = EXTRACT_BE_16BITS(&p[2]);
+	proto = EXTRACT_BE_16BITS(p + 2);
 	if (ndo->ndo_eflag) {
                 ND_PRINT((ndo, "%s, ethertype %s (0x%04x), length %u: ",
                        tok2str(chdlc_cast_values, "0x%02x", p[0]),

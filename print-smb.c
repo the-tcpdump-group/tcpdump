@@ -821,7 +821,7 @@ print_smb(netdissect_options *ndo,
 	return;
 
     ND_TCHECK_16BITS(&buf[10]);
-    flags2 = EXTRACT_LE_16BITS(&buf[10]);
+    flags2 = EXTRACT_LE_16BITS(buf + 10);
     unicodestr = flags2 & 0x8000;
     nterrcodes = flags2 & 0x4000;
 
@@ -829,12 +829,12 @@ print_smb(netdissect_options *ndo,
     smb_fdata(ndo, buf, fmt_smbheader, buf + 33, unicodestr);
 
     if (nterrcodes) {
-    	nterror = EXTRACT_LE_32BITS(&buf[5]);
+    	nterror = EXTRACT_LE_32BITS(buf + 5);
 	if (nterror)
 	    ND_PRINT((ndo, "NTError = %s\n", nt_errstr(nterror)));
     } else {
 	if (buf[5])
-	    ND_PRINT((ndo, "SMBError = %s\n", smb_errstr(buf[5], EXTRACT_LE_16BITS(&buf[7]))));
+	    ND_PRINT((ndo, "SMBError = %s\n", smb_errstr(buf[5], EXTRACT_LE_16BITS(buf + 7))));
     }
 
     smboffset = 32;

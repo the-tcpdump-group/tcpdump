@@ -1505,7 +1505,7 @@ mldv2_query_print(netdissect_options *ndo, const u_char *bp, u_int len)
     }
 
     ND_TCHECK2(bp[26], 2);
-    nsrcs = EXTRACT_BE_16BITS(&bp[26]);
+    nsrcs = EXTRACT_BE_16BITS(bp + 26);
     if (nsrcs > 0) {
 	if (len < 28 + nsrcs * sizeof(struct in6_addr))
 	    ND_PRINT((ndo," [invalid number of sources]"));
