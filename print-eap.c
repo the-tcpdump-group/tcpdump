@@ -189,7 +189,7 @@ eap_print(netdissect_options *ndo,
         ND_PRINT((ndo, ", %s (%u), id %u, len %u",
                tok2str(eap_code_values, "unknown", type),
                type,
-               *(tptr+1),
+               EXTRACT_8BITS((tptr + 1)),
                len));
 
         ND_TCHECK2(*tptr, len);

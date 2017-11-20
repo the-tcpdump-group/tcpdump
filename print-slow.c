@@ -292,7 +292,7 @@ slow_print(netdissect_options *ndo,
     if (print_version == 1) {
         ND_PRINT((ndo, "%sv%u, length %u",
                tok2str(slow_proto_values, "unknown (%u)", subtype),
-               *(pptr+1),
+               EXTRACT_8BITS((pptr + 1)),
                len));
     } else {
         /* some slow protos don't have a version number in the header */

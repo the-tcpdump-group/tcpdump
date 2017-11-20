@@ -741,7 +741,7 @@ rsvp_obj_print(netdissect_options *ndo,
                        *(obj_tptr + sizeof(struct in_addr))));
                 ND_PRINT((ndo, "%s  Flags: [0x%02x], DestPort %u",
                        indent,
-                       *(obj_tptr+5),
+                       EXTRACT_8BITS((obj_tptr + 5)),
                        EXTRACT_BE_16BITS(obj_tptr + 6)));
                 obj_tlen-=8;
                 obj_tptr+=8;
@@ -755,7 +755,7 @@ rsvp_obj_print(netdissect_options *ndo,
                        *(obj_tptr + sizeof(struct in6_addr))));
                 ND_PRINT((ndo, "%s  Flags: [0x%02x], DestPort %u",
                        indent,
-                       *(obj_tptr+sizeof(struct in6_addr)+1),
+                       EXTRACT_8BITS((obj_tptr + sizeof(struct in6_addr) + 1)),
                        EXTRACT_BE_16BITS(obj_tptr + sizeof(struct in6_addr) + 2)));
                 obj_tlen-=20;
                 obj_tptr+=20;
@@ -1100,7 +1100,7 @@ rsvp_obj_print(netdissect_options *ndo,
                         ND_PRINT((ndo, ", %s, %s/%u, Flags: [%s]",
                                RSVP_OBJ_XRO_MASK_LOOSE(EXTRACT_8BITS(obj_tptr)) ? "Loose" : "Strict",
                                ipaddr_string(ndo, obj_tptr+2),
-                               *(obj_tptr+6),
+                               EXTRACT_8BITS((obj_tptr + 6)),
                                bittok2str(rsvp_obj_rro_flag_values,
                                    "none",
                                    EXTRACT_8BITS((obj_tptr + 7))))); /* rfc3209 says that this field is rsvd. */
@@ -1119,7 +1119,7 @@ rsvp_obj_print(netdissect_options *ndo,
                                tok2str(rsvp_ctype_values,
                                        "Unknown",
                                        EXTRACT_8BITS((obj_tptr + 3)) + (256 * RSVP_OBJ_RRO)),
-                               *(obj_tptr+3),
+                               EXTRACT_8BITS((obj_tptr + 3)),
                                EXTRACT_BE_32BITS(obj_tptr + 4)));
                     }
                     obj_tlen-=*(obj_tptr+1);
@@ -1369,7 +1369,7 @@ rsvp_obj_print(netdissect_options *ndo,
                     return-1;
                 ND_PRINT((ndo, "%s  Msg-Version: %u, length: %u",
                        indent,
-                       (*obj_tptr & 0xf0) >> 4,
+                       (EXTRACT_8BITS(obj_tptr) & 0xf0) >> 4,
                        EXTRACT_BE_16BITS(obj_tptr + 2) << 2));
                 obj_tptr+=4; /* get to the start of the service header */
                 obj_tlen-=4;
@@ -1647,7 +1647,7 @@ rsvp_obj_print(netdissect_options *ndo,
                     ND_PRINT((ndo, "%s    %s TLV (0x%02x), length: %u", /* length includes header */
                            indent,
                            tok2str(rsvp_obj_prop_tlv_values,"unknown",EXTRACT_8BITS(obj_tptr)),
-                           *obj_tptr,
+                           EXTRACT_8BITS(obj_tptr),
                            *(obj_tptr + 1)));
                     if (obj_tlen < *(obj_tptr+1))
                         return-1;
@@ -1673,7 +1673,7 @@ rsvp_obj_print(netdissect_options *ndo,
                     return-1;
                 ND_PRINT((ndo, "%s  Flags [0x%02x], epoch: %u",
                        indent,
-                       *obj_tptr,
+                       EXTRACT_8BITS(obj_tptr),
                        EXTRACT_BE_24BITS(obj_tptr + 1)));
                 obj_tlen-=4;
                 obj_tptr+=4;

@@ -580,7 +580,7 @@ hncp_print_rec(netdissect_options *ndo,
                 break;
             }
             ND_PRINT((ndo, " Verdict: %u Fingerprint: %s Common Name: ",
-                *value,
+                EXTRACT_8BITS(value),
                 format_256(value + 4)));
             safeputs(ndo, value + 36, bodylen - 36);
         }

@@ -446,10 +446,10 @@ ldp_tlv_print(netdissect_options *ndo,
 
                 case LDP_FEC_MARTINI_IFPARM_VCCV:
                     ND_PRINT((ndo, "\n\t\t  Control Channels (0x%02x) = [%s]",
-                           *(tptr+2),
+                           EXTRACT_8BITS((tptr + 2)),
                            bittok2str(ldp_fec_martini_ifparm_vccv_cc_values, "none", EXTRACT_8BITS((tptr + 2)))));
                     ND_PRINT((ndo, "\n\t\t  CV Types (0x%02x) = [%s]",
-                           *(tptr+3),
+                           EXTRACT_8BITS((tptr + 3)),
                            bittok2str(ldp_fec_martini_ifparm_vccv_cv_values, "none", EXTRACT_8BITS((tptr + 3)))));
                     break;
 

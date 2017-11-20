@@ -57,7 +57,7 @@ dtp_print (netdissect_options *ndo, const u_char *pptr, u_int length)
     ND_TCHECK2(*tptr, DTP_HEADER_LEN);
 
     ND_PRINT((ndo, "DTPv%u, length %u",
-           (*tptr),
+           EXTRACT_8BITS(tptr),
            length));
 
     /*
