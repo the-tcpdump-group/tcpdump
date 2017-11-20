@@ -434,8 +434,9 @@ handle_ctrl_proto(netdissect_options *ndo,
 	ND_PRINT((ndo, "%s (0x%02x), id %u, length %u",
 	          tok2str(cpcodes, "Unknown Opcode",code),
 	          code,
-	          *tptr++, /* ID */
+	          EXTRACT_8BITS(tptr), /* ID */
 	          length + 2));
+	tptr++;
 
 	if (!ndo->ndo_vflag)
 		return;
