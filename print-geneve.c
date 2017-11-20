@@ -157,7 +157,7 @@ geneve_print(netdissect_options *ndo, const u_char *bp, u_int len)
 
     ND_TCHECK2(*bp, 8);
 
-    ver_opt = *bp;
+    ver_opt = EXTRACT_8BITS(bp);
     bp += 1;
     len -= 1;
 
@@ -167,7 +167,7 @@ geneve_print(netdissect_options *ndo, const u_char *bp, u_int len)
         return;
     }
 
-    flags = *bp;
+    flags = EXTRACT_8BITS(bp);
     bp += 1;
     len -= 1;
 
@@ -179,7 +179,7 @@ geneve_print(netdissect_options *ndo, const u_char *bp, u_int len)
     bp += 3;
     len -= 3;
 
-    reserved = *bp;
+    reserved = EXTRACT_8BITS(bp);
     bp += 1;
     len -= 1;
 

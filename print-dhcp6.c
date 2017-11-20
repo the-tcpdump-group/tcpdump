@@ -286,11 +286,15 @@ dhcp6opt_print(netdissect_options *ndo,
 	uint16_t opttype;
 	size_t optlen;
 	uint8_t auth_proto;
+	uint8_t auth_alg;
+	uint8_t auth_rdm;
 	u_int authinfolen, authrealmlen;
 	int remain_len;  /* Length of remaining options */
 	int label_len;   /* Label length */
 	uint16_t subopt_code;
 	uint16_t subopt_len;
+	uint8_t dh6_reconf_type;
+	uint8_t dh6_lq_query_type;
 
 	if (cp == ep)
 		return;
@@ -395,7 +399,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			ND_PRINT((ndo, " %d)", *tp));
+			ND_PRINT((ndo, " %d)", EXTRACT_8BITS(tp)));
 			break;
 		case DH6OPT_ELAPSED_TIME:
 			if (optlen != 2) {
@@ -417,7 +421,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			auth_proto = *tp;
+			auth_proto = EXTRACT_8BITS(tp);
 			switch (auth_proto) {
 			case DH6OPT_AUTHPROTO_DELAYED:
 				ND_PRINT((ndo, " proto: delayed"));
@@ -430,22 +434,24 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp++;
-			switch (*tp) {
+			auth_alg = EXTRACT_8BITS(tp);
+			switch (auth_alg) {
 			case DH6OPT_AUTHALG_HMACMD5:
 				/* XXX: may depend on the protocol */
 				ND_PRINT((ndo, ", alg: HMAC-MD5"));
 				break;
 			default:
-				ND_PRINT((ndo, ", alg: %d", *tp));
+				ND_PRINT((ndo, ", alg: %d", auth_alg));
 				break;
 			}
 			tp++;
-			switch (*tp) {
+			auth_rdm = EXTRACT_8BITS(tp);
+			switch (auth_rdm) {
 			case DH6OPT_AUTHRDM_MONOCOUNTER:
 				ND_PRINT((ndo, ", RDM: mono"));
 				break;
 			default:
-				ND_PRINT((ndo, ", RDM: %d", *tp));
+				ND_PRINT((ndo, ", RDM: %d", auth_rdm));
 				break;
 			}
 			tp++;
@@ -468,7 +474,7 @@ dhcp6opt_print(netdissect_options *ndo,
 					ND_PRINT((ndo, ", realm: "));
 				}
 				for (i = 0; i < authrealmlen; i++, tp++)
-					ND_PRINT((ndo, "%02x", *tp));
+					ND_PRINT((ndo, "%02x", EXTRACT_8BITS(tp)));
 				ND_PRINT((ndo, ", key ID: %08x", EXTRACT_BE_32BITS(tp)));
 				tp += 4;
 				ND_PRINT((ndo, ", HMAC-MD5:"));
@@ -480,7 +486,7 @@ dhcp6opt_print(netdissect_options *ndo,
 					ND_PRINT((ndo, " ??"));
 					break;
 				}
-				switch (*tp++) {
+				switch (EXTRACT_8BITS(tp)) {
 				case DH6OPT_AUTHRECONFIG_KEY:
 					ND_PRINT((ndo, " reconfig-key"));
 					break;
@@ -491,6 +497,7 @@ dhcp6opt_print(netdissect_options *ndo,
 					ND_PRINT((ndo, " type: ??"));
 					break;
 				}
+				tp++;
 				ND_PRINT((ndo, " value:"));
 				for (i = 0; i < 4; i++, tp+= 4)
 					ND_PRINT((ndo, " %08x", EXTRACT_BE_32BITS(tp)));
@@ -523,7 +530,8 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			switch (*tp) {
+			dh6_reconf_type = EXTRACT_8BITS(tp);
+			switch (dh6_reconf_type) {
 			case DH6_RENEW:
 				ND_PRINT((ndo, " for renew)"));
 				break;
@@ -531,7 +539,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				ND_PRINT((ndo, " for inf-req)"));
 				break;
 			default:
-				ND_PRINT((ndo, " for ?\?\?(%02x))", *tp));
+				ND_PRINT((ndo, " for ?\?\?(%02x))", dh6_reconf_type));
 				break;
 			}
 			break;
@@ -648,7 +656,8 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			switch (*tp) {
+			dh6_lq_query_type = EXTRACT_8BITS(tp);
+			switch (dh6_lq_query_type) {
 			case 1:
 				ND_PRINT((ndo, " by-address"));
 				break;
@@ -656,7 +665,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				ND_PRINT((ndo, " by-clientID"));
 				break;
 			default:
-				ND_PRINT((ndo, " type_%d", (int)*tp));
+				ND_PRINT((ndo, " type_%d", (int)dh6_lq_query_type));
 				break;
 			}
 			ND_PRINT((ndo, " %s", ip6addr_string(ndo, &tp[1])));
@@ -733,13 +742,14 @@ dhcp6opt_print(netdissect_options *ndo,
 			remain_len = optlen;
 			ND_PRINT((ndo, " "));
 			/* Encoding is described in section 3.1 of RFC 1035 */
-			while (remain_len && *tp) {
-				label_len =  *tp++;
+			while (remain_len && EXTRACT_8BITS(tp)) {
+				label_len = EXTRACT_8BITS(tp);
+				tp++;
 				if (label_len < remain_len - 1) {
 					(void)fn_printn(ndo, tp, label_len, NULL);
 					tp += label_len;
 					remain_len -= (label_len + 1);
-					if(*tp) ND_PRINT((ndo, "."));
+					if(EXTRACT_8BITS(tp)) ND_PRINT((ndo, "."));
 				} else {
 					ND_PRINT((ndo, " ?"));
 					break;

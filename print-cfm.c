@@ -232,7 +232,7 @@ cfm_network_addr_print(netdissect_options *ndo,
         return hexdump;
     }
     /* The calling function must make any due ND_TCHECK calls. */
-    network_addr_type = *tptr;
+    network_addr_type = EXTRACT_8BITS(tptr);
     ND_PRINT((ndo, "\n\t  Network Address Type %s (%u)",
            tok2str(af_values, "Unknown", network_addr_type),
            network_addr_type));
@@ -567,7 +567,7 @@ cfm_print(netdissect_options *ndo,
             }
             ND_PRINT((ndo, ", Status: %s (%u)",
                    tok2str(cfm_tlv_port_status_values, "Unknown", EXTRACT_8BITS(tptr)),
-                   *tptr));
+                   EXTRACT_8BITS(tptr)));
             break;
 
         case CFM_TLV_INTERFACE_STATUS:
@@ -577,7 +577,7 @@ cfm_print(netdissect_options *ndo,
             }
             ND_PRINT((ndo, ", Status: %s (%u)",
                    tok2str(cfm_tlv_interface_status_values, "Unknown", EXTRACT_8BITS(tptr)),
-                   *tptr));
+                   EXTRACT_8BITS(tptr)));
             break;
 
         case CFM_TLV_PRIVATE:
@@ -606,7 +606,7 @@ cfm_print(netdissect_options *ndo,
              * Get the Chassis ID length and check it.
              * IEEE 802.1Q-2014 Section 21.5.3.1
              */
-            chassis_id_length = *tptr;
+            chassis_id_length = EXTRACT_8BITS(tptr);
             tptr++;
             tlen--;
             cfm_tlv_len--;
@@ -621,7 +621,7 @@ cfm_print(netdissect_options *ndo,
                     ND_PRINT((ndo, "\n\t  (TLV too short)"));
                     goto next_tlv;
                 }
-                chassis_id_type = *tptr;
+                chassis_id_type = EXTRACT_8BITS(tptr);
                 cfm_tlv_len--;
                 ND_PRINT((ndo, "\n\t  Chassis-ID Type %s (%u), Chassis-ID length %u",
                        tok2str(cfm_tlv_senderid_chassisid_values,
@@ -680,7 +680,7 @@ cfm_print(netdissect_options *ndo,
             }
 
             /* Here mgmt_addr_length stands for the management domain length. */
-            mgmt_addr_length = *tptr;
+            mgmt_addr_length = EXTRACT_8BITS(tptr);
             tptr++;
             tlen--;
             cfm_tlv_len--;
@@ -710,7 +710,7 @@ cfm_print(netdissect_options *ndo,
                 }
 
                 /* Here mgmt_addr_length stands for the management address length. */
-                mgmt_addr_length = *tptr;
+                mgmt_addr_length = EXTRACT_8BITS(tptr);
                 tptr++;
                 tlen--;
                 cfm_tlv_len--;

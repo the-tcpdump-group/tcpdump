@@ -56,9 +56,10 @@ ns_nskip(netdissect_options *ndo,
 {
 	register u_char i;
 
-	if (!ND_TTEST2(*cp, 1))
+	if (!ND_TTEST_8BITS(cp))
 		return (NULL);
-	i = *cp++;
+	i = EXTRACT_8BITS(cp);
+	cp++;
 	while (i) {
 		if ((i & INDIR_MASK) == INDIR_MASK)
 			return (cp + 1);
@@ -67,17 +68,19 @@ ns_nskip(netdissect_options *ndo,
 
 			if ((i & ~INDIR_MASK) != EDNS0_ELT_BITLABEL)
 				return(NULL); /* unknown ELT */
-			if (!ND_TTEST2(*cp, 1))
+			if (!ND_TTEST_8BITS(cp))
 				return (NULL);
-			if ((bitlen = *cp++) == 0)
+			if ((bitlen = EXTRACT_8BITS(cp)) == 0)
 				bitlen = 256;
+			cp++;
 			bytelen = (bitlen + 7) / 8;
 			cp += bytelen;
 		} else
 			cp += i;
-		if (!ND_TTEST2(*cp, 1))
+		if (!ND_TTEST_8BITS(cp))
 			return (NULL);
-		i = *cp++;
+		i = EXTRACT_8BITS(cp);
+		cp++;
 	}
 	return (cp);
 }
@@ -91,9 +94,9 @@ blabel_print(netdissect_options *ndo,
 	const u_char *bitp, *lim;
 	char tc;
 
-	if (!ND_TTEST2(*cp, 1))
+	if (!ND_TTEST_8BITS(cp))
 		return(NULL);
-	if ((bitlen = *cp) == 0)
+	if ((bitlen = EXTRACT_8BITS(cp)) == 0)
 		bitlen = 256;
 	slen = (bitlen + 3) / 4;
 	lim = cp + 1 + slen;
@@ -106,11 +109,13 @@ blabel_print(netdissect_options *ndo,
 	}
 	if (b > 4) {
 		ND_TCHECK(*bitp);
-		tc = *bitp++;
+		tc = EXTRACT_8BITS(bitp);
+		bitp++;
 		ND_PRINT((ndo, "%02x", tc & (0xff << (8 - b))));
 	} else if (b > 0) {
 		ND_TCHECK(*bitp);
-		tc = *bitp++;
+		tc = EXTRACT_8BITS(bitp);
+		bitp++;
 		ND_PRINT((ndo, "%1x", ((tc >> 4) & 0x0f) & (0x0f << (4 - b))));
 	}
 	ND_PRINT((ndo, "/%d]", bitlen));
@@ -126,18 +131,18 @@ labellen(netdissect_options *ndo,
 {
 	register u_int i;
 
-	if (!ND_TTEST2(*cp, 1))
+	if (!ND_TTEST_8BITS(cp))
 		return(-1);
-	i = *cp;
+	i = EXTRACT_8BITS(cp);
 	if ((i & INDIR_MASK) == EDNS0_MASK) {
 		int bitlen, elt;
 		if ((elt = (i & ~INDIR_MASK)) != EDNS0_ELT_BITLABEL) {
 			ND_PRINT((ndo, "<ELT %d>", elt));
 			return(-1);
 		}
-		if (!ND_TTEST2(*(cp + 1), 1))
+		if (!ND_TTEST_8BITS(cp + 1))
 			return(-1);
-		if ((bitlen = *(cp + 1)) == 0)
+		if ((bitlen = EXTRACT_8BITS(cp + 1)) == 0)
 			bitlen = 256;
 		return(((bitlen + 7) / 8) + 1);
 	} else
@@ -156,10 +161,12 @@ ns_nprint(netdissect_options *ndo,
 
 	if ((l = labellen(ndo, cp)) == (u_int)-1)
 		return(NULL);
-	if (!ND_TTEST2(*cp, 1))
+	if (!ND_TTEST_8BITS(cp))
 		return(NULL);
 	max_offset = (u_int)(cp - bp);
-	if (((i = *cp++) & INDIR_MASK) != INDIR_MASK) {
+	i = EXTRACT_8BITS(cp);
+	cp++;
+	if ((i & INDIR_MASK) != INDIR_MASK) {
 		compress = 0;
 		rp = cp + l;
 	}
@@ -171,9 +178,9 @@ ns_nprint(netdissect_options *ndo,
 					rp = cp + 1;
 					compress = 1;
 				}
-				if (!ND_TTEST2(*cp, 1))
+				if (!ND_TTEST_8BITS(cp))
 					return(NULL);
-				offset = (((i << 8) | *cp) & 0x3fff);
+				offset = (((i << 8) | EXTRACT_8BITS(cp)) & 0x3fff);
 				/*
 				 * This must move backwards in the packet.
 				 * No RFC explicitly says that, but BIND's
@@ -192,9 +199,10 @@ ns_nprint(netdissect_options *ndo,
 				cp = bp + offset;
 				if ((l = labellen(ndo, cp)) == (u_int)-1)
 					return(NULL);
-				if (!ND_TTEST2(*cp, 1))
+				if (!ND_TTEST_8BITS(cp))
 					return(NULL);
-				i = *cp++;
+				i = EXTRACT_8BITS(cp);
+				cp++;
 				continue;
 			}
 			if ((i & INDIR_MASK) == EDNS0_MASK) {
@@ -218,9 +226,10 @@ ns_nprint(netdissect_options *ndo,
 			ND_PRINT((ndo, "."));
 			if ((l = labellen(ndo, cp)) == (u_int)-1)
 				return(NULL);
-			if (!ND_TTEST2(*cp, 1))
+			if (!ND_TTEST_8BITS(cp))
 				return(NULL);
-			i = *cp++;
+			i = EXTRACT_8BITS(cp);
+			cp++;
 			if (!compress)
 				rp += l + 1;
 		}
@@ -236,9 +245,10 @@ ns_cprint(netdissect_options *ndo,
 {
 	register u_int i;
 
-	if (!ND_TTEST2(*cp, 1))
+	if (!ND_TTEST_8BITS(cp))
 		return (NULL);
-	i = *cp++;
+	i = EXTRACT_8BITS(cp);
+	cp++;
 	if (fn_printn(ndo, cp, i, ndo->ndo_snapend))
 		return (NULL);
 	return (cp + i);
@@ -502,9 +512,9 @@ ns_rprint(netdissect_options *ndo,
 		int pbit, pbyte;
 		char ntop_buf[INET6_ADDRSTRLEN];
 
-		if (!ND_TTEST2(*cp, 1))
+		if (!ND_TTEST_8BITS(cp))
 			return(NULL);
-		pbit = *cp;
+		pbit = EXTRACT_8BITS(cp);
 		pbyte = (pbit & ~7) / 8;
 		if (pbit > 128) {
 			ND_PRINT((ndo, " %u(bad plen)", pbit));
@@ -548,23 +558,23 @@ ns_rprint(netdissect_options *ndo,
 		if ((cp = ns_nprint(ndo, cp, bp)) == NULL)
 			return(NULL);
 		cp += 6;
-		if (!ND_TTEST2(*cp, 2))
+		if (!ND_TTEST_16BITS(cp))
 			return(NULL);
 		ND_PRINT((ndo, " fudge=%u", EXTRACT_BE_16BITS(cp)));
 		cp += 2;
-		if (!ND_TTEST2(*cp, 2))
+		if (!ND_TTEST_16BITS(cp))
 			return(NULL);
 		ND_PRINT((ndo, " maclen=%u", EXTRACT_BE_16BITS(cp)));
 		cp += 2 + EXTRACT_BE_16BITS(cp);
-		if (!ND_TTEST2(*cp, 2))
+		if (!ND_TTEST_16BITS(cp))
 			return(NULL);
 		ND_PRINT((ndo, " origid=%u", EXTRACT_BE_16BITS(cp)));
 		cp += 2;
-		if (!ND_TTEST2(*cp, 2))
+		if (!ND_TTEST_16BITS(cp))
 			return(NULL);
 		ND_PRINT((ndo, " error=%u", EXTRACT_BE_16BITS(cp)));
 		cp += 2;
-		if (!ND_TTEST2(*cp, 2))
+		if (!ND_TTEST_16BITS(cp))
 			return(NULL);
 		ND_PRINT((ndo, " otherlen=%u", EXTRACT_BE_16BITS(cp)));
 		cp += 2;

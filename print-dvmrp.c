@@ -197,14 +197,16 @@ print_report(netdissect_options *ndo,
 			}
 			origin = 0;
 			for (i = 0; i < width; ++i) {
-				ND_TCHECK(*bp);
-				origin = origin << 8 | *bp++;
+				ND_TCHECK_8BITS(bp);
+				origin = origin << 8 | EXTRACT_8BITS(bp);
+				bp++;
 			}
 			for ( ; i < 4; ++i)
 				origin <<= 8;
 
-			ND_TCHECK(*bp);
-			metric = *bp++;
+			ND_TCHECK_8BITS(bp);
+			metric = EXTRACT_8BITS(bp);
+			bp++;
 			done = metric & 0x80;
 			metric &= 0x7f;
 			ND_PRINT((ndo, "\n\t  %s metric %d", intoa(htonl(origin)),
@@ -262,9 +264,12 @@ print_neighbors(netdissect_options *ndo,
 		ND_TCHECK2(bp[0], 7);
 		laddr = bp;
 		bp += 4;
-		metric = *bp++;
-		thresh = *bp++;
-		ncount = *bp++;
+		metric = EXTRACT_8BITS(bp);
+		bp++;
+		thresh = EXTRACT_8BITS(bp);
+		bp++;
+		ncount = EXTRACT_8BITS(bp);
+		bp++;
 		len -= 7;
 		while (--ncount >= 0) {
 			ND_TCHECK2(bp[0], 4);
@@ -297,10 +302,14 @@ print_neighbors2(netdissect_options *ndo,
 		ND_TCHECK2(bp[0], 8);
 		laddr = bp;
 		bp += 4;
-		metric = *bp++;
-		thresh = *bp++;
-		flags = *bp++;
-		ncount = *bp++;
+		metric = EXTRACT_8BITS(bp);
+		bp++;
+		thresh = EXTRACT_8BITS(bp);
+		bp++;
+		flags = EXTRACT_8BITS(bp);
+		bp++;
+		ncount = EXTRACT_8BITS(bp);
+		bp++;
 		len -= 8;
 		while (--ncount >= 0 && (len >= 4) && (bp + 4) <= ep) {
 			ND_PRINT((ndo, " [%s -> ", ipaddr_string(ndo, laddr)));
