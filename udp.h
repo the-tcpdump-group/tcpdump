@@ -260,6 +260,9 @@ struct udphdr {
 #ifndef WB_PORT
 #define WB_PORT				4567
 #endif
+#ifndef BFD_MHOP_CONTROL_PORT
+#define BFD_MHOP_CONTROL_PORT		4784	/* RFC 5883 */
+#endif
 #ifndef VXLAN_PORT
 #define VXLAN_PORT			4789	/* RFC 7348 */
 #endif
