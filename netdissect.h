@@ -315,7 +315,7 @@ struct netdissect_options {
 /* Bail if "var" was not captured */
 #define ND_TCHECK(var) ND_TCHECK2(var, sizeof(var))
 
-#define ND_PRINT(STUFF) (*ndo->ndo_printf)STUFF
+#define ND_PRINT(STUFF) (ndo->ndo_printf)STUFF
 #define ND_DEFAULTPRINT(ap, length) (*ndo->ndo_default_print)(ndo, ap, length)
 
 extern void ts_print(netdissect_options *, const struct timeval *);
