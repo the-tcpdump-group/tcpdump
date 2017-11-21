@@ -47,7 +47,6 @@ extern const char *tcpport_string(netdissect_options *, u_short);
 extern const char *udpport_string(netdissect_options *, u_short);
 extern const char *isonsap_string(netdissect_options *, const u_char *, register u_int);
 extern const char *dnaddr_string(netdissect_options *, u_short);
-extern const char *protoid_string(netdissect_options *, const u_char *);
 extern const char *ipxsap_string(netdissect_options *, u_short);
 extern const char *getname(netdissect_options *, const u_char *);
 extern const char *getname6(netdissect_options *, const u_char *);
