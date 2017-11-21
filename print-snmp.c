@@ -440,7 +440,7 @@ asn1_parse(netdissect_options *ndo,
 	 */
 	id = EXTRACT_8BITS(p) & ASN_ID_BITS;		/* lower 5 bits, range 00-1f */
 #ifdef notdef
-	form = (*p & 0xe0) >> 5;	/* move upper 3 bits to lower 3 */
+	form = (EXTRACT_8BITS(p) & 0xe0) >> 5;	/* move upper 3 bits to lower 3 */
 	class = form >> 1;		/* bits 7&6 -> bits 1&0, range 0-3 */
 	form &= 0x1;			/* bit 5 -> bit 0, range 0-1 */
 #else

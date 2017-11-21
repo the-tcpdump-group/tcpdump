@@ -409,7 +409,7 @@ aoe_print(netdissect_options *ndo,
 		goto invalid;
 	/* Ver/Flags */
 	ND_TCHECK2(*cp, 1);
-	ver = (*cp & 0xF0) >> 4;
+	ver = (EXTRACT_8BITS(cp) & 0xF0) >> 4;
 	/* Don't advance cp yet: low order 4 bits are version-specific. */
 	ND_PRINT((ndo, ", Ver %u", ver));
 

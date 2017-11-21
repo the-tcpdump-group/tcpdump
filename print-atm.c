@@ -462,7 +462,7 @@ oam_print (netdissect_options *ndo,
 
     ND_TCHECK(*(p+ATM_HDR_LEN_NOHEC+hec));
     cell_header = EXTRACT_BE_32BITS(p + hec);
-    cell_type = ((*(p+ATM_HDR_LEN_NOHEC+hec))>>4) & 0x0f;
+    cell_type = (EXTRACT_8BITS((p + ATM_HDR_LEN_NOHEC + hec)) >> 4) & 0x0f;
     func_type = EXTRACT_8BITS((p + ATM_HDR_LEN_NOHEC + hec)) & 0x0f;
 
     vpi = (cell_header>>20)&0xff;
