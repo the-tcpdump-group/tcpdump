@@ -539,7 +539,7 @@ static int dccp_print_option(netdissect_options *ndo, const u_char *option, u_in
 
 	if (*option >= 32) {
 		ND_TCHECK(*(option+1));
-		optlen = *(option +1);
+		optlen = EXTRACT_8BITS(option + 1);
 		if (optlen < 2) {
 			if (*option >= 128)
 				ND_PRINT((ndo, "CCID option %u optlen too short", *option));

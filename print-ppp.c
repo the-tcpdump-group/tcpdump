@@ -1103,7 +1103,7 @@ print_ipcp_config_options(netdissect_options *ndo,
                                 while (ipcomp_subopttotallen >= 2) {
                                         ND_TCHECK2(*p, 2);
                                         ipcomp_subopt = *p;
-                                        ipcomp_suboptlen = *(p+1);
+                                        ipcomp_suboptlen = EXTRACT_8BITS(p + 1);
 
                                         /* sanity check */
                                         if (ipcomp_subopt == 0 ||

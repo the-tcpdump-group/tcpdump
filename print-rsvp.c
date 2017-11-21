@@ -1069,7 +1069,7 @@ rsvp_obj_print(netdissect_options *ndo,
 		    u_char length;
 
 		    ND_TCHECK2(*obj_tptr, 4);
-		    length = *(obj_tptr + 1);
+		    length = EXTRACT_8BITS(obj_tptr + 1);
                     ND_PRINT((ndo, "%s  Subobject Type: %s, length %u",
                            indent,
                            tok2str(rsvp_obj_xro_values,
@@ -1091,7 +1091,7 @@ rsvp_obj_print(netdissect_options *ndo,
 				goto invalid;
 			}
 			ND_TCHECK2(*obj_tptr, 8);
-			prefix_length = *(obj_tptr+6);
+			prefix_length = EXTRACT_8BITS(obj_tptr + 6);
 			if (prefix_length != 32) {
 				ND_PRINT((ndo, " ERROR: Prefix length %u != 32",
 					  prefix_length));
@@ -1122,8 +1122,8 @@ rsvp_obj_print(netdissect_options *ndo,
                                EXTRACT_8BITS((obj_tptr + 3)),
                                EXTRACT_BE_32BITS(obj_tptr + 4)));
                     }
-                    obj_tlen-=*(obj_tptr+1);
-                    obj_tptr+=*(obj_tptr+1);
+                    obj_tlen-=EXTRACT_8BITS(obj_tptr + 1);
+                    obj_tptr+=EXTRACT_8BITS(obj_tptr + 1);
                 }
                 break;
             default:
@@ -1171,7 +1171,7 @@ rsvp_obj_print(netdissect_options *ndo,
             case RSVP_CTYPE_TUNNEL_IPV4:
                 if (obj_tlen < 4)
                     return-1;
-                namelen = *(obj_tptr+3);
+                namelen = EXTRACT_8BITS(obj_tptr + 3);
                 if (obj_tlen < 4+namelen)
                     return-1;
                 ND_PRINT((ndo, "%s  Session Name: ", indent));
@@ -1571,7 +1571,7 @@ rsvp_obj_print(netdissect_options *ndo,
             case RSVP_CTYPE_IPV4:
                 if (obj_tlen < 8)
                     return-1;
-                error_code=*(obj_tptr+5);
+                error_code=EXTRACT_8BITS(obj_tptr + 5);
                 error_value=EXTRACT_BE_16BITS(obj_tptr + 6);
                 ND_PRINT((ndo, "%s  Error Node Address: %s, Flags: [0x%02x]%s  Error Code: %s (%u)",
                        indent,
@@ -1603,7 +1603,7 @@ rsvp_obj_print(netdissect_options *ndo,
             case RSVP_CTYPE_IPV6:
                 if (obj_tlen < 20)
                     return-1;
-                error_code=*(obj_tptr+17);
+                error_code=EXTRACT_8BITS(obj_tptr + 17);
                 error_value=EXTRACT_BE_16BITS(obj_tptr + 18);
                 ND_PRINT((ndo, "%s  Error Node Address: %s, Flags: [0x%02x]%s  Error Code: %s (%u)",
                        indent,
@@ -1654,8 +1654,8 @@ rsvp_obj_print(netdissect_options *ndo,
                     if (*(obj_tptr+1) < 2)
                         return -1;
                     print_unknown_data(ndo, obj_tptr + 2, "\n\t\t", *(obj_tptr + 1) - 2);
-                    obj_tlen-=*(obj_tptr+1);
-                    obj_tptr+=*(obj_tptr+1);
+                    obj_tlen-=EXTRACT_8BITS(obj_tptr + 1);
+                    obj_tptr+=EXTRACT_8BITS(obj_tptr + 1);
                 }
                 break;
             default:

@@ -656,7 +656,7 @@ lldp_private_8021_print(netdissect_options *ndo,
     if (tlv_len < 4) {
         return hexdump;
     }
-    subtype = *(tptr+3);
+    subtype = EXTRACT_8BITS(tptr + 3);
 
     ND_PRINT((ndo, "\n\t  %s Subtype (%u)",
            tok2str(lldp_8021_subtype_values, "unknown", subtype),
@@ -687,7 +687,7 @@ lldp_private_8021_print(netdissect_options *ndo,
         if (tlv_len < 7) {
             return hexdump;
         }
-        sublen = *(tptr+6);
+        sublen = EXTRACT_8BITS(tptr + 6);
         if (tlv_len < 7+sublen) {
             return hexdump;
         }
@@ -698,7 +698,7 @@ lldp_private_8021_print(netdissect_options *ndo,
         if (tlv_len < 5) {
             return hexdump;
         }
-        sublen = *(tptr+4);
+        sublen = EXTRACT_8BITS(tptr + 4);
         if (tlv_len < 5+sublen) {
             return hexdump;
         }
@@ -709,13 +709,13 @@ lldp_private_8021_print(netdissect_options *ndo,
         if(tlv_len<LLDP_PRIVATE_8021_SUBTYPE_CONGESTION_NOTIFICATION_LENGTH){
         	return hexdump;
         }
-        tval=*(tptr+4);
+        tval=EXTRACT_8BITS(tptr + 4);
         ND_PRINT((ndo, "\n\t    Pre-Priority CNPV Indicator"));
         ND_PRINT((ndo, "\n\t     Priority : 0  1  2  3  4  5  6  7"));
         ND_PRINT((ndo, "\n\t     Value    : "));
         for(i=0;i<NO_OF_BITS;i++)
             ND_PRINT((ndo, "%-2d ", (tval >> i) & 0x01));
-        tval=*(tptr+5);
+        tval=EXTRACT_8BITS(tptr + 5);
         ND_PRINT((ndo, "\n\t    Pre-Priority Ready Indicator"));
         ND_PRINT((ndo, "\n\t     Priority : 0  1  2  3  4  5  6  7"));
         ND_PRINT((ndo, "\n\t     Value    : "));
@@ -727,7 +727,7 @@ lldp_private_8021_print(netdissect_options *ndo,
         if(tlv_len<LLDP_PRIVATE_8021_SUBTYPE_ETS_CONFIGURATION_LENGTH) {
             return hexdump;
         }
-        tval=*(tptr+4);
+        tval=EXTRACT_8BITS(tptr + 4);
         ND_PRINT((ndo, "\n\t    Willing:%d, CBS:%d, RES:%d, Max TCs:%d",
         	tval >> 7, (tval >> 6) & 0x02, (tval >> 3) & 0x07, tval & 0x07));
 
@@ -759,11 +759,11 @@ lldp_private_8021_print(netdissect_options *ndo,
         if(tlv_len<LLDP_PRIVATE_8021_SUBTYPE_PFC_CONFIGURATION_LENGTH) {
             return hexdump;
         }
-        tval=*(tptr+4);
+        tval=EXTRACT_8BITS(tptr + 4);
         ND_PRINT((ndo, "\n\t    Willing: %d, MBC: %d, RES: %d, PFC cap:%d ",
         	tval >> 7, (tval >> 6) & 0x01, (tval >> 4) & 0x03, (tval & 0x0f)));
         ND_PRINT((ndo, "\n\t    PFC Enable"));
-        tval=*(tptr+5);
+        tval=EXTRACT_8BITS(tptr + 5);
         ND_PRINT((ndo, "\n\t     Priority : 0  1  2  3  4  5  6  7"));
         ND_PRINT((ndo, "\n\t     Value    : "));
         for(i=0;i<NO_OF_BITS;i++)
@@ -786,7 +786,7 @@ lldp_private_8021_print(netdissect_options *ndo,
         i=0;
         ND_PRINT((ndo, "\n\t    Application Priority Table"));
         while(i<sublen) {
-        	tval=*(tptr+i+5);
+        	tval=EXTRACT_8BITS(tptr + i + 5);
         	ND_PRINT((ndo, "\n\t      Priority: %u, RES: %u, Sel: %u, Protocol ID: %u",
         		 tval >> 5, (tval >> 3) & 0x03, (tval & 0x07),
 			 EXTRACT_BE_16BITS(tptr + i + 5)));
@@ -798,20 +798,20 @@ lldp_private_8021_print(netdissect_options *ndo,
         	return hexdump;
         }
         ND_PRINT((ndo, "\n\t    EVB Bridge Status"));
-        tval=*(tptr+4);
+        tval=EXTRACT_8BITS(tptr + 4);
         ND_PRINT((ndo, "\n\t      RES: %d, BGID: %d, RRCAP: %d, RRCTR: %d",
         	tval >> 3, (tval >> 2) & 0x01, (tval >> 1) & 0x01, tval & 0x01));
         ND_PRINT((ndo, "\n\t    EVB Station Status"));
-        tval=*(tptr+5);
+        tval=EXTRACT_8BITS(tptr + 5);
         ND_PRINT((ndo, "\n\t      RES: %d, SGID: %d, RRREQ: %d,RRSTAT: %d",
         	tval >> 4, (tval >> 3) & 0x01, (tval >> 2) & 0x01, tval & 0x03));
-        tval=*(tptr+6);
+        tval=EXTRACT_8BITS(tptr + 6);
         ND_PRINT((ndo, "\n\t    R: %d, RTE: %d, ",tval >> 5, tval & 0x1f));
-        tval=*(tptr+7);
+        tval=EXTRACT_8BITS(tptr + 7);
         ND_PRINT((ndo, "EVB Mode: %s [%d]",
         	tok2str(lldp_evb_mode_values, "unknown", tval >> 6), tval >> 6));
         ND_PRINT((ndo, "\n\t    ROL: %d, RWD: %d, ", (tval >> 5) & 0x01, tval & 0x1f));
-        tval=*(tptr+8);
+        tval=EXTRACT_8BITS(tptr + 8);
         ND_PRINT((ndo, "RES: %d, ROL: %d, RKA: %d", tval >> 6, (tval >> 5) & 0x01, tval & 0x1f));
         break;
 
@@ -819,7 +819,7 @@ lldp_private_8021_print(netdissect_options *ndo,
         if(tlv_len<LLDP_PRIVATE_8021_SUBTYPE_CDCP_MIN_LENGTH){
         	return hexdump;
         }
-        tval=*(tptr+4);
+        tval=EXTRACT_8BITS(tptr + 4);
         ND_PRINT((ndo, "\n\t    Role: %d, RES: %d, Scomp: %d ",
         	tval >> 7, (tval >> 4) & 0x07, (tval >> 3) & 0x01));
         ND_PRINT((ndo, "ChnCap: %d", EXTRACT_BE_16BITS(tptr + 6) & 0x0fff));
@@ -856,7 +856,7 @@ lldp_private_8023_print(netdissect_options *ndo,
     if (tlv_len < 4) {
         return hexdump;
     }
-    subtype = *(tptr+3);
+    subtype = EXTRACT_8BITS(tptr + 3);
 
     ND_PRINT((ndo, "\n\t  %s Subtype (%u)",
            tok2str(lldp_8023_subtype_values, "unknown", subtype),
@@ -940,7 +940,7 @@ lldp_private_iana_print(netdissect_options *ndo,
     if (tlv_len < 8) {
         return hexdump;
     }
-    subtype = *(tptr+3);
+    subtype = EXTRACT_8BITS(tptr + 3);
 
     ND_PRINT((ndo, "\n\t  %s Subtype (%u)",
            tok2str(lldp_iana_subtype_values, "unknown", subtype),
@@ -976,7 +976,7 @@ lldp_private_tia_print(netdissect_options *ndo,
     if (tlv_len < 4) {
         return hexdump;
     }
-    subtype = *(tptr+3);
+    subtype = EXTRACT_8BITS(tptr + 3);
 
     ND_PRINT((ndo, "\n\t  %s Subtype (%u)",
            tok2str(lldp_tia_subtype_values, "unknown", subtype),
@@ -1016,7 +1016,7 @@ lldp_private_tia_print(netdissect_options *ndo,
         if (tlv_len < 5) {
             return hexdump;
         }
-        location_format = *(tptr+4);
+        location_format = EXTRACT_8BITS(tptr + 4);
         ND_PRINT((ndo, "\n\t    Location data format %s (0x%02x)",
                tok2str(lldp_tia_location_data_format_values, "unknown", location_format),
                location_format));
@@ -1045,7 +1045,7 @@ lldp_private_tia_print(netdissect_options *ndo,
             if (tlv_len < 6) {
                 return hexdump;
             }
-            lci_len = *(tptr+5);
+            lci_len = EXTRACT_8BITS(tptr + 5);
             if (lci_len < 3) {
                 return hexdump;
             }
@@ -1069,7 +1069,7 @@ lldp_private_tia_print(netdissect_options *ndo,
                     return hexdump;
                 }
 		ca_type = *(tptr);
-                ca_len = *(tptr+1);
+                ca_len = EXTRACT_8BITS(tptr + 1);
 
 		tptr += 2;
                 lci_len -= 2;
@@ -1159,7 +1159,7 @@ lldp_private_dcbx_print(netdissect_options *ndo,
     if (len < 4) {
         return hexdump;
     }
-    subtype = *(pptr+3);
+    subtype = EXTRACT_8BITS(pptr + 3);
 
     ND_PRINT((ndo, "\n\t  %s Subtype (%u)",
            tok2str(lldp_dcbx_subtype_values, "unknown", subtype),
@@ -1218,7 +1218,7 @@ lldp_private_dcbx_print(netdissect_options *ndo,
 	    ND_PRINT((ndo, "\n\t      Oper_Version: %d", *tptr));
 	    ND_PRINT((ndo, "\n\t      Max_Version: %d", *(tptr + 1)));
 	    ND_PRINT((ndo, "\n\t      Info block(0x%02X): ", *(tptr + 2)));
-	    tval = *(tptr+2);
+	    tval = EXTRACT_8BITS(tptr + 2);
 	    ND_PRINT((ndo, "Enable bit: %d, Willing bit: %d, Error Bit: %d",
 		(tval &  0x80) ? 1 : 0, (tval &  0x40) ? 1 : 0,
 		(tval &  0x20) ? 1 : 0));
@@ -1249,12 +1249,12 @@ lldp_private_dcbx_print(netdissect_options *ndo,
 	    ND_PRINT((ndo, "\n\t      Oper_Version: %d", *tptr));
 	    ND_PRINT((ndo, "\n\t      Max_Version: %d", *(tptr + 1)));
 	    ND_PRINT((ndo, "\n\t      Info block(0x%02X): ", *(tptr + 2)));
-	    tval = *(tptr+2);
+	    tval = EXTRACT_8BITS(tptr + 2);
 	    ND_PRINT((ndo, "Enable bit: %d, Willing bit: %d, Error Bit: %d",
 		(tval &  0x80) ? 1 : 0, (tval &  0x40) ? 1 : 0,
 		(tval &  0x20) ? 1 : 0));
 	    ND_PRINT((ndo, "\n\t      SubType: %d", *(tptr + 3)));
-	    tval = *(tptr+4);
+	    tval = EXTRACT_8BITS(tptr + 4);
 	    ND_PRINT((ndo, "\n\t      PFC Config (0x%02X)", *(tptr + 4)));
 	    for (i = 0; i <= 7; i++)
 		ND_PRINT((ndo, "\n\t          Priority Bit %d: %s",
@@ -1270,7 +1270,7 @@ lldp_private_dcbx_print(netdissect_options *ndo,
 	    ND_PRINT((ndo, "\n\t      Oper_Version: %d", *tptr));
 	    ND_PRINT((ndo, "\n\t      Max_Version: %d", *(tptr + 1)));
 	    ND_PRINT((ndo, "\n\t      Info block(0x%02X): ", *(tptr + 2)));
-	    tval = *(tptr+2);
+	    tval = EXTRACT_8BITS(tptr + 2);
 	    ND_PRINT((ndo, "Enable bit: %d, Willing bit: %d, Error Bit: %d",
 		(tval &  0x80) ? 1 : 0, (tval &  0x40) ? 1 : 0,
 		(tval &  0x20) ? 1 : 0));

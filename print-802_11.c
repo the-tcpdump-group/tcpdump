@@ -1023,7 +1023,7 @@ parse_elements(netdissect_options *ndo,
 			return 0;
 		if (length < 2)
 			return 0;
-		elementlen = *(p + offset + 1);
+		elementlen = EXTRACT_8BITS(p + offset + 1);
 
 		/* Make sure we have the entire element. */
 		if (!ND_TTEST2(*(p + offset + 2), elementlen))
@@ -1123,7 +1123,7 @@ parse_elements(netdissect_options *ndo,
 				length -= ds.length;
 				break;
 			}
-			ds.channel = *(p + offset);
+			ds.channel = EXTRACT_8BITS(p + offset);
 			offset += 1;
 			length -= 1;
 			/*

@@ -196,7 +196,7 @@ eap_print(netdissect_options *ndo,
 
         if (type <= 2) { /* For EAP_REQUEST and EAP_RESPONSE only */
             ND_TCHECK_8BITS(tptr+4);
-            subtype = *(tptr+4);
+            subtype = EXTRACT_8BITS(tptr + 4);
             ND_PRINT((ndo, "\n\t\t Type %s (%u)",
                    tok2str(eap_type_values, "unknown", subtype),
                    subtype));

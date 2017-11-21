@@ -668,7 +668,7 @@ print_vendor_attr(netdissect_options *ndo,
 	ND_TCHECK2(*data, 2);
 
         vendor_type = *(data);
-        vendor_length = *(data+1);
+        vendor_length = EXTRACT_8BITS(data + 1);
 
         if (vendor_length < 2)
         {

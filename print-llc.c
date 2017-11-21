@@ -167,7 +167,7 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 	}
 
 	dsap_field = *p;
-	ssap_field = *(p + 1);
+	ssap_field = EXTRACT_8BITS(p + 1);
 
 	/*
 	 * OK, what type of LLC frame is this?  The length
@@ -175,7 +175,7 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 	 * have a two-byte control field, and U frames have
 	 * a one-byte control field.
 	 */
-	control = *(p + 2);
+	control = EXTRACT_8BITS(p + 2);
 	if ((control & LLC_U_FMT) == LLC_U_FMT) {
 		/*
 		 * U frame.

@@ -113,7 +113,7 @@ geneve_opts_print(netdissect_options *ndo, const u_char *bp, u_int len)
         sep = ", ";
 
         opt_class = EXTRACT_BE_16BITS(bp);
-        opt_type = *(bp + 2);
+        opt_type = EXTRACT_8BITS(bp + 2);
         opt_len = 4 + ((*(bp + 3) & OPT_LEN_MASK) * 4);
 
         ND_PRINT((ndo, "class %s (0x%x) type 0x%x%s len %u",

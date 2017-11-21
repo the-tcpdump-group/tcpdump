@@ -170,7 +170,7 @@ cdp_print(netdissect_options *ndo,
 		    case 0x05: /* Version */
 			ND_PRINT((ndo, "\n\t  "));
 			for (i=0;i<len;i++) {
-			    j = *(tptr+i);
+			    j = EXTRACT_8BITS(tptr + i);
 			    if (j == '\n') /* lets rework the version string to
 					      get a nice indentation */
 				ND_PRINT((ndo, "\n\t  "));

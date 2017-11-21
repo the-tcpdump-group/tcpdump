@@ -384,7 +384,7 @@ ldp_tlv_print(netdissect_options *ndo,
              * Pseudowire Types.
              */
             TLV_TCHECK(7);
-            vc_info_len = *(tptr+2);
+            vc_info_len = EXTRACT_8BITS(tptr + 2);
 
             /*
 	     * According to RFC 4908, the VC info Length field can be zero,
@@ -422,7 +422,7 @@ ldp_tlv_print(netdissect_options *ndo,
 
             while (vc_info_len > 2) {
                 vc_info_tlv_type = *tptr;
-                vc_info_tlv_len = *(tptr+1);
+                vc_info_tlv_len = EXTRACT_8BITS(tptr + 1);
                 if (vc_info_tlv_len < 2)
                     break;
                 if (vc_info_len < vc_info_tlv_len)

@@ -130,7 +130,7 @@ vtp_print (netdissect_options *ndo,
 
     ND_TCHECK2(*tptr, VTP_HEADER_LEN);
 
-    type = *(tptr+1);
+    type = EXTRACT_8BITS(tptr + 1);
     ND_PRINT((ndo, "VTPv%u, Message %s (0x%02x), length %u",
 	   *tptr,
 	   tok2str(vtp_message_type_values,"Unknown message type", type),
@@ -144,7 +144,7 @@ vtp_print (netdissect_options *ndo,
 
     /* verbose mode print all fields */
     ND_PRINT((ndo, "\n\tDomain name: "));
-    mgmtd_len = *(tptr + 3);
+    mgmtd_len = EXTRACT_8BITS(tptr + 3);
     if (mgmtd_len < 1 ||  mgmtd_len > 32) {
 	ND_PRINT((ndo, " [invalid MgmtD Len %d]", mgmtd_len));
 	return;
@@ -288,7 +288,7 @@ vtp_print (netdissect_options *ndo,
                     goto trunc;
                 ND_TCHECK2(*tptr, 2);
                 type = *tptr;
-                tlv_len = *(tptr+1);
+                tlv_len = EXTRACT_8BITS(tptr + 1);
 
                 ND_PRINT((ndo, "\n\t\t%s (0x%04x) TLV",
                        tok2str(vtp_vlan_tlv_values, "Unknown", type),

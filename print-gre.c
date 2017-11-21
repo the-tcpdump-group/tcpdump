@@ -180,8 +180,8 @@ gre_print_0(netdissect_options *ndo, const u_char *bp, u_int length)
 			if (len < 4)
 				goto trunc;
 			af = EXTRACT_BE_16BITS(bp);
-			sreoff = *(bp + 2);
-			srelen = *(bp + 3);
+			sreoff = EXTRACT_8BITS(bp + 2);
+			srelen = EXTRACT_8BITS(bp + 3);
 			bp += 4;
 			len -= 4;
 
