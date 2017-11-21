@@ -433,12 +433,14 @@ pgm_print(netdissect_options *ndo,
 	     * That option header MUST be an OPT_LENGTH option
 	     * (see the first paragraph of section 9.1 in RFC 3208).
 	     */
-	    opt_type = *bp++;
+	    opt_type = EXTRACT_8BITS(bp);
+	    bp++;
 	    if ((opt_type & PGM_OPT_MASK) != PGM_OPT_LENGTH) {
 		ND_PRINT((ndo, "[First option bad, should be PGM_OPT_LENGTH, is %u]", opt_type & PGM_OPT_MASK));
 		return;
 	    }
-	    opt_len = *bp++;
+	    opt_len = EXTRACT_8BITS(bp);
+	    bp++;
 	    if (opt_len != 4) {
 		ND_PRINT((ndo, "[Bad OPT_LENGTH option, length %u != 4]", opt_len));
 		return;
@@ -461,8 +463,10 @@ pgm_print(netdissect_options *ndo,
 		    ND_PRINT((ndo, " [|OPT]"));
 		    return;
 		}
-		opt_type = *bp++;
-		opt_len = *bp++;
+		opt_type = EXTRACT_8BITS(bp);
+		bp++;
+		opt_len = EXTRACT_8BITS(bp);
+		bp++;
 		if (opt_len < PGM_MIN_OPT_LEN) {
 		    ND_PRINT((ndo, "[Bad option, length %u < %u]", opt_len,
 		        PGM_MIN_OPT_LEN));

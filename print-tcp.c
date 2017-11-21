@@ -429,12 +429,14 @@ tcp_print(netdissect_options *ndo,
                         if (ch != '\0')
                                 ND_PRINT((ndo, "%c", ch));
                         ND_TCHECK(*cp);
-                        opt = *cp++;
+                        opt = EXTRACT_8BITS(cp);
+                        cp++;
                         if (ZEROLENOPT(opt))
                                 len = 1;
                         else {
                                 ND_TCHECK(*cp);
-                                len = *cp++;	/* total including type, len */
+                                len = EXTRACT_8BITS(cp);
+                                cp++;	/* total including type, len */
                                 if (len < 2 || len > hlen)
                                         goto bad;
                                 --hlen;		/* account for length byte */
@@ -801,7 +803,8 @@ print_tcp_rst_data(netdissect_options *ndo,
         }
         ND_PRINT((ndo, " "));
         while (length-- && sp < ndo->ndo_snapend) {
-                c = *sp++;
+                c = EXTRACT_8BITS(sp);
+                sp++;
                 safeputchar(ndo, c);
         }
         ND_PRINT((ndo, "]"));

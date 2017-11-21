@@ -1535,7 +1535,8 @@ dnsname_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 	/* DNS name decoding - no decompression */
 	ND_PRINT((ndo,", \""));
 	while (cp < ep) {
-		i = *cp++;
+		i = EXTRACT_8BITS(cp);
+		cp++;
 		if (i) {
 			if (i > ep - cp) {
 				ND_PRINT((ndo,"???"));

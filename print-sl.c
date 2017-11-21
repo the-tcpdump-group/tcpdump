@@ -231,9 +231,11 @@ compressed_sl_print(netdissect_options *ndo,
 	register const u_char *cp = chdr;
 	register u_int flags, hlen;
 
-	flags = *cp++;
+	flags = EXTRACT_8BITS(cp);
+	cp++;
 	if (flags & NEW_C) {
-		lastconn = *cp++;
+		lastconn = EXTRACT_8BITS(cp);
+		cp++;
 		ND_PRINT((ndo, "ctcp %d", lastconn));
 	} else
 		ND_PRINT((ndo, "ctcp *"));

@@ -274,14 +274,16 @@ subtlvs_print(netdissect_options *ndo,
     uint32_t t1, t2;
 
     while (cp < ep) {
-        subtype = *cp++;
+        subtype = EXTRACT_8BITS(cp);
+        cp++;
         if(subtype == MESSAGE_SUB_PAD1) {
             ND_PRINT((ndo, " sub-pad1"));
             continue;
         }
         if(cp == ep)
             goto invalid;
-        sublen = *cp++;
+        sublen = EXTRACT_8BITS(cp);
+        cp++;
         if(cp + sublen > ep)
             goto invalid;
 

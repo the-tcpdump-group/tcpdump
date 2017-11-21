@@ -119,7 +119,8 @@ c_print(netdissect_options *ndo,
 
 	flag = 1;
 	while (s < ep) {
-		c = *s++;
+		c = EXTRACT_8BITS(s);
+		s++;
 		if (c == '\0') {
 			flag = 0;
 			break;

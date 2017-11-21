@@ -429,7 +429,8 @@ handle_ctrl_proto(netdissect_options *ndo,
 		goto trunc;
 	ND_TCHECK2(*tptr, 2);
 
-	code = *tptr++;
+	code = EXTRACT_8BITS(tptr);
+	tptr++;
 
 	ND_PRINT((ndo, "%s (0x%02x), id %u, length %u",
 	          tok2str(cpcodes, "Unknown Opcode",code),
@@ -1390,7 +1391,8 @@ ppp_hdlc(netdissect_options *ndo,
 	 * contents.
 	 */
 	for (s = p, t = b, i = length; i > 0 && ND_TTEST(*s); i--) {
-		c = *s++;
+		c = EXTRACT_8BITS(s);
+		s++;
 		if (c == 0x7d) {
 			if (i <= 1 || !ND_TTEST(*s))
 				break;

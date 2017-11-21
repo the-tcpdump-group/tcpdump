@@ -1369,7 +1369,8 @@ lldp_mgmt_addr_tlv_print(netdissect_options *ndo,
     if (tlen < 1) {
         return 0;
     }
-    mgmt_addr_len = *tptr++;
+    mgmt_addr_len = EXTRACT_8BITS(tptr);
+    tptr++;
     tlen--;
 
     if (tlen < mgmt_addr_len) {
