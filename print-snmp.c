@@ -72,6 +72,7 @@
 #endif
 
 #include "netdissect.h"
+#include "extract.h"
 
 #undef OPAQUE  /* defined in <wingdi.h> */
 
@@ -437,7 +438,7 @@ asn1_parse(netdissect_options *ndo,
 	 *  +---+---+---+---+---+---+---+---+
 	 *    7   6   5   4   3   2   1   0
 	 */
-	id = *p & ASN_ID_BITS;		/* lower 5 bits, range 00-1f */
+	id = EXTRACT_8BITS(p) & ASN_ID_BITS;		/* lower 5 bits, range 00-1f */
 #ifdef notdef
 	form = (*p & 0xe0) >> 5;	/* move upper 3 bits to lower 3 */
 	class = form >> 1;		/* bits 7&6 -> bits 1&0, range 0-3 */

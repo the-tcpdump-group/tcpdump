@@ -159,7 +159,7 @@ mpcp_print(netdissect_options *ndo, register const u_char *pptr, register u_int 
 
     case MPCP_OPCODE_GATE:
         ND_TCHECK2(*tptr, MPCP_GRANT_NUMBER_LEN);
-        grant_numbers = *tptr & MPCP_GRANT_NUMBER_MASK;
+        grant_numbers = EXTRACT_8BITS(tptr) & MPCP_GRANT_NUMBER_MASK;
         ND_PRINT((ndo, "\n\tGrant Numbers %u, Flags [ %s ]",
                grant_numbers,
                bittok2str(mpcp_grant_flag_values,

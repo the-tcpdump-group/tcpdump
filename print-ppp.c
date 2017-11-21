@@ -1395,7 +1395,8 @@ ppp_hdlc(netdissect_options *ndo,
 			if (i <= 1 || !ND_TTEST(*s))
 				break;
 			i--;
-			c = *s++ ^ 0x20;
+			c = EXTRACT_8BITS(s) ^ 0x20;
+			s++;
 		}
 		*t++ = c;
 	}
