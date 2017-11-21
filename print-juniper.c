@@ -1234,8 +1234,10 @@ juniper_parse_header(netdissect_options *ndo,
 
         ND_TCHECK2(tptr[0], jnx_ext_len);
         while (jnx_ext_len > JUNIPER_EXT_TLV_OVERHEAD) {
-            tlv_type = *(tptr++);
-            tlv_len = *(tptr++);
+            tlv_type = EXTRACT_8BITS(tptr);
+            tptr++;
+            tlv_len = EXTRACT_8BITS(tptr);
+            tptr++;
             tlv_value = 0;
 
             /* sanity checks */

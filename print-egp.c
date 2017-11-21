@@ -166,7 +166,8 @@ egpnrprint(netdissect_options *ndo,
 		switch (netlen) {
 
 		case 1:
-			addr = *cp++;
+			addr = EXTRACT_8BITS(cp);
+			cp++;
 			/* fall through */
 		case 2:
 			addr = (addr << 8) | *cp++;
@@ -179,7 +180,8 @@ egpnrprint(netdissect_options *ndo,
 		if (length < 1)
 			goto trunc;
 		ND_TCHECK2(cp[0], 1);
-		distances = *cp++;
+		distances = EXTRACT_8BITS(cp);
+		cp++;
 		length--;
 		ND_PRINT((ndo, " %s %s ",
 		       gateways < (int)egp->egp_intgw ? "int" : "ext",
@@ -193,7 +195,8 @@ egpnrprint(netdissect_options *ndo,
 			ND_TCHECK2(cp[0], 2);
 			ND_PRINT((ndo, "%sd%d:", comma, (int)*cp++));
 			comma = ", ";
-			networks = *cp++;
+			networks = EXTRACT_8BITS(cp);
+			cp++;
 			length -= 2;
 			while (--networks >= 0) {
 				/* Pickup network number */
