@@ -133,7 +133,8 @@ name_interpret(netdissect_options *ndo,
     if (in >= maxbuf)
 	return(-1);	/* name goes past the end of the buffer */
     ND_TCHECK2(*in, 1);
-    len = (*in++) / 2;
+    len = EXTRACT_8BITS(in) / 2;
+    in++;
 
     *out=0;
 
