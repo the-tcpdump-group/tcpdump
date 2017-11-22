@@ -632,7 +632,7 @@ print_attr_string(netdissect_options *ndo,
         break;
    }
 
-   for (i=0; i < length && *data; i++, data++)
+   for (i=0; i < length && EXTRACT_8BITS(data); i++, data++)
        ND_PRINT((ndo, "%c", (*data < 32 || *data > 126) ? '.' : *data));
 
    return;

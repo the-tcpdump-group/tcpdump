@@ -1185,8 +1185,8 @@ rsvp_obj_print(netdissect_options *ndo,
                                   "none",
                                   EXTRACT_8BITS((obj_tptr + 2))),
                        *(obj_tptr + 2)));
-                obj_tlen-=4+*(obj_tptr+3);
-                obj_tptr+=4+*(obj_tptr+3);
+                obj_tlen-=4+EXTRACT_8BITS((obj_tptr + 3));
+                obj_tptr+=4+EXTRACT_8BITS((obj_tptr + 3));
                 break;
             default:
                 hexdump=TRUE;
@@ -1649,7 +1649,7 @@ rsvp_obj_print(netdissect_options *ndo,
                            tok2str(rsvp_obj_prop_tlv_values,"unknown",EXTRACT_8BITS(obj_tptr)),
                            EXTRACT_8BITS(obj_tptr),
                            *(obj_tptr + 1)));
-                    if (obj_tlen < *(obj_tptr+1))
+                    if (obj_tlen < EXTRACT_8BITS((obj_tptr + 1)))
                         return-1;
                     if (*(obj_tptr+1) < 2)
                         return -1;

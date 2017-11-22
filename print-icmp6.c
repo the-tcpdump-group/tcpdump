@@ -1546,7 +1546,7 @@ dnsname_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 				safeputchar(ndo, *cp);
 				cp++;
 			}
-			if (cp + 1 < ep && *cp)
+			if (cp + 1 < ep && EXTRACT_8BITS(cp))
 				ND_PRINT((ndo,"."));
 		} else {
 			if (cp == ep) {

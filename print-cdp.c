@@ -396,7 +396,7 @@ static unsigned long cdp_get_number(const u_char * p, int l)
     unsigned long res=0;
     while( l>0 )
     {
-	res = (res<<8) + *p;
+	res = (res<<8) + EXTRACT_8BITS(p);
 	p++; l--;
     }
     return res;

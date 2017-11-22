@@ -481,7 +481,7 @@ asn1_parse(netdissect_options *ndo,
 			return -1;
 		}
 		ND_TCHECK(*p);
-		elem->id = id = (id << 7) | *p;
+		elem->id = id = (id << 7) | EXTRACT_8BITS(p);
 		--len;
 		++hdr;
 		++p;
@@ -501,8 +501,10 @@ asn1_parse(netdissect_options *ndo,
 			return -1;
 		}
 		ND_TCHECK2(*p, noct);
-		for (; noct-- > 0; len--, hdr++)
-			elem->asnlen = (elem->asnlen << ASN_SHIFT8) | *p++;
+		for (; noct-- > 0; len--, hdr++) {
+			elem->asnlen = (elem->asnlen << ASN_SHIFT8) | EXTRACT_8BITS(p);
+			p++;
+		}
 	}
 	if (len < elem->asnlen) {
 		ND_PRINT((ndo, "[len%d<asnlen%u]", len, elem->asnlen));
@@ -544,7 +546,7 @@ asn1_parse(netdissect_options *ndo,
 				if (*p & ASN_BIT8)	/* negative */
 					data = -1;
 				for (i = elem->asnlen; i-- > 0; p++)
-					data = (data << ASN_SHIFT8) | *p;
+					data = (data << ASN_SHIFT8) | EXTRACT_8BITS(p);
 				elem->data.integer = data;
 				break;
 			}
@@ -581,7 +583,7 @@ asn1_parse(netdissect_options *ndo,
 				elem->type = BE_UNS;
 				data = 0;
 				for (i = elem->asnlen; i-- > 0; p++)
-					data = (data << 8) + *p;
+					data = (data << 8) + EXTRACT_8BITS(p);
 				elem->data.uns = data;
 				break;
 			}
@@ -591,7 +593,7 @@ asn1_parse(netdissect_options *ndo,
 			        elem->type = BE_UNS64;
 				data64 = 0;
 				for (i = elem->asnlen; i-- > 0; p++)
-					data64 = (data64 << 8) + *p;
+					data64 = (data64 << 8) + EXTRACT_8BITS(p);
 				elem->data.uns64 = data64;
 				break;
 			}
