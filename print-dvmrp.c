@@ -32,6 +32,8 @@
 #include "addrtoname.h"
 
 /*
+ * See: RFC 1075 and draft-ietf-idmr-dvmrp-v3
+ *
  * DVMRP message types and flag values shamelessly stolen from
  * mrouted/dvmrp.h.
  */
@@ -58,7 +60,7 @@
 static int print_probe(netdissect_options *, const u_char *, const u_char *, u_int);
 static int print_report(netdissect_options *, const u_char *, const u_char *, u_int);
 static int print_neighbors(netdissect_options *, const u_char *, const u_char *, u_int);
-static int print_neighbors2(netdissect_options *, const u_char *, const u_char *, u_int, uint32_t);
+static int print_neighbors2(netdissect_options *, const u_char *, const u_char *, u_int, uint8_t, uint8_t);
 static int print_prune(netdissect_options *, const u_char *);
 static int print_graft(netdissect_options *, const u_char *);
 static int print_graft_ack(netdissect_options *, const u_char *);
@@ -69,14 +71,14 @@ dvmrp_print(netdissect_options *ndo,
 {
 	register const u_char *ep;
 	register u_char type;
-	uint32_t target_level;
+	uint8_t major_version, minor_version;
 
 	ep = (const u_char *)ndo->ndo_snapend;
 	if (bp >= ep)
 		return;
 
-	ND_TCHECK(bp[1]);
-	type = bp[1];
+	ND_TCHECK_8BITS(bp + 1);
+	type = EXTRACT_8BITS(bp + 1);
 
 	/* Skip IGMP header */
 	bp += 8;
@@ -117,15 +119,15 @@ dvmrp_print(netdissect_options *ndo,
 	case DVMRP_NEIGHBORS2:
 		ND_PRINT((ndo, " Neighbors2"));
 		/*
-		 * extract version and capabilities from IGMP group
-		 * address field
+		 * extract version from IGMP group address field
 		 */
 		bp -= 4;
 		ND_TCHECK2(bp[0], 4);
-		target_level = (bp[0] << 24) | (bp[1] << 16) |
-		    (bp[2] << 8) | bp[3];
+		major_version = EXTRACT_8BITS(bp + 3);
+		minor_version = EXTRACT_8BITS(bp + 2);
 		bp += 4;
-		if (print_neighbors2(ndo, bp, ep, len, target_level) < 0)
+		if (print_neighbors2(ndo, bp, ep, len, major_version,
+		    minor_version) < 0)
 			goto trunc;
 		break;
 
@@ -287,15 +289,14 @@ trunc:
 static int
 print_neighbors2(netdissect_options *ndo,
                  register const u_char *bp, register const u_char *ep,
-                 register u_int len, uint32_t target_level)
+                 register u_int len, uint8_t major_version,
+                 uint8_t minor_version)
 {
 	const u_char *laddr;
 	register u_char metric, thresh, flags;
 	register int ncount;
 
-	ND_PRINT((ndo, " (v %u.%u):",
-	       target_level & 0xff,
-	       (target_level >> 8) & 0xff));
+	ND_PRINT((ndo, " (v %u.%u):", major_version, minor_version));
 
 	while (len > 0 && bp < ep) {
 		ND_TCHECK2(bp[0], 8);
