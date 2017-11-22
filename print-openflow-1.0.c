@@ -763,7 +763,7 @@ of10_bsn_message_print(netdissect_options *ndo,
 		goto invalid;
 	/* subtype */
 	ND_TCHECK2(*cp, 4);
-	subtype = EXTRACT_BE_32BITS(cp);
+	subtype = EXTRACT_BE_U_4(cp);
 	cp += 4;
 	ND_PRINT((ndo, "\n\t subtype %s", tok2str(bsn_subtype_str, "unknown (0x%08x)", subtype)));
 	switch (subtype) {
@@ -835,7 +835,7 @@ of10_bsn_message_print(netdissect_options *ndo,
 			goto invalid;
 		/* report_mirror_ports */
 		ND_TCHECK2(*cp, 1);
-		ND_PRINT((ndo, ", report_mirror_ports %s", tok2str(bsn_onoff_str, "bogus (%u)", EXTRACT_8BITS(cp))));
+		ND_PRINT((ndo, ", report_mirror_ports %s", tok2str(bsn_onoff_str, "bogus (%u)", EXTRACT_U_1(cp))));
 		cp += 1;
 		/* pad */
 		ND_TCHECK2(*cp, 3);
@@ -872,7 +872,7 @@ of10_bsn_message_print(netdissect_options *ndo,
 			goto invalid;
 		/* vport_no */
 		ND_TCHECK2(*cp, 4);
-		ND_PRINT((ndo, ", vport_no %u", EXTRACT_BE_32BITS(cp)));
+		ND_PRINT((ndo, ", vport_no %u", EXTRACT_BE_U_4(cp)));
 		cp += 4;
 		break;
 	case BSN_SHELL_COMMAND:
@@ -892,7 +892,7 @@ of10_bsn_message_print(netdissect_options *ndo,
 			goto invalid;
 		/* service */
 		ND_TCHECK2(*cp, 4);
-		ND_PRINT((ndo, ", service %u", EXTRACT_BE_32BITS(cp)));
+		ND_PRINT((ndo, ", service %u", EXTRACT_BE_U_4(cp)));
 		cp += 4;
 		/* data */
 		ND_PRINT((ndo, ", data '"));
@@ -939,7 +939,7 @@ of10_bsn_message_print(netdissect_options *ndo,
 			goto invalid;
 		/* status */
 		ND_TCHECK2(*cp, 4);
-		ND_PRINT((ndo, ", status 0x%08x", EXTRACT_BE_32BITS(cp)));
+		ND_PRINT((ndo, ", status 0x%08x", EXTRACT_BE_U_4(cp)));
 		cp += 4;
 		break;
 	default:
@@ -968,7 +968,7 @@ of10_bsn_actions_print(netdissect_options *ndo,
 		goto invalid;
 	/* subtype */
 	ND_TCHECK2(*cp, 4);
-	subtype = EXTRACT_BE_32BITS(cp);
+	subtype = EXTRACT_BE_U_4(cp);
 	cp += 4;
 	ND_PRINT((ndo, "\n\t  subtype %s", tok2str(bsn_action_subtype_str, "unknown (0x%08x)", subtype)));
 	switch (subtype) {
@@ -991,11 +991,11 @@ of10_bsn_actions_print(netdissect_options *ndo,
 			goto invalid;
 		/* dest_port */
 		ND_TCHECK2(*cp, 4);
-		ND_PRINT((ndo, ", dest_port %u", EXTRACT_BE_32BITS(cp)));
+		ND_PRINT((ndo, ", dest_port %u", EXTRACT_BE_U_4(cp)));
 		cp += 4;
 		/* vlan_tag */
 		ND_TCHECK2(*cp, 4);
-		vlan_tag = EXTRACT_BE_32BITS(cp);
+		vlan_tag = EXTRACT_BE_U_4(cp);
 		cp += 4;
 		switch (vlan_tag >> 16) {
 		case 0:
@@ -1009,7 +1009,7 @@ of10_bsn_actions_print(netdissect_options *ndo,
 		}
 		/* copy_stage */
 		ND_TCHECK2(*cp, 1);
-		ND_PRINT((ndo, ", copy_stage %s", tok2str(bsn_mirror_copy_stage_str, "unknown (%u)", EXTRACT_8BITS(cp))));
+		ND_PRINT((ndo, ", copy_stage %s", tok2str(bsn_mirror_copy_stage_str, "unknown (%u)", EXTRACT_U_1(cp))));
 		cp += 1;
 		/* pad */
 		ND_TCHECK2(*cp, 3);
@@ -1042,7 +1042,7 @@ of10_vendor_action_print(netdissect_options *ndo,
 		goto invalid;
 	/* vendor */
 	ND_TCHECK2(*cp, 4);
-	vendor = EXTRACT_BE_32BITS(cp);
+	vendor = EXTRACT_BE_U_4(cp);
 	cp += 4;
 	ND_PRINT((ndo, ", vendor 0x%08x (%s)", vendor, of_vendor_name(vendor)));
 	/* data */
@@ -1071,7 +1071,7 @@ of10_vendor_message_print(netdissect_options *ndo,
 		goto invalid;
 	/* vendor */
 	ND_TCHECK2(*cp, 4);
-	vendor = EXTRACT_BE_32BITS(cp);
+	vendor = EXTRACT_BE_U_4(cp);
 	cp += 4;
 	ND_PRINT((ndo, ", vendor 0x%08x (%s)", vendor, of_vendor_name(vendor)));
 	/* data */
@@ -1100,7 +1100,7 @@ of10_vendor_data_print(netdissect_options *ndo,
 		goto invalid;
 	/* vendor */
 	ND_TCHECK2(*cp, 4);
-	vendor = EXTRACT_BE_32BITS(cp);
+	vendor = EXTRACT_BE_U_4(cp);
 	cp += 4;
 	ND_PRINT((ndo, ", vendor 0x%08x (%s)", vendor, of_vendor_name(vendor)));
 	/* data */
@@ -1150,7 +1150,7 @@ of10_phy_ports_print(netdissect_options *ndo,
 			goto invalid;
 		/* port_no */
 		ND_TCHECK2(*cp, 2);
-		ND_PRINT((ndo, "\n\t  port_no %s", tok2str(ofpp_str, "%u", EXTRACT_BE_16BITS(cp))));
+		ND_PRINT((ndo, "\n\t  port_no %s", tok2str(ofpp_str, "%u", EXTRACT_BE_U_2(cp))));
 		cp += 2;
 		/* hw_addr */
 		ND_TCHECK2(*cp, ETHER_ADDR_LEN);
@@ -1170,38 +1170,38 @@ of10_phy_ports_print(netdissect_options *ndo,
 		}
 		/* config */
 		ND_TCHECK2(*cp, 4);
-		ND_PRINT((ndo, "\n\t   config 0x%08x", EXTRACT_BE_32BITS(cp)));
-		of10_bitmap_print(ndo, ofppc_bm, EXTRACT_BE_32BITS(cp),
+		ND_PRINT((ndo, "\n\t   config 0x%08x", EXTRACT_BE_U_4(cp)));
+		of10_bitmap_print(ndo, ofppc_bm, EXTRACT_BE_U_4(cp),
 				  OFPPC_U);
 		cp += 4;
 		/* state */
 		ND_TCHECK2(*cp, 4);
-		ND_PRINT((ndo, "\n\t   state 0x%08x", EXTRACT_BE_32BITS(cp)));
-		of10_bitmap_print(ndo, ofpps_bm, EXTRACT_BE_32BITS(cp),
+		ND_PRINT((ndo, "\n\t   state 0x%08x", EXTRACT_BE_U_4(cp)));
+		of10_bitmap_print(ndo, ofpps_bm, EXTRACT_BE_U_4(cp),
 				  OFPPS_U);
 		cp += 4;
 		/* curr */
 		ND_TCHECK2(*cp, 4);
-		ND_PRINT((ndo, "\n\t   curr 0x%08x", EXTRACT_BE_32BITS(cp)));
-		of10_bitmap_print(ndo, ofppf_bm, EXTRACT_BE_32BITS(cp),
+		ND_PRINT((ndo, "\n\t   curr 0x%08x", EXTRACT_BE_U_4(cp)));
+		of10_bitmap_print(ndo, ofppf_bm, EXTRACT_BE_U_4(cp),
 				  OFPPF_U);
 		cp += 4;
 		/* advertised */
 		ND_TCHECK2(*cp, 4);
-		ND_PRINT((ndo, "\n\t   advertised 0x%08x", EXTRACT_BE_32BITS(cp)));
-		of10_bitmap_print(ndo, ofppf_bm, EXTRACT_BE_32BITS(cp),
+		ND_PRINT((ndo, "\n\t   advertised 0x%08x", EXTRACT_BE_U_4(cp)));
+		of10_bitmap_print(ndo, ofppf_bm, EXTRACT_BE_U_4(cp),
 				  OFPPF_U);
 		cp += 4;
 		/* supported */
 		ND_TCHECK2(*cp, 4);
-		ND_PRINT((ndo, "\n\t   supported 0x%08x", EXTRACT_BE_32BITS(cp)));
-		of10_bitmap_print(ndo, ofppf_bm, EXTRACT_BE_32BITS(cp),
+		ND_PRINT((ndo, "\n\t   supported 0x%08x", EXTRACT_BE_U_4(cp)));
+		of10_bitmap_print(ndo, ofppf_bm, EXTRACT_BE_U_4(cp),
 				  OFPPF_U);
 		cp += 4;
 		/* peer */
 		ND_TCHECK2(*cp, 4);
-		ND_PRINT((ndo, "\n\t   peer 0x%08x", EXTRACT_BE_32BITS(cp)));
-		of10_bitmap_print(ndo, ofppf_bm, EXTRACT_BE_32BITS(cp),
+		ND_PRINT((ndo, "\n\t   peer 0x%08x", EXTRACT_BE_U_4(cp)));
+		of10_bitmap_print(ndo, ofppf_bm, EXTRACT_BE_U_4(cp),
 				  OFPPF_U);
 		cp += 4;
 next_port:
@@ -1234,12 +1234,12 @@ of10_queue_props_print(netdissect_options *ndo,
 			goto invalid;
 		/* property */
 		ND_TCHECK2(*cp, 2);
-		property = EXTRACT_BE_16BITS(cp);
+		property = EXTRACT_BE_U_2(cp);
 		cp += 2;
 		ND_PRINT((ndo, "\n\t   property %s", tok2str(ofpqt_str, "invalid (0x%04x)", property)));
 		/* len */
 		ND_TCHECK2(*cp, 2);
-		plen = EXTRACT_BE_16BITS(cp);
+		plen = EXTRACT_BE_U_2(cp);
 		cp += 2;
 		ND_PRINT((ndo, ", len %u", plen));
 		if (plen < OF_QUEUE_PROP_HEADER_LEN || plen > len)
@@ -1270,7 +1270,7 @@ of10_queue_props_print(netdissect_options *ndo,
 		if (property == OFPQT_MIN_RATE) { /* the only case of property decoding */
 			/* rate */
 			ND_TCHECK2(*cp, 2);
-			rate = EXTRACT_BE_16BITS(cp);
+			rate = EXTRACT_BE_U_2(cp);
 			cp += 2;
 			if (rate > 1000)
 				ND_PRINT((ndo, ", rate disabled"));
@@ -1308,11 +1308,11 @@ of10_queues_print(netdissect_options *ndo,
 			goto invalid;
 		/* queue_id */
 		ND_TCHECK2(*cp, 4);
-		ND_PRINT((ndo, "\n\t  queue_id %u", EXTRACT_BE_32BITS(cp)));
+		ND_PRINT((ndo, "\n\t  queue_id %u", EXTRACT_BE_U_4(cp)));
 		cp += 4;
 		/* len */
 		ND_TCHECK2(*cp, 2);
-		desclen = EXTRACT_BE_16BITS(cp);
+		desclen = EXTRACT_BE_U_2(cp);
 		cp += 2;
 		ND_PRINT((ndo, ", len %u", desclen));
 		if (desclen < OF_PACKET_QUEUE_LEN || desclen > len)
@@ -1355,14 +1355,14 @@ of10_match_print(netdissect_options *ndo,
 
 	/* wildcards */
 	ND_TCHECK2(*cp, 4);
-	wildcards = EXTRACT_BE_32BITS(cp);
+	wildcards = EXTRACT_BE_U_4(cp);
 	if (wildcards & OFPFW_U)
 		ND_PRINT((ndo, "%swildcards 0x%08x (bogus)", pfx, wildcards));
 	cp += 4;
 	/* in_port */
 	ND_TCHECK2(*cp, 2);
 	if (! (wildcards & OFPFW_IN_PORT))
-		ND_PRINT((ndo, "%smatch in_port %s", pfx, tok2str(ofpp_str, "%u", EXTRACT_BE_16BITS(cp))));
+		ND_PRINT((ndo, "%smatch in_port %s", pfx, tok2str(ofpp_str, "%u", EXTRACT_BE_U_2(cp))));
 	cp += 2;
 	/* dl_src */
 	ND_TCHECK2(*cp, ETHER_ADDR_LEN);
@@ -1377,19 +1377,19 @@ of10_match_print(netdissect_options *ndo,
 	/* dl_vlan */
 	ND_TCHECK2(*cp, 2);
 	if (! (wildcards & OFPFW_DL_VLAN))
-		ND_PRINT((ndo, "%smatch dl_vlan %s", pfx, vlan_str(EXTRACT_BE_16BITS(cp))));
+		ND_PRINT((ndo, "%smatch dl_vlan %s", pfx, vlan_str(EXTRACT_BE_U_2(cp))));
 	cp += 2;
 	/* dl_vlan_pcp */
 	ND_TCHECK2(*cp, 1);
 	if (! (wildcards & OFPFW_DL_VLAN_PCP))
-		ND_PRINT((ndo, "%smatch dl_vlan_pcp %s", pfx, pcp_str(EXTRACT_8BITS(cp))));
+		ND_PRINT((ndo, "%smatch dl_vlan_pcp %s", pfx, pcp_str(EXTRACT_U_1(cp))));
 	cp += 1;
 	/* pad1 */
 	ND_TCHECK2(*cp, 1);
 	cp += 1;
 	/* dl_type */
 	ND_TCHECK2(*cp, 2);
-	dl_type = EXTRACT_BE_16BITS(cp);
+	dl_type = EXTRACT_BE_U_2(cp);
 	cp += 2;
 	if (! (wildcards & OFPFW_DL_TYPE))
 		ND_PRINT((ndo, "%smatch dl_type 0x%04x", pfx, dl_type));
@@ -1428,7 +1428,7 @@ of10_match_print(netdissect_options *ndo,
 		field_name = ! (wildcards & OFPFW_DL_TYPE) && dl_type == ETHERTYPE_IP
 		  && ! (wildcards & OFPFW_NW_PROTO) && nw_proto == IPPROTO_ICMP
 		  ? "icmp_type" : "tp_src";
-		ND_PRINT((ndo, "%smatch %s %u", pfx, field_name, EXTRACT_BE_16BITS(cp)));
+		ND_PRINT((ndo, "%smatch %s %u", pfx, field_name, EXTRACT_BE_U_2(cp)));
 	}
 	cp += 2;
 	/* tp_dst */
@@ -1437,7 +1437,7 @@ of10_match_print(netdissect_options *ndo,
 		field_name = ! (wildcards & OFPFW_DL_TYPE) && dl_type == ETHERTYPE_IP
 		  && ! (wildcards & OFPFW_NW_PROTO) && nw_proto == IPPROTO_ICMP
 		  ? "icmp_code" : "tp_dst";
-		ND_PRINT((ndo, "%smatch %s %u", pfx, field_name, EXTRACT_BE_16BITS(cp)));
+		ND_PRINT((ndo, "%smatch %s %u", pfx, field_name, EXTRACT_BE_U_2(cp)));
 	}
 	return cp + 2;
 
@@ -1463,12 +1463,12 @@ of10_actions_print(netdissect_options *ndo,
 			goto invalid;
 		/* type */
 		ND_TCHECK2(*cp, 2);
-		type = EXTRACT_BE_16BITS(cp);
+		type = EXTRACT_BE_U_2(cp);
 		cp += 2;
 		ND_PRINT((ndo, "%saction type %s", pfx, tok2str(ofpat_str, "invalid (0x%04x)", type)));
 		/* length */
 		ND_TCHECK2(*cp, 2);
-		alen = EXTRACT_BE_16BITS(cp);
+		alen = EXTRACT_BE_U_2(cp);
 		cp += 2;
 		ND_PRINT((ndo, ", len %u", alen));
 		/* On action size underrun/overrun skip the rest of the action list. */
@@ -1513,19 +1513,19 @@ of10_actions_print(netdissect_options *ndo,
 		case OFPAT_OUTPUT:
 			/* port */
 			ND_TCHECK2(*cp, 2);
-			output_port = EXTRACT_BE_16BITS(cp);
+			output_port = EXTRACT_BE_U_2(cp);
 			cp += 2;
 			ND_PRINT((ndo, ", port %s", tok2str(ofpp_str, "%u", output_port)));
 			/* max_len */
 			ND_TCHECK2(*cp, 2);
 			if (output_port == OFPP_CONTROLLER)
-				ND_PRINT((ndo, ", max_len %u", EXTRACT_BE_16BITS(cp)));
+				ND_PRINT((ndo, ", max_len %u", EXTRACT_BE_U_2(cp)));
 			cp += 2;
 			break;
 		case OFPAT_SET_VLAN_VID:
 			/* vlan_vid */
 			ND_TCHECK2(*cp, 2);
-			ND_PRINT((ndo, ", vlan_vid %s", vlan_str(EXTRACT_BE_16BITS(cp))));
+			ND_PRINT((ndo, ", vlan_vid %s", vlan_str(EXTRACT_BE_U_2(cp))));
 			cp += 2;
 			/* pad */
 			ND_TCHECK2(*cp, 2);
@@ -1534,7 +1534,7 @@ of10_actions_print(netdissect_options *ndo,
 		case OFPAT_SET_VLAN_PCP:
 			/* vlan_pcp */
 			ND_TCHECK2(*cp, 1);
-			ND_PRINT((ndo, ", vlan_pcp %s", pcp_str(EXTRACT_8BITS(cp))));
+			ND_PRINT((ndo, ", vlan_pcp %s", pcp_str(EXTRACT_U_1(cp))));
 			cp += 1;
 			/* pad */
 			ND_TCHECK2(*cp, 3);
@@ -1570,7 +1570,7 @@ of10_actions_print(netdissect_options *ndo,
 		case OFPAT_SET_TP_DST:
 			/* nw_tos */
 			ND_TCHECK2(*cp, 2);
-			ND_PRINT((ndo, ", tp_port %u", EXTRACT_BE_16BITS(cp)));
+			ND_PRINT((ndo, ", tp_port %u", EXTRACT_BE_U_2(cp)));
 			cp += 2;
 			/* pad */
 			ND_TCHECK2(*cp, 2);
@@ -1579,14 +1579,14 @@ of10_actions_print(netdissect_options *ndo,
 		case OFPAT_ENQUEUE:
 			/* port */
 			ND_TCHECK2(*cp, 2);
-			ND_PRINT((ndo, ", port %s", tok2str(ofpp_str, "%u", EXTRACT_BE_16BITS(cp))));
+			ND_PRINT((ndo, ", port %s", tok2str(ofpp_str, "%u", EXTRACT_BE_U_2(cp))));
 			cp += 2;
 			/* pad */
 			ND_TCHECK2(*cp, 6);
 			cp += 6;
 			/* queue_id */
 			ND_TCHECK2(*cp, 4);
-			ND_PRINT((ndo, ", queue_id %s", tok2str(ofpq_str, "%u", EXTRACT_BE_32BITS(cp))));
+			ND_PRINT((ndo, ", queue_id %s", tok2str(ofpq_str, "%u", EXTRACT_BE_U_4(cp))));
 			cp += 4;
 			break;
 		case OFPAT_VENDOR:
@@ -1620,11 +1620,11 @@ of10_features_reply_print(netdissect_options *ndo,
 {
 	/* datapath_id */
 	ND_TCHECK2(*cp, 8);
-	ND_PRINT((ndo, "\n\t dpid 0x%016" PRIx64, EXTRACT_BE_64BITS(cp)));
+	ND_PRINT((ndo, "\n\t dpid 0x%016" PRIx64, EXTRACT_BE_U_8(cp)));
 	cp += 8;
 	/* n_buffers */
 	ND_TCHECK2(*cp, 4);
-	ND_PRINT((ndo, ", n_buffers %u", EXTRACT_BE_32BITS(cp)));
+	ND_PRINT((ndo, ", n_buffers %u", EXTRACT_BE_U_4(cp)));
 	cp += 4;
 	/* n_tables */
 	ND_TCHECK2(*cp, 1);
@@ -1635,14 +1635,14 @@ of10_features_reply_print(netdissect_options *ndo,
 	cp += 3;
 	/* capabilities */
 	ND_TCHECK2(*cp, 4);
-	ND_PRINT((ndo, "\n\t capabilities 0x%08x", EXTRACT_BE_32BITS(cp)));
-	of10_bitmap_print(ndo, ofp_capabilities_bm, EXTRACT_BE_32BITS(cp),
+	ND_PRINT((ndo, "\n\t capabilities 0x%08x", EXTRACT_BE_U_4(cp)));
+	of10_bitmap_print(ndo, ofp_capabilities_bm, EXTRACT_BE_U_4(cp),
 			  OFPCAP_U);
 	cp += 4;
 	/* actions */
 	ND_TCHECK2(*cp, 4);
-	ND_PRINT((ndo, "\n\t actions 0x%08x", EXTRACT_BE_32BITS(cp)));
-	of10_bitmap_print(ndo, ofpat_bm, EXTRACT_BE_32BITS(cp), OFPAT_U);
+	ND_PRINT((ndo, "\n\t actions 0x%08x", EXTRACT_BE_U_4(cp)));
+	of10_bitmap_print(ndo, ofpat_bm, EXTRACT_BE_U_4(cp), OFPAT_U);
 	cp += 4;
 	/* ports */
 	return of10_phy_ports_print(ndo, cp, ep, len - OF_SWITCH_FEATURES_LEN);
@@ -1664,43 +1664,43 @@ of10_flow_mod_print(netdissect_options *ndo,
 		return ep; /* end of snapshot */
 	/* cookie */
 	ND_TCHECK2(*cp, 8);
-	ND_PRINT((ndo, "\n\t cookie 0x%016" PRIx64, EXTRACT_BE_64BITS(cp)));
+	ND_PRINT((ndo, "\n\t cookie 0x%016" PRIx64, EXTRACT_BE_U_8(cp)));
 	cp += 8;
 	/* command */
 	ND_TCHECK2(*cp, 2);
-	command = EXTRACT_BE_16BITS(cp);
+	command = EXTRACT_BE_U_2(cp);
 	ND_PRINT((ndo, ", command %s", tok2str(ofpfc_str, "invalid (0x%04x)", command)));
 	cp += 2;
 	/* idle_timeout */
 	ND_TCHECK2(*cp, 2);
-	if (EXTRACT_BE_16BITS(cp))
-		ND_PRINT((ndo, ", idle_timeout %u", EXTRACT_BE_16BITS(cp)));
+	if (EXTRACT_BE_U_2(cp))
+		ND_PRINT((ndo, ", idle_timeout %u", EXTRACT_BE_U_2(cp)));
 	cp += 2;
 	/* hard_timeout */
 	ND_TCHECK2(*cp, 2);
-	if (EXTRACT_BE_16BITS(cp))
-		ND_PRINT((ndo, ", hard_timeout %u", EXTRACT_BE_16BITS(cp)));
+	if (EXTRACT_BE_U_2(cp))
+		ND_PRINT((ndo, ", hard_timeout %u", EXTRACT_BE_U_2(cp)));
 	cp += 2;
 	/* priority */
 	ND_TCHECK2(*cp, 2);
-	if (EXTRACT_BE_16BITS(cp))
-		ND_PRINT((ndo, ", priority %u", EXTRACT_BE_16BITS(cp)));
+	if (EXTRACT_BE_U_2(cp))
+		ND_PRINT((ndo, ", priority %u", EXTRACT_BE_U_2(cp)));
 	cp += 2;
 	/* buffer_id */
 	ND_TCHECK2(*cp, 4);
 	if (command == OFPFC_ADD || command == OFPFC_MODIFY ||
 	    command == OFPFC_MODIFY_STRICT)
-		ND_PRINT((ndo, ", buffer_id %s", tok2str(bufferid_str, "0x%08x", EXTRACT_BE_32BITS(cp))));
+		ND_PRINT((ndo, ", buffer_id %s", tok2str(bufferid_str, "0x%08x", EXTRACT_BE_U_4(cp))));
 	cp += 4;
 	/* out_port */
 	ND_TCHECK2(*cp, 2);
 	if (command == OFPFC_DELETE || command == OFPFC_DELETE_STRICT)
-		ND_PRINT((ndo, ", out_port %s", tok2str(ofpp_str, "%u", EXTRACT_BE_16BITS(cp))));
+		ND_PRINT((ndo, ", out_port %s", tok2str(ofpp_str, "%u", EXTRACT_BE_U_2(cp))));
 	cp += 2;
 	/* flags */
 	ND_TCHECK2(*cp, 2);
-	ND_PRINT((ndo, ", flags 0x%04x", EXTRACT_BE_16BITS(cp)));
-	of10_bitmap_print(ndo, ofpff_bm, EXTRACT_BE_16BITS(cp), OFPFF_U);
+	ND_PRINT((ndo, ", flags 0x%04x", EXTRACT_BE_U_2(cp)));
+	of10_bitmap_print(ndo, ofpff_bm, EXTRACT_BE_U_2(cp), OFPFF_U);
 	cp += 2;
 	/* actions */
 	return of10_actions_print(ndo, "\n\t ", cp, ep, len - OF_FLOW_MOD_LEN);
@@ -1717,7 +1717,7 @@ of10_port_mod_print(netdissect_options *ndo,
 {
 	/* port_no */
 	ND_TCHECK2(*cp, 2);
-	ND_PRINT((ndo, "\n\t port_no %s", tok2str(ofpp_str, "%u", EXTRACT_BE_16BITS(cp))));
+	ND_PRINT((ndo, "\n\t port_no %s", tok2str(ofpp_str, "%u", EXTRACT_BE_U_2(cp))));
 	cp += 2;
 	/* hw_addr */
 	ND_TCHECK2(*cp, ETHER_ADDR_LEN);
@@ -1725,18 +1725,18 @@ of10_port_mod_print(netdissect_options *ndo,
 	cp += ETHER_ADDR_LEN;
 	/* config */
 	ND_TCHECK2(*cp, 4);
-	ND_PRINT((ndo, "\n\t config 0x%08x", EXTRACT_BE_32BITS(cp)));
-	of10_bitmap_print(ndo, ofppc_bm, EXTRACT_BE_32BITS(cp), OFPPC_U);
+	ND_PRINT((ndo, "\n\t config 0x%08x", EXTRACT_BE_U_4(cp)));
+	of10_bitmap_print(ndo, ofppc_bm, EXTRACT_BE_U_4(cp), OFPPC_U);
 	cp += 4;
 	/* mask */
 	ND_TCHECK2(*cp, 4);
-	ND_PRINT((ndo, "\n\t mask 0x%08x", EXTRACT_BE_32BITS(cp)));
-	of10_bitmap_print(ndo, ofppc_bm, EXTRACT_BE_32BITS(cp), OFPPC_U);
+	ND_PRINT((ndo, "\n\t mask 0x%08x", EXTRACT_BE_U_4(cp)));
+	of10_bitmap_print(ndo, ofppc_bm, EXTRACT_BE_U_4(cp), OFPPC_U);
 	cp += 4;
 	/* advertise */
 	ND_TCHECK2(*cp, 4);
-	ND_PRINT((ndo, "\n\t advertise 0x%08x", EXTRACT_BE_32BITS(cp)));
-	of10_bitmap_print(ndo, ofppf_bm, EXTRACT_BE_32BITS(cp), OFPPF_U);
+	ND_PRINT((ndo, "\n\t advertise 0x%08x", EXTRACT_BE_U_4(cp)));
+	of10_bitmap_print(ndo, ofppf_bm, EXTRACT_BE_U_4(cp), OFPPF_U);
 	cp += 4;
 	/* pad */
 	ND_TCHECK2(*cp, 4);
@@ -1758,13 +1758,13 @@ of10_stats_request_print(netdissect_options *ndo,
 
 	/* type */
 	ND_TCHECK2(*cp, 2);
-	type = EXTRACT_BE_16BITS(cp);
+	type = EXTRACT_BE_U_2(cp);
 	cp += 2;
 	ND_PRINT((ndo, "\n\t type %s", tok2str(ofpst_str, "invalid (0x%04x)", type)));
 	/* flags */
 	ND_TCHECK2(*cp, 2);
-	ND_PRINT((ndo, ", flags 0x%04x", EXTRACT_BE_16BITS(cp)));
-	if (EXTRACT_BE_16BITS(cp))
+	ND_PRINT((ndo, ", flags 0x%04x", EXTRACT_BE_U_2(cp)));
+	if (EXTRACT_BE_U_2(cp))
 		ND_PRINT((ndo, " (bogus)"));
 	cp += 2;
 	/* type-specific body of one of fixed lengths */
@@ -1784,21 +1784,21 @@ of10_stats_request_print(netdissect_options *ndo,
 			return ep; /* end of snapshot */
 		/* table_id */
 		ND_TCHECK2(*cp, 1);
-		ND_PRINT((ndo, "\n\t table_id %s", tok2str(tableid_str, "%u", EXTRACT_8BITS(cp))));
+		ND_PRINT((ndo, "\n\t table_id %s", tok2str(tableid_str, "%u", EXTRACT_U_1(cp))));
 		cp += 1;
 		/* pad */
 		ND_TCHECK2(*cp, 1);
 		cp += 1;
 		/* out_port */
 		ND_TCHECK2(*cp, 2);
-		ND_PRINT((ndo, ", out_port %s", tok2str(ofpp_str, "%u", EXTRACT_BE_16BITS(cp))));
+		ND_PRINT((ndo, ", out_port %s", tok2str(ofpp_str, "%u", EXTRACT_BE_U_2(cp))));
 		return cp + 2;
 	case OFPST_PORT:
 		if (len != OF_PORT_STATS_REQUEST_LEN)
 			goto invalid;
 		/* port_no */
 		ND_TCHECK2(*cp, 2);
-		ND_PRINT((ndo, "\n\t port_no %s", tok2str(ofpp_str, "%u", EXTRACT_BE_16BITS(cp))));
+		ND_PRINT((ndo, "\n\t port_no %s", tok2str(ofpp_str, "%u", EXTRACT_BE_U_2(cp))));
 		cp += 2;
 		/* pad */
 		ND_TCHECK2(*cp, 6);
@@ -1808,14 +1808,14 @@ of10_stats_request_print(netdissect_options *ndo,
 			goto invalid;
 		/* port_no */
 		ND_TCHECK2(*cp, 2);
-		ND_PRINT((ndo, "\n\t port_no %s", tok2str(ofpp_str, "%u", EXTRACT_BE_16BITS(cp))));
+		ND_PRINT((ndo, "\n\t port_no %s", tok2str(ofpp_str, "%u", EXTRACT_BE_U_2(cp))));
 		cp += 2;
 		/* pad */
 		ND_TCHECK2(*cp, 2);
 		cp += 2;
 		/* queue_id */
 		ND_TCHECK2(*cp, 4);
-		ND_PRINT((ndo, ", queue_id %s", tok2str(ofpq_str, "%u", EXTRACT_BE_32BITS(cp))));
+		ND_PRINT((ndo, ", queue_id %s", tok2str(ofpq_str, "%u", EXTRACT_BE_U_4(cp))));
 		return cp + 4;
 	case OFPST_VENDOR:
 		return of10_vendor_data_print(ndo, cp, ep, len);
@@ -1892,14 +1892,14 @@ of10_flow_stats_reply_print(netdissect_options *ndo,
 			goto invalid;
 		/* length */
 		ND_TCHECK2(*cp, 2);
-		entry_len = EXTRACT_BE_16BITS(cp);
+		entry_len = EXTRACT_BE_U_2(cp);
 		ND_PRINT((ndo, "\n\t length %u", entry_len));
 		if (entry_len < OF_FLOW_STATS_LEN || entry_len > len)
 			goto invalid;
 		cp += 2;
 		/* table_id */
 		ND_TCHECK2(*cp, 1);
-		ND_PRINT((ndo, ", table_id %s", tok2str(tableid_str, "%u", EXTRACT_8BITS(cp))));
+		ND_PRINT((ndo, ", table_id %s", tok2str(tableid_str, "%u", EXTRACT_U_1(cp))));
 		cp += 1;
 		/* pad */
 		ND_TCHECK2(*cp, 1);
@@ -1909,38 +1909,38 @@ of10_flow_stats_reply_print(netdissect_options *ndo,
 			return ep; /* end of snapshot */
 		/* duration_sec */
 		ND_TCHECK2(*cp, 4);
-		ND_PRINT((ndo, "\n\t  duration_sec %u", EXTRACT_BE_32BITS(cp)));
+		ND_PRINT((ndo, "\n\t  duration_sec %u", EXTRACT_BE_U_4(cp)));
 		cp += 4;
 		/* duration_nsec */
 		ND_TCHECK2(*cp, 4);
-		ND_PRINT((ndo, ", duration_nsec %u", EXTRACT_BE_32BITS(cp)));
+		ND_PRINT((ndo, ", duration_nsec %u", EXTRACT_BE_U_4(cp)));
 		cp += 4;
 		/* priority */
 		ND_TCHECK2(*cp, 2);
-		ND_PRINT((ndo, ", priority %u", EXTRACT_BE_16BITS(cp)));
+		ND_PRINT((ndo, ", priority %u", EXTRACT_BE_U_2(cp)));
 		cp += 2;
 		/* idle_timeout */
 		ND_TCHECK2(*cp, 2);
-		ND_PRINT((ndo, ", idle_timeout %u", EXTRACT_BE_16BITS(cp)));
+		ND_PRINT((ndo, ", idle_timeout %u", EXTRACT_BE_U_2(cp)));
 		cp += 2;
 		/* hard_timeout */
 		ND_TCHECK2(*cp, 2);
-		ND_PRINT((ndo, ", hard_timeout %u", EXTRACT_BE_16BITS(cp)));
+		ND_PRINT((ndo, ", hard_timeout %u", EXTRACT_BE_U_2(cp)));
 		cp += 2;
 		/* pad2 */
 		ND_TCHECK2(*cp, 6);
 		cp += 6;
 		/* cookie */
 		ND_TCHECK2(*cp, 8);
-		ND_PRINT((ndo, ", cookie 0x%016" PRIx64, EXTRACT_BE_64BITS(cp)));
+		ND_PRINT((ndo, ", cookie 0x%016" PRIx64, EXTRACT_BE_U_8(cp)));
 		cp += 8;
 		/* packet_count */
 		ND_TCHECK2(*cp, 8);
-		ND_PRINT((ndo, ", packet_count %" PRIu64, EXTRACT_BE_64BITS(cp)));
+		ND_PRINT((ndo, ", packet_count %" PRIu64, EXTRACT_BE_U_8(cp)));
 		cp += 8;
 		/* byte_count */
 		ND_TCHECK2(*cp, 8);
-		ND_PRINT((ndo, ", byte_count %" PRIu64, EXTRACT_BE_64BITS(cp)));
+		ND_PRINT((ndo, ", byte_count %" PRIu64, EXTRACT_BE_U_8(cp)));
 		cp += 8;
 		/* actions */
 		if (ep == (cp = of10_actions_print(ndo, "\n\t  ", cp, ep, entry_len - OF_FLOW_STATS_LEN)))
@@ -1969,15 +1969,15 @@ of10_aggregate_stats_reply_print(netdissect_options *ndo,
 		goto invalid;
 	/* packet_count */
 	ND_TCHECK2(*cp, 8);
-	ND_PRINT((ndo, "\n\t packet_count %" PRIu64, EXTRACT_BE_64BITS(cp)));
+	ND_PRINT((ndo, "\n\t packet_count %" PRIu64, EXTRACT_BE_U_8(cp)));
 	cp += 8;
 	/* byte_count */
 	ND_TCHECK2(*cp, 8);
-	ND_PRINT((ndo, ", byte_count %" PRIu64, EXTRACT_BE_64BITS(cp)));
+	ND_PRINT((ndo, ", byte_count %" PRIu64, EXTRACT_BE_U_8(cp)));
 	cp += 8;
 	/* flow_count */
 	ND_TCHECK2(*cp, 4);
-	ND_PRINT((ndo, ", flow_count %u", EXTRACT_BE_32BITS(cp)));
+	ND_PRINT((ndo, ", flow_count %u", EXTRACT_BE_U_4(cp)));
 	cp += 4;
 	/* pad */
 	ND_TCHECK2(*cp, 4);
@@ -2005,7 +2005,7 @@ of10_table_stats_reply_print(netdissect_options *ndo,
 			goto invalid;
 		/* table_id */
 		ND_TCHECK2(*cp, 1);
-		ND_PRINT((ndo, "\n\t table_id %s", tok2str(tableid_str, "%u", EXTRACT_8BITS(cp))));
+		ND_PRINT((ndo, "\n\t table_id %s", tok2str(tableid_str, "%u", EXTRACT_U_1(cp))));
 		cp += 1;
 		/* pad */
 		ND_TCHECK2(*cp, 3);
@@ -2018,25 +2018,25 @@ of10_table_stats_reply_print(netdissect_options *ndo,
 		cp += OFP_MAX_TABLE_NAME_LEN;
 		/* wildcards */
 		ND_TCHECK2(*cp, 4);
-		ND_PRINT((ndo, "\n\t  wildcards 0x%08x", EXTRACT_BE_32BITS(cp)));
-		of10_bitmap_print(ndo, ofpfw_bm, EXTRACT_BE_32BITS(cp),
+		ND_PRINT((ndo, "\n\t  wildcards 0x%08x", EXTRACT_BE_U_4(cp)));
+		of10_bitmap_print(ndo, ofpfw_bm, EXTRACT_BE_U_4(cp),
 				  OFPFW_U);
 		cp += 4;
 		/* max_entries */
 		ND_TCHECK2(*cp, 4);
-		ND_PRINT((ndo, "\n\t  max_entries %u", EXTRACT_BE_32BITS(cp)));
+		ND_PRINT((ndo, "\n\t  max_entries %u", EXTRACT_BE_U_4(cp)));
 		cp += 4;
 		/* active_count */
 		ND_TCHECK2(*cp, 4);
-		ND_PRINT((ndo, ", active_count %u", EXTRACT_BE_32BITS(cp)));
+		ND_PRINT((ndo, ", active_count %u", EXTRACT_BE_U_4(cp)));
 		cp += 4;
 		/* lookup_count */
 		ND_TCHECK2(*cp, 8);
-		ND_PRINT((ndo, ", lookup_count %" PRIu64, EXTRACT_BE_64BITS(cp)));
+		ND_PRINT((ndo, ", lookup_count %" PRIu64, EXTRACT_BE_U_8(cp)));
 		cp += 8;
 		/* matched_count */
 		ND_TCHECK2(*cp, 8);
-		ND_PRINT((ndo, ", matched_count %" PRIu64, EXTRACT_BE_64BITS(cp)));
+		ND_PRINT((ndo, ", matched_count %" PRIu64, EXTRACT_BE_U_8(cp)));
 		cp += 8;
 
 		len -= OF_TABLE_STATS_LEN;
@@ -2065,7 +2065,7 @@ of10_port_stats_reply_print(netdissect_options *ndo,
 			goto invalid;
 		/* port_no */
 		ND_TCHECK2(*cp, 2);
-		ND_PRINT((ndo, "\n\t  port_no %s", tok2str(ofpp_str, "%u", EXTRACT_BE_16BITS(cp))));
+		ND_PRINT((ndo, "\n\t  port_no %s", tok2str(ofpp_str, "%u", EXTRACT_BE_U_2(cp))));
 		cp += 2;
 		if (ndo->ndo_vflag < 2) {
 			ND_TCHECK2(*cp, OF_PORT_STATS_LEN - 2);
@@ -2077,51 +2077,51 @@ of10_port_stats_reply_print(netdissect_options *ndo,
 		cp += 6;
 		/* rx_packets */
 		ND_TCHECK2(*cp, 8);
-		ND_PRINT((ndo, ", rx_packets %" PRIu64, EXTRACT_BE_64BITS(cp)));
+		ND_PRINT((ndo, ", rx_packets %" PRIu64, EXTRACT_BE_U_8(cp)));
 		cp += 8;
 		/* tx_packets */
 		ND_TCHECK2(*cp, 8);
-		ND_PRINT((ndo, ", tx_packets %" PRIu64, EXTRACT_BE_64BITS(cp)));
+		ND_PRINT((ndo, ", tx_packets %" PRIu64, EXTRACT_BE_U_8(cp)));
 		cp += 8;
 		/* rx_bytes */
 		ND_TCHECK2(*cp, 8);
-		ND_PRINT((ndo, ", rx_bytes %" PRIu64, EXTRACT_BE_64BITS(cp)));
+		ND_PRINT((ndo, ", rx_bytes %" PRIu64, EXTRACT_BE_U_8(cp)));
 		cp += 8;
 		/* tx_bytes */
 		ND_TCHECK2(*cp, 8);
-		ND_PRINT((ndo, ", tx_bytes %" PRIu64, EXTRACT_BE_64BITS(cp)));
+		ND_PRINT((ndo, ", tx_bytes %" PRIu64, EXTRACT_BE_U_8(cp)));
 		cp += 8;
 		/* rx_dropped */
 		ND_TCHECK2(*cp, 8);
-		ND_PRINT((ndo, ", rx_dropped %" PRIu64, EXTRACT_BE_64BITS(cp)));
+		ND_PRINT((ndo, ", rx_dropped %" PRIu64, EXTRACT_BE_U_8(cp)));
 		cp += 8;
 		/* tx_dropped */
 		ND_TCHECK2(*cp, 8);
-		ND_PRINT((ndo, ", tx_dropped %" PRIu64, EXTRACT_BE_64BITS(cp)));
+		ND_PRINT((ndo, ", tx_dropped %" PRIu64, EXTRACT_BE_U_8(cp)));
 		cp += 8;
 		/* rx_errors */
 		ND_TCHECK2(*cp, 8);
-		ND_PRINT((ndo, ", rx_errors %" PRIu64, EXTRACT_BE_64BITS(cp)));
+		ND_PRINT((ndo, ", rx_errors %" PRIu64, EXTRACT_BE_U_8(cp)));
 		cp += 8;
 		/* tx_errors */
 		ND_TCHECK2(*cp, 8);
-		ND_PRINT((ndo, ", tx_errors %" PRIu64, EXTRACT_BE_64BITS(cp)));
+		ND_PRINT((ndo, ", tx_errors %" PRIu64, EXTRACT_BE_U_8(cp)));
 		cp += 8;
 		/* rx_frame_err */
 		ND_TCHECK2(*cp, 8);
-		ND_PRINT((ndo, ", rx_frame_err %" PRIu64, EXTRACT_BE_64BITS(cp)));
+		ND_PRINT((ndo, ", rx_frame_err %" PRIu64, EXTRACT_BE_U_8(cp)));
 		cp += 8;
 		/* rx_over_err */
 		ND_TCHECK2(*cp, 8);
-		ND_PRINT((ndo, ", rx_over_err %" PRIu64, EXTRACT_BE_64BITS(cp)));
+		ND_PRINT((ndo, ", rx_over_err %" PRIu64, EXTRACT_BE_U_8(cp)));
 		cp += 8;
 		/* rx_crc_err */
 		ND_TCHECK2(*cp, 8);
-		ND_PRINT((ndo, ", rx_crc_err %" PRIu64, EXTRACT_BE_64BITS(cp)));
+		ND_PRINT((ndo, ", rx_crc_err %" PRIu64, EXTRACT_BE_U_8(cp)));
 		cp += 8;
 		/* collisions */
 		ND_TCHECK2(*cp, 8);
-		ND_PRINT((ndo, ", collisions %" PRIu64, EXTRACT_BE_64BITS(cp)));
+		ND_PRINT((ndo, ", collisions %" PRIu64, EXTRACT_BE_U_8(cp)));
 		cp += 8;
 next_port:
 		len -= OF_PORT_STATS_LEN;
@@ -2150,26 +2150,26 @@ of10_queue_stats_reply_print(netdissect_options *ndo,
 			goto invalid;
 		/* port_no */
 		ND_TCHECK2(*cp, 2);
-		ND_PRINT((ndo, "\n\t  port_no %s", tok2str(ofpp_str, "%u", EXTRACT_BE_16BITS(cp))));
+		ND_PRINT((ndo, "\n\t  port_no %s", tok2str(ofpp_str, "%u", EXTRACT_BE_U_2(cp))));
 		cp += 2;
 		/* pad */
 		ND_TCHECK2(*cp, 2);
 		cp += 2;
 		/* queue_id */
 		ND_TCHECK2(*cp, 4);
-		ND_PRINT((ndo, ", queue_id %u", EXTRACT_BE_32BITS(cp)));
+		ND_PRINT((ndo, ", queue_id %u", EXTRACT_BE_U_4(cp)));
 		cp += 4;
 		/* tx_bytes */
 		ND_TCHECK2(*cp, 8);
-		ND_PRINT((ndo, ", tx_bytes %" PRIu64, EXTRACT_BE_64BITS(cp)));
+		ND_PRINT((ndo, ", tx_bytes %" PRIu64, EXTRACT_BE_U_8(cp)));
 		cp += 8;
 		/* tx_packets */
 		ND_TCHECK2(*cp, 8);
-		ND_PRINT((ndo, ", tx_packets %" PRIu64, EXTRACT_BE_64BITS(cp)));
+		ND_PRINT((ndo, ", tx_packets %" PRIu64, EXTRACT_BE_U_8(cp)));
 		cp += 8;
 		/* tx_errors */
 		ND_TCHECK2(*cp, 8);
-		ND_PRINT((ndo, ", tx_errors %" PRIu64, EXTRACT_BE_64BITS(cp)));
+		ND_PRINT((ndo, ", tx_errors %" PRIu64, EXTRACT_BE_U_8(cp)));
 		cp += 8;
 
 		len -= OF_QUEUE_STATS_LEN;
@@ -2195,13 +2195,13 @@ of10_stats_reply_print(netdissect_options *ndo,
 
 	/* type */
 	ND_TCHECK2(*cp, 2);
-	type = EXTRACT_BE_16BITS(cp);
+	type = EXTRACT_BE_U_2(cp);
 	ND_PRINT((ndo, "\n\t type %s", tok2str(ofpst_str, "invalid (0x%04x)", type)));
 	cp += 2;
 	/* flags */
 	ND_TCHECK2(*cp, 2);
-	ND_PRINT((ndo, ", flags 0x%04x", EXTRACT_BE_16BITS(cp)));
-	of10_bitmap_print(ndo, ofpsf_reply_bm, EXTRACT_BE_16BITS(cp),
+	ND_PRINT((ndo, ", flags 0x%04x", EXTRACT_BE_U_2(cp)));
+	of10_bitmap_print(ndo, ofpsf_reply_bm, EXTRACT_BE_U_2(cp),
 			  OFPSF_REPLY_U);
 	cp += 2;
 
@@ -2237,15 +2237,15 @@ of10_packet_out_print(netdissect_options *ndo,
 
 	/* buffer_id */
 	ND_TCHECK2(*cp, 4);
-	ND_PRINT((ndo, "\n\t buffer_id 0x%08x", EXTRACT_BE_32BITS(cp)));
+	ND_PRINT((ndo, "\n\t buffer_id 0x%08x", EXTRACT_BE_U_4(cp)));
 	cp += 4;
 	/* in_port */
 	ND_TCHECK2(*cp, 2);
-	ND_PRINT((ndo, ", in_port %s", tok2str(ofpp_str, "%u", EXTRACT_BE_16BITS(cp))));
+	ND_PRINT((ndo, ", in_port %s", tok2str(ofpp_str, "%u", EXTRACT_BE_U_2(cp))));
 	cp += 2;
 	/* actions_len */
 	ND_TCHECK2(*cp, 2);
-	actions_len = EXTRACT_BE_16BITS(cp);
+	actions_len = EXTRACT_BE_U_2(cp);
 	cp += 2;
 	if (actions_len > len - OF_PACKET_OUT_LEN)
 		goto invalid;
@@ -2271,19 +2271,19 @@ of10_packet_in_print(netdissect_options *ndo,
 {
 	/* buffer_id */
 	ND_TCHECK2(*cp, 4);
-	ND_PRINT((ndo, "\n\t buffer_id %s", tok2str(bufferid_str, "0x%08x", EXTRACT_BE_32BITS(cp))));
+	ND_PRINT((ndo, "\n\t buffer_id %s", tok2str(bufferid_str, "0x%08x", EXTRACT_BE_U_4(cp))));
 	cp += 4;
 	/* total_len */
 	ND_TCHECK2(*cp, 2);
-	ND_PRINT((ndo, ", total_len %u", EXTRACT_BE_16BITS(cp)));
+	ND_PRINT((ndo, ", total_len %u", EXTRACT_BE_U_2(cp)));
 	cp += 2;
 	/* in_port */
 	ND_TCHECK2(*cp, 2);
-	ND_PRINT((ndo, ", in_port %s", tok2str(ofpp_str, "%u", EXTRACT_BE_16BITS(cp))));
+	ND_PRINT((ndo, ", in_port %s", tok2str(ofpp_str, "%u", EXTRACT_BE_U_2(cp))));
 	cp += 2;
 	/* reason */
 	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, ", reason %s", tok2str(ofpr_str, "invalid (0x%02x)", EXTRACT_8BITS(cp))));
+	ND_PRINT((ndo, ", reason %s", tok2str(ofpr_str, "invalid (0x%02x)", EXTRACT_U_1(cp))));
 	cp += 1;
 	/* pad */
 	ND_TCHECK2(*cp, 1);
@@ -2307,43 +2307,43 @@ of10_flow_removed_print(netdissect_options *ndo,
 		return ep; /* end of snapshot */
 	/* cookie */
 	ND_TCHECK2(*cp, 8);
-	ND_PRINT((ndo, "\n\t cookie 0x%016" PRIx64, EXTRACT_BE_64BITS(cp)));
+	ND_PRINT((ndo, "\n\t cookie 0x%016" PRIx64, EXTRACT_BE_U_8(cp)));
 	cp += 8;
 	/* priority */
 	ND_TCHECK2(*cp, 2);
-	if (EXTRACT_BE_16BITS(cp))
-		ND_PRINT((ndo, ", priority %u", EXTRACT_BE_16BITS(cp)));
+	if (EXTRACT_BE_U_2(cp))
+		ND_PRINT((ndo, ", priority %u", EXTRACT_BE_U_2(cp)));
 	cp += 2;
 	/* reason */
 	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, ", reason %s", tok2str(ofprr_str, "unknown (0x%02x)", EXTRACT_8BITS(cp))));
+	ND_PRINT((ndo, ", reason %s", tok2str(ofprr_str, "unknown (0x%02x)", EXTRACT_U_1(cp))));
 	cp += 1;
 	/* pad */
 	ND_TCHECK2(*cp, 1);
 	cp += 1;
 	/* duration_sec */
 	ND_TCHECK2(*cp, 4);
-	ND_PRINT((ndo, ", duration_sec %u", EXTRACT_BE_32BITS(cp)));
+	ND_PRINT((ndo, ", duration_sec %u", EXTRACT_BE_U_4(cp)));
 	cp += 4;
 	/* duration_nsec */
 	ND_TCHECK2(*cp, 4);
-	ND_PRINT((ndo, ", duration_nsec %u", EXTRACT_BE_32BITS(cp)));
+	ND_PRINT((ndo, ", duration_nsec %u", EXTRACT_BE_U_4(cp)));
 	cp += 4;
 	/* idle_timeout */
 	ND_TCHECK2(*cp, 2);
-	if (EXTRACT_BE_16BITS(cp))
-		ND_PRINT((ndo, ", idle_timeout %u", EXTRACT_BE_16BITS(cp)));
+	if (EXTRACT_BE_U_2(cp))
+		ND_PRINT((ndo, ", idle_timeout %u", EXTRACT_BE_U_2(cp)));
 	cp += 2;
 	/* pad2 */
 	ND_TCHECK2(*cp, 2);
 	cp += 2;
 	/* packet_count */
 	ND_TCHECK2(*cp, 8);
-	ND_PRINT((ndo, ", packet_count %" PRIu64, EXTRACT_BE_64BITS(cp)));
+	ND_PRINT((ndo, ", packet_count %" PRIu64, EXTRACT_BE_U_8(cp)));
 	cp += 8;
 	/* byte_count */
 	ND_TCHECK2(*cp, 8);
-	ND_PRINT((ndo, ", byte_count %" PRIu64, EXTRACT_BE_64BITS(cp)));
+	ND_PRINT((ndo, ", byte_count %" PRIu64, EXTRACT_BE_U_8(cp)));
 	return cp + 8;
 
 trunc:
@@ -2361,7 +2361,7 @@ of10_error_print(netdissect_options *ndo,
 
 	/* type */
 	ND_TCHECK2(*cp, 2);
-	type = EXTRACT_BE_16BITS(cp);
+	type = EXTRACT_BE_U_2(cp);
 	cp += 2;
 	ND_PRINT((ndo, "\n\t type %s", tok2str(ofpet_str, "invalid (0x%04x)", type)));
 	/* code */
@@ -2374,7 +2374,7 @@ of10_error_print(netdissect_options *ndo,
 		type == OFPET_PORT_MOD_FAILED ? ofppmfc_str :
 		type == OFPET_QUEUE_OP_FAILED ? ofpqofc_str :
 		empty_str;
-	ND_PRINT((ndo, ", code %s", tok2str(code_str, "invalid (0x%04x)", EXTRACT_BE_16BITS(cp))));
+	ND_PRINT((ndo, ", code %s", tok2str(code_str, "invalid (0x%04x)", EXTRACT_BE_U_2(cp))));
 	cp += 2;
 	/* data */
 	return of10_data_print(ndo, cp, ep, len - OF_ERROR_MSG_LEN);
@@ -2420,11 +2420,11 @@ of10_header_body_print(netdissect_options *ndo,
 			goto next_message;
 		/* flags */
 		ND_TCHECK2(*cp, 2);
-		ND_PRINT((ndo, "\n\t flags %s", tok2str(ofp_config_str, "invalid (0x%04x)", EXTRACT_BE_16BITS(cp))));
+		ND_PRINT((ndo, "\n\t flags %s", tok2str(ofp_config_str, "invalid (0x%04x)", EXTRACT_BE_U_2(cp))));
 		cp += 2;
 		/* miss_send_len */
 		ND_TCHECK2(*cp, 2);
-		ND_PRINT((ndo, ", miss_send_len %u", EXTRACT_BE_16BITS(cp)));
+		ND_PRINT((ndo, ", miss_send_len %u", EXTRACT_BE_U_2(cp)));
 		return cp + 2;
 	case OFPT_PORT_MOD:
 		if (len != OF_PORT_MOD_LEN)
@@ -2439,7 +2439,7 @@ of10_header_body_print(netdissect_options *ndo,
 			goto next_message;
 		/* port */
 		ND_TCHECK2(*cp, 2);
-		ND_PRINT((ndo, "\n\t port_no %s", tok2str(ofpp_str, "%u", EXTRACT_BE_16BITS(cp))));
+		ND_PRINT((ndo, "\n\t port_no %s", tok2str(ofpp_str, "%u", EXTRACT_BE_U_2(cp))));
 		cp += 2;
 		/* pad */
 		ND_TCHECK2(*cp, 2);
@@ -2457,7 +2457,7 @@ of10_header_body_print(netdissect_options *ndo,
 			goto next_message;
 		/* reason */
 		ND_TCHECK2(*cp, 1);
-		ND_PRINT((ndo, "\n\t reason %s", tok2str(ofppr_str, "invalid (0x%02x)", EXTRACT_8BITS(cp))));
+		ND_PRINT((ndo, "\n\t reason %s", tok2str(ofppr_str, "invalid (0x%02x)", EXTRACT_U_1(cp))));
 		cp += 1;
 		/* pad */
 		ND_TCHECK2(*cp, 7);
@@ -2548,7 +2548,7 @@ of10_header_body_print(netdissect_options *ndo,
 			goto next_message;
 		/* port */
 		ND_TCHECK2(*cp, 2);
-		ND_PRINT((ndo, "\n\t port_no %s", tok2str(ofpp_str, "%u", EXTRACT_BE_16BITS(cp))));
+		ND_PRINT((ndo, "\n\t port_no %s", tok2str(ofpp_str, "%u", EXTRACT_BE_U_2(cp))));
 		cp += 2;
 		/* pad */
 		ND_TCHECK2(*cp, 6);

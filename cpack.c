@@ -100,7 +100,7 @@ cpack_uint64(struct cpack_state *cs, uint64_t *u)
 	if ((next = cpack_align_and_reserve(cs, sizeof(*u))) == NULL)
 		return -1;
 
-	*u = EXTRACT_LE_64BITS(next);
+	*u = EXTRACT_LE_U_8(next);
 
 	/* Move pointer past the uint64_t. */
 	cs->c_next = next + sizeof(*u);
@@ -116,7 +116,7 @@ cpack_uint32(struct cpack_state *cs, uint32_t *u)
 	if ((next = cpack_align_and_reserve(cs, sizeof(*u))) == NULL)
 		return -1;
 
-	*u = EXTRACT_LE_32BITS(next);
+	*u = EXTRACT_LE_U_4(next);
 
 	/* Move pointer past the uint32_t. */
 	cs->c_next = next + sizeof(*u);
@@ -132,7 +132,7 @@ cpack_uint16(struct cpack_state *cs, uint16_t *u)
 	if ((next = cpack_align_and_reserve(cs, sizeof(*u))) == NULL)
 		return -1;
 
-	*u = EXTRACT_LE_16BITS(next);
+	*u = EXTRACT_LE_U_2(next);
 
 	/* Move pointer past the uint16_t. */
 	cs->c_next = next + sizeof(*u);

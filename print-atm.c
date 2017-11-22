@@ -282,7 +282,7 @@ atm_if_print(netdissect_options *ndo,
 	 * packet nor an RFC 2684 routed NLPID-formatted PDU nor
 	 * an 802.2-but-no-SNAP IP packet.
 	 */
-	llchdr = EXTRACT_BE_24BITS(p);
+	llchdr = EXTRACT_BE_U_3(p);
 	if (llchdr != LLC_UI_HDR(LLCSAP_SNAP) &&
 	    llchdr != LLC_UI_HDR(LLCSAP_ISONS) &&
 	    llchdr != LLC_UI_HDR(LLCSAP_IP)) {
@@ -308,10 +308,10 @@ atm_if_print(netdissect_options *ndo,
 		}
 		if (ndo->ndo_eflag)
 			ND_PRINT((ndo, "%08x%08x %08x%08x ",
-			       EXTRACT_BE_32BITS(p),
-			       EXTRACT_BE_32BITS(p + 4),
-			       EXTRACT_BE_32BITS(p + 8),
-			       EXTRACT_BE_32BITS(p + 12)));
+			       EXTRACT_BE_U_4(p),
+			       EXTRACT_BE_U_4(p + 4),
+			       EXTRACT_BE_U_4(p + 8),
+			       EXTRACT_BE_U_4(p + 12)));
 		p += 20;
 		length -= 20;
 		caplen -= 20;
@@ -366,7 +366,7 @@ sig_print(netdissect_options *ndo,
 		 * do from the caplen test above, we also know we have
 		 * the call reference.
 		 */
-		call_ref = EXTRACT_BE_24BITS(p + CALL_REF_POS);
+		call_ref = EXTRACT_BE_U_3(p + CALL_REF_POS);
 		ND_PRINT((ndo, "CALL_REF:0x%06x", call_ref));
 	} else {
 		/* SSCOP with some unknown protocol atop it */
@@ -461,9 +461,9 @@ oam_print (netdissect_options *ndo,
 
 
     ND_TCHECK(*(p+ATM_HDR_LEN_NOHEC+hec));
-    cell_header = EXTRACT_BE_32BITS(p + hec);
-    cell_type = (EXTRACT_8BITS((p + ATM_HDR_LEN_NOHEC + hec)) >> 4) & 0x0f;
-    func_type = EXTRACT_8BITS((p + ATM_HDR_LEN_NOHEC + hec)) & 0x0f;
+    cell_header = EXTRACT_BE_U_4(p + hec);
+    cell_type = (EXTRACT_U_1((p + ATM_HDR_LEN_NOHEC + hec)) >> 4) & 0x0f;
+    func_type = EXTRACT_U_1((p + ATM_HDR_LEN_NOHEC + hec)) & 0x0f;
 
     vpi = (cell_header>>20)&0xff;
     vci = (cell_header>>4)&0xffff;
@@ -501,17 +501,17 @@ oam_print (netdissect_options *ndo,
                tok2str(oam_fm_loopback_indicator_values,
                        "Unknown",
                        oam_ptr.oam_fm_loopback->loopback_indicator & OAM_FM_LOOPBACK_INDICATOR_MASK),
-               EXTRACT_BE_32BITS(&oam_ptr.oam_fm_loopback->correlation_tag)));
+               EXTRACT_BE_U_4(&oam_ptr.oam_fm_loopback->correlation_tag)));
         ND_PRINT((ndo, "\n\tLocation-ID "));
         for (idx = 0; idx < sizeof(oam_ptr.oam_fm_loopback->loopback_id); idx++) {
             if (idx % 2) {
-                ND_PRINT((ndo, "%04x ", EXTRACT_BE_16BITS(&oam_ptr.oam_fm_loopback->loopback_id[idx])));
+                ND_PRINT((ndo, "%04x ", EXTRACT_BE_U_2(&oam_ptr.oam_fm_loopback->loopback_id[idx])));
             }
         }
         ND_PRINT((ndo, "\n\tSource-ID   "));
         for (idx = 0; idx < sizeof(oam_ptr.oam_fm_loopback->source_id); idx++) {
             if (idx % 2) {
-                ND_PRINT((ndo, "%04x ", EXTRACT_BE_16BITS(&oam_ptr.oam_fm_loopback->source_id[idx])));
+                ND_PRINT((ndo, "%04x ", EXTRACT_BE_U_2(&oam_ptr.oam_fm_loopback->source_id[idx])));
             }
         }
         break;
@@ -524,7 +524,7 @@ oam_print (netdissect_options *ndo,
         ND_PRINT((ndo, "\n\tLocation-ID "));
         for (idx = 0; idx < sizeof(oam_ptr.oam_fm_ais_rdi->failure_location); idx++) {
             if (idx % 2) {
-                ND_PRINT((ndo, "%04x ", EXTRACT_BE_16BITS(&oam_ptr.oam_fm_ais_rdi->failure_location[idx])));
+                ND_PRINT((ndo, "%04x ", EXTRACT_BE_U_2(&oam_ptr.oam_fm_ais_rdi->failure_location[idx])));
             }
         }
         break;
@@ -539,7 +539,7 @@ oam_print (netdissect_options *ndo,
 
     /* crc10 checksum verification */
     ND_TCHECK2(*(p + OAM_CELLTYPE_FUNCTYPE_LEN + OAM_FUNCTION_SPECIFIC_LEN), 2);
-    cksum = EXTRACT_BE_16BITS(p + OAM_CELLTYPE_FUNCTYPE_LEN + OAM_FUNCTION_SPECIFIC_LEN)
+    cksum = EXTRACT_BE_U_2(p + OAM_CELLTYPE_FUNCTYPE_LEN + OAM_FUNCTION_SPECIFIC_LEN)
         & OAM_CRC10_MASK;
     cksum_shouldbe = verify_crc10_cksum(0, p, OAM_PAYLOAD_LEN);
 

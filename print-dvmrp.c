@@ -78,7 +78,7 @@ dvmrp_print(netdissect_options *ndo,
 		return;
 
 	ND_TCHECK_1(bp + 1);
-	type = EXTRACT_8BITS(bp + 1);
+	type = EXTRACT_U_1(bp + 1);
 
 	/* Skip IGMP header */
 	bp += 8;
@@ -123,8 +123,8 @@ dvmrp_print(netdissect_options *ndo,
 		 */
 		bp -= 4;
 		ND_TCHECK2(bp[0], 4);
-		major_version = EXTRACT_8BITS(bp + 3);
-		minor_version = EXTRACT_8BITS(bp + 2);
+		major_version = EXTRACT_U_1(bp + 3);
+		minor_version = EXTRACT_U_1(bp + 2);
 		bp += 4;
 		if (print_neighbors2(ndo, bp, ep, len, major_version,
 		    minor_version) < 0)
@@ -199,14 +199,14 @@ print_report(netdissect_options *ndo,
 			origin = 0;
 			for (i = 0; i < width; ++i) {
 				ND_TCHECK_1(bp);
-				origin = origin << 8 | EXTRACT_8BITS(bp);
+				origin = origin << 8 | EXTRACT_U_1(bp);
 				bp++;
 			}
 			for ( ; i < 4; ++i)
 				origin <<= 8;
 
 			ND_TCHECK_1(bp);
-			metric = EXTRACT_8BITS(bp);
+			metric = EXTRACT_U_1(bp);
 			bp++;
 			done = metric & 0x80;
 			metric &= 0x7f;
@@ -265,11 +265,11 @@ print_neighbors(netdissect_options *ndo,
 		ND_TCHECK2(bp[0], 7);
 		laddr = bp;
 		bp += 4;
-		metric = EXTRACT_8BITS(bp);
+		metric = EXTRACT_U_1(bp);
 		bp++;
-		thresh = EXTRACT_8BITS(bp);
+		thresh = EXTRACT_U_1(bp);
 		bp++;
-		ncount = EXTRACT_8BITS(bp);
+		ncount = EXTRACT_U_1(bp);
 		bp++;
 		len -= 7;
 		while (--ncount >= 0) {
@@ -302,13 +302,13 @@ print_neighbors2(netdissect_options *ndo,
 		ND_TCHECK2(bp[0], 8);
 		laddr = bp;
 		bp += 4;
-		metric = EXTRACT_8BITS(bp);
+		metric = EXTRACT_U_1(bp);
 		bp++;
-		thresh = EXTRACT_8BITS(bp);
+		thresh = EXTRACT_U_1(bp);
 		bp++;
-		flags = EXTRACT_8BITS(bp);
+		flags = EXTRACT_U_1(bp);
 		bp++;
-		ncount = EXTRACT_8BITS(bp);
+		ncount = EXTRACT_U_1(bp);
 		bp++;
 		len -= 8;
 		while (--ncount >= 0 && (len >= 4) && (bp + 4) <= ep) {
@@ -347,7 +347,7 @@ print_prune(netdissect_options *ndo,
 	ND_PRINT((ndo, " src %s grp %s", ipaddr_string(ndo, bp), ipaddr_string(ndo, bp + 4)));
 	bp += 8;
 	ND_PRINT((ndo, " timer "));
-	unsigned_relts_print(ndo, EXTRACT_BE_32BITS(bp));
+	unsigned_relts_print(ndo, EXTRACT_BE_U_4(bp));
 	return (0);
 trunc:
 	return (-1);

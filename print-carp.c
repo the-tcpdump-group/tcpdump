@@ -73,9 +73,9 @@ carp_print(netdissect_options *ndo, register const u_char *bp, register u_int le
 		vec[0].len = len;
 		if (ND_TTEST2(bp[0], len) && in_cksum(vec, 1))
 			ND_PRINT((ndo, " (bad carp cksum %x!)",
-				EXTRACT_BE_16BITS(bp + 6)));
+				EXTRACT_BE_U_2(bp + 6)));
 	}
-	ND_PRINT((ndo, "counter=%" PRIu64, EXTRACT_BE_64BITS(bp + 8)));
+	ND_PRINT((ndo, "counter=%" PRIu64, EXTRACT_BE_U_8(bp + 8)));
 
 	return;
 trunc:

@@ -55,11 +55,11 @@ otv_print(netdissect_options *ndo, const u_char *bp, u_int len)
     bp += 1;
 
     ND_TCHECK2(*bp, 3);
-    ND_PRINT((ndo, "overlay %u, ", EXTRACT_BE_24BITS(bp)));
+    ND_PRINT((ndo, "overlay %u, ", EXTRACT_BE_U_3(bp)));
     bp += 3;
 
     ND_TCHECK2(*bp, 3);
-    ND_PRINT((ndo, "instance %u\n", EXTRACT_BE_24BITS(bp)));
+    ND_PRINT((ndo, "instance %u\n", EXTRACT_BE_U_3(bp)));
     bp += 3;
 
     /* Reserved */

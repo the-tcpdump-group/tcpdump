@@ -167,7 +167,7 @@ eap_print(netdissect_options *ndo,
                tok2str(eap_frame_type_values, "unknown", eap->type),
                eap->type,
                eap->version,
-               EXTRACT_BE_16BITS(eap->length)));
+               EXTRACT_BE_U_2(eap->length)));
 	return;
     }
 
@@ -175,7 +175,7 @@ eap_print(netdissect_options *ndo,
            tok2str(eap_frame_type_values, "unknown", eap->type),
            eap->type,
            eap->version,
-           EXTRACT_BE_16BITS(eap->length)));
+           EXTRACT_BE_U_2(eap->length)));
 
     tptr += sizeof(struct eap_frame_t);
     tlen -= sizeof(struct eap_frame_t);
@@ -185,18 +185,18 @@ eap_print(netdissect_options *ndo,
         ND_TCHECK_1(tptr);
         type = *(tptr);
         ND_TCHECK_2(tptr + 2);
-        len = EXTRACT_BE_16BITS(tptr + 2);
+        len = EXTRACT_BE_U_2(tptr + 2);
         ND_PRINT((ndo, ", %s (%u), id %u, len %u",
                tok2str(eap_code_values, "unknown", type),
                type,
-               EXTRACT_8BITS((tptr + 1)),
+               EXTRACT_U_1((tptr + 1)),
                len));
 
         ND_TCHECK2(*tptr, len);
 
         if (type <= 2) { /* For EAP_REQUEST and EAP_RESPONSE only */
             ND_TCHECK_1(tptr + 4);
-            subtype = EXTRACT_8BITS(tptr + 4);
+            subtype = EXTRACT_U_1(tptr + 4);
             ND_PRINT((ndo, "\n\t\t Type %s (%u)",
                    tok2str(eap_type_values, "unknown", subtype),
                    subtype));
@@ -227,7 +227,7 @@ eap_print(netdissect_options *ndo,
                 while (count < len) {
                     ND_TCHECK_1(tptr + count);
                     ND_PRINT((ndo, " %s (%u),",
-                           tok2str(eap_type_values, "unknown", EXTRACT_8BITS((tptr + count))),
+                           tok2str(eap_type_values, "unknown", EXTRACT_U_1((tptr + count))),
                            *(tptr + count)));
                     count++;
                 }
@@ -238,28 +238,28 @@ eap_print(netdissect_options *ndo,
                 ND_TCHECK_1(tptr + 5);
                 if (subtype == EAP_TYPE_TTLS)
                     ND_PRINT((ndo, " TTLSv%u",
-                           EAP_TTLS_VERSION(EXTRACT_8BITS((tptr + 5)))));
+                           EAP_TTLS_VERSION(EXTRACT_U_1((tptr + 5)))));
                 ND_PRINT((ndo, " flags [%s] 0x%02x,",
-                       bittok2str(eap_tls_flags_values, "none", EXTRACT_8BITS((tptr + 5))),
+                       bittok2str(eap_tls_flags_values, "none", EXTRACT_U_1((tptr + 5))),
                        *(tptr + 5)));
 
                 if (EAP_TLS_EXTRACT_BIT_L(*(tptr+5))) {
                     ND_TCHECK_4(tptr + 6);
-		    ND_PRINT((ndo, " len %u", EXTRACT_BE_32BITS(tptr + 6)));
+		    ND_PRINT((ndo, " len %u", EXTRACT_BE_U_4(tptr + 6)));
                 }
                 break;
 
             case EAP_TYPE_FAST:
                 ND_TCHECK_1(tptr + 5);
                 ND_PRINT((ndo, " FASTv%u",
-                       EAP_TTLS_VERSION(EXTRACT_8BITS((tptr + 5)))));
+                       EAP_TTLS_VERSION(EXTRACT_U_1((tptr + 5)))));
                 ND_PRINT((ndo, " flags [%s] 0x%02x,",
-                       bittok2str(eap_tls_flags_values, "none", EXTRACT_8BITS((tptr + 5))),
+                       bittok2str(eap_tls_flags_values, "none", EXTRACT_U_1((tptr + 5))),
                        *(tptr + 5)));
 
                 if (EAP_TLS_EXTRACT_BIT_L(*(tptr+5))) {
                     ND_TCHECK_4(tptr + 6);
-                    ND_PRINT((ndo, " len %u", EXTRACT_BE_32BITS(tptr + 6)));
+                    ND_PRINT((ndo, " len %u", EXTRACT_BE_U_4(tptr + 6)));
                 }
 
                 /* FIXME - TLV attributes follow */
@@ -269,7 +269,7 @@ eap_print(netdissect_options *ndo,
             case EAP_TYPE_SIM:
                 ND_TCHECK_1(tptr + 5);
                 ND_PRINT((ndo, " subtype [%s] 0x%02x,",
-                       tok2str(eap_aka_subtype_values, "unknown", EXTRACT_8BITS((tptr + 5))),
+                       tok2str(eap_aka_subtype_values, "unknown", EXTRACT_U_1((tptr + 5))),
                        *(tptr + 5)));
 
                 /* FIXME - TLV attributes follow */

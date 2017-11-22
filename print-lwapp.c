@@ -202,7 +202,7 @@ lwapp_control_print(netdissect_options *ndo,
     }
 
     /* ok they seem to want to know everything - lets fully decode it */
-    tlen=EXTRACT_BE_16BITS(lwapp_trans_header->length);
+    tlen=EXTRACT_BE_U_2(lwapp_trans_header->length);
 
     ND_PRINT((ndo, "LWAPPv%u, %s frame, Radio-id %u, Flags [%s], Frag-id %u, length %u",
            LWAPP_EXTRACT_VERSION(lwapp_trans_header->version),
@@ -225,7 +225,7 @@ lwapp_control_print(netdissect_options *ndo,
         ND_TCHECK2(*tptr, sizeof(struct lwapp_control_header));
 
         lwapp_control_header = (const struct lwapp_control_header *)tptr;
-	msg_tlen = EXTRACT_BE_16BITS(lwapp_control_header->len);
+	msg_tlen = EXTRACT_BE_U_2(lwapp_control_header->len);
 
 	/* print message header */
         ND_PRINT((ndo, "\n\t  Msg type: %s (%u), Seqnum: %u, Msg len: %d, Session: 0x%08x",
@@ -233,7 +233,7 @@ lwapp_control_print(netdissect_options *ndo,
                lwapp_control_header->msg_type,
                lwapp_control_header->seq_num,
                msg_tlen,
-               EXTRACT_BE_32BITS(lwapp_control_header->session_id)));
+               EXTRACT_BE_U_4(lwapp_control_header->session_id)));
 
         /* did we capture enough for fully decoding the message */
         ND_TCHECK2(*tptr, msg_tlen);
@@ -319,7 +319,7 @@ lwapp_data_print(netdissect_options *ndo,
     }
 
     /* ok they seem to want to know everything - lets fully decode it */
-    tlen=EXTRACT_BE_16BITS(lwapp_trans_header->length);
+    tlen=EXTRACT_BE_U_2(lwapp_trans_header->length);
 
     ND_PRINT((ndo, "LWAPPv%u, %s frame, Radio-id  %u, Flags [%s], Frag-id  %u, length %u",
            LWAPP_EXTRACT_VERSION(lwapp_trans_header->version),

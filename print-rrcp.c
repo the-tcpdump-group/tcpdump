@@ -98,9 +98,9 @@ rrcp_print(netdissect_options *ndo,
 	uint8_t rrcp_opcode;
 
 	ND_TCHECK(*(cp + RRCP_PROTO_OFFSET));
-	rrcp_proto = EXTRACT_8BITS(cp + RRCP_PROTO_OFFSET);
+	rrcp_proto = EXTRACT_U_1(cp + RRCP_PROTO_OFFSET);
 	ND_TCHECK(*(cp + RRCP_OPCODE_ISREPLY_OFFSET));
-	rrcp_opcode = EXTRACT_8BITS((cp + RRCP_OPCODE_ISREPLY_OFFSET)) & RRCP_OPCODE_MASK;
+	rrcp_opcode = EXTRACT_U_1((cp + RRCP_OPCODE_ISREPLY_OFFSET)) & RRCP_OPCODE_MASK;
 	if (src != NULL && dst != NULL) {
 		ND_PRINT((ndo, "%s > %s, ",
 			(src->addr_string)(ndo, src->addr),
@@ -116,13 +116,13 @@ rrcp_print(netdissect_options *ndo,
 	if (rrcp_opcode==1 || rrcp_opcode==2){
 	    ND_TCHECK2(*(cp + RRCP_REG_ADDR_OFFSET), 6);
     	    ND_PRINT((ndo, " addr=0x%04x, data=0x%08x",
-		     EXTRACT_LE_16BITS(cp + RRCP_REG_ADDR_OFFSET),
-		     EXTRACT_LE_32BITS(cp + RRCP_REG_DATA_OFFSET)));
+		     EXTRACT_LE_U_2(cp + RRCP_REG_ADDR_OFFSET),
+		     EXTRACT_LE_U_4(cp + RRCP_REG_DATA_OFFSET)));
 	}
 	if (rrcp_proto==1){
 	    ND_TCHECK2(*(cp + RRCP_AUTHKEY_OFFSET), 2);
     	    ND_PRINT((ndo, ", auth=0x%04x",
-		  EXTRACT_BE_16BITS(cp + RRCP_AUTHKEY_OFFSET)));
+		  EXTRACT_BE_U_2(cp + RRCP_AUTHKEY_OFFSET)));
 	}
 	if (rrcp_proto==1 && rrcp_opcode==0 &&
 	     ((*(cp + RRCP_OPCODE_ISREPLY_OFFSET)) & RRCP_ISREPLY)){
@@ -131,13 +131,13 @@ rrcp_print(netdissect_options *ndo,
 		     *(cp + RRCP_DOWNLINK_PORT_OFFSET),
 		     *(cp + RRCP_UPLINK_PORT_OFFSET),
 		     etheraddr_string(ndo, cp + RRCP_UPLINK_MAC_OFFSET),
-		     EXTRACT_BE_32BITS(cp + RRCP_VENDOR_ID_OFFSET),
-		     EXTRACT_BE_16BITS(cp + RRCP_CHIP_ID_OFFSET)));
+		     EXTRACT_BE_U_4(cp + RRCP_VENDOR_ID_OFFSET),
+		     EXTRACT_BE_U_2(cp + RRCP_CHIP_ID_OFFSET)));
 	}else if (rrcp_opcode==1 || rrcp_opcode==2 || rrcp_proto==2){
 	    ND_TCHECK2(*(cp + RRCP_COOKIE2_OFFSET), 4);
 	    ND_PRINT((ndo, ", cookie=0x%08x%08x ",
-		    EXTRACT_BE_32BITS(cp + RRCP_COOKIE2_OFFSET),
-		    EXTRACT_BE_32BITS(cp + RRCP_COOKIE1_OFFSET)));
+		    EXTRACT_BE_U_4(cp + RRCP_COOKIE2_OFFSET),
+		    EXTRACT_BE_U_4(cp + RRCP_COOKIE1_OFFSET)));
 	}
 	return;
 

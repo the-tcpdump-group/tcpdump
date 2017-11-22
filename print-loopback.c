@@ -64,7 +64,7 @@ loopback_message_print(netdissect_options *ndo, const u_char *cp, const u_int le
 		goto invalid;
 	/* function */
 	ND_TCHECK2(*cp, 2);
-	function = EXTRACT_LE_16BITS(cp);
+	function = EXTRACT_LE_U_2(cp);
 	cp += 2;
 	ND_PRINT((ndo, ", %s", tok2str(fcode_str, " invalid (%u)", function)));
 
@@ -74,7 +74,7 @@ loopback_message_print(netdissect_options *ndo, const u_char *cp, const u_int le
 				goto invalid;
 			/* receipt number */
 			ND_TCHECK2(*cp, 2);
-			ND_PRINT((ndo, ", receipt number %u", EXTRACT_LE_16BITS(cp)));
+			ND_PRINT((ndo, ", receipt number %u", EXTRACT_LE_U_2(cp)));
 			cp += 2;
 			/* data */
 			ND_PRINT((ndo, ", data (%u octets)", len - 4));
@@ -116,7 +116,7 @@ loopback_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 		goto invalid;
 	/* skipCount */
 	ND_TCHECK2(*cp, 2);
-	skipCount = EXTRACT_LE_16BITS(cp);
+	skipCount = EXTRACT_LE_U_2(cp);
 	cp += 2;
 	ND_PRINT((ndo, ", skipCount %u", skipCount));
 	if (skipCount % 8)

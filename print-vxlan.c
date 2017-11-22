@@ -58,7 +58,7 @@ vxlan_print(netdissect_options *ndo, const u_char *bp, u_int len)
     flags = *bp;
     bp += 4;
 
-    vni = EXTRACT_BE_24BITS(bp);
+    vni = EXTRACT_BE_U_3(bp);
     bp += 4;
 
     ND_PRINT((ndo, "VXLAN, "));

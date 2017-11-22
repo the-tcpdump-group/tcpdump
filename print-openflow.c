@@ -94,11 +94,11 @@ of_header_body_print(netdissect_options *ndo, const u_char *cp, const u_char *ep
 	cp += 1;
 	/* length */
 	ND_TCHECK2(*cp, 2);
-	length = EXTRACT_BE_16BITS(cp);
+	length = EXTRACT_BE_U_2(cp);
 	cp += 2;
 	/* xid */
 	ND_TCHECK2(*cp, 4);
-	xid = EXTRACT_BE_32BITS(cp);
+	xid = EXTRACT_BE_U_4(cp);
 	cp += 4;
 	/* Message length includes the header length and a message always includes
 	 * the basic header. A message length underrun fails decoding of the rest of

@@ -109,7 +109,7 @@ stp_print_config_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
     ND_TCHECK(stp_bpdu->port_id);
     ND_PRINT((ndo, ", bridge-id %s.%04x, length %u",
            stp_print_bridge_id((const u_char *)&stp_bpdu->bridge_id),
-           EXTRACT_BE_16BITS(&stp_bpdu->port_id), length));
+           EXTRACT_BE_U_2(&stp_bpdu->port_id), length));
 
     /* in non-verbose mode just print the bridge-id */
     if (!ndo->ndo_vflag) {
@@ -119,14 +119,14 @@ stp_print_config_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
     ND_TCHECK(stp_bpdu->forward_delay);
     ND_PRINT((ndo, "\n\tmessage-age %.2fs, max-age %.2fs"
            ", hello-time %.2fs, forwarding-delay %.2fs",
-           (float) EXTRACT_BE_16BITS(&stp_bpdu->message_age) / STP_TIME_BASE,
-           (float) EXTRACT_BE_16BITS(&stp_bpdu->max_age) / STP_TIME_BASE,
-           (float) EXTRACT_BE_16BITS(&stp_bpdu->hello_time) / STP_TIME_BASE,
-           (float) EXTRACT_BE_16BITS(&stp_bpdu->forward_delay) / STP_TIME_BASE));
+           (float) EXTRACT_BE_U_2(&stp_bpdu->message_age) / STP_TIME_BASE,
+           (float) EXTRACT_BE_U_2(&stp_bpdu->max_age) / STP_TIME_BASE,
+           (float) EXTRACT_BE_U_2(&stp_bpdu->hello_time) / STP_TIME_BASE,
+           (float) EXTRACT_BE_U_2(&stp_bpdu->forward_delay) / STP_TIME_BASE));
 
     ND_PRINT((ndo, "\n\troot-id %s, root-pathcost %u",
            stp_print_bridge_id((const u_char *)&stp_bpdu->root_id),
-           EXTRACT_BE_32BITS(&stp_bpdu->root_path_cost)));
+           EXTRACT_BE_U_4(&stp_bpdu->root_path_cost)));
 
     /* Port role is only valid for 802.1w */
     if (stp_bpdu->protocol_version == STP_PROTO_RAPID) {
@@ -264,40 +264,40 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
     ND_TCHECK(stp_bpdu->root_path_cost);
     ND_PRINT((ndo, "CIST root-id %s, CIST ext-pathcost %u",
            stp_print_bridge_id((const u_char *)&stp_bpdu->root_id),
-           EXTRACT_BE_32BITS(&stp_bpdu->root_path_cost)));
+           EXTRACT_BE_U_4(&stp_bpdu->root_path_cost)));
 
     ND_TCHECK(stp_bpdu->bridge_id);
     ND_PRINT((ndo, "\n\tCIST regional-root-id %s, ",
            stp_print_bridge_id((const u_char *)&stp_bpdu->bridge_id)));
 
     ND_TCHECK(stp_bpdu->port_id);
-    ND_PRINT((ndo, "CIST port-id %04x,", EXTRACT_BE_16BITS(&stp_bpdu->port_id)));
+    ND_PRINT((ndo, "CIST port-id %04x,", EXTRACT_BE_U_2(&stp_bpdu->port_id)));
 
     ND_TCHECK(stp_bpdu->forward_delay);
     ND_PRINT((ndo, "\n\tmessage-age %.2fs, max-age %.2fs"
            ", hello-time %.2fs, forwarding-delay %.2fs",
-           (float) EXTRACT_BE_16BITS(&stp_bpdu->message_age) / STP_TIME_BASE,
-           (float) EXTRACT_BE_16BITS(&stp_bpdu->max_age) / STP_TIME_BASE,
-           (float) EXTRACT_BE_16BITS(&stp_bpdu->hello_time) / STP_TIME_BASE,
-           (float) EXTRACT_BE_16BITS(&stp_bpdu->forward_delay) / STP_TIME_BASE));
+           (float) EXTRACT_BE_U_2(&stp_bpdu->message_age) / STP_TIME_BASE,
+           (float) EXTRACT_BE_U_2(&stp_bpdu->max_age) / STP_TIME_BASE,
+           (float) EXTRACT_BE_U_2(&stp_bpdu->hello_time) / STP_TIME_BASE,
+           (float) EXTRACT_BE_U_2(&stp_bpdu->forward_delay) / STP_TIME_BASE));
 
     ND_TCHECK_2(ptr + MST_BPDU_VER3_LEN_OFFSET);
-    ND_PRINT((ndo, "\n\tv3len %d, ", EXTRACT_BE_16BITS(ptr + MST_BPDU_VER3_LEN_OFFSET)));
+    ND_PRINT((ndo, "\n\tv3len %d, ", EXTRACT_BE_U_2(ptr + MST_BPDU_VER3_LEN_OFFSET)));
     ND_TCHECK_4(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 12);
     ND_PRINT((ndo, "MCID Name "));
     if (fn_printzp(ndo, ptr + MST_BPDU_CONFIG_NAME_OFFSET, 32, ndo->ndo_snapend))
 	goto trunc;
     ND_PRINT((ndo, ", rev %u,"
             "\n\t\tdigest %08x%08x%08x%08x, ",
-	          EXTRACT_BE_16BITS(ptr + MST_BPDU_CONFIG_NAME_OFFSET + 32),
-	          EXTRACT_BE_32BITS(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET),
-	          EXTRACT_BE_32BITS(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 4),
-	          EXTRACT_BE_32BITS(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 8),
-	          EXTRACT_BE_32BITS(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 12)));
+	          EXTRACT_BE_U_2(ptr + MST_BPDU_CONFIG_NAME_OFFSET + 32),
+	          EXTRACT_BE_U_4(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET),
+	          EXTRACT_BE_U_4(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 4),
+	          EXTRACT_BE_U_4(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 8),
+	          EXTRACT_BE_U_4(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 12)));
 
     ND_TCHECK_4(ptr + MST_BPDU_CIST_INT_PATH_COST_OFFSET);
     ND_PRINT((ndo, "CIST int-root-pathcost %u,",
-            EXTRACT_BE_32BITS(ptr + MST_BPDU_CIST_INT_PATH_COST_OFFSET)));
+            EXTRACT_BE_U_4(ptr + MST_BPDU_CIST_INT_PATH_COST_OFFSET)));
 
     ND_TCHECK_BRIDGE_ID(ptr + MST_BPDU_CIST_BRIDGE_ID_OFFSET);
     ND_PRINT((ndo, "\n\tCIST bridge-id %s, ",
@@ -308,14 +308,14 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
 
     /* Dump all MSTI's */
     ND_TCHECK_2(ptr + MST_BPDU_VER3_LEN_OFFSET);
-    v3len = EXTRACT_BE_16BITS(ptr + MST_BPDU_VER3_LEN_OFFSET);
+    v3len = EXTRACT_BE_U_2(ptr + MST_BPDU_VER3_LEN_OFFSET);
     if (v3len > MST_BPDU_CONFIG_INFO_LENGTH) {
         len = v3len - MST_BPDU_CONFIG_INFO_LENGTH;
         offset = MST_BPDU_MSTI_OFFSET;
         while (len >= MST_BPDU_MSTI_LENGTH) {
             ND_TCHECK2(*(ptr + offset), MST_BPDU_MSTI_LENGTH);
 
-            msti = EXTRACT_BE_16BITS(ptr + offset + MST_BPDU_MSTI_ROOT_PRIO_OFFSET);
+            msti = EXTRACT_BE_U_2(ptr + offset + MST_BPDU_MSTI_ROOT_PRIO_OFFSET);
             msti = msti & 0x0FFF;
 
             ND_PRINT((ndo, "\n\tMSTI %d, Flags [%s], port-role %s",
@@ -325,7 +325,7 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
             ND_PRINT((ndo, "\n\t\tMSTI regional-root-id %s, pathcost %u",
                    stp_print_bridge_id(ptr + offset +
                                        MST_BPDU_MSTI_ROOT_PRIO_OFFSET),
-                   EXTRACT_BE_32BITS(ptr + offset + MST_BPDU_MSTI_ROOT_PATH_COST_OFFSET)));
+                   EXTRACT_BE_U_4(ptr + offset + MST_BPDU_MSTI_ROOT_PATH_COST_OFFSET)));
             ND_PRINT((ndo, "\n\t\tMSTI bridge-prio %d, port-prio %d, hops %d",
                    ptr[offset + MST_BPDU_MSTI_BRIDGE_PRIO_OFFSET] >> 4,
                    ptr[offset + MST_BPDU_MSTI_PORT_PRIO_OFFSET] >> 4,
@@ -357,17 +357,17 @@ stp_print_spb_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
     ptr = (const u_char *)stp_bpdu;
     ND_TCHECK_4(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET + 16);
 
-    ND_PRINT((ndo, "\n\tv4len %d, ", EXTRACT_BE_16BITS(ptr + offset)));
+    ND_PRINT((ndo, "\n\tv4len %d, ", EXTRACT_BE_U_2(ptr + offset)));
     ND_PRINT((ndo, "AUXMCID Name "));
     if (fn_printzp(ndo, ptr + offset + SPB_BPDU_CONFIG_NAME_OFFSET, 32,
 		   ndo->ndo_snapend))
 	goto trunc;
     ND_PRINT((ndo, ", Rev %u,\n\t\tdigest %08x%08x%08x%08x",
-            EXTRACT_BE_16BITS(ptr + offset + SPB_BPDU_CONFIG_REV_OFFSET),
-            EXTRACT_BE_32BITS(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET),
-            EXTRACT_BE_32BITS(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET + 4),
-            EXTRACT_BE_32BITS(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET + 8),
-            EXTRACT_BE_32BITS(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET + 12)));
+            EXTRACT_BE_U_2(ptr + offset + SPB_BPDU_CONFIG_REV_OFFSET),
+            EXTRACT_BE_U_4(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET),
+            EXTRACT_BE_U_4(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET + 4),
+            EXTRACT_BE_U_4(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET + 8),
+            EXTRACT_BE_U_4(ptr + offset + SPB_BPDU_CONFIG_DIGEST_OFFSET + 12)));
 
     ND_PRINT((ndo, "\n\tAgreement num %d, Discarded Agreement num %d, Agreement valid-"
             "flag %d,\n\tRestricted role-flag: %d, Format id %d cap %d, "
@@ -381,12 +381,12 @@ stp_print_spb_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
             ptr[offset + SPB_BPDU_AGREEMENT_FORMAT_OFFSET]&0x00ff,
             ptr[offset + SPB_BPDU_AGREEMENT_CON_OFFSET]>>4,
             ptr[offset + SPB_BPDU_AGREEMENT_CON_OFFSET]&0x00ff,
-            EXTRACT_BE_16BITS(ptr + offset + SPB_BPDU_AGREEMENT_EDGE_OFFSET),
-            EXTRACT_BE_32BITS(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET),
-            EXTRACT_BE_32BITS(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET + 4),
-            EXTRACT_BE_32BITS(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET + 8),
-            EXTRACT_BE_32BITS(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET + 12),
-            EXTRACT_BE_32BITS(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET + 16)));
+            EXTRACT_BE_U_2(ptr + offset + SPB_BPDU_AGREEMENT_EDGE_OFFSET),
+            EXTRACT_BE_U_4(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET),
+            EXTRACT_BE_U_4(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET + 4),
+            EXTRACT_BE_U_4(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET + 8),
+            EXTRACT_BE_U_4(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET + 12),
+            EXTRACT_BE_U_4(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET + 16)));
     return 1;
 
 trunc:
@@ -410,7 +410,7 @@ stp_print(netdissect_options *ndo, const u_char *p, u_int length)
         goto trunc;
 
     ND_TCHECK(stp_bpdu->protocol_id);
-    if (EXTRACT_BE_16BITS(&stp_bpdu->protocol_id)) {
+    if (EXTRACT_BE_U_2(&stp_bpdu->protocol_id)) {
         ND_PRINT((ndo, "unknown STP version, length %u", length));
         return;
     }
@@ -463,7 +463,7 @@ stp_print(netdissect_options *ndo, const u_char *p, u_int length)
 
             /* Validate v3 length */
             ND_TCHECK_2(p + MST_BPDU_VER3_LEN_OFFSET);
-            mstp_len = EXTRACT_BE_16BITS(p + MST_BPDU_VER3_LEN_OFFSET);
+            mstp_len = EXTRACT_BE_U_2(p + MST_BPDU_VER3_LEN_OFFSET);
             mstp_len += 2;  /* length encoding itself is 2 bytes */
             if (length < (sizeof(struct stp_bpdu_) + mstp_len)) {
                 goto trunc;
@@ -475,7 +475,7 @@ stp_print(netdissect_options *ndo, const u_char *p, u_int length)
             {
               /* Validate v4 length */
               ND_TCHECK_2(p + MST_BPDU_VER3_LEN_OFFSET + mstp_len);
-              spb_len = EXTRACT_BE_16BITS(p + MST_BPDU_VER3_LEN_OFFSET + mstp_len);
+              spb_len = EXTRACT_BE_U_2(p + MST_BPDU_VER3_LEN_OFFSET + mstp_len);
               spb_len += 2;
               if (length < (sizeof(struct stp_bpdu_) + mstp_len + spb_len) ||
                   spb_len < SPB_BPDU_MIN_LEN) {

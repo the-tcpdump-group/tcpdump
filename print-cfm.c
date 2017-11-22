@@ -232,7 +232,7 @@ cfm_network_addr_print(netdissect_options *ndo,
         return hexdump;
     }
     /* The calling function must make any due ND_TCHECK calls. */
-    network_addr_type = EXTRACT_8BITS(tptr);
+    network_addr_type = EXTRACT_U_1(tptr);
     ND_PRINT((ndo, "\n\t  Network Address Type %s (%u)",
            tok2str(af_values, "Unknown", network_addr_type),
            network_addr_type));
@@ -361,8 +361,8 @@ cfm_print(netdissect_options *ndo,
         }
 
         ND_PRINT((ndo, "\n\t  Sequence Number 0x%08x, MA-End-Point-ID 0x%04x",
-               EXTRACT_BE_32BITS(msg_ptr.cfm_ccm->sequence),
-               EXTRACT_BE_16BITS(msg_ptr.cfm_ccm->ma_epi)));
+               EXTRACT_BE_U_4(msg_ptr.cfm_ccm->sequence),
+               EXTRACT_BE_U_2(msg_ptr.cfm_ccm->ma_epi)));
 
         namesp = msg_ptr.cfm_ccm->names;
         names_data_remaining = sizeof(msg_ptr.cfm_ccm->names);
@@ -477,7 +477,7 @@ cfm_print(netdissect_options *ndo,
                bittok2str(cfm_ltm_flag_values, "none", cfm_common_header->flags)));
 
         ND_PRINT((ndo, "\n\t  Transaction-ID 0x%08x, ttl %u",
-               EXTRACT_BE_32BITS(msg_ptr.cfm_ltm->transaction_id),
+               EXTRACT_BE_U_4(msg_ptr.cfm_ltm->transaction_id),
                msg_ptr.cfm_ltm->ttl));
 
         ND_PRINT((ndo, "\n\t  Original-MAC %s, Target-MAC %s",
@@ -500,7 +500,7 @@ cfm_print(netdissect_options *ndo,
                bittok2str(cfm_ltr_flag_values, "none", cfm_common_header->flags)));
 
         ND_PRINT((ndo, "\n\t  Transaction-ID 0x%08x, ttl %u",
-               EXTRACT_BE_32BITS(msg_ptr.cfm_ltr->transaction_id),
+               EXTRACT_BE_U_4(msg_ptr.cfm_ltr->transaction_id),
                msg_ptr.cfm_ltr->ttl));
 
         ND_PRINT((ndo, "\n\t  Replay-Action %s (%u)",
@@ -545,7 +545,7 @@ cfm_print(netdissect_options *ndo,
         if (tlen < sizeof(struct cfm_tlv_header_t))
             goto tooshort;
         ND_TCHECK2(*tptr, sizeof(struct cfm_tlv_header_t));
-        cfm_tlv_len=EXTRACT_BE_16BITS(&cfm_tlv_header->length);
+        cfm_tlv_len=EXTRACT_BE_U_2(&cfm_tlv_header->length);
 
         ND_PRINT((ndo, ", length %u", cfm_tlv_len));
 
@@ -566,8 +566,8 @@ cfm_print(netdissect_options *ndo,
                 return;
             }
             ND_PRINT((ndo, ", Status: %s (%u)",
-                   tok2str(cfm_tlv_port_status_values, "Unknown", EXTRACT_8BITS(tptr)),
-                   EXTRACT_8BITS(tptr)));
+                   tok2str(cfm_tlv_port_status_values, "Unknown", EXTRACT_U_1(tptr)),
+                   EXTRACT_U_1(tptr)));
             break;
 
         case CFM_TLV_INTERFACE_STATUS:
@@ -576,8 +576,8 @@ cfm_print(netdissect_options *ndo,
                 return;
             }
             ND_PRINT((ndo, ", Status: %s (%u)",
-                   tok2str(cfm_tlv_interface_status_values, "Unknown", EXTRACT_8BITS(tptr)),
-                   EXTRACT_8BITS(tptr)));
+                   tok2str(cfm_tlv_interface_status_values, "Unknown", EXTRACT_U_1(tptr)),
+                   EXTRACT_U_1(tptr)));
             break;
 
         case CFM_TLV_PRIVATE:
@@ -586,8 +586,8 @@ cfm_print(netdissect_options *ndo,
                 return;
             }
             ND_PRINT((ndo, ", Vendor: %s (%u), Sub-Type %u",
-                   tok2str(oui_values,"Unknown", EXTRACT_BE_24BITS(tptr)),
-                   EXTRACT_BE_24BITS(tptr),
+                   tok2str(oui_values,"Unknown", EXTRACT_BE_U_3(tptr)),
+                   EXTRACT_BE_U_3(tptr),
                    *(tptr + 3)));
             hexdump = TRUE;
             break;
@@ -606,7 +606,7 @@ cfm_print(netdissect_options *ndo,
              * Get the Chassis ID length and check it.
              * IEEE 802.1Q-2014 Section 21.5.3.1
              */
-            chassis_id_length = EXTRACT_8BITS(tptr);
+            chassis_id_length = EXTRACT_U_1(tptr);
             tptr++;
             tlen--;
             cfm_tlv_len--;
@@ -621,7 +621,7 @@ cfm_print(netdissect_options *ndo,
                     ND_PRINT((ndo, "\n\t  (TLV too short)"));
                     goto next_tlv;
                 }
-                chassis_id_type = EXTRACT_8BITS(tptr);
+                chassis_id_type = EXTRACT_U_1(tptr);
                 cfm_tlv_len--;
                 ND_PRINT((ndo, "\n\t  Chassis-ID Type %s (%u), Chassis-ID length %u",
                        tok2str(cfm_tlv_senderid_chassisid_values,
@@ -680,7 +680,7 @@ cfm_print(netdissect_options *ndo,
             }
 
             /* Here mgmt_addr_length stands for the management domain length. */
-            mgmt_addr_length = EXTRACT_8BITS(tptr);
+            mgmt_addr_length = EXTRACT_U_1(tptr);
             tptr++;
             tlen--;
             cfm_tlv_len--;
@@ -710,7 +710,7 @@ cfm_print(netdissect_options *ndo,
                 }
 
                 /* Here mgmt_addr_length stands for the management address length. */
-                mgmt_addr_length = EXTRACT_8BITS(tptr);
+                mgmt_addr_length = EXTRACT_U_1(tptr);
                 tptr++;
                 tlen--;
                 cfm_tlv_len--;

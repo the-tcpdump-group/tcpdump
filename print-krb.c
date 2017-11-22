@@ -119,7 +119,7 @@ c_print(netdissect_options *ndo,
 
 	flag = 1;
 	while (s < ep) {
-		c = EXTRACT_8BITS(s);
+		c = EXTRACT_U_1(s);
 		s++;
 		if (c == '\0') {
 			flag = 0;
@@ -173,7 +173,7 @@ krb4_print(netdissect_options *ndo,
 #define PRINT		if ((cp = c_print(ndo, cp, ndo->ndo_snapend)) == NULL) goto trunc
 /*  True if struct krb is little endian */
 #define IS_LENDIAN(kp)	(((kp)->type & 0x01) != 0)
-#define KTOHSP(kp, cp)	(IS_LENDIAN(kp) ? EXTRACT_LE_16BITS(cp) : EXTRACT_BE_16BITS(cp))
+#define KTOHSP(kp, cp)	(IS_LENDIAN(kp) ? EXTRACT_LE_U_2(cp) : EXTRACT_BE_U_2(cp))
 
 	kp = (const struct krb *)cp;
 
@@ -203,11 +203,11 @@ krb4_print(netdissect_options *ndo,
 	case AUTH_MSG_APPL_REQUEST:
 		cp += 2;
 		ND_TCHECK(*cp);
-		ND_PRINT((ndo, "v%d ", EXTRACT_8BITS(cp)));
+		ND_PRINT((ndo, "v%d ", EXTRACT_U_1(cp)));
 		cp++;
 		PRINT;
 		ND_TCHECK(*cp);
-		ND_PRINT((ndo, " (%d)", EXTRACT_8BITS(cp)));
+		ND_PRINT((ndo, " (%d)", EXTRACT_U_1(cp)));
 		cp++;
 		ND_TCHECK(*cp);
 		ND_PRINT((ndo, " (%d)", *cp));

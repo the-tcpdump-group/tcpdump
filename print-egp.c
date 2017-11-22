@@ -166,15 +166,15 @@ egpnrprint(netdissect_options *ndo,
 		switch (netlen) {
 
 		case 1:
-			addr = EXTRACT_8BITS(cp);
+			addr = EXTRACT_U_1(cp);
 			cp++;
 			/* fall through */
 		case 2:
-			addr = (addr << 8) | EXTRACT_8BITS(cp);
+			addr = (addr << 8) | EXTRACT_U_1(cp);
 			cp++;
 			/* fall through */
 		case 3:
-			addr = (addr << 8) | EXTRACT_8BITS(cp);
+			addr = (addr << 8) | EXTRACT_U_1(cp);
 			cp++;
 			break;
 		}
@@ -183,7 +183,7 @@ egpnrprint(netdissect_options *ndo,
 		if (length < 1)
 			goto trunc;
 		ND_TCHECK2(cp[0], 1);
-		distances = EXTRACT_8BITS(cp);
+		distances = EXTRACT_U_1(cp);
 		cp++;
 		length--;
 		ND_PRINT((ndo, " %s %s ",
@@ -196,10 +196,10 @@ egpnrprint(netdissect_options *ndo,
 			if (length < 2)
 				goto trunc;
 			ND_TCHECK2(cp[0], 2);
-			ND_PRINT((ndo, "%sd%d:", comma, EXTRACT_8BITS(cp)));
+			ND_PRINT((ndo, "%sd%d:", comma, EXTRACT_U_1(cp)));
 			cp++;
 			comma = ", ";
-			networks = EXTRACT_8BITS(cp);
+			networks = EXTRACT_U_1(cp);
 			cp++;
 			length -= 2;
 			while (networks != 0) {
@@ -207,23 +207,23 @@ egpnrprint(netdissect_options *ndo,
 				if (length < 1)
 					goto trunc;
 				ND_TCHECK2(cp[0], 1);
-				addr = ((uint32_t)EXTRACT_8BITS(cp)) << 24;
+				addr = ((uint32_t) EXTRACT_U_1(cp)) << 24;
 				cp++;
 				length--;
 				if (IN_CLASSB(addr)) {
 					if (length < 1)
 						goto trunc;
 					ND_TCHECK2(cp[0], 1);
-					addr |= ((uint32_t)EXTRACT_8BITS(cp)) << 16;
+					addr |= ((uint32_t) EXTRACT_U_1(cp)) << 16;
 					cp++;
 					length--;
 				} else if (!IN_CLASSA(addr)) {
 					if (length < 2)
 						goto trunc;
 					ND_TCHECK2(cp[0], 2);
-					addr |= ((uint32_t)EXTRACT_8BITS(cp)) << 16;
+					addr |= ((uint32_t) EXTRACT_U_1(cp)) << 16;
 					cp++;
-					addr |= ((uint32_t)EXTRACT_8BITS(cp)) << 8;
+					addr |= ((uint32_t) EXTRACT_U_1(cp)) << 8;
 					cp++;
 					length -= 2;
 				}
@@ -257,8 +257,8 @@ egp_print(netdissect_options *ndo,
         if (!ndo->ndo_vflag) {
             ND_PRINT((ndo, "EGPv%u, AS %u, seq %u, length %u",
                    egp->egp_version,
-                   EXTRACT_BE_16BITS(&egp->egp_as),
-                   EXTRACT_BE_16BITS(&egp->egp_sequence),
+                   EXTRACT_BE_U_2(&egp->egp_as),
+                   EXTRACT_BE_U_2(&egp->egp_sequence),
                    length));
             return;
         } else
@@ -294,8 +294,8 @@ egp_print(netdissect_options *ndo,
 				break;
 			}
 			ND_PRINT((ndo, " hello:%d poll:%d",
-			       EXTRACT_BE_16BITS(&egp->egp_hello),
-			       EXTRACT_BE_16BITS(&egp->egp_poll)));
+			       EXTRACT_BE_U_2(&egp->egp_hello),
+			       EXTRACT_BE_U_2(&egp->egp_poll)));
 			break;
 
 		case EGPC_REFUSE:
@@ -376,10 +376,10 @@ egp_print(netdissect_options *ndo,
 		else
 			ND_PRINT((ndo, " [status %d]", status));
 
-		if (EXTRACT_BE_16BITS(&egp->egp_reason) <= EGPR_UVERSION)
-			ND_PRINT((ndo, " %s", egp_reasons[EXTRACT_BE_16BITS(&egp->egp_reason)]));
+		if (EXTRACT_BE_U_2(&egp->egp_reason) <= EGPR_UVERSION)
+			ND_PRINT((ndo, " %s", egp_reasons[EXTRACT_BE_U_2(&egp->egp_reason)]));
 		else
-			ND_PRINT((ndo, " [reason %d]", EXTRACT_BE_16BITS(&egp->egp_reason)));
+			ND_PRINT((ndo, " [reason %d]", EXTRACT_BE_U_2(&egp->egp_reason)));
 		break;
 
 	default:

@@ -114,7 +114,7 @@ trans2_qfsinfo(netdissect_options *ndo,
 
     if (request) {
 	ND_TCHECK2(*param, 2);
-	level = EXTRACT_LE_16BITS(param);
+	level = EXTRACT_LE_U_2(param);
 	fmt = "InfoLevel=[d]\n";
 	smb_fdata(ndo, param, fmt, param + pcnt, unicodestr);
     } else {
@@ -182,11 +182,11 @@ print_trans2(netdissect_options *ndo,
     ND_TCHECK(words[0]);
     if (request) {
 	ND_TCHECK2(w[14 * 2], 2);
-	pcnt = EXTRACT_LE_16BITS(w + 9 * 2);
-	param = buf + EXTRACT_LE_16BITS(w + 10 * 2);
-	dcnt = EXTRACT_LE_16BITS(w + 11 * 2);
-	data = buf + EXTRACT_LE_16BITS(w + 12 * 2);
-	fn = smbfindint(EXTRACT_LE_16BITS(w + 14 * 2), trans2_fns);
+	pcnt = EXTRACT_LE_U_2(w + 9 * 2);
+	param = buf + EXTRACT_LE_U_2(w + 10 * 2);
+	dcnt = EXTRACT_LE_U_2(w + 11 * 2);
+	data = buf + EXTRACT_LE_U_2(w + 12 * 2);
+	fn = smbfindint(EXTRACT_LE_U_2(w + 14 * 2), trans2_fns);
     } else {
 	if (words[0] == 0) {
 	    ND_PRINT((ndo, "%s\n", fn->name));
@@ -194,10 +194,10 @@ print_trans2(netdissect_options *ndo,
 	    return;
 	}
 	ND_TCHECK2(w[7 * 2], 2);
-	pcnt = EXTRACT_LE_16BITS(w + 3 * 2);
-	param = buf + EXTRACT_LE_16BITS(w + 4 * 2);
-	dcnt = EXTRACT_LE_16BITS(w + 6 * 2);
-	data = buf + EXTRACT_LE_16BITS(w + 7 * 2);
+	pcnt = EXTRACT_LE_U_2(w + 3 * 2);
+	param = buf + EXTRACT_LE_U_2(w + 4 * 2);
+	dcnt = EXTRACT_LE_U_2(w + 6 * 2);
+	data = buf + EXTRACT_LE_U_2(w + 7 * 2);
     }
 
     ND_PRINT((ndo, "%s param_length=%d data_length=%d\n", fn->name, pcnt, dcnt));
@@ -224,7 +224,7 @@ print_trans2(netdissect_options *ndo,
     }
 
     ND_TCHECK2(*dat, 2);
-    bcc = EXTRACT_LE_16BITS(dat);
+    bcc = EXTRACT_LE_U_2(dat);
     ND_PRINT((ndo, "smb_bcc=%u\n", bcc));
     if (fn->descript.fn)
 	(*fn->descript.fn)(ndo, param, data, pcnt, dcnt);
@@ -343,20 +343,20 @@ print_trans(netdissect_options *ndo,
 
     if (request) {
 	ND_TCHECK2(w[12 * 2], 2);
-	paramlen = EXTRACT_LE_16BITS(w + 9 * 2);
-	param = buf + EXTRACT_LE_16BITS(w + 10 * 2);
-	datalen = EXTRACT_LE_16BITS(w + 11 * 2);
-	data = buf + EXTRACT_LE_16BITS(w + 12 * 2);
+	paramlen = EXTRACT_LE_U_2(w + 9 * 2);
+	param = buf + EXTRACT_LE_U_2(w + 10 * 2);
+	datalen = EXTRACT_LE_U_2(w + 11 * 2);
+	data = buf + EXTRACT_LE_U_2(w + 12 * 2);
 	f1 = "TotParamCnt=[d] \nTotDataCnt=[d] \nMaxParmCnt=[d] \nMaxDataCnt=[d]\nMaxSCnt=[d] \nTransFlags=[w] \nRes1=[w] \nRes2=[w] \nRes3=[w]\nParamCnt=[d] \nParamOff=[d] \nDataCnt=[d] \nDataOff=[d] \nSUCnt=[d]\n";
 	f2 = "|Name=[S]\n";
 	f3 = "|Param ";
 	f4 = "|Data ";
     } else {
 	ND_TCHECK2(w[7 * 2], 2);
-	paramlen = EXTRACT_LE_16BITS(w + 3 * 2);
-	param = buf + EXTRACT_LE_16BITS(w + 4 * 2);
-	datalen = EXTRACT_LE_16BITS(w + 6 * 2);
-	data = buf + EXTRACT_LE_16BITS(w + 7 * 2);
+	paramlen = EXTRACT_LE_U_2(w + 3 * 2);
+	param = buf + EXTRACT_LE_U_2(w + 4 * 2);
+	datalen = EXTRACT_LE_U_2(w + 6 * 2);
+	data = buf + EXTRACT_LE_U_2(w + 7 * 2);
 	f1 = "TotParamCnt=[d] \nTotDataCnt=[d] \nRes1=[d]\nParamCnt=[d] \nParamOff=[d] \nRes2=[d] \nDataCnt=[d] \nDataOff=[d] \nRes3=[d]\nLsetup=[d]\n";
 	f2 = "|Unknown ";
 	f3 = "|Param ";
@@ -367,7 +367,7 @@ print_trans(netdissect_options *ndo,
         unicodestr);
 
     ND_TCHECK2(*data1, 2);
-    bcc = EXTRACT_LE_16BITS(data1);
+    bcc = EXTRACT_LE_U_2(data1);
     ND_PRINT((ndo, "smb_bcc=%u\n", bcc));
     if (bcc > 0) {
 	smb_fdata(ndo, data1 + 2, f2, maxbuf - (paramlen + datalen), unicodestr);
@@ -420,14 +420,15 @@ print_negprot(netdissect_options *ndo,
 	smb_print_data(ndo, words + 1, min(wct * 2, PTR_DIFF(maxbuf, words + 1)));
 
     ND_TCHECK2(*data, 2);
-    bcc = EXTRACT_LE_16BITS(data);
+    bcc = EXTRACT_LE_U_2(data);
     ND_PRINT((ndo, "smb_bcc=%u\n", bcc));
     if (bcc > 0) {
 	if (f2)
-	    smb_fdata(ndo, data + 2, f2, min(data + 2 + EXTRACT_LE_16BITS(data),
-		maxbuf), unicodestr);
+	    smb_fdata(ndo, data + 2, f2, min(data + 2 + EXTRACT_LE_U_2(data),
+                                             maxbuf), unicodestr);
 	else
-	    smb_print_data(ndo, data + 2, min(EXTRACT_LE_16BITS(data), PTR_DIFF(maxbuf, data + 2)));
+	    smb_print_data(ndo, data + 2,
+                           min(EXTRACT_LE_U_2(data), PTR_DIFF(maxbuf, data + 2)));
     }
     return;
 trunc:
@@ -464,14 +465,15 @@ print_sesssetup(netdissect_options *ndo,
 	smb_print_data(ndo, words + 1, min(wct * 2, PTR_DIFF(maxbuf, words + 1)));
 
     ND_TCHECK2(*data, 2);
-    bcc = EXTRACT_LE_16BITS(data);
+    bcc = EXTRACT_LE_U_2(data);
     ND_PRINT((ndo, "smb_bcc=%u\n", bcc));
     if (bcc > 0) {
 	if (f2)
-	    smb_fdata(ndo, data + 2, f2, min(data + 2 + EXTRACT_LE_16BITS(data),
-		maxbuf), unicodestr);
+	    smb_fdata(ndo, data + 2, f2, min(data + 2 + EXTRACT_LE_U_2(data),
+                                             maxbuf), unicodestr);
 	else
-	    smb_print_data(ndo, data + 2, min(EXTRACT_LE_16BITS(data), PTR_DIFF(maxbuf, data + 2)));
+	    smb_print_data(ndo, data + 2,
+                           min(EXTRACT_LE_U_2(data), PTR_DIFF(maxbuf, data + 2)));
     }
     return;
 trunc:
@@ -504,14 +506,15 @@ print_lockingandx(netdissect_options *ndo,
 	smb_fdata(ndo, words + 1, f1, maxwords, unicodestr);
 
     ND_TCHECK2(*data, 2);
-    bcc = EXTRACT_LE_16BITS(data);
+    bcc = EXTRACT_LE_U_2(data);
     ND_PRINT((ndo, "smb_bcc=%u\n", bcc));
     if (bcc > 0) {
 	if (f2)
-	    smb_fdata(ndo, data + 2, f2, min(data + 2 + EXTRACT_LE_16BITS(data),
-		maxbuf), unicodestr);
+	    smb_fdata(ndo, data + 2, f2, min(data + 2 + EXTRACT_LE_U_2(data),
+                                             maxbuf), unicodestr);
 	else
-	    smb_print_data(ndo, data + 2, min(EXTRACT_LE_16BITS(data), PTR_DIFF(maxbuf, data + 2)));
+	    smb_print_data(ndo, data + 2,
+                           min(EXTRACT_LE_U_2(data), PTR_DIFF(maxbuf, data + 2)));
     }
     return;
 trunc:
@@ -821,7 +824,7 @@ print_smb(netdissect_options *ndo,
 	return;
 
     ND_TCHECK_2(&buf[10]);
-    flags2 = EXTRACT_LE_16BITS(buf + 10);
+    flags2 = EXTRACT_LE_U_2(buf + 10);
     unicodestr = flags2 & 0x8000;
     nterrcodes = flags2 & 0x4000;
 
@@ -829,12 +832,12 @@ print_smb(netdissect_options *ndo,
     smb_fdata(ndo, buf, fmt_smbheader, buf + 33, unicodestr);
 
     if (nterrcodes) {
-    	nterror = EXTRACT_LE_32BITS(buf + 5);
+    	nterror = EXTRACT_LE_U_4(buf + 5);
 	if (nterror)
 	    ND_PRINT((ndo, "NTError = %s\n", nt_errstr(nterror)));
     } else {
 	if (buf[5])
-	    ND_PRINT((ndo, "SMBError = %s\n", smb_errstr(buf[5], EXTRACT_LE_16BITS(buf + 7))));
+	    ND_PRINT((ndo, "SMBError = %s\n", smb_errstr(buf[5], EXTRACT_LE_U_2(buf + 7))));
     }
 
     smboffset = 32;
@@ -871,14 +874,14 @@ print_smb(netdissect_options *ndo,
 
 		    for (i = 0; &words[1 + 2 * i] < maxwords; i++) {
 			ND_TCHECK2(words[1 + 2 * i], 2);
-			v = EXTRACT_LE_16BITS(words + 1 + 2 * i);
+			v = EXTRACT_LE_U_2(words + 1 + 2 * i);
 			ND_PRINT((ndo, "smb_vwv[%d]=%d (0x%X)\n", i, v, v));
 		    }
 		}
 	    }
 
 	    ND_TCHECK2(*data, 2);
-	    bcc = EXTRACT_LE_16BITS(data);
+	    bcc = EXTRACT_LE_U_2(data);
 	    ND_PRINT((ndo, "smb_bcc=%u\n", bcc));
 	    if (f2) {
 		if (bcc > 0)
@@ -900,7 +903,7 @@ print_smb(netdissect_options *ndo,
 	if (command == 0xFF)
 	    break;
 	ND_TCHECK2(words[3], 2);
-	newsmboffset = EXTRACT_LE_16BITS(words + 3);
+	newsmboffset = EXTRACT_LE_U_2(words + 3);
 
 	fn = smbfind(command, smb_fns);
 
@@ -941,7 +944,7 @@ nbt_tcp_print(netdissect_options *ndo,
 	goto trunc;
     maxbuf = data + caplen;
     type = data[0];
-    nbt_len = EXTRACT_BE_16BITS(data + 2);
+    nbt_len = EXTRACT_BE_U_2(data + 2);
     length -= 4;
     caplen -= 4;
 
@@ -1107,15 +1110,15 @@ nbt_udp137_print(netdissect_options *ndo,
     int total, i;
 
     ND_TCHECK2(data[10], 2);
-    name_trn_id = EXTRACT_BE_16BITS(data);
+    name_trn_id = EXTRACT_BE_U_2(data);
     response = (data[2] >> 7);
     opcode = (data[2] >> 3) & 0xF;
     nm_flags = ((data[2] & 0x7) << 4) + (data[3] >> 4);
     rcode = data[3] & 0xF;
-    qdcount = EXTRACT_BE_16BITS(data + 4);
-    ancount = EXTRACT_BE_16BITS(data + 6);
-    nscount = EXTRACT_BE_16BITS(data + 8);
-    arcount = EXTRACT_BE_16BITS(data + 10);
+    qdcount = EXTRACT_BE_U_2(data + 4);
+    ancount = EXTRACT_BE_U_2(data + 6);
+    nscount = EXTRACT_BE_U_2(data + 8);
+    arcount = EXTRACT_BE_U_2(data + 10);
     startbuf = data;
 
     if (maxbuf <= data)
@@ -1168,12 +1171,12 @@ nbt_udp137_print(netdissect_options *ndo,
 	    if (p == NULL)
 		goto out;
 	    ND_TCHECK_2(p);
-	    restype = EXTRACT_BE_16BITS(p);
+	    restype = EXTRACT_BE_U_2(p);
 	    p = smb_fdata(ndo, p, "ResType=[rw]\nResClass=[rw]\nTTL=[rD]\n", p + 8, 0);
 	    if (p == NULL)
 		goto out;
 	    ND_TCHECK_2(p);
-	    rdlen = EXTRACT_BE_16BITS(p);
+	    rdlen = EXTRACT_BE_U_2(p);
 	    ND_PRINT((ndo, "ResourceLength=%d\nResourceData=\n", rdlen));
 	    p += 2;
 	    if (rdlen == 6) {
@@ -1250,7 +1253,7 @@ smb_tcp_print(netdissect_options *ndo,
     if (caplen < 4)
 	goto trunc;
     maxbuf = data + caplen;
-    smb_len = EXTRACT_BE_24BITS(data + 1);
+    smb_len = EXTRACT_BE_U_3(data + 1);
     length -= 4;
     caplen -= 4;
 
@@ -1382,7 +1385,7 @@ netbeui_print(netdissect_options *ndo,
     if (maxbuf > ndo->ndo_snapend)
 	maxbuf = ndo->ndo_snapend;
     ND_TCHECK(data[4]);
-    len = EXTRACT_LE_16BITS(data);
+    len = EXTRACT_LE_U_2(data);
     command = data[4];
     data2 = data + len;
     if (data2 >= maxbuf) {

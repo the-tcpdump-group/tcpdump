@@ -105,16 +105,16 @@ cdp_print(netdissect_options *ndo,
 	tptr = pptr; /* temporary pointer */
 
 	ND_TCHECK2(*tptr, CDP_HEADER_LEN);
-	ND_PRINT((ndo, "CDPv%u, ttl: %us", EXTRACT_8BITS((tptr + CDP_HEADER_VERSION_OFFSET)),
+	ND_PRINT((ndo, "CDPv%u, ttl: %us", EXTRACT_U_1((tptr + CDP_HEADER_VERSION_OFFSET)),
 					   *(tptr + CDP_HEADER_TTL_OFFSET)));
 	if (ndo->ndo_vflag)
-		ND_PRINT((ndo, ", checksum: 0x%04x (unverified), length %u", EXTRACT_BE_16BITS(tptr + CDP_HEADER_CHECKSUM_OFFSET), length));
+		ND_PRINT((ndo, ", checksum: 0x%04x (unverified), length %u", EXTRACT_BE_U_2(tptr + CDP_HEADER_CHECKSUM_OFFSET), length));
 	tptr += CDP_HEADER_LEN;
 
 	while (tptr < (pptr+length)) {
 		ND_TCHECK2(*tptr, CDP_TLV_HEADER_LEN); /* read out Type and Length */
-		type = EXTRACT_BE_16BITS(tptr + CDP_TLV_TYPE_OFFSET);
-		len  = EXTRACT_BE_16BITS(tptr + CDP_TLV_LEN_OFFSET); /* object length includes the 4 bytes header length */
+		type = EXTRACT_BE_U_2(tptr + CDP_TLV_TYPE_OFFSET);
+		len  = EXTRACT_BE_U_2(tptr + CDP_TLV_LEN_OFFSET); /* object length includes the 4 bytes header length */
 		if (len < CDP_TLV_HEADER_LEN) {
 		    if (ndo->ndo_vflag)
 			ND_PRINT((ndo, "\n\t%s (0x%02x), TLV length: %u byte%s (too short)",
@@ -164,13 +164,13 @@ cdp_print(netdissect_options *ndo,
 			if (len < 4)
 			    goto trunc;
 			ND_PRINT((ndo, "(0x%08x): %s",
-			       EXTRACT_BE_32BITS(tptr),
-			       bittok2str(cdp_capability_values, "none", EXTRACT_BE_32BITS(tptr))));
+			       EXTRACT_BE_U_4(tptr),
+			       bittok2str(cdp_capability_values, "none", EXTRACT_BE_U_4(tptr))));
 			break;
 		    case 0x05: /* Version */
 			ND_PRINT((ndo, "\n\t  "));
 			for (i=0;i<len;i++) {
-			    j = EXTRACT_8BITS(tptr + i);
+			    j = EXTRACT_U_1(tptr + i);
 			    if (j == '\n') /* lets rework the version string to
 					      get a nice indentation */
 				ND_PRINT((ndo, "\n\t  "));
@@ -197,7 +197,7 @@ cdp_print(netdissect_options *ndo,
 		    case 0x0a: /* Native VLAN ID - CDPv2 */
 			if (len < 2)
 			    goto trunc;
-			ND_PRINT((ndo, "%d", EXTRACT_BE_16BITS(tptr)));
+			ND_PRINT((ndo, "%d", EXTRACT_BE_U_2(tptr)));
 			break;
 		    case 0x0b: /* Duplex - CDPv2 */
 			if (len < 1)
@@ -211,7 +211,7 @@ cdp_print(netdissect_options *ndo,
 		    case 0x0e: /* ATA-186 VoIP VLAN request - incomplete doc. */
 			if (len < 3)
 			    goto trunc;
-			ND_PRINT((ndo, "app %d, vlan %d", EXTRACT_8BITS((tptr)), EXTRACT_BE_16BITS(tptr + 1)));
+			ND_PRINT((ndo, "app %d, vlan %d", EXTRACT_U_1((tptr)), EXTRACT_BE_U_2(tptr + 1)));
 			break;
 		    case 0x10: /* ATA-186 VoIP VLAN assignment - incomplete doc. */
 			ND_PRINT((ndo, "%1.2fW", cdp_get_number(tptr, len) / 1000.0));
@@ -219,7 +219,7 @@ cdp_print(netdissect_options *ndo,
 		    case 0x11: /* MTU - not documented */
 			if (len < 4)
 			    goto trunc;
-			ND_PRINT((ndo, "%u bytes", EXTRACT_BE_32BITS(tptr)));
+			ND_PRINT((ndo, "%u bytes", EXTRACT_BE_U_4(tptr)));
 			break;
 		    case 0x12: /* AVVID trust bitmap - not documented */
 			if (len < 1)
@@ -288,7 +288,7 @@ cdp_print_addr(netdissect_options *ndo,
 	ND_TCHECK2(*p, 4);
 	if (p + 4 > endp)
 		goto trunc;
-	num = EXTRACT_BE_32BITS(p);
+	num = EXTRACT_BE_U_4(p);
 	p += 4;
 
 	while (p < endp && num >= 0) {
@@ -302,7 +302,7 @@ cdp_print_addr(netdissect_options *ndo,
 		ND_TCHECK2(p[pl], 2);
 		if (p + pl + 2 > endp)
 			goto trunc;
-		al = EXTRACT_BE_16BITS(p + pl);	/* address length */
+		al = EXTRACT_BE_U_2(p + pl);	/* address length */
 
 		if (pt == PT_NLPID && pl == 1 && *p == NLPID_IP && al == 4) {
 			/*
@@ -341,9 +341,9 @@ cdp_print_addr(netdissect_options *ndo,
 			ND_TCHECK2(*p, pl);
 			if (p + pl > endp)
 				goto trunc;
-			ND_PRINT((ndo, "pt=0x%02x, pl=%d, pb=", EXTRACT_8BITS((p - 2)), pl));
+			ND_PRINT((ndo, "pt=0x%02x, pl=%d, pb=", EXTRACT_U_1((p - 2)), pl));
 			while (pl-- > 0) {
-				ND_PRINT((ndo, " %02x", EXTRACT_8BITS(p)));
+				ND_PRINT((ndo, " %02x", EXTRACT_U_1(p)));
 				p++;
 			}
 			ND_TCHECK2(*p, 2);
@@ -355,7 +355,7 @@ cdp_print_addr(netdissect_options *ndo,
 			if (p + al > endp)
 				goto trunc;
 			while (al-- > 0) {
-				ND_PRINT((ndo, " %02x", EXTRACT_8BITS(p)));
+				ND_PRINT((ndo, " %02x", EXTRACT_U_1(p)));
 				p++;
 			}
 		}
@@ -400,7 +400,7 @@ static unsigned long cdp_get_number(const u_char * p, int l)
     unsigned long res=0;
     while( l>0 )
     {
-	res = (res<<8) + EXTRACT_8BITS(p);
+	res = (res<<8) + EXTRACT_U_1(p);
 	p++; l--;
     }
     return res;

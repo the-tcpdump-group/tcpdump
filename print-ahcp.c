@@ -107,7 +107,7 @@ ahcp_time_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 	if (cp + 4 != ep)
 		goto invalid;
 	ND_TCHECK2(*cp, 4);
-	t = EXTRACT_BE_32BITS(cp);
+	t = EXTRACT_BE_U_4(cp);
 	if (NULL == (tm = gmtime(&t)))
 		ND_PRINT((ndo, ": gmtime() error"));
 	else if (0 == strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", tm))
@@ -131,7 +131,7 @@ ahcp_seconds_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 	if (cp + 4 != ep)
 		goto invalid;
 	ND_TCHECK2(*cp, 4);
-	ND_PRINT((ndo, ": %us", EXTRACT_BE_32BITS(cp)));
+	ND_PRINT((ndo, ": %us", EXTRACT_BE_U_4(cp)));
 	return 0;
 
 invalid:
@@ -317,7 +317,7 @@ ahcp1_body_print(netdissect_options *ndo, const u_char *cp, const u_char *ep)
 	cp += 1;
 	/* Length */
 	ND_TCHECK2(*cp, 2);
-	body_len = EXTRACT_BE_16BITS(cp);
+	body_len = EXTRACT_BE_U_2(cp);
 	cp += 2;
 
 	if (ndo->ndo_vflag) {
@@ -381,7 +381,7 @@ ahcp_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 				cp += 1;
 				/* Nonce */
 				ND_TCHECK2(*cp, 4);
-				ND_PRINT((ndo, ", Nonce 0x%08x", EXTRACT_BE_32BITS(cp)));
+				ND_PRINT((ndo, ", Nonce 0x%08x", EXTRACT_BE_U_4(cp)));
 				cp += 4;
 				/* Source Id */
 				ND_TCHECK2(*cp, 8);

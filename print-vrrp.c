@@ -144,7 +144,7 @@ vrrp_print(netdissect_options *ndo,
 			vec[0].len = len;
 			if (in_cksum(vec, 1))
 				ND_PRINT((ndo, ", (bad vrrp cksum %x)",
-					EXTRACT_BE_16BITS(bp + 6)));
+					EXTRACT_BE_U_2(bp + 6)));
 		}
 
 		if (version == 3 && ND_TTEST2(bp[0], len)) {
@@ -152,7 +152,7 @@ vrrp_print(netdissect_options *ndo,
 				len, len, IPPROTO_VRRP);
 			if (cksum)
 				ND_PRINT((ndo, ", (bad vrrp cksum %x)",
-					EXTRACT_BE_16BITS(bp + 6)));
+					EXTRACT_BE_U_2(bp + 6)));
 		}
 
 		ND_PRINT((ndo, ", addrs"));

@@ -54,16 +54,16 @@ typedef unsigned char nd_uint64_t[8];
  * Use this for IPv4 addresses.  It's defined as an array of octets, so
  * that it's not aligned on its "natural" boundary, and it's defined as
  * a structure in the hopes that this makes it harder to naively use
- * EXTRACT_BE_32BITS() to extract the value - in many cases you just want
+ * EXTRACT_BE_U_4() to extract the value - in many cases you just want
  * to use UNALIGNED_MEMCPY() to copy its value, so that it remains in
  * network byte order.
  *
  * (Among other things, we don't want somebody thinking "IPv4 addresses,
- * they're in network byte order, so we want EXTRACT_BE_32BITS(), right?"
+ * they're in network byte order, so we want EXTRACT_BE_U_4(), right?"
  * and then handing the result to system APIs that expect network-order
  * IPv4 addresses, such as inet_ntop(), on their little-endian PCs, getting
  * the wrong behavior, and concluding "oh, it must be in *little*-endian
- * order" and "fixing" it to use EXTRACT_LE_32BITS().  Yes, people do this;
+ * order" and "fixing" it to use EXTRACT_LE_U_4().  Yes, people do this;
  * that's why Wireshark has tvb_get_ipv4(), to extract an IPv4 address from
  * a packet data buffer; it was introduced in reaction to somebody who
  * *had* done that.)

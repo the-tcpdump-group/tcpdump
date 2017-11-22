@@ -149,7 +149,7 @@ aoev1_issue_print(netdissect_options *ndo,
 		goto invalid;
 	/* AFlags */
 	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, "\n\tAFlags: [%s]", bittok2str(aoev1_aflag_str, "none", EXTRACT_8BITS(cp))));
+	ND_PRINT((ndo, "\n\tAFlags: [%s]", bittok2str(aoev1_aflag_str, "none", EXTRACT_U_1(cp))));
 	cp += 1;
 	/* Err/Feature */
 	ND_TCHECK2(*cp, 1);
@@ -214,11 +214,11 @@ aoev1_query_print(netdissect_options *ndo,
 		goto invalid;
 	/* Buffer Count */
 	ND_TCHECK2(*cp, 2);
-	ND_PRINT((ndo, "\n\tBuffer Count: %u", EXTRACT_BE_16BITS(cp)));
+	ND_PRINT((ndo, "\n\tBuffer Count: %u", EXTRACT_BE_U_2(cp)));
 	cp += 2;
 	/* Firmware Version */
 	ND_TCHECK2(*cp, 2);
-	ND_PRINT((ndo, ", Firmware Version: %u", EXTRACT_BE_16BITS(cp)));
+	ND_PRINT((ndo, ", Firmware Version: %u", EXTRACT_BE_U_2(cp)));
 	cp += 2;
 	/* Sector Count */
 	ND_TCHECK2(*cp, 1);
@@ -226,12 +226,12 @@ aoev1_query_print(netdissect_options *ndo,
 	cp += 1;
 	/* AoE/CCmd */
 	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, ", AoE: %u, CCmd: %s", (EXTRACT_8BITS(cp) & 0xF0) >> 4,
-	          tok2str(aoev1_ccmd_str, "Unknown (0x02x)", EXTRACT_8BITS(cp) & 0x0F)));
+	ND_PRINT((ndo, ", AoE: %u, CCmd: %s", (EXTRACT_U_1(cp) & 0xF0) >> 4,
+	          tok2str(aoev1_ccmd_str, "Unknown (0x02x)", EXTRACT_U_1(cp) & 0x0F)));
 	cp += 1;
 	/* Config String Length */
 	ND_TCHECK2(*cp, 2);
-	cslen = EXTRACT_BE_16BITS(cp);
+	cslen = EXTRACT_BE_U_2(cp);
 	cp += 2;
 	if (cslen > AOEV1_MAX_CONFSTR_LEN || AOEV1_QUERY_ARG_LEN + cslen > len)
 		goto invalid;
@@ -266,11 +266,11 @@ aoev1_mac_print(netdissect_options *ndo,
 	cp += 1;
 	/* MCmd */
 	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, "\n\tMCmd: %s", tok2str(aoev1_mcmd_str, "Unknown (0x%02x)", EXTRACT_8BITS(cp))));
+	ND_PRINT((ndo, "\n\tMCmd: %s", tok2str(aoev1_mcmd_str, "Unknown (0x%02x)", EXTRACT_U_1(cp))));
 	cp += 1;
 	/* MError */
 	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, ", MError: %s", tok2str(aoev1_merror_str, "Unknown (0x%02x)", EXTRACT_8BITS(cp))));
+	ND_PRINT((ndo, ", MError: %s", tok2str(aoev1_merror_str, "Unknown (0x%02x)", EXTRACT_U_1(cp))));
 	cp += 1;
 	/* Dir Count */
 	ND_TCHECK2(*cp, 1);
@@ -286,7 +286,7 @@ aoev1_mac_print(netdissect_options *ndo,
 		cp += 1;
 		/* DCmd */
 		ND_TCHECK2(*cp, 1);
-		ND_PRINT((ndo, "\n\t DCmd: %s", tok2str(aoev1_dcmd_str, "Unknown (0x%02x)", EXTRACT_8BITS(cp))));
+		ND_PRINT((ndo, "\n\t DCmd: %s", tok2str(aoev1_dcmd_str, "Unknown (0x%02x)", EXTRACT_U_1(cp))));
 		cp += 1;
 		/* Ethernet Address */
 		ND_TCHECK2(*cp, ETHER_ADDR_LEN);
@@ -314,7 +314,7 @@ aoev1_reserve_print(netdissect_options *ndo,
 		goto invalid;
 	/* RCmd */
 	ND_TCHECK2(*cp, 1);
-	ND_PRINT((ndo, "\n\tRCmd: %s", tok2str(aoev1_rcmd_str, "Unknown (0x%02x)", EXTRACT_8BITS(cp))));
+	ND_PRINT((ndo, "\n\tRCmd: %s", tok2str(aoev1_rcmd_str, "Unknown (0x%02x)", EXTRACT_U_1(cp))));
 	cp += 1;
 	/* NMacs (correlated with the length) */
 	ND_TCHECK2(*cp, 1);
@@ -350,7 +350,7 @@ aoev1_print(netdissect_options *ndo,
 	if (len < AOEV1_COMMON_HDR_LEN)
 		goto invalid;
 	/* Flags */
-	flags = EXTRACT_8BITS(cp) & 0x0F;
+	flags = EXTRACT_U_1(cp) & 0x0F;
 	ND_PRINT((ndo, ", Flags: [%s]", bittok2str(aoev1_flag_str, "none", flags)));
 	cp += 1;
 	if (! ndo->ndo_vflag)
@@ -358,11 +358,11 @@ aoev1_print(netdissect_options *ndo,
 	/* Error */
 	ND_TCHECK2(*cp, 1);
 	if (flags & AOEV1_FLAG_E)
-		ND_PRINT((ndo, "\n\tError: %s", tok2str(aoev1_errcode_str, "Invalid (%u)", EXTRACT_8BITS(cp))));
+		ND_PRINT((ndo, "\n\tError: %s", tok2str(aoev1_errcode_str, "Invalid (%u)", EXTRACT_U_1(cp))));
 	cp += 1;
 	/* Major */
 	ND_TCHECK2(*cp, 2);
-	ND_PRINT((ndo, "\n\tMajor: 0x%04x", EXTRACT_BE_16BITS(cp)));
+	ND_PRINT((ndo, "\n\tMajor: 0x%04x", EXTRACT_BE_U_2(cp)));
 	cp += 2;
 	/* Minor */
 	ND_TCHECK2(*cp, 1);
@@ -375,7 +375,7 @@ aoev1_print(netdissect_options *ndo,
 	ND_PRINT((ndo, ", Command: %s", tok2str(cmdcode_str, "Unknown (0x%02x)", command)));
 	/* Tag */
 	ND_TCHECK2(*cp, 4);
-	ND_PRINT((ndo, ", Tag: 0x%08x", EXTRACT_BE_32BITS(cp)));
+	ND_PRINT((ndo, ", Tag: 0x%08x", EXTRACT_BE_U_4(cp)));
 	cp += 4;
 	/* Arg */
 	cmd_decoder =
@@ -409,7 +409,7 @@ aoe_print(netdissect_options *ndo,
 		goto invalid;
 	/* Ver/Flags */
 	ND_TCHECK2(*cp, 1);
-	ver = (EXTRACT_8BITS(cp) & 0xF0) >> 4;
+	ver = (EXTRACT_U_1(cp) & 0xF0) >> 4;
 	/* Don't advance cp yet: low order 4 bits are version-specific. */
 	ND_PRINT((ndo, ", Ver %u", ver));
 

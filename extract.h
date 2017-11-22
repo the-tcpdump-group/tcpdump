@@ -23,8 +23,8 @@
  * For 8-bit values; needed to fetch a one-byte value.  Byte order
  * isn't relevant, and alignment isn't an issue.
  */
-#define EXTRACT_8BITS(p)	(*(p))
-#define EXTRACT_INT8(p)		((int8_t)(*(p)))
+#define EXTRACT_U_1(p)	(*(p))
+#define EXTRACT_S_1(p)	((int8_t)(*(p)))
 
 /*
  * Inline functions or macros to extract possibly-unaligned big-endian
@@ -83,31 +83,31 @@
  * architectures in all cases?
  */
 static inline uint16_t UNALIGNED_OK
-EXTRACT_BE_16BITS(const void *p)
+EXTRACT_BE_U_2(const void *p)
 {
 	return ((uint16_t)ntohs(*(const uint16_t *)(p)));
 }
 
 static inline int16_t UNALIGNED_OK
-EXTRACT_BE_INT16(const void *p)
+EXTRACT_BE_S_2(const void *p)
 {
 	return ((int16_t)ntohs(*(const int16_t *)(p)));
 }
 
 static inline uint32_t UNALIGNED_OK
-EXTRACT_BE_32BITS(const void *p)
+EXTRACT_BE_U_4(const void *p)
 {
 	return ((uint32_t)ntohl(*(const uint32_t *)(p)));
 }
 
 static inline int32_t UNALIGNED_OK
-EXTRACT_BE_INT32(const void *p)
+EXTRACT_BE_S_4(const void *p)
 {
 	return ((int32_t)ntohl(*(const int32_t *)(p)));
 }
 
 static inline uint64_t UNALIGNED_OK
-EXTRACT_BE_64BITS(const void *p)
+EXTRACT_BE_U_8(const void *p)
 {
 	return ((uint64_t)(((uint64_t)ntohl(*((const uint32_t *)(p) + 0))) << 32 |
 		((uint64_t)ntohl(*((const uint32_t *)(p) + 1))) << 0));
@@ -115,7 +115,7 @@ EXTRACT_BE_64BITS(const void *p)
 }
 
 static inline int64_t UNALIGNED_OK
-EXTRACT_BE_INT64(const void *p)
+EXTRACT_BE_S_8(const void *p)
 {
 	return ((int64_t)(((int64_t)ntohl(*((const uint32_t *)(p) + 0))) << 32 |
 		((uint64_t)ntohl(*((const uint32_t *)(p) + 1))) << 0));
@@ -192,38 +192,38 @@ typedef struct {
 } __attribute__((packed)) unaligned_int32_t;
 
 UNALIGNED_OK static inline uint16_t
-EXTRACT_BE_16BITS(const void *p)
+EXTRACT_BE_U_2(const void *p)
 {
 	return ((uint16_t)ntohs(((const unaligned_uint16_t *)(p))->val));
 }
 
 UNALIGNED_OK static inline int16_t
-EXTRACT_BE_INT16(const void *p)
+EXTRACT_BE_S_2(const void *p)
 {
 	return ((int16_t)ntohs(((const unaligned_int16_t *)(p))->val));
 }
 
 UNALIGNED_OK static inline uint32_t
-EXTRACT_BE_32BITS(const void *p)
+EXTRACT_BE_U_4(const void *p)
 {
 	return ((uint32_t)ntohl(((const unaligned_uint32_t *)(p))->val));
 }
 
 UNALIGNED_OK static inline int32_t
-EXTRACT_BE_INT32(const void *p)
+EXTRACT_BE_S_4(const void *p)
 {
 	return ((int32_t)ntohl(((const unaligned_int32_t *)(p))->val));
 }
 
 UNALIGNED_OK static inline uint64_t
-EXTRACT_BE_64BITS(const void *p)
+EXTRACT_BE_U_8(const void *p)
 {
 	return ((uint64_t)(((uint64_t)ntohl(((const unaligned_uint32_t *)(p) + 0)->val)) << 32 |
 		((uint64_t)ntohl(((const unaligned_uint32_t *)(p) + 1)->val)) << 0));
 }
 
 UNALIGNED_OK static inline int64_t
-EXTRACT_BE_INT64(const void *p)
+EXTRACT_BE_S_8(const void *p)
 {
 	return ((int64_t)(((uint64_t)ntohl(((const unaligned_uint32_t *)(p) + 0)->val)) << 32 |
 		((uint64_t)ntohl(((const unaligned_uint32_t *)(p) + 1)->val)) << 0));
@@ -237,23 +237,23 @@ EXTRACT_BE_INT64(const void *p)
  * quantities the hard way - fetch the bytes one at a time and
  * assemble them.
  */
-#define EXTRACT_BE_16BITS(p) \
+#define EXTRACT_BE_U_2(p) \
 	((uint16_t)(((uint16_t)(*((const uint8_t *)(p) + 0)) << 8) | \
 	            ((uint16_t)(*((const uint8_t *)(p) + 1)) << 0)))
-#define EXTRACT_BE_INT16(p) \
+#define EXTRACT_BE_S_2(p) \
 	((int16_t)(((uint16_t)(*((const uint8_t *)(p) + 0)) << 8) | \
 	           ((uint16_t)(*((const uint8_t *)(p) + 1)) << 0)))
-#define EXTRACT_BE_32BITS(p) \
+#define EXTRACT_BE_U_4(p) \
 	((uint32_t)(((uint32_t)(*((const uint8_t *)(p) + 0)) << 24) | \
 	            ((uint32_t)(*((const uint8_t *)(p) + 1)) << 16) | \
 	            ((uint32_t)(*((const uint8_t *)(p) + 2)) << 8) | \
 	            ((uint32_t)(*((const uint8_t *)(p) + 3)) << 0)))
-#define EXTRACT_BE_INT32(p) \
+#define EXTRACT_BE_S_4(p) \
 	((int32_t)(((uint32_t)(*((const uint8_t *)(p) + 0)) << 24) | \
 	           ((uint32_t)(*((const uint8_t *)(p) + 1)) << 16) | \
 	           ((uint32_t)(*((const uint8_t *)(p) + 2)) << 8) | \
 	           ((uint32_t)(*((const uint8_t *)(p) + 3)) << 0)))
-#define EXTRACT_BE_64BITS(p) \
+#define EXTRACT_BE_U_8(p) \
 	((uint64_t)(((uint64_t)(*((const uint8_t *)(p) + 0)) << 56) | \
 	            ((uint64_t)(*((const uint8_t *)(p) + 1)) << 48) | \
 	            ((uint64_t)(*((const uint8_t *)(p) + 2)) << 40) | \
@@ -262,7 +262,7 @@ EXTRACT_BE_INT64(const void *p)
 	            ((uint64_t)(*((const uint8_t *)(p) + 5)) << 16) | \
 	            ((uint64_t)(*((const uint8_t *)(p) + 6)) << 8) | \
 	            ((uint64_t)(*((const uint8_t *)(p) + 7)) << 0)))
-#define EXTRACT_BE_INT64(p) \
+#define EXTRACT_BE_S_8(p) \
 	((int64_t)(((uint64_t)(*((const uint8_t *)(p) + 0)) << 56) | \
 	           ((uint64_t)(*((const uint8_t *)(p) + 1)) << 48) | \
 	           ((uint64_t)(*((const uint8_t *)(p) + 2)) << 40) | \
@@ -273,12 +273,12 @@ EXTRACT_BE_INT64(const void *p)
 	           ((uint64_t)(*((const uint8_t *)(p) + 7)) << 0)))
 #endif /* unaligned access checks */
 
-#define EXTRACT_BE_24BITS(p) \
+#define EXTRACT_BE_U_3(p) \
 	((uint32_t)(((uint32_t)(*((const uint8_t *)(p) + 0)) << 16) | \
 	            ((uint32_t)(*((const uint8_t *)(p) + 1)) << 8) | \
 	            ((uint32_t)(*((const uint8_t *)(p) + 2)) << 0)))
 
-#define EXTRACT_BE_INT24(p) \
+#define EXTRACT_BE_S_3(p) \
 	(((*((const uint8_t *)(p) + 0)) & 0x80) ? \
 	  ((int32_t)(((uint32_t)(*((const uint8_t *)(p) + 0)) << 16) | \
 	             ((uint32_t)(*((const uint8_t *)(p) + 1)) << 8) | \
@@ -288,14 +288,14 @@ EXTRACT_BE_INT64(const void *p)
 	             ((uint32_t)(*((const uint8_t *)(p) + 1)) << 8) | \
 	             ((uint32_t)(*((const uint8_t *)(p) + 2)) << 0))))
 
-#define EXTRACT_BE_40BITS(p) \
+#define EXTRACT_BE_U_5(p) \
 	((uint64_t)(((uint64_t)(*((const uint8_t *)(p) + 0)) << 32) | \
 	            ((uint64_t)(*((const uint8_t *)(p) + 1)) << 24) | \
 	            ((uint64_t)(*((const uint8_t *)(p) + 2)) << 16) | \
 	            ((uint64_t)(*((const uint8_t *)(p) + 3)) << 8) | \
 	            ((uint64_t)(*((const uint8_t *)(p) + 4)) << 0)))
 
-#define EXTRACT_BE_INT40(p) \
+#define EXTRACT_BE_S_5(p) \
 	(((*((const uint8_t *)(p) + 0)) & 0x80) ? \
 	  ((int64_t)(((uint64_t)(*((const uint8_t *)(p) + 0)) << 32) | \
 	             ((uint64_t)(*((const uint8_t *)(p) + 1)) << 24) | \
@@ -309,7 +309,7 @@ EXTRACT_BE_INT64(const void *p)
 	             ((uint64_t)(*((const uint8_t *)(p) + 3)) << 8) | \
 	             ((uint64_t)(*((const uint8_t *)(p) + 4)) << 0))))
 
-#define EXTRACT_BE_48BITS(p) \
+#define EXTRACT_BE_U_6(p) \
 	((uint64_t)(((uint64_t)(*((const uint8_t *)(p) + 0)) << 40) | \
 	            ((uint64_t)(*((const uint8_t *)(p) + 1)) << 32) | \
 	            ((uint64_t)(*((const uint8_t *)(p) + 2)) << 24) | \
@@ -317,7 +317,7 @@ EXTRACT_BE_INT64(const void *p)
 	            ((uint64_t)(*((const uint8_t *)(p) + 4)) << 8) | \
 	            ((uint64_t)(*((const uint8_t *)(p) + 5)) << 0)))
 
-#define EXTRACT_BE_INT48(p) \
+#define EXTRACT_BE_S_6(p) \
 	(((*((const uint8_t *)(p) + 0)) & 0x80) ? \
 	  ((uint64_t)(((uint64_t)(*((const uint8_t *)(p) + 0)) << 40) | \
 	              ((uint64_t)(*((const uint8_t *)(p) + 1)) << 32) | \
@@ -333,7 +333,7 @@ EXTRACT_BE_INT64(const void *p)
 	              ((uint64_t)(*((const uint8_t *)(p) + 4)) << 8) | \
 	              ((uint64_t)(*((const uint8_t *)(p) + 5)) << 0))))
 
-#define EXTRACT_BE_56BITS(p) \
+#define EXTRACT_BE_U_7(p) \
 	((uint64_t)(((uint64_t)(*((const uint8_t *)(p) + 0)) << 48) | \
 	            ((uint64_t)(*((const uint8_t *)(p) + 1)) << 40) | \
 	            ((uint64_t)(*((const uint8_t *)(p) + 2)) << 32) | \
@@ -342,7 +342,7 @@ EXTRACT_BE_INT64(const void *p)
 	            ((uint64_t)(*((const uint8_t *)(p) + 5)) << 8) | \
 	            ((uint64_t)(*((const uint8_t *)(p) + 6)) << 0)))
 
-#define EXTRACT_BE_INT56(p) \
+#define EXTRACT_BE_S_7(p) \
 	(((*((const uint8_t *)(p) + 0)) & 0x80) ? \
 	  ((int64_t)(((uint64_t)(*((const uint8_t *)(p) + 0)) << 48) | \
 	             ((uint64_t)(*((const uint8_t *)(p) + 1)) << 40) | \
@@ -364,19 +364,19 @@ EXTRACT_BE_INT64(const void *p)
  * Macros to extract possibly-unaligned little-endian integral values.
  * XXX - do loads on little-endian machines that support unaligned loads?
  */
-#define EXTRACT_LE_16BITS(p) \
+#define EXTRACT_LE_U_2(p) \
 	((uint16_t)(((uint16_t)(*((const uint8_t *)(p) + 1)) << 8) | \
 	            ((uint16_t)(*((const uint8_t *)(p) + 0)) << 0)))
-#define EXTRACT_LE_32BITS(p) \
+#define EXTRACT_LE_U_4(p) \
 	((uint32_t)(((uint32_t)(*((const uint8_t *)(p) + 3)) << 24) | \
 	            ((uint32_t)(*((const uint8_t *)(p) + 2)) << 16) | \
 	            ((uint32_t)(*((const uint8_t *)(p) + 1)) << 8) | \
 	            ((uint32_t)(*((const uint8_t *)(p) + 0)) << 0)))
-#define EXTRACT_LE_24BITS(p) \
+#define EXTRACT_LE_U_3(p) \
 	((uint32_t)(((uint32_t)(*((const uint8_t *)(p) + 2)) << 16) | \
 	            ((uint32_t)(*((const uint8_t *)(p) + 1)) << 8) | \
 	            ((uint32_t)(*((const uint8_t *)(p) + 0)) << 0)))
-#define EXTRACT_LE_64BITS(p) \
+#define EXTRACT_LE_U_8(p) \
 	((uint64_t)(((uint64_t)(*((const uint8_t *)(p) + 7)) << 56) | \
 	            ((uint64_t)(*((const uint8_t *)(p) + 6)) << 48) | \
 	            ((uint64_t)(*((const uint8_t *)(p) + 5)) << 40) | \

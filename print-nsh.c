@@ -77,7 +77,7 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
     bp += 1;
     next_protocol = *bp;
     bp += 1;
-    service_path_id = EXTRACT_BE_24BITS(bp);
+    service_path_id = EXTRACT_BE_U_3(bp);
     bp += 3;
     service_index = *bp;
     bp += 1;
@@ -117,7 +117,7 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
     if (ndo->ndo_vflag > 2) {
         if (md_type == 0x01) {
             for (n = 0; n < length - 2; n++) {
-                ctx = EXTRACT_BE_32BITS(bp);
+                ctx = EXTRACT_BE_U_4(bp);
                 bp += NSH_HDR_WORD_SIZE;
                 ND_PRINT((ndo, "\n        Context[%02d]: 0x%08x", n, ctx));
             }
@@ -125,7 +125,7 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
         else if (md_type == 0x02) {
             n = 0;
             while (n < length - 2) {
-                tlv_class = EXTRACT_BE_16BITS(bp);
+                tlv_class = EXTRACT_BE_U_2(bp);
                 bp += 2;
                 tlv_type  = *bp;
                 bp += 1;
@@ -143,7 +143,7 @@ nsh_print(netdissect_options *ndo, const u_char *bp, u_int len)
                 }
 
                 for (vn = 0; vn < tlv_len; vn++) {
-                    ctx = EXTRACT_BE_32BITS(bp);
+                    ctx = EXTRACT_BE_U_4(bp);
                     bp += NSH_HDR_WORD_SIZE;
                     ND_PRINT((ndo, "\n            Value[%02d]: 0x%08x", vn, ctx));
                 }

@@ -76,7 +76,7 @@
  * unused argument remind us that we should fix this some day.
  *
  * XXX - also, it fetches the TCP checksum field in COMPRESSED_TCP
- * packets directly, rather than with EXTRACT_16BITS(); RFC 1144 says
+ * packets directly, rather than with EXTRACT_BE_U_2(); RFC 1144 says
  * it's "the unmodified TCP checksum", which would imply that it's
  * big-endian, but perhaps, on the platform where this was developed,
  * the packets were munged by the networking stack before being handed

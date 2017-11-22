@@ -539,7 +539,7 @@ etheraddr_string(netdissect_options *ndo, register const u_char *ep)
 	}
 #endif
 	cp = buf;
-	oui = EXTRACT_BE_24BITS(ep);
+	oui = EXTRACT_BE_U_3(ep);
 	*cp++ = hex[*ep >> 4 ];
 	*cp++ = hex[*ep++ & 0xf];
 	for (i = 5; --i >= 0;) {
