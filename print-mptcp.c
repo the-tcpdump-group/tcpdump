@@ -367,8 +367,10 @@ remove_addr_print(netdissect_options *ndo,
 
         opt_len -= 3;
         ND_PRINT((ndo, " id"));
-        while (opt_len--)
-                ND_PRINT((ndo, " %u", *addr_id++));
+        while (opt_len--) {
+                ND_PRINT((ndo, " %u", EXTRACT_8BITS(addr_id)));
+                addr_id++;
+        }
         return 1;
 }
 

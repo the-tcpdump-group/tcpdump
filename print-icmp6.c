@@ -617,7 +617,8 @@ print_lladdr(netdissect_options *ndo, const uint8_t *p, size_t l)
 	while (l > 0 && q < ep) {
 		if (q > p)
                         ND_PRINT((ndo,":"));
-		ND_PRINT((ndo,"%02x", *q++));
+		ND_PRINT((ndo,"%02x", EXTRACT_8BITS(q)));
+		q++;
 		l--;
 	}
 }

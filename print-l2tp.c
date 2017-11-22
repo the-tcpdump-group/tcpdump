@@ -268,7 +268,8 @@ print_string(netdissect_options *ndo, const u_char *dat, u_int length)
 {
 	u_int i;
 	for (i=0; i<length; i++) {
-		ND_PRINT((ndo, "%c", *dat++));
+		ND_PRINT((ndo, "%c", EXTRACT_8BITS(dat)));
+		dat++;
 	}
 }
 
@@ -277,7 +278,8 @@ print_octets(netdissect_options *ndo, const u_char *dat, u_int length)
 {
 	u_int i;
 	for (i=0; i<length; i++) {
-		ND_PRINT((ndo, "%02x", *dat++));
+		ND_PRINT((ndo, "%02x", EXTRACT_8BITS(dat)));
+		dat++;
 	}
 }
 

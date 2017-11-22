@@ -342,8 +342,10 @@ cdp_print_addr(netdissect_options *ndo,
 			if (p + pl > endp)
 				goto trunc;
 			ND_PRINT((ndo, "pt=0x%02x, pl=%d, pb=", EXTRACT_8BITS((p - 2)), pl));
-			while (pl-- > 0)
-				ND_PRINT((ndo, " %02x", *p++));
+			while (pl-- > 0) {
+				ND_PRINT((ndo, " %02x", EXTRACT_8BITS(p)));
+				p++;
+			}
 			ND_TCHECK2(*p, 2);
 			if (p + 2 > endp)
 				goto trunc;
@@ -352,8 +354,10 @@ cdp_print_addr(netdissect_options *ndo,
 			ND_TCHECK2(*p, al);
 			if (p + al > endp)
 				goto trunc;
-			while (al-- > 0)
-				ND_PRINT((ndo, " %02x", *p++));
+			while (al-- > 0) {
+				ND_PRINT((ndo, " %02x", EXTRACT_8BITS(p)));
+				p++;
+			}
 		}
 		num--;
 		if (num)

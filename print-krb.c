@@ -203,10 +203,12 @@ krb4_print(netdissect_options *ndo,
 	case AUTH_MSG_APPL_REQUEST:
 		cp += 2;
 		ND_TCHECK(*cp);
-		ND_PRINT((ndo, "v%d ", *cp++));
+		ND_PRINT((ndo, "v%d ", EXTRACT_8BITS(cp)));
+		cp++;
 		PRINT;
 		ND_TCHECK(*cp);
-		ND_PRINT((ndo, " (%d)", *cp++));
+		ND_PRINT((ndo, " (%d)", EXTRACT_8BITS(cp)));
+		cp++;
 		ND_TCHECK(*cp);
 		ND_PRINT((ndo, " (%d)", *cp));
 		break;

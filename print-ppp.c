@@ -883,7 +883,8 @@ handle_chap(netdissect_options *ndo,
 		ND_PRINT((ndo, ", Value "));
 		for (i = 0; i < val_size; i++) {
 			ND_TCHECK(*p);
-			ND_PRINT((ndo, "%02x", *p++));
+			ND_PRINT((ndo, "%02x", EXTRACT_8BITS(p)));
+			p++;
 		}
 		name_size = len - (p - p0);
 		ND_PRINT((ndo, ", Name "));

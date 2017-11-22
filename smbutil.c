@@ -685,8 +685,10 @@ smb_fdata1(netdissect_options *ndo,
 	  {
 	    int l = atoi(fmt + 1);
 	    ND_TCHECK2(*buf, l);
-	    while (l--)
-		ND_PRINT((ndo, "%02x", *buf++));
+	    while (l--) {
+		ND_PRINT((ndo, "%02x", EXTRACT_8BITS(buf)));
+		buf++;
+	    }
 	    fmt++;
 	    while (isdigit((unsigned char)*fmt))
 		fmt++;
