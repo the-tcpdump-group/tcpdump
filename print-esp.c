@@ -636,12 +636,12 @@ esp_print(netdissect_options *ndo,
 	_U_
 #endif
 	,
-	int *nhdr
+	u_int *nhdr
 #ifndef HAVE_LIBCRYPTO
 	_U_
 #endif
 	,
-	int *padlen
+	u_int *padlen
 #ifndef HAVE_LIBCRYPTO
 	_U_
 #endif
@@ -807,14 +807,14 @@ esp_print(netdissect_options *ndo,
 		advance = sizeof(struct newesp);
 
 	/* sanity check for pad length */
-	if (ep - bp < *(ep - 2))
+	if (ep - bp < EXTRACT_8BITS(ep - 2))
 		goto fail;
 
 	if (padlen)
-		*padlen = *(ep - 2) + 2;
+		*padlen = EXTRACT_8BITS(ep - 2) + 2;
 
 	if (nhdr)
-		*nhdr = *(ep - 1);
+		*nhdr = EXTRACT_8BITS(ep - 1);
 
 	ND_PRINT((ndo, ": "));
 	return advance;

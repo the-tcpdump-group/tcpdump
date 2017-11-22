@@ -58,12 +58,10 @@
 static int print_probe(netdissect_options *, const u_char *, const u_char *, u_int);
 static int print_report(netdissect_options *, const u_char *, const u_char *, u_int);
 static int print_neighbors(netdissect_options *, const u_char *, const u_char *, u_int);
-static int print_neighbors2(netdissect_options *, const u_char *, const u_char *, u_int);
+static int print_neighbors2(netdissect_options *, const u_char *, const u_char *, u_int, uint32_t);
 static int print_prune(netdissect_options *, const u_char *);
 static int print_graft(netdissect_options *, const u_char *);
 static int print_graft_ack(netdissect_options *, const u_char *);
-
-static uint32_t target_level;
 
 void
 dvmrp_print(netdissect_options *ndo,
@@ -71,6 +69,7 @@ dvmrp_print(netdissect_options *ndo,
 {
 	register const u_char *ep;
 	register u_char type;
+	uint32_t target_level;
 
 	ep = (const u_char *)ndo->ndo_snapend;
 	if (bp >= ep)
@@ -126,7 +125,7 @@ dvmrp_print(netdissect_options *ndo,
 		target_level = (bp[0] << 24) | (bp[1] << 16) |
 		    (bp[2] << 8) | bp[3];
 		bp += 4;
-		if (print_neighbors2(ndo, bp, ep, len) < 0)
+		if (print_neighbors2(ndo, bp, ep, len, target_level) < 0)
 			goto trunc;
 		break;
 
@@ -288,15 +287,15 @@ trunc:
 static int
 print_neighbors2(netdissect_options *ndo,
                  register const u_char *bp, register const u_char *ep,
-                 register u_int len)
+                 register u_int len, uint32_t target_level)
 {
 	const u_char *laddr;
 	register u_char metric, thresh, flags;
 	register int ncount;
 
-	ND_PRINT((ndo, " (v %d.%d):",
-	       (int)target_level & 0xff,
-	       (int)(target_level >> 8) & 0xff));
+	ND_PRINT((ndo, " (v %u.%u):",
+	       target_level & 0xff,
+	       (target_level >> 8) & 0xff));
 
 	while (len > 0 && bp < ep) {
 		ND_TCHECK2(bp[0], 8);

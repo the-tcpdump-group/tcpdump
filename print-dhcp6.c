@@ -665,7 +665,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				ND_PRINT((ndo, " by-clientID"));
 				break;
 			default:
-				ND_PRINT((ndo, " type_%d", (int)dh6_lq_query_type));
+				ND_PRINT((ndo, " type_%u", dh6_lq_query_type));
 				break;
 			}
 			ND_PRINT((ndo, " %s", ip6addr_string(ndo, &tp[1])));

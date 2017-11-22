@@ -174,10 +174,10 @@ int
 hbhopt_print(netdissect_options *ndo, register const u_char *bp)
 {
     const struct ip6_hbh *dp = (const struct ip6_hbh *)bp;
-    int hbhlen = 0;
+    u_int hbhlen = 0;
 
     ND_TCHECK(dp->ip6h_len);
-    hbhlen = (int)((dp->ip6h_len + 1) << 3);
+    hbhlen = (dp->ip6h_len + 1) << 3;
     ND_TCHECK2(*dp, hbhlen);
     ND_PRINT((ndo, "HBH "));
     if (ndo->ndo_vflag)
@@ -194,10 +194,10 @@ int
 dstopt_print(netdissect_options *ndo, register const u_char *bp)
 {
     const struct ip6_dest *dp = (const struct ip6_dest *)bp;
-    int dstoptlen = 0;
+    u_int dstoptlen = 0;
 
     ND_TCHECK(dp->ip6d_len);
-    dstoptlen = (int)((dp->ip6d_len + 1) << 3);
+    dstoptlen = (dp->ip6d_len + 1) << 3;
     ND_TCHECK2(*dp, dstoptlen);
     ND_PRINT((ndo, "DSTOPT "));
     if (ndo->ndo_vflag) {

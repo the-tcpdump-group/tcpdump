@@ -387,14 +387,14 @@ struct forces_tlv {
 #define	GET_TOP_TLV(fhdr) ((const struct forces_tlv *)((fhdr) + sizeof (struct forcesh)))
 #define TLV_SET_LEN(len)  (F_ALN_LEN(TLV_HDRL) + (len))
 #define TLV_ALN_LEN(len)  F_ALN_LEN(TLV_SET_LEN(len))
-#define TLV_RDAT_LEN(tlv) ((int)(EXTRACT_16BITS(&(tlv)->length) - TLV_SET_LEN(0))
+#define TLV_RDAT_LEN(tlv) (EXTRACT_16BITS(&(tlv)->length) - TLV_SET_LEN(0)
 #define TLV_DATA(tlvp)   ((const void*)(((const char*)(tlvp)) + TLV_SET_LEN(0)))
 #define GO_NXT_TLV(tlv,rlen) ((rlen) -= F_ALN_LEN(EXTRACT_BE_16BITS(&(tlv)->length)), \
 		              (const struct forces_tlv*)(((const char*)(tlv)) \
 				      + F_ALN_LEN(EXTRACT_BE_16BITS(&(tlv)->length))))
 #define ILV_SET_LEN(len)  (F_ALN_LEN(ILV_HDRL) + (len))
 #define ILV_ALN_LEN(len)  F_ALN_LEN(ILV_SET_LEN(len))
-#define ILV_RDAT_LEN(ilv) ((int)(EXTRACT_BE_32BITS(&(ilv)->length)) - ILV_SET_LEN(0))
+#define ILV_RDAT_LEN(ilv) (EXTRACT_BE_32BITS(&(ilv)->length)) - ILV_SET_LEN(0)
 #define ILV_DATA(ilvp)   ((const void*)(((const char*)(ilvp)) + ILV_SET_LEN(0)))
 #define GO_NXT_ILV(ilv,rlen) ((rlen) -= F_ALN_LEN(EXTRACT_BE_32BITS(&(ilv)->length)), \
 		              (const struct forces_ilv *)(((const char*)(ilv)) \

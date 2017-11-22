@@ -48,7 +48,7 @@ ip6_finddst(netdissect_options *ndo, struct in6_addr *dst,
             const struct ip6_hdr *ip6)
 {
 	const u_char *cp;
-	int advance;
+	u_int advance;
 	u_int nh;
 	const void *dst_addr;
 	const struct ip6_rthdr *dp;
@@ -77,7 +77,7 @@ ip6_finddst(netdissect_options *ndo, struct in6_addr *dst,
 			 * the first 8 octets.
 			 */
 			ND_TCHECK2(*cp, 2);
-			advance = (int)((*(cp + 1) + 1) << 3);
+			advance = (EXTRACT_8BITS(cp + 1) + 1) << 3;
 			nh = *cp;
 			break;
 
@@ -219,7 +219,7 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 	const u_char *ipend;
 	register const u_char *cp;
 	register u_int payload_len;
-	int nh;
+	u_int nh;
 	int fragmented = 0;
 	u_int flow;
 
@@ -297,19 +297,19 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			advance = hbhopt_print(ndo, cp);
 			if (advance < 0)
 				return;
-			nh = *cp;
+			nh = EXTRACT_8BITS(cp);
 			break;
 		case IPPROTO_DSTOPTS:
 			advance = dstopt_print(ndo, cp);
 			if (advance < 0)
 				return;
-			nh = *cp;
+			nh = EXTRACT_8BITS(cp);
 			break;
 		case IPPROTO_FRAGMENT:
 			advance = frag6_print(ndo, cp, (const u_char *)ip6);
 			if (advance < 0 || ndo->ndo_snapend <= cp + advance)
 				return;
-			nh = *cp;
+			nh = EXTRACT_8BITS(cp);
 			fragmented = 1;
 			break;
 
@@ -326,14 +326,14 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			advance = mobility_print(ndo, cp, (const u_char *)ip6);
 			if (advance < 0)
 				return;
-			nh = *cp;
+			nh = EXTRACT_8BITS(cp);
 			return;
 		case IPPROTO_ROUTING:
 			ND_TCHECK(*cp);
 			advance = rt6_print(ndo, cp, (const u_char *)ip6);
 			if (advance < 0)
 				return;
-			nh = *cp;
+			nh = EXTRACT_8BITS(cp);
 			break;
 		case IPPROTO_SCTP:
 			sctp_print(ndo, cp, (const u_char *)ip6, len);
@@ -354,11 +354,11 @@ ip6_print(netdissect_options *ndo, const u_char *bp, u_int length)
 			advance = ah_print(ndo, cp);
 			if (advance < 0)
 				return;
-			nh = *cp;
+			nh = EXTRACT_8BITS(cp);
 			break;
 		case IPPROTO_ESP:
 		    {
-			int enh, padlen;
+			u_int enh, padlen;
 			advance = esp_print(ndo, cp, len, (const u_char *)ip6, &enh, &padlen);
 			if (advance < 0)
 				return;

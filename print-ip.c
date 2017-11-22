@@ -359,7 +359,7 @@ again:
 
 	case IPPROTO_ESP:
 	{
-		int enh, padlen;
+		u_int enh, padlen;
 		ipds->advance = esp_print(ndo, ipds->cp, ipds->len,
 				    (const u_char *)ipds->ip,
 				    &enh, &padlen);
@@ -598,7 +598,7 @@ ip_print(netdissect_options *ndo,
 	ipds->off = EXTRACT_BE_16BITS(&ipds->ip->ip_off);
 
         if (ndo->ndo_vflag) {
-            ND_PRINT((ndo, "(tos 0x%x", (int)ipds->ip->ip_tos));
+            ND_PRINT((ndo, "(tos 0x%x", ipds->ip->ip_tos));
             /* ECN bits */
             switch (ipds->ip->ip_tos & 0x03) {
 

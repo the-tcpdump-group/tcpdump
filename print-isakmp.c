@@ -3115,7 +3115,7 @@ isakmp_rfc3948_print(netdissect_options *ndo,
 
 	/* must be an ESP packet */
 	{
-		int nh, enh, padlen;
+		u_int nh, enh, padlen;
 		int advance;
 
 		ND_PRINT((ndo, "UDP-encap: "));
