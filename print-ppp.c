@@ -889,7 +889,8 @@ handle_chap(netdissect_options *ndo,
 		ND_PRINT((ndo, ", Name "));
 		for (i = 0; i < name_size; i++) {
 			ND_TCHECK(*p);
-			safeputchar(ndo, *p++);
+			safeputchar(ndo, EXTRACT_8BITS(p));
+			p++;
 		}
 		break;
 	case CHAP_SUCC:
@@ -898,7 +899,8 @@ handle_chap(netdissect_options *ndo,
 		ND_PRINT((ndo, ", Msg "));
 		for (i = 0; i< msg_size; i++) {
 			ND_TCHECK(*p);
-			safeputchar(ndo, *p++);
+			safeputchar(ndo, EXTRACT_8BITS(p));
+			p++;
 		}
 		break;
 	}
@@ -968,7 +970,8 @@ handle_pap(netdissect_options *ndo,
 		ND_PRINT((ndo, ", Peer "));
 		for (i = 0; i < peerid_len; i++) {
 			ND_TCHECK(*p);
-			safeputchar(ndo, *p++);
+			safeputchar(ndo, EXTRACT_8BITS(p));
+			p++;
 		}
 
 		if (length - (p - p0) < 1)
@@ -981,7 +984,8 @@ handle_pap(netdissect_options *ndo,
 		ND_PRINT((ndo, ", Name "));
 		for (i = 0; i < passwd_len; i++) {
 			ND_TCHECK(*p);
-			safeputchar(ndo, *p++);
+			safeputchar(ndo, EXTRACT_8BITS(p));
+			p++;
 		}
 		break;
 	case PAP_AACK:
@@ -1003,7 +1007,8 @@ handle_pap(netdissect_options *ndo,
 		ND_PRINT((ndo, ", Msg "));
 		for (i = 0; i< msg_len; i++) {
 			ND_TCHECK(*p);
-			safeputchar(ndo, *p++);
+			safeputchar(ndo, EXTRACT_8BITS(p));
+			p++;
 		}
 		break;
 	}
