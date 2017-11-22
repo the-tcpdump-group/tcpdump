@@ -135,8 +135,8 @@ egpnrprint(netdissect_options *ndo,
 	uint32_t addr;
 	register uint32_t net;
 	register u_int netlen;
-	int gateways, distances, networks;
-	int t_gateways;
+	u_int gateways, distances, networks;
+	u_int t_gateways;
 	const char *comma;
 
 	addr = egp->egp_sourcenet;
@@ -170,10 +170,13 @@ egpnrprint(netdissect_options *ndo,
 			cp++;
 			/* fall through */
 		case 2:
-			addr = (addr << 8) | *cp++;
+			addr = (addr << 8) | EXTRACT_8BITS(cp);
+			cp++;
 			/* fall through */
 		case 3:
-			addr = (addr << 8) | *cp++;
+			addr = (addr << 8) | EXTRACT_8BITS(cp);
+			cp++;
+			break;
 		}
 		addr |= net;
 		length -= 4 - netlen;
@@ -184,43 +187,50 @@ egpnrprint(netdissect_options *ndo,
 		cp++;
 		length--;
 		ND_PRINT((ndo, " %s %s ",
-		       gateways < (int)egp->egp_intgw ? "int" : "ext",
+		       gateways < egp->egp_intgw ? "int" : "ext",
 		       ipaddr_string(ndo, &addr)));
 
 		comma = "";
 		ND_PRINT((ndo, "("));
-		while (--distances >= 0) {
+		while (distances != 0) {
 			if (length < 2)
 				goto trunc;
 			ND_TCHECK2(cp[0], 2);
-			ND_PRINT((ndo, "%sd%d:", comma, (int)*cp++));
+			ND_PRINT((ndo, "%sd%d:", comma, EXTRACT_8BITS(cp)));
+			cp++;
 			comma = ", ";
 			networks = EXTRACT_8BITS(cp);
 			cp++;
 			length -= 2;
-			while (--networks >= 0) {
+			while (networks != 0) {
 				/* Pickup network number */
 				if (length < 1)
 					goto trunc;
 				ND_TCHECK2(cp[0], 1);
-				addr = (uint32_t)*cp++ << 24;
+				addr = ((uint32_t)EXTRACT_8BITS(cp)) << 24;
+				cp++;
 				length--;
 				if (IN_CLASSB(addr)) {
 					if (length < 1)
 						goto trunc;
 					ND_TCHECK2(cp[0], 1);
-					addr |= (uint32_t)*cp++ << 16;
+					addr |= ((uint32_t)EXTRACT_8BITS(cp)) << 16;
+					cp++;
 					length--;
 				} else if (!IN_CLASSA(addr)) {
 					if (length < 2)
 						goto trunc;
 					ND_TCHECK2(cp[0], 2);
-					addr |= (uint32_t)*cp++ << 16;
-					addr |= (uint32_t)*cp++ << 8;
+					addr |= ((uint32_t)EXTRACT_8BITS(cp)) << 16;
+					cp++;
+					addr |= ((uint32_t)EXTRACT_8BITS(cp)) << 8;
+					cp++;
 					length -= 2;
 				}
 				ND_PRINT((ndo, " %s", ipaddr_string(ndo, &addr)));
+				networks--;
 			}
+			distances--;
 		}
 		ND_PRINT((ndo, ")"));
 	}
