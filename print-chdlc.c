@@ -94,7 +94,7 @@ chdlc_print(netdissect_options *ndo, register const u_char *p, u_int length)
                 /* is the fudge byte set ? lets verify by spotting ISO headers */
                 if (length < 2)
                     goto trunc;
-                ND_TCHECK_16BITS(p);
+                ND_TCHECK_2(p);
                 if (*(p+1) == NLPID_CLNP ||
                     *(p+1) == NLPID_ESIS ||
                     *(p+1) == NLPID_ISIS)

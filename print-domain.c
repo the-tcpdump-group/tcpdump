@@ -56,7 +56,7 @@ ns_nskip(netdissect_options *ndo,
 {
 	register u_char i;
 
-	if (!ND_TTEST_8BITS(cp))
+	if (!ND_TTEST_1(cp))
 		return (NULL);
 	i = EXTRACT_8BITS(cp);
 	cp++;
@@ -68,7 +68,7 @@ ns_nskip(netdissect_options *ndo,
 
 			if ((i & ~INDIR_MASK) != EDNS0_ELT_BITLABEL)
 				return(NULL); /* unknown ELT */
-			if (!ND_TTEST_8BITS(cp))
+			if (!ND_TTEST_1(cp))
 				return (NULL);
 			if ((bitlen = EXTRACT_8BITS(cp)) == 0)
 				bitlen = 256;
@@ -77,7 +77,7 @@ ns_nskip(netdissect_options *ndo,
 			cp += bytelen;
 		} else
 			cp += i;
-		if (!ND_TTEST_8BITS(cp))
+		if (!ND_TTEST_1(cp))
 			return (NULL);
 		i = EXTRACT_8BITS(cp);
 		cp++;
@@ -94,7 +94,7 @@ blabel_print(netdissect_options *ndo,
 	const u_char *bitp, *lim;
 	char tc;
 
-	if (!ND_TTEST_8BITS(cp))
+	if (!ND_TTEST_1(cp))
 		return(NULL);
 	if ((bitlen = EXTRACT_8BITS(cp)) == 0)
 		bitlen = 256;
@@ -131,7 +131,7 @@ labellen(netdissect_options *ndo,
 {
 	register u_int i;
 
-	if (!ND_TTEST_8BITS(cp))
+	if (!ND_TTEST_1(cp))
 		return(-1);
 	i = EXTRACT_8BITS(cp);
 	if ((i & INDIR_MASK) == EDNS0_MASK) {
@@ -140,7 +140,7 @@ labellen(netdissect_options *ndo,
 			ND_PRINT((ndo, "<ELT %d>", elt));
 			return(-1);
 		}
-		if (!ND_TTEST_8BITS(cp + 1))
+		if (!ND_TTEST_1(cp + 1))
 			return(-1);
 		if ((bitlen = EXTRACT_8BITS(cp + 1)) == 0)
 			bitlen = 256;
@@ -161,7 +161,7 @@ ns_nprint(netdissect_options *ndo,
 
 	if ((l = labellen(ndo, cp)) == (u_int)-1)
 		return(NULL);
-	if (!ND_TTEST_8BITS(cp))
+	if (!ND_TTEST_1(cp))
 		return(NULL);
 	max_offset = (u_int)(cp - bp);
 	i = EXTRACT_8BITS(cp);
@@ -178,7 +178,7 @@ ns_nprint(netdissect_options *ndo,
 					rp = cp + 1;
 					compress = 1;
 				}
-				if (!ND_TTEST_8BITS(cp))
+				if (!ND_TTEST_1(cp))
 					return(NULL);
 				offset = (((i << 8) | EXTRACT_8BITS(cp)) & 0x3fff);
 				/*
@@ -199,7 +199,7 @@ ns_nprint(netdissect_options *ndo,
 				cp = bp + offset;
 				if ((l = labellen(ndo, cp)) == (u_int)-1)
 					return(NULL);
-				if (!ND_TTEST_8BITS(cp))
+				if (!ND_TTEST_1(cp))
 					return(NULL);
 				i = EXTRACT_8BITS(cp);
 				cp++;
@@ -226,7 +226,7 @@ ns_nprint(netdissect_options *ndo,
 			ND_PRINT((ndo, "."));
 			if ((l = labellen(ndo, cp)) == (u_int)-1)
 				return(NULL);
-			if (!ND_TTEST_8BITS(cp))
+			if (!ND_TTEST_1(cp))
 				return(NULL);
 			i = EXTRACT_8BITS(cp);
 			cp++;
@@ -245,7 +245,7 @@ ns_cprint(netdissect_options *ndo,
 {
 	register u_int i;
 
-	if (!ND_TTEST_8BITS(cp))
+	if (!ND_TTEST_1(cp))
 		return (NULL);
 	i = EXTRACT_8BITS(cp);
 	cp++;
@@ -512,7 +512,7 @@ ns_rprint(netdissect_options *ndo,
 		int pbit, pbyte;
 		char ntop_buf[INET6_ADDRSTRLEN];
 
-		if (!ND_TTEST_8BITS(cp))
+		if (!ND_TTEST_1(cp))
 			return(NULL);
 		pbit = EXTRACT_8BITS(cp);
 		pbyte = (pbit & ~7) / 8;
@@ -558,23 +558,23 @@ ns_rprint(netdissect_options *ndo,
 		if ((cp = ns_nprint(ndo, cp, bp)) == NULL)
 			return(NULL);
 		cp += 6;
-		if (!ND_TTEST_16BITS(cp))
+		if (!ND_TTEST_2(cp))
 			return(NULL);
 		ND_PRINT((ndo, " fudge=%u", EXTRACT_BE_16BITS(cp)));
 		cp += 2;
-		if (!ND_TTEST_16BITS(cp))
+		if (!ND_TTEST_2(cp))
 			return(NULL);
 		ND_PRINT((ndo, " maclen=%u", EXTRACT_BE_16BITS(cp)));
 		cp += 2 + EXTRACT_BE_16BITS(cp);
-		if (!ND_TTEST_16BITS(cp))
+		if (!ND_TTEST_2(cp))
 			return(NULL);
 		ND_PRINT((ndo, " origid=%u", EXTRACT_BE_16BITS(cp)));
 		cp += 2;
-		if (!ND_TTEST_16BITS(cp))
+		if (!ND_TTEST_2(cp))
 			return(NULL);
 		ND_PRINT((ndo, " error=%u", EXTRACT_BE_16BITS(cp)));
 		cp += 2;
-		if (!ND_TTEST_16BITS(cp))
+		if (!ND_TTEST_2(cp))
 			return(NULL);
 		ND_PRINT((ndo, " otherlen=%u", EXTRACT_BE_16BITS(cp)));
 		cp += 2;

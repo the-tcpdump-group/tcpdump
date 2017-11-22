@@ -1342,7 +1342,7 @@ esis_print(netdissect_options *ndo,
 
             case ESIS_OPTION_PROTOCOLS:
                 while (opli>0) {
-                    ND_TCHECK_8BITS(tptr);
+                    ND_TCHECK_1(tptr);
                     ND_PRINT((ndo, "%s (0x%02x)",
                            tok2str(nlpid_values,
                                    "unknown",
@@ -1625,7 +1625,7 @@ isis_print_mt_capability_subtlv(netdissect_options *ndo,
           stlv_len = stlv_len - 8;
 
           while (stlv_len >= 4) {
-            ND_TCHECK_32BITS(tptr);
+            ND_TCHECK_4(tptr);
             ND_PRINT((ndo, "\n\t        T: %d, R: %d, RES: %d, ISID: %d",
                     (EXTRACT_BE_32BITS(tptr) >> 31),
                     (EXTRACT_BE_32BITS(tptr) >> 30) & 0x01,
@@ -2000,13 +2000,13 @@ isis_print_ext_is_reach(netdissect_options *ndo,
     tptr+=NODE_ID_LEN;
 
     if (tlv_type != ISIS_TLV_IS_ALIAS_ID) { /* the Alias TLV Metric field is implicit 0 */
-        if (!ND_TTEST_24BITS(tptr))    /* and is therefore skipped */
+        if (!ND_TTEST_3(tptr))    /* and is therefore skipped */
 	    return(0);
 	ND_PRINT((ndo, ", Metric: %d", EXTRACT_BE_24BITS(tptr)));
 	tptr+=3;
     }
 
-    if (!ND_TTEST_8BITS(tptr))
+    if (!ND_TTEST_1(tptr))
         return(0);
     subtlv_sum_len=EXTRACT_8BITS(tptr); /* read out subTLV length */
     tptr++;
@@ -2041,7 +2041,7 @@ static int
 isis_print_mtid(netdissect_options *ndo,
                 const uint8_t *tptr, const char *ident)
 {
-    if (!ND_TTEST_16BITS(tptr))
+    if (!ND_TTEST_2(tptr))
         return(0);
 
     ND_PRINT((ndo, "%s%s",
@@ -2072,14 +2072,14 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
     uint8_t prefix[sizeof(struct in6_addr)]; /* shared copy buffer for IPv4 and IPv6 prefixes */
     u_int metric, status_byte, bit_length, byte_length, sublen, processed, subtlvtype, subtlvlen;
 
-    if (!ND_TTEST_32BITS(tptr))
+    if (!ND_TTEST_4(tptr))
         return (0);
     metric = EXTRACT_BE_32BITS(tptr);
     processed=4;
     tptr+=4;
 
     if (afi == AF_INET) {
-        if (!ND_TTEST_8BITS(tptr)) /* fetch status byte */
+        if (!ND_TTEST_1(tptr)) /* fetch status byte */
             return (0);
         status_byte=EXTRACT_8BITS(tptr);
         tptr++;
@@ -2145,7 +2145,7 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
            than one subTLV - therefore the first byte must reflect
            the aggregate bytecount of the subTLVs for this prefix
         */
-        if (!ND_TTEST_8BITS(tptr))
+        if (!ND_TTEST_1(tptr))
             return (0);
         sublen=EXTRACT_8BITS(tptr);
         tptr++;
@@ -2588,7 +2588,7 @@ isis_print(netdissect_options *ndo,
         /* now check if we have a decoder otherwise do a hexdump at the end*/
 	switch (tlv_type) {
 	case ISIS_TLV_AREA_ADDR:
-	    ND_TCHECK_8BITS(tptr);
+	    ND_TCHECK_1(tptr);
 	    alen = EXTRACT_8BITS(tptr);
 	    tptr++;
 	    while (tmp && alen < tmp) {
@@ -2600,7 +2600,7 @@ isis_print(netdissect_options *ndo,
 		tmp -= alen + 1;
 		if (tmp==0) /* if this is the last area address do not attemt a boundary check */
                     break;
-		ND_TCHECK_8BITS(tptr);
+		ND_TCHECK_1(tptr);
 		alen = EXTRACT_8BITS(tptr);
 		tptr++;
 	    }
@@ -2615,7 +2615,7 @@ isis_print(netdissect_options *ndo,
 	    break;
 
         case ISIS_TLV_ISNEIGH_VARLEN:
-            if (!ND_TTEST_8BITS(tptr) || tmp < 3) /* min. TLV length */
+            if (!ND_TTEST_1(tptr) || tmp < 3) /* min. TLV length */
 		goto trunctlv;
 	    lan_alen = EXTRACT_8BITS(tptr); /* LAN address length */
 	    tptr++;
@@ -2672,7 +2672,7 @@ isis_print(netdissect_options *ndo,
             }
             break;
         case ISIS_TLV_IS_REACH:
-	    ND_TCHECK_8BITS(tptr);  /* check if there is one byte left to read out the virtual flag */
+	    ND_TCHECK_1(tptr);  /* check if there is one byte left to read out the virtual flag */
             ND_PRINT((ndo, "\n\t      %s",
                    tok2str(isis_is_reach_virtual_values,
                            "bogus virtual flag 0x%02x",
@@ -2774,7 +2774,7 @@ isis_print(netdissect_options *ndo,
 	    }
 	    break;
 	case ISIS_TLV_AUTH:
-	    ND_TCHECK_8BITS(tptr);
+	    ND_TCHECK_1(tptr);
 
             ND_PRINT((ndo, "\n\t      %s: ",
                    tok2str(isis_subtlv_auth_values,
@@ -2788,7 +2788,7 @@ isis_print(netdissect_options *ndo,
 		break;
 	    case ISIS_SUBTLV_AUTH_MD5:
 		for(i=1;i<tlv_len;i++) {
-		    ND_TCHECK_8BITS(tptr + i);
+		    ND_TCHECK_1(tptr + i);
 		    ND_PRINT((ndo, "%02x", EXTRACT_8BITS(tptr + i)));
 		}
 		if (tlv_len != ISIS_SUBTLV_AUTH_MD5_LEN+1)
@@ -2801,11 +2801,11 @@ isis_print(netdissect_options *ndo,
 
 		break;
             case ISIS_SUBTLV_AUTH_GENERIC:
-		ND_TCHECK_16BITS(tptr + 1);
+		ND_TCHECK_2(tptr + 1);
                 key_id = EXTRACT_BE_16BITS(tptr + 1);
                 ND_PRINT((ndo, "%u, password: ", key_id));
                 for(i=1 + sizeof(uint16_t);i<tlv_len;i++) {
-                    ND_TCHECK_8BITS(tptr + i);
+                    ND_TCHECK_1(tptr + i);
                     ND_PRINT((ndo, "%02x", EXTRACT_8BITS(tptr + i)));
                 }
                 break;
@@ -2820,7 +2820,7 @@ isis_print(netdissect_options *ndo,
 	case ISIS_TLV_PTP_ADJ:
 	    tlv_ptp_adj = (const struct isis_tlv_ptp_adj *)tptr;
 	    if(tmp>=1) {
-		ND_TCHECK_8BITS(tptr);
+		ND_TCHECK_1(tptr);
 		ND_PRINT((ndo, "\n\t      Adjacency State: %s (%u)",
 		       tok2str(isis_ptp_adjancey_values, "unknown", EXTRACT_8BITS(tptr)),
 		       EXTRACT_8BITS(tptr)));
@@ -2848,7 +2848,7 @@ isis_print(netdissect_options *ndo,
 	case ISIS_TLV_PROTOCOLS:
 	    ND_PRINT((ndo, "\n\t      NLPID(s): "));
 	    while (tmp>0) {
-		ND_TCHECK_8BITS(tptr);
+		ND_TCHECK_1(tptr);
 		ND_PRINT((ndo, "%s (0x%02x)",
                        tok2str(nlpid_values,
                                "unknown",
@@ -2863,7 +2863,7 @@ isis_print(netdissect_options *ndo,
 
     case ISIS_TLV_MT_PORT_CAP:
     {
-      ND_TCHECK_16BITS(tptr);
+      ND_TCHECK_2(tptr);
 
       ND_PRINT((ndo, "\n\t       RES: %d, MTID(s): %d",
               (EXTRACT_BE_16BITS(tptr) >> 12),
@@ -2880,7 +2880,7 @@ isis_print(netdissect_options *ndo,
 
     case ISIS_TLV_MT_CAPABILITY:
 
-      ND_TCHECK_16BITS(tptr);
+      ND_TCHECK_2(tptr);
 
       ND_PRINT((ndo, "\n\t      O: %d, RES: %d, MTID(s): %d",
                 (EXTRACT_BE_16BITS(tptr) >> 15) & 0x01,
@@ -2925,7 +2925,7 @@ isis_print(netdissect_options *ndo,
 
 	    if (tmp < 1)
 	        break;
-	    ND_TCHECK_8BITS(tptr);
+	    ND_TCHECK_1(tptr);
 	    ND_PRINT((ndo, ", Flags: [%s]", ISIS_MASK_TLV_SHARED_RISK_GROUP(EXTRACT_8BITS(tptr)) ? "numbered" : "unnumbered"));
 	    tptr++;
 	    tmp--;
@@ -2945,7 +2945,7 @@ isis_print(netdissect_options *ndo,
 	    tmp-=sizeof(struct in_addr);
 
 	    while (tmp>=4) {
-                ND_TCHECK_32BITS(tptr);
+                ND_TCHECK_4(tptr);
                 ND_PRINT((ndo, "\n\t      Link-ID: 0x%08x", EXTRACT_BE_32BITS(tptr)));
                 tptr+=4;
                 tmp-=4;
@@ -3057,7 +3057,7 @@ isis_print(netdissect_options *ndo,
             tptr++;
             switch (isis_subtlv_idrp) {
             case ISIS_SUBTLV_IDRP_ASN:
-                ND_TCHECK_16BITS(tptr); /* fetch AS number */
+                ND_TCHECK_2(tptr); /* fetch AS number */
                 ND_PRINT((ndo, "AS Number: %u", EXTRACT_BE_16BITS(tptr)));
                 break;
             case ISIS_SUBTLV_IDRP_LOCAL:
@@ -3095,7 +3095,7 @@ isis_print(netdissect_options *ndo,
             tmp-=sizeof(struct isis_metric_block);
 
             while(tmp>0) {
-                ND_TCHECK_8BITS(tptr);
+                ND_TCHECK_1(tptr);
                 prefix_len=EXTRACT_8BITS(tptr); /* read out prefix length in semioctets*/
                 tptr++;
                 if (prefix_len < 2) {

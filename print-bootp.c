@@ -354,7 +354,7 @@ bootp_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "\n\t  Client-Ethernet-Address %s", etheraddr_string(ndo, bp->bp_chaddr)));
 	}
 
-	ND_TCHECK_8BITS(bp->bp_sname);		/* check first char only */
+	ND_TCHECK_1(bp->bp_sname);		/* check first char only */
 	if (EXTRACT_8BITS(bp->bp_sname)) {
 		ND_PRINT((ndo, "\n\t  sname \""));
 		if (fn_printztn(ndo, bp->bp_sname, (u_int)sizeof bp->bp_sname,
@@ -365,7 +365,7 @@ bootp_print(netdissect_options *ndo,
 		}
 		ND_PRINT((ndo, "\""));
 	}
-	ND_TCHECK_8BITS(bp->bp_file);		/* check first char only */
+	ND_TCHECK_1(bp->bp_file);		/* check first char only */
 	if (EXTRACT_8BITS(bp->bp_file)) {
 		ND_PRINT((ndo, "\n\t  file \""));
 		if (fn_printztn(ndo, bp->bp_file, (u_int)sizeof bp->bp_file,
@@ -611,7 +611,7 @@ rfc1048_print(netdissect_options *ndo,
 	bp += sizeof(int32_t);
 
 	/* Loop while we there is a tag left in the buffer */
-	while (ND_TTEST_8BITS(bp)) {
+	while (ND_TTEST_1(bp)) {
 		tag = EXTRACT_8BITS(bp);
 		bp++;
 		if (tag == TAG_PAD && ndo->ndo_vflag < 3)
@@ -619,7 +619,7 @@ rfc1048_print(netdissect_options *ndo,
 		if (tag == TAG_END && ndo->ndo_vflag < 3)
 			return;
 		if (tag == TAG_EXTENDED_OPTION) {
-			ND_TCHECK_16BITS(bp + 1);
+			ND_TCHECK_2(bp + 1);
 			tag = EXTRACT_BE_16BITS(bp + 1);
 			/* XXX we don't know yet if the IANA will
 			 * preclude overlap of 1-byte and 2-byte spaces.
@@ -634,7 +634,7 @@ rfc1048_print(netdissect_options *ndo,
 			len = 0;
 		else {
 			/* Get the length; check for truncation */
-			ND_TCHECK_8BITS(bp);
+			ND_TCHECK_1(bp);
 			len = EXTRACT_8BITS(bp);
 			bp++;
 		}
@@ -644,8 +644,8 @@ rfc1048_print(netdissect_options *ndo,
 
 		if (tag == TAG_PAD && ndo->ndo_vflag > 2) {
 			u_int ntag = 1;
-			while (ND_TTEST_8BITS(bp) &&
-			    EXTRACT_8BITS(bp) == TAG_PAD) {
+			while (ND_TTEST_1(bp) &&
+			       EXTRACT_8BITS(bp) == TAG_PAD) {
 				bp++;
 				ntag++;
 			}

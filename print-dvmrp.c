@@ -77,7 +77,7 @@ dvmrp_print(netdissect_options *ndo,
 	if (bp >= ep)
 		return;
 
-	ND_TCHECK_8BITS(bp + 1);
+	ND_TCHECK_1(bp + 1);
 	type = EXTRACT_8BITS(bp + 1);
 
 	/* Skip IGMP header */
@@ -198,14 +198,14 @@ print_report(netdissect_options *ndo,
 			}
 			origin = 0;
 			for (i = 0; i < width; ++i) {
-				ND_TCHECK_8BITS(bp);
+				ND_TCHECK_1(bp);
 				origin = origin << 8 | EXTRACT_8BITS(bp);
 				bp++;
 			}
 			for ( ; i < 4; ++i)
 				origin <<= 8;
 
-			ND_TCHECK_8BITS(bp);
+			ND_TCHECK_1(bp);
 			metric = EXTRACT_8BITS(bp);
 			bp++;
 			done = metric & 0x80;

@@ -389,29 +389,29 @@ EXTRACT_BE_INT64(const void *p)
 /*
  * Macros to check the presence of the values in question.
  */
-#define ND_TTEST_8BITS(p) ND_TTEST2(*(p), 1)
-#define ND_TCHECK_8BITS(p) ND_TCHECK2(*(p), 1)
+#define ND_TTEST_1(p) ND_TTEST2(*(p), 1)
+#define ND_TCHECK_1(p) ND_TCHECK2(*(p), 1)
 
-#define ND_TTEST_16BITS(p) ND_TTEST2(*(p), 2)
-#define ND_TCHECK_16BITS(p) ND_TCHECK2(*(p), 2)
+#define ND_TTEST_2(p) ND_TTEST2(*(p), 2)
+#define ND_TCHECK_2(p) ND_TCHECK2(*(p), 2)
 
-#define ND_TTEST_24BITS(p) ND_TTEST2(*(p), 3)
-#define ND_TCHECK_24BITS(p) ND_TCHECK2(*(p), 3)
+#define ND_TTEST_3(p) ND_TTEST2(*(p), 3)
+#define ND_TCHECK_3(p) ND_TCHECK2(*(p), 3)
 
-#define ND_TTEST_32BITS(p) ND_TTEST2(*(p), 4)
-#define ND_TCHECK_32BITS(p) ND_TCHECK2(*(p), 4)
+#define ND_TTEST_4(p) ND_TTEST2(*(p), 4)
+#define ND_TCHECK_4(p) ND_TCHECK2(*(p), 4)
 
-#define ND_TTEST_40BITS(p) ND_TTEST2(*(p), 5)
-#define ND_TCHECK_40BITS(p) ND_TCHECK2(*(p), 5)
+#define ND_TTEST_5(p) ND_TTEST2(*(p), 5)
+#define ND_TCHECK_5(p) ND_TCHECK2(*(p), 5)
 
-#define ND_TTEST_48BITS(p) ND_TTEST2(*(p), 6)
-#define ND_TCHECK_48BITS(p) ND_TCHECK2(*(p), 6)
+#define ND_TTEST_6(p) ND_TTEST2(*(p), 6)
+#define ND_TCHECK_6(p) ND_TCHECK2(*(p), 6)
 
-#define ND_TTEST_56BITS(p) ND_TTEST2(*(p), 7)
-#define ND_TCHECK_56BITS(p) ND_TCHECK2(*(p), 7)
+#define ND_TTEST_7(p) ND_TTEST2(*(p), 7)
+#define ND_TCHECK_7(p) ND_TCHECK2(*(p), 7)
 
-#define ND_TTEST_64BITS(p) ND_TTEST2(*(p), 8)
-#define ND_TCHECK_64BITS(p) ND_TCHECK2(*(p), 8)
+#define ND_TTEST_8(p) ND_TTEST2(*(p), 8)
+#define ND_TCHECK_8(p) ND_TCHECK2(*(p), 8)
 
-#define ND_TTEST_128BITS(p) ND_TTEST2(*(p), 16)
-#define ND_TCHECK_128BITS(p) ND_TCHECK2(*(p), 16)
+#define ND_TTEST_16(p) ND_TTEST2(*(p), 16)
+#define ND_TCHECK_16(p) ND_TCHECK2(*(p), 16)

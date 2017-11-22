@@ -102,12 +102,12 @@ static int parse_q922_addr(netdissect_options *ndo,
                            const u_char *p, u_int *dlci,
                            u_int *addr_len, uint8_t *flags, u_int length)
 {
-	if (!ND_TTEST_8BITS(p) || length < 1)
+	if (!ND_TTEST_1(p) || length < 1)
 		return -1;
 	if ((EXTRACT_8BITS(p) & FR_EA_BIT))
 		return 0;
 
-	if (!ND_TTEST_8BITS(p+1) || length < 2)
+	if (!ND_TTEST_1(p + 1) || length < 2)
 		return -1;
 	*addr_len = 2;
 	*dlci = ((EXTRACT_8BITS(p) & 0xFC) << 2) | ((EXTRACT_8BITS(p+1) & 0xF0) >> 4);
@@ -122,7 +122,7 @@ static int parse_q922_addr(netdissect_options *ndo,
 
 	p += 2;
 	length -= 2;
-	if (!ND_TTEST_8BITS(p) || length < 1)
+	if (!ND_TTEST_1(p) || length < 1)
 		return -1;
 	(*addr_len)++;		/* 3- or 4-byte Q.922 address */
 	if ((EXTRACT_8BITS(p) & FR_EA_BIT) == 0) {
@@ -132,7 +132,7 @@ static int parse_q922_addr(netdissect_options *ndo,
 		length--;
 	}
 
-	if (!ND_TTEST_8BITS(p) || length < 1)
+	if (!ND_TTEST_1(p) || length < 1)
 		return -1;
 	if ((EXTRACT_8BITS(p) & FR_EA_BIT) == 0)
 		return 0; /* more than 4 bytes of Q.922 address? */
@@ -253,7 +253,7 @@ fr_print(netdissect_options *ndo,
 		return 0;
 	}
 
-	ND_TCHECK_8BITS(p + addr_len);
+	ND_TCHECK_1(p + addr_len);
 	if (length < addr_len + 1)
 		goto trunc;
 
@@ -263,7 +263,7 @@ fr_print(netdissect_options *ndo,
                  * with an Ethernet type (Cisco HDLC type?) following the
                  * address.
                  */
-		if (!ND_TTEST_16BITS(p + addr_len) || length < addr_len + 2) {
+		if (!ND_TTEST_2(p + addr_len) || length < addr_len + 2) {
                         /* no Ethertype */
                         ND_PRINT((ndo, "UI %02x! ", EXTRACT_8BITS(p + addr_len)));
                 } else {
@@ -285,7 +285,7 @@ fr_print(netdissect_options *ndo,
                 }
         }
 
-	ND_TCHECK_8BITS(p + addr_len + 1);
+	ND_TCHECK_1(p + addr_len + 1);
 	if (length < addr_len + 2)
 		goto trunc;
 
@@ -307,7 +307,7 @@ fr_print(netdissect_options *ndo,
 		hdr_len = addr_len + 1 /* UI */ + 1 /* NLPID */;
 	}
 
-        ND_TCHECK_8BITS(p + hdr_len - 1);
+        ND_TCHECK_1(p + hdr_len - 1);
 	if (length < hdr_len)
 		goto trunc;
 	nlpid = EXTRACT_8BITS(p + hdr_len - 1);
@@ -907,7 +907,7 @@ q933_print(netdissect_options *ndo,
 	ND_PRINT((ndo, "%s, codeset %u", is_ansi ? "ANSI" : "CCITT", codeset));
 
 	if (call_ref_length != 0) {
-		ND_TCHECK_8BITS(p);
+		ND_TCHECK_1(p);
 		if (call_ref_length > 1 || EXTRACT_8BITS(p) != 0) {
 			/*
 			 * Not a dummy call reference.

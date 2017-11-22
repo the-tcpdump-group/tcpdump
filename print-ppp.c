@@ -613,7 +613,7 @@ print_lcp_config_options(netdissect_options *ndo,
 			ND_PRINT((ndo, " (length bogus, should be >= 6)"));
 			return len;
 		}
-		ND_TCHECK_24BITS(p + 2);
+		ND_TCHECK_3(p + 2);
 		ND_PRINT((ndo, ": Vendor: %s (%u)",
 			tok2str(oui_values,"Unknown",EXTRACT_BE_24BITS(p + 2)),
 			EXTRACT_BE_24BITS(p + 2)));
@@ -632,7 +632,7 @@ print_lcp_config_options(netdissect_options *ndo,
 			ND_PRINT((ndo, " (length bogus, should be = 4)"));
 			return len;
 		}
-		ND_TCHECK_16BITS(p + 2);
+		ND_TCHECK_2(p + 2);
 		ND_PRINT((ndo, ": %u", EXTRACT_BE_16BITS(p + 2)));
 		break;
 	case LCPOPT_ACCM:
@@ -640,7 +640,7 @@ print_lcp_config_options(netdissect_options *ndo,
 			ND_PRINT((ndo, " (length bogus, should be = 6)"));
 			return len;
 		}
-		ND_TCHECK_32BITS(p + 2);
+		ND_TCHECK_4(p + 2);
 		ND_PRINT((ndo, ": 0x%08x", EXTRACT_BE_32BITS(p + 2)));
 		break;
 	case LCPOPT_AP:
@@ -648,7 +648,7 @@ print_lcp_config_options(netdissect_options *ndo,
 			ND_PRINT((ndo, " (length bogus, should be >= 4)"));
 			return len;
 		}
-		ND_TCHECK_16BITS(p + 2);
+		ND_TCHECK_2(p + 2);
 		ND_PRINT((ndo, ": %s", tok2str(ppptype2str, "Unknown Auth Proto (0x04x)", EXTRACT_BE_16BITS(p + 2))));
 
 		switch (EXTRACT_BE_16BITS(p + 2)) {
@@ -670,7 +670,7 @@ print_lcp_config_options(netdissect_options *ndo,
 			ND_PRINT((ndo, " (length bogus, should be >= 4)"));
 			return 0;
 		}
-		ND_TCHECK_16BITS(p+2);
+		ND_TCHECK_2(p + 2);
 		if (EXTRACT_BE_16BITS(p + 2) == PPP_LQM)
 			ND_PRINT((ndo, ": LQR"));
 		else
@@ -681,7 +681,7 @@ print_lcp_config_options(netdissect_options *ndo,
 			ND_PRINT((ndo, " (length bogus, should be = 6)"));
 			return 0;
 		}
-		ND_TCHECK_32BITS(p + 2);
+		ND_TCHECK_4(p + 2);
 		ND_PRINT((ndo, ": 0x%08x", EXTRACT_BE_32BITS(p + 2)));
 		break;
 	case LCPOPT_PFC:
@@ -693,7 +693,7 @@ print_lcp_config_options(netdissect_options *ndo,
 			ND_PRINT((ndo, " (length bogus, should be = 4)"));
 			return 0;
 		}
-		ND_TCHECK_16BITS(p + 2);
+		ND_TCHECK_2(p + 2);
 		ND_PRINT((ndo, ": 0x%04x", EXTRACT_BE_16BITS(p + 2)));
 		break;
 	case LCPOPT_CBACK:
@@ -712,7 +712,7 @@ print_lcp_config_options(netdissect_options *ndo,
 			ND_PRINT((ndo, " (length bogus, should be = 4)"));
 			return 0;
 		}
-		ND_TCHECK_16BITS(p + 2);
+		ND_TCHECK_2(p + 2);
 		ND_PRINT((ndo, ": %u", EXTRACT_BE_16BITS(p + 2)));
 		break;
 	case LCPOPT_MLED:
@@ -817,7 +817,7 @@ handle_mlppp(netdissect_options *ndo,
         ND_PRINT((ndo, "[|mlppp]"));
         return;
     }
-    if (!ND_TTEST_16BITS(p)) {
+    if (!ND_TTEST_2(p)) {
         ND_PRINT((ndo, "[|mlppp]"));
         return;
     }
@@ -1072,7 +1072,7 @@ print_ipcp_config_options(netdissect_options *ndo,
 			ND_PRINT((ndo, " (length bogus, should be >= 4)"));
 			return 0;
 		}
-		ND_TCHECK_16BITS(p+2);
+		ND_TCHECK_2(p + 2);
 		compproto = EXTRACT_BE_16BITS(p + 2);
 
 		ND_PRINT((ndo, ": %s (0x%02x):",
@@ -1353,7 +1353,7 @@ print_bacp_config_options(netdissect_options *ndo,
 			ND_PRINT((ndo, " (length bogus, should be = 6)"));
 			return len;
 		}
-		ND_TCHECK_32BITS(p + 2);
+		ND_TCHECK_4(p + 2);
 		ND_PRINT((ndo, ": Magic-Num 0x%08x", EXTRACT_BE_32BITS(p + 2)));
 		break;
 	default:

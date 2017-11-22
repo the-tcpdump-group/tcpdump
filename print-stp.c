@@ -281,9 +281,9 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
            (float) EXTRACT_BE_16BITS(&stp_bpdu->hello_time) / STP_TIME_BASE,
            (float) EXTRACT_BE_16BITS(&stp_bpdu->forward_delay) / STP_TIME_BASE));
 
-    ND_TCHECK_16BITS(ptr + MST_BPDU_VER3_LEN_OFFSET);
+    ND_TCHECK_2(ptr + MST_BPDU_VER3_LEN_OFFSET);
     ND_PRINT((ndo, "\n\tv3len %d, ", EXTRACT_BE_16BITS(ptr + MST_BPDU_VER3_LEN_OFFSET)));
-    ND_TCHECK_32BITS(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 12);
+    ND_TCHECK_4(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 12);
     ND_PRINT((ndo, "MCID Name "));
     if (fn_printzp(ndo, ptr + MST_BPDU_CONFIG_NAME_OFFSET, 32, ndo->ndo_snapend))
 	goto trunc;
@@ -295,7 +295,7 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
 	          EXTRACT_BE_32BITS(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 8),
 	          EXTRACT_BE_32BITS(ptr + MST_BPDU_CONFIG_DIGEST_OFFSET + 12)));
 
-    ND_TCHECK_32BITS(ptr + MST_BPDU_CIST_INT_PATH_COST_OFFSET);
+    ND_TCHECK_4(ptr + MST_BPDU_CIST_INT_PATH_COST_OFFSET);
     ND_PRINT((ndo, "CIST int-root-pathcost %u,",
             EXTRACT_BE_32BITS(ptr + MST_BPDU_CIST_INT_PATH_COST_OFFSET)));
 
@@ -307,7 +307,7 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
     ND_PRINT((ndo, "CIST remaining-hops %d", ptr[MST_BPDU_CIST_REMAIN_HOPS_OFFSET]));
 
     /* Dump all MSTI's */
-    ND_TCHECK_16BITS(ptr + MST_BPDU_VER3_LEN_OFFSET);
+    ND_TCHECK_2(ptr + MST_BPDU_VER3_LEN_OFFSET);
     v3len = EXTRACT_BE_16BITS(ptr + MST_BPDU_VER3_LEN_OFFSET);
     if (v3len > MST_BPDU_CONFIG_INFO_LENGTH) {
         len = v3len - MST_BPDU_CONFIG_INFO_LENGTH;
@@ -355,7 +355,7 @@ stp_print_spb_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
     }
 
     ptr = (const u_char *)stp_bpdu;
-    ND_TCHECK_32BITS(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET + 16);
+    ND_TCHECK_4(ptr + offset + SPB_BPDU_AGREEMENT_DIGEST_OFFSET + 16);
 
     ND_PRINT((ndo, "\n\tv4len %d, ", EXTRACT_BE_16BITS(ptr + offset)));
     ND_PRINT((ndo, "AUXMCID Name "));
@@ -462,7 +462,7 @@ stp_print(netdissect_options *ndo, const u_char *p, u_int length)
             }
 
             /* Validate v3 length */
-            ND_TCHECK_16BITS(p + MST_BPDU_VER3_LEN_OFFSET);
+            ND_TCHECK_2(p + MST_BPDU_VER3_LEN_OFFSET);
             mstp_len = EXTRACT_BE_16BITS(p + MST_BPDU_VER3_LEN_OFFSET);
             mstp_len += 2;  /* length encoding itself is 2 bytes */
             if (length < (sizeof(struct stp_bpdu_) + mstp_len)) {
@@ -474,7 +474,7 @@ stp_print(netdissect_options *ndo, const u_char *p, u_int length)
             if (stp_bpdu->protocol_version == STP_PROTO_SPB)
             {
               /* Validate v4 length */
-              ND_TCHECK_16BITS(p + MST_BPDU_VER3_LEN_OFFSET + mstp_len);
+              ND_TCHECK_2(p + MST_BPDU_VER3_LEN_OFFSET + mstp_len);
               spb_len = EXTRACT_BE_16BITS(p + MST_BPDU_VER3_LEN_OFFSET + mstp_len);
               spb_len += 2;
               if (length < (sizeof(struct stp_bpdu_) + mstp_len + spb_len) ||

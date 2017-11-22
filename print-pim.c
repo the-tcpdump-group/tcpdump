@@ -1022,7 +1022,7 @@ pimv2_print(netdissect_options *ndo,
 		/* Fragment Tag, Hash Mask len, and BSR-priority */
 		if (len < 2)
 			goto trunc;
-		ND_TCHECK_16BITS(bp);
+		ND_TCHECK_2(bp);
 		ND_PRINT((ndo, " tag=%x", EXTRACT_BE_16BITS(bp)));
 		bp += 2;
 		len -= 2;
@@ -1079,7 +1079,7 @@ pimv2_print(netdissect_options *ndo,
 
 				if (len < 2)
 					goto trunc;
-				ND_TCHECK_16BITS(bp);
+				ND_TCHECK_2(bp);
 				ND_PRINT((ndo, ",holdtime="));
 				unsigned_relts_print(ndo,
 						     EXTRACT_BE_16BITS(bp));
@@ -1130,7 +1130,7 @@ pimv2_print(netdissect_options *ndo,
 		ND_PRINT((ndo, " prio=%d", bp[1]));
 		if (len < 4)
 			goto trunc;
-		ND_TCHECK_16BITS(&bp[2]);
+		ND_TCHECK_2(&bp[2]);
 		ND_PRINT((ndo, " holdtime="));
 		unsigned_relts_print(ndo, EXTRACT_BE_16BITS(bp + 2));
 		bp += 4;
@@ -1172,7 +1172,7 @@ pimv2_print(netdissect_options *ndo,
 		len -= advance;
 		if (len < 2)
 			goto trunc;
-		ND_TCHECK_16BITS(bp);
+		ND_TCHECK_2(bp);
 		ND_PRINT((ndo, " TUNR "));
 		unsigned_relts_print(ndo, EXTRACT_BE_16BITS(bp));
 		break;

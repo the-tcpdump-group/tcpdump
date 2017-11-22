@@ -737,7 +737,7 @@ ospf6_decode_v3(netdissect_options *ndo,
 	case OSPF_TYPE_HELLO: {
 		register const struct hello6 *hellop = (const struct hello6 *)((const uint8_t *)op + OSPF6HDR_LEN);
 
-		ND_TCHECK_32BITS(&hellop->hello_options);
+		ND_TCHECK_4(&hellop->hello_options);
 		ND_PRINT((ndo, "\n\tOptions [%s]",
 		          bittok2str(ospf6_option_values, "none",
 		          EXTRACT_BE_32BITS(&hellop->hello_options))));

@@ -101,7 +101,7 @@ tftp_print(netdissect_options *ndo,
 	/* Print tftp request type */
 	if (length < 2)
 		goto trunc;
-	ND_TCHECK_16BITS(bp);
+	ND_TCHECK_2(bp);
 	opcode = EXTRACT_BE_16BITS(bp);
 	cp = tok2str(op2str, "tftp-#%d", opcode);
 	ND_PRINT((ndo, " %s", cp));
@@ -168,7 +168,7 @@ tftp_print(netdissect_options *ndo,
 	case DATA:
 		if (length < 2)
 			goto trunc;	/* no block number */
-		ND_TCHECK_16BITS(bp);
+		ND_TCHECK_2(bp);
 		ND_PRINT((ndo, " block %d", EXTRACT_BE_16BITS(bp)));
 		break;
 
@@ -176,7 +176,7 @@ tftp_print(netdissect_options *ndo,
 		/* Print error code string */
 		if (length < 2)
 			goto trunc;	/* no error code */
-		ND_TCHECK_16BITS(bp);
+		ND_TCHECK_2(bp);
 		ND_PRINT((ndo, " %s", tok2str(err2str, "tftp-err-#%d \"",
 				       EXTRACT_BE_16BITS(bp))));
 		bp += 2;

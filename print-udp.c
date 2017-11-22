@@ -102,11 +102,11 @@ vat_print(netdissect_options *ndo, const void *hdr, register const struct udphdr
 	/* vat/vt audio */
 	u_int ts;
 
-	ND_TCHECK_16BITS((const u_int *)hdr);
+	ND_TCHECK_2((const u_int *)hdr);
 	ts = EXTRACT_BE_16BITS(hdr);
 	if ((ts & 0xf060) != 0) {
 		/* probably vt */
-		ND_TCHECK_16BITS(&up->uh_ulen);
+		ND_TCHECK_2(&up->uh_ulen);
 		ND_PRINT((ndo, "udp/vt %u %d / %d",
 			     (uint32_t)(EXTRACT_BE_16BITS(&up->uh_ulen) - sizeof(*up)),
 			     ts & 0x3ff, ts >> 10));
@@ -114,11 +114,11 @@ vat_print(netdissect_options *ndo, const void *hdr, register const struct udphdr
 		/* probably vat */
 		uint32_t i0, i1;
 
-		ND_TCHECK_32BITS(&((const u_int *)hdr)[0]);
+		ND_TCHECK_4(&((const u_int *)hdr)[0]);
 		i0 = EXTRACT_BE_32BITS(&((const u_int *)hdr)[0]);
-		ND_TCHECK_32BITS(&((const u_int *)hdr)[1]);
+		ND_TCHECK_4(&((const u_int *)hdr)[1]);
 		i1 = EXTRACT_BE_32BITS(&((const u_int *)hdr)[1]);
-		ND_TCHECK_16BITS(&up->uh_ulen);
+		ND_TCHECK_2(&up->uh_ulen);
 		ND_PRINT((ndo, "udp/vat %u c%d %u%s",
 			(uint32_t)(EXTRACT_BE_16BITS(&up->uh_ulen) - sizeof(*up) - 8),
 			i0 & 0xffff,
@@ -144,11 +144,11 @@ rtp_print(netdissect_options *ndo, const void *hdr, u_int len,
 	uint32_t i0, i1;
 	const char * ptype;
 
-	ND_TCHECK_32BITS(&((const u_int *)hdr)[0]);
+	ND_TCHECK_4(&((const u_int *)hdr)[0]);
 	i0 = EXTRACT_BE_32BITS(&((const u_int *)hdr)[0]);
-	ND_TCHECK_32BITS(&((const u_int *)hdr)[1]);
+	ND_TCHECK_4(&((const u_int *)hdr)[1]);
 	i1 = EXTRACT_BE_32BITS(&((const u_int *)hdr)[1]);
-	ND_TCHECK_16BITS(&up->uh_ulen);
+	ND_TCHECK_2(&up->uh_ulen);
 	dlen = EXTRACT_BE_16BITS(&up->uh_ulen) - sizeof(*up) - 8;
 	ip += 2;
 	len >>= 2;
@@ -180,12 +180,12 @@ rtp_print(netdissect_options *ndo, const void *hdr, u_int len,
 		i0 & 0xffff,
 		i1));
 	if (ndo->ndo_vflag) {
-		ND_TCHECK_32BITS(&((const u_int *)hdr)[2]);
+		ND_TCHECK_4(&((const u_int *)hdr)[2]);
 		ND_PRINT((ndo, " %u", EXTRACT_BE_32BITS(&((const u_int *)hdr)[2])));
 		if (hasopt) {
 			u_int i2, optlen;
 			do {
-				ND_TCHECK_32BITS(ip);
+				ND_TCHECK_4(ip);
 				i2 = EXTRACT_BE_32BITS(ip);
 				optlen = (i2 >> 16) & 0xff;
 				if (optlen == 0 || optlen > len) {
@@ -198,7 +198,7 @@ rtp_print(netdissect_options *ndo, const void *hdr, u_int len,
 		}
 		if (hasext) {
 			u_int i2, extlen;
-			ND_TCHECK_32BITS(ip);
+			ND_TCHECK_4(ip);
 			i2 = EXTRACT_BE_32BITS(ip);
 			extlen = (i2 & 0xffff) + 1;
 			if (extlen > len) {
@@ -207,7 +207,7 @@ rtp_print(netdissect_options *ndo, const void *hdr, u_int len,
 			}
 			ip += extlen;
 		}
-		ND_TCHECK_32BITS(ip);
+		ND_TCHECK_4(ip);
 		if (contype == 0x1f) /*XXX H.261 */
 			ND_PRINT((ndo, " 0x%04x", EXTRACT_BE_32BITS(ip) >> 16));
 	}

@@ -680,7 +680,7 @@ bgp_vpn_sg_print(netdissect_options *ndo,
     total_length = 0;
 
     /* Source address length, encoded in bits */
-    ND_TCHECK_8BITS(pptr);
+    ND_TCHECK_1(pptr);
     addr_length = EXTRACT_8BITS(pptr);
     pptr++;
 
@@ -695,7 +695,7 @@ bgp_vpn_sg_print(netdissect_options *ndo,
     }
 
     /* Group address length, encoded in bits */
-    ND_TCHECK_8BITS(pptr);
+    ND_TCHECK_1(pptr);
     addr_length = EXTRACT_8BITS(pptr);
     pptr++;
 
@@ -784,7 +784,7 @@ decode_rt_routing_info(netdissect_options *ndo,
 		return -1;
 
 	/* With at least "origin AS", possibly with "route target". */
-	ND_TCHECK_32BITS(pptr + 1);
+	ND_TCHECK_4(pptr + 1);
 	as_printf(ndo, asbuf, sizeof(asbuf), EXTRACT_BE_32BITS(pptr + 1));
 
         plen-=32; /* adjust prefix length */
@@ -1037,7 +1037,7 @@ decode_labeled_vpn_l2(netdissect_options *ndo,
 {
         int plen,tlen,stringlen,tlv_type,tlv_len,ttlv_len;
 
-	ND_TCHECK_16BITS(pptr);
+	ND_TCHECK_2(pptr);
         plen=EXTRACT_BE_16BITS(pptr);
         tlen=plen;
         pptr+=2;
@@ -1458,7 +1458,7 @@ bgp_attr_print(netdissect_options *ndo,
 		if (len != 4)
 			ND_PRINT((ndo, "invalid len"));
 		else {
-			ND_TCHECK_32BITS(tptr);
+			ND_TCHECK_4(tptr);
 			ND_PRINT((ndo, "%u", EXTRACT_BE_32BITS(tptr)));
 		}
 		break;
@@ -1504,7 +1504,7 @@ bgp_attr_print(netdissect_options *ndo,
 		}
 		while (tlen>0) {
 			uint32_t comm;
-			ND_TCHECK_32BITS(tptr);
+			ND_TCHECK_4(tptr);
 			comm = EXTRACT_BE_32BITS(tptr);
 			switch (comm) {
 			case BGP_COMMUNITY_NO_EXPORT:
@@ -2064,7 +2064,7 @@ bgp_attr_print(netdissect_options *ndo,
                 while (tlen>0) {
                     uint16_t extd_comm;
 
-                    ND_TCHECK_16BITS(tptr);
+                    ND_TCHECK_2(tptr);
                     extd_comm=EXTRACT_BE_16BITS(tptr);
 
 		    ND_PRINT((ndo, "\n\t    %s (0x%04x), Flags [%s]",
@@ -2250,7 +2250,7 @@ bgp_attr_print(netdissect_options *ndo,
 		break;
 	}
         case BGPTYPE_ATTR_SET:
-                ND_TCHECK_32BITS(tptr);
+                ND_TCHECK_4(tptr);
                 if (len < 4)
                 	goto trunc;
 		ND_PRINT((ndo, "\n\t    Origin AS: %s",
@@ -2516,7 +2516,7 @@ bgp_update_print(netdissect_options *ndo,
 	length -= BGP_SIZE;
 
 	/* Unfeasible routes */
-	ND_TCHECK_16BITS(p);
+	ND_TCHECK_2(p);
 	if (length < 2)
 		goto trunc;
 	withdrawn_routes_len = EXTRACT_BE_16BITS(p);
@@ -2536,7 +2536,7 @@ bgp_update_print(netdissect_options *ndo,
 		length -= withdrawn_routes_len;
 	}
 
-	ND_TCHECK_16BITS(p);
+	ND_TCHECK_2(p);
 	if (length < 2)
 		goto trunc;
 	len = EXTRACT_BE_16BITS(p);
@@ -2716,7 +2716,7 @@ bgp_notification_print(netdissect_options *ndo,
 		bgpn.bgpn_minor == BGP_NOTIFY_MINOR_CEASE_RESET) &&
 		length >= BGP_NOTIFICATION_SIZE + 1) {
 		    tptr = dat + BGP_NOTIFICATION_SIZE;
-		    ND_TCHECK_8BITS(tptr);
+		    ND_TCHECK_1(tptr);
 		    shutdown_comm_length = EXTRACT_8BITS(tptr);
 		    remainder_offset = 0;
 		    /* garbage, hexdump it all */

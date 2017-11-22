@@ -820,7 +820,7 @@ print_smb(netdissect_options *ndo,
     if (ndo->ndo_vflag < 2)
 	return;
 
-    ND_TCHECK_16BITS(&buf[10]);
+    ND_TCHECK_2(&buf[10]);
     flags2 = EXTRACT_LE_16BITS(buf + 10);
     unicodestr = flags2 & 0x8000;
     nterrcodes = flags2 & 0x4000;
@@ -1167,12 +1167,12 @@ nbt_udp137_print(netdissect_options *ndo,
 	    p = smb_fdata(ndo, p, "Name=[n1]\n#", maxbuf, 0);
 	    if (p == NULL)
 		goto out;
-	    ND_TCHECK_16BITS(p);
+	    ND_TCHECK_2(p);
 	    restype = EXTRACT_BE_16BITS(p);
 	    p = smb_fdata(ndo, p, "ResType=[rw]\nResClass=[rw]\nTTL=[rD]\n", p + 8, 0);
 	    if (p == NULL)
 		goto out;
-	    ND_TCHECK_16BITS(p);
+	    ND_TCHECK_2(p);
 	    rdlen = EXTRACT_BE_16BITS(p);
 	    ND_PRINT((ndo, "ResourceLength=%d\nResourceData=\n", rdlen));
 	    p += 2;

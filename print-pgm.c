@@ -361,7 +361,7 @@ pgm_print(netdissect_options *ndo,
 	     * and stopping if we don't have enough.
 	     */
 	    bp += (2 * sizeof(uint16_t));
-	    ND_TCHECK_16BITS(bp);
+	    ND_TCHECK_2(bp);
 	    switch (EXTRACT_BE_16BITS(bp)) {
 	    case AFNUM_INET:
 		ND_TCHECK2(*bp, sizeof(struct in_addr));
