@@ -319,7 +319,7 @@ stp_print_mstp_bpdu(netdissect_options *ndo, const struct stp_bpdu_ *stp_bpdu,
             msti = msti & 0x0FFF;
 
             ND_PRINT((ndo, "\n\tMSTI %d, Flags [%s], port-role %s",
-                   msti, bittok2str(stp_bpdu_flag_values, "none", ptr[offset]),
+                   msti, bittok2str(stp_bpdu_flag_values, "none", EXTRACT_U_1(ptr + offset)),
                    tok2str(rstp_obj_port_role_values, "Unknown",
                            RSTP_EXTRACT_PORT_ROLE(ptr[offset]))));
             ND_PRINT((ndo, "\n\t\tMSTI regional-root-id %s, pathcost %u",
