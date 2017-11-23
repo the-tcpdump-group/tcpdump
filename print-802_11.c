@@ -2707,22 +2707,22 @@ print_radiotap_field(netdissect_options *ndo,
 		}
 
 	case IEEE80211_RADIOTAP_TX_ATTENUATION: {
-		uint16_t tx_attenuation;
+		int16_t tx_attenuation;
 
-		rc = cpack_uint16(s, &tx_attenuation);
+		rc = cpack_int16(s, &tx_attenuation);
 		if (rc != 0)
 			goto trunc;
-		ND_PRINT((ndo, "%d tx power ", -(int)tx_attenuation));
+		ND_PRINT((ndo, "%d tx power ", -tx_attenuation));
 		break;
 		}
 
 	case IEEE80211_RADIOTAP_DB_TX_ATTENUATION: {
-		uint8_t db_tx_attenuation;
+		int8_t db_tx_attenuation;
 
-		rc = cpack_uint8(s, &db_tx_attenuation);
+		rc = cpack_int8(s, &db_tx_attenuation);
 		if (rc != 0)
 			goto trunc;
-		ND_PRINT((ndo, "%ddB tx attenuation ", -(int)db_tx_attenuation));
+		ND_PRINT((ndo, "%ddB tx attenuation ", -db_tx_attenuation));
 		break;
 		}
 
