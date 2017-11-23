@@ -194,7 +194,8 @@ krb4_print(netdissect_options *ndo,
 			return;
 		cp += 4;	/* ctime */
 		ND_TCHECK(*cp);
-		ND_PRINT((ndo, " %dmin ", *cp++ * 5));
+		ND_PRINT((ndo, " %dmin ", EXTRACT_U_1(cp) * 5));
+		cp++;
 		PRINT;
 		ND_PRINT((ndo, "."));
 		PRINT;
