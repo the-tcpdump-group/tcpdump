@@ -21,6 +21,14 @@
 
 /* \summary: Internet Group Management Protocol (IGMP) printer */
 
+/*
+ * specification:
+ *
+ *	RFC 2236 for IGMPv2
+ *	RFC 3376 for IGMPv3
+ *	draft-asaeda-mboned-mtrace-v2 for the mtrace message
+ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -43,14 +51,12 @@ static const char tstr[] = "[|igmp]";
  * The packet format for a traceroute request.
  */
 struct tr_query {
-    uint32_t  tr_src;          /* traceroute source */
-    uint32_t  tr_dst;          /* traceroute destination */
-    uint32_t  tr_raddr;        /* traceroute response address */
-    uint32_t  tr_rttlqid;      /* response ttl and qid */
+    nd_uint32_t  tr_src;        /* traceroute source */
+    nd_uint32_t  tr_dst;        /* traceroute destination */
+    nd_uint32_t  tr_raddr;      /* traceroute response address */
+    nd_uint8_t   tr_rttl;       /* response ttl */
+    nd_uint24_t  tr_qid;        /* qid */
 };
-
-#define TR_GETTTL(x)        (int)(((x) >> 24) & 0xff)
-#define TR_GETQID(x)        ((x) & 0x00ffffff)
 
 /*
  * Traceroute response format.  A traceroute response has a tr_query at the
@@ -114,11 +120,11 @@ print_mtrace(netdissect_options *ndo,
 	return;
     }
     ND_PRINT((ndo, "mtrace %u: %s to %s reply-to %s",
-        TR_GETQID(EXTRACT_BE_U_4(&tr->tr_rttlqid)),
-        ipaddr_string(ndo, &tr->tr_src), ipaddr_string(ndo, &tr->tr_dst),
-        ipaddr_string(ndo, &tr->tr_raddr)));
-    if (IN_CLASSD(EXTRACT_BE_U_4(&tr->tr_raddr)))
-        ND_PRINT((ndo, " with-ttl %d", TR_GETTTL(EXTRACT_BE_U_4(&tr->tr_rttlqid))));
+        EXTRACT_BE_U_3(tr->tr_qid),
+        ipaddr_string(ndo, tr->tr_src), ipaddr_string(ndo, tr->tr_dst),
+        ipaddr_string(ndo, tr->tr_raddr)));
+    if (IN_CLASSD(EXTRACT_BE_U_4(tr->tr_raddr)))
+        ND_PRINT((ndo, " with-ttl %u", EXTRACT_U_1(&tr->tr_rttl)));
     return;
 trunc:
     ND_PRINT((ndo, "%s", tstr));
@@ -135,12 +141,12 @@ print_mresp(netdissect_options *ndo,
 	ND_PRINT((ndo, " [invalid len %d]", len));
 	return;
     }
-    ND_PRINT((ndo, "mresp %lu: %s to %s reply-to %s",
-        (u_long)TR_GETQID(EXTRACT_BE_U_4(&tr->tr_rttlqid)),
-        ipaddr_string(ndo, &tr->tr_src), ipaddr_string(ndo, &tr->tr_dst),
-        ipaddr_string(ndo, &tr->tr_raddr)));
-    if (IN_CLASSD(EXTRACT_BE_U_4(&tr->tr_raddr)))
-        ND_PRINT((ndo, " with-ttl %d", TR_GETTTL(EXTRACT_BE_U_4(&tr->tr_rttlqid))));
+    ND_PRINT((ndo, "mresp %u: %s to %s reply-to %s",
+        EXTRACT_BE_U_3(tr->tr_qid),
+        ipaddr_string(ndo, tr->tr_src), ipaddr_string(ndo, tr->tr_dst),
+        ipaddr_string(ndo, tr->tr_raddr)));
+    if (IN_CLASSD(EXTRACT_BE_U_4(tr->tr_raddr)))
+        ND_PRINT((ndo, " with-ttl %u", EXTRACT_U_1(&tr->tr_rttl)));
     return;
 trunc:
     ND_PRINT((ndo, "%s", tstr));
