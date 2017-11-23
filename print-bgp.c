@@ -1622,7 +1622,7 @@ bgp_attr_print(netdissect_options *ndo,
                         case (AFNUM_INET<<8 | SAFNUM_RT_ROUTING_INFO):
                         case (AFNUM_INET<<8 | SAFNUM_MULTICAST_VPN):
                         case (AFNUM_INET<<8 | SAFNUM_MDT):
-			    if (tlen < (int)sizeof(struct in_addr)) {
+			    if (tlen < sizeof(struct in_addr)) {
                                 ND_PRINT((ndo, "invalid len"));
                                 tlen = 0;
                             } else {
@@ -1635,7 +1635,7 @@ bgp_attr_print(netdissect_options *ndo,
                         case (AFNUM_INET<<8 | SAFNUM_VPNUNICAST):
                         case (AFNUM_INET<<8 | SAFNUM_VPNMULTICAST):
                         case (AFNUM_INET<<8 | SAFNUM_VPNUNIMULTICAST):
-                            if (tlen < (int)(sizeof(struct in_addr)+BGP_VPN_RD_LEN)) {
+                            if (tlen < sizeof(struct in_addr)+BGP_VPN_RD_LEN) {
                                 ND_PRINT((ndo, "invalid len"));
                                 tlen = 0;
                             } else {
@@ -1651,7 +1651,7 @@ bgp_attr_print(netdissect_options *ndo,
                         case (AFNUM_INET6<<8 | SAFNUM_MULTICAST):
                         case (AFNUM_INET6<<8 | SAFNUM_UNIMULTICAST):
                         case (AFNUM_INET6<<8 | SAFNUM_LABUNICAST):
-                            if (tlen < (int)sizeof(struct in6_addr)) {
+                            if (tlen < sizeof(struct in6_addr)) {
                                 ND_PRINT((ndo, "invalid len"));
                                 tlen = 0;
                             } else {
@@ -1664,7 +1664,7 @@ bgp_attr_print(netdissect_options *ndo,
                         case (AFNUM_INET6<<8 | SAFNUM_VPNUNICAST):
                         case (AFNUM_INET6<<8 | SAFNUM_VPNMULTICAST):
                         case (AFNUM_INET6<<8 | SAFNUM_VPNUNIMULTICAST):
-                            if (tlen < (int)(sizeof(struct in6_addr)+BGP_VPN_RD_LEN)) {
+                            if (tlen < sizeof(struct in6_addr)+BGP_VPN_RD_LEN) {
                                 ND_PRINT((ndo, "invalid len"));
                                 tlen = 0;
                             } else {
@@ -1680,7 +1680,7 @@ bgp_attr_print(netdissect_options *ndo,
                         case (AFNUM_L2VPN<<8 | SAFNUM_VPNUNICAST):
                         case (AFNUM_L2VPN<<8 | SAFNUM_VPNMULTICAST):
                         case (AFNUM_L2VPN<<8 | SAFNUM_VPNUNIMULTICAST):
-                            if (tlen < (int)sizeof(struct in_addr)) {
+                            if (tlen < sizeof(struct in_addr)) {
                                 ND_PRINT((ndo, "invalid len"));
                                 tlen = 0;
                             } else {
