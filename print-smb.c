@@ -823,7 +823,7 @@ print_smb(netdissect_options *ndo,
     if (ndo->ndo_vflag < 2)
 	return;
 
-    ND_TCHECK_2(&buf[10]);
+    ND_TCHECK_2(buf + 10);
     flags2 = EXTRACT_LE_U_2(buf + 10);
     unicodestr = flags2 & 0x8000;
     nterrcodes = flags2 & 0x4000;

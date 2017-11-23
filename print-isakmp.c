@@ -922,7 +922,7 @@ ikev1_attrmap_print(netdissect_options *ndo,
 	if (p[0] & 0x80)
 		totlen = 4;
 	else {
-		ND_TCHECK_2(&p[2]);
+		ND_TCHECK_2(p + 2);
 		totlen = 4 + EXTRACT_BE_U_2(p + 2);
 	}
 	if (ep2 < p + totlen) {
@@ -930,7 +930,7 @@ ikev1_attrmap_print(netdissect_options *ndo,
 		return ep2 + 1;
 	}
 
-	ND_TCHECK_2(&p[0]);
+	ND_TCHECK_2(p);
 	ND_PRINT((ndo,"("));
 	t = EXTRACT_BE_U_2(p) & 0x7fff;
 	if (map && t < nmap && map[t].type)
@@ -939,7 +939,7 @@ ikev1_attrmap_print(netdissect_options *ndo,
 		ND_PRINT((ndo,"type=#%d ", t));
 	if (p[0] & 0x80) {
 		ND_PRINT((ndo,"value="));
-		ND_TCHECK_2(&p[2]);
+		ND_TCHECK_2(p + 2);
 		v = EXTRACT_BE_U_2(p + 2);
 		if (map && t < nmap && v < map[t].nvalue && map[t].value[v])
 			ND_PRINT((ndo,"%s", map[t].value[v]));
@@ -973,7 +973,7 @@ ikev1_attr_print(netdissect_options *ndo, const u_char *p, const u_char *ep2)
 	if (p[0] & 0x80)
 		totlen = 4;
 	else {
-		ND_TCHECK_2(&p[2]);
+		ND_TCHECK_2(p + 2);
 		totlen = 4 + EXTRACT_BE_U_2(p + 2);
 	}
 	if (ep2 < p + totlen) {
@@ -981,7 +981,7 @@ ikev1_attr_print(netdissect_options *ndo, const u_char *p, const u_char *ep2)
 		return ep2 + 1;
 	}
 
-	ND_TCHECK_2(&p[0]);
+	ND_TCHECK_2(p);
 	ND_PRINT((ndo,"("));
 	t = EXTRACT_BE_U_2(p) & 0x7fff;
 	ND_PRINT((ndo,"type=#%d ", t));

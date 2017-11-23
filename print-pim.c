@@ -1130,7 +1130,7 @@ pimv2_print(netdissect_options *ndo,
 		ND_PRINT((ndo, " prio=%d", bp[1]));
 		if (len < 4)
 			goto trunc;
-		ND_TCHECK_2(&bp[2]);
+		ND_TCHECK_2(bp + 2);
 		ND_PRINT((ndo, " holdtime="));
 		unsigned_relts_print(ndo, EXTRACT_BE_U_2(bp + 2));
 		bp += 4;
