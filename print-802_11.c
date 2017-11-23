@@ -1166,12 +1166,12 @@ parse_elements(netdissect_options *ndo,
 			memcpy(&tim, p + offset, 2);
 			offset += 2;
 			length -= 2;
-			if (tim.length <= 3) {
+			if (tim.length <= 3U) {
 				offset += tim.length;
 				length -= tim.length;
 				break;
 			}
-			if (tim.length - 3 > (int)sizeof tim.bitmap)
+			if (tim.length - 3U > sizeof tim.bitmap)
 				return 0;
 			memcpy(&tim.count, p + offset, 3);
 			offset += 3;
