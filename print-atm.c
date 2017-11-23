@@ -358,7 +358,7 @@ sig_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "Q.2931"));
 		ND_TCHECK(p[MSG_TYPE_POS]);
 		ND_PRINT((ndo, ":%s ",
-		    tok2str(msgtype2str, "msgtype#%d", p[MSG_TYPE_POS])));
+		    tok2str(msgtype2str, "msgtype#%d", EXTRACT_U_1(p + MSG_TYPE_POS))));
 
 		/*
 		 * The call reference comes before the message type,

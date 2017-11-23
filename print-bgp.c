@@ -1398,7 +1398,7 @@ bgp_attr_print(netdissect_options *ndo,
 			ND_TCHECK(*tptr);
 			ND_PRINT((ndo, "%s", tok2str(bgp_origin_values,
 						"Unknown Origin Typecode",
-						tptr[0])));
+						EXTRACT_U_1(tptr))));
 		}
 		break;
 
@@ -1429,7 +1429,7 @@ bgp_attr_print(netdissect_options *ndo,
 		while (tptr < pptr + len) {
 			ND_TCHECK(tptr[0]);
                         ND_PRINT((ndo, "%s", tok2str(bgp_as_path_segment_open_values,
-						"?", tptr[0])));
+						"?", EXTRACT_U_1(tptr))));
 			ND_TCHECK(tptr[1]);
                         for (i = 0; i < tptr[1] * as_size; i += as_size) {
                             ND_TCHECK2(tptr[2 + i], as_size);
@@ -1441,7 +1441,7 @@ bgp_attr_print(netdissect_options *ndo,
                         }
 			ND_TCHECK(tptr[0]);
                         ND_PRINT((ndo, "%s", tok2str(bgp_as_path_segment_close_values,
-						"?", tptr[0])));
+						"?", EXTRACT_U_1(tptr))));
                         ND_TCHECK(tptr[1]);
                         tptr += 2 + tptr[1] * as_size;
 		}
@@ -2360,7 +2360,7 @@ bgp_capabilities_print(netdissect_options *ndo,
                                       EXTRACT_BE_U_2(opt + i + 2)),
                            EXTRACT_BE_U_2(opt + i + 2),
                            tok2str(bgp_safi_values, "Unknown",
-                                      opt[i+5]),
+                                      EXTRACT_U_1(opt + i + 5)),
                            opt[i+5]));
                     break;
                 case BGP_CAPCODE_RESTART:
@@ -2375,7 +2375,7 @@ bgp_capabilities_print(netdissect_options *ndo,
                                           EXTRACT_BE_U_2(opt + i + cap_offset)),
                                EXTRACT_BE_U_2(opt + i + cap_offset),
                                tok2str(bgp_safi_values,"Unknown",
-                                          opt[i+cap_offset+2]),
+                                          EXTRACT_U_1(opt + i + cap_offset + 2)),
                                opt[i+cap_offset+2],
                                ((opt[i+cap_offset+3])&0x80) ? "yes" : "no" ));
                         tcap_len-=4;
@@ -2410,9 +2410,9 @@ bgp_capabilities_print(netdissect_options *ndo,
                         ND_PRINT((ndo, "\n\t\tAFI %s (%u), SAFI %s (%u), Send/Receive: %s",
                                   tok2str(af_values,"Unknown",EXTRACT_BE_U_2(opt + i + cap_offset)),
                                   EXTRACT_BE_U_2(opt + i + cap_offset),
-                                  tok2str(bgp_safi_values,"Unknown",opt[i+cap_offset+2]),
+                                  tok2str(bgp_safi_values,"Unknown",EXTRACT_U_1(opt + i + cap_offset + 2)),
                                   opt[i+cap_offset+2],
-                                  tok2str(bgp_add_path_recvsend,"Bogus (0x%02x)",opt[i+cap_offset+3])
+                                  tok2str(bgp_add_path_recvsend,"Bogus (0x%02x)",EXTRACT_U_1(opt + i + cap_offset + 3))
                         ));
                         tcap_len-=4;
                         cap_offset+=4;

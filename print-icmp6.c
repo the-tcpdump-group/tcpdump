@@ -1432,7 +1432,7 @@ mldv2_report_print(netdissect_options *ndo, const u_char *bp, u_int len)
             ND_TCHECK2(bp[group + 4], sizeof(struct in6_addr));
             ND_PRINT((ndo," [gaddr %s", ip6addr_string(ndo, &bp[group + 4])));
 	    ND_PRINT((ndo," %s", tok2str(mldv2report2str, " [v2-report-#%d]",
-                                         bp[group])));
+                                         EXTRACT_U_1(bp + group))));
             nsrcs = (bp[group + 2] << 8) + bp[group + 3];
 	    /* Check the number of sources and print them */
 	    if (len < group + 20 + (nsrcs * sizeof(struct in6_addr))) {

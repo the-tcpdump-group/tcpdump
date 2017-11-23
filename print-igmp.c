@@ -172,7 +172,7 @@ print_igmpv3_report(netdissect_options *ndo,
 	    ND_TCHECK2(bp[group+4], 4);
             ND_PRINT((ndo, " [gaddr %s", ipaddr_string(ndo, &bp[group+4])));
 	    ND_PRINT((ndo, " %s", tok2str(igmpv3report2str, " [v3-report-#%d]",
-								bp[group])));
+								EXTRACT_U_1(bp + group))));
             nsrcs = EXTRACT_BE_U_2(bp + group + 2);
 	    /* Check the number of sources and print them */
 	    if (len < group+8+(nsrcs<<2)) {

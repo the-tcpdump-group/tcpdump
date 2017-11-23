@@ -654,7 +654,7 @@ print_lcp_config_options(netdissect_options *ndo,
 		switch (EXTRACT_BE_U_2(p + 2)) {
 		case PPP_CHAP:
 			ND_TCHECK(p[4]);
-			ND_PRINT((ndo, ", %s", tok2str(authalg_values, "Unknown Auth Alg %u", p[4])));
+			ND_PRINT((ndo, ", %s", tok2str(authalg_values, "Unknown Auth Alg %u", EXTRACT_U_1(p + 4))));
 			break;
 		case PPP_PAP: /* fall through */
 		case PPP_EAP:
@@ -704,7 +704,7 @@ print_lcp_config_options(netdissect_options *ndo,
 		ND_PRINT((ndo, ": "));
 		ND_TCHECK(p[2]);
 		ND_PRINT((ndo, ": Callback Operation %s (%u)",
-                       tok2str(ppp_callback_values, "Unknown", p[2]),
+                       tok2str(ppp_callback_values, "Unknown", EXTRACT_U_1(p + 2)),
                        p[2]));
 		break;
 	case LCPOPT_MLMRRU:
