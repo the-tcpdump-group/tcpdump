@@ -77,7 +77,7 @@ nflog_if_print(netdissect_options *ndo,
 	u_int caplen = h->caplen;
 	u_int length = h->len;
 
-	if (caplen < (int) sizeof(nflog_hdr_t) || length < (int) sizeof(nflog_hdr_t)) {
+	if (caplen < sizeof(nflog_hdr_t) || length < sizeof(nflog_hdr_t)) {
 		ND_PRINT((ndo, "[|nflog]"));
 		return h_size;
 	}
