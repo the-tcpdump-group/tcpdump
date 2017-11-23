@@ -480,19 +480,22 @@ print_cstring(netdissect_options *ndo,
 		ND_PRINT((ndo, "%s", tstr));
 		return (0);
 	}
-	length = *cp++;
+	length = EXTRACT_U_1(cp);
+	cp++;
 
 	/* Spec says string can be at most 32 bytes long */
 	if (length > 32) {
 		ND_PRINT((ndo, "[len=%u]", length));
 		return (0);
 	}
-	while ((int)--length >= 0) {
+	while (length != 0) {
 		if (cp >= (const char *)ep) {
 			ND_PRINT((ndo, "%s", tstr));
 			return (0);
 		}
-		ND_PRINT((ndo, "%c", *cp++));
+		ND_PRINT((ndo, "%c", EXTRACT_U_1(cp)));
+		cp++;
+		length--;
 	}
 	return (cp);
 }
