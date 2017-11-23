@@ -715,7 +715,7 @@ ipN_print(netdissect_options *ndo, register const u_char *bp, register u_int len
 		ip6_print (ndo, bp, length);
 		break;
 	default:
-		ND_PRINT((ndo, "unknown ip %d", (*bp & 0xF0) >> 4));
+		ND_PRINT((ndo, "unknown ip %d", (EXTRACT_U_1(bp) & 0xF0) >> 4));
 		break;
 	}
 	return;
