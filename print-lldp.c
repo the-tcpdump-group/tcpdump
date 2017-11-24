@@ -1032,7 +1032,7 @@ lldp_private_tia_print(netdissect_options *ndo,
                    (*(tptr + 10) >> 2), lldp_extract_latlon(tptr + 10)));
             ND_PRINT((ndo, "\n\t    Altitude type %s (%u)",
                    tok2str(lldp_tia_location_altitude_type_values, "unknown",EXTRACT_U_1((tptr + 15)) >> 4),
-                   (*(tptr + 15) >> 4)));
+                   (EXTRACT_U_1(tptr + 15) >> 4)));
             ND_PRINT((ndo, "\n\t    Altitude resolution %u, altitude value 0x%x",
                    (EXTRACT_BE_U_2(tptr + 15)>>6)&0x3f,
                    ((EXTRACT_BE_U_4(tptr + 16) & 0x3fffffff))));
@@ -1113,7 +1113,7 @@ lldp_private_tia_print(netdissect_options *ndo,
                tok2str(lldp_tia_power_source_values, "none", (EXTRACT_U_1((tptr + 4)) & 0x30) >> 4)));
         ND_PRINT((ndo, "\n\t    Power priority [%s] (0x%02x)",
                tok2str(lldp_tia_power_priority_values, "none", EXTRACT_U_1((tptr + 4)) & 0x0f),
-               *(tptr + 4) & 0x0f));
+               (EXTRACT_U_1(tptr + 4) & 0x0f)));
         power_val = EXTRACT_BE_U_2(tptr + 5);
         if (power_val < LLDP_TIA_POWER_VAL_MAX) {
             ND_PRINT((ndo, ", Power %.1f Watts", ((float)power_val) / 10));
