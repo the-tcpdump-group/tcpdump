@@ -90,7 +90,7 @@ print_long_pos_vector(netdissect_options *ndo,
 		return (-1);
 	ND_PRINT((ndo, "GN_ADDR:%s ", linkaddr_string (ndo, bp, 0, GEONET_ADDR_LEN)));
 
-	if (!ND_TTEST2(*(bp+12), 8))
+	if (!ND_TTEST_8(bp + 12))
 		return (-1);
 	lat = EXTRACT_BE_U_4(bp + 12);
 	ND_PRINT((ndo, "lat:%d ", lat));
@@ -127,7 +127,7 @@ geonet_print(netdissect_options *ndo, const u_char *bp, u_int length,
 	if (length < 36)
 		goto invalid;
 
-	ND_TCHECK2(*bp, 8);
+	ND_TCHECK_8(bp);
 	version = bp[0] >> 4;
 	next_hdr = bp[0] & 0x0f;
 	hdr_type = bp[1] >> 4;
@@ -242,7 +242,7 @@ geonet_print(netdissect_options *ndo, const u_char *bp, u_int length,
 			case 2: /* BTP A/B */
 				if (length < 4)
 					goto invalid;
-				ND_TCHECK2(*bp, 4);
+				ND_TCHECK_4(bp);
 				print_btp(ndo, bp);
 				length -= 4;
 				bp += 4;
@@ -254,7 +254,7 @@ geonet_print(netdissect_options *ndo, const u_char *bp, u_int length,
 					 * or was that just not
 					 * reporting genuine errors?
 					 */
-					ND_TCHECK2(*bp, 2);
+					ND_TCHECK_2(bp);
 					print_btp_body(ndo, bp);
 				}
 				break;

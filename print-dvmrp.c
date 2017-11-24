@@ -122,7 +122,7 @@ dvmrp_print(netdissect_options *ndo,
 		 * extract version from IGMP group address field
 		 */
 		bp -= 4;
-		ND_TCHECK2(bp[0], 4);
+		ND_TCHECK_4(bp);
 		major_version = EXTRACT_U_1(bp + 3);
 		minor_version = EXTRACT_U_1(bp + 2);
 		bp += 4;
@@ -174,7 +174,7 @@ print_report(netdissect_options *ndo,
 			ND_PRINT((ndo, " [|]"));
 			return (0);
 		}
-		ND_TCHECK2(bp[0], 3);
+		ND_TCHECK_3(bp);
 		mask = (uint32_t)0xff << 24 | bp[0] << 16 | bp[1] << 8 | bp[2];
 		width = 1;
 		if (bp[0])
@@ -227,7 +227,7 @@ print_probe(netdissect_options *ndo,
 {
 	register uint32_t genid;
 
-	ND_TCHECK2(bp[0], 4);
+	ND_TCHECK_4(bp);
 	if ((len < 4) || ((bp + 4) > ep)) {
 		/* { (ctags) */
 		ND_PRINT((ndo, " [|}"));
@@ -242,7 +242,7 @@ print_probe(netdissect_options *ndo,
 		return (0);
 
 	while ((len > 0) && (bp < ep)) {
-		ND_TCHECK2(bp[0], 4);
+		ND_TCHECK_4(bp);
 		ND_PRINT((ndo, "\n\tneighbor %s", ipaddr_string(ndo, bp)));
 		bp += 4; len -= 4;
 	}
@@ -262,7 +262,7 @@ print_neighbors(netdissect_options *ndo,
 	register int ncount;
 
 	while (len > 0 && bp < ep) {
-		ND_TCHECK2(bp[0], 7);
+		ND_TCHECK_7(bp);
 		laddr = bp;
 		bp += 4;
 		metric = EXTRACT_U_1(bp);
@@ -273,7 +273,7 @@ print_neighbors(netdissect_options *ndo,
 		bp++;
 		len -= 7;
 		while (--ncount >= 0) {
-			ND_TCHECK2(bp[0], 4);
+			ND_TCHECK_4(bp);
 			ND_PRINT((ndo, " [%s ->", ipaddr_string(ndo, laddr)));
 			ND_PRINT((ndo, " %s, (%d/%d)]",
 				   ipaddr_string(ndo, bp), metric, thresh));
@@ -299,7 +299,7 @@ print_neighbors2(netdissect_options *ndo,
 	ND_PRINT((ndo, " (v %u.%u):", major_version, minor_version));
 
 	while (len > 0 && bp < ep) {
-		ND_TCHECK2(bp[0], 8);
+		ND_TCHECK_8(bp);
 		laddr = bp;
 		bp += 4;
 		metric = EXTRACT_U_1(bp);
@@ -357,7 +357,7 @@ static int
 print_graft(netdissect_options *ndo,
             register const u_char *bp)
 {
-	ND_TCHECK2(bp[0], 8);
+	ND_TCHECK_8(bp);
 	ND_PRINT((ndo, " src %s grp %s", ipaddr_string(ndo, bp), ipaddr_string(ndo, bp + 4)));
 	return (0);
 trunc:
@@ -368,7 +368,7 @@ static int
 print_graft_ack(netdissect_options *ndo,
                 register const u_char *bp)
 {
-	ND_TCHECK2(bp[0], 8);
+	ND_TCHECK_8(bp);
 	ND_PRINT((ndo, " src %s grp %s", ipaddr_string(ndo, bp), ipaddr_string(ndo, bp + 4)));
 	return (0);
 trunc:

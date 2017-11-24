@@ -843,7 +843,7 @@ pdatacnt_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "%sTABLE APPEND\n", ib));
 	}
 	for (i = 0; i < IDcnt; i++) {
-		ND_TCHECK2(*pptr, 4);
+		ND_TCHECK_4(pptr);
 		if (len < 4)
 			goto trunc;
 		id = EXTRACT_BE_U_4(pptr);
@@ -1228,7 +1228,7 @@ asttlv_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "illegal ASTresult-TLV: %d bytes!\n", dlen));
 		return -1;
 	}
-	ND_TCHECK2(*pptr, 4);
+	ND_TCHECK_4(pptr);
 	rescode = EXTRACT_BE_U_4(pptr);
 	if (rescode > ASTMCD) {
 		ND_PRINT((ndo, "illegal ASTresult result code: %d!\n", rescode));
@@ -1286,7 +1286,7 @@ asrtlv_print(netdissect_options *ndo,
 		ND_PRINT((ndo, "illegal ASRresult-TLV: %d bytes!\n", dlen));
 		return -1;
 	}
-	ND_TCHECK2(*pptr, 4);
+	ND_TCHECK_4(pptr);
 	rescode = EXTRACT_BE_U_4(pptr);
 
 	if (rescode > ASRMCD) {
@@ -1706,7 +1706,7 @@ forces_print(netdissect_options *ndo,
 		goto error;
 	}
 
-	ND_TCHECK2(*(pptr + 20), 4);
+	ND_TCHECK_4(pptr + 20);
 	flg_raw = EXTRACT_BE_U_4(pptr + 20);
 	if (ndo->ndo_vflag >= 1) {
 		ND_PRINT((ndo, "\n\tForCES Version %d len %uB flags 0x%08x ",

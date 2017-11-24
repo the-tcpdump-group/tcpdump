@@ -572,7 +572,7 @@ decode_labeled_prefix4(netdissect_options *ndo,
 	u_int plen, plenbytes;
 
 	/* prefix length and label = 4 bytes */
-	ND_TCHECK2(pptr[0], 4);
+	ND_TCHECK_4(pptr);
 	ITEMCHECK(4);
 	plen = pptr[0];   /* get prefix length */
 
@@ -881,7 +881,7 @@ decode_mdt_vpn_nlri(netdissect_options *ndo,
     pptr++;
 
     /* RD */
-    ND_TCHECK2(pptr[0], 8);
+    ND_TCHECK_8(pptr);
     rd = pptr;
     pptr+=8;
 
@@ -929,7 +929,7 @@ decode_multicast_vpn(netdissect_options *ndo,
         uint8_t route_type, route_length, addr_length, sg_length;
         u_int offset;
 
-	ND_TCHECK2(pptr[0], 2);
+	ND_TCHECK_2(pptr);
         route_type = EXTRACT_U_1(pptr);
         pptr++;
         route_length = EXTRACT_U_1(pptr);
@@ -1076,7 +1076,7 @@ decode_labeled_vpn_l2(netdissect_options *ndo,
 	    while (tlen>0) {
 		if (tlen < 3)
 		    return -1;
-		ND_TCHECK2(pptr[0], 3);
+		ND_TCHECK_3(pptr);
 		tlv_type=EXTRACT_U_1(pptr);
 		pptr++;
 		tlv_len=EXTRACT_BE_U_2(pptr);
@@ -1167,7 +1167,7 @@ decode_labeled_prefix6(netdissect_options *ndo,
 	u_int plen, plenbytes;
 
 	/* prefix length and label = 4 bytes */
-	ND_TCHECK2(pptr[0], 4);
+	ND_TCHECK_4(pptr);
 	ITEMCHECK(4);
 	plen = pptr[0]; /* get prefix length */
 
@@ -1450,7 +1450,7 @@ bgp_attr_print(netdissect_options *ndo,
 		if (len != 4)
 			ND_PRINT((ndo, "invalid len"));
 		else {
-			ND_TCHECK2(tptr[0], 4);
+			ND_TCHECK_4(tptr);
 			ND_PRINT((ndo, "%s", ipaddr_string(ndo, tptr)));
 		}
 		break;
@@ -1493,7 +1493,7 @@ bgp_attr_print(netdissect_options *ndo,
 			ND_PRINT((ndo, "invalid len"));
 			break;
 		}
-		ND_TCHECK2(tptr[0], 8);
+		ND_TCHECK_8(tptr);
 		ND_PRINT((ndo, " AS #%s, origin %s",
 	   	    as_printf(ndo, astostr, sizeof(astostr), EXTRACT_BE_U_4(tptr)),
 	   	    ipaddr_string(ndo, tptr + 4)));
@@ -1533,7 +1533,7 @@ bgp_attr_print(netdissect_options *ndo,
 			ND_PRINT((ndo, "invalid len"));
 			break;
 		}
-		ND_TCHECK2(tptr[0], 4);
+		ND_TCHECK_4(tptr);
                 ND_PRINT((ndo, "%s",ipaddr_string(ndo, tptr)));
                 break;
         case BGPTYPE_CLUSTER_LIST:
@@ -1542,7 +1542,7 @@ bgp_attr_print(netdissect_options *ndo,
 			break;
 		}
                 while (tlen>0) {
-			ND_TCHECK2(tptr[0], 4);
+			ND_TCHECK_4(tptr);
                         ND_PRINT((ndo, "%s%s",
                                ipaddr_string(ndo, tptr),
                                 (tlen>4) ? ", " : ""));
@@ -1551,7 +1551,7 @@ bgp_attr_print(netdissect_options *ndo,
                 }
                 break;
 	case BGPTYPE_MP_REACH_NLRI:
-		ND_TCHECK2(tptr[0], 3);
+		ND_TCHECK_3(tptr);
 		af = EXTRACT_BE_U_2(tptr);
 		safi = EXTRACT_U_1(tptr + 2);
 
@@ -2075,7 +2075,7 @@ bgp_attr_print(netdissect_options *ndo,
 			   extd_comm,
 			   bittok2str(bgp_extd_comm_flag_values, "none", extd_comm)));
 
-                    ND_TCHECK2(*(tptr+2), 6);
+                    ND_TCHECK_6(tptr + 2);
                     switch(extd_comm) {
                     case BGP_EXT_COM_RT_0:
                     case BGP_EXT_COM_RO_0:
@@ -2134,7 +2134,7 @@ bgp_attr_print(netdissect_options *ndo,
                         ND_PRINT((ndo, ": AS %u", EXTRACT_BE_U_2(tptr + 2)));
                         break;
                     default:
-                        ND_TCHECK2(*tptr,8);
+                        ND_TCHECK_8(tptr);
                         print_unknown_data(ndo, tptr, "\n\t      ", 8);
                         break;
                     }
@@ -2147,7 +2147,7 @@ bgp_attr_print(netdissect_options *ndo,
         {
                 uint8_t tunnel_type, flags;
 
-                ND_TCHECK2(tptr[0], 5);
+                ND_TCHECK_5(tptr);
                 flags = EXTRACT_U_1(tptr);
                 tunnel_type = EXTRACT_U_1(tptr + 1);
                 tlen = len;
@@ -2164,32 +2164,32 @@ bgp_attr_print(netdissect_options *ndo,
                 switch (tunnel_type) {
                 case BGP_PMSI_TUNNEL_PIM_SM: /* fall through */
                 case BGP_PMSI_TUNNEL_PIM_BIDIR:
-                    ND_TCHECK2(tptr[0], 8);
+                    ND_TCHECK_8(tptr);
                     ND_PRINT((ndo, "\n\t      Sender %s, P-Group %s",
                            ipaddr_string(ndo, tptr),
                            ipaddr_string(ndo, tptr+4)));
                     break;
 
                 case BGP_PMSI_TUNNEL_PIM_SSM:
-                    ND_TCHECK2(tptr[0], 8);
+                    ND_TCHECK_8(tptr);
                     ND_PRINT((ndo, "\n\t      Root-Node %s, P-Group %s",
                            ipaddr_string(ndo, tptr),
                            ipaddr_string(ndo, tptr+4)));
                     break;
                 case BGP_PMSI_TUNNEL_INGRESS:
-                    ND_TCHECK2(tptr[0], 4);
+                    ND_TCHECK_4(tptr);
                     ND_PRINT((ndo, "\n\t      Tunnel-Endpoint %s",
                            ipaddr_string(ndo, tptr)));
                     break;
                 case BGP_PMSI_TUNNEL_LDP_P2MP: /* fall through */
                 case BGP_PMSI_TUNNEL_LDP_MP2MP:
-                    ND_TCHECK2(tptr[0], 8);
+                    ND_TCHECK_8(tptr);
                     ND_PRINT((ndo, "\n\t      Root-Node %s, LSP-ID 0x%08x",
                            ipaddr_string(ndo, tptr),
                            EXTRACT_BE_U_4(tptr + 4)));
                     break;
                 case BGP_PMSI_TUNNEL_RSVP_P2MP:
-                    ND_TCHECK2(tptr[0], 8);
+                    ND_TCHECK_8(tptr);
                     ND_PRINT((ndo, "\n\t      Extended-Tunnel-ID %s, P2MP-ID 0x%08x",
                            ipaddr_string(ndo, tptr),
                            EXTRACT_BE_U_4(tptr + 4)));
@@ -2210,7 +2210,7 @@ bgp_attr_print(netdissect_options *ndo,
 
 		while (tlen >= 3) {
 
-		    ND_TCHECK2(tptr[0], 3);
+		    ND_TCHECK_3(tptr);
 
 		    type = EXTRACT_U_1(tptr);
 		    length = EXTRACT_BE_U_2(tptr + 1);
@@ -2262,7 +2262,7 @@ bgp_attr_print(netdissect_options *ndo,
                 while (len) {
                     u_int aflags, alenlen, alen;
 
-                    ND_TCHECK2(tptr[0], 2);
+                    ND_TCHECK_2(tptr);
                     if (len < 2)
                         goto trunc;
                     aflags = EXTRACT_U_1(tptr);
@@ -2555,7 +2555,7 @@ bgp_update_print(netdissect_options *ndo,
 		while (len) {
 			int aflags, atype, alenlen, alen;
 
-			ND_TCHECK2(p[0], 2);
+			ND_TCHECK_2(p);
 			if (len < 2)
 			    goto trunc;
 			if (length < 2)
@@ -2700,7 +2700,7 @@ bgp_notification_print(netdissect_options *ndo,
              */
 	    if(bgpn.bgpn_minor == BGP_NOTIFY_MINOR_CEASE_MAXPRFX && length >= BGP_NOTIFICATION_SIZE + 7) {
 		tptr = dat + BGP_NOTIFICATION_SIZE;
-		ND_TCHECK2(*tptr, 7);
+		ND_TCHECK_7(tptr);
 		ND_PRINT((ndo, ", AFI %s (%u), SAFI %s (%u), Max Prefixes: %u",
 		       tok2str(af_values, "Unknown",
 				  EXTRACT_BE_U_2(tptr)),
@@ -2854,7 +2854,7 @@ bgp_print(netdissect_options *ndo,
 	p = dat;
 	start = p;
 	while (p < ep) {
-		if (!ND_TTEST2(p[0], 1))
+		if (!ND_TTEST_1(p))
 			break;
 		if (p[0] != 0xff) {
 			p++;

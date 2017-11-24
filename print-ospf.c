@@ -922,24 +922,24 @@ ospf_decode_lls(netdissect_options *ndo,
         ND_PRINT((ndo, "\n\t[LLS truncated]"));
         return (1);
     }
-    ND_TCHECK2(*dptr, 2);
+    ND_TCHECK_2(dptr);
     ND_PRINT((ndo, "\n\t  LLS: checksum: 0x%04x", (u_int) EXTRACT_BE_U_2(dptr)));
 
     dptr += 2;
-    ND_TCHECK2(*dptr, 2);
+    ND_TCHECK_2(dptr);
     length2 = EXTRACT_BE_U_2(dptr);
     ND_PRINT((ndo, ", length: %u", length2));
 
     dptr += 2;
     ND_TCHECK(*dptr);
     while (dptr < dataend) {
-        ND_TCHECK2(*dptr, 2);
+        ND_TCHECK_2(dptr);
         lls_type = EXTRACT_BE_U_2(dptr);
         ND_PRINT((ndo, "\n\t    %s (%u)",
                tok2str(ospf_lls_tlv_values,"Unknown TLV",lls_type),
                lls_type));
         dptr += 2;
-        ND_TCHECK2(*dptr, 2);
+        ND_TCHECK_2(dptr);
         lls_len = EXTRACT_BE_U_2(dptr);
         ND_PRINT((ndo, ", length: %u", lls_len));
         dptr += 2;
@@ -950,7 +950,7 @@ ospf_decode_lls(netdissect_options *ndo,
                 ND_PRINT((ndo, " [should be 4]"));
                 lls_len = 4;
             }
-            ND_TCHECK2(*dptr, 4);
+            ND_TCHECK_4(dptr);
             lls_flags = EXTRACT_BE_U_4(dptr);
             ND_PRINT((ndo, "\n\t      Options: 0x%08x [%s]", lls_flags,
                    bittok2str(ospf_lls_eo_options, "?", lls_flags)));
@@ -962,7 +962,7 @@ ospf_decode_lls(netdissect_options *ndo,
                 ND_PRINT((ndo, " [should be 20]"));
                 lls_len = 20;
             }
-            ND_TCHECK2(*dptr, 4);
+            ND_TCHECK_4(dptr);
             ND_PRINT((ndo, "\n\t      Sequence number: 0x%08x", EXTRACT_BE_U_4(dptr)));
             break;
         }

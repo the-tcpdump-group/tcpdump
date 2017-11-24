@@ -175,7 +175,7 @@ lwapp_control_print(netdissect_options *ndo,
 
     if (has_ap_ident) {
         /* check if enough bytes for AP identity */
-        ND_TCHECK2(*tptr, 6);
+        ND_TCHECK_6(tptr);
         lwapp_trans_header = (const struct lwapp_transport_header *)(pptr+6);
     } else {
         lwapp_trans_header = (const struct lwapp_transport_header *)pptr;
@@ -295,7 +295,7 @@ lwapp_data_print(netdissect_options *ndo,
     tptr=pptr;
 
     /* check if enough bytes for AP identity */
-    ND_TCHECK2(*tptr, 6);
+    ND_TCHECK_6(tptr);
     lwapp_trans_header = (const struct lwapp_transport_header *)pptr;
     ND_TCHECK(*lwapp_trans_header);
 

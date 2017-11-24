@@ -323,7 +323,7 @@ mobility_print(netdissect_options *ndo,
 		ND_PRINT((ndo, " status=%u", mh->ip6m_data8[0]));
 		/* Reserved */
 		hlen = IP6M_MINLEN;
-		ND_TCHECK2(bp[hlen], 16);
+		ND_TCHECK_16(bp + hlen);
 		ND_PRINT((ndo, " homeaddr %s", ip6addr_string(ndo, &bp[hlen])));
 		hlen += 16;
 		break;

@@ -85,19 +85,19 @@ of_header_body_print(netdissect_options *ndo, const u_char *cp, const u_char *ep
 	if (ep < cp + OF_HEADER_LEN)
 		goto invalid;
 	/* version */
-	ND_TCHECK2(*cp, 1);
+	ND_TCHECK_1(cp);
 	version = *cp;
 	cp += 1;
 	/* type */
-	ND_TCHECK2(*cp, 1);
+	ND_TCHECK_1(cp);
 	type = *cp;
 	cp += 1;
 	/* length */
-	ND_TCHECK2(*cp, 2);
+	ND_TCHECK_2(cp);
 	length = EXTRACT_BE_U_2(cp);
 	cp += 2;
 	/* xid */
-	ND_TCHECK2(*cp, 4);
+	ND_TCHECK_4(cp);
 	xid = EXTRACT_BE_U_4(cp);
 	cp += 4;
 	/* Message length includes the header length and a message always includes

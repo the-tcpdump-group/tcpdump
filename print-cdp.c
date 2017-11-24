@@ -285,21 +285,21 @@ cdp_print_addr(netdissect_options *ndo,
 		0xaa, 0xaa, 0x03, 0x00, 0x00, 0x00, 0x86, 0xdd
 	};
 
-	ND_TCHECK2(*p, 4);
+	ND_TCHECK_4(p);
 	if (p + 4 > endp)
 		goto trunc;
 	num = EXTRACT_BE_U_4(p);
 	p += 4;
 
 	while (p < endp && num >= 0) {
-		ND_TCHECK2(*p, 2);
+		ND_TCHECK_2(p);
 		if (p + 2 > endp)
 			goto trunc;
 		pt = p[0];		/* type of "protocol" field */
 		pl = p[1];		/* length of "protocol" field */
 		p += 2;
 
-		ND_TCHECK2(p[pl], 2);
+		ND_TCHECK_2(p + pl);
 		if (p + pl + 2 > endp)
 			goto trunc;
 		al = EXTRACT_BE_U_2(p + pl);	/* address length */
@@ -312,7 +312,7 @@ cdp_print_addr(netdissect_options *ndo,
 			 */
 			p += 3;
 
-			ND_TCHECK2(*p, 4);
+			ND_TCHECK_4(p);
 			if (p + 4 > endp)
 				goto trunc;
 			ND_PRINT((ndo, "IPv4 (%u) %s", num, ipaddr_string(ndo, p)));
@@ -346,7 +346,7 @@ cdp_print_addr(netdissect_options *ndo,
 				ND_PRINT((ndo, " %02x", EXTRACT_U_1(p)));
 				p++;
 			}
-			ND_TCHECK2(*p, 2);
+			ND_TCHECK_2(p);
 			if (p + 2 > endp)
 				goto trunc;
 			ND_PRINT((ndo, ", al=%d, a=", al));

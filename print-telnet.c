@@ -56,6 +56,7 @@
 #include <stdio.h>
 
 #include "netdissect.h"
+#include "extract.h"
 
 static const char tstr[] = " [|telnet]";
 
@@ -437,7 +438,7 @@ telnet_parse(netdissect_options *ndo, const u_char *sp, u_int length, int print)
 		/* IAC SB .... IAC SE */
 		p = sp;
 		while (length > (u_int)(p + 1 - sp)) {
-			ND_TCHECK2(*p, 2);
+			ND_TCHECK_2(p);
 			if (p[0] == IAC && p[1] == SE)
 				break;
 			p++;

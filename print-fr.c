@@ -222,7 +222,7 @@ fr_if_print(netdissect_options *ndo,
 	register u_int length = h->len;
 	register u_int caplen = h->caplen;
 
-        ND_TCHECK2(*p, 4); /* minimum frame header length */
+        ND_TCHECK_4(p); /* minimum frame header length */
 
         if ((length = fr_print(ndo, p, length)) == 0)
             return (0);
@@ -378,7 +378,7 @@ mfr_if_print(netdissect_options *ndo,
 	register u_int length = h->len;
 	register u_int caplen = h->caplen;
 
-        ND_TCHECK2(*p, 2); /* minimum frame header length */
+        ND_TCHECK_2(p); /* minimum frame header length */
 
         if ((length = mfr_print(ndo, p, length)) == 0)
             return (0);
@@ -456,7 +456,7 @@ mfr_print(netdissect_options *ndo,
  *    +----+----+----+----+----+----+----+----+
  */
 
-    ND_TCHECK2(*p, 4); /* minimum frame header length */
+    ND_TCHECK_4(p); /* minimum frame header length */
 
     if ((EXTRACT_U_1(p) & MFR_BEC_MASK) == MFR_CTRL_FRAME && EXTRACT_U_1(p + 1) == 0) {
         ND_PRINT((ndo, "FRF.16 Control, Flags [%s], %s, length %u",
@@ -602,7 +602,7 @@ frf15_print(netdissect_options *ndo,
 
     if (length < 2)
         goto trunc;
-    ND_TCHECK2(*p, 2);
+    ND_TCHECK_2(p);
 
     flags = EXTRACT_U_1(p)&MFR_BEC_MASK;
     sequence_num = (EXTRACT_U_1(p)&0x1e)<<7 | EXTRACT_U_1(p + 1);

@@ -2015,7 +2015,7 @@ isis_print_ext_is_reach(netdissect_options *ndo,
     if (subtlv_sum_len) {
         ND_PRINT((ndo, " (%u)", subtlv_sum_len));
         while (subtlv_sum_len>0) {
-            if (!ND_TTEST2(*tptr,2))
+            if (!ND_TTEST_2(tptr))
                 return(0);
             subtlv_type=EXTRACT_U_1(tptr);
             subtlv_len=EXTRACT_U_1(tptr + 1);
@@ -2092,7 +2092,7 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
         }
         processed++;
     } else if (afi == AF_INET6) {
-        if (!ND_TTEST2(*tptr, 2)) /* fetch status & prefix_len byte */
+        if (!ND_TTEST_2(tptr)) /* fetch status & prefix_len byte */
             return (0);
         status_byte=EXTRACT_U_1(tptr);
         bit_length=EXTRACT_U_1(tptr + 1);
@@ -2153,7 +2153,7 @@ isis_print_extd_ip_reach(netdissect_options *ndo,
         ND_PRINT((ndo, " (%u)", sublen));   /* print out subTLV length */
 
         while (sublen>0) {
-            if (!ND_TTEST2(*tptr,2))
+            if (!ND_TTEST_2(tptr))
                 return (0);
             subtlvtype=EXTRACT_U_1(tptr);
             subtlvlen=EXTRACT_U_1(tptr + 1);
@@ -3189,7 +3189,7 @@ osi_print_cksum(netdissect_options *ndo, const uint8_t *pptr,
          */
         if (!checksum
             || checksum_offset < 0
-            || !ND_TTEST2(*(pptr + checksum_offset), 2)
+            || !ND_TTEST_2(pptr + checksum_offset)
             || (u_int)checksum_offset > length
             || !ND_TTEST2(*pptr, length)) {
                 ND_PRINT((ndo, " (unverified)"));

@@ -71,7 +71,7 @@ dtp_print (netdissect_options *ndo, const u_char *pptr, u_int length)
 
     while (tptr < (pptr+length)) {
 
-        ND_TCHECK2(*tptr, 4);
+        ND_TCHECK_4(tptr);
 	type = EXTRACT_BE_U_2(tptr);
         len  = EXTRACT_BE_U_2(tptr + 2);
        /* XXX: should not be but sometimes it is, see the test captures */

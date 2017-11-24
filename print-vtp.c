@@ -180,7 +180,7 @@ vtp_print (netdissect_options *ndo,
 	 *
 	 */
 
-	ND_TCHECK2(*tptr, 8);
+	ND_TCHECK_8(tptr);
 	ND_PRINT((ndo, "\n\t  Config Rev %x, Updater %s",
 	       EXTRACT_BE_U_4(tptr),
 	       ipaddr_string(ndo, tptr+4)));
@@ -286,7 +286,7 @@ vtp_print (netdissect_options *ndo,
                  */
                 if (len < 2)
                     goto trunc;
-                ND_TCHECK2(*tptr, 2);
+                ND_TCHECK_2(tptr);
                 type = *tptr;
                 tlv_len = EXTRACT_U_1(tptr + 1);
 
@@ -376,7 +376,7 @@ vtp_print (netdissect_options *ndo,
 	 *
 	 */
 
-	ND_TCHECK2(*tptr, 4);
+	ND_TCHECK_4(tptr);
 	ND_PRINT((ndo, "\n\tStart value: %u", EXTRACT_BE_U_4(tptr)));
 	break;
 

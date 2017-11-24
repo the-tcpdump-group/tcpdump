@@ -459,7 +459,7 @@ pgm_print(netdissect_options *ndo,
 		    ND_PRINT((ndo, "[Total option length leaves no room for final option]"));
 		    return;
 		}
-		if (!ND_TTEST2(*bp, 2)) {
+		if (!ND_TTEST_2(bp)) {
 		    ND_PRINT((ndo, " [|OPT]"));
 		    return;
 		}
@@ -521,7 +521,7 @@ pgm_print(netdissect_options *ndo,
 			    ND_PRINT((ndo, "[Option length not a multiple of 4]"));
 			    return;
 			}
-			ND_TCHECK2(*bp, 4);
+			ND_TCHECK_4(bp);
 			ND_PRINT((ndo, " %u", EXTRACT_BE_U_4(bp)));
 			bp += 4;
 			opt_len -= 4;

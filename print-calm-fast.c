@@ -24,6 +24,7 @@
 #include <netdissect-stdinc.h>
 
 #include "netdissect.h"
+#include "extract.h"
 #include "addrtoname.h"
 
 /*
@@ -42,7 +43,7 @@ calm_fast_print(netdissect_options *ndo, const u_char *bp, u_int length, const s
 	int srcNwref;
 	int dstNwref;
 
-	ND_TCHECK2(*bp, 2);
+	ND_TCHECK_2(bp);
 	if (length < 2)
 		goto trunc;
 	srcNwref = bp[0];

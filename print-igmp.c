@@ -175,7 +175,7 @@ print_igmpv3_report(netdissect_options *ndo,
 		ND_PRINT((ndo, " [invalid number of groups]"));
 		return;
 	    }
-	    ND_TCHECK2(bp[group+4], 4);
+	    ND_TCHECK_4(bp + (group + 4));
             ND_PRINT((ndo, " [gaddr %s", ipaddr_string(ndo, &bp[group+4])));
 	    ND_PRINT((ndo, " %s", tok2str(igmpv3report2str, " [v3-report-#%d]",
 								EXTRACT_U_1(bp + group))));
@@ -191,7 +191,7 @@ print_igmpv3_report(netdissect_options *ndo,
 		/* Print the sources */
                 ND_PRINT((ndo, " {"));
                 for (j=0; j<nsrcs; j++) {
-		    ND_TCHECK2(bp[group+8+(j<<2)], 4);
+		    ND_TCHECK_4(bp + (group + 8 + (j << 2)));
 		    ND_PRINT((ndo, " %s", ipaddr_string(ndo, &bp[group+8+(j<<2)])));
 		}
                 ND_PRINT((ndo, " }"));
@@ -249,7 +249,7 @@ print_igmpv3_query(netdissect_options *ndo,
 	else if (ndo->ndo_vflag > 1) {
 	    ND_PRINT((ndo, " {"));
 	    for (i=0; i<nsrcs; i++) {
-		ND_TCHECK2(bp[12+(i<<2)], 4);
+		ND_TCHECK_4(bp + (12 + (i << 2)));
 		ND_PRINT((ndo, " %s", ipaddr_string(ndo, &bp[12+(i<<2)])));
 	    }
 	    ND_PRINT((ndo, " }"));
@@ -295,13 +295,13 @@ igmp_print(netdissect_options *ndo,
 	}
         break;
     case 0x12:
-        ND_TCHECK2(bp[4], 4);
+        ND_TCHECK_4(bp + 4);
         ND_PRINT((ndo, "igmp v1 report %s", ipaddr_string(ndo, &bp[4])));
         if (len != 8)
             ND_PRINT((ndo, " [len %d]", len));
         break;
     case 0x16:
-        ND_TCHECK2(bp[4], 4);
+        ND_TCHECK_4(bp + 4);
         ND_PRINT((ndo, "igmp v2 report %s", ipaddr_string(ndo, &bp[4])));
         break;
     case 0x22:
@@ -309,7 +309,7 @@ igmp_print(netdissect_options *ndo,
 	print_igmpv3_report(ndo, bp, len);
         break;
     case 0x17:
-        ND_TCHECK2(bp[4], 4);
+        ND_TCHECK_4(bp + 4);
         ND_PRINT((ndo, "igmp leave %s", ipaddr_string(ndo, &bp[4])));
         break;
     case 0x13:

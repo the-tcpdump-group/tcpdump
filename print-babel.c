@@ -51,7 +51,7 @@ babel_print(netdissect_options *ndo,
 {
     ND_PRINT((ndo, "babel"));
 
-    ND_TCHECK2(*cp, 4);
+    ND_TCHECK_4(cp);
 
     if(cp[0] != 42) {
         ND_PRINT((ndo, " invalid header"));
@@ -350,7 +350,7 @@ babel_print_v2(netdissect_options *ndo,
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0xFF, 0, 0, 0, 0 };
     u_char v6_prefix[16] = {0};
 
-    ND_TCHECK2(*cp, 4);
+    ND_TCHECK_4(cp);
     if (length < 4)
         goto invalid;
     bodylen = EXTRACT_BE_U_2(cp + 2);
@@ -364,14 +364,14 @@ babel_print_v2(netdissect_options *ndo,
 
         message = cp + 4 + i;
 
-        ND_TCHECK2(*message, 1);
+        ND_TCHECK_1(message);
         if((type = message[0]) == MESSAGE_PAD1) {
             ND_PRINT((ndo, ndo->ndo_vflag ? "\n\tPad 1" : " pad1"));
             i += 1;
             continue;
         }
 
-        ND_TCHECK2(*message, 2);
+        ND_TCHECK_2(message);
         ICHECK(i, 2);
         len = message[1];
 

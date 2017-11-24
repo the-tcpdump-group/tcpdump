@@ -655,7 +655,7 @@ print_vendor_attr(netdissect_options *ndo,
 
     if (length < 4)
         goto trunc;
-    ND_TCHECK2(*data, 4);
+    ND_TCHECK_4(data);
     vendor_id = EXTRACT_BE_U_4(data);
     data+=4;
     length-=4;
@@ -665,7 +665,7 @@ print_vendor_attr(netdissect_options *ndo,
            vendor_id));
 
     while (length >= 2) {
-	ND_TCHECK2(*data, 2);
+	ND_TCHECK_2(data);
 
         vendor_type = *(data);
         vendor_length = EXTRACT_U_1(data + 1);
@@ -721,7 +721,7 @@ print_attr_num(netdissect_options *ndo,
        return;
    }
 
-   ND_TCHECK2(data[0],4);
+   ND_TCHECK_4(data);
                           /* This attribute has standard values */
    if (attr_type[attr_code].siz_subtypes)
    {
@@ -842,7 +842,7 @@ print_attr_address(netdissect_options *ndo,
        return;
    }
 
-   ND_TCHECK2(data[0],4);
+   ND_TCHECK_4(data);
 
    switch(attr_code)
    {
@@ -885,7 +885,7 @@ print_attr_address6(netdissect_options *ndo,
        return;
    }
 
-   ND_TCHECK2(data[0], 16);
+   ND_TCHECK_16(data);
 
    ND_PRINT((ndo, "%s", ip6addr_string(ndo, data)));
 
@@ -949,7 +949,7 @@ print_attr_time(netdissect_options *ndo,
        return;
    }
 
-   ND_TCHECK2(data[0],4);
+   ND_TCHECK_4(data);
 
    attr_time = EXTRACT_BE_U_4(data);
    strlcpy(string, ctime(&attr_time), sizeof(string));
@@ -985,11 +985,11 @@ print_attr_strange(netdissect_options *ndo,
                return;
            }
            ND_PRINT((ndo, "User_challenge ("));
-           ND_TCHECK2(data[0],8);
+           ND_TCHECK_8(data);
            len_data = 8;
            PRINT_HEX(len_data, data);
            ND_PRINT((ndo, ") User_resp("));
-           ND_TCHECK2(data[0],8);
+           ND_TCHECK_8(data);
            len_data = 8;
            PRINT_HEX(len_data, data);
            ND_PRINT((ndo, ")"));
@@ -1001,25 +1001,25 @@ print_attr_strange(netdissect_options *ndo,
                ND_PRINT((ndo, "ERROR: length %u != 14", length));
                return;
            }
-           ND_TCHECK2(data[0],1);
+           ND_TCHECK_1(data);
            if (*data)
               ND_PRINT((ndo, "User can change password"));
            else
               ND_PRINT((ndo, "User cannot change password"));
            data++;
-           ND_TCHECK2(data[0],1);
+           ND_TCHECK_1(data);
            ND_PRINT((ndo, ", Min password length: %d", *data));
            data++;
            ND_PRINT((ndo, ", created at: "));
-           ND_TCHECK2(data[0],4);
+           ND_TCHECK_4(data);
            len_data = 4;
            PRINT_HEX(len_data, data);
            ND_PRINT((ndo, ", expires in: "));
-           ND_TCHECK2(data[0],4);
+           ND_TCHECK_4(data);
            len_data = 4;
            PRINT_HEX(len_data, data);
            ND_PRINT((ndo, ", Current Time: "));
-           ND_TCHECK2(data[0],4);
+           ND_TCHECK_4(data);
            len_data = 4;
            PRINT_HEX(len_data, data);
         break;
@@ -1030,7 +1030,7 @@ print_attr_strange(netdissect_options *ndo,
                ND_PRINT((ndo, "ERROR: length %u != 8", length));
                return;
            }
-           ND_TCHECK2(data[0],8);
+           ND_TCHECK_8(data);
            len_data = 8;
            PRINT_HEX(len_data, data);
         break;
@@ -1041,7 +1041,7 @@ print_attr_strange(netdissect_options *ndo,
                ND_PRINT((ndo, "Error: length %u != 4", length));
                return;
            }
-           ND_TCHECK2(data[0],4);
+           ND_TCHECK_4(data);
 
            error_cause_value = EXTRACT_BE_U_4(data);
            ND_PRINT((ndo, "Error cause %u: %s", error_cause_value, tok2str(errorcausetype, "Error-Cause %u not known", error_cause_value)));

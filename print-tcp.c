@@ -733,7 +733,7 @@ tcp_print(netdissect_options *ndo,
                 ldp_print(ndo, bp, length);
         }
         else if ((IS_SRC_OR_DST_PORT(NFS_PORT)) &&
-                 length >= 4 && ND_TTEST2(*bp, 4)) {
+                 length >= 4 && ND_TTEST_4(bp)) {
                 /*
                  * If data present, header length valid, and NFS port used,
                  * assume NFS.

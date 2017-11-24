@@ -500,7 +500,7 @@ rsvp_intserv_print(netdissect_options *ndo,
     if (obj_tlen < 4)
         return 0;
     parameter_id = *(tptr);
-    ND_TCHECK2(*(tptr + 2), 2);
+    ND_TCHECK_2(tptr + 2);
     parameter_length = EXTRACT_BE_U_2(tptr + 2)<<2; /* convert wordcount to bytecount */
 
     ND_PRINT((ndo, "\n\t      Parameter ID: %s (%u), length: %u, Flags: [0x%02x]",
@@ -522,7 +522,7 @@ rsvp_intserv_print(netdissect_options *ndo,
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         */
         if (parameter_length == 4) {
-	    ND_TCHECK2(*(tptr + 4), 4);
+	    ND_TCHECK_4(tptr + 4);
             ND_PRINT((ndo, "\n\t\tIS hop count: %u", EXTRACT_BE_U_4(tptr + 4)));
         }
         break;
@@ -536,7 +536,7 @@ rsvp_intserv_print(netdissect_options *ndo,
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         */
         if (parameter_length == 4) {
-	    ND_TCHECK2(*(tptr + 4), 4);
+	    ND_TCHECK_4(tptr + 4);
             bw.i = EXTRACT_BE_U_4(tptr + 4);
             ND_PRINT((ndo, "\n\t\tPath b/w estimate: %.10g Mbps", bw.f / 125000));
         }
@@ -551,7 +551,7 @@ rsvp_intserv_print(netdissect_options *ndo,
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         */
         if (parameter_length == 4) {
-	    ND_TCHECK2(*(tptr + 4), 4);
+	    ND_TCHECK_4(tptr + 4);
             ND_PRINT((ndo, "\n\t\tMinimum path latency: "));
             if (EXTRACT_BE_U_4(tptr + 4) == 0xffffffff)
                 ND_PRINT((ndo, "don't care"));
@@ -570,7 +570,7 @@ rsvp_intserv_print(netdissect_options *ndo,
         * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         */
         if (parameter_length == 4) {
-	    ND_TCHECK2(*(tptr + 4), 4);
+	    ND_TCHECK_4(tptr + 4);
             ND_PRINT((ndo, "\n\t\tComposed MTU: %u bytes", EXTRACT_BE_U_4(tptr + 4)));
         }
         break;
@@ -616,7 +616,7 @@ rsvp_intserv_print(netdissect_options *ndo,
         */
 
         if (parameter_length == 8) {
-	    ND_TCHECK2(*(tptr + 4), 8);
+	    ND_TCHECK_8(tptr + 4);
             bw.i = EXTRACT_BE_U_4(tptr + 4);
             ND_PRINT((ndo, "\n\t\tRate: %.10g Mbps", bw.f / 125000));
             ND_PRINT((ndo, "\n\t\tSlack Term: %u", EXTRACT_BE_U_4(tptr + 8)));
@@ -628,7 +628,7 @@ rsvp_intserv_print(netdissect_options *ndo,
     case 135:
     case 136:
         if (parameter_length == 4) {
-	    ND_TCHECK2(*(tptr + 4), 4);
+	    ND_TCHECK_4(tptr + 4);
             ND_PRINT((ndo, "\n\t\tValue: %u", EXTRACT_BE_U_4(tptr + 4)));
         }
         break;
@@ -1068,7 +1068,7 @@ rsvp_obj_print(netdissect_options *ndo,
                 while(obj_tlen >= 4 ) {
 		    u_char length;
 
-		    ND_TCHECK2(*obj_tptr, 4);
+		    ND_TCHECK_4(obj_tptr);
 		    length = EXTRACT_U_1(obj_tptr + 1);
                     ND_PRINT((ndo, "%s  Subobject Type: %s, length %u",
                            indent,
@@ -1090,7 +1090,7 @@ rsvp_obj_print(netdissect_options *ndo,
 				ND_PRINT((ndo, " ERROR: length != 8"));
 				goto invalid;
 			}
-			ND_TCHECK2(*obj_tptr, 8);
+			ND_TCHECK_8(obj_tptr);
 			prefix_length = EXTRACT_U_1(obj_tptr + 6);
 			if (prefix_length != 32) {
 				ND_PRINT((ndo, " ERROR: Prefix length %u != 32",
@@ -1110,7 +1110,7 @@ rsvp_obj_print(netdissect_options *ndo,
 				ND_PRINT((ndo, " ERROR: length != 8"));
 				goto invalid;
 			}
-			ND_TCHECK2(*obj_tptr, 8);
+			ND_TCHECK_8(obj_tptr);
                         ND_PRINT((ndo, ", Flags: [%s] (%#x), Class-Type: %s (%u), %u",
                                bittok2str(rsvp_obj_rro_label_flag_values,
                                    "none",

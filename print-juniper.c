@@ -760,7 +760,7 @@ juniper_pppoe_atm_if_print(netdissect_options *ndo,
 
         p+=l2info.header_len;
 
-        ND_TCHECK2(p[0], 2);
+        ND_TCHECK_2(p);
         extracted_ethertype = EXTRACT_BE_U_2(p);
         /* this DLT contains nothing but raw PPPoE frames,
          * prepended with a type field*/
@@ -965,7 +965,7 @@ juniper_atm1_if_print(netdissect_options *ndo,
             return l2info.header_len;
         }
 
-        ND_TCHECK2(p[0], 3);
+        ND_TCHECK_3(p);
         if (EXTRACT_BE_U_3(p) == 0xfefe03 || /* NLPID encaps ? */
             EXTRACT_BE_U_3(p) == 0xaaaa03) { /* SNAP encaps ? */
 
@@ -1019,7 +1019,7 @@ juniper_atm2_if_print(netdissect_options *ndo,
             return l2info.header_len;
         }
 
-        ND_TCHECK2(p[0], 3);
+        ND_TCHECK_3(p);
         if (EXTRACT_BE_U_3(p) == 0xfefe03 || /* NLPID encaps ? */
             EXTRACT_BE_U_3(p) == 0xaaaa03) { /* SNAP encaps ? */
 
@@ -1194,7 +1194,7 @@ juniper_parse_header(netdissect_options *ndo,
 
     l2info->length = h->len;
     l2info->caplen = h->caplen;
-    ND_TCHECK2(p[0], 4);
+    ND_TCHECK_4(p);
     l2info->flags = p[3];
     l2info->direction = p[3]&JUNIPER_BPF_PKT_IN;
 
@@ -1219,7 +1219,7 @@ juniper_parse_header(netdissect_options *ndo,
         tptr = p+jnx_header_len;
 
         /* ok to read extension length ? */
-        ND_TCHECK2(tptr[0], 2);
+        ND_TCHECK_2(tptr);
         jnx_ext_len = EXTRACT_BE_U_2(tptr);
         jnx_header_len += 2;
         tptr +=2;
@@ -1302,7 +1302,7 @@ juniper_parse_header(netdissect_options *ndo,
          * perform the v4/v6 heuristics
          * to figure out what it is
          */
-        ND_TCHECK2(p[jnx_header_len + 4], 1);
+        ND_TCHECK_1(p + (jnx_header_len + 4));
         if (ip_heuristic_guess(ndo, p + jnx_header_len + 4,
                                l2info->length - (jnx_header_len + 4)) == 0)
             ND_PRINT((ndo, "no IP-hdr found!"));
@@ -1399,7 +1399,7 @@ juniper_parse_header(netdissect_options *ndo,
     case DLT_JUNIPER_MLFR:
         switch (l2info->cookie_type) {
         case LS_COOKIE_ID:
-            ND_TCHECK2(p[0], 2);
+            ND_TCHECK_2(p);
             l2info->bundle = l2info->cookie[1];
             l2info->proto = EXTRACT_BE_U_2(p);
             l2info->header_len += 2;
@@ -1423,7 +1423,7 @@ juniper_parse_header(netdissect_options *ndo,
     case DLT_JUNIPER_MFR:
         switch (l2info->cookie_type) {
         case LS_COOKIE_ID:
-            ND_TCHECK2(p[0], 2);
+            ND_TCHECK_2(p);
             l2info->bundle = l2info->cookie[1];
             l2info->proto = EXTRACT_BE_U_2(p);
             l2info->header_len += 2;
@@ -1442,7 +1442,7 @@ juniper_parse_header(netdissect_options *ndo,
 #endif
 #ifdef DLT_JUNIPER_ATM2
     case DLT_JUNIPER_ATM2:
-        ND_TCHECK2(p[0], 4);
+        ND_TCHECK_4(p);
         /* ATM cell relay control word present ? */
         if (l2info->cookie[7] & ATM2_PKT_TYPE_MASK) {
             control_word = EXTRACT_BE_U_4(p);

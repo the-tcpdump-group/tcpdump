@@ -856,11 +856,11 @@ ospf6_print_lls(netdissect_options *ndo,
 	if (len < OSPF_LLS_HDRLEN)
 		goto trunc;
 	/* Checksum */
-	ND_TCHECK2(*cp, 2);
+	ND_TCHECK_2(cp);
 	ND_PRINT((ndo, "\n\tLLS Checksum 0x%04x", EXTRACT_BE_U_2(cp)));
 	cp += 2;
 	/* LLS Data Length */
-	ND_TCHECK2(*cp, 2);
+	ND_TCHECK_2(cp);
 	llsdatalen = EXTRACT_BE_U_2(cp);
 	ND_PRINT((ndo, ", Data Length %u", llsdatalen));
 	if (llsdatalen < OSPF_LLS_HDRLEN || llsdatalen > len)
@@ -887,29 +887,29 @@ ospf6_decode_at(netdissect_options *ndo,
 	if (len < OSPF6_AT_HDRLEN)
 		goto trunc;
 	/* Authentication Type */
-	ND_TCHECK2(*cp, 2);
+	ND_TCHECK_2(cp);
 	ND_PRINT((ndo, "\n\tAuthentication Type %s", tok2str(ospf6_auth_type_str, "unknown (0x%04x)", EXTRACT_BE_U_2(cp))));
 	cp += 2;
 	/* Auth Data Len */
-	ND_TCHECK2(*cp, 2);
+	ND_TCHECK_2(cp);
 	authdatalen = EXTRACT_BE_U_2(cp);
 	ND_PRINT((ndo, ", Length %u", authdatalen));
 	if (authdatalen < OSPF6_AT_HDRLEN || authdatalen > len)
 		goto trunc;
 	cp += 2;
 	/* Reserved */
-	ND_TCHECK2(*cp, 2);
+	ND_TCHECK_2(cp);
 	cp += 2;
 	/* Security Association ID */
-	ND_TCHECK2(*cp, 2);
+	ND_TCHECK_2(cp);
 	ND_PRINT((ndo, ", SAID %u", EXTRACT_BE_U_2(cp)));
 	cp += 2;
 	/* Cryptographic Sequence Number (High-Order 32 Bits) */
-	ND_TCHECK2(*cp, 4);
+	ND_TCHECK_4(cp);
 	ND_PRINT((ndo, ", CSN 0x%08x", EXTRACT_BE_U_4(cp)));
 	cp += 4;
 	/* Cryptographic Sequence Number (Low-Order 32 Bits) */
-	ND_TCHECK2(*cp, 4);
+	ND_TCHECK_4(cp);
 	ND_PRINT((ndo, ":%08x", EXTRACT_BE_U_4(cp)));
 	cp += 4;
 	/* Authentication Data */

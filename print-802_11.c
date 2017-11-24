@@ -1019,7 +1019,7 @@ parse_elements(netdissect_options *ndo,
 
 	while (length != 0) {
 		/* Make sure we at least have the element ID and length. */
-		if (!ND_TTEST2(*(p + offset), 2))
+		if (!ND_TTEST_2(p + offset))
 			return 0;
 		if (length < 2)
 			return 0;
@@ -1447,7 +1447,7 @@ handle_auth(netdissect_options *ndo,
 
 	memset(&pbody, 0, sizeof(pbody));
 
-	if (!ND_TTEST2(*p, 6))
+	if (!ND_TTEST_6(p))
 		return 0;
 	if (length < 6)
 		return 0;
@@ -1580,7 +1580,7 @@ static int
 handle_action(netdissect_options *ndo,
               const uint8_t *src, const u_char *p, u_int length)
 {
-	if (!ND_TTEST2(*p, 2))
+	if (!ND_TTEST_2(p))
 		return 0;
 	if (length < 2)
 		return 0;

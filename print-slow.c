@@ -620,7 +620,7 @@ slow_oam_print(netdissect_options *ndo,
         /* Sequence number */
         if (tlen < 2)
             goto tooshort;
-        ND_TCHECK2(*tptr, 2);
+        ND_TCHECK_2(tptr);
         ND_PRINT((ndo, "\n\t  Sequence Number %u", EXTRACT_BE_U_2(tptr)));
         tlen -= 2;
         tptr += 2;

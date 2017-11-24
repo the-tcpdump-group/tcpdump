@@ -338,7 +338,7 @@ ns_qprint(netdissect_options *ndo,
 
 	cp = ns_nskip(ndo, cp);
 
-	if (cp == NULL || !ND_TTEST2(*cp, 4))
+	if (cp == NULL || !ND_TTEST_4(cp))
 		return(NULL);
 
 	/* print the qtype */
@@ -467,7 +467,7 @@ ns_rprint(netdissect_options *ndo,
 		break;
 	case T_MX:
 		ND_PRINT((ndo, " "));
-		if (!ND_TTEST2(*cp, 2))
+		if (!ND_TTEST_2(cp))
 			return(NULL);
 		if (ns_nprint(ndo, cp + 2, bp) == NULL)
 			return(NULL);
@@ -486,7 +486,7 @@ ns_rprint(netdissect_options *ndo,
 
 	case T_SRV:
 		ND_PRINT((ndo, " "));
-		if (!ND_TTEST2(*cp, 6))
+		if (!ND_TTEST_6(cp))
 			return(NULL);
 		if (ns_nprint(ndo, cp + 6, bp) == NULL)
 			return(NULL);

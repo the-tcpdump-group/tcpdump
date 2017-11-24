@@ -538,7 +538,7 @@ oam_print (netdissect_options *ndo,
     }
 
     /* crc10 checksum verification */
-    ND_TCHECK2(*(p + OAM_CELLTYPE_FUNCTYPE_LEN + OAM_FUNCTION_SPECIFIC_LEN), 2);
+    ND_TCHECK_2(p + OAM_CELLTYPE_FUNCTYPE_LEN + OAM_FUNCTION_SPECIFIC_LEN);
     cksum = EXTRACT_BE_U_2(p + OAM_CELLTYPE_FUNCTYPE_LEN + OAM_FUNCTION_SPECIFIC_LEN)
         & OAM_CRC10_MASK;
     cksum_shouldbe = verify_crc10_cksum(0, p, OAM_PAYLOAD_LEN);

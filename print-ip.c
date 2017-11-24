@@ -73,7 +73,7 @@ ip_printroute(netdissect_options *ndo,
 		ND_PRINT((ndo, " [bad ptr %u]", cp[2]));
 
 	for (len = 3; len < length; len += 4) {
-		ND_TCHECK2(cp[len], 4);
+		ND_TCHECK_4(cp + len);
 		ND_PRINT((ndo, " %s", ipaddr_string(ndo, &cp[len])));
 		if (ptr > len)
 			ND_PRINT((ndo, ","));

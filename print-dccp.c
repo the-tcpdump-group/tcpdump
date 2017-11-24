@@ -245,10 +245,10 @@ static void dccp_print_ack_no(netdissect_options *ndo, const u_char *bp)
 	uint64_t ackno;
 
 	if (DCCPH_X(dh) != 0) {
-		ND_TCHECK2(*ackp, 8);
+		ND_TCHECK_8(ackp);
 		ackno = EXTRACT_BE_U_6(ackp + 2);
 	} else {
-		ND_TCHECK2(*ackp, 4);
+		ND_TCHECK_4(ackp);
 		ackno = EXTRACT_BE_U_3(ackp + 1);
 	}
 

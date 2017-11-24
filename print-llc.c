@@ -425,7 +425,7 @@ snap_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 	register u_short et;
 	register int ret;
 
-	ND_TCHECK2(*p, 5);
+	ND_TCHECK_5(p);
 	if (caplen < 5 || length < 5)
 		goto trunc;
 	orgcode = EXTRACT_BE_U_3(p);

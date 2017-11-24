@@ -948,7 +948,7 @@ fs_print(netdissect_options *ndo,
 		{
 			char a[AFSOPAQUEMAX+1];
 			FIDOUT();
-			ND_TCHECK2(bp[0], 4);
+			ND_TCHECK_4(bp);
 			i = EXTRACT_BE_U_4(bp);
 			bp += sizeof(uint32_t);
 			ND_TCHECK2(bp[0], i);

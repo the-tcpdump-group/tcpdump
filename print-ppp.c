@@ -426,7 +426,7 @@ handle_ctrl_proto(netdissect_options *ndo,
 
 	if (length < 4) /* FIXME weak boundary checking */
 		goto trunc;
-	ND_TCHECK2(*tptr, 2);
+	ND_TCHECK_2(tptr);
 
 	code = EXTRACT_U_1(tptr);
 	tptr++;
@@ -597,7 +597,7 @@ print_lcp_config_options(netdissect_options *ndo,
 
 	if (length < 2)
 		return 0;
-	ND_TCHECK2(*p, 2);
+	ND_TCHECK_2(p);
 	opt = EXTRACT_U_1(p);
 	len = EXTRACT_U_1(p + 1);
 	if (length < len)
@@ -743,7 +743,7 @@ print_lcp_config_options(netdissect_options *ndo,
 				ND_PRINT((ndo, " (length bogus, should be = 7)"));
 				return 0;
 			}
-			ND_TCHECK2(*(p + 3), 4);
+			ND_TCHECK_4(p + 3);
 			ND_PRINT((ndo, ": IPv4 %s", ipaddr_string(ndo, p + 3)));
 			break;
 		case MEDCLASS_MAC:
@@ -751,7 +751,7 @@ print_lcp_config_options(netdissect_options *ndo,
 				ND_PRINT((ndo, " (length bogus, should be = 9)"));
 				return 0;
 			}
-			ND_TCHECK2(*(p + 3), 6);
+			ND_TCHECK_6(p + 3);
 			ND_PRINT((ndo, ": MAC %s", etheraddr_string(ndo, p + 3)));
 			break;
 		case MEDCLASS_MNB:
@@ -1048,7 +1048,7 @@ print_ipcp_config_options(netdissect_options *ndo,
 
 	if (length < 2)
 		return 0;
-	ND_TCHECK2(*p, 2);
+	ND_TCHECK_2(p);
 	opt = EXTRACT_U_1(p);
 	len = EXTRACT_U_1(p + 1);
 	if (length < len)
@@ -1072,7 +1072,7 @@ print_ipcp_config_options(netdissect_options *ndo,
 			ND_PRINT((ndo, " (length bogus, should be = 10)"));
 			return len;
 		}
-		ND_TCHECK2(*(p + 6), 4);
+		ND_TCHECK_4(p + 6);
 		ND_PRINT((ndo, ": src %s, dst %s",
 		       ipaddr_string(ndo, p + 2),
 		       ipaddr_string(ndo, p + 6)));
@@ -1117,7 +1117,7 @@ print_ipcp_config_options(netdissect_options *ndo,
                                 ND_PRINT((ndo, "\n\t      Suboptions, length %u", ipcomp_subopttotallen));
 
                                 while (ipcomp_subopttotallen >= 2) {
-                                        ND_TCHECK2(*p, 2);
+                                        ND_TCHECK_2(p);
                                         ipcomp_subopt = EXTRACT_U_1(p);
                                         ipcomp_suboptlen = EXTRACT_U_1(p + 1);
 
@@ -1154,7 +1154,7 @@ print_ipcp_config_options(netdissect_options *ndo,
 			ND_PRINT((ndo, " (length bogus, should be = 6)"));
 			return 0;
 		}
-		ND_TCHECK2(*(p + 2), 4);
+		ND_TCHECK_4(p + 2);
 		ND_PRINT((ndo, ": %s", ipaddr_string(ndo, p + 2)));
 		break;
 	default:
@@ -1184,7 +1184,7 @@ print_ip6cp_config_options(netdissect_options *ndo,
 
 	if (length < 2)
 		return 0;
-	ND_TCHECK2(*p, 2);
+	ND_TCHECK_2(p);
 	opt = EXTRACT_U_1(p);
 	len = EXTRACT_U_1(p + 1);
 	if (length < len)
@@ -1208,7 +1208,7 @@ print_ip6cp_config_options(netdissect_options *ndo,
 			ND_PRINT((ndo, " (length bogus, should be = 10)"));
 			return len;
 		}
-		ND_TCHECK2(*(p + 2), 8);
+		ND_TCHECK_8(p + 2);
 		ND_PRINT((ndo, ": %04x:%04x:%04x:%04x",
 		       EXTRACT_BE_U_2(p + 2),
 		       EXTRACT_BE_U_2(p + 4),
@@ -1244,7 +1244,7 @@ print_ccp_config_options(netdissect_options *ndo,
 
 	if (length < 2)
 		return 0;
-	ND_TCHECK2(*p, 2);
+	ND_TCHECK_2(p);
 	opt = EXTRACT_U_1(p);
 	len = EXTRACT_U_1(p + 1);
 	if (length < len)
@@ -1343,7 +1343,7 @@ print_bacp_config_options(netdissect_options *ndo,
 
 	if (length < 2)
 		return 0;
-	ND_TCHECK2(*p, 2);
+	ND_TCHECK_2(p);
 	opt = EXTRACT_U_1(p);
 	len = EXTRACT_U_1(p + 1);
 	if (length < len)
