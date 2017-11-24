@@ -902,7 +902,7 @@ clnp_print(netdissect_options *ndo,
                 ND_PRINT((ndo, ", bad opts/li"));
                 return (0);
             }
-            ND_TCHECK2(*pptr, 2);
+            ND_TCHECK_2(pptr);
             op = EXTRACT_U_1(pptr);
             opli = EXTRACT_U_1(pptr + 1);
             pptr += 2;
@@ -1313,7 +1313,7 @@ esis_print(netdissect_options *ndo,
                 ND_PRINT((ndo, ", bad opts/li"));
                 return;
             }
-            ND_TCHECK2(*pptr, 2);
+            ND_TCHECK_2(pptr);
             op = EXTRACT_U_1(pptr);
             opli = EXTRACT_U_1(pptr + 1);
             pptr += 2;
@@ -1334,7 +1334,7 @@ esis_print(netdissect_options *ndo,
 
             case ESIS_OPTION_ES_CONF_TIME:
                 if (opli == 2) {
-                    ND_TCHECK2(*pptr, 2);
+                    ND_TCHECK_2(pptr);
                     ND_PRINT((ndo, "%us", EXTRACT_BE_U_2(tptr)));
                 } else
                     ND_PRINT((ndo, "(bad length)"));
@@ -1411,7 +1411,7 @@ isis_print_mt_port_cap_subtlv(netdissect_options *ndo,
 
   while (len > 2)
   {
-    ND_TCHECK2(*tptr, 2);
+    ND_TCHECK_2(tptr);
     stlv_type = EXTRACT_U_1(tptr);
     stlv_len  = EXTRACT_U_1(tptr + 1);
 
@@ -1532,7 +1532,7 @@ isis_print_mt_capability_subtlv(netdissect_options *ndo,
 
   while (len > 2)
   {
-    ND_TCHECK2(*tptr, 2);
+    ND_TCHECK_2(tptr);
     stlv_type = EXTRACT_U_1(tptr);
     stlv_len  = EXTRACT_U_1(tptr + 1);
     tptr = tptr + 2;
@@ -2561,7 +2561,7 @@ isis_print(netdissect_options *ndo,
      */
 
     while (packet_len > 0) {
-	ND_TCHECK2(*pptr, 2);
+	ND_TCHECK_2(pptr);
 	if (packet_len < 2)
 	    goto trunc;
 	tlv_type = EXTRACT_U_1(pptr);

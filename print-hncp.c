@@ -422,7 +422,7 @@ hncp_print_rec(netdissect_options *ndo,
                 ND_PRINT((ndo, "\t"));
         }
 
-        ND_TCHECK2(*tlv, 4);
+        ND_TCHECK_4(tlv);
         if (i + 4 > length)
             goto invalid;
 

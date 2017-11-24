@@ -182,7 +182,7 @@ egpnrprint(netdissect_options *ndo,
 		length -= 4 - netlen;
 		if (length < 1)
 			goto trunc;
-		ND_TCHECK2(cp[0], 1);
+		ND_TCHECK_1(cp);
 		distances = EXTRACT_U_1(cp);
 		cp++;
 		length--;
@@ -195,7 +195,7 @@ egpnrprint(netdissect_options *ndo,
 		while (distances != 0) {
 			if (length < 2)
 				goto trunc;
-			ND_TCHECK2(cp[0], 2);
+			ND_TCHECK_2(cp);
 			ND_PRINT((ndo, "%sd%d:", comma, EXTRACT_U_1(cp)));
 			cp++;
 			comma = ", ";
@@ -206,21 +206,21 @@ egpnrprint(netdissect_options *ndo,
 				/* Pickup network number */
 				if (length < 1)
 					goto trunc;
-				ND_TCHECK2(cp[0], 1);
+				ND_TCHECK_1(cp);
 				addr = ((uint32_t) EXTRACT_U_1(cp)) << 24;
 				cp++;
 				length--;
 				if (IN_CLASSB(addr)) {
 					if (length < 1)
 						goto trunc;
-					ND_TCHECK2(cp[0], 1);
+					ND_TCHECK_1(cp);
 					addr |= ((uint32_t) EXTRACT_U_1(cp)) << 16;
 					cp++;
 					length--;
 				} else if (!IN_CLASSA(addr)) {
 					if (length < 2)
 						goto trunc;
-					ND_TCHECK2(cp[0], 2);
+					ND_TCHECK_2(cp);
 					addr |= ((uint32_t) EXTRACT_U_1(cp)) << 16;
 					cp++;
 					addr |= ((uint32_t) EXTRACT_U_1(cp)) << 8;

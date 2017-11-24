@@ -529,7 +529,7 @@ cfm_print(netdissect_options *ndo,
         cfm_tlv_header = (const struct cfm_tlv_header_t *)tptr;
 
         /* Enough to read the tlv type ? */
-        ND_TCHECK2(*tptr, 1);
+        ND_TCHECK_1(tptr);
         cfm_tlv_type=cfm_tlv_header->type;
 
         ND_PRINT((ndo, "\n\t%s TLV (0x%02x)",

@@ -187,7 +187,7 @@ ospf_print_grace_lsa(netdissect_options *ndo,
 
 
     while (ls_length > 0) {
-        ND_TCHECK2(*tptr, 4);
+        ND_TCHECK_4(tptr);
         if (ls_length < 4) {
             ND_PRINT((ndo, "\n\t    Remaining LS length %u < 4", ls_length));
             return -1;
@@ -274,7 +274,7 @@ ospf_print_te_lsa(netdissect_options *ndo,
     } bw;
 
     while (ls_length != 0) {
-        ND_TCHECK2(*tptr, 4);
+        ND_TCHECK_4(tptr);
         if (ls_length < 4) {
             ND_PRINT((ndo, "\n\t    Remaining LS length %u < 4", ls_length));
             return -1;
@@ -308,7 +308,7 @@ ospf_print_te_lsa(netdissect_options *ndo,
                            tlv_length));
                     return -1;
                 }
-                ND_TCHECK2(*tptr, 4);
+                ND_TCHECK_4(tptr);
                 subtlv_type = EXTRACT_BE_U_2(tptr);
                 subtlv_length = EXTRACT_BE_U_2(tptr + 2);
                 tptr+=4;
@@ -483,7 +483,7 @@ ospf_print_te_lsa(netdissect_options *ndo,
                 ND_PRINT((ndo, "\n\t    TLV length %u < 4", tlv_length));
                 return -1;
             }
-            ND_TCHECK2(*tptr, 4);
+            ND_TCHECK_4(tptr);
             ND_PRINT((ndo, ", %s", ipaddr_string(ndo, tptr)));
             break;
 
@@ -803,7 +803,7 @@ ospf_print_lsa(netdissect_options *ndo,
 		tptr = (const uint8_t *)(&lsap->lsa_un.un_ri_tlv.type);
 
 		while (ls_length != 0) {
-                    ND_TCHECK2(*tptr, 4);
+                    ND_TCHECK_4(tptr);
 		    if (ls_length < 4) {
                         ND_PRINT((ndo, "\n\t    Remaining LS length %u < 4", ls_length));
                         return(ls_end);
