@@ -179,9 +179,6 @@ static const struct tok cpcodes[] = {
 #define LCPOPT_SDLOS	29
 #define LCPOPT_PPPMUX	30
 
-#define LCPOPT_MIN LCPOPT_VEXT
-#define LCPOPT_MAX LCPOPT_PPPMUX
-
 static const char *lcpconfopts[] = {
 	"Vend-Ext",		/* (0) */
 	"MRU",			/* (1) */
@@ -215,6 +212,8 @@ static const char *lcpconfopts[] = {
 	"SDL-over-SONET/SDH",	/* (29) */
 	"PPP-Muxing",		/* (30) */
 };
+
+#define NUM_LCPOPTS	(sizeof lcpconfopts / sizeof lcpconfopts[0])
 
 /* ECP - to be supported */
 
@@ -604,14 +603,14 @@ print_lcp_config_options(netdissect_options *ndo,
 	if (length < len)
 		return 0;
 	if (len < 2) {
-		if ((opt >= LCPOPT_MIN) && (opt <= LCPOPT_MAX))
+		if (opt < NUM_LCPOPTS)
 			ND_PRINT((ndo, "\n\t  %s Option (0x%02x), length %u (length bogus, should be >= 2)",
 			          lcpconfopts[opt], opt, len));
 		else
 			ND_PRINT((ndo, "\n\tunknown LCP option 0x%02x", opt));
 		return 0;
 	}
-	if ((opt >= LCPOPT_MIN) && (opt <= LCPOPT_MAX))
+	if (opt < NUM_LCPOPTS)
 		ND_PRINT((ndo, "\n\t  %s Option (0x%02x), length %u", lcpconfopts[opt], opt, len));
 	else {
 		ND_PRINT((ndo, "\n\tunknown LCP option 0x%02x", opt));
