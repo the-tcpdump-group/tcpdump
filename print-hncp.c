@@ -207,7 +207,7 @@ print_prefix(netdissect_options *ndo, const u_char *prefix, u_int max_length)
     char buf[sizeof("xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx::/128")];
 
     if (prefix[0] >= 96 && max_length >= IPV4_MAPPED_HEADING_LEN + 1 &&
-        is_ipv4_mapped_address(&prefix[1])) {
+        is_ipv4_mapped_address(prefix + 1)) {
         struct in_addr addr;
         u_int plen;
 

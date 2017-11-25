@@ -74,7 +74,7 @@ ip_printroute(netdissect_options *ndo,
 
 	for (len = 3; len < length; len += 4) {
 		ND_TCHECK_4(cp + len);
-		ND_PRINT((ndo, " %s", ipaddr_string(ndo, &cp[len])));
+		ND_PRINT((ndo, " %s", ipaddr_string(ndo, cp + len)));
 		if (ptr > len)
 			ND_PRINT((ndo, ","));
 	}
@@ -221,7 +221,7 @@ ip_printts(netdissect_options *ndo,
 			type = " ^ ";
 		ND_TCHECK2(cp[len], hoplen);
 		ND_PRINT((ndo, "%s%d@%s", type, EXTRACT_BE_U_4(cp + len + hoplen - 4),
-			  hoplen!=8 ? "" : ipaddr_string(ndo, &cp[len])));
+			  hoplen!=8 ? "" : ipaddr_string(ndo, cp + len)));
 		type = " ";
 	}
 

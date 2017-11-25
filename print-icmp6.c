@@ -1430,7 +1430,7 @@ mldv2_report_print(netdissect_options *ndo, const u_char *bp, u_int len)
                     return;
 	    }
             ND_TCHECK2(bp[group + 4], sizeof(struct in6_addr));
-            ND_PRINT((ndo," [gaddr %s", ip6addr_string(ndo, &bp[group + 4])));
+            ND_PRINT((ndo," [gaddr %s", ip6addr_string(ndo, bp + group + 4)));
 	    ND_PRINT((ndo," %s", tok2str(mldv2report2str, " [v2-report-#%d]",
                                          EXTRACT_U_1(bp + group))));
             nsrcs = (bp[group + 2] << 8) + bp[group + 3];
@@ -1447,7 +1447,7 @@ mldv2_report_print(netdissect_options *ndo, const u_char *bp, u_int len)
                 for (j = 0; j < nsrcs; j++) {
                     ND_TCHECK2(bp[group + 20 + j * sizeof(struct in6_addr)],
                             sizeof(struct in6_addr));
-		    ND_PRINT((ndo," %s", ip6addr_string(ndo, &bp[group + 20 + j * sizeof(struct in6_addr)])));
+		    ND_PRINT((ndo," %s", ip6addr_string(ndo, bp + group + 20 + (j * sizeof(struct in6_addr)))));
 		}
                 ND_PRINT((ndo," }"));
             }
@@ -1487,7 +1487,7 @@ mldv2_query_print(netdissect_options *ndo, const u_char *bp, u_int len)
             ND_PRINT((ndo," [max resp delay=%d]", mrt));
     }
     ND_TCHECK2(bp[8], sizeof(struct in6_addr));
-    ND_PRINT((ndo," [gaddr %s", ip6addr_string(ndo, &bp[8])));
+    ND_PRINT((ndo," [gaddr %s", ip6addr_string(ndo, bp + 8)));
 
     if (ndo->ndo_vflag) {
         ND_TCHECK(bp[25]);
@@ -1515,7 +1515,7 @@ mldv2_query_print(netdissect_options *ndo, const u_char *bp, u_int len)
 	    for (i = 0; i < nsrcs; i++) {
 		ND_TCHECK2(bp[28 + i * sizeof(struct in6_addr)],
                         sizeof(struct in6_addr));
-		ND_PRINT((ndo," %s", ip6addr_string(ndo, &bp[28 + i * sizeof(struct in6_addr)])));
+		ND_PRINT((ndo," %s", ip6addr_string(ndo, bp + 28 + (i * sizeof(struct in6_addr)))));
 	    }
 	    ND_PRINT((ndo," }"));
 	} else

@@ -370,7 +370,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			ND_PRINT((ndo, " %s", ip6addr_string(ndo, &tp[0])));
+			ND_PRINT((ndo, " %s", ip6addr_string(ndo, tp)));
 			ND_PRINT((ndo, " pltime:%u vltime:%u",
 			    EXTRACT_BE_U_4(tp + 16),
 			    EXTRACT_BE_U_4(tp + 20)));
@@ -560,7 +560,7 @@ dhcp6opt_print(netdissect_options *ndo,
 			}
 			tp = (const u_char *)(dh6o + 1);
 			for (i = 0; i < optlen; i += 16)
-				ND_PRINT((ndo, " %s", ip6addr_string(ndo, &tp[i])));
+				ND_PRINT((ndo, " %s", ip6addr_string(ndo, tp + i)));
 			ND_PRINT((ndo, ")"));
 			break;
 		case DH6OPT_SIP_SERVER_D:
@@ -617,7 +617,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			ND_PRINT((ndo, " %s/%d", ip6addr_string(ndo, &tp[9]), tp[8]));
+			ND_PRINT((ndo, " %s/%d", ip6addr_string(ndo, tp + 9), tp[8]));
 			ND_PRINT((ndo, " pltime:%u vltime:%u",
 			    EXTRACT_BE_U_4(tp),
 			    EXTRACT_BE_U_4(tp + 4)));
@@ -668,7 +668,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				ND_PRINT((ndo, " type_%u", dh6_lq_query_type));
 				break;
 			}
-			ND_PRINT((ndo, " %s", ip6addr_string(ndo, &tp[1])));
+			ND_PRINT((ndo, " %s", ip6addr_string(ndo, tp + 1)));
 			if (optlen > 17) {
 				/* there are query-options */
 				dhcp6opt_print(ndo, tp + 17, tp + optlen);
@@ -689,7 +689,7 @@ dhcp6opt_print(netdissect_options *ndo,
 				break;
 			}
 			tp = (const u_char *)(dh6o + 1);
-			ND_PRINT((ndo, " %s ", ip6addr_string(ndo, &tp[0])));
+			ND_PRINT((ndo, " %s ", ip6addr_string(ndo, tp)));
 			/*
 			 * Print hex dump first 10 characters.
 			 */
@@ -718,7 +718,7 @@ dhcp6opt_print(netdissect_options *ndo,
 						ND_PRINT((ndo, " ?"));
 						break;
 					}
-					ND_PRINT((ndo, " %s", ip6addr_string(ndo, &tp[0])));
+					ND_PRINT((ndo, " %s", ip6addr_string(ndo, tp)));
 					break;
 				case DH6OPT_NTP_SUBOPTION_SRV_FQDN:
 					ND_PRINT((ndo, " "));

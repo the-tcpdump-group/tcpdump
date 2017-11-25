@@ -158,10 +158,10 @@ pimv1_join_prune_print(netdissect_options *ndo,
 			unsigned_relts_print(ndo, hold);
 		}
 		ND_PRINT((ndo, "%s (%s/%d, %s", njoin ? "Join" : "Prune",
-		ipaddr_string(ndo, &bp[26]), bp[25] & 0x3f,
-		ipaddr_string(ndo, &bp[12])));
+		ipaddr_string(ndo, bp + 26), bp[25] & 0x3f,
+		ipaddr_string(ndo, bp + 12)));
 		if (EXTRACT_BE_U_4(bp + 16) != 0xffffffff)
-			ND_PRINT((ndo, "/%s", ipaddr_string(ndo, &bp[16])));
+			ND_PRINT((ndo, "/%s", ipaddr_string(ndo, bp + 16)));
 		ND_PRINT((ndo, ") %s%s %s",
 		    (bp[24] & 0x01) ? "Sparse" : "Dense",
 		    (bp[25] & 0x80) ? " WC" : "",
@@ -210,7 +210,7 @@ pimv1_join_prune_print(netdissect_options *ndo,
 			goto trunc;
 		ND_TCHECK2(bp[0], sizeof(struct in_addr));
 		if (EXTRACT_BE_U_4(bp) != 0xffffffff)
-			ND_PRINT((ndo, "/%s", ipaddr_string(ndo, &bp[0])));
+			ND_PRINT((ndo, "/%s", ipaddr_string(ndo, bp)));
 		bp += 4;
 		len -= 4;
 		if (len < 4)
@@ -235,7 +235,7 @@ pimv1_join_prune_print(netdissect_options *ndo,
 			    (bp[0] & 0x01) ? "Sparse " : "Dense ",
 			    (bp[1] & 0x80) ? "WC " : "",
 			    (bp[1] & 0x40) ? "RP " : "SPT ",
-			    ipaddr_string(ndo, &bp[2]),
+			    ipaddr_string(ndo, bp + 2),
 			    bp[1] & 0x3f));
 			bp += 6;
 			len -= 6;
@@ -285,30 +285,30 @@ pimv1_print(netdissect_options *ndo,
 
 	case PIMV1_TYPE_REGISTER:
 		ND_TCHECK2(bp[8], 20);			/* ip header */
-		ND_PRINT((ndo, " for %s > %s", ipaddr_string(ndo, &bp[20]),
-		    ipaddr_string(ndo, &bp[24])));
+		ND_PRINT((ndo, " for %s > %s", ipaddr_string(ndo, bp + 20),
+			  ipaddr_string(ndo, bp + 24)));
 		break;
 	case PIMV1_TYPE_REGISTER_STOP:
 		ND_TCHECK2(bp[12], sizeof(struct in_addr));
-		ND_PRINT((ndo, " for %s > %s", ipaddr_string(ndo, &bp[8]),
-		    ipaddr_string(ndo, &bp[12])));
+		ND_PRINT((ndo, " for %s > %s", ipaddr_string(ndo, bp + 8),
+			  ipaddr_string(ndo, bp + 12)));
 		break;
 	case PIMV1_TYPE_RP_REACHABILITY:
 		if (ndo->ndo_vflag) {
 			ND_TCHECK_2(bp + 22);
-			ND_PRINT((ndo, " group %s", ipaddr_string(ndo, &bp[8])));
+			ND_PRINT((ndo, " group %s", ipaddr_string(ndo, bp + 8)));
 			if (EXTRACT_BE_U_4(bp + 12) != 0xffffffff)
-				ND_PRINT((ndo, "/%s", ipaddr_string(ndo, &bp[12])));
-			ND_PRINT((ndo, " RP %s hold ", ipaddr_string(ndo, &bp[16])));
+				ND_PRINT((ndo, "/%s", ipaddr_string(ndo, bp + 12)));
+			ND_PRINT((ndo, " RP %s hold ", ipaddr_string(ndo, bp + 16)));
 			unsigned_relts_print(ndo, EXTRACT_BE_U_2(bp + 22));
 		}
 		break;
 	case PIMV1_TYPE_ASSERT:
 		ND_TCHECK2(bp[16], sizeof(struct in_addr));
-		ND_PRINT((ndo, " for %s > %s", ipaddr_string(ndo, &bp[16]),
-		    ipaddr_string(ndo, &bp[8])));
+		ND_PRINT((ndo, " for %s > %s", ipaddr_string(ndo, bp + 16),
+			  ipaddr_string(ndo, bp + 8)));
 		if (EXTRACT_BE_U_4(bp + 12) != 0xffffffff)
-			ND_PRINT((ndo, "/%s", ipaddr_string(ndo, &bp[12])));
+			ND_PRINT((ndo, "/%s", ipaddr_string(ndo, bp + 12)));
 		ND_TCHECK_4(bp + 24);
 		ND_PRINT((ndo, " %s pref %d metric %d",
 		    (bp[20] & 0x80) ? "RP-tree" : "SPT",
@@ -433,7 +433,7 @@ cisco_autorp_print(netdissect_options *ndo,
 				goto trunc;
 			ND_TCHECK_6(bp);
 			ND_PRINT((ndo, "%c%s%s/%d", s, bp[0] & 1 ? "!" : "",
-			          ipaddr_string(ndo, &bp[2]), bp[1]));
+			          ipaddr_string(ndo, bp + 2), bp[1]));
 			if (bp[0] & 0x02) {
 				ND_PRINT((ndo, " bidir"));
 			}
