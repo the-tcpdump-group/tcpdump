@@ -507,7 +507,7 @@ rsvp_intserv_print(netdissect_options *ndo,
            tok2str(rsvp_intserv_parameter_id_values,"unknown",parameter_id),
            parameter_id,
            parameter_length,
-           *(tptr + 1)));
+           EXTRACT_U_1(tptr + 1)));
 
     if (obj_tlen < parameter_length+4)
         return 0;

@@ -200,7 +200,7 @@ ahcp_ipv6_prefixes_print(netdissect_options *ndo, const u_char *cp, const u_char
 		if (cp + 17 > ep)
 			goto invalid;
 		ND_TCHECK2(*cp, 17);
-		ND_PRINT((ndo, "%s%s/%u", sep, ip6addr_string(ndo, cp), *(cp + 16)));
+		ND_PRINT((ndo, "%s%s/%u", sep, ip6addr_string(ndo, cp), EXTRACT_U_1(cp + 16)));
 		cp += 17;
 		sep = ", ";
 	}
@@ -224,7 +224,7 @@ ahcp_ipv4_prefixes_print(netdissect_options *ndo, const u_char *cp, const u_char
 		if (cp + 5 > ep)
 			goto invalid;
 		ND_TCHECK_5(cp);
-		ND_PRINT((ndo, "%s%s/%u", sep, ipaddr_string(ndo, cp), *(cp + 4)));
+		ND_PRINT((ndo, "%s%s/%u", sep, ipaddr_string(ndo, cp), EXTRACT_U_1(cp + 4)));
 		cp += 5;
 		sep = ", ";
 	}

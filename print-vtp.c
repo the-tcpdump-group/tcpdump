@@ -152,7 +152,7 @@ vtp_print (netdissect_options *ndo,
     fn_printzp(ndo, tptr + 4, mgmtd_len, NULL);
     ND_PRINT((ndo, ", %s: %u",
 	   tok2str(vtp_header_values, "Unknown", type),
-	   *(tptr+2)));
+	   EXTRACT_U_1(tptr + 2)));
 
     tptr += VTP_HEADER_LEN;
 

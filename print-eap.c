@@ -228,7 +228,7 @@ eap_print(netdissect_options *ndo,
                     ND_TCHECK_1(tptr + count);
                     ND_PRINT((ndo, " %s (%u),",
                            tok2str(eap_type_values, "unknown", EXTRACT_U_1((tptr + count))),
-                           *(tptr + count)));
+                           EXTRACT_U_1(tptr + count)));
                     count++;
                 }
                 break;
@@ -241,7 +241,7 @@ eap_print(netdissect_options *ndo,
                            EAP_TTLS_VERSION(EXTRACT_U_1((tptr + 5)))));
                 ND_PRINT((ndo, " flags [%s] 0x%02x,",
                        bittok2str(eap_tls_flags_values, "none", EXTRACT_U_1((tptr + 5))),
-                       *(tptr + 5)));
+                       EXTRACT_U_1(tptr + 5)));
 
                 if (EAP_TLS_EXTRACT_BIT_L(*(tptr+5))) {
                     ND_TCHECK_4(tptr + 6);
@@ -255,7 +255,7 @@ eap_print(netdissect_options *ndo,
                        EAP_TTLS_VERSION(EXTRACT_U_1((tptr + 5)))));
                 ND_PRINT((ndo, " flags [%s] 0x%02x,",
                        bittok2str(eap_tls_flags_values, "none", EXTRACT_U_1((tptr + 5))),
-                       *(tptr + 5)));
+                       EXTRACT_U_1(tptr + 5)));
 
                 if (EAP_TLS_EXTRACT_BIT_L(*(tptr+5))) {
                     ND_TCHECK_4(tptr + 6);
@@ -270,7 +270,7 @@ eap_print(netdissect_options *ndo,
                 ND_TCHECK_1(tptr + 5);
                 ND_PRINT((ndo, " subtype [%s] 0x%02x,",
                        tok2str(eap_aka_subtype_values, "unknown", EXTRACT_U_1((tptr + 5))),
-                       *(tptr + 5)));
+                       EXTRACT_U_1(tptr + 5)));
 
                 /* FIXME - TLV attributes follow */
                 break;

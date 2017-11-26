@@ -106,7 +106,7 @@ cdp_print(netdissect_options *ndo,
 
 	ND_TCHECK2(*tptr, CDP_HEADER_LEN);
 	ND_PRINT((ndo, "CDPv%u, ttl: %us", EXTRACT_U_1((tptr + CDP_HEADER_VERSION_OFFSET)),
-					   *(tptr + CDP_HEADER_TTL_OFFSET)));
+					   EXTRACT_U_1(tptr + CDP_HEADER_TTL_OFFSET)));
 	if (ndo->ndo_vflag)
 		ND_PRINT((ndo, ", checksum: 0x%04x (unverified), length %u", EXTRACT_BE_U_2(tptr + CDP_HEADER_CHECKSUM_OFFSET), length));
 	tptr += CDP_HEADER_LEN;

@@ -262,7 +262,7 @@ slow_print(netdissect_options *ndo,
             goto tooshort;
         ND_TCHECK(*(pptr+1));
         if (*(pptr+1) != LACP_VERSION) {
-            ND_PRINT((ndo, "LACP version %u packet not supported", *(pptr+1)));
+            ND_PRINT((ndo, "LACP version %u packet not supported", EXTRACT_U_1(pptr + 1)));
             return;
         }
         print_version = 1;
@@ -273,7 +273,7 @@ slow_print(netdissect_options *ndo,
             goto tooshort;
         ND_TCHECK(*(pptr+1));
         if (*(pptr+1) != MARKER_VERSION) {
-            ND_PRINT((ndo, "MARKER version %u packet not supported", *(pptr+1)));
+            ND_PRINT((ndo, "MARKER version %u packet not supported", EXTRACT_U_1(pptr + 1)));
             return;
         }
         print_version = 1;

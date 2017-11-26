@@ -2119,8 +2119,8 @@ bgp_attr_print(netdissect_options *ndo,
                                tok2str(bgp_extd_comm_ospf_rtype_values,
 					  "unknown (0x%02x)",
 					  EXTRACT_U_1((tptr + 6))),
-                               (*(tptr+7) &  BGP_OSPF_RTYPE_METRIC_TYPE) ? "E2" : "",
-                               ((*(tptr+6) == BGP_OSPF_RTYPE_EXT) || (*(tptr+6) == BGP_OSPF_RTYPE_NSSA)) ? "E1" : ""));
+                               (EXTRACT_U_1(tptr + 7) &  BGP_OSPF_RTYPE_METRIC_TYPE) ? "E2" : "",
+                               ((EXTRACT_U_1(tptr + 6) == BGP_OSPF_RTYPE_EXT) || (EXTRACT_U_1(tptr + 6) == BGP_OSPF_RTYPE_NSSA)) ? "E1" : ""));
                         break;
                     case BGP_EXT_COM_L2INFO:
                         ND_PRINT((ndo, ": %s Control Flags [0x%02x]:MTU %u",
