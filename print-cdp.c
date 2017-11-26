@@ -381,7 +381,9 @@ cdp_print_prefixes(netdissect_options *ndo,
 	ND_PRINT((ndo, " IPv4 Prefixes (%d):", l / 5));
 
 	while (l > 0) {
-		ND_PRINT((ndo, " %u.%u.%u.%u/%u", p[0], p[1], p[2], p[3], p[4]));
+		ND_PRINT((ndo, " %u.%u.%u.%u/%u",
+			  EXTRACT_U_1(p), EXTRACT_U_1(p + 1), EXTRACT_U_1(p + 2),
+			  EXTRACT_U_1(p + 3), EXTRACT_U_1(p + 4)));
 		l -= 5;
 		p += 5;
 	}

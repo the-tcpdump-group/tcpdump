@@ -617,8 +617,10 @@ print_ets_priority_assignment_table(netdissect_options *ndo,
     ND_PRINT((ndo, "\n\t    Priority Assignment Table"));
     ND_PRINT((ndo, "\n\t     Priority : 0   1   2   3   4   5   6   7"));
     ND_PRINT((ndo, "\n\t     Value    : %-3d %-3d %-3d %-3d %-3d %-3d %-3d %-3d",
-            ptr[0]>>4,ptr[0]&0x0f,ptr[1]>>4,ptr[1]&0x0f,ptr[2]>>4,
-            ptr[2] & 0x0f, ptr[3] >> 4, ptr[3] & 0x0f));
+              EXTRACT_U_1(ptr) >> 4, EXTRACT_U_1(ptr) & 0x0f,
+              EXTRACT_U_1(ptr + 1) >> 4, EXTRACT_U_1(ptr + 1) & 0x0f,
+              EXTRACT_U_1(ptr + 2) >> 4, EXTRACT_U_1(ptr + 2) & 0x0f,
+              EXTRACT_U_1(ptr + 3) >> 4, EXTRACT_U_1(ptr + 3) & 0x0f));
 }
 
 static void
@@ -628,7 +630,9 @@ print_tc_bandwidth_table(netdissect_options *ndo,
     ND_PRINT((ndo, "\n\t    TC Bandwidth Table"));
     ND_PRINT((ndo, "\n\t     TC%%   : 0   1   2   3   4   5   6   7"));
     ND_PRINT((ndo, "\n\t     Value : %-3d %-3d %-3d %-3d %-3d %-3d %-3d %-3d",
-             ptr[0], ptr[1], ptr[2], ptr[3], ptr[4], ptr[5], ptr[6], ptr[7]));
+              EXTRACT_U_1(ptr), EXTRACT_U_1(ptr + 1), EXTRACT_U_1(ptr + 2),
+              EXTRACT_U_1(ptr + 3), EXTRACT_U_1(ptr + 4), EXTRACT_U_1(ptr + 5),
+              EXTRACT_U_1(ptr + 6), EXTRACT_U_1(ptr + 7)));
 }
 
 static void
@@ -638,7 +642,9 @@ print_tsa_assignment_table(netdissect_options *ndo,
     ND_PRINT((ndo, "\n\t    TSA Assignment Table"));
     ND_PRINT((ndo, "\n\t     Traffic Class: 0   1   2   3   4   5   6   7"));
     ND_PRINT((ndo, "\n\t     Value        : %-3d %-3d %-3d %-3d %-3d %-3d %-3d %-3d",
-             ptr[0], ptr[1], ptr[2], ptr[3], ptr[4], ptr[5], ptr[6], ptr[7]));
+              EXTRACT_U_1(ptr), EXTRACT_U_1(ptr + 1), EXTRACT_U_1(ptr + 2),
+              EXTRACT_U_1(ptr + 3), EXTRACT_U_1(ptr + 4), EXTRACT_U_1(ptr + 5),
+              EXTRACT_U_1(ptr + 6), EXTRACT_U_1(ptr + 7)));
 }
 
 /*

@@ -378,7 +378,9 @@ llc_print(netdissect_options *ndo, const u_char *p, u_int length, u_int caplen,
 					if (caplen > 0)
 						ND_DEFAULTPRINT((const u_char *)p, caplen);
 				} else
-					ND_PRINT((ndo, ": %02x %02x", p[1], p[2]));
+					ND_PRINT((ndo, ": %02x %02x",
+						  EXTRACT_U_1(p + 1),
+						  EXTRACT_U_1(p + 2)));
 				return (hdrlen);
 			}
 		}

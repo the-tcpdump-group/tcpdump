@@ -1421,7 +1421,8 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 				mask = data + sizeof(struct in_addr);
 				ND_PRINT((ndo," len=%d %s/%u.%u.%u.%u", len,
 					  ipaddr_string(ndo, data),
-					  mask[0], mask[1], mask[2], mask[3]));
+					  EXTRACT_U_1(mask), EXTRACT_U_1(mask + 1),
+					  EXTRACT_U_1(mask + 2), EXTRACT_U_1(mask + 3)));
 			}
 			len = 0;
 			break;
@@ -1443,10 +1444,10 @@ ikev1_id_print(netdissect_options *ndo, u_char tpay _U_,
 				/*XXX*/
 				ND_PRINT((ndo," len=%d %s/0x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x", len,
 					  ip6addr_string(ndo, data),
-					  mask[0], mask[1], mask[2], mask[3],
-					  mask[4], mask[5], mask[6], mask[7],
-					  mask[8], mask[9], mask[10], mask[11],
-					  mask[12], mask[13], mask[14], mask[15]));
+					  EXTRACT_U_1(mask), EXTRACT_U_1(mask + 1), EXTRACT_U_1(mask + 2), EXTRACT_U_1(mask + 3),
+					  EXTRACT_U_1(mask + 4), EXTRACT_U_1(mask + 5), EXTRACT_U_1(mask + 6), EXTRACT_U_1(mask + 7),
+					  EXTRACT_U_1(mask + 8), EXTRACT_U_1(mask + 9), EXTRACT_U_1(mask + 10), EXTRACT_U_1(mask + 11),
+					  EXTRACT_U_1(mask + 12), EXTRACT_U_1(mask + 13), EXTRACT_U_1(mask + 14), EXTRACT_U_1(mask + 15)));
 			}
 			len = 0;
 			break;
@@ -2603,7 +2604,7 @@ ikev2_vid_print(netdissect_options *ndo, u_char tpay,
 	len = ntohs(e.len) - 4;
 	ND_TCHECK2(*vid, len);
 	for(i=0; i<len; i++) {
-		if(ND_ISPRINT(vid[i])) ND_PRINT((ndo, "%c", vid[i]));
+		if(ND_ISPRINT(vid[i])) ND_PRINT((ndo, "%c", EXTRACT_U_1(vid + i)));
 		else ND_PRINT((ndo, "."));
 	}
 	if (2 < ndo->ndo_vflag && 4 < len) {

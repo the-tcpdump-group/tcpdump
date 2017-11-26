@@ -57,7 +57,7 @@ babel_print(netdissect_options *ndo,
         ND_PRINT((ndo, " invalid header"));
         return;
     } else {
-        ND_PRINT((ndo, " %d", cp[1]));
+        ND_PRINT((ndo, " %d", EXTRACT_U_1(cp + 1)));
     }
 
     switch(cp[1]) {
@@ -487,9 +487,9 @@ babel_print_v2(netdissect_options *ndo,
                     ND_PRINT((ndo, "/truncated"));
                 else
                     ND_PRINT((ndo, "%s%s%s",
-                           (message[3] & 0x80) ? "/prefix": "",
-                           (message[3] & 0x40) ? "/id" : "",
-                           (message[3] & 0x3f) ? "/unknown" : ""));
+                           (EXTRACT_U_1(message + 3) & 0x80) ? "/prefix": "",
+                           (EXTRACT_U_1(message + 3) & 0x40) ? "/id" : "",
+                           (EXTRACT_U_1(message + 3) & 0x3f) ? "/unknown" : ""));
             } else {
                 u_short interval, seqno, metric;
                 u_char plen;
@@ -507,9 +507,9 @@ babel_print_v2(netdissect_options *ndo,
                 seqno = EXTRACT_BE_U_2(message + 8);
                 metric = EXTRACT_BE_U_2(message + 10);
                 ND_PRINT((ndo, "%s%s%s %s metric %u seqno %u interval %s",
-                       (message[3] & 0x80) ? "/prefix": "",
-                       (message[3] & 0x40) ? "/id" : "",
-                       (message[3] & 0x3f) ? "/unknown" : "",
+                       (EXTRACT_U_1(message + 3) & 0x80) ? "/prefix": "",
+                       (EXTRACT_U_1(message + 3) & 0x40) ? "/id" : "",
+                       (EXTRACT_U_1(message + 3) & 0x3f) ? "/unknown" : "",
                        format_prefix(ndo, prefix, plen),
                        metric, seqno, format_interval_update(interval)));
                 if(message[3] & 0x80) {
@@ -538,7 +538,7 @@ babel_print_v2(netdissect_options *ndo,
                                     message + 4, NULL, len - 2, prefix);
                 if(rc < 0) goto invalid;
                 ND_PRINT((ndo, "for %s",
-                       message[2] == 0 ? "any" : format_prefix(ndo, prefix, plen)));
+                       EXTRACT_U_1(message + 2) == 0 ? "any" : format_prefix(ndo, prefix, plen)));
             }
         }
             break;
@@ -558,7 +558,7 @@ babel_print_v2(netdissect_options *ndo,
                 if(rc < 0) goto invalid;
                 plen = message[3] + (message[2] == 1 ? 96 : 0);
                 ND_PRINT((ndo, "(%u hops) for %s seqno %u id %s",
-                       message[6], format_prefix(ndo, prefix, plen),
+                       EXTRACT_U_1(message + 6), format_prefix(ndo, prefix, plen),
                        seqno, format_id(message + 8)));
             }
         }
@@ -582,7 +582,7 @@ babel_print_v2(netdissect_options *ndo,
                 if(len < 18) goto invalid;
                 ND_PRINT((ndo, "key-id %u digest-%u ", EXTRACT_BE_U_2(message + 2), len - 2));
                 for (j = 0; j < len - 2; j++)
-                    ND_PRINT((ndo, "%02X", message[4 + j]));
+                    ND_PRINT((ndo, "%02X", EXTRACT_U_1(message + j + 4)));
             }
         }
             break;

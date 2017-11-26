@@ -78,7 +78,7 @@ sunatm_if_print(netdissect_options *ndo,
 	}
 
 	if (ndo->ndo_eflag) {
-		ND_PRINT((ndo, p[DIR_POS] & 0x80 ? "Tx: " : "Rx: "));
+		ND_PRINT((ndo, EXTRACT_U_1(p + DIR_POS) & 0x80 ? "Tx: " : "Rx: "));
 	}
 
 	switch (p[DIR_POS] & 0x0f) {

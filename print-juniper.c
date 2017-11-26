@@ -1362,7 +1362,7 @@ juniper_parse_header(netdissect_options *ndo,
                     ND_PRINT((ndo, ", cookie 0x"));
                 for (idx = 0; idx < l2info->cookie_len; idx++) {
                     l2info->cookie[idx] = p[idx]; /* copy cookie data */
-                    if (ndo->ndo_eflag) ND_PRINT((ndo, "%02x", p[idx]));
+                    if (ndo->ndo_eflag) ND_PRINT((ndo, "%02x", EXTRACT_U_1(p + idx)));
                 }
             }
 

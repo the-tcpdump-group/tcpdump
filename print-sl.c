@@ -151,8 +151,8 @@ sliplink_print(netdissect_options *ndo,
 		register int i;
 
 		for (i = SLX_CHDR; i < SLX_CHDR + CHDR_LEN - 1; ++i)
-			ND_PRINT((ndo, "%02x.", p[i]));
-		ND_PRINT((ndo, "%02x: ", p[SLX_CHDR + CHDR_LEN - 1]));
+			ND_PRINT((ndo, "%02x.", EXTRACT_U_1(p + i)));
+		ND_PRINT((ndo, "%02x: ", EXTRACT_U_1(p + SLX_CHDR + CHDR_LEN - 1)));
 		return;
 	}
 	switch (p[SLX_CHDR] & 0xf0) {
@@ -188,7 +188,7 @@ sliplink_print(netdissect_options *ndo,
 			    length, dir);
 			ND_PRINT((ndo, ": "));
 		} else
-			ND_PRINT((ndo, "slip-%d!: ", p[SLX_CHDR]));
+			ND_PRINT((ndo, "slip-%d!: ", EXTRACT_U_1(p + SLX_CHDR)));
 	}
 }
 

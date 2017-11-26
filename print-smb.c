@@ -837,7 +837,8 @@ print_smb(netdissect_options *ndo,
 	    ND_PRINT((ndo, "NTError = %s\n", nt_errstr(nterror)));
     } else {
 	if (buf[5])
-	    ND_PRINT((ndo, "SMBError = %s\n", smb_errstr(buf[5], EXTRACT_LE_U_2(buf + 7))));
+	    ND_PRINT((ndo, "SMBError = %s\n", smb_errstr(EXTRACT_U_1(buf + 5),
+		      EXTRACT_LE_U_2(buf + 7))));
     }
 
     smboffset = 32;

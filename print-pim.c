@@ -158,14 +158,14 @@ pimv1_join_prune_print(netdissect_options *ndo,
 			unsigned_relts_print(ndo, hold);
 		}
 		ND_PRINT((ndo, "%s (%s/%d, %s", njoin ? "Join" : "Prune",
-		ipaddr_string(ndo, bp + 26), bp[25] & 0x3f,
+		ipaddr_string(ndo, bp + 26), EXTRACT_U_1(bp + 25) & 0x3f,
 		ipaddr_string(ndo, bp + 12)));
 		if (EXTRACT_BE_U_4(bp + 16) != 0xffffffff)
 			ND_PRINT((ndo, "/%s", ipaddr_string(ndo, bp + 16)));
 		ND_PRINT((ndo, ") %s%s %s",
-		    (bp[24] & 0x01) ? "Sparse" : "Dense",
-		    (bp[25] & 0x80) ? " WC" : "",
-		    (bp[25] & 0x40) ? "RP" : "SPT"));
+		    (EXTRACT_U_1(bp + 24) & 0x01) ? "Sparse" : "Dense",
+		    (EXTRACT_U_1(bp + 25) & 0x80) ? " WC" : "",
+		    (EXTRACT_U_1(bp + 25) & 0x40) ? "RP" : "SPT"));
 		return;
 	}
 
@@ -232,11 +232,11 @@ pimv1_join_prune_print(netdissect_options *ndo,
 				goto trunc;
 			ND_TCHECK_6(bp);
 			ND_PRINT((ndo, "\n\t%s %s%s%s%s/%d", type,
-			    (bp[0] & 0x01) ? "Sparse " : "Dense ",
-			    (bp[1] & 0x80) ? "WC " : "",
-			    (bp[1] & 0x40) ? "RP " : "SPT ",
+			    (EXTRACT_U_1(bp) & 0x01) ? "Sparse " : "Dense ",
+			    (EXTRACT_U_1(bp + 1) & 0x80) ? "WC " : "",
+			    (EXTRACT_U_1(bp + 1) & 0x40) ? "RP " : "SPT ",
 			    ipaddr_string(ndo, bp + 2),
-			    bp[1] & 0x3f));
+			    EXTRACT_U_1(bp + 1) & 0x3f));
 			bp += 6;
 			len -= 6;
 		}
@@ -271,7 +271,7 @@ pimv1_print(netdissect_options *ndo,
 				ND_PRINT((ndo, " Sparse-Dense-mode"));
 				break;
 			default:
-				ND_PRINT((ndo, " mode-%d", bp[8] >> 4));
+				ND_PRINT((ndo, " mode-%d", EXTRACT_U_1(bp + 8) >> 4));
 				break;
 			}
 		}
@@ -311,9 +311,9 @@ pimv1_print(netdissect_options *ndo,
 			ND_PRINT((ndo, "/%s", ipaddr_string(ndo, bp + 12)));
 		ND_TCHECK_4(bp + 24);
 		ND_PRINT((ndo, " %s pref %d metric %d",
-		    (bp[20] & 0x80) ? "RP-tree" : "SPT",
-		EXTRACT_BE_U_4(bp + 20) & 0x7fffffff,
-		EXTRACT_BE_U_4(bp + 24)));
+		    (EXTRACT_U_1(bp + 20) & 0x80) ? "RP-tree" : "SPT",
+		    EXTRACT_BE_U_4(bp + 20) & 0x7fffffff,
+		    EXTRACT_BE_U_4(bp + 24)));
 		break;
 	case PIMV1_TYPE_JOIN_PRUNE:
 	case PIMV1_TYPE_GRAFT:
@@ -327,7 +327,7 @@ pimv1_print(netdissect_options *ndo,
 	}
 	ND_TCHECK(bp[4]);
 	if ((bp[4] >> 4) != 1)
-		ND_PRINT((ndo, " [v%d]", bp[4] >> 4));
+		ND_PRINT((ndo, " [v%d]", EXTRACT_U_1(bp + 4) >> 4));
 	return;
 
 trunc:
@@ -418,7 +418,7 @@ cisco_autorp_print(netdissect_options *ndo,
 			break;
 		}
 		if (bp[0] & 0xfc)
-			ND_PRINT((ndo, " [rsvd=0x%02x]", bp[0] & 0xfc));
+			ND_PRINT((ndo, " [rsvd=0x%02x]", EXTRACT_U_1(bp) & 0xfc));
 		bp += 1;
 		len -= 1;
 		if (len < 1)
@@ -432,13 +432,13 @@ cisco_autorp_print(netdissect_options *ndo,
 			if (len < 6)
 				goto trunc;
 			ND_TCHECK_6(bp);
-			ND_PRINT((ndo, "%c%s%s/%d", s, bp[0] & 1 ? "!" : "",
-			          ipaddr_string(ndo, bp + 2), bp[1]));
+			ND_PRINT((ndo, "%c%s%s/%d", s, EXTRACT_U_1(bp) & 1 ? "!" : "",
+			          ipaddr_string(ndo, bp + 2), EXTRACT_U_1(bp + 1)));
 			if (bp[0] & 0x02) {
 				ND_PRINT((ndo, " bidir"));
 			}
 			if (bp[0] & 0xfc) {
-				ND_PRINT((ndo, "[rsvd=0x%02x]", bp[0] & 0xfc));
+				ND_PRINT((ndo, "[rsvd=0x%02x]", EXTRACT_U_1(bp) & 0xfc));
 			}
 			s = ',';
 			bp += 6; len -= 6;
@@ -622,26 +622,26 @@ pimv2_addr_print(netdissect_options *ndo,
 			if (!silent) {
 				ND_PRINT((ndo, "%s", ipaddr_string(ndo, bp + 2)));
 				if (bp[1] != 32)
-					ND_PRINT((ndo, "/%u", bp[1]));
+					ND_PRINT((ndo, "/%u", EXTRACT_U_1(bp + 1)));
 			}
 		}
 		else if (af == AF_INET6) {
 			if (!silent) {
 				ND_PRINT((ndo, "%s", ip6addr_string(ndo, bp + 2)));
 				if (bp[1] != 128)
-					ND_PRINT((ndo, "/%u", bp[1]));
+					ND_PRINT((ndo, "/%u", EXTRACT_U_1(bp + 1)));
 			}
 		}
 		if (bp[0] && !silent) {
 			if (at == pimv2_group) {
-				ND_PRINT((ndo, "(0x%02x)", bp[0]));
+				ND_PRINT((ndo, "(0x%02x)", EXTRACT_U_1(bp)));
 			} else {
 				ND_PRINT((ndo, "(%s%s%s",
-					bp[0] & 0x04 ? "S" : "",
-					bp[0] & 0x02 ? "W" : "",
-					bp[0] & 0x01 ? "R" : ""));
+					EXTRACT_U_1(bp) & 0x04 ? "S" : "",
+					EXTRACT_U_1(bp) & 0x02 ? "W" : "",
+					EXTRACT_U_1(bp) & 0x01 ? "R" : ""));
 				if (bp[0] & 0xf8) {
-					ND_PRINT((ndo, "+0x%02x", bp[0] & 0xf8));
+					ND_PRINT((ndo, "+0x%02x", EXTRACT_U_1(bp) & 0xf8));
 				}
 				ND_PRINT((ndo, ")"));
 			}
@@ -1029,11 +1029,11 @@ pimv2_print(netdissect_options *ndo,
 		if (len < 1)
 			goto trunc;
 		ND_TCHECK(bp[0]);
-		ND_PRINT((ndo, " hashmlen=%d", bp[0]));
+		ND_PRINT((ndo, " hashmlen=%d", EXTRACT_U_1(bp)));
 		if (len < 2)
 			goto trunc;
 		ND_TCHECK(bp[2]);
-		ND_PRINT((ndo, " BSRprio=%d", bp[1]));
+		ND_PRINT((ndo, " BSRprio=%d", EXTRACT_U_1(bp + 1)));
 		bp += 2;
 		len -= 2;
 
@@ -1056,11 +1056,11 @@ pimv2_print(netdissect_options *ndo,
 			if (len < 1)
 				goto trunc;
 			ND_TCHECK(bp[0]);
-			ND_PRINT((ndo, " RPcnt=%d", bp[0]));
+			ND_PRINT((ndo, " RPcnt=%d", EXTRACT_U_1(bp)));
 			if (len < 2)
 				goto trunc;
 			ND_TCHECK(bp[1]);
-			ND_PRINT((ndo, " FRPcnt=%d", frpcnt = bp[1]));
+			ND_PRINT((ndo, " FRPcnt=%d", frpcnt = EXTRACT_U_1(bp + 1)));
 			if (len < 4)
 				goto trunc;
 			bp += 4;
@@ -1086,7 +1086,7 @@ pimv2_print(netdissect_options *ndo,
 				if (len < 3)
 					goto trunc;
 				ND_TCHECK(bp[2]);
-				ND_PRINT((ndo, ",prio=%d", bp[2]));
+				ND_PRINT((ndo, ",prio=%d", EXTRACT_U_1(bp + 2)));
 				if (len < 4)
 					goto trunc;
 				bp += 4;
@@ -1122,12 +1122,12 @@ pimv2_print(netdissect_options *ndo,
 		if (len < 1)
 			goto trunc;
 		ND_TCHECK(bp[0]);
-		ND_PRINT((ndo, " prefix-cnt=%d", bp[0]));
+		ND_PRINT((ndo, " prefix-cnt=%d", EXTRACT_U_1(bp)));
 		pfxcnt = bp[0];
 		if (len < 2)
 			goto trunc;
 		ND_TCHECK(bp[1]);
-		ND_PRINT((ndo, " prio=%d", bp[1]));
+		ND_PRINT((ndo, " prio=%d", EXTRACT_U_1(bp + 1)));
 		if (len < 4)
 			goto trunc;
 		ND_TCHECK_2(bp + 2);

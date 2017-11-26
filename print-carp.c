@@ -66,7 +66,7 @@ carp_print(netdissect_options *ndo, register const u_char *bp, register u_int le
 	ND_TCHECK(bp[2]);
 	ND_TCHECK(bp[5]);
 	ND_PRINT((ndo, "vhid=%d advbase=%d advskew=%d authlen=%d ",
-	    bp[1], bp[5], bp[2], bp[3]));
+	    EXTRACT_U_1(bp + 1), EXTRACT_U_1(bp + 5), EXTRACT_U_1(bp + 2), EXTRACT_U_1(bp + 3)));
 	if (ndo->ndo_vflag) {
 		struct cksum_vec vec[1];
 		vec[0].ptr = (const uint8_t *)bp;

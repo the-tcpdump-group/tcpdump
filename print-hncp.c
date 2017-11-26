@@ -774,9 +774,9 @@ hncp_print_rec(netdissect_options *ndo,
             ip_address = format_ip6addr(ndo, value);
             ND_PRINT((ndo, " IP-Address: %s %c%c%c ",
                 ip_address,
-                (value[16] & 4) ? 'l' : '-',
-                (value[16] & 2) ? 'b' : '-',
-                (value[16] & 1) ? 's' : '-'
+                (EXTRACT_U_1(value + 16) & 4) ? 'l' : '-',
+                (EXTRACT_U_1(value + 16) & 2) ? 'b' : '-',
+                (EXTRACT_U_1(value + 16) & 1) ? 's' : '-'
             ));
             len = print_dns_label(ndo, value+17, bodylen-17, 1);
             if (len < 0) {

@@ -182,10 +182,10 @@ mobility_opt_print(netdissect_options *ndo,
 			break;
 		default:
 			if (len - i < IP6MOPT_MINLEN) {
-				ND_PRINT((ndo, "(sopt_type %u: trunc)", bp[i]));
+				ND_PRINT((ndo, "(sopt_type %u: trunc)", EXTRACT_U_1(bp + i)));
 				goto trunc;
 			}
-			ND_PRINT((ndo, "(type-0x%02x: len=%u)", bp[i], bp[i + 1]));
+			ND_PRINT((ndo, "(type-0x%02x: len=%u)", EXTRACT_U_1(bp + i), EXTRACT_U_1(bp + i + 1)));
 			break;
 		}
 	}

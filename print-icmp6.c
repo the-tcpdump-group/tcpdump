@@ -1495,7 +1495,7 @@ mldv2_query_print(netdissect_options *ndo, const u_char *bp, u_int len)
 		ND_PRINT((ndo," sflag"));
 	}
 	if (bp[24] & 0x07) {
-		ND_PRINT((ndo," robustness=%d", bp[24] & 0x07));
+		ND_PRINT((ndo," robustness=%d", EXTRACT_U_1(bp + 24) & 0x07));
 	}
 	if (bp[25] < 128) {
 		qqi = bp[25];
