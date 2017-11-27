@@ -132,7 +132,7 @@ vtp_print (netdissect_options *ndo,
 
     type = EXTRACT_U_1(tptr + 1);
     ND_PRINT((ndo, "VTPv%u, Message %s (0x%02x), length %u",
-	   *tptr,
+	   EXTRACT_U_1(tptr),
 	   tok2str(vtp_message_type_values,"Unknown message type", type),
 	   type,
 	   length));

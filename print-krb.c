@@ -211,7 +211,7 @@ krb4_print(netdissect_options *ndo,
 		ND_PRINT((ndo, " (%d)", EXTRACT_U_1(cp)));
 		cp++;
 		ND_TCHECK(*cp);
-		ND_PRINT((ndo, " (%d)", *cp));
+		ND_PRINT((ndo, " (%d)", EXTRACT_U_1(cp)));
 		break;
 
 	case AUTH_MSG_KDC_REPLY:

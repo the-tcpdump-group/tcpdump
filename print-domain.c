@@ -105,7 +105,7 @@ blabel_print(netdissect_options *ndo,
 	ND_PRINT((ndo, "\\[x"));
 	for (bitp = cp + 1, b = bitlen; bitp < lim && b > 7; b -= 8, bitp++) {
 		ND_TCHECK(*bitp);
-		ND_PRINT((ndo, "%02x", *bitp));
+		ND_PRINT((ndo, "%02x", EXTRACT_U_1(bitp)));
 	}
 	if (b > 4) {
 		ND_TCHECK(*bitp);

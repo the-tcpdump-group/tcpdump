@@ -637,7 +637,7 @@ smb_fdata1(netdissect_options *ndo,
 
 	    ND_TCHECK(*buf);
 	    if (*buf != 4 && *buf != 2) {
-		ND_PRINT((ndo, "Error! ASCIIZ buffer of type %u", *buf));
+		ND_PRINT((ndo, "Error! ASCIIZ buffer of type %u", EXTRACT_U_1(buf)));
 		return maxbuf;	/* give up */
 	    }
 	    len = 0;

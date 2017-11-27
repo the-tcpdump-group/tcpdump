@@ -138,7 +138,8 @@ rip_entry_print_v2(netdissect_options *ndo,
 			u_int i = 0;
 			ND_PRINT((ndo, "\n\t  Simple Text Authentication data: "));
 			for (; i < RIP_AUTHLEN; p++, i++)
-				ND_PRINT((ndo, "%c", ND_ISPRINT(*p) ? *p : '.'));
+				ND_PRINT((ndo, "%c",
+					 ND_ISPRINT(*p) ? EXTRACT_U_1(p) : '.'));
 		} else if (auth_type == 3) {
 			ND_PRINT((ndo, "\n\t  Auth header:"));
 			ND_PRINT((ndo, " Packet Len %u,", EXTRACT_BE_U_2((const uint8_t *)ni + 4)));

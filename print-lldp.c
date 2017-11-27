@@ -1209,7 +1209,7 @@ lldp_private_dcbx_print(netdissect_options *ndo,
             }
 	    ND_PRINT((ndo, "\n\t    Control - Protocol Control (type 0x%x, length %d)",
 		LLDP_DCBX_CONTROL_TLV, tlv_len));
-	    ND_PRINT((ndo, "\n\t      Oper_Version: %d", *tptr));
+	    ND_PRINT((ndo, "\n\t      Oper_Version: %d", EXTRACT_U_1(tptr)));
 	    ND_PRINT((ndo, "\n\t      Max_Version: %d", EXTRACT_U_1(tptr + 1)));
 	    ND_PRINT((ndo, "\n\t      Sequence Number: %d", EXTRACT_BE_U_4(tptr + 2)));
 	    ND_PRINT((ndo, "\n\t      Acknowledgement Number: %d",
@@ -1221,7 +1221,7 @@ lldp_private_dcbx_print(netdissect_options *ndo,
             }
 	    ND_PRINT((ndo, "\n\t    Feature - Priority Group (type 0x%x, length %d)",
 		LLDP_DCBX_PRIORITY_GROUPS_TLV, tlv_len));
-	    ND_PRINT((ndo, "\n\t      Oper_Version: %d", *tptr));
+	    ND_PRINT((ndo, "\n\t      Oper_Version: %d", EXTRACT_U_1(tptr)));
 	    ND_PRINT((ndo, "\n\t      Max_Version: %d", EXTRACT_U_1(tptr + 1)));
 	    ND_PRINT((ndo, "\n\t      Info block(0x%02X): ", EXTRACT_U_1(tptr + 2)));
 	    tval = EXTRACT_U_1(tptr + 2);
@@ -1252,7 +1252,7 @@ lldp_private_dcbx_print(netdissect_options *ndo,
 	    ND_PRINT((ndo, "\n\t    Feature - Priority Flow Control"));
 	    ND_PRINT((ndo, " (type 0x%x, length %d)",
 		LLDP_DCBX_PRIORITY_FLOW_CONTROL_TLV, tlv_len));
-	    ND_PRINT((ndo, "\n\t      Oper_Version: %d", *tptr));
+	    ND_PRINT((ndo, "\n\t      Oper_Version: %d", EXTRACT_U_1(tptr)));
 	    ND_PRINT((ndo, "\n\t      Max_Version: %d", EXTRACT_U_1(tptr + 1)));
 	    ND_PRINT((ndo, "\n\t      Info block(0x%02X): ", EXTRACT_U_1(tptr + 2)));
 	    tval = EXTRACT_U_1(tptr + 2);
@@ -1273,7 +1273,7 @@ lldp_private_dcbx_print(netdissect_options *ndo,
             }
 	    ND_PRINT((ndo, "\n\t    Feature - Application (type 0x%x, length %d)",
 		LLDP_DCBX_APPLICATION_TLV, tlv_len));
-	    ND_PRINT((ndo, "\n\t      Oper_Version: %d", *tptr));
+	    ND_PRINT((ndo, "\n\t      Oper_Version: %d", EXTRACT_U_1(tptr)));
 	    ND_PRINT((ndo, "\n\t      Max_Version: %d", EXTRACT_U_1(tptr + 1)));
 	    ND_PRINT((ndo, "\n\t      Info block(0x%02X): ", EXTRACT_U_1(tptr + 2)));
 	    tval = EXTRACT_U_1(tptr + 2);

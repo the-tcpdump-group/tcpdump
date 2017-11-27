@@ -202,7 +202,7 @@ cdp_print(netdissect_options *ndo,
 		    case 0x0b: /* Duplex - CDPv2 */
 			if (len < 1)
 			    goto trunc;
-			ND_PRINT((ndo, "%s", *(tptr) ? "full": "half"));
+			ND_PRINT((ndo, "%s", EXTRACT_U_1(tptr) ? "full": "half"));
 			break;
 
 		    /* http://www.cisco.com/c/en/us/td/docs/voice_ip_comm/cata/186/2_12_m/english/release/notes/186rn21m.html
@@ -224,12 +224,12 @@ cdp_print(netdissect_options *ndo,
 		    case 0x12: /* AVVID trust bitmap - not documented */
 			if (len < 1)
 			    goto trunc;
-			ND_PRINT((ndo, "0x%02x", *(tptr)));
+			ND_PRINT((ndo, "0x%02x", EXTRACT_U_1(tptr)));
 			break;
 		    case 0x13: /* AVVID untrusted port CoS - not documented */
 			if (len < 1)
 			    goto trunc;
-			ND_PRINT((ndo, "0x%02x", *(tptr)));
+			ND_PRINT((ndo, "0x%02x", EXTRACT_U_1(tptr)));
 			break;
 		    case 0x14: /* System Name - not documented */
 			ND_PRINT((ndo, "'"));
@@ -243,7 +243,7 @@ cdp_print(netdissect_options *ndo,
 		    case 0x17: /* Physical Location - not documented */
 			if (len < 1)
 			    goto trunc;
-			ND_PRINT((ndo, "0x%02x", *(tptr)));
+			ND_PRINT((ndo, "0x%02x", EXTRACT_U_1(tptr)));
 			if (len > 1) {
 				ND_PRINT((ndo, "/"));
 				(void)fn_printn(ndo, tptr + 1, len - 1, NULL);

@@ -678,7 +678,7 @@ isoclns_print(netdissect_options *ndo, const uint8_t *p, u_int length)
 	}
 
 	if (ndo->ndo_eflag)
-		ND_PRINT((ndo, "OSI NLPID %s (0x%02x): ", tok2str(nlpid_values, "Unknown", EXTRACT_U_1(p)), *p));
+		ND_PRINT((ndo, "OSI NLPID %s (0x%02x): ", tok2str(nlpid_values, "Unknown", EXTRACT_U_1(p)), EXTRACT_U_1(p)));
 
 	switch (*p) {
 
@@ -718,7 +718,7 @@ isoclns_print(netdissect_options *ndo, const uint8_t *p, u_int length)
 
 	default:
 		if (!ndo->ndo_eflag)
-			ND_PRINT((ndo, "OSI NLPID 0x%02x unknown", *p));
+			ND_PRINT((ndo, "OSI NLPID 0x%02x unknown", EXTRACT_U_1(p)));
 		ND_PRINT((ndo, "%slength: %u", ndo->ndo_eflag ? "" : ", ", length));
 		if (length > 1)
 			print_unknown_data(ndo, p, "\n\t", length);

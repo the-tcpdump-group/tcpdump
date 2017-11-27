@@ -784,7 +784,7 @@ of10_bsn_message_print(netdissect_options *ndo,
 			goto invalid;
 		/* index */
 		ND_TCHECK_1(cp);
-		ND_PRINT((ndo, ", index %u", *cp));
+		ND_PRINT((ndo, ", index %u", EXTRACT_U_1(cp)));
 		cp += 1;
 		/* pad */
 		ND_TCHECK_7(cp);
@@ -808,7 +808,7 @@ of10_bsn_message_print(netdissect_options *ndo,
 			goto invalid;
 		/* index */
 		ND_TCHECK_1(cp);
-		ND_PRINT((ndo, ", index %u", *cp));
+		ND_PRINT((ndo, ", index %u", EXTRACT_U_1(cp)));
 		cp += 1;
 		/* pad */
 		ND_TCHECK_3(cp);
@@ -1396,7 +1396,7 @@ of10_match_print(netdissect_options *ndo,
 	/* nw_tos */
 	ND_TCHECK_1(cp);
 	if (! (wildcards & OFPFW_NW_TOS))
-		ND_PRINT((ndo, "%smatch nw_tos 0x%02x", pfx, *cp));
+		ND_PRINT((ndo, "%smatch nw_tos 0x%02x", pfx, EXTRACT_U_1(cp)));
 	cp += 1;
 	/* nw_proto */
 	ND_TCHECK_1(cp);
@@ -1560,7 +1560,7 @@ of10_actions_print(netdissect_options *ndo,
 		case OFPAT_SET_NW_TOS:
 			/* nw_tos */
 			ND_TCHECK_1(cp);
-			ND_PRINT((ndo, ", nw_tos 0x%02x", *cp));
+			ND_PRINT((ndo, ", nw_tos 0x%02x", EXTRACT_U_1(cp)));
 			cp += 1;
 			/* pad */
 			ND_TCHECK_3(cp);
@@ -1628,7 +1628,7 @@ of10_features_reply_print(netdissect_options *ndo,
 	cp += 4;
 	/* n_tables */
 	ND_TCHECK_1(cp);
-	ND_PRINT((ndo, ", n_tables %u", *cp));
+	ND_PRINT((ndo, ", n_tables %u", EXTRACT_U_1(cp)));
 	cp += 1;
 	/* pad */
 	ND_TCHECK_3(cp);

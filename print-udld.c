@@ -166,7 +166,7 @@ udld_print (netdissect_options *ndo, const u_char *pptr, u_int length)
         case UDLD_TIMEOUT_INTERVAL_TLV:
             if (len != 1)
                 goto invalid;
-            ND_PRINT((ndo, ", %us", (*tptr)));
+            ND_PRINT((ndo, ", %us", (EXTRACT_U_1(tptr))));
             break;
 
         case UDLD_SEQ_NUMBER_TLV:

@@ -175,7 +175,7 @@ pppoe_print(netdissect_options *ndo, register const u_char *bp, u_int length)
 					/* Print hex, not fast to abuse printf but this doesn't get used much */
 					ND_PRINT((ndo, " [%s 0x", tok2str(pppoetag2str, "TAG-0x%x", tag_type)));
 					for (v=p; v<p+tag_len; v++) {
-						ND_PRINT((ndo, "%02X", *v));
+						ND_PRINT((ndo, "%02X", EXTRACT_U_1(v)));
 					}
 					ND_PRINT((ndo, "]"));
 				}

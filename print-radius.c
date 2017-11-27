@@ -594,7 +594,7 @@ print_attr_string(netdissect_options *ndo,
            if (length < 3)
               goto trunc;
            if (*data && (*data <=0x1F) )
-              ND_PRINT((ndo, "Tag[%u] ", *data));
+              ND_PRINT((ndo, "Tag[%u] ", EXTRACT_U_1(data)));
            else
               ND_PRINT((ndo, "Tag[Unused] "));
            data++;
@@ -614,7 +614,7 @@ print_attr_string(netdissect_options *ndo,
               if (length < 1)
                  goto trunc;
               if (*data)
-                ND_PRINT((ndo, "Tag[%u] ", *data));
+                ND_PRINT((ndo, "Tag[%u] ", EXTRACT_U_1(data)));
               else
                 ND_PRINT((ndo, "Tag[Unused] "));
               data++;
@@ -626,14 +626,14 @@ print_attr_string(netdissect_options *ndo,
               goto trunc;
            ND_PRINT((ndo, "%s (0x%02x) ",
                   tok2str(rfc4675_tagged,"Unknown tag",EXTRACT_U_1(data)),
-                  *data));
+                  EXTRACT_U_1(data)));
            data++;
            length--;
         break;
    }
 
    for (i=0; i < length && EXTRACT_U_1(data); i++, data++)
-       ND_PRINT((ndo, "%c", (*data < 32 || *data > 126) ? '.' : *data));
+       ND_PRINT((ndo, "%c", (EXTRACT_U_1(data) < 32 || EXTRACT_U_1(data) > 126) ? '.' : EXTRACT_U_1(data)));
 
    return;
 
@@ -693,7 +693,7 @@ print_vendor_attr(netdissect_options *ndo,
                vendor_type,
                vendor_length));
         for (idx = 0; idx < vendor_length ; idx++, data++)
-            ND_PRINT((ndo, "%c", (*data < 32 || *data > 126) ? '.' : *data));
+            ND_PRINT((ndo, "%c", (EXTRACT_U_1(data) < 32 || EXTRACT_U_1(data) > 126) ? '.' : EXTRACT_U_1(data)));
         length-=vendor_length;
     }
     return;
@@ -734,7 +734,7 @@ print_attr_num(netdissect_options *ndo,
          if (!*data)
             ND_PRINT((ndo, "Tag[Unused] "));
          else
-            ND_PRINT((ndo, "Tag[%d] ", *data));
+            ND_PRINT((ndo, "Tag[%d] ", EXTRACT_U_1(data)));
          data++;
          data_value = EXTRACT_BE_U_3(data);
       }
@@ -796,7 +796,7 @@ print_attr_num(netdissect_options *ndo,
 
         case TUNNEL_PREFERENCE:
             if (*data)
-               ND_PRINT((ndo, "Tag[%d] ", *data));
+               ND_PRINT((ndo, "Tag[%d] ", EXTRACT_U_1(data)));
             else
                ND_PRINT((ndo, "Tag[Unused] "));
             data++;
@@ -806,7 +806,7 @@ print_attr_num(netdissect_options *ndo,
         case EGRESS_VLAN_ID:
             ND_PRINT((ndo, "%s (0x%02x) ",
                    tok2str(rfc4675_tagged,"Unknown tag",EXTRACT_U_1(data)),
-                   *data));
+                   EXTRACT_U_1(data)));
             data++;
             ND_PRINT((ndo, "%d", EXTRACT_BE_U_3(data)));
           break;
@@ -1008,7 +1008,7 @@ print_attr_strange(netdissect_options *ndo,
               ND_PRINT((ndo, "User cannot change password"));
            data++;
            ND_TCHECK_1(data);
-           ND_PRINT((ndo, ", Min password length: %d", *data));
+           ND_PRINT((ndo, ", Min password length: %d", EXTRACT_U_1(data)));
            data++;
            ND_PRINT((ndo, ", created at: "));
            ND_TCHECK_4(data);

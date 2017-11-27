@@ -191,7 +191,7 @@ auth_print(netdissect_options *ndo, register const u_char *pptr)
                  bfd_auth_header->auth_type,
                  bfd_auth_header->auth_len));
                 pptr += 2;
-                ND_PRINT((ndo, "\n\t  Auth Key ID: %d", *pptr));
+                ND_PRINT((ndo, "\n\t  Auth Key ID: %d", EXTRACT_U_1(pptr)));
 
         switch(bfd_auth_header->auth_type) {
             case AUTH_PASSWORD:

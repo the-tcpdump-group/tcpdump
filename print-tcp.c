@@ -461,7 +461,7 @@ tcp_print(netdissect_options *ndo,
                         case TCPOPT_WSCALE:
                                 datalen = 1;
                                 LENCHECK(datalen);
-                                ND_PRINT((ndo, " %u", *cp));
+                                ND_PRINT((ndo, " %u", EXTRACT_U_1(cp)));
                                 break;
 
                         case TCPOPT_SACK:

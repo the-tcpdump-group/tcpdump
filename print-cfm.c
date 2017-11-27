@@ -588,7 +588,7 @@ cfm_print(netdissect_options *ndo,
             ND_PRINT((ndo, ", Vendor: %s (%u), Sub-Type %u",
                    tok2str(oui_values,"Unknown", EXTRACT_BE_U_3(tptr)),
                    EXTRACT_BE_U_3(tptr),
-                   *(tptr + 3)));
+                   EXTRACT_U_1(tptr + 3)));
             hexdump = TRUE;
             break;
 

@@ -336,7 +336,7 @@ static void
 pptp_err_code_print(netdissect_options *ndo,
                     const uint8_t *err_code)
 {
-	ND_PRINT((ndo, " ERR_CODE(%u", *err_code));
+	ND_PRINT((ndo, " ERR_CODE(%u", EXTRACT_U_1(err_code)));
 	if (ndo->ndo_vflag) {
 		ND_PRINT((ndo, ":%s", tok2str(pptp_errcode_str, "?", EXTRACT_U_1(err_code))));
 	}
@@ -482,7 +482,7 @@ static void
 pptp_result_code_print(netdissect_options *ndo,
                        const uint8_t *result_code, int ctrl_msg_type)
 {
-	ND_PRINT((ndo, " RESULT_CODE(%u", *result_code));
+	ND_PRINT((ndo, " RESULT_CODE(%u", EXTRACT_U_1(result_code)));
 	if (ndo->ndo_vflag) {
 		const struct tok *dict =
 			ctrl_msg_type == PPTP_CTRL_MSG_TYPE_SCCRP    ? pptp_scrrp_str :

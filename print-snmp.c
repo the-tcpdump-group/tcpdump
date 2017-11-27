@@ -682,7 +682,7 @@ asn1_print_octets(netdissect_options *ndo, struct be *elem)
 
 	ND_TCHECK2(*p, asnlen);
 	for (i = asnlen; i-- > 0; p++)
-		ND_PRINT((ndo, "_%.2x", *p));
+		ND_PRINT((ndo, "_%.2x", EXTRACT_U_1(p)));
 	return 0;
 
 trunc:
@@ -712,7 +712,7 @@ asn1_print_string(netdissect_options *ndo, struct be *elem)
 		ND_PRINT((ndo, "\""));
 	} else {
 		for (i = asnlen; i-- > 0; p++) {
-			ND_PRINT((ndo, first ? "%.2x" : "_%.2x", *p));
+			ND_PRINT((ndo, first ? "%.2x" : "_%.2x", EXTRACT_U_1(p)));
 			first = 0;
 		}
 	}
@@ -825,7 +825,7 @@ asn1_print(netdissect_options *ndo,
 		p = (const u_char *)elem->data.raw;
 		ND_TCHECK2(*p, asnlen);
 		for (i = asnlen; i-- != 0; p++) {
-			ND_PRINT((ndo, (i == asnlen-1) ? "%u" : ".%u", *p));
+			ND_PRINT((ndo, (i == asnlen-1) ? "%u" : ".%u", EXTRACT_U_1(p)));
 		}
 		break;
 

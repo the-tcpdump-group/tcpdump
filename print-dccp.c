@@ -542,7 +542,7 @@ static int dccp_print_option(netdissect_options *ndo, const u_char *option, u_in
 		optlen = EXTRACT_U_1(option + 1);
 		if (optlen < 2) {
 			if (*option >= 128)
-				ND_PRINT((ndo, "CCID option %u optlen too short", *option));
+				ND_PRINT((ndo, "CCID option %u optlen too short", EXTRACT_U_1(option)));
 			else
 				ND_PRINT((ndo, "%s optlen too short",
 					  tok2str(dccp_option_values, "Option %u", EXTRACT_U_1(option))));
@@ -554,7 +554,7 @@ static int dccp_print_option(netdissect_options *ndo, const u_char *option, u_in
 	if (hlen < optlen) {
 		if (*option >= 128)
 			ND_PRINT((ndo, "CCID option %u optlen goes past header length",
-				  *option));
+				  EXTRACT_U_1(option)));
 		else
 			ND_PRINT((ndo, "%s optlen goes past header length",
 				  tok2str(dccp_option_values, "Option %u", EXTRACT_U_1(option))));
@@ -563,7 +563,7 @@ static int dccp_print_option(netdissect_options *ndo, const u_char *option, u_in
 	ND_TCHECK2(*option, optlen);
 
 	if (*option >= 128) {
-		ND_PRINT((ndo, "CCID option %d", *option));
+		ND_PRINT((ndo, "CCID option %d", EXTRACT_U_1(option)));
 		switch (optlen) {
 			case 4:
 				ND_PRINT((ndo, " %u", EXTRACT_BE_U_2(option + 2)));

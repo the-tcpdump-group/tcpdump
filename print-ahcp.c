@@ -373,11 +373,11 @@ ahcp_print(netdissect_options *ndo, const u_char *cp, const u_int len)
 			} else {
 				/* Hopcount */
 				ND_TCHECK_1(cp);
-				ND_PRINT((ndo, "\n\tHopcount %u", *cp));
+				ND_PRINT((ndo, "\n\tHopcount %u", EXTRACT_U_1(cp)));
 				cp += 1;
 				/* Original Hopcount */
 				ND_TCHECK_1(cp);
-				ND_PRINT((ndo, ", Original Hopcount %u", *cp));
+				ND_PRINT((ndo, ", Original Hopcount %u", EXTRACT_U_1(cp)));
 				cp += 1;
 				/* Nonce */
 				ND_TCHECK_4(cp);
