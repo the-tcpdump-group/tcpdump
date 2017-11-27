@@ -243,7 +243,7 @@ eap_print(netdissect_options *ndo,
                        bittok2str(eap_tls_flags_values, "none", EXTRACT_U_1((tptr + 5))),
                        EXTRACT_U_1(tptr + 5)));
 
-                if (EAP_TLS_EXTRACT_BIT_L(*(tptr+5))) {
+                if (EAP_TLS_EXTRACT_BIT_L(EXTRACT_U_1(tptr + 5))) {
                     ND_TCHECK_4(tptr + 6);
 		    ND_PRINT((ndo, " len %u", EXTRACT_BE_U_4(tptr + 6)));
                 }
@@ -257,7 +257,7 @@ eap_print(netdissect_options *ndo,
                        bittok2str(eap_tls_flags_values, "none", EXTRACT_U_1((tptr + 5))),
                        EXTRACT_U_1(tptr + 5)));
 
-                if (EAP_TLS_EXTRACT_BIT_L(*(tptr+5))) {
+                if (EAP_TLS_EXTRACT_BIT_L(EXTRACT_U_1(tptr + 5))) {
                     ND_TCHECK_4(tptr + 6);
                     ND_PRINT((ndo, " len %u", EXTRACT_BE_U_4(tptr + 6)));
                 }

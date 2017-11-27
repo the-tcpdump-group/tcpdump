@@ -106,10 +106,10 @@ udld_print (netdissect_options *ndo, const u_char *pptr, u_int length)
 
     ND_TCHECK2(*tptr, UDLD_HEADER_LEN);
 
-    code = UDLD_EXTRACT_OPCODE(*tptr);
+    code = UDLD_EXTRACT_OPCODE(EXTRACT_U_1(tptr));
 
     ND_PRINT((ndo, "UDLDv%u, Code %s (%x), Flags [%s] (0x%02x), length %u",
-           UDLD_EXTRACT_VERSION(*tptr),
+           UDLD_EXTRACT_VERSION(EXTRACT_U_1(tptr)),
            tok2str(udld_code_values, "Reserved", code),
            code,
            bittok2str(udld_flags_values, "none", EXTRACT_U_1((tptr + 1))),
