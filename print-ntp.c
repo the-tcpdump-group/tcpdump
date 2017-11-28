@@ -616,15 +616,7 @@ print_ntp_digest(netdissect_options *ndo, const unsigned i_lev,
 				indent(ndo, i_lev);
 			else
 				ND_PRINT((ndo, ", "));
-			switch (length) {
-			case 16:
-				ND_PRINT((ndo, "MD5-"));
-				break;
-			case 20:
-				ND_PRINT((ndo, "SHA1-"));
-				break;
-			}
-			ND_PRINT((ndo, "Digest="));
+			ND_PRINT((ndo, "%u-bit Digest=", length * 8));
 		} else
 			ND_PRINT((ndo, " "));
 		ND_PRINT((ndo, "%08x", EXTRACT_BE_U_4(digest)));
