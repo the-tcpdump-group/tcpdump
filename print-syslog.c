@@ -95,8 +95,8 @@ syslog_print(netdissect_options *ndo,
         msg_off++;
         ND_TCHECK_1(pptr + msg_off);
         while (msg_off <= SYSLOG_MAX_DIGITS &&
-               *(pptr+msg_off) >= '0' &&
-               *(pptr+msg_off) <= '9') {
+               EXTRACT_U_1(pptr + msg_off) >= '0' &&
+               EXTRACT_U_1(pptr + msg_off) <= '9') {
             pri = pri * 10 + (*(pptr+msg_off) - '0');
             msg_off++;
             ND_TCHECK_1(pptr + msg_off);

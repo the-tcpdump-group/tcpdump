@@ -516,7 +516,7 @@ telnet_print(netdissect_options *ndo, const u_char *sp, u_int length)
 	osp = sp;
 
 	ND_TCHECK(*sp);
-	while (length > 0 && *sp == IAC) {
+	while (length > 0 && EXTRACT_U_1(sp) == IAC) {
 		/*
 		 * Parse the Telnet command without printing it,
 		 * to determine its length.

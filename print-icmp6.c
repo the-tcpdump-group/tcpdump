@@ -1322,7 +1322,7 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 			ND_PRINT((ndo," lifetime %us, domain(s):",
                                   EXTRACT_BE_U_4(&opds->nd_opt_dnssl_lifetime)));
 			domp = cp + 8; /* domain names, variable-sized, RFC1035-encoded */
-			while (domp < cp + (op->nd_opt_len << 3) && *domp != '\0')
+			while (domp < cp + (op->nd_opt_len << 3) && EXTRACT_U_1(domp) != '\0')
 			{
 				ND_PRINT((ndo, " "));
 				if ((domp = ns_nprint (ndo, domp, bp)) == NULL)

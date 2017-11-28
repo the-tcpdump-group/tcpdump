@@ -465,7 +465,7 @@ asn1_parse(netdissect_options *ndo,
 		 */
 		id = 0;
 		ND_TCHECK(*p);
-		while (*p & ASN_BIT8) {
+		while (EXTRACT_U_1(p) & ASN_BIT8) {
 			if (len < 1) {
 				ND_PRINT((ndo, "[Xtagfield?]"));
 				return -1;
