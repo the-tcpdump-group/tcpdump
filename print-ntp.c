@@ -936,7 +936,7 @@ print_ntp_digest(netdissect_options *ndo, const unsigned i_lev,
 			ND_PRINT((ndo, ", Digest="));
 		} else
 			ND_PRINT((ndo, " "));
-		ND_PRINT((ndo, "%08x", EXTRACT_32BITS(digest)));
+		ND_PRINT((ndo, "%08x", EXTRACT_BE_U_4(digest)));
 		++digest;
 		length -= sizeof(uint32_t);
 	}
@@ -1083,7 +1083,7 @@ ntp_control_print(netdissect_options *ndo,
 				((const uint8_t *)cd + endpos + padlen);
 			ND_TCHECK(*key_id);
 			indent(ndo, i_lev + 1);
-			ND_PRINT((ndo, "KeyID=%u", EXTRACT_32BITS(*key_id)));
+			ND_PRINT((ndo, "KeyID=%u", EXTRACT_BE_U_4(*key_id)));
 			unprocessed -= sizeof(*key_id);
 
 			++key_id;	/* digest follows Key ID */
