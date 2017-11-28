@@ -229,16 +229,16 @@ name_len(netdissect_options *ndo,
 
     if (s >= maxbuf)
 	return(-1);	/* name goes past the end of the buffer */
-    ND_TCHECK2(*s, 1);
+    ND_TCHECK_1(s);
     c = *s;
     if ((c & 0xC0) == 0xC0)
 	return(2);
     while (*s) {
 	if (s >= maxbuf)
 	    return(-1);	/* name goes past the end of the buffer */
-	ND_TCHECK2(*s, 1);
+	ND_TCHECK_1(s);
 	s += (*s) + 1;
-	ND_TCHECK2(*s, 1);
+	ND_TCHECK_1(s);
     }
     return(PTR_DIFF(s, s0) + 1);
 
