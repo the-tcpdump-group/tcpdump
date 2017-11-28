@@ -913,8 +913,8 @@ ntp_control_print_assocs(netdissect_options *ndo, const uint8_t *dp,
 	for (; count >= 4; dp += 4, count -= 4) {
 		ND_TCHECK2(*dp, 4);
 		indent(ndo, i_lev);
-		ND_PRINT((ndo, "assoc=%5u: ", EXTRACT_16BITS(dp)));
-		ntp_control_print_PSW(ndo, EXTRACT_16BITS(dp + 2), i_lev, "");
+		ND_PRINT((ndo, "assoc=%5u: ", EXTRACT_BE_U_2(dp)));
+		ntp_control_print_PSW(ndo, EXTRACT_BE_U_2(dp + 2), i_lev, "");
 	}
 	return;
 trunc:
