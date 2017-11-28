@@ -1190,7 +1190,7 @@ ntp_reserved_print(netdissect_options *ndo,
 	unsigned i_lev = 1;		/* indent level */
 
 	ND_TCHECK(rd->magic);
-	s = EXTRACT_16BITS(&rd->magic);
+	s = EXTRACT_BE_U_2(&rd->magic);
 	R = (s & 0x8000) >> 15;
 	M = (s & 0x4000) >> 14;
 	mode = (rd->magic & MODEMASK) >> MODESHIFT;
@@ -1198,7 +1198,7 @@ ntp_reserved_print(netdissect_options *ndo,
 	ND_PRINT((ndo, "R=%u, M=%u, mode==%u (reserved)", R, M, mode));
 
 	ND_TCHECK(rd->sequence);
-	s = EXTRACT_16BITS(&rd->sequence);
+	s = EXTRACT_BE_U_2(&rd->sequence);
 	A = (s & 0x8000) >> 15;
 	sequence = (s & 0x7fff) >> 1;
 	ND_PRINT((ndo, ", A=%u, M=%u, Sequence=%u", A, M, sequence));
@@ -1206,14 +1206,14 @@ ntp_reserved_print(netdissect_options *ndo,
 	ND_PRINT((ndo, ", Implem.=%u, ReqCode=%u", rd->implem, rd->req_code));
 
 	ND_TCHECK(rd->err_count);
-	s = EXTRACT_16BITS(&rd->err_count);
+	s = EXTRACT_BE_U_2(&rd->err_count);
 	err = (s & 0xf000) >> 12;
 	count = (s & 0x0fff);
 	indent(ndo, i_lev);
 	ND_PRINT((ndo, "Err=%u, Count=%u", err, count));
 
 	ND_TCHECK(rd->mbz_size);
-	s = EXTRACT_16BITS(&rd->mbz_size);
+	s = EXTRACT_BE_U_2(&rd->mbz_size);
 	mbz = (s & 0xf000) >> 12;
 	size = (s & 0x0fff);
 	ND_PRINT((ndo, ", MBZ=%u, Size=%u", mbz, size));
