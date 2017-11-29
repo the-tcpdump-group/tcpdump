@@ -84,7 +84,7 @@ static const struct tok rstp_obj_port_role_values[] = {
     { 0, NULL}
 };
 
-#define ND_TCHECK_BRIDGE_ID(p) ND_TCHECK2(*(p), 8)
+#define ND_TCHECK_BRIDGE_ID(p) ND_TCHECK_8(p)
 
 static char *
 stp_print_bridge_id(const u_char *p)

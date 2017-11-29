@@ -90,7 +90,7 @@ static int resp_get_length(netdissect_options *, register const u_char *, int, c
 #define FIND_CRLF(_ptr, _len)                   \
     for (;;) {                                  \
         LCHECK2(_len, 2);                       \
-        ND_TCHECK2(*_ptr, 2);                   \
+        ND_TCHECK_2(_ptr);                   \
         if (*_ptr == '\r' && *(_ptr+1) == '\n') \
             break;                              \
         _ptr++;                                 \

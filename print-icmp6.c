@@ -1350,7 +1350,7 @@ icmp6_opt_print(netdissect_options *ndo, const u_char *bp, int resid)
 			case 1:
 				break;
 			case 2:
-				ND_TCHECK2(*in6p, 8);
+				ND_TCHECK_8(in6p);
 				memcpy(&in6, opri + 1, 8);
 				break;
 			case 3:
