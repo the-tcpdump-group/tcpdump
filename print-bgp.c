@@ -732,13 +732,15 @@ bgp_vpn_rd_print(netdissect_options *ndo,
         snprintf(pos, sizeof(rd) - (pos - rd), "%u:%u (= %u.%u.%u.%u)",
                  EXTRACT_BE_U_2(pptr + 2),
                  EXTRACT_BE_U_4(pptr + 4),
-                 *(pptr+4), *(pptr+5), *(pptr+6), *(pptr+7));
+                 EXTRACT_U_1(pptr + 4), EXTRACT_U_1(pptr + 5),
+                 EXTRACT_U_1(pptr + 6), EXTRACT_U_1(pptr + 7));
         break;
         /* IP-address:AS fmt*/
 
     case 1:
         snprintf(pos, sizeof(rd) - (pos - rd), "%u.%u.%u.%u:%u",
-            *(pptr+2), *(pptr+3), *(pptr+4), *(pptr+5),
+            EXTRACT_U_1(pptr + 2), EXTRACT_U_1(pptr + 3),
+            EXTRACT_U_1(pptr + 4), EXTRACT_U_1(pptr + 5),
             EXTRACT_BE_U_2(pptr + 6));
         break;
 
@@ -746,8 +748,9 @@ bgp_vpn_rd_print(netdissect_options *ndo,
     case 2:
 	snprintf(pos, sizeof(rd) - (pos - rd), "%s:%u (%u.%u.%u.%u:%u)",
 	    as_printf(ndo, astostr, sizeof(astostr), EXTRACT_BE_U_4(pptr + 2)),
-	    EXTRACT_BE_U_2(pptr + 6), *(pptr+2), *(pptr+3), *(pptr+4),
-	    *(pptr+5), EXTRACT_BE_U_2(pptr + 6));
+	    EXTRACT_BE_U_2(pptr + 6), EXTRACT_U_1(pptr + 2),
+	    EXTRACT_U_1(pptr + 3), EXTRACT_U_1(pptr + 4),
+	    EXTRACT_U_1(pptr + 5), EXTRACT_BE_U_2(pptr + 6));
         break;
     default:
         snprintf(pos, sizeof(rd) - (pos - rd), "unknown RD format");
