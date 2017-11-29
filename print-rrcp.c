@@ -125,7 +125,7 @@ rrcp_print(netdissect_options *ndo,
 		  EXTRACT_BE_U_2(cp + RRCP_AUTHKEY_OFFSET)));
 	}
 	if (rrcp_proto==1 && rrcp_opcode==0 &&
-	     ((*(cp + RRCP_OPCODE_ISREPLY_OFFSET)) & RRCP_ISREPLY)){
+	     ((EXTRACT_U_1(cp + RRCP_OPCODE_ISREPLY_OFFSET)) & RRCP_ISREPLY)){
 	    ND_TCHECK_4(cp + RRCP_VENDOR_ID_OFFSET);
 	    ND_PRINT((ndo, " downlink_port=%d, uplink_port=%d, uplink_mac=%s, vendor_id=%08x ,chip_id=%04x ",
 		     EXTRACT_U_1(cp + RRCP_DOWNLINK_PORT_OFFSET),

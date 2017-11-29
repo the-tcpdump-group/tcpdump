@@ -114,7 +114,7 @@ geneve_opts_print(netdissect_options *ndo, const u_char *bp, u_int len)
 
         opt_class = EXTRACT_BE_U_2(bp);
         opt_type = EXTRACT_U_1(bp + 2);
-        opt_len = 4 + ((*(bp + 3) & OPT_LEN_MASK) * 4);
+        opt_len = 4 + ((EXTRACT_U_1(bp + 3) & OPT_LEN_MASK) * 4);
 
         ND_PRINT((ndo, "class %s (0x%x) type 0x%x%s len %u",
                   format_opt_class(opt_class), opt_class, opt_type,
