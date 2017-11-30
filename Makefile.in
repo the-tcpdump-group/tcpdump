@@ -334,7 +334,7 @@ EXTRA_DIST = \
 	config.h.in \
 	config.sub \
 	configure \
-	configure.in \
+	configure.ac \
 	install-sh \
 	lbl/os-osf4.h \
 	lbl/os-solaris2.h \
