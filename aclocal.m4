@@ -606,12 +606,13 @@ AC_DEFUN(AC_LBL_LIBPCAP,
             # we add the source directory for the local libpcap, so
             # we pick up its header files.
             #
-            # We do, however, want its additional libraries, because
-            # it makes calls to routines in those libraries, so we'll
-            # need to link with them.
+            # We do, however, want its additional libraries, as required
+            # when linking statically, because it makes calls to
+            # routines in those libraries, so we'll need to link with
+            # them, because we'll be linking statically with it.
             #
             $2="-I$local_pcap_dir $$2"
-            additional_libs=`"$PCAP_CONFIG" --additinoal-libs`
+            additional_libs=`"$PCAP_CONFIG" --static --additional-libs`
             libpcap="$libpcap $additional_libs"
         else
             #
