@@ -133,7 +133,7 @@ syslog_print(netdissect_options *ndo,
     /* print the syslog text in verbose mode */
     for (; msg_off < len; msg_off++) {
         ND_TCHECK_1(pptr + msg_off);
-        safeputchar(ndo, *(pptr + msg_off));
+        safeputchar(ndo, EXTRACT_U_1(pptr + msg_off));
     }
 
     if (ndo->ndo_vflag > 1)
